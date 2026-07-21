@@ -30,11 +30,42 @@ class CatalogImportTests(unittest.TestCase):
 
     def test_real_catalog_counts(self) -> None:
         self.assertEqual(len(self.snapshot.assets_documents), 4)
-        self.assertEqual(len(self.snapshot.assets), 58)
-        self.assertEqual(len(self.snapshot.queries), 4)
+        self.assertEqual(len(self.snapshot.assets), 60)
+        self.assertEqual(len(self.snapshot.queries), 5)
         self.assertEqual(len(self.snapshot.lifecycle_documents), 9)
         self.assertEqual(len(self.snapshot.lifecycle_records), 0)
         self.assertIn("ARCH-INTENT-001", self.snapshot.assets)
+
+    def test_local_ci_assets_and_query_contract(self) -> None:
+        self.assertIn("CI-WORKFLOW-001", self.snapshot.assets)
+        self.assertIn("CI-VALIDATOR-001", self.snapshot.assets)
+        recipe = self.snapshot.queries["QUERY-CI-VALIDATE-001"]
+        self.assertEqual(
+            recipe["command"],
+            [
+                "uv",
+                "run",
+                "--locked",
+                "--managed-python",
+                "python",
+                "-B",
+                "scripts/validate_ci.py",
+            ],
+        )
+        self.assertFalse(recipe["network_required"])
+        self.assertEqual(recipe["write_effects"], "NONE")
+        self.assertNotIn(
+            "CODEX_PILOT",
+            self.snapshot.manifest["deferred_capabilities"],
+        )
+        self.assertIn(
+            "REMOTE_CI",
+            self.snapshot.manifest["deferred_capabilities"],
+        )
+        self.assertIn(
+            "CLEAN_CLONE",
+            self.snapshot.manifest["deferred_capabilities"],
+        )
 
     def test_duplicate_across_registries_rejected(self) -> None:
         manifest, assets, queries, lifecycle = self.documents()

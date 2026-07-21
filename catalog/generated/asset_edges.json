@@ -223,6 +223,26 @@
       "target_asset_id": "CTRL-UVLOCK-001"
     },
     {
+      "source_asset_id": "CI-VALIDATOR-001",
+      "relation": "depends_on",
+      "target_asset_id": "CTRL-UVLOCK-001"
+    },
+    {
+      "source_asset_id": "CI-VALIDATOR-001",
+      "relation": "validated_by",
+      "target_asset_id": "CATALOG-VALIDATOR-001"
+    },
+    {
+      "source_asset_id": "CI-WORKFLOW-001",
+      "relation": "depends_on",
+      "target_asset_id": "CI-VALIDATOR-001"
+    },
+    {
+      "source_asset_id": "CI-WORKFLOW-001",
+      "relation": "governed_by",
+      "target_asset_id": "CTRL-AGENTS-001"
+    },
+    {
       "source_asset_id": "CTRL-AGENTS-001",
       "relation": "governed_by",
       "target_asset_id": "CTRL-TASK-03-001"
@@ -235,7 +255,7 @@
     {
       "source_asset_id": "CTRL-QUALITY-GATE-001",
       "relation": "validated_by",
-      "target_asset_id": "CATALOG-VALIDATOR-001"
+      "target_asset_id": "CI-VALIDATOR-001"
     },
     {
       "source_asset_id": "CTRL-TASK-03-001",

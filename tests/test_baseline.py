@@ -43,6 +43,21 @@ class RepositoryStatePolicyTests(unittest.TestCase):
         arguments.update(overrides)
         return module.classify_state(**arguments)
 
+    def classify_atom7(self, **overrides: object) -> str:
+        arguments = {
+            "head_oid": module.ATOM5_WORK_ACCEPTANCE_COMMIT_OID,
+            "commit_count": module.ATOM5_WORK_ACCEPTANCE_COMMIT_COUNT,
+            "parent_oid": module.ATOM5_COMMIT_OID,
+            "tracked": module.atom7_repository_files(),
+            "staged": set(module.ATOM7_LOCAL_CI_FILES),
+            "untracked": set(),
+            "unstaged": set(),
+            "commit_subject": module.ATOM5_WORK_ACCEPTANCE_COMMIT_SUBJECT,
+            "commit_changed": set(module.ATOM5_WORK_ACCEPTANCE_FILES),
+        }
+        arguments.update(overrides)
+        return module.classify_state(**arguments)
+
     def test_pre_git_import_staged_state_remains_valid(self) -> None:
         state = module.classify_state(
             head_oid=module.BASE_COMMIT_OID,
@@ -120,7 +135,7 @@ class RepositoryStatePolicyTests(unittest.TestCase):
 
     def test_atom5_work_acceptance_exact_committed_state_passes(self) -> None:
         state = self.classify_atom5_acceptance(
-            head_oid="f" * 40,
+            head_oid=module.ATOM5_WORK_ACCEPTANCE_COMMIT_OID,
             commit_count=module.ATOM5_WORK_ACCEPTANCE_COMMIT_COUNT,
             parent_oid=module.ATOM5_COMMIT_OID,
             staged=set(),
@@ -128,6 +143,91 @@ class RepositoryStatePolicyTests(unittest.TestCase):
             commit_changed=set(module.ATOM5_WORK_ACCEPTANCE_FILES),
         )
         self.assertEqual(state, "ATOM5_WORK_ACCEPTANCE_COMMITTED")
+
+    def test_atom7_exact_staged_state_passes(self) -> None:
+        self.assertEqual(
+            self.classify_atom7(),
+            "ATOM7_LOCAL_CI_CANDIDATE_STAGED",
+        )
+
+    def test_atom7_exact_committed_state_passes(self) -> None:
+        state = self.classify_atom7(
+            head_oid="f" * 40,
+            commit_count=module.ATOM7_LOCAL_CI_COMMIT_COUNT,
+            parent_oid=module.ATOM5_WORK_ACCEPTANCE_COMMIT_OID,
+            staged=set(),
+            commit_subject=module.ATOM7_LOCAL_CI_COMMIT_SUBJECT,
+            commit_changed=set(module.ATOM7_LOCAL_CI_FILES),
+        )
+        self.assertEqual(state, "ATOM7_LOCAL_CI_CANDIDATE_COMMITTED")
+
+    def test_atom7_missing_path_fails(self) -> None:
+        staged = set(module.ATOM7_LOCAL_CI_FILES)
+        staged.remove(".github/workflows/ci.yml")
+        self.assertEqual(
+            self.classify_atom7(staged=staged),
+            "INVALID_REPOSITORY_STATE",
+        )
+
+    def test_atom7_extra_path_fails(self) -> None:
+        self.assertEqual(
+            self.classify_atom7(
+                staged=set(module.ATOM7_LOCAL_CI_FILES) | {"unexpected.txt"}
+            ),
+            "INVALID_REPOSITORY_STATE",
+        )
+
+    def test_atom7_mixed_or_untracked_state_fails(self) -> None:
+        self.assertEqual(
+            self.classify_atom7(unstaged={"README.md"}),
+            "INVALID_REPOSITORY_STATE",
+        )
+        self.assertEqual(
+            self.classify_atom7(untracked={"unexpected.txt"}),
+            "INVALID_REPOSITORY_STATE",
+        )
+
+    def test_atom7_unstaged_only_state_fails(self) -> None:
+        self.assertEqual(
+            self.classify_atom7(
+                staged=set(),
+                unstaged=set(module.ATOM7_LOCAL_CI_FILES),
+            ),
+            "INVALID_REPOSITORY_STATE",
+        )
+
+    def test_atom7_wrong_parent_or_subject_fails(self) -> None:
+        committed = {
+            "head_oid": "f" * 40,
+            "commit_count": module.ATOM7_LOCAL_CI_COMMIT_COUNT,
+            "parent_oid": module.ATOM5_WORK_ACCEPTANCE_COMMIT_OID,
+            "staged": set(),
+            "commit_subject": module.ATOM7_LOCAL_CI_COMMIT_SUBJECT,
+            "commit_changed": set(module.ATOM7_LOCAL_CI_FILES),
+        }
+        self.assertEqual(
+            self.classify_atom7(**(committed | {"parent_oid": module.ATOM5_COMMIT_OID})),
+            "INVALID_REPOSITORY_STATE",
+        )
+        self.assertEqual(
+            self.classify_atom7(**(committed | {"commit_subject": "ci: arbitrary"})),
+            "INVALID_REPOSITORY_STATE",
+        )
+
+    def test_atom7_wrong_committed_file_set_fails(self) -> None:
+        changed = set(module.ATOM7_LOCAL_CI_FILES)
+        changed.remove("catalog/generated/asset_edges.json")
+        self.assertEqual(
+            self.classify_atom7(
+                head_oid="f" * 40,
+                commit_count=module.ATOM7_LOCAL_CI_COMMIT_COUNT,
+                parent_oid=module.ATOM5_WORK_ACCEPTANCE_COMMIT_OID,
+                staged=set(),
+                commit_subject=module.ATOM7_LOCAL_CI_COMMIT_SUBJECT,
+                commit_changed=changed,
+            ),
+            "INVALID_REPOSITORY_STATE",
+        )
 
     def test_atom5_work_acceptance_missing_core_fails(self) -> None:
         staged = set(module.ATOM5_WORK_ACCEPTANCE_FILES)
@@ -271,6 +371,10 @@ class RepositoryStatePolicyTests(unittest.TestCase):
         self.assertEqual(len(module.ATOM5_CREATED_FILES), 16)
         self.assertEqual(len(module.ATOM5_CHANGED_FILES), 28)
         self.assertEqual(len(module.ATOM5_WORK_ACCEPTANCE_FILES), 5)
+        self.assertEqual(len(module.ATOM7_LOCAL_CI_MODIFIED_FILES), 15)
+        self.assertEqual(len(module.ATOM7_LOCAL_CI_CREATED_FILES), 3)
+        self.assertEqual(len(module.ATOM7_LOCAL_CI_FILES), 18)
+        self.assertEqual(module.ATOM7_EXPECTED_REPOSITORY_FILE_COUNT, 77)
         self.assertEqual(
             module.ATOM5_COMMIT_SUBJECT,
             "feat: add registry skeletons and generated navigation",
@@ -278,6 +382,10 @@ class RepositoryStatePolicyTests(unittest.TestCase):
         self.assertEqual(
             module.ATOM5_WORK_ACCEPTANCE_COMMIT_SUBJECT,
             "fix: validate Atom 5 Work acceptance",
+        )
+        self.assertEqual(
+            module.ATOM7_LOCAL_CI_COMMIT_SUBJECT,
+            "ci: add pinned repository validation",
         )
 
     def test_exact_import_style_partition(self) -> None:

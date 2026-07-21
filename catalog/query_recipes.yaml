@@ -108,3 +108,27 @@ recipes:
   output_contract:
     format: text
     max_records: 100
+- recipe_id: QUERY-CI-VALIDATE-001
+  record_version: '1.0'
+  purpose: Run the complete platform-neutral repository gate with exact runtime, lock, security, Catalog, generated-view, and test checks.
+  kind: local_command
+  read_only: true
+  bounded: true
+  network_required: false
+  write_effects: NONE
+  timeout_seconds: 120
+  command:
+  - uv
+  - run
+  - --locked
+  - --managed-python
+  - python
+  - -B
+  - scripts/validate_ci.py
+  parameters: []
+  target_asset_ids:
+  - CI-WORKFLOW-001
+  - CI-VALIDATOR-001
+  output_contract:
+    format: text
+    max_records: 100

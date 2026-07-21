@@ -10,10 +10,11 @@ dependencies = [
 
 [tool.uv]
 package = false
+required-version = "==0.11.29"
 
 [tool.solana-alpha-lab]
 task = "TASK-03"
-stage = "CATALOG_FOUNDATION_STAGED"
+stage = "ATOM7_LOCAL_CI_CANDIDATE"
 exact_python_pin = "3.13.14"
 exact_powershell_pin = "7.6.3"
 catalog_version = "0.1.0"

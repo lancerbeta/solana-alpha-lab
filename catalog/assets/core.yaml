@@ -79,7 +79,7 @@ records:
     repository_path: AGENTS.md
   integrity:
     kind: sha256
-    sha256: 66598006482a5d6261f49f570d0a445071a180ce673385f22b41443219ca1b22
+    sha256: de156ba35d4e6fc623af575e1240145ce38f3f9f3668489dc3aaf0212cb52dbc
   access:
     mode: read_only
     method: file
@@ -110,7 +110,7 @@ records:
     repository_path: docs/tasks/TASK-03.md
   integrity:
     kind: sha256
-    sha256: 1233d5be005ef4ccae92f59be157b1fd1b028eb018bd960f949540ca2f7e0920
+    sha256: 47e52bc5a28f5c97dbbd9e364e31a4dfe148e9f24687d4d929b4decbd095496a
   access:
     mode: read_only
     method: file
@@ -140,7 +140,7 @@ records:
     repository_path: pyproject.toml
   integrity:
     kind: sha256
-    sha256: b5ea5ae8543bac762053b868bb7cfd7d58b9905d73632f10d7577d0c1931dece
+    sha256: f03ab4586ac55ccf8e55ac32b661ca394dde5941af6424fcb5be37644ffb66c8
   access:
     mode: read_only
     method: file
@@ -189,7 +189,7 @@ records:
 - asset_id: CTRL-QUALITY-GATE-001
   record_version: '1.1'
   asset_type: script
-  purpose: One-command local quality gate for runtime, secrets, Catalog, repository policy, and hooks.
+  purpose: Windows compatibility wrapper for the platform-neutral repository validation gate.
   status: IMPLEMENTED_UNVERIFIED
   origin: REPOSITORY
   as_of: '2026-07-21'
@@ -200,14 +200,79 @@ records:
     repository_path: scripts/validate.ps1
   integrity:
     kind: sha256
-    sha256: b0545a860925d14870fd4d5a81bbf7cc1c1324c4f5e63582ecf64499385be80c
+    sha256: 5a3b2a03a8df957259b452940ee78f785b5868723c7449e492dd2bf1a1bd8347
   access:
     mode: read_only
     method: command
-    recipe_id: QUERY-CATALOG-VALIDATE-001
+    recipe_id: QUERY-CI-VALIDATE-001
     network_required: false
     secrets_required: false
   relations:
+  - relation_type: validated_by
+    target_asset_id: CI-VALIDATOR-001
+  consumers:
+  - TASK-03
+  evidence: []
+  classification:
+    contains_secrets: false
+    contains_raw_data: false
+    sensitivity: INTERNAL_NON_SECRET
+- asset_id: CI-WORKFLOW-001
+  record_version: '1.0'
+  asset_type: script
+  purpose: Immutable-pinned GitHub Actions workflow candidate for one read-only repository validation job.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-07-21'
+  truth_owner: TASK-03
+  location:
+    kind: git_path
+    logical_uri: repo://.github/workflows/ci.yml
+    repository_path: .github/workflows/ci.yml
+  integrity:
+    kind: sha256
+    sha256: 596a1f8b4687533f2690815a06b1ba97d8ff2f2f940d7cc7c56e4b4f6be38423
+  access:
+    mode: read_only
+    method: file
+    network_required: false
+    secrets_required: false
+  relations:
+  - relation_type: depends_on
+    target_asset_id: CI-VALIDATOR-001
+  - relation_type: governed_by
+    target_asset_id: CTRL-AGENTS-001
+  consumers:
+  - TASK-03
+  evidence: []
+  classification:
+    contains_secrets: false
+    contains_raw_data: false
+    sensitivity: INTERNAL_NON_SECRET
+- asset_id: CI-VALIDATOR-001
+  record_version: '1.0'
+  asset_type: script
+  purpose: Single platform-neutral gate for runtime, lock, secrets, Catalog, generated views, repository policy, and tests.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-07-21'
+  truth_owner: TASK-03
+  location:
+    kind: git_path
+    logical_uri: repo://scripts/validate_ci.py
+    repository_path: scripts/validate_ci.py
+  integrity:
+    kind: sha256
+    sha256: a43c437b2fb1b807f5ccd15ead3cb655e9f9d68edcdff7e85eaee51d70bc2d15
+  access:
+    mode: read_only
+    method: command
+    recipe_id: QUERY-CI-VALIDATE-001
+    network_required: false
+    secrets_required: false
+  relations:
+  - relation_type: depends_on
+    target_asset_id: CTRL-UVLOCK-001
   - relation_type: validated_by
     target_asset_id: CATALOG-VALIDATOR-001
   consumers:

@@ -1,42 +1,66 @@
 # Solana Memecoin Intraday Alpha Lab
 
-A bounded, evidence-first research system for executable Solana memecoin alpha on a 15-minute to 4-hour horizon.
+A bounded, evidence-first research system for executable Solana memecoin alpha
+on a 15-minute to 4-hour horizon.
 
 ## Current repository stage
 
-The accepted local history contains the repository baseline and Project Asset Catalog foundation. The current staged candidate imports exact TASK-01 and TASK-02 pre-Git evidence and registers `ARCH-INTENT-001` without creating a new commit or remote.
+Atom 5 is Work-accepted and canonical Atom 6 is closed by Atom-5 evidence. The
+current repository change is the Atom 7A local CI candidate: a pinned workflow
+and one platform-neutral validation gate. It has not run on GitHub and is not
+Work-accepted. Private remote activation and clean-clone evidence remain pending.
+
+The Catalog contains 60 assets, 4 asset shards, 4 schemas, and 5 read-only query
+recipes. All nine lifecycle registries remain empty.
+
+## Exact prerequisites
+
+- CPython `3.13.14`;
+- uv `0.11.29`;
+- dependencies resolved only from the committed `uv.lock`.
+
+No repository or environment secret is required for validation.
+
+## Platform-neutral validation
 
 ```text
-HEAD: ee6119ae0b7750710c7f822c50137ed95b4977e9
-state: PRE_GIT_IMPORT_STAGED
-repository files after import: 58
-Catalog assets: 44
-Catalog query recipes: 4
-Catalog schemas: 3
-imported exact bytes: 20
-external immutable bundles: 2
-bundle-only superseded records: 1
-architecture intents: 1
+uv run --locked --managed-python python -B scripts/validate_ci.py
 ```
 
-## One-command validation
+The gate checks exact runtime and uv pins, lock immutability, fake-secret
+rejection, repository secret scanning, Catalog schemas and semantics, stable-ID
+resolution, generated navigation freshness, exact pre-Git provenance,
+repository state, hooks, EOL policy, and the full test suite.
+
+On the validated Windows workstation, the compatibility command delegates to
+the same gate:
 
 ```powershell
 pwsh -NoProfile -ExecutionPolicy Bypass -File .\scripts\validate.ps1
 ```
 
-The gate validates runtime/lock, repository secrets, Catalog schema and semantics, stable-ID resolution, exact import hashes, provenance and availability, architecture intent boundaries, Git state, EOL policy, receipts, and tests.
+## Future private clone bootstrap
 
-## Pre-Git provenance policy
+Remote activation is not part of the local candidate. After separate Work
+authorization supplies the private repository URL and exact commit:
 
-- imported bytes remain historical references with `origin=PRE_GIT`;
-- source bundles stay outside Git and are registered by exact SHA-256;
-- `first_reliable_available_at` is preserved;
-- backfill/import does not create earlier availability;
-- exact imported evidence preserves source bytes even when historical formatting includes an extra final blank line; hashes and provenance, not style normalization, govern those files;
-- superseded validators remain bundle-only and are not activated;
-- current architecture intent is dated 2026-07-21 and is not attributed to earlier tasks.
+```text
+git clone <PRIVATE_REPOSITORY_URL> <BOUNDED_LOCAL_DIRECTORY>
+cd <BOUNDED_LOCAL_DIRECTORY>
+git checkout --detach <AUTHORIZED_COMMIT_SHA>
+uv run --locked --managed-python python -B scripts/validate_ci.py
+```
 
-## Security boundary
+Do not infer a remote URL from local metadata. Clean-clone acceptance requires a
+sanitized receipt proving the exact checkout, clean tree, and passing gate.
 
-Do not place `.env`, credentials, tokens, seed phrases, private keys, raw data, wallet mappings, or machine-specific absolute paths in this repository. No provider call, remote, push, Codex write, or real-money action is authorized by this staged import.
+## Security and provenance boundary
+
+Do not place `.env`, credentials, tokens, seed phrases, private keys, raw data,
+wallet mappings, or machine-specific absolute paths in this repository. Exact
+TASK-01/TASK-02 imported bytes remain historical references; source bundles stay
+outside Git and are registered by SHA-256. `ARCH-INTENT-001` remains
+`ACCEPTED_DIRECTION_NOT_IMPLEMENTED`.
+
+Current external CI status: `NOT_RUN_EXPECTED`. Provider/API/RPC calls and cash
+spend remain zero.

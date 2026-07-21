@@ -1,14 +1,16 @@
 ---
-handoff_status: WORK_ACCEPTED_CHECKPOINT
+handoff_status: IMPLEMENTATION_CANDIDATE
 task_id: TASK-03
-atom_id: T03-A5-ACC
+atom_id: T03-A7A
 canonical_status_owner: ChatGPT_Project_Work
 last_accepted_atom: T03-A5
-accepted_commit: cd1465ea5de1fb33cee272422863b05d9459bd83
-accepted_parent: 85ab008b762edacd335bba3d9776100bc52775ce
-accepted_repository_state: ATOM5_REGISTRIES_NAVIGATION_COMMITTED
+accepted_commit: 9c021299b83804f5cb744c1d9dc9a8124de43f59
+accepted_parent: cd1465ea5de1fb33cee272422863b05d9459bd83
+accepted_repository_state: ATOM5_WORK_ACCEPTANCE_COMMITTED
 atom_6: SATISFIED_BY_ATOM5_EVIDENCE
-next_candidate: ATOM_7_NOT_YET_AUTHORIZED
+candidate_parent: 9c021299b83804f5cb744c1d9dc9a8124de43f59
+candidate_repository_state: ATOM7_LOCAL_CI_CANDIDATE_COMMITTED
+next_candidate: A7A_WORK_ACCEPTANCE_NOT_YET_AUTHORIZED
 remote: NONE
 ---
 
@@ -22,6 +24,9 @@ remote: NONE
 - accepted commit: `cd1465ea5de1fb33cee272422863b05d9459bd83`;
 - accepted parent: `85ab008b762edacd335bba3d9776100bc52775ce`;
 - repository state: `ATOM5_REGISTRIES_NAVIGATION_COMMITTED`;
+- Work-acceptance checkpoint: `9c021299b83804f5cb744c1d9dc9a8124de43f59`,
+  parent `cd1465ea5de1fb33cee272422863b05d9459bd83`, repository state
+  `ATOM5_WORK_ACCEPTANCE_COMMITTED`;
 - exact implementation set: 28/28;
 - Catalog: 58 assets, 4 shards, 4 schemas, and 4 queries;
 - lifecycle registries: 9, all production records empty;
@@ -39,6 +44,24 @@ targeted and full validation PASS, reproducible generated navigation checks,
 acceptance-safe task/handoff updates, clean working tree, remote `NONE`, and no
 authorized external write or scope expansion.
 
+## Atom 7A implementation candidate
+
+- exact local write-set: 18/18;
+- proposed commit subject: `ci: add pinned repository validation`;
+- exact runtime contract: Python `3.13.14`, uv `0.11.29`;
+- clean-HEAD offline preflight: 64/64 PASS;
+- targeted CI, repository-state, Catalog, generator, and lifecycle tests:
+  68/68 PASS;
+- CI workflow: immutable-pinned, push/main only, `contents: read`;
+- platform-neutral command:
+  `uv run --locked --managed-python python -B scripts/validate_ci.py`;
+- CI execution: `NOT_RUN_EXPECTED`;
+- private remote, default remote branch, and clean-clone evidence: `MISSING`;
+- provider/API/RPC calls: 0; cash spend: USD 0.
+
+This checkpoint is repository implementation evidence, not Work acceptance.
+The last accepted atom remains Atom 5. Atom 7B/7C remain unauthorized.
+
 ## Truth boundaries
 
 - `ARCH-INTENT-001` remains `ACCEPTED_DIRECTION_NOT_IMPLEMENTED`;
@@ -47,7 +70,7 @@ authorized external write or scope expansion.
 - no Project Source, roadmap, canonical living state, remote status, provider,
   database, VPS, wallet, signer, or external system was changed;
 - TASK-03 remains `IN_PROGRESS`;
-- Atom 7 is `NOT YET AUTHORIZED`.
+- Atom 7A remains a local implementation candidate only.
 
 ## Historical limitations retained
 
@@ -57,5 +80,5 @@ authorized external write or scope expansion.
 
 ## Exact next action
 
-Wait for explicit Work authorization for Atom 7. Do not start it, create a
-remote, or push.
+Request separate Work acceptance of the completed Atom 7A local candidate. Do
+not create a remote, push, or start Atom 7B/7C.

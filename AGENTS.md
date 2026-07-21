@@ -12,7 +12,7 @@ ChatGPT Project / Work owns mission, roadmap, task status, acceptance, and canon
 
 TASK-03 — Private repository, controls & Project Asset Catalog.
 
-Current atom: Atom 5 registry skeletons and Catalog-generated navigation, as an implementation candidate without Work acceptance, remote, or lifecycle activation.
+Current atom: Atom 7A local pinned CI candidate, without remote execution, Work acceptance, clean-clone evidence, or lifecycle activation.
 
 ## WORKSPACE_ONLY
 
@@ -41,6 +41,14 @@ Network access is off by default. No provider/API/RPC call, account creation, pa
 External context such as AOT/ALBS is advisory only. It must carry as-of, first-reliable-availability, TTL, revision, hash, confidence/calibration, lineage, evidence, and allowed-consumer fields. It cannot directly command a bot and cannot bypass risk, execution, inventory, holdout, or economics gates.
 
 ## VALIDATION_COMMAND
+
+Platform-neutral gate:
+
+```text
+uv run --locked --managed-python python -B scripts/validate_ci.py
+```
+
+Windows compatibility wrapper:
 
 ```powershell
 pwsh -NoProfile -ExecutionPolicy Bypass -File .\scripts\validate.ps1

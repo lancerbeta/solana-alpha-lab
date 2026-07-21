@@ -5,7 +5,7 @@ implementation_status: IN_PROGRESS
 canonical_status_owner: ChatGPT_Project_Work
 phase: P0
 cash_cap: USD_0
-repository_commit: cd1465ea5de1fb33cee272422863b05d9459bd83
+repository_commit: 9c021299b83804f5cb744c1d9dc9a8124de43f59
 remote: NONE
 provider_calls: 0
 contains_secrets: false
@@ -25,7 +25,9 @@ contains_secrets: false
 - Atom 5 — Registries and generated navigation / `T03-A5`: accepted PASS.
 - Accepted Atom 5 commit: `cd1465ea5de1fb33cee272422863b05d9459bd83`;
   parent: `85ab008b762edacd335bba3d9776100bc52775ce`.
-- Accepted repository state: `ATOM5_REGISTRIES_NAVIGATION_COMMITTED`.
+- Atom 5 Work-acceptance checkpoint: `9c021299b83804f5cb744c1d9dc9a8124de43f59`;
+  parent: `cd1465ea5de1fb33cee272422863b05d9459bd83`.
+- Accepted repository state: `ATOM5_WORK_ACCEPTANCE_COMMITTED`.
 - Remote/push: absent. Provider/API/RPC calls: 0.
 
 ## Atom 5 Work acceptance
@@ -71,12 +73,38 @@ accepted Atom 5 validation evidence.
 - TASK-03 remains `IN_PROGRESS`.
 - Last accepted atom: Atom 5 / `T03-A5`.
 - Atom 6 is closed as `SATISFIED_BY_ATOM5_EVIDENCE` without a new implementation.
-- Atom 7 is `NOT YET AUTHORIZED`.
+- Atom 7A is authorized only as a local CI implementation candidate.
+- The Atom 7A candidate does not establish CI PASS, a private remote, a remote
+  default branch, or clean-clone acceptance.
+- Atom 7B and Atom 7C are `NOT YET AUTHORIZED`.
 - `ARCH-INTENT-001` remains `ACCEPTED_DIRECTION_NOT_IMPLEMENTED`.
 - No canonical lifecycle state, Project Source, roadmap, remote status, provider,
   database, VPS, wallet, signer, real-money action, or external service was changed.
 
+## Atom 7A local CI candidate
+
+- exact implementation inventory: 18 repository files;
+- workflow trigger: push to `main` only;
+- workflow permissions: `contents: read` only;
+- immutable action pins: `actions/checkout` and `astral-sh/setup-uv`;
+- exact executable contract: Python `3.13.14`, uv `0.11.29`, committed
+  `uv.lock` unchanged;
+- one platform-neutral validation command:
+  `uv run --locked --managed-python python -B scripts/validate_ci.py`;
+- Windows validation delegates to the same gate;
+- targeted CI, repository-state, Catalog, generator, and lifecycle tests:
+  68/68 PASS;
+- workflow execution status: `NOT_RUN_EXPECTED` until a separately authorized
+  first push;
+- remote/default branch/clean clone: `MISSING`;
+- provider/API/RPC calls: 0; cash spend: USD 0;
+- all nine production lifecycle registries remain empty.
+
+The clean-HEAD preflight passed 64/64 locally with the approved existing uv
+runtime and offline controls. This is implementation evidence only; it does not
+change the last Work-accepted atom or canonical status.
+
 ## Next safe checkpoint
 
-Await explicit Work authorization for Atom 7. Do not start it, create a remote,
-or push.
+After the local candidate commit and validation, request separate Work acceptance
+of Atom 7A. Do not create a remote, push, or start Atom 7B/7C.
