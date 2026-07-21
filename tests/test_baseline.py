@@ -103,6 +103,21 @@ class RepositoryStatePolicyTests(unittest.TestCase):
         arguments.update(overrides)
         return module.classify_state(**arguments)
 
+    def classify_atom7_ref_repair(self, **overrides: object) -> str:
+        arguments = {
+            "head_oid": module.ATOM7_FINAL_HANDOFF_COMMIT_OID,
+            "commit_count": module.ATOM7_FINAL_HANDOFF_COMMIT_COUNT,
+            "parent_oid": module.ATOM7_CI_CLEAN_CLONE_REPAIR_COMMIT_OID,
+            "tracked": module.atom7_repository_files(),
+            "staged": set(module.ATOM7_REF_NORMALIZATION_REPAIR_FILES),
+            "untracked": set(),
+            "unstaged": set(),
+            "commit_subject": module.ATOM7_FINAL_HANDOFF_COMMIT_SUBJECT,
+            "commit_changed": set(module.ATOM7_FINAL_HANDOFF_FILES),
+        }
+        arguments.update(overrides)
+        return module.classify_state(**arguments)
+
     def test_pre_git_import_staged_state_remains_valid(self) -> None:
         state = module.classify_state(
             head_oid=module.BASE_COMMIT_OID,
@@ -443,6 +458,61 @@ class RepositoryStatePolicyTests(unittest.TestCase):
                     "INVALID_REPOSITORY_STATE",
                 )
 
+    def test_atom7_ref_repair_exact_staged_state_passes(self) -> None:
+        self.assertEqual(
+            self.classify_atom7_ref_repair(),
+            "ATOM7_REF_NORMALIZATION_REPAIR_STAGED",
+        )
+
+    def test_atom7_ref_repair_exact_committed_state_passes(self) -> None:
+        self.assertEqual(
+            self.classify_atom7_ref_repair(
+                head_oid="f" * 40,
+                commit_count=module.ATOM7_REF_NORMALIZATION_REPAIR_COMMIT_COUNT,
+                parent_oid=module.ATOM7_FINAL_HANDOFF_COMMIT_OID,
+                staged=set(),
+                commit_subject=module.ATOM7_REF_NORMALIZATION_REPAIR_COMMIT_SUBJECT,
+                commit_changed=set(module.ATOM7_REF_NORMALIZATION_REPAIR_FILES),
+            ),
+            "ATOM7_REF_NORMALIZATION_REPAIR_COMMITTED",
+        )
+
+    def test_atom7_ref_repair_wrong_inventory_fails(self) -> None:
+        for overrides in (
+            {"staged": {"scripts/validate_baseline.py"}},
+            {
+                "staged": set(module.ATOM7_REF_NORMALIZATION_REPAIR_FILES)
+                | {"unexpected.txt"}
+            },
+            {"unstaged": {"tests/test_baseline.py"}},
+            {"untracked": {"unexpected.txt"}},
+        ):
+            with self.subTest(overrides=overrides):
+                self.assertEqual(
+                    self.classify_atom7_ref_repair(**overrides),
+                    "INVALID_REPOSITORY_STATE",
+                )
+
+    def test_atom7_ref_repair_wrong_commit_contract_fails(self) -> None:
+        committed = {
+            "head_oid": "f" * 40,
+            "commit_count": module.ATOM7_REF_NORMALIZATION_REPAIR_COMMIT_COUNT,
+            "parent_oid": module.ATOM7_FINAL_HANDOFF_COMMIT_OID,
+            "staged": set(),
+            "commit_subject": module.ATOM7_REF_NORMALIZATION_REPAIR_COMMIT_SUBJECT,
+            "commit_changed": set(module.ATOM7_REF_NORMALIZATION_REPAIR_FILES),
+        }
+        for overrides in (
+            {"parent_oid": module.ATOM7_CI_CLEAN_CLONE_REPAIR_COMMIT_OID},
+            {"commit_subject": "fix: arbitrary remote refs"},
+            {"commit_changed": {"tests/test_baseline.py"}},
+        ):
+            with self.subTest(overrides=overrides):
+                self.assertEqual(
+                    self.classify_atom7_ref_repair(**(committed | overrides)),
+                    "INVALID_REPOSITORY_STATE",
+                )
+
     def test_atom5_work_acceptance_missing_core_fails(self) -> None:
         staged = set(module.ATOM5_WORK_ACCEPTANCE_FILES)
         staged.remove("catalog/assets/core.yaml")
@@ -591,6 +661,7 @@ class RepositoryStatePolicyTests(unittest.TestCase):
         self.assertEqual(len(module.ATOM7_PRE_PUSH_REPAIR_FILES), 2)
         self.assertEqual(len(module.ATOM7_CI_CLEAN_CLONE_REPAIR_FILES), 7)
         self.assertEqual(len(module.ATOM7_FINAL_HANDOFF_FILES), 11)
+        self.assertEqual(len(module.ATOM7_REF_NORMALIZATION_REPAIR_FILES), 2)
         self.assertEqual(module.ATOM7_EXPECTED_REPOSITORY_FILE_COUNT, 77)
         self.assertEqual(
             module.ATOM5_COMMIT_SUBJECT,
@@ -615,6 +686,10 @@ class RepositoryStatePolicyTests(unittest.TestCase):
         self.assertEqual(
             module.ATOM7_FINAL_HANDOFF_COMMIT_SUBJECT,
             "docs: reconcile TASK-03 final handoff",
+        )
+        self.assertEqual(
+            module.ATOM7_REF_NORMALIZATION_REPAIR_COMMIT_SUBJECT,
+            "fix: normalize remote symbolic refs",
         )
         self.assertEqual(
             module.EXPECTED_DEFERRED_CAPABILITIES,
@@ -645,6 +720,50 @@ class RepositoryStatePolicyTests(unittest.TestCase):
         )
         self.assertNotIn("README.md", module.EXACT_IMPORT_FILES)
         self.assertIn("README.md", module.STYLE_CHECKED_CHANGED_FILES)
+
+
+class RemoteRefParserTests(unittest.TestCase):
+    def test_exact_symbolic_head_and_main_records_pass(self) -> None:
+        output = (
+            "refs/remotes/origin/HEAD\trefs/remotes/origin/main\n"
+            "refs/remotes/origin/main\t\n"
+        )
+        refs, target = module.parse_remote_ref_records(output)
+        self.assertEqual(refs, {"origin/HEAD", "origin/main"})
+        self.assertEqual(target, "refs/remotes/origin/main")
+
+    def test_origin_head_missing_or_incorrect_target_fails(self) -> None:
+        for target in ("", "refs/remotes/origin/other"):
+            with self.subTest(target=target):
+                output = (
+                    f"refs/remotes/origin/HEAD\t{target}\n"
+                    "refs/remotes/origin/main\t\n"
+                )
+                with self.assertRaisesRegex(
+                    AssertionError,
+                    "origin_head_target_invalid",
+                ):
+                    module.parse_remote_ref_records(output)
+
+    def test_truncated_short_remote_name_fails(self) -> None:
+        with self.assertRaisesRegex(
+            AssertionError,
+            "remote_ref_prefix_invalid",
+        ):
+            module.parse_remote_ref_records(
+                "origin\trefs/remotes/origin/main\n"
+            )
+
+    def test_extra_remote_ref_fails(self) -> None:
+        output = (
+            "refs/remotes/origin/main\t\n"
+            "refs/remotes/origin/other\t\n"
+        )
+        with self.assertRaisesRegex(
+            AssertionError,
+            "remote_ref_not_allowed:origin/other",
+        ):
+            module.parse_remote_ref_records(output)
 
 
 class GitTopologyPolicyTests(unittest.TestCase):

@@ -153,6 +153,9 @@ ATOM7_FINAL_HANDOFF_COMMIT_COUNT = (
 ATOM7_FINAL_HANDOFF_COMMIT_SUBJECT = (
     "docs: reconcile TASK-03 final handoff"
 )
+ATOM7_FINAL_HANDOFF_COMMIT_OID = (
+    "767d7a8c3eaa108d0b77db69a7182a9bda1f3fe0"
+)
 ATOM7_FINAL_HANDOFF_FILES = {
     "AGENTS.md",
     "README.md",
@@ -166,6 +169,16 @@ ATOM7_FINAL_HANDOFF_FILES = {
     "tests/test_baseline.py",
     "tests/test_catalog.py",
 }
+ATOM7_REF_NORMALIZATION_REPAIR_COMMIT_COUNT = (
+    ATOM7_FINAL_HANDOFF_COMMIT_COUNT + 1
+)
+ATOM7_REF_NORMALIZATION_REPAIR_COMMIT_SUBJECT = (
+    "fix: normalize remote symbolic refs"
+)
+ATOM7_REF_NORMALIZATION_REPAIR_FILES = {
+    "scripts/validate_baseline.py",
+    "tests/test_baseline.py",
+}
 EXPECTED_DEFERRED_CAPABILITIES = {"GRAPH_DATABASE"}
 EXPECTED_ORIGIN_URL = "https://github.com/lancerbeta/solana-alpha-lab.git"
 EXPECTED_CI_ORIGIN_URLS = {
@@ -174,6 +187,7 @@ EXPECTED_CI_ORIGIN_URLS = {
 }
 EXPECTED_GITHUB_REPOSITORY = "lancerbeta/solana-alpha-lab"
 EXPECTED_ORIGIN_FETCH_REFSPEC = "+refs/heads/*:refs/remotes/origin/*"
+REMOTE_REF_PREFIX = "refs/remotes/"
 CODEX_CAPTURE_REF_PATTERN = re.compile(
     r"^refs/codex/turn-diffs/captures/[0-9]{13}/"
     r"[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}/base$"
@@ -241,6 +255,41 @@ def policy_refs(all_refs: set[str]) -> set[str] | None:
             continue
         result.add(ref)
     return result
+
+
+def parse_remote_ref_records(output: str) -> tuple[set[str], str | None]:
+    """Parse full Git remote ref records and enforce the exact origin policy."""
+    remote_tracking_refs: set[str] = set()
+    remote_head_target = None
+    allowed_refs = {"origin/HEAD", "origin/main"}
+    expected_head_target = "refs/remotes/origin/main"
+
+    for line in output.splitlines():
+        if not line:
+            continue
+        if line.count("\t") != 1:
+            raise AssertionError("remote_ref_record_malformed")
+        full_name, symref = line.split("\t", 1)
+        if full_name != full_name.strip() or symref != symref.strip():
+            raise AssertionError("remote_ref_record_whitespace")
+        if not full_name.startswith(REMOTE_REF_PREFIX):
+            raise AssertionError("remote_ref_prefix_invalid")
+        name = full_name[len(REMOTE_REF_PREFIX) :]
+        if name not in allowed_refs:
+            raise AssertionError(f"remote_ref_not_allowed:{name}")
+        if name in remote_tracking_refs:
+            raise AssertionError(f"duplicate_remote_ref:{name}")
+        if name == "origin/HEAD":
+            if symref != expected_head_target:
+                raise AssertionError("origin_head_target_invalid")
+            remote_head_target = symref
+        elif symref:
+            raise AssertionError(f"unexpected_remote_symref:{name}")
+        remote_tracking_refs.add(name)
+
+    if remote_head_target is not None and "origin/main" not in remote_tracking_refs:
+        raise AssertionError("origin_head_target_missing")
+    return remote_tracking_refs, remote_head_target
 
 
 def classify_git_topology(
@@ -658,6 +707,31 @@ def classify_state(
         and commit_changed == ATOM7_FINAL_HANDOFF_FILES
     ):
         return "ATOM7_FINAL_HANDOFF_COMMITTED"
+    if (
+        head_oid == ATOM7_FINAL_HANDOFF_COMMIT_OID
+        and commit_count == ATOM7_FINAL_HANDOFF_COMMIT_COUNT
+        and parent_oid == ATOM7_CI_CLEAN_CLONE_REPAIR_COMMIT_OID
+        and tracked == atom7_files
+        and len(tracked) == ATOM7_EXPECTED_REPOSITORY_FILE_COUNT
+        and staged == ATOM7_REF_NORMALIZATION_REPAIR_FILES
+        and not unstaged
+        and not untracked
+        and commit_subject == ATOM7_FINAL_HANDOFF_COMMIT_SUBJECT
+        and commit_changed == ATOM7_FINAL_HANDOFF_FILES
+    ):
+        return "ATOM7_REF_NORMALIZATION_REPAIR_STAGED"
+    if (
+        commit_count == ATOM7_REF_NORMALIZATION_REPAIR_COMMIT_COUNT
+        and parent_oid == ATOM7_FINAL_HANDOFF_COMMIT_OID
+        and tracked == atom7_files
+        and len(tracked) == ATOM7_EXPECTED_REPOSITORY_FILE_COUNT
+        and not staged
+        and not unstaged
+        and not untracked
+        and commit_subject == ATOM7_REF_NORMALIZATION_REPAIR_COMMIT_SUBJECT
+        and commit_changed == ATOM7_REF_NORMALIZATION_REPAIR_FILES
+    ):
+        return "ATOM7_REF_NORMALIZATION_REPAIR_COMMITTED"
     return "INVALID_REPOSITORY_STATE"
 
 
@@ -845,6 +919,24 @@ def validate_atom7_final_handoff_staged_style_policy() -> None:
     )
 
 
+def validate_atom7_ref_normalization_repair_staged_style_policy() -> None:
+    diff = run(
+        [
+            "git",
+            "diff",
+            "--cached",
+            "--check",
+            "--",
+            *sorted(ATOM7_REF_NORMALIZATION_REPAIR_FILES),
+        ]
+    )
+    assert_check(
+        "atom7_ref_normalization_repair_staged_diff_check",
+        diff.returncode == 0,
+        diff.stdout.strip() + diff.stderr.strip(),
+    )
+
+
 def validate() -> None:
     github_actions = os.environ.get("GITHUB_ACTIONS", "").lower() == "true"
     branch_result = run(["git", "symbolic-ref", "--short", "HEAD"])
@@ -893,21 +985,14 @@ def validate() -> None:
         [
             "git",
             "for-each-ref",
-            "--format=%(refname:short)%09%(symref)",
+            "--format=%(refname)%09%(symref)",
             "refs/remotes",
         ]
     )
     remote_ref_code = remote_ref_result.returncode
-    remote_tracking_refs = set()
-    remote_head_target = None
-    for line in remote_ref_result.stdout.splitlines():
-        name, _, symref = line.partition("\t")
-        name = name.strip()
-        if not name:
-            continue
-        remote_tracking_refs.add(name)
-        if name == "origin/HEAD":
-            remote_head_target = symref.strip()
+    remote_tracking_refs, remote_head_target = parse_remote_ref_records(
+        remote_ref_result.stdout
+    )
     tag_code, tags = command_set(["git", "tag", "--list"])
     all_ref_code, all_refs = command_set(
         ["git", "for-each-ref", "--format=%(refname)"]
@@ -992,6 +1077,8 @@ def validate() -> None:
         "ATOM7_CI_CLEAN_CLONE_REPAIR_COMMITTED",
         "ATOM7_FINAL_HANDOFF_STAGED",
         "ATOM7_FINAL_HANDOFF_COMMITTED",
+        "ATOM7_REF_NORMALIZATION_REPAIR_STAGED",
+        "ATOM7_REF_NORMALIZATION_REPAIR_COMMITTED",
     }
     assert_check("repository_state", state in valid_states, state)
     if state == "ATOM7_FINAL_HANDOFF_STAGED":
@@ -1003,6 +1090,19 @@ def validate() -> None:
     if state == "ATOM7_FINAL_HANDOFF_COMMITTED":
         assert_check(
             "atom7_final_handoff_committed_topology",
+            topology
+            in {"PUBLISHED_LOCAL", "GITHUB_ACTIONS_CHECKOUT", "CLEAN_CLONE"},
+            topology,
+        )
+    if state == "ATOM7_REF_NORMALIZATION_REPAIR_STAGED":
+        assert_check(
+            "atom7_ref_normalization_repair_staged_topology",
+            topology == "PUBLISHED_LOCAL",
+            topology,
+        )
+    if state == "ATOM7_REF_NORMALIZATION_REPAIR_COMMITTED":
+        assert_check(
+            "atom7_ref_normalization_repair_committed_topology",
             topology
             in {"PUBLISHED_LOCAL", "GITHUB_ACTIONS_CHECKOUT", "CLEAN_CLONE"},
             topology,
@@ -1031,6 +1131,8 @@ def validate() -> None:
         assert_check("atom7_ci_clean_clone_repair_commit_contract", True)
     if state == "ATOM7_FINAL_HANDOFF_COMMITTED":
         assert_check("atom7_final_handoff_commit_contract", True)
+    if state == "ATOM7_REF_NORMALIZATION_REPAIR_COMMITTED":
+        assert_check("atom7_ref_normalization_repair_commit_contract", True)
     manifest = yaml.safe_load(
         (ROOT / "catalog/catalog_manifest.yaml").read_text(encoding="utf-8")
     )
@@ -1085,6 +1187,8 @@ def validate() -> None:
         validate_atom7_ci_clean_clone_repair_staged_style_policy()
     if state == "ATOM7_FINAL_HANDOFF_STAGED":
         validate_atom7_final_handoff_staged_style_policy()
+    if state == "ATOM7_REF_NORMALIZATION_REPAIR_STAGED":
+        validate_atom7_ref_normalization_repair_staged_style_policy()
     tests = run([sys.executable,"-B","-m","unittest","discover","-s","tests","-p","test_*.py"])
     if tests.stdout.strip(): print(tests.stdout.strip())
     if tests.stderr.strip(): print(tests.stderr.strip())
