@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Validate exact historical through Atom 7A TASK-03 repository states."""
+"""Validate exact historical through Atom 7 pre-push repair states."""
 
 from __future__ import annotations
 
@@ -7,11 +7,13 @@ import hashlib
 import importlib.metadata
 import json
 import os
+import re
 import subprocess
 import sys
 import tempfile
 import tomllib
 from pathlib import Path
+from urllib.parse import urlsplit
 
 ROOT = Path(__file__).resolve().parents[1]
 BASE_COMMIT_OID = 'ee6119ae0b7750710c7f822c50137ed95b4977e9'
@@ -87,6 +89,7 @@ ATOM5_WORK_ACCEPTANCE_COMMIT_SUBJECT = (
 ATOM5_WORK_ACCEPTANCE_COMMIT_OID = "9c021299b83804f5cb744c1d9dc9a8124de43f59"
 ATOM7_LOCAL_CI_COMMIT_COUNT = ATOM5_WORK_ACCEPTANCE_COMMIT_COUNT + 1
 ATOM7_LOCAL_CI_COMMIT_SUBJECT = "ci: add pinned repository validation"
+ATOM7_LOCAL_CI_COMMIT_OID = "4320b621f56bf86c8561be4a379dfc1d0e8937b2"
 ATOM7_LOCAL_CI_MODIFIED_FILES = {
     "AGENTS.md",
     "README.md",
@@ -114,6 +117,25 @@ ATOM7_LOCAL_CI_FILES = (
 )
 ATOM7_EXPECTED_REPOSITORY_FILE_COUNT = (
     ATOM5_EXPECTED_REPOSITORY_FILE_COUNT + len(ATOM7_LOCAL_CI_CREATED_FILES)
+)
+ATOM7_PRE_PUSH_REPAIR_COMMIT_COUNT = ATOM7_LOCAL_CI_COMMIT_COUNT + 1
+ATOM7_PRE_PUSH_REPAIR_COMMIT_SUBJECT = (
+    "fix: validate repository publication states"
+)
+ATOM7_PRE_PUSH_REPAIR_FILES = {
+    "scripts/validate_baseline.py",
+    "tests/test_baseline.py",
+}
+EXPECTED_ORIGIN_URL = "https://github.com/lancerbeta/solana-alpha-lab.git"
+EXPECTED_CI_ORIGIN_URLS = {
+    EXPECTED_ORIGIN_URL,
+    "https://github.com/lancerbeta/solana-alpha-lab",
+}
+EXPECTED_GITHUB_REPOSITORY = "lancerbeta/solana-alpha-lab"
+EXPECTED_ORIGIN_FETCH_REFSPEC = "+refs/heads/*:refs/remotes/origin/*"
+CODEX_CAPTURE_REF_PATTERN = re.compile(
+    r"^refs/codex/turn-diffs/captures/[0-9]{13}/"
+    r"[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}/base$"
 )
 FINGERPRINT_FILES = EXPECTED_CHANGED_FILES - {'docs/evidence/task03_atom4b_pre_git_import_receipt.json'}
 EXACT_IMPORT_FILES = {
@@ -145,6 +167,133 @@ def run(command: list[str], *, binary: bool = False):
 def command_set(command: list[str]) -> tuple[int, set[str]]:
     result = run(command)
     return result.returncode, {line.strip() for line in result.stdout.splitlines() if line.strip()}
+
+
+def command_lines(command: list[str]) -> tuple[int, tuple[str, ...]]:
+    result = run(command)
+    return result.returncode, tuple(
+        line.strip() for line in result.stdout.splitlines() if line.strip()
+    )
+
+
+def origin_url_is_safe(url: str, *, github_actions: bool) -> bool:
+    parsed = urlsplit(url)
+    allowed_urls = EXPECTED_CI_ORIGIN_URLS if github_actions else {EXPECTED_ORIGIN_URL}
+    return (
+        url in allowed_urls
+        and parsed.scheme == "https"
+        and parsed.hostname == "github.com"
+        and parsed.username is None
+        and parsed.password is None
+        and parsed.port is None
+        and not parsed.query
+        and not parsed.fragment
+    )
+
+
+def policy_refs(all_refs: set[str]) -> set[str] | None:
+    result = set()
+    for ref in all_refs:
+        if ref.startswith("refs/codex/"):
+            if not CODEX_CAPTURE_REF_PATTERN.fullmatch(ref):
+                return None
+            continue
+        result.add(ref)
+    return result
+
+
+def classify_git_topology(
+    *,
+    branch: str | None,
+    head_oid: str,
+    remotes: set[str],
+    fetch_urls: tuple[str, ...],
+    push_urls: tuple[str, ...],
+    fetch_refspecs: tuple[str, ...],
+    push_refspecs: tuple[str, ...],
+    upstream: str | None,
+    local_branches: set[str],
+    remote_tracking_refs: set[str],
+    tags: set[str],
+    all_refs: set[str],
+    github_actions: bool,
+    github_repository: str | None,
+    github_ref: str | None,
+    github_sha: str | None,
+) -> str:
+    if tags or push_refspecs:
+        return "INVALID_GIT_TOPOLOGY"
+    repository_refs = policy_refs(all_refs)
+    if repository_refs is None:
+        return "INVALID_GIT_TOPOLOGY"
+
+    if github_actions:
+        origin_ok = (
+            remotes == {"origin"}
+            and len(fetch_urls) == 1
+            and fetch_urls == push_urls
+            and origin_url_is_safe(fetch_urls[0], github_actions=True)
+            and fetch_refspecs == (EXPECTED_ORIGIN_FETCH_REFSPEC,)
+        )
+        refs_ok = (
+            branch in {None, "main"}
+            and local_branches <= {"main"}
+            and remote_tracking_refs <= {"origin/main"}
+            and repository_refs
+            <= {"refs/heads/main", "refs/remotes/origin/main"}
+        )
+        upstream_ok = (
+            (branch is None and upstream is None)
+            or (branch == "main" and upstream in {None, "origin/main"})
+        )
+        context_ok = (
+            github_repository == EXPECTED_GITHUB_REPOSITORY
+            and github_ref == "refs/heads/main"
+            and github_sha == head_oid
+        )
+        if origin_ok and refs_ok and upstream_ok and context_ok:
+            return "GITHUB_ACTIONS_CHECKOUT"
+        return "INVALID_GIT_TOPOLOGY"
+
+    if branch != "main" or local_branches != {"main"}:
+        return "INVALID_GIT_TOPOLOGY"
+
+    if not remotes:
+        if (
+            not fetch_urls
+            and not push_urls
+            and not fetch_refspecs
+            and upstream is None
+            and not remote_tracking_refs
+            and repository_refs == {"refs/heads/main"}
+        ):
+            return "PRE_REMOTE"
+        return "INVALID_GIT_TOPOLOGY"
+
+    origin_ok = (
+        remotes == {"origin"}
+        and fetch_urls == (EXPECTED_ORIGIN_URL,)
+        and push_urls == (EXPECTED_ORIGIN_URL,)
+        and origin_url_is_safe(fetch_urls[0], github_actions=False)
+        and fetch_refspecs == (EXPECTED_ORIGIN_FETCH_REFSPEC,)
+    )
+    if not origin_ok:
+        return "INVALID_GIT_TOPOLOGY"
+
+    if (
+        upstream is None
+        and not remote_tracking_refs
+        and repository_refs == {"refs/heads/main"}
+    ):
+        return "BOUND_PRE_PUSH"
+    if (
+        upstream == "origin/main"
+        and remote_tracking_refs == {"origin/main"}
+        and repository_refs
+        == {"refs/heads/main", "refs/remotes/origin/main"}
+    ):
+        return "PUBLISHED_LOCAL"
+    return "INVALID_GIT_TOPOLOGY"
 
 
 def tree_files(treeish: str) -> set[str]:
@@ -376,6 +525,31 @@ def classify_state(
         and commit_changed == ATOM7_LOCAL_CI_FILES
     ):
         return "ATOM7_LOCAL_CI_CANDIDATE_COMMITTED"
+    if (
+        head_oid == ATOM7_LOCAL_CI_COMMIT_OID
+        and commit_count == ATOM7_LOCAL_CI_COMMIT_COUNT
+        and parent_oid == ATOM5_WORK_ACCEPTANCE_COMMIT_OID
+        and tracked == atom7_files
+        and len(tracked) == ATOM7_EXPECTED_REPOSITORY_FILE_COUNT
+        and staged == ATOM7_PRE_PUSH_REPAIR_FILES
+        and not unstaged
+        and not untracked
+        and commit_subject == ATOM7_LOCAL_CI_COMMIT_SUBJECT
+        and commit_changed == ATOM7_LOCAL_CI_FILES
+    ):
+        return "ATOM7_PRE_PUSH_REPAIR_STAGED"
+    if (
+        commit_count == ATOM7_PRE_PUSH_REPAIR_COMMIT_COUNT
+        and parent_oid == ATOM7_LOCAL_CI_COMMIT_OID
+        and tracked == atom7_files
+        and len(tracked) == ATOM7_EXPECTED_REPOSITORY_FILE_COUNT
+        and not staged
+        and not unstaged
+        and not untracked
+        and commit_subject == ATOM7_PRE_PUSH_REPAIR_COMMIT_SUBJECT
+        and commit_changed == ATOM7_PRE_PUSH_REPAIR_FILES
+    ):
+        return "ATOM7_PRE_PUSH_REPAIR_COMMITTED"
     return "INVALID_REPOSITORY_STATE"
 
 
@@ -509,22 +683,126 @@ def validate_atom7_local_ci_staged_style_policy() -> None:
     )
 
 
+def validate_atom7_pre_push_repair_staged_style_policy() -> None:
+    diff = run(
+        [
+            "git",
+            "diff",
+            "--cached",
+            "--check",
+            "--",
+            *sorted(ATOM7_PRE_PUSH_REPAIR_FILES),
+        ]
+    )
+    assert_check(
+        "atom7_pre_push_repair_staged_diff_check",
+        diff.returncode == 0,
+        diff.stdout.strip() + diff.stderr.strip(),
+    )
+
+
 def validate() -> None:
-    branch = run(["git","symbolic-ref","--short","HEAD"]); assert_check("branch_main", branch.returncode == 0 and branch.stdout.strip() == "main")
+    github_actions = os.environ.get("GITHUB_ACTIONS", "").lower() == "true"
+    branch_result = run(["git", "symbolic-ref", "--short", "HEAD"])
+    branch_name = (
+        branch_result.stdout.strip() if branch_result.returncode == 0 else None
+    )
+    assert_check(
+        "branch_main_or_ci_detached",
+        (branch_result.returncode == 0 and branch_name == "main")
+        or (github_actions and branch_result.returncode != 0),
+    )
     head = run(["git","rev-parse","HEAD"]); assert_check("head_read", head.returncode == 0); head_oid = head.stdout.strip()
     count = run(["git","rev-list","--count","HEAD"]); assert_check("commit_count_read", count.returncode == 0); commit_count = int(count.stdout.strip())
     parent_oid = None
     if commit_count >= 2:
         parent = run(["git","rev-parse","HEAD^"]); assert_check("parent_read", parent.returncode == 0); parent_oid = parent.stdout.strip()
-    remote_code, remotes = command_set(["git","remote"])
+    remote_code, remotes = command_set(["git", "remote"])
+    fetch_url_code = push_url_code = fetch_refspec_code = push_refspec_code = 0
+    fetch_urls: tuple[str, ...] = ()
+    push_urls: tuple[str, ...] = ()
+    fetch_refspecs: tuple[str, ...] = ()
+    push_refspecs: tuple[str, ...] = ()
+    if "origin" in remotes:
+        fetch_url_code, fetch_urls = command_lines(
+            ["git", "remote", "get-url", "--all", "origin"]
+        )
+        push_url_code, push_urls = command_lines(
+            ["git", "remote", "get-url", "--push", "--all", "origin"]
+        )
+        fetch_refspec_code, fetch_refspecs = command_lines(
+            ["git", "config", "--get-all", "remote.origin.fetch"]
+        )
+        push_refspec_code, push_refspecs = command_lines(
+            ["git", "config", "--get-all", "remote.origin.push"]
+        )
+    upstream_result = run(
+        ["git", "rev-parse", "--abbrev-ref", "--symbolic-full-name", "@{upstream}"]
+    )
+    upstream = (
+        upstream_result.stdout.strip() if upstream_result.returncode == 0 else None
+    )
+    local_branch_code, local_branches = command_set(
+        ["git", "for-each-ref", "--format=%(refname:short)", "refs/heads"]
+    )
+    remote_ref_code, remote_tracking_refs = command_set(
+        ["git", "for-each-ref", "--format=%(refname:short)", "refs/remotes"]
+    )
+    tag_code, tags = command_set(["git", "tag", "--list"])
+    all_ref_code, all_refs = command_set(
+        ["git", "for-each-ref", "--format=%(refname)"]
+    )
     tracked_code, tracked = command_set(["git","ls-files"])
     staged_code, staged = command_set(["git","diff","--cached","--name-only"])
     untracked_code, untracked = command_set(["git","ls-files","--others","--exclude-standard"])
     unstaged_code, unstaged = command_set(["git","diff","--name-only"])
     subject = run(["git","show","-s","--format=%s","HEAD"])
     changed_code, commit_changed = command_set(["git","diff-tree","--no-commit-id","--name-only","-r","HEAD"])
-    assert_check("git_inventory_commands", all(c == 0 for c in (remote_code,tracked_code,staged_code,untracked_code,unstaged_code,subject.returncode,changed_code)))
-    assert_check("remote_count_zero", not remotes)
+    inventory_codes = (
+        remote_code,
+        fetch_url_code,
+        push_url_code,
+        fetch_refspec_code,
+        local_branch_code,
+        remote_ref_code,
+        tag_code,
+        all_ref_code,
+        tracked_code,
+        staged_code,
+        untracked_code,
+        unstaged_code,
+        subject.returncode,
+        changed_code,
+    )
+    assert_check(
+        "git_inventory_commands",
+        all(code == 0 for code in inventory_codes)
+        and push_refspec_code in {0, 1}
+        and (upstream_result.returncode == 0 or not upstream_result.stdout.strip()),
+    )
+    topology = classify_git_topology(
+        branch=branch_name,
+        head_oid=head_oid,
+        remotes=remotes,
+        fetch_urls=fetch_urls,
+        push_urls=push_urls,
+        fetch_refspecs=fetch_refspecs,
+        push_refspecs=push_refspecs,
+        upstream=upstream,
+        local_branches=local_branches,
+        remote_tracking_refs=remote_tracking_refs,
+        tags=tags,
+        all_refs=all_refs,
+        github_actions=github_actions,
+        github_repository=os.environ.get("GITHUB_REPOSITORY"),
+        github_ref=os.environ.get("GITHUB_REF"),
+        github_sha=os.environ.get("GITHUB_SHA"),
+    )
+    assert_check(
+        "repository_topology",
+        topology != "INVALID_GIT_TOPOLOGY",
+        topology,
+    )
     state = classify_state(
         head_oid=head_oid,
         commit_count=commit_count,
@@ -547,6 +825,8 @@ def validate() -> None:
         "ATOM5_WORK_ACCEPTANCE_COMMITTED",
         "ATOM7_LOCAL_CI_CANDIDATE_STAGED",
         "ATOM7_LOCAL_CI_CANDIDATE_COMMITTED",
+        "ATOM7_PRE_PUSH_REPAIR_STAGED",
+        "ATOM7_PRE_PUSH_REPAIR_COMMITTED",
     }
     assert_check("repository_state", state in valid_states, state)
     if state.startswith("ATOM7_"):
@@ -567,6 +847,8 @@ def validate() -> None:
         assert_check("atom5_work_acceptance_commit_contract", True)
     if state == "ATOM7_LOCAL_CI_CANDIDATE_COMMITTED":
         assert_check("atom7_local_ci_commit_contract", True)
+    if state == "ATOM7_PRE_PUSH_REPAIR_COMMITTED":
+        assert_check("atom7_pre_push_repair_commit_contract", True)
     assert_check("venv_present", (ROOT/".venv").is_dir())
     assert_check("runtime_exact", sys.version_info[:3] == EXPECTED_PYTHON)
     assert_check("runtime_is_venv", Path(sys.prefix).resolve() == (ROOT/".venv").resolve())
@@ -607,10 +889,13 @@ def validate() -> None:
         validate_atom5_work_acceptance_staged_style_policy()
     if state == "ATOM7_LOCAL_CI_CANDIDATE_STAGED":
         validate_atom7_local_ci_staged_style_policy()
+    if state == "ATOM7_PRE_PUSH_REPAIR_STAGED":
+        validate_atom7_pre_push_repair_staged_style_policy()
     tests = run([sys.executable,"-B","-m","unittest","discover","-s","tests","-p","test_*.py"])
     if tests.stdout.strip(): print(tests.stdout.strip())
     if tests.stderr.strip(): print(tests.stderr.strip())
     assert_check("unit_tests", tests.returncode == 0)
+    print(f"GIT_TOPOLOGY: {topology}")
     print(f"REPOSITORY_STATE: {state}")
     print("RESULT: PASS")
 
