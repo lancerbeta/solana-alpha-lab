@@ -78,7 +78,9 @@
             "evidence",
             "external_bundle",
             "pre_git_artifact",
-            "architecture_intent"
+            "architecture_intent",
+            "lifecycle_registry",
+            "generated_view"
           ]
         },
         "purpose": {

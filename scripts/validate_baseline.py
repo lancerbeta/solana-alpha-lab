@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Validate TASK-03 pre-Git import and Work-acceptance sync states."""
+"""Validate exact historical and Atom 5 TASK-03 repository states."""
 
 from __future__ import annotations
 
@@ -33,6 +33,45 @@ WORK_ACCEPTANCE_SYNC_FILES = {
 }
 WORK_ACCEPTANCE_COMMIT_COUNT = IMPORT_COMMIT_COUNT + 1
 WORK_ACCEPTANCE_COMMIT_SUBJECT = "fix: validate Work acceptance checkpoint"
+WORK_ACCEPTANCE_COMMIT_OID = "85ab008b762edacd335bba3d9776100bc52775ce"
+ATOM5_COMMIT_COUNT = WORK_ACCEPTANCE_COMMIT_COUNT + 1
+ATOM5_COMMIT_SUBJECT = "feat: add registry skeletons and generated navigation"
+ATOM5_MODIFIED_FILES = {
+    "AGENTS.md",
+    "catalog/catalog_manifest.yaml",
+    "catalog/assets/core.yaml",
+    "catalog/schemas/catalog_manifest.schema.json",
+    "catalog/schemas/asset_catalog.schema.json",
+    "scripts/validate_catalog.py",
+    "scripts/validate.ps1",
+    "scripts/validate_baseline.py",
+    "tests/test_catalog.py",
+    "tests/test_baseline.py",
+    "docs/tasks/TASK-03.md",
+    "docs/handoffs/latest.md",
+}
+ATOM5_CREATED_FILES = {
+    "catalog/assets/lifecycle.yaml",
+    "catalog/schemas/lifecycle_registry.schema.json",
+    "scripts/generate_navigation.py",
+    "tests/test_lifecycle_registries.py",
+    "tests/test_generate_navigation.py",
+    "registries/research_cycles.yaml",
+    "registries/hypotheses.yaml",
+    "registries/global_trial_ledger.yaml",
+    "registries/feature_catalog.yaml",
+    "registries/holdout_consumption.yaml",
+    "registries/strategies.yaml",
+    "registries/bot_instances.yaml",
+    "registries/reuse_candidates.yaml",
+    "registries/decisions_negative_results.yaml",
+    "docs/PROJECT_MAP.md",
+    "catalog/generated/asset_edges.json",
+}
+ATOM5_CHANGED_FILES = ATOM5_MODIFIED_FILES | ATOM5_CREATED_FILES
+ATOM5_EXPECTED_REPOSITORY_FILE_COUNT = (
+    EXPECTED_REPOSITORY_FILE_COUNT + len(ATOM5_CREATED_FILES)
+)
 FINGERPRINT_FILES = EXPECTED_CHANGED_FILES - {'docs/evidence/task03_atom4b_pre_git_import_receipt.json'}
 EXACT_IMPORT_FILES = {
     path
@@ -63,6 +102,25 @@ def run(command: list[str], *, binary: bool = False):
 def command_set(command: list[str]) -> tuple[int, set[str]]:
     result = run(command)
     return result.returncode, {line.strip() for line in result.stdout.splitlines() if line.strip()}
+
+
+def tree_files(treeish: str) -> set[str]:
+    code, files = command_set(["git", "ls-tree", "-r", "--name-only", treeish])
+    if code != 0:
+        raise AssertionError(f"tree_inventory_read_failed:{treeish}")
+    return files
+
+
+def import_repository_files() -> set[str]:
+    return tree_files(IMPORT_COMMIT_OID)
+
+
+def work_acceptance_repository_files() -> set[str]:
+    return tree_files(WORK_ACCEPTANCE_COMMIT_OID)
+
+
+def atom5_repository_files() -> set[str]:
+    return work_acceptance_repository_files() | ATOM5_CREATED_FILES
 
 
 def repository_files() -> set[str]:
@@ -102,8 +160,7 @@ def source_entries(state: str) -> dict[str, tuple[str, str]]:
         result = run(["git","ls-files","--stage","-z"], binary=True)
         if result.returncode != 0: raise AssertionError("index_read_failed")
         return parse_index_entries(result.stdout)
-    treeish = IMPORT_COMMIT_OID if state.startswith("WORK_ACCEPTANCE_SYNC_") else "HEAD"
-    result = run(["git","ls-tree","-r","-z",treeish], binary=True)
+    result = run(["git","ls-tree","-r","-z",IMPORT_COMMIT_OID], binary=True)
     if result.returncode != 0: raise AssertionError("head_tree_read_failed")
     return parse_tree_entries(result.stdout)
 
@@ -111,10 +168,8 @@ def source_entries(state: str) -> dict[str, tuple[str, str]]:
 def blob_bytes(state: str, path: str) -> bytes:
     if state == "PRE_GIT_IMPORT_STAGED":
         reference = f":{path}"
-    elif state.startswith("WORK_ACCEPTANCE_SYNC_"):
-        reference = f"{IMPORT_COMMIT_OID}:{path}"
     else:
-        reference = f"HEAD:{path}"
+        reference = f"{IMPORT_COMMIT_OID}:{path}"
     result = run(["git","show",reference], binary=True)
     if result.returncode != 0: raise AssertionError(f"blob_read_failed:{path}")
     return result.stdout
@@ -142,15 +197,38 @@ def classify_state(
     commit_subject: str | None = None,
     commit_changed: set[str] | None = None,
 ) -> str:
-    if head_oid == BASE_COMMIT_OID and commit_count == BASE_COMMIT_COUNT and tracked == repository_files() and len(tracked) == EXPECTED_REPOSITORY_FILE_COUNT and staged == EXPECTED_CHANGED_FILES and not untracked and not unstaged:
+    import_files = import_repository_files()
+    work_files = work_acceptance_repository_files()
+    atom5_files = atom5_repository_files()
+    if (
+        head_oid == BASE_COMMIT_OID
+        and commit_count == BASE_COMMIT_COUNT
+        and parent_oid == BASE_PARENT_OID
+        and tracked == import_files
+        and len(tracked) == EXPECTED_REPOSITORY_FILE_COUNT
+        and staged == EXPECTED_CHANGED_FILES
+        and not untracked
+        and not unstaged
+    ):
         return "PRE_GIT_IMPORT_STAGED"
-    if commit_count == BASE_COMMIT_COUNT + 1 and parent_oid == BASE_COMMIT_OID and tracked == repository_files() and len(tracked) == EXPECTED_REPOSITORY_FILE_COUNT and not staged and not untracked and not unstaged:
+    if (
+        head_oid == IMPORT_COMMIT_OID
+        and commit_count == IMPORT_COMMIT_COUNT
+        and parent_oid == BASE_COMMIT_OID
+        and tracked == import_files
+        and len(tracked) == EXPECTED_REPOSITORY_FILE_COUNT
+        and not staged
+        and not untracked
+        and not unstaged
+        and commit_subject == RECOMMENDED_COMMIT_MESSAGE
+        and commit_changed == EXPECTED_CHANGED_FILES
+    ):
         return "PRE_GIT_IMPORT_COMMITTED"
     if (
         head_oid == IMPORT_COMMIT_OID
         and commit_count == IMPORT_COMMIT_COUNT
         and parent_oid == BASE_COMMIT_OID
-        and tracked == repository_files()
+        and tracked == work_files
         and len(tracked) == EXPECTED_REPOSITORY_FILE_COUNT
         and staged == WORK_ACCEPTANCE_SYNC_FILES
         and not unstaged
@@ -158,9 +236,10 @@ def classify_state(
     ):
         return "WORK_ACCEPTANCE_SYNC_STAGED"
     if (
-        commit_count == WORK_ACCEPTANCE_COMMIT_COUNT
+        head_oid == WORK_ACCEPTANCE_COMMIT_OID
+        and commit_count == WORK_ACCEPTANCE_COMMIT_COUNT
         and parent_oid == IMPORT_COMMIT_OID
-        and tracked == repository_files()
+        and tracked == work_files
         and len(tracked) == EXPECTED_REPOSITORY_FILE_COUNT
         and not staged
         and not unstaged
@@ -169,6 +248,29 @@ def classify_state(
         and commit_changed == WORK_ACCEPTANCE_SYNC_FILES
     ):
         return "WORK_ACCEPTANCE_SYNC_COMMITTED"
+    if (
+        head_oid == WORK_ACCEPTANCE_COMMIT_OID
+        and commit_count == WORK_ACCEPTANCE_COMMIT_COUNT
+        and parent_oid == IMPORT_COMMIT_OID
+        and tracked == atom5_files
+        and len(tracked) == ATOM5_EXPECTED_REPOSITORY_FILE_COUNT
+        and staged == ATOM5_CHANGED_FILES
+        and not unstaged
+        and not untracked
+    ):
+        return "ATOM5_REGISTRIES_NAVIGATION_STAGED"
+    if (
+        commit_count == ATOM5_COMMIT_COUNT
+        and parent_oid == WORK_ACCEPTANCE_COMMIT_OID
+        and tracked == atom5_files
+        and len(tracked) == ATOM5_EXPECTED_REPOSITORY_FILE_COUNT
+        and not staged
+        and not unstaged
+        and not untracked
+        and commit_subject == ATOM5_COMMIT_SUBJECT
+        and commit_changed == ATOM5_CHANGED_FILES
+    ):
+        return "ATOM5_REGISTRIES_NAVIGATION_COMMITTED"
     return "INVALID_REPOSITORY_STATE"
 
 
@@ -248,8 +350,25 @@ def validate_work_acceptance_staged_style_policy() -> None:
     )
 
 
+def validate_atom5_staged_style_policy() -> None:
+    diff = run(
+        [
+            "git",
+            "diff",
+            "--cached",
+            "--check",
+            "--",
+            *sorted(ATOM5_CHANGED_FILES),
+        ]
+    )
+    assert_check(
+        "atom5_staged_diff_check",
+        diff.returncode == 0,
+        diff.stdout.strip() + diff.stderr.strip(),
+    )
+
+
 def validate() -> None:
-    assert_check("repository_file_count", len(repository_files()) == EXPECTED_REPOSITORY_FILE_COUNT)
     branch = run(["git","symbolic-ref","--short","HEAD"]); assert_check("branch_main", branch.returncode == 0 and branch.stdout.strip() == "main")
     head = run(["git","rev-parse","HEAD"]); assert_check("head_read", head.returncode == 0); head_oid = head.stdout.strip()
     count = run(["git","rev-list","--count","HEAD"]); assert_check("commit_count_read", count.returncode == 0); commit_count = int(count.stdout.strip())
@@ -281,13 +400,23 @@ def validate() -> None:
         "PRE_GIT_IMPORT_COMMITTED",
         "WORK_ACCEPTANCE_SYNC_STAGED",
         "WORK_ACCEPTANCE_SYNC_COMMITTED",
+        "ATOM5_REGISTRIES_NAVIGATION_STAGED",
+        "ATOM5_REGISTRIES_NAVIGATION_COMMITTED",
     }
     assert_check("repository_state", state in valid_states, state)
+    expected_file_count = (
+        ATOM5_EXPECTED_REPOSITORY_FILE_COUNT
+        if state.startswith("ATOM5_")
+        else EXPECTED_REPOSITORY_FILE_COUNT
+    )
+    assert_check("repository_file_count", len(repository_files()) == expected_file_count)
     if state == "PRE_GIT_IMPORT_COMMITTED":
         message = run(["git","log","-1","--pretty=%B"])
         assert_check("import_commit_message", message.returncode == 0 and message.stdout.strip() == RECOMMENDED_COMMIT_MESSAGE, message.stdout.strip())
     if state == "WORK_ACCEPTANCE_SYNC_COMMITTED":
         assert_check("work_acceptance_commit_contract", True)
+    if state == "ATOM5_REGISTRIES_NAVIGATION_COMMITTED":
+        assert_check("atom5_commit_contract", True)
     assert_check("venv_present", (ROOT/".venv").is_dir())
     assert_check("runtime_exact", sys.version_info[:3] == EXPECTED_PYTHON)
     assert_check("runtime_is_venv", Path(sys.prefix).resolve() == (ROOT/".venv").resolve())
@@ -311,13 +440,18 @@ def validate() -> None:
     manifest_hash, content_hash = fingerprints(state)
     assert_check("payload_manifest_fingerprint", receipt.get("payload_manifest_sha256") == manifest_hash)
     assert_check("payload_content_fingerprint", receipt.get("payload_content_sha256") == content_hash)
-    assert_check("source_inventory", set(source_entries(state)) == repository_files())
+    assert_check(
+        "source_inventory",
+        set(source_entries(state)) == import_repository_files(),
+    )
     assert_check("pre_commit_mode", source_entries(state)[".githooks/pre-commit"][0] == "100755")
     validate_eol(state); print("eol_checkout_contract: PASS")
     if state == "PRE_GIT_IMPORT_STAGED":
         validate_staged_style_policy()
     if state == "WORK_ACCEPTANCE_SYNC_STAGED":
         validate_work_acceptance_staged_style_policy()
+    if state == "ATOM5_REGISTRIES_NAVIGATION_STAGED":
+        validate_atom5_staged_style_policy()
     tests = run([sys.executable,"-B","-m","unittest","discover","-s","tests","-p","test_*.py"])
     if tests.stdout.strip(): print(tests.stdout.strip())
     if tests.stderr.strip(): print(tests.stderr.strip())
@@ -327,7 +461,7 @@ def validate() -> None:
 
 
 def main() -> int:
-    print("=== TASK-03 ATOM 4B / 4D-R REPOSITORY VALIDATION ===")
+    print("=== TASK-03 REPOSITORY STATE VALIDATION ===")
     try: validate()
     except Exception as exc:
         print("RESULT: FAIL"); print(f"ERROR_TYPE: {type(exc).__name__}"); print(f"ERROR: {exc}"); return 1

@@ -1,0 +1,254 @@
+schema_version: '1.1'
+registry_id: CATALOG-ASSET-REGISTRY-LIFECYCLE-001
+as_of: '2026-07-21'
+records:
+- asset_id: REGISTRY-RESEARCH-CYCLES-001
+  record_version: '1.0'
+  asset_type: lifecycle_registry
+  purpose: Active registry for bounded research-cycle lifecycle records.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-07-21'
+  truth_owner: TASK-03
+  location:
+    kind: git_path
+    logical_uri: repo://registries/research_cycles.yaml
+    repository_path: registries/research_cycles.yaml
+  integrity:
+    kind: sha256
+    sha256: 2ca0195a7617f2f95b7334291c776b78b447ea854b4c43b48dbe0f25fe08f797
+  access: &registry_access
+    mode: task_write
+    method: file
+    network_required: false
+    secrets_required: false
+  relations: &schema_relation
+  - relation_type: depends_on
+    target_asset_id: CATALOG-SCHEMA-LIFECYCLE-001
+  consumers: &task03_consumer
+  - TASK-03
+  evidence: []
+  classification: &internal_classification
+    contains_secrets: false
+    contains_raw_data: false
+    sensitivity: INTERNAL_NON_SECRET
+- asset_id: REGISTRY-HYPOTHESES-001
+  record_version: '1.0'
+  asset_type: lifecycle_registry
+  purpose: Active registry for evidence-bearing research hypotheses.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-07-21'
+  truth_owner: TASK-03
+  location:
+    kind: git_path
+    logical_uri: repo://registries/hypotheses.yaml
+    repository_path: registries/hypotheses.yaml
+  integrity:
+    kind: sha256
+    sha256: 9ee9f983fa6869c0ee1ff6a249e06dd38fc059a956943cfea8539822054236d9
+  access: *registry_access
+  relations: *schema_relation
+  consumers: *task03_consumer
+  evidence: []
+  classification: *internal_classification
+- asset_id: REGISTRY-GLOBAL-TRIAL-LEDGER-001
+  record_version: '1.0'
+  asset_type: lifecycle_registry
+  purpose: Active global ledger for trial outcomes and lifecycle evidence.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-07-21'
+  truth_owner: TASK-03
+  location:
+    kind: git_path
+    logical_uri: repo://registries/global_trial_ledger.yaml
+    repository_path: registries/global_trial_ledger.yaml
+  integrity:
+    kind: sha256
+    sha256: 41b2f3cd1e2303f90318d0295c36c390999c7539031cb52db1a03779be56b671
+  access: *registry_access
+  relations: *schema_relation
+  consumers: *task03_consumer
+  evidence: []
+  classification: *internal_classification
+- asset_id: REGISTRY-FEATURE-CATALOG-001
+  record_version: '1.0'
+  asset_type: lifecycle_registry
+  purpose: Active registry for feature definitions and reliable availability.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-07-21'
+  truth_owner: TASK-03
+  location:
+    kind: git_path
+    logical_uri: repo://registries/feature_catalog.yaml
+    repository_path: registries/feature_catalog.yaml
+  integrity:
+    kind: sha256
+    sha256: 1c65b9d4a43096056686549055c5fdb259e5486f04484a73b5c7635050c89f55
+  access: *registry_access
+  relations: *schema_relation
+  consumers: *task03_consumer
+  evidence: []
+  classification: *internal_classification
+- asset_id: REGISTRY-HOLDOUT-CONSUMPTION-001
+  record_version: '1.0'
+  asset_type: lifecycle_registry
+  purpose: Active ledger for auditable holdout-set consumption events.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-07-21'
+  truth_owner: TASK-03
+  location:
+    kind: git_path
+    logical_uri: repo://registries/holdout_consumption.yaml
+    repository_path: registries/holdout_consumption.yaml
+  integrity:
+    kind: sha256
+    sha256: 863d68e53861c4aa30f6afa1a512ec5ab84c8966273cee6d42ca1519ef5fa07a
+  access: *registry_access
+  relations: *schema_relation
+  consumers: *task03_consumer
+  evidence: []
+  classification: *internal_classification
+- asset_id: REGISTRY-STRATEGIES-001
+  record_version: '1.0'
+  asset_type: lifecycle_registry
+  purpose: Active registry for strategies linked to validated hypotheses.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-07-21'
+  truth_owner: TASK-03
+  location:
+    kind: git_path
+    logical_uri: repo://registries/strategies.yaml
+    repository_path: registries/strategies.yaml
+  integrity:
+    kind: sha256
+    sha256: 82518f4016ae746f40a2e7fff107365a98287111bf56b2648b3207e4e3c7cb36
+  access: *registry_access
+  relations: *schema_relation
+  consumers: *task03_consumer
+  evidence: []
+  classification: *internal_classification
+- asset_id: REGISTRY-BOT-INSTANCES-001
+  record_version: '1.0'
+  asset_type: lifecycle_registry
+  purpose: Active registry for strategy-bound bot instance lifecycle records.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-07-21'
+  truth_owner: TASK-03
+  location:
+    kind: git_path
+    logical_uri: repo://registries/bot_instances.yaml
+    repository_path: registries/bot_instances.yaml
+  integrity:
+    kind: sha256
+    sha256: 25622701c6dfbe077f9b1b7e0d79fabe7be248412d94ee3f2ec0d15f5fff7dd8
+  access: *registry_access
+  relations: *schema_relation
+  consumers: *task03_consumer
+  evidence: []
+  classification: *internal_classification
+- asset_id: REGISTRY-REUSE-CANDIDATES-001
+  record_version: '1.0'
+  asset_type: lifecycle_registry
+  purpose: Empty active registry referencing historical TASK-01 reuse evidence without copying lifecycle truth.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-07-21'
+  truth_owner: TASK-03
+  location:
+    kind: git_path
+    logical_uri: repo://registries/reuse_candidates.yaml
+    repository_path: registries/reuse_candidates.yaml
+  integrity:
+    kind: sha256
+    sha256: cf480ff38b1c971e1827ecc951df25c9e7a0fa05417122d5566e22860d404179
+  access: *registry_access
+  relations:
+  - relation_type: depends_on
+    target_asset_id: CATALOG-SCHEMA-LIFECYCLE-001
+  - relation_type: derived_from
+    target_asset_id: PRE-GIT-TASK01-A024
+  consumers: *task03_consumer
+  evidence: []
+  classification: *internal_classification
+- asset_id: REGISTRY-DECISIONS-NEGATIVE-RESULTS-001
+  record_version: '1.0'
+  asset_type: lifecycle_registry
+  purpose: Active registry for decisions and durable negative research results.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-07-21'
+  truth_owner: TASK-03
+  location:
+    kind: git_path
+    logical_uri: repo://registries/decisions_negative_results.yaml
+    repository_path: registries/decisions_negative_results.yaml
+  integrity:
+    kind: sha256
+    sha256: 6396b1ef361c86ff39be917992eb723afda94d2280599cbee66cdbd184a4ef35
+  access: *registry_access
+  relations: *schema_relation
+  consumers: *task03_consumer
+  evidence: []
+  classification: *internal_classification
+- asset_id: GENERATED-PROJECT-MAP-001
+  record_version: '1.0'
+  asset_type: generated_view
+  purpose: Deterministic human-readable navigation projected only from the Catalog.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-07-21'
+  truth_owner: TASK-03
+  location:
+    kind: git_path
+    logical_uri: repo://docs/PROJECT_MAP.md
+    repository_path: docs/PROJECT_MAP.md
+  integrity:
+    kind: sha256
+    sha256: 5d5c834fecd686b6b48c519e7e856eb55e1bd52f2a6ce75364dfadb9df7452d8
+  access:
+    mode: read_only
+    method: file
+    network_required: false
+    secrets_required: false
+  relations:
+  - relation_type: derived_from
+    target_asset_id: CATALOG-ROOT-001
+  - relation_type: validated_by
+    target_asset_id: GENERATOR-CATALOG-NAVIGATION-001
+  consumers: *task03_consumer
+  evidence: []
+  classification: *internal_classification
+- asset_id: GENERATED-EDGE-PROJECTION-001
+  record_version: '1.0'
+  asset_type: generated_view
+  purpose: Deterministic machine-readable projection of Catalog asset relations.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-07-21'
+  truth_owner: TASK-03
+  location:
+    kind: git_path
+    logical_uri: repo://catalog/generated/asset_edges.json
+    repository_path: catalog/generated/asset_edges.json
+  integrity:
+    kind: sha256
+    sha256: 6160e89a6163dbdffa2e20b60603928cbab2fa3e12696b06686617889954f10b
+  access:
+    mode: read_only
+    method: file
+    network_required: false
+    secrets_required: false
+  relations:
+  - relation_type: derived_from
+    target_asset_id: CATALOG-ROOT-001
+  - relation_type: validated_by
+    target_asset_id: GENERATOR-CATALOG-NAVIGATION-001
+  consumers: *task03_consumer
+  evidence: []
+  classification: *internal_classification

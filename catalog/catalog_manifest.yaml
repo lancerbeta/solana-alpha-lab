@@ -8,12 +8,24 @@ root_resolver:
   - catalog/assets/core.yaml
   - catalog/assets/pre_git.yaml
   - catalog/assets/architecture.yaml
+  - catalog/assets/lifecycle.yaml
   query_registries:
   - catalog/query_recipes.yaml
+  lifecycle_registries:
+  - registries/research_cycles.yaml
+  - registries/hypotheses.yaml
+  - registries/global_trial_ledger.yaml
+  - registries/feature_catalog.yaml
+  - registries/holdout_consumption.yaml
+  - registries/strategies.yaml
+  - registries/bot_instances.yaml
+  - registries/reuse_candidates.yaml
+  - registries/decisions_negative_results.yaml
   schemas:
   - catalog/schemas/catalog_manifest.schema.json
   - catalog/schemas/asset_catalog.schema.json
   - catalog/schemas/query_recipe.schema.json
+  - catalog/schemas/lifecycle_registry.schema.json
   commands:
     validate:
     - uv
@@ -45,6 +57,24 @@ root_resolver:
     - resolve-query
     - '{recipe_id}'
     - --json
+    generate_navigation:
+    - uv
+    - run
+    - --locked
+    - --managed-python
+    - python
+    - -B
+    - scripts/generate_navigation.py
+    - --write
+    check_generated_navigation:
+    - uv
+    - run
+    - --locked
+    - --managed-python
+    - python
+    - -B
+    - scripts/generate_navigation.py
+    - --check
 policies:
   absolute_paths: FORBIDDEN
   secrets: FORBIDDEN
@@ -103,10 +133,21 @@ mandatory_asset_ids:
 - PRE-GIT-TASK02-TOOLS-001
 - PRE-GIT-TASK02-VALIDATION-001
 - ARCH-INTENT-001
+- CATALOG-ASSET-REGISTRY-LIFECYCLE-001
+- CATALOG-SCHEMA-LIFECYCLE-001
+- REGISTRY-RESEARCH-CYCLES-001
+- REGISTRY-HYPOTHESES-001
+- REGISTRY-GLOBAL-TRIAL-LEDGER-001
+- REGISTRY-FEATURE-CATALOG-001
+- REGISTRY-HOLDOUT-CONSUMPTION-001
+- REGISTRY-STRATEGIES-001
+- REGISTRY-BOT-INSTANCES-001
+- REGISTRY-REUSE-CANDIDATES-001
+- REGISTRY-DECISIONS-NEGATIVE-RESULTS-001
+- GENERATOR-CATALOG-NAVIGATION-001
+- GENERATED-PROJECT-MAP-001
+- GENERATED-EDGE-PROJECTION-001
 deferred_capabilities:
-- GENERATED_PROJECT_MAP
-- GENERATED_EDGE_PROJECTION
-- REGISTRY_SKELETONS
 - REMOTE_CI
 - CLEAN_CLONE
 - CODEX_PILOT

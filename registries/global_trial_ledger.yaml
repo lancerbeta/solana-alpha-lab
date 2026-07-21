@@ -1,0 +1,7 @@
+schema_version: '1.0'
+registry_id: SMIAL-REGISTRY-GLOBAL-TRIAL-LEDGER
+registry_type: global_trial_ledger
+as_of: '2026-07-21'
+truth_owner: TASK-03
+source_asset_ids: []
+records: []

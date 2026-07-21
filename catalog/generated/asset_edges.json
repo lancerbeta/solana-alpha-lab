@@ -1,0 +1,566 @@
+{
+  "schema_version": "1.0",
+  "catalog_id": "SMIAL-PROJECT-ASSET-CATALOG",
+  "edges": [
+    {
+      "source_asset_id": "ADR-CATALOG-BASELINE-001",
+      "relation": "governed_by",
+      "target_asset_id": "CTRL-TASK-03-001"
+    },
+    {
+      "source_asset_id": "ARCH-INTENT-001",
+      "relation": "evidenced_by",
+      "target_asset_id": "EVIDENCE-ATOM4B-RECEIPT-001"
+    },
+    {
+      "source_asset_id": "ARCH-INTENT-001",
+      "relation": "governed_by",
+      "target_asset_id": "CTRL-TASK-03-001"
+    },
+    {
+      "source_asset_id": "BUNDLE-TASK01-COMPLETION-001",
+      "relation": "contains",
+      "target_asset_id": "PRE-GIT-TASK01-A017"
+    },
+    {
+      "source_asset_id": "BUNDLE-TASK01-COMPLETION-001",
+      "relation": "contains",
+      "target_asset_id": "PRE-GIT-TASK01-A018"
+    },
+    {
+      "source_asset_id": "BUNDLE-TASK01-COMPLETION-001",
+      "relation": "contains",
+      "target_asset_id": "PRE-GIT-TASK01-A019"
+    },
+    {
+      "source_asset_id": "BUNDLE-TASK01-COMPLETION-001",
+      "relation": "contains",
+      "target_asset_id": "PRE-GIT-TASK01-A020"
+    },
+    {
+      "source_asset_id": "BUNDLE-TASK01-COMPLETION-001",
+      "relation": "contains",
+      "target_asset_id": "PRE-GIT-TASK01-A021"
+    },
+    {
+      "source_asset_id": "BUNDLE-TASK01-COMPLETION-001",
+      "relation": "contains",
+      "target_asset_id": "PRE-GIT-TASK01-A022"
+    },
+    {
+      "source_asset_id": "BUNDLE-TASK01-COMPLETION-001",
+      "relation": "contains",
+      "target_asset_id": "PRE-GIT-TASK01-A023"
+    },
+    {
+      "source_asset_id": "BUNDLE-TASK01-COMPLETION-001",
+      "relation": "contains",
+      "target_asset_id": "PRE-GIT-TASK01-A024"
+    },
+    {
+      "source_asset_id": "BUNDLE-TASK01-COMPLETION-001",
+      "relation": "contains",
+      "target_asset_id": "PRE-GIT-TASK01-A025"
+    },
+    {
+      "source_asset_id": "BUNDLE-TASK01-COMPLETION-001",
+      "relation": "contains",
+      "target_asset_id": "PRE-GIT-TASK01-A026"
+    },
+    {
+      "source_asset_id": "BUNDLE-TASK01-COMPLETION-001",
+      "relation": "contains",
+      "target_asset_id": "PRE-GIT-TASK01-A027"
+    },
+    {
+      "source_asset_id": "BUNDLE-TASK01-COMPLETION-001",
+      "relation": "contains",
+      "target_asset_id": "PRE-GIT-TASK01-A028"
+    },
+    {
+      "source_asset_id": "BUNDLE-TASK01-COMPLETION-001",
+      "relation": "contains",
+      "target_asset_id": "PRE-GIT-TASK01-A029"
+    },
+    {
+      "source_asset_id": "BUNDLE-TASK02-COMPLETION-001",
+      "relation": "contains",
+      "target_asset_id": "PRE-GIT-TASK02-BOOTSTRAP-001"
+    },
+    {
+      "source_asset_id": "BUNDLE-TASK02-COMPLETION-001",
+      "relation": "contains",
+      "target_asset_id": "PRE-GIT-TASK02-CHECKSUMS-001"
+    },
+    {
+      "source_asset_id": "BUNDLE-TASK02-COMPLETION-001",
+      "relation": "contains",
+      "target_asset_id": "PRE-GIT-TASK02-ENV-REPORT-001"
+    },
+    {
+      "source_asset_id": "BUNDLE-TASK02-COMPLETION-001",
+      "relation": "contains",
+      "target_asset_id": "PRE-GIT-TASK02-OPERATOR-RECEIPT-001"
+    },
+    {
+      "source_asset_id": "BUNDLE-TASK02-COMPLETION-001",
+      "relation": "contains",
+      "target_asset_id": "PRE-GIT-TASK02-SUMMARY-001"
+    },
+    {
+      "source_asset_id": "BUNDLE-TASK02-COMPLETION-001",
+      "relation": "contains",
+      "target_asset_id": "PRE-GIT-TASK02-TASK-RECORD-001"
+    },
+    {
+      "source_asset_id": "BUNDLE-TASK02-COMPLETION-001",
+      "relation": "contains",
+      "target_asset_id": "PRE-GIT-TASK02-TOOLS-001"
+    },
+    {
+      "source_asset_id": "BUNDLE-TASK02-COMPLETION-001",
+      "relation": "contains",
+      "target_asset_id": "PRE-GIT-TASK02-VALIDATION-001"
+    },
+    {
+      "source_asset_id": "CATALOG-ASSET-REGISTRY-ARCHITECTURE-001",
+      "relation": "depends_on",
+      "target_asset_id": "CATALOG-SCHEMA-ASSET-001"
+    },
+    {
+      "source_asset_id": "CATALOG-ASSET-REGISTRY-CORE-001",
+      "relation": "depends_on",
+      "target_asset_id": "CATALOG-SCHEMA-ASSET-001"
+    },
+    {
+      "source_asset_id": "CATALOG-ASSET-REGISTRY-LIFECYCLE-001",
+      "relation": "depends_on",
+      "target_asset_id": "CATALOG-SCHEMA-ASSET-001"
+    },
+    {
+      "source_asset_id": "CATALOG-ASSET-REGISTRY-PRE-GIT-001",
+      "relation": "depends_on",
+      "target_asset_id": "CATALOG-SCHEMA-ASSET-001"
+    },
+    {
+      "source_asset_id": "CATALOG-CLI-001",
+      "relation": "depends_on",
+      "target_asset_id": "CATALOG-ROOT-001"
+    },
+    {
+      "source_asset_id": "CATALOG-QUERY-REGISTRY-001",
+      "relation": "depends_on",
+      "target_asset_id": "CATALOG-SCHEMA-QUERY-001"
+    },
+    {
+      "source_asset_id": "CATALOG-ROOT-001",
+      "relation": "contains",
+      "target_asset_id": "CATALOG-ASSET-REGISTRY-ARCHITECTURE-001"
+    },
+    {
+      "source_asset_id": "CATALOG-ROOT-001",
+      "relation": "contains",
+      "target_asset_id": "CATALOG-ASSET-REGISTRY-CORE-001"
+    },
+    {
+      "source_asset_id": "CATALOG-ROOT-001",
+      "relation": "contains",
+      "target_asset_id": "CATALOG-ASSET-REGISTRY-LIFECYCLE-001"
+    },
+    {
+      "source_asset_id": "CATALOG-ROOT-001",
+      "relation": "contains",
+      "target_asset_id": "CATALOG-ASSET-REGISTRY-PRE-GIT-001"
+    },
+    {
+      "source_asset_id": "CATALOG-ROOT-001",
+      "relation": "contains",
+      "target_asset_id": "CATALOG-QUERY-REGISTRY-001"
+    },
+    {
+      "source_asset_id": "CATALOG-ROOT-001",
+      "relation": "contains",
+      "target_asset_id": "CATALOG-SCHEMA-LIFECYCLE-001"
+    },
+    {
+      "source_asset_id": "CATALOG-ROOT-001",
+      "relation": "contains",
+      "target_asset_id": "GENERATOR-CATALOG-NAVIGATION-001"
+    },
+    {
+      "source_asset_id": "CATALOG-ROOT-001",
+      "relation": "governed_by",
+      "target_asset_id": "ADR-CATALOG-BASELINE-001"
+    },
+    {
+      "source_asset_id": "CATALOG-ROOT-001",
+      "relation": "validated_by",
+      "target_asset_id": "CATALOG-VALIDATOR-001"
+    },
+    {
+      "source_asset_id": "CATALOG-SCHEMA-ASSET-001",
+      "relation": "validated_by",
+      "target_asset_id": "CATALOG-VALIDATOR-001"
+    },
+    {
+      "source_asset_id": "CATALOG-SCHEMA-LIFECYCLE-001",
+      "relation": "validated_by",
+      "target_asset_id": "CATALOG-VALIDATOR-001"
+    },
+    {
+      "source_asset_id": "CATALOG-SCHEMA-MANIFEST-001",
+      "relation": "validated_by",
+      "target_asset_id": "CATALOG-VALIDATOR-001"
+    },
+    {
+      "source_asset_id": "CATALOG-SCHEMA-QUERY-001",
+      "relation": "validated_by",
+      "target_asset_id": "CATALOG-VALIDATOR-001"
+    },
+    {
+      "source_asset_id": "CATALOG-VALIDATOR-001",
+      "relation": "depends_on",
+      "target_asset_id": "CTRL-UVLOCK-001"
+    },
+    {
+      "source_asset_id": "CTRL-AGENTS-001",
+      "relation": "governed_by",
+      "target_asset_id": "CTRL-TASK-03-001"
+    },
+    {
+      "source_asset_id": "CTRL-PYPROJECT-001",
+      "relation": "depends_on",
+      "target_asset_id": "ENV-WORKSTATION-001"
+    },
+    {
+      "source_asset_id": "CTRL-QUALITY-GATE-001",
+      "relation": "validated_by",
+      "target_asset_id": "CATALOG-VALIDATOR-001"
+    },
+    {
+      "source_asset_id": "CTRL-TASK-03-001",
+      "relation": "contains",
+      "target_asset_id": "CATALOG-ROOT-001"
+    },
+    {
+      "source_asset_id": "CTRL-UVLOCK-001",
+      "relation": "depends_on",
+      "target_asset_id": "CTRL-PYPROJECT-001"
+    },
+    {
+      "source_asset_id": "ENV-WORKSTATION-001",
+      "relation": "produces",
+      "target_asset_id": "SCM-BASELINE-COMMIT-001"
+    },
+    {
+      "source_asset_id": "EVIDENCE-ATOM3A-RECEIPT-001",
+      "relation": "evidenced_by",
+      "target_asset_id": "CATALOG-ROOT-001"
+    },
+    {
+      "source_asset_id": "EVIDENCE-ATOM4B-RECEIPT-001",
+      "relation": "evidenced_by",
+      "target_asset_id": "CATALOG-ROOT-001"
+    },
+    {
+      "source_asset_id": "GENERATED-EDGE-PROJECTION-001",
+      "relation": "derived_from",
+      "target_asset_id": "CATALOG-ROOT-001"
+    },
+    {
+      "source_asset_id": "GENERATED-EDGE-PROJECTION-001",
+      "relation": "validated_by",
+      "target_asset_id": "GENERATOR-CATALOG-NAVIGATION-001"
+    },
+    {
+      "source_asset_id": "GENERATED-PROJECT-MAP-001",
+      "relation": "derived_from",
+      "target_asset_id": "CATALOG-ROOT-001"
+    },
+    {
+      "source_asset_id": "GENERATED-PROJECT-MAP-001",
+      "relation": "validated_by",
+      "target_asset_id": "GENERATOR-CATALOG-NAVIGATION-001"
+    },
+    {
+      "source_asset_id": "GENERATOR-CATALOG-NAVIGATION-001",
+      "relation": "depends_on",
+      "target_asset_id": "CATALOG-VALIDATOR-001"
+    },
+    {
+      "source_asset_id": "GENERATOR-CATALOG-NAVIGATION-001",
+      "relation": "produces",
+      "target_asset_id": "GENERATED-EDGE-PROJECTION-001"
+    },
+    {
+      "source_asset_id": "GENERATOR-CATALOG-NAVIGATION-001",
+      "relation": "produces",
+      "target_asset_id": "GENERATED-PROJECT-MAP-001"
+    },
+    {
+      "source_asset_id": "PRE-GIT-TASK01-A017",
+      "relation": "derived_from",
+      "target_asset_id": "BUNDLE-TASK01-COMPLETION-001"
+    },
+    {
+      "source_asset_id": "PRE-GIT-TASK01-A017",
+      "relation": "evidenced_by",
+      "target_asset_id": "EVIDENCE-ATOM4B-RECEIPT-001"
+    },
+    {
+      "source_asset_id": "PRE-GIT-TASK01-A018",
+      "relation": "derived_from",
+      "target_asset_id": "BUNDLE-TASK01-COMPLETION-001"
+    },
+    {
+      "source_asset_id": "PRE-GIT-TASK01-A018",
+      "relation": "evidenced_by",
+      "target_asset_id": "EVIDENCE-ATOM4B-RECEIPT-001"
+    },
+    {
+      "source_asset_id": "PRE-GIT-TASK01-A019",
+      "relation": "derived_from",
+      "target_asset_id": "BUNDLE-TASK01-COMPLETION-001"
+    },
+    {
+      "source_asset_id": "PRE-GIT-TASK01-A019",
+      "relation": "evidenced_by",
+      "target_asset_id": "EVIDENCE-ATOM4B-RECEIPT-001"
+    },
+    {
+      "source_asset_id": "PRE-GIT-TASK01-A020",
+      "relation": "derived_from",
+      "target_asset_id": "BUNDLE-TASK01-COMPLETION-001"
+    },
+    {
+      "source_asset_id": "PRE-GIT-TASK01-A020",
+      "relation": "evidenced_by",
+      "target_asset_id": "EVIDENCE-ATOM4B-RECEIPT-001"
+    },
+    {
+      "source_asset_id": "PRE-GIT-TASK01-A021",
+      "relation": "derived_from",
+      "target_asset_id": "BUNDLE-TASK01-COMPLETION-001"
+    },
+    {
+      "source_asset_id": "PRE-GIT-TASK01-A021",
+      "relation": "evidenced_by",
+      "target_asset_id": "EVIDENCE-ATOM4B-RECEIPT-001"
+    },
+    {
+      "source_asset_id": "PRE-GIT-TASK01-A022",
+      "relation": "derived_from",
+      "target_asset_id": "BUNDLE-TASK01-COMPLETION-001"
+    },
+    {
+      "source_asset_id": "PRE-GIT-TASK01-A022",
+      "relation": "evidenced_by",
+      "target_asset_id": "EVIDENCE-ATOM4B-RECEIPT-001"
+    },
+    {
+      "source_asset_id": "PRE-GIT-TASK01-A023",
+      "relation": "derived_from",
+      "target_asset_id": "BUNDLE-TASK01-COMPLETION-001"
+    },
+    {
+      "source_asset_id": "PRE-GIT-TASK01-A023",
+      "relation": "evidenced_by",
+      "target_asset_id": "EVIDENCE-ATOM4B-RECEIPT-001"
+    },
+    {
+      "source_asset_id": "PRE-GIT-TASK01-A024",
+      "relation": "derived_from",
+      "target_asset_id": "BUNDLE-TASK01-COMPLETION-001"
+    },
+    {
+      "source_asset_id": "PRE-GIT-TASK01-A024",
+      "relation": "evidenced_by",
+      "target_asset_id": "EVIDENCE-ATOM4B-RECEIPT-001"
+    },
+    {
+      "source_asset_id": "PRE-GIT-TASK01-A025",
+      "relation": "derived_from",
+      "target_asset_id": "BUNDLE-TASK01-COMPLETION-001"
+    },
+    {
+      "source_asset_id": "PRE-GIT-TASK01-A025",
+      "relation": "evidenced_by",
+      "target_asset_id": "EVIDENCE-ATOM4B-RECEIPT-001"
+    },
+    {
+      "source_asset_id": "PRE-GIT-TASK01-A026",
+      "relation": "derived_from",
+      "target_asset_id": "BUNDLE-TASK01-COMPLETION-001"
+    },
+    {
+      "source_asset_id": "PRE-GIT-TASK01-A026",
+      "relation": "evidenced_by",
+      "target_asset_id": "EVIDENCE-ATOM4B-RECEIPT-001"
+    },
+    {
+      "source_asset_id": "PRE-GIT-TASK01-A027",
+      "relation": "derived_from",
+      "target_asset_id": "BUNDLE-TASK01-COMPLETION-001"
+    },
+    {
+      "source_asset_id": "PRE-GIT-TASK01-A027",
+      "relation": "evidenced_by",
+      "target_asset_id": "EVIDENCE-ATOM4B-RECEIPT-001"
+    },
+    {
+      "source_asset_id": "PRE-GIT-TASK01-A028",
+      "relation": "derived_from",
+      "target_asset_id": "BUNDLE-TASK01-COMPLETION-001"
+    },
+    {
+      "source_asset_id": "PRE-GIT-TASK01-A028",
+      "relation": "superseded_by",
+      "target_asset_id": "CATALOG-VALIDATOR-001"
+    },
+    {
+      "source_asset_id": "PRE-GIT-TASK01-A029",
+      "relation": "derived_from",
+      "target_asset_id": "BUNDLE-TASK01-COMPLETION-001"
+    },
+    {
+      "source_asset_id": "PRE-GIT-TASK01-A029",
+      "relation": "evidenced_by",
+      "target_asset_id": "EVIDENCE-ATOM4B-RECEIPT-001"
+    },
+    {
+      "source_asset_id": "PRE-GIT-TASK02-BOOTSTRAP-001",
+      "relation": "derived_from",
+      "target_asset_id": "BUNDLE-TASK02-COMPLETION-001"
+    },
+    {
+      "source_asset_id": "PRE-GIT-TASK02-BOOTSTRAP-001",
+      "relation": "evidenced_by",
+      "target_asset_id": "EVIDENCE-ATOM4B-RECEIPT-001"
+    },
+    {
+      "source_asset_id": "PRE-GIT-TASK02-CHECKSUMS-001",
+      "relation": "derived_from",
+      "target_asset_id": "BUNDLE-TASK02-COMPLETION-001"
+    },
+    {
+      "source_asset_id": "PRE-GIT-TASK02-CHECKSUMS-001",
+      "relation": "evidenced_by",
+      "target_asset_id": "EVIDENCE-ATOM4B-RECEIPT-001"
+    },
+    {
+      "source_asset_id": "PRE-GIT-TASK02-ENV-REPORT-001",
+      "relation": "derived_from",
+      "target_asset_id": "BUNDLE-TASK02-COMPLETION-001"
+    },
+    {
+      "source_asset_id": "PRE-GIT-TASK02-ENV-REPORT-001",
+      "relation": "evidenced_by",
+      "target_asset_id": "EVIDENCE-ATOM4B-RECEIPT-001"
+    },
+    {
+      "source_asset_id": "PRE-GIT-TASK02-OPERATOR-RECEIPT-001",
+      "relation": "derived_from",
+      "target_asset_id": "BUNDLE-TASK02-COMPLETION-001"
+    },
+    {
+      "source_asset_id": "PRE-GIT-TASK02-OPERATOR-RECEIPT-001",
+      "relation": "evidenced_by",
+      "target_asset_id": "EVIDENCE-ATOM4B-RECEIPT-001"
+    },
+    {
+      "source_asset_id": "PRE-GIT-TASK02-SUMMARY-001",
+      "relation": "derived_from",
+      "target_asset_id": "BUNDLE-TASK02-COMPLETION-001"
+    },
+    {
+      "source_asset_id": "PRE-GIT-TASK02-SUMMARY-001",
+      "relation": "evidenced_by",
+      "target_asset_id": "EVIDENCE-ATOM4B-RECEIPT-001"
+    },
+    {
+      "source_asset_id": "PRE-GIT-TASK02-TASK-RECORD-001",
+      "relation": "derived_from",
+      "target_asset_id": "BUNDLE-TASK02-COMPLETION-001"
+    },
+    {
+      "source_asset_id": "PRE-GIT-TASK02-TASK-RECORD-001",
+      "relation": "evidenced_by",
+      "target_asset_id": "EVIDENCE-ATOM4B-RECEIPT-001"
+    },
+    {
+      "source_asset_id": "PRE-GIT-TASK02-TOOLS-001",
+      "relation": "derived_from",
+      "target_asset_id": "BUNDLE-TASK02-COMPLETION-001"
+    },
+    {
+      "source_asset_id": "PRE-GIT-TASK02-TOOLS-001",
+      "relation": "evidenced_by",
+      "target_asset_id": "EVIDENCE-ATOM4B-RECEIPT-001"
+    },
+    {
+      "source_asset_id": "PRE-GIT-TASK02-VALIDATION-001",
+      "relation": "derived_from",
+      "target_asset_id": "BUNDLE-TASK02-COMPLETION-001"
+    },
+    {
+      "source_asset_id": "PRE-GIT-TASK02-VALIDATION-001",
+      "relation": "evidenced_by",
+      "target_asset_id": "EVIDENCE-ATOM4B-RECEIPT-001"
+    },
+    {
+      "source_asset_id": "REGISTRY-BOT-INSTANCES-001",
+      "relation": "depends_on",
+      "target_asset_id": "CATALOG-SCHEMA-LIFECYCLE-001"
+    },
+    {
+      "source_asset_id": "REGISTRY-DECISIONS-NEGATIVE-RESULTS-001",
+      "relation": "depends_on",
+      "target_asset_id": "CATALOG-SCHEMA-LIFECYCLE-001"
+    },
+    {
+      "source_asset_id": "REGISTRY-FEATURE-CATALOG-001",
+      "relation": "depends_on",
+      "target_asset_id": "CATALOG-SCHEMA-LIFECYCLE-001"
+    },
+    {
+      "source_asset_id": "REGISTRY-GLOBAL-TRIAL-LEDGER-001",
+      "relation": "depends_on",
+      "target_asset_id": "CATALOG-SCHEMA-LIFECYCLE-001"
+    },
+    {
+      "source_asset_id": "REGISTRY-HOLDOUT-CONSUMPTION-001",
+      "relation": "depends_on",
+      "target_asset_id": "CATALOG-SCHEMA-LIFECYCLE-001"
+    },
+    {
+      "source_asset_id": "REGISTRY-HYPOTHESES-001",
+      "relation": "depends_on",
+      "target_asset_id": "CATALOG-SCHEMA-LIFECYCLE-001"
+    },
+    {
+      "source_asset_id": "REGISTRY-RESEARCH-CYCLES-001",
+      "relation": "depends_on",
+      "target_asset_id": "CATALOG-SCHEMA-LIFECYCLE-001"
+    },
+    {
+      "source_asset_id": "REGISTRY-REUSE-CANDIDATES-001",
+      "relation": "depends_on",
+      "target_asset_id": "CATALOG-SCHEMA-LIFECYCLE-001"
+    },
+    {
+      "source_asset_id": "REGISTRY-REUSE-CANDIDATES-001",
+      "relation": "derived_from",
+      "target_asset_id": "PRE-GIT-TASK01-A024"
+    },
+    {
+      "source_asset_id": "REGISTRY-STRATEGIES-001",
+      "relation": "depends_on",
+      "target_asset_id": "CATALOG-SCHEMA-LIFECYCLE-001"
+    },
+    {
+      "source_asset_id": "SCM-BASELINE-COMMIT-001",
+      "relation": "governed_by",
+      "target_asset_id": "CTRL-TASK-03-001"
+    }
+  ]
+}

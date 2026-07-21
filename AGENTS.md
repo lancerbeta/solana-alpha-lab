@@ -12,7 +12,7 @@ ChatGPT Project / Work owns mission, roadmap, task status, acceptance, and canon
 
 TASK-03 — Private repository, controls & Project Asset Catalog.
 
-Current atom: exact pre-Git TASK-01/02 evidence import and `ARCH-INTENT-001` registration, staged without commit or remote.
+Current atom: Atom 5 registry skeletons and Catalog-generated navigation, as an implementation candidate without Work acceptance, remote, or lifecycle activation.
 
 ## WORKSPACE_ONLY
 

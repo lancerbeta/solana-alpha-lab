@@ -26,8 +26,23 @@ class CatalogSnapshot:
     manifest: dict[str, Any]
     assets_documents: list[dict[str, Any]]
     queries_documents: list[dict[str, Any]]
+    lifecycle_documents: list[dict[str, Any]]
     assets: dict[str, dict[str, Any]]
     queries: dict[str, dict[str, Any]]
+    lifecycle_records: dict[str, dict[str, Any]]
+
+
+EXPECTED_LIFECYCLE_REGISTRIES = {
+    "registries/research_cycles.yaml": "research_cycles",
+    "registries/hypotheses.yaml": "hypotheses",
+    "registries/global_trial_ledger.yaml": "global_trial_ledger",
+    "registries/feature_catalog.yaml": "feature_catalog",
+    "registries/holdout_consumption.yaml": "holdout_consumption",
+    "registries/strategies.yaml": "strategies",
+    "registries/bot_instances.yaml": "bot_instances",
+    "registries/reuse_candidates.yaml": "reuse_candidates",
+    "registries/decisions_negative_results.yaml": "decisions_negative_results",
+}
 
 
 def load_yaml(path: Path) -> dict[str, Any]:
@@ -169,8 +184,10 @@ def validate_semantics(
     manifest: dict[str, Any],
     assets_documents: list[dict[str, Any]],
     queries_documents: list[dict[str, Any]],
+    lifecycle_documents: list[dict[str, Any]],
     *,
     root: Path = ROOT,
+    allow_generated_drift: bool = False,
 ) -> CatalogSnapshot:
     assets = index_unique(
         [record for document in assets_documents for record in document["records"]],
@@ -180,6 +197,10 @@ def validate_semantics(
         [record for document in queries_documents for record in document["recipes"]],
         "recipe_id", "query",
     )
+    lifecycle_records = index_unique(
+        [record for document in lifecycle_documents for record in document["records"]],
+        "record_id", "lifecycle_record",
+    )
 
     missing_mandatory = set(manifest["mandatory_asset_ids"]) - set(assets)
     if missing_mandatory:
@@ -188,6 +209,7 @@ def validate_semantics(
     all_registry_paths = (
         manifest["root_resolver"]["asset_registries"]
         + manifest["root_resolver"]["query_registries"]
+        + manifest["root_resolver"]["lifecycle_registries"]
         + manifest["root_resolver"]["schemas"]
     )
     for relative in all_registry_paths:
@@ -203,21 +225,63 @@ def validate_semantics(
     if not registry_paths.issubset(registered_registry_paths):
         raise CatalogValidationError("asset_registry_path_not_registered")
 
+    lifecycle_paths = set(manifest["root_resolver"]["lifecycle_registries"])
+    if lifecycle_paths != set(EXPECTED_LIFECYCLE_REGISTRIES):
+        raise CatalogValidationError("lifecycle_registry_inventory_mismatch")
+    observed_lifecycle_types = {
+        path: document["registry_type"]
+        for path, document in zip(
+            manifest["root_resolver"]["lifecycle_registries"],
+            lifecycle_documents,
+            strict=True,
+        )
+    }
+    if observed_lifecycle_types != EXPECTED_LIFECYCLE_REGISTRIES:
+        raise CatalogValidationError("lifecycle_registry_type_mismatch")
+    registered_lifecycle_paths = {
+        record["location"].get("repository_path")
+        for record in assets.values()
+        if record["asset_type"] == "lifecycle_registry"
+    }
+    if registered_lifecycle_paths != lifecycle_paths:
+        raise CatalogValidationError("lifecycle_registry_path_not_registered")
+
+    for document in lifecycle_documents:
+        registry_id = document["registry_id"]
+        for source_asset_id in document["source_asset_ids"]:
+            if source_asset_id not in assets:
+                raise CatalogValidationError(
+                    f"broken_lifecycle_source_asset:{registry_id}:{source_asset_id}"
+                )
+        for record in document["records"]:
+            for evidence_asset_id in record["evidence_asset_ids"]:
+                if evidence_asset_id not in assets:
+                    raise CatalogValidationError(
+                        f"broken_lifecycle_evidence_asset:{record['record_id']}:{evidence_asset_id}"
+                    )
+
     for asset_id, asset in assets.items():
         location = asset["location"]
         repository_path = location.get("repository_path")
         if repository_path is not None:
             path = resolve_repository_path(repository_path, root)
             if location["kind"] == "git_path" and not path.is_file():
-                raise CatalogValidationError(f"asset_path_missing:{asset_id}:{repository_path}")
+                if not (allow_generated_drift and asset["asset_type"] == "generated_view"):
+                    raise CatalogValidationError(f"asset_path_missing:{asset_id}:{repository_path}")
 
         integrity = asset["integrity"]
         if integrity["kind"] == "sha256":
             if location["kind"] == "git_path":
                 if repository_path is None:
                     raise CatalogValidationError(f"sha256_without_repository_path:{asset_id}")
-                observed = sha256(resolve_repository_path(repository_path, root))
-                if observed != integrity["sha256"]:
+                path = resolve_repository_path(repository_path, root)
+                if path.is_file():
+                    observed = sha256(path)
+                else:
+                    observed = None
+                if observed != integrity["sha256"] and not (
+                    allow_generated_drift and asset["asset_type"] == "generated_view"
+                ):
                     raise CatalogValidationError(f"sha256_mismatch:{asset_id}")
             elif location["kind"] not in {"external_bundle", "logical_only"}:
                 raise CatalogValidationError(f"external_sha256_location_invalid:{asset_id}")
@@ -266,14 +330,29 @@ def validate_semantics(
     if "PRE_GIT_IMPORT" in manifest["deferred_capabilities"]:
         raise CatalogValidationError("pre_git_import_still_deferred")
 
-    return CatalogSnapshot(manifest, assets_documents, queries_documents, assets, queries)
+    return CatalogSnapshot(
+        manifest,
+        assets_documents,
+        queries_documents,
+        lifecycle_documents,
+        assets,
+        queries,
+        lifecycle_records,
+    )
 
 
-def load_and_validate(root: Path = ROOT) -> CatalogSnapshot:
+def load_and_validate(
+    root: Path = ROOT,
+    *,
+    allow_generated_drift: bool = False,
+) -> CatalogSnapshot:
     manifest = load_yaml(root / "catalog/catalog_manifest.yaml")
     manifest_schema = load_json(root / "catalog/schemas/catalog_manifest.schema.json")
     asset_schema = load_json(root / "catalog/schemas/asset_catalog.schema.json")
     query_schema = load_json(root / "catalog/schemas/query_recipe.schema.json")
+    lifecycle_schema = load_json(
+        root / "catalog/schemas/lifecycle_registry.schema.json"
+    )
 
     validate_schema_instance(manifest_schema, manifest, "manifest")
     asset_documents = []
@@ -286,11 +365,27 @@ def load_and_validate(root: Path = ROOT) -> CatalogSnapshot:
         document = load_yaml(resolve_repository_path(relative, root))
         validate_schema_instance(query_schema, document, f"queries:{relative}")
         query_documents.append(document)
-    return validate_semantics(manifest, asset_documents, query_documents, root=root)
+    lifecycle_documents = []
+    for relative in manifest["root_resolver"]["lifecycle_registries"]:
+        document = load_yaml(resolve_repository_path(relative, root))
+        validate_schema_instance(
+            lifecycle_schema,
+            document,
+            f"lifecycle:{relative}",
+        )
+        lifecycle_documents.append(document)
+    return validate_semantics(
+        manifest,
+        asset_documents,
+        query_documents,
+        lifecycle_documents,
+        root=root,
+        allow_generated_drift=allow_generated_drift,
+    )
 
 
 def main() -> int:
-    print("=== TASK-03 ATOM 4B CATALOG VALIDATION ===")
+    print("=== TASK-03 ATOM 5 CATALOG VALIDATION ===")
     try:
         snapshot = load_and_validate()
     except Exception as exc:
@@ -301,6 +396,7 @@ def main() -> int:
     print("manifest_schema: PASS")
     print("asset_schema: PASS")
     print("query_schema: PASS")
+    print("lifecycle_schema: PASS")
     print("multi_registry_merge: PASS")
     print("path_policy: PASS")
     print("duplicate_ids: PASS")
@@ -313,6 +409,8 @@ def main() -> int:
     print(f"asset_registry_count: {len(snapshot.assets_documents)}")
     print(f"asset_count: {len(snapshot.assets)}")
     print(f"query_count: {len(snapshot.queries)}")
+    print(f"lifecycle_registry_count: {len(snapshot.lifecycle_documents)}")
+    print(f"lifecycle_record_count: {len(snapshot.lifecycle_records)}")
     print("CATALOG_RESULT: PASS")
     return 0
 

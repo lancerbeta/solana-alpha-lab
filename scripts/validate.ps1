@@ -85,6 +85,14 @@ try {
         }
         Write-Output "CATALOG_RESOLUTION: PASS"
 
+        $navigation = Invoke-NativeResult -File "uv.exe" -Arguments @(
+            "run", "--locked", "--managed-python", "python", "-B",
+            ".\scripts\generate_navigation.py", "--check"
+        )
+        Write-NativeOutput $navigation
+        if ($navigation.ExitCode -ne 0) { throw "GENERATED_NAVIGATION_STALE" }
+        Write-Output "GENERATED_NAVIGATION: PASS"
+
         $preGit = Invoke-NativeResult -File "uv.exe" -Arguments @(
             "run", "--locked", "--managed-python", "python", "-B",
             ".\scripts\validate_pre_git_import.py"

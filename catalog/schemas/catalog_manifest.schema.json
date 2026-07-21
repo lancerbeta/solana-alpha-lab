@@ -43,6 +43,7 @@
       "required": [
         "asset_registries",
         "query_registries",
+        "lifecycle_registries",
         "schemas",
         "commands"
       ],
@@ -65,9 +66,19 @@
             "pattern": "^(?![A-Za-z]:)(?!/)(?!\\\\)(?!.*(?:^|[\\\\/])\\.\\.(?:[\\\\/]|$))[A-Za-z0-9._/@{}-]+(?:/[A-Za-z0-9._/@{}-]+)*$"
           }
         },
+        "lifecycle_registries": {
+          "type": "array",
+          "minItems": 9,
+          "maxItems": 9,
+          "uniqueItems": true,
+          "items": {
+            "type": "string",
+            "pattern": "^(?![A-Za-z]:)(?!/)(?!\\\\)(?!.*(?:^|[\\\\/])\\.\\.(?:[\\\\/]|$))[A-Za-z0-9._/@{}-]+(?:/[A-Za-z0-9._/@{}-]+)*$"
+          }
+        },
         "schemas": {
           "type": "array",
-          "minItems": 3,
+          "minItems": 4,
           "uniqueItems": true,
           "items": {
             "type": "string",
@@ -80,7 +91,9 @@
           "required": [
             "validate",
             "resolve_asset",
-            "resolve_query"
+            "resolve_query",
+            "generate_navigation",
+            "check_generated_navigation"
           ],
           "properties": {
             "validate": {
@@ -90,6 +103,12 @@
               "$ref": "#/$defs/command"
             },
             "resolve_query": {
+              "$ref": "#/$defs/command"
+            },
+            "generate_navigation": {
+              "$ref": "#/$defs/command"
+            },
+            "check_generated_navigation": {
               "$ref": "#/$defs/command"
             }
           }

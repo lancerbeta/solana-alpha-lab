@@ -79,7 +79,7 @@ records:
     repository_path: AGENTS.md
   integrity:
     kind: sha256
-    sha256: 64f28312bfeb45943aca1fa3aff5b02a240861b63bde9244c123feec41be1544
+    sha256: 66598006482a5d6261f49f570d0a445071a180ce673385f22b41443219ca1b22
   access:
     mode: read_only
     method: file
@@ -110,7 +110,7 @@ records:
     repository_path: docs/tasks/TASK-03.md
   integrity:
     kind: sha256
-    sha256: 71d9442ae543c4f2f3b9ab42fea4a8564d80363de3847c110ba0ab19ab08aadf
+    sha256: 9bc8ecf8e184655d7a2aafda52dd939caff47ed1d7ed319e4f2876d70ae3980e
   access:
     mode: read_only
     method: file
@@ -200,7 +200,7 @@ records:
     repository_path: scripts/validate.ps1
   integrity:
     kind: sha256
-    sha256: ff72b0aa3ddc040f04a1715fbd3c84bf9ab51dbecee3903349b52a1dd0d04dd5
+    sha256: b0545a860925d14870fd4d5a81bbf7cc1c1324c4f5e63582ecf64499385be80c
   access:
     mode: read_only
     method: command
@@ -251,6 +251,12 @@ records:
     target_asset_id: CATALOG-ASSET-REGISTRY-PRE-GIT-001
   - relation_type: contains
     target_asset_id: CATALOG-ASSET-REGISTRY-ARCHITECTURE-001
+  - relation_type: contains
+    target_asset_id: CATALOG-ASSET-REGISTRY-LIFECYCLE-001
+  - relation_type: contains
+    target_asset_id: CATALOG-SCHEMA-LIFECYCLE-001
+  - relation_type: contains
+    target_asset_id: GENERATOR-CATALOG-NAVIGATION-001
   consumers:
   - TASK-03
   evidence: []
@@ -332,7 +338,7 @@ records:
     repository_path: catalog/schemas/catalog_manifest.schema.json
   integrity:
     kind: sha256
-    sha256: 7bcbce4d55c9b584ec3f2a40ee5e1a4043a5349d8147916421b0cb2a70c8ad03
+    sha256: 2ebe494a8dd963ea40369e12a7e96dcd982bf75db6725cbd9b95474d23a6cf28
   access:
     mode: read_only
     method: file
@@ -362,7 +368,7 @@ records:
     repository_path: catalog/schemas/asset_catalog.schema.json
   integrity:
     kind: sha256
-    sha256: 098393d72cbccf3b5b8355076ea8556a8385e7afc059f46132950f618eb7852b
+    sha256: 20d8724dc7fcd3318f3cfc262b6759006b54b1679483ea37871ac3212ed86efb
   access:
     mode: read_only
     method: file
@@ -422,7 +428,7 @@ records:
     repository_path: scripts/validate_catalog.py
   integrity:
     kind: sha256
-    sha256: a526f2c54c32cf38579316529fffb8d85d84ec5e96b154b1774f377bcc1d57e6
+    sha256: f64241887f41f8fe71503b40de8d24c896c79f2b4be0999e5c51a6ed5947b042
   access:
     mode: read_only
     method: command
@@ -618,6 +624,100 @@ records:
   relations:
   - relation_type: evidenced_by
     target_asset_id: CATALOG-ROOT-001
+  consumers:
+  - TASK-03
+  evidence: []
+  classification:
+    contains_secrets: false
+    contains_raw_data: false
+    sensitivity: INTERNAL_NON_SECRET
+- asset_id: CATALOG-ASSET-REGISTRY-LIFECYCLE-001
+  record_version: '1.0'
+  asset_type: catalog_registry
+  purpose: Catalog shard for active lifecycle registry assets and generated navigation views.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-07-21'
+  truth_owner: TASK-03
+  location:
+    kind: git_path
+    logical_uri: repo://catalog/assets/lifecycle.yaml
+    repository_path: catalog/assets/lifecycle.yaml
+  integrity:
+    kind: catalog_commit
+    note: Registry self-integrity is bound by the Atom 5 candidate commit and its validation evidence.
+  access:
+    mode: read_only
+    method: file
+    network_required: false
+    secrets_required: false
+  relations:
+  - relation_type: depends_on
+    target_asset_id: CATALOG-SCHEMA-ASSET-001
+  consumers:
+  - TASK-03
+  evidence: []
+  classification:
+    contains_secrets: false
+    contains_raw_data: false
+    sensitivity: INTERNAL_NON_SECRET
+- asset_id: CATALOG-SCHEMA-LIFECYCLE-001
+  record_version: '1.0'
+  asset_type: schema
+  purpose: Versioned discriminator schema for the nine active lifecycle registry contracts.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-07-21'
+  truth_owner: TASK-03
+  location:
+    kind: git_path
+    logical_uri: repo://catalog/schemas/lifecycle_registry.schema.json
+    repository_path: catalog/schemas/lifecycle_registry.schema.json
+  integrity:
+    kind: sha256
+    sha256: f956d5880ec5d8be4e30ad177031274053494e57efe7416335767d47d5378125
+  access:
+    mode: read_only
+    method: file
+    network_required: false
+    secrets_required: false
+  relations:
+  - relation_type: validated_by
+    target_asset_id: CATALOG-VALIDATOR-001
+  consumers:
+  - TASK-03
+  evidence: []
+  classification:
+    contains_secrets: false
+    contains_raw_data: false
+    sensitivity: INTERNAL_NON_SECRET
+- asset_id: GENERATOR-CATALOG-NAVIGATION-001
+  record_version: '1.0'
+  asset_type: script
+  purpose: Deterministic Catalog-only generator for the project map and edge projection.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-07-21'
+  truth_owner: TASK-03
+  location:
+    kind: git_path
+    logical_uri: repo://scripts/generate_navigation.py
+    repository_path: scripts/generate_navigation.py
+  integrity:
+    kind: sha256
+    sha256: aa640f5f104a92e5a7117b135ba4ab9bad4b82414d3a18ded7c71e0cfb521df0
+  access:
+    mode: task_write
+    method: command
+    network_required: false
+    secrets_required: false
+  relations:
+  - relation_type: depends_on
+    target_asset_id: CATALOG-VALIDATOR-001
+  - relation_type: produces
+    target_asset_id: GENERATED-PROJECT-MAP-001
+  - relation_type: produces
+    target_asset_id: GENERATED-EDGE-PROJECTION-001
   consumers:
   - TASK-03
   evidence: []
