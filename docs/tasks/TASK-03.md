@@ -5,7 +5,7 @@ implementation_status: IN_PROGRESS
 canonical_status_owner: ChatGPT_Project_Work
 phase: P0
 cash_cap: USD_0
-repository_commit: "399ef0365b017fcd9d7b81389218a63bf1e466c1"
+repository_commit: ee6119ae0b7750710c7f822c50137ed95b4977e9
 remote: NONE
 provider_calls: 0
 contains_secrets: false
@@ -15,57 +15,49 @@ contains_secrets: false
 
 ## Accepted checkpoints
 
-- TASK-02 and Source activation: accepted.
-- Local root commit `399ef0365b017fcd9d7b81389218a63bf1e466c1`:
-  `COMMITTED_BASELINE`, clean, no remote.
-- uv-managed CPython 3.13.14 and PowerShell 7.6.3: validated.
-- Local secret rejection and versioned pre-commit hook: validated.
+- Repository baseline commit: accepted.
+- Catalog foundation commit: `ee6119ae0b7750710c7f822c50137ed95b4977e9`, accepted.
+- Catalog foundation: 17 assets, 3 queries, 3 schemas, stable-ID resolver PASS.
+- Remote/push: absent.
+- Provider/API/RPC calls: 0.
 
-## Current atom — 3A-R
+## Current atom
 
-Implement and stage the Catalog foundation, with the pre-commit EOL repair:
+Stage exact import of TASK-01 and TASK-02 historical evidence plus registration of `ARCH-INTENT-001`:
 
-- root resolver;
-- manifest, asset-registry, and query-recipe schemas;
-- one core asset registry with current repository/control assets;
-- bounded read-only query registry;
-- deterministic Catalog validator and resolver CLI;
-- dependency adoption ADR;
-- unit and negative tests;
-- exact staged candidate receipt;
-- `*.ps1 text eol=lf` checkout policy and roundtrip validation.
+- 12 exact TASK-01 files;
+- 8 exact TASK-02 files;
+- 2 external immutable bundle records;
+- 1 bundle-only superseded TASK-01 validator record;
+- provenance-aware Catalog schema evolution;
+- `first_reliable_available_at` preservation and no-backfill rule;
+- architecture intent registration as current direction, not historical evidence;
+- deterministic import validator and query recipe;
+- no commit and no remote.
 
-## Explicitly excluded
+## Not allowed
 
-- pre-Git TASK-01/02 import;
-- lifecycle registry skeletons;
-- generated project map and edge projection;
-- private remote, CI, clean clone;
-- GitHub connector permissions;
-- Codex workspace/write actions;
-- provider/API/RPC calls;
-- raw/canonical data, DB, VPS, wallet, signer, or real money.
+- commit, remote, push, connector permission, Codex write;
+- provider account/key/API/RPC call;
+- raw/canonical market data;
+- database, collector, VPS, wallet, signer, or real money;
+- claiming that `ARCH-INTENT-001`, `ORCH-001`, or `CTX-AOT-ALBS-001` is implemented.
 
-## Atom 3A-R acceptance
+## Acceptance
 
-- exact dependencies are locked: `PyYAML==6.0.3`, `jsonschema==4.26.0`;
-- root manifest and three standalone schemas validate;
-- stable asset/query IDs are unique and mandatory IDs resolve;
-- all relations and query targets resolve;
-- repository paths are relative, present, and inside the repository;
-- declared SHA-256 values match non-self-referential files;
-- self-referential Catalog roots use accepted-commit evidence policy;
-- query recipes are bounded, read-only, and no-write;
-- duplicate, broken-reference, absolute-path, hash-drift, and write-effect
-  negative tests fail as designed;
-- resolver CLI returns the expected root asset and validation recipe;
-- `.gitattributes` declares `*.ps1 text eol=lf` and forbids the old CRLF rule;
-- working-tree, staged/committed, cached-attribute, and temporary checkout
-  checks all prove LF-only PowerShell bytes;
-- exact 21-file Atom 3A-R changed set is staged; no unstaged/untracked drift;
-- no commit or remote is created.
+- repository state is `PRE_GIT_IMPORT_STAGED`;
+- HEAD remains `ee6119ae0b7750710c7f822c50137ed95b4977e9` and commit count remains 2;
+- repository file count is 58; staged change count is 40; no untracked or unstaged drift;
+- 20 imported files match exact SHA-256 and source-bundle paths;
+- exact imported files are exempt from repository style normalization; all repository-authored staged files still pass `git diff --check`;
+- source ZIP audits and checksum ledgers pass;
+- Catalog has 44 assets, 4 query recipes, 3 schemas, and 3 asset registries;
+- external bundles remain outside Git;
+- A028 stays bundle-only and superseded;
+- provenance and first reliable availability validate;
+- `ARCH-INTENT-001` is current direction only;
+- pre-commit hook, quality gate, secret/path/EOL checks, and tests pass.
 
-## Next atom
+## Next atom after acceptance
 
-Review and separately authorize the Catalog-foundation commit. Pre-Git import
-remains a later atom after the committed foundation is accepted.
+Create a separate import commit only after staged hashes, Catalog resolution, provenance, availability, and rollback evidence are accepted. Remote remains later.

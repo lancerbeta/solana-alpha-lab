@@ -1,0 +1,55 @@
+schema_version: '1.1'
+registry_id: CATALOG-ASSET-REGISTRY-ARCHITECTURE-001
+as_of: '2026-07-21'
+records:
+- asset_id: ARCH-INTENT-001
+  record_version: '1.0'
+  asset_type: architecture_intent
+  purpose: Accepted direction for a data-driven hypothesis factory and regime-aware bot lifecycle orchestration.
+  status: ACCEPTED_DIRECTION_NOT_IMPLEMENTED
+  origin: PROJECT_SOURCE
+  as_of: '2026-07-21'
+  truth_owner: USER_GOAL_OWNER
+  location:
+    kind: git_path
+    logical_uri: repo://docs/architecture/intents/ARCH-INTENT-001-hypothesis-factory-and-regime-aware-orchestration.md
+    repository_path: docs/architecture/intents/ARCH-INTENT-001-hypothesis-factory-and-regime-aware-orchestration.md
+  integrity:
+    kind: sha256
+    sha256: 59f810a75bce0c9a55f3e7dd751744a06d2e4a19a0378f47b08fb2b2bc2edad6
+  access:
+    mode: read_only
+    method: file
+    recipe_id: QUERY-CATALOG-RESOLVE-ASSET-001
+    network_required: false
+    secrets_required: false
+  relations:
+  - relation_type: governed_by
+    target_asset_id: CTRL-TASK-03-001
+  - relation_type: evidenced_by
+    target_asset_id: EVIDENCE-ATOM4B-RECEIPT-001
+  consumers:
+  - FACTORY-001
+  - REG-RESEARCH-001
+  - REG-DEPLOY-001
+  - ORCH-001
+  - CTX-AOT-ALBS-001
+  evidence:
+  - evidence_id: EVIDENCE-ARCH-INTENT-001
+    kind: import_receipt
+    reference: EVIDENCE-ATOM4B-RECEIPT-001
+    result: PASS
+  classification:
+    contains_secrets: false
+    contains_raw_data: false
+    sensitivity: INTERNAL_NON_SECRET
+  provenance:
+    created_at: '2026-07-21'
+    first_reliable_available_at: '2026-07-21'
+    imported_by_task: TASK-03
+    import_mode: REGISTERED_CURRENT_INTENT
+    past_availability_claim: NO_PAST_AVAILABILITY_CLAIM
+    retention: TRACKED_REFERENCE
+    canonicality: CURRENT_INTENT
+    availability_note: Current user-owned architecture direction; it is not attributed to TASK-01 or TASK-02 and does not
+      claim implementation.

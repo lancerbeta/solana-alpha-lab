@@ -1,0 +1,79 @@
+{
+  "schema_version": "1.0",
+  "task_id": "TASK-02",
+  "observed_at_utc": "2026-07-20T21:57:51+00:00",
+  "os": {
+    "name": "Майкрософт Windows 11 Pro",
+    "version": "10.0.26200",
+    "build": "26200",
+    "architecture": "64-bit",
+    "process_architecture": "AMD64"
+  },
+  "resources": {
+    "ram_gb": 31.1,
+    "system_disk_total_gb": 344.2,
+    "system_disk_free_gb": 176.5,
+    "disk_acceptance_rule": "OBSERVED_NO_UNIVERSAL_THRESHOLD"
+  },
+  "time": {
+    "timezone": "Russian Standard Time",
+    "service_state": "Running",
+    "service_start_mode": "Auto",
+    "mode": "NTP",
+    "status_query": "PASS"
+  },
+  "virtualization": {
+    "hypervisor_present": true,
+    "virtualization_firmware_enabled": true,
+    "wsl_version": "2.3.26.0",
+    "wsl_status": "PASS",
+    "user_linux_distribution_required": false
+  },
+  "python": {
+    "version": "3.14.2",
+    "architecture": "AMD64",
+    "implementation": "cpython",
+    "venv_active": false
+  },
+  "tools": {
+    "uv": "uv 0.11.29 (901092ee1 2026-07-15 x86_64-pc-windows-msvc)",
+    "git": "git version 2.55.0.windows.3",
+    "docker_client": "29.6.2",
+    "docker_server": "29.6.2 / linux / amd64",
+    "docker_compose": "5.3.1",
+    "editor": "NOT_INSTALLED_NOT_REQUIRED_FOR_TASK02"
+  },
+  "runtime_tests": {
+    "docker_hello_world_cached": "PASS",
+    "residual_test_container": "NONE"
+  },
+  "scope_assertions": {
+    "cash_spend_usd": 0,
+    "provider_accounts_created": 0,
+    "provider_api_rpc_calls": 0,
+    "repository_created": false,
+    "vps_created": false,
+    "wallet_or_signer_configured": false
+  },
+  "checks": {
+    "windows_os": true,
+    "python_3_12_plus": true,
+    "python_64_bit": true,
+    "uv_available": true,
+    "uv_resolves_python_3_14": true,
+    "git_available": true,
+    "windows_time_query": true,
+    "wsl_available": true,
+    "docker_client_available": true,
+    "docker_engine_healthy": true,
+    "docker_compose_available": true,
+    "docker_cached_hello_world": true,
+    "no_residual_test_container": true,
+    "redaction_scan": true
+  },
+  "redaction": {
+    "status": "PASS",
+    "findings": [],
+    "policy": "ALLOWLISTED_NON_SECRET_FIELDS_ONLY"
+  }
+}

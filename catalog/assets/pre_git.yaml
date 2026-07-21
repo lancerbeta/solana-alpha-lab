@@ -1,0 +1,1196 @@
+schema_version: '1.1'
+registry_id: CATALOG-ASSET-REGISTRY-PRE-GIT-001
+as_of: '2026-07-21'
+records:
+- asset_id: BUNDLE-TASK01-COMPLETION-001
+  record_version: '1.0'
+  asset_type: external_bundle
+  purpose: Immutable canonical TASK-01 completion bundle retained outside Git and registered by exact SHA-256.
+  status: VALIDATED_PRE_GIT
+  origin: EXTERNAL
+  as_of: '2026-07-18'
+  truth_owner: TASK-01
+  location:
+    kind: external_bundle
+    logical_uri: library://SMIAL_TASK-01_Completion_Handoff_v1.0.zip
+  integrity:
+    kind: sha256
+    sha256: 857e87242d9a765f0b39f2ad266a8ec3e2da488b9e019d048d7a0c7a1a304e34
+  access:
+    mode: read_only
+    method: external_reference
+    network_required: false
+    secrets_required: false
+  relations:
+  - relation_type: contains
+    target_asset_id: PRE-GIT-TASK01-A017
+  - relation_type: contains
+    target_asset_id: PRE-GIT-TASK01-A018
+  - relation_type: contains
+    target_asset_id: PRE-GIT-TASK01-A019
+  - relation_type: contains
+    target_asset_id: PRE-GIT-TASK01-A020
+  - relation_type: contains
+    target_asset_id: PRE-GIT-TASK01-A021
+  - relation_type: contains
+    target_asset_id: PRE-GIT-TASK01-A022
+  - relation_type: contains
+    target_asset_id: PRE-GIT-TASK01-A023
+  - relation_type: contains
+    target_asset_id: PRE-GIT-TASK01-A024
+  - relation_type: contains
+    target_asset_id: PRE-GIT-TASK01-A025
+  - relation_type: contains
+    target_asset_id: PRE-GIT-TASK01-A026
+  - relation_type: contains
+    target_asset_id: PRE-GIT-TASK01-A027
+  - relation_type: contains
+    target_asset_id: PRE-GIT-TASK01-A029
+  - relation_type: contains
+    target_asset_id: PRE-GIT-TASK01-A028
+  consumers:
+  - TASK-03
+  evidence:
+  - evidence_id: EVIDENCE-BUNDLE-TASK01-001
+    kind: bundle_checksum
+    reference: EVIDENCE-ATOM4B-RECEIPT-001
+    result: PASS
+  classification:
+    contains_secrets: false
+    contains_raw_data: false
+    sensitivity: INTERNAL_NON_SECRET
+  provenance:
+    created_at: '2026-07-18'
+    first_reliable_available_at: '2026-07-18'
+    imported_by_task: TASK-03
+    import_mode: BUNDLE_ONLY
+    past_availability_claim: PRESERVED
+    retention: EXTERNAL_IMMUTABLE_BUNDLE
+    canonicality: EXTERNAL_BUNDLE
+    availability_note: Bundle availability is recorded from its validated completion date; import does not create earlier
+      availability.
+- asset_id: BUNDLE-TASK02-COMPLETION-001
+  record_version: '1.0'
+  asset_type: external_bundle
+  purpose: Immutable TASK-02 workstation evidence bundle retained outside Git and registered by exact SHA-256.
+  status: VALIDATED_PRE_GIT
+  origin: EXTERNAL
+  as_of: '2026-07-21'
+  truth_owner: TASK-02
+  location:
+    kind: external_bundle
+    logical_uri: library://SMIAL_TASK02_LIBRARY_ARTIFACTS_2026-07-21.zip
+  integrity:
+    kind: sha256
+    sha256: c0530da2bbf4c33953c86264ae1bb4074b80f41990506901feee92cdd92d6149
+  access:
+    mode: read_only
+    method: external_reference
+    network_required: false
+    secrets_required: false
+  relations:
+  - relation_type: contains
+    target_asset_id: PRE-GIT-TASK02-CHECKSUMS-001
+  - relation_type: contains
+    target_asset_id: PRE-GIT-TASK02-SUMMARY-001
+  - relation_type: contains
+    target_asset_id: PRE-GIT-TASK02-BOOTSTRAP-001
+  - relation_type: contains
+    target_asset_id: PRE-GIT-TASK02-ENV-REPORT-001
+  - relation_type: contains
+    target_asset_id: PRE-GIT-TASK02-OPERATOR-RECEIPT-001
+  - relation_type: contains
+    target_asset_id: PRE-GIT-TASK02-TASK-RECORD-001
+  - relation_type: contains
+    target_asset_id: PRE-GIT-TASK02-TOOLS-001
+  - relation_type: contains
+    target_asset_id: PRE-GIT-TASK02-VALIDATION-001
+  consumers:
+  - TASK-03
+  evidence:
+  - evidence_id: EVIDENCE-BUNDLE-TASK02-001
+    kind: bundle_checksum
+    reference: EVIDENCE-ATOM4B-RECEIPT-001
+    result: PASS
+  classification:
+    contains_secrets: false
+    contains_raw_data: false
+    sensitivity: INTERNAL_NON_SECRET
+  provenance:
+    created_at: '2026-07-21'
+    first_reliable_available_at: '2026-07-21'
+    imported_by_task: TASK-03
+    import_mode: BUNDLE_ONLY
+    past_availability_claim: PRESERVED
+    retention: EXTERNAL_IMMUTABLE_BUNDLE
+    canonicality: EXTERNAL_BUNDLE
+    availability_note: Bundle availability is recorded from the validated TASK-02 completion date.
+- asset_id: PRE-GIT-TASK01-A017
+  record_version: '1.0'
+  asset_type: pre_git_artifact
+  purpose: Original checksum ledger for the immutable TASK-01 completion bundle.
+  status: VALIDATED_PRE_GIT
+  origin: PRE_GIT
+  as_of: '2026-07-18'
+  truth_owner: TASK-01
+  location:
+    kind: git_path
+    logical_uri: repo://docs/evidence/pre_git/task01/CHECKSUMS_SHA256.txt
+    repository_path: docs/evidence/pre_git/task01/CHECKSUMS_SHA256.txt
+  integrity:
+    kind: sha256
+    sha256: 860fd944322d41d6271d8134fc57f034e874191887f87fa794f8456ec2f95442
+  access:
+    mode: read_only
+    method: file
+    recipe_id: QUERY-CATALOG-RESOLVE-ASSET-001
+    network_required: false
+    secrets_required: false
+  relations:
+  - relation_type: derived_from
+    target_asset_id: BUNDLE-TASK01-COMPLETION-001
+  - relation_type: evidenced_by
+    target_asset_id: EVIDENCE-ATOM4B-RECEIPT-001
+  consumers:
+  - TASK-03
+  evidence:
+  - evidence_id: EVIDENCE-IMPORT-A017-001
+    kind: import_receipt
+    reference: EVIDENCE-ATOM4B-RECEIPT-001
+    result: PASS
+  classification:
+    contains_secrets: false
+    contains_raw_data: false
+    sensitivity: INTERNAL_NON_SECRET
+  provenance:
+    created_at: '2026-07-18'
+    first_reliable_available_at: '2026-07-18'
+    source_bundle_asset_id: BUNDLE-TASK01-COMPLETION-001
+    source_bundle_sha256: 857e87242d9a765f0b39f2ad266a8ec3e2da488b9e019d048d7a0c7a1a304e34
+    source_path: CHECKSUMS_SHA256.txt
+    legacy_ids:
+    - A017
+    imported_by_task: TASK-03
+    import_mode: EXACT_BYTES
+    past_availability_claim: PRESERVED
+    retention: TRACKED_REFERENCE
+    canonicality: HISTORICAL_REFERENCE
+    availability_note: Exact bytes are imported without changing historical creation or availability claims.
+- asset_id: PRE-GIT-TASK01-A018
+  record_version: '1.0'
+  asset_type: pre_git_artifact
+  purpose: Validated T0/T1/T2 data option-value, cadence, retention, and stop-policy contract.
+  status: VALIDATED_PRE_GIT
+  origin: PRE_GIT
+  as_of: '2026-07-18'
+  truth_owner: TASK-01
+  location:
+    kind: git_path
+    logical_uri: repo://docs/evidence/pre_git/task01/data_option_tiers_v1.yaml
+    repository_path: docs/evidence/pre_git/task01/data_option_tiers_v1.yaml
+  integrity:
+    kind: sha256
+    sha256: f19c0263f94b19135d91d2e61f1f14d158b48c4bd030a514d640041df0210d13
+  access:
+    mode: read_only
+    method: file
+    recipe_id: QUERY-CATALOG-RESOLVE-ASSET-001
+    network_required: false
+    secrets_required: false
+  relations:
+  - relation_type: derived_from
+    target_asset_id: BUNDLE-TASK01-COMPLETION-001
+  - relation_type: evidenced_by
+    target_asset_id: EVIDENCE-ATOM4B-RECEIPT-001
+  consumers:
+  - TASK-05
+  - TASK-10
+  - TASK-16
+  - TASK-20
+  evidence:
+  - evidence_id: EVIDENCE-IMPORT-A018-001
+    kind: import_receipt
+    reference: EVIDENCE-ATOM4B-RECEIPT-001
+    result: PASS
+  classification:
+    contains_secrets: false
+    contains_raw_data: false
+    sensitivity: INTERNAL_NON_SECRET
+  provenance:
+    created_at: '2026-07-18'
+    first_reliable_available_at: '2026-07-18'
+    source_bundle_asset_id: BUNDLE-TASK01-COMPLETION-001
+    source_bundle_sha256: 857e87242d9a765f0b39f2ad266a8ec3e2da488b9e019d048d7a0c7a1a304e34
+    source_path: 02_KEEP_LOCALLY_DO_NOT_UPLOAD/task_01_artifacts/data_option_tiers_v1.yaml
+    legacy_ids:
+    - A018
+    imported_by_task: TASK-03
+    import_mode: EXACT_BYTES
+    past_availability_claim: PRESERVED
+    retention: TRACKED_REFERENCE
+    canonicality: HISTORICAL_REFERENCE
+    availability_note: Exact bytes are imported without changing historical creation or availability claims.
+- asset_id: PRE-GIT-TASK01-A019
+  record_version: '1.0'
+  asset_type: pre_git_artifact
+  purpose: Validated mapping from research hypotheses to required point-in-time data coverage.
+  status: VALIDATED_PRE_GIT
+  origin: PRE_GIT
+  as_of: '2026-07-18'
+  truth_owner: TASK-01
+  location:
+    kind: git_path
+    logical_uri: repo://docs/evidence/pre_git/task01/hypothesis_data_coverage_matrix_v1.md
+    repository_path: docs/evidence/pre_git/task01/hypothesis_data_coverage_matrix_v1.md
+  integrity:
+    kind: sha256
+    sha256: 5ba0b904d4ca3942cb701fa28ccbc7c35c8ce580385c6766a2fc4596b2c16814
+  access:
+    mode: read_only
+    method: file
+    recipe_id: QUERY-CATALOG-RESOLVE-ASSET-001
+    network_required: false
+    secrets_required: false
+  relations:
+  - relation_type: derived_from
+    target_asset_id: BUNDLE-TASK01-COMPLETION-001
+  - relation_type: evidenced_by
+    target_asset_id: EVIDENCE-ATOM4B-RECEIPT-001
+  consumers:
+  - TASK-05
+  - TASK-20
+  - TASK-28
+  evidence:
+  - evidence_id: EVIDENCE-IMPORT-A019-001
+    kind: import_receipt
+    reference: EVIDENCE-ATOM4B-RECEIPT-001
+    result: PASS
+  classification:
+    contains_secrets: false
+    contains_raw_data: false
+    sensitivity: INTERNAL_NON_SECRET
+  provenance:
+    created_at: '2026-07-18'
+    first_reliable_available_at: '2026-07-18'
+    source_bundle_asset_id: BUNDLE-TASK01-COMPLETION-001
+    source_bundle_sha256: 857e87242d9a765f0b39f2ad266a8ec3e2da488b9e019d048d7a0c7a1a304e34
+    source_path: 02_KEEP_LOCALLY_DO_NOT_UPLOAD/task_01_artifacts/hypothesis_data_coverage_matrix_v1.md
+    legacy_ids:
+    - A019
+    imported_by_task: TASK-03
+    import_mode: EXACT_BYTES
+    past_availability_claim: PRESERVED
+    retention: TRACKED_REFERENCE
+    canonicality: HISTORICAL_REFERENCE
+    availability_note: Exact bytes are imported without changing historical creation or availability claims.
+- asset_id: PRE-GIT-TASK01-A020
+  record_version: '1.0'
+  asset_type: pre_git_artifact
+  purpose: Just-in-time provider account checklist with no credentials or account creation evidence.
+  status: VALIDATED_PRE_GIT
+  origin: PRE_GIT
+  as_of: '2026-07-18'
+  truth_owner: TASK-01
+  location:
+    kind: git_path
+    logical_uri: repo://docs/evidence/pre_git/task01/provider_account_checklist_v1.md
+    repository_path: docs/evidence/pre_git/task01/provider_account_checklist_v1.md
+  integrity:
+    kind: sha256
+    sha256: 6cd7c4486e2b9562be2404737c3ae37579bfd5c49faa4dfe974b2350478d49aa
+  access:
+    mode: read_only
+    method: file
+    recipe_id: QUERY-CATALOG-RESOLVE-ASSET-001
+    network_required: false
+    secrets_required: false
+  relations:
+  - relation_type: derived_from
+    target_asset_id: BUNDLE-TASK01-COMPLETION-001
+  - relation_type: evidenced_by
+    target_asset_id: EVIDENCE-ATOM4B-RECEIPT-001
+  consumers:
+  - TASK-07
+  evidence:
+  - evidence_id: EVIDENCE-IMPORT-A020-001
+    kind: import_receipt
+    reference: EVIDENCE-ATOM4B-RECEIPT-001
+    result: PASS
+  classification:
+    contains_secrets: false
+    contains_raw_data: false
+    sensitivity: INTERNAL_NON_SECRET
+  provenance:
+    created_at: '2026-07-18'
+    first_reliable_available_at: '2026-07-18'
+    source_bundle_asset_id: BUNDLE-TASK01-COMPLETION-001
+    source_bundle_sha256: 857e87242d9a765f0b39f2ad266a8ec3e2da488b9e019d048d7a0c7a1a304e34
+    source_path: 02_KEEP_LOCALLY_DO_NOT_UPLOAD/task_01_artifacts/provider_account_checklist_v1.md
+    legacy_ids:
+    - A020
+    imported_by_task: TASK-03
+    import_mode: EXACT_BYTES
+    past_availability_claim: PRESERVED
+    retention: TRACKED_REFERENCE
+    canonicality: HISTORICAL_REFERENCE
+    availability_note: Exact bytes are imported without changing historical creation or availability claims.
+- asset_id: PRE-GIT-TASK01-A021
+  record_version: '1.0'
+  asset_type: pre_git_artifact
+  purpose: Historical provider pricing and cost snapshot used for later measured economics decisions.
+  status: VALIDATED_PRE_GIT
+  origin: PRE_GIT
+  as_of: '2026-07-18'
+  truth_owner: TASK-01
+  location:
+    kind: git_path
+    logical_uri: repo://docs/evidence/pre_git/task01/provider_cost_snapshot_v1.csv
+    repository_path: docs/evidence/pre_git/task01/provider_cost_snapshot_v1.csv
+  integrity:
+    kind: sha256
+    sha256: ad3339fcf07e4dfb70290803d9ae0c589308ae9792e57e0f4d78cf55f9e52888
+  access:
+    mode: read_only
+    method: file
+    recipe_id: QUERY-CATALOG-RESOLVE-ASSET-001
+    network_required: false
+    secrets_required: false
+  relations:
+  - relation_type: derived_from
+    target_asset_id: BUNDLE-TASK01-COMPLETION-001
+  - relation_type: evidenced_by
+    target_asset_id: EVIDENCE-ATOM4B-RECEIPT-001
+  consumers:
+  - TASK-04
+  - TASK-07
+  - TASK-15
+  - TASK-47
+  evidence:
+  - evidence_id: EVIDENCE-IMPORT-A021-001
+    kind: import_receipt
+    reference: EVIDENCE-ATOM4B-RECEIPT-001
+    result: PASS
+  classification:
+    contains_secrets: false
+    contains_raw_data: false
+    sensitivity: INTERNAL_NON_SECRET
+  provenance:
+    created_at: '2026-07-18'
+    first_reliable_available_at: '2026-07-18'
+    source_bundle_asset_id: BUNDLE-TASK01-COMPLETION-001
+    source_bundle_sha256: 857e87242d9a765f0b39f2ad266a8ec3e2da488b9e019d048d7a0c7a1a304e34
+    source_path: 02_KEEP_LOCALLY_DO_NOT_UPLOAD/task_01_artifacts/provider_cost_snapshot_v1.csv
+    legacy_ids:
+    - A021
+    imported_by_task: TASK-03
+    import_mode: EXACT_BYTES
+    past_availability_claim: PRESERVED
+    retention: TRACKED_REFERENCE
+    canonicality: HISTORICAL_REFERENCE
+    availability_note: Exact bytes are imported without changing historical creation or availability claims.
+- asset_id: PRE-GIT-TASK01-A022
+  record_version: '1.0'
+  asset_type: pre_git_artifact
+  purpose: Frozen zero-cash provider shortlist decision for future bounded validation, not runtime proof.
+  status: VALIDATED_PRE_GIT
+  origin: PRE_GIT
+  as_of: '2026-07-18'
+  truth_owner: TASK-01
+  location:
+    kind: git_path
+    logical_uri: repo://docs/evidence/pre_git/task01/provider_decision_v1.md
+    repository_path: docs/evidence/pre_git/task01/provider_decision_v1.md
+  integrity:
+    kind: sha256
+    sha256: 7ed7462f2b9da4aa7bae31469d2423584b89bd7930767ea4cfdd073980a75ec3
+  access:
+    mode: read_only
+    method: file
+    recipe_id: QUERY-CATALOG-RESOLVE-ASSET-001
+    network_required: false
+    secrets_required: false
+  relations:
+  - relation_type: derived_from
+    target_asset_id: BUNDLE-TASK01-COMPLETION-001
+  - relation_type: evidenced_by
+    target_asset_id: EVIDENCE-ATOM4B-RECEIPT-001
+  consumers:
+  - TASK-04
+  - TASK-07
+  evidence:
+  - evidence_id: EVIDENCE-IMPORT-A022-001
+    kind: import_receipt
+    reference: EVIDENCE-ATOM4B-RECEIPT-001
+    result: PASS
+  classification:
+    contains_secrets: false
+    contains_raw_data: false
+    sensitivity: INTERNAL_NON_SECRET
+  provenance:
+    created_at: '2026-07-18'
+    first_reliable_available_at: '2026-07-18'
+    source_bundle_asset_id: BUNDLE-TASK01-COMPLETION-001
+    source_bundle_sha256: 857e87242d9a765f0b39f2ad266a8ec3e2da488b9e019d048d7a0c7a1a304e34
+    source_path: 02_KEEP_LOCALLY_DO_NOT_UPLOAD/task_01_artifacts/provider_decision_v1.md
+    legacy_ids:
+    - A022
+    imported_by_task: TASK-03
+    import_mode: EXACT_BYTES
+    past_availability_claim: PRESERVED
+    retention: TRACKED_REFERENCE
+    canonicality: HISTORICAL_REFERENCE
+    availability_note: Exact bytes are imported without changing historical creation or availability claims.
+- asset_id: PRE-GIT-TASK01-A023
+  record_version: '1.0'
+  asset_type: pre_git_artifact
+  purpose: Frozen design for bounded provider smoke validation; no provider request was executed.
+  status: VALIDATED_PRE_GIT
+  origin: PRE_GIT
+  as_of: '2026-07-18'
+  truth_owner: TASK-01
+  location:
+    kind: git_path
+    logical_uri: repo://docs/evidence/pre_git/task01/provider_smoke_spec_v1.yaml
+    repository_path: docs/evidence/pre_git/task01/provider_smoke_spec_v1.yaml
+  integrity:
+    kind: sha256
+    sha256: a42c8a20dc31101ce134e277e1a612539f7161411ea8261bb109e5cc64d24ddc
+  access:
+    mode: read_only
+    method: file
+    recipe_id: QUERY-CATALOG-RESOLVE-ASSET-001
+    network_required: false
+    secrets_required: false
+  relations:
+  - relation_type: derived_from
+    target_asset_id: BUNDLE-TASK01-COMPLETION-001
+  - relation_type: evidenced_by
+    target_asset_id: EVIDENCE-ATOM4B-RECEIPT-001
+  consumers:
+  - TASK-07
+  evidence:
+  - evidence_id: EVIDENCE-IMPORT-A023-001
+    kind: import_receipt
+    reference: EVIDENCE-ATOM4B-RECEIPT-001
+    result: PASS
+  classification:
+    contains_secrets: false
+    contains_raw_data: false
+    sensitivity: INTERNAL_NON_SECRET
+  provenance:
+    created_at: '2026-07-18'
+    first_reliable_available_at: '2026-07-18'
+    source_bundle_asset_id: BUNDLE-TASK01-COMPLETION-001
+    source_bundle_sha256: 857e87242d9a765f0b39f2ad266a8ec3e2da488b9e019d048d7a0c7a1a304e34
+    source_path: 02_KEEP_LOCALLY_DO_NOT_UPLOAD/task_01_artifacts/provider_smoke_spec_v1.yaml
+    legacy_ids:
+    - A023
+    imported_by_task: TASK-03
+    import_mode: EXACT_BYTES
+    past_availability_claim: PRESERVED
+    retention: TRACKED_REFERENCE
+    canonicality: HISTORICAL_REFERENCE
+    availability_note: Exact bytes are imported without changing historical creation or availability claims.
+- asset_id: PRE-GIT-TASK01-A024
+  record_version: '1.0'
+  asset_type: pre_git_artifact
+  purpose: Validated pre-Git data and software reuse candidate subset for later architecture review.
+  status: VALIDATED_PRE_GIT
+  origin: PRE_GIT
+  as_of: '2026-07-18'
+  truth_owner: TASK-01
+  location:
+    kind: git_path
+    logical_uri: repo://docs/evidence/pre_git/task01/reuse_candidate_registry.yaml
+    repository_path: docs/evidence/pre_git/task01/reuse_candidate_registry.yaml
+  integrity:
+    kind: sha256
+    sha256: 7651eae8991fba3bba22a98cb33b8760c2daa468ee677cdd3423c36a4d458d0a
+  access:
+    mode: read_only
+    method: file
+    recipe_id: QUERY-CATALOG-RESOLVE-ASSET-001
+    network_required: false
+    secrets_required: false
+  relations:
+  - relation_type: derived_from
+    target_asset_id: BUNDLE-TASK01-COMPLETION-001
+  - relation_type: evidenced_by
+    target_asset_id: EVIDENCE-ATOM4B-RECEIPT-001
+  consumers:
+  - TASK-04
+  evidence:
+  - evidence_id: EVIDENCE-IMPORT-A024-001
+    kind: import_receipt
+    reference: EVIDENCE-ATOM4B-RECEIPT-001
+    result: PASS
+  classification:
+    contains_secrets: false
+    contains_raw_data: false
+    sensitivity: INTERNAL_NON_SECRET
+  provenance:
+    created_at: '2026-07-18'
+    first_reliable_available_at: '2026-07-18'
+    source_bundle_asset_id: BUNDLE-TASK01-COMPLETION-001
+    source_bundle_sha256: 857e87242d9a765f0b39f2ad266a8ec3e2da488b9e019d048d7a0c7a1a304e34
+    source_path: 02_KEEP_LOCALLY_DO_NOT_UPLOAD/task_01_artifacts/reuse_candidate_registry.yaml
+    legacy_ids:
+    - A024
+    imported_by_task: TASK-03
+    import_mode: EXACT_BYTES
+    past_availability_claim: PRESERVED
+    retention: TRACKED_REFERENCE
+    canonicality: HISTORICAL_REFERENCE
+    availability_note: Exact bytes are imported without changing historical creation or availability claims.
+- asset_id: PRE-GIT-TASK01-A025
+  record_version: '1.0'
+  asset_type: pre_git_artifact
+  purpose: Provider-neutral source and domain contract with point-in-time and execution semantics.
+  status: VALIDATED_PRE_GIT
+  origin: PRE_GIT
+  as_of: '2026-07-18'
+  truth_owner: TASK-01
+  location:
+    kind: git_path
+    logical_uri: repo://docs/evidence/pre_git/task01/sources_v1.yaml
+    repository_path: docs/evidence/pre_git/task01/sources_v1.yaml
+  integrity:
+    kind: sha256
+    sha256: 48bbe25253a46857f7307ac06df81b42e208a4f336fa220fb48da31846848a3f
+  access:
+    mode: read_only
+    method: file
+    recipe_id: QUERY-CATALOG-RESOLVE-ASSET-001
+    network_required: false
+    secrets_required: false
+  relations:
+  - relation_type: derived_from
+    target_asset_id: BUNDLE-TASK01-COMPLETION-001
+  - relation_type: evidenced_by
+    target_asset_id: EVIDENCE-ATOM4B-RECEIPT-001
+  consumers:
+  - TASK-04
+  - TASK-05
+  - TASK-06
+  - TASK-07
+  evidence:
+  - evidence_id: EVIDENCE-IMPORT-A025-001
+    kind: import_receipt
+    reference: EVIDENCE-ATOM4B-RECEIPT-001
+    result: PASS
+  classification:
+    contains_secrets: false
+    contains_raw_data: false
+    sensitivity: INTERNAL_NON_SECRET
+  provenance:
+    created_at: '2026-07-18'
+    first_reliable_available_at: '2026-07-18'
+    source_bundle_asset_id: BUNDLE-TASK01-COMPLETION-001
+    source_bundle_sha256: 857e87242d9a765f0b39f2ad266a8ec3e2da488b9e019d048d7a0c7a1a304e34
+    source_path: 02_KEEP_LOCALLY_DO_NOT_UPLOAD/task_01_artifacts/sources_v1.yaml
+    legacy_ids:
+    - A025
+    imported_by_task: TASK-03
+    import_mode: EXACT_BYTES
+    past_availability_claim: PRESERVED
+    retention: TRACKED_REFERENCE
+    canonicality: HISTORICAL_REFERENCE
+    availability_note: Exact bytes are imported without changing historical creation or availability claims.
+- asset_id: PRE-GIT-TASK01-A026
+  record_version: '1.0'
+  asset_type: pre_git_artifact
+  purpose: Immutable TASK-01 completion record proving design-only scope and zero provider calls.
+  status: VALIDATED_PRE_GIT
+  origin: PRE_GIT
+  as_of: '2026-07-18'
+  truth_owner: TASK-01
+  location:
+    kind: git_path
+    logical_uri: repo://docs/evidence/pre_git/task01/task_01_completion_record_v1.md
+    repository_path: docs/evidence/pre_git/task01/task_01_completion_record_v1.md
+  integrity:
+    kind: sha256
+    sha256: f378899260c0e93db8e8075373f90feb1349a675790783b8a519b139a6981f12
+  access:
+    mode: read_only
+    method: file
+    recipe_id: QUERY-CATALOG-RESOLVE-ASSET-001
+    network_required: false
+    secrets_required: false
+  relations:
+  - relation_type: derived_from
+    target_asset_id: BUNDLE-TASK01-COMPLETION-001
+  - relation_type: evidenced_by
+    target_asset_id: EVIDENCE-ATOM4B-RECEIPT-001
+  consumers:
+  - TASK-03
+  evidence:
+  - evidence_id: EVIDENCE-IMPORT-A026-001
+    kind: import_receipt
+    reference: EVIDENCE-ATOM4B-RECEIPT-001
+    result: PASS
+  classification:
+    contains_secrets: false
+    contains_raw_data: false
+    sensitivity: INTERNAL_NON_SECRET
+  provenance:
+    created_at: '2026-07-18'
+    first_reliable_available_at: '2026-07-18'
+    source_bundle_asset_id: BUNDLE-TASK01-COMPLETION-001
+    source_bundle_sha256: 857e87242d9a765f0b39f2ad266a8ec3e2da488b9e019d048d7a0c7a1a304e34
+    source_path: 02_KEEP_LOCALLY_DO_NOT_UPLOAD/task_01_artifacts/task_01_completion_record_v1.md
+    legacy_ids:
+    - A026
+    imported_by_task: TASK-03
+    import_mode: EXACT_BYTES
+    past_availability_claim: PRESERVED
+    retention: TRACKED_REFERENCE
+    canonicality: HISTORICAL_REFERENCE
+    availability_note: Exact bytes are imported without changing historical creation or availability claims.
+- asset_id: PRE-GIT-TASK01-A027
+  record_version: '1.0'
+  asset_type: pre_git_artifact
+  purpose: Final TASK-01 gap audit documenting validated coverage, limitations, and downstream owners.
+  status: VALIDATED_PRE_GIT
+  origin: PRE_GIT
+  as_of: '2026-07-18'
+  truth_owner: TASK-01
+  location:
+    kind: git_path
+    logical_uri: repo://docs/evidence/pre_git/task01/task_01_final_gap_audit_v1.md
+    repository_path: docs/evidence/pre_git/task01/task_01_final_gap_audit_v1.md
+  integrity:
+    kind: sha256
+    sha256: 1ccb45b7275fda9870f57330b82373f8d7bd0fd68e74579b3c032f851aa0f5b2
+  access:
+    mode: read_only
+    method: file
+    recipe_id: QUERY-CATALOG-RESOLVE-ASSET-001
+    network_required: false
+    secrets_required: false
+  relations:
+  - relation_type: derived_from
+    target_asset_id: BUNDLE-TASK01-COMPLETION-001
+  - relation_type: evidenced_by
+    target_asset_id: EVIDENCE-ATOM4B-RECEIPT-001
+  consumers:
+  - TASK-03
+  evidence:
+  - evidence_id: EVIDENCE-IMPORT-A027-001
+    kind: import_receipt
+    reference: EVIDENCE-ATOM4B-RECEIPT-001
+    result: PASS
+  classification:
+    contains_secrets: false
+    contains_raw_data: false
+    sensitivity: INTERNAL_NON_SECRET
+  provenance:
+    created_at: '2026-07-18'
+    first_reliable_available_at: '2026-07-18'
+    source_bundle_asset_id: BUNDLE-TASK01-COMPLETION-001
+    source_bundle_sha256: 857e87242d9a765f0b39f2ad266a8ec3e2da488b9e019d048d7a0c7a1a304e34
+    source_path: 02_KEEP_LOCALLY_DO_NOT_UPLOAD/task_01_artifacts/task_01_final_gap_audit_v1.md
+    legacy_ids:
+    - A027
+    imported_by_task: TASK-03
+    import_mode: EXACT_BYTES
+    past_availability_claim: PRESERVED
+    retention: TRACKED_REFERENCE
+    canonicality: HISTORICAL_REFERENCE
+    availability_note: Exact bytes are imported without changing historical creation or availability claims.
+- asset_id: PRE-GIT-TASK01-A029
+  record_version: '1.0'
+  asset_type: pre_git_artifact
+  purpose: Historical TASK-01 validation report retained as exact pre-Git evidence.
+  status: VALIDATED_PRE_GIT
+  origin: PRE_GIT
+  as_of: '2026-07-18'
+  truth_owner: TASK-01
+  location:
+    kind: git_path
+    logical_uri: repo://docs/evidence/pre_git/task01/validation_report.txt
+    repository_path: docs/evidence/pre_git/task01/validation_report.txt
+  integrity:
+    kind: sha256
+    sha256: 5cadcb942eeb583a39aa6a7bb1f82169f9e67809ff9925d448f3fb1c2199edb3
+  access:
+    mode: read_only
+    method: file
+    recipe_id: QUERY-CATALOG-RESOLVE-ASSET-001
+    network_required: false
+    secrets_required: false
+  relations:
+  - relation_type: derived_from
+    target_asset_id: BUNDLE-TASK01-COMPLETION-001
+  - relation_type: evidenced_by
+    target_asset_id: EVIDENCE-ATOM4B-RECEIPT-001
+  consumers:
+  - TASK-03
+  evidence:
+  - evidence_id: EVIDENCE-IMPORT-A029-001
+    kind: import_receipt
+    reference: EVIDENCE-ATOM4B-RECEIPT-001
+    result: PASS
+  classification:
+    contains_secrets: false
+    contains_raw_data: false
+    sensitivity: INTERNAL_NON_SECRET
+  provenance:
+    created_at: '2026-07-18'
+    first_reliable_available_at: '2026-07-18'
+    source_bundle_asset_id: BUNDLE-TASK01-COMPLETION-001
+    source_bundle_sha256: 857e87242d9a765f0b39f2ad266a8ec3e2da488b9e019d048d7a0c7a1a304e34
+    source_path: 02_KEEP_LOCALLY_DO_NOT_UPLOAD/validation/validation_report.txt
+    legacy_ids:
+    - A029
+    imported_by_task: TASK-03
+    import_mode: EXACT_BYTES
+    past_availability_claim: PRESERVED
+    retention: TRACKED_REFERENCE
+    canonicality: HISTORICAL_REFERENCE
+    availability_note: Exact bytes are imported without changing historical creation or availability claims.
+- asset_id: PRE-GIT-TASK01-A028
+  record_version: '1.0'
+  asset_type: pre_git_artifact
+  purpose: Superseded TASK-01 bundle validator retained only inside the immutable source bundle.
+  status: BUNDLE_ONLY_SUPERSEDED
+  origin: PRE_GIT
+  as_of: '2026-07-18'
+  truth_owner: TASK-01
+  location:
+    kind: logical_only
+    logical_uri: bundle://BUNDLE-TASK01-COMPLETION-001/02_KEEP_LOCALLY_DO_NOT_UPLOAD/validation/validate_task01_completion.py
+  integrity:
+    kind: sha256
+    sha256: 5ba5a555ede73247ea567ca1de41bd7a75b64bd75f1fa2d11e98111f7bd1c6f5
+  access:
+    mode: read_only
+    method: external_reference
+    network_required: false
+    secrets_required: false
+  relations:
+  - relation_type: derived_from
+    target_asset_id: BUNDLE-TASK01-COMPLETION-001
+  - relation_type: superseded_by
+    target_asset_id: CATALOG-VALIDATOR-001
+  consumers:
+  - TASK-03
+  evidence:
+  - evidence_id: EVIDENCE-IMPORT-A028-001
+    kind: import_receipt
+    reference: EVIDENCE-ATOM4B-RECEIPT-001
+    result: PASS
+  classification:
+    contains_secrets: false
+    contains_raw_data: false
+    sensitivity: INTERNAL_NON_SECRET
+  provenance:
+    created_at: '2026-07-18'
+    first_reliable_available_at: '2026-07-18'
+    source_bundle_asset_id: BUNDLE-TASK01-COMPLETION-001
+    source_bundle_sha256: 857e87242d9a765f0b39f2ad266a8ec3e2da488b9e019d048d7a0c7a1a304e34
+    source_path: 02_KEEP_LOCALLY_DO_NOT_UPLOAD/validation/validate_task01_completion.py
+    legacy_ids:
+    - A028
+    imported_by_task: TASK-03
+    import_mode: BUNDLE_ONLY
+    past_availability_claim: PRESERVED
+    retention: BUNDLE_ONLY
+    canonicality: HISTORICAL_REFERENCE
+    availability_note: Superseded validator stays only inside the immutable bundle and is not active repository code.
+- asset_id: PRE-GIT-TASK02-CHECKSUMS-001
+  record_version: '1.0'
+  asset_type: pre_git_artifact
+  purpose: Original checksum ledger for the immutable TASK-02 library artifact bundle.
+  status: VALIDATED_PRE_GIT
+  origin: PRE_GIT
+  as_of: '2026-07-21'
+  truth_owner: TASK-02
+  location:
+    kind: git_path
+    logical_uri: repo://docs/evidence/pre_git/task02/CHECKSUMS_SHA256.txt
+    repository_path: docs/evidence/pre_git/task02/CHECKSUMS_SHA256.txt
+  integrity:
+    kind: sha256
+    sha256: ed1de0a6a0c30e251c32bd4dbf9ddeb04efc2a28de297ac0c43376fd4c0d4647
+  access:
+    mode: read_only
+    method: file
+    recipe_id: QUERY-CATALOG-RESOLVE-ASSET-001
+    network_required: false
+    secrets_required: false
+  relations:
+  - relation_type: derived_from
+    target_asset_id: BUNDLE-TASK02-COMPLETION-001
+  - relation_type: evidenced_by
+    target_asset_id: EVIDENCE-ATOM4B-RECEIPT-001
+  consumers:
+  - TASK-03
+  evidence:
+  - evidence_id: EVIDENCE-IMPORT-PRE-GIT-TASK02-CHECKSUMS-001-001
+    kind: import_receipt
+    reference: EVIDENCE-ATOM4B-RECEIPT-001
+    result: PASS
+  classification:
+    contains_secrets: false
+    contains_raw_data: false
+    sensitivity: INTERNAL_NON_SECRET
+  provenance:
+    created_at: '2026-07-21'
+    first_reliable_available_at: '2026-07-21'
+    source_bundle_asset_id: BUNDLE-TASK02-COMPLETION-001
+    source_bundle_sha256: c0530da2bbf4c33953c86264ae1bb4074b80f41990506901feee92cdd92d6149
+    source_path: CHECKSUMS_SHA256.txt
+    imported_by_task: TASK-03
+    import_mode: EXACT_BYTES
+    past_availability_claim: PRESERVED
+    retention: TRACKED_REFERENCE
+    canonicality: HISTORICAL_REFERENCE
+    availability_note: Exact bytes are imported from the accepted TASK-02 completion bundle.
+- asset_id: PRE-GIT-TASK02-SUMMARY-001
+  record_version: '1.0'
+  asset_type: pre_git_artifact
+  purpose: Human-readable TASK-02 completion summary and scope boundary.
+  status: VALIDATED_PRE_GIT
+  origin: PRE_GIT
+  as_of: '2026-07-21'
+  truth_owner: TASK-02
+  location:
+    kind: git_path
+    logical_uri: repo://docs/evidence/pre_git/task02/TASK02_COMPLETION_SUMMARY.md
+    repository_path: docs/evidence/pre_git/task02/TASK02_COMPLETION_SUMMARY.md
+  integrity:
+    kind: sha256
+    sha256: 3a917f3b6d7e79cda949b49576b51f9b9a87363dd2829cf0605e3c96345f3cd7
+  access:
+    mode: read_only
+    method: file
+    recipe_id: QUERY-CATALOG-RESOLVE-ASSET-001
+    network_required: false
+    secrets_required: false
+  relations:
+  - relation_type: derived_from
+    target_asset_id: BUNDLE-TASK02-COMPLETION-001
+  - relation_type: evidenced_by
+    target_asset_id: EVIDENCE-ATOM4B-RECEIPT-001
+  consumers:
+  - TASK-03
+  evidence:
+  - evidence_id: EVIDENCE-IMPORT-PRE-GIT-TASK02-SUMMARY-001-001
+    kind: import_receipt
+    reference: EVIDENCE-ATOM4B-RECEIPT-001
+    result: PASS
+  classification:
+    contains_secrets: false
+    contains_raw_data: false
+    sensitivity: INTERNAL_NON_SECRET
+  provenance:
+    created_at: '2026-07-21'
+    first_reliable_available_at: '2026-07-21'
+    source_bundle_asset_id: BUNDLE-TASK02-COMPLETION-001
+    source_bundle_sha256: c0530da2bbf4c33953c86264ae1bb4074b80f41990506901feee92cdd92d6149
+    source_path: TASK02_COMPLETION_SUMMARY.md
+    imported_by_task: TASK-03
+    import_mode: EXACT_BYTES
+    past_availability_claim: PRESERVED
+    retention: TRACKED_REFERENCE
+    canonicality: HISTORICAL_REFERENCE
+    availability_note: Exact bytes are imported from the accepted TASK-02 completion bundle.
+- asset_id: PRE-GIT-TASK02-BOOTSTRAP-001
+  record_version: '1.0'
+  asset_type: pre_git_artifact
+  purpose: Deterministic workstation bootstrap validator retained as historical implementation evidence.
+  status: VALIDATED_PRE_GIT
+  origin: PRE_GIT
+  as_of: '2026-07-21'
+  truth_owner: TASK-02
+  location:
+    kind: git_path
+    logical_uri: repo://docs/evidence/pre_git/task02/bootstrap_check.py
+    repository_path: docs/evidence/pre_git/task02/bootstrap_check.py
+  integrity:
+    kind: sha256
+    sha256: d53dc4f51fd41ddb817f1e3cf54b9282bfa2ea83eb1c036e0314830b5b24bfdc
+  access:
+    mode: read_only
+    method: file
+    recipe_id: QUERY-CATALOG-RESOLVE-ASSET-001
+    network_required: false
+    secrets_required: false
+  relations:
+  - relation_type: derived_from
+    target_asset_id: BUNDLE-TASK02-COMPLETION-001
+  - relation_type: evidenced_by
+    target_asset_id: EVIDENCE-ATOM4B-RECEIPT-001
+  consumers:
+  - TASK-03
+  - TASK-04
+  evidence:
+  - evidence_id: EVIDENCE-IMPORT-PRE-GIT-TASK02-BOOTSTRAP-001-001
+    kind: import_receipt
+    reference: EVIDENCE-ATOM4B-RECEIPT-001
+    result: PASS
+  classification:
+    contains_secrets: false
+    contains_raw_data: false
+    sensitivity: INTERNAL_NON_SECRET
+  provenance:
+    created_at: '2026-07-21'
+    first_reliable_available_at: '2026-07-21'
+    source_bundle_asset_id: BUNDLE-TASK02-COMPLETION-001
+    source_bundle_sha256: c0530da2bbf4c33953c86264ae1bb4074b80f41990506901feee92cdd92d6149
+    source_path: bootstrap_check.py
+    imported_by_task: TASK-03
+    import_mode: EXACT_BYTES
+    past_availability_claim: PRESERVED
+    retention: TRACKED_REFERENCE
+    canonicality: HISTORICAL_REFERENCE
+    availability_note: Exact bytes are imported from the accepted TASK-02 completion bundle.
+- asset_id: PRE-GIT-TASK02-ENV-REPORT-001
+  record_version: '1.0'
+  asset_type: pre_git_artifact
+  purpose: Sanitized accepted workstation environment report.
+  status: VALIDATED_PRE_GIT
+  origin: PRE_GIT
+  as_of: '2026-07-21'
+  truth_owner: TASK-02
+  location:
+    kind: git_path
+    logical_uri: repo://docs/evidence/pre_git/task02/env_report.txt
+    repository_path: docs/evidence/pre_git/task02/env_report.txt
+  integrity:
+    kind: sha256
+    sha256: 44691c228f19ef6b01580318655461b0191e6fdae9418a15fd3a459847b0fb83
+  access:
+    mode: read_only
+    method: file
+    recipe_id: QUERY-CATALOG-RESOLVE-ASSET-001
+    network_required: false
+    secrets_required: false
+  relations:
+  - relation_type: derived_from
+    target_asset_id: BUNDLE-TASK02-COMPLETION-001
+  - relation_type: evidenced_by
+    target_asset_id: EVIDENCE-ATOM4B-RECEIPT-001
+  consumers:
+  - TASK-03
+  - TASK-04
+  evidence:
+  - evidence_id: EVIDENCE-IMPORT-PRE-GIT-TASK02-ENV-REPORT-001-001
+    kind: import_receipt
+    reference: EVIDENCE-ATOM4B-RECEIPT-001
+    result: PASS
+  classification:
+    contains_secrets: false
+    contains_raw_data: false
+    sensitivity: INTERNAL_NON_SECRET
+  provenance:
+    created_at: '2026-07-21'
+    first_reliable_available_at: '2026-07-21'
+    source_bundle_asset_id: BUNDLE-TASK02-COMPLETION-001
+    source_bundle_sha256: c0530da2bbf4c33953c86264ae1bb4074b80f41990506901feee92cdd92d6149
+    source_path: env_report.txt
+    imported_by_task: TASK-03
+    import_mode: EXACT_BYTES
+    past_availability_claim: PRESERVED
+    retention: TRACKED_REFERENCE
+    canonicality: HISTORICAL_REFERENCE
+    availability_note: Exact bytes are imported from the accepted TASK-02 completion bundle.
+- asset_id: PRE-GIT-TASK02-OPERATOR-RECEIPT-001
+  record_version: '1.0'
+  asset_type: pre_git_artifact
+  purpose: Sanitized operator-attested TASK-02 observations and controlled failure provenance.
+  status: VALIDATED_PRE_GIT
+  origin: PRE_GIT
+  as_of: '2026-07-21'
+  truth_owner: TASK-02
+  location:
+    kind: git_path
+    logical_uri: repo://docs/evidence/pre_git/task02/operator_observation_receipt.json
+    repository_path: docs/evidence/pre_git/task02/operator_observation_receipt.json
+  integrity:
+    kind: sha256
+    sha256: 98af4b66c5ff9b885e9afe8774780750d8c6c5efff8a167fdd072d0523991f4e
+  access:
+    mode: read_only
+    method: file
+    recipe_id: QUERY-CATALOG-RESOLVE-ASSET-001
+    network_required: false
+    secrets_required: false
+  relations:
+  - relation_type: derived_from
+    target_asset_id: BUNDLE-TASK02-COMPLETION-001
+  - relation_type: evidenced_by
+    target_asset_id: EVIDENCE-ATOM4B-RECEIPT-001
+  consumers:
+  - TASK-03
+  evidence:
+  - evidence_id: EVIDENCE-IMPORT-PRE-GIT-TASK02-OPERATOR-RECEIPT-001-001
+    kind: import_receipt
+    reference: EVIDENCE-ATOM4B-RECEIPT-001
+    result: PASS
+  classification:
+    contains_secrets: false
+    contains_raw_data: false
+    sensitivity: INTERNAL_NON_SECRET
+  provenance:
+    created_at: '2026-07-21'
+    first_reliable_available_at: '2026-07-21'
+    source_bundle_asset_id: BUNDLE-TASK02-COMPLETION-001
+    source_bundle_sha256: c0530da2bbf4c33953c86264ae1bb4074b80f41990506901feee92cdd92d6149
+    source_path: operator_observation_receipt.json
+    imported_by_task: TASK-03
+    import_mode: EXACT_BYTES
+    past_availability_claim: PRESERVED
+    retention: TRACKED_REFERENCE
+    canonicality: HISTORICAL_REFERENCE
+    availability_note: Exact bytes are imported from the accepted TASK-02 completion bundle.
+- asset_id: PRE-GIT-TASK02-TASK-RECORD-001
+  record_version: '1.0'
+  asset_type: pre_git_artifact
+  purpose: Final TASK-02 task record with accepted workstation state and handoff.
+  status: VALIDATED_PRE_GIT
+  origin: PRE_GIT
+  as_of: '2026-07-21'
+  truth_owner: TASK-02
+  location:
+    kind: git_path
+    logical_uri: repo://docs/evidence/pre_git/task02/task_02_workstation_bootstrap.md
+    repository_path: docs/evidence/pre_git/task02/task_02_workstation_bootstrap.md
+  integrity:
+    kind: sha256
+    sha256: 3dab690b72008fb242349c5257e8cc2e5ed4fa0fcaeb3c372084eb5e437454a0
+  access:
+    mode: read_only
+    method: file
+    recipe_id: QUERY-CATALOG-RESOLVE-ASSET-001
+    network_required: false
+    secrets_required: false
+  relations:
+  - relation_type: derived_from
+    target_asset_id: BUNDLE-TASK02-COMPLETION-001
+  - relation_type: evidenced_by
+    target_asset_id: EVIDENCE-ATOM4B-RECEIPT-001
+  consumers:
+  - TASK-03
+  evidence:
+  - evidence_id: EVIDENCE-IMPORT-PRE-GIT-TASK02-TASK-RECORD-001-001
+    kind: import_receipt
+    reference: EVIDENCE-ATOM4B-RECEIPT-001
+    result: PASS
+  classification:
+    contains_secrets: false
+    contains_raw_data: false
+    sensitivity: INTERNAL_NON_SECRET
+  provenance:
+    created_at: '2026-07-21'
+    first_reliable_available_at: '2026-07-21'
+    source_bundle_asset_id: BUNDLE-TASK02-COMPLETION-001
+    source_bundle_sha256: c0530da2bbf4c33953c86264ae1bb4074b80f41990506901feee92cdd92d6149
+    source_path: task_02_workstation_bootstrap.md
+    imported_by_task: TASK-03
+    import_mode: EXACT_BYTES
+    past_availability_claim: PRESERVED
+    retention: TRACKED_REFERENCE
+    canonicality: HISTORICAL_REFERENCE
+    availability_note: Exact bytes are imported from the accepted TASK-02 completion bundle.
+- asset_id: PRE-GIT-TASK02-TOOLS-001
+  record_version: '1.0'
+  asset_type: pre_git_artifact
+  purpose: Machine-readable accepted tool and runtime versions from TASK-02.
+  status: VALIDATED_PRE_GIT
+  origin: PRE_GIT
+  as_of: '2026-07-21'
+  truth_owner: TASK-02
+  location:
+    kind: git_path
+    logical_uri: repo://docs/evidence/pre_git/task02/tool_versions.json
+    repository_path: docs/evidence/pre_git/task02/tool_versions.json
+  integrity:
+    kind: sha256
+    sha256: 518e5757fab6711a4364cfc2707e656c913b498d48143d9d529cf4a130367c62
+  access:
+    mode: read_only
+    method: file
+    recipe_id: QUERY-CATALOG-RESOLVE-ASSET-001
+    network_required: false
+    secrets_required: false
+  relations:
+  - relation_type: derived_from
+    target_asset_id: BUNDLE-TASK02-COMPLETION-001
+  - relation_type: evidenced_by
+    target_asset_id: EVIDENCE-ATOM4B-RECEIPT-001
+  consumers:
+  - TASK-03
+  - TASK-04
+  evidence:
+  - evidence_id: EVIDENCE-IMPORT-PRE-GIT-TASK02-TOOLS-001-001
+    kind: import_receipt
+    reference: EVIDENCE-ATOM4B-RECEIPT-001
+    result: PASS
+  classification:
+    contains_secrets: false
+    contains_raw_data: false
+    sensitivity: INTERNAL_NON_SECRET
+  provenance:
+    created_at: '2026-07-21'
+    first_reliable_available_at: '2026-07-21'
+    source_bundle_asset_id: BUNDLE-TASK02-COMPLETION-001
+    source_bundle_sha256: c0530da2bbf4c33953c86264ae1bb4074b80f41990506901feee92cdd92d6149
+    source_path: tool_versions.json
+    imported_by_task: TASK-03
+    import_mode: EXACT_BYTES
+    past_availability_claim: PRESERVED
+    retention: TRACKED_REFERENCE
+    canonicality: HISTORICAL_REFERENCE
+    availability_note: Exact bytes are imported from the accepted TASK-02 completion bundle.
+- asset_id: PRE-GIT-TASK02-VALIDATION-001
+  record_version: '1.0'
+  asset_type: pre_git_artifact
+  purpose: Machine-readable TASK-02 validation receipt proving all bounded checks passed.
+  status: VALIDATED_PRE_GIT
+  origin: PRE_GIT
+  as_of: '2026-07-21'
+  truth_owner: TASK-02
+  location:
+    kind: git_path
+    logical_uri: repo://docs/evidence/pre_git/task02/validation_receipt.json
+    repository_path: docs/evidence/pre_git/task02/validation_receipt.json
+  integrity:
+    kind: sha256
+    sha256: 5b50b7c0574d323b8dede7e10456832296ce5ac168cd8859e27c4be4d2707270
+  access:
+    mode: read_only
+    method: file
+    recipe_id: QUERY-CATALOG-RESOLVE-ASSET-001
+    network_required: false
+    secrets_required: false
+  relations:
+  - relation_type: derived_from
+    target_asset_id: BUNDLE-TASK02-COMPLETION-001
+  - relation_type: evidenced_by
+    target_asset_id: EVIDENCE-ATOM4B-RECEIPT-001
+  consumers:
+  - TASK-03
+  - TASK-04
+  evidence:
+  - evidence_id: EVIDENCE-IMPORT-PRE-GIT-TASK02-VALIDATION-001-001
+    kind: import_receipt
+    reference: EVIDENCE-ATOM4B-RECEIPT-001
+    result: PASS
+  classification:
+    contains_secrets: false
+    contains_raw_data: false
+    sensitivity: INTERNAL_NON_SECRET
+  provenance:
+    created_at: '2026-07-21'
+    first_reliable_available_at: '2026-07-21'
+    source_bundle_asset_id: BUNDLE-TASK02-COMPLETION-001
+    source_bundle_sha256: c0530da2bbf4c33953c86264ae1bb4074b80f41990506901feee92cdd92d6149
+    source_path: validation_receipt.json
+    imported_by_task: TASK-03
+    import_mode: EXACT_BYTES
+    past_availability_claim: PRESERVED
+    retention: TRACKED_REFERENCE
+    canonicality: HISTORICAL_REFERENCE
+    availability_note: Exact bytes are imported from the accepted TASK-02 completion bundle.

@@ -1,57 +1,32 @@
 ---
 handoff_status: WORKING_CHECKPOINT
 task_id: TASK-03
-atom_id: TASK03-ATOM-3A-R
+atom_id: TASK03-ATOM-4B
 canonical_status_owner: ChatGPT_Project_Work
-accepted_base_commit: "399ef0365b017fcd9d7b81389218a63bf1e466c1"
-candidate_commit: NONE
+accepted_commit: ee6119ae0b7750710c7f822c50137ed95b4977e9
 remote: NONE
 ---
 
 # Latest handoff
 
-## Atom
-
-Catalog schemas, root resolver, and checkout/EOL repair are staged; no Catalog
-commit or remote exists.
-
 ## Candidate state
 
-- base commit: `399ef0365b017fcd9d7b81389218a63bf1e466c1`;
-- repository state: `CATALOG_FOUNDATION_STAGED`;
-- total repository files: 32;
-- staged Atom 3A-R files: 21;
-- untracked and unstaged files: 0;
-- remote count: 0.
+- `PRE_GIT_IMPORT_STAGED`;
+- HEAD `ee6119ae0b7750710c7f822c50137ed95b4977e9` remains unchanged;
+- 20 exact imported bytes;
+- 2 external bundle records;
+- 1 superseded bundle-only record;
+- `ARCH-INTENT-001` registered as current direction;
+- commit/push/remote/Codex/provider writes: none.
 
-## Foundation outputs
+## Provenance boundary
 
-- `catalog/catalog_manifest.yaml`;
-- standalone JSON Schemas for manifest/assets/queries;
-- core asset registry and read-only query registry;
-- `scripts/validate_catalog.py`;
-- `scripts/catalog_cli.py`;
-- ADR-001 and deterministic evidence receipt.
+TASK-01/02 artifacts remain `PRE_GIT` historical references. Their import date does not replace creation date or `first_reliable_available_at`. The immutable source ZIPs remain outside Git and are registered by SHA-256. Exact imported bytes are not reformatted to satisfy repository style rules; hash, encoding, secret/path, lineage, and availability checks govern them.
 
-## Checkout contract
+## Architecture intent boundary
 
-- `*.ps1 text eol=lf`;
-- working-tree and staged PowerShell bytes: LF-only;
-- `git check-attr` working/cached results: `lf`;
-- temporary `checkout-index` roundtrip: LF-only;
-- global Git configuration: unchanged.
+`ARCH-INTENT-001` is dated 2026-07-21 and belongs to the current Work-owned architecture direction. AOT/ALBS context is advisory only and cannot bypass bot lifecycle, risk, execution, inventory, or evidence gates.
 
-## Dependencies
+## Unresolved TASK-03 work
 
-- PyYAML `6.0.3` — exact lock, `safe_load` only;
-- jsonschema `4.26.0` — exact lock, Draft 2020-12;
-- no additional dependency or network action in Atom 3A-R.
-
-## Deferred
-
-Pre-Git import, generated map/edges, lifecycle registries, private remote,
-CI, clean clone, and Codex pilot remain unimplemented.
-
-## Proposed status
-
-No canonical TASK-03 status change is claimed from this staged checkpoint.
+Import commit, lifecycle registry skeletons, generated map/edges, private remote, CI, clean clone, bounded Codex pilot, and coordinated canonical handoff remain incomplete.

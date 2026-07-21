@@ -1,0 +1,1052 @@
+schema_version: "1.0.0"
+
+artifact:
+  artifact_id: SMIAL_TASK_01_SOURCES
+  artifact_version: "1.0"
+  task_id: TASK-01
+  task_execution_status: DONE
+  artifact_status: VALIDATED_SOURCE_CONTRACT
+  owner: user+assistant
+  created_at: "2026-07-18"
+  as_of: "2026-07-18"
+  entry_verdict: START_AS_WRITTEN
+  canonical_after_validation: true
+  canonical_sources_sync: PREPARED_FOR_CANONICAL_HANDOFF_USER_ACTIVATION_PENDING
+  contains_secrets: false
+  api_rpc_provider_requests_executed: false
+  endpoint_probing_executed: false
+  accounts_created: false
+  purchases_executed: false
+  downstream_artifacts:
+    - data_option_tiers_v1.yaml
+    - provider_cost_snapshot_v1.csv
+    - reuse_candidate_registry.yaml
+    - provider_decision_v1.md
+    - provider_account_checklist_v1.md
+    - provider_smoke_spec_v1.yaml
+
+task_boundary:
+  permitted:
+    - official_documentation_research
+    - static_contract_design
+    - local_artifact_creation
+    - static_validation
+  prohibited:
+    - api_requests
+    - rpc_requests
+    - websocket_connections
+    - endpoint_probing
+    - quota_or_latency_measurement
+    - account_creation
+    - plan_purchase
+    - transaction_build_simulate_sign_send
+    - external_writes
+  controlled_requests_owner_task: TASK-07
+  real_execution_owner_tasks:
+    - TASK-25
+    - TASK-26
+    - TASK-29
+
+global_rules:
+  provider_schema_is_canonical_schema: false
+  indexed_provider_is_protocol_truth: false
+  candle_or_spot_price_proves_fillability: false
+  historical_catalog_creates_past_strategy_availability: false
+  missing_timeout_no_route_equals_zero: false
+  raw_payload_before_normalization: true
+  append_only_observation_envelope: true
+  secret_storage:
+    allowed_locations:
+      - local_secret_store_defined_after_TASK-02
+      - local_env_file_excluded_from_git
+    forbidden_locations:
+      - chat
+      - project_sources
+      - git
+      - logs
+      - screenshots
+    never_collect:
+      - seed_phrase
+      - private_key
+      - wallet_backup
+      - session_cookie
+      - api_key_fragment
+  procurement:
+    required_payment_preference: ANY_CRYPTO_ASSET_ACCEPTED_BY_SERVICE
+    decision_order:
+      - technical_data_execution_truth
+      - security_terms_reliability_and_DoD
+      - documented_crypto_payment_preference
+      - total_cost_of_ownership
+      - convenience
+    free_plan_has_no_payment_penalty: true
+    fiat_only_exception_requires_user_approval: true
+    purchase_requires_measured_bottleneck: true
+    automatic_wallet_charge_default: disabled
+    payment_action_owner: user
+
+evidence_state_vocabulary:
+  official_docs: Public official documentation retrieved and inspected.
+  official_repo: Official source repository inspected; commit pin may still be pending.
+  official_dashboard_needed: Authenticated dashboard or sanitized user attestation is required.
+  conflict: Two official claims cannot yet be reconciled without dashboard or TASK-07 evidence.
+  task07_validation_required: Runtime schema, coverage, error, quota or latency claim is untested.
+  internal_design: Project contract only; implementation is downstream.
+  unknown: No sufficient official evidence found.
+
+truth_layers:
+  PROTOCOL_TRUTH:
+    authority:
+      - raw_solana_account_and_transaction_state
+      - official_program_idl_and_program_documentation
+      - explicit_slot_and_commitment
+    disallowed_substitutes:
+      - vendor_risk_score
+      - vendor_entity_label
+      - candle
+      - human_readable_parser_without_raw_lineage
+  TRANSPORT_OR_INDEX:
+    authority:
+      - request_and_delivery_evidence_for_that_provider
+      - indexed_or_parsed_record_with_provider_version
+    not_authoritative_for:
+      - protocol_state_without_raw_cross_check
+      - point_in_time_availability_before_local_observation
+  EXECUTABLE_QUOTE_REALITY:
+    authority:
+      - exact_mint_amount_direction_and_time_quote
+      - route_fee_context_and_error_or_no_route
+    disallowed_substitutes:
+      - candle_close
+      - spot_price_endpoint
+      - reserve_formula_alone
+      - historical_swap_price
+  LOCAL_OBSERVATION_TRUTH:
+    authority:
+      - request_and_response_timestamps
+      - raw_payload_hash
+      - failure_and_retry_chain
+      - provider_plan_and_credit_observation
+      - revision_link
+  DERIVED_PIT:
+    authority:
+      - deterministic_versioned_derivation_from_rows_available_at_decision_time
+
+timestamp_contract:
+  required_when_applicable:
+    - event_time
+    - observed_at
+    - available_to_strategy_at
+    - ingested_at
+  initial_first_reliable_available_at: UNSET_UNTIL_VALIDATED
+  rules:
+    event_time_is_not_observed_at: true
+    provider_response_time_is_not_chain_event_time: true
+    backfill_may_not_predate_first_reliable_available_at: true
+    commitment_must_be_stored_for_chain_observations: true
+    provider_clock_and_local_clock_must_not_be_silently_merged: true
+
+sources:
+  - source_id: SOLANA_RPC_PROTOCOL
+    display_name: Solana RPC and program state
+    source_class: protocol_interface
+    candidate_decision: ADOPT_AS_REFERENCE
+    truth_layers:
+      - PROTOCOL_TRUTH
+    authoritative_for:
+      - raw_account_state
+      - raw_transaction_and_status
+      - slot_blockhash_commitment_and_network_state
+      - token_accounts_and_supply
+    prohibited_uses:
+      - treating_shared_public_rpc_as_production_transport
+      - inferring_strategy_availability_from_event_time_only
+    official_evidence:
+      - evidence_id: SOLANA_RPC_OVERVIEW
+        url: https://solana.com/docs/rpc
+        state: official_docs
+        as_of: "2026-07-18"
+        fact_summary: HTTP and WebSocket methods expose network state and subscriptions; public endpoints are shared and not intended for production.
+    products:
+      - product_id: SOLANA_JSON_RPC_INTERFACE
+        endpoint_class: HTTP_RPC
+        base_url: UNSET_UNTIL_TASK07
+        method_classes:
+          - account_and_program_reads
+          - transaction_and_signature_reads
+          - token_account_and_supply_reads
+          - slot_blockhash_commitment_reads
+          - prioritization_fee_reads
+        runtime_permission: TASK07_CONTROLLED_READS_ONLY
+      - product_id: SOLANA_WEBSOCKET_INTERFACE
+        endpoint_class: WEBSOCKET
+        base_url: UNSET_UNTIL_TASK07
+        method_classes:
+          - account_subscriptions
+          - program_subscriptions
+          - log_subscriptions
+          - signature_subscriptions
+        runtime_permission: TASK07_CONTROLLED_SUBSCRIPTIONS_ONLY
+    auth:
+      account_state: NOT_APPLICABLE_FOR_INTERFACE_SPEC
+      credential_state: NONE
+      production_provider: UNSET_UNTIL_TASK07
+    payment:
+      mode: not_applicable
+      paid_transport_selection: UNSET_UNTIL_TASK07
+    observation_contract:
+      event_time: block_time_or_null_with_slot
+      observed_at: local_receive_time
+      available_to_strategy_at: local_validated_receive_time
+      ingested_at: raw_envelope_persist_time
+      revisions:
+        - commitment_progression
+        - processed_fork_rollback
+        - provider_archive_or_history_limit
+      raw_retention_required: true
+      missing_policy: preserve_null_or_error_with_method_and_commitment
+    validation:
+      current_state: official_docs
+      required_task: TASK-07
+      assertions:
+        - commitment_and_context_slot_are_preserved
+        - public_endpoint_is_not_used_as_production_SLA
+
+  - source_id: PUMP_PUBLIC_PROTOCOL_DOCS
+    display_name: Pump and PumpSwap public docs and IDLs
+    source_class: official_program_specification
+    candidate_decision: ADOPT_AS_REFERENCE
+    truth_layers:
+      - PROTOCOL_TRUTH
+    authoritative_for:
+      - program_account_layouts
+      - instruction_and_event_semantics
+      - quote_mint_and_v2_instruction_semantics
+      - effective_and_virtual_quote_reserve_semantics
+    prohibited_uses:
+      - treating_unpinned_latest_IDL_as_immutable
+      - treating_documentation_as_observed_chain_state
+    official_evidence:
+      - evidence_id: PUMP_PUBLIC_REPOSITORY
+        url: https://github.com/pump-fun/pump-public-docs
+        state: official_repo
+        as_of: "2026-07-18"
+        fact_summary: Official docs and IDLs include v2 trade instructions, quote_mint fields, and effective quote reserve guidance.
+    products:
+      - product_id: PUMP_IDL_AND_DOCS
+        endpoint_class: STATIC_REPOSITORY
+        runtime_permission: REFERENCE_ONLY
+        commit_pin: UNSET_UNTIL_TASK03_OR_TASK04
+        checksum: UNSET_UNTIL_PINNED
+    auth:
+      account_state: NOT_REQUIRED
+      credential_state: NONE
+    payment:
+      mode: not_applicable
+    observation_contract:
+      event_time: not_applicable
+      observed_at: documentation_retrieval_time
+      available_to_strategy_at: decoder_release_and_deployment_time
+      ingested_at: local_registry_update_time
+      revisions:
+        - repository_change
+        - program_upgrade
+        - IDL_or_field_append
+      raw_retention_required: true
+    validation:
+      current_state: official_repo
+      required_tasks:
+        - TASK-03
+        - TASK-04
+        - TASK-07
+      assertions:
+        - decoder_version_and_program_id_are_stored
+        - quote_mint_is_not_assumed_to_be_SOL
+        - effective_quote_reserves_are_versioned
+
+  - source_id: HELIUS
+    display_name: Helius
+    source_class: rpc_streaming_and_indexed_provider
+    candidate_decision: WRAP_PRIMARY_TRANSPORT_CANDIDATE
+    truth_layers:
+      - TRANSPORT_OR_INDEX
+    authoritative_for:
+      - its_delivery_and_error_evidence
+      - its_plan_credit_and_response_metadata
+    not_authoritative_for:
+      - protocol_semantics_without_raw_cross_check
+      - final_entity_or_swap_classification
+    official_evidence:
+      - evidence_id: HELIUS_PLANS
+        url: https://www.helius.dev/docs/billing/plans
+        state: official_docs
+        as_of: "2026-07-18"
+        fact_summary: Free plan lists 1M monthly credits, 10 RPC requests per second, and standard Solana WebSocket methods.
+      - evidence_id: HELIUS_ENHANCED_TRANSACTIONS
+        url: https://www.helius.dev/docs/api-reference/enhanced-transactions/overview
+        state: official_docs
+        as_of: "2026-07-18"
+        fact_summary: Enhanced Transactions parses transactions into human-readable swaps, transfers, and other operations.
+      - evidence_id: HELIUS_CRYPTO_PAYMENT
+        url: https://www.helius.dev/docs/billing/pay-with-crypto
+        state: official_docs
+        as_of: "2026-07-18"
+        fact_summary: Paid plans support USDC on Solana with manual renewal links or optional wallet authorization.
+    products:
+      - product_id: HELIUS_STANDARD_RPC_WSS
+        endpoint_class: MANAGED_RPC_AND_WEBSOCKET
+        endpoint: UNSET_UNTIL_TASK07
+        intended_role: preliminary_primary_raw_transport
+        runtime_permission: TASK07_CONTROLLED_READS_AND_SUBSCRIPTIONS_ONLY
+      - product_id: HELIUS_ENHANCED_TRANSACTIONS
+        endpoint_class: INDEXED_PARSED_API
+        endpoint: UNSET_UNTIL_TASK07
+        intended_role: convenience_and_cross_check_only
+        runtime_permission: TASK07_CONTROLLED_READS_ONLY
+      - product_id: HELIUS_GRPC_OR_DEDICATED
+        endpoint_class: HIGH_THROUGHPUT_STREAMING
+        intended_role: none_initially
+        runtime_permission: DEFERRED
+    auth:
+      auth_model: api_key
+      account_state: NOT_CREATED
+      credential_state: NOT_CREATED
+      future_secret_location: LOCAL_ONLY_AFTER_TASK02
+      key_may_enter_artifacts_or_chat: false
+    plan:
+      intended_initial_plan: Free
+      initial_price_claim: "$0/month"
+      monthly_credit_claim: 1000000
+      rpc_rps_claim: 10
+      claim_state: official_docs
+      purchase_now: false
+    payment:
+      mode: crypto_direct
+      accepted_assets_or_rail:
+        - USDC_on_Solana
+      renewal:
+        manual_payment_link_available: true
+        automatic_wallet_authorization_available: true
+        project_default: manual_only
+      evidence_state: official_docs
+      purchase_requires_measured_bottleneck: true
+    observation_contract:
+      event_time: raw_chain_slot_and_block_time_when_present
+      observed_at: local_response_or_message_receive_time
+      available_to_strategy_at: post_minimum_schema_validation_time
+      ingested_at: raw_envelope_persist_time
+      revisions:
+        - provider_parser_update
+        - reorg_or_commitment_progression
+        - historical_backfill_difference
+      raw_retention_required: true
+      parser_output_requires_raw_signature_link: true
+      failure_classes_to_preserve:
+        - timeout
+        - transport_error
+        - provider_5xx
+        - rate_limit_429
+        - malformed_payload
+        - subscription_disconnect
+        - reconnect_gap
+    validation:
+      current_state: task07_validation_required
+      required_task: TASK-07
+      assertions:
+        - raw_and_parsed_records_join_by_signature_and_index
+        - reconnect_gap_is_detected_and_reconciled
+        - credits_and_rate_limits_are_measured_not_assumed
+        - no_grpc_or_dedicated_purchase_without_bottleneck
+
+  - source_id: JUPITER_SWAP_V2
+    display_name: Jupiter Developer Platform Swap API v2
+    source_class: executable_quote_and_future_transaction_provider
+    candidate_decision: WRAP_PRIMARY_EXECUTABLE_QUOTE_CANDIDATE
+    truth_layers:
+      - EXECUTABLE_QUOTE_REALITY
+      - TRANSPORT_OR_INDEX
+    authoritative_for:
+      - its_exact_quote_route_fee_and_error_response
+      - its_request_class_plan_and_credit_evidence
+    not_authoritative_for:
+      - guaranteed_fill
+      - realized_vwap_without_landed_transaction
+      - protocol_state_outside_returned_route
+    official_evidence:
+      - evidence_id: JUPITER_SWAP_OVERVIEW
+        url: https://developers.jup.ag/docs/swap
+        state: official_docs
+        as_of: "2026-07-18"
+        fact_summary: Swap v2 documents Meta-Aggregator order/execute and Router build/submit paths.
+      - evidence_id: JUPITER_PLANS
+        url: https://developers.jup.ag/docs/portal/plans
+        state: official_docs
+        as_of: "2026-07-18"
+        fact_summary: Keyless access is listed at 0.5 RPS, Free at 1 RPS, and paid plans accept USDC on Solana.
+    products:
+      - product_id: JUPITER_ORDER
+        endpoint_class: EXECUTABLE_QUOTE_AND_ASSEMBLED_TRANSACTION
+        endpoint_path: /swap/v2/order
+        runtime_permission: TASK07_CONTROLLED_UNSIGNED_QUOTE_ONLY
+      - product_id: JUPITER_BUILD
+        endpoint_class: EXECUTABLE_QUOTE_AND_RAW_INSTRUCTIONS
+        endpoint_path: /swap/v2/build
+        runtime_permission: TASK07_DESIGN_OR_CONTROLLED_UNSIGNED_QUOTE_ONLY
+      - product_id: JUPITER_EXECUTE
+        endpoint_class: TRANSACTION_LANDING
+        endpoint_path: /swap/v2/execute
+        runtime_permission: PROHIBITED_UNTIL_LATER_EXECUTION_GATE
+      - product_id: JUPITER_SUBMIT
+        endpoint_class: TRANSACTION_LANDING
+        endpoint_path: /tx/v1/submit
+        runtime_permission: PROHIBITED_UNTIL_LATER_EXECUTION_GATE
+    auth:
+      auth_model: api_key_or_documented_keyless
+      account_state: NOT_CREATED
+      credential_state: NOT_CREATED
+      official_docs_state: conflict
+      conflict_detail: Swap overview says all endpoints require x-api-key while Plans documents keyless access at 0.5 RPS.
+      resolution: TASK07_NON_TRANSACTIONAL_CONTROLLED_CHECK_OR_DASHBOARD
+      key_may_enter_artifacts_or_chat: false
+    plan:
+      intended_initial_plan: Keyless_or_Free_after_TASK07_spec
+      keyless_rps_claim: 0.5
+      free_rps_claim: 1
+      free_price_claim: "$0/month"
+      claim_state: official_docs
+      purchase_now: false
+    payment:
+      mode: crypto_documented_processor
+      accepted_assets_or_rail:
+        - USDC_on_Solana
+      processor_claim: Moonpay_via_billing_flow
+      renewal_claim: paid_plans_billed_via_Stripe
+      evidence_state: official_docs
+      purchase_requires_measured_bottleneck: true
+    observation_contract:
+      event_time: context_slot_or_provider_context_when_present
+      observed_at: local_response_receive_time
+      available_to_strategy_at: post_quote_schema_and_freshness_validation_time
+      ingested_at: raw_envelope_persist_time
+      revisions:
+        - route_requote
+        - liquidity_change
+        - provider_router_change
+        - endpoint_or_fee_change
+      raw_retention_required: true
+      every_request_requires:
+        - input_mint
+        - output_mint
+        - atomic_amount
+        - direction
+        - requested_notional_id
+        - request_time
+        - response_time_or_timeout
+      failure_classes_to_preserve:
+        - no_route
+        - timeout
+        - rate_limit_429
+        - provider_4xx
+        - provider_5xx
+        - invalid_or_unsupported_mint
+        - stale_context
+        - malformed_payload
+      missing_policy: never_drop_or_convert_to_zero
+    validation:
+      current_state: task07_validation_required
+      required_task: TASK-07
+      assertions:
+        - buy_and_sell_quotes_for_exact_atomic_amounts
+        - no_route_and_error_rows_are_retained
+        - fees_route_context_and_quote_age_are_captured
+        - order_or_build_does_not_trigger_sign_or_send
+        - execute_and_submit_are_not_called
+
+  - source_id: SOLANA_TRACKER
+    display_name: Solana Tracker
+    source_class: indexed_data_rpc_and_candidate_quote_provider
+    candidate_decision: WRAP_INDEXED_AND_TASK07_QUOTE_COMPARISON_CANDIDATE
+    truth_layers:
+      - TRANSPORT_OR_INDEX
+      - EXECUTABLE_QUOTE_REALITY
+    authoritative_for:
+      - its_indexed_response_and_metadata
+      - its_exact_Raptor_quote_or_error_response_if_later_observed
+    not_authoritative_for:
+      - protocol_truth_without_raw_cross_check
+      - entity_or_risk_label_ground_truth
+      - past_strategy_availability
+      - executable_fill_without_quote_validation
+    official_evidence:
+      - evidence_id: SOLANA_TRACKER_PRICING
+        url: https://docs.solanatracker.io/pricing
+        state: official_docs
+        as_of: "2026-07-18"
+        fact_summary: Free Data API lists 10,000 monthly requests at 3 RPS; 70+ endpoints and paid Datastream/RPC products are described.
+      - evidence_id: SOLANA_TRACKER_RAPTOR_OVERVIEW
+        url: https://docs.solanatracker.io/raptor/overview
+        state: official_docs
+        as_of: "2026-07-18"
+        fact_summary: Hosted Raptor is documented as a public beta that is currently free and has no stated rate limits; quote/build/sign/send support does not authorize transaction paths in this project.
+    products:
+      - product_id: SOLANA_TRACKER_DATA_API
+        endpoint_class: INDEXED_REST_API
+        endpoint: UNSET_UNTIL_TASK07
+        intended_role: discovery_holder_deployer_trade_cross_check
+        runtime_permission: TASK07_CONTROLLED_READS_ONLY
+      - product_id: SOLANA_TRACKER_SHARED_RPC
+        endpoint_class: MANAGED_RPC
+        endpoint: UNSET_UNTIL_TASK07
+        intended_role: fallback_candidate_only
+        runtime_permission: TASK07_ONLY_IF_SMOKE_SPEC_SELECTS
+      - product_id: RAPTOR_SELF_HOSTED
+        endpoint_class: SELF_HOSTED_SWAP_ROUTER_BINARY
+        intended_role: possible_independent_quote_fallback
+        runtime_permission: DEFERRED_TO_TASK04_OR_TASK07_DUE_DILIGENCE
+      - product_id: RAPTOR_HOSTED_BETA
+        endpoint_class: HOSTED_SWAP_BETA
+        intended_role: possible_independent_unsigned_quote_contract_comparison
+        runtime_permission: TASK07_CONTROLLED_UNSIGNED_QUOTE_ONLY_AFTER_DUE_DILIGENCE
+    auth:
+      auth_model: api_key_for_data_api
+      account_state: NOT_CREATED
+      credential_state: NOT_CREATED
+      key_may_enter_artifacts_or_chat: false
+    plan:
+      intended_initial_plan: Free_Data_API_if_selected
+      free_request_claim_per_month: 10000
+      free_rps_claim: 3
+      purchase_now: false
+      paid_datastream_initially: false
+    payment:
+      mode: unknown
+      listed_price_currency: EUR
+      accepted_assets_or_rail: UNKNOWN
+      evidence_state: official_dashboard_needed
+      free_plan_not_blocked_by_unknown_upgrade_payment: true
+    observation_contract:
+      event_time: provider_event_or_chain_time_when_present
+      observed_at: local_response_receive_time
+      available_to_strategy_at: post_schema_validation_time
+      ingested_at: raw_envelope_persist_time
+      revisions:
+        - indexer_backfill
+        - entity_label_change
+        - risk_or_PnL_method_change
+        - endpoint_schema_change
+      raw_retention_required: true
+      vendor_label_requires:
+        - provider
+        - field_version_or_retrieval_date
+        - confidence_or_unknown
+        - observation_time
+      failure_classes_to_preserve:
+        - timeout
+        - rate_limit_429
+        - provider_4xx
+        - provider_5xx
+        - empty_result
+        - malformed_payload
+    validation:
+      current_state: task07_validation_required
+      required_task: TASK-07
+      assertions:
+        - universe_includes_dead_non_migrated_and_failed_cases_or_gap_is_explicit
+        - provider_labels_are_not_hindsight_truth
+        - payment_mode_is_user_attested_before_any_paid_decision
+
+  - source_id: BIRDEYE
+    display_name: Birdeye Data Services
+    source_class: indexed_market_and_holder_provider
+    candidate_decision: WRAP_LATER_IF_MEASURED_GAP
+    truth_layers:
+      - TRANSPORT_OR_INDEX
+    authoritative_for:
+      - its_market_holder_trade_and_security_response
+    not_authoritative_for:
+      - protocol_truth_without_raw_cross_check
+      - executable_fillability
+      - stable_entity_or_security_labels_without_versioning
+    official_evidence:
+      - evidence_id: BIRDEYE_PRICING
+        url: https://docs.birdeye.so/docs/pricing
+        state: official_docs
+        as_of: "2026-07-18"
+        fact_summary: Tiered subscriptions, compute-unit allowances and rate limits are documented.
+      - evidence_id: BIRDEYE_DATA_ACCESS
+        url: https://docs.birdeye.so/docs/data-accessibility-by-packages
+        state: official_docs
+        as_of: "2026-07-18"
+        fact_summary: Endpoint access varies by package.
+      - evidence_id: BIRDEYE_PAYMENT
+        url: https://docs.birdeye.so/docs/payment
+        state: official_docs
+        as_of: "2026-07-18"
+        fact_summary: USDC and USDT payment is documented for longer-duration subscriptions through support contact.
+      - evidence_id: BIRDEYE_X402
+        url: https://docs.birdeye.so/reference/x402
+        state: official_docs
+        as_of: "2026-07-18"
+        fact_summary: Birdeye documents keyless per-request access paid in USDC on Solana; price is route-specific and supplied in payment terms, while client-side signing is required.
+    products:
+      - product_id: BIRDEYE_REST_API
+        endpoint_class: INDEXED_REST_API
+        endpoint: UNSET_UNTIL_TASK07
+        intended_role: secondary_trade_holder_market_cross_check
+        runtime_permission: TASK07_ONLY_IF_SHORTLIST_RETAINS
+      - product_id: BIRDEYE_WEBSOCKET
+        endpoint_class: INDEXED_WEBSOCKET
+        intended_role: none_initially
+        runtime_permission: DEFERRED
+      - product_id: BIRDEYE_X402_API
+        endpoint_class: PAID_PER_REQUEST_INDEXED_API
+        intended_role: targeted_gap_only_after_free_plan_measurement
+        runtime_permission: PROHIBITED_UNTIL_EXPLICIT_COST_AND_SIGNER_GATE
+    auth:
+      auth_model: api_key
+      account_state: NOT_CREATED
+      credential_state: NOT_CREATED
+      key_may_enter_artifacts_or_chat: false
+    plan:
+      intended_initial_plan: no_purchase
+      purchase_now: false
+      long_subscription_prepayment: prohibited_without_measured_need
+    payment:
+      mode: crypto_direct_via_contact
+      accepted_assets_or_rail:
+        - USDC
+        - USDT
+      minimum_crypto_subscription_duration_claim:
+        - 3_months
+        - 6_months
+        - 1_year
+      evidence_state: official_docs
+      purchase_requires_measured_bottleneck: true
+    observation_contract:
+      event_time: provider_market_or_chain_time_when_present
+      observed_at: local_response_receive_time
+      available_to_strategy_at: post_schema_validation_time
+      ingested_at: raw_envelope_persist_time
+      revisions:
+        - market_data_backfill
+        - security_label_change
+        - package_or_endpoint_change
+      raw_retention_required: true
+      failure_classes_to_preserve:
+        - timeout
+        - rate_limit_429
+        - provider_4xx
+        - provider_5xx
+        - empty_result
+    validation:
+      current_state: task07_validation_required
+      required_task: TASK-07_IF_RETAINED
+      assertions:
+        - no_long_subscription_before_free_or_shortlist_evidence
+        - price_or_OHLCV_is_not_executable_quote_truth
+
+  - source_id: DUNE_SOLANA_CATALOG
+    display_name: Dune Solana data catalog
+    source_class: historical_catalog
+    candidate_decision: ADOPT_AS_REFERENCE
+    truth_layers:
+      - TRANSPORT_OR_INDEX
+    authoritative_for:
+      - its_historical_indexed_rows_and_decoded_tables
+    not_authoritative_for:
+      - live_universe_discovery
+      - local_observed_at
+      - local_available_to_strategy_at
+      - executable_quote_or_fill
+    official_evidence:
+      - evidence_id: DUNE_SOLANA_OVERVIEW
+        url: https://docs.dune.com/data-catalog/solana/overview
+        state: official_docs
+        as_of: "2026-07-18"
+        fact_summary: Raw and decoded Solana transactions, blocks, instructions and account activity are indexed.
+    products:
+      - product_id: DUNE_SOLANA_TABLES
+        endpoint_class: HISTORICAL_SQL_CATALOG
+        intended_role: discovery_backfill_cross_check
+        runtime_permission: REFERENCE_DESIGN_ONLY_IN_TASK01
+    auth:
+      account_state: NOT_CREATED
+      credential_state: NONE
+    payment:
+      mode: not_evaluated
+      reason: no_purchase_or_runtime_dependency_selected
+    observation_contract:
+      event_time: indexed_chain_time_and_slot_when_available
+      observed_at: local_query_response_time_if_ever_queried
+      available_to_strategy_at: never_backdated_before_local_retrieval
+      ingested_at: local_raw_export_persist_time_if_ever_used
+      revisions:
+        - decoder_update
+        - table_backfill
+        - schema_change
+      raw_retention_required: true
+    validation:
+      current_state: official_docs
+      required_task: TASK07_OR_LATER_IF_SELECTED
+      assertions:
+        - catalog_rows_do_not_fabricate_historical_strategy_knowledge
+        - export_license_terms_and_freshness_are_checked_before_dependency
+
+  - source_id: LOCAL_OBSERVATION_PIPELINE
+    display_name: SMIAL local append-only observation and derivation layer
+    source_class: internal_system
+    candidate_decision: BUILD_MINIMUM_NECESSARY
+    truth_layers:
+      - LOCAL_OBSERVATION_TRUTH
+      - DERIVED_PIT
+    authoritative_for:
+      - local_request_response_and_ingestion_times
+      - raw_payload_hash_and_revision_lineage
+      - local_failure_retry_and_disagreement_evidence
+      - point_in_time_derived_features_and_outcomes
+      - provider_credit_cash_storage_and_QA_telemetry
+    prohibited_uses:
+      - overwriting_raw_observations
+      - backdating_first_reliable_available_at
+      - converting_missing_timeout_or_no_route_to_zero
+      - storing_secrets_or_payment_wallet_details
+    official_evidence: []
+    products:
+      - product_id: RAW_ENVELOPE
+        endpoint_class: INTERNAL_APPEND_ONLY_STORAGE
+        implementation_task: TASK-06
+      - product_id: NORMALIZED_CONTRACTS
+        endpoint_class: INTERNAL_VERSIONED_SCHEMA
+        implementation_task: TASK-05
+      - product_id: PROVIDER_SMOKE_HARNESS
+        endpoint_class: INTERNAL_CONTROLLED_VALIDATOR
+        implementation_task: TASK-07
+    auth:
+      account_state: NOT_APPLICABLE
+      credential_state: NONE_IN_ARTIFACTS
+    payment:
+      mode: not_applicable
+    observation_contract:
+      event_time: source_specific_event_time_or_null
+      observed_at: monotonic_local_receive_time_plus_UTC_wall_time
+      available_to_strategy_at: first_time_record_passes_minimum_strategy_validation
+      ingested_at: durable_append_commit_time
+      revisions:
+        - append_new_revision_only
+      raw_retention_required: true
+      required_lineage:
+        - provider_source_id
+        - product_id
+        - request_class
+        - sanitized_request_hash
+        - raw_payload_hash
+        - schema_version
+        - program_or_decoder_version_when_applicable
+        - revision_of_observation_id_or_null
+        - disagreement_id_or_null
+    validation:
+      current_state: internal_design
+      required_tasks:
+        - TASK-05
+        - TASK-06
+        - TASK-07
+      assertions:
+        - idempotent_append_and_deduplication_are_distinct
+        - raw_and_normalized_rows_are_replayable
+        - first_reliable_available_at_starts_only_after_validation
+
+domain_contracts:
+  D01:
+    name: universe_discovery
+    primary_sources:
+      - HELIUS
+      - SOLANA_RPC_PROTOCOL
+      - PUMP_PUBLIC_PROTOCOL_DOCS
+    fallback_sources:
+      - SOLANA_TRACKER
+      - DUNE_SOLANA_CATALOG
+    local_truth_source: LOCAL_OBSERVATION_PIPELINE
+    contract_state: preliminary_task07_validation_required
+    gap: live_completeness_reconnect_and_non_migrated_terminal_coverage_unmeasured
+  D02:
+    name: token_and_program_identity
+    primary_sources:
+      - SOLANA_RPC_PROTOCOL
+      - PUMP_PUBLIC_PROTOCOL_DOCS
+    fallback_sources:
+      - HELIUS
+      - SOLANA_TRACKER
+      - BIRDEYE
+    local_truth_source: LOCAL_OBSERVATION_PIPELINE
+    contract_state: preliminary_task07_validation_required
+    gap: token_program_metadata_revision_and_decoder_edge_cases_unmeasured
+  D03:
+    name: bonding_curve_state
+    primary_sources:
+      - SOLANA_RPC_PROTOCOL
+      - PUMP_PUBLIC_PROTOCOL_DOCS
+    fallback_sources:
+      - HELIUS
+      - SOLANA_TRACKER
+      - DUNE_SOLANA_CATALOG
+    local_truth_source: LOCAL_OBSERVATION_PIPELINE
+    contract_state: preliminary_task07_validation_required
+    gap: decoder_version_and_effective_quote_reserve_runtime_validation_pending
+  D04:
+    name: migration_and_canonical_pool
+    primary_sources:
+      - SOLANA_RPC_PROTOCOL
+      - PUMP_PUBLIC_PROTOCOL_DOCS
+    fallback_sources:
+      - HELIUS
+      - SOLANA_TRACKER
+      - DUNE_SOLANA_CATALOG
+    local_truth_source: LOCAL_OBSERVATION_PIPELINE
+    contract_state: preliminary_task07_validation_required
+    gap: failed_and_non_migrated_lifecycle_definition_and_lag_unmeasured
+  D05:
+    name: pool_truth
+    primary_sources:
+      - SOLANA_RPC_PROTOCOL
+      - PUMP_PUBLIC_PROTOCOL_DOCS
+    fallback_sources:
+      - HELIUS
+      - SOLANA_TRACKER
+      - BIRDEYE
+      - DUNE_SOLANA_CATALOG
+    local_truth_source: LOCAL_OBSERVATION_PIPELINE
+    contract_state: preliminary_task07_validation_required
+    gap: venue_and_program_version_coverage_registry_pending
+  D06:
+    name: trades_and_swaps
+    primary_sources:
+      - SOLANA_RPC_PROTOCOL
+      - PUMP_PUBLIC_PROTOCOL_DOCS
+    fallback_sources:
+      - HELIUS
+      - SOLANA_TRACKER
+      - BIRDEYE
+      - DUNE_SOLANA_CATALOG
+    local_truth_source: LOCAL_OBSERVATION_PIPELINE
+    contract_state: preliminary_task07_validation_required
+    gap: parsed_swap_inner_instruction_and_revision_coverage_unmeasured
+  D07:
+    name: point_in_time_market_references
+    primary_sources:
+      - LOCAL_OBSERVATION_PIPELINE
+    fallback_sources: []
+    contract_state: internal_design
+    gap: implementation_and_replay_validation_pending
+  D08:
+    name: executable_quote_panel
+    primary_sources:
+      - JUPITER_SWAP_V2
+    fallback_sources:
+      - SOLANA_TRACKER
+    fallback_products:
+      - SOLANA_TRACKER.RAPTOR_HOSTED_BETA
+    diagnostic_non_equivalent_candidates:
+      - SOLANA_RPC_PROTOCOL
+    local_truth_source: LOCAL_OBSERVATION_PIPELINE
+    contract_state: preliminary_task07_validation_required
+    gap: raptor_fallback_equivalence_route_overlap_and_beta_stability_unvalidated
+  D09:
+    name: quote_and_route_failures
+    primary_sources:
+      - JUPITER_SWAP_V2
+      - LOCAL_OBSERVATION_PIPELINE
+    fallback_sources:
+      - SOLANA_TRACKER
+    fallback_products:
+      - SOLANA_TRACKER.RAPTOR_HOSTED_BETA
+    contract_state: preliminary_task07_validation_required
+    gap: unobserved_failures_are_irrecoverable_and_cross_router_taxonomy_is_unvalidated
+  D10:
+    name: execution_and_landing_evidence
+    primary_sources:
+      - JUPITER_SWAP_V2
+      - SOLANA_RPC_PROTOCOL
+      - LOCAL_OBSERVATION_PIPELINE
+    fallback_sources:
+      - HELIUS
+    contract_state: schema_only_execution_prohibited
+    gap: runtime_validation_deferred_to_later_execution_tasks
+  D11:
+    name: holder_snapshots
+    primary_sources:
+      - SOLANA_RPC_PROTOCOL
+    fallback_sources:
+      - HELIUS
+      - SOLANA_TRACKER
+      - BIRDEYE
+      - DUNE_SOLANA_CATALOG
+    local_truth_source: LOCAL_OBSERVATION_PIPELINE
+    contract_state: preliminary_task07_validation_required
+    gap: historical_snapshot_and_vendor_exclusion_semantics_unmeasured
+  D12:
+    name: entity_deployer_funder_and_bundle_inputs
+    primary_sources:
+      - SOLANA_RPC_PROTOCOL
+      - LOCAL_OBSERVATION_PIPELINE
+    fallback_sources:
+      - HELIUS
+      - SOLANA_TRACKER
+      - DUNE_SOLANA_CATALOG
+    contract_state: preliminary_task07_validation_required
+    gap: entity_labels_are_revision_prone_and_not_ground_truth
+  D13:
+    name: liquidity_creator_and_related_wallet_actions
+    primary_sources:
+      - SOLANA_RPC_PROTOCOL
+      - PUMP_PUBLIC_PROTOCOL_DOCS
+    fallback_sources:
+      - HELIUS
+      - SOLANA_TRACKER
+      - BIRDEYE
+      - DUNE_SOLANA_CATALOG
+    local_truth_source: LOCAL_OBSERVATION_PIPELINE
+    contract_state: preliminary_task07_validation_required
+    gap: attribution_and_venue_decoder_coverage_unmeasured
+  D14:
+    name: network_state
+    primary_sources:
+      - SOLANA_RPC_PROTOCOL
+    fallback_sources:
+      - HELIUS
+    local_truth_source: LOCAL_OBSERVATION_PIPELINE
+    contract_state: preliminary_task07_validation_required
+    gap: provider_local_latency_and_strategy_specific_landing_not_measured
+  D15:
+    name: observation_lineage
+    primary_sources:
+      - LOCAL_OBSERVATION_PIPELINE
+    fallback_sources: []
+    contract_state: internal_design_mandatory_forward_only
+    gap: implementation_pending_TASK05_TASK06
+  D16:
+    name: provider_service_quality
+    primary_sources:
+      - LOCAL_OBSERVATION_PIPELINE
+    evidence_sources:
+      - HELIUS
+      - JUPITER_SWAP_V2
+      - SOLANA_TRACKER
+      - BIRDEYE
+    fallback_sources: []
+    contract_state: documentation_only_measurement_pending
+    gap: reliability_latency_quota_and_disagreement_unmeasured
+  D17:
+    name: cohort_and_regime_context
+    primary_sources:
+      - LOCAL_OBSERVATION_PIPELINE
+      - SOLANA_RPC_PROTOCOL
+    fallback_sources:
+      - SOLANA_TRACKER
+      - BIRDEYE
+      - JUPITER_SWAP_V2
+    contract_state: preliminary_derived_design
+    gap: feature_availability_and_candle_revision_semantics_pending
+  D18:
+    name: vendor_social_and_smart_money_enrichment
+    primary_sources: []
+    fallback_sources:
+      - SOLANA_TRACKER
+      - BIRDEYE
+    contract_state: excluded_T2_without_active_hypothesis_data_memo
+    gap: intentionally_not_collected
+  D19:
+    name: economic_and_procurement_control
+    primary_sources:
+      - LOCAL_OBSERVATION_PIPELINE
+    evidence_sources:
+      - HELIUS
+      - JUPITER_SWAP_V2
+      - SOLANA_TRACKER
+      - BIRDEYE
+    fallback_sources: []
+    contract_state: official_docs_plus_future_dashboard_attestation
+    gap: actual_usage_cash_storage_and_QA_costs_are_forward_only
+  D20:
+    name: outcomes_and_labels
+    primary_sources:
+      - LOCAL_OBSERVATION_PIPELINE
+      - JUPITER_SWAP_V2
+    fallback_sources:
+      - SOLANA_RPC_PROTOCOL
+    contract_state: internal_derived_design_task07_inputs_pending
+    gap: executable_exit_and_route_death_evidence_is_forward_only
+
+unresolved_evidence:
+  - issue_id: SRC-GAP-001
+    severity: HIGH
+    domain_ids:
+      - D08
+      - D09
+    state: unknown
+    claim: Raptor is the designed independent quote fallback candidate, but equivalence, route overlap and beta stability are not runtime-validated.
+    resolution_task: TASK-07
+    allowed_outcomes:
+      - Jupiter_sufficient_for_bounded_panel
+      - validated_second_router
+      - restrict_venue_or_notional_scope
+      - REDESIGN_DATA
+  - issue_id: SRC-CONFLICT-002
+    severity: MEDIUM
+    source_id: JUPITER_SWAP_V2
+    state: conflict
+    claim: Official Swap overview requires x-api-key while official Plans documents keyless access.
+    resolution_task: TASK-07
+  - issue_id: SRC-DASHBOARD-003
+    severity: MEDIUM
+    source_id: SOLANA_TRACKER
+    state: official_dashboard_needed
+    claim: Public pricing lists EUR amounts but no accepted payment rail was found.
+    resolution: sanitized_user_attestation_only_if_paid_plan_becomes_candidate
+  - issue_id: SRC-QUALITY-004
+    severity: HIGH
+    source_ids:
+      - HELIUS
+      - SOLANA_TRACKER
+      - BIRDEYE
+    state: task07_validation_required
+    claim: Universe completeness, parser revisions and dead/non-migrated coverage are unmeasured.
+    resolution_task: TASK-07
+  - issue_id: SRC-CAPACITY-005
+    severity: MEDIUM
+    source_id: HELIUS
+    state: task07_validation_required
+    claim: Free-tier RPC/WSS feasibility for the bounded sentinel is not measured.
+    resolution_task: TASK-07
+  - issue_id: SRC-PAYMENT-006
+    severity: MEDIUM
+    source_id: BIRDEYE
+    state: official_docs
+    claim: Birdeye x402 exists, but numeric route prices are supplied per request and the flow requires a client-held wallet and signed payment payload.
+    resolution: Keep design_only; no request_or_payment_until_measured_gap_explicit_user_approval_and_signer_isolation_gate
+
+domain_defaults:
+  first_reliable_available_at: UNSET_UNTIL_VALIDATED
+  raw_retention: required
+  revision_mode: append_new_revision_never_overwrite
+  missing_mode: explicit_null_or_typed_failure_never_zero
+  disagreement_mode: preserve_both_link_with_disagreement_id
+  user_visible_iteration_footer:
+    required: true
+    fields:
+      - ОТ_ВАС_СЕЙЧАС
+      - ЧТО_СДЕЛАЛ_АССИСТЕНТ
+      - СЛЕДУЮЩИЙ_АТОМ
+      - BLOCKER
+
+handoff:
+  current_task: TASK-01
+  task_execution_status: DONE
+  current_blocker: NONE
+  user_action_required_now: NONE
+  accounts_required_now: NONE
+  purchase_required_now: NONE
+  state_change: DELTA-01-001_PENDING_USER_ACTIVATION
+  next_task_candidate: TASK-02
+  next_task_gate: RUN_TASK_ENTRY_GATE_BEFORE_START
+  task03_import_requirement: Import all validated TASK-01 artifacts, hashes and validation evidence into the private Git registry without rewriting their history.
+  do_not_start_next_task_automatically: true

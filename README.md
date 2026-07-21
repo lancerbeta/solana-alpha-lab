@@ -1,30 +1,23 @@
 # Solana Memecoin Intraday Alpha Lab
 
-A bounded, evidence-first research system for executable Solana memecoin
-alpha on a 15-minute to 4-hour horizon.
+A bounded, evidence-first research system for executable Solana memecoin alpha on a 15-minute to 4-hour horizon.
 
 ## Current repository stage
 
-TASK-03 is building the private implementation truth layer. The local root
-commit is accepted. Atom 3A adds the staged Project Asset Catalog foundation:
+The accepted local history contains the repository baseline and Project Asset Catalog foundation. The current staged candidate imports exact TASK-01 and TASK-02 pre-Git evidence and registers `ARCH-INTENT-001` without creating a new commit or remote.
 
-- `catalog/catalog_manifest.yaml` as the stable root resolver;
-- versioned asset and query registries;
-- standalone JSON Schema Draft 2020-12 files;
-- deterministic Catalog validator and read-only resolver CLI;
-- exact locked dependencies for safe YAML and JSON Schema validation.
-
-Atom 3A-R also repairs the checkout contract before the Catalog commit:
-
-- tracked text is LF;
-- PowerShell `.ps1` files are explicitly materialized as LF;
-- `.bat` and `.cmd` remain CRLF;
-- the quality gate checks working-tree bytes, staged/committed blobs,
-  `git check-attr`, and a temporary `checkout-index` roundtrip.
-
-The Catalog foundation is staged but not committed. Pre-Git TASK-01/02 import,
-generated project map/edges, lifecycle registries, private remote, CI, clean
-clone, and Codex pilot remain unimplemented.
+```text
+HEAD: ee6119ae0b7750710c7f822c50137ed95b4977e9
+state: PRE_GIT_IMPORT_STAGED
+repository files after import: 58
+Catalog assets: 44
+Catalog query recipes: 4
+Catalog schemas: 3
+imported exact bytes: 20
+external immutable bundles: 2
+bundle-only superseded records: 1
+architecture intents: 1
+```
 
 ## One-command validation
 
@@ -32,26 +25,18 @@ clone, and Codex pilot remain unimplemented.
 pwsh -NoProfile -ExecutionPolicy Bypass -File .\scripts\validate.ps1
 ```
 
-Expected additions:
+The gate validates runtime/lock, repository secrets, Catalog schema and semantics, stable-ID resolution, exact import hashes, provenance and availability, architecture intent boundaries, Git state, EOL policy, receipts, and tests.
 
-```text
-CATALOG_VALIDATION: PASS
-CATALOG_RESOLUTION: PASS
-ps1_eol_attribute_worktree: PASS
-ps1_eol_attribute_index: PASS
-ps1_checkout_roundtrip_lf: PASS
-REPOSITORY_STATE: CATALOG_FOUNDATION_STAGED
-RESULT: PASS
-```
+## Pre-Git provenance policy
 
-## Catalog usage
+- imported bytes remain historical references with `origin=PRE_GIT`;
+- source bundles stay outside Git and are registered by exact SHA-256;
+- `first_reliable_available_at` is preserved;
+- backfill/import does not create earlier availability;
+- exact imported evidence preserves source bytes even when historical formatting includes an extra final blank line; hashes and provenance, not style normalization, govern those files;
+- superseded validators remain bundle-only and are not activated;
+- current architecture intent is dated 2026-07-21 and is not attributed to earlier tasks.
 
-```powershell
-uv run --locked --managed-python python -B .\scripts\catalog_cli.py list-assets
-uv run --locked --managed-python python -B .\scripts\catalog_cli.py resolve-asset CATALOG-ROOT-001 --json
-uv run --locked --managed-python python -B .\scripts\catalog_cli.py resolve-query QUERY-CATALOG-VALIDATE-001 --json
-```
+## Security boundary
 
-All commands are local and read-only. Catalog metadata contains no secrets,
-raw data bytes, provider credentials, wallet material, or machine-specific
-absolute paths.
+Do not place `.env`, credentials, tokens, seed phrases, private keys, raw data, wallet mappings, or machine-specific absolute paths in this repository. No provider call, remote, push, Codex write, or real-money action is authorized by this staged import.

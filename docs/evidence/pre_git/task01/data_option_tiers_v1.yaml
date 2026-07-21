@@ -1,0 +1,977 @@
+schema_version: "1.0.0"
+
+artifact:
+  artifact_id: SMIAL_TASK_01_DATA_OPTION_TIERS
+  artifact_version: "1.0"
+  task_id: TASK-01
+  task_execution_status: DONE
+  artifact_status: VALIDATED_COLLECTION_POLICY
+  owner: user+assistant
+  created_at: "2026-07-18"
+  as_of: "2026-07-18"
+  canonical_after_validation: true
+  canonical_sources_sync: PREPARED_FOR_CANONICAL_HANDOFF_USER_ACTIVATION_PENDING
+  upstream_artifacts:
+    - sources_v1.yaml
+    - hypothesis_data_coverage_matrix_v1.md
+  downstream_artifacts:
+    - provider_cost_snapshot_v1.csv
+    - reuse_candidate_registry.yaml
+    - provider_smoke_spec_v1.yaml
+  api_rpc_provider_requests_executed: false
+  accounts_created: false
+  purchases_executed: false
+  contains_secrets: false
+
+design_status:
+  purpose: BOUNDED_INITIAL_COLLECTION_CONTRACT_FOR_FUTURE_TASKS
+  thresholds_are_market_truth: false
+  thresholds_are_provisional_engineering_caps: true
+  runtime_validation_task: TASK-07
+  collection_pilot_tasks:
+    - TASK-08
+    - TASK-09
+    - TASK-10
+    - TASK-11
+    - TASK-12
+  freeze_task: TASK-20
+  deletion_or_retention_enforcement_task: TASK-16
+
+option_value_model:
+  conceptual_score: >-
+    (irrecoverability_later * plausible_family_reuse * decision_value)
+    / (credits_cash + storage + QA + operator_burden)
+  ordinal_only: true
+  false_precision_prohibited: true
+  required_before_new_collection:
+    - named_consumer
+    - tier
+    - primary_falsifier_or_control_value
+    - first_reliable_available_at
+    - collection_profile
+    - retention_class
+    - budget_bucket
+    - stop_rule
+
+tier_definitions:
+  T0_CORE:
+    intent: Preserve irrecoverable universe, observation, execution and lineage truth.
+    collection_mode: bounded_continuous_or_event_plus_triggered
+    raw_append_only: true
+    can_be_disabled_for_cost_without_decision: false
+    disable_requires:
+      - explicit_blocker_or_redesign_memo
+      - affected_consumer_list
+      - gap_start_timestamp
+    examples:
+      - lifecycle_and_universe_events
+      - raw_program_pool_trade_state
+      - four_timestamps_and_lineage
+      - executable_buy_sell_quotes
+      - no_route_timeout_and_provider_errors
+  T1_BUDGETED_REUSE:
+    intent: Preserve reusable enrichments only within a measured budget.
+    collection_mode: sparse_base_plus_state_trigger
+    raw_append_only: true
+    can_be_disabled_for_cost_without_decision: true
+    disable_action: record_gap_and_keep_T0_running
+    examples:
+      - holder_snapshots
+      - deployer_funder_bundle_entity_inputs
+      - dense_depth_liquidity_and_network_context
+  T2_HYPOTHESIS_SPECIFIC:
+    intent: Collect only for an active falsifiable hypothesis or approved control.
+    collection_mode: disabled_by_default
+    raw_append_only: true
+    activation_requires:
+      - hypothesis_data_memo_id
+      - named_hypothesis_or_decision_consumer
+      - cheaper_alternative_review
+      - cash_credit_storage_and_QA_cap
+      - stop_cost
+      - first_reliable_available_at
+      - approval_record
+    examples:
+      - vendor_risk_or_smart_money_scores
+      - social_sentiment_and_influencer_data
+      - expensive_low_latency_or_gRPC_streams
+
+global_collection_rules:
+  target_horizon:
+    min_minutes: 15
+    max_hours: 4
+  not_HFT: true
+  universe_policy:
+    discover_all_observable_cases: true
+    retain_dead_inactive_non_migrated_failed_cases: true
+    quote_every_discovered_token: false
+    quote_sample_method: deterministic_stratified_with_inclusion_probability
+    sample_metadata_required:
+      - cohort_id
+      - selection_rule_version
+      - inclusion_probability_or_unknown
+      - selected_at
+      - not_selected_reason
+  timestamp_policy:
+    required:
+      - event_time
+      - observed_at
+      - available_to_strategy_at
+      - ingested_at
+    initial_first_reliable_available_at: UNSET_UNTIL_VALIDATED
+    historical_backdating_allowed: false
+  failure_policy:
+    persist_every_attempt: true
+    missing_timeout_no_route_equals_zero: false
+    retain_retry_chain: true
+    retry_is_new_observation: true
+  raw_policy:
+    preserve_before_normalization: true
+    revision_mode: append_never_overwrite
+    provider_disagreement_mode: preserve_both_and_link
+    deletion_before_TASK16_restore_drill: prohibited
+  payment_policy:
+    initial_cash_budget_usd_per_month: 0
+    nonzero_cash_requires_user_approval: true
+    prefer_any_documented_crypto_payable_service: true
+    fiat_only_exception_requires_memo: true
+    automatic_wallet_payment_default: disabled
+
+collection_profiles:
+  CP01_UNIVERSE_EVENT_SPINE:
+    tier: T0_CORE
+    intent: Observe all feasible launch/lifecycle events and preserve omissions/failures.
+    mode:
+      primary: event_stream_or_subscription
+      reconciliation: bounded_global_poll
+    provisional_cadence:
+      event_stream: continuous_when_collector_runs
+      reconciliation_interval_seconds: 300
+      full_low_frequency_audit_interval_hours: 6
+    scope_caps:
+      per_asset_polling_default: false
+      max_global_reconciliation_runs_per_day: 288
+    triggers:
+      - collector_start_or_reconnect
+      - schema_or_program_version_change
+      - provider_divergence
+    stop_behavior:
+      stream_gap: keep_gap_explicit_and_start_reconciliation
+      repeated_reconnect_failure: pause_promotion_not_delete_rows
+
+  CP02_ACTIVE_STATE_SENTINEL:
+    tier: T0_CORE
+    intent: Preserve bounded pool/program state without polling the whole universe densely.
+    provisional_cadence:
+      eligible_or_active_asset_interval_seconds: 300
+      inactive_asset_interval_seconds: 900
+      triggered_asset_interval_seconds: 30
+      triggered_window_minutes: 60
+    scope_caps:
+      max_base_active_assets: 50
+      max_concurrent_triggered_assets: 10
+      max_trigger_activations_per_day: 20
+    triggers:
+      - lifecycle_transition
+      - migration_or_pool_creation
+      - route_or_depth_deterioration
+      - creator_or_liquidity_action
+      - signal_candidate
+    fallback_when_cap_reached: retain_event_spine_and_rank_triggers_deterministically
+
+  CP03_TRADE_EVENT_SPINE:
+    tier: T0_CORE
+    intent: Preserve raw successful and failed transaction evidence for selected programs/pools.
+    mode:
+      primary: program_or_pool_event_stream
+      fallback: bounded_signature_reconciliation
+    provisional_cadence:
+      event_stream: continuous_when_collector_runs
+      reconciliation_interval_minutes: 15
+    scope_caps:
+      program_allowlist_required: true
+      unbounded_address_crawl: false
+      max_reconciliation_windows_per_day: 96
+    triggers:
+      - reconnect_gap
+      - sequence_or_slot_gap
+      - parsed_vs_raw_disagreement
+
+  CP04_BASE_QUOTE_PANEL:
+    tier: T0_CORE
+    intent: Create forward-only executable buy/sell evidence outside active signals.
+    provider_source_id: JUPITER_SWAP_V2
+    sampling:
+      max_tokens_selected_per_hour: 2
+      method: deterministic_stratified_by_lifecycle_venue_liquidity_and_age
+      selection_log_required: true
+    panel:
+      sides:
+        - buy
+        - sell
+      notionals_usd:
+        - 10
+        - 25
+        - 50
+      snapshot_offsets_minutes:
+        - 0
+        - 15
+        - 60
+        - 240
+      diagnostic_notional_usd: 100
+      diagnostic_in_base_panel: false
+      atomic_amount_and_conversion_reference_required: true
+      no_route_and_errors_are_rows: true
+    derived_request_budget_assumption:
+      requests_per_standard_snapshot: 6
+      standard_snapshots_per_token: 4
+      max_tokens_per_day: 48
+      estimated_max_attempts_per_day: 1152
+      assumption_state: provisional_one_request_per_side_notional
+    timing:
+      max_requests_per_minute: 24
+      target_panel_span_seconds: 30
+      panel_order: randomized_balanced_side_and_notional
+      stale_panel_if_span_exceeds_seconds: 60
+
+  CP05_TRIGGERED_QUOTE_PANEL:
+    tier: T0_CORE
+    intent: Increase quote resolution around high-decision-value state changes.
+    provider_source_id: JUPITER_SWAP_V2
+    activation_priority:
+      - route_death_or_recovery
+      - migration_or_first_signal_eligibility
+      - depth_or_liquidity_break
+      - creator_or_related_wallet_sell
+      - registered_signal_candidate
+    scope_caps:
+      max_new_triggered_tokens_per_day: 6
+      max_concurrent_triggered_tokens: 3
+      one_active_window_per_token: true
+      retrigger_extends_window_only_with_reason_code: true
+    panel:
+      sides:
+        - buy
+        - sell
+      notionals_usd:
+        - 10
+        - 25
+        - 50
+      snapshot_offsets_minutes:
+        - 0
+        - 2
+        - 5
+        - 15
+        - 30
+        - 60
+        - 120
+        - 240
+      no_route_and_errors_are_rows: true
+    derived_request_budget_assumption:
+      requests_per_snapshot: 6
+      snapshots_per_triggered_token: 8
+      max_tokens_per_day: 6
+      estimated_max_attempts_per_day: 288
+      assumption_state: provisional_one_request_per_side_notional
+
+  CP06_DIAGNOSTIC_100_USD_QUOTE:
+    tier: T1_BUDGETED_REUSE
+    intent: Measure the first wider-capacity step without making it a default burden.
+    provider_source_id: JUPITER_SWAP_V2
+    sampling:
+      max_tokens_per_day: 2
+      eligibility:
+        - standard_panel_has_valid_10_25_50_quotes_or_typed_failures
+        - capacity_or_route_question_is_decision_relevant
+    panel:
+      sides:
+        - buy
+        - sell
+      notionals_usd:
+        - 100
+      snapshot_offsets_minutes:
+        - 0
+        - 60
+        - 240
+    derived_request_budget_assumption:
+      estimated_max_attempts_per_day: 12
+
+  CP07_SPARSE_HOLDER_ENTITY_ENRICHMENT:
+    tier: T1_BUDGETED_REUSE
+    intent: Preserve reusable toxicity inputs without continuous expensive snapshots.
+    provisional_cadence:
+      lifecycle_snapshots:
+        - first_observed
+        - migration_or_signal_eligible
+        - 60_minutes_after_eligibility
+        - 240_minutes_after_eligibility
+      inactive_refresh_hours: 24
+    scope_caps:
+      max_enriched_tokens_per_day: 100
+      max_solana_tracker_requests_per_day: 200
+      max_cross_provider_checks_per_day: 25
+    triggers:
+      - creator_or_related_wallet_activity
+      - holder_concentration_jump
+      - bundle_or_funder_evidence
+      - registered_signal_candidate
+    cap_behavior: skip_lowest_priority_T1_and_record_budget_exclusion
+
+  CP08_NETWORK_AND_PROVIDER_SENTINEL:
+    tier: T1_BUDGETED_REUSE
+    intent: Separate market/strategy failure from provider and network conditions.
+    provisional_cadence:
+      coarse_network_snapshot_seconds: 300
+      provider_status_snapshot_minutes: 15
+      quote_or_request_context: every_attempt
+    scope_caps:
+      max_coarse_snapshots_per_day: 288
+    triggers:
+      - latency_spike
+      - repeated_timeout_or_429
+      - context_slot_divergence
+      - reconnect
+
+  CP09_CONTROL_TELEMETRY:
+    tier: T0_CORE
+    intent: Preserve lineage, cost, credit, storage and QA evidence for every collection path.
+    provisional_cadence:
+      request_telemetry: every_attempt
+      credit_snapshot: before_and_after_controlled_batch_when_dashboard_or_header_allows
+      storage_rollup: hourly
+      cash_and_subscription_rollup: on_change_and_monthly
+      operator_time_rollup: per_work_session
+    secrets_or_payment_identifiers_allowed: false
+
+  CP10_DERIVED_PIT_ONLY:
+    tier: T0_CORE
+    intent: Compute features and outcomes only from already-available versioned rows.
+    collection_mode: no_external_collection
+    recompute:
+      on_new_upstream_revision: append_new_derived_version
+      historical_availability_backdating: prohibited
+
+  CP11_SCHEMA_ONLY_DISABLED:
+    tier: T0_CORE
+    intent: Define future execution fields while preventing premature transactions.
+    collection_mode: disabled
+    activation_gate: later_authorized_execution_task
+    prohibited_now:
+      - build_transaction
+      - simulate_transaction
+      - sign_transaction
+      - send_transaction
+
+  CP12_T2_DISABLED:
+    tier: T2_HYPOTHESIS_SPECIFIC
+    intent: Explicitly exclude speculative enrichment.
+    collection_mode: disabled
+    activation_gate: approved_hypothesis_data_memo
+
+provider_budget_envelopes:
+  JUPITER_SWAP_V2:
+    starting_plan: Keyless_or_Free_after_TASK07_resolution
+    cash_cap_usd_per_month: 0
+    planned_attempts_per_day:
+      base_quote_panel_max: 1152
+      triggered_quote_panel_max: 288
+      diagnostic_100_usd_max: 12
+      planning_total_max: 1452
+    hard_attempt_cap_per_day: 2000
+    max_attempts_per_minute: 24
+    soft_pause_conditions:
+      - daily_attempts_at_or_above_1500
+      - first_429_or_provider_quota_warning
+      - panel_p95_span_above_60_seconds
+    hard_pause_conditions:
+      - daily_attempts_at_or_above_2000
+      - three_rate_limit_events_within_15_minutes
+      - response_contract_break
+      - execute_or_submit_path_selected
+    retry_policy:
+      max_retries_per_logical_quote: 2
+      backoff_seconds:
+        - 5
+        - 30
+      retry_after_header_has_priority: true
+      no_route_retry_immediately: false
+    upgrade_gate:
+      required_evidence:
+        - valid_panel_demand_exceeds_free_rate_limit_for_7_days
+        - missed_decision_value_is_quantified
+        - batching_or_lower_cadence_is_insufficient
+        - full_monthly_TCO_and_crypto_payment_rechecked
+
+  HELIUS:
+    starting_plan: Free
+    cash_cap_usd_per_month: 0
+    documented_monthly_credit_allowance: 1000000
+    planning_credit_cap_per_month: 700000
+    soft_pause_credit_threshold_per_month: 800000
+    hard_pause_credit_threshold_per_month: 900000
+    provisional_daily_credit_cap: 20000
+    credit_cost_per_request_class: UNSET_UNTIL_TASK07
+    soft_pause_conditions:
+      - observed_daily_credits_at_or_above_20000
+      - monthly_credits_at_or_above_800000
+      - first_unexplained_429
+      - stream_bytes_or_credits_cannot_be_observed
+    hard_pause_conditions:
+      - monthly_credits_at_or_above_900000
+      - repeated_reconnect_gap_without_reconciliation
+      - raw_and_parsed_signature_join_breaks
+      - schema_or_program_version_change_without_decoder_gate
+    fallback_behavior: keep_local_gap_and_use_bounded_reconciliation
+    upgrade_gate:
+      required_evidence:
+        - seven_day_measured_credit_or_rate_bottleneck
+        - T0_data_loss_or_material_decision_loss
+        - no_lower_cost_cadence_or_filter_fix
+        - full_monthly_TCO_and_crypto_payment_rechecked
+      prohibited_initial_upgrades:
+        - gRPC
+        - dedicated_node
+        - shred_delivery
+
+  SOLANA_TRACKER:
+    starting_plan: Free_Data_API_if_retained_after_TASK07
+    cash_cap_usd_per_month: 0
+    documented_request_allowance_per_month: 10000
+    planning_request_cap_per_month: 6000
+    soft_pause_request_threshold_per_month: 7500
+    hard_pause_request_threshold_per_month: 8500
+    provisional_daily_request_cap: 200
+    soft_pause_conditions:
+      - daily_requests_at_or_above_200
+      - monthly_requests_at_or_above_7500
+      - payment_or_entitlement_claim_needed_but_unattested
+    hard_pause_conditions:
+      - monthly_requests_at_or_above_8500
+      - repeated_429
+      - universe_filter_excludes_dead_or_non_migrated_cases_silently
+      - vendor_label_revision_cannot_be_versioned
+    upgrade_gate:
+      required_evidence:
+        - measured_T1_or_reconciliation_gap_has_named_consumer
+        - free_cap_blocks_material_decision
+        - payment_rail_is_sanitized_user_attested
+        - full_monthly_TCO_and_crypto_preference_reviewed
+      prohibited_initial_upgrades:
+        - Premium_Datastream
+        - dedicated_node
+
+  BIRDEYE:
+    starting_plan: no_account_or_purchase_initially
+    cash_cap_usd_per_month: 0
+    planned_requests_per_day: 0
+    activation_gate:
+      - independent_cross_check_gap_remains_after_primary_smoke
+      - exact_endpoint_is_available_on_selected_plan
+      - request_or_subscription_cost_is_compared
+    hard_pause_conditions:
+      - long_duration_subscription_required_before_measured_need
+      - endpoint_is_only_price_or_OHLCV_but_consumer_requires_executable_quote
+    upgrade_gate:
+      required_evidence:
+        - named_cross_check_or_hypothesis_consumer
+        - cheaper_alternative_failed
+        - USDC_or_USDT_payment_terms_rechecked
+        - cancellation_and_prepayment_risk_reviewed
+
+  DUNE_SOLANA_CATALOG:
+    starting_plan: reference_only
+    cash_cap_usd_per_month: 0
+    planned_runtime_queries_per_day: 0
+    activation_gate:
+      - historical_backfill_or_completeness_question_is_named
+      - freshness_export_license_and_terms_are_checked
+    hard_pause_conditions:
+      - catalog_data_is_used_to_backdate_strategy_availability
+
+storage_and_retention:
+  policy_state: PROPOSED_NOT_ENFORCED_BEFORE_TASK16
+  sizing_formula: daily_bytes_x_retention_days_x_replication_factor_x_safety_factor
+  sizing_inputs:
+    daily_bytes: UNSET_UNTIL_PILOT
+    replication_factor: 2
+    safety_factor: 1.5
+  deletion_before_restore_drill: prohibited
+  retention_classes:
+    R0_AUDIT_INDEFINITE:
+      applies_to:
+        - schemas_and_configs
+        - manifests_and_checksums
+        - lineage_metadata
+        - trial_decision_and_negative_result_records
+        - cost_and_access_decisions_without_sensitive_payment_data
+      hot_days: 365
+      cold_rule: retain_for_project_lifetime
+    R1_T0_RAW:
+      applies_to:
+        - universe_lifecycle_and_program_events
+        - raw_pool_trade_and_quote_payloads
+        - no_route_timeout_and_error_payloads
+        - observation_and_revision_envelopes
+      hot_days: 90
+      cold_rule: compressed_replayable_until_domain_close_plus_365_days
+      hashes_and_manifest_after_cold_expiry: retain_indefinitely
+    R2_T1_RAW:
+      applies_to:
+        - holder_entity_depth_and_network_enrichment
+      hot_days: 30
+      cold_rule: compressed_replayable_for_365_days_or_relevant_RC_close_plus_180_days_whichever_is_later
+      normalized_and_aggregate_rule: retain_for_project_lifetime_with_lineage
+    R3_T2_RAW:
+      applies_to:
+        - approved_hypothesis_specific_enrichment
+      hot_days: 30
+      cold_rule: defined_by_hypothesis_data_memo_minimum_relevant_RC_close_plus_180_days
+    R4_TEMPORARY_FIXTURE:
+      applies_to:
+        - sanitized_smoke_fixtures
+        - local_test_exports
+      hot_days: 30
+      cold_rule: keep_only_minimal_replay_set_after_validation
+  storage_soft_stops:
+    - free_disk_fraction_below_0_30
+    - projected_30_day_bytes_above_0_50_of_currently_available_capacity
+    - daily_growth_above_2x_trailing_7_day_median_without_explained_scope_change
+  storage_hard_stops:
+    - free_disk_fraction_below_0_20
+    - raw_partition_write_or_checksum_failure
+    - backup_manifest_missing_when_backup_is_required
+  hard_stop_action: stop_external_collection_safely_preserve_queue_and_existing_raw
+
+qa_budget:
+  schema_validation:
+    T0_CORE: 100_percent_of_rows_or_messages
+    T1_BUDGETED_REUSE: 100_percent_of_rows_or_messages
+    T2_HYPOTHESIS_SPECIFIC: 100_percent_of_rows_or_messages
+  semantic_manual_or_deep_checks:
+    T0_CORE:
+      sample_fraction: 0.01
+      minimum_per_request_class_per_day: 20
+      anomalies_checked: 100_percent
+    T1_BUDGETED_REUSE:
+      sample_fraction: 0.005
+      minimum_per_source_per_day: 10
+      anomalies_checked: 100_percent
+    T2_HYPOTHESIS_SPECIFIC:
+      rule: set_in_hypothesis_data_memo
+  automated_acceptance_thresholds:
+    critical_timestamp_completeness: 1.0
+    critical_source_and_version_completeness: 1.0
+    silent_exception_loss_allowed: 0
+    no_route_and_error_preservation: 1.0
+    raw_replay_selected_sample: 1.0
+    future_leakage_test_pass_rate: 1.0
+    duplicate_logical_events_after_dedupe_max_fraction: 0.001
+    runtime_clock_drift_max_seconds_or_explicitly_measured: 1
+    pilot_collector_availability_min_fraction: 0.95
+  interpretation:
+    availability_below_threshold: blocks_promotion_but_does_not_delete_data
+    any_silent_loss_or_leakage: hard_pause
+    duplicate_threshold_breach: investigate_idempotency_and_dedupe_before_promotion
+  operator_attention:
+    track_minutes_per_session: true
+    cash_equivalent_rate: UNSET_BY_USER
+    soft_redesign_trigger: more_than_60_minutes_manual_QA_per_day_for_3_consecutive_days
+    response: automate_narrow_scope_or_pause_lowest_option_value_T1
+
+global_stop_rules:
+  immediate_hard_pause:
+    - cannot_reconstruct_data_available_at_decision_time
+    - dead_non_migrated_or_no_route_cases_disappear_silently
+    - candle_or_spot_price_used_as_executable_exit
+    - provider_revision_overwrites_raw_history
+    - missing_timeout_or_no_route_converted_to_zero
+    - secret_or_private_payment_identifier_enters_artifact_log_chat_or_git
+    - paid_plan_or_infrastructure_selected_without_measured_bottleneck_and_user_approval
+    - new_field_provider_or_cadence_has_no_tier_consumer_cost_cap_or_first_availability
+    - transaction_build_simulate_sign_or_send_attempted_before_authorized_task
+    - quote_fee_or_price_impact_double_counted_against_fee_inclusive_output
+  soft_pause_and_review:
+    - provider_divergence_above_UNSET_UNTIL_TASK07_threshold
+    - cost_or_credit_soft_threshold_reached
+    - manual_QA_burden_exceeds_operator_attention_trigger
+    - complexity_increases_without_named_information_gain
+    - low_priority_T1_displaces_T0_budget
+  priority_when_budget_constrained:
+    keep_first:
+      - CP01_UNIVERSE_EVENT_SPINE
+      - CP09_CONTROL_TELEMETRY
+      - CP04_BASE_QUOTE_PANEL_at_reduced_deterministic_sample
+      - raw_error_and_gap_records
+    reduce_next:
+      - CP06_DIAGNOSTIC_100_USD_QUOTE
+      - CP07_SPARSE_HOLDER_ENTITY_ENRICHMENT
+      - CP08_NETWORK_AND_PROVIDER_SENTINEL
+    disable_first:
+      - CP12_T2_DISABLED
+      - optional_cross_provider_enrichment
+      - high_resolution_non_triggered_T1
+    never_silently_reduce:
+      - universe_inclusion_and_failure_evidence
+      - four_timestamps_and_lineage
+      - no_route_timeout_and_error_retention
+
+domain_options:
+  D01:
+    tier: T0_CORE
+    profiles:
+      - CP01_UNIVERSE_EVENT_SPINE
+      - CP09_CONTROL_TELEMETRY
+    retention_class: R1_T0_RAW
+    budget_bucket: HELIUS
+    named_consumers:
+      - H01-H18
+      - TASK-08
+      - TASK-20
+      - TASK-21
+    irrecoverability: high
+    first_reliable_available_at: UNSET_UNTIL_VALIDATED
+  D02:
+    tier: T0_CORE
+    profiles:
+      - CP01_UNIVERSE_EVENT_SPINE
+      - CP02_ACTIVE_STATE_SENTINEL
+    retention_class: R1_T0_RAW
+    budget_bucket: HELIUS
+    named_consumers:
+      - H01
+      - H04
+      - H05
+      - H06
+      - H17
+      - TASK-05
+      - TASK-08
+      - TASK-09
+    irrecoverability: medium
+    first_reliable_available_at: UNSET_UNTIL_VALIDATED
+  D03:
+    tier: T0_CORE
+    profiles:
+      - CP02_ACTIVE_STATE_SENTINEL
+    retention_class: R1_T0_RAW
+    budget_bucket: HELIUS
+    named_consumers:
+      - H01
+      - H03
+      - H11
+      - H17
+      - TASK-09
+      - TASK-26
+    irrecoverability: high
+    first_reliable_available_at: UNSET_UNTIL_VALIDATED
+  D04:
+    tier: T0_CORE
+    profiles:
+      - CP01_UNIVERSE_EVENT_SPINE
+      - CP02_ACTIVE_STATE_SENTINEL
+    retention_class: R1_T0_RAW
+    budget_bucket: HELIUS
+    named_consumers:
+      - H01
+      - H11
+      - H17
+      - TASK-08
+      - TASK-09
+      - TASK-20
+    irrecoverability: high
+    first_reliable_available_at: UNSET_UNTIL_VALIDATED
+  D05:
+    tier: T0_CORE
+    secondary_tier: T1_BUDGETED_REUSE
+    profiles:
+      - CP02_ACTIVE_STATE_SENTINEL
+      - CP09_CONTROL_TELEMETRY
+    retention_class: R1_T0_RAW
+    dense_snapshot_retention_class: R2_T1_RAW
+    budget_bucket: HELIUS
+    named_consumers:
+      - H01
+      - H02
+      - H03
+      - H07
+      - H08
+      - H10
+      - H16
+      - TASK-09
+      - TASK-10
+      - TASK-26
+    irrecoverability: high
+    first_reliable_available_at: UNSET_UNTIL_VALIDATED
+  D06:
+    tier: T0_CORE
+    profiles:
+      - CP03_TRADE_EVENT_SPINE
+    retention_class: R1_T0_RAW
+    budget_bucket: HELIUS
+    named_consumers:
+      - H01
+      - H02
+      - H03
+      - H09
+      - H10
+      - H14
+      - H18
+      - TASK-09
+      - TASK-20
+      - TASK-21
+    irrecoverability: medium
+    first_reliable_available_at: UNSET_UNTIL_VALIDATED
+  D07:
+    tier: T0_CORE
+    profiles:
+      - CP10_DERIVED_PIT_ONLY
+    retention_class: R0_AUDIT_INDEFINITE
+    budget_bucket: LOCAL_COMPUTE
+    named_consumers:
+      - H01
+      - H02
+      - H03
+      - H10
+      - H11
+      - H18
+    irrecoverability: high_if_upstream_observation_lost
+    first_reliable_available_at: UNSET_UNTIL_VALIDATED
+  D08:
+    tier: T0_CORE
+    profiles:
+      - CP04_BASE_QUOTE_PANEL
+      - CP05_TRIGGERED_QUOTE_PANEL
+      - CP06_DIAGNOSTIC_100_USD_QUOTE
+    retention_class: R1_T0_RAW
+    budget_bucket: JUPITER_SWAP_V2
+    named_consumers:
+      - H01
+      - H02
+      - H03
+      - H07
+      - H08
+      - H13
+      - H16
+      - H17
+      - TASK-10
+      - TASK-25
+      - TASK-26
+      - TASK-29
+    irrecoverability: critical
+    first_reliable_available_at: UNSET_UNTIL_VALIDATED
+  D09:
+    tier: T0_CORE
+    profiles:
+      - CP04_BASE_QUOTE_PANEL
+      - CP05_TRIGGERED_QUOTE_PANEL
+      - CP09_CONTROL_TELEMETRY
+    retention_class: R1_T0_RAW
+    budget_bucket: JUPITER_SWAP_V2
+    named_consumers:
+      - H07
+      - H08
+      - H13
+      - H16
+      - H17
+      - TASK-06
+      - TASK-07
+      - TASK-10
+      - TASK-25
+    irrecoverability: critical
+    first_reliable_available_at: UNSET_UNTIL_VALIDATED
+  D10:
+    tier: T0_CORE
+    profiles:
+      - CP11_SCHEMA_ONLY_DISABLED
+    retention_class: R1_T0_RAW
+    budget_bucket: DISABLED_UNTIL_LATER_GATE
+    named_consumers:
+      - H08
+      - H13
+      - H16
+      - H17
+      - TASK-25
+      - TASK-26
+      - TASK-29
+    irrecoverability: critical
+    first_reliable_available_at: UNSET_UNTIL_AUTHORIZED_LATER_TASK
+  D11:
+    tier: T1_BUDGETED_REUSE
+    profiles:
+      - CP07_SPARSE_HOLDER_ENTITY_ENRICHMENT
+    retention_class: R2_T1_RAW
+    budget_bucket: SOLANA_TRACKER
+    named_consumers:
+      - H05
+      - H06
+      - H09
+      - H14
+      - H15
+      - TASK-11
+      - TASK-20
+    irrecoverability: high
+    first_reliable_available_at: UNSET_UNTIL_VALIDATED
+  D12:
+    tier: T1_BUDGETED_REUSE
+    profiles:
+      - CP07_SPARSE_HOLDER_ENTITY_ENRICHMENT
+    retention_class: R2_T1_RAW
+    budget_bucket: SOLANA_TRACKER
+    named_consumers:
+      - H04
+      - H05
+      - H06
+      - H09
+      - H14
+      - H15
+      - TASK-11
+      - TASK-20
+    irrecoverability: medium_high
+    first_reliable_available_at: UNSET_UNTIL_VALIDATED
+  D13:
+    tier: T1_BUDGETED_REUSE
+    profiles:
+      - CP03_TRADE_EVENT_SPINE
+      - CP07_SPARSE_HOLDER_ENTITY_ENRICHMENT
+    retention_class: R2_T1_RAW
+    budget_bucket: HELIUS
+    named_consumers:
+      - H02
+      - H04
+      - H06
+      - H07
+      - H10
+      - H16
+    irrecoverability: medium
+    first_reliable_available_at: UNSET_UNTIL_VALIDATED
+  D14:
+    tier: T1_BUDGETED_REUSE
+    profiles:
+      - CP08_NETWORK_AND_PROVIDER_SENTINEL
+      - CP09_CONTROL_TELEMETRY
+    retention_class: R2_T1_RAW
+    budget_bucket: HELIUS
+    named_consumers:
+      - H08
+      - H16
+      - H17
+      - TASK-10
+      - TASK-25
+      - TASK-26
+    irrecoverability: medium_high
+    first_reliable_available_at: UNSET_UNTIL_VALIDATED
+  D15:
+    tier: T0_CORE
+    profiles:
+      - CP09_CONTROL_TELEMETRY
+    retention_class: R0_AUDIT_INDEFINITE
+    budget_bucket: LOCAL_STORAGE
+    named_consumers:
+      - ALL_HYPOTHESES
+      - TASK-05
+      - TASK-06
+      - TASK-07
+      - TASK-16
+      - TASK-17
+    irrecoverability: critical
+    first_reliable_available_at: START_OF_VALIDATED_RAW_ENVELOPE
+  D16:
+    tier: T0_CORE
+    profiles:
+      - CP08_NETWORK_AND_PROVIDER_SENTINEL
+      - CP09_CONTROL_TELEMETRY
+    retention_class: R0_AUDIT_INDEFINITE
+    budget_bucket: PROVIDER_CONTROL
+    named_consumers:
+      - H08
+      - H16
+      - TASK-07
+      - TASK-10
+      - TASK-12
+      - TASK-15
+    irrecoverability: high
+    first_reliable_available_at: START_OF_VALIDATED_REQUEST_LOGGING
+  D17:
+    tier: T1_BUDGETED_REUSE
+    profiles:
+      - CP08_NETWORK_AND_PROVIDER_SENTINEL
+      - CP10_DERIVED_PIT_ONLY
+    retention_class: R2_T1_RAW
+    budget_bucket: LOCAL_COMPUTE
+    named_consumers:
+      - H12
+      - H18
+      - NEXT_REGIME_FAMILIES
+    irrecoverability: low_medium
+    first_reliable_available_at: UNSET_UNTIL_VALIDATED
+  D18:
+    tier: T2_HYPOTHESIS_SPECIFIC
+    profiles:
+      - CP12_T2_DISABLED
+    retention_class: R3_T2_RAW
+    budget_bucket: DISABLED
+    named_consumers:
+      - H15_ONLY_IF_APPROVED_MEMO
+    irrecoverability: medium
+    first_reliable_available_at: UNSET_NO_ACTIVE_MEMO
+  D19:
+    tier: T0_CORE
+    profiles:
+      - CP09_CONTROL_TELEMETRY
+    retention_class: R0_AUDIT_INDEFINITE
+    budget_bucket: PROJECT_ECONOMICS
+    named_consumers:
+      - TASK-01
+      - TASK-12
+      - TASK-15
+      - TASK-16
+      - TASK-47
+    irrecoverability: high
+    first_reliable_available_at: TASK01_START
+  D20:
+    tier: T0_CORE
+    profiles:
+      - CP10_DERIVED_PIT_ONLY
+    retention_class: R0_AUDIT_INDEFINITE
+    budget_bucket: LOCAL_COMPUTE
+    named_consumers:
+      - H01-H18
+      - TASK-20
+      - TASK-21
+      - TASK-25
+      - TASK-26
+      - TASK-29
+    irrecoverability: critical
+    first_reliable_available_at: AFTER_VALIDATED_EXECUTABLE_INPUTS
+
+static_budget_reconciliation:
+  quote_attempts:
+    base_panel_max_per_day: 1152
+    triggered_panel_max_per_day: 288
+    diagnostic_100_usd_max_per_day: 12
+    computed_planning_max_per_day: 1452
+    provider_hard_cap_per_day: 2000
+    headroom_attempts_per_day: 548
+    reconciliation_status: PASS
+  cash:
+    initial_monthly_cap_usd: 0
+    provider_paid_plan_count_allowed_now: 0
+    reconciliation_status: PASS
+  source_allowances:
+    helius_planning_fraction_of_documented_monthly_allowance: 0.70
+    helius_hard_pause_fraction_of_documented_monthly_allowance: 0.90
+    solana_tracker_planning_fraction_of_documented_monthly_allowance: 0.60
+    solana_tracker_hard_pause_fraction_of_documented_monthly_allowance: 0.85
+    reconciliation_status: PROVISIONAL_UNTIL_TASK07
+
+handoff:
+  current_task: TASK-01
+  task_execution_status: DONE
+  current_blocker: NONE
+  user_action_required_now: NONE
+  accounts_required_now: NONE
+  purchase_required_now: NONE
+  state_change: DELTA-01-001_PENDING_USER_ACTIVATION
+  next_task_candidate: TASK-02
+  next_task_gate: RUN_TASK_ENTRY_GATE_BEFORE_START
+  task03_import_requirement: Import this validated config and its checksum into the private Git registry.
+  do_not_start_next_task_automatically: true

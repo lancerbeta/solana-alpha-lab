@@ -1,4 +1,4 @@
-schema_version: '1.0'
+schema_version: '1.1'
 registry_id: CATALOG-ASSET-REGISTRY-CORE-001
 as_of: '2026-07-21'
 records:
@@ -66,7 +66,7 @@ records:
     contains_raw_data: false
     sensitivity: INTERNAL_NON_SECRET
 - asset_id: CTRL-AGENTS-001
-  record_version: '1.0'
+  record_version: '1.1'
   asset_type: control_document
   purpose: Repository-level agent contract for scope, safety, validation, and status ownership.
   status: IMPLEMENTED_UNVERIFIED
@@ -79,7 +79,7 @@ records:
     repository_path: AGENTS.md
   integrity:
     kind: sha256
-    sha256: e539dfe03675b5ddbf0afaeaa20231c6a07be39bcb9e0ea06dbaa7871a608f89
+    sha256: 64f28312bfeb45943aca1fa3aff5b02a240861b63bde9244c123feec41be1544
   access:
     mode: read_only
     method: file
@@ -97,7 +97,7 @@ records:
     contains_raw_data: false
     sensitivity: INTERNAL_NON_SECRET
 - asset_id: CTRL-TASK-03-001
-  record_version: '1.0'
+  record_version: '1.1'
   asset_type: control_document
   purpose: Active implementation contract and Definition of Done mirror for TASK-03.
   status: IMPLEMENTED_UNVERIFIED
@@ -110,7 +110,7 @@ records:
     repository_path: docs/tasks/TASK-03.md
   integrity:
     kind: sha256
-    sha256: 5571094cf81a1820dc60bb5ec53fe9f73867bac709d67c9df35b1d11e017ae18
+    sha256: 1aa1d9e493c702c2efec03c0ad153b8dc136df5ce3fc8a9986d13a95179c4de9
   access:
     mode: read_only
     method: file
@@ -187,7 +187,7 @@ records:
     contains_raw_data: false
     sensitivity: INTERNAL_NON_SECRET
 - asset_id: CTRL-QUALITY-GATE-001
-  record_version: '1.0'
+  record_version: '1.1'
   asset_type: script
   purpose: One-command local quality gate for runtime, secrets, Catalog, repository policy, and hooks.
   status: IMPLEMENTED_UNVERIFIED
@@ -200,7 +200,7 @@ records:
     repository_path: scripts/validate.ps1
   integrity:
     kind: sha256
-    sha256: 3d00ae5b1be5157efe2edf446689dea7be9a423747b2a305be09fda081900faf
+    sha256: ff72b0aa3ddc040f04a1715fbd3c84bf9ab51dbecee3903349b52a1dd0d04dd5
   access:
     mode: read_only
     method: command
@@ -218,7 +218,7 @@ records:
     contains_raw_data: false
     sensitivity: INTERNAL_NON_SECRET
 - asset_id: CATALOG-ROOT-001
-  record_version: '1.0'
+  record_version: '1.1'
   asset_type: catalog_root
   purpose: Stable machine-readable resolver for Catalog registries, schemas, commands, and policies.
   status: IMPLEMENTED_UNVERIFIED
@@ -247,6 +247,10 @@ records:
     target_asset_id: CATALOG-VALIDATOR-001
   - relation_type: governed_by
     target_asset_id: ADR-CATALOG-BASELINE-001
+  - relation_type: contains
+    target_asset_id: CATALOG-ASSET-REGISTRY-PRE-GIT-001
+  - relation_type: contains
+    target_asset_id: CATALOG-ASSET-REGISTRY-ARCHITECTURE-001
   consumers:
   - TASK-03
   evidence: []
@@ -285,7 +289,7 @@ records:
     contains_raw_data: false
     sensitivity: INTERNAL_NON_SECRET
 - asset_id: CATALOG-QUERY-REGISTRY-001
-  record_version: '1.0'
+  record_version: '1.1'
   asset_type: catalog_registry
   purpose: Bounded read-only query and command recipes used to validate and resolve Catalog records.
   status: IMPLEMENTED_UNVERIFIED
@@ -315,7 +319,7 @@ records:
     contains_raw_data: false
     sensitivity: INTERNAL_NON_SECRET
 - asset_id: CATALOG-SCHEMA-MANIFEST-001
-  record_version: '1.0'
+  record_version: '1.1'
   asset_type: schema
   purpose: Standalone Draft 2020-12 schema for the Catalog root manifest.
   status: IMPLEMENTED_UNVERIFIED
@@ -328,7 +332,7 @@ records:
     repository_path: catalog/schemas/catalog_manifest.schema.json
   integrity:
     kind: sha256
-    sha256: 7a35de582baae3a367b49e0ec6e11562c1a9776cb10126bcde03712ed1f5f2d8
+    sha256: 7bcbce4d55c9b584ec3f2a40ee5e1a4043a5349d8147916421b0cb2a70c8ad03
   access:
     mode: read_only
     method: file
@@ -345,9 +349,9 @@ records:
     contains_raw_data: false
     sensitivity: INTERNAL_NON_SECRET
 - asset_id: CATALOG-SCHEMA-ASSET-001
-  record_version: '1.0'
+  record_version: '1.1'
   asset_type: schema
-  purpose: Standalone Draft 2020-12 schema for typed asset registry records.
+  purpose: Backward-compatible Draft 2020-12 asset schema v1.1 with pre-Git provenance and architecture-intent contracts.
   status: IMPLEMENTED_UNVERIFIED
   origin: REPOSITORY
   as_of: '2026-07-21'
@@ -358,7 +362,7 @@ records:
     repository_path: catalog/schemas/asset_catalog.schema.json
   integrity:
     kind: sha256
-    sha256: fa9c4ef517be86021c964e48b0c9a4f1ee01f82aa0fe89c0efa73bcefdb37ec2
+    sha256: 098393d72cbccf3b5b8355076ea8556a8385e7afc059f46132950f618eb7852b
   access:
     mode: read_only
     method: file
@@ -405,7 +409,7 @@ records:
     contains_raw_data: false
     sensitivity: INTERNAL_NON_SECRET
 - asset_id: CATALOG-VALIDATOR-001
-  record_version: '1.0'
+  record_version: '1.1'
   asset_type: script
   purpose: Deterministic schema and semantic validator for Catalog policy and integrity.
   status: IMPLEMENTED_UNVERIFIED
@@ -418,7 +422,7 @@ records:
     repository_path: scripts/validate_catalog.py
   integrity:
     kind: sha256
-    sha256: 7ff4180b257e36b6821c31cdc0ccf1af56721b6e743d97af6fd0730465ac5c17
+    sha256: a526f2c54c32cf38579316529fffb8d85d84ec5e96b154b1774f377bcc1d57e6
   access:
     mode: read_only
     method: command
@@ -511,6 +515,101 @@ records:
   integrity:
     kind: catalog_commit
     note: Receipt excludes itself from payload fingerprints and is bound by the candidate/commit tree.
+  access:
+    mode: read_only
+    method: file
+    network_required: false
+    secrets_required: false
+  relations:
+  - relation_type: evidenced_by
+    target_asset_id: CATALOG-ROOT-001
+  consumers:
+  - TASK-03
+  evidence: []
+  classification:
+    contains_secrets: false
+    contains_raw_data: false
+    sensitivity: INTERNAL_NON_SECRET
+- asset_id: CATALOG-ASSET-REGISTRY-PRE-GIT-001
+  record_version: '1.0'
+  asset_type: catalog_registry
+  purpose: Catalog registry for exact pre-Git artifacts, immutable source bundles, and provenance contracts.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-07-21'
+  truth_owner: TASK-03
+  location:
+    kind: git_path
+    logical_uri: repo://catalog/assets/pre_git.yaml
+    repository_path: catalog/assets/pre_git.yaml
+  integrity:
+    kind: catalog_commit
+    note: Registry self-integrity is bound by the accepted import commit and receipt.
+  access:
+    mode: read_only
+    method: file
+    recipe_id: QUERY-PRE-GIT-VERIFY-001
+    network_required: false
+    secrets_required: false
+  relations:
+  - relation_type: depends_on
+    target_asset_id: CATALOG-SCHEMA-ASSET-001
+  consumers:
+  - TASK-03
+  - TASK-04
+  - TASK-05
+  - TASK-07
+  evidence: []
+  classification:
+    contains_secrets: false
+    contains_raw_data: false
+    sensitivity: INTERNAL_NON_SECRET
+- asset_id: CATALOG-ASSET-REGISTRY-ARCHITECTURE-001
+  record_version: '1.0'
+  asset_type: catalog_registry
+  purpose: Catalog registry for accepted architecture intents that are explicitly not implementation evidence.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-07-21'
+  truth_owner: TASK-03
+  location:
+    kind: git_path
+    logical_uri: repo://catalog/assets/architecture.yaml
+    repository_path: catalog/assets/architecture.yaml
+  integrity:
+    kind: catalog_commit
+    note: Registry self-integrity is bound by the accepted import commit and receipt.
+  access:
+    mode: read_only
+    method: file
+    network_required: false
+    secrets_required: false
+  relations:
+  - relation_type: depends_on
+    target_asset_id: CATALOG-SCHEMA-ASSET-001
+  consumers:
+  - TASK-03
+  - TASK-04
+  evidence: []
+  classification:
+    contains_secrets: false
+    contains_raw_data: false
+    sensitivity: INTERNAL_NON_SECRET
+- asset_id: EVIDENCE-ATOM4B-RECEIPT-001
+  record_version: '1.0'
+  asset_type: evidence
+  purpose: Deterministic receipt for exact pre-Git import, provenance validation, and architecture-intent registration.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-07-21'
+  truth_owner: TASK-03
+  location:
+    kind: git_path
+    logical_uri: repo://docs/evidence/task03_atom4b_pre_git_import_receipt.json
+    repository_path: docs/evidence/task03_atom4b_pre_git_import_receipt.json
+  integrity:
+    kind: catalog_commit
+    note: Receipt is bound by the future accepted import commit and external post-commit evidence.
   access:
     mode: read_only
     method: file

@@ -108,7 +108,10 @@
         "unregistered_mandatory_output",
         "self_integrity",
         "query_write_effects",
-        "graph_database"
+        "graph_database",
+        "pre_git_availability",
+        "external_bundle_bytes",
+        "architecture_intent_claim"
       ],
       "properties": {
         "absolute_paths": {
@@ -137,6 +140,15 @@
         },
         "graph_database": {
           "const": "DEFERRED_UNTIL_MEASURED_NEED_ADR"
+        },
+        "pre_git_availability": {
+          "const": "PRESERVE_FIRST_RELIABLE_AVAILABLE_AT"
+        },
+        "external_bundle_bytes": {
+          "const": "OUTSIDE_GIT_REGISTER_BY_HASH"
+        },
+        "architecture_intent_claim": {
+          "const": "DIRECTION_ONLY_UNTIL_IMPLEMENTED_EVIDENCE"
         }
       }
     },

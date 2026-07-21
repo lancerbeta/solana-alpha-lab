@@ -1,0 +1,55 @@
+{
+  "schema_version": "1.0",
+  "task_id": "TASK-02",
+  "evidence_type": "USER_ATTESTATION_FROM_CONTROLLED_COMMAND_OUTPUT",
+  "as_of": "2026-07-21",
+  "observations": {
+    "shell": "PowerShell 5.1.26100.8875 (Desktop)",
+    "python_registered_runtimes": [
+      "3.14.2 AMD64 CPython",
+      "3.10.6 AMD64 CPython"
+    ],
+    "python_default_runtime": "3.14.2 AMD64 CPython",
+    "pip_version_for_python_3_14": "25.3",
+    "python_default_venv_active": false,
+    "python_user_site_enabled": true,
+    "project_dependency_policy": "UV_MANAGED_ENVIRONMENT_ONLY",
+    "winget_version": "1.29.280",
+    "docker_install_mode": "PER_USER",
+    "docker_backend": "WSL_2_LINUX_CONTAINERS",
+    "docker_account_required": false,
+    "editor_decision": "NOT_INSTALLED_NOT_REQUIRED_FOR_TASK02"
+  },
+  "controlled_failures": [
+    {
+      "id": "T02-INC-001",
+      "stage": "initial_os_inventory",
+      "cause": "Assistant fallback command used a nullable runtime property incorrectly",
+      "effect": "Read-only command failed; no system state changed",
+      "recovery": "Replaced with Win32_OperatingSystem and environment architecture fields",
+      "final_status": "CLOSED_NO_SIDE_EFFECT"
+    },
+    {
+      "id": "T02-INC-002",
+      "stage": "docker_install",
+      "cause": "WinGet --scope user exposed no applicable Docker Desktop installer",
+      "effect": "Installation failed before install; no Docker files were installed by that attempt",
+      "recovery": "Downloaded the official WinGet-resolved installer and used Docker's per-user --user mode with WSL 2",
+      "final_status": "CLOSED"
+    },
+    {
+      "id": "T02-INC-003",
+      "stage": "python_diagnostic",
+      "cause": "Windows PowerShell 5.1 altered quoting in a multiline python -c payload",
+      "effect": "Read-only Python diagnostic failed; no system state changed",
+      "recovery": "Passed Python code through stdin and repeated the diagnostic",
+      "final_status": "CLOSED_NO_SIDE_EFFECT"
+    }
+  ],
+  "limitations": [
+    "The exact project Python version is not pinned yet; TASK-03/04 must choose it through uv after dependency-compatibility checks.",
+    "No user Linux distribution was installed because Docker Desktop's WSL 2 backend passed without one.",
+    "The official hello-world image remains in Docker cache; the test container was removed and no project state was created."
+  ],
+  "contains_secrets": false
+}

@@ -1,0 +1,359 @@
+schema_version: "1.0.0"
+
+artifact:
+  artifact_id: SMIAL_TASK_01_REUSE_CANDIDATE_REGISTRY_DATA_SUBSET
+  artifact_version: "1.0"
+  task_id: TASK-01
+  task_execution_status: DONE
+  artifact_status: VALIDATED_DATA_SUBSET
+  owner: user+assistant
+  created_at: "2026-07-18"
+  as_of: "2026-07-18"
+  canonical_after_validation: true
+  canonical_sources_sync: PREPARED_FOR_CANONICAL_HANDOFF_USER_ACTIVATION_PENDING
+  scope: DATA_SOURCE_DECODER_ROUTER_AND_REFERENCE_REUSE_ONLY
+  full_software_reuse_gate_owner_task: TASK-04
+  contains_secrets: false
+  api_rpc_provider_requests_executed: false
+  endpoint_probing_executed: false
+  accounts_created: false
+  purchases_executed: false
+
+gate:
+  order:
+    - ADOPT
+    - WRAP
+    - FORK
+    - BUILD
+  rules:
+    ADOPT: Use an official specification, catalog or compatible component without recreating it.
+    WRAP: Put a thin project-owned contract around a service/component while preserving raw evidence and an exit path.
+    FORK: Fork only with license compatibility, pinned source, a maintenance owner and a material unmet need.
+    BUILD: Build only after the first three gates fail against a named requirement.
+  no_decision_from_popularity_only: true
+  minimum_review_dimensions:
+    - official_provenance
+    - license_or_terms
+    - maturity_and_change_risk
+    - point_in_time_and_truth_limits
+    - signer_and_secret_boundary
+    - telemetry_and_privacy
+    - operations_and_total_cost
+    - pin_update_and_exit_path
+
+decision_vocabulary:
+  ADOPT_AS_REFERENCE: Adopt authoritative semantics/catalog reference; do not create runtime dependency by implication.
+  WRAP_FOR_TASK07: Retain for controlled non-transactional comparison under a project-owned interface.
+  DEFER: Do not introduce now; preserve as a measured-gap option.
+  REJECT_INITIAL_SPINE: Do not use as the initial project architecture; reconsider only through an explicit ADR.
+
+candidates:
+  - candidate_id: REUSE-SOLANA-RPC-SPEC
+    name: Solana official RPC specification
+    category: protocol_interface_reference
+    official_url: https://solana.com/docs/rpc
+    provenance_state: official_docs
+    license_or_terms_state: official_documentation_terms_apply
+    maturity_state: canonical_public_interface
+    plausible_use:
+      - method_and_commitment_semantics
+      - provider_neutral_raw_transport_contract
+    truth_limits:
+      - shared_public_endpoints_are_not_a_production_transport_SLA
+      - event_time_does_not_prove_local_availability
+    security_and_privacy:
+      - no_sign_or_send_in_TASK01_or_TASK07
+      - no_credentials_in_artifacts
+    operations_and_tco: Managed provider still required for measured reliability; specification itself has no project cash purchase.
+    decision: ADOPT_AS_REFERENCE
+    rationale: Recreating Solana RPC semantics would add drift without business value.
+    downstream_consumers:
+      - TASK-04
+      - TASK-05
+      - TASK-06
+      - TASK-07
+    next_validation: Pin cited method docs and validate response envelopes in TASK-07.
+    exit_path: Provider wrappers remain replaceable because canonical schema is provider-neutral.
+
+  - candidate_id: REUSE-PUMP-PUBLIC-DOCS-IDL
+    name: Pump public documentation and IDLs
+    category: program_semantics_and_decoder_reference
+    official_url: https://github.com/pump-fun/pump-public-docs
+    provenance_state: official_repo
+    license_or_terms_state: no_repository_license_located_as_of_2026_07_18
+    maturity_state: active_protocol_reference_version_pin_pending
+    plausible_use:
+      - instruction_event_and_account_semantics
+      - quote_mint_and_v2_semantics
+      - decoder_fixture_design
+    truth_limits:
+      - documentation_is_not_observed_chain_state
+      - unpinned_latest_IDL_is_not_immutable
+      - official_repository_does_not_automatically_grant_copy_or_fork_rights
+    security_and_privacy:
+      - no_executable_binary_adopted
+      - program_ids_and_IDL_checksums_must_be_pinned
+    operations_and_tco: Low reference cost; ongoing drift monitoring required.
+    decision: ADOPT_AS_REFERENCE
+    rationale: Official program semantics are safer than inventing a decoder contract; code reuse remains license-gated.
+    downstream_consumers:
+      - TASK-04
+      - TASK-05
+      - TASK-07
+      - TASK-09
+    next_validation: Pin commit/program IDs/checksums and add known-transaction fixtures after repository setup.
+    exit_path: Keep locally versioned IDL/semantic mappings with provenance; never depend on unpinned main.
+
+  - candidate_id: REUSE-JUPITER-SWAP-V2
+    name: Jupiter Swap API v2
+    category: managed_executable_quote_and_future_landing_service
+    official_url: https://developers.jup.ag/docs/swap
+    provenance_state: official_docs
+    license_or_terms_state: managed_service_terms_and_dashboard_attestation_needed_before_paid_use
+    maturity_state: current_official_API_with_auth_claim_conflict
+    plausible_use:
+      - exact_amount_buy_and_sell_quote_panel
+      - route_fee_and_no_route_observation
+      - future_unsigned_build_contract
+    truth_limits:
+      - quote_is_not_a_fill
+      - order_or_build_is_not_realized_VWAP
+      - provider_route_does_not_replace_raw_chain_truth
+    security_and_privacy:
+      - execute_and_submit_prohibited_until_later_execution_gate
+      - signer_and_wallet_are_outside_provider_research_wrapper
+      - API_key_if_any_never_enters_chat_git_logs_or_fixtures
+    operations_and_tco: Keyless/Free first; paid upgrade only after measured quote-panel bottleneck.
+    decision: WRAP_FOR_TASK07
+    rationale: Highest current information gain for testing execution illusion without building a router.
+    downstream_consumers:
+      - TASK-04
+      - TASK-06
+      - TASK-07
+      - TASK-10
+      - TASK-25
+    next_validation: Resolve keyless-versus-api-key conflict and validate unsigned quote/error schema only in TASK-07.
+    exit_path: Preserve raw request/response/error envelopes and a provider-neutral executable_quote contract.
+
+  - candidate_id: REUSE-SOLANA-TRACKER-RAPTOR-HOSTED
+    name: Solana Tracker Raptor hosted API
+    category: managed_swap_quote_router_beta
+    official_url: https://docs.solanatracker.io/raptor/overview
+    provenance_state: official_docs
+    license_or_terms_state: hosted_service_terms_and_future_pricing_unknown
+    maturity_state: public_beta_currently_free_and_no_rate_limits_stated
+    plausible_use:
+      - independent_unsigned_quote_contract_comparison
+      - route_coverage_gap_diagnosis
+    truth_limits:
+      - beta_marketing_claim_is_not_an_SLA
+      - a_quote_is_not_a_fill
+      - equivalence_to_Jupiter_and_venue_coverage_are_unproven
+    security_and_privacy:
+      - quote_only_in_TASK07_if_due_diligence_passes
+      - build_sign_send_paths_remain_prohibited
+      - terms_privacy_and_request_retention_require_review
+    operations_and_tco: Current beta price is stated as free, but future price, stability and support are unknown.
+    decision: WRAP_FOR_TASK07
+    rationale: A bounded second-router comparison may falsify provider-specific route coverage cheaply; no account or call is authorized here.
+    downstream_consumers:
+      - TASK-04
+      - TASK-07
+      - TASK-10
+    next_validation: TASK-07 due diligence, then at most one matched unsigned quote/error fixture family if retained.
+    exit_path: Treat as optional adapter; no canonical schema or research label may depend on Raptor-only fields.
+
+  - candidate_id: REUSE-SOLANA-TRACKER-RAPTOR-SELFHOSTED
+    name: Solana Tracker Raptor self-hosted binary
+    category: self_hosted_swap_router
+    official_url: https://docs.solanatracker.io/pricing
+    provenance_state: official_docs
+    license_or_terms_state: zero_licensing_fees_stated_binary_license_and_distribution_terms_need_review
+    maturity_state: optional_self_host_path_version_and_release_process_need_due_diligence
+    plausible_use:
+      - independent_router_if_hosted_service_fails_requirements
+    truth_limits:
+      - local_route_math_still_does_not_prove_landing_or_realized_VWAP
+      - binary_coverage_and_freshness_are_unmeasured
+    security_and_privacy:
+      - binary_supply_chain_signature_checksum_and_network_egress_review_required
+      - no_signing_key_or_wallet_access
+    operations_and_tco: License price may be zero while VPS, updates, observability and incident burden are nonzero.
+    decision: DEFER
+    rationale: Hosted comparison provides cheaper information before accepting self-hosting complexity.
+    downstream_consumers:
+      - TASK-04
+      - TASK-07
+    next_validation: Consider only after a measured independent-router gap and explicit ADR.
+    exit_path: Do not deploy or make it a schema dependency at the initial stage.
+
+  - candidate_id: REUSE-YELLOWSTONE-VIXEN
+    name: Yellowstone Vixen
+    category: solana_stream_parser_framework
+    official_url: https://github.com/rpcpool/yellowstone-vixen
+    provenance_state: official_repo
+    license_or_terms_state: MIT
+    maturity_state: active_repo_release_and_main_examples_may_diverge_pin_required
+    plausible_use:
+      - program_aware_realtime_pipeline
+      - parser_codegen_and_offline_parser_tests
+      - Prometheus_instrumented_stream_handlers
+    truth_limits:
+      - parser_output_is_not_protocol_truth_without_raw_lineage
+      - framework_does_not_solve_universe_selection_or_PIT_labels
+    security_and_privacy:
+      - dependency_and_generated_code_review_required
+      - no_secret_or_signer_access
+    operations_and_tco: Rust/gRPC toolchain and framework coupling exceed initial Python/DuckDB needs unless throughput proves otherwise.
+    decision: DEFER
+    rationale: Strong reusable option, but adopting before a measured stream/decoder bottleneck would raise complexity and rework risk.
+    downstream_consumers:
+      - TASK-04
+      - TASK-07
+      - TASK-09
+    next_validation: Reconsider after controlled stream throughput and parser-maintenance measurements.
+    exit_path: Keep parser contracts and raw envelopes language-neutral so a later adapter is possible.
+
+  - candidate_id: REUSE-YELLOWSTONE-OLD-FAITHFUL
+    name: Yellowstone Old Faithful
+    category: historical_solana_archive_reference
+    official_url: https://github.com/rpcpool/yellowstone-faithful
+    provenance_state: official_repo
+    license_or_terms_state: AGPL-3.0
+    maturity_state: repository_explicitly_states_RFC_not_for_production_and_breaking_changes_possible
+    plausible_use:
+      - architecture_reference_for_content_addressed_history
+      - possible_future_historical_archive_gap
+    truth_limits:
+      - historical_archive_cannot_reconstruct_our_past_observed_at
+      - archive_availability_does_not_create_live_strategy_availability
+    security_and_privacy:
+      - network_service_copyleft_and_distribution_implications_require_legal_review
+      - large_archive_ingestion_expands_attack_and_data_quality surface
+    operations_and_tco: Heavy storage, indexing and operational burden; incompatible with cheap initial falsification path.
+    decision: ADOPT_AS_REFERENCE
+    rationale: Useful architectural evidence, but production dependency is rejected at current maturity and cost.
+    downstream_consumers:
+      - TASK-04
+      - TASK-16
+      - TASK-17
+    next_validation: No runtime action; revisit only for a measured history gap with license/TCO memo.
+    exit_path: Reference concepts only; do not copy code or deploy initially.
+
+  - candidate_id: REUSE-DUNE-SOLANA-CATALOG
+    name: Dune Solana data catalog
+    category: historical_data_catalog
+    official_url: https://docs.dune.com/data-catalog/solana/overview
+    provenance_state: official_docs
+    license_or_terms_state: managed_service_terms_and_dataset_specific_terms_apply
+    maturity_state: established_raw_and_decoded_catalog_reference
+    plausible_use:
+      - universe_discovery_cross_check
+      - historical_protocol_and_decoder_comparison
+      - cheap_early_hazard_or_cohort_queries_if_entitlement_allows
+    truth_limits:
+      - cannot_backdate_local_observed_at_or_available_to_strategy_at
+      - decoded_tables_are_provider_models_not_protocol_truth
+      - cannot prove executable_quotes_or_routes
+    security_and_privacy:
+      - no secrets in saved query text
+      - public wallet identifiers still require purpose_limitation_and_minimization
+    operations_and_tco: Query/credit entitlement and export limits must be checked only if selected; avoid bulk export by default.
+    decision: ADOPT_AS_REFERENCE
+    rationale: Can shorten historical discovery and cross-check work without replacing the forward observation spine.
+    downstream_consumers:
+      - TASK-04
+      - TASK-07
+      - TASK-08
+      - TASK-20
+    next_validation: Define one bounded query/export use case before any account or paid decision.
+    exit_path: Store query text, dataset/version/as_of and result hash so historical work remains replayable elsewhere.
+
+  - candidate_id: REUSE-HUMMINGBOT
+    name: Hummingbot
+    category: general_trading_bot_framework
+    official_url: https://github.com/hummingbot/hummingbot
+    provenance_state: official_repo
+    license_or_terms_state: Apache-2.0
+    maturity_state: active_mature_framework_release_v2_15_0_seen_2026_06_16
+    plausible_use:
+      - architecture_reference_for_connectors_and_strategy_lifecycle
+      - possible_future_execution_component_after_research_gates
+    truth_limits:
+      - general_bot_framework_does_not_solve_Solana_memecoin_PIT_universe_or_execution_research
+      - connector_backtests_may_not_model_route_death_or_actual_Solana_landing
+    security_and_privacy:
+      - anonymous_data_reporting_and_telemetry_controls_require_review
+      - signer_key_and_wallet_boundary_conflicts_with_current_isolation_goal
+      - dependency_and_container_supply_chain_is_large
+    operations_and_tco: Docker and broad connector framework add substantial surface before any validated edge.
+    decision: REJECT_INITIAL_SPINE
+    rationale: Reusing the whole framework now would optimize bot deployment before proving executable alpha; selectively reuse ideas later.
+    downstream_consumers:
+      - TASK-04
+      - TASK-25
+      - TASK-33
+    next_validation: Reconsider only after a validated strategy requires functionality cheaper to adopt than build/wrap.
+    exit_path: No dependency introduced; preserve project-owned strategy, quote and execution contracts.
+
+  - candidate_id: REUSE-BIRDEYE-X402
+    name: Birdeye x402 Pay-Per-Request API
+    category: provider_specific_machine_payment_data_API
+    official_url: https://docs.birdeye.so/reference/x402
+    provenance_state: official_docs
+    license_or_terms_state: managed_service_terms_plus_x402_and_Coinbase_CDP_facilitator_terms_apply
+    maturity_state: current_official_path_updated_about_one_month_before_as_of
+    plausible_use:
+      - targeted_keyless_data_endpoint_when_free_standard_access_has_a_measured_gap
+      - avoid_long_subscription_commitment_for_sparse_requests
+    truth_limits:
+      - numeric_route_prices_are_not_published_on_the_overview_and_must_not_be_guessed
+      - payment_success_does_not_prove_data_quality_or_TCO
+      - indexed_price_holder_or_security_data_is_not_executable_or_protocol_truth
+    security_and_privacy:
+      - request_flow_requires_a_client_held_wallet_and_signed_payment_payload
+      - no_autonomous_wallet_authorization_by_default
+      - user_performs_and_approves_every_payment
+      - no_wallet_receipt_identifier_or_secret_in_project_artifacts
+      - collector_and_research_process_may_not_receive_a_production_signing_key
+    operations_and_tco: Per-request payment may avoid subscriptions, but route-specific price, usage volume, facilitator dependency, accounting and signer isolation determine real TCO.
+    decision: DEFER
+    rationale: Official provider-specific support is confirmed, but it is unnecessary for the free initial shortlist and introduces a signing/payment boundary before any measured data gap.
+    downstream_consumers:
+      - TASK-01
+      - TASK-04
+      - TASK-07
+      - TASK-14
+      - TASK-15
+    next_validation: Keep design-only now; later compare a route-specific disclosed price and signer-safe manual flow only after explicit user approval and a measured Standard-plan gap.
+    exit_path: Never couple data contracts to the payment rail.
+
+material_findings:
+  - issue_id: REUSE-MAT-001
+    severity: HIGH
+    claim: A second unsigned quote source may cheaply separate Jupiter-specific route gaps from market route death.
+    evidence: Raptor hosted API is documented as public beta, currently free and without stated rate limits.
+    decision: Retain only as a TASK-07 controlled comparison candidate after due diligence; do not call or adopt runtime now.
+  - issue_id: REUSE-MAT-002
+    severity: MEDIUM
+    claim: Birdeye Standard plus x402 pay-per-request is available.
+    evidence: Direct retrieval of the official Birdeye x402 reference confirms keyless per-request USDC on Solana, route-specific payment terms, replay protection and 100 RPS per-IP pre-payment limit.
+    decision: Accept product availability; keep Standard and x402 as separate access paths, do not invent route prices, and defer all request/sign/payment activity until a measured gap and explicit security/cost gate.
+  - issue_id: REUSE-MAT-003
+    severity: MEDIUM
+    claim: Open-source trading or archive frameworks automatically shorten the initial path.
+    evidence: Vixen adds Rust/gRPC coupling; Old Faithful is RFC/not-production and AGPL; Hummingbot has broad dependency, telemetry and signer surfaces.
+    decision: Reuse specifications and ideas now; defer runtime frameworks until a measured bottleneck or validated edge exists.
+
+handoff:
+  current_task: TASK-01
+  task_execution_status: DONE
+  current_blocker: NONE
+  user_action_required_now: NONE
+  accounts_required_now: NONE
+  purchase_required_now: NONE
+  state_change: DELTA-01-001_PENDING_USER_ACTIVATION
+  next_task_candidate: TASK-02
+  next_task_gate: RUN_TASK_ENTRY_GATE_BEFORE_START
+  task03_import_requirement: Seed the Git reuse registry with this validated data subset; TASK-04 owns the full software gate.
+  do_not_start_next_task_automatically: true

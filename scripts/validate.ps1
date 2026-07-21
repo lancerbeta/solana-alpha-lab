@@ -85,6 +85,14 @@ try {
         }
         Write-Output "CATALOG_RESOLUTION: PASS"
 
+        $preGit = Invoke-NativeResult -File "uv.exe" -Arguments @(
+            "run", "--locked", "--managed-python", "python", "-B",
+            ".\scripts\validate_pre_git_import.py"
+        )
+        Write-NativeOutput $preGit
+        if ($preGit.ExitCode -ne 0) { throw "PRE_GIT_IMPORT_VALIDATION_FAILED" }
+        Write-Output "PRE_GIT_IMPORT_VALIDATION: PASS"
+
         $policy = Invoke-NativeResult -File "uv.exe" -Arguments @(
             "run", "--locked", "--managed-python", "python", "-B",
             ".\scripts\validate_baseline.py"

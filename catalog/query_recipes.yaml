@@ -83,3 +83,28 @@ recipes:
   output_contract:
     format: json
     max_records: 1
+- recipe_id: QUERY-PRE-GIT-VERIFY-001
+  record_version: '1.0'
+  purpose: Verify exact imported pre-Git bytes, source-bundle lineage, availability claims, and architecture intent registration.
+  kind: local_command
+  read_only: true
+  bounded: true
+  network_required: false
+  write_effects: NONE
+  timeout_seconds: 60
+  command:
+  - uv
+  - run
+  - --locked
+  - --managed-python
+  - python
+  - -B
+  - scripts/validate_pre_git_import.py
+  parameters: []
+  target_asset_ids:
+  - CATALOG-ASSET-REGISTRY-PRE-GIT-001
+  - CATALOG-ASSET-REGISTRY-ARCHITECTURE-001
+  - ARCH-INTENT-001
+  output_contract:
+    format: text
+    max_records: 100

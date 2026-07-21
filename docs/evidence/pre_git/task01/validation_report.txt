@@ -1,0 +1,43 @@
+SMIAL TASK-01 COMPLETION VALIDATION
+as_of=2026-07-18
+status=TESTED_PASS
+tests_passed=103
+tests_failed=0
+
+Canonical package:
+- YAML parse: PASS
+- exact Project Source count 7: PASS
+- manifest-to-files reconciliation: PASS
+- manifest hashes and headers: PASS
+- Project Instruction first line/hash/character count/UI limit: PASS (7921 characters)
+- roadmap/state/archive/active-task reconciliation: PASS
+- task graph: 58 IDs, known dependencies, no cycle: PASS
+- fresh-context restore simulation: PASS
+
+TASK-01 artifacts:
+- source contracts: 8
+- domains: D01-D20 complete
+- data-option domain policies: 20
+- Raptor D08/D09 fallback mapping: PASS
+- provider cost rows: 26; purchase_now=true rows: 0
+- reuse candidates: 10
+- smoke cases: 34
+- planned attempts: 35
+- hard attempt cap: 50
+- cash cap: USD 0
+- transaction/payment paths: prohibited
+- provider/API/RPC requests executed: 0
+- accounts created: 0
+- purchases executed: 0
+- secret-pattern scan: PASS
+
+Evidence boundaries:
+- runtime auth/schema/coverage/latency/quota/routes: NOT_TESTABLE_IN_TASK01
+- dashboard/payment attestation: USER_ATTESTATION_REQUIRED_LATER only if a paid decision becomes relevant
+- UI installation equality: USER_ATTESTATION_REQUIRED
+
+Exact validator:
+02_KEEP_LOCALLY_DO_NOT_UPLOAD/validation/validate_task01_completion.py
+
+RESULT=PASS
+

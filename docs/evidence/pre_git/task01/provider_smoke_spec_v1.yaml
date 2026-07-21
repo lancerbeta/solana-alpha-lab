@@ -1,0 +1,375 @@
+schema_version: "1.0.0"
+
+artifact:
+  artifact_id: SMIAL_TASK_01_PROVIDER_SMOKE_SPEC
+  artifact_version: "1.0"
+  task_id: TASK-01
+  task_execution_status: DONE
+  artifact_status: VALIDATED_FROZEN_DESIGN
+  owner: user+assistant
+  created_at: "2026-07-18"
+  as_of: "2026-07-18"
+  execution_owner_task: TASK-07
+  execution_status: NOT_EXECUTED
+  canonical_after_validation: true
+  contains_secrets: false
+  api_rpc_provider_requests_executed: false
+  accounts_created: false
+  purchases_executed: false
+
+purpose:
+  primary: Validate contracts, failure semantics, timestamps, coverage, credits and replay before collectors.
+  not_a_goal:
+    - benchmark_for_marketing
+    - production_SLA_claim
+    - trading_or_transaction_execution
+    - alpha_validation
+    - provider_purchase_justification_without_measured_bottleneck
+
+freeze_policy:
+  status: DESIGN_FROZEN_EXECUTION_PROHIBITED_UNTIL_TASK07_ENTRY_GATE
+  before_execution_required:
+    - TASK-02_DONE
+    - TASK-03_secret_controls_available
+    - TASK-05_schema_available
+    - TASK-06_raw_envelope_and_redaction_tests_PASS
+    - official_docs_rechecked
+    - accounts_and_entitlements_sanitized_attested_if_required
+    - all_dynamic_samples_resolved_and_hash_frozen
+    - explicit_TASK07_start
+  material_contract_change_action: stop_and_patch_spec_before_any_request
+
+global_budget:
+  planned_case_count: 34
+  planned_attempt_count: 35
+  hard_attempt_cap: 50
+  cash_cap_usd: 0
+  paid_requests_allowed: false
+  concurrency: 1
+  default_timeout_seconds: 10
+  max_timeout_seconds: 20
+  max_response_bytes_per_attempt: 2000000
+  max_total_response_bytes: 20000000
+  max_retries_per_case: 0
+  rate_limit_probe_by_intent: prohibited
+  websocket_max_connections: 1
+  websocket_max_open_seconds: 10
+  websocket_max_data_messages: 1
+  stop_before_cap_headroom_attempts: 5
+
+security_boundary:
+  allowed_http_methods:
+    - GET
+    - POST_JSON_RPC_READ_ONLY
+  prohibited_actions:
+    - build_transaction
+    - simulate_transaction
+    - sign_transaction
+    - send_transaction
+    - execute_swap
+    - submit_transaction
+    - create_or_modify_webhook
+    - wallet_connect
+    - x402_payment_challenge_or_payment
+    - account_creation
+    - plan_purchase
+  forbidden_request_fields:
+    - taker
+    - payer
+    - receiver
+    - referralAccount
+    - feeAccount
+    - tipAccount
+    - jitoTipLamports
+    - priorityFeeLamports_override
+    - signedTransaction
+    - transaction
+    - privateKey
+    - seed
+  credential_locations:
+    allowed:
+      - local_secret_store_created_by_TASK02_or_TASK03
+      - process_environment_injected_without_shell_history
+    forbidden:
+      - this_yaml
+      - chat
+      - project_sources
+      - git
+      - command_line_arguments
+      - request_fixture
+      - logs
+      - screenshots
+
+redaction_contract:
+  request_before_persist:
+    headers_drop_or_hash:
+      - authorization
+      - x-api-key
+      - cookie
+      - set-cookie
+    query_drop_or_hash:
+      - api-key
+      - api_key
+      - token
+      - key
+    body_drop_or_hash:
+      - signedTransaction
+      - transaction
+      - privateKey
+      - seed
+    retain_safe:
+      - provider_id
+      - case_id
+      - method_class
+      - path_template
+      - sanitized_params
+      - request_hash_after_redaction
+  response_before_fixture:
+    drop:
+      - provider_internal_headers
+      - cookies
+      - payment_recipient
+      - payment_signature
+    transaction_payload_policy: fail_case_and_do_not_publish_if_quote_only_case_contains_non_null_transaction
+    public_chain_identifiers_allowed_with_purpose: true
+
+timestamp_contract:
+  local_timezone: UTC
+  required:
+    - request_started_at
+    - request_sent_at
+    - response_headers_at_or_null
+    - response_complete_at_or_timeout
+    - observed_at
+    - available_to_strategy_at_or_null
+    - ingested_at
+  provider_or_chain_when_present:
+    - slot
+    - contextSlot
+    - blockTime
+    - provider_timestamp
+    - quote_expire_at
+  assertions:
+    - request_started_at_lte_request_sent_at
+    - request_sent_at_lte_response_complete_at_or_timeout
+    - observed_at_lte_ingested_at
+    - event_time_never_substitutes_for_observed_at
+    - first_reliable_available_at_is_not_backdated
+
+failure_taxonomy:
+  persist_every_attempt: true
+  missing_is_zero: false
+  terminal_classes:
+    - SUCCESS
+    - TIMEOUT
+    - DNS_OR_TLS
+    - AUTH
+    - RATE_LIMIT_429
+    - PROVIDER_4XX
+    - PROVIDER_5XX
+    - INVALID_REQUEST
+    - NO_ROUTE
+    - EMPTY_VALID
+    - MALFORMED_PAYLOAD
+    - SCHEMA_DRIFT
+    - RESPONSE_TOO_LARGE
+    - PROHIBITED_PAYLOAD
+    - STOP_CAP
+  provider_failure_is_market_no_route: false
+  retry_is_new_observation: true
+
+safe_samples:
+  WSOL_MINT:
+    value: So11111111111111111111111111111111111111112
+    type: public_mint
+    state: FROZEN
+  USDC_MINT:
+    value: EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v
+    type: public_mint
+    state: FROZEN
+  SYSTEM_PROGRAM:
+    value: "11111111111111111111111111111111"
+    type: public_program
+    state: FROZEN
+  RAPTOR_PROGRAM:
+    value: RaptorD5ojtsqDDtJeRsunPLg6GvLYNnwKJWxYE4m87
+    type: public_program_from_official_docs
+    state: FROZEN
+  RECENT_PUMP_MINT:
+    value: UNSET
+    type: dynamic_public_mint
+    state: RESOLVE_AND_FREEZE_BEFORE_EXECUTION
+    resolver_case: ST03
+    rule: first_valid_mint_sorted_by_createdAt_desc_where_market_pumpfun_status_default
+  RECENT_PUMP_DECIMALS:
+    value: UNSET
+    type: dynamic_public_metadata
+    state: RESOLVE_AND_FREEZE_BEFORE_EXECUTION
+    resolver_case: ST06
+  RECENT_PUMP_SELL_AMOUNT_ATOMIC:
+    value: UNSET
+    type: derived_safe_quote_amount
+    state: RESOLVE_AND_FREEZE_BEFORE_EXECUTION
+    rule: max_1_atomic_unit_or_amount_equivalent_to_1_token_using_validated_decimals_no_wallet_balance_needed
+  RAPTOR_RECENT_SIGNATURE:
+    value: UNSET
+    type: dynamic_public_signature
+    state: RESOLVE_AND_FREEZE_DURING_ORDERED_RUN
+    resolver_case: H08
+
+providers:
+  HELIUS_RPC:
+    source_id: HELIUS
+    auth: local_env_HELIUS_API_KEY
+    base_url: SECRET_BOUND_MAINNET_RPC_ENDPOINT
+    account_required: true
+    cost_model: documented_standard_RPC_credit_model_recheck_before_run
+  HELIUS_WSS:
+    source_id: HELIUS
+    auth: local_env_HELIUS_API_KEY
+    base_url: SECRET_BOUND_MAINNET_WSS_ENDPOINT
+    account_required: true
+  SOLANA_TRACKER_DATA:
+    source_id: SOLANA_TRACKER
+    auth: local_header_x_api_key
+    base_url: https://data.solanatracker.io
+    account_required: true
+  JUPITER_SWAP:
+    source_id: JUPITER_SWAP_V2
+    auth: UNRESOLVED_KEYLESS_OR_LOCAL_HEADER_X_API_KEY
+    base_url: https://api.jup.ag
+    account_required: CONDITIONAL_ON_AUTH_RECHECK
+  RAPTOR_HOSTED:
+    source_id: SOLANA_TRACKER
+    auth: RECHECK_CURRENT_OFFICIAL_CONTRACT
+    base_url: https://raptor-beta.solanatracker.io
+    account_required: RECHECK
+
+assertion_sets:
+  JSON_RPC_BASE:
+    - jsonrpc_equals_2_0_or_typed_error
+    - response_id_matches_request_id
+    - result_xor_error
+    - http_and_rpc_error_are_separate
+  INDEXED_BASE:
+    - valid_JSON_or_typed_failure
+    - provider_fields_are_not_promoted_to_protocol_truth
+    - null_empty_and_not_found_are_distinct
+    - raw_payload_hash_present
+  QUOTE_BASE:
+    - exact_inputMint_outputMint_and_atomic_amount_round_trip
+    - output_amount_is_atomic_string_or_typed_failure
+    - route_or_no_route_is_explicit
+    - fees_and_price_impact_are_preserved_without_double_counting
+    - transaction_is_null_or_absent
+    - no_sign_or_send_side_effect
+
+cases:
+  - {case_id: H01, provider: HELIUS_RPC, request_class: RPC_HEALTH, method: POST_JSON_RPC_READ_ONLY, path: /, rpc_method: getHealth, params: [], assertion_sets: [JSON_RPC_BASE], depends_on: []}
+  - {case_id: H02, provider: HELIUS_RPC, request_class: RPC_VERSION, method: POST_JSON_RPC_READ_ONLY, path: /, rpc_method: getVersion, params: [], assertion_sets: [JSON_RPC_BASE], depends_on: []}
+  - {case_id: H03, provider: HELIUS_RPC, request_class: RPC_SLOT_PROCESSED, method: POST_JSON_RPC_READ_ONLY, path: /, rpc_method: getSlot, params: [{commitment: processed}], assertion_sets: [JSON_RPC_BASE], depends_on: []}
+  - {case_id: H04, provider: HELIUS_RPC, request_class: RPC_SLOT_FINALIZED, method: POST_JSON_RPC_READ_ONLY, path: /, rpc_method: getSlot, params: [{commitment: finalized}], assertion_sets: [JSON_RPC_BASE], depends_on: []}
+  - {case_id: H05, provider: HELIUS_RPC, request_class: RPC_BLOCKHASH, method: POST_JSON_RPC_READ_ONLY, path: /, rpc_method: getLatestBlockhash, params: [{commitment: finalized}], assertion_sets: [JSON_RPC_BASE], depends_on: []}
+  - {case_id: H06, provider: HELIUS_RPC, request_class: RPC_ACCOUNT, method: POST_JSON_RPC_READ_ONLY, path: /, rpc_method: getAccountInfo, params: ["${WSOL_MINT}", {encoding: base64, commitment: finalized}], assertion_sets: [JSON_RPC_BASE], depends_on: []}
+  - {case_id: H07, provider: HELIUS_RPC, request_class: RPC_TOKEN_SUPPLY, method: POST_JSON_RPC_READ_ONLY, path: /, rpc_method: getTokenSupply, params: ["${WSOL_MINT}", {commitment: finalized}], assertion_sets: [JSON_RPC_BASE], depends_on: []}
+  - {case_id: H08, provider: HELIUS_RPC, request_class: RPC_SIGNATURES, method: POST_JSON_RPC_READ_ONLY, path: /, rpc_method: getSignaturesForAddress, params: ["${RAPTOR_PROGRAM}", {limit: 2, commitment: finalized}], assertion_sets: [JSON_RPC_BASE], depends_on: [], output_binding: RAPTOR_RECENT_SIGNATURE}
+  - {case_id: H09, provider: HELIUS_RPC, request_class: RPC_TRANSACTION, method: POST_JSON_RPC_READ_ONLY, path: /, rpc_method: getTransaction, params: ["${RAPTOR_RECENT_SIGNATURE}", {encoding: json, commitment: finalized, maxSupportedTransactionVersion: 0}], assertion_sets: [JSON_RPC_BASE], depends_on: [H08]}
+  - {case_id: H10, provider: HELIUS_RPC, request_class: RPC_PRIORITY_FEES, method: POST_JSON_RPC_READ_ONLY, path: /, rpc_method: getRecentPrioritizationFees, params: [[]], assertion_sets: [JSON_RPC_BASE], depends_on: []}
+  - {case_id: H11, provider: HELIUS_RPC, request_class: RPC_NEGATIVE_NON_MINT, method: POST_JSON_RPC_READ_ONLY, path: /, rpc_method: getTokenSupply, params: ["${SYSTEM_PROGRAM}", {commitment: finalized}], assertion_sets: [JSON_RPC_BASE], expected_terminal: INVALID_REQUEST_OR_TYPED_RPC_ERROR, depends_on: []}
+  - case_id: H12
+    provider: HELIUS_WSS
+    request_class: WSS_ACCOUNT_SUBSCRIBE_AND_UNSUBSCRIBE
+    method: POST_JSON_RPC_READ_ONLY
+    path: /
+    rpc_method_sequence: [accountSubscribe, accountUnsubscribe]
+    params: ["${WSOL_MINT}", {encoding: base64, commitment: finalized}]
+    planned_attempts: 2
+    assertion_sets: [JSON_RPC_BASE]
+    limits: {max_open_seconds: 10, max_data_messages: 1}
+    depends_on: []
+
+  - {case_id: ST01, provider: SOLANA_TRACKER_DATA, request_class: SEARCH_WSOL, method: GET, path: /search, query: {query: "${WSOL_MINT}", limit: 2}, assertion_sets: [INDEXED_BASE], depends_on: []}
+  - {case_id: ST02, provider: SOLANA_TRACKER_DATA, request_class: SEARCH_USDC, method: GET, path: /search, query: {query: "${USDC_MINT}", limit: 2}, assertion_sets: [INDEXED_BASE], depends_on: []}
+  - {case_id: ST03, provider: SOLANA_TRACKER_DATA, request_class: RECENT_PUMP_DEFAULT, method: GET, path: /search, query: {market: pumpfun, status: default, sortBy: createdAt, sortOrder: desc, limit: 2}, assertion_sets: [INDEXED_BASE], depends_on: [], output_binding: RECENT_PUMP_MINT}
+  - {case_id: ST04, provider: SOLANA_TRACKER_DATA, request_class: RECENT_PUMP_GRADUATING, method: GET, path: /search, query: {market: pumpfun, status: graduating, sortBy: createdAt, sortOrder: desc, limit: 2}, assertion_sets: [INDEXED_BASE], depends_on: []}
+  - {case_id: ST05, provider: SOLANA_TRACKER_DATA, request_class: RECENT_PUMP_GRADUATED, method: GET, path: /search, query: {market: pumpfun, status: graduated, sortBy: createdAt, sortOrder: desc, limit: 2}, assertion_sets: [INDEXED_BASE], depends_on: []}
+  - {case_id: ST06, provider: SOLANA_TRACKER_DATA, request_class: TOKEN_FULL, method: GET, path: "/tokens/${RECENT_PUMP_MINT}", query: {}, assertion_sets: [INDEXED_BASE], depends_on: [ST03], output_binding: RECENT_PUMP_DECIMALS}
+  - {case_id: ST07, provider: SOLANA_TRACKER_DATA, request_class: HOLDERS_TOP20, method: GET, path: "/tokens/${RECENT_PUMP_MINT}/holders/top", query: {}, assertion_sets: [INDEXED_BASE], depends_on: [ST03]}
+  - {case_id: ST08, provider: SOLANA_TRACKER_DATA, request_class: HOLDERS_PAGINATED, method: GET, path: "/tokens/${RECENT_PUMP_MINT}/holders/paginated", query: {limit: 10}, assertion_sets: [INDEXED_BASE], depends_on: [ST03]}
+
+  - {case_id: J01, provider: JUPITER_SWAP, request_class: ORDER_WSOL_USDC_001_SOL, method: GET, path: /swap/v2/order, query: {inputMint: "${WSOL_MINT}", outputMint: "${USDC_MINT}", amount: "10000000"}, assertion_sets: [QUOTE_BASE], depends_on: []}
+  - {case_id: J02, provider: JUPITER_SWAP, request_class: ORDER_WSOL_USDC_010_SOL, method: GET, path: /swap/v2/order, query: {inputMint: "${WSOL_MINT}", outputMint: "${USDC_MINT}", amount: "100000000"}, assertion_sets: [QUOTE_BASE], depends_on: []}
+  - {case_id: J03, provider: JUPITER_SWAP, request_class: ORDER_WSOL_USDC_100_SOL, method: GET, path: /swap/v2/order, query: {inputMint: "${WSOL_MINT}", outputMint: "${USDC_MINT}", amount: "1000000000"}, assertion_sets: [QUOTE_BASE], depends_on: []}
+  - {case_id: J04, provider: JUPITER_SWAP, request_class: ORDER_USDC_WSOL_1_USDC, method: GET, path: /swap/v2/order, query: {inputMint: "${USDC_MINT}", outputMint: "${WSOL_MINT}", amount: "1000000"}, assertion_sets: [QUOTE_BASE], depends_on: []}
+  - {case_id: J05, provider: JUPITER_SWAP, request_class: ORDER_USDC_WSOL_10_USDC, method: GET, path: /swap/v2/order, query: {inputMint: "${USDC_MINT}", outputMint: "${WSOL_MINT}", amount: "10000000"}, assertion_sets: [QUOTE_BASE], depends_on: []}
+  - {case_id: J06, provider: JUPITER_SWAP, request_class: ORDER_USDC_WSOL_100_USDC, method: GET, path: /swap/v2/order, query: {inputMint: "${USDC_MINT}", outputMint: "${WSOL_MINT}", amount: "100000000"}, assertion_sets: [QUOTE_BASE], depends_on: []}
+  - {case_id: J07, provider: JUPITER_SWAP, request_class: ORDER_BUY_RECENT_PUMP, method: GET, path: /swap/v2/order, query: {inputMint: "${WSOL_MINT}", outputMint: "${RECENT_PUMP_MINT}", amount: "10000000"}, assertion_sets: [QUOTE_BASE], depends_on: [ST03]}
+  - {case_id: J08, provider: JUPITER_SWAP, request_class: ORDER_SELL_RECENT_PUMP, method: GET, path: /swap/v2/order, query: {inputMint: "${RECENT_PUMP_MINT}", outputMint: "${WSOL_MINT}", amount: "${RECENT_PUMP_SELL_AMOUNT_ATOMIC}"}, assertion_sets: [QUOTE_BASE], depends_on: [ST06]}
+  - {case_id: J09, provider: JUPITER_SWAP, request_class: ORDER_NEGATIVE_NON_MINT, method: GET, path: /swap/v2/order, query: {inputMint: "${WSOL_MINT}", outputMint: "${SYSTEM_PROGRAM}", amount: "10000000"}, assertion_sets: [QUOTE_BASE], expected_terminal: INVALID_REQUEST_OR_NO_ROUTE, depends_on: []}
+
+  - {case_id: R01, provider: RAPTOR_HOSTED, request_class: RAPTOR_HEALTH, method: GET, path: /health, query: {}, assertion_sets: [INDEXED_BASE], depends_on: []}
+  - {case_id: R02, provider: RAPTOR_HOSTED, request_class: RAPTOR_QUOTE_WSOL_USDC, method: GET, path: /quote, query: {inputMint: "${WSOL_MINT}", outputMint: "${USDC_MINT}", amount: 10000000, slippageBps: "50"}, assertion_sets: [QUOTE_BASE], depends_on: []}
+  - {case_id: R03, provider: RAPTOR_HOSTED, request_class: RAPTOR_QUOTE_USDC_WSOL, method: GET, path: /quote, query: {inputMint: "${USDC_MINT}", outputMint: "${WSOL_MINT}", amount: 1000000, slippageBps: "50"}, assertion_sets: [QUOTE_BASE], depends_on: []}
+  - {case_id: R04, provider: RAPTOR_HOSTED, request_class: RAPTOR_QUOTE_BUY_RECENT_PUMP, method: GET, path: /quote, query: {inputMint: "${WSOL_MINT}", outputMint: "${RECENT_PUMP_MINT}", amount: 10000000, slippageBps: "50"}, assertion_sets: [QUOTE_BASE], depends_on: [ST03]}
+  - {case_id: R05, provider: RAPTOR_HOSTED, request_class: RAPTOR_QUOTE_SELL_RECENT_PUMP, method: GET, path: /quote, query: {inputMint: "${RECENT_PUMP_MINT}", outputMint: "${WSOL_MINT}", amount: "${RECENT_PUMP_SELL_AMOUNT_ATOMIC}", slippageBps: "50"}, assertion_sets: [QUOTE_BASE], depends_on: [ST06]}
+
+comparison_contracts:
+  - comparison_id: CMP_QUOTE_001
+    cases: [J01, R02]
+    same_case_fields: [inputMint, outputMint, amount]
+    compare: [route_presence, output_atomic, fee_fields, price_impact, latency, context_slot, failure_class]
+    prohibit: declaring_one_provider_truth_from_one_pair
+  - comparison_id: CMP_QUOTE_002
+    cases: [J04, R03]
+    same_case_fields: [inputMint, outputMint, amount]
+    compare: [route_presence, output_atomic, fee_fields, price_impact, latency, context_slot, failure_class]
+    prohibit: treating_quote_difference_as_realized_slippage
+  - comparison_id: CMP_QUOTE_003
+    cases: [J07, R04]
+    same_case_fields: [inputMint, outputMint, amount]
+    compare: [route_presence, route_death_disagreement, output_atomic, fees, context_slot]
+    prohibit: dropping_no_route_or_provider_error
+
+run_order:
+  - [H01, H02, H03, H04, H05, H06, H07, H08, H09, H10, H11, H12]
+  - [ST01, ST02, ST03, ST04, ST05, ST06, ST07, ST08]
+  - [J01, J02, J03, J04, J05, J06, J07, J08, J09]
+  - [R01, R02, R03, R04, R05]
+
+stop_conditions:
+  immediate:
+    - attempt_count_gte_50
+    - cash_cost_gt_0
+    - response_bytes_total_gt_20000000
+    - any_secret_detected_in_persisted_or_displayed_evidence
+    - any_transaction_build_sign_send_or_payment_path_reached
+    - quote_only_response_contains_non_null_transaction
+    - endpoint_or_auth_contract_materially_changed
+    - clock_not_UTC_or_timestamp_order_invalid
+    - three_consecutive_provider_failures_same_provider
+  action: persist_safe_failure_record_stop_provider_and_require_spec_patch
+
+evidence_outputs_TASK07:
+  - provider_smoke_report.md
+  - redacted_raw_envelopes
+  - sanitized_small_fixtures
+  - request_case_result_table
+  - credit_and_response_size_reconciliation
+  - schema_and_timestamp_disagreement_report
+  - first_reliable_available_at_updates_or_explicit_UNSET
+
+handoff:
+  current_task: TASK-01
+  task_execution_status: DONE
+  current_blocker: NONE
+  user_action_required_now: NONE
+  accounts_required_now: NONE
+  purchase_required_now: NONE
+  execution_status: NOT_EXECUTED
+  state_change: DELTA-01-001_PENDING_USER_ACTIVATION
+  next_task_candidate: TASK-02
+  execution_owner_task: TASK-07
+  next_task_gate: RUN_TASK_ENTRY_GATE_BEFORE_START
+  task03_import_requirement: Import this frozen design and checksum into Git; do not execute it before TASK-07 and all listed prerequisites.
+  do_not_start_TASK07: true
+  do_not_start_next_task_automatically: true

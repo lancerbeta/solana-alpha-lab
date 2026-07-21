@@ -1,0 +1,32 @@
+{
+  "schema_version": "1.0",
+  "task_id": "TASK-02",
+  "validated_at_utc": "2026-07-20T21:57:51+00:00",
+  "result": "PASS",
+  "checks": {
+    "windows_os": true,
+    "python_3_12_plus": true,
+    "python_64_bit": true,
+    "uv_available": true,
+    "uv_resolves_python_3_14": true,
+    "git_available": true,
+    "windows_time_query": true,
+    "wsl_available": true,
+    "docker_client_available": true,
+    "docker_engine_healthy": true,
+    "docker_compose_available": true,
+    "docker_cached_hello_world": true,
+    "no_residual_test_container": true,
+    "redaction_scan": true
+  },
+  "outputs": [
+    "env_report.txt",
+    "tool_versions.json",
+    "validation_receipt.json"
+  ],
+  "notes": [
+    "No username, hostname, IP, serial/device ID, token, or secret collected.",
+    "No repository, provider account, API/RPC request, VPS, wallet, or signer created.",
+    "Docker hello-world executed from local cache with --pull=never and --rm."
+  ]
+}
