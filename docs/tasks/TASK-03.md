@@ -5,7 +5,7 @@ implementation_status: IN_PROGRESS
 canonical_status_owner: ChatGPT_Project_Work
 phase: P0
 cash_cap: USD_0
-repository_commit: ee6119ae0b7750710c7f822c50137ed95b4977e9
+repository_commit: e03639f4811d7e40f25b965ab79626c229c0fd8a
 remote: NONE
 provider_calls: 0
 contains_secrets: false
@@ -18,46 +18,49 @@ contains_secrets: false
 - Repository baseline commit: accepted.
 - Catalog foundation commit: `ee6119ae0b7750710c7f822c50137ed95b4977e9`, accepted.
 - Catalog foundation: 17 assets, 3 queries, 3 schemas, stable-ID resolver PASS.
+- Atom 4 — Pre-Git lineage import / `T03-A4C`: accepted.
+- Accepted import commit: `e03639f4811d7e40f25b965ab79626c229c0fd8a`;
+  parent: `ee6119ae0b7750710c7f822c50137ed95b4977e9`.
+- `TASK03-ATOM-4B` receipt: PASS; imported SHA-256 reconciliation:
+  20/20 PASS; `ARCH-INTENT-001` hash: PASS.
 - Remote/push: absent.
 - Provider/API/RPC calls: 0.
 
-## Current atom
+## Acceptance limitations
 
-Stage exact import of TASK-01 and TASK-02 historical evidence plus registration of `ARCH-INTENT-001`:
+- Pre-commit execution for import commit `e03639f4811d7e40f25b965ab79626c229c0fd8a`:
+  NOT_TESTABLE.
+- Tests at the import commit: NOT_RUN.
 
-- 12 exact TASK-01 files;
-- 8 exact TASK-02 files;
-- 2 external immutable bundle records;
-- 1 bundle-only superseded TASK-01 validator record;
-- provenance-aware Catalog schema evolution;
-- `first_reliable_available_at` preservation and no-backfill rule;
-- architecture intent registration as current direction, not historical evidence;
-- deterministic import validator and query recipe;
-- no commit and no remote.
+These limitations do not replace the accepted Atom 4 receipt and read-only hash
+reconciliation evidence.
 
-## Not allowed
+## Current authorization boundary
 
-- commit, remote, push, connector permission, Codex write;
+- TASK-03 remains `IN_PROGRESS`.
+- Atom 5 is the next candidate and is `NOT YET AUTHORIZED`.
+- No Atom 5 implementation or lifecycle-state transition has started.
+- Remote, push, connector permission, and external service writes remain prohibited.
 - provider account/key/API/RPC call;
 - raw/canonical market data;
 - database, collector, VPS, wallet, signer, or real money;
 - claiming that `ARCH-INTENT-001`, `ORCH-001`, or `CTX-AOT-ALBS-001` is implemented.
 
-## Acceptance
+## Accepted Atom 4 evidence
 
-- repository state is `PRE_GIT_IMPORT_STAGED`;
-- HEAD remains `ee6119ae0b7750710c7f822c50137ed95b4977e9` and commit count remains 2;
-- repository file count is 58; staged change count is 40; no untracked or unstaged drift;
+- repository state is `PRE_GIT_IMPORT_COMMITTED` at the accepted commit;
+- repository file count is 58 and the accepted import commit changes exactly 40 files;
 - 20 imported files match exact SHA-256 and source-bundle paths;
-- exact imported files are exempt from repository style normalization; all repository-authored staged files still pass `git diff --check`;
+- exact imported files remain exempt from repository style normalization;
 - source ZIP audits and checksum ledgers pass;
 - Catalog has 44 assets, 4 query recipes, 3 schemas, and 3 asset registries;
 - external bundles remain outside Git;
 - A028 stays bundle-only and superseded;
 - provenance and first reliable availability validate;
 - `ARCH-INTENT-001` is current direction only;
-- pre-commit hook, quality gate, secret/path/EOL checks, and tests pass.
+- quality-gate receipt, secret/path/EOL checks, and deterministic import checks pass,
+  subject to the recorded NOT_TESTABLE / NOT_RUN limitations above.
 
-## Next atom after acceptance
+## Next candidate
 
-Create a separate import commit only after staged hashes, Catalog resolution, provenance, availability, and rollback evidence are accepted. Remote remains later.
+Atom 5 is `NOT YET AUTHORIZED`. Remote remains later.

@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Validate TASK-03 staged or committed pre-Git import state."""
+"""Validate TASK-03 pre-Git import and Work-acceptance sync states."""
 
 from __future__ import annotations
 
@@ -19,9 +19,20 @@ BASE_TREE_OID = '47181f0595e687858a3c3f790ae2f79415aed4a2'
 BASE_PARENT_OID = '399ef0365b017fcd9d7b81389218a63bf1e466c1'
 BASE_FILE_COUNT = 32
 BASE_COMMIT_COUNT = 2
+IMPORT_COMMIT_OID = "e03639f4811d7e40f25b965ab79626c229c0fd8a"
+IMPORT_COMMIT_COUNT = BASE_COMMIT_COUNT + 1
 CURRENT_RECEIPT = ROOT / 'docs/evidence/task03_atom4b_pre_git_import_receipt.json'
 EXPECTED_REPOSITORY_FILE_COUNT = 58
 EXPECTED_CHANGED_FILES = {'docs/tasks/TASK-03.md', 'tests/test_baseline.py', 'docs/evidence/pre_git/task02/operator_observation_receipt.json', 'scripts/validate_catalog.py', 'catalog/assets/pre_git.yaml', 'docs/evidence/pre_git/task01/validation_report.txt', 'docs/evidence/pre_git/task02/validation_receipt.json', 'docs/evidence/pre_git/task01/sources_v1.yaml', 'docs/evidence/task03_atom4b_pre_git_import_receipt.json', 'docs/evidence/pre_git/task01/provider_cost_snapshot_v1.csv', 'docs/evidence/pre_git/task01/provider_smoke_spec_v1.yaml', 'catalog/assets/core.yaml', 'catalog/query_recipes.yaml', 'docs/evidence/pre_git/task02/bootstrap_check.py', 'docs/evidence/pre_git/task02/env_report.txt', 'docs/architecture/intents/ARCH-INTENT-001-hypothesis-factory-and-regime-aware-orchestration.md', 'tests/test_pre_git_import.py', 'catalog/schemas/asset_catalog.schema.json', 'docs/evidence/pre_git/task01/provider_decision_v1.md', 'docs/evidence/pre_git/task01/hypothesis_data_coverage_matrix_v1.md', 'docs/evidence/pre_git/task01/task_01_completion_record_v1.md', 'scripts/validate.ps1', 'docs/handoffs/latest.md', 'docs/evidence/pre_git/task02/TASK02_COMPLETION_SUMMARY.md', 'docs/evidence/pre_git/task02/tool_versions.json', 'docs/evidence/pre_git/task01/task_01_final_gap_audit_v1.md', 'catalog/catalog_manifest.yaml', 'catalog/assets/architecture.yaml', 'docs/evidence/pre_git/task02/CHECKSUMS_SHA256.txt', 'scripts/validate_baseline.py', 'scripts/validate_pre_git_import.py', 'tests/test_catalog.py', 'README.md', 'catalog/schemas/catalog_manifest.schema.json', 'docs/evidence/pre_git/task01/provider_account_checklist_v1.md', 'docs/evidence/pre_git/task01/reuse_candidate_registry.yaml', 'docs/evidence/pre_git/task01/CHECKSUMS_SHA256.txt', 'AGENTS.md', 'docs/evidence/pre_git/task01/data_option_tiers_v1.yaml', 'docs/evidence/pre_git/task02/task_02_workstation_bootstrap.md'}
+WORK_ACCEPTANCE_SYNC_FILES = {
+    "catalog/assets/core.yaml",
+    "scripts/validate_baseline.py",
+    "tests/test_baseline.py",
+    "docs/tasks/TASK-03.md",
+    "docs/handoffs/latest.md",
+}
+WORK_ACCEPTANCE_COMMIT_COUNT = IMPORT_COMMIT_COUNT + 1
+WORK_ACCEPTANCE_COMMIT_SUBJECT = "fix: validate Work acceptance checkpoint"
 FINGERPRINT_FILES = EXPECTED_CHANGED_FILES - {'docs/evidence/task03_atom4b_pre_git_import_receipt.json'}
 EXACT_IMPORT_FILES = {
     path
@@ -91,13 +102,19 @@ def source_entries(state: str) -> dict[str, tuple[str, str]]:
         result = run(["git","ls-files","--stage","-z"], binary=True)
         if result.returncode != 0: raise AssertionError("index_read_failed")
         return parse_index_entries(result.stdout)
-    result = run(["git","ls-tree","-r","-z","HEAD"], binary=True)
+    treeish = IMPORT_COMMIT_OID if state.startswith("WORK_ACCEPTANCE_SYNC_") else "HEAD"
+    result = run(["git","ls-tree","-r","-z",treeish], binary=True)
     if result.returncode != 0: raise AssertionError("head_tree_read_failed")
     return parse_tree_entries(result.stdout)
 
 
 def blob_bytes(state: str, path: str) -> bytes:
-    reference = f":{path}" if state == "PRE_GIT_IMPORT_STAGED" else f"HEAD:{path}"
+    if state == "PRE_GIT_IMPORT_STAGED":
+        reference = f":{path}"
+    elif state.startswith("WORK_ACCEPTANCE_SYNC_"):
+        reference = f"{IMPORT_COMMIT_OID}:{path}"
+    else:
+        reference = f"HEAD:{path}"
     result = run(["git","show",reference], binary=True)
     if result.returncode != 0: raise AssertionError(f"blob_read_failed:{path}")
     return result.stdout
@@ -113,11 +130,45 @@ def fingerprints(state: str) -> tuple[str, str]:
     return hashlib.sha256(bytes(manifest)).hexdigest(), hashlib.sha256(bytes(content)).hexdigest()
 
 
-def classify_state(*, head_oid: str, commit_count: int, parent_oid: str | None, tracked: set[str], staged: set[str], untracked: set[str], unstaged: set[str]) -> str:
+def classify_state(
+    *,
+    head_oid: str,
+    commit_count: int,
+    parent_oid: str | None,
+    tracked: set[str],
+    staged: set[str],
+    untracked: set[str],
+    unstaged: set[str],
+    commit_subject: str | None = None,
+    commit_changed: set[str] | None = None,
+) -> str:
     if head_oid == BASE_COMMIT_OID and commit_count == BASE_COMMIT_COUNT and tracked == repository_files() and len(tracked) == EXPECTED_REPOSITORY_FILE_COUNT and staged == EXPECTED_CHANGED_FILES and not untracked and not unstaged:
         return "PRE_GIT_IMPORT_STAGED"
     if commit_count == BASE_COMMIT_COUNT + 1 and parent_oid == BASE_COMMIT_OID and tracked == repository_files() and len(tracked) == EXPECTED_REPOSITORY_FILE_COUNT and not staged and not untracked and not unstaged:
         return "PRE_GIT_IMPORT_COMMITTED"
+    if (
+        head_oid == IMPORT_COMMIT_OID
+        and commit_count == IMPORT_COMMIT_COUNT
+        and parent_oid == BASE_COMMIT_OID
+        and tracked == repository_files()
+        and len(tracked) == EXPECTED_REPOSITORY_FILE_COUNT
+        and staged == WORK_ACCEPTANCE_SYNC_FILES
+        and not unstaged
+        and not untracked
+    ):
+        return "WORK_ACCEPTANCE_SYNC_STAGED"
+    if (
+        commit_count == WORK_ACCEPTANCE_COMMIT_COUNT
+        and parent_oid == IMPORT_COMMIT_OID
+        and tracked == repository_files()
+        and len(tracked) == EXPECTED_REPOSITORY_FILE_COUNT
+        and not staged
+        and not unstaged
+        and not untracked
+        and commit_subject == WORK_ACCEPTANCE_COMMIT_SUBJECT
+        and commit_changed == WORK_ACCEPTANCE_SYNC_FILES
+    ):
+        return "WORK_ACCEPTANCE_SYNC_COMMITTED"
     return "INVALID_REPOSITORY_STATE"
 
 
@@ -179,6 +230,24 @@ def validate_staged_style_policy() -> None:
     print("immutable_exact_import_style_policy: PASS")
 
 
+def validate_work_acceptance_staged_style_policy() -> None:
+    diff = run(
+        [
+            "git",
+            "diff",
+            "--cached",
+            "--check",
+            "--",
+            *sorted(WORK_ACCEPTANCE_SYNC_FILES),
+        ]
+    )
+    assert_check(
+        "work_acceptance_staged_diff_check",
+        diff.returncode == 0,
+        diff.stdout.strip() + diff.stderr.strip(),
+    )
+
+
 def validate() -> None:
     assert_check("repository_file_count", len(repository_files()) == EXPECTED_REPOSITORY_FILE_COUNT)
     branch = run(["git","symbolic-ref","--short","HEAD"]); assert_check("branch_main", branch.returncode == 0 and branch.stdout.strip() == "main")
@@ -192,13 +261,33 @@ def validate() -> None:
     staged_code, staged = command_set(["git","diff","--cached","--name-only"])
     untracked_code, untracked = command_set(["git","ls-files","--others","--exclude-standard"])
     unstaged_code, unstaged = command_set(["git","diff","--name-only"])
-    assert_check("git_inventory_commands", all(c == 0 for c in (remote_code,tracked_code,staged_code,untracked_code,unstaged_code)))
+    subject = run(["git","show","-s","--format=%s","HEAD"])
+    changed_code, commit_changed = command_set(["git","diff-tree","--no-commit-id","--name-only","-r","HEAD"])
+    assert_check("git_inventory_commands", all(c == 0 for c in (remote_code,tracked_code,staged_code,untracked_code,unstaged_code,subject.returncode,changed_code)))
     assert_check("remote_count_zero", not remotes)
-    state = classify_state(head_oid=head_oid,commit_count=commit_count,parent_oid=parent_oid,tracked=tracked,staged=staged,untracked=untracked,unstaged=unstaged)
-    assert_check("repository_state", state in {"PRE_GIT_IMPORT_STAGED","PRE_GIT_IMPORT_COMMITTED"}, state)
+    state = classify_state(
+        head_oid=head_oid,
+        commit_count=commit_count,
+        parent_oid=parent_oid,
+        tracked=tracked,
+        staged=staged,
+        untracked=untracked,
+        unstaged=unstaged,
+        commit_subject=subject.stdout.strip(),
+        commit_changed=commit_changed,
+    )
+    valid_states = {
+        "PRE_GIT_IMPORT_STAGED",
+        "PRE_GIT_IMPORT_COMMITTED",
+        "WORK_ACCEPTANCE_SYNC_STAGED",
+        "WORK_ACCEPTANCE_SYNC_COMMITTED",
+    }
+    assert_check("repository_state", state in valid_states, state)
     if state == "PRE_GIT_IMPORT_COMMITTED":
         message = run(["git","log","-1","--pretty=%B"])
         assert_check("import_commit_message", message.returncode == 0 and message.stdout.strip() == RECOMMENDED_COMMIT_MESSAGE, message.stdout.strip())
+    if state == "WORK_ACCEPTANCE_SYNC_COMMITTED":
+        assert_check("work_acceptance_commit_contract", True)
     assert_check("venv_present", (ROOT/".venv").is_dir())
     assert_check("runtime_exact", sys.version_info[:3] == EXPECTED_PYTHON)
     assert_check("runtime_is_venv", Path(sys.prefix).resolve() == (ROOT/".venv").resolve())
@@ -227,6 +316,8 @@ def validate() -> None:
     validate_eol(state); print("eol_checkout_contract: PASS")
     if state == "PRE_GIT_IMPORT_STAGED":
         validate_staged_style_policy()
+    if state == "WORK_ACCEPTANCE_SYNC_STAGED":
+        validate_work_acceptance_staged_style_policy()
     tests = run([sys.executable,"-B","-m","unittest","discover","-s","tests","-p","test_*.py"])
     if tests.stdout.strip(): print(tests.stdout.strip())
     if tests.stderr.strip(): print(tests.stderr.strip())
@@ -236,7 +327,7 @@ def validate() -> None:
 
 
 def main() -> int:
-    print("=== TASK-03 ATOM 4B REPOSITORY VALIDATION ===")
+    print("=== TASK-03 ATOM 4B / 4D-R REPOSITORY VALIDATION ===")
     try: validate()
     except Exception as exc:
         print("RESULT: FAIL"); print(f"ERROR_TYPE: {type(exc).__name__}"); print(f"ERROR: {exc}"); return 1
