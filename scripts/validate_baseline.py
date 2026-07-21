@@ -36,6 +36,7 @@ WORK_ACCEPTANCE_COMMIT_SUBJECT = "fix: validate Work acceptance checkpoint"
 WORK_ACCEPTANCE_COMMIT_OID = "85ab008b762edacd335bba3d9776100bc52775ce"
 ATOM5_COMMIT_COUNT = WORK_ACCEPTANCE_COMMIT_COUNT + 1
 ATOM5_COMMIT_SUBJECT = "feat: add registry skeletons and generated navigation"
+ATOM5_COMMIT_OID = "cd1465ea5de1fb33cee272422863b05d9459bd83"
 ATOM5_MODIFIED_FILES = {
     "AGENTS.md",
     "catalog/catalog_manifest.yaml",
@@ -71,6 +72,17 @@ ATOM5_CREATED_FILES = {
 ATOM5_CHANGED_FILES = ATOM5_MODIFIED_FILES | ATOM5_CREATED_FILES
 ATOM5_EXPECTED_REPOSITORY_FILE_COUNT = (
     EXPECTED_REPOSITORY_FILE_COUNT + len(ATOM5_CREATED_FILES)
+)
+ATOM5_WORK_ACCEPTANCE_FILES = {
+    "scripts/validate_baseline.py",
+    "tests/test_baseline.py",
+    "docs/tasks/TASK-03.md",
+    "docs/handoffs/latest.md",
+    "catalog/assets/core.yaml",
+}
+ATOM5_WORK_ACCEPTANCE_COMMIT_COUNT = ATOM5_COMMIT_COUNT + 1
+ATOM5_WORK_ACCEPTANCE_COMMIT_SUBJECT = (
+    "fix: validate Atom 5 Work acceptance"
 )
 FINGERPRINT_FILES = EXPECTED_CHANGED_FILES - {'docs/evidence/task03_atom4b_pre_git_import_receipt.json'}
 EXACT_IMPORT_FILES = {
@@ -120,7 +132,7 @@ def work_acceptance_repository_files() -> set[str]:
 
 
 def atom5_repository_files() -> set[str]:
-    return work_acceptance_repository_files() | ATOM5_CREATED_FILES
+    return tree_files(ATOM5_COMMIT_OID)
 
 
 def repository_files() -> set[str]:
@@ -260,7 +272,8 @@ def classify_state(
     ):
         return "ATOM5_REGISTRIES_NAVIGATION_STAGED"
     if (
-        commit_count == ATOM5_COMMIT_COUNT
+        head_oid == ATOM5_COMMIT_OID
+        and commit_count == ATOM5_COMMIT_COUNT
         and parent_oid == WORK_ACCEPTANCE_COMMIT_OID
         and tracked == atom5_files
         and len(tracked) == ATOM5_EXPECTED_REPOSITORY_FILE_COUNT
@@ -271,6 +284,29 @@ def classify_state(
         and commit_changed == ATOM5_CHANGED_FILES
     ):
         return "ATOM5_REGISTRIES_NAVIGATION_COMMITTED"
+    if (
+        head_oid == ATOM5_COMMIT_OID
+        and commit_count == ATOM5_COMMIT_COUNT
+        and parent_oid == WORK_ACCEPTANCE_COMMIT_OID
+        and tracked == atom5_files
+        and len(tracked) == ATOM5_EXPECTED_REPOSITORY_FILE_COUNT
+        and staged == ATOM5_WORK_ACCEPTANCE_FILES
+        and not unstaged
+        and not untracked
+    ):
+        return "ATOM5_WORK_ACCEPTANCE_STAGED"
+    if (
+        commit_count == ATOM5_WORK_ACCEPTANCE_COMMIT_COUNT
+        and parent_oid == ATOM5_COMMIT_OID
+        and tracked == atom5_files
+        and len(tracked) == ATOM5_EXPECTED_REPOSITORY_FILE_COUNT
+        and not staged
+        and not unstaged
+        and not untracked
+        and commit_subject == ATOM5_WORK_ACCEPTANCE_COMMIT_SUBJECT
+        and commit_changed == ATOM5_WORK_ACCEPTANCE_FILES
+    ):
+        return "ATOM5_WORK_ACCEPTANCE_COMMITTED"
     return "INVALID_REPOSITORY_STATE"
 
 
@@ -368,6 +404,24 @@ def validate_atom5_staged_style_policy() -> None:
     )
 
 
+def validate_atom5_work_acceptance_staged_style_policy() -> None:
+    diff = run(
+        [
+            "git",
+            "diff",
+            "--cached",
+            "--check",
+            "--",
+            *sorted(ATOM5_WORK_ACCEPTANCE_FILES),
+        ]
+    )
+    assert_check(
+        "atom5_work_acceptance_staged_diff_check",
+        diff.returncode == 0,
+        diff.stdout.strip() + diff.stderr.strip(),
+    )
+
+
 def validate() -> None:
     branch = run(["git","symbolic-ref","--short","HEAD"]); assert_check("branch_main", branch.returncode == 0 and branch.stdout.strip() == "main")
     head = run(["git","rev-parse","HEAD"]); assert_check("head_read", head.returncode == 0); head_oid = head.stdout.strip()
@@ -402,6 +456,8 @@ def validate() -> None:
         "WORK_ACCEPTANCE_SYNC_COMMITTED",
         "ATOM5_REGISTRIES_NAVIGATION_STAGED",
         "ATOM5_REGISTRIES_NAVIGATION_COMMITTED",
+        "ATOM5_WORK_ACCEPTANCE_STAGED",
+        "ATOM5_WORK_ACCEPTANCE_COMMITTED",
     }
     assert_check("repository_state", state in valid_states, state)
     expected_file_count = (
@@ -417,6 +473,8 @@ def validate() -> None:
         assert_check("work_acceptance_commit_contract", True)
     if state == "ATOM5_REGISTRIES_NAVIGATION_COMMITTED":
         assert_check("atom5_commit_contract", True)
+    if state == "ATOM5_WORK_ACCEPTANCE_COMMITTED":
+        assert_check("atom5_work_acceptance_commit_contract", True)
     assert_check("venv_present", (ROOT/".venv").is_dir())
     assert_check("runtime_exact", sys.version_info[:3] == EXPECTED_PYTHON)
     assert_check("runtime_is_venv", Path(sys.prefix).resolve() == (ROOT/".venv").resolve())
@@ -452,6 +510,8 @@ def validate() -> None:
         validate_work_acceptance_staged_style_policy()
     if state == "ATOM5_REGISTRIES_NAVIGATION_STAGED":
         validate_atom5_staged_style_policy()
+    if state == "ATOM5_WORK_ACCEPTANCE_STAGED":
+        validate_atom5_work_acceptance_staged_style_policy()
     tests = run([sys.executable,"-B","-m","unittest","discover","-s","tests","-p","test_*.py"])
     if tests.stdout.strip(): print(tests.stdout.strip())
     if tests.stderr.strip(): print(tests.stderr.strip())

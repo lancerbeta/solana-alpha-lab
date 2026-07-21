@@ -110,7 +110,7 @@ records:
     repository_path: docs/tasks/TASK-03.md
   integrity:
     kind: sha256
-    sha256: 9bc8ecf8e184655d7a2aafda52dd939caff47ed1d7ed319e4f2876d70ae3980e
+    sha256: 1233d5be005ef4ccae92f59be157b1fd1b028eb018bd960f949540ca2f7e0920
   access:
     mode: read_only
     method: file
