@@ -73,6 +73,21 @@ class RepositoryStatePolicyTests(unittest.TestCase):
         arguments.update(overrides)
         return module.classify_state(**arguments)
 
+    def classify_atom7_ci_repair(self, **overrides: object) -> str:
+        arguments = {
+            "head_oid": module.ATOM7_PRE_PUSH_REPAIR_COMMIT_OID,
+            "commit_count": module.ATOM7_PRE_PUSH_REPAIR_COMMIT_COUNT,
+            "parent_oid": module.ATOM7_LOCAL_CI_COMMIT_OID,
+            "tracked": module.atom7_repository_files(),
+            "staged": set(module.ATOM7_CI_CLEAN_CLONE_REPAIR_FILES),
+            "untracked": set(),
+            "unstaged": set(),
+            "commit_subject": module.ATOM7_PRE_PUSH_REPAIR_COMMIT_SUBJECT,
+            "commit_changed": set(module.ATOM7_PRE_PUSH_REPAIR_FILES),
+        }
+        arguments.update(overrides)
+        return module.classify_state(**arguments)
+
     def test_pre_git_import_staged_state_remains_valid(self) -> None:
         state = module.classify_state(
             head_oid=module.BASE_COMMIT_OID,
@@ -299,6 +314,63 @@ class RepositoryStatePolicyTests(unittest.TestCase):
                     "INVALID_REPOSITORY_STATE",
                 )
 
+    def test_atom7_ci_repair_exact_staged_state_passes(self) -> None:
+        self.assertEqual(
+            self.classify_atom7_ci_repair(),
+            "ATOM7_CI_CLEAN_CLONE_REPAIR_STAGED",
+        )
+
+    def test_atom7_ci_repair_exact_committed_state_passes(self) -> None:
+        self.assertEqual(
+            self.classify_atom7_ci_repair(
+                head_oid="f" * 40,
+                commit_count=module.ATOM7_CI_CLEAN_CLONE_REPAIR_COMMIT_COUNT,
+                parent_oid=module.ATOM7_PRE_PUSH_REPAIR_COMMIT_OID,
+                staged=set(),
+                commit_subject=module.ATOM7_CI_CLEAN_CLONE_REPAIR_COMMIT_SUBJECT,
+                commit_changed=set(module.ATOM7_CI_CLEAN_CLONE_REPAIR_FILES),
+            ),
+            "ATOM7_CI_CLEAN_CLONE_REPAIR_COMMITTED",
+        )
+
+    def test_atom7_ci_repair_wrong_inventory_fails(self) -> None:
+        missing = set(module.ATOM7_CI_CLEAN_CLONE_REPAIR_FILES)
+        missing.remove("catalog/assets/core.yaml")
+        for overrides in (
+            {"staged": missing},
+            {
+                "staged": set(module.ATOM7_CI_CLEAN_CLONE_REPAIR_FILES)
+                | {"unexpected.txt"}
+            },
+            {"unstaged": {"README.md"}},
+            {"untracked": {"unexpected.txt"}},
+        ):
+            with self.subTest(overrides=overrides):
+                self.assertEqual(
+                    self.classify_atom7_ci_repair(**overrides),
+                    "INVALID_REPOSITORY_STATE",
+                )
+
+    def test_atom7_ci_repair_wrong_commit_contract_fails(self) -> None:
+        committed = {
+            "head_oid": "f" * 40,
+            "commit_count": module.ATOM7_CI_CLEAN_CLONE_REPAIR_COMMIT_COUNT,
+            "parent_oid": module.ATOM7_PRE_PUSH_REPAIR_COMMIT_OID,
+            "staged": set(),
+            "commit_subject": module.ATOM7_CI_CLEAN_CLONE_REPAIR_COMMIT_SUBJECT,
+            "commit_changed": set(module.ATOM7_CI_CLEAN_CLONE_REPAIR_FILES),
+        }
+        for overrides in (
+            {"parent_oid": module.ATOM7_LOCAL_CI_COMMIT_OID},
+            {"commit_subject": "fix: arbitrary CI repair"},
+            {"commit_changed": {"scripts/validate_ci.py"}},
+        ):
+            with self.subTest(overrides=overrides):
+                self.assertEqual(
+                    self.classify_atom7_ci_repair(**(committed | overrides)),
+                    "INVALID_REPOSITORY_STATE",
+                )
+
     def test_atom5_work_acceptance_missing_core_fails(self) -> None:
         staged = set(module.ATOM5_WORK_ACCEPTANCE_FILES)
         staged.remove("catalog/assets/core.yaml")
@@ -445,6 +517,7 @@ class RepositoryStatePolicyTests(unittest.TestCase):
         self.assertEqual(len(module.ATOM7_LOCAL_CI_CREATED_FILES), 3)
         self.assertEqual(len(module.ATOM7_LOCAL_CI_FILES), 18)
         self.assertEqual(len(module.ATOM7_PRE_PUSH_REPAIR_FILES), 2)
+        self.assertEqual(len(module.ATOM7_CI_CLEAN_CLONE_REPAIR_FILES), 7)
         self.assertEqual(module.ATOM7_EXPECTED_REPOSITORY_FILE_COUNT, 77)
         self.assertEqual(
             module.ATOM5_COMMIT_SUBJECT,
@@ -461,6 +534,10 @@ class RepositoryStatePolicyTests(unittest.TestCase):
         self.assertEqual(
             module.ATOM7_PRE_PUSH_REPAIR_COMMIT_SUBJECT,
             "fix: validate repository publication states",
+        )
+        self.assertEqual(
+            module.ATOM7_CI_CLEAN_CLONE_REPAIR_COMMIT_SUBJECT,
+            "fix: make CI and clean clone reproducible",
         )
 
     def test_exact_import_style_partition(self) -> None:
@@ -549,6 +626,41 @@ class GitTopologyPolicyTests(unittest.TestCase):
             ),
             "PUBLISHED_LOCAL",
         )
+
+    def test_clean_clone_state_passes(self) -> None:
+        self.assertEqual(
+            self.classify_topology(
+                upstream="origin/main",
+                remote_tracking_refs={"origin/HEAD", "origin/main"},
+                remote_head_target="refs/remotes/origin/main",
+                all_refs={
+                    "refs/heads/main",
+                    "refs/remotes/origin/HEAD",
+                    "refs/remotes/origin/main",
+                },
+            ),
+            "CLEAN_CLONE",
+        )
+
+    def test_clean_clone_origin_head_must_be_exact_symbolic_ref(self) -> None:
+        common = {
+            "upstream": "origin/main",
+            "remote_tracking_refs": {"origin/HEAD", "origin/main"},
+            "all_refs": {
+                "refs/heads/main",
+                "refs/remotes/origin/HEAD",
+                "refs/remotes/origin/main",
+            },
+        }
+        for target in (None, "", "refs/remotes/origin/other"):
+            with self.subTest(target=target):
+                self.assertEqual(
+                    self.classify_topology(
+                        **common,
+                        remote_head_target=target,
+                    ),
+                    "INVALID_GIT_TOPOLOGY",
+                )
 
     def test_github_actions_detached_checkout_passes(self) -> None:
         ci_url = "https://github.com/lancerbeta/solana-alpha-lab"

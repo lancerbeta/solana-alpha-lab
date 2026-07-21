@@ -51,7 +51,7 @@ def expected_workflow() -> dict[str, Any]:
                         "uses": CHECKOUT_PIN,
                         "with": {
                             "persist-credentials": "false",
-                            "fetch-depth": "2",
+                            "fetch-depth": "0",
                         },
                     },
                     {
@@ -63,6 +63,10 @@ def expected_workflow() -> dict[str, Any]:
                             "python-version": ".".join(map(str, EXPECTED_PYTHON)),
                             "enable-cache": "false",
                         },
+                    },
+                    {
+                        "name": "Configure local hooks",
+                        "run": "git config --local core.hooksPath .githooks",
                     },
                     {
                         "name": "Validate repository",

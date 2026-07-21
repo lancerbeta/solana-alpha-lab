@@ -45,14 +45,18 @@ Remote activation is not part of the local candidate. After separate Work
 authorization supplies the private repository URL and exact commit:
 
 ```text
-git clone <PRIVATE_REPOSITORY_URL> <BOUNDED_LOCAL_DIRECTORY>
+git clone --branch main --single-branch <PRIVATE_REPOSITORY_URL> <BOUNDED_LOCAL_DIRECTORY>
 cd <BOUNDED_LOCAL_DIRECTORY>
-git checkout --detach <AUTHORIZED_COMMIT_SHA>
+git show -s --format=%H HEAD
+git config --local core.hooksPath .githooks
 uv run --locked --managed-python python -B scripts/validate_ci.py
 ```
 
-Do not infer a remote URL from local metadata. Clean-clone acceptance requires a
-sanitized receipt proving the exact checkout, clean tree, and passing gate.
+The `git show` output must equal `<AUTHORIZED_COMMIT_SHA>` exactly; stop before
+validation on any mismatch. Keep `main` attached to `origin/main` and do not use
+a detached checkout. Do not infer a remote URL from local metadata. Clean-clone
+acceptance requires a sanitized receipt proving the exact checkout, clean tree,
+local hooks setup, and passing gate.
 
 ## Security and provenance boundary
 

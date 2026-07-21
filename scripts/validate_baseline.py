@@ -122,9 +122,25 @@ ATOM7_PRE_PUSH_REPAIR_COMMIT_COUNT = ATOM7_LOCAL_CI_COMMIT_COUNT + 1
 ATOM7_PRE_PUSH_REPAIR_COMMIT_SUBJECT = (
     "fix: validate repository publication states"
 )
+ATOM7_PRE_PUSH_REPAIR_COMMIT_OID = "a29c7ac2b90c948519d53fd2d6d4c879381dc861"
 ATOM7_PRE_PUSH_REPAIR_FILES = {
     "scripts/validate_baseline.py",
     "tests/test_baseline.py",
+}
+ATOM7_CI_CLEAN_CLONE_REPAIR_COMMIT_COUNT = (
+    ATOM7_PRE_PUSH_REPAIR_COMMIT_COUNT + 1
+)
+ATOM7_CI_CLEAN_CLONE_REPAIR_COMMIT_SUBJECT = (
+    "fix: make CI and clean clone reproducible"
+)
+ATOM7_CI_CLEAN_CLONE_REPAIR_FILES = {
+    ".github/workflows/ci.yml",
+    "README.md",
+    "catalog/assets/core.yaml",
+    "scripts/validate_baseline.py",
+    "scripts/validate_ci.py",
+    "tests/test_baseline.py",
+    "tests/test_ci.py",
 }
 EXPECTED_ORIGIN_URL = "https://github.com/lancerbeta/solana-alpha-lab.git"
 EXPECTED_CI_ORIGIN_URLS = {
@@ -220,6 +236,7 @@ def classify_git_topology(
     github_repository: str | None,
     github_ref: str | None,
     github_sha: str | None,
+    remote_head_target: str | None = None,
 ) -> str:
     if tags or push_refspecs:
         return "INVALID_GIT_TOPOLOGY"
@@ -234,6 +251,7 @@ def classify_git_topology(
             and fetch_urls == push_urls
             and origin_url_is_safe(fetch_urls[0], github_actions=True)
             and fetch_refspecs == (EXPECTED_ORIGIN_FETCH_REFSPEC,)
+            and remote_head_target is None
         )
         refs_ok = (
             branch in {None, "main"}
@@ -265,6 +283,7 @@ def classify_git_topology(
             and not fetch_refspecs
             and upstream is None
             and not remote_tracking_refs
+            and remote_head_target is None
             and repository_refs == {"refs/heads/main"}
         ):
             return "PRE_REMOTE"
@@ -283,16 +302,30 @@ def classify_git_topology(
     if (
         upstream is None
         and not remote_tracking_refs
+        and remote_head_target is None
         and repository_refs == {"refs/heads/main"}
     ):
         return "BOUND_PRE_PUSH"
     if (
         upstream == "origin/main"
         and remote_tracking_refs == {"origin/main"}
+        and remote_head_target is None
         and repository_refs
         == {"refs/heads/main", "refs/remotes/origin/main"}
     ):
         return "PUBLISHED_LOCAL"
+    if (
+        upstream == "origin/main"
+        and remote_tracking_refs == {"origin/HEAD", "origin/main"}
+        and remote_head_target == "refs/remotes/origin/main"
+        and repository_refs
+        == {
+            "refs/heads/main",
+            "refs/remotes/origin/HEAD",
+            "refs/remotes/origin/main",
+        }
+    ):
+        return "CLEAN_CLONE"
     return "INVALID_GIT_TOPOLOGY"
 
 
@@ -550,6 +583,31 @@ def classify_state(
         and commit_changed == ATOM7_PRE_PUSH_REPAIR_FILES
     ):
         return "ATOM7_PRE_PUSH_REPAIR_COMMITTED"
+    if (
+        head_oid == ATOM7_PRE_PUSH_REPAIR_COMMIT_OID
+        and commit_count == ATOM7_PRE_PUSH_REPAIR_COMMIT_COUNT
+        and parent_oid == ATOM7_LOCAL_CI_COMMIT_OID
+        and tracked == atom7_files
+        and len(tracked) == ATOM7_EXPECTED_REPOSITORY_FILE_COUNT
+        and staged == ATOM7_CI_CLEAN_CLONE_REPAIR_FILES
+        and not unstaged
+        and not untracked
+        and commit_subject == ATOM7_PRE_PUSH_REPAIR_COMMIT_SUBJECT
+        and commit_changed == ATOM7_PRE_PUSH_REPAIR_FILES
+    ):
+        return "ATOM7_CI_CLEAN_CLONE_REPAIR_STAGED"
+    if (
+        commit_count == ATOM7_CI_CLEAN_CLONE_REPAIR_COMMIT_COUNT
+        and parent_oid == ATOM7_PRE_PUSH_REPAIR_COMMIT_OID
+        and tracked == atom7_files
+        and len(tracked) == ATOM7_EXPECTED_REPOSITORY_FILE_COUNT
+        and not staged
+        and not unstaged
+        and not untracked
+        and commit_subject == ATOM7_CI_CLEAN_CLONE_REPAIR_COMMIT_SUBJECT
+        and commit_changed == ATOM7_CI_CLEAN_CLONE_REPAIR_FILES
+    ):
+        return "ATOM7_CI_CLEAN_CLONE_REPAIR_COMMITTED"
     return "INVALID_REPOSITORY_STATE"
 
 
@@ -701,6 +759,24 @@ def validate_atom7_pre_push_repair_staged_style_policy() -> None:
     )
 
 
+def validate_atom7_ci_clean_clone_repair_staged_style_policy() -> None:
+    diff = run(
+        [
+            "git",
+            "diff",
+            "--cached",
+            "--check",
+            "--",
+            *sorted(ATOM7_CI_CLEAN_CLONE_REPAIR_FILES),
+        ]
+    )
+    assert_check(
+        "atom7_ci_clean_clone_repair_staged_diff_check",
+        diff.returncode == 0,
+        diff.stdout.strip() + diff.stderr.strip(),
+    )
+
+
 def validate() -> None:
     github_actions = os.environ.get("GITHUB_ACTIONS", "").lower() == "true"
     branch_result = run(["git", "symbolic-ref", "--short", "HEAD"])
@@ -745,9 +821,25 @@ def validate() -> None:
     local_branch_code, local_branches = command_set(
         ["git", "for-each-ref", "--format=%(refname:short)", "refs/heads"]
     )
-    remote_ref_code, remote_tracking_refs = command_set(
-        ["git", "for-each-ref", "--format=%(refname:short)", "refs/remotes"]
+    remote_ref_result = run(
+        [
+            "git",
+            "for-each-ref",
+            "--format=%(refname:short)%09%(symref)",
+            "refs/remotes",
+        ]
     )
+    remote_ref_code = remote_ref_result.returncode
+    remote_tracking_refs = set()
+    remote_head_target = None
+    for line in remote_ref_result.stdout.splitlines():
+        name, _, symref = line.partition("\t")
+        name = name.strip()
+        if not name:
+            continue
+        remote_tracking_refs.add(name)
+        if name == "origin/HEAD":
+            remote_head_target = symref.strip()
     tag_code, tags = command_set(["git", "tag", "--list"])
     all_ref_code, all_refs = command_set(
         ["git", "for-each-ref", "--format=%(refname)"]
@@ -797,6 +889,7 @@ def validate() -> None:
         github_repository=os.environ.get("GITHUB_REPOSITORY"),
         github_ref=os.environ.get("GITHUB_REF"),
         github_sha=os.environ.get("GITHUB_SHA"),
+        remote_head_target=remote_head_target,
     )
     assert_check(
         "repository_topology",
@@ -827,6 +920,8 @@ def validate() -> None:
         "ATOM7_LOCAL_CI_CANDIDATE_COMMITTED",
         "ATOM7_PRE_PUSH_REPAIR_STAGED",
         "ATOM7_PRE_PUSH_REPAIR_COMMITTED",
+        "ATOM7_CI_CLEAN_CLONE_REPAIR_STAGED",
+        "ATOM7_CI_CLEAN_CLONE_REPAIR_COMMITTED",
     }
     assert_check("repository_state", state in valid_states, state)
     if state.startswith("ATOM7_"):
@@ -849,6 +944,8 @@ def validate() -> None:
         assert_check("atom7_local_ci_commit_contract", True)
     if state == "ATOM7_PRE_PUSH_REPAIR_COMMITTED":
         assert_check("atom7_pre_push_repair_commit_contract", True)
+    if state == "ATOM7_CI_CLEAN_CLONE_REPAIR_COMMITTED":
+        assert_check("atom7_ci_clean_clone_repair_commit_contract", True)
     assert_check("venv_present", (ROOT/".venv").is_dir())
     assert_check("runtime_exact", sys.version_info[:3] == EXPECTED_PYTHON)
     assert_check("runtime_is_venv", Path(sys.prefix).resolve() == (ROOT/".venv").resolve())
@@ -891,6 +988,8 @@ def validate() -> None:
         validate_atom7_local_ci_staged_style_policy()
     if state == "ATOM7_PRE_PUSH_REPAIR_STAGED":
         validate_atom7_pre_push_repair_staged_style_policy()
+    if state == "ATOM7_CI_CLEAN_CLONE_REPAIR_STAGED":
+        validate_atom7_ci_clean_clone_repair_staged_style_policy()
     tests = run([sys.executable,"-B","-m","unittest","discover","-s","tests","-p","test_*.py"])
     if tests.stdout.strip(): print(tests.stdout.strip())
     if tests.stderr.strip(): print(tests.stderr.strip())

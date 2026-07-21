@@ -53,8 +53,18 @@ class CiWorkflowTests(unittest.TestCase):
         self.assertEqual(job["timeout-minutes"], "10")
         self.assertEqual(job["concurrency"] if "concurrency" in job else None, None)
         self.assertEqual(document["concurrency"]["cancel-in-progress"], "true")
-        self.assertEqual(job["steps"][0]["with"], {"persist-credentials": "false", "fetch-depth": "2"})
+        self.assertEqual(
+            job["steps"][0]["with"],
+            {"persist-credentials": "false", "fetch-depth": "0"},
+        )
         self.assertEqual(job["steps"][1]["with"]["enable-cache"], "false")
+        self.assertEqual(
+            job["steps"][2],
+            {
+                "name": "Configure local hooks",
+                "run": "git config --local core.hooksPath .githooks",
+            },
+        )
 
     def test_tag_based_action_reference_fails(self) -> None:
         self.assert_invalid(self.text.replace(ci.CHECKOUT_PIN, "actions/checkout@v7"))
@@ -78,14 +88,43 @@ class CiWorkflowTests(unittest.TestCase):
     def test_checkout_cache_timeout_and_concurrency_drift_fail(self) -> None:
         mutations = (
             self.text.replace("persist-credentials: false", "persist-credentials: true"),
-            self.text.replace("fetch-depth: 2", "fetch-depth: 1"),
+            self.text.replace("fetch-depth: 0", "fetch-depth: 1"),
             self.text.replace("enable-cache: false", "enable-cache: true"),
+            self.text.replace(
+                "git config --local core.hooksPath .githooks",
+                "git config --global core.hooksPath .githooks",
+            ),
+            self.text.replace(
+                "git config --local core.hooksPath .githooks\n",
+                "",
+            ),
             self.text.replace("timeout-minutes: 10\n", ""),
             self.text.replace("cancel-in-progress: true", "cancel-in-progress: false"),
         )
         for mutation in mutations:
             with self.subTest():
                 self.assert_invalid(mutation)
+
+
+class CleanCloneDocumentationTests(unittest.TestCase):
+    def test_clean_clone_is_attached_exact_and_hooks_configured(self) -> None:
+        text = (ROOT / "README.md").read_text(encoding="utf-8")
+        clone = (
+            "git clone --branch main --single-branch "
+            "<PRIVATE_REPOSITORY_URL> <BOUNDED_LOCAL_DIRECTORY>"
+        )
+        head_check = "git show -s --format=%H HEAD"
+        hooks = "git config --local core.hooksPath .githooks"
+        validation = ci.VALIDATION_COMMAND
+        self.assertIn(clone, text)
+        self.assertNotIn("git checkout --detach", text)
+        self.assertLess(text.index(head_check), text.index(hooks))
+        self.assertLess(text.index(hooks), text.index(validation, text.index(hooks)))
+        self.assertIn(
+            "must equal `<AUTHORIZED_COMMIT_SHA>` exactly",
+            text,
+        )
+        self.assertIn("Keep `main` attached to `origin/main`", text)
 
 
 class PlatformGateContractTests(unittest.TestCase):
