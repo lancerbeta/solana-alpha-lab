@@ -1,0 +1,11 @@
+#!/bin/sh
+set -eu
+
+repo_root="$(git rev-parse --show-toplevel)"
+cd "$repo_root"
+
+exec pwsh \
+  -NoProfile \
+  -NonInteractive \
+  -ExecutionPolicy Bypass \
+  -File "./scripts/validate.ps1"

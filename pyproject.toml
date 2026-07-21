@@ -1,0 +1,17 @@
+[project]
+name = "solana-alpha-lab"
+version = "0.0.0"
+description = "Bounded evidence-first Solana memecoin intraday alpha research."
+requires-python = ">=3.13,<3.14"
+dependencies = []
+
+[tool.uv]
+package = false
+
+[tool.solana-alpha-lab]
+task = "TASK-03"
+stage = "COMMIT_READY_UNCOMMITTED"
+exact_python_pin = "3.13.14"
+exact_powershell_pin = "7.6.3"
+provider_calls_allowed = false
+real_money_allowed = false
