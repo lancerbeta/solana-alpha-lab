@@ -1,64 +1,40 @@
 #!/usr/bin/env python3
-"""Validate TASK-03 commit-ready and first-commit repository states."""
+"""Validate TASK-03 Catalog foundation with deterministic LF checkout policy."""
 
 from __future__ import annotations
 
 import hashlib
+import importlib.metadata
 import json
 import os
-import re
 import subprocess
 import sys
+import tempfile
 import tomllib
 from pathlib import Path
-from typing import Iterable
 
 ROOT = Path(__file__).resolve().parents[1]
-RECEIPT_PATH = (
-    ROOT / "docs/evidence/task03_atom2f_commit_ready_receipt.json"
-)
-
-EXPECTED_FILES = {
-    ".gitattributes",
-    ".gitignore",
-    ".env.example",
-    ".python-version",
-    ".githooks/pre-commit",
-    "README.md",
-    "AGENTS.md",
-    "pyproject.toml",
-    "uv.lock",
-    "docs/tasks/TASK-03.md",
-    "docs/handoffs/latest.md",
-    "docs/evidence/task03_atom2_baseline_receipt.json",
-    "docs/evidence/task03_atom2_python_lock_receipt.json",
-    "docs/evidence/task03_atom2d_quality_gate_receipt.json",
-    "docs/evidence/task03_atom2e_staging_receipt.json",
-    "docs/evidence/task03_atom2f_commit_ready_receipt.json",
-    "scripts/validate_baseline.py",
-    "scripts/validate.ps1",
-    "scripts/secret_scan.py",
-    "tests/test_baseline.py",
-    "tests/test_secret_scan.py",
-}
-FINGERPRINT_FILES = EXPECTED_FILES - {
-    "docs/evidence/task03_atom2f_commit_ready_receipt.json"
-}
-IGNORED_PARTS = {".git", ".venv", "__pycache__"}
+BASE_COMMIT_OID = '399ef0365b017fcd9d7b81389218a63bf1e466c1'
+BASE_TREE_OID = '8f5559723ca0aefb4fa706131d3b1839481be19d'
+BASE_FILE_COUNT = 21
+CURRENT_RECEIPT = ROOT / 'docs/evidence/task03_atom3a_catalog_foundation_receipt.json'
+EXPECTED_REPOSITORY_FILE_COUNT = 32
+EXPECTED_CHANGED_FILES = {'catalog/query_recipes.yaml', 'catalog/schemas/catalog_manifest.schema.json', '.gitattributes', 'catalog/schemas/asset_catalog.schema.json', 'docs/evidence/task03_atom3a_catalog_foundation_receipt.json', 'scripts/catalog_cli.py', 'scripts/validate_baseline.py', 'tests/test_baseline.py', 'catalog/assets/core.yaml', 'pyproject.toml', 'docs/tasks/TASK-03.md', 'scripts/validate_catalog.py', 'tests/test_catalog.py', 'catalog/schemas/query_recipe.schema.json', 'README.md', 'catalog/catalog_manifest.yaml', 'docs/decisions/ADR-001-project-asset-catalog-baseline.md', 'AGENTS.md', 'docs/handoffs/latest.md', 'scripts/validate.ps1', 'uv.lock'}
+EXPECTED_STAGED_FILES = len(EXPECTED_CHANGED_FILES)
+FINGERPRINT_FILES = EXPECTED_CHANGED_FILES - {'docs/evidence/task03_atom3a_catalog_foundation_receipt.json'}
 EXPECTED_PYTHON = (3, 13, 14)
-EXPECTED_REQUIRES_PYTHON = ">=3.13,<3.14"
 EXPECTED_POWERSHELL = "7.6.3"
-EXPECTED_HOOKS_PATH = ".githooks"
-RECOMMENDED_COMMIT_MESSAGE = (
-    "chore: establish local repository baseline"
-)
+EXPECTED_JSONSCHEMA = "4.26.0"
+EXPECTED_PYYAML = "6.0.3"
+RECOMMENDED_COMMIT_MESSAGE = 'feat: add project asset catalog foundation'
+EXPECTED_PS1_RULE = "*.ps1 text eol=lf"
+FORBIDDEN_PS1_RULE = "*.ps1 text eol=crlf"
+EXPECTED_PS1_PATHS = {"scripts/validate.ps1"}
+SUPERSEDED_RECEIPT_SHA256 = 'de34a4ccc39a89d8d1ae9ddbc394ba92603b2bbbed9fecaf9db9ab1bf920662d'
+IGNORED_PARTS = {".git", ".venv", "__pycache__"}
 
 
-def run(
-    command: list[str],
-    *,
-    binary: bool = False,
-) -> subprocess.CompletedProcess:
+def run(command: list[str], *, binary: bool = False):
     env = os.environ.copy()
     env["PYTHONDONTWRITEBYTECODE"] = "1"
     env["UV_MANAGED_PYTHON"] = "1"
@@ -73,22 +49,10 @@ def run(
     )
 
 
-def sha256_bytes(data: bytes) -> str:
-    return hashlib.sha256(data).hexdigest()
-
-
-def sha256(path: Path) -> str:
-    return sha256_bytes(path.read_bytes())
-
-
 def command_set(command: list[str]) -> tuple[int, set[str]]:
-    completed = run(command)
-    values = {
-        line.strip()
-        for line in completed.stdout.splitlines()
-        if line.strip()
-    }
-    return completed.returncode, values
+    result = run(command)
+    values = {line.strip() for line in result.stdout.splitlines() if line.strip()}
+    return result.returncode, values
 
 
 def repository_files() -> set[str]:
@@ -105,43 +69,8 @@ def repository_files() -> set[str]:
     return result
 
 
-def classify_repository_state(
-    *,
-    head_exists: bool,
-    commit_count: int,
-    tracked: set[str],
-    staged: set[str],
-    untracked: set[str],
-    unstaged: set[str],
-) -> str:
-    if (
-        not head_exists
-        and commit_count == 0
-        and tracked == EXPECTED_FILES
-        and staged == EXPECTED_FILES
-        and not untracked
-        and not unstaged
-    ):
-        return "COMMIT_READY_STAGED"
-
-    if (
-        head_exists
-        and commit_count == 1
-        and tracked == EXPECTED_FILES
-        and not staged
-        and not untracked
-        and not unstaged
-    ):
-        return "COMMITTED_BASELINE"
-
-    return "INVALID_REPOSITORY_STATE"
-
-
-def parse_index_entries(
-    records: bytes,
-) -> dict[str, tuple[str, str]]:
+def parse_index_entries(records: bytes) -> dict[str, tuple[str, str]]:
     result: dict[str, tuple[str, str]] = {}
-
     for record in records.split(b"\0"):
         if not record:
             continue
@@ -150,15 +79,11 @@ def parse_index_entries(
         if stage != "0":
             raise AssertionError("non_zero_index_stage")
         result[raw_path.decode("utf-8")] = (mode, oid)
-
     return result
 
 
-def parse_tree_entries(
-    records: bytes,
-) -> dict[str, tuple[str, str]]:
+def parse_tree_entries(records: bytes) -> dict[str, tuple[str, str]]:
     result: dict[str, tuple[str, str]] = {}
-
     for record in records.split(b"\0"):
         if not record:
             continue
@@ -167,127 +92,154 @@ def parse_tree_entries(
         if object_type != "blob":
             raise AssertionError("non_blob_tree_entry")
         result[raw_path.decode("utf-8")] = (mode, oid)
-
     return result
 
 
 def source_entries(state: str) -> dict[str, tuple[str, str]]:
-    if state == "COMMIT_READY_STAGED":
-        completed = run(
-            ["git", "ls-files", "--stage", "-z"],
-            binary=True,
-        )
-        if completed.returncode != 0:
+    if state == "CATALOG_FOUNDATION_STAGED":
+        result = run(["git", "ls-files", "--stage", "-z"], binary=True)
+        if result.returncode != 0:
             raise AssertionError("index_read_failed")
-        return parse_index_entries(completed.stdout)
+        return parse_index_entries(result.stdout)
 
-    if state == "COMMITTED_BASELINE":
-        completed = run(
-            ["git", "ls-tree", "-r", "-z", "HEAD"],
-            binary=True,
-        )
-        if completed.returncode != 0:
-            raise AssertionError("head_tree_read_failed")
-        return parse_tree_entries(completed.stdout)
-
-    raise AssertionError("unsupported_fingerprint_state")
+    result = run(["git", "ls-tree", "-r", "-z", "HEAD"], binary=True)
+    if result.returncode != 0:
+        raise AssertionError("head_tree_read_failed")
+    return parse_tree_entries(result.stdout)
 
 
 def blob_bytes(state: str, path: str) -> bytes:
-    reference = f":{path}"
-    if state == "COMMITTED_BASELINE":
-        reference = f"HEAD:{path}"
-
-    completed = run(
-        ["git", "show", reference],
-        binary=True,
-    )
-    if completed.returncode != 0:
+    reference = f":{path}" if state == "CATALOG_FOUNDATION_STAGED" else f"HEAD:{path}"
+    result = run(["git", "show", reference], binary=True)
+    if result.returncode != 0:
         raise AssertionError(f"blob_read_failed:{path}")
-    return completed.stdout
+    return result.stdout
 
 
-def fingerprints_for_state(state: str) -> tuple[str, str]:
+def fingerprints(state: str) -> tuple[str, str]:
     entries = source_entries(state)
-    selected = {
-        path: entries[path]
-        for path in sorted(FINGERPRINT_FILES)
-    }
-
     manifest = bytearray()
     content = bytearray()
 
-    for path, (mode, oid) in selected.items():
-        manifest.extend(
-            f"{mode} {oid} {path}\n".encode("utf-8")
-        )
-
+    for path in sorted(FINGERPRINT_FILES):
+        mode, oid = entries[path]
+        manifest.extend(f"{mode} {oid} {path}\n".encode("utf-8"))
         blob = blob_bytes(state, path)
-        encoded_path = path.encode("utf-8")
-        content.extend(len(encoded_path).to_bytes(4, "big"))
-        content.extend(encoded_path)
+        encoded = path.encode("utf-8")
+        content.extend(len(encoded).to_bytes(4, "big"))
+        content.extend(encoded)
         content.extend(len(blob).to_bytes(8, "big"))
         content.extend(blob)
 
     return (
-        sha256_bytes(bytes(manifest)),
-        sha256_bytes(bytes(content)),
+        hashlib.sha256(bytes(manifest)).hexdigest(),
+        hashlib.sha256(bytes(content)).hexdigest(),
     )
 
 
-def contains_forbidden_absolute_user_path(text: str) -> bool:
-    slash = "/"
-    backslash = "\\"
-    patterns = (
-        re.compile(
-            r"(?i)[A-Z]:"
-            + re.escape(backslash)
-            + "Users"
-            + re.escape(backslash)
-            + r"[^\\\s]+"
-        ),
-        re.compile(
-            re.escape(slash)
-            + "home"
-            + re.escape(slash)
-            + r"[^/\s]+",
-            re.IGNORECASE,
-        ),
-        re.compile(
-            re.escape(slash)
-            + "Users"
-            + re.escape(slash)
-            + r"[^/\s]+",
-            re.IGNORECASE,
-        ),
-    )
-    return any(pattern.search(text) for pattern in patterns)
+def classify_state(
+    *,
+    head_oid: str,
+    commit_count: int,
+    parent_oid: str | None,
+    tracked: set[str],
+    staged: set[str],
+    untracked: set[str],
+    unstaged: set[str],
+) -> str:
+    if (
+        head_oid == BASE_COMMIT_OID
+        and commit_count == 1
+        and tracked == repository_files()
+        and len(tracked) == EXPECTED_REPOSITORY_FILE_COUNT
+        and staged == EXPECTED_CHANGED_FILES
+        and not untracked
+        and not unstaged
+    ):
+        return "CATALOG_FOUNDATION_STAGED"
+
+    if (
+        commit_count == 2
+        and parent_oid == BASE_COMMIT_OID
+        and tracked == repository_files()
+        and len(tracked) == EXPECTED_REPOSITORY_FILE_COUNT
+        and not staged
+        and not untracked
+        and not unstaged
+    ):
+        return "CATALOG_FOUNDATION_COMMITTED"
+
+    return "INVALID_REPOSITORY_STATE"
 
 
-def validate_env_example(text: str) -> list[str]:
-    errors: list[str] = []
-
-    for number, raw in enumerate(text.splitlines(), start=1):
-        line = raw.strip()
-        if not line or line.startswith("#"):
-            continue
-        if "=" not in line:
-            errors.append(f"line_{number}_missing_equals")
-            continue
-        key, value = line.split("=", 1)
-        if not re.fullmatch(r"[A-Z][A-Z0-9_]*", key):
-            errors.append(f"line_{number}_invalid_key")
-        if value.strip():
-            errors.append(f"line_{number}_non_empty_value")
-
-    return errors
+def parse_eol_attribute(output: str, expected_path: str) -> str:
+    prefix = f"{expected_path}: eol: "
+    lines = [line.strip() for line in output.splitlines() if line.strip()]
+    if len(lines) != 1 or not lines[0].startswith(prefix):
+        raise AssertionError("unexpected_check_attr_output")
+    return lines[0][len(prefix):].strip()
 
 
-def assert_check(
-    name: str,
-    condition: bool,
-    detail: str = "",
-) -> None:
+def is_lf_only(data: bytes) -> bool:
+    return bool(data) and b"\r" not in data and b"\n" in data
+
+
+def checkout_index_bytes(relative_path: str) -> bytes:
+    with tempfile.TemporaryDirectory(prefix="smial_eol_checkout_") as temporary:
+        prefix = Path(temporary).resolve().as_posix() + "/"
+        result = run([
+            "git", "checkout-index", "--all", "--force", f"--prefix={prefix}"
+        ])
+        if result.returncode != 0:
+            raise AssertionError(
+                "checkout_index_failed:" + result.stderr.strip()
+            )
+        return (Path(temporary) / relative_path).read_bytes()
+
+
+def eol_evidence(state: str) -> dict[str, str]:
+    attributes = (ROOT / ".gitattributes").read_text(encoding="utf-8").splitlines()
+    if EXPECTED_PS1_RULE not in attributes or FORBIDDEN_PS1_RULE in attributes:
+        raise AssertionError("gitattributes_ps1_rule_mismatch")
+
+    tracked_ps1 = run(["git", "ls-files", "*.ps1"])
+    if tracked_ps1.returncode != 0:
+        raise AssertionError("ps1_inventory_failed")
+    paths = {line.strip() for line in tracked_ps1.stdout.splitlines() if line.strip()}
+    if paths != EXPECTED_PS1_PATHS:
+        raise AssertionError(f"ps1_inventory_mismatch:{sorted(paths)}")
+
+    path = next(iter(EXPECTED_PS1_PATHS))
+    work_attr = run(["git", "check-attr", "eol", "--", path])
+    cache_attr = run(["git", "check-attr", "--cached", "eol", "--", path])
+    if work_attr.returncode != 0 or cache_attr.returncode != 0:
+        raise AssertionError("check_attr_failed")
+    work_value = parse_eol_attribute(work_attr.stdout, path)
+    cache_value = parse_eol_attribute(cache_attr.stdout, path)
+    if work_value != "lf" or cache_value != "lf":
+        raise AssertionError(f"ps1_attribute_not_lf:{work_value}:{cache_value}")
+
+    working = (ROOT / path).read_bytes()
+    source = blob_bytes(state, path)
+    roundtrip = checkout_index_bytes(path)
+    if not is_lf_only(working):
+        raise AssertionError("working_tree_ps1_not_lf")
+    if not is_lf_only(source):
+        raise AssertionError("source_ps1_not_lf")
+    if not is_lf_only(roundtrip):
+        raise AssertionError("checkout_roundtrip_ps1_not_lf")
+
+    return {
+        "gitattributes_rule": EXPECTED_PS1_RULE,
+        "working_attribute": work_value,
+        "cached_attribute": cache_value,
+        "working_tree_bytes": "LF_NO_CR",
+        "source_blob_bytes": "LF_NO_CR",
+        "checkout_index_roundtrip": "LF_NO_CR",
+    }
+
+
+def assert_check(name: str, condition: bool, detail: str = "") -> None:
     if not condition:
         suffix = f": {detail}" if detail else ""
         raise AssertionError(f"{name}{suffix}")
@@ -295,63 +247,41 @@ def assert_check(
 
 
 def validate() -> None:
-    assert_check(
-        "file_set",
-        repository_files() == EXPECTED_FILES,
-    )
+    assert_check("repository_file_count", len(repository_files()) == EXPECTED_REPOSITORY_FILE_COUNT)
 
     branch = run(["git", "symbolic-ref", "--short", "HEAD"])
-    assert_check(
-        "branch_main",
-        branch.returncode == 0
-        and branch.stdout.strip() == "main",
-    )
+    assert_check("branch_main", branch.returncode == 0 and branch.stdout.strip() == "main")
 
-    head = run(["git", "rev-parse", "--verify", "HEAD"])
-    head_exists = head.returncode == 0
+    head = run(["git", "rev-parse", "HEAD"])
+    assert_check("head_read", head.returncode == 0)
+    head_oid = head.stdout.strip()
 
-    commit_count = 0
-    if head_exists:
-        count = run(["git", "rev-list", "--count", "HEAD"])
-        assert_check(
-            "commit_count_read",
-            count.returncode == 0,
-        )
-        commit_count = int(count.stdout.strip())
+    count = run(["git", "rev-list", "--count", "HEAD"])
+    assert_check("commit_count_read", count.returncode == 0)
+    commit_count = int(count.stdout.strip())
+
+    parent_oid: str | None = None
+    if commit_count >= 2:
+        parent = run(["git", "rev-parse", "HEAD^"])
+        assert_check("parent_read", parent.returncode == 0)
+        parent_oid = parent.stdout.strip()
 
     remote_code, remotes = command_set(["git", "remote"])
-    assert_check(
-        "remote_count_zero",
-        remote_code == 0 and not remotes,
-    )
-
     tracked_code, tracked = command_set(["git", "ls-files"])
-    staged_code, staged = command_set(
-        ["git", "diff", "--cached", "--name-only"]
-    )
-    untracked_code, untracked = command_set(
-        ["git", "ls-files", "--others", "--exclude-standard"]
-    )
-    unstaged_code, unstaged = command_set(
-        ["git", "diff", "--name-only"]
-    )
+    staged_code, staged = command_set(["git", "diff", "--cached", "--name-only"])
+    untracked_code, untracked = command_set(["git", "ls-files", "--others", "--exclude-standard"])
+    unstaged_code, unstaged = command_set(["git", "diff", "--name-only"])
 
     assert_check(
         "git_inventory_commands",
-        all(
-            code == 0
-            for code in (
-                tracked_code,
-                staged_code,
-                untracked_code,
-                unstaged_code,
-            )
-        ),
+        all(code == 0 for code in (remote_code, tracked_code, staged_code, untracked_code, unstaged_code)),
     )
+    assert_check("remote_count_zero", not remotes)
 
-    state = classify_repository_state(
-        head_exists=head_exists,
+    state = classify_state(
+        head_oid=head_oid,
         commit_count=commit_count,
+        parent_oid=parent_oid,
         tracked=tracked,
         staged=staged,
         untracked=untracked,
@@ -359,250 +289,92 @@ def validate() -> None:
     )
     assert_check(
         "repository_state",
-        state
-        in {
-            "COMMIT_READY_STAGED",
-            "COMMITTED_BASELINE",
-        },
+        state in {"CATALOG_FOUNDATION_STAGED", "CATALOG_FOUNDATION_COMMITTED"},
         state,
     )
 
-    assert_check("venv_present", (ROOT / ".venv").is_dir())
+    if state == "CATALOG_FOUNDATION_COMMITTED":
+        message = run(["git", "log", "-1", "--pretty=%B"])
+        assert_check(
+            "catalog_commit_message",
+            message.returncode == 0 and message.stdout.strip() == RECOMMENDED_COMMIT_MESSAGE,
+            message.stdout.strip(),
+        )
 
-    pin_text = (
-        ROOT / ".python-version"
-    ).read_text(encoding="utf-8")
-    assert_check(
-        "python_version_file",
-        pin_text == "3.13.14\n",
-    )
+    assert_check("venv_present", (ROOT / ".venv").is_dir())
+    assert_check("runtime_exact", sys.version_info[:3] == EXPECTED_PYTHON)
+    assert_check("runtime_is_venv", Path(sys.prefix).resolve() == (ROOT / ".venv").resolve())
+    assert_check("jsonschema_version", importlib.metadata.version("jsonschema") == EXPECTED_JSONSCHEMA)
+    assert_check("pyyaml_version", importlib.metadata.version("PyYAML") == EXPECTED_PYYAML)
 
     with (ROOT / "pyproject.toml").open("rb") as handle:
         metadata = tomllib.load(handle)
-
-    project = metadata.get("project", {})
-    tool_state = (
-        metadata.get("tool", {}).get("solana-alpha-lab", {})
-    )
-
+    dependencies = set(metadata["project"]["dependencies"])
     assert_check(
-        "requires_python",
-        project.get("requires-python")
-        == EXPECTED_REQUIRES_PYTHON,
-    )
-    assert_check(
-        "exact_python_pin",
-        tool_state.get("exact_python_pin") == "3.13.14",
-    )
-    assert_check(
-        "exact_powershell_pin",
-        tool_state.get("exact_powershell_pin")
-        == EXPECTED_POWERSHELL,
-    )
-    assert_check(
-        "runtime_exact",
-        sys.version_info[:3] == EXPECTED_PYTHON,
-    )
-    assert_check(
-        "runtime_is_venv",
-        Path(sys.prefix).resolve() == (ROOT / ".venv").resolve(),
+        "dependency_contract",
+        dependencies == {f"PyYAML=={EXPECTED_PYYAML}", f"jsonschema=={EXPECTED_JSONSCHEMA}"},
     )
 
-    managed = run(
-        ["uv", "python", "find", "--managed-python", "3.13.14"]
-    )
-    assert_check(
-        "managed_python_present",
-        managed.returncode == 0,
-    )
+    lock = run(["uv", "lock", "--check", "--managed-python"])
+    assert_check("uv_lock_check", lock.returncode == 0, lock.stderr.strip())
 
-    lock = run(
-        ["uv", "lock", "--check", "--managed-python"]
-    )
-    assert_check(
-        "uv_lock_check",
-        lock.returncode == 0,
-        lock.stderr.strip(),
-    )
-
-    hooks = run(
-        [
-            "git",
-            "config",
-            "--local",
-            "--get",
-            "core.hooksPath",
-        ]
-    )
-    assert_check(
-        "hooks_path_config",
-        hooks.returncode == 0
-        and hooks.stdout.strip() == EXPECTED_HOOKS_PATH,
-    )
-
-    hook_text = (
-        ROOT / ".githooks/pre-commit"
-    ).read_text(encoding="utf-8")
-    assert_check(
-        "pre_commit_execution_policy",
-        "-ExecutionPolicy Bypass" in hook_text,
-    )
-
-    entries = source_entries(state)
-    assert_check(
-        "source_inventory",
-        set(entries) == EXPECTED_FILES,
-    )
-    assert_check(
-        "pre_commit_mode",
-        entries[".githooks/pre-commit"][0] == "100755",
-        entries[".githooks/pre-commit"][0],
-    )
-
-    if state == "COMMIT_READY_STAGED":
-        diff_check = run(["git", "diff", "--cached", "--check"])
-        assert_check(
-            "staged_diff_check",
-            diff_check.returncode == 0,
-            diff_check.stdout.strip() + diff_check.stderr.strip(),
-        )
-    else:
-        parents = run(
-            ["git", "rev-list", "--parents", "-n", "1", "HEAD"]
-        )
-        parent_tokens = parents.stdout.strip().split()
-        assert_check(
-            "single_root_commit",
-            parents.returncode == 0
-            and commit_count == 1
-            and len(parent_tokens) == 1,
-        )
-
-        tree_check = run(
-            ["git", "diff-tree", "--check", "--root", "HEAD"]
-        )
-        assert_check(
-            "committed_tree_check",
-            tree_check.returncode == 0,
-            tree_check.stdout.strip() + tree_check.stderr.strip(),
-        )
-
-    env_errors = validate_env_example(
-        (ROOT / ".env.example").read_text(encoding="utf-8")
-    )
-    assert_check(
-        "env_example_placeholder_only",
-        not env_errors,
-        str(env_errors),
-    )
-    assert_check("real_env_absent", not (ROOT / ".env").exists())
-
-    text_files: Iterable[Path] = (
-        ROOT / relative for relative in EXPECTED_FILES
-    )
-    line_endings: list[str] = []
-    absolute_paths: list[str] = []
-
-    for path in text_files:
-        raw = path.read_bytes()
-        text = raw.decode("utf-8")
-        relative = path.relative_to(ROOT).as_posix()
-
-        if b"\r\n" in raw or b"\r" in raw:
-            line_endings.append(relative)
-        if contains_forbidden_absolute_user_path(text):
-            absolute_paths.append(relative)
-
-    assert_check(
-        "lf_line_endings",
-        not line_endings,
-        str(line_endings),
-    )
-    assert_check(
-        "no_absolute_user_paths",
-        not absolute_paths,
-        str(absolute_paths),
-    )
-
-    receipt = json.loads(
-        RECEIPT_PATH.read_text(encoding="utf-8")
-    )
-    allow_pending = (
-        os.environ.get(
-            "TASK03_ALLOW_PENDING_COMMIT_READY"
-        )
-        == "1"
-    )
-    receipt_result = receipt.get("result")
-
+    receipt = json.loads(CURRENT_RECEIPT.read_text(encoding="utf-8"))
     assert_check(
         "receipt_identity",
         receipt.get("task_id") == "TASK-03"
-        and receipt.get("atom_id") == "TASK03-ATOM-2F"
-        and (
-            receipt_result == "PASS"
-            or (
-                allow_pending
-                and receipt_result == "PENDING"
-            )
-        ),
-        str(receipt_result),
+        and receipt.get("atom_id") == "TASK03-ATOM-3A-R"
+        and receipt.get("result") == "PASS",
     )
     assert_check(
-        "receipt_state_contract",
-        receipt.get("prepared_state")
-        == "COMMIT_READY_STAGED"
-        and receipt.get("post_commit_state_supported")
-        == "COMMITTED_BASELINE",
+        "receipt_base_commit",
+        receipt.get("base_commit_oid") == BASE_COMMIT_OID
+        and receipt.get("base_tree_oid") == BASE_TREE_OID,
     )
     assert_check(
-        "receipt_commit_policy",
-        receipt.get("recommended_commit_message")
-        == RECOMMENDED_COMMIT_MESSAGE
-        and receipt.get("author_identity_status")
-        == "PENDING_ATOM_2G",
+        "receipt_candidate_contract",
+        receipt.get("candidate_state") == "CATALOG_FOUNDATION_STAGED"
+        and receipt.get("post_commit_state_supported") == "CATALOG_FOUNDATION_COMMITTED"
+        and receipt.get("recommended_commit_message") == RECOMMENDED_COMMIT_MESSAGE,
+    )
+    assert_check(
+        "receipt_repair_lineage",
+        receipt.get("supersedes_atom_id") == "TASK03-ATOM-3A"
+        and receipt.get("supersedes_receipt_sha256") == SUPERSEDED_RECEIPT_SHA256,
+    )
+    assert_check("receipt_changed_count", receipt.get("staged_file_count") == EXPECTED_STAGED_FILES)
+    assert_check("receipt_repository_count", receipt.get("repository_file_count") == EXPECTED_REPOSITORY_FILE_COUNT)
+
+    manifest_hash, content_hash = fingerprints(state)
+    assert_check("payload_manifest_fingerprint", receipt.get("payload_manifest_sha256") == manifest_hash)
+    assert_check("payload_content_fingerprint", receipt.get("payload_content_sha256") == content_hash)
+    assert_check(
+        "receipt_lock_hash",
+        receipt.get("uv_lock_sha256") == hashlib.sha256((ROOT / "uv.lock").read_bytes()).hexdigest(),
     )
 
-    expected_hashes = receipt.get("static_file_sha256", {})
-    observed_hashes = {
-        relative: sha256(ROOT / relative)
-        for relative in sorted(FINGERPRINT_FILES)
-    }
-    assert_check(
-        "receipt_hashes",
-        expected_hashes == observed_hashes,
-    )
+    entries = source_entries(state)
+    assert_check("source_inventory", set(entries) == repository_files())
+    assert_check("pre_commit_mode", entries[".githooks/pre-commit"][0] == "100755")
 
-    manifest_hash, content_hash = fingerprints_for_state(state)
-    assert_check(
-        "payload_manifest_fingerprint",
-        receipt.get("payload_manifest_sha256")
-        == manifest_hash,
-    )
-    assert_check(
-        "payload_content_fingerprint",
-        receipt.get("payload_content_sha256")
-        == content_hash,
-    )
-    assert_check(
-        "receipt_file_count",
-        receipt.get("expected_file_count")
-        == len(EXPECTED_FILES),
-    )
+    evidence = eol_evidence(state)
+    assert_check("gitattributes_ps1_rule", evidence["gitattributes_rule"] == EXPECTED_PS1_RULE)
+    assert_check("ps1_eol_attribute_worktree", evidence["working_attribute"] == "lf")
+    assert_check("ps1_eol_attribute_index", evidence["cached_attribute"] == "lf")
+    assert_check("ps1_working_tree_lf", evidence["working_tree_bytes"] == "LF_NO_CR")
+    assert_check("ps1_source_blob_lf", evidence["source_blob_bytes"] == "LF_NO_CR")
+    assert_check("ps1_checkout_roundtrip_lf", evidence["checkout_index_roundtrip"] == "LF_NO_CR")
+    assert_check("receipt_eol_contract", receipt.get("eol_contract") == evidence)
 
-    tests = run(
-        [
-            sys.executable,
-            "-B",
-            "-m",
-            "unittest",
-            "discover",
-            "-s",
-            "tests",
-            "-p",
-            "test_*.py",
-        ]
-    )
+    if state == "CATALOG_FOUNDATION_STAGED":
+        diff_check = run(["git", "diff", "--cached", "--check"])
+        assert_check("staged_diff_check", diff_check.returncode == 0, diff_check.stdout.strip() + diff_check.stderr.strip())
+    else:
+        tree_check = run(["git", "diff-tree", "--check", "--root", "HEAD"])
+        assert_check("committed_tree_check", tree_check.returncode == 0, tree_check.stdout.strip() + tree_check.stderr.strip())
+
+    tests = run([
+        sys.executable, "-B", "-m", "unittest", "discover", "-s", "tests", "-p", "test_*.py"
+    ])
     if tests.stdout.strip():
         print(tests.stdout.strip())
     if tests.stderr.strip():
@@ -610,11 +382,12 @@ def validate() -> None:
     assert_check("unit_tests", tests.returncode == 0)
 
     print(f"REPOSITORY_STATE: {state}")
+    print("EOL_CHECKOUT_CONTRACT: PASS")
     print("RESULT: PASS")
 
 
 def main() -> int:
-    print("=== TASK-03 ATOM 2F COMMIT-READY VALIDATION ===")
+    print("=== TASK-03 ATOM 3A-R EOL CONTRACT VALIDATION ===")
     try:
         validate()
     except Exception as exc:

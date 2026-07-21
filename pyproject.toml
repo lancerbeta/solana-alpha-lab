@@ -3,15 +3,19 @@ name = "solana-alpha-lab"
 version = "0.0.0"
 description = "Bounded evidence-first Solana memecoin intraday alpha research."
 requires-python = ">=3.13,<3.14"
-dependencies = []
+dependencies = [
+  "PyYAML==6.0.3",
+  "jsonschema==4.26.0",
+]
 
 [tool.uv]
 package = false
 
 [tool.solana-alpha-lab]
 task = "TASK-03"
-stage = "COMMIT_READY_UNCOMMITTED"
+stage = "CATALOG_FOUNDATION_STAGED"
 exact_python_pin = "3.13.14"
 exact_powershell_pin = "7.6.3"
+catalog_version = "0.1.0"
 provider_calls_allowed = false
 real_money_allowed = false

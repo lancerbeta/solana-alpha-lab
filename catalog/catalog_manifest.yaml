@@ -1,0 +1,82 @@
+schema_version: '1.0'
+catalog_id: SMIAL-PROJECT-ASSET-CATALOG
+catalog_version: 0.1.0
+as_of: '2026-07-21'
+implementation_status: FOUNDATION_IMPLEMENTED_UNVERIFIED
+root_resolver:
+  asset_registries:
+  - catalog/assets/core.yaml
+  query_registries:
+  - catalog/query_recipes.yaml
+  schemas:
+  - catalog/schemas/catalog_manifest.schema.json
+  - catalog/schemas/asset_catalog.schema.json
+  - catalog/schemas/query_recipe.schema.json
+  commands:
+    validate:
+    - uv
+    - run
+    - --locked
+    - --managed-python
+    - python
+    - -B
+    - scripts/validate_catalog.py
+    resolve_asset:
+    - uv
+    - run
+    - --locked
+    - --managed-python
+    - python
+    - -B
+    - scripts/catalog_cli.py
+    - resolve-asset
+    - '{asset_id}'
+    - --json
+    resolve_query:
+    - uv
+    - run
+    - --locked
+    - --managed-python
+    - python
+    - -B
+    - scripts/catalog_cli.py
+    - resolve-query
+    - '{recipe_id}'
+    - --json
+policies:
+  absolute_paths: FORBIDDEN
+  secrets: FORBIDDEN
+  raw_bytes: OUTSIDE_CATALOG
+  duplicate_ids: FAIL
+  broken_references: FAIL
+  unregistered_mandatory_output: CATALOG_GAP
+  self_integrity: ACCEPTED_GIT_COMMIT_PLUS_EXTERNAL_RECEIPT
+  query_write_effects: FORBIDDEN
+  graph_database: DEFERRED_UNTIL_MEASURED_NEED_ADR
+mandatory_asset_ids:
+- SCM-BASELINE-COMMIT-001
+- ENV-WORKSTATION-001
+- CTRL-AGENTS-001
+- CTRL-TASK-03-001
+- CTRL-PYPROJECT-001
+- CTRL-UVLOCK-001
+- CTRL-QUALITY-GATE-001
+- CATALOG-ROOT-001
+- CATALOG-ASSET-REGISTRY-CORE-001
+- CATALOG-QUERY-REGISTRY-001
+- CATALOG-SCHEMA-MANIFEST-001
+- CATALOG-SCHEMA-ASSET-001
+- CATALOG-SCHEMA-QUERY-001
+- CATALOG-VALIDATOR-001
+- CATALOG-CLI-001
+- ADR-CATALOG-BASELINE-001
+- EVIDENCE-ATOM3A-RECEIPT-001
+deferred_capabilities:
+- PRE_GIT_IMPORT
+- GENERATED_PROJECT_MAP
+- GENERATED_EDGE_PROJECTION
+- REGISTRY_SKELETONS
+- REMOTE_CI
+- CLEAN_CLONE
+- CODEX_PILOT
+- GRAPH_DATABASE

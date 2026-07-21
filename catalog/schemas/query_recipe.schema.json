@@ -1,0 +1,157 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:smial:catalog:query-registry:1.0",
+  "title": "SMIAL query recipe registry",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "registry_id",
+    "as_of",
+    "recipes"
+  ],
+  "properties": {
+    "schema_version": {
+      "const": "1.0"
+    },
+    "registry_id": {
+      "type": "string",
+      "pattern": "^[A-Z][A-Z0-9]*(?:-[A-Z0-9]+)+$"
+    },
+    "as_of": {
+      "type": "string",
+      "pattern": "^20[0-9]{2}-[0-9]{2}-[0-9]{2}$"
+    },
+    "recipes": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "$ref": "#/$defs/recipe"
+      }
+    }
+  },
+  "$defs": {
+    "recipe": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "recipe_id",
+        "record_version",
+        "purpose",
+        "kind",
+        "read_only",
+        "bounded",
+        "network_required",
+        "write_effects",
+        "timeout_seconds",
+        "command",
+        "parameters",
+        "target_asset_ids",
+        "output_contract"
+      ],
+      "properties": {
+        "recipe_id": {
+          "type": "string",
+          "pattern": "^[A-Z][A-Z0-9]*(?:-[A-Z0-9]+)+$"
+        },
+        "record_version": {
+          "type": "string",
+          "pattern": "^[0-9]+\\.[0-9]+$"
+        },
+        "purpose": {
+          "type": "string",
+          "minLength": 12,
+          "maxLength": 500
+        },
+        "kind": {
+          "enum": [
+            "local_command",
+            "file_read",
+            "duckdb_readonly",
+            "http_readonly"
+          ]
+        },
+        "read_only": {
+          "const": true
+        },
+        "bounded": {
+          "const": true
+        },
+        "network_required": {
+          "type": "boolean"
+        },
+        "write_effects": {
+          "const": "NONE"
+        },
+        "timeout_seconds": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 120
+        },
+        "command": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "parameters": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "name",
+              "required",
+              "pattern"
+            ],
+            "properties": {
+              "name": {
+                "type": "string",
+                "pattern": "^[a-z][a-z0-9_]*$"
+              },
+              "required": {
+                "type": "boolean"
+              },
+              "pattern": {
+                "type": "string",
+                "minLength": 1
+              }
+            }
+          }
+        },
+        "target_asset_ids": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": {
+            "type": "string",
+            "pattern": "^[A-Z][A-Z0-9]*(?:-[A-Z0-9]+)+$"
+          }
+        },
+        "output_contract": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "format",
+            "max_records"
+          ],
+          "properties": {
+            "format": {
+              "enum": [
+                "text",
+                "json"
+              ]
+            },
+            "max_records": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 1000
+            }
+          }
+        }
+      }
+    }
+  }
+}

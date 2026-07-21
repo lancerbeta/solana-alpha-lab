@@ -1,9 +1,10 @@
 ---
 handoff_status: WORKING_CHECKPOINT
 task_id: TASK-03
-atom_id: TASK03-ATOM-2F
+atom_id: TASK03-ATOM-3A-R
 canonical_status_owner: ChatGPT_Project_Work
-accepted_commit: NONE
+accepted_base_commit: "399ef0365b017fcd9d7b81389218a63bf1e466c1"
+candidate_commit: NONE
 remote: NONE
 ---
 
@@ -11,63 +12,46 @@ remote: NONE
 
 ## Atom
 
-Commit-ready repository patch validated; commit not created.
+Catalog schemas, root resolver, and checkout/EOL repair are staged; no Catalog
+commit or remote exists.
 
-## Current state
+## Candidate state
 
-- branch: `main`, unborn
-- repository state: `COMMIT_READY_STAGED`
-- staged files: 21
-- untracked files: 0
-- unstaged files: 0
-- hook mode: `100755`
-- remote count: 0
+- base commit: `399ef0365b017fcd9d7b81389218a63bf1e466c1`;
+- repository state: `CATALOG_FOUNDATION_STAGED`;
+- total repository files: 32;
+- staged Atom 3A-R files: 21;
+- untracked and unstaged files: 0;
+- remote count: 0.
 
-## Commit boundary
+## Foundation outputs
 
-Recommended message:
+- `catalog/catalog_manifest.yaml`;
+- standalone JSON Schemas for manifest/assets/queries;
+- core asset registry and read-only query registry;
+- `scripts/validate_catalog.py`;
+- `scripts/catalog_cli.py`;
+- ADR-001 and deterministic evidence receipt.
 
-```text
-chore: establish local repository baseline
-```
+## Checkout contract
 
-Author identity remains pending explicit Atom 2G handling. The tracked
-receipt stores deterministic payload fingerprints and supports post-commit
-verification without attempting to store its own future commit hash.
+- `*.ps1 text eol=lf`;
+- working-tree and staged PowerShell bytes: LF-only;
+- `git check-attr` working/cached results: `lf`;
+- temporary `checkout-index` roundtrip: LF-only;
+- global Git configuration: unchanged.
 
-## Validation
+## Dependencies
 
-- canonical PowerShell 7 quality gate with process-scoped `-ExecutionPolicy Bypass`;
-- exact CPython and `uv.lock`;
-- staged secret scan;
-- staged whitespace and inventory checks;
-- payload manifest/content fingerprints;
-- real `git hook run pre-commit`;
-- two-state validator:
-  `COMMIT_READY_STAGED → COMMITTED_BASELINE`.
+- PyYAML `6.0.3` — exact lock, `safe_load` only;
+- jsonschema `4.26.0` — exact lock, Draft 2020-12;
+- no additional dependency or network action in Atom 3A-R.
 
-## Security and access
+## Deferred
 
-- secrets observed: 0
-- provider/API/RPC calls: 0
-- external-service writes: 0
-- remote actions: 0
-- connector permissions: 0
-- Codex writes: 0
-- wallet/signer actions: 0
-- cash spend: USD 0
-
-## Local Git writes
-
-Index entries and local blob objects exist. No commit or reference exists.
-Rollback restores the accepted Atom 2E index and files; unreachable objects
-may remain until ordinary Git garbage collection.
-
-## Unresolved
-
-First commit, remote, CI, Asset Catalog, registries, pre-Git import, clean
-clone, and Codex pilot remain unimplemented.
+Pre-Git import, generated map/edges, lifecycle registries, private remote,
+CI, clean clone, and Codex pilot remain unimplemented.
 
 ## Proposed status
 
-No canonical status change may be claimed from this working checkpoint.
+No canonical TASK-03 status change is claimed from this staged checkpoint.

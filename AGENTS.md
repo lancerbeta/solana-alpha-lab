@@ -16,9 +16,9 @@ handoff evidence but must not claim acceptance.
 
 TASK-03 — Private repository, controls & Project Asset Catalog.
 
-Current atom: commit-ready patch without commit. The exact baseline is
-staged, but commit creation, remote actions, connector permission, and Codex
-writes remain prohibited.
+Current atom: Catalog schemas, root resolver, and checkout/EOL repair. Remote
+creation, pre-Git import, lifecycle registries, generated project map, and
+Codex writes are outside this atom.
 
 ## WORKSPACE_ONLY
 
@@ -28,81 +28,66 @@ files or Catalog metadata.
 
 ## NO_SECRETS
 
-Never create, request, display, store, or commit:
-
-- `.env` values;
-- API keys, access tokens, passwords, cookies, or private endpoints;
-- seed phrases, private keys, wallet recovery data, or signer material;
-- credentials in URLs, logs, fixtures, screenshots, or exception traces.
-
-`.env.example` remains placeholder-only. Secret tests construct synthetic
-rejection fixtures in memory and contain no usable secret.
+Never create, request, display, store, or commit `.env` values, API keys,
+access tokens, passwords, cookies, seed phrases, private keys, signer
+material, credential URLs, or private endpoints.
 
 ## EXTERNAL_ACTIONS
 
-Network access is off by default. No provider/API/RPC call, account
-creation, payment, remote creation, push, pull request, connector
-permission, VPS action, wallet action, or package adoption without an
-explicit Work-approved atom.
+No provider/API/RPC call, account creation, payment, remote creation, push,
+connector permission, VPS action, wallet action, or package adoption beyond
+the exact Atom 3A dependencies without explicit Work approval.
 
 ## PYTHON_AND_DEPENDENCIES
 
-- Project runtime: uv-managed CPython 3.13.14.
-- Runtime range: Python 3.13 only.
-- Project environment: `.venv`, never global site-packages.
-- Dependency truth: `pyproject.toml` plus `uv.lock`.
-- Validation must not update the lockfile.
+- uv-managed CPython 3.13.14;
+- PowerShell 7.6.3 Core x64;
+- dependency truth: `pyproject.toml` plus `uv.lock`;
+- Atom 3A adopts exact `PyYAML==6.0.3` and `jsonschema==4.26.0` only;
+- YAML is loaded only with `yaml.safe_load`;
+- JSON Schema references are local; network schema resolution is forbidden.
+
+## PROJECT_ASSET_CATALOG
+
+- root resolver: `catalog/catalog_manifest.yaml`;
+- Catalog owns discovery, location, relations, access recipes, and evidence;
+- Git/data/runtime/specialized registries own bytes and domain truth;
+- stable IDs are immutable once committed;
+- raw/canonical bytes never enter Catalog metadata;
+- secrets and absolute paths fail validation;
+- missing mandatory output is `CATALOG_GAP`;
+- self-referential Catalog files are bound by accepted commit/tree evidence,
+  not by embedding their own hash;
+- generated views are regenerated later, never hand-edited;
+- graph database remains deferred until measured need.
+
+## TEXT_AND_CHECKOUT_CONTRACT
+
+- tracked text uses LF;
+- `*.ps1` is explicitly `text eol=lf`;
+- `*.bat` and `*.cmd` remain `text eol=crlf`;
+- do not change global `core.autocrlf` for this project;
+- the quality gate must verify `.gitattributes`, working-tree bytes,
+  staged/committed blobs, cached and working-tree attributes, and a temporary
+  checkout roundtrip before commit or clean-clone acceptance.
 
 ## LOCAL_QUALITY_GATE
 
-- PowerShell runtime: 7.6.3 Core x64.
-- Canonical command:
-  `pwsh -NoProfile -ExecutionPolicy Bypass -File .\scripts\validate.ps1`
-- Local Git hook path: `.githooks`.
-- `pre-commit` invokes the canonical command.
-- Hook bypass is not authorized.
+```powershell
+pwsh -NoProfile -ExecutionPolicy Bypass -File .\scripts\validate.ps1
+```
 
-## REPOSITORY_STATES
+Atom 3A-R accepts exactly:
 
-The quality gate accepts only:
-
-- `COMMIT_READY_STAGED`: unborn `main`, exact approved staged tree, zero
-  untracked/unstaged files, zero remotes;
-- `COMMITTED_BASELINE`: exactly one root commit, exact approved HEAD tree,
-  clean index/worktree, zero remotes.
-
-Any partial staging, additional commit, extra file, unstaged drift, remote,
-or non-root first commit fails.
-
-## COMMIT_PROTOCOL
-
-- Atom 2F prepares and fingerprints the commit-ready tree only.
-- Atom 2G separately confirms author identity policy and creates the commit.
-- The tracked receipt records payload fingerprints, not the future commit
-  hash, avoiding a self-referential commit.
-- After commit, the same quality gate must report `COMMITTED_BASELINE`.
-- The resulting commit hash is external acceptance evidence until the
-  transactional TASK-03 living-state handoff.
-
-## DATA_BOUNDARY
-
-Raw and canonical data bytes do not belong in Git. Track only approved
-schemas, contracts, sanitized fixtures, manifests, fingerprints, and
-evidence.
+- `CATALOG_FOUNDATION_STAGED`: baseline commit remains HEAD and the exact
+  Catalog plus EOL-repair candidate is staged;
+- `CATALOG_FOUNDATION_COMMITTED`: a later exact second commit contains the
+  same payload and a clean working tree.
 
 ## CHANGE_PROTOCOL
 
-Before editing:
-
-1. read this file and `docs/tasks/TASK-03.md`;
-2. confirm the named atom and allowed files;
-3. stop on secrets, unexpected files, broader access, payment, or scope
-   expansion.
-
-After editing:
-
-1. run the canonical validation command;
-2. inspect staged or committed tree evidence;
-3. update `docs/handoffs/latest.md`;
-4. do not commit, push, or change canonical status unless explicitly
-   authorized.
+1. Read this file and `docs/tasks/TASK-03.md`.
+2. Resolve relevant assets through the Catalog, not filename guessing.
+3. Run the canonical quality gate.
+4. Do not commit, push, connect GitHub, import pre-Git bundles, or give Codex
+   write access unless the active atom explicitly authorizes it.

@@ -1,0 +1,85 @@
+schema_version: '1.0'
+registry_id: CATALOG-QUERY-REGISTRY-001
+as_of: '2026-07-21'
+recipes:
+- recipe_id: QUERY-CATALOG-VALIDATE-001
+  record_version: '1.0'
+  purpose: Validate Catalog schemas, paths, references, integrity, and policy without network access.
+  kind: local_command
+  read_only: true
+  bounded: true
+  network_required: false
+  write_effects: NONE
+  timeout_seconds: 60
+  command:
+  - uv
+  - run
+  - --locked
+  - --managed-python
+  - python
+  - -B
+  - scripts/validate_catalog.py
+  parameters: []
+  target_asset_ids:
+  - CATALOG-ROOT-001
+  output_contract:
+    format: text
+    max_records: 100
+- recipe_id: QUERY-CATALOG-RESOLVE-ASSET-001
+  record_version: '1.0'
+  purpose: Resolve one stable asset ID to its canonical metadata record without filesystem search.
+  kind: local_command
+  read_only: true
+  bounded: true
+  network_required: false
+  write_effects: NONE
+  timeout_seconds: 30
+  command:
+  - uv
+  - run
+  - --locked
+  - --managed-python
+  - python
+  - -B
+  - scripts/catalog_cli.py
+  - resolve-asset
+  - '{asset_id}'
+  - --json
+  parameters:
+  - name: asset_id
+    required: true
+    pattern: ^[A-Z][A-Z0-9]*(?:-[A-Z0-9]+)+$
+  target_asset_ids:
+  - CATALOG-ROOT-001
+  output_contract:
+    format: json
+    max_records: 1
+- recipe_id: QUERY-CATALOG-RESOLVE-QUERY-001
+  record_version: '1.0'
+  purpose: Resolve one stable query recipe ID to its bounded read-only execution contract.
+  kind: local_command
+  read_only: true
+  bounded: true
+  network_required: false
+  write_effects: NONE
+  timeout_seconds: 30
+  command:
+  - uv
+  - run
+  - --locked
+  - --managed-python
+  - python
+  - -B
+  - scripts/catalog_cli.py
+  - resolve-query
+  - '{recipe_id}'
+  - --json
+  parameters:
+  - name: recipe_id
+    required: true
+    pattern: ^[A-Z][A-Z0-9]*(?:-[A-Z0-9]+)+$
+  target_asset_ids:
+  - CATALOG-QUERY-REGISTRY-001
+  output_contract:
+    format: json
+    max_records: 1

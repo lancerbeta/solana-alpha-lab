@@ -3,37 +3,28 @@
 A bounded, evidence-first research system for executable Solana memecoin
 alpha on a 15-minute to 4-hour horizon.
 
-## Current control state
-
-- Phase: P0 — Project Control & Source Foundation
-- Active task: TASK-03 — Private repository, controls & Project Asset Catalog
-- Local branch: `main`
-- First commit: not created
-- Remote repository: absent
-- Provider/API/RPC calls: zero
-- Real-money execution: prohibited
-- TASK-03 cash cap: USD 0
-
-## Business objective
-
-Build a low-cost, repeatable Alpha Factory whose eventual success criterion
-is owner cashflow after trading and infrastructure cash costs. Backtest PnL,
-code volume, dataset size, and bot count are not business outcomes.
-
 ## Current repository stage
 
-The repository contains a reviewed commit-ready baseline:
+TASK-03 is building the private implementation truth layer. The local root
+commit is accepted. Atom 3A adds the staged Project Asset Catalog foundation:
 
-- uv-managed CPython 3.13.14 and deterministic `uv.lock`;
-- PowerShell 7.6.3 one-command quality gate;
-- repository and staged-content secret rejection;
-- versioned `.githooks/pre-commit`;
-- deterministic payload fingerprints;
-- support for validation both immediately before and immediately after the
-  first local commit.
+- `catalog/catalog_manifest.yaml` as the stable root resolver;
+- versioned asset and query registries;
+- standalone JSON Schema Draft 2020-12 files;
+- deterministic Catalog validator and read-only resolver CLI;
+- exact locked dependencies for safe YAML and JSON Schema validation.
 
-The commit itself, remote, CI, Asset Catalog, registry import, and Codex
-pilot are not accepted yet.
+Atom 3A-R also repairs the checkout contract before the Catalog commit:
+
+- tracked text is LF;
+- PowerShell `.ps1` files are explicitly materialized as LF;
+- `.bat` and `.cmd` remain CRLF;
+- the quality gate checks working-tree bytes, staged/committed blobs,
+  `git check-attr`, and a temporary `checkout-index` roundtrip.
+
+The Catalog foundation is staged but not committed. Pre-Git TASK-01/02 import,
+generated project map/edges, lifecycle registries, private remote, CI, clean
+clone, and Codex pilot remain unimplemented.
 
 ## One-command validation
 
@@ -41,30 +32,26 @@ pilot are not accepted yet.
 pwsh -NoProfile -ExecutionPolicy Bypass -File .\scripts\validate.ps1
 ```
 
-Supported actual states:
-
-- `COMMIT_READY_STAGED`: no commit exists and the exact approved tree is
-  staged;
-- `COMMITTED_BASELINE`: exactly one root commit exists and the working tree
-  is clean.
-
-The pre-commit hook validates `COMMIT_READY_STAGED`. The same command must
-validate `COMMITTED_BASELINE` after the separately authorized commit.
-
-## Commit boundary
-
-Recommended first commit message:
+Expected additions:
 
 ```text
-chore: establish local repository baseline
+CATALOG_VALIDATION: PASS
+CATALOG_RESOLUTION: PASS
+ps1_eol_attribute_worktree: PASS
+ps1_eol_attribute_index: PASS
+ps1_checkout_roundtrip_lf: PASS
+REPOSITORY_STATE: CATALOG_FOUNDATION_STAGED
+RESULT: PASS
 ```
 
-Author identity and commit creation remain separate Atom 2G decisions.
-The tracked receipt does not contain a commit hash, avoiding self-reference;
-acceptance records the resulting hash externally and later in living state.
+## Catalog usage
 
-## Security boundary
+```powershell
+uv run --locked --managed-python python -B .\scripts\catalog_cli.py list-assets
+uv run --locked --managed-python python -B .\scripts\catalog_cli.py resolve-asset CATALOG-ROOT-001 --json
+uv run --locked --managed-python python -B .\scripts\catalog_cli.py resolve-query QUERY-CATALOG-VALIDATE-001 --json
+```
 
-Do not place `.env`, credentials, tokens, seed phrases, private keys, raw
-data, wallet mappings, or machine-specific absolute paths in this
-repository.
+All commands are local and read-only. Catalog metadata contains no secrets,
+raw data bytes, provider credentials, wallet material, or machine-specific
+absolute paths.

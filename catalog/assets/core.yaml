@@ -1,0 +1,528 @@
+schema_version: '1.0'
+registry_id: CATALOG-ASSET-REGISTRY-CORE-001
+as_of: '2026-07-21'
+records:
+- asset_id: SCM-BASELINE-COMMIT-001
+  record_version: '1.0'
+  asset_type: repository_snapshot
+  purpose: Accepted first local root commit that established repository controls before Catalog work.
+  status: VALIDATED_LOCAL_COMMITTED
+  origin: REPOSITORY
+  as_of: '2026-07-21'
+  truth_owner: TASK-03
+  location:
+    kind: git_commit
+    logical_uri: git://commit/399ef0365b017fcd9d7b81389218a63bf1e466c1
+  integrity:
+    kind: git_commit
+    commit_oid: 399ef0365b017fcd9d7b81389218a63bf1e466c1
+    tree_oid: 8f5559723ca0aefb4fa706131d3b1839481be19d
+  access:
+    mode: read_only
+    method: git_object
+    network_required: false
+    secrets_required: false
+  relations:
+  - relation_type: governed_by
+    target_asset_id: CTRL-TASK-03-001
+  consumers:
+  - TASK-03
+  evidence:
+  - evidence_id: EVIDENCE-ATOM2G-RUNTIME-001
+    kind: runtime_receipt
+    reference: TASK03-ATOM2G-C external receipt
+    result: PASS
+  classification:
+    contains_secrets: false
+    contains_raw_data: false
+    sensitivity: INTERNAL_NON_SECRET
+- asset_id: ENV-WORKSTATION-001
+  record_version: '1.0'
+  asset_type: environment
+  purpose: Validated Windows workstation and local development toolchain used by TASK-03.
+  status: VALIDATED_ACTIVE
+  origin: RUNTIME
+  as_of: '2026-07-21'
+  truth_owner: TASK-03
+  location:
+    kind: runtime
+    logical_uri: runtime://workstation/local
+  integrity:
+    kind: runtime_receipt
+    reference: TASK-02 validation receipt
+  access:
+    mode: task_write
+    method: runtime_attestation
+    network_required: false
+    secrets_required: false
+  relations:
+  - relation_type: produces
+    target_asset_id: SCM-BASELINE-COMMIT-001
+  consumers:
+  - TASK-03
+  evidence: []
+  classification:
+    contains_secrets: false
+    contains_raw_data: false
+    sensitivity: INTERNAL_NON_SECRET
+- asset_id: CTRL-AGENTS-001
+  record_version: '1.0'
+  asset_type: control_document
+  purpose: Repository-level agent contract for scope, safety, validation, and status ownership.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-07-21'
+  truth_owner: TASK-03
+  location:
+    kind: git_path
+    logical_uri: repo://AGENTS.md
+    repository_path: AGENTS.md
+  integrity:
+    kind: sha256
+    sha256: e539dfe03675b5ddbf0afaeaa20231c6a07be39bcb9e0ea06dbaa7871a608f89
+  access:
+    mode: read_only
+    method: file
+    recipe_id: QUERY-CATALOG-RESOLVE-ASSET-001
+    network_required: false
+    secrets_required: false
+  relations:
+  - relation_type: governed_by
+    target_asset_id: CTRL-TASK-03-001
+  consumers:
+  - TASK-03
+  evidence: []
+  classification:
+    contains_secrets: false
+    contains_raw_data: false
+    sensitivity: INTERNAL_NON_SECRET
+- asset_id: CTRL-TASK-03-001
+  record_version: '1.0'
+  asset_type: control_document
+  purpose: Active implementation contract and Definition of Done mirror for TASK-03.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-07-21'
+  truth_owner: TASK-03
+  location:
+    kind: git_path
+    logical_uri: repo://docs/tasks/TASK-03.md
+    repository_path: docs/tasks/TASK-03.md
+  integrity:
+    kind: sha256
+    sha256: 5571094cf81a1820dc60bb5ec53fe9f73867bac709d67c9df35b1d11e017ae18
+  access:
+    mode: read_only
+    method: file
+    network_required: false
+    secrets_required: false
+  relations:
+  - relation_type: contains
+    target_asset_id: CATALOG-ROOT-001
+  consumers:
+  - TASK-03
+  evidence: []
+  classification:
+    contains_secrets: false
+    contains_raw_data: false
+    sensitivity: INTERNAL_NON_SECRET
+- asset_id: CTRL-PYPROJECT-001
+  record_version: '1.0'
+  asset_type: configuration
+  purpose: Exact project runtime and dependency declaration for the repository.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-07-21'
+  truth_owner: TASK-03
+  location:
+    kind: git_path
+    logical_uri: repo://pyproject.toml
+    repository_path: pyproject.toml
+  integrity:
+    kind: sha256
+    sha256: b5ea5ae8543bac762053b868bb7cfd7d58b9905d73632f10d7577d0c1931dece
+  access:
+    mode: read_only
+    method: file
+    network_required: false
+    secrets_required: false
+  relations:
+  - relation_type: depends_on
+    target_asset_id: ENV-WORKSTATION-001
+  consumers:
+  - TASK-03
+  evidence: []
+  classification:
+    contains_secrets: false
+    contains_raw_data: false
+    sensitivity: INTERNAL_NON_SECRET
+- asset_id: CTRL-UVLOCK-001
+  record_version: '1.0'
+  asset_type: lockfile
+  purpose: Deterministic dependency lock including Catalog validation dependencies.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-07-21'
+  truth_owner: TASK-03
+  location:
+    kind: git_path
+    logical_uri: repo://uv.lock
+    repository_path: uv.lock
+  integrity:
+    kind: sha256
+    sha256: 7fc04ac7585f8f4807140d14792033f2702bc74ac158217e6afb9aafd831bb7c
+  access:
+    mode: read_only
+    method: file
+    network_required: false
+    secrets_required: false
+  relations:
+  - relation_type: depends_on
+    target_asset_id: CTRL-PYPROJECT-001
+  consumers:
+  - TASK-03
+  evidence: []
+  classification:
+    contains_secrets: false
+    contains_raw_data: false
+    sensitivity: INTERNAL_NON_SECRET
+- asset_id: CTRL-QUALITY-GATE-001
+  record_version: '1.0'
+  asset_type: script
+  purpose: One-command local quality gate for runtime, secrets, Catalog, repository policy, and hooks.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-07-21'
+  truth_owner: TASK-03
+  location:
+    kind: git_path
+    logical_uri: repo://scripts/validate.ps1
+    repository_path: scripts/validate.ps1
+  integrity:
+    kind: sha256
+    sha256: 3d00ae5b1be5157efe2edf446689dea7be9a423747b2a305be09fda081900faf
+  access:
+    mode: read_only
+    method: command
+    recipe_id: QUERY-CATALOG-VALIDATE-001
+    network_required: false
+    secrets_required: false
+  relations:
+  - relation_type: validated_by
+    target_asset_id: CATALOG-VALIDATOR-001
+  consumers:
+  - TASK-03
+  evidence: []
+  classification:
+    contains_secrets: false
+    contains_raw_data: false
+    sensitivity: INTERNAL_NON_SECRET
+- asset_id: CATALOG-ROOT-001
+  record_version: '1.0'
+  asset_type: catalog_root
+  purpose: Stable machine-readable resolver for Catalog registries, schemas, commands, and policies.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-07-21'
+  truth_owner: TASK-03
+  location:
+    kind: git_path
+    logical_uri: repo://catalog/catalog_manifest.yaml
+    repository_path: catalog/catalog_manifest.yaml
+  integrity:
+    kind: catalog_commit
+    note: Self-referential root is bound by accepted commit/tree and external receipt.
+  access:
+    mode: read_only
+    method: file
+    recipe_id: QUERY-CATALOG-RESOLVE-ASSET-001
+    network_required: false
+    secrets_required: false
+  relations:
+  - relation_type: contains
+    target_asset_id: CATALOG-ASSET-REGISTRY-CORE-001
+  - relation_type: contains
+    target_asset_id: CATALOG-QUERY-REGISTRY-001
+  - relation_type: validated_by
+    target_asset_id: CATALOG-VALIDATOR-001
+  - relation_type: governed_by
+    target_asset_id: ADR-CATALOG-BASELINE-001
+  consumers:
+  - TASK-03
+  evidence: []
+  classification:
+    contains_secrets: false
+    contains_raw_data: false
+    sensitivity: INTERNAL_NON_SECRET
+- asset_id: CATALOG-ASSET-REGISTRY-CORE-001
+  record_version: '1.0'
+  asset_type: catalog_registry
+  purpose: Core Catalog asset records for repository controls, environment, schemas, and evidence.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-07-21'
+  truth_owner: TASK-03
+  location:
+    kind: git_path
+    logical_uri: repo://catalog/assets/core.yaml
+    repository_path: catalog/assets/core.yaml
+  integrity:
+    kind: catalog_commit
+    note: Registry does not embed its own hash; commit/tree receipt owns self-integrity.
+  access:
+    mode: read_only
+    method: file
+    network_required: false
+    secrets_required: false
+  relations:
+  - relation_type: depends_on
+    target_asset_id: CATALOG-SCHEMA-ASSET-001
+  consumers:
+  - TASK-03
+  evidence: []
+  classification:
+    contains_secrets: false
+    contains_raw_data: false
+    sensitivity: INTERNAL_NON_SECRET
+- asset_id: CATALOG-QUERY-REGISTRY-001
+  record_version: '1.0'
+  asset_type: catalog_registry
+  purpose: Bounded read-only query and command recipes used to validate and resolve Catalog records.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-07-21'
+  truth_owner: TASK-03
+  location:
+    kind: git_path
+    logical_uri: repo://catalog/query_recipes.yaml
+    repository_path: catalog/query_recipes.yaml
+  integrity:
+    kind: catalog_commit
+    note: Registry is bound by accepted commit/tree evidence.
+  access:
+    mode: read_only
+    method: file
+    network_required: false
+    secrets_required: false
+  relations:
+  - relation_type: depends_on
+    target_asset_id: CATALOG-SCHEMA-QUERY-001
+  consumers:
+  - TASK-03
+  evidence: []
+  classification:
+    contains_secrets: false
+    contains_raw_data: false
+    sensitivity: INTERNAL_NON_SECRET
+- asset_id: CATALOG-SCHEMA-MANIFEST-001
+  record_version: '1.0'
+  asset_type: schema
+  purpose: Standalone Draft 2020-12 schema for the Catalog root manifest.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-07-21'
+  truth_owner: TASK-03
+  location:
+    kind: git_path
+    logical_uri: repo://catalog/schemas/catalog_manifest.schema.json
+    repository_path: catalog/schemas/catalog_manifest.schema.json
+  integrity:
+    kind: sha256
+    sha256: 7a35de582baae3a367b49e0ec6e11562c1a9776cb10126bcde03712ed1f5f2d8
+  access:
+    mode: read_only
+    method: file
+    network_required: false
+    secrets_required: false
+  relations:
+  - relation_type: validated_by
+    target_asset_id: CATALOG-VALIDATOR-001
+  consumers:
+  - TASK-03
+  evidence: []
+  classification:
+    contains_secrets: false
+    contains_raw_data: false
+    sensitivity: INTERNAL_NON_SECRET
+- asset_id: CATALOG-SCHEMA-ASSET-001
+  record_version: '1.0'
+  asset_type: schema
+  purpose: Standalone Draft 2020-12 schema for typed asset registry records.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-07-21'
+  truth_owner: TASK-03
+  location:
+    kind: git_path
+    logical_uri: repo://catalog/schemas/asset_catalog.schema.json
+    repository_path: catalog/schemas/asset_catalog.schema.json
+  integrity:
+    kind: sha256
+    sha256: fa9c4ef517be86021c964e48b0c9a4f1ee01f82aa0fe89c0efa73bcefdb37ec2
+  access:
+    mode: read_only
+    method: file
+    network_required: false
+    secrets_required: false
+  relations:
+  - relation_type: validated_by
+    target_asset_id: CATALOG-VALIDATOR-001
+  consumers:
+  - TASK-03
+  evidence: []
+  classification:
+    contains_secrets: false
+    contains_raw_data: false
+    sensitivity: INTERNAL_NON_SECRET
+- asset_id: CATALOG-SCHEMA-QUERY-001
+  record_version: '1.0'
+  asset_type: schema
+  purpose: Standalone Draft 2020-12 schema for bounded read-only query recipes.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-07-21'
+  truth_owner: TASK-03
+  location:
+    kind: git_path
+    logical_uri: repo://catalog/schemas/query_recipe.schema.json
+    repository_path: catalog/schemas/query_recipe.schema.json
+  integrity:
+    kind: sha256
+    sha256: 03c38476880cbc3b18e44fd2a5b0aa24aa629cceeb5a36013db944a04194abd4
+  access:
+    mode: read_only
+    method: file
+    network_required: false
+    secrets_required: false
+  relations:
+  - relation_type: validated_by
+    target_asset_id: CATALOG-VALIDATOR-001
+  consumers:
+  - TASK-03
+  evidence: []
+  classification:
+    contains_secrets: false
+    contains_raw_data: false
+    sensitivity: INTERNAL_NON_SECRET
+- asset_id: CATALOG-VALIDATOR-001
+  record_version: '1.0'
+  asset_type: script
+  purpose: Deterministic schema and semantic validator for Catalog policy and integrity.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-07-21'
+  truth_owner: TASK-03
+  location:
+    kind: git_path
+    logical_uri: repo://scripts/validate_catalog.py
+    repository_path: scripts/validate_catalog.py
+  integrity:
+    kind: sha256
+    sha256: 7ff4180b257e36b6821c31cdc0ccf1af56721b6e743d97af6fd0730465ac5c17
+  access:
+    mode: read_only
+    method: command
+    recipe_id: QUERY-CATALOG-VALIDATE-001
+    network_required: false
+    secrets_required: false
+  relations:
+  - relation_type: depends_on
+    target_asset_id: CTRL-UVLOCK-001
+  consumers:
+  - TASK-03
+  evidence: []
+  classification:
+    contains_secrets: false
+    contains_raw_data: false
+    sensitivity: INTERNAL_NON_SECRET
+- asset_id: CATALOG-CLI-001
+  record_version: '1.0'
+  asset_type: script
+  purpose: Read-only stable-ID CLI for listing and resolving asset and query records.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-07-21'
+  truth_owner: TASK-03
+  location:
+    kind: git_path
+    logical_uri: repo://scripts/catalog_cli.py
+    repository_path: scripts/catalog_cli.py
+  integrity:
+    kind: sha256
+    sha256: 995175d69d1b95cb6e7694c67550c94ba63c8548082f18cb781bb21ecb63344e
+  access:
+    mode: read_only
+    method: command
+    recipe_id: QUERY-CATALOG-RESOLVE-ASSET-001
+    network_required: false
+    secrets_required: false
+  relations:
+  - relation_type: depends_on
+    target_asset_id: CATALOG-ROOT-001
+  consumers:
+  - TASK-03
+  evidence: []
+  classification:
+    contains_secrets: false
+    contains_raw_data: false
+    sensitivity: INTERNAL_NON_SECRET
+- asset_id: ADR-CATALOG-BASELINE-001
+  record_version: '1.0'
+  asset_type: decision
+  purpose: Accepted decision for typed YAML plus JSON Schema Catalog baseline and graph database deferral.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-07-21'
+  truth_owner: TASK-03
+  location:
+    kind: git_path
+    logical_uri: repo://docs/decisions/ADR-001-project-asset-catalog-baseline.md
+    repository_path: docs/decisions/ADR-001-project-asset-catalog-baseline.md
+  integrity:
+    kind: sha256
+    sha256: 0d5993c66a36055b4c8aeff05aee7d1c1a54fa4bd1feefc866d29d78410821d8
+  access:
+    mode: read_only
+    method: file
+    network_required: false
+    secrets_required: false
+  relations:
+  - relation_type: governed_by
+    target_asset_id: CTRL-TASK-03-001
+  consumers:
+  - TASK-03
+  evidence: []
+  classification:
+    contains_secrets: false
+    contains_raw_data: false
+    sensitivity: INTERNAL_NON_SECRET
+- asset_id: EVIDENCE-ATOM3A-RECEIPT-001
+  record_version: '1.1'
+  asset_type: evidence
+  purpose: Deterministic staged-candidate receipt for Catalog foundation validation, checkout/EOL repair, and fingerprints.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-07-21'
+  truth_owner: TASK-03
+  location:
+    kind: git_path
+    logical_uri: repo://docs/evidence/task03_atom3a_catalog_foundation_receipt.json
+    repository_path: docs/evidence/task03_atom3a_catalog_foundation_receipt.json
+  integrity:
+    kind: catalog_commit
+    note: Receipt excludes itself from payload fingerprints and is bound by the candidate/commit tree.
+  access:
+    mode: read_only
+    method: file
+    network_required: false
+    secrets_required: false
+  relations:
+  - relation_type: evidenced_by
+    target_asset_id: CATALOG-ROOT-001
+  consumers:
+  - TASK-03
+  evidence: []
+  classification:
+    contains_secrets: false
+    contains_raw_data: false
+    sensitivity: INTERNAL_NON_SECRET

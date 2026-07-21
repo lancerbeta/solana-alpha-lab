@@ -5,7 +5,7 @@ implementation_status: IN_PROGRESS
 canonical_status_owner: ChatGPT_Project_Work
 phase: P0
 cash_cap: USD_0
-repository_commit: NONE
+repository_commit: "399ef0365b017fcd9d7b81389218a63bf1e466c1"
 remote: NONE
 provider_calls: 0
 contains_secrets: false
@@ -15,56 +15,57 @@ contains_secrets: false
 
 ## Accepted checkpoints
 
-- TASK-02: DONE.
-- Local repository/security baseline: validated.
-- uv-managed CPython 3.13.14 and `uv.lock`: validated.
-- PowerShell 7.6.3 local quality gate: validated.
-- Host execution policy requires process-scoped `-ExecutionPolicy Bypass` for repository-owned unsigned validation scripts; no persistent policy change.
-- Secret rejection and versioned pre-commit hook: validated.
-- First-commit candidate staging evidence: validated.
-- Commits: 0.
-- Remotes: 0.
-- Provider/API/RPC calls: 0.
-- Project Asset Catalog: not implemented.
-- Codex workspace/write access: not granted.
+- TASK-02 and Source activation: accepted.
+- Local root commit `399ef0365b017fcd9d7b81389218a63bf1e466c1`:
+  `COMMITTED_BASELINE`, clean, no remote.
+- uv-managed CPython 3.13.14 and PowerShell 7.6.3: validated.
+- Local secret rejection and versioned pre-commit hook: validated.
 
-## Current atom
+## Current atom — 3A-R
 
-Prepare the exact repository tree for a separately authorized first commit:
+Implement and stage the Catalog foundation, with the pre-commit EOL repair:
 
-- replace pre-commit-only assertions with a two-state validator;
-- preserve strict staged-tree validation before commit;
-- support exactly one clean root commit after commit;
-- create a commit-ready receipt with deterministic payload fingerprints;
-- avoid embedding the unknown future commit hash in the commit itself;
-- leave author identity and commit execution to Atom 2G.
+- root resolver;
+- manifest, asset-registry, and query-recipe schemas;
+- one core asset registry with current repository/control assets;
+- bounded read-only query registry;
+- deterministic Catalog validator and resolver CLI;
+- dependency adoption ADR;
+- unit and negative tests;
+- exact staged candidate receipt;
+- `*.ps1 text eol=lf` checkout policy and roundtrip validation.
 
-## Not allowed
+## Explicitly excluded
 
-- creating the first commit;
-- remote or GitHub repository creation;
-- connector permission;
-- Codex workspace/write action;
-- provider account/key/API/RPC call;
-- trading/data dependencies;
-- raw/canonical data;
-- database, VPS, wallet, signer, or real money.
+- pre-Git TASK-01/02 import;
+- lifecycle registry skeletons;
+- generated project map and edge projection;
+- private remote, CI, clean clone;
+- GitHub connector permissions;
+- Codex workspace/write actions;
+- provider/API/RPC calls;
+- raw/canonical data, DB, VPS, wallet, signer, or real money.
 
-## Acceptance
+## Atom 3A-R acceptance
 
-- repository state is `COMMIT_READY_STAGED`;
-- exactly 21 approved files are staged;
-- no untracked or unstaged file remains;
-- `.githooks/pre-commit` has mode `100755`;
-- staged secret scan and whitespace check pass;
-- payload manifest/content fingerprints match the Atom 2F receipt;
-- real pre-commit hook and canonical quality gate pass;
-- validator is statically proven to accept exactly one clean root commit
-  with the same payload fingerprints;
-- commit count and remote count remain zero.
+- exact dependencies are locked: `PyYAML==6.0.3`, `jsonschema==4.26.0`;
+- root manifest and three standalone schemas validate;
+- stable asset/query IDs are unique and mandatory IDs resolve;
+- all relations and query targets resolve;
+- repository paths are relative, present, and inside the repository;
+- declared SHA-256 values match non-self-referential files;
+- self-referential Catalog roots use accepted-commit evidence policy;
+- query recipes are bounded, read-only, and no-write;
+- duplicate, broken-reference, absolute-path, hash-drift, and write-effect
+  negative tests fail as designed;
+- resolver CLI returns the expected root asset and validation recipe;
+- `.gitattributes` declares `*.ps1 text eol=lf` and forbids the old CRLF rule;
+- working-tree, staged/committed, cached-attribute, and temporary checkout
+  checks all prove LF-only PowerShell bytes;
+- exact 21-file Atom 3A-R changed set is staged; no unstaged/untracked drift;
+- no commit or remote is created.
 
-## Next atom after acceptance
+## Next atom
 
-Atom 2G confirms the repository-local author identity policy, creates one
-local root commit with the approved message, and validates the resulting
-`COMMITTED_BASELINE`. Remote creation remains a later separate action.
+Review and separately authorize the Catalog-foundation commit. Pre-Git import
+remains a later atom after the committed foundation is accepted.
