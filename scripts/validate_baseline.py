@@ -179,6 +179,19 @@ ATOM7_REF_NORMALIZATION_REPAIR_FILES = {
     "scripts/validate_baseline.py",
     "tests/test_baseline.py",
 }
+ATOM7_REF_NORMALIZATION_REPAIR_COMMIT_OID = (
+    "9c284a25f6f6ce42fa2617f410fbbc9806f84ffd"
+)
+ATOM7_SINGLE_BRANCH_REFSPEC_REPAIR_COMMIT_COUNT = (
+    ATOM7_REF_NORMALIZATION_REPAIR_COMMIT_COUNT + 1
+)
+ATOM7_SINGLE_BRANCH_REFSPEC_REPAIR_COMMIT_SUBJECT = (
+    "fix: support single-branch clean clone refspec"
+)
+ATOM7_SINGLE_BRANCH_REFSPEC_REPAIR_FILES = {
+    "scripts/validate_baseline.py",
+    "tests/test_baseline.py",
+}
 EXPECTED_DEFERRED_CAPABILITIES = {"GRAPH_DATABASE"}
 EXPECTED_ORIGIN_URL = "https://github.com/lancerbeta/solana-alpha-lab.git"
 EXPECTED_CI_ORIGIN_URLS = {
@@ -187,6 +200,9 @@ EXPECTED_CI_ORIGIN_URLS = {
 }
 EXPECTED_GITHUB_REPOSITORY = "lancerbeta/solana-alpha-lab"
 EXPECTED_ORIGIN_FETCH_REFSPEC = "+refs/heads/*:refs/remotes/origin/*"
+EXPECTED_SINGLE_BRANCH_FETCH_REFSPEC = (
+    "+refs/heads/main:refs/remotes/origin/main"
+)
 REMOTE_REF_PREFIX = "refs/remotes/"
 CODEX_CAPTURE_REF_PATTERN = re.compile(
     r"^refs/codex/turn-diffs/captures/[0-9]{13}/"
@@ -319,13 +335,15 @@ def classify_git_topology(
         return "INVALID_GIT_TOPOLOGY"
 
     if github_actions:
-        origin_ok = (
+        origin_identity_ok = (
             remotes == {"origin"}
             and len(fetch_urls) == 1
             and fetch_urls == push_urls
             and origin_url_is_safe(fetch_urls[0], github_actions=True)
-            and fetch_refspecs == (EXPECTED_ORIGIN_FETCH_REFSPEC,)
             and remote_head_target is None
+        )
+        refspec_policy_ok = fetch_refspecs == (
+            EXPECTED_ORIGIN_FETCH_REFSPEC,
         )
         refs_ok = (
             branch in {None, "main"}
@@ -343,7 +361,7 @@ def classify_git_topology(
             and github_ref == "refs/heads/main"
             and github_sha == head_oid
         )
-        if origin_ok and refs_ok and upstream_ok and context_ok:
+        if origin_identity_ok and refspec_policy_ok and refs_ok and upstream_ok and context_ok:
             return "GITHUB_ACTIONS_CHECKOUT"
         return "INVALID_GIT_TOPOLOGY"
 
@@ -363,25 +381,33 @@ def classify_git_topology(
             return "PRE_REMOTE"
         return "INVALID_GIT_TOPOLOGY"
 
-    origin_ok = (
+    origin_identity_ok = (
         remotes == {"origin"}
         and fetch_urls == (EXPECTED_ORIGIN_URL,)
         and push_urls == (EXPECTED_ORIGIN_URL,)
         and origin_url_is_safe(fetch_urls[0], github_actions=False)
-        and fetch_refspecs == (EXPECTED_ORIGIN_FETCH_REFSPEC,)
     )
-    if not origin_ok:
+    if not origin_identity_ok:
         return "INVALID_GIT_TOPOLOGY"
 
+    wildcard_refspec_ok = fetch_refspecs == (
+        EXPECTED_ORIGIN_FETCH_REFSPEC,
+    )
+    single_branch_refspec_ok = fetch_refspecs == (
+        EXPECTED_SINGLE_BRANCH_FETCH_REFSPEC,
+    )
+
     if (
-        upstream is None
+        wildcard_refspec_ok
+        and upstream is None
         and not remote_tracking_refs
         and remote_head_target is None
         and repository_refs == {"refs/heads/main"}
     ):
         return "BOUND_PRE_PUSH"
     if (
-        upstream == "origin/main"
+        wildcard_refspec_ok
+        and upstream == "origin/main"
         and remote_tracking_refs == {"origin/main"}
         and remote_head_target is None
         and repository_refs
@@ -389,7 +415,8 @@ def classify_git_topology(
     ):
         return "PUBLISHED_LOCAL"
     if (
-        upstream == "origin/main"
+        (wildcard_refspec_ok or single_branch_refspec_ok)
+        and upstream == "origin/main"
         and remote_tracking_refs == {"origin/HEAD", "origin/main"}
         and remote_head_target == "refs/remotes/origin/main"
         and repository_refs
@@ -732,6 +759,31 @@ def classify_state(
         and commit_changed == ATOM7_REF_NORMALIZATION_REPAIR_FILES
     ):
         return "ATOM7_REF_NORMALIZATION_REPAIR_COMMITTED"
+    if (
+        head_oid == ATOM7_REF_NORMALIZATION_REPAIR_COMMIT_OID
+        and commit_count == ATOM7_REF_NORMALIZATION_REPAIR_COMMIT_COUNT
+        and parent_oid == ATOM7_FINAL_HANDOFF_COMMIT_OID
+        and tracked == atom7_files
+        and len(tracked) == ATOM7_EXPECTED_REPOSITORY_FILE_COUNT
+        and staged == ATOM7_SINGLE_BRANCH_REFSPEC_REPAIR_FILES
+        and not unstaged
+        and not untracked
+        and commit_subject == ATOM7_REF_NORMALIZATION_REPAIR_COMMIT_SUBJECT
+        and commit_changed == ATOM7_REF_NORMALIZATION_REPAIR_FILES
+    ):
+        return "ATOM7_SINGLE_BRANCH_REFSPEC_REPAIR_STAGED"
+    if (
+        commit_count == ATOM7_SINGLE_BRANCH_REFSPEC_REPAIR_COMMIT_COUNT
+        and parent_oid == ATOM7_REF_NORMALIZATION_REPAIR_COMMIT_OID
+        and tracked == atom7_files
+        and len(tracked) == ATOM7_EXPECTED_REPOSITORY_FILE_COUNT
+        and not staged
+        and not unstaged
+        and not untracked
+        and commit_subject == ATOM7_SINGLE_BRANCH_REFSPEC_REPAIR_COMMIT_SUBJECT
+        and commit_changed == ATOM7_SINGLE_BRANCH_REFSPEC_REPAIR_FILES
+    ):
+        return "ATOM7_SINGLE_BRANCH_REFSPEC_REPAIR_COMMITTED"
     return "INVALID_REPOSITORY_STATE"
 
 
@@ -937,6 +989,24 @@ def validate_atom7_ref_normalization_repair_staged_style_policy() -> None:
     )
 
 
+def validate_atom7_single_branch_refspec_repair_staged_style_policy() -> None:
+    diff = run(
+        [
+            "git",
+            "diff",
+            "--cached",
+            "--check",
+            "--",
+            *sorted(ATOM7_SINGLE_BRANCH_REFSPEC_REPAIR_FILES),
+        ]
+    )
+    assert_check(
+        "atom7_single_branch_refspec_repair_staged_diff_check",
+        diff.returncode == 0,
+        diff.stdout.strip() + diff.stderr.strip(),
+    )
+
+
 def validate() -> None:
     github_actions = os.environ.get("GITHUB_ACTIONS", "").lower() == "true"
     branch_result = run(["git", "symbolic-ref", "--short", "HEAD"])
@@ -1079,6 +1149,8 @@ def validate() -> None:
         "ATOM7_FINAL_HANDOFF_COMMITTED",
         "ATOM7_REF_NORMALIZATION_REPAIR_STAGED",
         "ATOM7_REF_NORMALIZATION_REPAIR_COMMITTED",
+        "ATOM7_SINGLE_BRANCH_REFSPEC_REPAIR_STAGED",
+        "ATOM7_SINGLE_BRANCH_REFSPEC_REPAIR_COMMITTED",
     }
     assert_check("repository_state", state in valid_states, state)
     if state == "ATOM7_FINAL_HANDOFF_STAGED":
@@ -1103,6 +1175,19 @@ def validate() -> None:
     if state == "ATOM7_REF_NORMALIZATION_REPAIR_COMMITTED":
         assert_check(
             "atom7_ref_normalization_repair_committed_topology",
+            topology
+            in {"PUBLISHED_LOCAL", "GITHUB_ACTIONS_CHECKOUT", "CLEAN_CLONE"},
+            topology,
+        )
+    if state == "ATOM7_SINGLE_BRANCH_REFSPEC_REPAIR_STAGED":
+        assert_check(
+            "atom7_single_branch_refspec_repair_staged_topology",
+            topology == "PUBLISHED_LOCAL",
+            topology,
+        )
+    if state == "ATOM7_SINGLE_BRANCH_REFSPEC_REPAIR_COMMITTED":
+        assert_check(
+            "atom7_single_branch_refspec_repair_committed_topology",
             topology
             in {"PUBLISHED_LOCAL", "GITHUB_ACTIONS_CHECKOUT", "CLEAN_CLONE"},
             topology,
@@ -1133,6 +1218,8 @@ def validate() -> None:
         assert_check("atom7_final_handoff_commit_contract", True)
     if state == "ATOM7_REF_NORMALIZATION_REPAIR_COMMITTED":
         assert_check("atom7_ref_normalization_repair_commit_contract", True)
+    if state == "ATOM7_SINGLE_BRANCH_REFSPEC_REPAIR_COMMITTED":
+        assert_check("atom7_single_branch_refspec_repair_commit_contract", True)
     manifest = yaml.safe_load(
         (ROOT / "catalog/catalog_manifest.yaml").read_text(encoding="utf-8")
     )
@@ -1189,6 +1276,8 @@ def validate() -> None:
         validate_atom7_final_handoff_staged_style_policy()
     if state == "ATOM7_REF_NORMALIZATION_REPAIR_STAGED":
         validate_atom7_ref_normalization_repair_staged_style_policy()
+    if state == "ATOM7_SINGLE_BRANCH_REFSPEC_REPAIR_STAGED":
+        validate_atom7_single_branch_refspec_repair_staged_style_policy()
     tests = run([sys.executable,"-B","-m","unittest","discover","-s","tests","-p","test_*.py"])
     if tests.stdout.strip(): print(tests.stdout.strip())
     if tests.stderr.strip(): print(tests.stderr.strip())

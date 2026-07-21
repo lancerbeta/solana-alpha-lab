@@ -118,6 +118,24 @@ class RepositoryStatePolicyTests(unittest.TestCase):
         arguments.update(overrides)
         return module.classify_state(**arguments)
 
+    def classify_atom7_single_branch_refspec_repair(
+        self,
+        **overrides: object,
+    ) -> str:
+        arguments = {
+            "head_oid": module.ATOM7_REF_NORMALIZATION_REPAIR_COMMIT_OID,
+            "commit_count": module.ATOM7_REF_NORMALIZATION_REPAIR_COMMIT_COUNT,
+            "parent_oid": module.ATOM7_FINAL_HANDOFF_COMMIT_OID,
+            "tracked": module.atom7_repository_files(),
+            "staged": set(module.ATOM7_SINGLE_BRANCH_REFSPEC_REPAIR_FILES),
+            "untracked": set(),
+            "unstaged": set(),
+            "commit_subject": module.ATOM7_REF_NORMALIZATION_REPAIR_COMMIT_SUBJECT,
+            "commit_changed": set(module.ATOM7_REF_NORMALIZATION_REPAIR_FILES),
+        }
+        arguments.update(overrides)
+        return module.classify_state(**arguments)
+
     def test_pre_git_import_staged_state_remains_valid(self) -> None:
         state = module.classify_state(
             head_oid=module.BASE_COMMIT_OID,
@@ -513,6 +531,87 @@ class RepositoryStatePolicyTests(unittest.TestCase):
                     "INVALID_REPOSITORY_STATE",
                 )
 
+    def test_atom7_single_branch_refspec_repair_exact_staged_state_passes(
+        self,
+    ) -> None:
+        self.assertEqual(
+            self.classify_atom7_single_branch_refspec_repair(),
+            "ATOM7_SINGLE_BRANCH_REFSPEC_REPAIR_STAGED",
+        )
+
+    def test_atom7_single_branch_refspec_repair_exact_committed_state_passes(
+        self,
+    ) -> None:
+        self.assertEqual(
+            self.classify_atom7_single_branch_refspec_repair(
+                head_oid="f" * 40,
+                commit_count=(
+                    module.ATOM7_SINGLE_BRANCH_REFSPEC_REPAIR_COMMIT_COUNT
+                ),
+                parent_oid=module.ATOM7_REF_NORMALIZATION_REPAIR_COMMIT_OID,
+                staged=set(),
+                commit_subject=(
+                    module.ATOM7_SINGLE_BRANCH_REFSPEC_REPAIR_COMMIT_SUBJECT
+                ),
+                commit_changed=set(
+                    module.ATOM7_SINGLE_BRANCH_REFSPEC_REPAIR_FILES
+                ),
+            ),
+            "ATOM7_SINGLE_BRANCH_REFSPEC_REPAIR_COMMITTED",
+        )
+
+    def test_atom7_single_branch_refspec_repair_wrong_inventory_fails(
+        self,
+    ) -> None:
+        for overrides in (
+            {"staged": {"scripts/validate_baseline.py"}},
+            {
+                "staged": set(
+                    module.ATOM7_SINGLE_BRANCH_REFSPEC_REPAIR_FILES
+                )
+                | {"unexpected.txt"}
+            },
+            {"unstaged": {"tests/test_baseline.py"}},
+            {"untracked": {"unexpected.txt"}},
+        ):
+            with self.subTest(overrides=overrides):
+                self.assertEqual(
+                    self.classify_atom7_single_branch_refspec_repair(
+                        **overrides
+                    ),
+                    "INVALID_REPOSITORY_STATE",
+                )
+
+    def test_atom7_single_branch_refspec_repair_wrong_commit_contract_fails(
+        self,
+    ) -> None:
+        committed = {
+            "head_oid": "f" * 40,
+            "commit_count": (
+                module.ATOM7_SINGLE_BRANCH_REFSPEC_REPAIR_COMMIT_COUNT
+            ),
+            "parent_oid": module.ATOM7_REF_NORMALIZATION_REPAIR_COMMIT_OID,
+            "staged": set(),
+            "commit_subject": (
+                module.ATOM7_SINGLE_BRANCH_REFSPEC_REPAIR_COMMIT_SUBJECT
+            ),
+            "commit_changed": set(
+                module.ATOM7_SINGLE_BRANCH_REFSPEC_REPAIR_FILES
+            ),
+        }
+        for overrides in (
+            {"parent_oid": module.ATOM7_FINAL_HANDOFF_COMMIT_OID},
+            {"commit_subject": "fix: arbitrary single-branch refspec"},
+            {"commit_changed": {"tests/test_baseline.py"}},
+        ):
+            with self.subTest(overrides=overrides):
+                self.assertEqual(
+                    self.classify_atom7_single_branch_refspec_repair(
+                        **(committed | overrides)
+                    ),
+                    "INVALID_REPOSITORY_STATE",
+                )
+
     def test_atom5_work_acceptance_missing_core_fails(self) -> None:
         staged = set(module.ATOM5_WORK_ACCEPTANCE_FILES)
         staged.remove("catalog/assets/core.yaml")
@@ -662,6 +761,10 @@ class RepositoryStatePolicyTests(unittest.TestCase):
         self.assertEqual(len(module.ATOM7_CI_CLEAN_CLONE_REPAIR_FILES), 7)
         self.assertEqual(len(module.ATOM7_FINAL_HANDOFF_FILES), 11)
         self.assertEqual(len(module.ATOM7_REF_NORMALIZATION_REPAIR_FILES), 2)
+        self.assertEqual(
+            len(module.ATOM7_SINGLE_BRANCH_REFSPEC_REPAIR_FILES),
+            2,
+        )
         self.assertEqual(module.ATOM7_EXPECTED_REPOSITORY_FILE_COUNT, 77)
         self.assertEqual(
             module.ATOM5_COMMIT_SUBJECT,
@@ -690,6 +793,10 @@ class RepositoryStatePolicyTests(unittest.TestCase):
         self.assertEqual(
             module.ATOM7_REF_NORMALIZATION_REPAIR_COMMIT_SUBJECT,
             "fix: normalize remote symbolic refs",
+        )
+        self.assertEqual(
+            module.ATOM7_SINGLE_BRANCH_REFSPEC_REPAIR_COMMIT_SUBJECT,
+            "fix: support single-branch clean clone refspec",
         )
         self.assertEqual(
             module.EXPECTED_DEFERRED_CAPABILITIES,
@@ -841,6 +948,124 @@ class GitTopologyPolicyTests(unittest.TestCase):
             ),
             "CLEAN_CLONE",
         )
+
+    def test_clean_clone_single_branch_refspec_passes(self) -> None:
+        self.assertEqual(
+            self.classify_topology(
+                fetch_refspecs=(
+                    module.EXPECTED_SINGLE_BRANCH_FETCH_REFSPEC,
+                ),
+                upstream="origin/main",
+                remote_tracking_refs={"origin/HEAD", "origin/main"},
+                remote_head_target="refs/remotes/origin/main",
+                all_refs={
+                    "refs/heads/main",
+                    "refs/remotes/origin/HEAD",
+                    "refs/remotes/origin/main",
+                },
+            ),
+            "CLEAN_CLONE",
+        )
+
+    def test_single_branch_refspec_fails_outside_clean_clone(self) -> None:
+        narrow = (module.EXPECTED_SINGLE_BRANCH_FETCH_REFSPEC,)
+        cases = (
+            {"fetch_refspecs": narrow},
+            {
+                "fetch_refspecs": narrow,
+                "upstream": "origin/main",
+                "remote_tracking_refs": {"origin/main"},
+                "all_refs": {
+                    "refs/heads/main",
+                    "refs/remotes/origin/main",
+                },
+            },
+            {
+                "branch": None,
+                "fetch_refspecs": narrow,
+                "local_branches": set(),
+                "remote_tracking_refs": {"origin/main"},
+                "all_refs": {"refs/remotes/origin/main"},
+                "github_actions": True,
+                "github_repository": module.EXPECTED_GITHUB_REPOSITORY,
+                "github_ref": "refs/heads/main",
+                "github_sha": self.HEAD_OID,
+            },
+        )
+        for overrides in cases:
+            with self.subTest(overrides=overrides):
+                self.assertEqual(
+                    self.classify_topology(**overrides),
+                    "INVALID_GIT_TOPOLOGY",
+                )
+
+    def test_clean_clone_wrong_or_malformed_refspec_fails(self) -> None:
+        common = {
+            "upstream": "origin/main",
+            "remote_tracking_refs": {"origin/HEAD", "origin/main"},
+            "remote_head_target": "refs/remotes/origin/main",
+            "all_refs": {
+                "refs/heads/main",
+                "refs/remotes/origin/HEAD",
+                "refs/remotes/origin/main",
+            },
+        }
+        refspecs = (
+            ("+refs/heads/other:refs/remotes/origin/main",),
+            ("+refs/heads/main:refs/remotes/origin/other",),
+            ("+refs/heads/main",),
+            (
+                module.EXPECTED_ORIGIN_FETCH_REFSPEC,
+                module.EXPECTED_SINGLE_BRANCH_FETCH_REFSPEC,
+            ),
+        )
+        for fetch_refspecs in refspecs:
+            with self.subTest(fetch_refspecs=fetch_refspecs):
+                self.assertEqual(
+                    self.classify_topology(
+                        **common,
+                        fetch_refspecs=fetch_refspecs,
+                    ),
+                    "INVALID_GIT_TOPOLOGY",
+                )
+
+    def test_clean_clone_extra_remote_ref_branch_or_tag_fails(self) -> None:
+        common = {
+            "upstream": "origin/main",
+            "remote_tracking_refs": {"origin/HEAD", "origin/main"},
+            "remote_head_target": "refs/remotes/origin/main",
+            "all_refs": {
+                "refs/heads/main",
+                "refs/remotes/origin/HEAD",
+                "refs/remotes/origin/main",
+            },
+        }
+        cases = (
+            {"remotes": {"origin", "backup"}},
+            {
+                "local_branches": {"main", "other"},
+                "all_refs": common["all_refs"] | {"refs/heads/other"},
+            },
+            {
+                "remote_tracking_refs": {
+                    "origin/HEAD",
+                    "origin/main",
+                    "origin/other",
+                },
+                "all_refs": common["all_refs"]
+                | {"refs/remotes/origin/other"},
+            },
+            {
+                "tags": {"v1"},
+                "all_refs": common["all_refs"] | {"refs/tags/v1"},
+            },
+        )
+        for overrides in cases:
+            with self.subTest(overrides=overrides):
+                self.assertEqual(
+                    self.classify_topology(**(common | overrides)),
+                    "INVALID_GIT_TOPOLOGY",
+                )
 
     def test_clean_clone_origin_head_must_be_exact_symbolic_ref(self) -> None:
         common = {
