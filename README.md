@@ -5,10 +5,12 @@ on a 15-minute to 4-hour horizon.
 
 ## Current repository stage
 
-Atom 5 is Work-accepted and canonical Atom 6 is closed by Atom-5 evidence. The
-current repository change is the Atom 7A local CI candidate: a pinned workflow
-and one platform-neutral validation gate. It has not run on GitHub and is not
-Work-accepted. Private remote activation and clean-clone evidence remain pending.
+Atom 7B is Work-accepted. The private repository is active on `origin/main`; the
+prior accepted HEAD is `21cfe7fb5c0d410bd9c86976ee3c815dca249399`, and GitHub
+Actions run `29868825180` passed for that exact commit. The current change is the
+T03-A7C final acceptance candidate. It still requires a new terminal CI PASS and
+an exact-final-HEAD clean-clone receipt before Work may reconcile canonical
+Sources or accept TASK-03 as complete.
 
 The Catalog contains 60 assets, 4 asset shards, 4 schemas, and 5 read-only query
 recipes. All nine lifecycle registries remain empty.
@@ -39,10 +41,9 @@ the same gate:
 pwsh -NoProfile -ExecutionPolicy Bypass -File .\scripts\validate.ps1
 ```
 
-## Future private clone bootstrap
+## Private clean-clone bootstrap
 
-Remote activation is not part of the local candidate. After separate Work
-authorization supplies the private repository URL and exact commit:
+For an authorized bounded acceptance clone of the private repository:
 
 ```text
 git clone --branch main --single-branch <PRIVATE_REPOSITORY_URL> <BOUNDED_LOCAL_DIRECTORY>
@@ -54,9 +55,9 @@ uv run --locked --managed-python python -B scripts/validate_ci.py
 
 The `git show` output must equal `<AUTHORIZED_COMMIT_SHA>` exactly; stop before
 validation on any mismatch. Keep `main` attached to `origin/main` and do not use
-a detached checkout. Do not infer a remote URL from local metadata. Clean-clone
-acceptance requires a sanitized receipt proving the exact checkout, clean tree,
-local hooks setup, and passing gate.
+a detached checkout. The clean-clone receipt must prove the authorized final
+commit, exact private origin, clean tree, clone-local hooks setup, and a passing
+gate. Temporary-clone cleanup is a separate, target-specific user decision.
 
 ## Security and provenance boundary
 
@@ -66,5 +67,6 @@ TASK-01/TASK-02 imported bytes remain historical references; source bundles stay
 outside Git and are registered by SHA-256. `ARCH-INTENT-001` remains
 `ACCEPTED_DIRECTION_NOT_IMPLEMENTED`.
 
-Current external CI status: `NOT_RUN_EXPECTED`. Provider/API/RPC calls and cash
-spend remain zero.
+Accepted external CI evidence: run `29868825180` PASS at the prior accepted
+HEAD. The T03-A7C candidate requires its own new terminal run. Provider/API/RPC
+calls and cash spend remain zero.

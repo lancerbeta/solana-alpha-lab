@@ -12,7 +12,10 @@ ChatGPT Project / Work owns mission, roadmap, task status, acceptance, and canon
 
 TASK-03 — Private repository, controls & Project Asset Catalog.
 
-Current atom: Atom 7A local pinned CI candidate, without remote execution, Work acceptance, clean-clone evidence, or lifecycle activation.
+Current atom: T03-A7C final acceptance candidate. Reconcile the accepted private
+origin/main and CI evidence, then require terminal CI and an exact-HEAD clean
+clone before proposing TASK-03 completion. TASK-03 remains IN_PROGRESS and
+TASK-04 is not active.
 
 ## WORKSPACE_ONLY
 

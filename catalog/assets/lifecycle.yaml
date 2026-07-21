@@ -1,14 +1,14 @@
 schema_version: '1.1'
 registry_id: CATALOG-ASSET-REGISTRY-LIFECYCLE-001
-as_of: '2026-07-21'
+as_of: '2026-07-22'
 records:
 - asset_id: REGISTRY-RESEARCH-CYCLES-001
   record_version: '1.0'
   asset_type: lifecycle_registry
   purpose: Active registry for bounded research-cycle lifecycle records.
-  status: IMPLEMENTED_UNVERIFIED
+  status: VALIDATED_ACTIVE
   origin: REPOSITORY
-  as_of: '2026-07-21'
+  as_of: '2026-07-22'
   truth_owner: TASK-03
   location:
     kind: git_path
@@ -36,9 +36,9 @@ records:
   record_version: '1.0'
   asset_type: lifecycle_registry
   purpose: Active registry for evidence-bearing research hypotheses.
-  status: IMPLEMENTED_UNVERIFIED
+  status: VALIDATED_ACTIVE
   origin: REPOSITORY
-  as_of: '2026-07-21'
+  as_of: '2026-07-22'
   truth_owner: TASK-03
   location:
     kind: git_path
@@ -56,9 +56,9 @@ records:
   record_version: '1.0'
   asset_type: lifecycle_registry
   purpose: Active global ledger for trial outcomes and lifecycle evidence.
-  status: IMPLEMENTED_UNVERIFIED
+  status: VALIDATED_ACTIVE
   origin: REPOSITORY
-  as_of: '2026-07-21'
+  as_of: '2026-07-22'
   truth_owner: TASK-03
   location:
     kind: git_path
@@ -76,9 +76,9 @@ records:
   record_version: '1.0'
   asset_type: lifecycle_registry
   purpose: Active registry for feature definitions and reliable availability.
-  status: IMPLEMENTED_UNVERIFIED
+  status: VALIDATED_ACTIVE
   origin: REPOSITORY
-  as_of: '2026-07-21'
+  as_of: '2026-07-22'
   truth_owner: TASK-03
   location:
     kind: git_path
@@ -96,9 +96,9 @@ records:
   record_version: '1.0'
   asset_type: lifecycle_registry
   purpose: Active ledger for auditable holdout-set consumption events.
-  status: IMPLEMENTED_UNVERIFIED
+  status: VALIDATED_ACTIVE
   origin: REPOSITORY
-  as_of: '2026-07-21'
+  as_of: '2026-07-22'
   truth_owner: TASK-03
   location:
     kind: git_path
@@ -116,9 +116,9 @@ records:
   record_version: '1.0'
   asset_type: lifecycle_registry
   purpose: Active registry for strategies linked to validated hypotheses.
-  status: IMPLEMENTED_UNVERIFIED
+  status: VALIDATED_ACTIVE
   origin: REPOSITORY
-  as_of: '2026-07-21'
+  as_of: '2026-07-22'
   truth_owner: TASK-03
   location:
     kind: git_path
@@ -136,9 +136,9 @@ records:
   record_version: '1.0'
   asset_type: lifecycle_registry
   purpose: Active registry for strategy-bound bot instance lifecycle records.
-  status: IMPLEMENTED_UNVERIFIED
+  status: VALIDATED_ACTIVE
   origin: REPOSITORY
-  as_of: '2026-07-21'
+  as_of: '2026-07-22'
   truth_owner: TASK-03
   location:
     kind: git_path
@@ -156,9 +156,9 @@ records:
   record_version: '1.0'
   asset_type: lifecycle_registry
   purpose: Empty active registry referencing historical TASK-01 reuse evidence without copying lifecycle truth.
-  status: IMPLEMENTED_UNVERIFIED
+  status: VALIDATED_ACTIVE
   origin: REPOSITORY
-  as_of: '2026-07-21'
+  as_of: '2026-07-22'
   truth_owner: TASK-03
   location:
     kind: git_path
@@ -180,9 +180,9 @@ records:
   record_version: '1.0'
   asset_type: lifecycle_registry
   purpose: Active registry for decisions and durable negative research results.
-  status: IMPLEMENTED_UNVERIFIED
+  status: VALIDATED_ACTIVE
   origin: REPOSITORY
-  as_of: '2026-07-21'
+  as_of: '2026-07-22'
   truth_owner: TASK-03
   location:
     kind: git_path
@@ -200,9 +200,9 @@ records:
   record_version: '1.0'
   asset_type: generated_view
   purpose: Deterministic human-readable navigation projected only from the Catalog.
-  status: IMPLEMENTED_UNVERIFIED
+  status: VALIDATED_ACTIVE
   origin: REPOSITORY
-  as_of: '2026-07-21'
+  as_of: '2026-07-22'
   truth_owner: TASK-03
   location:
     kind: git_path
@@ -210,7 +210,7 @@ records:
     repository_path: docs/PROJECT_MAP.md
   integrity:
     kind: sha256
-    sha256: d3701827e4fa11e49d440e70aa373f8b475fe89cdf3977cad530b3c92bcc3a51
+    sha256: 2fa39b6aa8b436ee29fc9eb81b794a708447aacb9adead7fae2084cc1c734b45
   access:
     mode: read_only
     method: file
@@ -228,9 +228,9 @@ records:
   record_version: '1.0'
   asset_type: generated_view
   purpose: Deterministic machine-readable projection of Catalog asset relations.
-  status: IMPLEMENTED_UNVERIFIED
+  status: VALIDATED_ACTIVE
   origin: REPOSITORY
-  as_of: '2026-07-21'
+  as_of: '2026-07-22'
   truth_owner: TASK-03
   location:
     kind: git_path

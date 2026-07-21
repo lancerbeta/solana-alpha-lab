@@ -1,38 +1,41 @@
 ---
-handoff_status: IMPLEMENTATION_CANDIDATE
+handoff_status: FINAL_ACCEPTANCE_CANDIDATE
 task_id: TASK-03
-atom_id: T03-A7A
+atom_id: T03-A7C
 canonical_status_owner: ChatGPT_Project_Work
-last_accepted_atom: T03-A5
-accepted_commit: 9c021299b83804f5cb744c1d9dc9a8124de43f59
-accepted_parent: cd1465ea5de1fb33cee272422863b05d9459bd83
-accepted_repository_state: ATOM5_WORK_ACCEPTANCE_COMMITTED
+last_accepted_atom: T03-A7B
+previous_accepted_commit: 21cfe7fb5c0d410bd9c86976ee3c815dca249399
+previous_accepted_parent: a29c7ac2b90c948519d53fd2d6d4c879381dc861
+accepted_repository_state: ATOM7_CI_CLEAN_CLONE_REPAIR_COMMITTED
 atom_6: SATISFIED_BY_ATOM5_EVIDENCE
-candidate_parent: 9c021299b83804f5cb744c1d9dc9a8124de43f59
-candidate_repository_state: ATOM7_LOCAL_CI_CANDIDATE_COMMITTED
-next_candidate: A7A_WORK_ACCEPTANCE_NOT_YET_AUTHORIZED
-remote: NONE
+candidate_parent: 21cfe7fb5c0d410bd9c86976ee3c815dca249399
+candidate_commit: EXTERNAL_RECEIPT_REQUIRED
+candidate_repository_state: ATOM7_FINAL_HANDOFF_COMMITTED
+current_system_state_source_update: PENDING_WORK_AFTER_CLEAN_CLONE
+next_candidate: TASK03_WORK_ACCEPTANCE_AFTER_EXTERNAL_RECEIPTS
+remote: https://github.com/lancerbeta/solana-alpha-lab.git
 ---
 
 # Latest handoff
 
 ## Work acceptance
 
-- TASK-03 status: `IN_PROGRESS`;
-- last accepted atom: Atom 5 — Registries and generated navigation / `T03-A5`;
-- verdict: ACCEPTED / PASS;
-- accepted commit: `cd1465ea5de1fb33cee272422863b05d9459bd83`;
-- accepted parent: `85ab008b762edacd335bba3d9776100bc52775ce`;
-- repository state: `ATOM5_REGISTRIES_NAVIGATION_COMMITTED`;
-- Work-acceptance checkpoint: `9c021299b83804f5cb744c1d9dc9a8124de43f59`,
-  parent `cd1465ea5de1fb33cee272422863b05d9459bd83`, repository state
-  `ATOM5_WORK_ACCEPTANCE_COMMITTED`;
-- exact implementation set: 28/28;
-- Catalog: 58 assets, 4 shards, 4 schemas, and 4 queries;
-- lifecycle registries: 9, all production records empty;
-- tests: 55/55 PASS before and after commit;
-- Catalog and generated navigation validation: PASS;
-- working tree: clean; remote: `NONE`.
+- TASK-03 status: `IN_PROGRESS`; canonical status owner remains ChatGPT Project
+  / Work.
+- Last accepted atom: Atom 7B — private origin, publication, and CI / `T03-A7B`.
+- Previous accepted commit: `21cfe7fb5c0d410bd9c86976ee3c815dca249399`;
+  parent `a29c7ac2b90c948519d53fd2d6d4c879381dc861`; repository state
+  `ATOM7_CI_CLEAN_CLONE_REPAIR_COMMITTED`.
+- A7A commit `4320b621f56bf86c8561be4a379dfc1d0e8937b2` introduced the
+  exact 18/18 local pinned-CI implementation.
+- Publication-state repair `a29c7ac2b90c948519d53fd2d6d4c879381dc861`
+  was pushed normally; run `29867613482` is retained as immutable FAIL evidence.
+- Reproducibility repair `21cfe7fb5c0d410bd9c86976ee3c815dca249399`
+  passed local validation 110/110 and GitHub Actions run `29868825180`.
+- Private `origin/main` is active at
+  `https://github.com/lancerbeta/solana-alpha-lab.git`; the repository is
+  private, default branch is `main`, remote branches are exactly `{main}`, and
+  tags are absent.
 
 ## Canonical Atom 6 verdict
 
@@ -44,41 +47,67 @@ targeted and full validation PASS, reproducible generated navigation checks,
 acceptance-safe task/handoff updates, clean working tree, remote `NONE`, and no
 authorized external write or scope expansion.
 
-## Atom 7A implementation candidate
+## T03-A7C final acceptance candidate
 
-- exact local write-set: 18/18;
-- proposed commit subject: `ci: add pinned repository validation`;
-- exact runtime contract: Python `3.13.14`, uv `0.11.29`;
-- clean-HEAD offline preflight: 64/64 PASS;
-- targeted CI, repository-state, Catalog, generator, and lifecycle tests:
-  68/68 PASS;
-- CI workflow: immutable-pinned, push/main only, `contents: read`;
-- platform-neutral command:
-  `uv run --locked --managed-python python -B scripts/validate_ci.py`;
-- CI execution: `NOT_RUN_EXPECTED`;
-- private remote, default remote branch, and clean-clone evidence: `MISSING`;
-- provider/API/RPC calls: 0; cash spend: USD 0.
+- Candidate parent:
+  `21cfe7fb5c0d410bd9c86976ee3c815dca249399`.
+- Candidate commit: supplied by the external post-commit receipt; a tracked
+  placeholder SHA is forbidden because it would be self-referential.
+- Required repository state: `ATOM7_FINAL_HANDOFF_COMMITTED` in both
+  `PUBLISHED_LOCAL` and bounded `CLEAN_CLONE` topologies.
+- Exact runtime: Python `3.13.14`, uv `0.11.29`; `uv.lock` SHA-256
+  `7fc04ac7585f8f4807140d14792033f2702bc74ac158217e6afb9aafd831bb7c`.
+- Catalog expectation: 60 assets, 4 asset shards, 4 schemas, 5 read-only query
+  recipes; deferred capability exactly `GRAPH_DATABASE`.
+- Lifecycle expectation: 9 registries, production record count 0.
+- Security: workflow permissions `contents: read`; immutable action pins;
+  credential-bearing origins, extra refs/remotes/branches/tags, secrets, and
+  write-capable CI behavior remain rejected.
+- Spend and external systems: provider/API/RPC calls 0; cash spend USD 0; no
+  database, VPS, wallet, or signer action.
 
-This checkpoint is repository implementation evidence, not Work acceptance.
-The last accepted atom remains Atom 5. Atom 7B/7C remain unauthorized.
+The candidate becomes eligible for Work acceptance only after its exact commit
+is pushed fast-forward, the new GitHub Actions run reaches terminal PASS, and a
+fresh single-branch clone of that exact remote HEAD passes the full gate in
+`CLEAN_CLONE` topology with a clean tree. The resulting CI and clone receipts
+remain external evidence.
 
 ## Truth boundaries
 
 - `ARCH-INTENT-001` remains `ACCEPTED_DIRECTION_NOT_IMPLEMENTED`;
 - no lifecycle records were created or activated;
 - historical `PRE-GIT-TASK01-A024` remains a reference, not active lifecycle truth;
-- no Project Source, roadmap, canonical living state, remote status, provider,
-  database, VPS, wallet, signer, or external system was changed;
+- canonical `current_system_state` Source synchronization is
+  `PENDING_WORK_AFTER_CLEAN_CLONE`; no surrogate repository living-state file
+  is created;
+- no Project Source, roadmap, provider, database, VPS, wallet, signer, or paid
+  external system was changed;
 - TASK-03 remains `IN_PROGRESS`;
-- Atom 7A remains a local implementation candidate only.
+- TASK-04 is not active and requires a separate Work handoff after TASK-03
+  acceptance.
 
 ## Historical limitations retained
 
 - pre-commit execution for `e03639f4811d7e40f25b965ab79626c229c0fd8a`:
   NOT_TESTABLE;
 - tests at the import commit: NOT_RUN.
+- run `29867613482`: immutable FAIL evidence for the first published candidate;
+  no rerun or receipt rewrite occurred;
+- the final candidate commit cannot embed its own SHA or post-push CI/clone
+  evidence.
+
+## TASK-04 handoff boundary
+
+After the exact A7C commit, terminal CI PASS, and exact-HEAD clean-clone receipt,
+submit this handoff to Work. Work may then reconcile canonical Sources, decide
+TASK-03 acceptance, and separately activate TASK-04 with the validated Catalog,
+immutable pre-Git lineage, empty typed registries, commit/tree, CI, and clone
+receipts. No provider or data acquisition call is implied.
 
 ## Exact next action
 
-Request separate Work acceptance of the completed Atom 7A local candidate. Do
-not create a remote, push, or start Atom 7B/7C.
+Create the normal A7C commit with subject
+`docs: reconcile TASK-03 final handoff`, push `main` fast-forward, require the
+new terminal CI PASS, then validate and retain an exact-final-HEAD bounded clean
+clone. Stop and return the external receipt for separate Work acceptance; do not
+claim TASK-03 DONE or activate TASK-04.

@@ -15,6 +15,8 @@ import tomllib
 from pathlib import Path
 from urllib.parse import urlsplit
 
+import yaml
+
 ROOT = Path(__file__).resolve().parents[1]
 BASE_COMMIT_OID = 'ee6119ae0b7750710c7f822c50137ed95b4977e9'
 BASE_TREE_OID = '47181f0595e687858a3c3f790ae2f79415aed4a2'
@@ -133,6 +135,9 @@ ATOM7_CI_CLEAN_CLONE_REPAIR_COMMIT_COUNT = (
 ATOM7_CI_CLEAN_CLONE_REPAIR_COMMIT_SUBJECT = (
     "fix: make CI and clean clone reproducible"
 )
+ATOM7_CI_CLEAN_CLONE_REPAIR_COMMIT_OID = (
+    "21cfe7fb5c0d410bd9c86976ee3c815dca249399"
+)
 ATOM7_CI_CLEAN_CLONE_REPAIR_FILES = {
     ".github/workflows/ci.yml",
     "README.md",
@@ -142,6 +147,26 @@ ATOM7_CI_CLEAN_CLONE_REPAIR_FILES = {
     "tests/test_baseline.py",
     "tests/test_ci.py",
 }
+ATOM7_FINAL_HANDOFF_COMMIT_COUNT = (
+    ATOM7_CI_CLEAN_CLONE_REPAIR_COMMIT_COUNT + 1
+)
+ATOM7_FINAL_HANDOFF_COMMIT_SUBJECT = (
+    "docs: reconcile TASK-03 final handoff"
+)
+ATOM7_FINAL_HANDOFF_FILES = {
+    "AGENTS.md",
+    "README.md",
+    "catalog/assets/core.yaml",
+    "catalog/assets/lifecycle.yaml",
+    "catalog/catalog_manifest.yaml",
+    "docs/PROJECT_MAP.md",
+    "docs/handoffs/latest.md",
+    "docs/tasks/TASK-03.md",
+    "scripts/validate_baseline.py",
+    "tests/test_baseline.py",
+    "tests/test_catalog.py",
+}
+EXPECTED_DEFERRED_CAPABILITIES = {"GRAPH_DATABASE"}
 EXPECTED_ORIGIN_URL = "https://github.com/lancerbeta/solana-alpha-lab.git"
 EXPECTED_CI_ORIGIN_URLS = {
     EXPECTED_ORIGIN_URL,
@@ -608,6 +633,31 @@ def classify_state(
         and commit_changed == ATOM7_CI_CLEAN_CLONE_REPAIR_FILES
     ):
         return "ATOM7_CI_CLEAN_CLONE_REPAIR_COMMITTED"
+    if (
+        head_oid == ATOM7_CI_CLEAN_CLONE_REPAIR_COMMIT_OID
+        and commit_count == ATOM7_CI_CLEAN_CLONE_REPAIR_COMMIT_COUNT
+        and parent_oid == ATOM7_PRE_PUSH_REPAIR_COMMIT_OID
+        and tracked == atom7_files
+        and len(tracked) == ATOM7_EXPECTED_REPOSITORY_FILE_COUNT
+        and staged == ATOM7_FINAL_HANDOFF_FILES
+        and not unstaged
+        and not untracked
+        and commit_subject == ATOM7_CI_CLEAN_CLONE_REPAIR_COMMIT_SUBJECT
+        and commit_changed == ATOM7_CI_CLEAN_CLONE_REPAIR_FILES
+    ):
+        return "ATOM7_FINAL_HANDOFF_STAGED"
+    if (
+        commit_count == ATOM7_FINAL_HANDOFF_COMMIT_COUNT
+        and parent_oid == ATOM7_CI_CLEAN_CLONE_REPAIR_COMMIT_OID
+        and tracked == atom7_files
+        and len(tracked) == ATOM7_EXPECTED_REPOSITORY_FILE_COUNT
+        and not staged
+        and not unstaged
+        and not untracked
+        and commit_subject == ATOM7_FINAL_HANDOFF_COMMIT_SUBJECT
+        and commit_changed == ATOM7_FINAL_HANDOFF_FILES
+    ):
+        return "ATOM7_FINAL_HANDOFF_COMMITTED"
     return "INVALID_REPOSITORY_STATE"
 
 
@@ -777,6 +827,24 @@ def validate_atom7_ci_clean_clone_repair_staged_style_policy() -> None:
     )
 
 
+def validate_atom7_final_handoff_staged_style_policy() -> None:
+    diff = run(
+        [
+            "git",
+            "diff",
+            "--cached",
+            "--check",
+            "--",
+            *sorted(ATOM7_FINAL_HANDOFF_FILES),
+        ]
+    )
+    assert_check(
+        "atom7_final_handoff_staged_diff_check",
+        diff.returncode == 0,
+        diff.stdout.strip() + diff.stderr.strip(),
+    )
+
+
 def validate() -> None:
     github_actions = os.environ.get("GITHUB_ACTIONS", "").lower() == "true"
     branch_result = run(["git", "symbolic-ref", "--short", "HEAD"])
@@ -922,8 +990,23 @@ def validate() -> None:
         "ATOM7_PRE_PUSH_REPAIR_COMMITTED",
         "ATOM7_CI_CLEAN_CLONE_REPAIR_STAGED",
         "ATOM7_CI_CLEAN_CLONE_REPAIR_COMMITTED",
+        "ATOM7_FINAL_HANDOFF_STAGED",
+        "ATOM7_FINAL_HANDOFF_COMMITTED",
     }
     assert_check("repository_state", state in valid_states, state)
+    if state == "ATOM7_FINAL_HANDOFF_STAGED":
+        assert_check(
+            "atom7_final_handoff_staged_topology",
+            topology == "PUBLISHED_LOCAL",
+            topology,
+        )
+    if state == "ATOM7_FINAL_HANDOFF_COMMITTED":
+        assert_check(
+            "atom7_final_handoff_committed_topology",
+            topology
+            in {"PUBLISHED_LOCAL", "GITHUB_ACTIONS_CHECKOUT", "CLEAN_CLONE"},
+            topology,
+        )
     if state.startswith("ATOM7_"):
         expected_file_count = ATOM7_EXPECTED_REPOSITORY_FILE_COUNT
     elif state.startswith("ATOM5_"):
@@ -946,6 +1029,16 @@ def validate() -> None:
         assert_check("atom7_pre_push_repair_commit_contract", True)
     if state == "ATOM7_CI_CLEAN_CLONE_REPAIR_COMMITTED":
         assert_check("atom7_ci_clean_clone_repair_commit_contract", True)
+    if state == "ATOM7_FINAL_HANDOFF_COMMITTED":
+        assert_check("atom7_final_handoff_commit_contract", True)
+    manifest = yaml.safe_load(
+        (ROOT / "catalog/catalog_manifest.yaml").read_text(encoding="utf-8")
+    )
+    assert_check(
+        "deferred_capabilities",
+        set(manifest["deferred_capabilities"])
+        == EXPECTED_DEFERRED_CAPABILITIES,
+    )
     assert_check("venv_present", (ROOT/".venv").is_dir())
     assert_check("runtime_exact", sys.version_info[:3] == EXPECTED_PYTHON)
     assert_check("runtime_is_venv", Path(sys.prefix).resolve() == (ROOT/".venv").resolve())
@@ -990,6 +1083,8 @@ def validate() -> None:
         validate_atom7_pre_push_repair_staged_style_policy()
     if state == "ATOM7_CI_CLEAN_CLONE_REPAIR_STAGED":
         validate_atom7_ci_clean_clone_repair_staged_style_policy()
+    if state == "ATOM7_FINAL_HANDOFF_STAGED":
+        validate_atom7_final_handoff_staged_style_policy()
     tests = run([sys.executable,"-B","-m","unittest","discover","-s","tests","-p","test_*.py"])
     if tests.stdout.strip(): print(tests.stdout.strip())
     if tests.stderr.strip(): print(tests.stderr.strip())

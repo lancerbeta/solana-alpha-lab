@@ -1,6 +1,6 @@
 schema_version: '1.1'
 registry_id: CATALOG-ASSET-REGISTRY-CORE-001
-as_of: '2026-07-21'
+as_of: '2026-07-22'
 records:
 - asset_id: SCM-BASELINE-COMMIT-001
   record_version: '1.0'
@@ -69,9 +69,9 @@ records:
   record_version: '1.1'
   asset_type: control_document
   purpose: Repository-level agent contract for scope, safety, validation, and status ownership.
-  status: IMPLEMENTED_UNVERIFIED
+  status: VALIDATED_ACTIVE
   origin: REPOSITORY
-  as_of: '2026-07-21'
+  as_of: '2026-07-22'
   truth_owner: TASK-03
   location:
     kind: git_path
@@ -79,7 +79,7 @@ records:
     repository_path: AGENTS.md
   integrity:
     kind: sha256
-    sha256: de156ba35d4e6fc623af575e1240145ce38f3f9f3668489dc3aaf0212cb52dbc
+    sha256: 32135700f454a547ee7993ef52c864b0b5b01016c0ba3a1661cc894a2b7f46c9
   access:
     mode: read_only
     method: file
@@ -100,9 +100,9 @@ records:
   record_version: '1.1'
   asset_type: control_document
   purpose: Active implementation contract and Definition of Done mirror for TASK-03.
-  status: IMPLEMENTED_UNVERIFIED
+  status: VALIDATED_ACTIVE
   origin: REPOSITORY
-  as_of: '2026-07-21'
+  as_of: '2026-07-22'
   truth_owner: TASK-03
   location:
     kind: git_path
@@ -110,7 +110,7 @@ records:
     repository_path: docs/tasks/TASK-03.md
   integrity:
     kind: sha256
-    sha256: 47e52bc5a28f5c97dbbd9e364e31a4dfe148e9f24687d4d929b4decbd095496a
+    sha256: f214777df65d094449a1a985d381e5c75497b8e80c0f4c9a1745a54e7dc91d61
   access:
     mode: read_only
     method: file
@@ -130,9 +130,9 @@ records:
   record_version: '1.0'
   asset_type: configuration
   purpose: Exact project runtime and dependency declaration for the repository.
-  status: IMPLEMENTED_UNVERIFIED
+  status: VALIDATED_ACTIVE
   origin: REPOSITORY
-  as_of: '2026-07-21'
+  as_of: '2026-07-22'
   truth_owner: TASK-03
   location:
     kind: git_path
@@ -160,9 +160,9 @@ records:
   record_version: '1.0'
   asset_type: lockfile
   purpose: Deterministic dependency lock including Catalog validation dependencies.
-  status: IMPLEMENTED_UNVERIFIED
+  status: VALIDATED_ACTIVE
   origin: REPOSITORY
-  as_of: '2026-07-21'
+  as_of: '2026-07-22'
   truth_owner: TASK-03
   location:
     kind: git_path
@@ -190,9 +190,9 @@ records:
   record_version: '1.1'
   asset_type: script
   purpose: Windows compatibility wrapper for the platform-neutral repository validation gate.
-  status: IMPLEMENTED_UNVERIFIED
+  status: VALIDATED_ACTIVE
   origin: REPOSITORY
-  as_of: '2026-07-21'
+  as_of: '2026-07-22'
   truth_owner: TASK-03
   location:
     kind: git_path
@@ -220,10 +220,10 @@ records:
 - asset_id: CI-WORKFLOW-001
   record_version: '1.0'
   asset_type: script
-  purpose: Immutable-pinned GitHub Actions workflow candidate for one read-only repository validation job.
-  status: IMPLEMENTED_UNVERIFIED
+  purpose: Immutable-pinned GitHub Actions workflow for one read-only repository validation job.
+  status: VALIDATED_ACTIVE
   origin: REPOSITORY
-  as_of: '2026-07-21'
+  as_of: '2026-07-22'
   truth_owner: TASK-03
   location:
     kind: git_path
@@ -244,7 +244,11 @@ records:
     target_asset_id: CTRL-AGENTS-001
   consumers:
   - TASK-03
-  evidence: []
+  evidence:
+  - evidence_id: EVIDENCE-CI-WORKFLOW-RUN-29868825180
+    kind: validator
+    reference: https://github.com/lancerbeta/solana-alpha-lab/actions/runs/29868825180
+    result: PASS
   classification:
     contains_secrets: false
     contains_raw_data: false
@@ -253,9 +257,9 @@ records:
   record_version: '1.0'
   asset_type: script
   purpose: Single platform-neutral gate for runtime, lock, secrets, Catalog, generated views, repository policy, and tests.
-  status: IMPLEMENTED_UNVERIFIED
+  status: VALIDATED_ACTIVE
   origin: REPOSITORY
-  as_of: '2026-07-21'
+  as_of: '2026-07-22'
   truth_owner: TASK-03
   location:
     kind: git_path
@@ -277,7 +281,11 @@ records:
     target_asset_id: CATALOG-VALIDATOR-001
   consumers:
   - TASK-03
-  evidence: []
+  evidence:
+  - evidence_id: EVIDENCE-CI-VALIDATOR-RUN-29868825180
+    kind: validator
+    reference: https://github.com/lancerbeta/solana-alpha-lab/actions/runs/29868825180
+    result: PASS
   classification:
     contains_secrets: false
     contains_raw_data: false
@@ -286,9 +294,9 @@ records:
   record_version: '1.1'
   asset_type: catalog_root
   purpose: Stable machine-readable resolver for Catalog registries, schemas, commands, and policies.
-  status: IMPLEMENTED_UNVERIFIED
+  status: VALIDATED_ACTIVE
   origin: REPOSITORY
-  as_of: '2026-07-21'
+  as_of: '2026-07-22'
   truth_owner: TASK-03
   location:
     kind: git_path
@@ -333,9 +341,9 @@ records:
   record_version: '1.0'
   asset_type: catalog_registry
   purpose: Core Catalog asset records for repository controls, environment, schemas, and evidence.
-  status: IMPLEMENTED_UNVERIFIED
+  status: VALIDATED_ACTIVE
   origin: REPOSITORY
-  as_of: '2026-07-21'
+  as_of: '2026-07-22'
   truth_owner: TASK-03
   location:
     kind: git_path
@@ -363,9 +371,9 @@ records:
   record_version: '1.1'
   asset_type: catalog_registry
   purpose: Bounded read-only query and command recipes used to validate and resolve Catalog records.
-  status: IMPLEMENTED_UNVERIFIED
+  status: VALIDATED_ACTIVE
   origin: REPOSITORY
-  as_of: '2026-07-21'
+  as_of: '2026-07-22'
   truth_owner: TASK-03
   location:
     kind: git_path
@@ -393,9 +401,9 @@ records:
   record_version: '1.1'
   asset_type: schema
   purpose: Standalone Draft 2020-12 schema for the Catalog root manifest.
-  status: IMPLEMENTED_UNVERIFIED
+  status: VALIDATED_ACTIVE
   origin: REPOSITORY
-  as_of: '2026-07-21'
+  as_of: '2026-07-22'
   truth_owner: TASK-03
   location:
     kind: git_path
@@ -423,9 +431,9 @@ records:
   record_version: '1.1'
   asset_type: schema
   purpose: Backward-compatible Draft 2020-12 asset schema v1.1 with pre-Git provenance and architecture-intent contracts.
-  status: IMPLEMENTED_UNVERIFIED
+  status: VALIDATED_ACTIVE
   origin: REPOSITORY
-  as_of: '2026-07-21'
+  as_of: '2026-07-22'
   truth_owner: TASK-03
   location:
     kind: git_path
@@ -453,9 +461,9 @@ records:
   record_version: '1.0'
   asset_type: schema
   purpose: Standalone Draft 2020-12 schema for bounded read-only query recipes.
-  status: IMPLEMENTED_UNVERIFIED
+  status: VALIDATED_ACTIVE
   origin: REPOSITORY
-  as_of: '2026-07-21'
+  as_of: '2026-07-22'
   truth_owner: TASK-03
   location:
     kind: git_path
@@ -483,9 +491,9 @@ records:
   record_version: '1.1'
   asset_type: script
   purpose: Deterministic schema and semantic validator for Catalog policy and integrity.
-  status: IMPLEMENTED_UNVERIFIED
+  status: VALIDATED_ACTIVE
   origin: REPOSITORY
-  as_of: '2026-07-21'
+  as_of: '2026-07-22'
   truth_owner: TASK-03
   location:
     kind: git_path
@@ -514,9 +522,9 @@ records:
   record_version: '1.0'
   asset_type: script
   purpose: Read-only stable-ID CLI for listing and resolving asset and query records.
-  status: IMPLEMENTED_UNVERIFIED
+  status: VALIDATED_ACTIVE
   origin: REPOSITORY
-  as_of: '2026-07-21'
+  as_of: '2026-07-22'
   truth_owner: TASK-03
   location:
     kind: git_path
@@ -605,9 +613,9 @@ records:
   record_version: '1.0'
   asset_type: catalog_registry
   purpose: Catalog registry for exact pre-Git artifacts, immutable source bundles, and provenance contracts.
-  status: IMPLEMENTED_UNVERIFIED
+  status: VALIDATED_ACTIVE
   origin: REPOSITORY
-  as_of: '2026-07-21'
+  as_of: '2026-07-22'
   truth_owner: TASK-03
   location:
     kind: git_path
@@ -639,9 +647,9 @@ records:
   record_version: '1.0'
   asset_type: catalog_registry
   purpose: Catalog registry for accepted architecture intents that are explicitly not implementation evidence.
-  status: IMPLEMENTED_UNVERIFIED
+  status: VALIDATED_ACTIVE
   origin: REPOSITORY
-  as_of: '2026-07-21'
+  as_of: '2026-07-22'
   truth_owner: TASK-03
   location:
     kind: git_path
@@ -700,9 +708,9 @@ records:
   record_version: '1.0'
   asset_type: catalog_registry
   purpose: Catalog shard for active lifecycle registry assets and generated navigation views.
-  status: IMPLEMENTED_UNVERIFIED
+  status: VALIDATED_ACTIVE
   origin: REPOSITORY
-  as_of: '2026-07-21'
+  as_of: '2026-07-22'
   truth_owner: TASK-03
   location:
     kind: git_path
@@ -730,9 +738,9 @@ records:
   record_version: '1.0'
   asset_type: schema
   purpose: Versioned discriminator schema for the nine active lifecycle registry contracts.
-  status: IMPLEMENTED_UNVERIFIED
+  status: VALIDATED_ACTIVE
   origin: REPOSITORY
-  as_of: '2026-07-21'
+  as_of: '2026-07-22'
   truth_owner: TASK-03
   location:
     kind: git_path
@@ -760,9 +768,9 @@ records:
   record_version: '1.0'
   asset_type: script
   purpose: Deterministic Catalog-only generator for the project map and edge projection.
-  status: IMPLEMENTED_UNVERIFIED
+  status: VALIDATED_ACTIVE
   origin: REPOSITORY
-  as_of: '2026-07-21'
+  as_of: '2026-07-22'
   truth_owner: TASK-03
   location:
     kind: git_path

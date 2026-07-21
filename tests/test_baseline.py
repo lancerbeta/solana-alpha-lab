@@ -88,6 +88,21 @@ class RepositoryStatePolicyTests(unittest.TestCase):
         arguments.update(overrides)
         return module.classify_state(**arguments)
 
+    def classify_atom7_final_handoff(self, **overrides: object) -> str:
+        arguments = {
+            "head_oid": module.ATOM7_CI_CLEAN_CLONE_REPAIR_COMMIT_OID,
+            "commit_count": module.ATOM7_CI_CLEAN_CLONE_REPAIR_COMMIT_COUNT,
+            "parent_oid": module.ATOM7_PRE_PUSH_REPAIR_COMMIT_OID,
+            "tracked": module.atom7_repository_files(),
+            "staged": set(module.ATOM7_FINAL_HANDOFF_FILES),
+            "untracked": set(),
+            "unstaged": set(),
+            "commit_subject": module.ATOM7_CI_CLEAN_CLONE_REPAIR_COMMIT_SUBJECT,
+            "commit_changed": set(module.ATOM7_CI_CLEAN_CLONE_REPAIR_FILES),
+        }
+        arguments.update(overrides)
+        return module.classify_state(**arguments)
+
     def test_pre_git_import_staged_state_remains_valid(self) -> None:
         state = module.classify_state(
             head_oid=module.BASE_COMMIT_OID,
@@ -371,6 +386,63 @@ class RepositoryStatePolicyTests(unittest.TestCase):
                     "INVALID_REPOSITORY_STATE",
                 )
 
+    def test_atom7_final_handoff_exact_staged_state_passes(self) -> None:
+        self.assertEqual(
+            self.classify_atom7_final_handoff(),
+            "ATOM7_FINAL_HANDOFF_STAGED",
+        )
+
+    def test_atom7_final_handoff_exact_committed_state_passes(self) -> None:
+        self.assertEqual(
+            self.classify_atom7_final_handoff(
+                head_oid="f" * 40,
+                commit_count=module.ATOM7_FINAL_HANDOFF_COMMIT_COUNT,
+                parent_oid=module.ATOM7_CI_CLEAN_CLONE_REPAIR_COMMIT_OID,
+                staged=set(),
+                commit_subject=module.ATOM7_FINAL_HANDOFF_COMMIT_SUBJECT,
+                commit_changed=set(module.ATOM7_FINAL_HANDOFF_FILES),
+            ),
+            "ATOM7_FINAL_HANDOFF_COMMITTED",
+        )
+
+    def test_atom7_final_handoff_wrong_inventory_fails(self) -> None:
+        missing = set(module.ATOM7_FINAL_HANDOFF_FILES)
+        missing.remove("catalog/catalog_manifest.yaml")
+        for overrides in (
+            {"staged": missing},
+            {
+                "staged": set(module.ATOM7_FINAL_HANDOFF_FILES)
+                | {"unexpected.txt"}
+            },
+            {"unstaged": {"README.md"}},
+            {"untracked": {"unexpected.txt"}},
+        ):
+            with self.subTest(overrides=overrides):
+                self.assertEqual(
+                    self.classify_atom7_final_handoff(**overrides),
+                    "INVALID_REPOSITORY_STATE",
+                )
+
+    def test_atom7_final_handoff_wrong_commit_contract_fails(self) -> None:
+        committed = {
+            "head_oid": "f" * 40,
+            "commit_count": module.ATOM7_FINAL_HANDOFF_COMMIT_COUNT,
+            "parent_oid": module.ATOM7_CI_CLEAN_CLONE_REPAIR_COMMIT_OID,
+            "staged": set(),
+            "commit_subject": module.ATOM7_FINAL_HANDOFF_COMMIT_SUBJECT,
+            "commit_changed": set(module.ATOM7_FINAL_HANDOFF_FILES),
+        }
+        for overrides in (
+            {"parent_oid": module.ATOM7_PRE_PUSH_REPAIR_COMMIT_OID},
+            {"commit_subject": "docs: arbitrary final handoff"},
+            {"commit_changed": {"docs/handoffs/latest.md"}},
+        ):
+            with self.subTest(overrides=overrides):
+                self.assertEqual(
+                    self.classify_atom7_final_handoff(**(committed | overrides)),
+                    "INVALID_REPOSITORY_STATE",
+                )
+
     def test_atom5_work_acceptance_missing_core_fails(self) -> None:
         staged = set(module.ATOM5_WORK_ACCEPTANCE_FILES)
         staged.remove("catalog/assets/core.yaml")
@@ -518,6 +590,7 @@ class RepositoryStatePolicyTests(unittest.TestCase):
         self.assertEqual(len(module.ATOM7_LOCAL_CI_FILES), 18)
         self.assertEqual(len(module.ATOM7_PRE_PUSH_REPAIR_FILES), 2)
         self.assertEqual(len(module.ATOM7_CI_CLEAN_CLONE_REPAIR_FILES), 7)
+        self.assertEqual(len(module.ATOM7_FINAL_HANDOFF_FILES), 11)
         self.assertEqual(module.ATOM7_EXPECTED_REPOSITORY_FILE_COUNT, 77)
         self.assertEqual(
             module.ATOM5_COMMIT_SUBJECT,
@@ -538,6 +611,14 @@ class RepositoryStatePolicyTests(unittest.TestCase):
         self.assertEqual(
             module.ATOM7_CI_CLEAN_CLONE_REPAIR_COMMIT_SUBJECT,
             "fix: make CI and clean clone reproducible",
+        )
+        self.assertEqual(
+            module.ATOM7_FINAL_HANDOFF_COMMIT_SUBJECT,
+            "docs: reconcile TASK-03 final handoff",
+        )
+        self.assertEqual(
+            module.EXPECTED_DEFERRED_CAPABILITIES,
+            {"GRAPH_DATABASE"},
         )
 
     def test_exact_import_style_partition(self) -> None:

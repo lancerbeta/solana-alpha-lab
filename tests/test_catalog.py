@@ -36,7 +36,7 @@ class CatalogImportTests(unittest.TestCase):
         self.assertEqual(len(self.snapshot.lifecycle_records), 0)
         self.assertIn("ARCH-INTENT-001", self.snapshot.assets)
 
-    def test_local_ci_assets_and_query_contract(self) -> None:
+    def test_validated_ci_assets_and_query_contract(self) -> None:
         self.assertIn("CI-WORKFLOW-001", self.snapshot.assets)
         self.assertIn("CI-VALIDATOR-001", self.snapshot.assets)
         recipe = self.snapshot.queries["QUERY-CI-VALIDATE-001"]
@@ -54,17 +54,66 @@ class CatalogImportTests(unittest.TestCase):
         )
         self.assertFalse(recipe["network_required"])
         self.assertEqual(recipe["write_effects"], "NONE")
-        self.assertNotIn(
-            "CODEX_PILOT",
+        self.assertEqual(
             self.snapshot.manifest["deferred_capabilities"],
+            ["GRAPH_DATABASE"],
         )
-        self.assertIn(
-            "REMOTE_CI",
-            self.snapshot.manifest["deferred_capabilities"],
+        for asset_id in ("CI-WORKFLOW-001", "CI-VALIDATOR-001"):
+            asset = self.snapshot.assets[asset_id]
+            self.assertEqual(asset["status"], "VALIDATED_ACTIVE")
+            self.assertEqual(len(asset["evidence"]), 1)
+            self.assertEqual(asset["evidence"][0]["result"], "PASS")
+            self.assertEqual(
+                asset["evidence"][0]["reference"],
+                "https://github.com/lancerbeta/solana-alpha-lab/actions/runs/29868825180",
+            )
+
+    def test_repository_catalog_and_registry_assets_are_validated(self) -> None:
+        expected_active = {
+            "CTRL-AGENTS-001",
+            "CTRL-TASK-03-001",
+            "CTRL-PYPROJECT-001",
+            "CTRL-UVLOCK-001",
+            "CTRL-QUALITY-GATE-001",
+            "CI-WORKFLOW-001",
+            "CI-VALIDATOR-001",
+            "CATALOG-ROOT-001",
+            "CATALOG-ASSET-REGISTRY-CORE-001",
+            "CATALOG-QUERY-REGISTRY-001",
+            "CATALOG-SCHEMA-MANIFEST-001",
+            "CATALOG-SCHEMA-ASSET-001",
+            "CATALOG-SCHEMA-QUERY-001",
+            "CATALOG-VALIDATOR-001",
+            "CATALOG-CLI-001",
+            "CATALOG-ASSET-REGISTRY-PRE-GIT-001",
+            "CATALOG-ASSET-REGISTRY-ARCHITECTURE-001",
+            "CATALOG-ASSET-REGISTRY-LIFECYCLE-001",
+            "CATALOG-SCHEMA-LIFECYCLE-001",
+            "GENERATOR-CATALOG-NAVIGATION-001",
+            "REGISTRY-RESEARCH-CYCLES-001",
+            "REGISTRY-HYPOTHESES-001",
+            "REGISTRY-GLOBAL-TRIAL-LEDGER-001",
+            "REGISTRY-FEATURE-CATALOG-001",
+            "REGISTRY-HOLDOUT-CONSUMPTION-001",
+            "REGISTRY-STRATEGIES-001",
+            "REGISTRY-BOT-INSTANCES-001",
+            "REGISTRY-REUSE-CANDIDATES-001",
+            "REGISTRY-DECISIONS-NEGATIVE-RESULTS-001",
+            "GENERATED-PROJECT-MAP-001",
+            "GENERATED-EDGE-PROJECTION-001",
+        }
+        observed_active = {
+            asset_id
+            for asset_id, asset in self.snapshot.assets.items()
+            if asset["status"] == "VALIDATED_ACTIVE"
+        }
+        self.assertEqual(
+            observed_active,
+            expected_active | {"ENV-WORKSTATION-001"},
         )
-        self.assertIn(
-            "CLEAN_CLONE",
-            self.snapshot.manifest["deferred_capabilities"],
+        self.assertEqual(
+            self.snapshot.assets["ARCH-INTENT-001"]["status"],
+            "ACCEPTED_DIRECTION_NOT_IMPLEMENTED",
         )
 
     def test_duplicate_across_registries_rejected(self) -> None:
