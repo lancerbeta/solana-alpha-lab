@@ -108,13 +108,37 @@ def synthetic_document(registry_type: str) -> dict:
     }
 
 
+def synthetic_reuse_v11_document() -> dict:
+    document = synthetic_document("reuse_candidates")
+    document["schema_version"] = "1.1"
+    document["records"][0].update(
+        {
+            "component_area": "A0_RUNTIME",
+            "candidate_name": "Synthetic candidate",
+            "verdict": "ADOPT",
+            "decision_status": "ACCEPTED",
+            "pin": "1.2.3",
+            "decision_owner": "TASK-04_ARCHITECTURE_OWNER",
+            "named_consumers": ["TASK-05"],
+            "matrix_asset_id": "MATRIX-T04-MVP-STACK-001",
+            "next_validation": "TASK-05_CONTRACT_FIXTURE_VALIDATION",
+        }
+    )
+    return document
+
+
 class LifecycleRegistryTests(unittest.TestCase):
-    def test_all_production_registries_are_valid_and_empty(self) -> None:
+    def test_all_production_registries_are_valid(self) -> None:
         for registry_type in REGISTRIES:
             with self.subTest(registry_type=registry_type):
                 document = production_document(registry_type)
                 self.assertFalse(list(VALIDATOR.iter_errors(document)))
-                self.assertEqual(document["records"], [])
+                if registry_type == "reuse_candidates":
+                    self.assertEqual(document["schema_version"], "1.1")
+                    self.assertEqual(len(document["records"]), 52)
+                else:
+                    self.assertEqual(document["schema_version"], "1.0")
+                    self.assertEqual(document["records"], [])
 
     def test_every_discriminator_accepts_its_minimal_record(self) -> None:
         for registry_type in REGISTRIES:
@@ -139,8 +163,23 @@ class LifecycleRegistryTests(unittest.TestCase):
 
     def test_reuse_registry_references_history_without_copying_truth(self) -> None:
         document = production_document("reuse_candidates")
-        self.assertEqual(document["source_asset_ids"], ["PRE-GIT-TASK01-A024"])
-        self.assertEqual(document["records"], [])
+        self.assertIn("PRE-GIT-TASK01-A024", document["source_asset_ids"])
+        self.assertEqual(len(document["records"]), 52)
+        self.assertTrue(all(record["derived_from"] == "PRE-GIT-TASK01-A024" for record in document["records"]))
+
+    def test_historical_reuse_v10_remains_valid(self) -> None:
+        self.assertFalse(list(VALIDATOR.iter_errors(synthetic_document("reuse_candidates"))))
+
+    def test_reuse_v11_requires_compact_decision_contract(self) -> None:
+        document = synthetic_reuse_v11_document()
+        self.assertFalse(list(VALIDATOR.iter_errors(document)))
+        del document["records"][0]["matrix_asset_id"]
+        self.assertTrue(list(VALIDATOR.iter_errors(document)))
+
+    def test_non_reuse_registry_cannot_claim_schema_v11(self) -> None:
+        document = synthetic_document("hypotheses")
+        document["schema_version"] = "1.1"
+        self.assertTrue(list(VALIDATOR.iter_errors(document)))
 
 
 if __name__ == "__main__":

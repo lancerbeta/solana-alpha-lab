@@ -5,7 +5,8 @@ records:
 - asset_id: SCM-BASELINE-COMMIT-001
   record_version: '1.0'
   asset_type: repository_snapshot
-  purpose: Accepted first local root commit that established repository controls before Catalog work.
+  purpose: Accepted first local root commit that established repository controls before
+    Catalog work.
   status: VALIDATED_LOCAL_COMMITTED
   origin: REPOSITORY
   as_of: '2026-07-21'
@@ -66,20 +67,21 @@ records:
     contains_raw_data: false
     sensitivity: INTERNAL_NON_SECRET
 - asset_id: CTRL-AGENTS-001
-  record_version: '1.1'
+  record_version: '1.2'
   asset_type: control_document
-  purpose: Repository-level agent contract for scope, safety, validation, and status ownership.
-  status: VALIDATED_ACTIVE
+  purpose: Repository-level agent contract for scope, safety, validation, and status
+    ownership.
+  status: IMPLEMENTED_UNVERIFIED
   origin: REPOSITORY
   as_of: '2026-07-22'
-  truth_owner: TASK-03
+  truth_owner: TASK-04
   location:
     kind: git_path
     logical_uri: repo://AGENTS.md
     repository_path: AGENTS.md
   integrity:
     kind: sha256
-    sha256: 32135700f454a547ee7993ef52c864b0b5b01016c0ba3a1661cc894a2b7f46c9
+    sha256: 64952dffee51f8f89dfa8ce1ea98b88351d08418b499c54e447d27194448a5c0
   access:
     mode: read_only
     method: file
@@ -88,9 +90,10 @@ records:
     secrets_required: false
   relations:
   - relation_type: governed_by
-    target_asset_id: CTRL-TASK-03-001
+    target_asset_id: CTRL-TASK-04-001
   consumers:
   - TASK-03
+  - TASK-04
   evidence: []
   classification:
     contains_secrets: false
@@ -127,20 +130,20 @@ records:
     contains_raw_data: false
     sensitivity: INTERNAL_NON_SECRET
 - asset_id: CTRL-PYPROJECT-001
-  record_version: '1.0'
+  record_version: '1.2'
   asset_type: configuration
   purpose: Exact project runtime and dependency declaration for the repository.
-  status: VALIDATED_ACTIVE
+  status: IMPLEMENTED_UNVERIFIED
   origin: REPOSITORY
   as_of: '2026-07-22'
-  truth_owner: TASK-03
+  truth_owner: TASK-04
   location:
     kind: git_path
     logical_uri: repo://pyproject.toml
     repository_path: pyproject.toml
   integrity:
     kind: sha256
-    sha256: f03ab4586ac55ccf8e55ac32b661ca394dde5941af6424fcb5be37644ffb66c8
+    sha256: 6f6c5dfce0d9828a74872f2e0a3644f8925fa10f91792224f79ed6f7d076756d
   access:
     mode: read_only
     method: file
@@ -149,28 +152,31 @@ records:
   relations:
   - relation_type: depends_on
     target_asset_id: ENV-WORKSTATION-001
+  - relation_type: governed_by
+    target_asset_id: ADR-MVP-STACK-002
   consumers:
-  - TASK-03
+  - TASK-04
+  - TASK-05
   evidence: []
   classification:
     contains_secrets: false
     contains_raw_data: false
     sensitivity: INTERNAL_NON_SECRET
 - asset_id: CTRL-UVLOCK-001
-  record_version: '1.0'
+  record_version: '1.2'
   asset_type: lockfile
   purpose: Deterministic dependency lock including Catalog validation dependencies.
-  status: VALIDATED_ACTIVE
+  status: IMPLEMENTED_UNVERIFIED
   origin: REPOSITORY
   as_of: '2026-07-22'
-  truth_owner: TASK-03
+  truth_owner: TASK-04
   location:
     kind: git_path
     logical_uri: repo://uv.lock
     repository_path: uv.lock
   integrity:
     kind: sha256
-    sha256: 7fc04ac7585f8f4807140d14792033f2702bc74ac158217e6afb9aafd831bb7c
+    sha256: 3b75cc1c5a2c0c83560beaf1a57c4543b885e0909c75db6d1939e90d09eefedb
   access:
     mode: read_only
     method: file
@@ -179,8 +185,11 @@ records:
   relations:
   - relation_type: depends_on
     target_asset_id: CTRL-PYPROJECT-001
+  - relation_type: governed_by
+    target_asset_id: ADR-MVP-STACK-002
   consumers:
-  - TASK-03
+  - TASK-04
+  - TASK-05
   evidence: []
   classification:
     contains_secrets: false
@@ -189,7 +198,8 @@ records:
 - asset_id: CTRL-QUALITY-GATE-001
   record_version: '1.1'
   asset_type: script
-  purpose: Windows compatibility wrapper for the platform-neutral repository validation gate.
+  purpose: Windows compatibility wrapper for the platform-neutral repository validation
+    gate.
   status: VALIDATED_ACTIVE
   origin: REPOSITORY
   as_of: '2026-07-22'
@@ -220,7 +230,8 @@ records:
 - asset_id: CI-WORKFLOW-001
   record_version: '1.0'
   asset_type: script
-  purpose: Immutable-pinned GitHub Actions workflow for one read-only repository validation job.
+  purpose: Immutable-pinned GitHub Actions workflow for one read-only repository validation
+    job.
   status: VALIDATED_ACTIVE
   origin: REPOSITORY
   as_of: '2026-07-22'
@@ -254,20 +265,21 @@ records:
     contains_raw_data: false
     sensitivity: INTERNAL_NON_SECRET
 - asset_id: CI-VALIDATOR-001
-  record_version: '1.0'
+  record_version: '1.2'
   asset_type: script
-  purpose: Single platform-neutral gate for runtime, lock, secrets, Catalog, generated views, repository policy, and tests.
-  status: VALIDATED_ACTIVE
+  purpose: Single platform-neutral gate for runtime, lock, secrets, Catalog, generated
+    views, repository policy, and tests.
+  status: IMPLEMENTED_UNVERIFIED
   origin: REPOSITORY
   as_of: '2026-07-22'
-  truth_owner: TASK-03
+  truth_owner: TASK-04
   location:
     kind: git_path
     logical_uri: repo://scripts/validate_ci.py
     repository_path: scripts/validate_ci.py
   integrity:
     kind: sha256
-    sha256: 6b0f1873dec26b52579ef6b62e7d01309b3d16aeaca050cde013e251e8a7aefc
+    sha256: 8da49e3f8d141edcc94efd9bda1ad296cd018e5bfbd98bb8370933c94c4f6f5c
   access:
     mode: read_only
     method: command
@@ -279,8 +291,11 @@ records:
     target_asset_id: CTRL-UVLOCK-001
   - relation_type: validated_by
     target_asset_id: CATALOG-VALIDATOR-001
+  - relation_type: depends_on
+    target_asset_id: VALIDATOR-T04-ARCHITECTURE-001
   consumers:
   - TASK-03
+  - TASK-04
   evidence:
   - evidence_id: EVIDENCE-CI-VALIDATOR-RUN-29868825180
     kind: validator
@@ -291,20 +306,22 @@ records:
     contains_raw_data: false
     sensitivity: INTERNAL_NON_SECRET
 - asset_id: CATALOG-ROOT-001
-  record_version: '1.1'
+  record_version: '1.2'
   asset_type: catalog_root
-  purpose: Stable machine-readable resolver for Catalog registries, schemas, commands, and policies.
-  status: VALIDATED_ACTIVE
+  purpose: Stable machine-readable resolver for Catalog registries, schemas, commands,
+    and policies.
+  status: IMPLEMENTED_UNVERIFIED
   origin: REPOSITORY
   as_of: '2026-07-22'
-  truth_owner: TASK-03
+  truth_owner: TASK-04
   location:
     kind: git_path
     logical_uri: repo://catalog/catalog_manifest.yaml
     repository_path: catalog/catalog_manifest.yaml
   integrity:
     kind: catalog_commit
-    note: Self-referential root is bound by accepted commit/tree and external receipt.
+    note: Self-integrity is bound by the staged Atom 5A candidate and external Work
+      acceptance receipt.
   access:
     mode: read_only
     method: file
@@ -332,26 +349,29 @@ records:
     target_asset_id: GENERATOR-CATALOG-NAVIGATION-001
   consumers:
   - TASK-03
+  - TASK-04
   evidence: []
   classification:
     contains_secrets: false
     contains_raw_data: false
     sensitivity: INTERNAL_NON_SECRET
 - asset_id: CATALOG-ASSET-REGISTRY-CORE-001
-  record_version: '1.0'
+  record_version: '1.2'
   asset_type: catalog_registry
-  purpose: Core Catalog asset records for repository controls, environment, schemas, and evidence.
-  status: VALIDATED_ACTIVE
+  purpose: Core Catalog asset records for repository controls, environment, schemas,
+    and evidence.
+  status: IMPLEMENTED_UNVERIFIED
   origin: REPOSITORY
   as_of: '2026-07-22'
-  truth_owner: TASK-03
+  truth_owner: TASK-04
   location:
     kind: git_path
     logical_uri: repo://catalog/assets/core.yaml
     repository_path: catalog/assets/core.yaml
   integrity:
     kind: catalog_commit
-    note: Registry does not embed its own hash; commit/tree receipt owns self-integrity.
+    note: Self-integrity is bound by the staged Atom 5A candidate and external Work
+      acceptance receipt.
   access:
     mode: read_only
     method: file
@@ -362,6 +382,7 @@ records:
     target_asset_id: CATALOG-SCHEMA-ASSET-001
   consumers:
   - TASK-03
+  - TASK-04
   evidence: []
   classification:
     contains_secrets: false
@@ -370,7 +391,8 @@ records:
 - asset_id: CATALOG-QUERY-REGISTRY-001
   record_version: '1.1'
   asset_type: catalog_registry
-  purpose: Bounded read-only query and command recipes used to validate and resolve Catalog records.
+  purpose: Bounded read-only query and command recipes used to validate and resolve
+    Catalog records.
   status: VALIDATED_ACTIVE
   origin: REPOSITORY
   as_of: '2026-07-22'
@@ -430,7 +452,8 @@ records:
 - asset_id: CATALOG-SCHEMA-ASSET-001
   record_version: '1.1'
   asset_type: schema
-  purpose: Backward-compatible Draft 2020-12 asset schema v1.1 with pre-Git provenance and architecture-intent contracts.
+  purpose: Backward-compatible Draft 2020-12 asset schema v1.1 with pre-Git provenance
+    and architecture-intent contracts.
   status: VALIDATED_ACTIVE
   origin: REPOSITORY
   as_of: '2026-07-22'
@@ -488,20 +511,20 @@ records:
     contains_raw_data: false
     sensitivity: INTERNAL_NON_SECRET
 - asset_id: CATALOG-VALIDATOR-001
-  record_version: '1.1'
+  record_version: '1.2'
   asset_type: script
   purpose: Deterministic schema and semantic validator for Catalog policy and integrity.
-  status: VALIDATED_ACTIVE
+  status: IMPLEMENTED_UNVERIFIED
   origin: REPOSITORY
   as_of: '2026-07-22'
-  truth_owner: TASK-03
+  truth_owner: TASK-04
   location:
     kind: git_path
     logical_uri: repo://scripts/validate_catalog.py
     repository_path: scripts/validate_catalog.py
   integrity:
     kind: sha256
-    sha256: f64241887f41f8fe71503b40de8d24c896c79f2b4be0999e5c51a6ed5947b042
+    sha256: dded437eb15472c528c41911d44b20cd3e656d317c1b79e5bf7abaf677752271
   access:
     mode: read_only
     method: command
@@ -513,6 +536,7 @@ records:
     target_asset_id: CTRL-UVLOCK-001
   consumers:
   - TASK-03
+  - TASK-04
   evidence: []
   classification:
     contains_secrets: false
@@ -552,7 +576,8 @@ records:
 - asset_id: ADR-CATALOG-BASELINE-001
   record_version: '1.0'
   asset_type: decision
-  purpose: Accepted decision for typed YAML plus JSON Schema Catalog baseline and graph database deferral.
+  purpose: Accepted decision for typed YAML plus JSON Schema Catalog baseline and
+    graph database deferral.
   status: IMPLEMENTED_UNVERIFIED
   origin: REPOSITORY
   as_of: '2026-07-21'
@@ -582,7 +607,8 @@ records:
 - asset_id: EVIDENCE-ATOM3A-RECEIPT-001
   record_version: '1.1'
   asset_type: evidence
-  purpose: Deterministic staged-candidate receipt for Catalog foundation validation, checkout/EOL repair, and fingerprints.
+  purpose: Deterministic staged-candidate receipt for Catalog foundation validation,
+    checkout/EOL repair, and fingerprints.
   status: IMPLEMENTED_UNVERIFIED
   origin: REPOSITORY
   as_of: '2026-07-21'
@@ -593,7 +619,8 @@ records:
     repository_path: docs/evidence/task03_atom3a_catalog_foundation_receipt.json
   integrity:
     kind: catalog_commit
-    note: Receipt excludes itself from payload fingerprints and is bound by the candidate/commit tree.
+    note: Receipt excludes itself from payload fingerprints and is bound by the candidate/commit
+      tree.
   access:
     mode: read_only
     method: file
@@ -612,7 +639,8 @@ records:
 - asset_id: CATALOG-ASSET-REGISTRY-PRE-GIT-001
   record_version: '1.0'
   asset_type: catalog_registry
-  purpose: Catalog registry for exact pre-Git artifacts, immutable source bundles, and provenance contracts.
+  purpose: Catalog registry for exact pre-Git artifacts, immutable source bundles,
+    and provenance contracts.
   status: VALIDATED_ACTIVE
   origin: REPOSITORY
   as_of: '2026-07-22'
@@ -646,7 +674,8 @@ records:
 - asset_id: CATALOG-ASSET-REGISTRY-ARCHITECTURE-001
   record_version: '1.0'
   asset_type: catalog_registry
-  purpose: Catalog registry for accepted architecture intents that are explicitly not implementation evidence.
+  purpose: Catalog registry for accepted architecture intents that are explicitly
+    not implementation evidence.
   status: VALIDATED_ACTIVE
   origin: REPOSITORY
   as_of: '2026-07-22'
@@ -677,7 +706,8 @@ records:
 - asset_id: EVIDENCE-ATOM4B-RECEIPT-001
   record_version: '1.0'
   asset_type: evidence
-  purpose: Deterministic receipt for exact pre-Git import, provenance validation, and architecture-intent registration.
+  purpose: Deterministic receipt for exact pre-Git import, provenance validation,
+    and architecture-intent registration.
   status: IMPLEMENTED_UNVERIFIED
   origin: REPOSITORY
   as_of: '2026-07-21'
@@ -688,7 +718,8 @@ records:
     repository_path: docs/evidence/task03_atom4b_pre_git_import_receipt.json
   integrity:
     kind: catalog_commit
-    note: Receipt is bound by the future accepted import commit and external post-commit evidence.
+    note: Receipt is bound by the future accepted import commit and external post-commit
+      evidence.
   access:
     mode: read_only
     method: file
@@ -705,20 +736,22 @@ records:
     contains_raw_data: false
     sensitivity: INTERNAL_NON_SECRET
 - asset_id: CATALOG-ASSET-REGISTRY-LIFECYCLE-001
-  record_version: '1.0'
+  record_version: '1.2'
   asset_type: catalog_registry
-  purpose: Catalog shard for active lifecycle registry assets and generated navigation views.
-  status: VALIDATED_ACTIVE
+  purpose: Catalog shard for active lifecycle registry assets and generated navigation
+    views.
+  status: IMPLEMENTED_UNVERIFIED
   origin: REPOSITORY
   as_of: '2026-07-22'
-  truth_owner: TASK-03
+  truth_owner: TASK-04
   location:
     kind: git_path
     logical_uri: repo://catalog/assets/lifecycle.yaml
     repository_path: catalog/assets/lifecycle.yaml
   integrity:
     kind: catalog_commit
-    note: Registry self-integrity is bound by the Atom 5 candidate commit and its validation evidence.
+    note: Self-integrity is bound by the staged Atom 5A candidate and external Work
+      acceptance receipt.
   access:
     mode: read_only
     method: file
@@ -729,26 +762,27 @@ records:
     target_asset_id: CATALOG-SCHEMA-ASSET-001
   consumers:
   - TASK-03
+  - TASK-04
   evidence: []
   classification:
     contains_secrets: false
     contains_raw_data: false
     sensitivity: INTERNAL_NON_SECRET
 - asset_id: CATALOG-SCHEMA-LIFECYCLE-001
-  record_version: '1.0'
+  record_version: '1.2'
   asset_type: schema
   purpose: Versioned discriminator schema for the nine active lifecycle registry contracts.
-  status: VALIDATED_ACTIVE
+  status: IMPLEMENTED_UNVERIFIED
   origin: REPOSITORY
   as_of: '2026-07-22'
-  truth_owner: TASK-03
+  truth_owner: TASK-04
   location:
     kind: git_path
     logical_uri: repo://catalog/schemas/lifecycle_registry.schema.json
     repository_path: catalog/schemas/lifecycle_registry.schema.json
   integrity:
     kind: sha256
-    sha256: f956d5880ec5d8be4e30ad177031274053494e57efe7416335767d47d5378125
+    sha256: eeb60a4364e472f37eca323681bd5c14e98cc49199d9777c025a4f0e94798b80
   access:
     mode: read_only
     method: file
@@ -757,8 +791,11 @@ records:
   relations:
   - relation_type: validated_by
     target_asset_id: CATALOG-VALIDATOR-001
+  - relation_type: governed_by
+    target_asset_id: CTRL-TASK-04-001
   consumers:
   - TASK-03
+  - TASK-04
   evidence: []
   classification:
     contains_secrets: false
@@ -793,6 +830,728 @@ records:
     target_asset_id: GENERATED-EDGE-PROJECTION-001
   consumers:
   - TASK-03
+  evidence: []
+  classification:
+    contains_secrets: false
+    contains_raw_data: false
+    sensitivity: INTERNAL_NON_SECRET
+- asset_id: CTRL-README-001
+  record_version: '1.0'
+  asset_type: control_document
+  purpose: Repository bootstrap instructions with an explicit non-canonical status
+    boundary.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-07-22'
+  truth_owner: TASK-04
+  location:
+    kind: git_path
+    logical_uri: repo://README.md
+    repository_path: README.md
+  integrity:
+    kind: sha256
+    sha256: e93c78b023f0db04f859dd721d43b30c9eeafb6f03d7dc5bb0cbafabff68dee5
+  access:
+    mode: read_only
+    method: file
+    network_required: false
+    secrets_required: false
+  relations:
+  - relation_type: governed_by
+    target_asset_id: CTRL-TASK-04-001
+  consumers:
+  - TASK-04
+  evidence: []
+  classification:
+    contains_secrets: false
+    contains_raw_data: false
+    sensitivity: INTERNAL_NON_SECRET
+- asset_id: CTRL-TASK-04-001
+  record_version: '1.0'
+  asset_type: control_document
+  purpose: Repository mirror of the bounded TASK-04 architecture contract and candidate
+    checkpoint.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-07-22'
+  truth_owner: TASK-04
+  location:
+    kind: git_path
+    logical_uri: repo://docs/tasks/TASK-04.md
+    repository_path: docs/tasks/TASK-04.md
+  integrity:
+    kind: sha256
+    sha256: be9b021c59ba1b640799514941c35982a4fab6216c90057780a338559fc7878f
+  access:
+    mode: read_only
+    method: file
+    network_required: false
+    secrets_required: false
+  relations:
+  - relation_type: contains
+    target_asset_id: ADR-MVP-STACK-002
+  - relation_type: contains
+    target_asset_id: MATRIX-T04-MVP-STACK-001
+  - relation_type: evidenced_by
+    target_asset_id: EVIDENCE-T04-A5A-CANDIDATE-001
+  consumers:
+  - TASK-04
+  - TASK-05
+  evidence: []
+  classification:
+    contains_secrets: false
+    contains_raw_data: false
+    sensitivity: INTERNAL_NON_SECRET
+- asset_id: CTRL-HANDOFF-PROTOCOL-001
+  record_version: '1.0'
+  asset_type: control_document
+  purpose: Durable local Work-to-Codex handoff trigger and path-safety contract.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-07-22'
+  truth_owner: TASK-04
+  location:
+    kind: git_path
+    logical_uri: repo://docs/agent/HANDOFF_PROTOCOL.md
+    repository_path: docs/agent/HANDOFF_PROTOCOL.md
+  integrity:
+    kind: sha256
+    sha256: 3435bebf47233a449326a828845966549e1c77ead2dab0eb862da8ae54a4a0fd
+  access:
+    mode: read_only
+    method: file
+    network_required: false
+    secrets_required: false
+  relations:
+  - relation_type: governed_by
+    target_asset_id: CTRL-TASK-04-001
+  consumers:
+  - TASK-04
+  evidence: []
+  classification:
+    contains_secrets: false
+    contains_raw_data: false
+    sensitivity: INTERNAL_NON_SECRET
+- asset_id: CTRL-LATEST-HANDOFF-001
+  record_version: '1.0'
+  asset_type: control_document
+  purpose: Latest repository candidate handoff for Work review without canonical acceptance
+    claims.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-07-22'
+  truth_owner: TASK-04
+  location:
+    kind: git_path
+    logical_uri: repo://docs/handoffs/latest.md
+    repository_path: docs/handoffs/latest.md
+  integrity:
+    kind: sha256
+    sha256: 45eecab3e868c599dbf1c98875758ef76115c8dd5acd85e888d2b436f65971bf
+  access:
+    mode: read_only
+    method: file
+    network_required: false
+    secrets_required: false
+  relations:
+  - relation_type: governed_by
+    target_asset_id: CTRL-TASK-04-001
+  - relation_type: evidenced_by
+    target_asset_id: EVIDENCE-T04-A5A-CANDIDATE-001
+  consumers:
+  - TASK-04
+  evidence: []
+  classification:
+    contains_secrets: false
+    contains_raw_data: false
+    sensitivity: INTERNAL_NON_SECRET
+- asset_id: ADR-MVP-STACK-002
+  record_version: '1.0'
+  asset_type: decision
+  purpose: Bounded MVP architecture, exact stack pins, custom BUILD justifications
+    and reuse boundaries.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-07-22'
+  truth_owner: TASK-04
+  location:
+    kind: git_path
+    logical_uri: repo://docs/decisions/ADR-002-mvp-stack.md
+    repository_path: docs/decisions/ADR-002-mvp-stack.md
+  integrity:
+    kind: sha256
+    sha256: 4a3991c9f87176597b92c7a3108672a13584831f65ea64f771dd89de63b8f2a9
+  access:
+    mode: read_only
+    method: file
+    network_required: false
+    secrets_required: false
+  relations:
+  - relation_type: governed_by
+    target_asset_id: CTRL-TASK-04-001
+  - relation_type: evidenced_by
+    target_asset_id: MATRIX-T04-MVP-STACK-001
+  - relation_type: evidenced_by
+    target_asset_id: EVIDENCE-T04-RESEARCH-ACCEPTANCE-001
+  - relation_type: evidenced_by
+    target_asset_id: PROTOTYPE-T04-CORE-NATIVE-STACK-001
+  consumers:
+  - TASK-04
+  - TASK-05
+  evidence: []
+  classification:
+    contains_secrets: false
+    contains_raw_data: false
+    sensitivity: INTERNAL_NON_SECRET
+- asset_id: MATRIX-T04-MVP-STACK-001
+  record_version: '1.0'
+  asset_type: decision
+  purpose: Exact 52-row component decision matrix with stable identities, verdicts,
+    pins and exit boundaries.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-07-22'
+  truth_owner: TASK-04
+  location:
+    kind: git_path
+    logical_uri: repo://docs/decisions/TASK04_component_candidate_matrix_v1.json
+    repository_path: docs/decisions/TASK04_component_candidate_matrix_v1.json
+  integrity:
+    kind: sha256
+    sha256: 100e0fdba3d4d3dabb34c80f9872c75f9a806ac3241295e8aa98caeca8f403e5
+  access:
+    mode: read_only
+    method: file
+    network_required: false
+    secrets_required: false
+  relations:
+  - relation_type: governed_by
+    target_asset_id: CTRL-TASK-04-001
+  - relation_type: derived_from
+    target_asset_id: EVIDENCE-T04-RESEARCH-ACCEPTANCE-001
+  - relation_type: derived_from
+    target_asset_id: PROTOTYPE-T04-CORE-NATIVE-STACK-001
+  consumers:
+  - TASK-04
+  - TASK-05
+  evidence: []
+  classification:
+    contains_secrets: false
+    contains_raw_data: false
+    sensitivity: INTERNAL_NON_SECRET
+- asset_id: EVIDENCE-T04-RESEARCH-ACCEPTANCE-001
+  record_version: '1.0'
+  asset_type: evidence
+  purpose: Normalized acceptance manifest for TASK-04 Atom 2A, 2B/2C and Atom 3 source
+    evidence.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-07-22'
+  truth_owner: TASK-04
+  location:
+    kind: git_path
+    logical_uri: repo://docs/evidence/task04/research/TASK04_RESEARCH_ACCEPTANCE.json
+    repository_path: docs/evidence/task04/research/TASK04_RESEARCH_ACCEPTANCE.json
+  integrity:
+    kind: sha256
+    sha256: 34e3897aab8d454b624f1575c2e191f4249868b1c40e31b378896c2ef1149aa9
+  access:
+    mode: read_only
+    method: file
+    network_required: false
+    secrets_required: false
+  relations:
+  - relation_type: governed_by
+    target_asset_id: CTRL-TASK-04-001
+  consumers:
+  - TASK-04
+  evidence: []
+  classification:
+    contains_secrets: false
+    contains_raw_data: false
+    sensitivity: INTERNAL_NON_SECRET
+- asset_id: EVIDENCE-T04-MANIFEST-001
+  record_version: '1.0'
+  asset_type: evidence
+  purpose: Content-addressed manifest for compact tracked TASK-04 research and Atom
+    4R support evidence.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-07-22'
+  truth_owner: TASK-04
+  location:
+    kind: git_path
+    logical_uri: repo://docs/evidence/task04/EVIDENCE_MANIFEST.json
+    repository_path: docs/evidence/task04/EVIDENCE_MANIFEST.json
+  integrity:
+    kind: sha256
+    sha256: 269ebfe9cfed0c162662937404f513e64e9c5c7fbd031c2d18f99e72fd984856
+  access:
+    mode: read_only
+    method: file
+    network_required: false
+    secrets_required: false
+  relations:
+  - relation_type: contains
+    target_asset_id: EVIDENCE-T04-RESEARCH-ACCEPTANCE-001
+  - relation_type: contains
+    target_asset_id: PROTOTYPE-T04-CORE-NATIVE-STACK-001
+  - relation_type: contains
+    target_asset_id: EVIDENCE-T04-A4R-WORK-ACCEPTANCE-001
+  consumers:
+  - TASK-04
+  evidence: []
+  classification:
+    contains_secrets: false
+    contains_raw_data: false
+    sensitivity: INTERNAL_NON_SECRET
+- asset_id: PROTOTYPE-T04-CORE-NATIVE-STACK-001
+  record_version: '1.0'
+  asset_type: evidence
+  purpose: Accepted Atom 4R cross-platform offline native-stack prototype validation
+    receipt.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-07-22'
+  truth_owner: TASK-04
+  location:
+    kind: git_path
+    logical_uri: repo://docs/evidence/task04/a4r/TASK04_A4R_VALIDATION_RECEIPT.json
+    repository_path: docs/evidence/task04/a4r/TASK04_A4R_VALIDATION_RECEIPT.json
+  integrity:
+    kind: sha256
+    sha256: cc4484e69bb85235a77fa4a69ad04a568da83e1d0ff49ecabb57d8408ad11b4a
+  access:
+    mode: read_only
+    method: file
+    network_required: false
+    secrets_required: false
+  relations:
+  - relation_type: governed_by
+    target_asset_id: CTRL-TASK-04-001
+  - relation_type: evidenced_by
+    target_asset_id: EVIDENCE-T04-PIT-REPLAY-001
+  - relation_type: evidenced_by
+    target_asset_id: EVIDENCE-T04-SUPPLY-CHAIN-001
+  consumers:
+  - TASK-04
+  - TASK-05
+  evidence: []
+  classification:
+    contains_secrets: false
+    contains_raw_data: false
+    sensitivity: INTERNAL_NON_SECRET
+- asset_id: EVIDENCE-T04-PIT-REPLAY-001
+  record_version: '1.0'
+  asset_type: evidence
+  purpose: Accepted Atom 4R deterministic PIT replay and immutable Parquet receipt.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-07-22'
+  truth_owner: TASK-04
+  location:
+    kind: git_path
+    logical_uri: repo://docs/evidence/task04/a4r/PIT_REPLAY_RECEIPT.json
+    repository_path: docs/evidence/task04/a4r/PIT_REPLAY_RECEIPT.json
+  integrity:
+    kind: sha256
+    sha256: c3fc9c0a42245410fdaa2feef32dc527d1e49a5122482f38260bb14753ac0e1f
+  access:
+    mode: read_only
+    method: file
+    network_required: false
+    secrets_required: false
+  relations:
+  - relation_type: governed_by
+    target_asset_id: CTRL-TASK-04-001
+  consumers:
+  - TASK-04
+  evidence: []
+  classification:
+    contains_secrets: false
+    contains_raw_data: false
+    sensitivity: INTERNAL_NON_SECRET
+- asset_id: EVIDENCE-T04-PACKAGE-GRAPH-001
+  record_version: '1.0'
+  asset_type: evidence
+  purpose: Accepted Atom 4R exact cross-platform package and wheel graph evidence.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-07-22'
+  truth_owner: TASK-04
+  location:
+    kind: git_path
+    logical_uri: repo://docs/evidence/task04/a4r/PACKAGE_GRAPH.json
+    repository_path: docs/evidence/task04/a4r/PACKAGE_GRAPH.json
+  integrity:
+    kind: sha256
+    sha256: 0f0fb4c712196fe8508e49e9ea51750399fa7bfe0e965e4e4e032a3e7f308759
+  access:
+    mode: read_only
+    method: file
+    network_required: false
+    secrets_required: false
+  relations:
+  - relation_type: governed_by
+    target_asset_id: CTRL-TASK-04-001
+  consumers:
+  - TASK-04
+  evidence: []
+  classification:
+    contains_secrets: false
+    contains_raw_data: false
+    sensitivity: INTERNAL_NON_SECRET
+- asset_id: EVIDENCE-T04-SUPPLY-CHAIN-001
+  record_version: '1.0'
+  asset_type: evidence
+  purpose: Accepted Atom 4R supply-chain, license metadata and PREVIEW SBOM receipt.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-07-22'
+  truth_owner: TASK-04
+  location:
+    kind: git_path
+    logical_uri: repo://docs/evidence/task04/a4r/SUPPLY_CHAIN_RECEIPT.json
+    repository_path: docs/evidence/task04/a4r/SUPPLY_CHAIN_RECEIPT.json
+  integrity:
+    kind: sha256
+    sha256: ae3976f93f0ec3437b523d3a662a5eb5240abb81fe94c48cdf6aee8e6d21cb79
+  access:
+    mode: read_only
+    method: file
+    network_required: false
+    secrets_required: false
+  relations:
+  - relation_type: evidenced_by
+    target_asset_id: EVIDENCE-T04-PACKAGE-GRAPH-001
+  - relation_type: evidenced_by
+    target_asset_id: EVIDENCE-T04-A4R-SBOM-001
+  consumers:
+  - TASK-04
+  evidence: []
+  classification:
+    contains_secrets: false
+    contains_raw_data: false
+    sensitivity: INTERNAL_NON_SECRET
+- asset_id: EVIDENCE-T04-CLEANUP-001
+  record_version: '1.0'
+  asset_type: evidence
+  purpose: Accepted Atom 4R cleanup and unchanged-repository boundary receipt.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-07-22'
+  truth_owner: TASK-04
+  location:
+    kind: git_path
+    logical_uri: repo://docs/evidence/task04/a4r/CLEANUP_RECEIPT.json
+    repository_path: docs/evidence/task04/a4r/CLEANUP_RECEIPT.json
+  integrity:
+    kind: sha256
+    sha256: cc8ea1ec42732080f2264f8d0eb67c7fe3f20299b5d9c04c53d70ae89ad66cc1
+  access:
+    mode: read_only
+    method: file
+    network_required: false
+    secrets_required: false
+  relations:
+  - relation_type: governed_by
+    target_asset_id: CTRL-TASK-04-001
+  consumers:
+  - TASK-04
+  evidence: []
+  classification:
+    contains_secrets: false
+    contains_raw_data: false
+    sensitivity: INTERNAL_NON_SECRET
+- asset_id: EVIDENCE-T04-A4R-SBOM-001
+  record_version: '1.0'
+  asset_type: evidence
+  purpose: Exact accepted Atom 4R CycloneDX 1.5 PREVIEW export with separately normalized
+    graph digest.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-07-22'
+  truth_owner: TASK-04
+  location:
+    kind: git_path
+    logical_uri: repo://docs/evidence/task04/a4r/SBOM.cdx.json
+    repository_path: docs/evidence/task04/a4r/SBOM.cdx.json
+  integrity:
+    kind: sha256
+    sha256: 4db108ab39ea41339949ca4fc74383e80aa040855b5222f6b9892f257f81aeb6
+  access:
+    mode: read_only
+    method: file
+    network_required: false
+    secrets_required: false
+  relations:
+  - relation_type: governed_by
+    target_asset_id: CTRL-TASK-04-001
+  consumers:
+  - TASK-04
+  evidence: []
+  classification:
+    contains_secrets: false
+    contains_raw_data: false
+    sensitivity: INTERNAL_NON_SECRET
+- asset_id: EVIDENCE-T04-A4R-WORK-ACCEPTANCE-001
+  record_version: '1.0'
+  asset_type: evidence
+  purpose: Work acceptance memo closing the bounded Atom 4R prototype gate with explicit
+    patches.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-07-22'
+  truth_owner: TASK-04
+  location:
+    kind: git_path
+    logical_uri: repo://docs/evidence/task04/a4r/TASK04_A4R_WORK_ACCEPTANCE.md
+    repository_path: docs/evidence/task04/a4r/TASK04_A4R_WORK_ACCEPTANCE.md
+  integrity:
+    kind: sha256
+    sha256: ad2c95d30b2b924c9affb3945ace4227618f013f4daccfec3f6cbaeb4bd9bbb8
+  access:
+    mode: read_only
+    method: file
+    network_required: false
+    secrets_required: false
+  relations:
+  - relation_type: evidenced_by
+    target_asset_id: PROTOTYPE-T04-CORE-NATIVE-STACK-001
+  consumers:
+  - TASK-04
+  evidence: []
+  classification:
+    contains_secrets: false
+    contains_raw_data: false
+    sensitivity: INTERNAL_NON_SECRET
+- asset_id: EVIDENCE-T04-A4R-WORK-RECEIPT-001
+  record_version: '1.0'
+  asset_type: evidence
+  purpose: Machine-readable Work acceptance receipt for the closed Atom 4R prototype
+    gate.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-07-22'
+  truth_owner: TASK-04
+  location:
+    kind: git_path
+    logical_uri: repo://docs/evidence/task04/a4r/TASK04_A4R_WORK_ACCEPTANCE_RECEIPT.json
+    repository_path: docs/evidence/task04/a4r/TASK04_A4R_WORK_ACCEPTANCE_RECEIPT.json
+  integrity:
+    kind: sha256
+    sha256: f50e84d48d2617e6051a6de13851e105b1c077ea233c43b46fda3878aac76b20
+  access:
+    mode: read_only
+    method: file
+    network_required: false
+    secrets_required: false
+  relations:
+  - relation_type: evidenced_by
+    target_asset_id: PROTOTYPE-T04-CORE-NATIVE-STACK-001
+  consumers:
+  - TASK-04
+  evidence: []
+  classification:
+    contains_secrets: false
+    contains_raw_data: false
+    sensitivity: INTERNAL_NON_SECRET
+- asset_id: SBOM-T04-CORE-STACK-001
+  record_version: '1.0'
+  asset_type: evidence
+  purpose: Atom 5A exact-lock CycloneDX 1.5 PREVIEW export for the runtime and security
+    graph.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-07-22'
+  truth_owner: TASK-04
+  location:
+    kind: git_path
+    logical_uri: repo://docs/evidence/task04/a5a/SBOM.cdx.json
+    repository_path: docs/evidence/task04/a5a/SBOM.cdx.json
+  integrity:
+    kind: sha256
+    sha256: 6502eda8930d46db5e754f4f1b8fb406acde435f0bf410d4c0edb766f981cba7
+  access:
+    mode: read_only
+    method: file
+    network_required: false
+    secrets_required: false
+  relations:
+  - relation_type: derived_from
+    target_asset_id: CTRL-UVLOCK-001
+  - relation_type: governed_by
+    target_asset_id: ADR-MVP-STACK-002
+  consumers:
+  - TASK-04
+  - TASK-05
+  evidence: []
+  classification:
+    contains_secrets: false
+    contains_raw_data: false
+    sensitivity: INTERNAL_NON_SECRET
+- asset_id: FIXTURE-T04-PIT-001
+  record_version: '1.0'
+  asset_type: evidence
+  purpose: Sanitized deterministic PIT fixture covering binary, NULL, availability
+    and revision identity.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-07-22'
+  truth_owner: TASK-04
+  location:
+    kind: git_path
+    logical_uri: repo://tests/fixtures/task04/pit_fixture_v1.json
+    repository_path: tests/fixtures/task04/pit_fixture_v1.json
+  integrity:
+    kind: sha256
+    sha256: a69931f98e734f1213c62b49ec30f636f13e2a7db189e0e1c7f09cdf4c61935a
+  access:
+    mode: read_only
+    method: file
+    network_required: false
+    secrets_required: false
+  relations:
+  - relation_type: derived_from
+    target_asset_id: PROTOTYPE-T04-CORE-NATIVE-STACK-001
+  - relation_type: validated_by
+    target_asset_id: TEST-T04-CORE-STACK-001
+  consumers:
+  - TASK-04
+  - TASK-05
+  evidence: []
+  classification:
+    contains_secrets: false
+    contains_raw_data: false
+    sensitivity: INTERNAL_NON_SECRET
+- asset_id: TEST-T04-CORE-STACK-001
+  record_version: '1.0'
+  asset_type: script
+  purpose: Offline end-to-end Parquet, DuckDB and immutable migration-ledger replay
+    plus negative contract tests for the TASK-04 core stack candidate.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-07-22'
+  truth_owner: TASK-04
+  location:
+    kind: git_path
+    logical_uri: repo://tests/test_task04_core_stack.py
+    repository_path: tests/test_task04_core_stack.py
+  integrity:
+    kind: sha256
+    sha256: f2be846c1431c8159a80cbe4926e4fbb5c3ddc3b1f424662296479d2a993a337
+  access:
+    mode: read_only
+    method: command
+    network_required: false
+    secrets_required: false
+  relations:
+  - relation_type: depends_on
+    target_asset_id: FIXTURE-T04-PIT-001
+  - relation_type: validated_by
+    target_asset_id: VALIDATOR-T04-ARCHITECTURE-001
+  consumers:
+  - TASK-04
+  evidence: []
+  classification:
+    contains_secrets: false
+    contains_raw_data: false
+    sensitivity: INTERNAL_NON_SECRET
+- asset_id: VALIDATOR-T04-ARCHITECTURE-001
+  record_version: '1.0'
+  asset_type: script
+  purpose: Fail-closed TASK-04 replay, architecture, matrix, registry, dependency,
+    evidence and SBOM validator.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-07-22'
+  truth_owner: TASK-04
+  location:
+    kind: git_path
+    logical_uri: repo://scripts/validate_task04.py
+    repository_path: scripts/validate_task04.py
+  integrity:
+    kind: sha256
+    sha256: b2e5a57f82774cc12a128521519f3561fea2e812cddd488d5d7ed10966cb0dfe
+  access:
+    mode: read_only
+    method: command
+    network_required: false
+    secrets_required: false
+  relations:
+  - relation_type: governed_by
+    target_asset_id: CTRL-TASK-04-001
+  - relation_type: depends_on
+    target_asset_id: CTRL-UVLOCK-001
+  consumers:
+  - TASK-04
+  - TASK-05
+  evidence: []
+  classification:
+    contains_secrets: false
+    contains_raw_data: false
+    sensitivity: INTERNAL_NON_SECRET
+- asset_id: VALIDATOR-REPOSITORY-STATE-001
+  record_version: '1.0'
+  asset_type: script
+  purpose: Fail-closed historical and exact staged repository-state validator including
+    Atom 5A.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-07-22'
+  truth_owner: TASK-04
+  location:
+    kind: git_path
+    logical_uri: repo://scripts/validate_baseline.py
+    repository_path: scripts/validate_baseline.py
+  integrity:
+    kind: sha256
+    sha256: 2c0ec342e67259365c3c2a58594f34dd804d9425dde4ede385772b746a4016a2
+  access:
+    mode: read_only
+    method: command
+    network_required: false
+    secrets_required: false
+  relations:
+  - relation_type: governed_by
+    target_asset_id: CTRL-TASK-04-001
+  - relation_type: depends_on
+    target_asset_id: CATALOG-ROOT-001
+  consumers:
+  - TASK-04
+  evidence: []
+  classification:
+    contains_secrets: false
+    contains_raw_data: false
+    sensitivity: INTERNAL_NON_SECRET
+- asset_id: EVIDENCE-T04-A5A-CANDIDATE-001
+  record_version: '1.0'
+  asset_type: evidence
+  purpose: Tracked bounded Atom 5A candidate checkpoint with zero-effect and exact-count
+    claims.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-07-22'
+  truth_owner: TASK-04
+  location:
+    kind: git_path
+    logical_uri: repo://docs/evidence/task04/TASK04_A5A_CANDIDATE_RECEIPT.json
+    repository_path: docs/evidence/task04/TASK04_A5A_CANDIDATE_RECEIPT.json
+  integrity:
+    kind: sha256
+    sha256: 5c5270de88d2fcbfbba5ed1c1770c896534d5f009e9914b458b83d5b7fe3ea20
+  access:
+    mode: read_only
+    method: file
+    network_required: false
+    secrets_required: false
+  relations:
+  - relation_type: governed_by
+    target_asset_id: CTRL-TASK-04-001
+  - relation_type: validated_by
+    target_asset_id: VALIDATOR-T04-ARCHITECTURE-001
+  consumers:
+  - TASK-04
   evidence: []
   classification:
     contains_secrets: false

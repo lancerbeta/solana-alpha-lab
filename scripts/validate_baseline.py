@@ -192,6 +192,76 @@ ATOM7_SINGLE_BRANCH_REFSPEC_REPAIR_FILES = {
     "scripts/validate_baseline.py",
     "tests/test_baseline.py",
 }
+TASK04_BASE_COMMIT_OID = "f8ff483dbcf00454852a9638466eb4123e2c5809"
+TASK04_BASE_TREE_OID = "cfbf181fa2c005cf517a218c70ede51c701b5a43"
+TASK04_BASE_PARENT_OID = ATOM7_REF_NORMALIZATION_REPAIR_COMMIT_OID
+TASK04_BASE_COMMIT_COUNT = ATOM7_SINGLE_BRANCH_REFSPEC_REPAIR_COMMIT_COUNT
+TASK04_BASE_FILE_COUNT = 77
+TASK04_MODIFIED_FILES = {
+    "AGENTS.md",
+    "README.md",
+    "catalog/assets/core.yaml",
+    "catalog/assets/lifecycle.yaml",
+    "catalog/catalog_manifest.yaml",
+    "catalog/generated/asset_edges.json",
+    "catalog/schemas/lifecycle_registry.schema.json",
+    "docs/PROJECT_MAP.md",
+    "docs/handoffs/latest.md",
+    "pyproject.toml",
+    "registries/reuse_candidates.yaml",
+    "scripts/validate_baseline.py",
+    "scripts/validate_catalog.py",
+    "scripts/validate_ci.py",
+    "tests/test_baseline.py",
+    "tests/test_catalog.py",
+    "tests/test_ci.py",
+    "tests/test_lifecycle_registries.py",
+    "uv.lock",
+}
+TASK04_CREATED_FILES = {
+    "docs/agent/HANDOFF_PROTOCOL.md",
+    "docs/decisions/ADR-002-mvp-stack.md",
+    "docs/decisions/TASK04_component_candidate_matrix_v1.json",
+    "docs/evidence/task04/EVIDENCE_MANIFEST.json",
+    "docs/evidence/task04/TASK04_A5A_CANDIDATE_RECEIPT.json",
+    "docs/evidence/task04/a4r/CLEANUP_RECEIPT.json",
+    "docs/evidence/task04/a4r/PACKAGE_GRAPH.json",
+    "docs/evidence/task04/a4r/PIT_REPLAY_RECEIPT.json",
+    "docs/evidence/task04/a4r/SBOM.cdx.json",
+    "docs/evidence/task04/a4r/SUPPLY_CHAIN_RECEIPT.json",
+    "docs/evidence/task04/a4r/TASK04_A4R_VALIDATION_RECEIPT.json",
+    "docs/evidence/task04/a4r/TASK04_A4R_WORK_ACCEPTANCE.md",
+    "docs/evidence/task04/a4r/TASK04_A4R_WORK_ACCEPTANCE_RECEIPT.json",
+    "docs/evidence/task04/a5a/SBOM.cdx.json",
+    "docs/evidence/task04/research/TASK04_RESEARCH_ACCEPTANCE.json",
+    "docs/tasks/TASK-04.md",
+    "scripts/validate_task04.py",
+    "tests/fixtures/task04/pit_fixture_v1.json",
+    "tests/test_task04_core_stack.py",
+}
+TASK04_CHANGED_FILES = TASK04_MODIFIED_FILES | TASK04_CREATED_FILES
+TASK04_EXPECTED_REPOSITORY_FILE_COUNT = TASK04_BASE_FILE_COUNT + len(TASK04_CREATED_FILES)
+TASK04_EXPECTED_CATALOG_VERSION = "0.3.0"
+TASK04_EXPECTED_CATALOG_ASSET_COUNT = 82
+TASK04_EXPECTED_RUNTIME_DEPENDENCIES = {
+    "PyYAML==6.0.3",
+    "jsonschema==4.26.0",
+    "duckdb==1.5.5",
+    "pyarrow==25.0.0",
+    "pydantic==2.13.4",
+    "solana==0.40.1",
+    "solders==0.28.0",
+    "prometheus-client==0.25.0",
+}
+TASK04_EXPECTED_RUNTIME_VERSIONS = {
+    "duckdb": "1.5.5",
+    "pyarrow": "25.0.0",
+    "pydantic": "2.13.4",
+    "pydantic-core": "2.46.4",
+    "solana": "0.40.1",
+    "solders": "0.28.0",
+    "prometheus-client": "0.25.0",
+}
 EXPECTED_DEFERRED_CAPABILITIES = {"GRAPH_DATABASE"}
 EXPECTED_ORIGIN_URL = "https://github.com/lancerbeta/solana-alpha-lab.git"
 EXPECTED_CI_ORIGIN_URLS = {
@@ -460,6 +530,10 @@ def atom7_repository_files() -> set[str]:
     )
 
 
+def task04_repository_files() -> set[str]:
+    return tree_files(TASK04_BASE_COMMIT_OID) | TASK04_CREATED_FILES
+
+
 def repository_files() -> set[str]:
     result = set()
     for path in ROOT.rglob("*"):
@@ -539,6 +613,20 @@ def classify_state(
     atom5_files = atom5_repository_files()
     atom5_acceptance_files = atom5_work_acceptance_repository_files()
     atom7_files = atom7_repository_files()
+    task04_files = task04_repository_files()
+    if (
+        head_oid == TASK04_BASE_COMMIT_OID
+        and commit_count == TASK04_BASE_COMMIT_COUNT
+        and parent_oid == TASK04_BASE_PARENT_OID
+        and tracked == task04_files
+        and len(tracked) == TASK04_EXPECTED_REPOSITORY_FILE_COUNT
+        and staged == TASK04_CHANGED_FILES
+        and not untracked
+        and not unstaged
+        and commit_subject == ATOM7_SINGLE_BRANCH_REFSPEC_REPAIR_COMMIT_SUBJECT
+        and commit_changed == ATOM7_SINGLE_BRANCH_REFSPEC_REPAIR_FILES
+    ):
+        return "TASK04_ATOM5A_CANDIDATE_STAGED"
     if (
         head_oid == BASE_COMMIT_OID
         and commit_count == BASE_COMMIT_COUNT
@@ -1007,6 +1095,24 @@ def validate_atom7_single_branch_refspec_repair_staged_style_policy() -> None:
     )
 
 
+def validate_task04_atom5a_staged_style_policy() -> None:
+    diff = run(
+        [
+            "git",
+            "diff",
+            "--cached",
+            "--check",
+            "--",
+            *sorted(TASK04_CHANGED_FILES),
+        ]
+    )
+    assert_check(
+        "task04_atom5a_staged_diff_check",
+        diff.returncode == 0,
+        diff.stdout.strip() + diff.stderr.strip(),
+    )
+
+
 def validate() -> None:
     github_actions = os.environ.get("GITHUB_ACTIONS", "").lower() == "true"
     branch_result = run(["git", "symbolic-ref", "--short", "HEAD"])
@@ -1151,6 +1257,7 @@ def validate() -> None:
         "ATOM7_REF_NORMALIZATION_REPAIR_COMMITTED",
         "ATOM7_SINGLE_BRANCH_REFSPEC_REPAIR_STAGED",
         "ATOM7_SINGLE_BRANCH_REFSPEC_REPAIR_COMMITTED",
+        "TASK04_ATOM5A_CANDIDATE_STAGED",
     }
     assert_check("repository_state", state in valid_states, state)
     if state == "ATOM7_FINAL_HANDOFF_STAGED":
@@ -1192,7 +1299,15 @@ def validate() -> None:
             in {"PUBLISHED_LOCAL", "GITHUB_ACTIONS_CHECKOUT", "CLEAN_CLONE"},
             topology,
         )
-    if state.startswith("ATOM7_"):
+    if state == "TASK04_ATOM5A_CANDIDATE_STAGED":
+        assert_check(
+            "task04_atom5a_staged_topology",
+            topology == "PUBLISHED_LOCAL",
+            topology,
+        )
+    if state == "TASK04_ATOM5A_CANDIDATE_STAGED":
+        expected_file_count = TASK04_EXPECTED_REPOSITORY_FILE_COUNT
+    elif state.startswith("ATOM7_"):
         expected_file_count = ATOM7_EXPECTED_REPOSITORY_FILE_COUNT
     elif state.startswith("ATOM5_"):
         expected_file_count = ATOM5_EXPECTED_REPOSITORY_FILE_COUNT
@@ -1228,13 +1343,64 @@ def validate() -> None:
         set(manifest["deferred_capabilities"])
         == EXPECTED_DEFERRED_CAPABILITIES,
     )
+    if state == "TASK04_ATOM5A_CANDIDATE_STAGED":
+        assert_check(
+            "task04_catalog_version",
+            str(manifest.get("catalog_version")) == TASK04_EXPECTED_CATALOG_VERSION,
+        )
+        asset_count = sum(
+            len(yaml.safe_load((ROOT / relative).read_text(encoding="utf-8"))["records"])
+            for relative in manifest["root_resolver"]["asset_registries"]
+        )
+        assert_check("task04_catalog_asset_count", asset_count == TASK04_EXPECTED_CATALOG_ASSET_COUNT)
+        lifecycle = [
+            yaml.safe_load((ROOT / relative).read_text(encoding="utf-8"))
+            for relative in manifest["root_resolver"]["lifecycle_registries"]
+        ]
+        reuse_count = sum(
+            len(document["records"])
+            for document in lifecycle
+            if document["registry_type"] == "reuse_candidates"
+        )
+        production_count = sum(
+            len(document["records"])
+            for document in lifecycle
+            if document["registry_type"] != "reuse_candidates"
+        )
+        assert_check("reuse_decision_record_count", reuse_count == 52)
+        assert_check("production_lifecycle_record_count", production_count == 0)
     assert_check("venv_present", (ROOT/".venv").is_dir())
     assert_check("runtime_exact", sys.version_info[:3] == EXPECTED_PYTHON)
     assert_check("runtime_is_venv", Path(sys.prefix).resolve() == (ROOT/".venv").resolve())
     assert_check("jsonschema_version", importlib.metadata.version("jsonschema") == EXPECTED_JSONSCHEMA)
     assert_check("pyyaml_version", importlib.metadata.version("PyYAML") == EXPECTED_PYYAML)
     with (ROOT/"pyproject.toml").open("rb") as handle: metadata = tomllib.load(handle)
-    assert_check("dependency_contract", set(metadata["project"]["dependencies"]) == {f"PyYAML=={EXPECTED_PYYAML}",f"jsonschema=={EXPECTED_JSONSCHEMA}"})
+    expected_dependencies = (
+        TASK04_EXPECTED_RUNTIME_DEPENDENCIES
+        if state == "TASK04_ATOM5A_CANDIDATE_STAGED"
+        else {f"PyYAML=={EXPECTED_PYYAML}", f"jsonschema=={EXPECTED_JSONSCHEMA}"}
+    )
+    assert_check("dependency_contract", set(metadata["project"]["dependencies"]) == expected_dependencies)
+    if state == "TASK04_ATOM5A_CANDIDATE_STAGED":
+        assert_check(
+            "security_dependency_group",
+            metadata.get("dependency-groups") == {"security": ["pip-audit==2.10.1"]},
+        )
+        assert_check(
+            "mutable_tool_metadata_removed",
+            not ({"task", "stage", "catalog_version"} & set(metadata["tool"]["solana-alpha-lab"])),
+        )
+        for distribution, expected in TASK04_EXPECTED_RUNTIME_VERSIONS.items():
+            assert_check(
+                f"runtime_version:{distribution}",
+                importlib.metadata.version(distribution) == expected,
+            )
+        try:
+            importlib.metadata.version("pip-audit")
+        except importlib.metadata.PackageNotFoundError:
+            print("runtime_security_group_absent: PASS")
+        else:
+            raise AssertionError("runtime_security_group_present")
     assert_check("uv_version_contract", metadata["tool"]["uv"].get("required-version") == "==0.11.29")
     lock = run(["uv","lock","--check","--managed-python"]); assert_check("uv_lock_check", lock.returncode == 0, lock.stderr.strip())
     receipt = json.loads(CURRENT_RECEIPT.read_text(encoding="utf-8"))
@@ -1278,6 +1444,8 @@ def validate() -> None:
         validate_atom7_ref_normalization_repair_staged_style_policy()
     if state == "ATOM7_SINGLE_BRANCH_REFSPEC_REPAIR_STAGED":
         validate_atom7_single_branch_refspec_repair_staged_style_policy()
+    if state == "TASK04_ATOM5A_CANDIDATE_STAGED":
+        validate_task04_atom5a_staged_style_policy()
     tests = run([sys.executable,"-B","-m","unittest","discover","-s","tests","-p","test_*.py"])
     if tests.stdout.strip(): print(tests.stdout.strip())
     if tests.stderr.strip(): print(tests.stderr.strip())

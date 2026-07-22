@@ -3,17 +3,17 @@
 A bounded, evidence-first research system for executable Solana memecoin alpha
 on a 15-minute to 4-hour horizon.
 
-## Current repository stage
+## Repository status boundary
 
-Atom 7B is Work-accepted. The private repository is active on `origin/main`; the
-prior accepted HEAD is `21cfe7fb5c0d410bd9c86976ee3c815dca249399`, and GitHub
-Actions run `29868825180` passed for that exact commit. The current change is the
-T03-A7C final acceptance candidate. It still requires a new terminal CI PASS and
-an exact-final-HEAD clean-clone receipt before Work may reconcile canonical
-Sources or accept TASK-03 as complete.
+This README is bootstrap documentation, not a live task-status source.
+Work/control plane owns canonical status and acceptance. For current work, use
+only the task and handoff explicitly named by the Work-approved prompt. The
+repository may contain an uncommitted or staged candidate without changing the
+canonical task state.
 
-The Catalog contains 60 assets, 4 asset shards, 4 schemas, and 5 read-only query
-recipes. All nine lifecycle registries remain empty.
+Catalog counts, lifecycle counts, exact dependency pins, and candidate state
+are checked by the repository validation gate and recorded in the explicitly
+named task/handoff.
 
 ## Exact prerequisites
 
@@ -67,6 +67,6 @@ TASK-01/TASK-02 imported bytes remain historical references; source bundles stay
 outside Git and are registered by SHA-256. `ARCH-INTENT-001` remains
 `ACCEPTED_DIRECTION_NOT_IMPLEMENTED`.
 
-Accepted external CI evidence: run `29868825180` PASS at the prior accepted
-HEAD. The T03-A7C candidate requires its own new terminal run. Provider/API/RPC
-calls and cash spend remain zero.
+Provider/API/RPC access, wallet or signer use, and real-money actions require a
+separate explicit Work authorization; repository documentation does not grant
+that authority.

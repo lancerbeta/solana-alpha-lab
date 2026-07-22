@@ -1,0 +1,47 @@
+{
+  "schema_version": "1.0",
+  "artifact_id": "EVIDENCE-T04-MANIFEST-001",
+  "task_id": "TASK-04",
+  "as_of": "2026-07-22",
+  "scope": "TRACKED_TASK04_RESEARCH_AND_A4R_SUPPORT_FILES",
+  "files": [
+    {
+      "path": "docs/evidence/task04/research/TASK04_RESEARCH_ACCEPTANCE.json",
+      "sha256": "34e3897aab8d454b624f1575c2e191f4249868b1c40e31b378896c2ef1149aa9"
+    },
+    {
+      "path": "docs/evidence/task04/a4r/TASK04_A4R_VALIDATION_RECEIPT.json",
+      "sha256": "cc4484e69bb85235a77fa4a69ad04a568da83e1d0ff49ecabb57d8408ad11b4a"
+    },
+    {
+      "path": "docs/evidence/task04/a4r/PIT_REPLAY_RECEIPT.json",
+      "sha256": "c3fc9c0a42245410fdaa2feef32dc527d1e49a5122482f38260bb14753ac0e1f"
+    },
+    {
+      "path": "docs/evidence/task04/a4r/PACKAGE_GRAPH.json",
+      "sha256": "0f0fb4c712196fe8508e49e9ea51750399fa7bfe0e965e4e4e032a3e7f308759"
+    },
+    {
+      "path": "docs/evidence/task04/a4r/SUPPLY_CHAIN_RECEIPT.json",
+      "sha256": "ae3976f93f0ec3437b523d3a662a5eb5240abb81fe94c48cdf6aee8e6d21cb79"
+    },
+    {
+      "path": "docs/evidence/task04/a4r/CLEANUP_RECEIPT.json",
+      "sha256": "cc8ea1ec42732080f2264f8d0eb67c7fe3f20299b5d9c04c53d70ae89ad66cc1"
+    },
+    {
+      "path": "docs/evidence/task04/a4r/SBOM.cdx.json",
+      "sha256": "4db108ab39ea41339949ca4fc74383e80aa040855b5222f6b9892f257f81aeb6"
+    },
+    {
+      "path": "docs/evidence/task04/a4r/TASK04_A4R_WORK_ACCEPTANCE.md",
+      "sha256": "ad2c95d30b2b924c9affb3945ace4227618f013f4daccfec3f6cbaeb4bd9bbb8"
+    },
+    {
+      "path": "docs/evidence/task04/a4r/TASK04_A4R_WORK_ACCEPTANCE_RECEIPT.json",
+      "sha256": "f50e84d48d2617e6051a6de13851e105b1c077ea233c43b46fda3878aac76b20"
+    }
+  ],
+  "contains_secrets": false,
+  "contains_absolute_paths": false
+}

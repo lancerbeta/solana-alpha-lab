@@ -385,7 +385,7 @@ def load_and_validate(
 
 
 def main() -> int:
-    print("=== TASK-03 ATOM 5 CATALOG VALIDATION ===")
+    print("=== SMIAL CATALOG VALIDATION ===")
     try:
         snapshot = load_and_validate()
     except Exception as exc:
@@ -410,6 +410,14 @@ def main() -> int:
     print(f"asset_count: {len(snapshot.assets)}")
     print(f"query_count: {len(snapshot.queries)}")
     print(f"lifecycle_registry_count: {len(snapshot.lifecycle_documents)}")
+    reuse_records = sum(
+        len(document["records"])
+        for document in snapshot.lifecycle_documents
+        if document["registry_type"] == "reuse_candidates"
+    )
+    production_records = len(snapshot.lifecycle_records) - reuse_records
+    print(f"reuse_decision_record_count: {reuse_records}")
+    print(f"production_lifecycle_record_count: {production_records}")
     print(f"lifecycle_record_count: {len(snapshot.lifecycle_records)}")
     print("CATALOG_RESULT: PASS")
     return 0

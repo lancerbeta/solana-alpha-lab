@@ -1,0 +1,1426 @@
+{
+  "schema_version": "1.0",
+  "asset_id": "MATRIX-T04-MVP-STACK-001",
+  "task_id": "TASK-04",
+  "atom_id": "T04-A5A",
+  "status": "IMPLEMENTED_UNVERIFIED",
+  "as_of": "2026-07-22",
+  "base_commit": "f8ff483dbcf00454852a9638466eb4123e2c5809",
+  "source_matrix_sha256": "80fef98e5b1f1c8d615ccb789ca091ed668a68a83c9b8de89f8f8e342157c650",
+  "prototype_gate": "CLOSED_PASS",
+  "row_count": 52,
+  "verdict_counts": {
+    "ADOPT": 13,
+    "WRAP": 8,
+    "FORK": 0,
+    "BUILD": 8,
+    "DEFER": 15,
+    "REJECT": 8
+  },
+  "rows": [
+    {
+      "candidate_id": "REUSE-T04-CPYTHON-001",
+      "verdict": "ADOPT",
+      "decision_status": "ACCEPTED_RETAIN",
+      "component_area": "A1_RUNTIME_DEPENDENCIES",
+      "candidate_name": "CPython",
+      "pin": "3.13.14",
+      "decision_owner": "TASK-04_ARCHITECTURE_OWNER",
+      "maintenance_owner": "TASK-04_ARCHITECTURE_OWNER",
+      "named_consumers": [
+        "TASK-05..TASK-12; all Python tooling"
+      ],
+      "integration_boundary": "Project runtime only; system Python remains unrelated.",
+      "primary_evidence": [
+        "TASK-03 runtime receipt; current_system_state; Atom 2A acceptance"
+      ],
+      "as_of": "2026-07-22",
+      "license_terms_state": "PSF License; exact runtime already validated by TASK-03.",
+      "pit_replay": "Deterministic interpreter baseline; no data semantics delegated.",
+      "security_signer": "Research runtime has no signer or wallet authority.",
+      "maintenance_sbom": "Pin in .python-version/uv.lock receipts; upgrade only by explicit task.",
+      "tco": "LOW; already installed and reproduced in clean clone.",
+      "lock_in": "LOW",
+      "exit_path": "Upgrade to a later CPython minor after wheel/test matrix passes.",
+      "falsifier": "A required accepted dependency cannot resolve or execute on 3.13.14.",
+      "next_validation": "TASK-05_CONTRACT_FIXTURE_VALIDATION"
+    },
+    {
+      "candidate_id": "REUSE-T04-UV-001",
+      "verdict": "ADOPT",
+      "decision_status": "ACCEPTED_RETAIN",
+      "component_area": "A1_RUNTIME_DEPENDENCIES",
+      "candidate_name": "uv + uv.lock",
+      "pin": "0.11.29",
+      "decision_owner": "TASK-04_ARCHITECTURE_OWNER",
+      "maintenance_owner": "TASK-04_ARCHITECTURE_OWNER",
+      "named_consumers": [
+        "TASK-05..TASK-12; CI; clean clone; SBOM/audit receipts"
+      ],
+      "integration_boundary": "Sole project dependency authority; pip is bootstrap/compatibility only.",
+      "primary_evidence": [
+        "TASK-03 repository truth; Atom 2A/2C acceptance patches"
+      ],
+      "as_of": "2026-07-22",
+      "license_terms_state": "Exact official license record must be captured in Atom 5; existing component is already validated.",
+      "pit_replay": "Locks code environment, not market data; receipts bind interpreter and lock hash.",
+      "security_signer": "No secrets in lock; no unlocked install path in CI.",
+      "maintenance_sbom": "Use --locked/--managed-python; review advisories and exact lock diff.",
+      "tco": "LOW; existing validated workflow.",
+      "lock_in": "LOW-MEDIUM",
+      "exit_path": "Export standard dependency views if a named consumer requires them; pyproject remains portable.",
+      "falsifier": "Cross-platform native core cannot share one reviewed lock or uv export/audit is non-reproducible.",
+      "next_validation": "TASK-05_CONTRACT_FIXTURE_VALIDATION"
+    },
+    {
+      "candidate_id": "REUSE-T04-VENV-001",
+      "verdict": "ADOPT",
+      "decision_status": "ACCEPTED_RETAIN",
+      "component_area": "A1_RUNTIME_DEPENDENCIES",
+      "candidate_name": "uv-managed project .venv",
+      "pin": "PENDING_TASK_SPECIFIC_CONTRACT",
+      "decision_owner": "TASK-04_ARCHITECTURE_OWNER",
+      "maintenance_owner": "TASK-04_ARCHITECTURE_OWNER",
+      "named_consumers": [
+        "Local development; CI-equivalent validation"
+      ],
+      "integration_boundary": "Disposable, Git-ignored environment.",
+      "primary_evidence": [
+        "TASK-03 clean-clone/runtime receipts"
+      ],
+      "as_of": "2026-07-22",
+      "license_terms_state": "No separate product contract; inherits CPython/uv.",
+      "pit_replay": "Rebuild, never copy, the environment.",
+      "security_signer": "No project secrets persisted in environment artifacts or receipts.",
+      "maintenance_sbom": "Delete/recreate on lock change.",
+      "tco": "LOW",
+      "lock_in": "LOW",
+      "exit_path": "Recreate via any standard Python environment tool from exported requirements if needed.",
+      "falsifier": "Clean recreation does not reproduce imports/tests.",
+      "next_validation": "TASK-05_CONTRACT_FIXTURE_VALIDATION"
+    },
+    {
+      "candidate_id": "REUSE-T04-PIPTOOLS-001",
+      "verdict": "REJECT",
+      "decision_status": "REJECTED_FOR_BASELINE",
+      "component_area": "A1_RUNTIME_DEPENDENCIES",
+      "candidate_name": "pip-tools as canonical lock authority",
+      "pin": "PENDING_TASK_SPECIFIC_CONTRACT",
+      "decision_owner": "WORK_CONTROL_PLANE",
+      "maintenance_owner": "WORK_CONTROL_PLANE",
+      "named_consumers": [
+        "None"
+      ],
+      "integration_boundary": "Would duplicate the accepted uv lock workflow.",
+      "primary_evidence": [
+        "Atom 2A acceptance patch"
+      ],
+      "as_of": "2026-07-22",
+      "license_terms_state": "Not decision-relevant after rejection.",
+      "pit_replay": "No additional PIT value.",
+      "security_signer": "Second resolver/lock authority increases drift surface.",
+      "maintenance_sbom": "Would require parallel pins and validation.",
+      "tco": "MEDIUM; migration and dual-workflow burden.",
+      "lock_in": "MEDIUM",
+      "exit_path": "Not adopted.",
+      "falsifier": "Reconsider only if uv cannot satisfy a named consumer or platform requirement.",
+      "next_validation": "REOPEN_ONLY_AFTER_FALSIFIER_INVALIDATION"
+    },
+    {
+      "candidate_id": "REUSE-T04-POETRY-001",
+      "verdict": "REJECT",
+      "decision_status": "REJECTED_FOR_BASELINE",
+      "component_area": "A1_RUNTIME_DEPENDENCIES",
+      "candidate_name": "Poetry",
+      "pin": "PENDING_TASK_SPECIFIC_CONTRACT",
+      "decision_owner": "WORK_CONTROL_PLANE",
+      "maintenance_owner": "WORK_CONTROL_PLANE",
+      "named_consumers": [
+        "None"
+      ],
+      "integration_boundary": "Broader packaging workflow than required.",
+      "primary_evidence": [
+        "Atom 2A report + acceptance patch"
+      ],
+      "as_of": "2026-07-22",
+      "license_terms_state": "Not decision-relevant after rejection.",
+      "pit_replay": "No unique replay benefit.",
+      "security_signer": "Adds another dependency authority.",
+      "maintenance_sbom": "Extra lock/build surface.",
+      "tco": "MEDIUM",
+      "lock_in": "MEDIUM-HIGH",
+      "exit_path": "Not adopted.",
+      "falsifier": "Reconsider only if project becomes a distributable package with a demonstrated workflow gap.",
+      "next_validation": "REOPEN_ONLY_AFTER_FALSIFIER_INVALIDATION"
+    },
+    {
+      "candidate_id": "REUSE-T04-PYLOCK-001",
+      "verdict": "DEFER",
+      "decision_status": "DEFERRED",
+      "component_area": "A1_RUNTIME_DEPENDENCIES",
+      "candidate_name": "pylock.toml / pip lock as canonical path",
+      "pin": "PENDING_TASK_SPECIFIC_CONTRACT",
+      "decision_owner": "WORK_CONTROL_PLANE",
+      "maintenance_owner": "WORK_CONTROL_PLANE",
+      "named_consumers": [
+        "Future external installer/distribution consumer"
+      ],
+      "integration_boundary": "Export-only; never a second source of truth.",
+      "primary_evidence": [
+        "Atom 2A report + acceptance patch"
+      ],
+      "as_of": "2026-07-22",
+      "license_terms_state": "Standard/tool terms to review if activated.",
+      "pit_replay": "Environment portability only.",
+      "security_signer": "Must not bypass accepted lock.",
+      "maintenance_sbom": "Generate and hash only when a consumer exists.",
+      "tco": "LOW when needed",
+      "lock_in": "LOW",
+      "exit_path": "Delete generated export.",
+      "falsifier": "A named consumer cannot use uv.lock or a supported export.",
+      "next_validation": "REASSESS_ONLY_ON_DOCUMENTED_TRIGGER"
+    },
+    {
+      "candidate_id": "REUSE-T04-SOLANA-PY-001",
+      "verdict": "WRAP",
+      "decision_status": "CONDITIONAL_ACCEPT",
+      "component_area": "A2_SOLANA_INGESTION_DECODING",
+      "candidate_name": "solana-py async RPC/WebSocket client",
+      "pin": "0.40.1",
+      "decision_owner": "TASK-04_ARCHITECTURE_OWNER",
+      "maintenance_owner": "TASK-04_ARCHITECTURE_OWNER",
+      "named_consumers": [
+        "TASK-07, TASK-08, TASK-09; future replay fixtures"
+      ],
+      "integration_boundary": "Project-owned RpcPort exposes bounded read methods and raw-response capture; no direct library types above adapter.",
+      "primary_evidence": [
+        "Atom 2B report + 2B/2C acceptance memo"
+      ],
+      "as_of": "2026-07-22",
+      "license_terms_state": "MIT reported by Atom 2B review; exact package metadata receipt required before commit.",
+      "pit_replay": "Adapter records method/params/context/observed_at/available_at/raw bytes before normalization.",
+      "security_signer": "Read-only methods only in P1; transaction build/send/sign APIs excluded.",
+      "maintenance_sbom": "Exact package pin + transitive lock + import smoke.",
+      "tco": "LOW-MEDIUM",
+      "lock_in": "MEDIUM, bounded by adapter",
+      "exit_path": "Replace adapter with another JSON-RPC/WSS client; raw envelope and normalized contracts remain.",
+      "falsifier": "Cannot preserve raw/context/timestamps or fails accepted Python/platform matrix.",
+      "next_validation": "TASK-05_ADAPTER_BOUNDARY_VALIDATION"
+    },
+    {
+      "candidate_id": "REUSE-T04-SOLDERS-001",
+      "verdict": "WRAP",
+      "decision_status": "CONDITIONAL_ACCEPT",
+      "component_area": "A2_SOLANA_INGESTION_DECODING",
+      "candidate_name": "solders low-level Solana types/parsing",
+      "pin": "0.28.0",
+      "decision_owner": "TASK-04_ARCHITECTURE_OWNER",
+      "maintenance_owner": "TASK-04_ARCHITECTURE_OWNER",
+      "named_consumers": [
+        "TASK-05, TASK-07..TASK-09; decoder fixtures"
+      ],
+      "integration_boundary": "Confined to adapter/decoder layer; project DTOs cross the boundary.",
+      "primary_evidence": [
+        "Atom 2B report + acceptance patch"
+      ],
+      "as_of": "2026-07-22",
+      "license_terms_state": "Exact package license metadata must be captured in prototype/Atom 5. Exact solders==0.28.0 artifact metadata is missing in the accepted receipt; no stronger license claim is inferred.",
+      "pit_replay": "Decode exact bytes deterministically; raw bytes remain source evidence.",
+      "security_signer": "Signer/key objects are forbidden from current adapter interface.",
+      "maintenance_sbom": "ABI3 wheels exist for Windows x64/Linux glibc x86_64; verify exact wheel hashes.",
+      "tco": "LOW-MEDIUM; native wheel review required.",
+      "lock_in": "MEDIUM, bounded by DTO boundary",
+      "exit_path": "Replace parser implementation while retaining raw fixtures and DTO contract.",
+      "falsifier": "Wheel/import or deterministic byte parsing fails on the platform matrix.",
+      "next_validation": "TASK-05_ADAPTER_BOUNDARY_VALIDATION"
+    },
+    {
+      "candidate_id": "REUSE-T04-ANCHORPY-001",
+      "verdict": "DEFER",
+      "decision_status": "DEFERRED",
+      "component_area": "A2_SOLANA_INGESTION_DECODING",
+      "candidate_name": "AnchorPy",
+      "pin": "0.21.0",
+      "decision_owner": "WORK_CONTROL_PLANE",
+      "maintenance_owner": "WORK_CONTROL_PLANE",
+      "named_consumers": [
+        "None currently"
+      ],
+      "integration_boundary": "Would be behind decoder/client boundary if later justified.",
+      "primary_evidence": [
+        "Atom 2B report corrected by acceptance patch"
+      ],
+      "as_of": "2026-07-22",
+      "license_terms_state": "Review only if reconsidered.",
+      "pit_replay": "Useful only if generated IDL client materially reduces decoder burden.",
+      "security_signer": "Full client surface is broader than current read-only need.",
+      "maintenance_sbom": "Current dependency compatibility/maintenance not proven; no named consumer.",
+      "tco": "MEDIUM",
+      "lock_in": "MEDIUM-HIGH",
+      "exit_path": "Not adopted.",
+      "falsifier": "Reconsider if pure decoder maintenance becomes measured bottleneck and current stack passes fixtures.",
+      "next_validation": "REASSESS_ONLY_ON_DOCUMENTED_TRIGGER"
+    },
+    {
+      "candidate_id": "REUSE-T04-PUMP-SOURCE-001",
+      "verdict": "WRAP",
+      "decision_status": "CONDITIONAL_REFERENCE_ONLY",
+      "component_area": "A2_SOLANA_INGESTION_DECODING",
+      "candidate_name": "Pump/PumpSwap official source/IDL snapshot",
+      "pin": "PENDING_EXACT_REPOSITORY_COMMIT_AND_CONTENT_HASHES",
+      "decision_owner": "TASK-04_ARCHITECTURE_OWNER",
+      "maintenance_owner": "TASK-04_ARCHITECTURE_OWNER",
+      "named_consumers": [
+        "TASK-05, TASK-07..TASK-09, TASK-26"
+      ],
+      "integration_boundary": "External immutable reference; no 'latest' lookup at runtime; vendoring prohibited until license/redistribution is proven.",
+      "primary_evidence": [
+        "Atom 2B acceptance patch"
+      ],
+      "as_of": "2026-07-22",
+      "license_terms_state": "UNKNOWN_REQUIRES_REVIEW for vendored IDL/docs bytes.",
+      "pit_replay": "Protocol/source version and quote_mint stored with every decoded observation.",
+      "security_signer": "Reference/decoder only; no signing or transaction execution.",
+      "maintenance_sbom": "Commit/hash and source drift monitor; open report that pump.json may lag requires fixture cross-check.",
+      "tco": "LOW as reference; MEDIUM maintenance if layouts drift.",
+      "lock_in": "LOW-MEDIUM",
+      "exit_path": "Switch source snapshot/parser; raw on-chain bytes remain.",
+      "falsifier": "Pinned source cannot reconcile with successful known transaction/account fixtures.",
+      "next_validation": "TASK-05_ADAPTER_BOUNDARY_VALIDATION"
+    },
+    {
+      "candidate_id": "REUSE-T04-PUMP-DECODER-001",
+      "verdict": "BUILD",
+      "decision_status": "ACCEPTED_THIN_CUSTOM",
+      "component_area": "A2_SOLANA_INGESTION_DECODING",
+      "candidate_name": "Project-owned pure Pump/PumpSwap decoder",
+      "pin": "PENDING_TASK_SPECIFIC_CONTRACT",
+      "decision_owner": "PROJECT_MAINTAINER",
+      "maintenance_owner": "PROJECT_MAINTAINER",
+      "named_consumers": [
+        "TASK-05, TASK-07..TASK-09, TASK-26"
+      ],
+      "integration_boundary": "Pure function: bytes + explicit protocol snapshot -> typed DTO/error; zero network.",
+      "primary_evidence": [
+        "OS reuse rule; Atom 2B acceptance"
+      ],
+      "as_of": "2026-07-22",
+      "license_terms_state": "Project code; must not embed unlicensed source bytes.",
+      "pit_replay": "Unknown instruction/account layout hard-fails; no guessed zero/default fields.",
+      "security_signer": "No signer, no transaction build/send.",
+      "maintenance_sbom": "Owner: project; golden fixtures and protocol drift receipt required.",
+      "tco": "MEDIUM but bounded; justified by project-specific truth boundary.",
+      "lock_in": "LOW",
+      "exit_path": "Replace implementation while retaining decoder contract and fixture corpus.",
+      "falsifier": "A maintained official parser passes the same fixtures with lower TCO and acceptable license/security.",
+      "next_validation": "TASK-05_BOUNDED_IMPLEMENTATION_VALIDATION"
+    },
+    {
+      "candidate_id": "REUSE-T04-VIXEN-001",
+      "verdict": "DEFER",
+      "decision_status": "DEFERRED_TRIGGERED",
+      "component_area": "A2_SOLANA_INGESTION_DECODING",
+      "candidate_name": "Yellowstone gRPC / Vixen",
+      "pin": "PENDING_IF_TRIGGERED",
+      "decision_owner": "WORK_CONTROL_PLANE",
+      "maintenance_owner": "WORK_CONTROL_PLANE",
+      "named_consumers": [
+        "Future high-cadence TASK-08/09 or measured decoder offload"
+      ],
+      "integration_boundary": "Would feed the same raw envelope through a provider adapter.",
+      "primary_evidence": [
+        "Blueprint candidate map; Atom 2B acceptance"
+      ],
+      "as_of": "2026-07-22",
+      "license_terms_state": "Exact current repo/license review required if trigger fires.",
+      "pit_replay": "Must preserve our observed/available timestamps and raw envelope.",
+      "security_signer": "Read stream only.",
+      "maintenance_sbom": "Rust/gRPC surface and provider entitlement add burden.",
+      "tco": "HIGHER",
+      "lock_in": "MEDIUM-HIGH",
+      "exit_path": "Return to WSS/REST adapter.",
+      "falsifier": "Adopt only after measured WSS/REST coverage, latency, or decoder-maintenance failure.",
+      "next_validation": "REASSESS_ONLY_ON_DOCUMENTED_TRIGGER"
+    },
+    {
+      "candidate_id": "REUSE-T04-PARQUET-001",
+      "verdict": "ADOPT",
+      "decision_status": "ACCEPTED_FORMAT",
+      "component_area": "A3_RAW_PARQUET",
+      "candidate_name": "Apache Parquet dataset pieces",
+      "pin": "PENDING_TASK_SPECIFIC_CONTRACT",
+      "decision_owner": "TASK-04_ARCHITECTURE_OWNER",
+      "maintenance_owner": "TASK-04_ARCHITECTURE_OWNER",
+      "named_consumers": [
+        "TASK-05, TASK-06, TASK-08..TASK-13, research tasks"
+      ],
+      "integration_boundary": "Immutable files; accepted files are never modified in place.",
+      "primary_evidence": [
+        "Atom 2A report + acceptance"
+      ],
+      "as_of": "2026-07-22",
+      "license_terms_state": "Open specification; implementation license belongs to writer.",
+      "pit_replay": "Manifest binds schema, partitions, hashes, time bounds and generation receipt.",
+      "security_signer": "Raw data outside Git; secrets redacted before durable write.",
+      "maintenance_sbom": "Format is engine-neutral; validate files and metadata.",
+      "tco": "LOW",
+      "lock_in": "LOW",
+      "exit_path": "Read with another Parquet engine.",
+      "falsifier": "Cannot preserve required binary/null/timestamp semantics or bounded partition access.",
+      "next_validation": "TASK-05_CONTRACT_FIXTURE_VALIDATION"
+    },
+    {
+      "candidate_id": "REUSE-T04-PYARROW-001",
+      "verdict": "WRAP",
+      "decision_status": "PROTOTYPE_GATE",
+      "component_area": "A3_RAW_PARQUET",
+      "candidate_name": "PyArrow Parquet writer/reader",
+      "pin": "25.0.0",
+      "decision_owner": "TASK-04_ARCHITECTURE_OWNER",
+      "maintenance_owner": "TASK-04_ARCHITECTURE_OWNER",
+      "named_consumers": [
+        "TASK-06, TASK-08..TASK-13"
+      ],
+      "integration_boundary": "Project ParquetPort controls filenames, partitions, staging, metadata and manifest commit.",
+      "primary_evidence": [
+        "Atom 2A report + acceptance"
+      ],
+      "as_of": "2026-07-22",
+      "license_terms_state": "Apache-2.0; exact wheel/package metadata receipt required.",
+      "pit_replay": "Binary payload, nulls, timestamps and schema metadata must round-trip.",
+      "security_signer": "No network or dynamic extension requirement in write path.",
+      "maintenance_sbom": "Native wheel hashes for Windows x64/Linux glibc x86_64.",
+      "tco": "MEDIUM due native dependency, otherwise low ops.",
+      "lock_in": "LOW-MEDIUM, bounded by Parquet standard",
+      "exit_path": "Replace writer while retaining Parquet/manifest contract.",
+      "falsifier": "Prototype cannot resolve cross-platform or deterministic round-trip/rebuild fails.",
+      "next_validation": "TASK-05_ADAPTER_BOUNDARY_VALIDATION"
+    },
+    {
+      "candidate_id": "REUSE-T04-PARQUET-PORT-001",
+      "verdict": "BUILD",
+      "decision_status": "ACCEPTED_THIN_CUSTOM",
+      "component_area": "A3_RAW_PARQUET",
+      "candidate_name": "Project ParquetPort + dataset manifest writer",
+      "pin": "PENDING_TASK_SPECIFIC_CONTRACT",
+      "decision_owner": "PROJECT_MAINTAINER",
+      "maintenance_owner": "PROJECT_MAINTAINER",
+      "named_consumers": [
+        "TASK-06, TASK-08..TASK-13, Catalog dataset records"
+      ],
+      "integration_boundary": "New file + staging + atomic manifest promotion; no in-place accepted-file mutation.",
+      "primary_evidence": [
+        "Atom 2A acceptance; Catalog invariants"
+      ],
+      "as_of": "2026-07-22",
+      "license_terms_state": "Project code.",
+      "pit_replay": "Records file hashes, schema ID/version, event/time bounds, first reliable availability and generation receipt.",
+      "security_signer": "Reject absolute paths/secrets; bounded logical roots.",
+      "maintenance_sbom": "Owner TASK-06; fixtures define behavior independent of PyArrow.",
+      "tco": "LOW-MEDIUM",
+      "lock_in": "LOW",
+      "exit_path": "Reimplement port over another writer.",
+      "falsifier": "A maintained library provides the same manifest/atomicity/PIT contract with lower TCO.",
+      "next_validation": "TASK-05_BOUNDED_IMPLEMENTATION_VALIDATION"
+    },
+    {
+      "candidate_id": "REUSE-T04-FASTPARQUET-001",
+      "verdict": "REJECT",
+      "decision_status": "REJECTED_PRODUCTION",
+      "component_area": "A3_RAW_PARQUET",
+      "candidate_name": "fastparquet",
+      "pin": "PENDING_TASK_SPECIFIC_CONTRACT",
+      "decision_owner": "WORK_CONTROL_PLANE",
+      "maintenance_owner": "WORK_CONTROL_PLANE",
+      "named_consumers": [
+        "None"
+      ],
+      "integration_boundary": "Not adopted; no fixture dependency by default.",
+      "primary_evidence": [
+        "Atom 2A report + acceptance"
+      ],
+      "as_of": "2026-07-22",
+      "license_terms_state": "Not decision-relevant after rejection.",
+      "pit_replay": "No unique advantage.",
+      "security_signer": "Additional dependency surface.",
+      "maintenance_sbom": "Official project retirement materially increases risk.",
+      "tco": "MEDIUM-HIGH future maintenance",
+      "lock_in": "MEDIUM",
+      "exit_path": "Not adopted.",
+      "falsifier": "Reconsider only for a specific interoperability bug that PyArrow cannot expose.",
+      "next_validation": "REOPEN_ONLY_AFTER_FALSIFIER_INVALIDATION"
+    },
+    {
+      "candidate_id": "REUSE-T04-DUCKDB-001",
+      "verdict": "ADOPT",
+      "decision_status": "PROTOTYPE_GATE",
+      "component_area": "A4_DUCKDB_QUERY",
+      "candidate_name": "DuckDB embedded persistent analytical store",
+      "pin": "1.5.5",
+      "decision_owner": "TASK-04_ARCHITECTURE_OWNER",
+      "maintenance_owner": "TASK-04_ARCHITECTURE_OWNER",
+      "named_consumers": [
+        "TASK-05, TASK-09..TASK-13, TASK-18/19 and research"
+      ],
+      "integration_boundary": "Derived/rebuildable projection; raw Parquet + manifests remain truth.",
+      "primary_evidence": [
+        "Atom 2A report + acceptance"
+      ],
+      "as_of": "2026-07-22",
+      "license_terms_state": "MIT; exact package metadata receipt required.",
+      "pit_replay": "Fresh DB must rebuild from Parquet + DDL + migration ledger.",
+      "security_signer": "Extension auto-install/auto-load disabled; community/network extensions deny-by-default.",
+      "maintenance_sbom": "Native wheel pin/hash and extension policy test.",
+      "tco": "LOW ops; MEDIUM native dependency",
+      "lock_in": "LOW-MEDIUM",
+      "exit_path": "Rebuild into another SQL engine from standard Parquet/JSON Schema.",
+      "falsifier": "Prototype rebuild is non-deterministic, extension policy cannot be enforced, or measured contention exceeds single-writer design.",
+      "next_validation": "TASK-05_CONTRACT_FIXTURE_VALIDATION"
+    },
+    {
+      "candidate_id": "REUSE-T04-DUCKDB-SINGLE-WRITER-001",
+      "verdict": "ADOPT",
+      "decision_status": "ACCEPTED_POLICY",
+      "component_area": "A4_DUCKDB_QUERY",
+      "candidate_name": "Single-writer process discipline",
+      "pin": "PENDING_TASK_SPECIFIC_CONTRACT",
+      "decision_owner": "TASK-04_ARCHITECTURE_OWNER",
+      "maintenance_owner": "TASK-04_ARCHITECTURE_OWNER",
+      "named_consumers": [
+        "TASK-06, TASK-09..TASK-13, ORCH-001"
+      ],
+      "integration_boundary": "Coordinator owns writer lock/run identity; readers use snapshots/read-only mode.",
+      "primary_evidence": [
+        "Atom 2A acceptance; ARCH-INTENT-001 bounded orchestration"
+      ],
+      "as_of": "2026-07-22",
+      "license_terms_state": "N/A policy.",
+      "pit_replay": "Eliminates ambiguous concurrent write ordering.",
+      "security_signer": "No signer relevance.",
+      "maintenance_sbom": "Enforced by tests/health metrics, not package metadata.",
+      "tco": "LOW",
+      "lock_in": "LOW",
+      "exit_path": "Move to shared catalog/server only after measured trigger.",
+      "falsifier": "A named consumer requires concurrent independent writers and cannot be serialized economically.",
+      "next_validation": "TASK-05_CONTRACT_FIXTURE_VALIDATION"
+    },
+    {
+      "candidate_id": "REUSE-T04-QUACK-001",
+      "verdict": "DEFER",
+      "decision_status": "DEFERRED",
+      "component_area": "A4_DUCKDB_QUERY",
+      "candidate_name": "Quack client-server",
+      "pin": "PENDING_IF_TRIGGERED",
+      "decision_owner": "WORK_CONTROL_PLANE",
+      "maintenance_owner": "WORK_CONTROL_PLANE",
+      "named_consumers": [
+        "Future shared multi-writer analytics"
+      ],
+      "integration_boundary": "Would replace only serving layer.",
+      "primary_evidence": [
+        "Atom 2A report"
+      ],
+      "as_of": "2026-07-22",
+      "license_terms_state": "Review if triggered.",
+      "pit_replay": "Must remain rebuildable from Parquet.",
+      "security_signer": "Adds network/service boundary.",
+      "maintenance_sbom": "Beta maturity reported in Atom 2A.",
+      "tco": "MEDIUM-HIGH",
+      "lock_in": "MEDIUM",
+      "exit_path": "Return to embedded DuckDB.",
+      "falsifier": "Trigger only on measured multi-process writer need.",
+      "next_validation": "REASSESS_ONLY_ON_DOCUMENTED_TRIGGER"
+    },
+    {
+      "candidate_id": "REUSE-T04-DUCKLAKE-001",
+      "verdict": "DEFER",
+      "decision_status": "DEFERRED",
+      "component_area": "A4_DUCKDB_QUERY",
+      "candidate_name": "DuckLake + PostgreSQL catalog",
+      "pin": "PENDING_IF_TRIGGERED",
+      "decision_owner": "WORK_CONTROL_PLANE",
+      "maintenance_owner": "WORK_CONTROL_PLANE",
+      "named_consumers": [
+        "Future production concurrent lake access"
+      ],
+      "integration_boundary": "Would replace serving/catalog layer, not raw data format.",
+      "primary_evidence": [
+        "Atom 2A report + acceptance"
+      ],
+      "as_of": "2026-07-22",
+      "license_terms_state": "Review if triggered.",
+      "pit_replay": "Must preserve dataset manifests and replay.",
+      "security_signer": "Adds DB credentials/network/backup surface.",
+      "maintenance_sbom": "Additional PostgreSQL and catalog operations.",
+      "tco": "HIGH relative to MVP",
+      "lock_in": "MEDIUM",
+      "exit_path": "Rebuild from Parquet into embedded or another catalog.",
+      "falsifier": "Adopt only after measured concurrency/scale requirement.",
+      "next_validation": "REASSESS_ONLY_ON_DOCUMENTED_TRIGGER"
+    },
+    {
+      "candidate_id": "REUSE-T04-DUCKDB-MULTIWRITER-001",
+      "verdict": "REJECT",
+      "decision_status": "REJECTED_ARCHITECTURE",
+      "component_area": "A4_DUCKDB_QUERY",
+      "candidate_name": "Multiple independent writers to one native .duckdb file",
+      "pin": "PENDING_NOT_APPLICABLE_REJECTED_ARCHITECTURE",
+      "decision_owner": "WORK_CONTROL_PLANE",
+      "maintenance_owner": "WORK_CONTROL_PLANE",
+      "named_consumers": [
+        "None"
+      ],
+      "integration_boundary": "Forbidden.",
+      "primary_evidence": [
+        "Atom 2A official concurrency review"
+      ],
+      "as_of": "2026-07-22",
+      "license_terms_state": "N/A.",
+      "pit_replay": "Write ordering/locking would weaken reproducibility.",
+      "security_signer": "N/A.",
+      "maintenance_sbom": "Operational failure mode, not package issue.",
+      "tco": "HIGH incident risk",
+      "lock_in": "HIGH operational coupling",
+      "exit_path": "Use single writer or later shared-catalog design.",
+      "falsifier": "No reconsideration without a different supported concurrency architecture.",
+      "next_validation": "REOPEN_ONLY_AFTER_FALSIFIER_INVALIDATION"
+    },
+    {
+      "candidate_id": "REUSE-T04-JSONSCHEMA-001",
+      "verdict": "ADOPT",
+      "decision_status": "ACCEPTED_RETAIN",
+      "component_area": "A5_SCHEMA_MODELS_MIGRATIONS",
+      "candidate_name": "JSON Schema Draft 2020-12 + jsonschema validator",
+      "pin": "4.26.0",
+      "decision_owner": "TASK-04_ARCHITECTURE_OWNER",
+      "maintenance_owner": "TASK-04_ARCHITECTURE_OWNER",
+      "named_consumers": [
+        "TASK-05/06; Catalog; external contracts and receipts"
+      ],
+      "integration_boundary": "Durable external/artifact contracts; standalone local schemas only.",
+      "primary_evidence": [
+        "Existing ADR-001; Atom 2A acceptance"
+      ],
+      "as_of": "2026-07-22",
+      "license_terms_state": "jsonschema MIT; accepted in existing ADR-001.",
+      "pit_replay": "Schema version/hash travels with artifacts and data manifests.",
+      "security_signer": "No remote $ref resolution; no secrets.",
+      "maintenance_sbom": "Existing exact lock and tests.",
+      "tco": "LOW",
+      "lock_in": "LOW",
+      "exit_path": "Standard schema can be consumed by other validators.",
+      "falsifier": "Cannot express a required contract without unsafe custom behavior.",
+      "next_validation": "TASK-05_CONTRACT_FIXTURE_VALIDATION"
+    },
+    {
+      "candidate_id": "REUSE-T04-PYDANTIC-001",
+      "verdict": "WRAP",
+      "decision_status": "PROTOTYPE_GATE",
+      "component_area": "A5_SCHEMA_MODELS_MIGRATIONS",
+      "candidate_name": "Pydantic v2 boundary models",
+      "pin": "2.13.4",
+      "decision_owner": "TASK-04_ARCHITECTURE_OWNER",
+      "maintenance_owner": "TASK-04_ARCHITECTURE_OWNER",
+      "named_consumers": [
+        "TASK-05/06; adapters; configs; normalized DTOs"
+      ],
+      "integration_boundary": "Models stay at Python boundaries; durable truth remains JSON Schema/DDL/raw bytes.",
+      "primary_evidence": [
+        "Atom 2A report + acceptance"
+      ],
+      "as_of": "2026-07-22",
+      "license_terms_state": "MIT; exact package/core wheel metadata receipt required.",
+      "pit_replay": "Strict validation; missing remains missing; no future/default inference.",
+      "security_signer": "Reject extra/unsafe fields by contract; no secret-bearing models in evidence.",
+      "maintenance_sbom": "pydantic-core native wheel pin/hash.",
+      "tco": "LOW-MEDIUM",
+      "lock_in": "MEDIUM, bounded by JSON Schema/DTO boundary",
+      "exit_path": "Replace model library while retaining JSON Schema and serialized contracts.",
+      "falsifier": "Prototype cannot preserve strict null/timestamp/binary semantics or cross-platform resolution fails.",
+      "next_validation": "TASK-05_ADAPTER_BOUNDARY_VALIDATION"
+    },
+    {
+      "candidate_id": "REUSE-T04-DUCKDB-DDL-001",
+      "verdict": "ADOPT",
+      "decision_status": "ACCEPTED",
+      "component_area": "A5_SCHEMA_MODELS_MIGRATIONS",
+      "candidate_name": "DuckDB SQL DDL",
+      "pin": "1.5.5",
+      "decision_owner": "TASK-04_ARCHITECTURE_OWNER",
+      "maintenance_owner": "TASK-04_ARCHITECTURE_OWNER",
+      "named_consumers": [
+        "TASK-05, TASK-06, research query layer"
+      ],
+      "integration_boundary": "Internal analytical relations only.",
+      "primary_evidence": [
+        "Atom 2A acceptance"
+      ],
+      "as_of": "2026-07-22",
+      "license_terms_state": "Project SQL.",
+      "pit_replay": "DDL version and migration receipt bind every derived relation.",
+      "security_signer": "Read/write scope bounded by migrations and query recipes.",
+      "maintenance_sbom": "No separate package beyond DuckDB.",
+      "tco": "LOW",
+      "lock_in": "MEDIUM SQL dialect, mitigated by rebuildable Parquet truth",
+      "exit_path": "Translate DDL and rebuild from Parquet.",
+      "falsifier": "Required relation semantics cannot be represented or ported economically.",
+      "next_validation": "TASK-05_CONTRACT_FIXTURE_VALIDATION"
+    },
+    {
+      "candidate_id": "REUSE-T04-MIGRATION-LEDGER-001",
+      "verdict": "BUILD",
+      "decision_status": "PROTOTYPE_GATE_THIN_CUSTOM",
+      "component_area": "A5_SCHEMA_MODELS_MIGRATIONS",
+      "candidate_name": "Thin repository-local migration ledger",
+      "pin": "PENDING_TASK_SPECIFIC_CONTRACT",
+      "decision_owner": "PROJECT_MAINTAINER",
+      "maintenance_owner": "PROJECT_MAINTAINER",
+      "named_consumers": [
+        "TASK-05/06; clean rebuild; Catalog relation records"
+      ],
+      "integration_boundary": "Monotonic IDs, immutable SQL/Python steps, SHA-256, explicit schema/data phase, receipt and supersession.",
+      "primary_evidence": [
+        "Atom 2A report + acceptance"
+      ],
+      "as_of": "2026-07-22",
+      "license_terms_state": "Project code.",
+      "pit_replay": "Fresh rebuild from raw Parquet must produce same schema/result digest.",
+      "security_signer": "No arbitrary untracked scripts; migration path reviewed and hashed.",
+      "maintenance_sbom": "Owner TASK-05; no external framework dependency.",
+      "tco": "LOW-MEDIUM",
+      "lock_in": "LOW",
+      "exit_path": "Convert tracked migrations or rebuild directly from canonical format.",
+      "falsifier": "Prototype shows custom ledger cannot safely handle required nullable/widening/crash cases.",
+      "next_validation": "TASK-05_BOUNDED_IMPLEMENTATION_VALIDATION"
+    },
+    {
+      "candidate_id": "REUSE-T04-ALEMBIC-001",
+      "verdict": "DEFER",
+      "decision_status": "DEFERRED",
+      "component_area": "A5_SCHEMA_MODELS_MIGRATIONS",
+      "candidate_name": "Alembic for DuckDB baseline",
+      "pin": "PENDING_IF_AUXILIARY_SQLALCHEMY_STORE",
+      "decision_owner": "WORK_CONTROL_PLANE",
+      "maintenance_owner": "WORK_CONTROL_PLANE",
+      "named_consumers": [
+        "Future auxiliary SQLAlchemy-backed store only"
+      ],
+      "integration_boundary": "Not canonical for DuckDB/Parquet.",
+      "primary_evidence": [
+        "Atom 2A report + acceptance"
+      ],
+      "as_of": "2026-07-22",
+      "license_terms_state": "Review if triggered.",
+      "pit_replay": "No first-party DuckDB-owned canonical bridge established in reviewed evidence.",
+      "security_signer": "Additional migration execution surface.",
+      "maintenance_sbom": "Extra SQLAlchemy stack.",
+      "tco": "MEDIUM",
+      "lock_in": "MEDIUM-HIGH",
+      "exit_path": "Not adopted now.",
+      "falsifier": "Reconsider when a named SQLAlchemy store exists and first-party compatibility is proven.",
+      "next_validation": "REASSESS_ONLY_ON_DOCUMENTED_TRIGGER"
+    },
+    {
+      "candidate_id": "REUSE-T04-SQLALCHEMY-MIGRATE-001",
+      "verdict": "REJECT",
+      "decision_status": "REJECTED_LEGACY",
+      "component_area": "A5_SCHEMA_MODELS_MIGRATIONS",
+      "candidate_name": "sqlalchemy-migrate",
+      "pin": "PENDING_TASK_SPECIFIC_CONTRACT",
+      "decision_owner": "WORK_CONTROL_PLANE",
+      "maintenance_owner": "WORK_CONTROL_PLANE",
+      "named_consumers": [
+        "None"
+      ],
+      "integration_boundary": "Not adopted.",
+      "primary_evidence": [
+        "Atom 2A report"
+      ],
+      "as_of": "2026-07-22",
+      "license_terms_state": "Not decision-relevant.",
+      "pit_replay": "No advantage.",
+      "security_signer": "Extra stale dependency surface.",
+      "maintenance_sbom": "Legacy/obsolete path in research.",
+      "tco": "HIGH future maintenance",
+      "lock_in": "HIGH",
+      "exit_path": "Not adopted.",
+      "falsifier": "No reconsideration without a maintained supported successor story.",
+      "next_validation": "REOPEN_ONLY_AFTER_FALSIFIER_INVALIDATION"
+    },
+    {
+      "candidate_id": "REUSE-T04-COMPOSE-001",
+      "verdict": "ADOPT",
+      "decision_status": "ACCEPTED_RETAIN",
+      "component_area": "A6_ORCHESTRATION_OBSERVABILITY",
+      "candidate_name": "Docker Compose",
+      "pin": "5.3.1",
+      "decision_owner": "TASK-04_ARCHITECTURE_OWNER",
+      "maintenance_owner": "TASK-04_ARCHITECTURE_OWNER",
+      "named_consumers": [
+        "TASK-08..TASK-12; TASK-15"
+      ],
+      "integration_boundary": "Process/container lifecycle, profiles, health-gated startup; no domain scheduling truth.",
+      "primary_evidence": [
+        "Current system state; Atom 2C acceptance"
+      ],
+      "as_of": "2026-07-22",
+      "license_terms_state": "Apache-2.0.",
+      "pit_replay": "Services remain replayable; Compose does not own data ordering/checkpoints.",
+      "security_signer": "No secrets in tracked Compose; signer service remains absent.",
+      "maintenance_sbom": "Use accepted local version; validate rendered config and image pins later.",
+      "tco": "LOW on existing workstation",
+      "lock_in": "LOW-MEDIUM",
+      "exit_path": "Move service definitions to another runner while preserving internal ports/contracts.",
+      "falsifier": "Cannot enforce health/start/stop/restart requirements for the bounded pilot.",
+      "next_validation": "TASK-05_CONTRACT_FIXTURE_VALIDATION"
+    },
+    {
+      "candidate_id": "REUSE-T04-COORDINATOR-001",
+      "verdict": "BUILD",
+      "decision_status": "ACCEPTED_THIN_CUSTOM",
+      "component_area": "A6_ORCHESTRATION_OBSERVABILITY",
+      "candidate_name": "Thin repository-local coordinator/retry policy",
+      "pin": "PENDING_TASK_SPECIFIC_CONTRACT",
+      "decision_owner": "PROJECT_MAINTAINER",
+      "maintenance_owner": "PROJECT_MAINTAINER",
+      "named_consumers": [
+        "TASK-08..TASK-12; replay and later ORCH-001"
+      ],
+      "integration_boundary": "Run ID, single-writer lock, checkpoints, bounded retries, idempotency, replay mode, batch boundaries and receipts.",
+      "primary_evidence": [
+        "Atom 2C acceptance; ARCH-INTENT-001"
+      ],
+      "as_of": "2026-07-22",
+      "license_terms_state": "Project code.",
+      "pit_replay": "Retry/restart cannot change decision timestamps or erase failed attempts.",
+      "security_signer": "No signer; retries forbid duplicate send semantics in future execution layer.",
+      "maintenance_sbom": "Owner TASK-12; stdlib-first.",
+      "tco": "LOW-MEDIUM",
+      "lock_in": "LOW",
+      "exit_path": "Wrap a scheduler/workflow engine later behind the same coordinator ports.",
+      "falsifier": "Simple coordinator cannot prevent duplicate runs or recover checkpoints in injected failures.",
+      "next_validation": "TASK-05_BOUNDED_IMPLEMENTATION_VALIDATION"
+    },
+    {
+      "candidate_id": "REUSE-T04-APSCHEDULER-001",
+      "verdict": "DEFER",
+      "decision_status": "DEFERRED",
+      "component_area": "A6_ORCHESTRATION_OBSERVABILITY",
+      "candidate_name": "APScheduler",
+      "pin": "PENDING_TASK_SPECIFIC_CONTRACT",
+      "decision_owner": "WORK_CONTROL_PLANE",
+      "maintenance_owner": "WORK_CONTROL_PLANE",
+      "named_consumers": [
+        "Future bounded cron/interval scheduling"
+      ],
+      "integration_boundary": "SchedulerPort only; never domain truth.",
+      "primary_evidence": [
+        "Atom 2C report + acceptance"
+      ],
+      "as_of": "2026-07-22",
+      "license_terms_state": "MIT reported by Atom 2C.",
+      "pit_replay": "Scheduling must not own replay/checkpoint semantics.",
+      "security_signer": "No secrets/signing.",
+      "maintenance_sbom": "Extra package only after measured gap.",
+      "tco": "LOW",
+      "lock_in": "LOW if wrapped",
+      "exit_path": "Remove scheduler implementation.",
+      "falsifier": "Adopt only when simple coordinator cannot express a real recurring schedule cleanly.",
+      "next_validation": "REASSESS_ONLY_ON_DOCUMENTED_TRIGGER"
+    },
+    {
+      "candidate_id": "REUSE-T04-CELERY-001",
+      "verdict": "REJECT",
+      "decision_status": "REJECTED_MVP",
+      "component_area": "A6_ORCHESTRATION_OBSERVABILITY",
+      "candidate_name": "Celery",
+      "pin": "PENDING_TASK_SPECIFIC_CONTRACT",
+      "decision_owner": "WORK_CONTROL_PLANE",
+      "maintenance_owner": "WORK_CONTROL_PLANE",
+      "named_consumers": [
+        "None"
+      ],
+      "integration_boundary": "Would add broker/worker/beat topology.",
+      "primary_evidence": [
+        "Atom 2C report"
+      ],
+      "as_of": "2026-07-22",
+      "license_terms_state": "BSD reported by Atom 2C.",
+      "pit_replay": "Duplicate scheduler/task risks conflict with deterministic replay.",
+      "security_signer": "Additional network and credential surface.",
+      "maintenance_sbom": "Large dependency/ops surface.",
+      "tco": "HIGH relative to single-host MVP",
+      "lock_in": "HIGH once task API spreads",
+      "exit_path": "Not adopted.",
+      "falsifier": "Reconsider only after measured queue fan-out requirement.",
+      "next_validation": "REOPEN_ONLY_AFTER_FALSIFIER_INVALIDATION"
+    },
+    {
+      "candidate_id": "REUSE-T04-TEMPORAL-001",
+      "verdict": "DEFER",
+      "decision_status": "DEFERRED",
+      "component_area": "A6_ORCHESTRATION_OBSERVABILITY",
+      "candidate_name": "Temporal",
+      "pin": "PENDING_IF_TRIGGERED",
+      "decision_owner": "WORK_CONTROL_PLANE",
+      "maintenance_owner": "WORK_CONTROL_PLANE",
+      "named_consumers": [
+        "Future multi-host, business-critical durable workflows"
+      ],
+      "integration_boundary": "Would sit behind workflow/coordinator port.",
+      "primary_evidence": [
+        "Atom 2C report"
+      ],
+      "as_of": "2026-07-22",
+      "license_terms_state": "MIT reported by Atom 2C.",
+      "pit_replay": "Strong workflow replay, but different semantic/control plane.",
+      "security_signer": "Adds service credentials/network.",
+      "maintenance_sbom": "Separate Temporal service + SDK.",
+      "tco": "HIGH for current stage",
+      "lock_in": "MEDIUM-HIGH",
+      "exit_path": "Preserve domain contracts; remove workflow backend.",
+      "falsifier": "Adopt only after real long-running recovery cannot be met by local checkpoints.",
+      "next_validation": "REASSESS_ONLY_ON_DOCUMENTED_TRIGGER"
+    },
+    {
+      "candidate_id": "REUSE-T04-LOGGING-001",
+      "verdict": "ADOPT",
+      "decision_status": "ACCEPTED",
+      "component_area": "A6_ORCHESTRATION_OBSERVABILITY",
+      "candidate_name": "Python stdlib structured logging",
+      "pin": "3.13.14",
+      "decision_owner": "TASK-04_ARCHITECTURE_OWNER",
+      "maintenance_owner": "TASK-04_ARCHITECTURE_OWNER",
+      "named_consumers": [
+        "TASK-06..TASK-15; incident/debug evidence"
+      ],
+      "integration_boundary": "Frozen log schema + QueueHandler/QueueListener + rotation; adapter-ready.",
+      "primary_evidence": [
+        "Atom 2C report + acceptance"
+      ],
+      "as_of": "2026-07-22",
+      "license_terms_state": "PSF/stdlib.",
+      "pit_replay": "Logs contain run/event IDs and timestamps but do not replace raw evidence.",
+      "security_signer": "Mandatory redaction; no secrets, wallet linkage or absolute paths.",
+      "maintenance_sbom": "No extra package.",
+      "tco": "LOW",
+      "lock_in": "LOW",
+      "exit_path": "Add another handler/exporter without changing event fields.",
+      "falsifier": "Cannot sustain non-blocking structured logging or redaction tests fail.",
+      "next_validation": "TASK-05_CONTRACT_FIXTURE_VALIDATION"
+    },
+    {
+      "candidate_id": "REUSE-T04-PROM-CLIENT-001",
+      "verdict": "WRAP",
+      "decision_status": "CONDITIONAL_ACCEPT",
+      "component_area": "A6_ORCHESTRATION_OBSERVABILITY",
+      "candidate_name": "prometheus-client metrics API",
+      "pin": "0.25.0",
+      "decision_owner": "TASK-04_ARCHITECTURE_OWNER",
+      "maintenance_owner": "TASK-04_ARCHITECTURE_OWNER",
+      "named_consumers": [
+        "TASK-12, TASK-15, TASK-18; future dashboards/alerts"
+      ],
+      "integration_boundary": "Frozen metric dictionary and labels; exporter hidden behind MetricsPort.",
+      "primary_evidence": [
+        "Atom 2C report + acceptance"
+      ],
+      "as_of": "2026-07-22",
+      "license_terms_state": "Apache-2.0 AND BSD-2-Clause per acceptance patch.",
+      "pit_replay": "Metrics summarize health; never replace raw/replay evidence.",
+      "security_signer": "No high-cardinality wallet/token labels; no secrets.",
+      "maintenance_sbom": "Exact pin/license receipt; low package footprint.",
+      "tco": "LOW",
+      "lock_in": "LOW via OpenMetrics/Prometheus conventions",
+      "exit_path": "Replace exporter while retaining metric names/semantics.",
+      "falsifier": "Metric API cannot meet bounded labels/health requirements or package fails platform lock.",
+      "next_validation": "TASK-05_ADAPTER_BOUNDARY_VALIDATION"
+    },
+    {
+      "candidate_id": "REUSE-T04-PROM-SERVER-001",
+      "verdict": "DEFER",
+      "decision_status": "DEFERRED",
+      "component_area": "A6_ORCHESTRATION_OBSERVABILITY",
+      "candidate_name": "Prometheus server",
+      "pin": "PENDING_NAMED_CONSUMER",
+      "decision_owner": "WORK_CONTROL_PLANE",
+      "maintenance_owner": "WORK_CONTROL_PLANE",
+      "named_consumers": [
+        "Future persistent scraping/retention/alerts in TASK-12/15"
+      ],
+      "integration_boundary": "External collector only; client metric contract stays stable.",
+      "primary_evidence": [
+        "Atom 2C acceptance patch"
+      ],
+      "as_of": "2026-07-22",
+      "license_terms_state": "Apache-2.0 reported by Atom 2C.",
+      "pit_replay": "Not a source of data truth.",
+      "security_signer": "Adds network endpoint/storage and access controls.",
+      "maintenance_sbom": "Separate service/image patching.",
+      "tco": "MEDIUM",
+      "lock_in": "LOW-MEDIUM",
+      "exit_path": "Use local snapshots or another OpenMetrics-compatible backend.",
+      "falsifier": "Adopt only when a persistent scraper/retention/alert consumer exists.",
+      "next_validation": "REASSESS_ONLY_ON_DOCUMENTED_TRIGGER"
+    },
+    {
+      "candidate_id": "REUSE-T04-OTEL-001",
+      "verdict": "DEFER",
+      "decision_status": "DEFERRED",
+      "component_area": "A6_ORCHESTRATION_OBSERVABILITY",
+      "candidate_name": "OpenTelemetry Python",
+      "pin": "PENDING_DISTRIBUTED_TRACING_NEED",
+      "decision_owner": "WORK_CONTROL_PLANE",
+      "maintenance_owner": "WORK_CONTROL_PLANE",
+      "named_consumers": [
+        "Future multi-service tracing/remote collector"
+      ],
+      "integration_boundary": "Exporter layer; existing log/metric names remain.",
+      "primary_evidence": [
+        "Atom 2C report + acceptance"
+      ],
+      "as_of": "2026-07-22",
+      "license_terms_state": "Apache-2.0 reported by Atom 2C.",
+      "pit_replay": "Tracing is supplemental, not evidence truth.",
+      "security_signer": "Additional exporters/transport/config.",
+      "maintenance_sbom": "More packages; Python logs signal still development in reviewed evidence.",
+      "tco": "MEDIUM",
+      "lock_in": "LOW-MEDIUM",
+      "exit_path": "Remove exporter/instrumentation.",
+      "falsifier": "Adopt only when cross-service latency/causality cannot be diagnosed with current logs/metrics.",
+      "next_validation": "REASSESS_ONLY_ON_DOCUMENTED_TRIGGER"
+    },
+    {
+      "candidate_id": "REUSE-T04-QUOTE-PORT-001",
+      "verdict": "BUILD",
+      "decision_status": "ACCEPTED_THIN_CUSTOM",
+      "component_area": "A7_QUOTE_ROUTER",
+      "candidate_name": "Project QuoteProviderPort",
+      "pin": "PENDING_TASK_SPECIFIC_CONTRACT",
+      "decision_owner": "PROJECT_MAINTAINER",
+      "maintenance_owner": "PROJECT_MAINTAINER",
+      "named_consumers": [
+        "TASK-07, TASK-10, TASK-25, TASK-37"
+      ],
+      "integration_boundary": "Atomic mints/amounts, side, route, context slot, fees, no-route/error, latency and provider identity.",
+      "primary_evidence": [
+        "TASK-01 contract; Atom 2B acceptance"
+      ],
+      "as_of": "2026-07-22",
+      "license_terms_state": "Project code.",
+      "pit_replay": "Every response/error stored with observed/available timestamps and raw hash.",
+      "security_signer": "Quote-only; no build/execute/submit/sign methods in initial port.",
+      "maintenance_sbom": "Owner TASK-05/10; provider adapters replaceable.",
+      "tco": "LOW-MEDIUM",
+      "lock_in": "LOW",
+      "exit_path": "Swap provider adapter without changing normalized quote contract.",
+      "falsifier": "A standard maintained interface satisfies exact no-route/PIT/cost semantics without signer exposure.",
+      "next_validation": "TASK-05_BOUNDED_IMPLEMENTATION_VALIDATION"
+    },
+    {
+      "candidate_id": "REUSE-T04-JUPITER-V2-001",
+      "verdict": "WRAP",
+      "decision_status": "ACCEPT_CONTRACT_RUNTIME_DEFERRED",
+      "component_area": "A7_QUOTE_ROUTER",
+      "candidate_name": "Jupiter Swap V2 quote contract",
+      "pin": "PENDING_TASK_SPECIFIC_CONTRACT",
+      "decision_owner": "TASK-04_ARCHITECTURE_OWNER",
+      "maintenance_owner": "TASK-04_ARCHITECTURE_OWNER",
+      "named_consumers": [
+        "TASK-07 controlled smoke; TASK-10 quote logger; later TASK-37"
+      ],
+      "integration_boundary": "JupiterAdapter implements QuoteProviderPort; /build is excluded initially.",
+      "primary_evidence": [
+        "TASK-01 source contract; Atom 2B acceptance patch"
+      ],
+      "as_of": "2026-07-22",
+      "license_terms_state": "API terms/auth must be revalidated at TASK-07; no code redistribution decision.",
+      "pit_replay": "Preserve raw quote, route, context, timestamps and no-route/error.",
+      "security_signer": "No taker, no transaction, no execute/submit/sign in quote-only stage.",
+      "maintenance_sbom": "External mutable contract; docs snapshot/as_of and schema fixtures required.",
+      "tco": "LOW at free smoke; quota cost measured later",
+      "lock_in": "MEDIUM, bounded by adapter",
+      "exit_path": "Use Raptor/another quote provider through same port.",
+      "falsifier": "TASK-07 cannot obtain reproducible buy/sell quote/no-route semantics inside cap or terms/auth are incompatible.",
+      "next_validation": "TASK-05_ADAPTER_BOUNDARY_VALIDATION"
+    },
+    {
+      "candidate_id": "REUSE-T04-JUPITER-BUILD-001",
+      "verdict": "DEFER",
+      "decision_status": "DEFERRED_SECURITY_GATE",
+      "component_area": "A7_QUOTE_ROUTER",
+      "candidate_name": "Jupiter /build or execution paths",
+      "pin": "PENDING_TASK_SPECIFIC_CONTRACT",
+      "decision_owner": "WORK_CONTROL_PLANE",
+      "maintenance_owner": "WORK_CONTROL_PLANE",
+      "named_consumers": [
+        "TASK-37+ only"
+      ],
+      "integration_boundary": "Separate future transaction composition adapter.",
+      "primary_evidence": [
+        "Atom 2B acceptance; OS execution gates"
+      ],
+      "as_of": "2026-07-22",
+      "license_terms_state": "Revalidate current terms/API at future gate.",
+      "pit_replay": "Build context/quote age/blockhash must be logged.",
+      "security_signer": "No signer or submit path until later gates.",
+      "maintenance_sbom": "External contract drift.",
+      "tco": "UNKNOWN until runtime",
+      "lock_in": "MEDIUM",
+      "exit_path": "Use another builder/router while retaining execution contract.",
+      "falsifier": "Only reconsider after quote logger and shadow requirements exist.",
+      "next_validation": "REASSESS_ONLY_ON_DOCUMENTED_TRIGGER"
+    },
+    {
+      "candidate_id": "REUSE-T04-RAPTOR-001",
+      "verdict": "DEFER",
+      "decision_status": "DEFERRED_TASK07_COMPARATOR",
+      "component_area": "A7_QUOTE_ROUTER",
+      "candidate_name": "Raptor hosted/self-hosted quote comparator",
+      "pin": "PENDING_CURRENT_DOCS/BINARY/TERMS",
+      "decision_owner": "WORK_CONTROL_PLANE",
+      "maintenance_owner": "WORK_CONTROL_PLANE",
+      "named_consumers": [
+        "TASK-07 D08/D09 fallback equivalence check"
+      ],
+      "integration_boundary": "Comparator adapter only; never automatic canonical fallback before evidence.",
+      "primary_evidence": [
+        "TASK-01 open evidence; Atom 2B acceptance"
+      ],
+      "as_of": "2026-07-22",
+      "license_terms_state": "UNKNOWN_REQUIRES_REVIEW.",
+      "pit_replay": "Must preserve provider identity and divergence; cannot backfill our availability.",
+      "security_signer": "Quote/read only; self-hosted mode adds RPC/Yellowstone credentials.",
+      "maintenance_sbom": "Hosted beta or self-hosted binary surface not fully evidenced.",
+      "tco": "UNKNOWN/MEDIUM",
+      "lock_in": "MEDIUM",
+      "exit_path": "Remove comparator; Jupiter/raw route evidence remains.",
+      "falsifier": "TASK-07 equivalence, route overlap, stability or terms fail.",
+      "next_validation": "REASSESS_ONLY_ON_DOCUMENTED_TRIGGER"
+    },
+    {
+      "candidate_id": "REUSE-T04-HUMMINGBOT-001",
+      "verdict": "REJECT",
+      "decision_status": "REJECTED_INITIAL_SPINE_REFERENCE_ONLY",
+      "component_area": "A7_QUOTE_ROUTER",
+      "candidate_name": "Hummingbot Gateway",
+      "pin": "PENDING_TASK_SPECIFIC_CONTRACT",
+      "decision_owner": "WORK_CONTROL_PLANE",
+      "maintenance_owner": "WORK_CONTROL_PLANE",
+      "named_consumers": [
+        "Reference only; no runtime consumer"
+      ],
+      "integration_boundary": "Too broad for quote-only Pump/Jupiter boundary.",
+      "primary_evidence": [
+        "Blueprint reuse map; Atom 1 inventory"
+      ],
+      "as_of": "2026-07-22",
+      "license_terms_state": "Would require full code/license/security review if reconsidered.",
+      "pit_replay": "Does not own our PIT data or strategy evidence.",
+      "security_signer": "Execution/key surface is out of scope and increases blast radius.",
+      "maintenance_sbom": "Large third-party execution plumbing.",
+      "tco": "HIGH relative to narrow adapter",
+      "lock_in": "HIGH",
+      "exit_path": "Not adopted.",
+      "falsifier": "Reconsider only if multiple validated protocols need standardized execution and signer isolation audit passes.",
+      "next_validation": "REOPEN_ONLY_AFTER_FALSIFIER_INVALIDATION"
+    },
+    {
+      "candidate_id": "REUSE-T04-CUSTOM-ROUTER-001",
+      "verdict": "REJECT",
+      "decision_status": "REJECTED_BUILD",
+      "component_area": "A7_QUOTE_ROUTER",
+      "candidate_name": "Custom route-finding engine",
+      "pin": "PENDING_TASK_SPECIFIC_CONTRACT",
+      "decision_owner": "WORK_CONTROL_PLANE",
+      "maintenance_owner": "WORK_CONTROL_PLANE",
+      "named_consumers": [
+        "None"
+      ],
+      "integration_boundary": "Do not build; consume official routing surfaces.",
+      "primary_evidence": [
+        "DEC-007/034; blueprint"
+      ],
+      "as_of": "2026-07-22",
+      "license_terms_state": "Project code if ever built.",
+      "pit_replay": "Would create major execution/model maintenance burden.",
+      "security_signer": "High transaction/security surface.",
+      "maintenance_sbom": "Large custom system.",
+      "tco": "VERY HIGH",
+      "lock_in": "HIGH to own implementation",
+      "exit_path": "Use official providers.",
+      "falsifier": "Only revisit after official routes materially fail a validated strategy and economics justify build.",
+      "next_validation": "REOPEN_ONLY_AFTER_FALSIFIER_INVALIDATION"
+    },
+    {
+      "candidate_id": "REUSE-T04-UNITTEST-001",
+      "verdict": "ADOPT",
+      "decision_status": "ACCEPTED_RETAIN",
+      "component_area": "A8_TEST_REPLAY_SUPPLY_CHAIN",
+      "candidate_name": "Python unittest",
+      "pin": "3.13.14",
+      "decision_owner": "TASK-04_ARCHITECTURE_OWNER",
+      "maintenance_owner": "TASK-04_ARCHITECTURE_OWNER",
+      "named_consumers": [
+        "All tasks and CI"
+      ],
+      "integration_boundary": "Default runner; fixture corpus remains runner-neutral.",
+      "primary_evidence": [
+        "TASK-03 test baseline; Atom 2C acceptance"
+      ],
+      "as_of": "2026-07-22",
+      "license_terms_state": "PSF/stdlib.",
+      "pit_replay": "Existing deterministic test continuity.",
+      "security_signer": "No extra package surface.",
+      "maintenance_sbom": "Bound to CPython pin.",
+      "tco": "LOW",
+      "lock_in": "LOW",
+      "exit_path": "pytest can wrap/run later without rewriting fixtures.",
+      "falsifier": "Concrete fixture/plugin ergonomics create material maintenance burden.",
+      "next_validation": "TASK-05_CONTRACT_FIXTURE_VALIDATION"
+    },
+    {
+      "candidate_id": "REUSE-T04-GOLDEN-FIXTURES-001",
+      "verdict": "BUILD",
+      "decision_status": "ACCEPTED_THIN_CUSTOM",
+      "component_area": "A8_TEST_REPLAY_SUPPLY_CHAIN",
+      "candidate_name": "Versioned golden fixture corpus",
+      "pin": "PENDING_TASK_SPECIFIC_CONTRACT",
+      "decision_owner": "PROJECT_MAINTAINER",
+      "maintenance_owner": "PROJECT_MAINTAINER",
+      "named_consumers": [
+        "TASK-05..TASK-12; provider/decoder/migration/replay tests"
+      ],
+      "integration_boundary": "Small sanitized immutable inputs + expected digests; no raw dumps/secrets.",
+      "primary_evidence": [
+        "Atoms 2A/2B/2C; OS replay contract"
+      ],
+      "as_of": "2026-07-22",
+      "license_terms_state": "Project evidence; third-party fixture provenance recorded.",
+      "pit_replay": "Exact raw bytes, schema/source version and expected outputs.",
+      "security_signer": "No private keys or wallet linkage.",
+      "maintenance_sbom": "Hash manifest; supersede, never rewrite historical fixture.",
+      "tco": "MEDIUM creation, high reuse value",
+      "lock_in": "LOW",
+      "exit_path": "Use same fixtures under another implementation/runner.",
+      "falsifier": "Fixture cannot discriminate candidate behavior or provenance is unclear.",
+      "next_validation": "TASK-05_BOUNDED_IMPLEMENTATION_VALIDATION"
+    },
+    {
+      "candidate_id": "REUSE-T04-REPLAY-HARNESS-001",
+      "verdict": "BUILD",
+      "decision_status": "ACCEPTED_THIN_CUSTOM",
+      "component_area": "A8_TEST_REPLAY_SUPPLY_CHAIN",
+      "candidate_name": "Deterministic project replay harness",
+      "pin": "PENDING_TASK_SPECIFIC_CONTRACT",
+      "decision_owner": "PROJECT_MAINTAINER",
+      "maintenance_owner": "PROJECT_MAINTAINER",
+      "named_consumers": [
+        "TASK-06, TASK-19, all experiments and runtime validation"
+      ],
+      "integration_boundary": "Fixture manifest -> adapter/decoder/normalizer/storage/query -> exact receipt.",
+      "primary_evidence": [
+        "Atom 2C acceptance; OS"
+      ],
+      "as_of": "2026-07-22",
+      "license_terms_state": "Project code.",
+      "pit_replay": "Enforces as-of guards, same input/config -> same digest.",
+      "security_signer": "Network disabled by default; redaction and logical paths.",
+      "maintenance_sbom": "Stdlib-first; all dependency versions in receipt.",
+      "tco": "MEDIUM, foundational reuse",
+      "lock_in": "LOW",
+      "exit_path": "Retain fixture/receipt contract and replace internals.",
+      "falsifier": "Prototype cannot produce stable digest or catches no injected leakage/drift.",
+      "next_validation": "TASK-05_BOUNDED_IMPLEMENTATION_VALIDATION"
+    },
+    {
+      "candidate_id": "REUSE-T04-RECEIPT-PROFILE-001",
+      "verdict": "BUILD",
+      "decision_status": "ACCEPTED_THIN_CUSTOM",
+      "component_area": "A8_TEST_REPLAY_SUPPLY_CHAIN",
+      "candidate_name": "Narrow deterministic JSON receipt profile",
+      "pin": "PENDING_TASK_SPECIFIC_CONTRACT",
+      "decision_owner": "PROJECT_MAINTAINER",
+      "maintenance_owner": "PROJECT_MAINTAINER",
+      "named_consumers": [
+        "All validation/prototype/migration/data manifests"
+      ],
+      "integration_boundary": "Internal receipt format; not claimed as full RFC 8785/JCS.",
+      "primary_evidence": [
+        "Atom 2C acceptance patch"
+      ],
+      "as_of": "2026-07-22",
+      "license_terms_state": "Project contract using stdlib JSON/hashlib.",
+      "pit_replay": "Byte-stable receipts bind config/input/output hashes.",
+      "security_signer": "No secrets; deterministic redaction before hash.",
+      "maintenance_sbom": "No extra package.",
+      "tco": "LOW",
+      "lock_in": "LOW",
+      "exit_path": "Adopt vetted JCS library only if cross-language consumer appears.",
+      "falsifier": "Cross-platform byte stability fails for supported data types.",
+      "next_validation": "TASK-05_BOUNDED_IMPLEMENTATION_VALIDATION"
+    },
+    {
+      "candidate_id": "REUSE-T04-PYTEST-001",
+      "verdict": "DEFER",
+      "decision_status": "DEFERRED",
+      "component_area": "A8_TEST_REPLAY_SUPPLY_CHAIN",
+      "candidate_name": "pytest",
+      "pin": "PENDING_MEASURED_ERGONOMICS_GAP",
+      "decision_owner": "WORK_CONTROL_PLANE",
+      "maintenance_owner": "WORK_CONTROL_PLANE",
+      "named_consumers": [
+        "Future richer fixture/plugin test needs"
+      ],
+      "integration_boundary": "Runner/wrapper only; fixture corpus stays neutral.",
+      "primary_evidence": [
+        "Atom 2C report + acceptance"
+      ],
+      "as_of": "2026-07-22",
+      "license_terms_state": "MIT reported by Atom 2C.",
+      "pit_replay": "No change to receipt semantics.",
+      "security_signer": "Extra plugin surface if adopted.",
+      "maintenance_sbom": "Additional dependency/plugins.",
+      "tco": "LOW-MEDIUM",
+      "lock_in": "LOW",
+      "exit_path": "Continue unittest.",
+      "falsifier": "Adopt when unittest setup materially slows or complicates named tests.",
+      "next_validation": "REASSESS_ONLY_ON_DOCUMENTED_TRIGGER"
+    },
+    {
+      "candidate_id": "REUSE-T04-HYPOTHESIS-001",
+      "verdict": "DEFER",
+      "decision_status": "DEFERRED",
+      "component_area": "A8_TEST_REPLAY_SUPPLY_CHAIN",
+      "candidate_name": "Hypothesis property-based testing",
+      "pin": "PENDING_STABLE_INVARIANT",
+      "decision_owner": "WORK_CONTROL_PLANE",
+      "maintenance_owner": "WORK_CONTROL_PLANE",
+      "named_consumers": [
+        "Future schema/normalization invariants"
+      ],
+      "integration_boundary": "Targeted tests only, not global framework.",
+      "primary_evidence": [
+        "Atom 2C report + acceptance"
+      ],
+      "as_of": "2026-07-22",
+      "license_terms_state": "Review if triggered.",
+      "pit_replay": "Seeds/examples must be recorded.",
+      "security_signer": "No network; bounded generation.",
+      "maintenance_sbom": "Additional package.",
+      "tco": "LOW-MEDIUM",
+      "lock_in": "LOW",
+      "exit_path": "Retain discovered regression fixtures.",
+      "falsifier": "Adopt only after a concrete invariant is hard to cover with examples.",
+      "next_validation": "REASSESS_ONLY_ON_DOCUMENTED_TRIGGER"
+    },
+    {
+      "candidate_id": "REUSE-T04-PIP-AUDIT-001",
+      "verdict": "ADOPT",
+      "decision_status": "CONDITIONAL_GUARDED",
+      "component_area": "A8_TEST_REPLAY_SUPPLY_CHAIN",
+      "candidate_name": "pip-audit",
+      "pin": "2.10.1",
+      "decision_owner": "TASK-04_ARCHITECTURE_OWNER",
+      "maintenance_owner": "TASK-04_ARCHITECTURE_OWNER",
+      "named_consumers": [
+        "TASK-04/05+ dependency handoffs and CI"
+      ],
+      "integration_boundary": "Receipt generator against locked/frozen environment/input only.",
+      "primary_evidence": [
+        "Atom 2C acceptance patch"
+      ],
+      "as_of": "2026-07-22",
+      "license_terms_state": "Apache-2.0 per Atom 2C review; exact metadata receipt required.",
+      "pit_replay": "Audit receipt binds lock hash, tool version, advisory snapshot time.",
+      "security_signer": "Run without credentials; never resolve arbitrary untrusted draft inputs.",
+      "maintenance_sbom": "Pinned tool, advisory feed is time-varying.",
+      "tco": "LOW",
+      "lock_in": "LOW",
+      "exit_path": "Replace with another audit scanner; retain SBOM/lock.",
+      "falsifier": "Audit requires uncontrolled resolution/code execution or cannot consume locked environment safely.",
+      "next_validation": "TASK-05_CONTRACT_FIXTURE_VALIDATION"
+    },
+    {
+      "candidate_id": "REUSE-T04-UV-CYCLONEDX-001",
+      "verdict": "ADOPT",
+      "decision_status": "PREVIEW_RECEIPT_ONLY",
+      "component_area": "A8_TEST_REPLAY_SUPPLY_CHAIN",
+      "candidate_name": "uv CycloneDX 1.5 export",
+      "pin": "0.11.29",
+      "decision_owner": "TASK-04_ARCHITECTURE_OWNER",
+      "maintenance_owner": "TASK-04_ARCHITECTURE_OWNER",
+      "named_consumers": [
+        "TASK-04/05 handoff; Catalog evidence; security review"
+      ],
+      "integration_boundary": "Generated SBOM receipt, not dependency authority or stable external API.",
+      "primary_evidence": [
+        "Atom 2C acceptance patch"
+      ],
+      "as_of": "2026-07-22",
+      "license_terms_state": "Exporter inherits uv; CycloneDX schema/terms recorded with artifact.",
+      "pit_replay": "SBOM hash binds exact lock/exporter version.",
+      "security_signer": "No secrets; schema validation mandatory.",
+      "maintenance_sbom": "Official support is preview; validate output every run.",
+      "tco": "LOW",
+      "lock_in": "LOW",
+      "exit_path": "Switch exporter while retaining lock and standard SBOM artifact.",
+      "falsifier": "Output is schema-invalid, non-deterministic or omits locked packages materially.",
+      "next_validation": "TASK-05_CONTRACT_FIXTURE_VALIDATION"
+    },
+    {
+      "candidate_id": "REUSE-T04-GITHUB-DEPENDENCY-001",
+      "verdict": "WRAP",
+      "decision_status": "SECONDARY_USER_ATTESTATION_REQUIRED",
+      "component_area": "A8_TEST_REPLAY_SUPPLY_CHAIN",
+      "candidate_name": "GitHub dependency graph / Dependabot",
+      "pin": "PENDING_TASK_SPECIFIC_CONTRACT",
+      "decision_owner": "TASK-04_ARCHITECTURE_OWNER",
+      "maintenance_owner": "TASK-04_ARCHITECTURE_OWNER",
+      "named_consumers": [
+        "Outer security signal for private repository"
+      ],
+      "integration_boundary": "Secondary alert/export only; repo-local lock/receipts remain canonical.",
+      "primary_evidence": [
+        "Atom 2C report + acceptance"
+      ],
+      "as_of": "2026-07-22",
+      "license_terms_state": "GitHub service terms.",
+      "pit_replay": "Alerts are time-varying evidence with observed_at.",
+      "security_signer": "No broad org access; named repo only.",
+      "maintenance_sbom": "Read-back settings before claiming enabled.",
+      "tco": "LOW",
+      "lock_in": "LOW",
+      "exit_path": "Disable service; local controls remain.",
+      "falsifier": "Feature unavailable or duplicates noise without decision value.",
+      "next_validation": "TASK-05_ADAPTER_BOUNDARY_VALIDATION"
+    },
+    {
+      "candidate_id": "REUSE-T04-SIGSTORE-SLSA-001",
+      "verdict": "DEFER",
+      "decision_status": "DEFERRED_RELEASE_BOUNDARY",
+      "component_area": "A8_TEST_REPLAY_SUPPLY_CHAIN",
+      "candidate_name": "Sigstore / in-toto / SLSA provenance",
+      "pin": "PENDING_REAL_ARTIFACT_DISTRIBUTION",
+      "decision_owner": "WORK_CONTROL_PLANE",
+      "maintenance_owner": "WORK_CONTROL_PLANE",
+      "named_consumers": [
+        "Future releases/images/deployments"
+      ],
+      "integration_boundary": "Artifact publication verification only.",
+      "primary_evidence": [
+        "Atom 2C report + acceptance"
+      ],
+      "as_of": "2026-07-22",
+      "license_terms_state": "Review exact tools if triggered.",
+      "pit_replay": "Provenance supplements, not replaces, internal receipts.",
+      "security_signer": "Requires trusted identities/signing policy; premature now.",
+      "maintenance_sbom": "Additional toolchain and trust roots.",
+      "tco": "MEDIUM-HIGH",
+      "lock_in": "LOW-MEDIUM",
+      "exit_path": "Retain hashes/SBOM and remove signing layer.",
+      "falsifier": "Adopt only when durable external artifacts are published or consumed.",
+      "next_validation": "REASSESS_ONLY_ON_DOCUMENTED_TRIGGER"
+    }
+  ]
+}

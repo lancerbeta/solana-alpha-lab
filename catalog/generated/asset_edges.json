@@ -8,6 +8,26 @@
       "target_asset_id": "CTRL-TASK-03-001"
     },
     {
+      "source_asset_id": "ADR-MVP-STACK-002",
+      "relation": "evidenced_by",
+      "target_asset_id": "EVIDENCE-T04-RESEARCH-ACCEPTANCE-001"
+    },
+    {
+      "source_asset_id": "ADR-MVP-STACK-002",
+      "relation": "evidenced_by",
+      "target_asset_id": "MATRIX-T04-MVP-STACK-001"
+    },
+    {
+      "source_asset_id": "ADR-MVP-STACK-002",
+      "relation": "evidenced_by",
+      "target_asset_id": "PROTOTYPE-T04-CORE-NATIVE-STACK-001"
+    },
+    {
+      "source_asset_id": "ADR-MVP-STACK-002",
+      "relation": "governed_by",
+      "target_asset_id": "CTRL-TASK-04-001"
+    },
+    {
       "source_asset_id": "ARCH-INTENT-001",
       "relation": "evidenced_by",
       "target_asset_id": "EVIDENCE-ATOM4B-RECEIPT-001"
@@ -204,6 +224,11 @@
     },
     {
       "source_asset_id": "CATALOG-SCHEMA-LIFECYCLE-001",
+      "relation": "governed_by",
+      "target_asset_id": "CTRL-TASK-04-001"
+    },
+    {
+      "source_asset_id": "CATALOG-SCHEMA-LIFECYCLE-001",
       "relation": "validated_by",
       "target_asset_id": "CATALOG-VALIDATOR-001"
     },
@@ -229,6 +254,11 @@
     },
     {
       "source_asset_id": "CI-VALIDATOR-001",
+      "relation": "depends_on",
+      "target_asset_id": "VALIDATOR-T04-ARCHITECTURE-001"
+    },
+    {
+      "source_asset_id": "CI-VALIDATOR-001",
       "relation": "validated_by",
       "target_asset_id": "CATALOG-VALIDATOR-001"
     },
@@ -245,7 +275,22 @@
     {
       "source_asset_id": "CTRL-AGENTS-001",
       "relation": "governed_by",
-      "target_asset_id": "CTRL-TASK-03-001"
+      "target_asset_id": "CTRL-TASK-04-001"
+    },
+    {
+      "source_asset_id": "CTRL-HANDOFF-PROTOCOL-001",
+      "relation": "governed_by",
+      "target_asset_id": "CTRL-TASK-04-001"
+    },
+    {
+      "source_asset_id": "CTRL-LATEST-HANDOFF-001",
+      "relation": "evidenced_by",
+      "target_asset_id": "EVIDENCE-T04-A5A-CANDIDATE-001"
+    },
+    {
+      "source_asset_id": "CTRL-LATEST-HANDOFF-001",
+      "relation": "governed_by",
+      "target_asset_id": "CTRL-TASK-04-001"
     },
     {
       "source_asset_id": "CTRL-PYPROJECT-001",
@@ -253,9 +298,19 @@
       "target_asset_id": "ENV-WORKSTATION-001"
     },
     {
+      "source_asset_id": "CTRL-PYPROJECT-001",
+      "relation": "governed_by",
+      "target_asset_id": "ADR-MVP-STACK-002"
+    },
+    {
       "source_asset_id": "CTRL-QUALITY-GATE-001",
       "relation": "validated_by",
       "target_asset_id": "CI-VALIDATOR-001"
+    },
+    {
+      "source_asset_id": "CTRL-README-001",
+      "relation": "governed_by",
+      "target_asset_id": "CTRL-TASK-04-001"
     },
     {
       "source_asset_id": "CTRL-TASK-03-001",
@@ -263,9 +318,29 @@
       "target_asset_id": "CATALOG-ROOT-001"
     },
     {
+      "source_asset_id": "CTRL-TASK-04-001",
+      "relation": "contains",
+      "target_asset_id": "ADR-MVP-STACK-002"
+    },
+    {
+      "source_asset_id": "CTRL-TASK-04-001",
+      "relation": "contains",
+      "target_asset_id": "MATRIX-T04-MVP-STACK-001"
+    },
+    {
+      "source_asset_id": "CTRL-TASK-04-001",
+      "relation": "evidenced_by",
+      "target_asset_id": "EVIDENCE-T04-A5A-CANDIDATE-001"
+    },
+    {
       "source_asset_id": "CTRL-UVLOCK-001",
       "relation": "depends_on",
       "target_asset_id": "CTRL-PYPROJECT-001"
+    },
+    {
+      "source_asset_id": "CTRL-UVLOCK-001",
+      "relation": "governed_by",
+      "target_asset_id": "ADR-MVP-STACK-002"
     },
     {
       "source_asset_id": "ENV-WORKSTATION-001",
@@ -281,6 +356,86 @@
       "source_asset_id": "EVIDENCE-ATOM4B-RECEIPT-001",
       "relation": "evidenced_by",
       "target_asset_id": "CATALOG-ROOT-001"
+    },
+    {
+      "source_asset_id": "EVIDENCE-T04-A4R-SBOM-001",
+      "relation": "governed_by",
+      "target_asset_id": "CTRL-TASK-04-001"
+    },
+    {
+      "source_asset_id": "EVIDENCE-T04-A4R-WORK-ACCEPTANCE-001",
+      "relation": "evidenced_by",
+      "target_asset_id": "PROTOTYPE-T04-CORE-NATIVE-STACK-001"
+    },
+    {
+      "source_asset_id": "EVIDENCE-T04-A4R-WORK-RECEIPT-001",
+      "relation": "evidenced_by",
+      "target_asset_id": "PROTOTYPE-T04-CORE-NATIVE-STACK-001"
+    },
+    {
+      "source_asset_id": "EVIDENCE-T04-A5A-CANDIDATE-001",
+      "relation": "governed_by",
+      "target_asset_id": "CTRL-TASK-04-001"
+    },
+    {
+      "source_asset_id": "EVIDENCE-T04-A5A-CANDIDATE-001",
+      "relation": "validated_by",
+      "target_asset_id": "VALIDATOR-T04-ARCHITECTURE-001"
+    },
+    {
+      "source_asset_id": "EVIDENCE-T04-CLEANUP-001",
+      "relation": "governed_by",
+      "target_asset_id": "CTRL-TASK-04-001"
+    },
+    {
+      "source_asset_id": "EVIDENCE-T04-MANIFEST-001",
+      "relation": "contains",
+      "target_asset_id": "EVIDENCE-T04-A4R-WORK-ACCEPTANCE-001"
+    },
+    {
+      "source_asset_id": "EVIDENCE-T04-MANIFEST-001",
+      "relation": "contains",
+      "target_asset_id": "EVIDENCE-T04-RESEARCH-ACCEPTANCE-001"
+    },
+    {
+      "source_asset_id": "EVIDENCE-T04-MANIFEST-001",
+      "relation": "contains",
+      "target_asset_id": "PROTOTYPE-T04-CORE-NATIVE-STACK-001"
+    },
+    {
+      "source_asset_id": "EVIDENCE-T04-PACKAGE-GRAPH-001",
+      "relation": "governed_by",
+      "target_asset_id": "CTRL-TASK-04-001"
+    },
+    {
+      "source_asset_id": "EVIDENCE-T04-PIT-REPLAY-001",
+      "relation": "governed_by",
+      "target_asset_id": "CTRL-TASK-04-001"
+    },
+    {
+      "source_asset_id": "EVIDENCE-T04-RESEARCH-ACCEPTANCE-001",
+      "relation": "governed_by",
+      "target_asset_id": "CTRL-TASK-04-001"
+    },
+    {
+      "source_asset_id": "EVIDENCE-T04-SUPPLY-CHAIN-001",
+      "relation": "evidenced_by",
+      "target_asset_id": "EVIDENCE-T04-A4R-SBOM-001"
+    },
+    {
+      "source_asset_id": "EVIDENCE-T04-SUPPLY-CHAIN-001",
+      "relation": "evidenced_by",
+      "target_asset_id": "EVIDENCE-T04-PACKAGE-GRAPH-001"
+    },
+    {
+      "source_asset_id": "FIXTURE-T04-PIT-001",
+      "relation": "derived_from",
+      "target_asset_id": "PROTOTYPE-T04-CORE-NATIVE-STACK-001"
+    },
+    {
+      "source_asset_id": "FIXTURE-T04-PIT-001",
+      "relation": "validated_by",
+      "target_asset_id": "TEST-T04-CORE-STACK-001"
     },
     {
       "source_asset_id": "GENERATED-EDGE-PROJECTION-001",
@@ -316,6 +471,21 @@
       "source_asset_id": "GENERATOR-CATALOG-NAVIGATION-001",
       "relation": "produces",
       "target_asset_id": "GENERATED-PROJECT-MAP-001"
+    },
+    {
+      "source_asset_id": "MATRIX-T04-MVP-STACK-001",
+      "relation": "derived_from",
+      "target_asset_id": "EVIDENCE-T04-RESEARCH-ACCEPTANCE-001"
+    },
+    {
+      "source_asset_id": "MATRIX-T04-MVP-STACK-001",
+      "relation": "derived_from",
+      "target_asset_id": "PROTOTYPE-T04-CORE-NATIVE-STACK-001"
+    },
+    {
+      "source_asset_id": "MATRIX-T04-MVP-STACK-001",
+      "relation": "governed_by",
+      "target_asset_id": "CTRL-TASK-04-001"
     },
     {
       "source_asset_id": "PRE-GIT-TASK01-A017",
@@ -528,6 +698,21 @@
       "target_asset_id": "EVIDENCE-ATOM4B-RECEIPT-001"
     },
     {
+      "source_asset_id": "PROTOTYPE-T04-CORE-NATIVE-STACK-001",
+      "relation": "evidenced_by",
+      "target_asset_id": "EVIDENCE-T04-PIT-REPLAY-001"
+    },
+    {
+      "source_asset_id": "PROTOTYPE-T04-CORE-NATIVE-STACK-001",
+      "relation": "evidenced_by",
+      "target_asset_id": "EVIDENCE-T04-SUPPLY-CHAIN-001"
+    },
+    {
+      "source_asset_id": "PROTOTYPE-T04-CORE-NATIVE-STACK-001",
+      "relation": "governed_by",
+      "target_asset_id": "CTRL-TASK-04-001"
+    },
+    {
       "source_asset_id": "REGISTRY-BOT-INSTANCES-001",
       "relation": "depends_on",
       "target_asset_id": "CATALOG-SCHEMA-LIFECYCLE-001"
@@ -570,7 +755,22 @@
     {
       "source_asset_id": "REGISTRY-REUSE-CANDIDATES-001",
       "relation": "derived_from",
+      "target_asset_id": "MATRIX-T04-MVP-STACK-001"
+    },
+    {
+      "source_asset_id": "REGISTRY-REUSE-CANDIDATES-001",
+      "relation": "derived_from",
       "target_asset_id": "PRE-GIT-TASK01-A024"
+    },
+    {
+      "source_asset_id": "REGISTRY-REUSE-CANDIDATES-001",
+      "relation": "governed_by",
+      "target_asset_id": "ADR-MVP-STACK-002"
+    },
+    {
+      "source_asset_id": "REGISTRY-REUSE-CANDIDATES-001",
+      "relation": "governed_by",
+      "target_asset_id": "CTRL-TASK-04-001"
     },
     {
       "source_asset_id": "REGISTRY-STRATEGIES-001",
@@ -578,9 +778,49 @@
       "target_asset_id": "CATALOG-SCHEMA-LIFECYCLE-001"
     },
     {
+      "source_asset_id": "SBOM-T04-CORE-STACK-001",
+      "relation": "derived_from",
+      "target_asset_id": "CTRL-UVLOCK-001"
+    },
+    {
+      "source_asset_id": "SBOM-T04-CORE-STACK-001",
+      "relation": "governed_by",
+      "target_asset_id": "ADR-MVP-STACK-002"
+    },
+    {
       "source_asset_id": "SCM-BASELINE-COMMIT-001",
       "relation": "governed_by",
       "target_asset_id": "CTRL-TASK-03-001"
+    },
+    {
+      "source_asset_id": "TEST-T04-CORE-STACK-001",
+      "relation": "depends_on",
+      "target_asset_id": "FIXTURE-T04-PIT-001"
+    },
+    {
+      "source_asset_id": "TEST-T04-CORE-STACK-001",
+      "relation": "validated_by",
+      "target_asset_id": "VALIDATOR-T04-ARCHITECTURE-001"
+    },
+    {
+      "source_asset_id": "VALIDATOR-REPOSITORY-STATE-001",
+      "relation": "depends_on",
+      "target_asset_id": "CATALOG-ROOT-001"
+    },
+    {
+      "source_asset_id": "VALIDATOR-REPOSITORY-STATE-001",
+      "relation": "governed_by",
+      "target_asset_id": "CTRL-TASK-04-001"
+    },
+    {
+      "source_asset_id": "VALIDATOR-T04-ARCHITECTURE-001",
+      "relation": "depends_on",
+      "target_asset_id": "CTRL-UVLOCK-001"
+    },
+    {
+      "source_asset_id": "VALIDATOR-T04-ARCHITECTURE-001",
+      "relation": "governed_by",
+      "target_asset_id": "CTRL-TASK-04-001"
     }
   ]
 }

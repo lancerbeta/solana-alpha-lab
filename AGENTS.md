@@ -8,14 +8,21 @@ Implement only the active bounded task that advances the Solana Memecoin Intrada
 
 ChatGPT Project / Work owns mission, roadmap, task status, acceptance, and canonical state. Repository agents and Codex may propose status changes in handoff evidence but must not claim acceptance.
 
-## CURRENT_TASK
+## INPUT_ROUTING
 
-TASK-03 — Private repository, controls & Project Asset Catalog.
+Default: `INPUT=DIRECT_PROMPT`.
 
-Current atom: T03-A7C final acceptance candidate. Reconcile the accepted private
-origin/main and CI evidence, then require terminal CI and an exact-HEAD clean
-clone before proposing TASK-03 completion. TASK-03 remains IN_PROGRESS and
-TASK-04 is not active.
+- The active task and atom come from the current Work-approved direct prompt or
+  an explicitly named local handoff.
+- Read local input only when the current prompt contains
+  `LOCAL_HANDOFF: <repository-relative path>`.
+- Read Work acceptance output only when the current prompt contains
+  `ACCEPT_LOCAL_HANDOFF: <repository-relative path>`.
+- The validation and path rules for both triggers are defined by
+  `docs/agent/HANDOFF_PROTOCOL.md`.
+- Never search for the newest, latest, or most recently modified handoff.
+- A direct prompt or handoff grants only the authority class it states. It never
+  implies commit, push, external action, or canonical status authority.
 
 ## WORKSPACE_ONLY
 
@@ -59,4 +66,8 @@ pwsh -NoProfile -ExecutionPolicy Bypass -File .\scripts\validate.ps1
 
 ## CHANGE_PROTOCOL
 
-Read this file and `docs/tasks/TASK-03.md`, confirm the named atom, run the quality gate, inspect exact staged/committed inventory, and do not commit, push, or change canonical status unless explicitly authorized.
+Read this file and the task/handoff explicitly named by the current prompt,
+confirm the bounded atom, run the quality gate, inspect the exact staged or
+committed inventory, and do not commit, push, perform another authority class,
+or change canonical status unless explicitly authorized. Work owns canonical
+status and acceptance.

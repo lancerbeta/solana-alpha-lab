@@ -1,8 +1,1000 @@
-schema_version: '1.0'
+schema_version: '1.1'
 registry_id: SMIAL-REGISTRY-REUSE-CANDIDATES
 registry_type: reuse_candidates
-as_of: '2026-07-21'
-truth_owner: TASK-03
+as_of: '2026-07-22'
+truth_owner: TASK-04
 source_asset_ids:
 - PRE-GIT-TASK01-A024
-records: []
+- MATRIX-T04-MVP-STACK-001
+- ADR-MVP-STACK-002
+- EVIDENCE-T04-RESEARCH-ACCEPTANCE-001
+- PROTOTYPE-T04-CORE-NATIVE-STACK-001
+records:
+- record_kind: reuse_candidate
+  record_id: REUSE-T04-CPYTHON-001
+  status: RECORDED
+  created_at: '2026-07-22T00:00:00Z'
+  evidence_asset_ids:
+  - MATRIX-T04-MVP-STACK-001
+  - EVIDENCE-T04-RESEARCH-ACCEPTANCE-001
+  - PROTOTYPE-T04-CORE-NATIVE-STACK-001
+  derived_from: PRE-GIT-TASK01-A024
+  component_area: A1_RUNTIME_DEPENDENCIES
+  candidate_name: CPython
+  verdict: ADOPT
+  decision_status: ACCEPTED_RETAIN
+  pin: 3.13.14
+  decision_owner: TASK-04_ARCHITECTURE_OWNER
+  named_consumers:
+  - TASK-05..TASK-12; all Python tooling
+  matrix_asset_id: MATRIX-T04-MVP-STACK-001
+  next_validation: TASK-05_CONTRACT_FIXTURE_VALIDATION
+- record_kind: reuse_candidate
+  record_id: REUSE-T04-UV-001
+  status: RECORDED
+  created_at: '2026-07-22T00:00:00Z'
+  evidence_asset_ids:
+  - MATRIX-T04-MVP-STACK-001
+  - EVIDENCE-T04-RESEARCH-ACCEPTANCE-001
+  - PROTOTYPE-T04-CORE-NATIVE-STACK-001
+  derived_from: PRE-GIT-TASK01-A024
+  component_area: A1_RUNTIME_DEPENDENCIES
+  candidate_name: uv + uv.lock
+  verdict: ADOPT
+  decision_status: ACCEPTED_RETAIN
+  pin: 0.11.29
+  decision_owner: TASK-04_ARCHITECTURE_OWNER
+  named_consumers:
+  - TASK-05..TASK-12; CI; clean clone; SBOM/audit receipts
+  matrix_asset_id: MATRIX-T04-MVP-STACK-001
+  next_validation: TASK-05_CONTRACT_FIXTURE_VALIDATION
+- record_kind: reuse_candidate
+  record_id: REUSE-T04-VENV-001
+  status: RECORDED
+  created_at: '2026-07-22T00:00:00Z'
+  evidence_asset_ids:
+  - MATRIX-T04-MVP-STACK-001
+  - EVIDENCE-T04-RESEARCH-ACCEPTANCE-001
+  - PROTOTYPE-T04-CORE-NATIVE-STACK-001
+  derived_from: PRE-GIT-TASK01-A024
+  component_area: A1_RUNTIME_DEPENDENCIES
+  candidate_name: uv-managed project .venv
+  verdict: ADOPT
+  decision_status: ACCEPTED_RETAIN
+  pin: PENDING_TASK_SPECIFIC_CONTRACT
+  decision_owner: TASK-04_ARCHITECTURE_OWNER
+  named_consumers:
+  - Local development; CI-equivalent validation
+  matrix_asset_id: MATRIX-T04-MVP-STACK-001
+  next_validation: TASK-05_CONTRACT_FIXTURE_VALIDATION
+- record_kind: reuse_candidate
+  record_id: REUSE-T04-PIPTOOLS-001
+  status: REJECTED
+  created_at: '2026-07-22T00:00:00Z'
+  evidence_asset_ids:
+  - MATRIX-T04-MVP-STACK-001
+  - EVIDENCE-T04-RESEARCH-ACCEPTANCE-001
+  - PROTOTYPE-T04-CORE-NATIVE-STACK-001
+  derived_from: PRE-GIT-TASK01-A024
+  component_area: A1_RUNTIME_DEPENDENCIES
+  candidate_name: pip-tools as canonical lock authority
+  verdict: REJECT
+  decision_status: REJECTED_FOR_BASELINE
+  pin: PENDING_TASK_SPECIFIC_CONTRACT
+  decision_owner: WORK_CONTROL_PLANE
+  named_consumers:
+  - None
+  matrix_asset_id: MATRIX-T04-MVP-STACK-001
+  next_validation: REOPEN_ONLY_AFTER_FALSIFIER_INVALIDATION
+- record_kind: reuse_candidate
+  record_id: REUSE-T04-POETRY-001
+  status: REJECTED
+  created_at: '2026-07-22T00:00:00Z'
+  evidence_asset_ids:
+  - MATRIX-T04-MVP-STACK-001
+  - EVIDENCE-T04-RESEARCH-ACCEPTANCE-001
+  - PROTOTYPE-T04-CORE-NATIVE-STACK-001
+  derived_from: PRE-GIT-TASK01-A024
+  component_area: A1_RUNTIME_DEPENDENCIES
+  candidate_name: Poetry
+  verdict: REJECT
+  decision_status: REJECTED_FOR_BASELINE
+  pin: PENDING_TASK_SPECIFIC_CONTRACT
+  decision_owner: WORK_CONTROL_PLANE
+  named_consumers:
+  - None
+  matrix_asset_id: MATRIX-T04-MVP-STACK-001
+  next_validation: REOPEN_ONLY_AFTER_FALSIFIER_INVALIDATION
+- record_kind: reuse_candidate
+  record_id: REUSE-T04-PYLOCK-001
+  status: RECORDED
+  created_at: '2026-07-22T00:00:00Z'
+  evidence_asset_ids:
+  - MATRIX-T04-MVP-STACK-001
+  - EVIDENCE-T04-RESEARCH-ACCEPTANCE-001
+  - PROTOTYPE-T04-CORE-NATIVE-STACK-001
+  derived_from: PRE-GIT-TASK01-A024
+  component_area: A1_RUNTIME_DEPENDENCIES
+  candidate_name: pylock.toml / pip lock as canonical path
+  verdict: DEFER
+  decision_status: DEFERRED
+  pin: PENDING_TASK_SPECIFIC_CONTRACT
+  decision_owner: WORK_CONTROL_PLANE
+  named_consumers:
+  - Future external installer/distribution consumer
+  matrix_asset_id: MATRIX-T04-MVP-STACK-001
+  next_validation: REASSESS_ONLY_ON_DOCUMENTED_TRIGGER
+- record_kind: reuse_candidate
+  record_id: REUSE-T04-SOLANA-PY-001
+  status: RECORDED
+  created_at: '2026-07-22T00:00:00Z'
+  evidence_asset_ids:
+  - MATRIX-T04-MVP-STACK-001
+  - EVIDENCE-T04-RESEARCH-ACCEPTANCE-001
+  - PROTOTYPE-T04-CORE-NATIVE-STACK-001
+  derived_from: PRE-GIT-TASK01-A024
+  component_area: A2_SOLANA_INGESTION_DECODING
+  candidate_name: solana-py async RPC/WebSocket client
+  verdict: WRAP
+  decision_status: CONDITIONAL_ACCEPT
+  pin: 0.40.1
+  decision_owner: TASK-04_ARCHITECTURE_OWNER
+  named_consumers:
+  - TASK-07, TASK-08, TASK-09; future replay fixtures
+  matrix_asset_id: MATRIX-T04-MVP-STACK-001
+  next_validation: TASK-05_ADAPTER_BOUNDARY_VALIDATION
+- record_kind: reuse_candidate
+  record_id: REUSE-T04-SOLDERS-001
+  status: RECORDED
+  created_at: '2026-07-22T00:00:00Z'
+  evidence_asset_ids:
+  - MATRIX-T04-MVP-STACK-001
+  - EVIDENCE-T04-RESEARCH-ACCEPTANCE-001
+  - PROTOTYPE-T04-CORE-NATIVE-STACK-001
+  derived_from: PRE-GIT-TASK01-A024
+  component_area: A2_SOLANA_INGESTION_DECODING
+  candidate_name: solders low-level Solana types/parsing
+  verdict: WRAP
+  decision_status: CONDITIONAL_ACCEPT
+  pin: 0.28.0
+  decision_owner: TASK-04_ARCHITECTURE_OWNER
+  named_consumers:
+  - TASK-05, TASK-07..TASK-09; decoder fixtures
+  matrix_asset_id: MATRIX-T04-MVP-STACK-001
+  next_validation: TASK-05_ADAPTER_BOUNDARY_VALIDATION
+- record_kind: reuse_candidate
+  record_id: REUSE-T04-ANCHORPY-001
+  status: RECORDED
+  created_at: '2026-07-22T00:00:00Z'
+  evidence_asset_ids:
+  - MATRIX-T04-MVP-STACK-001
+  - EVIDENCE-T04-RESEARCH-ACCEPTANCE-001
+  - PROTOTYPE-T04-CORE-NATIVE-STACK-001
+  derived_from: PRE-GIT-TASK01-A024
+  component_area: A2_SOLANA_INGESTION_DECODING
+  candidate_name: AnchorPy
+  verdict: DEFER
+  decision_status: DEFERRED
+  pin: 0.21.0
+  decision_owner: WORK_CONTROL_PLANE
+  named_consumers:
+  - None currently
+  matrix_asset_id: MATRIX-T04-MVP-STACK-001
+  next_validation: REASSESS_ONLY_ON_DOCUMENTED_TRIGGER
+- record_kind: reuse_candidate
+  record_id: REUSE-T04-PUMP-SOURCE-001
+  status: RECORDED
+  created_at: '2026-07-22T00:00:00Z'
+  evidence_asset_ids:
+  - MATRIX-T04-MVP-STACK-001
+  - EVIDENCE-T04-RESEARCH-ACCEPTANCE-001
+  - PROTOTYPE-T04-CORE-NATIVE-STACK-001
+  derived_from: PRE-GIT-TASK01-A024
+  component_area: A2_SOLANA_INGESTION_DECODING
+  candidate_name: Pump/PumpSwap official source/IDL snapshot
+  verdict: WRAP
+  decision_status: CONDITIONAL_REFERENCE_ONLY
+  pin: PENDING_EXACT_REPOSITORY_COMMIT_AND_CONTENT_HASHES
+  decision_owner: TASK-04_ARCHITECTURE_OWNER
+  named_consumers:
+  - TASK-05, TASK-07..TASK-09, TASK-26
+  matrix_asset_id: MATRIX-T04-MVP-STACK-001
+  next_validation: TASK-05_ADAPTER_BOUNDARY_VALIDATION
+- record_kind: reuse_candidate
+  record_id: REUSE-T04-PUMP-DECODER-001
+  status: RECORDED
+  created_at: '2026-07-22T00:00:00Z'
+  evidence_asset_ids:
+  - MATRIX-T04-MVP-STACK-001
+  - EVIDENCE-T04-RESEARCH-ACCEPTANCE-001
+  - PROTOTYPE-T04-CORE-NATIVE-STACK-001
+  derived_from: PRE-GIT-TASK01-A024
+  component_area: A2_SOLANA_INGESTION_DECODING
+  candidate_name: Project-owned pure Pump/PumpSwap decoder
+  verdict: BUILD
+  decision_status: ACCEPTED_THIN_CUSTOM
+  pin: PENDING_TASK_SPECIFIC_CONTRACT
+  decision_owner: PROJECT_MAINTAINER
+  named_consumers:
+  - TASK-05, TASK-07..TASK-09, TASK-26
+  matrix_asset_id: MATRIX-T04-MVP-STACK-001
+  next_validation: TASK-05_BOUNDED_IMPLEMENTATION_VALIDATION
+- record_kind: reuse_candidate
+  record_id: REUSE-T04-VIXEN-001
+  status: RECORDED
+  created_at: '2026-07-22T00:00:00Z'
+  evidence_asset_ids:
+  - MATRIX-T04-MVP-STACK-001
+  - EVIDENCE-T04-RESEARCH-ACCEPTANCE-001
+  - PROTOTYPE-T04-CORE-NATIVE-STACK-001
+  derived_from: PRE-GIT-TASK01-A024
+  component_area: A2_SOLANA_INGESTION_DECODING
+  candidate_name: Yellowstone gRPC / Vixen
+  verdict: DEFER
+  decision_status: DEFERRED_TRIGGERED
+  pin: PENDING_IF_TRIGGERED
+  decision_owner: WORK_CONTROL_PLANE
+  named_consumers:
+  - Future high-cadence TASK-08/09 or measured decoder offload
+  matrix_asset_id: MATRIX-T04-MVP-STACK-001
+  next_validation: REASSESS_ONLY_ON_DOCUMENTED_TRIGGER
+- record_kind: reuse_candidate
+  record_id: REUSE-T04-PARQUET-001
+  status: RECORDED
+  created_at: '2026-07-22T00:00:00Z'
+  evidence_asset_ids:
+  - MATRIX-T04-MVP-STACK-001
+  - EVIDENCE-T04-RESEARCH-ACCEPTANCE-001
+  - PROTOTYPE-T04-CORE-NATIVE-STACK-001
+  derived_from: PRE-GIT-TASK01-A024
+  component_area: A3_RAW_PARQUET
+  candidate_name: Apache Parquet dataset pieces
+  verdict: ADOPT
+  decision_status: ACCEPTED_FORMAT
+  pin: PENDING_TASK_SPECIFIC_CONTRACT
+  decision_owner: TASK-04_ARCHITECTURE_OWNER
+  named_consumers:
+  - TASK-05, TASK-06, TASK-08..TASK-13, research tasks
+  matrix_asset_id: MATRIX-T04-MVP-STACK-001
+  next_validation: TASK-05_CONTRACT_FIXTURE_VALIDATION
+- record_kind: reuse_candidate
+  record_id: REUSE-T04-PYARROW-001
+  status: RECORDED
+  created_at: '2026-07-22T00:00:00Z'
+  evidence_asset_ids:
+  - MATRIX-T04-MVP-STACK-001
+  - EVIDENCE-T04-RESEARCH-ACCEPTANCE-001
+  - PROTOTYPE-T04-CORE-NATIVE-STACK-001
+  derived_from: PRE-GIT-TASK01-A024
+  component_area: A3_RAW_PARQUET
+  candidate_name: PyArrow Parquet writer/reader
+  verdict: WRAP
+  decision_status: PROTOTYPE_GATE
+  pin: 25.0.0
+  decision_owner: TASK-04_ARCHITECTURE_OWNER
+  named_consumers:
+  - TASK-06, TASK-08..TASK-13
+  matrix_asset_id: MATRIX-T04-MVP-STACK-001
+  next_validation: TASK-05_ADAPTER_BOUNDARY_VALIDATION
+- record_kind: reuse_candidate
+  record_id: REUSE-T04-PARQUET-PORT-001
+  status: RECORDED
+  created_at: '2026-07-22T00:00:00Z'
+  evidence_asset_ids:
+  - MATRIX-T04-MVP-STACK-001
+  - EVIDENCE-T04-RESEARCH-ACCEPTANCE-001
+  - PROTOTYPE-T04-CORE-NATIVE-STACK-001
+  derived_from: PRE-GIT-TASK01-A024
+  component_area: A3_RAW_PARQUET
+  candidate_name: Project ParquetPort + dataset manifest writer
+  verdict: BUILD
+  decision_status: ACCEPTED_THIN_CUSTOM
+  pin: PENDING_TASK_SPECIFIC_CONTRACT
+  decision_owner: PROJECT_MAINTAINER
+  named_consumers:
+  - TASK-06, TASK-08..TASK-13, Catalog dataset records
+  matrix_asset_id: MATRIX-T04-MVP-STACK-001
+  next_validation: TASK-05_BOUNDED_IMPLEMENTATION_VALIDATION
+- record_kind: reuse_candidate
+  record_id: REUSE-T04-FASTPARQUET-001
+  status: REJECTED
+  created_at: '2026-07-22T00:00:00Z'
+  evidence_asset_ids:
+  - MATRIX-T04-MVP-STACK-001
+  - EVIDENCE-T04-RESEARCH-ACCEPTANCE-001
+  - PROTOTYPE-T04-CORE-NATIVE-STACK-001
+  derived_from: PRE-GIT-TASK01-A024
+  component_area: A3_RAW_PARQUET
+  candidate_name: fastparquet
+  verdict: REJECT
+  decision_status: REJECTED_PRODUCTION
+  pin: PENDING_TASK_SPECIFIC_CONTRACT
+  decision_owner: WORK_CONTROL_PLANE
+  named_consumers:
+  - None
+  matrix_asset_id: MATRIX-T04-MVP-STACK-001
+  next_validation: REOPEN_ONLY_AFTER_FALSIFIER_INVALIDATION
+- record_kind: reuse_candidate
+  record_id: REUSE-T04-DUCKDB-001
+  status: RECORDED
+  created_at: '2026-07-22T00:00:00Z'
+  evidence_asset_ids:
+  - MATRIX-T04-MVP-STACK-001
+  - EVIDENCE-T04-RESEARCH-ACCEPTANCE-001
+  - PROTOTYPE-T04-CORE-NATIVE-STACK-001
+  derived_from: PRE-GIT-TASK01-A024
+  component_area: A4_DUCKDB_QUERY
+  candidate_name: DuckDB embedded persistent analytical store
+  verdict: ADOPT
+  decision_status: PROTOTYPE_GATE
+  pin: 1.5.5
+  decision_owner: TASK-04_ARCHITECTURE_OWNER
+  named_consumers:
+  - TASK-05, TASK-09..TASK-13, TASK-18/19 and research
+  matrix_asset_id: MATRIX-T04-MVP-STACK-001
+  next_validation: TASK-05_CONTRACT_FIXTURE_VALIDATION
+- record_kind: reuse_candidate
+  record_id: REUSE-T04-DUCKDB-SINGLE-WRITER-001
+  status: RECORDED
+  created_at: '2026-07-22T00:00:00Z'
+  evidence_asset_ids:
+  - MATRIX-T04-MVP-STACK-001
+  - EVIDENCE-T04-RESEARCH-ACCEPTANCE-001
+  - PROTOTYPE-T04-CORE-NATIVE-STACK-001
+  derived_from: PRE-GIT-TASK01-A024
+  component_area: A4_DUCKDB_QUERY
+  candidate_name: Single-writer process discipline
+  verdict: ADOPT
+  decision_status: ACCEPTED_POLICY
+  pin: PENDING_TASK_SPECIFIC_CONTRACT
+  decision_owner: TASK-04_ARCHITECTURE_OWNER
+  named_consumers:
+  - TASK-06, TASK-09..TASK-13, ORCH-001
+  matrix_asset_id: MATRIX-T04-MVP-STACK-001
+  next_validation: TASK-05_CONTRACT_FIXTURE_VALIDATION
+- record_kind: reuse_candidate
+  record_id: REUSE-T04-QUACK-001
+  status: RECORDED
+  created_at: '2026-07-22T00:00:00Z'
+  evidence_asset_ids:
+  - MATRIX-T04-MVP-STACK-001
+  - EVIDENCE-T04-RESEARCH-ACCEPTANCE-001
+  - PROTOTYPE-T04-CORE-NATIVE-STACK-001
+  derived_from: PRE-GIT-TASK01-A024
+  component_area: A4_DUCKDB_QUERY
+  candidate_name: Quack client-server
+  verdict: DEFER
+  decision_status: DEFERRED
+  pin: PENDING_IF_TRIGGERED
+  decision_owner: WORK_CONTROL_PLANE
+  named_consumers:
+  - Future shared multi-writer analytics
+  matrix_asset_id: MATRIX-T04-MVP-STACK-001
+  next_validation: REASSESS_ONLY_ON_DOCUMENTED_TRIGGER
+- record_kind: reuse_candidate
+  record_id: REUSE-T04-DUCKLAKE-001
+  status: RECORDED
+  created_at: '2026-07-22T00:00:00Z'
+  evidence_asset_ids:
+  - MATRIX-T04-MVP-STACK-001
+  - EVIDENCE-T04-RESEARCH-ACCEPTANCE-001
+  - PROTOTYPE-T04-CORE-NATIVE-STACK-001
+  derived_from: PRE-GIT-TASK01-A024
+  component_area: A4_DUCKDB_QUERY
+  candidate_name: DuckLake + PostgreSQL catalog
+  verdict: DEFER
+  decision_status: DEFERRED
+  pin: PENDING_IF_TRIGGERED
+  decision_owner: WORK_CONTROL_PLANE
+  named_consumers:
+  - Future production concurrent lake access
+  matrix_asset_id: MATRIX-T04-MVP-STACK-001
+  next_validation: REASSESS_ONLY_ON_DOCUMENTED_TRIGGER
+- record_kind: reuse_candidate
+  record_id: REUSE-T04-DUCKDB-MULTIWRITER-001
+  status: REJECTED
+  created_at: '2026-07-22T00:00:00Z'
+  evidence_asset_ids:
+  - MATRIX-T04-MVP-STACK-001
+  - EVIDENCE-T04-RESEARCH-ACCEPTANCE-001
+  - PROTOTYPE-T04-CORE-NATIVE-STACK-001
+  derived_from: PRE-GIT-TASK01-A024
+  component_area: A4_DUCKDB_QUERY
+  candidate_name: Multiple independent writers to one native .duckdb file
+  verdict: REJECT
+  decision_status: REJECTED_ARCHITECTURE
+  pin: PENDING_NOT_APPLICABLE_REJECTED_ARCHITECTURE
+  decision_owner: WORK_CONTROL_PLANE
+  named_consumers:
+  - None
+  matrix_asset_id: MATRIX-T04-MVP-STACK-001
+  next_validation: REOPEN_ONLY_AFTER_FALSIFIER_INVALIDATION
+- record_kind: reuse_candidate
+  record_id: REUSE-T04-JSONSCHEMA-001
+  status: RECORDED
+  created_at: '2026-07-22T00:00:00Z'
+  evidence_asset_ids:
+  - MATRIX-T04-MVP-STACK-001
+  - EVIDENCE-T04-RESEARCH-ACCEPTANCE-001
+  - PROTOTYPE-T04-CORE-NATIVE-STACK-001
+  derived_from: PRE-GIT-TASK01-A024
+  component_area: A5_SCHEMA_MODELS_MIGRATIONS
+  candidate_name: JSON Schema Draft 2020-12 + jsonschema validator
+  verdict: ADOPT
+  decision_status: ACCEPTED_RETAIN
+  pin: 4.26.0
+  decision_owner: TASK-04_ARCHITECTURE_OWNER
+  named_consumers:
+  - TASK-05/06; Catalog; external contracts and receipts
+  matrix_asset_id: MATRIX-T04-MVP-STACK-001
+  next_validation: TASK-05_CONTRACT_FIXTURE_VALIDATION
+- record_kind: reuse_candidate
+  record_id: REUSE-T04-PYDANTIC-001
+  status: RECORDED
+  created_at: '2026-07-22T00:00:00Z'
+  evidence_asset_ids:
+  - MATRIX-T04-MVP-STACK-001
+  - EVIDENCE-T04-RESEARCH-ACCEPTANCE-001
+  - PROTOTYPE-T04-CORE-NATIVE-STACK-001
+  derived_from: PRE-GIT-TASK01-A024
+  component_area: A5_SCHEMA_MODELS_MIGRATIONS
+  candidate_name: Pydantic v2 boundary models
+  verdict: WRAP
+  decision_status: PROTOTYPE_GATE
+  pin: 2.13.4
+  decision_owner: TASK-04_ARCHITECTURE_OWNER
+  named_consumers:
+  - TASK-05/06; adapters; configs; normalized DTOs
+  matrix_asset_id: MATRIX-T04-MVP-STACK-001
+  next_validation: TASK-05_ADAPTER_BOUNDARY_VALIDATION
+- record_kind: reuse_candidate
+  record_id: REUSE-T04-DUCKDB-DDL-001
+  status: RECORDED
+  created_at: '2026-07-22T00:00:00Z'
+  evidence_asset_ids:
+  - MATRIX-T04-MVP-STACK-001
+  - EVIDENCE-T04-RESEARCH-ACCEPTANCE-001
+  - PROTOTYPE-T04-CORE-NATIVE-STACK-001
+  derived_from: PRE-GIT-TASK01-A024
+  component_area: A5_SCHEMA_MODELS_MIGRATIONS
+  candidate_name: DuckDB SQL DDL
+  verdict: ADOPT
+  decision_status: ACCEPTED
+  pin: 1.5.5
+  decision_owner: TASK-04_ARCHITECTURE_OWNER
+  named_consumers:
+  - TASK-05, TASK-06, research query layer
+  matrix_asset_id: MATRIX-T04-MVP-STACK-001
+  next_validation: TASK-05_CONTRACT_FIXTURE_VALIDATION
+- record_kind: reuse_candidate
+  record_id: REUSE-T04-MIGRATION-LEDGER-001
+  status: RECORDED
+  created_at: '2026-07-22T00:00:00Z'
+  evidence_asset_ids:
+  - MATRIX-T04-MVP-STACK-001
+  - EVIDENCE-T04-RESEARCH-ACCEPTANCE-001
+  - PROTOTYPE-T04-CORE-NATIVE-STACK-001
+  derived_from: PRE-GIT-TASK01-A024
+  component_area: A5_SCHEMA_MODELS_MIGRATIONS
+  candidate_name: Thin repository-local migration ledger
+  verdict: BUILD
+  decision_status: PROTOTYPE_GATE_THIN_CUSTOM
+  pin: PENDING_TASK_SPECIFIC_CONTRACT
+  decision_owner: PROJECT_MAINTAINER
+  named_consumers:
+  - TASK-05/06; clean rebuild; Catalog relation records
+  matrix_asset_id: MATRIX-T04-MVP-STACK-001
+  next_validation: TASK-05_BOUNDED_IMPLEMENTATION_VALIDATION
+- record_kind: reuse_candidate
+  record_id: REUSE-T04-ALEMBIC-001
+  status: RECORDED
+  created_at: '2026-07-22T00:00:00Z'
+  evidence_asset_ids:
+  - MATRIX-T04-MVP-STACK-001
+  - EVIDENCE-T04-RESEARCH-ACCEPTANCE-001
+  - PROTOTYPE-T04-CORE-NATIVE-STACK-001
+  derived_from: PRE-GIT-TASK01-A024
+  component_area: A5_SCHEMA_MODELS_MIGRATIONS
+  candidate_name: Alembic for DuckDB baseline
+  verdict: DEFER
+  decision_status: DEFERRED
+  pin: PENDING_IF_AUXILIARY_SQLALCHEMY_STORE
+  decision_owner: WORK_CONTROL_PLANE
+  named_consumers:
+  - Future auxiliary SQLAlchemy-backed store only
+  matrix_asset_id: MATRIX-T04-MVP-STACK-001
+  next_validation: REASSESS_ONLY_ON_DOCUMENTED_TRIGGER
+- record_kind: reuse_candidate
+  record_id: REUSE-T04-SQLALCHEMY-MIGRATE-001
+  status: REJECTED
+  created_at: '2026-07-22T00:00:00Z'
+  evidence_asset_ids:
+  - MATRIX-T04-MVP-STACK-001
+  - EVIDENCE-T04-RESEARCH-ACCEPTANCE-001
+  - PROTOTYPE-T04-CORE-NATIVE-STACK-001
+  derived_from: PRE-GIT-TASK01-A024
+  component_area: A5_SCHEMA_MODELS_MIGRATIONS
+  candidate_name: sqlalchemy-migrate
+  verdict: REJECT
+  decision_status: REJECTED_LEGACY
+  pin: PENDING_TASK_SPECIFIC_CONTRACT
+  decision_owner: WORK_CONTROL_PLANE
+  named_consumers:
+  - None
+  matrix_asset_id: MATRIX-T04-MVP-STACK-001
+  next_validation: REOPEN_ONLY_AFTER_FALSIFIER_INVALIDATION
+- record_kind: reuse_candidate
+  record_id: REUSE-T04-COMPOSE-001
+  status: RECORDED
+  created_at: '2026-07-22T00:00:00Z'
+  evidence_asset_ids:
+  - MATRIX-T04-MVP-STACK-001
+  - EVIDENCE-T04-RESEARCH-ACCEPTANCE-001
+  - PROTOTYPE-T04-CORE-NATIVE-STACK-001
+  derived_from: PRE-GIT-TASK01-A024
+  component_area: A6_ORCHESTRATION_OBSERVABILITY
+  candidate_name: Docker Compose
+  verdict: ADOPT
+  decision_status: ACCEPTED_RETAIN
+  pin: 5.3.1
+  decision_owner: TASK-04_ARCHITECTURE_OWNER
+  named_consumers:
+  - TASK-08..TASK-12; TASK-15
+  matrix_asset_id: MATRIX-T04-MVP-STACK-001
+  next_validation: TASK-05_CONTRACT_FIXTURE_VALIDATION
+- record_kind: reuse_candidate
+  record_id: REUSE-T04-COORDINATOR-001
+  status: RECORDED
+  created_at: '2026-07-22T00:00:00Z'
+  evidence_asset_ids:
+  - MATRIX-T04-MVP-STACK-001
+  - EVIDENCE-T04-RESEARCH-ACCEPTANCE-001
+  - PROTOTYPE-T04-CORE-NATIVE-STACK-001
+  derived_from: PRE-GIT-TASK01-A024
+  component_area: A6_ORCHESTRATION_OBSERVABILITY
+  candidate_name: Thin repository-local coordinator/retry policy
+  verdict: BUILD
+  decision_status: ACCEPTED_THIN_CUSTOM
+  pin: PENDING_TASK_SPECIFIC_CONTRACT
+  decision_owner: PROJECT_MAINTAINER
+  named_consumers:
+  - TASK-08..TASK-12; replay and later ORCH-001
+  matrix_asset_id: MATRIX-T04-MVP-STACK-001
+  next_validation: TASK-05_BOUNDED_IMPLEMENTATION_VALIDATION
+- record_kind: reuse_candidate
+  record_id: REUSE-T04-APSCHEDULER-001
+  status: RECORDED
+  created_at: '2026-07-22T00:00:00Z'
+  evidence_asset_ids:
+  - MATRIX-T04-MVP-STACK-001
+  - EVIDENCE-T04-RESEARCH-ACCEPTANCE-001
+  - PROTOTYPE-T04-CORE-NATIVE-STACK-001
+  derived_from: PRE-GIT-TASK01-A024
+  component_area: A6_ORCHESTRATION_OBSERVABILITY
+  candidate_name: APScheduler
+  verdict: DEFER
+  decision_status: DEFERRED
+  pin: PENDING_TASK_SPECIFIC_CONTRACT
+  decision_owner: WORK_CONTROL_PLANE
+  named_consumers:
+  - Future bounded cron/interval scheduling
+  matrix_asset_id: MATRIX-T04-MVP-STACK-001
+  next_validation: REASSESS_ONLY_ON_DOCUMENTED_TRIGGER
+- record_kind: reuse_candidate
+  record_id: REUSE-T04-CELERY-001
+  status: REJECTED
+  created_at: '2026-07-22T00:00:00Z'
+  evidence_asset_ids:
+  - MATRIX-T04-MVP-STACK-001
+  - EVIDENCE-T04-RESEARCH-ACCEPTANCE-001
+  - PROTOTYPE-T04-CORE-NATIVE-STACK-001
+  derived_from: PRE-GIT-TASK01-A024
+  component_area: A6_ORCHESTRATION_OBSERVABILITY
+  candidate_name: Celery
+  verdict: REJECT
+  decision_status: REJECTED_MVP
+  pin: PENDING_TASK_SPECIFIC_CONTRACT
+  decision_owner: WORK_CONTROL_PLANE
+  named_consumers:
+  - None
+  matrix_asset_id: MATRIX-T04-MVP-STACK-001
+  next_validation: REOPEN_ONLY_AFTER_FALSIFIER_INVALIDATION
+- record_kind: reuse_candidate
+  record_id: REUSE-T04-TEMPORAL-001
+  status: RECORDED
+  created_at: '2026-07-22T00:00:00Z'
+  evidence_asset_ids:
+  - MATRIX-T04-MVP-STACK-001
+  - EVIDENCE-T04-RESEARCH-ACCEPTANCE-001
+  - PROTOTYPE-T04-CORE-NATIVE-STACK-001
+  derived_from: PRE-GIT-TASK01-A024
+  component_area: A6_ORCHESTRATION_OBSERVABILITY
+  candidate_name: Temporal
+  verdict: DEFER
+  decision_status: DEFERRED
+  pin: PENDING_IF_TRIGGERED
+  decision_owner: WORK_CONTROL_PLANE
+  named_consumers:
+  - Future multi-host, business-critical durable workflows
+  matrix_asset_id: MATRIX-T04-MVP-STACK-001
+  next_validation: REASSESS_ONLY_ON_DOCUMENTED_TRIGGER
+- record_kind: reuse_candidate
+  record_id: REUSE-T04-LOGGING-001
+  status: RECORDED
+  created_at: '2026-07-22T00:00:00Z'
+  evidence_asset_ids:
+  - MATRIX-T04-MVP-STACK-001
+  - EVIDENCE-T04-RESEARCH-ACCEPTANCE-001
+  - PROTOTYPE-T04-CORE-NATIVE-STACK-001
+  derived_from: PRE-GIT-TASK01-A024
+  component_area: A6_ORCHESTRATION_OBSERVABILITY
+  candidate_name: Python stdlib structured logging
+  verdict: ADOPT
+  decision_status: ACCEPTED
+  pin: 3.13.14
+  decision_owner: TASK-04_ARCHITECTURE_OWNER
+  named_consumers:
+  - TASK-06..TASK-15; incident/debug evidence
+  matrix_asset_id: MATRIX-T04-MVP-STACK-001
+  next_validation: TASK-05_CONTRACT_FIXTURE_VALIDATION
+- record_kind: reuse_candidate
+  record_id: REUSE-T04-PROM-CLIENT-001
+  status: RECORDED
+  created_at: '2026-07-22T00:00:00Z'
+  evidence_asset_ids:
+  - MATRIX-T04-MVP-STACK-001
+  - EVIDENCE-T04-RESEARCH-ACCEPTANCE-001
+  - PROTOTYPE-T04-CORE-NATIVE-STACK-001
+  derived_from: PRE-GIT-TASK01-A024
+  component_area: A6_ORCHESTRATION_OBSERVABILITY
+  candidate_name: prometheus-client metrics API
+  verdict: WRAP
+  decision_status: CONDITIONAL_ACCEPT
+  pin: 0.25.0
+  decision_owner: TASK-04_ARCHITECTURE_OWNER
+  named_consumers:
+  - TASK-12, TASK-15, TASK-18; future dashboards/alerts
+  matrix_asset_id: MATRIX-T04-MVP-STACK-001
+  next_validation: TASK-05_ADAPTER_BOUNDARY_VALIDATION
+- record_kind: reuse_candidate
+  record_id: REUSE-T04-PROM-SERVER-001
+  status: RECORDED
+  created_at: '2026-07-22T00:00:00Z'
+  evidence_asset_ids:
+  - MATRIX-T04-MVP-STACK-001
+  - EVIDENCE-T04-RESEARCH-ACCEPTANCE-001
+  - PROTOTYPE-T04-CORE-NATIVE-STACK-001
+  derived_from: PRE-GIT-TASK01-A024
+  component_area: A6_ORCHESTRATION_OBSERVABILITY
+  candidate_name: Prometheus server
+  verdict: DEFER
+  decision_status: DEFERRED
+  pin: PENDING_NAMED_CONSUMER
+  decision_owner: WORK_CONTROL_PLANE
+  named_consumers:
+  - Future persistent scraping/retention/alerts in TASK-12/15
+  matrix_asset_id: MATRIX-T04-MVP-STACK-001
+  next_validation: REASSESS_ONLY_ON_DOCUMENTED_TRIGGER
+- record_kind: reuse_candidate
+  record_id: REUSE-T04-OTEL-001
+  status: RECORDED
+  created_at: '2026-07-22T00:00:00Z'
+  evidence_asset_ids:
+  - MATRIX-T04-MVP-STACK-001
+  - EVIDENCE-T04-RESEARCH-ACCEPTANCE-001
+  - PROTOTYPE-T04-CORE-NATIVE-STACK-001
+  derived_from: PRE-GIT-TASK01-A024
+  component_area: A6_ORCHESTRATION_OBSERVABILITY
+  candidate_name: OpenTelemetry Python
+  verdict: DEFER
+  decision_status: DEFERRED
+  pin: PENDING_DISTRIBUTED_TRACING_NEED
+  decision_owner: WORK_CONTROL_PLANE
+  named_consumers:
+  - Future multi-service tracing/remote collector
+  matrix_asset_id: MATRIX-T04-MVP-STACK-001
+  next_validation: REASSESS_ONLY_ON_DOCUMENTED_TRIGGER
+- record_kind: reuse_candidate
+  record_id: REUSE-T04-QUOTE-PORT-001
+  status: RECORDED
+  created_at: '2026-07-22T00:00:00Z'
+  evidence_asset_ids:
+  - MATRIX-T04-MVP-STACK-001
+  - EVIDENCE-T04-RESEARCH-ACCEPTANCE-001
+  - PROTOTYPE-T04-CORE-NATIVE-STACK-001
+  derived_from: PRE-GIT-TASK01-A024
+  component_area: A7_QUOTE_ROUTER
+  candidate_name: Project QuoteProviderPort
+  verdict: BUILD
+  decision_status: ACCEPTED_THIN_CUSTOM
+  pin: PENDING_TASK_SPECIFIC_CONTRACT
+  decision_owner: PROJECT_MAINTAINER
+  named_consumers:
+  - TASK-07, TASK-10, TASK-25, TASK-37
+  matrix_asset_id: MATRIX-T04-MVP-STACK-001
+  next_validation: TASK-05_BOUNDED_IMPLEMENTATION_VALIDATION
+- record_kind: reuse_candidate
+  record_id: REUSE-T04-JUPITER-V2-001
+  status: RECORDED
+  created_at: '2026-07-22T00:00:00Z'
+  evidence_asset_ids:
+  - MATRIX-T04-MVP-STACK-001
+  - EVIDENCE-T04-RESEARCH-ACCEPTANCE-001
+  - PROTOTYPE-T04-CORE-NATIVE-STACK-001
+  derived_from: PRE-GIT-TASK01-A024
+  component_area: A7_QUOTE_ROUTER
+  candidate_name: Jupiter Swap V2 quote contract
+  verdict: WRAP
+  decision_status: ACCEPT_CONTRACT_RUNTIME_DEFERRED
+  pin: PENDING_TASK_SPECIFIC_CONTRACT
+  decision_owner: TASK-04_ARCHITECTURE_OWNER
+  named_consumers:
+  - TASK-07 controlled smoke; TASK-10 quote logger; later TASK-37
+  matrix_asset_id: MATRIX-T04-MVP-STACK-001
+  next_validation: TASK-05_ADAPTER_BOUNDARY_VALIDATION
+- record_kind: reuse_candidate
+  record_id: REUSE-T04-JUPITER-BUILD-001
+  status: RECORDED
+  created_at: '2026-07-22T00:00:00Z'
+  evidence_asset_ids:
+  - MATRIX-T04-MVP-STACK-001
+  - EVIDENCE-T04-RESEARCH-ACCEPTANCE-001
+  - PROTOTYPE-T04-CORE-NATIVE-STACK-001
+  derived_from: PRE-GIT-TASK01-A024
+  component_area: A7_QUOTE_ROUTER
+  candidate_name: Jupiter /build or execution paths
+  verdict: DEFER
+  decision_status: DEFERRED_SECURITY_GATE
+  pin: PENDING_TASK_SPECIFIC_CONTRACT
+  decision_owner: WORK_CONTROL_PLANE
+  named_consumers:
+  - TASK-37+ only
+  matrix_asset_id: MATRIX-T04-MVP-STACK-001
+  next_validation: REASSESS_ONLY_ON_DOCUMENTED_TRIGGER
+- record_kind: reuse_candidate
+  record_id: REUSE-T04-RAPTOR-001
+  status: RECORDED
+  created_at: '2026-07-22T00:00:00Z'
+  evidence_asset_ids:
+  - MATRIX-T04-MVP-STACK-001
+  - EVIDENCE-T04-RESEARCH-ACCEPTANCE-001
+  - PROTOTYPE-T04-CORE-NATIVE-STACK-001
+  derived_from: PRE-GIT-TASK01-A024
+  component_area: A7_QUOTE_ROUTER
+  candidate_name: Raptor hosted/self-hosted quote comparator
+  verdict: DEFER
+  decision_status: DEFERRED_TASK07_COMPARATOR
+  pin: PENDING_CURRENT_DOCS/BINARY/TERMS
+  decision_owner: WORK_CONTROL_PLANE
+  named_consumers:
+  - TASK-07 D08/D09 fallback equivalence check
+  matrix_asset_id: MATRIX-T04-MVP-STACK-001
+  next_validation: REASSESS_ONLY_ON_DOCUMENTED_TRIGGER
+- record_kind: reuse_candidate
+  record_id: REUSE-T04-HUMMINGBOT-001
+  status: REJECTED
+  created_at: '2026-07-22T00:00:00Z'
+  evidence_asset_ids:
+  - MATRIX-T04-MVP-STACK-001
+  - EVIDENCE-T04-RESEARCH-ACCEPTANCE-001
+  - PROTOTYPE-T04-CORE-NATIVE-STACK-001
+  derived_from: PRE-GIT-TASK01-A024
+  component_area: A7_QUOTE_ROUTER
+  candidate_name: Hummingbot Gateway
+  verdict: REJECT
+  decision_status: REJECTED_INITIAL_SPINE_REFERENCE_ONLY
+  pin: PENDING_TASK_SPECIFIC_CONTRACT
+  decision_owner: WORK_CONTROL_PLANE
+  named_consumers:
+  - Reference only; no runtime consumer
+  matrix_asset_id: MATRIX-T04-MVP-STACK-001
+  next_validation: REOPEN_ONLY_AFTER_FALSIFIER_INVALIDATION
+- record_kind: reuse_candidate
+  record_id: REUSE-T04-CUSTOM-ROUTER-001
+  status: REJECTED
+  created_at: '2026-07-22T00:00:00Z'
+  evidence_asset_ids:
+  - MATRIX-T04-MVP-STACK-001
+  - EVIDENCE-T04-RESEARCH-ACCEPTANCE-001
+  - PROTOTYPE-T04-CORE-NATIVE-STACK-001
+  derived_from: PRE-GIT-TASK01-A024
+  component_area: A7_QUOTE_ROUTER
+  candidate_name: Custom route-finding engine
+  verdict: REJECT
+  decision_status: REJECTED_BUILD
+  pin: PENDING_TASK_SPECIFIC_CONTRACT
+  decision_owner: WORK_CONTROL_PLANE
+  named_consumers:
+  - None
+  matrix_asset_id: MATRIX-T04-MVP-STACK-001
+  next_validation: REOPEN_ONLY_AFTER_FALSIFIER_INVALIDATION
+- record_kind: reuse_candidate
+  record_id: REUSE-T04-UNITTEST-001
+  status: RECORDED
+  created_at: '2026-07-22T00:00:00Z'
+  evidence_asset_ids:
+  - MATRIX-T04-MVP-STACK-001
+  - EVIDENCE-T04-RESEARCH-ACCEPTANCE-001
+  - PROTOTYPE-T04-CORE-NATIVE-STACK-001
+  derived_from: PRE-GIT-TASK01-A024
+  component_area: A8_TEST_REPLAY_SUPPLY_CHAIN
+  candidate_name: Python unittest
+  verdict: ADOPT
+  decision_status: ACCEPTED_RETAIN
+  pin: 3.13.14
+  decision_owner: TASK-04_ARCHITECTURE_OWNER
+  named_consumers:
+  - All tasks and CI
+  matrix_asset_id: MATRIX-T04-MVP-STACK-001
+  next_validation: TASK-05_CONTRACT_FIXTURE_VALIDATION
+- record_kind: reuse_candidate
+  record_id: REUSE-T04-GOLDEN-FIXTURES-001
+  status: RECORDED
+  created_at: '2026-07-22T00:00:00Z'
+  evidence_asset_ids:
+  - MATRIX-T04-MVP-STACK-001
+  - EVIDENCE-T04-RESEARCH-ACCEPTANCE-001
+  - PROTOTYPE-T04-CORE-NATIVE-STACK-001
+  derived_from: PRE-GIT-TASK01-A024
+  component_area: A8_TEST_REPLAY_SUPPLY_CHAIN
+  candidate_name: Versioned golden fixture corpus
+  verdict: BUILD
+  decision_status: ACCEPTED_THIN_CUSTOM
+  pin: PENDING_TASK_SPECIFIC_CONTRACT
+  decision_owner: PROJECT_MAINTAINER
+  named_consumers:
+  - TASK-05..TASK-12; provider/decoder/migration/replay tests
+  matrix_asset_id: MATRIX-T04-MVP-STACK-001
+  next_validation: TASK-05_BOUNDED_IMPLEMENTATION_VALIDATION
+- record_kind: reuse_candidate
+  record_id: REUSE-T04-REPLAY-HARNESS-001
+  status: RECORDED
+  created_at: '2026-07-22T00:00:00Z'
+  evidence_asset_ids:
+  - MATRIX-T04-MVP-STACK-001
+  - EVIDENCE-T04-RESEARCH-ACCEPTANCE-001
+  - PROTOTYPE-T04-CORE-NATIVE-STACK-001
+  derived_from: PRE-GIT-TASK01-A024
+  component_area: A8_TEST_REPLAY_SUPPLY_CHAIN
+  candidate_name: Deterministic project replay harness
+  verdict: BUILD
+  decision_status: ACCEPTED_THIN_CUSTOM
+  pin: PENDING_TASK_SPECIFIC_CONTRACT
+  decision_owner: PROJECT_MAINTAINER
+  named_consumers:
+  - TASK-06, TASK-19, all experiments and runtime validation
+  matrix_asset_id: MATRIX-T04-MVP-STACK-001
+  next_validation: TASK-05_BOUNDED_IMPLEMENTATION_VALIDATION
+- record_kind: reuse_candidate
+  record_id: REUSE-T04-RECEIPT-PROFILE-001
+  status: RECORDED
+  created_at: '2026-07-22T00:00:00Z'
+  evidence_asset_ids:
+  - MATRIX-T04-MVP-STACK-001
+  - EVIDENCE-T04-RESEARCH-ACCEPTANCE-001
+  - PROTOTYPE-T04-CORE-NATIVE-STACK-001
+  derived_from: PRE-GIT-TASK01-A024
+  component_area: A8_TEST_REPLAY_SUPPLY_CHAIN
+  candidate_name: Narrow deterministic JSON receipt profile
+  verdict: BUILD
+  decision_status: ACCEPTED_THIN_CUSTOM
+  pin: PENDING_TASK_SPECIFIC_CONTRACT
+  decision_owner: PROJECT_MAINTAINER
+  named_consumers:
+  - All validation/prototype/migration/data manifests
+  matrix_asset_id: MATRIX-T04-MVP-STACK-001
+  next_validation: TASK-05_BOUNDED_IMPLEMENTATION_VALIDATION
+- record_kind: reuse_candidate
+  record_id: REUSE-T04-PYTEST-001
+  status: RECORDED
+  created_at: '2026-07-22T00:00:00Z'
+  evidence_asset_ids:
+  - MATRIX-T04-MVP-STACK-001
+  - EVIDENCE-T04-RESEARCH-ACCEPTANCE-001
+  - PROTOTYPE-T04-CORE-NATIVE-STACK-001
+  derived_from: PRE-GIT-TASK01-A024
+  component_area: A8_TEST_REPLAY_SUPPLY_CHAIN
+  candidate_name: pytest
+  verdict: DEFER
+  decision_status: DEFERRED
+  pin: PENDING_MEASURED_ERGONOMICS_GAP
+  decision_owner: WORK_CONTROL_PLANE
+  named_consumers:
+  - Future richer fixture/plugin test needs
+  matrix_asset_id: MATRIX-T04-MVP-STACK-001
+  next_validation: REASSESS_ONLY_ON_DOCUMENTED_TRIGGER
+- record_kind: reuse_candidate
+  record_id: REUSE-T04-HYPOTHESIS-001
+  status: RECORDED
+  created_at: '2026-07-22T00:00:00Z'
+  evidence_asset_ids:
+  - MATRIX-T04-MVP-STACK-001
+  - EVIDENCE-T04-RESEARCH-ACCEPTANCE-001
+  - PROTOTYPE-T04-CORE-NATIVE-STACK-001
+  derived_from: PRE-GIT-TASK01-A024
+  component_area: A8_TEST_REPLAY_SUPPLY_CHAIN
+  candidate_name: Hypothesis property-based testing
+  verdict: DEFER
+  decision_status: DEFERRED
+  pin: PENDING_STABLE_INVARIANT
+  decision_owner: WORK_CONTROL_PLANE
+  named_consumers:
+  - Future schema/normalization invariants
+  matrix_asset_id: MATRIX-T04-MVP-STACK-001
+  next_validation: REASSESS_ONLY_ON_DOCUMENTED_TRIGGER
+- record_kind: reuse_candidate
+  record_id: REUSE-T04-PIP-AUDIT-001
+  status: RECORDED
+  created_at: '2026-07-22T00:00:00Z'
+  evidence_asset_ids:
+  - MATRIX-T04-MVP-STACK-001
+  - EVIDENCE-T04-RESEARCH-ACCEPTANCE-001
+  - PROTOTYPE-T04-CORE-NATIVE-STACK-001
+  derived_from: PRE-GIT-TASK01-A024
+  component_area: A8_TEST_REPLAY_SUPPLY_CHAIN
+  candidate_name: pip-audit
+  verdict: ADOPT
+  decision_status: CONDITIONAL_GUARDED
+  pin: 2.10.1
+  decision_owner: TASK-04_ARCHITECTURE_OWNER
+  named_consumers:
+  - TASK-04/05+ dependency handoffs and CI
+  matrix_asset_id: MATRIX-T04-MVP-STACK-001
+  next_validation: TASK-05_CONTRACT_FIXTURE_VALIDATION
+- record_kind: reuse_candidate
+  record_id: REUSE-T04-UV-CYCLONEDX-001
+  status: RECORDED
+  created_at: '2026-07-22T00:00:00Z'
+  evidence_asset_ids:
+  - MATRIX-T04-MVP-STACK-001
+  - EVIDENCE-T04-RESEARCH-ACCEPTANCE-001
+  - PROTOTYPE-T04-CORE-NATIVE-STACK-001
+  derived_from: PRE-GIT-TASK01-A024
+  component_area: A8_TEST_REPLAY_SUPPLY_CHAIN
+  candidate_name: uv CycloneDX 1.5 export
+  verdict: ADOPT
+  decision_status: PREVIEW_RECEIPT_ONLY
+  pin: 0.11.29
+  decision_owner: TASK-04_ARCHITECTURE_OWNER
+  named_consumers:
+  - TASK-04/05 handoff; Catalog evidence; security review
+  matrix_asset_id: MATRIX-T04-MVP-STACK-001
+  next_validation: TASK-05_CONTRACT_FIXTURE_VALIDATION
+- record_kind: reuse_candidate
+  record_id: REUSE-T04-GITHUB-DEPENDENCY-001
+  status: RECORDED
+  created_at: '2026-07-22T00:00:00Z'
+  evidence_asset_ids:
+  - MATRIX-T04-MVP-STACK-001
+  - EVIDENCE-T04-RESEARCH-ACCEPTANCE-001
+  - PROTOTYPE-T04-CORE-NATIVE-STACK-001
+  derived_from: PRE-GIT-TASK01-A024
+  component_area: A8_TEST_REPLAY_SUPPLY_CHAIN
+  candidate_name: GitHub dependency graph / Dependabot
+  verdict: WRAP
+  decision_status: SECONDARY_USER_ATTESTATION_REQUIRED
+  pin: PENDING_TASK_SPECIFIC_CONTRACT
+  decision_owner: TASK-04_ARCHITECTURE_OWNER
+  named_consumers:
+  - Outer security signal for private repository
+  matrix_asset_id: MATRIX-T04-MVP-STACK-001
+  next_validation: TASK-05_ADAPTER_BOUNDARY_VALIDATION
+- record_kind: reuse_candidate
+  record_id: REUSE-T04-SIGSTORE-SLSA-001
+  status: RECORDED
+  created_at: '2026-07-22T00:00:00Z'
+  evidence_asset_ids:
+  - MATRIX-T04-MVP-STACK-001
+  - EVIDENCE-T04-RESEARCH-ACCEPTANCE-001
+  - PROTOTYPE-T04-CORE-NATIVE-STACK-001
+  derived_from: PRE-GIT-TASK01-A024
+  component_area: A8_TEST_REPLAY_SUPPLY_CHAIN
+  candidate_name: Sigstore / in-toto / SLSA provenance
+  verdict: DEFER
+  decision_status: DEFERRED_RELEASE_BOUNDARY
+  pin: PENDING_REAL_ARTIFACT_DISTRIBUTION
+  decision_owner: WORK_CONTROL_PLANE
+  named_consumers:
+  - Future releases/images/deployments
+  matrix_asset_id: MATRIX-T04-MVP-STACK-001
+  next_validation: REASSESS_ONLY_ON_DOCUMENTED_TRIGGER

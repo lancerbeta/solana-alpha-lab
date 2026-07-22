@@ -1,0 +1,46 @@
+{
+  "schema_version": "1.0",
+  "artifact_id": "EVIDENCE-T04-RESEARCH-ACCEPTANCE-001",
+  "task_id": "TASK-04",
+  "atom_id": "T04-A5A",
+  "status": "ACCEPTED_INPUT_NORMALIZED",
+  "as_of": "2026-07-22",
+  "source_bundle_sha256": "fe543adb8bd48168b688bc99402556debe80ed0c6daf1a65df592fc03bbfaa9f",
+  "source_files": [
+    {
+      "path": "EVIDENCE/ATOM2A/TASK04_ATOM2A_ACCEPTANCE_RECEIPT_v1.0.json",
+      "sha256": "e03a05d87e3a52ba536be7f1ec30f3bf48c594951ba2fc1c5e11b3c23e92116a"
+    },
+    {
+      "path": "EVIDENCE/ATOM2A/TASK04_ATOM2A_CORE_DATA_STACK_ACCEPTANCE_v1.0.md",
+      "sha256": "81fef0024f3f9dca7515996df16b6648745de47a9ff84f76438b56c465c59ada"
+    },
+    {
+      "path": "EVIDENCE/ATOM2BC/TASK04_ATOM2B_2C_ACCEPTANCE_RECEIPT_v1.0.json",
+      "sha256": "aec7e9a2482f6c74ca8a2f98d4a4599d9769a3b289bb7dc3647d5306b0670c7c"
+    },
+    {
+      "path": "EVIDENCE/ATOM2BC/TASK04_ATOM2B_2C_ACCEPTANCE_v1.0.md",
+      "sha256": "580f8740eafd4a1322f90f3af827227ec358da652a94a8eb8dbe3b02729bc40a"
+    },
+    {
+      "path": "EVIDENCE/ATOM3/TASK04_ATOM3_SYNTHESIS_RECEIPT_v1.0.json",
+      "sha256": "74ab383b140d8c41eeab7214a9854e4bd01d871f2f2b50cb55fc5730996efea7"
+    },
+    {
+      "path": "EVIDENCE/ATOM3/TASK04_COMPONENT_CANDIDATE_MATRIX_DRAFT_v0.1.json",
+      "sha256": "80fef98e5b1f1c8d615ccb789ca091ed668a68a83c9b8de89f8f8e342157c650"
+    }
+  ],
+  "accepted_results": {
+    "atom_2a": "PASS_WITH_PATCH",
+    "atom_2b_2c": "PASS_WITH_PATCH",
+    "atom_3": "PASS_WITH_PATCH",
+    "candidate_rows": 52,
+    "prototype_required_then_closed_by_atom_4r": true
+  },
+  "repository_writes_from_research_atoms": 0,
+  "provider_api_rpc_calls": 0,
+  "cash_spend_usd": 0,
+  "contains_secrets": false
+}

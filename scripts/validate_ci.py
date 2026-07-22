@@ -166,6 +166,7 @@ def child_commands() -> list[tuple[str, list[str]]]:
             "PRE_GIT_IMPORT_VALIDATION",
             [python, "-B", "scripts/validate_pre_git_import.py"],
         ),
+        ("TASK04_ARCHITECTURE", [python, "-B", "scripts/validate_task04.py"]),
         ("REPOSITORY_POLICY", [python, "-B", "scripts/validate_baseline.py"]),
         ("PRE_COMMIT_HOOK", ["git", "config", "--local", "--get", "core.hooksPath"]),
     ]

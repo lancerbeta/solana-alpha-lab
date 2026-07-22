@@ -6,6 +6,17 @@ requires-python = ">=3.13,<3.14"
 dependencies = [
   "PyYAML==6.0.3",
   "jsonschema==4.26.0",
+  "duckdb==1.5.5",
+  "pyarrow==25.0.0",
+  "pydantic==2.13.4",
+  "solana==0.40.1",
+  "solders==0.28.0",
+  "prometheus-client==0.25.0",
+]
+
+[dependency-groups]
+security = [
+  "pip-audit==2.10.1",
 ]
 
 [tool.uv]
@@ -13,10 +24,7 @@ package = false
 required-version = "==0.11.29"
 
 [tool.solana-alpha-lab]
-task = "TASK-03"
-stage = "ATOM7_LOCAL_CI_CANDIDATE"
 exact_python_pin = "3.13.14"
 exact_powershell_pin = "7.6.3"
-catalog_version = "0.1.0"
 provider_calls_allowed = false
 real_money_allowed = false

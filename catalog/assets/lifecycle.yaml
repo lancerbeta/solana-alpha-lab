@@ -17,18 +17,18 @@ records:
   integrity:
     kind: sha256
     sha256: 2ca0195a7617f2f95b7334291c776b78b447ea854b4c43b48dbe0f25fe08f797
-  access: &registry_access
+  access: &id001
     mode: task_write
     method: file
     network_required: false
     secrets_required: false
-  relations: &schema_relation
+  relations: &id002
   - relation_type: depends_on
     target_asset_id: CATALOG-SCHEMA-LIFECYCLE-001
-  consumers: &task03_consumer
+  consumers: &id003
   - TASK-03
   evidence: []
-  classification: &internal_classification
+  classification: &id004
     contains_secrets: false
     contains_raw_data: false
     sensitivity: INTERNAL_NON_SECRET
@@ -47,11 +47,11 @@ records:
   integrity:
     kind: sha256
     sha256: 9ee9f983fa6869c0ee1ff6a249e06dd38fc059a956943cfea8539822054236d9
-  access: *registry_access
-  relations: *schema_relation
-  consumers: *task03_consumer
+  access: *id001
+  relations: *id002
+  consumers: *id003
   evidence: []
-  classification: *internal_classification
+  classification: *id004
 - asset_id: REGISTRY-GLOBAL-TRIAL-LEDGER-001
   record_version: '1.0'
   asset_type: lifecycle_registry
@@ -67,11 +67,11 @@ records:
   integrity:
     kind: sha256
     sha256: 41b2f3cd1e2303f90318d0295c36c390999c7539031cb52db1a03779be56b671
-  access: *registry_access
-  relations: *schema_relation
-  consumers: *task03_consumer
+  access: *id001
+  relations: *id002
+  consumers: *id003
   evidence: []
-  classification: *internal_classification
+  classification: *id004
 - asset_id: REGISTRY-FEATURE-CATALOG-001
   record_version: '1.0'
   asset_type: lifecycle_registry
@@ -87,11 +87,11 @@ records:
   integrity:
     kind: sha256
     sha256: 1c65b9d4a43096056686549055c5fdb259e5486f04484a73b5c7635050c89f55
-  access: *registry_access
-  relations: *schema_relation
-  consumers: *task03_consumer
+  access: *id001
+  relations: *id002
+  consumers: *id003
   evidence: []
-  classification: *internal_classification
+  classification: *id004
 - asset_id: REGISTRY-HOLDOUT-CONSUMPTION-001
   record_version: '1.0'
   asset_type: lifecycle_registry
@@ -107,11 +107,11 @@ records:
   integrity:
     kind: sha256
     sha256: 863d68e53861c4aa30f6afa1a512ec5ab84c8966273cee6d42ca1519ef5fa07a
-  access: *registry_access
-  relations: *schema_relation
-  consumers: *task03_consumer
+  access: *id001
+  relations: *id002
+  consumers: *id003
   evidence: []
-  classification: *internal_classification
+  classification: *id004
 - asset_id: REGISTRY-STRATEGIES-001
   record_version: '1.0'
   asset_type: lifecycle_registry
@@ -127,11 +127,11 @@ records:
   integrity:
     kind: sha256
     sha256: 82518f4016ae746f40a2e7fff107365a98287111bf56b2648b3207e4e3c7cb36
-  access: *registry_access
-  relations: *schema_relation
-  consumers: *task03_consumer
+  access: *id001
+  relations: *id002
+  consumers: *id003
   evidence: []
-  classification: *internal_classification
+  classification: *id004
 - asset_id: REGISTRY-BOT-INSTANCES-001
   record_version: '1.0'
   asset_type: lifecycle_registry
@@ -147,35 +147,44 @@ records:
   integrity:
     kind: sha256
     sha256: 25622701c6dfbe077f9b1b7e0d79fabe7be248412d94ee3f2ec0d15f5fff7dd8
-  access: *registry_access
-  relations: *schema_relation
-  consumers: *task03_consumer
+  access: *id001
+  relations: *id002
+  consumers: *id003
   evidence: []
-  classification: *internal_classification
+  classification: *id004
 - asset_id: REGISTRY-REUSE-CANDIDATES-001
-  record_version: '1.0'
+  record_version: '1.2'
   asset_type: lifecycle_registry
-  purpose: Empty active registry referencing historical TASK-01 reuse evidence without copying lifecycle truth.
-  status: VALIDATED_ACTIVE
+  purpose: Append-only TASK-04 architecture reuse decisions reconciled to the accepted
+    52-row matrix.
+  status: IMPLEMENTED_UNVERIFIED
   origin: REPOSITORY
   as_of: '2026-07-22'
-  truth_owner: TASK-03
+  truth_owner: TASK-04
   location:
     kind: git_path
     logical_uri: repo://registries/reuse_candidates.yaml
     repository_path: registries/reuse_candidates.yaml
   integrity:
     kind: sha256
-    sha256: cf480ff38b1c971e1827ecc951df25c9e7a0fa05417122d5566e22860d404179
-  access: *registry_access
+    sha256: ccfc03c3150a742a5a8396f575eb620cc769de9eb57d6e726b0439d54efe0f01
+  access: *id001
   relations:
   - relation_type: depends_on
     target_asset_id: CATALOG-SCHEMA-LIFECYCLE-001
   - relation_type: derived_from
     target_asset_id: PRE-GIT-TASK01-A024
-  consumers: *task03_consumer
+  - relation_type: derived_from
+    target_asset_id: MATRIX-T04-MVP-STACK-001
+  - relation_type: governed_by
+    target_asset_id: ADR-MVP-STACK-002
+  - relation_type: governed_by
+    target_asset_id: CTRL-TASK-04-001
+  consumers:
+  - TASK-04
+  - TASK-05
   evidence: []
-  classification: *internal_classification
+  classification: *id004
 - asset_id: REGISTRY-DECISIONS-NEGATIVE-RESULTS-001
   record_version: '1.0'
   asset_type: lifecycle_registry
@@ -191,26 +200,26 @@ records:
   integrity:
     kind: sha256
     sha256: 6396b1ef361c86ff39be917992eb723afda94d2280599cbee66cdbd184a4ef35
-  access: *registry_access
-  relations: *schema_relation
-  consumers: *task03_consumer
+  access: *id001
+  relations: *id002
+  consumers: *id003
   evidence: []
-  classification: *internal_classification
+  classification: *id004
 - asset_id: GENERATED-PROJECT-MAP-001
-  record_version: '1.0'
+  record_version: '1.2'
   asset_type: generated_view
   purpose: Deterministic human-readable navigation projected only from the Catalog.
-  status: VALIDATED_ACTIVE
+  status: IMPLEMENTED_UNVERIFIED
   origin: REPOSITORY
   as_of: '2026-07-22'
-  truth_owner: TASK-03
+  truth_owner: TASK-04
   location:
     kind: git_path
     logical_uri: repo://docs/PROJECT_MAP.md
     repository_path: docs/PROJECT_MAP.md
   integrity:
     kind: sha256
-    sha256: 2fa39b6aa8b436ee29fc9eb81b794a708447aacb9adead7fae2084cc1c734b45
+    sha256: 4b7a8909d2bbe22bd262b232141028fcab957f8e4d44d2b685509b64684a4098
   access:
     mode: read_only
     method: file
@@ -221,24 +230,26 @@ records:
     target_asset_id: CATALOG-ROOT-001
   - relation_type: validated_by
     target_asset_id: GENERATOR-CATALOG-NAVIGATION-001
-  consumers: *task03_consumer
+  consumers:
+  - TASK-04
+  - TASK-05
   evidence: []
-  classification: *internal_classification
+  classification: *id004
 - asset_id: GENERATED-EDGE-PROJECTION-001
-  record_version: '1.0'
+  record_version: '1.2'
   asset_type: generated_view
   purpose: Deterministic machine-readable projection of Catalog asset relations.
-  status: VALIDATED_ACTIVE
+  status: IMPLEMENTED_UNVERIFIED
   origin: REPOSITORY
   as_of: '2026-07-22'
-  truth_owner: TASK-03
+  truth_owner: TASK-04
   location:
     kind: git_path
     logical_uri: repo://catalog/generated/asset_edges.json
     repository_path: catalog/generated/asset_edges.json
   integrity:
     kind: sha256
-    sha256: c9691dfd149763acd3f80ea2e248fc2a5fe266d98f33355c667e1e4ac0a932ce
+    sha256: 5cfb38237476b5deaf5b29db832fc17dee526a9f7855c208037399218fd34f8e
   access:
     mode: read_only
     method: file
@@ -249,6 +260,8 @@ records:
     target_asset_id: CATALOG-ROOT-001
   - relation_type: validated_by
     target_asset_id: GENERATOR-CATALOG-NAVIGATION-001
-  consumers: *task03_consumer
+  consumers:
+  - TASK-04
+  - TASK-05
   evidence: []
-  classification: *internal_classification
+  classification: *id004

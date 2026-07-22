@@ -136,6 +136,57 @@ class RepositoryStatePolicyTests(unittest.TestCase):
         arguments.update(overrides)
         return module.classify_state(**arguments)
 
+    def classify_task04_atom5a(self, **overrides: object) -> str:
+        arguments = {
+            "head_oid": module.TASK04_BASE_COMMIT_OID,
+            "commit_count": module.TASK04_BASE_COMMIT_COUNT,
+            "parent_oid": module.TASK04_BASE_PARENT_OID,
+            "tracked": module.task04_repository_files(),
+            "staged": set(module.TASK04_CHANGED_FILES),
+            "untracked": set(),
+            "unstaged": set(),
+            "commit_subject": module.ATOM7_SINGLE_BRANCH_REFSPEC_REPAIR_COMMIT_SUBJECT,
+            "commit_changed": set(module.ATOM7_SINGLE_BRANCH_REFSPEC_REPAIR_FILES),
+        }
+        arguments.update(overrides)
+        return module.classify_state(**arguments)
+
+    def test_task04_atom5a_exact_staged_state_passes(self) -> None:
+        self.assertEqual(
+            self.classify_task04_atom5a(),
+            "TASK04_ATOM5A_CANDIDATE_STAGED",
+        )
+
+    def test_task04_atom5a_missing_or_extra_staged_file_fails(self) -> None:
+        missing = set(module.TASK04_CHANGED_FILES)
+        missing.remove(next(iter(missing)))
+        self.assertEqual(
+            self.classify_task04_atom5a(staged=missing),
+            "INVALID_REPOSITORY_STATE",
+        )
+        extra = set(module.TASK04_CHANGED_FILES) | {"unexpected.txt"}
+        self.assertEqual(
+            self.classify_task04_atom5a(staged=extra),
+            "INVALID_REPOSITORY_STATE",
+        )
+
+    def test_task04_atom5a_untracked_or_unstaged_file_fails(self) -> None:
+        self.assertEqual(
+            self.classify_task04_atom5a(untracked={"unexpected.txt"}),
+            "INVALID_REPOSITORY_STATE",
+        )
+        self.assertEqual(
+            self.classify_task04_atom5a(unstaged={"README.md"}),
+            "INVALID_REPOSITORY_STATE",
+        )
+
+    def test_task04_atom5a_base_constants_are_exact(self) -> None:
+        self.assertEqual(module.TASK04_BASE_COMMIT_OID, "f8ff483dbcf00454852a9638466eb4123e2c5809")
+        self.assertEqual(module.TASK04_BASE_TREE_OID, "cfbf181fa2c005cf517a218c70ede51c701b5a43")
+        self.assertEqual(module.TASK04_BASE_FILE_COUNT, 77)
+        self.assertEqual(len(module.TASK04_CHANGED_FILES), 38)
+        self.assertEqual(module.TASK04_EXPECTED_REPOSITORY_FILE_COUNT, 96)
+
     def test_pre_git_import_staged_state_remains_valid(self) -> None:
         state = module.classify_state(
             head_oid=module.BASE_COMMIT_OID,

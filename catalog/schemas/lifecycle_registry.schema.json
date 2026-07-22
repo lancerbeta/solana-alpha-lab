@@ -15,7 +15,10 @@
   ],
   "properties": {
     "schema_version": {
-      "const": "1.0"
+      "enum": [
+        "1.0",
+        "1.1"
+      ]
     },
     "registry_id": {
       "type": "string",
@@ -55,65 +58,182 @@
   "oneOf": [
     {
       "properties": {
-        "registry_id": {"const": "SMIAL-REGISTRY-RESEARCH-CYCLES"},
-        "registry_type": {"const": "research_cycles"},
-        "records": {"items": {"$ref": "#/$defs/research_cycle"}}
+        "registry_id": {
+          "const": "SMIAL-REGISTRY-RESEARCH-CYCLES"
+        },
+        "registry_type": {
+          "const": "research_cycles"
+        },
+        "records": {
+          "items": {
+            "$ref": "#/$defs/research_cycle"
+          }
+        },
+        "schema_version": {
+          "const": "1.0"
+        }
       }
     },
     {
       "properties": {
-        "registry_id": {"const": "SMIAL-REGISTRY-HYPOTHESES"},
-        "registry_type": {"const": "hypotheses"},
-        "records": {"items": {"$ref": "#/$defs/hypothesis"}}
+        "registry_id": {
+          "const": "SMIAL-REGISTRY-HYPOTHESES"
+        },
+        "registry_type": {
+          "const": "hypotheses"
+        },
+        "records": {
+          "items": {
+            "$ref": "#/$defs/hypothesis"
+          }
+        },
+        "schema_version": {
+          "const": "1.0"
+        }
       }
     },
     {
       "properties": {
-        "registry_id": {"const": "SMIAL-REGISTRY-GLOBAL-TRIAL-LEDGER"},
-        "registry_type": {"const": "global_trial_ledger"},
-        "records": {"items": {"$ref": "#/$defs/trial"}}
+        "registry_id": {
+          "const": "SMIAL-REGISTRY-GLOBAL-TRIAL-LEDGER"
+        },
+        "registry_type": {
+          "const": "global_trial_ledger"
+        },
+        "records": {
+          "items": {
+            "$ref": "#/$defs/trial"
+          }
+        },
+        "schema_version": {
+          "const": "1.0"
+        }
       }
     },
     {
       "properties": {
-        "registry_id": {"const": "SMIAL-REGISTRY-FEATURE-CATALOG"},
-        "registry_type": {"const": "feature_catalog"},
-        "records": {"items": {"$ref": "#/$defs/feature"}}
+        "registry_id": {
+          "const": "SMIAL-REGISTRY-FEATURE-CATALOG"
+        },
+        "registry_type": {
+          "const": "feature_catalog"
+        },
+        "records": {
+          "items": {
+            "$ref": "#/$defs/feature"
+          }
+        },
+        "schema_version": {
+          "const": "1.0"
+        }
       }
     },
     {
       "properties": {
-        "registry_id": {"const": "SMIAL-REGISTRY-HOLDOUT-CONSUMPTION"},
-        "registry_type": {"const": "holdout_consumption"},
-        "records": {"items": {"$ref": "#/$defs/holdout_consumption"}}
+        "registry_id": {
+          "const": "SMIAL-REGISTRY-HOLDOUT-CONSUMPTION"
+        },
+        "registry_type": {
+          "const": "holdout_consumption"
+        },
+        "records": {
+          "items": {
+            "$ref": "#/$defs/holdout_consumption"
+          }
+        },
+        "schema_version": {
+          "const": "1.0"
+        }
       }
     },
     {
       "properties": {
-        "registry_id": {"const": "SMIAL-REGISTRY-STRATEGIES"},
-        "registry_type": {"const": "strategies"},
-        "records": {"items": {"$ref": "#/$defs/strategy"}}
+        "registry_id": {
+          "const": "SMIAL-REGISTRY-STRATEGIES"
+        },
+        "registry_type": {
+          "const": "strategies"
+        },
+        "records": {
+          "items": {
+            "$ref": "#/$defs/strategy"
+          }
+        },
+        "schema_version": {
+          "const": "1.0"
+        }
       }
     },
     {
       "properties": {
-        "registry_id": {"const": "SMIAL-REGISTRY-BOT-INSTANCES"},
-        "registry_type": {"const": "bot_instances"},
-        "records": {"items": {"$ref": "#/$defs/bot_instance"}}
+        "registry_id": {
+          "const": "SMIAL-REGISTRY-BOT-INSTANCES"
+        },
+        "registry_type": {
+          "const": "bot_instances"
+        },
+        "records": {
+          "items": {
+            "$ref": "#/$defs/bot_instance"
+          }
+        },
+        "schema_version": {
+          "const": "1.0"
+        }
       }
     },
     {
       "properties": {
-        "registry_id": {"const": "SMIAL-REGISTRY-REUSE-CANDIDATES"},
-        "registry_type": {"const": "reuse_candidates"},
-        "records": {"items": {"$ref": "#/$defs/reuse_candidate"}}
-      }
+        "registry_id": {
+          "const": "SMIAL-REGISTRY-REUSE-CANDIDATES"
+        },
+        "registry_type": {
+          "const": "reuse_candidates"
+        }
+      },
+      "oneOf": [
+        {
+          "properties": {
+            "schema_version": {
+              "const": "1.0"
+            },
+            "records": {
+              "items": {
+                "$ref": "#/$defs/reuse_candidate_v1_0"
+              }
+            }
+          }
+        },
+        {
+          "properties": {
+            "schema_version": {
+              "const": "1.1"
+            },
+            "records": {
+              "items": {
+                "$ref": "#/$defs/reuse_candidate"
+              }
+            }
+          }
+        }
+      ]
     },
     {
       "properties": {
-        "registry_id": {"const": "SMIAL-REGISTRY-DECISIONS-NEGATIVE-RESULTS"},
-        "registry_type": {"const": "decisions_negative_results"},
-        "records": {"items": {"$ref": "#/$defs/decision_negative_result"}}
+        "registry_id": {
+          "const": "SMIAL-REGISTRY-DECISIONS-NEGATIVE-RESULTS"
+        },
+        "registry_type": {
+          "const": "decisions_negative_results"
+        },
+        "records": {
+          "items": {
+            "$ref": "#/$defs/decision_negative_result"
+          }
+        },
+        "schema_version": {
+          "const": "1.0"
+        }
       }
     }
   ],
@@ -151,25 +271,45 @@
         "evidence_asset_ids"
       ],
       "properties": {
-        "record_kind": {"type": "string"},
-        "record_id": {"$ref": "#/$defs/stable_id"},
-        "status": {"$ref": "#/$defs/status"},
-        "created_at": {"$ref": "#/$defs/timestamp"},
+        "record_kind": {
+          "type": "string"
+        },
+        "record_id": {
+          "$ref": "#/$defs/stable_id"
+        },
+        "status": {
+          "$ref": "#/$defs/status"
+        },
+        "created_at": {
+          "$ref": "#/$defs/timestamp"
+        },
         "evidence_asset_ids": {
           "type": "array",
           "uniqueItems": true,
-          "items": {"$ref": "#/$defs/stable_id"}
+          "items": {
+            "$ref": "#/$defs/stable_id"
+          }
         }
       }
     },
     "research_cycle": {
       "allOf": [
-        {"$ref": "#/$defs/base_record"},
         {
-          "required": ["title"],
+          "$ref": "#/$defs/base_record"
+        },
+        {
+          "required": [
+            "title"
+          ],
           "properties": {
-            "record_kind": {"const": "research_cycle"},
-            "title": {"type": "string", "minLength": 3, "maxLength": 200}
+            "record_kind": {
+              "const": "research_cycle"
+            },
+            "title": {
+              "type": "string",
+              "minLength": 3,
+              "maxLength": 200
+            }
           }
         }
       ],
@@ -177,13 +317,26 @@
     },
     "hypothesis": {
       "allOf": [
-        {"$ref": "#/$defs/base_record"},
         {
-          "required": ["research_cycle_id", "statement"],
+          "$ref": "#/$defs/base_record"
+        },
+        {
+          "required": [
+            "research_cycle_id",
+            "statement"
+          ],
           "properties": {
-            "record_kind": {"const": "hypothesis"},
-            "research_cycle_id": {"$ref": "#/$defs/stable_id"},
-            "statement": {"type": "string", "minLength": 8, "maxLength": 500}
+            "record_kind": {
+              "const": "hypothesis"
+            },
+            "research_cycle_id": {
+              "$ref": "#/$defs/stable_id"
+            },
+            "statement": {
+              "type": "string",
+              "minLength": 8,
+              "maxLength": 500
+            }
           }
         }
       ],
@@ -191,13 +344,29 @@
     },
     "trial": {
       "allOf": [
-        {"$ref": "#/$defs/base_record"},
         {
-          "required": ["hypothesis_id", "outcome"],
+          "$ref": "#/$defs/base_record"
+        },
+        {
+          "required": [
+            "hypothesis_id",
+            "outcome"
+          ],
           "properties": {
-            "record_kind": {"const": "trial"},
-            "hypothesis_id": {"$ref": "#/$defs/stable_id"},
-            "outcome": {"enum": ["PENDING", "PASS", "FAIL", "INCONCLUSIVE"]}
+            "record_kind": {
+              "const": "trial"
+            },
+            "hypothesis_id": {
+              "$ref": "#/$defs/stable_id"
+            },
+            "outcome": {
+              "enum": [
+                "PENDING",
+                "PASS",
+                "FAIL",
+                "INCONCLUSIVE"
+              ]
+            }
           }
         }
       ],
@@ -205,13 +374,26 @@
     },
     "feature": {
       "allOf": [
-        {"$ref": "#/$defs/base_record"},
         {
-          "required": ["definition", "first_reliable_available_at"],
+          "$ref": "#/$defs/base_record"
+        },
+        {
+          "required": [
+            "definition",
+            "first_reliable_available_at"
+          ],
           "properties": {
-            "record_kind": {"const": "feature"},
-            "definition": {"type": "string", "minLength": 8, "maxLength": 500},
-            "first_reliable_available_at": {"$ref": "#/$defs/timestamp"}
+            "record_kind": {
+              "const": "feature"
+            },
+            "definition": {
+              "type": "string",
+              "minLength": 8,
+              "maxLength": 500
+            },
+            "first_reliable_available_at": {
+              "$ref": "#/$defs/timestamp"
+            }
           }
         }
       ],
@@ -219,13 +401,24 @@
     },
     "holdout_consumption": {
       "allOf": [
-        {"$ref": "#/$defs/base_record"},
         {
-          "required": ["research_cycle_id", "consumed_at"],
+          "$ref": "#/$defs/base_record"
+        },
+        {
+          "required": [
+            "research_cycle_id",
+            "consumed_at"
+          ],
           "properties": {
-            "record_kind": {"const": "holdout_consumption"},
-            "research_cycle_id": {"$ref": "#/$defs/stable_id"},
-            "consumed_at": {"$ref": "#/$defs/timestamp"}
+            "record_kind": {
+              "const": "holdout_consumption"
+            },
+            "research_cycle_id": {
+              "$ref": "#/$defs/stable_id"
+            },
+            "consumed_at": {
+              "$ref": "#/$defs/timestamp"
+            }
           }
         }
       ],
@@ -233,16 +426,24 @@
     },
     "strategy": {
       "allOf": [
-        {"$ref": "#/$defs/base_record"},
         {
-          "required": ["hypothesis_ids"],
+          "$ref": "#/$defs/base_record"
+        },
+        {
+          "required": [
+            "hypothesis_ids"
+          ],
           "properties": {
-            "record_kind": {"const": "strategy"},
+            "record_kind": {
+              "const": "strategy"
+            },
             "hypothesis_ids": {
               "type": "array",
               "minItems": 1,
               "uniqueItems": true,
-              "items": {"$ref": "#/$defs/stable_id"}
+              "items": {
+                "$ref": "#/$defs/stable_id"
+              }
             }
           }
         }
@@ -251,12 +452,20 @@
     },
     "bot_instance": {
       "allOf": [
-        {"$ref": "#/$defs/base_record"},
         {
-          "required": ["strategy_id"],
+          "$ref": "#/$defs/base_record"
+        },
+        {
+          "required": [
+            "strategy_id"
+          ],
           "properties": {
-            "record_kind": {"const": "bot_instance"},
-            "strategy_id": {"$ref": "#/$defs/stable_id"}
+            "record_kind": {
+              "const": "bot_instance"
+            },
+            "strategy_id": {
+              "$ref": "#/$defs/stable_id"
+            }
           }
         }
       ],
@@ -264,12 +473,85 @@
     },
     "reuse_candidate": {
       "allOf": [
-        {"$ref": "#/$defs/base_record"},
         {
-          "required": ["derived_from"],
+          "$ref": "#/$defs/base_record"
+        },
+        {
+          "required": [
+            "derived_from",
+            "component_area",
+            "candidate_name",
+            "verdict",
+            "decision_status",
+            "pin",
+            "decision_owner",
+            "named_consumers",
+            "matrix_asset_id",
+            "next_validation"
+          ],
           "properties": {
-            "record_kind": {"const": "reuse_candidate"},
-            "derived_from": {"$ref": "#/$defs/stable_id"}
+            "record_kind": {
+              "const": "reuse_candidate"
+            },
+            "derived_from": {
+              "$ref": "#/$defs/stable_id"
+            },
+            "component_area": {
+              "type": "string",
+              "minLength": 3,
+              "maxLength": 120
+            },
+            "candidate_name": {
+              "type": "string",
+              "minLength": 2,
+              "maxLength": 240
+            },
+            "verdict": {
+              "enum": [
+                "ADOPT",
+                "WRAP",
+                "FORK",
+                "BUILD",
+                "DEFER",
+                "REJECT"
+              ]
+            },
+            "decision_status": {
+              "type": "string",
+              "minLength": 3,
+              "maxLength": 80
+            },
+            "pin": {
+              "type": "string",
+              "minLength": 3,
+              "maxLength": 160
+            },
+            "decision_owner": {
+              "type": "string",
+              "minLength": 3,
+              "maxLength": 120
+            },
+            "named_consumers": {
+              "type": "array",
+              "minItems": 1,
+              "uniqueItems": true,
+              "items": {
+                "type": "string",
+                "minLength": 3,
+                "maxLength": 240
+              }
+            },
+            "matrix_asset_id": {
+              "const": "MATRIX-T04-MVP-STACK-001"
+            },
+            "next_validation": {
+              "type": "string",
+              "minLength": 3,
+              "maxLength": 160
+            },
+            "supersedes_record_id": {
+              "$ref": "#/$defs/stable_id"
+            }
           }
         }
       ],
@@ -277,12 +559,46 @@
     },
     "decision_negative_result": {
       "allOf": [
-        {"$ref": "#/$defs/base_record"},
         {
-          "required": ["summary"],
+          "$ref": "#/$defs/base_record"
+        },
+        {
+          "required": [
+            "summary"
+          ],
           "properties": {
-            "record_kind": {"enum": ["decision", "negative_result"]},
-            "summary": {"type": "string", "minLength": 8, "maxLength": 500}
+            "record_kind": {
+              "enum": [
+                "decision",
+                "negative_result"
+              ]
+            },
+            "summary": {
+              "type": "string",
+              "minLength": 8,
+              "maxLength": 500
+            }
+          }
+        }
+      ],
+      "unevaluatedProperties": false
+    },
+    "reuse_candidate_v1_0": {
+      "allOf": [
+        {
+          "$ref": "#/$defs/base_record"
+        },
+        {
+          "required": [
+            "derived_from"
+          ],
+          "properties": {
+            "record_kind": {
+              "const": "reuse_candidate"
+            },
+            "derived_from": {
+              "$ref": "#/$defs/stable_id"
+            }
           }
         }
       ],

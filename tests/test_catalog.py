@@ -30,10 +30,23 @@ class CatalogImportTests(unittest.TestCase):
 
     def test_real_catalog_counts(self) -> None:
         self.assertEqual(len(self.snapshot.assets_documents), 4)
-        self.assertEqual(len(self.snapshot.assets), 60)
+        self.assertEqual(len(self.snapshot.assets), 82)
         self.assertEqual(len(self.snapshot.queries), 5)
         self.assertEqual(len(self.snapshot.lifecycle_documents), 9)
-        self.assertEqual(len(self.snapshot.lifecycle_records), 0)
+        self.assertEqual(len(self.snapshot.lifecycle_records), 52)
+        reuse = next(
+            document for document in self.snapshot.lifecycle_documents
+            if document["registry_type"] == "reuse_candidates"
+        )
+        self.assertEqual(len(reuse["records"]), 52)
+        self.assertEqual(
+            sum(
+                len(document["records"])
+                for document in self.snapshot.lifecycle_documents
+                if document["registry_type"] != "reuse_candidates"
+            ),
+            0,
+        )
         self.assertIn("ARCH-INTENT-001", self.snapshot.assets)
 
     def test_validated_ci_assets_and_query_contract(self) -> None:
@@ -60,7 +73,6 @@ class CatalogImportTests(unittest.TestCase):
         )
         for asset_id in ("CI-WORKFLOW-001", "CI-VALIDATOR-001"):
             asset = self.snapshot.assets[asset_id]
-            self.assertEqual(asset["status"], "VALIDATED_ACTIVE")
             self.assertEqual(len(asset["evidence"]), 1)
             self.assertEqual(asset["evidence"][0]["result"], "PASS")
             self.assertEqual(
@@ -68,53 +80,40 @@ class CatalogImportTests(unittest.TestCase):
                 "https://github.com/lancerbeta/solana-alpha-lab/actions/runs/29868825180",
             )
 
-    def test_repository_catalog_and_registry_assets_are_validated(self) -> None:
-        expected_active = {
-            "CTRL-AGENTS-001",
-            "CTRL-TASK-03-001",
-            "CTRL-PYPROJECT-001",
-            "CTRL-UVLOCK-001",
-            "CTRL-QUALITY-GATE-001",
-            "CI-WORKFLOW-001",
-            "CI-VALIDATOR-001",
-            "CATALOG-ROOT-001",
+    def test_repository_catalog_and_registry_candidate_states_are_explicit(self) -> None:
+        for asset_id in (
+            "CTRL-AGENTS-001", "CTRL-PYPROJECT-001", "CTRL-UVLOCK-001",
+            "CI-VALIDATOR-001", "CATALOG-ROOT-001",
             "CATALOG-ASSET-REGISTRY-CORE-001",
-            "CATALOG-QUERY-REGISTRY-001",
-            "CATALOG-SCHEMA-MANIFEST-001",
-            "CATALOG-SCHEMA-ASSET-001",
-            "CATALOG-SCHEMA-QUERY-001",
-            "CATALOG-VALIDATOR-001",
-            "CATALOG-CLI-001",
-            "CATALOG-ASSET-REGISTRY-PRE-GIT-001",
-            "CATALOG-ASSET-REGISTRY-ARCHITECTURE-001",
             "CATALOG-ASSET-REGISTRY-LIFECYCLE-001",
             "CATALOG-SCHEMA-LIFECYCLE-001",
-            "GENERATOR-CATALOG-NAVIGATION-001",
-            "REGISTRY-RESEARCH-CYCLES-001",
-            "REGISTRY-HYPOTHESES-001",
-            "REGISTRY-GLOBAL-TRIAL-LEDGER-001",
-            "REGISTRY-FEATURE-CATALOG-001",
-            "REGISTRY-HOLDOUT-CONSUMPTION-001",
-            "REGISTRY-STRATEGIES-001",
-            "REGISTRY-BOT-INSTANCES-001",
             "REGISTRY-REUSE-CANDIDATES-001",
-            "REGISTRY-DECISIONS-NEGATIVE-RESULTS-001",
-            "GENERATED-PROJECT-MAP-001",
-            "GENERATED-EDGE-PROJECTION-001",
-        }
-        observed_active = {
-            asset_id
-            for asset_id, asset in self.snapshot.assets.items()
-            if asset["status"] == "VALIDATED_ACTIVE"
-        }
+            "GENERATED-PROJECT-MAP-001", "GENERATED-EDGE-PROJECTION-001",
+        ):
+            self.assertEqual(
+                self.snapshot.assets[asset_id]["status"],
+                "IMPLEMENTED_UNVERIFIED",
+            )
         self.assertEqual(
-            observed_active,
-            expected_active | {"ENV-WORKSTATION-001"},
+            self.snapshot.assets["CI-WORKFLOW-001"]["status"],
+            "VALIDATED_ACTIVE",
         )
         self.assertEqual(
             self.snapshot.assets["ARCH-INTENT-001"]["status"],
             "ACCEPTED_DIRECTION_NOT_IMPLEMENTED",
         )
+
+    def test_task04_mandatory_assets_are_registered(self) -> None:
+        required = {
+            "CTRL-TASK-04-001", "CTRL-HANDOFF-PROTOCOL-001",
+            "ADR-MVP-STACK-002", "MATRIX-T04-MVP-STACK-001",
+            "EVIDENCE-T04-RESEARCH-ACCEPTANCE-001",
+            "PROTOTYPE-T04-CORE-NATIVE-STACK-001", "FIXTURE-T04-PIT-001",
+            "EVIDENCE-T04-A4R-WORK-ACCEPTANCE-001",
+            "SBOM-T04-CORE-STACK-001", "VALIDATOR-T04-ARCHITECTURE-001",
+            "EVIDENCE-T04-A5A-CANDIDATE-001",
+        }
+        self.assertTrue(required.issubset(self.snapshot.assets))
 
     def test_duplicate_across_registries_rejected(self) -> None:
         manifest, assets, queries, lifecycle = self.documents()

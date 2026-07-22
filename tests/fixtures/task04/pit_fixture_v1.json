@@ -1,0 +1,59 @@
+{
+  "schema_version": "1.0",
+  "fixture_id": "FIXTURE-T04-PIT-001",
+  "decision_as_of": "2026-07-22T12:00:00Z",
+  "observations": [
+    {
+      "observation_id": "obs-future",
+      "value": 99,
+      "payload_hex": "66757475726500ff",
+      "event_time": "2026-07-22T11:56:00Z",
+      "observed_at": "2026-07-22T11:57:00Z",
+      "available_to_strategy_at": "2026-07-22T12:00:01Z",
+      "ingested_at": "2026-07-22T11:58:30Z",
+      "first_reliable_available_at": "2026-07-22T12:00:01Z",
+      "source": "synthetic_offline_fixture",
+      "source_version": "1.0",
+      "revision": 1
+    },
+    {
+      "observation_id": "obs-null",
+      "value": null,
+      "payload_hex": "00ff10",
+      "event_time": "2026-07-22T11:54:00Z",
+      "observed_at": "2026-07-22T11:55:00Z",
+      "available_to_strategy_at": "2026-07-22T11:58:00Z",
+      "ingested_at": "2026-07-22T11:59:00Z",
+      "first_reliable_available_at": "2026-07-22T11:58:00Z",
+      "source": "synthetic_offline_fixture",
+      "source_version": "1.0",
+      "revision": 1
+    },
+    {
+      "observation_id": "obs-b",
+      "value": 20,
+      "payload_hex": "62696e617279ff",
+      "event_time": "2026-07-22T11:52:00Z",
+      "observed_at": "2026-07-22T11:53:00Z",
+      "available_to_strategy_at": "2026-07-22T11:57:00Z",
+      "ingested_at": "2026-07-22T11:58:00Z",
+      "first_reliable_available_at": "2026-07-22T11:57:00Z",
+      "source": "synthetic_offline_fixture",
+      "source_version": "1.0",
+      "revision": 2
+    },
+    {
+      "observation_id": "obs-a",
+      "value": 10,
+      "payload_hex": "000102fe",
+      "event_time": "2026-07-22T11:50:00Z",
+      "observed_at": "2026-07-22T11:51:00Z",
+      "available_to_strategy_at": "2026-07-22T11:56:00Z",
+      "ingested_at": "2026-07-22T11:57:00Z",
+      "first_reliable_available_at": "2026-07-22T11:56:00Z",
+      "source": "synthetic_offline_fixture",
+      "source_version": "1.0",
+      "revision": 1
+    }
+  ]
+}

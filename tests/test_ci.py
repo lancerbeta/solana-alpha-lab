@@ -148,6 +148,7 @@ class PlatformGateContractTests(unittest.TestCase):
         self.assertIn("scripts/validate_catalog.py", commands["CATALOG_VALIDATION"])
         self.assertIn("scripts/generate_navigation.py", commands["GENERATED_NAVIGATION"])
         self.assertIn("--check", commands["GENERATED_NAVIGATION"])
+        self.assertIn("scripts/validate_task04.py", commands["TASK04_ARCHITECTURE"])
         self.assertIn("scripts/validate_baseline.py", commands["REPOSITORY_POLICY"])
 
     def test_child_failure_is_propagated(self) -> None:
