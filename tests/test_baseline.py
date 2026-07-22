@@ -151,6 +151,54 @@ class RepositoryStatePolicyTests(unittest.TestCase):
         arguments.update(overrides)
         return module.classify_state(**arguments)
 
+    def classify_task04_architecture_committed(self, **overrides: object) -> str:
+        arguments = {
+            "head_oid": module.TASK04_ARCHITECTURE_COMMIT_OID,
+            "commit_count": module.TASK04_ARCHITECTURE_COMMIT_COUNT,
+            "parent_oid": module.TASK04_BASE_COMMIT_OID,
+            "tracked": module.task04_repository_files(),
+            "staged": set(),
+            "untracked": set(),
+            "unstaged": set(),
+            "commit_subject": module.TASK04_ARCHITECTURE_COMMIT_SUBJECT,
+            "commit_changed": set(module.TASK04_CHANGED_FILES),
+        }
+        arguments.update(overrides)
+        return module.classify_state(**arguments)
+
+    def classify_task04_policy_repair_staged(self, **overrides: object) -> str:
+        arguments = {
+            "head_oid": module.TASK04_ARCHITECTURE_COMMIT_OID,
+            "commit_count": module.TASK04_ARCHITECTURE_COMMIT_COUNT,
+            "parent_oid": module.TASK04_BASE_COMMIT_OID,
+            "tracked": module.task04_repository_files(),
+            "staged": set(module.TASK04_POLICY_REPAIR_FILES),
+            "untracked": set(),
+            "unstaged": set(),
+            "commit_subject": module.TASK04_ARCHITECTURE_COMMIT_SUBJECT,
+            "commit_changed": set(module.TASK04_CHANGED_FILES),
+        }
+        arguments.update(overrides)
+        return module.classify_state(**arguments)
+
+    def classify_task04_policy_repair_committed(
+        self,
+        **overrides: object,
+    ) -> str:
+        arguments = {
+            "head_oid": "1" * 40,
+            "commit_count": module.TASK04_POLICY_REPAIR_COMMIT_COUNT,
+            "parent_oid": module.TASK04_ARCHITECTURE_COMMIT_OID,
+            "tracked": module.task04_repository_files(),
+            "staged": set(),
+            "untracked": set(),
+            "unstaged": set(),
+            "commit_subject": module.TASK04_POLICY_REPAIR_COMMIT_SUBJECT,
+            "commit_changed": set(module.TASK04_POLICY_REPAIR_FILES),
+        }
+        arguments.update(overrides)
+        return module.classify_state(**arguments)
+
     def test_task04_atom5a_exact_staged_state_passes(self) -> None:
         self.assertEqual(
             self.classify_task04_atom5a(),
@@ -186,6 +234,106 @@ class RepositoryStatePolicyTests(unittest.TestCase):
         self.assertEqual(module.TASK04_BASE_FILE_COUNT, 77)
         self.assertEqual(len(module.TASK04_CHANGED_FILES), 38)
         self.assertEqual(module.TASK04_EXPECTED_REPOSITORY_FILE_COUNT, 96)
+
+    def test_task04_architecture_committed_state_is_exact(self) -> None:
+        self.assertEqual(
+            self.classify_task04_architecture_committed(),
+            "TASK04_ATOM5B_ARCHITECTURE_COMMITTED",
+        )
+
+    def test_task04_architecture_committed_identity_drift_fails(self) -> None:
+        cases = {
+            "head_oid": "0" * 40,
+            "commit_count": module.TASK04_ARCHITECTURE_COMMIT_COUNT + 1,
+            "parent_oid": module.TASK04_BASE_PARENT_OID,
+            "commit_subject": "wrong subject",
+            "commit_changed": set(module.TASK04_CHANGED_FILES) - {"AGENTS.md"},
+            "staged": {"unexpected.txt"},
+            "untracked": {"unexpected.txt"},
+            "unstaged": {"README.md"},
+        }
+        for key, value in cases.items():
+            with self.subTest(key=key):
+                self.assertEqual(
+                    self.classify_task04_architecture_committed(**{key: value}),
+                    "INVALID_REPOSITORY_STATE",
+                )
+
+    def test_task04_policy_repair_staged_state_is_exact(self) -> None:
+        self.assertEqual(
+            self.classify_task04_policy_repair_staged(),
+            "TASK04_ATOM5B_POLICY_REPAIR_STAGED",
+        )
+
+    def test_task04_policy_repair_staged_inventory_or_dirty_tree_fails(self) -> None:
+        missing = set(module.TASK04_POLICY_REPAIR_FILES)
+        missing.remove("catalog/assets/core.yaml")
+        cases = (
+            {"staged": missing},
+            {"staged": set(module.TASK04_POLICY_REPAIR_FILES) | {"unexpected.txt"}},
+            {"untracked": {"unexpected.txt"}},
+            {"unstaged": {"scripts/validate_baseline.py"}},
+            {"commit_changed": set(module.TASK04_CHANGED_FILES) - {"README.md"}},
+        )
+        for overrides in cases:
+            with self.subTest(overrides=overrides):
+                self.assertEqual(
+                    self.classify_task04_policy_repair_staged(**overrides),
+                    "INVALID_REPOSITORY_STATE",
+                )
+
+    def test_task04_policy_repair_future_commit_has_no_self_oid_pin(self) -> None:
+        for future_oid in ("1" * 40, "2" * 40):
+            with self.subTest(future_oid=future_oid):
+                self.assertEqual(
+                    self.classify_task04_policy_repair_committed(
+                        head_oid=future_oid
+                    ),
+                    "TASK04_ATOM5B_POLICY_REPAIR_COMMITTED",
+                )
+
+    def test_task04_policy_repair_future_commit_contract_is_fail_closed(self) -> None:
+        cases = {
+            "head_oid": module.TASK04_ARCHITECTURE_COMMIT_OID,
+            "commit_count": module.TASK04_ARCHITECTURE_COMMIT_COUNT,
+            "parent_oid": module.TASK04_BASE_COMMIT_OID,
+            "commit_subject": module.TASK04_ARCHITECTURE_COMMIT_SUBJECT,
+            "commit_changed": set(module.TASK04_POLICY_REPAIR_FILES)
+            - {"tests/test_baseline.py"},
+            "staged": set(module.TASK04_POLICY_REPAIR_FILES),
+            "untracked": {"unexpected.txt"},
+            "unstaged": {"catalog/assets/core.yaml"},
+        }
+        for key, value in cases.items():
+            with self.subTest(key=key):
+                self.assertEqual(
+                    self.classify_task04_policy_repair_committed(**{key: value}),
+                    "INVALID_REPOSITORY_STATE",
+                )
+
+    def test_task04_atom5b_policy_constants_are_exact(self) -> None:
+        self.assertEqual(
+            module.TASK04_ARCHITECTURE_COMMIT_OID,
+            "b2bae357bb5ec84c6b28ceeeb44fb2d6176dbae3",
+        )
+        self.assertEqual(
+            module.TASK04_ARCHITECTURE_TREE_OID,
+            "388fa66d0890e1b38122151b808f63a9b463c1b5",
+        )
+        self.assertEqual(module.TASK04_ARCHITECTURE_COMMIT_COUNT, 13)
+        self.assertEqual(module.TASK04_POLICY_REPAIR_COMMIT_COUNT, 14)
+        self.assertEqual(
+            module.TASK04_POLICY_REPAIR_COMMIT_SUBJECT,
+            "fix: recognize TASK-04 architecture commit state",
+        )
+        self.assertEqual(
+            module.TASK04_POLICY_REPAIR_FILES,
+            {
+                "catalog/assets/core.yaml",
+                "scripts/validate_baseline.py",
+                "tests/test_baseline.py",
+            },
+        )
 
     def test_pre_git_import_staged_state_remains_valid(self) -> None:
         state = module.classify_state(

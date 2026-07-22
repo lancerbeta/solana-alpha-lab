@@ -241,6 +241,31 @@ TASK04_CREATED_FILES = {
 }
 TASK04_CHANGED_FILES = TASK04_MODIFIED_FILES | TASK04_CREATED_FILES
 TASK04_EXPECTED_REPOSITORY_FILE_COUNT = TASK04_BASE_FILE_COUNT + len(TASK04_CREATED_FILES)
+TASK04_ARCHITECTURE_COMMIT_OID = "b2bae357bb5ec84c6b28ceeeb44fb2d6176dbae3"
+TASK04_ARCHITECTURE_TREE_OID = "388fa66d0890e1b38122151b808f63a9b463c1b5"
+TASK04_ARCHITECTURE_COMMIT_COUNT = TASK04_BASE_COMMIT_COUNT + 1
+TASK04_ARCHITECTURE_COMMIT_SUBJECT = (
+    "feat: record TASK-04 architecture and reuse decisions"
+)
+TASK04_POLICY_REPAIR_COMMIT_COUNT = TASK04_ARCHITECTURE_COMMIT_COUNT + 1
+TASK04_POLICY_REPAIR_COMMIT_SUBJECT = (
+    "fix: recognize TASK-04 architecture commit state"
+)
+TASK04_POLICY_REPAIR_FILES = {
+    "catalog/assets/core.yaml",
+    "scripts/validate_baseline.py",
+    "tests/test_baseline.py",
+}
+TASK04_REPOSITORY_STATES = {
+    "TASK04_ATOM5A_CANDIDATE_STAGED",
+    "TASK04_ATOM5B_ARCHITECTURE_COMMITTED",
+    "TASK04_ATOM5B_POLICY_REPAIR_STAGED",
+    "TASK04_ATOM5B_POLICY_REPAIR_COMMITTED",
+}
+TASK04_COMMITTED_STATES = {
+    "TASK04_ATOM5B_ARCHITECTURE_COMMITTED",
+    "TASK04_ATOM5B_POLICY_REPAIR_COMMITTED",
+}
 TASK04_EXPECTED_CATALOG_VERSION = "0.3.0"
 TASK04_EXPECTED_CATALOG_ASSET_COUNT = 82
 TASK04_EXPECTED_RUNTIME_DEPENDENCIES = {
@@ -614,6 +639,46 @@ def classify_state(
     atom5_acceptance_files = atom5_work_acceptance_repository_files()
     atom7_files = atom7_repository_files()
     task04_files = task04_repository_files()
+    if (
+        head_oid == TASK04_ARCHITECTURE_COMMIT_OID
+        and commit_count == TASK04_ARCHITECTURE_COMMIT_COUNT
+        and parent_oid == TASK04_BASE_COMMIT_OID
+        and tracked == task04_files
+        and len(tracked) == TASK04_EXPECTED_REPOSITORY_FILE_COUNT
+        and staged == TASK04_POLICY_REPAIR_FILES
+        and not untracked
+        and not unstaged
+        and commit_subject == TASK04_ARCHITECTURE_COMMIT_SUBJECT
+        and commit_changed == TASK04_CHANGED_FILES
+    ):
+        return "TASK04_ATOM5B_POLICY_REPAIR_STAGED"
+    if (
+        head_oid == TASK04_ARCHITECTURE_COMMIT_OID
+        and commit_count == TASK04_ARCHITECTURE_COMMIT_COUNT
+        and parent_oid == TASK04_BASE_COMMIT_OID
+        and tracked == task04_files
+        and len(tracked) == TASK04_EXPECTED_REPOSITORY_FILE_COUNT
+        and not staged
+        and not untracked
+        and not unstaged
+        and commit_subject == TASK04_ARCHITECTURE_COMMIT_SUBJECT
+        and commit_changed == TASK04_CHANGED_FILES
+    ):
+        return "TASK04_ATOM5B_ARCHITECTURE_COMMITTED"
+    if (
+        re.fullmatch(r"[0-9a-f]{40}", head_oid) is not None
+        and head_oid != TASK04_ARCHITECTURE_COMMIT_OID
+        and commit_count == TASK04_POLICY_REPAIR_COMMIT_COUNT
+        and parent_oid == TASK04_ARCHITECTURE_COMMIT_OID
+        and tracked == task04_files
+        and len(tracked) == TASK04_EXPECTED_REPOSITORY_FILE_COUNT
+        and not staged
+        and not untracked
+        and not unstaged
+        and commit_subject == TASK04_POLICY_REPAIR_COMMIT_SUBJECT
+        and commit_changed == TASK04_POLICY_REPAIR_FILES
+    ):
+        return "TASK04_ATOM5B_POLICY_REPAIR_COMMITTED"
     if (
         head_oid == TASK04_BASE_COMMIT_OID
         and commit_count == TASK04_BASE_COMMIT_COUNT
@@ -1113,6 +1178,24 @@ def validate_task04_atom5a_staged_style_policy() -> None:
     )
 
 
+def validate_task04_atom5b_policy_repair_staged_style_policy() -> None:
+    diff = run(
+        [
+            "git",
+            "diff",
+            "--cached",
+            "--check",
+            "--",
+            *sorted(TASK04_POLICY_REPAIR_FILES),
+        ]
+    )
+    assert_check(
+        "task04_atom5b_policy_repair_staged_diff_check",
+        diff.returncode == 0,
+        diff.stdout.strip() + diff.stderr.strip(),
+    )
+
+
 def validate() -> None:
     github_actions = os.environ.get("GITHUB_ACTIONS", "").lower() == "true"
     branch_result = run(["git", "symbolic-ref", "--short", "HEAD"])
@@ -1257,8 +1340,7 @@ def validate() -> None:
         "ATOM7_REF_NORMALIZATION_REPAIR_COMMITTED",
         "ATOM7_SINGLE_BRANCH_REFSPEC_REPAIR_STAGED",
         "ATOM7_SINGLE_BRANCH_REFSPEC_REPAIR_COMMITTED",
-        "TASK04_ATOM5A_CANDIDATE_STAGED",
-    }
+    } | TASK04_REPOSITORY_STATES
     assert_check("repository_state", state in valid_states, state)
     if state == "ATOM7_FINAL_HANDOFF_STAGED":
         assert_check(
@@ -1305,7 +1387,20 @@ def validate() -> None:
             topology == "PUBLISHED_LOCAL",
             topology,
         )
-    if state == "TASK04_ATOM5A_CANDIDATE_STAGED":
+    if state == "TASK04_ATOM5B_POLICY_REPAIR_STAGED":
+        assert_check(
+            "task04_atom5b_policy_repair_staged_topology",
+            topology == "PUBLISHED_LOCAL",
+            topology,
+        )
+    if state in TASK04_COMMITTED_STATES:
+        assert_check(
+            "task04_committed_topology",
+            topology
+            in {"PUBLISHED_LOCAL", "GITHUB_ACTIONS_CHECKOUT", "CLEAN_CLONE"},
+            topology,
+        )
+    if state in TASK04_REPOSITORY_STATES:
         expected_file_count = TASK04_EXPECTED_REPOSITORY_FILE_COUNT
     elif state.startswith("ATOM7_"):
         expected_file_count = ATOM7_EXPECTED_REPOSITORY_FILE_COUNT
@@ -1335,6 +1430,10 @@ def validate() -> None:
         assert_check("atom7_ref_normalization_repair_commit_contract", True)
     if state == "ATOM7_SINGLE_BRANCH_REFSPEC_REPAIR_COMMITTED":
         assert_check("atom7_single_branch_refspec_repair_commit_contract", True)
+    if state == "TASK04_ATOM5B_ARCHITECTURE_COMMITTED":
+        assert_check("task04_atom5b_architecture_commit_contract", True)
+    if state == "TASK04_ATOM5B_POLICY_REPAIR_COMMITTED":
+        assert_check("task04_atom5b_policy_repair_commit_contract", True)
     manifest = yaml.safe_load(
         (ROOT / "catalog/catalog_manifest.yaml").read_text(encoding="utf-8")
     )
@@ -1343,7 +1442,7 @@ def validate() -> None:
         set(manifest["deferred_capabilities"])
         == EXPECTED_DEFERRED_CAPABILITIES,
     )
-    if state == "TASK04_ATOM5A_CANDIDATE_STAGED":
+    if state in TASK04_REPOSITORY_STATES:
         assert_check(
             "task04_catalog_version",
             str(manifest.get("catalog_version")) == TASK04_EXPECTED_CATALOG_VERSION,
@@ -1377,11 +1476,11 @@ def validate() -> None:
     with (ROOT/"pyproject.toml").open("rb") as handle: metadata = tomllib.load(handle)
     expected_dependencies = (
         TASK04_EXPECTED_RUNTIME_DEPENDENCIES
-        if state == "TASK04_ATOM5A_CANDIDATE_STAGED"
+        if state in TASK04_REPOSITORY_STATES
         else {f"PyYAML=={EXPECTED_PYYAML}", f"jsonschema=={EXPECTED_JSONSCHEMA}"}
     )
     assert_check("dependency_contract", set(metadata["project"]["dependencies"]) == expected_dependencies)
-    if state == "TASK04_ATOM5A_CANDIDATE_STAGED":
+    if state in TASK04_REPOSITORY_STATES:
         assert_check(
             "security_dependency_group",
             metadata.get("dependency-groups") == {"security": ["pip-audit==2.10.1"]},
@@ -1446,6 +1545,8 @@ def validate() -> None:
         validate_atom7_single_branch_refspec_repair_staged_style_policy()
     if state == "TASK04_ATOM5A_CANDIDATE_STAGED":
         validate_task04_atom5a_staged_style_policy()
+    if state == "TASK04_ATOM5B_POLICY_REPAIR_STAGED":
+        validate_task04_atom5b_policy_repair_staged_style_policy()
     tests = run([sys.executable,"-B","-m","unittest","discover","-s","tests","-p","test_*.py"])
     if tests.stdout.strip(): print(tests.stdout.strip())
     if tests.stderr.strip(): print(tests.stderr.strip())
