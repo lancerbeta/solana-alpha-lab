@@ -1,0 +1,23 @@
+{
+  "ledger_version": "1.0",
+  "migrations": [
+    {
+      "migration_id": "T05-0001-CANONICAL-SCHEMA-V1",
+      "migration_order": 1,
+      "migration_kind": "DDL",
+      "schema_version": "1.0",
+      "sql_path": "migrations/0001_canonical_schema_v1.sql",
+      "content_sha256": "eae9d1544b11cffc03afba1e263153168a11dc6f648df9117a55a4cae5d23f09",
+      "application_state": "DECLARED",
+      "changes": [
+        {
+          "operation": "INITIAL_SCHEMA",
+          "relation": null,
+          "column": null,
+          "from_type": null,
+          "to_type": null
+        }
+      ]
+    }
+  ]
+}

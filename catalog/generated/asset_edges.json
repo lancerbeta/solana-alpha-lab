@@ -333,6 +333,16 @@
       "target_asset_id": "EVIDENCE-T04-A5A-CANDIDATE-001"
     },
     {
+      "source_asset_id": "CTRL-TASK-05-001",
+      "relation": "depends_on",
+      "target_asset_id": "ADR-MVP-STACK-002"
+    },
+    {
+      "source_asset_id": "CTRL-TASK-05-001",
+      "relation": "validated_by",
+      "target_asset_id": "TEST-T05-SCHEMA-CONTRACT-001"
+    },
+    {
       "source_asset_id": "CTRL-UVLOCK-001",
       "relation": "depends_on",
       "target_asset_id": "CTRL-PYPROJECT-001"
@@ -438,6 +448,26 @@
       "target_asset_id": "TEST-T04-CORE-STACK-001"
     },
     {
+      "source_asset_id": "FIXTURE-T05-SCHEMA-CONTRACT-001",
+      "relation": "derived_from",
+      "target_asset_id": "SCHEMA-T05-CANONICAL-DDL-001"
+    },
+    {
+      "source_asset_id": "FIXTURE-T05-SCHEMA-CONTRACT-001",
+      "relation": "validated_by",
+      "target_asset_id": "TEST-T05-SCHEMA-CONTRACT-001"
+    },
+    {
+      "source_asset_id": "FIXTURE-T05-SCHEMA-MODEL-ROUNDTRIP-001",
+      "relation": "depends_on",
+      "target_asset_id": "SCHEMA-T05-PYDANTIC-BOUNDARIES-001"
+    },
+    {
+      "source_asset_id": "FIXTURE-T05-SCHEMA-MODEL-ROUNDTRIP-001",
+      "relation": "validated_by",
+      "target_asset_id": "TEST-T05-MODELS-001"
+    },
+    {
       "source_asset_id": "GENERATED-EDGE-PROJECTION-001",
       "relation": "derived_from",
       "target_asset_id": "CATALOG-ROOT-001"
@@ -473,6 +503,16 @@
       "target_asset_id": "GENERATED-PROJECT-MAP-001"
     },
     {
+      "source_asset_id": "LEDGER-T05-MIGRATIONS-001",
+      "relation": "depends_on",
+      "target_asset_id": "MIGRATION-T05-0001-001"
+    },
+    {
+      "source_asset_id": "LEDGER-T05-MIGRATIONS-001",
+      "relation": "validated_by",
+      "target_asset_id": "TEST-T05-MIGRATIONS-001"
+    },
+    {
       "source_asset_id": "MATRIX-T04-MVP-STACK-001",
       "relation": "derived_from",
       "target_asset_id": "EVIDENCE-T04-RESEARCH-ACCEPTANCE-001"
@@ -486,6 +526,16 @@
       "source_asset_id": "MATRIX-T04-MVP-STACK-001",
       "relation": "governed_by",
       "target_asset_id": "CTRL-TASK-04-001"
+    },
+    {
+      "source_asset_id": "MIGRATION-T05-0001-001",
+      "relation": "derived_from",
+      "target_asset_id": "SCHEMA-T05-CANONICAL-DDL-001"
+    },
+    {
+      "source_asset_id": "MIGRATION-T05-0001-001",
+      "relation": "validated_by",
+      "target_asset_id": "TEST-T05-MIGRATIONS-001"
     },
     {
       "source_asset_id": "PRE-GIT-TASK01-A017",
@@ -713,6 +763,16 @@
       "target_asset_id": "CTRL-TASK-04-001"
     },
     {
+      "source_asset_id": "QUERY-RUNNER-T05-PIT-001",
+      "relation": "depends_on",
+      "target_asset_id": "SCHEMA-T05-CANONICAL-DDL-001"
+    },
+    {
+      "source_asset_id": "QUERY-RUNNER-T05-PIT-001",
+      "relation": "validated_by",
+      "target_asset_id": "TEST-T05-CATALOG-QUERIES-001"
+    },
+    {
       "source_asset_id": "REGISTRY-BOT-INSTANCES-001",
       "relation": "depends_on",
       "target_asset_id": "CATALOG-SCHEMA-LIFECYCLE-001"
@@ -788,9 +848,274 @@
       "target_asset_id": "ADR-MVP-STACK-002"
     },
     {
+      "source_asset_id": "SCHEMA-T05-CANONICAL-DDL-001",
+      "relation": "governed_by",
+      "target_asset_id": "CTRL-TASK-05-001"
+    },
+    {
+      "source_asset_id": "SCHEMA-T05-CANONICAL-DDL-001",
+      "relation": "validated_by",
+      "target_asset_id": "TEST-T05-SCHEMA-CONTRACT-001"
+    },
+    {
+      "source_asset_id": "SCHEMA-T05-PYDANTIC-BOUNDARIES-001",
+      "relation": "depends_on",
+      "target_asset_id": "SCHEMA-T05-CANONICAL-DDL-001"
+    },
+    {
+      "source_asset_id": "SCHEMA-T05-PYDANTIC-BOUNDARIES-001",
+      "relation": "governed_by",
+      "target_asset_id": "CTRL-TASK-05-001"
+    },
+    {
+      "source_asset_id": "SCHEMA-T05-PYDANTIC-BOUNDARIES-001",
+      "relation": "validated_by",
+      "target_asset_id": "TEST-T05-MODELS-001"
+    },
+    {
+      "source_asset_id": "SCHEMA-T05-REL-CANONICAL-OBSERVATIONS-001",
+      "relation": "depends_on",
+      "target_asset_id": "SCHEMA-T05-CANONICAL-DDL-001"
+    },
+    {
+      "source_asset_id": "SCHEMA-T05-REL-CANONICAL-OBSERVATIONS-001",
+      "relation": "depends_on",
+      "target_asset_id": "SCHEMA-T05-PYDANTIC-BOUNDARIES-001"
+    },
+    {
+      "source_asset_id": "SCHEMA-T05-REL-CANONICAL-OBSERVATIONS-001",
+      "relation": "validated_by",
+      "target_asset_id": "TEST-T05-MODELS-001"
+    },
+    {
+      "source_asset_id": "SCHEMA-T05-REL-DATASET-MANIFESTS-001",
+      "relation": "depends_on",
+      "target_asset_id": "SCHEMA-T05-CANONICAL-DDL-001"
+    },
+    {
+      "source_asset_id": "SCHEMA-T05-REL-DATASET-MANIFESTS-001",
+      "relation": "depends_on",
+      "target_asset_id": "SCHEMA-T05-PYDANTIC-BOUNDARIES-001"
+    },
+    {
+      "source_asset_id": "SCHEMA-T05-REL-DATASET-MANIFESTS-001",
+      "relation": "validated_by",
+      "target_asset_id": "TEST-T05-MODELS-001"
+    },
+    {
+      "source_asset_id": "SCHEMA-T05-REL-ENTITY-INPUT-SNAPSHOTS-001",
+      "relation": "depends_on",
+      "target_asset_id": "SCHEMA-T05-CANONICAL-DDL-001"
+    },
+    {
+      "source_asset_id": "SCHEMA-T05-REL-ENTITY-INPUT-SNAPSHOTS-001",
+      "relation": "depends_on",
+      "target_asset_id": "SCHEMA-T05-PYDANTIC-BOUNDARIES-001"
+    },
+    {
+      "source_asset_id": "SCHEMA-T05-REL-ENTITY-INPUT-SNAPSHOTS-001",
+      "relation": "validated_by",
+      "target_asset_id": "TEST-T05-MODELS-001"
+    },
+    {
+      "source_asset_id": "SCHEMA-T05-REL-EXECUTION-ATTEMPTS-001",
+      "relation": "depends_on",
+      "target_asset_id": "SCHEMA-T05-CANONICAL-DDL-001"
+    },
+    {
+      "source_asset_id": "SCHEMA-T05-REL-EXECUTION-ATTEMPTS-001",
+      "relation": "depends_on",
+      "target_asset_id": "SCHEMA-T05-PYDANTIC-BOUNDARIES-001"
+    },
+    {
+      "source_asset_id": "SCHEMA-T05-REL-EXECUTION-ATTEMPTS-001",
+      "relation": "validated_by",
+      "target_asset_id": "TEST-T05-MODELS-001"
+    },
+    {
+      "source_asset_id": "SCHEMA-T05-REL-FEATURE-OBSERVATIONS-001",
+      "relation": "depends_on",
+      "target_asset_id": "SCHEMA-T05-CANONICAL-DDL-001"
+    },
+    {
+      "source_asset_id": "SCHEMA-T05-REL-FEATURE-OBSERVATIONS-001",
+      "relation": "depends_on",
+      "target_asset_id": "SCHEMA-T05-PYDANTIC-BOUNDARIES-001"
+    },
+    {
+      "source_asset_id": "SCHEMA-T05-REL-FEATURE-OBSERVATIONS-001",
+      "relation": "validated_by",
+      "target_asset_id": "TEST-T05-MODELS-001"
+    },
+    {
+      "source_asset_id": "SCHEMA-T05-REL-MIGRATION-MANIFESTS-001",
+      "relation": "depends_on",
+      "target_asset_id": "SCHEMA-T05-CANONICAL-DDL-001"
+    },
+    {
+      "source_asset_id": "SCHEMA-T05-REL-MIGRATION-MANIFESTS-001",
+      "relation": "depends_on",
+      "target_asset_id": "SCHEMA-T05-PYDANTIC-BOUNDARIES-001"
+    },
+    {
+      "source_asset_id": "SCHEMA-T05-REL-MIGRATION-MANIFESTS-001",
+      "relation": "validated_by",
+      "target_asset_id": "TEST-T05-MODELS-001"
+    },
+    {
+      "source_asset_id": "SCHEMA-T05-REL-PARTITION-MANIFESTS-001",
+      "relation": "depends_on",
+      "target_asset_id": "SCHEMA-T05-CANONICAL-DDL-001"
+    },
+    {
+      "source_asset_id": "SCHEMA-T05-REL-PARTITION-MANIFESTS-001",
+      "relation": "depends_on",
+      "target_asset_id": "SCHEMA-T05-PYDANTIC-BOUNDARIES-001"
+    },
+    {
+      "source_asset_id": "SCHEMA-T05-REL-PARTITION-MANIFESTS-001",
+      "relation": "validated_by",
+      "target_asset_id": "TEST-T05-MODELS-001"
+    },
+    {
+      "source_asset_id": "SCHEMA-T05-REL-POOL-STATE-SNAPSHOTS-001",
+      "relation": "depends_on",
+      "target_asset_id": "SCHEMA-T05-CANONICAL-DDL-001"
+    },
+    {
+      "source_asset_id": "SCHEMA-T05-REL-POOL-STATE-SNAPSHOTS-001",
+      "relation": "depends_on",
+      "target_asset_id": "SCHEMA-T05-PYDANTIC-BOUNDARIES-001"
+    },
+    {
+      "source_asset_id": "SCHEMA-T05-REL-POOL-STATE-SNAPSHOTS-001",
+      "relation": "validated_by",
+      "target_asset_id": "TEST-T05-MODELS-001"
+    },
+    {
+      "source_asset_id": "SCHEMA-T05-REL-QUOTE-ATTEMPTS-001",
+      "relation": "depends_on",
+      "target_asset_id": "SCHEMA-T05-CANONICAL-DDL-001"
+    },
+    {
+      "source_asset_id": "SCHEMA-T05-REL-QUOTE-ATTEMPTS-001",
+      "relation": "depends_on",
+      "target_asset_id": "SCHEMA-T05-PYDANTIC-BOUNDARIES-001"
+    },
+    {
+      "source_asset_id": "SCHEMA-T05-REL-QUOTE-ATTEMPTS-001",
+      "relation": "validated_by",
+      "target_asset_id": "TEST-T05-MODELS-001"
+    },
+    {
+      "source_asset_id": "SCHEMA-T05-REL-RAW-API-EVENTS-001",
+      "relation": "depends_on",
+      "target_asset_id": "SCHEMA-T05-CANONICAL-DDL-001"
+    },
+    {
+      "source_asset_id": "SCHEMA-T05-REL-RAW-API-EVENTS-001",
+      "relation": "depends_on",
+      "target_asset_id": "SCHEMA-T05-PYDANTIC-BOUNDARIES-001"
+    },
+    {
+      "source_asset_id": "SCHEMA-T05-REL-RAW-API-EVENTS-001",
+      "relation": "validated_by",
+      "target_asset_id": "TEST-T05-MODELS-001"
+    },
+    {
+      "source_asset_id": "SCHEMA-T05-REL-REGIME-OBSERVATIONS-001",
+      "relation": "depends_on",
+      "target_asset_id": "SCHEMA-T05-CANONICAL-DDL-001"
+    },
+    {
+      "source_asset_id": "SCHEMA-T05-REL-REGIME-OBSERVATIONS-001",
+      "relation": "depends_on",
+      "target_asset_id": "SCHEMA-T05-PYDANTIC-BOUNDARIES-001"
+    },
+    {
+      "source_asset_id": "SCHEMA-T05-REL-REGIME-OBSERVATIONS-001",
+      "relation": "validated_by",
+      "target_asset_id": "TEST-T05-MODELS-001"
+    },
+    {
+      "source_asset_id": "SCHEMA-T05-REL-SIGNAL-DECISION-EVENTS-001",
+      "relation": "depends_on",
+      "target_asset_id": "SCHEMA-T05-CANONICAL-DDL-001"
+    },
+    {
+      "source_asset_id": "SCHEMA-T05-REL-SIGNAL-DECISION-EVENTS-001",
+      "relation": "depends_on",
+      "target_asset_id": "SCHEMA-T05-PYDANTIC-BOUNDARIES-001"
+    },
+    {
+      "source_asset_id": "SCHEMA-T05-REL-SIGNAL-DECISION-EVENTS-001",
+      "relation": "validated_by",
+      "target_asset_id": "TEST-T05-MODELS-001"
+    },
+    {
+      "source_asset_id": "SCHEMA-T05-REL-STRATEGY-OUTCOMES-001",
+      "relation": "depends_on",
+      "target_asset_id": "SCHEMA-T05-CANONICAL-DDL-001"
+    },
+    {
+      "source_asset_id": "SCHEMA-T05-REL-STRATEGY-OUTCOMES-001",
+      "relation": "depends_on",
+      "target_asset_id": "SCHEMA-T05-PYDANTIC-BOUNDARIES-001"
+    },
+    {
+      "source_asset_id": "SCHEMA-T05-REL-STRATEGY-OUTCOMES-001",
+      "relation": "validated_by",
+      "target_asset_id": "TEST-T05-MODELS-001"
+    },
+    {
+      "source_asset_id": "SCHEMA-T05-REL-TOKEN-LIFECYCLE-EVENTS-001",
+      "relation": "depends_on",
+      "target_asset_id": "SCHEMA-T05-CANONICAL-DDL-001"
+    },
+    {
+      "source_asset_id": "SCHEMA-T05-REL-TOKEN-LIFECYCLE-EVENTS-001",
+      "relation": "depends_on",
+      "target_asset_id": "SCHEMA-T05-PYDANTIC-BOUNDARIES-001"
+    },
+    {
+      "source_asset_id": "SCHEMA-T05-REL-TOKEN-LIFECYCLE-EVENTS-001",
+      "relation": "validated_by",
+      "target_asset_id": "TEST-T05-MODELS-001"
+    },
+    {
+      "source_asset_id": "SCHEMA-T05-REL-TRADE-ORDERFLOW-INPUTS-001",
+      "relation": "depends_on",
+      "target_asset_id": "SCHEMA-T05-CANONICAL-DDL-001"
+    },
+    {
+      "source_asset_id": "SCHEMA-T05-REL-TRADE-ORDERFLOW-INPUTS-001",
+      "relation": "depends_on",
+      "target_asset_id": "SCHEMA-T05-PYDANTIC-BOUNDARIES-001"
+    },
+    {
+      "source_asset_id": "SCHEMA-T05-REL-TRADE-ORDERFLOW-INPUTS-001",
+      "relation": "validated_by",
+      "target_asset_id": "TEST-T05-MODELS-001"
+    },
+    {
       "source_asset_id": "SCM-BASELINE-COMMIT-001",
       "relation": "governed_by",
       "target_asset_id": "CTRL-TASK-03-001"
+    },
+    {
+      "source_asset_id": "SCRIPT-T05-MIGRATION-LEDGER-001",
+      "relation": "depends_on",
+      "target_asset_id": "SCHEMA-T05-CANONICAL-DDL-001"
+    },
+    {
+      "source_asset_id": "SCRIPT-T05-MIGRATION-LEDGER-001",
+      "relation": "governed_by",
+      "target_asset_id": "CTRL-TASK-05-001"
+    },
+    {
+      "source_asset_id": "SCRIPT-T05-MIGRATION-LEDGER-001",
+      "relation": "validated_by",
+      "target_asset_id": "TEST-T05-MIGRATIONS-001"
     },
     {
       "source_asset_id": "TEST-T04-CORE-STACK-001",
@@ -801,6 +1126,46 @@
       "source_asset_id": "TEST-T04-CORE-STACK-001",
       "relation": "validated_by",
       "target_asset_id": "VALIDATOR-T04-ARCHITECTURE-001"
+    },
+    {
+      "source_asset_id": "TEST-T05-CATALOG-QUERIES-001",
+      "relation": "depends_on",
+      "target_asset_id": "FIXTURE-T05-SCHEMA-CONTRACT-001"
+    },
+    {
+      "source_asset_id": "TEST-T05-CATALOG-QUERIES-001",
+      "relation": "depends_on",
+      "target_asset_id": "QUERY-RUNNER-T05-PIT-001"
+    },
+    {
+      "source_asset_id": "TEST-T05-MIGRATIONS-001",
+      "relation": "depends_on",
+      "target_asset_id": "LEDGER-T05-MIGRATIONS-001"
+    },
+    {
+      "source_asset_id": "TEST-T05-MIGRATIONS-001",
+      "relation": "depends_on",
+      "target_asset_id": "SCRIPT-T05-MIGRATION-LEDGER-001"
+    },
+    {
+      "source_asset_id": "TEST-T05-MODELS-001",
+      "relation": "depends_on",
+      "target_asset_id": "FIXTURE-T05-SCHEMA-MODEL-ROUNDTRIP-001"
+    },
+    {
+      "source_asset_id": "TEST-T05-MODELS-001",
+      "relation": "depends_on",
+      "target_asset_id": "SCHEMA-T05-PYDANTIC-BOUNDARIES-001"
+    },
+    {
+      "source_asset_id": "TEST-T05-SCHEMA-CONTRACT-001",
+      "relation": "depends_on",
+      "target_asset_id": "FIXTURE-T05-SCHEMA-CONTRACT-001"
+    },
+    {
+      "source_asset_id": "TEST-T05-SCHEMA-CONTRACT-001",
+      "relation": "depends_on",
+      "target_asset_id": "SCHEMA-T05-CANONICAL-DDL-001"
     },
     {
       "source_asset_id": "VALIDATOR-REPOSITORY-STATE-001",

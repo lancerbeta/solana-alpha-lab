@@ -1,6 +1,6 @@
 schema_version: '1.0'
 registry_id: CATALOG-QUERY-REGISTRY-001
-as_of: '2026-07-21'
+as_of: '2026-07-23'
 recipes:
 - recipe_id: QUERY-CATALOG-VALIDATE-001
   record_version: '1.0'
@@ -131,4 +131,106 @@ recipes:
   - CI-VALIDATOR-001
   output_contract:
     format: text
+    max_records: 100
+- recipe_id: QUERY-T05-PIT-RELATION-001
+  record_version: '1.0'
+  purpose: Read one allow-listed TASK-05 canonical relation at an explicit UTC as-of cutoff with deterministic ordering and a hard row limit.
+  kind: duckdb_readonly
+  read_only: true
+  bounded: true
+  network_required: false
+  write_effects: NONE
+  timeout_seconds: 30
+  command:
+  - uv
+  - run
+  - --offline
+  - --locked
+  - --managed-python
+  - python
+  - -B
+  - scripts/query_task05.py
+  - pit-relation
+  - --database-path
+  - '{database_path}'
+  - --relation
+  - '{relation}'
+  - --as-of
+  - '{as_of}'
+  - --limit
+  - '{limit}'
+  parameters:
+  - name: database_path
+    required: true
+    pattern: '^(?!.*[.][.])[^<>|?*"]+[.]duckdb$'
+  - name: relation
+    required: true
+    pattern: '^(?:raw_api_events|canonical_observations|token_lifecycle_events|pool_state_snapshots|trade_orderflow_inputs|entity_input_snapshots|feature_observations|regime_observations|signal_decision_events|quote_attempts|execution_attempts|strategy_outcomes|dataset_manifests|partition_manifests|migration_manifests)$'
+  - name: as_of
+    required: true
+    pattern: '^20[0-9]{2}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}(?:[.][0-9]{1,6})?Z$'
+  - name: limit
+    required: true
+    pattern: '^(?:[1-9]|[1-9][0-9]|100)$'
+  target_asset_ids:
+  - QUERY-RUNNER-T05-PIT-001
+  - SCHEMA-T05-REL-RAW-API-EVENTS-001
+  - SCHEMA-T05-REL-CANONICAL-OBSERVATIONS-001
+  - SCHEMA-T05-REL-TOKEN-LIFECYCLE-EVENTS-001
+  - SCHEMA-T05-REL-POOL-STATE-SNAPSHOTS-001
+  - SCHEMA-T05-REL-TRADE-ORDERFLOW-INPUTS-001
+  - SCHEMA-T05-REL-ENTITY-INPUT-SNAPSHOTS-001
+  - SCHEMA-T05-REL-FEATURE-OBSERVATIONS-001
+  - SCHEMA-T05-REL-REGIME-OBSERVATIONS-001
+  - SCHEMA-T05-REL-SIGNAL-DECISION-EVENTS-001
+  - SCHEMA-T05-REL-QUOTE-ATTEMPTS-001
+  - SCHEMA-T05-REL-EXECUTION-ATTEMPTS-001
+  - SCHEMA-T05-REL-STRATEGY-OUTCOMES-001
+  - SCHEMA-T05-REL-DATASET-MANIFESTS-001
+  - SCHEMA-T05-REL-PARTITION-MANIFESTS-001
+  - SCHEMA-T05-REL-MIGRATION-MANIFESTS-001
+  output_contract:
+    format: json
+    max_records: 100
+- recipe_id: QUERY-T05-DECISION-SAFE-OBSERVATIONS-001
+  record_version: '1.0'
+  purpose: Execute the TASK-05 decision-safe canonical observation macro at an explicit UTC cutoff with deterministic ordering and a hard row limit.
+  kind: duckdb_readonly
+  read_only: true
+  bounded: true
+  network_required: false
+  write_effects: NONE
+  timeout_seconds: 30
+  command:
+  - uv
+  - run
+  - --offline
+  - --locked
+  - --managed-python
+  - python
+  - -B
+  - scripts/query_task05.py
+  - decision-safe-observations
+  - --database-path
+  - '{database_path}'
+  - --as-of
+  - '{as_of}'
+  - --limit
+  - '{limit}'
+  parameters:
+  - name: database_path
+    required: true
+    pattern: '^(?!.*[.][.])[^<>|?*"]+[.]duckdb$'
+  - name: as_of
+    required: true
+    pattern: '^20[0-9]{2}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}(?:[.][0-9]{1,6})?Z$'
+  - name: limit
+    required: true
+    pattern: '^(?:[1-9]|[1-9][0-9]|100)$'
+  target_asset_ids:
+  - QUERY-RUNNER-T05-PIT-001
+  - SCHEMA-T05-CANONICAL-DDL-001
+  - SCHEMA-T05-REL-CANONICAL-OBSERVATIONS-001
+  output_contract:
+    format: json
     max_records: 100

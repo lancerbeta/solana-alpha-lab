@@ -75,8 +75,10 @@ EXPECTED_CRITICAL_PINS = {
 }
 EXPECTED_A4R_SBOM_SHA256 = "4db108ab39ea41339949ca4fc74383e80aa040855b5222f6b9892f257f81aeb6"
 EXPECTED_A4R_NORMALIZED_GRAPH_SHA256 = "e970bdc62a01229b926f7e734acfcd2deefb56addb0807641729962e151a772f"
-EXPECTED_CATALOG_ASSET_COUNT = 82
-EXPECTED_CATALOG_VERSION = "0.3.0"
+EXPECTED_CATALOG_CHECKPOINTS = {
+    ("0.3.0", 82, 5),
+    ("0.4.0", 110, 7),
+}
 EXPECTED_MATRIX_FIELDS = {
     "candidate_id", "verdict", "decision_status", "component_area",
     "candidate_name", "pin", "decision_owner", "maintenance_owner",
@@ -830,6 +832,19 @@ def validate_runtime_versions() -> None:
     raise Task04ValidationError("security_group_leaked_into_runtime")
 
 
+def validate_catalog_checkpoint(
+    version: object,
+    asset_count: int,
+    query_count: int,
+) -> None:
+    checkpoint = (str(version), asset_count, query_count)
+    if checkpoint not in EXPECTED_CATALOG_CHECKPOINTS:
+        raise Task04ValidationError(
+            "catalog_checkpoint_mismatch:"
+            f"{checkpoint[0]}:{checkpoint[1]}:{checkpoint[2]}"
+        )
+
+
 def validate() -> tuple[str, str]:
     with (ROOT / "pyproject.toml").open("rb") as handle:
         validate_dependency_contract(tomllib.load(handle))
@@ -860,10 +875,11 @@ def validate() -> tuple[str, str]:
     )
     validate_bridge()
     snapshot = load_and_validate()
-    if snapshot.manifest.get("catalog_version") != EXPECTED_CATALOG_VERSION:
-        raise Task04ValidationError("catalog_version_mismatch")
-    if len(snapshot.assets) != EXPECTED_CATALOG_ASSET_COUNT:
-        raise Task04ValidationError("catalog_asset_count_mismatch")
+    validate_catalog_checkpoint(
+        snapshot.manifest.get("catalog_version"),
+        len(snapshot.assets),
+        len(snapshot.queries),
+    )
     required = {
         "CTRL-TASK-04-001", "CTRL-HANDOFF-PROTOCOL-001", "ADR-MVP-STACK-002",
         "MATRIX-T04-MVP-STACK-001", "EVIDENCE-T04-RESEARCH-ACCEPTANCE-001",

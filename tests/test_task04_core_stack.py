@@ -46,6 +46,25 @@ def prepare_replay(root: Path, order: str = "source") -> dict[str, object]:
 
 
 class Task04CoreStackTests(unittest.TestCase):
+    def test_catalog_checkpoint_accepts_only_exact_task04_and_task05_states(
+        self,
+    ) -> None:
+        for checkpoint in (("0.3.0", 82, 5), ("0.4.0", 110, 7)):
+            with self.subTest(checkpoint=checkpoint):
+                task04_validator.validate_catalog_checkpoint(*checkpoint)
+        for checkpoint in (
+            ("0.3.0", 110, 7),
+            ("0.4.0", 82, 5),
+            ("0.4.0", 110, 5),
+            ("0.5.0", 110, 7),
+        ):
+            with self.subTest(checkpoint=checkpoint):
+                with self.assertRaisesRegex(
+                    task04_validator.Task04ValidationError,
+                    "catalog_checkpoint_mismatch",
+                ):
+                    task04_validator.validate_catalog_checkpoint(*checkpoint)
+
     def test_strict_model_rejects_coercion_and_extra_fields(self) -> None:
         _, observations = task04_validator.load_replay_fixture()
         invalid = observations[0].model_dump()

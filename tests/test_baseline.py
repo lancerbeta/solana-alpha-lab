@@ -199,6 +199,36 @@ class RepositoryStatePolicyTests(unittest.TestCase):
         arguments.update(overrides)
         return module.classify_state(**arguments)
 
+    def classify_task05_atom5a(self, **overrides: object) -> str:
+        arguments = {
+            "head_oid": module.TASK05_BASE_COMMIT_OID,
+            "commit_count": module.TASK05_BASE_COMMIT_COUNT,
+            "parent_oid": module.TASK05_BASE_PARENT_OID,
+            "tracked": module.task05_repository_files(),
+            "staged": set(module.TASK05_CHANGED_FILES),
+            "untracked": set(),
+            "unstaged": set(),
+            "commit_subject": module.TASK04_POLICY_REPAIR_COMMIT_SUBJECT,
+            "commit_changed": set(module.TASK04_POLICY_REPAIR_FILES),
+        }
+        arguments.update(overrides)
+        return module.classify_state(**arguments)
+
+    def classify_task05_committed(self, **overrides: object) -> str:
+        arguments = {
+            "head_oid": "1" * 40,
+            "commit_count": module.TASK05_COMMIT_COUNT,
+            "parent_oid": module.TASK05_BASE_COMMIT_OID,
+            "tracked": module.task05_repository_files(),
+            "staged": set(),
+            "untracked": set(),
+            "unstaged": set(),
+            "commit_subject": module.TASK05_COMMIT_SUBJECT,
+            "commit_changed": set(module.TASK05_CHANGED_FILES),
+        }
+        arguments.update(overrides)
+        return module.classify_state(**arguments)
+
     def test_task04_atom5a_exact_staged_state_passes(self) -> None:
         self.assertEqual(
             self.classify_task04_atom5a(),
@@ -334,6 +364,79 @@ class RepositoryStatePolicyTests(unittest.TestCase):
                 "tests/test_baseline.py",
             },
         )
+
+    def test_task05_atom5a_exact_staged_state_passes(self) -> None:
+        self.assertEqual(
+            self.classify_task05_atom5a(),
+            "TASK05_ATOM5A_CANDIDATE_STAGED",
+        )
+
+    def test_task05_atom5a_inventory_or_dirty_tree_fails(self) -> None:
+        missing = set(module.TASK05_CHANGED_FILES)
+        missing.remove("scripts/query_task05.py")
+        cases = (
+            {"staged": missing},
+            {"staged": set(module.TASK05_CHANGED_FILES) | {"unexpected.txt"}},
+            {"untracked": {"unexpected.txt"}},
+            {"unstaged": {"catalog/assets/core.yaml"}},
+            {"commit_changed": set(module.TASK04_POLICY_REPAIR_FILES)
+                - {"tests/test_baseline.py"}},
+        )
+        for overrides in cases:
+            with self.subTest(overrides=overrides):
+                self.assertEqual(
+                    self.classify_task05_atom5a(**overrides),
+                    "INVALID_REPOSITORY_STATE",
+                )
+
+    def test_task05_future_commit_has_no_self_oid_pin(self) -> None:
+        for future_oid in ("1" * 40, "2" * 40):
+            with self.subTest(future_oid=future_oid):
+                self.assertEqual(
+                    self.classify_task05_committed(head_oid=future_oid),
+                    "TASK05_ATOM5B_CANDIDATE_COMMITTED",
+                )
+
+    def test_task05_future_commit_contract_is_fail_closed(self) -> None:
+        cases = {
+            "head_oid": module.TASK05_BASE_COMMIT_OID,
+            "commit_count": module.TASK05_BASE_COMMIT_COUNT,
+            "parent_oid": module.TASK05_BASE_PARENT_OID,
+            "commit_subject": "feat: arbitrary data contract",
+            "commit_changed": set(module.TASK05_CHANGED_FILES)
+            - {"scripts/query_task05.py"},
+            "staged": set(module.TASK05_CHANGED_FILES),
+            "untracked": {"unexpected.txt"},
+            "unstaged": {"catalog/assets/core.yaml"},
+        }
+        for key, value in cases.items():
+            with self.subTest(key=key):
+                self.assertEqual(
+                    self.classify_task05_committed(**{key: value}),
+                    "INVALID_REPOSITORY_STATE",
+                )
+
+    def test_task05_policy_constants_are_exact(self) -> None:
+        self.assertEqual(
+            module.TASK05_BASE_COMMIT_OID,
+            "644bda35429ab74b9488d11e78827234d5d438f3",
+        )
+        self.assertEqual(
+            module.TASK05_BASE_TREE_OID,
+            "51e29051d1f3d8f43c074ae30b341d543a8b5e59",
+        )
+        self.assertEqual(module.TASK05_BASE_COMMIT_COUNT, 14)
+        self.assertEqual(module.TASK05_BASE_FILE_COUNT, 96)
+        self.assertEqual(len(module.TASK05_MODIFIED_FILES), 11)
+        self.assertEqual(len(module.TASK05_CREATED_FILES), 15)
+        self.assertEqual(len(module.TASK05_CHANGED_FILES), 26)
+        self.assertEqual(module.TASK05_EXPECTED_REPOSITORY_FILE_COUNT, 111)
+        self.assertEqual(module.TASK05_COMMIT_COUNT, 15)
+        self.assertEqual(
+            module.TASK05_COMMIT_SUBJECT,
+            "feat: add TASK-05 canonical data contract",
+        )
+        self.assertIn(".smial-handoff", module.IGNORED_PARTS)
 
     def test_pre_git_import_staged_state_remains_valid(self) -> None:
         state = module.classify_state(

@@ -287,6 +287,55 @@ TASK04_EXPECTED_RUNTIME_VERSIONS = {
     "solders": "0.28.0",
     "prometheus-client": "0.25.0",
 }
+TASK05_BASE_COMMIT_OID = "644bda35429ab74b9488d11e78827234d5d438f3"
+TASK05_BASE_TREE_OID = "51e29051d1f3d8f43c074ae30b341d543a8b5e59"
+TASK05_BASE_PARENT_OID = TASK04_ARCHITECTURE_COMMIT_OID
+TASK05_BASE_COMMIT_COUNT = TASK04_POLICY_REPAIR_COMMIT_COUNT
+TASK05_BASE_FILE_COUNT = TASK04_EXPECTED_REPOSITORY_FILE_COUNT
+TASK05_MODIFIED_FILES = {
+    "catalog/assets/core.yaml",
+    "catalog/assets/lifecycle.yaml",
+    "catalog/catalog_manifest.yaml",
+    "catalog/generated/asset_edges.json",
+    "catalog/query_recipes.yaml",
+    "docs/PROJECT_MAP.md",
+    "scripts/validate_baseline.py",
+    "scripts/validate_task04.py",
+    "tests/test_baseline.py",
+    "tests/test_catalog.py",
+    "tests/test_task04_core_stack.py",
+}
+TASK05_CREATED_FILES = {
+    "docs/contracts/data_contract_v1.md",
+    "migrations/0001_canonical_schema_v1.sql",
+    "migrations/ledger_v1.json",
+    "schemas/schema_v1.sql",
+    "scripts/query_task05.py",
+    "src/solana_alpha_lab/__init__.py",
+    "src/solana_alpha_lab/contracts/__init__.py",
+    "src/solana_alpha_lab/contracts/migration_ledger.py",
+    "src/solana_alpha_lab/contracts/schema_v1.py",
+    "tests/fixtures/task05/schema_contract_fixture_v1.json",
+    "tests/fixtures/task05/schema_model_roundtrip_fixture_v1.json",
+    "tests/test_task05_catalog_queries.py",
+    "tests/test_task05_migrations.py",
+    "tests/test_task05_models.py",
+    "tests/test_task05_schema_contract.py",
+}
+TASK05_CHANGED_FILES = TASK05_MODIFIED_FILES | TASK05_CREATED_FILES
+TASK05_EXPECTED_REPOSITORY_FILE_COUNT = (
+    TASK05_BASE_FILE_COUNT + len(TASK05_CREATED_FILES)
+)
+TASK05_COMMIT_COUNT = TASK05_BASE_COMMIT_COUNT + 1
+TASK05_COMMIT_SUBJECT = "feat: add TASK-05 canonical data contract"
+TASK05_REPOSITORY_STATES = {
+    "TASK05_ATOM5A_CANDIDATE_STAGED",
+    "TASK05_ATOM5B_CANDIDATE_COMMITTED",
+}
+TASK05_COMMITTED_STATES = {"TASK05_ATOM5B_CANDIDATE_COMMITTED"}
+TASK05_EXPECTED_CATALOG_VERSION = "0.4.0"
+TASK05_EXPECTED_CATALOG_ASSET_COUNT = 110
+TASK05_EXPECTED_CATALOG_QUERY_COUNT = 7
 EXPECTED_DEFERRED_CAPABILITIES = {"GRAPH_DATABASE"}
 EXPECTED_ORIGIN_URL = "https://github.com/lancerbeta/solana-alpha-lab.git"
 EXPECTED_CI_ORIGIN_URLS = {
@@ -322,7 +371,7 @@ EXPECTED_PYYAML = "6.0.3"
 RECOMMENDED_COMMIT_MESSAGE = 'feat: import pre-git evidence and register architecture intent'
 EXPECTED_GITATTRIBUTES = "* text=auto eol=lf\n*.ps1 text eol=lf\n*.bat text eol=crlf\n*.cmd text eol=crlf\n"
 PS1_PROBE = "scripts/validate.ps1"
-IGNORED_PARTS = {".git", ".venv", "__pycache__"}
+IGNORED_PARTS = {".git", ".smial-handoff", ".venv", "__pycache__"}
 
 
 def run(command: list[str], *, binary: bool = False):
@@ -559,6 +608,10 @@ def task04_repository_files() -> set[str]:
     return tree_files(TASK04_BASE_COMMIT_OID) | TASK04_CREATED_FILES
 
 
+def task05_repository_files() -> set[str]:
+    return tree_files(TASK05_BASE_COMMIT_OID) | TASK05_CREATED_FILES
+
+
 def repository_files() -> set[str]:
     result = set()
     for path in ROOT.rglob("*"):
@@ -639,6 +692,34 @@ def classify_state(
     atom5_acceptance_files = atom5_work_acceptance_repository_files()
     atom7_files = atom7_repository_files()
     task04_files = task04_repository_files()
+    task05_files = task05_repository_files()
+    if (
+        head_oid == TASK05_BASE_COMMIT_OID
+        and commit_count == TASK05_BASE_COMMIT_COUNT
+        and parent_oid == TASK05_BASE_PARENT_OID
+        and tracked == task05_files
+        and len(tracked) == TASK05_EXPECTED_REPOSITORY_FILE_COUNT
+        and staged == TASK05_CHANGED_FILES
+        and not untracked
+        and not unstaged
+        and commit_subject == TASK04_POLICY_REPAIR_COMMIT_SUBJECT
+        and commit_changed == TASK04_POLICY_REPAIR_FILES
+    ):
+        return "TASK05_ATOM5A_CANDIDATE_STAGED"
+    if (
+        re.fullmatch(r"[0-9a-f]{40}", head_oid) is not None
+        and head_oid != TASK05_BASE_COMMIT_OID
+        and commit_count == TASK05_COMMIT_COUNT
+        and parent_oid == TASK05_BASE_COMMIT_OID
+        and tracked == task05_files
+        and len(tracked) == TASK05_EXPECTED_REPOSITORY_FILE_COUNT
+        and not staged
+        and not untracked
+        and not unstaged
+        and commit_subject == TASK05_COMMIT_SUBJECT
+        and commit_changed == TASK05_CHANGED_FILES
+    ):
+        return "TASK05_ATOM5B_CANDIDATE_COMMITTED"
     if (
         head_oid == TASK04_ARCHITECTURE_COMMIT_OID
         and commit_count == TASK04_ARCHITECTURE_COMMIT_COUNT
@@ -1196,6 +1277,24 @@ def validate_task04_atom5b_policy_repair_staged_style_policy() -> None:
     )
 
 
+def validate_task05_atom5a_staged_style_policy() -> None:
+    diff = run(
+        [
+            "git",
+            "diff",
+            "--cached",
+            "--check",
+            "--",
+            *sorted(TASK05_CHANGED_FILES),
+        ]
+    )
+    assert_check(
+        "task05_atom5a_staged_diff_check",
+        diff.returncode == 0,
+        diff.stdout.strip() + diff.stderr.strip(),
+    )
+
+
 def validate() -> None:
     github_actions = os.environ.get("GITHUB_ACTIONS", "").lower() == "true"
     branch_result = run(["git", "symbolic-ref", "--short", "HEAD"])
@@ -1340,7 +1439,7 @@ def validate() -> None:
         "ATOM7_REF_NORMALIZATION_REPAIR_COMMITTED",
         "ATOM7_SINGLE_BRANCH_REFSPEC_REPAIR_STAGED",
         "ATOM7_SINGLE_BRANCH_REFSPEC_REPAIR_COMMITTED",
-    } | TASK04_REPOSITORY_STATES
+    } | TASK04_REPOSITORY_STATES | TASK05_REPOSITORY_STATES
     assert_check("repository_state", state in valid_states, state)
     if state == "ATOM7_FINAL_HANDOFF_STAGED":
         assert_check(
@@ -1400,7 +1499,22 @@ def validate() -> None:
             in {"PUBLISHED_LOCAL", "GITHUB_ACTIONS_CHECKOUT", "CLEAN_CLONE"},
             topology,
         )
-    if state in TASK04_REPOSITORY_STATES:
+    if state == "TASK05_ATOM5A_CANDIDATE_STAGED":
+        assert_check(
+            "task05_atom5a_staged_topology",
+            topology == "PUBLISHED_LOCAL",
+            topology,
+        )
+    if state in TASK05_COMMITTED_STATES:
+        assert_check(
+            "task05_committed_topology",
+            topology
+            in {"PUBLISHED_LOCAL", "GITHUB_ACTIONS_CHECKOUT", "CLEAN_CLONE"},
+            topology,
+        )
+    if state in TASK05_REPOSITORY_STATES:
+        expected_file_count = TASK05_EXPECTED_REPOSITORY_FILE_COUNT
+    elif state in TASK04_REPOSITORY_STATES:
         expected_file_count = TASK04_EXPECTED_REPOSITORY_FILE_COUNT
     elif state.startswith("ATOM7_"):
         expected_file_count = ATOM7_EXPECTED_REPOSITORY_FILE_COUNT
@@ -1434,6 +1548,8 @@ def validate() -> None:
         assert_check("task04_atom5b_architecture_commit_contract", True)
     if state == "TASK04_ATOM5B_POLICY_REPAIR_COMMITTED":
         assert_check("task04_atom5b_policy_repair_commit_contract", True)
+    if state == "TASK05_ATOM5B_CANDIDATE_COMMITTED":
+        assert_check("task05_atom5b_commit_contract", True)
     manifest = yaml.safe_load(
         (ROOT / "catalog/catalog_manifest.yaml").read_text(encoding="utf-8")
     )
@@ -1468,6 +1584,43 @@ def validate() -> None:
         )
         assert_check("reuse_decision_record_count", reuse_count == 52)
         assert_check("production_lifecycle_record_count", production_count == 0)
+    if state in TASK05_REPOSITORY_STATES:
+        assert_check(
+            "task05_catalog_version",
+            str(manifest.get("catalog_version")) == TASK05_EXPECTED_CATALOG_VERSION,
+        )
+        asset_count = sum(
+            len(yaml.safe_load((ROOT / relative).read_text(encoding="utf-8"))["records"])
+            for relative in manifest["root_resolver"]["asset_registries"]
+        )
+        assert_check(
+            "task05_catalog_asset_count",
+            asset_count == TASK05_EXPECTED_CATALOG_ASSET_COUNT,
+        )
+        query_count = sum(
+            len(yaml.safe_load((ROOT / relative).read_text(encoding="utf-8"))["recipes"])
+            for relative in manifest["root_resolver"]["query_registries"]
+        )
+        assert_check(
+            "task05_catalog_query_count",
+            query_count == TASK05_EXPECTED_CATALOG_QUERY_COUNT,
+        )
+        lifecycle = [
+            yaml.safe_load((ROOT / relative).read_text(encoding="utf-8"))
+            for relative in manifest["root_resolver"]["lifecycle_registries"]
+        ]
+        reuse_count = sum(
+            len(document["records"])
+            for document in lifecycle
+            if document["registry_type"] == "reuse_candidates"
+        )
+        production_count = sum(
+            len(document["records"])
+            for document in lifecycle
+            if document["registry_type"] != "reuse_candidates"
+        )
+        assert_check("reuse_decision_record_count", reuse_count == 52)
+        assert_check("production_lifecycle_record_count", production_count == 0)
     assert_check("venv_present", (ROOT/".venv").is_dir())
     assert_check("runtime_exact", sys.version_info[:3] == EXPECTED_PYTHON)
     assert_check("runtime_is_venv", Path(sys.prefix).resolve() == (ROOT/".venv").resolve())
@@ -1476,11 +1629,11 @@ def validate() -> None:
     with (ROOT/"pyproject.toml").open("rb") as handle: metadata = tomllib.load(handle)
     expected_dependencies = (
         TASK04_EXPECTED_RUNTIME_DEPENDENCIES
-        if state in TASK04_REPOSITORY_STATES
+        if state in TASK04_REPOSITORY_STATES | TASK05_REPOSITORY_STATES
         else {f"PyYAML=={EXPECTED_PYYAML}", f"jsonschema=={EXPECTED_JSONSCHEMA}"}
     )
     assert_check("dependency_contract", set(metadata["project"]["dependencies"]) == expected_dependencies)
-    if state in TASK04_REPOSITORY_STATES:
+    if state in TASK04_REPOSITORY_STATES | TASK05_REPOSITORY_STATES:
         assert_check(
             "security_dependency_group",
             metadata.get("dependency-groups") == {"security": ["pip-audit==2.10.1"]},
@@ -1547,6 +1700,8 @@ def validate() -> None:
         validate_task04_atom5a_staged_style_policy()
     if state == "TASK04_ATOM5B_POLICY_REPAIR_STAGED":
         validate_task04_atom5b_policy_repair_staged_style_policy()
+    if state == "TASK05_ATOM5A_CANDIDATE_STAGED":
+        validate_task05_atom5a_staged_style_policy()
     tests = run([sys.executable,"-B","-m","unittest","discover","-s","tests","-p","test_*.py"])
     if tests.stdout.strip(): print(tests.stdout.strip())
     if tests.stderr.strip(): print(tests.stderr.strip())
