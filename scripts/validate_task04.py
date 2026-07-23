@@ -78,6 +78,7 @@ EXPECTED_A4R_NORMALIZED_GRAPH_SHA256 = "e970bdc62a01229b926f7e734acfcd2deefb56ad
 EXPECTED_CATALOG_CHECKPOINTS = {
     ("0.3.0", 82, 5),
     ("0.4.0", 110, 7),
+    ("0.4.1", 111, 7),
 }
 EXPECTED_MATRIX_FIELDS = {
     "candidate_id", "verdict", "decision_status", "component_area",

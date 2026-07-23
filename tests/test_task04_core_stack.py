@@ -49,13 +49,20 @@ class Task04CoreStackTests(unittest.TestCase):
     def test_catalog_checkpoint_accepts_only_exact_task04_and_task05_states(
         self,
     ) -> None:
-        for checkpoint in (("0.3.0", 82, 5), ("0.4.0", 110, 7)):
+        for checkpoint in (
+            ("0.3.0", 82, 5),
+            ("0.4.0", 110, 7),
+            ("0.4.1", 111, 7),
+        ):
             with self.subTest(checkpoint=checkpoint):
                 task04_validator.validate_catalog_checkpoint(*checkpoint)
         for checkpoint in (
             ("0.3.0", 110, 7),
             ("0.4.0", 82, 5),
             ("0.4.0", 110, 5),
+            ("0.4.1", 110, 7),
+            ("0.4.1", 111, 5),
+            ("0.4.1", 112, 7),
             ("0.5.0", 110, 7),
         ):
             with self.subTest(checkpoint=checkpoint):

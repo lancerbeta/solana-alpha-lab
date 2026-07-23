@@ -30,7 +30,7 @@ class CatalogImportTests(unittest.TestCase):
 
     def test_real_catalog_counts(self) -> None:
         self.assertEqual(len(self.snapshot.assets_documents), 4)
-        self.assertEqual(len(self.snapshot.assets), 110)
+        self.assertEqual(len(self.snapshot.assets), 111)
         self.assertEqual(len(self.snapshot.queries), 7)
         self.assertEqual(len(self.snapshot.lifecycle_documents), 9)
         self.assertEqual(len(self.snapshot.lifecycle_records), 52)
@@ -114,6 +114,28 @@ class CatalogImportTests(unittest.TestCase):
             "EVIDENCE-T04-A5A-CANDIDATE-001",
         }
         self.assertTrue(required.issubset(self.snapshot.assets))
+
+    def test_task05_task_and_data_contract_assets_are_distinct(self) -> None:
+        task = self.snapshot.assets["CTRL-TASK-05-001"]
+        contract = self.snapshot.assets["CONTRACT-T05-DATA-001"]
+        handoff = self.snapshot.assets["CTRL-LATEST-HANDOFF-001"]
+        self.assertEqual(
+            task["location"]["repository_path"],
+            "docs/tasks/TASK-05.md",
+        )
+        self.assertEqual(
+            contract["location"]["repository_path"],
+            "docs/contracts/data_contract_v1.md",
+        )
+        self.assertEqual(handoff["truth_owner"], "TASK-05")
+        self.assertEqual(
+            {relation["target_asset_id"] for relation in handoff["relations"]},
+            {
+                "CTRL-TASK-05-001",
+                "CONTRACT-T05-DATA-001",
+                "TEST-T05-CATALOG-QUERIES-001",
+            },
+        )
 
     def test_duplicate_across_registries_rejected(self) -> None:
         manifest, assets, queries, lifecycle = self.documents()

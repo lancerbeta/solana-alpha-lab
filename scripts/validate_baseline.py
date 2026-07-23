@@ -332,10 +332,55 @@ TASK05_REPOSITORY_STATES = {
     "TASK05_ATOM5A_CANDIDATE_STAGED",
     "TASK05_ATOM5B_CANDIDATE_COMMITTED",
 }
-TASK05_COMMITTED_STATES = {"TASK05_ATOM5B_CANDIDATE_COMMITTED"}
+TASK05_FINALIZATION_BASE_COMMIT_OID = (
+    "b7aff0117b1fc6ca4c4229b4c2eb4b9c202e3625"
+)
+TASK05_FINALIZATION_BASE_TREE_OID = (
+    "27d41a8307efdec19faabb82e7be9b5553d3cbdf"
+)
+TASK05_FINALIZATION_BASE_PARENT_OID = TASK05_BASE_COMMIT_OID
+TASK05_FINALIZATION_BASE_COMMIT_COUNT = TASK05_COMMIT_COUNT
+TASK05_FINALIZATION_BASE_FILE_COUNT = TASK05_EXPECTED_REPOSITORY_FILE_COUNT
+TASK05_FINALIZATION_MODIFIED_FILES = {
+    "catalog/assets/core.yaml",
+    "catalog/assets/lifecycle.yaml",
+    "catalog/catalog_manifest.yaml",
+    "catalog/generated/asset_edges.json",
+    "docs/PROJECT_MAP.md",
+    "docs/handoffs/latest.md",
+    "scripts/validate_baseline.py",
+    "scripts/validate_task04.py",
+    "tests/test_baseline.py",
+    "tests/test_catalog.py",
+    "tests/test_task04_core_stack.py",
+    "tests/test_task05_catalog_queries.py",
+}
+TASK05_FINALIZATION_CREATED_FILES = {"docs/tasks/TASK-05.md"}
+TASK05_FINALIZATION_FILES = (
+    TASK05_FINALIZATION_MODIFIED_FILES | TASK05_FINALIZATION_CREATED_FILES
+)
+TASK05_FINALIZATION_EXPECTED_REPOSITORY_FILE_COUNT = (
+    TASK05_FINALIZATION_BASE_FILE_COUNT + len(TASK05_FINALIZATION_CREATED_FILES)
+)
+TASK05_FINALIZATION_COMMIT_COUNT = TASK05_FINALIZATION_BASE_COMMIT_COUNT + 1
+TASK05_FINALIZATION_COMMIT_SUBJECT = (
+    "docs: finalize TASK-05 repository handoff"
+)
+TASK05_FINALIZATION_REPOSITORY_STATES = {
+    "TASK05_FINALIZATION_STAGED",
+    "TASK05_FINALIZATION_COMMITTED",
+}
+TASK05_REPOSITORY_STATES |= TASK05_FINALIZATION_REPOSITORY_STATES
+TASK05_COMMITTED_STATES = {
+    "TASK05_ATOM5B_CANDIDATE_COMMITTED",
+    "TASK05_FINALIZATION_COMMITTED",
+}
 TASK05_EXPECTED_CATALOG_VERSION = "0.4.0"
 TASK05_EXPECTED_CATALOG_ASSET_COUNT = 110
 TASK05_EXPECTED_CATALOG_QUERY_COUNT = 7
+TASK05_FINALIZATION_EXPECTED_CATALOG_VERSION = "0.4.1"
+TASK05_FINALIZATION_EXPECTED_CATALOG_ASSET_COUNT = 111
+TASK05_FINALIZATION_EXPECTED_CATALOG_QUERY_COUNT = 7
 EXPECTED_DEFERRED_CAPABILITIES = {"GRAPH_DATABASE"}
 EXPECTED_ORIGIN_URL = "https://github.com/lancerbeta/solana-alpha-lab.git"
 EXPECTED_CI_ORIGIN_URLS = {
@@ -612,6 +657,13 @@ def task05_repository_files() -> set[str]:
     return tree_files(TASK05_BASE_COMMIT_OID) | TASK05_CREATED_FILES
 
 
+def task05_finalization_repository_files() -> set[str]:
+    return (
+        tree_files(TASK05_FINALIZATION_BASE_COMMIT_OID)
+        | TASK05_FINALIZATION_CREATED_FILES
+    )
+
+
 def repository_files() -> set[str]:
     result = set()
     for path in ROOT.rglob("*"):
@@ -693,6 +745,36 @@ def classify_state(
     atom7_files = atom7_repository_files()
     task04_files = task04_repository_files()
     task05_files = task05_repository_files()
+    task05_finalization_files = task05_finalization_repository_files()
+    if (
+        head_oid == TASK05_FINALIZATION_BASE_COMMIT_OID
+        and commit_count == TASK05_FINALIZATION_BASE_COMMIT_COUNT
+        and parent_oid == TASK05_FINALIZATION_BASE_PARENT_OID
+        and tracked == task05_finalization_files
+        and len(tracked)
+        == TASK05_FINALIZATION_EXPECTED_REPOSITORY_FILE_COUNT
+        and staged == TASK05_FINALIZATION_FILES
+        and not untracked
+        and not unstaged
+        and commit_subject == TASK05_COMMIT_SUBJECT
+        and commit_changed == TASK05_CHANGED_FILES
+    ):
+        return "TASK05_FINALIZATION_STAGED"
+    if (
+        re.fullmatch(r"[0-9a-f]{40}", head_oid) is not None
+        and head_oid != TASK05_FINALIZATION_BASE_COMMIT_OID
+        and commit_count == TASK05_FINALIZATION_COMMIT_COUNT
+        and parent_oid == TASK05_FINALIZATION_BASE_COMMIT_OID
+        and tracked == task05_finalization_files
+        and len(tracked)
+        == TASK05_FINALIZATION_EXPECTED_REPOSITORY_FILE_COUNT
+        and not staged
+        and not untracked
+        and not unstaged
+        and commit_subject == TASK05_FINALIZATION_COMMIT_SUBJECT
+        and commit_changed == TASK05_FINALIZATION_FILES
+    ):
+        return "TASK05_FINALIZATION_COMMITTED"
     if (
         head_oid == TASK05_BASE_COMMIT_OID
         and commit_count == TASK05_BASE_COMMIT_COUNT
@@ -1295,6 +1377,24 @@ def validate_task05_atom5a_staged_style_policy() -> None:
     )
 
 
+def validate_task05_finalization_staged_style_policy() -> None:
+    diff = run(
+        [
+            "git",
+            "diff",
+            "--cached",
+            "--check",
+            "--",
+            *sorted(TASK05_FINALIZATION_FILES),
+        ]
+    )
+    assert_check(
+        "task05_finalization_staged_diff_check",
+        diff.returncode == 0,
+        diff.stdout.strip() + diff.stderr.strip(),
+    )
+
+
 def validate() -> None:
     github_actions = os.environ.get("GITHUB_ACTIONS", "").lower() == "true"
     branch_result = run(["git", "symbolic-ref", "--short", "HEAD"])
@@ -1505,6 +1605,12 @@ def validate() -> None:
             topology == "PUBLISHED_LOCAL",
             topology,
         )
+    if state == "TASK05_FINALIZATION_STAGED":
+        assert_check(
+            "task05_finalization_staged_topology",
+            topology == "PUBLISHED_LOCAL",
+            topology,
+        )
     if state in TASK05_COMMITTED_STATES:
         assert_check(
             "task05_committed_topology",
@@ -1512,7 +1618,11 @@ def validate() -> None:
             in {"PUBLISHED_LOCAL", "GITHUB_ACTIONS_CHECKOUT", "CLEAN_CLONE"},
             topology,
         )
-    if state in TASK05_REPOSITORY_STATES:
+    if state in TASK05_FINALIZATION_REPOSITORY_STATES:
+        expected_file_count = (
+            TASK05_FINALIZATION_EXPECTED_REPOSITORY_FILE_COUNT
+        )
+    elif state in TASK05_REPOSITORY_STATES:
         expected_file_count = TASK05_EXPECTED_REPOSITORY_FILE_COUNT
     elif state in TASK04_REPOSITORY_STATES:
         expected_file_count = TASK04_EXPECTED_REPOSITORY_FILE_COUNT
@@ -1550,6 +1660,8 @@ def validate() -> None:
         assert_check("task04_atom5b_policy_repair_commit_contract", True)
     if state == "TASK05_ATOM5B_CANDIDATE_COMMITTED":
         assert_check("task05_atom5b_commit_contract", True)
+    if state == "TASK05_FINALIZATION_COMMITTED":
+        assert_check("task05_finalization_commit_contract", True)
     manifest = yaml.safe_load(
         (ROOT / "catalog/catalog_manifest.yaml").read_text(encoding="utf-8")
     )
@@ -1584,7 +1696,55 @@ def validate() -> None:
         )
         assert_check("reuse_decision_record_count", reuse_count == 52)
         assert_check("production_lifecycle_record_count", production_count == 0)
-    if state in TASK05_REPOSITORY_STATES:
+    if state in TASK05_FINALIZATION_REPOSITORY_STATES:
+        assert_check(
+            "task05_finalization_catalog_version",
+            str(manifest.get("catalog_version"))
+            == TASK05_FINALIZATION_EXPECTED_CATALOG_VERSION,
+        )
+        asset_count = sum(
+            len(
+                yaml.safe_load(
+                    (ROOT / relative).read_text(encoding="utf-8")
+                )["records"]
+            )
+            for relative in manifest["root_resolver"]["asset_registries"]
+        )
+        assert_check(
+            "task05_finalization_catalog_asset_count",
+            asset_count == TASK05_FINALIZATION_EXPECTED_CATALOG_ASSET_COUNT,
+        )
+        query_count = sum(
+            len(
+                yaml.safe_load(
+                    (ROOT / relative).read_text(encoding="utf-8")
+                )["recipes"]
+            )
+            for relative in manifest["root_resolver"]["query_registries"]
+        )
+        assert_check(
+            "task05_finalization_catalog_query_count",
+            query_count == TASK05_FINALIZATION_EXPECTED_CATALOG_QUERY_COUNT,
+        )
+        lifecycle = [
+            yaml.safe_load(
+                (ROOT / relative).read_text(encoding="utf-8")
+            )
+            for relative in manifest["root_resolver"]["lifecycle_registries"]
+        ]
+        reuse_count = sum(
+            len(document["records"])
+            for document in lifecycle
+            if document["registry_type"] == "reuse_candidates"
+        )
+        production_count = sum(
+            len(document["records"])
+            for document in lifecycle
+            if document["registry_type"] != "reuse_candidates"
+        )
+        assert_check("reuse_decision_record_count", reuse_count == 52)
+        assert_check("production_lifecycle_record_count", production_count == 0)
+    elif state in TASK05_REPOSITORY_STATES:
         assert_check(
             "task05_catalog_version",
             str(manifest.get("catalog_version")) == TASK05_EXPECTED_CATALOG_VERSION,
@@ -1702,6 +1862,8 @@ def validate() -> None:
         validate_task04_atom5b_policy_repair_staged_style_policy()
     if state == "TASK05_ATOM5A_CANDIDATE_STAGED":
         validate_task05_atom5a_staged_style_policy()
+    if state == "TASK05_FINALIZATION_STAGED":
+        validate_task05_finalization_staged_style_policy()
     tests = run([sys.executable,"-B","-m","unittest","discover","-s","tests","-p","test_*.py"])
     if tests.stdout.strip(): print(tests.stdout.strip())
     if tests.stderr.strip(): print(tests.stderr.strip())

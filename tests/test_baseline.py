@@ -229,6 +229,42 @@ class RepositoryStatePolicyTests(unittest.TestCase):
         arguments.update(overrides)
         return module.classify_state(**arguments)
 
+    def classify_task05_finalization_staged(
+        self,
+        **overrides: object,
+    ) -> str:
+        arguments = {
+            "head_oid": module.TASK05_FINALIZATION_BASE_COMMIT_OID,
+            "commit_count": module.TASK05_FINALIZATION_BASE_COMMIT_COUNT,
+            "parent_oid": module.TASK05_FINALIZATION_BASE_PARENT_OID,
+            "tracked": module.task05_finalization_repository_files(),
+            "staged": set(module.TASK05_FINALIZATION_FILES),
+            "untracked": set(),
+            "unstaged": set(),
+            "commit_subject": module.TASK05_COMMIT_SUBJECT,
+            "commit_changed": set(module.TASK05_CHANGED_FILES),
+        }
+        arguments.update(overrides)
+        return module.classify_state(**arguments)
+
+    def classify_task05_finalization_committed(
+        self,
+        **overrides: object,
+    ) -> str:
+        arguments = {
+            "head_oid": "1" * 40,
+            "commit_count": module.TASK05_FINALIZATION_COMMIT_COUNT,
+            "parent_oid": module.TASK05_FINALIZATION_BASE_COMMIT_OID,
+            "tracked": module.task05_finalization_repository_files(),
+            "staged": set(),
+            "untracked": set(),
+            "unstaged": set(),
+            "commit_subject": module.TASK05_FINALIZATION_COMMIT_SUBJECT,
+            "commit_changed": set(module.TASK05_FINALIZATION_FILES),
+        }
+        arguments.update(overrides)
+        return module.classify_state(**arguments)
+
     def test_task04_atom5a_exact_staged_state_passes(self) -> None:
         self.assertEqual(
             self.classify_task04_atom5a(),
@@ -437,6 +473,104 @@ class RepositoryStatePolicyTests(unittest.TestCase):
             "feat: add TASK-05 canonical data contract",
         )
         self.assertIn(".smial-handoff", module.IGNORED_PARTS)
+
+    def test_task05_finalization_exact_staged_state_passes(self) -> None:
+        self.assertEqual(
+            self.classify_task05_finalization_staged(),
+            "TASK05_FINALIZATION_STAGED",
+        )
+
+    def test_task05_finalization_staged_state_is_fail_closed(self) -> None:
+        missing = set(module.TASK05_FINALIZATION_FILES)
+        missing.remove("docs/tasks/TASK-05.md")
+        cases = (
+            {"staged": missing},
+            {
+                "staged":
+                set(module.TASK05_FINALIZATION_FILES) | {"unexpected.txt"}
+            },
+            {"untracked": {"unexpected.txt"}},
+            {"unstaged": {"docs/handoffs/latest.md"}},
+            {
+                "commit_changed":
+                set(module.TASK05_CHANGED_FILES)
+                - {"scripts/query_task05.py"}
+            },
+        )
+        for overrides in cases:
+            with self.subTest(overrides=overrides):
+                self.assertEqual(
+                    self.classify_task05_finalization_staged(**overrides),
+                    "INVALID_REPOSITORY_STATE",
+                )
+
+    def test_task05_finalization_future_commit_has_no_self_oid_pin(self) -> None:
+        for future_oid in ("1" * 40, "2" * 40):
+            with self.subTest(future_oid=future_oid):
+                self.assertEqual(
+                    self.classify_task05_finalization_committed(
+                        head_oid=future_oid
+                    ),
+                    "TASK05_FINALIZATION_COMMITTED",
+                )
+
+    def test_task05_finalization_future_commit_is_fail_closed(self) -> None:
+        cases = {
+            "head_oid": module.TASK05_FINALIZATION_BASE_COMMIT_OID,
+            "commit_count": module.TASK05_FINALIZATION_BASE_COMMIT_COUNT,
+            "parent_oid": module.TASK05_FINALIZATION_BASE_PARENT_OID,
+            "commit_subject": "docs: arbitrary handoff",
+            "commit_changed":
+                set(module.TASK05_FINALIZATION_FILES)
+                - {"docs/tasks/TASK-05.md"},
+            "staged": set(module.TASK05_FINALIZATION_FILES),
+            "untracked": {"unexpected.txt"},
+            "unstaged": {"docs/handoffs/latest.md"},
+        }
+        for key, value in cases.items():
+            with self.subTest(key=key):
+                self.assertEqual(
+                    self.classify_task05_finalization_committed(
+                        **{key: value}
+                    ),
+                    "INVALID_REPOSITORY_STATE",
+                )
+
+    def test_task05_finalization_policy_constants_are_exact(self) -> None:
+        self.assertEqual(
+            module.TASK05_FINALIZATION_BASE_COMMIT_OID,
+            "b7aff0117b1fc6ca4c4229b4c2eb4b9c202e3625",
+        )
+        self.assertEqual(
+            module.TASK05_FINALIZATION_BASE_TREE_OID,
+            "27d41a8307efdec19faabb82e7be9b5553d3cbdf",
+        )
+        self.assertEqual(module.TASK05_FINALIZATION_BASE_COMMIT_COUNT, 15)
+        self.assertEqual(module.TASK05_FINALIZATION_BASE_FILE_COUNT, 111)
+        self.assertEqual(len(module.TASK05_FINALIZATION_MODIFIED_FILES), 12)
+        self.assertEqual(len(module.TASK05_FINALIZATION_CREATED_FILES), 1)
+        self.assertEqual(len(module.TASK05_FINALIZATION_FILES), 13)
+        self.assertEqual(
+            module.TASK05_FINALIZATION_EXPECTED_REPOSITORY_FILE_COUNT,
+            112,
+        )
+        self.assertEqual(module.TASK05_FINALIZATION_COMMIT_COUNT, 16)
+        self.assertEqual(
+            module.TASK05_FINALIZATION_COMMIT_SUBJECT,
+            "docs: finalize TASK-05 repository handoff",
+        )
+        self.assertEqual(
+            module.TASK05_FINALIZATION_EXPECTED_CATALOG_VERSION,
+            "0.4.1",
+        )
+        self.assertEqual(
+            module.TASK05_FINALIZATION_EXPECTED_CATALOG_ASSET_COUNT,
+            111,
+        )
+        self.assertEqual(
+            module.TASK05_FINALIZATION_EXPECTED_CATALOG_QUERY_COUNT,
+            7,
+        )
 
     def test_pre_git_import_staged_state_remains_valid(self) -> None:
         state = module.classify_state(

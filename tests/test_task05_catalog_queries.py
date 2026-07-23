@@ -77,7 +77,9 @@ RELATION_ASSET_IDS = {
 }
 
 FILE_ASSET_IDS = {
+    "CTRL-LATEST-HANDOFF-001",
     "CTRL-TASK-05-001",
+    "CONTRACT-T05-DATA-001",
     "SCHEMA-T05-CANONICAL-DDL-001",
     "SCHEMA-T05-PYDANTIC-BOUNDARIES-001",
     "SCRIPT-T05-MIGRATION-LEDGER-001",
@@ -299,8 +301,8 @@ class Task05CatalogTransactionTests(unittest.TestCase):
         )
 
     def test_catalog_version_counts_and_task05_inventory_are_exact(self) -> None:
-        self.assertEqual(self.snapshot.manifest["catalog_version"], "0.4.0")
-        self.assertEqual(len(self.snapshot.assets), 110)
+        self.assertEqual(self.snapshot.manifest["catalog_version"], "0.4.1")
+        self.assertEqual(len(self.snapshot.assets), 111)
         self.assertEqual(len(self.snapshot.queries), 7)
         self.assertEqual(
             {

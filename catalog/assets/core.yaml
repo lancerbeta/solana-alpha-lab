@@ -933,21 +933,21 @@ records:
     contains_raw_data: false
     sensitivity: INTERNAL_NON_SECRET
 - asset_id: CTRL-LATEST-HANDOFF-001
-  record_version: '1.0'
+  record_version: '2.0'
   asset_type: control_document
-  purpose: Latest repository candidate handoff for Work review without canonical acceptance
-    claims.
+  purpose: TASK-05 finalization candidate, published implementation evidence and
+    bounded TASK-06 entry gate without canonical acceptance claims.
   status: IMPLEMENTED_UNVERIFIED
   origin: REPOSITORY
-  as_of: '2026-07-22'
-  truth_owner: TASK-04
+  as_of: '2026-07-23'
+  truth_owner: TASK-05
   location:
     kind: git_path
     logical_uri: repo://docs/handoffs/latest.md
     repository_path: docs/handoffs/latest.md
   integrity:
     kind: sha256
-    sha256: 45eecab3e868c599dbf1c98875758ef76115c8dd5acd85e888d2b436f65971bf
+    sha256: dd9e63b7a1f3b988168deeb8e7be81b7c746eb825660310bd1c5d8a932e1da9c
   access:
     mode: read_only
     method: file
@@ -955,11 +955,14 @@ records:
     secrets_required: false
   relations:
   - relation_type: governed_by
-    target_asset_id: CTRL-TASK-04-001
-  - relation_type: evidenced_by
-    target_asset_id: EVIDENCE-T04-A5A-CANDIDATE-001
+    target_asset_id: CTRL-TASK-05-001
+  - relation_type: depends_on
+    target_asset_id: CONTRACT-T05-DATA-001
+  - relation_type: validated_by
+    target_asset_id: TEST-T05-CATALOG-QUERIES-001
   consumers:
-  - TASK-04
+  - TASK-05
+  - TASK-06
   evidence: []
   classification:
     contains_secrets: false
@@ -1425,7 +1428,7 @@ records:
     contains_raw_data: false
     sensitivity: INTERNAL_NON_SECRET
 - asset_id: TEST-T04-CORE-STACK-001
-  record_version: '1.1'
+  record_version: '1.2'
   asset_type: script
   purpose: Offline end-to-end Parquet, DuckDB and immutable migration-ledger replay
     plus negative contract tests for the TASK-04 core stack candidate.
@@ -1439,7 +1442,7 @@ records:
     repository_path: tests/test_task04_core_stack.py
   integrity:
     kind: sha256
-    sha256: 8ab4373a120688310e840f1152fd0476bd68644fe3d9cfc614bb5b2989ae6a0e
+    sha256: b3b40e7c13f07f1f473a693b6995f5ac2093754aa324a1482d5507e570acb867
   access:
     mode: read_only
     method: command
@@ -1458,7 +1461,7 @@ records:
     contains_raw_data: false
     sensitivity: INTERNAL_NON_SECRET
 - asset_id: VALIDATOR-T04-ARCHITECTURE-001
-  record_version: '1.1'
+  record_version: '1.2'
   asset_type: script
   purpose: Fail-closed TASK-04 replay, architecture, matrix, registry, dependency,
     evidence and SBOM validator.
@@ -1472,7 +1475,7 @@ records:
     repository_path: scripts/validate_task04.py
   integrity:
     kind: sha256
-    sha256: a863442b366803d3ce2dec23b5191245f2b0f60dbd6f0e21f7c04deda124790a
+    sha256: c86fa0339b8d42b00532ac805a0e2f8e6ac321866d6199f97aedf5d3ff74741e
   access:
     mode: read_only
     method: command
@@ -1492,10 +1495,10 @@ records:
     contains_raw_data: false
     sensitivity: INTERNAL_NON_SECRET
 - asset_id: VALIDATOR-REPOSITORY-STATE-001
-  record_version: '1.3'
+  record_version: '1.4'
   asset_type: script
-  purpose: Fail-closed historical and exact staged repository-state validator including
-    Atom 5A.
+  purpose: Fail-closed historical, TASK-05 implementation and exact finalization
+    staged/committed repository-state validator.
   status: IMPLEMENTED_UNVERIFIED
   origin: REPOSITORY
   as_of: '2026-07-23'
@@ -1506,7 +1509,7 @@ records:
     repository_path: scripts/validate_baseline.py
   integrity:
     kind: sha256
-    sha256: fbeee99a2c10a64cff6e8b48c8fa141dfa78faa673dba42e047427f9d13bd943
+    sha256: 3a918c2d8e4207c87e80ea4d4c372233227c047fae1dbdfcc38db38b86d0317c
   access:
     mode: read_only
     method: command
@@ -1515,6 +1518,8 @@ records:
   relations:
   - relation_type: governed_by
     target_asset_id: CTRL-TASK-04-001
+  - relation_type: governed_by
+    target_asset_id: CTRL-TASK-05-001
   - relation_type: depends_on
     target_asset_id: CATALOG-ROOT-001
   consumers:
@@ -1561,7 +1566,42 @@ records:
 - asset_id: CTRL-TASK-05-001
   record_version: '1.0'
   asset_type: control_document
-  purpose: 'TASK-05 canonical schema v1 contract defining relation ownership, PIT semantics, state coherence and downstream consumers.'
+  purpose: 'Repository mirror of the bounded TASK-05 objective, scope, Definition of Done, accepted implementation evidence and TASK-06 gate.'
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-07-23'
+  truth_owner: TASK-05
+  location:
+    kind: git_path
+    logical_uri: 'repo://docs/tasks/TASK-05.md'
+    repository_path: docs/tasks/TASK-05.md
+  integrity:
+    kind: sha256
+    sha256: 4ffce06d7caf5641cbd45eb74d188f65e2453d76e1cbe4af081c89a6d740abe2
+  access:
+    mode: read_only
+    method: file
+    network_required: false
+    secrets_required: false
+  relations:
+  - relation_type: depends_on
+    target_asset_id: ADR-MVP-STACK-002
+  - relation_type: contains
+    target_asset_id: CONTRACT-T05-DATA-001
+  - relation_type: validated_by
+    target_asset_id: TEST-T05-SCHEMA-CONTRACT-001
+  consumers:
+  - TASK-05
+  - TASK-06
+  evidence: []
+  classification:
+    contains_secrets: false
+    contains_raw_data: false
+    sensitivity: INTERNAL_NON_SECRET
+- asset_id: CONTRACT-T05-DATA-001
+  record_version: '1.0'
+  asset_type: control_document
+  purpose: 'TASK-05 canonical field, owner, unit, point-in-time, revision, missing-state and execution-state data contract.'
   status: IMPLEMENTED_UNVERIFIED
   origin: REPOSITORY
   as_of: '2026-07-23'
@@ -1579,6 +1619,8 @@ records:
     network_required: false
     secrets_required: false
   relations:
+  - relation_type: governed_by
+    target_asset_id: CTRL-TASK-05-001
   - relation_type: depends_on
     target_asset_id: ADR-MVP-STACK-002
   - relation_type: validated_by
@@ -1972,9 +2014,9 @@ records:
     contains_raw_data: false
     sensitivity: INTERNAL_NON_SECRET
 - asset_id: TEST-T05-CATALOG-QUERIES-001
-  record_version: '1.0'
+  record_version: '1.1'
   asset_type: script
-  purpose: 'Offline tests proving TASK-05 query bounds, UTC eligibility, write denial, external-access denial, raw BLOB exclusion and Catalog registration.'
+  purpose: 'Offline tests proving TASK-05 query bounds, UTC eligibility, write denial, external-access denial, raw BLOB exclusion and exact task/data-contract Catalog registration.'
   status: IMPLEMENTED_UNVERIFIED
   origin: REPOSITORY
   as_of: '2026-07-23'
@@ -1985,7 +2027,7 @@ records:
     repository_path: tests/test_task05_catalog_queries.py
   integrity:
     kind: sha256
-    sha256: d6fc620ff679b981eb64523b75beba0cc3ba666f7d72670a9ab951e7b82286b2
+    sha256: 9bd5af4238ce97bf8bbe81b0d59383f287db27e3b32e3fc249c7925968b1d213
   access:
     mode: read_only
     method: command
