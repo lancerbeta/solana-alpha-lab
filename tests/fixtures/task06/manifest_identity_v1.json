@@ -1,0 +1,50 @@
+{
+  "dataset": {
+    "dataset_id": "raw-api-events",
+    "dataset_version": "2026-07-24.1",
+    "schema_id": "raw-api-events-v1",
+    "schema_sha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+    "generation_task_id": "TASK-06",
+    "generation_run_id": "fixture-run-001",
+    "validation_receipt_sha256": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+    "created_at": "2026-07-24T08:03:00Z",
+    "first_reliable_available_at": "2026-07-24T08:03:01Z"
+  },
+  "partitions": [
+    {
+      "partition_id": "date=2026-07-24/hour=08",
+      "logical_location": "raw-api-events/date=2026-07-24/hour=08/part-000.parquet",
+      "file_sha256": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+      "content_sha256": "dddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd",
+      "row_count": 2,
+      "min_event_time": "2026-07-24T07:58:00Z",
+      "max_event_time": "2026-07-24T07:59:00Z",
+      "min_available_to_strategy_at": "2026-07-24T07:58:02Z",
+      "max_available_to_strategy_at": "2026-07-24T07:59:02Z",
+      "created_at": "2026-07-24T08:00:00Z",
+      "first_reliable_available_at": "2026-07-24T08:00:01Z"
+    },
+    {
+      "partition_id": "date=2026-07-24/hour=09",
+      "logical_location": "raw-api-events/date=2026-07-24/hour=09/part-000.parquet",
+      "file_sha256": "eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee",
+      "content_sha256": "ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff",
+      "row_count": 1,
+      "min_event_time": "2026-07-24T08:01:00Z",
+      "max_event_time": "2026-07-24T08:01:00Z",
+      "min_available_to_strategy_at": "2026-07-24T08:01:02Z",
+      "max_available_to_strategy_at": "2026-07-24T08:01:02Z",
+      "created_at": "2026-07-24T08:02:00Z",
+      "first_reliable_available_at": "2026-07-24T08:02:01Z"
+    }
+  ],
+  "expected": {
+    "dataset_manifest_id": "dataset-0aaedb8d2aed1a02c4245c5c7dbd8bbe7b26fce17cd8172a930255e75535d62d",
+    "partition_manifest_ids": [
+      "partition-0ac00cdb8dc7a04937e1332d26bd28b4f81a95e783e2cb22558a4d226655831c",
+      "partition-90226eccf94760e43cb39612a86b14b566eae01ef001c427b988586f449c6e04"
+    ],
+    "dataset_fingerprint": "f8b93f51fd26064db9ec2cd752df8f639dc461a1d836a756ac8e3cf42765518f",
+    "dataset_content_sha256": "a80d08ef86d6ed2ee66943e46b6712167c4e1a6a0f7364a53283efe6f09365e7"
+  }
+}

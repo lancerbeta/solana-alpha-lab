@@ -265,6 +265,154 @@ class RepositoryStatePolicyTests(unittest.TestCase):
         arguments.update(overrides)
         return module.classify_state(**arguments)
 
+    def classify_task06_atom7a(self, **overrides: object) -> str:
+        arguments = {
+            "head_oid": module.TASK06_BASE_COMMIT_OID,
+            "commit_count": module.TASK06_BASE_COMMIT_COUNT,
+            "parent_oid": module.TASK06_BASE_PARENT_OID,
+            "tracked": module.task06_repository_files(),
+            "staged": set(module.TASK06_CHANGED_FILES),
+            "untracked": set(),
+            "unstaged": set(),
+            "commit_subject": module.TASK05_FINALIZATION_COMMIT_SUBJECT,
+            "commit_changed": set(module.TASK05_FINALIZATION_FILES),
+        }
+        arguments.update(overrides)
+        return module.classify_state(**arguments)
+
+    def classify_task06_atom7b(self, **overrides: object) -> str:
+        arguments = {
+            "head_oid": "1" * 40,
+            "commit_count": module.TASK06_COMMIT_COUNT,
+            "parent_oid": module.TASK06_BASE_COMMIT_OID,
+            "tracked": module.task06_repository_files(),
+            "staged": set(),
+            "untracked": set(),
+            "unstaged": set(),
+            "commit_subject": module.TASK06_COMMIT_SUBJECT,
+            "commit_changed": set(module.TASK06_CHANGED_FILES),
+        }
+        arguments.update(overrides)
+        return module.classify_state(**arguments)
+
+    def test_task06_atom7a_exact_staged_state_passes(self) -> None:
+        self.assertEqual(
+            self.classify_task06_atom7a(),
+            "TASK06_ATOM7A_CANDIDATE_STAGED",
+        )
+
+    def test_task06_atom7a_state_is_fail_closed(self) -> None:
+        missing = set(module.TASK06_CHANGED_FILES)
+        missing.remove("tests/test_task06_storage_budget.py")
+        cases = (
+            {"staged": missing},
+            {
+                "staged":
+                set(module.TASK06_CHANGED_FILES) | {"unexpected.txt"}
+            },
+            {"untracked": {"unexpected.txt"}},
+            {"unstaged": {"catalog/assets/core.yaml"}},
+            {
+                "commit_changed":
+                set(module.TASK05_FINALIZATION_FILES)
+                - {"docs/tasks/TASK-05.md"}
+            },
+        )
+        for overrides in cases:
+            with self.subTest(overrides=overrides):
+                self.assertEqual(
+                    self.classify_task06_atom7a(**overrides),
+                    "INVALID_REPOSITORY_STATE",
+                )
+
+    def test_task06_future_commit_has_no_self_oid_pin(self) -> None:
+        for future_oid in ("1" * 40, "2" * 40):
+            with self.subTest(future_oid=future_oid):
+                self.assertEqual(
+                    self.classify_task06_atom7b(head_oid=future_oid),
+                    "TASK06_ATOM7B_CANDIDATE_COMMITTED",
+                )
+
+    def test_task06_future_commit_contract_is_fail_closed(self) -> None:
+        cases = {
+            "head_oid": module.TASK06_BASE_COMMIT_OID,
+            "commit_count": module.TASK06_BASE_COMMIT_COUNT,
+            "parent_oid": module.TASK06_BASE_PARENT_OID,
+            "commit_subject": "feat: arbitrary storage boundary",
+            "commit_changed":
+                set(module.TASK06_CHANGED_FILES)
+                - {"tests/test_task06_storage_budget.py"},
+            "staged": set(module.TASK06_CHANGED_FILES),
+            "untracked": {"unexpected.txt"},
+            "unstaged": {"catalog/assets/core.yaml"},
+        }
+        for key, value in cases.items():
+            with self.subTest(key=key):
+                self.assertEqual(
+                    self.classify_task06_atom7b(**{key: value}),
+                    "INVALID_REPOSITORY_STATE",
+                )
+
+    def test_task06_policy_constants_are_exact(self) -> None:
+        self.assertEqual(
+            module.TASK06_BASE_COMMIT_OID,
+            "1db62c7abc06bcb4ab209b3db7f4eb858f64330a",
+        )
+        self.assertEqual(
+            module.TASK06_BASE_TREE_OID,
+            "6ec5e7a10b7c547b02c37436a1f37d0729a6f657",
+        )
+        self.assertEqual(module.TASK06_BASE_COMMIT_COUNT, 16)
+        self.assertEqual(module.TASK06_BASE_FILE_COUNT, 112)
+        self.assertEqual(
+            module.TASK06_MODIFIED_FILES,
+            {
+                "catalog/assets/core.yaml",
+                "catalog/assets/lifecycle.yaml",
+                "catalog/catalog_manifest.yaml",
+                "catalog/generated/asset_edges.json",
+                "docs/PROJECT_MAP.md",
+                "scripts/validate_baseline.py",
+                "scripts/validate_task04.py",
+                "tests/test_baseline.py",
+                "tests/test_catalog.py",
+                "tests/test_task04_core_stack.py",
+                "tests/test_task05_catalog_queries.py",
+            },
+        )
+        self.assertEqual(
+            module.TASK06_CREATED_FILES,
+            {
+                "docs/contracts/dataset_manifest_contract_v1.md",
+                "docs/contracts/raw_parquet_store_contract_v1.md",
+                "docs/contracts/raw_storage_contract_v1.md",
+                "docs/contracts/storage_budget_contract_v1.md",
+                "docs/tasks/TASK-06.md",
+                "src/solana_alpha_lab/storage/__init__.py",
+                "src/solana_alpha_lab/storage/budget.py",
+                "src/solana_alpha_lab/storage/manifests.py",
+                "src/solana_alpha_lab/storage/parquet_store.py",
+                "src/solana_alpha_lab/storage/raw_envelope.py",
+                "tests/fixtures/task06/manifest_identity_v1.json",
+                "tests/fixtures/task06/raw_envelope_v1.json",
+                "tests/test_task06_catalog.py",
+                "tests/test_task06_manifests.py",
+                "tests/test_task06_parquet_store.py",
+                "tests/test_task06_raw_envelope.py",
+                "tests/test_task06_storage_budget.py",
+            },
+        )
+        self.assertEqual(len(module.TASK06_CHANGED_FILES), 28)
+        self.assertEqual(module.TASK06_EXPECTED_REPOSITORY_FILE_COUNT, 129)
+        self.assertEqual(module.TASK06_COMMIT_COUNT, 17)
+        self.assertEqual(
+            module.TASK06_COMMIT_SUBJECT,
+            "feat: add TASK-06 raw storage boundary",
+        )
+        self.assertEqual(module.TASK06_EXPECTED_CATALOG_VERSION, "0.5.0")
+        self.assertEqual(module.TASK06_EXPECTED_CATALOG_ASSET_COUNT, 128)
+        self.assertEqual(module.TASK06_EXPECTED_CATALOG_QUERY_COUNT, 7)
+
     def test_task04_atom5a_exact_staged_state_passes(self) -> None:
         self.assertEqual(
             self.classify_task04_atom5a(),

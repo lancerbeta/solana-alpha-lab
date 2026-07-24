@@ -1,0 +1,71 @@
+{
+  "fixture_id": "TASK06-RAW-ENVELOPE-V1",
+  "policy_version": "1.0",
+  "request_identity": {
+    "method": "GET",
+    "url": "https://provider.invalid/v1/items?api_key=FAKE",
+    "headers": {
+      "accept": "application/json",
+      "authorization": "Bearer FAKE",
+      "x-api-key": "FAKE"
+    }
+  },
+  "expected_redacted_request": {
+    "method": "GET",
+    "url": "https://provider.invalid/v1/items?api_key=[REDACTED]",
+    "headers": {
+      "accept": "application/json",
+      "authorization": "[REDACTED]",
+      "x-api-key": "[REDACTED]"
+    }
+  },
+  "success_body": {
+    "result": {
+      "slot": 123,
+      "mint": "SyntheticMint111111111111111111111111111"
+    },
+    "access_token": "FAKE"
+  },
+  "expected_redacted_success_body": {
+    "result": {
+      "slot": 123,
+      "mint": "SyntheticMint111111111111111111111111111"
+    },
+    "access_token": "[REDACTED]"
+  },
+  "error_cases": [
+    {
+      "status": "HTTP_ERROR",
+      "error_class": "HTTP_429",
+      "body": {
+        "error": "rate_limit"
+      }
+    },
+    {
+      "status": "PROVIDER_ERROR",
+      "error_class": "PROVIDER_UNAVAILABLE",
+      "body": {
+        "error": "provider_unavailable"
+      }
+    },
+    {
+      "status": "TIMEOUT",
+      "error_class": "READ_TIMEOUT",
+      "body": ""
+    },
+    {
+      "status": "INVALID_RESPONSE",
+      "error_class": "SCHEMA_MISMATCH",
+      "body": {
+        "error": "invalid_shape"
+      }
+    }
+  ],
+  "timestamps": {
+    "event_time": "2026-07-24T09:59:59Z",
+    "observed_at": "2026-07-24T10:00:00Z",
+    "ingested_at": "2026-07-24T10:00:01Z",
+    "first_reliable_available_at": "2026-07-24T10:00:01Z",
+    "available_to_strategy_at": "2026-07-24T10:00:01Z"
+  }
+}

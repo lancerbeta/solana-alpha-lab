@@ -301,8 +301,8 @@ class Task05CatalogTransactionTests(unittest.TestCase):
         )
 
     def test_catalog_version_counts_and_task05_inventory_are_exact(self) -> None:
-        self.assertEqual(self.snapshot.manifest["catalog_version"], "0.4.1")
-        self.assertEqual(len(self.snapshot.assets), 111)
+        self.assertEqual(self.snapshot.manifest["catalog_version"], "0.5.0")
+        self.assertEqual(len(self.snapshot.assets), 128)
         self.assertEqual(len(self.snapshot.queries), 7)
         self.assertEqual(
             {
