@@ -54,6 +54,7 @@ class Task04CoreStackTests(unittest.TestCase):
             ("0.4.0", 110, 7),
             ("0.4.1", 111, 7),
             ("0.5.0", 128, 7),
+            ("0.5.1", 128, 7),
         ):
             with self.subTest(checkpoint=checkpoint):
                 task04_validator.validate_catalog_checkpoint(*checkpoint)
@@ -67,6 +68,9 @@ class Task04CoreStackTests(unittest.TestCase):
             ("0.5.0", 127, 7),
             ("0.5.0", 128, 5),
             ("0.5.0", 129, 7),
+            ("0.5.1", 127, 7),
+            ("0.5.1", 128, 5),
+            ("0.5.1", 129, 7),
         ):
             with self.subTest(checkpoint=checkpoint):
                 with self.assertRaisesRegex(

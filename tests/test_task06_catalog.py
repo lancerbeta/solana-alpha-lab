@@ -84,7 +84,7 @@ class Task06CatalogTests(unittest.TestCase):
     ) -> None:
         self.assertEqual(
             self.snapshot.manifest["catalog_version"],
-            "0.5.0",
+            "0.5.1",
         )
         self.assertEqual(len(self.snapshot.assets), 128)
         self.assertEqual(len(self.snapshot.queries), 7)
@@ -140,6 +140,30 @@ class Task06CatalogTests(unittest.TestCase):
             ("validated_by", "TEST-T06-CATALOG-001"),
             task_relations,
         )
+
+    def test_latest_handoff_is_owned_by_task06_and_targets_task07(self) -> None:
+        handoff = self.snapshot.assets["CTRL-LATEST-HANDOFF-001"]
+        self.assertEqual(handoff["truth_owner"], "TASK-06")
+        self.assertEqual(
+            handoff["location"]["repository_path"],
+            "docs/handoffs/latest.md",
+        )
+        self.assertEqual(
+            handoff["integrity"]["sha256"],
+            sha256(ROOT / "docs/handoffs/latest.md"),
+        )
+        self.assertEqual(
+            relation_pairs(handoff),
+            {
+                ("governed_by", "CTRL-TASK-06-001"),
+                ("depends_on", "CONTRACT-T06-RAW-STORAGE-001"),
+                ("depends_on", "CONTRACT-T06-DATASET-MANIFEST-001"),
+                ("depends_on", "CONTRACT-T06-RAW-PARQUET-001"),
+                ("depends_on", "CONTRACT-T06-STORAGE-BUDGET-001"),
+                ("validated_by", "TEST-T06-CATALOG-001"),
+            },
+        )
+        self.assertEqual(set(handoff["consumers"]), {"TASK-06", "TASK-07"})
 
     def test_implementation_and_contract_validation_edges_are_exact(
         self,

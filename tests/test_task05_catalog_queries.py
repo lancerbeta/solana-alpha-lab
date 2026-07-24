@@ -94,7 +94,9 @@ FILE_ASSET_IDS = {
     "TEST-T05-CATALOG-QUERIES-001",
 }
 
-TASK05_ASSET_IDS = FILE_ASSET_IDS | set(RELATION_ASSET_IDS.values())
+TASK05_ASSET_IDS = (
+    FILE_ASSET_IDS - {"CTRL-LATEST-HANDOFF-001"}
+) | set(RELATION_ASSET_IDS.values())
 TASK05_QUERY_IDS = {
     "QUERY-T05-PIT-RELATION-001",
     "QUERY-T05-DECISION-SAFE-OBSERVATIONS-001",
@@ -301,7 +303,7 @@ class Task05CatalogTransactionTests(unittest.TestCase):
         )
 
     def test_catalog_version_counts_and_task05_inventory_are_exact(self) -> None:
-        self.assertEqual(self.snapshot.manifest["catalog_version"], "0.5.0")
+        self.assertEqual(self.snapshot.manifest["catalog_version"], "0.5.1")
         self.assertEqual(len(self.snapshot.assets), 128)
         self.assertEqual(len(self.snapshot.queries), 7)
         self.assertEqual(

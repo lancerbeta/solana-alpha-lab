@@ -115,7 +115,7 @@ class CatalogImportTests(unittest.TestCase):
         }
         self.assertTrue(required.issubset(self.snapshot.assets))
 
-    def test_task05_task_and_data_contract_assets_are_distinct(self) -> None:
+    def test_task05_contract_and_task06_handoff_are_distinct(self) -> None:
         task = self.snapshot.assets["CTRL-TASK-05-001"]
         contract = self.snapshot.assets["CONTRACT-T05-DATA-001"]
         handoff = self.snapshot.assets["CTRL-LATEST-HANDOFF-001"]
@@ -127,13 +127,16 @@ class CatalogImportTests(unittest.TestCase):
             contract["location"]["repository_path"],
             "docs/contracts/data_contract_v1.md",
         )
-        self.assertEqual(handoff["truth_owner"], "TASK-05")
+        self.assertEqual(handoff["truth_owner"], "TASK-06")
         self.assertEqual(
             {relation["target_asset_id"] for relation in handoff["relations"]},
             {
-                "CTRL-TASK-05-001",
-                "CONTRACT-T05-DATA-001",
-                "TEST-T05-CATALOG-QUERIES-001",
+                "CTRL-TASK-06-001",
+                "CONTRACT-T06-RAW-STORAGE-001",
+                "CONTRACT-T06-DATASET-MANIFEST-001",
+                "CONTRACT-T06-RAW-PARQUET-001",
+                "CONTRACT-T06-STORAGE-BUDGET-001",
+                "TEST-T06-CATALOG-001",
             },
         )
 
