@@ -1,0 +1,121 @@
+{
+  "receipt_id": "TASK07_PROVIDER_SMOKE_EXECUTION_RECEIPT_V1",
+  "receipt_version": "1.0",
+  "task_id": "TASK-07",
+  "atom": "T07-A5A",
+  "status": "PASS_WITH_PROVIDER_FAILURE_EVIDENCE",
+  "created_at": "2026-07-24T14:05:13.562Z",
+  "first_reliable_available_at": "2026-07-24T14:05:13.562Z",
+  "accepted_base": {
+    "head": "8c52f16774306f88b332c7641bc5a14c6fda0786",
+    "tree": "a17836456013f841a49ede261615e390cd41850f",
+    "branch": "main"
+  },
+  "source_runs": [
+    {
+      "run_id": "t07a4b-20260724T132144Z",
+      "attempt_count": 33,
+      "file_count": 99,
+      "raw_file_bytes": 466676,
+      "response_bytes": 48777,
+      "fileset_sha256": "cbf9d931a9337c67bceeb83887e8eca3fd326050f81266443f31cb3aeaffbf0c"
+    },
+    {
+      "run_id": "t07a4b-20260724T135632Z",
+      "attempt_count": 2,
+      "file_count": 6,
+      "raw_file_bytes": 22738,
+      "response_bytes": 827,
+      "fileset_sha256": "729922dbf54b1b8e229119d65a11b2a69cc7283460335c5e1fa4c2bab61ea92c"
+    }
+  ],
+  "tracked_fixture": {
+    "path": "tests/fixtures/task07/provider_smoke_live_evidence_v1.json",
+    "sha256": "efc95a74868a8868501051ea64216e18788eafa15e226d872ac9695e24b60668",
+    "attempt_count": 35,
+    "response_bodies_in_fixture": 0,
+    "credentials_in_fixture": 0,
+    "absolute_paths_in_fixture": 0
+  },
+  "accepted_result": {
+    "terminal_counts": {
+      "SUCCESS": 32,
+      "INVALID_REQUEST": 1,
+      "PROVIDER_5XX": 2
+    },
+    "provider_attempt_counts": {
+      "HELIUS_RPC": 11,
+      "HELIUS_WSS": 2,
+      "SOLANA_TRACKER_DATA": 8,
+      "JUPITER_SWAP": 9,
+      "RAPTOR_HOSTED": 5
+    },
+    "response_bytes": 49604,
+    "reclassified_attempts": [
+      "R01#1",
+      "R02#1",
+      "R03#1"
+    ],
+    "retained_provider_failures": [
+      "J09#1",
+      "R05#1"
+    ],
+    "network_attempts_in_source_runs": 35,
+    "retries_in_source_runs": 0,
+    "modeled_helius_credits": 15,
+    "cash_spend_usd": 0,
+    "persistent_credentials_created": 0,
+    "wallet_signer_transaction_actions": 0
+  },
+  "checks": {
+    "raw_runs_read_only": "PASS",
+    "raw_fileset_hashes_match_pre_write_evidence": "PASS",
+    "attempt_inventory_matches_frozen_contract": "PASS",
+    "accepted_reclassifications_are_exact": "PASS",
+    "provider_failure_semantics_preserved": "PASS",
+    "fixture_is_clean_clone_portable": "PASS",
+    "secret_and_absolute_path_scan": "PASS"
+  },
+  "validation": {
+    "targeted_evidence_tests": {
+      "passed": 11,
+      "failed": 0
+    },
+    "full_repository_suite": {
+      "passed": 376,
+      "failed": 0
+    },
+    "secret_scan": "PASS",
+    "catalog_validation": {
+      "status": "PASS",
+      "asset_count": 128,
+      "query_count": 7,
+      "lifecycle_record_count": 52
+    },
+    "generated_navigation_check": "PASS",
+    "repository_state_policy": "KNOWN_UNRECOGNIZED_UNTRACKED_TASK07_CANDIDATE_OUTSIDE_ATOM_SCOPE"
+  },
+  "authority": {
+    "class": "LOCAL_WRITE_ONLY",
+    "managed_files": [
+      "docs/evidence/task07/provider_smoke_execution_summary_v1.md",
+      "docs/evidence/task07/provider_smoke_execution_receipt_v1.json",
+      "tests/fixtures/task07/provider_smoke_live_evidence_v1.json",
+      "tests/test_task07_provider_smoke_evidence.py"
+    ],
+    "network_calls_during_atom": 0,
+    "raw_files_written_during_atom": 0,
+    "dependency_changes": 0,
+    "catalog_changes": 0,
+    "staged": false,
+    "committed": false,
+    "pushed": false
+  },
+  "residuals": [
+    "R05#1 remains PROVIDER_5XX/http_500 and requires no semantic repair in this atom.",
+    "Provider success proves transport and response-contract feasibility, not fillability or alpha.",
+    "Catalog registration remains a separate authority-gated atom."
+  ],
+  "catalog_status": "CATALOG_GAP_PENDING_SEPARATE_ATOM",
+  "state_change": "NONE"
+}

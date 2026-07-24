@@ -84,9 +84,9 @@ class Task06CatalogTests(unittest.TestCase):
     ) -> None:
         self.assertEqual(
             self.snapshot.manifest["catalog_version"],
-            "0.5.1",
+            "0.6.0",
         )
-        self.assertEqual(len(self.snapshot.assets), 128)
+        self.assertEqual(len(self.snapshot.assets), 141)
         self.assertEqual(len(self.snapshot.queries), 7)
         self.assertTrue(
             TASK06_ASSET_IDS.issubset(

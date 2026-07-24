@@ -331,6 +331,155 @@ class RepositoryStatePolicyTests(unittest.TestCase):
         arguments.update(overrides)
         return module.classify_state(**arguments)
 
+    def classify_task07_atom6a(self, **overrides: object) -> str:
+        arguments = {
+            "head_oid": module.TASK07_BASE_COMMIT_OID,
+            "commit_count": module.TASK07_BASE_COMMIT_COUNT,
+            "parent_oid": module.TASK07_BASE_PARENT_OID,
+            "tracked": module.task07_repository_files(),
+            "staged": set(module.TASK07_CHANGED_FILES),
+            "untracked": set(),
+            "unstaged": set(),
+            "commit_subject": module.TASK06_FINALIZATION_COMMIT_SUBJECT,
+            "commit_changed": set(module.TASK06_FINALIZATION_FILES),
+        }
+        arguments.update(overrides)
+        return module.classify_state(**arguments)
+
+    def classify_task07_atom6b(self, **overrides: object) -> str:
+        arguments = {
+            "head_oid": "1" * 40,
+            "commit_count": module.TASK07_COMMIT_COUNT,
+            "parent_oid": module.TASK07_BASE_COMMIT_OID,
+            "tracked": module.task07_repository_files(),
+            "staged": set(),
+            "untracked": set(),
+            "unstaged": set(),
+            "commit_subject": module.TASK07_COMMIT_SUBJECT,
+            "commit_changed": set(module.TASK07_CHANGED_FILES),
+        }
+        arguments.update(overrides)
+        return module.classify_state(**arguments)
+
+    def test_task07_atom6a_exact_staged_state_passes(self) -> None:
+        self.assertEqual(
+            self.classify_task07_atom6a(),
+            "TASK07_ATOM6A_CANDIDATE_STAGED",
+        )
+
+    def test_task07_atom6a_state_is_fail_closed(self) -> None:
+        missing = set(module.TASK07_CHANGED_FILES)
+        missing.remove("tests/test_task07_provider_smoke_transport.py")
+        cases = (
+            {"staged": missing},
+            {
+                "staged":
+                set(module.TASK07_CHANGED_FILES) | {"unexpected.txt"}
+            },
+            {"untracked": {"unexpected.txt"}},
+            {"unstaged": {"catalog/assets/core.yaml"}},
+            {
+                "commit_changed":
+                set(module.TASK06_FINALIZATION_FILES)
+                - {"docs/tasks/TASK-06.md"}
+            },
+        )
+        for overrides in cases:
+            with self.subTest(overrides=overrides):
+                self.assertEqual(
+                    self.classify_task07_atom6a(**overrides),
+                    "INVALID_REPOSITORY_STATE",
+                )
+
+    def test_task07_future_commit_has_no_self_oid_pin(self) -> None:
+        for future_oid in ("1" * 40, "2" * 40):
+            with self.subTest(future_oid=future_oid):
+                self.assertEqual(
+                    self.classify_task07_atom6b(head_oid=future_oid),
+                    "TASK07_ATOM6B_CANDIDATE_COMMITTED",
+                )
+
+    def test_task07_future_commit_contract_is_fail_closed(self) -> None:
+        cases = {
+            "head_oid": module.TASK07_BASE_COMMIT_OID,
+            "commit_count": module.TASK07_BASE_COMMIT_COUNT,
+            "parent_oid": module.TASK07_BASE_PARENT_OID,
+            "commit_subject": "feat: arbitrary provider smoke",
+            "commit_changed":
+                set(module.TASK07_CHANGED_FILES)
+                - {"tests/test_task07_provider_smoke_transport.py"},
+            "staged": set(module.TASK07_CHANGED_FILES),
+            "untracked": {"unexpected.txt"},
+            "unstaged": {"catalog/assets/core.yaml"},
+        }
+        for key, value in cases.items():
+            with self.subTest(key=key):
+                self.assertEqual(
+                    self.classify_task07_atom6b(**{key: value}),
+                    "INVALID_REPOSITORY_STATE",
+                )
+
+    def test_task07_policy_constants_are_exact(self) -> None:
+        self.assertEqual(
+            module.TASK07_BASE_COMMIT_OID,
+            "8c52f16774306f88b332c7641bc5a14c6fda0786",
+        )
+        self.assertEqual(
+            module.TASK07_BASE_TREE_OID,
+            "a17836456013f841a49ede261615e390cd41850f",
+        )
+        self.assertEqual(module.TASK07_BASE_COMMIT_COUNT, 18)
+        self.assertEqual(module.TASK07_BASE_FILE_COUNT, 129)
+        self.assertEqual(
+            module.TASK07_MODIFIED_FILES,
+            {
+                "catalog/assets/core.yaml",
+                "catalog/assets/lifecycle.yaml",
+                "catalog/catalog_manifest.yaml",
+                "catalog/generated/asset_edges.json",
+                "docs/PROJECT_MAP.md",
+                "scripts/validate_baseline.py",
+                "scripts/validate_task04.py",
+                "tests/test_baseline.py",
+                "tests/test_catalog.py",
+                "tests/test_task04_core_stack.py",
+                "tests/test_task05_catalog_queries.py",
+                "tests/test_task06_catalog.py",
+            },
+        )
+        self.assertEqual(
+            module.TASK07_CREATED_FILES,
+            {
+                "docs/contracts/provider_smoke_runtime_contract_v1.md",
+                "docs/contracts/provider_smoke_transport_contract_v1.md",
+                "docs/evidence/task07/provider_smoke_execution_receipt_v1.json",
+                "docs/evidence/task07/provider_smoke_execution_summary_v1.md",
+                "scripts/run_task07_provider_smoke.py",
+                "src/solana_alpha_lab/provider_smoke.py",
+                "src/solana_alpha_lab/provider_smoke_transport.py",
+                "tests/fixtures/task07/provider_smoke_contract_v1.json",
+                "tests/fixtures/task07/provider_smoke_live_evidence_v1.json",
+                "tests/test_task07_catalog.py",
+                "tests/test_task07_provider_smoke.py",
+                "tests/test_task07_provider_smoke_evidence.py",
+                "tests/test_task07_provider_smoke_transport.py",
+            },
+        )
+        self.assertEqual(len(module.TASK07_CHANGED_FILES), 25)
+        self.assertEqual(module.TASK07_EXPECTED_REPOSITORY_FILE_COUNT, 142)
+        self.assertEqual(module.TASK07_COMMIT_COUNT, 19)
+        self.assertEqual(
+            module.TASK07_COMMIT_SUBJECT,
+            "feat: add TASK-07 bounded provider smoke",
+        )
+        self.assertEqual(module.TASK07_EXPECTED_CATALOG_VERSION, "0.6.0")
+        self.assertEqual(module.TASK07_EXPECTED_CATALOG_ASSET_COUNT, 141)
+        self.assertEqual(module.TASK07_EXPECTED_CATALOG_QUERY_COUNT, 7)
+        self.assertEqual(
+            module.IGNORED_REPOSITORY_PREFIXES,
+            {"data/raw"},
+        )
+
     def test_task06_atom7a_exact_staged_state_passes(self) -> None:
         self.assertEqual(
             self.classify_task06_atom7a(),

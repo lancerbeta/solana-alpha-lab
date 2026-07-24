@@ -519,7 +519,7 @@ records:
   evidence: []
   classification: *t06_internal
 - asset_id: TEST-T06-CATALOG-001
-  record_version: '1.1'
+  record_version: '1.2'
   asset_type: script
   purpose: Catalog tests for the exact TASK-06 stable-ID inventory, hashes, ownership, finalization handoff, consumers and no-raw-bytes boundary.
   status: IMPLEMENTED_UNVERIFIED
@@ -532,7 +532,7 @@ records:
     repository_path: tests/test_task06_catalog.py
   integrity:
     kind: sha256
-    sha256: 8859c0c997e97915d3e32fc6126dd8a0657e63e3abdbe8b78df4ebc9aa8850da
+    sha256: c8ea380b36048a3922c17f9ccb8d80f25865c360017bcf4cf58617555a14cc91
   access: *t06_read_file
   relations:
   - relation_type: governed_by
@@ -1942,7 +1942,7 @@ records:
     contains_raw_data: false
     sensitivity: INTERNAL_NON_SECRET
 - asset_id: TEST-T04-CORE-STACK-001
-  record_version: '1.4'
+  record_version: '1.5'
   asset_type: script
   purpose: Offline end-to-end Parquet, DuckDB and immutable migration-ledger replay
     plus negative contract tests for the TASK-04 core stack candidate.
@@ -1956,7 +1956,7 @@ records:
     repository_path: tests/test_task04_core_stack.py
   integrity:
     kind: sha256
-    sha256: a3246ff959e75fa912b656b067ed9d04a320654648ed468cac2b170069963394
+    sha256: 39ea5900b60c1bcec559934c2067e828886de51a322f4d84018c7ae2ef6c2624
   access:
     mode: read_only
     method: command
@@ -1975,7 +1975,7 @@ records:
     contains_raw_data: false
     sensitivity: INTERNAL_NON_SECRET
 - asset_id: VALIDATOR-T04-ARCHITECTURE-001
-  record_version: '1.4'
+  record_version: '1.5'
   asset_type: script
   purpose: Fail-closed TASK-04 replay, architecture, matrix, registry, dependency,
     evidence and SBOM validator.
@@ -1989,7 +1989,7 @@ records:
     repository_path: scripts/validate_task04.py
   integrity:
     kind: sha256
-    sha256: b19402df2714b58eee0065412550111db5631685e2b6437c0036c4b2a127ec96
+    sha256: af2f308096faf24e01bbd98156c417fdb60add4da05cdf26faec87baf0e98e6d
   access:
     mode: read_only
     method: command
@@ -2009,10 +2009,10 @@ records:
     contains_raw_data: false
     sensitivity: INTERNAL_NON_SECRET
 - asset_id: VALIDATOR-REPOSITORY-STATE-001
-  record_version: '1.6'
+  record_version: '1.7'
   asset_type: script
-  purpose: Fail-closed historical, TASK-05/TASK-06 implementation and exact
-    finalization staged/committed repository-state validator.
+  purpose: Fail-closed historical, TASK-05/TASK-06 and exact TASK-07
+    staged/committed repository-state validator.
   status: IMPLEMENTED_UNVERIFIED
   origin: REPOSITORY
   as_of: '2026-07-24'
@@ -2023,7 +2023,7 @@ records:
     repository_path: scripts/validate_baseline.py
   integrity:
     kind: sha256
-    sha256: 4ccbaf84999da9552874caeca56cc1a4b8c3d6d4c80f578347f19f3e307bfc53
+    sha256: ab166b40a7e4d7ed6dc74bbb2e7afc81f692be277db16a04bb89e2d05e2c3c03
   access:
     mode: read_only
     method: command
@@ -2042,6 +2042,7 @@ records:
   - TASK-04
   - TASK-05
   - TASK-06
+  - TASK-07
   evidence: []
   classification:
     contains_secrets: false
@@ -2531,7 +2532,7 @@ records:
     contains_raw_data: false
     sensitivity: INTERNAL_NON_SECRET
 - asset_id: TEST-T05-CATALOG-QUERIES-001
-  record_version: '1.3'
+  record_version: '1.4'
   asset_type: script
   purpose: 'Offline tests proving TASK-05 query bounds, UTC eligibility, write denial, external-access denial, raw BLOB exclusion and exact task/data-contract Catalog registration.'
   status: IMPLEMENTED_UNVERIFIED
@@ -2544,7 +2545,7 @@ records:
     repository_path: tests/test_task05_catalog_queries.py
   integrity:
     kind: sha256
-    sha256: 3e3c04032998a172e2deeca8af7e5f0dbc19d6c442a910eb77a0fc08412d5b1c
+    sha256: 224cff66ae793dd424b6bf72333421bb0f794e3ca1b06d7aff1d1d438e2dba6c
   access:
     mode: read_only
     method: command
@@ -3088,3 +3089,345 @@ records:
     contains_secrets: false
     contains_raw_data: false
     sensitivity: INTERNAL_NON_SECRET
+- asset_id: CONTRACT-T07-PROVIDER-SMOKE-RUNTIME-001
+  record_version: '1.0'
+  asset_type: control_document
+  purpose: Frozen offline-first provider-smoke runtime contract for exact cases, caps, dynamic values, terminal classes and prohibited actions.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-07-24'
+  truth_owner: TASK-07
+  location:
+    kind: git_path
+    logical_uri: repo://docs/contracts/provider_smoke_runtime_contract_v1.md
+    repository_path: docs/contracts/provider_smoke_runtime_contract_v1.md
+  integrity:
+    kind: sha256
+    sha256: f30025168be49079566fc9b4dd32875dee53003e63963e5437a405322c021ba3
+  access: &t07_read_file
+    mode: read_only
+    method: file
+    network_required: false
+    secrets_required: false
+  relations:
+  - relation_type: derived_from
+    target_asset_id: PRE-GIT-TASK01-A023
+  - relation_type: validated_by
+    target_asset_id: TEST-T07-PROVIDER-SMOKE-001
+  consumers:
+  - TASK-07
+  evidence: []
+  classification: &t07_internal
+    contains_secrets: false
+    contains_raw_data: false
+    sensitivity: INTERNAL_NON_SECRET
+- asset_id: CONTRACT-T07-PROVIDER-SMOKE-TRANSPORT-001
+  record_version: '1.0'
+  asset_type: control_document
+  purpose: Exact HTTP, JSON-RPC and WSS transport, credential, persistence, recovery and zero-transaction boundary for the bounded provider smoke.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-07-24'
+  truth_owner: TASK-07
+  location:
+    kind: git_path
+    logical_uri: repo://docs/contracts/provider_smoke_transport_contract_v1.md
+    repository_path: docs/contracts/provider_smoke_transport_contract_v1.md
+  integrity:
+    kind: sha256
+    sha256: 6b856106fad2c2cd4bfff2fdde5e5cf0c11d2cf9ef9cf16484f219d166637ef3
+  access: *t07_read_file
+  relations:
+  - relation_type: derived_from
+    target_asset_id: PRE-GIT-TASK01-A023
+  - relation_type: depends_on
+    target_asset_id: CONTRACT-T06-RAW-STORAGE-001
+  - relation_type: validated_by
+    target_asset_id: TEST-T07-PROVIDER-SMOKE-TRANSPORT-001
+  consumers:
+  - TASK-07
+  evidence: []
+  classification: *t07_internal
+- asset_id: EVIDENCE-T07-PROVIDER-SMOKE-RECEIPT-001
+  record_version: '1.0'
+  asset_type: evidence
+  purpose: Machine-readable sanitized receipt binding the accepted 35-attempt provider-smoke result to immutable local raw-run fileset hashes.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-07-24'
+  truth_owner: TASK-07
+  location:
+    kind: git_path
+    logical_uri: repo://docs/evidence/task07/provider_smoke_execution_receipt_v1.json
+    repository_path: docs/evidence/task07/provider_smoke_execution_receipt_v1.json
+  integrity:
+    kind: sha256
+    sha256: 900cf054916995e2b839fad3bf4873666bcd9ca635903d1a58937b346de27786
+  access: *t07_read_file
+  relations:
+  - relation_type: derived_from
+    target_asset_id: FIXTURE-T07-PROVIDER-SMOKE-EVIDENCE-001
+  - relation_type: validated_by
+    target_asset_id: TEST-T07-PROVIDER-SMOKE-EVIDENCE-001
+  consumers:
+  - TASK-07
+  evidence: []
+  classification: *t07_internal
+- asset_id: EVIDENCE-T07-PROVIDER-SMOKE-SUMMARY-001
+  record_version: '1.0'
+  asset_type: evidence
+  purpose: Human-readable accepted provider-smoke result, corrected classification boundary, residual failures, costs and non-claims.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-07-24'
+  truth_owner: TASK-07
+  location:
+    kind: git_path
+    logical_uri: repo://docs/evidence/task07/provider_smoke_execution_summary_v1.md
+    repository_path: docs/evidence/task07/provider_smoke_execution_summary_v1.md
+  integrity:
+    kind: sha256
+    sha256: 871951f09d9123130701aa006ca31258f4342d565b33c85c45d49dbb4d1a5142
+  access: *t07_read_file
+  relations:
+  - relation_type: derived_from
+    target_asset_id: FIXTURE-T07-PROVIDER-SMOKE-EVIDENCE-001
+  - relation_type: evidenced_by
+    target_asset_id: EVIDENCE-T07-PROVIDER-SMOKE-RECEIPT-001
+  consumers:
+  - TASK-07
+  evidence: []
+  classification: *t07_internal
+- asset_id: SCRIPT-T07-PROVIDER-SMOKE-LAUNCHER-001
+  record_version: '1.0'
+  asset_type: script
+  purpose: Offline-by-default command launcher with exact external-authority phrases, bounded credential prompts and Raptor-tail recovery mode.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-07-24'
+  truth_owner: TASK-07
+  location:
+    kind: git_path
+    logical_uri: repo://scripts/run_task07_provider_smoke.py
+    repository_path: scripts/run_task07_provider_smoke.py
+  integrity:
+    kind: sha256
+    sha256: 4a161e469085ee2fa0c3cc6686d03fa103bb6cdca55cb4ac771f6a8bea117b06
+  access: *t07_read_file
+  relations:
+  - relation_type: depends_on
+    target_asset_id: MODULE-T07-PROVIDER-SMOKE-001
+  - relation_type: depends_on
+    target_asset_id: MODULE-T07-PROVIDER-SMOKE-TRANSPORT-001
+  - relation_type: validated_by
+    target_asset_id: TEST-T07-PROVIDER-SMOKE-TRANSPORT-001
+  consumers:
+  - TASK-07
+  evidence: []
+  classification: *t07_internal
+- asset_id: MODULE-T07-PROVIDER-SMOKE-001
+  record_version: '1.0'
+  asset_type: script
+  purpose: Frozen provider-smoke plan compiler, materializer, safety guard, response validator and TASK-06 raw-event adapter.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-07-24'
+  truth_owner: TASK-07
+  location:
+    kind: git_path
+    logical_uri: repo://src/solana_alpha_lab/provider_smoke.py
+    repository_path: src/solana_alpha_lab/provider_smoke.py
+  integrity:
+    kind: sha256
+    sha256: 2f3d337a928fb945aadf1e0e1baf71866f6fb1a4741005cc8543c292b0ed698e
+  access: *t07_read_file
+  relations:
+  - relation_type: depends_on
+    target_asset_id: CONTRACT-T07-PROVIDER-SMOKE-RUNTIME-001
+  - relation_type: depends_on
+    target_asset_id: MODULE-T06-STORAGE-API-001
+  - relation_type: validated_by
+    target_asset_id: TEST-T07-PROVIDER-SMOKE-001
+  consumers:
+  - TASK-07
+  evidence: []
+  classification: *t07_internal
+- asset_id: MODULE-T07-PROVIDER-SMOKE-TRANSPORT-001
+  record_version: '1.0'
+  asset_type: script
+  purpose: Bounded provider transport, pacing, credential isolation, immutable sink, failure handling and Raptor-tail recovery implementation.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-07-24'
+  truth_owner: TASK-07
+  location:
+    kind: git_path
+    logical_uri: repo://src/solana_alpha_lab/provider_smoke_transport.py
+    repository_path: src/solana_alpha_lab/provider_smoke_transport.py
+  integrity:
+    kind: sha256
+    sha256: 435f7a62680309b0c0fb18772322d98af51df34666b37749146986bdbcdb3cca
+  access: *t07_read_file
+  relations:
+  - relation_type: depends_on
+    target_asset_id: CONTRACT-T07-PROVIDER-SMOKE-TRANSPORT-001
+  - relation_type: depends_on
+    target_asset_id: MODULE-T07-PROVIDER-SMOKE-001
+  - relation_type: depends_on
+    target_asset_id: MODULE-T06-STORAGE-API-001
+  - relation_type: validated_by
+    target_asset_id: TEST-T07-PROVIDER-SMOKE-TRANSPORT-001
+  consumers:
+  - TASK-07
+  evidence: []
+  classification: *t07_internal
+- asset_id: FIXTURE-T07-PROVIDER-SMOKE-CONTRACT-001
+  record_version: '1.0'
+  asset_type: evidence
+  purpose: Sanitized frozen case, attempt, provider-policy, dynamic-binding and prohibited-response fixture for offline contract tests.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-07-24'
+  truth_owner: TASK-07
+  location:
+    kind: git_path
+    logical_uri: repo://tests/fixtures/task07/provider_smoke_contract_v1.json
+    repository_path: tests/fixtures/task07/provider_smoke_contract_v1.json
+  integrity:
+    kind: sha256
+    sha256: 82c0b1b551ba46684941c4ac914b6c5d230948897db7839fbc4bdc51f9df1ec3
+  access: *t07_read_file
+  relations:
+  - relation_type: derived_from
+    target_asset_id: PRE-GIT-TASK01-A023
+  - relation_type: validated_by
+    target_asset_id: TEST-T07-PROVIDER-SMOKE-001
+  consumers:
+  - TASK-07
+  evidence: []
+  classification: *t07_internal
+- asset_id: FIXTURE-T07-PROVIDER-SMOKE-EVIDENCE-001
+  record_version: '1.0'
+  asset_type: evidence
+  purpose: Portable sanitized 35-attempt metadata fixture preserving source and accepted classifications, timestamps and content hashes without raw bodies.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-07-24'
+  truth_owner: TASK-07
+  location:
+    kind: git_path
+    logical_uri: repo://tests/fixtures/task07/provider_smoke_live_evidence_v1.json
+    repository_path: tests/fixtures/task07/provider_smoke_live_evidence_v1.json
+  integrity:
+    kind: sha256
+    sha256: efc95a74868a8868501051ea64216e18788eafa15e226d872ac9695e24b60668
+  access: *t07_read_file
+  relations:
+  - relation_type: derived_from
+    target_asset_id: FIXTURE-T07-PROVIDER-SMOKE-CONTRACT-001
+  - relation_type: validated_by
+    target_asset_id: TEST-T07-PROVIDER-SMOKE-EVIDENCE-001
+  consumers:
+  - TASK-07
+  evidence: []
+  classification: *t07_internal
+- asset_id: TEST-T07-PROVIDER-SMOKE-001
+  record_version: '1.0'
+  asset_type: script
+  purpose: Offline contract tests for frozen inventory, caps, pacing, dynamic bindings, redaction, terminal states and prohibited payloads.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-07-24'
+  truth_owner: TASK-07
+  location:
+    kind: git_path
+    logical_uri: repo://tests/test_task07_provider_smoke.py
+    repository_path: tests/test_task07_provider_smoke.py
+  integrity:
+    kind: sha256
+    sha256: 346e3264ce71204144c694049b056878f24b1454de8514458188f97db98e8b4c
+  access: *t07_read_file
+  relations:
+  - relation_type: depends_on
+    target_asset_id: MODULE-T07-PROVIDER-SMOKE-001
+  - relation_type: depends_on
+    target_asset_id: FIXTURE-T07-PROVIDER-SMOKE-CONTRACT-001
+  consumers:
+  - TASK-07
+  evidence: []
+  classification: *t07_internal
+- asset_id: TEST-T07-PROVIDER-SMOKE-EVIDENCE-001
+  record_version: '1.0'
+  asset_type: script
+  purpose: Fail-closed tests for accepted classification, provider failures, run roots, hashes, timestamps, sanitization and authority boundaries.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-07-24'
+  truth_owner: TASK-07
+  location:
+    kind: git_path
+    logical_uri: repo://tests/test_task07_provider_smoke_evidence.py
+    repository_path: tests/test_task07_provider_smoke_evidence.py
+  integrity:
+    kind: sha256
+    sha256: 497e2691b20a59d99705f963192657eea7a43761441e10df4251f8288b525735
+  access: *t07_read_file
+  relations:
+  - relation_type: depends_on
+    target_asset_id: FIXTURE-T07-PROVIDER-SMOKE-EVIDENCE-001
+  - relation_type: depends_on
+    target_asset_id: EVIDENCE-T07-PROVIDER-SMOKE-RECEIPT-001
+  consumers:
+  - TASK-07
+  evidence: []
+  classification: *t07_internal
+- asset_id: TEST-T07-PROVIDER-SMOKE-TRANSPORT-001
+  record_version: '1.0'
+  asset_type: script
+  purpose: Transport and recovery tests for exact request binding, credential isolation, no retry, immutable persistence and stop conditions.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-07-24'
+  truth_owner: TASK-07
+  location:
+    kind: git_path
+    logical_uri: repo://tests/test_task07_provider_smoke_transport.py
+    repository_path: tests/test_task07_provider_smoke_transport.py
+  integrity:
+    kind: sha256
+    sha256: 873cc1bc2d87aed083565e29bba8da32d856e9e195a98913fdfe688b8de1c291
+  access: *t07_read_file
+  relations:
+  - relation_type: depends_on
+    target_asset_id: MODULE-T07-PROVIDER-SMOKE-TRANSPORT-001
+  - relation_type: depends_on
+    target_asset_id: SCRIPT-T07-PROVIDER-SMOKE-LAUNCHER-001
+  consumers:
+  - TASK-07
+  evidence: []
+  classification: *t07_internal
+- asset_id: TEST-T07-CATALOG-001
+  record_version: '1.0'
+  asset_type: script
+  purpose: Catalog tests for exact TASK-07 stable IDs, file hashes, lineage, accepted checkpoint and no-raw-bytes boundary.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-07-24'
+  truth_owner: TASK-07
+  location:
+    kind: git_path
+    logical_uri: repo://tests/test_task07_catalog.py
+    repository_path: tests/test_task07_catalog.py
+  integrity:
+    kind: sha256
+    sha256: b1d63eb21de3844ee6f4a9a8a790f33bc4113b99393d455c47a999e4266e6e9d
+  access: *t07_read_file
+  relations:
+  - relation_type: depends_on
+    target_asset_id: CATALOG-ROOT-001
+  - relation_type: depends_on
+    target_asset_id: CATALOG-VALIDATOR-001
+  consumers:
+  - TASK-07
+  evidence: []
+  classification: *t07_internal

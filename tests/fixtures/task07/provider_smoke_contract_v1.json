@@ -1,0 +1,169 @@
+{
+  "fixture_id": "TASK07_PROVIDER_SMOKE_CONTRACT_V1",
+  "fixture_version": "1.0",
+  "frozen_spec_sha256": "a42c8a20dc31101ce134e277e1a612539f7161411ea8261bb109e5cc64d24ddc",
+  "runtime_evidence_as_of": "2026-07-24T03:42:09.018Z",
+  "expected_case_ids": [
+    "H01",
+    "H02",
+    "H03",
+    "H04",
+    "H05",
+    "H06",
+    "H07",
+    "H08",
+    "H09",
+    "H10",
+    "H11",
+    "H12",
+    "ST01",
+    "ST02",
+    "ST03",
+    "ST04",
+    "ST05",
+    "ST06",
+    "ST07",
+    "ST08",
+    "J01",
+    "J02",
+    "J03",
+    "J04",
+    "J05",
+    "J06",
+    "J07",
+    "J08",
+    "J09",
+    "R01",
+    "R02",
+    "R03",
+    "R04",
+    "R05"
+  ],
+  "expected_attempt_ids": [
+    "H01#1",
+    "H02#1",
+    "H03#1",
+    "H04#1",
+    "H05#1",
+    "H06#1",
+    "H07#1",
+    "H08#1",
+    "H09#1",
+    "H10#1",
+    "H11#1",
+    "H12#1",
+    "H12#2",
+    "ST01#1",
+    "ST02#1",
+    "ST03#1",
+    "ST04#1",
+    "ST05#1",
+    "ST06#1",
+    "ST07#1",
+    "ST08#1",
+    "J01#1",
+    "J02#1",
+    "J03#1",
+    "J04#1",
+    "J05#1",
+    "J06#1",
+    "J07#1",
+    "J08#1",
+    "J09#1",
+    "R01#1",
+    "R02#1",
+    "R03#1",
+    "R04#1",
+    "R05#1"
+  ],
+  "provider_policies": {
+    "HELIUS_RPC": {
+      "group": "HELIUS",
+      "minimum_interval_seconds": 0.2,
+      "account_required": true,
+      "credit_cap": 25
+    },
+    "HELIUS_WSS": {
+      "group": "HELIUS",
+      "minimum_interval_seconds": 0.2,
+      "account_required": true,
+      "credit_cap": 25
+    },
+    "SOLANA_TRACKER_DATA": {
+      "group": "SOLANA_TRACKER",
+      "minimum_interval_seconds": 0.4,
+      "account_required": true,
+      "credit_cap": null
+    },
+    "JUPITER_SWAP": {
+      "group": "JUPITER",
+      "minimum_interval_seconds": 2.2,
+      "account_required": false,
+      "credit_cap": null
+    },
+    "RAPTOR_HOSTED": {
+      "group": "RAPTOR",
+      "minimum_interval_seconds": 1.0,
+      "account_required": false,
+      "credit_cap": null
+    }
+  },
+  "public_and_dynamic_bindings": {
+    "frozen": [
+      "RAPTOR_PROGRAM",
+      "SYSTEM_PROGRAM",
+      "USDC_MINT",
+      "WSOL_MINT"
+    ],
+    "producers": {
+      "RAPTOR_RECENT_SIGNATURE": "H08",
+      "RECENT_PUMP_DECIMALS": "ST06",
+      "RECENT_PUMP_MINT": "ST03"
+    },
+    "derived": {
+      "RECENT_PUMP_SELL_AMOUNT_ATOMIC": "max(1, 10 ** RECENT_PUMP_DECIMALS)"
+    }
+  },
+  "sample_bindings": {
+    "RAPTOR_RECENT_SIGNATURE": "1111111111111111111111111111111111111111111111111111111111111111",
+    "RECENT_PUMP_MINT": "So11111111111111111111111111111111111111112",
+    "RECENT_PUMP_DECIMALS": 6
+  },
+  "response_samples": {
+    "quote_without_transaction": {
+      "inputMint": "So11111111111111111111111111111111111111112",
+      "outputMint": "EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v",
+      "outAmount": "1000000",
+      "transaction": null
+    },
+    "typed_quote_error": {
+      "errorCode": "NO_ROUTES_FOUND",
+      "errorMessage": "No routes found",
+      "transaction": ""
+    },
+    "prohibited_transaction": {
+      "outAmount": "1000000",
+      "transaction": "BASE64_SYNTHETIC_TRANSACTION_BYTES"
+    },
+    "prohibited_payment": {
+      "errorCode": "PAYMENT_REQUIRED",
+      "paymentRecipient": "synthetic-recipient",
+      "x402": {
+        "amount": "1"
+      }
+    },
+    "secret_bearing_success": {
+      "result": {
+        "authorization": "Bearer SYNTHETIC_SECRET_VALUE_12345",
+        "slot": 123
+      }
+    }
+  },
+  "timestamps": {
+    "event_time": "2026-07-24T04:00:00Z",
+    "observed_at": "2026-07-24T04:00:01Z",
+    "available_to_strategy_at": "2026-07-24T04:00:02Z",
+    "first_reliable_available_at": "2026-07-24T04:00:02Z",
+    "ingested_at": "2026-07-24T04:00:03Z"
+  }
+}

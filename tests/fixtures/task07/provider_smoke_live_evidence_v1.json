@@ -1,0 +1,156 @@
+{
+  "fixture_id": "TASK07_PROVIDER_SMOKE_LIVE_EVIDENCE_V1",
+  "fixture_version": "1.0",
+  "task_id": "TASK-07",
+  "source_contracts": {
+    "runtime_contract": {
+      "path": "docs/contracts/provider_smoke_runtime_contract_v1.md",
+      "sha256": "f30025168be49079566fc9b4dd32875dee53003e63963e5437a405322c021ba3"
+    },
+    "transport_contract": {
+      "path": "docs/contracts/provider_smoke_transport_contract_v1.md",
+      "sha256": "6b856106fad2c2cd4bfff2fdde5e5cf0c11d2cf9ef9cf16484f219d166637ef3"
+    },
+    "frozen_contract_fixture": {
+      "path": "tests/fixtures/task07/provider_smoke_contract_v1.json",
+      "sha256": "82c0b1b551ba46684941c4ac914b6c5d230948897db7839fbc4bdc51f9df1ec3",
+      "frozen_spec_sha256": "a42c8a20dc31101ce134e277e1a612539f7161411ea8261bb109e5cc64d24ddc"
+    }
+  },
+  "raw_runs": [
+    {
+      "run_id": "t07a4b-20260724T132144Z",
+      "logical_root": "data/raw/task07_provider_smoke_v1/run=t07a4b-20260724T132144Z",
+      "attempt_count": 33,
+      "file_count": 99,
+      "raw_file_bytes": 466676,
+      "response_bytes": 48777,
+      "fileset_sha256": "cbf9d931a9337c67bceeb83887e8eca3fd326050f81266443f31cb3aeaffbf0c",
+      "first_response_complete_at": "2026-07-24T16:21:45.620648+03:00",
+      "last_response_complete_at": "2026-07-24T16:22:23.014426+03:00"
+    },
+    {
+      "run_id": "t07a4b-20260724T135632Z",
+      "logical_root": "data/raw/task07_provider_smoke_v1/run=t07a4b-20260724T135632Z",
+      "attempt_count": 2,
+      "file_count": 6,
+      "raw_file_bytes": 22738,
+      "response_bytes": 827,
+      "fileset_sha256": "729922dbf54b1b8e229119d65a11b2a69cc7283460335c5e1fa4c2bab61ea92c",
+      "first_response_complete_at": "2026-07-24T16:56:32.487643+03:00",
+      "last_response_complete_at": "2026-07-24T16:56:33.569967+03:00"
+    }
+  ],
+  "attempt_field_order": [
+    "attempt_id",
+    "provider",
+    "source_run_id",
+    "source_terminal_class",
+    "accepted_terminal_class",
+    "source_error_class",
+    "accepted_error_class",
+    "status_code",
+    "response_size_bytes",
+    "response_complete_at",
+    "response_content_sha256"
+  ],
+  "attempt_rows": [
+    ["H01#1", "HELIUS_RPC", "t07a4b-20260724T132144Z", "SUCCESS", "SUCCESS", null, null, 200, 44, "2026-07-24T16:21:45.620648+03:00", "f262d9668884e977aeb142bd3e992c36d9d5852e9747b4e5c38ed2ef2a474993"],
+    ["H02#1", "HELIUS_RPC", "t07a4b-20260724T132144Z", "SUCCESS", "SUCCESS", null, null, 200, 88, "2026-07-24T16:21:46.667402+03:00", "2d9d5eb18c97a5f3e0a58e50251bc478f448275c46aa87f9cd3baab0015aee78"],
+    ["H03#1", "HELIUS_RPC", "t07a4b-20260724T132144Z", "SUCCESS", "SUCCESS", null, null, 200, 49, "2026-07-24T16:21:47.74231+03:00", "c0a55b009249020528ff34eda324f529f87811af5bdf30f1de1410b5024f69c8"],
+    ["H04#1", "HELIUS_RPC", "t07a4b-20260724T132144Z", "SUCCESS", "SUCCESS", null, null, 200, 49, "2026-07-24T16:21:48.623301+03:00", "7375c29e372ffee1f5dc54f396d5f0c36b63372bb695358a2fb39b928af2e817"],
+    ["H05#1", "HELIUS_RPC", "t07a4b-20260724T132144Z", "SUCCESS", "SUCCESS", null, null, 200, 193, "2026-07-24T16:21:49.611258+03:00", "6ef5cdf8b23c6f13d100b89c8b0b97a6a94dc0c1055dc6fb2f8378b4468e0bb9"],
+    ["H06#1", "HELIUS_RPC", "t07a4b-20260724T132144Z", "SUCCESS", "SUCCESS", null, null, 200, 376, "2026-07-24T16:21:50.713788+03:00", "e6d164fc807555653c8ea20f829df6730b33df02b6dd07aab0694d8a4d5427cc"],
+    ["H07#1", "HELIUS_RPC", "t07a4b-20260724T132144Z", "SUCCESS", "SUCCESS", null, null, 200, 163, "2026-07-24T16:21:51.699227+03:00", "c7de751b0a178a61c23d6028fe58fc3288d33b31dda831b8cebcd9a36e478e3f"],
+    ["H08#1", "HELIUS_RPC", "t07a4b-20260724T132144Z", "SUCCESS", "SUCCESS", null, null, 200, 479, "2026-07-24T16:21:52.792097+03:00", "07a49ea171c2152030c5ade210692f0c705228510465c03ea827094d934586c8"],
+    ["H09#1", "HELIUS_RPC", "t07a4b-20260724T132144Z", "SUCCESS", "SUCCESS", null, null, 200, 15141, "2026-07-24T16:21:53.886864+03:00", "5be6a65f7bbd8090bc99d2a66512fd0190d72b9f4f682e7dc986fbf716f17f51"],
+    ["H10#1", "HELIUS_RPC", "t07a4b-20260724T132144Z", "SUCCESS", "SUCCESS", null, null, 200, 6191, "2026-07-24T16:21:55.034397+03:00", "dcfe4c182c385ba4c4ac1e746af0a7e3af13cee428e36a3921a9ed020c0c6616"],
+    ["H11#1", "HELIUS_RPC", "t07a4b-20260724T132144Z", "INVALID_REQUEST", "INVALID_REQUEST", "json_rpc_typed_error", "json_rpc_typed_error", 200, 98, "2026-07-24T16:21:56.000986+03:00", "7c4b183c008948de54b2a94558d278e3fd0d7fb73bff59b9bd54b6a2bc60355b"],
+    ["H12#1", "HELIUS_WSS", "t07a4b-20260724T132144Z", "SUCCESS", "SUCCESS", null, null, 101, 489, "2026-07-24T16:21:58.089366+03:00", "a1b98961634f112ef032e9b448d98040ae646124457ae17e9ec3044f14f461c3"],
+    ["H12#2", "HELIUS_WSS", "t07a4b-20260724T132144Z", "SUCCESS", "SUCCESS", null, null, 101, 44, "2026-07-24T16:21:58.414042+03:00", "eab230fa46f8239bfdac8441e6a3d88840a8ccb5621fd924a3eedf9a70cf7be7"],
+    ["ST01#1", "SOLANA_TRACKER_DATA", "t07a4b-20260724T132144Z", "SUCCESS", "SUCCESS", null, null, 200, 1053, "2026-07-24T16:21:59.058325+03:00", "5c7c1163679161a1752772ad46fe0ea8fa0148822bb06d22fd2cdd6a40e77238"],
+    ["ST02#1", "SOLANA_TRACKER_DATA", "t07a4b-20260724T132144Z", "SUCCESS", "SUCCESS", null, null, 200, 1146, "2026-07-24T16:21:59.484923+03:00", "f25036fefeb12c05449a617f5ccb72c4fee6da6928729980c022a7319adde828"],
+    ["ST03#1", "SOLANA_TRACKER_DATA", "t07a4b-20260724T132144Z", "SUCCESS", "SUCCESS", null, null, 200, 3409, "2026-07-24T16:22:00.080719+03:00", "f41c32d66a768a729d780b132776e63f1ec401b5d55fbdad4211e013a0de9d26"],
+    ["ST04#1", "SOLANA_TRACKER_DATA", "t07a4b-20260724T132144Z", "SUCCESS", "SUCCESS", null, null, 200, 3487, "2026-07-24T16:22:00.396215+03:00", "33a09f56c224a137045e83b89bc5d7d823debe5afbf197499c6e0f57e083138a"],
+    ["ST05#1", "SOLANA_TRACKER_DATA", "t07a4b-20260724T132144Z", "SUCCESS", "SUCCESS", null, null, 200, 93, "2026-07-24T16:22:00.797287+03:00", "3fdc80447c9f21a36742834d8217f82bb7e4a00e68b22d6d4d9c57cda6643dd5"],
+    ["ST06#1", "SOLANA_TRACKER_DATA", "t07a4b-20260724T132144Z", "SUCCESS", "SUCCESS", null, null, 200, 3074, "2026-07-24T16:22:01.188532+03:00", "162e4315e4fd1e41a1aeb907748cfa7c6d81b709bc3563efad43b2979fae8d3f"],
+    ["ST07#1", "SOLANA_TRACKER_DATA", "t07a4b-20260724T132144Z", "SUCCESS", "SUCCESS", null, null, 200, 176, "2026-07-24T16:22:01.624731+03:00", "e268ecbd8ac41c933dd98d97eacac7b3835a9a83518808c261d3a9e2402d1628"],
+    ["ST08#1", "SOLANA_TRACKER_DATA", "t07a4b-20260724T132144Z", "SUCCESS", "SUCCESS", null, null, 200, 1036, "2026-07-24T16:22:02.039079+03:00", "74a2cf132c2dba88be5d79df4010e70d3f0fba27632fc9ad878d92d78b34c0f1"],
+    ["J01#1", "JUPITER_SWAP", "t07a4b-20260724T132144Z", "SUCCESS", "SUCCESS", null, null, 200, 1244, "2026-07-24T16:22:03.192732+03:00", "d9683fb40c413c1eab12ca8cd9ae06ca466e299373c34ba0f38990649cf47804"],
+    ["J02#1", "JUPITER_SWAP", "t07a4b-20260724T132144Z", "SUCCESS", "SUCCESS", null, null, 200, 1248, "2026-07-24T16:22:05.263593+03:00", "019d3af81b9392a7ef22b079ef169d26f5b41414c246bbffe428df8a57b6f6df"],
+    ["J03#1", "JUPITER_SWAP", "t07a4b-20260724T132144Z", "SUCCESS", "SUCCESS", null, null, 200, 1249, "2026-07-24T16:22:07.475739+03:00", "25a1f262b58f743a68109e0c20e9feb2feb7ef5dbdd86c86cecbed4509c9d90c"],
+    ["J04#1", "JUPITER_SWAP", "t07a4b-20260724T132144Z", "SUCCESS", "SUCCESS", null, null, 200, 1251, "2026-07-24T16:22:09.757117+03:00", "0799a5c36392b304ea663519be981d1c6a17d61e1f240275118e0960dfd82d21"],
+    ["J05#1", "JUPITER_SWAP", "t07a4b-20260724T132144Z", "SUCCESS", "SUCCESS", null, null, 200, 1250, "2026-07-24T16:22:11.932625+03:00", "c3a5020a2dcbf6171c7fed0bb8cb72a7be824af35f1aa2b9cf582457baf671da"],
+    ["J06#1", "JUPITER_SWAP", "t07a4b-20260724T132144Z", "SUCCESS", "SUCCESS", null, null, 200, 1564, "2026-07-24T16:22:14.186842+03:00", "68d6356957b91fb23d356656a85a4a3ccb9770ad8fc2c1d876af709116bdf3a0"],
+    ["J07#1", "JUPITER_SWAP", "t07a4b-20260724T132144Z", "SUCCESS", "SUCCESS", null, null, 200, 1262, "2026-07-24T16:22:16.278714+03:00", "7a21be606d6b3a5afd77f8466759779240633710088e9bd7a9de131a0e2208f6"],
+    ["J08#1", "JUPITER_SWAP", "t07a4b-20260724T132144Z", "SUCCESS", "SUCCESS", null, null, 200, 1244, "2026-07-24T16:22:18.476489+03:00", "cc8a960b34812f760f2e3e1f56eeb63c482835cdc08ea18c58e9d6502a782985"],
+    ["J09#1", "JUPITER_SWAP", "t07a4b-20260724T132144Z", "PROVIDER_5XX", "PROVIDER_5XX", "http_500", "http_500", 500, 41, "2026-07-24T16:22:20.722151+03:00", "9b40358fa1b67b88de22a9e319bd43915cbed82981ab50c97760ce7b7878f80a"],
+    ["R01#1", "RAPTOR_HOSTED", "t07a4b-20260724T132144Z", "MALFORMED_PAYLOAD", "SUCCESS", "response_not_json", null, 200, 2, "2026-07-24T16:22:21.301964+03:00", "565339bc4d33d72817b583024112eb7f5cdf3e5eef0252d6ec1b9c9a94e12bb3"],
+    ["R02#1", "RAPTOR_HOSTED", "t07a4b-20260724T132144Z", "SCHEMA_DRIFT", "SUCCESS", "quote_output_amount_invalid", null, 200, 771, "2026-07-24T16:22:21.975534+03:00", "a0958d7a03c7f7768660821554bff48e9f4cc4255dada159e71225d1e9ffbfab"],
+    ["R03#1", "RAPTOR_HOSTED", "t07a4b-20260724T132144Z", "SCHEMA_DRIFT", "SUCCESS", "quote_output_amount_invalid", null, 200, 773, "2026-07-24T16:22:23.014426+03:00", "01174e97fed6ec19f0b0fc990f57676c4fb5a6fb7b38b224e77131dc08a790f2"],
+    ["R04#1", "RAPTOR_HOSTED", "t07a4b-20260724T135632Z", "SUCCESS", "SUCCESS", null, null, 200, 759, "2026-07-24T16:56:32.487643+03:00", "782ba08121ebe0b8aa67bcab32efe8f115be9a738ef5e3b96c43263a756a5561"],
+    ["R05#1", "RAPTOR_HOSTED", "t07a4b-20260724T135632Z", "PROVIDER_5XX", "PROVIDER_5XX", "http_500", "http_500", 500, 68, "2026-07-24T16:56:33.569967+03:00", "edeca6672a22aed68dc427de5bfac652a99e5a376493b88a41a435310f4437b8"]
+  ],
+  "accepted_reclassifications": [
+    {
+      "attempt_id": "R01#1",
+      "from": ["MALFORMED_PAYLOAD", "response_not_json"],
+      "to": ["SUCCESS", null],
+      "basis": "Raptor health contract accepts the exact text response OK."
+    },
+    {
+      "attempt_id": "R02#1",
+      "from": ["SCHEMA_DRIFT", "quote_output_amount_invalid"],
+      "to": ["SUCCESS", null],
+      "basis": "Raptor quote contract uses the provider-specific amountOut field."
+    },
+    {
+      "attempt_id": "R03#1",
+      "from": ["SCHEMA_DRIFT", "quote_output_amount_invalid"],
+      "to": ["SUCCESS", null],
+      "basis": "Raptor quote contract uses the provider-specific amountOut field."
+    }
+  ],
+  "aggregate": {
+    "attempt_count": 35,
+    "source_terminal_counts": {
+      "SUCCESS": 29,
+      "INVALID_REQUEST": 1,
+      "PROVIDER_5XX": 2,
+      "MALFORMED_PAYLOAD": 1,
+      "SCHEMA_DRIFT": 2
+    },
+    "accepted_terminal_counts": {
+      "SUCCESS": 32,
+      "INVALID_REQUEST": 1,
+      "PROVIDER_5XX": 2
+    },
+    "provider_attempt_counts": {
+      "HELIUS_RPC": 11,
+      "HELIUS_WSS": 2,
+      "SOLANA_TRACKER_DATA": 8,
+      "JUPITER_SWAP": 9,
+      "RAPTOR_HOSTED": 5
+    },
+    "response_bytes": 49604,
+    "network_attempts_in_source_runs": 35,
+    "retries": 0,
+    "modeled_helius_credits": 15,
+    "cash_spend_usd": 0,
+    "persistent_credentials_created": 0,
+    "wallet_signer_transaction_actions": 0
+  },
+  "sanitization": {
+    "response_bodies_in_fixture": 0,
+    "request_values_in_fixture": 0,
+    "headers_in_fixture": 0,
+    "credentials_in_fixture": 0,
+    "absolute_paths_in_fixture": 0
+  },
+  "limitations": [
+    "R05 remains PROVIDER_5XX/http_500 evidence; it is not NO_ROUTE, zero, or a successful response.",
+    "A successful quote response is not evidence of a fill, executable realized VWAP, or net return.",
+    "Raptor hosted beta is an optional research source with no accepted production SLA.",
+    "Raw response bodies remain in the ignored immutable local raw runs and are not required to validate this fixture."
+  ]
+}
