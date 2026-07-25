@@ -361,6 +361,163 @@ class RepositoryStatePolicyTests(unittest.TestCase):
         arguments.update(overrides)
         return module.classify_state(**arguments)
 
+    def classify_task08_atom8a(self, **overrides: object) -> str:
+        arguments = {
+            "head_oid": module.TASK08_BASE_COMMIT_OID,
+            "commit_count": module.TASK08_BASE_COMMIT_COUNT,
+            "parent_oid": module.TASK08_BASE_PARENT_OID,
+            "tracked": module.task08_repository_files(),
+            "staged": set(module.TASK08_CHANGED_FILES),
+            "untracked": set(),
+            "unstaged": set(),
+            "commit_subject": module.TASK07_COMMIT_SUBJECT,
+            "commit_changed": set(module.TASK07_CHANGED_FILES),
+        }
+        arguments.update(overrides)
+        return module.classify_state(**arguments)
+
+    def classify_task08_atom8b(self, **overrides: object) -> str:
+        arguments = {
+            "head_oid": "1" * 40,
+            "commit_count": module.TASK08_COMMIT_COUNT,
+            "parent_oid": module.TASK08_BASE_COMMIT_OID,
+            "tracked": module.task08_repository_files(),
+            "staged": set(),
+            "untracked": set(),
+            "unstaged": set(),
+            "commit_subject": module.TASK08_COMMIT_SUBJECT,
+            "commit_changed": set(module.TASK08_CHANGED_FILES),
+        }
+        arguments.update(overrides)
+        return module.classify_state(**arguments)
+
+    def test_task08_atom8a_exact_staged_state_passes(self) -> None:
+        self.assertEqual(
+            self.classify_task08_atom8a(),
+            "TASK08_ATOM8A_CANDIDATE_STAGED",
+        )
+
+    def test_task08_atom8a_state_is_fail_closed(self) -> None:
+        missing = set(module.TASK08_CHANGED_FILES)
+        missing.remove("tests/test_task08_catalog.py")
+        cases = (
+            {"staged": missing},
+            {
+                "staged":
+                set(module.TASK08_CHANGED_FILES) | {"unexpected.txt"}
+            },
+            {"untracked": {"unexpected.txt"}},
+            {"unstaged": {"catalog/assets/core.yaml"}},
+            {"parent_oid": module.TASK07_BASE_PARENT_OID},
+            {
+                "commit_changed":
+                set(module.TASK07_CHANGED_FILES)
+                - {"tests/test_task07_provider_smoke_transport.py"}
+            },
+        )
+        for overrides in cases:
+            with self.subTest(overrides=overrides):
+                self.assertEqual(
+                    self.classify_task08_atom8a(**overrides),
+                    "INVALID_REPOSITORY_STATE",
+                )
+
+    def test_task08_future_commit_has_no_self_oid_pin(self) -> None:
+        for future_oid in ("1" * 40, "2" * 40):
+            with self.subTest(future_oid=future_oid):
+                self.assertEqual(
+                    self.classify_task08_atom8b(head_oid=future_oid),
+                    "TASK08_ATOM8B_CANDIDATE_COMMITTED",
+                )
+
+    def test_task08_future_commit_contract_is_fail_closed(self) -> None:
+        cases = {
+            "head_oid": module.TASK08_BASE_COMMIT_OID,
+            "commit_count": module.TASK08_BASE_COMMIT_COUNT,
+            "parent_oid": module.TASK08_BASE_PARENT_OID,
+            "commit_subject": "feat: arbitrary lifecycle probe",
+            "commit_changed":
+                set(module.TASK08_CHANGED_FILES)
+                - {"tests/test_task08_catalog.py"},
+            "staged": set(module.TASK08_CHANGED_FILES),
+            "untracked": {"unexpected.txt"},
+            "unstaged": {"catalog/assets/core.yaml"},
+        }
+        for key, value in cases.items():
+            with self.subTest(key=key):
+                self.assertEqual(
+                    self.classify_task08_atom8b(**{key: value}),
+                    "INVALID_REPOSITORY_STATE",
+                )
+
+    def test_task08_policy_constants_are_exact(self) -> None:
+        self.assertEqual(
+            module.TASK08_BASE_COMMIT_OID,
+            "03731b647ca4d47283a2dcb4154622865b606327",
+        )
+        self.assertEqual(
+            module.TASK08_BASE_TREE_OID,
+            "0462d283a5b0a6a1c0a6eab63b2e7e8463757522",
+        )
+        self.assertEqual(module.TASK08_BASE_COMMIT_COUNT, 19)
+        self.assertEqual(module.TASK08_BASE_FILE_COUNT, 142)
+        self.assertEqual(
+            module.TASK08_MODIFIED_FILES,
+            {
+                "catalog/assets/core.yaml",
+                "catalog/assets/lifecycle.yaml",
+                "catalog/catalog_manifest.yaml",
+                "catalog/generated/asset_edges.json",
+                "docs/PROJECT_MAP.md",
+                "scripts/validate_baseline.py",
+                "scripts/validate_task04.py",
+                "tests/test_baseline.py",
+                "tests/test_catalog.py",
+                "tests/test_task04_core_stack.py",
+                "tests/test_task05_catalog_queries.py",
+                "tests/test_task06_catalog.py",
+                "tests/test_task07_catalog.py",
+            },
+        )
+        self.assertEqual(
+            module.TASK08_CREATED_FILES,
+            {
+                "docs/contracts/lifecycle_discovery_contract_v1.md",
+                "docs/contracts/lifecycle_discovery_probe_transport_contract_v1.md",
+                "docs/evidence/task08/"
+                "lifecycle_discovery_probe_execution_receipt_v1.json",
+                "docs/evidence/task08/"
+                "lifecycle_discovery_probe_execution_summary_v1.md",
+                "scripts/run_task08_lifecycle_discovery_probe.py",
+                "src/solana_alpha_lab/lifecycle_discovery.py",
+                "src/solana_alpha_lab/lifecycle_discovery_transport.py",
+                "src/solana_alpha_lab/pump_event_decoder.py",
+                "tests/fixtures/task08/lifecycle_discovery_contract_v1.json",
+                "tests/fixtures/task08/"
+                "lifecycle_discovery_probe_live_evidence_v1.json",
+                "tests/fixtures/task08/pump_event_idl_subset_v1.json",
+                "tests/test_task08_catalog.py",
+                "tests/test_task08_lifecycle_discovery.py",
+                "tests/test_task08_lifecycle_discovery_probe_evidence.py",
+                "tests/test_task08_lifecycle_discovery_transport.py",
+                "tests/test_task08_pump_event_decoder.py",
+            },
+        )
+        self.assertEqual(len(module.TASK08_CHANGED_FILES), 29)
+        self.assertEqual(module.TASK08_EXPECTED_REPOSITORY_FILE_COUNT, 158)
+        self.assertEqual(module.TASK08_COMMIT_COUNT, 20)
+        self.assertEqual(
+            module.TASK08_COMMIT_SUBJECT,
+            "feat: add TASK-08 lifecycle discovery probe",
+        )
+        self.assertEqual(module.TASK08_EXPECTED_CATALOG_VERSION, "0.7.0")
+        self.assertEqual(module.TASK08_EXPECTED_CATALOG_ASSET_COUNT, 158)
+        self.assertEqual(module.TASK08_EXPECTED_CATALOG_QUERY_COUNT, 7)
+        self.assertEqual(
+            module.IGNORED_REPOSITORY_PREFIXES,
+            {"data/raw"},
+        )
+
     def test_task07_atom6a_exact_staged_state_passes(self) -> None:
         self.assertEqual(
             self.classify_task07_atom6a(),

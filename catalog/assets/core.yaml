@@ -1,6 +1,6 @@
 schema_version: '1.1'
 registry_id: CATALOG-ASSET-REGISTRY-CORE-001
-as_of: '2026-07-24'
+as_of: '2026-07-25'
 records:
 - asset_id: SCM-BASELINE-COMMIT-001
   record_version: '1.0'
@@ -519,12 +519,12 @@ records:
   evidence: []
   classification: *t06_internal
 - asset_id: TEST-T06-CATALOG-001
-  record_version: '1.2'
+  record_version: '1.3'
   asset_type: script
   purpose: Catalog tests for the exact TASK-06 stable-ID inventory, hashes, ownership, finalization handoff, consumers and no-raw-bytes boundary.
   status: IMPLEMENTED_UNVERIFIED
   origin: REPOSITORY
-  as_of: '2026-07-24'
+  as_of: '2026-07-25'
   truth_owner: TASK-06
   location:
     kind: git_path
@@ -532,7 +532,7 @@ records:
     repository_path: tests/test_task06_catalog.py
   integrity:
     kind: sha256
-    sha256: c8ea380b36048a3922c17f9ccb8d80f25865c360017bcf4cf58617555a14cc91
+    sha256: 4aa21951223bb4dc5a1a06ba680920b3a685059f95bd7a4be6ccc5fa7b36fd7f
   access: *t06_read_file
   relations:
   - relation_type: governed_by
@@ -1942,13 +1942,13 @@ records:
     contains_raw_data: false
     sensitivity: INTERNAL_NON_SECRET
 - asset_id: TEST-T04-CORE-STACK-001
-  record_version: '1.5'
+  record_version: '1.6'
   asset_type: script
   purpose: Offline end-to-end Parquet, DuckDB and immutable migration-ledger replay
     plus negative contract tests for the TASK-04 core stack candidate.
   status: IMPLEMENTED_UNVERIFIED
   origin: REPOSITORY
-  as_of: '2026-07-24'
+  as_of: '2026-07-25'
   truth_owner: TASK-04
   location:
     kind: git_path
@@ -1956,7 +1956,7 @@ records:
     repository_path: tests/test_task04_core_stack.py
   integrity:
     kind: sha256
-    sha256: 39ea5900b60c1bcec559934c2067e828886de51a322f4d84018c7ae2ef6c2624
+    sha256: 29f23c353cea725c298319b5bef76561f4fa26214b4fcff053269dac60a4306f
   access:
     mode: read_only
     method: command
@@ -1975,13 +1975,13 @@ records:
     contains_raw_data: false
     sensitivity: INTERNAL_NON_SECRET
 - asset_id: VALIDATOR-T04-ARCHITECTURE-001
-  record_version: '1.5'
+  record_version: '1.6'
   asset_type: script
   purpose: Fail-closed TASK-04 replay, architecture, matrix, registry, dependency,
     evidence and SBOM validator.
   status: IMPLEMENTED_UNVERIFIED
   origin: REPOSITORY
-  as_of: '2026-07-24'
+  as_of: '2026-07-25'
   truth_owner: TASK-04
   location:
     kind: git_path
@@ -1989,7 +1989,7 @@ records:
     repository_path: scripts/validate_task04.py
   integrity:
     kind: sha256
-    sha256: af2f308096faf24e01bbd98156c417fdb60add4da05cdf26faec87baf0e98e6d
+    sha256: b796ebff8c7cba19a062e8e8b025279bb1fb384ed19765c7ba3eeab2e566c184
   access:
     mode: read_only
     method: command
@@ -2009,13 +2009,13 @@ records:
     contains_raw_data: false
     sensitivity: INTERNAL_NON_SECRET
 - asset_id: VALIDATOR-REPOSITORY-STATE-001
-  record_version: '1.7'
+  record_version: '1.8'
   asset_type: script
-  purpose: Fail-closed historical, TASK-05/TASK-06 and exact TASK-07
-    staged/committed repository-state validator.
+  purpose: Fail-closed historical and exact through-TASK-08 staged/committed
+    repository-state validator.
   status: IMPLEMENTED_UNVERIFIED
   origin: REPOSITORY
-  as_of: '2026-07-24'
+  as_of: '2026-07-25'
   truth_owner: TASK-04
   location:
     kind: git_path
@@ -2023,7 +2023,7 @@ records:
     repository_path: scripts/validate_baseline.py
   integrity:
     kind: sha256
-    sha256: ab166b40a7e4d7ed6dc74bbb2e7afc81f692be277db16a04bb89e2d05e2c3c03
+    sha256: 2fd5a23a9d17564bbca9923dc24a4998201511f1fc00a0f18b31fe926698d2c1
   access:
     mode: read_only
     method: command
@@ -2043,6 +2043,7 @@ records:
   - TASK-05
   - TASK-06
   - TASK-07
+  - TASK-08
   evidence: []
   classification:
     contains_secrets: false
@@ -2532,12 +2533,12 @@ records:
     contains_raw_data: false
     sensitivity: INTERNAL_NON_SECRET
 - asset_id: TEST-T05-CATALOG-QUERIES-001
-  record_version: '1.4'
+  record_version: '1.5'
   asset_type: script
   purpose: 'Offline tests proving TASK-05 query bounds, UTC eligibility, write denial, external-access denial, raw BLOB exclusion and exact task/data-contract Catalog registration.'
   status: IMPLEMENTED_UNVERIFIED
   origin: REPOSITORY
-  as_of: '2026-07-24'
+  as_of: '2026-07-25'
   truth_owner: TASK-05
   location:
     kind: git_path
@@ -2545,7 +2546,7 @@ records:
     repository_path: tests/test_task05_catalog_queries.py
   integrity:
     kind: sha256
-    sha256: 224cff66ae793dd424b6bf72333421bb0f794e3ca1b06d7aff1d1d438e2dba6c
+    sha256: 5a54745592f4d0eabd624810397b26b3fb1c9d5048030b21b42d7d6994912f9f
   access:
     mode: read_only
     method: command
@@ -3407,12 +3408,12 @@ records:
   evidence: []
   classification: *t07_internal
 - asset_id: TEST-T07-CATALOG-001
-  record_version: '1.0'
+  record_version: '1.1'
   asset_type: script
   purpose: Catalog tests for exact TASK-07 stable IDs, file hashes, lineage, accepted checkpoint and no-raw-bytes boundary.
   status: IMPLEMENTED_UNVERIFIED
   origin: REPOSITORY
-  as_of: '2026-07-24'
+  as_of: '2026-07-25'
   truth_owner: TASK-07
   location:
     kind: git_path
@@ -3420,7 +3421,7 @@ records:
     repository_path: tests/test_task07_catalog.py
   integrity:
     kind: sha256
-    sha256: b1d63eb21de3844ee6f4a9a8a790f33bc4113b99393d455c47a999e4266e6e9d
+    sha256: 39dfee97be6d9bcf4134b901b41fc564e474e8fd21724f3785096dd9918bc965
   access: *t07_read_file
   relations:
   - relation_type: depends_on
@@ -3431,3 +3432,487 @@ records:
   - TASK-07
   evidence: []
   classification: *t07_internal
+- asset_id: CONTRACT-T08-LIFECYCLE-DISCOVERY-001
+  record_version: '1.0'
+  asset_type: control_document
+  purpose: Frozen unbiased Pump lifecycle universe, state, point-in-time timestamp, coverage, cadence, cap and cheapest-falsifier contract.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-07-25'
+  truth_owner: TASK-08
+  location:
+    kind: git_path
+    logical_uri: repo://docs/contracts/lifecycle_discovery_contract_v1.md
+    repository_path: docs/contracts/lifecycle_discovery_contract_v1.md
+  integrity:
+    kind: sha256
+    sha256: e8015fee12d4b6cda149837046cd6a36d00aff1658120c9eb28ae873152ac8c4
+  access: &t08_read_file
+    mode: read_only
+    method: file
+    network_required: false
+    secrets_required: false
+  relations:
+  - relation_type: depends_on
+    target_asset_id: CONTRACT-T05-DATA-001
+  - relation_type: derived_from
+    target_asset_id: PRE-GIT-TASK01-A019
+  - relation_type: validated_by
+    target_asset_id: TEST-T08-LIFECYCLE-DISCOVERY-001
+  consumers:
+  - TASK-08
+  - TASK-09
+  - TASK-11
+  - TASK-12
+  evidence: []
+  classification: &t08_internal
+    contains_secrets: false
+    contains_raw_data: false
+    sensitivity: INTERNAL_NON_SECRET
+- asset_id: CONTRACT-T08-LIFECYCLE-DISCOVERY-TRANSPORT-001
+  record_version: '1.1'
+  asset_type: control_document
+  purpose: Exact bounded Helius WSS/RPC and Solana Tracker transport, credential, receipt-time, immutable persistence, failure and zero-transaction contract.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-07-25'
+  truth_owner: TASK-08
+  location:
+    kind: git_path
+    logical_uri: repo://docs/contracts/lifecycle_discovery_probe_transport_contract_v1.md
+    repository_path: docs/contracts/lifecycle_discovery_probe_transport_contract_v1.md
+  integrity:
+    kind: sha256
+    sha256: b03f86ed7e8ecc3c161c871fd2ac2a61db753ee9d8a45c94b921e34af51d84dd
+  access: *t08_read_file
+  relations:
+  - relation_type: depends_on
+    target_asset_id: CONTRACT-T08-LIFECYCLE-DISCOVERY-001
+  - relation_type: depends_on
+    target_asset_id: CONTRACT-T06-RAW-STORAGE-001
+  - relation_type: derived_from
+    target_asset_id: PRE-GIT-TASK01-A023
+  - relation_type: validated_by
+    target_asset_id: TEST-T08-LIFECYCLE-DISCOVERY-TRANSPORT-001
+  - relation_type: evidenced_by
+    target_asset_id: EVIDENCE-T08-LIFECYCLE-DISCOVERY-RECEIPT-001
+  consumers:
+  - TASK-08
+  - TASK-12
+  evidence: []
+  classification: *t08_internal
+- asset_id: SCRIPT-T08-LIFECYCLE-DISCOVERY-PROBE-001
+  record_version: '1.0'
+  asset_type: script
+  purpose: Offline-by-default launcher for one authority-tripwired bounded lifecycle-discovery probe with hidden credentials and immutable TASK-06 storage.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-07-25'
+  truth_owner: TASK-08
+  location:
+    kind: git_path
+    logical_uri: repo://scripts/run_task08_lifecycle_discovery_probe.py
+    repository_path: scripts/run_task08_lifecycle_discovery_probe.py
+  integrity:
+    kind: sha256
+    sha256: a3fd03e11b053b8f1093ba1d87cb42f99b52b2bce5f15c41eb289e2cb3e86ab5
+  access: *t08_read_file
+  relations:
+  - relation_type: depends_on
+    target_asset_id: MODULE-T08-LIFECYCLE-DISCOVERY-001
+  - relation_type: depends_on
+    target_asset_id: MODULE-T08-LIFECYCLE-DISCOVERY-TRANSPORT-001
+  - relation_type: depends_on
+    target_asset_id: MODULE-T08-PUMP-EVENT-DECODER-001
+  - relation_type: validated_by
+    target_asset_id: TEST-T08-LIFECYCLE-DISCOVERY-TRANSPORT-001
+  consumers:
+  - TASK-08
+  - TASK-12
+  evidence: []
+  classification: *t08_internal
+- asset_id: MODULE-T08-LIFECYCLE-DISCOVERY-001
+  record_version: '1.0'
+  asset_type: script
+  purpose: Deterministic offline compiler and reducer for unbiased Pump lifecycle observations, typed failures, coverage gaps and point-in-time state.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-07-25'
+  truth_owner: TASK-08
+  location:
+    kind: git_path
+    logical_uri: repo://src/solana_alpha_lab/lifecycle_discovery.py
+    repository_path: src/solana_alpha_lab/lifecycle_discovery.py
+  integrity:
+    kind: sha256
+    sha256: 3834167b5a57d93bcec4468061240554d6d106e89f6f6820ae70c8ef569c1cd4
+  access: *t08_read_file
+  relations:
+  - relation_type: depends_on
+    target_asset_id: CONTRACT-T08-LIFECYCLE-DISCOVERY-001
+  - relation_type: depends_on
+    target_asset_id: SCHEMA-T05-PYDANTIC-BOUNDARIES-001
+  - relation_type: validated_by
+    target_asset_id: TEST-T08-LIFECYCLE-DISCOVERY-001
+  consumers:
+  - TASK-08
+  - TASK-09
+  - TASK-11
+  - TASK-12
+  evidence: []
+  classification: *t08_internal
+- asset_id: MODULE-T08-LIFECYCLE-DISCOVERY-TRANSPORT-001
+  record_version: '1.1'
+  asset_type: script
+  purpose: Bounded sequential provider transport with receipt-time WSS stamps, caps, typed failures, credential isolation and immutable raw finalization.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-07-25'
+  truth_owner: TASK-08
+  location:
+    kind: git_path
+    logical_uri: repo://src/solana_alpha_lab/lifecycle_discovery_transport.py
+    repository_path: src/solana_alpha_lab/lifecycle_discovery_transport.py
+  integrity:
+    kind: sha256
+    sha256: 5d82a54575ff1f4bb9d099ee23b8c139229ab7679eb336cabb631536f7e9e3f1
+  access: *t08_read_file
+  relations:
+  - relation_type: depends_on
+    target_asset_id: CONTRACT-T08-LIFECYCLE-DISCOVERY-TRANSPORT-001
+  - relation_type: depends_on
+    target_asset_id: MODULE-T08-LIFECYCLE-DISCOVERY-001
+  - relation_type: depends_on
+    target_asset_id: MODULE-T08-PUMP-EVENT-DECODER-001
+  - relation_type: depends_on
+    target_asset_id: MODULE-T06-STORAGE-API-001
+  - relation_type: validated_by
+    target_asset_id: TEST-T08-LIFECYCLE-DISCOVERY-TRANSPORT-001
+  consumers:
+  - TASK-08
+  - TASK-12
+  evidence: []
+  classification: *t08_internal
+- asset_id: MODULE-T08-PUMP-EVENT-DECODER-001
+  record_version: '1.0'
+  asset_type: script
+  purpose: Source-pinned Borsh decoder for the accepted Pump lifecycle event subset with strict discriminator, field-order and drift checks.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-07-25'
+  truth_owner: TASK-08
+  location:
+    kind: git_path
+    logical_uri: repo://src/solana_alpha_lab/pump_event_decoder.py
+    repository_path: src/solana_alpha_lab/pump_event_decoder.py
+  integrity:
+    kind: sha256
+    sha256: afd5eb12808aa7c42537ca212002e7508e2a97cad3f9228d9c0cf09b4a91f79c
+  access: *t08_read_file
+  relations:
+  - relation_type: depends_on
+    target_asset_id: FIXTURE-T08-PUMP-EVENT-IDL-001
+  - relation_type: depends_on
+    target_asset_id: SCHEMA-T05-PYDANTIC-BOUNDARIES-001
+  - relation_type: validated_by
+    target_asset_id: TEST-T08-PUMP-EVENT-DECODER-001
+  consumers:
+  - TASK-08
+  - TASK-12
+  evidence: []
+  classification: *t08_internal
+- asset_id: FIXTURE-T08-LIFECYCLE-DISCOVERY-CONTRACT-001
+  record_version: '1.0'
+  asset_type: evidence
+  purpose: Sanitized frozen lifecycle cases, timestamps, coverage gaps, invalid transitions, caps and prohibited outcomes for offline contract tests.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-07-25'
+  truth_owner: TASK-08
+  location:
+    kind: git_path
+    logical_uri: repo://tests/fixtures/task08/lifecycle_discovery_contract_v1.json
+    repository_path: tests/fixtures/task08/lifecycle_discovery_contract_v1.json
+  integrity:
+    kind: sha256
+    sha256: 409fa9f409af5f374d9ff59dff4e3e442bb6c31e0367412f41f4af2bbee1169d
+  access: *t08_read_file
+  relations:
+  - relation_type: derived_from
+    target_asset_id: CONTRACT-T08-LIFECYCLE-DISCOVERY-001
+  - relation_type: validated_by
+    target_asset_id: TEST-T08-LIFECYCLE-DISCOVERY-001
+  consumers:
+  - TASK-08
+  evidence: []
+  classification: *t08_internal
+- asset_id: FIXTURE-T08-PUMP-EVENT-IDL-001
+  record_version: '1.0'
+  asset_type: evidence
+  purpose: Exact sanitized official Pump IDL subset pinned to one upstream content blob for deterministic lifecycle event decoding and drift detection.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-07-25'
+  truth_owner: TASK-08
+  location:
+    kind: git_path
+    logical_uri: repo://tests/fixtures/task08/pump_event_idl_subset_v1.json
+    repository_path: tests/fixtures/task08/pump_event_idl_subset_v1.json
+  integrity:
+    kind: sha256
+    sha256: a81246032718a61fdc0e4cd3e3628bcbf8c7a07ec59de4e528f0acb6e5e9eba7
+  access: *t08_read_file
+  relations:
+  - relation_type: derived_from
+    target_asset_id: PRE-GIT-TASK01-A019
+  - relation_type: validated_by
+    target_asset_id: TEST-T08-PUMP-EVENT-DECODER-001
+  consumers:
+  - TASK-08
+  evidence: []
+  classification: *t08_internal
+- asset_id: DATA-T08-LIFECYCLE-DISCOVERY-PROBE-RAW-001
+  record_version: '1.0'
+  asset_type: evidence
+  purpose: Logical content-addressed pointer to the immutable ignored TASK-08 probe partition; Catalog stores its identity and hash but never its raw bytes.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: RUNTIME
+  as_of: '2026-07-25'
+  truth_owner: TASK-08
+  location:
+    kind: logical_only
+    logical_uri: raw://task08_lifecycle_discovery_probe_v1/run=t08a5-20260725T084127Z/partitions/probe.parquet
+  integrity:
+    kind: sha256
+    sha256: 079dc1401b4da3cf0e1d63d2b20210e017252f26d93c4dd2afd8af7d950fcb6a
+  access:
+    mode: read_only
+    method: runtime_attestation
+    network_required: false
+    secrets_required: false
+  relations:
+  - relation_type: derived_from
+    target_asset_id: MODULE-T08-LIFECYCLE-DISCOVERY-TRANSPORT-001
+  - relation_type: evidenced_by
+    target_asset_id: EVIDENCE-T08-LIFECYCLE-DISCOVERY-RECEIPT-001
+  - relation_type: validated_by
+    target_asset_id: TEST-T08-LIFECYCLE-DISCOVERY-EVIDENCE-001
+  consumers:
+  - TASK-08
+  - TASK-09
+  - TASK-11
+  - TASK-12
+  evidence:
+  - evidence_id: EVIDENCE-T08-LIFECYCLE-DISCOVERY-RECEIPT-001
+    kind: runtime_receipt
+    reference: docs/evidence/task08/lifecycle_discovery_probe_execution_receipt_v1.json
+    result: PASS
+  classification: *t08_internal
+- asset_id: FIXTURE-T08-LIFECYCLE-DISCOVERY-EVIDENCE-001
+  record_version: '1.0'
+  asset_type: evidence
+  purpose: Portable sanitized probe metadata preserving counts, typed failures, logical raw identity, timestamps and hashes without provider bodies or credentials.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-07-25'
+  truth_owner: TASK-08
+  location:
+    kind: git_path
+    logical_uri: repo://tests/fixtures/task08/lifecycle_discovery_probe_live_evidence_v1.json
+    repository_path: tests/fixtures/task08/lifecycle_discovery_probe_live_evidence_v1.json
+  integrity:
+    kind: sha256
+    sha256: e439e6a3f80560a1ea8c4475fc0278f8971784c31a7a20f1b633c37c2b0d21bd
+  access: *t08_read_file
+  relations:
+  - relation_type: derived_from
+    target_asset_id: DATA-T08-LIFECYCLE-DISCOVERY-PROBE-RAW-001
+  - relation_type: validated_by
+    target_asset_id: TEST-T08-LIFECYCLE-DISCOVERY-EVIDENCE-001
+  consumers:
+  - TASK-08
+  evidence: []
+  classification: *t08_internal
+- asset_id: TEST-T08-LIFECYCLE-DISCOVERY-001
+  record_version: '1.0'
+  asset_type: script
+  purpose: Offline tests for unbiased universe selection, exact lifecycle transitions, PIT timestamps, coverage gaps, caps and prohibited classifications.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-07-25'
+  truth_owner: TASK-08
+  location:
+    kind: git_path
+    logical_uri: repo://tests/test_task08_lifecycle_discovery.py
+    repository_path: tests/test_task08_lifecycle_discovery.py
+  integrity:
+    kind: sha256
+    sha256: 466ec568984946f67bc6d55bdd6de9908e3306d7760d2248b62210025e6c127c
+  access: *t08_read_file
+  relations:
+  - relation_type: depends_on
+    target_asset_id: MODULE-T08-LIFECYCLE-DISCOVERY-001
+  - relation_type: depends_on
+    target_asset_id: FIXTURE-T08-LIFECYCLE-DISCOVERY-CONTRACT-001
+  consumers:
+  - TASK-08
+  evidence: []
+  classification: *t08_internal
+- asset_id: TEST-T08-LIFECYCLE-DISCOVERY-TRANSPORT-001
+  record_version: '1.0'
+  asset_type: script
+  purpose: Offline transport tests for exact bindings, receipt-time stamps, credential isolation, no retry, caps, persistence and stop conditions.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-07-25'
+  truth_owner: TASK-08
+  location:
+    kind: git_path
+    logical_uri: repo://tests/test_task08_lifecycle_discovery_transport.py
+    repository_path: tests/test_task08_lifecycle_discovery_transport.py
+  integrity:
+    kind: sha256
+    sha256: c002406c0f71dc54dc5ce502cc12250d71bb25b4d0caf82f04440af202aa233a
+  access: *t08_read_file
+  relations:
+  - relation_type: depends_on
+    target_asset_id: MODULE-T08-LIFECYCLE-DISCOVERY-TRANSPORT-001
+  - relation_type: depends_on
+    target_asset_id: SCRIPT-T08-LIFECYCLE-DISCOVERY-PROBE-001
+  consumers:
+  - TASK-08
+  evidence: []
+  classification: *t08_internal
+- asset_id: TEST-T08-PUMP-EVENT-DECODER-001
+  record_version: '1.0'
+  asset_type: script
+  purpose: Offline decoder tests for pinned Pump event discriminators, nested Borsh fields, failed transactions, unsupported data and protocol drift.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-07-25'
+  truth_owner: TASK-08
+  location:
+    kind: git_path
+    logical_uri: repo://tests/test_task08_pump_event_decoder.py
+    repository_path: tests/test_task08_pump_event_decoder.py
+  integrity:
+    kind: sha256
+    sha256: d88a756889bf2dc146d0d3971237b5248beeadf6c7de5999c4d477edb29024dd
+  access: *t08_read_file
+  relations:
+  - relation_type: depends_on
+    target_asset_id: MODULE-T08-PUMP-EVENT-DECODER-001
+  - relation_type: depends_on
+    target_asset_id: FIXTURE-T08-PUMP-EVENT-IDL-001
+  consumers:
+  - TASK-08
+  evidence: []
+  classification: *t08_internal
+- asset_id: TEST-T08-LIFECYCLE-DISCOVERY-EVIDENCE-001
+  record_version: '1.0'
+  asset_type: script
+  purpose: Fail-closed tests for raw hash reconciliation, probe classifications, caps, sanitization, authority boundaries and explicit coverage blocker evidence.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-07-25'
+  truth_owner: TASK-08
+  location:
+    kind: git_path
+    logical_uri: repo://tests/test_task08_lifecycle_discovery_probe_evidence.py
+    repository_path: tests/test_task08_lifecycle_discovery_probe_evidence.py
+  integrity:
+    kind: sha256
+    sha256: 314c8dcd620ebe0c0cc0851e5401c08e87193007831257e1704e41fb1b6e82e6
+  access: *t08_read_file
+  relations:
+  - relation_type: depends_on
+    target_asset_id: FIXTURE-T08-LIFECYCLE-DISCOVERY-EVIDENCE-001
+  - relation_type: depends_on
+    target_asset_id: EVIDENCE-T08-LIFECYCLE-DISCOVERY-RECEIPT-001
+  consumers:
+  - TASK-08
+  evidence: []
+  classification: *t08_internal
+- asset_id: EVIDENCE-T08-LIFECYCLE-DISCOVERY-RECEIPT-001
+  record_version: '1.0'
+  asset_type: evidence
+  purpose: Machine-readable accepted TASK-08 transport result, exact raw hashes, caps, sanitized classifications and explicit coverage-blocker boundary.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-07-25'
+  truth_owner: TASK-08
+  location:
+    kind: git_path
+    logical_uri: repo://docs/evidence/task08/lifecycle_discovery_probe_execution_receipt_v1.json
+    repository_path: docs/evidence/task08/lifecycle_discovery_probe_execution_receipt_v1.json
+  integrity:
+    kind: sha256
+    sha256: 33a3f0b90de36c1543ee605eccc07685798f1b2e08ee6a5f494345d5cb19df40
+  access: *t08_read_file
+  relations:
+  - relation_type: derived_from
+    target_asset_id: FIXTURE-T08-LIFECYCLE-DISCOVERY-EVIDENCE-001
+  - relation_type: derived_from
+    target_asset_id: DATA-T08-LIFECYCLE-DISCOVERY-PROBE-RAW-001
+  - relation_type: validated_by
+    target_asset_id: TEST-T08-LIFECYCLE-DISCOVERY-EVIDENCE-001
+  consumers:
+  - TASK-08
+  - TASK-09
+  - TASK-11
+  - TASK-12
+  evidence: []
+  classification: *t08_internal
+- asset_id: EVIDENCE-T08-LIFECYCLE-DISCOVERY-SUMMARY-001
+  record_version: '1.0'
+  asset_type: evidence
+  purpose: Human-readable TASK-08 transport acceptance, lifecycle coverage blocker, raw evidence pointers, costs, residual risks and non-claims.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-07-25'
+  truth_owner: TASK-08
+  location:
+    kind: git_path
+    logical_uri: repo://docs/evidence/task08/lifecycle_discovery_probe_execution_summary_v1.md
+    repository_path: docs/evidence/task08/lifecycle_discovery_probe_execution_summary_v1.md
+  integrity:
+    kind: sha256
+    sha256: 59eb9a3f03f4e31f35b6bfe33f0c5680ac42f2f45278ae292e1ea328456d8536
+  access: *t08_read_file
+  relations:
+  - relation_type: derived_from
+    target_asset_id: FIXTURE-T08-LIFECYCLE-DISCOVERY-EVIDENCE-001
+  - relation_type: evidenced_by
+    target_asset_id: EVIDENCE-T08-LIFECYCLE-DISCOVERY-RECEIPT-001
+  consumers:
+  - TASK-08
+  - TASK-09
+  - TASK-11
+  - TASK-12
+  evidence: []
+  classification: *t08_internal
+- asset_id: TEST-T08-CATALOG-001
+  record_version: '1.0'
+  asset_type: script
+  purpose: Catalog tests for exact TASK-08 stable IDs, file and raw hashes, lineage, named consumers, accepted checkpoint and no-raw-bytes boundary.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-07-25'
+  truth_owner: TASK-08
+  location:
+    kind: git_path
+    logical_uri: repo://tests/test_task08_catalog.py
+    repository_path: tests/test_task08_catalog.py
+  integrity:
+    kind: sha256
+    sha256: a414b06186ed46ce70b5bd3625e6ee0c7064312f244bb722fc8694db05991f3a
+  access: *t08_read_file
+  relations:
+  - relation_type: depends_on
+    target_asset_id: CATALOG-ROOT-001
+  - relation_type: depends_on
+    target_asset_id: CATALOG-VALIDATOR-001
+  consumers:
+  - TASK-08
+  evidence: []
+  classification: *t08_internal

@@ -1,0 +1,127 @@
+{
+  "fixture_id": "TASK08_LIFECYCLE_DISCOVERY_PROBE_LIVE_EVIDENCE_V1",
+  "fixture_version": "1.0",
+  "task_id": "TASK-08",
+  "atom": "T08-A6",
+  "source_atom": "T08-A5U-PROBE",
+  "transport_acceptance_status": "PASS",
+  "lifecycle_coverage_status": "NOT_TESTABLE_IN_WINDOW",
+  "coverage_disposition": "EXPLICIT_COVERAGE_BLOCKER_CANDIDATE_REQUIRES_CONTROL_PLANE_ACCEPTANCE",
+  "raw_run": {
+    "run_id": "t08a5-20260725T084127Z",
+    "logical_root": "task08_lifecycle_discovery_probe_v1/run=t08a5-20260725T084127Z",
+    "dataset_id": "SMIAL_TASK08_LIFECYCLE_DISCOVERY_PROBE_RAW",
+    "dataset_version": "1.0",
+    "transport_contract_version": "1.1",
+    "partition_id": "t08a5-20260725T084127Z-probe",
+    "dataset_manifest_id": "dataset-6a37988ab1b5b5906c1566e0cde2bb2cade5128a12371a484186b36cd8d84d28",
+    "partition_manifest_id": "partition-e68c180198399f0d8e77aab46ed8d539a2943f9643d605dfa43adf524440e088",
+    "content_sha256": "71b168959a25da5aa2e285dd4f8e74e3346d27b8aa0fa3a760d7c45395915766",
+    "created_at": "2026-07-25T08:41:33.034705Z",
+    "first_reliable_available_at": "2026-07-25T08:41:33.034705Z",
+    "min_available_to_strategy_at": "2026-07-25T08:41:27.560231Z",
+    "max_available_to_strategy_at": "2026-07-25T08:41:33.034609Z",
+    "row_count": 388,
+    "event_count_received": 388,
+    "event_count_stored": 388,
+    "omitted_event_count": 0,
+    "raw_body_bytes_received": 600292,
+    "raw_body_bytes_stored": 600292,
+    "stored_file_bytes": 799765,
+    "provider_events_received": {
+      "HELIUS": 386,
+      "SOLANA_TRACKER": 2
+    },
+    "provider_events_stored": {
+      "HELIUS": 386,
+      "SOLANA_TRACKER": 2
+    },
+    "status_counts": {
+      "SUCCESS": 386,
+      "HTTP_ERROR": 2
+    },
+    "files": [
+      {
+        "logical_path": "partitions/probe.parquet",
+        "bytes": 798206,
+        "sha256": "079dc1401b4da3cf0e1d63d2b20210e017252f26d93c4dd2afd8af7d950fcb6a"
+      },
+      {
+        "logical_path": "receipts/probe.manifest.json",
+        "bytes": 742,
+        "sha256": "8872648a10ca39b6b9cdf3f10dba75dc51bef8083ddd768dca221720dab6ea98"
+      },
+      {
+        "logical_path": "receipts/probe.receipt.json",
+        "bytes": 817,
+        "sha256": "d1fb206fceb9a0277e65ae36f99ed245f1d82200d1b3d7fc0ce7d4b906d42598"
+      }
+    ]
+  },
+  "probe_summary": {
+    "status": "NOT_TESTABLE_IN_WINDOW",
+    "elapsed_seconds": 7,
+    "concurrency": 1,
+    "notifications": 385,
+    "successful_notifications": 102,
+    "failed_notifications": 283,
+    "truncated_notifications": 0,
+    "decoded_events": 101,
+    "create_events": 0,
+    "unsupported_pump_program_data": 15,
+    "unique_followup_candidates": 0,
+    "rpc_followups": 0,
+    "solana_tracker_requests": 2,
+    "solana_tracker_failures": 2,
+    "stream_bytes": 600238,
+    "received_bytes": 600292,
+    "stored_bytes": 799765,
+    "received_and_stored_bytes": 1400057,
+    "helius_credits": 15,
+    "evidence_records": 388,
+    "wss_stop_reason": "STREAM_GUARD",
+    "retries": 0,
+    "cash_spend_usd_cents": 0
+  },
+  "retained_failure_evidence": [
+    {
+      "provider": "SOLANA_TRACKER",
+      "terminal_class": "HTTP_ERROR",
+      "error_class": "http_status_not_success:401",
+      "count": 2,
+      "accepted_semantics": "ACCESS_FAILURE_NOT_EMPTY_NOT_ZERO_NOT_NO_ROUTE"
+    }
+  ],
+  "frozen_caps": {
+    "elapsed_seconds": 600,
+    "wss_connections": 1,
+    "wss_subscriptions": 1,
+    "notifications": 500,
+    "stream_bytes": 1000000,
+    "rpc_followups": 20,
+    "helius_credits": 41,
+    "solana_tracker_requests": 8,
+    "admission_received_bytes": 900000,
+    "received_and_stored_bytes": 5000000,
+    "concurrency": 1,
+    "retries": 0,
+    "cash_spend_usd_cents": 0
+  },
+  "decision_boundary": {
+    "eligible_create_event_observed": false,
+    "followup_candidate_created": false,
+    "unbiased_lifecycle_sample_established": false,
+    "retry_authorized": false,
+    "pilot_24h_authorized": false,
+    "catalog_acceptance_implied": false,
+    "canonical_status_change_implied": false
+  },
+  "sanitization": {
+    "provider_bodies_in_fixture": 0,
+    "request_values_in_fixture": 0,
+    "headers_in_fixture": 0,
+    "credentials_in_fixture": 0,
+    "absolute_paths_in_fixture": 0,
+    "wallet_signer_transaction_actions": 0
+  }
+}

@@ -388,6 +388,46 @@
       "target_asset_id": "TEST-T07-PROVIDER-SMOKE-TRANSPORT-001"
     },
     {
+      "source_asset_id": "CONTRACT-T08-LIFECYCLE-DISCOVERY-001",
+      "relation": "depends_on",
+      "target_asset_id": "CONTRACT-T05-DATA-001"
+    },
+    {
+      "source_asset_id": "CONTRACT-T08-LIFECYCLE-DISCOVERY-001",
+      "relation": "derived_from",
+      "target_asset_id": "PRE-GIT-TASK01-A019"
+    },
+    {
+      "source_asset_id": "CONTRACT-T08-LIFECYCLE-DISCOVERY-001",
+      "relation": "validated_by",
+      "target_asset_id": "TEST-T08-LIFECYCLE-DISCOVERY-001"
+    },
+    {
+      "source_asset_id": "CONTRACT-T08-LIFECYCLE-DISCOVERY-TRANSPORT-001",
+      "relation": "depends_on",
+      "target_asset_id": "CONTRACT-T06-RAW-STORAGE-001"
+    },
+    {
+      "source_asset_id": "CONTRACT-T08-LIFECYCLE-DISCOVERY-TRANSPORT-001",
+      "relation": "depends_on",
+      "target_asset_id": "CONTRACT-T08-LIFECYCLE-DISCOVERY-001"
+    },
+    {
+      "source_asset_id": "CONTRACT-T08-LIFECYCLE-DISCOVERY-TRANSPORT-001",
+      "relation": "derived_from",
+      "target_asset_id": "PRE-GIT-TASK01-A023"
+    },
+    {
+      "source_asset_id": "CONTRACT-T08-LIFECYCLE-DISCOVERY-TRANSPORT-001",
+      "relation": "evidenced_by",
+      "target_asset_id": "EVIDENCE-T08-LIFECYCLE-DISCOVERY-RECEIPT-001"
+    },
+    {
+      "source_asset_id": "CONTRACT-T08-LIFECYCLE-DISCOVERY-TRANSPORT-001",
+      "relation": "validated_by",
+      "target_asset_id": "TEST-T08-LIFECYCLE-DISCOVERY-TRANSPORT-001"
+    },
+    {
       "source_asset_id": "CTRL-AGENTS-001",
       "relation": "governed_by",
       "target_asset_id": "CTRL-TASK-04-001"
@@ -528,6 +568,21 @@
       "target_asset_id": "ADR-MVP-STACK-002"
     },
     {
+      "source_asset_id": "DATA-T08-LIFECYCLE-DISCOVERY-PROBE-RAW-001",
+      "relation": "derived_from",
+      "target_asset_id": "MODULE-T08-LIFECYCLE-DISCOVERY-TRANSPORT-001"
+    },
+    {
+      "source_asset_id": "DATA-T08-LIFECYCLE-DISCOVERY-PROBE-RAW-001",
+      "relation": "evidenced_by",
+      "target_asset_id": "EVIDENCE-T08-LIFECYCLE-DISCOVERY-RECEIPT-001"
+    },
+    {
+      "source_asset_id": "DATA-T08-LIFECYCLE-DISCOVERY-PROBE-RAW-001",
+      "relation": "validated_by",
+      "target_asset_id": "TEST-T08-LIFECYCLE-DISCOVERY-EVIDENCE-001"
+    },
+    {
       "source_asset_id": "ENV-WORKSTATION-001",
       "relation": "produces",
       "target_asset_id": "SCM-BASELINE-COMMIT-001"
@@ -633,6 +688,31 @@
       "target_asset_id": "EVIDENCE-T07-PROVIDER-SMOKE-RECEIPT-001"
     },
     {
+      "source_asset_id": "EVIDENCE-T08-LIFECYCLE-DISCOVERY-RECEIPT-001",
+      "relation": "derived_from",
+      "target_asset_id": "DATA-T08-LIFECYCLE-DISCOVERY-PROBE-RAW-001"
+    },
+    {
+      "source_asset_id": "EVIDENCE-T08-LIFECYCLE-DISCOVERY-RECEIPT-001",
+      "relation": "derived_from",
+      "target_asset_id": "FIXTURE-T08-LIFECYCLE-DISCOVERY-EVIDENCE-001"
+    },
+    {
+      "source_asset_id": "EVIDENCE-T08-LIFECYCLE-DISCOVERY-RECEIPT-001",
+      "relation": "validated_by",
+      "target_asset_id": "TEST-T08-LIFECYCLE-DISCOVERY-EVIDENCE-001"
+    },
+    {
+      "source_asset_id": "EVIDENCE-T08-LIFECYCLE-DISCOVERY-SUMMARY-001",
+      "relation": "derived_from",
+      "target_asset_id": "FIXTURE-T08-LIFECYCLE-DISCOVERY-EVIDENCE-001"
+    },
+    {
+      "source_asset_id": "EVIDENCE-T08-LIFECYCLE-DISCOVERY-SUMMARY-001",
+      "relation": "evidenced_by",
+      "target_asset_id": "EVIDENCE-T08-LIFECYCLE-DISCOVERY-RECEIPT-001"
+    },
+    {
       "source_asset_id": "FIXTURE-T04-PIT-001",
       "relation": "derived_from",
       "target_asset_id": "PROTOTYPE-T04-CORE-NATIVE-STACK-001"
@@ -701,6 +781,36 @@
       "source_asset_id": "FIXTURE-T07-PROVIDER-SMOKE-EVIDENCE-001",
       "relation": "validated_by",
       "target_asset_id": "TEST-T07-PROVIDER-SMOKE-EVIDENCE-001"
+    },
+    {
+      "source_asset_id": "FIXTURE-T08-LIFECYCLE-DISCOVERY-CONTRACT-001",
+      "relation": "derived_from",
+      "target_asset_id": "CONTRACT-T08-LIFECYCLE-DISCOVERY-001"
+    },
+    {
+      "source_asset_id": "FIXTURE-T08-LIFECYCLE-DISCOVERY-CONTRACT-001",
+      "relation": "validated_by",
+      "target_asset_id": "TEST-T08-LIFECYCLE-DISCOVERY-001"
+    },
+    {
+      "source_asset_id": "FIXTURE-T08-LIFECYCLE-DISCOVERY-EVIDENCE-001",
+      "relation": "derived_from",
+      "target_asset_id": "DATA-T08-LIFECYCLE-DISCOVERY-PROBE-RAW-001"
+    },
+    {
+      "source_asset_id": "FIXTURE-T08-LIFECYCLE-DISCOVERY-EVIDENCE-001",
+      "relation": "validated_by",
+      "target_asset_id": "TEST-T08-LIFECYCLE-DISCOVERY-EVIDENCE-001"
+    },
+    {
+      "source_asset_id": "FIXTURE-T08-PUMP-EVENT-IDL-001",
+      "relation": "derived_from",
+      "target_asset_id": "PRE-GIT-TASK01-A019"
+    },
+    {
+      "source_asset_id": "FIXTURE-T08-PUMP-EVENT-IDL-001",
+      "relation": "validated_by",
+      "target_asset_id": "TEST-T08-PUMP-EVENT-DECODER-001"
     },
     {
       "source_asset_id": "GENERATED-EDGE-PROJECTION-001",
@@ -836,6 +946,61 @@
       "source_asset_id": "MODULE-T07-PROVIDER-SMOKE-TRANSPORT-001",
       "relation": "validated_by",
       "target_asset_id": "TEST-T07-PROVIDER-SMOKE-TRANSPORT-001"
+    },
+    {
+      "source_asset_id": "MODULE-T08-LIFECYCLE-DISCOVERY-001",
+      "relation": "depends_on",
+      "target_asset_id": "CONTRACT-T08-LIFECYCLE-DISCOVERY-001"
+    },
+    {
+      "source_asset_id": "MODULE-T08-LIFECYCLE-DISCOVERY-001",
+      "relation": "depends_on",
+      "target_asset_id": "SCHEMA-T05-PYDANTIC-BOUNDARIES-001"
+    },
+    {
+      "source_asset_id": "MODULE-T08-LIFECYCLE-DISCOVERY-001",
+      "relation": "validated_by",
+      "target_asset_id": "TEST-T08-LIFECYCLE-DISCOVERY-001"
+    },
+    {
+      "source_asset_id": "MODULE-T08-LIFECYCLE-DISCOVERY-TRANSPORT-001",
+      "relation": "depends_on",
+      "target_asset_id": "CONTRACT-T08-LIFECYCLE-DISCOVERY-TRANSPORT-001"
+    },
+    {
+      "source_asset_id": "MODULE-T08-LIFECYCLE-DISCOVERY-TRANSPORT-001",
+      "relation": "depends_on",
+      "target_asset_id": "MODULE-T06-STORAGE-API-001"
+    },
+    {
+      "source_asset_id": "MODULE-T08-LIFECYCLE-DISCOVERY-TRANSPORT-001",
+      "relation": "depends_on",
+      "target_asset_id": "MODULE-T08-LIFECYCLE-DISCOVERY-001"
+    },
+    {
+      "source_asset_id": "MODULE-T08-LIFECYCLE-DISCOVERY-TRANSPORT-001",
+      "relation": "depends_on",
+      "target_asset_id": "MODULE-T08-PUMP-EVENT-DECODER-001"
+    },
+    {
+      "source_asset_id": "MODULE-T08-LIFECYCLE-DISCOVERY-TRANSPORT-001",
+      "relation": "validated_by",
+      "target_asset_id": "TEST-T08-LIFECYCLE-DISCOVERY-TRANSPORT-001"
+    },
+    {
+      "source_asset_id": "MODULE-T08-PUMP-EVENT-DECODER-001",
+      "relation": "depends_on",
+      "target_asset_id": "FIXTURE-T08-PUMP-EVENT-IDL-001"
+    },
+    {
+      "source_asset_id": "MODULE-T08-PUMP-EVENT-DECODER-001",
+      "relation": "depends_on",
+      "target_asset_id": "SCHEMA-T05-PYDANTIC-BOUNDARIES-001"
+    },
+    {
+      "source_asset_id": "MODULE-T08-PUMP-EVENT-DECODER-001",
+      "relation": "validated_by",
+      "target_asset_id": "TEST-T08-PUMP-EVENT-DECODER-001"
     },
     {
       "source_asset_id": "PRE-GIT-TASK01-A017",
@@ -1513,6 +1678,26 @@
       "target_asset_id": "TEST-T07-PROVIDER-SMOKE-TRANSPORT-001"
     },
     {
+      "source_asset_id": "SCRIPT-T08-LIFECYCLE-DISCOVERY-PROBE-001",
+      "relation": "depends_on",
+      "target_asset_id": "MODULE-T08-LIFECYCLE-DISCOVERY-001"
+    },
+    {
+      "source_asset_id": "SCRIPT-T08-LIFECYCLE-DISCOVERY-PROBE-001",
+      "relation": "depends_on",
+      "target_asset_id": "MODULE-T08-LIFECYCLE-DISCOVERY-TRANSPORT-001"
+    },
+    {
+      "source_asset_id": "SCRIPT-T08-LIFECYCLE-DISCOVERY-PROBE-001",
+      "relation": "depends_on",
+      "target_asset_id": "MODULE-T08-PUMP-EVENT-DECODER-001"
+    },
+    {
+      "source_asset_id": "SCRIPT-T08-LIFECYCLE-DISCOVERY-PROBE-001",
+      "relation": "validated_by",
+      "target_asset_id": "TEST-T08-LIFECYCLE-DISCOVERY-TRANSPORT-001"
+    },
+    {
       "source_asset_id": "TEST-T04-CORE-STACK-001",
       "relation": "depends_on",
       "target_asset_id": "FIXTURE-T04-PIT-001"
@@ -1671,6 +1856,56 @@
       "source_asset_id": "TEST-T07-PROVIDER-SMOKE-TRANSPORT-001",
       "relation": "depends_on",
       "target_asset_id": "SCRIPT-T07-PROVIDER-SMOKE-LAUNCHER-001"
+    },
+    {
+      "source_asset_id": "TEST-T08-CATALOG-001",
+      "relation": "depends_on",
+      "target_asset_id": "CATALOG-ROOT-001"
+    },
+    {
+      "source_asset_id": "TEST-T08-CATALOG-001",
+      "relation": "depends_on",
+      "target_asset_id": "CATALOG-VALIDATOR-001"
+    },
+    {
+      "source_asset_id": "TEST-T08-LIFECYCLE-DISCOVERY-001",
+      "relation": "depends_on",
+      "target_asset_id": "FIXTURE-T08-LIFECYCLE-DISCOVERY-CONTRACT-001"
+    },
+    {
+      "source_asset_id": "TEST-T08-LIFECYCLE-DISCOVERY-001",
+      "relation": "depends_on",
+      "target_asset_id": "MODULE-T08-LIFECYCLE-DISCOVERY-001"
+    },
+    {
+      "source_asset_id": "TEST-T08-LIFECYCLE-DISCOVERY-EVIDENCE-001",
+      "relation": "depends_on",
+      "target_asset_id": "EVIDENCE-T08-LIFECYCLE-DISCOVERY-RECEIPT-001"
+    },
+    {
+      "source_asset_id": "TEST-T08-LIFECYCLE-DISCOVERY-EVIDENCE-001",
+      "relation": "depends_on",
+      "target_asset_id": "FIXTURE-T08-LIFECYCLE-DISCOVERY-EVIDENCE-001"
+    },
+    {
+      "source_asset_id": "TEST-T08-LIFECYCLE-DISCOVERY-TRANSPORT-001",
+      "relation": "depends_on",
+      "target_asset_id": "MODULE-T08-LIFECYCLE-DISCOVERY-TRANSPORT-001"
+    },
+    {
+      "source_asset_id": "TEST-T08-LIFECYCLE-DISCOVERY-TRANSPORT-001",
+      "relation": "depends_on",
+      "target_asset_id": "SCRIPT-T08-LIFECYCLE-DISCOVERY-PROBE-001"
+    },
+    {
+      "source_asset_id": "TEST-T08-PUMP-EVENT-DECODER-001",
+      "relation": "depends_on",
+      "target_asset_id": "FIXTURE-T08-PUMP-EVENT-IDL-001"
+    },
+    {
+      "source_asset_id": "TEST-T08-PUMP-EVENT-DECODER-001",
+      "relation": "depends_on",
+      "target_asset_id": "MODULE-T08-PUMP-EVENT-DECODER-001"
     },
     {
       "source_asset_id": "VALIDATOR-REPOSITORY-STATE-001",

@@ -1,0 +1,104 @@
+{
+  "receipt_id": "TASK08_LIFECYCLE_DISCOVERY_PROBE_EXECUTION_RECEIPT_V1",
+  "receipt_version": "1.0",
+  "task_id": "TASK-08",
+  "atom": "T08-A6",
+  "source_atom": "T08-A5U-PROBE",
+  "status": "PASS_WITH_EXPLICIT_COVERAGE_BLOCKER_EVIDENCE",
+  "created_at": "2026-07-25T08:41:33.034705Z",
+  "first_reliable_available_at": "2026-07-25T08:41:33.034705Z",
+  "accepted_base": {
+    "head": "03731b647ca4d47283a2dcb4154622865b606327",
+    "tree": "0462d283a5b0a6a1c0a6eab63b2e7e8463757522",
+    "branch": "main"
+  },
+  "source_run": {
+    "run_id": "t08a5-20260725T084127Z",
+    "logical_root": "task08_lifecycle_discovery_probe_v1/run=t08a5-20260725T084127Z",
+    "transport_contract_version": "1.1",
+    "partition_sha256": "079dc1401b4da3cf0e1d63d2b20210e017252f26d93c4dd2afd8af7d950fcb6a",
+    "manifest_sha256": "8872648a10ca39b6b9cdf3f10dba75dc51bef8083ddd768dca221720dab6ea98",
+    "receipt_sha256": "d1fb206fceb9a0277e65ae36f99ed245f1d82200d1b3d7fc0ce7d4b906d42598",
+    "content_sha256": "71b168959a25da5aa2e285dd4f8e74e3346d27b8aa0fa3a760d7c45395915766",
+    "event_count_stored": 388,
+    "stored_file_bytes": 799765
+  },
+  "tracked_fixture": {
+    "path": "tests/fixtures/task08/lifecycle_discovery_probe_live_evidence_v1.json",
+    "sha256": "e439e6a3f80560a1ea8c4475fc0278f8971784c31a7a20f1b633c37c2b0d21bd",
+    "provider_bodies_in_fixture": 0,
+    "credentials_in_fixture": 0,
+    "absolute_paths_in_fixture": 0
+  },
+  "accepted_result": {
+    "transport_acceptance_status": "PASS",
+    "lifecycle_coverage_status": "NOT_TESTABLE_IN_WINDOW",
+    "coverage_disposition": "EXPLICIT_COVERAGE_BLOCKER_CANDIDATE_REQUIRES_CONTROL_PLANE_ACCEPTANCE",
+    "evidence_records": 388,
+    "helius_notifications": 385,
+    "decoded_events": 101,
+    "create_events": 0,
+    "solana_tracker_requests": 2,
+    "solana_tracker_failures": 2,
+    "solana_tracker_terminal_class": "HTTP_ERROR",
+    "solana_tracker_error_class": "http_status_not_success:401",
+    "wss_stop_reason": "STREAM_GUARD",
+    "network_attempts_in_source_run": 3,
+    "retries_in_source_run": 0,
+    "modeled_helius_credits": 15,
+    "cash_spend_usd": 0,
+    "wallet_signer_transaction_actions": 0
+  },
+  "checks": {
+    "raw_run_read_only": "PASS",
+    "raw_file_hashes_match_pre_write_evidence": "PASS",
+    "partition_manifest_receipt_reconcile": "PASS",
+    "provider_failure_semantics_preserved": "PASS",
+    "no_create_event_not_promoted": "PASS",
+    "all_frozen_caps_respected": "PASS",
+    "fixture_is_clean_clone_portable": "PASS",
+    "secret_and_absolute_path_scan": "PASS"
+  },
+  "validation": {
+    "targeted_evidence_tests": {
+      "passed": 10,
+      "failed": 0
+    },
+    "targeted_task08_suite": {
+      "passed": 73,
+      "failed": 0
+    },
+    "full_repository_suite": {
+      "passed": 459,
+      "failed": 0
+    },
+    "secret_scan": "PASS",
+    "file_hygiene": "PASS"
+  },
+  "authority": {
+    "class": "LOCAL_WRITE_ONLY",
+    "managed_files": [
+      "docs/contracts/lifecycle_discovery_probe_transport_contract_v1.md",
+      "docs/evidence/task08/lifecycle_discovery_probe_execution_summary_v1.md",
+      "docs/evidence/task08/lifecycle_discovery_probe_execution_receipt_v1.json",
+      "tests/fixtures/task08/lifecycle_discovery_probe_live_evidence_v1.json",
+      "tests/test_task08_lifecycle_discovery_probe_evidence.py"
+    ],
+    "network_calls_during_atom": 0,
+    "raw_files_written_during_atom": 0,
+    "dependency_changes": 0,
+    "catalog_changes": 0,
+    "canonical_status_changes": 0,
+    "staged": false,
+    "committed": false,
+    "pushed": false
+  },
+  "residuals": [
+    "The Helius stream reached STREAM_GUARD after seven seconds without an accepted CreateEvent, so the frozen probe cannot establish an unbiased lifecycle sample.",
+    "Both Solana Tracker observations remain HTTP_ERROR/http_status_not_success:401 access failures; they are not empty, zero, NO_ROUTE or lifecycle evidence.",
+    "Neither a retry nor a 24-hour pilot is authorized by this result.",
+    "Catalog registration and canonical coverage-blocker disposition remain separate authority-gated atoms."
+  ],
+  "catalog_status": "CATALOG_GAP_PENDING_SEPARATE_ATOM",
+  "state_change": "NONE"
+}

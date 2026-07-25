@@ -1,0 +1,196 @@
+{
+  "schema": "solana_alpha_lab.lifecycle_discovery_contract",
+  "schema_version": "1.0",
+  "task_id": "TASK-08",
+  "atom_id": "T08-A3",
+  "as_of": "2026-07-25",
+  "status": "OFFLINE_PROTOCOL_PINNED_CANDIDATE",
+  "protocol": {
+    "official_source": "github:pump-fun/pump-public-docs",
+    "pin_state": "PINNED_OFFICIAL_IDL_BLOB",
+    "program_id": "6EF8rrecthR5Dkzon8Nwu78hRvfCKubJ14M5uBEwF6P",
+    "idl_path": "idl/pump.json",
+    "idl_blob_sha": "062e66f032bb9f295353b573be3400070bd55e5b",
+    "event_subset_fixture": "tests/fixtures/task08/pump_event_idl_subset_v1.json"
+  },
+  "event_vocabulary": [
+    {
+      "source_event": "CreateEvent",
+      "lifecycle_state": "CREATED",
+      "requires_success": true,
+      "destination_required": false
+    },
+    {
+      "source_event": "TradeEvent",
+      "lifecycle_state": "ACTIVE",
+      "requires_success": true,
+      "destination_required": false
+    },
+    {
+      "source_event": "CompleteEvent",
+      "lifecycle_state": "MIGRATION_STARTED",
+      "requires_success": true,
+      "destination_required": false
+    },
+    {
+      "source_event": "CompletePumpAmmMigrationEvent",
+      "lifecycle_state": "MIGRATED",
+      "requires_success": true,
+      "destination_required": true
+    }
+  ],
+  "derived_states": {
+    "DISCOVERED": "FIRST_INDEXED_PROVIDER_OBSERVATION_ONLY",
+    "INACTIVE": {
+      "minimum_quiet_seconds": 21600,
+      "complete_coverage_required": true
+    },
+    "UNKNOWN": [
+      "INSUFFICIENT_FOLLOWUP",
+      "COVERAGE_GAP",
+      "PROVIDER_DISAGREEMENT",
+      "PROTOCOL_OR_SCHEMA_DRIFT"
+    ]
+  },
+  "universes": {
+    "domain": "PUMPFUN",
+    "launch": {
+      "source_role": "HELIUS_CHAIN_PRIMARY",
+      "source_event": "CreateEvent",
+      "transaction_must_succeed": true,
+      "intake_seconds": 7200,
+      "selection_fields": []
+    },
+    "followup_seconds": 79200,
+    "post_migration": "SUBSET_OF_LAUNCH_UNIVERSE",
+    "signal": "NONE",
+    "execution": "NONE",
+    "failed_transactions": "RAW_EVIDENCE_ONLY",
+    "right_censoring": "UNKNOWN",
+    "cohort_identity_fields": [
+      "program_id",
+      "signature",
+      "instruction_index",
+      "mint"
+    ],
+    "forbidden_selection_fields": [
+      "future_availability",
+      "holder_count",
+      "liquidity",
+      "market_cap",
+      "migration_outcome",
+      "popularity",
+      "price_return",
+      "risk_score",
+      "volume"
+    ]
+  },
+  "timestamps": [
+    "event_at",
+    "observed_at",
+    "first_reliable_available_at",
+    "available_at",
+    "ingested_at"
+  ],
+  "provider_roles": {
+    "HELIUS_CHAIN_PRIMARY": {
+      "provider": "HELIUS",
+      "surface": "STANDARD_WSS",
+      "event_owner": true,
+      "method": "logsSubscribe",
+      "program_id": "6EF8rrecthR5Dkzon8Nwu78hRvfCKubJ14M5uBEwF6P",
+      "mentions": [
+        "6EF8rrecthR5Dkzon8Nwu78hRvfCKubJ14M5uBEwF6P"
+      ],
+      "commitment": "confirmed",
+      "auth_mode": "LOCAL_USER_BOUNDARY",
+      "auth_material_persisted": false
+    },
+    "SOLANA_TRACKER_REST_FALLBACK": {
+      "provider": "SOLANA_TRACKER",
+      "surface": "REST",
+      "event_owner": false,
+      "paths": [
+        "/tokens/latest",
+        "/tokens/multi/graduating",
+        "/tokens/multi/graduated"
+      ],
+      "pacing_requests_per_second": 1,
+      "auth_mode": "LOCAL_USER_BOUNDARY",
+      "auth_material_persisted": false,
+      "premium_datastream_allowed": false
+    }
+  },
+  "provider_facts": {
+    "as_of": "2026-07-25",
+    "helius_free_monthly_credits": 1000000,
+    "helius_rpc_requests_per_second": 10,
+    "helius_wss_connection_credit": 1,
+    "helius_wss_credits_per_100000_bytes": 2,
+    "solana_tracker_documented_free_requests": 10000,
+    "solana_tracker_product_page_free_requests": 2500,
+    "solana_tracker_conservative_allowance": 2500,
+    "solana_tracker_published_requests_per_second": 3,
+    "dashboard_readback_required": true
+  },
+  "probe_budget": {
+    "elapsed_seconds": 600,
+    "wss_connections": 1,
+    "wss_subscriptions": 1,
+    "notifications": 500,
+    "stream_bytes": 1000000,
+    "rpc_followups": 20,
+    "helius_credits": 41,
+    "solana_tracker_requests": 8,
+    "received_and_stored_bytes": 5000000,
+    "concurrency": 1,
+    "retries": 0,
+    "cash_spend_usd_cents": 0
+  },
+  "pilot_budget": {
+    "elapsed_hours": 24,
+    "intake_hours": 2,
+    "followup_hours": 22,
+    "wss_initial_connections": 1,
+    "wss_reconnects": 6,
+    "stream_bytes": 500000000,
+    "rpc_followups": 5000,
+    "helius_credits": 16000,
+    "solana_tracker_requests": 1200,
+    "solana_tracker_allowance_reserve": 1300,
+    "dataset_bytes": 1073741824,
+    "partition_bytes": 67108864,
+    "minimum_free_bytes_after_write": 21474836480,
+    "concurrency": 1,
+    "cash_spend_usd_cents": 0
+  },
+  "security": {
+    "network_enabled": false,
+    "credential_use_enabled": false,
+    "local_data_write_enabled": false,
+    "dependency_changes_enabled": false,
+    "cash_spend_usd_cents": 0,
+    "wallet_signer_transaction_actions": 0,
+    "durable_absolute_paths_allowed": false,
+    "durable_auth_material_allowed": false,
+    "transport_imports_allowed": false
+  },
+  "catalog": {
+    "future_asset_ids": [
+      "CTRL-TASK-08-001",
+      "CONTRACT-T08-LIFECYCLE-DISCOVERY-001",
+      "MODULE-T08-LIFECYCLE-DISCOVERY-001",
+      "FIXTURE-T08-LIFECYCLE-DISCOVERY-001",
+      "TEST-T08-LIFECYCLE-DISCOVERY-001"
+    ],
+    "named_consumers": [
+      "TASK-09",
+      "TASK-11",
+      "TASK-12",
+      "TASK-13",
+      "TASK-18",
+      "TASK-19"
+    ],
+    "update_in_this_atom": false
+  }
+}
