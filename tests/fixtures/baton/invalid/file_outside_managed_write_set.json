@@ -1,0 +1,12 @@
+{
+  "managed_write_set": [
+    "docs/evidence/baton/**"
+  ],
+  "observed_paths": [
+    "AGENTS.md",
+    "docs/evidence/baton/x.json"
+  ],
+  "expected_outside": [
+    "AGENTS.md"
+  ]
+}

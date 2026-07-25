@@ -1,0 +1,24 @@
+---
+description: Explicit input routes only; no handoff discovery
+alwaysApply: true
+---
+
+# Input routing
+
+Default input is `DIRECT_PROMPT`.
+
+Allowed explicit routes:
+
+- `DIRECT_PROMPT`
+- `LOCAL_HANDOFF: <repository-relative path>`
+- `ACCEPT_LOCAL_HANDOFF: <repository-relative path>`
+- `GITHUB_BATON: <exact contract locator>` (documented future route)
+
+Rules:
+
+- Read local handoffs only when the named trigger is present.
+- Follow `docs/agent/HANDOFF_PROTOCOL.md` path and manifest rules.
+- Follow `docs/agent/GITHUB_BATON_PROTOCOL.md` for baton contracts.
+- Never search for newest/latest/last-modified handoffs or Issues.
+- Reject absolute paths, parent traversal, and workspace escapes.
+- Route selection lives in `docs/agent/EXECUTION_ROUTER_PROTOCOL.md`.

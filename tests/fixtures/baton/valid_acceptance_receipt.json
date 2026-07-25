@@ -1,0 +1,22 @@
+{
+  "acceptance_schema": "smial.github_baton.acceptance_receipt",
+  "schema_version": "1.0",
+  "contract_id": "CTRL-BATON-A62-DEMO-001",
+  "contract_revision": 1,
+  "expected_contract_sha256": "39c4e743b7aa5239690faab39cb26cc6f10de89d1b22b818a60b67978c5c449c",
+  "pr_number": 0,
+  "reviewed_head": "bd152b3199a9ba5c75374bd798b1e81756cd4d9b",
+  "reviewed_tree": "a068018e57ad53340ad94321539ed7d1b411bc10",
+  "verdict": "PASS",
+  "contract_compliance": "PASS",
+  "authority_compliance": "PASS",
+  "semantic_invariants": [
+    "Cursor EXECUTION_ONLY"
+  ],
+  "evidence_reviewed": [
+    "execution_receipt"
+  ],
+  "required_repairs": [],
+  "merge_authorized": false,
+  "canonical_status_change": "NONE"
+}

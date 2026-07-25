@@ -1,0 +1,66 @@
+name: Control Atom Contract
+description: Manual fallback form for a revision-locked GitHub Baton Atom Contract.
+title: "[CTRL-ATOM] "
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Project Chat GPT control plane owns the Atom Contract, routing, semantic
+        acceptance, canonical status and DONE.
+
+        This Issue body is **mutable transport infrastructure**, not the trust
+        anchor. Cursor must compare extracted contract bytes to an
+        **out-of-band** `expected_contract_sha256` supplied by the launcher.
+        An Issue-embedded hash is informational only and never establishes trust.
+
+        This form grants **no authority**. Authority class, managed write set and
+        network caps live only inside the marked JSON payload and the launcher
+        parameters.
+  - type: input
+    id: task_id
+    attributes:
+      label: Task ID
+      description: Temporary or canonical task id (for example CTRL-BATON-SETUP).
+      placeholder: CTRL-BATON-SETUP
+    validations:
+      required: true
+  - type: input
+    id: atom_id
+    attributes:
+      label: Atom ID
+      description: Exact atom id for this bounded execution.
+      placeholder: A6.2_BATON_MACHINE_LAYER
+    validations:
+      required: true
+  - type: input
+    id: contract_revision
+    attributes:
+      label: Contract revision
+      description: Integer revision matching the JSON payload contract_revision.
+      placeholder: "1"
+    validations:
+      required: true
+  - type: textarea
+    id: contract_payload
+    attributes:
+      label: Exact marked Atom Contract JSON
+      description: |
+        Paste the exact markers and JSON payload bytes. Do not put secrets here.
+        Launcher must supply expected_contract_sha256 out-of-band.
+      value: |
+        <!-- SMIAL-BATON-CONTRACT-BEGIN -->
+        {
+          "automation_schema": "smial.github_baton.atom_contract"
+        }
+        <!-- SMIAL-BATON-CONTRACT-END -->
+      render: markdown
+    validations:
+      required: true
+  - type: markdown
+    attributes:
+      value: |
+        Launcher checklist:
+        1. Compute SHA-256 of the exact payload bytes between the markers.
+        2. Pass repository, issue number, revision and expected_contract_sha256
+           out-of-band to Cursor preflight.
+        3. Do not treat this Issue text as immutable or as the trust root.

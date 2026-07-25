@@ -31,7 +31,10 @@ class CiValidationError(RuntimeError):
 def expected_workflow() -> dict[str, Any]:
     return {
         "name": "Repository validation",
-        "on": {"push": {"branches": ["main"]}},
+        "on": {
+            "pull_request": {"branches": ["main"]},
+            "push": {"branches": ["main"]},
+        },
         "permissions": {"contents": "read"},
         "concurrency": {
             "group": "${{ github.workflow }}-${{ github.ref }}",
@@ -146,6 +149,7 @@ def child_commands() -> list[tuple[str, list[str]]]:
             "SECRET_REJECTION",
             [python, "-B", "scripts/secret_scan.py", "--self-test", "--scan-repository"],
         ),
+        ("BATON_VALIDATION", [python, "-B", "scripts/validate_baton.py"]),
         ("CATALOG_VALIDATION", [python, "-B", "scripts/validate_catalog.py"]),
         (
             "CATALOG_RESOLUTION",

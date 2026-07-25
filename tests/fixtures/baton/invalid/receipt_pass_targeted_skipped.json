@@ -1,0 +1,48 @@
+{
+  "receipt_schema": "smial.github_baton.execution_receipt",
+  "schema_version": "1.0",
+  "contract_id": "CTRL-BATON-A62-DEMO-001",
+  "contract_revision": 1,
+  "expected_contract_sha256": "39c4e743b7aa5239690faab39cb26cc6f10de89d1b22b818a60b67978c5c449c",
+  "result": "PASS_CANDIDATE",
+  "repository": {
+    "observed_base_head": "bd152b3199a9ba5c75374bd798b1e81756cd4d9b",
+    "observed_base_tree": "a068018e57ad53340ad94321539ed7d1b411bc10",
+    "branch": "main",
+    "candidate_head": "NOT_COMMITTED",
+    "candidate_tree": "NOT_AVAILABLE",
+    "dirty_before": 0,
+    "dirty_after": 1
+  },
+  "changes": {
+    "changed_files": [
+      "docs/evidence/baton/a62_local_validation.json"
+    ],
+    "staged_files": [],
+    "files_outside_managed_write_set": [],
+    "diff_sha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+  },
+  "validation": {
+    "commands": [
+      "scripts/validate_baton.py"
+    ],
+    "targeted": "SKIPPED",
+    "full": "PASS",
+    "catalog": "PASS",
+    "security": "PASS"
+  },
+  "side_effects": {
+    "github_reads": 1,
+    "github_writes": 0,
+    "provider_calls": 0,
+    "cash_spend_usd": 0,
+    "credential_values_exposed": 0,
+    "wallet_actions": 0,
+    "signer_actions": 0,
+    "transaction_actions": 0
+  },
+  "limitations": [],
+  "blockers": [],
+  "contains_secrets": false,
+  "contains_absolute_user_paths": false
+}

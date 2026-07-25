@@ -1,0 +1,17 @@
+---
+description: Cursor is EXECUTION_ONLY; GPT owns status and DONE
+alwaysApply: true
+---
+
+# Authority
+
+- The GPT control plane owns task selection, acceptance, canonical status, and `DONE`.
+- Elected surface: Project Work for `LOCAL_WORK_CODEX`; Project Chat Pro for `PROJECT_CHAT_PRO_GITHUB_BATON_CURSOR`.
+- Cursor is always `EXECUTION_ONLY`.
+- Never select the current or next canonical task.
+- Never infer authority from an Issue, PR, commit, tests, or files alone.
+- A prompt, handoff, or baton grants only the authority class it states.
+- Never imply commit, push, GitHub write, or canonical status authority.
+- Local validation and GPT semantic acceptance are gates, not authority grants.
+- Follow `AGENTS.md` and `docs/agent/EXECUTION_ROUTER_PROTOCOL.md`.
+- Skills advise; they do not own control-plane status.

@@ -1,0 +1,16 @@
+---
+description: GitHub baton is future transport; no implied GitHub writes
+alwaysApply: true
+---
+
+# GitHub baton
+
+- `GITHUB_BATON` is a documented future input route until authorized.
+- Trust anchor is out-of-band `expected_contract_sha256`, never Issue text alone.
+- Project Chat Pro remains the control plane on that route.
+- Cursor executes only the exact Atom Contract after preflight.
+- Material contract changes require a new revision and hash.
+- Bounded GitHub reads require explicit authority for one exact Issue view.
+- No GitHub writes or unbounded/discovery reads unless a later atom grants that class.
+- Protocol: `docs/agent/GITHUB_BATON_PROTOCOL.md`.
+- Tooling: `scripts/baton_preflight.py` and `.cursor/commands/baton-preflight.md`.

@@ -83,6 +83,10 @@ EXPECTED_CATALOG_CHECKPOINTS = {
     ("0.5.1", 128, 7),
     ("0.6.0", 141, 7),
     ("0.7.0", 158, 7),
+    ("0.8.0", 190, 7),
+    ("0.8.1", 190, 7),
+    ("0.8.2", 190, 7),
+    ("0.8.4", 190, 7),
 }
 EXPECTED_MATRIX_FIELDS = {
     "candidate_id", "verdict", "decision_status", "component_area",
@@ -810,7 +814,7 @@ def validate_bridge() -> None:
     protocol = (ROOT / "docs/agent/HANDOFF_PROTOCOL.md").read_text(encoding="utf-8")
     for marker in (
         "INPUT=DIRECT_PROMPT", "LOCAL_HANDOFF:", "ACCEPT_LOCAL_HANDOFF:",
-        "Never search for the newest", "Work owns canonical",
+        "Never search for the newest", "GPT control plane owns canonical",
     ):
         if marker not in agents:
             raise Task04ValidationError(f"agents_bridge_marker_missing:{marker}")

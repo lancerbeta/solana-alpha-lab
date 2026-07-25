@@ -8,6 +8,11 @@
       "target_asset_id": "CTRL-TASK-03-001"
     },
     {
+      "source_asset_id": "ADR-GPT-EXECUTOR-ROUTING-003",
+      "relation": "governed_by",
+      "target_asset_id": "CTRL-BATON-SETUP-001"
+    },
+    {
       "source_asset_id": "ADR-MVP-STACK-002",
       "relation": "evidenced_by",
       "target_asset_id": "EVIDENCE-T04-RESEARCH-ACCEPTANCE-001"
@@ -433,6 +438,11 @@
       "target_asset_id": "CTRL-TASK-04-001"
     },
     {
+      "source_asset_id": "CTRL-BATON-SETUP-001",
+      "relation": "governed_by",
+      "target_asset_id": "CTRL-AGENTS-001"
+    },
+    {
       "source_asset_id": "CTRL-HANDOFF-PROTOCOL-001",
       "relation": "governed_by",
       "target_asset_id": "CTRL-TASK-04-001"
@@ -568,6 +578,51 @@
       "target_asset_id": "ADR-MVP-STACK-002"
     },
     {
+      "source_asset_id": "CURSOR-CMD-BATON-PREFLIGHT-001",
+      "relation": "governed_by",
+      "target_asset_id": "CTRL-BATON-SETUP-001"
+    },
+    {
+      "source_asset_id": "CURSOR-IGNORE-001",
+      "relation": "governed_by",
+      "target_asset_id": "CTRL-BATON-SETUP-001"
+    },
+    {
+      "source_asset_id": "CURSOR-RULE-AUTHORITY-001",
+      "relation": "governed_by",
+      "target_asset_id": "CTRL-BATON-SETUP-001"
+    },
+    {
+      "source_asset_id": "CURSOR-RULE-CATALOG-001",
+      "relation": "governed_by",
+      "target_asset_id": "CTRL-BATON-SETUP-001"
+    },
+    {
+      "source_asset_id": "CURSOR-RULE-GITHUB-BATON-001",
+      "relation": "governed_by",
+      "target_asset_id": "CTRL-BATON-SETUP-001"
+    },
+    {
+      "source_asset_id": "CURSOR-RULE-INPUT-ROUTING-001",
+      "relation": "governed_by",
+      "target_asset_id": "CTRL-BATON-SETUP-001"
+    },
+    {
+      "source_asset_id": "CURSOR-RULE-LANGUAGE-001",
+      "relation": "governed_by",
+      "target_asset_id": "CTRL-BATON-SETUP-001"
+    },
+    {
+      "source_asset_id": "CURSOR-RULE-SECURITY-001",
+      "relation": "governed_by",
+      "target_asset_id": "CTRL-BATON-SETUP-001"
+    },
+    {
+      "source_asset_id": "CURSOR-RULE-VALIDATION-001",
+      "relation": "governed_by",
+      "target_asset_id": "CTRL-BATON-SETUP-001"
+    },
+    {
       "source_asset_id": "DATA-T08-LIFECYCLE-DISCOVERY-PROBE-RAW-001",
       "relation": "derived_from",
       "target_asset_id": "MODULE-T08-LIFECYCLE-DISCOVERY-TRANSPORT-001"
@@ -596,6 +651,11 @@
       "source_asset_id": "EVIDENCE-ATOM4B-RECEIPT-001",
       "relation": "evidenced_by",
       "target_asset_id": "CATALOG-ROOT-001"
+    },
+    {
+      "source_asset_id": "EVIDENCE-BATON-A62-001",
+      "relation": "derived_from",
+      "target_asset_id": "SCRIPT-BATON-VALIDATE-001"
     },
     {
       "source_asset_id": "EVIDENCE-T04-A4R-SBOM-001",
@@ -711,6 +771,16 @@
       "source_asset_id": "EVIDENCE-T08-LIFECYCLE-DISCOVERY-SUMMARY-001",
       "relation": "evidenced_by",
       "target_asset_id": "EVIDENCE-T08-LIFECYCLE-DISCOVERY-RECEIPT-001"
+    },
+    {
+      "source_asset_id": "FIXTURE-BATON-SUITE-001",
+      "relation": "governed_by",
+      "target_asset_id": "CTRL-BATON-SETUP-001"
+    },
+    {
+      "source_asset_id": "FIXTURE-BATON-VALID-CONTRACT-001",
+      "relation": "governed_by",
+      "target_asset_id": "CTRL-BATON-SETUP-001"
     },
     {
       "source_asset_id": "FIXTURE-T04-PIT-001",
@@ -1213,6 +1283,16 @@
       "target_asset_id": "EVIDENCE-ATOM4B-RECEIPT-001"
     },
     {
+      "source_asset_id": "PROTOCOL-EXECUTION-ROUTER-001",
+      "relation": "governed_by",
+      "target_asset_id": "CTRL-BATON-SETUP-001"
+    },
+    {
+      "source_asset_id": "PROTOCOL-GITHUB-BATON-001",
+      "relation": "governed_by",
+      "target_asset_id": "CTRL-BATON-SETUP-001"
+    },
+    {
       "source_asset_id": "PROTOTYPE-T04-CORE-NATIVE-STACK-001",
       "relation": "evidenced_by",
       "target_asset_id": "EVIDENCE-T04-PIT-REPLAY-001"
@@ -1311,6 +1391,21 @@
       "source_asset_id": "SBOM-T04-CORE-STACK-001",
       "relation": "governed_by",
       "target_asset_id": "ADR-MVP-STACK-002"
+    },
+    {
+      "source_asset_id": "SCHEMA-BATON-ACCEPTANCE-RECEIPT-001",
+      "relation": "governed_by",
+      "target_asset_id": "CTRL-BATON-SETUP-001"
+    },
+    {
+      "source_asset_id": "SCHEMA-BATON-ATOM-CONTRACT-001",
+      "relation": "governed_by",
+      "target_asset_id": "CTRL-BATON-SETUP-001"
+    },
+    {
+      "source_asset_id": "SCHEMA-BATON-EXECUTION-RECEIPT-001",
+      "relation": "governed_by",
+      "target_asset_id": "CTRL-BATON-SETUP-001"
     },
     {
       "source_asset_id": "SCHEMA-T05-CANONICAL-DDL-001",
@@ -1568,6 +1663,31 @@
       "target_asset_id": "CTRL-TASK-03-001"
     },
     {
+      "source_asset_id": "SCRIPT-BATON-CONTRACT-001",
+      "relation": "governed_by",
+      "target_asset_id": "CTRL-BATON-SETUP-001"
+    },
+    {
+      "source_asset_id": "SCRIPT-BATON-PREFLIGHT-001",
+      "relation": "governed_by",
+      "target_asset_id": "CTRL-BATON-SETUP-001"
+    },
+    {
+      "source_asset_id": "SCRIPT-BATON-RECEIPT-001",
+      "relation": "governed_by",
+      "target_asset_id": "CTRL-BATON-SETUP-001"
+    },
+    {
+      "source_asset_id": "SCRIPT-BATON-SCOPE-001",
+      "relation": "governed_by",
+      "target_asset_id": "CTRL-BATON-SETUP-001"
+    },
+    {
+      "source_asset_id": "SCRIPT-BATON-VALIDATE-001",
+      "relation": "governed_by",
+      "target_asset_id": "CTRL-BATON-SETUP-001"
+    },
+    {
       "source_asset_id": "SCRIPT-T05-MIGRATION-LEDGER-001",
       "relation": "depends_on",
       "target_asset_id": "SCHEMA-T05-CANONICAL-DDL-001"
@@ -1696,6 +1816,46 @@
       "source_asset_id": "SCRIPT-T08-LIFECYCLE-DISCOVERY-PROBE-001",
       "relation": "validated_by",
       "target_asset_id": "TEST-T08-LIFECYCLE-DISCOVERY-TRANSPORT-001"
+    },
+    {
+      "source_asset_id": "TEMPLATE-BATON-ISSUE-FORM-001",
+      "relation": "governed_by",
+      "target_asset_id": "CTRL-BATON-SETUP-001"
+    },
+    {
+      "source_asset_id": "TEMPLATE-BATON-PULL-REQUEST-001",
+      "relation": "governed_by",
+      "target_asset_id": "CTRL-BATON-SETUP-001"
+    },
+    {
+      "source_asset_id": "TEST-BATON-CONTRACT-001",
+      "relation": "governed_by",
+      "target_asset_id": "CTRL-BATON-SETUP-001"
+    },
+    {
+      "source_asset_id": "TEST-BATON-CURSORIGNORE-001",
+      "relation": "governed_by",
+      "target_asset_id": "CTRL-BATON-SETUP-001"
+    },
+    {
+      "source_asset_id": "TEST-BATON-PREFLIGHT-001",
+      "relation": "governed_by",
+      "target_asset_id": "CTRL-BATON-SETUP-001"
+    },
+    {
+      "source_asset_id": "TEST-BATON-RECEIPTS-001",
+      "relation": "governed_by",
+      "target_asset_id": "CTRL-BATON-SETUP-001"
+    },
+    {
+      "source_asset_id": "TEST-BATON-REPOSITORY-POLICY-001",
+      "relation": "governed_by",
+      "target_asset_id": "CTRL-BATON-SETUP-001"
+    },
+    {
+      "source_asset_id": "TEST-BATON-SCOPE-001",
+      "relation": "governed_by",
+      "target_asset_id": "CTRL-BATON-SETUP-001"
     },
     {
       "source_asset_id": "TEST-T04-CORE-STACK-001",

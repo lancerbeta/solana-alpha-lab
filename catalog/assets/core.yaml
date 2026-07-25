@@ -1,6 +1,6 @@
 schema_version: '1.1'
 registry_id: CATALOG-ASSET-REGISTRY-CORE-001
-as_of: '2026-07-25'
+as_of: '2026-07-26'
 records:
 - asset_id: SCM-BASELINE-COMMIT-001
   record_version: '1.0'
@@ -519,12 +519,12 @@ records:
   evidence: []
   classification: *t06_internal
 - asset_id: TEST-T06-CATALOG-001
-  record_version: '1.3'
+  record_version: '1.4'
   asset_type: script
   purpose: Catalog tests for the exact TASK-06 stable-ID inventory, hashes, ownership, finalization handoff, consumers and no-raw-bytes boundary.
   status: IMPLEMENTED_UNVERIFIED
   origin: REPOSITORY
-  as_of: '2026-07-25'
+  as_of: '2026-07-26'
   truth_owner: TASK-06
   location:
     kind: git_path
@@ -532,7 +532,7 @@ records:
     repository_path: tests/test_task06_catalog.py
   integrity:
     kind: sha256
-    sha256: 4aa21951223bb4dc5a1a06ba680920b3a685059f95bd7a4be6ccc5fa7b36fd7f
+    sha256: 9fa0ff084665493dba616f165980a0cf6b537cd5b3eb9b7d58b549092c73b7c5
   access: *t06_read_file
   relations:
   - relation_type: governed_by
@@ -575,21 +575,21 @@ records:
     contains_raw_data: false
     sensitivity: INTERNAL_NON_SECRET
 - asset_id: CTRL-AGENTS-001
-  record_version: '1.2'
+  record_version: '1.3'
   asset_type: control_document
   purpose: Repository-level agent contract for scope, safety, validation, and status
     ownership.
   status: IMPLEMENTED_UNVERIFIED
   origin: REPOSITORY
-  as_of: '2026-07-22'
-  truth_owner: TASK-04
+  as_of: '2026-07-25'
+  truth_owner: CTRL-BATON-SETUP
   location:
     kind: git_path
     logical_uri: repo://AGENTS.md
     repository_path: AGENTS.md
   integrity:
     kind: sha256
-    sha256: 64952dffee51f8f89dfa8ce1ea98b88351d08418b499c54e447d27194448a5c0
+    sha256: fd422a53efa28bf2b75a845a5c985427148f5026a92d473a5b1a0c54eabea7b1
   access:
     mode: read_only
     method: file
@@ -602,6 +602,7 @@ records:
   consumers:
   - TASK-03
   - TASK-04
+  - CTRL-BATON-SETUP
   evidence: []
   classification:
     contains_secrets: false
@@ -736,13 +737,13 @@ records:
     contains_raw_data: false
     sensitivity: INTERNAL_NON_SECRET
 - asset_id: CI-WORKFLOW-001
-  record_version: '1.0'
+  record_version: '1.1'
   asset_type: script
-  purpose: Immutable-pinned GitHub Actions workflow for one read-only repository validation
-    job.
+  purpose: Immutable-pinned GitHub Actions workflow for pull_request and push validation
+    on main.
   status: VALIDATED_ACTIVE
   origin: REPOSITORY
-  as_of: '2026-07-22'
+  as_of: '2026-07-25'
   truth_owner: TASK-03
   location:
     kind: git_path
@@ -750,7 +751,7 @@ records:
     repository_path: .github/workflows/ci.yml
   integrity:
     kind: sha256
-    sha256: 4d88507fb11db6a387a03264affaafc8f8efa4171b7477ea3904fe6d37c48e0b
+    sha256: 8b8139bc64091126dcddec10bd9c32bd962080836fb56badf959af7187bfb8fe
   access:
     mode: read_only
     method: file
@@ -773,13 +774,13 @@ records:
     contains_raw_data: false
     sensitivity: INTERNAL_NON_SECRET
 - asset_id: CI-VALIDATOR-001
-  record_version: '1.2'
+  record_version: '1.3'
   asset_type: script
   purpose: Single platform-neutral gate for runtime, lock, secrets, Catalog, generated
-    views, repository policy, and tests.
+    views, repository policy, baton machine-layer checks, and tests.
   status: IMPLEMENTED_UNVERIFIED
   origin: REPOSITORY
-  as_of: '2026-07-22'
+  as_of: '2026-07-25'
   truth_owner: TASK-04
   location:
     kind: git_path
@@ -787,7 +788,7 @@ records:
     repository_path: scripts/validate_ci.py
   integrity:
     kind: sha256
-    sha256: 8da49e3f8d141edcc94efd9bda1ad296cd018e5bfbd98bb8370933c94c4f6f5c
+    sha256: c5415cff29ab3d92d8b00d18cc3e8bf7cc050f21e21fe7ccffdf3a850b8718f1
   access:
     mode: read_only
     method: command
@@ -1942,13 +1943,13 @@ records:
     contains_raw_data: false
     sensitivity: INTERNAL_NON_SECRET
 - asset_id: TEST-T04-CORE-STACK-001
-  record_version: '1.6'
+  record_version: '1.7'
   asset_type: script
   purpose: Offline end-to-end Parquet, DuckDB and immutable migration-ledger replay
     plus negative contract tests for the TASK-04 core stack candidate.
   status: IMPLEMENTED_UNVERIFIED
   origin: REPOSITORY
-  as_of: '2026-07-25'
+  as_of: '2026-07-26'
   truth_owner: TASK-04
   location:
     kind: git_path
@@ -1956,7 +1957,7 @@ records:
     repository_path: tests/test_task04_core_stack.py
   integrity:
     kind: sha256
-    sha256: 29f23c353cea725c298319b5bef76561f4fa26214b4fcff053269dac60a4306f
+    sha256: 51497f975545f86dde319a2473087567e68a6a2e2ed8a273a1a7c5077cc53a41
   access:
     mode: read_only
     method: command
@@ -1975,13 +1976,13 @@ records:
     contains_raw_data: false
     sensitivity: INTERNAL_NON_SECRET
 - asset_id: VALIDATOR-T04-ARCHITECTURE-001
-  record_version: '1.6'
+  record_version: '1.7'
   asset_type: script
   purpose: Fail-closed TASK-04 replay, architecture, matrix, registry, dependency,
     evidence and SBOM validator.
   status: IMPLEMENTED_UNVERIFIED
   origin: REPOSITORY
-  as_of: '2026-07-25'
+  as_of: '2026-07-26'
   truth_owner: TASK-04
   location:
     kind: git_path
@@ -1989,7 +1990,7 @@ records:
     repository_path: scripts/validate_task04.py
   integrity:
     kind: sha256
-    sha256: b796ebff8c7cba19a062e8e8b025279bb1fb384ed19765c7ba3eeab2e566c184
+    sha256: 8b924df1063c2d3fc2789307885467f86995653429f273666f695cf2549c5c02
   access:
     mode: read_only
     method: command
@@ -2009,13 +2010,13 @@ records:
     contains_raw_data: false
     sensitivity: INTERNAL_NON_SECRET
 - asset_id: VALIDATOR-REPOSITORY-STATE-001
-  record_version: '1.8'
+  record_version: '2.0'
   asset_type: script
-  purpose: Fail-closed historical and exact through-TASK-08 staged/committed
-    repository-state validator.
+  purpose: Fail-closed historical and compositional repository-state/topology
+    validator through CTRL-BATON A6.4.
   status: IMPLEMENTED_UNVERIFIED
   origin: REPOSITORY
-  as_of: '2026-07-25'
+  as_of: '2026-07-26'
   truth_owner: TASK-04
   location:
     kind: git_path
@@ -2023,7 +2024,7 @@ records:
     repository_path: scripts/validate_baseline.py
   integrity:
     kind: sha256
-    sha256: 2fd5a23a9d17564bbca9923dc24a4998201511f1fc00a0f18b31fe926698d2c1
+    sha256: 5ff80c10751718fb4b0f3d9804f261d0d3c64dd2edd2d9851a6e4046c28c4068
   access:
     mode: read_only
     method: command
@@ -2533,12 +2534,12 @@ records:
     contains_raw_data: false
     sensitivity: INTERNAL_NON_SECRET
 - asset_id: TEST-T05-CATALOG-QUERIES-001
-  record_version: '1.5'
+  record_version: '1.6'
   asset_type: script
   purpose: 'Offline tests proving TASK-05 query bounds, UTC eligibility, write denial, external-access denial, raw BLOB exclusion and exact task/data-contract Catalog registration.'
   status: IMPLEMENTED_UNVERIFIED
   origin: REPOSITORY
-  as_of: '2026-07-25'
+  as_of: '2026-07-26'
   truth_owner: TASK-05
   location:
     kind: git_path
@@ -2546,7 +2547,7 @@ records:
     repository_path: tests/test_task05_catalog_queries.py
   integrity:
     kind: sha256
-    sha256: 5a54745592f4d0eabd624810397b26b3fb1c9d5048030b21b42d7d6994912f9f
+    sha256: cf9e34a25e48034e27f308c49b51eb0636d0eff7380882e37757c7f61af75b13
   access:
     mode: read_only
     method: command
@@ -3408,12 +3409,12 @@ records:
   evidence: []
   classification: *t07_internal
 - asset_id: TEST-T07-CATALOG-001
-  record_version: '1.1'
+  record_version: '1.2'
   asset_type: script
   purpose: Catalog tests for exact TASK-07 stable IDs, file hashes, lineage, accepted checkpoint and no-raw-bytes boundary.
   status: IMPLEMENTED_UNVERIFIED
   origin: REPOSITORY
-  as_of: '2026-07-25'
+  as_of: '2026-07-26'
   truth_owner: TASK-07
   location:
     kind: git_path
@@ -3421,7 +3422,7 @@ records:
     repository_path: tests/test_task07_catalog.py
   integrity:
     kind: sha256
-    sha256: 39dfee97be6d9bcf4134b901b41fc564e474e8fd21724f3785096dd9918bc965
+    sha256: 5e80e3939944912b6e48a699da15ae20f3fbea921064dc29ecb8877178f13574
   access: *t07_read_file
   relations:
   - relation_type: depends_on
@@ -3892,12 +3893,12 @@ records:
   evidence: []
   classification: *t08_internal
 - asset_id: TEST-T08-CATALOG-001
-  record_version: '1.0'
+  record_version: '1.1'
   asset_type: script
   purpose: Catalog tests for exact TASK-08 stable IDs, file and raw hashes, lineage, named consumers, accepted checkpoint and no-raw-bytes boundary.
   status: IMPLEMENTED_UNVERIFIED
   origin: REPOSITORY
-  as_of: '2026-07-25'
+  as_of: '2026-07-26'
   truth_owner: TASK-08
   location:
     kind: git_path
@@ -3905,7 +3906,7 @@ records:
     repository_path: tests/test_task08_catalog.py
   integrity:
     kind: sha256
-    sha256: a414b06186ed46ce70b5bd3625e6ee0c7064312f244bb722fc8694db05991f3a
+    sha256: 12e49508c1839b418cf53e78272c4622f43bb4790268ec4e244331304177d73b
   access: *t08_read_file
   relations:
   - relation_type: depends_on
@@ -3916,3 +3917,966 @@ records:
   - TASK-08
   evidence: []
   classification: *t08_internal
+- asset_id: CTRL-BATON-SETUP-001
+  record_version: '1.2'
+  asset_type: control_document
+  purpose: Candidate control-infrastructure task mirror for GPT baton routing,
+    machine layer, and compositional repository lifecycle.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-07-26'
+  truth_owner: ChatGPT_Project_GPT_Control_Plane
+  location:
+    kind: git_path
+    logical_uri: repo://docs/tasks/CTRL-BATON-SETUP.md
+    repository_path: docs/tasks/CTRL-BATON-SETUP.md
+  integrity:
+    kind: sha256
+    sha256: a521fff3f40d424f0e7f1dfba26ae60dc2a5131006b9bf3cf9ef4a2a643fb4e9
+  access:
+    mode: read_only
+    method: file
+    network_required: false
+    secrets_required: false
+  relations:
+  - relation_type: governed_by
+    target_asset_id: CTRL-AGENTS-001
+  consumers:
+  - CTRL-BATON-SETUP
+  evidence: []
+  classification:
+    contains_secrets: false
+    contains_raw_data: false
+    sensitivity: INTERNAL_NON_SECRET
+- asset_id: PROTOCOL-EXECUTION-ROUTER-001
+  record_version: '1.0'
+  asset_type: control_document
+  purpose: Beginner-safe execution router among GPT_ONLY, LOCAL_WORK_CODEX and GitHub baton Cursor routes.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-07-25'
+  truth_owner: ChatGPT_Project_GPT_Control_Plane
+  location:
+    kind: git_path
+    logical_uri: repo://docs/agent/EXECUTION_ROUTER_PROTOCOL.md
+    repository_path: docs/agent/EXECUTION_ROUTER_PROTOCOL.md
+  integrity:
+    kind: sha256
+    sha256: 5bb233ed5f9a0fc783b3f67e66434f754a16e4ffd6271389651326e105b48b6a
+  access:
+    mode: read_only
+    method: file
+    network_required: false
+    secrets_required: false
+  relations:
+  - relation_type: governed_by
+    target_asset_id: CTRL-BATON-SETUP-001
+  consumers:
+  - CTRL-BATON-SETUP
+  evidence: []
+  classification:
+    contains_secrets: false
+    contains_raw_data: false
+    sensitivity: INTERNAL_NON_SECRET
+- asset_id: PROTOCOL-GITHUB-BATON-001
+  record_version: '1.0'
+  asset_type: control_document
+  purpose: GitHub Baton protocol for revision-locked Atom Contracts and out-of-band hash trust.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-07-25'
+  truth_owner: ChatGPT_Project_GPT_Control_Plane
+  location:
+    kind: git_path
+    logical_uri: repo://docs/agent/GITHUB_BATON_PROTOCOL.md
+    repository_path: docs/agent/GITHUB_BATON_PROTOCOL.md
+  integrity:
+    kind: sha256
+    sha256: bbba3f9aef2e04694f575e3e80fd2be14ed5341470bc0e7454d118fecbb94f5f
+  access:
+    mode: read_only
+    method: file
+    network_required: false
+    secrets_required: false
+  relations:
+  - relation_type: governed_by
+    target_asset_id: CTRL-BATON-SETUP-001
+  consumers:
+  - CTRL-BATON-SETUP
+  evidence: []
+  classification:
+    contains_secrets: false
+    contains_raw_data: false
+    sensitivity: INTERNAL_NON_SECRET
+- asset_id: ADR-GPT-EXECUTOR-ROUTING-003
+  record_version: '1.0'
+  asset_type: decision
+  purpose: Proposed local ADR for GPT control plane and executor routing with deferred MCP and Automations.
+  status: PROPOSED
+  origin: REPOSITORY
+  as_of: '2026-07-25'
+  truth_owner: ChatGPT_Project_GPT_Control_Plane
+  location:
+    kind: git_path
+    logical_uri: repo://docs/decisions/ADR-003-gpt-executor-routing.md
+    repository_path: docs/decisions/ADR-003-gpt-executor-routing.md
+  integrity:
+    kind: sha256
+    sha256: 99a2401cf19a5e4b00bc9409a41d091f412f0bb5c726f509ae64a2fd0a78d216
+  access:
+    mode: read_only
+    method: file
+    network_required: false
+    secrets_required: false
+  relations:
+  - relation_type: governed_by
+    target_asset_id: CTRL-BATON-SETUP-001
+  consumers:
+  - CTRL-BATON-SETUP
+  evidence: []
+  classification:
+    contains_secrets: false
+    contains_raw_data: false
+    sensitivity: INTERNAL_NON_SECRET
+- asset_id: CURSOR-RULE-AUTHORITY-001
+  record_version: '1.0'
+  asset_type: configuration
+  purpose: Always-on Cursor rule encoding EXECUTION_ONLY and GPT control-plane ownership.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-07-25'
+  truth_owner: CTRL-BATON-SETUP
+  location:
+    kind: git_path
+    logical_uri: repo://.cursor/rules/00-authority.mdc
+    repository_path: .cursor/rules/00-authority.mdc
+  integrity:
+    kind: sha256
+    sha256: 39fcdc1ba70f2e9da64efeb7576954d5e8c65baa516b1334c95ed10333cd818f
+  access:
+    mode: read_only
+    method: file
+    network_required: false
+    secrets_required: false
+  relations:
+  - relation_type: governed_by
+    target_asset_id: CTRL-BATON-SETUP-001
+  consumers:
+  - CTRL-BATON-SETUP
+  evidence: []
+  classification:
+    contains_secrets: false
+    contains_raw_data: false
+    sensitivity: INTERNAL_NON_SECRET
+- asset_id: CURSOR-RULE-INPUT-ROUTING-001
+  record_version: '1.0'
+  asset_type: configuration
+  purpose: Always-on Cursor rule for explicit input routes including future GITHUB_BATON.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-07-25'
+  truth_owner: CTRL-BATON-SETUP
+  location:
+    kind: git_path
+    logical_uri: repo://.cursor/rules/10-input-routing.mdc
+    repository_path: .cursor/rules/10-input-routing.mdc
+  integrity:
+    kind: sha256
+    sha256: 224dd54fa41375f866747c011f37756ad6cabe38ea16e3ebc6b776abf6dab9e2
+  access:
+    mode: read_only
+    method: file
+    network_required: false
+    secrets_required: false
+  relations:
+  - relation_type: governed_by
+    target_asset_id: CTRL-BATON-SETUP-001
+  consumers:
+  - CTRL-BATON-SETUP
+  evidence: []
+  classification:
+    contains_secrets: false
+    contains_raw_data: false
+    sensitivity: INTERNAL_NON_SECRET
+- asset_id: CURSOR-RULE-VALIDATION-001
+  record_version: '1.0'
+  asset_type: configuration
+  purpose: Always-on Cursor rule for the platform-neutral validation gate command.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-07-25'
+  truth_owner: CTRL-BATON-SETUP
+  location:
+    kind: git_path
+    logical_uri: repo://.cursor/rules/20-validation.mdc
+    repository_path: .cursor/rules/20-validation.mdc
+  integrity:
+    kind: sha256
+    sha256: 384818d7e256c6073e190aee175aada6ce805722623b814a8c3690848dce5aff
+  access:
+    mode: read_only
+    method: file
+    network_required: false
+    secrets_required: false
+  relations:
+  - relation_type: governed_by
+    target_asset_id: CTRL-BATON-SETUP-001
+  consumers:
+  - CTRL-BATON-SETUP
+  evidence: []
+  classification:
+    contains_secrets: false
+    contains_raw_data: false
+    sensitivity: INTERNAL_NON_SECRET
+- asset_id: CURSOR-RULE-SECURITY-001
+  record_version: '1.0'
+  asset_type: configuration
+  purpose: Always-on Cursor rule for secrets wallets and fail-closed network defaults.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-07-25'
+  truth_owner: CTRL-BATON-SETUP
+  location:
+    kind: git_path
+    logical_uri: repo://.cursor/rules/30-security-and-secrets.mdc
+    repository_path: .cursor/rules/30-security-and-secrets.mdc
+  integrity:
+    kind: sha256
+    sha256: 94aafbfab25fccc0f8d680b04aed0e62a7ad11be0f3d6a441a49e8e751a68946
+  access:
+    mode: read_only
+    method: file
+    network_required: false
+    secrets_required: false
+  relations:
+  - relation_type: governed_by
+    target_asset_id: CTRL-BATON-SETUP-001
+  consumers:
+  - CTRL-BATON-SETUP
+  evidence: []
+  classification:
+    contains_secrets: false
+    contains_raw_data: false
+    sensitivity: INTERNAL_NON_SECRET
+- asset_id: CURSOR-RULE-CATALOG-001
+  record_version: '1.0'
+  asset_type: configuration
+  purpose: Always-on Cursor rule for Catalog and evidence boundaries without dual truth owners.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-07-25'
+  truth_owner: CTRL-BATON-SETUP
+  location:
+    kind: git_path
+    logical_uri: repo://.cursor/rules/40-catalog-and-evidence.mdc
+    repository_path: .cursor/rules/40-catalog-and-evidence.mdc
+  integrity:
+    kind: sha256
+    sha256: 7b0e9f2abde071680ea286ea94dd397738e435f79d91b41578272209aa2425cd
+  access:
+    mode: read_only
+    method: file
+    network_required: false
+    secrets_required: false
+  relations:
+  - relation_type: governed_by
+    target_asset_id: CTRL-BATON-SETUP-001
+  consumers:
+  - CTRL-BATON-SETUP
+  evidence: []
+  classification:
+    contains_secrets: false
+    contains_raw_data: false
+    sensitivity: INTERNAL_NON_SECRET
+- asset_id: CURSOR-RULE-GITHUB-BATON-001
+  record_version: '1.0'
+  asset_type: configuration
+  purpose: Always-on Cursor rule for baton transport out-of-band hash trust and no implied writes.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-07-25'
+  truth_owner: CTRL-BATON-SETUP
+  location:
+    kind: git_path
+    logical_uri: repo://.cursor/rules/50-github-baton.mdc
+    repository_path: .cursor/rules/50-github-baton.mdc
+  integrity:
+    kind: sha256
+    sha256: 0a2b64f3b9b47df3da7777df15c7013e7b549b7c74dac0d4c5198705ed031f4a
+  access:
+    mode: read_only
+    method: file
+    network_required: false
+    secrets_required: false
+  relations:
+  - relation_type: governed_by
+    target_asset_id: CTRL-BATON-SETUP-001
+  consumers:
+  - CTRL-BATON-SETUP
+  evidence: []
+  classification:
+    contains_secrets: false
+    contains_raw_data: false
+    sensitivity: INTERNAL_NON_SECRET
+- asset_id: CURSOR-RULE-LANGUAGE-001
+  record_version: '1.0'
+  asset_type: configuration
+  purpose: Always-on Cursor rule for Russian user-facing reporting with canonical technical tokens.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-07-25'
+  truth_owner: CTRL-BATON-SETUP
+  location:
+    kind: git_path
+    logical_uri: repo://.cursor/rules/05-language-and-reporting.mdc
+    repository_path: .cursor/rules/05-language-and-reporting.mdc
+  integrity:
+    kind: sha256
+    sha256: f4d5e653169efc740bb2bdb95f9da605aa663c81e4c117a7457e794dae991f19
+  access:
+    mode: read_only
+    method: file
+    network_required: false
+    secrets_required: false
+  relations:
+  - relation_type: governed_by
+    target_asset_id: CTRL-BATON-SETUP-001
+  consumers:
+  - CTRL-BATON-SETUP
+  evidence: []
+  classification:
+    contains_secrets: false
+    contains_raw_data: false
+    sensitivity: INTERNAL_NON_SECRET
+- asset_id: CURSOR-CMD-BATON-PREFLIGHT-001
+  record_version: '1.0'
+  asset_type: configuration
+  purpose: Read-only Cursor command playbook for bounded baton preflight inputs and stops.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-07-25'
+  truth_owner: CTRL-BATON-SETUP
+  location:
+    kind: git_path
+    logical_uri: repo://.cursor/commands/baton-preflight.md
+    repository_path: .cursor/commands/baton-preflight.md
+  integrity:
+    kind: sha256
+    sha256: 7e320bfb0906fe4494b5eb83373b32ffa9f250fb99af0beece71043e21a78470
+  access:
+    mode: read_only
+    method: file
+    network_required: false
+    secrets_required: false
+  relations:
+  - relation_type: governed_by
+    target_asset_id: CTRL-BATON-SETUP-001
+  consumers:
+  - CTRL-BATON-SETUP
+  evidence: []
+  classification:
+    contains_secrets: false
+    contains_raw_data: false
+    sensitivity: INTERNAL_NON_SECRET
+- asset_id: CURSOR-IGNORE-001
+  record_version: '1.0'
+  asset_type: configuration
+  purpose: Cursor ignore patterns protecting secrets raw data wallets and handoff exports.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-07-25'
+  truth_owner: CTRL-BATON-SETUP
+  location:
+    kind: git_path
+    logical_uri: repo://.cursorignore
+    repository_path: .cursorignore
+  integrity:
+    kind: sha256
+    sha256: 701e9239cb213a9c3d1515f7b1e74492a7022b19ad398d188563a488a48c0b80
+  access:
+    mode: read_only
+    method: file
+    network_required: false
+    secrets_required: false
+  relations:
+  - relation_type: governed_by
+    target_asset_id: CTRL-BATON-SETUP-001
+  consumers:
+  - CTRL-BATON-SETUP
+  evidence: []
+  classification:
+    contains_secrets: false
+    contains_raw_data: false
+    sensitivity: INTERNAL_NON_SECRET
+- asset_id: SCHEMA-BATON-ATOM-CONTRACT-001
+  record_version: '1.0'
+  asset_type: schema
+  purpose: JSON Schema Draft 2020-12 for revision-locked GitHub Baton Atom Contracts.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-07-25'
+  truth_owner: CTRL-BATON-SETUP
+  location:
+    kind: git_path
+    logical_uri: repo://docs/contracts/atom_contract.schema.json
+    repository_path: docs/contracts/atom_contract.schema.json
+  integrity:
+    kind: sha256
+    sha256: e050af8ed8f311d60b1e37cb6ff93995d378b0cde3d34144f8f11c5004c46dfc
+  access:
+    mode: read_only
+    method: file
+    network_required: false
+    secrets_required: false
+  relations:
+  - relation_type: governed_by
+    target_asset_id: CTRL-BATON-SETUP-001
+  consumers:
+  - CTRL-BATON-SETUP
+  evidence: []
+  classification:
+    contains_secrets: false
+    contains_raw_data: false
+    sensitivity: INTERNAL_NON_SECRET
+- asset_id: SCHEMA-BATON-EXECUTION-RECEIPT-001
+  record_version: '1.0'
+  asset_type: schema
+  purpose: JSON Schema Draft 2020-12 for sanitized baton execution receipts.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-07-25'
+  truth_owner: CTRL-BATON-SETUP
+  location:
+    kind: git_path
+    logical_uri: repo://docs/contracts/execution_receipt.schema.json
+    repository_path: docs/contracts/execution_receipt.schema.json
+  integrity:
+    kind: sha256
+    sha256: e9d1e4ad72626a34403bb32bd25da088e1e684f1264ee52f4a59463c4fa36984
+  access:
+    mode: read_only
+    method: file
+    network_required: false
+    secrets_required: false
+  relations:
+  - relation_type: governed_by
+    target_asset_id: CTRL-BATON-SETUP-001
+  consumers:
+  - CTRL-BATON-SETUP
+  evidence: []
+  classification:
+    contains_secrets: false
+    contains_raw_data: false
+    sensitivity: INTERNAL_NON_SECRET
+- asset_id: SCHEMA-BATON-ACCEPTANCE-RECEIPT-001
+  record_version: '1.0'
+  asset_type: schema
+  purpose: JSON Schema Draft 2020-12 for GPT acceptance receipts without merge authority.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-07-25'
+  truth_owner: CTRL-BATON-SETUP
+  location:
+    kind: git_path
+    logical_uri: repo://docs/contracts/acceptance_receipt.schema.json
+    repository_path: docs/contracts/acceptance_receipt.schema.json
+  integrity:
+    kind: sha256
+    sha256: 5aad6e11269e21486197f3d862d97c44ffd2884df37f90b4e642aec4f31d196f
+  access:
+    mode: read_only
+    method: file
+    network_required: false
+    secrets_required: false
+  relations:
+  - relation_type: governed_by
+    target_asset_id: CTRL-BATON-SETUP-001
+  consumers:
+  - CTRL-BATON-SETUP
+  evidence: []
+  classification:
+    contains_secrets: false
+    contains_raw_data: false
+    sensitivity: INTERNAL_NON_SECRET
+- asset_id: TEMPLATE-BATON-ISSUE-FORM-001
+  record_version: '1.0'
+  asset_type: configuration
+  purpose: Manual GitHub Issue form fallback for marked Atom Contract transport.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-07-25'
+  truth_owner: CTRL-BATON-SETUP
+  location:
+    kind: git_path
+    logical_uri: repo://.github/ISSUE_TEMPLATE/control-atom.yml
+    repository_path: .github/ISSUE_TEMPLATE/control-atom.yml
+  integrity:
+    kind: sha256
+    sha256: d6692799cafcaa83b9049105e9ddcc7983635196800231d0434fe1c9ada69e97
+  access:
+    mode: read_only
+    method: file
+    network_required: false
+    secrets_required: false
+  relations:
+  - relation_type: governed_by
+    target_asset_id: CTRL-BATON-SETUP-001
+  consumers:
+  - CTRL-BATON-SETUP
+  evidence: []
+  classification:
+    contains_secrets: false
+    contains_raw_data: false
+    sensitivity: INTERNAL_NON_SECRET
+- asset_id: TEMPLATE-BATON-PULL-REQUEST-001
+  record_version: '1.0'
+  asset_type: configuration
+  purpose: Pull request template stating Draft PR is evidence not DONE.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-07-25'
+  truth_owner: CTRL-BATON-SETUP
+  location:
+    kind: git_path
+    logical_uri: repo://.github/pull_request_template.md
+    repository_path: .github/pull_request_template.md
+  integrity:
+    kind: sha256
+    sha256: cb480d338f98723137427aa7afbe219a833c6a893df17aef66d0fda994b894f9
+  access:
+    mode: read_only
+    method: file
+    network_required: false
+    secrets_required: false
+  relations:
+  - relation_type: governed_by
+    target_asset_id: CTRL-BATON-SETUP-001
+  consumers:
+  - CTRL-BATON-SETUP
+  evidence: []
+  classification:
+    contains_secrets: false
+    contains_raw_data: false
+    sensitivity: INTERNAL_NON_SECRET
+- asset_id: SCRIPT-BATON-CONTRACT-001
+  record_version: '1.0'
+  asset_type: script
+  purpose: Exact marker extraction out-of-band hash verify and managed-write validation.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-07-25'
+  truth_owner: CTRL-BATON-SETUP
+  location:
+    kind: git_path
+    logical_uri: repo://scripts/baton_contract.py
+    repository_path: scripts/baton_contract.py
+  integrity:
+    kind: sha256
+    sha256: 0cf9c68b51fc028679ec0c38ae8d658dbde808421849861d4aea550ab9886a58
+  access:
+    mode: read_only
+    method: file
+    network_required: false
+    secrets_required: false
+  relations:
+  - relation_type: governed_by
+    target_asset_id: CTRL-BATON-SETUP-001
+  consumers:
+  - CTRL-BATON-SETUP
+  evidence: []
+  classification:
+    contains_secrets: false
+    contains_raw_data: false
+    sensitivity: INTERNAL_NON_SECRET
+- asset_id: SCRIPT-BATON-PREFLIGHT-001
+  record_version: '1.0'
+  asset_type: script
+  purpose: Offline and live baton preflight with explicit GitHub-read authority gate.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-07-25'
+  truth_owner: CTRL-BATON-SETUP
+  location:
+    kind: git_path
+    logical_uri: repo://scripts/baton_preflight.py
+    repository_path: scripts/baton_preflight.py
+  integrity:
+    kind: sha256
+    sha256: 0da607810dd66d13b7539ed5174e6ee2db16c8133104560b9049be4ab71407b2
+  access:
+    mode: read_only
+    method: file
+    network_required: false
+    secrets_required: false
+  relations:
+  - relation_type: governed_by
+    target_asset_id: CTRL-BATON-SETUP-001
+  consumers:
+  - CTRL-BATON-SETUP
+  evidence: []
+  classification:
+    contains_secrets: false
+    contains_raw_data: false
+    sensitivity: INTERNAL_NON_SECRET
+- asset_id: SCRIPT-BATON-SCOPE-001
+  record_version: '1.0'
+  asset_type: script
+  purpose: Dirty-path scope checker against managed write set without mutating Git.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-07-25'
+  truth_owner: CTRL-BATON-SETUP
+  location:
+    kind: git_path
+    logical_uri: repo://scripts/baton_scope.py
+    repository_path: scripts/baton_scope.py
+  integrity:
+    kind: sha256
+    sha256: f59f3431ae68144beb001736c9402dd2326f435efca8d4298be24f9cd44ff4ba
+  access:
+    mode: read_only
+    method: file
+    network_required: false
+    secrets_required: false
+  relations:
+  - relation_type: governed_by
+    target_asset_id: CTRL-BATON-SETUP-001
+  consumers:
+  - CTRL-BATON-SETUP
+  evidence: []
+  classification:
+    contains_secrets: false
+    contains_raw_data: false
+    sensitivity: INTERNAL_NON_SECRET
+- asset_id: SCRIPT-BATON-RECEIPT-001
+  record_version: '1.0'
+  asset_type: script
+  purpose: Execution and acceptance receipt semantic validators for baton receipts.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-07-25'
+  truth_owner: CTRL-BATON-SETUP
+  location:
+    kind: git_path
+    logical_uri: repo://scripts/baton_receipt.py
+    repository_path: scripts/baton_receipt.py
+  integrity:
+    kind: sha256
+    sha256: 828730d9422ffcd92442268941c92ee80bddb3863f4f12d5f6842105b528355c
+  access:
+    mode: read_only
+    method: file
+    network_required: false
+    secrets_required: false
+  relations:
+  - relation_type: governed_by
+    target_asset_id: CTRL-BATON-SETUP-001
+  consumers:
+  - CTRL-BATON-SETUP
+  evidence: []
+  classification:
+    contains_secrets: false
+    contains_raw_data: false
+    sensitivity: INTERNAL_NON_SECRET
+- asset_id: SCRIPT-BATON-VALIDATE-001
+  record_version: '1.0'
+  asset_type: script
+  purpose: Deterministic offline validator for baton schemas fixtures templates and rules.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-07-25'
+  truth_owner: CTRL-BATON-SETUP
+  location:
+    kind: git_path
+    logical_uri: repo://scripts/validate_baton.py
+    repository_path: scripts/validate_baton.py
+  integrity:
+    kind: sha256
+    sha256: 1ab326d15adc4aff926681e1976fc77fda66a6818567bc1b2d80961452de0c2f
+  access:
+    mode: read_only
+    method: file
+    network_required: false
+    secrets_required: false
+  relations:
+  - relation_type: governed_by
+    target_asset_id: CTRL-BATON-SETUP-001
+  consumers:
+  - CTRL-BATON-SETUP
+  evidence: []
+  classification:
+    contains_secrets: false
+    contains_raw_data: false
+    sensitivity: INTERNAL_NON_SECRET
+- asset_id: FIXTURE-BATON-SUITE-001
+  record_version: '1.0'
+  asset_type: evidence
+  purpose: Deterministic fixture manifest listing all baton offline positive and negative cases.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-07-25'
+  truth_owner: CTRL-BATON-SETUP
+  location:
+    kind: git_path
+    logical_uri: repo://tests/fixtures/baton/fixture_manifest.json
+    repository_path: tests/fixtures/baton/fixture_manifest.json
+  integrity:
+    kind: sha256
+    sha256: e2b8f8ca87ebd986710b454255f5d4f62e806864987b7703d18021dc73404417
+  access:
+    mode: read_only
+    method: file
+    network_required: false
+    secrets_required: false
+  relations:
+  - relation_type: governed_by
+    target_asset_id: CTRL-BATON-SETUP-001
+  consumers:
+  - CTRL-BATON-SETUP
+  evidence: []
+  classification:
+    contains_secrets: false
+    contains_raw_data: false
+    sensitivity: INTERNAL_NON_SECRET
+- asset_id: FIXTURE-BATON-VALID-CONTRACT-001
+  record_version: '1.0'
+  asset_type: evidence
+  purpose: Sanitized valid Atom Contract fixture bytes for offline hash tests.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-07-25'
+  truth_owner: CTRL-BATON-SETUP
+  location:
+    kind: git_path
+    logical_uri: repo://tests/fixtures/baton/valid_atom_contract.json
+    repository_path: tests/fixtures/baton/valid_atom_contract.json
+  integrity:
+    kind: sha256
+    sha256: 39c4e743b7aa5239690faab39cb26cc6f10de89d1b22b818a60b67978c5c449c
+  access:
+    mode: read_only
+    method: file
+    network_required: false
+    secrets_required: false
+  relations:
+  - relation_type: governed_by
+    target_asset_id: CTRL-BATON-SETUP-001
+  consumers:
+  - CTRL-BATON-SETUP
+  evidence: []
+  classification:
+    contains_secrets: false
+    contains_raw_data: false
+    sensitivity: INTERNAL_NON_SECRET
+- asset_id: TEST-BATON-CONTRACT-001
+  record_version: '1.0'
+  asset_type: script
+  purpose: Unit tests for marker extraction hashing and managed-write fail-closed rules.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-07-25'
+  truth_owner: CTRL-BATON-SETUP
+  location:
+    kind: git_path
+    logical_uri: repo://tests/test_baton_contract.py
+    repository_path: tests/test_baton_contract.py
+  integrity:
+    kind: sha256
+    sha256: 365113e630431ff12d04913f9777b14b82eb701c6dae3fdc9f35574eea8bf9d5
+  access:
+    mode: read_only
+    method: file
+    network_required: false
+    secrets_required: false
+  relations:
+  - relation_type: governed_by
+    target_asset_id: CTRL-BATON-SETUP-001
+  consumers:
+  - CTRL-BATON-SETUP
+  evidence: []
+  classification:
+    contains_secrets: false
+    contains_raw_data: false
+    sensitivity: INTERNAL_NON_SECRET
+- asset_id: TEST-BATON-PREFLIGHT-001
+  record_version: '1.0'
+  asset_type: script
+  purpose: Unit tests for offline preflight authority gates and github read counts.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-07-25'
+  truth_owner: CTRL-BATON-SETUP
+  location:
+    kind: git_path
+    logical_uri: repo://tests/test_baton_preflight.py
+    repository_path: tests/test_baton_preflight.py
+  integrity:
+    kind: sha256
+    sha256: ff37c69949f387efd8835b698b04a7f5ddc6340f0db9d4d3d74ad46376c2dbf9
+  access:
+    mode: read_only
+    method: file
+    network_required: false
+    secrets_required: false
+  relations:
+  - relation_type: governed_by
+    target_asset_id: CTRL-BATON-SETUP-001
+  consumers:
+  - CTRL-BATON-SETUP
+  evidence: []
+  classification:
+    contains_secrets: false
+    contains_raw_data: false
+    sensitivity: INTERNAL_NON_SECRET
+- asset_id: TEST-BATON-RECEIPTS-001
+  record_version: '1.0'
+  asset_type: script
+  purpose: Unit tests for execution and acceptance receipt semantic failures.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-07-25'
+  truth_owner: CTRL-BATON-SETUP
+  location:
+    kind: git_path
+    logical_uri: repo://tests/test_baton_receipts.py
+    repository_path: tests/test_baton_receipts.py
+  integrity:
+    kind: sha256
+    sha256: 6de8320a8a3e9a14d3abec1661680ca8f46fb344efb4753b3275d7b2f5c69650
+  access:
+    mode: read_only
+    method: file
+    network_required: false
+    secrets_required: false
+  relations:
+  - relation_type: governed_by
+    target_asset_id: CTRL-BATON-SETUP-001
+  consumers:
+  - CTRL-BATON-SETUP
+  evidence: []
+  classification:
+    contains_secrets: false
+    contains_raw_data: false
+    sensitivity: INTERNAL_NON_SECRET
+- asset_id: TEST-BATON-CURSORIGNORE-001
+  record_version: '1.0'
+  asset_type: script
+  purpose: Static test for cursorignore secret blocks and env example allow ordering.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-07-25'
+  truth_owner: CTRL-BATON-SETUP
+  location:
+    kind: git_path
+    logical_uri: repo://tests/test_baton_cursorignore.py
+    repository_path: tests/test_baton_cursorignore.py
+  integrity:
+    kind: sha256
+    sha256: 54065698745bf1bd872a8d22f1089bca5c74ca190b624ac204f973e5591d00ae
+  access:
+    mode: read_only
+    method: file
+    network_required: false
+    secrets_required: false
+  relations:
+  - relation_type: governed_by
+    target_asset_id: CTRL-BATON-SETUP-001
+  consumers:
+  - CTRL-BATON-SETUP
+  evidence: []
+  classification:
+    contains_secrets: false
+    contains_raw_data: false
+    sensitivity: INTERNAL_NON_SECRET
+- asset_id: TEST-BATON-SCOPE-001
+  record_version: '1.0'
+  asset_type: script
+  purpose: Unit tests for managed-write scope and portable symlink containment.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-07-25'
+  truth_owner: CTRL-BATON-SETUP
+  location:
+    kind: git_path
+    logical_uri: repo://tests/test_baton_scope.py
+    repository_path: tests/test_baton_scope.py
+  integrity:
+    kind: sha256
+    sha256: d281f292a891c2a7bc9c5f9abea445261d71689d40c74d9ee5da7800628af61d
+  access:
+    mode: read_only
+    method: file
+    network_required: false
+    secrets_required: false
+  relations:
+  - relation_type: governed_by
+    target_asset_id: CTRL-BATON-SETUP-001
+  consumers:
+  - CTRL-BATON-SETUP
+  evidence: []
+  classification:
+    contains_secrets: false
+    contains_raw_data: false
+    sensitivity: INTERNAL_NON_SECRET
+- asset_id: TEST-BATON-REPOSITORY-POLICY-001
+  record_version: '1.2'
+  asset_type: script
+  purpose: Unit tests for exact local staged, committed and published feature,
+    PR merge, main merge, and legacy repository policy.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-07-26'
+  truth_owner: CTRL-BATON-SETUP
+  location:
+    kind: git_path
+    logical_uri: repo://tests/test_baton_repository_policy.py
+    repository_path: tests/test_baton_repository_policy.py
+  integrity:
+    kind: sha256
+    sha256: f662a27eb9f047844a79aee8b99a60224c5ce6b3ce8fafae804541c2dfb428af
+  access:
+    mode: read_only
+    method: file
+    network_required: false
+    secrets_required: false
+  relations:
+  - relation_type: governed_by
+    target_asset_id: CTRL-BATON-SETUP-001
+  consumers:
+  - CTRL-BATON-SETUP
+  evidence: []
+  classification:
+    contains_secrets: false
+    contains_raw_data: false
+    sensitivity: INTERNAL_NON_SECRET
+- asset_id: EVIDENCE-BATON-A62-001
+  record_version: '1.2'
+  asset_type: evidence
+  purpose: Local A6.4 compositional repository lifecycle validation evidence
+    preserving the prior A6.2 R4 checkpoint.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-07-26'
+  truth_owner: CTRL-BATON-SETUP
+  location:
+    kind: git_path
+    logical_uri: repo://docs/evidence/baton/a62_machine_layer_local_validation.json
+    repository_path: docs/evidence/baton/a62_machine_layer_local_validation.json
+  integrity:
+    kind: sha256
+    sha256: fc9bec424562bf351031aa5b5772697db64d5ec4d303b68316031c8b575362f2
+  access:
+    mode: read_only
+    method: file
+    network_required: false
+    secrets_required: false
+  relations:
+  - relation_type: derived_from
+    target_asset_id: SCRIPT-BATON-VALIDATE-001
+  consumers:
+  - CTRL-BATON-SETUP
+  evidence: []
+  classification:
+    contains_secrets: false
+    contains_raw_data: false
+    sensitivity: INTERNAL_NON_SECRET

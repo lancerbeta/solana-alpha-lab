@@ -48,7 +48,13 @@ class CiWorkflowTests(unittest.TestCase):
     def test_permissions_checkout_cache_trigger_and_limits_are_exact(self) -> None:
         document = yaml.load(self.text, Loader=yaml.BaseLoader)
         self.assertEqual(document["permissions"], {"contents": "read"})
-        self.assertEqual(document["on"], {"push": {"branches": ["main"]}})
+        self.assertEqual(
+            document["on"],
+            {
+                "pull_request": {"branches": ["main"]},
+                "push": {"branches": ["main"]},
+            },
+        )
         job = document["jobs"]["validate"]
         self.assertEqual(job["timeout-minutes"], "10")
         self.assertEqual(job["concurrency"] if "concurrency" in job else None, None)

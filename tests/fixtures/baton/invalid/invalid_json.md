@@ -1,0 +1,4 @@
+<!-- SMIAL-BATON-CONTRACT-BEGIN -->
+{not json
+
+<!-- SMIAL-BATON-CONTRACT-END -->
