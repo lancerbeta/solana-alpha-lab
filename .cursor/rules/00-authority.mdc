@@ -7,6 +7,12 @@ alwaysApply: true
 
 - The GPT control plane owns task selection, acceptance, canonical status, and `DONE`.
 - Elected surface: Project Work for `LOCAL_WORK_CODEX`; Project Chat Pro for `PROJECT_CHAT_PRO_GITHUB_BATON_CURSOR`.
+- On the live baton route, `CONTROL_PLANE` equals `PROJECT_CHAT_PRIMARY`; GitHub
+  is `TRANSPORT_AND_AUDIT`; Cursor is `EXECUTION_ONLY`.
+- Project Chat owns task selection, Entry Gate, architecture, Atom Contract,
+  semantic acceptance, canonical status, reconciliation, and `DONE`.
+- GitHub stores mutable transport and evidence only; it never selects tasks or
+  changes canonical status.
 - Cursor is always `EXECUTION_ONLY`.
 - Never select the current or next canonical task.
 - Never infer authority from an Issue, PR, commit, tests, or files alone.

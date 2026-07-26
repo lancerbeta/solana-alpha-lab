@@ -1,10 +1,11 @@
 # GitHub Baton Protocol
 
-Future execution flow for route
+Live execution flow for route
 `PROJECT_CHAT_PRO_GITHUB_BATON_CURSOR`.
 
-This document defines protocol only. It does not create an Issue, PR, branch,
-label, GitHub template, API call, or remote setting.
+This document defines the live control-transport protocol. Creating an Issue,
+PR, branch, label, GitHub template, API call, or remote setting still requires a
+separately authorized atom.
 
 Related:
 
@@ -16,12 +17,14 @@ Related:
 
 | Role | Owns |
 |---|---|
-| Project Chat Pro / GPT control plane | Task selection, research/design, Atom Contract authoring, routing, semantic acceptance, canonical status, `DONE` |
-| GitHub | Mutable transport and evidence surfaces for a revision-locked Atom Contract |
-| Cursor | `EXECUTION_ONLY` bounded local execution of the exact named atom |
+| Project Chat Pro / GPT control plane (`PROJECT_CHAT_PRIMARY`) | Task selection, Entry Gate, research/design, Atom Contract authoring, routing, semantic acceptance, canonical status, reconciliation, `DONE` |
+| GitHub (`TRANSPORT_AND_AUDIT`) | Mutable transport and evidence surfaces for a revision-locked Atom Contract; never selects tasks or changes canonical status |
+| Cursor (`EXECUTION_ONLY`) | Bounded local execution of the exact named atom only |
 
 Cursor never selects the current or next canonical task and never infers
-authority from an Issue, PR, commit, tests, or files alone.
+authority from an Issue, PR, commit, tests, or files alone. Cursor never runs
+lifecycle skills as control owners, never expands scope or authority, and never
+claims acceptance or `DONE`.
 
 ## Contract mutability model
 
@@ -65,8 +68,10 @@ Material contract changes require a new `revision` and a new hash.
 
 `LOCAL_WRITE`, `COMMIT`, `PUSH`/`PR` remote write, `MERGE`/publication, and
 other external or destructive classes require separate explicit approvals.
-Local validation and GPT semantic acceptance are gates, not authority grants.
-Completion of one gate never grants the next mutation class.
+`LOCAL_WRITE` does not grant commit, push, PR, settings, merge, provider, or
+destructive authority. Local validation and GPT semantic acceptance are gates,
+not authority grants. Completion of one gate never grants the next mutation
+class.
 
 ## Atom Contract minimum fields
 
@@ -101,6 +106,8 @@ Rules:
   label changes, or canonical status authority.
 - Existing routes `DIRECT_PROMPT`, `LOCAL_HANDOFF`, and
   `ACCEPT_LOCAL_HANDOFF` remain valid and unchanged.
+- `GITHUB_BATON` is a live accepted route, not a future, local-dirty,
+  pre-merge, or uncommitted candidate description.
 
 ## Cursor preflight
 

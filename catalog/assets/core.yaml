@@ -589,7 +589,7 @@ records:
     repository_path: AGENTS.md
   integrity:
     kind: sha256
-    sha256: fd422a53efa28bf2b75a845a5c985427148f5026a92d473a5b1a0c54eabea7b1
+    sha256: 0abbf7e64f2cd6672dfc2cdf712707a4b10ae3401aead2bb6d0097f6c5bf63a7
   access:
     mode: read_only
     method: file
@@ -3932,7 +3932,7 @@ records:
     repository_path: docs/tasks/CTRL-BATON-SETUP.md
   integrity:
     kind: sha256
-    sha256: a521fff3f40d424f0e7f1dfba26ae60dc2a5131006b9bf3cf9ef4a2a643fb4e9
+    sha256: 9ad4d47037a038b512ba1f382778cd1d64c5bbfff1d133317c4bfa88b7608b34
   access:
     mode: read_only
     method: file
@@ -3962,7 +3962,7 @@ records:
     repository_path: docs/agent/EXECUTION_ROUTER_PROTOCOL.md
   integrity:
     kind: sha256
-    sha256: 5bb233ed5f9a0fc783b3f67e66434f754a16e4ffd6271389651326e105b48b6a
+    sha256: e3b063cb50f26c363b66a56565fdbb0aee220a6f0a6017c522bcdb97d14cb409
   access:
     mode: read_only
     method: file
@@ -3992,7 +3992,7 @@ records:
     repository_path: docs/agent/GITHUB_BATON_PROTOCOL.md
   integrity:
     kind: sha256
-    sha256: bbba3f9aef2e04694f575e3e80fd2be14ed5341470bc0e7454d118fecbb94f5f
+    sha256: 068e13c5ee29fac395c1fe310a6add575dd18085eb376735b46f843fcec150f5
   access:
     mode: read_only
     method: file
@@ -4022,7 +4022,7 @@ records:
     repository_path: docs/decisions/ADR-003-gpt-executor-routing.md
   integrity:
     kind: sha256
-    sha256: 99a2401cf19a5e4b00bc9409a41d091f412f0bb5c726f509ae64a2fd0a78d216
+    sha256: f6fc3b4bfb9049844b3156203899fc4f6954f5bfb07eb8955e832d8c2c515e07
   access:
     mode: read_only
     method: file
@@ -4052,7 +4052,7 @@ records:
     repository_path: .cursor/rules/00-authority.mdc
   integrity:
     kind: sha256
-    sha256: 9fa7c28c58870e2ff0416e7ec63671c04a525c5b1d87e5983ce2077260d0d98f
+    sha256: 820faaa602a1324290b01b824a3242f5edaddc69710c495c71566a269c9010ea
   access:
     mode: read_only
     method: file
@@ -4082,7 +4082,7 @@ records:
     repository_path: .cursor/rules/10-input-routing.mdc
   integrity:
     kind: sha256
-    sha256: 224dd54fa41375f866747c011f37756ad6cabe38ea16e3ebc6b776abf6dab9e2
+    sha256: 83642d604932a080aebf72e511df23287ab384820dd4a0671d2a2b84fee2be92
   access:
     mode: read_only
     method: file
@@ -4202,7 +4202,7 @@ records:
     repository_path: .cursor/rules/50-github-baton.mdc
   integrity:
     kind: sha256
-    sha256: 0a2b64f3b9b47df3da7777df15c7013e7b549b7c74dac0d4c5198705ed031f4a
+    sha256: c3122f3ce62239d671e335ec78d330ebfa4f826a35a981625280eb79ef018956
   access:
     mode: read_only
     method: file
@@ -4592,7 +4592,7 @@ records:
     repository_path: scripts/validate_baton.py
   integrity:
     kind: sha256
-    sha256: 8f63fe0030b1782e59820b2f2a5106eb18568961af2e612f5ec54c114b186815
+    sha256: a5da6b0646c59010a0503d1e61dc32b051a7b8c200efe854d64865d233a29566
   access:
     mode: read_only
     method: file
@@ -4682,7 +4682,7 @@ records:
     repository_path: tests/test_baton_contract.py
   integrity:
     kind: sha256
-    sha256: 365113e630431ff12d04913f9777b14b82eb701c6dae3fdc9f35574eea8bf9d5
+    sha256: 49bcc82278aab194b94612e580e6f6633e01f3b6a2165f953325f5a52f9ad22e
   access:
     mode: read_only
     method: file

@@ -17,8 +17,8 @@ Related:
 
 - `AGENTS.md` — repository contract and input routes
 - `docs/agent/HANDOFF_PROTOCOL.md` — local Work↔Codex handoff
-- `docs/agent/GITHUB_BATON_PROTOCOL.md` — future GitHub Atom Contract baton
-- `docs/decisions/ADR-003-gpt-executor-routing.md` — routing decision candidate
+- `docs/agent/GITHUB_BATON_PROTOCOL.md` — live GitHub Atom Contract baton
+- `docs/decisions/ADR-003-gpt-executor-routing.md` — accepted repository routing ADR
 
 ## Control-plane ownership
 
@@ -59,19 +59,22 @@ Preserved input routes:
 
 ### 3. `PROJECT_CHAT_PRO_GITHUB_BATON_CURSOR`
 
-Project Chat Pro remains the control plane. GitHub publishes a revision-locked,
-content-addressed Atom Contract for transport. Cursor executes only that exact
-atom and returns evidence through an Issue comment or Draft PR under separate
-authorization.
+Project Chat Pro remains the primary control plane
+(`CONTROL_PLANE=PROJECT_CHAT_PRIMARY`). GitHub is `TRANSPORT_AND_AUDIT` for a
+revision-locked, content-addressed Atom Contract. Cursor is `EXECUTION_ONLY`
+and executes only that exact atom, returning evidence through an Issue comment
+or Draft PR under separate authorization.
 
-Documented future input route:
+Live accepted input route:
 
 - `GITHUB_BATON`
 
-This route is protocol-documented only until later machine-layer atoms land.
-The A6.2 machine layer currently exists only as a local dirty candidate: it is
-not committed, not pushed, not live-piloted, and not canonical `DONE`.
-MCP and Cursor Automations remain deferred.
+`GITHUB_BATON` is a live accepted route for this repository control contract. It
+is not a future-only, local-dirty, pre-merge, or uncommitted candidate description.
+The baton machine layer is committed on `main` and used through exact Issue
+transport with out-of-band hash trust. Canonical Project Sources reconciliation
+and roadmap `DONE` remain GPT-owned and may still be pending. MCP and Cursor
+Automations remain deferred.
 
 ## Routing criteria
 

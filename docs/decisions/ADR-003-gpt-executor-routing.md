@@ -1,18 +1,18 @@
 ---
 adr_id: ADR-003
 title: GPT control plane and executor routing
-status: PROPOSED_LOCAL_CANDIDATE
-as_of: 2026-07-25
+status: ACCEPTED_REPOSITORY_MIRROR
+as_of: 2026-07-26
 owner_task: CTRL-BATON-SETUP
 contains_secrets: false
 ---
 
 # ADR-003 — GPT control plane and executor routing
 
-> Local decision candidate only. Not accepted canonical truth. The GPT control
-> plane retains semantic acceptance, roadmap registration, and `DONE`.
-> This ADR grants no commit, push, GitHub write, provider, signer, or spend
-> authority.
+> Accepted repository control mirror for the live GitHub Baton and Cursor
+> workplace. Canonical Project Sources reconciliation and roadmap `DONE`
+> remain GPT-owned and may still be pending. This ADR grants no commit, push,
+> GitHub write, provider, signer, or spend authority by itself.
 
 ## Context
 
@@ -30,8 +30,9 @@ Adopt three first-class execution routes:
    is unnecessary.
 2. `LOCAL_WORK_CODEX` — Project Work remains control plane; may execute
    directly or use the existing Work↔Codex handoff.
-3. `PROJECT_CHAT_PRO_GITHUB_BATON_CURSOR` — Project Chat Pro remains control
-   plane; GitHub transports a revision-locked Atom Contract; Cursor is
+3. `PROJECT_CHAT_PRO_GITHUB_BATON_CURSOR` — Project Chat Pro remains primary
+   control plane (`CONTROL_PLANE=PROJECT_CHAT_PRIMARY`); GitHub is
+   `TRANSPORT_AND_AUDIT` for a revision-locked Atom Contract; Cursor is
    `EXECUTION_ONLY`.
 
 GPT control plane means the elected owning ChatGPT Project surface:
@@ -41,12 +42,16 @@ GPT control plane means the elected owning ChatGPT Project surface:
 
 Non-negotiable ownership:
 
-- GPT owns task selection, research/design, routing, semantic acceptance,
-  canonical status, and `DONE`.
-- Cursor never selects current/next canonical tasks and never infers authority
-  from Issue, PR, commit, tests, or files alone.
+- Project Chat owns task selection, Entry Gate, research/design, Atom Contract,
+  routing, semantic acceptance, canonical status, reconciliation, and `DONE`.
+- GitHub stores mutable transport and evidence only; it never selects tasks or
+  changes canonical status.
+- Cursor never selects current/next canonical tasks, never runs lifecycle
+  skills as control owners, never expands scope or authority, and never claims
+  acceptance or `DONE`.
 - Preserve `DIRECT_PROMPT`, `LOCAL_HANDOFF`, and `ACCEPT_LOCAL_HANDOFF`.
-- Add `GITHUB_BATON` only as a documented future input route.
+- Treat `GITHUB_BATON` as a live accepted input route, not a future,
+  local-dirty, pre-merge, or uncommitted candidate description.
 - One Atom Contract identifies repository, issue, revision, contract hash, base
   HEAD/tree, authority, and managed write set.
 - The Atom Contract is revision-locked and content-addressed; published Issue
@@ -54,6 +59,8 @@ Non-negotiable ownership:
   expected_contract_sha256 plus revision checks on exact extracted payload bytes;
   Cursor fails closed on mismatch.
 - Material contract changes require a new revision and hash.
+- Authority classes remain separate: `LOCAL_WRITE` does not grant commit, push,
+  PR, settings, merge, provider, or destructive authority.
 - Skills are helper procedures, not canonical control owners.
 - Seven canonical Project Sources remain in ChatGPT Project and are not copied
   into Cursor/Git as a second permanent-memory truth owner.
@@ -78,23 +85,24 @@ Repository mirrors:
 ## Why MCP, Automations, and Cloud Agents are deferred
 
 - MCP and Cursor Automations add network and privilege surfaces before the baton
-  contract, preflight, and evidence return path are frozen.
+  evidence-return path and operator workflow are frozen for those surfaces.
 - Cloud Agents are not the default executor until local identity, write-set, and
-  receipt rules are proven on the private repository path.
+  receipt rules remain proven on the private repository path.
 - Deferral keeps authority explicit and beginner-safe; revisit only under a new
   accepted ADR/atom.
 
 ## Consequences
 
-- Routing docs and Cursor project rules can guide executors without granting
-  status authority.
-- `GITHUB_BATON` may be documented and preflighted before any Issue/PR machine
-  layer exists.
-- The A6.2 machine layer currently exists only as a local dirty candidate: not
-  committed, not pushed, not live-piloted, and not canonical `DONE`.
-- Catalog registration of new protocol assets remains part of that local
-  candidate until GPT semantic acceptance and a later commit authority.
-- TASK-09 and roadmap status remain untouched by this candidate.
+- Routing docs and Cursor project rules guide executors without granting status
+  authority.
+- `GITHUB_BATON` is live on the accepted repository control contracts and may be
+  preflighted and executed under exact Atom Contracts.
+- The baton machine layer is committed on `main` and is no longer described as a
+  local-dirty / pre-merge / uncommitted candidate.
+- Catalog and generated navigation must stay hash-reconciled with those control
+  contracts.
+- `TASK-09` remains READY / NOT_STARTED and is untouched by this ADR.
+- Canonical Project Sources remain unchanged until later GPT reconciliation.
 - MCP and Cursor Automations remain deferred.
 - In-envelope semantic repairs that stay inside original objective, write set,
   authority, and caps do not require a new transport or revision.
@@ -111,9 +119,8 @@ Repository mirrors:
 
 ## Rollback / supersession
 
-- As `PROPOSED_LOCAL_CANDIDATE`, this file may be revised or removed by a later
-  authorized atom before acceptance.
-- Acceptance requires GPT control-plane semantic acceptance and canonical
-  registration.
+- As `ACCEPTED_REPOSITORY_MIRROR`, material changes require a later authorized
+  atom and, when terms change, a new baton contract revision/hash.
+- Canonical Source registration and roadmap `DONE` remain GPT-owned.
 - A superseding ADR must state the replaced `adr_id`, as-of date, and what
   authority classes remain deferred.

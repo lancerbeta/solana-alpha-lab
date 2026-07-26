@@ -205,5 +205,33 @@ class BatonContractTests(unittest.TestCase):
                 )
 
 
+class LiveRouteContractTests(unittest.TestCase):
+    def test_control_contracts_reject_stale_future_route_language(self) -> None:
+        from validate_baton import (  # noqa: WPS433
+            LIVE_ROUTE_CONTROL_PATHS,
+            STALE_ROUTE_PHRASES,
+            validate_protocol_links,
+        )
+
+        validate_protocol_links()
+        for relative in LIVE_ROUTE_CONTROL_PATHS:
+            text = (ROOT / relative).read_text(encoding="utf-8")
+            for phrase in STALE_ROUTE_PHRASES:
+                with self.subTest(path=relative, phrase=phrase):
+                    self.assertNotIn(phrase, text)
+
+    def test_live_route_role_invariants_are_present(self) -> None:
+        authority = (ROOT / ".cursor/rules/00-authority.mdc").read_text(encoding="utf-8")
+        protocol = (ROOT / "docs/agent/GITHUB_BATON_PROTOCOL.md").read_text(
+            encoding="utf-8"
+        )
+        agents = (ROOT / "AGENTS.md").read_text(encoding="utf-8")
+        self.assertIn("PROJECT_CHAT_PRIMARY", authority)
+        self.assertIn("TRANSPORT_AND_AUDIT", authority)
+        self.assertIn("EXECUTION_ONLY", authority)
+        self.assertIn("PROJECT_CHAT_PRIMARY", protocol)
+        self.assertIn("live accepted", agents.lower())
+
+
 if __name__ == "__main__":
     unittest.main()
