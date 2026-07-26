@@ -636,6 +636,7 @@ CTRL_GENERIC_FEATURE_AHEAD_MAX = 16
 CTRL_GENERIC_REPOSITORY_STATES = {
     "CTRL_GENERIC_CONTROL_FEATURE_COMMITTED",
     "CTRL_GENERIC_CONTROL_FEATURE_REPAIR_STAGED",
+    "CTRL_GENERIC_CONTROL_FEATURE_PUBLISHED_REPAIR_STAGED",
     "CTRL_GENERIC_CONTROL_PR_MERGE_CHECKOUT",
     "CTRL_GENERIC_CONTROL_MAIN_MERGE_COMMITTED",
 }
@@ -655,6 +656,10 @@ CTRL_GENERIC_LIFECYCLE_COMBINATIONS = {
     (
         "CTRL_GENERIC_CONTROL_FEATURE_REPAIR_STAGED",
         "CTRL_GENERIC_FEATURE_LOCAL_REPAIR_STAGED",
+    ),
+    (
+        "CTRL_GENERIC_CONTROL_FEATURE_PUBLISHED_REPAIR_STAGED",
+        "CTRL_GENERIC_FEATURE_PUBLISHED_REPAIR_STAGED",
     ),
     (
         "CTRL_GENERIC_CONTROL_PR_MERGE_CHECKOUT",
@@ -2065,6 +2070,21 @@ def classify_ctrl_generic_feature_repair_staged(
     )
 
 
+def classify_ctrl_generic_feature_published_repair_staged(
+    view: CtrlBatonGitView,
+    github: CtrlBatonGithubContext,
+) -> bool:
+    return (
+        not github.actions
+        and ctrl_baton_origin_identity_ok(view, github_actions=False)
+        and ctrl_generic_feature_history_shape_ok(view)
+        and view.feature_remote_oid == view.head_oid
+        and view.upstream == f"origin/{view.branch}"
+        and f"refs/remotes/origin/{view.branch}" in view.all_refs
+        and ctrl_generic_staged_repair_worktree_ok(view)
+    )
+
+
 def classify_ctrl_generic_feature_ahead_of_published(
     view: CtrlBatonGitView,
     github: CtrlBatonGithubContext,
@@ -2268,6 +2288,11 @@ def classify_ctrl_baton_state_machine(
             "CTRL_BATON_A62_MAIN_MERGE_COMMITTED",
             "BATON_MAIN_LOCAL_POST_MERGE",
         )
+    elif classify_ctrl_generic_feature_published_repair_staged(view, github):
+        result = (
+            "CTRL_GENERIC_CONTROL_FEATURE_PUBLISHED_REPAIR_STAGED",
+            "CTRL_GENERIC_FEATURE_PUBLISHED_REPAIR_STAGED",
+        )
     elif classify_ctrl_generic_feature_repair_staged(view, github):
         result = (
             "CTRL_GENERIC_CONTROL_FEATURE_REPAIR_STAGED",
@@ -2279,7 +2304,6 @@ def classify_ctrl_baton_state_machine(
             "CTRL_GENERIC_FEATURE_LOCAL",
         )
     elif classify_ctrl_generic_feature_ahead_of_published(view, github):
-
         result = (
             "CTRL_GENERIC_CONTROL_FEATURE_COMMITTED",
             "CTRL_GENERIC_FEATURE_AHEAD_OF_PUBLISHED",

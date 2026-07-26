@@ -6,8 +6,8 @@ phase: control_infrastructure
 canonical_status: REPOSITORY_MIRROR_IN_PROGRESS
 canonical_status_owner: ChatGPT_Project_GPT_Control_Plane
 current_owning_surface: Project_Chat_Pro
-repository_evidence_status: LOCAL_COMMIT_STOP_BEFORE_PUSH
-atom_id: CWR-A1D_REPOSITORY_GATE_REPAIR
+repository_evidence_status: PUBLISHED_DRAFT_PR_EVIDENCE
+atom_id: CWR-A3_PRE_MERGE_TASK_MIRROR_REPAIR
 provider_api_rpc_calls: 0
 cash_spend_usd: 0
 wallet_signer_transaction_actions: 0
@@ -29,14 +29,20 @@ GitHub Baton and Cursor workplace. Canonical Project Sources and roadmap
 
 ## Active atom
 
-`CWR-A1D_REPOSITORY_GATE_REPAIR` continues the live-route chain started by
-`CWR-A1_LIVE_ROUTE_CONTRACT_REPAIR` on local branch
-`ctrl/live-baton-reconciliation` from accepted base
-`ad98f5d762fe590cc5c82c7e3bc9b5047e9b4a69` /
-`d8a1acb72fb8a66917a4f99169616666d8898e89`.
+`CWR-A3_PRE_MERGE_TASK_MIRROR_REPAIR` continues the live-route chain started by
+`CWR-A1_LIVE_ROUTE_CONTRACT_REPAIR` on published branch
+`ctrl/live-baton-reconciliation`.
 
-Authority: bounded six-file local repair plus exactly one second local
-commit with the normal pre-commit hook. Stop before push.
+Publication evidence:
+
+- Branch pushed to `origin/ctrl/live-baton-reconciliation`
+- Draft PR `#6` open into `main`
+- Prior CI on the published head: PASS
+- Current atom repairs published staged lifecycle plus this living mirror
+
+Authority: bounded four-file local repair, one normal commit, non-force push to
+the existing upstream, and UTF-8 body-only update of Draft PR `#6`.
+Stop before Ready or merge.
 
 ## Invariants
 
@@ -53,10 +59,12 @@ commit with the normal pre-commit hook. Stop before push.
   preflight structured output.
 - Generic ctrl repository file count binds the actual committed tree inventory
   fail-closed, not the historical fixed Baton 225-file checkpoint.
-- Generic ctrl staged repair accepts modified tracked files only.
+- Generic ctrl staged repair accepts modified tracked files only, including on
+  a published linear branch with matching upstream and remote OID.
 
 ## Non-goals
 
-- Push, Draft PR, Issue comment, merge, or canonical status change
+- Ready transition, merge, settings mutation, branch deletion, Issue comment,
+  or canonical status change
 - TASK-09 implementation
 - Dependency, provider, wallet, signer, or real-money action

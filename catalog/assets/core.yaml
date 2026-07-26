@@ -2024,7 +2024,7 @@ records:
     repository_path: scripts/validate_baseline.py
   integrity:
     kind: sha256
-    sha256: 162e46a0d0c1c58580cbe0da29d0c702e74508562c0b0c9f27ad457438cad8b2
+    sha256: 33f5e3f09ffa53f9a7351b27f0fc13f2f85eb991c8cd467a902bc32351e594b5
   access:
     mode: read_only
     method: command
@@ -4833,7 +4833,7 @@ records:
     repository_path: tests/test_baton_repository_policy.py
   integrity:
     kind: sha256
-    sha256: 32d9d980af0b677b8052c4d78ddfb105c98b92cb162df03691c527a02774ea49
+    sha256: 0d56053cbd3a62c53a0c318f4d5ee9fe0c7dcb7ef3c6f334456419f28f52de78
   access:
     mode: read_only
     method: file
