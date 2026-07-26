@@ -12,7 +12,8 @@ import subprocess
 import sys
 import tempfile
 import tomllib
-from pathlib import Path
+from collections import namedtuple
+from pathlib import Path, PurePosixPath, PureWindowsPath
 from urllib.parse import urlsplit
 
 import yaml
@@ -579,6 +580,221 @@ TASK08_COMMITTED_STATES = {"TASK08_ATOM8B_CANDIDATE_COMMITTED"}
 TASK08_EXPECTED_CATALOG_VERSION = "0.7.0"
 TASK08_EXPECTED_CATALOG_ASSET_COUNT = 158
 TASK08_EXPECTED_CATALOG_QUERY_COUNT = 7
+CTRL_BATON_A62_COMMIT_OID = "bd152b3199a9ba5c75374bd798b1e81756cd4d9b"
+CTRL_BATON_A62_TREE_OID = "a068018e57ad53340ad94321539ed7d1b411bc10"
+CTRL_BATON_A62_FEATURE_OID = "64e184b6a661d379a62179895df422e0700ee79e"
+CTRL_BATON_A62_FEATURE_TREE_OID = "59516a7fe01941bf04ed40b3e1d375039b994795"
+CTRL_BATON_A612_FEATURE_OID = "0c43dda4209cfeb281d33ac8ed50b07c809a1068"
+CTRL_BATON_A612_FEATURE_TREE_OID = "906701eb4d3555a6721ccd721b2b5083152ef3c9"
+CTRL_BATON_A617_FEATURE_OID = "57ea966c1afe00d16836f2067e8a2c985289116b"
+CTRL_BATON_A617_FEATURE_TREE_OID = "12eb2852fd7b733572464a085fa0cd5091b4ab22"
+CTRL_BATON_A62_COMMIT_SUBJECT = "feat(control): add GPT-Cursor GitHub baton"
+CTRL_BATON_A69_EXPECTED_CATALOG_VERSION = "0.8.2"
+CTRL_BATON_A613_EXPECTED_CATALOG_VERSION = "0.8.3"
+CTRL_BATON_A62_EXPECTED_CATALOG_VERSION = "0.8.4"
+CTRL_BATON_FEATURE_BRANCH = "ctrl/baton-setup"
+CTRL_BATON_FEATURE_UPSTREAM = "origin/ctrl/baton-setup"
+CTRL_BATON_EXPECTED_INDEX_PATH_COUNT = 225
+# Asset/query counts for dirty candidate are computed from parsed registries;
+# these constants are only used as consistency anchors for known checkpoints.
+CTRL_BATON_A62_REPOSITORY_STATES = {
+    "CTRL_BATON_A62R_CANDIDATE_DIRTY",
+    "CTRL_BATON_A62R_CANDIDATE_STAGED",
+    "CTRL_BATON_A69_PR_CI_REPAIR_STAGED",
+    "CTRL_BATON_A613_FINAL_RECONCILIATION_STAGED",
+    "CTRL_BATON_A618_LOCAL_MAIN_REPAIR_STAGED",
+    "CTRL_BATON_A62_FEATURE_COMMITTED",
+    "CTRL_BATON_A62_PR_MERGE_CHECKOUT",
+    "CTRL_BATON_A62_MAIN_MERGE_COMMITTED",
+}
+CTRL_BATON_A62_LIFECYCLE_COMBINATIONS = {
+    ("CTRL_BATON_A62R_CANDIDATE_DIRTY", "PUBLISHED_LOCAL"),
+    ("CTRL_BATON_A62R_CANDIDATE_STAGED", "BATON_FEATURE_LOCAL"),
+    (
+        "CTRL_BATON_A69_PR_CI_REPAIR_STAGED",
+        "BATON_FEATURE_PUBLISHED_REPAIR_STAGED",
+    ),
+    (
+        "CTRL_BATON_A613_FINAL_RECONCILIATION_STAGED",
+        "BATON_FEATURE_PUBLISHED_RECONCILIATION_STAGED",
+    ),
+    (
+        "CTRL_BATON_A618_LOCAL_MAIN_REPAIR_STAGED",
+        "BATON_FEATURE_PUBLISHED_LOCAL_MAIN_REPAIR_STAGED",
+    ),
+    ("CTRL_BATON_A62_FEATURE_COMMITTED", "BATON_FEATURE_LOCAL"),
+    ("CTRL_BATON_A62_FEATURE_COMMITTED", "BATON_FEATURE_AHEAD_OF_PUBLISHED"),
+    ("CTRL_BATON_A62_FEATURE_COMMITTED", "BATON_FEATURE_PUBLISHED"),
+    ("CTRL_BATON_A62_PR_MERGE_CHECKOUT", "GITHUB_PR_MERGE_CHECKOUT"),
+    ("CTRL_BATON_A62_MAIN_MERGE_COMMITTED", "GITHUB_MAIN_PUSH_CHECKOUT"),
+    ("CTRL_BATON_A62_MAIN_MERGE_COMMITTED", "BATON_MAIN_LOCAL_POST_MERGE"),
+}
+CTRL_BATON_A62R_REQUIRED_TRACKED_FILES = frozenset(
+    {
+        "docs/agent/GITHUB_BATON_PROTOCOL.md",
+        "docs/contracts/atom_contract.schema.json",
+        "scripts/validate_baton.py",
+        "scripts/baton_contract.py",
+        "scripts/baton_scope.py",
+        "scripts/baton_receipt.py",
+        "scripts/baton_preflight.py",
+        "tests/fixtures/baton/fixture_manifest.json",
+        "tests/fixtures/baton/valid_atom_contract.json",
+        ".cursor/rules/00-authority.mdc",
+        ".cursorignore",
+    }
+)
+CTRL_BATON_A62R_EXPECTED_MODIFIED = frozenset(
+    {
+        ".github/workflows/ci.yml",
+        "AGENTS.md",
+        "catalog/assets/core.yaml",
+        "catalog/assets/lifecycle.yaml",
+        "catalog/catalog_manifest.yaml",
+        "catalog/generated/asset_edges.json",
+        "docs/PROJECT_MAP.md",
+        "scripts/validate_baseline.py",
+        "scripts/validate_ci.py",
+        "scripts/validate_task04.py",
+        "tests/test_catalog.py",
+        "tests/test_ci.py",
+        "tests/test_task04_core_stack.py",
+        "tests/test_task05_catalog_queries.py",
+        "tests/test_task06_catalog.py",
+        "tests/test_task07_catalog.py",
+        "tests/test_task08_catalog.py",
+    }
+)
+CTRL_BATON_A62R_EXPECTED_UNTRACKED = frozenset(
+    {
+        ".cursor/commands/baton-preflight.md",
+        ".cursor/rules/00-authority.mdc",
+        ".cursor/rules/05-language-and-reporting.mdc",
+        ".cursor/rules/10-input-routing.mdc",
+        ".cursor/rules/20-validation.mdc",
+        ".cursor/rules/30-security-and-secrets.mdc",
+        ".cursor/rules/40-catalog-and-evidence.mdc",
+        ".cursor/rules/50-github-baton.mdc",
+        ".cursorignore",
+        ".github/ISSUE_TEMPLATE/control-atom.yml",
+        ".github/pull_request_template.md",
+        "docs/agent/EXECUTION_ROUTER_PROTOCOL.md",
+        "docs/agent/GITHUB_BATON_PROTOCOL.md",
+        "docs/contracts/acceptance_receipt.schema.json",
+        "docs/contracts/atom_contract.schema.json",
+        "docs/contracts/execution_receipt.schema.json",
+        "docs/decisions/ADR-003-gpt-executor-routing.md",
+        "docs/evidence/baton/a62_machine_layer_local_validation.json",
+        "docs/tasks/CTRL-BATON-SETUP.md",
+        "scripts/baton_contract.py",
+        "scripts/baton_preflight.py",
+        "scripts/baton_receipt.py",
+        "scripts/baton_scope.py",
+        "scripts/validate_baton.py",
+        "tests/fixtures/baton/expected_contract_sha256.txt",
+        "tests/fixtures/baton/fixture_manifest.json",
+        "tests/fixtures/baton/invalid/absolute_posix_path.json",
+        "tests/fixtures/baton/invalid/absolute_windows_path.json",
+        "tests/fixtures/baton/invalid/acceptance_canonical_status_change.json",
+        "tests/fixtures/baton/invalid/acceptance_merge_authorized.json",
+        "tests/fixtures/baton/invalid/base_head_mismatch_contract.json",
+        "tests/fixtures/baton/invalid/base_tree_mismatch_contract.json",
+        "tests/fixtures/baton/invalid/contract_revision_mismatch.json",
+        "tests/fixtures/baton/invalid/duplicate_markers.md",
+        "tests/fixtures/baton/invalid/file_outside_managed_write_set.json",
+        "tests/fixtures/baton/invalid/forbidden_wallet_target.json",
+        "tests/fixtures/baton/invalid/git_target.json",
+        "tests/fixtures/baton/invalid/invalid_authority.json",
+        "tests/fixtures/baton/invalid/invalid_json.md",
+        "tests/fixtures/baton/invalid/issue_body_whitespace_and_embedded_hash.md",
+        "tests/fixtures/baton/invalid/local_write_empty_write_set.json",
+        "tests/fixtures/baton/invalid/missing_marker.md",
+        "tests/fixtures/baton/invalid/parent_traversal.json",
+        "tests/fixtures/baton/invalid/read_only_nonempty_write_set.json",
+        "tests/fixtures/baton/invalid/receipt_github_write.json",
+        "tests/fixtures/baton/invalid/receipt_secrets_true.json",
+        "tests/fixtures/baton/invalid/unsafe_glob.json",
+        "tests/fixtures/baton/invalid/whitespace_changed_contract.json",
+        "tests/fixtures/baton/invalid/wrong_repository.json",
+        "tests/fixtures/baton/valid_acceptance_receipt.json",
+        "tests/fixtures/baton/valid_atom_contract.json",
+        "tests/fixtures/baton/valid_execution_receipt.json",
+        "tests/fixtures/baton/valid_issue_body.md",
+        "tests/test_baton_contract.py",
+        "tests/test_baton_cursorignore.py",
+        "tests/test_baton_preflight.py",
+        "tests/test_baton_receipts.py",
+        "tests/test_baton_scope.py",
+        "tests/test_baton_repository_policy.py",
+        "tests/fixtures/baton/invalid/receipt_pass_full_not_run.json",
+        "tests/fixtures/baton/invalid/receipt_pass_targeted_skipped.json",
+        "tests/fixtures/baton/invalid/receipt_embedded_windows_path.json",
+        "tests/fixtures/baton/invalid/receipt_embedded_posix_home.json",
+        "tests/fixtures/baton/invalid/receipt_password_assignment.json",
+        "tests/fixtures/baton/invalid/receipt_token_assignment.json",
+        "tests/fixtures/baton/invalid/receipt_no_change_with_files.json",
+        "tests/fixtures/baton/invalid/issue_body_crlf.md",
+    }
+)
+CTRL_BATON_A69_REPAIR_PATHS = frozenset(
+    {
+        "catalog/assets/core.yaml",
+        "catalog/catalog_manifest.yaml",
+        "docs/evidence/baton/a62_machine_layer_local_validation.json",
+        "docs/tasks/CTRL-BATON-SETUP.md",
+        "scripts/validate_baseline.py",
+        "scripts/validate_baton.py",
+        "scripts/validate_task04.py",
+        "tests/fixtures/baton/fixture_manifest.json",
+        "tests/test_baton_preflight.py",
+        "tests/test_baton_repository_policy.py",
+        "tests/test_task04_core_stack.py",
+        "tests/test_task05_catalog_queries.py",
+        "tests/test_task06_catalog.py",
+        "tests/test_task07_catalog.py",
+        "tests/test_task08_catalog.py",
+    }
+)
+CTRL_BATON_A613_RECONCILIATION_PATHS = frozenset(
+    {
+        "catalog/assets/core.yaml",
+        "catalog/catalog_manifest.yaml",
+        "docs/evidence/baton/a62_machine_layer_local_validation.json",
+        "docs/tasks/CTRL-BATON-SETUP.md",
+        "scripts/validate_baseline.py",
+        "scripts/validate_task04.py",
+        "tests/test_baton_repository_policy.py",
+        "tests/test_task04_core_stack.py",
+        "tests/test_task05_catalog_queries.py",
+        "tests/test_task06_catalog.py",
+        "tests/test_task07_catalog.py",
+        "tests/test_task08_catalog.py",
+    }
+)
+CTRL_BATON_A618_LOCAL_MAIN_REPAIR_PATHS = (
+    CTRL_BATON_A613_RECONCILIATION_PATHS
+)
+
+
+def ctrl_baton_a62r_expected_committed_changed() -> frozenset[str]:
+    """Exact commit_changed set = modified ∪ previously-untracked."""
+    return frozenset(
+        CTRL_BATON_A62R_EXPECTED_MODIFIED | CTRL_BATON_A62R_EXPECTED_UNTRACKED
+    )
+
+
+def ctrl_baton_a62r_expected_committed_tracked() -> set[str]:
+    """Exact tracked set after clean commit = TASK-08 ∪ previously-untracked."""
+    return task08_repository_files() | set(CTRL_BATON_A62R_EXPECTED_UNTRACKED)
+
+
+def ctrl_baton_a62r_expected_repository_file_count() -> int:
+    """Dirty and committed candidates both count TASK-08 + candidate files."""
+    return TASK08_EXPECTED_REPOSITORY_FILE_COUNT + len(
+        CTRL_BATON_A62R_EXPECTED_UNTRACKED
+    )
+
+
 EXPECTED_DEFERRED_CAPABILITIES = {"GRAPH_DATABASE"}
 EXPECTED_ORIGIN_URL = "https://github.com/lancerbeta/solana-alpha-lab.git"
 EXPECTED_CI_ORIGIN_URLS = {
@@ -616,11 +832,98 @@ EXPECTED_GITATTRIBUTES = "* text=auto eol=lf\n*.ps1 text eol=lf\n*.bat text eol=
 PS1_PROBE = "scripts/validate.ps1"
 IGNORED_PARTS = {".git", ".smial-handoff", ".venv", "__pycache__"}
 IGNORED_REPOSITORY_PREFIXES = {"data/raw"}
+CTRL_BATON_DIRTY_REFS = frozenset(
+    {"refs/heads/main", "refs/remotes/origin/main"}
+)
+CTRL_BATON_FEATURE_LOCAL_REFS = frozenset(
+    {
+        "refs/heads/main",
+        f"refs/heads/{CTRL_BATON_FEATURE_BRANCH}",
+        "refs/remotes/origin/main",
+    }
+)
+CTRL_BATON_FEATURE_PUBLISHED_REFS = frozenset(
+    CTRL_BATON_FEATURE_LOCAL_REFS
+    | {f"refs/remotes/origin/{CTRL_BATON_FEATURE_BRANCH}"}
+)
+
+CtrlBatonGitView = namedtuple(
+    "CtrlBatonGitView",
+    (
+        "branch",
+        "head_oid",
+        "head_parents",
+        "feature_parents",
+        "head_tree_oid",
+        "feature_tree_oid",
+        "main_oid",
+        "origin_main_oid",
+        "feature_local_oid",
+        "feature_remote_oid",
+        "upstream",
+        "remotes",
+        "fetch_urls",
+        "push_urls",
+        "fetch_refspecs",
+        "push_refspecs",
+        "all_refs",
+        "tracked",
+        "staged",
+        "staged_added",
+        "staged_modified",
+        "unstaged",
+        "untracked",
+        "conflicts",
+        "base_diff",
+        "head_subject",
+        "commits_after_base",
+        "index_base_diff",
+        "index_catalog_version",
+        "head_tree_path_count",
+        "head_catalog_version",
+    ),
+    defaults=(None, None, None, None, None, None),
+)
+
+CtrlBatonGithubContext = namedtuple(
+    "CtrlBatonGithubContext",
+    (
+        "actions",
+        "repository",
+        "event_name",
+        "ref",
+        "sha",
+        "base_ref",
+        "head_ref",
+        "event_number",
+        "event_ref",
+        "event_base_ref",
+        "event_base_sha",
+        "event_head_ref",
+        "event_head_sha",
+        "event_before_sha",
+        "event_after_sha",
+    ),
+)
 
 
-def run(command: list[str], *, binary: bool = False):
-    env = os.environ.copy(); env["PYTHONDONTWRITEBYTECODE"] = "1"; env["UV_MANAGED_PYTHON"] = "1"
-    return subprocess.run(command, cwd=ROOT, env=env, text=not binary, stdout=subprocess.PIPE, stderr=subprocess.PIPE, check=False)
+def run(
+    command: list[str],
+    *,
+    binary: bool = False,
+    input_data: bytes | str | None = None,
+):
+    env = os.environ.copy(); env["PYTHONDONTWRITEBYTECODE"] = "1"; env["UV_MANAGED_PYTHON"] = "1"; env["GIT_OPTIONAL_LOCKS"] = "0"
+    return subprocess.run(
+        command,
+        cwd=ROOT,
+        env=env,
+        text=not binary,
+        input=input_data,
+        stdout=subprocess.PIPE,
+        stderr=subprocess.PIPE,
+        check=False,
+    )
 
 
 def command_set(command: list[str]) -> tuple[int, set[str]]:
@@ -632,6 +935,366 @@ def command_lines(command: list[str]) -> tuple[int, tuple[str, ...]]:
     result = run(command)
     return result.returncode, tuple(
         line.strip() for line in result.stdout.splitlines() if line.strip()
+    )
+
+
+class CanonicalRepositoryBytesError(RuntimeError):
+    """Fail-closed error while resolving the bytes Git stores as a blob."""
+
+
+CanonicalRepositoryContent = namedtuple(
+    "CanonicalRepositoryContent",
+    ("path", "content", "git_oid", "sha256", "source"),
+)
+CatalogCanonicalIntegritySweep = namedtuple(
+    "CatalogCanonicalIntegritySweep",
+    ("asset_count", "checked_sha256", "mismatches"),
+)
+
+
+def _safe_canonical_repository_path(relative: str) -> tuple[str, Path]:
+    if (
+        not isinstance(relative, str)
+        or not relative
+        or relative != relative.strip()
+        or "\x00" in relative
+        or "\\" in relative
+        or PurePosixPath(relative).is_absolute()
+        or PureWindowsPath(relative).is_absolute()
+        or PureWindowsPath(relative).drive
+    ):
+        raise CanonicalRepositoryBytesError("canonical_path_unsafe")
+    parts = relative.split("/")
+    if (
+        any(part in {"", ".", ".."} for part in parts)
+        or any(part.casefold() == ".git" for part in parts)
+    ):
+        raise CanonicalRepositoryBytesError("canonical_path_unsafe")
+    root = ROOT.resolve()
+    path = (ROOT / Path(*parts)).resolve(strict=False)
+    if path != root and root not in path.parents:
+        raise CanonicalRepositoryBytesError("canonical_path_escape")
+    return relative, path
+
+
+def _canonical_git_result(
+    command: list[str],
+    *,
+    binary: bool = False,
+    input_data: bytes | str | None = None,
+    error_code: str,
+):
+    try:
+        result = run(command, binary=binary, input_data=input_data)
+    except OSError as exc:
+        raise CanonicalRepositoryBytesError(error_code) from exc
+    if result.returncode != 0:
+        raise CanonicalRepositoryBytesError(error_code)
+    return result
+
+
+def _canonical_git_attributes(relative: str, *, cached: bool) -> dict[str, str]:
+    command = ["git", "check-attr"]
+    if cached:
+        command.append("--cached")
+    command.extend(
+        [
+            "-z",
+            "filter",
+            "working-tree-encoding",
+            "text",
+            "eol",
+            "--",
+            relative,
+        ]
+    )
+    result = _canonical_git_result(
+        command,
+        binary=True,
+        error_code="canonical_check_attr_failed",
+    )
+    parts = result.stdout.split(b"\0")
+    if parts and parts[-1] == b"":
+        parts.pop()
+    if len(parts) != 12:
+        raise CanonicalRepositoryBytesError("canonical_check_attr_malformed")
+    attributes: dict[str, str] = {}
+    for offset in range(0, len(parts), 3):
+        try:
+            path_value, name, value = (
+                part.decode("utf-8") for part in parts[offset : offset + 3]
+            )
+        except UnicodeDecodeError as exc:
+            raise CanonicalRepositoryBytesError(
+                "canonical_check_attr_malformed"
+            ) from exc
+        if path_value != relative or name in attributes:
+            raise CanonicalRepositoryBytesError("canonical_check_attr_malformed")
+        attributes[name] = value
+    if set(attributes) != {"filter", "working-tree-encoding", "text", "eol"}:
+        raise CanonicalRepositoryBytesError("canonical_check_attr_malformed")
+    if attributes["filter"] != "unspecified":
+        raise CanonicalRepositoryBytesError("canonical_custom_filter_unsupported")
+    if attributes["working-tree-encoding"] != "unspecified":
+        raise CanonicalRepositoryBytesError(
+            "canonical_working_tree_encoding_unsupported"
+        )
+    if attributes["text"] not in {"auto", "set"} or attributes["eol"] != "lf":
+        raise CanonicalRepositoryBytesError("canonical_eol_policy_ambiguous")
+    return attributes
+
+
+def _canonical_index_entry(relative: str) -> tuple[str, str] | None:
+    result = _canonical_git_result(
+        [
+            "git",
+            "ls-files",
+            "--stage",
+            "-z",
+            "--",
+            f":(literal){relative}",
+        ],
+        binary=True,
+        error_code="canonical_index_read_failed",
+    )
+    records = [record for record in result.stdout.split(b"\0") if record]
+    if not records:
+        return None
+    if len(records) != 1 or b"\t" not in records[0]:
+        raise CanonicalRepositoryBytesError("canonical_index_entry_ambiguous")
+    metadata, raw_path = records[0].split(b"\t", 1)
+    try:
+        mode, oid, stage = metadata.decode("ascii").split()
+        indexed_path = raw_path.decode("utf-8")
+    except (UnicodeDecodeError, ValueError) as exc:
+        raise CanonicalRepositoryBytesError(
+            "canonical_index_entry_malformed"
+        ) from exc
+    if indexed_path != relative or stage != "0":
+        raise CanonicalRepositoryBytesError("canonical_index_entry_malformed")
+    if mode not in {"100644", "100755"}:
+        raise CanonicalRepositoryBytesError("canonical_index_mode_not_blob")
+    if re.fullmatch(r"[0-9a-f]+", oid) is None:
+        raise CanonicalRepositoryBytesError("canonical_index_oid_invalid")
+    return mode, oid
+
+
+def _git_oid_for_content(content: bytes, object_format: str) -> str:
+    if object_format not in {"sha1", "sha256"}:
+        raise CanonicalRepositoryBytesError("canonical_object_format_unsupported")
+    header = b"blob " + str(len(content)).encode("ascii") + b"\0"
+    return hashlib.new(object_format, header + content).hexdigest()
+
+
+def _canonical_hash_object(
+    content: bytes,
+    *,
+    relative: str | None = None,
+) -> str:
+    command = ["git", "hash-object"]
+    if relative is not None:
+        command.append(f"--path={relative}")
+    command.append("--stdin")
+    result = _canonical_git_result(
+        command,
+        binary=True,
+        input_data=content,
+        error_code="canonical_hash_object_failed",
+    )
+    try:
+        oid = result.stdout.strip().decode("ascii")
+    except UnicodeDecodeError as exc:
+        raise CanonicalRepositoryBytesError(
+            "canonical_hash_object_invalid"
+        ) from exc
+    if re.fullmatch(r"[0-9a-f]+", oid) is None:
+        raise CanonicalRepositoryBytesError("canonical_hash_object_invalid")
+    return oid
+
+
+def canonical_repository_content(
+    relative: str,
+    *,
+    allow_worktree_candidate: bool = False,
+) -> CanonicalRepositoryContent:
+    """Resolve and prove the exact content bytes Git stores or would store.
+
+    Clean tracked paths are read from the stage-0 index blob. A dirty tracked or
+    untracked path is accepted only when the caller explicitly permits a
+    worktree candidate. Candidate conversion is selected from the only two
+    transformations supported by this repository policy (identity or CRLF to
+    LF), then proved against Git's own side-effect-free hash-object result.
+    """
+
+    relative, worktree_path = _safe_canonical_repository_path(relative)
+    index_entry = _canonical_index_entry(relative)
+    use_worktree = index_entry is None
+    if index_entry is not None:
+        diff = run(
+            [
+                "git",
+                "diff-files",
+                "--quiet",
+                "--",
+                f":(literal){relative}",
+            ]
+        )
+        if diff.returncode == 1:
+            use_worktree = True
+        elif diff.returncode != 0:
+            raise CanonicalRepositoryBytesError("canonical_worktree_state_failed")
+
+    if not use_worktree:
+        _, oid = index_entry
+        _canonical_git_attributes(relative, cached=True)
+        object_type = _canonical_git_result(
+            ["git", "cat-file", "-t", oid],
+            error_code="canonical_cat_file_type_failed",
+        ).stdout.strip()
+        if object_type != "blob":
+            raise CanonicalRepositoryBytesError("canonical_index_object_not_blob")
+        content = _canonical_git_result(
+            ["git", "cat-file", "blob", oid],
+            binary=True,
+            error_code="canonical_cat_file_blob_failed",
+        ).stdout
+        if _canonical_hash_object(content) != oid:
+            raise CanonicalRepositoryBytesError("canonical_index_blob_oid_mismatch")
+        return CanonicalRepositoryContent(
+            relative,
+            content,
+            oid,
+            hashlib.sha256(content).hexdigest(),
+            "INDEX_BLOB",
+        )
+
+    if not allow_worktree_candidate:
+        if index_entry is None:
+            raise CanonicalRepositoryBytesError("canonical_index_entry_missing")
+        raise CanonicalRepositoryBytesError("canonical_worktree_candidate_forbidden")
+    if worktree_path.is_symlink() or not worktree_path.is_file():
+        raise CanonicalRepositoryBytesError("canonical_worktree_file_missing")
+    _canonical_git_attributes(relative, cached=False)
+    raw = worktree_path.read_bytes()
+    if b"\r" in raw.replace(b"\r\n", b""):
+        raise CanonicalRepositoryBytesError("canonical_bare_cr_unsupported")
+    git_oid = _canonical_hash_object(raw, relative=relative)
+    object_format = _canonical_git_result(
+        ["git", "rev-parse", "--show-object-format"],
+        error_code="canonical_object_format_read_failed",
+    ).stdout.strip()
+    candidates = [raw]
+    normalized = raw.replace(b"\r\n", b"\n")
+    if normalized != raw:
+        candidates.append(normalized)
+    matching = [
+        candidate
+        for candidate in candidates
+        if _git_oid_for_content(candidate, object_format) == git_oid
+    ]
+    if len(matching) != 1:
+        raise CanonicalRepositoryBytesError("canonical_clean_proof_failed")
+    content = matching[0]
+    if _canonical_hash_object(content) != git_oid:
+        raise CanonicalRepositoryBytesError("canonical_hash_object_parity_failed")
+    return CanonicalRepositoryContent(
+        relative,
+        content,
+        git_oid,
+        hashlib.sha256(content).hexdigest(),
+        "WORKTREE_CLEAN_CANDIDATE",
+    )
+
+
+def canonical_catalog_integrity_sweep(
+    *,
+    allow_worktree_candidate: bool = False,
+) -> CatalogCanonicalIntegritySweep:
+    """Check every Catalog record and every repository-backed SHA-256."""
+
+    manifest = yaml.safe_load(
+        (ROOT / "catalog/catalog_manifest.yaml").read_text(encoding="utf-8")
+    )
+    registry_paths = manifest.get("root_resolver", {}).get("asset_registries")
+    if not isinstance(registry_paths, list) or not registry_paths:
+        raise CanonicalRepositoryBytesError("canonical_catalog_registries_invalid")
+    records: list[tuple[str, dict]] = []
+    for registry_path in registry_paths:
+        _, path = _safe_canonical_repository_path(registry_path)
+        if not path.is_file():
+            raise CanonicalRepositoryBytesError(
+                f"canonical_catalog_registry_missing:{registry_path}"
+            )
+        document = yaml.safe_load(path.read_text(encoding="utf-8"))
+        shard_records = document.get("records") if isinstance(document, dict) else None
+        if not isinstance(shard_records, list):
+            raise CanonicalRepositoryBytesError(
+                f"canonical_catalog_registry_invalid:{registry_path}"
+            )
+        records.extend((registry_path, record) for record in shard_records)
+
+    asset_ids: set[str] = set()
+    duplicates: set[str] = set()
+    missing: list[str] = []
+    mismatches: list[tuple[str, str, str, str, str]] = []
+    checked = 0
+    for shard, record in records:
+        asset_id = record.get("asset_id") if isinstance(record, dict) else None
+        if not isinstance(asset_id, str) or not asset_id:
+            raise CanonicalRepositoryBytesError("canonical_catalog_asset_id_invalid")
+        if asset_id in asset_ids:
+            duplicates.add(asset_id)
+        asset_ids.add(asset_id)
+        location = record.get("location")
+        integrity = record.get("integrity")
+        if not isinstance(location, dict) or not isinstance(integrity, dict):
+            raise CanonicalRepositoryBytesError(
+                f"canonical_catalog_record_invalid:{asset_id}"
+            )
+        if location.get("kind") != "git_path":
+            continue
+        repository_path = location.get("repository_path")
+        if not isinstance(repository_path, str):
+            missing.append(asset_id)
+            continue
+        _, actual_path = _safe_canonical_repository_path(repository_path)
+        if not actual_path.is_file():
+            missing.append(asset_id)
+            continue
+        if integrity.get("kind") != "sha256":
+            continue
+        registered = integrity.get("sha256")
+        if not isinstance(registered, str):
+            raise CanonicalRepositoryBytesError(
+                f"canonical_catalog_sha256_invalid:{asset_id}"
+            )
+        resolved = canonical_repository_content(
+            repository_path,
+            allow_worktree_candidate=allow_worktree_candidate,
+        )
+        checked += 1
+        if resolved.sha256 != registered:
+            mismatches.append(
+                (
+                    asset_id,
+                    shard,
+                    repository_path,
+                    registered,
+                    resolved.sha256,
+                )
+            )
+    if duplicates:
+        raise CanonicalRepositoryBytesError(
+            "canonical_catalog_duplicate_asset_ids:" + ",".join(sorted(duplicates))
+        )
+    if missing:
+        raise CanonicalRepositoryBytesError(
+            "canonical_catalog_missing_paths:" + ",".join(sorted(missing))
+        )
+    return CatalogCanonicalIntegritySweep(
+        len(records),
+        checked,
+        tuple(mismatches),
     )
 
 
@@ -648,6 +1311,561 @@ def origin_url_is_safe(url: str, *, github_actions: bool) -> bool:
         and not parsed.query
         and not parsed.fragment
     )
+
+
+def empty_ctrl_baton_github_context() -> CtrlBatonGithubContext:
+    return CtrlBatonGithubContext(
+        False,
+        None,
+        None,
+        None,
+        None,
+        None,
+        None,
+        None,
+        None,
+        None,
+        None,
+        None,
+        None,
+        None,
+        None,
+    )
+
+
+def read_ctrl_baton_github_context() -> CtrlBatonGithubContext:
+    """Read only GitHub-provided environment and event payload fields.
+
+    The event payload is never logged wholesale. Missing or malformed fields
+    remain ``None`` and therefore fail the corresponding topology classifier.
+    """
+
+    actions = os.environ.get("GITHUB_ACTIONS", "").lower() == "true"
+    if not actions:
+        return empty_ctrl_baton_github_context()
+
+    event_name = os.environ.get("GITHUB_EVENT_NAME") or None
+    event_path = os.environ.get("GITHUB_EVENT_PATH") or None
+    document: dict = {}
+    if event_path:
+        try:
+            candidate = json.loads(Path(event_path).read_text(encoding="utf-8"))
+        except (OSError, UnicodeError, json.JSONDecodeError):
+            candidate = None
+        if isinstance(candidate, dict):
+            document = candidate
+
+    event_number = document.get("number")
+    if not isinstance(event_number, int) or isinstance(event_number, bool):
+        event_number = None
+    event_ref = document.get("ref")
+    if not isinstance(event_ref, str):
+        event_ref = None
+    event_before_sha = document.get("before")
+    if not isinstance(event_before_sha, str):
+        event_before_sha = None
+    event_after_sha = document.get("after")
+    if not isinstance(event_after_sha, str):
+        event_after_sha = None
+
+    event_base_ref = event_base_sha = event_head_ref = event_head_sha = None
+    pull_request = document.get("pull_request")
+    if isinstance(pull_request, dict):
+        base = pull_request.get("base")
+        head = pull_request.get("head")
+        if isinstance(base, dict):
+            if isinstance(base.get("ref"), str):
+                event_base_ref = base["ref"]
+            if isinstance(base.get("sha"), str):
+                event_base_sha = base["sha"]
+        if isinstance(head, dict):
+            if isinstance(head.get("ref"), str):
+                event_head_ref = head["ref"]
+            if isinstance(head.get("sha"), str):
+                event_head_sha = head["sha"]
+
+    return CtrlBatonGithubContext(
+        actions,
+        os.environ.get("GITHUB_REPOSITORY") or None,
+        event_name,
+        os.environ.get("GITHUB_REF") or None,
+        os.environ.get("GITHUB_SHA") or None,
+        os.environ.get("GITHUB_BASE_REF") or None,
+        os.environ.get("GITHUB_HEAD_REF") or None,
+        event_number,
+        event_ref,
+        event_base_ref,
+        event_base_sha,
+        event_head_ref,
+        event_head_sha,
+        event_before_sha,
+        event_after_sha,
+    )
+
+
+def ctrl_baton_origin_identity_ok(
+    view: CtrlBatonGitView, *, github_actions: bool
+) -> bool:
+    allowed_urls = EXPECTED_CI_ORIGIN_URLS if github_actions else {EXPECTED_ORIGIN_URL}
+    return (
+        view.remotes == frozenset({"origin"})
+        and len(view.fetch_urls) == 1
+        and view.fetch_urls == view.push_urls
+        and view.fetch_urls[0] in allowed_urls
+        and origin_url_is_safe(
+            view.fetch_urls[0],
+            github_actions=github_actions,
+        )
+        and view.fetch_refspecs == (EXPECTED_ORIGIN_FETCH_REFSPEC,)
+        and not view.push_refspecs
+    )
+
+
+def ctrl_baton_expected_changed() -> frozenset[str]:
+    return ctrl_baton_a62r_expected_committed_changed()
+
+
+def ctrl_baton_expected_tracked() -> frozenset[str]:
+    return frozenset(ctrl_baton_a62r_expected_committed_tracked())
+
+
+def ctrl_baton_clean_candidate(view: CtrlBatonGitView) -> bool:
+    return (
+        view.tracked == ctrl_baton_expected_tracked()
+        and len(view.tracked) == CTRL_BATON_EXPECTED_INDEX_PATH_COUNT
+        and not view.staged
+        and not view.staged_added
+        and not view.staged_modified
+        and not view.unstaged
+        and not view.untracked
+        and not view.conflicts
+    )
+
+
+def classify_ctrl_baton_dirty(
+    view: CtrlBatonGitView,
+    github: CtrlBatonGithubContext,
+) -> bool:
+    return (
+        not github.actions
+        and ctrl_baton_origin_identity_ok(view, github_actions=False)
+        and view.branch == "main"
+        and view.head_oid == CTRL_BATON_A62_COMMIT_OID
+        and view.head_tree_oid == CTRL_BATON_A62_TREE_OID
+        and view.main_oid == CTRL_BATON_A62_COMMIT_OID
+        and view.origin_main_oid == CTRL_BATON_A62_COMMIT_OID
+        and view.feature_local_oid is None
+        and view.feature_remote_oid is None
+        and view.upstream == "origin/main"
+        and view.all_refs == CTRL_BATON_DIRTY_REFS
+        and view.tracked == frozenset(task08_repository_files())
+        and not view.staged
+        and not view.staged_added
+        and not view.staged_modified
+        and view.unstaged == CTRL_BATON_A62R_EXPECTED_MODIFIED
+        and view.untracked == CTRL_BATON_A62R_EXPECTED_UNTRACKED
+        and not view.conflicts
+        and view.base_diff == frozenset()
+    )
+
+
+def classify_ctrl_baton_staged(
+    view: CtrlBatonGitView,
+    github: CtrlBatonGithubContext,
+) -> bool:
+    return (
+        not github.actions
+        and ctrl_baton_origin_identity_ok(view, github_actions=False)
+        and view.branch == CTRL_BATON_FEATURE_BRANCH
+        and view.head_oid == CTRL_BATON_A62_COMMIT_OID
+        and view.head_tree_oid == CTRL_BATON_A62_TREE_OID
+        and view.main_oid == CTRL_BATON_A62_COMMIT_OID
+        and view.origin_main_oid == CTRL_BATON_A62_COMMIT_OID
+        and view.feature_local_oid == CTRL_BATON_A62_COMMIT_OID
+        and view.feature_remote_oid is None
+        and view.upstream is None
+        and view.all_refs == CTRL_BATON_FEATURE_LOCAL_REFS
+        and view.tracked == ctrl_baton_expected_tracked()
+        and len(view.tracked) == CTRL_BATON_EXPECTED_INDEX_PATH_COUNT
+        and view.staged == ctrl_baton_expected_changed()
+        and view.staged_added == CTRL_BATON_A62R_EXPECTED_UNTRACKED
+        and view.staged_modified == CTRL_BATON_A62R_EXPECTED_MODIFIED
+        and not view.unstaged
+        and not view.untracked
+        and not view.conflicts
+        and view.base_diff == frozenset()
+    )
+
+
+def ctrl_baton_feature_commit_content_ok(view: CtrlBatonGitView) -> bool:
+    return (
+        re.fullmatch(r"[0-9a-f]{40}", view.head_oid or "") is not None
+        and view.head_oid != CTRL_BATON_A62_COMMIT_OID
+        and view.head_parents == (CTRL_BATON_A62_COMMIT_OID,)
+        and view.feature_parents == (CTRL_BATON_A62_COMMIT_OID,)
+        and re.fullmatch(r"[0-9a-f]{40}", view.head_tree_oid or "") is not None
+        and view.feature_tree_oid == view.head_tree_oid
+        and view.head_tree_path_count == CTRL_BATON_EXPECTED_INDEX_PATH_COUNT
+        and view.head_catalog_version == CTRL_BATON_A62_EXPECTED_CATALOG_VERSION
+        and view.feature_local_oid == view.head_oid
+        and view.main_oid == CTRL_BATON_A62_COMMIT_OID
+        and view.origin_main_oid == CTRL_BATON_A62_COMMIT_OID
+        and view.base_diff == ctrl_baton_expected_changed()
+        and view.head_subject == CTRL_BATON_A62_COMMIT_SUBJECT
+        and view.commits_after_base == 1
+        and ctrl_baton_clean_candidate(view)
+    )
+
+
+def classify_ctrl_baton_a69_repair_staged(
+    view: CtrlBatonGitView,
+    github: CtrlBatonGithubContext,
+) -> bool:
+    return (
+        not github.actions
+        and ctrl_baton_origin_identity_ok(view, github_actions=False)
+        and view.branch == CTRL_BATON_FEATURE_BRANCH
+        and view.head_oid == CTRL_BATON_A62_FEATURE_OID
+        and view.head_parents == (CTRL_BATON_A62_COMMIT_OID,)
+        and view.feature_parents == (CTRL_BATON_A62_COMMIT_OID,)
+        and view.head_tree_oid == CTRL_BATON_A62_FEATURE_TREE_OID
+        and view.feature_tree_oid == CTRL_BATON_A62_FEATURE_TREE_OID
+        and view.head_subject == CTRL_BATON_A62_COMMIT_SUBJECT
+        and view.commits_after_base == 1
+        and view.main_oid == CTRL_BATON_A62_COMMIT_OID
+        and view.origin_main_oid == CTRL_BATON_A62_COMMIT_OID
+        and view.feature_local_oid == CTRL_BATON_A62_FEATURE_OID
+        and view.feature_remote_oid == CTRL_BATON_A62_FEATURE_OID
+        and view.upstream == CTRL_BATON_FEATURE_UPSTREAM
+        and view.all_refs == CTRL_BATON_FEATURE_PUBLISHED_REFS
+        and view.tracked == ctrl_baton_expected_tracked()
+        and len(view.tracked) == CTRL_BATON_EXPECTED_INDEX_PATH_COUNT
+        and view.staged == CTRL_BATON_A69_REPAIR_PATHS
+        and not view.staged_added
+        and view.staged_modified == CTRL_BATON_A69_REPAIR_PATHS
+        and not view.unstaged
+        and not view.untracked
+        and not view.conflicts
+        and view.base_diff == ctrl_baton_expected_changed()
+        and view.index_base_diff == ctrl_baton_expected_changed()
+        and len(view.index_base_diff) == len(ctrl_baton_expected_changed())
+        and view.index_catalog_version == CTRL_BATON_A69_EXPECTED_CATALOG_VERSION
+    )
+
+
+def classify_ctrl_baton_a613_reconciliation_staged(
+    view: CtrlBatonGitView,
+    github: CtrlBatonGithubContext,
+) -> bool:
+    return (
+        not github.actions
+        and ctrl_baton_origin_identity_ok(view, github_actions=False)
+        and view.branch == CTRL_BATON_FEATURE_BRANCH
+        and view.head_oid == CTRL_BATON_A612_FEATURE_OID
+        and view.head_parents == (CTRL_BATON_A62_COMMIT_OID,)
+        and view.feature_parents == (CTRL_BATON_A62_COMMIT_OID,)
+        and view.head_tree_oid == CTRL_BATON_A612_FEATURE_TREE_OID
+        and view.feature_tree_oid == CTRL_BATON_A612_FEATURE_TREE_OID
+        and view.head_subject == CTRL_BATON_A62_COMMIT_SUBJECT
+        and view.commits_after_base == 1
+        and view.main_oid == CTRL_BATON_A62_COMMIT_OID
+        and view.origin_main_oid == CTRL_BATON_A62_COMMIT_OID
+        and view.feature_local_oid == CTRL_BATON_A612_FEATURE_OID
+        and view.feature_remote_oid == CTRL_BATON_A612_FEATURE_OID
+        and view.upstream == CTRL_BATON_FEATURE_UPSTREAM
+        and view.all_refs == CTRL_BATON_FEATURE_PUBLISHED_REFS
+        and view.tracked == ctrl_baton_expected_tracked()
+        and len(view.tracked) == CTRL_BATON_EXPECTED_INDEX_PATH_COUNT
+        and view.staged == CTRL_BATON_A613_RECONCILIATION_PATHS
+        and not view.staged_added
+        and view.staged_modified == CTRL_BATON_A613_RECONCILIATION_PATHS
+        and not view.unstaged
+        and not view.untracked
+        and not view.conflicts
+        and view.base_diff == ctrl_baton_expected_changed()
+        and view.index_base_diff == ctrl_baton_expected_changed()
+        and len(view.index_base_diff) == len(ctrl_baton_expected_changed())
+        and view.index_catalog_version == CTRL_BATON_A613_EXPECTED_CATALOG_VERSION
+    )
+
+
+def classify_ctrl_baton_a618_local_main_repair_staged(
+    view: CtrlBatonGitView,
+    github: CtrlBatonGithubContext,
+) -> bool:
+    return (
+        not github.actions
+        and ctrl_baton_origin_identity_ok(view, github_actions=False)
+        and view.branch == CTRL_BATON_FEATURE_BRANCH
+        and view.head_oid == CTRL_BATON_A617_FEATURE_OID
+        and view.head_parents == (CTRL_BATON_A62_COMMIT_OID,)
+        and view.feature_parents == (CTRL_BATON_A62_COMMIT_OID,)
+        and view.head_tree_oid == CTRL_BATON_A617_FEATURE_TREE_OID
+        and view.feature_tree_oid == CTRL_BATON_A617_FEATURE_TREE_OID
+        and view.head_subject == CTRL_BATON_A62_COMMIT_SUBJECT
+        and view.commits_after_base == 1
+        and view.main_oid == CTRL_BATON_A62_COMMIT_OID
+        and view.origin_main_oid == CTRL_BATON_A62_COMMIT_OID
+        and view.feature_local_oid == CTRL_BATON_A617_FEATURE_OID
+        and view.feature_remote_oid == CTRL_BATON_A617_FEATURE_OID
+        and view.upstream == CTRL_BATON_FEATURE_UPSTREAM
+        and view.all_refs == CTRL_BATON_FEATURE_PUBLISHED_REFS
+        and view.tracked == ctrl_baton_expected_tracked()
+        and len(view.tracked) == CTRL_BATON_EXPECTED_INDEX_PATH_COUNT
+        and view.staged == CTRL_BATON_A618_LOCAL_MAIN_REPAIR_PATHS
+        and not view.staged_added
+        and view.staged_modified == CTRL_BATON_A618_LOCAL_MAIN_REPAIR_PATHS
+        and not view.unstaged
+        and not view.untracked
+        and not view.conflicts
+        and view.base_diff == ctrl_baton_expected_changed()
+        and view.index_base_diff == ctrl_baton_expected_changed()
+        and len(view.index_base_diff) == len(ctrl_baton_expected_changed())
+        and view.index_catalog_version == CTRL_BATON_A62_EXPECTED_CATALOG_VERSION
+        and view.head_catalog_version == CTRL_BATON_A613_EXPECTED_CATALOG_VERSION
+    )
+
+
+def classify_ctrl_baton_feature_local(
+    view: CtrlBatonGitView,
+    github: CtrlBatonGithubContext,
+) -> bool:
+    return (
+        not github.actions
+        and ctrl_baton_origin_identity_ok(view, github_actions=False)
+        and ctrl_baton_feature_commit_content_ok(view)
+        and view.branch == CTRL_BATON_FEATURE_BRANCH
+        and view.feature_remote_oid is None
+        and view.upstream is None
+        and view.all_refs == CTRL_BATON_FEATURE_LOCAL_REFS
+    )
+
+
+def classify_ctrl_baton_feature_published(
+    view: CtrlBatonGitView,
+    github: CtrlBatonGithubContext,
+) -> bool:
+    return (
+        not github.actions
+        and ctrl_baton_origin_identity_ok(view, github_actions=False)
+        and ctrl_baton_feature_commit_content_ok(view)
+        and view.branch == CTRL_BATON_FEATURE_BRANCH
+        and view.feature_remote_oid == view.head_oid
+        and view.upstream == CTRL_BATON_FEATURE_UPSTREAM
+        and view.all_refs == CTRL_BATON_FEATURE_PUBLISHED_REFS
+    )
+
+
+def classify_ctrl_baton_feature_ahead_of_published(
+    view: CtrlBatonGitView,
+    github: CtrlBatonGithubContext,
+) -> bool:
+    return (
+        not github.actions
+        and ctrl_baton_origin_identity_ok(view, github_actions=False)
+        and ctrl_baton_feature_commit_content_ok(view)
+        and view.branch == CTRL_BATON_FEATURE_BRANCH
+        and view.head_oid != CTRL_BATON_A617_FEATURE_OID
+        and view.feature_remote_oid == CTRL_BATON_A617_FEATURE_OID
+        and view.upstream == CTRL_BATON_FEATURE_UPSTREAM
+        and view.all_refs == CTRL_BATON_FEATURE_PUBLISHED_REFS
+    )
+
+
+def _pull_request_number(ref: str | None) -> int | None:
+    match = re.fullmatch(r"refs/pull/([1-9][0-9]*)/merge", ref or "")
+    return int(match.group(1)) if match else None
+
+
+def ctrl_baton_pr_refs_ok(view: CtrlBatonGitView, number: int) -> bool:
+    allowed = {
+        "refs/heads/main",
+        "refs/remotes/origin/main",
+        f"refs/remotes/origin/{CTRL_BATON_FEATURE_BRANCH}",
+        f"refs/remotes/pull/{number}/merge",
+    }
+    return bool(view.all_refs) and view.all_refs <= allowed
+
+
+def classify_ctrl_baton_pr_merge_checkout(
+    view: CtrlBatonGitView,
+    github: CtrlBatonGithubContext,
+) -> bool:
+    number = _pull_request_number(github.ref)
+    if number is None or len(view.head_parents) != 2:
+        return False
+    base_oid, feature_oid = view.head_parents
+    return (
+        github.actions
+        and github.repository == EXPECTED_GITHUB_REPOSITORY
+        and github.event_name == "pull_request"
+        and github.sha == view.head_oid
+        and github.base_ref == "main"
+        and github.head_ref == CTRL_BATON_FEATURE_BRANCH
+        and github.event_number == number
+        and github.event_base_ref == "main"
+        and github.event_base_sha == CTRL_BATON_A62_COMMIT_OID
+        and github.event_head_ref == CTRL_BATON_FEATURE_BRANCH
+        and github.event_head_sha == feature_oid
+        and view.branch is None
+        and base_oid == CTRL_BATON_A62_COMMIT_OID
+        and view.feature_parents == (CTRL_BATON_A62_COMMIT_OID,)
+        and view.feature_tree_oid == view.head_tree_oid
+        and view.head_tree_path_count == CTRL_BATON_EXPECTED_INDEX_PATH_COUNT
+        and view.head_catalog_version == CTRL_BATON_A62_EXPECTED_CATALOG_VERSION
+        and view.base_diff == ctrl_baton_expected_changed()
+        and ctrl_baton_clean_candidate(view)
+        and ctrl_baton_origin_identity_ok(view, github_actions=True)
+        and view.upstream is None
+        and ctrl_baton_pr_refs_ok(view, number)
+    )
+
+
+def ctrl_baton_main_refs_ok(
+    view: CtrlBatonGitView,
+    feature_oid: str,
+) -> bool:
+    allowed = {
+        "refs/heads/main",
+        "refs/remotes/origin/main",
+        f"refs/remotes/origin/{CTRL_BATON_FEATURE_BRANCH}",
+    }
+    if not view.all_refs or not view.all_refs <= allowed:
+        return False
+    if view.feature_remote_oid not in {None, feature_oid}:
+        return False
+    return {
+        "refs/heads/main",
+        "refs/remotes/origin/main",
+    } <= view.all_refs
+
+
+def classify_ctrl_baton_main_merge(
+    view: CtrlBatonGitView,
+    github: CtrlBatonGithubContext,
+) -> bool:
+    if len(view.head_parents) != 2:
+        return False
+    base_oid, feature_oid = view.head_parents
+    return (
+        github.actions
+        and github.repository == EXPECTED_GITHUB_REPOSITORY
+        and github.event_name == "push"
+        and github.ref == "refs/heads/main"
+        and github.sha == view.head_oid
+        and github.base_ref is None
+        and github.head_ref is None
+        and github.event_ref == "refs/heads/main"
+        and github.event_before_sha == CTRL_BATON_A62_COMMIT_OID
+        and github.event_after_sha == view.head_oid
+        and view.branch == "main"
+        and base_oid == CTRL_BATON_A62_COMMIT_OID
+        and view.feature_parents == (CTRL_BATON_A62_COMMIT_OID,)
+        and view.feature_tree_oid == view.head_tree_oid
+        and view.head_tree_path_count == CTRL_BATON_EXPECTED_INDEX_PATH_COUNT
+        and view.head_catalog_version == CTRL_BATON_A62_EXPECTED_CATALOG_VERSION
+        and view.base_diff == ctrl_baton_expected_changed()
+        and ctrl_baton_clean_candidate(view)
+        and ctrl_baton_origin_identity_ok(view, github_actions=True)
+        and view.main_oid == view.head_oid
+        and view.origin_main_oid == view.head_oid
+        and view.feature_local_oid is None
+        and view.upstream in {None, "origin/main"}
+        and ctrl_baton_main_refs_ok(view, feature_oid)
+    )
+
+
+def classify_ctrl_baton_main_merge_local(
+    view: CtrlBatonGitView,
+    github: CtrlBatonGithubContext,
+) -> bool:
+    if len(view.head_parents) != 2:
+        return False
+    base_oid, feature_oid = view.head_parents
+    return (
+        not github.actions
+        and ctrl_baton_origin_identity_ok(view, github_actions=False)
+        and view.branch == "main"
+        and base_oid == CTRL_BATON_A62_COMMIT_OID
+        and view.feature_parents == (CTRL_BATON_A62_COMMIT_OID,)
+        and view.feature_tree_oid == view.head_tree_oid
+        and view.head_tree_path_count == CTRL_BATON_EXPECTED_INDEX_PATH_COUNT
+        and view.head_catalog_version == CTRL_BATON_A62_EXPECTED_CATALOG_VERSION
+        and view.base_diff == ctrl_baton_expected_changed()
+        and ctrl_baton_clean_candidate(view)
+        and view.main_oid == view.head_oid
+        and view.origin_main_oid == view.head_oid
+        and view.feature_local_oid == feature_oid
+        and view.feature_remote_oid == feature_oid
+        and view.upstream == "origin/main"
+        and view.all_refs == CTRL_BATON_FEATURE_PUBLISHED_REFS
+    )
+
+
+def classify_ctrl_baton_state_machine(
+    view: CtrlBatonGitView,
+    github: CtrlBatonGithubContext,
+) -> tuple[str, str]:
+    """Return one exact repository-state/topology pair or fail closed."""
+
+    if classify_ctrl_baton_dirty(view, github):
+        result = ("CTRL_BATON_A62R_CANDIDATE_DIRTY", "PUBLISHED_LOCAL")
+    elif classify_ctrl_baton_staged(view, github):
+        result = (
+            "CTRL_BATON_A62R_CANDIDATE_STAGED",
+            "BATON_FEATURE_LOCAL",
+        )
+    elif classify_ctrl_baton_a69_repair_staged(view, github):
+        result = (
+            "CTRL_BATON_A69_PR_CI_REPAIR_STAGED",
+            "BATON_FEATURE_PUBLISHED_REPAIR_STAGED",
+        )
+    elif classify_ctrl_baton_a613_reconciliation_staged(view, github):
+        result = (
+            "CTRL_BATON_A613_FINAL_RECONCILIATION_STAGED",
+            "BATON_FEATURE_PUBLISHED_RECONCILIATION_STAGED",
+        )
+    elif classify_ctrl_baton_a618_local_main_repair_staged(view, github):
+        result = (
+            "CTRL_BATON_A618_LOCAL_MAIN_REPAIR_STAGED",
+            "BATON_FEATURE_PUBLISHED_LOCAL_MAIN_REPAIR_STAGED",
+        )
+    elif classify_ctrl_baton_feature_local(view, github):
+        result = (
+            "CTRL_BATON_A62_FEATURE_COMMITTED",
+            "BATON_FEATURE_LOCAL",
+        )
+    elif classify_ctrl_baton_feature_ahead_of_published(view, github):
+        result = (
+            "CTRL_BATON_A62_FEATURE_COMMITTED",
+            "BATON_FEATURE_AHEAD_OF_PUBLISHED",
+        )
+    elif classify_ctrl_baton_feature_published(view, github):
+        result = (
+            "CTRL_BATON_A62_FEATURE_COMMITTED",
+            "BATON_FEATURE_PUBLISHED",
+        )
+    elif classify_ctrl_baton_pr_merge_checkout(view, github):
+        result = (
+            "CTRL_BATON_A62_PR_MERGE_CHECKOUT",
+            "GITHUB_PR_MERGE_CHECKOUT",
+        )
+    elif classify_ctrl_baton_main_merge(view, github):
+        result = (
+            "CTRL_BATON_A62_MAIN_MERGE_COMMITTED",
+            "GITHUB_MAIN_PUSH_CHECKOUT",
+        )
+    elif classify_ctrl_baton_main_merge_local(view, github):
+        result = (
+            "CTRL_BATON_A62_MAIN_MERGE_COMMITTED",
+            "BATON_MAIN_LOCAL_POST_MERGE",
+        )
+    else:
+        return ("INVALID_REPOSITORY_STATE", "INVALID_GIT_TOPOLOGY")
+
+    if result not in CTRL_BATON_A62_LIFECYCLE_COMBINATIONS:
+        return ("INVALID_REPOSITORY_STATE", "INVALID_GIT_TOPOLOGY")
+    return result
 
 
 def policy_refs(all_refs: set[str]) -> set[str] | None:
@@ -694,6 +1912,215 @@ def parse_remote_ref_records(output: str) -> tuple[set[str], str | None]:
     if remote_head_target is not None and "origin/main" not in remote_tracking_refs:
         raise AssertionError("origin_head_target_missing")
     return remote_tracking_refs, remote_head_target
+
+
+def parse_remote_ref_inventory(output: str) -> tuple[set[str], str | None]:
+    """Parse all remote refs without electing an allowed topology."""
+
+    remote_tracking_refs: set[str] = set()
+    remote_head_target = None
+    for line in output.splitlines():
+        if not line:
+            continue
+        if line.count("\t") != 1:
+            raise AssertionError("remote_ref_record_malformed")
+        full_name, symref = line.split("\t", 1)
+        if full_name != full_name.strip() or symref != symref.strip():
+            raise AssertionError("remote_ref_record_whitespace")
+        if not full_name.startswith(REMOTE_REF_PREFIX):
+            raise AssertionError("remote_ref_prefix_invalid")
+        name = full_name[len(REMOTE_REF_PREFIX) :]
+        if name in remote_tracking_refs:
+            raise AssertionError(f"duplicate_remote_ref:{name}")
+        if symref:
+            if (
+                name != "origin/HEAD"
+                or symref != "refs/remotes/origin/main"
+            ):
+                raise AssertionError(f"unexpected_remote_symref:{name}")
+            remote_head_target = symref
+        remote_tracking_refs.add(name)
+    return remote_tracking_refs, remote_head_target
+
+
+def optional_git_oid(ref: str) -> str | None:
+    result = run(["git", "rev-parse", "--verify", ref])
+    value = result.stdout.strip()
+    if result.returncode != 0 or re.fullmatch(r"[0-9a-f]{40}", value) is None:
+        return None
+    return value
+
+
+def git_commit_parents(oid: str | None) -> tuple[str, ...]:
+    if oid is None:
+        return ()
+    result = run(["git", "show", "-s", "--format=%P", oid])
+    if result.returncode != 0:
+        return ()
+    parents = tuple(result.stdout.strip().split())
+    if any(re.fullmatch(r"[0-9a-f]{40}", parent) is None for parent in parents):
+        return ()
+    return parents
+
+
+def git_tree_oid(oid: str | None) -> str | None:
+    if oid is None:
+        return None
+    result = run(["git", "rev-parse", "--verify", f"{oid}^{{tree}}"])
+    value = result.stdout.strip()
+    if result.returncode != 0 or re.fullmatch(r"[0-9a-f]{40}", value) is None:
+        return None
+    return value
+
+
+def git_tree_path_count(oid: str | None) -> int | None:
+    if oid is None:
+        return None
+    code, paths = command_set(["git", "ls-tree", "-r", "--name-only", oid])
+    return len(paths) if code == 0 else None
+
+
+def git_commit_subject(oid: str | None) -> str | None:
+    if oid is None:
+        return None
+    result = run(["git", "show", "-s", "--format=%s", oid])
+    return result.stdout.strip() if result.returncode == 0 else None
+
+
+def git_commit_count_after_base(base_oid: str, target_oid: str) -> int | None:
+    result = run(["git", "rev-list", "--count", f"{base_oid}..{target_oid}"])
+    value = result.stdout.strip()
+    if result.returncode != 0 or not value.isdigit():
+        return None
+    return int(value)
+
+
+def git_diff_paths(base_oid: str, target_oid: str) -> frozenset[str] | None:
+    code, paths = command_set(
+        ["git", "diff", "--name-only", base_oid, target_oid, "--"]
+    )
+    return frozenset(paths) if code == 0 else None
+
+
+def git_index_diff_paths(base_oid: str) -> frozenset[str] | None:
+    code, paths = command_set(
+        ["git", "diff", "--cached", "--name-only", base_oid, "--"]
+    )
+    return frozenset(paths) if code == 0 else None
+
+
+def git_index_catalog_version() -> str | None:
+    result = run(["git", "show", ":catalog/catalog_manifest.yaml"], binary=True)
+    if result.returncode != 0:
+        return None
+    try:
+        manifest = yaml.safe_load(result.stdout.decode("utf-8"))
+    except (UnicodeDecodeError, yaml.YAMLError):
+        return None
+    if not isinstance(manifest, dict):
+        return None
+    value = manifest.get("catalog_version")
+    return str(value) if value is not None else None
+
+
+def git_commit_catalog_version(oid: str | None) -> str | None:
+    if oid is None:
+        return None
+    result = run(
+        ["git", "show", f"{oid}:catalog/catalog_manifest.yaml"],
+        binary=True,
+    )
+    if result.returncode != 0:
+        return None
+    try:
+        manifest = yaml.safe_load(result.stdout.decode("utf-8"))
+    except (UnicodeDecodeError, yaml.YAMLError):
+        return None
+    if not isinstance(manifest, dict):
+        return None
+    value = manifest.get("catalog_version")
+    return str(value) if value is not None else None
+
+
+def collect_ctrl_baton_git_view(
+    *,
+    branch: str | None,
+    head_oid: str,
+    remotes: set[str],
+    fetch_urls: tuple[str, ...],
+    push_urls: tuple[str, ...],
+    fetch_refspecs: tuple[str, ...],
+    push_refspecs: tuple[str, ...],
+    upstream: str | None,
+    all_refs: set[str],
+    tracked: set[str],
+    staged: set[str],
+    unstaged: set[str],
+    untracked: set[str],
+) -> CtrlBatonGitView:
+    head_parents = git_commit_parents(head_oid)
+    feature_local_oid = optional_git_oid(
+        f"refs/heads/{CTRL_BATON_FEATURE_BRANCH}"
+    )
+    feature_remote_oid = optional_git_oid(
+        f"refs/remotes/origin/{CTRL_BATON_FEATURE_BRANCH}"
+    )
+    feature_oid = None
+    if len(head_parents) == 2:
+        feature_oid = head_parents[1]
+    elif branch == CTRL_BATON_FEATURE_BRANCH and head_oid != CTRL_BATON_A62_COMMIT_OID:
+        feature_oid = head_oid
+    elif (
+        feature_local_oid is not None
+        and feature_local_oid != CTRL_BATON_A62_COMMIT_OID
+    ):
+        feature_oid = feature_local_oid
+
+    added_code, staged_added = command_set(
+        ["git", "diff", "--cached", "--name-only", "--diff-filter=A"]
+    )
+    modified_code, staged_modified = command_set(
+        ["git", "diff", "--cached", "--name-only", "--diff-filter=M"]
+    )
+    conflict_code, conflicts = command_set(
+        ["git", "diff", "--name-only", "--diff-filter=U"]
+    )
+    if any(code != 0 for code in (added_code, modified_code, conflict_code)):
+        raise AssertionError("ctrl_baton_inventory_read_failed")
+
+    return CtrlBatonGitView(
+        branch,
+        head_oid,
+        head_parents,
+        git_commit_parents(feature_oid),
+        git_tree_oid(head_oid),
+        git_tree_oid(feature_oid),
+        optional_git_oid("refs/heads/main"),
+        optional_git_oid("refs/remotes/origin/main"),
+        feature_local_oid,
+        feature_remote_oid,
+        upstream,
+        frozenset(remotes),
+        fetch_urls,
+        push_urls,
+        fetch_refspecs,
+        push_refspecs,
+        frozenset(all_refs),
+        frozenset(tracked),
+        frozenset(staged),
+        frozenset(staged_added),
+        frozenset(staged_modified),
+        frozenset(unstaged),
+        frozenset(untracked),
+        frozenset(conflicts),
+        git_diff_paths(CTRL_BATON_A62_COMMIT_OID, head_oid),
+        git_commit_subject(head_oid),
+        git_commit_count_after_base(CTRL_BATON_A62_COMMIT_OID, head_oid),
+        git_index_diff_paths(CTRL_BATON_A62_COMMIT_OID),
+        git_index_catalog_version(),
+        git_tree_path_count(head_oid),
+        git_commit_catalog_version(head_oid),
+    )
 
 
 def classify_git_topology(
@@ -1773,16 +3200,29 @@ def validate_task06_finalization_staged_style_policy() -> None:
     )
 
 
+def validate_ctrl_baton_staged_style_policy() -> None:
+    diff = run(
+        [
+            "git",
+            "diff",
+            "--cached",
+            "--check",
+            "--",
+            *sorted(ctrl_baton_expected_changed()),
+        ]
+    )
+    assert_check(
+        "ctrl_baton_staged_diff_check",
+        diff.returncode == 0,
+        diff.stdout.strip() + diff.stderr.strip(),
+    )
+
+
 def validate() -> None:
     github_actions = os.environ.get("GITHUB_ACTIONS", "").lower() == "true"
     branch_result = run(["git", "symbolic-ref", "--short", "HEAD"])
     branch_name = (
         branch_result.stdout.strip() if branch_result.returncode == 0 else None
-    )
-    assert_check(
-        "branch_main_or_ci_detached",
-        (branch_result.returncode == 0 and branch_name == "main")
-        or (github_actions and branch_result.returncode != 0),
     )
     head = run(["git","rev-parse","HEAD"]); assert_check("head_read", head.returncode == 0); head_oid = head.stdout.strip()
     count = run(["git","rev-list","--count","HEAD"]); assert_check("commit_count_read", count.returncode == 0); commit_count = int(count.stdout.strip())
@@ -1826,7 +3266,7 @@ def validate() -> None:
         ]
     )
     remote_ref_code = remote_ref_result.returncode
-    remote_tracking_refs, remote_head_target = parse_remote_ref_records(
+    remote_tracking_refs, remote_head_target = parse_remote_ref_inventory(
         remote_ref_result.stdout
     )
     tag_code, tags = command_set(["git", "tag", "--list"])
@@ -1861,7 +3301,27 @@ def validate() -> None:
         and push_refspec_code in {0, 1}
         and (upstream_result.returncode == 0 or not upstream_result.stdout.strip()),
     )
-    topology = classify_git_topology(
+    github_context = read_ctrl_baton_github_context()
+    baton_view = collect_ctrl_baton_git_view(
+        branch=branch_name,
+        head_oid=head_oid,
+        remotes=remotes,
+        fetch_urls=fetch_urls,
+        push_urls=push_urls,
+        fetch_refspecs=fetch_refspecs,
+        push_refspecs=push_refspecs,
+        upstream=upstream,
+        all_refs=all_refs,
+        tracked=tracked,
+        staged=staged,
+        unstaged=unstaged,
+        untracked=untracked,
+    )
+    baton_state, baton_topology = classify_ctrl_baton_state_machine(
+        baton_view,
+        github_context,
+    )
+    legacy_topology = classify_git_topology(
         branch=branch_name,
         head_oid=head_oid,
         remotes=remotes,
@@ -1880,12 +3340,7 @@ def validate() -> None:
         github_sha=os.environ.get("GITHUB_SHA"),
         remote_head_target=remote_head_target,
     )
-    assert_check(
-        "repository_topology",
-        topology != "INVALID_GIT_TOPOLOGY",
-        topology,
-    )
-    state = classify_state(
+    legacy_state = classify_state(
         head_oid=head_oid,
         commit_count=commit_count,
         parent_oid=parent_oid,
@@ -1895,6 +3350,22 @@ def validate() -> None:
         unstaged=unstaged,
         commit_subject=subject.stdout.strip(),
         commit_changed=commit_changed,
+    )
+    if (baton_state, baton_topology) in CTRL_BATON_A62_LIFECYCLE_COMBINATIONS:
+        state = baton_state
+        topology = baton_topology
+    else:
+        assert_check(
+            "branch_main_or_ci_detached",
+            (branch_result.returncode == 0 and branch_name == "main")
+            or (github_actions and branch_result.returncode != 0),
+        )
+        state = legacy_state
+        topology = legacy_topology
+    assert_check(
+        "repository_topology",
+        topology != "INVALID_GIT_TOPOLOGY",
+        topology,
     )
     valid_states = {
         "PRE_GIT_IMPORT_STAGED",
@@ -1923,8 +3394,15 @@ def validate() -> None:
         | TASK06_REPOSITORY_STATES
         | TASK07_REPOSITORY_STATES
         | TASK08_REPOSITORY_STATES
+        | CTRL_BATON_A62_REPOSITORY_STATES
     )
     assert_check("repository_state", state in valid_states, state)
+    if state in CTRL_BATON_A62_REPOSITORY_STATES:
+        assert_check(
+            "ctrl_baton_state_topology_combination",
+            (state, topology) in CTRL_BATON_A62_LIFECYCLE_COMBINATIONS,
+            f"{state}/{topology}",
+        )
     if state == "ATOM7_FINAL_HANDOFF_STAGED":
         assert_check(
             "atom7_final_handoff_staged_topology",
@@ -2049,6 +3527,8 @@ def validate() -> None:
         )
     if state in TASK08_REPOSITORY_STATES:
         expected_file_count = TASK08_EXPECTED_REPOSITORY_FILE_COUNT
+    elif state in CTRL_BATON_A62_REPOSITORY_STATES:
+        expected_file_count = ctrl_baton_a62r_expected_repository_file_count()
     elif state in TASK07_REPOSITORY_STATES:
         expected_file_count = TASK07_EXPECTED_REPOSITORY_FILE_COUNT
     elif state in TASK06_FINALIZATION_REPOSITORY_STATES:
@@ -2146,6 +3626,98 @@ def validate() -> None:
         assert_check(
             "task08_catalog_query_count",
             query_count == TASK08_EXPECTED_CATALOG_QUERY_COUNT,
+        )
+        lifecycle = [
+            yaml.safe_load(
+                (ROOT / relative).read_text(encoding="utf-8")
+            )
+            for relative in manifest["root_resolver"]["lifecycle_registries"]
+        ]
+        reuse_count = sum(
+            len(document["records"])
+            for document in lifecycle
+            if document["registry_type"] == "reuse_candidates"
+        )
+        production_count = sum(
+            len(document["records"])
+            for document in lifecycle
+            if document["registry_type"] != "reuse_candidates"
+        )
+        assert_check("reuse_decision_record_count", reuse_count == 52)
+        assert_check("production_lifecycle_record_count", production_count == 0)
+    elif state in CTRL_BATON_A62_REPOSITORY_STATES:
+        if state == "CTRL_BATON_A69_PR_CI_REPAIR_STAGED":
+            expected_ctrl_baton_catalog_version = (
+                CTRL_BATON_A69_EXPECTED_CATALOG_VERSION
+            )
+        elif state == "CTRL_BATON_A613_FINAL_RECONCILIATION_STAGED":
+            expected_ctrl_baton_catalog_version = (
+                CTRL_BATON_A613_EXPECTED_CATALOG_VERSION
+            )
+        else:
+            expected_ctrl_baton_catalog_version = (
+                CTRL_BATON_A62_EXPECTED_CATALOG_VERSION
+            )
+        assert_check(
+            "ctrl_baton_a62_catalog_version",
+            str(manifest.get("catalog_version"))
+            == expected_ctrl_baton_catalog_version,
+        )
+        asset_count = sum(
+            len(
+                yaml.safe_load(
+                    (ROOT / relative).read_text(encoding="utf-8")
+                )["records"]
+            )
+            for relative in manifest["root_resolver"]["asset_registries"]
+        )
+        query_count = sum(
+            len(
+                yaml.safe_load(
+                    (ROOT / relative).read_text(encoding="utf-8")
+                )["recipes"]
+            )
+            for relative in manifest["root_resolver"]["query_registries"]
+        )
+        schema_registry_files = len(
+            list(manifest.get("root_resolver", {}).get("schemas") or [])
+        )
+        schema_asset_records = 0
+        asset_ids: set[str] = set()
+        for relative in manifest["root_resolver"]["asset_registries"]:
+            document = yaml.safe_load((ROOT / relative).read_text(encoding="utf-8"))
+            for record in document["records"]:
+                asset_ids.add(record["asset_id"])
+                if record.get("asset_type") == "schema":
+                    schema_asset_records += 1
+        mandatory_ids = list(manifest.get("mandatory_asset_ids") or [])
+        print(
+            "ctrl_baton_a62_catalog_counts:"
+            f" asset_records={asset_count}"
+            f" schema_registry_files={schema_registry_files}"
+            f" schema_asset_records={schema_asset_records}"
+            f" query_records={query_count}"
+            f" mandatory_asset_ids={len(mandatory_ids)}"
+        )
+        assert_check("ctrl_baton_a62_catalog_asset_count_positive", asset_count > 0)
+        assert_check("ctrl_baton_a62_catalog_query_count_positive", query_count > 0)
+        assert_check(
+            "ctrl_baton_a62_mandatory_ids_nonempty",
+            len(mandatory_ids) > 0,
+        )
+        missing_mandatory = sorted(set(mandatory_ids) - asset_ids)
+        assert_check(
+            "ctrl_baton_a62_mandatory_ids_present",
+            not missing_mandatory,
+            ",".join(missing_mandatory),
+        )
+        assert_check(
+            "ctrl_baton_a62_no_catalog_tx_script",
+            "SCRIPT-BATON-CATALOG-TX-001" not in asset_ids,
+        )
+        assert_check(
+            "ctrl_baton_a62_fixture_suite_registered",
+            "FIXTURE-BATON-SUITE-001" in asset_ids,
         )
         lifecycle = [
             yaml.safe_load(
@@ -2434,6 +4006,7 @@ def validate() -> None:
         | TASK06_REPOSITORY_STATES
         | TASK07_REPOSITORY_STATES
         | TASK08_REPOSITORY_STATES
+        | CTRL_BATON_A62_REPOSITORY_STATES
         else {f"PyYAML=={EXPECTED_PYYAML}", f"jsonschema=={EXPECTED_JSONSCHEMA}"}
     )
     assert_check("dependency_contract", set(metadata["project"]["dependencies"]) == expected_dependencies)
@@ -2444,6 +4017,7 @@ def validate() -> None:
         | TASK06_REPOSITORY_STATES
         | TASK07_REPOSITORY_STATES
         | TASK08_REPOSITORY_STATES
+        | CTRL_BATON_A62_REPOSITORY_STATES
     ):
         assert_check(
             "security_dependency_group",
@@ -2519,6 +4093,13 @@ def validate() -> None:
         validate_task06_atom7a_staged_style_policy()
     if state == "TASK06_FINALIZATION_STAGED":
         validate_task06_finalization_staged_style_policy()
+    if state in {
+        "CTRL_BATON_A62R_CANDIDATE_STAGED",
+        "CTRL_BATON_A69_PR_CI_REPAIR_STAGED",
+        "CTRL_BATON_A613_FINAL_RECONCILIATION_STAGED",
+        "CTRL_BATON_A618_LOCAL_MAIN_REPAIR_STAGED",
+    }:
+        validate_ctrl_baton_staged_style_policy()
     tests = run([sys.executable,"-B","-m","unittest","discover","-s","tests","-p","test_*.py"])
     if tests.stdout.strip(): print(tests.stdout.strip())
     if tests.stderr.strip(): print(tests.stderr.strip())

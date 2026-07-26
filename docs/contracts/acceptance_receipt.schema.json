@@ -1,0 +1,102 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:smial:github-baton:acceptance-receipt:1.0",
+  "title": "SMIAL GitHub Baton Acceptance Receipt",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "acceptance_schema",
+    "schema_version",
+    "contract_id",
+    "contract_revision",
+    "expected_contract_sha256",
+    "pr_number",
+    "reviewed_head",
+    "reviewed_tree",
+    "verdict",
+    "contract_compliance",
+    "authority_compliance",
+    "semantic_invariants",
+    "evidence_reviewed",
+    "required_repairs",
+    "merge_authorized",
+    "canonical_status_change"
+  ],
+  "properties": {
+    "acceptance_schema": {
+      "const": "smial.github_baton.acceptance_receipt"
+    },
+    "schema_version": {
+      "const": "1.0"
+    },
+    "contract_id": {
+      "type": "string",
+      "minLength": 3,
+      "maxLength": 120
+    },
+    "contract_revision": {
+      "type": "integer",
+      "minimum": 1
+    },
+    "expected_contract_sha256": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{64}$"
+    },
+    "pr_number": {
+      "type": "integer",
+      "minimum": 0
+    },
+    "reviewed_head": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{40}$"
+    },
+    "reviewed_tree": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{40}$"
+    },
+    "verdict": {
+      "enum": [
+        "PASS",
+        "PASS_WITH_PATCH",
+        "FAIL_REPAIR_REQUIRED",
+        "BLOCKED"
+      ]
+    },
+    "contract_compliance": {
+      "enum": [
+        "PASS",
+        "FAIL"
+      ]
+    },
+    "authority_compliance": {
+      "enum": [
+        "PASS",
+        "FAIL"
+      ]
+    },
+    "semantic_invariants": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "evidence_reviewed": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "required_repairs": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "merge_authorized": {
+      "const": false
+    },
+    "canonical_status_change": {
+      "const": "NONE"
+    }
+  }
+}

@@ -1,0 +1,252 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:smial:github-baton:execution-receipt:1.0",
+  "title": "SMIAL GitHub Baton Execution Receipt",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "receipt_schema",
+    "schema_version",
+    "contract_id",
+    "contract_revision",
+    "expected_contract_sha256",
+    "result",
+    "repository",
+    "changes",
+    "validation",
+    "side_effects",
+    "limitations",
+    "blockers",
+    "contains_secrets",
+    "contains_absolute_user_paths"
+  ],
+  "properties": {
+    "receipt_schema": {
+      "const": "smial.github_baton.execution_receipt"
+    },
+    "schema_version": {
+      "const": "1.0"
+    },
+    "contract_id": {
+      "type": "string",
+      "minLength": 3,
+      "maxLength": 120
+    },
+    "contract_revision": {
+      "type": "integer",
+      "minimum": 1
+    },
+    "expected_contract_sha256": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{64}$"
+    },
+    "result": {
+      "enum": [
+        "PASS_CANDIDATE",
+        "BLOCKED",
+        "FAIL_VALIDATION",
+        "NO_CHANGE"
+      ]
+    },
+    "repository": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "observed_base_head",
+        "observed_base_tree",
+        "branch",
+        "candidate_head",
+        "candidate_tree",
+        "dirty_before",
+        "dirty_after"
+      ],
+      "properties": {
+        "observed_base_head": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{40}$"
+        },
+        "observed_base_tree": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{40}$"
+        },
+        "branch": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 64
+        },
+        "candidate_head": {
+          "type": "string",
+          "pattern": "^(NOT_COMMITTED|[0-9a-f]{40})$"
+        },
+        "candidate_tree": {
+          "type": "string",
+          "pattern": "^(NOT_AVAILABLE|[0-9a-f]{40})$"
+        },
+        "dirty_before": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "dirty_after": {
+          "type": "integer",
+          "minimum": 0
+        }
+      }
+    },
+    "changes": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "changed_files",
+        "staged_files",
+        "files_outside_managed_write_set",
+        "diff_sha256"
+      ],
+      "properties": {
+        "changed_files": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "staged_files": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "files_outside_managed_write_set": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "diff_sha256": {
+          "type": "string",
+          "pattern": "^(NONE|[0-9a-f]{64})$"
+        }
+      }
+    },
+    "validation": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "commands",
+        "targeted",
+        "full",
+        "catalog",
+        "security"
+      ],
+      "properties": {
+        "commands": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "targeted": {
+          "enum": [
+            "PASS",
+            "FAIL",
+            "NOT_RUN",
+            "SKIPPED",
+            "PENDING"
+          ]
+        },
+        "full": {
+          "enum": [
+            "PASS",
+            "FAIL",
+            "NOT_RUN",
+            "SKIPPED",
+            "PENDING"
+          ]
+        },
+        "catalog": {
+          "enum": [
+            "PASS",
+            "FAIL",
+            "NOT_APPLICABLE",
+            "NOT_RUN",
+            "SKIPPED",
+            "PENDING"
+          ]
+        },
+        "security": {
+          "enum": [
+            "PASS",
+            "FAIL",
+            "NOT_RUN",
+            "SKIPPED",
+            "PENDING"
+          ]
+        }
+      }
+    },
+    "side_effects": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "github_reads",
+        "github_writes",
+        "provider_calls",
+        "cash_spend_usd",
+        "credential_values_exposed",
+        "wallet_actions",
+        "signer_actions",
+        "transaction_actions"
+      ],
+      "properties": {
+        "github_reads": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "github_writes": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "provider_calls": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "cash_spend_usd": {
+          "type": "number",
+          "minimum": 0
+        },
+        "credential_values_exposed": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "wallet_actions": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "signer_actions": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "transaction_actions": {
+          "type": "integer",
+          "minimum": 0
+        }
+      }
+    },
+    "limitations": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "blockers": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "contains_secrets": {
+      "const": false
+    },
+    "contains_absolute_user_paths": {
+      "const": false
+    }
+  }
+}

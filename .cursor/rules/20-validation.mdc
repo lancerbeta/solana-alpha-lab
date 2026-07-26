@@ -1,0 +1,20 @@
+---
+description: Required local validation gate before claiming technical completion
+alwaysApply: true
+---
+
+# Validation
+
+Platform-neutral gate:
+
+```text
+uv run --locked --managed-python python -B scripts/validate_ci.py
+```
+
+Rules:
+
+- Run the gate when the active atom requires validation evidence.
+- Do not weaken or patch validators merely to pass.
+- Report Catalog-pending failures honestly; do not edit Catalog unless authorized.
+- Technical validation is not semantic acceptance or `DONE`.
+- See `AGENTS.md` section `VALIDATION_COMMAND`.

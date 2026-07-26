@@ -1,0 +1,310 @@
+{
+  "manifest_schema": "smial.github_baton.fixture_manifest",
+  "schema_version": "1.0",
+  "fixtures": [
+    {
+      "id": "valid_atom_contract",
+      "path": "tests/fixtures/baton/valid_atom_contract.json",
+      "category": "valid_contract_bytes",
+      "expected_outcome": "PASS",
+      "expected_error_code": "",
+      "contract_revision": 1,
+      "contract_sha256": "39c4e743b7aa5239690faab39cb26cc6f10de89d1b22b818a60b67978c5c449c",
+      "sha256": "39c4e743b7aa5239690faab39cb26cc6f10de89d1b22b818a60b67978c5c449c"
+    },
+    {
+      "id": "valid_issue_body",
+      "path": "tests/fixtures/baton/valid_issue_body.md",
+      "category": "valid_issue_body",
+      "expected_outcome": "PASS",
+      "expected_error_code": "",
+      "contract_revision": 1,
+      "contract_sha256": "39c4e743b7aa5239690faab39cb26cc6f10de89d1b22b818a60b67978c5c449c",
+      "sha256": "658ce00e470510de2151b67cfa45684023ba25357f44bace39dcd73ad970417e"
+    },
+    {
+      "id": "valid_execution_receipt",
+      "path": "tests/fixtures/baton/valid_execution_receipt.json",
+      "category": "valid_execution_receipt",
+      "expected_outcome": "PASS",
+      "expected_error_code": "",
+      "sha256": "4f0ee693cdf96df469f1ea3c60a80a801fa8669ba3a99d25db44208bf2f3053c"
+    },
+    {
+      "id": "valid_acceptance_receipt",
+      "path": "tests/fixtures/baton/valid_acceptance_receipt.json",
+      "category": "valid_acceptance_receipt",
+      "expected_outcome": "PASS",
+      "expected_error_code": "",
+      "sha256": "130d32a87ab3e3d0f52753736d26cc148c4237e007e69d59def8552ed8b5272e"
+    },
+    {
+      "id": "expected_contract_sha256_file",
+      "path": "tests/fixtures/baton/expected_contract_sha256.txt",
+      "category": "adversarial_scope_unit",
+      "expected_outcome": "COVERED_BY_UNIT",
+      "expected_error_code": "",
+      "sha256": "8d2b7e9eef9a877abe5f2e916ed916da9b71caa0804bb077a450d1618f94f530"
+    },
+    {
+      "id": "hash_mismatch_valid_bytes",
+      "path": "tests/fixtures/baton/valid_atom_contract.json",
+      "category": "hash_mismatch",
+      "expected_outcome": "FAIL",
+      "expected_error_code": "contract_hash_mismatch",
+      "contract_revision": 1,
+      "contract_sha256": "39c4e743b7aa5239690faab39cb26cc6f10de89d1b22b818a60b67978c5c449c",
+      "sha256": "39c4e743b7aa5239690faab39cb26cc6f10de89d1b22b818a60b67978c5c449c"
+    },
+    {
+      "id": "contract_revision_mismatch",
+      "path": "tests/fixtures/baton/invalid/contract_revision_mismatch.json",
+      "category": "revision_mismatch",
+      "expected_outcome": "FAIL",
+      "expected_error_code": "contract_revision_mismatch",
+      "oob_expected_revision": 1,
+      "contract_revision": 2,
+      "sha256": "e18aac98763aea943cbf04e0660a754c9ec292a4f747e9b57c42cab21b28fbae"
+    },
+    {
+      "id": "duplicate_markers",
+      "path": "tests/fixtures/baton/invalid/duplicate_markers.md",
+      "category": "marker_invalid",
+      "expected_outcome": "FAIL",
+      "expected_error_code": "begin_marker_count_invalid",
+      "sha256": "6415cd7d94aa78d738c7461ebacf6bb8c7a7d3616ef49b9fd35d002909fa0a02"
+    },
+    {
+      "id": "missing_marker",
+      "path": "tests/fixtures/baton/invalid/missing_marker.md",
+      "category": "marker_invalid",
+      "expected_outcome": "FAIL",
+      "expected_error_code": "begin_marker_count_invalid",
+      "sha256": "c51658cd02077224e498c2857e6a7374318695e53585ebe476bf29931457156e"
+    },
+    {
+      "id": "invalid_json",
+      "path": "tests/fixtures/baton/invalid/invalid_json.md",
+      "category": "invalid_json_after_markers",
+      "expected_outcome": "FAIL",
+      "expected_error_code": "payload_json_invalid",
+      "sha256": "de2fde0105ca566f5de06f7189b33906e807c96c727f195bae8ee38e5f4af621"
+    },
+    {
+      "id": "whitespace_changed_contract",
+      "path": "tests/fixtures/baton/invalid/whitespace_changed_contract.json",
+      "category": "whitespace_hash_drift",
+      "expected_outcome": "FAIL",
+      "expected_error_code": "contract_hash_mismatch",
+      "sha256": "7e95427baa00554e8d4f2da0e7b9fb9f38d621cd4a7effa9e54987bb831e0ee9"
+    },
+    {
+      "id": "issue_body_whitespace_and_embedded_hash",
+      "path": "tests/fixtures/baton/invalid/issue_body_whitespace_and_embedded_hash.md",
+      "category": "whitespace_hash_drift",
+      "expected_outcome": "FAIL",
+      "expected_error_code": "contract_hash_mismatch",
+      "sha256": "7d250c737f75d8b2deb6fc2d029a76e57d357a08a098383938f390f1e3167ba9"
+    },
+    {
+      "id": "base_head_mismatch_contract",
+      "path": "tests/fixtures/baton/invalid/base_head_mismatch_contract.json",
+      "category": "base_head_mismatch",
+      "expected_outcome": "FAIL",
+      "expected_error_code": "base_head_mismatch",
+      "sha256": "5fb297dd9bf1551fb72c5c1d550d0909121e78a7b8ba36f6688569abb29bec30"
+    },
+    {
+      "id": "base_tree_mismatch_contract",
+      "path": "tests/fixtures/baton/invalid/base_tree_mismatch_contract.json",
+      "category": "base_tree_mismatch",
+      "expected_outcome": "FAIL",
+      "expected_error_code": "base_tree_mismatch",
+      "sha256": "865b4d788c6feb8e8e052753852c7456a0542625aed847ad428ae8eebce1c4c4"
+    },
+    {
+      "id": "wrong_repository",
+      "path": "tests/fixtures/baton/invalid/wrong_repository.json",
+      "category": "semantic_contract_invalid",
+      "expected_outcome": "FAIL",
+      "expected_error_code": "schema_validation",
+      "sha256": "f3a33e419e9817d17068d2233e91db15551f80dd047756ed9b0c6d4bb37204f5"
+    },
+    {
+      "id": "read_only_nonempty_write_set",
+      "path": "tests/fixtures/baton/invalid/read_only_nonempty_write_set.json",
+      "category": "semantic_contract_invalid",
+      "expected_outcome": "FAIL",
+      "expected_error_code": "read_only_nonempty_write_set",
+      "sha256": "bd1f9eab9085efa46d4624dfb135385857f228efc6f89ad5368b42c3873fe76b"
+    },
+    {
+      "id": "local_write_empty_write_set",
+      "path": "tests/fixtures/baton/invalid/local_write_empty_write_set.json",
+      "category": "semantic_contract_invalid",
+      "expected_outcome": "FAIL",
+      "expected_error_code": "local_write_empty_write_set",
+      "sha256": "5e35cc227c59c2ff8e3172a72fff3318c92f28cdf163a0b5d99811b5b69d6486"
+    },
+    {
+      "id": "absolute_windows_path",
+      "path": "tests/fixtures/baton/invalid/absolute_windows_path.json",
+      "category": "semantic_contract_invalid",
+      "expected_outcome": "FAIL",
+      "expected_error_code": "path_absolute",
+      "sha256": "23d7e956554059894d901c9204be6e8850923770de01f8ff82acf8903727247e"
+    },
+    {
+      "id": "absolute_posix_path",
+      "path": "tests/fixtures/baton/invalid/absolute_posix_path.json",
+      "category": "semantic_contract_invalid",
+      "expected_outcome": "FAIL",
+      "expected_error_code": "path_absolute",
+      "sha256": "b34f6a2ce4552606f2210032efddaee03125b6dfd15dd1323dd7367a6755ba70"
+    },
+    {
+      "id": "parent_traversal",
+      "path": "tests/fixtures/baton/invalid/parent_traversal.json",
+      "category": "semantic_contract_invalid",
+      "expected_outcome": "FAIL",
+      "expected_error_code": "managed_write_path_invalid",
+      "sha256": "627c23d2c5133d71e8588a0ac7386779a881aefffbf2418e7486164ae352c6b9"
+    },
+    {
+      "id": "git_target",
+      "path": "tests/fixtures/baton/invalid/git_target.json",
+      "category": "semantic_contract_invalid",
+      "expected_outcome": "FAIL",
+      "expected_error_code": "managed_write_forbidden",
+      "sha256": "3780d32f5edf562ef7086782380b55738d363897302b2ff0bcc3e94a900fe0c0"
+    },
+    {
+      "id": "forbidden_wallet_target",
+      "path": "tests/fixtures/baton/invalid/forbidden_wallet_target.json",
+      "category": "semantic_contract_invalid",
+      "expected_outcome": "FAIL",
+      "expected_error_code": "managed_write_forbidden",
+      "sha256": "7489ed51dd84cab0714470b8570141d54a6510904317274034e756f66caa749a"
+    },
+    {
+      "id": "unsafe_glob",
+      "path": "tests/fixtures/baton/invalid/unsafe_glob.json",
+      "category": "semantic_contract_invalid",
+      "expected_outcome": "FAIL",
+      "expected_error_code": "managed_write_unsafe_glob",
+      "sha256": "5cdb44e50691b27c7b68b3dcdda6c1f31ad3f07c459e8014530fe08b4a6aabb1"
+    },
+    {
+      "id": "invalid_authority",
+      "path": "tests/fixtures/baton/invalid/invalid_authority.json",
+      "category": "semantic_contract_invalid",
+      "expected_outcome": "FAIL",
+      "expected_error_code": "schema_validation",
+      "sha256": "cc50dffe59cbb985436811bc5e08d712ab67efe59aef38367b48fd35faec1f84"
+    },
+    {
+      "id": "receipt_github_write",
+      "path": "tests/fixtures/baton/invalid/receipt_github_write.json",
+      "category": "execution_receipt_invalid",
+      "expected_outcome": "FAIL",
+      "expected_error_code": "github_writes_not_authorized",
+      "sha256": "d1fac61d72e952974db8319ec3f0f860fce2ed9eed1e532b60611f35cf3bdd1e"
+    },
+    {
+      "id": "receipt_secrets_true",
+      "path": "tests/fixtures/baton/invalid/receipt_secrets_true.json",
+      "category": "execution_receipt_invalid",
+      "expected_outcome": "FAIL",
+      "expected_error_code": "schema_validation",
+      "sha256": "3700719f5c96a2e7c4cdb9f546c060e3cb1e478496138fc1520edff7b5d5bcd3"
+    },
+    {
+      "id": "acceptance_canonical_status_change",
+      "path": "tests/fixtures/baton/invalid/acceptance_canonical_status_change.json",
+      "category": "acceptance_receipt_invalid",
+      "expected_outcome": "FAIL",
+      "expected_error_code": "schema_validation",
+      "sha256": "d8b21b6315a355d4c706281f24a96b808cefbfbeb47747754abba333edfa0cf9"
+    },
+    {
+      "id": "acceptance_merge_authorized",
+      "path": "tests/fixtures/baton/invalid/acceptance_merge_authorized.json",
+      "category": "acceptance_receipt_invalid",
+      "expected_outcome": "FAIL",
+      "expected_error_code": "schema_validation",
+      "sha256": "407a89c3ffbc6443d520503c7cc2dfd2477fcef31b2cd37fee16c2bf7042ad84"
+    },
+    {
+      "id": "file_outside_managed_write_set",
+      "path": "tests/fixtures/baton/invalid/file_outside_managed_write_set.json",
+      "category": "scope_outside",
+      "expected_outcome": "PASS",
+      "expected_error_code": "",
+      "sha256": "b0f59b2c5527fb8d48bb931b0df3e8a6d96cd93aa2c02e86fd27b5c6992cee3d"
+    },
+    {
+      "id": "receipt_pass_full_not_run",
+      "path": "tests/fixtures/baton/invalid/receipt_pass_full_not_run.json",
+      "category": "execution_receipt_invalid",
+      "expected_outcome": "FAIL",
+      "expected_error_code": "pass_with_full_incomplete",
+      "sha256": "6a90eda9767964b1f7adfdad48e5bed6e946257553547cab33e3b86df38b12f0"
+    },
+    {
+      "id": "receipt_pass_targeted_skipped",
+      "path": "tests/fixtures/baton/invalid/receipt_pass_targeted_skipped.json",
+      "category": "execution_receipt_invalid",
+      "expected_outcome": "FAIL",
+      "expected_error_code": "pass_with_targeted_incomplete",
+      "sha256": "ecb7b84aabd7a4b5fab88d3db5124190f68118df33892ec86424f8fb3ba49f1a"
+    },
+    {
+      "id": "receipt_embedded_windows_path",
+      "path": "tests/fixtures/baton/invalid/receipt_embedded_windows_path.json",
+      "category": "execution_receipt_invalid",
+      "expected_outcome": "FAIL",
+      "expected_error_code": "absolute_user_path_in_contract_string",
+      "sha256": "82f900ef66204eb98569aac93a734c7c1214219eff9598b4742471ae40fc21c1"
+    },
+    {
+      "id": "receipt_embedded_posix_home",
+      "path": "tests/fixtures/baton/invalid/receipt_embedded_posix_home.json",
+      "category": "execution_receipt_invalid",
+      "expected_outcome": "FAIL",
+      "expected_error_code": "absolute_user_path_in_contract_string",
+      "sha256": "a236dab93910971da4625cc31952c318dc3f87d3258a38e071390282259a2ed6"
+    },
+    {
+      "id": "receipt_password_assignment",
+      "path": "tests/fixtures/baton/invalid/receipt_password_assignment.json",
+      "category": "execution_receipt_invalid",
+      "expected_outcome": "FAIL",
+      "expected_error_code": "credential_value_in_contract_string",
+      "sha256": "0deb4cc3f2993bd0bfca7337a8c5e6615d696f5e172027d9206e1cb49bd95f7e"
+    },
+    {
+      "id": "receipt_token_assignment",
+      "path": "tests/fixtures/baton/invalid/receipt_token_assignment.json",
+      "category": "execution_receipt_invalid",
+      "expected_outcome": "FAIL",
+      "expected_error_code": "credential_value_in_contract_string",
+      "sha256": "8ddd0167a6e5b8af66cccebd533c51c98c66de1e099e5e666cf8ba1d57136f8f"
+    },
+    {
+      "id": "receipt_no_change_with_files",
+      "path": "tests/fixtures/baton/invalid/receipt_no_change_with_files.json",
+      "category": "execution_receipt_invalid",
+      "expected_outcome": "FAIL",
+      "expected_error_code": "no_change_with_changed_files",
+      "sha256": "5ead9723ec9df138a9692ff29691b55ea82943954bc4a7a77dc95d7be983cb86"
+    },
+    {
+      "id": "issue_body_crlf",
+      "path": "tests/fixtures/baton/invalid/issue_body_crlf.md",
+      "category": "offline_exact_bytes_crlf",
+      "expected_outcome": "FAIL",
+      "expected_error_code": "payload_contains_cr",
+      "sha256": "658ce00e470510de2151b67cfa45684023ba25357f44bace39dcd73ad970417e"
+    }
+  ]
+}

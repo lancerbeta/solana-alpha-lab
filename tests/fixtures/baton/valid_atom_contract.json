@@ -1,0 +1,84 @@
+{
+  "automation_schema": "smial.github_baton.atom_contract",
+  "schema_version": "1.0",
+  "contract_id": "CTRL-BATON-A62-DEMO-001",
+  "contract_revision": 1,
+  "created_at": "2026-07-25T15:00:00Z",
+  "created_by_control_plane": "ChatGPT_Project_GPT_Control_Plane",
+  "project": {
+    "project_id": "SMIAL",
+    "task_id": "CTRL-BATON-SETUP",
+    "atom_id": "A6.2_BATON_MACHINE_LAYER",
+    "canonical_status_snapshot": "CANDIDATE_NOT_REGISTERED"
+  },
+  "repository": {
+    "full_name": "lancerbeta/solana-alpha-lab",
+    "base_branch": "main",
+    "base_head": "bd152b3199a9ba5c75374bd798b1e81756cd4d9b",
+    "base_tree": "a068018e57ad53340ad94321539ed7d1b411bc10",
+    "expected_upstream": "origin/main",
+    "require_clean_worktree": true
+  },
+  "objective": {
+    "result": "Offline-testable baton machine layer exists",
+    "why_now": "Protocol foundation needs deterministic preflight/receipt tooling",
+    "cheapest_falsifier": "Marker extraction or out-of-band hash check fails"
+  },
+  "inputs": {
+    "catalog_asset_ids": [
+      "CTRL-AGENTS-001"
+    ],
+    "repository_paths": [
+      "AGENTS.md"
+    ],
+    "external_fact_refs": []
+  },
+  "execution": {
+    "surface": "CURSOR_LOCAL",
+    "authority_class": "LOCAL_WRITE",
+    "network": {
+      "allowed": false,
+      "allowed_targets": []
+    },
+    "credentials": {
+      "allowed": false,
+      "references_only": true
+    },
+    "dependency_changes_allowed": false,
+    "cash_cap_usd": 0
+  },
+  "managed_write_set": [
+    "docs/evidence/baton/**"
+  ],
+  "explicit_exclusions": [
+    ".env",
+    "wallet/**"
+  ],
+  "acceptance": {
+    "targeted_commands": [
+      "uv run --locked --managed-python python -B scripts/validate_baton.py"
+    ],
+    "full_validation_command": "uv run --locked --managed-python python -B scripts/validate_ci.py",
+    "semantic_invariants": [
+      "Cursor remains EXECUTION_ONLY"
+    ],
+    "required_receipts": [
+      "execution_receipt"
+    ]
+  },
+  "stop_conditions": [
+    "hash mismatch",
+    "authority missing"
+  ],
+  "rollback": {
+    "strategy": "Discard uncommitted candidate files in managed write set",
+    "destructive_actions_allowed": false
+  },
+  "return_contract": {
+    "issue_comment_required": true,
+    "draft_pr_required": false,
+    "exact_artifacts": [
+      "execution_receipt.json"
+    ]
+  }
+}

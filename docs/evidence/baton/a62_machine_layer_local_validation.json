@@ -1,0 +1,349 @@
+{
+  "check": "A6_18_PRE_MERGE_LOCAL_MAIN_STATE_REPAIR",
+  "atom_id": "A6.18_PRE_MERGE_LOCAL_MAIN_STATE_REPAIR",
+  "result": "PASS_CANDIDATE",
+  "repository_evidence_status": "PRE_MERGE_LOCAL_MAIN_REPAIR_CANDIDATE",
+  "prior_checkpoint": {
+    "check": "A6_2R4_BATON_ORIGIN_REDACTION_REPAIR",
+    "atom_id": "A6.2R4_BATON_ORIGIN_REDACTION_REPAIR",
+    "result": "PASS_CANDIDATE",
+    "base": {
+      "branch": "main",
+      "head": "bd152b3199a9ba5c75374bd798b1e81756cd4d9b",
+      "tree": "a068018e57ad53340ad94321539ed7d1b411bc10",
+      "upstream": "origin/main"
+    },
+    "candidate_topology": {
+      "local_dirty_candidate": true,
+      "stage": false,
+      "commit": false,
+      "push": false
+    },
+    "inventory": {
+      "final_dirty_path_count": 84,
+      "tracked_modified_count": 17,
+      "untracked_count": 67,
+      "staged_count": 0,
+      "conflict_count": 0,
+      "files_outside_repaired_managed_write_set": []
+    },
+    "repairs": {
+      "raw_origin_removed_from_receipts": "PASS",
+      "credential_origin_redaction_test": "PASS",
+      "validate_baton_current_sha256": "4128881bed6ae25e2162479f33e4dc34ffef76e714312ed016078ffe35577c82",
+      "task_mirror_atom": "A6.2R4_BATON_ORIGIN_REDACTION_REPAIR",
+      "prior_atoms": [
+        "A6.2R2_BATON_PORTABILITY_AND_FAIL_CLOSED_REPAIR",
+        "A6.2R3_BATON_REPOSITORY_IDENTITY_AND_URI_REPAIR",
+        "A6.2R4_BATON_ORIGIN_REDACTION_REPAIR"
+      ]
+    },
+    "validation": {
+      "focused_tests": "PASS",
+      "focused_test_count": 66,
+      "focused_skipped": 0,
+      "baton_validation": "PASS",
+      "catalog_validation": "PASS",
+      "generated_navigation": "PASS",
+      "repository_policy": "PASS",
+      "full_validation": "PASS",
+      "full_test_count": 536,
+      "full_skipped": 0,
+      "repository_state": "CTRL_BATON_A62R_CANDIDATE_DIRTY",
+      "security": "PASS",
+      "line_endings": "PASS"
+    },
+    "catalog": {
+      "version": "0.8.0",
+      "asset_records": 190,
+      "schema_registry_files": 4,
+      "schema_asset_records": 25,
+      "query_records": 7,
+      "mandatory_asset_ids": 190
+    },
+    "authority": {
+      "local_writes": true,
+      "git_stage": false,
+      "commit": false,
+      "push": false,
+      "canonical_status_change": "NONE",
+      "github_reads": 0,
+      "github_writes": 0,
+      "provider_calls": 0,
+      "dependency_changes": 0,
+      "cash_spend_usd": 0,
+      "wallet_signer_transaction_actions": 0
+    },
+    "contains_secrets": false,
+    "contains_absolute_user_paths": false
+  },
+  "a6_4_checkpoint": {
+    "check": "A6_4_COMPOSITIONAL_REPOSITORY_STATE_MACHINE_PATCH",
+    "result": "PASS_CANDIDATE",
+    "allowed_combination_count": 6,
+    "repository_policy_test_count": 35,
+    "full_unit_test_count": 559,
+    "catalog_version": "0.8.1",
+    "staged_path_count": 84,
+    "staged_diff_sha256": "04047dd372e92214f4bd0ee638e0106e222af62c3282a9a4067669054884bfeb"
+  },
+  "publication_checkpoints": {
+    "a6_5_exact_restage": {
+      "result": "PASS_READY_TO_COMMIT",
+      "staged_path_count": 84,
+      "staged_diff_sha256": "d8ebdd4ec1ec09a9db211da94dec5b85e9f41fdb6a61cc662acd5713dcd07485"
+    },
+    "a6_6_single_local_commit": {
+      "result": "PASS_COMMITTED",
+      "commit": "64e184b6a661d379a62179895df422e0700ee79e",
+      "tree": "59516a7fe01941bf04ed40b3e1d375039b994795",
+      "parent": "bd152b3199a9ba5c75374bd798b1e81756cd4d9b"
+    },
+    "a6_7_feature_publication": {
+      "result": "PASS_PUSHED",
+      "upstream": "origin/ctrl/baton-setup",
+      "local_remote_oid_equal": true
+    },
+    "a6_10_exact_repair_stage": {
+      "result": "PASS_READY_TO_AMEND",
+      "staged_path_count": 15,
+      "staged_diff_sha256": "c36fd7f6288f7224cf6e3642afbc57c9eaf6c466c425af395063e6b342c6029f",
+      "catalog_version": "0.8.2",
+      "fixture_hashes_valid": 37
+    },
+    "a6_11_single_amend": {
+      "result": "PASS_AMENDED",
+      "old_commit": "64e184b6a661d379a62179895df422e0700ee79e",
+      "new_commit": "0c43dda4209cfeb281d33ac8ed50b07c809a1068",
+      "tree": "906701eb4d3555a6721ccd721b2b5083152ef3c9",
+      "parent": "bd152b3199a9ba5c75374bd798b1e81756cd4d9b",
+      "changed_path_count": 84,
+      "test_count": 590,
+      "skipped": 0
+    },
+    "a6_12_force_with_lease_and_pr_ci": {
+      "result": "PASS_PUSHED_CI",
+      "commit": "0c43dda4209cfeb281d33ac8ed50b07c809a1068",
+      "tree": "906701eb4d3555a6721ccd721b2b5083152ef3c9",
+      "pr": 1,
+      "pr_state": "OPEN",
+      "draft": true,
+      "workflow_run": 30180449298,
+      "job": 89735975358,
+      "synthetic_merge_sha": "ff8a18fdde54f3af5b2fc2f4fa5e1e5ec676e5eb",
+      "ci": "PASS"
+    },
+    "a6_14_exact_reconciliation_stage": {
+      "result": "PASS_READY_TO_AMEND",
+      "staged_path_count": 12,
+      "staged_diff_sha256": "f21a4bdefc57f225d1f47a859eda2df47cd1a6d7e9835ee316757a4468ea7ff4",
+      "catalog_version": "0.8.3"
+    },
+    "a6_15_single_reconciliation_amend": {
+      "result": "PASS_AMENDED",
+      "old_commit": "0c43dda4209cfeb281d33ac8ed50b07c809a1068",
+      "new_commit": "57ea966c1afe00d16836f2067e8a2c985289116b",
+      "tree": "12eb2852fd7b733572464a085fa0cd5091b4ab22",
+      "parent": "bd152b3199a9ba5c75374bd798b1e81756cd4d9b",
+      "changed_path_count": 84,
+      "test_count": 601,
+      "skipped": 0
+    },
+    "a6_16_force_with_lease_and_pr_ci": {
+      "result": "PASS_PUSHED_CI",
+      "commit": "57ea966c1afe00d16836f2067e8a2c985289116b",
+      "tree": "12eb2852fd7b733572464a085fa0cd5091b4ab22",
+      "pr": 1,
+      "pr_state": "OPEN",
+      "draft": true,
+      "workflow_run": 30190666920,
+      "job": 89763237448,
+      "synthetic_merge_sha": "1b97ff72cfe03786cee8e4dbae234c3a470d46fc",
+      "ci": "PASS"
+    },
+    "a6_17_pr_body_and_ready": {
+      "result": "PASS_READY",
+      "pr": 1,
+      "state": "OPEN",
+      "draft": false,
+      "body_reconciled": true
+    }
+  },
+  "a6_8_failed_ci": {
+    "pr": 1,
+    "draft": true,
+    "state": "OPEN",
+    "run": 30177151609,
+    "job": 89727671250,
+    "synthetic_merge_sha": "1db68b93af715eb54024bb713be0e5874a63e984",
+    "rerun_performed": false
+  },
+  "a6_8r1_root_cause": {
+    "result": "ROOT_CAUSE_FOUND",
+    "class": "VALIDATOR_DEFECT",
+    "first_failing_validator": "scripts/validate_baton.py::_verify_manifest_entry_hash",
+    "error_code": "fixture_hash_mismatch",
+    "exact_error": "fixture_hash_mismatch:tests/fixtures/baton/invalid/file_outside_managed_write_set.json:b0f59b2c5527fb8d48bb931b0df3e8a6d96cd93aa2c02e86fd27b5c6992cee3d!=8c55f3c34637fca236ea1c5a540265232b682c049797acd4575b807715c242a7",
+    "cause": "platform-dependent raw Windows worktree hashing instead of canonical Git blob content",
+    "repository_topology": "GITHUB_PR_MERGE_CHECKOUT",
+    "repository_topology_drift": false
+  },
+  "a6_9_checkpoint": {
+    "check": "A6_9_PR_CI_CANONICAL_BLOB_HASH_REPAIR",
+    "result": "PASS_CANDIDATE",
+    "catalog_version": "0.8.2",
+    "fixture_manifest_entries": 37,
+    "fixture_manifest_hashes_valid": 37,
+    "canonical_integrity_sweep": "PASS",
+    "allowed_combination_count": 8,
+    "managed_write_set_count": 15,
+    "full_unit_test_count": 590,
+    "skipped": 0,
+    "validate_ci": "INTENTIONALLY_NOT_RUN"
+  },
+  "accepted_external_checkpoint": {
+    "checkpoint": "A6.17_PR_BODY_UPDATE_AND_MARK_READY",
+    "repository": "lancerbeta/solana-alpha-lab",
+    "branch": "ctrl/baton-setup",
+    "commit": "57ea966c1afe00d16836f2067e8a2c985289116b",
+    "tree": "12eb2852fd7b733572464a085fa0cd5091b4ab22",
+    "parent": "bd152b3199a9ba5c75374bd798b1e81756cd4d9b",
+    "upstream": "origin/ctrl/baton-setup",
+    "changed_path_count": 84,
+    "commit_count": 1,
+    "catalog_version": "0.8.3",
+    "local_validation": {
+      "result": "PASS",
+      "test_count": 601,
+      "skipped": 0
+    },
+    "pull_request": {
+      "number": 1,
+      "state": "OPEN",
+      "draft": false,
+      "base": "main",
+      "head": "ctrl/baton-setup",
+      "workflow_run": 30190666920,
+      "job": 89763237448,
+      "ci": "PASS",
+      "synthetic_merge_sha": "1b97ff72cfe03786cee8e4dbae234c3a470d46fc"
+    },
+    "merge": false,
+    "canonical_status_change": "NONE"
+  },
+  "current_candidate": {
+    "atom_id": "A6.18_PRE_MERGE_LOCAL_MAIN_STATE_REPAIR",
+    "status": "PRE_MERGE_LOCAL_MAIN_REPAIR_CANDIDATE",
+    "base_commit": "57ea966c1afe00d16836f2067e8a2c985289116b",
+    "catalog_target": "0.8.4",
+    "managed_write_set_count": 12,
+    "managed_write_set": [
+      "catalog/assets/core.yaml",
+      "catalog/catalog_manifest.yaml",
+      "docs/evidence/baton/a62_machine_layer_local_validation.json",
+      "docs/tasks/CTRL-BATON-SETUP.md",
+      "scripts/validate_baseline.py",
+      "scripts/validate_task04.py",
+      "tests/test_baton_repository_policy.py",
+      "tests/test_task04_core_stack.py",
+      "tests/test_task05_catalog_queries.py",
+      "tests/test_task06_catalog.py",
+      "tests/test_task07_catalog.py",
+      "tests/test_task08_catalog.py"
+    ],
+    "content_checkpoint": "PRE_STAGE_CANDIDATE",
+    "stage_authorized": true,
+    "single_amend_authorized": true,
+    "exact_force_with_lease_authorized": true,
+    "pr_body_reconciliation_authorized": true,
+    "settings_write": false,
+    "purchase": false,
+    "merge": false,
+    "canonical_status_change": "NONE"
+  },
+  "future_external_identities": {
+    "amended_commit_sha": "PENDING_EXTERNAL_READBACK",
+    "amended_tree_sha": "PENDING_EXTERNAL_READBACK",
+    "workflow_run": "PENDING_EXTERNAL_READBACK",
+    "workflow_job": "PENDING_EXTERNAL_READBACK",
+    "post_push_synthetic_merge_sha": "PENDING_EXTERNAL_READBACK",
+    "final_merge_sha": "PENDING_EXTERNAL_READBACK"
+  },
+  "state_machine": {
+    "allowed_combination_count": 11,
+    "merge_policy": "MERGE_COMMIT_ONLY",
+    "a613_reconciliation_staged_supported": true,
+    "a618_local_main_repair_staged_supported": true,
+    "generic_amended_ahead_of_published_supported": true,
+    "generic_published_head_supported": true,
+    "direct_main_rejected": true,
+    "squash_rejected": true,
+    "fast_forward_rejected": true,
+    "swapped_parents_rejected": true,
+    "merge_tree_drift_rejected": true,
+    "pr_merge_checkout_supported": true,
+    "github_main_push_checkout_supported": true,
+    "local_main_post_merge_with_preserved_feature_refs_supported": true,
+    "github_and_local_main_contexts_separated": true
+  },
+  "inventory": {
+    "managed_write_set_count": 12,
+    "unstaged_path_count": 12,
+    "staged_path_count": 0,
+    "index_path_count": 225,
+    "unstaged_paths_outside_managed_write_set": [],
+    "new_untracked_repository_files": [],
+    "conflict_count": 0
+  },
+  "validation": {
+    "focused_tests": "PASS",
+    "focused_test_count": 36,
+    "repository_policy_tests": "PASS",
+    "repository_policy_test_count": 83,
+    "task04_task08_regressions": "PASS",
+    "task04_task08_regression_test_count": 293,
+    "catalog_tests": "PASS",
+    "catalog_test_count": 71,
+    "catalog_validation": "PASS",
+    "baton_validation": "PASS",
+    "full_unit_tests": "PASS",
+    "full_unit_test_count": 607,
+    "skipped": 0,
+    "validate_ci": "INTENTIONALLY_NOT_RUN"
+  },
+  "catalog": {
+    "version": "0.8.4",
+    "asset_records": 190,
+    "schema_registry_files": 4,
+    "schema_asset_records": 25,
+    "query_records": 7,
+    "canonical_integrity_sweep": "PASS",
+    "new_asset_ids": 0,
+    "generated_navigation": "UNCHANGED_NOT_REGENERATED"
+  },
+  "authority": {
+    "local_write": true,
+    "git_stage": true,
+    "amend_count_max": 1,
+    "force_with_lease_push_count_max": 1,
+    "github_pr_body_write": true,
+    "settings_writes": 0,
+    "purchase": false,
+    "merge": false,
+    "dependency_changes": 0,
+    "canonical_status_change": "NONE"
+  },
+  "task09": {
+    "status": "READY",
+    "execution": "NOT_STARTED"
+  },
+  "limitations": [
+    "A6.18 commit/tree/CI identities require external read-back after amend/push",
+    "GITHUB_PRIVATE_BRANCH_PROTECTION=DEFERRED_BY_OWNER_COST_NOT_JUSTIFIED_FOR_MVP",
+    "merge and canonical reconciliation remain unauthorized"
+  ],
+  "next_boundary": "MERGE_PR_1_AND_POST_MERGE_READBACK",
+  "self_referential_assertions": false,
+  "contains_secrets": false,
+  "contains_absolute_user_paths": false
+}
