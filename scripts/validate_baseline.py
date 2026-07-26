@@ -4313,6 +4313,7 @@ def validate() -> None:
         | TASK07_REPOSITORY_STATES
         | TASK08_REPOSITORY_STATES
         | CTRL_BATON_A62_REPOSITORY_STATES
+        | CTRL_GENERIC_REPOSITORY_STATES
         else {f"PyYAML=={EXPECTED_PYYAML}", f"jsonschema=={EXPECTED_JSONSCHEMA}"}
     )
     assert_check("dependency_contract", set(metadata["project"]["dependencies"]) == expected_dependencies)
@@ -4324,6 +4325,7 @@ def validate() -> None:
         | TASK07_REPOSITORY_STATES
         | TASK08_REPOSITORY_STATES
         | CTRL_BATON_A62_REPOSITORY_STATES
+        | CTRL_GENERIC_REPOSITORY_STATES
     ):
         assert_check(
             "security_dependency_group",
