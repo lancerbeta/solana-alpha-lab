@@ -350,7 +350,11 @@ def _run_preflight_base_mismatch(
     ), mock.patch.object(
         baton_preflight,
         "run_git",
-        side_effect=["main", observed_head, observed_tree, "origin/main"],
+        side_effect=["main", observed_head, observed_tree],
+    ), mock.patch.object(
+        baton_preflight,
+        "read_upstream",
+        return_value="origin/main",
     ), mock.patch.object(baton_preflight, "dirty_count", return_value=0):
         result = baton_preflight.preflight(
             repository="lancerbeta/solana-alpha-lab",
@@ -556,7 +560,7 @@ def validate_canonical_catalog_integrity() -> None:
         )
     except CanonicalRepositoryBytesError as exc:
         raise BatonValidationError(f"canonical_catalog_sweep_failed:{exc}") from exc
-    assert_check("canonical_catalog_asset_count", sweep.asset_count == 190)
+    assert_check("canonical_catalog_asset_count", sweep.asset_count == 191)
     assert_check("canonical_catalog_sha256_checked", sweep.checked_sha256 > 0)
     if sweep.mismatches:
         detail = ",".join(
@@ -703,8 +707,21 @@ def validate_protocol_links() -> None:
         "CWR-A1_LIVE_ROUTE_CONTRACT_REPAIR" in reconciliation,
     )
     assert_check(
-        "reconciliation_control_plane",
-        "PROJECT_CHAT_PRIMARY" in reconciliation,
+        "reconciliation_current_owner",
+        re.search(
+            r"^current_owning_surface: LOCAL_WORK_PRIMARY$",
+            reconciliation,
+            re.MULTILINE,
+        )
+        is not None,
+    )
+    assert_check(
+        "reconciliation_local_work_control_plane",
+        "`LOCAL_WORK_PRIMARY`" in reconciliation,
+    )
+    assert_check(
+        "reconciliation_generic_baton_control_plane",
+        "`CONTROL_PLANE` = `PROJECT_CHAT_PRIMARY`" in reconciliation,
     )
     for relative in LIVE_ROUTE_CONTROL_PATHS:
         text = (ROOT / relative).read_text(encoding="utf-8")

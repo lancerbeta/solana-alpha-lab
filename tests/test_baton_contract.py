@@ -225,11 +225,27 @@ class LiveRouteContractTests(unittest.TestCase):
         protocol = (ROOT / "docs/agent/GITHUB_BATON_PROTOCOL.md").read_text(
             encoding="utf-8"
         )
+        reconciliation = (
+            ROOT / "docs/tasks/CTRL-CURSOR-WORKPLACE-RECONCILIATION.md"
+        ).read_text(encoding="utf-8")
         agents = (ROOT / "AGENTS.md").read_text(encoding="utf-8")
         self.assertIn("PROJECT_CHAT_PRIMARY", authority)
         self.assertIn("TRANSPORT_AND_AUDIT", authority)
         self.assertIn("EXECUTION_ONLY", authority)
         self.assertIn("PROJECT_CHAT_PRIMARY", protocol)
+        self.assertIn(
+            "current_owning_surface: LOCAL_WORK_PRIMARY",
+            reconciliation,
+        )
+        self.assertIn("`LOCAL_WORK_PRIMARY`", reconciliation)
+        self.assertIn(
+            "`CONTROL_PLANE` = `PROJECT_CHAT_PRIMARY`",
+            reconciliation,
+        )
+        self.assertIn(
+            "CWR-A4_WORK_REELECTION_FAIL_CLOSED_REPAIR",
+            reconciliation,
+        )
         self.assertIn("live accepted", agents.lower())
 
 

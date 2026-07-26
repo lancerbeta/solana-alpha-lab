@@ -89,23 +89,58 @@ class BatonPreflightTests(unittest.TestCase):
 
     def test_missing_upstream_is_deterministic_none(self) -> None:
         with mock.patch.object(
-            baton_preflight.subprocess,
-            "run",
-            return_value=mock.Mock(returncode=128, stdout="", stderr="no upstream"),
+            baton_preflight,
+            "run_git",
+            side_effect=["refs/heads/feature", ""],
         ):
             self.assertEqual(baton_preflight.read_upstream(), "NONE")
         with mock.patch.object(
-            baton_preflight.subprocess,
-            "run",
-            return_value=mock.Mock(returncode=0, stdout="\n", stderr=""),
-        ):
-            self.assertEqual(baton_preflight.read_upstream(), "NONE")
-        with mock.patch.object(
-            baton_preflight.subprocess,
-            "run",
-            return_value=mock.Mock(returncode=0, stdout="origin/feature\n", stderr=""),
+            baton_preflight,
+            "run_git",
+            side_effect=["refs/heads/feature", "origin/feature"],
         ):
             self.assertEqual(baton_preflight.read_upstream(), "origin/feature")
+
+    def test_upstream_git_errors_fail_closed(self) -> None:
+        with mock.patch.object(
+            baton_preflight,
+            "run_git",
+            side_effect=RuntimeError("git_failed:symbolic-ref:128"),
+        ):
+            with self.assertRaises(RuntimeError):
+                baton_preflight.read_upstream()
+        with mock.patch.object(
+            baton_preflight,
+            "run_git",
+            side_effect=[
+                "refs/heads/feature",
+                RuntimeError("git_failed:for-each-ref:128"),
+            ],
+        ):
+            with self.assertRaises(RuntimeError):
+                baton_preflight.read_upstream()
+
+    def test_preflight_blocks_structurally_when_git_state_is_unreadable(self) -> None:
+        with _identity_ok(), mock.patch.object(
+            baton_preflight,
+            "run_git",
+            side_effect=RuntimeError("fatal: sensitive local detail"),
+        ):
+            result = baton_preflight.preflight(
+                repository="lancerbeta/solana-alpha-lab",
+                issue=1,
+                revision=1,
+                expected_contract_sha256=self.expected,
+                issue_body=self.body,
+                allow_github_read=False,
+            )
+        self.assertEqual(result["result"], "BLOCKED")
+        self.assertEqual(result["base"], {})
+        self.assertEqual(
+            result["observed_vs_expected"],
+            ["local_git_state_unreadable"],
+        )
+        self.assertNotIn("sensitive local detail", json.dumps(result))
 
     def test_preflight_accepts_none_upstream_when_contract_expects_none(self) -> None:
         contract = json.loads(
@@ -302,7 +337,8 @@ class BatonPreflightTests(unittest.TestCase):
         self.assertIn("--allow-github-read", source)
         self.assertIn("read_bytes()", source)
         self.assertIn("def read_upstream", source)
-        self.assertIn('return "NONE"', source)
+        self.assertIn('return upstream if upstream else "NONE"', source)
+        self.assertIn('"local_git_state_unreadable"', source)
 
     def test_exact_https_origin_identity_pass(self) -> None:
         for origin in (
