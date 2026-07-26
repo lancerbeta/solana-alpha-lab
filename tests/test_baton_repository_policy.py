@@ -2150,10 +2150,57 @@ class GenericControlMainMergeTests(unittest.TestCase):
             self.LOCAL,
         )
 
+    def test_local_post_merge_without_origin_head_passes(self) -> None:
+        view = generic_main_merge_local_view()
+        self.assertNotIn("refs/remotes/origin/HEAD", view.all_refs)
+        self.assertIsNone(view.remote_head_target)
+        self.assertEqual(classify(view), self.LOCAL)
+
+    def test_local_post_merge_with_canonical_origin_head_passes(self) -> None:
+        refs = frozenset(
+            {
+                "refs/heads/main",
+                "refs/remotes/origin/main",
+                "refs/remotes/origin/HEAD",
+                f"refs/heads/{GENERIC_BRANCH}",
+                f"refs/remotes/origin/{GENERIC_BRANCH}",
+            }
+        )
+        self.assertEqual(
+            classify(
+                generic_main_merge_local_view(
+                    all_refs=refs,
+                    remote_head_target="refs/remotes/origin/main",
+                )
+            ),
+            self.LOCAL,
+        )
+
     def test_optional_retained_generic_feature_refs_pass(self) -> None:
         self.assertEqual(
             classify(generic_main_merge_local_view()),
             self.LOCAL,
+        )
+        refs = frozenset(
+            {
+                "refs/heads/main",
+                "refs/remotes/origin/main",
+                "refs/remotes/origin/HEAD",
+                f"refs/remotes/origin/{GENERIC_BRANCH}",
+                f"refs/remotes/origin/{baseline.CTRL_BATON_FEATURE_BRANCH}",
+            }
+        )
+        self.assertEqual(
+            classify(
+                generic_main_merge_view(
+                    feature_local_oid=None,
+                    feature_remote_oid=GENERIC_HEAD,
+                    all_refs=refs,
+                    remote_head_target="refs/remotes/origin/main",
+                ),
+                generic_push_github_context(),
+            ),
+            self.GITHUB,
         )
         self.assertEqual(
             classify(
@@ -2170,6 +2217,46 @@ class GenericControlMainMergeTests(unittest.TestCase):
                 generic_push_github_context(),
             ),
             self.GITHUB,
+        )
+
+    def test_origin_head_wrong_target_fails(self) -> None:
+        refs = frozenset(
+            {
+                "refs/heads/main",
+                "refs/remotes/origin/main",
+                "refs/remotes/origin/HEAD",
+                f"refs/heads/{GENERIC_BRANCH}",
+                f"refs/remotes/origin/{GENERIC_BRANCH}",
+            }
+        )
+        self.assertNotEqual(
+            classify(
+                generic_main_merge_local_view(
+                    all_refs=refs,
+                    remote_head_target="refs/remotes/origin/develop",
+                )
+            ),
+            self.LOCAL,
+        )
+
+    def test_origin_head_not_symbolic_fails(self) -> None:
+        refs = frozenset(
+            {
+                "refs/heads/main",
+                "refs/remotes/origin/main",
+                "refs/remotes/origin/HEAD",
+                f"refs/heads/{GENERIC_BRANCH}",
+                f"refs/remotes/origin/{GENERIC_BRANCH}",
+            }
+        )
+        self.assertNotEqual(
+            classify(
+                generic_main_merge_local_view(
+                    all_refs=refs,
+                    remote_head_target=None,
+                )
+            ),
+            self.LOCAL,
         )
 
     def test_feature_history_over_max_fails(self) -> None:

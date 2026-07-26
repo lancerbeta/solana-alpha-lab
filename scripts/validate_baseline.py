@@ -925,8 +925,10 @@ CtrlBatonGitView = namedtuple(
         "feature_based_on_main_ok",
         "feature_from_main_count",
         "feature_from_main_linear_ok",
+        "remote_head_target",
     ),
     defaults=(
+        None,
         None,
         None,
         None,
@@ -1545,8 +1547,16 @@ def ctrl_generic_main_refs_ok(view: CtrlBatonGitView) -> bool:
     required = {"refs/heads/main", "refs/remotes/origin/main"}
     if not view.all_refs or not required <= view.all_refs:
         return False
+    origin_head_ref = "refs/remotes/origin/HEAD"
+    expected_head_target = "refs/remotes/origin/main"
+    has_origin_head = origin_head_ref in view.all_refs
+    if has_origin_head:
+        if view.remote_head_target != expected_head_target:
+            return False
+    elif view.remote_head_target is not None:
+        return False
     for ref in view.all_refs:
-        if ref in required:
+        if ref in required or ref == origin_head_ref:
             continue
         if ref.startswith("refs/heads/"):
             if is_ctrl_generic_control_branch(ref[len("refs/heads/") :]):
@@ -2462,6 +2472,7 @@ def collect_ctrl_baton_git_view(
     staged: set[str],
     unstaged: set[str],
     untracked: set[str],
+    remote_head_target: str | None = None,
 ) -> CtrlBatonGitView:
     head_parents = git_commit_parents(head_oid)
     if is_ctrl_generic_control_branch(branch):
@@ -2637,6 +2648,7 @@ def collect_ctrl_baton_git_view(
         feature_based_on_main_ok,
         feature_from_main_count,
         feature_from_main_linear_ok,
+        remote_head_target,
     )
 
 
@@ -3833,6 +3845,7 @@ def validate() -> None:
         staged=staged,
         unstaged=unstaged,
         untracked=untracked,
+        remote_head_target=remote_head_target,
     )
     baton_state, baton_topology = classify_ctrl_baton_state_machine(
         baton_view,
