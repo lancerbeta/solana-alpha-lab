@@ -350,7 +350,11 @@ def _run_preflight_base_mismatch(
     ), mock.patch.object(
         baton_preflight,
         "run_git",
-        side_effect=["main", observed_head, observed_tree, "origin/main"],
+        side_effect=["main", observed_head, observed_tree],
+    ), mock.patch.object(
+        baton_preflight,
+        "read_upstream",
+        return_value="origin/main",
     ), mock.patch.object(baton_preflight, "dirty_count", return_value=0):
         result = baton_preflight.preflight(
             repository="lancerbeta/solana-alpha-lab",
@@ -556,7 +560,7 @@ def validate_canonical_catalog_integrity() -> None:
         )
     except CanonicalRepositoryBytesError as exc:
         raise BatonValidationError(f"canonical_catalog_sweep_failed:{exc}") from exc
-    assert_check("canonical_catalog_asset_count", sweep.asset_count == 190)
+    assert_check("canonical_catalog_asset_count", sweep.asset_count == 191)
     assert_check("canonical_catalog_sha256_checked", sweep.checked_sha256 > 0)
     if sweep.mismatches:
         detail = ",".join(
@@ -632,17 +636,100 @@ def validate_cursor_and_templates() -> None:
         assert_check(f"pr_template:{needle}", needle.lower() in pr.lower())
 
 
+LIVE_ROUTE_CONTROL_PATHS = (
+    "AGENTS.md",
+    ".cursor/rules/00-authority.mdc",
+    ".cursor/rules/10-input-routing.mdc",
+    ".cursor/rules/50-github-baton.mdc",
+    "docs/agent/EXECUTION_ROUTER_PROTOCOL.md",
+    "docs/agent/GITHUB_BATON_PROTOCOL.md",
+    "docs/decisions/ADR-003-gpt-executor-routing.md",
+    "docs/tasks/CTRL-BATON-SETUP.md",
+    "docs/tasks/CTRL-CURSOR-WORKPLACE-RECONCILIATION.md",
+)
+
+STALE_ROUTE_PHRASES = (
+    "documented future input route",
+    "documented future route",
+    "future GitHub Atom Contract baton",
+    "Documented future input route",
+    "protocol-documented only until later",
+    "local dirty candidate",
+    "not committed, not pushed, not live-piloted",
+    "A6.2 machine layer currently exists only as a local dirty candidate",
+    "Add `GITHUB_BATON` only as a documented future input route",
+    "GITHUB_BATON` is a documented future",
+    "Future execution flow",
+    "PRE_MERGE_LOCAL_MAIN_REPAIR_CANDIDATE",
+    "PROPOSED_LOCAL_CANDIDATE",
+    "repository_evidence_status: PRE_MERGE",
+    "canonical_status: CANDIDATE_NOT_REGISTERED",
+)
+
+
 def validate_protocol_links() -> None:
     agents = (ROOT / "AGENTS.md").read_text(encoding="utf-8")
     assert_check("agents_github_baton", "GITHUB_BATON" in agents)
     assert_check("agents_execution_only", "EXECUTION_ONLY" in agents)
     assert_check("agents_gpt_control_plane", "GPT control plane" in agents or "control plane" in agents.lower())
+    assert_check("agents_live_accepted_route", "live accepted" in agents.lower())
     protocol = (ROOT / "docs/agent/GITHUB_BATON_PROTOCOL.md").read_text(encoding="utf-8")
     assert_check(
         "protocol_oob_hash",
         "expected" in protocol.lower() and "sha-256" in protocol.lower(),
     )
     assert_check("protocol_mutable_transport", "mutable" in protocol.lower())
+    assert_check("protocol_live_execution_flow", "Live execution flow" in protocol)
+    assert_check("protocol_project_chat_primary", "PROJECT_CHAT_PRIMARY" in protocol)
+    assert_check("protocol_transport_and_audit", "TRANSPORT_AND_AUDIT" in protocol)
+    router = (ROOT / "docs/agent/EXECUTION_ROUTER_PROTOCOL.md").read_text(encoding="utf-8")
+    assert_check("router_live_accepted_route", "Live accepted input route" in router)
+    assert_check(
+        "router_not_future_only_candidate",
+        "not a future-only, local-dirty, pre-merge, or uncommitted candidate" in router,
+    )
+    authority = (ROOT / ".cursor/rules/00-authority.mdc").read_text(encoding="utf-8")
+    assert_check("authority_project_chat_primary", "PROJECT_CHAT_PRIMARY" in authority)
+    assert_check("authority_transport_and_audit", "TRANSPORT_AND_AUDIT" in authority)
+    baton_rule = (ROOT / ".cursor/rules/50-github-baton.mdc").read_text(encoding="utf-8")
+    assert_check("baton_rule_live_accepted", "live accepted input route" in baton_rule.lower())
+    adr = (ROOT / "docs/decisions/ADR-003-gpt-executor-routing.md").read_text(encoding="utf-8")
+    assert_check("adr_accepted_repository_mirror", "ACCEPTED_REPOSITORY_MIRROR" in adr)
+    assert_check("adr_live_accepted_route", "live accepted input route" in adr.lower())
+    setup = (ROOT / "docs/tasks/CTRL-BATON-SETUP.md").read_text(encoding="utf-8")
+    assert_check("setup_live_route_posture", "Live route posture" in setup)
+    assert_check("setup_not_future_only", "future-only, local-dirty" in setup)
+    reconciliation = (
+        ROOT / "docs/tasks/CTRL-CURSOR-WORKPLACE-RECONCILIATION.md"
+    ).read_text(encoding="utf-8")
+    assert_check(
+        "reconciliation_mirror_exists",
+        "CWR-A1_LIVE_ROUTE_CONTRACT_REPAIR" in reconciliation,
+    )
+    assert_check(
+        "reconciliation_current_owner",
+        re.search(
+            r"^current_owning_surface: LOCAL_WORK_PRIMARY$",
+            reconciliation,
+            re.MULTILINE,
+        )
+        is not None,
+    )
+    assert_check(
+        "reconciliation_local_work_control_plane",
+        "`LOCAL_WORK_PRIMARY`" in reconciliation,
+    )
+    assert_check(
+        "reconciliation_generic_baton_control_plane",
+        "`CONTROL_PLANE` = `PROJECT_CHAT_PRIMARY`" in reconciliation,
+    )
+    for relative in LIVE_ROUTE_CONTROL_PATHS:
+        text = (ROOT / relative).read_text(encoding="utf-8")
+        for phrase in STALE_ROUTE_PHRASES:
+            assert_check(
+                f"stale_route_absent:{relative}:{phrase}",
+                phrase not in text,
+            )
 
 
 def validate_offline_commands_have_no_hidden_network() -> None:

@@ -591,7 +591,7 @@ CTRL_BATON_A617_FEATURE_TREE_OID = "12eb2852fd7b733572464a085fa0cd5091b4ab22"
 CTRL_BATON_A62_COMMIT_SUBJECT = "feat(control): add GPT-Cursor GitHub baton"
 CTRL_BATON_A69_EXPECTED_CATALOG_VERSION = "0.8.2"
 CTRL_BATON_A613_EXPECTED_CATALOG_VERSION = "0.8.3"
-CTRL_BATON_A62_EXPECTED_CATALOG_VERSION = "0.8.4"
+CTRL_BATON_A62_EXPECTED_CATALOG_VERSION = "0.8.5"
 CTRL_BATON_FEATURE_BRANCH = "ctrl/baton-setup"
 CTRL_BATON_FEATURE_UPSTREAM = "origin/ctrl/baton-setup"
 CTRL_BATON_EXPECTED_INDEX_PATH_COUNT = 225
@@ -635,6 +635,8 @@ CTRL_GENERIC_CONTROL_BRANCH_RE = re.compile(
 CTRL_GENERIC_FEATURE_AHEAD_MAX = 16
 CTRL_GENERIC_REPOSITORY_STATES = {
     "CTRL_GENERIC_CONTROL_FEATURE_COMMITTED",
+    "CTRL_GENERIC_CONTROL_FEATURE_REPAIR_STAGED",
+    "CTRL_GENERIC_CONTROL_FEATURE_PUBLISHED_REPAIR_STAGED",
     "CTRL_GENERIC_CONTROL_PR_MERGE_CHECKOUT",
     "CTRL_GENERIC_CONTROL_MAIN_MERGE_COMMITTED",
 }
@@ -650,6 +652,14 @@ CTRL_GENERIC_LIFECYCLE_COMBINATIONS = {
     (
         "CTRL_GENERIC_CONTROL_FEATURE_COMMITTED",
         "CTRL_GENERIC_FEATURE_PUBLISHED",
+    ),
+    (
+        "CTRL_GENERIC_CONTROL_FEATURE_REPAIR_STAGED",
+        "CTRL_GENERIC_FEATURE_LOCAL_REPAIR_STAGED",
+    ),
+    (
+        "CTRL_GENERIC_CONTROL_FEATURE_PUBLISHED_REPAIR_STAGED",
+        "CTRL_GENERIC_FEATURE_PUBLISHED_REPAIR_STAGED",
     ),
     (
         "CTRL_GENERIC_CONTROL_PR_MERGE_CHECKOUT",
@@ -1517,6 +1527,21 @@ def ctrl_generic_clean_worktree(view: CtrlBatonGitView) -> bool:
     )
 
 
+def ctrl_generic_staged_repair_worktree_ok(view: CtrlBatonGitView) -> bool:
+    """Allow only staged modifications of already-tracked paths."""
+    return (
+        bool(view.tracked)
+        and bool(view.staged)
+        and bool(view.staged_modified)
+        and not view.staged_added
+        and view.staged == view.staged_modified
+        and view.staged <= view.tracked
+        and not view.unstaged
+        and not view.untracked
+        and not view.conflicts
+    )
+
+
 def ctrl_generic_ref_name_allowed(ref: str) -> bool:
     if ref in {"refs/heads/main", "refs/remotes/origin/main"}:
         return True
@@ -1605,7 +1630,7 @@ def ctrl_generic_pr_refs_ok(
     return True
 
 
-def ctrl_generic_feature_history_ok(view: CtrlBatonGitView) -> bool:
+def ctrl_generic_feature_history_shape_ok(view: CtrlBatonGitView) -> bool:
     if not is_ctrl_generic_control_branch(view.branch):
         return False
     if view.branch == CTRL_BATON_FEATURE_BRANCH:
@@ -1625,8 +1650,14 @@ def ctrl_generic_feature_history_ok(view: CtrlBatonGitView) -> bool:
         and view.feature_from_main_linear_ok is True
         and isinstance(from_main_count, int)
         and 1 <= from_main_count <= CTRL_GENERIC_FEATURE_AHEAD_MAX
-        and ctrl_generic_clean_worktree(view)
         and ctrl_generic_feature_refs_ok(view, view.branch)
+    )
+
+
+def ctrl_generic_feature_history_ok(view: CtrlBatonGitView) -> bool:
+    return (
+        ctrl_generic_feature_history_shape_ok(view)
+        and ctrl_generic_clean_worktree(view)
     )
 
 
@@ -2025,6 +2056,35 @@ def classify_ctrl_generic_feature_local(
     )
 
 
+def classify_ctrl_generic_feature_repair_staged(
+    view: CtrlBatonGitView,
+    github: CtrlBatonGithubContext,
+) -> bool:
+    return (
+        not github.actions
+        and ctrl_baton_origin_identity_ok(view, github_actions=False)
+        and ctrl_generic_feature_history_shape_ok(view)
+        and view.feature_remote_oid is None
+        and view.upstream is None
+        and ctrl_generic_staged_repair_worktree_ok(view)
+    )
+
+
+def classify_ctrl_generic_feature_published_repair_staged(
+    view: CtrlBatonGitView,
+    github: CtrlBatonGithubContext,
+) -> bool:
+    return (
+        not github.actions
+        and ctrl_baton_origin_identity_ok(view, github_actions=False)
+        and ctrl_generic_feature_history_shape_ok(view)
+        and view.feature_remote_oid == view.head_oid
+        and view.upstream == f"origin/{view.branch}"
+        and f"refs/remotes/origin/{view.branch}" in view.all_refs
+        and ctrl_generic_staged_repair_worktree_ok(view)
+    )
+
+
 def classify_ctrl_generic_feature_ahead_of_published(
     view: CtrlBatonGitView,
     github: CtrlBatonGithubContext,
@@ -2227,6 +2287,16 @@ def classify_ctrl_baton_state_machine(
         result = (
             "CTRL_BATON_A62_MAIN_MERGE_COMMITTED",
             "BATON_MAIN_LOCAL_POST_MERGE",
+        )
+    elif classify_ctrl_generic_feature_published_repair_staged(view, github):
+        result = (
+            "CTRL_GENERIC_CONTROL_FEATURE_PUBLISHED_REPAIR_STAGED",
+            "CTRL_GENERIC_FEATURE_PUBLISHED_REPAIR_STAGED",
+        )
+    elif classify_ctrl_generic_feature_repair_staged(view, github):
+        result = (
+            "CTRL_GENERIC_CONTROL_FEATURE_REPAIR_STAGED",
+            "CTRL_GENERIC_FEATURE_LOCAL_REPAIR_STAGED",
         )
     elif classify_ctrl_generic_feature_local(view, github):
         result = (
@@ -4067,7 +4137,8 @@ def validate() -> None:
     elif state in CTRL_BATON_A62_REPOSITORY_STATES:
         expected_file_count = ctrl_baton_a62r_expected_repository_file_count()
     elif state in CTRL_GENERIC_REPOSITORY_STATES:
-        expected_file_count = ctrl_baton_a62r_expected_repository_file_count()
+        # Fail-closed against the actual committed tree, not historical Baton 225.
+        expected_file_count = baton_view.head_tree_path_count
     elif state in TASK07_REPOSITORY_STATES:
         expected_file_count = TASK07_EXPECTED_REPOSITORY_FILE_COUNT
     elif state in TASK06_FINALIZATION_REPOSITORY_STATES:

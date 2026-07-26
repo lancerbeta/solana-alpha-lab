@@ -12,7 +12,7 @@ Allowed explicit routes:
 - `DIRECT_PROMPT`
 - `LOCAL_HANDOFF: <repository-relative path>`
 - `ACCEPT_LOCAL_HANDOFF: <repository-relative path>`
-- `GITHUB_BATON: <exact contract locator>` (documented future route)
+- `GITHUB_BATON: <exact contract locator>` (live accepted route)
 
 Rules:
 

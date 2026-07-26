@@ -115,14 +115,21 @@ def run_git(args: list[str]) -> str:
     return completed.stdout.strip()
 
 
+def read_upstream() -> str:
+    """Return upstream, or NONE only when successful Git reads prove it unset."""
+    branch_ref = run_git(["symbolic-ref", "--quiet", "HEAD"])
+    if not branch_ref.startswith("refs/heads/") or "\n" in branch_ref:
+        raise RuntimeError("git_symbolic_branch_invalid")
+    upstream = run_git(
+        ["for-each-ref", "--format=%(upstream:short)", branch_ref]
+    )
+    if "\n" in upstream:
+        raise RuntimeError("git_upstream_output_invalid")
+    return upstream if upstream else "NONE"
+
+
 def dirty_count() -> int:
-    text = subprocess.run(
-        ["git", "status", "--porcelain", "-uall"],
-        cwd=ROOT,
-        check=True,
-        capture_output=True,
-        text=True,
-    ).stdout
+    text = run_git(["status", "--porcelain", "-uall"])
     return len([line for line in text.splitlines() if line.strip()])
 
 
@@ -262,11 +269,25 @@ def preflight(
             repository, issue
         )
 
-    branch = run_git(["rev-parse", "--abbrev-ref", "HEAD"])
-    head = run_git(["rev-parse", "HEAD"])
-    tree = run_git(["rev-parse", "HEAD^{tree}"])
-    upstream = run_git(["rev-parse", "--abbrev-ref", "@{upstream}"])
-    dirty = dirty_count()
+    try:
+        branch = run_git(["rev-parse", "--abbrev-ref", "HEAD"])
+        head = run_git(["rev-parse", "HEAD"])
+        tree = run_git(["rev-parse", "HEAD^{tree}"])
+        upstream = read_upstream()
+        dirty = dirty_count()
+    except (OSError, RuntimeError, subprocess.SubprocessError):
+        return build_result(
+            result="BLOCKED",
+            repository=repository,
+            issue=issue,
+            revision=revision,
+            contract_hash_ok=False,
+            authority_class="",
+            base={},
+            observed_vs_expected=["local_git_state_unreadable"],
+            github_reads=github_reads,
+            github_writes=github_writes,
+        )
     base = {
         "branch": branch,
         "head": head,

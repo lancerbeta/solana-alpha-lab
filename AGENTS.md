@@ -37,9 +37,9 @@ Default: `INPUT=DIRECT_PROMPT`.
   `ACCEPT_LOCAL_HANDOFF: <repository-relative path>`.
 - Read a GitHub-transported Atom Contract only when the current prompt contains
   `GITHUB_BATON: <exact contract locator>` and the contract is validated under
-  `docs/agent/GITHUB_BATON_PROTOCOL.md`. `GITHUB_BATON` is a documented future
-  input route; it grants no implicit Issue/PR write, commit, push, or status
-  authority.
+  `docs/agent/GITHUB_BATON_PROTOCOL.md`. `GITHUB_BATON` is a live accepted
+  input route for `PROJECT_CHAT_PRO_GITHUB_BATON_CURSOR`; it grants no implicit
+  Issue/PR write, commit, push, or status authority.
 - Local handoff validation and path rules are defined by
   `docs/agent/HANDOFF_PROTOCOL.md`.
 - Execution-route selection among `GPT_ONLY`, `LOCAL_WORK_CODEX`, and
