@@ -629,6 +629,44 @@ CTRL_BATON_A62_LIFECYCLE_COMBINATIONS = {
     ("CTRL_BATON_A62_MAIN_MERGE_COMMITTED", "GITHUB_MAIN_PUSH_CHECKOUT"),
     ("CTRL_BATON_A62_MAIN_MERGE_COMMITTED", "BATON_MAIN_LOCAL_POST_MERGE"),
 }
+CTRL_GENERIC_CONTROL_BRANCH_RE = re.compile(
+    r"^ctrl/[A-Za-z0-9][A-Za-z0-9._/-]*$"
+)
+CTRL_GENERIC_FEATURE_AHEAD_MAX = 16
+CTRL_GENERIC_REPOSITORY_STATES = {
+    "CTRL_GENERIC_CONTROL_FEATURE_COMMITTED",
+    "CTRL_GENERIC_CONTROL_PR_MERGE_CHECKOUT",
+    "CTRL_GENERIC_CONTROL_MAIN_MERGE_COMMITTED",
+}
+CTRL_GENERIC_LIFECYCLE_COMBINATIONS = {
+    (
+        "CTRL_GENERIC_CONTROL_FEATURE_COMMITTED",
+        "CTRL_GENERIC_FEATURE_LOCAL",
+    ),
+    (
+        "CTRL_GENERIC_CONTROL_FEATURE_COMMITTED",
+        "CTRL_GENERIC_FEATURE_AHEAD_OF_PUBLISHED",
+    ),
+    (
+        "CTRL_GENERIC_CONTROL_FEATURE_COMMITTED",
+        "CTRL_GENERIC_FEATURE_PUBLISHED",
+    ),
+    (
+        "CTRL_GENERIC_CONTROL_PR_MERGE_CHECKOUT",
+        "CTRL_GENERIC_PR_MERGE_CHECKOUT",
+    ),
+    (
+        "CTRL_GENERIC_CONTROL_MAIN_MERGE_COMMITTED",
+        "GITHUB_GENERIC_MAIN_PUSH_CHECKOUT",
+    ),
+    (
+        "CTRL_GENERIC_CONTROL_MAIN_MERGE_COMMITTED",
+        "GENERIC_MAIN_LOCAL_POST_MERGE",
+    ),
+}
+CTRL_BATON_OR_GENERIC_LIFECYCLE_COMBINATIONS = (
+    CTRL_BATON_A62_LIFECYCLE_COMBINATIONS | CTRL_GENERIC_LIFECYCLE_COMBINATIONS
+)
 CTRL_BATON_A62R_REQUIRED_TRACKED_FILES = frozenset(
     {
         "docs/agent/GITHUB_BATON_PROTOCOL.md",
@@ -881,8 +919,27 @@ CtrlBatonGitView = namedtuple(
         "index_catalog_version",
         "head_tree_path_count",
         "head_catalog_version",
+        "feature_ahead_count",
+        "feature_remote_ancestor_ok",
+        "feature_ahead_linear_ok",
+        "feature_based_on_main_ok",
+        "feature_from_main_count",
+        "feature_from_main_linear_ok",
     ),
-    defaults=(None, None, None, None, None, None),
+    defaults=(
+        None,
+        None,
+        None,
+        None,
+        None,
+        None,
+        None,
+        None,
+        None,
+        None,
+        None,
+        None,
+    ),
 )
 
 CtrlBatonGithubContext = namedtuple(
@@ -1442,6 +1499,149 @@ def ctrl_baton_clean_candidate(view: CtrlBatonGitView) -> bool:
     )
 
 
+def is_ctrl_generic_control_branch(name: str | None) -> bool:
+    return bool(name and CTRL_GENERIC_CONTROL_BRANCH_RE.fullmatch(name))
+
+
+def ctrl_generic_clean_worktree(view: CtrlBatonGitView) -> bool:
+    return (
+        bool(view.tracked)
+        and not view.staged
+        and not view.staged_added
+        and not view.staged_modified
+        and not view.unstaged
+        and not view.untracked
+        and not view.conflicts
+    )
+
+
+def ctrl_generic_ref_name_allowed(ref: str) -> bool:
+    if ref in {"refs/heads/main", "refs/remotes/origin/main"}:
+        return True
+    if ref.startswith("refs/heads/"):
+        return is_ctrl_generic_control_branch(ref[len("refs/heads/") :])
+    if ref.startswith("refs/remotes/origin/"):
+        name = ref[len("refs/remotes/origin/") :]
+        return name == "HEAD" or is_ctrl_generic_control_branch(name)
+    if ref.startswith("refs/remotes/pull/") and ref.endswith("/merge"):
+        return (
+            re.fullmatch(r"refs/remotes/pull/[1-9][0-9]*/merge", ref) is not None
+        )
+    return False
+
+
+def ctrl_generic_feature_refs_ok(view: CtrlBatonGitView, branch: str) -> bool:
+    required = {
+        "refs/heads/main",
+        "refs/remotes/origin/main",
+        f"refs/heads/{branch}",
+    }
+    if not required <= view.all_refs:
+        return False
+    return all(ctrl_generic_ref_name_allowed(ref) for ref in view.all_refs)
+
+
+def ctrl_generic_main_refs_ok(view: CtrlBatonGitView) -> bool:
+    required = {"refs/heads/main", "refs/remotes/origin/main"}
+    if not view.all_refs or not required <= view.all_refs:
+        return False
+    for ref in view.all_refs:
+        if ref in required:
+            continue
+        if ref.startswith("refs/heads/"):
+            if is_ctrl_generic_control_branch(ref[len("refs/heads/") :]):
+                continue
+            return False
+        if ref.startswith("refs/remotes/origin/"):
+            if is_ctrl_generic_control_branch(
+                ref[len("refs/remotes/origin/") :]
+            ):
+                continue
+            return False
+        return False
+    return True
+
+
+def ctrl_generic_pr_refs_ok(
+    view: CtrlBatonGitView,
+    *,
+    number: int,
+    head_ref: str,
+) -> bool:
+    required = {
+        "refs/remotes/origin/main",
+        f"refs/remotes/origin/{head_ref}",
+        f"refs/remotes/pull/{number}/merge",
+    }
+    if not view.all_refs or not required <= view.all_refs:
+        return False
+    pull_merge_ref = f"refs/remotes/pull/{number}/merge"
+    for ref in view.all_refs:
+        if ref == pull_merge_ref:
+            continue
+        if ref in {"refs/heads/main", "refs/remotes/origin/main"}:
+            continue
+        if ref.startswith("refs/heads/"):
+            if is_ctrl_generic_control_branch(ref[len("refs/heads/") :]):
+                continue
+            return False
+        if ref.startswith("refs/remotes/origin/"):
+            if is_ctrl_generic_control_branch(
+                ref[len("refs/remotes/origin/") :]
+            ):
+                continue
+            return False
+        return False
+    return True
+
+
+def ctrl_generic_feature_history_ok(view: CtrlBatonGitView) -> bool:
+    if not is_ctrl_generic_control_branch(view.branch):
+        return False
+    if view.branch == CTRL_BATON_FEATURE_BRANCH:
+        return False
+    if len(view.head_parents) != 1:
+        return False
+    from_main_count = view.feature_from_main_count
+    return (
+        re.fullmatch(r"[0-9a-f]{40}", view.head_oid or "") is not None
+        and re.fullmatch(r"[0-9a-f]{40}", view.head_tree_oid or "") is not None
+        and re.fullmatch(r"[0-9a-f]{40}", view.main_oid or "") is not None
+        and view.main_oid == view.origin_main_oid
+        and view.head_oid != view.main_oid
+        and view.feature_local_oid == view.head_oid
+        and view.feature_tree_oid == view.head_tree_oid
+        and view.feature_based_on_main_ok is True
+        and view.feature_from_main_linear_ok is True
+        and isinstance(from_main_count, int)
+        and 1 <= from_main_count <= CTRL_GENERIC_FEATURE_AHEAD_MAX
+        and ctrl_generic_clean_worktree(view)
+        and ctrl_generic_feature_refs_ok(view, view.branch)
+    )
+
+
+def ctrl_generic_main_merge_shape_ok(
+    view: CtrlBatonGitView,
+    *,
+    previous_main_oid: str,
+    feature_oid: str,
+) -> bool:
+    ahead_count = view.feature_ahead_count
+    return (
+        re.fullmatch(r"[0-9a-f]{40}", view.head_oid or "") is not None
+        and re.fullmatch(r"[0-9a-f]{40}", view.head_tree_oid or "") is not None
+        and re.fullmatch(r"[0-9a-f]{40}", previous_main_oid or "") is not None
+        and re.fullmatch(r"[0-9a-f]{40}", feature_oid or "") is not None
+        and feature_oid != previous_main_oid
+        and view.feature_remote_ancestor_ok is True
+        and view.feature_ahead_linear_ok is True
+        and isinstance(ahead_count, int)
+        and 1 <= ahead_count <= CTRL_GENERIC_FEATURE_AHEAD_MAX
+        and view.feature_tree_oid == view.head_tree_oid
+        and ctrl_generic_clean_worktree(view)
+    )
+
+
 def classify_ctrl_baton_dirty(
     view: CtrlBatonGitView,
     github: CtrlBatonGithubContext,
@@ -1802,6 +2002,164 @@ def classify_ctrl_baton_main_merge_local(
     )
 
 
+def classify_ctrl_generic_feature_local(
+    view: CtrlBatonGitView,
+    github: CtrlBatonGithubContext,
+) -> bool:
+    return (
+        not github.actions
+        and ctrl_baton_origin_identity_ok(view, github_actions=False)
+        and ctrl_generic_feature_history_ok(view)
+        and view.feature_remote_oid is None
+        and view.upstream is None
+    )
+
+
+def classify_ctrl_generic_feature_ahead_of_published(
+    view: CtrlBatonGitView,
+    github: CtrlBatonGithubContext,
+) -> bool:
+    remote_oid = view.feature_remote_oid
+    ahead_count = view.feature_ahead_count
+    return (
+        not github.actions
+        and ctrl_baton_origin_identity_ok(view, github_actions=False)
+        and ctrl_generic_feature_history_ok(view)
+        and re.fullmatch(r"[0-9a-f]{40}", remote_oid or "") is not None
+        and remote_oid != view.head_oid
+        and view.upstream == f"origin/{view.branch}"
+        and f"refs/remotes/origin/{view.branch}" in view.all_refs
+        and view.feature_remote_ancestor_ok is True
+        and view.feature_ahead_linear_ok is True
+        and isinstance(ahead_count, int)
+        and ahead_count >= 1
+    )
+
+
+def classify_ctrl_generic_feature_published(
+    view: CtrlBatonGitView,
+    github: CtrlBatonGithubContext,
+) -> bool:
+    return (
+        not github.actions
+        and ctrl_baton_origin_identity_ok(view, github_actions=False)
+        and ctrl_generic_feature_history_ok(view)
+        and view.feature_remote_oid == view.head_oid
+        and view.upstream == f"origin/{view.branch}"
+        and f"refs/remotes/origin/{view.branch}" in view.all_refs
+    )
+
+
+def classify_ctrl_generic_pr_merge_checkout(
+    view: CtrlBatonGitView,
+    github: CtrlBatonGithubContext,
+) -> bool:
+    number = _pull_request_number(github.ref)
+    head_ref = github.head_ref
+    if (
+        number is None
+        or not is_ctrl_generic_control_branch(head_ref)
+        or head_ref == CTRL_BATON_FEATURE_BRANCH
+        or len(view.head_parents) != 2
+    ):
+        return False
+    base_oid, feature_oid = view.head_parents
+    ahead_count = view.feature_ahead_count
+    if "refs/heads/main" in view.all_refs:
+        local_main_ok = view.main_oid == base_oid
+    else:
+        local_main_ok = view.main_oid in {None, base_oid}
+    return (
+        github.actions
+        and github.repository == EXPECTED_GITHUB_REPOSITORY
+        and github.event_name == "pull_request"
+        and github.sha == view.head_oid
+        and github.base_ref == "main"
+        and github.head_ref == head_ref
+        and github.event_number == number
+        and github.event_base_ref == "main"
+        and github.event_base_sha == base_oid
+        and github.event_head_ref == head_ref
+        and github.event_head_sha == feature_oid
+        and view.branch is None
+        and re.fullmatch(r"[0-9a-f]{40}", view.head_oid or "") is not None
+        and re.fullmatch(r"[0-9a-f]{40}", view.head_tree_oid or "") is not None
+        and re.fullmatch(r"[0-9a-f]{40}", base_oid or "") is not None
+        and re.fullmatch(r"[0-9a-f]{40}", feature_oid or "") is not None
+        and feature_oid != base_oid
+        and view.origin_main_oid == base_oid
+        and local_main_ok
+        and view.feature_remote_ancestor_ok is True
+        and view.feature_ahead_linear_ok is True
+        and isinstance(ahead_count, int)
+        and 1 <= ahead_count <= CTRL_GENERIC_FEATURE_AHEAD_MAX
+        and view.feature_tree_oid == view.head_tree_oid
+        and ctrl_generic_clean_worktree(view)
+        and ctrl_baton_origin_identity_ok(view, github_actions=True)
+        and view.upstream is None
+        and ctrl_generic_pr_refs_ok(view, number=number, head_ref=head_ref)
+    )
+
+
+def classify_ctrl_generic_main_merge(
+    view: CtrlBatonGitView,
+    github: CtrlBatonGithubContext,
+) -> bool:
+    if len(view.head_parents) != 2:
+        return False
+    previous_main_oid, feature_oid = view.head_parents
+    return (
+        github.actions
+        and github.repository == EXPECTED_GITHUB_REPOSITORY
+        and github.event_name == "push"
+        and github.ref == "refs/heads/main"
+        and github.sha == view.head_oid
+        and github.base_ref is None
+        and github.head_ref is None
+        and github.event_ref == "refs/heads/main"
+        and github.event_before_sha == previous_main_oid
+        and github.event_after_sha == view.head_oid
+        and view.branch == "main"
+        and view.main_oid == view.head_oid
+        and view.origin_main_oid == view.head_oid
+        and view.upstream in {None, "origin/main"}
+        and view.feature_local_oid in {None, feature_oid}
+        and view.feature_remote_oid in {None, feature_oid}
+        and ctrl_generic_main_merge_shape_ok(
+            view,
+            previous_main_oid=previous_main_oid,
+            feature_oid=feature_oid,
+        )
+        and ctrl_baton_origin_identity_ok(view, github_actions=True)
+        and ctrl_generic_main_refs_ok(view)
+    )
+
+
+def classify_ctrl_generic_main_merge_local(
+    view: CtrlBatonGitView,
+    github: CtrlBatonGithubContext,
+) -> bool:
+    if len(view.head_parents) != 2:
+        return False
+    previous_main_oid, feature_oid = view.head_parents
+    return (
+        not github.actions
+        and ctrl_baton_origin_identity_ok(view, github_actions=False)
+        and view.branch == "main"
+        and view.main_oid == view.head_oid
+        and view.origin_main_oid == view.head_oid
+        and view.upstream == "origin/main"
+        and view.feature_local_oid in {None, feature_oid}
+        and view.feature_remote_oid in {None, feature_oid}
+        and ctrl_generic_main_merge_shape_ok(
+            view,
+            previous_main_oid=previous_main_oid,
+            feature_oid=feature_oid,
+        )
+        and ctrl_generic_main_refs_ok(view)
+    )
+
+
 def classify_ctrl_baton_state_machine(
     view: CtrlBatonGitView,
     github: CtrlBatonGithubContext,
@@ -1860,10 +2218,40 @@ def classify_ctrl_baton_state_machine(
             "CTRL_BATON_A62_MAIN_MERGE_COMMITTED",
             "BATON_MAIN_LOCAL_POST_MERGE",
         )
+    elif classify_ctrl_generic_feature_local(view, github):
+        result = (
+            "CTRL_GENERIC_CONTROL_FEATURE_COMMITTED",
+            "CTRL_GENERIC_FEATURE_LOCAL",
+        )
+    elif classify_ctrl_generic_feature_ahead_of_published(view, github):
+        result = (
+            "CTRL_GENERIC_CONTROL_FEATURE_COMMITTED",
+            "CTRL_GENERIC_FEATURE_AHEAD_OF_PUBLISHED",
+        )
+    elif classify_ctrl_generic_feature_published(view, github):
+        result = (
+            "CTRL_GENERIC_CONTROL_FEATURE_COMMITTED",
+            "CTRL_GENERIC_FEATURE_PUBLISHED",
+        )
+    elif classify_ctrl_generic_pr_merge_checkout(view, github):
+        result = (
+            "CTRL_GENERIC_CONTROL_PR_MERGE_CHECKOUT",
+            "CTRL_GENERIC_PR_MERGE_CHECKOUT",
+        )
+    elif classify_ctrl_generic_main_merge(view, github):
+        result = (
+            "CTRL_GENERIC_CONTROL_MAIN_MERGE_COMMITTED",
+            "GITHUB_GENERIC_MAIN_PUSH_CHECKOUT",
+        )
+    elif classify_ctrl_generic_main_merge_local(view, github):
+        result = (
+            "CTRL_GENERIC_CONTROL_MAIN_MERGE_COMMITTED",
+            "GENERIC_MAIN_LOCAL_POST_MERGE",
+        )
     else:
         return ("INVALID_REPOSITORY_STATE", "INVALID_GIT_TOPOLOGY")
 
-    if result not in CTRL_BATON_A62_LIFECYCLE_COMBINATIONS:
+    if result not in CTRL_BATON_OR_GENERIC_LIFECYCLE_COMBINATIONS:
         return ("INVALID_REPOSITORY_STATE", "INVALID_GIT_TOPOLOGY")
     return result
 
@@ -1995,6 +2383,23 @@ def git_commit_count_after_base(base_oid: str, target_oid: str) -> int | None:
     return int(value)
 
 
+def git_is_ancestor(ancestor_oid: str, descendant_oid: str) -> bool:
+    result = run(
+        ["git", "merge-base", "--is-ancestor", ancestor_oid, descendant_oid]
+    )
+    return result.returncode == 0
+
+
+def git_range_merge_count(base_oid: str, target_oid: str) -> int | None:
+    result = run(
+        ["git", "rev-list", "--count", "--merges", f"{base_oid}..{target_oid}"]
+    )
+    value = result.stdout.strip()
+    if result.returncode != 0 or not value.isdigit():
+        return None
+    return int(value)
+
+
 def git_diff_paths(base_oid: str, target_oid: str) -> frozenset[str] | None:
     code, paths = command_set(
         ["git", "diff", "--name-only", base_oid, target_oid, "--"]
@@ -2059,16 +2464,52 @@ def collect_ctrl_baton_git_view(
     untracked: set[str],
 ) -> CtrlBatonGitView:
     head_parents = git_commit_parents(head_oid)
+    if is_ctrl_generic_control_branch(branch):
+        active_feature_branch = branch
+    else:
+        active_feature_branch = CTRL_BATON_FEATURE_BRANCH
     feature_local_oid = optional_git_oid(
-        f"refs/heads/{CTRL_BATON_FEATURE_BRANCH}"
+        f"refs/heads/{active_feature_branch}"
     )
     feature_remote_oid = optional_git_oid(
-        f"refs/remotes/origin/{CTRL_BATON_FEATURE_BRANCH}"
+        f"refs/remotes/origin/{active_feature_branch}"
     )
     feature_oid = None
+    main_oid = optional_git_oid("refs/heads/main")
     if len(head_parents) == 2:
         feature_oid = head_parents[1]
+        if (
+            feature_local_oid is not None
+            and feature_local_oid != feature_oid
+        ):
+            feature_local_oid = None
+        if (
+            feature_remote_oid is not None
+            and feature_remote_oid != feature_oid
+        ):
+            feature_remote_oid = None
+        if feature_local_oid is None or feature_remote_oid is None:
+            for ref in sorted(all_refs):
+                if feature_local_oid is None and ref.startswith("refs/heads/ctrl/"):
+                    tip = optional_git_oid(ref)
+                    if tip == feature_oid:
+                        feature_local_oid = tip
+                if (
+                    feature_remote_oid is None
+                    and ref.startswith("refs/remotes/origin/ctrl/")
+                ):
+                    tip = optional_git_oid(ref)
+                    if tip == feature_oid:
+                        feature_remote_oid = tip
     elif branch == CTRL_BATON_FEATURE_BRANCH and head_oid != CTRL_BATON_A62_COMMIT_OID:
+        feature_oid = head_oid
+    elif (
+        branch is not None
+        and branch != CTRL_BATON_FEATURE_BRANCH
+        and is_ctrl_generic_control_branch(branch)
+        and main_oid is not None
+        and head_oid != main_oid
+    ):
         feature_oid = head_oid
     elif (
         feature_local_oid is not None
@@ -2088,6 +2529,76 @@ def collect_ctrl_baton_git_view(
     if any(code != 0 for code in (added_code, modified_code, conflict_code)):
         raise AssertionError("ctrl_baton_inventory_read_failed")
 
+    origin_main_oid = optional_git_oid("refs/remotes/origin/main")
+    feature_ahead_count = None
+    feature_remote_ancestor_ok = None
+    feature_ahead_linear_ok = None
+    feature_based_on_main_ok = None
+    feature_from_main_count = None
+    feature_from_main_linear_ok = None
+    if len(head_parents) == 2:
+        merge_base_oid, merge_feature_oid = head_parents
+        if (
+            re.fullmatch(r"[0-9a-f]{40}", merge_base_oid or "") is not None
+            and re.fullmatch(r"[0-9a-f]{40}", merge_feature_oid or "") is not None
+        ):
+            feature_remote_ancestor_ok = git_is_ancestor(
+                merge_base_oid, merge_feature_oid
+            )
+            if feature_remote_ancestor_ok:
+                feature_ahead_count = git_commit_count_after_base(
+                    merge_base_oid, merge_feature_oid
+                )
+                merge_count = git_range_merge_count(
+                    merge_base_oid, merge_feature_oid
+                )
+                feature_ahead_linear_ok = (
+                    merge_count == 0 if merge_count is not None else None
+                )
+            else:
+                feature_ahead_linear_ok = False
+    elif (
+        isinstance(feature_remote_oid, str)
+        and re.fullmatch(r"[0-9a-f]{40}", feature_remote_oid) is not None
+        and re.fullmatch(r"[0-9a-f]{40}", head_oid) is not None
+    ):
+        feature_remote_ancestor_ok = git_is_ancestor(feature_remote_oid, head_oid)
+        if feature_remote_ancestor_ok:
+            feature_ahead_count = git_commit_count_after_base(
+                feature_remote_oid, head_oid
+            )
+            merge_count = git_range_merge_count(feature_remote_oid, head_oid)
+            feature_ahead_linear_ok = (
+                merge_count == 0 if merge_count is not None else None
+            )
+        else:
+            feature_ahead_linear_ok = False
+    if (
+        isinstance(origin_main_oid, str)
+        and re.fullmatch(r"[0-9a-f]{40}", origin_main_oid) is not None
+        and re.fullmatch(r"[0-9a-f]{40}", head_oid) is not None
+    ):
+        feature_based_on_main_ok = git_is_ancestor(origin_main_oid, head_oid)
+    if (
+        len(head_parents) != 2
+        and isinstance(main_oid, str)
+        and isinstance(origin_main_oid, str)
+        and main_oid == origin_main_oid
+        and re.fullmatch(r"[0-9a-f]{40}", main_oid) is not None
+        and re.fullmatch(r"[0-9a-f]{40}", head_oid) is not None
+        and head_oid != main_oid
+    ):
+        if git_is_ancestor(main_oid, head_oid):
+            feature_from_main_count = git_commit_count_after_base(
+                main_oid, head_oid
+            )
+            merge_count = git_range_merge_count(main_oid, head_oid)
+            feature_from_main_linear_ok = (
+                merge_count == 0 if merge_count is not None else None
+            )
+        else:
+            feature_from_main_linear_ok = False
+
     return CtrlBatonGitView(
         branch,
         head_oid,
@@ -2095,8 +2606,8 @@ def collect_ctrl_baton_git_view(
         git_commit_parents(feature_oid),
         git_tree_oid(head_oid),
         git_tree_oid(feature_oid),
-        optional_git_oid("refs/heads/main"),
-        optional_git_oid("refs/remotes/origin/main"),
+        main_oid,
+        origin_main_oid,
         feature_local_oid,
         feature_remote_oid,
         upstream,
@@ -2120,6 +2631,12 @@ def collect_ctrl_baton_git_view(
         git_index_catalog_version(),
         git_tree_path_count(head_oid),
         git_commit_catalog_version(head_oid),
+        feature_ahead_count,
+        feature_remote_ancestor_ok,
+        feature_ahead_linear_ok,
+        feature_based_on_main_ok,
+        feature_from_main_count,
+        feature_from_main_linear_ok,
     )
 
 
@@ -3351,7 +3868,7 @@ def validate() -> None:
         commit_subject=subject.stdout.strip(),
         commit_changed=commit_changed,
     )
-    if (baton_state, baton_topology) in CTRL_BATON_A62_LIFECYCLE_COMBINATIONS:
+    if (baton_state, baton_topology) in CTRL_BATON_OR_GENERIC_LIFECYCLE_COMBINATIONS:
         state = baton_state
         topology = baton_topology
     else:
@@ -3395,12 +3912,19 @@ def validate() -> None:
         | TASK07_REPOSITORY_STATES
         | TASK08_REPOSITORY_STATES
         | CTRL_BATON_A62_REPOSITORY_STATES
+        | CTRL_GENERIC_REPOSITORY_STATES
     )
     assert_check("repository_state", state in valid_states, state)
     if state in CTRL_BATON_A62_REPOSITORY_STATES:
         assert_check(
             "ctrl_baton_state_topology_combination",
             (state, topology) in CTRL_BATON_A62_LIFECYCLE_COMBINATIONS,
+            f"{state}/{topology}",
+        )
+    if state in CTRL_GENERIC_REPOSITORY_STATES:
+        assert_check(
+            "ctrl_generic_state_topology_combination",
+            (state, topology) in CTRL_GENERIC_LIFECYCLE_COMBINATIONS,
             f"{state}/{topology}",
         )
     if state == "ATOM7_FINAL_HANDOFF_STAGED":
@@ -3528,6 +4052,8 @@ def validate() -> None:
     if state in TASK08_REPOSITORY_STATES:
         expected_file_count = TASK08_EXPECTED_REPOSITORY_FILE_COUNT
     elif state in CTRL_BATON_A62_REPOSITORY_STATES:
+        expected_file_count = ctrl_baton_a62r_expected_repository_file_count()
+    elif state in CTRL_GENERIC_REPOSITORY_STATES:
         expected_file_count = ctrl_baton_a62r_expected_repository_file_count()
     elif state in TASK07_REPOSITORY_STATES:
         expected_file_count = TASK07_EXPECTED_REPOSITORY_FILE_COUNT
@@ -4007,6 +4533,7 @@ def validate() -> None:
         | TASK07_REPOSITORY_STATES
         | TASK08_REPOSITORY_STATES
         | CTRL_BATON_A62_REPOSITORY_STATES
+        | CTRL_GENERIC_REPOSITORY_STATES
         else {f"PyYAML=={EXPECTED_PYYAML}", f"jsonschema=={EXPECTED_JSONSCHEMA}"}
     )
     assert_check("dependency_contract", set(metadata["project"]["dependencies"]) == expected_dependencies)
@@ -4018,6 +4545,7 @@ def validate() -> None:
         | TASK07_REPOSITORY_STATES
         | TASK08_REPOSITORY_STATES
         | CTRL_BATON_A62_REPOSITORY_STATES
+        | CTRL_GENERIC_REPOSITORY_STATES
     ):
         assert_check(
             "security_dependency_group",

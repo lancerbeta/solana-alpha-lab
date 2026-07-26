@@ -15,3 +15,11 @@ alwaysApply: true
 - Local validation and GPT semantic acceptance are gates, not authority grants.
 - Follow `AGENTS.md` and `docs/agent/EXECUTION_ROUTER_PROTOCOL.md`.
 - Skills advise; they do not own control-plane status.
+
+## Imported lifecycle skill isolation
+
+- The user skills `start-solana-task` and `finish-solana-task` are non-executable in Cursor. They may be read only to report conflicts with `AGENTS.md` or project rules.
+- Cursor must not use those skills to run an Entry Gate, Finish Gate, emit `DONE_CONFIRMED`, select a current or next canonical task, perform a skill auto-chain, or invoke `refactor-solana-lab`.
+- Conversational cues such as `продолжай`, `что дальше`, or a task appearing complete grant no lifecycle-skill authority. Cursor acts only on an explicit GPT-control-plane-approved route and exact atom.
+- Cursor must not claim semantic acceptance, canonical status changes, or `DONE`.
+- This isolation does not disable third-party skill import or unrelated skills.
