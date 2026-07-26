@@ -1488,18 +1488,25 @@ def generic_feature_ahead_view(
     return view._replace(**overrides)
 
 
-def generic_pr_view(**overrides: object) -> baseline.CtrlBatonGitView:
+def generic_pr_view(
+    *,
+    feature_commit_count: int = 1,
+    **overrides: object,
+) -> baseline.CtrlBatonGitView:
     refs = frozenset(
         {
+            "refs/heads/main",
             "refs/remotes/origin/main",
             f"refs/remotes/origin/{GENERIC_BRANCH}",
             "refs/remotes/pull/2/merge",
         }
     )
+    feature_parent = GENERIC_BASE if feature_commit_count == 1 else INTERMEDIATE
     view = generic_feature_view(
         branch=None,
         head_oid=GENERIC_MERGE,
         head_parents=(GENERIC_BASE, GENERIC_HEAD),
+        feature_parents=(feature_parent,),
         main_oid=None,
         origin_main_oid=None,
         feature_local_oid=None,
@@ -1508,6 +1515,9 @@ def generic_pr_view(**overrides: object) -> baseline.CtrlBatonGitView:
         push_urls=("https://github.com/lancerbeta/solana-alpha-lab",),
         all_refs=refs,
         upstream=None,
+        feature_ahead_count=feature_commit_count,
+        feature_remote_ancestor_ok=True,
+        feature_ahead_linear_ok=True,
     )
     return view._replace(**overrides)
 
@@ -1714,6 +1724,70 @@ class GenericControlPullRequestCheckoutTests(unittest.TestCase):
             self.EXPECTED,
         )
 
+    def test_bounded_linear_feature_histories_pass(self) -> None:
+        for feature_commit_count in (1, 2, 6, baseline.CTRL_GENERIC_FEATURE_AHEAD_MAX):
+            with self.subTest(feature_commit_count=feature_commit_count):
+                self.assertEqual(
+                    classify(
+                        generic_pr_view(
+                            feature_commit_count=feature_commit_count
+                        ),
+                        generic_pr_github_context(),
+                    ),
+                    self.EXPECTED,
+                )
+
+    def test_extra_origin_baton_setup_ref_does_not_block(self) -> None:
+        refs = frozenset(
+            {
+                "refs/heads/main",
+                "refs/remotes/origin/main",
+                f"refs/remotes/origin/{GENERIC_BRANCH}",
+                f"refs/remotes/origin/{baseline.CTRL_BATON_FEATURE_BRANCH}",
+                "refs/remotes/pull/2/merge",
+            }
+        )
+        self.assertEqual(
+            classify(
+                generic_pr_view(all_refs=refs),
+                generic_pr_github_context(),
+            ),
+            self.EXPECTED,
+        )
+
+    def test_feature_history_over_max_fails(self) -> None:
+        self.assertNotEqual(
+            classify(
+                generic_pr_view(
+                    feature_commit_count=baseline.CTRL_GENERIC_FEATURE_AHEAD_MAX
+                    + 1
+                ),
+                generic_pr_github_context(),
+            ),
+            self.EXPECTED,
+        )
+
+    def test_base_not_ancestor_of_feature_fails(self) -> None:
+        self.assertNotEqual(
+            classify(
+                generic_pr_view(
+                    feature_remote_ancestor_ok=False,
+                    feature_ahead_linear_ok=False,
+                ),
+                generic_pr_github_context(),
+            ),
+            self.EXPECTED,
+        )
+
+    def test_merge_commit_in_feature_range_fails(self) -> None:
+        self.assertNotEqual(
+            classify(
+                generic_pr_view(feature_ahead_linear_ok=False),
+                generic_pr_github_context(),
+            ),
+            self.EXPECTED,
+        )
+
     def test_squash_or_fast_forward_fails(self) -> None:
         self.assertNotEqual(
             classify(
@@ -1784,6 +1858,42 @@ class GenericControlPullRequestCheckoutTests(unittest.TestCase):
         self.assertNotEqual(
             classify(
                 generic_pr_view(unstaged=frozenset({"README.md"})),
+                generic_pr_github_context(),
+            ),
+            self.EXPECTED,
+        )
+
+    def test_extra_non_control_ref_fails(self) -> None:
+        refs = frozenset(
+            {
+                "refs/heads/main",
+                "refs/remotes/origin/main",
+                f"refs/remotes/origin/{GENERIC_BRANCH}",
+                "refs/remotes/origin/feature/other",
+                "refs/remotes/pull/2/merge",
+            }
+        )
+        self.assertNotEqual(
+            classify(
+                generic_pr_view(all_refs=refs),
+                generic_pr_github_context(),
+            ),
+            self.EXPECTED,
+        )
+
+    def test_unexpected_pull_ref_fails(self) -> None:
+        refs = frozenset(
+            {
+                "refs/heads/main",
+                "refs/remotes/origin/main",
+                f"refs/remotes/origin/{GENERIC_BRANCH}",
+                "refs/remotes/pull/2/merge",
+                "refs/remotes/pull/99/merge",
+            }
+        )
+        self.assertNotEqual(
+            classify(
+                generic_pr_view(all_refs=refs),
                 generic_pr_github_context(),
             ),
             self.EXPECTED,

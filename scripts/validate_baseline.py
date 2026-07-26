@@ -1523,13 +1523,32 @@ def ctrl_generic_pr_refs_ok(
     number: int,
     head_ref: str,
 ) -> bool:
-    allowed = {
+    required = {
         "refs/heads/main",
         "refs/remotes/origin/main",
         f"refs/remotes/origin/{head_ref}",
         f"refs/remotes/pull/{number}/merge",
     }
-    return bool(view.all_refs) and view.all_refs <= allowed
+    if not view.all_refs or not required <= view.all_refs:
+        return False
+    pull_merge_ref = f"refs/remotes/pull/{number}/merge"
+    for ref in view.all_refs:
+        if ref == pull_merge_ref:
+            continue
+        if ref in {"refs/heads/main", "refs/remotes/origin/main"}:
+            continue
+        if ref.startswith("refs/heads/"):
+            if is_ctrl_generic_control_branch(ref[len("refs/heads/") :]):
+                continue
+            return False
+        if ref.startswith("refs/remotes/origin/"):
+            if is_ctrl_generic_control_branch(
+                ref[len("refs/remotes/origin/") :]
+            ):
+                continue
+            return False
+        return False
+    return True
 
 
 def ctrl_generic_feature_commit_shape_ok(view: CtrlBatonGitView) -> bool:
@@ -1990,6 +2009,7 @@ def classify_ctrl_generic_pr_merge_checkout(
     ):
         return False
     base_oid, feature_oid = view.head_parents
+    ahead_count = view.feature_ahead_count
     return (
         github.actions
         and github.repository == EXPECTED_GITHUB_REPOSITORY
@@ -2008,7 +2028,10 @@ def classify_ctrl_generic_pr_merge_checkout(
         and re.fullmatch(r"[0-9a-f]{40}", base_oid or "") is not None
         and re.fullmatch(r"[0-9a-f]{40}", feature_oid or "") is not None
         and feature_oid != base_oid
-        and view.feature_parents == (base_oid,)
+        and view.feature_remote_ancestor_ok is True
+        and view.feature_ahead_linear_ok is True
+        and isinstance(ahead_count, int)
+        and 1 <= ahead_count <= CTRL_GENERIC_FEATURE_AHEAD_MAX
         and view.feature_tree_oid == view.head_tree_oid
         and ctrl_generic_clean_worktree(view)
         and ctrl_baton_origin_identity_ok(view, github_actions=True)
@@ -2358,7 +2381,28 @@ def collect_ctrl_baton_git_view(
     feature_remote_ancestor_ok = None
     feature_ahead_linear_ok = None
     feature_based_on_main_ok = None
-    if (
+    if len(head_parents) == 2:
+        merge_base_oid, merge_feature_oid = head_parents
+        if (
+            re.fullmatch(r"[0-9a-f]{40}", merge_base_oid or "") is not None
+            and re.fullmatch(r"[0-9a-f]{40}", merge_feature_oid or "") is not None
+        ):
+            feature_remote_ancestor_ok = git_is_ancestor(
+                merge_base_oid, merge_feature_oid
+            )
+            if feature_remote_ancestor_ok:
+                feature_ahead_count = git_commit_count_after_base(
+                    merge_base_oid, merge_feature_oid
+                )
+                merge_count = git_range_merge_count(
+                    merge_base_oid, merge_feature_oid
+                )
+                feature_ahead_linear_ok = (
+                    merge_count == 0 if merge_count is not None else None
+                )
+            else:
+                feature_ahead_linear_ok = False
+    elif (
         isinstance(feature_remote_oid, str)
         and re.fullmatch(r"[0-9a-f]{40}", feature_remote_oid) is not None
         and re.fullmatch(r"[0-9a-f]{40}", head_oid) is not None
