@@ -4052,7 +4052,7 @@ records:
     repository_path: .cursor/rules/00-authority.mdc
   integrity:
     kind: sha256
-    sha256: 39fcdc1ba70f2e9da64efeb7576954d5e8c65baa516b1334c95ed10333cd818f
+    sha256: 9fa7c28c58870e2ff0416e7ec63671c04a525c5b1d87e5983ce2077260d0d98f
   access:
     mode: read_only
     method: file
@@ -4592,7 +4592,7 @@ records:
     repository_path: scripts/validate_baton.py
   integrity:
     kind: sha256
-    sha256: 1ab326d15adc4aff926681e1976fc77fda66a6818567bc1b2d80961452de0c2f
+    sha256: 8f63fe0030b1782e59820b2f2a5106eb18568961af2e612f5ec54c114b186815
   access:
     mode: read_only
     method: file

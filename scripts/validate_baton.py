@@ -570,6 +570,31 @@ def validate_canonical_catalog_integrity() -> None:
 def validate_cursor_and_templates() -> None:
     for path in REQUIRED_PATHS + CURSOR_RULES:
         assert_check(f"exists:{path.relative_to(ROOT).as_posix()}", path.is_file())
+    authority = (ROOT / ".cursor/rules/00-authority.mdc").read_text(encoding="utf-8")
+    for needle in [
+        (
+            "The user skills `start-solana-task` and `finish-solana-task` "
+            "are non-executable in Cursor."
+        ),
+        (
+            "Cursor must not use those skills to run an Entry Gate, Finish Gate, "
+            "emit `DONE_CONFIRMED`, select a current or next canonical task, "
+            "perform a skill auto-chain, or invoke `refactor-solana-lab`."
+        ),
+        (
+            "Conversational cues such as `продолжай`, `что дальше`, or a task "
+            "appearing complete grant no lifecycle-skill authority."
+        ),
+        (
+            "Cursor must not claim semantic acceptance, canonical status "
+            "changes, or `DONE`."
+        ),
+        (
+            "This isolation does not disable third-party skill import or "
+            "unrelated skills."
+        ),
+    ]:
+        assert_check(f"authority_lifecycle_isolation:{needle}", needle in authority)
     cmd = (ROOT / ".cursor/commands/baton-preflight.md").read_text(encoding="utf-8")
     for needle in [
         "expected_contract_sha256",
