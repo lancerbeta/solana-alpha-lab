@@ -1370,7 +1370,7 @@ class LegacyRegressionTests(unittest.TestCase):
         )
         self.assertEqual(
             len(baseline.CTRL_GENERIC_LIFECYCLE_COMBINATIONS),
-            3,
+            4,
         )
         self.assertEqual(
             baseline.CTRL_GENERIC_LIFECYCLE_COMBINATIONS,
@@ -1378,6 +1378,10 @@ class LegacyRegressionTests(unittest.TestCase):
                 (
                     "CTRL_GENERIC_CONTROL_FEATURE_COMMITTED",
                     "CTRL_GENERIC_FEATURE_LOCAL",
+                ),
+                (
+                    "CTRL_GENERIC_CONTROL_FEATURE_COMMITTED",
+                    "CTRL_GENERIC_FEATURE_AHEAD_OF_PUBLISHED",
                 ),
                 (
                     "CTRL_GENERIC_CONTROL_FEATURE_COMMITTED",
@@ -1458,6 +1462,24 @@ def generic_feature_published_view(**overrides: object) -> baseline.CtrlBatonGit
     return view._replace(**overrides)
 
 
+GENERIC_REMOTE_TIP = "1" * 40
+GENERIC_AHEAD_HEAD = "2" * 40
+GENERIC_AHEAD_TREE = "3" * 40
+
+
+def generic_feature_ahead_view(**overrides: object) -> baseline.CtrlBatonGitView:
+    view = generic_feature_published_view(
+        head_oid=GENERIC_AHEAD_HEAD,
+        head_parents=(GENERIC_REMOTE_TIP,),
+        feature_parents=(GENERIC_REMOTE_TIP,),
+        head_tree_oid=GENERIC_AHEAD_TREE,
+        feature_tree_oid=GENERIC_AHEAD_TREE,
+        feature_local_oid=GENERIC_AHEAD_HEAD,
+        feature_remote_oid=GENERIC_REMOTE_TIP,
+    )
+    return view._replace(**overrides)
+
+
 def generic_pr_view(**overrides: object) -> baseline.CtrlBatonGitView:
     refs = frozenset(
         {
@@ -1512,6 +1534,10 @@ class GenericControlFeatureCommittedTests(unittest.TestCase):
         "CTRL_GENERIC_CONTROL_FEATURE_COMMITTED",
         "CTRL_GENERIC_FEATURE_PUBLISHED",
     )
+    AHEAD = (
+        "CTRL_GENERIC_CONTROL_FEATURE_COMMITTED",
+        "CTRL_GENERIC_FEATURE_AHEAD_OF_PUBLISHED",
+    )
 
     def test_exact_local_generic_control_branch_passes(self) -> None:
         self.assertEqual(classify(generic_feature_view()), self.LOCAL)
@@ -1520,6 +1546,62 @@ class GenericControlFeatureCommittedTests(unittest.TestCase):
         self.assertEqual(
             classify(generic_feature_published_view()),
             self.PUBLISHED,
+        )
+
+    def test_exact_ahead_of_published_generic_control_branch_passes(self) -> None:
+        self.assertEqual(classify(generic_feature_ahead_view()), self.AHEAD)
+
+    def test_ahead_wrong_parent_fails(self) -> None:
+        self.assertNotEqual(
+            classify(generic_feature_ahead_view(head_parents=(GENERIC_BASE,))),
+            self.AHEAD,
+        )
+        self.assertNotEqual(
+            classify(generic_feature_ahead_view(feature_parents=(GENERIC_BASE,))),
+            self.AHEAD,
+        )
+
+    def test_ahead_two_or_more_commits_fails(self) -> None:
+        self.assertNotEqual(
+            classify(
+                generic_feature_ahead_view(
+                    head_parents=(INTERMEDIATE,),
+                    feature_parents=(INTERMEDIATE,),
+                    feature_remote_oid=GENERIC_REMOTE_TIP,
+                )
+            ),
+            self.AHEAD,
+        )
+
+    def test_ahead_wrong_upstream_fails(self) -> None:
+        self.assertNotEqual(
+            classify(generic_feature_ahead_view(upstream="origin/main")),
+            self.AHEAD,
+        )
+
+    def test_ahead_dirty_worktree_fails(self) -> None:
+        self.assertNotEqual(
+            classify(
+                generic_feature_ahead_view(
+                    unstaged=frozenset({"scripts/validate_baseline.py"})
+                )
+            ),
+            self.AHEAD,
+        )
+
+    def test_ahead_extra_ref_fails(self) -> None:
+        refs = frozenset(
+            {
+                "refs/heads/main",
+                "refs/remotes/origin/main",
+                f"refs/heads/{GENERIC_BRANCH}",
+                f"refs/remotes/origin/{GENERIC_BRANCH}",
+                "refs/heads/feature/other",
+            }
+        )
+        self.assertNotEqual(
+            classify(generic_feature_ahead_view(all_refs=refs)),
+            self.AHEAD,
         )
 
     def test_historical_baton_branch_is_not_generic(self) -> None:

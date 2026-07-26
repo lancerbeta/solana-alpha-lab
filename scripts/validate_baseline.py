@@ -643,6 +643,10 @@ CTRL_GENERIC_LIFECYCLE_COMBINATIONS = {
     ),
     (
         "CTRL_GENERIC_CONTROL_FEATURE_COMMITTED",
+        "CTRL_GENERIC_FEATURE_AHEAD_OF_PUBLISHED",
+    ),
+    (
+        "CTRL_GENERIC_CONTROL_FEATURE_COMMITTED",
         "CTRL_GENERIC_FEATURE_PUBLISHED",
     ),
     (
@@ -1919,6 +1923,39 @@ def classify_ctrl_generic_feature_local(
     )
 
 
+def classify_ctrl_generic_feature_ahead_of_published(
+    view: CtrlBatonGitView,
+    github: CtrlBatonGithubContext,
+) -> bool:
+    if not is_ctrl_generic_control_branch(view.branch):
+        return False
+    if view.branch == CTRL_BATON_FEATURE_BRANCH:
+        return False
+    if len(view.head_parents) != 1:
+        return False
+    remote_oid = view.feature_remote_oid
+    return (
+        not github.actions
+        and ctrl_baton_origin_identity_ok(view, github_actions=False)
+        and re.fullmatch(r"[0-9a-f]{40}", view.head_oid or "") is not None
+        and re.fullmatch(r"[0-9a-f]{40}", view.head_tree_oid or "") is not None
+        and re.fullmatch(r"[0-9a-f]{40}", view.main_oid or "") is not None
+        and re.fullmatch(r"[0-9a-f]{40}", remote_oid or "") is not None
+        and view.main_oid == view.origin_main_oid
+        and view.head_oid != view.main_oid
+        and remote_oid != view.head_oid
+        and remote_oid != view.main_oid
+        and view.head_parents == (remote_oid,)
+        and view.feature_local_oid == view.head_oid
+        and view.feature_parents == (remote_oid,)
+        and view.feature_tree_oid == view.head_tree_oid
+        and view.upstream == f"origin/{view.branch}"
+        and f"refs/remotes/origin/{view.branch}" in view.all_refs
+        and ctrl_generic_clean_worktree(view)
+        and ctrl_generic_feature_refs_ok(view, view.branch)
+    )
+
+
 def classify_ctrl_generic_feature_published(
     view: CtrlBatonGitView,
     github: CtrlBatonGithubContext,
@@ -2036,6 +2073,11 @@ def classify_ctrl_baton_state_machine(
         result = (
             "CTRL_GENERIC_CONTROL_FEATURE_COMMITTED",
             "CTRL_GENERIC_FEATURE_LOCAL",
+        )
+    elif classify_ctrl_generic_feature_ahead_of_published(view, github):
+        result = (
+            "CTRL_GENERIC_CONTROL_FEATURE_COMMITTED",
+            "CTRL_GENERIC_FEATURE_AHEAD_OF_PUBLISHED",
         )
     elif classify_ctrl_generic_feature_published(view, github):
         result = (
