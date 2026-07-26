@@ -635,6 +635,7 @@ CTRL_GENERIC_CONTROL_BRANCH_RE = re.compile(
 CTRL_GENERIC_FEATURE_AHEAD_MAX = 16
 CTRL_GENERIC_REPOSITORY_STATES = {
     "CTRL_GENERIC_CONTROL_FEATURE_COMMITTED",
+    "CTRL_GENERIC_CONTROL_FEATURE_REPAIR_STAGED",
     "CTRL_GENERIC_CONTROL_PR_MERGE_CHECKOUT",
     "CTRL_GENERIC_CONTROL_MAIN_MERGE_COMMITTED",
 }
@@ -650,6 +651,10 @@ CTRL_GENERIC_LIFECYCLE_COMBINATIONS = {
     (
         "CTRL_GENERIC_CONTROL_FEATURE_COMMITTED",
         "CTRL_GENERIC_FEATURE_PUBLISHED",
+    ),
+    (
+        "CTRL_GENERIC_CONTROL_FEATURE_REPAIR_STAGED",
+        "CTRL_GENERIC_FEATURE_LOCAL_REPAIR_STAGED",
     ),
     (
         "CTRL_GENERIC_CONTROL_PR_MERGE_CHECKOUT",
@@ -1517,6 +1522,21 @@ def ctrl_generic_clean_worktree(view: CtrlBatonGitView) -> bool:
     )
 
 
+def ctrl_generic_staged_repair_worktree_ok(view: CtrlBatonGitView) -> bool:
+    """Allow only staged modifications of already-tracked paths."""
+    return (
+        bool(view.tracked)
+        and bool(view.staged)
+        and bool(view.staged_modified)
+        and not view.staged_added
+        and view.staged == view.staged_modified
+        and view.staged <= view.tracked
+        and not view.unstaged
+        and not view.untracked
+        and not view.conflicts
+    )
+
+
 def ctrl_generic_ref_name_allowed(ref: str) -> bool:
     if ref in {"refs/heads/main", "refs/remotes/origin/main"}:
         return True
@@ -1605,7 +1625,7 @@ def ctrl_generic_pr_refs_ok(
     return True
 
 
-def ctrl_generic_feature_history_ok(view: CtrlBatonGitView) -> bool:
+def ctrl_generic_feature_history_shape_ok(view: CtrlBatonGitView) -> bool:
     if not is_ctrl_generic_control_branch(view.branch):
         return False
     if view.branch == CTRL_BATON_FEATURE_BRANCH:
@@ -1625,8 +1645,14 @@ def ctrl_generic_feature_history_ok(view: CtrlBatonGitView) -> bool:
         and view.feature_from_main_linear_ok is True
         and isinstance(from_main_count, int)
         and 1 <= from_main_count <= CTRL_GENERIC_FEATURE_AHEAD_MAX
-        and ctrl_generic_clean_worktree(view)
         and ctrl_generic_feature_refs_ok(view, view.branch)
+    )
+
+
+def ctrl_generic_feature_history_ok(view: CtrlBatonGitView) -> bool:
+    return (
+        ctrl_generic_feature_history_shape_ok(view)
+        and ctrl_generic_clean_worktree(view)
     )
 
 
@@ -2025,6 +2051,20 @@ def classify_ctrl_generic_feature_local(
     )
 
 
+def classify_ctrl_generic_feature_repair_staged(
+    view: CtrlBatonGitView,
+    github: CtrlBatonGithubContext,
+) -> bool:
+    return (
+        not github.actions
+        and ctrl_baton_origin_identity_ok(view, github_actions=False)
+        and ctrl_generic_feature_history_shape_ok(view)
+        and view.feature_remote_oid is None
+        and view.upstream is None
+        and ctrl_generic_staged_repair_worktree_ok(view)
+    )
+
+
 def classify_ctrl_generic_feature_ahead_of_published(
     view: CtrlBatonGitView,
     github: CtrlBatonGithubContext,
@@ -2228,12 +2268,18 @@ def classify_ctrl_baton_state_machine(
             "CTRL_BATON_A62_MAIN_MERGE_COMMITTED",
             "BATON_MAIN_LOCAL_POST_MERGE",
         )
+    elif classify_ctrl_generic_feature_repair_staged(view, github):
+        result = (
+            "CTRL_GENERIC_CONTROL_FEATURE_REPAIR_STAGED",
+            "CTRL_GENERIC_FEATURE_LOCAL_REPAIR_STAGED",
+        )
     elif classify_ctrl_generic_feature_local(view, github):
         result = (
             "CTRL_GENERIC_CONTROL_FEATURE_COMMITTED",
             "CTRL_GENERIC_FEATURE_LOCAL",
         )
     elif classify_ctrl_generic_feature_ahead_of_published(view, github):
+
         result = (
             "CTRL_GENERIC_CONTROL_FEATURE_COMMITTED",
             "CTRL_GENERIC_FEATURE_AHEAD_OF_PUBLISHED",
@@ -4067,7 +4113,8 @@ def validate() -> None:
     elif state in CTRL_BATON_A62_REPOSITORY_STATES:
         expected_file_count = ctrl_baton_a62r_expected_repository_file_count()
     elif state in CTRL_GENERIC_REPOSITORY_STATES:
-        expected_file_count = ctrl_baton_a62r_expected_repository_file_count()
+        # Fail-closed against the actual committed tree, not historical Baton 225.
+        expected_file_count = baton_view.head_tree_path_count
     elif state in TASK07_REPOSITORY_STATES:
         expected_file_count = TASK07_EXPECTED_REPOSITORY_FILE_COUNT
     elif state in TASK06_FINALIZATION_REPOSITORY_STATES:

@@ -1370,7 +1370,7 @@ class LegacyRegressionTests(unittest.TestCase):
         )
         self.assertEqual(
             len(baseline.CTRL_GENERIC_LIFECYCLE_COMBINATIONS),
-            6,
+            7,
         )
         self.assertEqual(
             baseline.CTRL_GENERIC_LIFECYCLE_COMBINATIONS,
@@ -1386,6 +1386,10 @@ class LegacyRegressionTests(unittest.TestCase):
                 (
                     "CTRL_GENERIC_CONTROL_FEATURE_COMMITTED",
                     "CTRL_GENERIC_FEATURE_PUBLISHED",
+                ),
+                (
+                    "CTRL_GENERIC_CONTROL_FEATURE_REPAIR_STAGED",
+                    "CTRL_GENERIC_FEATURE_LOCAL_REPAIR_STAGED",
                 ),
                 (
                     "CTRL_GENERIC_CONTROL_PR_MERGE_CHECKOUT",
@@ -1787,6 +1791,148 @@ class GenericControlFeatureCommittedTests(unittest.TestCase):
         self.assertNotEqual(
             classify(generic_feature_view(branch="feature/other")),
             self.LOCAL,
+        )
+
+
+def generic_feature_repair_staged_view(
+    *,
+    feature_commit_count: int = 1,
+    **overrides: object,
+) -> baseline.CtrlBatonGitView:
+    staged = frozenset({"scripts/validate_baseline.py"})
+    defaults = {
+        "staged": staged,
+        "staged_added": frozenset(),
+        "staged_modified": staged,
+    }
+    defaults.update(overrides)
+    return generic_feature_view(
+        feature_commit_count=feature_commit_count,
+        **defaults,
+    )
+
+
+class GenericControlFeatureRepairStagedTests(unittest.TestCase):
+    STAGED = (
+        "CTRL_GENERIC_CONTROL_FEATURE_REPAIR_STAGED",
+        "CTRL_GENERIC_FEATURE_LOCAL_REPAIR_STAGED",
+    )
+
+    def test_exact_staged_modifications_pass(self) -> None:
+        self.assertEqual(classify(generic_feature_repair_staged_view()), self.STAGED)
+
+    def test_staged_addition_fails(self) -> None:
+        staged = frozenset({"scripts/validate_baseline.py", "docs/new.md"})
+        self.assertNotEqual(
+            classify(
+                generic_feature_repair_staged_view(
+                    staged=staged,
+                    staged_added=frozenset({"docs/new.md"}),
+                    staged_modified=frozenset({"scripts/validate_baseline.py"}),
+                )
+            ),
+            self.STAGED,
+        )
+
+    def test_staged_deletion_fails(self) -> None:
+        staged = frozenset({"scripts/validate_baseline.py"})
+        self.assertNotEqual(
+            classify(
+                generic_feature_repair_staged_view(
+                    staged=staged,
+                    staged_added=frozenset(),
+                    staged_modified=frozenset(),
+                )
+            ),
+            self.STAGED,
+        )
+
+    def test_unstaged_or_untracked_or_conflict_fails(self) -> None:
+        self.assertNotEqual(
+            classify(
+                generic_feature_repair_staged_view(
+                    unstaged=frozenset({"AGENTS.md"})
+                )
+            ),
+            self.STAGED,
+        )
+        self.assertNotEqual(
+            classify(
+                generic_feature_repair_staged_view(
+                    untracked=frozenset({"scratch.txt"})
+                )
+            ),
+            self.STAGED,
+        )
+        self.assertNotEqual(
+            classify(
+                generic_feature_repair_staged_view(
+                    conflicts=frozenset({"README.md"})
+                )
+            ),
+            self.STAGED,
+        )
+
+    def test_wrong_upstream_or_remote_fails(self) -> None:
+        self.assertNotEqual(
+            classify(
+                generic_feature_repair_staged_view(upstream="origin/main")
+            ),
+            self.STAGED,
+        )
+        self.assertNotEqual(
+            classify(
+                generic_feature_repair_staged_view(
+                    feature_remote_oid=GENERIC_HEAD,
+                    upstream=f"origin/{GENERIC_BRANCH}",
+                    all_refs=frozenset(
+                        {
+                            "refs/heads/main",
+                            "refs/remotes/origin/main",
+                            f"refs/heads/{GENERIC_BRANCH}",
+                            f"refs/remotes/origin/{GENERIC_BRANCH}",
+                        }
+                    ),
+                )
+            ),
+            self.STAGED,
+        )
+
+    def test_non_linear_or_over_cap_history_fails(self) -> None:
+        over = baseline.CTRL_GENERIC_FEATURE_AHEAD_MAX + 1
+        self.assertNotEqual(
+            classify(
+                generic_feature_repair_staged_view(
+                    feature_from_main_linear_ok=False
+                )
+            ),
+            self.STAGED,
+        )
+        self.assertNotEqual(
+            classify(
+                generic_feature_repair_staged_view(
+                    feature_commit_count=over
+                )
+            ),
+            self.STAGED,
+        )
+
+    def test_non_control_branch_fails(self) -> None:
+        self.assertNotEqual(
+            classify(generic_feature_repair_staged_view(branch="feature/other")),
+            self.STAGED,
+        )
+
+    def test_empty_staged_is_not_repair_staged(self) -> None:
+        self.assertNotEqual(
+            classify(
+                generic_feature_view(
+                    staged=frozenset(),
+                    staged_added=frozenset(),
+                    staged_modified=frozenset(),
+                )
+            ),
+            self.STAGED,
         )
 
 

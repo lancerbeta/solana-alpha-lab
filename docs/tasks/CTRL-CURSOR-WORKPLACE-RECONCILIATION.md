@@ -6,8 +6,8 @@ phase: control_infrastructure
 canonical_status: REPOSITORY_MIRROR_IN_PROGRESS
 canonical_status_owner: ChatGPT_Project_GPT_Control_Plane
 current_owning_surface: Project_Chat_Pro
-repository_evidence_status: LOCAL_WRITE_STOP_BEFORE_COMMIT
-atom_id: CWR-A1_LIVE_ROUTE_CONTRACT_REPAIR
+repository_evidence_status: LOCAL_COMMIT_STOP_BEFORE_PUSH
+atom_id: CWR-A1D_REPOSITORY_GATE_REPAIR
 provider_api_rpc_calls: 0
 cash_spend_usd: 0
 wallet_signer_transaction_actions: 0
@@ -29,12 +29,14 @@ GitHub Baton and Cursor workplace. Canonical Project Sources and roadmap
 
 ## Active atom
 
+`CWR-A1D_REPOSITORY_GATE_REPAIR` continues the live-route chain started by
 `CWR-A1_LIVE_ROUTE_CONTRACT_REPAIR` on local branch
 `ctrl/live-baton-reconciliation` from accepted base
-`308a062f3c5cb28c1ac9ba1c1fc5fc368f74bd8a` /
-`6e2aaea5c94f00d7d2c6e4c71668f4bb75885b53`.
+`ad98f5d762fe590cc5c82c7e3bc9b5047e9b4a69` /
+`d8a1acb72fb8a66917a4f99169616666d8898e89`.
 
-Authority: `LOCAL_WRITE` only. Stop before staging or commit.
+Authority: bounded six-file local repair plus exactly one second local
+commit with the normal pre-commit hook. Stop before push.
 
 ## Invariants
 
@@ -47,9 +49,14 @@ Authority: `LOCAL_WRITE` only. Stop before staging or commit.
   PR, settings, merge, provider, or destructive authority.
 - `TASK-09` remains READY / NOT_STARTED.
 - Canonical Sources remain unchanged and require later reconciliation.
+- Missing `@{upstream}` is represented as deterministic `NONE` in baton
+  preflight structured output.
+- Generic ctrl repository file count binds the actual committed tree inventory
+  fail-closed, not the historical fixed Baton 225-file checkpoint.
+- Generic ctrl staged repair accepts modified tracked files only.
 
 ## Non-goals
 
-- Commit, push, Draft PR, Issue comment, merge, or canonical status change
+- Push, Draft PR, Issue comment, merge, or canonical status change
 - TASK-09 implementation
 - Dependency, provider, wallet, signer, or real-money action

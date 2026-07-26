@@ -1,9 +1,11 @@
 # tests/test_baton_preflight.py
 from __future__ import annotations
 
+import hashlib
 import json
 import sys
 import unittest
+from contextlib import contextmanager
 from pathlib import Path
 from unittest import mock
 
@@ -28,6 +30,25 @@ def _identity_ok():
     )
 
 
+@contextmanager
+def _git_base(
+    *,
+    branch: str = "main",
+    head: str = "bd152b3199a9ba5c75374bd798b1e81756cd4d9b",
+    tree: str = "a068018e57ad53340ad94321539ed7d1b411bc10",
+    upstream: str = "origin/main",
+    dirty: int = 0,
+):
+    with mock.patch.object(
+        baton_preflight,
+        "run_git",
+        side_effect=[branch, head, tree],
+    ), mock.patch.object(
+        baton_preflight, "read_upstream", return_value=upstream
+    ), mock.patch.object(baton_preflight, "dirty_count", return_value=dirty):
+        yield
+
+
 class BatonPreflightTests(unittest.TestCase):
     @classmethod
     def setUpClass(cls) -> None:
@@ -39,12 +60,7 @@ class BatonPreflightTests(unittest.TestCase):
         cls.body_bytes = (cls.fix / "valid_issue_body.md").read_bytes()
 
     def test_offline_body_no_github_side_effects(self) -> None:
-        with _identity_ok(), mock.patch.object(baton_preflight, "run_git", side_effect=[
-            "main",
-            "bd152b3199a9ba5c75374bd798b1e81756cd4d9b",
-            "a068018e57ad53340ad94321539ed7d1b411bc10",
-            "origin/main",
-        ]), mock.patch.object(baton_preflight, "dirty_count", return_value=0):
+        with _identity_ok(), _git_base():
             result = baton_preflight.preflight(
                 repository="lancerbeta/solana-alpha-lab",
                 issue=1,
@@ -57,14 +73,10 @@ class BatonPreflightTests(unittest.TestCase):
         self.assertEqual(result["side_effects"]["github_reads"], 0)
         self.assertEqual(result["side_effects"]["github_writes"], 0)
         self.assertEqual(result["side_effects"]["local_writes"], 0)
+        self.assertEqual(result["base"]["upstream"], "origin/main")
 
     def test_offline_exact_bytes_accepted(self) -> None:
-        with _identity_ok(), mock.patch.object(baton_preflight, "run_git", side_effect=[
-            "main",
-            "bd152b3199a9ba5c75374bd798b1e81756cd4d9b",
-            "a068018e57ad53340ad94321539ed7d1b411bc10",
-            "origin/main",
-        ]), mock.patch.object(baton_preflight, "dirty_count", return_value=0):
+        with _identity_ok(), _git_base():
             result = baton_preflight.preflight(
                 repository="lancerbeta/solana-alpha-lab",
                 issue=1,
@@ -74,6 +86,70 @@ class BatonPreflightTests(unittest.TestCase):
                 allow_github_read=False,
             )
         self.assertEqual(result["result"], "PASS_READONLY")
+
+    def test_missing_upstream_is_deterministic_none(self) -> None:
+        with mock.patch.object(
+            baton_preflight.subprocess,
+            "run",
+            return_value=mock.Mock(returncode=128, stdout="", stderr="no upstream"),
+        ):
+            self.assertEqual(baton_preflight.read_upstream(), "NONE")
+        with mock.patch.object(
+            baton_preflight.subprocess,
+            "run",
+            return_value=mock.Mock(returncode=0, stdout="\n", stderr=""),
+        ):
+            self.assertEqual(baton_preflight.read_upstream(), "NONE")
+        with mock.patch.object(
+            baton_preflight.subprocess,
+            "run",
+            return_value=mock.Mock(returncode=0, stdout="origin/feature\n", stderr=""),
+        ):
+            self.assertEqual(baton_preflight.read_upstream(), "origin/feature")
+
+    def test_preflight_accepts_none_upstream_when_contract_expects_none(self) -> None:
+        contract = json.loads(
+            extract_contract_payload_bytes(self.body_bytes).decode("utf-8")
+        )
+        contract["repository"]["expected_upstream"] = "NONE"
+        payload = json.dumps(contract, indent=2, ensure_ascii=False).encode("utf-8")
+        body = (
+            BEGIN_MARKER.encode("utf-8")
+            + b"\n"
+            + payload
+            + b"\n"
+            + END_MARKER.encode("utf-8")
+            + b"\n"
+        )
+        digest = hashlib.sha256(payload).hexdigest()
+        with _identity_ok(), _git_base(upstream="NONE"):
+            result = baton_preflight.preflight(
+                repository="lancerbeta/solana-alpha-lab",
+                issue=1,
+                revision=1,
+                expected_contract_sha256=digest,
+                issue_body=body,
+                allow_github_read=False,
+            )
+        self.assertEqual(result["result"], "PASS_READONLY")
+        self.assertEqual(result["base"]["upstream"], "NONE")
+
+    def test_preflight_blocks_when_upstream_expected_but_none(self) -> None:
+        with _identity_ok(), _git_base(upstream="NONE"):
+            result = baton_preflight.preflight(
+                repository="lancerbeta/solana-alpha-lab",
+                issue=1,
+                revision=1,
+                expected_contract_sha256=self.expected,
+                issue_body=self.body,
+                allow_github_read=False,
+            )
+        self.assertEqual(result["result"], "BLOCKED")
+        self.assertTrue(result["contract_hash_ok"])
+        self.assertIn(
+            "expected_upstream:NONE!=origin/main",
+            result["observed_vs_expected"],
+        )
 
     def test_crlf_offline_issue_body_no_silent_normalization(self) -> None:
         payload = extract_contract_payload_bytes(self.body_bytes)
@@ -91,12 +167,7 @@ class BatonPreflightTests(unittest.TestCase):
         with self.assertRaises(BatonContractError) as ctx:
             extract_contract_payload_bytes(raw)
         self.assertEqual(ctx.exception.code, "payload_contains_cr")
-        with _identity_ok(), mock.patch.object(baton_preflight, "run_git", side_effect=[
-            "main",
-            "bd152b3199a9ba5c75374bd798b1e81756cd4d9b",
-            "a068018e57ad53340ad94321539ed7d1b411bc10",
-            "origin/main",
-        ]), mock.patch.object(baton_preflight, "dirty_count", return_value=0):
+        with _identity_ok(), _git_base():
             result = baton_preflight.preflight(
                 repository="lancerbeta/solana-alpha-lab",
                 issue=1,
@@ -126,15 +197,8 @@ class BatonPreflightTests(unittest.TestCase):
         observed_head = "bd152b3199a9ba5c75374bd798b1e81756cd4d9b"
         observed_tree = "a068018e57ad53340ad94321539ed7d1b411bc10"
         # Hash must match payload so base mismatch is the blocking cause.
-        import hashlib
-
         digest = hashlib.sha256(payload).hexdigest()
-        with _identity_ok(), mock.patch.object(baton_preflight, "run_git", side_effect=[
-            "main",
-            observed_head,
-            observed_tree,
-            "origin/main",
-        ]), mock.patch.object(baton_preflight, "dirty_count", return_value=0):
+        with _identity_ok(), _git_base(head=observed_head, tree=observed_tree):
             result = baton_preflight.preflight(
                 repository="lancerbeta/solana-alpha-lab",
                 issue=1,
@@ -164,17 +228,10 @@ class BatonPreflightTests(unittest.TestCase):
             + payload
             + b"\n<!-- SMIAL-BATON-CONTRACT-END -->\n"
         )
-        import hashlib
-
         digest = hashlib.sha256(payload).hexdigest()
         observed_head = "bd152b3199a9ba5c75374bd798b1e81756cd4d9b"
         observed_tree = "a068018e57ad53340ad94321539ed7d1b411bc10"
-        with _identity_ok(), mock.patch.object(baton_preflight, "run_git", side_effect=[
-            "main",
-            observed_head,
-            observed_tree,
-            "origin/main",
-        ]), mock.patch.object(baton_preflight, "dirty_count", return_value=0):
+        with _identity_ok(), _git_base(head=observed_head, tree=observed_tree):
             result = baton_preflight.preflight(
                 repository="lancerbeta/solana-alpha-lab",
                 issue=1,
@@ -222,12 +279,7 @@ class BatonPreflightTests(unittest.TestCase):
             baton_preflight,
             "fetch_issue_body_live",
             return_value=(self.body, 1, 0),
-        ) as fetch, mock.patch.object(baton_preflight, "run_git", side_effect=[
-            "main",
-            "bd152b3199a9ba5c75374bd798b1e81756cd4d9b",
-            "a068018e57ad53340ad94321539ed7d1b411bc10",
-            "origin/main",
-        ]), mock.patch.object(baton_preflight, "dirty_count", return_value=0):
+        ) as fetch, _git_base():
             result = baton_preflight.preflight(
                 repository="lancerbeta/solana-alpha-lab",
                 issue=42,
@@ -249,6 +301,8 @@ class BatonPreflightTests(unittest.TestCase):
         self.assertIn("gh", source)
         self.assertIn("--allow-github-read", source)
         self.assertIn("read_bytes()", source)
+        self.assertIn("def read_upstream", source)
+        self.assertIn('return "NONE"', source)
 
     def test_exact_https_origin_identity_pass(self) -> None:
         for origin in (

@@ -115,6 +115,21 @@ def run_git(args: list[str]) -> str:
     return completed.stdout.strip()
 
 
+def read_upstream() -> str:
+    """Return the configured upstream, or deterministic NONE when unset."""
+    completed = subprocess.run(
+        ["git", "rev-parse", "--abbrev-ref", "@{upstream}"],
+        cwd=ROOT,
+        check=False,
+        capture_output=True,
+        text=True,
+    )
+    if completed.returncode != 0:
+        return "NONE"
+    text = completed.stdout.strip()
+    return text if text else "NONE"
+
+
 def dirty_count() -> int:
     text = subprocess.run(
         ["git", "status", "--porcelain", "-uall"],
@@ -265,7 +280,7 @@ def preflight(
     branch = run_git(["rev-parse", "--abbrev-ref", "HEAD"])
     head = run_git(["rev-parse", "HEAD"])
     tree = run_git(["rev-parse", "HEAD^{tree}"])
-    upstream = run_git(["rev-parse", "--abbrev-ref", "@{upstream}"])
+    upstream = read_upstream()
     dirty = dirty_count()
     base = {
         "branch": branch,
