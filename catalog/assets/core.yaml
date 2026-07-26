@@ -2024,7 +2024,7 @@ records:
     repository_path: scripts/validate_baseline.py
   integrity:
     kind: sha256
-    sha256: 154ccaedf18d658dd2593deda43f1ce6b003d3df09a0fd1f7bd6685d9712dc51
+    sha256: 88926eeae51c08c0d4bc91f25a23a0600939709f10c1703b2e3b51c0e9d2e474
   access:
     mode: read_only
     method: command

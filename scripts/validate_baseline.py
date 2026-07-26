@@ -3833,6 +3833,8 @@ def validate() -> None:
         expected_file_count = TASK08_EXPECTED_REPOSITORY_FILE_COUNT
     elif state in CTRL_BATON_A62_REPOSITORY_STATES:
         expected_file_count = ctrl_baton_a62r_expected_repository_file_count()
+    elif state in CTRL_GENERIC_REPOSITORY_STATES:
+        expected_file_count = ctrl_baton_a62r_expected_repository_file_count()
     elif state in TASK07_REPOSITORY_STATES:
         expected_file_count = TASK07_EXPECTED_REPOSITORY_FILE_COUNT
     elif state in TASK06_FINALIZATION_REPOSITORY_STATES:
