@@ -1368,6 +1368,318 @@ class LegacyRegressionTests(unittest.TestCase):
                 ),
             },
         )
+        self.assertEqual(
+            len(baseline.CTRL_GENERIC_LIFECYCLE_COMBINATIONS),
+            3,
+        )
+        self.assertEqual(
+            baseline.CTRL_GENERIC_LIFECYCLE_COMBINATIONS,
+            {
+                (
+                    "CTRL_GENERIC_CONTROL_FEATURE_COMMITTED",
+                    "CTRL_GENERIC_FEATURE_LOCAL",
+                ),
+                (
+                    "CTRL_GENERIC_CONTROL_FEATURE_COMMITTED",
+                    "CTRL_GENERIC_FEATURE_PUBLISHED",
+                ),
+                (
+                    "CTRL_GENERIC_CONTROL_PR_MERGE_CHECKOUT",
+                    "CTRL_GENERIC_PR_MERGE_CHECKOUT",
+                ),
+            },
+        )
+
+
+GENERIC_BRANCH = "ctrl/cursor-workplace-validation"
+GENERIC_BASE = "a" * 40
+GENERIC_HEAD = "b" * 40
+GENERIC_TREE = "c" * 40
+GENERIC_MERGE = "d" * 40
+
+
+def generic_feature_view(**overrides: object) -> baseline.CtrlBatonGitView:
+    refs = frozenset(
+        {
+            "refs/heads/main",
+            "refs/remotes/origin/main",
+            f"refs/heads/{GENERIC_BRANCH}",
+        }
+    )
+    view = baseline.CtrlBatonGitView(
+        GENERIC_BRANCH,
+        GENERIC_HEAD,
+        (GENERIC_BASE,),
+        (GENERIC_BASE,),
+        GENERIC_TREE,
+        GENERIC_TREE,
+        GENERIC_BASE,
+        GENERIC_BASE,
+        GENERIC_HEAD,
+        None,
+        None,
+        frozenset({"origin"}),
+        (baseline.EXPECTED_ORIGIN_URL,),
+        (baseline.EXPECTED_ORIGIN_URL,),
+        (baseline.EXPECTED_ORIGIN_FETCH_REFSPEC,),
+        (),
+        refs,
+        EXPECTED_TRACKED,
+        frozenset(),
+        frozenset(),
+        frozenset(),
+        frozenset(),
+        frozenset(),
+        frozenset(),
+        frozenset({"scripts/validate_baseline.py"}),
+        "fix(control): isolate lifecycle skills in Cursor",
+        1,
+        frozenset(),
+        None,
+        len(EXPECTED_TRACKED),
+        "0.8.4",
+    )
+    return view._replace(**overrides)
+
+
+def generic_feature_published_view(**overrides: object) -> baseline.CtrlBatonGitView:
+    view = generic_feature_view(
+        feature_remote_oid=GENERIC_HEAD,
+        upstream=f"origin/{GENERIC_BRANCH}",
+        all_refs=frozenset(
+            {
+                "refs/heads/main",
+                "refs/remotes/origin/main",
+                f"refs/heads/{GENERIC_BRANCH}",
+                f"refs/remotes/origin/{GENERIC_BRANCH}",
+            }
+        ),
+    )
+    return view._replace(**overrides)
+
+
+def generic_pr_view(**overrides: object) -> baseline.CtrlBatonGitView:
+    refs = frozenset(
+        {
+            "refs/remotes/origin/main",
+            f"refs/remotes/origin/{GENERIC_BRANCH}",
+            "refs/remotes/pull/2/merge",
+        }
+    )
+    view = generic_feature_view(
+        branch=None,
+        head_oid=GENERIC_MERGE,
+        head_parents=(GENERIC_BASE, GENERIC_HEAD),
+        main_oid=None,
+        origin_main_oid=None,
+        feature_local_oid=None,
+        feature_remote_oid=GENERIC_HEAD,
+        fetch_urls=("https://github.com/lancerbeta/solana-alpha-lab",),
+        push_urls=("https://github.com/lancerbeta/solana-alpha-lab",),
+        all_refs=refs,
+        upstream=None,
+    )
+    return view._replace(**overrides)
+
+
+def generic_pr_github_context(**overrides: object) -> baseline.CtrlBatonGithubContext:
+    context = baseline.CtrlBatonGithubContext(
+        True,
+        baseline.EXPECTED_GITHUB_REPOSITORY,
+        "pull_request",
+        "refs/pull/2/merge",
+        GENERIC_MERGE,
+        "main",
+        GENERIC_BRANCH,
+        2,
+        None,
+        "main",
+        GENERIC_BASE,
+        GENERIC_BRANCH,
+        GENERIC_HEAD,
+        None,
+        None,
+    )
+    return context._replace(**overrides)
+
+
+class GenericControlFeatureCommittedTests(unittest.TestCase):
+    LOCAL = (
+        "CTRL_GENERIC_CONTROL_FEATURE_COMMITTED",
+        "CTRL_GENERIC_FEATURE_LOCAL",
+    )
+    PUBLISHED = (
+        "CTRL_GENERIC_CONTROL_FEATURE_COMMITTED",
+        "CTRL_GENERIC_FEATURE_PUBLISHED",
+    )
+
+    def test_exact_local_generic_control_branch_passes(self) -> None:
+        self.assertEqual(classify(generic_feature_view()), self.LOCAL)
+
+    def test_exact_published_generic_control_branch_passes(self) -> None:
+        self.assertEqual(
+            classify(generic_feature_published_view()),
+            self.PUBLISHED,
+        )
+
+    def test_historical_baton_branch_is_not_generic(self) -> None:
+        self.assertNotEqual(
+            classify(
+                generic_feature_view(branch=baseline.CTRL_BATON_FEATURE_BRANCH)
+            ),
+            self.LOCAL,
+        )
+
+    def test_direct_main_fails(self) -> None:
+        self.assertNotEqual(
+            classify(
+                generic_feature_view(
+                    branch="main",
+                    head_oid=GENERIC_BASE,
+                    head_parents=(INTERMEDIATE,),
+                    feature_local_oid=GENERIC_BASE,
+                )
+            ),
+            self.LOCAL,
+        )
+
+    def test_wrong_base_or_head_fails(self) -> None:
+        self.assertNotEqual(
+            classify(generic_feature_view(head_parents=(INTERMEDIATE,))),
+            self.LOCAL,
+        )
+        self.assertNotEqual(
+            classify(generic_feature_view(main_oid=INTERMEDIATE)),
+            self.LOCAL,
+        )
+        self.assertNotEqual(
+            classify(generic_feature_view(origin_main_oid=INTERMEDIATE)),
+            self.LOCAL,
+        )
+
+    def test_dirty_worktree_fails(self) -> None:
+        self.assertNotEqual(
+            classify(
+                generic_feature_view(
+                    unstaged=frozenset({"scripts/validate_baseline.py"})
+                )
+            ),
+            self.LOCAL,
+        )
+
+    def test_merge_commit_on_feature_fails(self) -> None:
+        self.assertNotEqual(
+            classify(
+                generic_feature_view(head_parents=(GENERIC_BASE, GENERIC_HEAD))
+            ),
+            self.LOCAL,
+        )
+
+    def test_non_control_branch_fails(self) -> None:
+        self.assertNotEqual(
+            classify(generic_feature_view(branch="feature/other")),
+            self.LOCAL,
+        )
+
+
+class GenericControlPullRequestCheckoutTests(unittest.TestCase):
+    EXPECTED = (
+        "CTRL_GENERIC_CONTROL_PR_MERGE_CHECKOUT",
+        "CTRL_GENERIC_PR_MERGE_CHECKOUT",
+    )
+
+    def test_exact_generic_pr_merge_checkout_passes(self) -> None:
+        self.assertEqual(
+            classify(generic_pr_view(), generic_pr_github_context()),
+            self.EXPECTED,
+        )
+
+    def test_squash_or_fast_forward_fails(self) -> None:
+        self.assertNotEqual(
+            classify(
+                generic_pr_view(head_parents=(GENERIC_BASE,)),
+                generic_pr_github_context(),
+            ),
+            self.EXPECTED,
+        )
+        self.assertNotEqual(
+            classify(
+                generic_pr_view(head_parents=(GENERIC_HEAD,)),
+                generic_pr_github_context(event_head_sha=GENERIC_HEAD),
+            ),
+            self.EXPECTED,
+        )
+
+    def test_wrong_event_base_or_head_fails(self) -> None:
+        self.assertNotEqual(
+            classify(
+                generic_pr_view(),
+                generic_pr_github_context(event_base_sha=INTERMEDIATE),
+            ),
+            self.EXPECTED,
+        )
+        self.assertNotEqual(
+            classify(
+                generic_pr_view(),
+                generic_pr_github_context(event_head_sha=INTERMEDIATE),
+            ),
+            self.EXPECTED,
+        )
+        self.assertNotEqual(
+            classify(
+                generic_pr_view(),
+                generic_pr_github_context(head_ref="feature/other"),
+            ),
+            self.EXPECTED,
+        )
+
+    def test_attached_branch_fails(self) -> None:
+        self.assertNotEqual(
+            classify(
+                generic_pr_view(branch=GENERIC_BRANCH),
+                generic_pr_github_context(),
+            ),
+            self.EXPECTED,
+        )
+
+    def test_swapped_parents_fail(self) -> None:
+        self.assertNotEqual(
+            classify(
+                generic_pr_view(head_parents=(GENERIC_HEAD, GENERIC_BASE)),
+                generic_pr_github_context(),
+            ),
+            self.EXPECTED,
+        )
+
+    def test_merge_tree_drift_fails(self) -> None:
+        self.assertNotEqual(
+            classify(
+                generic_pr_view(head_tree_oid=MERGE_TREE_DRIFT),
+                generic_pr_github_context(),
+            ),
+            self.EXPECTED,
+        )
+
+    def test_dirty_worktree_fails(self) -> None:
+        self.assertNotEqual(
+            classify(
+                generic_pr_view(unstaged=frozenset({"README.md"})),
+                generic_pr_github_context(),
+            ),
+            self.EXPECTED,
+        )
+
+    def test_historical_baton_head_ref_is_not_generic(self) -> None:
+        self.assertNotEqual(
+            classify(
+                generic_pr_view(),
+                generic_pr_github_context(
+                    head_ref=baseline.CTRL_BATON_FEATURE_BRANCH,
+                    event_head_ref=baseline.CTRL_BATON_FEATURE_BRANCH,
+                ),
+            ),
+            self.EXPECTED,
+        )
 
 
 if __name__ == "__main__":
