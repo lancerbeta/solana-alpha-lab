@@ -1495,7 +1495,6 @@ def generic_pr_view(
 ) -> baseline.CtrlBatonGitView:
     refs = frozenset(
         {
-            "refs/heads/main",
             "refs/remotes/origin/main",
             f"refs/remotes/origin/{GENERIC_BRANCH}",
             "refs/remotes/pull/2/merge",
@@ -1508,7 +1507,7 @@ def generic_pr_view(
         head_parents=(GENERIC_BASE, GENERIC_HEAD),
         feature_parents=(feature_parent,),
         main_oid=None,
-        origin_main_oid=None,
+        origin_main_oid=GENERIC_BASE,
         feature_local_oid=None,
         feature_remote_oid=GENERIC_HEAD,
         fetch_urls=("https://github.com/lancerbeta/solana-alpha-lab",),
@@ -1724,6 +1723,31 @@ class GenericControlPullRequestCheckoutTests(unittest.TestCase):
             self.EXPECTED,
         )
 
+    def test_detached_checkout_without_local_main_passes(self) -> None:
+        self.assertIsNone(generic_pr_view().main_oid)
+        self.assertNotIn("refs/heads/main", generic_pr_view().all_refs)
+        self.assertEqual(
+            classify(generic_pr_view(), generic_pr_github_context()),
+            self.EXPECTED,
+        )
+
+    def test_optional_local_main_matching_base_passes(self) -> None:
+        refs = frozenset(
+            {
+                "refs/heads/main",
+                "refs/remotes/origin/main",
+                f"refs/remotes/origin/{GENERIC_BRANCH}",
+                "refs/remotes/pull/2/merge",
+            }
+        )
+        self.assertEqual(
+            classify(
+                generic_pr_view(main_oid=GENERIC_BASE, all_refs=refs),
+                generic_pr_github_context(),
+            ),
+            self.EXPECTED,
+        )
+
     def test_bounded_linear_feature_histories_pass(self) -> None:
         for feature_commit_count in (1, 2, 6, baseline.CTRL_GENERIC_FEATURE_AHEAD_MAX):
             with self.subTest(feature_commit_count=feature_commit_count):
@@ -1737,13 +1761,13 @@ class GenericControlPullRequestCheckoutTests(unittest.TestCase):
                     self.EXPECTED,
                 )
 
-    def test_extra_origin_baton_setup_ref_does_not_block(self) -> None:
+    def test_extra_historical_and_generic_ctrl_refs_pass(self) -> None:
         refs = frozenset(
             {
-                "refs/heads/main",
                 "refs/remotes/origin/main",
                 f"refs/remotes/origin/{GENERIC_BRANCH}",
                 f"refs/remotes/origin/{baseline.CTRL_BATON_FEATURE_BRANCH}",
+                "refs/remotes/origin/ctrl/other-control",
                 "refs/remotes/pull/2/merge",
             }
         )
@@ -1783,6 +1807,47 @@ class GenericControlPullRequestCheckoutTests(unittest.TestCase):
         self.assertNotEqual(
             classify(
                 generic_pr_view(feature_ahead_linear_ok=False),
+                generic_pr_github_context(),
+            ),
+            self.EXPECTED,
+        )
+
+    def test_missing_origin_main_ref_fails(self) -> None:
+        refs = frozenset(
+            {
+                f"refs/remotes/origin/{GENERIC_BRANCH}",
+                "refs/remotes/pull/2/merge",
+            }
+        )
+        self.assertNotEqual(
+            classify(
+                generic_pr_view(all_refs=refs),
+                generic_pr_github_context(),
+            ),
+            self.EXPECTED,
+        )
+
+    def test_origin_main_oid_mismatch_fails(self) -> None:
+        self.assertNotEqual(
+            classify(
+                generic_pr_view(origin_main_oid=INTERMEDIATE),
+                generic_pr_github_context(),
+            ),
+            self.EXPECTED,
+        )
+
+    def test_optional_local_main_mismatch_fails(self) -> None:
+        refs = frozenset(
+            {
+                "refs/heads/main",
+                "refs/remotes/origin/main",
+                f"refs/remotes/origin/{GENERIC_BRANCH}",
+                "refs/remotes/pull/2/merge",
+            }
+        )
+        self.assertNotEqual(
+            classify(
+                generic_pr_view(main_oid=INTERMEDIATE, all_refs=refs),
                 generic_pr_github_context(),
             ),
             self.EXPECTED,
@@ -1866,7 +1931,6 @@ class GenericControlPullRequestCheckoutTests(unittest.TestCase):
     def test_extra_non_control_ref_fails(self) -> None:
         refs = frozenset(
             {
-                "refs/heads/main",
                 "refs/remotes/origin/main",
                 f"refs/remotes/origin/{GENERIC_BRANCH}",
                 "refs/remotes/origin/feature/other",
@@ -1884,7 +1948,6 @@ class GenericControlPullRequestCheckoutTests(unittest.TestCase):
     def test_unexpected_pull_ref_fails(self) -> None:
         refs = frozenset(
             {
-                "refs/heads/main",
                 "refs/remotes/origin/main",
                 f"refs/remotes/origin/{GENERIC_BRANCH}",
                 "refs/remotes/pull/2/merge",

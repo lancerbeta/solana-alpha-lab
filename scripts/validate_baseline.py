@@ -1524,7 +1524,6 @@ def ctrl_generic_pr_refs_ok(
     head_ref: str,
 ) -> bool:
     required = {
-        "refs/heads/main",
         "refs/remotes/origin/main",
         f"refs/remotes/origin/{head_ref}",
         f"refs/remotes/pull/{number}/merge",
@@ -2010,6 +2009,10 @@ def classify_ctrl_generic_pr_merge_checkout(
         return False
     base_oid, feature_oid = view.head_parents
     ahead_count = view.feature_ahead_count
+    if "refs/heads/main" in view.all_refs:
+        local_main_ok = view.main_oid == base_oid
+    else:
+        local_main_ok = view.main_oid in {None, base_oid}
     return (
         github.actions
         and github.repository == EXPECTED_GITHUB_REPOSITORY
@@ -2028,6 +2031,8 @@ def classify_ctrl_generic_pr_merge_checkout(
         and re.fullmatch(r"[0-9a-f]{40}", base_oid or "") is not None
         and re.fullmatch(r"[0-9a-f]{40}", feature_oid or "") is not None
         and feature_oid != base_oid
+        and view.origin_main_oid == base_oid
+        and local_main_ok
         and view.feature_remote_ancestor_ok is True
         and view.feature_ahead_linear_ok is True
         and isinstance(ahead_count, int)
