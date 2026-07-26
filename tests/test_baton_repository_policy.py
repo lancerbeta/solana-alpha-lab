@@ -1467,7 +1467,11 @@ GENERIC_AHEAD_HEAD = "2" * 40
 GENERIC_AHEAD_TREE = "3" * 40
 
 
-def generic_feature_ahead_view(**overrides: object) -> baseline.CtrlBatonGitView:
+def generic_feature_ahead_view(
+    *,
+    ahead_count: int = 1,
+    **overrides: object,
+) -> baseline.CtrlBatonGitView:
     view = generic_feature_published_view(
         head_oid=GENERIC_AHEAD_HEAD,
         head_parents=(GENERIC_REMOTE_TIP,),
@@ -1476,6 +1480,10 @@ def generic_feature_ahead_view(**overrides: object) -> baseline.CtrlBatonGitView
         feature_tree_oid=GENERIC_AHEAD_TREE,
         feature_local_oid=GENERIC_AHEAD_HEAD,
         feature_remote_oid=GENERIC_REMOTE_TIP,
+        feature_ahead_count=ahead_count,
+        feature_remote_ancestor_ok=True,
+        feature_ahead_linear_ok=True,
+        feature_based_on_main_ok=True,
     )
     return view._replace(**overrides)
 
@@ -1549,27 +1557,37 @@ class GenericControlFeatureCommittedTests(unittest.TestCase):
         )
 
     def test_exact_ahead_of_published_generic_control_branch_passes(self) -> None:
-        self.assertEqual(classify(generic_feature_ahead_view()), self.AHEAD)
+        for ahead_count in (1, 2, 3, baseline.CTRL_GENERIC_FEATURE_AHEAD_MAX):
+            with self.subTest(ahead_count=ahead_count):
+                self.assertEqual(
+                    classify(generic_feature_ahead_view(ahead_count=ahead_count)),
+                    self.AHEAD,
+                )
 
-    def test_ahead_wrong_parent_fails(self) -> None:
-        self.assertNotEqual(
-            classify(generic_feature_ahead_view(head_parents=(GENERIC_BASE,))),
-            self.AHEAD,
-        )
-        self.assertNotEqual(
-            classify(generic_feature_ahead_view(feature_parents=(GENERIC_BASE,))),
-            self.AHEAD,
-        )
-
-    def test_ahead_two_or_more_commits_fails(self) -> None:
+    def test_ahead_over_max_fails(self) -> None:
         self.assertNotEqual(
             classify(
                 generic_feature_ahead_view(
-                    head_parents=(INTERMEDIATE,),
-                    feature_parents=(INTERMEDIATE,),
-                    feature_remote_oid=GENERIC_REMOTE_TIP,
+                    ahead_count=baseline.CTRL_GENERIC_FEATURE_AHEAD_MAX + 1
                 )
             ),
+            self.AHEAD,
+        )
+
+    def test_ahead_remote_not_ancestor_fails(self) -> None:
+        self.assertNotEqual(
+            classify(
+                generic_feature_ahead_view(
+                    feature_remote_ancestor_ok=False,
+                    feature_ahead_linear_ok=False,
+                )
+            ),
+            self.AHEAD,
+        )
+
+    def test_ahead_merge_in_range_fails(self) -> None:
+        self.assertNotEqual(
+            classify(generic_feature_ahead_view(feature_ahead_linear_ok=False)),
             self.AHEAD,
         )
 
@@ -1579,11 +1597,31 @@ class GenericControlFeatureCommittedTests(unittest.TestCase):
             self.AHEAD,
         )
 
+    def test_ahead_main_drift_fails(self) -> None:
+        self.assertNotEqual(
+            classify(generic_feature_ahead_view(origin_main_oid=INTERMEDIATE)),
+            self.AHEAD,
+        )
+        self.assertNotEqual(
+            classify(generic_feature_ahead_view(feature_based_on_main_ok=False)),
+            self.AHEAD,
+        )
+
     def test_ahead_dirty_worktree_fails(self) -> None:
         self.assertNotEqual(
             classify(
                 generic_feature_ahead_view(
                     unstaged=frozenset({"scripts/validate_baseline.py"})
+                )
+            ),
+            self.AHEAD,
+        )
+
+    def test_ahead_historical_baton_branch_is_not_generic(self) -> None:
+        self.assertNotEqual(
+            classify(
+                generic_feature_ahead_view(
+                    branch=baseline.CTRL_BATON_FEATURE_BRANCH
                 )
             ),
             self.AHEAD,

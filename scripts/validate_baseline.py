@@ -632,6 +632,7 @@ CTRL_BATON_A62_LIFECYCLE_COMBINATIONS = {
 CTRL_GENERIC_CONTROL_BRANCH_RE = re.compile(
     r"^ctrl/[A-Za-z0-9][A-Za-z0-9._/-]*$"
 )
+CTRL_GENERIC_FEATURE_AHEAD_MAX = 16
 CTRL_GENERIC_REPOSITORY_STATES = {
     "CTRL_GENERIC_CONTROL_FEATURE_COMMITTED",
     "CTRL_GENERIC_CONTROL_PR_MERGE_CHECKOUT",
@@ -909,8 +910,12 @@ CtrlBatonGitView = namedtuple(
         "index_catalog_version",
         "head_tree_path_count",
         "head_catalog_version",
+        "feature_ahead_count",
+        "feature_remote_ancestor_ok",
+        "feature_ahead_linear_ok",
+        "feature_based_on_main_ok",
     ),
-    defaults=(None, None, None, None, None, None),
+    defaults=(None, None, None, None, None, None, None, None, None, None),
 )
 
 CtrlBatonGithubContext = namedtuple(
@@ -1931,9 +1936,8 @@ def classify_ctrl_generic_feature_ahead_of_published(
         return False
     if view.branch == CTRL_BATON_FEATURE_BRANCH:
         return False
-    if len(view.head_parents) != 1:
-        return False
     remote_oid = view.feature_remote_oid
+    ahead_count = view.feature_ahead_count
     return (
         not github.actions
         and ctrl_baton_origin_identity_ok(view, github_actions=False)
@@ -1944,13 +1948,15 @@ def classify_ctrl_generic_feature_ahead_of_published(
         and view.main_oid == view.origin_main_oid
         and view.head_oid != view.main_oid
         and remote_oid != view.head_oid
-        and remote_oid != view.main_oid
-        and view.head_parents == (remote_oid,)
         and view.feature_local_oid == view.head_oid
-        and view.feature_parents == (remote_oid,)
         and view.feature_tree_oid == view.head_tree_oid
         and view.upstream == f"origin/{view.branch}"
         and f"refs/remotes/origin/{view.branch}" in view.all_refs
+        and view.feature_remote_ancestor_ok is True
+        and view.feature_ahead_linear_ok is True
+        and view.feature_based_on_main_ok is True
+        and isinstance(ahead_count, int)
+        and 1 <= ahead_count <= CTRL_GENERIC_FEATURE_AHEAD_MAX
         and ctrl_generic_clean_worktree(view)
         and ctrl_generic_feature_refs_ok(view, view.branch)
     )
@@ -2224,6 +2230,23 @@ def git_commit_count_after_base(base_oid: str, target_oid: str) -> int | None:
     return int(value)
 
 
+def git_is_ancestor(ancestor_oid: str, descendant_oid: str) -> bool:
+    result = run(
+        ["git", "merge-base", "--is-ancestor", ancestor_oid, descendant_oid]
+    )
+    return result.returncode == 0
+
+
+def git_range_merge_count(base_oid: str, target_oid: str) -> int | None:
+    result = run(
+        ["git", "rev-list", "--count", "--merges", f"{base_oid}..{target_oid}"]
+    )
+    value = result.stdout.strip()
+    if result.returncode != 0 or not value.isdigit():
+        return None
+    return int(value)
+
+
 def git_diff_paths(base_oid: str, target_oid: str) -> frozenset[str] | None:
     code, paths = command_set(
         ["git", "diff", "--name-only", base_oid, target_oid, "--"]
@@ -2330,6 +2353,34 @@ def collect_ctrl_baton_git_view(
     if any(code != 0 for code in (added_code, modified_code, conflict_code)):
         raise AssertionError("ctrl_baton_inventory_read_failed")
 
+    origin_main_oid = optional_git_oid("refs/remotes/origin/main")
+    feature_ahead_count = None
+    feature_remote_ancestor_ok = None
+    feature_ahead_linear_ok = None
+    feature_based_on_main_ok = None
+    if (
+        isinstance(feature_remote_oid, str)
+        and re.fullmatch(r"[0-9a-f]{40}", feature_remote_oid) is not None
+        and re.fullmatch(r"[0-9a-f]{40}", head_oid) is not None
+    ):
+        feature_remote_ancestor_ok = git_is_ancestor(feature_remote_oid, head_oid)
+        if feature_remote_ancestor_ok:
+            feature_ahead_count = git_commit_count_after_base(
+                feature_remote_oid, head_oid
+            )
+            merge_count = git_range_merge_count(feature_remote_oid, head_oid)
+            feature_ahead_linear_ok = (
+                merge_count == 0 if merge_count is not None else None
+            )
+        else:
+            feature_ahead_linear_ok = False
+    if (
+        isinstance(origin_main_oid, str)
+        and re.fullmatch(r"[0-9a-f]{40}", origin_main_oid) is not None
+        and re.fullmatch(r"[0-9a-f]{40}", head_oid) is not None
+    ):
+        feature_based_on_main_ok = git_is_ancestor(origin_main_oid, head_oid)
+
     return CtrlBatonGitView(
         branch,
         head_oid,
@@ -2338,7 +2389,7 @@ def collect_ctrl_baton_git_view(
         git_tree_oid(head_oid),
         git_tree_oid(feature_oid),
         main_oid,
-        optional_git_oid("refs/remotes/origin/main"),
+        origin_main_oid,
         feature_local_oid,
         feature_remote_oid,
         upstream,
@@ -2362,6 +2413,10 @@ def collect_ctrl_baton_git_view(
         git_index_catalog_version(),
         git_tree_path_count(head_oid),
         git_commit_catalog_version(head_oid),
+        feature_ahead_count,
+        feature_remote_ancestor_ok,
+        feature_ahead_linear_ok,
+        feature_based_on_main_ok,
     )
 
 
