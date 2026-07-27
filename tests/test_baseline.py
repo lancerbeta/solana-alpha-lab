@@ -399,7 +399,7 @@ class RepositoryStatePolicyTests(unittest.TestCase):
             "head_oid": module.TASK09_BASE_COMMIT_OID,
             "commit_count": module.TASK09_BASE_COMMIT_COUNT,
             "parent_oid": module.TASK09_BASE_PARENT_OID,
-            "tracked": module.task09_repository_files(),
+            "tracked": module.task09_atom2_repository_files(),
             "staged": set(module.TASK09_CHANGED_FILES),
             "untracked": set(),
             "unstaged": set(),
@@ -420,7 +420,7 @@ class RepositoryStatePolicyTests(unittest.TestCase):
     def test_task09_atom2_policy_repair_state_is_fail_closed(self) -> None:
         missing = set(module.TASK09_CHANGED_FILES)
         missing.remove("tests/test_baton_repository_policy.py")
-        tracked_missing = module.task09_repository_files()
+        tracked_missing = module.task09_atom2_repository_files()
         tracked_missing.remove(
             "docs/contracts/pumpswap_touch_observation_contract_v1.md"
         )
@@ -493,11 +493,130 @@ class RepositoryStatePolicyTests(unittest.TestCase):
             },
         )
         self.assertEqual(len(module.TASK09_CHANGED_FILES), 14)
-        self.assertEqual(module.TASK09_EXPECTED_REPOSITORY_FILE_COUNT, 229)
+        self.assertEqual(
+            module.TASK09_ATOM2_EXPECTED_REPOSITORY_FILE_COUNT,
+            229,
+        )
+        self.assertEqual(
+            module.TASK09_ATOM2_COMMIT_OID,
+            "fca6b3ee581954b0a4e5e3972c74db09c5f921e5",
+        )
+        self.assertEqual(
+            module.TASK09_ATOM2_TREE_OID,
+            "1fe2784ebe199c6b71c16c059ea8413397195593",
+        )
+        self.assertEqual(module.TASK09_ATOM2_COMMIT_COUNT, 40)
+        self.assertEqual(
+            module.TASK09_ATOM2_COMMIT_SUBJECT,
+            "feat: freeze TASK-09 PumpSwap Touch contract",
+        )
+        self.assertEqual(
+            module.TASK09_ATOM3_CREATED_FILES,
+            {
+                "src/solana_alpha_lab/pumpswap_touch_decoder.py",
+                "tests/fixtures/task09/pumpswap_idl_subset_v1.json",
+                "tests/test_task09_pumpswap_touch_decoder.py",
+            },
+        )
+        self.assertEqual(
+            module.TASK09_ATOM3_MODIFIED_FILES,
+            {
+                "catalog/assets/core.yaml",
+                "catalog/catalog_manifest.yaml",
+                "docs/contracts/pumpswap_touch_observation_contract_v1.md",
+                "scripts/validate_baseline.py",
+                "scripts/validate_task04.py",
+                "tests/test_baseline.py",
+                "tests/test_baton_repository_policy.py",
+                "tests/test_task04_core_stack.py",
+                "tests/test_task05_catalog_queries.py",
+                "tests/test_task06_catalog.py",
+                "tests/test_task07_catalog.py",
+                "tests/test_task08_catalog.py",
+            },
+        )
+        self.assertEqual(len(module.TASK09_ATOM3_CHANGED_FILES), 15)
+        self.assertEqual(module.TASK09_EXPECTED_REPOSITORY_FILE_COUNT, 232)
         self.assertEqual(module.TASK09_BASE_CATALOG_VERSION, "0.8.5")
-        self.assertEqual(module.TASK09_EXPECTED_CATALOG_VERSION, "0.8.6")
+        self.assertEqual(
+            module.TASK09_ATOM2_EXPECTED_CATALOG_VERSION,
+            "0.8.6",
+        )
+        self.assertEqual(module.TASK09_EXPECTED_CATALOG_VERSION, "0.8.7")
         self.assertEqual(module.TASK09_EXPECTED_CATALOG_ASSET_COUNT, 191)
         self.assertEqual(module.TASK09_EXPECTED_CATALOG_QUERY_COUNT, 7)
+
+    def classify_task09_atom3(
+        self,
+        *,
+        committed: bool = False,
+        **overrides: object,
+    ) -> str:
+        arguments = {
+            "head_oid": (
+                "1" * 40 if committed else module.TASK09_ATOM2_COMMIT_OID
+            ),
+            "commit_count": (
+                module.TASK09_ATOM3_COMMIT_COUNT
+                if committed
+                else module.TASK09_ATOM2_COMMIT_COUNT
+            ),
+            "parent_oid": (
+                module.TASK09_ATOM2_COMMIT_OID
+                if committed
+                else module.TASK09_BASE_COMMIT_OID
+            ),
+            "tracked": module.task09_repository_files(),
+            "staged": (
+                set() if committed else set(module.TASK09_ATOM3_CHANGED_FILES)
+            ),
+            "untracked": set(),
+            "unstaged": set(),
+            "commit_subject": (
+                module.TASK09_ATOM3_COMMIT_SUBJECT
+                if committed
+                else module.TASK09_ATOM2_COMMIT_SUBJECT
+            ),
+            "commit_changed": (
+                set(module.TASK09_ATOM3_CHANGED_FILES)
+                if committed
+                else set(module.TASK09_CHANGED_FILES)
+            ),
+        }
+        arguments.update(overrides)
+        return module.classify_state(**arguments)
+
+    def test_task09_atom3_staged_and_committed_states_pass(self) -> None:
+        self.assertEqual(
+            self.classify_task09_atom3(),
+            "TASK09_ATOM3_DECODER_STAGED",
+        )
+        self.assertEqual(
+            self.classify_task09_atom3(committed=True),
+            "TASK09_ATOM3_DECODER_COMMITTED",
+        )
+
+    def test_task09_atom3_state_is_fail_closed(self) -> None:
+        missing = set(module.TASK09_ATOM3_CHANGED_FILES)
+        missing.remove("src/solana_alpha_lab/pumpswap_touch_decoder.py")
+        cases = (
+            {"staged": missing},
+            {
+                "staged":
+                set(module.TASK09_ATOM3_CHANGED_FILES) | {"unexpected.txt"}
+            },
+            {"untracked": {"unexpected.txt"}},
+            {"unstaged": {"tests/test_baseline.py"}},
+            {"parent_oid": module.TASK09_BASE_PARENT_OID},
+            {"commit_subject": "feat: add decoder"},
+            {"commit_changed": {"unexpected.txt"}},
+        )
+        for overrides in cases:
+            with self.subTest(overrides=overrides):
+                self.assertEqual(
+                    self.classify_task09_atom3(**overrides),
+                    "INVALID_REPOSITORY_STATE",
+                )
 
     def test_task08_atom8a_exact_staged_state_passes(self) -> None:
         self.assertEqual(

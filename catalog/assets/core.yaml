@@ -532,7 +532,7 @@ records:
     repository_path: tests/test_task06_catalog.py
   integrity:
     kind: sha256
-    sha256: ccebc3ad37389ce33a1b0aa22e712a5b3a658725a92814c5b5f572f5c0c131b4
+    sha256: 6dcd8e4416671939f1e7843c49c886dc2924f38ba8e8fcf9f682e883a76f3fa7
   access: *t06_read_file
   relations:
   - relation_type: governed_by
@@ -1957,7 +1957,7 @@ records:
     repository_path: tests/test_task04_core_stack.py
   integrity:
     kind: sha256
-    sha256: 9fac52a58f5e6c30e950d60a77a10f151e1f18763c6a846c8a1ecdced2e33a30
+    sha256: 440a5ecdf0388d51b707f5d5e87124b8eb2eee84e6716062bc75d8a41e95bc00
   access:
     mode: read_only
     method: command
@@ -1990,7 +1990,7 @@ records:
     repository_path: scripts/validate_task04.py
   integrity:
     kind: sha256
-    sha256: 50e43aaa771548a3cc83979b22979116cbfb615028c8eb563917fbf55df752c7
+    sha256: 20403726066fca397837e47146df5be5e265f59b5c3ebca3106c2310121790b9
   access:
     mode: read_only
     method: command
@@ -2024,7 +2024,7 @@ records:
     repository_path: scripts/validate_baseline.py
   integrity:
     kind: sha256
-    sha256: 1797f89c53eb382f20d71e9223b28dd3d99542a5d3cca2c9584e76c0401b8eaa
+    sha256: 87a631b8b847e8b094a2ef2182df5794c01b4ab7391ad114d361e06e05ddab78
   access:
     mode: read_only
     method: command
@@ -2548,7 +2548,7 @@ records:
     repository_path: tests/test_task05_catalog_queries.py
   integrity:
     kind: sha256
-    sha256: 9a87b5120a802c0efa5fe78882b61604c0e39b4f3ba988b549cb19c3a25d04b9
+    sha256: 62dee69a2b24e5b87deddfafaed1c3b62ab8b68a7c89aa185f029965538e72b1
   access:
     mode: read_only
     method: command
@@ -3423,7 +3423,7 @@ records:
     repository_path: tests/test_task07_catalog.py
   integrity:
     kind: sha256
-    sha256: 5fcd433ac9e4e5e5e19fa95a09040450e92e60db7ffee206fbe780b77aca1e8e
+    sha256: 665be0aed0b37b7d0a93e9f117501d0d7a59422249f96939e97dfac032ba55bf
   access: *t07_read_file
   relations:
   - relation_type: depends_on
@@ -3907,7 +3907,7 @@ records:
     repository_path: tests/test_task08_catalog.py
   integrity:
     kind: sha256
-    sha256: 173ba936638f8263125c9d7faa980ec27192bf8a161b78cd4e1697f1b02f1d6a
+    sha256: a2999ed670e709710fcbc54b42cf7b5551377adbed72af8a024f1656814f4d8e
   access: *t08_read_file
   relations:
   - relation_type: depends_on
@@ -4873,7 +4873,7 @@ records:
     repository_path: tests/test_baton_repository_policy.py
   integrity:
     kind: sha256
-    sha256: 2a81fae6e5f54b28038833423c126b25d6ea4ae3b84c5d74861450671f74e0db
+    sha256: ccb82d43b23c3777a421f836a647cde6393a7fa329407796913a1a3b6e7f38ef
   access:
     mode: read_only
     method: file

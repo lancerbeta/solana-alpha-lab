@@ -100,11 +100,18 @@ The PumpSwap program is:
 
 `pAMMBay6oceH9fJKBRHGP5D4bD4sWpmSwMn52FMfXEA`
 
-The mutable upstream `main` ref is not a decoder pin. Before T09-A3 may decode
-bytes, it must bind an exact official IDL blob SHA and freeze only the required
-Pool, `BuyEvent`, `SellEvent` and nested type subset. A discriminator,
-field-order, Borsh-type, program-address or appended-field mismatch is
-`BLOCKED_PROTOCOL_DRIFT`.
+The mutable upstream `main` ref is not a decoder pin. T09-A3 therefore binds:
+
+- upstream commit
+  `9c82f61cb711b044a17f770ab8ce9f9bdf78f333`;
+- Git blob SHA-1 `a654b6f924c8e5458ba9b38c9e13a3980f5e9518`;
+- exact `idl/pump_amm.json` SHA-256
+  `6b5c7ec4e5ef9742fa99dc57b0d75b1031b379bba02a7e1b3c5a4cad68d77e56`;
+- only the exact Pool, `BuyEvent` and `SellEvent` layouts required by Touch.
+
+A discriminator, field-order, Borsh-type, program-address or appended-field
+mismatch is `BLOCKED_PROTOCOL_DRIFT`. The pinned subset is used for offline
+decode and deterministic replay only; it does not authorize a network client.
 
 Required logical evidence includes:
 
@@ -273,6 +280,9 @@ Later reconciliation must register:
 - `CONTRACT-T09-PUMPSWAP-TOUCH-001`;
 - `FIXTURE-T09-PUMPSWAP-TOUCH-001`;
 - `TEST-T09-PUMPSWAP-TOUCH-001`.
+- `MODULE-T09-PUMPSWAP-TOUCH-DECODER-001`;
+- `FIXTURE-T09-PUMPSWAP-IDL-SUBSET-001`;
+- `TEST-T09-PUMPSWAP-TOUCH-DECODER-001`.
 
 Named consumers are TASK-10, TASK-13, TASK-18/19, TASK-20..26, TASK-28..40 and
 TASK-43..47. Atom 2 does not update Catalog; its expected status is
@@ -293,6 +303,23 @@ Atom 2 passes only when:
 8. targeted and full offline validation, secret scan and file hygiene pass;
 9. the staged inventory contains exactly the three authorized Atom 2 files.
 
-The next candidate atom is T09-A3: pin the official PumpSwap IDL subset and
-implement an offline decoder/projector with synthetic deterministic replay.
-That atom requires a separate exact write set and authority.
+## Atom 3 accepted implementation boundary
+
+T09-A3 pins the exact official subset above and implements:
+
+- fail-closed Borsh decoding for the PumpSwap Pool account and successful
+  `BuyEvent` / `SellEvent` program data;
+- strict owner, program, discriminator, field-order, type, length and trailing
+  byte checks;
+- separate raw, signed virtual and derived effective quote reserves;
+- canonical `pool_state_snapshots`, `trade_orderflow_inputs` and
+  `canonical_observations` projections;
+- user-side trade amounts, fee source fields and PIT timestamps without a
+  Fillable, `NO_ROUTE`, quote, migration or NetReturn claim;
+- deterministic synthetic replay with no network, credential, dependency or
+  data-write surface.
+
+Atom 3 does not create a general collector framework. Its next candidate atom
+is T09-A4: a separately authorized bounded standard Solana
+`logsSubscribe`/`getTransaction` probe that reuses TASK-06 raw envelopes and
+the frozen 30-second caps.

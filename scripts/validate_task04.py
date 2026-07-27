@@ -89,6 +89,7 @@ EXPECTED_CATALOG_CHECKPOINTS = {
     ("0.8.4", 190, 7),
     ("0.8.5", 191, 7),
     ("0.8.6", 191, 7),
+    ("0.8.7", 191, 7),
 }
 EXPECTED_MATRIX_FIELDS = {
     "candidate_id", "verdict", "decision_status", "component_area",
