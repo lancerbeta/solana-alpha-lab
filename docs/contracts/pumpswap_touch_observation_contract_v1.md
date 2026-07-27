@@ -246,6 +246,8 @@ Terminal classifications are:
 
 - at least one fully mappable Touch event:
   `FIELD_COVERAGE_CANDIDATE`;
+- at least one decoded Touch event with an explicit unresolved source field:
+  `FIELD_COVERAGE_GAP_OBSERVED`;
 - no accepted Touch event before a cap:
   `NOT_TESTABLE_IN_WINDOW`;
 - official protocol mismatch:
@@ -323,3 +325,37 @@ Atom 3 does not create a general collector framework. Its next candidate atom
 is T09-A4: a separately authorized bounded standard Solana
 `logsSubscribe`/`getTransaction` probe that reuses TASK-06 raw envelopes and
 the frozen 30-second caps.
+
+## Atom 4 accepted offline implementation boundary
+
+T09-A4 prepares a fail-closed runner around the official public Solana
+mainnet-beta RPC endpoints:
+
+- `wss://api.mainnet-beta.solana.com` for one standard `logsSubscribe`;
+- `https://api.mainnet-beta.solana.com` for at most eight read-only
+  `getTransaction` follow-ups;
+- no API key, provider account, wallet, signer, transaction construction,
+  simulation, send, dependency change, retry or cash spend;
+- Helius and enhanced `transactionSubscribe` remain disabled fallbacks.
+
+The official public endpoint is suitable only for this bounded development
+probe, has no SLA and may return a typed rate-limit/provider failure. Such a
+failure is retained and never converted to an empty observation.
+
+The 30-second cap covers the whole run. The concrete runner reserves time for
+follow-ups by limiting the WSS capture to 20 seconds and each HTTP read to
+0.75 seconds. The original 1,500,000-byte stream cap remains the outer hard
+cap. A stricter 983,616-byte admission guard proves that received bytes plus
+worst-case redacted storage expansion and metadata cannot exceed the frozen
+4,000,000-byte combined cap.
+
+The default CLI path is offline preflight only. Network and raw writes require
+the exact non-secret tripwire:
+
+`TASK09_A4_PUMPSWAP_TOUCH_EXTERNAL_RPC_WSS_RAW_WRITE`
+
+Offline synthetic tests cover the exact request bodies, one-pubkey
+`mentions`, successful and failed transaction notifications, PumpSwap
+invocation-stack attribution, pinned event decode, bounded follow-ups,
+provider/gap classifications and TASK-06 Parquet evidence. Real network
+execution remains a separate external-action gate.

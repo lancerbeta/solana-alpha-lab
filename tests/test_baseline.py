@@ -536,13 +536,42 @@ class RepositoryStatePolicyTests(unittest.TestCase):
             },
         )
         self.assertEqual(len(module.TASK09_ATOM3_CHANGED_FILES), 15)
-        self.assertEqual(module.TASK09_EXPECTED_REPOSITORY_FILE_COUNT, 232)
+        self.assertEqual(
+            module.TASK09_ATOM3_COMMIT_OID,
+            "d5e9545e99111b035def4b8a95223635ba9e724a",
+        )
+        self.assertEqual(
+            module.TASK09_ATOM3_TREE_OID,
+            "f527e00c4276f670429da9567b689ac669084da9",
+        )
+        self.assertEqual(
+            module.TASK09_ATOM4_CREATED_FILES,
+            {
+                "scripts/run_task09_pumpswap_touch_probe.py",
+                "src/solana_alpha_lab/pumpswap_touch_probe.py",
+                "tests/test_task09_pumpswap_touch_probe.py",
+            },
+        )
+        self.assertEqual(
+            module.TASK09_ATOM4_MODIFIED_FILES,
+            module.TASK09_ATOM3_MODIFIED_FILES,
+        )
+        self.assertEqual(len(module.TASK09_ATOM4_CHANGED_FILES), 15)
+        self.assertEqual(
+            module.TASK09_ATOM3_EXPECTED_REPOSITORY_FILE_COUNT,
+            232,
+        )
+        self.assertEqual(module.TASK09_EXPECTED_REPOSITORY_FILE_COUNT, 235)
         self.assertEqual(module.TASK09_BASE_CATALOG_VERSION, "0.8.5")
         self.assertEqual(
             module.TASK09_ATOM2_EXPECTED_CATALOG_VERSION,
             "0.8.6",
         )
-        self.assertEqual(module.TASK09_EXPECTED_CATALOG_VERSION, "0.8.7")
+        self.assertEqual(
+            module.TASK09_ATOM3_EXPECTED_CATALOG_VERSION,
+            "0.8.7",
+        )
+        self.assertEqual(module.TASK09_EXPECTED_CATALOG_VERSION, "0.8.8")
         self.assertEqual(module.TASK09_EXPECTED_CATALOG_ASSET_COUNT, 191)
         self.assertEqual(module.TASK09_EXPECTED_CATALOG_QUERY_COUNT, 7)
 
@@ -566,7 +595,7 @@ class RepositoryStatePolicyTests(unittest.TestCase):
                 if committed
                 else module.TASK09_BASE_COMMIT_OID
             ),
-            "tracked": module.task09_repository_files(),
+            "tracked": module.task09_atom3_repository_files(),
             "staged": (
                 set() if committed else set(module.TASK09_ATOM3_CHANGED_FILES)
             ),
@@ -615,6 +644,78 @@ class RepositoryStatePolicyTests(unittest.TestCase):
             with self.subTest(overrides=overrides):
                 self.assertEqual(
                     self.classify_task09_atom3(**overrides),
+                    "INVALID_REPOSITORY_STATE",
+                )
+
+    def classify_task09_atom4(
+        self,
+        *,
+        committed: bool = False,
+        **overrides: object,
+    ) -> str:
+        arguments = {
+            "head_oid": (
+                "2" * 40 if committed else module.TASK09_ATOM3_COMMIT_OID
+            ),
+            "commit_count": (
+                module.TASK09_ATOM4_COMMIT_COUNT
+                if committed
+                else module.TASK09_ATOM3_COMMIT_COUNT
+            ),
+            "parent_oid": (
+                module.TASK09_ATOM3_COMMIT_OID
+                if committed
+                else module.TASK09_ATOM2_COMMIT_OID
+            ),
+            "tracked": module.task09_repository_files(),
+            "staged": (
+                set() if committed else set(module.TASK09_ATOM4_CHANGED_FILES)
+            ),
+            "untracked": set(),
+            "unstaged": set(),
+            "commit_subject": (
+                module.TASK09_ATOM4_COMMIT_SUBJECT
+                if committed
+                else module.TASK09_ATOM3_COMMIT_SUBJECT
+            ),
+            "commit_changed": (
+                set(module.TASK09_ATOM4_CHANGED_FILES)
+                if committed
+                else set(module.TASK09_ATOM3_CHANGED_FILES)
+            ),
+        }
+        arguments.update(overrides)
+        return module.classify_state(**arguments)
+
+    def test_task09_atom4_staged_and_committed_states_pass(self) -> None:
+        self.assertEqual(
+            self.classify_task09_atom4(),
+            "TASK09_ATOM4_PROBE_STAGED",
+        )
+        self.assertEqual(
+            self.classify_task09_atom4(committed=True),
+            "TASK09_ATOM4_PROBE_COMMITTED",
+        )
+
+    def test_task09_atom4_state_is_fail_closed(self) -> None:
+        missing = set(module.TASK09_ATOM4_CHANGED_FILES)
+        missing.remove("src/solana_alpha_lab/pumpswap_touch_probe.py")
+        cases = (
+            {"staged": missing},
+            {
+                "staged":
+                set(module.TASK09_ATOM4_CHANGED_FILES) | {"unexpected.txt"}
+            },
+            {"untracked": {"unexpected.txt"}},
+            {"unstaged": {"tests/test_baseline.py"}},
+            {"parent_oid": module.TASK09_BASE_COMMIT_OID},
+            {"commit_subject": "feat: add probe"},
+            {"commit_changed": {"unexpected.txt"}},
+        )
+        for overrides in cases:
+            with self.subTest(overrides=overrides):
+                self.assertEqual(
+                    self.classify_task09_atom4(**overrides),
                     "INVALID_REPOSITORY_STATE",
                 )
 

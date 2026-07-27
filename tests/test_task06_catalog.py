@@ -84,7 +84,7 @@ class Task06CatalogTests(unittest.TestCase):
     ) -> None:
         self.assertEqual(
             self.snapshot.manifest["catalog_version"],
-            "0.8.7",
+            "0.8.8",
         )
         self.assertEqual(len(self.snapshot.assets), 191)
         self.assertEqual(len(self.snapshot.queries), 7)
