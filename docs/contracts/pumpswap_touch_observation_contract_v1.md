@@ -1,0 +1,405 @@
+# PumpSwap Touch observation contract v1 — TASK-09 Atom 2
+
+## Status and purpose
+
+This contract freezes the offline boundary for
+`T09-A2_PUMPSWAP_TOUCH_CONTRACT`. It narrows TASK-09 to point-in-time
+PumpSwap **Touch** evidence: observed pool state, successful decoded buy/sell
+events, reserve components, fee fields and explicit coverage failures.
+
+It does not authorize or implement a provider, API, RPC or WebSocket request,
+credential loading, dependency change, dataset write, Catalog update, commit,
+push, pull request, wallet, signer, transaction or payment action. Atom 2 is
+offline after the exact Git base is fetched. Cash spend is USD 0.
+
+The estimand is:
+
+> Can one bounded, point-in-time PumpSwap observation probe reconstruct the
+> required pool, trade, reserve, fee, timestamp and provenance fields without
+> pretending that observation means migration, fillability or executable
+> routing?
+
+This is not alpha, a strategy, a fill model, a provider SLA or NetReturn.
+
+## Accepted Entry Gate patch
+
+TASK-09 is Touch-only.
+
+- `Touch` means a PumpSwap pool/account/event was observed with explicit
+  evidence and availability time.
+- `Fillable`, `NO_ROUTE`, executable quotes, route counts, transaction
+  payloads, RealizedVWAP and NetReturn belong to TASK-10 or later.
+- A failed transaction is retained as typed raw evidence. It does not create a
+  successful pool snapshot or trade input.
+- Missing, zero, failed, stale, disagreement and not-observed remain distinct.
+- TASK-08 `NOT_TESTABLE_IN_WINDOW` remains an accepted lifecycle coverage
+  blocker. TASK-09 does not repair it by selecting only visible pools.
+
+## Reuse decision
+
+TASK-09 follows `ADOPT -> WRAP -> FORK -> BUILD`:
+
+- `ADOPT` TASK-05 `pool_state_snapshots`, `trade_orderflow_inputs`,
+  `canonical_observations` and point-in-time timestamp semantics;
+- read TASK-05 `token_lifecycle_events` only for explicit migration evidence;
+- never write TASK-05 `quote_attempts` from TASK-09;
+- `WRAP` TASK-06 redaction, raw identity, immutable evidence and manifest
+  boundaries;
+- `WRAP` TASK-08 lifecycle evidence and its explicit coverage blocker;
+- `BUILD` later only a thin PumpSwap decoder/projector after an exact official
+  IDL blob is pinned;
+- `FORK` nothing and reject a general collector framework before a second real
+  consumer.
+
+## Universe separation
+
+The following labels are independent evidence classifications. They must not
+be collapsed into one implicit post-migration universe.
+
+### `PUMPSWAP_OBSERVED`
+
+Membership requires a successful, source-pinned PumpSwap pool/account or
+buy/sell event observation with:
+
+- PumpSwap program identity;
+- transaction signature and instruction/event position when available;
+- pool identity;
+- context slot;
+- event and availability timestamps;
+- raw evidence lineage.
+
+Membership proves Touch only. It does not prove Pump migration provenance,
+canonical pool status, route availability or representativeness of launches.
+
+### `PUMP_MIGRATION_CONFIRMED`
+
+Membership requires accepted successful Pump lifecycle evidence naming both
+the destination PumpSwap program and destination pool. A pool lookup, a
+PumpSwap trade or a pool index cannot manufacture this label.
+
+### `CANONICAL_INDEX_CANDIDATE`
+
+Membership requires an observed PumpSwap pool account with `index == 0`.
+Official PumpSwap documentation states that pools created by the Pump
+`migrate` instruction use canonical index zero. The converse is not accepted:
+`index == 0` remains a candidate label until explicit migration evidence links
+the token and destination pool.
+
+Launch, signal and execution universes remain unavailable or empty. No
+outcome-dependent selection field may be used to admit an observation.
+
+## Official protocol boundary
+
+Official sources observed read-only on 2026-07-27:
+
+- `https://github.com/pump-fun/pump-public-docs`;
+- `docs/PUMP_SWAP_README.md`;
+- `idl/pump_amm.json`.
+
+The PumpSwap program is:
+
+`pAMMBay6oceH9fJKBRHGP5D4bD4sWpmSwMn52FMfXEA`
+
+The mutable upstream `main` ref is not a decoder pin. T09-A3 therefore binds:
+
+- upstream commit
+  `9c82f61cb711b044a17f770ab8ce9f9bdf78f333`;
+- Git blob SHA-1 `a654b6f924c8e5458ba9b38c9e13a3980f5e9518`;
+- exact `idl/pump_amm.json` SHA-256
+  `6b5c7ec4e5ef9742fa99dc57b0d75b1031b379bba02a7e1b3c5a4cad68d77e56`;
+- only the exact Pool, `BuyEvent` and `SellEvent` layouts required by Touch.
+
+A discriminator, field-order, Borsh-type, program-address or appended-field
+mismatch is `BLOCKED_PROTOCOL_DRIFT`. The pinned subset is used for offline
+decode and deterministic replay only; it does not authorize a network client.
+
+Required logical evidence includes:
+
+- Pool identity, index, creator, base/quote mint and vault accounts;
+- raw base-vault and raw quote-vault balances;
+- `virtual_quote_reserves`;
+- buy/sell direction and exact input/output atomic amounts;
+- current fee fields carried by the source evidence;
+- transaction result, signature, event position and context slot.
+
+Fee rates are not hard-coded. A later observation records source values and
+source version; missing fee evidence is a coverage gap, not zero.
+
+## Reserve semantics
+
+PumpSwap effective quote reserves are:
+
+```text
+effective_quote_reserves_atomic
+= raw_quote_vault_balance_atomic
++ virtual_quote_reserves_atomic
+```
+
+The three values are retained separately:
+
+1. `raw_quote_vault_balance_atomic`;
+2. signed `virtual_quote_reserves_atomic`;
+3. derived `effective_quote_reserves_atomic`.
+
+Base reserves remain the raw base-vault balance. The virtual component must
+never overwrite the raw quote balance. The effective value must never be
+stored as if it were the raw vault value.
+
+The official Pool field is signed `i128`. Existing canonical integer fields
+are non-negative and have narrower physical storage constraints. Therefore:
+
+- exact signed source bytes remain in redacted raw evidence;
+- a representable signed virtual value may use
+  `canonical_observations.value_decimal`;
+- a non-negative representable effective value may use
+  `canonical_observations.value_atomic`;
+- negative effective reserves, numeric overflow or precision loss yield
+  `SCHEMA_GAP_BLOCK_CANONICALIZATION`;
+- values are never clamped, wrapped, dropped or converted to zero.
+
+## Canonical schema mapping
+
+| Relation | TASK-09 use |
+|---|---|
+| `raw_api_events` | Retain redacted log/account/transaction evidence, successful and failed outcomes, exact content identity and source version. |
+| `token_lifecycle_events` | Read-only input for `PUMP_MIGRATION_CONFIRMED`; TASK-09 does not infer or rewrite lifecycle history. |
+| `pool_state_snapshots` | Write raw base-vault balance to `base_reserve_atomic` and raw quote-vault balance to `quote_reserve_atomic`; never substitute effective reserves. |
+| `trade_orderflow_inputs` | Write only successful decoded PumpSwap buy/sell Touch amounts and side; the row is an observed trade, not our fill. |
+| `canonical_observations` | Store representable virtual/effective quote reserve, fee and coverage claims with raw lineage and explicit units. |
+| `quote_attempts` | Forbidden TASK-09 writer. `NO_ROUTE`, route identity/count and executable quote evidence begin in TASK-10. |
+
+Any mandatory field that cannot be mapped without information loss becomes an
+explicit `SCHEMA_GAP`; Atom 2 does not silently add a new relation.
+
+## Identity, time and revisions
+
+Every durable observation preserves:
+
+```text
+event_at
+<= observed_at
+<= first_reliable_available_at
+<= available_at
+<= ingested_at
+```
+
+`available_at` maps to TASK-05 `available_to_strategy_at`. Backfill never moves
+`first_reliable_available_at` backward.
+
+Pool observation identity includes source version, pool, slot and evidence
+position. Trade identity additionally includes transaction signature and
+instruction/event position. Repeated provider claims coexist as revisions or
+disagreement; they never overwrite earlier evidence.
+
+## Primary transport and conditional fallback
+
+The later probe's primary spine is provider-agnostic standard Solana
+`logsSubscribe`:
+
+- exactly one `mentions` pubkey: the PumpSwap program;
+- `confirmed` commitment;
+- one connection, one subscription, concurrency one;
+- bounded standard `getTransaction` follow-ups only for selected signatures;
+- failed transaction notifications remain raw failure evidence.
+
+Official Solana references checked on 2026-07-27:
+
+- `https://solana.com/docs/rpc/websocket/logssubscribe`;
+- `https://solana.com/docs/rpc/http/gettransaction`.
+
+Helius `transactionSubscribe` is a conditional fallback, disabled for the first
+probe. Official Helius documentation checked on 2026-07-27 places enhanced
+WebSocket methods on Developer and higher plans, while Free supports standard
+WebSocket methods. No plan purchase or upgrade is justified by Atom 2.
+
+## Cheapest-falsifier envelope
+
+This envelope is a plan, not provider-call authority.
+
+| Dimension | Hard cap |
+|---|---:|
+| Elapsed time | 30 seconds |
+| WSS connections | 1 |
+| WSS subscriptions | 1 |
+| Notifications | 256 |
+| Uncompressed stream bytes | 1,500,000 |
+| `getTransaction` follow-ups | 8 |
+| Modeled Helius credits | 40 |
+| Received plus stored bytes | 4,000,000 |
+| Concurrency | 1 |
+| Retries | 0 |
+| Cash | USD 0 |
+
+The maximum modeled use is 39 credits:
+
+```text
+ceil(1,500,000 / 100,000) * 2
++ 8 standard RPC calls
++ 1 connection
+= 39
+```
+
+One credit of headroom remains. A later external atom must verify the actual
+account plan and billing surface before opening a connection.
+
+Terminal classifications are:
+
+- at least one fully mappable Touch event:
+  `FIELD_COVERAGE_CANDIDATE`;
+- at least one decoded Touch event with an explicit unresolved source field:
+  `FIELD_COVERAGE_GAP_OBSERVED`;
+- no accepted Touch event before a cap:
+  `NOT_TESTABLE_IN_WINDOW`;
+- official protocol mismatch:
+  `BLOCKED_PROTOCOL_DRIFT`;
+- required value cannot fit the canonical mapping:
+  `SCHEMA_GAP_BLOCK_CANONICALIZATION`;
+- provider/auth failure: typed provider failure, never empty, zero or
+  `NO_ROUTE`.
+
+No terminal classification grants a retry, longer run or purchase.
+
+## Security, stop and rollback
+
+Atom 2 immediately fails on:
+
+- any network client, credential lookup or provider call;
+- secret-bearing content or an absolute machine path in durable evidence;
+- a transaction build/simulate/sign/send, wallet, webhook or payment path;
+- non-zero cash, dependency change or file outside the managed set;
+- universe collapse, future filtering or Fillable/Touch conflation;
+- raw/effective reserve substitution or precision loss;
+- timestamp, revision, budget or protocol drift.
+
+Before a later external run, rollback is no action. During a separately
+authorized run, stop closes bounded clients and retains only already-redacted
+immutable partial evidence with its typed terminal state.
+
+## Catalog impact
+
+Later reconciliation must register:
+
+- `CONTRACT-T09-PUMPSWAP-TOUCH-001`;
+- `FIXTURE-T09-PUMPSWAP-TOUCH-001`;
+- `TEST-T09-PUMPSWAP-TOUCH-001`.
+- `MODULE-T09-PUMPSWAP-TOUCH-DECODER-001`;
+- `FIXTURE-T09-PUMPSWAP-IDL-SUBSET-001`;
+- `TEST-T09-PUMPSWAP-TOUCH-DECODER-001`;
+- `MODULE-T09-PUMPSWAP-TOUCH-PROBE-001`;
+- `SCRIPT-T09-PUMPSWAP-TOUCH-PROBE-001`;
+- `TEST-T09-PUMPSWAP-TOUCH-PROBE-001`;
+- `DATA-T09-PUMPSWAP-TOUCH-PROBE-RAW-001`;
+- `FIXTURE-T09-PUMPSWAP-TOUCH-EVIDENCE-001`;
+- `EVIDENCE-T09-PUMPSWAP-TOUCH-RECEIPT-001`;
+- `EVIDENCE-T09-PUMPSWAP-TOUCH-SUMMARY-001`;
+- `TEST-T09-PUMPSWAP-TOUCH-EVIDENCE-001`.
+
+Named consumers are TASK-10, TASK-13, TASK-18/19, TASK-20..26, TASK-28..40 and
+TASK-43..47. Atoms 2 through 4 leave
+`CATALOG_GAP_PENDING_T09_RECONCILIATION`; T09-A5 closes that gap through
+Catalog `0.9.0` while keeping raw bytes outside Git.
+
+## Atom 2 Definition of Done
+
+Atom 2 passes only when:
+
+1. the exact JSON fixture hash and three-file managed set agree;
+2. the three universes remain separate and migration inference fails closed;
+3. Touch cannot become Fillable, `NO_ROUTE`, quote or NetReturn evidence;
+4. raw, virtual and effective reserve semantics pass signed boundary tests;
+5. TASK-05 schema projections validate without writing `quote_attempts`;
+6. point-in-time timestamps, missing/failure states and revisions remain
+   explicit;
+7. the primary/fallback roles and 39-credit cheapest-falsifier math agree;
+8. targeted and full offline validation, secret scan and file hygiene pass;
+9. the staged inventory contains exactly the three authorized Atom 2 files.
+
+## Atom 3 accepted implementation boundary
+
+T09-A3 pins the exact official subset above and implements:
+
+- fail-closed Borsh decoding for the PumpSwap Pool account and successful
+  `BuyEvent` / `SellEvent` program data;
+- strict owner, program, discriminator, field-order, type, length and trailing
+  byte checks;
+- separate raw, signed virtual and derived effective quote reserves;
+- canonical `pool_state_snapshots`, `trade_orderflow_inputs` and
+  `canonical_observations` projections;
+- user-side trade amounts, fee source fields and PIT timestamps without a
+  Fillable, `NO_ROUTE`, quote, migration or NetReturn claim;
+- deterministic synthetic replay with no network, credential, dependency or
+  data-write surface.
+
+Atom 3 does not create a general collector framework. Its next candidate atom
+is T09-A4: a separately authorized bounded standard Solana
+`logsSubscribe`/`getTransaction` probe that reuses TASK-06 raw envelopes and
+the frozen 30-second caps.
+
+## Atom 4 accepted offline implementation boundary
+
+T09-A4 prepares a fail-closed runner around the official public Solana
+mainnet-beta RPC endpoints:
+
+- `wss://api.mainnet-beta.solana.com` for one standard `logsSubscribe`;
+- `https://api.mainnet-beta.solana.com` for at most eight read-only
+  `getTransaction` follow-ups;
+- no API key, provider account, wallet, signer, transaction construction,
+  simulation, send, dependency change, retry or cash spend;
+- Helius and enhanced `transactionSubscribe` remain disabled fallbacks.
+
+The official public endpoint is suitable only for this bounded development
+probe, has no SLA and may return a typed rate-limit/provider failure. Such a
+failure is retained and never converted to an empty observation.
+
+The 30-second cap covers the whole run. The concrete runner reserves time for
+follow-ups by limiting the WSS capture to 20 seconds and each HTTP read to
+0.75 seconds. The original 1,500,000-byte stream cap remains the outer hard
+cap. A stricter 983,616-byte admission guard proves that received bytes plus
+worst-case redacted storage expansion and metadata cannot exceed the frozen
+4,000,000-byte combined cap.
+
+The default CLI path is offline preflight only. Network and raw writes require
+the exact non-secret tripwire:
+
+`TASK09_A4_PUMPSWAP_TOUCH_EXTERNAL_RPC_WSS_RAW_WRITE`
+
+Offline synthetic tests cover the exact request bodies, one-pubkey
+`mentions`, successful and failed transaction notifications, PumpSwap
+invocation-stack attribution, pinned event decode, bounded follow-ups,
+provider/gap classifications and TASK-06 Parquet evidence. Real network
+execution remains a separate external-action gate.
+
+## Atom 4 observed execution and repair boundary
+
+The one authorized run `t09a4-20260727T184740Z` reached the 256-notification
+cap, retained 258 redacted raw records and stopped fail-closed on
+`get_transaction_result_keys_drift`. The official public RPC response
+contained the required `blockTime`, `meta`, `slot`, `transaction` and
+`version` fields plus one additive `transactionIndex` field. The official
+`getTransaction` documentation did not list that field as of 2026-07-27.
+
+T09-A4R therefore permits exactly one forward-compatible extension:
+
+- `transactionIndex` is optional;
+- when present, it must be a non-boolean integer greater than or equal to zero;
+- every required result key remains mandatory;
+- every other unknown result key still stops as schema drift;
+- the original raw record and its
+  `INVALID_RESPONSE/get_transaction_result_keys_drift` classification remain
+  immutable.
+
+Offline replay after this repair classifies the preserved response as
+`FIELD_COVERAGE_CANDIDATE`. It does not retroactively make the live runner a
+clean success and does not authorize another external call.
+
+The sanitized fixture and acceptance receipt bind the ignored raw hashes:
+
+- `tests/fixtures/task09/pumpswap_touch_probe_live_evidence_v1.json`;
+- `docs/evidence/task09/pumpswap_touch_probe_execution_receipt_v1.json`;
+- `docs/evidence/task09/pumpswap_touch_probe_execution_summary_v1.md`.
+
+The accepted bounded result contains 256 notifications, including 124
+successful and 132 failed transactions, and 75 pinned-IDL Touch events. It
+proves only post-migration Touch transport and field coverage. Launch/lifecycle
+representativeness, Fillable, `NO_ROUTE`, executable quotes, migration, alpha
+and NetReturn remain unproven or out of TASK-09 scope.

@@ -573,11 +573,11 @@ class FixtureManifestCanonicalIntegrityTests(unittest.TestCase):
         )
         self.assertEqual(result.returncode, 0)
 
-    def test_all_191_catalog_assets_have_canonical_integrity(self) -> None:
+    def test_all_205_catalog_assets_have_canonical_integrity(self) -> None:
         sweep = baseline.canonical_catalog_integrity_sweep(
             allow_worktree_candidate=True
         )
-        self.assertEqual(sweep.asset_count, 191)
+        self.assertEqual(sweep.asset_count, 205)
         self.assertGreater(sweep.checked_sha256, 0)
         self.assertEqual(sweep.mismatches, ())
 
@@ -1409,6 +1409,43 @@ class LegacyRegressionTests(unittest.TestCase):
                 ),
             },
         )
+        self.assertEqual(
+            baseline.TASK09_LIFECYCLE_COMBINATIONS,
+            {
+                (
+                    "TASK09_ATOM2_POLICY_REPAIR_STAGED",
+                    "TASK09_FEATURE_LOCAL_POLICY_REPAIR_STAGED",
+                ),
+                (
+                    "TASK09_ATOM2_POLICY_REPAIR_COMMITTED",
+                    "TASK09_FEATURE_LOCAL_ATOM2_COMMITTED",
+                ),
+                (
+                    "TASK09_ATOM3_DECODER_STAGED",
+                    "TASK09_FEATURE_LOCAL_ATOM3_STAGED",
+                ),
+                (
+                    "TASK09_ATOM3_DECODER_COMMITTED",
+                    "TASK09_FEATURE_LOCAL_ATOM3_COMMITTED",
+                ),
+                (
+                    "TASK09_ATOM4_PROBE_STAGED",
+                    "TASK09_FEATURE_LOCAL_ATOM4_STAGED",
+                ),
+                (
+                    "TASK09_ATOM4_PROBE_COMMITTED",
+                    "TASK09_FEATURE_LOCAL_ATOM4_COMMITTED",
+                ),
+                (
+                    "TASK09_FINALIZATION_STAGED",
+                    "TASK09_FEATURE_LOCAL_FINALIZATION_STAGED",
+                ),
+                (
+                    "TASK09_FINALIZATION_COMMITTED",
+                    "TASK09_FEATURE_LOCAL_FINALIZATION_COMMITTED",
+                ),
+            },
+        )
 
 
 GENERIC_BRANCH = "ctrl/cursor-workplace-validation"
@@ -1471,6 +1508,586 @@ def generic_feature_view(
         True,
     )
     return view._replace(**overrides)
+
+
+def task09_policy_repair_staged_view(
+    **overrides: object,
+) -> baseline.CtrlBatonGitView:
+    refs = frozenset(
+        {
+            "refs/heads/main",
+            "refs/remotes/origin/HEAD",
+            "refs/remotes/origin/main",
+            f"refs/heads/{baseline.TASK09_FEATURE_BRANCH}",
+            "refs/heads/ctrl/live-baton-reconciliation",
+            "refs/remotes/origin/ctrl/live-baton-reconciliation",
+        }
+    )
+    view = generic_feature_view(
+        branch=baseline.TASK09_FEATURE_BRANCH,
+        head_oid=baseline.TASK09_BASE_COMMIT_OID,
+        head_parents=baseline.TASK09_BASE_PARENT_OIDS,
+        feature_parents=baseline.TASK09_BASE_PARENT_OIDS,
+        head_tree_oid=baseline.TASK09_BASE_TREE_OID,
+        feature_tree_oid=baseline.TASK09_BASE_TREE_OID,
+        main_oid=baseline.TASK09_BASE_PARENT_OID,
+        origin_main_oid=baseline.TASK09_BASE_COMMIT_OID,
+        feature_local_oid=baseline.TASK09_BASE_COMMIT_OID,
+        feature_remote_oid=None,
+        upstream=None,
+        all_refs=refs,
+        tracked=frozenset(baseline.task09_atom2_repository_files()),
+        staged=baseline.TASK09_CHANGED_FILES,
+        staged_added=baseline.TASK09_ATOM2_CREATED_FILES,
+        staged_modified=baseline.TASK09_POLICY_REPAIR_MODIFIED_FILES,
+        unstaged=frozenset(),
+        untracked=frozenset(),
+        conflicts=frozenset(),
+        base_diff=frozenset(),
+        head_subject=baseline.TASK09_BASE_COMMIT_SUBJECT,
+        commits_after_base=0,
+        index_base_diff=baseline.TASK09_CHANGED_FILES,
+        index_catalog_version=(
+            baseline.TASK09_ATOM3_EXPECTED_CATALOG_VERSION
+        ),
+        head_tree_path_count=baseline.TASK09_BASE_FILE_COUNT,
+        head_catalog_version=baseline.TASK09_BASE_CATALOG_VERSION,
+        feature_based_on_main_ok=True,
+        remote_head_target="refs/remotes/origin/main",
+    )
+    return view._replace(**overrides)
+
+
+class Task09PolicyRepairStagedTopologyTests(unittest.TestCase):
+    EXPECTED = "TASK09_FEATURE_LOCAL_POLICY_REPAIR_STAGED"
+
+    def classify(self, **overrides: object) -> str:
+        return baseline.classify_task09_topology(
+            task09_policy_repair_staged_view(**overrides),
+            local_github_context(),
+        )
+
+    def test_exact_task09_staged_topology_passes(self) -> None:
+        self.assertEqual(self.classify(), self.EXPECTED)
+
+    def test_identity_and_base_are_fail_closed(self) -> None:
+        mutations = (
+            {"branch": "task09/other"},
+            {"head_oid": baseline.TASK09_BASE_PARENT_OID},
+            {"head_parents": tuple(reversed(baseline.TASK09_BASE_PARENT_OIDS))},
+            {"head_tree_oid": GENERIC_TREE},
+            {"origin_main_oid": baseline.TASK09_BASE_PARENT_OID},
+            {"main_oid": GENERIC_BASE},
+            {"feature_local_oid": None},
+            {"head_subject": "Merge pull request #6"},
+        )
+        for mutation in mutations:
+            with self.subTest(mutation=mutation):
+                self.assertNotEqual(self.classify(**mutation), self.EXPECTED)
+
+    def test_staged_inventory_is_fail_closed(self) -> None:
+        missing = frozenset(
+            set(baseline.TASK09_CHANGED_FILES)
+            - {"tests/test_baton_repository_policy.py"}
+        )
+        mutations = (
+            {"staged": missing},
+            {
+                "staged":
+                baseline.TASK09_CHANGED_FILES | {"unexpected.txt"}
+            },
+            {"staged_added": frozenset()},
+            {"staged_modified": frozenset()},
+            {"index_base_diff": missing},
+            {"untracked": frozenset({"unexpected.txt"})},
+            {"unstaged": frozenset({"scripts/validate_baseline.py"})},
+            {"conflicts": frozenset({"tests/test_baseline.py"})},
+        )
+        for mutation in mutations:
+            with self.subTest(mutation=mutation):
+                self.assertNotEqual(self.classify(**mutation), self.EXPECTED)
+
+    def test_remote_and_ref_policy_is_fail_closed(self) -> None:
+        extra_refs = (
+            task09_policy_repair_staged_view().all_refs
+            | {"refs/heads/task10/unapproved"}
+        )
+        mutations = (
+            {"feature_remote_oid": baseline.TASK09_BASE_COMMIT_OID},
+            {"upstream": f"origin/{baseline.TASK09_FEATURE_BRANCH}"},
+            {"remote_head_target": None},
+            {"all_refs": extra_refs},
+            {"fetch_urls": ("https://example.invalid/repository.git",)},
+        )
+        for mutation in mutations:
+            with self.subTest(mutation=mutation):
+                self.assertNotEqual(self.classify(**mutation), self.EXPECTED)
+
+    def test_github_actions_context_fails(self) -> None:
+        context = local_github_context()._replace(actions=True)
+        self.assertEqual(
+            baseline.classify_task09_topology(
+                task09_policy_repair_staged_view(),
+                context,
+            ),
+            "INVALID_GIT_TOPOLOGY",
+        )
+
+
+def task09_atom3_staged_view(
+    **overrides: object,
+) -> baseline.CtrlBatonGitView:
+    refs = frozenset(
+        {
+            "refs/heads/main",
+            "refs/remotes/origin/HEAD",
+            "refs/remotes/origin/main",
+            f"refs/heads/{baseline.TASK09_FEATURE_BRANCH}",
+            "refs/heads/ctrl/live-baton-reconciliation",
+            "refs/remotes/origin/ctrl/live-baton-reconciliation",
+        }
+    )
+    view = generic_feature_view(
+        branch=baseline.TASK09_FEATURE_BRANCH,
+        head_oid=baseline.TASK09_ATOM2_COMMIT_OID,
+        head_parents=(baseline.TASK09_BASE_COMMIT_OID,),
+        feature_parents=(baseline.TASK09_BASE_COMMIT_OID,),
+        head_tree_oid=baseline.TASK09_ATOM2_TREE_OID,
+        feature_tree_oid=baseline.TASK09_ATOM2_TREE_OID,
+        main_oid=baseline.TASK09_BASE_PARENT_OID,
+        origin_main_oid=baseline.TASK09_BASE_COMMIT_OID,
+        feature_local_oid=baseline.TASK09_ATOM2_COMMIT_OID,
+        feature_remote_oid=None,
+        upstream=None,
+        all_refs=refs,
+        tracked=frozenset(baseline.task09_atom3_repository_files()),
+        staged=baseline.TASK09_ATOM3_CHANGED_FILES,
+        staged_added=baseline.TASK09_ATOM3_CREATED_FILES,
+        staged_modified=baseline.TASK09_ATOM3_MODIFIED_FILES,
+        unstaged=frozenset(),
+        untracked=frozenset(),
+        conflicts=frozenset(),
+        base_diff=baseline.TASK09_CHANGED_FILES,
+        head_subject=baseline.TASK09_ATOM2_COMMIT_SUBJECT,
+        commits_after_base=1,
+        index_base_diff=(
+            baseline.TASK09_CHANGED_FILES
+            | baseline.TASK09_ATOM3_CHANGED_FILES
+        ),
+        index_catalog_version=(
+            baseline.TASK09_ATOM3_EXPECTED_CATALOG_VERSION
+        ),
+        head_tree_path_count=(
+            baseline.TASK09_ATOM2_EXPECTED_REPOSITORY_FILE_COUNT
+        ),
+        head_catalog_version=(
+            baseline.TASK09_ATOM2_EXPECTED_CATALOG_VERSION
+        ),
+        feature_based_on_main_ok=True,
+        remote_head_target="refs/remotes/origin/main",
+    )
+    return view._replace(**overrides)
+
+
+def task09_atom3_committed_view(
+    **overrides: object,
+) -> baseline.CtrlBatonGitView:
+    head = "1" * 40
+    tree = "2" * 40
+    view = task09_atom3_staged_view(
+        head_oid=head,
+        head_parents=(baseline.TASK09_ATOM2_COMMIT_OID,),
+        feature_parents=(baseline.TASK09_ATOM2_COMMIT_OID,),
+        head_tree_oid=tree,
+        feature_tree_oid=tree,
+        feature_local_oid=head,
+        tracked=frozenset(baseline.task09_atom3_repository_files()),
+        staged=frozenset(),
+        staged_added=frozenset(),
+        staged_modified=frozenset(),
+        base_diff=(
+            baseline.TASK09_CHANGED_FILES
+            | baseline.TASK09_ATOM3_CHANGED_FILES
+        ),
+        head_subject=baseline.TASK09_ATOM3_COMMIT_SUBJECT,
+        commits_after_base=2,
+        head_tree_path_count=(
+            baseline.TASK09_ATOM3_EXPECTED_REPOSITORY_FILE_COUNT
+        ),
+        head_catalog_version=(
+            baseline.TASK09_ATOM3_EXPECTED_CATALOG_VERSION
+        ),
+    )
+    return view._replace(**overrides)
+
+
+class Task09Atom3TopologyTests(unittest.TestCase):
+    def test_exact_staged_and_committed_topologies_pass(self) -> None:
+        self.assertEqual(
+            baseline.classify_task09_topology(
+                task09_atom3_staged_view(),
+                local_github_context(),
+            ),
+            "TASK09_FEATURE_LOCAL_ATOM3_STAGED",
+        )
+        self.assertEqual(
+            baseline.classify_task09_topology(
+                task09_atom3_committed_view(),
+                local_github_context(),
+            ),
+            "TASK09_FEATURE_LOCAL_ATOM3_COMMITTED",
+        )
+
+    def test_staged_inventory_and_history_are_fail_closed(self) -> None:
+        expected = "TASK09_FEATURE_LOCAL_ATOM3_STAGED"
+        missing = frozenset(
+            set(baseline.TASK09_ATOM3_CHANGED_FILES)
+            - {"tests/test_task09_pumpswap_touch_decoder.py"}
+        )
+        mutations = (
+            {"staged": missing},
+            {"staged_added": frozenset()},
+            {"staged_modified": frozenset()},
+            {"head_parents": baseline.TASK09_BASE_PARENT_OIDS},
+            {"commits_after_base": 2},
+            {"base_diff": frozenset()},
+            {"index_base_diff": baseline.TASK09_CHANGED_FILES},
+            {"untracked": frozenset({"unexpected.txt"})},
+        )
+        for mutation in mutations:
+            with self.subTest(mutation=mutation):
+                self.assertNotEqual(
+                    baseline.classify_task09_topology(
+                        task09_atom3_staged_view(**mutation),
+                        local_github_context(),
+                    ),
+                    expected,
+                )
+
+    def test_committed_inventory_and_history_are_fail_closed(self) -> None:
+        expected = "TASK09_FEATURE_LOCAL_ATOM3_COMMITTED"
+        mutations = (
+            {"head_oid": baseline.TASK09_ATOM2_COMMIT_OID},
+            {"head_parents": (baseline.TASK09_BASE_COMMIT_OID,)},
+            {"feature_local_oid": None},
+            {"head_subject": "feat: add decoder"},
+            {"commits_after_base": 1},
+            {"head_tree_path_count": 231},
+            {"staged": baseline.TASK09_ATOM3_CHANGED_FILES},
+        )
+        for mutation in mutations:
+            with self.subTest(mutation=mutation):
+                self.assertNotEqual(
+                    baseline.classify_task09_topology(
+                        task09_atom3_committed_view(**mutation),
+                        local_github_context(),
+                    ),
+                    expected,
+                )
+
+
+def task09_atom4_staged_view(
+    **overrides: object,
+) -> baseline.CtrlBatonGitView:
+    view = task09_atom3_committed_view(
+        head_oid=baseline.TASK09_ATOM3_COMMIT_OID,
+        head_parents=(baseline.TASK09_ATOM2_COMMIT_OID,),
+        feature_parents=(baseline.TASK09_ATOM2_COMMIT_OID,),
+        head_tree_oid=baseline.TASK09_ATOM3_TREE_OID,
+        feature_tree_oid=baseline.TASK09_ATOM3_TREE_OID,
+        feature_local_oid=baseline.TASK09_ATOM3_COMMIT_OID,
+        tracked=frozenset(baseline.task09_repository_files()),
+        staged=baseline.TASK09_ATOM4_CHANGED_FILES,
+        staged_added=baseline.TASK09_ATOM4_CREATED_FILES,
+        staged_modified=baseline.TASK09_ATOM4_MODIFIED_FILES,
+        base_diff=(
+            baseline.TASK09_CHANGED_FILES
+            | baseline.TASK09_ATOM3_CHANGED_FILES
+        ),
+        head_subject=baseline.TASK09_ATOM3_COMMIT_SUBJECT,
+        commits_after_base=2,
+        index_base_diff=(
+            baseline.TASK09_CHANGED_FILES
+            | baseline.TASK09_ATOM3_CHANGED_FILES
+            | baseline.TASK09_ATOM4_CHANGED_FILES
+        ),
+        index_catalog_version=(
+            baseline.TASK09_ATOM4_EXPECTED_CATALOG_VERSION
+        ),
+        head_tree_path_count=(
+            baseline.TASK09_ATOM3_EXPECTED_REPOSITORY_FILE_COUNT
+        ),
+        head_catalog_version=(
+            baseline.TASK09_ATOM3_EXPECTED_CATALOG_VERSION
+        ),
+    )
+    return view._replace(**overrides)
+
+
+def task09_atom4_committed_view(
+    **overrides: object,
+) -> baseline.CtrlBatonGitView:
+    head = "3" * 40
+    tree = "4" * 40
+    view = task09_atom4_staged_view(
+        head_oid=head,
+        head_parents=(baseline.TASK09_ATOM3_COMMIT_OID,),
+        feature_parents=(baseline.TASK09_ATOM3_COMMIT_OID,),
+        head_tree_oid=tree,
+        feature_tree_oid=tree,
+        feature_local_oid=head,
+        tracked=frozenset(baseline.task09_repository_files()),
+        staged=frozenset(),
+        staged_added=frozenset(),
+        staged_modified=frozenset(),
+        base_diff=(
+            baseline.TASK09_CHANGED_FILES
+            | baseline.TASK09_ATOM3_CHANGED_FILES
+            | baseline.TASK09_ATOM4_CHANGED_FILES
+        ),
+        head_subject=baseline.TASK09_ATOM4_COMMIT_SUBJECT,
+        commits_after_base=3,
+        head_tree_path_count=(
+            baseline.TASK09_ATOM4_EXPECTED_REPOSITORY_FILE_COUNT
+        ),
+        head_catalog_version=(
+            baseline.TASK09_ATOM4_EXPECTED_CATALOG_VERSION
+        ),
+    )
+    return view._replace(**overrides)
+
+
+class Task09Atom4TopologyTests(unittest.TestCase):
+    def test_exact_staged_and_committed_topologies_pass(self) -> None:
+        self.assertEqual(
+            baseline.classify_task09_topology(
+                task09_atom4_staged_view(),
+                local_github_context(),
+            ),
+            "TASK09_FEATURE_LOCAL_ATOM4_STAGED",
+        )
+        self.assertEqual(
+            baseline.classify_task09_topology(
+                task09_atom4_committed_view(),
+                local_github_context(),
+            ),
+            "TASK09_FEATURE_LOCAL_ATOM4_COMMITTED",
+        )
+
+    def test_staged_inventory_and_history_are_fail_closed(self) -> None:
+        expected = "TASK09_FEATURE_LOCAL_ATOM4_STAGED"
+        missing = frozenset(
+            set(baseline.TASK09_ATOM4_CHANGED_FILES)
+            - {"tests/test_task09_pumpswap_touch_probe.py"}
+        )
+        mutations = (
+            {"staged": missing},
+            {"staged_added": frozenset()},
+            {"staged_modified": frozenset()},
+            {"head_oid": baseline.TASK09_ATOM2_COMMIT_OID},
+            {"commits_after_base": 3},
+            {"base_diff": frozenset()},
+            {
+                "index_base_diff":
+                baseline.TASK09_CHANGED_FILES
+                | baseline.TASK09_ATOM3_CHANGED_FILES
+            },
+            {"untracked": frozenset({"unexpected.txt"})},
+        )
+        for mutation in mutations:
+            with self.subTest(mutation=mutation):
+                self.assertNotEqual(
+                    baseline.classify_task09_topology(
+                        task09_atom4_staged_view(**mutation),
+                        local_github_context(),
+                    ),
+                    expected,
+                )
+
+    def test_committed_inventory_and_history_are_fail_closed(self) -> None:
+        expected = "TASK09_FEATURE_LOCAL_ATOM4_COMMITTED"
+        mutations = (
+            {"head_oid": baseline.TASK09_ATOM3_COMMIT_OID},
+            {"head_parents": (baseline.TASK09_ATOM2_COMMIT_OID,)},
+            {"feature_local_oid": None},
+            {"head_subject": "feat: add probe"},
+            {"commits_after_base": 2},
+            {"head_tree_path_count": 234},
+            {"staged": baseline.TASK09_ATOM4_CHANGED_FILES},
+        )
+        for mutation in mutations:
+            with self.subTest(mutation=mutation):
+                self.assertNotEqual(
+                    baseline.classify_task09_topology(
+                        task09_atom4_committed_view(**mutation),
+                        local_github_context(),
+                    ),
+                    expected,
+                )
+
+
+def task09_finalization_staged_view(
+    **overrides: object,
+) -> baseline.CtrlBatonGitView:
+    view = task09_atom4_committed_view(
+        head_oid=baseline.TASK09_ATOM4_COMMIT_OID,
+        head_parents=(baseline.TASK09_ATOM3_COMMIT_OID,),
+        feature_parents=(baseline.TASK09_ATOM3_COMMIT_OID,),
+        head_tree_oid=baseline.TASK09_ATOM4_TREE_OID,
+        feature_tree_oid=baseline.TASK09_ATOM4_TREE_OID,
+        feature_local_oid=baseline.TASK09_ATOM4_COMMIT_OID,
+        tracked=frozenset(baseline.task09_finalization_repository_files()),
+        staged=baseline.TASK09_FINALIZATION_CHANGED_FILES,
+        staged_added=baseline.TASK09_FINALIZATION_CREATED_FILES,
+        staged_modified=baseline.TASK09_FINALIZATION_MODIFIED_FILES,
+        base_diff=(
+            baseline.TASK09_CHANGED_FILES
+            | baseline.TASK09_ATOM3_CHANGED_FILES
+            | baseline.TASK09_ATOM4_CHANGED_FILES
+        ),
+        head_subject=baseline.TASK09_ATOM4_COMMIT_SUBJECT,
+        commits_after_base=3,
+        index_base_diff=(
+            baseline.TASK09_CHANGED_FILES
+            | baseline.TASK09_ATOM3_CHANGED_FILES
+            | baseline.TASK09_ATOM4_CHANGED_FILES
+            | baseline.TASK09_FINALIZATION_CHANGED_FILES
+        ),
+        index_catalog_version=baseline.TASK09_EXPECTED_CATALOG_VERSION,
+        head_tree_path_count=(
+            baseline.TASK09_ATOM4_EXPECTED_REPOSITORY_FILE_COUNT
+        ),
+        head_catalog_version=(
+            baseline.TASK09_ATOM4_EXPECTED_CATALOG_VERSION
+        ),
+    )
+    return view._replace(**overrides)
+
+
+def task09_finalization_committed_view(
+    **overrides: object,
+) -> baseline.CtrlBatonGitView:
+    head = "5" * 40
+    tree = "6" * 40
+    view = task09_finalization_staged_view(
+        head_oid=head,
+        head_parents=(baseline.TASK09_ATOM4_COMMIT_OID,),
+        feature_parents=(baseline.TASK09_ATOM4_COMMIT_OID,),
+        head_tree_oid=tree,
+        feature_tree_oid=tree,
+        feature_local_oid=head,
+        tracked=frozenset(baseline.task09_finalization_repository_files()),
+        staged=frozenset(),
+        staged_added=frozenset(),
+        staged_modified=frozenset(),
+        base_diff=(
+            baseline.TASK09_CHANGED_FILES
+            | baseline.TASK09_ATOM3_CHANGED_FILES
+            | baseline.TASK09_ATOM4_CHANGED_FILES
+            | baseline.TASK09_FINALIZATION_CHANGED_FILES
+        ),
+        head_subject=baseline.TASK09_FINALIZATION_COMMIT_SUBJECT,
+        commits_after_base=4,
+        index_catalog_version=baseline.TASK09_EXPECTED_CATALOG_VERSION,
+        head_tree_path_count=(
+            baseline.TASK09_FINALIZATION_EXPECTED_REPOSITORY_FILE_COUNT
+        ),
+        head_catalog_version=baseline.TASK09_EXPECTED_CATALOG_VERSION,
+    )
+    return view._replace(**overrides)
+
+
+class Task09FinalizationTopologyTests(unittest.TestCase):
+    def test_exact_staged_and_committed_topologies_pass(self) -> None:
+        self.assertEqual(
+            baseline.classify_task09_topology(
+                task09_finalization_staged_view(),
+                local_github_context(),
+            ),
+            "TASK09_FEATURE_LOCAL_FINALIZATION_STAGED",
+        )
+        self.assertEqual(
+            baseline.classify_task09_topology(
+                task09_finalization_committed_view(),
+                local_github_context(),
+            ),
+            "TASK09_FEATURE_LOCAL_FINALIZATION_COMMITTED",
+        )
+        committed = task09_finalization_committed_view()
+        published = committed._replace(
+            main_oid=baseline.TASK09_BASE_COMMIT_OID,
+            origin_main_oid=baseline.TASK09_BASE_COMMIT_OID,
+            feature_remote_oid=committed.head_oid,
+            upstream=f"origin/{baseline.TASK09_FEATURE_BRANCH}",
+            all_refs=(
+                committed.all_refs
+                | {
+                    "refs/remotes/origin/"
+                    f"{baseline.TASK09_FEATURE_BRANCH}"
+                }
+            ),
+            feature_from_main_count=4,
+            feature_from_main_linear_ok=True,
+        )
+        self.assertEqual(
+            baseline.classify_ctrl_baton_state_machine(
+                published,
+                local_github_context(),
+            ),
+            (
+                "CTRL_GENERIC_CONTROL_FEATURE_COMMITTED",
+                "CTRL_GENERIC_FEATURE_PUBLISHED",
+            ),
+        )
+
+    def test_staged_inventory_and_history_are_fail_closed(self) -> None:
+        expected = "TASK09_FEATURE_LOCAL_FINALIZATION_STAGED"
+        missing = frozenset(
+            set(baseline.TASK09_FINALIZATION_CHANGED_FILES)
+            - {
+                "docs/evidence/task09/"
+                "pumpswap_touch_probe_execution_receipt_v1.json"
+            }
+        )
+        mutations = (
+            {"staged": missing},
+            {"staged_added": frozenset()},
+            {"staged_modified": frozenset()},
+            {"head_oid": baseline.TASK09_ATOM3_COMMIT_OID},
+            {"commits_after_base": 4},
+            {"base_diff": frozenset()},
+            {"untracked": frozenset({"unexpected.txt"})},
+        )
+        for mutation in mutations:
+            with self.subTest(mutation=mutation):
+                self.assertNotEqual(
+                    baseline.classify_task09_topology(
+                        task09_finalization_staged_view(**mutation),
+                        local_github_context(),
+                    ),
+                    expected,
+                )
+
+    def test_committed_inventory_and_history_are_fail_closed(self) -> None:
+        expected = "TASK09_FEATURE_LOCAL_FINALIZATION_COMMITTED"
+        mutations = (
+            {"head_oid": baseline.TASK09_ATOM4_COMMIT_OID},
+            {"head_parents": (baseline.TASK09_ATOM3_COMMIT_OID,)},
+            {"feature_local_oid": None},
+            {"head_subject": "feat: accept evidence"},
+            {"commits_after_base": 3},
+            {"head_tree_path_count": 238},
+            {"staged": baseline.TASK09_FINALIZATION_CHANGED_FILES},
+        )
+        for mutation in mutations:
+            with self.subTest(mutation=mutation):
+                self.assertNotEqual(
+                    baseline.classify_task09_topology(
+                        task09_finalization_committed_view(**mutation),
+                        local_github_context(),
+                    ),
+                    expected,
+                )
 
 
 def generic_feature_published_view(
