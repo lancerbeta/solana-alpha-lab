@@ -519,7 +519,7 @@ records:
   evidence: []
   classification: *t06_internal
 - asset_id: TEST-T06-CATALOG-001
-  record_version: '1.5'
+  record_version: '1.6'
   asset_type: script
   purpose: Catalog tests for the exact TASK-06 stable-ID inventory, hashes, ownership, finalization handoff, consumers and no-raw-bytes boundary.
   status: IMPLEMENTED_UNVERIFIED
@@ -532,7 +532,7 @@ records:
     repository_path: tests/test_task06_catalog.py
   integrity:
     kind: sha256
-    sha256: 9e8662655ba709be6cbaae59a0c38bf9f81533c3ccb10653bee8623615e2acaa
+    sha256: ccebc3ad37389ce33a1b0aa22e712a5b3a658725a92814c5b5f572f5c0c131b4
   access: *t06_read_file
   relations:
   - relation_type: governed_by
@@ -1943,7 +1943,7 @@ records:
     contains_raw_data: false
     sensitivity: INTERNAL_NON_SECRET
 - asset_id: TEST-T04-CORE-STACK-001
-  record_version: '1.8'
+  record_version: '1.9'
   asset_type: script
   purpose: Offline end-to-end Parquet, DuckDB and immutable migration-ledger replay
     plus negative contract tests for the TASK-04 core stack candidate.
@@ -1957,7 +1957,7 @@ records:
     repository_path: tests/test_task04_core_stack.py
   integrity:
     kind: sha256
-    sha256: d5de571caf05ab5174e94cfa37a9f4ce90e0c6df2004115f153d15191bb9ae2d
+    sha256: 9fac52a58f5e6c30e950d60a77a10f151e1f18763c6a846c8a1ecdced2e33a30
   access:
     mode: read_only
     method: command
@@ -1976,7 +1976,7 @@ records:
     contains_raw_data: false
     sensitivity: INTERNAL_NON_SECRET
 - asset_id: VALIDATOR-T04-ARCHITECTURE-001
-  record_version: '1.8'
+  record_version: '1.9'
   asset_type: script
   purpose: Fail-closed TASK-04 replay, architecture, matrix, registry, dependency,
     evidence and SBOM validator.
@@ -1990,7 +1990,7 @@ records:
     repository_path: scripts/validate_task04.py
   integrity:
     kind: sha256
-    sha256: 1e517140860b84f466acaa62cb1ca85dbb41f4011ce63624b5cc7458b79c05b9
+    sha256: 50e43aaa771548a3cc83979b22979116cbfb615028c8eb563917fbf55df752c7
   access:
     mode: read_only
     method: command
@@ -2010,7 +2010,7 @@ records:
     contains_raw_data: false
     sensitivity: INTERNAL_NON_SECRET
 - asset_id: VALIDATOR-REPOSITORY-STATE-001
-  record_version: '2.1'
+  record_version: '2.2'
   asset_type: script
   purpose: Fail-closed historical and compositional repository-state/topology
     validator through CTRL-BATON A6.4.
@@ -2024,7 +2024,7 @@ records:
     repository_path: scripts/validate_baseline.py
   integrity:
     kind: sha256
-    sha256: 3dee61a459bd5b777ae40746a8afcb267d2ff6092fab60538a7f0b5d417acf36
+    sha256: 1797f89c53eb382f20d71e9223b28dd3d99542a5d3cca2c9584e76c0401b8eaa
   access:
     mode: read_only
     method: command
@@ -2045,6 +2045,7 @@ records:
   - TASK-06
   - TASK-07
   - TASK-08
+  - TASK-09
   evidence: []
   classification:
     contains_secrets: false
@@ -2534,7 +2535,7 @@ records:
     contains_raw_data: false
     sensitivity: INTERNAL_NON_SECRET
 - asset_id: TEST-T05-CATALOG-QUERIES-001
-  record_version: '1.7'
+  record_version: '1.8'
   asset_type: script
   purpose: 'Offline tests proving TASK-05 query bounds, UTC eligibility, write denial, external-access denial, raw BLOB exclusion and exact task/data-contract Catalog registration.'
   status: IMPLEMENTED_UNVERIFIED
@@ -2547,7 +2548,7 @@ records:
     repository_path: tests/test_task05_catalog_queries.py
   integrity:
     kind: sha256
-    sha256: 5bfac1b99716f5221f59006134a2168b6c234a5b9fb38b73dbe412bd5560aad0
+    sha256: 9a87b5120a802c0efa5fe78882b61604c0e39b4f3ba988b549cb19c3a25d04b9
   access:
     mode: read_only
     method: command
@@ -3409,7 +3410,7 @@ records:
   evidence: []
   classification: *t07_internal
 - asset_id: TEST-T07-CATALOG-001
-  record_version: '1.3'
+  record_version: '1.4'
   asset_type: script
   purpose: Catalog tests for exact TASK-07 stable IDs, file hashes, lineage, accepted checkpoint and no-raw-bytes boundary.
   status: IMPLEMENTED_UNVERIFIED
@@ -3422,7 +3423,7 @@ records:
     repository_path: tests/test_task07_catalog.py
   integrity:
     kind: sha256
-    sha256: 68ad585f968a8f188293ccc67220d2d6b88e0238fa3d568720e57a02731bc94e
+    sha256: 5fcd433ac9e4e5e5e19fa95a09040450e92e60db7ffee206fbe780b77aca1e8e
   access: *t07_read_file
   relations:
   - relation_type: depends_on
@@ -3893,7 +3894,7 @@ records:
   evidence: []
   classification: *t08_internal
 - asset_id: TEST-T08-CATALOG-001
-  record_version: '1.2'
+  record_version: '1.3'
   asset_type: script
   purpose: Catalog tests for exact TASK-08 stable IDs, file and raw hashes, lineage, named consumers, accepted checkpoint and no-raw-bytes boundary.
   status: IMPLEMENTED_UNVERIFIED
@@ -3906,7 +3907,7 @@ records:
     repository_path: tests/test_task08_catalog.py
   integrity:
     kind: sha256
-    sha256: 979dc3087d8c1dd017df282dc651e33b689d9c2674fabbfd474b0373cd5a2912
+    sha256: 173ba936638f8263125c9d7faa980ec27192bf8a161b78cd4e1697f1b02f1d6a
   access: *t08_read_file
   relations:
   - relation_type: depends_on
@@ -4858,7 +4859,7 @@ records:
     contains_raw_data: false
     sensitivity: INTERNAL_NON_SECRET
 - asset_id: TEST-BATON-REPOSITORY-POLICY-001
-  record_version: '1.3'
+  record_version: '1.4'
   asset_type: script
   purpose: Unit tests for exact local staged, committed and published feature,
     PR merge, main merge, and legacy repository policy.
@@ -4872,7 +4873,7 @@ records:
     repository_path: tests/test_baton_repository_policy.py
   integrity:
     kind: sha256
-    sha256: 9a163410a8cfc4abcb8311d094a71092024c93b44ca4c1dea9ce9aecead09829
+    sha256: 2a81fae6e5f54b28038833423c126b25d6ea4ae3b84c5d74861450671f74e0db
   access:
     mode: read_only
     method: file
@@ -4883,6 +4884,7 @@ records:
     target_asset_id: CTRL-BATON-SETUP-001
   consumers:
   - CTRL-BATON-SETUP
+  - TASK-09
   evidence: []
   classification:
     contains_secrets: false

@@ -1,0 +1,401 @@
+{
+  "schema": "solana_alpha_lab.pumpswap_touch_observation_contract",
+  "schema_version": "1.0",
+  "task_id": "TASK-09",
+  "atom_id": "T09-A2",
+  "as_of": "2026-07-27",
+  "status": "OFFLINE_TOUCH_CONTRACT_CANDIDATE",
+  "estimand": {
+    "decision": "CAN_BOUNDED_PUMPSWAP_TOUCH_RECONSTRUCT_PIT_FIELDS",
+    "scope": "POST_MIGRATION_TOUCH_ONLY",
+    "accepted_claim": "TOUCH",
+    "forbidden_claims": [
+      "FILLABLE",
+      "NO_ROUTE",
+      "EXECUTABLE_QUOTE",
+      "REALIZED_VWAP",
+      "NET_RETURN",
+      "MIGRATION_FROM_POOL_OBSERVATION",
+      "MIGRATION_FROM_INDEX_ZERO"
+    ]
+  },
+  "inherited_task08_boundary": {
+    "lifecycle_coverage_status": "NOT_TESTABLE_IN_WINDOW",
+    "retained_records": 388,
+    "accepted_create_events": 0,
+    "retry_authorized": false,
+    "longer_pilot_authorized": false
+  },
+  "universes": [
+    {
+      "universe_id": "PUMPSWAP_OBSERVED",
+      "membership": "SOURCE_PINNED_SUCCESSFUL_POOL_ACCOUNT_OR_BUY_SELL_EVENT",
+      "proves_migration": false,
+      "proves_canonical_pool": false,
+      "proves_fillable": false
+    },
+    {
+      "universe_id": "PUMP_MIGRATION_CONFIRMED",
+      "membership": "ACCEPTED_SUCCESSFUL_PUMP_MIGRATION_EVENT_WITH_DESTINATION_PROGRAM_AND_POOL",
+      "pool_observation_sufficient": false,
+      "index_zero_sufficient": false,
+      "destination_match_required": true
+    },
+    {
+      "universe_id": "CANONICAL_INDEX_CANDIDATE",
+      "membership": "OBSERVED_PUMPSWAP_POOL_ACCOUNT_WITH_INDEX_ZERO",
+      "candidate_only": true,
+      "proves_migration": false,
+      "requires_later_provenance_link": true
+    }
+  ],
+  "universe_relationship": {
+    "labels_are_independent": true,
+    "implicit_subset_claims_forbidden": true,
+    "launch_universe": "UNAVAILABLE_NOT_INFERRED",
+    "signal_universe": "NONE",
+    "execution_universe": "NONE",
+    "outcome_dependent_selection_forbidden": true
+  },
+  "protocol": {
+    "official_source": "github:pump-fun/pump-public-docs",
+    "official_docs_path": "docs/PUMP_SWAP_README.md",
+    "official_idl_path": "idl/pump_amm.json",
+    "facts_observed_as_of": "2026-07-27",
+    "program_id": "pAMMBay6oceH9fJKBRHGP5D4bD4sWpmSwMn52FMfXEA",
+    "mutable_upstream_ref_is_decoder_pin": false,
+    "exact_idl_blob_required_before_atom": "T09-A3",
+    "required_idl_subset": [
+      "Pool",
+      "BuyEvent",
+      "SellEvent",
+      "NESTED_TYPES_REFERENCED_BY_REQUIRED_SUBSET"
+    ],
+    "drift_terminal_state": "BLOCKED_PROTOCOL_DRIFT"
+  },
+  "touch_semantics": {
+    "accepted_event_kinds": [
+      "POOL_ACCOUNT_OBSERVED",
+      "BUY_EVENT_OBSERVED",
+      "SELL_EVENT_OBSERVED"
+    ],
+    "transaction_must_succeed_for_canonical_projection": true,
+    "failed_transaction_disposition": "TYPED_RAW_EVIDENCE_ONLY",
+    "partial_field_disposition": "RETAIN_RAW_AND_RECORD_FIELD_COVERAGE_GAP",
+    "missing_is_zero": false,
+    "provider_failure_is_no_route": false,
+    "observed_trade_is_our_fill": false
+  },
+  "reserve_semantics": {
+    "raw_base_reserve": "RAW_BASE_VAULT_BALANCE_ATOMIC",
+    "raw_quote_reserve": "RAW_QUOTE_VAULT_BALANCE_ATOMIC",
+    "virtual_quote_reserves": {
+      "source_type": "i128",
+      "signed": true,
+      "must_be_retained_separately": true
+    },
+    "effective_quote_reserves_formula": "RAW_QUOTE_VAULT_BALANCE_ATOMIC + VIRTUAL_QUOTE_RESERVES_ATOMIC",
+    "effective_must_not_replace_raw": true,
+    "negative_effective_terminal_state": "SCHEMA_GAP_BLOCK_CANONICALIZATION",
+    "overflow_terminal_state": "SCHEMA_GAP_BLOCK_CANONICALIZATION",
+    "precision_loss_forbidden": true,
+    "test_vectors": [
+      {
+        "raw_quote_vault_balance_atomic": 4000000000,
+        "virtual_quote_reserves_atomic": 0,
+        "effective_quote_reserves_atomic": 4000000000,
+        "canonicalizable": true
+      },
+      {
+        "raw_quote_vault_balance_atomic": 1000,
+        "virtual_quote_reserves_atomic": -200,
+        "effective_quote_reserves_atomic": 800,
+        "canonicalizable": true
+      },
+      {
+        "raw_quote_vault_balance_atomic": 100,
+        "virtual_quote_reserves_atomic": -200,
+        "effective_quote_reserves_atomic": -100,
+        "canonicalizable": false
+      }
+    ]
+  },
+  "schema_mapping": {
+    "raw_api_events": {
+      "task09_mode": "WRITE",
+      "purpose": "REDACTED_SOURCE_EVIDENCE_AND_TYPED_FAILURES",
+      "raw_lineage_required": true
+    },
+    "token_lifecycle_events": {
+      "task09_mode": "READ_ONLY",
+      "purpose": "EXPLICIT_MIGRATION_CONFIRMATION_ONLY",
+      "inference_write_forbidden": true
+    },
+    "pool_state_snapshots": {
+      "task09_mode": "WRITE",
+      "base_reserve_atomic_semantics": "RAW_BASE_VAULT_BALANCE_ATOMIC",
+      "quote_reserve_atomic_semantics": "RAW_QUOTE_VAULT_BALANCE_ATOMIC",
+      "effective_reserve_substitution_forbidden": true
+    },
+    "trade_orderflow_inputs": {
+      "task09_mode": "WRITE",
+      "successful_decoded_events_only": true,
+      "observed_trade_not_fill": true
+    },
+    "canonical_observations": {
+      "task09_mode": "WRITE_WHEN_EXACTLY_REPRESENTABLE",
+      "observation_types": [
+        "PUMPSWAP_VIRTUAL_QUOTE_RESERVES",
+        "PUMPSWAP_EFFECTIVE_QUOTE_RESERVES",
+        "PUMPSWAP_FEE_FIELD",
+        "PUMPSWAP_FIELD_COVERAGE"
+      ],
+      "raw_lineage_required": true
+    },
+    "quote_attempts": {
+      "task09_mode": "FORBIDDEN",
+      "first_writer_for_route_evidence": "TASK-10",
+      "no_route_forbidden": true
+    }
+  },
+  "timestamps": [
+    "event_at",
+    "observed_at",
+    "first_reliable_available_at",
+    "available_at",
+    "ingested_at"
+  ],
+  "timestamp_mapping": {
+    "available_at": "available_to_strategy_at",
+    "backdated_first_reliable_available_at_forbidden": true,
+    "timezone": "UTC_AWARE"
+  },
+  "identity": {
+    "pool_observation_fields": [
+      "source_version",
+      "pool_id",
+      "context_slot",
+      "evidence_position"
+    ],
+    "trade_observation_fields": [
+      "source_version",
+      "pool_id",
+      "transaction_signature",
+      "instruction_or_event_position"
+    ],
+    "overwrite_revision_forbidden": true,
+    "provider_disagreement_coexists": true
+  },
+  "provider_roles": {
+    "SOLANA_STANDARD_WSS_PRIMARY": {
+      "surface": "STANDARD_SOLANA_WSS",
+      "method": "logsSubscribe",
+      "mentions": [
+        "pAMMBay6oceH9fJKBRHGP5D4bD4sWpmSwMn52FMfXEA"
+      ],
+      "commitment": "confirmed",
+      "event_owner": true,
+      "followup_method": "getTransaction",
+      "auth_mode": "JIT_LOCAL_USER_BOUNDARY",
+      "auth_material_persisted": false
+    },
+    "HELIUS_TRANSACTION_SUBSCRIBE_CONDITIONAL_FALLBACK": {
+      "surface": "ENHANCED_WSS",
+      "method": "transactionSubscribe",
+      "enabled_for_first_probe": false,
+      "minimum_documented_plan": "DEVELOPER",
+      "purchase_or_upgrade_authorized": false,
+      "event_owner": false
+    }
+  },
+  "provider_facts": {
+    "as_of": "2026-07-27",
+    "standard_logs_subscribe_is_solana_rpc": true,
+    "logs_subscribe_mentions_pubkeys_per_subscription": 1,
+    "get_transaction_result_may_be_null": true,
+    "helius_free_websocket_types": [
+      "STANDARD"
+    ],
+    "helius_developer_websocket_types": [
+      "STANDARD",
+      "ENHANCED"
+    ],
+    "helius_stream_credits_per_100000_uncompressed_bytes": 2,
+    "helius_connection_credits": 1,
+    "helius_standard_rpc_credits": 1,
+    "account_plan_readback_required_before_external_probe": true
+  },
+  "cheapest_falsifier": {
+    "elapsed_seconds": 30,
+    "wss_connections": 1,
+    "wss_subscriptions": 1,
+    "notifications": 256,
+    "uncompressed_stream_bytes": 1500000,
+    "get_transaction_followups": 8,
+    "modeled_helius_credits": 39,
+    "helius_credit_cap": 40,
+    "received_plus_stored_bytes": 4000000,
+    "concurrency": 1,
+    "retries": 0,
+    "cash_spend_usd_cents": 0,
+    "no_event_disposition": "NOT_TESTABLE_IN_WINDOW",
+    "extension_or_retry_authorized": false
+  },
+  "terminal_states": [
+    "FIELD_COVERAGE_CANDIDATE",
+    "NOT_TESTABLE_IN_WINDOW",
+    "BLOCKED_PROTOCOL_DRIFT",
+    "SCHEMA_GAP_BLOCK_CANONICALIZATION",
+    "TYPED_PROVIDER_FAILURE"
+  ],
+  "schema_projection_examples": {
+    "pool_state_snapshots": {
+      "pool_snapshot_id": "pool-snapshot-synthetic-001",
+      "idempotency_key": "pool-snapshot-idem-synthetic-001",
+      "business_key": "pumpswap-pool-synthetic:slot-100",
+      "pool_id": "pool-synthetic-001",
+      "base_mint": "base-mint-synthetic",
+      "quote_mint": "So11111111111111111111111111111111111111112",
+      "base_decimals": 6,
+      "quote_decimals": 9,
+      "base_reserve_atomic": 250000000,
+      "quote_reserve_atomic": 4000000000,
+      "context_slot": 100,
+      "event_time": "2026-07-27T00:00:00Z",
+      "observed_at": "2026-07-27T00:00:01Z",
+      "available_to_strategy_at": "2026-07-27T00:00:02Z",
+      "ingested_at": "2026-07-27T00:00:03Z",
+      "first_reliable_available_at": "2026-07-27T00:00:02Z",
+      "source": "synthetic_pumpswap_touch_fixture",
+      "source_version": "1.0",
+      "schema_version": "1.0",
+      "revision_number": 1,
+      "revision_of": null,
+      "raw_event_id": "raw-synthetic-pool-001",
+      "content_sha256": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+      "quality_flags": "SYNTHETIC_RAW_RESERVES"
+    },
+    "trade_orderflow_inputs": {
+      "trade_input_id": "trade-synthetic-001",
+      "idempotency_key": "trade-idem-synthetic-001",
+      "business_key": "pumpswap-trade-synthetic:signature:0",
+      "pool_id": "pool-synthetic-001",
+      "side": "BUY",
+      "input_mint": "So11111111111111111111111111111111111111112",
+      "input_amount_atomic": 100000000,
+      "input_decimals": 9,
+      "output_mint": "base-mint-synthetic",
+      "output_amount_atomic": 5000000,
+      "output_decimals": 6,
+      "trader_entity_id": null,
+      "transaction_signature": "signature-synthetic-001",
+      "context_slot": 100,
+      "event_time": "2026-07-27T00:00:00Z",
+      "observed_at": "2026-07-27T00:00:01Z",
+      "available_to_strategy_at": "2026-07-27T00:00:02Z",
+      "ingested_at": "2026-07-27T00:00:03Z",
+      "first_reliable_available_at": "2026-07-27T00:00:02Z",
+      "source": "synthetic_pumpswap_touch_fixture",
+      "source_version": "1.0",
+      "schema_version": "1.0",
+      "revision_number": 1,
+      "revision_of": null,
+      "raw_event_id": "raw-synthetic-trade-001",
+      "content_sha256": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+      "quality_flags": "SYNTHETIC_OBSERVED_TRADE_NOT_FILL"
+    },
+    "canonical_observations": [
+      {
+        "observation_id": "observation-virtual-reserves-synthetic-001",
+        "idempotency_key": "observation-virtual-idem-synthetic-001",
+        "business_key": "pumpswap-pool-synthetic:virtual:slot-100",
+        "entity_type": "PUMPSWAP_POOL",
+        "entity_id": "pool-synthetic-001",
+        "observation_type": "PUMPSWAP_VIRTUAL_QUOTE_RESERVES",
+        "value_decimal": "0",
+        "value_atomic": null,
+        "unit": "QUOTE_ATOMIC_SIGNED",
+        "amount_mint": null,
+        "amount_decimals": null,
+        "event_time": "2026-07-27T00:00:00Z",
+        "observed_at": "2026-07-27T00:00:01Z",
+        "available_to_strategy_at": "2026-07-27T00:00:02Z",
+        "ingested_at": "2026-07-27T00:00:03Z",
+        "first_reliable_available_at": "2026-07-27T00:00:02Z",
+        "source": "synthetic_pumpswap_touch_fixture",
+        "source_version": "1.0",
+        "schema_version": "1.0",
+        "revision_number": 1,
+        "revision_of": null,
+        "raw_event_id": "raw-synthetic-pool-001",
+        "content_sha256": "dddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd",
+        "quality_flags": "SYNTHETIC_SIGNED_VIRTUAL_RESERVE"
+      },
+      {
+        "observation_id": "observation-effective-reserves-synthetic-001",
+        "idempotency_key": "observation-effective-idem-synthetic-001",
+        "business_key": "pumpswap-pool-synthetic:effective:slot-100",
+        "entity_type": "PUMPSWAP_POOL",
+        "entity_id": "pool-synthetic-001",
+        "observation_type": "PUMPSWAP_EFFECTIVE_QUOTE_RESERVES",
+        "value_decimal": null,
+        "value_atomic": 4000000000,
+        "unit": "ATOMIC",
+        "amount_mint": "So11111111111111111111111111111111111111112",
+        "amount_decimals": 9,
+        "event_time": "2026-07-27T00:00:00Z",
+        "observed_at": "2026-07-27T00:00:01Z",
+        "available_to_strategy_at": "2026-07-27T00:00:02Z",
+        "ingested_at": "2026-07-27T00:00:03Z",
+        "first_reliable_available_at": "2026-07-27T00:00:02Z",
+        "source": "synthetic_pumpswap_touch_fixture",
+        "source_version": "1.0",
+        "schema_version": "1.0",
+        "revision_number": 1,
+        "revision_of": null,
+        "raw_event_id": "raw-synthetic-pool-001",
+        "content_sha256": "eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee",
+        "quality_flags": "SYNTHETIC_DERIVED_EFFECTIVE_RESERVE"
+      }
+    ]
+  },
+  "catalog": {
+    "status": "CATALOG_GAP_PENDING_T09_RECONCILIATION",
+    "future_asset_ids": [
+      "CONTRACT-T09-PUMPSWAP-TOUCH-001",
+      "FIXTURE-T09-PUMPSWAP-TOUCH-001",
+      "TEST-T09-PUMPSWAP-TOUCH-001"
+    ],
+    "named_consumers": [
+      "TASK-10",
+      "TASK-13",
+      "TASK-18",
+      "TASK-19",
+      "TASK-20..26",
+      "TASK-28..40",
+      "TASK-43..47"
+    ]
+  },
+  "authority": {
+    "class": "LOCAL_WRITE_AND_EXACT_STAGE_ONLY",
+    "managed_files": [
+      "docs/contracts/pumpswap_touch_observation_contract_v1.md",
+      "tests/fixtures/task09/pumpswap_touch_observation_contract_v1.json",
+      "tests/test_task09_pumpswap_touch_observation_contract.py"
+    ],
+    "network_after_git_fetch": false,
+    "dependency_changes": 0,
+    "provider_api_rpc_wss_calls": 0,
+    "credential_use": false,
+    "cash_spend_usd_cents": 0,
+    "commit": false,
+    "push": false,
+    "pull_request": false,
+    "merge": false
+  },
+  "next_atom": {
+    "atom_id": "T09-A3",
+    "purpose": "PIN_OFFICIAL_IDL_AND_BUILD_OFFLINE_DECODER_PROJECTOR",
+    "separate_authority_required": true
+  }
+}

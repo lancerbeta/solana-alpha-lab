@@ -1409,6 +1409,15 @@ class LegacyRegressionTests(unittest.TestCase):
                 ),
             },
         )
+        self.assertEqual(
+            baseline.TASK09_LIFECYCLE_COMBINATIONS,
+            {
+                (
+                    "TASK09_ATOM2_POLICY_REPAIR_STAGED",
+                    "TASK09_FEATURE_LOCAL_POLICY_REPAIR_STAGED",
+                )
+            },
+        )
 
 
 GENERIC_BRANCH = "ctrl/cursor-workplace-validation"
@@ -1471,6 +1480,128 @@ def generic_feature_view(
         True,
     )
     return view._replace(**overrides)
+
+
+def task09_policy_repair_staged_view(
+    **overrides: object,
+) -> baseline.CtrlBatonGitView:
+    refs = frozenset(
+        {
+            "refs/heads/main",
+            "refs/remotes/origin/HEAD",
+            "refs/remotes/origin/main",
+            f"refs/heads/{baseline.TASK09_FEATURE_BRANCH}",
+            "refs/heads/ctrl/live-baton-reconciliation",
+            "refs/remotes/origin/ctrl/live-baton-reconciliation",
+        }
+    )
+    view = generic_feature_view(
+        branch=baseline.TASK09_FEATURE_BRANCH,
+        head_oid=baseline.TASK09_BASE_COMMIT_OID,
+        head_parents=baseline.TASK09_BASE_PARENT_OIDS,
+        feature_parents=baseline.TASK09_BASE_PARENT_OIDS,
+        head_tree_oid=baseline.TASK09_BASE_TREE_OID,
+        feature_tree_oid=baseline.TASK09_BASE_TREE_OID,
+        main_oid=baseline.TASK09_BASE_PARENT_OID,
+        origin_main_oid=baseline.TASK09_BASE_COMMIT_OID,
+        feature_local_oid=baseline.TASK09_BASE_COMMIT_OID,
+        feature_remote_oid=None,
+        upstream=None,
+        all_refs=refs,
+        tracked=frozenset(baseline.task09_repository_files()),
+        staged=baseline.TASK09_CHANGED_FILES,
+        staged_added=baseline.TASK09_ATOM2_CREATED_FILES,
+        staged_modified=baseline.TASK09_POLICY_REPAIR_MODIFIED_FILES,
+        unstaged=frozenset(),
+        untracked=frozenset(),
+        conflicts=frozenset(),
+        base_diff=frozenset(),
+        head_subject=baseline.TASK09_BASE_COMMIT_SUBJECT,
+        commits_after_base=0,
+        index_base_diff=baseline.TASK09_CHANGED_FILES,
+        index_catalog_version=baseline.TASK09_EXPECTED_CATALOG_VERSION,
+        head_tree_path_count=baseline.TASK09_BASE_FILE_COUNT,
+        head_catalog_version=baseline.TASK09_BASE_CATALOG_VERSION,
+        feature_based_on_main_ok=True,
+        remote_head_target="refs/remotes/origin/main",
+    )
+    return view._replace(**overrides)
+
+
+class Task09PolicyRepairStagedTopologyTests(unittest.TestCase):
+    EXPECTED = "TASK09_FEATURE_LOCAL_POLICY_REPAIR_STAGED"
+
+    def classify(self, **overrides: object) -> str:
+        return baseline.classify_task09_topology(
+            task09_policy_repair_staged_view(**overrides),
+            local_github_context(),
+        )
+
+    def test_exact_task09_staged_topology_passes(self) -> None:
+        self.assertEqual(self.classify(), self.EXPECTED)
+
+    def test_identity_and_base_are_fail_closed(self) -> None:
+        mutations = (
+            {"branch": "task09/other"},
+            {"head_oid": baseline.TASK09_BASE_PARENT_OID},
+            {"head_parents": tuple(reversed(baseline.TASK09_BASE_PARENT_OIDS))},
+            {"head_tree_oid": GENERIC_TREE},
+            {"origin_main_oid": baseline.TASK09_BASE_PARENT_OID},
+            {"main_oid": GENERIC_BASE},
+            {"feature_local_oid": None},
+            {"head_subject": "Merge pull request #6"},
+        )
+        for mutation in mutations:
+            with self.subTest(mutation=mutation):
+                self.assertNotEqual(self.classify(**mutation), self.EXPECTED)
+
+    def test_staged_inventory_is_fail_closed(self) -> None:
+        missing = frozenset(
+            set(baseline.TASK09_CHANGED_FILES)
+            - {"tests/test_baton_repository_policy.py"}
+        )
+        mutations = (
+            {"staged": missing},
+            {
+                "staged":
+                baseline.TASK09_CHANGED_FILES | {"unexpected.txt"}
+            },
+            {"staged_added": frozenset()},
+            {"staged_modified": frozenset()},
+            {"index_base_diff": missing},
+            {"untracked": frozenset({"unexpected.txt"})},
+            {"unstaged": frozenset({"scripts/validate_baseline.py"})},
+            {"conflicts": frozenset({"tests/test_baseline.py"})},
+        )
+        for mutation in mutations:
+            with self.subTest(mutation=mutation):
+                self.assertNotEqual(self.classify(**mutation), self.EXPECTED)
+
+    def test_remote_and_ref_policy_is_fail_closed(self) -> None:
+        extra_refs = (
+            task09_policy_repair_staged_view().all_refs
+            | {"refs/heads/task10/unapproved"}
+        )
+        mutations = (
+            {"feature_remote_oid": baseline.TASK09_BASE_COMMIT_OID},
+            {"upstream": f"origin/{baseline.TASK09_FEATURE_BRANCH}"},
+            {"remote_head_target": None},
+            {"all_refs": extra_refs},
+            {"fetch_urls": ("https://example.invalid/repository.git",)},
+        )
+        for mutation in mutations:
+            with self.subTest(mutation=mutation):
+                self.assertNotEqual(self.classify(**mutation), self.EXPECTED)
+
+    def test_github_actions_context_fails(self) -> None:
+        context = local_github_context()._replace(actions=True)
+        self.assertEqual(
+            baseline.classify_task09_topology(
+                task09_policy_repair_staged_view(),
+                context,
+            ),
+            "INVALID_GIT_TOPOLOGY",
+        )
 
 
 def generic_feature_published_view(
