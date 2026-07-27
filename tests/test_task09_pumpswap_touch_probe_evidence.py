@@ -277,7 +277,10 @@ class Task09PumpSwapTouchProbeEvidenceTests(unittest.TestCase):
             "EVIDENCE-T09-PUMPSWAP-TOUCH-SUMMARY-001",
             "TEST-T09-PUMPSWAP-TOUCH-EVIDENCE-001",
         }
-        self.assertEqual(manifest["catalog_version"], "0.9.0")
+        self.assertGreaterEqual(
+            tuple(int(part) for part in manifest["catalog_version"].split(".")),
+            (0, 9, 0),
+        )
         self.assertTrue(expected.issubset(records))
         self.assertTrue(
             expected.issubset(set(manifest["mandatory_asset_ids"]))

@@ -46,7 +46,7 @@ def prepare_replay(root: Path, order: str = "source") -> dict[str, object]:
 
 
 class Task04CoreStackTests(unittest.TestCase):
-    def test_catalog_checkpoint_accepts_only_exact_known_states(
+    def test_catalog_checkpoint_accepts_history_and_monotonic_successors(
         self,
     ) -> None:
         for checkpoint in (
@@ -65,6 +65,8 @@ class Task04CoreStackTests(unittest.TestCase):
             ("0.8.6", 191, 7),
             ("0.8.8", 191, 7),
             ("0.9.0", 205, 7),
+            ("0.9.1", 205, 7),
+            ("0.10.0", 206, 8),
         ):
             with self.subTest(checkpoint=checkpoint):
                 task04_validator.validate_catalog_checkpoint(*checkpoint)
@@ -102,6 +104,10 @@ class Task04CoreStackTests(unittest.TestCase):
             ("0.8.6", 190, 7),
             ("0.8.6", 191, 5),
             ("0.8.6", 192, 7),
+            ("0.9.0", 206, 7),
+            ("0.9.1", 204, 7),
+            ("0.9.1", 205, 6),
+            ("0.9.1-alpha", 205, 7),
         ):
             with self.subTest(checkpoint=checkpoint):
                 with self.assertRaisesRegex(

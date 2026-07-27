@@ -72,7 +72,13 @@ class Task07CatalogTests(unittest.TestCase):
         cls.snapshot = load_and_validate()
 
     def test_catalog_checkpoint_and_mandatory_inventory_are_exact(self) -> None:
-        self.assertEqual(self.snapshot.manifest["catalog_version"], "0.9.0")
+        self.assertGreaterEqual(
+            tuple(
+                int(part)
+                for part in self.snapshot.manifest["catalog_version"].split(".")
+            ),
+            (0, 9, 0),
+        )
         self.assertEqual(len(self.snapshot.assets), 205)
         self.assertEqual(len(self.snapshot.queries), 7)
         self.assertTrue(

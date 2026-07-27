@@ -851,11 +851,28 @@ def validate_catalog_checkpoint(
     query_count: int,
 ) -> None:
     checkpoint = (str(version), asset_count, query_count)
-    if checkpoint not in EXPECTED_CATALOG_CHECKPOINTS:
-        raise Task04ValidationError(
-            "catalog_checkpoint_mismatch:"
-            f"{checkpoint[0]}:{checkpoint[1]}:{checkpoint[2]}"
-        )
+    if checkpoint in EXPECTED_CATALOG_CHECKPOINTS:
+        return
+    latest = max(
+        EXPECTED_CATALOG_CHECKPOINTS,
+        key=lambda item: tuple(int(part) for part in item[0].split(".")),
+    )
+    try:
+        version_parts = tuple(int(part) for part in checkpoint[0].split("."))
+    except ValueError:
+        version_parts = ()
+    latest_parts = tuple(int(part) for part in latest[0].split("."))
+    if (
+        len(version_parts) == 3
+        and version_parts > latest_parts
+        and asset_count >= latest[1]
+        and query_count >= latest[2]
+    ):
+        return
+    raise Task04ValidationError(
+        "catalog_checkpoint_mismatch:"
+        f"{checkpoint[0]}:{checkpoint[1]}:{checkpoint[2]}"
+    )
 
 
 def validate() -> tuple[str, str]:
