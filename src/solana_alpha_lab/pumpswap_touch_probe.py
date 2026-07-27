@@ -780,8 +780,20 @@ def validate_get_transaction_response(
         "transaction",
         "version",
     }
-    if set(result) != required_result_keys:
+    allowed_result_keys = required_result_keys | {"transactionIndex"}
+    result_keys = set(result)
+    if (
+        not required_result_keys.issubset(result_keys)
+        or not result_keys.issubset(allowed_result_keys)
+    ):
         raise TouchNotificationError("get_transaction_result_keys_drift")
+    transaction_index = result.get("transactionIndex")
+    if "transactionIndex" in result and (
+        isinstance(transaction_index, bool)
+        or not isinstance(transaction_index, int)
+        or transaction_index < 0
+    ):
+        raise TouchNotificationError("get_transaction_index_invalid")
     slot = result["slot"]
     if isinstance(slot, bool) or not isinstance(slot, int) or slot < 0:
         raise TouchNotificationError("get_transaction_slot_invalid")
@@ -858,6 +870,7 @@ def validate_get_transaction_response(
         "pre_token_balance_count": len(meta["preTokenBalances"]),
         "result_present": True,
         "terminal": "FIELD_COVERAGE_CANDIDATE",
+        "transaction_index_present": "transactionIndex" in result,
     }
 
 

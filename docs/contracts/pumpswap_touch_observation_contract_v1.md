@@ -284,11 +284,20 @@ Later reconciliation must register:
 - `TEST-T09-PUMPSWAP-TOUCH-001`.
 - `MODULE-T09-PUMPSWAP-TOUCH-DECODER-001`;
 - `FIXTURE-T09-PUMPSWAP-IDL-SUBSET-001`;
-- `TEST-T09-PUMPSWAP-TOUCH-DECODER-001`.
+- `TEST-T09-PUMPSWAP-TOUCH-DECODER-001`;
+- `MODULE-T09-PUMPSWAP-TOUCH-PROBE-001`;
+- `SCRIPT-T09-PUMPSWAP-TOUCH-PROBE-001`;
+- `TEST-T09-PUMPSWAP-TOUCH-PROBE-001`;
+- `DATA-T09-PUMPSWAP-TOUCH-PROBE-RAW-001`;
+- `FIXTURE-T09-PUMPSWAP-TOUCH-EVIDENCE-001`;
+- `EVIDENCE-T09-PUMPSWAP-TOUCH-RECEIPT-001`;
+- `EVIDENCE-T09-PUMPSWAP-TOUCH-SUMMARY-001`;
+- `TEST-T09-PUMPSWAP-TOUCH-EVIDENCE-001`.
 
 Named consumers are TASK-10, TASK-13, TASK-18/19, TASK-20..26, TASK-28..40 and
-TASK-43..47. Atom 2 does not update Catalog; its expected status is
-`CATALOG_GAP_PENDING_T09_RECONCILIATION`.
+TASK-43..47. Atoms 2 through 4 leave
+`CATALOG_GAP_PENDING_T09_RECONCILIATION`; T09-A5 closes that gap through
+Catalog `0.9.0` while keeping raw bytes outside Git.
 
 ## Atom 2 Definition of Done
 
@@ -359,3 +368,38 @@ Offline synthetic tests cover the exact request bodies, one-pubkey
 invocation-stack attribution, pinned event decode, bounded follow-ups,
 provider/gap classifications and TASK-06 Parquet evidence. Real network
 execution remains a separate external-action gate.
+
+## Atom 4 observed execution and repair boundary
+
+The one authorized run `t09a4-20260727T184740Z` reached the 256-notification
+cap, retained 258 redacted raw records and stopped fail-closed on
+`get_transaction_result_keys_drift`. The official public RPC response
+contained the required `blockTime`, `meta`, `slot`, `transaction` and
+`version` fields plus one additive `transactionIndex` field. The official
+`getTransaction` documentation did not list that field as of 2026-07-27.
+
+T09-A4R therefore permits exactly one forward-compatible extension:
+
+- `transactionIndex` is optional;
+- when present, it must be a non-boolean integer greater than or equal to zero;
+- every required result key remains mandatory;
+- every other unknown result key still stops as schema drift;
+- the original raw record and its
+  `INVALID_RESPONSE/get_transaction_result_keys_drift` classification remain
+  immutable.
+
+Offline replay after this repair classifies the preserved response as
+`FIELD_COVERAGE_CANDIDATE`. It does not retroactively make the live runner a
+clean success and does not authorize another external call.
+
+The sanitized fixture and acceptance receipt bind the ignored raw hashes:
+
+- `tests/fixtures/task09/pumpswap_touch_probe_live_evidence_v1.json`;
+- `docs/evidence/task09/pumpswap_touch_probe_execution_receipt_v1.json`;
+- `docs/evidence/task09/pumpswap_touch_probe_execution_summary_v1.md`.
+
+The accepted bounded result contains 256 notifications, including 124
+successful and 132 failed transactions, and 75 pinned-IDL Touch events. It
+proves only post-migration Touch transport and field coverage. Launch/lifecycle
+representativeness, Fillable, `NO_ROUTE`, executable quotes, migration, alpha
+and NetReturn remain unproven or out of TASK-09 scope.

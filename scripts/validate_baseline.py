@@ -689,12 +689,54 @@ TASK09_ATOM4_COMMIT_COUNT = TASK09_ATOM3_COMMIT_COUNT + 1
 TASK09_ATOM4_COMMIT_SUBJECT = (
     "feat: add TASK-09 PumpSwap Touch probe"
 )
+TASK09_ATOM4_COMMIT_OID = "c02294407b17f71b44725ef61cc022fecd7ba80f"
+TASK09_ATOM4_TREE_OID = "c1cd3540368d9e93e16ad2e8fa00a5eff1e67daa"
 TASK09_ATOM4_EXPECTED_REPOSITORY_FILE_COUNT = (
     TASK09_ATOM3_EXPECTED_REPOSITORY_FILE_COUNT
     + len(TASK09_ATOM4_CREATED_FILES)
 )
-TASK09_EXPECTED_REPOSITORY_FILE_COUNT = (
+TASK09_FINALIZATION_CREATED_FILES = frozenset(
+    {
+        "docs/evidence/task09/pumpswap_touch_probe_execution_receipt_v1.json",
+        "docs/evidence/task09/pumpswap_touch_probe_execution_summary_v1.md",
+        "tests/fixtures/task09/pumpswap_touch_probe_live_evidence_v1.json",
+        "tests/test_task09_pumpswap_touch_probe_evidence.py",
+    }
+)
+TASK09_FINALIZATION_DOMAIN_MODIFIED_FILES = frozenset(
+    {
+        "docs/contracts/pumpswap_touch_observation_contract_v1.md",
+        "src/solana_alpha_lab/pumpswap_touch_probe.py",
+        "tests/test_task09_pumpswap_touch_probe.py",
+    }
+)
+TASK09_FINALIZATION_POLICY_MODIFIED_FILES = (
+    TASK09_ATOM3_POLICY_MODIFIED_FILES
+    | {
+        "catalog/assets/lifecycle.yaml",
+        "catalog/generated/asset_edges.json",
+        "docs/PROJECT_MAP.md",
+        "scripts/validate_baton.py",
+        "tests/test_catalog.py",
+    }
+)
+TASK09_FINALIZATION_MODIFIED_FILES = frozenset(
+    TASK09_FINALIZATION_DOMAIN_MODIFIED_FILES
+    | TASK09_FINALIZATION_POLICY_MODIFIED_FILES
+)
+TASK09_FINALIZATION_CHANGED_FILES = frozenset(
+    TASK09_FINALIZATION_CREATED_FILES | TASK09_FINALIZATION_MODIFIED_FILES
+)
+TASK09_FINALIZATION_COMMIT_COUNT = TASK09_ATOM4_COMMIT_COUNT + 1
+TASK09_FINALIZATION_COMMIT_SUBJECT = (
+    "feat: accept TASK-09 PumpSwap Touch evidence"
+)
+TASK09_FINALIZATION_EXPECTED_REPOSITORY_FILE_COUNT = (
     TASK09_ATOM4_EXPECTED_REPOSITORY_FILE_COUNT
+    + len(TASK09_FINALIZATION_CREATED_FILES)
+)
+TASK09_EXPECTED_REPOSITORY_FILE_COUNT = (
+    TASK09_FINALIZATION_EXPECTED_REPOSITORY_FILE_COUNT
 )
 TASK09_REPOSITORY_STATES = {
     "TASK09_ATOM2_POLICY_REPAIR_STAGED",
@@ -703,11 +745,14 @@ TASK09_REPOSITORY_STATES = {
     "TASK09_ATOM3_DECODER_COMMITTED",
     "TASK09_ATOM4_PROBE_STAGED",
     "TASK09_ATOM4_PROBE_COMMITTED",
+    "TASK09_FINALIZATION_STAGED",
+    "TASK09_FINALIZATION_COMMITTED",
 }
 TASK09_COMMITTED_STATES = {
     "TASK09_ATOM2_POLICY_REPAIR_COMMITTED",
     "TASK09_ATOM3_DECODER_COMMITTED",
     "TASK09_ATOM4_PROBE_COMMITTED",
+    "TASK09_FINALIZATION_COMMITTED",
 }
 TASK09_LIFECYCLE_COMBINATIONS = {
     (
@@ -734,12 +779,22 @@ TASK09_LIFECYCLE_COMBINATIONS = {
         "TASK09_ATOM4_PROBE_COMMITTED",
         "TASK09_FEATURE_LOCAL_ATOM4_COMMITTED",
     ),
+    (
+        "TASK09_FINALIZATION_STAGED",
+        "TASK09_FEATURE_LOCAL_FINALIZATION_STAGED",
+    ),
+    (
+        "TASK09_FINALIZATION_COMMITTED",
+        "TASK09_FEATURE_LOCAL_FINALIZATION_COMMITTED",
+    ),
 }
 TASK09_BASE_CATALOG_VERSION = "0.8.5"
 TASK09_ATOM2_EXPECTED_CATALOG_VERSION = "0.8.6"
 TASK09_ATOM3_EXPECTED_CATALOG_VERSION = "0.8.7"
-TASK09_EXPECTED_CATALOG_VERSION = "0.8.8"
-TASK09_EXPECTED_CATALOG_ASSET_COUNT = 191
+TASK09_ATOM4_EXPECTED_CATALOG_VERSION = "0.8.8"
+TASK09_ATOM4_EXPECTED_CATALOG_ASSET_COUNT = 191
+TASK09_EXPECTED_CATALOG_VERSION = "0.9.0"
+TASK09_EXPECTED_CATALOG_ASSET_COUNT = 205
 TASK09_EXPECTED_CATALOG_QUERY_COUNT = 7
 CTRL_BATON_A62_COMMIT_OID = "bd152b3199a9ba5c75374bd798b1e81756cd4d9b"
 CTRL_BATON_A62_TREE_OID = "a068018e57ad53340ad94321539ed7d1b411bc10"
@@ -1673,7 +1728,13 @@ def ctrl_baton_clean_candidate(view: CtrlBatonGitView) -> bool:
 
 
 def is_ctrl_generic_control_branch(name: str | None) -> bool:
-    return bool(name and CTRL_GENERIC_CONTROL_BRANCH_RE.fullmatch(name))
+    return bool(
+        name
+        and (
+            CTRL_GENERIC_CONTROL_BRANCH_RE.fullmatch(name)
+            or name == TASK09_FEATURE_BRANCH
+        )
+    )
 
 
 def task09_ref_name_allowed(ref: str) -> bool:
@@ -1715,6 +1776,7 @@ def classify_task09_topology(
     atom2_tracked = frozenset(task09_atom2_repository_files())
     atom3_tracked = frozenset(task09_atom3_repository_files())
     atom4_tracked = frozenset(task09_repository_files())
+    finalization_tracked = frozenset(task09_finalization_repository_files())
     if (
         not github.actions
         and ctrl_baton_origin_identity_ok(view, github_actions=False)
@@ -1866,7 +1928,8 @@ def classify_task09_topology(
             | TASK09_ATOM3_CHANGED_FILES
             | TASK09_ATOM4_CHANGED_FILES
         )
-        and view.index_catalog_version == TASK09_EXPECTED_CATALOG_VERSION
+        and view.index_catalog_version
+        == TASK09_ATOM4_EXPECTED_CATALOG_VERSION
         and view.head_catalog_version
         == TASK09_ATOM3_EXPECTED_CATALOG_VERSION
         and view.head_tree_path_count
@@ -1899,12 +1962,85 @@ def classify_task09_topology(
             | TASK09_ATOM3_CHANGED_FILES
             | TASK09_ATOM4_CHANGED_FILES
         )
-        and view.index_catalog_version == TASK09_EXPECTED_CATALOG_VERSION
-        and view.head_catalog_version == TASK09_EXPECTED_CATALOG_VERSION
+        and view.index_catalog_version
+        == TASK09_ATOM4_EXPECTED_CATALOG_VERSION
+        and view.head_catalog_version
+        == TASK09_ATOM4_EXPECTED_CATALOG_VERSION
         and view.head_tree_path_count
         == TASK09_ATOM4_EXPECTED_REPOSITORY_FILE_COUNT
     ):
         return "TASK09_FEATURE_LOCAL_ATOM4_COMMITTED"
+    if (
+        shared
+        and view.head_oid == TASK09_ATOM4_COMMIT_OID
+        and view.head_parents == (TASK09_ATOM3_COMMIT_OID,)
+        and view.feature_parents == (TASK09_ATOM3_COMMIT_OID,)
+        and view.head_tree_oid == TASK09_ATOM4_TREE_OID
+        and view.feature_tree_oid == TASK09_ATOM4_TREE_OID
+        and view.feature_local_oid == TASK09_ATOM4_COMMIT_OID
+        and view.tracked == finalization_tracked
+        and len(view.tracked)
+        == TASK09_FINALIZATION_EXPECTED_REPOSITORY_FILE_COUNT
+        and view.staged == TASK09_FINALIZATION_CHANGED_FILES
+        and view.staged_added == TASK09_FINALIZATION_CREATED_FILES
+        and view.staged_modified == TASK09_FINALIZATION_MODIFIED_FILES
+        and view.base_diff
+        == (
+            TASK09_CHANGED_FILES
+            | TASK09_ATOM3_CHANGED_FILES
+            | TASK09_ATOM4_CHANGED_FILES
+        )
+        and view.head_subject == TASK09_ATOM4_COMMIT_SUBJECT
+        and view.commits_after_base == 3
+        and view.index_base_diff
+        == (
+            TASK09_CHANGED_FILES
+            | TASK09_ATOM3_CHANGED_FILES
+            | TASK09_ATOM4_CHANGED_FILES
+            | TASK09_FINALIZATION_CHANGED_FILES
+        )
+        and view.index_catalog_version == TASK09_EXPECTED_CATALOG_VERSION
+        and view.head_catalog_version
+        == TASK09_ATOM4_EXPECTED_CATALOG_VERSION
+        and view.head_tree_path_count
+        == TASK09_ATOM4_EXPECTED_REPOSITORY_FILE_COUNT
+    ):
+        return "TASK09_FEATURE_LOCAL_FINALIZATION_STAGED"
+    if (
+        shared
+        and view.head_oid != TASK09_ATOM4_COMMIT_OID
+        and view.head_parents == (TASK09_ATOM4_COMMIT_OID,)
+        and view.feature_parents == (TASK09_ATOM4_COMMIT_OID,)
+        and view.head_tree_oid == view.feature_tree_oid
+        and view.feature_local_oid == view.head_oid
+        and view.tracked == finalization_tracked
+        and len(view.tracked)
+        == TASK09_FINALIZATION_EXPECTED_REPOSITORY_FILE_COUNT
+        and not view.staged
+        and not view.staged_added
+        and not view.staged_modified
+        and view.base_diff
+        == (
+            TASK09_CHANGED_FILES
+            | TASK09_ATOM3_CHANGED_FILES
+            | TASK09_ATOM4_CHANGED_FILES
+            | TASK09_FINALIZATION_CHANGED_FILES
+        )
+        and view.head_subject == TASK09_FINALIZATION_COMMIT_SUBJECT
+        and view.commits_after_base == 4
+        and view.index_base_diff
+        == (
+            TASK09_CHANGED_FILES
+            | TASK09_ATOM3_CHANGED_FILES
+            | TASK09_ATOM4_CHANGED_FILES
+            | TASK09_FINALIZATION_CHANGED_FILES
+        )
+        and view.index_catalog_version == TASK09_EXPECTED_CATALOG_VERSION
+        and view.head_catalog_version == TASK09_EXPECTED_CATALOG_VERSION
+        and view.head_tree_path_count
+        == TASK09_FINALIZATION_EXPECTED_REPOSITORY_FILE_COUNT
+    ):
+        return "TASK09_FEATURE_LOCAL_FINALIZATION_COMMITTED"
     return "INVALID_GIT_TOPOLOGY"
 
 
@@ -3326,6 +3462,13 @@ def task09_repository_files() -> set[str]:
     )
 
 
+def task09_finalization_repository_files() -> set[str]:
+    return (
+        tree_files(TASK09_ATOM4_COMMIT_OID)
+        | set(TASK09_FINALIZATION_CREATED_FILES)
+    )
+
+
 def repository_files() -> set[str]:
     result = set()
     for path in ROOT.rglob("*"):
@@ -3425,6 +3568,7 @@ def classify_state(
     task09_atom2_files = task09_atom2_repository_files()
     task09_atom3_files = task09_atom3_repository_files()
     task09_files = task09_repository_files()
+    task09_finalization_files = task09_finalization_repository_files()
     if (
         head_oid == TASK09_BASE_COMMIT_OID
         and commit_count == TASK09_BASE_COMMIT_COUNT
@@ -3505,6 +3649,35 @@ def classify_state(
         and commit_changed == set(TASK09_ATOM4_CHANGED_FILES)
     ):
         return "TASK09_ATOM4_PROBE_COMMITTED"
+    if (
+        head_oid == TASK09_ATOM4_COMMIT_OID
+        and commit_count == TASK09_ATOM4_COMMIT_COUNT
+        and parent_oid == TASK09_ATOM3_COMMIT_OID
+        and tracked == task09_finalization_files
+        and len(tracked)
+        == TASK09_FINALIZATION_EXPECTED_REPOSITORY_FILE_COUNT
+        and staged == TASK09_FINALIZATION_CHANGED_FILES
+        and not untracked
+        and not unstaged
+        and commit_subject == TASK09_ATOM4_COMMIT_SUBJECT
+        and commit_changed == set(TASK09_ATOM4_CHANGED_FILES)
+    ):
+        return "TASK09_FINALIZATION_STAGED"
+    if (
+        re.fullmatch(r"[0-9a-f]{40}", head_oid) is not None
+        and head_oid != TASK09_ATOM4_COMMIT_OID
+        and commit_count == TASK09_FINALIZATION_COMMIT_COUNT
+        and parent_oid == TASK09_ATOM4_COMMIT_OID
+        and tracked == task09_finalization_files
+        and len(tracked)
+        == TASK09_FINALIZATION_EXPECTED_REPOSITORY_FILE_COUNT
+        and not staged
+        and not untracked
+        and not unstaged
+        and commit_subject == TASK09_FINALIZATION_COMMIT_SUBJECT
+        and commit_changed == set(TASK09_FINALIZATION_CHANGED_FILES)
+    ):
+        return "TASK09_FINALIZATION_COMMITTED"
     if (
         head_oid == TASK08_BASE_COMMIT_OID
         and commit_count == TASK08_BASE_COMMIT_COUNT
@@ -4372,6 +4545,24 @@ def validate_task09_atom4_probe_staged_style_policy() -> None:
     )
 
 
+def validate_task09_finalization_staged_style_policy() -> None:
+    diff = run(
+        [
+            "git",
+            "diff",
+            "--cached",
+            "--check",
+            "--",
+            *sorted(TASK09_FINALIZATION_CHANGED_FILES),
+        ]
+    )
+    assert_check(
+        "task09_finalization_staged_diff_check",
+        diff.returncode == 0,
+        diff.stdout.strip() + diff.stderr.strip(),
+    )
+
+
 def validate() -> None:
     github_actions = os.environ.get("GITHUB_ACTIONS", "").lower() == "true"
     branch_result = run(["git", "symbolic-ref", "--short", "HEAD"])
@@ -4737,6 +4928,18 @@ def validate() -> None:
             topology == "TASK09_FEATURE_LOCAL_ATOM4_COMMITTED",
             topology,
         )
+    if state == "TASK09_FINALIZATION_STAGED":
+        assert_check(
+            "task09_finalization_staged_topology",
+            topology == "TASK09_FEATURE_LOCAL_FINALIZATION_STAGED",
+            topology,
+        )
+    if state == "TASK09_FINALIZATION_COMMITTED":
+        assert_check(
+            "task09_finalization_committed_topology",
+            topology == "TASK09_FEATURE_LOCAL_FINALIZATION_COMMITTED",
+            topology,
+        )
     if state in {
         "TASK09_ATOM2_POLICY_REPAIR_STAGED",
         "TASK09_ATOM2_POLICY_REPAIR_COMMITTED",
@@ -4747,6 +4950,11 @@ def validate() -> None:
         "TASK09_ATOM3_DECODER_COMMITTED",
     }:
         expected_file_count = TASK09_ATOM3_EXPECTED_REPOSITORY_FILE_COUNT
+    elif state in {
+        "TASK09_ATOM4_PROBE_STAGED",
+        "TASK09_ATOM4_PROBE_COMMITTED",
+    }:
+        expected_file_count = TASK09_ATOM4_EXPECTED_REPOSITORY_FILE_COUNT
     elif state in TASK09_REPOSITORY_STATES:
         expected_file_count = TASK09_EXPECTED_REPOSITORY_FILE_COUNT
     elif state in TASK08_REPOSITORY_STATES:
@@ -4822,6 +5030,8 @@ def validate() -> None:
         assert_check("task09_atom3_decoder_commit_contract", True)
     if state == "TASK09_ATOM4_PROBE_COMMITTED":
         assert_check("task09_atom4_probe_commit_contract", True)
+    if state == "TASK09_FINALIZATION_COMMITTED":
+        assert_check("task09_finalization_commit_contract", True)
     manifest = yaml.safe_load(
         (ROOT / "catalog/catalog_manifest.yaml").read_text(encoding="utf-8")
     )
@@ -4845,6 +5055,13 @@ def validate() -> None:
             expected_task09_catalog_version = (
                 TASK09_ATOM3_EXPECTED_CATALOG_VERSION
             )
+        elif state in {
+            "TASK09_ATOM4_PROBE_STAGED",
+            "TASK09_ATOM4_PROBE_COMMITTED",
+        }:
+            expected_task09_catalog_version = (
+                TASK09_ATOM4_EXPECTED_CATALOG_VERSION
+            )
         else:
             expected_task09_catalog_version = (
                 TASK09_EXPECTED_CATALOG_VERSION
@@ -4864,7 +5081,20 @@ def validate() -> None:
         )
         assert_check(
             "task09_catalog_asset_count",
-            asset_count == TASK09_EXPECTED_CATALOG_ASSET_COUNT,
+            asset_count
+            == (
+                TASK09_ATOM4_EXPECTED_CATALOG_ASSET_COUNT
+                if state
+                in {
+                    "TASK09_ATOM2_POLICY_REPAIR_STAGED",
+                    "TASK09_ATOM2_POLICY_REPAIR_COMMITTED",
+                    "TASK09_ATOM3_DECODER_STAGED",
+                    "TASK09_ATOM3_DECODER_COMMITTED",
+                    "TASK09_ATOM4_PROBE_STAGED",
+                    "TASK09_ATOM4_PROBE_COMMITTED",
+                }
+                else TASK09_EXPECTED_CATALOG_ASSET_COUNT
+            ),
         )
         query_count = sum(
             len(
@@ -5409,6 +5639,8 @@ def validate() -> None:
         validate_task09_atom3_decoder_staged_style_policy()
     if state == "TASK09_ATOM4_PROBE_STAGED":
         validate_task09_atom4_probe_staged_style_policy()
+    if state == "TASK09_FINALIZATION_STAGED":
+        validate_task09_finalization_staged_style_policy()
     tests = run([sys.executable,"-B","-m","unittest","discover","-s","tests","-p","test_*.py"])
     if tests.stdout.strip(): print(tests.stdout.strip())
     if tests.stderr.strip(): print(tests.stderr.strip())

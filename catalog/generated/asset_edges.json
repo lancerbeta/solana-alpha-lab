@@ -433,6 +433,36 @@
       "target_asset_id": "TEST-T08-LIFECYCLE-DISCOVERY-TRANSPORT-001"
     },
     {
+      "source_asset_id": "CONTRACT-T09-PUMPSWAP-TOUCH-001",
+      "relation": "depends_on",
+      "target_asset_id": "CONTRACT-T06-RAW-STORAGE-001"
+    },
+    {
+      "source_asset_id": "CONTRACT-T09-PUMPSWAP-TOUCH-001",
+      "relation": "depends_on",
+      "target_asset_id": "EVIDENCE-T08-LIFECYCLE-DISCOVERY-RECEIPT-001"
+    },
+    {
+      "source_asset_id": "CONTRACT-T09-PUMPSWAP-TOUCH-001",
+      "relation": "depends_on",
+      "target_asset_id": "SCHEMA-T05-REL-CANONICAL-OBSERVATIONS-001"
+    },
+    {
+      "source_asset_id": "CONTRACT-T09-PUMPSWAP-TOUCH-001",
+      "relation": "depends_on",
+      "target_asset_id": "SCHEMA-T05-REL-POOL-STATE-SNAPSHOTS-001"
+    },
+    {
+      "source_asset_id": "CONTRACT-T09-PUMPSWAP-TOUCH-001",
+      "relation": "depends_on",
+      "target_asset_id": "SCHEMA-T05-REL-TRADE-ORDERFLOW-INPUTS-001"
+    },
+    {
+      "source_asset_id": "CONTRACT-T09-PUMPSWAP-TOUCH-001",
+      "relation": "validated_by",
+      "target_asset_id": "TEST-T09-PUMPSWAP-TOUCH-001"
+    },
+    {
       "source_asset_id": "CTRL-AGENTS-001",
       "relation": "governed_by",
       "target_asset_id": "CTRL-TASK-04-001"
@@ -648,6 +678,21 @@
       "target_asset_id": "TEST-T08-LIFECYCLE-DISCOVERY-EVIDENCE-001"
     },
     {
+      "source_asset_id": "DATA-T09-PUMPSWAP-TOUCH-PROBE-RAW-001",
+      "relation": "derived_from",
+      "target_asset_id": "MODULE-T09-PUMPSWAP-TOUCH-PROBE-001"
+    },
+    {
+      "source_asset_id": "DATA-T09-PUMPSWAP-TOUCH-PROBE-RAW-001",
+      "relation": "evidenced_by",
+      "target_asset_id": "EVIDENCE-T09-PUMPSWAP-TOUCH-RECEIPT-001"
+    },
+    {
+      "source_asset_id": "DATA-T09-PUMPSWAP-TOUCH-PROBE-RAW-001",
+      "relation": "validated_by",
+      "target_asset_id": "TEST-T09-PUMPSWAP-TOUCH-EVIDENCE-001"
+    },
+    {
       "source_asset_id": "ENV-WORKSTATION-001",
       "relation": "produces",
       "target_asset_id": "SCM-BASELINE-COMMIT-001"
@@ -783,6 +828,31 @@
       "target_asset_id": "EVIDENCE-T08-LIFECYCLE-DISCOVERY-RECEIPT-001"
     },
     {
+      "source_asset_id": "EVIDENCE-T09-PUMPSWAP-TOUCH-RECEIPT-001",
+      "relation": "derived_from",
+      "target_asset_id": "DATA-T09-PUMPSWAP-TOUCH-PROBE-RAW-001"
+    },
+    {
+      "source_asset_id": "EVIDENCE-T09-PUMPSWAP-TOUCH-RECEIPT-001",
+      "relation": "derived_from",
+      "target_asset_id": "FIXTURE-T09-PUMPSWAP-TOUCH-EVIDENCE-001"
+    },
+    {
+      "source_asset_id": "EVIDENCE-T09-PUMPSWAP-TOUCH-RECEIPT-001",
+      "relation": "validated_by",
+      "target_asset_id": "TEST-T09-PUMPSWAP-TOUCH-EVIDENCE-001"
+    },
+    {
+      "source_asset_id": "EVIDENCE-T09-PUMPSWAP-TOUCH-SUMMARY-001",
+      "relation": "derived_from",
+      "target_asset_id": "FIXTURE-T09-PUMPSWAP-TOUCH-EVIDENCE-001"
+    },
+    {
+      "source_asset_id": "EVIDENCE-T09-PUMPSWAP-TOUCH-SUMMARY-001",
+      "relation": "evidenced_by",
+      "target_asset_id": "EVIDENCE-T09-PUMPSWAP-TOUCH-RECEIPT-001"
+    },
+    {
       "source_asset_id": "FIXTURE-BATON-SUITE-001",
       "relation": "governed_by",
       "target_asset_id": "CTRL-BATON-SETUP-001"
@@ -891,6 +961,36 @@
       "source_asset_id": "FIXTURE-T08-PUMP-EVENT-IDL-001",
       "relation": "validated_by",
       "target_asset_id": "TEST-T08-PUMP-EVENT-DECODER-001"
+    },
+    {
+      "source_asset_id": "FIXTURE-T09-PUMPSWAP-IDL-SUBSET-001",
+      "relation": "governed_by",
+      "target_asset_id": "CONTRACT-T09-PUMPSWAP-TOUCH-001"
+    },
+    {
+      "source_asset_id": "FIXTURE-T09-PUMPSWAP-IDL-SUBSET-001",
+      "relation": "validated_by",
+      "target_asset_id": "TEST-T09-PUMPSWAP-TOUCH-DECODER-001"
+    },
+    {
+      "source_asset_id": "FIXTURE-T09-PUMPSWAP-TOUCH-001",
+      "relation": "derived_from",
+      "target_asset_id": "CONTRACT-T09-PUMPSWAP-TOUCH-001"
+    },
+    {
+      "source_asset_id": "FIXTURE-T09-PUMPSWAP-TOUCH-001",
+      "relation": "validated_by",
+      "target_asset_id": "TEST-T09-PUMPSWAP-TOUCH-001"
+    },
+    {
+      "source_asset_id": "FIXTURE-T09-PUMPSWAP-TOUCH-EVIDENCE-001",
+      "relation": "derived_from",
+      "target_asset_id": "DATA-T09-PUMPSWAP-TOUCH-PROBE-RAW-001"
+    },
+    {
+      "source_asset_id": "FIXTURE-T09-PUMPSWAP-TOUCH-EVIDENCE-001",
+      "relation": "validated_by",
+      "target_asset_id": "TEST-T09-PUMPSWAP-TOUCH-EVIDENCE-001"
     },
     {
       "source_asset_id": "GENERATED-EDGE-PROJECTION-001",
@@ -1081,6 +1181,41 @@
       "source_asset_id": "MODULE-T08-PUMP-EVENT-DECODER-001",
       "relation": "validated_by",
       "target_asset_id": "TEST-T08-PUMP-EVENT-DECODER-001"
+    },
+    {
+      "source_asset_id": "MODULE-T09-PUMPSWAP-TOUCH-DECODER-001",
+      "relation": "depends_on",
+      "target_asset_id": "FIXTURE-T09-PUMPSWAP-IDL-SUBSET-001"
+    },
+    {
+      "source_asset_id": "MODULE-T09-PUMPSWAP-TOUCH-DECODER-001",
+      "relation": "governed_by",
+      "target_asset_id": "CONTRACT-T09-PUMPSWAP-TOUCH-001"
+    },
+    {
+      "source_asset_id": "MODULE-T09-PUMPSWAP-TOUCH-DECODER-001",
+      "relation": "validated_by",
+      "target_asset_id": "TEST-T09-PUMPSWAP-TOUCH-DECODER-001"
+    },
+    {
+      "source_asset_id": "MODULE-T09-PUMPSWAP-TOUCH-PROBE-001",
+      "relation": "depends_on",
+      "target_asset_id": "MODULE-T06-STORAGE-API-001"
+    },
+    {
+      "source_asset_id": "MODULE-T09-PUMPSWAP-TOUCH-PROBE-001",
+      "relation": "depends_on",
+      "target_asset_id": "MODULE-T09-PUMPSWAP-TOUCH-DECODER-001"
+    },
+    {
+      "source_asset_id": "MODULE-T09-PUMPSWAP-TOUCH-PROBE-001",
+      "relation": "governed_by",
+      "target_asset_id": "CONTRACT-T09-PUMPSWAP-TOUCH-001"
+    },
+    {
+      "source_asset_id": "MODULE-T09-PUMPSWAP-TOUCH-PROBE-001",
+      "relation": "validated_by",
+      "target_asset_id": "TEST-T09-PUMPSWAP-TOUCH-PROBE-001"
     },
     {
       "source_asset_id": "PRE-GIT-TASK01-A017",
@@ -1828,6 +1963,16 @@
       "target_asset_id": "TEST-T08-LIFECYCLE-DISCOVERY-TRANSPORT-001"
     },
     {
+      "source_asset_id": "SCRIPT-T09-PUMPSWAP-TOUCH-PROBE-001",
+      "relation": "depends_on",
+      "target_asset_id": "MODULE-T09-PUMPSWAP-TOUCH-PROBE-001"
+    },
+    {
+      "source_asset_id": "SCRIPT-T09-PUMPSWAP-TOUCH-PROBE-001",
+      "relation": "validated_by",
+      "target_asset_id": "TEST-T09-PUMPSWAP-TOUCH-PROBE-001"
+    },
+    {
       "source_asset_id": "TEMPLATE-BATON-ISSUE-FORM-001",
       "relation": "governed_by",
       "target_asset_id": "CTRL-BATON-SETUP-001"
@@ -2076,6 +2221,46 @@
       "source_asset_id": "TEST-T08-PUMP-EVENT-DECODER-001",
       "relation": "depends_on",
       "target_asset_id": "MODULE-T08-PUMP-EVENT-DECODER-001"
+    },
+    {
+      "source_asset_id": "TEST-T09-PUMPSWAP-TOUCH-001",
+      "relation": "depends_on",
+      "target_asset_id": "CONTRACT-T09-PUMPSWAP-TOUCH-001"
+    },
+    {
+      "source_asset_id": "TEST-T09-PUMPSWAP-TOUCH-001",
+      "relation": "depends_on",
+      "target_asset_id": "FIXTURE-T09-PUMPSWAP-TOUCH-001"
+    },
+    {
+      "source_asset_id": "TEST-T09-PUMPSWAP-TOUCH-DECODER-001",
+      "relation": "depends_on",
+      "target_asset_id": "FIXTURE-T09-PUMPSWAP-IDL-SUBSET-001"
+    },
+    {
+      "source_asset_id": "TEST-T09-PUMPSWAP-TOUCH-DECODER-001",
+      "relation": "depends_on",
+      "target_asset_id": "MODULE-T09-PUMPSWAP-TOUCH-DECODER-001"
+    },
+    {
+      "source_asset_id": "TEST-T09-PUMPSWAP-TOUCH-EVIDENCE-001",
+      "relation": "depends_on",
+      "target_asset_id": "EVIDENCE-T09-PUMPSWAP-TOUCH-RECEIPT-001"
+    },
+    {
+      "source_asset_id": "TEST-T09-PUMPSWAP-TOUCH-EVIDENCE-001",
+      "relation": "depends_on",
+      "target_asset_id": "FIXTURE-T09-PUMPSWAP-TOUCH-EVIDENCE-001"
+    },
+    {
+      "source_asset_id": "TEST-T09-PUMPSWAP-TOUCH-PROBE-001",
+      "relation": "depends_on",
+      "target_asset_id": "MODULE-T09-PUMPSWAP-TOUCH-PROBE-001"
+    },
+    {
+      "source_asset_id": "TEST-T09-PUMPSWAP-TOUCH-PROBE-001",
+      "relation": "depends_on",
+      "target_asset_id": "SCRIPT-T09-PUMPSWAP-TOUCH-PROBE-001"
     },
     {
       "source_asset_id": "VALIDATOR-REPOSITORY-STATE-001",

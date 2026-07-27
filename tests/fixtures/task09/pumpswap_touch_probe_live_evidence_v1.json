@@ -1,0 +1,174 @@
+{
+  "fixture_id": "TASK09_PUMPSWAP_TOUCH_PROBE_LIVE_EVIDENCE_V1",
+  "fixture_version": "1.0",
+  "task_id": "TASK-09",
+  "atom": "T09-A5",
+  "source_atom": "T09-A4_PUMPSWAP_TOUCH_EXTERNAL_RPC_WSS_RAW_WRITE",
+  "repair_atom": "T09-A4R_TRANSACTION_INDEX_EXTENSION",
+  "transport_acceptance_status": "PASS_WITH_FAIL_CLOSED_SCHEMA_EXTENSION",
+  "touch_coverage_status": "FIELD_COVERAGE_CANDIDATE",
+  "coverage_disposition": "BOUNDED_POST_MIGRATION_TOUCH_EVIDENCE_NOT_FILLABLE",
+  "accepted_base": {
+    "branch": "task09/pumpswap-touch-pilot",
+    "head": "c02294407b17f71b44725ef61cc022fecd7ba80f",
+    "tree": "c1cd3540368d9e93e16ad2e8fa00a5eff1e67daa"
+  },
+  "raw_run": {
+    "run_id": "t09a4-20260727T184740Z",
+    "logical_root": "task09_pumpswap_touch_probe_v1/run=t09a4-20260727T184740Z",
+    "dataset_id": "SMIAL_TASK09_PUMPSWAP_TOUCH_PROBE_RAW",
+    "dataset_version": "1.0",
+    "transport_contract_version": "1.0",
+    "partition_id": "t09a4-20260727T184740Z-probe",
+    "dataset_manifest_id": "dataset-2bd446a8efabb81fe1020342dde7b0634de04caf5a6fc2a5b88b33131193102f",
+    "partition_manifest_id": "partition-526cf4e932517f2948da45928d60c5e9dda1e05767444090c9eea7fae35b1f75",
+    "content_sha256": "0de9a748669c25fa08c4d1de594899a0761db48a1ba25774dd7f4d1109eaf73d",
+    "created_at": "2026-07-27T18:47:43.597275Z",
+    "first_reliable_available_at": "2026-07-27T18:47:43.597275Z",
+    "min_available_to_strategy_at": "2026-07-27T18:47:40.830899Z",
+    "max_available_to_strategy_at": "2026-07-27T18:47:43.597028Z",
+    "observation_span_microseconds": 2766129,
+    "row_count": 258,
+    "event_count_received": 258,
+    "event_count_stored": 258,
+    "omitted_event_count": 0,
+    "canonical_redacted_body_bytes": 694186,
+    "stored_file_bytes": 843801,
+    "method_event_counts": {
+      "HTTP getTransaction": 1,
+      "WSS logsSubscribe": 257
+    },
+    "status_counts": {
+      "INVALID_RESPONSE": 1,
+      "SUCCESS": 257
+    },
+    "files": [
+      {
+        "logical_path": "partitions/probe.parquet",
+        "bytes": 842679,
+        "sha256": "577e614c0b2f41b7a1e3ae92b6cfd965e87e4d4bca76070925873df1ef5b4466"
+      },
+      {
+        "logical_path": "receipts/probe.manifest.json",
+        "bytes": 742,
+        "sha256": "2070c0d36aeb963be8e3e39628c2d7a032679dad34d4d6f9131951190bba6493"
+      },
+      {
+        "logical_path": "receipts/probe.receipt.json",
+        "bytes": 380,
+        "sha256": "6191f4b2434351dbfda4b8e4d0b57fd879bc62cdf1604460a52a7d5cf76b31be"
+      }
+    ]
+  },
+  "probe_summary": {
+    "live_terminal_status": "STOPPED_SCHEMA_DRIFT",
+    "offline_replay_status": "PASS",
+    "offline_replay_terminal": "FIELD_COVERAGE_CANDIDATE",
+    "wss_stop_reason": "NOTIFICATION_CAP",
+    "notifications": 256,
+    "successful_notifications": 124,
+    "failed_notifications": 132,
+    "truncated_notifications": 0,
+    "decoded_events": 75,
+    "buy_events": 41,
+    "sell_events": 34,
+    "unsupported_program_data": 6,
+    "unique_followup_candidates": 64,
+    "rpc_followups": 1,
+    "get_transaction_result_present": 1,
+    "get_transaction_account_key_count": 27,
+    "get_transaction_pre_token_balance_count": 8,
+    "get_transaction_post_token_balance_count": 7,
+    "evidence_records": 258,
+    "provider_attempts": 2,
+    "wss_connections": 1,
+    "wss_subscriptions": 1,
+    "concurrency": 1,
+    "retries": 0,
+    "restart_attempts": 0,
+    "provider_credits": 0,
+    "cash_spend_usd_cents": 0
+  },
+  "observed_schema_extension": {
+    "provider": "SOLANA_STANDARD_RPC",
+    "method": "getTransaction",
+    "field": "transactionIndex",
+    "observed_type": "nonnegative_integer",
+    "live_error_class": "get_transaction_result_keys_drift",
+    "repair_policy": "ALLOW_ONLY_THIS_OPTIONAL_TYPED_FIELD_AND_REJECT_ALL_OTHER_UNKNOWN_KEYS",
+    "official_documentation_status": "NOT_LISTED_IN_RESULT_FIELDS_AS_OF_2026-07-27",
+    "raw_record_preserved_as_invalid_response": true,
+    "offline_replay_reclassified_raw_record": false
+  },
+  "touch_field_coverage": {
+    "event_types": [
+      "BuyEvent",
+      "SellEvent"
+    ],
+    "required_observed_fields": [
+      "pool",
+      "pool_base_token_reserves",
+      "pool_quote_token_reserves",
+      "virtual_quote_reserves",
+      "protocol_fee",
+      "protocol_fee_basis_points",
+      "coin_creator_fee",
+      "coin_creator_fee_basis_points",
+      "lp_fee",
+      "lp_fee_basis_points",
+      "timestamp"
+    ],
+    "raw_virtual_effective_reserve_separation": "PASS",
+    "failed_transaction_evidence_retained": true,
+    "fillable_claim": false,
+    "no_route_claim": false,
+    "migration_claim": false,
+    "net_return_claim": false
+  },
+  "lineage_and_ordering": {
+    "unique_raw_event_ids": 258,
+    "unique_idempotency_keys": 258,
+    "duplicate_event_count": 0,
+    "revision_1_records": 258,
+    "revision_link_records": 0,
+    "file_row_order_is_source_order": false,
+    "consumer_ordering_rule": "SORT_BY_OBSERVED_AT_THEN_RAW_EVENT_ID",
+    "observed_equals_available_to_strategy": true,
+    "ingested_not_before_observed": true,
+    "first_reliable_available_equals_observed": true
+  },
+  "frozen_caps": {
+    "elapsed_seconds": 30,
+    "wss_capture_seconds": 20,
+    "wss_connections": 1,
+    "wss_subscriptions": 1,
+    "notifications": 256,
+    "stream_bytes": 1500000,
+    "rpc_followups": 8,
+    "admission_received_bytes": 983616,
+    "received_and_stored_bytes": 4000000,
+    "concurrency": 1,
+    "retries": 0,
+    "cash_spend_usd_cents": 0
+  },
+  "decision_boundary": {
+    "bounded_touch_transport_established": true,
+    "post_migration_trade_field_coverage_established": true,
+    "launch_universe_coverage_established": false,
+    "lifecycle_representativeness_established": false,
+    "fillable_established": false,
+    "no_route_established": false,
+    "net_return_established": false,
+    "retry_authorized": false,
+    "additional_external_call_authorized": false,
+    "canonical_status_change_implied": false
+  },
+  "sanitization": {
+    "provider_bodies_in_fixture": 0,
+    "request_values_in_fixture": 0,
+    "headers_in_fixture": 0,
+    "credentials_in_fixture": 0,
+    "absolute_paths_in_fixture": 0,
+    "wallet_signer_transaction_actions": 0
+  }
+}

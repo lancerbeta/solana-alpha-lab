@@ -64,6 +64,7 @@ class Task04CoreStackTests(unittest.TestCase):
             ("0.8.5", 191, 7),
             ("0.8.6", 191, 7),
             ("0.8.8", 191, 7),
+            ("0.9.0", 205, 7),
         ):
             with self.subTest(checkpoint=checkpoint):
                 task04_validator.validate_catalog_checkpoint(*checkpoint)

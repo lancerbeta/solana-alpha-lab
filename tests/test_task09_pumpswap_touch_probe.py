@@ -36,6 +36,7 @@ from solana_alpha_lab.pumpswap_touch_probe import (  # noqa: E402
     ExternalAuthorityRequiredError,
     ExternalExecutionGate,
     HttpCapture,
+    TouchNotificationError,
     TouchProbeRunner,
     WssCapture,
     bind_get_transaction,
@@ -282,6 +283,63 @@ class Task09PumpSwapTouchProbeTests(unittest.TestCase):
             )["terminal"],
             "TYPED_PROVIDER_FAILURE",
         )
+
+    def test_get_transaction_accepts_only_typed_transaction_index_extension(
+        self,
+    ) -> None:
+        document = {
+            "id": "x",
+            "jsonrpc": "2.0",
+            "result": {
+                "blockTime": 1_720_000_000,
+                "meta": {
+                    "err": None,
+                    "loadedAddresses": {
+                        "readonly": [],
+                        "writable": [],
+                    },
+                    "logMessages": [],
+                    "postTokenBalances": [],
+                    "preTokenBalances": [],
+                },
+                "slot": 1,
+                "transaction": {
+                    "message": {
+                        "accountKeys": [PUMPSWAP_PROGRAM_ID],
+                        "instructions": [],
+                    },
+                    "signatures": ["1" * 64],
+                },
+                "transactionIndex": 0,
+                "version": 0,
+            },
+        }
+        accepted = validate_get_transaction_response(
+            json.dumps(document).encode(),
+            request_id="x",
+        )
+        self.assertTrue(accepted["transaction_index_present"])
+
+        document["result"]["transactionIndex"] = True
+        with self.assertRaisesRegex(
+            TouchNotificationError,
+            "get_transaction_index_invalid",
+        ):
+            validate_get_transaction_response(
+                json.dumps(document).encode(),
+                request_id="x",
+            )
+
+        document["result"]["transactionIndex"] = 0
+        document["result"]["unexpected"] = None
+        with self.assertRaisesRegex(
+            TouchNotificationError,
+            "get_transaction_result_keys_drift",
+        ):
+            validate_get_transaction_response(
+                json.dumps(document).encode(),
+                request_id="x",
+            )
 
     def test_fake_transport_runner_writes_bounded_raw_evidence(self) -> None:
         def wss_exchange(request, **limits):
