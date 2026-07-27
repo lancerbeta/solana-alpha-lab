@@ -623,6 +623,7 @@ def validate_cursor_and_templates() -> None:
             (
                 "Codex and Cursor may proceed",
                 "one full-gate owner per exact candidate fingerprint",
+                "exact Atom Contract Issue creation/update/read-back",
             ),
         ),
         "authority": (
@@ -646,6 +647,7 @@ def validate_cursor_and_templates() -> None:
             (
                 "Routine GitHub transport",
                 "Provider/API/RPC/WSS",
+                "exact named-Issue receipt comments",
             ),
         ),
         "catalog": (
@@ -660,6 +662,7 @@ def validate_cursor_and_templates() -> None:
             (
                 "standing project autonomy",
                 "Cursor never merges",
+                "exact receipt comment",
             ),
         ),
         "router": (
@@ -667,6 +670,7 @@ def validate_cursor_and_templates() -> None:
             (
                 "STANDING_PROJECT_AUTONOMY",
                 "FULL_VALIDATION=DELEGATED_TO_CI",
+                "exact Atom Contract Issue creation/update/read-back",
             ),
         ),
         "protocol": (
@@ -674,6 +678,7 @@ def validate_cursor_and_templates() -> None:
             (
                 "standing routine authority",
                 "FULL_VALIDATION=DELEGATED_TO_CI",
+                "exact named-Issue receipt comments",
             ),
         ),
         "handoff": (
@@ -708,6 +713,18 @@ def validate_cursor_and_templates() -> None:
     ignore = (ROOT / ".cursorignore").read_text(encoding="utf-8")
     for needle in [".env", "!.env.example", ".smial-handoff/**", "wallet/**"]:
         assert_check(f"cursorignore:{needle}", needle in ignore)
+    hook = (ROOT / ".githooks/pre-commit").read_text(encoding="utf-8")
+    wrapper = (ROOT / "scripts/validate.ps1").read_text(encoding="utf-8")
+    for needle in ["./scripts/validate.ps1", "-PreCommit"]:
+        assert_check(f"precommit_jit_hook:{needle}", needle in hook)
+    for needle in [
+        "[switch]$PreCommit",
+        '"diff", "--cached", "--check"',
+        r".\scripts\secret_scan.py",
+        "PRE_COMMIT_JIT: PASS",
+        r".\scripts\validate_ci.py",
+    ]:
+        assert_check(f"precommit_jit_wrapper:{needle}", needle in wrapper)
     issue = yaml.safe_load(
         (ROOT / ".github/ISSUE_TEMPLATE/control-atom.yml").read_text(encoding="utf-8")
     )

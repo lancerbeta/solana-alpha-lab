@@ -575,7 +575,7 @@ records:
     contains_raw_data: false
     sensitivity: INTERNAL_NON_SECRET
 - asset_id: CTRL-AGENTS-001
-  record_version: '1.6'
+  record_version: '1.7'
   asset_type: control_document
   purpose: Repository-level agent contract for standing routine autonomy, scope,
     safety, JIT validation, and status ownership.
@@ -589,7 +589,7 @@ records:
     repository_path: AGENTS.md
   integrity:
     kind: sha256
-    sha256: fdf0118752e69ac0bd364db09e010ad12994d2e6f261a344ece9ef12e7f834c5
+    sha256: d844e75f9d584625d7e0a576aae7061b4f803f68f5dd4f0e80aa11770e3d3a03
   access:
     mode: read_only
     method: file
@@ -705,13 +705,13 @@ records:
     contains_raw_data: false
     sensitivity: INTERNAL_NON_SECRET
 - asset_id: CTRL-QUALITY-GATE-001
-  record_version: '1.1'
+  record_version: '1.2'
   asset_type: script
-  purpose: Windows compatibility wrapper for the platform-neutral repository validation
-    gate.
+  purpose: Windows wrapper for the cheap pre-commit staged/secret checks and the
+    explicit platform-neutral full repository gate.
   status: VALIDATED_ACTIVE
   origin: REPOSITORY
-  as_of: '2026-07-22'
+  as_of: '2026-07-28'
   truth_owner: TASK-03
   location:
     kind: git_path
@@ -719,7 +719,7 @@ records:
     repository_path: scripts/validate.ps1
   integrity:
     kind: sha256
-    sha256: 5a3b2a03a8df957259b452940ee78f785b5868723c7449e492dd2bf1a1bd8347
+    sha256: a293f8ee733fc6995463bc8863d25bf847fcfbce234e1be42aba5f37e5bd14e9
   access:
     mode: read_only
     method: command
@@ -3984,7 +3984,7 @@ records:
     contains_raw_data: false
     sensitivity: INTERNAL_NON_SECRET
 - asset_id: PROTOCOL-EXECUTION-ROUTER-001
-  record_version: '1.1'
+  record_version: '1.2'
   asset_type: control_document
   purpose: Execution router combining GPT control ownership with standing routine
     autonomy across local and GitHub baton routes.
@@ -3998,7 +3998,7 @@ records:
     repository_path: docs/agent/EXECUTION_ROUTER_PROTOCOL.md
   integrity:
     kind: sha256
-    sha256: f71f4f10839e04f6ffdb4e8e3bf85295a185b5e59a1146e0753b83c48df61973
+    sha256: 83f1a64bf106b4b3676653923f9daa49a57754a6a613698da044c6300c30c151
   access:
     mode: read_only
     method: file
@@ -4015,7 +4015,7 @@ records:
     contains_raw_data: false
     sensitivity: INTERNAL_NON_SECRET
 - asset_id: PROTOCOL-GITHUB-BATON-001
-  record_version: '1.1'
+  record_version: '1.2'
   asset_type: control_document
   purpose: GitHub Baton protocol for revision-locked contracts, standing routine
     delivery, JIT validation, and out-of-band hash trust.
@@ -4029,7 +4029,7 @@ records:
     repository_path: docs/agent/GITHUB_BATON_PROTOCOL.md
   integrity:
     kind: sha256
-    sha256: 5204c6fac76b10813ebf596ab23639eeff5739b47c6c9a2ac6c2ddb407e9b6b8
+    sha256: 9a2963158790426c406739698c86bd70da2c10fcd3adc34e7c3b21f809394412
   access:
     mode: read_only
     method: file
@@ -4077,7 +4077,7 @@ records:
     contains_raw_data: false
     sensitivity: INTERNAL_NON_SECRET
 - asset_id: CURSOR-RULE-AUTHORITY-001
-  record_version: '1.1'
+  record_version: '1.2'
   asset_type: configuration
   purpose: Always-on Cursor rule combining EXECUTION_ONLY with standing routine
     autonomy and GPT control ownership.
@@ -4091,7 +4091,7 @@ records:
     repository_path: .cursor/rules/00-authority.mdc
   integrity:
     kind: sha256
-    sha256: 0bb8414c62fd813252498cfb8a6cf5e8376c6eae927755ea9eb90ce5bce824d5
+    sha256: 498feac5239f3a4f342084e67a2f828baab3897eeb22f873b8a8c89365bf7371
   access:
     mode: read_only
     method: file
@@ -4170,7 +4170,7 @@ records:
     contains_raw_data: false
     sensitivity: INTERNAL_NON_SECRET
 - asset_id: CURSOR-RULE-SECURITY-001
-  record_version: '1.1'
+  record_version: '1.2'
   asset_type: configuration
   purpose: Always-on Cursor rule for secrets, wallets, bounded GitHub transport,
     and separately gated external actions.
@@ -4184,7 +4184,7 @@ records:
     repository_path: .cursor/rules/30-security-and-secrets.mdc
   integrity:
     kind: sha256
-    sha256: 13963a4536fece0862321de06b0551fce2b74c6ee6267b894b9deaa182ae765b
+    sha256: 1680688889bad4f68c6603a903a428e31f0c8edff4810da1ff31298b1214771d
   access:
     mode: read_only
     method: file
@@ -4232,7 +4232,7 @@ records:
     contains_raw_data: false
     sensitivity: INTERNAL_NON_SECRET
 - asset_id: CURSOR-RULE-GITHUB-BATON-001
-  record_version: '1.1'
+  record_version: '1.2'
   asset_type: configuration
   purpose: Always-on Cursor rule for exact baton trust, routine GitHub delivery,
     and stop-before-merge behavior.
@@ -4246,7 +4246,7 @@ records:
     repository_path: .cursor/rules/50-github-baton.mdc
   integrity:
     kind: sha256
-    sha256: f9702e51d3150351d3cd649997b12da41c6314e77782d5e7f2e5ef0e4e31847a
+    sha256: c86db983fd28d8ada3c9f7dbcd9bd8b349caae9335133f2946e8afe1b97abd83
   access:
     mode: read_only
     method: file
@@ -4626,7 +4626,7 @@ records:
     contains_raw_data: false
     sensitivity: INTERNAL_NON_SECRET
 - asset_id: SCRIPT-BATON-VALIDATE-001
-  record_version: '1.2'
+  record_version: '1.4'
   asset_type: script
   purpose: Deterministic offline validator for baton schemas, fixtures, route ownership,
     standing autonomy, JIT validation, Catalog integrity, templates, and rules.
@@ -4640,7 +4640,7 @@ records:
     repository_path: scripts/validate_baton.py
   integrity:
     kind: sha256
-    sha256: 7107aff101eb662371f2da48d7e3802959326c6839706a21928f324550ff8a09
+    sha256: cfbbafbf958e2c3e3f782e02ce4b518d373777cc1a96dc0f3c4b689c09cf66f6
   access:
     mode: read_only
     method: file
