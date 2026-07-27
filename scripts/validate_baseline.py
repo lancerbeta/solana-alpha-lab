@@ -846,10 +846,11 @@ CTRL_BATON_A62_LIFECYCLE_COMBINATIONS = {
     ("CTRL_BATON_A62_MAIN_MERGE_COMMITTED", "BATON_MAIN_LOCAL_POST_MERGE"),
 }
 CTRL_GENERIC_CONTROL_BRANCH_RE = re.compile(
-    r"^ctrl/[A-Za-z0-9][A-Za-z0-9._/-]*$"
+    r"^(?:ctrl|task[0-9]{2})/[A-Za-z0-9][A-Za-z0-9._/-]*$"
 )
 CTRL_GENERIC_FEATURE_AHEAD_MAX = 16
 CTRL_GENERIC_REPOSITORY_STATES = {
+    "CTRL_GENERIC_PROJECT_FEATURE_INITIAL_STAGED",
     "CTRL_GENERIC_CONTROL_FEATURE_COMMITTED",
     "CTRL_GENERIC_CONTROL_FEATURE_REPAIR_STAGED",
     "CTRL_GENERIC_CONTROL_FEATURE_PUBLISHED_REPAIR_STAGED",
@@ -857,6 +858,10 @@ CTRL_GENERIC_REPOSITORY_STATES = {
     "CTRL_GENERIC_CONTROL_MAIN_MERGE_COMMITTED",
 }
 CTRL_GENERIC_LIFECYCLE_COMBINATIONS = {
+    (
+        "CTRL_GENERIC_PROJECT_FEATURE_INITIAL_STAGED",
+        "CTRL_GENERIC_FEATURE_INITIAL_STAGED",
+    ),
     (
         "CTRL_GENERIC_CONTROL_FEATURE_COMMITTED",
         "CTRL_GENERIC_FEATURE_LOCAL",
@@ -2071,6 +2076,20 @@ def ctrl_generic_staged_repair_worktree_ok(view: CtrlBatonGitView) -> bool:
     )
 
 
+def ctrl_generic_initial_staged_worktree_ok(view: CtrlBatonGitView) -> bool:
+    """Allow one complete pre-commit index without deletions or split staging."""
+    return (
+        bool(view.tracked)
+        and bool(view.staged)
+        and view.staged == view.staged_added | view.staged_modified
+        and view.staged_added <= view.tracked
+        and view.staged_modified <= view.tracked
+        and not view.unstaged
+        and not view.untracked
+        and not view.conflicts
+    )
+
+
 def ctrl_generic_ref_name_allowed(ref: str) -> bool:
     if ref in {"refs/heads/main", "refs/remotes/origin/main"}:
         return True
@@ -2585,6 +2604,29 @@ def classify_ctrl_generic_feature_local(
     )
 
 
+def classify_ctrl_generic_feature_initial_staged(
+    view: CtrlBatonGitView,
+    github: CtrlBatonGithubContext,
+) -> bool:
+    return (
+        not github.actions
+        and ctrl_baton_origin_identity_ok(view, github_actions=False)
+        and is_ctrl_generic_control_branch(view.branch)
+        and view.branch not in {
+            CTRL_BATON_FEATURE_BRANCH,
+            TASK09_FEATURE_BRANCH,
+        }
+        and view.head_oid == view.main_oid == view.origin_main_oid
+        and view.feature_local_oid == view.head_oid
+        and view.feature_tree_oid == view.head_tree_oid
+        and view.feature_remote_oid is None
+        and view.upstream is None
+        and view.feature_based_on_main_ok is True
+        and ctrl_generic_feature_refs_ok(view, view.branch)
+        and ctrl_generic_initial_staged_worktree_ok(view)
+    )
+
+
 def classify_ctrl_generic_feature_repair_staged(
     view: CtrlBatonGitView,
     github: CtrlBatonGithubContext,
@@ -2816,6 +2858,11 @@ def classify_ctrl_baton_state_machine(
         result = (
             "CTRL_BATON_A62_MAIN_MERGE_COMMITTED",
             "BATON_MAIN_LOCAL_POST_MERGE",
+        )
+    elif classify_ctrl_generic_feature_initial_staged(view, github):
+        result = (
+            "CTRL_GENERIC_PROJECT_FEATURE_INITIAL_STAGED",
+            "CTRL_GENERIC_FEATURE_INITIAL_STAGED",
         )
     elif classify_ctrl_generic_feature_published_repair_staged(view, github):
         result = (
@@ -3088,6 +3135,12 @@ def collect_ctrl_baton_git_view(
     main_oid = optional_git_oid("refs/heads/main")
     if branch == TASK09_FEATURE_BRANCH:
         feature_oid = head_oid
+    elif (
+        is_ctrl_generic_control_branch(branch)
+        and main_oid is not None
+        and head_oid == main_oid
+    ):
+        feature_oid = head_oid
     elif len(head_parents) == 2:
         feature_oid = head_parents[1]
         if (
@@ -3120,7 +3173,6 @@ def collect_ctrl_baton_git_view(
         and branch != CTRL_BATON_FEATURE_BRANCH
         and is_ctrl_generic_control_branch(branch)
         and main_oid is not None
-        and head_oid != main_oid
     ):
         feature_oid = head_oid
     elif (
@@ -3198,9 +3250,11 @@ def collect_ctrl_baton_git_view(
         and main_oid == origin_main_oid
         and re.fullmatch(r"[0-9a-f]{40}", main_oid) is not None
         and re.fullmatch(r"[0-9a-f]{40}", head_oid) is not None
-        and head_oid != main_oid
     ):
-        if git_is_ancestor(main_oid, head_oid):
+        if head_oid == main_oid and is_ctrl_generic_control_branch(branch):
+            feature_from_main_count = 0
+            feature_from_main_linear_ok = True
+        elif git_is_ancestor(main_oid, head_oid):
             feature_from_main_count = git_commit_count_after_base(
                 main_oid, head_oid
             )
@@ -4961,6 +5015,8 @@ def validate() -> None:
         expected_file_count = TASK08_EXPECTED_REPOSITORY_FILE_COUNT
     elif state in CTRL_BATON_A62_REPOSITORY_STATES:
         expected_file_count = ctrl_baton_a62r_expected_repository_file_count()
+    elif state == "CTRL_GENERIC_PROJECT_FEATURE_INITIAL_STAGED":
+        expected_file_count = len(baton_view.tracked)
     elif state in CTRL_GENERIC_REPOSITORY_STATES:
         # Fail-closed against the actual committed tree, not historical Baton 225.
         expected_file_count = baton_view.head_tree_path_count

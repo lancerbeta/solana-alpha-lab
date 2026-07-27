@@ -1370,11 +1370,15 @@ class LegacyRegressionTests(unittest.TestCase):
         )
         self.assertEqual(
             len(baseline.CTRL_GENERIC_LIFECYCLE_COMBINATIONS),
-            8,
+            9,
         )
         self.assertEqual(
             baseline.CTRL_GENERIC_LIFECYCLE_COMBINATIONS,
             {
+                (
+                    "CTRL_GENERIC_PROJECT_FEATURE_INITIAL_STAGED",
+                    "CTRL_GENERIC_FEATURE_INITIAL_STAGED",
+                ),
                 (
                     "CTRL_GENERIC_CONTROL_FEATURE_COMMITTED",
                     "CTRL_GENERIC_FEATURE_LOCAL",
@@ -1510,6 +1514,89 @@ def generic_feature_view(
     return view._replace(**overrides)
 
 
+def generic_initial_staged_view(
+    *,
+    branch: str = GENERIC_BRANCH,
+    **overrides: object,
+) -> baseline.CtrlBatonGitView:
+    staged = frozenset({"scripts/validate_baseline.py"})
+    refs = frozenset(
+        {
+            "refs/heads/main",
+            "refs/remotes/origin/main",
+            f"refs/heads/{branch}",
+        }
+    )
+    defaults = {
+        "branch": branch,
+        "head_oid": GENERIC_BASE,
+        "head_tree_oid": GENERIC_TREE,
+        "feature_tree_oid": GENERIC_TREE,
+        "main_oid": GENERIC_BASE,
+        "origin_main_oid": GENERIC_BASE,
+        "feature_local_oid": GENERIC_BASE,
+        "feature_remote_oid": None,
+        "upstream": None,
+        "all_refs": refs,
+        "staged": staged,
+        "staged_added": frozenset(),
+        "staged_modified": staged,
+        "feature_from_main_count": 0,
+        "feature_based_on_main_ok": True,
+        "feature_from_main_linear_ok": True,
+    }
+    defaults.update(overrides)
+    return generic_feature_view(**defaults)
+
+
+class GenericInitialStagedTests(unittest.TestCase):
+    STAGED = (
+        "CTRL_GENERIC_PROJECT_FEATURE_INITIAL_STAGED",
+        "CTRL_GENERIC_FEATURE_INITIAL_STAGED",
+    )
+
+    def test_ctrl_and_task_branches_pass_before_first_commit(self) -> None:
+        for branch in (GENERIC_BRANCH, "task10/fillable-pilot"):
+            with self.subTest(branch=branch):
+                self.assertEqual(
+                    classify(generic_initial_staged_view(branch=branch)),
+                    self.STAGED,
+                )
+
+    def test_split_or_dirty_worktree_fails(self) -> None:
+        for overrides in (
+            {"unstaged": frozenset({"AGENTS.md"})},
+            {"untracked": frozenset({"scratch.txt"})},
+            {"conflicts": frozenset({"AGENTS.md"})},
+            {"staged_modified": frozenset()},
+        ):
+            with self.subTest(overrides=overrides):
+                self.assertNotEqual(
+                    classify(generic_initial_staged_view(**overrides)),
+                    self.STAGED,
+                )
+
+    def test_main_drift_or_remote_branch_fails(self) -> None:
+        for overrides in (
+            {"origin_main_oid": INTERMEDIATE},
+            {
+                "feature_remote_oid": GENERIC_BASE,
+                "upstream": f"origin/{GENERIC_BRANCH}",
+            },
+        ):
+            with self.subTest(overrides=overrides):
+                self.assertNotEqual(
+                    classify(generic_initial_staged_view(**overrides)),
+                    self.STAGED,
+                )
+
+    def test_unscoped_branch_fails(self) -> None:
+        self.assertNotEqual(
+            classify(generic_initial_staged_view(branch="feature/other")),
+            self.STAGED,
+        )
+
+
 def task09_policy_repair_staged_view(
     **overrides: object,
 ) -> baseline.CtrlBatonGitView:
@@ -1610,7 +1697,7 @@ class Task09PolicyRepairStagedTopologyTests(unittest.TestCase):
     def test_remote_and_ref_policy_is_fail_closed(self) -> None:
         extra_refs = (
             task09_policy_repair_staged_view().all_refs
-            | {"refs/heads/task10/unapproved"}
+            | {"refs/heads/feature/unapproved"}
         )
         mutations = (
             {"feature_remote_oid": baseline.TASK09_BASE_COMMIT_OID},

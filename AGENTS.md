@@ -17,6 +17,35 @@ must not claim acceptance. Cursor is always `EXECUTION_ONLY`: it never selects
 the current or next canonical task, never declares DONE, and never infers
 authority from an Issue, PR, commit, tests, or files alone.
 
+## STANDING_PROJECT_AUTONOMY
+
+The goal owner granted a durable project-local autonomy envelope on 2026-07-28.
+Within the active objective and this repository, Codex may proceed without a
+new approval for:
+
+- read-only inspection, official-document verification, calculations, and
+  validation;
+- bounded local writes, refactoring, Catalog maintenance, generated consumers,
+  routine repair, tests, and exact staging;
+- task branches, ordinary commits, Git fetch/read-back, non-force push to a
+  task branch, and creation or update of a pull request;
+- routine implementation choices whose alternatives do not materially change
+  the estimand, scope, cost, data contract, or safety boundary.
+
+This is an explicit standing grant across the listed authority classes, not
+authority inferred from a file, commit, Issue, PR, or passing test. A stricter
+active-task contract, exact write set, offline requirement, cap, or stop
+condition still wins. Codex must keep work bounded to the active objective and
+must not claim canonical acceptance or `DONE`.
+
+The standing grant does not authorize final merge/publication, force push,
+history rewrite, destructive cleanup, branch deletion, repository or account
+settings, credentials or secrets, provider/API/RPC/WSS execution, purchases,
+deployment, wallet/signer/transaction actions, real money, or any action that
+only the user can complete. Those remain explicit user gates. If an ordinary
+step exposes one of these boundaries, stop only at that boundary and return the
+smallest concrete user action.
+
 ## LANGUAGE_AND_REPORTING
 
 User-facing communication defaults to Russian. Keep code, paths, schema keys,
@@ -46,9 +75,9 @@ Default: `INPUT=DIRECT_PROMPT`.
   `PROJECT_CHAT_PRO_GITHUB_BATON_CURSOR` is defined by
   `docs/agent/EXECUTION_ROUTER_PROTOCOL.md`.
 - Never search for the newest, latest, or most recently modified handoff.
-- A direct prompt, handoff, or baton grants only the authority class it states.
-  It never implies commit, push, external action, GitHub write, or canonical
-  status authority.
+- A direct prompt, handoff, baton, or standing grant defines the applicable
+  authority envelope. Never infer a broader envelope from an Issue, PR,
+  commit, tests, or files alone.
 
 ## WORKSPACE_ONLY
 
@@ -60,7 +89,13 @@ Never create, request, display, store, or commit `.env` values, API keys, access
 
 ## EXTERNAL_ACTIONS
 
-Network access is off by default. No provider/API/RPC call, account creation, payment, remote creation, push, pull request, connector permission, VPS action, wallet action, or package adoption without an explicit GPT-control-plane-approved atom.
+GitHub transport covered by `STANDING_PROJECT_AUTONOMY` may be used for ordinary
+fetch, non-force task-branch push, pull-request work, CI read-back, and routine
+review interaction. Public official documentation may be read when it changes
+a decision. Provider/API/RPC/WSS execution, account or repository settings,
+payment, remote creation, connector permission changes, VPS actions, package
+adoption, deployment, wallet/signer/transaction actions, and any other external
+side effect remain separately gated.
 
 ## PRE_GIT_PROVENANCE
 
@@ -94,6 +129,7 @@ pwsh -NoProfile -ExecutionPolicy Bypass -File .\scripts\validate.ps1
 
 Read this file and the task/handoff explicitly named by the current prompt,
 confirm the bounded atom, run the quality gate, inspect the exact staged or
-committed inventory, and do not commit, push, perform another authority class,
-or change canonical status unless explicitly authorized. The GPT control plane
+committed inventory, and use the standing autonomy envelope without pausing for
+routine microsteps. Do not cross a stricter task cap, merge, perform another
+excluded authority class, or change canonical status. The GPT control plane
 owns canonical status and acceptance.

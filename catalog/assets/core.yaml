@@ -1,6 +1,6 @@
 schema_version: '1.1'
 registry_id: CATALOG-ASSET-REGISTRY-CORE-001
-as_of: '2026-07-26'
+as_of: '2026-07-28'
 records:
 - asset_id: SCM-BASELINE-COMMIT-001
   record_version: '1.0'
@@ -519,12 +519,12 @@ records:
   evidence: []
   classification: *t06_internal
 - asset_id: TEST-T06-CATALOG-001
-  record_version: '1.6'
+  record_version: '1.7'
   asset_type: script
-  purpose: Catalog tests for the exact TASK-06 stable-ID inventory, hashes, ownership, finalization handoff, consumers and no-raw-bytes boundary.
+  purpose: Catalog tests for the TASK-06 stable-ID inventory, hashes, ownership, finalization handoff, consumers, no-raw-bytes boundary and monotonic active Catalog version.
   status: IMPLEMENTED_UNVERIFIED
   origin: REPOSITORY
-  as_of: '2026-07-27'
+  as_of: '2026-07-28'
   truth_owner: TASK-06
   location:
     kind: git_path
@@ -532,7 +532,7 @@ records:
     repository_path: tests/test_task06_catalog.py
   integrity:
     kind: sha256
-    sha256: 1476659e663358f47d71ff1b860067f2b76bca79f36929eef2072301394c8a1f
+    sha256: 17c5ee91e4378a8ecd32b91c7bfca36267ead4a206eefcf9289a5a0b7d8fa958
   access: *t06_read_file
   relations:
   - relation_type: governed_by
@@ -575,13 +575,13 @@ records:
     contains_raw_data: false
     sensitivity: INTERNAL_NON_SECRET
 - asset_id: CTRL-AGENTS-001
-  record_version: '1.3'
+  record_version: '1.4'
   asset_type: control_document
   purpose: Repository-level agent contract for scope, safety, validation, and status
     ownership.
   status: IMPLEMENTED_UNVERIFIED
   origin: REPOSITORY
-  as_of: '2026-07-25'
+  as_of: '2026-07-28'
   truth_owner: CTRL-BATON-SETUP
   location:
     kind: git_path
@@ -589,7 +589,7 @@ records:
     repository_path: AGENTS.md
   integrity:
     kind: sha256
-    sha256: 0abbf7e64f2cd6672dfc2cdf712707a4b10ae3401aead2bb6d0097f6c5bf63a7
+    sha256: 7f3e5b4bfc54af0231addeeddb67ae30049d1c219923487d0894904038407a3f
   access:
     mode: read_only
     method: file
@@ -1943,13 +1943,13 @@ records:
     contains_raw_data: false
     sensitivity: INTERNAL_NON_SECRET
 - asset_id: TEST-T04-CORE-STACK-001
-  record_version: '1.9'
+  record_version: '2.0'
   asset_type: script
   purpose: Offline end-to-end Parquet, DuckDB and immutable migration-ledger replay
     plus negative contract tests for the TASK-04 core stack candidate.
   status: IMPLEMENTED_UNVERIFIED
   origin: REPOSITORY
-  as_of: '2026-07-27'
+  as_of: '2026-07-28'
   truth_owner: TASK-04
   location:
     kind: git_path
@@ -1957,7 +1957,7 @@ records:
     repository_path: tests/test_task04_core_stack.py
   integrity:
     kind: sha256
-    sha256: f71ad6bca27a238c22a7e13682f6ef3822e78ce467ea51c96325d8580e6b573a
+    sha256: 9389fbccea47ffd2d4622cacd5a4b69c88b97f83281e8dac5154a2db41315415
   access:
     mode: read_only
     method: command
@@ -1976,13 +1976,13 @@ records:
     contains_raw_data: false
     sensitivity: INTERNAL_NON_SECRET
 - asset_id: VALIDATOR-T04-ARCHITECTURE-001
-  record_version: '1.9'
+  record_version: '2.0'
   asset_type: script
   purpose: Fail-closed TASK-04 replay, architecture, matrix, registry, dependency,
     evidence and SBOM validator.
   status: IMPLEMENTED_UNVERIFIED
   origin: REPOSITORY
-  as_of: '2026-07-27'
+  as_of: '2026-07-28'
   truth_owner: TASK-04
   location:
     kind: git_path
@@ -1990,7 +1990,7 @@ records:
     repository_path: scripts/validate_task04.py
   integrity:
     kind: sha256
-    sha256: 562a20ef8748eb5497c85dfef66678d023f49d3ccdbc92058e14da3e8de3382b
+    sha256: 4783be0ef02893c8bfd1da946d7ea785289c93815afe2ee15e27d87b45427fa5
   access:
     mode: read_only
     method: command
@@ -2010,13 +2010,13 @@ records:
     contains_raw_data: false
     sensitivity: INTERNAL_NON_SECRET
 - asset_id: VALIDATOR-REPOSITORY-STATE-001
-  record_version: '2.2'
+  record_version: '2.3'
   asset_type: script
   purpose: Fail-closed historical and compositional repository-state/topology
     validator through CTRL-BATON A6.4.
   status: IMPLEMENTED_UNVERIFIED
   origin: REPOSITORY
-  as_of: '2026-07-27'
+  as_of: '2026-07-28'
   truth_owner: TASK-04
   location:
     kind: git_path
@@ -2024,7 +2024,7 @@ records:
     repository_path: scripts/validate_baseline.py
   integrity:
     kind: sha256
-    sha256: 960d88e83fecb9132acc91ff5b87dae55a992098c65e42f76d20de84b288ecf1
+    sha256: 665055452d56f44ce8219241c459393222789e5677e4529bb36e0a43d87b75a9
   access:
     mode: read_only
     method: command
@@ -2535,12 +2535,12 @@ records:
     contains_raw_data: false
     sensitivity: INTERNAL_NON_SECRET
 - asset_id: TEST-T05-CATALOG-QUERIES-001
-  record_version: '1.8'
+  record_version: '1.9'
   asset_type: script
-  purpose: 'Offline tests proving TASK-05 query bounds, UTC eligibility, write denial, external-access denial, raw BLOB exclusion and exact task/data-contract Catalog registration.'
+  purpose: 'Offline tests proving TASK-05 query bounds, UTC eligibility, write denial, external-access denial, raw BLOB exclusion, task/data-contract registration and monotonic active Catalog version.'
   status: IMPLEMENTED_UNVERIFIED
   origin: REPOSITORY
-  as_of: '2026-07-27'
+  as_of: '2026-07-28'
   truth_owner: TASK-05
   location:
     kind: git_path
@@ -2548,7 +2548,7 @@ records:
     repository_path: tests/test_task05_catalog_queries.py
   integrity:
     kind: sha256
-    sha256: 99c21b0aaac052374ce1f8d8355845dedefacffdf81bc14e1307143d9c3d11b6
+    sha256: 9de0686eb2188e58e565db3738e2721cf2773236d27f1280c1d578b27ad3f990
   access:
     mode: read_only
     method: command
@@ -3410,12 +3410,12 @@ records:
   evidence: []
   classification: *t07_internal
 - asset_id: TEST-T07-CATALOG-001
-  record_version: '1.4'
+  record_version: '1.5'
   asset_type: script
-  purpose: Catalog tests for exact TASK-07 stable IDs, file hashes, lineage, accepted checkpoint and no-raw-bytes boundary.
+  purpose: Catalog tests for TASK-07 stable IDs, file hashes, lineage, accepted baseline, monotonic active Catalog version and no-raw-bytes boundary.
   status: IMPLEMENTED_UNVERIFIED
   origin: REPOSITORY
-  as_of: '2026-07-27'
+  as_of: '2026-07-28'
   truth_owner: TASK-07
   location:
     kind: git_path
@@ -3423,7 +3423,7 @@ records:
     repository_path: tests/test_task07_catalog.py
   integrity:
     kind: sha256
-    sha256: 03802ee276801ccacc566b16348e9d3c9a3e384ea7f97bc1ddb49aa5f9be5ca5
+    sha256: 85b0dd65675794a6d7c180284eabf356f03689c9c54401af1d38d2908796f9da
   access: *t07_read_file
   relations:
   - relation_type: depends_on
@@ -3894,12 +3894,12 @@ records:
   evidence: []
   classification: *t08_internal
 - asset_id: TEST-T08-CATALOG-001
-  record_version: '1.3'
+  record_version: '1.4'
   asset_type: script
-  purpose: Catalog tests for exact TASK-08 stable IDs, file and raw hashes, lineage, named consumers, accepted checkpoint and no-raw-bytes boundary.
+  purpose: Catalog tests for TASK-08 stable IDs, file and raw hashes, lineage, named consumers, monotonic active Catalog version and no-raw-bytes boundary.
   status: IMPLEMENTED_UNVERIFIED
   origin: REPOSITORY
-  as_of: '2026-07-27'
+  as_of: '2026-07-28'
   truth_owner: TASK-08
   location:
     kind: git_path
@@ -3907,7 +3907,7 @@ records:
     repository_path: tests/test_task08_catalog.py
   integrity:
     kind: sha256
-    sha256: 93f54ceb74fb6dd86d6218d530af94ffba6f86b27a4722d994a476d0ebcea8a7
+    sha256: 0b010541619a9ae5e1b19f65876df0f1401308f8e0e71e429f5b431be80e73c5
   access: *t08_read_file
   relations:
   - relation_type: depends_on
@@ -4859,13 +4859,13 @@ records:
     contains_raw_data: false
     sensitivity: INTERNAL_NON_SECRET
 - asset_id: TEST-BATON-REPOSITORY-POLICY-001
-  record_version: '1.4'
+  record_version: '1.6'
   asset_type: script
   purpose: Unit tests for exact local staged, committed and published feature,
     PR merge, main merge, and legacy repository policy.
   status: IMPLEMENTED_UNVERIFIED
   origin: REPOSITORY
-  as_of: '2026-07-27'
+  as_of: '2026-07-28'
   truth_owner: CTRL-BATON-SETUP
   location:
     kind: git_path
@@ -4873,7 +4873,7 @@ records:
     repository_path: tests/test_baton_repository_policy.py
   integrity:
     kind: sha256
-    sha256: 79e7fd3a5567148147f0373925bb654d0b9f97bd37ba8970bd0100e1407ac2a3
+    sha256: d023874ab70bcc2e2784aace475e4f87bc39d428f2389355808df8b7d53b7ab6
   access:
     mode: read_only
     method: file
@@ -5413,12 +5413,12 @@ records:
     contains_raw_data: false
     sensitivity: INTERNAL_NON_SECRET
 - asset_id: TEST-T09-PUMPSWAP-TOUCH-EVIDENCE-001
-  record_version: '1.0'
+  record_version: '1.1'
   asset_type: script
-  purpose: Fail-closed tests for raw hash reconciliation, bounded schema repair, decoder counts, PIT lineage, caps, sanitization and Touch-only acceptance.
+  purpose: Fail-closed tests for raw hash reconciliation, bounded schema repair, decoder counts, PIT lineage, caps, sanitization, Touch-only acceptance and monotonic active Catalog version.
   status: IMPLEMENTED_UNVERIFIED
   origin: REPOSITORY
-  as_of: '2026-07-27'
+  as_of: '2026-07-28'
   truth_owner: TASK-09
   location:
     kind: git_path
@@ -5426,7 +5426,7 @@ records:
     repository_path: tests/test_task09_pumpswap_touch_probe_evidence.py
   integrity:
     kind: sha256
-    sha256: 2e64f596700a23f108d83c63b52ddc3656d292edc7a8765e61bd1e5fef8d85b6
+    sha256: 6cc44206cb1da9b36fe3bdf00f9a8c9c3b2380e77be0394f2be7d18e10e2ae9c
   access:
     mode: read_only
     method: file
