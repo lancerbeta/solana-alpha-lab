@@ -1,6 +1,6 @@
 schema_version: '1.1'
 registry_id: CATALOG-ASSET-REGISTRY-LIFECYCLE-001
-as_of: '2026-07-23'
+as_of: '2026-07-28'
 records:
 - asset_id: REGISTRY-RESEARCH-CYCLES-001
   record_version: '1.0'
@@ -206,7 +206,7 @@ records:
   evidence: []
   classification: *id004
 - asset_id: GENERATED-PROJECT-MAP-001
-  record_version: '1.15'
+  record_version: '1.16'
   asset_type: generated_view
   purpose: Deterministic human-readable navigation projected only from the Catalog.
   status: IMPLEMENTED_UNVERIFIED
@@ -219,7 +219,7 @@ records:
     repository_path: docs/PROJECT_MAP.md
   integrity:
     kind: sha256
-    sha256: f5ac3374c97f6b9fe06f0a782f82b47b18bcebf78e1a50b433b27f9f5ff91603
+    sha256: 0532d45c82f7f6019056a19acee85b1a63d6eb0238a6decb4470bd69056e81c5
   access:
     mode: read_only
     method: file

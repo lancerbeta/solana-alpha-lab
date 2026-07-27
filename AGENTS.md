@@ -20,8 +20,8 @@ authority from an Issue, PR, commit, tests, or files alone.
 ## STANDING_PROJECT_AUTONOMY
 
 The goal owner granted a durable project-local autonomy envelope on 2026-07-28.
-Within the active objective and this repository, Codex may proceed without a
-new approval for:
+Within the active objective and this repository, Codex and Cursor may proceed
+without a new approval for:
 
 - read-only inspection, official-document verification, calculations, and
   validation;
@@ -35,8 +35,11 @@ new approval for:
 This is an explicit standing grant across the listed authority classes, not
 authority inferred from a file, commit, Issue, PR, or passing test. A stricter
 active-task contract, exact write set, offline requirement, cap, or stop
-condition still wins. Codex must keep work bounded to the active objective and
-must not claim canonical acceptance or `DONE`.
+condition still wins. Cursor receives the objective and bounded scope from the
+active direct prompt, handoff, or baton; the standing grant supplies routine
+execution classes and necessary direct test, Catalog, hash, and generated
+consumers. It does not let Cursor select a task, widen product semantics, or
+claim canonical acceptance or `DONE`.
 
 Codex performs a final pull-request merge only after the goal owner gives an
 explicit confirmation for that exact PR immediately before the merge. The
@@ -130,11 +133,28 @@ Windows compatibility wrapper:
 pwsh -NoProfile -ExecutionPolicy Bypass -File .\scripts\validate.ps1
 ```
 
+## VALIDATION_ECONOMY
+
+- During implementation, run the smallest targeted checks for the changed
+  behavior and direct consumers.
+- Use one full-gate owner per exact candidate fingerprint: Cursor locally,
+  Codex validation, or GitHub CI. Do not repeat the full gate after staging,
+  commit, or publication when the candidate and environment are unchanged.
+- When the route guarantees full validation on the same pushed head, Cursor may
+  return targeted evidence plus `FULL_VALIDATION=DELEGATED_TO_CI`, then read
+  back CI when transport is available. Delegation is not a blocker.
+- Re-run a failed check only after its root cause changed; re-run a passed full
+  gate only when the candidate fingerprint, dependencies, relevant runtime, or
+  validation policy changed.
+- Catalog, generated-view, security, and topology checks apply when their owner
+  or consumer changed; read-only work does not trigger repository validation.
+
 ## CHANGE_PROTOCOL
 
 Read this file and the task/handoff explicitly named by the current prompt,
-confirm the bounded atom, run the quality gate, inspect the exact staged or
-committed inventory, and use the standing autonomy envelope without pausing for
-routine microsteps. Do not cross a stricter task cap, merge without exact
-per-PR confirmation, perform another excluded authority class, or change
-canonical status. The GPT control plane owns canonical status and acceptance.
+confirm the bounded objective, apply `VALIDATION_ECONOMY`, inspect the exact
+staged or committed inventory, and use the standing autonomy envelope without
+pausing for routine microsteps. Cursor stops before merge; Codex merges only
+after exact per-PR confirmation. Do not cross a stricter task cap, perform an
+excluded authority class, or change canonical status. The GPT control plane
+owns canonical status and acceptance.

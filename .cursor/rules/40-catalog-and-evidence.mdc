@@ -9,6 +9,9 @@ alwaysApply: true
 - Do not copy the seven ChatGPT Project Sources into Git as a second permanent-memory owner.
 - Do not invent past `first_reliable_available_at` availability.
 - Exact imported pre-Git bytes stay under `docs/evidence/pre_git/`.
-- Do not manually edit generated Catalog navigation or `docs/PROJECT_MAP.md` unless the atom explicitly authorizes that write set.
+- Catalog/hash maintenance and direct generated consumers required by an
+  in-scope change are routine propagation under standing project autonomy.
+- Never manually edit generated Catalog navigation or `docs/PROJECT_MAP.md`;
+  update its owner and run the deterministic generator.
 - Machine-specific absolute paths must not enter Catalog metadata.
 - See `AGENTS.md` and existing Catalog/ADR docs for integrity rules.

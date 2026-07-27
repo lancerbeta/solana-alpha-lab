@@ -21,8 +21,10 @@
 
 ## Validation
 
+- Candidate commit/tree or staged fingerprint:
 - Targeted commands:
-- Full validation:
+- Single full-gate owner (`Cursor` / `Codex` / `GitHub CI`):
+- Full-gate receipt, reuse, or `FULL_VALIDATION=DELEGATED_TO_CI`:
 - Catalog delta:
 
 ## Side effects
@@ -52,10 +54,10 @@
 
 ## Merge authorization status
 
-- Not authorized / authorized by later explicit boundary:
+- Awaiting / exact per-PR user confirmation received:
 
 ---
 
 Draft PR is candidate evidence, not canonical acceptance.
-Merge is separately authorized.
+Cursor never merges; Codex merges after exact per-PR user confirmation.
 Commit/tests/CI do not establish DONE.

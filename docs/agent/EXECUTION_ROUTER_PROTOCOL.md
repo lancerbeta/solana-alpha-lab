@@ -31,9 +31,11 @@ The GPT control plane owns:
 - canonical status and `DONE`.
 
 Cursor, when used, is always `EXECUTION_ONLY`. It executes only an explicitly
-authorized bounded atom. It never selects the current or next canonical task,
-never declares `DONE`, and never infers authority from an Issue, PR, commit,
-tests, or files alone.
+scoped bounded objective. `AGENTS.md` standing project autonomy supplies routine
+execution classes; the active prompt, handoff, or baton supplies scope and any
+stricter stops. Cursor never selects the current or next canonical task, never
+declares `DONE`, and never infers scope from an Issue, PR, commit, tests, or
+files alone.
 
 ## Three routes
 
@@ -63,7 +65,7 @@ Project Chat Pro remains the primary control plane
 (`CONTROL_PLANE=PROJECT_CHAT_PRIMARY`). GitHub is `TRANSPORT_AND_AUDIT` for a
 revision-locked, content-addressed Atom Contract. Cursor is `EXECUTION_ONLY`
 and executes only that exact atom, returning evidence through an Issue comment
-or Draft PR under separate authorization.
+or PR under standing routine authority unless the contract is stricter.
 
 Live accepted input route:
 
@@ -101,35 +103,46 @@ Do not create Cursor, Codex, Cloud Agent, Automation, or MCP executor when:
 Every authorized atom must state:
 
 - exact repository identity;
-- authority class (`LOCAL_WRITE`, commit, push, GitHub write, etc.);
-- managed write set;
+- bounded objective and initial managed write set;
 - expected base revision when mutation is allowed;
-- stop-before boundaries (for example stop before commit).
+- network/cost/dependency caps and stop-before boundaries.
 
-Existing rule: a prompt, handoff, or baton grants only the authority class it
-states. It never implies commit, push, external action, GitHub write, or
-canonical status authority.
+The prompt, handoff, or baton scopes the objective. `STANDING_PROJECT_AUTONOMY`
+supplies routine local write, direct propagation, test, stage, commit,
+fetch/read-back, non-force task-branch push, PR/review, and CI classes. A
+stricter contract wins. Cursor may add only direct tests, Catalog/hash records,
+and generated consumers necessary to keep the scoped change valid, and must
+report the final exact inventory.
 
-`LOCAL_WRITE`, `COMMIT`, `PUSH`/`PR` remote write, `MERGE`/publication, and
-other external or destructive classes require separate explicit approvals.
-Local validation and GPT semantic acceptance are gates, not authority grants.
-Completion of one gate never grants the next mutation class.
+Provider/API/RPC/WSS, credentials, spend, package adoption, deploy, wallet,
+signer, transaction, real money, settings, force/history rewrite, destructive
+cleanup, branch deletion, material product/architecture scope, and user-only
+actions remain excluded gates. Cursor stops before merge. Codex requests exact
+per-PR confirmation and performs the merge.
 
 Cursor never:
 
 - chooses TASK-XX or CTRL-XX as “next”;
 - updates canonical Project Sources as permanent-memory truth;
-- silently widens the managed write set;
+- widens product semantics or adds unrelated truth owners;
 - performs network/provider/RPC calls without an explicit
   GPT-control-plane-approved atom.
+
+## Validation ownership
+
+Use targeted checks while iterating. Elect one full-gate owner for the exact
+candidate fingerprint: Cursor, Codex, or GitHub CI. When CI is guaranteed on
+the same pushed head, Cursor may report targeted evidence and
+`FULL_VALIDATION=DELEGATED_TO_CI`; do not duplicate the full gate merely because
+the same bytes were staged, committed, pushed, or placed in a PR.
 
 ## Route switching rules
 
 - Route changes require an explicit control-plane decision in the active prompt
   or named handoff/baton.
 - Silent mid-task ownership transfer is forbidden.
-- Switching from `GPT_ONLY` to an executor requires a new bounded atom with
-  explicit authority and write set.
+- Switching from `GPT_ONLY` to an executor requires a bounded objective and
+  scope; routine classes come from standing project autonomy.
 - Switching into `GITHUB_BATON` requires a new Atom Contract revision and hash
   when material terms change.
 - Skills such as start/finish helpers may advise; they do not own routing or
@@ -139,11 +152,12 @@ Cursor never:
 
 1. Read `AGENTS.md`.
 2. Identify the active input route from the current prompt only.
-3. Confirm the route and authority class.
+3. Confirm the route, objective, scope, caps, and stricter stops.
 4. If `GPT_ONLY`, stop after analysis; create no executor.
 5. If local handoff, follow `HANDOFF_PROTOCOL.md` path rules exactly.
 6. If GitHub baton, follow `GITHUB_BATON_PROTOCOL.md` preflight before any write.
-7. Execute only the named atom; stop at the stated boundary.
+7. Execute the named atom through routine delivery; stop only at a stated or
+   excluded boundary.
 
 ## Failure and stop conditions
 
@@ -151,10 +165,11 @@ Stop without mutation when:
 
 - repository identity, branch, HEAD/tree, or upstream mismatch expected base;
 - worktree is dirty before a mutation atom that requires clean state;
-- contract hash, revision, or authority class is missing/invalid;
+- contract hash, revision, objective, caps, or scope is missing/invalid;
 - managed write set is absent or would be exceeded;
 - secrets, absolute machine paths, or out-of-workspace paths appear;
-- network/GitHub action is requested without explicit authorization;
+- GitHub action is outside standing routine transport or violates a stricter
+  contract; provider/credentialed network action lacks an exact gate;
 - acceptance or `DONE` is requested from an execution-only agent.
 
 On stop, return `BLOCKED` with exact observed versus expected facts. Do not
