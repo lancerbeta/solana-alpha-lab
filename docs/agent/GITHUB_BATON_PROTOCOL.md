@@ -3,10 +3,13 @@
 Live execution flow for route
 `PROJECT_CHAT_PRO_GITHUB_BATON_CURSOR`.
 
-This document defines the live control-transport protocol. Exact contract read,
-task branch, ordinary commit, non-force push, PR/review, and CI interaction are
-routine transport under `STANDING_PROJECT_AUTONOMY`. Settings, provider calls,
-credentials, spend, destructive actions, and merge remain separately bounded.
+This document defines the live control-transport protocol. Exact Atom Contract
+Issue creation/update/read-back by the GPT control plane, exact named-Issue
+receipt comments by the executor, task branch, ordinary commit, non-force push,
+PR/review, and CI interaction are routine transport under
+`STANDING_PROJECT_AUTONOMY`. Unrelated Issue discovery/mutation, settings,
+provider calls, credentials, spend, destructive actions, and merge remain
+separately bounded.
 
 Related:
 
@@ -52,12 +55,13 @@ Material contract changes require a new `revision` and a new hash.
 
 ## End-to-end flow
 
-1. Project Chat Pro authors an exact GitHub Atom Contract.
+1. Project Chat Pro authors, validates, publishes, and reads back an exact
+   GitHub Atom Contract Issue under the standing grant.
 2. Cursor runs preflight against the named contract (local checks plus one
    exact GitHub read under the standing grant).
 3. Cursor performs bounded local execution inside the managed write set.
 4. Cursor runs targeted validation while iterating and produces a sanitized
-   receipt.
+   receipt, which it may post to the exact named Issue or PR.
 5. Cursor may stage, commit, non-force push, create/update the PR, and read CI
    under standing routine authority unless the contract has a stricter stop.
 6. One full-gate owner validates the exact candidate: Cursor, Codex, or GitHub
@@ -72,13 +76,14 @@ Material contract changes require a new `revision` and a new hash.
    performs merge/read-back.
 10. GPT control plane performs canonical reconciliation.
 
-The standing grant supplies routine local write→stage→commit→push→PR/CI
-delivery as one envelope. The Atom Contract scopes objective, base, managed
-write set, dependencies, caps, rollback, and stricter stops; it does not need
-to re-grant each routine step. Provider/API/RPC/WSS, credentials, spend,
-package adoption, deploy, wallet/signer/transaction, settings,
-force/destructive/history actions, material scope change, and merge remain
-excluded or conditional gates.
+The standing grant supplies exact Atom Contract Issue
+creation/update/read-back, exact named-Issue receipt comments, and routine local
+write→stage→commit→push→PR/CI delivery as one envelope. The Atom Contract scopes
+objective, base, managed write set, dependencies, caps, rollback, and stricter
+stops; it does not need to re-grant each routine step. Unrelated Issue
+discovery/mutation, provider/API/RPC/WSS, credentials, spend, package adoption,
+deploy, wallet/signer/transaction, settings, force/destructive/history actions,
+material scope change, and merge remain excluded or conditional gates.
 
 ## Atom Contract minimum fields
 
@@ -157,6 +162,8 @@ When `LOCAL_WRITE` is authorized:
 - run targeted checks under `VALIDATION_ECONOMY`;
 - produce a sanitized receipt (no secrets, usernames, emails, absolute
   machine paths, tokens, or wallet material);
+- post that receipt only to the exact named Issue or PR when the return channel
+  requires it;
 - continue through routine commit/push/PR/CI delivery unless a stricter stop is
   explicit.
 

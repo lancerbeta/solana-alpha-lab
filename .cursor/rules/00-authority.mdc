@@ -19,8 +19,10 @@ alwaysApply: true
 - The active prompt, handoff, or baton supplies the bounded objective and
   scope. `AGENTS.md` `STANDING_PROJECT_AUTONOMY` supplies routine execution
   authority for local writes, direct propagation consumers, tests, exact
-  staging, ordinary commits, fetch/read-back, non-force task-branch push,
-  PR/review, and CI interaction unless the active contract is stricter.
+  staging, exact named-Issue receipt comments, ordinary commits,
+  fetch/read-back, non-force task-branch push, PR/review, and CI interaction
+  unless the active contract is stricter. Cursor does not create or discover
+  unrelated Issues.
 - Proceed through those routine steps without asking the user for another
   approval. Report the final exact inventory and side effects.
 - Stop for material scope/estimand/data-contract/safety changes and the

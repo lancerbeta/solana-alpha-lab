@@ -1,3 +1,7 @@
+param(
+    [switch]$PreCommit
+)
+
 $ErrorActionPreference = "Stop"
 Set-StrictMode -Version Latest
 
@@ -52,16 +56,39 @@ try {
 
     Push-Location $root.Text.Trim()
     try {
-        $validation = Invoke-NativeResult -File "uv.exe" -Arguments @(
-            "run", "--locked", "--managed-python", "python", "-B",
-            ".\scripts\validate_ci.py"
-        )
-        $validation.Lines | ForEach-Object { Write-Output $_ }
-        if ($validation.ExitCode -ne 0) {
-            throw "PLATFORM_NEUTRAL_VALIDATION_FAILED"
+        if ($PreCommit) {
+            $diffCheck = Invoke-NativeResult -File "git.exe" -Arguments @(
+                "diff", "--cached", "--check"
+            )
+            $diffCheck.Lines | ForEach-Object { Write-Output $_ }
+            if ($diffCheck.ExitCode -ne 0) {
+                throw "STAGED_DIFF_CHECK_FAILED"
+            }
+
+            $secretCheck = Invoke-NativeResult -File "uv.exe" -Arguments @(
+                "run", "--locked", "--managed-python", "python", "-B",
+                ".\scripts\secret_scan.py", "--self-test", "--scan-repository"
+            )
+            $secretCheck.Lines | ForEach-Object { Write-Output $_ }
+            if ($secretCheck.ExitCode -ne 0) {
+                throw "PRE_COMMIT_SECRET_CHECK_FAILED"
+            }
+
+            Write-Output "PRE_COMMIT_JIT: PASS"
+            Write-Output "RESULT: PASS"
         }
-        Write-Output "WINDOWS_COMPATIBILITY: PASS"
-        Write-Output "RESULT: PASS"
+        else {
+            $validation = Invoke-NativeResult -File "uv.exe" -Arguments @(
+                "run", "--locked", "--managed-python", "python", "-B",
+                ".\scripts\validate_ci.py"
+            )
+            $validation.Lines | ForEach-Object { Write-Output $_ }
+            if ($validation.ExitCode -ne 0) {
+                throw "PLATFORM_NEUTRAL_VALIDATION_FAILED"
+            }
+            Write-Output "WINDOWS_COMPATIBILITY: PASS"
+            Write-Output "RESULT: PASS"
+        }
     }
     finally {
         Pop-Location

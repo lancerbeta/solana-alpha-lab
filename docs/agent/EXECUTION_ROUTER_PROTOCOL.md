@@ -32,10 +32,11 @@ The GPT control plane owns:
 
 Cursor, when used, is always `EXECUTION_ONLY`. It executes only an explicitly
 scoped bounded objective. `AGENTS.md` standing project autonomy supplies routine
-execution classes; the active prompt, handoff, or baton supplies scope and any
-stricter stops. Cursor never selects the current or next canonical task, never
-declares `DONE`, and never infers scope from an Issue, PR, commit, tests, or
-files alone.
+execution classes, including an exact named-Issue receipt comment; the active
+prompt, handoff, or baton supplies scope and any stricter stops. Cursor never
+selects the current or next canonical task, never declares `DONE`, never
+creates or discovers unrelated Issues, and never infers scope from an Issue,
+PR, commit, tests, or files alone.
 
 ## Three routes
 
@@ -65,7 +66,9 @@ Project Chat Pro remains the primary control plane
 (`CONTROL_PLANE=PROJECT_CHAT_PRIMARY`). GitHub is `TRANSPORT_AND_AUDIT` for a
 revision-locked, content-addressed Atom Contract. Cursor is `EXECUTION_ONLY`
 and executes only that exact atom, returning evidence through an Issue comment
-or PR under standing routine authority unless the contract is stricter.
+or PR under standing routine authority unless the contract is stricter. The GPT
+control plane may create/update/read back the exact Atom Contract Issue under
+the same standing grant.
 
 Live accepted input route:
 
@@ -109,10 +112,12 @@ Every authorized atom must state:
 
 The prompt, handoff, or baton scopes the objective. `STANDING_PROJECT_AUTONOMY`
 supplies routine local write, direct propagation, test, stage, commit,
-fetch/read-back, non-force task-branch push, PR/review, and CI classes. A
-stricter contract wins. Cursor may add only direct tests, Catalog/hash records,
-and generated consumers necessary to keep the scoped change valid, and must
-report the final exact inventory.
+exact Atom Contract Issue creation/update/read-back by the GPT control plane,
+exact named-Issue receipt comments by the executor, fetch/read-back, non-force
+task-branch push, PR/review, and CI classes. A stricter contract wins. Cursor
+may add only direct tests, Catalog/hash records, and generated consumers
+necessary to keep the scoped change valid, and must report the final exact
+inventory.
 
 Provider/API/RPC/WSS, credentials, spend, package adoption, deploy, wallet,
 signer, transaction, real money, settings, force/history rewrite, destructive

@@ -206,7 +206,7 @@ records:
   evidence: []
   classification: *id004
 - asset_id: GENERATED-PROJECT-MAP-001
-  record_version: '1.16'
+  record_version: '1.17'
   asset_type: generated_view
   purpose: Deterministic human-readable navigation projected only from the Catalog.
   status: IMPLEMENTED_UNVERIFIED
@@ -219,7 +219,7 @@ records:
     repository_path: docs/PROJECT_MAP.md
   integrity:
     kind: sha256
-    sha256: 0532d45c82f7f6019056a19acee85b1a63d6eb0238a6decb4470bd69056e81c5
+    sha256: bf4af31974680d6bedad9d267d12b5d63ae03fb9820b9a83907daa4332ee3ca6
   access:
     mode: read_only
     method: file

@@ -13,9 +13,10 @@ alwaysApply: true
 - Cursor is `EXECUTION_ONLY` and executes only the exact Atom Contract after
   preflight.
 - Material contract changes require a new revision and hash.
-- The exact named Issue read and routine commit, non-force task-branch push,
-  PR/review, and CI interaction use standing project autonomy; the Atom
-  Contract still scopes objective, base, write set, caps, and stricter stops.
+- The exact named Issue read, exact receipt comment, routine commit, non-force
+  task-branch push, PR/review, and CI interaction use standing project autonomy;
+  the Atom Contract still scopes objective, base, write set, caps, and stricter
+  stops. Cursor does not create or discover unrelated Issues.
 - No newest/latest discovery, unrelated GitHub writes, settings, provider,
   destructive action, or scope expansion.
 - Cursor never merges. Codex merges only after exact per-PR user confirmation.

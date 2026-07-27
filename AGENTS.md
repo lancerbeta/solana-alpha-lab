@@ -27,8 +27,10 @@ without a new approval for:
   validation;
 - bounded local writes, refactoring, Catalog maintenance, generated consumers,
   routine repair, tests, and exact staging;
-- task branches, ordinary commits, Git fetch/read-back, non-force push to a
-  task branch, and creation or update of a pull request;
+- exact Atom Contract Issue creation/update/read-back by the GPT control plane,
+  exact named-Issue receipt comments by an executor, task branches, ordinary
+  commits, Git fetch/read-back, non-force push to a task branch, and creation
+  or update of a pull request;
 - routine implementation choices whose alternatives do not materially change
   the estimand, scope, cost, data contract, or safety boundary.
 
@@ -76,7 +78,9 @@ Default: `INPUT=DIRECT_PROMPT`.
   `GITHUB_BATON: <exact contract locator>` and the contract is validated under
   `docs/agent/GITHUB_BATON_PROTOCOL.md`. `GITHUB_BATON` is a live accepted
   input route for `PROJECT_CHAT_PRO_GITHUB_BATON_CURSOR`; it grants no implicit
-  Issue/PR write, commit, push, or status authority.
+  Issue/PR write, commit, push, or status authority. Those routine actions are
+  authorized only by the explicit standing grant above or a stricter direct
+  user instruction.
 - Local handoff validation and path rules are defined by
   `docs/agent/HANDOFF_PROTOCOL.md`.
 - Execution-route selection among `GPT_ONLY`, `LOCAL_WORK_CODEX`, and
@@ -97,13 +101,16 @@ Never create, request, display, store, or commit `.env` values, API keys, access
 
 ## EXTERNAL_ACTIONS
 
-GitHub transport covered by `STANDING_PROJECT_AUTONOMY` may be used for ordinary
-fetch, non-force task-branch push, pull-request work, CI read-back, and routine
-review interaction. Public official documentation may be read when it changes
-a decision. Provider/API/RPC/WSS execution, account or repository settings,
-payment, remote creation, connector permission changes, VPS actions, package
-adoption, deployment, wallet/signer/transaction actions, and any other external
-side effect remain separately gated.
+GitHub transport covered by `STANDING_PROJECT_AUTONOMY` may be used for exact
+Atom Contract Issue creation/update/read-back, exact named-Issue receipt
+comments, ordinary fetch, non-force task-branch push, pull-request work, CI
+read-back, and routine review interaction. It does not authorize unrelated
+Issue discovery or account/repository-wide mutation. Public official
+documentation may be read when it changes a decision. Provider/API/RPC/WSS
+execution, account or repository settings, payment, remote creation, connector
+permission changes, VPS actions, package adoption, deployment,
+wallet/signer/transaction actions, and any other external side effect remain
+separately gated.
 
 ## PRE_GIT_PROVENANCE
 

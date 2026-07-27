@@ -1,6 +1,6 @@
 schema_version: '1.0'
 catalog_id: SMIAL-PROJECT-ASSET-CATALOG
-catalog_version: 0.9.3
+catalog_version: 0.9.5
 as_of: '2026-07-28'
 implementation_status: FOUNDATION_IMPLEMENTED_UNVERIFIED
 root_resolver:
