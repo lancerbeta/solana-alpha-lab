@@ -3,9 +3,10 @@
 Live execution flow for route
 `PROJECT_CHAT_PRO_GITHUB_BATON_CURSOR`.
 
-This document defines the live control-transport protocol. Creating an Issue,
-PR, branch, label, GitHub template, API call, or remote setting still requires a
-separately authorized atom.
+This document defines the live control-transport protocol. Exact contract read,
+task branch, ordinary commit, non-force push, PR/review, and CI interaction are
+routine transport under `STANDING_PROJECT_AUTONOMY`. Settings, provider calls,
+credentials, spend, destructive actions, and merge remain separately bounded.
 
 Related:
 
@@ -53,25 +54,31 @@ Material contract changes require a new `revision` and a new hash.
 
 1. Project Chat Pro authors an exact GitHub Atom Contract.
 2. Cursor runs preflight against the named contract (local checks plus one
-   bounded GitHub read only when explicitly authorized).
+   exact GitHub read under the standing grant).
 3. Cursor performs bounded local execution inside the managed write set.
-4. Cursor runs local validation and produces a sanitized receipt.
-5. Separate commit authorization is required before any commit.
-6. Separate push / Draft PR authorization is required before remote publish.
-7. GPT performs semantic acceptance.
+4. Cursor runs targeted validation while iterating and produces a sanitized
+   receipt.
+5. Cursor may stage, commit, non-force push, create/update the PR, and read CI
+   under standing routine authority unless the contract has a stricter stop.
+6. One full-gate owner validates the exact candidate: Cursor, Codex, or GitHub
+   CI. Delegation uses `FULL_VALIDATION=DELEGATED_TO_CI` plus commit/tree
+   identity and is not a blocker.
+7. GPT performs semantic acceptance after evidence read-back.
 8. Optional bounded repair may continue inside the same atom/envelope when it
    stays within the original objective, managed write set, dependency set,
    authority class, network/cost caps, and rollback boundary; otherwise a new
    contract revision/hash and explicit approval are required.
-9. Separate merge/publication authorization is required.
+9. Cursor stops before merge. Codex obtains exact per-PR user confirmation and
+   performs merge/read-back.
 10. GPT control plane performs canonical reconciliation.
 
-`LOCAL_WRITE`, `COMMIT`, `PUSH`/`PR` remote write, `MERGE`/publication, and
-other external or destructive classes require separate explicit approvals.
-`LOCAL_WRITE` does not grant commit, push, PR, settings, merge, provider, or
-destructive authority. Local validation and GPT semantic acceptance are gates,
-not authority grants. Completion of one gate never grants the next mutation
-class.
+The standing grant supplies routine local write→stage→commit→push→PR/CI
+delivery as one envelope. The Atom Contract scopes objective, base, managed
+write set, dependencies, caps, rollback, and stricter stops; it does not need
+to re-grant each routine step. Provider/API/RPC/WSS, credentials, spend,
+package adoption, deploy, wallet/signer/transaction, settings,
+force/destructive/history actions, material scope change, and merge remain
+excluded or conditional gates.
 
 ## Atom Contract minimum fields
 
@@ -82,12 +89,11 @@ One Atom Contract must identify:
 - contract `revision`;
 - contract content hash (SHA-256 of canonical contract bytes);
 - expected base `HEAD` and `tree`;
-- authority class;
+- authority class or stricter exclusions;
 - managed write set;
 - stop-before boundaries;
 - validation command;
-- evidence return channel (Issue comment and/or Draft PR) as a later
-  authorized step, not an implied write.
+- evidence return channel (Issue comment and/or PR).
 
 ## Input route
 
@@ -101,9 +107,10 @@ Rules:
 
 - Reject discovery by newest/last-modified Issue or PR.
 - Reject absolute machine paths and parent traversal.
-- A trigger grants only the authority class stated by the contract.
-- `GITHUB_BATON` never implies Issue/PR comment write, commit, push, merge,
-  label changes, or canonical status authority.
+- A trigger scopes the contract; standing project autonomy supplies routine
+  delivery unless the contract is stricter.
+- `GITHUB_BATON` never implies merge, settings, provider action, material scope
+  expansion, or canonical status authority.
 - Existing routes `DIRECT_PROMPT`, `LOCAL_HANDOFF`, and
   `ACCEPT_LOCAL_HANDOFF` remain valid and unchanged.
 - `GITHUB_BATON` is a live accepted route, not a future, local-dirty,
@@ -117,14 +124,13 @@ Before any mutation, verify:
 - branch, `HEAD`, `tree`, and upstream match the expected base;
 - worktree dirty state matches the contract requirement (usually clean);
 - contract revision and hash match;
-- authority class is present and sufficient only for the requested step;
+- authority/exclusions are valid and compatible with the standing envelope;
 - managed write set is non-empty only when local writes are authorized.
 
 ### Bounded GitHub read
 
-Fetching the exact contract from GitHub requires already-explicit authority for
-one bounded read of the exact repository and exact Issue/revision named by
-`GITHUB_BATON`.
+Standing project autonomy covers one bounded read of the exact repository and
+Issue/revision named by `GITHUB_BATON`.
 
 When authorized:
 
@@ -135,7 +141,8 @@ When authorized:
 - count and report exact GitHub reads;
 - make zero GitHub writes.
 
-If that exact GitHub read was not authorized, return `BLOCKED_AUTHORITY`.
+If the active contract forbids that read or the standing grant is unavailable,
+return `BLOCKED_AUTHORITY`.
 On revision/hash mismatch, return `BLOCKED_CONTRACT_MISMATCH`.
 
 No GitHub writes or unbounded/discovery reads. Local preflight makes zero local
@@ -147,10 +154,11 @@ mismatch.
 When `LOCAL_WRITE` is authorized:
 
 - edit only paths inside the managed write set;
-- run the stated validation command;
+- run targeted checks under `VALIDATION_ECONOMY`;
 - produce a sanitized receipt (no secrets, usernames, emails, absolute
   machine paths, tokens, or wallet material);
-- stop before commit unless a later approval explicitly authorizes commit.
+- continue through routine commit/push/PR/CI delivery unless a stricter stop is
+  explicit.
 
 ## Internal repair policy
 
@@ -162,16 +170,13 @@ When `LOCAL_WRITE` is authorized:
   system, changed architecture, or destructive action requires a new contract
   revision/hash and explicit approval.
 
-## Separate later authorities
+## Excluded and conditional boundaries
 
-The following remain out of band until explicitly authorized:
-
-- `git add` / commit;
-- push;
-- Draft PR creation or update;
-- Issue comment evidence publish;
-- merge / publication;
-- canonical status changes and `DONE`.
+- Cursor never merges; Codex merges only after exact per-PR confirmation.
+- Provider/API/RPC/WSS, credentials, spend, deploy, wallet/signer/transaction,
+  settings, force/destructive/history operations, material scope change, and
+  user-only actions require an exact gate.
+- Canonical status changes and `DONE` remain GPT control-plane decisions.
 
 ## Deferred surfaces
 
@@ -183,7 +188,6 @@ The following remain out of band until explicitly authorized:
 ## Failure and stop conditions
 
 Stop and return `BLOCKED`, `BLOCKED_AUTHORITY`, or
-`BLOCKED_CONTRACT_MISMATCH` when identity, revision, hash, base, authority,
-write-set, cleanliness, or GitHub-read authorization checks fail; when secrets
-or absolute paths appear; or when a step requests an authority class not
-granted by the active contract.
+`BLOCKED_CONTRACT_MISMATCH` when identity, revision, hash, base, scope,
+write-set, cleanliness, caps, or stricter-stop checks fail; when secrets or
+absolute paths appear; or when a step crosses an excluded boundary.

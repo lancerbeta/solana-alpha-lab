@@ -2,7 +2,7 @@
 adr_id: ADR-003
 title: GPT control plane and executor routing
 status: ACCEPTED_REPOSITORY_MIRROR
-as_of: 2026-07-26
+as_of: 2026-07-28
 owner_task: CTRL-BATON-SETUP
 contains_secrets: false
 ---
@@ -11,8 +11,9 @@ contains_secrets: false
 
 > Accepted repository control mirror for the live GitHub Baton and Cursor
 > workplace. Canonical Project Sources reconciliation and roadmap `DONE`
-> remain GPT-owned and may still be pending. This ADR grants no commit, push,
-> GitHub write, provider, signer, or spend authority by itself.
+> remain GPT-owned and may still be pending. This ADR does not select a task or
+> grant status authority; the standing routine execution grant lives in
+> `AGENTS.md`.
 
 ## Context
 
@@ -59,8 +60,16 @@ Non-negotiable ownership:
   expected_contract_sha256 plus revision checks on exact extracted payload bytes;
   Cursor fails closed on mismatch.
 - Material contract changes require a new revision and hash.
-- Authority classes remain separate: `LOCAL_WRITE` does not grant commit, push,
-  PR, settings, merge, provider, or destructive authority.
+- Within an elected objective, scoped write set, caps, and stop conditions,
+  `STANDING_PROJECT_AUTONOMY` covers routine local writes, direct propagation
+  to tests/Catalog/generated consumers, staging, ordinary commit, fetch,
+  non-force branch push, PR/review work, and CI read-back.
+- A stricter Atom Contract still wins. Cursor stops before merge; Codex asks
+  once for the exact PR and then performs the merge.
+- Provider/API/RPC/WSS or credentialed-account calls, package/dependency
+  changes, purchases/deployments, wallet/signer/real-money actions,
+  force/destructive operations, settings/access changes, and canonical
+  acceptance/status remain separate gates.
 - Skills are helper procedures, not canonical control owners.
 - Seven canonical Project Sources remain in ChatGPT Project and are not copied
   into Cursor/Git as a second permanent-memory truth owner.
@@ -106,15 +115,22 @@ Repository mirrors:
 - MCP and Cursor Automations remain deferred.
 - In-envelope semantic repairs that stay inside original objective, write set,
   authority, and caps do not require a new transport or revision.
+- During iteration, run targeted checks. Assign exactly one full-gate owner to
+  each unchanged candidate fingerprint: Cursor, Codex, or GitHub CI. A passing
+  full gate is reused until bytes, dependencies, runtime, or applicable policy
+  change.
 
 ## Security boundary
 
-- Network off by default.
+- Offline work remains the default for product implementation. Exact GitHub
+  transport/read-back and public official-documentation reads are routine
+  control-plane operations under the standing grant.
 - No secrets, wallet material, absolute machine paths, usernames, or account
   emails in contracts/receipts.
-- No implicit GitHub write, commit, push, merge, or canonical status change.
-- Bounded GitHub reads require already-explicit authority for the exact
-  repository and Issue/revision; no discovery reads.
+- No artifact or conversational cue selects a task, expands scope, authorizes
+  merge, or changes canonical status.
+- GitHub operations stay bound to the elected repository, branch, PR, and
+  exact Issue/revision; no unrelated account/repository discovery.
 - Managed write sets are fail-closed.
 
 ## Rollback / supersession

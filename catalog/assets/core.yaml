@@ -575,10 +575,10 @@ records:
     contains_raw_data: false
     sensitivity: INTERNAL_NON_SECRET
 - asset_id: CTRL-AGENTS-001
-  record_version: '1.5'
+  record_version: '1.6'
   asset_type: control_document
-  purpose: Repository-level agent contract for scope, safety, validation, and status
-    ownership.
+  purpose: Repository-level agent contract for standing routine autonomy, scope,
+    safety, JIT validation, and status ownership.
   status: IMPLEMENTED_UNVERIFIED
   origin: REPOSITORY
   as_of: '2026-07-28'
@@ -589,7 +589,7 @@ records:
     repository_path: AGENTS.md
   integrity:
     kind: sha256
-    sha256: d5dc3ab0c5177478096e3ddb6ac77637fe72ff5c836fcc497bcaf6e73c292463
+    sha256: fdf0118752e69ac0bd364db09e010ad12994d2e6f261a344ece9ef12e7f834c5
   access:
     mode: read_only
     method: file
@@ -815,13 +815,13 @@ records:
     contains_raw_data: false
     sensitivity: INTERNAL_NON_SECRET
 - asset_id: CATALOG-ROOT-001
-  record_version: '1.2'
+  record_version: '1.3'
   asset_type: catalog_root
   purpose: Stable machine-readable resolver for Catalog registries, schemas, commands,
     and policies.
   status: IMPLEMENTED_UNVERIFIED
   origin: REPOSITORY
-  as_of: '2026-07-22'
+  as_of: '2026-07-28'
   truth_owner: TASK-04
   location:
     kind: git_path
@@ -865,13 +865,13 @@ records:
     contains_raw_data: false
     sensitivity: INTERNAL_NON_SECRET
 - asset_id: CATALOG-ASSET-REGISTRY-CORE-001
-  record_version: '1.2'
+  record_version: '1.3'
   asset_type: catalog_registry
   purpose: Core Catalog asset records for repository controls, environment, schemas,
     and evidence.
   status: IMPLEMENTED_UNVERIFIED
   origin: REPOSITORY
-  as_of: '2026-07-22'
+  as_of: '2026-07-28'
   truth_owner: TASK-04
   location:
     kind: git_path
@@ -1245,13 +1245,13 @@ records:
     contains_raw_data: false
     sensitivity: INTERNAL_NON_SECRET
 - asset_id: CATALOG-ASSET-REGISTRY-LIFECYCLE-001
-  record_version: '1.2'
+  record_version: '1.3'
   asset_type: catalog_registry
   purpose: Catalog shard for active lifecycle registry assets and generated navigation
     views.
   status: IMPLEMENTED_UNVERIFIED
   origin: REPOSITORY
-  as_of: '2026-07-22'
+  as_of: '2026-07-28'
   truth_owner: TASK-04
   location:
     kind: git_path
@@ -1412,12 +1412,13 @@ records:
     contains_raw_data: false
     sensitivity: INTERNAL_NON_SECRET
 - asset_id: CTRL-HANDOFF-PROTOCOL-001
-  record_version: '1.0'
+  record_version: '1.1'
   asset_type: control_document
-  purpose: Durable local Work-to-Codex handoff trigger and path-safety contract.
+  purpose: Durable local handoff trigger, path-safety contract, and standing-autonomy
+    scope boundary.
   status: IMPLEMENTED_UNVERIFIED
   origin: REPOSITORY
-  as_of: '2026-07-22'
+  as_of: '2026-07-28'
   truth_owner: TASK-04
   location:
     kind: git_path
@@ -1425,7 +1426,7 @@ records:
     repository_path: docs/agent/HANDOFF_PROTOCOL.md
   integrity:
     kind: sha256
-    sha256: 3435bebf47233a449326a828845966549e1c77ead2dab0eb862da8ae54a4a0fd
+    sha256: 0b34154951718c508b26f5038ee186218a2ac2d81a09aa69d9cb0ff09e8cb08f
   access:
     mode: read_only
     method: file
@@ -3919,13 +3920,13 @@ records:
   evidence: []
   classification: *t08_internal
 - asset_id: CTRL-BATON-SETUP-001
-  record_version: '1.2'
+  record_version: '1.3'
   asset_type: control_document
-  purpose: Candidate control-infrastructure task mirror for GPT baton routing,
-    machine layer, and compositional repository lifecycle.
+  purpose: Live control-infrastructure mirror for GPT baton routing, standing routine
+    autonomy, and compositional repository lifecycle.
   status: IMPLEMENTED_UNVERIFIED
   origin: REPOSITORY
-  as_of: '2026-07-26'
+  as_of: '2026-07-28'
   truth_owner: ChatGPT_Project_GPT_Control_Plane
   location:
     kind: git_path
@@ -3933,7 +3934,7 @@ records:
     repository_path: docs/tasks/CTRL-BATON-SETUP.md
   integrity:
     kind: sha256
-    sha256: 9ad4d47037a038b512ba1f382778cd1d64c5bbfff1d133317c4bfa88b7608b34
+    sha256: 112aea251b525b9747f01bcb2d545d06773df18633cf878c57bac94f630ae855
   access:
     mode: read_only
     method: file
@@ -3983,12 +3984,13 @@ records:
     contains_raw_data: false
     sensitivity: INTERNAL_NON_SECRET
 - asset_id: PROTOCOL-EXECUTION-ROUTER-001
-  record_version: '1.0'
+  record_version: '1.1'
   asset_type: control_document
-  purpose: Beginner-safe execution router among GPT_ONLY, LOCAL_WORK_CODEX and GitHub baton Cursor routes.
+  purpose: Execution router combining GPT control ownership with standing routine
+    autonomy across local and GitHub baton routes.
   status: IMPLEMENTED_UNVERIFIED
   origin: REPOSITORY
-  as_of: '2026-07-25'
+  as_of: '2026-07-28'
   truth_owner: ChatGPT_Project_GPT_Control_Plane
   location:
     kind: git_path
@@ -3996,7 +3998,7 @@ records:
     repository_path: docs/agent/EXECUTION_ROUTER_PROTOCOL.md
   integrity:
     kind: sha256
-    sha256: e3b063cb50f26c363b66a56565fdbb0aee220a6f0a6017c522bcdb97d14cb409
+    sha256: f71f4f10839e04f6ffdb4e8e3bf85295a185b5e59a1146e0753b83c48df61973
   access:
     mode: read_only
     method: file
@@ -4013,12 +4015,13 @@ records:
     contains_raw_data: false
     sensitivity: INTERNAL_NON_SECRET
 - asset_id: PROTOCOL-GITHUB-BATON-001
-  record_version: '1.0'
+  record_version: '1.1'
   asset_type: control_document
-  purpose: GitHub Baton protocol for revision-locked Atom Contracts and out-of-band hash trust.
+  purpose: GitHub Baton protocol for revision-locked contracts, standing routine
+    delivery, JIT validation, and out-of-band hash trust.
   status: IMPLEMENTED_UNVERIFIED
   origin: REPOSITORY
-  as_of: '2026-07-25'
+  as_of: '2026-07-28'
   truth_owner: ChatGPT_Project_GPT_Control_Plane
   location:
     kind: git_path
@@ -4026,7 +4029,7 @@ records:
     repository_path: docs/agent/GITHUB_BATON_PROTOCOL.md
   integrity:
     kind: sha256
-    sha256: 068e13c5ee29fac395c1fe310a6add575dd18085eb376735b46f843fcec150f5
+    sha256: 5204c6fac76b10813ebf596ab23639eeff5739b47c6c9a2ac6c2ddb407e9b6b8
   access:
     mode: read_only
     method: file
@@ -4043,13 +4046,13 @@ records:
     contains_raw_data: false
     sensitivity: INTERNAL_NON_SECRET
 - asset_id: ADR-GPT-EXECUTOR-ROUTING-003
-  record_version: '1.1'
+  record_version: '1.2'
   asset_type: decision
   purpose: Accepted repository mirror for GPT control-plane and executor routing,
-    with MCP and Automations deferred until measured need.
+    with standing routine autonomy and material gates kept separate.
   status: VALIDATED_ACTIVE
   origin: REPOSITORY
-  as_of: '2026-07-27'
+  as_of: '2026-07-28'
   truth_owner: ChatGPT_Project_GPT_Control_Plane
   location:
     kind: git_path
@@ -4057,7 +4060,7 @@ records:
     repository_path: docs/decisions/ADR-003-gpt-executor-routing.md
   integrity:
     kind: sha256
-    sha256: f6fc3b4bfb9049844b3156203899fc4f6954f5bfb07eb8955e832d8c2c515e07
+    sha256: 392eaedfccb83ac4b0072d5abe4d3b56dfa371f84382b57a6369867260d6bd2e
   access:
     mode: read_only
     method: file
@@ -4074,12 +4077,13 @@ records:
     contains_raw_data: false
     sensitivity: INTERNAL_NON_SECRET
 - asset_id: CURSOR-RULE-AUTHORITY-001
-  record_version: '1.0'
+  record_version: '1.1'
   asset_type: configuration
-  purpose: Always-on Cursor rule encoding EXECUTION_ONLY and GPT control-plane ownership.
+  purpose: Always-on Cursor rule combining EXECUTION_ONLY with standing routine
+    autonomy and GPT control ownership.
   status: IMPLEMENTED_UNVERIFIED
   origin: REPOSITORY
-  as_of: '2026-07-25'
+  as_of: '2026-07-28'
   truth_owner: CTRL-BATON-SETUP
   location:
     kind: git_path
@@ -4087,7 +4091,7 @@ records:
     repository_path: .cursor/rules/00-authority.mdc
   integrity:
     kind: sha256
-    sha256: 820faaa602a1324290b01b824a3242f5edaddc69710c495c71566a269c9010ea
+    sha256: 0bb8414c62fd813252498cfb8a6cf5e8376c6eae927755ea9eb90ce5bce824d5
   access:
     mode: read_only
     method: file
@@ -4135,12 +4139,13 @@ records:
     contains_raw_data: false
     sensitivity: INTERNAL_NON_SECRET
 - asset_id: CURSOR-RULE-VALIDATION-001
-  record_version: '1.0'
+  record_version: '1.1'
   asset_type: configuration
-  purpose: Always-on Cursor rule for the platform-neutral validation gate command.
+  purpose: Always-on Cursor rule for targeted iteration and one full-gate owner
+    per candidate fingerprint.
   status: IMPLEMENTED_UNVERIFIED
   origin: REPOSITORY
-  as_of: '2026-07-25'
+  as_of: '2026-07-28'
   truth_owner: CTRL-BATON-SETUP
   location:
     kind: git_path
@@ -4148,7 +4153,7 @@ records:
     repository_path: .cursor/rules/20-validation.mdc
   integrity:
     kind: sha256
-    sha256: 384818d7e256c6073e190aee175aada6ce805722623b814a8c3690848dce5aff
+    sha256: 14787689e01c2ab3514c7a0d724ba65a3092fe55e96986a30de7893691bb1e31
   access:
     mode: read_only
     method: file
@@ -4165,12 +4170,13 @@ records:
     contains_raw_data: false
     sensitivity: INTERNAL_NON_SECRET
 - asset_id: CURSOR-RULE-SECURITY-001
-  record_version: '1.0'
+  record_version: '1.1'
   asset_type: configuration
-  purpose: Always-on Cursor rule for secrets wallets and fail-closed network defaults.
+  purpose: Always-on Cursor rule for secrets, wallets, bounded GitHub transport,
+    and separately gated external actions.
   status: IMPLEMENTED_UNVERIFIED
   origin: REPOSITORY
-  as_of: '2026-07-25'
+  as_of: '2026-07-28'
   truth_owner: CTRL-BATON-SETUP
   location:
     kind: git_path
@@ -4178,7 +4184,7 @@ records:
     repository_path: .cursor/rules/30-security-and-secrets.mdc
   integrity:
     kind: sha256
-    sha256: 94aafbfab25fccc0f8d680b04aed0e62a7ad11be0f3d6a441a49e8e751a68946
+    sha256: 13963a4536fece0862321de06b0551fce2b74c6ee6267b894b9deaa182ae765b
   access:
     mode: read_only
     method: file
@@ -4195,12 +4201,13 @@ records:
     contains_raw_data: false
     sensitivity: INTERNAL_NON_SECRET
 - asset_id: CURSOR-RULE-CATALOG-001
-  record_version: '1.0'
+  record_version: '1.1'
   asset_type: configuration
-  purpose: Always-on Cursor rule for Catalog and evidence boundaries without dual truth owners.
+  purpose: Always-on Cursor rule for routine Catalog propagation and evidence boundaries
+    without dual truth owners.
   status: IMPLEMENTED_UNVERIFIED
   origin: REPOSITORY
-  as_of: '2026-07-25'
+  as_of: '2026-07-28'
   truth_owner: CTRL-BATON-SETUP
   location:
     kind: git_path
@@ -4208,7 +4215,7 @@ records:
     repository_path: .cursor/rules/40-catalog-and-evidence.mdc
   integrity:
     kind: sha256
-    sha256: 7b0e9f2abde071680ea286ea94dd397738e435f79d91b41578272209aa2425cd
+    sha256: eea67fb5f1c51baf3d2b74ab90ca7363c21f05072ecfaa6315199a475b74cd89
   access:
     mode: read_only
     method: file
@@ -4225,12 +4232,13 @@ records:
     contains_raw_data: false
     sensitivity: INTERNAL_NON_SECRET
 - asset_id: CURSOR-RULE-GITHUB-BATON-001
-  record_version: '1.0'
+  record_version: '1.1'
   asset_type: configuration
-  purpose: Always-on Cursor rule for baton transport out-of-band hash trust and no implied writes.
+  purpose: Always-on Cursor rule for exact baton trust, routine GitHub delivery,
+    and stop-before-merge behavior.
   status: IMPLEMENTED_UNVERIFIED
   origin: REPOSITORY
-  as_of: '2026-07-25'
+  as_of: '2026-07-28'
   truth_owner: CTRL-BATON-SETUP
   location:
     kind: git_path
@@ -4238,7 +4246,7 @@ records:
     repository_path: .cursor/rules/50-github-baton.mdc
   integrity:
     kind: sha256
-    sha256: c3122f3ce62239d671e335ec78d330ebfa4f826a35a981625280eb79ef018956
+    sha256: f9702e51d3150351d3cd649997b12da41c6314e77782d5e7f2e5ef0e4e31847a
   access:
     mode: read_only
     method: file
@@ -4285,12 +4293,13 @@ records:
     contains_raw_data: false
     sensitivity: INTERNAL_NON_SECRET
 - asset_id: CURSOR-CMD-BATON-PREFLIGHT-001
-  record_version: '1.0'
+  record_version: '1.1'
   asset_type: configuration
-  purpose: Read-only Cursor command playbook for bounded baton preflight inputs and stops.
+  purpose: Read-only Cursor command for exact baton preflight under the standing
+    GitHub-read grant.
   status: IMPLEMENTED_UNVERIFIED
   origin: REPOSITORY
-  as_of: '2026-07-25'
+  as_of: '2026-07-28'
   truth_owner: CTRL-BATON-SETUP
   location:
     kind: git_path
@@ -4298,7 +4307,7 @@ records:
     repository_path: .cursor/commands/baton-preflight.md
   integrity:
     kind: sha256
-    sha256: 7e320bfb0906fe4494b5eb83373b32ffa9f250fb99af0beece71043e21a78470
+    sha256: f0888336ac38f389ae81933fdd9715d383a77b47574a456cb76599460cd9a2cc
   access:
     mode: read_only
     method: file
@@ -4465,12 +4474,13 @@ records:
     contains_raw_data: false
     sensitivity: INTERNAL_NON_SECRET
 - asset_id: TEMPLATE-BATON-PULL-REQUEST-001
-  record_version: '1.0'
+  record_version: '1.1'
   asset_type: configuration
-  purpose: Pull request template stating Draft PR is evidence not DONE.
+  purpose: Pull request template for candidate evidence, single full-gate ownership,
+    and merge confirmation handoff.
   status: IMPLEMENTED_UNVERIFIED
   origin: REPOSITORY
-  as_of: '2026-07-25'
+  as_of: '2026-07-28'
   truth_owner: CTRL-BATON-SETUP
   location:
     kind: git_path
@@ -4478,7 +4488,7 @@ records:
     repository_path: .github/pull_request_template.md
   integrity:
     kind: sha256
-    sha256: cb480d338f98723137427aa7afbe219a833c6a893df17aef66d0fda994b894f9
+    sha256: 08ac2a53b326a9e522f6e4b4044c8c5023ea7fb572abdaf8c22ae498e992d086
   access:
     mode: read_only
     method: file
@@ -4616,13 +4626,13 @@ records:
     contains_raw_data: false
     sensitivity: INTERNAL_NON_SECRET
 - asset_id: SCRIPT-BATON-VALIDATE-001
-  record_version: '1.1'
+  record_version: '1.2'
   asset_type: script
   purpose: Deterministic offline validator for baton schemas, fixtures, route ownership,
-    Catalog integrity, templates, and rules.
+    standing autonomy, JIT validation, Catalog integrity, templates, and rules.
   status: IMPLEMENTED_UNVERIFIED
   origin: REPOSITORY
-  as_of: '2026-07-27'
+  as_of: '2026-07-28'
   truth_owner: CTRL-BATON-SETUP
   location:
     kind: git_path
@@ -4630,7 +4640,7 @@ records:
     repository_path: scripts/validate_baton.py
   integrity:
     kind: sha256
-    sha256: f85a3ab1760c6efb51b176a8ae2a18bcf72241a9142ad91f952587ad00d2bd5c
+    sha256: 7107aff101eb662371f2da48d7e3802959326c6839706a21928f324550ff8a09
   access:
     mode: read_only
     method: file

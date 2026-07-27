@@ -574,7 +574,25 @@ def validate_canonical_catalog_integrity() -> None:
 def validate_cursor_and_templates() -> None:
     for path in REQUIRED_PATHS + CURSOR_RULES:
         assert_check(f"exists:{path.relative_to(ROOT).as_posix()}", path.is_file())
+    agents = (ROOT / "AGENTS.md").read_text(encoding="utf-8")
     authority = (ROOT / ".cursor/rules/00-authority.mdc").read_text(encoding="utf-8")
+    validation = (ROOT / ".cursor/rules/20-validation.mdc").read_text(encoding="utf-8")
+    security = (
+        ROOT / ".cursor/rules/30-security-and-secrets.mdc"
+    ).read_text(encoding="utf-8")
+    catalog_rule = (
+        ROOT / ".cursor/rules/40-catalog-and-evidence.mdc"
+    ).read_text(encoding="utf-8")
+    baton_rule = (
+        ROOT / ".cursor/rules/50-github-baton.mdc"
+    ).read_text(encoding="utf-8")
+    router = (
+        ROOT / "docs/agent/EXECUTION_ROUTER_PROTOCOL.md"
+    ).read_text(encoding="utf-8")
+    protocol = (
+        ROOT / "docs/agent/GITHUB_BATON_PROTOCOL.md"
+    ).read_text(encoding="utf-8")
+    handoff = (ROOT / "docs/agent/HANDOFF_PROTOCOL.md").read_text(encoding="utf-8")
     for needle in [
         (
             "The user skills `start-solana-task` and `finish-solana-task` "
@@ -599,6 +617,79 @@ def validate_cursor_and_templates() -> None:
         ),
     ]:
         assert_check(f"authority_lifecycle_isolation:{needle}", needle in authority)
+    policy_needles = {
+        "agents": (
+            agents,
+            (
+                "Codex and Cursor may proceed",
+                "one full-gate owner per exact candidate fingerprint",
+            ),
+        ),
+        "authority": (
+            authority,
+            (
+                "STANDING_PROJECT_AUTONOMY",
+                "Proceed through those routine steps without asking",
+                "Cursor stops before merge",
+            ),
+        ),
+        "validation": (
+            validation,
+            (
+                "one full-gate owner per exact candidate fingerprint",
+                "FULL_VALIDATION=DELEGATED_TO_CI",
+                "Never run the full gate merely because",
+            ),
+        ),
+        "security": (
+            security,
+            (
+                "Routine GitHub transport",
+                "Provider/API/RPC/WSS",
+            ),
+        ),
+        "catalog": (
+            catalog_rule,
+            (
+                "routine propagation",
+                "Never manually edit generated Catalog navigation",
+            ),
+        ),
+        "baton": (
+            baton_rule,
+            (
+                "standing project autonomy",
+                "Cursor never merges",
+            ),
+        ),
+        "router": (
+            router,
+            (
+                "STANDING_PROJECT_AUTONOMY",
+                "FULL_VALIDATION=DELEGATED_TO_CI",
+            ),
+        ),
+        "protocol": (
+            protocol,
+            (
+                "standing routine authority",
+                "FULL_VALIDATION=DELEGATED_TO_CI",
+            ),
+        ),
+        "handoff": (
+            handoff,
+            (
+                "A handoff trigger alone grants read access only",
+                "standing grant covers routine",
+            ),
+        ),
+    }
+    for policy_name, (text, needles) in policy_needles.items():
+        for needle in needles:
+            assert_check(
+                f"cursor_jit_policy:{policy_name}:{needle}",
+                needle.lower() in text.lower(),
+            )
     cmd = (ROOT / ".cursor/commands/baton-preflight.md").read_text(encoding="utf-8")
     for needle in [
         "expected_contract_sha256",
@@ -607,6 +698,7 @@ def validate_cursor_and_templates() -> None:
         "github_reads",
         "github_writes",
         "--allow-github-read",
+        "standing grant",
     ]:
         assert_check(f"preflight_cmd:{needle}", needle in cmd)
     assert_check(
@@ -629,11 +721,37 @@ def validate_cursor_and_templates() -> None:
     pr = (ROOT / ".github/pull_request_template.md").read_text(encoding="utf-8")
     for needle in [
         "Draft PR is candidate evidence",
-        "merge is separately authorized",
+        "Cursor never merges",
         "do not establish DONE",
         "expected SHA-256",
+        "Single full-gate owner",
+        "FULL_VALIDATION=DELEGATED_TO_CI",
     ]:
         assert_check(f"pr_template:{needle}", needle.lower() in pr.lower())
+    stale_active_policy = (
+        "Separate commit authorization is required",
+        "LOCAL_WRITE does not grant commit",
+        "merge is separately authorized",
+    )
+    active_policy_texts = {
+        "AGENTS.md": agents,
+        ".cursor/rules/00-authority.mdc": authority,
+        ".cursor/rules/20-validation.mdc": validation,
+        ".cursor/rules/30-security-and-secrets.mdc": security,
+        ".cursor/rules/40-catalog-and-evidence.mdc": catalog_rule,
+        ".cursor/rules/50-github-baton.mdc": baton_rule,
+        ".cursor/commands/baton-preflight.md": cmd,
+        "docs/agent/EXECUTION_ROUTER_PROTOCOL.md": router,
+        "docs/agent/GITHUB_BATON_PROTOCOL.md": protocol,
+        "docs/agent/HANDOFF_PROTOCOL.md": handoff,
+        ".github/pull_request_template.md": pr,
+    }
+    for relative, text in active_policy_texts.items():
+        for phrase in stale_active_policy:
+            assert_check(
+                f"stale_cursor_policy_absent:{relative}:{phrase}",
+                phrase.lower() not in text.lower(),
+            )
 
 
 LIVE_ROUTE_CONTROL_PATHS = (

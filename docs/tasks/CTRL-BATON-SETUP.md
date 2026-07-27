@@ -36,10 +36,18 @@ later GPT reconciliation.
   `PROJECT_CHAT_PRO_GITHUB_BATON_CURSOR`.
 - Do not describe the route or machine layer as future-only, local-dirty,
   pre-merge, or uncommitted candidate state.
-- Authority classes remain separate: `LOCAL_WRITE` does not grant commit, push,
-  PR, settings, merge, provider, or destructive authority.
+- Within an elected objective, write set, caps, and stop conditions, the
+  standing project grant covers routine local delivery through commit,
+  non-force branch push, PR, review repair, and CI read-back. Cursor stops
+  before merge; Codex asks once for the exact PR and then merges.
+- Provider/API/RPC/WSS, credentials, dependencies, deploy/purchase,
+  wallet/signer/real money, force/destructive work, settings/access changes,
+  canonical acceptance, and scope expansion remain separate gates.
 - Historical A6.* atoms below are retained as provenance of how the machine
   layer landed on `main`; they are not the current live-route description.
+
+The authority lines recorded inside historical atoms below remain immutable
+evidence of those runs. They do not override the current standing grant.
 
 ## Atom authority split (historical provenance)
 
@@ -112,8 +120,10 @@ Live mirror outputs now include:
 - compositional repository-state/topology policy for historical baton and
   generic `ctrl/*` lifecycles;
 - Catalog registration with deterministic hash reconciliation;
-- stop before unauthorized commit, push, merge, settings writes, branch
-  deletion, or canonical Source mutation.
+- targeted validation during iteration and one full-gate owner per unchanged
+  candidate fingerprint;
+- routine delivery through PR/CI, then stop before merge or any excluded
+  authority boundary.
 
 `TASK-09` remains READY / NOT_STARTED.
 
@@ -123,7 +133,8 @@ Repository DoD for this mirror is technical only:
 
 - control contracts describe `GITHUB_BATON` as live accepted, not future /
   local-dirty / pre-merge / uncommitted;
-- authority class separation remains explicit;
+- standing routine execution and separately gated material boundaries remain
+  explicit;
 - preflight and managed-write boundaries remain fail-closed;
 - Catalog hashes and generated navigation reconcile;
 - no merge, settings change, branch deletion, purchase, or canonical Source

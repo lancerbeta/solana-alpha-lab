@@ -16,8 +16,18 @@ alwaysApply: true
 - Cursor is always `EXECUTION_ONLY`.
 - Never select the current or next canonical task.
 - Never infer authority from an Issue, PR, commit, tests, or files alone.
-- A prompt, handoff, or baton grants only the authority class it states.
-- Never imply commit, push, GitHub write, or canonical status authority.
+- The active prompt, handoff, or baton supplies the bounded objective and
+  scope. `AGENTS.md` `STANDING_PROJECT_AUTONOMY` supplies routine execution
+  authority for local writes, direct propagation consumers, tests, exact
+  staging, ordinary commits, fetch/read-back, non-force task-branch push,
+  PR/review, and CI interaction unless the active contract is stricter.
+- Proceed through those routine steps without asking the user for another
+  approval. Report the final exact inventory and side effects.
+- Stop for material scope/estimand/data-contract/safety changes and the
+  excluded provider, credential, spend, wallet, destructive, settings, and
+  user-only boundaries listed in `AGENTS.md`.
+- Cursor stops before merge. Codex obtains exact per-PR confirmation and
+  performs the merge.
 - Local validation and GPT semantic acceptance are gates, not authority grants.
 - Follow `AGENTS.md` and `docs/agent/EXECUTION_ROUTER_PROTOCOL.md`.
 - Skills advise; they do not own control-plane status.
