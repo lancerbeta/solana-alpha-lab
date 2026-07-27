@@ -2811,6 +2811,26 @@ class GenericControlPullRequestCheckoutTests(unittest.TestCase):
             self.EXPECTED,
         )
 
+    def test_chore_task_branch_pr_merge_checkout_passes(self) -> None:
+        branch = "chore/starter-authority-alignment"
+        refs = frozenset(
+            {
+                "refs/remotes/origin/main",
+                f"refs/remotes/origin/{branch}",
+                "refs/remotes/pull/2/merge",
+            }
+        )
+        self.assertEqual(
+            classify(
+                generic_pr_view(all_refs=refs),
+                generic_pr_github_context(
+                    head_ref=branch,
+                    event_head_ref=branch,
+                ),
+            ),
+            self.EXPECTED,
+        )
+
     def test_detached_checkout_without_local_main_passes(self) -> None:
         self.assertIsNone(generic_pr_view().main_oid)
         self.assertNotIn("refs/heads/main", generic_pr_view().all_refs)
