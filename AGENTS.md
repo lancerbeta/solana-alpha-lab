@@ -38,13 +38,18 @@ active-task contract, exact write set, offline requirement, cap, or stop
 condition still wins. Codex must keep work bounded to the active objective and
 must not claim canonical acceptance or `DONE`.
 
-The standing grant does not authorize final merge/publication, force push,
-history rewrite, destructive cleanup, branch deletion, repository or account
-settings, credentials or secrets, provider/API/RPC/WSS execution, purchases,
-deployment, wallet/signer/transaction actions, real money, or any action that
-only the user can complete. Those remain explicit user gates. If an ordinary
-step exposes one of these boundaries, stop only at that boundary and return the
-smallest concrete user action.
+Codex performs a final pull-request merge only after the goal owner gives an
+explicit confirmation for that exact PR immediately before the merge. The
+confirmation is the gate; it is not an instruction for the user to click the
+merge button. Without that per-PR confirmation, stop before merge.
+
+The standing grant does not authorize force push, history rewrite, destructive
+cleanup, branch deletion, repository or account settings, credentials or
+secrets, provider/API/RPC/WSS execution, purchases, deployment,
+wallet/signer/transaction actions, real money, or any action that only the user
+can complete. Those remain explicit user gates. If an ordinary step exposes one
+of these boundaries, stop only at that boundary and return the smallest
+concrete user action.
 
 ## LANGUAGE_AND_REPORTING
 
@@ -130,6 +135,6 @@ pwsh -NoProfile -ExecutionPolicy Bypass -File .\scripts\validate.ps1
 Read this file and the task/handoff explicitly named by the current prompt,
 confirm the bounded atom, run the quality gate, inspect the exact staged or
 committed inventory, and use the standing autonomy envelope without pausing for
-routine microsteps. Do not cross a stricter task cap, merge, perform another
-excluded authority class, or change canonical status. The GPT control plane
-owns canonical status and acceptance.
+routine microsteps. Do not cross a stricter task cap, merge without exact
+per-PR confirmation, perform another excluded authority class, or change
+canonical status. The GPT control plane owns canonical status and acceptance.

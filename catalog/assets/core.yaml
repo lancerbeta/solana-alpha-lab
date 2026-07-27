@@ -575,7 +575,7 @@ records:
     contains_raw_data: false
     sensitivity: INTERNAL_NON_SECRET
 - asset_id: CTRL-AGENTS-001
-  record_version: '1.4'
+  record_version: '1.5'
   asset_type: control_document
   purpose: Repository-level agent contract for scope, safety, validation, and status
     ownership.
@@ -589,7 +589,7 @@ records:
     repository_path: AGENTS.md
   integrity:
     kind: sha256
-    sha256: 7f3e5b4bfc54af0231addeeddb67ae30049d1c219923487d0894904038407a3f
+    sha256: d5dc3ab0c5177478096e3ddb6ac77637fe72ff5c836fcc497bcaf6e73c292463
   access:
     mode: read_only
     method: file
