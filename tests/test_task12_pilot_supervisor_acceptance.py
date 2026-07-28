@@ -470,8 +470,8 @@ class Task12PilotSupervisorAcceptanceTests(unittest.TestCase):
             "EVIDENCE-T12-PILOT-SUPERVISOR-OFFLINE-SUMMARY-001",
             "TEST-T12-PILOT-SUPERVISOR-ACCEPTANCE-001",
         }
-        self.assertEqual(manifest["catalog_version"], "0.15.0")
-        self.assertEqual(len(records), 252)
+        self.assertEqual(manifest["catalog_version"], "0.16.0")
+        self.assertEqual(len(records), 262)
         self.assertTrue(expected.issubset(records))
         self.assertTrue(
             expected.issubset(set(manifest["mandatory_asset_ids"]))

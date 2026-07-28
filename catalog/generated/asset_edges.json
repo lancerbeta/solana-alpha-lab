@@ -528,6 +528,41 @@
       "target_asset_id": "TEST-T12-PILOT-SUPERVISOR-CONTRACT-001"
     },
     {
+      "source_asset_id": "CONTRACT-T13-PILOT-AUDIT-001",
+      "relation": "depends_on",
+      "target_asset_id": "DATA-T08-LIFECYCLE-DISCOVERY-PROBE-RAW-001"
+    },
+    {
+      "source_asset_id": "CONTRACT-T13-PILOT-AUDIT-001",
+      "relation": "depends_on",
+      "target_asset_id": "DATA-T09-PUMPSWAP-TOUCH-PROBE-RAW-001"
+    },
+    {
+      "source_asset_id": "CONTRACT-T13-PILOT-AUDIT-001",
+      "relation": "depends_on",
+      "target_asset_id": "DATA-T10-JUPITER-QUOTE-PILOT-RAW-001"
+    },
+    {
+      "source_asset_id": "CONTRACT-T13-PILOT-AUDIT-001",
+      "relation": "depends_on",
+      "target_asset_id": "DATA-T10-JUPITER-QUOTE-PILOT-RAW-002"
+    },
+    {
+      "source_asset_id": "CONTRACT-T13-PILOT-AUDIT-001",
+      "relation": "depends_on",
+      "target_asset_id": "DATA-T11-ENTITY-INPUT-PILOT-RAW-001"
+    },
+    {
+      "source_asset_id": "CONTRACT-T13-PILOT-AUDIT-001",
+      "relation": "validated_by",
+      "target_asset_id": "TEST-T13-PILOT-AUDIT-ACCEPTANCE-001"
+    },
+    {
+      "source_asset_id": "CONTRACT-T13-PILOT-AUDIT-001",
+      "relation": "validated_by",
+      "target_asset_id": "TEST-T13-PILOT-AUDIT-CONTRACT-001"
+    },
+    {
       "source_asset_id": "CTRL-AGENTS-001",
       "relation": "governed_by",
       "target_asset_id": "CTRL-TASK-04-001"
@@ -1103,6 +1138,26 @@
       "target_asset_id": "EVIDENCE-T12-PILOT-SUPERVISOR-OFFLINE-ACCEPTANCE-001"
     },
     {
+      "source_asset_id": "EVIDENCE-T13-PILOT-AUDIT-OFFLINE-ACCEPTANCE-001",
+      "relation": "derived_from",
+      "target_asset_id": "FIXTURE-T13-PILOT-AUDIT-OFFLINE-ACCEPTANCE-001"
+    },
+    {
+      "source_asset_id": "EVIDENCE-T13-PILOT-AUDIT-OFFLINE-ACCEPTANCE-001",
+      "relation": "validated_by",
+      "target_asset_id": "TEST-T13-PILOT-AUDIT-ACCEPTANCE-001"
+    },
+    {
+      "source_asset_id": "EVIDENCE-T13-PILOT-AUDIT-OFFLINE-SUMMARY-001",
+      "relation": "derived_from",
+      "target_asset_id": "FIXTURE-T13-PILOT-AUDIT-OFFLINE-ACCEPTANCE-001"
+    },
+    {
+      "source_asset_id": "EVIDENCE-T13-PILOT-AUDIT-OFFLINE-SUMMARY-001",
+      "relation": "evidenced_by",
+      "target_asset_id": "EVIDENCE-T13-PILOT-AUDIT-OFFLINE-ACCEPTANCE-001"
+    },
+    {
       "source_asset_id": "FIXTURE-BATON-SUITE-001",
       "relation": "governed_by",
       "target_asset_id": "CTRL-BATON-SETUP-001"
@@ -1386,6 +1441,71 @@
       "source_asset_id": "FIXTURE-T12-PILOT-SUPERVISOR-OFFLINE-ACCEPTANCE-001",
       "relation": "validated_by",
       "target_asset_id": "TEST-T12-PILOT-SUPERVISOR-ACCEPTANCE-001"
+    },
+    {
+      "source_asset_id": "FIXTURE-T13-PILOT-AUDIT-OFFLINE-ACCEPTANCE-001",
+      "relation": "derived_from",
+      "target_asset_id": "CONTRACT-T13-PILOT-AUDIT-001"
+    },
+    {
+      "source_asset_id": "FIXTURE-T13-PILOT-AUDIT-OFFLINE-ACCEPTANCE-001",
+      "relation": "derived_from",
+      "target_asset_id": "FIXTURE-T13-PILOT-AUDIT-POPULATION-001"
+    },
+    {
+      "source_asset_id": "FIXTURE-T13-PILOT-AUDIT-OFFLINE-ACCEPTANCE-001",
+      "relation": "derived_from",
+      "target_asset_id": "MODULE-T13-PILOT-AUDIT-001"
+    },
+    {
+      "source_asset_id": "FIXTURE-T13-PILOT-AUDIT-OFFLINE-ACCEPTANCE-001",
+      "relation": "validated_by",
+      "target_asset_id": "TEST-T13-PILOT-AUDIT-ACCEPTANCE-001"
+    },
+    {
+      "source_asset_id": "FIXTURE-T13-PILOT-AUDIT-POPULATION-001",
+      "relation": "derived_from",
+      "target_asset_id": "EVIDENCE-T08-LIFECYCLE-DISCOVERY-RECEIPT-001"
+    },
+    {
+      "source_asset_id": "FIXTURE-T13-PILOT-AUDIT-POPULATION-001",
+      "relation": "derived_from",
+      "target_asset_id": "EVIDENCE-T09-PUMPSWAP-TOUCH-RECEIPT-001"
+    },
+    {
+      "source_asset_id": "FIXTURE-T13-PILOT-AUDIT-POPULATION-001",
+      "relation": "derived_from",
+      "target_asset_id": "EVIDENCE-T10-JUPITER-QUOTE-RECEIPT-001"
+    },
+    {
+      "source_asset_id": "FIXTURE-T13-PILOT-AUDIT-POPULATION-001",
+      "relation": "derived_from",
+      "target_asset_id": "EVIDENCE-T10-JUPITER-QUOTE-RECEIPT-002"
+    },
+    {
+      "source_asset_id": "FIXTURE-T13-PILOT-AUDIT-POPULATION-001",
+      "relation": "derived_from",
+      "target_asset_id": "EVIDENCE-T11-ENTITY-INPUT-RECEIPT-001"
+    },
+    {
+      "source_asset_id": "FIXTURE-T13-PILOT-AUDIT-POPULATION-001",
+      "relation": "derived_from",
+      "target_asset_id": "EVIDENCE-T12-PILOT-SUPERVISOR-OFFLINE-ACCEPTANCE-001"
+    },
+    {
+      "source_asset_id": "FIXTURE-T13-PILOT-AUDIT-POPULATION-001",
+      "relation": "governed_by",
+      "target_asset_id": "CONTRACT-T13-PILOT-AUDIT-001"
+    },
+    {
+      "source_asset_id": "FIXTURE-T13-PILOT-AUDIT-POPULATION-001",
+      "relation": "validated_by",
+      "target_asset_id": "TEST-T13-PILOT-AUDIT-ACCEPTANCE-001"
+    },
+    {
+      "source_asset_id": "FIXTURE-T13-PILOT-AUDIT-POPULATION-001",
+      "relation": "validated_by",
+      "target_asset_id": "TEST-T13-PILOT-AUDIT-CONTRACT-001"
     },
     {
       "source_asset_id": "GENERATED-EDGE-PROJECTION-001",
@@ -1741,6 +1861,26 @@
       "source_asset_id": "MODULE-T12-PILOT-SUPERVISOR-001",
       "relation": "validated_by",
       "target_asset_id": "TEST-T12-PILOT-SUPERVISOR-ACCEPTANCE-001"
+    },
+    {
+      "source_asset_id": "MODULE-T13-PILOT-AUDIT-001",
+      "relation": "depends_on",
+      "target_asset_id": "FIXTURE-T13-PILOT-AUDIT-POPULATION-001"
+    },
+    {
+      "source_asset_id": "MODULE-T13-PILOT-AUDIT-001",
+      "relation": "governed_by",
+      "target_asset_id": "CONTRACT-T13-PILOT-AUDIT-001"
+    },
+    {
+      "source_asset_id": "MODULE-T13-PILOT-AUDIT-001",
+      "relation": "validated_by",
+      "target_asset_id": "TEST-T13-PILOT-AUDIT-001"
+    },
+    {
+      "source_asset_id": "MODULE-T13-PILOT-AUDIT-001",
+      "relation": "validated_by",
+      "target_asset_id": "TEST-T13-PILOT-AUDIT-ACCEPTANCE-001"
     },
     {
       "source_asset_id": "PRE-GIT-TASK01-A017",
@@ -2553,6 +2693,26 @@
       "target_asset_id": "TEST-T12-PILOT-SUPERVISOR-ACCEPTANCE-001"
     },
     {
+      "source_asset_id": "SCRIPT-T13-PILOT-AUDIT-001",
+      "relation": "depends_on",
+      "target_asset_id": "MODULE-T13-PILOT-AUDIT-001"
+    },
+    {
+      "source_asset_id": "SCRIPT-T13-PILOT-AUDIT-001",
+      "relation": "governed_by",
+      "target_asset_id": "CONTRACT-T13-PILOT-AUDIT-001"
+    },
+    {
+      "source_asset_id": "SCRIPT-T13-PILOT-AUDIT-001",
+      "relation": "validated_by",
+      "target_asset_id": "TEST-T13-PILOT-AUDIT-001"
+    },
+    {
+      "source_asset_id": "SCRIPT-T13-PILOT-AUDIT-001",
+      "relation": "validated_by",
+      "target_asset_id": "TEST-T13-PILOT-AUDIT-ACCEPTANCE-001"
+    },
+    {
       "source_asset_id": "TEMPLATE-BATON-ISSUE-FORM-001",
       "relation": "governed_by",
       "target_asset_id": "CTRL-BATON-SETUP-001"
@@ -2991,6 +3151,46 @@
       "source_asset_id": "TEST-T12-PILOT-SUPERVISOR-CONTRACT-001",
       "relation": "depends_on",
       "target_asset_id": "FIXTURE-T12-PILOT-SUPERVISOR-CONTRACT-001"
+    },
+    {
+      "source_asset_id": "TEST-T13-PILOT-AUDIT-001",
+      "relation": "depends_on",
+      "target_asset_id": "CONTRACT-T13-PILOT-AUDIT-001"
+    },
+    {
+      "source_asset_id": "TEST-T13-PILOT-AUDIT-001",
+      "relation": "depends_on",
+      "target_asset_id": "FIXTURE-T13-PILOT-AUDIT-POPULATION-001"
+    },
+    {
+      "source_asset_id": "TEST-T13-PILOT-AUDIT-001",
+      "relation": "depends_on",
+      "target_asset_id": "MODULE-T13-PILOT-AUDIT-001"
+    },
+    {
+      "source_asset_id": "TEST-T13-PILOT-AUDIT-ACCEPTANCE-001",
+      "relation": "depends_on",
+      "target_asset_id": "EVIDENCE-T13-PILOT-AUDIT-OFFLINE-ACCEPTANCE-001"
+    },
+    {
+      "source_asset_id": "TEST-T13-PILOT-AUDIT-ACCEPTANCE-001",
+      "relation": "depends_on",
+      "target_asset_id": "EVIDENCE-T13-PILOT-AUDIT-OFFLINE-SUMMARY-001"
+    },
+    {
+      "source_asset_id": "TEST-T13-PILOT-AUDIT-ACCEPTANCE-001",
+      "relation": "depends_on",
+      "target_asset_id": "FIXTURE-T13-PILOT-AUDIT-OFFLINE-ACCEPTANCE-001"
+    },
+    {
+      "source_asset_id": "TEST-T13-PILOT-AUDIT-CONTRACT-001",
+      "relation": "depends_on",
+      "target_asset_id": "CONTRACT-T13-PILOT-AUDIT-001"
+    },
+    {
+      "source_asset_id": "TEST-T13-PILOT-AUDIT-CONTRACT-001",
+      "relation": "depends_on",
+      "target_asset_id": "FIXTURE-T13-PILOT-AUDIT-POPULATION-001"
     },
     {
       "source_asset_id": "VALIDATOR-REPOSITORY-STATE-001",

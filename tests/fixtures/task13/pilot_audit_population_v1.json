@@ -1,0 +1,486 @@
+{
+  "schema": "solana_alpha_lab.pilot_audit_population",
+  "schema_version": "1.0",
+  "contract_id": "CONTRACT-T13-PILOT-AUDIT-001",
+  "population_id": "POPULATION-T13-BOUNDED-HISTORICAL-EVIDENCE-001",
+  "population_version": "1.0",
+  "task_id": "TASK-13",
+  "atom_id": "T13-A2_FROZEN_BOUNDED_AUDIT_CONTRACT_V1",
+  "as_of": "2026-07-28",
+  "status": "FROZEN_BOUNDED_HISTORICAL_EVIDENCE_CONTRACT",
+  "entry_verdict": "START_WITH_PATCH",
+  "accepted_claim": "BOUNDED_HISTORICAL_EVIDENCE_AUDIT_CONTRACT_FROZEN",
+  "sustained_pilot_claim": false,
+  "provider_purchase_claim": false,
+  "repository_checkpoint": {
+    "accepted_main_commit": "2ebef3f7f8c22c4a2f5dc2a47b3149cc4497e274",
+    "accepted_tree": "e2e3080260c1be4ba44d99e3bfe0c9be4dfc0766",
+    "catalog_version": "0.15.0",
+    "catalog_assets": 252,
+    "catalog_shards": 4,
+    "catalog_schemas": 4,
+    "catalog_queries": 7
+  },
+  "population": {
+    "class": "BOUNDED_HISTORICAL_EVIDENCE_NOT_SUSTAINED_PILOT",
+    "global_pit_cutoff": "2026-07-28T10:25:42.035105Z",
+    "primary_slice_id": "T08_ACCEPTED",
+    "primary_consumer": "TASK-14",
+    "raw_rows": 658,
+    "raw_parquet_files": 7,
+    "raw_parquet_bytes": 1738772,
+    "projection_files": 2,
+    "projection_bytes": 2727936,
+    "data_files": 9,
+    "data_bytes": 4466708,
+    "unique_raw_event_ids": 658,
+    "unique_idempotency_keys": 658,
+    "unique_content_sha256": 657,
+    "included_task_ids": [
+      "TASK-08",
+      "TASK-09",
+      "TASK-10",
+      "TASK-11"
+    ],
+    "control_evidence_task_ids": [
+      "TASK-12"
+    ],
+    "excluded_from_raw_denominator": [
+      "TASK-07_PROVIDER_SMOKE",
+      "TASK-08_NON_ACCEPTED_EXPLORATORY_RUNS",
+      "TASK-12_SYNTHETIC_SUPERVISOR_VECTORS",
+      "TRACKED_FIXTURES_RECEIPTS_AND_SUMMARIES",
+      "FUTURE_OBSERVATIONS"
+    ]
+  },
+  "slices": [
+    {
+      "slice_id": "T08_ACCEPTED",
+      "task_id": "TASK-08",
+      "asset_ids": [
+        "DATA-T08-LIFECYCLE-DISCOVERY-PROBE-RAW-001",
+        "EVIDENCE-T08-LIFECYCLE-DISCOVERY-RECEIPT-001",
+        "FIXTURE-T08-LIFECYCLE-DISCOVERY-EVIDENCE-001"
+      ],
+      "role": "PRIMARY_AUDIT_SLICE",
+      "raw_rows": 388,
+      "unique_raw_event_ids": 388,
+      "unique_idempotency_keys": 388,
+      "unique_content_sha256": 387,
+      "missing_identity_rows": 0,
+      "pit_order_violations": 0,
+      "status_counts": [
+        {
+          "source": "HELIUS",
+          "response_status": "SUCCESS",
+          "error_class": null,
+          "rows": 386
+        },
+        {
+          "source": "SOLANA_TRACKER",
+          "response_status": "HTTP_ERROR",
+          "error_class": "http_status_not_success:401",
+          "rows": 2
+        }
+      ]
+    },
+    {
+      "slice_id": "T09_ACCEPTED",
+      "task_id": "TASK-09",
+      "asset_ids": [
+        "DATA-T09-PUMPSWAP-TOUCH-PROBE-RAW-001",
+        "EVIDENCE-T09-PUMPSWAP-TOUCH-RECEIPT-001",
+        "FIXTURE-T09-PUMPSWAP-TOUCH-EVIDENCE-001"
+      ],
+      "role": "CROSS_CHECK",
+      "raw_rows": 258,
+      "unique_raw_event_ids": 258,
+      "unique_idempotency_keys": 258,
+      "unique_content_sha256": 258,
+      "missing_identity_rows": 0,
+      "pit_order_violations": 0,
+      "status_counts": [
+        {
+          "source": "SOLANA_STANDARD_RPC",
+          "response_status": "SUCCESS",
+          "error_class": null,
+          "rows": 257
+        },
+        {
+          "source": "SOLANA_STANDARD_RPC",
+          "response_status": "INVALID_RESPONSE",
+          "error_class": "get_transaction_result_keys_drift",
+          "rows": 1
+        }
+      ]
+    },
+    {
+      "slice_id": "T10_FAIL_CLOSED_V1",
+      "task_id": "TASK-10",
+      "asset_ids": [
+        "DATA-T10-JUPITER-QUOTE-PILOT-RAW-001",
+        "DATA-T10-JUPITER-QUOTE-PROJECTION-001",
+        "EVIDENCE-T10-JUPITER-QUOTE-RECEIPT-001",
+        "FIXTURE-T10-JUPITER-QUOTE-LIVE-EVIDENCE-001"
+      ],
+      "role": "CROSS_CHECK",
+      "raw_rows": 1,
+      "unique_raw_event_ids": 1,
+      "unique_idempotency_keys": 1,
+      "unique_content_sha256": 1,
+      "missing_identity_rows": 0,
+      "pit_order_violations": 0,
+      "status_counts": [
+        {
+          "source": "JUPITER_METIS",
+          "response_status": "INVALID_RESPONSE",
+          "error_class": "SCHEMA_MISMATCH",
+          "rows": 1
+        }
+      ],
+      "projection_rows": {
+        "raw_api_events": 1,
+        "quote_attempts": 1,
+        "execution_attempts": 0
+      }
+    },
+    {
+      "slice_id": "T10_ACCEPTED_V2",
+      "task_id": "TASK-10",
+      "asset_ids": [
+        "DATA-T10-JUPITER-QUOTE-PILOT-RAW-002",
+        "DATA-T10-JUPITER-QUOTE-PROJECTION-002",
+        "EVIDENCE-T10-JUPITER-QUOTE-RECEIPT-002",
+        "FIXTURE-T10-JUPITER-QUOTE-LIVE-EVIDENCE-002"
+      ],
+      "role": "CROSS_CHECK",
+      "raw_rows": 8,
+      "unique_raw_event_ids": 8,
+      "unique_idempotency_keys": 8,
+      "unique_content_sha256": 8,
+      "missing_identity_rows": 0,
+      "pit_order_violations": 0,
+      "status_counts": [
+        {
+          "source": "JUPITER_METIS",
+          "response_status": "SUCCESS",
+          "error_class": null,
+          "rows": 8
+        }
+      ],
+      "projection_rows": {
+        "raw_api_events": 8,
+        "quote_attempts": 8,
+        "execution_attempts": 0
+      }
+    },
+    {
+      "slice_id": "T11_ACCEPTED",
+      "task_id": "TASK-11",
+      "asset_ids": [
+        "DATA-T11-ENTITY-INPUT-PILOT-RAW-001",
+        "EVIDENCE-T11-ENTITY-INPUT-RECEIPT-001",
+        "FIXTURE-T11-ENTITY-INPUT-LIVE-EVIDENCE-001"
+      ],
+      "role": "CROSS_CHECK",
+      "raw_rows": 3,
+      "unique_raw_event_ids": 3,
+      "unique_idempotency_keys": 3,
+      "unique_content_sha256": 3,
+      "missing_identity_rows": 0,
+      "pit_order_violations": 0,
+      "status_counts": [
+        {
+          "source": "HELIUS_STANDARD_SOLANA_RPC",
+          "response_status": "SUCCESS",
+          "error_class": null,
+          "rows": 3
+        }
+      ]
+    }
+  ],
+  "data_files": [
+    {
+      "slice_id": "T08_ACCEPTED",
+      "asset_id": "DATA-T08-LIFECYCLE-DISCOVERY-PROBE-RAW-001",
+      "kind": "RAW_PARQUET",
+      "path": "data/raw/task08_lifecycle_discovery_probe_v1/run=t08a5-20260725T084127Z/partitions/probe.parquet",
+      "sha256": "079dc1401b4da3cf0e1d63d2b20210e017252f26d93c4dd2afd8af7d950fcb6a",
+      "bytes": 798206,
+      "rows": 388
+    },
+    {
+      "slice_id": "T09_ACCEPTED",
+      "asset_id": "DATA-T09-PUMPSWAP-TOUCH-PROBE-RAW-001",
+      "kind": "RAW_PARQUET",
+      "path": "data/raw/task09_pumpswap_touch_probe_v1/run=t09a4-20260727T184740Z/partitions/probe.parquet",
+      "sha256": "577e614c0b2f41b7a1e3ae92b6cfd965e87e4d4bca76070925873df1ef5b4466",
+      "bytes": 842679,
+      "rows": 258
+    },
+    {
+      "slice_id": "T10_FAIL_CLOSED_V1",
+      "asset_id": "DATA-T10-JUPITER-QUOTE-PILOT-RAW-001",
+      "kind": "RAW_PARQUET",
+      "path": "data/raw/task10_jupiter_quote_pilot_v1/run=t10a4-20260728T011304Z/partitions/quotes.parquet",
+      "sha256": "eed05d3c5f65f5adf4e77c07e0fbbccd94856ecabfcb7c5b963e3c0611c8cb67",
+      "bytes": 14811,
+      "rows": 1
+    },
+    {
+      "slice_id": "T10_FAIL_CLOSED_V1",
+      "asset_id": "DATA-T10-JUPITER-QUOTE-PROJECTION-001",
+      "kind": "DUCKDB_PROJECTION",
+      "path": "data/raw/task10_jupiter_quote_pilot_v1/run=t10a4-20260728T011304Z/projections/quotes.duckdb",
+      "sha256": "557692a5a37a6d30e8e7ed9e293e5ee24cb6315c9c8714b09e2d561a75d18f5b",
+      "bytes": 1355776,
+      "rows": 1
+    },
+    {
+      "slice_id": "T10_ACCEPTED_V2",
+      "asset_id": "DATA-T10-JUPITER-QUOTE-PILOT-RAW-002",
+      "kind": "RAW_PARQUET",
+      "path": "data/raw/task10_jupiter_quote_pilot_v2/run=t10a6-20260728T015829Z/partitions/quotes.parquet",
+      "sha256": "0648390ba3af49bacf804aafb7cc4788fbbb7040508cfef79f88c3d1ed188d1b",
+      "bytes": 31635,
+      "rows": 8
+    },
+    {
+      "slice_id": "T10_ACCEPTED_V2",
+      "asset_id": "DATA-T10-JUPITER-QUOTE-PROJECTION-002",
+      "kind": "DUCKDB_PROJECTION",
+      "path": "data/raw/task10_jupiter_quote_pilot_v2/run=t10a6-20260728T015829Z/projections/quotes.duckdb",
+      "sha256": "c1664a1180a525477d9beba5b5d13662cf9b5ae8721506363ce34d65af50ceda",
+      "bytes": 1372160,
+      "rows": 8
+    },
+    {
+      "slice_id": "T11_ACCEPTED",
+      "asset_id": "DATA-T11-ENTITY-INPUT-PILOT-RAW-001",
+      "kind": "RAW_PARQUET",
+      "path": "data/raw/task11_entity_input_probe_v1/run=t11a3-20260728T102537Z/partitions/01-getTokenSupply.parquet",
+      "sha256": "819fbfe6f76a11fa9c9c834cfb9fb78952fcfdc1ac354031c75f88922a872a29",
+      "bytes": 8852,
+      "rows": 1
+    },
+    {
+      "slice_id": "T11_ACCEPTED",
+      "asset_id": "DATA-T11-ENTITY-INPUT-PILOT-RAW-001",
+      "kind": "RAW_PARQUET",
+      "path": "data/raw/task11_entity_input_probe_v1/run=t11a3-20260728T102537Z/partitions/02-getTokenLargestAccounts.parquet",
+      "sha256": "847f9a7f406adf65d58e75095c1acc410807b5f68933bd99106757f2dd09aaa9",
+      "bytes": 24019,
+      "rows": 1
+    },
+    {
+      "slice_id": "T11_ACCEPTED",
+      "asset_id": "DATA-T11-ENTITY-INPUT-PILOT-RAW-001",
+      "kind": "RAW_PARQUET",
+      "path": "data/raw/task11_entity_input_probe_v1/run=t11a3-20260728T102537Z/partitions/03-getMultipleAccounts.parquet",
+      "sha256": "5a01c427070c2ff50d8d208fc02f4cbd6c1b567aa89ef1d1e0499271e66e919b",
+      "bytes": 18570,
+      "rows": 1
+    }
+  ],
+  "tracked_evidence": [
+    {
+      "asset_id": "EVIDENCE-T08-LIFECYCLE-DISCOVERY-RECEIPT-001",
+      "path": "docs/evidence/task08/lifecycle_discovery_probe_execution_receipt_v1.json",
+      "sha256": "33a3f0b90de36c1543ee605eccc07685798f1b2e08ee6a5f494345d5cb19df40"
+    },
+    {
+      "asset_id": "FIXTURE-T08-LIFECYCLE-DISCOVERY-EVIDENCE-001",
+      "path": "tests/fixtures/task08/lifecycle_discovery_probe_live_evidence_v1.json",
+      "sha256": "e439e6a3f80560a1ea8c4475fc0278f8971784c31a7a20f1b633c37c2b0d21bd"
+    },
+    {
+      "asset_id": "EVIDENCE-T09-PUMPSWAP-TOUCH-RECEIPT-001",
+      "path": "docs/evidence/task09/pumpswap_touch_probe_execution_receipt_v1.json",
+      "sha256": "8e9c066671ec8a0334d7cf41cf2cb5a725a836ad0c7c3f473b0e35902a16f0ee"
+    },
+    {
+      "asset_id": "FIXTURE-T09-PUMPSWAP-TOUCH-EVIDENCE-001",
+      "path": "tests/fixtures/task09/pumpswap_touch_probe_live_evidence_v1.json",
+      "sha256": "20d5fc95e92b2837eee1f64c139f97ad5f98354eb2826c4771d7fb7969c9b735"
+    },
+    {
+      "asset_id": "EVIDENCE-T10-JUPITER-QUOTE-RECEIPT-001",
+      "path": "docs/evidence/task10/jupiter_quote_logger_execution_receipt_v1.json",
+      "sha256": "024f6f4bf81f28dbfa431296fca8373482546debe6acfee9ac90835acfc00ad9"
+    },
+    {
+      "asset_id": "EVIDENCE-T10-JUPITER-QUOTE-RECEIPT-002",
+      "path": "docs/evidence/task10/jupiter_quote_logger_execution_receipt_v2.json",
+      "sha256": "01c6392d38ab4fd8c67bead42a9a5013d2c82206a706cb50e9aac523560490ec"
+    },
+    {
+      "asset_id": "FIXTURE-T10-JUPITER-QUOTE-LIVE-EVIDENCE-001",
+      "path": "tests/fixtures/task10/jupiter_quote_logger_live_evidence_v1.json",
+      "sha256": "8d02ae7e5f32c65c97de2a725d9ed64220c99e09942d3efae356b273ef1d2409"
+    },
+    {
+      "asset_id": "FIXTURE-T10-JUPITER-QUOTE-LIVE-EVIDENCE-002",
+      "path": "tests/fixtures/task10/jupiter_quote_logger_live_evidence_v2.json",
+      "sha256": "242e76b2295ce37b47ac851b29cd44e8b8d457a0ac7669a9b71013f0deb4d7d5"
+    },
+    {
+      "asset_id": "EVIDENCE-T11-ENTITY-INPUT-RECEIPT-001",
+      "path": "docs/evidence/task11/entity_input_pilot_execution_receipt_v1.json",
+      "sha256": "324c9ace8c49668864c274de19c09d42a7e794169f9a5ad619df8b47f3209ff4"
+    },
+    {
+      "asset_id": "FIXTURE-T11-ENTITY-INPUT-LIVE-EVIDENCE-001",
+      "path": "tests/fixtures/task11/entity_input_live_evidence_v1.json",
+      "sha256": "2c0e00c1aacb32a75cbe5807517e5e514751cec0271a540594147390e8fbf7b2"
+    },
+    {
+      "asset_id": "EVIDENCE-T12-PILOT-SUPERVISOR-OFFLINE-ACCEPTANCE-001",
+      "path": "docs/evidence/task12/pilot_supervisor_offline_acceptance_receipt_v1.json",
+      "sha256": "66e35fce32ba17e2017cdb744c14af193daba89da6c4f1dbbad6e44def4a7b7f"
+    },
+    {
+      "asset_id": "FIXTURE-T12-PILOT-SUPERVISOR-OFFLINE-ACCEPTANCE-001",
+      "path": "tests/fixtures/task12/pilot_supervisor_offline_acceptance_v1.json",
+      "sha256": "f798ab8fc40f141b95dce843939710025bc8958f094d62e07c0c51c9a00a1d5b"
+    }
+  ],
+  "metrics": {
+    "identity_completeness": {
+      "numerator": "ROWS_WITH_NON_NULL_RAW_EVENT_ID_IDEMPOTENCY_KEY_AND_CONTENT_SHA256",
+      "denominator": "RAW_ROWS_PER_SLICE"
+    },
+    "identity_duplicate_rate": {
+      "numerator": "ROWS_BEYOND_FIRST_IDENTITY_OCCURRENCE",
+      "denominator": "RAW_ROWS_PER_SLICE"
+    },
+    "content_repetition_rate": {
+      "numerator": "ROWS_BEYOND_FIRST_CONTENT_SHA256_OCCURRENCE",
+      "denominator": "RAW_ROWS_PER_SLICE"
+    },
+    "pit_ordering_violation_rate": {
+      "numerator": "ROWS_VIOLATING_FROZEN_TIMESTAMP_CHAIN",
+      "denominator": "ROWS_WITH_RELEVANT_TIMESTAMP_PAIR"
+    },
+    "availability_lag": {
+      "expression": "available_to_strategy_at - first_reliable_available_at",
+      "unit": "milliseconds",
+      "denominator": "ROWS_WITH_BOTH_TIMESTAMPS"
+    },
+    "typed_failure_rate": {
+      "numerator": "ROWS_WITH_NON_SUCCESS_RESPONSE_STATUS",
+      "denominator": "RAW_ROWS_PER_SLICE"
+    },
+    "raw_projection_reconciliation": {
+      "numerator": "PROJECTION_ROWS_WITH_EXACT_RAW_LINEAGE",
+      "denominator": "TASK10_PROJECTION_ROWS"
+    },
+    "source_status_divergence": {
+      "numerator": "TYPED_STATUS_COUNT_BY_SOURCE",
+      "denominator": "T08_PRIMARY_SLICE_ROWS"
+    }
+  },
+  "typed_states": {
+    "SUCCESS": "RETAINED_RESPONSE_ACCEPTED_BY_ITS_SOURCE_CONTRACT",
+    "HTTP_ERROR": "PROVIDER_OR_ACCESS_FAILURE_NOT_EMPTY_ZERO_OR_NO_ROUTE",
+    "INVALID_RESPONSE": "PRESERVED_SCHEMA_OR_RESPONSE_CONTRACT_DRIFT",
+    "NO_ROUTE": "EXPLICIT_QUOTE_EVIDENCE_ONLY",
+    "AUDIT_INPUT_MISSING_OR_DRIFTED": "EXPECTED_LOCAL_INPUT_ABSENT_OR_HASH_MISMATCH",
+    "NOT_TESTABLE": "METRIC_UNAVAILABLE_OR_NOT_COMPARABLE_NOT_ZERO"
+  },
+  "pit": {
+    "nullable_event_time_allowed_by_source_contract": true,
+    "required_non_null_order": [
+      "event_time",
+      "observed_at",
+      "first_reliable_available_at",
+      "available_to_strategy_at",
+      "ingested_at"
+    ],
+    "backfill_availability_forbidden": true,
+    "missing_as_zero": false,
+    "provider_failure_as_no_route": false,
+    "quote_as_fill": false
+  },
+  "reuse": {
+    "adopt": [
+      "QUERY-T05-PIT-RELATION-001",
+      "SCHEMA-T05-REL-RAW-API-EVENTS-001",
+      "PYTHON_DUCKDB_EXISTING_LOCKED_STACK"
+    ],
+    "wrap": [
+      "CONTRACT-T06-RAW-STORAGE-001",
+      "CONTRACT-T06-DATASET-MANIFEST-001",
+      "CONTRACT-T06-RAW-PARQUET-001"
+    ],
+    "fork": [],
+    "future_build": [
+      "MODULE-T13-BOUNDED-PILOT-AUDITOR-001"
+    ],
+    "new_dependency_count": 0,
+    "general_data_quality_framework": false
+  },
+  "caps": {
+    "data_files_exact": 9,
+    "input_bytes_exact": 4466708,
+    "raw_rows_exact": 658,
+    "future_local_wall_seconds_max": 120,
+    "future_sanitized_output_bytes_max": 1048576,
+    "network_calls": 0,
+    "provider_api_rpc_wss_calls": 0,
+    "retries": 0,
+    "credential_use": 0,
+    "raw_data_writes": 0,
+    "cash_spend_usd_cents": 0,
+    "provider_credits": 0,
+    "wallet_signer_transaction_actions": 0
+  },
+  "catalog": {
+    "registered_in_atom2": false,
+    "status": "CATALOG_TRANSACTION_PENDING_TASK13_FINAL_RECONCILIATION",
+    "blocks_task13_done": true,
+    "blocks_contract_freeze": false,
+    "planned_asset_ids": [
+      "CONTRACT-T13-PILOT-AUDIT-001",
+      "FIXTURE-T13-PILOT-AUDIT-POPULATION-001",
+      "TEST-T13-PILOT-AUDIT-CONTRACT-001",
+      "MODULE-T13-BOUNDED-PILOT-AUDITOR-001"
+    ]
+  },
+  "security": {
+    "provider_bodies_in_tracked_outputs": 0,
+    "contains_secrets": false,
+    "absolute_machine_paths": 0,
+    "credential_reads": 0,
+    "wallet_signer_transaction_actions": 0,
+    "transaction_build_simulate_send": 0
+  },
+  "authority": {
+    "class": "LOCAL_WRITE_ONLY",
+    "source": "EXPLICIT_USER",
+    "managed_files": [
+      "docs/contracts/pilot_audit_contract_v1.md",
+      "tests/fixtures/task13/pilot_audit_population_v1.json",
+      "tests/test_task13_pilot_audit_contract.py"
+    ],
+    "network_calls": 0,
+    "provider_api_rpc_wss_calls": 0,
+    "credential_use": 0,
+    "collector_executions": 0,
+    "raw_data_writes": 0,
+    "cash_spend_usd_cents": 0,
+    "provider_credits": 0,
+    "dependency_changes": 0,
+    "commit": false,
+    "push": false,
+    "pull_request": false,
+    "merge": false,
+    "ui_changes": false,
+    "destructive_actions": false
+  },
+  "next_atom": {
+    "atom_id": "T13-A3_THIN_DETERMINISTIC_AUDITOR_V1",
+    "implementation_authorized": false,
+    "external_calls_authorized": false,
+    "requires_new_bounded_write_set": true
+  }
+}

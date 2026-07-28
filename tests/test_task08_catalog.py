@@ -93,7 +93,7 @@ class Task08CatalogTests(unittest.TestCase):
             ),
             (0, 9, 0),
         )
-        self.assertEqual(len(self.snapshot.assets), 252)
+        self.assertEqual(len(self.snapshot.assets), 262)
         self.assertEqual(len(self.snapshot.queries), 7)
         self.assertTrue(
             TASK08_ASSET_IDS.issubset(
@@ -230,7 +230,7 @@ class Task08CatalogTests(unittest.TestCase):
         self.assertFalse(asset["classification"]["contains_raw_data"])
         self.assertEqual(
             set(asset["consumers"]),
-            {"TASK-08", "TASK-09", "TASK-11", "TASK-12"},
+            {"TASK-08", "TASK-09", "TASK-11", "TASK-12", "TASK-13"},
         )
         self.assertEqual(
             set(

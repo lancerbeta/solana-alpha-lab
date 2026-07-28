@@ -351,7 +351,7 @@ class Task11EntityInputReplayTests(unittest.TestCase):
             "TEST-T11-ENTITY-INPUT-TRANSPORT-001",
             "TEST-T11-ENTITY-INPUT-REPLAY-001",
         }
-        self.assertEqual(manifest["catalog_version"], "0.15.0")
+        self.assertEqual(manifest["catalog_version"], "0.16.0")
         self.assertTrue(expected.issubset(records))
         self.assertTrue(
             expected.issubset(set(manifest["mandatory_asset_ids"]))
