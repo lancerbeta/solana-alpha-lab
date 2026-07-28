@@ -1,0 +1,129 @@
+{
+  "receipt_id": "TASK12_PILOT_SUPERVISOR_OFFLINE_ACCEPTANCE_RECEIPT_V1",
+  "receipt_version": "1.0",
+  "task_id": "TASK-12",
+  "atom_id": "T12-A5_CATALOG_REPOSITORY_FINALIZATION_V1",
+  "source_atom_id": "T12-A4_DETERMINISTIC_OFFLINE_ACCEPTANCE_V1",
+  "status": "PASS",
+  "as_of": "2026-07-28",
+  "repository_base": {
+    "branch": "main",
+    "head": "a3047da7d9731f6a87b01f652baaffb004d98ea2",
+    "tree": "223c019052d65655c1f1f08827b042cf13d653b5"
+  },
+  "fixture": {
+    "path": "tests/fixtures/task12/pilot_supervisor_offline_acceptance_v1.json",
+    "sha256": "d94fa0721774906084b943d1a8abf197ee96508633ddd7a9f1fdfa07c07cfd61",
+    "status": "FROZEN_EXPECTED_OFFLINE_ACCEPTANCE"
+  },
+  "implementation": {
+    "contract_id": "CONTRACT-T12-PILOT-SUPERVISOR-001",
+    "contract_sha256": "f65f068746f9239e13b30707ef99a6b8c2713d4635f926dd4d6fd7c61028848f",
+    "contract_fixture_sha256": "dad8c95b2e81fe918a04fa651cb55e8556ee91cdeb0074161b7315d69821df2c",
+    "module_sha256": "a398379711eb5f6b9799d0029b1cf882676492229838ac07c42a523fe12865f7",
+    "launcher_sha256": "fb85b2e0a9fc60a01dc01f80817ae1458471861728ef4635eb5a0893d434405f",
+    "implementation_test_sha256": "e7c33406a940217b9108c7ba675c8f151f387cbb72f7f90ef3dc7b79cac1164d",
+    "child_plan_sha256": "ff0524ab2a77b517f8796ff54a753842306b83de9be6e8d4c391776afba0cf1d",
+    "child_launcher_sha256": "1f55be602f12d972e429e29da85afc986d093bcd84a72fd147604e1351e7d877"
+  },
+  "accepted_result": {
+    "accepted_claim": "THIN_OFFLINE_SUPERVISOR_DETERMINISTIC_CONTROL_ACCEPTANCE",
+    "vector_count": 7,
+    "real_allowlisted_offline_preflight_vectors": 1,
+    "synthetic_control_vectors": 6,
+    "child_spawns_per_acceptance_suite": 5,
+    "terminal_counts": {
+      "SUCCEEDED": 1,
+      "FAILED": 2,
+      "TIMED_OUT": 1,
+      "STOPPED": 0,
+      "BLOCKED_DUPLICATE": 1,
+      "BLOCKED_DISK": 2
+    },
+    "zero_retry": true,
+    "duplicate_and_start_disk_blocks_spawn": true,
+    "timeout_and_runtime_disk_breach_stop_child": true,
+    "raw_child_bodies_retained": false,
+    "volatile_timestamps_in_stable_projection": false
+  },
+  "checks": {
+    "source_fingerprint_readback": "PASS_8_OF_8",
+    "frozen_vector_projection": "PASS_7_OF_7",
+    "deterministic_run_and_duplicate_identity": "PASS",
+    "event_schema_and_line_limits": "PASS",
+    "monotonic_elapsed_and_utc_evidence": "PASS",
+    "lineage_and_pit_non_backdating": "PASS",
+    "duplicate_no_spawn": "PASS",
+    "disk_preflight_no_spawn": "PASS",
+    "external_effect_counters": "PASS_ZERO",
+    "raw_body_and_absolute_path_exclusion": "PASS_ZERO",
+    "catalog_deferral_explicit": "PASS"
+  },
+  "validation": {
+    "atom4_acceptance_suite": {
+      "passed": 7,
+      "failed": 0,
+      "status": "PASS"
+    },
+    "atom5_catalog_finalization_suite": {
+      "passed": 1,
+      "failed": 0,
+      "status": "PASS"
+    },
+    "task12_contract_implementation_acceptance_suite": {
+      "passed": 42,
+      "failed": 0,
+      "status": "PASS"
+    },
+    "full_repository_unit_suite": {
+      "passed": 904,
+      "failed": 0,
+      "status": "PASS"
+    },
+    "catalog_validation": "PASS_CANDIDATE_0_15_0_252_ASSETS",
+    "navigation_validation": "PASS",
+    "secret_scan": "PASS",
+    "file_hygiene": "PASS",
+    "repository_policy_validation": "FAIL_EXPECTED_INVALID_GIT_TOPOLOGY_UNTRACKED_LOCAL_WRITE_CANDIDATE",
+    "full_validate_ci": "NOT_RUN_BLOCKED_BY_EXACT_REPOSITORY_POLICY_FAILURE"
+  },
+  "authority": {
+    "class": "LOCAL_WRITE_ONLY",
+    "offline_supervisor_attempts_per_acceptance_suite": 7,
+    "child_spawns_per_acceptance_suite": 5,
+    "collector_executions": 0,
+    "network_calls": 0,
+    "provider_api_rpc_wss_calls": 0,
+    "credential_use": 0,
+    "provider_credits": 0,
+    "raw_data_writes": 0,
+    "cash_spend_usd_cents": 0,
+    "dependency_changes": 0,
+    "wallet_signer_transaction_actions": 0,
+    "commit": false,
+    "push": false,
+    "pull_request": false,
+    "merge": false,
+    "ui_changes": false,
+    "destructive_actions": false
+  },
+  "catalog": {
+    "version": "0.15.0",
+    "assets": 252,
+    "shards": 4,
+    "schemas": 4,
+    "queries": 7,
+    "changed_in_atom4": false,
+    "changed_in_atom5": true,
+    "status": "REGISTERED_IN_TASK12_CATALOG_TRANSACTION"
+  },
+  "nonclaims": [
+    "No provider, collector, raw-data or credentialed execution was performed.",
+    "The one real consumer vector ran only the existing TASK-11 offline preflight.",
+    "The result does not establish automatic restart, sustained 24-48 hour operation, unattended collection safety or production readiness.",
+    "The result is not strategy, execution, alpha or owner-cashflow evidence.",
+    "TASK-12 remains IN_PROGRESS until repository delivery and the separate finish gate."
+  ],
+  "canonical_status_candidate": "TECHNICAL_DOD_CANDIDATE_TASK12_REMAINS_IN_PROGRESS_UNTIL_MERGE_AND_FINISH_GATE",
+  "state_change": "CANDIDATE_REQUIRES_REPOSITORY_AND_CONTROL_PLANE_ACCEPTANCE"
+}
