@@ -4626,7 +4626,7 @@ records:
     contains_raw_data: false
     sensitivity: INTERNAL_NON_SECRET
 - asset_id: SCRIPT-BATON-VALIDATE-001
-  record_version: '1.4'
+  record_version: '1.5'
   asset_type: script
   purpose: Deterministic offline validator for baton schemas, fixtures, route ownership,
     standing autonomy, JIT validation, Catalog integrity, templates, and rules.
@@ -4640,7 +4640,7 @@ records:
     repository_path: scripts/validate_baton.py
   integrity:
     kind: sha256
-    sha256: cfbbafbf958e2c3e3f782e02ce4b518d373777cc1a96dc0f3c4b689c09cf66f6
+    sha256: 66dcfa8f46bdbd70715f7a0a15ca51014344ec3f6c2eb2a56c00b59f695b25f0
   access:
     mode: read_only
     method: file
