@@ -873,6 +873,21 @@
       "target_asset_id": "TEST-T11-ENTITY-INPUT-REPLAY-001"
     },
     {
+      "source_asset_id": "DECISION-T14-PROVIDER-PURCHASE-001",
+      "relation": "derived_from",
+      "target_asset_id": "EVIDENCE-T13-PILOT-AUDIT-OFFLINE-ACCEPTANCE-001"
+    },
+    {
+      "source_asset_id": "DECISION-T14-PROVIDER-PURCHASE-001",
+      "relation": "evidenced_by",
+      "target_asset_id": "EVIDENCE-T14-PROVIDER-PURCHASE-ACCEPTANCE-001"
+    },
+    {
+      "source_asset_id": "DECISION-T14-PROVIDER-PURCHASE-001",
+      "relation": "validated_by",
+      "target_asset_id": "TEST-T14-PROVIDER-PURCHASE-DECISION-001"
+    },
+    {
       "source_asset_id": "ENV-WORKSTATION-001",
       "relation": "produces",
       "target_asset_id": "SCM-BASELINE-COMMIT-001"
@@ -1156,6 +1171,21 @@
       "source_asset_id": "EVIDENCE-T13-PILOT-AUDIT-OFFLINE-SUMMARY-001",
       "relation": "evidenced_by",
       "target_asset_id": "EVIDENCE-T13-PILOT-AUDIT-OFFLINE-ACCEPTANCE-001"
+    },
+    {
+      "source_asset_id": "EVIDENCE-T14-PROVIDER-PURCHASE-ACCEPTANCE-001",
+      "relation": "derived_from",
+      "target_asset_id": "DECISION-T14-PROVIDER-PURCHASE-001"
+    },
+    {
+      "source_asset_id": "EVIDENCE-T14-PROVIDER-PURCHASE-ACCEPTANCE-001",
+      "relation": "derived_from",
+      "target_asset_id": "FIXTURE-T14-PROVIDER-PURCHASE-DECISION-001"
+    },
+    {
+      "source_asset_id": "EVIDENCE-T14-PROVIDER-PURCHASE-ACCEPTANCE-001",
+      "relation": "validated_by",
+      "target_asset_id": "TEST-T14-PROVIDER-PURCHASE-DECISION-001"
     },
     {
       "source_asset_id": "FIXTURE-BATON-SUITE-001",
@@ -1506,6 +1536,41 @@
       "source_asset_id": "FIXTURE-T13-PILOT-AUDIT-POPULATION-001",
       "relation": "validated_by",
       "target_asset_id": "TEST-T13-PILOT-AUDIT-CONTRACT-001"
+    },
+    {
+      "source_asset_id": "FIXTURE-T14-PROVIDER-PURCHASE-DECISION-001",
+      "relation": "derived_from",
+      "target_asset_id": "EVIDENCE-T07-PROVIDER-SMOKE-RECEIPT-001"
+    },
+    {
+      "source_asset_id": "FIXTURE-T14-PROVIDER-PURCHASE-DECISION-001",
+      "relation": "derived_from",
+      "target_asset_id": "EVIDENCE-T08-LIFECYCLE-DISCOVERY-RECEIPT-001"
+    },
+    {
+      "source_asset_id": "FIXTURE-T14-PROVIDER-PURCHASE-DECISION-001",
+      "relation": "derived_from",
+      "target_asset_id": "EVIDENCE-T10-JUPITER-QUOTE-RECEIPT-002"
+    },
+    {
+      "source_asset_id": "FIXTURE-T14-PROVIDER-PURCHASE-DECISION-001",
+      "relation": "derived_from",
+      "target_asset_id": "EVIDENCE-T11-ENTITY-INPUT-RECEIPT-001"
+    },
+    {
+      "source_asset_id": "FIXTURE-T14-PROVIDER-PURCHASE-DECISION-001",
+      "relation": "derived_from",
+      "target_asset_id": "EVIDENCE-T13-PILOT-AUDIT-OFFLINE-ACCEPTANCE-001"
+    },
+    {
+      "source_asset_id": "FIXTURE-T14-PROVIDER-PURCHASE-DECISION-001",
+      "relation": "governed_by",
+      "target_asset_id": "DECISION-T14-PROVIDER-PURCHASE-001"
+    },
+    {
+      "source_asset_id": "FIXTURE-T14-PROVIDER-PURCHASE-DECISION-001",
+      "relation": "validated_by",
+      "target_asset_id": "TEST-T14-PROVIDER-PURCHASE-DECISION-001"
     },
     {
       "source_asset_id": "GENERATED-EDGE-PROJECTION-001",
@@ -3191,6 +3256,21 @@
       "source_asset_id": "TEST-T13-PILOT-AUDIT-CONTRACT-001",
       "relation": "depends_on",
       "target_asset_id": "FIXTURE-T13-PILOT-AUDIT-POPULATION-001"
+    },
+    {
+      "source_asset_id": "TEST-T14-PROVIDER-PURCHASE-DECISION-001",
+      "relation": "depends_on",
+      "target_asset_id": "DECISION-T14-PROVIDER-PURCHASE-001"
+    },
+    {
+      "source_asset_id": "TEST-T14-PROVIDER-PURCHASE-DECISION-001",
+      "relation": "depends_on",
+      "target_asset_id": "EVIDENCE-T14-PROVIDER-PURCHASE-ACCEPTANCE-001"
+    },
+    {
+      "source_asset_id": "TEST-T14-PROVIDER-PURCHASE-DECISION-001",
+      "relation": "depends_on",
+      "target_asset_id": "FIXTURE-T14-PROVIDER-PURCHASE-DECISION-001"
     },
     {
       "source_asset_id": "VALIDATOR-REPOSITORY-STATE-001",

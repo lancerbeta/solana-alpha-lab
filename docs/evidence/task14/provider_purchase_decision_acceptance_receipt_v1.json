@@ -1,0 +1,73 @@
+{
+  "schema_version": "1.0",
+  "receipt_id": "EVIDENCE-T14-PROVIDER-PURCHASE-ACCEPTANCE-001",
+  "receipt_version": "1.0",
+  "task_id": "TASK-14",
+  "atom_id": "T14-A3_DETERMINISTIC_DEFER_ACCEPTANCE_V1",
+  "as_of": "2026-07-29",
+  "verdict": "PASS",
+  "accepted_decision": {
+    "asset_id": "DECISION-T14-PROVIDER-PURCHASE-001",
+    "decision_id": "DEC-T14-PROVIDER-PURCHASE-001",
+    "decision_version": "2.0",
+    "status": "DEFER",
+    "accepted_claim": "PROVIDER_PURCHASE_DECISION_REQUIRES_BOUNDED_USAGE_MEASUREMENT",
+    "repository_path": "docs/decisions/provider_decision_v2.md",
+    "sha256": "39dbf21501f950e0365b04668f10387d43cae2db66a997159b0061998c09fc41"
+  },
+  "frozen_fixture": {
+    "asset_id": "FIXTURE-T14-PROVIDER-PURCHASE-DECISION-001",
+    "repository_path": "tests/fixtures/task14/provider_purchase_decision_v1.json",
+    "sha256": "572243a331b75a3723893e4fe24730c15af6dc7a77d7f0bfa2c96e968291eee1"
+  },
+  "acceptance": {
+    "decision_alternative": "DEFER",
+    "purchase_requirement_established": false,
+    "bounded_usage_measurement_required": true,
+    "helius_capacity_estimate_status": "NON_DECISION_VALID_SENSITIVITY_ONLY",
+    "detailed_observation_layer": "VERSIONED_WATCHLIST_MEMBERS_ONLY",
+    "watchlist_policy_evolution": "FORWARD_ONLY_NO_HISTORICAL_REWRITE",
+    "all_solana_token_ticks_authorized": false,
+    "ultra_low_latency_hft_authorized": false,
+    "downstream_contract_owners": [
+      "TASK-15",
+      "TASK-17"
+    ],
+    "deterministic_acceptance": "11_OF_11_PASS"
+  },
+  "catalog": {
+    "status": "REGISTERED_IN_TASK14_CATALOG_TRANSACTION",
+    "changed_in_atom3": true,
+    "catalog_version": "0.17.0",
+    "assets": 266,
+    "shards": 4,
+    "schemas": 4,
+    "queries": 7,
+    "registered_asset_ids": [
+      "DECISION-T14-PROVIDER-PURCHASE-001",
+      "FIXTURE-T14-PROVIDER-PURCHASE-DECISION-001",
+      "TEST-T14-PROVIDER-PURCHASE-DECISION-001",
+      "EVIDENCE-T14-PROVIDER-PURCHASE-ACCEPTANCE-001"
+    ]
+  },
+  "authority": {
+    "network_calls_in_atom": 0,
+    "provider_api_rpc_wss_calls_in_atom": 0,
+    "account_or_dashboard_actions": 0,
+    "credential_use": 0,
+    "dependency_changes": 0,
+    "cash_spend_usd": 0,
+    "wallet_signer_transaction_actions": 0,
+    "commit_push_pr_merge_actions": 0
+  },
+  "non_claims": [
+    "No sustained 24-48 hour usage, reliability, coverage or provider-limit measurement was performed.",
+    "No provider purchase, exact paid-plan selection or cash authorization is established.",
+    "No watchlist engine, collector, provider adapter or production service was implemented.",
+    "No fill, realized execution, NetReturn, PathRisk, production readiness or alpha claim is established.",
+    "TASK-14 remains IN_PROGRESS until repository delivery and the separate finish gate."
+  ],
+  "canonical_status_candidate": "TECHNICAL_DOD_CANDIDATE_TASK14_REMAINS_IN_PROGRESS_UNTIL_MERGE_AND_FINISH_GATE",
+  "state_change": "CANDIDATE_REQUIRES_REPOSITORY_AND_CONTROL_PLANE_ACCEPTANCE",
+  "next_atom": "T14-A4_REPOSITORY_DELIVERY_V1"
+}
