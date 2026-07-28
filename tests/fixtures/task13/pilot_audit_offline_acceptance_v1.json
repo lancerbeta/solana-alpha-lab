@@ -1,0 +1,283 @@
+{
+  "schema": "solana_alpha_lab.pilot_audit_offline_acceptance",
+  "schema_version": "1.0",
+  "fixture_id": "FIXTURE-T13-PILOT-AUDIT-OFFLINE-ACCEPTANCE-001",
+  "task_id": "TASK-13",
+  "atom_id": "T13-A4_DETERMINISTIC_OFFLINE_ACCEPTANCE_V1",
+  "as_of": "2026-07-28",
+  "status": "FROZEN_EXPECTED_OFFLINE_ACCEPTANCE",
+  "entry_verdict": "START_WITH_PATCH",
+  "accepted_claim": "BOUNDED_HISTORICAL_EVIDENCE_QUALITY_ACCEPTANCE",
+  "source_result": {
+    "schema": "solana_alpha_lab.pilot_audit_result",
+    "schema_version": "1.0",
+    "status": "PASS_FROZEN_BASELINE_REPRODUCED",
+    "result_sha256": "688740fce2f4cd4b8181f2d7724ccca6281d6d0d09db4093a10cd3f7bfde1dc6",
+    "input_manifest_sha256": "f74b22ecdb939f645c9304c6b20dba32ea0e842af9c35213b4fef6ac0acdf7f0",
+    "population_fixture_sha256": "873cb9e17ee341fe0163e7dbef0a35559bc7f3fc0b5807418051a90d9c64e7e0",
+    "global_pit_cutoff": "2026-07-28T10:25:42.035105Z",
+    "primary_slice_id": "T08_ACCEPTED",
+    "primary_consumer": "TASK-14"
+  },
+  "source_fingerprints": [
+    {
+      "asset_id": "CONTRACT-T13-PILOT-AUDIT-001",
+      "path": "docs/contracts/pilot_audit_contract_v1.md",
+      "sha256": "bbaedffe09b13aa0d5b3fa54b888d6cc235f7202282a124dbb95de73b660b728"
+    },
+    {
+      "asset_id": "FIXTURE-T13-PILOT-AUDIT-POPULATION-001",
+      "path": "tests/fixtures/task13/pilot_audit_population_v1.json",
+      "sha256": "873cb9e17ee341fe0163e7dbef0a35559bc7f3fc0b5807418051a90d9c64e7e0"
+    },
+    {
+      "asset_id": "TEST-T13-PILOT-AUDIT-CONTRACT-001",
+      "path": "tests/test_task13_pilot_audit_contract.py",
+      "sha256": "e84d24a714e5c8d03cf334c3f8eb3ac0d060c7720ad4a84527b04d8c54fe48aa"
+    },
+    {
+      "asset_id": "MODULE-T13-BOUNDED-PILOT-AUDITOR-001",
+      "path": "src/solana_alpha_lab/pilot_audit.py",
+      "sha256": "4eed3c602d83dfb64375f3d4d996e41654068bb58e0f2e15a30b45d61f087eeb"
+    },
+    {
+      "asset_id": "SCRIPT-T13-PILOT-AUDITOR-001",
+      "path": "scripts/run_task13_pilot_audit.py",
+      "sha256": "9179cd1c0267bc7519c7ea114a142a9dd7562907099031c7ee8b3aa0ab37dfe7"
+    },
+    {
+      "asset_id": "TEST-T13-PILOT-AUDITOR-001",
+      "path": "tests/test_task13_pilot_audit.py",
+      "sha256": "d42d31ee98427fe46c5ee074feb38d35446b093e617b5bd1da5802b519a369b4"
+    }
+  ],
+  "accepted_result": {
+    "data_files": 9,
+    "input_bytes": 4466708,
+    "raw_rows": 658,
+    "identity_complete_rows": 658,
+    "unique_raw_event_ids": 658,
+    "duplicate_raw_event_id_rows": 0,
+    "unique_idempotency_keys": 658,
+    "duplicate_idempotency_key_rows": 0,
+    "unique_content_sha256": 657,
+    "repeated_content_rows": 1,
+    "typed_failure_rows": 4,
+    "pit_order_violations": 0,
+    "rows_after_global_pit_cutoff": 0,
+    "tracked_evidence_verified": 12,
+    "projection_slices_reconciled": 2,
+    "projection_raw_rows": 9,
+    "projection_quote_rows": 9,
+    "projection_execution_rows": 0,
+    "provider_purchase_requirement_established": false,
+    "sustained_reliability_rate_established": false,
+    "sustained_coverage_established": false
+  },
+  "slice_results": [
+    {
+      "slice_id": "T08_ACCEPTED",
+      "role": "PRIMARY_AUDIT_SLICE",
+      "raw_rows": 388,
+      "identity_complete_rows": 388,
+      "duplicate_raw_event_id_rows": 0,
+      "duplicate_idempotency_key_rows": 0,
+      "repeated_content_rows": 1,
+      "typed_failure_rows": 2,
+      "pit_order_violations": 0,
+      "rows_after_global_pit_cutoff": 0,
+      "availability_lag_milliseconds": {
+        "minimum": "0",
+        "maximum": "0",
+        "mean": "0"
+      },
+      "typed_failures": [
+        {
+          "source": "SOLANA_TRACKER",
+          "response_status": "HTTP_ERROR",
+          "error_class": "http_status_not_success:401",
+          "rows": 2,
+          "interpretation": "ACCESS_FAILURE_NOT_RELIABILITY_OR_EMPTY_DATA"
+        }
+      ]
+    },
+    {
+      "slice_id": "T09_ACCEPTED",
+      "role": "CROSS_CHECK",
+      "raw_rows": 258,
+      "identity_complete_rows": 258,
+      "duplicate_raw_event_id_rows": 0,
+      "duplicate_idempotency_key_rows": 0,
+      "repeated_content_rows": 0,
+      "typed_failure_rows": 1,
+      "pit_order_violations": 0,
+      "rows_after_global_pit_cutoff": 0,
+      "availability_lag_milliseconds": {
+        "minimum": "0",
+        "maximum": "0",
+        "mean": "0"
+      },
+      "typed_failures": [
+        {
+          "source": "SOLANA_STANDARD_RPC",
+          "response_status": "INVALID_RESPONSE",
+          "error_class": "get_transaction_result_keys_drift",
+          "rows": 1,
+          "interpretation": "PRESERVED_SCHEMA_DRIFT"
+        }
+      ]
+    },
+    {
+      "slice_id": "T10_FAIL_CLOSED_V1",
+      "role": "CROSS_CHECK",
+      "raw_rows": 1,
+      "identity_complete_rows": 1,
+      "duplicate_raw_event_id_rows": 0,
+      "duplicate_idempotency_key_rows": 0,
+      "repeated_content_rows": 0,
+      "typed_failure_rows": 1,
+      "pit_order_violations": 0,
+      "rows_after_global_pit_cutoff": 0,
+      "availability_lag_milliseconds": {
+        "minimum": "0.003",
+        "maximum": "0.003",
+        "mean": "0.003"
+      },
+      "typed_failures": [
+        {
+          "source": "JUPITER_METIS",
+          "response_status": "INVALID_RESPONSE",
+          "error_class": "SCHEMA_MISMATCH",
+          "rows": 1,
+          "interpretation": "PRESERVED_FAIL_CLOSED_SCHEMA_MISMATCH"
+        }
+      ]
+    },
+    {
+      "slice_id": "T10_ACCEPTED_V2",
+      "role": "CROSS_CHECK",
+      "raw_rows": 8,
+      "identity_complete_rows": 8,
+      "duplicate_raw_event_id_rows": 0,
+      "duplicate_idempotency_key_rows": 0,
+      "repeated_content_rows": 0,
+      "typed_failure_rows": 0,
+      "pit_order_violations": 0,
+      "rows_after_global_pit_cutoff": 0,
+      "availability_lag_milliseconds": {
+        "minimum": "0.002",
+        "maximum": "0.003",
+        "mean": "0.002375"
+      },
+      "typed_failures": []
+    },
+    {
+      "slice_id": "T11_ACCEPTED",
+      "role": "CROSS_CHECK",
+      "raw_rows": 3,
+      "identity_complete_rows": 3,
+      "duplicate_raw_event_id_rows": 0,
+      "duplicate_idempotency_key_rows": 0,
+      "repeated_content_rows": 0,
+      "typed_failure_rows": 0,
+      "pit_order_violations": 0,
+      "rows_after_global_pit_cutoff": 0,
+      "availability_lag_milliseconds": {
+        "minimum": "0",
+        "maximum": "0",
+        "mean": "0"
+      },
+      "typed_failures": []
+    }
+  ],
+  "projection_results": [
+    {
+      "slice_id": "T10_FAIL_CLOSED_V1",
+      "raw_api_events": 1,
+      "quote_attempts": 1,
+      "execution_attempts": 0,
+      "raw_event_lineage_exact": true,
+      "quote_event_lineage_exact": true,
+      "quote_is_fill": false
+    },
+    {
+      "slice_id": "T10_ACCEPTED_V2",
+      "raw_api_events": 8,
+      "quote_attempts": 8,
+      "execution_attempts": 0,
+      "raw_event_lineage_exact": true,
+      "quote_event_lineage_exact": true,
+      "quote_is_fill": false
+    }
+  ],
+  "decision_boundary": {
+    "valid_for": [
+      "BOUNDED_RAW_EVIDENCE_INTEGRITY",
+      "TYPED_FAILURE_PRESERVATION",
+      "TASK10_RAW_PROJECTION_RECONCILIATION"
+    ],
+    "not_valid_for": [
+      "SUSTAINED_24_48H_OPERATION",
+      "PROVIDER_RELIABILITY_RATE",
+      "PROVIDER_PURCHASE_REQUIREMENT",
+      "FILL_OR_REALIZED_EXECUTION",
+      "NET_RETURN_OR_ALPHA"
+    ],
+    "task14_implication": "PROVIDER_PURCHASE_REQUIREMENT_NOT_ESTABLISHED",
+    "required_before_rate_or_coverage_claim": "SUSTAINED_MEASUREMENT_UNDER_SEPARATE_AUTHORITY"
+  },
+  "nonclaims": {
+    "sustained_24_48h_operation": false,
+    "provider_reliability_rate": false,
+    "provider_purchase_requirement": false,
+    "lifecycle_representativeness": false,
+    "fillable_or_realized_execution": false,
+    "net_return_or_alpha": false,
+    "production_readiness": false
+  },
+  "authority": {
+    "class": "LOCAL_WRITE_ONLY",
+    "source": "EXPLICIT_USER",
+    "managed_files": [
+      "tests/fixtures/task13/pilot_audit_offline_acceptance_v1.json",
+      "docs/evidence/task13/pilot_audit_offline_acceptance_receipt_v1.json",
+      "docs/evidence/task13/pilot_audit_offline_acceptance_summary_v1.md",
+      "tests/test_task13_pilot_audit_acceptance.py"
+    ],
+    "offline_auditor_runs": 1,
+    "data_files_read_per_run": 9,
+    "input_bytes_read_per_run": 4466708,
+    "network_calls": 0,
+    "provider_api_rpc_wss_calls": 0,
+    "credential_use": 0,
+    "collector_executions": 0,
+    "raw_data_writes": 0,
+    "cash_spend_usd_cents": 0,
+    "provider_credits": 0,
+    "dependency_changes": 0,
+    "wallet_signer_transaction_actions": 0,
+    "commit": false,
+    "push": false,
+    "pull_request": false,
+    "merge": false,
+    "ui_changes": false,
+    "destructive_actions": false
+  },
+  "catalog": {
+    "version": "0.15.0",
+    "assets": 252,
+    "shards": 4,
+    "schemas": 4,
+    "queries": 7,
+    "changed_in_atom4": false,
+    "status": "CATALOG_TRANSACTION_PENDING_TASK13_FINAL_RECONCILIATION",
+    "blocks_task13_done": true,
+    "blocks_atom4_acceptance": false
+  },
+  "next_atom": {
+    "atom_id": "T13-A5_CATALOG_REPOSITORY_FINALIZATION_V1",
+    "catalog_write_authorized": false,
+    "repository_delivery_authorized": false,
+    "requires_new_bounded_write_set": true
+  }
+}

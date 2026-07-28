@@ -1,0 +1,139 @@
+{
+  "receipt_id": "TASK13_PILOT_AUDIT_OFFLINE_ACCEPTANCE_RECEIPT_V1",
+  "receipt_version": "1.0",
+  "task_id": "TASK-13",
+  "atom_id": "T13-A4_DETERMINISTIC_OFFLINE_ACCEPTANCE_V1",
+  "status": "PASS",
+  "as_of": "2026-07-28",
+  "repository_base": {
+    "accepted_main_commit": "2ebef3f7f8c22c4a2f5dc2a47b3149cc4497e274",
+    "accepted_tree": "e2e3080260c1be4ba44d99e3bfe0c9be4dfc0766",
+    "local_branch": "task12/offline-supervisor",
+    "local_head": "5fb63d92d04c778d0526bff5537bda3219ba0af3",
+    "local_tree": "e2e3080260c1be4ba44d99e3bfe0c9be4dfc0766"
+  },
+  "fixture": {
+    "path": "tests/fixtures/task13/pilot_audit_offline_acceptance_v1.json",
+    "sha256": "97885ea7b782c68a65ac27744bce6703300acfe76cfe20a7f4141767fdee77c5",
+    "status": "FROZEN_EXPECTED_OFFLINE_ACCEPTANCE"
+  },
+  "implementation": {
+    "contract_id": "CONTRACT-T13-PILOT-AUDIT-001",
+    "contract_sha256": "bbaedffe09b13aa0d5b3fa54b888d6cc235f7202282a124dbb95de73b660b728",
+    "population_fixture_sha256": "873cb9e17ee341fe0163e7dbef0a35559bc7f3fc0b5807418051a90d9c64e7e0",
+    "contract_test_sha256": "e84d24a714e5c8d03cf334c3f8eb3ac0d060c7720ad4a84527b04d8c54fe48aa",
+    "module_sha256": "4eed3c602d83dfb64375f3d4d996e41654068bb58e0f2e15a30b45d61f087eeb",
+    "launcher_sha256": "9179cd1c0267bc7519c7ea114a142a9dd7562907099031c7ee8b3aa0ab37dfe7",
+    "implementation_test_sha256": "d42d31ee98427fe46c5ee074feb38d35446b093e617b5bd1da5802b519a369b4"
+  },
+  "accepted_result": {
+    "accepted_claim": "BOUNDED_HISTORICAL_EVIDENCE_QUALITY_ACCEPTANCE",
+    "source_result_sha256": "688740fce2f4cd4b8181f2d7724ccca6281d6d0d09db4093a10cd3f7bfde1dc6",
+    "input_manifest_sha256": "f74b22ecdb939f645c9304c6b20dba32ea0e842af9c35213b4fef6ac0acdf7f0",
+    "data_files": 9,
+    "input_bytes": 4466708,
+    "raw_rows": 658,
+    "identity_complete_rows": 658,
+    "duplicate_raw_event_id_rows": 0,
+    "duplicate_idempotency_key_rows": 0,
+    "repeated_content_rows": 1,
+    "typed_failure_rows": 4,
+    "pit_order_violations": 0,
+    "rows_after_global_pit_cutoff": 0,
+    "tracked_evidence_verified": 12,
+    "projection_slices_reconciled": 2,
+    "projection_quote_rows": 9,
+    "projection_execution_rows": 0,
+    "provider_purchase_requirement_established": false,
+    "sustained_reliability_rate_established": false,
+    "sustained_coverage_established": false
+  },
+  "checks": {
+    "source_fingerprint_readback": "PASS_6_OF_6",
+    "frozen_population_data_file_readback": "PASS_9_OF_9",
+    "frozen_population_input_bytes": "PASS_4466708",
+    "raw_identity_completeness": "PASS_658_OF_658",
+    "duplicate_raw_event_ids": "PASS_ZERO",
+    "duplicate_idempotency_keys": "PASS_ZERO",
+    "repeated_content_classification": "PASS_ONE_NOT_IDENTITY_DUPLICATE",
+    "typed_failure_preservation": "PASS_4_ROWS",
+    "pit_ordering": "PASS_ZERO_VIOLATIONS",
+    "global_pit_cutoff": "PASS_ZERO_ROWS_AFTER_CUTOFF",
+    "task10_raw_projection_lineage": "PASS_2_OF_2",
+    "execution_attempt_rows": "PASS_ZERO",
+    "tracked_evidence_readback": "PASS_12_OF_12",
+    "raw_body_and_absolute_path_exclusion": "PASS_ZERO",
+    "external_effect_counters": "PASS_ZERO",
+    "decision_boundary": "PASS_BOUNDED_NOT_SUSTAINED"
+  },
+  "validation": {
+    "atom4_acceptance_suite": {
+      "passed": 9,
+      "failed": 0,
+      "status": "PASS"
+    },
+    "atom5_catalog_finalization_suite": {
+      "passed": 1,
+      "failed": 0,
+      "status": "PASS"
+    },
+    "task13_contract_implementation_acceptance_suite": {
+      "passed": 31,
+      "failed": 0,
+      "status": "PASS"
+    },
+    "real_local_population_run": {
+      "status": "PASS",
+      "result_sha256": "688740fce2f4cd4b8181f2d7724ccca6281d6d0d09db4093a10cd3f7bfde1dc6"
+    },
+    "full_repository_suite": {
+      "status": "PASS"
+    },
+    "catalog_validation": "PASS_CANDIDATE_0_16_0_262_ASSETS",
+    "navigation_validation": "PASS",
+    "secret_scan": "PASS",
+    "file_hygiene": "PASS"
+  },
+  "authority": {
+    "class": "LOCAL_WRITE_ONLY",
+    "offline_auditor_runs": 1,
+    "data_files_read_per_run": 9,
+    "input_bytes_read_per_run": 4466708,
+    "collector_executions": 0,
+    "network_calls": 0,
+    "provider_api_rpc_wss_calls": 0,
+    "credential_use": 0,
+    "provider_credits": 0,
+    "raw_data_writes": 0,
+    "cash_spend_usd_cents": 0,
+    "dependency_changes": 0,
+    "wallet_signer_transaction_actions": 0,
+    "commit": false,
+    "push": false,
+    "pull_request": false,
+    "merge": false,
+    "ui_changes": false,
+    "destructive_actions": false
+  },
+  "catalog": {
+    "version": "0.16.0",
+    "assets": 262,
+    "shards": 4,
+    "schemas": 4,
+    "queries": 7,
+    "changed_in_atom4": false,
+    "changed_in_atom5": true,
+    "status": "REGISTERED_IN_TASK13_CATALOG_TRANSACTION"
+  },
+  "nonclaims": [
+    "The accepted population contains bounded historical runs lasting seconds, not a sustained 24-48 hour pilot.",
+    "The two Solana Tracker HTTP 401 rows are access-failure evidence, not provider reliability or empty-data observations.",
+    "The retained schema failures are typed evidence and are not NO_ROUTE.",
+    "The nine TASK-10 quote rows are not fills and zero execution-attempt rows exist.",
+    "The evidence does not establish a provider purchase requirement, lifecycle representativeness, Fillable, realized execution, NetReturn, PathRisk, production readiness or alpha.",
+    "TASK-13 remains IN_PROGRESS until repository delivery and the separate finish gate."
+  ],
+  "canonical_status_candidate": "TECHNICAL_DOD_CANDIDATE_TASK13_REMAINS_IN_PROGRESS_UNTIL_MERGE_AND_FINISH_GATE",
+  "state_change": "CANDIDATE_REQUIRES_REPOSITORY_AND_CONTROL_PLANE_ACCEPTANCE",
+  "next_atom": "T13-A6_REPOSITORY_DELIVERY_V1"
+}
