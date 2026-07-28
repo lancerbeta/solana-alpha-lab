@@ -51,8 +51,8 @@ SUMMARY_PATH = (
 )
 DISK_OK = 4_000_000_000
 FIXTURE_SHA256 = (
-    "d94fa0721774906084b943d1a8abf197"
-    "ee96508633ddd7a9f1fdfa07c07cfd61"
+    "f798ab8fc40f141b95dce84393971002"
+    "5bc8958f094d62e07c0c51c9a00a1d5b"
 )
 REQUIRED_EVENT_FIELDS = {
     "schema_version",

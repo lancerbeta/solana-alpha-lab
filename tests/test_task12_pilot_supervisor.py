@@ -123,6 +123,11 @@ class Task12PilotSupervisorTests(unittest.TestCase):
         self.assertTrue(first.run_id.startswith("t12-"))
         self.assertEqual(len(first.duplicate_key), 64)
 
+    def test_offline_spec_preserves_virtual_environment_launcher(self) -> None:
+        expected = Path(sys.executable).absolute()
+        self.assertEqual(self.spec.python_executable, expected)
+        self.assertEqual(self.spec.actual_argv(ROOT)[0], str(expected))
+
     def test_identity_rejects_non_utc_window_and_zero_attempt(self) -> None:
         with self.assertRaisesRegex(
             PilotSupervisorError,

@@ -39,7 +39,7 @@ and bounded line size on every execution.
 - Frozen acceptance fixture:
   `tests/fixtures/task12/pilot_supervisor_offline_acceptance_v1.json`
 - Fixture SHA-256:
-  `d94fa0721774906084b943d1a8abf197ee96508633ddd7a9f1fdfa07c07cfd61`
+  `f798ab8fc40f141b95dce843939710025bc8958f094d62e07c0c51c9a00a1d5b`
 - Machine-readable receipt:
   `docs/evidence/task12/pilot_supervisor_offline_acceptance_receipt_v1.json`
 - Acceptance test:
@@ -47,7 +47,7 @@ and bounded line size on every execution.
 - Contract SHA-256:
   `f65f068746f9239e13b30707ef99a6b8c2713d4635f926dd4d6fd7c61028848f`
 - Supervisor module SHA-256:
-  `a398379711eb5f6b9799d0029b1cf882676492229838ac07c42a523fe12865f7`
+  `b235b7b19fab79a888a4fb55afbe50d0f62868588f227473297ea7278f7849da`
 - CLI SHA-256:
   `fb85b2e0a9fc60a01dc01f80817ae1458471861728ef4635eb5a0893d434405f`
 
@@ -55,8 +55,8 @@ Validation:
 
 - Atom-4 acceptance suite: `7/7 PASS`;
 - Atom-5 Catalog finalization check: `1/1 PASS`;
-- TASK-12 contract, implementation and acceptance suite: `42/42 PASS`;
-- full repository unit suite: `904/904 PASS`;
+- TASK-12 contract, implementation and acceptance suite: `43/43 PASS`;
+- full repository unit suite: `905/905 PASS`;
 - Catalog transaction:
   `0.15.0 / 252 assets / 4 shards / 4 schemas / 7 queries PASS`;
 - generated navigation: `PASS`;

@@ -39,7 +39,7 @@
     },
     {
       "path": "src/solana_alpha_lab/pilot_supervisor.py",
-      "sha256": "a398379711eb5f6b9799d0029b1cf882676492229838ac07c42a523fe12865f7"
+      "sha256": "b235b7b19fab79a888a4fb55afbe50d0f62868588f227473297ea7278f7849da"
     },
     {
       "path": "scripts/run_task12_pilot_supervisor.py",
@@ -47,7 +47,7 @@
     },
     {
       "path": "tests/test_task12_pilot_supervisor.py",
-      "sha256": "e7c33406a940217b9108c7ba675c8f151f387cbb72f7f90ef3dc7b79cac1164d"
+      "sha256": "0051fc08df922a3cf8ec09ef6584e172255c730e42d62409fc4a8c280e057daa"
     },
     {
       "path": "tests/fixtures/task11/entity_input_pilot_plan_v1.json",

@@ -329,7 +329,10 @@ def make_task11_offline_spec(
         plan_sha256=hashlib.sha256(plan.read_bytes()).hexdigest(),
         logical_target_scope=LOGICAL_TARGET_SCOPE,
         expected_success_marker=EXPECTED_SUCCESS_MARKER,
-        python_executable=python_executable.resolve(),
+        # Preserve the virtual-environment launcher path. On POSIX,
+        # resolving its symlink selects the base interpreter and loses the
+        # environment's installed packages.
+        python_executable=python_executable.absolute(),
     )
     spec.validate(root)
     return spec
