@@ -1,0 +1,153 @@
+{
+  "fixture_id": "TASK11_ENTITY_INPUT_LIVE_EVIDENCE_V1",
+  "fixture_version": "1.0",
+  "task_id": "TASK-11",
+  "atom": "T11-A4_OFFLINE_REPLAY_AND_SANITIZED_EVIDENCE_V1",
+  "source_atom": "T11-A3_HELIUS_3CALL_RAW_PILOT_V1",
+  "status": "PASS_RAW_TOP20_ACCOUNT_CONCENTRATION_FEASIBILITY",
+  "accepted_base": {
+    "branch": "main",
+    "head": "f3843952f151de0f736621ef8124032f7b27bce9",
+    "tree": "04c2c75dcc7f428b964e595b5ff3df8677abc627"
+  },
+  "replay_result": {
+    "accepted_claim": "RAW_TOP20_ACCOUNT_CONCENTRATION_FEASIBILITY",
+    "adjusted_top_accounts_supply_share": null,
+    "attempts": [
+      {
+        "content_sha256": "730b754f5bc3126070bd81249f23ba2fb76beda850a9af943bdcc8837852e401",
+        "file_sha256": "819fbfe6f76a11fa9c9c834cfb9fb78952fcfdc1ac354031c75f88922a872a29",
+        "logical_location": "task11_entity_input_probe_v1/run=t11a3-20260728T102537Z/partitions/01-getTokenSupply.parquet",
+        "method": "getTokenSupply",
+        "partition_bytes": 8852,
+        "raw_event_id": "raw-98f385729bef65c47885188266f1f5a4dd5f3f95b4e10c9c6fada2f62f4972bc",
+        "redacted_body_sha256": "3224fee3b85f532e161100223e6ed46b865938d3bf5d6628e9fc858e8a46e9f5",
+        "response_bytes": 198,
+        "response_complete_at": "2026-07-28T10:25:39.408880+00:00",
+        "rpc_id": 1
+      },
+      {
+        "content_sha256": "7cbd1d5d5a86e5d08b39869f900a2930bfcd694bb00d585c64c39d161f80ff99",
+        "file_sha256": "847f9a7f406adf65d58e75095c1acc410807b5f68933bd99106757f2dd09aaa9",
+        "logical_location": "task11_entity_input_probe_v1/run=t11a3-20260728T102537Z/partitions/02-getTokenLargestAccounts.parquet",
+        "method": "getTokenLargestAccounts",
+        "partition_bytes": 24019,
+        "raw_event_id": "raw-c0a889ff026a57cf7dccba6fa1eb8a56e41a94868d0bf30b50445833ca9bfcd7",
+        "redacted_body_sha256": "3ecdb878077409001af8f54faf7c0a18c3b616cd79a5cc66fe97d7a22f43d483",
+        "response_bytes": 3218,
+        "response_complete_at": "2026-07-28T10:25:40.707986+00:00",
+        "rpc_id": 2
+      },
+      {
+        "content_sha256": "64464f0bb61f168415e82ff9bcf5c3dd8dd18d2037fbe735beb14b52b7062fa7",
+        "file_sha256": "5a01c427070c2ff50d8d208fc02f4cbd6c1b567aa89ef1d1e0499271e66e919b",
+        "logical_location": "task11_entity_input_probe_v1/run=t11a3-20260728T102537Z/partitions/03-getMultipleAccounts.parquet",
+        "method": "getMultipleAccounts",
+        "partition_bytes": 18570,
+        "raw_event_id": "raw-b89f6bc28b51460e37851636a53bb4335c37f2cd15070a1ad4ac452cbfc5ca66",
+        "redacted_body_sha256": "7e22482b9c512226bb49ea08f9cede1be6debcfb73246360ca3b121c04e46ace",
+        "response_bytes": 10674,
+        "response_complete_at": "2026-07-28T10:25:42.035105+00:00",
+        "rpc_id": 3
+      }
+    ],
+    "availability_class": "PARTIAL_CURRENT_SNAPSHOT",
+    "cash_spend_usd_cents": 0,
+    "context_slots": {
+      "largest_accounts": 435725699,
+      "owners": 435725701,
+      "spread": 4,
+      "supply": 435725697
+    },
+    "dataset_id": "SMIAL_TASK11_ENTITY_INPUT_PROBE_RAW",
+    "dataset_version": "1.0",
+    "deployer_funder_bundler": "NOT_TESTED",
+    "exclusion_inventory_complete": false,
+    "logical_root": "task11_entity_input_probe_v1/run=t11a3-20260728T102537Z",
+    "modeled_credits": 30,
+    "owner_resolution_count": 20,
+    "projection": {
+      "content_sha256": [
+        "945a67708e3ba92b1eedfcd6f3e97262187801b46bdeedb350eae0de8ec838fd",
+        "e5507abbad748c6e585e7b3704bf305b06bf1e21eb8226c4c948f672ba8c98bf",
+        "02ef33bd3c7d4e6b9a2e8762447a46285a4475b24fd1061c1c2a5f93596e7418",
+        "8f8a210f0dc417c4df6d839e03074a8525ca928979c30e41838b15634aee0f4a",
+        "e36b7bc7da295c2616e29672c5ccb4a29739247a55b429df5b5331d1c6e3c215"
+      ],
+      "entity_snapshot_ids": [
+        "entity-945a67708e3ba92b1eedfcd6f3e97262187801b46bdeedb350eae0de8ec838fd",
+        "entity-e5507abbad748c6e585e7b3704bf305b06bf1e21eb8226c4c948f672ba8c98bf",
+        "entity-02ef33bd3c7d4e6b9a2e8762447a46285a4475b24fd1061c1c2a5f93596e7418",
+        "entity-8f8a210f0dc417c4df6d839e03074a8525ca928979c30e41838b15634aee0f4a",
+        "entity-e36b7bc7da295c2616e29672c5ccb4a29739247a55b429df5b5331d1c6e3c215"
+      ],
+      "metric_names": [
+        "raw_top_accounts_amount_atomic",
+        "raw_top_accounts_supply_share",
+        "adjusted_top_accounts_supply_share",
+        "unresolved_owner_account_count",
+        "context_slot_spread"
+      ],
+      "row_count": 5
+    },
+    "provider_calls": 3,
+    "quality_flags": [
+      "RAW_TOP_ACCOUNTS_CURRENT_SNAPSHOT",
+      "EVENT_TIME_PROXY_OBSERVED_AT_NO_BLOCK_TIME",
+      "ADJUSTED_CONCENTRATION_UNAVAILABLE",
+      "MULTI_SLOT_SNAPSHOT"
+    ],
+    "raw_event_ids": [
+      "raw-98f385729bef65c47885188266f1f5a4dd5f3f95b4e10c9c6fada2f62f4972bc",
+      "raw-c0a889ff026a57cf7dccba6fa1eb8a56e41a94868d0bf30b50445833ca9bfcd7",
+      "raw-b89f6bc28b51460e37851636a53bb4335c37f2cd15070a1ad4ac452cbfc5ca66"
+    ],
+    "raw_top_accounts_amount_atomic": 896130192559592,
+    "raw_top_accounts_supply_share": "0.9694652411735517224957652807",
+    "receipt_bytes": 4225,
+    "receipt_sha256": "0cad0cb9fac95475691ab9f71fac01a29ae63b87a8910647e0a0afcc23d233f1",
+    "received_bytes": 14090,
+    "replay_contract_version": "1.0",
+    "retries": 0,
+    "run_id": "t11a3-20260728T102537Z",
+    "selected_mint": "4vXNhA6ncbx8usZ14CfxkYeQKdaQYgrLfJXNyWcVpump",
+    "snapshot_available_at": "2026-07-28T10:25:42.035105+00:00",
+    "snapshot_ingested_at": "2026-07-28T10:25:42.035658+00:00",
+    "stored_partition_bytes": 51441,
+    "supply_atomic": 924355154265060,
+    "top_account_count": 20,
+    "unresolved_exclusion_account_count": 20,
+    "unresolved_owner_account_count": 0,
+    "wallet_signer_transaction_actions": 0
+  },
+  "decision_boundary": {
+    "raw_top20_account_concentration_feasibility": true,
+    "all_top_account_owners_resolved": true,
+    "complete_holder_distribution_established": false,
+    "exclusion_inventory_complete": false,
+    "adjusted_concentration_established": false,
+    "deployer_established": false,
+    "funder_established": false,
+    "bundler_or_common_ownership_established": false,
+    "strategy_veto_or_alpha_established": false,
+    "canonical_done_implied": false
+  },
+  "sanitization": {
+    "provider_bodies_in_fixture": 0,
+    "owner_addresses_in_fixture": 0,
+    "credential_values_in_fixture": 0,
+    "request_or_response_headers_in_fixture": 0,
+    "absolute_machine_paths_in_fixture": 0,
+    "wallet_signer_transaction_actions": 0
+  },
+  "authority": {
+    "network_calls_during_atom4": 0,
+    "credential_use_during_atom4": 0,
+    "provider_credits_during_atom4": 0,
+    "cash_spend_usd_cents_during_atom4": 0,
+    "dependency_changes": 0,
+    "commit": false,
+    "push": false,
+    "wallet_signer_transaction_actions": 0
+  }
+}

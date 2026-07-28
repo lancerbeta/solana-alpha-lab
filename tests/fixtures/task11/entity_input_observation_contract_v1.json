@@ -1,0 +1,226 @@
+{
+  "schema": "solana_alpha_lab.entity_input_observation_contract",
+  "schema_version": "1.0",
+  "task_id": "TASK-11",
+  "atom_id": "T11-A2",
+  "as_of": "2026-07-28",
+  "status": "FROZEN_OFFLINE_CONTRACT",
+  "estimand": {
+    "accepted_claim": "RAW_TOP_ACCOUNT_CONCENTRATION_FEASIBILITY",
+    "unit": "ONE_MINT_AT_ONE_PIT_AVAILABILITY_CUT",
+    "candidate_mint": "4vXNhA6ncbx8usZ14CfxkYeQKdaQYgrLfJXNyWcVpump",
+    "raw_top_account_limit": 20,
+    "raw_account_is_wallet_owner": false,
+    "full_holder_distribution_claim": false,
+    "ownership_cluster_claim": false,
+    "alpha_claim": false
+  },
+  "evidence_classes": [
+    {
+      "class": "RAW_ONCHAIN",
+      "meaning": "Provider-neutral Solana RPC value preserved with context slot and raw lineage.",
+      "may_change_raw_value": false,
+      "may_drive_exclusion": true
+    },
+    {
+      "class": "DERIVED_ADJUSTED",
+      "meaning": "Deterministic calculation from raw facts and a complete evidence-backed exclusion inventory.",
+      "may_change_raw_value": false,
+      "may_drive_exclusion": false
+    },
+    {
+      "class": "VENDOR_LABEL",
+      "meaning": "Versioned provider assertion such as bundler, insider or developer label.",
+      "may_change_raw_value": false,
+      "may_drive_exclusion": false
+    },
+    {
+      "class": "PROJECT_INFERENCE",
+      "meaning": "Project-owned inference with an evidence reference, rule version and explicit confidence.",
+      "may_change_raw_value": false,
+      "may_drive_exclusion": true
+    }
+  ],
+  "primary_provider": {
+    "provider_id": "HELIUS_STANDARD_SOLANA_RPC",
+    "role": "PRIMARY_RAW_CURRENT_SNAPSHOT_CANDIDATE",
+    "protocol_owner": "SOLANA_STANDARD_RPC",
+    "methods": [
+      "getTokenSupply",
+      "getTokenLargestAccounts",
+      "getMultipleAccounts"
+    ],
+    "method_count_cap_candidate": 3,
+    "retries_candidate": 0,
+    "credentialed_call_in_atom2": false,
+    "actual_call_requires_separate_gate": true
+  },
+  "availability": {
+    "event_time_rule": "OBSERVED_AT_PROXY_WHEN_RPC_HAS_SLOT_BUT_NO_BLOCK_TIME",
+    "event_time_proxy_quality_flag": "EVENT_TIME_PROXY_OBSERVED_AT_NO_BLOCK_TIME",
+    "required_order": [
+      "event_time",
+      "observed_at",
+      "first_reliable_available_at",
+      "available_to_strategy_at",
+      "ingested_at"
+    ],
+    "context_slots_retained_separately": true,
+    "multi_slot_snapshot_flag_required": true,
+    "historical_reconstruction_from_current_rpc": false,
+    "initial_availability_class": "FORWARD_ONLY"
+  },
+  "holder_semantics": {
+    "missing_owner_is_zero": false,
+    "missing_balance_is_zero": false,
+    "zero_supply_share_value": null,
+    "raw_share_formula": "SUM_TOP_ACCOUNT_AMOUNT_ATOMIC / TOTAL_SUPPLY_ATOMIC",
+    "owner_aggregation_requires_resolved_owner": true,
+    "adjusted_share_requires_complete_exclusion_inventory": true,
+    "adjusted_share_formula": "SUM_INCLUDED_TOP_ACCOUNT_AMOUNT_ATOMIC / (TOTAL_SUPPLY_ATOMIC - TOTAL_EVIDENCE_BACKED_EXCLUDED_SUPPLY_ATOMIC)",
+    "vendor_label_can_exclude": false,
+    "unresolved_exclusion_yields_adjusted_null": true,
+    "top_accounts_prove_full_distribution": false
+  },
+  "deployer_funder_bundler_semantics": {
+    "raw_deployer_fact_required_for_deployer_claim": true,
+    "immediate_funder_is_ultimate_funder": false,
+    "vendor_bundler_label_is_ground_truth": false,
+    "unavailable_history_disposition": "NOT_TESTABLE",
+    "provider_failure_disposition": "PROVIDER_ERROR_NOT_EMPTY_NOT_ZERO",
+    "ownership_without_evidence": "FORBIDDEN"
+  },
+  "projection_relation": {
+    "asset_id": "SCHEMA-T05-REL-ENTITY-INPUT-SNAPSHOTS-001",
+    "entity_type": "HOLDER",
+    "raw_event_link_required": true,
+    "revision_number_required": true,
+    "source_and_source_version_required": true,
+    "quality_flags_carry_evidence_class": true
+  },
+  "projection_metrics": [
+    "raw_top_accounts_amount_atomic",
+    "raw_top_accounts_supply_share",
+    "adjusted_top_accounts_supply_share",
+    "unresolved_owner_account_count",
+    "context_slot_spread"
+  ],
+  "reuse": {
+    "adopt": [
+      "SOLANA_STANDARD_RPC_SEMANTICS",
+      "SCHEMA-T05-REL-ENTITY-INPUT-SNAPSHOTS-001"
+    ],
+    "wrap": [
+      "CONTRACT-T06-RAW-STORAGE-001",
+      "CONTRACT-T08-LIFECYCLE-DISCOVERY-001"
+    ],
+    "fork": [],
+    "build": [
+      "THIN_OFFLINE_ENTITY_REDUCER_ONLY"
+    ],
+    "new_dependency_count": 0
+  },
+  "synthetic_vectors": [
+    {
+      "vector_id": "PARTIAL_EXCLUSIONS_KEEP_ADJUSTED_NULL",
+      "supply_atomic": 1000000,
+      "context_slots": [
+        100,
+        101,
+        102
+      ],
+      "accounts": [
+        {
+          "token_account": "synthetic-account-a",
+          "owner": "synthetic-owner-a",
+          "amount_atomic": 400000,
+          "context_slot": 101
+        },
+        {
+          "token_account": "synthetic-account-b",
+          "owner": "synthetic-owner-b",
+          "amount_atomic": 200000,
+          "context_slot": 101
+        },
+        {
+          "token_account": "synthetic-account-c",
+          "owner": null,
+          "amount_atomic": 100000,
+          "context_slot": 102
+        }
+      ],
+      "exclusion_inventory_complete": false,
+      "excluded_supply_atomic_total": null,
+      "exclusion_inventory_evidence_ref": null,
+      "expected": {
+        "raw_top_accounts_amount_atomic": 700000,
+        "raw_top_accounts_supply_share": "0.7",
+        "adjusted_top_accounts_supply_share": null,
+        "unresolved_owner_account_count": 1,
+        "context_slot_spread": 2
+      }
+    },
+    {
+      "vector_id": "COMPLETE_EXCLUSIONS_ENABLE_ADJUSTED",
+      "supply_atomic": 1000000,
+      "context_slots": [
+        100,
+        101,
+        102
+      ],
+      "accounts": [
+        {
+          "token_account": "synthetic-account-a",
+          "owner": "synthetic-owner-a",
+          "amount_atomic": 400000,
+          "context_slot": 101
+        },
+        {
+          "token_account": "synthetic-account-b",
+          "owner": "synthetic-owner-b",
+          "amount_atomic": 200000,
+          "context_slot": 101
+        },
+        {
+          "token_account": "synthetic-account-c",
+          "owner": "synthetic-owner-c",
+          "amount_atomic": 100000,
+          "context_slot": 102
+        }
+      ],
+      "exclusion_inventory_complete": true,
+      "excluded_supply_atomic_total": 200000,
+      "exclusion_inventory_evidence_ref": "synthetic-exclusion-inventory-001",
+      "expected": {
+        "raw_top_accounts_amount_atomic": 700000,
+        "raw_top_accounts_supply_share": "0.7",
+        "adjusted_top_accounts_supply_share": "0.625",
+        "unresolved_owner_account_count": 0,
+        "context_slot_spread": 2
+      }
+    }
+  ],
+  "security": {
+    "secrets_in_fixture": 0,
+    "absolute_machine_paths": 0,
+    "wallet_signer_transaction_actions": 0,
+    "transaction_build_simulate_send": 0,
+    "durable_provider_headers": false
+  },
+  "authority": {
+    "class": "LOCAL_WRITE_ONLY",
+    "managed_files": [
+      "docs/contracts/entity_input_observation_contract_v1.md",
+      "src/solana_alpha_lab/entity_inputs.py",
+      "tests/fixtures/task11/entity_input_observation_contract_v1.json",
+      "tests/test_task11_entity_inputs.py"
+    ],
+    "network_calls": 0,
+    "provider_api_rpc_wss_calls": 0,
+    "credential_use": 0,
+    "cash_spend_usd_cents": 0,
+    "dependency_changes": 0,
+    "commit": 0,
+    "push": 0
+  }
+}

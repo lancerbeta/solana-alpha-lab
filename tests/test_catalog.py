@@ -30,7 +30,7 @@ class CatalogImportTests(unittest.TestCase):
 
     def test_real_catalog_counts(self) -> None:
         self.assertEqual(len(self.snapshot.assets_documents), 4)
-        self.assertEqual(len(self.snapshot.assets), 228)
+        self.assertEqual(len(self.snapshot.assets), 242)
         self.assertEqual(len(self.snapshot.queries), 7)
         self.assertEqual(len(self.snapshot.lifecycle_documents), 9)
         self.assertEqual(len(self.snapshot.lifecycle_records), 52)

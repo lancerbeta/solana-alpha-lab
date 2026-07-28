@@ -519,7 +519,7 @@ records:
   evidence: []
   classification: *t06_internal
 - asset_id: TEST-T06-CATALOG-001
-  record_version: '1.9'
+  record_version: '1.10'
   asset_type: script
   purpose: Catalog tests for the TASK-06 stable-ID inventory, hashes, ownership, finalization handoff, consumers, no-raw-bytes boundary and monotonic active Catalog version.
   status: IMPLEMENTED_UNVERIFIED
@@ -532,7 +532,7 @@ records:
     repository_path: tests/test_task06_catalog.py
   integrity:
     kind: sha256
-    sha256: 844ecce43c594939c7282f7cf8d3e5ccb61e2c1e62824639784281a05ac6cd7f
+    sha256: ad11931d11111c9ab52fbc271df6e56df8a2f3cf037691e4bfc93541a640998e
   access: *t06_read_file
   relations:
   - relation_type: governed_by
@@ -2536,7 +2536,7 @@ records:
     contains_raw_data: false
     sensitivity: INTERNAL_NON_SECRET
 - asset_id: TEST-T05-CATALOG-QUERIES-001
-  record_version: '1.11'
+  record_version: '1.12'
   asset_type: script
   purpose: 'Offline tests proving TASK-05 query bounds, UTC eligibility, write denial, external-access denial, raw BLOB exclusion, task/data-contract registration and monotonic active Catalog version.'
   status: IMPLEMENTED_UNVERIFIED
@@ -2549,7 +2549,7 @@ records:
     repository_path: tests/test_task05_catalog_queries.py
   integrity:
     kind: sha256
-    sha256: 3a9bde84d9dba97efce1f84dda29bf225125f48d66fec9c5f59ed3a664fb4758
+    sha256: 3ff9db958a8de61a277b84f37c60d79e55a675f7ca8b0037fcf6595a3ba435a1
   access:
     mode: read_only
     method: command
@@ -3411,7 +3411,7 @@ records:
   evidence: []
   classification: *t07_internal
 - asset_id: TEST-T07-CATALOG-001
-  record_version: '1.7'
+  record_version: '1.8'
   asset_type: script
   purpose: Catalog tests for TASK-07 stable IDs, file hashes, lineage, accepted baseline, monotonic active Catalog version and no-raw-bytes boundary.
   status: IMPLEMENTED_UNVERIFIED
@@ -3424,7 +3424,7 @@ records:
     repository_path: tests/test_task07_catalog.py
   integrity:
     kind: sha256
-    sha256: 60cfeaf63748d768c55d270207a01efa147c0bc0699b157b3596d89fe99b2a65
+    sha256: 07638854efe52c6b779beb90550f6bea5b2b5d9a43a3a9e1885d55f4d13c9c34
   access: *t07_read_file
   relations:
   - relation_type: depends_on
@@ -3895,7 +3895,7 @@ records:
   evidence: []
   classification: *t08_internal
 - asset_id: TEST-T08-CATALOG-001
-  record_version: '1.6'
+  record_version: '1.7'
   asset_type: script
   purpose: Catalog tests for TASK-08 stable IDs, file and raw hashes, lineage, named consumers, monotonic active Catalog version and no-raw-bytes boundary.
   status: IMPLEMENTED_UNVERIFIED
@@ -3908,7 +3908,7 @@ records:
     repository_path: tests/test_task08_catalog.py
   integrity:
     kind: sha256
-    sha256: 7d3038e0f5c1afc0c96cb5e31a7a8b39c7154cdb7e7ffd1d34c0eef29841748b
+    sha256: f6f43bf473eb3228802c5e44fa6e9c02fe42b17c135e0ef3d26ef950c8af2557
   access: *t08_read_file
   relations:
   - relation_type: depends_on
@@ -4626,7 +4626,7 @@ records:
     contains_raw_data: false
     sensitivity: INTERNAL_NON_SECRET
 - asset_id: SCRIPT-BATON-VALIDATE-001
-  record_version: '1.5'
+  record_version: '1.6'
   asset_type: script
   purpose: Deterministic offline validator for baton schemas, fixtures, route ownership,
     standing autonomy, JIT validation, Catalog integrity, templates, and rules.
@@ -4640,7 +4640,7 @@ records:
     repository_path: scripts/validate_baton.py
   integrity:
     kind: sha256
-    sha256: 66dcfa8f46bdbd70715f7a0a15ca51014344ec3f6c2eb2a56c00b59f695b25f0
+    sha256: 7cd707b3f8a7f88c02851aab3a885a3f61c868c785bdb26b56affb0c1a965eb7
   access:
     mode: read_only
     method: file
@@ -4869,7 +4869,7 @@ records:
     contains_raw_data: false
     sensitivity: INTERNAL_NON_SECRET
 - asset_id: TEST-BATON-REPOSITORY-POLICY-001
-  record_version: '1.11'
+  record_version: '1.12'
   asset_type: script
   purpose: Unit tests for exact local staged, committed and published feature,
     PR merge, main merge, current Catalog integrity, and legacy repository policy.
@@ -4883,7 +4883,7 @@ records:
     repository_path: tests/test_baton_repository_policy.py
   integrity:
     kind: sha256
-    sha256: b0cd8dc57bcf382679093ff0fd21de9e5f454801573c9a2e8c6cae254b3fd919
+    sha256: 9154e8f74f5cf2f6f9e45a7c04ddf8893788868e1ee8c7ec0fe224c17cf0e8b0
   access:
     mode: read_only
     method: file
@@ -6357,3 +6357,518 @@ records:
     contains_secrets: false
     contains_raw_data: false
     sensitivity: INTERNAL_NON_SECRET
+- asset_id: CONTRACT-T11-ENTITY-INPUT-OBSERVATION-001
+  record_version: '1.0'
+  asset_type: control_document
+  purpose: Frozen TASK-11 PIT-safe boundary separating raw top-account facts,
+    adjusted exclusions, vendor labels and project inferences with explicit
+    missingness, revisions, confidence and non-claims.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-07-28'
+  truth_owner: TASK-11
+  location:
+    kind: git_path
+    logical_uri: repo://docs/contracts/entity_input_observation_contract_v1.md
+    repository_path: docs/contracts/entity_input_observation_contract_v1.md
+  integrity:
+    kind: sha256
+    sha256: 5d92f8dae8860043dae3115fb5a7cb4deb50de48c8efb2a6bca46fc47987d8e4
+  access:
+    mode: read_only
+    method: file
+    network_required: false
+    secrets_required: false
+  relations:
+  - relation_type: depends_on
+    target_asset_id: SCHEMA-T05-REL-ENTITY-INPUT-SNAPSHOTS-001
+  - relation_type: depends_on
+    target_asset_id: CONTRACT-T06-RAW-STORAGE-001
+  - relation_type: depends_on
+    target_asset_id: CONTRACT-T08-LIFECYCLE-DISCOVERY-001
+  - relation_type: validated_by
+    target_asset_id: TEST-T11-ENTITY-INPUT-OBSERVATION-001
+  consumers:
+  - TASK-11
+  - TASK-12
+  - TASK-13
+  - TASK-18
+  - TASK-19
+  - TASK-20
+  - TASK-24
+  - TASK-29
+  evidence: []
+  classification: &t11_internal
+    contains_secrets: false
+    contains_raw_data: false
+    sensitivity: INTERNAL_NON_SECRET
+- asset_id: MODULE-T11-ENTITY-INPUT-REDUCER-001
+  record_version: '1.0'
+  asset_type: script
+  purpose: Deterministic offline TASK-11 reducer for raw top-account
+    concentration, owner resolution, adjusted-null exclusion semantics,
+    multi-slot quality flags and TASK-05 entity snapshot projection.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-07-28'
+  truth_owner: TASK-11
+  location:
+    kind: git_path
+    logical_uri: repo://src/solana_alpha_lab/entity_inputs.py
+    repository_path: src/solana_alpha_lab/entity_inputs.py
+  integrity:
+    kind: sha256
+    sha256: 16a0a8cd0cf9f6c7213188a8aeef1100a949da16f02f7c704987de32388d3a43
+  access:
+    mode: read_only
+    method: file
+    network_required: false
+    secrets_required: false
+  relations:
+  - relation_type: governed_by
+    target_asset_id: CONTRACT-T11-ENTITY-INPUT-OBSERVATION-001
+  - relation_type: depends_on
+    target_asset_id: SCHEMA-T05-REL-ENTITY-INPUT-SNAPSHOTS-001
+  - relation_type: validated_by
+    target_asset_id: TEST-T11-ENTITY-INPUT-OBSERVATION-001
+  consumers:
+  - TASK-11
+  - TASK-12
+  - TASK-13
+  - TASK-18
+  - TASK-19
+  - TASK-24
+  evidence: []
+  classification: *t11_internal
+- asset_id: MODULE-T11-ENTITY-INPUT-TRANSPORT-001
+  record_version: '1.0'
+  asset_type: script
+  purpose: Exact-authority Helius standard RPC transport for three sequential
+    calls with no retries, hard call/credit/time/byte caps, in-memory credential
+    handling and TASK-06 durable raw envelopes.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-07-28'
+  truth_owner: TASK-11
+  location:
+    kind: git_path
+    logical_uri: repo://src/solana_alpha_lab/entity_input_transport.py
+    repository_path: src/solana_alpha_lab/entity_input_transport.py
+  integrity:
+    kind: sha256
+    sha256: a908ccc60dcbb2d6aa8e86aa2cf9ee0bf404714b9b613a9e769c64301c23e7ff
+  access:
+    mode: read_only
+    method: file
+    network_required: false
+    secrets_required: false
+  relations:
+  - relation_type: governed_by
+    target_asset_id: CONTRACT-T11-ENTITY-INPUT-OBSERVATION-001
+  - relation_type: depends_on
+    target_asset_id: FIXTURE-T11-ENTITY-INPUT-PILOT-PLAN-001
+  - relation_type: depends_on
+    target_asset_id: MODULE-T11-ENTITY-INPUT-REDUCER-001
+  - relation_type: depends_on
+    target_asset_id: CONTRACT-T06-RAW-STORAGE-001
+  - relation_type: validated_by
+    target_asset_id: TEST-T11-ENTITY-INPUT-TRANSPORT-001
+  consumers:
+  - TASK-11
+  - TASK-12
+  evidence: []
+  classification: *t11_internal
+- asset_id: MODULE-T11-ENTITY-INPUT-REPLAY-001
+  record_version: '1.0'
+  asset_type: script
+  purpose: Offline fail-closed TASK-11 replay of the canonical runtime receipt
+    and three immutable raw partitions into five portable entity-input rows.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-07-28'
+  truth_owner: TASK-11
+  location:
+    kind: git_path
+    logical_uri: repo://src/solana_alpha_lab/entity_input_replay.py
+    repository_path: src/solana_alpha_lab/entity_input_replay.py
+  integrity:
+    kind: sha256
+    sha256: f309a3e6a6964b552679508d158b9f082354b1bf45de81bdedbcacf5084f51bb
+  access:
+    mode: read_only
+    method: file
+    network_required: false
+    secrets_required: false
+  relations:
+  - relation_type: governed_by
+    target_asset_id: CONTRACT-T11-ENTITY-INPUT-OBSERVATION-001
+  - relation_type: depends_on
+    target_asset_id: DATA-T11-ENTITY-INPUT-PILOT-RAW-001
+  - relation_type: depends_on
+    target_asset_id: MODULE-T11-ENTITY-INPUT-REDUCER-001
+  - relation_type: validated_by
+    target_asset_id: TEST-T11-ENTITY-INPUT-REPLAY-001
+  consumers:
+  - TASK-11
+  - TASK-13
+  - TASK-18
+  - TASK-19
+  evidence: []
+  classification: *t11_internal
+- asset_id: SCRIPT-T11-ENTITY-INPUT-PROBE-001
+  record_version: '1.0'
+  asset_type: script
+  purpose: Beginner-safe TASK-11 CLI entrypoint for one gated live raw pilot or
+    deterministic offline replay without exposing credentials.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-07-28'
+  truth_owner: TASK-11
+  location:
+    kind: git_path
+    logical_uri: repo://scripts/run_task11_entity_input_probe.py
+    repository_path: scripts/run_task11_entity_input_probe.py
+  integrity:
+    kind: sha256
+    sha256: 1f55be602f12d972e429e29da85afc986d093bcd84a72fd147604e1351e7d877
+  access:
+    mode: read_only
+    method: file
+    network_required: false
+    secrets_required: false
+  relations:
+  - relation_type: depends_on
+    target_asset_id: MODULE-T11-ENTITY-INPUT-TRANSPORT-001
+  - relation_type: depends_on
+    target_asset_id: MODULE-T11-ENTITY-INPUT-REPLAY-001
+  - relation_type: depends_on
+    target_asset_id: FIXTURE-T11-ENTITY-INPUT-PILOT-PLAN-001
+  - relation_type: validated_by
+    target_asset_id: TEST-T11-ENTITY-INPUT-TRANSPORT-001
+  - relation_type: validated_by
+    target_asset_id: TEST-T11-ENTITY-INPUT-REPLAY-001
+  consumers:
+  - TASK-11
+  - TASK-12
+  evidence: []
+  classification: *t11_internal
+- asset_id: FIXTURE-T11-ENTITY-INPUT-OBSERVATION-001
+  record_version: '1.0'
+  asset_type: evidence
+  purpose: Deterministic synthetic TASK-11 fixture for raw versus adjusted
+    concentration, owner resolution, exclusions, PIT availability and
+    multi-slot snapshot semantics.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-07-28'
+  truth_owner: TASK-11
+  location:
+    kind: git_path
+    logical_uri: repo://tests/fixtures/task11/entity_input_observation_contract_v1.json
+    repository_path: tests/fixtures/task11/entity_input_observation_contract_v1.json
+  integrity:
+    kind: sha256
+    sha256: b5fe517e3ddd6d0668edc3576210882082203edbf1f3bfca92b38a9164a1c686
+  access:
+    mode: read_only
+    method: file
+    network_required: false
+    secrets_required: false
+  relations:
+  - relation_type: derived_from
+    target_asset_id: CONTRACT-T11-ENTITY-INPUT-OBSERVATION-001
+  - relation_type: validated_by
+    target_asset_id: TEST-T11-ENTITY-INPUT-OBSERVATION-001
+  consumers:
+  - TASK-11
+  evidence: []
+  classification: *t11_internal
+- asset_id: FIXTURE-T11-ENTITY-INPUT-PILOT-PLAN-001
+  record_version: '1.0'
+  asset_type: evidence
+  purpose: Frozen TASK-11 selected mint, exact Helius standard RPC methods,
+    credential boundary, three-call and 30-credit caps, durable storage budget,
+    stop conditions and non-claims.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-07-28'
+  truth_owner: TASK-11
+  location:
+    kind: git_path
+    logical_uri: repo://tests/fixtures/task11/entity_input_pilot_plan_v1.json
+    repository_path: tests/fixtures/task11/entity_input_pilot_plan_v1.json
+  integrity:
+    kind: sha256
+    sha256: ff0524ab2a77b517f8796ff54a753842306b83de9be6e8d4c391776afba0cf1d
+  access:
+    mode: read_only
+    method: file
+    network_required: false
+    secrets_required: false
+  relations:
+  - relation_type: governed_by
+    target_asset_id: CONTRACT-T11-ENTITY-INPUT-OBSERVATION-001
+  - relation_type: derived_from
+    target_asset_id: EVIDENCE-T08-LIFECYCLE-DISCOVERY-RECEIPT-001
+  - relation_type: validated_by
+    target_asset_id: TEST-T11-ENTITY-INPUT-TRANSPORT-001
+  consumers:
+  - TASK-11
+  evidence: []
+  classification: *t11_internal
+- asset_id: DATA-T11-ENTITY-INPUT-PILOT-RAW-001
+  record_version: '1.0'
+  asset_type: evidence
+  purpose: Logical content-addressed pointer to the ignored TASK-11 runtime
+    receipt that binds three immutable raw Parquet partitions; raw bytes remain
+    outside Git.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: RUNTIME
+  as_of: '2026-07-28'
+  truth_owner: TASK-11
+  location:
+    kind: logical_only
+    logical_uri: raw://task11_entity_input_probe_v1/run=t11a3-20260728T102537Z/receipts/probe.receipt.json
+  integrity:
+    kind: sha256
+    sha256: 0cad0cb9fac95475691ab9f71fac01a29ae63b87a8910647e0a0afcc23d233f1
+  access:
+    mode: read_only
+    method: runtime_attestation
+    network_required: false
+    secrets_required: false
+  relations:
+  - relation_type: derived_from
+    target_asset_id: MODULE-T11-ENTITY-INPUT-TRANSPORT-001
+  - relation_type: evidenced_by
+    target_asset_id: EVIDENCE-T11-ENTITY-INPUT-RECEIPT-001
+  - relation_type: validated_by
+    target_asset_id: TEST-T11-ENTITY-INPUT-REPLAY-001
+  consumers:
+  - TASK-11
+  - TASK-12
+  - TASK-13
+  - TASK-18
+  - TASK-19
+  - TASK-20
+  - TASK-24
+  - TASK-29
+  evidence:
+  - evidence_id: EVIDENCE-T11-ENTITY-INPUT-RECEIPT-001
+    kind: runtime_receipt
+    reference: docs/evidence/task11/entity_input_pilot_execution_receipt_v1.json
+    result: PASS
+  classification: *t11_internal
+- asset_id: FIXTURE-T11-ENTITY-INPUT-LIVE-EVIDENCE-001
+  record_version: '1.0'
+  asset_type: evidence
+  purpose: Portable sanitized TASK-11 live evidence preserving aggregate
+    top-account metrics, PIT lineage, raw identities, caps, costs and explicit
+    non-claims without provider bodies or owner-address inventory.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-07-28'
+  truth_owner: TASK-11
+  location:
+    kind: git_path
+    logical_uri: repo://tests/fixtures/task11/entity_input_live_evidence_v1.json
+    repository_path: tests/fixtures/task11/entity_input_live_evidence_v1.json
+  integrity:
+    kind: sha256
+    sha256: 2c0e00c1aacb32a75cbe5807517e5e514751cec0271a540594147390e8fbf7b2
+  access:
+    mode: read_only
+    method: file
+    network_required: false
+    secrets_required: false
+  relations:
+  - relation_type: derived_from
+    target_asset_id: DATA-T11-ENTITY-INPUT-PILOT-RAW-001
+  - relation_type: validated_by
+    target_asset_id: TEST-T11-ENTITY-INPUT-REPLAY-001
+  consumers:
+  - TASK-11
+  - TASK-12
+  - TASK-13
+  - TASK-18
+  - TASK-19
+  - TASK-20
+  - TASK-24
+  - TASK-29
+  evidence: []
+  classification: *t11_internal
+- asset_id: EVIDENCE-T11-ENTITY-INPUT-RECEIPT-001
+  record_version: '1.0'
+  asset_type: evidence
+  purpose: Machine-readable TASK-11 acceptance for the three-call raw pilot,
+    immutable hashes, offline replay, entity snapshot projection, caps, costs,
+    Catalog transaction and explicit unavailable claims.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-07-28'
+  truth_owner: TASK-11
+  location:
+    kind: git_path
+    logical_uri: repo://docs/evidence/task11/entity_input_pilot_execution_receipt_v1.json
+    repository_path: docs/evidence/task11/entity_input_pilot_execution_receipt_v1.json
+  integrity:
+    kind: sha256
+    sha256: 324c9ace8c49668864c274de19c09d42a7e794169f9a5ad619df8b47f3209ff4
+  access:
+    mode: read_only
+    method: file
+    network_required: false
+    secrets_required: false
+  relations:
+  - relation_type: derived_from
+    target_asset_id: FIXTURE-T11-ENTITY-INPUT-LIVE-EVIDENCE-001
+  - relation_type: derived_from
+    target_asset_id: DATA-T11-ENTITY-INPUT-PILOT-RAW-001
+  - relation_type: validated_by
+    target_asset_id: TEST-T11-ENTITY-INPUT-REPLAY-001
+  consumers:
+  - TASK-11
+  - TASK-12
+  - TASK-13
+  - TASK-18
+  - TASK-19
+  - TASK-20
+  - TASK-24
+  - TASK-29
+  evidence: []
+  classification: *t11_internal
+- asset_id: EVIDENCE-T11-ENTITY-INPUT-SUMMARY-001
+  record_version: '1.0'
+  asset_type: evidence
+  purpose: Human-readable TASK-11 bounded result, raw versus adjusted
+    semantics, unavailable claims, PIT evidence, immutable pointers, costs,
+    Catalog checkpoint, residuals and next repository boundary.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-07-28'
+  truth_owner: TASK-11
+  location:
+    kind: git_path
+    logical_uri: repo://docs/evidence/task11/entity_input_pilot_execution_summary_v1.md
+    repository_path: docs/evidence/task11/entity_input_pilot_execution_summary_v1.md
+  integrity:
+    kind: sha256
+    sha256: 457215a87621c858312c15a2b2963a0e8bf0e7857bbf4d1f7230c9b901ad0657
+  access:
+    mode: read_only
+    method: file
+    network_required: false
+    secrets_required: false
+  relations:
+  - relation_type: derived_from
+    target_asset_id: FIXTURE-T11-ENTITY-INPUT-LIVE-EVIDENCE-001
+  - relation_type: evidenced_by
+    target_asset_id: EVIDENCE-T11-ENTITY-INPUT-RECEIPT-001
+  consumers:
+  - TASK-11
+  - TASK-12
+  - TASK-13
+  - TASK-18
+  - TASK-19
+  - TASK-20
+  - TASK-24
+  - TASK-29
+  evidence: []
+  classification: *t11_internal
+- asset_id: TEST-T11-ENTITY-INPUT-OBSERVATION-001
+  record_version: '1.0'
+  asset_type: script
+  purpose: Offline fail-closed TASK-11 tests for raw/adjusted separation,
+    evidence classes, exclusions, owner resolution, PIT timing, missingness,
+    projection rows and transaction prohibitions.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-07-28'
+  truth_owner: TASK-11
+  location:
+    kind: git_path
+    logical_uri: repo://tests/test_task11_entity_inputs.py
+    repository_path: tests/test_task11_entity_inputs.py
+  integrity:
+    kind: sha256
+    sha256: ed5df5df849e0e76d556ac7f5934fd2013e76c72a46ef57220968a8bbcce8411
+  access:
+    mode: read_only
+    method: file
+    network_required: false
+    secrets_required: false
+  relations:
+  - relation_type: depends_on
+    target_asset_id: CONTRACT-T11-ENTITY-INPUT-OBSERVATION-001
+  - relation_type: depends_on
+    target_asset_id: FIXTURE-T11-ENTITY-INPUT-OBSERVATION-001
+  - relation_type: depends_on
+    target_asset_id: MODULE-T11-ENTITY-INPUT-REDUCER-001
+  consumers:
+  - TASK-11
+  evidence: []
+  classification: *t11_internal
+- asset_id: TEST-T11-ENTITY-INPUT-TRANSPORT-001
+  record_version: '1.0'
+  asset_type: script
+  purpose: Deterministic TASK-11 tests for exact external authority, credential
+    redaction, endpoint/method allowlist, sequential no-retry caps, response and
+    storage budgets, immutable raw envelopes and zero transaction actions.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-07-28'
+  truth_owner: TASK-11
+  location:
+    kind: git_path
+    logical_uri: repo://tests/test_task11_entity_input_transport.py
+    repository_path: tests/test_task11_entity_input_transport.py
+  integrity:
+    kind: sha256
+    sha256: fb653afc836a0f7ba0b9adb858aa6605319cf2e779ce50bda050c8ea8584e33a
+  access:
+    mode: read_only
+    method: file
+    network_required: false
+    secrets_required: false
+  relations:
+  - relation_type: depends_on
+    target_asset_id: FIXTURE-T11-ENTITY-INPUT-PILOT-PLAN-001
+  - relation_type: depends_on
+    target_asset_id: MODULE-T11-ENTITY-INPUT-TRANSPORT-001
+  consumers:
+  - TASK-11
+  evidence: []
+  classification: *t11_internal
+- asset_id: TEST-T11-ENTITY-INPUT-REPLAY-001
+  record_version: '1.0'
+  asset_type: script
+  purpose: Fail-closed TASK-11 tests for raw receipt and partition hash
+    reconciliation, RPC schema replay, projection counts, sanitization, caps,
+    non-claims, Catalog registration and logical-only raw identity.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-07-28'
+  truth_owner: TASK-11
+  location:
+    kind: git_path
+    logical_uri: repo://tests/test_task11_entity_input_replay.py
+    repository_path: tests/test_task11_entity_input_replay.py
+  integrity:
+    kind: sha256
+    sha256: 6e2f3d2e8fd6611a575661b43789cd3a4e8cdee7b2cbc3559a3caa5b3c69772d
+  access:
+    mode: read_only
+    method: file
+    network_required: false
+    secrets_required: false
+  relations:
+  - relation_type: depends_on
+    target_asset_id: FIXTURE-T11-ENTITY-INPUT-LIVE-EVIDENCE-001
+  - relation_type: depends_on
+    target_asset_id: EVIDENCE-T11-ENTITY-INPUT-RECEIPT-001
+  - relation_type: depends_on
+    target_asset_id: EVIDENCE-T11-ENTITY-INPUT-SUMMARY-001
+  consumers:
+  - TASK-11
+  evidence: []
+  classification: *t11_internal
