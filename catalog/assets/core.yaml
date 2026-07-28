@@ -519,12 +519,12 @@ records:
   evidence: []
   classification: *t06_internal
 - asset_id: TEST-T06-CATALOG-001
-  record_version: '1.12'
+  record_version: '1.13'
   asset_type: script
   purpose: Catalog tests for the TASK-06 stable-ID inventory, hashes, ownership, finalization handoff, consumers, no-raw-bytes boundary and monotonic active Catalog version.
   status: IMPLEMENTED_UNVERIFIED
   origin: REPOSITORY
-  as_of: '2026-07-28'
+  as_of: '2026-07-29'
   truth_owner: TASK-06
   location:
     kind: git_path
@@ -532,7 +532,7 @@ records:
     repository_path: tests/test_task06_catalog.py
   integrity:
     kind: sha256
-    sha256: 1644db17bd37637d4ffd55555dc4bab2756f531c12cb8e4e4d8e2f9f7b9900a8
+    sha256: a6a621adad8f20f9bcd3d54f78bfe9a8fa7f755362483f88a5c2c98e68893c3e
   access: *t06_read_file
   relations:
   - relation_type: governed_by
@@ -2536,12 +2536,12 @@ records:
     contains_raw_data: false
     sensitivity: INTERNAL_NON_SECRET
 - asset_id: TEST-T05-CATALOG-QUERIES-001
-  record_version: '1.14'
+  record_version: '1.15'
   asset_type: script
   purpose: 'Offline tests proving TASK-05 query bounds, UTC eligibility, write denial, external-access denial, raw BLOB exclusion, task/data-contract registration and monotonic active Catalog version.'
   status: IMPLEMENTED_UNVERIFIED
   origin: REPOSITORY
-  as_of: '2026-07-28'
+  as_of: '2026-07-29'
   truth_owner: TASK-05
   location:
     kind: git_path
@@ -2549,7 +2549,7 @@ records:
     repository_path: tests/test_task05_catalog_queries.py
   integrity:
     kind: sha256
-    sha256: 148e863e51402af3ff158f5de930da8f88958616775488c6a722403afa7824b3
+    sha256: 02c2594e13161586e11153dd430c942442eb9fcada081bb8bac359978e712295
   access:
     mode: read_only
     method: command
@@ -3411,12 +3411,12 @@ records:
   evidence: []
   classification: *t07_internal
 - asset_id: TEST-T07-CATALOG-001
-  record_version: '1.10'
+  record_version: '1.11'
   asset_type: script
   purpose: Catalog tests for TASK-07 stable IDs, file hashes, lineage, accepted baseline, monotonic active Catalog version and no-raw-bytes boundary.
   status: IMPLEMENTED_UNVERIFIED
   origin: REPOSITORY
-  as_of: '2026-07-28'
+  as_of: '2026-07-29'
   truth_owner: TASK-07
   location:
     kind: git_path
@@ -3424,7 +3424,7 @@ records:
     repository_path: tests/test_task07_catalog.py
   integrity:
     kind: sha256
-    sha256: 7afa3c97eca0768197fb2a5f44088a0168d74a71bada8ae1d8ddc10187608103
+    sha256: 8e4a3ff2ad608355ab28173c1f142d108d71a657be1572d1a7847e5db3d08a6d
   access: *t07_read_file
   relations:
   - relation_type: depends_on
@@ -3898,12 +3898,12 @@ records:
   evidence: []
   classification: *t08_internal
 - asset_id: TEST-T08-CATALOG-001
-  record_version: '1.9'
+  record_version: '1.10'
   asset_type: script
   purpose: Catalog tests for TASK-08 stable IDs, file and raw hashes, lineage, named consumers, monotonic active Catalog version and no-raw-bytes boundary.
   status: IMPLEMENTED_UNVERIFIED
   origin: REPOSITORY
-  as_of: '2026-07-28'
+  as_of: '2026-07-29'
   truth_owner: TASK-08
   location:
     kind: git_path
@@ -3911,7 +3911,7 @@ records:
     repository_path: tests/test_task08_catalog.py
   integrity:
     kind: sha256
-    sha256: 10e875cfc5abfe7d3e56ca522d937f7da237c412f3625790b78c0165f5b20f99
+    sha256: c483039273b635876af16f17de40750236bca166fcd22cfb6646dd68f8e492ed
   access: *t08_read_file
   relations:
   - relation_type: depends_on
@@ -4629,13 +4629,13 @@ records:
     contains_raw_data: false
     sensitivity: INTERNAL_NON_SECRET
 - asset_id: SCRIPT-BATON-VALIDATE-001
-  record_version: '1.8'
+  record_version: '1.9'
   asset_type: script
   purpose: Deterministic offline validator for baton schemas, fixtures, route ownership,
     standing autonomy, JIT validation, Catalog integrity, templates, and rules.
   status: IMPLEMENTED_UNVERIFIED
   origin: REPOSITORY
-  as_of: '2026-07-28'
+  as_of: '2026-07-29'
   truth_owner: CTRL-BATON-SETUP
   location:
     kind: git_path
@@ -4643,7 +4643,7 @@ records:
     repository_path: scripts/validate_baton.py
   integrity:
     kind: sha256
-    sha256: ad1747d989f39a3a7d0c9db2d96ea8abf60ca985cbb527bb68bfe9ace91ec9fe
+    sha256: a1f34c2e724e8413c47c188b1a0e2f04716df132c7a71b4ac6d941d35233ca97
   access:
     mode: read_only
     method: file
@@ -4872,13 +4872,13 @@ records:
     contains_raw_data: false
     sensitivity: INTERNAL_NON_SECRET
 - asset_id: TEST-BATON-REPOSITORY-POLICY-001
-  record_version: '1.14'
+  record_version: '1.15'
   asset_type: script
   purpose: Unit tests for exact local staged, committed and published feature,
     PR merge, main merge, current Catalog integrity, and legacy repository policy.
   status: IMPLEMENTED_UNVERIFIED
   origin: REPOSITORY
-  as_of: '2026-07-28'
+  as_of: '2026-07-29'
   truth_owner: CTRL-BATON-SETUP
   location:
     kind: git_path
@@ -4886,7 +4886,7 @@ records:
     repository_path: tests/test_baton_repository_policy.py
   integrity:
     kind: sha256
-    sha256: 4b4e12f8033fe17cb4704caa2a0648812208d2bdafe7040684a5ccbe48daacfa
+    sha256: 58134c3c9a7e49c7d9b2eed35df8aa59ba3a6c50876e57d4439937b4a9f0ba48
   access:
     mode: read_only
     method: file
@@ -6843,14 +6843,14 @@ records:
   evidence: []
   classification: *t11_internal
 - asset_id: TEST-T11-ENTITY-INPUT-REPLAY-001
-  record_version: '1.2'
+  record_version: '1.3'
   asset_type: script
   purpose: Fail-closed TASK-11 tests for raw receipt and partition hash
     reconciliation, RPC schema replay, projection counts, sanitization, caps,
     non-claims, Catalog registration and logical-only raw identity.
   status: IMPLEMENTED_UNVERIFIED
   origin: REPOSITORY
-  as_of: '2026-07-28'
+  as_of: '2026-07-29'
   truth_owner: TASK-11
   location:
     kind: git_path
@@ -6858,7 +6858,7 @@ records:
     repository_path: tests/test_task11_entity_input_replay.py
   integrity:
     kind: sha256
-    sha256: 617726e974ab9667a4818ed3dd0f93f0461507fc50ed8a66bdfdb2a8f8b8656f
+    sha256: 7ff456334048db44ad533a966fba9fcc4e37d51c9fd706ad4719a4aa0026be3e
   access:
     mode: read_only
     method: file
@@ -7179,14 +7179,14 @@ records:
   evidence: []
   classification: *t12_internal
 - asset_id: TEST-T12-PILOT-SUPERVISOR-ACCEPTANCE-001
-  record_version: '1.2'
+  record_version: '1.3'
   asset_type: script
   purpose: Deterministic TASK-12 acceptance and finalization tests for seven
     control vectors, source fingerprints, event and lineage invariants, zero
     external effects, exact Catalog registration and mandatory output counts.
   status: IMPLEMENTED_UNVERIFIED
   origin: REPOSITORY
-  as_of: '2026-07-28'
+  as_of: '2026-07-29'
   truth_owner: TASK-12
   location:
     kind: git_path
@@ -7194,7 +7194,7 @@ records:
     repository_path: tests/test_task12_pilot_supervisor_acceptance.py
   integrity:
     kind: sha256
-    sha256: acb92fc06f0e88799bc57ab657c41e01f0c64bbc1a956f514cf3d530dde30a85
+    sha256: d1752f8acb3901fb5e9e84640a868ed3ac6666ccf8ce65e5bc24814f2301b198
   access:
     mode: read_only
     method: file
@@ -7532,14 +7532,14 @@ records:
   evidence: []
   classification: *t13_internal
 - asset_id: TEST-T13-PILOT-AUDIT-ACCEPTANCE-001
-  record_version: '1.0'
+  record_version: '1.1'
   asset_type: script
   purpose: Deterministic TASK-13 acceptance and finalization tests for source
     hashes, measured denominators, typed failures, PIT, projection lineage,
     non-claims and exact Catalog registration.
   status: IMPLEMENTED_UNVERIFIED
   origin: REPOSITORY
-  as_of: '2026-07-28'
+  as_of: '2026-07-29'
   truth_owner: TASK-13
   location:
     kind: git_path
@@ -7547,7 +7547,7 @@ records:
     repository_path: tests/test_task13_pilot_audit_acceptance.py
   integrity:
     kind: sha256
-    sha256: 4b3d395a089decdcc39240d3820886967ebad63a92d7aa025315e323b705b5e1
+    sha256: f4f11da3c8fbffba5ca177a85ac9f4219f365aa45d5df1f08e328e83694c5c99
   access:
     mode: read_only
     method: file
@@ -7564,3 +7564,152 @@ records:
   - TASK-13
   evidence: []
   classification: *t13_internal
+- asset_id: DECISION-T14-PROVIDER-PURCHASE-001
+  record_version: '1.0'
+  asset_type: decision
+  purpose: Frozen TASK-14 DEFER decision requiring bounded usage measurement
+    before any provider purchase and preserving watchlist-scoped detailed
+    observation.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-07-29'
+  truth_owner: TASK-14
+  location:
+    kind: git_path
+    logical_uri: repo://docs/decisions/provider_decision_v2.md
+    repository_path: docs/decisions/provider_decision_v2.md
+  integrity:
+    kind: sha256
+    sha256: 39dbf21501f950e0365b04668f10387d43cae2db66a997159b0061998c09fc41
+  access:
+    mode: read_only
+    method: file
+    network_required: false
+    secrets_required: false
+  relations:
+  - relation_type: derived_from
+    target_asset_id: EVIDENCE-T13-PILOT-AUDIT-OFFLINE-ACCEPTANCE-001
+  - relation_type: validated_by
+    target_asset_id: TEST-T14-PROVIDER-PURCHASE-DECISION-001
+  - relation_type: evidenced_by
+    target_asset_id: EVIDENCE-T14-PROVIDER-PURCHASE-ACCEPTANCE-001
+  consumers:
+  - TASK-14
+  - TASK-15
+  - TASK-17
+  evidence: []
+  classification: &t14_internal
+    contains_secrets: false
+    contains_raw_data: false
+    sensitivity: INTERNAL_NON_SECRET
+- asset_id: FIXTURE-T14-PROVIDER-PURCHASE-DECISION-001
+  record_version: '1.0'
+  asset_type: evidence
+  purpose: Frozen machine-readable TASK-14 DEFER decision fixture binding
+    local evidence, directional capacity sensitivity, official pricing
+    snapshot, reconsideration gate and observation-universe boundary.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-07-29'
+  truth_owner: TASK-14
+  location:
+    kind: git_path
+    logical_uri: repo://tests/fixtures/task14/provider_purchase_decision_v1.json
+    repository_path: tests/fixtures/task14/provider_purchase_decision_v1.json
+  integrity:
+    kind: sha256
+    sha256: 572243a331b75a3723893e4fe24730c15af6dc7a77d7f0bfa2c96e968291eee1
+  access:
+    mode: read_only
+    method: file
+    network_required: false
+    secrets_required: false
+  relations:
+  - relation_type: governed_by
+    target_asset_id: DECISION-T14-PROVIDER-PURCHASE-001
+  - relation_type: derived_from
+    target_asset_id: EVIDENCE-T07-PROVIDER-SMOKE-RECEIPT-001
+  - relation_type: derived_from
+    target_asset_id: EVIDENCE-T08-LIFECYCLE-DISCOVERY-RECEIPT-001
+  - relation_type: derived_from
+    target_asset_id: EVIDENCE-T10-JUPITER-QUOTE-RECEIPT-002
+  - relation_type: derived_from
+    target_asset_id: EVIDENCE-T11-ENTITY-INPUT-RECEIPT-001
+  - relation_type: derived_from
+    target_asset_id: EVIDENCE-T13-PILOT-AUDIT-OFFLINE-ACCEPTANCE-001
+  - relation_type: validated_by
+    target_asset_id: TEST-T14-PROVIDER-PURCHASE-DECISION-001
+  consumers:
+  - TASK-14
+  - TASK-15
+  - TASK-17
+  evidence: []
+  classification: *t14_internal
+- asset_id: TEST-T14-PROVIDER-PURCHASE-DECISION-001
+  record_version: '1.0'
+  asset_type: script
+  purpose: Deterministic TASK-14 tests for evidence fingerprints, DEFER
+    validity, sensitivity arithmetic, dated pricing scope, reconsideration
+    gate, watchlist boundary, zero effects and exact Catalog registration.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-07-29'
+  truth_owner: TASK-14
+  location:
+    kind: git_path
+    logical_uri: repo://tests/test_task14_provider_purchase_decision.py
+    repository_path: tests/test_task14_provider_purchase_decision.py
+  integrity:
+    kind: sha256
+    sha256: f91b0ac97171044cdac452facbde80a0ea7554865f69e317069045acf13123bf
+  access:
+    mode: read_only
+    method: file
+    network_required: false
+    secrets_required: false
+  relations:
+  - relation_type: depends_on
+    target_asset_id: DECISION-T14-PROVIDER-PURCHASE-001
+  - relation_type: depends_on
+    target_asset_id: FIXTURE-T14-PROVIDER-PURCHASE-DECISION-001
+  - relation_type: depends_on
+    target_asset_id: EVIDENCE-T14-PROVIDER-PURCHASE-ACCEPTANCE-001
+  consumers:
+  - TASK-14
+  evidence: []
+  classification: *t14_internal
+- asset_id: EVIDENCE-T14-PROVIDER-PURCHASE-ACCEPTANCE-001
+  record_version: '1.0'
+  asset_type: evidence
+  purpose: Sanitized machine-readable TASK-14 acceptance receipt binding the
+    DEFER decision, immutable fixture, Catalog checkpoint, watchlist boundary,
+    explicit non-claims and zero external effects.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-07-29'
+  truth_owner: TASK-14
+  location:
+    kind: git_path
+    logical_uri: repo://docs/evidence/task14/provider_purchase_decision_acceptance_receipt_v1.json
+    repository_path: docs/evidence/task14/provider_purchase_decision_acceptance_receipt_v1.json
+  integrity:
+    kind: sha256
+    sha256: 47d950c863822bcfa72ade4172d1b834f029ac1198e05af6986939c2de94eb9e
+  access:
+    mode: read_only
+    method: file
+    network_required: false
+    secrets_required: false
+  relations:
+  - relation_type: derived_from
+    target_asset_id: DECISION-T14-PROVIDER-PURCHASE-001
+  - relation_type: derived_from
+    target_asset_id: FIXTURE-T14-PROVIDER-PURCHASE-DECISION-001
+  - relation_type: validated_by
+    target_asset_id: TEST-T14-PROVIDER-PURCHASE-DECISION-001
+  consumers:
+  - TASK-14
+  - TASK-15
+  - TASK-17
+  evidence: []
+  classification: *t14_internal

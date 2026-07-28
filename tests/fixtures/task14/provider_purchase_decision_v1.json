@@ -1,0 +1,257 @@
+{
+  "schema_version": "1.0",
+  "decision_id": "DEC-T14-PROVIDER-PURCHASE-001",
+  "decision_version": "2.0",
+  "task_id": "TASK-14",
+  "atom_id": "T14-A2_FROZEN_DEFERRED_PURCHASE_DECISION_V1",
+  "as_of": "2026-07-29",
+  "pricing_snapshot_ttl_days": 30,
+  "status": "DEFER",
+  "accepted_claim": "PROVIDER_PURCHASE_DECISION_REQUIRES_BOUNDED_USAGE_MEASUREMENT",
+  "entry_verdict": "START_AS_WRITTEN",
+  "alternatives": {
+    "NO_PURCHASE": {
+      "decision_valid": false,
+      "reason": "The seven-second source window cannot establish sustained free-tier sufficiency."
+    },
+    "DEFER": {
+      "decision_valid": true,
+      "reason": "A bounded sustained-usage measurement is required before either free-tier sufficiency or paid-tier need can be accepted."
+    },
+    "PROPOSE_BOUNDED_PURCHASE": {
+      "decision_valid": false,
+      "reason": "Sustained usage, reliability, coverage, exact checkout terms and a paid-only bottleneck are absent."
+    }
+  },
+  "local_evidence": [
+    {
+      "asset_id": "EVIDENCE-T07-PROVIDER-SMOKE-RECEIPT-001",
+      "sha256": "900cf054916995e2b839fad3bf4873666bcd9ca635903d1a58937b346de27786",
+      "decision_fact": "35 attempts, 32 accepted successes, 1 invalid request, 2 provider 5xx, 15 modeled Helius credits, USD 0"
+    },
+    {
+      "asset_id": "EVIDENCE-T08-LIFECYCLE-DISCOVERY-RECEIPT-001",
+      "sha256": "33a3f0b90de36c1543ee605eccc07685798f1b2e08ee6a5f494345d5cb19df40",
+      "decision_fact": "7-second stream, 600238 Helius stream bytes, 2 Solana Tracker 401 access failures, coverage NOT_TESTABLE_IN_WINDOW"
+    },
+    {
+      "asset_id": "EVIDENCE-T10-JUPITER-QUOTE-RECEIPT-002",
+      "sha256": "01c6392d38ab4fd8c67bead42a9a5013d2c82206a706cb50e9aac523560490ec",
+      "decision_fact": "8 public keyless calls, 2.2-second pacing floor, 8 quote-available results, USD 0"
+    },
+    {
+      "asset_id": "EVIDENCE-T11-ENTITY-INPUT-RECEIPT-001",
+      "sha256": "324c9ace8c49668864c274de19c09d42a7e794169f9a5ad619df8b47f3209ff4",
+      "decision_fact": "3 Helius standard RPC calls, 30 modeled credits, USD 0"
+    },
+    {
+      "asset_id": "EVIDENCE-T13-PILOT-AUDIT-OFFLINE-ACCEPTANCE-001",
+      "sha256": "d932512f861736944cbca3d184528dae0366afbfdb45e185f44ba245c85f752d",
+      "decision_fact": "658-row bounded integrity accepted; sustained reliability, coverage and purchase requirement not established"
+    }
+  ],
+  "official_snapshot": [
+    {
+      "provider": "HELIUS",
+      "official_sources": [
+        "https://www.helius.dev/pricing",
+        "https://www.helius.dev/docs/billing/plans",
+        "https://www.helius.dev/docs/billing/credits",
+        "https://www.helius.dev/docs/faqs/billing"
+      ],
+      "free": {
+        "price_usd_month": 0,
+        "monthly_credits": 1000000,
+        "rpc_requests_per_second": 10,
+        "standard_websockets": true
+      },
+      "cheapest_paid_reference": {
+        "plan": "Developer",
+        "list_price_usd_month": 49,
+        "promotional_price_requires_checkout_readback": true,
+        "monthly_credits": 10000000,
+        "rpc_requests_per_second": 50
+      },
+      "streaming_meter": {
+        "credits": 2,
+        "decimal_megabytes": "0.1",
+        "billing_size_basis": "uncompressed_message_size"
+      },
+      "cancellation": {
+        "public_terms_complete_for_reference": true,
+        "summary": "Cancel in billing dashboard; service continues through current billing period and reverts to free limits."
+      }
+    },
+    {
+      "provider": "SOLANA_TRACKER",
+      "official_sources": [
+        "https://docs.solanatracker.io/pricing"
+      ],
+      "data_api_free": {
+        "price_eur_month": 0,
+        "requests_month": 10000,
+        "requests_per_second": 3
+      },
+      "data_api_paid_reference": {
+        "plan": "Advanced",
+        "price_eur_month": 50,
+        "requests_month": 200000
+      },
+      "rpc_free": {
+        "one_time_price_eur": 1,
+        "monthly_credits": 500000,
+        "requests_per_second": 5
+      },
+      "rpc_paid_reference": {
+        "plan": "Developer",
+        "price_eur_month": 35,
+        "monthly_credits": 15000000,
+        "requests_per_second": 60
+      },
+      "cancellation": {
+        "public_terms_complete_for_reference": false,
+        "summary": "Not established from the reviewed public pricing page."
+      }
+    },
+    {
+      "provider": "JUPITER",
+      "official_sources": [
+        "https://developers.jup.ag/pricing",
+        "https://developers.jup.ag/docs/portal/setup"
+      ],
+      "keyless": {
+        "signup_required": false,
+        "requests_per_second": "0.5"
+      },
+      "portal_free": {
+        "price_usd_month": 0,
+        "requests_per_second": 1
+      },
+      "paid_reference": {
+        "plan": "Developer",
+        "price_usd_month": 25,
+        "monthly_credits": 25000000,
+        "requests_per_second": 10
+      },
+      "cancellation": {
+        "public_terms_complete_for_reference": false,
+        "summary": "Not established from the reviewed public pricing and setup pages."
+      }
+    },
+    {
+      "provider": "BIRDEYE",
+      "official_sources": [
+        "https://docs.birdeye.so/docs/pricing",
+        "https://docs.birdeye.so/docs/payment"
+      ],
+      "standard": {
+        "price_usd_month": 0,
+        "included_compute_units": 30000,
+        "requests_per_second": 1,
+        "data_access": "LIMITED"
+      },
+      "paid_reference": {
+        "plan": "Lite",
+        "price_usd_month": 39,
+        "included_compute_units": 1500000,
+        "requests_per_second": 15
+      },
+      "cancellation": {
+        "public_terms_complete_for_reference": false,
+        "summary": "Account settings expose cancellation, but effective-date and refund rules were not established."
+      }
+    },
+    {
+      "provider": "RAPTOR",
+      "official_sources": [
+        "https://docs.solanatracker.io/pricing"
+      ],
+      "self_hosted": {
+        "subscription_price": 0,
+        "api_key_required": false,
+        "published_rate_limit": null
+      },
+      "hosted_beta": {
+        "published_plan_price": null,
+        "production_sla_established": false
+      },
+      "cancellation": {
+        "public_terms_complete_for_reference": false,
+        "summary": "No paid hosted plan is published."
+      }
+    }
+  ],
+  "directional_helius_capacity_estimate": {
+    "source_run": "t08a5-20260725T084127Z",
+    "stream_bytes": 600238,
+    "observed_seconds": 7,
+    "target_seconds": 604800,
+    "meter_credits": 2,
+    "meter_decimal_bytes": 100000,
+    "sensitivity_1d_bytes": 7408651886,
+    "sensitivity_1d_credits": 148175,
+    "sensitivity_7d_bytes": 51860563200,
+    "sensitivity_7d_credits": 1037213,
+    "sensitivity_30d_bytes": 222259556572,
+    "sensitivity_30d_credits": 4445193,
+    "free_monthly_credits": 1000000,
+    "sensitivity_7d_free_headroom_credits": -37213,
+    "sensitivity_30d_free_tier_multiple": "4.445193",
+    "confidence": "NON_DECISION_VALID_SENSITIVITY_ONLY",
+    "purchase_trigger": false
+  },
+  "reconsideration_gate": {
+    "all_conditions_required": [
+      "NAMED_CONSUMER_BLOCKED_BY_EXACT_PROVIDER_LIMIT",
+      "DECISION_VALID_BOUNDED_MEASUREMENT",
+      "FREE_OR_CHEAPER_PATH_FALSIFIED",
+      "CURRENT_CHECKOUT_AND_CANCELLATION_READBACK",
+      "OWNER_APPROVED_EXACT_PLAN_AND_CASH_CAP"
+    ],
+    "pricing_snapshot_expiry": "2026-08-28",
+    "default_before_all_conditions": "DEFER"
+  },
+  "observation_universe_direction": {
+    "status": "FROZEN_DOWNSTREAM_BOUNDARY_NOT_IMPLEMENTED",
+    "discovery_layer": "MINIMAL_RULE_EVALUATION_INPUTS_ONLY",
+    "detailed_observation_layer": "VERSIONED_WATCHLIST_MEMBERS_ONLY",
+    "policy_evolution": "FORWARD_ONLY_NO_HISTORICAL_REWRITE",
+    "stable_spine": [
+      "RAW_IDENTITY",
+      "POINT_IN_TIME_AVAILABILITY",
+      "IMMUTABLE_STORAGE",
+      "LINEAGE"
+    ],
+    "watchlist_membership_fields": [
+      "mint",
+      "policy_version",
+      "matched_rule_ids",
+      "hypothesis_ids",
+      "entered_at",
+      "exited_at",
+      "first_reliable_available_at",
+      "reason_codes",
+      "evidence_checkpoint"
+    ],
+    "excluded": [
+      "ALL_SOLANA_TOKEN_TICKS",
+      "CONTINUOUS_ALL_TOKEN_PRICE_CAPTURE",
+      "EVERY_LOW_LEVEL_ACTION",
+      "ULTRA_LOW_LATENCY_HFT"
+    ],
+    "downstream_owners": [
+      "TASK-15",
+      "TASK-17"
+    ]
+  },
+  "authority": {
+    "network_calls_in_atom": 0,
+    "provider_api_rpc_wss_calls_in_atom": 0,
+    "account_or_dashboard_actions": 0,
+    "credential_use": 0,
+    "dependency_changes": 0,
+    "cash_spend_usd": 0,
+    "wallet_signer_transaction_actions": 0
+  },
+  "next_atom": "T14-A3_DETERMINISTIC_DEFER_ACCEPTANCE_V1"
+}

@@ -577,7 +577,7 @@ class FixtureManifestCanonicalIntegrityTests(unittest.TestCase):
         sweep = baseline.canonical_catalog_integrity_sweep(
             allow_worktree_candidate=True
         )
-        self.assertEqual(sweep.asset_count, 262)
+        self.assertEqual(sweep.asset_count, 266)
         self.assertGreater(sweep.checked_sha256, 0)
         self.assertEqual(sweep.mismatches, ())
 
