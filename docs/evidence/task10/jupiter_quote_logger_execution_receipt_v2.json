@@ -1,0 +1,141 @@
+{
+  "receipt_id": "TASK10_JUPITER_QUOTE_LOGGER_EXECUTION_RECEIPT_V2",
+  "receipt_version": "2.0",
+  "task_id": "TASK-10",
+  "atom": "T10-A7_ACCEPTANCE_AND_FINALIZATION",
+  "source_atom": "T10-A6_BOUNDED_EXTERNAL_QUOTE_PILOT_V2",
+  "status": "PASS_BOUNDED_BUY_REVERSE_SELL_QUOTE_PANEL",
+  "created_at": "2026-07-28T02:00:54.192175Z",
+  "first_reliable_available_at": "2026-07-28T02:00:54.192175Z",
+  "accepted_base": {
+    "branch": "chore/starter-authority-alignment",
+    "head": "392c0d34ada6ca6f1721acafcc52ca63433a630f",
+    "tree": "2311522a0f6de05840964d005e76b2f2345ae368"
+  },
+  "source_selection": {
+    "selected_mint": "4vXNhA6ncbx8usZ14CfxkYeQKdaQYgrLfJXNyWcVpump",
+    "selected_mint_decimals": 6,
+    "selection_rule": "SOLE_NON_WSOL_MINT_IN_ACCEPTED_TASK09_GETTRANSACTION_TOKEN_BALANCES",
+    "price_or_route_observation_used": false,
+    "source_asset_id": "DATA-T09-PUMPSWAP-TOUCH-PROBE-RAW-001",
+    "source_run_id": "t09a4-20260727T184740Z",
+    "source_partition_sha256": "577e614c0b2f41b7a1e3ae92b6cfd965e87e4d4bca76070925873df1ef5b4466",
+    "source_content_sha256": "0de9a748669c25fa08c4d1de594899a0761db48a1ba25774dd7f4d1109eaf73d"
+  },
+  "source_run": {
+    "run_id": "t10a6-20260728T015829Z",
+    "logical_root": "task10_jupiter_quote_pilot_v2/run=t10a6-20260728T015829Z",
+    "plan_sha256": "b76c11f19f8244d6b2dfa5c4bb6c8594a5e790f22eef5010117d21b475243833",
+    "raw_partition_sha256": "0648390ba3af49bacf804aafb7cc4788fbbb7040508cfef79f88c3d1ed188d1b",
+    "raw_content_sha256": "12f0bb76938c518933e47ef0a73ea901e640948aee408b419a1cc2f74f645cce",
+    "projection_database_sha256": "c1664a1180a525477d9beba5b5d13662cf9b5ae8721506363ce34d65af50ceda",
+    "manifest_sha256": "84cf3cf6103cbf7e81e3ff05c76e363514b60a033149085a5e375e8b65e86ca4",
+    "runtime_receipt_sha256": "ac64469d0e0dd214aba775f625a90aec0006a3685921ab2234f49df89531f0a4",
+    "stored_events": 8,
+    "stored_bytes": 1406298,
+    "received_bytes": 13282,
+    "live_status": "COMPLETE",
+    "live_stop_reason": null,
+    "live_terminal_counts": {
+      "QUOTE_AVAILABLE": 8
+    }
+  },
+  "tracked_fixture": {
+    "path": "tests/fixtures/task10/jupiter_quote_logger_live_evidence_v2.json",
+    "sha256": "242e76b2295ce37b47ac851b29cd44e8b8d457a0ac7669a9b71013f0deb4d7d5",
+    "provider_bodies_in_fixture": 0,
+    "credentials_in_fixture": 0,
+    "absolute_paths_in_fixture": 0
+  },
+  "accepted_result": {
+    "transport_acceptance_status": "PASS",
+    "quote_panel_status": "PASS_BOUNDED_BUY_REVERSE_SELL_QUOTE_AVAILABLE",
+    "buy_quote_available": 4,
+    "sell_quote_available": 4,
+    "exact_reverse_input_matches": 4,
+    "no_route_observed": 0,
+    "provider_error_observed": 0,
+    "invalid_response_observed": 0,
+    "timeout_observed": 0,
+    "execution_attempt_rows": 0,
+    "quote_round_trip_delta_bps_by_usd_notional": {
+      "10": "-342.166000",
+      "25": "-480.533200",
+      "50": "-704.926400",
+      "100": "-1118.882100"
+    },
+    "size_dependent_quote_round_trip_deterioration_observed": true,
+    "normalized_fee_fields_all_null": true,
+    "fillable_established": false,
+    "realized_vwap_established": false,
+    "net_return_established": false,
+    "path_risk_established": false
+  },
+  "checks": {
+    "raw_partition_manifest_readback": "PASS",
+    "raw_content_hash_reconciled": "PASS",
+    "unique_raw_event_ids": "PASS_8_OF_8",
+    "unique_idempotency_keys": "PASS_8_OF_8",
+    "buy_panel_atomic_inputs_exact": "PASS",
+    "dependent_sell_inputs_equal_buy_outputs": "PASS_4_OF_4",
+    "quote_attempt_statuses": "PASS_8_QUOTE_AVAILABLE",
+    "pit_timestamp_ordering": "PASS",
+    "minimum_request_interval": "PASS",
+    "context_slots_monotonic_in_observed_run": "PASS",
+    "forbidden_transaction_instruction_payloads": "PASS_ZERO",
+    "fee_non_overlap_policy": "PASS",
+    "execution_attempt_rows_zero": "PASS",
+    "all_frozen_caps_respected": "PASS",
+    "fixture_is_clean_clone_portable": "PASS",
+    "secret_and_absolute_path_scan": "PASS"
+  },
+  "validation": {
+    "targeted_quote_suite": {
+      "passed": 64,
+      "failed": 0
+    },
+    "targeted_v2_evidence_suite": {
+      "passed": 12,
+      "failed": 0,
+      "status": "PASS"
+    },
+    "full_repository_suite": {
+      "passed": 834,
+      "failed": 0,
+      "status": "PASS"
+    },
+    "catalog_validation": "PASS_228_ASSETS",
+    "navigation_validation": "PASS",
+    "secret_scan": "PASS",
+    "file_hygiene": "PASS"
+  },
+  "authority": {
+    "external_authority": "T10-A6_BOUNDED_EXTERNAL_QUOTE_PILOT_V2",
+    "external_run_count": 1,
+    "external_provider_calls": 8,
+    "external_retries": 0,
+    "network_calls_during_acceptance": 0,
+    "raw_files_written_during_acceptance": 0,
+    "dependency_changes": 0,
+    "api_keys_used": 0,
+    "accounts_used": 0,
+    "provider_credits": 0,
+    "cash_spend_usd_cents": 0,
+    "wallet_signer_transaction_actions": 0,
+    "commit": false,
+    "push": false,
+    "pull_request": false,
+    "merge": false,
+    "ui_changes": false
+  },
+  "residuals": [
+    "All eight observations are provider quotes, not fills, landed transactions, realized VWAP, settled cashflow, NetReturn or PathRisk.",
+    "The observed quote-only round-trip delta worsened monotonically from -342.1660 bps at USD 10 to -1118.8821 bps at USD 100; this is bounded size-sensitivity evidence, not a causal decomposition.",
+    "The provider omitted route feeAmount and feeMint in all eight responses. Normalized fee fields remain null and provider outAmount is not reduced a second time.",
+    "No NO_ROUTE outcome occurred in this bounded panel; only the deterministic offline state transition is tested.",
+    "The legacy Jupiter quote surface is compatibility evidence only and mutable provider behavior must be revalidated before future consumers depend on it."
+  ],
+  "catalog_status": "REGISTERED_IN_TASK10_V2_CATALOG_TRANSACTION",
+  "canonical_status_candidate": "TECHNICAL_DOD_PASS_REQUIRES_REPOSITORY_FINALIZATION",
+  "state_change": "CANDIDATE_REQUIRES_CONTROL_PLANE_ACCEPTANCE"
+}

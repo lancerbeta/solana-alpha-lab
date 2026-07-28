@@ -519,7 +519,7 @@ records:
   evidence: []
   classification: *t06_internal
 - asset_id: TEST-T06-CATALOG-001
-  record_version: '1.7'
+  record_version: '1.9'
   asset_type: script
   purpose: Catalog tests for the TASK-06 stable-ID inventory, hashes, ownership, finalization handoff, consumers, no-raw-bytes boundary and monotonic active Catalog version.
   status: IMPLEMENTED_UNVERIFIED
@@ -532,7 +532,7 @@ records:
     repository_path: tests/test_task06_catalog.py
   integrity:
     kind: sha256
-    sha256: 17c5ee91e4378a8ecd32b91c7bfca36267ead4a206eefcf9289a5a0b7d8fa958
+    sha256: 844ecce43c594939c7282f7cf8d3e5ccb61e2c1e62824639784281a05ac6cd7f
   access: *t06_read_file
   relations:
   - relation_type: governed_by
@@ -2536,7 +2536,7 @@ records:
     contains_raw_data: false
     sensitivity: INTERNAL_NON_SECRET
 - asset_id: TEST-T05-CATALOG-QUERIES-001
-  record_version: '1.9'
+  record_version: '1.11'
   asset_type: script
   purpose: 'Offline tests proving TASK-05 query bounds, UTC eligibility, write denial, external-access denial, raw BLOB exclusion, task/data-contract registration and monotonic active Catalog version.'
   status: IMPLEMENTED_UNVERIFIED
@@ -2549,7 +2549,7 @@ records:
     repository_path: tests/test_task05_catalog_queries.py
   integrity:
     kind: sha256
-    sha256: 9de0686eb2188e58e565db3738e2721cf2773236d27f1280c1d578b27ad3f990
+    sha256: 3a9bde84d9dba97efce1f84dda29bf225125f48d66fec9c5f59ed3a664fb4758
   access:
     mode: read_only
     method: command
@@ -3411,7 +3411,7 @@ records:
   evidence: []
   classification: *t07_internal
 - asset_id: TEST-T07-CATALOG-001
-  record_version: '1.5'
+  record_version: '1.7'
   asset_type: script
   purpose: Catalog tests for TASK-07 stable IDs, file hashes, lineage, accepted baseline, monotonic active Catalog version and no-raw-bytes boundary.
   status: IMPLEMENTED_UNVERIFIED
@@ -3424,7 +3424,7 @@ records:
     repository_path: tests/test_task07_catalog.py
   integrity:
     kind: sha256
-    sha256: 85b0dd65675794a6d7c180284eabf356f03689c9c54401af1d38d2908796f9da
+    sha256: 60cfeaf63748d768c55d270207a01efa147c0bc0699b157b3596d89fe99b2a65
   access: *t07_read_file
   relations:
   - relation_type: depends_on
@@ -3895,7 +3895,7 @@ records:
   evidence: []
   classification: *t08_internal
 - asset_id: TEST-T08-CATALOG-001
-  record_version: '1.4'
+  record_version: '1.6'
   asset_type: script
   purpose: Catalog tests for TASK-08 stable IDs, file and raw hashes, lineage, named consumers, monotonic active Catalog version and no-raw-bytes boundary.
   status: IMPLEMENTED_UNVERIFIED
@@ -3908,7 +3908,7 @@ records:
     repository_path: tests/test_task08_catalog.py
   integrity:
     kind: sha256
-    sha256: 0b010541619a9ae5e1b19f65876df0f1401308f8e0e71e429f5b431be80e73c5
+    sha256: 7d3038e0f5c1afc0c96cb5e31a7a8b39c7154cdb7e7ffd1d34c0eef29841748b
   access: *t08_read_file
   relations:
   - relation_type: depends_on
@@ -4626,7 +4626,7 @@ records:
     contains_raw_data: false
     sensitivity: INTERNAL_NON_SECRET
 - asset_id: SCRIPT-BATON-VALIDATE-001
-  record_version: '1.4'
+  record_version: '1.5'
   asset_type: script
   purpose: Deterministic offline validator for baton schemas, fixtures, route ownership,
     standing autonomy, JIT validation, Catalog integrity, templates, and rules.
@@ -4640,7 +4640,7 @@ records:
     repository_path: scripts/validate_baton.py
   integrity:
     kind: sha256
-    sha256: cfbbafbf958e2c3e3f782e02ce4b518d373777cc1a96dc0f3c4b689c09cf66f6
+    sha256: 66dcfa8f46bdbd70715f7a0a15ca51014344ec3f6c2eb2a56c00b59f695b25f0
   access:
     mode: read_only
     method: file
@@ -4869,10 +4869,10 @@ records:
     contains_raw_data: false
     sensitivity: INTERNAL_NON_SECRET
 - asset_id: TEST-BATON-REPOSITORY-POLICY-001
-  record_version: '1.7'
+  record_version: '1.11'
   asset_type: script
   purpose: Unit tests for exact local staged, committed and published feature,
-    PR merge, main merge, and legacy repository policy.
+    PR merge, main merge, current Catalog integrity, and legacy repository policy.
   status: IMPLEMENTED_UNVERIFIED
   origin: REPOSITORY
   as_of: '2026-07-28'
@@ -4883,7 +4883,7 @@ records:
     repository_path: tests/test_baton_repository_policy.py
   integrity:
     kind: sha256
-    sha256: d79ab263d1dbc5f9125f9e9437ef3ace0f4bb7130d28d45af8c9d57dec1f93c3
+    sha256: b0cd8dc57bcf382679093ff0fd21de9e5f454801573c9a2e8c6cae254b3fd919
   access:
     mode: read_only
     method: file
@@ -5449,6 +5449,909 @@ records:
     target_asset_id: EVIDENCE-T09-PUMPSWAP-TOUCH-RECEIPT-001
   consumers:
   - TASK-09
+  evidence: []
+  classification:
+    contains_secrets: false
+    contains_raw_data: false
+    sensitivity: INTERNAL_NON_SECRET
+- asset_id: CONTRACT-T10-JUPITER-QUOTE-OBSERVATION-001
+  record_version: '1.0'
+  asset_type: control_document
+  purpose: Frozen TASK-10 quote-only compatibility estimand, provider-surface patch, buy/reverse-sell panels, PIT, typed states, accounting, caps and stop boundary.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-07-28'
+  truth_owner: TASK-10
+  location:
+    kind: git_path
+    logical_uri: repo://docs/contracts/jupiter_quote_observation_contract_v1.md
+    repository_path: docs/contracts/jupiter_quote_observation_contract_v1.md
+  integrity:
+    kind: sha256
+    sha256: 86e7a5264ae6a2cde3e95fe450f853d9e2cda01623164f39bde55162a6c3aa64
+  access:
+    mode: read_only
+    method: file
+    network_required: false
+    secrets_required: false
+  relations:
+  - relation_type: derived_from
+    target_asset_id: PRE-GIT-TASK01-A023
+  - relation_type: depends_on
+    target_asset_id: SCHEMA-T05-REL-QUOTE-ATTEMPTS-001
+  - relation_type: depends_on
+    target_asset_id: SCHEMA-T05-REL-EXECUTION-ATTEMPTS-001
+  - relation_type: depends_on
+    target_asset_id: CONTRACT-T06-RAW-STORAGE-001
+  - relation_type: depends_on
+    target_asset_id: EVIDENCE-T09-PUMPSWAP-TOUCH-RECEIPT-001
+  - relation_type: validated_by
+    target_asset_id: TEST-T10-JUPITER-QUOTE-OBSERVATION-001
+  consumers:
+  - TASK-10
+  - TASK-13
+  - TASK-18
+  - TASK-19
+  - TASK-25
+  - TASK-26
+  - TASK-36
+  - TASK-37
+  - TASK-38
+  - TASK-39
+  - TASK-40
+  - TASK-43
+  - TASK-44
+  - TASK-45
+  - TASK-46
+  - TASK-47
+  evidence: []
+  classification:
+    contains_secrets: false
+    contains_raw_data: false
+    sensitivity: INTERNAL_NON_SECRET
+- asset_id: FIXTURE-T10-JUPITER-QUOTE-OBSERVATION-001
+  record_version: '1.0'
+  asset_type: evidence
+  purpose: Deterministic synthetic TASK-10 fixture for provider-surface selection, exact atomic panels, five quote states, PIT ordering, fee policy, caps and exclusions.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-07-28'
+  truth_owner: TASK-10
+  location:
+    kind: git_path
+    logical_uri: repo://tests/fixtures/task10/jupiter_quote_observation_contract_v1.json
+    repository_path: tests/fixtures/task10/jupiter_quote_observation_contract_v1.json
+  integrity:
+    kind: sha256
+    sha256: 097ffed63c5a6950403966325c79f8c514f800cbbc2766eb8528c77e30db87aa
+  access:
+    mode: read_only
+    method: file
+    network_required: false
+    secrets_required: false
+  relations:
+  - relation_type: derived_from
+    target_asset_id: CONTRACT-T10-JUPITER-QUOTE-OBSERVATION-001
+  - relation_type: validated_by
+    target_asset_id: TEST-T10-JUPITER-QUOTE-OBSERVATION-001
+  consumers:
+  - TASK-10
+  - TASK-13
+  evidence: []
+  classification:
+    contains_secrets: false
+    contains_raw_data: false
+    sensitivity: INTERNAL_NON_SECRET
+- asset_id: TEST-T10-JUPITER-QUOTE-OBSERVATION-001
+  record_version: '1.0'
+  asset_type: script
+  purpose: Offline fail-closed TASK-10 tests for quote-only provider selection, atomic panels, five QuoteAttempt states, PIT, fee non-overlap, caps and prohibited transaction actions.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-07-28'
+  truth_owner: TASK-10
+  location:
+    kind: git_path
+    logical_uri: repo://tests/test_task10_jupiter_quote_observation_contract.py
+    repository_path: tests/test_task10_jupiter_quote_observation_contract.py
+  integrity:
+    kind: sha256
+    sha256: 4b159bcc80cf44204de0d30276dbc5c45d1f40fe4c71c8fb494741900f0b9e33
+  access:
+    mode: read_only
+    method: file
+    network_required: false
+    secrets_required: false
+  relations:
+  - relation_type: depends_on
+    target_asset_id: CONTRACT-T10-JUPITER-QUOTE-OBSERVATION-001
+  - relation_type: depends_on
+    target_asset_id: FIXTURE-T10-JUPITER-QUOTE-OBSERVATION-001
+  - relation_type: depends_on
+    target_asset_id: SCHEMA-T05-REL-QUOTE-ATTEMPTS-001
+  consumers:
+  - TASK-10
+  evidence: []
+  classification:
+    contains_secrets: false
+    contains_raw_data: false
+    sensitivity: INTERNAL_NON_SECRET
+- asset_id: MODULE-T10-JUPITER-QUOTE-LOGGER-001
+  record_version: '1.1'
+  asset_type: script
+  purpose: Offline TASK-10 request identity, five-state quote classification, exact
+    reverse-sell projection, in-memory redacted raw envelope and fail-closed typed
+    adapter for the observed additive Jupiter quote schema.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-07-28'
+  truth_owner: TASK-10
+  location:
+    kind: git_path
+    logical_uri: repo://src/solana_alpha_lab/jupiter_quote_logger.py
+    repository_path: src/solana_alpha_lab/jupiter_quote_logger.py
+  integrity:
+    kind: sha256
+    sha256: 811f08e43eb26c99ef93dccfade372cbae5adb1c1ee718c7ff6d3ce543a9d507
+  access:
+    mode: read_only
+    method: file
+    network_required: false
+    secrets_required: false
+  relations:
+  - relation_type: governed_by
+    target_asset_id: CONTRACT-T10-JUPITER-QUOTE-OBSERVATION-001
+  - relation_type: depends_on
+    target_asset_id: SCHEMA-T05-REL-QUOTE-ATTEMPTS-001
+  - relation_type: depends_on
+    target_asset_id: CONTRACT-T06-RAW-STORAGE-001
+  - relation_type: validated_by
+    target_asset_id: TEST-T10-JUPITER-QUOTE-LOGGER-001
+  consumers:
+  - TASK-10
+  - TASK-13
+  - TASK-18
+  - TASK-19
+  - TASK-25
+  - TASK-26
+  - TASK-36
+  - TASK-37
+  - TASK-38
+  - TASK-39
+  - TASK-40
+  - TASK-43
+  - TASK-44
+  - TASK-45
+  - TASK-46
+  - TASK-47
+  evidence: []
+  classification:
+    contains_secrets: false
+    contains_raw_data: false
+    sensitivity: INTERNAL_NON_SECRET
+- asset_id: SCRIPT-T10-JUPITER-QUOTE-LOGGER-001
+  record_version: '1.2'
+  asset_type: script
+  purpose: TASK-10 CLI for read-only synthetic replay and the exact-authority bounded
+    external quote pilot with frozen caps, stop conditions and durable evidence.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-07-28'
+  truth_owner: TASK-10
+  location:
+    kind: git_path
+    logical_uri: repo://scripts/run_task10_jupiter_quote_logger.py
+    repository_path: scripts/run_task10_jupiter_quote_logger.py
+  integrity:
+    kind: sha256
+    sha256: b4bc139f37a086dd1599882dd0672862e9f8fb312c8215b9b9fac8c667a7ecaf
+  access:
+    mode: read_only
+    method: file
+    network_required: false
+    secrets_required: false
+  relations:
+  - relation_type: depends_on
+    target_asset_id: MODULE-T10-JUPITER-QUOTE-LOGGER-001
+  - relation_type: validated_by
+    target_asset_id: TEST-T10-JUPITER-QUOTE-LOGGER-001
+  consumers:
+  - TASK-10
+  evidence: []
+  classification:
+    contains_secrets: false
+    contains_raw_data: false
+    sensitivity: INTERNAL_NON_SECRET
+- asset_id: FIXTURE-T10-JUPITER-QUOTE-LOGGER-001
+  record_version: '1.0'
+  asset_type: evidence
+  purpose: Deterministic synthetic TASK-10 transport cases covering available quote,
+    explicit no-route, provider failure, forbidden payload and timeout.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-07-28'
+  truth_owner: TASK-10
+  location:
+    kind: git_path
+    logical_uri: repo://tests/fixtures/task10/jupiter_quote_logger_cases_v1.json
+    repository_path: tests/fixtures/task10/jupiter_quote_logger_cases_v1.json
+  integrity:
+    kind: sha256
+    sha256: 744d79202805746271547123a6aff23cb299eb2b0b52e3639f4bf5a2554a2382
+  access:
+    mode: read_only
+    method: file
+    network_required: false
+    secrets_required: false
+  relations:
+  - relation_type: derived_from
+    target_asset_id: CONTRACT-T10-JUPITER-QUOTE-OBSERVATION-001
+  - relation_type: validated_by
+    target_asset_id: TEST-T10-JUPITER-QUOTE-LOGGER-001
+  consumers:
+  - TASK-10
+  - TASK-13
+  evidence: []
+  classification:
+    contains_secrets: false
+    contains_raw_data: false
+    sensitivity: INTERNAL_NON_SECRET
+- asset_id: TEST-T10-JUPITER-QUOTE-LOGGER-001
+  record_version: '1.1'
+  asset_type: script
+  purpose: Offline fail-closed TASK-10 tests for atomic panels, five terminal states,
+    PIT ordering, raw identity, fee non-overlap, sell dependency, network tripwire
+    and the exact typed additive Jupiter schema repair.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-07-28'
+  truth_owner: TASK-10
+  location:
+    kind: git_path
+    logical_uri: repo://tests/test_task10_jupiter_quote_logger.py
+    repository_path: tests/test_task10_jupiter_quote_logger.py
+  integrity:
+    kind: sha256
+    sha256: 9c2aa0d1e2f98d9f70ab90a90f1d2af596aa6e7f519de50370b311706eedac83
+  access:
+    mode: read_only
+    method: file
+    network_required: false
+    secrets_required: false
+  relations:
+  - relation_type: depends_on
+    target_asset_id: CONTRACT-T10-JUPITER-QUOTE-OBSERVATION-001
+  - relation_type: depends_on
+    target_asset_id: MODULE-T10-JUPITER-QUOTE-LOGGER-001
+  - relation_type: depends_on
+    target_asset_id: SCRIPT-T10-JUPITER-QUOTE-LOGGER-001
+  - relation_type: depends_on
+    target_asset_id: FIXTURE-T10-JUPITER-QUOTE-LOGGER-001
+  - relation_type: depends_on
+    target_asset_id: SCHEMA-T05-REL-QUOTE-ATTEMPTS-001
+  consumers:
+  - TASK-10
+  evidence: []
+  classification:
+    contains_secrets: false
+    contains_raw_data: false
+    sensitivity: INTERNAL_NON_SECRET
+- asset_id: FIXTURE-T10-JUPITER-QUOTE-PILOT-PLAN-001
+  record_version: '1.0'
+  asset_type: evidence
+  purpose: Frozen pre-observation TASK-10 mint selection, public keyless Jupiter
+    surface, exact atomic panels, external caps, stop conditions, storage targets
+    and authority boundary.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-07-28'
+  truth_owner: TASK-10
+  location:
+    kind: git_path
+    logical_uri: repo://tests/fixtures/task10/jupiter_quote_pilot_plan_v1.json
+    repository_path: tests/fixtures/task10/jupiter_quote_pilot_plan_v1.json
+  integrity:
+    kind: sha256
+    sha256: ec22bfa5e183a2787d5c1e4e07fb6e6e25996fbacc8b356d089588da1ff6d21b
+  access:
+    mode: read_only
+    method: file
+    network_required: false
+    secrets_required: false
+  relations:
+  - relation_type: governed_by
+    target_asset_id: CONTRACT-T10-JUPITER-QUOTE-OBSERVATION-001
+  - relation_type: derived_from
+    target_asset_id: EVIDENCE-T09-PUMPSWAP-TOUCH-RECEIPT-001
+  - relation_type: validated_by
+    target_asset_id: TEST-T10-JUPITER-QUOTE-TRANSPORT-001
+  consumers:
+  - TASK-10
+  evidence: []
+  classification:
+    contains_secrets: false
+    contains_raw_data: false
+    sensitivity: INTERNAL_NON_SECRET
+- asset_id: MODULE-T10-JUPITER-QUOTE-TRANSPORT-001
+  record_version: '1.1'
+  asset_type: script
+  purpose: Exact-authority keyless Jupiter quote transport with no redirects or
+    retries, sequential pacing, hard call/byte/time caps, durable TASK-06 Parquet
+    raw envelopes and TASK-05 DuckDB quote projection.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-07-28'
+  truth_owner: TASK-10
+  location:
+    kind: git_path
+    logical_uri: repo://src/solana_alpha_lab/jupiter_quote_transport.py
+    repository_path: src/solana_alpha_lab/jupiter_quote_transport.py
+  integrity:
+    kind: sha256
+    sha256: dd47c8368b84b190fd2312e1486a08c1b5e7301db036391b30b2d8ac22399ff4
+  access:
+    mode: read_only
+    method: file
+    network_required: false
+    secrets_required: false
+  relations:
+  - relation_type: governed_by
+    target_asset_id: CONTRACT-T10-JUPITER-QUOTE-OBSERVATION-001
+  - relation_type: depends_on
+    target_asset_id: FIXTURE-T10-JUPITER-QUOTE-PILOT-PLAN-001
+  - relation_type: depends_on
+    target_asset_id: FIXTURE-T10-JUPITER-QUOTE-PILOT-PLAN-002
+  - relation_type: depends_on
+    target_asset_id: MODULE-T10-JUPITER-QUOTE-LOGGER-001
+  - relation_type: depends_on
+    target_asset_id: CONTRACT-T06-RAW-STORAGE-001
+  - relation_type: validated_by
+    target_asset_id: TEST-T10-JUPITER-QUOTE-TRANSPORT-001
+  consumers:
+  - TASK-10
+  evidence: []
+  classification:
+    contains_secrets: false
+    contains_raw_data: false
+    sensitivity: INTERNAL_NON_SECRET
+- asset_id: TEST-T10-JUPITER-QUOTE-TRANSPORT-001
+  record_version: '1.1'
+  asset_type: script
+  purpose: Deterministic TASK-10 tests for external authority, exact endpoint and
+    panels, no redirects/retries, pacing, response and durable byte caps, stop
+    conditions, Parquet/DuckDB persistence and zero execution rows.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-07-28'
+  truth_owner: TASK-10
+  location:
+    kind: git_path
+    logical_uri: repo://tests/test_task10_jupiter_quote_transport.py
+    repository_path: tests/test_task10_jupiter_quote_transport.py
+  integrity:
+    kind: sha256
+    sha256: 8f02e2830660124e929235d445021309bc24b1e0697d6980c92660fe65cbaee3
+  access:
+    mode: read_only
+    method: file
+    network_required: false
+    secrets_required: false
+  relations:
+  - relation_type: depends_on
+    target_asset_id: FIXTURE-T10-JUPITER-QUOTE-PILOT-PLAN-001
+  - relation_type: depends_on
+    target_asset_id: FIXTURE-T10-JUPITER-QUOTE-PILOT-PLAN-002
+  - relation_type: depends_on
+    target_asset_id: MODULE-T10-JUPITER-QUOTE-TRANSPORT-001
+  consumers:
+  - TASK-10
+  evidence: []
+  classification:
+    contains_secrets: false
+    contains_raw_data: false
+    sensitivity: INTERNAL_NON_SECRET
+- asset_id: DATA-T10-JUPITER-QUOTE-PILOT-RAW-001
+  record_version: '1.0'
+  asset_type: evidence
+  purpose: Logical content-addressed pointer to the immutable ignored TASK-10
+    Jupiter quote raw partition preserving the fail-closed live schema drift; raw
+    bytes remain outside Git.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: RUNTIME
+  as_of: '2026-07-28'
+  truth_owner: TASK-10
+  location:
+    kind: logical_only
+    logical_uri: raw://task10_jupiter_quote_pilot_v1/run=t10a4-20260728T011304Z/partitions/quotes.parquet
+  integrity:
+    kind: sha256
+    sha256: eed05d3c5f65f5adf4e77c07e0fbbccd94856ecabfcb7c5b963e3c0611c8cb67
+  access:
+    mode: read_only
+    method: runtime_attestation
+    network_required: false
+    secrets_required: false
+  relations:
+  - relation_type: derived_from
+    target_asset_id: MODULE-T10-JUPITER-QUOTE-TRANSPORT-001
+  - relation_type: evidenced_by
+    target_asset_id: EVIDENCE-T10-JUPITER-QUOTE-RECEIPT-001
+  - relation_type: validated_by
+    target_asset_id: TEST-T10-JUPITER-QUOTE-EVIDENCE-001
+  consumers:
+  - TASK-10
+  - TASK-13
+  evidence:
+  - evidence_id: EVIDENCE-T10-JUPITER-QUOTE-RECEIPT-001
+    kind: runtime_receipt
+    reference: docs/evidence/task10/jupiter_quote_logger_execution_receipt_v1.json
+    result: PENDING
+  classification:
+    contains_secrets: false
+    contains_raw_data: false
+    sensitivity: INTERNAL_NON_SECRET
+- asset_id: DATA-T10-JUPITER-QUOTE-PROJECTION-001
+  record_version: '1.0'
+  asset_type: evidence
+  purpose: Logical content-addressed pointer to the immutable ignored TASK-10
+    DuckDB projection with one historical invalid quote row and zero execution
+    rows; bytes remain outside Git.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: RUNTIME
+  as_of: '2026-07-28'
+  truth_owner: TASK-10
+  location:
+    kind: logical_only
+    logical_uri: raw://task10_jupiter_quote_pilot_v1/run=t10a4-20260728T011304Z/projections/quotes.duckdb
+  integrity:
+    kind: sha256
+    sha256: 557692a5a37a6d30e8e7ed9e293e5ee24cb6315c9c8714b09e2d561a75d18f5b
+  access:
+    mode: read_only
+    method: runtime_attestation
+    network_required: false
+    secrets_required: false
+  relations:
+  - relation_type: derived_from
+    target_asset_id: DATA-T10-JUPITER-QUOTE-PILOT-RAW-001
+  - relation_type: evidenced_by
+    target_asset_id: EVIDENCE-T10-JUPITER-QUOTE-RECEIPT-001
+  - relation_type: validated_by
+    target_asset_id: TEST-T10-JUPITER-QUOTE-EVIDENCE-001
+  consumers:
+  - TASK-10
+  - TASK-13
+  evidence:
+  - evidence_id: EVIDENCE-T10-JUPITER-QUOTE-RECEIPT-001
+    kind: runtime_receipt
+    reference: docs/evidence/task10/jupiter_quote_logger_execution_receipt_v1.json
+    result: PENDING
+  classification:
+    contains_secrets: false
+    contains_raw_data: false
+    sensitivity: INTERNAL_NON_SECRET
+- asset_id: FIXTURE-T10-JUPITER-QUOTE-LIVE-EVIDENCE-001
+  record_version: '1.0'
+  asset_type: evidence
+  purpose: Portable sanitized TASK-10 live quote metadata preserving selection,
+    caps, exact raw identities, typed schema drift, offline replay candidate,
+    costs and explicit non-claims without provider bodies.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-07-28'
+  truth_owner: TASK-10
+  location:
+    kind: git_path
+    logical_uri: repo://tests/fixtures/task10/jupiter_quote_logger_live_evidence_v1.json
+    repository_path: tests/fixtures/task10/jupiter_quote_logger_live_evidence_v1.json
+  integrity:
+    kind: sha256
+    sha256: 8d02ae7e5f32c65c97de2a725d9ed64220c99e09942d3efae356b273ef1d2409
+  access:
+    mode: read_only
+    method: file
+    network_required: false
+    secrets_required: false
+  relations:
+  - relation_type: derived_from
+    target_asset_id: DATA-T10-JUPITER-QUOTE-PILOT-RAW-001
+  - relation_type: derived_from
+    target_asset_id: DATA-T10-JUPITER-QUOTE-PROJECTION-001
+  - relation_type: validated_by
+    target_asset_id: TEST-T10-JUPITER-QUOTE-EVIDENCE-001
+  consumers:
+  - TASK-10
+  - TASK-13
+  evidence: []
+  classification:
+    contains_secrets: false
+    contains_raw_data: false
+    sensitivity: INTERNAL_NON_SECRET
+- asset_id: EVIDENCE-T10-JUPITER-QUOTE-RECEIPT-001
+  record_version: '1.0'
+  asset_type: evidence
+  purpose: Machine-readable TASK-10 fail-closed live run, immutable raw hashes,
+    typed additive schema repair, offline quote candidate, caps, costs and
+    explicit unobserved execution claims.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-07-28'
+  truth_owner: TASK-10
+  location:
+    kind: git_path
+    logical_uri: repo://docs/evidence/task10/jupiter_quote_logger_execution_receipt_v1.json
+    repository_path: docs/evidence/task10/jupiter_quote_logger_execution_receipt_v1.json
+  integrity:
+    kind: sha256
+    sha256: 024f6f4bf81f28dbfa431296fca8373482546debe6acfee9ac90835acfc00ad9
+  access:
+    mode: read_only
+    method: file
+    network_required: false
+    secrets_required: false
+  relations:
+  - relation_type: derived_from
+    target_asset_id: FIXTURE-T10-JUPITER-QUOTE-LIVE-EVIDENCE-001
+  - relation_type: derived_from
+    target_asset_id: DATA-T10-JUPITER-QUOTE-PILOT-RAW-001
+  - relation_type: derived_from
+    target_asset_id: DATA-T10-JUPITER-QUOTE-PROJECTION-001
+  - relation_type: validated_by
+    target_asset_id: TEST-T10-JUPITER-QUOTE-EVIDENCE-001
+  consumers:
+  - TASK-10
+  - TASK-13
+  - TASK-18
+  - TASK-19
+  evidence: []
+  classification:
+    contains_secrets: false
+    contains_raw_data: false
+    sensitivity: INTERNAL_NON_SECRET
+- asset_id: EVIDENCE-T10-JUPITER-QUOTE-SUMMARY-001
+  record_version: '1.0'
+  asset_type: evidence
+  purpose: Human-readable TASK-10 fail-closed run, typed schema repair, candidate
+    quote metrics, raw pointers, authority, costs, residuals and exact next gate.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-07-28'
+  truth_owner: TASK-10
+  location:
+    kind: git_path
+    logical_uri: repo://docs/evidence/task10/jupiter_quote_logger_execution_summary_v1.md
+    repository_path: docs/evidence/task10/jupiter_quote_logger_execution_summary_v1.md
+  integrity:
+    kind: sha256
+    sha256: 252154240fae32135144c93c2246e2af36c4e2c0171982b0f87d17dbeab8d505
+  access:
+    mode: read_only
+    method: file
+    network_required: false
+    secrets_required: false
+  relations:
+  - relation_type: derived_from
+    target_asset_id: FIXTURE-T10-JUPITER-QUOTE-LIVE-EVIDENCE-001
+  - relation_type: evidenced_by
+    target_asset_id: EVIDENCE-T10-JUPITER-QUOTE-RECEIPT-001
+  consumers:
+  - TASK-10
+  - TASK-13
+  - TASK-18
+  - TASK-19
+  evidence: []
+  classification:
+    contains_secrets: false
+    contains_raw_data: false
+    sensitivity: INTERNAL_NON_SECRET
+- asset_id: TEST-T10-JUPITER-QUOTE-EVIDENCE-001
+  record_version: '1.0'
+  asset_type: script
+  purpose: Fail-closed tests for raw hash reconciliation, typed schema repair,
+    historical immutability, offline replay candidate, caps, sanitization,
+    execution non-claims and Catalog registration.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-07-28'
+  truth_owner: TASK-10
+  location:
+    kind: git_path
+    logical_uri: repo://tests/test_task10_jupiter_quote_logger_evidence.py
+    repository_path: tests/test_task10_jupiter_quote_logger_evidence.py
+  integrity:
+    kind: sha256
+    sha256: 62d7d67ff75694ab3d540d9cdaceafb4d652ba38a36ff042a5e184d4bf326342
+  access:
+    mode: read_only
+    method: file
+    network_required: false
+    secrets_required: false
+  relations:
+  - relation_type: depends_on
+    target_asset_id: FIXTURE-T10-JUPITER-QUOTE-LIVE-EVIDENCE-001
+  - relation_type: depends_on
+    target_asset_id: EVIDENCE-T10-JUPITER-QUOTE-RECEIPT-001
+  consumers:
+  - TASK-10
+  evidence: []
+  classification:
+    contains_secrets: false
+    contains_raw_data: false
+    sensitivity: INTERNAL_NON_SECRET
+- asset_id: FIXTURE-T10-JUPITER-QUOTE-PILOT-PLAN-002
+  record_version: '2.0'
+  asset_type: evidence
+  purpose: Frozen pre-observation TASK-10 A6 mint lineage, exact buy and dependent
+    reverse-sell panels, isolated v2 raw root, public keyless provider surface,
+    hard caps, stop conditions and explicit external authority.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-07-28'
+  truth_owner: TASK-10
+  location:
+    kind: git_path
+    logical_uri: repo://tests/fixtures/task10/jupiter_quote_pilot_plan_v2.json
+    repository_path: tests/fixtures/task10/jupiter_quote_pilot_plan_v2.json
+  integrity:
+    kind: sha256
+    sha256: b76c11f19f8244d6b2dfa5c4bb6c8594a5e790f22eef5010117d21b475243833
+  access:
+    mode: read_only
+    method: file
+    network_required: false
+    secrets_required: false
+  relations:
+  - relation_type: governed_by
+    target_asset_id: CONTRACT-T10-JUPITER-QUOTE-OBSERVATION-001
+  - relation_type: derived_from
+    target_asset_id: EVIDENCE-T09-PUMPSWAP-TOUCH-RECEIPT-001
+  - relation_type: derived_from
+    target_asset_id: EVIDENCE-T10-JUPITER-QUOTE-RECEIPT-001
+  - relation_type: validated_by
+    target_asset_id: TEST-T10-JUPITER-QUOTE-TRANSPORT-001
+  consumers:
+  - TASK-10
+  evidence: []
+  classification:
+    contains_secrets: false
+    contains_raw_data: false
+    sensitivity: INTERNAL_NON_SECRET
+- asset_id: DATA-T10-JUPITER-QUOTE-PILOT-RAW-002
+  record_version: '2.0'
+  asset_type: evidence
+  purpose: Logical content-addressed pointer to the immutable ignored TASK-10 A6
+    raw partition containing four buy and four exact reverse-sell public Jupiter
+    quote observations; raw bytes remain outside Git.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: RUNTIME
+  as_of: '2026-07-28'
+  truth_owner: TASK-10
+  location:
+    kind: logical_only
+    logical_uri: raw://task10_jupiter_quote_pilot_v2/run=t10a6-20260728T015829Z/partitions/quotes.parquet
+  integrity:
+    kind: sha256
+    sha256: 0648390ba3af49bacf804aafb7cc4788fbbb7040508cfef79f88c3d1ed188d1b
+  access:
+    mode: read_only
+    method: runtime_attestation
+    network_required: false
+    secrets_required: false
+  relations:
+  - relation_type: derived_from
+    target_asset_id: FIXTURE-T10-JUPITER-QUOTE-PILOT-PLAN-002
+  - relation_type: derived_from
+    target_asset_id: MODULE-T10-JUPITER-QUOTE-TRANSPORT-001
+  - relation_type: evidenced_by
+    target_asset_id: EVIDENCE-T10-JUPITER-QUOTE-RECEIPT-002
+  - relation_type: validated_by
+    target_asset_id: TEST-T10-JUPITER-QUOTE-EVIDENCE-002
+  consumers:
+  - TASK-10
+  - TASK-13
+  - TASK-25
+  - TASK-26
+  evidence:
+  - evidence_id: EVIDENCE-T10-JUPITER-QUOTE-RECEIPT-002
+    kind: runtime_receipt
+    reference: docs/evidence/task10/jupiter_quote_logger_execution_receipt_v2.json
+    result: PENDING
+  classification:
+    contains_secrets: false
+    contains_raw_data: false
+    sensitivity: INTERNAL_NON_SECRET
+- asset_id: DATA-T10-JUPITER-QUOTE-PROJECTION-002
+  record_version: '2.0'
+  asset_type: evidence
+  purpose: Logical content-addressed pointer to the immutable ignored TASK-10 A6
+    DuckDB projection with eight quote attempts and zero execution attempts;
+    bytes remain outside Git.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: RUNTIME
+  as_of: '2026-07-28'
+  truth_owner: TASK-10
+  location:
+    kind: logical_only
+    logical_uri: raw://task10_jupiter_quote_pilot_v2/run=t10a6-20260728T015829Z/projections/quotes.duckdb
+  integrity:
+    kind: sha256
+    sha256: c1664a1180a525477d9beba5b5d13662cf9b5ae8721506363ce34d65af50ceda
+  access:
+    mode: read_only
+    method: runtime_attestation
+    network_required: false
+    secrets_required: false
+  relations:
+  - relation_type: derived_from
+    target_asset_id: DATA-T10-JUPITER-QUOTE-PILOT-RAW-002
+  - relation_type: evidenced_by
+    target_asset_id: EVIDENCE-T10-JUPITER-QUOTE-RECEIPT-002
+  - relation_type: validated_by
+    target_asset_id: TEST-T10-JUPITER-QUOTE-EVIDENCE-002
+  consumers:
+  - TASK-10
+  - TASK-13
+  - TASK-25
+  - TASK-26
+  evidence:
+  - evidence_id: EVIDENCE-T10-JUPITER-QUOTE-RECEIPT-002
+    kind: runtime_receipt
+    reference: docs/evidence/task10/jupiter_quote_logger_execution_receipt_v2.json
+    result: PENDING
+  classification:
+    contains_secrets: false
+    contains_raw_data: false
+    sensitivity: INTERNAL_NON_SECRET
+- asset_id: FIXTURE-T10-JUPITER-QUOTE-LIVE-EVIDENCE-002
+  record_version: '2.0'
+  asset_type: evidence
+  purpose: Portable sanitized TASK-10 A6 evidence preserving exact panel metrics,
+    route identities, quote-only round-trip deterioration, PIT observability,
+    raw identities, caps, costs and non-claims without provider bodies.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-07-28'
+  truth_owner: TASK-10
+  location:
+    kind: git_path
+    logical_uri: repo://tests/fixtures/task10/jupiter_quote_logger_live_evidence_v2.json
+    repository_path: tests/fixtures/task10/jupiter_quote_logger_live_evidence_v2.json
+  integrity:
+    kind: sha256
+    sha256: 242e76b2295ce37b47ac851b29cd44e8b8d457a0ac7669a9b71013f0deb4d7d5
+  access:
+    mode: read_only
+    method: file
+    network_required: false
+    secrets_required: false
+  relations:
+  - relation_type: derived_from
+    target_asset_id: DATA-T10-JUPITER-QUOTE-PILOT-RAW-002
+  - relation_type: derived_from
+    target_asset_id: DATA-T10-JUPITER-QUOTE-PROJECTION-002
+  - relation_type: validated_by
+    target_asset_id: TEST-T10-JUPITER-QUOTE-EVIDENCE-002
+  consumers:
+  - TASK-10
+  - TASK-13
+  - TASK-25
+  - TASK-26
+  evidence: []
+  classification:
+    contains_secrets: false
+    contains_raw_data: false
+    sensitivity: INTERNAL_NON_SECRET
+- asset_id: EVIDENCE-T10-JUPITER-QUOTE-RECEIPT-002
+  record_version: '2.0'
+  asset_type: evidence
+  purpose: Machine-readable TASK-10 A6 acceptance for all buy and exact reverse-sell
+    quote panels, immutable raw hashes, PIT observability, quote-only size
+    deterioration, caps, costs, fee null policy and execution non-claims.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-07-28'
+  truth_owner: TASK-10
+  location:
+    kind: git_path
+    logical_uri: repo://docs/evidence/task10/jupiter_quote_logger_execution_receipt_v2.json
+    repository_path: docs/evidence/task10/jupiter_quote_logger_execution_receipt_v2.json
+  integrity:
+    kind: sha256
+    sha256: 01c6392d38ab4fd8c67bead42a9a5013d2c82206a706cb50e9aac523560490ec
+  access:
+    mode: read_only
+    method: file
+    network_required: false
+    secrets_required: false
+  relations:
+  - relation_type: derived_from
+    target_asset_id: FIXTURE-T10-JUPITER-QUOTE-LIVE-EVIDENCE-002
+  - relation_type: derived_from
+    target_asset_id: DATA-T10-JUPITER-QUOTE-PILOT-RAW-002
+  - relation_type: derived_from
+    target_asset_id: DATA-T10-JUPITER-QUOTE-PROJECTION-002
+  - relation_type: validated_by
+    target_asset_id: TEST-T10-JUPITER-QUOTE-EVIDENCE-002
+  consumers:
+  - TASK-10
+  - TASK-13
+  - TASK-18
+  - TASK-19
+  - TASK-25
+  - TASK-26
+  evidence: []
+  classification:
+    contains_secrets: false
+    contains_raw_data: false
+    sensitivity: INTERNAL_NON_SECRET
+- asset_id: EVIDENCE-T10-JUPITER-QUOTE-SUMMARY-002
+  record_version: '2.0'
+  asset_type: evidence
+  purpose: Human-readable TASK-10 A6 buy/reverse-sell quote compatibility result,
+    panel metrics, size deterioration, latency/cadence, immutable raw pointers,
+    authority, costs, fee policy, boundaries and downstream warning.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-07-28'
+  truth_owner: TASK-10
+  location:
+    kind: git_path
+    logical_uri: repo://docs/evidence/task10/jupiter_quote_logger_execution_summary_v2.md
+    repository_path: docs/evidence/task10/jupiter_quote_logger_execution_summary_v2.md
+  integrity:
+    kind: sha256
+    sha256: 578b5312246303cf6da38e45f52077b2e6a0dfa4f9e0e318c824fb20ab03dccd
+  access:
+    mode: read_only
+    method: file
+    network_required: false
+    secrets_required: false
+  relations:
+  - relation_type: derived_from
+    target_asset_id: FIXTURE-T10-JUPITER-QUOTE-LIVE-EVIDENCE-002
+  - relation_type: evidenced_by
+    target_asset_id: EVIDENCE-T10-JUPITER-QUOTE-RECEIPT-002
+  consumers:
+  - TASK-10
+  - TASK-13
+  - TASK-18
+  - TASK-19
+  - TASK-25
+  - TASK-26
+  evidence: []
+  classification:
+    contains_secrets: false
+    contains_raw_data: false
+    sensitivity: INTERNAL_NON_SECRET
+- asset_id: TEST-T10-JUPITER-QUOTE-EVIDENCE-002
+  record_version: '2.0'
+  asset_type: script
+  purpose: Fail-closed tests for TASK-10 A6 raw hashes, exact buy/reverse-sell
+    pairing, quote-only size deterioration, PIT pacing and latency, fee nulls,
+    caps, sanitization, execution non-claims and Catalog registration.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-07-28'
+  truth_owner: TASK-10
+  location:
+    kind: git_path
+    logical_uri: repo://tests/test_task10_jupiter_quote_logger_evidence_v2.py
+    repository_path: tests/test_task10_jupiter_quote_logger_evidence_v2.py
+  integrity:
+    kind: sha256
+    sha256: 35b80a47d55a515ee36f0a7539b9476989cf618c791ad9f76fa741cf86791f88
+  access:
+    mode: read_only
+    method: file
+    network_required: false
+    secrets_required: false
+  relations:
+  - relation_type: depends_on
+    target_asset_id: FIXTURE-T10-JUPITER-QUOTE-LIVE-EVIDENCE-002
+  - relation_type: depends_on
+    target_asset_id: EVIDENCE-T10-JUPITER-QUOTE-RECEIPT-002
+  consumers:
+  - TASK-10
   evidence: []
   classification:
     contains_secrets: false

@@ -573,11 +573,11 @@ class FixtureManifestCanonicalIntegrityTests(unittest.TestCase):
         )
         self.assertEqual(result.returncode, 0)
 
-    def test_all_205_catalog_assets_have_canonical_integrity(self) -> None:
+    def test_all_current_catalog_assets_have_canonical_integrity(self) -> None:
         sweep = baseline.canonical_catalog_integrity_sweep(
             allow_worktree_candidate=True
         )
-        self.assertEqual(sweep.asset_count, 205)
+        self.assertEqual(sweep.asset_count, 228)
         self.assertGreater(sweep.checked_sha256, 0)
         self.assertEqual(sweep.mismatches, ())
 
