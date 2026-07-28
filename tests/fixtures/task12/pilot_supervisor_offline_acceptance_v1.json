@@ -1,0 +1,290 @@
+{
+  "schema": "solana_alpha_lab.pilot_supervisor_offline_acceptance",
+  "schema_version": "1.0",
+  "acceptance_id": "EVIDENCE-T12-PILOT-SUPERVISOR-OFFLINE-ACCEPTANCE-001",
+  "task_id": "TASK-12",
+  "atom_id": "T12-A4_DETERMINISTIC_OFFLINE_ACCEPTANCE_V1",
+  "as_of": "2026-07-28",
+  "status": "FROZEN_EXPECTED_OFFLINE_ACCEPTANCE",
+  "accepted_claim": "THIN_OFFLINE_SUPERVISOR_DETERMINISTIC_CONTROL_ACCEPTANCE",
+  "consumer": {
+    "asset_id": "SCRIPT-T11-ENTITY-INPUT-PROBE-001",
+    "launcher_path": "scripts/run_task11_entity_input_probe.py",
+    "mode": "OFFLINE_PREFLIGHT_ONLY",
+    "sanitized_argv": [
+      "{python}",
+      "-B",
+      "scripts/run_task11_entity_input_probe.py"
+    ],
+    "forbidden_arguments": [
+      "--execute",
+      "--replay-run"
+    ],
+    "success_marker": "TASK11_ENTITY_PROBE_PREFLIGHT: PASS",
+    "logical_target_scope": "TASK11_ENTITY_INPUT_OFFLINE_PREFLIGHT",
+    "child_plan_sha256": "ff0524ab2a77b517f8796ff54a753842306b83de9be6e8d4c391776afba0cf1d"
+  },
+  "source_fingerprints": [
+    {
+      "path": "docs/contracts/pilot_supervisor_contract_v1.md",
+      "sha256": "f65f068746f9239e13b30707ef99a6b8c2713d4635f926dd4d6fd7c61028848f"
+    },
+    {
+      "path": "tests/fixtures/task12/pilot_supervisor_contract_v1.json",
+      "sha256": "dad8c95b2e81fe918a04fa651cb55e8556ee91cdeb0074161b7315d69821df2c"
+    },
+    {
+      "path": "tests/test_task12_pilot_supervisor_contract.py",
+      "sha256": "b35729f1e3578766f9cf46f0ff6f2a5406db0c189aaa9b9fd4fb150994373176"
+    },
+    {
+      "path": "src/solana_alpha_lab/pilot_supervisor.py",
+      "sha256": "b235b7b19fab79a888a4fb55afbe50d0f62868588f227473297ea7278f7849da"
+    },
+    {
+      "path": "scripts/run_task12_pilot_supervisor.py",
+      "sha256": "fb85b2e0a9fc60a01dc01f80817ae1458471861728ef4635eb5a0893d434405f"
+    },
+    {
+      "path": "tests/test_task12_pilot_supervisor.py",
+      "sha256": "0051fc08df922a3cf8ec09ef6584e172255c730e42d62409fc4a8c280e057daa"
+    },
+    {
+      "path": "tests/fixtures/task11/entity_input_pilot_plan_v1.json",
+      "sha256": "ff0524ab2a77b517f8796ff54a753842306b83de9be6e8d4c391776afba0cf1d"
+    },
+    {
+      "path": "scripts/run_task11_entity_input_probe.py",
+      "sha256": "1f55be602f12d972e429e29da85afc986d093bcd84a72fd147604e1351e7d877"
+    }
+  ],
+  "vectors": [
+    {
+      "vector_id": "OFFLINE_PREFLIGHT_SUCCESS",
+      "window_start": "2026-07-28T13:00:00Z",
+      "run_id": "t12-cf52e65803302dba76c61ad534188d78bb22347696868335faf59cfb358b03f7",
+      "duplicate_key": "12b195a28a684ac5de3118b41732f195a9921f5973fb5fd9bc673a5109da4092",
+      "child_mode": "REAL_ALLOWLISTED_OFFLINE_PREFLIGHT",
+      "expected": {
+        "state": "SUCCEEDED",
+        "reason": null,
+        "child_exit_code_class": "ZERO",
+        "child_spawn_count": 1,
+        "success_marker_observed": true,
+        "retry_count": 0
+      },
+      "required_event_types": [
+        "SUPERVISOR_STARTED",
+        "CHILD_STARTED",
+        "CHILD_ACTIVITY",
+        "HEALTH_CHANGED",
+        "CHILD_EXITED",
+        "SUPERVISOR_FINISHED"
+      ],
+      "forbidden_event_types": [
+        "STOP_REQUESTED"
+      ]
+    },
+    {
+      "vector_id": "ZERO_EXIT_WITHOUT_MARKER_FAILS",
+      "window_start": "2026-07-28T13:01:00Z",
+      "run_id": "t12-c225f6f42fdc95c93e0895f836da30bf6cc6669b8d57d3fcb7ac52acc097e11a",
+      "duplicate_key": "b68e11d2a51192b2e68fb0387fa4fca5dbef5fb02e109b08934eeab71fa6941a",
+      "child_mode": "SYNTHETIC_ZERO_WITHOUT_MARKER",
+      "expected": {
+        "state": "FAILED",
+        "reason": "EXPECTED_MARKER_MISSING",
+        "child_exit_code_class": "ZERO",
+        "child_spawn_count": 1,
+        "success_marker_observed": false,
+        "retry_count": 0
+      },
+      "required_event_types": [
+        "SUPERVISOR_STARTED",
+        "CHILD_STARTED",
+        "CHILD_ACTIVITY",
+        "CHILD_EXITED",
+        "SUPERVISOR_FINISHED"
+      ],
+      "forbidden_event_types": [
+        "STOP_REQUESTED"
+      ]
+    },
+    {
+      "vector_id": "NONZERO_EXIT_RETAINED",
+      "window_start": "2026-07-28T13:02:00Z",
+      "run_id": "t12-c6a69ae0e58b3e9746b817d8e1687e44ca4c973f8f0af6d3341489a8e22cd14c",
+      "duplicate_key": "8fe45611ffdaa175bb9965b651f2eb3cf730b72c610e6b04849d6c422519d27b",
+      "child_mode": "SYNTHETIC_NONZERO",
+      "expected": {
+        "state": "FAILED",
+        "reason": "CHILD_EXIT_NONZERO",
+        "child_exit_code_class": "NONZERO",
+        "child_spawn_count": 1,
+        "success_marker_observed": false,
+        "retry_count": 0
+      },
+      "required_event_types": [
+        "SUPERVISOR_STARTED",
+        "CHILD_STARTED",
+        "CHILD_ACTIVITY",
+        "CHILD_EXITED",
+        "SUPERVISOR_FINISHED"
+      ],
+      "forbidden_event_types": [
+        "STOP_REQUESTED"
+      ]
+    },
+    {
+      "vector_id": "ACTIVE_DUPLICATE_BLOCKED",
+      "window_start": "2026-07-28T13:03:00Z",
+      "run_id": "t12-4d6a50a841f45ffe475419502251907805fc87a43dc7180f28e6d2f3afcc5a66",
+      "duplicate_key": "7733313d3f5d4646d9f26e163d78272bcece6d3ef8acca096ce1c29de805d2a7",
+      "child_mode": "NO_SPAWN_ACTIVE_LOCK",
+      "expected": {
+        "state": "BLOCKED_DUPLICATE",
+        "reason": "ACTIVE_DUPLICATE",
+        "child_exit_code_class": "NONE",
+        "child_spawn_count": 0,
+        "success_marker_observed": false,
+        "retry_count": 0
+      },
+      "required_event_types": [
+        "SUPERVISOR_STARTED",
+        "SUPERVISOR_FINISHED"
+      ],
+      "forbidden_event_types": [
+        "CHILD_STARTED",
+        "CHILD_EXITED",
+        "STOP_REQUESTED"
+      ]
+    },
+    {
+      "vector_id": "INSUFFICIENT_DISK_BLOCKS_SPAWN",
+      "window_start": "2026-07-28T13:04:00Z",
+      "run_id": "t12-620312fd902ef7acff8e9ad52c4a839a297c0ff892da70534c20df6f6e2ec2d5",
+      "duplicate_key": "80a40a57e678a2ee3ba813295015115c0265c09361f019532a600953f9d49fb4",
+      "child_mode": "NO_SPAWN_DISK_PREFLIGHT",
+      "expected": {
+        "state": "BLOCKED_DISK",
+        "reason": "INSUFFICIENT_DISK_BEFORE_START",
+        "child_exit_code_class": "NONE",
+        "child_spawn_count": 0,
+        "success_marker_observed": false,
+        "retry_count": 0
+      },
+      "required_event_types": [
+        "SUPERVISOR_STARTED",
+        "SUPERVISOR_FINISHED"
+      ],
+      "forbidden_event_types": [
+        "CHILD_STARTED",
+        "CHILD_EXITED",
+        "STOP_REQUESTED"
+      ]
+    },
+    {
+      "vector_id": "WALL_TIMEOUT_STOPS_CHILD",
+      "window_start": "2026-07-28T13:05:00Z",
+      "run_id": "t12-dfe32544b0092896663bdfac1868edb22b1d702bfbf968599465df8db7233ade",
+      "duplicate_key": "14d29dd7d4f2383c0050e9702a38538220927ceb6bd18cede91793852343d2f5",
+      "child_mode": "SYNTHETIC_WALL_TIMEOUT",
+      "expected": {
+        "state": "TIMED_OUT",
+        "reason": "CHILD_WALL_TIMEOUT",
+        "child_exit_code_class": "NONZERO",
+        "child_spawn_count": 1,
+        "success_marker_observed": false,
+        "retry_count": 0
+      },
+      "required_event_types": [
+        "SUPERVISOR_STARTED",
+        "CHILD_STARTED",
+        "STOP_REQUESTED",
+        "CHILD_ACTIVITY",
+        "CHILD_EXITED",
+        "SUPERVISOR_FINISHED"
+      ],
+      "forbidden_event_types": []
+    },
+    {
+      "vector_id": "RUNTIME_DISK_BREACH_STOPS_CHILD",
+      "window_start": "2026-07-28T13:06:00Z",
+      "run_id": "t12-ea7e56f15104753d6b7fec86e14db55690cb8e2554d5a18613f9fcba1252869c",
+      "duplicate_key": "a070d7b7d36f37bd008d3f6cea529e35f7aaefad7e9fa1036bcb3d87f8ea6a60",
+      "child_mode": "SYNTHETIC_RUNTIME_DISK_BREACH",
+      "expected": {
+        "state": "BLOCKED_DISK",
+        "reason": "DISK_GUARD_BREACHED",
+        "child_exit_code_class": "NONZERO",
+        "child_spawn_count": 1,
+        "success_marker_observed": false,
+        "retry_count": 0
+      },
+      "required_event_types": [
+        "SUPERVISOR_STARTED",
+        "CHILD_STARTED",
+        "STOP_REQUESTED",
+        "CHILD_ACTIVITY",
+        "CHILD_EXITED",
+        "SUPERVISOR_FINISHED"
+      ],
+      "forbidden_event_types": []
+    }
+  ],
+  "stable_projection": {
+    "volatile_fields_excluded": [
+      "observed_at",
+      "monotonic_elapsed_ms",
+      "disk_free_bytes",
+      "child_start_timestamp",
+      "child_observation_timestamp",
+      "child_availability_timestamp",
+      "platform_specific_terminated_exit_code",
+      "stdout_bytes",
+      "stderr_bytes",
+      "stdout_sha256",
+      "stderr_sha256"
+    ],
+    "raw_child_bodies_retained": false,
+    "machine_specific_paths_retained": false,
+    "cross_platform_exit_classes": [
+      "ZERO",
+      "NONZERO",
+      "NONE"
+    ]
+  },
+  "authority": {
+    "class": "LOCAL_WRITE_ONLY",
+    "network_calls": 0,
+    "provider_api_rpc_wss_calls": 0,
+    "credential_use": 0,
+    "collector_executions": 0,
+    "raw_data_writes": 0,
+    "cash_spend_usd_cents": 0,
+    "provider_credits": 0,
+    "dependency_changes": 0,
+    "wallet_signer_transaction_actions": 0,
+    "commit": false,
+    "push": false,
+    "pull_request": false,
+    "merge": false,
+    "ui_changes": false,
+    "destructive_actions": false
+  },
+  "nonclaims": {
+    "unattended_collection_safe": false,
+    "sustained_pilot_validated": false,
+    "automatic_restart_validated": false,
+    "provider_execution_validated": false,
+    "production_readiness": false,
+    "strategy_or_alpha_evidence": false,
+    "task12_done": false
+  },
+  "catalog": {
+    "changed_in_atom4": false,
+    "status": "CATALOG_TRANSACTION_PENDING_TASK12_FINAL_RECONCILIATION",
+    "blocks_task12_done": true,
+    "blocks_atom4_acceptance": false
+  }
+}

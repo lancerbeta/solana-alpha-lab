@@ -513,6 +513,21 @@
       "target_asset_id": "TEST-T11-ENTITY-INPUT-OBSERVATION-001"
     },
     {
+      "source_asset_id": "CONTRACT-T12-PILOT-SUPERVISOR-001",
+      "relation": "depends_on",
+      "target_asset_id": "SCRIPT-T11-ENTITY-INPUT-PROBE-001"
+    },
+    {
+      "source_asset_id": "CONTRACT-T12-PILOT-SUPERVISOR-001",
+      "relation": "validated_by",
+      "target_asset_id": "TEST-T12-PILOT-SUPERVISOR-ACCEPTANCE-001"
+    },
+    {
+      "source_asset_id": "CONTRACT-T12-PILOT-SUPERVISOR-001",
+      "relation": "validated_by",
+      "target_asset_id": "TEST-T12-PILOT-SUPERVISOR-CONTRACT-001"
+    },
+    {
       "source_asset_id": "CTRL-AGENTS-001",
       "relation": "governed_by",
       "target_asset_id": "CTRL-TASK-04-001"
@@ -1068,6 +1083,26 @@
       "target_asset_id": "EVIDENCE-T11-ENTITY-INPUT-RECEIPT-001"
     },
     {
+      "source_asset_id": "EVIDENCE-T12-PILOT-SUPERVISOR-OFFLINE-ACCEPTANCE-001",
+      "relation": "derived_from",
+      "target_asset_id": "FIXTURE-T12-PILOT-SUPERVISOR-OFFLINE-ACCEPTANCE-001"
+    },
+    {
+      "source_asset_id": "EVIDENCE-T12-PILOT-SUPERVISOR-OFFLINE-ACCEPTANCE-001",
+      "relation": "validated_by",
+      "target_asset_id": "TEST-T12-PILOT-SUPERVISOR-ACCEPTANCE-001"
+    },
+    {
+      "source_asset_id": "EVIDENCE-T12-PILOT-SUPERVISOR-OFFLINE-SUMMARY-001",
+      "relation": "derived_from",
+      "target_asset_id": "FIXTURE-T12-PILOT-SUPERVISOR-OFFLINE-ACCEPTANCE-001"
+    },
+    {
+      "source_asset_id": "EVIDENCE-T12-PILOT-SUPERVISOR-OFFLINE-SUMMARY-001",
+      "relation": "evidenced_by",
+      "target_asset_id": "EVIDENCE-T12-PILOT-SUPERVISOR-OFFLINE-ACCEPTANCE-001"
+    },
+    {
       "source_asset_id": "FIXTURE-BATON-SUITE-001",
       "relation": "governed_by",
       "target_asset_id": "CTRL-BATON-SETUP-001"
@@ -1326,6 +1361,31 @@
       "source_asset_id": "FIXTURE-T11-ENTITY-INPUT-PILOT-PLAN-001",
       "relation": "validated_by",
       "target_asset_id": "TEST-T11-ENTITY-INPUT-TRANSPORT-001"
+    },
+    {
+      "source_asset_id": "FIXTURE-T12-PILOT-SUPERVISOR-CONTRACT-001",
+      "relation": "derived_from",
+      "target_asset_id": "CONTRACT-T12-PILOT-SUPERVISOR-001"
+    },
+    {
+      "source_asset_id": "FIXTURE-T12-PILOT-SUPERVISOR-CONTRACT-001",
+      "relation": "validated_by",
+      "target_asset_id": "TEST-T12-PILOT-SUPERVISOR-CONTRACT-001"
+    },
+    {
+      "source_asset_id": "FIXTURE-T12-PILOT-SUPERVISOR-OFFLINE-ACCEPTANCE-001",
+      "relation": "derived_from",
+      "target_asset_id": "CONTRACT-T12-PILOT-SUPERVISOR-001"
+    },
+    {
+      "source_asset_id": "FIXTURE-T12-PILOT-SUPERVISOR-OFFLINE-ACCEPTANCE-001",
+      "relation": "derived_from",
+      "target_asset_id": "MODULE-T12-PILOT-SUPERVISOR-001"
+    },
+    {
+      "source_asset_id": "FIXTURE-T12-PILOT-SUPERVISOR-OFFLINE-ACCEPTANCE-001",
+      "relation": "validated_by",
+      "target_asset_id": "TEST-T12-PILOT-SUPERVISOR-ACCEPTANCE-001"
     },
     {
       "source_asset_id": "GENERATED-EDGE-PROJECTION-001",
@@ -1661,6 +1721,26 @@
       "source_asset_id": "MODULE-T11-ENTITY-INPUT-TRANSPORT-001",
       "relation": "validated_by",
       "target_asset_id": "TEST-T11-ENTITY-INPUT-TRANSPORT-001"
+    },
+    {
+      "source_asset_id": "MODULE-T12-PILOT-SUPERVISOR-001",
+      "relation": "depends_on",
+      "target_asset_id": "SCRIPT-T11-ENTITY-INPUT-PROBE-001"
+    },
+    {
+      "source_asset_id": "MODULE-T12-PILOT-SUPERVISOR-001",
+      "relation": "governed_by",
+      "target_asset_id": "CONTRACT-T12-PILOT-SUPERVISOR-001"
+    },
+    {
+      "source_asset_id": "MODULE-T12-PILOT-SUPERVISOR-001",
+      "relation": "validated_by",
+      "target_asset_id": "TEST-T12-PILOT-SUPERVISOR-001"
+    },
+    {
+      "source_asset_id": "MODULE-T12-PILOT-SUPERVISOR-001",
+      "relation": "validated_by",
+      "target_asset_id": "TEST-T12-PILOT-SUPERVISOR-ACCEPTANCE-001"
     },
     {
       "source_asset_id": "PRE-GIT-TASK01-A017",
@@ -2453,6 +2533,26 @@
       "target_asset_id": "TEST-T11-ENTITY-INPUT-TRANSPORT-001"
     },
     {
+      "source_asset_id": "SCRIPT-T12-PILOT-SUPERVISOR-001",
+      "relation": "depends_on",
+      "target_asset_id": "MODULE-T12-PILOT-SUPERVISOR-001"
+    },
+    {
+      "source_asset_id": "SCRIPT-T12-PILOT-SUPERVISOR-001",
+      "relation": "governed_by",
+      "target_asset_id": "CONTRACT-T12-PILOT-SUPERVISOR-001"
+    },
+    {
+      "source_asset_id": "SCRIPT-T12-PILOT-SUPERVISOR-001",
+      "relation": "validated_by",
+      "target_asset_id": "TEST-T12-PILOT-SUPERVISOR-001"
+    },
+    {
+      "source_asset_id": "SCRIPT-T12-PILOT-SUPERVISOR-001",
+      "relation": "validated_by",
+      "target_asset_id": "TEST-T12-PILOT-SUPERVISOR-ACCEPTANCE-001"
+    },
+    {
       "source_asset_id": "TEMPLATE-BATON-ISSUE-FORM-001",
       "relation": "governed_by",
       "target_asset_id": "CTRL-BATON-SETUP-001"
@@ -2856,6 +2956,41 @@
       "source_asset_id": "TEST-T11-ENTITY-INPUT-TRANSPORT-001",
       "relation": "depends_on",
       "target_asset_id": "MODULE-T11-ENTITY-INPUT-TRANSPORT-001"
+    },
+    {
+      "source_asset_id": "TEST-T12-PILOT-SUPERVISOR-001",
+      "relation": "depends_on",
+      "target_asset_id": "CONTRACT-T12-PILOT-SUPERVISOR-001"
+    },
+    {
+      "source_asset_id": "TEST-T12-PILOT-SUPERVISOR-001",
+      "relation": "depends_on",
+      "target_asset_id": "MODULE-T12-PILOT-SUPERVISOR-001"
+    },
+    {
+      "source_asset_id": "TEST-T12-PILOT-SUPERVISOR-ACCEPTANCE-001",
+      "relation": "depends_on",
+      "target_asset_id": "EVIDENCE-T12-PILOT-SUPERVISOR-OFFLINE-ACCEPTANCE-001"
+    },
+    {
+      "source_asset_id": "TEST-T12-PILOT-SUPERVISOR-ACCEPTANCE-001",
+      "relation": "depends_on",
+      "target_asset_id": "EVIDENCE-T12-PILOT-SUPERVISOR-OFFLINE-SUMMARY-001"
+    },
+    {
+      "source_asset_id": "TEST-T12-PILOT-SUPERVISOR-ACCEPTANCE-001",
+      "relation": "depends_on",
+      "target_asset_id": "FIXTURE-T12-PILOT-SUPERVISOR-OFFLINE-ACCEPTANCE-001"
+    },
+    {
+      "source_asset_id": "TEST-T12-PILOT-SUPERVISOR-CONTRACT-001",
+      "relation": "depends_on",
+      "target_asset_id": "CONTRACT-T12-PILOT-SUPERVISOR-001"
+    },
+    {
+      "source_asset_id": "TEST-T12-PILOT-SUPERVISOR-CONTRACT-001",
+      "relation": "depends_on",
+      "target_asset_id": "FIXTURE-T12-PILOT-SUPERVISOR-CONTRACT-001"
     },
     {
       "source_asset_id": "VALIDATOR-REPOSITORY-STATE-001",

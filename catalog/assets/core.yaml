@@ -519,7 +519,7 @@ records:
   evidence: []
   classification: *t06_internal
 - asset_id: TEST-T06-CATALOG-001
-  record_version: '1.10'
+  record_version: '1.11'
   asset_type: script
   purpose: Catalog tests for the TASK-06 stable-ID inventory, hashes, ownership, finalization handoff, consumers, no-raw-bytes boundary and monotonic active Catalog version.
   status: IMPLEMENTED_UNVERIFIED
@@ -532,7 +532,7 @@ records:
     repository_path: tests/test_task06_catalog.py
   integrity:
     kind: sha256
-    sha256: ad11931d11111c9ab52fbc271df6e56df8a2f3cf037691e4bfc93541a640998e
+    sha256: 10ec1abe59b15c6965e912c2d6871e26062348950609310acc06871902ccf39b
   access: *t06_read_file
   relations:
   - relation_type: governed_by
@@ -2536,7 +2536,7 @@ records:
     contains_raw_data: false
     sensitivity: INTERNAL_NON_SECRET
 - asset_id: TEST-T05-CATALOG-QUERIES-001
-  record_version: '1.12'
+  record_version: '1.13'
   asset_type: script
   purpose: 'Offline tests proving TASK-05 query bounds, UTC eligibility, write denial, external-access denial, raw BLOB exclusion, task/data-contract registration and monotonic active Catalog version.'
   status: IMPLEMENTED_UNVERIFIED
@@ -2549,7 +2549,7 @@ records:
     repository_path: tests/test_task05_catalog_queries.py
   integrity:
     kind: sha256
-    sha256: 3ff9db958a8de61a277b84f37c60d79e55a675f7ca8b0037fcf6595a3ba435a1
+    sha256: a851147f37172402c67b84365d83d4085dc797974d77ec5bd0a94014f4fc04cd
   access:
     mode: read_only
     method: command
@@ -3411,7 +3411,7 @@ records:
   evidence: []
   classification: *t07_internal
 - asset_id: TEST-T07-CATALOG-001
-  record_version: '1.8'
+  record_version: '1.9'
   asset_type: script
   purpose: Catalog tests for TASK-07 stable IDs, file hashes, lineage, accepted baseline, monotonic active Catalog version and no-raw-bytes boundary.
   status: IMPLEMENTED_UNVERIFIED
@@ -3424,7 +3424,7 @@ records:
     repository_path: tests/test_task07_catalog.py
   integrity:
     kind: sha256
-    sha256: 07638854efe52c6b779beb90550f6bea5b2b5d9a43a3a9e1885d55f4d13c9c34
+    sha256: e3f670fff5a6f343ee8b60cf42067d2cfd0af9b58cf663dc469c7ec3a4fdcbe6
   access: *t07_read_file
   relations:
   - relation_type: depends_on
@@ -3895,7 +3895,7 @@ records:
   evidence: []
   classification: *t08_internal
 - asset_id: TEST-T08-CATALOG-001
-  record_version: '1.7'
+  record_version: '1.8'
   asset_type: script
   purpose: Catalog tests for TASK-08 stable IDs, file and raw hashes, lineage, named consumers, monotonic active Catalog version and no-raw-bytes boundary.
   status: IMPLEMENTED_UNVERIFIED
@@ -3908,7 +3908,7 @@ records:
     repository_path: tests/test_task08_catalog.py
   integrity:
     kind: sha256
-    sha256: f6f43bf473eb3228802c5e44fa6e9c02fe42b17c135e0ef3d26ef950c8af2557
+    sha256: 0749ce4a78863e6b8e31b2246691ef0f71a13dd228e1f0610c53d0f0ed5b3e6b
   access: *t08_read_file
   relations:
   - relation_type: depends_on
@@ -4626,7 +4626,7 @@ records:
     contains_raw_data: false
     sensitivity: INTERNAL_NON_SECRET
 - asset_id: SCRIPT-BATON-VALIDATE-001
-  record_version: '1.6'
+  record_version: '1.7'
   asset_type: script
   purpose: Deterministic offline validator for baton schemas, fixtures, route ownership,
     standing autonomy, JIT validation, Catalog integrity, templates, and rules.
@@ -4640,7 +4640,7 @@ records:
     repository_path: scripts/validate_baton.py
   integrity:
     kind: sha256
-    sha256: 7cd707b3f8a7f88c02851aab3a885a3f61c868c785bdb26b56affb0c1a965eb7
+    sha256: ee96cfd82797510b220d71655467ad272d374d6d32680e70054dfe1730bee7b7
   access:
     mode: read_only
     method: file
@@ -4869,7 +4869,7 @@ records:
     contains_raw_data: false
     sensitivity: INTERNAL_NON_SECRET
 - asset_id: TEST-BATON-REPOSITORY-POLICY-001
-  record_version: '1.12'
+  record_version: '1.13'
   asset_type: script
   purpose: Unit tests for exact local staged, committed and published feature,
     PR merge, main merge, current Catalog integrity, and legacy repository policy.
@@ -4883,7 +4883,7 @@ records:
     repository_path: tests/test_baton_repository_policy.py
   integrity:
     kind: sha256
-    sha256: 9154e8f74f5cf2f6f9e45a7c04ddf8893788868e1ee8c7ec0fe224c17cf0e8b0
+    sha256: cf81c805930b328c3e58a183139c5a61370663f21cfd9b6577b64a2ae4536f0e
   access:
     mode: read_only
     method: file
@@ -6840,7 +6840,7 @@ records:
   evidence: []
   classification: *t11_internal
 - asset_id: TEST-T11-ENTITY-INPUT-REPLAY-001
-  record_version: '1.0'
+  record_version: '1.1'
   asset_type: script
   purpose: Fail-closed TASK-11 tests for raw receipt and partition hash
     reconciliation, RPC schema replay, projection counts, sanitization, caps,
@@ -6855,7 +6855,7 @@ records:
     repository_path: tests/test_task11_entity_input_replay.py
   integrity:
     kind: sha256
-    sha256: 6e2f3d2e8fd6611a575661b43789cd3a4e8cdee7b2cbc3559a3caa5b3c69772d
+    sha256: 58ad67bce85aecefcb50083b0e3cf730bf550bcbc539ebf31f794f34453f7b3e
   access:
     mode: read_only
     method: file
@@ -6872,3 +6872,339 @@ records:
   - TASK-11
   evidence: []
   classification: *t11_internal
+- asset_id: CONTRACT-T12-PILOT-SUPERVISOR-001
+  record_version: '1.0'
+  asset_type: control_document
+  purpose: Frozen TASK-12 offline process-supervisor boundary for one
+    allowlisted consumer, deterministic run identity, duplicate exclusion,
+    bounded health, timeout, disk, output, lineage and zero-external-effect
+    controls.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-07-28'
+  truth_owner: TASK-12
+  location:
+    kind: git_path
+    logical_uri: repo://docs/contracts/pilot_supervisor_contract_v1.md
+    repository_path: docs/contracts/pilot_supervisor_contract_v1.md
+  integrity:
+    kind: sha256
+    sha256: f65f068746f9239e13b30707ef99a6b8c2713d4635f926dd4d6fd7c61028848f
+  access:
+    mode: read_only
+    method: file
+    network_required: false
+    secrets_required: false
+  relations:
+  - relation_type: depends_on
+    target_asset_id: SCRIPT-T11-ENTITY-INPUT-PROBE-001
+  - relation_type: validated_by
+    target_asset_id: TEST-T12-PILOT-SUPERVISOR-CONTRACT-001
+  - relation_type: validated_by
+    target_asset_id: TEST-T12-PILOT-SUPERVISOR-ACCEPTANCE-001
+  consumers:
+  - TASK-12
+  - TASK-13
+  - TASK-15
+  evidence: []
+  classification: &t12_internal
+    contains_secrets: false
+    contains_raw_data: false
+    sensitivity: INTERNAL_NON_SECRET
+- asset_id: FIXTURE-T12-PILOT-SUPERVISOR-CONTRACT-001
+  record_version: '1.0'
+  asset_type: evidence
+  purpose: Deterministic machine-readable TASK-12 supervisor contract fixture
+    binding the one offline child, state machine, caps, lineage, authority and
+    explicit non-claims.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-07-28'
+  truth_owner: TASK-12
+  location:
+    kind: git_path
+    logical_uri: repo://tests/fixtures/task12/pilot_supervisor_contract_v1.json
+    repository_path: tests/fixtures/task12/pilot_supervisor_contract_v1.json
+  integrity:
+    kind: sha256
+    sha256: dad8c95b2e81fe918a04fa651cb55e8556ee91cdeb0074161b7315d69821df2c
+  access:
+    mode: read_only
+    method: file
+    network_required: false
+    secrets_required: false
+  relations:
+  - relation_type: derived_from
+    target_asset_id: CONTRACT-T12-PILOT-SUPERVISOR-001
+  - relation_type: validated_by
+    target_asset_id: TEST-T12-PILOT-SUPERVISOR-CONTRACT-001
+  consumers:
+  - TASK-12
+  evidence: []
+  classification: *t12_internal
+- asset_id: TEST-T12-PILOT-SUPERVISOR-CONTRACT-001
+  record_version: '1.0'
+  asset_type: script
+  purpose: Offline fail-closed tests for exact TASK-12 supervisor contract
+    identity, state and reason enums, one allowlisted child, zero retry,
+    bounded output and disk controls, lineage and forbidden external effects.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-07-28'
+  truth_owner: TASK-12
+  location:
+    kind: git_path
+    logical_uri: repo://tests/test_task12_pilot_supervisor_contract.py
+    repository_path: tests/test_task12_pilot_supervisor_contract.py
+  integrity:
+    kind: sha256
+    sha256: b35729f1e3578766f9cf46f0ff6f2a5406db0c189aaa9b9fd4fb150994373176
+  access:
+    mode: read_only
+    method: file
+    network_required: false
+    secrets_required: false
+  relations:
+  - relation_type: depends_on
+    target_asset_id: CONTRACT-T12-PILOT-SUPERVISOR-001
+  - relation_type: depends_on
+    target_asset_id: FIXTURE-T12-PILOT-SUPERVISOR-CONTRACT-001
+  consumers:
+  - TASK-12
+  evidence: []
+  classification: *t12_internal
+- asset_id: MODULE-T12-PILOT-SUPERVISOR-001
+  record_version: '1.1'
+  asset_type: script
+  purpose: Thin stdlib-first TASK-12 offline process supervisor implementing
+    deterministic identity, atomic duplicate locking, bounded child lifecycle,
+    health events, disk guards, sanitization and lineage receipts.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-07-28'
+  truth_owner: TASK-12
+  location:
+    kind: git_path
+    logical_uri: repo://src/solana_alpha_lab/pilot_supervisor.py
+    repository_path: src/solana_alpha_lab/pilot_supervisor.py
+  integrity:
+    kind: sha256
+    sha256: b235b7b19fab79a888a4fb55afbe50d0f62868588f227473297ea7278f7849da
+  access:
+    mode: read_only
+    method: file
+    network_required: false
+    secrets_required: false
+  relations:
+  - relation_type: governed_by
+    target_asset_id: CONTRACT-T12-PILOT-SUPERVISOR-001
+  - relation_type: depends_on
+    target_asset_id: SCRIPT-T11-ENTITY-INPUT-PROBE-001
+  - relation_type: validated_by
+    target_asset_id: TEST-T12-PILOT-SUPERVISOR-001
+  - relation_type: validated_by
+    target_asset_id: TEST-T12-PILOT-SUPERVISOR-ACCEPTANCE-001
+  consumers:
+  - TASK-12
+  - TASK-13
+  - TASK-15
+  evidence: []
+  classification: *t12_internal
+- asset_id: SCRIPT-T12-PILOT-SUPERVISOR-001
+  record_version: '1.0'
+  asset_type: script
+  purpose: Beginner-safe TASK-12 CLI exposing only the one frozen offline
+    supervisor falsifier and no provider, collector, credential or transaction
+    execution mode.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-07-28'
+  truth_owner: TASK-12
+  location:
+    kind: git_path
+    logical_uri: repo://scripts/run_task12_pilot_supervisor.py
+    repository_path: scripts/run_task12_pilot_supervisor.py
+  integrity:
+    kind: sha256
+    sha256: fb85b2e0a9fc60a01dc01f80817ae1458471861728ef4635eb5a0893d434405f
+  access:
+    mode: read_only
+    method: command
+    network_required: false
+    secrets_required: false
+  relations:
+  - relation_type: governed_by
+    target_asset_id: CONTRACT-T12-PILOT-SUPERVISOR-001
+  - relation_type: depends_on
+    target_asset_id: MODULE-T12-PILOT-SUPERVISOR-001
+  - relation_type: validated_by
+    target_asset_id: TEST-T12-PILOT-SUPERVISOR-001
+  - relation_type: validated_by
+    target_asset_id: TEST-T12-PILOT-SUPERVISOR-ACCEPTANCE-001
+  consumers:
+  - TASK-12
+  evidence: []
+  classification: *t12_internal
+- asset_id: TEST-T12-PILOT-SUPERVISOR-001
+  record_version: '1.1'
+  asset_type: script
+  purpose: Deterministic TASK-12 implementation tests for success, typed
+    failure, duplicate blocking, monotonic timeout, bounded stop, disk guards,
+    event shape, output caps, lineage and zero external effects.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-07-28'
+  truth_owner: TASK-12
+  location:
+    kind: git_path
+    logical_uri: repo://tests/test_task12_pilot_supervisor.py
+    repository_path: tests/test_task12_pilot_supervisor.py
+  integrity:
+    kind: sha256
+    sha256: 0051fc08df922a3cf8ec09ef6584e172255c730e42d62409fc4a8c280e057daa
+  access:
+    mode: read_only
+    method: file
+    network_required: false
+    secrets_required: false
+  relations:
+  - relation_type: depends_on
+    target_asset_id: CONTRACT-T12-PILOT-SUPERVISOR-001
+  - relation_type: depends_on
+    target_asset_id: MODULE-T12-PILOT-SUPERVISOR-001
+  consumers:
+  - TASK-12
+  evidence: []
+  classification: *t12_internal
+- asset_id: FIXTURE-T12-PILOT-SUPERVISOR-OFFLINE-ACCEPTANCE-001
+  record_version: '1.1'
+  asset_type: evidence
+  purpose: Frozen TASK-12 seven-vector acceptance matrix covering one real
+    offline preflight plus marker, exit, duplicate, start-disk, timeout and
+    runtime-disk fail-closed controls.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-07-28'
+  truth_owner: TASK-12
+  location:
+    kind: git_path
+    logical_uri: repo://tests/fixtures/task12/pilot_supervisor_offline_acceptance_v1.json
+    repository_path: tests/fixtures/task12/pilot_supervisor_offline_acceptance_v1.json
+  integrity:
+    kind: sha256
+    sha256: f798ab8fc40f141b95dce843939710025bc8958f094d62e07c0c51c9a00a1d5b
+  access:
+    mode: read_only
+    method: file
+    network_required: false
+    secrets_required: false
+  relations:
+  - relation_type: derived_from
+    target_asset_id: CONTRACT-T12-PILOT-SUPERVISOR-001
+  - relation_type: derived_from
+    target_asset_id: MODULE-T12-PILOT-SUPERVISOR-001
+  - relation_type: validated_by
+    target_asset_id: TEST-T12-PILOT-SUPERVISOR-ACCEPTANCE-001
+  consumers:
+  - TASK-12
+  evidence: []
+  classification: *t12_internal
+- asset_id: EVIDENCE-T12-PILOT-SUPERVISOR-OFFLINE-ACCEPTANCE-001
+  record_version: '1.1'
+  asset_type: evidence
+  purpose: Machine-readable TASK-12 acceptance and Catalog-finalization
+    receipt binding the frozen vectors, implementation hashes, exact zero
+    external-effect counters, validation and explicit production non-claims.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-07-28'
+  truth_owner: TASK-12
+  location:
+    kind: git_path
+    logical_uri: repo://docs/evidence/task12/pilot_supervisor_offline_acceptance_receipt_v1.json
+    repository_path: docs/evidence/task12/pilot_supervisor_offline_acceptance_receipt_v1.json
+  integrity:
+    kind: sha256
+    sha256: 66e35fce32ba17e2017cdb744c14af193daba89da6c4f1dbbad6e44def4a7b7f
+  access:
+    mode: read_only
+    method: file
+    network_required: false
+    secrets_required: false
+  relations:
+  - relation_type: derived_from
+    target_asset_id: FIXTURE-T12-PILOT-SUPERVISOR-OFFLINE-ACCEPTANCE-001
+  - relation_type: validated_by
+    target_asset_id: TEST-T12-PILOT-SUPERVISOR-ACCEPTANCE-001
+  consumers:
+  - TASK-12
+  - TASK-13
+  - TASK-15
+  evidence: []
+  classification: *t12_internal
+- asset_id: EVIDENCE-T12-PILOT-SUPERVISOR-OFFLINE-SUMMARY-001
+  record_version: '1.1'
+  asset_type: evidence
+  purpose: Human-readable TASK-12 offline-supervisor result, acceptance
+    matrix, immutable evidence pointers, Catalog checkpoint, zero-effect
+    receipt, residual risks and next repository boundary.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-07-28'
+  truth_owner: TASK-12
+  location:
+    kind: git_path
+    logical_uri: repo://docs/evidence/task12/pilot_supervisor_offline_acceptance_summary_v1.md
+    repository_path: docs/evidence/task12/pilot_supervisor_offline_acceptance_summary_v1.md
+  integrity:
+    kind: sha256
+    sha256: 66635fd8c0496807bcf33dac4bf75989e2211d3fde7ca1aef098db709cfc8e59
+  access:
+    mode: read_only
+    method: file
+    network_required: false
+    secrets_required: false
+  relations:
+  - relation_type: derived_from
+    target_asset_id: FIXTURE-T12-PILOT-SUPERVISOR-OFFLINE-ACCEPTANCE-001
+  - relation_type: evidenced_by
+    target_asset_id: EVIDENCE-T12-PILOT-SUPERVISOR-OFFLINE-ACCEPTANCE-001
+  consumers:
+  - TASK-12
+  - TASK-13
+  - TASK-15
+  evidence: []
+  classification: *t12_internal
+- asset_id: TEST-T12-PILOT-SUPERVISOR-ACCEPTANCE-001
+  record_version: '1.1'
+  asset_type: script
+  purpose: Deterministic TASK-12 acceptance and finalization tests for seven
+    control vectors, source fingerprints, event and lineage invariants, zero
+    external effects, exact Catalog registration and mandatory output counts.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-07-28'
+  truth_owner: TASK-12
+  location:
+    kind: git_path
+    logical_uri: repo://tests/test_task12_pilot_supervisor_acceptance.py
+    repository_path: tests/test_task12_pilot_supervisor_acceptance.py
+  integrity:
+    kind: sha256
+    sha256: 83fdf08a519a9a03c00c416dae546dd7daabe802a70e60e2b05ad12bf66980d5
+  access:
+    mode: read_only
+    method: file
+    network_required: false
+    secrets_required: false
+  relations:
+  - relation_type: depends_on
+    target_asset_id: FIXTURE-T12-PILOT-SUPERVISOR-OFFLINE-ACCEPTANCE-001
+  - relation_type: depends_on
+    target_asset_id: EVIDENCE-T12-PILOT-SUPERVISOR-OFFLINE-ACCEPTANCE-001
+  - relation_type: depends_on
+    target_asset_id: EVIDENCE-T12-PILOT-SUPERVISOR-OFFLINE-SUMMARY-001
+  consumers:
+  - TASK-12
+  evidence: []
+  classification: *t12_internal

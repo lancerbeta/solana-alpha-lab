@@ -1,0 +1,387 @@
+{
+  "schema": "solana_alpha_lab.pilot_supervisor_contract",
+  "schema_version": "1.0",
+  "contract_id": "CONTRACT-T12-PILOT-SUPERVISOR-001",
+  "task_id": "TASK-12",
+  "atom_id": "T12-A2_OFFLINE_SUPERVISOR_CONTRACT_V1",
+  "as_of": "2026-07-28",
+  "status": "FROZEN_OFFLINE_CONTRACT",
+  "entry_verdict": "START_WITH_PATCH",
+  "accepted_claim": "OFFLINE_SUPERVISOR_CONTRACT_FROZEN",
+  "implementation_claim": false,
+  "unattended_pilot_claim": false,
+  "selected_consumer": {
+    "asset_id": "SCRIPT-T11-ENTITY-INPUT-PROBE-001",
+    "launcher_path": "scripts/run_task11_entity_input_probe.py",
+    "mode": "OFFLINE_PREFLIGHT_ONLY",
+    "argv_template": [
+      "{python}",
+      "-B",
+      "scripts/run_task11_entity_input_probe.py"
+    ],
+    "forbidden_arguments": [
+      "--execute",
+      "--replay-run"
+    ],
+    "expected_success_marker": "TASK11_ENTITY_PROBE_PREFLIGHT: PASS",
+    "expected_exit_code": 0,
+    "network_required": false,
+    "raw_write_required": false
+  },
+  "reuse": {
+    "adopt": [
+      "REUSE-T04-LOGGING-001",
+      "PYTHON_STDLIB_PROCESS_AND_FILESYSTEM_PRIMITIVES",
+      "SCRIPT-T11-ENTITY-INPUT-PROBE-001"
+    ],
+    "wrap": [],
+    "fork": [],
+    "build": [
+      "REUSE-T04-COORDINATOR-001"
+    ],
+    "deferred": [
+      "REUSE-T04-COMPOSE-001",
+      "REUSE-T04-APSCHEDULER-001",
+      "REUSE-T04-TEMPORAL-001",
+      "REUSE-T04-PROM-CLIENT-001",
+      "REUSE-T04-PROM-SERVER-001",
+      "REUSE-T04-OTEL-001"
+    ],
+    "rejected": [
+      "REUSE-T04-CELERY-001"
+    ],
+    "new_dependency_count": 0
+  },
+  "run_identity": {
+    "canonical_encoding": "JSON_SORTED_KEYS_UTF8_NO_INSIGNIFICANT_WHITESPACE",
+    "hash_algorithm": "SHA256",
+    "visible_prefix": "t12-",
+    "inputs": [
+      "contract_version",
+      "consumer_asset_id",
+      "child_plan_sha256",
+      "logical_target_scope",
+      "utc_window_start",
+      "attempt_sequence"
+    ],
+    "duration_clock": "MONOTONIC",
+    "evidence_timestamp_clock": "UTC_RFC3339",
+    "restart_creates_new_attempt_sequence": true,
+    "restart_backdates_availability": false
+  },
+  "duplicate_guard": {
+    "key_fields": [
+      "consumer_asset_id",
+      "child_plan_sha256",
+      "logical_target_scope",
+      "utc_window_start"
+    ],
+    "acquisition": "ATOMIC_CREATE_EXCLUSIVE",
+    "max_active_processes_per_key": 1,
+    "age_alone_proves_stale": false,
+    "stale_reconciliation_requires": [
+      "recorded_process_identity",
+      "recorded_process_start_token",
+      "lock_owner_run_id"
+    ],
+    "duplicate_state": "BLOCKED_DUPLICATE",
+    "duplicate_reason": "ACTIVE_DUPLICATE",
+    "duplicate_spawns_child": false,
+    "release_only_owned_lock": true
+  },
+  "state_machine": {
+    "initial_state": "CREATED",
+    "states": [
+      "CREATED",
+      "STARTING",
+      "RUNNING",
+      "SUCCEEDED",
+      "FAILED",
+      "TIMED_OUT",
+      "STOPPED",
+      "BLOCKED_DUPLICATE",
+      "BLOCKED_DISK"
+    ],
+    "terminal_states": [
+      "SUCCEEDED",
+      "FAILED",
+      "TIMED_OUT",
+      "STOPPED",
+      "BLOCKED_DUPLICATE",
+      "BLOCKED_DISK"
+    ],
+    "allowed_transitions": {
+      "CREATED": [
+        "STARTING",
+        "BLOCKED_DUPLICATE",
+        "BLOCKED_DISK",
+        "FAILED",
+        "STOPPED"
+      ],
+      "STARTING": [
+        "RUNNING",
+        "FAILED",
+        "TIMED_OUT",
+        "STOPPED",
+        "BLOCKED_DISK"
+      ],
+      "RUNNING": [
+        "SUCCEEDED",
+        "FAILED",
+        "TIMED_OUT",
+        "STOPPED",
+        "BLOCKED_DISK"
+      ],
+      "SUCCEEDED": [],
+      "FAILED": [],
+      "TIMED_OUT": [],
+      "STOPPED": [],
+      "BLOCKED_DUPLICATE": [],
+      "BLOCKED_DISK": []
+    },
+    "success_requires": [
+      "child_exit_code_equals_zero",
+      "exact_success_marker_observed",
+      "output_within_caps",
+      "disk_guard_not_breached"
+    ],
+    "zero_exit_alone_is_success": false
+  },
+  "terminal_reasons": {
+    "CHILD_EXIT_NONZERO": "FAILED",
+    "EXPECTED_MARKER_MISSING": "FAILED",
+    "CHILD_OUTPUT_LIMIT_EXCEEDED": "FAILED",
+    "CHILD_LINE_LIMIT_EXCEEDED": "FAILED",
+    "CHILD_WALL_TIMEOUT": "TIMED_OUT",
+    "ACTIVE_DUPLICATE": "BLOCKED_DUPLICATE",
+    "INSUFFICIENT_DISK_BEFORE_START": "BLOCKED_DISK",
+    "DISK_GUARD_BREACHED": "BLOCKED_DISK",
+    "STOP_REQUESTED": "STOPPED",
+    "CHILD_SPAWN_FAILED": "FAILED",
+    "INVALID_CHILD_OUTPUT": "FAILED"
+  },
+  "health": {
+    "states": [
+      "STARTING",
+      "HEALTHY",
+      "DEGRADED",
+      "UNHEALTHY",
+      "STOPPED"
+    ],
+    "inputs": [
+      "child_process_alive",
+      "child_exit_code",
+      "last_bounded_output_activity",
+      "monotonic_elapsed",
+      "disk_guard",
+      "lock_ownership",
+      "terminal_marker"
+    ],
+    "spawn_grace_seconds": 5,
+    "silence_seconds_max": 30,
+    "child_wall_seconds_max": 60,
+    "poll_interval_milliseconds_min": 200,
+    "alive_after_silence_state": "DEGRADED",
+    "exit_without_terminal_marker_is_healthy": false
+  },
+  "retry_and_stop": {
+    "concurrency": 1,
+    "retry_count_max": 0,
+    "automatic_restart": false,
+    "graceful_stop_seconds": 5,
+    "forced_termination_after_grace": true,
+    "delete_child_artifacts_on_stop": false,
+    "delete_other_run_lock": false,
+    "retry_requires_new_contract_version": true
+  },
+  "structured_events": {
+    "encoding": "NDJSON_CANONICAL_JSON",
+    "required_event_types": [
+      "SUPERVISOR_STARTED",
+      "CHILD_STARTED",
+      "CHILD_ACTIVITY",
+      "HEALTH_CHANGED",
+      "STOP_REQUESTED",
+      "CHILD_EXITED",
+      "SUPERVISOR_FINISHED"
+    ],
+    "required_fields": [
+      "schema_version",
+      "event_type",
+      "run_id",
+      "consumer_asset_id",
+      "attempt_sequence",
+      "state",
+      "observed_at",
+      "monotonic_elapsed_ms",
+      "reason",
+      "child_exit_code",
+      "stdout_bytes",
+      "stderr_bytes",
+      "disk_free_bytes",
+      "provider_calls",
+      "cash_spend_usd_cents"
+    ],
+    "line_bytes_max": 16384,
+    "child_stdout_stderr_bytes_max": 262144,
+    "sanitized_run_log_bytes_max": 1048576,
+    "local_retention_days_max": 7,
+    "environment_dump_forbidden": true,
+    "provider_body_forbidden": true,
+    "absolute_machine_path_forbidden": true
+  },
+  "disk_guard": {
+    "telemetry_required": true,
+    "missing_telemetry_disposition": "FAIL_CLOSED",
+    "offline_predicted_child_write_bytes_max": 0,
+    "start_reserve_fixed_bytes": 536870912,
+    "start_reserve_multiplier": 2,
+    "start_required_formula": "2 * predicted_child_write_bytes_max + 536870912",
+    "runtime_reserve_fixed_bytes": 268435456,
+    "runtime_required_formula": "predicted_remaining_write_bytes_max + 268435456",
+    "insufficient_start_state": "BLOCKED_DISK",
+    "runtime_breach_state": "BLOCKED_DISK",
+    "runtime_breach_reason": "DISK_GUARD_BREACHED",
+    "sustained_pilot_forecast_claim": false
+  },
+  "lineage_and_pit": {
+    "child_artifacts_rewritten": false,
+    "required_lineage": [
+      "parent_run_id",
+      "child_run_id",
+      "consumer_asset_id",
+      "launcher_repository_path",
+      "child_plan_sha256",
+      "sanitized_argv",
+      "child_start_timestamp",
+      "child_observation_timestamp",
+      "child_availability_timestamp",
+      "terminal_exit_disposition",
+      "accepted_child_receipt_sha256",
+      "accepted_child_manifest_sha256"
+    ],
+    "task06_raw_identity_preserved": true,
+    "task06_revision_links_preserved": true,
+    "task06_manifest_hashes_preserved": true,
+    "event_observed_available_ingested_meanings_preserved": true,
+    "restart_backdates_availability": false,
+    "missing_output_is_zero": false,
+    "provider_failure_is_no_route": false,
+    "provider_failure_is_success": false
+  },
+  "synthetic_vectors": [
+    {
+      "vector_id": "OFFLINE_PREFLIGHT_SUCCESS",
+      "precondition": "DISK_OK_AND_LOCK_ACQUIRED",
+      "child_exit_code": 0,
+      "success_marker_present": true,
+      "expected_state": "SUCCEEDED",
+      "expected_reason": null,
+      "child_spawn_count": 1
+    },
+    {
+      "vector_id": "ZERO_EXIT_WITHOUT_MARKER_FAILS",
+      "precondition": "DISK_OK_AND_LOCK_ACQUIRED",
+      "child_exit_code": 0,
+      "success_marker_present": false,
+      "expected_state": "FAILED",
+      "expected_reason": "EXPECTED_MARKER_MISSING",
+      "child_spawn_count": 1
+    },
+    {
+      "vector_id": "NONZERO_EXIT_RETAINED",
+      "precondition": "DISK_OK_AND_LOCK_ACQUIRED",
+      "child_exit_code": 2,
+      "success_marker_present": false,
+      "expected_state": "FAILED",
+      "expected_reason": "CHILD_EXIT_NONZERO",
+      "child_spawn_count": 1
+    },
+    {
+      "vector_id": "ACTIVE_DUPLICATE_BLOCKED",
+      "precondition": "ACTIVE_LOCK_PRESENT",
+      "child_exit_code": null,
+      "success_marker_present": false,
+      "expected_state": "BLOCKED_DUPLICATE",
+      "expected_reason": "ACTIVE_DUPLICATE",
+      "child_spawn_count": 0
+    },
+    {
+      "vector_id": "INSUFFICIENT_DISK_BLOCKS_SPAWN",
+      "precondition": "FREE_BYTES_BELOW_START_RESERVE",
+      "child_exit_code": null,
+      "success_marker_present": false,
+      "expected_state": "BLOCKED_DISK",
+      "expected_reason": "INSUFFICIENT_DISK_BEFORE_START",
+      "child_spawn_count": 0
+    },
+    {
+      "vector_id": "WALL_TIMEOUT_STOPS_CHILD",
+      "precondition": "CHILD_ALIVE_BEYOND_WALL_CAP",
+      "child_exit_code": null,
+      "success_marker_present": false,
+      "expected_state": "TIMED_OUT",
+      "expected_reason": "CHILD_WALL_TIMEOUT",
+      "child_spawn_count": 1
+    },
+    {
+      "vector_id": "RUNTIME_DISK_BREACH_STOPS_CHILD",
+      "precondition": "FREE_BYTES_BELOW_RUNTIME_RESERVE",
+      "child_exit_code": null,
+      "success_marker_present": false,
+      "expected_state": "BLOCKED_DISK",
+      "expected_reason": "DISK_GUARD_BREACHED",
+      "child_spawn_count": 1
+    }
+  ],
+  "catalog": {
+    "target_registry": "catalog/assets/core.yaml",
+    "registered_in_atom2": false,
+    "status": "CATALOG_TRANSACTION_PENDING_TASK12_FINAL_RECONCILIATION",
+    "reason": "FULL_REGISTRATION_REQUIRES_MANIFEST_GENERATED_NAVIGATION_AND_COUNT_TEST_PROPAGATION_OUTSIDE_ATOM2_WRITE_SET",
+    "blocks_task12_done": true,
+    "blocks_contract_freeze": false,
+    "planned_asset_ids": [
+      "CONTRACT-T12-PILOT-SUPERVISOR-001",
+      "FIXTURE-T12-PILOT-SUPERVISOR-001",
+      "TEST-T12-PILOT-SUPERVISOR-CONTRACT-001"
+    ]
+  },
+  "security": {
+    "contains_secrets": false,
+    "absolute_machine_paths": 0,
+    "credential_reads": 0,
+    "wallet_signer_transaction_actions": 0,
+    "transaction_build_simulate_send": 0
+  },
+  "authority": {
+    "class": "LOCAL_WRITE_ONLY",
+    "source": "EXPLICIT_USER",
+    "managed_files": [
+      "docs/contracts/pilot_supervisor_contract_v1.md",
+      "tests/fixtures/task12/pilot_supervisor_contract_v1.json",
+      "tests/test_task12_pilot_supervisor_contract.py",
+      "catalog/assets/core.yaml"
+    ],
+    "network_calls": 0,
+    "provider_api_rpc_wss_calls": 0,
+    "credential_use": 0,
+    "collector_executions": 0,
+    "raw_data_writes": 0,
+    "cash_spend_usd_cents": 0,
+    "provider_credits": 0,
+    "dependency_changes": 0,
+    "commit": false,
+    "push": false,
+    "pull_request": false,
+    "merge": false,
+    "ui_changes": false,
+    "destructive_actions": false
+  },
+  "next_atom": {
+    "atom_id": "T12-A3_THIN_OFFLINE_SUPERVISOR_IMPLEMENTATION_V1",
+    "production_code_authorized": false,
+    "external_calls_authorized": false,
+    "requires_new_bounded_write_set": true
+  }
+}
