@@ -1,0 +1,100 @@
+{
+  "schema": "solana_alpha_lab.jupiter_quote_pilot_plan",
+  "schema_version": "1.0",
+  "task_id": "TASK-10",
+  "atom_id": "T10-A4_BOUNDED_EXTERNAL_QUOTE_PILOT",
+  "status": "FROZEN_BEFORE_EXTERNAL_OBSERVATION",
+  "run_id": "t10a4-20260728T011304Z",
+  "selection": {
+    "mint": "4vXNhA6ncbx8usZ14CfxkYeQKdaQYgrLfJXNyWcVpump",
+    "decimals": 6,
+    "rule": "SOLE_NON_WSOL_MINT_IN_ACCEPTED_TASK09_GETTRANSACTION_TOKEN_BALANCES",
+    "price_or_route_observation_used": false,
+    "source_task": "TASK-09",
+    "source_asset_id": "DATA-T09-PUMPSWAP-TOUCH-PROBE-RAW-001",
+    "source_run_id": "t09a4-20260727T184740Z",
+    "source_partition_sha256": "577e614c0b2f41b7a1e3ae92b6cfd965e87e4d4bca76070925873df1ef5b4466",
+    "source_content_sha256": "0de9a748669c25fa08c4d1de594899a0761db48a1ba25774dd7f4d1109eaf73d",
+    "source_raw_event_id": "raw-86dee058f272ebb62e54a1a7a3ee2ce840fe1c109e3b463b46d65914c71dc702",
+    "source_response_content_sha256": "fdcb075a854b3471d0d4de0afdae29297e1359a095d5d9b745934f60a907ad6b",
+    "source_slot": 435592031,
+    "source_signature": "56gFRAusByxwSkBX2NszEyRtHssNx7vPbzRrGhx8YkmcWwesLwas2h2iBWrDU9dnuNSBSkam22BLK7K5U6e7RgMC"
+  },
+  "provider_surface": {
+    "provider": "JUPITER_METIS",
+    "provider_version": "legacy_metis_v1_quote",
+    "base_url": "https://api.jup.ag",
+    "method": "GET",
+    "path": "/swap/v1/quote",
+    "claim": "LEGACY_QUOTE_COMPATIBILITY_ONLY",
+    "credentials": 0,
+    "accounts": 0,
+    "fallback_hosts": [],
+    "v2_fallback": false
+  },
+  "panels": {
+    "quote_mint": "EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v",
+    "quote_decimals": 6,
+    "slippage_bps": 100,
+    "buy_input_atomic": [
+      10000000,
+      25000000,
+      50000000,
+      100000000
+    ],
+    "sell_input_rule": "EXACT_ACCEPTED_BUY_OUT_AMOUNT_ATOMIC",
+    "sell_after_unavailable_buy": "NOT_ATTEMPTED_BUY_PREREQUISITE_FAILED"
+  },
+  "caps": {
+    "selected_mints": 1,
+    "buy_requests": 4,
+    "dependent_sell_requests_max": 4,
+    "http_requests_total_max": 8,
+    "concurrency": 1,
+    "retries": 0,
+    "wall_seconds_max": 600,
+    "request_timeout_seconds": 20,
+    "minimum_interval_seconds": 2.2,
+    "received_response_bytes_max": 1048576,
+    "durable_raw_bytes_max": 5242880,
+    "api_keys": 0,
+    "accounts": 0,
+    "provider_credits": 0,
+    "cash_spend_usd_cents": 0,
+    "wallet_signer_transaction_actions": 0
+  },
+  "stop_conditions": [
+    "AUTHENTICATION_OR_ACCOUNT_REQUIRED",
+    "V2_TRANSACTION_OR_INSTRUCTION_SURFACE_REQUIRED",
+    "UNCLASSIFIABLE_SCHEMA_DRIFT",
+    "RESPONSE_BYTE_CAP_EXHAUSTED",
+    "RAW_BYTE_CAP_EXHAUSTED",
+    "WALL_TIME_CAP_EXHAUSTED",
+    "DEPENDENCY_OR_SCHEMA_CHANGE_REQUIRED",
+    "REQUEST_OUTSIDE_FROZEN_MINT_PANEL"
+  ],
+  "storage": {
+    "logical_root": "task10_jupiter_quote_pilot_v1/run=t10a4-20260728T011304Z",
+    "raw_partition": "partitions/quotes.parquet",
+    "projection_database": "projections/quotes.duckdb",
+    "manifest": "receipts/quotes.manifest.json",
+    "receipt": "receipts/run.receipt.json",
+    "raw_bytes_in_git": false
+  },
+  "authority": {
+    "source": "EXPLICIT_USER",
+    "approved_phrase": "T10-A4_BOUNDED_EXTERNAL_QUOTE_PILOT",
+    "network": true,
+    "public_keyless_provider_calls": true,
+    "raw_write": true,
+    "dependency_changes": 0,
+    "credential_use": false,
+    "cash_spend_usd_cents": 0,
+    "wallet_signer_transaction_actions": 0,
+    "commit": false,
+    "push": false,
+    "pull_request": false,
+    "merge": false,
+    "ui_changes": false
+  }
+}

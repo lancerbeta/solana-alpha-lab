@@ -463,6 +463,36 @@
       "target_asset_id": "TEST-T09-PUMPSWAP-TOUCH-001"
     },
     {
+      "source_asset_id": "CONTRACT-T10-JUPITER-QUOTE-OBSERVATION-001",
+      "relation": "depends_on",
+      "target_asset_id": "CONTRACT-T06-RAW-STORAGE-001"
+    },
+    {
+      "source_asset_id": "CONTRACT-T10-JUPITER-QUOTE-OBSERVATION-001",
+      "relation": "depends_on",
+      "target_asset_id": "EVIDENCE-T09-PUMPSWAP-TOUCH-RECEIPT-001"
+    },
+    {
+      "source_asset_id": "CONTRACT-T10-JUPITER-QUOTE-OBSERVATION-001",
+      "relation": "depends_on",
+      "target_asset_id": "SCHEMA-T05-REL-EXECUTION-ATTEMPTS-001"
+    },
+    {
+      "source_asset_id": "CONTRACT-T10-JUPITER-QUOTE-OBSERVATION-001",
+      "relation": "depends_on",
+      "target_asset_id": "SCHEMA-T05-REL-QUOTE-ATTEMPTS-001"
+    },
+    {
+      "source_asset_id": "CONTRACT-T10-JUPITER-QUOTE-OBSERVATION-001",
+      "relation": "derived_from",
+      "target_asset_id": "PRE-GIT-TASK01-A023"
+    },
+    {
+      "source_asset_id": "CONTRACT-T10-JUPITER-QUOTE-OBSERVATION-001",
+      "relation": "validated_by",
+      "target_asset_id": "TEST-T10-JUPITER-QUOTE-OBSERVATION-001"
+    },
+    {
       "source_asset_id": "CTRL-AGENTS-001",
       "relation": "governed_by",
       "target_asset_id": "CTRL-TASK-04-001"
@@ -693,6 +723,71 @@
       "target_asset_id": "TEST-T09-PUMPSWAP-TOUCH-EVIDENCE-001"
     },
     {
+      "source_asset_id": "DATA-T10-JUPITER-QUOTE-PILOT-RAW-001",
+      "relation": "derived_from",
+      "target_asset_id": "MODULE-T10-JUPITER-QUOTE-TRANSPORT-001"
+    },
+    {
+      "source_asset_id": "DATA-T10-JUPITER-QUOTE-PILOT-RAW-001",
+      "relation": "evidenced_by",
+      "target_asset_id": "EVIDENCE-T10-JUPITER-QUOTE-RECEIPT-001"
+    },
+    {
+      "source_asset_id": "DATA-T10-JUPITER-QUOTE-PILOT-RAW-001",
+      "relation": "validated_by",
+      "target_asset_id": "TEST-T10-JUPITER-QUOTE-EVIDENCE-001"
+    },
+    {
+      "source_asset_id": "DATA-T10-JUPITER-QUOTE-PILOT-RAW-002",
+      "relation": "derived_from",
+      "target_asset_id": "FIXTURE-T10-JUPITER-QUOTE-PILOT-PLAN-002"
+    },
+    {
+      "source_asset_id": "DATA-T10-JUPITER-QUOTE-PILOT-RAW-002",
+      "relation": "derived_from",
+      "target_asset_id": "MODULE-T10-JUPITER-QUOTE-TRANSPORT-001"
+    },
+    {
+      "source_asset_id": "DATA-T10-JUPITER-QUOTE-PILOT-RAW-002",
+      "relation": "evidenced_by",
+      "target_asset_id": "EVIDENCE-T10-JUPITER-QUOTE-RECEIPT-002"
+    },
+    {
+      "source_asset_id": "DATA-T10-JUPITER-QUOTE-PILOT-RAW-002",
+      "relation": "validated_by",
+      "target_asset_id": "TEST-T10-JUPITER-QUOTE-EVIDENCE-002"
+    },
+    {
+      "source_asset_id": "DATA-T10-JUPITER-QUOTE-PROJECTION-001",
+      "relation": "derived_from",
+      "target_asset_id": "DATA-T10-JUPITER-QUOTE-PILOT-RAW-001"
+    },
+    {
+      "source_asset_id": "DATA-T10-JUPITER-QUOTE-PROJECTION-001",
+      "relation": "evidenced_by",
+      "target_asset_id": "EVIDENCE-T10-JUPITER-QUOTE-RECEIPT-001"
+    },
+    {
+      "source_asset_id": "DATA-T10-JUPITER-QUOTE-PROJECTION-001",
+      "relation": "validated_by",
+      "target_asset_id": "TEST-T10-JUPITER-QUOTE-EVIDENCE-001"
+    },
+    {
+      "source_asset_id": "DATA-T10-JUPITER-QUOTE-PROJECTION-002",
+      "relation": "derived_from",
+      "target_asset_id": "DATA-T10-JUPITER-QUOTE-PILOT-RAW-002"
+    },
+    {
+      "source_asset_id": "DATA-T10-JUPITER-QUOTE-PROJECTION-002",
+      "relation": "evidenced_by",
+      "target_asset_id": "EVIDENCE-T10-JUPITER-QUOTE-RECEIPT-002"
+    },
+    {
+      "source_asset_id": "DATA-T10-JUPITER-QUOTE-PROJECTION-002",
+      "relation": "validated_by",
+      "target_asset_id": "TEST-T10-JUPITER-QUOTE-EVIDENCE-002"
+    },
+    {
       "source_asset_id": "ENV-WORKSTATION-001",
       "relation": "produces",
       "target_asset_id": "SCM-BASELINE-COMMIT-001"
@@ -853,6 +948,66 @@
       "target_asset_id": "EVIDENCE-T09-PUMPSWAP-TOUCH-RECEIPT-001"
     },
     {
+      "source_asset_id": "EVIDENCE-T10-JUPITER-QUOTE-RECEIPT-001",
+      "relation": "derived_from",
+      "target_asset_id": "DATA-T10-JUPITER-QUOTE-PILOT-RAW-001"
+    },
+    {
+      "source_asset_id": "EVIDENCE-T10-JUPITER-QUOTE-RECEIPT-001",
+      "relation": "derived_from",
+      "target_asset_id": "DATA-T10-JUPITER-QUOTE-PROJECTION-001"
+    },
+    {
+      "source_asset_id": "EVIDENCE-T10-JUPITER-QUOTE-RECEIPT-001",
+      "relation": "derived_from",
+      "target_asset_id": "FIXTURE-T10-JUPITER-QUOTE-LIVE-EVIDENCE-001"
+    },
+    {
+      "source_asset_id": "EVIDENCE-T10-JUPITER-QUOTE-RECEIPT-001",
+      "relation": "validated_by",
+      "target_asset_id": "TEST-T10-JUPITER-QUOTE-EVIDENCE-001"
+    },
+    {
+      "source_asset_id": "EVIDENCE-T10-JUPITER-QUOTE-RECEIPT-002",
+      "relation": "derived_from",
+      "target_asset_id": "DATA-T10-JUPITER-QUOTE-PILOT-RAW-002"
+    },
+    {
+      "source_asset_id": "EVIDENCE-T10-JUPITER-QUOTE-RECEIPT-002",
+      "relation": "derived_from",
+      "target_asset_id": "DATA-T10-JUPITER-QUOTE-PROJECTION-002"
+    },
+    {
+      "source_asset_id": "EVIDENCE-T10-JUPITER-QUOTE-RECEIPT-002",
+      "relation": "derived_from",
+      "target_asset_id": "FIXTURE-T10-JUPITER-QUOTE-LIVE-EVIDENCE-002"
+    },
+    {
+      "source_asset_id": "EVIDENCE-T10-JUPITER-QUOTE-RECEIPT-002",
+      "relation": "validated_by",
+      "target_asset_id": "TEST-T10-JUPITER-QUOTE-EVIDENCE-002"
+    },
+    {
+      "source_asset_id": "EVIDENCE-T10-JUPITER-QUOTE-SUMMARY-001",
+      "relation": "derived_from",
+      "target_asset_id": "FIXTURE-T10-JUPITER-QUOTE-LIVE-EVIDENCE-001"
+    },
+    {
+      "source_asset_id": "EVIDENCE-T10-JUPITER-QUOTE-SUMMARY-001",
+      "relation": "evidenced_by",
+      "target_asset_id": "EVIDENCE-T10-JUPITER-QUOTE-RECEIPT-001"
+    },
+    {
+      "source_asset_id": "EVIDENCE-T10-JUPITER-QUOTE-SUMMARY-002",
+      "relation": "derived_from",
+      "target_asset_id": "FIXTURE-T10-JUPITER-QUOTE-LIVE-EVIDENCE-002"
+    },
+    {
+      "source_asset_id": "EVIDENCE-T10-JUPITER-QUOTE-SUMMARY-002",
+      "relation": "evidenced_by",
+      "target_asset_id": "EVIDENCE-T10-JUPITER-QUOTE-RECEIPT-002"
+    },
+    {
       "source_asset_id": "FIXTURE-BATON-SUITE-001",
       "relation": "governed_by",
       "target_asset_id": "CTRL-BATON-SETUP-001"
@@ -991,6 +1146,91 @@
       "source_asset_id": "FIXTURE-T09-PUMPSWAP-TOUCH-EVIDENCE-001",
       "relation": "validated_by",
       "target_asset_id": "TEST-T09-PUMPSWAP-TOUCH-EVIDENCE-001"
+    },
+    {
+      "source_asset_id": "FIXTURE-T10-JUPITER-QUOTE-LIVE-EVIDENCE-001",
+      "relation": "derived_from",
+      "target_asset_id": "DATA-T10-JUPITER-QUOTE-PILOT-RAW-001"
+    },
+    {
+      "source_asset_id": "FIXTURE-T10-JUPITER-QUOTE-LIVE-EVIDENCE-001",
+      "relation": "derived_from",
+      "target_asset_id": "DATA-T10-JUPITER-QUOTE-PROJECTION-001"
+    },
+    {
+      "source_asset_id": "FIXTURE-T10-JUPITER-QUOTE-LIVE-EVIDENCE-001",
+      "relation": "validated_by",
+      "target_asset_id": "TEST-T10-JUPITER-QUOTE-EVIDENCE-001"
+    },
+    {
+      "source_asset_id": "FIXTURE-T10-JUPITER-QUOTE-LIVE-EVIDENCE-002",
+      "relation": "derived_from",
+      "target_asset_id": "DATA-T10-JUPITER-QUOTE-PILOT-RAW-002"
+    },
+    {
+      "source_asset_id": "FIXTURE-T10-JUPITER-QUOTE-LIVE-EVIDENCE-002",
+      "relation": "derived_from",
+      "target_asset_id": "DATA-T10-JUPITER-QUOTE-PROJECTION-002"
+    },
+    {
+      "source_asset_id": "FIXTURE-T10-JUPITER-QUOTE-LIVE-EVIDENCE-002",
+      "relation": "validated_by",
+      "target_asset_id": "TEST-T10-JUPITER-QUOTE-EVIDENCE-002"
+    },
+    {
+      "source_asset_id": "FIXTURE-T10-JUPITER-QUOTE-LOGGER-001",
+      "relation": "derived_from",
+      "target_asset_id": "CONTRACT-T10-JUPITER-QUOTE-OBSERVATION-001"
+    },
+    {
+      "source_asset_id": "FIXTURE-T10-JUPITER-QUOTE-LOGGER-001",
+      "relation": "validated_by",
+      "target_asset_id": "TEST-T10-JUPITER-QUOTE-LOGGER-001"
+    },
+    {
+      "source_asset_id": "FIXTURE-T10-JUPITER-QUOTE-OBSERVATION-001",
+      "relation": "derived_from",
+      "target_asset_id": "CONTRACT-T10-JUPITER-QUOTE-OBSERVATION-001"
+    },
+    {
+      "source_asset_id": "FIXTURE-T10-JUPITER-QUOTE-OBSERVATION-001",
+      "relation": "validated_by",
+      "target_asset_id": "TEST-T10-JUPITER-QUOTE-OBSERVATION-001"
+    },
+    {
+      "source_asset_id": "FIXTURE-T10-JUPITER-QUOTE-PILOT-PLAN-001",
+      "relation": "derived_from",
+      "target_asset_id": "EVIDENCE-T09-PUMPSWAP-TOUCH-RECEIPT-001"
+    },
+    {
+      "source_asset_id": "FIXTURE-T10-JUPITER-QUOTE-PILOT-PLAN-001",
+      "relation": "governed_by",
+      "target_asset_id": "CONTRACT-T10-JUPITER-QUOTE-OBSERVATION-001"
+    },
+    {
+      "source_asset_id": "FIXTURE-T10-JUPITER-QUOTE-PILOT-PLAN-001",
+      "relation": "validated_by",
+      "target_asset_id": "TEST-T10-JUPITER-QUOTE-TRANSPORT-001"
+    },
+    {
+      "source_asset_id": "FIXTURE-T10-JUPITER-QUOTE-PILOT-PLAN-002",
+      "relation": "derived_from",
+      "target_asset_id": "EVIDENCE-T09-PUMPSWAP-TOUCH-RECEIPT-001"
+    },
+    {
+      "source_asset_id": "FIXTURE-T10-JUPITER-QUOTE-PILOT-PLAN-002",
+      "relation": "derived_from",
+      "target_asset_id": "EVIDENCE-T10-JUPITER-QUOTE-RECEIPT-001"
+    },
+    {
+      "source_asset_id": "FIXTURE-T10-JUPITER-QUOTE-PILOT-PLAN-002",
+      "relation": "governed_by",
+      "target_asset_id": "CONTRACT-T10-JUPITER-QUOTE-OBSERVATION-001"
+    },
+    {
+      "source_asset_id": "FIXTURE-T10-JUPITER-QUOTE-PILOT-PLAN-002",
+      "relation": "validated_by",
+      "target_asset_id": "TEST-T10-JUPITER-QUOTE-TRANSPORT-001"
     },
     {
       "source_asset_id": "GENERATED-EDGE-PROJECTION-001",
@@ -1216,6 +1456,56 @@
       "source_asset_id": "MODULE-T09-PUMPSWAP-TOUCH-PROBE-001",
       "relation": "validated_by",
       "target_asset_id": "TEST-T09-PUMPSWAP-TOUCH-PROBE-001"
+    },
+    {
+      "source_asset_id": "MODULE-T10-JUPITER-QUOTE-LOGGER-001",
+      "relation": "depends_on",
+      "target_asset_id": "CONTRACT-T06-RAW-STORAGE-001"
+    },
+    {
+      "source_asset_id": "MODULE-T10-JUPITER-QUOTE-LOGGER-001",
+      "relation": "depends_on",
+      "target_asset_id": "SCHEMA-T05-REL-QUOTE-ATTEMPTS-001"
+    },
+    {
+      "source_asset_id": "MODULE-T10-JUPITER-QUOTE-LOGGER-001",
+      "relation": "governed_by",
+      "target_asset_id": "CONTRACT-T10-JUPITER-QUOTE-OBSERVATION-001"
+    },
+    {
+      "source_asset_id": "MODULE-T10-JUPITER-QUOTE-LOGGER-001",
+      "relation": "validated_by",
+      "target_asset_id": "TEST-T10-JUPITER-QUOTE-LOGGER-001"
+    },
+    {
+      "source_asset_id": "MODULE-T10-JUPITER-QUOTE-TRANSPORT-001",
+      "relation": "depends_on",
+      "target_asset_id": "CONTRACT-T06-RAW-STORAGE-001"
+    },
+    {
+      "source_asset_id": "MODULE-T10-JUPITER-QUOTE-TRANSPORT-001",
+      "relation": "depends_on",
+      "target_asset_id": "FIXTURE-T10-JUPITER-QUOTE-PILOT-PLAN-001"
+    },
+    {
+      "source_asset_id": "MODULE-T10-JUPITER-QUOTE-TRANSPORT-001",
+      "relation": "depends_on",
+      "target_asset_id": "FIXTURE-T10-JUPITER-QUOTE-PILOT-PLAN-002"
+    },
+    {
+      "source_asset_id": "MODULE-T10-JUPITER-QUOTE-TRANSPORT-001",
+      "relation": "depends_on",
+      "target_asset_id": "MODULE-T10-JUPITER-QUOTE-LOGGER-001"
+    },
+    {
+      "source_asset_id": "MODULE-T10-JUPITER-QUOTE-TRANSPORT-001",
+      "relation": "governed_by",
+      "target_asset_id": "CONTRACT-T10-JUPITER-QUOTE-OBSERVATION-001"
+    },
+    {
+      "source_asset_id": "MODULE-T10-JUPITER-QUOTE-TRANSPORT-001",
+      "relation": "validated_by",
+      "target_asset_id": "TEST-T10-JUPITER-QUOTE-TRANSPORT-001"
     },
     {
       "source_asset_id": "PRE-GIT-TASK01-A017",
@@ -1973,6 +2263,16 @@
       "target_asset_id": "TEST-T09-PUMPSWAP-TOUCH-PROBE-001"
     },
     {
+      "source_asset_id": "SCRIPT-T10-JUPITER-QUOTE-LOGGER-001",
+      "relation": "depends_on",
+      "target_asset_id": "MODULE-T10-JUPITER-QUOTE-LOGGER-001"
+    },
+    {
+      "source_asset_id": "SCRIPT-T10-JUPITER-QUOTE-LOGGER-001",
+      "relation": "validated_by",
+      "target_asset_id": "TEST-T10-JUPITER-QUOTE-LOGGER-001"
+    },
+    {
       "source_asset_id": "TEMPLATE-BATON-ISSUE-FORM-001",
       "relation": "governed_by",
       "target_asset_id": "CTRL-BATON-SETUP-001"
@@ -2261,6 +2561,81 @@
       "source_asset_id": "TEST-T09-PUMPSWAP-TOUCH-PROBE-001",
       "relation": "depends_on",
       "target_asset_id": "SCRIPT-T09-PUMPSWAP-TOUCH-PROBE-001"
+    },
+    {
+      "source_asset_id": "TEST-T10-JUPITER-QUOTE-EVIDENCE-001",
+      "relation": "depends_on",
+      "target_asset_id": "EVIDENCE-T10-JUPITER-QUOTE-RECEIPT-001"
+    },
+    {
+      "source_asset_id": "TEST-T10-JUPITER-QUOTE-EVIDENCE-001",
+      "relation": "depends_on",
+      "target_asset_id": "FIXTURE-T10-JUPITER-QUOTE-LIVE-EVIDENCE-001"
+    },
+    {
+      "source_asset_id": "TEST-T10-JUPITER-QUOTE-EVIDENCE-002",
+      "relation": "depends_on",
+      "target_asset_id": "EVIDENCE-T10-JUPITER-QUOTE-RECEIPT-002"
+    },
+    {
+      "source_asset_id": "TEST-T10-JUPITER-QUOTE-EVIDENCE-002",
+      "relation": "depends_on",
+      "target_asset_id": "FIXTURE-T10-JUPITER-QUOTE-LIVE-EVIDENCE-002"
+    },
+    {
+      "source_asset_id": "TEST-T10-JUPITER-QUOTE-LOGGER-001",
+      "relation": "depends_on",
+      "target_asset_id": "CONTRACT-T10-JUPITER-QUOTE-OBSERVATION-001"
+    },
+    {
+      "source_asset_id": "TEST-T10-JUPITER-QUOTE-LOGGER-001",
+      "relation": "depends_on",
+      "target_asset_id": "FIXTURE-T10-JUPITER-QUOTE-LOGGER-001"
+    },
+    {
+      "source_asset_id": "TEST-T10-JUPITER-QUOTE-LOGGER-001",
+      "relation": "depends_on",
+      "target_asset_id": "MODULE-T10-JUPITER-QUOTE-LOGGER-001"
+    },
+    {
+      "source_asset_id": "TEST-T10-JUPITER-QUOTE-LOGGER-001",
+      "relation": "depends_on",
+      "target_asset_id": "SCHEMA-T05-REL-QUOTE-ATTEMPTS-001"
+    },
+    {
+      "source_asset_id": "TEST-T10-JUPITER-QUOTE-LOGGER-001",
+      "relation": "depends_on",
+      "target_asset_id": "SCRIPT-T10-JUPITER-QUOTE-LOGGER-001"
+    },
+    {
+      "source_asset_id": "TEST-T10-JUPITER-QUOTE-OBSERVATION-001",
+      "relation": "depends_on",
+      "target_asset_id": "CONTRACT-T10-JUPITER-QUOTE-OBSERVATION-001"
+    },
+    {
+      "source_asset_id": "TEST-T10-JUPITER-QUOTE-OBSERVATION-001",
+      "relation": "depends_on",
+      "target_asset_id": "FIXTURE-T10-JUPITER-QUOTE-OBSERVATION-001"
+    },
+    {
+      "source_asset_id": "TEST-T10-JUPITER-QUOTE-OBSERVATION-001",
+      "relation": "depends_on",
+      "target_asset_id": "SCHEMA-T05-REL-QUOTE-ATTEMPTS-001"
+    },
+    {
+      "source_asset_id": "TEST-T10-JUPITER-QUOTE-TRANSPORT-001",
+      "relation": "depends_on",
+      "target_asset_id": "FIXTURE-T10-JUPITER-QUOTE-PILOT-PLAN-001"
+    },
+    {
+      "source_asset_id": "TEST-T10-JUPITER-QUOTE-TRANSPORT-001",
+      "relation": "depends_on",
+      "target_asset_id": "FIXTURE-T10-JUPITER-QUOTE-PILOT-PLAN-002"
+    },
+    {
+      "source_asset_id": "TEST-T10-JUPITER-QUOTE-TRANSPORT-001",
+      "relation": "depends_on",
+      "target_asset_id": "MODULE-T10-JUPITER-QUOTE-TRANSPORT-001"
     },
     {
       "source_asset_id": "VALIDATOR-REPOSITORY-STATE-001",

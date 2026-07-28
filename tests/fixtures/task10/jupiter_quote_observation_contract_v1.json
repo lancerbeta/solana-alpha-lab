@@ -1,0 +1,486 @@
+{
+  "schema": "solana_alpha_lab.jupiter_quote_observation_contract",
+  "schema_version": "1.0",
+  "task_id": "TASK-10",
+  "atom_id": "T10-A2",
+  "as_of": "2026-07-28",
+  "status": "IMPLEMENTED_UNVERIFIED",
+  "entry_verdict": "START_WITH_PATCH",
+  "estimand": {
+    "question": "DID_BUY_AND_EXACT_REVERSE_SELL_QUOTES_EXIST_AT_PIT_AVAILABILITY",
+    "accepted_claim": "QUOTE_COMPATIBILITY_ONLY",
+    "separation": [
+      "TOUCH",
+      "FILLABLE",
+      "REALIZED_VWAP",
+      "NET",
+      "PATH_RISK"
+    ],
+    "forbidden_claims": [
+      "TRANSACTION_CONSTRUCTED",
+      "TRANSACTION_SIMULATED",
+      "TRANSACTION_SENT",
+      "FILL_OBSERVED",
+      "REALIZED_VWAP",
+      "NET_RETURN",
+      "PATH_RISK",
+      "STRATEGY_ALPHA",
+      "CURRENT_PRODUCTION_PATH_PROVEN"
+    ]
+  },
+  "official_facts": {
+    "observed_at": "2026-07-28",
+    "sources": [
+      "https://developers.jup.ag/docs/swap",
+      "https://developers.jup.ag/docs/api-reference/swap/v1/quote",
+      "https://developers.jup.ag/docs/llms.txt"
+    ],
+    "authentication_conflict": true,
+    "authentication_or_account_requirement_disposition": "STOP_NO_ACCOUNT_OR_KEY"
+  },
+  "provider_surface_decision": {
+    "current_recommended_family": "JUPITER_SWAP_V2",
+    "current_v2": {
+      "base_url": "https://api.jup.ag/swap/v2",
+      "order_path": "/order",
+      "order_returns_assembled_transaction": true,
+      "order_taker_coupled": true,
+      "build_path": "/build",
+      "build_returns_transaction_instructions": true,
+      "eligible_for_first_quote_only_pilot": false,
+      "block_reason": "TRANSACTION_OR_INSTRUCTION_SURFACE_FORBIDDEN"
+    },
+    "compatibility_candidate": {
+      "surface_id": "JUPITER_METIS_V1_QUOTE",
+      "base_url": "https://api.jup.ag",
+      "method": "GET",
+      "path": "/swap/v1/quote",
+      "maintenance_status": "LEGACY_NOT_ACTIVELY_MAINTAINED",
+      "future_pilot_claim": "LEGACY_QUOTE_COMPATIBILITY_ONLY",
+      "current_production_path_proven": false
+    },
+    "automatic_fallback_to_v2": false
+  },
+  "quote_panels": {
+    "input_quote_mint": "EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v",
+    "input_quote_symbol": "USDC",
+    "input_quote_decimals": 6,
+    "selected_output_mint": "task09-followup-mint-synthetic",
+    "selected_output_decimals": 6,
+    "selection_rule": "FREEZE_ONE_TASK09_FOLLOWUP_BEFORE_ANY_ROUTE_OBSERVATION",
+    "notionals": [
+      {
+        "usd": 10,
+        "buy_input_atomic": 10000000
+      },
+      {
+        "usd": 25,
+        "buy_input_atomic": 25000000
+      },
+      {
+        "usd": 50,
+        "buy_input_atomic": 50000000
+      },
+      {
+        "usd": 100,
+        "buy_input_atomic": 100000000
+      }
+    ],
+    "sell_input_rule": "EXACT_BUY_OUTPUT_QUOTED_ATOMIC",
+    "float_arithmetic_forbidden": true,
+    "sell_after_unavailable_buy": "NOT_ATTEMPTED_BUY_PREREQUISITE_FAILED"
+  },
+  "request_identity": {
+    "canonical_request_json_required": true,
+    "request_hash": "SHA256_CANONICAL_REQUEST_JSON",
+    "idempotency_fields": [
+      "provider_contract_version",
+      "side",
+      "input_mint",
+      "output_mint",
+      "input_requested_atomic",
+      "attempt_ordinal"
+    ],
+    "route_id": "SHA256_CANONICAL_ROUTE_PLAN_JSON",
+    "route_count": "LEN_ROUTE_PLAN"
+  },
+  "timestamps": [
+    "event_at",
+    "observed_at",
+    "available_at",
+    "ingested_at",
+    "first_reliable_available_at",
+    "provider_context_slot"
+  ],
+  "timestamp_mapping": {
+    "event_at": "requested_at",
+    "observed_at": "response_at",
+    "available_at": "available_to_strategy_at",
+    "ingested_at": "ingested_at",
+    "first_reliable_available_at": "first_reliable_available_at",
+    "provider_context_slot": "context_slot"
+  },
+  "terminal_states": {
+    "QUOTE_AVAILABLE": {
+      "response_required": true,
+      "output_required": true,
+      "route_id_required": true,
+      "route_count_min": 1,
+      "error_class_required": false
+    },
+    "NO_ROUTE": {
+      "response_required": true,
+      "output_required": false,
+      "route_id_required": false,
+      "route_count_exact": 0,
+      "error_class_required": false
+    },
+    "PROVIDER_ERROR": {
+      "output_required": false,
+      "route_id_required": false,
+      "error_class_required": true
+    },
+    "INVALID_RESPONSE": {
+      "output_required": false,
+      "route_id_required": false,
+      "error_class_required": true
+    },
+    "TIMEOUT": {
+      "response_required": false,
+      "output_required": false,
+      "route_id_required": false,
+      "error_class_required": true
+    }
+  },
+  "error_classes": [
+    "AUTHENTICATION_REQUIRED",
+    "ACCOUNT_REQUIRED",
+    "RATE_LIMITED",
+    "HTTP_4XX",
+    "HTTP_5XX",
+    "SCHEMA_MISMATCH",
+    "STALE_RESPONSE",
+    "TRANSACTION_PAYLOAD_FORBIDDEN",
+    "PROVIDER_CONTRACT_BLOCKED",
+    "TIMEOUT"
+  ],
+  "state_invariants": {
+    "missing_is_zero": false,
+    "provider_failure_is_no_route": false,
+    "timeout_is_no_route": false,
+    "stale_is_quote_available": false,
+    "unavailable_buy_creates_sell_attempt": false,
+    "retry_count": 0
+  },
+  "fee_accounting": {
+    "provider_out_amount_stored_exactly": true,
+    "embedded_economics_subtracted_again": false,
+    "price_impact_subtracted_again": false,
+    "slippage_limit_is_realized_cost": false,
+    "normalized_fees_require_single_mint_and_proven_inclusion_semantics": true,
+    "unknown_fee_projection": {
+      "provider_fee_atomic": null,
+      "platform_fee_atomic": null,
+      "fee_mint": null,
+      "included_in_output_amount": null,
+      "quality_flag": "PROVIDER_ROUTE_FEE_DETAIL_RAW_ONLY"
+    },
+    "price_impact_location": "REDACTED_RAW_EVIDENCE_SCHEMA_V1"
+  },
+  "raw_boundary": {
+    "contract_asset_id": "CONTRACT-T06-RAW-STORAGE-001",
+    "redaction_before_storage": true,
+    "append_only": true,
+    "raw_bytes_in_git": false,
+    "transaction_payload_disposition": "INVALID_RESPONSE_AND_STOP_AFTER_TYPED_RAW_ENVELOPE",
+    "transaction_decode_construct_simulate_sign_send": false
+  },
+  "schema_mapping": {
+    "quote_attempts": {
+      "asset_id": "SCHEMA-T05-REL-QUOTE-ATTEMPTS-001",
+      "task10_first_writer": true,
+      "relation_mode": "WRITE_ONLY_IN_FUTURE_EXTERNAL_ATOM"
+    },
+    "execution_attempts": {
+      "asset_id": "SCHEMA-T05-REL-EXECUTION-ATTEMPTS-001",
+      "task10_atom2_mode": "FORBIDDEN",
+      "quote_only_pilot_mode": "FORBIDDEN"
+    },
+    "task09_touch": {
+      "asset_id": "EVIDENCE-T09-PUMPSWAP-TOUCH-RECEIPT-001",
+      "accepted_claim": "TOUCH_ONLY",
+      "fillable_inference_forbidden": true,
+      "no_route_inference_forbidden": true
+    }
+  },
+  "quote_attempt_projection_examples": [
+    {
+      "quote_attempt_id": "quote-synthetic-available-001",
+      "idempotency_key": "quote-idem-available-001",
+      "business_key": "panel-synthetic-10",
+      "request_hash": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "provider": "JUPITER_METIS",
+      "provider_version": "legacy_metis_v1_quote",
+      "side": "BUY",
+      "input_mint": "EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v",
+      "input_requested_atomic": 10000000,
+      "input_decimals": 6,
+      "output_mint": "task09-followup-mint-synthetic",
+      "output_quoted_atomic": 2500000,
+      "output_decimals": 6,
+      "route_id": "route-synthetic-sha256",
+      "route_count": 2,
+      "context_slot": 100,
+      "requested_at": "2026-07-28T00:00:00Z",
+      "response_at": "2026-07-28T00:00:00.100000Z",
+      "available_to_strategy_at": "2026-07-28T00:00:00.120000Z",
+      "ingested_at": "2026-07-28T00:00:00.130000Z",
+      "first_reliable_available_at": "2026-07-28T00:00:00.110000Z",
+      "quote_age_ms": 20,
+      "provider_latency_ms": 100,
+      "provider_fee_atomic": null,
+      "platform_fee_atomic": null,
+      "fee_mint": null,
+      "included_in_output_amount": null,
+      "status": "QUOTE_AVAILABLE",
+      "error_class": null,
+      "raw_event_id": "raw-quote-synthetic-available-001",
+      "response_content_sha256": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+      "schema_version": "1.0",
+      "revision_number": 1,
+      "revision_of": null,
+      "quality_flags": "SYNTHETIC_PROVIDER_ROUTE_FEE_DETAIL_RAW_ONLY"
+    },
+    {
+      "quote_attempt_id": "quote-synthetic-no-route-001",
+      "idempotency_key": "quote-idem-no-route-001",
+      "business_key": "panel-synthetic-10",
+      "request_hash": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+      "provider": "JUPITER_METIS",
+      "provider_version": "legacy_metis_v1_quote",
+      "side": "SELL",
+      "input_mint": "task09-followup-mint-synthetic",
+      "input_requested_atomic": 2500000,
+      "input_decimals": 6,
+      "output_mint": "EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v",
+      "output_quoted_atomic": null,
+      "output_decimals": 6,
+      "route_id": null,
+      "route_count": 0,
+      "context_slot": 101,
+      "requested_at": "2026-07-28T00:00:01Z",
+      "response_at": "2026-07-28T00:00:01.100000Z",
+      "available_to_strategy_at": "2026-07-28T00:00:01.120000Z",
+      "ingested_at": "2026-07-28T00:00:01.130000Z",
+      "first_reliable_available_at": "2026-07-28T00:00:01.110000Z",
+      "quote_age_ms": 20,
+      "provider_latency_ms": 100,
+      "provider_fee_atomic": null,
+      "platform_fee_atomic": null,
+      "fee_mint": null,
+      "included_in_output_amount": null,
+      "status": "NO_ROUTE",
+      "error_class": null,
+      "raw_event_id": "raw-quote-synthetic-no-route-001",
+      "response_content_sha256": "dddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd",
+      "schema_version": "1.0",
+      "revision_number": 1,
+      "revision_of": null,
+      "quality_flags": "SYNTHETIC_EXPLICIT_NO_ROUTE"
+    },
+    {
+      "quote_attempt_id": "quote-synthetic-provider-error-001",
+      "idempotency_key": "quote-idem-provider-error-001",
+      "business_key": "panel-synthetic-25",
+      "request_hash": "eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee",
+      "provider": "JUPITER_METIS",
+      "provider_version": "legacy_metis_v1_quote",
+      "side": "BUY",
+      "input_mint": "EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v",
+      "input_requested_atomic": 25000000,
+      "input_decimals": 6,
+      "output_mint": "task09-followup-mint-synthetic",
+      "output_quoted_atomic": null,
+      "output_decimals": 6,
+      "route_id": null,
+      "route_count": null,
+      "context_slot": null,
+      "requested_at": "2026-07-28T00:00:02Z",
+      "response_at": "2026-07-28T00:00:02.100000Z",
+      "available_to_strategy_at": "2026-07-28T00:00:02.120000Z",
+      "ingested_at": "2026-07-28T00:00:02.130000Z",
+      "first_reliable_available_at": "2026-07-28T00:00:02.110000Z",
+      "quote_age_ms": null,
+      "provider_latency_ms": 100,
+      "provider_fee_atomic": null,
+      "platform_fee_atomic": null,
+      "fee_mint": null,
+      "included_in_output_amount": null,
+      "status": "PROVIDER_ERROR",
+      "error_class": "HTTP_5XX",
+      "raw_event_id": "raw-quote-synthetic-provider-error-001",
+      "response_content_sha256": "ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff",
+      "schema_version": "1.0",
+      "revision_number": 1,
+      "revision_of": null,
+      "quality_flags": "SYNTHETIC_PROVIDER_ERROR_NOT_NO_ROUTE"
+    },
+    {
+      "quote_attempt_id": "quote-synthetic-invalid-001",
+      "idempotency_key": "quote-idem-invalid-001",
+      "business_key": "panel-synthetic-50",
+      "request_hash": "1111111111111111111111111111111111111111111111111111111111111111",
+      "provider": "JUPITER_METIS",
+      "provider_version": "legacy_metis_v1_quote",
+      "side": "BUY",
+      "input_mint": "EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v",
+      "input_requested_atomic": 50000000,
+      "input_decimals": 6,
+      "output_mint": "task09-followup-mint-synthetic",
+      "output_quoted_atomic": null,
+      "output_decimals": 6,
+      "route_id": null,
+      "route_count": 0,
+      "context_slot": null,
+      "requested_at": "2026-07-28T00:00:03Z",
+      "response_at": "2026-07-28T00:00:03.100000Z",
+      "available_to_strategy_at": "2026-07-28T00:00:03.120000Z",
+      "ingested_at": "2026-07-28T00:00:03.130000Z",
+      "first_reliable_available_at": "2026-07-28T00:00:03.110000Z",
+      "quote_age_ms": null,
+      "provider_latency_ms": 100,
+      "provider_fee_atomic": null,
+      "platform_fee_atomic": null,
+      "fee_mint": null,
+      "included_in_output_amount": null,
+      "status": "INVALID_RESPONSE",
+      "error_class": "TRANSACTION_PAYLOAD_FORBIDDEN",
+      "raw_event_id": "raw-quote-synthetic-invalid-001",
+      "response_content_sha256": "2222222222222222222222222222222222222222222222222222222222222222",
+      "schema_version": "1.0",
+      "revision_number": 1,
+      "revision_of": null,
+      "quality_flags": "SYNTHETIC_FORBIDDEN_PAYLOAD"
+    },
+    {
+      "quote_attempt_id": "quote-synthetic-timeout-001",
+      "idempotency_key": "quote-idem-timeout-001",
+      "business_key": "panel-synthetic-100",
+      "request_hash": "3333333333333333333333333333333333333333333333333333333333333333",
+      "provider": "JUPITER_METIS",
+      "provider_version": "legacy_metis_v1_quote",
+      "side": "BUY",
+      "input_mint": "EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v",
+      "input_requested_atomic": 100000000,
+      "input_decimals": 6,
+      "output_mint": "task09-followup-mint-synthetic",
+      "output_quoted_atomic": null,
+      "output_decimals": 6,
+      "route_id": null,
+      "route_count": null,
+      "context_slot": null,
+      "requested_at": "2026-07-28T00:00:04Z",
+      "response_at": null,
+      "available_to_strategy_at": "2026-07-28T00:00:24.010000Z",
+      "ingested_at": "2026-07-28T00:00:24.020000Z",
+      "first_reliable_available_at": "2026-07-28T00:00:24Z",
+      "quote_age_ms": null,
+      "provider_latency_ms": null,
+      "provider_fee_atomic": null,
+      "platform_fee_atomic": null,
+      "fee_mint": null,
+      "included_in_output_amount": null,
+      "status": "TIMEOUT",
+      "error_class": "TIMEOUT",
+      "raw_event_id": "raw-quote-synthetic-timeout-001",
+      "response_content_sha256": "4444444444444444444444444444444444444444444444444444444444444444",
+      "schema_version": "1.0",
+      "revision_number": 1,
+      "revision_of": null,
+      "quality_flags": "SYNTHETIC_TIMEOUT_NO_RESPONSE"
+    }
+  ],
+  "future_external_caps": {
+    "selected_mints": 1,
+    "buy_requests": 4,
+    "dependent_sell_requests_max": 4,
+    "http_requests_total_max": 8,
+    "concurrency": 1,
+    "retries": 0,
+    "wall_seconds_max": 600,
+    "received_response_bytes_max": 1048576,
+    "durable_raw_bytes_max": 5242880,
+    "api_keys": 0,
+    "accounts": 0,
+    "provider_credits": 0,
+    "cash_spend_usd_cents": 0,
+    "wallet_signer_transaction_actions": 0
+  },
+  "stop_conditions": [
+    "AUTHENTICATION_OR_ACCOUNT_REQUIRED",
+    "V2_TRANSACTION_OR_INSTRUCTION_SURFACE_REQUIRED",
+    "UNCLASSIFIABLE_SCHEMA_DRIFT",
+    "RESPONSE_BYTE_CAP_EXHAUSTED",
+    "RAW_BYTE_CAP_EXHAUSTED",
+    "WALL_TIME_CAP_EXHAUSTED",
+    "DEPENDENCY_OR_SCHEMA_CHANGE_REQUIRED",
+    "REQUEST_OUTSIDE_FROZEN_MINT_PANEL"
+  ],
+  "catalog": {
+    "asset_ids": [
+      "CONTRACT-T10-JUPITER-QUOTE-OBSERVATION-001",
+      "FIXTURE-T10-JUPITER-QUOTE-OBSERVATION-001",
+      "TEST-T10-JUPITER-QUOTE-OBSERVATION-001"
+    ],
+    "named_consumers": [
+      "TASK-10",
+      "TASK-13",
+      "TASK-18",
+      "TASK-19",
+      "TASK-25",
+      "TASK-26",
+      "TASK-36",
+      "TASK-37",
+      "TASK-38",
+      "TASK-39",
+      "TASK-40",
+      "TASK-43",
+      "TASK-44",
+      "TASK-45",
+      "TASK-46",
+      "TASK-47"
+    ]
+  },
+  "authority": {
+    "class": "LOCAL_WRITE_ONLY",
+    "managed_files": [
+      "docs/contracts/jupiter_quote_observation_contract_v1.md",
+      "tests/fixtures/task10/jupiter_quote_observation_contract_v1.json",
+      "tests/test_task10_jupiter_quote_observation_contract.py",
+      "catalog/assets/core.yaml",
+      "catalog/assets/lifecycle.yaml",
+      "catalog/catalog_manifest.yaml",
+      "catalog/generated/asset_edges.json",
+      "docs/PROJECT_MAP.md",
+      "tests/test_catalog.py",
+      "tests/test_baton_repository_policy.py"
+    ],
+    "network": false,
+    "provider_api_rpc_wss_calls": 0,
+    "raw_data_writes": 0,
+    "dependency_changes": 0,
+    "credential_use": false,
+    "cash_spend_usd_cents": 0,
+    "wallet_signer_transaction_actions": 0,
+    "commit": false,
+    "push": false,
+    "pull_request": false,
+    "merge": false,
+    "ui_changes": false
+  },
+  "next_atom": {
+    "atom_id": "T10-A3_LOCAL_QUOTE_LOGGER_IMPLEMENTATION",
+    "separate_managed_write_set_required": true,
+    "external_calls_authorized": false
+  }
+}

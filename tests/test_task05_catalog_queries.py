@@ -310,7 +310,7 @@ class Task05CatalogTransactionTests(unittest.TestCase):
             ),
             (0, 9, 0),
         )
-        self.assertEqual(len(self.snapshot.assets), 205)
+        self.assertEqual(len(self.snapshot.assets), 228)
         self.assertEqual(len(self.snapshot.queries), 7)
         self.assertEqual(
             {

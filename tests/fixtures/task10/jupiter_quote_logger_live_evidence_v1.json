@@ -1,0 +1,177 @@
+{
+  "fixture_id": "TASK10_JUPITER_QUOTE_LOGGER_LIVE_EVIDENCE_V1",
+  "fixture_version": "1.0",
+  "task_id": "TASK-10",
+  "atom": "T10-A5_LOCAL_EVIDENCE_RECONCILIATION",
+  "source_atom": "T10-A4_BOUNDED_EXTERNAL_QUOTE_PILOT",
+  "repair_atom": "T10-A4R_TYPED_ADDITIVE_QUOTE_SCHEMA",
+  "status": "STOPPED_SCHEMA_DRIFT_OFFLINE_REPLAY_CANDIDATE",
+  "accepted_base": {
+    "branch": "chore/starter-authority-alignment",
+    "head": "392c0d34ada6ca6f1721acafcc52ca63433a630f",
+    "tree": "2311522a0f6de05840964d005e76b2f2345ae368"
+  },
+  "selection": {
+    "mint": "4vXNhA6ncbx8usZ14CfxkYeQKdaQYgrLfJXNyWcVpump",
+    "decimals": 6,
+    "rule": "SOLE_NON_WSOL_MINT_IN_ACCEPTED_TASK09_GETTRANSACTION_TOKEN_BALANCES",
+    "price_or_route_observation_used": false,
+    "source_asset_id": "DATA-T09-PUMPSWAP-TOUCH-PROBE-RAW-001",
+    "source_run_id": "t09a4-20260727T184740Z",
+    "source_partition_sha256": "577e614c0b2f41b7a1e3ae92b6cfd965e87e4d4bca76070925873df1ef5b4466",
+    "source_content_sha256": "0de9a748669c25fa08c4d1de594899a0761db48a1ba25774dd7f4d1109eaf73d",
+    "source_raw_event_id": "raw-86dee058f272ebb62e54a1a7a3ee2ce840fe1c109e3b463b46d65914c71dc702",
+    "source_slot": 435592031
+  },
+  "raw_run": {
+    "run_id": "t10a4-20260728T011304Z",
+    "logical_root": "task10_jupiter_quote_pilot_v1/run=t10a4-20260728T011304Z",
+    "dataset_id": "SMIAL_TASK10_JUPITER_QUOTE_PILOT_RAW",
+    "dataset_version": "1.0",
+    "transport_version": "1.0",
+    "plan_sha256": "ec22bfa5e183a2787d5c1e4e07fb6e6e25996fbacc8b356d089588da1ff6d21b",
+    "partition_id": "t10a4-20260728T011304Z-quotes",
+    "dataset_manifest_id": "dataset-a8aa1cb23242e2a83282e44977c09f3eb7aee2312273c259b263b4b2a9c2d03b",
+    "partition_manifest_id": "partition-cc48a0823edc49ff34df2bffbd4060af96b23a3577472d62659183fcc19a095e",
+    "content_sha256": "715c4b436e3f6ffc9926764287cdaca722504ac1edc066c52a7f7e8eb5e03c83",
+    "created_at": "2026-07-28T01:26:18.783227Z",
+    "first_reliable_available_at": "2026-07-28T01:26:18.783227Z",
+    "min_available_to_strategy_at": "2026-07-28T01:26:18.783226Z",
+    "max_available_to_strategy_at": "2026-07-28T01:26:18.783226Z",
+    "row_count": 1,
+    "raw_event_id": "raw-b74135314849e64c84036c8894544c89f0b5f565e65bc8a2e86f86577cf190e5",
+    "response_content_sha256": "b77d7b9480bdcd30d645aa9ff093d30ea4d0835efaf3b03ab279439f790151bb",
+    "files": [
+      {
+        "logical_path": "partitions/quotes.parquet",
+        "bytes": 14811,
+        "sha256": "eed05d3c5f65f5adf4e77c07e0fbbccd94856ecabfcb7c5b963e3c0611c8cb67"
+      },
+      {
+        "logical_path": "projections/quotes.duckdb",
+        "bytes": 1355776,
+        "sha256": "557692a5a37a6d30e8e7ed9e293e5ee24cb6315c9c8714b09e2d561a75d18f5b"
+      },
+      {
+        "logical_path": "receipts/quotes.manifest.json",
+        "bytes": 742,
+        "sha256": "40d836d273f90623b1cdc702f28e777e2699b6c6d44acd9db48a8e601e86e520"
+      },
+      {
+        "logical_path": "receipts/run.receipt.json",
+        "bytes": 1779,
+        "sha256": "6a25a37114de65c378b9de3ba4d8a130cd6553b9c908fc91e0dd68d7729b8059"
+      }
+    ]
+  },
+  "live_summary": {
+    "status": "STOPPED",
+    "stop_reason": "UNCLASSIFIABLE_SCHEMA_DRIFT",
+    "provider": "JUPITER_METIS",
+    "provider_version": "legacy_metis_v1_quote",
+    "provider_calls": 1,
+    "buy_attempts": 1,
+    "sell_attempts": 0,
+    "sell_not_attempted": 0,
+    "retries": 0,
+    "received_bytes": 1434,
+    "stored_events": 1,
+    "stored_bytes": 1373108,
+    "elapsed_seconds": 0.356842,
+    "terminal_counts": {
+      "INVALID_RESPONSE": 1
+    },
+    "quote_attempt_status": "INVALID_RESPONSE",
+    "quote_attempt_error_class": "SCHEMA_MISMATCH",
+    "execution_attempt_rows": 0,
+    "provider_credits": 0,
+    "cash_spend_usd_cents": 0,
+    "wallet_signer_transaction_actions": 0
+  },
+  "observed_schema_extension": {
+    "top_level_additive_fields": {
+      "instructionVersion": "null",
+      "loadedLongtailToken": "boolean",
+      "longtailMarketQuoteReport": "null",
+      "mostReliableAmmsQuoteReport": "object_with_info_string_map",
+      "otherRoutePlans": "null",
+      "swapUsdValue": "nonnegative_decimal_text",
+      "useIncurredSlippageForQuoting": "null",
+      "useRewards": "null"
+    },
+    "route_entry_keys": [
+      "bps",
+      "percent",
+      "swapInfo"
+    ],
+    "route_bps_observed_type": "null",
+    "route_percent_observed_type": "positive_integer",
+    "swap_info_additive_fields": {
+      "updateContextSlot": "nonnegative_atomic_text"
+    },
+    "swap_info_absent_field_pair": [
+      "feeAmount",
+      "feeMint"
+    ],
+    "transaction_or_instruction_payload_observed": false,
+    "repair_policy": "ALLOW_ONLY_OBSERVED_OPTIONAL_TYPED_FIELDS_REJECT_ALL_OTHER_UNKNOWN_KEYS",
+    "raw_record_preserved_as_invalid_response": true,
+    "historical_quote_attempt_rewritten": false,
+    "offline_replay_reclassified_historical_row": false
+  },
+  "offline_replay": {
+    "status": "PASS",
+    "terminal": "QUOTE_AVAILABLE_CANDIDATE_AFTER_TYPED_EXTENSION",
+    "input_requested_atomic": 10000000,
+    "output_quoted_atomic": 3452264667206,
+    "context_slot": 435648803,
+    "route_count": 2,
+    "route_id": "bc40c87af5d35349ae28d1dd45ab4dcd1f3df9f57f31e83bec1791fcd50ae5ce",
+    "quality_flags": "PROVIDER_ROUTE_FEE_FIELDS_ABSENT_RAW_ONLY",
+    "provider_fee_atomic": null,
+    "platform_fee_atomic": null,
+    "fee_mint": null,
+    "included_in_output_amount": null,
+    "live_raw_hashes_unchanged": true,
+    "network_calls": 0,
+    "raw_writes": 0
+  },
+  "frozen_caps": {
+    "selected_mints": 1,
+    "buy_requests": 4,
+    "dependent_sell_requests_max": 4,
+    "http_requests_total_max": 8,
+    "concurrency": 1,
+    "retries": 0,
+    "wall_seconds_max": 600,
+    "request_timeout_seconds": 20,
+    "minimum_interval_seconds": 2.2,
+    "received_response_bytes_max": 1048576,
+    "durable_raw_bytes_max": 5242880,
+    "api_keys": 0,
+    "accounts": 0,
+    "provider_credits": 0,
+    "cash_spend_usd_cents": 0,
+    "wallet_signer_transaction_actions": 0
+  },
+  "decision_boundary": {
+    "one_legacy_buy_quote_candidate_observed": true,
+    "all_buy_panels_observed": false,
+    "reverse_sell_observed": false,
+    "no_route_observed": false,
+    "fillable_established": false,
+    "realized_vwap_established": false,
+    "net_return_established": false,
+    "retry_authorized": false,
+    "additional_external_call_authorized": false,
+    "canonical_status_change_implied": false
+  },
+  "sanitization": {
+    "provider_bodies_in_fixture": 0,
+    "request_headers_in_fixture": 0,
+    "response_headers_in_fixture": 0,
+    "credentials_in_fixture": 0,
+    "absolute_paths_in_fixture": 0,
+    "wallet_signer_transaction_actions": 0
+  }
+}

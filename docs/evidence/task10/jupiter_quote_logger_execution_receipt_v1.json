@@ -1,0 +1,145 @@
+{
+  "receipt_id": "TASK10_JUPITER_QUOTE_LOGGER_EXECUTION_RECEIPT_V1",
+  "receipt_version": "1.0",
+  "task_id": "TASK-10",
+  "atom": "T10-A5_LOCAL_EVIDENCE_RECONCILIATION",
+  "source_atom": "T10-A4_BOUNDED_EXTERNAL_QUOTE_PILOT",
+  "repair_atom": "T10-A4R_TYPED_ADDITIVE_QUOTE_SCHEMA",
+  "status": "STOPPED_FAIL_CLOSED_OFFLINE_REPLAY_CANDIDATE",
+  "created_at": "2026-07-28T01:26:18.783227Z",
+  "first_reliable_available_at": "2026-07-28T01:26:18.783227Z",
+  "accepted_base": {
+    "branch": "chore/starter-authority-alignment",
+    "head": "392c0d34ada6ca6f1721acafcc52ca63433a630f",
+    "tree": "2311522a0f6de05840964d005e76b2f2345ae368"
+  },
+  "source_selection": {
+    "selected_mint": "4vXNhA6ncbx8usZ14CfxkYeQKdaQYgrLfJXNyWcVpump",
+    "selected_mint_decimals": 6,
+    "selection_rule": "SOLE_NON_WSOL_MINT_IN_ACCEPTED_TASK09_GETTRANSACTION_TOKEN_BALANCES",
+    "price_or_route_observation_used": false,
+    "source_asset_id": "DATA-T09-PUMPSWAP-TOUCH-PROBE-RAW-001",
+    "source_run_id": "t09a4-20260727T184740Z",
+    "source_partition_sha256": "577e614c0b2f41b7a1e3ae92b6cfd965e87e4d4bca76070925873df1ef5b4466",
+    "source_content_sha256": "0de9a748669c25fa08c4d1de594899a0761db48a1ba25774dd7f4d1109eaf73d"
+  },
+  "source_run": {
+    "run_id": "t10a4-20260728T011304Z",
+    "logical_root": "task10_jupiter_quote_pilot_v1/run=t10a4-20260728T011304Z",
+    "plan_sha256": "ec22bfa5e183a2787d5c1e4e07fb6e6e25996fbacc8b356d089588da1ff6d21b",
+    "raw_partition_sha256": "eed05d3c5f65f5adf4e77c07e0fbbccd94856ecabfcb7c5b963e3c0611c8cb67",
+    "raw_content_sha256": "715c4b436e3f6ffc9926764287cdaca722504ac1edc066c52a7f7e8eb5e03c83",
+    "projection_database_sha256": "557692a5a37a6d30e8e7ed9e293e5ee24cb6315c9c8714b09e2d561a75d18f5b",
+    "manifest_sha256": "40d836d273f90623b1cdc702f28e777e2699b6c6d44acd9db48a8e601e86e520",
+    "runtime_receipt_sha256": "6a25a37114de65c378b9de3ba4d8a130cd6553b9c908fc91e0dd68d7729b8059",
+    "stored_events": 1,
+    "stored_bytes": 1373108,
+    "received_bytes": 1434,
+    "live_status": "STOPPED",
+    "live_stop_reason": "UNCLASSIFIABLE_SCHEMA_DRIFT",
+    "live_terminal_counts": {
+      "INVALID_RESPONSE": 1
+    }
+  },
+  "tracked_fixture": {
+    "path": "tests/fixtures/task10/jupiter_quote_logger_live_evidence_v1.json",
+    "sha256": "8d02ae7e5f32c65c97de2a725d9ed64220c99e09942d3efae356b273ef1d2409",
+    "provider_bodies_in_fixture": 0,
+    "credentials_in_fixture": 0,
+    "absolute_paths_in_fixture": 0
+  },
+  "repair": {
+    "policy": "ALLOW_ONLY_OBSERVED_OPTIONAL_TYPED_FIELDS_REJECT_ALL_OTHER_UNKNOWN_KEYS",
+    "top_level_additive_field_count": 8,
+    "swap_info_additive_field": "updateContextSlot",
+    "swap_info_missing_fee_pair": [
+      "feeAmount",
+      "feeMint"
+    ],
+    "nullable_route_bps_with_positive_percent": true,
+    "transaction_or_instruction_payload_observed": false,
+    "historical_raw_record_rewritten": false,
+    "historical_invalid_response_classification_rewritten": false,
+    "historical_quote_attempt_rewritten": false,
+    "offline_replay_status": "PASS",
+    "offline_replay_terminal": "QUOTE_AVAILABLE_CANDIDATE_AFTER_TYPED_EXTENSION"
+  },
+  "candidate_result": {
+    "legacy_buy_quote_candidate_count": 1,
+    "input_requested_atomic": 10000000,
+    "output_quoted_atomic": 3452264667206,
+    "context_slot": 435648803,
+    "route_count": 2,
+    "route_id": "bc40c87af5d35349ae28d1dd45ab4dcd1f3df9f57f31e83bec1791fcd50ae5ce",
+    "quality_flags": "PROVIDER_ROUTE_FEE_FIELDS_ABSENT_RAW_ONLY",
+    "provider_fee_atomic": null,
+    "platform_fee_atomic": null,
+    "fee_mint": null,
+    "included_in_output_amount": null,
+    "all_buy_panels_observed": false,
+    "reverse_sell_observed": false,
+    "no_route_observed": false,
+    "fillable_established": false,
+    "net_return_established": false
+  },
+  "checks": {
+    "raw_run_read_only_after_stop": "PASS",
+    "raw_file_hashes_unchanged_after_offline_replay": "PASS",
+    "historical_schema_drift_evidence_preserved": "PASS",
+    "bounded_optional_extension_policy": "PASS",
+    "all_other_unknown_keys_rejected": "PASS",
+    "transaction_instruction_payload_rejected": "PASS",
+    "normalized_fees_remain_null_when_provider_fields_absent": "PASS",
+    "execution_attempt_rows_zero": "PASS",
+    "all_frozen_caps_respected": "PASS",
+    "fixture_is_clean_clone_portable": "PASS",
+    "secret_and_absolute_path_scan": "PASS"
+  },
+  "validation": {
+    "targeted_quote_suite": {
+      "passed": 52,
+      "failed": 0
+    },
+    "targeted_evidence_suite": {
+      "passed": 11,
+      "failed": 0
+    },
+    "full_repository_suite": {
+      "passed": 821,
+      "failed": 0
+    },
+    "catalog_validation": "PASS",
+    "navigation_validation": "PASS",
+    "secret_scan": "PASS",
+    "file_hygiene": "PASS"
+  },
+  "authority": {
+    "external_authority": "T10-A4_BOUNDED_EXTERNAL_QUOTE_PILOT",
+    "external_run_count": 1,
+    "external_provider_calls": 1,
+    "external_retries": 0,
+    "network_calls_during_repair_and_acceptance": 0,
+    "raw_files_written_during_repair_and_acceptance": 0,
+    "dependency_changes": 0,
+    "api_keys_used": 0,
+    "accounts_used": 0,
+    "provider_credits": 0,
+    "cash_spend_usd_cents": 0,
+    "wallet_signer_transaction_actions": 0,
+    "commit": false,
+    "push": false,
+    "pull_request": false,
+    "merge": false,
+    "ui_changes": false
+  },
+  "residuals": [
+    "The live row remains INVALID_RESPONSE/SCHEMA_MISMATCH and the run remains STOPPED/UNCLASSIFIABLE_SCHEMA_DRIFT; offline replay is a candidate interpretation, not a historical rewrite.",
+    "Only the USD 10 buy panel produced a preserved response. The USD 25, USD 50 and USD 100 buy panels and every dependent reverse sell remain unobserved.",
+    "The provider omitted route feeAmount and feeMint. Normalized provider fee, platform fee, fee mint and included-in-output fields therefore remain null.",
+    "This bounded observation does not establish Fillable, NO_ROUTE, execution, realized VWAP, inventory bounds, alpha or NetReturn.",
+    "The stop condition ended the authority. No retry or additional external call is authorized."
+  ],
+  "catalog_status": "REGISTERED_IN_TASK10_CATALOG_TRANSACTION",
+  "canonical_status_candidate": "NONE",
+  "state_change": "NONE"
+}

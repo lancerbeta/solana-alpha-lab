@@ -1,0 +1,198 @@
+{
+  "schema": "solana_alpha_lab.jupiter_quote_logger_cases",
+  "schema_version": "1.0",
+  "task_id": "TASK-10",
+  "atom_id": "T10-A3_LOCAL_QUOTE_LOGGER_IMPLEMENTATION",
+  "synthetic_only": true,
+  "cases": [
+    {
+      "case_id": "QUOTE_AVAILABLE_BUY",
+      "expected_status": "QUOTE_AVAILABLE",
+      "expected_error_class": null,
+      "expected_stop_reason": null,
+      "request": {
+        "side": "BUY",
+        "input_mint": "EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v",
+        "output_mint": "task09-followup-mint-synthetic",
+        "input_requested_atomic": 10000000,
+        "input_decimals": 6,
+        "output_decimals": 6,
+        "slippage_bps": 100,
+        "attempt_ordinal": 1,
+        "business_key": "task10-panel-usd-10"
+      },
+      "observation": {
+        "requested_at": "2026-07-28T00:00:00.000000Z",
+        "response_at": "2026-07-28T00:00:00.100000Z",
+        "first_reliable_available_at": "2026-07-28T00:00:00.110000Z",
+        "available_to_strategy_at": "2026-07-28T00:00:00.120000Z",
+        "ingested_at": "2026-07-28T00:00:00.130000Z",
+        "http_status_code": 200,
+        "response_body": {
+          "inputMint": "EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v",
+          "inAmount": "10000000",
+          "outputMint": "task09-followup-mint-synthetic",
+          "outAmount": "2500000",
+          "otherAmountThreshold": "2475000",
+          "swapMode": "ExactIn",
+          "slippageBps": 100,
+          "platformFee": null,
+          "priceImpactPct": "0.001",
+          "routePlan": [
+            {
+              "swapInfo": {
+                "ammKey": "synthetic-amm-key",
+                "label": "Synthetic AMM",
+                "inputMint": "EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v",
+                "outputMint": "task09-followup-mint-synthetic",
+                "inAmount": "10000000",
+                "outAmount": "2500000",
+                "feeAmount": "1000",
+                "feeMint": "EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v"
+              },
+              "percent": 100,
+              "bps": 10000
+            }
+          ],
+          "contextSlot": 100,
+          "timeTaken": 0.02
+        },
+        "timed_out": false,
+        "stale": false
+      }
+    },
+    {
+      "case_id": "NO_ROUTE_SELL",
+      "expected_status": "NO_ROUTE",
+      "expected_error_class": null,
+      "expected_stop_reason": null,
+      "request": {
+        "side": "SELL",
+        "input_mint": "task09-followup-mint-synthetic",
+        "output_mint": "EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v",
+        "input_requested_atomic": 2500000,
+        "input_decimals": 6,
+        "output_decimals": 6,
+        "slippage_bps": 100,
+        "attempt_ordinal": 5,
+        "business_key": "task10-panel-usd-10"
+      },
+      "observation": {
+        "requested_at": "2026-07-28T00:00:01.000000Z",
+        "response_at": "2026-07-28T00:00:01.100000Z",
+        "first_reliable_available_at": "2026-07-28T00:00:01.110000Z",
+        "available_to_strategy_at": "2026-07-28T00:00:01.120000Z",
+        "ingested_at": "2026-07-28T00:00:01.130000Z",
+        "http_status_code": 400,
+        "response_body": {
+          "error": "Could not find any route",
+          "errorCode": "COULD_NOT_FIND_ANY_ROUTE"
+        },
+        "timed_out": false,
+        "stale": false
+      }
+    },
+    {
+      "case_id": "PROVIDER_RATE_LIMIT",
+      "expected_status": "PROVIDER_ERROR",
+      "expected_error_class": "RATE_LIMITED",
+      "expected_stop_reason": null,
+      "request": {
+        "side": "BUY",
+        "input_mint": "EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v",
+        "output_mint": "task09-followup-mint-synthetic",
+        "input_requested_atomic": 25000000,
+        "input_decimals": 6,
+        "output_decimals": 6,
+        "slippage_bps": 100,
+        "attempt_ordinal": 2,
+        "business_key": "task10-panel-usd-25"
+      },
+      "observation": {
+        "requested_at": "2026-07-28T00:00:02.000000Z",
+        "response_at": "2026-07-28T00:00:02.100000Z",
+        "first_reliable_available_at": "2026-07-28T00:00:02.110000Z",
+        "available_to_strategy_at": "2026-07-28T00:00:02.120000Z",
+        "ingested_at": "2026-07-28T00:00:02.130000Z",
+        "http_status_code": 429,
+        "response_body": {
+          "error": "synthetic rate limit"
+        },
+        "timed_out": false,
+        "stale": false
+      }
+    },
+    {
+      "case_id": "INVALID_TRANSACTION_PAYLOAD",
+      "expected_status": "INVALID_RESPONSE",
+      "expected_error_class": "TRANSACTION_PAYLOAD_FORBIDDEN",
+      "expected_stop_reason": "V2_TRANSACTION_OR_INSTRUCTION_SURFACE_REQUIRED",
+      "request": {
+        "side": "BUY",
+        "input_mint": "EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v",
+        "output_mint": "task09-followup-mint-synthetic",
+        "input_requested_atomic": 50000000,
+        "input_decimals": 6,
+        "output_decimals": 6,
+        "slippage_bps": 100,
+        "attempt_ordinal": 3,
+        "business_key": "task10-panel-usd-50"
+      },
+      "observation": {
+        "requested_at": "2026-07-28T00:00:03.000000Z",
+        "response_at": "2026-07-28T00:00:03.100000Z",
+        "first_reliable_available_at": "2026-07-28T00:00:03.110000Z",
+        "available_to_strategy_at": "2026-07-28T00:00:03.120000Z",
+        "ingested_at": "2026-07-28T00:00:03.130000Z",
+        "http_status_code": 200,
+        "response_body": {
+          "transaction": "synthetic-forbidden-payload"
+        },
+        "timed_out": false,
+        "stale": false
+      }
+    },
+    {
+      "case_id": "TIMEOUT_NO_RESPONSE",
+      "expected_status": "TIMEOUT",
+      "expected_error_class": "TIMEOUT",
+      "expected_stop_reason": null,
+      "request": {
+        "side": "BUY",
+        "input_mint": "EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v",
+        "output_mint": "task09-followup-mint-synthetic",
+        "input_requested_atomic": 100000000,
+        "input_decimals": 6,
+        "output_decimals": 6,
+        "slippage_bps": 100,
+        "attempt_ordinal": 4,
+        "business_key": "task10-panel-usd-100"
+      },
+      "observation": {
+        "requested_at": "2026-07-28T00:00:04.000000Z",
+        "response_at": null,
+        "first_reliable_available_at": "2026-07-28T00:00:14.000000Z",
+        "available_to_strategy_at": "2026-07-28T00:00:14.000000Z",
+        "ingested_at": "2026-07-28T00:00:14.010000Z",
+        "http_status_code": null,
+        "response_body": null,
+        "timed_out": true,
+        "stale": false
+      }
+    }
+  ],
+  "authority": {
+    "network": false,
+    "provider_api_rpc_wss_calls": 0,
+    "raw_data_writes": 0,
+    "dependency_changes": 0,
+    "credential_use": false,
+    "cash_spend_usd_cents": 0,
+    "wallet_signer_transaction_actions": 0,
+    "commit": false,
+    "push": false,
+    "pull_request": false,
+    "merge": false,
+    "ui_changes": false
+  }
+}
