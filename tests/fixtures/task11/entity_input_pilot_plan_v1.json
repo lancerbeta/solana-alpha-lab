@@ -1,0 +1,81 @@
+{
+  "schema": "solana_alpha_lab.entity_input_pilot_plan",
+  "schema_version": "1.0",
+  "task_id": "TASK-11",
+  "atom_id": "T11-A3",
+  "as_of": "2026-07-28",
+  "status": "FROZEN_EXACT_EXTERNAL_GATE",
+  "selected_mint": "4vXNhA6ncbx8usZ14CfxkYeQKdaQYgrLfJXNyWcVpump",
+  "selected_mint_decimals": 6,
+  "provider": {
+    "provider_id": "HELIUS_STANDARD_SOLANA_RPC",
+    "protocol_owner": "SOLANA_STANDARD_RPC",
+    "host": "mainnet.helius-rpc.com",
+    "methods": [
+      "getTokenSupply",
+      "getTokenLargestAccounts",
+      "getMultipleAccounts"
+    ],
+    "commitment": "confirmed"
+  },
+  "caps": {
+    "provider_calls": 3,
+    "retries": 0,
+    "timeout_seconds_per_call": 15,
+    "elapsed_seconds": 60,
+    "response_bytes_each": 524288,
+    "received_bytes_total": 1048576,
+    "stored_bytes_total": 1048576,
+    "modeled_credits_per_call": 10,
+    "modeled_credits_total": 30,
+    "minimum_free_bytes": 1073741824,
+    "concurrency": 1,
+    "cash_spend_usd_cents": 0
+  },
+  "storage": {
+    "dataset_id": "SMIAL_TASK11_ENTITY_INPUT_PROBE_RAW",
+    "dataset_version": "1.0",
+    "logical_root": "task11_entity_input_probe_v1",
+    "partition_max_bytes": 262144,
+    "parquet_dataset_max_bytes": 917504,
+    "raw_contract_asset_id": "CONTRACT-T06-RAW-STORAGE-001"
+  },
+  "output_claim": {
+    "accepted_candidate": "RAW_TOP20_ACCOUNT_CONCENTRATION_FEASIBILITY",
+    "adjusted_concentration": "NULL_UNLESS_COMPLETE_EXCLUSION_INVENTORY",
+    "deployer_funder_bundler": "NOT_TESTED",
+    "full_holder_distribution": false,
+    "historical_reconstruction": false,
+    "ownership_graph": false,
+    "alpha": false
+  },
+  "authority": {
+    "authority_phrase": "T11-A3_HELIUS_3CALL_RAW_PILOT_V1",
+    "credential_use": "ONE_HELIUS_KEY_IN_MEMORY_ONLY",
+    "provider_api_rpc_wss_calls": 3,
+    "raw_write": true,
+    "dependency_changes": 0,
+    "commit": 0,
+    "push": 0,
+    "wallet_signer_transaction_actions": 0,
+    "cash_spend_usd_cents": 0
+  },
+  "managed_tracked_files": [
+    "src/solana_alpha_lab/entity_input_transport.py",
+    "scripts/run_task11_entity_input_probe.py",
+    "tests/fixtures/task11/entity_input_pilot_plan_v1.json",
+    "tests/test_task11_entity_input_transport.py"
+  ],
+  "stop_conditions": [
+    "AUTHORITY_OR_ACCESS_ATTESTATION_MISSING",
+    "CREDENTIAL_INVALID",
+    "CALL_OR_CREDIT_CAP",
+    "TIMEOUT_OR_DNS_TLS",
+    "HTTP_OR_PROVIDER_ERROR",
+    "RESPONSE_TOO_LARGE",
+    "SCHEMA_DRIFT",
+    "MINT_DECIMALS_DRIFT",
+    "INCOMPLETE_OWNER_RESPONSE",
+    "RAW_STORAGE_BUDGET_OR_INTEGRITY_FAILURE"
+  ]
+}

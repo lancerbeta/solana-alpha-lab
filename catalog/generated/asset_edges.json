@@ -493,6 +493,26 @@
       "target_asset_id": "TEST-T10-JUPITER-QUOTE-OBSERVATION-001"
     },
     {
+      "source_asset_id": "CONTRACT-T11-ENTITY-INPUT-OBSERVATION-001",
+      "relation": "depends_on",
+      "target_asset_id": "CONTRACT-T06-RAW-STORAGE-001"
+    },
+    {
+      "source_asset_id": "CONTRACT-T11-ENTITY-INPUT-OBSERVATION-001",
+      "relation": "depends_on",
+      "target_asset_id": "CONTRACT-T08-LIFECYCLE-DISCOVERY-001"
+    },
+    {
+      "source_asset_id": "CONTRACT-T11-ENTITY-INPUT-OBSERVATION-001",
+      "relation": "depends_on",
+      "target_asset_id": "SCHEMA-T05-REL-ENTITY-INPUT-SNAPSHOTS-001"
+    },
+    {
+      "source_asset_id": "CONTRACT-T11-ENTITY-INPUT-OBSERVATION-001",
+      "relation": "validated_by",
+      "target_asset_id": "TEST-T11-ENTITY-INPUT-OBSERVATION-001"
+    },
+    {
       "source_asset_id": "CTRL-AGENTS-001",
       "relation": "governed_by",
       "target_asset_id": "CTRL-TASK-04-001"
@@ -788,6 +808,21 @@
       "target_asset_id": "TEST-T10-JUPITER-QUOTE-EVIDENCE-002"
     },
     {
+      "source_asset_id": "DATA-T11-ENTITY-INPUT-PILOT-RAW-001",
+      "relation": "derived_from",
+      "target_asset_id": "MODULE-T11-ENTITY-INPUT-TRANSPORT-001"
+    },
+    {
+      "source_asset_id": "DATA-T11-ENTITY-INPUT-PILOT-RAW-001",
+      "relation": "evidenced_by",
+      "target_asset_id": "EVIDENCE-T11-ENTITY-INPUT-RECEIPT-001"
+    },
+    {
+      "source_asset_id": "DATA-T11-ENTITY-INPUT-PILOT-RAW-001",
+      "relation": "validated_by",
+      "target_asset_id": "TEST-T11-ENTITY-INPUT-REPLAY-001"
+    },
+    {
       "source_asset_id": "ENV-WORKSTATION-001",
       "relation": "produces",
       "target_asset_id": "SCM-BASELINE-COMMIT-001"
@@ -1006,6 +1041,31 @@
       "source_asset_id": "EVIDENCE-T10-JUPITER-QUOTE-SUMMARY-002",
       "relation": "evidenced_by",
       "target_asset_id": "EVIDENCE-T10-JUPITER-QUOTE-RECEIPT-002"
+    },
+    {
+      "source_asset_id": "EVIDENCE-T11-ENTITY-INPUT-RECEIPT-001",
+      "relation": "derived_from",
+      "target_asset_id": "DATA-T11-ENTITY-INPUT-PILOT-RAW-001"
+    },
+    {
+      "source_asset_id": "EVIDENCE-T11-ENTITY-INPUT-RECEIPT-001",
+      "relation": "derived_from",
+      "target_asset_id": "FIXTURE-T11-ENTITY-INPUT-LIVE-EVIDENCE-001"
+    },
+    {
+      "source_asset_id": "EVIDENCE-T11-ENTITY-INPUT-RECEIPT-001",
+      "relation": "validated_by",
+      "target_asset_id": "TEST-T11-ENTITY-INPUT-REPLAY-001"
+    },
+    {
+      "source_asset_id": "EVIDENCE-T11-ENTITY-INPUT-SUMMARY-001",
+      "relation": "derived_from",
+      "target_asset_id": "FIXTURE-T11-ENTITY-INPUT-LIVE-EVIDENCE-001"
+    },
+    {
+      "source_asset_id": "EVIDENCE-T11-ENTITY-INPUT-SUMMARY-001",
+      "relation": "evidenced_by",
+      "target_asset_id": "EVIDENCE-T11-ENTITY-INPUT-RECEIPT-001"
     },
     {
       "source_asset_id": "FIXTURE-BATON-SUITE-001",
@@ -1231,6 +1291,41 @@
       "source_asset_id": "FIXTURE-T10-JUPITER-QUOTE-PILOT-PLAN-002",
       "relation": "validated_by",
       "target_asset_id": "TEST-T10-JUPITER-QUOTE-TRANSPORT-001"
+    },
+    {
+      "source_asset_id": "FIXTURE-T11-ENTITY-INPUT-LIVE-EVIDENCE-001",
+      "relation": "derived_from",
+      "target_asset_id": "DATA-T11-ENTITY-INPUT-PILOT-RAW-001"
+    },
+    {
+      "source_asset_id": "FIXTURE-T11-ENTITY-INPUT-LIVE-EVIDENCE-001",
+      "relation": "validated_by",
+      "target_asset_id": "TEST-T11-ENTITY-INPUT-REPLAY-001"
+    },
+    {
+      "source_asset_id": "FIXTURE-T11-ENTITY-INPUT-OBSERVATION-001",
+      "relation": "derived_from",
+      "target_asset_id": "CONTRACT-T11-ENTITY-INPUT-OBSERVATION-001"
+    },
+    {
+      "source_asset_id": "FIXTURE-T11-ENTITY-INPUT-OBSERVATION-001",
+      "relation": "validated_by",
+      "target_asset_id": "TEST-T11-ENTITY-INPUT-OBSERVATION-001"
+    },
+    {
+      "source_asset_id": "FIXTURE-T11-ENTITY-INPUT-PILOT-PLAN-001",
+      "relation": "derived_from",
+      "target_asset_id": "EVIDENCE-T08-LIFECYCLE-DISCOVERY-RECEIPT-001"
+    },
+    {
+      "source_asset_id": "FIXTURE-T11-ENTITY-INPUT-PILOT-PLAN-001",
+      "relation": "governed_by",
+      "target_asset_id": "CONTRACT-T11-ENTITY-INPUT-OBSERVATION-001"
+    },
+    {
+      "source_asset_id": "FIXTURE-T11-ENTITY-INPUT-PILOT-PLAN-001",
+      "relation": "validated_by",
+      "target_asset_id": "TEST-T11-ENTITY-INPUT-TRANSPORT-001"
     },
     {
       "source_asset_id": "GENERATED-EDGE-PROJECTION-001",
@@ -1506,6 +1601,66 @@
       "source_asset_id": "MODULE-T10-JUPITER-QUOTE-TRANSPORT-001",
       "relation": "validated_by",
       "target_asset_id": "TEST-T10-JUPITER-QUOTE-TRANSPORT-001"
+    },
+    {
+      "source_asset_id": "MODULE-T11-ENTITY-INPUT-REDUCER-001",
+      "relation": "depends_on",
+      "target_asset_id": "SCHEMA-T05-REL-ENTITY-INPUT-SNAPSHOTS-001"
+    },
+    {
+      "source_asset_id": "MODULE-T11-ENTITY-INPUT-REDUCER-001",
+      "relation": "governed_by",
+      "target_asset_id": "CONTRACT-T11-ENTITY-INPUT-OBSERVATION-001"
+    },
+    {
+      "source_asset_id": "MODULE-T11-ENTITY-INPUT-REDUCER-001",
+      "relation": "validated_by",
+      "target_asset_id": "TEST-T11-ENTITY-INPUT-OBSERVATION-001"
+    },
+    {
+      "source_asset_id": "MODULE-T11-ENTITY-INPUT-REPLAY-001",
+      "relation": "depends_on",
+      "target_asset_id": "DATA-T11-ENTITY-INPUT-PILOT-RAW-001"
+    },
+    {
+      "source_asset_id": "MODULE-T11-ENTITY-INPUT-REPLAY-001",
+      "relation": "depends_on",
+      "target_asset_id": "MODULE-T11-ENTITY-INPUT-REDUCER-001"
+    },
+    {
+      "source_asset_id": "MODULE-T11-ENTITY-INPUT-REPLAY-001",
+      "relation": "governed_by",
+      "target_asset_id": "CONTRACT-T11-ENTITY-INPUT-OBSERVATION-001"
+    },
+    {
+      "source_asset_id": "MODULE-T11-ENTITY-INPUT-REPLAY-001",
+      "relation": "validated_by",
+      "target_asset_id": "TEST-T11-ENTITY-INPUT-REPLAY-001"
+    },
+    {
+      "source_asset_id": "MODULE-T11-ENTITY-INPUT-TRANSPORT-001",
+      "relation": "depends_on",
+      "target_asset_id": "CONTRACT-T06-RAW-STORAGE-001"
+    },
+    {
+      "source_asset_id": "MODULE-T11-ENTITY-INPUT-TRANSPORT-001",
+      "relation": "depends_on",
+      "target_asset_id": "FIXTURE-T11-ENTITY-INPUT-PILOT-PLAN-001"
+    },
+    {
+      "source_asset_id": "MODULE-T11-ENTITY-INPUT-TRANSPORT-001",
+      "relation": "depends_on",
+      "target_asset_id": "MODULE-T11-ENTITY-INPUT-REDUCER-001"
+    },
+    {
+      "source_asset_id": "MODULE-T11-ENTITY-INPUT-TRANSPORT-001",
+      "relation": "governed_by",
+      "target_asset_id": "CONTRACT-T11-ENTITY-INPUT-OBSERVATION-001"
+    },
+    {
+      "source_asset_id": "MODULE-T11-ENTITY-INPUT-TRANSPORT-001",
+      "relation": "validated_by",
+      "target_asset_id": "TEST-T11-ENTITY-INPUT-TRANSPORT-001"
     },
     {
       "source_asset_id": "PRE-GIT-TASK01-A017",
@@ -2273,6 +2428,31 @@
       "target_asset_id": "TEST-T10-JUPITER-QUOTE-LOGGER-001"
     },
     {
+      "source_asset_id": "SCRIPT-T11-ENTITY-INPUT-PROBE-001",
+      "relation": "depends_on",
+      "target_asset_id": "FIXTURE-T11-ENTITY-INPUT-PILOT-PLAN-001"
+    },
+    {
+      "source_asset_id": "SCRIPT-T11-ENTITY-INPUT-PROBE-001",
+      "relation": "depends_on",
+      "target_asset_id": "MODULE-T11-ENTITY-INPUT-REPLAY-001"
+    },
+    {
+      "source_asset_id": "SCRIPT-T11-ENTITY-INPUT-PROBE-001",
+      "relation": "depends_on",
+      "target_asset_id": "MODULE-T11-ENTITY-INPUT-TRANSPORT-001"
+    },
+    {
+      "source_asset_id": "SCRIPT-T11-ENTITY-INPUT-PROBE-001",
+      "relation": "validated_by",
+      "target_asset_id": "TEST-T11-ENTITY-INPUT-REPLAY-001"
+    },
+    {
+      "source_asset_id": "SCRIPT-T11-ENTITY-INPUT-PROBE-001",
+      "relation": "validated_by",
+      "target_asset_id": "TEST-T11-ENTITY-INPUT-TRANSPORT-001"
+    },
+    {
       "source_asset_id": "TEMPLATE-BATON-ISSUE-FORM-001",
       "relation": "governed_by",
       "target_asset_id": "CTRL-BATON-SETUP-001"
@@ -2636,6 +2816,46 @@
       "source_asset_id": "TEST-T10-JUPITER-QUOTE-TRANSPORT-001",
       "relation": "depends_on",
       "target_asset_id": "MODULE-T10-JUPITER-QUOTE-TRANSPORT-001"
+    },
+    {
+      "source_asset_id": "TEST-T11-ENTITY-INPUT-OBSERVATION-001",
+      "relation": "depends_on",
+      "target_asset_id": "CONTRACT-T11-ENTITY-INPUT-OBSERVATION-001"
+    },
+    {
+      "source_asset_id": "TEST-T11-ENTITY-INPUT-OBSERVATION-001",
+      "relation": "depends_on",
+      "target_asset_id": "FIXTURE-T11-ENTITY-INPUT-OBSERVATION-001"
+    },
+    {
+      "source_asset_id": "TEST-T11-ENTITY-INPUT-OBSERVATION-001",
+      "relation": "depends_on",
+      "target_asset_id": "MODULE-T11-ENTITY-INPUT-REDUCER-001"
+    },
+    {
+      "source_asset_id": "TEST-T11-ENTITY-INPUT-REPLAY-001",
+      "relation": "depends_on",
+      "target_asset_id": "EVIDENCE-T11-ENTITY-INPUT-RECEIPT-001"
+    },
+    {
+      "source_asset_id": "TEST-T11-ENTITY-INPUT-REPLAY-001",
+      "relation": "depends_on",
+      "target_asset_id": "EVIDENCE-T11-ENTITY-INPUT-SUMMARY-001"
+    },
+    {
+      "source_asset_id": "TEST-T11-ENTITY-INPUT-REPLAY-001",
+      "relation": "depends_on",
+      "target_asset_id": "FIXTURE-T11-ENTITY-INPUT-LIVE-EVIDENCE-001"
+    },
+    {
+      "source_asset_id": "TEST-T11-ENTITY-INPUT-TRANSPORT-001",
+      "relation": "depends_on",
+      "target_asset_id": "FIXTURE-T11-ENTITY-INPUT-PILOT-PLAN-001"
+    },
+    {
+      "source_asset_id": "TEST-T11-ENTITY-INPUT-TRANSPORT-001",
+      "relation": "depends_on",
+      "target_asset_id": "MODULE-T11-ENTITY-INPUT-TRANSPORT-001"
     },
     {
       "source_asset_id": "VALIDATOR-REPOSITORY-STATE-001",

@@ -560,7 +560,7 @@ def validate_canonical_catalog_integrity() -> None:
         )
     except CanonicalRepositoryBytesError as exc:
         raise BatonValidationError(f"canonical_catalog_sweep_failed:{exc}") from exc
-    assert_check("canonical_catalog_asset_count", sweep.asset_count == 228)
+    assert_check("canonical_catalog_asset_count", sweep.asset_count == 242)
     assert_check("canonical_catalog_sha256_checked", sweep.checked_sha256 > 0)
     if sweep.mismatches:
         detail = ",".join(

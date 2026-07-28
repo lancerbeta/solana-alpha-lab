@@ -1,0 +1,139 @@
+{
+  "receipt_id": "TASK11_ENTITY_INPUT_PILOT_EXECUTION_RECEIPT_V1",
+  "receipt_version": "1.0",
+  "task_id": "TASK-11",
+  "atom": "T11-A5_CATALOG_REPOSITORY_FINALIZATION_V1",
+  "source_atom": "T11-A3_HELIUS_3CALL_RAW_PILOT_V1",
+  "replay_atom": "T11-A4_OFFLINE_REPLAY_AND_SANITIZED_EVIDENCE_V1",
+  "status": "PASS_RAW_TOP20_ACCOUNT_CONCENTRATION_FEASIBILITY",
+  "created_at": "2026-07-28T10:25:42.035658Z",
+  "first_reliable_available_at": "2026-07-28T10:25:42.035105Z",
+  "accepted_base": {
+    "branch": "main",
+    "head": "f3843952f151de0f736621ef8124032f7b27bce9",
+    "tree": "04c2c75dcc7f428b964e595b5ff3df8677abc627"
+  },
+  "source_run": {
+    "run_id": "t11a3-20260728T102537Z",
+    "logical_root": "task11_entity_input_probe_v1/run=t11a3-20260728T102537Z",
+    "dataset_id": "SMIAL_TASK11_ENTITY_INPUT_PROBE_RAW",
+    "dataset_version": "1.0",
+    "provider": "HELIUS_STANDARD_SOLANA_RPC",
+    "transport_contract_version": "1.0",
+    "replay_contract_version": "1.0",
+    "runtime_receipt_sha256": "0cad0cb9fac95475691ab9f71fac01a29ae63b87a8910647e0a0afcc23d233f1",
+    "runtime_receipt_bytes": 4225,
+    "partition_file_sha256": [
+      "819fbfe6f76a11fa9c9c834cfb9fb78952fcfdc1ac354031c75f88922a872a29",
+      "847f9a7f406adf65d58e75095c1acc410807b5f68933bd99106757f2dd09aaa9",
+      "5a01c427070c2ff50d8d208fc02f4cbd6c1b567aa89ef1d1e0499271e66e919b"
+    ],
+    "partition_content_sha256": [
+      "730b754f5bc3126070bd81249f23ba2fb76beda850a9af943bdcc8837852e401",
+      "7cbd1d5d5a86e5d08b39869f900a2930bfcd694bb00d585c64c39d161f80ff99",
+      "64464f0bb61f168415e82ff9bcf5c3dd8dd18d2037fbe735beb14b52b7062fa7"
+    ],
+    "raw_event_ids": [
+      "raw-98f385729bef65c47885188266f1f5a4dd5f3f95b4e10c9c6fada2f62f4972bc",
+      "raw-c0a889ff026a57cf7dccba6fa1eb8a56e41a94868d0bf30b50445833ca9bfcd7",
+      "raw-b89f6bc28b51460e37851636a53bb4335c37f2cd15070a1ad4ac452cbfc5ca66"
+    ],
+    "provider_calls": 3,
+    "retries": 0,
+    "modeled_credits": 30,
+    "received_bytes": 14090,
+    "stored_partition_bytes": 51441,
+    "stored_total_bytes": 55666,
+    "cash_spend_usd_cents": 0,
+    "wallet_signer_transaction_actions": 0
+  },
+  "tracked_fixture": {
+    "path": "tests/fixtures/task11/entity_input_live_evidence_v1.json",
+    "sha256": "2c0e00c1aacb32a75cbe5807517e5e514751cec0271a540594147390e8fbf7b2",
+    "provider_bodies_in_fixture": 0,
+    "owner_addresses_in_fixture": 0,
+    "credential_values_in_fixture": 0,
+    "absolute_paths_in_fixture": 0
+  },
+  "accepted_result": {
+    "claim": "RAW_TOP20_ACCOUNT_CONCENTRATION_FEASIBILITY",
+    "selected_mint": "4vXNhA6ncbx8usZ14CfxkYeQKdaQYgrLfJXNyWcVpump",
+    "supply_atomic": 924355154265060,
+    "top_account_count": 20,
+    "owner_resolution_count": 20,
+    "raw_top_accounts_amount_atomic": 896130192559592,
+    "raw_top_accounts_supply_share": "0.9694652411735517224957652807",
+    "supply_context_slot": 435725697,
+    "largest_accounts_context_slot": 435725699,
+    "owners_context_slot": 435725701,
+    "context_slot_spread": 4,
+    "projection_row_count": 5,
+    "availability_class": "PARTIAL_CURRENT_SNAPSHOT",
+    "exclusion_inventory_complete": false,
+    "unresolved_exclusion_account_count": 20,
+    "adjusted_top_accounts_supply_share": null,
+    "deployer_funder_bundler": "NOT_TESTED"
+  },
+  "checks": {
+    "runtime_receipt_canonical_json": "PASS",
+    "runtime_receipt_hash_readback": "PASS",
+    "three_partition_file_hashes": "PASS",
+    "three_partition_content_hashes": "PASS",
+    "raw_event_contract_and_lineage": "PASS_3_OF_3",
+    "rpc_payload_schema_replay": "PASS_3_OF_3",
+    "owner_resolution": "PASS_20_OF_20",
+    "task05_projection": "PASS_5_ROWS",
+    "pit_timestamp_ordering": "PASS",
+    "multi_slot_snapshot_preserved": "PASS_SPREAD_4",
+    "all_frozen_caps_respected": "PASS",
+    "tracked_fixture_is_clean_clone_portable": "PASS",
+    "provider_bodies_credentials_and_absolute_paths": "PASS_ZERO"
+  },
+  "validation": {
+    "targeted_replay_evidence_suite": {
+      "passed": 8,
+      "failed": 0,
+      "status": "PASS"
+    },
+    "related_task05_task06_task11_suite": {
+      "passed": 79,
+      "failed": 0,
+      "status": "PASS"
+    },
+    "full_repository_suite": {
+      "passed": 862,
+      "failed": 0,
+      "status": "PASS"
+    },
+    "catalog_validation": "PASS_CANDIDATE_0_14_0_242_ASSETS",
+    "navigation_validation": "PASS",
+    "secret_scan": "PASS",
+    "file_hygiene": "PASS"
+  },
+  "authority": {
+    "external_source_run_calls": 3,
+    "external_source_run_modeled_credits": 30,
+    "network_calls_during_atom4": 0,
+    "credential_use_during_atom4": 0,
+    "provider_credits_during_atom4": 0,
+    "cash_spend_usd_cents_during_atom4": 0,
+    "raw_files_written_during_atom4": 0,
+    "dependency_changes": 0,
+    "commit": false,
+    "push": false,
+    "pull_request": false,
+    "merge": false,
+    "ui_changes": false,
+    "wallet_signer_transaction_actions": 0
+  },
+  "residuals": [
+    "The observed 96.94652411735517224957652807 percent is concentration across the twenty largest token accounts, not twenty independently controlled wallet entities.",
+    "All twenty token-account owners resolved, but no pool, program, treasury, burn, escrow or other exclusion inventory was collected. Adjusted concentration therefore remains null.",
+    "Deployer, immediate or ultimate funder, bundler and common-ownership facts remain NOT_TESTED; no vendor label or ownership inference is accepted.",
+    "The observation is current and forward-only from its retained availability time. It is not a launch-time or historical holder snapshot.",
+    "No strategy veto, toxicity classification, promotion, execution or alpha claim follows from this bounded pilot."
+  ],
+  "catalog_status": "REGISTERED_IN_TASK11_CATALOG_TRANSACTION",
+  "canonical_status_candidate": "TECHNICAL_DOD_CANDIDATE_TASK11_REMAINS_IN_PROGRESS_UNTIL_MERGE_AND_FINISH_GATE",
+  "state_change": "CANDIDATE_REQUIRES_REPOSITORY_AND_CONTROL_PLANE_ACCEPTANCE"
+}
