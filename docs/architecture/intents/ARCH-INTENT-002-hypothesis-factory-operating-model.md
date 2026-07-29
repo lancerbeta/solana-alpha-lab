@@ -187,6 +187,77 @@ Promotion depends on evidence quality and net-of-cost economics, not a single
 headline metric. Live degradation, data drift, capacity, execution quality and
 regime mismatch can pause an otherwise valid strategy.
 
+## Execution bridge and position truth
+
+A validated hypothesis produces profit or loss only through a separately
+versioned execution bridge. The intended causal and audit chain is:
+
+```text
+hypothesis_version
+→ frozen strategy_version and activation_epoch
+→ watchlist_membership and trigger_event
+→ signal_decision and pre-trade risk snapshot
+→ execution_intent
+→ quote / route / simulation evidence
+→ execution_attempt and observed settlement
+→ position events and exit decisions
+→ inventory reconciliation
+→ NetReturn and realized owner cashflow
+→ strategy degradation and hypothesis feedback
+```
+
+A trigger is not an order, an order is not a fill, and a successful entry is
+not profit. Risk, stale-data, no-route, capacity, duplicate-send and unresolved
+inventory vetoes remain active between every arrow.
+
+Every position must retain stable links to the hypothesis/version, trial,
+strategy version, activation epoch, watchlist reason, trigger, signal,
+execution attempts and exit rationale that created it. Intended, submitted,
+landed, filled, partially filled, unresolved, recovered and closed facts cannot
+be collapsed into one boolean. When several hypotheses target the same mint,
+logical attribution stays separate while an account-level risk view aggregates
+net exposure; netting must not erase which hypothesis created the risk or PnL.
+
+The project owns the semantics and truth of:
+
+- strategy and trigger versions;
+- capital allocation, exposure, daily-loss and kill-switch policy;
+- idempotency and duplicate-send protection;
+- position, inventory and reconciliation state;
+- actual fees, fills, settlement and net owner cashflow;
+- evidence lineage, incidents, decisions and recovery.
+
+It does not have to build every transport primitive. DEX aggregation,
+transaction construction/simulation, submission transport, RPC adapters,
+custody interfaces and monitoring backends may be adopted or wrapped when a
+current `ADOPT → WRAP → FORK → BUILD` gate proves fit, maintenance, license,
+supply-chain, signer isolation, observability, rollback and total-cost
+advantages. A third-party bot or router never becomes the owner of hypothesis,
+risk, position or cashflow truth.
+
+Backtest, replay, paper, shadow and live modes should share the same strategy,
+feature, decision and position interfaces. Mode-specific approximations are
+explicit evidence, not hidden branches. Promotion to a mode with more authority
+requires the previous mode's versioned results and a separately accepted gate.
+
+Monitoring is a precondition for live authority, not a dashboard added later.
+Before any unattended or real-money activation, the owner must be able to see
+and alert on:
+
+- input freshness, clock/feature lag and trigger-to-decision latency;
+- quote age, route availability, simulation and submission disposition;
+- landing/finality, actual fills, fees and reconciliation age;
+- open, partial, pending-exit and unresolved inventory;
+- gross/net PnL, drawdown, exposure, capacity and daily-loss headroom;
+- process/provider/signer health and the last proven safe state;
+- kill-switch state, incident owner, recovery action and decision deadline.
+
+A process that is alive while its data, signer, reconciliation or exit path is
+stale is unhealthy. Restart after an unknown transaction state fails closed:
+reconcile first, then decide whether another action is allowed. Monitoring loss
+with open or unresolved inventory pauses new entries and escalates recovery; it
+never silently widens risk.
+
 ## Owner pulse and future interface
 
 The future dashboard is a read model over accepted registries and evidence. It
@@ -297,6 +368,12 @@ reconciliation should preserve these future capability owners:
   reactivation epochs;
 - append-only hypothesis provenance, derivation and research-artifact ledger
   with a bounded prior-work query before a new trial;
+- versioned trigger-to-cashflow execution bridge with position attribution,
+  account-level risk aggregation, reconciliation and hypothesis feedback;
+- shared replay/paper/shadow/live interfaces plus an `ADOPT → WRAP → FORK →
+  BUILD` gate for replaceable execution plumbing;
+- mandatory monitoring, kill-switch, incident and recovery evidence before
+  unattended or real-money activation;
 - hypothesis data-requirement and watchlist ownership contracts;
 - analytical tool-capability registry and research router;
 - reproducible dataset builder and cached historical hydration;

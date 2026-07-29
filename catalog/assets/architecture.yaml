@@ -58,8 +58,9 @@ records:
   asset_type: architecture_intent
   purpose: Accepted operating model for hypothesis-owned data acquisition,
     append-only hypothesis provenance and derivation memory, research-tool
-    routing, lifecycle monitoring, owner pulse and a mandatory Factory Fit
-    review before every future task completion bundle.
+    routing, trigger-to-cashflow execution and position truth, lifecycle
+    monitoring, owner pulse and a mandatory Factory Fit review before every
+    future task completion bundle.
   status: ACCEPTED_DIRECTION_NOT_IMPLEMENTED
   origin: PROJECT_SOURCE
   as_of: '2026-07-29'
@@ -70,7 +71,7 @@ records:
     repository_path: docs/architecture/intents/ARCH-INTENT-002-hypothesis-factory-operating-model.md
   integrity:
     kind: sha256
-    sha256: b8ba252d420925304b448292f9558e9ec29d60d7da34a59f8d198eb1e32dc674
+    sha256: ea094d88abf635fbe4df3b1ff9b3f0e80cb87dfa836f67505173766e69708639
   access:
     mode: read_only
     method: file

@@ -7833,7 +7833,7 @@ records:
     repository_path: tests/test_task15_hypothesis_driven_acquisition_acceptance.py
   integrity:
     kind: sha256
-    sha256: c2bb530a89f08e158d1ff3c15a5e37bc80d115c060203eebffefd5bd5c79fcc9
+    sha256: 441382186c3a0c0c3c6d04a811141ccb4172f6a49766e6ce8ad815c789656e12
   access:
     mode: read_only
     method: file
@@ -7868,7 +7868,7 @@ records:
     repository_path: docs/evidence/task15/hypothesis_driven_acquisition_acceptance_receipt_v1.json
   integrity:
     kind: sha256
-    sha256: c4c9c41b4fa08eb4b0ac16f9976dde3b55b23e2d022f68ecf24e0f1cd9b43e18
+    sha256: 2ae27289292f2344756ac8f42ae019a13118290977fce1647ef494725935eaca
   access:
     mode: read_only
     method: file

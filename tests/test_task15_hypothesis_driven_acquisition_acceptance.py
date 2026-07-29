@@ -44,10 +44,10 @@ EXPECTED_FIXTURE_SHA256 = (
     "a1258f56c7521922876c1edd73ca77125e31294b623b8b793d6d5cfe2542235b"
 )
 EXPECTED_ARCHITECTURE_SHA256 = (
-    "b8ba252d420925304b448292f9558e9ec29d60d7da34a59f8d198eb1e32dc674"
+    "ea094d88abf635fbe4df3b1ff9b3f0e80cb87dfa836f67505173766e69708639"
 )
 EXPECTED_RECEIPT_SHA256 = (
-    "c4c9c41b4fa08eb4b0ac16f9976dde3b55b23e2d022f68ecf24e0f1cd9b43e18"
+    "2ae27289292f2344756ac8f42ae019a13118290977fce1647ef494725935eaca"
 )
 TASK15_ASSET_IDS = {
     "ARCH-INTENT-002",
@@ -217,6 +217,67 @@ class Task15HypothesisDrivenAcquisitionAcceptanceTests(
             self.architecture,
         )
 
+    def test_execution_bridge_connects_hypothesis_to_reconciled_cashflow(
+        self,
+    ) -> None:
+        bridge = self.receipt["execution_and_position_bridge"]
+        self.assertEqual(
+            bridge["status"],
+            "ARCHITECTURE_REQUIREMENT_ACCEPTED_NOT_IMPLEMENTED",
+        )
+        self.assertEqual(
+            bridge["required_chain"][0],
+            "HYPOTHESIS_VERSION",
+        )
+        self.assertEqual(
+            bridge["required_chain"][-1],
+            "STRATEGY_DEGRADATION_AND_HYPOTHESIS_FEEDBACK",
+        )
+        self.assertTrue(
+            bridge[
+                "replaceable_plumbing_requires_adopt_wrap_fork_build"
+            ]
+        )
+        self.assertFalse(
+            bridge[
+                "third_party_component_owns_hypothesis_risk_position_"
+                "or_cashflow_truth"
+            ]
+        )
+        self.assertTrue(
+            bridge["shared_replay_paper_shadow_live_interfaces_required"]
+        )
+        self.assertTrue(
+            bridge["monitoring_is_precondition_for_live_authority"]
+        )
+        self.assertTrue(
+            bridge[
+                "overlapping_hypotheses_retain_logical_position_attribution"
+            ]
+        )
+        self.assertTrue(bridge["account_level_risk_aggregation_required"])
+        self.assertTrue(
+            bridge[
+                "unknown_transaction_state_requires_reconciliation_"
+                "before_retry"
+            ]
+        )
+        self.assertFalse(
+            bridge[
+                "monitoring_loss_with_open_inventory_allows_new_entries"
+            ]
+        )
+        for statement in (
+            "A trigger is not an order",
+            "logical attribution stays separate",
+            "A third-party bot or router never becomes the owner",
+            "Monitoring is a precondition for live authority",
+            "reconcile first",
+            "pauses new entries and escalates recovery",
+        ):
+            with self.subTest(statement=statement):
+                self.assertIn(statement, self.architecture)
+
     def test_research_tool_routing_is_problem_and_contract_driven(
         self,
     ) -> None:
@@ -261,6 +322,18 @@ class Task15HypothesisDrivenAcquisitionAcceptanceTests(
         )
         self.assertIn(
             "RESEARCH_MEMORY_QUERY_BEFORE_NEW_TRIAL",
+            roadmap["required_meaning"],
+        )
+        self.assertIn(
+            "VERSIONED_TRIGGER_TO_CASHFLOW_EXECUTION_BRIDGE",
+            roadmap["required_meaning"],
+        )
+        self.assertIn(
+            "POSITION_ATTRIBUTION_ACCOUNT_RISK_AND_RECONCILIATION_TRUTH",
+            roadmap["required_meaning"],
+        )
+        self.assertIn(
+            "LIVE_REQUIRES_MONITORING_KILL_SWITCH_INCIDENT_AND_RECOVERY",
             roadmap["required_meaning"],
         )
         self.assertIn(

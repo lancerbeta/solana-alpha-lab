@@ -23,7 +23,7 @@
     "asset_id": "ARCH-INTENT-002",
     "status": "ACCEPTED_DIRECTION_NOT_IMPLEMENTED",
     "repository_path": "docs/architecture/intents/ARCH-INTENT-002-hypothesis-factory-operating-model.md",
-    "sha256": "b8ba252d420925304b448292f9558e9ec29d60d7da34a59f8d198eb1e32dc674",
+    "sha256": "ea094d88abf635fbe4df3b1ff9b3f0e80cb87dfa836f67505173766e69708639",
     "truth_owner": "USER_GOAL_OWNER"
   },
   "acceptance": {
@@ -36,7 +36,7 @@
     "triggered_live_capture_requires_historical_falsifier": true,
     "prior_task_historical_bytes_changed": false,
     "task01_operational_defaults_superseded": true,
-    "deterministic_acceptance": "25_OF_25_TARGETED_PASS"
+    "deterministic_acceptance": "26_OF_26_TARGETED_PASS"
   },
   "hypothesis_research_memory": {
     "status": "ARCHITECTURE_REQUIREMENT_ACCEPTED_NOT_IMPLEMENTED",
@@ -65,6 +65,38 @@
     "prior_work_query_before_new_research_cycle": true,
     "semantic_similarity_auto_rejects_candidate": false,
     "sensitive_raw_conversation_required": false
+  },
+  "execution_and_position_bridge": {
+    "status": "ARCHITECTURE_REQUIREMENT_ACCEPTED_NOT_IMPLEMENTED",
+    "required_chain": [
+      "HYPOTHESIS_VERSION",
+      "STRATEGY_VERSION_AND_ACTIVATION_EPOCH",
+      "WATCHLIST_MEMBERSHIP_AND_TRIGGER_EVENT",
+      "SIGNAL_DECISION_AND_PRE_TRADE_RISK_SNAPSHOT",
+      "EXECUTION_INTENT",
+      "QUOTE_ROUTE_AND_SIMULATION_EVIDENCE",
+      "EXECUTION_ATTEMPT_AND_OBSERVED_SETTLEMENT",
+      "POSITION_EVENTS_AND_EXIT_DECISIONS",
+      "INVENTORY_RECONCILIATION",
+      "NET_RETURN_AND_REALIZED_OWNER_CASHFLOW",
+      "STRATEGY_DEGRADATION_AND_HYPOTHESIS_FEEDBACK"
+    ],
+    "project_owned_truth": [
+      "STRATEGY_TRIGGER_AND_ACTIVATION_VERSIONS",
+      "CAPITAL_RISK_AND_KILL_SWITCH_POLICY",
+      "IDEMPOTENCY_AND_DUPLICATE_SEND_PROTECTION",
+      "POSITION_INVENTORY_AND_RECONCILIATION",
+      "ACTUAL_FEES_FILLS_SETTLEMENT_AND_NET_CASHFLOW",
+      "EVIDENCE_INCIDENT_DECISION_AND_RECOVERY_LINEAGE"
+    ],
+    "replaceable_plumbing_requires_adopt_wrap_fork_build": true,
+    "third_party_component_owns_hypothesis_risk_position_or_cashflow_truth": false,
+    "shared_replay_paper_shadow_live_interfaces_required": true,
+    "monitoring_is_precondition_for_live_authority": true,
+    "overlapping_hypotheses_retain_logical_position_attribution": true,
+    "account_level_risk_aggregation_required": true,
+    "unknown_transaction_state_requires_reconciliation_before_retry": true,
+    "monitoring_loss_with_open_inventory_allows_new_entries": false
   },
   "factory_fit_review": {
     "gate_id": "FACTORY_FIT_REVIEW_V1",
@@ -123,9 +155,15 @@
       "TEN_X_HYPOTHESIS_COUNT",
       "HISTORICAL_SOURCE_DISAPPEARS_OR_REVISES",
       "OVERLAPPING_HYPOTHESIS_WATCHLISTS",
+      "TWO_HYPOTHESES_CREATE_CONFLICTING_EXPOSURE_ON_ONE_MINT",
       "DORMANT_HYPOTHESIS_REACTIVATION",
       "SEMANTIC_DUPLICATE_REPEATS_PRIOR_RESEARCH",
       "DERIVED_INSIGHT_LOSES_PARENT_EVIDENCE",
+      "DUPLICATE_TRIGGER_OR_TRANSACTION_SEND",
+      "ROUTE_DISAPPEARS_BETWEEN_TRIGGER_ENTRY_AND_EXIT",
+      "PARTIAL_FILL_OR_UNKNOWN_TRANSACTION_LEAVES_UNRESOLVED_INVENTORY",
+      "PROCESS_ALIVE_WHILE_DATA_OR_EXIT_PATH_IS_STALE",
+      "MONITORING_FAILS_WHILE_POSITION_IS_OPEN",
       "STALE_DASHBOARD_BECOMES_FALSE_TRUTH",
       "PERSUASIVE_AI_OR_TOOL_OUTPUT_BYPASSES_VALIDATION"
     ],
@@ -165,6 +203,11 @@
       "HYPOTHESIS_LIFECYCLE_WITH_DORMANT_AND_REACTIVATION_EPOCHS",
       "APPEND_ONLY_HYPOTHESIS_PROVENANCE_AND_DERIVATION_LEDGER",
       "RESEARCH_MEMORY_QUERY_BEFORE_NEW_TRIAL",
+      "VERSIONED_TRIGGER_TO_CASHFLOW_EXECUTION_BRIDGE",
+      "POSITION_ATTRIBUTION_ACCOUNT_RISK_AND_RECONCILIATION_TRUTH",
+      "SHARED_REPLAY_PAPER_SHADOW_LIVE_INTERFACES",
+      "EXECUTION_PLUMBING_ADOPT_WRAP_FORK_BUILD_GATE",
+      "LIVE_REQUIRES_MONITORING_KILL_SWITCH_INCIDENT_AND_RECOVERY",
       "HYPOTHESIS_OWNED_WATCHLISTS_AND_DATA_REQUIREMENTS",
       "RESEARCH_TOOL_CAPABILITY_REGISTRY_AND_ROUTER",
       "HISTORICAL_BATCH_AND_REUSABLE_CACHE_FIRST",
@@ -191,6 +234,7 @@
   "non_claims": [
     "No hypothesis, strategy, watchlist engine, dashboard, research platform or tool registry was implemented.",
     "No hypothesis provenance ledger, derivation graph or research-memory service was implemented.",
+    "No trigger engine, execution adapter, position manager, risk service, signer, monitoring backend or trading action was implemented.",
     "No historical batch, provider measurement, live collection or position monitoring was executed.",
     "No canonical roadmap, Project Source, state or UI activation was changed.",
     "FACTORY_FIT_REVIEW is an accepted TASK-15 candidate, not yet reconciled into the canonical Operating System, roadmap and finish-solana-task workflow.",
