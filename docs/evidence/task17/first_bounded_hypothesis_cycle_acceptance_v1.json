@@ -1,0 +1,122 @@
+{
+  "schema": "smial.task17_first_bounded_hypothesis_cycle_acceptance.v1",
+  "task": "TASK-17",
+  "atom": "T17-A3_DETERMINISTIC_ACCEPTANCE_AND_CATALOG_V1",
+  "as_of": "2026-07-29",
+  "verdict": "PASS",
+  "repository_base": {
+    "head": "7423b2b44630e84b58edb5be5331171fd36c4cfc",
+    "tree": "123347d6eaf8363f5e3723e2c3fa9fb073be41a4"
+  },
+  "accepted_artifacts": [
+    {
+      "asset_id": "EVIDENCE-T17-FIRST-BOUNDED-HYPOTHESIS-CYCLE-001",
+      "path": "docs/evidence/task17/first_bounded_hypothesis_cycle_v1.md",
+      "sha256": "83f309a4c657edddca4ea3c80dcec8b881b631b9dee9459757d99a4e7a8f1004"
+    },
+    {
+      "asset_id": "DATA-T17-HYPOTHESIS-RESEARCH-MEMORY-001",
+      "path": "docs/evidence/task17/first_bounded_hypothesis_cycle_v1.json",
+      "sha256": "8c9da2232ab0feec86da130985eaa4e5168539adaa036d0c48f44b00567c06b6"
+    },
+    {
+      "asset_id": "TEST-T17-FIRST-BOUNDED-HYPOTHESIS-CYCLE-001",
+      "path": "tests/test_task17_first_bounded_hypothesis_cycle.py",
+      "sha256": "b19bec68e48b97917047ce778ba7817609133867ab39ef2e6d29899d641ca545"
+    }
+  ],
+  "hypothesis_acceptance": {
+    "family_id": "HYP-FAMILY-EXECUTION-CAPACITY-CURVATURE",
+    "hypothesis_version_id": "HYP-VERSION-EXECUTION-CAPACITY-CURVATURE-V1",
+    "definition_sha256": "5672d63dd8dbf8cc67a041cc1cc7fd75948de17e3a1c7cbaeb8a488ad790220b",
+    "research_cycle_id": "RESEARCH-CYCLE-EXECUTION-CAPACITY-001",
+    "origin_route": "RETAINED_DATA_EXPLORATION",
+    "schema_origin_kind": "DATA_ANALYSIS",
+    "current_state": "PAUSED",
+    "trials": 0,
+    "activation_epochs": 0,
+    "task16_fixture_used_as_production": false
+  },
+  "deterministic_query_acceptance": {
+    "query_recipe_id": "QUERY-T16-PRIOR-WORK-001",
+    "query_recipe_version": "2.0",
+    "query_id": "PRIOR-WORK-QUERY-T17-CAPACITY-ACCEPTANCE-001",
+    "as_of": "2026-07-29T12:18:49Z",
+    "max_results": 10,
+    "predicates": {
+      "mechanism_terms": [
+        "price impact capacity"
+      ]
+    },
+    "memory_content_sha256": "8c9da2232ab0feec86da130985eaa4e5168539adaa036d0c48f44b00567c06b6",
+    "result_count": 1,
+    "ordered_hypothesis_version_ids": [
+      "HYP-VERSION-EXECUTION-CAPACITY-CURVATURE-V1"
+    ],
+    "current_states": {
+      "HYP-VERSION-EXECUTION-CAPACITY-CURVATURE-V1": "PAUSED"
+    },
+    "trial_outcomes": {
+      "HYP-VERSION-EXECUTION-CAPACITY-CURVATURE-V1": []
+    },
+    "matched_by": [
+      "MECHANISM_TERM"
+    ],
+    "canonical_result_sha256": "1cb86c6d05feb1a44ab8316db1fff9f591600ff01bee831f91e308c010ff0a50",
+    "repeat_or_extension_requires_what_changed": true,
+    "automatic_reject_or_promotion": false
+  },
+  "production_memory_route": {
+    "allowed_paths": [
+      "tests/fixtures/task16/hypothesis_research_memory_v1.json",
+      "docs/evidence/task17/first_bounded_hypothesis_cycle_v1.json"
+    ],
+    "parent_traversal_allowed": false,
+    "arbitrary_json_allowed": false,
+    "network_required": false,
+    "write_effects": "NONE"
+  },
+  "data_decision": {
+    "verdict": "LIVE_NON_RECONSTRUCTABLE_NEED",
+    "data_requirement_asset_id": "DATA-REQUIREMENT-T17-EXECUTION-CAPACITY-001",
+    "live_capture_authority": "NOT_AUTHORIZED",
+    "scope": "VERSIONED_HYPOTHESIS_WATCHLIST_MEMBERS_ONLY",
+    "max_provider_calls_if_separately_authorized": 192,
+    "concurrency": 1,
+    "retries": 0,
+    "cash_cap_usd": 0
+  },
+  "catalog_checkpoint": {
+    "catalog_version": "0.20.0",
+    "assets": 286,
+    "asset_registries": 4,
+    "schemas": 4,
+    "queries": 8,
+    "lifecycle_registries": 9,
+    "lifecycle_records": 52,
+    "registered_asset_ids": [
+      "DATA-T17-HYPOTHESIS-RESEARCH-MEMORY-001",
+      "EVIDENCE-T17-FIRST-BOUNDED-HYPOTHESIS-CYCLE-001",
+      "DATA-REQUIREMENT-T17-EXECUTION-CAPACITY-001",
+      "TEST-T17-FIRST-BOUNDED-HYPOTHESIS-CYCLE-001",
+      "EVIDENCE-T17-FIRST-BOUNDED-HYPOTHESIS-CYCLE-ACCEPTANCE-001",
+      "TEST-T17-FIRST-BOUNDED-HYPOTHESIS-CYCLE-ACCEPTANCE-001"
+    ],
+    "updated_query_recipe_ids": [
+      "QUERY-T16-PRIOR-WORK-001"
+    ]
+  },
+  "authority": {
+    "provider_api_rpc_wss_calls": 0,
+    "cash_spend_usd": 0,
+    "wallet_actions": 0,
+    "signer_actions": 0,
+    "transaction_actions": 0,
+    "commit_actions": 0,
+    "push_actions": 0,
+    "pull_request_actions": 0,
+    "merge_actions": 0
+  },
+  "state_change": "LOCAL_CANDIDATE_REQUIRES_REPOSITORY_DELIVERY",
+  "next_atom": "T17-A4_REPOSITORY_DELIVERY_V1"
+}

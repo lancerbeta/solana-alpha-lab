@@ -8009,9 +8009,12 @@ records:
   evidence: []
   classification: *t16_internal
 - asset_id: TEST-T16-HYPOTHESIS-RESEARCH-MEMORY-ACCEPTANCE-001
-  record_version: '1.0'
+  record_version: '1.1'
   asset_type: script
-  purpose: Deterministic TASK-16 acceptance tests binding upstream fingerprints, empty legacy migration disposition, query evidence, Catalog checkpoint, generated navigation and zero authority.
+  purpose: Deterministic TASK-16 acceptance tests binding upstream
+    fingerprints, empty legacy migration disposition, query evidence,
+    historical Catalog checkpoint as an evolvable minimum, generated
+    navigation and zero authority.
   status: IMPLEMENTED_UNVERIFIED
   origin: REPOSITORY
   as_of: '2026-07-29'
@@ -8022,7 +8025,7 @@ records:
     repository_path: tests/test_task16_hypothesis_research_memory_acceptance.py
   integrity:
     kind: sha256
-    sha256: 8c6451e93368029c843eac9e3754d6ba33fd861e2b3a6d836e79c3b0a16aed5f
+    sha256: 428c23b072b44f9338029f156f654bea59c6cb68bac0e43c79570315d3f6bfdd
   access:
     mode: read_only
     method: file
@@ -8037,6 +8040,7 @@ records:
     target_asset_id: FIXTURE-T16-HYPOTHESIS-RESEARCH-MEMORY-001
   consumers:
   - TASK-16
+  - TASK-17
   evidence: []
   classification: *t16_internal
 - asset_id: TEST-T15-HYPOTHESIS-DRIVEN-ACQUISITION-001
@@ -8142,3 +8146,215 @@ records:
   - FACTORY-001
   evidence: []
   classification: *t15_internal
+- asset_id: DATA-T17-HYPOTHESIS-RESEARCH-MEMORY-001
+  record_version: '1.0'
+  asset_type: evidence
+  purpose: Immutable machine-readable first production hypothesis family,
+    version, origin, research cycle, evidence graph, paused decision and
+    non-authorizing data-need state.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-07-29'
+  truth_owner: TASK-17
+  location:
+    kind: git_path
+    logical_uri: repo://docs/evidence/task17/first_bounded_hypothesis_cycle_v1.json
+    repository_path: docs/evidence/task17/first_bounded_hypothesis_cycle_v1.json
+  integrity:
+    kind: sha256
+    sha256: 8c9da2232ab0feec86da130985eaa4e5168539adaa036d0c48f44b00567c06b6
+  access:
+    mode: read_only
+    method: command
+    recipe_id: QUERY-T16-PRIOR-WORK-001
+    network_required: false
+    secrets_required: false
+  relations:
+  - relation_type: governed_by
+    target_asset_id: CONTRACT-T16-HYPOTHESIS-LIFECYCLE-RESEARCH-MEMORY-001
+  - relation_type: derived_from
+    target_asset_id: PRE-GIT-TASK01-A019
+  - relation_type: derived_from
+    target_asset_id: EVIDENCE-T10-JUPITER-QUOTE-SUMMARY-002
+  - relation_type: validated_by
+    target_asset_id: TEST-T17-FIRST-BOUNDED-HYPOTHESIS-CYCLE-001
+  consumers:
+  - TASK-17
+  - FACTORY-001
+  evidence: []
+  classification: &t17_internal
+    contains_secrets: false
+    contains_raw_data: false
+    sensitivity: INTERNAL_NON_SECRET
+- asset_id: EVIDENCE-T17-FIRST-BOUNDED-HYPOTHESIS-CYCLE-001
+  record_version: '1.0'
+  asset_type: evidence
+  purpose: Human-readable first real hypothesis dossier binding retained
+    origin, what-changed rule, frozen mechanism, falsifier, estimand,
+    population, controls, search budget and bounded data verdict.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-07-29'
+  truth_owner: TASK-17
+  location:
+    kind: git_path
+    logical_uri: repo://docs/evidence/task17/first_bounded_hypothesis_cycle_v1.md
+    repository_path: docs/evidence/task17/first_bounded_hypothesis_cycle_v1.md
+  integrity:
+    kind: sha256
+    sha256: 83f309a4c657edddca4ea3c80dcec8b881b631b9dee9459757d99a4e7a8f1004
+  access:
+    mode: read_only
+    method: file
+    network_required: false
+    secrets_required: false
+  relations:
+  - relation_type: derived_from
+    target_asset_id: DATA-T17-HYPOTHESIS-RESEARCH-MEMORY-001
+  - relation_type: derived_from
+    target_asset_id: PRE-GIT-TASK01-A019
+  - relation_type: derived_from
+    target_asset_id: EVIDENCE-T10-JUPITER-QUOTE-SUMMARY-002
+  - relation_type: validated_by
+    target_asset_id: TEST-T17-FIRST-BOUNDED-HYPOTHESIS-CYCLE-001
+  consumers:
+  - TASK-17
+  - FACTORY-001
+  evidence: []
+  classification: *t17_internal
+- asset_id: DATA-REQUIREMENT-T17-EXECUTION-CAPACITY-001
+  record_version: '1.0'
+  asset_type: decision
+  purpose: Non-authorizing TASK-17 decision view for the exact
+    LIVE_NON_RECONSTRUCTABLE_NEED, versioned-watchlist scope, 192-call
+    ceiling, zero retries, zero cash and separate provider gate.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-07-29'
+  truth_owner: TASK-17
+  location:
+    kind: git_path
+    logical_uri: repo://docs/evidence/task17/first_bounded_hypothesis_cycle_v1.md
+    repository_path: docs/evidence/task17/first_bounded_hypothesis_cycle_v1.md
+  integrity:
+    kind: sha256
+    sha256: 83f309a4c657edddca4ea3c80dcec8b881b631b9dee9459757d99a4e7a8f1004
+  access:
+    mode: read_only
+    method: file
+    network_required: false
+    secrets_required: false
+  relations:
+  - relation_type: governed_by
+    target_asset_id: CONTRACT-T16-HYPOTHESIS-LIFECYCLE-RESEARCH-MEMORY-001
+  - relation_type: derived_from
+    target_asset_id: DATA-T17-HYPOTHESIS-RESEARCH-MEMORY-001
+  - relation_type: evidenced_by
+    target_asset_id: EVIDENCE-T17-FIRST-BOUNDED-HYPOTHESIS-CYCLE-001
+  - relation_type: validated_by
+    target_asset_id: TEST-T17-FIRST-BOUNDED-HYPOTHESIS-CYCLE-ACCEPTANCE-001
+  consumers:
+  - TASK-17
+  - FACTORY-001
+  evidence: []
+  classification: *t17_internal
+- asset_id: TEST-T17-FIRST-BOUNDED-HYPOTHESIS-CYCLE-001
+  record_version: '1.0'
+  asset_type: script
+  purpose: Deterministic tests for the first real hypothesis lifecycle graph,
+    retained origin, content hashes, production prior-work query, bounded
+    data decision, zero authority and legacy-registry preservation.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-07-29'
+  truth_owner: TASK-17
+  location:
+    kind: git_path
+    logical_uri: repo://tests/test_task17_first_bounded_hypothesis_cycle.py
+    repository_path: tests/test_task17_first_bounded_hypothesis_cycle.py
+  integrity:
+    kind: sha256
+    sha256: b19bec68e48b97917047ce778ba7817609133867ab39ef2e6d29899d641ca545
+  access:
+    mode: read_only
+    method: file
+    network_required: false
+    secrets_required: false
+  relations:
+  - relation_type: depends_on
+    target_asset_id: DATA-T17-HYPOTHESIS-RESEARCH-MEMORY-001
+  - relation_type: depends_on
+    target_asset_id: EVIDENCE-T17-FIRST-BOUNDED-HYPOTHESIS-CYCLE-001
+  - relation_type: depends_on
+    target_asset_id: SCRIPT-T16-PRIOR-WORK-QUERY-001
+  consumers:
+  - TASK-17
+  evidence: []
+  classification: *t17_internal
+- asset_id: EVIDENCE-T17-FIRST-BOUNDED-HYPOTHESIS-CYCLE-ACCEPTANCE-001
+  record_version: '1.0'
+  asset_type: evidence
+  purpose: Sanitized TASK-17 acceptance receipt binding exact dossier
+    fingerprints, reproducible production query, data decision, Catalog
+    checkpoint, generated navigation and zero external effects.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-07-29'
+  truth_owner: TASK-17
+  location:
+    kind: git_path
+    logical_uri: repo://docs/evidence/task17/first_bounded_hypothesis_cycle_acceptance_v1.json
+    repository_path: docs/evidence/task17/first_bounded_hypothesis_cycle_acceptance_v1.json
+  integrity:
+    kind: sha256
+    sha256: 6b9cf73fa4dbc3a3980c94fbfd92d94c1bf63e9c0e606f25ae0fc259cfe86a80
+  access:
+    mode: read_only
+    method: file
+    network_required: false
+    secrets_required: false
+  relations:
+  - relation_type: derived_from
+    target_asset_id: DATA-T17-HYPOTHESIS-RESEARCH-MEMORY-001
+  - relation_type: derived_from
+    target_asset_id: EVIDENCE-T17-FIRST-BOUNDED-HYPOTHESIS-CYCLE-001
+  - relation_type: validated_by
+    target_asset_id: TEST-T17-FIRST-BOUNDED-HYPOTHESIS-CYCLE-ACCEPTANCE-001
+  consumers:
+  - TASK-17
+  - FACTORY-001
+  evidence: []
+  classification: *t17_internal
+- asset_id: TEST-T17-FIRST-BOUNDED-HYPOTHESIS-CYCLE-ACCEPTANCE-001
+  record_version: '1.0'
+  asset_type: script
+  purpose: Deterministic TASK-17 acceptance tests binding immutable A2 bytes,
+    production-safe query routing, exact Catalog registration, generated
+    navigation, data non-authority and zero external effects.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-07-29'
+  truth_owner: TASK-17
+  location:
+    kind: git_path
+    logical_uri: repo://tests/test_task17_first_bounded_hypothesis_cycle_acceptance.py
+    repository_path: tests/test_task17_first_bounded_hypothesis_cycle_acceptance.py
+  integrity:
+    kind: sha256
+    sha256: fe7798a4fa57cb8dbf9b75c9e9f41c5ac58ba8e93e456a20d4907dde3c4522c9
+  access:
+    mode: read_only
+    method: file
+    network_required: false
+    secrets_required: false
+  relations:
+  - relation_type: depends_on
+    target_asset_id: EVIDENCE-T17-FIRST-BOUNDED-HYPOTHESIS-CYCLE-ACCEPTANCE-001
+  - relation_type: depends_on
+    target_asset_id: DATA-T17-HYPOTHESIS-RESEARCH-MEMORY-001
+  - relation_type: depends_on
+    target_asset_id: TEST-T17-FIRST-BOUNDED-HYPOTHESIS-CYCLE-001
+  consumers:
+  - TASK-17
+  evidence: []
+  classification: *t17_internal
