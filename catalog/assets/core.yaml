@@ -8883,11 +8883,12 @@ records:
   evidence: []
   classification: *t17a_internal
 - asset_id: TEST-T17A-EXECUTION-CAPACITY-AUDIT-001
-  record_version: '1.2'
+  record_version: '1.3'
   asset_type: script
   purpose: Deterministic acceptance tests for original timing failure,
     replacement-window replay, raw tamper failure, tracked receipt equality,
-    bounded claims, exact total usage and hash-bound logical-only CI fallback.
+    bounded claims, exact total usage, forward-compatible Catalog checkpoints
+    and hash-bound logical-only CI fallback.
   status: IMPLEMENTED_UNVERIFIED
   origin: REPOSITORY
   as_of: '2026-07-29'
@@ -8898,7 +8899,7 @@ records:
     repository_path: tests/test_task17a_execution_capacity_audit.py
   integrity:
     kind: sha256
-    sha256: bd8b17169beb9c2ab20d47286edc39210a925f912a871e85df7689f5f3810097
+    sha256: ebe36545dc7e2668707b564c76de07a71b6d4a59a358bdf9a3047ac766f80a1f
   access:
     mode: read_only
     method: file
@@ -8913,6 +8914,7 @@ records:
     target_asset_id: MODULE-T17A-EXECUTION-CAPACITY-AUDIT-001
   consumers:
   - TASK-17A
+  - TASK-19
   evidence: []
   classification: *t17a_internal
 - asset_id: CONTRACT-T18-NARROW-DATA-QUALITY-001
