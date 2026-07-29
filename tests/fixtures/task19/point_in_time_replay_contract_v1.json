@@ -1,0 +1,385 @@
+{
+  "schema": "solana_alpha_lab.task19_point_in_time_replay_contract",
+  "schema_version": "1.0",
+  "contract_id": "CONTRACT-T19-POINT-IN-TIME-REPLAY-001",
+  "task_id": "TASK-19",
+  "atom_id": "T19-A2_FROZEN_POINT_IN_TIME_REPLAY_CONTRACT_V1",
+  "status": "FROZEN_OFFLINE_CONTRACT",
+  "as_of": "2026-07-29",
+  "entry_gate": {
+    "verdict": "START_AS_WRITTEN",
+    "source_activation": "ACTIVATION_CONFIRMED_USER_SMOKE",
+    "accepted_base_commit": "7daa7702895f90844a488337dd74ddf26dbfa00b",
+    "accepted_base_tree": "43b4c493396114ff075723fc54496e3d5f920ed7",
+    "catalog_version": "0.23.0",
+    "catalog_assets": 321,
+    "catalog_shards": 4,
+    "catalog_schemas": 4,
+    "catalog_queries": 8,
+    "raw_files_present": 12,
+    "raw_rows_present": 32,
+    "raw_stored_bytes": 179208,
+    "raw_hash_readback": "PASS_12_OF_12",
+    "local_backup_present": true
+  },
+  "owner_decision": "RECONSTRUCT_EXACT_DECISION_TIME_QUOTE_RESULT_WITHOUT_FUTURE_ROW_LEAKAGE_OR_FAIL_CLOSED",
+  "estimand": {
+    "hypothesis_version_id": "HYP-VERSION-EXECUTION-CAPACITY-CURVATURE-V1",
+    "hypothesis_state": "PAUSED",
+    "watchlist_id": "HYP-WATCHLIST-EXECUTION-CAPACITY-V1",
+    "watchlist_version": "1.0",
+    "member_ids": [
+      "HYP-WATCH-MEMBER-T10-001"
+    ],
+    "accepted_windows": [
+      "T17A-WINDOW-01",
+      "T17A-WINDOW-03",
+      "T17A-WINDOW-04-REPAIR-01"
+    ],
+    "excluded_retained_windows": [
+      "T17A-WINDOW-02"
+    ],
+    "accepted_attempts": 24,
+    "excluded_retained_attempts": 8,
+    "complete_quote_pairs": 12,
+    "claim_scope": "ONE_MEMBER_THREE_WINDOWS_QUOTE_ONLY",
+    "expected_result": "SUPPORTED_WITHIN_ONE_MEMBER_THREE_WINDOWS_QUOTE_ONLY",
+    "expected_median_delta_cost_bps": "832.5706",
+    "promotion_authorized": false
+  },
+  "tracked_inputs": [
+    {
+      "asset_id": "FIXTURE-T17A-EXECUTION-CAPACITY-QUOTE-PANEL-001",
+      "path": "tests/fixtures/task17a/bounded_execution_capacity_quote_panel_contract_v1.json",
+      "sha256": "ac7a191f4a5888681fa2b90ea33261271d0d7d4a44c81653dbfc6d902fa6871f"
+    },
+    {
+      "asset_id": "EVIDENCE-T17A-EXECUTION-CAPACITY-AUDIT-001",
+      "path": "docs/evidence/task17a/execution_capacity_quote_panel_audit_v1.json",
+      "sha256": "15c9ba7641c15c5511b308485cc230d3bff977f6529c6b86019673e91ee8a0a2"
+    },
+    {
+      "asset_id": "CONTRACT-T18-NARROW-DATA-QUALITY-001",
+      "path": "docs/contracts/task18_narrow_data_quality_contract_v1.md",
+      "sha256": "b2acde679c09c7ac705194d5b97cd483440ac4f62a247129ab0d5636a2569a03"
+    },
+    {
+      "asset_id": "FIXTURE-T18-NARROW-DATA-QUALITY-001",
+      "path": "tests/fixtures/task18/narrow_data_quality_contract_v1.json",
+      "sha256": "1842df2ef349d9506ff612c3faf3c943a1a218f6c6a7e266c5af5f0f5578b3a6"
+    },
+    {
+      "asset_id": "EVIDENCE-T18-NARROW-DATA-QUALITY-AUDIT-001",
+      "path": "docs/evidence/task18/narrow_data_quality_audit_v1.json",
+      "sha256": "52a4585364930ca4a62e12a06cf196af14309f34ab3d46c75f2c00a168e40403"
+    },
+    {
+      "asset_id": "EVIDENCE-T18-CONTENT-ADDRESSED-BACKUP-RESTORE-001",
+      "path": "docs/evidence/task18/content_addressed_backup_restore_receipt_v1.json",
+      "sha256": "e951b7e345e06c21ed0a1b36d0ea7c4b29d4f8579ee1f4fefa35aee25a5600d1"
+    },
+    {
+      "asset_id": "EVIDENCE-T18-CATALOG-REPOSITORY-FINALIZATION-001",
+      "path": "docs/evidence/task18/catalog_repository_finalization_receipt_v1.json",
+      "sha256": "ff88b167a6eb197220bf4e105b699b4704621a93cb0b93c3674b457bb537e5ed"
+    }
+  ],
+  "time_contract": {
+    "timezone": "UTC",
+    "cutoff_source": "FROZEN_LITERAL_NOT_RUNTIME_MAXIMUM",
+    "runtime_cutoff_extension_allowed": false,
+    "eligibility_fields": [
+      "first_reliable_available_at",
+      "available_to_strategy_at",
+      "ingested_at"
+    ],
+    "event_time_grants_eligibility": false,
+    "requested_at_grants_eligibility": false,
+    "response_at_grants_eligibility": false,
+    "ordered_source_fields": [
+      "requested_at",
+      "response_at",
+      "first_reliable_available_at",
+      "available_to_strategy_at",
+      "ingested_at"
+    ],
+    "window_cutoffs": [
+      {
+        "window_id": "T17A-WINDOW-01",
+        "classification": "ACCEPTED",
+        "decision_at": "2026-07-29T14:17:06.203260Z",
+        "expected_eligible_rows": 8
+      },
+      {
+        "window_id": "T17A-WINDOW-02",
+        "classification": "EXCLUDED_RETAINED",
+        "audit_as_of": "2026-07-29T14:47:06.200169Z",
+        "expected_eligible_rows": 0
+      },
+      {
+        "window_id": "T17A-WINDOW-03",
+        "classification": "ACCEPTED",
+        "decision_at": "2026-07-29T15:17:10.046218Z",
+        "expected_eligible_rows": 8
+      },
+      {
+        "window_id": "T17A-WINDOW-04-REPAIR-01",
+        "classification": "ACCEPTED",
+        "decision_at": "2026-07-29T15:47:24.921906Z",
+        "expected_eligible_rows": 8
+      }
+    ],
+    "final_evaluation_decision_at": "2026-07-29T15:47:24.921906Z",
+    "backfill_availability_forbidden": true,
+    "eligibility_rule": "ACCEPTED_MEMBER_AND_FIRST_RELIABLE_AND_STRATEGY_AVAILABLE_AND_INGESTED_NO_LATER_THAN_LITERAL_WINDOW_CUTOFF"
+  },
+  "membership": {
+    "accepted_window_order": [
+      "T17A-WINDOW-01",
+      "T17A-WINDOW-03",
+      "T17A-WINDOW-04-REPAIR-01"
+    ],
+    "excluded_window_id": "T17A-WINDOW-02",
+    "excluded_reason": "TRIGGER_SEPARATION_SHORTFALL_0_007854_SECONDS",
+    "availability_may_override_exclusion": false,
+    "post_hoc_tolerance_allowed": false,
+    "reclassification_allowed": false,
+    "unknown_window_outcome": "EVIDENCE_UNAVAILABLE",
+    "production_extra_row_outcome": "EVIDENCE_UNAVAILABLE"
+  },
+  "ordering": {
+    "input_file_order_is_authority": false,
+    "window_order_source": "FROZEN_ACCEPTED_WINDOW_ORDER",
+    "within_window_keys": [
+      "call_ordinal",
+      "quote_attempt.quote_attempt_id",
+      "raw_event.raw_event_id",
+      "request_hash",
+      "idempotency_key"
+    ],
+    "duplicate_equal_bytes_outcome": "EVIDENCE_UNAVAILABLE",
+    "duplicate_changed_bytes_outcome": "EVIDENCE_UNAVAILABLE",
+    "silent_deduplication_allowed": false
+  },
+  "pairing": {
+    "notionals_usd": [
+      10,
+      25,
+      50,
+      100
+    ],
+    "ordinal_pairs": [
+      [
+        1,
+        2
+      ],
+      [
+        3,
+        4
+      ],
+      [
+        5,
+        6
+      ],
+      [
+        7,
+        8
+      ]
+    ],
+    "first_side": "BUY",
+    "second_side": "SELL",
+    "dependent_sell_input_equals_buy_output": true,
+    "arithmetic": "INTEGER_ATOMIC_UNITS_PLUS_DECIMAL",
+    "quantum": "0.0001",
+    "rounding": "ROUND_HALF_EVEN"
+  },
+  "expected_output": {
+    "schema": "smial.task19_point_in_time_replay.v1",
+    "schema_version": "1.0",
+    "replay_id": "REPLAY-T19-EXECUTION-CAPACITY-PIT-001",
+    "accepted_rows": 24,
+    "excluded_retained_rows": 8,
+    "complete_quote_pairs": 12,
+    "complete_monotonic_panels": 3,
+    "complete_panels": 3,
+    "cost_bps_by_window": {
+      "T17A-WINDOW-01": {
+        "10": "345.2850",
+        "25": "495.1112",
+        "50": "734.1092",
+        "100": "1174.2551",
+        "delta_100_minus_10": "828.9701"
+      },
+      "T17A-WINDOW-03": {
+        "10": "348.2840",
+        "25": "497.1640",
+        "50": "735.6348",
+        "100": "1181.6128",
+        "delta_100_minus_10": "833.3288"
+      },
+      "T17A-WINDOW-04-REPAIR-01": {
+        "10": "348.8440",
+        "25": "497.5428",
+        "50": "737.8010",
+        "100": "1181.4146",
+        "delta_100_minus_10": "832.5706"
+      }
+    },
+    "median_delta_cost_bps": "832.5706",
+    "hypothesis_result": "SUPPORTED_WITHIN_ONE_MEMBER_THREE_WINDOWS_QUOTE_ONLY",
+    "hypothesis_state": "PAUSED",
+    "promotion_authorized": false,
+    "serialization": "UTF8_JSON_SORT_KEYS_COMPACT_SEPARATORS_PLUS_FINAL_LF",
+    "repeat_output_sha256_must_match": true,
+    "shuffle_output_sha256_must_match": true
+  },
+  "adversarial_test_mode": {
+    "synthetic_rows_only_after_base_integrity_passes": true,
+    "synthetic_rows_are_production_evidence": false,
+    "physical_raw_changes_allowed": false
+  },
+  "adversarial_vectors": [
+    {
+      "vector_id": "T19-FUTURE-ROW-AFTER-CUTOFF-001",
+      "mutation": "APPEND_SYNTHETIC_ACCEPTED_WINDOW_ROW_WITH_ALL_AVAILABILITY_FIELDS_AFTER_LITERAL_CUTOFF",
+      "expected_outcome": "IGNORED_AND_BASE_OUTPUT_SHA256_UNCHANGED"
+    },
+    {
+      "vector_id": "T19-BACKFILL-TRAP-001",
+      "mutation": "OLD_EVENT_AND_REQUEST_TIME_WITH_FIRST_RELIABLE_AVAILABILITY_AFTER_LITERAL_CUTOFF",
+      "expected_outcome": "IGNORED_AND_BASE_OUTPUT_SHA256_UNCHANGED"
+    },
+    {
+      "vector_id": "T19-SHUFFLED-INPUT-001",
+      "mutation": "REVERSE_OR_RANDOMIZE_BASE_ROW_ORDER",
+      "expected_outcome": "BASE_OUTPUT_SHA256_UNCHANGED"
+    },
+    {
+      "vector_id": "T19-EXCLUDED-WINDOW-BEFORE-FINAL-CUTOFF-001",
+      "mutation": "PRESENT_ALL_EXCLUDED_WINDOW_ROWS_BEFORE_FINAL_EVALUATION_CUTOFF",
+      "expected_outcome": "EXCLUDED_ROWS_RETAINED_AND_OUTPUT_UNCHANGED"
+    },
+    {
+      "vector_id": "T19-DUPLICATE-IDENTITY-001",
+      "mutation": "DUPLICATE_EQUAL_BYTES_UNDER_SAME_STABLE_IDENTITY",
+      "expected_outcome": "EVIDENCE_UNAVAILABLE"
+    },
+    {
+      "vector_id": "T19-CHANGED-REVISION-001",
+      "mutation": "CHANGE_CONTENT_UNDER_EXISTING_IDENTITY_OR_REVISION",
+      "expected_outcome": "EVIDENCE_UNAVAILABLE"
+    },
+    {
+      "vector_id": "T19-MISSING-AVAILABILITY-001",
+      "mutation": "REMOVE_ONE_REQUIRED_AVAILABILITY_FIELD",
+      "expected_outcome": "EVIDENCE_UNAVAILABLE"
+    },
+    {
+      "vector_id": "T19-IMPOSSIBLE-TIME-ORDER-001",
+      "mutation": "SET_INGESTED_AT_BEFORE_AVAILABLE_TO_STRATEGY_AT",
+      "expected_outcome": "EVIDENCE_UNAVAILABLE"
+    },
+    {
+      "vector_id": "T19-INCOMPLETE-PAIR-001",
+      "mutation": "REMOVE_ONE_BUY_OR_DEPENDENT_SELL_FROM_ACCEPTED_WINDOW",
+      "expected_outcome": "EVIDENCE_UNAVAILABLE"
+    },
+    {
+      "vector_id": "T19-PHYSICAL-RAW-DRIFT-001",
+      "mutation": "ALTER_OR_APPEND_FROZEN_PRODUCTION_RAW_BYTES",
+      "expected_outcome": "EVIDENCE_UNAVAILABLE_BEFORE_REPLAY"
+    }
+  ],
+  "verdicts": {
+    "precedence": [
+      "EVIDENCE_UNAVAILABLE",
+      "LEAKAGE_DETECTED",
+      "REPLAY_SAFE_WITH_LIMITATIONS",
+      "REPLAY_SAFE"
+    ],
+    "EVIDENCE_UNAVAILABLE": "MISSING_UNREADABLE_UNPARSEABLE_HASH_SIZE_COUNT_IDENTITY_OR_PAIR_DRIFT",
+    "LEAKAGE_DETECTED": "INELIGIBLE_FUTURE_ROW_CHANGES_EARLIER_OUTPUT_OR_DETERMINISM_OR_MEMBERSHIP_FAILS",
+    "REPLAY_SAFE_WITH_LIMITATIONS": "ALL_HARD_REPLAY_AND_LEAKAGE_INVARIANTS_PASS_WITH_EXPLICIT_NONCRITICAL_REPLAY_LIMITATION",
+    "REPLAY_SAFE": "EXACT_EXPECTED_OUTPUT_AND_ALL_FAIL_CLOSED_AND_INVARIANCE_VECTORS_PASS_WITH_NO_REPLAY_LIMITATION",
+    "hypothesis_result_may_select_verdict": false,
+    "majority_vote_allowed": false
+  },
+  "non_claims": {
+    "cross_token_generalization": false,
+    "provider_reliability": false,
+    "fillable": false,
+    "realized_vwap": false,
+    "net_return": false,
+    "signal_or_strategy": false,
+    "execution_or_position": false,
+    "owner_cashflow": false,
+    "alpha": false,
+    "production_readiness": false
+  },
+  "reuse": {
+    "adopt": [
+      "QUERY-T05-PIT-RELATION-001",
+      "CONTRACT-T16-HYPOTHESIS-LIFECYCLE-RESEARCH-MEMORY-001"
+    ],
+    "wrap": [
+      "MODULE-T17A-EXECUTION-CAPACITY-AUDIT-001",
+      "MODULE-T18-DATA-QUALITY-001",
+      "EVIDENCE-T18-NARROW-DATA-QUALITY-AUDIT-001"
+    ],
+    "fork": [],
+    "build_later": [
+      "THIN_TASK19_POINT_IN_TIME_REPLAY_PROJECTOR",
+      "THIN_TASK19_ADVERSARIAL_LEAKAGE_HARNESS"
+    ],
+    "new_dependency_count": 0,
+    "generic_backtester": false,
+    "general_event_platform": false
+  },
+  "catalog": {
+    "registered_in_atom2": false,
+    "status": "CATALOG_TRANSACTION_PENDING_T19_A4",
+    "blocks_contract_freeze": false,
+    "blocks_task19_done": true,
+    "planned_asset_ids": [
+      "CONTRACT-T19-POINT-IN-TIME-REPLAY-001",
+      "FIXTURE-T19-POINT-IN-TIME-REPLAY-001",
+      "TEST-T19-POINT-IN-TIME-REPLAY-CONTRACT-001"
+    ],
+    "named_consumers": [
+      "TASK-19",
+      "TASK-20",
+      "FACTORY-001"
+    ]
+  },
+  "authority": {
+    "class": "LOCAL_WRITE_ONLY",
+    "source": "EXPLICIT_USER",
+    "managed_files": [
+      "docs/contracts/task19_point_in_time_replay_contract_v1.md",
+      "tests/fixtures/task19/point_in_time_replay_contract_v1.json",
+      "tests/test_task19_point_in_time_replay_contract.py"
+    ],
+    "network_calls": 0,
+    "provider_api_rpc_wss_calls": 0,
+    "drive_reads": 0,
+    "drive_writes": 0,
+    "credential_use": 0,
+    "collector_executions": 0,
+    "raw_data_writes": 0,
+    "cash_spend_usd_cents": 0,
+    "provider_credits": 0,
+    "dependency_changes": 0,
+    "commit": false,
+    "push": false,
+    "pull_request": false,
+    "merge": false,
+    "ui_changes": false,
+    "destructive_actions": false
+  },
+  "next_atom": {
+    "atom_id": "T19-A3_DETERMINISTIC_OFFLINE_REPLAY_AND_LEAKAGE_TESTS_V1",
+    "implementation_authorized": false,
+    "external_calls_authorized": false,
+    "raw_mutation_authorized": false
+  }
+}

@@ -1,0 +1,199 @@
+{
+  "receipt_id": "T19-A4-ACCEPTANCE-CATALOG-FACTORY-FIT-RECEIPT-001",
+  "receipt_version": "1.0",
+  "task_id": "TASK-19",
+  "atom_id": "T19-A4_ACCEPTANCE_CATALOG_FACTORY_FIT_V1",
+  "status": "PASS",
+  "as_of": "2026-07-29",
+  "repository_base": {
+    "branch": "task19/point-in-time-replay",
+    "head": "7daa7702895f90844a488337dd74ddf26dbfa00b",
+    "tree": "43b4c493396114ff075723fc54496e3d5f920ed7",
+    "upstream": "origin/main"
+  },
+  "accepted_result": {
+    "replay_verdict": "REPLAY_SAFE",
+    "claim_scope": "ONE_MEMBER_THREE_WINDOWS_QUOTE_ONLY",
+    "hypothesis_version_id": "HYP-VERSION-EXECUTION-CAPACITY-CURVATURE-V1",
+    "hypothesis_state": "PAUSED",
+    "promotion_authorized": false,
+    "accepted_rows": 24,
+    "excluded_retained_rows": 8,
+    "complete_quote_pairs": 12,
+    "median_delta_cost_bps": "832.5706",
+    "replay_output_sha256": "a456b3a57a21a5300740c7fc43afd18e5797f341238bb1b5875769669ab57e98",
+    "lineage_projection_sha256": "d8715c750c974ef8dc6a8f18dd34bc9574101d33ca0309d0b39544d018eab5b7",
+    "lineage_attempts": 32,
+    "adversarial_vectors_passed": 10,
+    "adversarial_vectors_total": 10,
+    "a3_receipt_sha256": "03e37130a71e529e7d0c25b0acaadaffa6db2e4d2c0a647c99866ffbbaae8d48"
+  },
+  "catalog": {
+    "status": "REGISTERED_IN_TASK19_CATALOG_TRANSACTION",
+    "catalog_version": "0.24.0",
+    "assets": 331,
+    "asset_registries": 4,
+    "schemas": 4,
+    "queries": 8,
+    "registered_asset_ids": [
+      "CONTRACT-T19-POINT-IN-TIME-REPLAY-001",
+      "FIXTURE-T19-POINT-IN-TIME-REPLAY-001",
+      "TEST-T19-POINT-IN-TIME-REPLAY-CONTRACT-001",
+      "MODULE-T19-POINT-IN-TIME-REPLAY-001",
+      "SCRIPT-T19-POINT-IN-TIME-REPLAY-001",
+      "EVIDENCE-T19-POINT-IN-TIME-REPLAY-001",
+      "EVIDENCE-T19-POINT-IN-TIME-REPLAY-SUMMARY-001",
+      "TEST-T19-POINT-IN-TIME-REPLAY-001",
+      "EVIDENCE-T19-ACCEPTANCE-CATALOG-FACTORY-FIT-001",
+      "TEST-T19-ACCEPTANCE-CATALOG-FACTORY-FIT-001"
+    ],
+    "named_consumers": [
+      "TASK-19",
+      "TASK-20",
+      "FACTORY-001"
+    ]
+  },
+  "factory_fit": {
+    "mode": "FULL_REVIEW",
+    "verdict": "PASS",
+    "trigger": "POINT_IN_TIME_DATA_LINEAGE_AND_SHARED_DOWNSTREAM_CONSUMERS",
+    "bounded_correction": {
+      "finding": "AGGREGATE_REPLAY_RECEIPT_LACKED_DIRECT_ATTEMPT_TO_RAW_CONTENT_LINEAGE",
+      "action": "ADDED_DETERMINISTIC_32_ATTEMPT_LINEAGE_PROJECTION_WITHOUT_RAW_PAYLOAD",
+      "scope_change": false,
+      "estimand_change": false,
+      "validation": "PASS"
+    },
+    "checks": [
+      {
+        "check_id": "GOAL_FIT",
+        "status": "PASS",
+        "evidence": "REPLAY_SAFE protects decision-time truth before broader collection."
+      },
+      {
+        "check_id": "COMPATIBILITY",
+        "status": "PASS",
+        "evidence": "Frozen TASK-17A/TASK-18 identities, verdicts and excluded membership reconcile exactly."
+      },
+      {
+        "check_id": "FLEXIBILITY_AND_REUSE",
+        "status": "PASS",
+        "evidence": "Thin TASK-19 projector wraps existing auditors and keeps the aggregate output contract stable."
+      },
+      {
+        "check_id": "EFFICIENCY",
+        "status": "PASS",
+        "evidence": "Offline replay uses existing bytes, dependencies and deterministic targeted tests."
+      },
+      {
+        "check_id": "HONEST_CLOSURE",
+        "status": "PASS",
+        "evidence": "One-member quote-only scope, PAUSED state and all non-claims remain explicit."
+      },
+      {
+        "check_id": "OWNER_JOURNEY",
+        "status": "PASS",
+        "evidence": "The summary exposes verdict, result, lineage, leakage proof, limitations and next boundary."
+      },
+      {
+        "check_id": "HYPOTHESIS_LIFECYCLE",
+        "status": "PASS",
+        "evidence": "Stable hypothesis version and PAUSED state are preserved without historical rewrite or promotion."
+      },
+      {
+        "check_id": "DATA_FITNESS",
+        "status": "PASS",
+        "evidence": "Literal cutoffs, membership, availability, missingness, revision and raw-hash gates fail closed."
+      },
+      {
+        "check_id": "TRADING_BRIDGE",
+        "status": "NOT_APPLICABLE",
+        "evidence": "TASK-19 is quote-only replay and authorizes no signal, fill, position, PnL or cashflow claim."
+      },
+      {
+        "check_id": "POSITION_AND_RISK_TRUTH",
+        "status": "NOT_APPLICABLE",
+        "evidence": "No position, inventory, risk or transaction state is created or inferred."
+      },
+      {
+        "check_id": "MONITORING_AND_RECOVERY",
+        "status": "PASS",
+        "evidence": "Missing or drifted local evidence returns EVIDENCE_UNAVAILABLE before replay; TASK-18 restore proof remains bound."
+      },
+      {
+        "check_id": "FAILURE_RED_TEAM",
+        "status": "PASS",
+        "evidence": "All 10 frozen future-row, shuffle, duplicate, revision, time, pair and physical-drift vectors pass."
+      },
+      {
+        "check_id": "BUILD_VERSUS_BUY",
+        "status": "PASS",
+        "evidence": "Existing TASK-17A/TASK-18 modules are wrapped; no dependency or generic backtester is added."
+      },
+      {
+        "check_id": "MIGRATION_AND_ROLLBACK",
+        "status": "PASS",
+        "evidence": "The change is additive and reversible; raw and prior tracked evidence remain immutable."
+      },
+      {
+        "check_id": "CONTRADICTION_SCAN",
+        "status": "PASS",
+        "evidence": "Canonical task, frozen contract, replay receipt, lineage, Catalog consumers and generated views agree."
+      }
+    ],
+    "previous_durable_followup": {
+      "followup_id": "TASK20_FUTURE_COLLECTION_BACKUP_RESTORE_AUTOMATION_POLICY",
+      "status": "ROUTED_UNCHANGED",
+      "owner": "TASK-20",
+      "activation_trigger": "BEFORE_ANY_FORWARD_COLLECTION",
+      "reason": "TASK-19 replays one immutable snapshot and does not widen future collection durability."
+    },
+    "new_followup": "NONE"
+  },
+  "validation": {
+    "task19_targeted_suite": "PASS_26_OF_26",
+    "clean_clone_without_raw": "PASS_WITH_3_EXPECTED_RAW_DEPENDENT_SKIPS",
+    "catalog_validation": "PASS_0_24_0_331_ASSETS",
+    "generated_navigation": "PASS",
+    "secret_scan": "PASS",
+    "file_hygiene": "PASS",
+    "full_repository_validation": "DEFERRED_TO_T19_A5_CI_SAME_CANDIDATE"
+  },
+  "authority": {
+    "local_write_only": true,
+    "network_calls": 0,
+    "provider_api_rpc_wss_calls": 0,
+    "drive_reads": 0,
+    "drive_writes": 0,
+    "collector_executions": 0,
+    "cash_spend_usd_cents": 0,
+    "provider_credits": 0,
+    "credential_use": 0,
+    "dependency_changes": 0,
+    "wallet_signer_transaction_actions": 0,
+    "commit": false,
+    "push": false,
+    "pull_request": false,
+    "merge": false
+  },
+  "nonclaims": [
+    "NOT_CROSS_TOKEN_GENERALIZATION",
+    "NOT_PROVIDER_RELIABILITY",
+    "NOT_FILLABLE",
+    "NOT_REALIZED_VWAP",
+    "NOT_NET_RETURN",
+    "NOT_SIGNAL_OR_STRATEGY",
+    "NOT_EXECUTION_OR_POSITION",
+    "NOT_OWNER_CASHFLOW",
+    "NOT_ALPHA",
+    "NOT_PRODUCTION_READINESS",
+    "NOT_TASK20_COLLECTION_AUTHORITY"
+  ],
+  "canonical_status_candidate": "TASK19_A4_LOCAL_CANDIDATE_READY_FOR_T19_A5",
+  "next_gate": {
+    "atom_id": "T19-A5_REPOSITORY_DELIVERY_V1",
+    "authority": "COMMIT_AND_NON_FORCE_TASK_BRANCH_PUSH_DRAFT_PR_CI",
+    "authorized_by_t19_a4": false
+  },
+  "state_change": "LOCAL_FILES_ONLY"
+}

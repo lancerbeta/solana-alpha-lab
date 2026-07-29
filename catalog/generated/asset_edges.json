@@ -693,6 +693,21 @@
       "target_asset_id": "TEST-T18-NARROW-DATA-QUALITY-CONTRACT-001"
     },
     {
+      "source_asset_id": "CONTRACT-T19-POINT-IN-TIME-REPLAY-001",
+      "relation": "derived_from",
+      "target_asset_id": "EVIDENCE-T18-CONTENT-ADDRESSED-BACKUP-RESTORE-001"
+    },
+    {
+      "source_asset_id": "CONTRACT-T19-POINT-IN-TIME-REPLAY-001",
+      "relation": "derived_from",
+      "target_asset_id": "EVIDENCE-T18-NARROW-DATA-QUALITY-AUDIT-001"
+    },
+    {
+      "source_asset_id": "CONTRACT-T19-POINT-IN-TIME-REPLAY-001",
+      "relation": "validated_by",
+      "target_asset_id": "TEST-T19-POINT-IN-TIME-REPLAY-CONTRACT-001"
+    },
+    {
       "source_asset_id": "CTRL-AGENTS-001",
       "relation": "governed_by",
       "target_asset_id": "CTRL-TASK-04-001"
@@ -1533,6 +1548,46 @@
       "target_asset_id": "TEST-T18-DATA-QUALITY-AUDIT-001"
     },
     {
+      "source_asset_id": "EVIDENCE-T19-ACCEPTANCE-CATALOG-FACTORY-FIT-001",
+      "relation": "derived_from",
+      "target_asset_id": "EVIDENCE-T19-POINT-IN-TIME-REPLAY-001"
+    },
+    {
+      "source_asset_id": "EVIDENCE-T19-ACCEPTANCE-CATALOG-FACTORY-FIT-001",
+      "relation": "validated_by",
+      "target_asset_id": "TEST-T19-ACCEPTANCE-CATALOG-FACTORY-FIT-001"
+    },
+    {
+      "source_asset_id": "EVIDENCE-T19-POINT-IN-TIME-REPLAY-001",
+      "relation": "derived_from",
+      "target_asset_id": "EVIDENCE-T18-CONTENT-ADDRESSED-BACKUP-RESTORE-001"
+    },
+    {
+      "source_asset_id": "EVIDENCE-T19-POINT-IN-TIME-REPLAY-001",
+      "relation": "derived_from",
+      "target_asset_id": "EVIDENCE-T18-NARROW-DATA-QUALITY-AUDIT-001"
+    },
+    {
+      "source_asset_id": "EVIDENCE-T19-POINT-IN-TIME-REPLAY-001",
+      "relation": "governed_by",
+      "target_asset_id": "CONTRACT-T19-POINT-IN-TIME-REPLAY-001"
+    },
+    {
+      "source_asset_id": "EVIDENCE-T19-POINT-IN-TIME-REPLAY-001",
+      "relation": "validated_by",
+      "target_asset_id": "TEST-T19-POINT-IN-TIME-REPLAY-001"
+    },
+    {
+      "source_asset_id": "EVIDENCE-T19-POINT-IN-TIME-REPLAY-SUMMARY-001",
+      "relation": "derived_from",
+      "target_asset_id": "EVIDENCE-T19-POINT-IN-TIME-REPLAY-001"
+    },
+    {
+      "source_asset_id": "EVIDENCE-T19-POINT-IN-TIME-REPLAY-SUMMARY-001",
+      "relation": "validated_by",
+      "target_asset_id": "TEST-T19-POINT-IN-TIME-REPLAY-001"
+    },
+    {
       "source_asset_id": "FIXTURE-BATON-SUITE-001",
       "relation": "governed_by",
       "target_asset_id": "CTRL-BATON-SETUP-001"
@@ -1993,6 +2048,16 @@
       "target_asset_id": "TEST-T18-NARROW-DATA-QUALITY-CONTRACT-001"
     },
     {
+      "source_asset_id": "FIXTURE-T19-POINT-IN-TIME-REPLAY-001",
+      "relation": "governed_by",
+      "target_asset_id": "CONTRACT-T19-POINT-IN-TIME-REPLAY-001"
+    },
+    {
+      "source_asset_id": "FIXTURE-T19-POINT-IN-TIME-REPLAY-001",
+      "relation": "validated_by",
+      "target_asset_id": "TEST-T19-POINT-IN-TIME-REPLAY-CONTRACT-001"
+    },
+    {
       "source_asset_id": "GENERATED-EDGE-PROJECTION-001",
       "relation": "derived_from",
       "target_asset_id": "CATALOG-ROOT-001"
@@ -2441,6 +2506,26 @@
       "source_asset_id": "MODULE-T18-DATA-QUALITY-001",
       "relation": "validated_by",
       "target_asset_id": "TEST-T18-DATA-QUALITY-AUDIT-001"
+    },
+    {
+      "source_asset_id": "MODULE-T19-POINT-IN-TIME-REPLAY-001",
+      "relation": "depends_on",
+      "target_asset_id": "MODULE-T17A-EXECUTION-CAPACITY-AUDIT-001"
+    },
+    {
+      "source_asset_id": "MODULE-T19-POINT-IN-TIME-REPLAY-001",
+      "relation": "depends_on",
+      "target_asset_id": "MODULE-T18-DATA-QUALITY-001"
+    },
+    {
+      "source_asset_id": "MODULE-T19-POINT-IN-TIME-REPLAY-001",
+      "relation": "governed_by",
+      "target_asset_id": "CONTRACT-T19-POINT-IN-TIME-REPLAY-001"
+    },
+    {
+      "source_asset_id": "MODULE-T19-POINT-IN-TIME-REPLAY-001",
+      "relation": "validated_by",
+      "target_asset_id": "TEST-T19-POINT-IN-TIME-REPLAY-001"
     },
     {
       "source_asset_id": "PRE-GIT-TASK01-A017",
@@ -3348,6 +3433,16 @@
       "target_asset_id": "TEST-T18-DATA-QUALITY-AUDIT-001"
     },
     {
+      "source_asset_id": "SCRIPT-T19-POINT-IN-TIME-REPLAY-001",
+      "relation": "depends_on",
+      "target_asset_id": "MODULE-T19-POINT-IN-TIME-REPLAY-001"
+    },
+    {
+      "source_asset_id": "SCRIPT-T19-POINT-IN-TIME-REPLAY-001",
+      "relation": "validated_by",
+      "target_asset_id": "TEST-T19-POINT-IN-TIME-REPLAY-001"
+    },
+    {
       "source_asset_id": "TEMPLATE-BATON-ISSUE-FORM-001",
       "relation": "governed_by",
       "target_asset_id": "CTRL-BATON-SETUP-001"
@@ -4041,6 +4136,41 @@
       "source_asset_id": "TEST-T18-NARROW-DATA-QUALITY-CONTRACT-001",
       "relation": "depends_on",
       "target_asset_id": "FIXTURE-T18-NARROW-DATA-QUALITY-001"
+    },
+    {
+      "source_asset_id": "TEST-T19-ACCEPTANCE-CATALOG-FACTORY-FIT-001",
+      "relation": "depends_on",
+      "target_asset_id": "EVIDENCE-T19-ACCEPTANCE-CATALOG-FACTORY-FIT-001"
+    },
+    {
+      "source_asset_id": "TEST-T19-ACCEPTANCE-CATALOG-FACTORY-FIT-001",
+      "relation": "depends_on",
+      "target_asset_id": "TEST-T19-POINT-IN-TIME-REPLAY-001"
+    },
+    {
+      "source_asset_id": "TEST-T19-POINT-IN-TIME-REPLAY-001",
+      "relation": "depends_on",
+      "target_asset_id": "EVIDENCE-T19-POINT-IN-TIME-REPLAY-001"
+    },
+    {
+      "source_asset_id": "TEST-T19-POINT-IN-TIME-REPLAY-001",
+      "relation": "depends_on",
+      "target_asset_id": "FIXTURE-T19-POINT-IN-TIME-REPLAY-001"
+    },
+    {
+      "source_asset_id": "TEST-T19-POINT-IN-TIME-REPLAY-001",
+      "relation": "depends_on",
+      "target_asset_id": "MODULE-T19-POINT-IN-TIME-REPLAY-001"
+    },
+    {
+      "source_asset_id": "TEST-T19-POINT-IN-TIME-REPLAY-CONTRACT-001",
+      "relation": "depends_on",
+      "target_asset_id": "CONTRACT-T19-POINT-IN-TIME-REPLAY-001"
+    },
+    {
+      "source_asset_id": "TEST-T19-POINT-IN-TIME-REPLAY-CONTRACT-001",
+      "relation": "depends_on",
+      "target_asset_id": "FIXTURE-T19-POINT-IN-TIME-REPLAY-001"
     },
     {
       "source_asset_id": "VALIDATOR-REPOSITORY-STATE-001",
