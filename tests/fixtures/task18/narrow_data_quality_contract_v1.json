@@ -1,0 +1,346 @@
+{
+  "schema": "solana_alpha_lab.narrow_data_quality_contract",
+  "schema_version": "1.0",
+  "contract_id": "CONTRACT-T18-NARROW-DATA-QUALITY-001",
+  "task_id": "TASK-18",
+  "atom_id": "T18-A2_FROZEN_NARROW_QUALITY_CONTRACT_V1",
+  "status": "FROZEN_OFFLINE_CONTRACT",
+  "as_of": "2026-07-29",
+  "entry_gate": {
+    "verdict": "START_AS_WRITTEN",
+    "source_activation": "ACTIVATION_CONFIRMED_USER_SMOKE",
+    "accepted_base_commit": "67fdb73127cd837174e9e20a057c413928c3628a",
+    "accepted_base_tree": "d74d3fa8e32192a492576938332832228fa5d7ce",
+    "catalog_version": "0.22.0",
+    "catalog_assets": 303,
+    "catalog_shards": 4,
+    "catalog_schemas": 4,
+    "catalog_queries": 8,
+    "raw_availability_observed": true,
+    "raw_availability_scope": "CURRENT_LOCAL_WORKSPACE_ONLY"
+  },
+  "estimand": {
+    "owner_decision": "TRUSTWORTHY_NARROW_QUOTE_ONLY_DATASET_FOR_REPLAY_OR_FAIL_CLOSED",
+    "hypothesis_version_id": "HYP-VERSION-EXECUTION-CAPACITY-CURVATURE-V1",
+    "watchlist_id": "HYP-WATCHLIST-EXECUTION-CAPACITY-V1",
+    "watchlist_version": "1.0",
+    "member_ids": [
+      "HYP-WATCH-MEMBER-T10-001"
+    ],
+    "accepted_windows": [
+      "T17A-WINDOW-01",
+      "T17A-WINDOW-03",
+      "T17A-WINDOW-04-REPAIR-01"
+    ],
+    "excluded_retained_windows": [
+      "T17A-WINDOW-02"
+    ],
+    "accepted_provider_calls": 24,
+    "excluded_retained_provider_calls": 8,
+    "total_provider_calls": 32,
+    "complete_quote_pairs": 12,
+    "claim_scope": "ONE_MEMBER_THREE_WINDOWS_QUOTE_ONLY",
+    "cross_token_generalization": false,
+    "quote_as_fill": false
+  },
+  "tracked_inputs": [
+    {
+      "asset_id": "EVIDENCE-T17A-EXECUTION-CAPACITY-AUDIT-001",
+      "path": "docs/evidence/task17a/execution_capacity_quote_panel_audit_v1.json",
+      "sha256": "15c9ba7641c15c5511b308485cc230d3bff977f6529c6b86019673e91ee8a0a2"
+    },
+    {
+      "asset_id": "FIXTURE-T17A-EXECUTION-CAPACITY-QUOTE-PANEL-001",
+      "path": "tests/fixtures/task17a/bounded_execution_capacity_quote_panel_contract_v1.json",
+      "sha256": "ac7a191f4a5888681fa2b90ea33261271d0d7d4a44c81653dbfc6d902fa6871f"
+    }
+  ],
+  "raw_inventory": {
+    "raw_bytes_in_git": false,
+    "logical_roots": [
+      "data/raw/task17a_execution_capacity_quote_panel_v1",
+      "data/raw/task17a_execution_capacity_quote_panel_v1_repair_01"
+    ],
+    "window_count": 4,
+    "file_count": 12,
+    "jsonl_attempt_rows": 32,
+    "stored_bytes": 179208,
+    "files": [
+      {
+        "window_id": "T17A-WINDOW-01",
+        "classification": "ACCEPTED",
+        "kind": "MANIFEST",
+        "path": "data/raw/task17a_execution_capacity_quote_panel_v1/window=T17A-WINDOW-01/manifest.json",
+        "bytes": 635,
+        "rows": 1,
+        "sha256": "82558d846b5a9ecabbbca0e2e9f5b5a3e77eec38018b6905f6a9f3b04d716995"
+      },
+      {
+        "window_id": "T17A-WINDOW-01",
+        "classification": "ACCEPTED",
+        "kind": "RAW_EVENTS_JSONL",
+        "path": "data/raw/task17a_execution_capacity_quote_panel_v1/window=T17A-WINDOW-01/raw_events.jsonl",
+        "bytes": 43797,
+        "rows": 8,
+        "sha256": "50077fc35fcc7e6d349fe178f15a3b800f7cb79a38e38352dc13175b7baf4e49"
+      },
+      {
+        "window_id": "T17A-WINDOW-01",
+        "classification": "ACCEPTED",
+        "kind": "RECEIPT",
+        "path": "data/raw/task17a_execution_capacity_quote_panel_v1/window=T17A-WINDOW-01/receipt.json",
+        "bytes": 673,
+        "rows": 1,
+        "sha256": "918049b14b9539f90e0ec08a60ec945eae8b76336fb5a959912d566cc81ebdbe"
+      },
+      {
+        "window_id": "T17A-WINDOW-02",
+        "classification": "EXCLUDED_RETAINED",
+        "kind": "MANIFEST",
+        "path": "data/raw/task17a_execution_capacity_quote_panel_v1/window=T17A-WINDOW-02/manifest.json",
+        "bytes": 635,
+        "rows": 1,
+        "sha256": "adaf60362b64f7bc9a272fa9a57736739cf58c9bed0e3090a8c1cd359d9f4846"
+      },
+      {
+        "window_id": "T17A-WINDOW-02",
+        "classification": "EXCLUDED_RETAINED",
+        "kind": "RAW_EVENTS_JSONL",
+        "path": "data/raw/task17a_execution_capacity_quote_panel_v1/window=T17A-WINDOW-02/raw_events.jsonl",
+        "bytes": 43411,
+        "rows": 8,
+        "sha256": "d4e8a8607e7ad932dfc69f0a2b80ccfeec6a175b5af4c81e039b2121c2c036c3"
+      },
+      {
+        "window_id": "T17A-WINDOW-02",
+        "classification": "EXCLUDED_RETAINED",
+        "kind": "RECEIPT",
+        "path": "data/raw/task17a_execution_capacity_quote_panel_v1/window=T17A-WINDOW-02/receipt.json",
+        "bytes": 673,
+        "rows": 1,
+        "sha256": "6d18a072d20c37414fc02b2b6a9ec5d5b55090dbfd1c13d9063811bc14cd8613"
+      },
+      {
+        "window_id": "T17A-WINDOW-03",
+        "classification": "ACCEPTED",
+        "kind": "MANIFEST",
+        "path": "data/raw/task17a_execution_capacity_quote_panel_v1/window=T17A-WINDOW-03/manifest.json",
+        "bytes": 635,
+        "rows": 1,
+        "sha256": "b7bc267d0b445fc98d78f27b8687da6692a03a544c53f38f5f9b75f0a6483f2f"
+      },
+      {
+        "window_id": "T17A-WINDOW-03",
+        "classification": "ACCEPTED",
+        "kind": "RAW_EVENTS_JSONL",
+        "path": "data/raw/task17a_execution_capacity_quote_panel_v1/window=T17A-WINDOW-03/raw_events.jsonl",
+        "bytes": 43399,
+        "rows": 8,
+        "sha256": "a45f611b2bbe3986168a44e3e13fe2743cfc52eb476448dcc8edef01f8771ab4"
+      },
+      {
+        "window_id": "T17A-WINDOW-03",
+        "classification": "ACCEPTED",
+        "kind": "RECEIPT",
+        "path": "data/raw/task17a_execution_capacity_quote_panel_v1/window=T17A-WINDOW-03/receipt.json",
+        "bytes": 673,
+        "rows": 1,
+        "sha256": "e327b7fe34321a888be23c45f144f019bd0b36f4134677c95bb0037679a40e23"
+      },
+      {
+        "window_id": "T17A-WINDOW-04-REPAIR-01",
+        "classification": "ACCEPTED",
+        "kind": "MANIFEST",
+        "path": "data/raw/task17a_execution_capacity_quote_panel_v1_repair_01/window=T17A-WINDOW-04-REPAIR-01/manifest.json",
+        "bytes": 645,
+        "rows": 1,
+        "sha256": "4c2e66389391896c8188339dcec735a35f34b025f5213e7c18dd13cdcec147c5"
+      },
+      {
+        "window_id": "T17A-WINDOW-04-REPAIR-01",
+        "classification": "ACCEPTED",
+        "kind": "RAW_EVENTS_JSONL",
+        "path": "data/raw/task17a_execution_capacity_quote_panel_v1_repair_01/window=T17A-WINDOW-04-REPAIR-01/raw_events.jsonl",
+        "bytes": 43349,
+        "rows": 8,
+        "sha256": "9e49aa2515684d7b097f15205496ca6813c065a665f13f9070956e326e8b8417"
+      },
+      {
+        "window_id": "T17A-WINDOW-04-REPAIR-01",
+        "classification": "ACCEPTED",
+        "kind": "RECEIPT",
+        "path": "data/raw/task17a_execution_capacity_quote_panel_v1_repair_01/window=T17A-WINDOW-04-REPAIR-01/receipt.json",
+        "bytes": 683,
+        "rows": 1,
+        "sha256": "14f2e590e7d346e295037a287334bcfb53f3d18d289904bca70a3ee16dceee6f"
+      }
+    ]
+  },
+  "quality_dimensions": {
+    "inventory_integrity": {
+      "hard_gate": true,
+      "checks": [
+        "FILE_PRESENT_AND_READABLE",
+        "RELATIVE_PATH_CONTAINED",
+        "EXACT_SIZE",
+        "EXACT_SHA256",
+        "JSON_OR_JSONL_PARSE",
+        "MANIFEST_RECEIPT_LINKAGE"
+      ]
+    },
+    "attempt_completeness": {
+      "hard_gate": true,
+      "attempts_per_window": 8,
+      "accepted_attempts": 24,
+      "excluded_retained_attempts": 8,
+      "total_attempts": 32,
+      "missing_as_zero": false
+    },
+    "stable_identity": {
+      "hard_gate": true,
+      "composite_key": [
+        "hypothesis_version_id",
+        "watchlist_id",
+        "watchlist_version",
+        "window_id",
+        "member_id",
+        "call_ordinal",
+        "request_hash",
+        "idempotency_key"
+      ],
+      "unique_quote_attempt_id": true,
+      "unique_raw_event_id": true,
+      "duplicate_equal_bytes_allowed": false,
+      "duplicate_changed_bytes_allowed": false
+    },
+    "point_in_time": {
+      "hard_gate": true,
+      "ordered_fields": [
+        "requested_at",
+        "response_at",
+        "first_reliable_available_at",
+        "available_to_strategy_at",
+        "ingested_at"
+      ],
+      "backfill_availability_forbidden": true,
+      "negative_lag_allowed": false,
+      "latency_tolerance_ms": 1.0
+    },
+    "temporal_membership": {
+      "hard_gate": true,
+      "request_pacing_floor_seconds": 2.2,
+      "accepted_trigger_separation_floor_seconds": 1800,
+      "excluded_window_id": "T17A-WINDOW-02",
+      "excluded_trigger_shortfall_seconds": 0.007854,
+      "post_hoc_tolerance_allowed": false,
+      "excluded_window_reclassification_allowed": false
+    },
+    "provider_and_schema": {
+      "hard_gate": true,
+      "envelope_schema": "solana_alpha_lab.task17a_quote_panel_raw",
+      "schema_version": "1.0",
+      "provider": "JUPITER_METIS",
+      "provider_version": "legacy_metis_v1_quote",
+      "endpoint_version": "legacy_metis_v1_quote",
+      "success_terminal_class": "QUOTE_AVAILABLE",
+      "provider_failure_as_no_route": false,
+      "quote_as_fill": false
+    },
+    "bytes_and_caps": {
+      "hard_gate": true,
+      "receipt_reconciliation_required": true,
+      "manifest_reconciliation_required": true,
+      "task17a_cap_reconciliation_required": true
+    },
+    "revision_and_overwrite": {
+      "hard_gate": true,
+      "expected_revision_number": 1,
+      "expected_revision_of": null,
+      "changed_content_under_same_identity": "NOT_FIT",
+      "overwrite_prevention_claim_from_current_hash_only": false
+    },
+    "retention_and_restore": {
+      "hard_gate_for_full_fit": true,
+      "current_local_availability_observed": true,
+      "backup_inventory_observed": false,
+      "restore_test_observed": false,
+      "missing_backup_or_restore_outcome": "FIT_WITH_LIMITATIONS_IF_ALL_HARD_REPLAY_INVARIANTS_PASS",
+      "file_mutation_allowed": false
+    }
+  },
+  "verdicts": {
+    "precedence": [
+      "EVIDENCE_UNAVAILABLE",
+      "NOT_FIT",
+      "FIT_WITH_LIMITATIONS",
+      "FIT_FOR_NARROW_QUOTE_ONLY_ESTIMAND"
+    ],
+    "EVIDENCE_UNAVAILABLE": "MISSING_UNREADABLE_UNPARSEABLE_OR_HASH_SIZE_ROW_COUNT_DRIFT",
+    "NOT_FIT": "AVAILABLE_BUT_HARD_REPLAY_QUALITY_INVARIANT_FAILED",
+    "FIT_WITH_LIMITATIONS": "HARD_REPLAY_INVARIANTS_PASS_WITH_EXPLICIT_NONCRITICAL_DURABILITY_LIMITATION",
+    "FIT_FOR_NARROW_QUOTE_ONLY_ESTIMAND": "ALL_HARD_INVARIANTS_PASS_AND_NO_DECLARED_LIMITATION_REMAINS",
+    "hypothesis_result_may_select_verdict": false,
+    "majority_vote_allowed": false
+  },
+  "non_claims": {
+    "cross_token_generalization": false,
+    "provider_reliability": false,
+    "fillable": false,
+    "realized_vwap": false,
+    "net_return": false,
+    "signal_or_strategy": false,
+    "alpha": false,
+    "production_readiness": false
+  },
+  "reuse": {
+    "adopt": [
+      "QUERY-T05-PIT-RELATION-001",
+      "TASK13_DETERMINISTIC_AUDIT_PATTERN"
+    ],
+    "wrap": [
+      "CONTRACT-T17A-EXECUTION-CAPACITY-QUOTE-PANEL-001",
+      "EVIDENCE-T17A-EXECUTION-CAPACITY-AUDIT-001"
+    ],
+    "fork": [],
+    "build_later": [
+      "THIN_TASK18_OFFLINE_QUALITY_AUDITOR"
+    ],
+    "new_dependency_count": 0,
+    "general_data_quality_framework": false
+  },
+  "catalog": {
+    "registered_in_atom2": false,
+    "status": "CATALOG_TRANSACTION_PENDING_T18_A4",
+    "blocks_contract_freeze": false,
+    "blocks_task18_done": true
+  },
+  "authority": {
+    "class": "LOCAL_WRITE_ONLY",
+    "source": "EXPLICIT_USER",
+    "managed_files": [
+      "docs/contracts/task18_narrow_data_quality_contract_v1.md",
+      "tests/fixtures/task18/narrow_data_quality_contract_v1.json",
+      "tests/test_task18_narrow_data_quality_contract.py"
+    ],
+    "network_calls": 0,
+    "provider_api_rpc_wss_calls": 0,
+    "credential_use": 0,
+    "collector_executions": 0,
+    "raw_data_writes": 0,
+    "cash_spend_usd_cents": 0,
+    "provider_credits": 0,
+    "dependency_changes": 0,
+    "commit": false,
+    "push": false,
+    "pull_request": false,
+    "merge": false,
+    "ui_changes": false,
+    "destructive_actions": false
+  },
+  "next_atom": {
+    "atom_id": "T18-A3_DETERMINISTIC_OFFLINE_QUALITY_AUDIT_V1",
+    "implementation_authorized": false,
+    "external_calls_authorized": false,
+    "raw_mutation_authorized": false
+  }
+}

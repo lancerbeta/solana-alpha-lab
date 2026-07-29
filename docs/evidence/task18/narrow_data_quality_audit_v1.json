@@ -1,0 +1,217 @@
+{
+  "as_of": "2026-07-29",
+  "atom": "T18-A3_DETERMINISTIC_OFFLINE_QUALITY_AUDIT_V1",
+  "authority": {
+    "cash_spend_usd_cents": 0,
+    "collector_executions": 0,
+    "credential_use": 0,
+    "dependency_changes": 0,
+    "network_calls": 0,
+    "provider_api_rpc_wss_calls": 0,
+    "provider_credits": 0,
+    "raw_data_writes": 0,
+    "wallet_signer_transaction_actions": 0
+  },
+  "checks": [
+    {
+      "check_id": "INVENTORY_INTEGRITY",
+      "failures": [],
+      "metrics": {
+        "expected_files": 12,
+        "expected_jsonl_attempt_rows": 32,
+        "expected_stored_bytes": 179208,
+        "resolved_files": 12,
+        "tracked_inputs_verified": 2
+      },
+      "status": "PASS"
+    },
+    {
+      "check_id": "ATTEMPT_COMPLETENESS",
+      "failures": [],
+      "metrics": {
+        "accepted_attempts": 24,
+        "excluded_retained_attempts": 8,
+        "total_attempts": 32,
+        "windows": 4
+      },
+      "status": "PASS"
+    },
+    {
+      "check_id": "MANIFEST_RECEIPT_LINKAGE",
+      "failures": [],
+      "metrics": {
+        "manifests": 4,
+        "nonzero_external_authority_receipts": 0,
+        "raw_jsonl_files": 4,
+        "receipts": 4,
+        "windows_reconciled": 4
+      },
+      "status": "PASS"
+    },
+    {
+      "check_id": "STABLE_IDENTITY",
+      "failures": [],
+      "metrics": {
+        "duplicate_content_hashes": 0,
+        "unique_composite_identities": 32,
+        "unique_content_hashes": 32,
+        "unique_quote_attempt_ids": 32,
+        "unique_raw_event_ids": 32
+      },
+      "status": "PASS"
+    },
+    {
+      "check_id": "POINT_IN_TIME_AND_LATENCY",
+      "failures": [],
+      "metrics": {
+        "latency_mismatches": 0,
+        "minimum_request_gap_seconds": 2.200048,
+        "pit_violations": 0,
+        "request_gap_count": 28
+      },
+      "status": "PASS"
+    },
+    {
+      "check_id": "TEMPORAL_MEMBERSHIP",
+      "failures": [],
+      "metrics": {
+        "accepted_trigger_separation_seconds": [
+          3599.993664,
+          1818.792805
+        ],
+        "accepted_window_ids": [
+          "T17A-WINDOW-01",
+          "T17A-WINDOW-03",
+          "T17A-WINDOW-04-REPAIR-01"
+        ],
+        "excluded_retained_window_ids": [
+          "T17A-WINDOW-02"
+        ],
+        "excluded_trigger_shortfall_seconds": 0.007854,
+        "post_hoc_reclassification": false
+      },
+      "status": "PASS"
+    },
+    {
+      "check_id": "PROVIDER_SCHEMA_AND_TYPED_OUTCOMES",
+      "failures": [],
+      "metrics": {
+        "provider": "JUPITER_METIS",
+        "provider_version": "legacy_metis_v1_quote",
+        "route_count_max": 3,
+        "route_count_min": 2,
+        "terminal_counts": {
+          "QUOTE_AVAILABLE": 32
+        }
+      },
+      "status": "PASS"
+    },
+    {
+      "check_id": "BYTES_RECEIPTS_AND_CAPS",
+      "failures": [],
+      "metrics": {
+        "per_window_received_cap": 1048576,
+        "per_window_stored_cap": 5242880,
+        "provider_calls_reconciled": 32,
+        "total_received_bytes": 51958,
+        "total_stored_bytes": 179208
+      },
+      "status": "PASS"
+    },
+    {
+      "check_id": "REVISION_AND_OVERWRITE",
+      "failures": [],
+      "metrics": {
+        "current_hashes_match": true,
+        "expected_revision_number": 1,
+        "expected_revision_of": null,
+        "observed_revision_conflicts": 0,
+        "overwrite_prevention_proven": false
+      },
+      "status": "PASS"
+    },
+    {
+      "check_id": "RETENTION_AND_RESTORE",
+      "failures": [],
+      "limitations": [
+        "BACKUP_INVENTORY_NOT_OBSERVED",
+        "OVERWRITE_PREVENTION_NOT_PROVEN_BY_CURRENT_HASHES",
+        "RESTORE_TEST_NOT_OBSERVED"
+      ],
+      "metrics": {
+        "backup_inventory_observed": false,
+        "current_local_availability": true,
+        "raw_mutation_performed": false,
+        "restore_test_observed": false
+      },
+      "status": "LIMITATION"
+    },
+    {
+      "check_id": "TRACKED_AUDIT_RECONCILIATION",
+      "failures": [],
+      "metrics": {
+        "accepted_windows_reconciled": 3,
+        "excluded_window_reconciled": true,
+        "tracked_audit_sha256": "15c9ba7641c15c5511b308485cc230d3bff977f6529c6b86019673e91ee8a0a2"
+      },
+      "status": "PASS"
+    }
+  ],
+  "claims": {
+    "alpha": false,
+    "cross_token_generalization": false,
+    "fillable": false,
+    "narrow_quote_only_data_quality": true,
+    "net_return": false,
+    "production_readiness": false,
+    "provider_reliability": false,
+    "realized_vwap": false,
+    "signal_or_strategy": false
+  },
+  "contract_id": "CONTRACT-T18-NARROW-DATA-QUALITY-001",
+  "contract_sha256": "1842df2ef349d9506ff612c3faf3c943a1a218f6c6a7e266c5af5f0f5578b3a6",
+  "coverage": {
+    "accepted_attempts": 24,
+    "accepted_windows": 3,
+    "complete_quote_pairs": 12,
+    "excluded_retained_attempts": 8,
+    "excluded_retained_windows": 1,
+    "files": 12,
+    "members": 1,
+    "received_bytes": 51958,
+    "stored_bytes": 179208,
+    "total_attempts": 32
+  },
+  "estimand": "ONE_MEMBER_THREE_WINDOWS_QUOTE_ONLY",
+  "limitations": [
+    "BACKUP_INVENTORY_NOT_OBSERVED",
+    "OVERWRITE_PREVENTION_NOT_PROVEN_BY_CURRENT_HASHES",
+    "RESTORE_TEST_NOT_OBSERVED"
+  ],
+  "next_gate": {
+    "replay_authorized_by_this_audit": false,
+    "status": "ELIGIBLE_CONDITIONAL_ON_TASK18_ACCEPTANCE",
+    "task_id": "TASK-19"
+  },
+  "quality_metrics": {
+    "accepted_trigger_separation_seconds": [
+      3599.993664,
+      1818.792805
+    ],
+    "duplicate_content_hashes": 0,
+    "hard_failure_count": 0,
+    "latency_mismatches": 0,
+    "limitation_count": 3,
+    "minimum_request_gap_seconds": 2.200048,
+    "pit_violations": 0,
+    "revision_conflicts": 0,
+    "unique_composite_identities": 32,
+    "unique_content_hashes": 32,
+    "unique_quote_attempt_ids": 32,
+    "unique_raw_event_ids": 32
+  },
+  "schema": "smial.task18_narrow_data_quality_audit.v1",
+  "schema_version": "1.0",
+  "task": "TASK-18",
+  "verdict": "FIT_WITH_LIMITATIONS"
+}

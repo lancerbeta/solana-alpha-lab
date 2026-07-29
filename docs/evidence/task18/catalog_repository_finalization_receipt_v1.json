@@ -1,0 +1,79 @@
+{
+  "receipt_id": "T18-A4-CATALOG-REPOSITORY-FINALIZATION-RECEIPT-001",
+  "receipt_version": "1.0",
+  "task_id": "TASK-18",
+  "atom_id": "T18-A4_CATALOG_REPOSITORY_FINALIZATION_V1",
+  "status": "PASS",
+  "as_of": "2026-07-29",
+  "repository_base": {
+    "branch": "task18/narrow-data-quality-gate",
+    "head": "67fdb73127cd837174e9e20a057c413928c3628a",
+    "tree": "d74d3fa8e32192a492576938332832228fa5d7ce",
+    "upstream": "origin/main"
+  },
+  "accepted_result": {
+    "quality_verdict": "FIT_FOR_NARROW_QUOTE_ONLY_ESTIMAND",
+    "recoverability": "CONTENT_ADDRESSED_BACKUP_AND_RESTORE_PROVEN",
+    "source_raw_files": 12,
+    "source_raw_bytes": 179208,
+    "backup_zip_bytes": 187756,
+    "backup_zip_sha256": "8b016b38096d87e182aa7d41e549fd6d97eb7008777e5c9dfe59b3b15178b838",
+    "backup_zip_md5": "5c273debe392d2130e20182c39e3d10c",
+    "drive_folder_id": "1c_v9gTNOxlUzxAoLhyY5FW45S50TZgl1",
+    "drive_file_id": "1msCdh2niGoh5wcGD7Ofiq9Dz9WBIFifn",
+    "source_mutation_or_deletion": false
+  },
+  "catalog": {
+    "status": "REGISTERED_IN_TASK18_CATALOG_TRANSACTION",
+    "catalog_version": "0.23.0",
+    "assets": 321,
+    "asset_registries": 4,
+    "schemas": 4,
+    "queries": 8,
+    "registered_asset_ids": [
+      "CONTRACT-T18-NARROW-DATA-QUALITY-001",
+      "FIXTURE-T18-NARROW-DATA-QUALITY-001",
+      "TEST-T18-NARROW-DATA-QUALITY-CONTRACT-001",
+      "MODULE-T18-DATA-QUALITY-001",
+      "SCRIPT-T18-DATA-QUALITY-AUDIT-001",
+      "EVIDENCE-T18-NARROW-DATA-QUALITY-AUDIT-001",
+      "EVIDENCE-T18-NARROW-DATA-QUALITY-SUMMARY-001",
+      "TEST-T18-DATA-QUALITY-AUDIT-001",
+      "CONTRACT-T18-CONTENT-ADDRESSED-BACKUP-RESTORE-001",
+      "FIXTURE-T18-CONTENT-ADDRESSED-BACKUP-RESTORE-001",
+      "MODULE-T18-BACKUP-RESTORE-001",
+      "SCRIPT-T18-BACKUP-PACKAGER-001",
+      "EVIDENCE-T18-CONTENT-ADDRESSED-BACKUP-RESTORE-001",
+      "EVIDENCE-T18-CONTENT-ADDRESSED-BACKUP-RESTORE-SUMMARY-001",
+      "TEST-T18-BACKUP-RESTORE-001",
+      "BUNDLE-T18-CONTENT-ADDRESSED-RAW-BACKUP-001",
+      "EVIDENCE-T18-CATALOG-REPOSITORY-FINALIZATION-001",
+      "TEST-T18-CATALOG-REPOSITORY-FINALIZATION-001"
+    ]
+  },
+  "validation": {
+    "task18_targeted_suite": "PASS_27_OF_27",
+    "full_unit_suite": "PASS_1068_OF_1068",
+    "catalog_validation": "PASS_0_23_0_321_ASSETS",
+    "generated_navigation": "PASS",
+    "file_hygiene": "PASS"
+  },
+  "authority": {
+    "local_write_only": true,
+    "network_calls": 0,
+    "provider_api_rpc_calls": 0,
+    "cash_spend": 0,
+    "wallet_signer_transaction_actions": 0,
+    "commit_push_pr_merge": false
+  },
+  "nonclaims": [
+    "NOT_FULL_STORAGE_RELIABILITY",
+    "NOT_AUTOMATED_PERIODIC_BACKUP",
+    "NOT_DISASTER_RECOVERY_SLA",
+    "NOT_MARKET_DATA_COMPLETENESS",
+    "NOT_EXECUTION_OR_FILL_VALIDATION",
+    "NOT_TASK19_AUTHORITY"
+  ],
+  "canonical_status_candidate": "TASK18_A4_LOCAL_CANDIDATE_READY_FOR_VALIDATION",
+  "state_change": "LOCAL_FILES_ONLY"
+}

@@ -243,9 +243,9 @@ class Task17AExecutionCapacityAuditTests(unittest.TestCase):
 
     def test_catalog_checkpoint_and_actual_assets_are_exact(self) -> None:
         snapshot = catalog.load_and_validate()
-        self.assertEqual(snapshot.manifest["catalog_version"], "0.22.0")
+        self.assertEqual(snapshot.manifest["catalog_version"], "0.23.0")
         checkpoint = catalog.observed_catalog_checkpoint(snapshot)
-        self.assertEqual(checkpoint["assets"], 303)
+        self.assertEqual(checkpoint["assets"], 321)
         self.assertEqual(checkpoint["asset_registries"], 4)
         self.assertEqual(checkpoint["schemas"], 4)
         self.assertEqual(checkpoint["queries"], 8)
