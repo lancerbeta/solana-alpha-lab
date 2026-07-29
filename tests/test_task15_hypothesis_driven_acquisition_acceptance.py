@@ -47,7 +47,7 @@ EXPECTED_ARCHITECTURE_SHA256 = (
     "ea094d88abf635fbe4df3b1ff9b3f0e80cb87dfa836f67505173766e69708639"
 )
 EXPECTED_RECEIPT_SHA256 = (
-    "2ae27289292f2344756ac8f42ae019a13118290977fce1647ef494725935eaca"
+    "b96ba7e55529f79726cafb09e3ab6162a94e6a49eb667971418454b122110683"
 )
 TASK15_ASSET_IDS = {
     "ARCH-INTENT-002",
@@ -366,7 +366,10 @@ class Task15HypothesisDrivenAcquisitionAcceptanceTests(
             {"FAST_PATH", "FULL_REVIEW"},
         )
         self.assertEqual(review["review_depth"], "FULL_REVIEW")
-        self.assertEqual(review["verdict"], "FACTORY_FIT_PASS")
+        self.assertEqual(
+            review["verdict"],
+            "FACTORY_FIT_PASS_WITH_FOLLOWUP",
+        )
         self.assertEqual(
             {item["dimension"] for item in review["dimensions"]},
             {
@@ -376,6 +379,7 @@ class Task15HypothesisDrivenAcquisitionAcceptanceTests(
                 "EFFICIENCY_AND_EVIDENCE_ECONOMY",
                 "RESEARCH_AND_STATISTICAL_TRUTH",
                 "OWNER_OPERABILITY",
+                "EXECUTION_POSITION_MONITORING_BRIDGE",
                 "SAFETY_AND_AUTHORITY",
                 "ADVERSARIAL_SCALE_AND_DRIFT",
             },
@@ -402,6 +406,17 @@ class Task15HypothesisDrivenAcquisitionAcceptanceTests(
             "CENTRALIZE_LIVE_CATALOG_CHECKPOINT_ASSERTIONS_WHILE_"
             "PRESERVING_HISTORICAL_RECEIPTS",
         )
+        followup = review["durable_followup"]
+        self.assertEqual(followup["status"], "RECORDED_NON_BLOCKING")
+        self.assertEqual(followup["owner"], "TASK-04_CATALOG_GOVERNANCE")
+        self.assertEqual(
+            followup["activation_trigger"],
+            "BEFORE_NEXT_CATALOG_VERSION_BUMP",
+        )
+        self.assertEqual(
+            followup["destination"],
+            "NEXT_CATALOG_TRANSACTION_PRECONDITION",
+        )
         self.assertIn(
             "PERSUASIVE_AI_OR_TOOL_OUTPUT_BYPASSES_VALIDATION",
             review["red_team_challenges"],
@@ -415,6 +430,32 @@ class Task15HypothesisDrivenAcquisitionAcceptanceTests(
             "at most one bounded follow-up candidate",
             self.architecture,
         )
+        workflow = self.receipt["finish_workflow_reconciliation"]
+        self.assertEqual(
+            workflow["status"],
+            "LOCAL_SKILL_UPDATED_AND_VALIDATED",
+        )
+        self.assertEqual(
+            set(workflow["mode_contract"]),
+            {"FAST_PATH", "FULL_REVIEW"},
+        )
+        self.assertEqual(
+            set(workflow["verdict_contract"]),
+            {"PASS", "PASS_WITH_FOLLOWUP", "FAIL"},
+        )
+        self.assertTrue(workflow["pre_done_factory_fit_gate_required"])
+        self.assertTrue(
+            workflow["factory_fit_fail_forbids_done_confirmed"]
+        )
+        self.assertTrue(workflow["followup_must_be_durable_and_owned"])
+        self.assertFalse(workflow["repository_owns_local_skill_installation"])
+        self.assertEqual(
+            workflow["validation"],
+            "SKILL_CREATOR_QUICK_VALIDATE_PASS",
+        )
+        for artifact_hash in workflow["artifacts"].values():
+            with self.subTest(artifact_hash=artifact_hash):
+                self.assertRegex(artifact_hash, r"^[0-9a-f]{64}$")
 
     def test_catalog_registration_and_generated_navigation_are_exact(
         self,

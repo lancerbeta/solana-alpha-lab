@@ -108,7 +108,7 @@
       "FULL_REVIEW"
     ],
     "materiality": "MATERIAL_ARCHITECTURE_AND_DATA_ACQUISITION_CHANGE",
-    "verdict": "FACTORY_FIT_PASS",
+    "verdict": "FACTORY_FIT_PASS_WITH_FOLLOWUP",
     "dimensions": [
       {
         "dimension": "MISSION_AND_NAMED_CONSUMER",
@@ -139,6 +139,11 @@
         "dimension": "OWNER_OPERABILITY",
         "result": "PASS",
         "evidence": "Owner pulse is a read model for hypotheses, watchlists, positions, net result, data health and decisions, never a truth owner."
+      },
+      {
+        "dimension": "EXECUTION_POSITION_MONITORING_BRIDGE",
+        "result": "PASS",
+        "evidence": "The versioned trigger-to-cashflow chain preserves project-owned risk, position, reconciliation and owner-cashflow truth; monitoring and recovery are prerequisites for live authority."
       },
       {
         "dimension": "SAFETY_AND_AUTHORITY",
@@ -174,7 +179,41 @@
       "disposition": "ACCEPTED_NOW_WITH_ONE_BOUNDED_FOLLOWUP_BEFORE_NEXT_CATALOG_VERSION_BUMP"
     },
     "required_patches": [],
-    "bounded_followup_candidate": "CENTRALIZE_LIVE_CATALOG_CHECKPOINT_ASSERTIONS_WHILE_PRESERVING_HISTORICAL_RECEIPTS"
+    "bounded_followup_candidate": "CENTRALIZE_LIVE_CATALOG_CHECKPOINT_ASSERTIONS_WHILE_PRESERVING_HISTORICAL_RECEIPTS",
+    "durable_followup": {
+      "status": "RECORDED_NON_BLOCKING",
+      "owner": "TASK-04_CATALOG_GOVERNANCE",
+      "reason": "Eleven direct consumers duplicate mutable Catalog checkpoint values and create measurable change amplification.",
+      "activation_trigger": "BEFORE_NEXT_CATALOG_VERSION_BUMP",
+      "destination": "NEXT_CATALOG_TRANSACTION_PRECONDITION",
+      "candidate": "CENTRALIZE_LIVE_CATALOG_CHECKPOINT_ASSERTIONS_WHILE_PRESERVING_HISTORICAL_RECEIPTS"
+    }
+  },
+  "finish_workflow_reconciliation": {
+    "status": "LOCAL_SKILL_UPDATED_AND_VALIDATED",
+    "skill_identity": "finish-solana-task",
+    "location_class": "CODEX_HOME_LOCAL_SKILL_OUTSIDE_REPOSITORY",
+    "pre_done_factory_fit_gate_required": true,
+    "mode_contract": [
+      "FAST_PATH",
+      "FULL_REVIEW"
+    ],
+    "verdict_contract": [
+      "PASS",
+      "PASS_WITH_FOLLOWUP",
+      "FAIL"
+    ],
+    "factory_fit_fail_forbids_done_confirmed": true,
+    "followup_must_be_durable_and_owned": true,
+    "artifacts": {
+      "skill_sha256": "49d4743806699e56fb83ccf5a86e9d475f9415380aa09d72c88fdb5543ccbfca",
+      "finish_gate_reference_sha256": "dde74396899efff3b1131b8eed100d116261532ede5d65dbe4e792319904dc47",
+      "factory_fit_reference_sha256": "72920aa9e40cad4cfe10e10fb915f64acdf715d184a466cfd01c0af79d61e313",
+      "openai_interface_sha256": "be24c31c40d62f5eca7f01091467821bb141afb862fcddc74c020d1c01c74e16"
+    },
+    "validation": "SKILL_CREATOR_QUICK_VALIDATE_PASS",
+    "canonical_operating_system_and_roadmap_reconciliation": "PENDING_TASK15_FINISH_GATE",
+    "repository_owns_local_skill_installation": false
   },
   "catalog": {
     "status": "REGISTERED_IN_TASK15_CATALOG_TRANSACTION",
@@ -237,7 +276,7 @@
     "No trigger engine, execution adapter, position manager, risk service, signer, monitoring backend or trading action was implemented.",
     "No historical batch, provider measurement, live collection or position monitoring was executed.",
     "No canonical roadmap, Project Source, state or UI activation was changed.",
-    "FACTORY_FIT_REVIEW is an accepted TASK-15 candidate, not yet reconciled into the canonical Operating System, roadmap and finish-solana-task workflow.",
+    "FACTORY_FIT_REVIEW is installed and validated in the local finish-solana-task workflow; canonical Operating System and roadmap reconciliation remain pending.",
     "No provider purchase, deployment, wallet, signer, transaction, real-money or alpha claim is established.",
     "TASK-15 remains in progress until repository delivery and finish reconciliation."
   ],
