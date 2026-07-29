@@ -9505,3 +9505,338 @@ records:
   - TASK-18
   evidence: []
   classification: *t18_internal
+- asset_id: CONTRACT-T19-POINT-IN-TIME-REPLAY-001
+  record_version: '1.0'
+  asset_type: control_document
+  purpose: Frozen TASK-19 contract for reconstructing the exact narrow
+    decision-time quote result with literal availability cutoffs and no
+    future-row leakage.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-07-29'
+  truth_owner: TASK-19
+  location:
+    kind: git_path
+    logical_uri: repo://docs/contracts/task19_point_in_time_replay_contract_v1.md
+    repository_path: docs/contracts/task19_point_in_time_replay_contract_v1.md
+  integrity:
+    kind: sha256
+    sha256: a9e25624078ae20ca36cb9fd981021b48aec181a6499f42175dee4db50a2eae7
+  access:
+    mode: read_only
+    method: file
+    network_required: false
+    secrets_required: false
+  relations:
+  - relation_type: derived_from
+    target_asset_id: EVIDENCE-T18-NARROW-DATA-QUALITY-AUDIT-001
+  - relation_type: derived_from
+    target_asset_id: EVIDENCE-T18-CONTENT-ADDRESSED-BACKUP-RESTORE-001
+  - relation_type: validated_by
+    target_asset_id: TEST-T19-POINT-IN-TIME-REPLAY-CONTRACT-001
+  consumers:
+  - TASK-19
+  - TASK-20
+  evidence: []
+  classification: &t19_internal
+    contains_secrets: false
+    contains_raw_data: false
+    sensitivity: INTERNAL_NON_SECRET
+- asset_id: FIXTURE-T19-POINT-IN-TIME-REPLAY-001
+  record_version: '1.0'
+  asset_type: evidence
+  purpose: Machine-readable TASK-19 contract binding literal cutoffs, exact
+    membership, expected output, adversarial vectors, verdicts and zero
+    external authority.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-07-29'
+  truth_owner: TASK-19
+  location:
+    kind: git_path
+    logical_uri: repo://tests/fixtures/task19/point_in_time_replay_contract_v1.json
+    repository_path: tests/fixtures/task19/point_in_time_replay_contract_v1.json
+  integrity:
+    kind: sha256
+    sha256: c2485b17ae2fd7daac08c6a433b95d842a9552fe74d6f5df8d52d4786f3abce0
+  access:
+    mode: read_only
+    method: file
+    network_required: false
+    secrets_required: false
+  relations:
+  - relation_type: governed_by
+    target_asset_id: CONTRACT-T19-POINT-IN-TIME-REPLAY-001
+  - relation_type: validated_by
+    target_asset_id: TEST-T19-POINT-IN-TIME-REPLAY-CONTRACT-001
+  consumers:
+  - TASK-19
+  - TASK-20
+  evidence: []
+  classification: *t19_internal
+- asset_id: TEST-T19-POINT-IN-TIME-REPLAY-CONTRACT-001
+  record_version: '1.0'
+  asset_type: script
+  purpose: Deterministic tests freezing TASK-19 literal cutoffs, membership,
+    ordering, expected output, adversarial outcomes, non-claims and local-only
+    authority.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-07-29'
+  truth_owner: TASK-19
+  location:
+    kind: git_path
+    logical_uri: repo://tests/test_task19_point_in_time_replay_contract.py
+    repository_path: tests/test_task19_point_in_time_replay_contract.py
+  integrity:
+    kind: sha256
+    sha256: 198ecd224c67d038a145b818fb676575f7546ddedfd130f45f5bda70d26ee26c
+  access:
+    mode: read_only
+    method: file
+    network_required: false
+    secrets_required: false
+  relations:
+  - relation_type: depends_on
+    target_asset_id: CONTRACT-T19-POINT-IN-TIME-REPLAY-001
+  - relation_type: depends_on
+    target_asset_id: FIXTURE-T19-POINT-IN-TIME-REPLAY-001
+  consumers:
+  - TASK-19
+  evidence: []
+  classification: *t19_internal
+- asset_id: MODULE-T19-POINT-IN-TIME-REPLAY-001
+  record_version: '1.0'
+  asset_type: script
+  purpose: Thin deterministic TASK-19 projector that wraps accepted auditors,
+    filters exact rows at literal cutoffs, binds attempt lineage and runs the
+    frozen leakage harness.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-07-29'
+  truth_owner: TASK-19
+  location:
+    kind: git_path
+    logical_uri: repo://src/solana_alpha_lab/task19_point_in_time_replay.py
+    repository_path: src/solana_alpha_lab/task19_point_in_time_replay.py
+  integrity:
+    kind: sha256
+    sha256: 1c8a49a28db13da6fda0f741fc4af96d4255e09d86ede0d3b81d6e5d7e6b271e
+  access:
+    mode: read_only
+    method: file
+    network_required: false
+    secrets_required: false
+  relations:
+  - relation_type: governed_by
+    target_asset_id: CONTRACT-T19-POINT-IN-TIME-REPLAY-001
+  - relation_type: depends_on
+    target_asset_id: MODULE-T17A-EXECUTION-CAPACITY-AUDIT-001
+  - relation_type: depends_on
+    target_asset_id: MODULE-T18-DATA-QUALITY-001
+  - relation_type: validated_by
+    target_asset_id: TEST-T19-POINT-IN-TIME-REPLAY-001
+  consumers:
+  - TASK-19
+  - TASK-20
+  evidence: []
+  classification: *t19_internal
+- asset_id: SCRIPT-T19-POINT-IN-TIME-REPLAY-001
+  record_version: '1.0'
+  asset_type: script
+  purpose: Offline CLI that recomputes or writes the sanitized TASK-19 replay,
+    lineage, leakage receipt and compact decision summary from exact local
+    evidence.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-07-29'
+  truth_owner: TASK-19
+  location:
+    kind: git_path
+    logical_uri: repo://scripts/run_task19_point_in_time_replay.py
+    repository_path: scripts/run_task19_point_in_time_replay.py
+  integrity:
+    kind: sha256
+    sha256: 10754b25d7e3a6cb142d0d4d692edd73d78093f4e273c6ea4b01bf8a4560b4e8
+  access:
+    mode: read_only
+    method: file
+    network_required: false
+    secrets_required: false
+  relations:
+  - relation_type: depends_on
+    target_asset_id: MODULE-T19-POINT-IN-TIME-REPLAY-001
+  - relation_type: validated_by
+    target_asset_id: TEST-T19-POINT-IN-TIME-REPLAY-001
+  consumers:
+  - TASK-19
+  - TASK-20
+  evidence: []
+  classification: *t19_internal
+- asset_id: EVIDENCE-T19-POINT-IN-TIME-REPLAY-001
+  record_version: '1.0'
+  asset_type: evidence
+  purpose: Sanitized deterministic receipt for exact point-in-time replay,
+    32-attempt lineage, 10-vector leakage resistance, fail-closed evidence
+    handling and bounded non-claims.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-07-29'
+  truth_owner: TASK-19
+  location:
+    kind: git_path
+    logical_uri: repo://docs/evidence/task19/point_in_time_replay_v1.json
+    repository_path: docs/evidence/task19/point_in_time_replay_v1.json
+  integrity:
+    kind: sha256
+    sha256: 03e37130a71e529e7d0c25b0acaadaffa6db2e4d2c0a647c99866ffbbaae8d48
+  access:
+    mode: read_only
+    method: file
+    network_required: false
+    secrets_required: false
+  relations:
+  - relation_type: derived_from
+    target_asset_id: EVIDENCE-T18-NARROW-DATA-QUALITY-AUDIT-001
+  - relation_type: derived_from
+    target_asset_id: EVIDENCE-T18-CONTENT-ADDRESSED-BACKUP-RESTORE-001
+  - relation_type: governed_by
+    target_asset_id: CONTRACT-T19-POINT-IN-TIME-REPLAY-001
+  - relation_type: validated_by
+    target_asset_id: TEST-T19-POINT-IN-TIME-REPLAY-001
+  consumers:
+  - TASK-19
+  - TASK-20
+  - FACTORY-001
+  evidence: []
+  classification: *t19_internal
+- asset_id: EVIDENCE-T19-POINT-IN-TIME-REPLAY-SUMMARY-001
+  record_version: '1.0'
+  asset_type: evidence
+  purpose: Human-readable TASK-19 decision summary exposing the narrow replay
+    verdict, exact result, lineage coverage, leakage proof, side effects and
+    next boundary.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-07-29'
+  truth_owner: TASK-19
+  location:
+    kind: git_path
+    logical_uri: repo://docs/evidence/task19/point_in_time_replay_summary_v1.md
+    repository_path: docs/evidence/task19/point_in_time_replay_summary_v1.md
+  integrity:
+    kind: sha256
+    sha256: 5ee39f02adea03149446f5c4a428551ed7e660c02ad3bc3a5d67e8668e52d0b5
+  access:
+    mode: read_only
+    method: file
+    network_required: false
+    secrets_required: false
+  relations:
+  - relation_type: derived_from
+    target_asset_id: EVIDENCE-T19-POINT-IN-TIME-REPLAY-001
+  - relation_type: validated_by
+    target_asset_id: TEST-T19-POINT-IN-TIME-REPLAY-001
+  consumers:
+  - TASK-19
+  - TASK-20
+  - FACTORY-001
+  evidence: []
+  classification: *t19_internal
+- asset_id: TEST-T19-POINT-IN-TIME-REPLAY-001
+  record_version: '1.0'
+  asset_type: script
+  purpose: Deterministic production and synthetic tests for literal cutoff
+    replay, complete lineage, 10 adversarial vectors, raw immutability,
+    clean-clone behavior and zero side effects.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-07-29'
+  truth_owner: TASK-19
+  location:
+    kind: git_path
+    logical_uri: repo://tests/test_task19_point_in_time_replay.py
+    repository_path: tests/test_task19_point_in_time_replay.py
+  integrity:
+    kind: sha256
+    sha256: 7d3a0656d5f711cc54beeb1a2e6a7fd7154bd93fea0d23d95c9a48bba75c9600
+  access:
+    mode: read_only
+    method: file
+    network_required: false
+    secrets_required: false
+  relations:
+  - relation_type: depends_on
+    target_asset_id: MODULE-T19-POINT-IN-TIME-REPLAY-001
+  - relation_type: depends_on
+    target_asset_id: FIXTURE-T19-POINT-IN-TIME-REPLAY-001
+  - relation_type: depends_on
+    target_asset_id: EVIDENCE-T19-POINT-IN-TIME-REPLAY-001
+  consumers:
+  - TASK-19
+  evidence: []
+  classification: *t19_internal
+- asset_id: EVIDENCE-T19-ACCEPTANCE-CATALOG-FACTORY-FIT-001
+  record_version: '1.0'
+  asset_type: evidence
+  purpose: TASK-19 A4 receipt reconciling replay, direct attempt lineage,
+    adversarial tests, bounded claims, Catalog consumers and proportional
+    Factory Fit.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-07-29'
+  truth_owner: TASK-19
+  location:
+    kind: git_path
+    logical_uri: repo://docs/evidence/task19/acceptance_catalog_factory_fit_v1.json
+    repository_path: docs/evidence/task19/acceptance_catalog_factory_fit_v1.json
+  integrity:
+    kind: sha256
+    sha256: fd1a18a6439c040a0b9b1fab6f175643969629c94249db0fe6ebcb2daad2b735
+  access:
+    mode: read_only
+    method: file
+    network_required: false
+    secrets_required: false
+  relations:
+  - relation_type: derived_from
+    target_asset_id: EVIDENCE-T19-POINT-IN-TIME-REPLAY-001
+  - relation_type: validated_by
+    target_asset_id: TEST-T19-ACCEPTANCE-CATALOG-FACTORY-FIT-001
+  consumers:
+  - TASK-19
+  - TASK-20
+  - FACTORY-001
+  evidence: []
+  classification: *t19_internal
+- asset_id: TEST-T19-ACCEPTANCE-CATALOG-FACTORY-FIT-001
+  record_version: '1.0'
+  asset_type: script
+  purpose: Exact hash-bound acceptance tests for TASK-19 Catalog registration,
+    lineage reconciliation, bounded claims, Factory Fit, generated navigation
+    and zero external authority.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-07-29'
+  truth_owner: TASK-19
+  location:
+    kind: git_path
+    logical_uri: repo://tests/test_task19_acceptance_catalog_factory_fit.py
+    repository_path: tests/test_task19_acceptance_catalog_factory_fit.py
+  integrity:
+    kind: sha256
+    sha256: f64ba844a6f3bc8553af0573e58b3f1ce3376f51b6d119b4b69ec85c5a47bf5d
+  access:
+    mode: read_only
+    method: file
+    network_required: false
+    secrets_required: false
+  relations:
+  - relation_type: depends_on
+    target_asset_id: EVIDENCE-T19-ACCEPTANCE-CATALOG-FACTORY-FIT-001
+  - relation_type: depends_on
+    target_asset_id: TEST-T19-POINT-IN-TIME-REPLAY-001
+  consumers:
+  - TASK-19
+  evidence: []
+  classification: *t19_internal
