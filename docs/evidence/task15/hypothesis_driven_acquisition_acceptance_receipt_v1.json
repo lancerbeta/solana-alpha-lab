@@ -1,0 +1,286 @@
+{
+  "schema_version": "1.0",
+  "receipt_id": "EVIDENCE-T15-HYPOTHESIS-DRIVEN-ACQUISITION-ACCEPTANCE-001",
+  "receipt_version": "1.0",
+  "task_id": "TASK-15",
+  "atom_id": "T15-A3_DETERMINISTIC_ACCEPTANCE_AND_CATALOG_V1",
+  "as_of": "2026-07-29",
+  "verdict": "PASS",
+  "accepted_contract": {
+    "asset_id": "CONTRACT-T15-BOUNDED-SUSTAINED-COLLECTION-001",
+    "contract_id": "CONTRACT-T15-BOUNDED-SUSTAINED-COLLECTION-001",
+    "contract_version": "1.0",
+    "status": "FROZEN_MEASUREMENT_NOT_DUE",
+    "repository_path": "docs/contracts/bounded_sustained_collection_contract_v1.md",
+    "sha256": "65f0ca725e8e3a28976d3f7286c8f8cea49180588704b12d75ddc7d12be7310e"
+  },
+  "frozen_fixture": {
+    "asset_id": "FIXTURE-T15-HYPOTHESIS-DRIVEN-ACQUISITION-001",
+    "repository_path": "tests/fixtures/task15/bounded_sustained_collection_contract_v1.json",
+    "sha256": "a1258f56c7521922876c1edd73ca77125e31294b623b8b793d6d5cfe2542235b"
+  },
+  "architecture_anchor": {
+    "asset_id": "ARCH-INTENT-002",
+    "status": "ACCEPTED_DIRECTION_NOT_IMPLEMENTED",
+    "repository_path": "docs/architecture/intents/ARCH-INTENT-002-hypothesis-factory-operating-model.md",
+    "sha256": "ea094d88abf635fbe4df3b1ff9b3f0e80cb87dfa836f67505173766e69708639",
+    "truth_owner": "USER_GOAL_OWNER"
+  },
+  "acceptance": {
+    "acquisition_path": "MEASUREMENT_NOT_DUE",
+    "provider_purchase": "DEFER",
+    "global_detailed_watchlist_authorized": false,
+    "hypothesis_owned_watchlists_required": true,
+    "historical_batch_first": true,
+    "thin_online_decision_ledger_required": true,
+    "triggered_live_capture_requires_historical_falsifier": true,
+    "prior_task_historical_bytes_changed": false,
+    "task01_operational_defaults_superseded": true,
+    "deterministic_acceptance": "26_OF_26_TARGETED_PASS"
+  },
+  "hypothesis_research_memory": {
+    "status": "ARCHITECTURE_REQUIREMENT_ACCEPTED_NOT_IMPLEMENTED",
+    "applies_to_all_origin_kinds": true,
+    "origin_kinds": [
+      "OWNER_OBSERVATION",
+      "DATA_ANALYSIS",
+      "AI_HYPOTHESIS_MINING",
+      "EXTERNAL_RESEARCH",
+      "TOOL_OR_FRAMEWORK_OUTPUT",
+      "DERIVED_FROM_EXISTING_HYPOTHESIS",
+      "OTHER_DECLARED"
+    ],
+    "required_chain": [
+      "ORIGIN_AND_INITIAL_QUESTION",
+      "MECHANISM_FALSIFIER_AND_EXPECTED_REGIME",
+      "TOOL_MODEL_PROMPT_QUERY_CODE_CONFIG_PROVENANCE",
+      "PIT_DATASET_POPULATION_CONTROLS_AND_EXCLUSIONS",
+      "TEST_DESIGN_ESTIMAND_SEARCH_BUDGET_AND_COSTS",
+      "RESULTS_UNCERTAINTY_NEGATIVE_AND_INCONCLUSIVE_OUTCOMES",
+      "CONCLUSION_DECISION_RATIONALE_OWNER_AND_TIME",
+      "DERIVATIVE_INSIGHT_PARENT_LINKS_AND_DELTA"
+    ],
+    "append_only": true,
+    "corrections_use_version_or_supersedes_event": true,
+    "prior_work_query_before_new_research_cycle": true,
+    "semantic_similarity_auto_rejects_candidate": false,
+    "sensitive_raw_conversation_required": false
+  },
+  "execution_and_position_bridge": {
+    "status": "ARCHITECTURE_REQUIREMENT_ACCEPTED_NOT_IMPLEMENTED",
+    "required_chain": [
+      "HYPOTHESIS_VERSION",
+      "STRATEGY_VERSION_AND_ACTIVATION_EPOCH",
+      "WATCHLIST_MEMBERSHIP_AND_TRIGGER_EVENT",
+      "SIGNAL_DECISION_AND_PRE_TRADE_RISK_SNAPSHOT",
+      "EXECUTION_INTENT",
+      "QUOTE_ROUTE_AND_SIMULATION_EVIDENCE",
+      "EXECUTION_ATTEMPT_AND_OBSERVED_SETTLEMENT",
+      "POSITION_EVENTS_AND_EXIT_DECISIONS",
+      "INVENTORY_RECONCILIATION",
+      "NET_RETURN_AND_REALIZED_OWNER_CASHFLOW",
+      "STRATEGY_DEGRADATION_AND_HYPOTHESIS_FEEDBACK"
+    ],
+    "project_owned_truth": [
+      "STRATEGY_TRIGGER_AND_ACTIVATION_VERSIONS",
+      "CAPITAL_RISK_AND_KILL_SWITCH_POLICY",
+      "IDEMPOTENCY_AND_DUPLICATE_SEND_PROTECTION",
+      "POSITION_INVENTORY_AND_RECONCILIATION",
+      "ACTUAL_FEES_FILLS_SETTLEMENT_AND_NET_CASHFLOW",
+      "EVIDENCE_INCIDENT_DECISION_AND_RECOVERY_LINEAGE"
+    ],
+    "replaceable_plumbing_requires_adopt_wrap_fork_build": true,
+    "third_party_component_owns_hypothesis_risk_position_or_cashflow_truth": false,
+    "shared_replay_paper_shadow_live_interfaces_required": true,
+    "monitoring_is_precondition_for_live_authority": true,
+    "overlapping_hypotheses_retain_logical_position_attribution": true,
+    "account_level_risk_aggregation_required": true,
+    "unknown_transaction_state_requires_reconciliation_before_retry": true,
+    "monitoring_loss_with_open_inventory_allows_new_entries": false
+  },
+  "factory_fit_review": {
+    "gate_id": "FACTORY_FIT_REVIEW_V1",
+    "timing": "AFTER_TECHNICAL_DOD_BEFORE_COMPLETION_BUNDLE",
+    "applicability": "MANDATORY_FOR_EVERY_FUTURE_CANONICAL_TASK",
+    "review_depth": "FULL_REVIEW",
+    "allowed_review_depths": [
+      "FAST_PATH",
+      "FULL_REVIEW"
+    ],
+    "materiality": "MATERIAL_ARCHITECTURE_AND_DATA_ACQUISITION_CHANGE",
+    "verdict": "FACTORY_FIT_PASS_WITH_FOLLOWUP",
+    "dimensions": [
+      {
+        "dimension": "MISSION_AND_NAMED_CONSUMER",
+        "result": "PASS",
+        "evidence": "Hypothesis-owned acquisition and owner pulse directly serve FACTORY-001 and TASK-14 provider decision."
+      },
+      {
+        "dimension": "FLEXIBILITY_AND_CHANGE_AMPLIFICATION",
+        "result": "PASS",
+        "evidence": "Cadence, fields, controls and live needs are owned by immutable hypothesis manifests rather than a global collector."
+      },
+      {
+        "dimension": "COMPATIBILITY_HISTORY_AND_PIT",
+        "result": "PASS",
+        "evidence": "TASK-03 through TASK-14 primitives remain reusable; pre-Git bytes stay unchanged and backfilled availability stays forbidden."
+      },
+      {
+        "dimension": "EFFICIENCY_AND_EVIDENCE_ECONOMY",
+        "result": "PASS",
+        "evidence": "Historical batch and content-addressed reuse precede separately gated live capture; measurement is not due without demand."
+      },
+      {
+        "dimension": "RESEARCH_AND_STATISTICAL_TRUTH",
+        "result": "PASS",
+        "evidence": "Append-only origin, tool, PIT data, method, negative-result, decision and derivation provenance joins controls, OOS, walk-forward, multiple-testing and regime evidence."
+      },
+      {
+        "dimension": "OWNER_OPERABILITY",
+        "result": "PASS",
+        "evidence": "Owner pulse is a read model for hypotheses, watchlists, positions, net result, data health and decisions, never a truth owner."
+      },
+      {
+        "dimension": "EXECUTION_POSITION_MONITORING_BRIDGE",
+        "result": "PASS",
+        "evidence": "The versioned trigger-to-cashflow chain preserves project-owned risk, position, reconciliation and owner-cashflow truth; monitoring and recovery are prerequisites for live authority."
+      },
+      {
+        "dimension": "SAFETY_AND_AUTHORITY",
+        "result": "PASS",
+        "evidence": "A3 has zero external, collection, spend, deployment, wallet, transaction and Git authority."
+      },
+      {
+        "dimension": "ADVERSARIAL_SCALE_AND_DRIFT",
+        "result": "PASS",
+        "evidence": "Overlapping watchlists, ten-times hypothesis growth, source loss, reactivation, stale UI and invalid AI outputs have explicit boundaries."
+      }
+    ],
+    "red_team_challenges": [
+      "TEN_X_HYPOTHESIS_COUNT",
+      "HISTORICAL_SOURCE_DISAPPEARS_OR_REVISES",
+      "OVERLAPPING_HYPOTHESIS_WATCHLISTS",
+      "TWO_HYPOTHESES_CREATE_CONFLICTING_EXPOSURE_ON_ONE_MINT",
+      "DORMANT_HYPOTHESIS_REACTIVATION",
+      "SEMANTIC_DUPLICATE_REPEATS_PRIOR_RESEARCH",
+      "DERIVED_INSIGHT_LOSES_PARENT_EVIDENCE",
+      "DUPLICATE_TRIGGER_OR_TRANSACTION_SEND",
+      "ROUTE_DISAPPEARS_BETWEEN_TRIGGER_ENTRY_AND_EXIT",
+      "PARTIAL_FILL_OR_UNKNOWN_TRANSACTION_LEAVES_UNRESOLVED_INVENTORY",
+      "PROCESS_ALIVE_WHILE_DATA_OR_EXIT_PATH_IS_STALE",
+      "MONITORING_FAILS_WHILE_POSITION_IS_OPEN",
+      "STALE_DASHBOARD_BECOMES_FALSE_TRUTH",
+      "PERSUASIVE_AI_OR_TOOL_OUTPUT_BYPASSES_VALIDATION"
+    ],
+    "observed_change_amplification": {
+      "signal": "LIVE_CATALOG_CHECKPOINT_VALUES_DUPLICATED_ACROSS_DIRECT_CONSUMERS",
+      "measured_direct_consumer_files_updated": 11,
+      "historical_receipts_changed": false,
+      "disposition": "ACCEPTED_NOW_WITH_ONE_BOUNDED_FOLLOWUP_BEFORE_NEXT_CATALOG_VERSION_BUMP"
+    },
+    "required_patches": [],
+    "bounded_followup_candidate": "CENTRALIZE_LIVE_CATALOG_CHECKPOINT_ASSERTIONS_WHILE_PRESERVING_HISTORICAL_RECEIPTS",
+    "durable_followup": {
+      "status": "RECORDED_NON_BLOCKING",
+      "owner": "TASK-04_CATALOG_GOVERNANCE",
+      "reason": "Eleven direct consumers duplicate mutable Catalog checkpoint values and create measurable change amplification.",
+      "activation_trigger": "BEFORE_NEXT_CATALOG_VERSION_BUMP",
+      "destination": "NEXT_CATALOG_TRANSACTION_PRECONDITION",
+      "candidate": "CENTRALIZE_LIVE_CATALOG_CHECKPOINT_ASSERTIONS_WHILE_PRESERVING_HISTORICAL_RECEIPTS"
+    }
+  },
+  "finish_workflow_reconciliation": {
+    "status": "LOCAL_SKILL_UPDATED_AND_VALIDATED",
+    "skill_identity": "finish-solana-task",
+    "location_class": "CODEX_HOME_LOCAL_SKILL_OUTSIDE_REPOSITORY",
+    "pre_done_factory_fit_gate_required": true,
+    "mode_contract": [
+      "FAST_PATH",
+      "FULL_REVIEW"
+    ],
+    "verdict_contract": [
+      "PASS",
+      "PASS_WITH_FOLLOWUP",
+      "FAIL"
+    ],
+    "factory_fit_fail_forbids_done_confirmed": true,
+    "followup_must_be_durable_and_owned": true,
+    "artifacts": {
+      "skill_sha256": "49d4743806699e56fb83ccf5a86e9d475f9415380aa09d72c88fdb5543ccbfca",
+      "finish_gate_reference_sha256": "dde74396899efff3b1131b8eed100d116261532ede5d65dbe4e792319904dc47",
+      "factory_fit_reference_sha256": "72920aa9e40cad4cfe10e10fb915f64acdf715d184a466cfd01c0af79d61e313",
+      "openai_interface_sha256": "be24c31c40d62f5eca7f01091467821bb141afb862fcddc74c020d1c01c74e16"
+    },
+    "validation": "SKILL_CREATOR_QUICK_VALIDATE_PASS",
+    "canonical_operating_system_and_roadmap_reconciliation": "PENDING_TASK15_FINISH_GATE",
+    "repository_owns_local_skill_installation": false
+  },
+  "catalog": {
+    "status": "REGISTERED_IN_TASK15_CATALOG_TRANSACTION",
+    "catalog_version": "0.18.0",
+    "assets": 272,
+    "shards": 4,
+    "schemas": 4,
+    "queries": 7,
+    "registered_asset_ids": [
+      "ARCH-INTENT-002",
+      "CONTRACT-T15-BOUNDED-SUSTAINED-COLLECTION-001",
+      "FIXTURE-T15-HYPOTHESIS-DRIVEN-ACQUISITION-001",
+      "TEST-T15-HYPOTHESIS-DRIVEN-ACQUISITION-001",
+      "TEST-T15-HYPOTHESIS-DRIVEN-ACQUISITION-ACCEPTANCE-001",
+      "EVIDENCE-T15-HYPOTHESIS-DRIVEN-ACQUISITION-ACCEPTANCE-001"
+    ]
+  },
+  "roadmap_reconciliation": {
+    "status": "REQUIRED_AFTER_REPOSITORY_ACCEPTANCE_NOT_PERFORMED_IN_A3",
+    "inputs": [
+      "ARCH-INTENT-002",
+      "CONTRACT-T15-BOUNDED-SUSTAINED-COLLECTION-001",
+      "EVIDENCE-T15-HYPOTHESIS-DRIVEN-ACQUISITION-ACCEPTANCE-001"
+    ],
+    "required_meaning": [
+      "HYPOTHESIS_LIFECYCLE_WITH_DORMANT_AND_REACTIVATION_EPOCHS",
+      "APPEND_ONLY_HYPOTHESIS_PROVENANCE_AND_DERIVATION_LEDGER",
+      "RESEARCH_MEMORY_QUERY_BEFORE_NEW_TRIAL",
+      "VERSIONED_TRIGGER_TO_CASHFLOW_EXECUTION_BRIDGE",
+      "POSITION_ATTRIBUTION_ACCOUNT_RISK_AND_RECONCILIATION_TRUTH",
+      "SHARED_REPLAY_PAPER_SHADOW_LIVE_INTERFACES",
+      "EXECUTION_PLUMBING_ADOPT_WRAP_FORK_BUILD_GATE",
+      "LIVE_REQUIRES_MONITORING_KILL_SWITCH_INCIDENT_AND_RECOVERY",
+      "HYPOTHESIS_OWNED_WATCHLISTS_AND_DATA_REQUIREMENTS",
+      "RESEARCH_TOOL_CAPABILITY_REGISTRY_AND_ROUTER",
+      "HISTORICAL_BATCH_AND_REUSABLE_CACHE_FIRST",
+      "OOS_WALK_FORWARD_MULTIPLE_TESTING_AND_REGIME_EVIDENCE",
+      "OWNER_PULSE_DASHBOARD_AND_PROBLEM_MONITORING",
+      "POSITION_LIFECYCLE_AND_NET_OWNER_CASHFLOW",
+      "LIVE_CAPTURE_ONLY_FOR_PROVEN_NON_RECONSTRUCTABLE_NEEDS",
+      "MANDATORY_FACTORY_FIT_REVIEW_FOR_EVERY_FUTURE_TASK",
+      "FACTORY_FIT_FAST_PATH_AND_FULL_REVIEW_DEPTHS",
+      "FACTORY_FIT_RECONCILED_INTO_OS_ROADMAP_AND_FINISH_SKILL"
+    ]
+  },
+  "authority": {
+    "network_calls_in_atom": 0,
+    "provider_api_rpc_wss_calls_in_atom": 0,
+    "account_or_dashboard_actions": 0,
+    "credential_use": 0,
+    "dependency_changes": 0,
+    "cash_spend_usd": 0,
+    "collector_or_scheduler_actions": 0,
+    "wallet_signer_transaction_actions": 0,
+    "commit_push_pr_merge_actions": 0
+  },
+  "non_claims": [
+    "No hypothesis, strategy, watchlist engine, dashboard, research platform or tool registry was implemented.",
+    "No hypothesis provenance ledger, derivation graph or research-memory service was implemented.",
+    "No trigger engine, execution adapter, position manager, risk service, signer, monitoring backend or trading action was implemented.",
+    "No historical batch, provider measurement, live collection or position monitoring was executed.",
+    "No canonical roadmap, Project Source, state or UI activation was changed.",
+    "FACTORY_FIT_REVIEW is installed and validated in the local finish-solana-task workflow; canonical Operating System and roadmap reconciliation remain pending.",
+    "No provider purchase, deployment, wallet, signer, transaction, real-money or alpha claim is established.",
+    "TASK-15 remains in progress until repository delivery and finish reconciliation."
+  ],
+  "canonical_status_candidate": "TECHNICAL_DOD_CANDIDATE_TASK15_REMAINS_IN_PROGRESS_UNTIL_REPOSITORY_AND_CONTROL_PLANE_ACCEPTANCE",
+  "state_change": "LOCAL_CANDIDATE_REQUIRES_REPOSITORY_ACCEPTANCE",
+  "next_atom": "T15-A4_REPOSITORY_DELIVERY_V1"
+}

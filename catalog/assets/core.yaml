@@ -532,7 +532,7 @@ records:
     repository_path: tests/test_task06_catalog.py
   integrity:
     kind: sha256
-    sha256: a6a621adad8f20f9bcd3d54f78bfe9a8fa7f755362483f88a5c2c98e68893c3e
+    sha256: d0a4c774ea2e83994efd695fd5c12feabae8a61704c8bc56df5738820059b771
   access: *t06_read_file
   relations:
   - relation_type: governed_by
@@ -959,13 +959,13 @@ records:
     contains_raw_data: false
     sensitivity: INTERNAL_NON_SECRET
 - asset_id: CATALOG-SCHEMA-ASSET-001
-  record_version: '1.1'
+  record_version: '1.2'
   asset_type: schema
-  purpose: Backward-compatible Draft 2020-12 asset schema v1.1 with pre-Git provenance
-    and architecture-intent contracts.
+  purpose: Backward-compatible Draft 2020-12 asset schema v1.2 with pre-Git
+    provenance and task-owned current architecture-intent registration.
   status: VALIDATED_ACTIVE
   origin: REPOSITORY
-  as_of: '2026-07-22'
+  as_of: '2026-07-29'
   truth_owner: TASK-03
   location:
     kind: git_path
@@ -973,7 +973,7 @@ records:
     repository_path: catalog/schemas/asset_catalog.schema.json
   integrity:
     kind: sha256
-    sha256: 20d8724dc7fcd3318f3cfc262b6759006b54b1679483ea37871ac3212ed86efb
+    sha256: f2ab657dbbe9457eca357c001478500f0d1b8e536d81a80be4644770a204daec
   access:
     mode: read_only
     method: file
@@ -2549,7 +2549,7 @@ records:
     repository_path: tests/test_task05_catalog_queries.py
   integrity:
     kind: sha256
-    sha256: 02c2594e13161586e11153dd430c942442eb9fcada081bb8bac359978e712295
+    sha256: 4287f79134a02a2090e0d7e60d1eaf333e9fb6f923c49eb9e3b610f5b14fae93
   access:
     mode: read_only
     method: command
@@ -3424,7 +3424,7 @@ records:
     repository_path: tests/test_task07_catalog.py
   integrity:
     kind: sha256
-    sha256: 8e4a3ff2ad608355ab28173c1f142d108d71a657be1572d1a7847e5db3d08a6d
+    sha256: 3fc13aefbfe4b1c0949ea2a25833283c01a8d0e5b375f7ceae5e29957b410ed6
   access: *t07_read_file
   relations:
   - relation_type: depends_on
@@ -3911,7 +3911,7 @@ records:
     repository_path: tests/test_task08_catalog.py
   integrity:
     kind: sha256
-    sha256: c483039273b635876af16f17de40750236bca166fcd22cfb6646dd68f8e492ed
+    sha256: 9deae15c0d4509656ebc46481d41e3615ad1bdb652aa2f141a9453c3b3b00c6a
   access: *t08_read_file
   relations:
   - relation_type: depends_on
@@ -4643,7 +4643,7 @@ records:
     repository_path: scripts/validate_baton.py
   integrity:
     kind: sha256
-    sha256: a1f34c2e724e8413c47c188b1a0e2f04716df132c7a71b4ac6d941d35233ca97
+    sha256: 0b311a293d1afad15151a0bd96b38bcd10f5029192cc4deb9403c20eef26cf37
   access:
     mode: read_only
     method: file
@@ -4886,7 +4886,7 @@ records:
     repository_path: tests/test_baton_repository_policy.py
   integrity:
     kind: sha256
-    sha256: 58134c3c9a7e49c7d9b2eed35df8aa59ba3a6c50876e57d4439937b4a9f0ba48
+    sha256: c8cbd285bc53fb7839df55feb8c49f4770ccbf51b5ddb931a3eb7b73126be204
   access:
     mode: read_only
     method: file
@@ -6858,7 +6858,7 @@ records:
     repository_path: tests/test_task11_entity_input_replay.py
   integrity:
     kind: sha256
-    sha256: 7ff456334048db44ad533a966fba9fcc4e37d51c9fd706ad4719a4aa0026be3e
+    sha256: 2d1a0903e4fef3d67a50fccaf0b1a015351b546ed99802017739b97d7c90d69a
   access:
     mode: read_only
     method: file
@@ -7194,7 +7194,7 @@ records:
     repository_path: tests/test_task12_pilot_supervisor_acceptance.py
   integrity:
     kind: sha256
-    sha256: d1752f8acb3901fb5e9e84640a868ed3ac6666ccf8ce65e5bc24814f2301b198
+    sha256: 8ac9dd383a02d07d1fa16f674500210d5fc050a48df58538175a4a700dbe1b8c
   access:
     mode: read_only
     method: file
@@ -7547,7 +7547,7 @@ records:
     repository_path: tests/test_task13_pilot_audit_acceptance.py
   integrity:
     kind: sha256
-    sha256: f4f11da3c8fbffba5ca177a85ac9f4219f365aa45d5df1f08e328e83694c5c99
+    sha256: 5536c4a4f2cf1fa5760ca1782568f00d4680fbbc3e3836c354919a4b075096fd
   access:
     mode: read_only
     method: file
@@ -7661,7 +7661,7 @@ records:
     repository_path: tests/test_task14_provider_purchase_decision.py
   integrity:
     kind: sha256
-    sha256: f91b0ac97171044cdac452facbde80a0ea7554865f69e317069045acf13123bf
+    sha256: 0a69de017605eb60238eca46fbb33a9e3eed4917cdfa3bc74e977c49020e0975
   access:
     mode: read_only
     method: file
@@ -7713,3 +7713,179 @@ records:
   - TASK-17
   evidence: []
   classification: *t14_internal
+- asset_id: CONTRACT-T15-BOUNDED-SUSTAINED-COLLECTION-001
+  record_version: '1.0'
+  asset_type: decision
+  purpose: Frozen hypothesis-driven acquisition and provider-measurement
+    admission contract requiring a named data consumer, historical batch
+    first, reusable cache and separately gated live capture.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-07-29'
+  truth_owner: TASK-15
+  location:
+    kind: git_path
+    logical_uri: repo://docs/contracts/bounded_sustained_collection_contract_v1.md
+    repository_path: docs/contracts/bounded_sustained_collection_contract_v1.md
+  integrity:
+    kind: sha256
+    sha256: 65f0ca725e8e3a28976d3f7286c8f8cea49180588704b12d75ddc7d12be7310e
+  access:
+    mode: read_only
+    method: file
+    network_required: false
+    secrets_required: false
+  relations:
+  - relation_type: governed_by
+    target_asset_id: ARCH-INTENT-002
+  - relation_type: derived_from
+    target_asset_id: DECISION-T14-PROVIDER-PURCHASE-001
+  - relation_type: validated_by
+    target_asset_id: TEST-T15-HYPOTHESIS-DRIVEN-ACQUISITION-001
+  - relation_type: evidenced_by
+    target_asset_id: EVIDENCE-T15-HYPOTHESIS-DRIVEN-ACQUISITION-ACCEPTANCE-001
+  consumers:
+  - TASK-15
+  - TASK-17
+  - FACTORY-001
+  evidence: []
+  classification: &t15_internal
+    contains_secrets: false
+    contains_raw_data: false
+    sensitivity: INTERNAL_NON_SECRET
+- asset_id: FIXTURE-T15-HYPOTHESIS-DRIVEN-ACQUISITION-001
+  record_version: '1.0'
+  asset_type: evidence
+  purpose: Frozen machine-readable TASK-15 acquisition precedence,
+    hypothesis ownership, retrospective population, live admission, fallback
+    measurement ceiling and zero-authority fixture.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-07-29'
+  truth_owner: TASK-15
+  location:
+    kind: git_path
+    logical_uri: repo://tests/fixtures/task15/bounded_sustained_collection_contract_v1.json
+    repository_path: tests/fixtures/task15/bounded_sustained_collection_contract_v1.json
+  integrity:
+    kind: sha256
+    sha256: a1258f56c7521922876c1edd73ca77125e31294b623b8b793d6d5cfe2542235b
+  access:
+    mode: read_only
+    method: file
+    network_required: false
+    secrets_required: false
+  relations:
+  - relation_type: governed_by
+    target_asset_id: CONTRACT-T15-BOUNDED-SUSTAINED-COLLECTION-001
+  - relation_type: validated_by
+    target_asset_id: TEST-T15-HYPOTHESIS-DRIVEN-ACQUISITION-001
+  consumers:
+  - TASK-15
+  - TASK-17
+  - FACTORY-001
+  evidence: []
+  classification: *t15_internal
+- asset_id: TEST-T15-HYPOTHESIS-DRIVEN-ACQUISITION-001
+  record_version: '1.0'
+  asset_type: script
+  purpose: Deterministic TASK-15 contract tests binding acquisition
+    precedence, hypothesis ownership, retrospective controls, live admission,
+    fallback ceilings, prior evidence and zero effects.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-07-29'
+  truth_owner: TASK-15
+  location:
+    kind: git_path
+    logical_uri: repo://tests/test_task15_bounded_sustained_collection_contract.py
+    repository_path: tests/test_task15_bounded_sustained_collection_contract.py
+  integrity:
+    kind: sha256
+    sha256: 53bb6dd9b38bc2fbdbe510789e60094684fa24b0965538633267d683e30ebcdc
+  access:
+    mode: read_only
+    method: file
+    network_required: false
+    secrets_required: false
+  relations:
+  - relation_type: depends_on
+    target_asset_id: CONTRACT-T15-BOUNDED-SUSTAINED-COLLECTION-001
+  - relation_type: depends_on
+    target_asset_id: FIXTURE-T15-HYPOTHESIS-DRIVEN-ACQUISITION-001
+  consumers:
+  - TASK-15
+  evidence: []
+  classification: *t15_internal
+- asset_id: TEST-T15-HYPOTHESIS-DRIVEN-ACQUISITION-ACCEPTANCE-001
+  record_version: '1.0'
+  asset_type: script
+  purpose: Deterministic TASK-15 semantic acceptance tests binding the exact
+    contract, fixture, operating-model intent, mandatory Factory Fit review,
+    Catalog checkpoint, generated navigation and zero effects.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-07-29'
+  truth_owner: TASK-15
+  location:
+    kind: git_path
+    logical_uri: repo://tests/test_task15_hypothesis_driven_acquisition_acceptance.py
+    repository_path: tests/test_task15_hypothesis_driven_acquisition_acceptance.py
+  integrity:
+    kind: sha256
+    sha256: 4b5c1c20851b4c790dd0f89f2ccca73389cb248c49786974d27eebff7e1d6cfc
+  access:
+    mode: read_only
+    method: file
+    network_required: false
+    secrets_required: false
+  relations:
+  - relation_type: depends_on
+    target_asset_id: ARCH-INTENT-002
+  - relation_type: depends_on
+    target_asset_id: CONTRACT-T15-BOUNDED-SUSTAINED-COLLECTION-001
+  - relation_type: depends_on
+    target_asset_id: FIXTURE-T15-HYPOTHESIS-DRIVEN-ACQUISITION-001
+  - relation_type: depends_on
+    target_asset_id: EVIDENCE-T15-HYPOTHESIS-DRIVEN-ACQUISITION-ACCEPTANCE-001
+  consumers:
+  - TASK-15
+  evidence: []
+  classification: *t15_internal
+- asset_id: EVIDENCE-T15-HYPOTHESIS-DRIVEN-ACQUISITION-ACCEPTANCE-001
+  record_version: '1.0'
+  asset_type: evidence
+  purpose: Sanitized TASK-15 acceptance receipt binding the hypothesis-driven
+    acquisition contract, operating-model architecture intent, mandatory
+    future Factory Fit review, Catalog checkpoint and zero effects.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-07-29'
+  truth_owner: TASK-15
+  location:
+    kind: git_path
+    logical_uri: repo://docs/evidence/task15/hypothesis_driven_acquisition_acceptance_receipt_v1.json
+    repository_path: docs/evidence/task15/hypothesis_driven_acquisition_acceptance_receipt_v1.json
+  integrity:
+    kind: sha256
+    sha256: b96ba7e55529f79726cafb09e3ab6162a94e6a49eb667971418454b122110683
+  access:
+    mode: read_only
+    method: file
+    network_required: false
+    secrets_required: false
+  relations:
+  - relation_type: derived_from
+    target_asset_id: ARCH-INTENT-002
+  - relation_type: derived_from
+    target_asset_id: CONTRACT-T15-BOUNDED-SUSTAINED-COLLECTION-001
+  - relation_type: derived_from
+    target_asset_id: FIXTURE-T15-HYPOTHESIS-DRIVEN-ACQUISITION-001
+  - relation_type: validated_by
+    target_asset_id: TEST-T15-HYPOTHESIS-DRIVEN-ACQUISITION-ACCEPTANCE-001
+  consumers:
+  - TASK-15
+  - TASK-17
+  - FACTORY-001
+  evidence: []
+  classification: *t15_internal
