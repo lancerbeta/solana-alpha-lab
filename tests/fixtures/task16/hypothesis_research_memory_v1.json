@@ -1,0 +1,475 @@
+{
+  "schema_version": "1.0",
+  "memory_id": "SMIAL-HYPOTHESIS-RESEARCH-MEMORY",
+  "as_of": "2026-07-30T12:00:00Z",
+  "truth_owner": "TASK-16",
+  "append_only": true,
+  "history_rewrite_policy": "CORRECT_WITH_NEW_RECORD_AND_SUPERSEDES_LINK",
+  "current_state_is_projection": true,
+  "hypothesis_families": [
+    {
+      "family_id": "HYP-FAMILY-LIQUIDITY-REVERSAL",
+      "title": "Liquidity-shock reversal",
+      "mechanism_class": "temporary liquidity imbalance",
+      "created_at": "2026-07-29T09:00:00Z",
+      "first_reliable_available_at": "2026-07-29T09:00:00Z",
+      "record_owner": "TASK-16",
+      "evidence_asset_ids": [
+        "ARCH-INTENT-002"
+      ]
+    }
+  ],
+  "hypothesis_origins": [
+    {
+      "origin_id": "HYP-ORIGIN-LIQUIDITY-REVERSAL-001",
+      "hypothesis_version_id": "HYP-VERSION-LIQUIDITY-REVERSAL-V1",
+      "origin_kind": "OWNER_OBSERVATION",
+      "originator": "owner",
+      "observed_at": "2026-07-29T08:00:00Z",
+      "recorded_at": "2026-07-29T08:30:00Z",
+      "first_reliable_available_at": "2026-07-29T09:00:00Z",
+      "initial_observation": "Temporary liquidity shocks may reverse after transaction costs.",
+      "source_reference_asset_ids": [
+        "ARCH-INTENT-002"
+      ],
+      "artifact_ids": [
+        "RESEARCH-ARTIFACT-LIQUIDITY-POPULATION-001"
+      ],
+      "record_owner": "TASK-16"
+    },
+    {
+      "origin_id": "HYP-ORIGIN-LIQUIDITY-REVERSAL-002",
+      "hypothesis_version_id": "HYP-VERSION-LIQUIDITY-REVERSAL-V2",
+      "origin_kind": "DERIVED_FROM_EXISTING_HYPOTHESIS",
+      "originator": "owner-and-offline-analysis",
+      "observed_at": "2026-07-30T08:00:00Z",
+      "recorded_at": "2026-07-30T08:15:00Z",
+      "first_reliable_available_at": "2026-07-30T08:30:00Z",
+      "initial_observation": "The negative result may be regime-dependent rather than universal.",
+      "source_reference_asset_ids": [
+        "ARCH-INTENT-002",
+        "CONTRACT-T15-BOUNDED-SUSTAINED-COLLECTION-001"
+      ],
+      "artifact_ids": [
+        "RESEARCH-ARTIFACT-LIQUIDITY-REGIME-001"
+      ],
+      "record_owner": "TASK-16"
+    }
+  ],
+  "research_cycles": [
+    {
+      "research_cycle_id": "RESEARCH-CYCLE-LIQUIDITY-REVERSAL-001",
+      "question": "Does a bounded liquidity shock reverse net of costs?",
+      "estimand": "Net-return difference versus point-in-time controls.",
+      "population_and_controls": "Named shocked candidates and matched candidates without the shock.",
+      "available_data_asset_ids": [
+        "DATA-T11-ENTITY-INPUT-PILOT-RAW-001"
+      ],
+      "required_output": "A bounded retrospective decision with explicit falsifier.",
+      "error_cost": "A false promotion wastes data and later pilot capacity.",
+      "time_cap_minutes": 120,
+      "cash_cap_usd": 0,
+      "privacy_boundary": "Repository evidence only; raw conversation excluded.",
+      "validation_owner": "TASK-16",
+      "opened_at": "2026-07-29T09:00:00Z",
+      "first_reliable_available_at": "2026-07-29T09:00:00Z",
+      "hypothesis_version_ids": [
+        "HYP-VERSION-LIQUIDITY-REVERSAL-V1"
+      ],
+      "record_owner": "TASK-16"
+    },
+    {
+      "research_cycle_id": "RESEARCH-CYCLE-LIQUIDITY-REVERSAL-002",
+      "question": "Does the same mechanism survive in the named high-attention regime?",
+      "estimand": "Regime-conditioned net-return difference versus the frozen controls.",
+      "population_and_controls": "The original population and controls restricted by PIT-safe regime evidence.",
+      "available_data_asset_ids": [
+        "DATA-T11-ENTITY-INPUT-PILOT-RAW-001",
+        "EVIDENCE-T13-PILOT-AUDIT-OFFLINE-ACCEPTANCE-001"
+      ],
+      "required_output": "A revalidation decision that states what changed.",
+      "error_cost": "A false reactivation repeats a known negative path.",
+      "time_cap_minutes": 120,
+      "cash_cap_usd": 0,
+      "privacy_boundary": "Repository evidence only; raw conversation excluded.",
+      "validation_owner": "TASK-16",
+      "opened_at": "2026-07-30T08:00:00Z",
+      "first_reliable_available_at": "2026-07-30T08:30:00Z",
+      "hypothesis_version_ids": [
+        "HYP-VERSION-LIQUIDITY-REVERSAL-V2"
+      ],
+      "record_owner": "TASK-16"
+    }
+  ],
+  "hypothesis_versions": [
+    {
+      "hypothesis_version_id": "HYP-VERSION-LIQUIDITY-REVERSAL-V1",
+      "family_id": "HYP-FAMILY-LIQUIDITY-REVERSAL",
+      "version_ordinal": 1,
+      "research_cycle_id": "RESEARCH-CYCLE-LIQUIDITY-REVERSAL-001",
+      "origin_id": "HYP-ORIGIN-LIQUIDITY-REVERSAL-001",
+      "definition_state": "FROZEN",
+      "statement": "A bounded liquidity shock reverses net of costs.",
+      "mechanism": "Temporary liquidity imbalance creates a short-lived executable-price dislocation.",
+      "falsifier": "No positive net-return difference versus PIT-safe controls after costs.",
+      "expected_regime_terms": [
+        "temporary-liquidity-imbalance"
+      ],
+      "feature_definition_asset_ids": [
+        "FEATURE-T05-LIQUIDITY-SHOCK-001"
+      ],
+      "label_definition_asset_ids": [
+        "LABEL-T16-NET-RETURN-001"
+      ],
+      "named_consumer_ids": [
+        "TASK-17"
+      ],
+      "created_at": "2026-07-29T09:00:00Z",
+      "first_reliable_available_at": "2026-07-29T09:00:00Z",
+      "definition_sha256": "2d7f7a291b0b3d0fc0438f7c2b22f8bf1500875f7ffcd4a39f35463bc5befaf7",
+      "evidence_asset_ids": [
+        "ARCH-INTENT-002"
+      ],
+      "record_owner": "TASK-16"
+    },
+    {
+      "hypothesis_version_id": "HYP-VERSION-LIQUIDITY-REVERSAL-V2",
+      "family_id": "HYP-FAMILY-LIQUIDITY-REVERSAL",
+      "version_ordinal": 2,
+      "research_cycle_id": "RESEARCH-CYCLE-LIQUIDITY-REVERSAL-002",
+      "origin_id": "HYP-ORIGIN-LIQUIDITY-REVERSAL-002",
+      "definition_state": "FROZEN",
+      "statement": "A bounded liquidity shock reverses net of costs only in a named high-attention regime.",
+      "mechanism": "Temporary liquidity imbalance plus high attention creates a recoverable executable-price dislocation.",
+      "falsifier": "No positive regime-conditioned net-return difference versus the frozen PIT-safe controls after costs.",
+      "expected_regime_terms": [
+        "high-attention",
+        "temporary-liquidity-imbalance"
+      ],
+      "feature_definition_asset_ids": [
+        "FEATURE-T05-LIQUIDITY-SHOCK-001",
+        "FEATURE-T16-ATTENTION-REGIME-001"
+      ],
+      "label_definition_asset_ids": [
+        "LABEL-T16-NET-RETURN-001"
+      ],
+      "named_consumer_ids": [
+        "TASK-17"
+      ],
+      "created_at": "2026-07-30T08:30:00Z",
+      "first_reliable_available_at": "2026-07-30T08:30:00Z",
+      "definition_sha256": "0cfb1a67b9ff59736760441f8505a0f2defaf0e36f0221d37e07a1021e2454f8",
+      "supersedes_hypothesis_version_id": "HYP-VERSION-LIQUIDITY-REVERSAL-V1",
+      "evidence_asset_ids": [
+        "ARCH-INTENT-002"
+      ],
+      "record_owner": "TASK-16"
+    }
+  ],
+  "research_artifacts": [
+    {
+      "research_artifact_id": "RESEARCH-ARTIFACT-LIQUIDITY-DATASET-001",
+      "hypothesis_version_ids": [
+        "HYP-VERSION-LIQUIDITY-REVERSAL-V1"
+      ],
+      "artifact_kind": "DATASET_SNAPSHOT",
+      "logical_uri": "evidence://task16/liquidity-dataset-001",
+      "content_sha256": "1111111111111111111111111111111111111111111111111111111111111111",
+      "created_at": "2026-07-29T09:00:00Z",
+      "first_reliable_available_at": "2026-07-29T09:00:00Z",
+      "dataset_as_of": "2026-07-29T08:00:00Z",
+      "tool_capability_id": "TOOL-CAPABILITY-DUCKDB-PIT-001",
+      "tool_name": "DuckDB",
+      "tool_version": "1.3.2",
+      "config_sha256": "2111111111111111111111111111111111111111111111111111111111111111",
+      "contains_sensitive_raw_conversation": false,
+      "record_owner": "TASK-16"
+    },
+    {
+      "research_artifact_id": "RESEARCH-ARTIFACT-LIQUIDITY-POPULATION-001",
+      "hypothesis_version_ids": [
+        "HYP-VERSION-LIQUIDITY-REVERSAL-V1"
+      ],
+      "artifact_kind": "CONFIG",
+      "logical_uri": "evidence://task16/liquidity-population-001",
+      "content_sha256": "2222222222222222222222222222222222222222222222222222222222222222",
+      "created_at": "2026-07-29T09:00:00Z",
+      "first_reliable_available_at": "2026-07-29T09:00:00Z",
+      "tool_name": "SMIAL",
+      "tool_version": "1.0",
+      "config_sha256": "3222222222222222222222222222222222222222222222222222222222222222",
+      "contains_sensitive_raw_conversation": false,
+      "record_owner": "TASK-16"
+    },
+    {
+      "research_artifact_id": "RESEARCH-ARTIFACT-LIQUIDITY-METHOD-001",
+      "hypothesis_version_ids": [
+        "HYP-VERSION-LIQUIDITY-REVERSAL-V1"
+      ],
+      "artifact_kind": "QUERY",
+      "logical_uri": "evidence://task16/liquidity-method-001",
+      "content_sha256": "3333333333333333333333333333333333333333333333333333333333333333",
+      "created_at": "2026-07-29T09:00:00Z",
+      "first_reliable_available_at": "2026-07-29T09:00:00Z",
+      "tool_capability_id": "TOOL-CAPABILITY-DUCKDB-PIT-001",
+      "tool_name": "DuckDB",
+      "tool_version": "1.3.2",
+      "config_sha256": "4333333333333333333333333333333333333333333333333333333333333333",
+      "contains_sensitive_raw_conversation": false,
+      "record_owner": "TASK-16"
+    },
+    {
+      "research_artifact_id": "RESEARCH-ARTIFACT-LIQUIDITY-COSTS-001",
+      "hypothesis_version_ids": [
+        "HYP-VERSION-LIQUIDITY-REVERSAL-V1"
+      ],
+      "artifact_kind": "CONFIG",
+      "logical_uri": "evidence://task16/liquidity-costs-001",
+      "content_sha256": "4444444444444444444444444444444444444444444444444444444444444444",
+      "created_at": "2026-07-29T09:00:00Z",
+      "first_reliable_available_at": "2026-07-29T09:00:00Z",
+      "tool_name": "SMIAL",
+      "tool_version": "1.0",
+      "config_sha256": "5444444444444444444444444444444444444444444444444444444444444444",
+      "contains_sensitive_raw_conversation": false,
+      "record_owner": "TASK-16"
+    },
+    {
+      "research_artifact_id": "RESEARCH-ARTIFACT-LIQUIDITY-RESULT-001",
+      "hypothesis_version_ids": [
+        "HYP-VERSION-LIQUIDITY-REVERSAL-V1"
+      ],
+      "artifact_kind": "REPORT",
+      "logical_uri": "evidence://task16/liquidity-result-001",
+      "content_sha256": "5555555555555555555555555555555555555555555555555555555555555555",
+      "created_at": "2026-07-29T12:00:00Z",
+      "first_reliable_available_at": "2026-07-29T12:00:00Z",
+      "tool_name": "SMIAL",
+      "tool_version": "1.0",
+      "contains_sensitive_raw_conversation": false,
+      "record_owner": "TASK-16"
+    },
+    {
+      "research_artifact_id": "RESEARCH-ARTIFACT-LIQUIDITY-REGIME-001",
+      "hypothesis_version_ids": [
+        "HYP-VERSION-LIQUIDITY-REVERSAL-V2"
+      ],
+      "artifact_kind": "DECISION_EVIDENCE",
+      "logical_uri": "evidence://task16/liquidity-regime-001",
+      "content_sha256": "6666666666666666666666666666666666666666666666666666666666666666",
+      "created_at": "2026-07-30T08:00:00Z",
+      "first_reliable_available_at": "2026-07-30T08:30:00Z",
+      "tool_name": "SMIAL",
+      "tool_version": "1.0",
+      "contains_sensitive_raw_conversation": false,
+      "record_owner": "TASK-16"
+    },
+    {
+      "research_artifact_id": "RESEARCH-ARTIFACT-LIQUIDITY-RESULT-002",
+      "hypothesis_version_ids": [
+        "HYP-VERSION-LIQUIDITY-REVERSAL-V2"
+      ],
+      "artifact_kind": "REPORT",
+      "logical_uri": "evidence://task16/liquidity-result-002",
+      "content_sha256": "7777777777777777777777777777777777777777777777777777777777777777",
+      "created_at": "2026-07-30T11:00:00Z",
+      "first_reliable_available_at": "2026-07-30T11:00:00Z",
+      "tool_name": "SMIAL",
+      "tool_version": "1.0",
+      "contains_sensitive_raw_conversation": false,
+      "record_owner": "TASK-16"
+    }
+  ],
+  "trials": [
+    {
+      "trial_id": "TRIAL-LIQUIDITY-REVERSAL-001",
+      "hypothesis_version_id": "HYP-VERSION-LIQUIDITY-REVERSAL-V1",
+      "research_cycle_id": "RESEARCH-CYCLE-LIQUIDITY-REVERSAL-001",
+      "trial_kind": "RETROSPECTIVE",
+      "estimand": "Net-return difference versus PIT-safe controls.",
+      "population_artifact_id": "RESEARCH-ARTIFACT-LIQUIDITY-POPULATION-001",
+      "control_artifact_ids": [
+        "RESEARCH-ARTIFACT-LIQUIDITY-POPULATION-001"
+      ],
+      "dataset_artifact_ids": [
+        "RESEARCH-ARTIFACT-LIQUIDITY-DATASET-001"
+      ],
+      "method_artifact_ids": [
+        "RESEARCH-ARTIFACT-LIQUIDITY-METHOD-001"
+      ],
+      "result_artifact_ids": [
+        "RESEARCH-ARTIFACT-LIQUIDITY-RESULT-001"
+      ],
+      "dataset_as_of": "2026-07-29T08:00:00Z",
+      "availability_cutoff": "2026-07-29T09:00:00Z",
+      "split_id": "SPLIT-LIQUIDITY-REVERSAL-001",
+      "holdout_consumption_ids": [
+        "HOLDOUT-CONSUMPTION-LIQUIDITY-001"
+      ],
+      "search_budget": {
+        "planned_variants": 3,
+        "executed_variants": 3,
+        "holdout_looks": 0
+      },
+      "cost_assumptions_artifact_id": "RESEARCH-ARTIFACT-LIQUIDITY-COSTS-001",
+      "outcome": "NEGATIVE",
+      "conclusion": "The effect did not survive explicit transaction costs.",
+      "limitation_codes": [
+        "REGIME_NOT_STRATIFIED"
+      ],
+      "completed_at": "2026-07-29T12:00:00Z",
+      "first_reliable_available_at": "2026-07-29T12:00:00Z",
+      "evidence_asset_ids": [
+        "EVIDENCE-T13-PILOT-AUDIT-OFFLINE-ACCEPTANCE-001"
+      ],
+      "record_owner": "TASK-16"
+    },
+    {
+      "trial_id": "TRIAL-LIQUIDITY-REVERSAL-002",
+      "hypothesis_version_id": "HYP-VERSION-LIQUIDITY-REVERSAL-V2",
+      "research_cycle_id": "RESEARCH-CYCLE-LIQUIDITY-REVERSAL-002",
+      "trial_kind": "REVALIDATION",
+      "estimand": "Regime-conditioned net-return difference versus frozen PIT-safe controls.",
+      "population_artifact_id": "RESEARCH-ARTIFACT-LIQUIDITY-POPULATION-001",
+      "control_artifact_ids": [
+        "RESEARCH-ARTIFACT-LIQUIDITY-POPULATION-001"
+      ],
+      "dataset_artifact_ids": [
+        "RESEARCH-ARTIFACT-LIQUIDITY-DATASET-001",
+        "RESEARCH-ARTIFACT-LIQUIDITY-REGIME-001"
+      ],
+      "method_artifact_ids": [
+        "RESEARCH-ARTIFACT-LIQUIDITY-METHOD-001"
+      ],
+      "result_artifact_ids": [
+        "RESEARCH-ARTIFACT-LIQUIDITY-RESULT-002"
+      ],
+      "dataset_as_of": "2026-07-30T08:00:00Z",
+      "availability_cutoff": "2026-07-30T08:30:00Z",
+      "split_id": "SPLIT-LIQUIDITY-REVERSAL-002",
+      "holdout_consumption_ids": [
+        "HOLDOUT-CONSUMPTION-LIQUIDITY-002"
+      ],
+      "search_budget": {
+        "planned_variants": 1,
+        "executed_variants": 1,
+        "holdout_looks": 1
+      },
+      "cost_assumptions_artifact_id": "RESEARCH-ARTIFACT-LIQUIDITY-COSTS-001",
+      "outcome": "POSITIVE",
+      "conclusion": "The frozen regime-conditioned variant survived the bounded controls.",
+      "limitation_codes": [
+        "SMALL_SAMPLE"
+      ],
+      "completed_at": "2026-07-30T11:00:00Z",
+      "first_reliable_available_at": "2026-07-30T11:00:00Z",
+      "evidence_asset_ids": [
+        "EVIDENCE-T13-PILOT-AUDIT-OFFLINE-ACCEPTANCE-001"
+      ],
+      "record_owner": "TASK-16"
+    }
+  ],
+  "decision_events": [
+    {
+      "decision_event_id": "DECISION-EVENT-LIQUIDITY-PROMOTE-001",
+      "hypothesis_version_id": "HYP-VERSION-LIQUIDITY-REVERSAL-V1",
+      "decision_kind": "PROMOTE",
+      "rationale": "Open one bounded retrospective research epoch.",
+      "decision_owner": "owner",
+      "decided_at": "2026-07-29T09:20:00Z",
+      "effective_at": "2026-07-29T09:20:00Z",
+      "first_reliable_available_at": "2026-07-29T09:20:00Z",
+      "trial_ids": [],
+      "next_condition": "Complete the frozen retrospective trial.",
+      "evidence_asset_ids": [
+        "ARCH-INTENT-002"
+      ],
+      "record_owner": "TASK-16"
+    },
+    {
+      "decision_event_id": "DECISION-EVENT-LIQUIDITY-DORMANT-001",
+      "hypothesis_version_id": "HYP-VERSION-LIQUIDITY-REVERSAL-V1",
+      "decision_kind": "MARK_DORMANT",
+      "rationale": "The unconditioned hypothesis failed net of costs.",
+      "decision_owner": "owner",
+      "decided_at": "2026-07-29T12:10:00Z",
+      "effective_at": "2026-07-29T12:10:00Z",
+      "first_reliable_available_at": "2026-07-29T12:10:00Z",
+      "trial_ids": [
+        "TRIAL-LIQUIDITY-REVERSAL-001"
+      ],
+      "next_condition": "Reconsider only after a named regime change.",
+      "evidence_asset_ids": [
+        "EVIDENCE-T13-PILOT-AUDIT-OFFLINE-ACCEPTANCE-001"
+      ],
+      "record_owner": "TASK-16"
+    },
+    {
+      "decision_event_id": "DECISION-EVENT-LIQUIDITY-REACTIVATE-001",
+      "hypothesis_version_id": "HYP-VERSION-LIQUIDITY-REVERSAL-V2",
+      "decision_kind": "REACTIVATE",
+      "rationale": "A named high-attention regime and a frozen positive revalidation justify a new research epoch.",
+      "decision_owner": "owner",
+      "decided_at": "2026-07-30T11:15:00Z",
+      "effective_at": "2026-07-30T11:15:00Z",
+      "first_reliable_available_at": "2026-07-30T11:15:00Z",
+      "trial_ids": [
+        "TRIAL-LIQUIDITY-REVERSAL-002"
+      ],
+      "next_condition": "Keep execution and live authority separately gated.",
+      "evidence_asset_ids": [
+        "RESEARCH-ARTIFACT-LIQUIDITY-REGIME-001"
+      ],
+      "record_owner": "TASK-16"
+    }
+  ],
+  "derivation_edges": [
+    {
+      "derivation_edge_id": "HYP-DERIVATION-LIQUIDITY-REACTIVATION-001",
+      "parent_hypothesis_version_ids": [
+        "HYP-VERSION-LIQUIDITY-REVERSAL-V1"
+      ],
+      "child_hypothesis_version_id": "HYP-VERSION-LIQUIDITY-REVERSAL-V2",
+      "derivation_kind": "REACTIVATION_REFORMULATION",
+      "rationale": "V2 retains the original mechanism and adds one named regime condition after the negative V1 result.",
+      "created_at": "2026-07-30T08:30:00Z",
+      "first_reliable_available_at": "2026-07-30T08:30:00Z",
+      "evidence_asset_ids": [
+        "RESEARCH-ARTIFACT-LIQUIDITY-RESULT-001",
+        "RESEARCH-ARTIFACT-LIQUIDITY-REGIME-001"
+      ],
+      "record_owner": "TASK-16"
+    }
+  ],
+  "activation_epochs": [
+    {
+      "activation_epoch_id": "ACTIVATION-EPOCH-LIQUIDITY-RESEARCH-001",
+      "hypothesis_version_id": "HYP-VERSION-LIQUIDITY-REVERSAL-V1",
+      "epoch_ordinal": 1,
+      "mode": "RESEARCH",
+      "opened_at": "2026-07-29T09:21:00Z",
+      "first_reliable_available_at": "2026-07-29T09:21:00Z",
+      "activation_basis_decision_event_id": "DECISION-EVENT-LIQUIDITY-PROMOTE-001",
+      "regime_evidence_asset_ids": [
+        "ARCH-INTENT-002"
+      ],
+      "authority_receipt_asset_ids": [],
+      "record_owner": "TASK-16"
+    },
+    {
+      "activation_epoch_id": "ACTIVATION-EPOCH-LIQUIDITY-RESEARCH-002",
+      "hypothesis_version_id": "HYP-VERSION-LIQUIDITY-REVERSAL-V2",
+      "epoch_ordinal": 2,
+      "mode": "RESEARCH",
+      "opened_at": "2026-07-30T11:16:00Z",
+      "first_reliable_available_at": "2026-07-30T11:16:00Z",
+      "activation_basis_decision_event_id": "DECISION-EVENT-LIQUIDITY-REACTIVATE-001",
+      "previous_activation_epoch_id": "ACTIVATION-EPOCH-LIQUIDITY-RESEARCH-001",
+      "regime_evidence_asset_ids": [
+        "RESEARCH-ARTIFACT-LIQUIDITY-REGIME-001"
+      ],
+      "authority_receipt_asset_ids": [],
+      "record_owner": "TASK-16"
+    }
+  ]
+}

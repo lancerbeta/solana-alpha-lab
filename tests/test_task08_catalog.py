@@ -93,8 +93,9 @@ class Task08CatalogTests(unittest.TestCase):
             ),
             (0, 9, 0),
         )
-        self.assertEqual(len(self.snapshot.assets), 272)
-        self.assertEqual(len(self.snapshot.queries), 7)
+        checkpoint = self.snapshot.manifest["current_checkpoint"]
+        self.assertEqual(len(self.snapshot.assets), checkpoint["assets"])
+        self.assertEqual(len(self.snapshot.queries), checkpoint["queries"])
         self.assertTrue(
             TASK08_ASSET_IDS.issubset(
                 set(self.snapshot.manifest["mandatory_asset_ids"])

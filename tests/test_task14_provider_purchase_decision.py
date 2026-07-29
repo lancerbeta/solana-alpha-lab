@@ -323,8 +323,10 @@ class Task14ProviderPurchaseDecisionTests(unittest.TestCase):
             for document in asset_documents
             for record in document["records"]
         }
-        self.assertEqual(manifest["catalog_version"], "0.18.0")
-        self.assertEqual(len(records), 272)
+        self.assertEqual(
+            len(records),
+            manifest["current_checkpoint"]["assets"],
+        )
         self.assertTrue(TASK14_ASSET_IDS.issubset(records))
         self.assertTrue(
             TASK14_ASSET_IDS.issubset(

@@ -32,6 +32,28 @@ class CatalogSnapshot:
     lifecycle_records: dict[str, dict[str, Any]]
 
 
+def observed_catalog_checkpoint(snapshot: CatalogSnapshot) -> dict[str, int]:
+    return {
+        "assets": len(snapshot.assets),
+        "asset_registries": len(snapshot.assets_documents),
+        "schemas": len(snapshot.manifest["root_resolver"]["schemas"]),
+        "queries": len(snapshot.queries),
+        "lifecycle_registries": len(snapshot.lifecycle_documents),
+        "lifecycle_records": len(snapshot.lifecycle_records),
+    }
+
+
+def validate_current_checkpoint(snapshot: CatalogSnapshot) -> None:
+    expected = snapshot.manifest["current_checkpoint"]
+    observed = observed_catalog_checkpoint(snapshot)
+    if expected != observed:
+        raise CatalogValidationError(
+            "catalog_current_checkpoint_drift:"
+            f"expected={json.dumps(expected, sort_keys=True)}:"
+            f"observed={json.dumps(observed, sort_keys=True)}"
+        )
+
+
 EXPECTED_LIFECYCLE_REGISTRIES = {
     "registries/research_cycles.yaml": "research_cycles",
     "registries/hypotheses.yaml": "hypotheses",
@@ -374,7 +396,7 @@ def load_and_validate(
             f"lifecycle:{relative}",
         )
         lifecycle_documents.append(document)
-    return validate_semantics(
+    snapshot = validate_semantics(
         manifest,
         asset_documents,
         query_documents,
@@ -382,6 +404,8 @@ def load_and_validate(
         root=root,
         allow_generated_drift=allow_generated_drift,
     )
+    validate_current_checkpoint(snapshot)
+    return snapshot
 
 
 def main() -> int:
