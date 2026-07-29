@@ -2011,13 +2011,13 @@ records:
     contains_raw_data: false
     sensitivity: INTERNAL_NON_SECRET
 - asset_id: VALIDATOR-REPOSITORY-STATE-001
-  record_version: '2.4'
+  record_version: '2.5'
   asset_type: script
   purpose: Fail-closed historical and compositional repository-state/topology
     validator through CTRL-BATON A6.4.
   status: IMPLEMENTED_UNVERIFIED
   origin: REPOSITORY
-  as_of: '2026-07-28'
+  as_of: '2026-07-29'
   truth_owner: TASK-04
   location:
     kind: git_path
@@ -2025,7 +2025,7 @@ records:
     repository_path: scripts/validate_baseline.py
   integrity:
     kind: sha256
-    sha256: cf682fa19ec02ed27c5c1dad2178e3623623bdb5d70c7f4216f51b36d1e1c9d7
+    sha256: d4aeebc44e8ce5f1ba2dd20a61baec412c3b586f57590a58cddc18e4a3ec9c9c
   access:
     mode: read_only
     method: command
