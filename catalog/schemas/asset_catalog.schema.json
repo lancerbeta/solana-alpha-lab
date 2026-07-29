@@ -1,6 +1,6 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "urn:smial:catalog:asset-registry:1.1",
+  "$id": "urn:smial:catalog:asset-registry:1.2",
   "title": "SMIAL asset registry with pre-Git provenance",
   "type": "object",
   "additionalProperties": false,
@@ -469,7 +469,8 @@
           }
         },
         "imported_by_task": {
-          "const": "TASK-03"
+          "type": "string",
+          "pattern": "^TASK-[0-9]{2}$"
         },
         "import_mode": {
           "enum": [

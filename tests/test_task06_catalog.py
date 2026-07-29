@@ -89,7 +89,7 @@ class Task06CatalogTests(unittest.TestCase):
             ),
             (0, 9, 0),
         )
-        self.assertEqual(len(self.snapshot.assets), 266)
+        self.assertEqual(len(self.snapshot.assets), 272)
         self.assertEqual(len(self.snapshot.queries), 7)
         self.assertTrue(
             TASK06_ASSET_IDS.issubset(

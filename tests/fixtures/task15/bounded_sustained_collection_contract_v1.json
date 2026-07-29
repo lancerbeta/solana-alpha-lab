@@ -1,0 +1,269 @@
+{
+  "schema_version": "1.0",
+  "contract_id": "CONTRACT-T15-BOUNDED-SUSTAINED-COLLECTION-001",
+  "contract_version": "1.0",
+  "task_id": "TASK-15",
+  "atom_id": "T15-A2_FROZEN_BOUNDED_MEASUREMENT_CONTRACT_V1",
+  "as_of": "2026-07-29",
+  "status": "FROZEN_MEASUREMENT_NOT_DUE",
+  "current_disposition": {
+    "acquisition_path": "MEASUREMENT_NOT_DUE",
+    "provider_purchase": "DEFER",
+    "reason": "NO_IMMUTABLE_NAMED_HYPOTHESIS_DATA_REQUIREMENT_MANIFEST"
+  },
+  "upstream_evidence": [
+    {
+      "asset_id": "ARCH-INTENT-001",
+      "repository_path": "docs/architecture/intents/ARCH-INTENT-001-hypothesis-factory-and-regime-aware-orchestration.md",
+      "sha256": "59f810a75bce0c9a55f3e7dd751744a06d2e4a19a0378f47b08fb2b2bc2edad6",
+      "use": "ACCEPTED_HYPOTHESIS_FACTORY_AND_REGIME_LIFECYCLE_DIRECTION"
+    },
+    {
+      "asset_id": "EVIDENCE-T01-HYPOTHESIS-DATA-COVERAGE-MATRIX-001",
+      "repository_path": "docs/evidence/pre_git/task01/hypothesis_data_coverage_matrix_v1.md",
+      "sha256": "5ba0b904d4ca3942cb701fa28ccbc7c35c8ce580385c6766a2fc4596b2c16814",
+      "use": "ADOPT_DOMAIN_TAXONOMY_AND_COVERAGE_CLASSES"
+    },
+    {
+      "asset_id": "EVIDENCE-T01-DATA-OPTION-TIERS-001",
+      "repository_path": "docs/evidence/pre_git/task01/data_option_tiers_v1.yaml",
+      "sha256": "f19c0263f94b19135d91d2e61f1f14d158b48c4bd030a514d640041df0210d13",
+      "use": "HISTORICAL_PROPOSAL_OPERATIONAL_CADENCE_NOT_ENFORCED"
+    },
+    {
+      "asset_id": "DECISION-T14-PROVIDER-PURCHASE-001",
+      "repository_path": "docs/decisions/provider_decision_v2.md",
+      "sha256": "39dbf21501f950e0365b04668f10387d43cae2db66a997159b0061998c09fc41",
+      "use": "DEFER_AND_PROVIDER_METERING_CONVENTION"
+    },
+    {
+      "asset_id": "FIXTURE-T14-PROVIDER-PURCHASE-DECISION-001",
+      "repository_path": "tests/fixtures/task14/provider_purchase_decision_v1.json",
+      "sha256": "572243a331b75a3723893e4fe24730c15af6dc7a77d7f0bfa2c96e968291eee1",
+      "use": "WATCHLIST_AND_PURCHASE_RECONSIDERATION_BOUNDARY"
+    },
+    {
+      "asset_id": "EVIDENCE-T14-PROVIDER-PURCHASE-ACCEPTANCE-001",
+      "repository_path": "docs/evidence/task14/provider_purchase_decision_acceptance_receipt_v1.json",
+      "sha256": "47d950c863822bcfa72ade4172d1b834f029ac1198e05af6986939c2de94eb9e",
+      "use": "ACCEPTED_ZERO_EFFECTS_DEFER_RECEIPT"
+    }
+  ],
+  "prior_task_compatibility": {
+    "neutral_or_reusable": [
+      "TASK03_CATALOG_AND_LIFECYCLE_REGISTRIES",
+      "TASK05_PIT_DATA_CONTRACT",
+      "TASK06_RAW_ENVELOPE_AND_STORAGE_GUARDS",
+      "TASK07_BOUNDED_PROVIDER_PRIMITIVES",
+      "TASK08_LIFECYCLE_DISCOVERY_REDUCER",
+      "TASK09_PUMPSWAP_TOUCH_OBSERVATION",
+      "TASK10_TRIGGERED_QUOTE_OBSERVATION",
+      "TASK11_ENTITY_INPUT_OBSERVATION",
+      "TASK12_OFFLINE_SUPERVISOR",
+      "TASK13_OFFLINE_AUDITOR",
+      "TASK14_PROVIDER_PURCHASE_DEFER"
+    ],
+    "historical_bytes_unchanged": true,
+    "superseded_operational_interpretation": [
+      "T0_CORE_IMPLIES_GLOBAL_DENSE_OR_ALWAYS_ON_COLLECTION",
+      "PROVISIONAL_CONTINUOUS_WHEN_COLLECTOR_RUNS_IS_A_PRODUCTION_DEFAULT",
+      "PROVISIONAL_RAW_RETENTION_IS_ENFORCED_BEFORE_TASK16"
+    ]
+  },
+  "acquisition_precedence": [
+    "THIN_ONLINE_DECISION_LEDGER",
+    "HISTORICAL_BATCH_FIRST",
+    "REUSABLE_CONTENT_ADDRESSED_CACHE",
+    "HYPOTHESIS_DATASET",
+    "TRIGGERED_LIVE_CAPTURE_ONLY_IF_HISTORY_IS_INSUFFICIENT"
+  ],
+  "hypothesis_ownership": {
+    "global_detailed_watchlist": false,
+    "watchlist_owner": "IMMUTABLE_HYPOTHESIS_VERSION_AND_TRIAL_OR_ACTIVATION_EPOCH",
+    "multi_watchlist_membership_allowed": true,
+    "cross_hypothesis_authority_inheritance": false,
+    "reactivation": "NEW_EPOCH_NO_HISTORICAL_REWRITE",
+    "required_identity_fields": [
+      "hypothesis_id",
+      "hypothesis_version",
+      "trial_id_or_activation_epoch",
+      "policy_version",
+      "research_question",
+      "mechanism",
+      "falsifier",
+      "population_spec",
+      "control_spec",
+      "entry_logic",
+      "monitoring_logic",
+      "exit_logic",
+      "regime_context_requirements",
+      "evidence_checkpoint"
+    ],
+    "membership_and_evaluation_fields": [
+      "mint",
+      "pool_identity_if_applicable",
+      "hypothesis_id",
+      "hypothesis_version",
+      "trial_id_or_activation_epoch",
+      "policy_version",
+      "matched_rule_ids",
+      "input_feature_versions",
+      "evaluation_result",
+      "reason_codes",
+      "missingness_codes",
+      "evaluated_at",
+      "entered_at",
+      "exited_at",
+      "first_reliable_available_at",
+      "source_revision",
+      "evidence_checkpoint"
+    ]
+  },
+  "hypothesis_data_requirement_manifest": {
+    "required_before_any_acquisition": true,
+    "required_fields": [
+      "hypothesis_id",
+      "hypothesis_version",
+      "trial_id",
+      "research_question",
+      "candidate_population_spec",
+      "rejected_and_control_population_spec",
+      "feature_definitions",
+      "label_definitions",
+      "field_units_keys_and_timestamps",
+      "cadence",
+      "lookback",
+      "validation_window",
+      "retention",
+      "pit_and_leakage_rules",
+      "coverage_class_per_field",
+      "preferred_source_and_fallback",
+      "source_revision_policy",
+      "request_credit_storage_time_caps",
+      "cheapest_falsifier",
+      "stop_conditions",
+      "live_capture_justification"
+    ],
+    "coverage_classes": [
+      "RECONSTRUCTIBLE_LATER",
+      "FORWARD_ONLY",
+      "PARTIAL_OR_VENDOR_DEPENDENT",
+      "DERIVED_PIT"
+    ],
+    "field_or_cadence_without_named_consumer": "EXCLUDED"
+  },
+  "thin_online_decision_ledger": {
+    "always_on_detailed_market_data": false,
+    "append_only": true,
+    "fields": [
+      "discovery_or_evaluation_time",
+      "mint_and_pool_identity",
+      "hypothesis_trial_and_policy_versions",
+      "exact_rule_input_values",
+      "input_feature_versions",
+      "source_revision",
+      "first_reliable_available_at",
+      "admit_reject_or_not_evaluable",
+      "reason_codes",
+      "missingness_codes",
+      "provider_failures",
+      "coverage_gaps",
+      "watchlist_membership_transition",
+      "decision_used_quote_or_liquidity_snapshot"
+    ],
+    "forbidden": [
+      "CONTINUOUS_ALL_TOKEN_PRICE_TICKS",
+      "ALL_PROVIDER_ENVELOPES",
+      "RICH_DATA_FOR_EVERY_DISCOVERED_TOKEN"
+    ]
+  },
+  "historical_batch": {
+    "default_for_reconstructible_fields": true,
+    "allowed_populations": [
+      "ADMITTED_WATCHLIST_MEMBERS",
+      "LATER_FILTER_REJECTIONS",
+      "EXPLICIT_SAMPLED_CONTROL_COHORT",
+      "BOUNDED_BROAD_HISTORICAL_UNIVERSE_FOR_PATTERN_DISCOVERY"
+    ],
+    "winner_only_population_allowed": false,
+    "selected_candidate_only_population_allowed": false,
+    "cache_key_fields": [
+      "source",
+      "query_contract",
+      "source_revision",
+      "content_sha256"
+    ],
+    "compatible_hypothesis_cache_reuse_required": true,
+    "historical_reconstruction_backdates_availability": false,
+    "fetch_time_and_claimed_history_recorded": true
+  },
+  "live_capture_admission": {
+    "all_required": [
+      "NAMED_IMMUTABLE_HYPOTHESIS_DATA_MANIFEST",
+      "EXACT_FIELD_AND_CADENCE_REQUIRED",
+      "FIELD_FORWARD_ONLY_OR_HISTORICAL_SOURCE_INADEQUACY_PROVEN",
+      "FIELD_CAN_CHANGE_HYPOTHESIS_OR_EXECUTION_VERDICT",
+      "CHEAPER_CADENCE_FILTER_BATCH_AND_CACHE_PATHS_FALSIFIED",
+      "FROZEN_WATCHLIST_AND_CONTROL_FIXTURE",
+      "HARD_BUDGETS_AND_DETERMINISTIC_STOPS",
+      "SEPARATE_EXPLICIT_EXTERNAL_ATOM"
+    ],
+    "stop_with_hypothesis_or_epoch_by_default": true,
+    "cross_hypothesis_reuse_requires_named_consumer": true,
+    "examples": [
+      "LIVE_QUOTE_OR_SLIPPAGE",
+      "PROVIDER_LATENCY",
+      "TRANSIENT_LIQUIDITY",
+      "SHORT_LIVED_NEWS_STATE",
+      "OPEN_POSITION_MONITORING_EVIDENCE"
+    ]
+  },
+  "acquisition_path_outcomes": [
+    "HISTORICAL_BATCH_PATH_ACCEPTED",
+    "LIVE_MEASUREMENT_ELIGIBLE",
+    "MEASUREMENT_NOT_DUE",
+    "ACQUISITION_PATH_INCONCLUSIVE"
+  ],
+  "future_live_measurement_ceiling": {
+    "architecture_default": false,
+    "separate_external_authority_required": true,
+    "max_hypothesis_versions": 1,
+    "max_active_candidate_mints": 10,
+    "calibration_wall_clock_seconds": 1800,
+    "total_wall_clock_seconds": 86400,
+    "wss_connection_attempts": 2,
+    "automatic_retries": 0,
+    "automatic_reconnects": 0,
+    "hard_credit_cap": 40000,
+    "meter_credits": 2,
+    "meter_decimal_bytes": 100000,
+    "credit_guard": 1,
+    "max_metered_uncompressed_bytes": 1999900000,
+    "max_bytes_modeled_credits": 39999,
+    "max_local_dataset_bytes": 268435456,
+    "min_free_disk_bytes_after_allocation": 2147483648,
+    "cash_spend_usd": 0,
+    "effective_credit_cap_formula": "min(40000, floor(0.10 * verified_remaining_monthly_credits))",
+    "minimum_effective_credit_cap_to_start": 5000,
+    "actual_manifest_caps_must_not_exceed_ceiling": true,
+    "calibration_projection_breach_action": "STOP"
+  },
+  "provider_decision_outcomes_after_eligible_live_measurement": [
+    "FREE_TIER_SUFFICIENT_CANDIDATE",
+    "PAID_PROPOSAL_ELIGIBLE_CANDIDATE",
+    "MEASUREMENT_INCONCLUSIVE"
+  ],
+  "authority": {
+    "network_calls_in_atom": 0,
+    "provider_api_rpc_wss_calls_in_atom": 0,
+    "account_or_dashboard_actions": 0,
+    "credential_use": 0,
+    "dependency_changes": 0,
+    "cash_spend_usd": 0,
+    "collector_or_scheduler_actions": 0,
+    "wallet_signer_transaction_actions": 0,
+    "commit_push_pr_merge_actions": 0
+  },
+  "catalog_transaction_status": "DEFERRED_TO_T15_A3",
+  "next_atom": "T15-A3_DETERMINISTIC_ACCEPTANCE_AND_CATALOG_V1"
+}

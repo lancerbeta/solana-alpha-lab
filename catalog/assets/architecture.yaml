@@ -1,6 +1,6 @@
 schema_version: '1.1'
 registry_id: CATALOG-ASSET-REGISTRY-ARCHITECTURE-001
-as_of: '2026-07-21'
+as_of: '2026-07-29'
 records:
 - asset_id: ARCH-INTENT-001
   record_version: '1.0'
@@ -53,3 +53,63 @@ records:
     canonicality: CURRENT_INTENT
     availability_note: Current user-owned architecture direction; it is not attributed to TASK-01 or TASK-02 and does not
       claim implementation.
+- asset_id: ARCH-INTENT-002
+  record_version: '1.0'
+  asset_type: architecture_intent
+  purpose: Accepted operating model for hypothesis-owned data acquisition,
+    append-only hypothesis provenance and derivation memory, research-tool
+    routing, lifecycle monitoring, owner pulse and a mandatory Factory Fit
+    review before every future task completion bundle.
+  status: ACCEPTED_DIRECTION_NOT_IMPLEMENTED
+  origin: PROJECT_SOURCE
+  as_of: '2026-07-29'
+  truth_owner: USER_GOAL_OWNER
+  location:
+    kind: git_path
+    logical_uri: repo://docs/architecture/intents/ARCH-INTENT-002-hypothesis-factory-operating-model.md
+    repository_path: docs/architecture/intents/ARCH-INTENT-002-hypothesis-factory-operating-model.md
+  integrity:
+    kind: sha256
+    sha256: b8ba252d420925304b448292f9558e9ec29d60d7da34a59f8d198eb1e32dc674
+  access:
+    mode: read_only
+    method: file
+    recipe_id: QUERY-CATALOG-RESOLVE-ASSET-001
+    network_required: false
+    secrets_required: false
+  relations:
+  - relation_type: derived_from
+    target_asset_id: ARCH-INTENT-001
+  - relation_type: advises
+    target_asset_id: CONTRACT-T15-BOUNDED-SUSTAINED-COLLECTION-001
+  - relation_type: evidenced_by
+    target_asset_id: EVIDENCE-T15-HYPOTHESIS-DRIVEN-ACQUISITION-ACCEPTANCE-001
+  - relation_type: validated_by
+    target_asset_id: TEST-T15-HYPOTHESIS-DRIVEN-ACQUISITION-ACCEPTANCE-001
+  consumers:
+  - FACTORY-001
+  - REG-RESEARCH-001
+  - REG-DEPLOY-001
+  - ORCH-001
+  - TASK-15
+  - TASK-17
+  evidence:
+  - evidence_id: EVIDENCE-ARCH-INTENT-002
+    kind: decision
+    reference: EVIDENCE-T15-HYPOTHESIS-DRIVEN-ACQUISITION-ACCEPTANCE-001
+    result: PASS
+  classification:
+    contains_secrets: false
+    contains_raw_data: false
+    sensitivity: INTERNAL_NON_SECRET
+  provenance:
+    created_at: '2026-07-29'
+    first_reliable_available_at: '2026-07-29'
+    imported_by_task: TASK-15
+    import_mode: REGISTERED_CURRENT_INTENT
+    past_availability_claim: NO_PAST_AVAILABILITY_CLAIM
+    retention: TRACKED_REFERENCE
+    canonicality: CURRENT_INTENT
+    availability_note: Current user-owned architecture direction accepted in
+      TASK-15; implementation and canonical Operating System reconciliation
+      remain separate.
