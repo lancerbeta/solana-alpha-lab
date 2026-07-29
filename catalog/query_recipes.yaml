@@ -235,8 +235,10 @@ recipes:
     format: json
     max_records: 100
 - recipe_id: QUERY-T16-PRIOR-WORK-001
-  record_version: '1.0'
-  purpose: Search the offline hypothesis research memory at an explicit point-in-time cutoff for reusable prior work without automatic rejection or promotion.
+  record_version: '2.0'
+  purpose: Search the exact offline TASK-16 fixture or TASK-17 production
+    hypothesis research memory at an explicit point-in-time cutoff for
+    reusable prior work without automatic rejection or promotion.
   kind: local_command
   read_only: true
   bounded: true
@@ -265,10 +267,10 @@ recipes:
   parameters:
   - name: memory_path
     required: true
-    pattern: ^tests/fixtures/task16/[a-z0-9_]+[.]json$
+    pattern: ^(?:tests/fixtures/task16/hypothesis_research_memory_v1|docs/evidence/task17/first_bounded_hypothesis_cycle_v1)[.]json$
   - name: query_id
     required: true
-    pattern: ^[A-Z][A-Z0-9]*(?:-[A-Z0-9]+)+$
+    pattern: ^PRIOR-WORK-QUERY-[A-Z0-9]+(?:-[A-Z0-9]+)*$
   - name: as_of
     required: true
     pattern: '^20[0-9]{2}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}(?:[.][0-9]{1,6})?Z$'
@@ -282,6 +284,7 @@ recipes:
   - SCRIPT-T16-PRIOR-WORK-QUERY-001
   - SCHEMA-T16-HYPOTHESIS-LIFECYCLE-RESEARCH-MEMORY-001
   - FIXTURE-T16-HYPOTHESIS-RESEARCH-MEMORY-001
+  - DATA-T17-HYPOTHESIS-RESEARCH-MEMORY-001
   output_contract:
     format: json
     max_records: 50

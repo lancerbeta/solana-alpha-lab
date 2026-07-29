@@ -1,0 +1,190 @@
+{
+  "schema_version": "1.0",
+  "memory_id": "SMIAL-HYPOTHESIS-RESEARCH-MEMORY",
+  "as_of": "2026-07-29T12:18:49Z",
+  "truth_owner": "TASK-17",
+  "append_only": true,
+  "history_rewrite_policy": "CORRECT_WITH_NEW_RECORD_AND_SUPERSEDES_LINK",
+  "current_state_is_projection": true,
+  "hypothesis_families": [
+    {
+      "family_id": "HYP-FAMILY-EXECUTION-CAPACITY-CURVATURE",
+      "title": "Execution-capacity curvature under notional scaling",
+      "mechanism_class": "SIZE_DEPENDENT_EXECUTABLE_ROUTE_DEPTH",
+      "created_at": "2026-07-29T12:18:49Z",
+      "first_reliable_available_at": "2026-07-29T12:18:49Z",
+      "record_owner": "TASK-17",
+      "evidence_asset_ids": [
+        "PRE-GIT-TASK01-A019",
+        "EVIDENCE-T10-JUPITER-QUOTE-SUMMARY-002",
+        "EVIDENCE-T17-FIRST-BOUNDED-HYPOTHESIS-CYCLE-001"
+      ]
+    }
+  ],
+  "hypothesis_origins": [
+    {
+      "origin_id": "HYP-ORIGIN-EXECUTION-CAPACITY-TASK10",
+      "hypothesis_version_id": "HYP-VERSION-EXECUTION-CAPACITY-CURVATURE-V1",
+      "origin_kind": "DATA_ANALYSIS",
+      "originator": "TASK-17 control plane from retained TASK-01 and TASK-10 evidence",
+      "observed_at": "2026-07-28T01:58:29Z",
+      "recorded_at": "2026-07-29T12:18:49Z",
+      "first_reliable_available_at": "2026-07-29T12:18:49Z",
+      "initial_observation": "The retained TASK-10 quote-only panel for one selected mint deteriorated monotonically from 342.1660 bps at USD 10 to 1118.8821 bps at USD 100. TASK-01 H08 had already named execution capacity as a bounded notional-sweep question. This is one real point-in-time observation, not population evidence, fill evidence, NetReturn or alpha.",
+      "source_reference_asset_ids": [
+        "PRE-GIT-TASK01-A019",
+        "EVIDENCE-T10-JUPITER-QUOTE-SUMMARY-002"
+      ],
+      "artifact_ids": [
+        "RESEARCH-ARTIFACT-T17-H08-COVERAGE-MATRIX-001",
+        "RESEARCH-ARTIFACT-T17-TASK10-QUOTE-SUMMARY-001"
+      ],
+      "record_owner": "TASK-17"
+    }
+  ],
+  "research_cycles": [
+    {
+      "research_cycle_id": "RESEARCH-CYCLE-EXECUTION-CAPACITY-001",
+      "question": "Do repeated matched quote-only panels show a reproducible rise in round-trip cost from USD 10 to USD 100, making a size curve necessary before future strategy-capacity decisions?",
+      "estimand": "Median across complete matched panels of cost_bps(USD100) minus cost_bps(USD10), where cost_bps(n) is 10,000 times one minus reverse_sell_usdc_atomic divided by buy_usdc_atomic.",
+      "population_and_controls": "Exact versioned hypothesis-watchlist members only; matched within token, triggered window, provider endpoint and version, and response class; frozen USD notionals 10, 25, 50 and 100; each reverse-sell input equals its preceding buy output; no-route, timeout and invalid response remain terminal nonnumeric observations.",
+      "available_data_asset_ids": [
+        "PRE-GIT-TASK01-A019",
+        "EVIDENCE-T10-JUPITER-QUOTE-SUMMARY-002"
+      ],
+      "required_output": "One data verdict and a separately gated next action. Current verdict is LIVE_NON_RECONSTRUCTABLE_NEED; provider capture remains NOT_AUTHORIZED.",
+      "error_cost": "A false safe-capacity conclusion can turn a paper edge into loss; rejecting a usable size is the cheaper error at this stage.",
+      "time_cap_minutes": 90,
+      "cash_cap_usd": 0,
+      "privacy_boundary": "Public market identifiers and sanitized content hashes only; no credentials, account data, raw conversation, wallet material or personal data.",
+      "validation_owner": "TASK-17 owning control plane",
+      "opened_at": "2026-07-29T12:18:49Z",
+      "first_reliable_available_at": "2026-07-29T12:18:49Z",
+      "hypothesis_version_ids": [
+        "HYP-VERSION-EXECUTION-CAPACITY-CURVATURE-V1"
+      ],
+      "record_owner": "TASK-17"
+    }
+  ],
+  "hypothesis_versions": [
+    {
+      "hypothesis_version_id": "HYP-VERSION-EXECUTION-CAPACITY-CURVATURE-V1",
+      "family_id": "HYP-FAMILY-EXECUTION-CAPACITY-CURVATURE",
+      "version_ordinal": 1,
+      "research_cycle_id": "RESEARCH-CYCLE-EXECUTION-CAPACITY-001",
+      "origin_id": "HYP-ORIGIN-EXECUTION-CAPACITY-TASK10",
+      "definition_state": "FROZEN",
+      "statement": "Across matched point-in-time quote panels, quote-only round-trip cost tends to rise as USD notional increases from 10 to 100; therefore future capacity decisions must use a size curve rather than one generic liquidity figure or a single quote.",
+      "mechanism": "Limited executable route depth and route fragmentation create nonlinear price impact as order size consumes progressively worse liquidity.",
+      "falsifier": "The bounded population falsifies the definition if median cost_bps(USD100) minus cost_bps(USD10) is not positive, no more than half of complete panels have all three adjacent cost increases, or the apparent pattern exists only during provider error or outage states.",
+      "expected_regime_terms": [
+        "fragmented liquidity",
+        "thin executable depth",
+        "volatile intraday conditions"
+      ],
+      "feature_definition_asset_ids": [],
+      "label_definition_asset_ids": [],
+      "data_requirement_asset_id": "DATA-REQUIREMENT-T17-EXECUTION-CAPACITY-001",
+      "named_consumer_ids": [
+        "FACTORY-001",
+        "TASK-17"
+      ],
+      "created_at": "2026-07-29T12:18:49Z",
+      "first_reliable_available_at": "2026-07-29T12:18:49Z",
+      "definition_sha256": "5672d63dd8dbf8cc67a041cc1cc7fd75948de17e3a1c7cbaeb8a488ad790220b",
+      "evidence_asset_ids": [
+        "PRE-GIT-TASK01-A019",
+        "EVIDENCE-T10-JUPITER-QUOTE-SUMMARY-002",
+        "EVIDENCE-T17-FIRST-BOUNDED-HYPOTHESIS-CYCLE-001"
+      ],
+      "record_owner": "TASK-17"
+    }
+  ],
+  "research_artifacts": [
+    {
+      "research_artifact_id": "RESEARCH-ARTIFACT-T17-H08-COVERAGE-MATRIX-001",
+      "hypothesis_version_ids": [
+        "HYP-VERSION-EXECUTION-CAPACITY-CURVATURE-V1"
+      ],
+      "artifact_kind": "REPORT",
+      "logical_uri": "repo://docs/evidence/pre_git/task01/hypothesis_data_coverage_matrix_v1.md",
+      "content_sha256": "5ba0b904d4ca3942cb701fa28ccbc7c35c8ce580385c6766a2fc4596b2c16814",
+      "created_at": "2026-07-18T23:59:59Z",
+      "first_reliable_available_at": "2026-07-18T23:59:59Z",
+      "tool_name": "Git exact-bytes pre-Git evidence import",
+      "tool_version": "1.0",
+      "contains_sensitive_raw_conversation": false,
+      "record_owner": "TASK-17"
+    },
+    {
+      "research_artifact_id": "RESEARCH-ARTIFACT-T17-TASK10-QUOTE-SUMMARY-001",
+      "hypothesis_version_ids": [
+        "HYP-VERSION-EXECUTION-CAPACITY-CURVATURE-V1"
+      ],
+      "artifact_kind": "DECISION_EVIDENCE",
+      "logical_uri": "repo://docs/evidence/task10/jupiter_quote_logger_execution_summary_v2.md",
+      "content_sha256": "578b5312246303cf6da38e45f52077b2e6a0dfa4f9e0e318c824fb20ab03dccd",
+      "created_at": "2026-07-28T23:59:59Z",
+      "first_reliable_available_at": "2026-07-28T23:59:59Z",
+      "dataset_as_of": "2026-07-28T01:58:29Z",
+      "tool_name": "TASK-10 bounded Jupiter quote logger",
+      "tool_version": "2.0",
+      "contains_sensitive_raw_conversation": false,
+      "record_owner": "TASK-17"
+    },
+    {
+      "research_artifact_id": "RESEARCH-ARTIFACT-T17-PRIOR-WORK-QUERY-001",
+      "hypothesis_version_ids": [
+        "HYP-VERSION-EXECUTION-CAPACITY-CURVATURE-V1"
+      ],
+      "artifact_kind": "QUERY",
+      "logical_uri": "repo://scripts/query_hypothesis_research_memory.py",
+      "content_sha256": "19a4cbb370d5f054f785641953e07ab3d78bfcd942b69eacdfb469315d37eaf6",
+      "created_at": "2026-07-29T12:18:49Z",
+      "first_reliable_available_at": "2026-07-29T12:18:49Z",
+      "tool_capability_id": "SCRIPT-T16-PRIOR-WORK-QUERY-001",
+      "tool_name": "query_hypothesis_research_memory.py",
+      "tool_version": "1.0",
+      "contains_sensitive_raw_conversation": false,
+      "record_owner": "TASK-17"
+    },
+    {
+      "research_artifact_id": "RESEARCH-ARTIFACT-T17-DOSSIER-001",
+      "hypothesis_version_ids": [
+        "HYP-VERSION-EXECUTION-CAPACITY-CURVATURE-V1"
+      ],
+      "artifact_kind": "REPORT",
+      "logical_uri": "repo://docs/evidence/task17/first_bounded_hypothesis_cycle_v1.md",
+      "content_sha256": "83f309a4c657edddca4ea3c80dcec8b881b631b9dee9459757d99a4e7a8f1004",
+      "created_at": "2026-07-29T12:18:49Z",
+      "first_reliable_available_at": "2026-07-29T12:18:49Z",
+      "tool_name": "TASK-17 owning control plane",
+      "tool_version": "1.0",
+      "contains_sensitive_raw_conversation": false,
+      "record_owner": "TASK-17"
+    }
+  ],
+  "trials": [],
+  "decision_events": [
+    {
+      "decision_event_id": "DECISION-EVENT-EXECUTION-CAPACITY-LIVE-NEED-001",
+      "hypothesis_version_id": "HYP-VERSION-EXECUTION-CAPACITY-CURVATURE-V1",
+      "decision_kind": "PAUSE",
+      "rationale": "LIVE_NON_RECONSTRUCTABLE_NEED: one TASK-10 point is insufficient to estimate a population, while historical chain data cannot reconstruct provider quote responses, error states or local request timing for unobserved notionals.",
+      "decision_owner": "TASK-17 owning control plane",
+      "decided_at": "2026-07-29T12:18:49Z",
+      "effective_at": "2026-07-29T12:18:49Z",
+      "first_reliable_available_at": "2026-07-29T12:18:49Z",
+      "trial_ids": [],
+      "next_condition": "Obtain a separate exact provider/API gate for at most 192 sequential zero-retry quote calls over 8 versioned watchlist members, 3 triggered windows and 4 buy/reverse-sell notionals, or close the candidate.",
+      "evidence_asset_ids": [
+        "PRE-GIT-TASK01-A019",
+        "EVIDENCE-T10-JUPITER-QUOTE-SUMMARY-002",
+        "EVIDENCE-T17-FIRST-BOUNDED-HYPOTHESIS-CYCLE-001"
+      ],
+      "record_owner": "TASK-17"
+    }
+  ],
+  "derivation_edges": [],
+  "activation_epochs": []
+}

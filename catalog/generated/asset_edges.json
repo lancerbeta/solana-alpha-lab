@@ -823,6 +823,26 @@
       "target_asset_id": "CTRL-BATON-SETUP-001"
     },
     {
+      "source_asset_id": "DATA-REQUIREMENT-T17-EXECUTION-CAPACITY-001",
+      "relation": "derived_from",
+      "target_asset_id": "DATA-T17-HYPOTHESIS-RESEARCH-MEMORY-001"
+    },
+    {
+      "source_asset_id": "DATA-REQUIREMENT-T17-EXECUTION-CAPACITY-001",
+      "relation": "evidenced_by",
+      "target_asset_id": "EVIDENCE-T17-FIRST-BOUNDED-HYPOTHESIS-CYCLE-001"
+    },
+    {
+      "source_asset_id": "DATA-REQUIREMENT-T17-EXECUTION-CAPACITY-001",
+      "relation": "governed_by",
+      "target_asset_id": "CONTRACT-T16-HYPOTHESIS-LIFECYCLE-RESEARCH-MEMORY-001"
+    },
+    {
+      "source_asset_id": "DATA-REQUIREMENT-T17-EXECUTION-CAPACITY-001",
+      "relation": "validated_by",
+      "target_asset_id": "TEST-T17-FIRST-BOUNDED-HYPOTHESIS-CYCLE-ACCEPTANCE-001"
+    },
+    {
       "source_asset_id": "DATA-T08-LIFECYCLE-DISCOVERY-PROBE-RAW-001",
       "relation": "derived_from",
       "target_asset_id": "MODULE-T08-LIFECYCLE-DISCOVERY-TRANSPORT-001"
@@ -931,6 +951,26 @@
       "source_asset_id": "DATA-T11-ENTITY-INPUT-PILOT-RAW-001",
       "relation": "validated_by",
       "target_asset_id": "TEST-T11-ENTITY-INPUT-REPLAY-001"
+    },
+    {
+      "source_asset_id": "DATA-T17-HYPOTHESIS-RESEARCH-MEMORY-001",
+      "relation": "derived_from",
+      "target_asset_id": "EVIDENCE-T10-JUPITER-QUOTE-SUMMARY-002"
+    },
+    {
+      "source_asset_id": "DATA-T17-HYPOTHESIS-RESEARCH-MEMORY-001",
+      "relation": "derived_from",
+      "target_asset_id": "PRE-GIT-TASK01-A019"
+    },
+    {
+      "source_asset_id": "DATA-T17-HYPOTHESIS-RESEARCH-MEMORY-001",
+      "relation": "governed_by",
+      "target_asset_id": "CONTRACT-T16-HYPOTHESIS-LIFECYCLE-RESEARCH-MEMORY-001"
+    },
+    {
+      "source_asset_id": "DATA-T17-HYPOTHESIS-RESEARCH-MEMORY-001",
+      "relation": "validated_by",
+      "target_asset_id": "TEST-T17-FIRST-BOUNDED-HYPOTHESIS-CYCLE-001"
     },
     {
       "source_asset_id": "DECISION-T14-PROVIDER-PURCHASE-001",
@@ -1281,6 +1321,41 @@
       "source_asset_id": "EVIDENCE-T16-HYPOTHESIS-RESEARCH-MEMORY-ACCEPTANCE-001",
       "relation": "validated_by",
       "target_asset_id": "TEST-T16-HYPOTHESIS-RESEARCH-MEMORY-ACCEPTANCE-001"
+    },
+    {
+      "source_asset_id": "EVIDENCE-T17-FIRST-BOUNDED-HYPOTHESIS-CYCLE-001",
+      "relation": "derived_from",
+      "target_asset_id": "DATA-T17-HYPOTHESIS-RESEARCH-MEMORY-001"
+    },
+    {
+      "source_asset_id": "EVIDENCE-T17-FIRST-BOUNDED-HYPOTHESIS-CYCLE-001",
+      "relation": "derived_from",
+      "target_asset_id": "EVIDENCE-T10-JUPITER-QUOTE-SUMMARY-002"
+    },
+    {
+      "source_asset_id": "EVIDENCE-T17-FIRST-BOUNDED-HYPOTHESIS-CYCLE-001",
+      "relation": "derived_from",
+      "target_asset_id": "PRE-GIT-TASK01-A019"
+    },
+    {
+      "source_asset_id": "EVIDENCE-T17-FIRST-BOUNDED-HYPOTHESIS-CYCLE-001",
+      "relation": "validated_by",
+      "target_asset_id": "TEST-T17-FIRST-BOUNDED-HYPOTHESIS-CYCLE-001"
+    },
+    {
+      "source_asset_id": "EVIDENCE-T17-FIRST-BOUNDED-HYPOTHESIS-CYCLE-ACCEPTANCE-001",
+      "relation": "derived_from",
+      "target_asset_id": "DATA-T17-HYPOTHESIS-RESEARCH-MEMORY-001"
+    },
+    {
+      "source_asset_id": "EVIDENCE-T17-FIRST-BOUNDED-HYPOTHESIS-CYCLE-ACCEPTANCE-001",
+      "relation": "derived_from",
+      "target_asset_id": "EVIDENCE-T17-FIRST-BOUNDED-HYPOTHESIS-CYCLE-001"
+    },
+    {
+      "source_asset_id": "EVIDENCE-T17-FIRST-BOUNDED-HYPOTHESIS-CYCLE-ACCEPTANCE-001",
+      "relation": "validated_by",
+      "target_asset_id": "TEST-T17-FIRST-BOUNDED-HYPOTHESIS-CYCLE-ACCEPTANCE-001"
     },
     {
       "source_asset_id": "FIXTURE-BATON-SUITE-001",
@@ -3481,6 +3556,36 @@
       "source_asset_id": "TEST-T16-HYPOTHESIS-RESEARCH-MEMORY-QUERY-001",
       "relation": "depends_on",
       "target_asset_id": "SCRIPT-T16-PRIOR-WORK-QUERY-001"
+    },
+    {
+      "source_asset_id": "TEST-T17-FIRST-BOUNDED-HYPOTHESIS-CYCLE-001",
+      "relation": "depends_on",
+      "target_asset_id": "DATA-T17-HYPOTHESIS-RESEARCH-MEMORY-001"
+    },
+    {
+      "source_asset_id": "TEST-T17-FIRST-BOUNDED-HYPOTHESIS-CYCLE-001",
+      "relation": "depends_on",
+      "target_asset_id": "EVIDENCE-T17-FIRST-BOUNDED-HYPOTHESIS-CYCLE-001"
+    },
+    {
+      "source_asset_id": "TEST-T17-FIRST-BOUNDED-HYPOTHESIS-CYCLE-001",
+      "relation": "depends_on",
+      "target_asset_id": "SCRIPT-T16-PRIOR-WORK-QUERY-001"
+    },
+    {
+      "source_asset_id": "TEST-T17-FIRST-BOUNDED-HYPOTHESIS-CYCLE-ACCEPTANCE-001",
+      "relation": "depends_on",
+      "target_asset_id": "DATA-T17-HYPOTHESIS-RESEARCH-MEMORY-001"
+    },
+    {
+      "source_asset_id": "TEST-T17-FIRST-BOUNDED-HYPOTHESIS-CYCLE-ACCEPTANCE-001",
+      "relation": "depends_on",
+      "target_asset_id": "EVIDENCE-T17-FIRST-BOUNDED-HYPOTHESIS-CYCLE-ACCEPTANCE-001"
+    },
+    {
+      "source_asset_id": "TEST-T17-FIRST-BOUNDED-HYPOTHESIS-CYCLE-ACCEPTANCE-001",
+      "relation": "depends_on",
+      "target_asset_id": "TEST-T17-FIRST-BOUNDED-HYPOTHESIS-CYCLE-001"
     },
     {
       "source_asset_id": "VALIDATOR-REPOSITORY-STATE-001",
