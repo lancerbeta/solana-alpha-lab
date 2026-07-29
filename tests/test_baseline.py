@@ -12,6 +12,21 @@ module = importlib.util.module_from_spec(spec)
 spec.loader.exec_module(module)
 
 
+class GenericControlBranchPolicyTests(unittest.TestCase):
+    def test_accepts_task_and_single_letter_subtask_branches(self) -> None:
+        self.assertTrue(module.is_ctrl_generic_control_branch("task17/pilot"))
+        self.assertTrue(
+            module.is_ctrl_generic_control_branch(
+                "task17a/bounded-execution-capacity-panel"
+            )
+        )
+
+    def test_rejects_ambiguous_subtask_suffixes(self) -> None:
+        self.assertFalse(module.is_ctrl_generic_control_branch("task17aa/pilot"))
+        self.assertFalse(module.is_ctrl_generic_control_branch("task1a/pilot"))
+        self.assertFalse(module.is_ctrl_generic_control_branch("task17A/pilot"))
+
+
 class RepositoryStatePolicyTests(unittest.TestCase):
     def classify_atom5(self, **overrides: object) -> str:
         arguments = {

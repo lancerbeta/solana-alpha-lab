@@ -2011,13 +2011,13 @@ records:
     contains_raw_data: false
     sensitivity: INTERNAL_NON_SECRET
 - asset_id: VALIDATOR-REPOSITORY-STATE-001
-  record_version: '2.4'
+  record_version: '2.5'
   asset_type: script
   purpose: Fail-closed historical and compositional repository-state/topology
     validator through CTRL-BATON A6.4.
   status: IMPLEMENTED_UNVERIFIED
   origin: REPOSITORY
-  as_of: '2026-07-28'
+  as_of: '2026-07-29'
   truth_owner: TASK-04
   location:
     kind: git_path
@@ -2025,7 +2025,7 @@ records:
     repository_path: scripts/validate_baseline.py
   integrity:
     kind: sha256
-    sha256: cf682fa19ec02ed27c5c1dad2178e3623623bdb5d70c7f4216f51b36d1e1c9d7
+    sha256: d4aeebc44e8ce5f1ba2dd20a61baec412c3b586f57590a58cddc18e4a3ec9c9c
   access:
     mode: read_only
     method: command
@@ -8326,7 +8326,7 @@ records:
   evidence: []
   classification: *t17_internal
 - asset_id: TEST-T17-FIRST-BOUNDED-HYPOTHESIS-CYCLE-ACCEPTANCE-001
-  record_version: '1.0'
+  record_version: '1.1'
   asset_type: script
   purpose: Deterministic TASK-17 acceptance tests binding immutable A2 bytes,
     production-safe query routing, exact Catalog registration, generated
@@ -8341,7 +8341,7 @@ records:
     repository_path: tests/test_task17_first_bounded_hypothesis_cycle_acceptance.py
   integrity:
     kind: sha256
-    sha256: fe7798a4fa57cb8dbf9b75c9e9f41c5ac58ba8e93e456a20d4907dde3c4522c9
+    sha256: d82395d82d94ad93c0f91361f1bf6eb984ca307cf643c322973b6336059e80f7
   access:
     mode: read_only
     method: file
@@ -8358,3 +8358,560 @@ records:
   - TASK-17
   evidence: []
   classification: *t17_internal
+- asset_id: CONTRACT-T17A-EXECUTION-CAPACITY-QUOTE-PANEL-001
+  record_version: '1.0'
+  asset_type: control_document
+  purpose: Frozen offline TASK-17A contract for one provenance-safe hypothesis
+    watchlist member, three foreground windows, four notionals, dependent
+    reverse-sell legs, exact 24-call cap, typed failures, retention and a
+    separate external authority gate.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-07-29'
+  truth_owner: TASK-17A
+  location:
+    kind: git_path
+    logical_uri: repo://docs/contracts/bounded_execution_capacity_quote_panel_contract_v1.md
+    repository_path: docs/contracts/bounded_execution_capacity_quote_panel_contract_v1.md
+  integrity:
+    kind: sha256
+    sha256: b1c7a7c022cc0e8f496651eb0b928eccce9ce77d4dbf8ada6a529e4f4907e652
+  access:
+    mode: read_only
+    method: file
+    network_required: false
+    secrets_required: false
+  relations:
+  - relation_type: derived_from
+    target_asset_id: DATA-REQUIREMENT-T17-EXECUTION-CAPACITY-001
+  - relation_type: derived_from
+    target_asset_id: FIXTURE-T10-JUPITER-QUOTE-PILOT-PLAN-002
+  - relation_type: governed_by
+    target_asset_id: CONTRACT-T06-RAW-STORAGE-001
+  - relation_type: validated_by
+    target_asset_id: TEST-T17A-EXECUTION-CAPACITY-QUOTE-PANEL-001
+  consumers:
+  - TASK-17A
+  - TASK-18
+  - FACTORY-001
+  evidence: []
+  classification: &t17a_internal
+    contains_secrets: false
+    contains_raw_data: false
+    sensitivity: INTERNAL_NON_SECRET
+- asset_id: FIXTURE-T17A-EXECUTION-CAPACITY-QUOTE-PANEL-001
+  record_version: '1.0'
+  asset_type: evidence
+  purpose: Machine-readable TASK-17A A2 watchlist, window, provider, panel,
+    failure, usage, raw identity, retention, cap and authority contract.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-07-29'
+  truth_owner: TASK-17A
+  location:
+    kind: git_path
+    logical_uri: repo://tests/fixtures/task17a/bounded_execution_capacity_quote_panel_contract_v1.json
+    repository_path: tests/fixtures/task17a/bounded_execution_capacity_quote_panel_contract_v1.json
+  integrity:
+    kind: sha256
+    sha256: ac7a191f4a5888681fa2b90ea33261271d0d7d4a44c81653dbfc6d902fa6871f
+  access:
+    mode: read_only
+    method: file
+    network_required: false
+    secrets_required: false
+  relations:
+  - relation_type: governed_by
+    target_asset_id: CONTRACT-T17A-EXECUTION-CAPACITY-QUOTE-PANEL-001
+  - relation_type: derived_from
+    target_asset_id: DATA-T17-HYPOTHESIS-RESEARCH-MEMORY-001
+  - relation_type: derived_from
+    target_asset_id: FIXTURE-T10-JUPITER-QUOTE-PILOT-PLAN-002
+  - relation_type: validated_by
+    target_asset_id: TEST-T17A-EXECUTION-CAPACITY-QUOTE-PANEL-001
+  consumers:
+  - TASK-17A
+  evidence: []
+  classification: *t17a_internal
+- asset_id: TEST-T17A-EXECUTION-CAPACITY-QUOTE-PANEL-001
+  record_version: '1.0'
+  asset_type: script
+  purpose: Deterministic tests for TASK-17A hypothesis identity, provenance-safe
+    watchlist, foreground windows, 24-call Pareto cap, keyless pacing,
+    buy/reverse-sell semantics, raw retention, Catalog and zero external
+    authority.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-07-29'
+  truth_owner: TASK-17A
+  location:
+    kind: git_path
+    logical_uri: repo://tests/test_task17a_bounded_execution_capacity_quote_panel_contract.py
+    repository_path: tests/test_task17a_bounded_execution_capacity_quote_panel_contract.py
+  integrity:
+    kind: sha256
+    sha256: 1da303c4f39ae2bbf2dd4a4d8d9c8910a43de574232e25ee4b076e6919306f1a
+  access:
+    mode: read_only
+    method: file
+    network_required: false
+    secrets_required: false
+  relations:
+  - relation_type: depends_on
+    target_asset_id: CONTRACT-T17A-EXECUTION-CAPACITY-QUOTE-PANEL-001
+  - relation_type: depends_on
+    target_asset_id: FIXTURE-T17A-EXECUTION-CAPACITY-QUOTE-PANEL-001
+  - relation_type: depends_on
+    target_asset_id: DATA-T17-HYPOTHESIS-RESEARCH-MEMORY-001
+  consumers:
+  - TASK-17A
+  evidence: []
+  classification: *t17a_internal
+- asset_id: CONTRACT-T17A-TIMING-REPAIR-001
+  record_version: '1.0'
+  asset_type: control_document
+  purpose: Frozen fail-closed one-window timing repair after the original A3
+    UTC trigger evidence missed the 1800-second minimum by 7.854 milliseconds.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-07-29'
+  truth_owner: TASK-17A
+  location:
+    kind: git_path
+    logical_uri: repo://docs/contracts/task17a_one_window_timing_repair_contract_v1.md
+    repository_path: docs/contracts/task17a_one_window_timing_repair_contract_v1.md
+  integrity:
+    kind: sha256
+    sha256: 169f58ad8fab664bc1a47a4da96fbf8742d2b7fb015498ff88a9c8abd93407f8
+  access:
+    mode: read_only
+    method: file
+    network_required: false
+    secrets_required: false
+  relations:
+  - relation_type: governed_by
+    target_asset_id: CONTRACT-T17A-EXECUTION-CAPACITY-QUOTE-PANEL-001
+  - relation_type: validated_by
+    target_asset_id: TEST-T17A-TIMING-REPAIR-001
+  consumers:
+  - TASK-17A
+  evidence: []
+  classification: *t17a_internal
+- asset_id: FIXTURE-T17A-TIMING-REPAIR-001
+  record_version: '1.0'
+  asset_type: evidence
+  purpose: Machine-readable repair contract binding immutable retained and
+    excluded windows, one replacement window, exact eight-call cap and a
+    separate external authority phrase.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-07-29'
+  truth_owner: TASK-17A
+  location:
+    kind: git_path
+    logical_uri: repo://tests/fixtures/task17a/one_window_timing_repair_contract_v1.json
+    repository_path: tests/fixtures/task17a/one_window_timing_repair_contract_v1.json
+  integrity:
+    kind: sha256
+    sha256: cbb1899a52b4014b2470e58e061785c6842b8c903ec7bc1063a841bd16dc2b16
+  access:
+    mode: read_only
+    method: file
+    network_required: false
+    secrets_required: false
+  relations:
+  - relation_type: governed_by
+    target_asset_id: CONTRACT-T17A-TIMING-REPAIR-001
+  - relation_type: validated_by
+    target_asset_id: TEST-T17A-TIMING-REPAIR-001
+  consumers:
+  - TASK-17A
+  evidence: []
+  classification: *t17a_internal
+- asset_id: MODULE-T17A-EXECUTION-CAPACITY-PANEL-001
+  record_version: '1.0'
+  asset_type: script
+  purpose: Exact-authority three-window TASK-17A quote-panel runner reusing
+    TASK-10 transport and projection with immutable raw JSONL manifests and
+    receipts outside Git.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-07-29'
+  truth_owner: TASK-17A
+  location:
+    kind: git_path
+    logical_uri: repo://src/solana_alpha_lab/task17a_execution_capacity_panel.py
+    repository_path: src/solana_alpha_lab/task17a_execution_capacity_panel.py
+  integrity:
+    kind: sha256
+    sha256: 277abeb2177d958d4ec06fb754a61914ba4f864621b7629b10091e78efae9c31
+  access:
+    mode: read_only
+    method: file
+    network_required: false
+    secrets_required: false
+  relations:
+  - relation_type: governed_by
+    target_asset_id: CONTRACT-T17A-EXECUTION-CAPACITY-QUOTE-PANEL-001
+  - relation_type: depends_on
+    target_asset_id: MODULE-T10-JUPITER-QUOTE-TRANSPORT-001
+  - relation_type: validated_by
+    target_asset_id: TEST-T17A-EXECUTION-CAPACITY-PANEL-001
+  consumers:
+  - TASK-17A
+  evidence: []
+  classification: *t17a_internal
+- asset_id: SCRIPT-T17A-EXECUTION-CAPACITY-PANEL-001
+  record_version: '1.0'
+  asset_type: script
+  purpose: Foreground CLI exposing offline preflight and exact runtime phrase
+    gate for the bounded TASK-17A quote panel.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-07-29'
+  truth_owner: TASK-17A
+  location:
+    kind: git_path
+    logical_uri: repo://scripts/run_task17a_execution_capacity_panel.py
+    repository_path: scripts/run_task17a_execution_capacity_panel.py
+  integrity:
+    kind: sha256
+    sha256: 9ce4e7c27f962134e5641fb3b87860b8e4d38dfb0af0a03d77c4467208cc68a3
+  access:
+    mode: read_only
+    method: file
+    network_required: false
+    secrets_required: false
+  relations:
+  - relation_type: depends_on
+    target_asset_id: MODULE-T17A-EXECUTION-CAPACITY-PANEL-001
+  - relation_type: validated_by
+    target_asset_id: TEST-T17A-EXECUTION-CAPACITY-PANEL-001
+  consumers:
+  - TASK-17A
+  evidence: []
+  classification: *t17a_internal
+- asset_id: TEST-T17A-EXECUTION-CAPACITY-PANEL-001
+  record_version: '1.0'
+  asset_type: script
+  purpose: Deterministic synthetic tests for three-window call caps, exact
+    authority, dependent sells, immutable persistence and auth early stop.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-07-29'
+  truth_owner: TASK-17A
+  location:
+    kind: git_path
+    logical_uri: repo://tests/test_task17a_execution_capacity_panel.py
+    repository_path: tests/test_task17a_execution_capacity_panel.py
+  integrity:
+    kind: sha256
+    sha256: 2d2d899b84400384034963eef57faea18eb687ae87c7d6e50873353efcd168d5
+  access:
+    mode: read_only
+    method: file
+    network_required: false
+    secrets_required: false
+  relations:
+  - relation_type: depends_on
+    target_asset_id: MODULE-T17A-EXECUTION-CAPACITY-PANEL-001
+  - relation_type: depends_on
+    target_asset_id: FIXTURE-T17A-EXECUTION-CAPACITY-QUOTE-PANEL-001
+  consumers:
+  - TASK-17A
+  evidence: []
+  classification: *t17a_internal
+- asset_id: MODULE-T17A-TIMING-REPAIR-001
+  record_version: '1.0'
+  asset_type: script
+  purpose: Exact one-window repair implementation that binds original evidence
+    hashes, enforces an 1801-second wall-clock boundary and writes only a new
+    immutable repair root.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-07-29'
+  truth_owner: TASK-17A
+  location:
+    kind: git_path
+    logical_uri: repo://src/solana_alpha_lab/task17a_timing_repair.py
+    repository_path: src/solana_alpha_lab/task17a_timing_repair.py
+  integrity:
+    kind: sha256
+    sha256: 5ca6d6b92b93a276b3c9f073185add952b60e68e0d7809c5e79a803cfa74476f
+  access:
+    mode: read_only
+    method: file
+    network_required: false
+    secrets_required: false
+  relations:
+  - relation_type: governed_by
+    target_asset_id: CONTRACT-T17A-TIMING-REPAIR-001
+  - relation_type: depends_on
+    target_asset_id: MODULE-T17A-EXECUTION-CAPACITY-PANEL-001
+  - relation_type: validated_by
+    target_asset_id: TEST-T17A-TIMING-REPAIR-001
+  consumers:
+  - TASK-17A
+  evidence: []
+  classification: *t17a_internal
+- asset_id: SCRIPT-T17A-TIMING-REPAIR-001
+  record_version: '1.0'
+  asset_type: script
+  purpose: Offline preflight and separate exact-authority CLI for the single
+    TASK-17A replacement window.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-07-29'
+  truth_owner: TASK-17A
+  location:
+    kind: git_path
+    logical_uri: repo://scripts/run_task17a_timing_repair.py
+    repository_path: scripts/run_task17a_timing_repair.py
+  integrity:
+    kind: sha256
+    sha256: 6d0eda77bb0125afdac66c8b54932f4c96a66e8c46a313d28e15ddd01740305e
+  access:
+    mode: read_only
+    method: file
+    network_required: false
+    secrets_required: false
+  relations:
+  - relation_type: depends_on
+    target_asset_id: MODULE-T17A-TIMING-REPAIR-001
+  - relation_type: validated_by
+    target_asset_id: TEST-T17A-TIMING-REPAIR-001
+  consumers:
+  - TASK-17A
+  evidence: []
+  classification: *t17a_internal
+- asset_id: TEST-T17A-TIMING-REPAIR-001
+  record_version: '1.1'
+  asset_type: script
+  purpose: Deterministic repair-contract tests for immutable input hashes,
+    exact eight-call cap, separate gate, wall-clock boundary and tracked
+    provenance when ignored raw bytes are unavailable in CI.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-07-29'
+  truth_owner: TASK-17A
+  location:
+    kind: git_path
+    logical_uri: repo://tests/test_task17a_timing_repair_contract.py
+    repository_path: tests/test_task17a_timing_repair_contract.py
+  integrity:
+    kind: sha256
+    sha256: ecc694765e1ef8f283e18143eb896654a2b412b5bb3df8da2e42c8cebb2079fa
+  access:
+    mode: read_only
+    method: file
+    network_required: false
+    secrets_required: false
+  relations:
+  - relation_type: depends_on
+    target_asset_id: CONTRACT-T17A-TIMING-REPAIR-001
+  - relation_type: depends_on
+    target_asset_id: FIXTURE-T17A-TIMING-REPAIR-001
+  consumers:
+  - TASK-17A
+  evidence: []
+  classification: *t17a_internal
+- asset_id: MODULE-T17A-EXECUTION-CAPACITY-AUDIT-001
+  record_version: '1.0'
+  asset_type: script
+  purpose: Fail-closed deterministic audit of identities, raw hashes, timing,
+    pacing, quote pairs, coverage, exclusions, usage and bounded curvature.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-07-29'
+  truth_owner: TASK-17A
+  location:
+    kind: git_path
+    logical_uri: repo://src/solana_alpha_lab/task17a_execution_capacity_audit.py
+    repository_path: src/solana_alpha_lab/task17a_execution_capacity_audit.py
+  integrity:
+    kind: sha256
+    sha256: 2d556507b056b02f5d6ce55e9a9e1fefec99a5630d97ec87a4009aea571ce14a
+  access:
+    mode: read_only
+    method: file
+    network_required: false
+    secrets_required: false
+  relations:
+  - relation_type: governed_by
+    target_asset_id: CONTRACT-T17A-EXECUTION-CAPACITY-QUOTE-PANEL-001
+  - relation_type: governed_by
+    target_asset_id: CONTRACT-T17A-TIMING-REPAIR-001
+  - relation_type: validated_by
+    target_asset_id: TEST-T17A-EXECUTION-CAPACITY-AUDIT-001
+  consumers:
+  - TASK-17A
+  - TASK-18
+  evidence: []
+  classification: *t17a_internal
+- asset_id: SCRIPT-T17A-EXECUTION-CAPACITY-AUDIT-001
+  record_version: '1.0'
+  asset_type: script
+  purpose: Deterministic CLI that recomputes or writes the sanitized TASK-17A
+    audit receipt from ignored raw evidence.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-07-29'
+  truth_owner: TASK-17A
+  location:
+    kind: git_path
+    logical_uri: repo://scripts/audit_task17a_execution_capacity_panel.py
+    repository_path: scripts/audit_task17a_execution_capacity_panel.py
+  integrity:
+    kind: sha256
+    sha256: 4df0a121e7b7b234d31e5e77b5865c4a307601d4214a8c55fbe979706bad7d8b
+  access:
+    mode: read_only
+    method: file
+    network_required: false
+    secrets_required: false
+  relations:
+  - relation_type: depends_on
+    target_asset_id: MODULE-T17A-EXECUTION-CAPACITY-AUDIT-001
+  - relation_type: validated_by
+    target_asset_id: TEST-T17A-EXECUTION-CAPACITY-AUDIT-001
+  consumers:
+  - TASK-17A
+  evidence: []
+  classification: *t17a_internal
+- asset_id: DATA-T17A-EXECUTION-CAPACITY-RAW-001
+  record_version: '1.0'
+  asset_type: evidence
+  purpose: Logical pointer to immutable ignored TASK-17A raw quote evidence for
+    three original windows plus one timing-repair window; exact included and
+    excluded file hashes are bound by the tracked audit receipt.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: RUNTIME
+  as_of: '2026-07-29'
+  truth_owner: TASK-17A
+  location:
+    kind: logical_only
+    logical_uri: raw://task17a_execution_capacity_quote_panel_v1+repair_01
+  integrity:
+    kind: sha256
+    sha256: 15c9ba7641c15c5511b308485cc230d3bff977f6529c6b86019673e91ee8a0a2
+  access:
+    mode: read_only
+    method: runtime_attestation
+    network_required: false
+    secrets_required: false
+  relations:
+  - relation_type: derived_from
+    target_asset_id: FIXTURE-T17A-EXECUTION-CAPACITY-QUOTE-PANEL-001
+  - relation_type: derived_from
+    target_asset_id: FIXTURE-T17A-TIMING-REPAIR-001
+  - relation_type: evidenced_by
+    target_asset_id: EVIDENCE-T17A-EXECUTION-CAPACITY-AUDIT-001
+  - relation_type: validated_by
+    target_asset_id: TEST-T17A-EXECUTION-CAPACITY-AUDIT-001
+  consumers:
+  - TASK-17A
+  - TASK-18
+  evidence:
+  - evidence_id: EVIDENCE-T17A-EXECUTION-CAPACITY-AUDIT-001
+    kind: runtime_receipt
+    reference: docs/evidence/task17a/execution_capacity_quote_panel_audit_v1.json
+    result: PENDING
+  classification: *t17a_internal
+- asset_id: EVIDENCE-T17A-EXECUTION-CAPACITY-AUDIT-001
+  record_version: '1.0'
+  asset_type: evidence
+  purpose: Sanitized deterministic acceptance receipt for exact matched-window
+    hashes, timing repair, 24 accepted and 8 excluded calls, bounded curvature,
+    non-claims and zero-effect reconciliation.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-07-29'
+  truth_owner: TASK-17A
+  location:
+    kind: git_path
+    logical_uri: repo://docs/evidence/task17a/execution_capacity_quote_panel_audit_v1.json
+    repository_path: docs/evidence/task17a/execution_capacity_quote_panel_audit_v1.json
+  integrity:
+    kind: sha256
+    sha256: 15c9ba7641c15c5511b308485cc230d3bff977f6529c6b86019673e91ee8a0a2
+  access:
+    mode: read_only
+    method: file
+    network_required: false
+    secrets_required: false
+  relations:
+  - relation_type: derived_from
+    target_asset_id: DATA-T17A-EXECUTION-CAPACITY-RAW-001
+  - relation_type: validated_by
+    target_asset_id: TEST-T17A-EXECUTION-CAPACITY-AUDIT-001
+  consumers:
+  - TASK-17A
+  - TASK-18
+  - FACTORY-001
+  evidence: []
+  classification: *t17a_internal
+- asset_id: EVIDENCE-T17A-EXECUTION-CAPACITY-SUMMARY-001
+  record_version: '1.0'
+  asset_type: evidence
+  purpose: Human decision summary of the bounded quote-only temporal
+    replication, exact cost curves, timing repair, usage and non-claims.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-07-29'
+  truth_owner: TASK-17A
+  location:
+    kind: git_path
+    logical_uri: repo://docs/evidence/task17a/execution_capacity_quote_panel_summary_v1.md
+    repository_path: docs/evidence/task17a/execution_capacity_quote_panel_summary_v1.md
+  integrity:
+    kind: sha256
+    sha256: 5a2598be6836dfcf5013abf020948e672ab990d2da81bca1036866c027c2471e
+  access:
+    mode: read_only
+    method: file
+    network_required: false
+    secrets_required: false
+  relations:
+  - relation_type: derived_from
+    target_asset_id: EVIDENCE-T17A-EXECUTION-CAPACITY-AUDIT-001
+  - relation_type: validated_by
+    target_asset_id: TEST-T17A-EXECUTION-CAPACITY-AUDIT-001
+  consumers:
+  - TASK-17A
+  - TASK-18
+  - FACTORY-001
+  evidence: []
+  classification: *t17a_internal
+- asset_id: TEST-T17A-EXECUTION-CAPACITY-AUDIT-001
+  record_version: '1.1'
+  asset_type: script
+  purpose: Deterministic acceptance tests for original timing failure,
+    replacement-window replay, raw tamper failure, tracked receipt equality,
+    bounded claims, exact total usage and hash-bound logical-only CI fallback.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-07-29'
+  truth_owner: TASK-17A
+  location:
+    kind: git_path
+    logical_uri: repo://tests/test_task17a_execution_capacity_audit.py
+    repository_path: tests/test_task17a_execution_capacity_audit.py
+  integrity:
+    kind: sha256
+    sha256: 9eb86ee6204d6c9d745de8c543d237838bd6be1a69b4e017e4c07dcef31a94cd
+  access:
+    mode: read_only
+    method: file
+    network_required: false
+    secrets_required: false
+  relations:
+  - relation_type: depends_on
+    target_asset_id: EVIDENCE-T17A-EXECUTION-CAPACITY-AUDIT-001
+  - relation_type: depends_on
+    target_asset_id: EVIDENCE-T17A-EXECUTION-CAPACITY-SUMMARY-001
+  - relation_type: depends_on
+    target_asset_id: MODULE-T17A-EXECUTION-CAPACITY-AUDIT-001
+  consumers:
+  - TASK-17A
+  evidence: []
+  classification: *t17a_internal

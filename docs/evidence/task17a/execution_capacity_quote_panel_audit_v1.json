@@ -1,0 +1,177 @@
+{
+  "atom": "T17A-A4_DETERMINISTIC_AUDIT_AND_CATALOG_V1",
+  "authority": {
+    "accounts": 0,
+    "api_keys": 0,
+    "approved_atoms": [
+      "T17A-A3_BOUNDED_EXTERNAL_QUOTE_PANEL_V1",
+      "T17A-A3R_ONE_WINDOW_TIMING_REPAIR_V1"
+    ],
+    "billed_credits_claim": "NOT_AVAILABLE_KEYLESS",
+    "cash_spend_usd_cents": 0,
+    "concurrency": 1,
+    "modeled_generic_credits": 32,
+    "provider_api_calls": 32,
+    "retries": 0,
+    "wallet_signer_transaction_actions": 0
+  },
+  "claims": {
+    "alpha": false,
+    "cross_token_generalization": false,
+    "data_quality": false,
+    "fillable": false,
+    "net_return": false,
+    "quote_only_temporal_replication": true,
+    "realized_vwap": false,
+    "signal_or_strategy": false
+  },
+  "contract_sha256": "ac7a191f4a5888681fa2b90ea33261271d0d7d4a44c81653dbfc6d902fa6871f",
+  "coverage": {
+    "complete_quote_pairs": 12,
+    "excluded_provider_calls": 8,
+    "members": 1,
+    "notionals_usd": [
+      10,
+      25,
+      50,
+      100
+    ],
+    "outages": 0,
+    "provider_calls": 24,
+    "received_bytes": 39013,
+    "stored_bytes": 134489,
+    "typed_failures": 0,
+    "windows": 3
+  },
+  "hypothesis_evaluation": {
+    "complete_monotonic_panels": 3,
+    "complete_panels": 3,
+    "current_state": "PAUSED",
+    "estimand": "MEDIAN_COST_BPS_USD100_MINUS_USD10_ACROSS_COMPLETE_MATCHED_PANELS",
+    "median_delta_cost_bps": "832.5706",
+    "promotion_authorized": false,
+    "result": "SUPPORTED_WITHIN_ONE_MEMBER_THREE_WINDOWS_QUOTE_ONLY",
+    "task18_quality_gate_eligible": true
+  },
+  "hypothesis_version_id": "HYP-VERSION-EXECUTION-CAPACITY-CURVATURE-V1",
+  "member_ids": [
+    "HYP-WATCH-MEMBER-T10-001"
+  ],
+  "raw_logical_roots": [
+    "task17a_execution_capacity_quote_panel_v1",
+    "task17a_execution_capacity_quote_panel_v1_repair_01"
+  ],
+  "repair": {
+    "excluded_but_retained_window": {
+      "manifest_sha256": "adaf60362b64f7bc9a272fa9a57736739cf58c9bed0e3090a8c1cd359d9f4846",
+      "provider_calls": 8,
+      "raw_events_sha256": "d4e8a8607e7ad932dfc69f0a2b80ccfeec6a175b5af4c81e039b2121c2c036c3",
+      "reason": "TRIGGER_SEPARATION_BELOW_FROZEN_MINIMUM",
+      "receipt_sha256": "6d18a072d20c37414fc02b2b6a9ec5d5b55090dbfd1c13d9063811bc14cd8613",
+      "trigger_separation_shortfall_seconds": "0.007854",
+      "window_id": "T17A-WINDOW-02"
+    },
+    "post_hoc_tolerance_allowed": false,
+    "repair_contract_sha256": "cbb1899a52b4014b2470e58e061785c6842b8c903ec7bc1063a841bd16dc2b16",
+    "replacement_window": {
+      "manifest_sha256": "4c2e66389391896c8188339dcec735a35f34b025f5213e7c18dd13cdcec147c5",
+      "provider_calls": 8,
+      "raw_events_sha256": "9e49aa2515684d7b097f15205496ca6813c065a665f13f9070956e326e8b8417",
+      "receipt_sha256": "14f2e590e7d346e295037a287334bcfb53f3d18d289904bca70a3ee16dceee6f",
+      "window_id": "T17A-WINDOW-04-REPAIR-01"
+    },
+    "root_cause": "MONOTONIC_PACING_WITHOUT_WALL_CLOCK_SAFETY_MARGIN"
+  },
+  "schema": "smial.task17a_execution_capacity_audit.v1",
+  "schema_version": "1.0",
+  "task": "TASK-17A",
+  "timing": {
+    "first_requested_at": "2026-07-29T14:16:50.002771Z",
+    "last_requested_at": "2026-07-29T15:47:24.191046Z",
+    "total_span_seconds": 5418.786469,
+    "window_separation_seconds": [
+      3599.993664,
+      1818.792805
+    ]
+  },
+  "verdict": "PASS",
+  "watchlist_id": "HYP-WATCHLIST-EXECUTION-CAPACITY-V1",
+  "watchlist_version": "1.0",
+  "windows": [
+    {
+      "adjacent_cost_increases": [
+        true,
+        true,
+        true
+      ],
+      "cost_bps_by_notional": {
+        "10": "345.2850",
+        "100": "1174.2551",
+        "25": "495.1112",
+        "50": "734.1092"
+      },
+      "delta_cost_bps_usd100_minus_usd10": "828.9701",
+      "manifest_sha256": "82558d846b5a9ecabbbca0e2e9f5b5a3e77eec38018b6905f6a9f3b04d716995",
+      "provider_calls": 8,
+      "raw_events_sha256": "50077fc35fcc7e6d349fe178f15a3b800f7cb79a38e38352dc13175b7baf4e49",
+      "receipt_sha256": "918049b14b9539f90e0ec08a60ec945eae8b76336fb5a959912d566cc81ebdbe",
+      "received_bytes": 13293,
+      "stored_bytes": 45105,
+      "terminal_counts": {
+        "QUOTE_AVAILABLE": 8
+      },
+      "triggered_at": "2026-07-29T14:16:50.002715Z",
+      "window_id": "T17A-WINDOW-01"
+    },
+    {
+      "adjacent_cost_increases": [
+        true,
+        true,
+        true
+      ],
+      "cost_bps_by_notional": {
+        "10": "348.2840",
+        "100": "1181.6128",
+        "25": "497.1640",
+        "50": "735.6348"
+      },
+      "delta_cost_bps_usd100_minus_usd10": "833.3288",
+      "manifest_sha256": "b7bc267d0b445fc98d78f27b8687da6692a03a544c53f38f5f9b75f0a6483f2f",
+      "provider_calls": 8,
+      "raw_events_sha256": "a45f611b2bbe3986168a44e3e13fe2743cfc52eb476448dcc8edef01f8771ab4",
+      "receipt_sha256": "e327b7fe34321a888be23c45f144f019bd0b36f4134677c95bb0037679a40e23",
+      "received_bytes": 12919,
+      "stored_bytes": 44707,
+      "terminal_counts": {
+        "QUOTE_AVAILABLE": 8
+      },
+      "triggered_at": "2026-07-29T15:16:49.996379Z",
+      "window_id": "T17A-WINDOW-03"
+    },
+    {
+      "adjacent_cost_increases": [
+        true,
+        true,
+        true
+      ],
+      "cost_bps_by_notional": {
+        "10": "348.8440",
+        "100": "1181.4146",
+        "25": "497.5428",
+        "50": "737.8010"
+      },
+      "delta_cost_bps_usd100_minus_usd10": "832.5706",
+      "manifest_sha256": "4c2e66389391896c8188339dcec735a35f34b025f5213e7c18dd13cdcec147c5",
+      "provider_calls": 8,
+      "raw_events_sha256": "9e49aa2515684d7b097f15205496ca6813c065a665f13f9070956e326e8b8417",
+      "receipt_sha256": "14f2e590e7d346e295037a287334bcfb53f3d18d289904bca70a3ee16dceee6f",
+      "received_bytes": 12801,
+      "stored_bytes": 44677,
+      "terminal_counts": {
+        "QUOTE_AVAILABLE": 8
+      },
+      "triggered_at": "2026-07-29T15:47:08.789184Z",
+      "window_id": "T17A-WINDOW-04-REPAIR-01"
+    }
+  ]
+}

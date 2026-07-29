@@ -149,23 +149,26 @@ class Task17FirstBoundedHypothesisCycleAcceptanceTests(
 
     def test_catalog_checkpoint_and_task17_assets_are_exact(self) -> None:
         checkpoint = self.receipt["catalog_checkpoint"]
-        self.assertEqual(
-            catalog.observed_catalog_checkpoint(self.snapshot),
-            {
-                "assets": checkpoint["assets"],
-                "asset_registries": checkpoint["asset_registries"],
-                "schemas": checkpoint["schemas"],
-                "queries": checkpoint["queries"],
-                "lifecycle_registries": checkpoint[
-                    "lifecycle_registries"
-                ],
-                "lifecycle_records": checkpoint["lifecycle_records"],
-            },
+        observed = catalog.observed_catalog_checkpoint(self.snapshot)
+        historical = {
+            "assets": checkpoint["assets"],
+            "asset_registries": checkpoint["asset_registries"],
+            "schemas": checkpoint["schemas"],
+            "queries": checkpoint["queries"],
+            "lifecycle_registries": checkpoint["lifecycle_registries"],
+            "lifecycle_records": checkpoint["lifecycle_records"],
+        }
+        for key, accepted_count in historical.items():
+            with self.subTest(checkpoint_count=key):
+                self.assertGreaterEqual(observed[key], accepted_count)
+        current_version = tuple(
+            int(part)
+            for part in self.snapshot.manifest["catalog_version"].split(".")
         )
-        self.assertEqual(
-            self.snapshot.manifest["catalog_version"],
-            checkpoint["catalog_version"],
+        accepted_version = tuple(
+            int(part) for part in checkpoint["catalog_version"].split(".")
         )
+        self.assertGreaterEqual(current_version, accepted_version)
         self.assertEqual(
             set(checkpoint["registered_asset_ids"]),
             set(checkpoint["registered_asset_ids"])
