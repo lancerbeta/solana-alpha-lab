@@ -10,6 +10,8 @@ import unittest
 from pathlib import Path
 from unittest import mock
 
+import yaml
+
 ROOT = Path(__file__).resolve().parents[1]
 SCRIPTS = str(ROOT / "scripts")
 if SCRIPTS not in sys.path:
@@ -577,7 +579,15 @@ class FixtureManifestCanonicalIntegrityTests(unittest.TestCase):
         sweep = baseline.canonical_catalog_integrity_sweep(
             allow_worktree_candidate=True
         )
-        self.assertEqual(sweep.asset_count, 272)
+        manifest = yaml.safe_load(
+            (ROOT / "catalog/catalog_manifest.yaml").read_text(
+                encoding="utf-8"
+            )
+        )
+        self.assertEqual(
+            sweep.asset_count,
+            manifest["current_checkpoint"]["assets"],
+        )
         self.assertGreater(sweep.checked_sha256, 0)
         self.assertEqual(sweep.mismatches, ())
 

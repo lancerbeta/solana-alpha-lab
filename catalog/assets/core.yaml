@@ -519,7 +519,7 @@ records:
   evidence: []
   classification: *t06_internal
 - asset_id: TEST-T06-CATALOG-001
-  record_version: '1.13'
+  record_version: '1.14'
   asset_type: script
   purpose: Catalog tests for the TASK-06 stable-ID inventory, hashes, ownership, finalization handoff, consumers, no-raw-bytes boundary and monotonic active Catalog version.
   status: IMPLEMENTED_UNVERIFIED
@@ -532,7 +532,7 @@ records:
     repository_path: tests/test_task06_catalog.py
   integrity:
     kind: sha256
-    sha256: d0a4c774ea2e83994efd695fd5c12feabae8a61704c8bc56df5738820059b771
+    sha256: 5859720ed163f3ba92a71546b3dd5f0cb198abb7c9e158ca6efa1edc7c360e1a
   access: *t06_read_file
   relations:
   - relation_type: governed_by
@@ -929,9 +929,9 @@ records:
     contains_raw_data: false
     sensitivity: INTERNAL_NON_SECRET
 - asset_id: CATALOG-SCHEMA-MANIFEST-001
-  record_version: '1.1'
+  record_version: '1.2'
   asset_type: schema
-  purpose: Standalone Draft 2020-12 schema for the Catalog root manifest.
+  purpose: Standalone Draft 2020-12 schema for the Catalog root manifest and its current physical-count checkpoint.
   status: VALIDATED_ACTIVE
   origin: REPOSITORY
   as_of: '2026-07-22'
@@ -942,7 +942,7 @@ records:
     repository_path: catalog/schemas/catalog_manifest.schema.json
   integrity:
     kind: sha256
-    sha256: 2ebe494a8dd963ea40369e12a7e96dcd982bf75db6725cbd9b95474d23a6cf28
+    sha256: cbd355d4acba52b77d68026255a1dfafb765bb5421f41f312badfbeb3a4b5d8e
   access:
     mode: read_only
     method: file
@@ -1020,9 +1020,9 @@ records:
     contains_raw_data: false
     sensitivity: INTERNAL_NON_SECRET
 - asset_id: CATALOG-VALIDATOR-001
-  record_version: '1.2'
+  record_version: '1.3'
   asset_type: script
-  purpose: Deterministic schema and semantic validator for Catalog policy and integrity.
+  purpose: Deterministic schema and semantic validator for Catalog policy, integrity and the current physical-count checkpoint.
   status: IMPLEMENTED_UNVERIFIED
   origin: REPOSITORY
   as_of: '2026-07-22'
@@ -1033,7 +1033,7 @@ records:
     repository_path: scripts/validate_catalog.py
   integrity:
     kind: sha256
-    sha256: dded437eb15472c528c41911d44b20cd3e656d317c1b79e5bf7abaf677752271
+    sha256: 7dca6a4f0857117c082c4b13ea60d4d517eaad6ed5f44cb00ecac399d65656df
   access:
     mode: read_only
     method: command
@@ -2536,7 +2536,7 @@ records:
     contains_raw_data: false
     sensitivity: INTERNAL_NON_SECRET
 - asset_id: TEST-T05-CATALOG-QUERIES-001
-  record_version: '1.15'
+  record_version: '1.16'
   asset_type: script
   purpose: 'Offline tests proving TASK-05 query bounds, UTC eligibility, write denial, external-access denial, raw BLOB exclusion, task/data-contract registration and monotonic active Catalog version.'
   status: IMPLEMENTED_UNVERIFIED
@@ -2549,7 +2549,7 @@ records:
     repository_path: tests/test_task05_catalog_queries.py
   integrity:
     kind: sha256
-    sha256: 4287f79134a02a2090e0d7e60d1eaf333e9fb6f923c49eb9e3b610f5b14fae93
+    sha256: 4744c3c633fe0c356e0b66d368fb6aa6605ef7c2399ff180a67a523e87b6d8fa
   access:
     mode: read_only
     method: command
@@ -3411,7 +3411,7 @@ records:
   evidence: []
   classification: *t07_internal
 - asset_id: TEST-T07-CATALOG-001
-  record_version: '1.11'
+  record_version: '1.12'
   asset_type: script
   purpose: Catalog tests for TASK-07 stable IDs, file hashes, lineage, accepted baseline, monotonic active Catalog version and no-raw-bytes boundary.
   status: IMPLEMENTED_UNVERIFIED
@@ -3424,7 +3424,7 @@ records:
     repository_path: tests/test_task07_catalog.py
   integrity:
     kind: sha256
-    sha256: 3fc13aefbfe4b1c0949ea2a25833283c01a8d0e5b375f7ceae5e29957b410ed6
+    sha256: a4c9343b85bda71c1d01469c3142280f4aafdc9fcadf381312c825e4eb5dc943
   access: *t07_read_file
   relations:
   - relation_type: depends_on
@@ -3898,7 +3898,7 @@ records:
   evidence: []
   classification: *t08_internal
 - asset_id: TEST-T08-CATALOG-001
-  record_version: '1.10'
+  record_version: '1.11'
   asset_type: script
   purpose: Catalog tests for TASK-08 stable IDs, file and raw hashes, lineage, named consumers, monotonic active Catalog version and no-raw-bytes boundary.
   status: IMPLEMENTED_UNVERIFIED
@@ -3911,7 +3911,7 @@ records:
     repository_path: tests/test_task08_catalog.py
   integrity:
     kind: sha256
-    sha256: 9deae15c0d4509656ebc46481d41e3615ad1bdb652aa2f141a9453c3b3b00c6a
+    sha256: 1b9134b27082ec391a9ce8efcf4a9d35d2c8f71354b2ed2a1748486f3205ddb9
   access: *t08_read_file
   relations:
   - relation_type: depends_on
@@ -4629,7 +4629,7 @@ records:
     contains_raw_data: false
     sensitivity: INTERNAL_NON_SECRET
 - asset_id: SCRIPT-BATON-VALIDATE-001
-  record_version: '1.9'
+  record_version: '1.10'
   asset_type: script
   purpose: Deterministic offline validator for baton schemas, fixtures, route ownership,
     standing autonomy, JIT validation, Catalog integrity, templates, and rules.
@@ -4643,7 +4643,7 @@ records:
     repository_path: scripts/validate_baton.py
   integrity:
     kind: sha256
-    sha256: 0b311a293d1afad15151a0bd96b38bcd10f5029192cc4deb9403c20eef26cf37
+    sha256: df5ec655f100f13e582da6b6d1a59eb4351f05d93a334676009d0e4f9107d9e6
   access:
     mode: read_only
     method: file
@@ -4872,7 +4872,7 @@ records:
     contains_raw_data: false
     sensitivity: INTERNAL_NON_SECRET
 - asset_id: TEST-BATON-REPOSITORY-POLICY-001
-  record_version: '1.15'
+  record_version: '1.16'
   asset_type: script
   purpose: Unit tests for exact local staged, committed and published feature,
     PR merge, main merge, current Catalog integrity, and legacy repository policy.
@@ -4886,7 +4886,7 @@ records:
     repository_path: tests/test_baton_repository_policy.py
   integrity:
     kind: sha256
-    sha256: c8cbd285bc53fb7839df55feb8c49f4770ccbf51b5ddb931a3eb7b73126be204
+    sha256: e8bb2d13acbb17ecc18efaf77ea40eee27a498539d12ef4f892c1bdc53033c56
   access:
     mode: read_only
     method: file
@@ -6843,7 +6843,7 @@ records:
   evidence: []
   classification: *t11_internal
 - asset_id: TEST-T11-ENTITY-INPUT-REPLAY-001
-  record_version: '1.3'
+  record_version: '1.4'
   asset_type: script
   purpose: Fail-closed TASK-11 tests for raw receipt and partition hash
     reconciliation, RPC schema replay, projection counts, sanitization, caps,
@@ -6858,7 +6858,7 @@ records:
     repository_path: tests/test_task11_entity_input_replay.py
   integrity:
     kind: sha256
-    sha256: 2d1a0903e4fef3d67a50fccaf0b1a015351b546ed99802017739b97d7c90d69a
+    sha256: 8edf2a3f983424379da400947e35096d429606fa410867e75d84a786ffebed05
   access:
     mode: read_only
     method: file
@@ -7179,7 +7179,7 @@ records:
   evidence: []
   classification: *t12_internal
 - asset_id: TEST-T12-PILOT-SUPERVISOR-ACCEPTANCE-001
-  record_version: '1.3'
+  record_version: '1.4'
   asset_type: script
   purpose: Deterministic TASK-12 acceptance and finalization tests for seven
     control vectors, source fingerprints, event and lineage invariants, zero
@@ -7194,7 +7194,7 @@ records:
     repository_path: tests/test_task12_pilot_supervisor_acceptance.py
   integrity:
     kind: sha256
-    sha256: 8ac9dd383a02d07d1fa16f674500210d5fc050a48df58538175a4a700dbe1b8c
+    sha256: 6f1701425fef2e5d90cad737d334962d81126779f35671187e2d166d29df9b65
   access:
     mode: read_only
     method: file
@@ -7532,7 +7532,7 @@ records:
   evidence: []
   classification: *t13_internal
 - asset_id: TEST-T13-PILOT-AUDIT-ACCEPTANCE-001
-  record_version: '1.1'
+  record_version: '1.2'
   asset_type: script
   purpose: Deterministic TASK-13 acceptance and finalization tests for source
     hashes, measured denominators, typed failures, PIT, projection lineage,
@@ -7547,7 +7547,7 @@ records:
     repository_path: tests/test_task13_pilot_audit_acceptance.py
   integrity:
     kind: sha256
-    sha256: 5536c4a4f2cf1fa5760ca1782568f00d4680fbbc3e3836c354919a4b075096fd
+    sha256: bdb93f3297e0cfb66581b5e257bb263eb507fb3252344b9f69b61c36ade301a8
   access:
     mode: read_only
     method: file
@@ -7646,7 +7646,7 @@ records:
   evidence: []
   classification: *t14_internal
 - asset_id: TEST-T14-PROVIDER-PURCHASE-DECISION-001
-  record_version: '1.0'
+  record_version: '1.1'
   asset_type: script
   purpose: Deterministic TASK-14 tests for evidence fingerprints, DEFER
     validity, sensitivity arithmetic, dated pricing scope, reconsideration
@@ -7661,7 +7661,7 @@ records:
     repository_path: tests/test_task14_provider_purchase_decision.py
   integrity:
     kind: sha256
-    sha256: 0a69de017605eb60238eca46fbb33a9e3eed4917cdfa3bc74e977c49020e0975
+    sha256: 0ae3c639905ccaa3a73575ca5cebb2eaf8de2bed3e3c36289ac50e7d5be0d195
   access:
     mode: read_only
     method: file
@@ -7786,6 +7786,259 @@ records:
   - FACTORY-001
   evidence: []
   classification: *t15_internal
+- asset_id: CONTRACT-T16-HYPOTHESIS-LIFECYCLE-RESEARCH-MEMORY-001
+  record_version: '1.0'
+  asset_type: decision
+  purpose: Frozen append-only hypothesis lifecycle and research-memory contract preserving origin, version lineage, trials, decisions, reactivation epochs and evidence-bearing prior-work reuse.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-07-29'
+  truth_owner: TASK-16
+  location:
+    kind: git_path
+    logical_uri: repo://docs/contracts/hypothesis_lifecycle_research_memory_contract_v1.md
+    repository_path: docs/contracts/hypothesis_lifecycle_research_memory_contract_v1.md
+  integrity:
+    kind: sha256
+    sha256: fddf51222c710269c0b34cbc9ec48023e99de6d768fcf3c504e2fca5c5aa07d5
+  access:
+    mode: read_only
+    method: file
+    network_required: false
+    secrets_required: false
+  relations:
+  - relation_type: governed_by
+    target_asset_id: ARCH-INTENT-002
+  - relation_type: derived_from
+    target_asset_id: CONTRACT-T15-BOUNDED-SUSTAINED-COLLECTION-001
+  - relation_type: validated_by
+    target_asset_id: TEST-T16-HYPOTHESIS-LIFECYCLE-RESEARCH-MEMORY-CONTRACT-001
+  - relation_type: evidenced_by
+    target_asset_id: EVIDENCE-T16-HYPOTHESIS-RESEARCH-MEMORY-ACCEPTANCE-001
+  consumers:
+  - TASK-16
+  - FACTORY-001
+  evidence: []
+  classification: &t16_internal
+    contains_secrets: false
+    contains_raw_data: false
+    sensitivity: INTERNAL_NON_SECRET
+- asset_id: SCHEMA-T16-HYPOTHESIS-LIFECYCLE-RESEARCH-MEMORY-001
+  record_version: '1.0'
+  asset_type: schema
+  purpose: Strict JSON Schema for append-only hypothesis families, immutable versions, origins, research cycles, artifacts, trials, decisions, derivations and activation epochs.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-07-29'
+  truth_owner: TASK-16
+  location:
+    kind: git_path
+    logical_uri: repo://docs/contracts/hypothesis_lifecycle_research_memory.schema.json
+    repository_path: docs/contracts/hypothesis_lifecycle_research_memory.schema.json
+  integrity:
+    kind: sha256
+    sha256: 92674d3aad07171534a614c7f89db01ab7ea7cda92feb24635fd4905fe359821
+  access:
+    mode: read_only
+    method: file
+    network_required: false
+    secrets_required: false
+  relations:
+  - relation_type: governed_by
+    target_asset_id: CONTRACT-T16-HYPOTHESIS-LIFECYCLE-RESEARCH-MEMORY-001
+  - relation_type: validated_by
+    target_asset_id: TEST-T16-HYPOTHESIS-LIFECYCLE-RESEARCH-MEMORY-CONTRACT-001
+  consumers:
+  - TASK-16
+  - FACTORY-001
+  evidence: []
+  classification: *t16_internal
+- asset_id: TEST-T16-HYPOTHESIS-LIFECYCLE-RESEARCH-MEMORY-CONTRACT-001
+  record_version: '1.0'
+  asset_type: script
+  purpose: Deterministic tests freezing the TASK-16 lifecycle vocabulary, append-only correction boundary, point-in-time semantics, provenance, negative memory and zero-authority contract.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-07-29'
+  truth_owner: TASK-16
+  location:
+    kind: git_path
+    logical_uri: repo://tests/test_task16_hypothesis_lifecycle_research_memory_contract.py
+    repository_path: tests/test_task16_hypothesis_lifecycle_research_memory_contract.py
+  integrity:
+    kind: sha256
+    sha256: 6bbae7321a22a3d99bda23b30695ac116f1a8c7be7d98e60e14d2f3ce7239fdf
+  access:
+    mode: read_only
+    method: file
+    network_required: false
+    secrets_required: false
+  relations:
+  - relation_type: depends_on
+    target_asset_id: CONTRACT-T16-HYPOTHESIS-LIFECYCLE-RESEARCH-MEMORY-001
+  - relation_type: depends_on
+    target_asset_id: SCHEMA-T16-HYPOTHESIS-LIFECYCLE-RESEARCH-MEMORY-001
+  consumers:
+  - TASK-16
+  evidence: []
+  classification: *t16_internal
+- asset_id: SCRIPT-T16-PRIOR-WORK-QUERY-001
+  record_version: '1.0'
+  asset_type: script
+  purpose: Deterministic offline validator and bounded point-in-time prior-work query over hypothesis research memory with evidence-bearing results and no automatic lifecycle decision.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-07-29'
+  truth_owner: TASK-16
+  location:
+    kind: git_path
+    logical_uri: repo://scripts/query_hypothesis_research_memory.py
+    repository_path: scripts/query_hypothesis_research_memory.py
+  integrity:
+    kind: sha256
+    sha256: 19a4cbb370d5f054f785641953e07ab3d78bfcd942b69eacdfb469315d37eaf6
+  access:
+    mode: read_only
+    method: command
+    recipe_id: QUERY-T16-PRIOR-WORK-001
+    network_required: false
+    secrets_required: false
+  relations:
+  - relation_type: governed_by
+    target_asset_id: CONTRACT-T16-HYPOTHESIS-LIFECYCLE-RESEARCH-MEMORY-001
+  - relation_type: depends_on
+    target_asset_id: SCHEMA-T16-HYPOTHESIS-LIFECYCLE-RESEARCH-MEMORY-001
+  - relation_type: validated_by
+    target_asset_id: TEST-T16-HYPOTHESIS-RESEARCH-MEMORY-QUERY-001
+  consumers:
+  - TASK-16
+  - FACTORY-001
+  evidence: []
+  classification: *t16_internal
+- asset_id: FIXTURE-T16-HYPOTHESIS-RESEARCH-MEMORY-001
+  record_version: '1.0'
+  asset_type: evidence
+  purpose: Sanitized append-only example memory preserving a negative first version, an explicit changed-condition derivation and a later positive reactivation version.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-07-29'
+  truth_owner: TASK-16
+  location:
+    kind: git_path
+    logical_uri: repo://tests/fixtures/task16/hypothesis_research_memory_v1.json
+    repository_path: tests/fixtures/task16/hypothesis_research_memory_v1.json
+  integrity:
+    kind: sha256
+    sha256: cce1829f0860e1553b89c4256b139b410151861af70796331459e041af396700
+  access:
+    mode: read_only
+    method: file
+    network_required: false
+    secrets_required: false
+  relations:
+  - relation_type: governed_by
+    target_asset_id: CONTRACT-T16-HYPOTHESIS-LIFECYCLE-RESEARCH-MEMORY-001
+  - relation_type: validated_by
+    target_asset_id: TEST-T16-HYPOTHESIS-RESEARCH-MEMORY-QUERY-001
+  - relation_type: evidenced_by
+    target_asset_id: EVIDENCE-T16-HYPOTHESIS-RESEARCH-MEMORY-ACCEPTANCE-001
+  consumers:
+  - TASK-16
+  - FACTORY-001
+  evidence: []
+  classification: *t16_internal
+- asset_id: TEST-T16-HYPOTHESIS-RESEARCH-MEMORY-QUERY-001
+  record_version: '1.0'
+  asset_type: script
+  purpose: Deterministic query tests covering stable identifiers, content hashes, point-in-time filtering, derivation integrity, reuse predicates, hard bounds and fail-closed malformed memory.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-07-29'
+  truth_owner: TASK-16
+  location:
+    kind: git_path
+    logical_uri: repo://tests/test_task16_hypothesis_research_memory_query.py
+    repository_path: tests/test_task16_hypothesis_research_memory_query.py
+  integrity:
+    kind: sha256
+    sha256: a72ad1fe2f0a42aa1674e4d15f54d091531609ed9769ef17bdef00909bbb584b
+  access:
+    mode: read_only
+    method: file
+    network_required: false
+    secrets_required: false
+  relations:
+  - relation_type: depends_on
+    target_asset_id: SCRIPT-T16-PRIOR-WORK-QUERY-001
+  - relation_type: depends_on
+    target_asset_id: FIXTURE-T16-HYPOTHESIS-RESEARCH-MEMORY-001
+  consumers:
+  - TASK-16
+  evidence: []
+  classification: *t16_internal
+- asset_id: EVIDENCE-T16-HYPOTHESIS-RESEARCH-MEMORY-ACCEPTANCE-001
+  record_version: '1.0'
+  asset_type: evidence
+  purpose: Sanitized TASK-16 receipt proving empty legacy preservation without synthetic history, deterministic prior-work retrieval, Catalog finalization and zero external effects.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-07-29'
+  truth_owner: TASK-16
+  location:
+    kind: git_path
+    logical_uri: repo://docs/evidence/task16/hypothesis_research_memory_acceptance_v1.json
+    repository_path: docs/evidence/task16/hypothesis_research_memory_acceptance_v1.json
+  integrity:
+    kind: sha256
+    sha256: b3d8af79086562aa756b6d57e55aac4ee37384f96ae277ff969ccea13970722a
+  access:
+    mode: read_only
+    method: file
+    network_required: false
+    secrets_required: false
+  relations:
+  - relation_type: derived_from
+    target_asset_id: CONTRACT-T16-HYPOTHESIS-LIFECYCLE-RESEARCH-MEMORY-001
+  - relation_type: derived_from
+    target_asset_id: FIXTURE-T16-HYPOTHESIS-RESEARCH-MEMORY-001
+  - relation_type: validated_by
+    target_asset_id: TEST-T16-HYPOTHESIS-RESEARCH-MEMORY-ACCEPTANCE-001
+  consumers:
+  - TASK-16
+  - FACTORY-001
+  evidence: []
+  classification: *t16_internal
+- asset_id: TEST-T16-HYPOTHESIS-RESEARCH-MEMORY-ACCEPTANCE-001
+  record_version: '1.0'
+  asset_type: script
+  purpose: Deterministic TASK-16 acceptance tests binding upstream fingerprints, empty legacy migration disposition, query evidence, Catalog checkpoint, generated navigation and zero authority.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-07-29'
+  truth_owner: TASK-16
+  location:
+    kind: git_path
+    logical_uri: repo://tests/test_task16_hypothesis_research_memory_acceptance.py
+    repository_path: tests/test_task16_hypothesis_research_memory_acceptance.py
+  integrity:
+    kind: sha256
+    sha256: 8c6451e93368029c843eac9e3754d6ba33fd861e2b3a6d836e79c3b0a16aed5f
+  access:
+    mode: read_only
+    method: file
+    network_required: false
+    secrets_required: false
+  relations:
+  - relation_type: depends_on
+    target_asset_id: EVIDENCE-T16-HYPOTHESIS-RESEARCH-MEMORY-ACCEPTANCE-001
+  - relation_type: depends_on
+    target_asset_id: SCRIPT-T16-PRIOR-WORK-QUERY-001
+  - relation_type: depends_on
+    target_asset_id: FIXTURE-T16-HYPOTHESIS-RESEARCH-MEMORY-001
+  consumers:
+  - TASK-16
+  evidence: []
+  classification: *t16_internal
 - asset_id: TEST-T15-HYPOTHESIS-DRIVEN-ACQUISITION-001
   record_version: '1.0'
   asset_type: script
@@ -7818,7 +8071,7 @@ records:
   evidence: []
   classification: *t15_internal
 - asset_id: TEST-T15-HYPOTHESIS-DRIVEN-ACQUISITION-ACCEPTANCE-001
-  record_version: '1.0'
+  record_version: '1.1'
   asset_type: script
   purpose: Deterministic TASK-15 semantic acceptance tests binding the exact
     contract, fixture, operating-model intent, mandatory Factory Fit review,
@@ -7833,7 +8086,7 @@ records:
     repository_path: tests/test_task15_hypothesis_driven_acquisition_acceptance.py
   integrity:
     kind: sha256
-    sha256: 4b5c1c20851b4c790dd0f89f2ccca73389cb248c49786974d27eebff7e1d6cfc
+    sha256: 3e8ed0c207f1d0a0a9edbd2e10867c1c5926f93605c8b79512f95cded87192fa
   access:
     mode: read_only
     method: file

@@ -29,11 +29,11 @@ class CatalogImportTests(unittest.TestCase):
         )
 
     def test_real_catalog_counts(self) -> None:
-        self.assertEqual(len(self.snapshot.assets_documents), 4)
-        self.assertEqual(len(self.snapshot.assets), 272)
-        self.assertEqual(len(self.snapshot.queries), 7)
-        self.assertEqual(len(self.snapshot.lifecycle_documents), 9)
-        self.assertEqual(len(self.snapshot.lifecycle_records), 52)
+        checkpoint = self.snapshot.manifest["current_checkpoint"]
+        self.assertEqual(
+            catalog.observed_catalog_checkpoint(self.snapshot),
+            checkpoint,
+        )
         reuse = next(
             document for document in self.snapshot.lifecycle_documents
             if document["registry_type"] == "reuse_candidates"
@@ -47,6 +47,15 @@ class CatalogImportTests(unittest.TestCase):
             ),
             0,
         )
+
+    def test_current_checkpoint_drift_fails_closed(self) -> None:
+        snapshot = copy.deepcopy(self.snapshot)
+        snapshot.manifest["current_checkpoint"]["assets"] += 1
+        with self.assertRaisesRegex(
+            catalog.CatalogValidationError,
+            "catalog_current_checkpoint_drift",
+        ):
+            catalog.validate_current_checkpoint(snapshot)
         self.assertIn("ARCH-INTENT-001", self.snapshot.assets)
 
     def test_validated_ci_assets_and_query_contract(self) -> None:

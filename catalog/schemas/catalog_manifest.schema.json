@@ -10,6 +10,7 @@
     "catalog_version",
     "as_of",
     "implementation_status",
+    "current_checkpoint",
     "root_resolver",
     "policies",
     "mandatory_asset_ids",
@@ -36,6 +37,44 @@
         "FOUNDATION_IMPLEMENTED_UNVERIFIED",
         "VALIDATED_ACTIVE"
       ]
+    },
+    "current_checkpoint": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "assets",
+        "asset_registries",
+        "schemas",
+        "queries",
+        "lifecycle_registries",
+        "lifecycle_records"
+      ],
+      "properties": {
+        "assets": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "asset_registries": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "schemas": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "queries": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "lifecycle_registries": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "lifecycle_records": {
+          "type": "integer",
+          "minimum": 0
+        }
+      }
     },
     "root_resolver": {
       "type": "object",

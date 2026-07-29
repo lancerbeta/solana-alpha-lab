@@ -1,0 +1,908 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "repo://docs/contracts/hypothesis_lifecycle_research_memory.schema.json",
+  "title": "SMIAL hypothesis lifecycle and research memory",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "memory_id",
+    "as_of",
+    "truth_owner",
+    "append_only",
+    "history_rewrite_policy",
+    "current_state_is_projection",
+    "hypothesis_families",
+    "hypothesis_origins",
+    "research_cycles",
+    "hypothesis_versions",
+    "research_artifacts",
+    "trials",
+    "decision_events",
+    "derivation_edges",
+    "activation_epochs"
+  ],
+  "properties": {
+    "schema_version": {
+      "const": "1.0"
+    },
+    "memory_id": {
+      "const": "SMIAL-HYPOTHESIS-RESEARCH-MEMORY"
+    },
+    "as_of": {
+      "$ref": "#/$defs/timestamp"
+    },
+    "truth_owner": {
+      "$ref": "#/$defs/task_id"
+    },
+    "append_only": {
+      "const": true
+    },
+    "history_rewrite_policy": {
+      "const": "CORRECT_WITH_NEW_RECORD_AND_SUPERSEDES_LINK"
+    },
+    "current_state_is_projection": {
+      "const": true
+    },
+    "hypothesis_families": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/hypothesis_family"
+      }
+    },
+    "hypothesis_origins": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/hypothesis_origin"
+      }
+    },
+    "research_cycles": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/research_cycle"
+      }
+    },
+    "hypothesis_versions": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/hypothesis_version"
+      }
+    },
+    "research_artifacts": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/research_artifact"
+      }
+    },
+    "trials": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/trial"
+      }
+    },
+    "decision_events": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/decision_event"
+      }
+    },
+    "derivation_edges": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/derivation_edge"
+      }
+    },
+    "activation_epochs": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/activation_epoch"
+      }
+    }
+  },
+  "$defs": {
+    "task_id": {
+      "type": "string",
+      "pattern": "^TASK-[0-9]{2}$"
+    },
+    "stable_id": {
+      "type": "string",
+      "pattern": "^[A-Z][A-Z0-9]*(?:-[A-Z0-9]+)+$"
+    },
+    "family_id": {
+      "type": "string",
+      "pattern": "^HYP-FAMILY-[A-Z0-9]+(?:-[A-Z0-9]+)*$"
+    },
+    "hypothesis_version_id": {
+      "type": "string",
+      "pattern": "^HYP-VERSION-[A-Z0-9]+(?:-[A-Z0-9]+)*-V[1-9][0-9]*$"
+    },
+    "origin_id": {
+      "type": "string",
+      "pattern": "^HYP-ORIGIN-[A-Z0-9]+(?:-[A-Z0-9]+)*$"
+    },
+    "research_cycle_id": {
+      "type": "string",
+      "pattern": "^RESEARCH-CYCLE-[A-Z0-9]+(?:-[A-Z0-9]+)*$"
+    },
+    "research_artifact_id": {
+      "type": "string",
+      "pattern": "^RESEARCH-ARTIFACT-[A-Z0-9]+(?:-[A-Z0-9]+)*$"
+    },
+    "trial_id": {
+      "type": "string",
+      "pattern": "^TRIAL-[A-Z0-9]+(?:-[A-Z0-9]+)*$"
+    },
+    "decision_event_id": {
+      "type": "string",
+      "pattern": "^DECISION-EVENT-[A-Z0-9]+(?:-[A-Z0-9]+)*$"
+    },
+    "derivation_edge_id": {
+      "type": "string",
+      "pattern": "^HYP-DERIVATION-[A-Z0-9]+(?:-[A-Z0-9]+)*$"
+    },
+    "activation_epoch_id": {
+      "type": "string",
+      "pattern": "^ACTIVATION-EPOCH-[A-Z0-9]+(?:-[A-Z0-9]+)*$"
+    },
+    "timestamp": {
+      "type": "string",
+      "pattern": "^20[0-9]{2}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}(?:\\.[0-9]+)?Z$"
+    },
+    "sha256": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{64}$"
+    },
+    "nonempty_text": {
+      "type": "string",
+      "minLength": 3,
+      "maxLength": 2000
+    },
+    "stable_id_array": {
+      "type": "array",
+      "uniqueItems": true,
+      "items": {
+        "$ref": "#/$defs/stable_id"
+      }
+    },
+    "artifact_id_array": {
+      "type": "array",
+      "uniqueItems": true,
+      "items": {
+        "$ref": "#/$defs/research_artifact_id"
+      }
+    },
+    "nonempty_artifact_id_array": {
+      "allOf": [
+        {
+          "$ref": "#/$defs/artifact_id_array"
+        },
+        {
+          "minItems": 1
+        }
+      ]
+    },
+    "hypothesis_version_id_array": {
+      "type": "array",
+      "uniqueItems": true,
+      "items": {
+        "$ref": "#/$defs/hypothesis_version_id"
+      }
+    },
+    "nonempty_hypothesis_version_id_array": {
+      "allOf": [
+        {
+          "$ref": "#/$defs/hypothesis_version_id_array"
+        },
+        {
+          "minItems": 1
+        }
+      ]
+    },
+    "hypothesis_family": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "family_id",
+        "title",
+        "mechanism_class",
+        "created_at",
+        "first_reliable_available_at",
+        "record_owner",
+        "evidence_asset_ids"
+      ],
+      "properties": {
+        "family_id": {
+          "$ref": "#/$defs/family_id"
+        },
+        "title": {
+          "type": "string",
+          "minLength": 3,
+          "maxLength": 240
+        },
+        "mechanism_class": {
+          "type": "string",
+          "minLength": 3,
+          "maxLength": 160
+        },
+        "created_at": {
+          "$ref": "#/$defs/timestamp"
+        },
+        "first_reliable_available_at": {
+          "$ref": "#/$defs/timestamp"
+        },
+        "record_owner": {
+          "$ref": "#/$defs/task_id"
+        },
+        "evidence_asset_ids": {
+          "$ref": "#/$defs/stable_id_array"
+        }
+      }
+    },
+    "hypothesis_origin": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "origin_id",
+        "hypothesis_version_id",
+        "origin_kind",
+        "originator",
+        "observed_at",
+        "recorded_at",
+        "first_reliable_available_at",
+        "initial_observation",
+        "source_reference_asset_ids",
+        "artifact_ids",
+        "record_owner"
+      ],
+      "properties": {
+        "origin_id": {
+          "$ref": "#/$defs/origin_id"
+        },
+        "hypothesis_version_id": {
+          "$ref": "#/$defs/hypothesis_version_id"
+        },
+        "origin_kind": {
+          "enum": [
+            "OWNER_OBSERVATION",
+            "DATA_ANALYSIS",
+            "AI_ASSISTED_EXPLORATION",
+            "EXTERNAL_RESEARCH",
+            "TOOL_OR_FRAMEWORK",
+            "DERIVED_FROM_EXISTING_HYPOTHESIS"
+          ]
+        },
+        "originator": {
+          "type": "string",
+          "minLength": 2,
+          "maxLength": 160
+        },
+        "observed_at": {
+          "$ref": "#/$defs/timestamp"
+        },
+        "recorded_at": {
+          "$ref": "#/$defs/timestamp"
+        },
+        "first_reliable_available_at": {
+          "$ref": "#/$defs/timestamp"
+        },
+        "initial_observation": {
+          "$ref": "#/$defs/nonempty_text"
+        },
+        "source_reference_asset_ids": {
+          "$ref": "#/$defs/stable_id_array"
+        },
+        "artifact_ids": {
+          "$ref": "#/$defs/artifact_id_array"
+        },
+        "record_owner": {
+          "$ref": "#/$defs/task_id"
+        }
+      }
+    },
+    "research_cycle": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "research_cycle_id",
+        "question",
+        "estimand",
+        "population_and_controls",
+        "available_data_asset_ids",
+        "required_output",
+        "error_cost",
+        "time_cap_minutes",
+        "cash_cap_usd",
+        "privacy_boundary",
+        "validation_owner",
+        "opened_at",
+        "first_reliable_available_at",
+        "hypothesis_version_ids",
+        "record_owner"
+      ],
+      "properties": {
+        "research_cycle_id": {
+          "$ref": "#/$defs/research_cycle_id"
+        },
+        "question": {
+          "$ref": "#/$defs/nonempty_text"
+        },
+        "estimand": {
+          "$ref": "#/$defs/nonempty_text"
+        },
+        "population_and_controls": {
+          "$ref": "#/$defs/nonempty_text"
+        },
+        "available_data_asset_ids": {
+          "$ref": "#/$defs/stable_id_array"
+        },
+        "required_output": {
+          "$ref": "#/$defs/nonempty_text"
+        },
+        "error_cost": {
+          "$ref": "#/$defs/nonempty_text"
+        },
+        "time_cap_minutes": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "cash_cap_usd": {
+          "type": "number",
+          "minimum": 0
+        },
+        "privacy_boundary": {
+          "$ref": "#/$defs/nonempty_text"
+        },
+        "validation_owner": {
+          "type": "string",
+          "minLength": 3,
+          "maxLength": 160
+        },
+        "opened_at": {
+          "$ref": "#/$defs/timestamp"
+        },
+        "first_reliable_available_at": {
+          "$ref": "#/$defs/timestamp"
+        },
+        "hypothesis_version_ids": {
+          "$ref": "#/$defs/nonempty_hypothesis_version_id_array"
+        },
+        "record_owner": {
+          "$ref": "#/$defs/task_id"
+        }
+      }
+    },
+    "hypothesis_version": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "hypothesis_version_id",
+        "family_id",
+        "version_ordinal",
+        "research_cycle_id",
+        "origin_id",
+        "definition_state",
+        "statement",
+        "mechanism",
+        "falsifier",
+        "expected_regime_terms",
+        "feature_definition_asset_ids",
+        "label_definition_asset_ids",
+        "named_consumer_ids",
+        "created_at",
+        "first_reliable_available_at",
+        "definition_sha256",
+        "evidence_asset_ids",
+        "record_owner"
+      ],
+      "properties": {
+        "hypothesis_version_id": {
+          "$ref": "#/$defs/hypothesis_version_id"
+        },
+        "family_id": {
+          "$ref": "#/$defs/family_id"
+        },
+        "version_ordinal": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "research_cycle_id": {
+          "$ref": "#/$defs/research_cycle_id"
+        },
+        "origin_id": {
+          "$ref": "#/$defs/origin_id"
+        },
+        "definition_state": {
+          "const": "FROZEN"
+        },
+        "statement": {
+          "$ref": "#/$defs/nonempty_text"
+        },
+        "mechanism": {
+          "$ref": "#/$defs/nonempty_text"
+        },
+        "falsifier": {
+          "$ref": "#/$defs/nonempty_text"
+        },
+        "expected_regime_terms": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": {
+            "type": "string",
+            "minLength": 2,
+            "maxLength": 120
+          }
+        },
+        "feature_definition_asset_ids": {
+          "$ref": "#/$defs/stable_id_array"
+        },
+        "label_definition_asset_ids": {
+          "$ref": "#/$defs/stable_id_array"
+        },
+        "data_requirement_asset_id": {
+          "$ref": "#/$defs/stable_id"
+        },
+        "named_consumer_ids": {
+          "$ref": "#/$defs/stable_id_array"
+        },
+        "created_at": {
+          "$ref": "#/$defs/timestamp"
+        },
+        "first_reliable_available_at": {
+          "$ref": "#/$defs/timestamp"
+        },
+        "definition_sha256": {
+          "$ref": "#/$defs/sha256"
+        },
+        "supersedes_hypothesis_version_id": {
+          "$ref": "#/$defs/hypothesis_version_id"
+        },
+        "evidence_asset_ids": {
+          "$ref": "#/$defs/stable_id_array"
+        },
+        "record_owner": {
+          "$ref": "#/$defs/task_id"
+        }
+      }
+    },
+    "research_artifact": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "research_artifact_id",
+        "hypothesis_version_ids",
+        "artifact_kind",
+        "logical_uri",
+        "content_sha256",
+        "created_at",
+        "first_reliable_available_at",
+        "tool_name",
+        "tool_version",
+        "contains_sensitive_raw_conversation",
+        "record_owner"
+      ],
+      "properties": {
+        "research_artifact_id": {
+          "$ref": "#/$defs/research_artifact_id"
+        },
+        "hypothesis_version_ids": {
+          "$ref": "#/$defs/hypothesis_version_id_array"
+        },
+        "artifact_kind": {
+          "enum": [
+            "DATASET_SNAPSHOT",
+            "QUERY",
+            "NOTEBOOK",
+            "CODE",
+            "CONFIG",
+            "SANITIZED_PROMPT",
+            "MODEL_OUTPUT",
+            "REPORT",
+            "DECISION_EVIDENCE"
+          ]
+        },
+        "logical_uri": {
+          "type": "string",
+          "pattern": "^[a-z][a-z0-9+.-]*://[^\\s]+$",
+          "maxLength": 500
+        },
+        "content_sha256": {
+          "$ref": "#/$defs/sha256"
+        },
+        "created_at": {
+          "$ref": "#/$defs/timestamp"
+        },
+        "first_reliable_available_at": {
+          "$ref": "#/$defs/timestamp"
+        },
+        "dataset_as_of": {
+          "$ref": "#/$defs/timestamp"
+        },
+        "tool_capability_id": {
+          "$ref": "#/$defs/stable_id"
+        },
+        "tool_name": {
+          "type": "string",
+          "minLength": 2,
+          "maxLength": 160
+        },
+        "tool_version": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 120
+        },
+        "config_sha256": {
+          "$ref": "#/$defs/sha256"
+        },
+        "contains_sensitive_raw_conversation": {
+          "const": false
+        },
+        "record_owner": {
+          "$ref": "#/$defs/task_id"
+        }
+      }
+    },
+    "search_budget": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "planned_variants",
+        "executed_variants",
+        "holdout_looks"
+      ],
+      "properties": {
+        "planned_variants": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "executed_variants": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "holdout_looks": {
+          "type": "integer",
+          "minimum": 0
+        }
+      }
+    },
+    "trial": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "trial_id",
+        "hypothesis_version_id",
+        "research_cycle_id",
+        "trial_kind",
+        "estimand",
+        "population_artifact_id",
+        "control_artifact_ids",
+        "dataset_artifact_ids",
+        "method_artifact_ids",
+        "result_artifact_ids",
+        "dataset_as_of",
+        "availability_cutoff",
+        "split_id",
+        "holdout_consumption_ids",
+        "search_budget",
+        "cost_assumptions_artifact_id",
+        "outcome",
+        "conclusion",
+        "limitation_codes",
+        "completed_at",
+        "first_reliable_available_at",
+        "evidence_asset_ids",
+        "record_owner"
+      ],
+      "properties": {
+        "trial_id": {
+          "$ref": "#/$defs/trial_id"
+        },
+        "hypothesis_version_id": {
+          "$ref": "#/$defs/hypothesis_version_id"
+        },
+        "research_cycle_id": {
+          "$ref": "#/$defs/research_cycle_id"
+        },
+        "trial_kind": {
+          "enum": [
+            "RETROSPECTIVE",
+            "OUT_OF_SAMPLE",
+            "WALK_FORWARD",
+            "SHADOW",
+            "PAPER",
+            "REVALIDATION"
+          ]
+        },
+        "estimand": {
+          "$ref": "#/$defs/nonempty_text"
+        },
+        "population_artifact_id": {
+          "$ref": "#/$defs/research_artifact_id"
+        },
+        "control_artifact_ids": {
+          "$ref": "#/$defs/nonempty_artifact_id_array"
+        },
+        "dataset_artifact_ids": {
+          "$ref": "#/$defs/nonempty_artifact_id_array"
+        },
+        "method_artifact_ids": {
+          "$ref": "#/$defs/nonempty_artifact_id_array"
+        },
+        "result_artifact_ids": {
+          "$ref": "#/$defs/nonempty_artifact_id_array"
+        },
+        "dataset_as_of": {
+          "$ref": "#/$defs/timestamp"
+        },
+        "availability_cutoff": {
+          "$ref": "#/$defs/timestamp"
+        },
+        "split_id": {
+          "$ref": "#/$defs/stable_id"
+        },
+        "holdout_consumption_ids": {
+          "$ref": "#/$defs/stable_id_array"
+        },
+        "search_budget": {
+          "$ref": "#/$defs/search_budget"
+        },
+        "cost_assumptions_artifact_id": {
+          "$ref": "#/$defs/research_artifact_id"
+        },
+        "outcome": {
+          "enum": [
+            "POSITIVE",
+            "NEGATIVE",
+            "INCONCLUSIVE",
+            "INVALID"
+          ]
+        },
+        "conclusion": {
+          "$ref": "#/$defs/nonempty_text"
+        },
+        "limitation_codes": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": {
+            "type": "string",
+            "pattern": "^[A-Z][A-Z0-9]*(?:_[A-Z0-9]+)*$"
+          }
+        },
+        "completed_at": {
+          "$ref": "#/$defs/timestamp"
+        },
+        "first_reliable_available_at": {
+          "$ref": "#/$defs/timestamp"
+        },
+        "evidence_asset_ids": {
+          "$ref": "#/$defs/stable_id_array"
+        },
+        "record_owner": {
+          "$ref": "#/$defs/task_id"
+        }
+      }
+    },
+    "decision_event": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "decision_event_id",
+        "hypothesis_version_id",
+        "decision_kind",
+        "rationale",
+        "decision_owner",
+        "decided_at",
+        "effective_at",
+        "first_reliable_available_at",
+        "trial_ids",
+        "evidence_asset_ids",
+        "record_owner"
+      ],
+      "properties": {
+        "decision_event_id": {
+          "$ref": "#/$defs/decision_event_id"
+        },
+        "hypothesis_version_id": {
+          "$ref": "#/$defs/hypothesis_version_id"
+        },
+        "decision_kind": {
+          "enum": [
+            "REJECT",
+            "REVISE",
+            "PROMOTE",
+            "PAUSE",
+            "MARK_DORMANT",
+            "RETIRE",
+            "REACTIVATE",
+            "CLOSE_RESEARCH_CYCLE",
+            "REOPEN_RESEARCH_CYCLE"
+          ]
+        },
+        "rationale": {
+          "$ref": "#/$defs/nonempty_text"
+        },
+        "decision_owner": {
+          "type": "string",
+          "minLength": 3,
+          "maxLength": 160
+        },
+        "decided_at": {
+          "$ref": "#/$defs/timestamp"
+        },
+        "effective_at": {
+          "$ref": "#/$defs/timestamp"
+        },
+        "first_reliable_available_at": {
+          "$ref": "#/$defs/timestamp"
+        },
+        "trial_ids": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": {
+            "$ref": "#/$defs/trial_id"
+          }
+        },
+        "activation_epoch_id": {
+          "$ref": "#/$defs/activation_epoch_id"
+        },
+        "supersedes_decision_event_id": {
+          "$ref": "#/$defs/decision_event_id"
+        },
+        "next_condition": {
+          "$ref": "#/$defs/nonempty_text"
+        },
+        "evidence_asset_ids": {
+          "$ref": "#/$defs/stable_id_array"
+        },
+        "record_owner": {
+          "$ref": "#/$defs/task_id"
+        }
+      }
+    },
+    "derivation_edge": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "derivation_edge_id",
+        "parent_hypothesis_version_ids",
+        "child_hypothesis_version_id",
+        "derivation_kind",
+        "rationale",
+        "created_at",
+        "first_reliable_available_at",
+        "evidence_asset_ids",
+        "record_owner"
+      ],
+      "properties": {
+        "derivation_edge_id": {
+          "$ref": "#/$defs/derivation_edge_id"
+        },
+        "parent_hypothesis_version_ids": {
+          "allOf": [
+            {
+              "$ref": "#/$defs/hypothesis_version_id_array"
+            },
+            {
+              "minItems": 1
+            }
+          ]
+        },
+        "child_hypothesis_version_id": {
+          "$ref": "#/$defs/hypothesis_version_id"
+        },
+        "derivation_kind": {
+          "enum": [
+            "EXTENDS",
+            "REFINES",
+            "CONTRADICTS",
+            "RECOMBINES",
+            "REACTIVATION_REFORMULATION"
+          ]
+        },
+        "rationale": {
+          "$ref": "#/$defs/nonempty_text"
+        },
+        "created_at": {
+          "$ref": "#/$defs/timestamp"
+        },
+        "first_reliable_available_at": {
+          "$ref": "#/$defs/timestamp"
+        },
+        "evidence_asset_ids": {
+          "$ref": "#/$defs/stable_id_array"
+        },
+        "record_owner": {
+          "$ref": "#/$defs/task_id"
+        }
+      }
+    },
+    "activation_epoch": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "activation_epoch_id",
+        "hypothesis_version_id",
+        "epoch_ordinal",
+        "mode",
+        "opened_at",
+        "first_reliable_available_at",
+        "activation_basis_decision_event_id",
+        "regime_evidence_asset_ids",
+        "authority_receipt_asset_ids",
+        "record_owner"
+      ],
+      "properties": {
+        "activation_epoch_id": {
+          "$ref": "#/$defs/activation_epoch_id"
+        },
+        "hypothesis_version_id": {
+          "$ref": "#/$defs/hypothesis_version_id"
+        },
+        "epoch_ordinal": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "mode": {
+          "enum": [
+            "RESEARCH",
+            "SHADOW",
+            "PAPER",
+            "LIVE"
+          ]
+        },
+        "opened_at": {
+          "$ref": "#/$defs/timestamp"
+        },
+        "first_reliable_available_at": {
+          "$ref": "#/$defs/timestamp"
+        },
+        "activation_basis_decision_event_id": {
+          "$ref": "#/$defs/decision_event_id"
+        },
+        "previous_activation_epoch_id": {
+          "$ref": "#/$defs/activation_epoch_id"
+        },
+        "strategy_version_id": {
+          "$ref": "#/$defs/stable_id"
+        },
+        "regime_evidence_asset_ids": {
+          "allOf": [
+            {
+              "$ref": "#/$defs/stable_id_array"
+            },
+            {
+              "minItems": 1
+            }
+          ]
+        },
+        "authority_receipt_asset_ids": {
+          "$ref": "#/$defs/stable_id_array"
+        },
+        "record_owner": {
+          "$ref": "#/$defs/task_id"
+        }
+      },
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "mode": {
+                "const": "LIVE"
+              }
+            },
+            "required": [
+              "mode"
+            ]
+          },
+          "then": {
+            "properties": {
+              "authority_receipt_asset_ids": {
+                "minItems": 1
+              }
+            }
+          }
+        }
+      ]
+    }
+  }
+}

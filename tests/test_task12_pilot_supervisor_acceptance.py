@@ -470,8 +470,10 @@ class Task12PilotSupervisorAcceptanceTests(unittest.TestCase):
             "EVIDENCE-T12-PILOT-SUPERVISOR-OFFLINE-SUMMARY-001",
             "TEST-T12-PILOT-SUPERVISOR-ACCEPTANCE-001",
         }
-        self.assertEqual(manifest["catalog_version"], "0.18.0")
-        self.assertEqual(len(records), 272)
+        self.assertEqual(
+            len(records),
+            manifest["current_checkpoint"]["assets"],
+        )
         self.assertTrue(expected.issubset(records))
         self.assertTrue(
             expected.issubset(set(manifest["mandatory_asset_ids"]))

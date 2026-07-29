@@ -1,0 +1,135 @@
+{
+  "schema": "smial.task16_hypothesis_research_memory_acceptance.v1",
+  "task": "TASK-16",
+  "atom": "T16-A5_MIGRATION_ACCEPTANCE_AND_CATALOG_FINALIZATION_V1",
+  "as_of": "2026-07-29",
+  "verdict": "PASS",
+  "repository_base": {
+    "head": "a411f986082b1689a57493d6810974982e731e54",
+    "tree": "c0ea9e36e4d98d79faf803c8bd1ad876c0557a40"
+  },
+  "accepted_artifacts": [
+    {
+      "path": "docs/contracts/hypothesis_lifecycle_research_memory.schema.json",
+      "sha256": "92674d3aad07171534a614c7f89db01ab7ea7cda92feb24635fd4905fe359821"
+    },
+    {
+      "path": "docs/contracts/hypothesis_lifecycle_research_memory_contract_v1.md",
+      "sha256": "fddf51222c710269c0b34cbc9ec48023e99de6d768fcf3c504e2fca5c5aa07d5"
+    },
+    {
+      "path": "scripts/query_hypothesis_research_memory.py",
+      "sha256": "19a4cbb370d5f054f785641953e07ab3d78bfcd942b69eacdfb469315d37eaf6"
+    },
+    {
+      "path": "tests/fixtures/task16/hypothesis_research_memory_v1.json",
+      "sha256": "cce1829f0860e1553b89c4256b139b410151861af70796331459e041af396700"
+    },
+    {
+      "path": "tests/test_task16_hypothesis_lifecycle_research_memory_contract.py",
+      "sha256": "6bbae7321a22a3d99bda23b30695ac116f1a8c7be7d98e60e14d2f3ce7239fdf"
+    },
+    {
+      "path": "tests/test_task16_hypothesis_research_memory_query.py",
+      "sha256": "a72ad1fe2f0a42aa1674e4d15f54d091531609ed9769ef17bdef00909bbb584b"
+    }
+  ],
+  "migration": {
+    "mode": "FORWARD_ONLY_NO_HISTORICAL_REWRITE",
+    "disposition": "PRESERVED_AS_V1_EMPTY_NO_SYNTHETIC_HISTORY",
+    "source_records_total": 0,
+    "created_records_from_legacy": 0,
+    "synthetic_history_created": false,
+    "historical_receipts_rewritten": false,
+    "sources": [
+      {
+        "path": "registries/research_cycles.yaml",
+        "sha256": "2ca0195a7617f2f95b7334291c776b78b447ea854b4c43b48dbe0f25fe08f797",
+        "records": 0
+      },
+      {
+        "path": "registries/hypotheses.yaml",
+        "sha256": "9ee9f983fa6869c0ee1ff6a249e06dd38fc059a956943cfea8539822054236d9",
+        "records": 0
+      },
+      {
+        "path": "registries/global_trial_ledger.yaml",
+        "sha256": "41b2f3cd1e2303f90318d0295c36c390999c7539031cb52db1a03779be56b671",
+        "records": 0
+      },
+      {
+        "path": "registries/decisions_negative_results.yaml",
+        "sha256": "6396b1ef361c86ff39be917992eb723afda94d2280599cbee66cdbd184a4ef35",
+        "records": 0
+      }
+    ],
+    "target_contract_asset_id": "CONTRACT-T16-HYPOTHESIS-LIFECYCLE-RESEARCH-MEMORY-001",
+    "target_schema_asset_id": "SCHEMA-T16-HYPOTHESIS-LIFECYCLE-RESEARCH-MEMORY-001"
+  },
+  "deterministic_query_acceptance": {
+    "query_recipe_id": "QUERY-T16-PRIOR-WORK-001",
+    "query_id": "PRIOR-WORK-QUERY-LIQUIDITY-ACCEPTANCE-001",
+    "as_of": "2026-07-30T12:00:00Z",
+    "max_results": 20,
+    "predicates": {
+      "mechanism_terms": [
+        "liquidity"
+      ]
+    },
+    "memory_content_sha256": "cce1829f0860e1553b89c4256b139b410151861af70796331459e041af396700",
+    "result_count": 2,
+    "ordered_hypothesis_version_ids": [
+      "HYP-VERSION-LIQUIDITY-REVERSAL-V1",
+      "HYP-VERSION-LIQUIDITY-REVERSAL-V2"
+    ],
+    "current_states": {
+      "HYP-VERSION-LIQUIDITY-REVERSAL-V1": "DORMANT",
+      "HYP-VERSION-LIQUIDITY-REVERSAL-V2": "REACTIVATED"
+    },
+    "trial_outcomes": {
+      "HYP-VERSION-LIQUIDITY-REVERSAL-V1": [
+        "NEGATIVE"
+      ],
+      "HYP-VERSION-LIQUIDITY-REVERSAL-V2": [
+        "POSITIVE"
+      ]
+    },
+    "canonical_result_sha256": "a2d834b3ec7ef41c4680d37f31ab9ea5768c511f66006721d508cd37daf13221",
+    "automatic_reject_or_promotion": false
+  },
+  "catalog_checkpoint": {
+    "catalog_version": "0.19.0",
+    "assets": 280,
+    "asset_registries": 4,
+    "schemas": 4,
+    "queries": 8,
+    "lifecycle_registries": 9,
+    "lifecycle_records": 52,
+    "registered_asset_ids": [
+      "CONTRACT-T16-HYPOTHESIS-LIFECYCLE-RESEARCH-MEMORY-001",
+      "SCHEMA-T16-HYPOTHESIS-LIFECYCLE-RESEARCH-MEMORY-001",
+      "TEST-T16-HYPOTHESIS-LIFECYCLE-RESEARCH-MEMORY-CONTRACT-001",
+      "SCRIPT-T16-PRIOR-WORK-QUERY-001",
+      "FIXTURE-T16-HYPOTHESIS-RESEARCH-MEMORY-001",
+      "TEST-T16-HYPOTHESIS-RESEARCH-MEMORY-QUERY-001",
+      "EVIDENCE-T16-HYPOTHESIS-RESEARCH-MEMORY-ACCEPTANCE-001",
+      "TEST-T16-HYPOTHESIS-RESEARCH-MEMORY-ACCEPTANCE-001"
+    ],
+    "registered_query_recipe_ids": [
+      "QUERY-T16-PRIOR-WORK-001"
+    ]
+  },
+  "authority": {
+    "provider_api_rpc_calls": 0,
+    "cash_spend_usd": 0,
+    "wallet_actions": 0,
+    "signer_actions": 0,
+    "transaction_actions": 0,
+    "commit_actions": 0,
+    "push_actions": 0,
+    "pull_request_actions": 0,
+    "merge_actions": 0
+  },
+  "state_change": "LOCAL_CANDIDATE_REQUIRES_REPOSITORY_DELIVERY",
+  "next_atom": "T16-A6_REPOSITORY_DELIVERY_V1"
+}

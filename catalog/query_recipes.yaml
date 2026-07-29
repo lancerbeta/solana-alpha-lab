@@ -234,3 +234,54 @@ recipes:
   output_contract:
     format: json
     max_records: 100
+- recipe_id: QUERY-T16-PRIOR-WORK-001
+  record_version: '1.0'
+  purpose: Search the offline hypothesis research memory at an explicit point-in-time cutoff for reusable prior work without automatic rejection or promotion.
+  kind: local_command
+  read_only: true
+  bounded: true
+  network_required: false
+  write_effects: NONE
+  timeout_seconds: 30
+  command:
+  - uv
+  - run
+  - --offline
+  - --locked
+  - --managed-python
+  - python
+  - -B
+  - scripts/query_hypothesis_research_memory.py
+  - --memory
+  - '{memory_path}'
+  - --query-id
+  - '{query_id}'
+  - --as-of
+  - '{as_of}'
+  - --max-results
+  - '{max_results}'
+  - --mechanism-terms
+  - '{mechanism_term}'
+  parameters:
+  - name: memory_path
+    required: true
+    pattern: ^tests/fixtures/task16/[a-z0-9_]+[.]json$
+  - name: query_id
+    required: true
+    pattern: ^[A-Z][A-Z0-9]*(?:-[A-Z0-9]+)+$
+  - name: as_of
+    required: true
+    pattern: '^20[0-9]{2}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}(?:[.][0-9]{1,6})?Z$'
+  - name: max_results
+    required: true
+    pattern: '^(?:[1-9]|[1-4][0-9]|50)$'
+  - name: mechanism_term
+    required: true
+    pattern: '^[A-Za-z0-9][A-Za-z0-9 _-]{1,119}$'
+  target_asset_ids:
+  - SCRIPT-T16-PRIOR-WORK-QUERY-001
+  - SCHEMA-T16-HYPOTHESIS-LIFECYCLE-RESEARCH-MEMORY-001
+  - FIXTURE-T16-HYPOTHESIS-RESEARCH-MEMORY-001
+  output_contract:
+    format: json
+    max_records: 50
