@@ -1,0 +1,159 @@
+{
+  "schema": "smial.task18_content_addressed_backup_restore_receipt.v1",
+  "schema_version": "1.0",
+  "task": "TASK-18",
+  "atom": "T18-A3R_CONTENT_ADDRESSED_BACKUP_RESTORE_PROOF_V1",
+  "as_of": "2026-07-29",
+  "status": "ACCEPTED_LOCAL_CANDIDATE",
+  "proof_method": "DRIVE_RAW_BYTE_IDENTITY_PLUS_DETERMINISTIC_LOCAL_RESTORE",
+  "contract": {
+    "document_path": "docs/contracts/task18_content_addressed_backup_restore_contract_v1.md",
+    "document_sha256": "dec80ed2e4f340668663f9431f01bdca1d31dcd767666a34b89a964566293f23",
+    "fixture_path": "tests/fixtures/task18/content_addressed_backup_restore_contract_v1.json",
+    "fixture_sha256": "21758d22644cea1036d42ab7fdb596472c03e1a125b096bfc20ccd595f2c0ef7"
+  },
+  "frozen_inputs": {
+    "quality_contract_sha256": "1842df2ef349d9506ff612c3faf3c943a1a218f6c6a7e266c5af5f0f5578b3a6",
+    "quality_audit_sha256": "52a4585364930ca4a62e12a06cf196af14309f34ab3d46c75f2c00a168e40403",
+    "quality_audit_verdict": "FIT_WITH_LIMITATIONS",
+    "raw_file_count": 12,
+    "raw_jsonl_rows": 32,
+    "raw_stored_bytes": 179208
+  },
+  "archive": {
+    "filename": "TASK18_RAW_BACKUP_v1_8b016b38096d87e182aa7d41e549fd6d97eb7008777e5c9dfe59b3b15178b838.zip",
+    "local_repository_relative_path": "local/task18_backup/TASK18_RAW_BACKUP_v1_8b016b38096d87e182aa7d41e549fd6d97eb7008777e5c9dfe59b3b15178b838.zip",
+    "bytes": 187756,
+    "sha256": "8b016b38096d87e182aa7d41e549fd6d97eb7008777e5c9dfe59b3b15178b838",
+    "md5": "5c273debe392d2130e20182c39e3d10c",
+    "compression": "ZIP_STORED",
+    "entry_count": 13,
+    "manifest_entries": 1,
+    "raw_file_entries": 12,
+    "source_stored_bytes": 179208
+  },
+  "google_drive": {
+    "folder": {
+      "name": "Solana Alpha Lab — Content-Addressed Backups",
+      "id": "1c_v9gTNOxlUzxAoLhyY5FW45S50TZgl1",
+      "url": "https://drive.google.com/drive/folders/1c_v9gTNOxlUzxAoLhyY5FW45S50TZgl1",
+      "created_by_atom": true
+    },
+    "file": {
+      "id": "1msCdh2niGoh5wcGD7Ofiq9Dz9WBIFifn",
+      "url": "https://drive.google.com/file/d/1msCdh2niGoh5wcGD7Ofiq9Dz9WBIFifn/view?usp=drivesdk",
+      "name": "TASK18_RAW_BACKUP_v1_8b016b38096d87e182aa7d41e549fd6d97eb7008777e5c9dfe59b3b15178b838.zip",
+      "mime_type": "application/zip",
+      "parent_folder_id": "1c_v9gTNOxlUzxAoLhyY5FW45S50TZgl1",
+      "bytes": 187756,
+      "created_time": "2026-07-29T18:07:15.401Z",
+      "modified_time": "2026-07-29T18:07:15.401Z",
+      "shared": false,
+      "visibility": "not_shared",
+      "new_file_upload": true,
+      "existing_file_replaced": false
+    },
+    "raw_readback": {
+      "decoded_bytes": 187756,
+      "sha256": "8b016b38096d87e182aa7d41e549fd6d97eb7008777e5c9dfe59b3b15178b838",
+      "md5": "5c273debe392d2130e20182c39e3d10c",
+      "size_match": true,
+      "sha256_match": true,
+      "md5_match": true,
+      "complete_byte_identity": true
+    }
+  },
+  "restore": {
+    "repository_relative_root": "local/task18_drive_restore/8b016b38096d87e182aa7d41e549fd6d97eb7008777e5c9dfe59b3b15178b838",
+    "proof_transitivity": "DRIVE_SHA256_AND_MD5_EQUAL_LOCAL_ARCHIVE_THAT_WAS_RESTORED",
+    "restored_file_count": 12,
+    "restored_stored_bytes": 179208,
+    "expected_entry_set_match": true,
+    "all_restored_hashes_match_manifest": true,
+    "restored_a3_verdict": "FIT_WITH_LIMITATIONS",
+    "restored_hard_failure_count": 0,
+    "source_mutations": 0,
+    "source_deletions": 0
+  },
+  "checks": [
+    {
+      "check_id": "CONTENT_ADDRESSED_ARCHIVE",
+      "status": "PASS"
+    },
+    {
+      "check_id": "DRIVE_PRIVATE_CREATE_ONLY_UPLOAD",
+      "status": "PASS"
+    },
+    {
+      "check_id": "DRIVE_RAW_DOWNLOAD_SIZE_MATCH",
+      "status": "PASS"
+    },
+    {
+      "check_id": "DRIVE_RAW_DOWNLOAD_SHA256_MATCH",
+      "status": "PASS"
+    },
+    {
+      "check_id": "DRIVE_RAW_DOWNLOAD_MD5_MATCH",
+      "status": "PASS"
+    },
+    {
+      "check_id": "ARCHIVE_ENTRY_INVENTORY_AND_HASHES",
+      "status": "PASS"
+    },
+    {
+      "check_id": "ISOLATED_RESTORE",
+      "status": "PASS"
+    },
+    {
+      "check_id": "RESTORED_A3_REPRODUCTION",
+      "status": "PASS"
+    },
+    {
+      "check_id": "SOURCE_IMMUTABILITY",
+      "status": "PASS"
+    }
+  ],
+  "reconciliation": {
+    "previous_verdict": "FIT_WITH_LIMITATIONS",
+    "superseded_limitations": [
+      "BACKUP_INVENTORY_NOT_OBSERVED",
+      "OVERWRITE_PREVENTION_NOT_PROVEN_BY_CURRENT_HASHES",
+      "RESTORE_TEST_NOT_OBSERVED"
+    ],
+    "replacement_evidence": "RECOVERABLE_CONTENT_ADDRESSED_SNAPSHOT_PROVEN",
+    "reconciled_verdict": "FIT_FOR_NARROW_QUOTE_ONLY_ESTIMAND",
+    "scope_constraints": [
+      "ONE_MEMBER",
+      "THREE_ACCEPTED_WINDOWS",
+      "QUOTE_ONLY",
+      "SNAPSHOT_SPECIFIC_DURABILITY_PROOF"
+    ],
+    "task19_replay_authorized_by_this_repair": false,
+    "next_gate": "T18-A4_CATALOG_REPOSITORY_FINALIZATION_V1"
+  },
+  "authority_receipt": {
+    "source_raw_mutations": 0,
+    "source_raw_deletions": 0,
+    "google_drive_folder_searches": 1,
+    "google_drive_folder_creates": 1,
+    "google_drive_file_uploads": 1,
+    "google_drive_file_updates": 0,
+    "google_drive_file_deletions": 0,
+    "google_drive_sharing_changes": 0,
+    "google_drive_public_links_created": 0,
+    "google_drive_metadata_reads": 1,
+    "google_drive_raw_download_reads": 6,
+    "browser_completed_downloads": 0,
+    "provider_api_rpc_wss_calls": 0,
+    "collector_executions": 0,
+    "cash_spend_usd_cents": 0,
+    "provider_credits": 0,
+    "wallet_signer_transaction_actions": 0,
+    "dependency_changes": 0,
+    "commit": false,
+    "push": false,
+    "pull_request": false,
+    "merge": false
+  },
+  "verdict": "PASS"
+}

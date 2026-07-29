@@ -63,6 +63,26 @@
       "target_asset_id": "TEST-T15-HYPOTHESIS-DRIVEN-ACQUISITION-ACCEPTANCE-001"
     },
     {
+      "source_asset_id": "BUNDLE-T18-CONTENT-ADDRESSED-RAW-BACKUP-001",
+      "relation": "derived_from",
+      "target_asset_id": "DATA-T17A-EXECUTION-CAPACITY-RAW-001"
+    },
+    {
+      "source_asset_id": "BUNDLE-T18-CONTENT-ADDRESSED-RAW-BACKUP-001",
+      "relation": "evidenced_by",
+      "target_asset_id": "EVIDENCE-T18-CONTENT-ADDRESSED-BACKUP-RESTORE-001"
+    },
+    {
+      "source_asset_id": "BUNDLE-T18-CONTENT-ADDRESSED-RAW-BACKUP-001",
+      "relation": "governed_by",
+      "target_asset_id": "CONTRACT-T18-CONTENT-ADDRESSED-BACKUP-RESTORE-001"
+    },
+    {
+      "source_asset_id": "BUNDLE-T18-CONTENT-ADDRESSED-RAW-BACKUP-001",
+      "relation": "validated_by",
+      "target_asset_id": "TEST-T18-BACKUP-RESTORE-001"
+    },
+    {
       "source_asset_id": "BUNDLE-TASK01-COMPLETION-001",
       "relation": "contains",
       "target_asset_id": "PRE-GIT-TASK01-A017"
@@ -651,6 +671,26 @@
       "source_asset_id": "CONTRACT-T17A-TIMING-REPAIR-001",
       "relation": "validated_by",
       "target_asset_id": "TEST-T17A-TIMING-REPAIR-001"
+    },
+    {
+      "source_asset_id": "CONTRACT-T18-CONTENT-ADDRESSED-BACKUP-RESTORE-001",
+      "relation": "governed_by",
+      "target_asset_id": "CONTRACT-T18-NARROW-DATA-QUALITY-001"
+    },
+    {
+      "source_asset_id": "CONTRACT-T18-CONTENT-ADDRESSED-BACKUP-RESTORE-001",
+      "relation": "validated_by",
+      "target_asset_id": "TEST-T18-BACKUP-RESTORE-001"
+    },
+    {
+      "source_asset_id": "CONTRACT-T18-NARROW-DATA-QUALITY-001",
+      "relation": "derived_from",
+      "target_asset_id": "EVIDENCE-T17A-EXECUTION-CAPACITY-AUDIT-001"
+    },
+    {
+      "source_asset_id": "CONTRACT-T18-NARROW-DATA-QUALITY-001",
+      "relation": "validated_by",
+      "target_asset_id": "TEST-T18-NARROW-DATA-QUALITY-CONTRACT-001"
     },
     {
       "source_asset_id": "CTRL-AGENTS-001",
@@ -1428,6 +1468,71 @@
       "target_asset_id": "TEST-T17A-EXECUTION-CAPACITY-AUDIT-001"
     },
     {
+      "source_asset_id": "EVIDENCE-T18-CATALOG-REPOSITORY-FINALIZATION-001",
+      "relation": "derived_from",
+      "target_asset_id": "EVIDENCE-T18-CONTENT-ADDRESSED-BACKUP-RESTORE-001"
+    },
+    {
+      "source_asset_id": "EVIDENCE-T18-CATALOG-REPOSITORY-FINALIZATION-001",
+      "relation": "derived_from",
+      "target_asset_id": "EVIDENCE-T18-NARROW-DATA-QUALITY-AUDIT-001"
+    },
+    {
+      "source_asset_id": "EVIDENCE-T18-CATALOG-REPOSITORY-FINALIZATION-001",
+      "relation": "validated_by",
+      "target_asset_id": "TEST-T18-CATALOG-REPOSITORY-FINALIZATION-001"
+    },
+    {
+      "source_asset_id": "EVIDENCE-T18-CONTENT-ADDRESSED-BACKUP-RESTORE-001",
+      "relation": "derived_from",
+      "target_asset_id": "EVIDENCE-T18-NARROW-DATA-QUALITY-AUDIT-001"
+    },
+    {
+      "source_asset_id": "EVIDENCE-T18-CONTENT-ADDRESSED-BACKUP-RESTORE-001",
+      "relation": "governed_by",
+      "target_asset_id": "CONTRACT-T18-CONTENT-ADDRESSED-BACKUP-RESTORE-001"
+    },
+    {
+      "source_asset_id": "EVIDENCE-T18-CONTENT-ADDRESSED-BACKUP-RESTORE-001",
+      "relation": "validated_by",
+      "target_asset_id": "TEST-T18-BACKUP-RESTORE-001"
+    },
+    {
+      "source_asset_id": "EVIDENCE-T18-CONTENT-ADDRESSED-BACKUP-RESTORE-SUMMARY-001",
+      "relation": "derived_from",
+      "target_asset_id": "EVIDENCE-T18-CONTENT-ADDRESSED-BACKUP-RESTORE-001"
+    },
+    {
+      "source_asset_id": "EVIDENCE-T18-CONTENT-ADDRESSED-BACKUP-RESTORE-SUMMARY-001",
+      "relation": "validated_by",
+      "target_asset_id": "TEST-T18-BACKUP-RESTORE-001"
+    },
+    {
+      "source_asset_id": "EVIDENCE-T18-NARROW-DATA-QUALITY-AUDIT-001",
+      "relation": "derived_from",
+      "target_asset_id": "DATA-T17A-EXECUTION-CAPACITY-RAW-001"
+    },
+    {
+      "source_asset_id": "EVIDENCE-T18-NARROW-DATA-QUALITY-AUDIT-001",
+      "relation": "governed_by",
+      "target_asset_id": "CONTRACT-T18-NARROW-DATA-QUALITY-001"
+    },
+    {
+      "source_asset_id": "EVIDENCE-T18-NARROW-DATA-QUALITY-AUDIT-001",
+      "relation": "validated_by",
+      "target_asset_id": "TEST-T18-DATA-QUALITY-AUDIT-001"
+    },
+    {
+      "source_asset_id": "EVIDENCE-T18-NARROW-DATA-QUALITY-SUMMARY-001",
+      "relation": "derived_from",
+      "target_asset_id": "EVIDENCE-T18-NARROW-DATA-QUALITY-AUDIT-001"
+    },
+    {
+      "source_asset_id": "EVIDENCE-T18-NARROW-DATA-QUALITY-SUMMARY-001",
+      "relation": "validated_by",
+      "target_asset_id": "TEST-T18-DATA-QUALITY-AUDIT-001"
+    },
+    {
       "source_asset_id": "FIXTURE-BATON-SUITE-001",
       "relation": "governed_by",
       "target_asset_id": "CTRL-BATON-SETUP-001"
@@ -1868,6 +1973,26 @@
       "target_asset_id": "TEST-T17A-TIMING-REPAIR-001"
     },
     {
+      "source_asset_id": "FIXTURE-T18-CONTENT-ADDRESSED-BACKUP-RESTORE-001",
+      "relation": "governed_by",
+      "target_asset_id": "CONTRACT-T18-CONTENT-ADDRESSED-BACKUP-RESTORE-001"
+    },
+    {
+      "source_asset_id": "FIXTURE-T18-CONTENT-ADDRESSED-BACKUP-RESTORE-001",
+      "relation": "validated_by",
+      "target_asset_id": "TEST-T18-BACKUP-RESTORE-001"
+    },
+    {
+      "source_asset_id": "FIXTURE-T18-NARROW-DATA-QUALITY-001",
+      "relation": "governed_by",
+      "target_asset_id": "CONTRACT-T18-NARROW-DATA-QUALITY-001"
+    },
+    {
+      "source_asset_id": "FIXTURE-T18-NARROW-DATA-QUALITY-001",
+      "relation": "validated_by",
+      "target_asset_id": "TEST-T18-NARROW-DATA-QUALITY-CONTRACT-001"
+    },
+    {
       "source_asset_id": "GENERATED-EDGE-PROJECTION-001",
       "relation": "derived_from",
       "target_asset_id": "CATALOG-ROOT-001"
@@ -2286,6 +2411,36 @@
       "source_asset_id": "MODULE-T17A-TIMING-REPAIR-001",
       "relation": "validated_by",
       "target_asset_id": "TEST-T17A-TIMING-REPAIR-001"
+    },
+    {
+      "source_asset_id": "MODULE-T18-BACKUP-RESTORE-001",
+      "relation": "depends_on",
+      "target_asset_id": "MODULE-T18-DATA-QUALITY-001"
+    },
+    {
+      "source_asset_id": "MODULE-T18-BACKUP-RESTORE-001",
+      "relation": "governed_by",
+      "target_asset_id": "CONTRACT-T18-CONTENT-ADDRESSED-BACKUP-RESTORE-001"
+    },
+    {
+      "source_asset_id": "MODULE-T18-BACKUP-RESTORE-001",
+      "relation": "validated_by",
+      "target_asset_id": "TEST-T18-BACKUP-RESTORE-001"
+    },
+    {
+      "source_asset_id": "MODULE-T18-DATA-QUALITY-001",
+      "relation": "depends_on",
+      "target_asset_id": "DATA-T17A-EXECUTION-CAPACITY-RAW-001"
+    },
+    {
+      "source_asset_id": "MODULE-T18-DATA-QUALITY-001",
+      "relation": "governed_by",
+      "target_asset_id": "CONTRACT-T18-NARROW-DATA-QUALITY-001"
+    },
+    {
+      "source_asset_id": "MODULE-T18-DATA-QUALITY-001",
+      "relation": "validated_by",
+      "target_asset_id": "TEST-T18-DATA-QUALITY-AUDIT-001"
     },
     {
       "source_asset_id": "PRE-GIT-TASK01-A017",
@@ -3173,6 +3328,26 @@
       "target_asset_id": "TEST-T17A-TIMING-REPAIR-001"
     },
     {
+      "source_asset_id": "SCRIPT-T18-BACKUP-PACKAGER-001",
+      "relation": "depends_on",
+      "target_asset_id": "MODULE-T18-BACKUP-RESTORE-001"
+    },
+    {
+      "source_asset_id": "SCRIPT-T18-BACKUP-PACKAGER-001",
+      "relation": "validated_by",
+      "target_asset_id": "TEST-T18-BACKUP-RESTORE-001"
+    },
+    {
+      "source_asset_id": "SCRIPT-T18-DATA-QUALITY-AUDIT-001",
+      "relation": "depends_on",
+      "target_asset_id": "MODULE-T18-DATA-QUALITY-001"
+    },
+    {
+      "source_asset_id": "SCRIPT-T18-DATA-QUALITY-AUDIT-001",
+      "relation": "validated_by",
+      "target_asset_id": "TEST-T18-DATA-QUALITY-AUDIT-001"
+    },
+    {
       "source_asset_id": "TEMPLATE-BATON-ISSUE-FORM-001",
       "relation": "governed_by",
       "target_asset_id": "CTRL-BATON-SETUP-001"
@@ -3811,6 +3986,61 @@
       "source_asset_id": "TEST-T17A-TIMING-REPAIR-001",
       "relation": "depends_on",
       "target_asset_id": "FIXTURE-T17A-TIMING-REPAIR-001"
+    },
+    {
+      "source_asset_id": "TEST-T18-BACKUP-RESTORE-001",
+      "relation": "depends_on",
+      "target_asset_id": "EVIDENCE-T18-CONTENT-ADDRESSED-BACKUP-RESTORE-001"
+    },
+    {
+      "source_asset_id": "TEST-T18-BACKUP-RESTORE-001",
+      "relation": "depends_on",
+      "target_asset_id": "FIXTURE-T18-CONTENT-ADDRESSED-BACKUP-RESTORE-001"
+    },
+    {
+      "source_asset_id": "TEST-T18-BACKUP-RESTORE-001",
+      "relation": "depends_on",
+      "target_asset_id": "MODULE-T18-BACKUP-RESTORE-001"
+    },
+    {
+      "source_asset_id": "TEST-T18-CATALOG-REPOSITORY-FINALIZATION-001",
+      "relation": "depends_on",
+      "target_asset_id": "EVIDENCE-T18-CATALOG-REPOSITORY-FINALIZATION-001"
+    },
+    {
+      "source_asset_id": "TEST-T18-CATALOG-REPOSITORY-FINALIZATION-001",
+      "relation": "depends_on",
+      "target_asset_id": "TEST-T18-BACKUP-RESTORE-001"
+    },
+    {
+      "source_asset_id": "TEST-T18-CATALOG-REPOSITORY-FINALIZATION-001",
+      "relation": "depends_on",
+      "target_asset_id": "TEST-T18-DATA-QUALITY-AUDIT-001"
+    },
+    {
+      "source_asset_id": "TEST-T18-DATA-QUALITY-AUDIT-001",
+      "relation": "depends_on",
+      "target_asset_id": "EVIDENCE-T18-NARROW-DATA-QUALITY-AUDIT-001"
+    },
+    {
+      "source_asset_id": "TEST-T18-DATA-QUALITY-AUDIT-001",
+      "relation": "depends_on",
+      "target_asset_id": "FIXTURE-T18-NARROW-DATA-QUALITY-001"
+    },
+    {
+      "source_asset_id": "TEST-T18-DATA-QUALITY-AUDIT-001",
+      "relation": "depends_on",
+      "target_asset_id": "MODULE-T18-DATA-QUALITY-001"
+    },
+    {
+      "source_asset_id": "TEST-T18-NARROW-DATA-QUALITY-CONTRACT-001",
+      "relation": "depends_on",
+      "target_asset_id": "CONTRACT-T18-NARROW-DATA-QUALITY-001"
+    },
+    {
+      "source_asset_id": "TEST-T18-NARROW-DATA-QUALITY-CONTRACT-001",
+      "relation": "depends_on",
+      "target_asset_id": "FIXTURE-T18-NARROW-DATA-QUALITY-001"
     },
     {
       "source_asset_id": "VALIDATOR-REPOSITORY-STATE-001",

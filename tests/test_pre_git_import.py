@@ -22,6 +22,23 @@ class PreGitImportTests(unittest.TestCase):
     def test_task02_count(self) -> None:
         self.assertEqual(len([p for p in module.EXPECTED_IMPORTS if "/task02/" in p]), 8)
 
+    def test_external_bundle_count_is_scoped_to_pre_git_owners(self) -> None:
+        assets = {
+            "BUNDLE-TASK01-COMPLETION-001": {
+                "asset_type": "external_bundle"
+            },
+            "BUNDLE-TASK02-COMPLETION-001": {
+                "asset_type": "external_bundle"
+            },
+            "BUNDLE-FUTURE-CONTENT-ADDRESSED-001": {
+                "asset_type": "external_bundle"
+            },
+        }
+        self.assertEqual(
+            set(module.pre_git_external_bundles(assets)),
+            module.PRE_GIT_EXTERNAL_BUNDLE_IDS,
+        )
+
     def test_architecture_hash(self) -> None:
         self.assertEqual(module.sha256(ROOT / module.ARCH_PATH), module.ARCH_SHA)
 
