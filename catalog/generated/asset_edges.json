@@ -623,6 +623,36 @@
       "target_asset_id": "TEST-T16-HYPOTHESIS-LIFECYCLE-RESEARCH-MEMORY-CONTRACT-001"
     },
     {
+      "source_asset_id": "CONTRACT-T17A-EXECUTION-CAPACITY-QUOTE-PANEL-001",
+      "relation": "derived_from",
+      "target_asset_id": "DATA-REQUIREMENT-T17-EXECUTION-CAPACITY-001"
+    },
+    {
+      "source_asset_id": "CONTRACT-T17A-EXECUTION-CAPACITY-QUOTE-PANEL-001",
+      "relation": "derived_from",
+      "target_asset_id": "FIXTURE-T10-JUPITER-QUOTE-PILOT-PLAN-002"
+    },
+    {
+      "source_asset_id": "CONTRACT-T17A-EXECUTION-CAPACITY-QUOTE-PANEL-001",
+      "relation": "governed_by",
+      "target_asset_id": "CONTRACT-T06-RAW-STORAGE-001"
+    },
+    {
+      "source_asset_id": "CONTRACT-T17A-EXECUTION-CAPACITY-QUOTE-PANEL-001",
+      "relation": "validated_by",
+      "target_asset_id": "TEST-T17A-EXECUTION-CAPACITY-QUOTE-PANEL-001"
+    },
+    {
+      "source_asset_id": "CONTRACT-T17A-TIMING-REPAIR-001",
+      "relation": "governed_by",
+      "target_asset_id": "CONTRACT-T17A-EXECUTION-CAPACITY-QUOTE-PANEL-001"
+    },
+    {
+      "source_asset_id": "CONTRACT-T17A-TIMING-REPAIR-001",
+      "relation": "validated_by",
+      "target_asset_id": "TEST-T17A-TIMING-REPAIR-001"
+    },
+    {
       "source_asset_id": "CTRL-AGENTS-001",
       "relation": "governed_by",
       "target_asset_id": "CTRL-TASK-04-001"
@@ -971,6 +1001,26 @@
       "source_asset_id": "DATA-T17-HYPOTHESIS-RESEARCH-MEMORY-001",
       "relation": "validated_by",
       "target_asset_id": "TEST-T17-FIRST-BOUNDED-HYPOTHESIS-CYCLE-001"
+    },
+    {
+      "source_asset_id": "DATA-T17A-EXECUTION-CAPACITY-RAW-001",
+      "relation": "derived_from",
+      "target_asset_id": "FIXTURE-T17A-EXECUTION-CAPACITY-QUOTE-PANEL-001"
+    },
+    {
+      "source_asset_id": "DATA-T17A-EXECUTION-CAPACITY-RAW-001",
+      "relation": "derived_from",
+      "target_asset_id": "FIXTURE-T17A-TIMING-REPAIR-001"
+    },
+    {
+      "source_asset_id": "DATA-T17A-EXECUTION-CAPACITY-RAW-001",
+      "relation": "evidenced_by",
+      "target_asset_id": "EVIDENCE-T17A-EXECUTION-CAPACITY-AUDIT-001"
+    },
+    {
+      "source_asset_id": "DATA-T17A-EXECUTION-CAPACITY-RAW-001",
+      "relation": "validated_by",
+      "target_asset_id": "TEST-T17A-EXECUTION-CAPACITY-AUDIT-001"
     },
     {
       "source_asset_id": "DECISION-T14-PROVIDER-PURCHASE-001",
@@ -1356,6 +1406,26 @@
       "source_asset_id": "EVIDENCE-T17-FIRST-BOUNDED-HYPOTHESIS-CYCLE-ACCEPTANCE-001",
       "relation": "validated_by",
       "target_asset_id": "TEST-T17-FIRST-BOUNDED-HYPOTHESIS-CYCLE-ACCEPTANCE-001"
+    },
+    {
+      "source_asset_id": "EVIDENCE-T17A-EXECUTION-CAPACITY-AUDIT-001",
+      "relation": "derived_from",
+      "target_asset_id": "DATA-T17A-EXECUTION-CAPACITY-RAW-001"
+    },
+    {
+      "source_asset_id": "EVIDENCE-T17A-EXECUTION-CAPACITY-AUDIT-001",
+      "relation": "validated_by",
+      "target_asset_id": "TEST-T17A-EXECUTION-CAPACITY-AUDIT-001"
+    },
+    {
+      "source_asset_id": "EVIDENCE-T17A-EXECUTION-CAPACITY-SUMMARY-001",
+      "relation": "derived_from",
+      "target_asset_id": "EVIDENCE-T17A-EXECUTION-CAPACITY-AUDIT-001"
+    },
+    {
+      "source_asset_id": "EVIDENCE-T17A-EXECUTION-CAPACITY-SUMMARY-001",
+      "relation": "validated_by",
+      "target_asset_id": "TEST-T17A-EXECUTION-CAPACITY-AUDIT-001"
     },
     {
       "source_asset_id": "FIXTURE-BATON-SUITE-001",
@@ -1768,6 +1838,36 @@
       "target_asset_id": "TEST-T16-HYPOTHESIS-RESEARCH-MEMORY-QUERY-001"
     },
     {
+      "source_asset_id": "FIXTURE-T17A-EXECUTION-CAPACITY-QUOTE-PANEL-001",
+      "relation": "derived_from",
+      "target_asset_id": "DATA-T17-HYPOTHESIS-RESEARCH-MEMORY-001"
+    },
+    {
+      "source_asset_id": "FIXTURE-T17A-EXECUTION-CAPACITY-QUOTE-PANEL-001",
+      "relation": "derived_from",
+      "target_asset_id": "FIXTURE-T10-JUPITER-QUOTE-PILOT-PLAN-002"
+    },
+    {
+      "source_asset_id": "FIXTURE-T17A-EXECUTION-CAPACITY-QUOTE-PANEL-001",
+      "relation": "governed_by",
+      "target_asset_id": "CONTRACT-T17A-EXECUTION-CAPACITY-QUOTE-PANEL-001"
+    },
+    {
+      "source_asset_id": "FIXTURE-T17A-EXECUTION-CAPACITY-QUOTE-PANEL-001",
+      "relation": "validated_by",
+      "target_asset_id": "TEST-T17A-EXECUTION-CAPACITY-QUOTE-PANEL-001"
+    },
+    {
+      "source_asset_id": "FIXTURE-T17A-TIMING-REPAIR-001",
+      "relation": "governed_by",
+      "target_asset_id": "CONTRACT-T17A-TIMING-REPAIR-001"
+    },
+    {
+      "source_asset_id": "FIXTURE-T17A-TIMING-REPAIR-001",
+      "relation": "validated_by",
+      "target_asset_id": "TEST-T17A-TIMING-REPAIR-001"
+    },
+    {
       "source_asset_id": "GENERATED-EDGE-PROJECTION-001",
       "relation": "derived_from",
       "target_asset_id": "CATALOG-ROOT-001"
@@ -2141,6 +2241,51 @@
       "source_asset_id": "MODULE-T13-PILOT-AUDIT-001",
       "relation": "validated_by",
       "target_asset_id": "TEST-T13-PILOT-AUDIT-ACCEPTANCE-001"
+    },
+    {
+      "source_asset_id": "MODULE-T17A-EXECUTION-CAPACITY-AUDIT-001",
+      "relation": "governed_by",
+      "target_asset_id": "CONTRACT-T17A-EXECUTION-CAPACITY-QUOTE-PANEL-001"
+    },
+    {
+      "source_asset_id": "MODULE-T17A-EXECUTION-CAPACITY-AUDIT-001",
+      "relation": "governed_by",
+      "target_asset_id": "CONTRACT-T17A-TIMING-REPAIR-001"
+    },
+    {
+      "source_asset_id": "MODULE-T17A-EXECUTION-CAPACITY-AUDIT-001",
+      "relation": "validated_by",
+      "target_asset_id": "TEST-T17A-EXECUTION-CAPACITY-AUDIT-001"
+    },
+    {
+      "source_asset_id": "MODULE-T17A-EXECUTION-CAPACITY-PANEL-001",
+      "relation": "depends_on",
+      "target_asset_id": "MODULE-T10-JUPITER-QUOTE-TRANSPORT-001"
+    },
+    {
+      "source_asset_id": "MODULE-T17A-EXECUTION-CAPACITY-PANEL-001",
+      "relation": "governed_by",
+      "target_asset_id": "CONTRACT-T17A-EXECUTION-CAPACITY-QUOTE-PANEL-001"
+    },
+    {
+      "source_asset_id": "MODULE-T17A-EXECUTION-CAPACITY-PANEL-001",
+      "relation": "validated_by",
+      "target_asset_id": "TEST-T17A-EXECUTION-CAPACITY-PANEL-001"
+    },
+    {
+      "source_asset_id": "MODULE-T17A-TIMING-REPAIR-001",
+      "relation": "depends_on",
+      "target_asset_id": "MODULE-T17A-EXECUTION-CAPACITY-PANEL-001"
+    },
+    {
+      "source_asset_id": "MODULE-T17A-TIMING-REPAIR-001",
+      "relation": "governed_by",
+      "target_asset_id": "CONTRACT-T17A-TIMING-REPAIR-001"
+    },
+    {
+      "source_asset_id": "MODULE-T17A-TIMING-REPAIR-001",
+      "relation": "validated_by",
+      "target_asset_id": "TEST-T17A-TIMING-REPAIR-001"
     },
     {
       "source_asset_id": "PRE-GIT-TASK01-A017",
@@ -2998,6 +3143,36 @@
       "target_asset_id": "TEST-T16-HYPOTHESIS-RESEARCH-MEMORY-QUERY-001"
     },
     {
+      "source_asset_id": "SCRIPT-T17A-EXECUTION-CAPACITY-AUDIT-001",
+      "relation": "depends_on",
+      "target_asset_id": "MODULE-T17A-EXECUTION-CAPACITY-AUDIT-001"
+    },
+    {
+      "source_asset_id": "SCRIPT-T17A-EXECUTION-CAPACITY-AUDIT-001",
+      "relation": "validated_by",
+      "target_asset_id": "TEST-T17A-EXECUTION-CAPACITY-AUDIT-001"
+    },
+    {
+      "source_asset_id": "SCRIPT-T17A-EXECUTION-CAPACITY-PANEL-001",
+      "relation": "depends_on",
+      "target_asset_id": "MODULE-T17A-EXECUTION-CAPACITY-PANEL-001"
+    },
+    {
+      "source_asset_id": "SCRIPT-T17A-EXECUTION-CAPACITY-PANEL-001",
+      "relation": "validated_by",
+      "target_asset_id": "TEST-T17A-EXECUTION-CAPACITY-PANEL-001"
+    },
+    {
+      "source_asset_id": "SCRIPT-T17A-TIMING-REPAIR-001",
+      "relation": "depends_on",
+      "target_asset_id": "MODULE-T17A-TIMING-REPAIR-001"
+    },
+    {
+      "source_asset_id": "SCRIPT-T17A-TIMING-REPAIR-001",
+      "relation": "validated_by",
+      "target_asset_id": "TEST-T17A-TIMING-REPAIR-001"
+    },
+    {
       "source_asset_id": "TEMPLATE-BATON-ISSUE-FORM-001",
       "relation": "governed_by",
       "target_asset_id": "CTRL-BATON-SETUP-001"
@@ -3586,6 +3761,56 @@
       "source_asset_id": "TEST-T17-FIRST-BOUNDED-HYPOTHESIS-CYCLE-ACCEPTANCE-001",
       "relation": "depends_on",
       "target_asset_id": "TEST-T17-FIRST-BOUNDED-HYPOTHESIS-CYCLE-001"
+    },
+    {
+      "source_asset_id": "TEST-T17A-EXECUTION-CAPACITY-AUDIT-001",
+      "relation": "depends_on",
+      "target_asset_id": "EVIDENCE-T17A-EXECUTION-CAPACITY-AUDIT-001"
+    },
+    {
+      "source_asset_id": "TEST-T17A-EXECUTION-CAPACITY-AUDIT-001",
+      "relation": "depends_on",
+      "target_asset_id": "EVIDENCE-T17A-EXECUTION-CAPACITY-SUMMARY-001"
+    },
+    {
+      "source_asset_id": "TEST-T17A-EXECUTION-CAPACITY-AUDIT-001",
+      "relation": "depends_on",
+      "target_asset_id": "MODULE-T17A-EXECUTION-CAPACITY-AUDIT-001"
+    },
+    {
+      "source_asset_id": "TEST-T17A-EXECUTION-CAPACITY-PANEL-001",
+      "relation": "depends_on",
+      "target_asset_id": "FIXTURE-T17A-EXECUTION-CAPACITY-QUOTE-PANEL-001"
+    },
+    {
+      "source_asset_id": "TEST-T17A-EXECUTION-CAPACITY-PANEL-001",
+      "relation": "depends_on",
+      "target_asset_id": "MODULE-T17A-EXECUTION-CAPACITY-PANEL-001"
+    },
+    {
+      "source_asset_id": "TEST-T17A-EXECUTION-CAPACITY-QUOTE-PANEL-001",
+      "relation": "depends_on",
+      "target_asset_id": "CONTRACT-T17A-EXECUTION-CAPACITY-QUOTE-PANEL-001"
+    },
+    {
+      "source_asset_id": "TEST-T17A-EXECUTION-CAPACITY-QUOTE-PANEL-001",
+      "relation": "depends_on",
+      "target_asset_id": "DATA-T17-HYPOTHESIS-RESEARCH-MEMORY-001"
+    },
+    {
+      "source_asset_id": "TEST-T17A-EXECUTION-CAPACITY-QUOTE-PANEL-001",
+      "relation": "depends_on",
+      "target_asset_id": "FIXTURE-T17A-EXECUTION-CAPACITY-QUOTE-PANEL-001"
+    },
+    {
+      "source_asset_id": "TEST-T17A-TIMING-REPAIR-001",
+      "relation": "depends_on",
+      "target_asset_id": "CONTRACT-T17A-TIMING-REPAIR-001"
+    },
+    {
+      "source_asset_id": "TEST-T17A-TIMING-REPAIR-001",
+      "relation": "depends_on",
+      "target_asset_id": "FIXTURE-T17A-TIMING-REPAIR-001"
     },
     {
       "source_asset_id": "VALIDATOR-REPOSITORY-STATE-001",

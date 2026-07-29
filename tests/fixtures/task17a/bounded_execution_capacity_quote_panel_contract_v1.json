@@ -1,0 +1,221 @@
+{
+  "schema": "solana_alpha_lab.bounded_execution_capacity_quote_panel_contract",
+  "schema_version": "1.0",
+  "task_id": "TASK-17A",
+  "atom_id": "T17A-A2_FROZEN_CAPTURE_CONTRACT_V1",
+  "status": "FROZEN_OFFLINE_CONTRACT",
+  "entry_gate": {
+    "verdict": "START_WITH_PATCH",
+    "as_of": "2026-07-29",
+    "source_activation": "ACTIVATION_CONFIRMED_USER_SMOKE",
+    "accepted_base_commit": "55fe5b0857affffa5cd97e9dada4f94dcdf706c3",
+    "accepted_base_tree": "edf4df8b8a2eb634337f40f317f29d342417bfb5",
+    "historical_data_verdict": "LIVE_NON_RECONSTRUCTABLE_NEED",
+    "reason": "HISTORICAL_CHAIN_STATE_CANNOT_RECONSTRUCT_UNOBSERVED_PROVIDER_ROUTE_ERROR_VERSION_OR_LOCAL_TIMING"
+  },
+  "hypothesis": {
+    "hypothesis_version_id": "HYP-VERSION-EXECUTION-CAPACITY-CURVATURE-V1",
+    "definition_sha256": "5672d63dd8dbf8cc67a041cc1cc7fd75948de17e3a1c7cbaeb8a488ad790220b",
+    "memory_asset_id": "DATA-T17-HYPOTHESIS-RESEARCH-MEMORY-001",
+    "memory_sha256": "8c9da2232ab0feec86da130985eaa4e5168539adaa036d0c48f44b00567c06b6",
+    "current_state": "PAUSED",
+    "current_claim_scope": "WITHIN_MEMBER_TEMPORAL_REPLICATION_ONLY",
+    "cross_token_generalization_authorized": false
+  },
+  "watchlist": {
+    "watchlist_id": "HYP-WATCHLIST-EXECUTION-CAPACITY-V1",
+    "version": "1.0",
+    "owner_hypothesis_version_id": "HYP-VERSION-EXECUTION-CAPACITY-CURVATURE-V1",
+    "membership_policy": "FORWARD_ONLY_NEW_VERSION_REQUIRED",
+    "outer_member_ceiling": 8,
+    "current_member_count": 1,
+    "unused_slots_authorize_discovery": false,
+    "members": [
+      {
+        "member_id": "HYP-WATCH-MEMBER-T10-001",
+        "mint": "4vXNhA6ncbx8usZ14CfxkYeQKdaQYgrLfJXNyWcVpump",
+        "decimals": 6,
+        "membership_reason": "RETAINED_TASK10_CAPACITY_WARNING_WITH_TASK09_PROVENANCE",
+        "selection_rule": "SOLE_NON_WSOL_MINT_IN_ACCEPTED_TASK09_GETTRANSACTION_TOKEN_BALANCES",
+        "source_task": "TASK-10",
+        "source_plan": "tests/fixtures/task10/jupiter_quote_pilot_plan_v2.json",
+        "source_asset_id": "EVIDENCE-T10-JUPITER-QUOTE-SUMMARY-002",
+        "price_profitability_or_route_selection_used": false
+      }
+    ]
+  },
+  "trigger_windows": {
+    "window_ids": [
+      "T17A-WINDOW-01",
+      "T17A-WINDOW-02",
+      "T17A-WINDOW-03"
+    ],
+    "trigger_kind": "FOREGROUND_CONTROL_PLANE_INVOCATION",
+    "background_process": false,
+    "scheduler": false,
+    "always_on_collection": false,
+    "minimum_separation_seconds": 1800,
+    "total_span_seconds_max": 86400,
+    "missed_window_policy": "RETAIN_EXPLICIT_COVERAGE_LOSS_NO_SILENT_RESCHEDULE",
+    "runtime_binding_required": [
+      "window_id",
+      "triggered_at",
+      "hypothesis_version_id",
+      "watchlist_id",
+      "watchlist_version",
+      "member_id"
+    ]
+  },
+  "provider_surface": {
+    "provider": "JUPITER_METIS",
+    "provider_version": "legacy_metis_v1_quote",
+    "base_url": "https://api.jup.ag",
+    "method": "GET",
+    "path": "/swap/v1/quote",
+    "claim": "LEGACY_QUOTE_COMPATIBILITY_ONLY",
+    "maintenance_status": "SUPERSEDED_NOT_ACTIVELY_MAINTAINED",
+    "official_docs_as_of": "2026-07-29",
+    "official_docs": [
+      "https://developers.jup.ag/docs/swap/v1/get-quote",
+      "https://developers.jup.ag/docs/portal/setup",
+      "https://developers.jup.ag/docs/portal/plans"
+    ],
+    "keyless_allowed": true,
+    "keyless_rate_limit_rps": 0.5,
+    "minimum_interval_seconds": 2.2,
+    "credentials": 0,
+    "accounts": 0,
+    "fallback_hosts": [],
+    "v2_fallback": false
+  },
+  "panel": {
+    "quote_mint": "EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v",
+    "quote_decimals": 6,
+    "slippage_bps": 100,
+    "restrict_intermediate_tokens": true,
+    "notionals_usd": [
+      10,
+      25,
+      50,
+      100
+    ],
+    "buy_input_usdc_atomic": [
+      10000000,
+      25000000,
+      50000000,
+      100000000
+    ],
+    "leg_order": [
+      "BUY",
+      "DEPENDENT_REVERSE_SELL"
+    ],
+    "sell_input_rule": "EXACT_ACCEPTED_BUY_OUT_AMOUNT_ATOMIC",
+    "sell_after_unavailable_buy": "NOT_ATTEMPTED_BUY_PREREQUISITE_FAILED",
+    "float_or_decimal_rerounding": false
+  },
+  "terminal_classes": [
+    "QUOTE_AVAILABLE",
+    "NO_ROUTE",
+    "PROVIDER_ERROR",
+    "INVALID_RESPONSE",
+    "TIMEOUT",
+    "NOT_ATTEMPTED_BUY_PREREQUISITE_FAILED"
+  ],
+  "caps": {
+    "outer_provider_call_ceiling": 192,
+    "current_members": 1,
+    "windows_per_member": 3,
+    "notionals_per_window": 4,
+    "legs_per_notional": 2,
+    "provider_calls_current_max": 24,
+    "provider_calls_per_window_max": 8,
+    "concurrency": 1,
+    "retries": 0,
+    "request_timeout_seconds": 20,
+    "window_wall_seconds_max": 300,
+    "minimum_interval_seconds": 2.2,
+    "received_response_bytes_per_window_max": 1048576,
+    "received_response_bytes_total_max": 3145728,
+    "durable_raw_bytes_per_window_max": 5242880,
+    "durable_raw_bytes_total_max": 15728640,
+    "api_keys": 0,
+    "accounts": 0,
+    "cash_spend_usd_cents": 0,
+    "wallet_signer_transaction_actions": 0
+  },
+  "usage_accounting": {
+    "billing_mode": "KEYLESS_NO_ACCOUNT",
+    "authoritative_meter": "EXACT_ATTEMPT_LEDGER",
+    "provider_account_meter_visible": false,
+    "generic_modeled_credits_per_request": 1,
+    "modeled_credits_current_max": 24,
+    "billed_credits_claim": "NOT_AVAILABLE_KEYLESS",
+    "cash_spend_usd_cents": 0
+  },
+  "raw_evidence": {
+    "contract_asset_id": "CONTRACT-T06-RAW-STORAGE-001",
+    "logical_root_template": "task17a_execution_capacity_quote_panel_v1/window={window_id}",
+    "raw_bytes_in_git": false,
+    "tracked_fixtures_are_synthetic": true,
+    "required_identity_fields": [
+      "request_hash",
+      "idempotency_key",
+      "provider_version",
+      "endpoint_version",
+      "hypothesis_version_id",
+      "watchlist_id",
+      "watchlist_version",
+      "window_id",
+      "member_id",
+      "call_ordinal",
+      "raw_content_sha256"
+    ],
+    "required_observability_fields": [
+      "requested_at",
+      "response_at",
+      "first_reliable_available_at",
+      "available_to_strategy_at",
+      "ingested_at",
+      "latency_ms",
+      "response_status",
+      "terminal_class",
+      "error_class",
+      "route_id",
+      "route_count",
+      "context_slot"
+    ]
+  },
+  "retention": {
+    "policy_id": "R1_T0_RAW",
+    "raw_hot_days": 90,
+    "raw_replayable_until": "RESEARCH_CYCLE_CLOSE_PLUS_365_DAYS",
+    "hash_manifest_aggregate_decision": "PROJECT_LIFETIME",
+    "deletion_in_atom": false
+  },
+  "stop_conditions": [
+    "MISSING_EXACT_A3_OWNER_AUTHORITY",
+    "HYPOTHESIS_WATCHLIST_MEMBER_OR_WINDOW_DRIFT",
+    "AUTHENTICATION_ACCOUNT_OR_API_KEY_REQUIRED",
+    "PROVIDER_ENDPOINT_OR_RESPONSE_SCHEMA_DRIFT",
+    "PACING_CALL_BYTE_TIMEOUT_WALL_OR_TOTAL_SPAN_CAP_EXHAUSTED",
+    "REQUEST_OUTSIDE_FROZEN_MEMBER_WINDOW_NOTIONAL_SET",
+    "DEPENDENCY_SCHEMA_OR_MIGRATION_CHANGE_REQUIRED",
+    "TRANSACTION_OR_INSTRUCTION_PAYLOAD",
+    "WALLET_SIGNER_TRANSACTION_DEPLOYMENT_OR_REAL_MONEY_REQUIRED"
+  ],
+  "authority": {
+    "source": "REPO_STANDING_AUTONOMY",
+    "local_write": true,
+    "network": false,
+    "provider_api_rpc_wss_calls": 0,
+    "raw_live_write": false,
+    "dependency_changes": 0,
+    "credential_use": false,
+    "cash_spend_usd_cents": 0,
+    "wallet_signer_transaction_actions": 0,
+    "scheduler_or_background_process": false,
+    "next_external_atom": "T17A-A3_BOUNDED_EXTERNAL_QUOTE_PANEL_V1",
+    "next_external_atom_separate_owner_gate_required": true,
+    "next_external_atom_provider_calls_max": 24
+  }
+}

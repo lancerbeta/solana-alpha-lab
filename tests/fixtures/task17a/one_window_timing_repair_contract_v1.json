@@ -1,0 +1,85 @@
+{
+  "schema": "solana_alpha_lab.task17a_one_window_timing_repair_contract",
+  "schema_version": "1.0",
+  "task_id": "TASK-17A",
+  "atom_id": "T17A-A3R_ONE_WINDOW_TIMING_REPAIR_V1",
+  "status": "FROZEN_OFFLINE_REPAIR_CONTRACT",
+  "defect": {
+    "minimum_separation_seconds": 1800,
+    "observed_separation_seconds": 1799.992146,
+    "shortfall_seconds": 0.007854,
+    "root_cause": "MONOTONIC_PACING_WITHOUT_WALL_CLOCK_SAFETY_MARGIN",
+    "post_hoc_tolerance_allowed": false
+  },
+  "accepted_input_windows": [
+    {
+      "window_id": "T17A-WINDOW-01",
+      "raw_events_sha256": "50077fc35fcc7e6d349fe178f15a3b800f7cb79a38e38352dc13175b7baf4e49",
+      "manifest_sha256": "82558d846b5a9ecabbbca0e2e9f5b5a3e77eec38018b6905f6a9f3b04d716995",
+      "receipt_sha256": "918049b14b9539f90e0ec08a60ec945eae8b76336fb5a959912d566cc81ebdbe"
+    },
+    {
+      "window_id": "T17A-WINDOW-03",
+      "raw_events_sha256": "a45f611b2bbe3986168a44e3e13fe2743cfc52eb476448dcc8edef01f8771ab4",
+      "manifest_sha256": "b7bc267d0b445fc98d78f27b8687da6692a03a544c53f38f5f9b75f0a6483f2f",
+      "receipt_sha256": "e327b7fe34321a888be23c45f144f019bd0b36f4134677c95bb0037679a40e23"
+    }
+  ],
+  "excluded_but_retained_window": {
+    "window_id": "T17A-WINDOW-02",
+    "reason": "TRIGGER_SEPARATION_BELOW_FROZEN_MINIMUM",
+    "raw_events_sha256": "d4e8a8607e7ad932dfc69f0a2b80ccfeec6a175b5af4c81e039b2121c2c036c3",
+    "manifest_sha256": "adaf60362b64f7bc9a272fa9a57736739cf58c9bed0e3090a8c1cd359d9f4846",
+    "receipt_sha256": "6d18a072d20c37414fc02b2b6a9ec5d5b55090dbfd1c13d9063811bc14cd8613"
+  },
+  "replacement_window": {
+    "window_id": "T17A-WINDOW-04-REPAIR-01",
+    "logical_root": "task17a_execution_capacity_quote_panel_v1_repair_01",
+    "minimum_wall_clock_separation_from_window_03_seconds": 1801,
+    "hypothesis_version_id": "HYP-VERSION-EXECUTION-CAPACITY-CURVATURE-V1",
+    "watchlist_id": "HYP-WATCHLIST-EXECUTION-CAPACITY-V1",
+    "watchlist_version": "1.0",
+    "member_id": "HYP-WATCH-MEMBER-T10-001",
+    "mint": "4vXNhA6ncbx8usZ14CfxkYeQKdaQYgrLfJXNyWcVpump",
+    "mint_decimals": 6,
+    "notionals_usd": [
+      10,
+      25,
+      50,
+      100
+    ],
+    "leg_order": [
+      "BUY",
+      "DEPENDENT_REVERSE_SELL"
+    ]
+  },
+  "caps": {
+    "provider_calls_max": 8,
+    "concurrency": 1,
+    "retries": 0,
+    "request_timeout_seconds": 20,
+    "minimum_interval_seconds": 2.2,
+    "received_response_bytes_max": 1048576,
+    "durable_raw_bytes_max": 5242880,
+    "api_keys": 0,
+    "accounts": 0,
+    "cash_spend_usd_cents": 0,
+    "wallet_signer_transaction_actions": 0
+  },
+  "authority": {
+    "source": "SEPARATE_EXPLICIT_USER_GATE_REQUIRED",
+    "exact_phrase": "T17A-A3R_ONE_WINDOW_TIMING_REPAIR_V1",
+    "network": false,
+    "provider_calls": 0,
+    "raw_live_write": false,
+    "commit": false,
+    "push": false,
+    "pull_request": false,
+    "merge": false
+  },
+  "accepted_window_set_after_repair": [
+    "T17A-WINDOW-01",
+    "T17A-WINDOW-03",
+    "T17A-WINDOW-04-REPAIR-01"
+  ]
+}
