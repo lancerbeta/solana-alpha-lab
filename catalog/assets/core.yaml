@@ -8685,10 +8685,11 @@ records:
   evidence: []
   classification: *t17a_internal
 - asset_id: TEST-T17A-TIMING-REPAIR-001
-  record_version: '1.0'
+  record_version: '1.1'
   asset_type: script
   purpose: Deterministic repair-contract tests for immutable input hashes,
-    exact eight-call cap, separate gate and wall-clock boundary.
+    exact eight-call cap, separate gate, wall-clock boundary and tracked
+    provenance when ignored raw bytes are unavailable in CI.
   status: IMPLEMENTED_UNVERIFIED
   origin: REPOSITORY
   as_of: '2026-07-29'
@@ -8699,7 +8700,7 @@ records:
     repository_path: tests/test_task17a_timing_repair_contract.py
   integrity:
     kind: sha256
-    sha256: 4ad63e17ce5a6dbb937548183a1dd8e3904a03439e44a8eca33661466aa1da7b
+    sha256: ecc694765e1ef8f283e18143eb896654a2b412b5bb3df8da2e42c8cebb2079fa
   access:
     mode: read_only
     method: file
@@ -8882,11 +8883,11 @@ records:
   evidence: []
   classification: *t17a_internal
 - asset_id: TEST-T17A-EXECUTION-CAPACITY-AUDIT-001
-  record_version: '1.0'
+  record_version: '1.1'
   asset_type: script
   purpose: Deterministic acceptance tests for original timing failure,
     replacement-window replay, raw tamper failure, tracked receipt equality,
-    bounded claims and exact total usage.
+    bounded claims, exact total usage and hash-bound logical-only CI fallback.
   status: IMPLEMENTED_UNVERIFIED
   origin: REPOSITORY
   as_of: '2026-07-29'
@@ -8897,7 +8898,7 @@ records:
     repository_path: tests/test_task17a_execution_capacity_audit.py
   integrity:
     kind: sha256
-    sha256: 12255aa45e9c3c7c1ecb84ba9db91b6951b02198e554bdf11d906389cde2e083
+    sha256: 9eb86ee6204d6c9d745de8c543d237838bd6be1a69b4e017e4c07dcef31a94cd
   access:
     mode: read_only
     method: file
