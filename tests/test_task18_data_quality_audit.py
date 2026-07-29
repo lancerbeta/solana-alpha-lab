@@ -33,6 +33,11 @@ SUMMARY_PATH = (
     / "task18"
     / "narrow_data_quality_summary_v1.md"
 )
+FROZEN_CONTRACT = json.loads(CONTRACT_PATH.read_text(encoding="utf-8"))
+RAW_EVIDENCE_AVAILABLE = all(
+    (ROOT / row["path"]).is_file()
+    for row in FROZEN_CONTRACT["raw_inventory"]["files"]
+)
 
 
 def sha256(path: Path) -> str:
@@ -44,6 +49,10 @@ class Task18DataQualityAuditTests(unittest.TestCase):
     def setUpClass(cls) -> None:
         cls.contract = json.loads(CONTRACT_PATH.read_text(encoding="utf-8"))
 
+    @unittest.skipUnless(
+        RAW_EVIDENCE_AVAILABLE,
+        "ignored TASK-17A raw evidence is unavailable in clean clone",
+    )
     def test_actual_frozen_raw_returns_fit_with_limitations(self) -> None:
         result = audit_narrow_data_quality(
             repository_root=ROOT,
@@ -66,6 +75,10 @@ class Task18DataQualityAuditTests(unittest.TestCase):
         self.assertFalse(result["claims"]["net_return"])
         self.assertFalse(result["claims"]["alpha"])
 
+    @unittest.skipUnless(
+        RAW_EVIDENCE_AVAILABLE,
+        "ignored TASK-17A raw evidence is unavailable in clean clone",
+    )
     def test_coverage_and_quality_metrics_reconcile_exactly(self) -> None:
         result = audit_narrow_data_quality(
             repository_root=ROOT,
@@ -112,6 +125,10 @@ class Task18DataQualityAuditTests(unittest.TestCase):
             )
         )
 
+    @unittest.skipUnless(
+        RAW_EVIDENCE_AVAILABLE,
+        "ignored TASK-17A raw evidence is unavailable in clean clone",
+    )
     def test_all_hard_checks_pass_and_retention_is_the_only_limitation(
         self,
     ) -> None:
@@ -180,6 +197,10 @@ class Task18DataQualityAuditTests(unittest.TestCase):
             "FIT_FOR_NARROW_QUOTE_ONLY_ESTIMAND",
         )
 
+    @unittest.skipUnless(
+        RAW_EVIDENCE_AVAILABLE,
+        "ignored TASK-17A raw evidence is unavailable in clean clone",
+    )
     def test_audit_is_deterministic_and_matches_tracked_evidence(self) -> None:
         first = audit_narrow_data_quality(
             repository_root=ROOT,
@@ -196,6 +217,10 @@ class Task18DataQualityAuditTests(unittest.TestCase):
         self.assertIn(sha256(AUDIT_PATH), summary)
         self.assertIn("FIT_WITH_LIMITATIONS", summary)
 
+    @unittest.skipUnless(
+        RAW_EVIDENCE_AVAILABLE,
+        "ignored TASK-17A raw evidence is unavailable in clean clone",
+    )
     def test_audit_does_not_mutate_frozen_raw_files(self) -> None:
         inventory = self.contract["raw_inventory"]["files"]
         before = {
@@ -212,6 +237,10 @@ class Task18DataQualityAuditTests(unittest.TestCase):
         }
         self.assertEqual(before, after)
 
+    @unittest.skipUnless(
+        RAW_EVIDENCE_AVAILABLE,
+        "ignored TASK-17A raw evidence is unavailable in clean clone",
+    )
     def test_authority_and_next_gate_remain_bounded(self) -> None:
         result = audit_narrow_data_quality(
             repository_root=ROOT,

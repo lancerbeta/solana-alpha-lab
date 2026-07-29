@@ -9139,7 +9139,7 @@ records:
   evidence: []
   classification: *t18_internal
 - asset_id: TEST-T18-DATA-QUALITY-AUDIT-001
-  record_version: '1.0'
+  record_version: '1.1'
   asset_type: script
   purpose: Deterministic acceptance and tamper tests for TASK-18 quality
     computation, hard failures, tracked receipt and bounded verdict.
@@ -9153,7 +9153,7 @@ records:
     repository_path: tests/test_task18_data_quality_audit.py
   integrity:
     kind: sha256
-    sha256: 29ef76bfe674e208b110062202c8e0f527773fde33e0adb7fde96cfd793ad825
+    sha256: 795d4e72649f8ae7765a49a9e01dea9f38059e299958b697a61da6a290b18c6d
   access:
     mode: read_only
     method: file
@@ -9361,7 +9361,7 @@ records:
   evidence: []
   classification: *t18_internal
 - asset_id: TEST-T18-BACKUP-RESTORE-001
-  record_version: '1.0'
+  record_version: '1.1'
   asset_type: script
   purpose: Deterministic tests for package reproducibility, content tamper,
     exact restore, receipt identity and zero source deletion.
@@ -9375,7 +9375,7 @@ records:
     repository_path: tests/test_task18_backup_restore.py
   integrity:
     kind: sha256
-    sha256: 9f3e6516fc8df369bdd3902af7f15c859b538431be88c6e6e2e2a2b644a7e303
+    sha256: 27a79286d31283aec43528e9a3e975f1a34d43632ca9bee6db211f651dfb0a66
   access:
     mode: read_only
     method: file

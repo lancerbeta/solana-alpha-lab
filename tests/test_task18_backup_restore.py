@@ -3,6 +3,7 @@ from __future__ import annotations
 import hashlib
 import io
 import json
+import shutil
 import tempfile
 import unittest
 import zipfile
@@ -31,6 +32,20 @@ REPAIR_RECEIPT_PATH = (
     / "task18"
     / "content_addressed_backup_restore_receipt_v1.json"
 )
+FROZEN_REPAIR_CONTRACT = json.loads(
+    REPAIR_CONTRACT_PATH.read_text(encoding="utf-8")
+)
+QUALITY_CONTRACT_PATH = (
+    ROOT
+    / FROZEN_REPAIR_CONTRACT["frozen_inputs"]["quality_contract_path"]
+)
+FROZEN_QUALITY_CONTRACT = json.loads(
+    QUALITY_CONTRACT_PATH.read_text(encoding="utf-8")
+)
+RAW_EVIDENCE_AVAILABLE = all(
+    (ROOT / row["path"]).is_file()
+    for row in FROZEN_QUALITY_CONTRACT["raw_inventory"]["files"]
+)
 
 
 class Task18BackupRestoreTests(unittest.TestCase):
@@ -40,6 +55,10 @@ class Task18BackupRestoreTests(unittest.TestCase):
             REPAIR_CONTRACT_PATH.read_text(encoding="utf-8")
         )
 
+    @unittest.skipUnless(
+        RAW_EVIDENCE_AVAILABLE,
+        "ignored TASK-17A raw evidence is unavailable in clean clone",
+    )
     def test_archive_bytes_are_deterministic_and_exact(self) -> None:
         first, first_manifest = build_archive_bytes(
             repository_root=ROOT,
@@ -64,6 +83,10 @@ class Task18BackupRestoreTests(unittest.TestCase):
                 self.assertEqual(info.date_time, (1980, 1, 1, 0, 0, 0))
                 self.assertEqual(info.compress_type, zipfile.ZIP_STORED)
 
+    @unittest.skipUnless(
+        RAW_EVIDENCE_AVAILABLE,
+        "ignored TASK-17A raw evidence is unavailable in clean clone",
+    )
     def test_materialized_archive_is_content_addressed(self) -> None:
         with tempfile.TemporaryDirectory() as directory:
             result = materialize_archive(
@@ -85,6 +108,10 @@ class Task18BackupRestoreTests(unittest.TestCase):
             self.assertEqual(result["sha256"], repeated["sha256"])
             self.assertEqual(result["path"], repeated["path"])
 
+    @unittest.skipUnless(
+        RAW_EVIDENCE_AVAILABLE,
+        "ignored TASK-17A raw evidence is unavailable in clean clone",
+    )
     def test_local_restore_reproduces_a3_quality_result(self) -> None:
         with tempfile.TemporaryDirectory() as output_directory:
             with tempfile.TemporaryDirectory() as restore_directory:
@@ -111,6 +138,10 @@ class Task18BackupRestoreTests(unittest.TestCase):
         self.assertEqual(restored["source_mutations"], 0)
         self.assertEqual(restored["source_deletions"], 0)
 
+    @unittest.skipUnless(
+        RAW_EVIDENCE_AVAILABLE,
+        "ignored TASK-17A raw evidence is unavailable in clean clone",
+    )
     def test_tampered_archive_fails_closed(self) -> None:
         archive_bytes, _manifest = build_archive_bytes(
             repository_root=ROOT,
@@ -154,6 +185,10 @@ class Task18BackupRestoreTests(unittest.TestCase):
         self.assertEqual(authority["provider_api_rpc_wss_calls"], 0)
         self.assertEqual(authority["cash_spend_usd_cents"], 0)
 
+    @unittest.skipUnless(
+        RAW_EVIDENCE_AVAILABLE,
+        "ignored TASK-17A raw evidence is unavailable in clean clone",
+    )
     def test_drive_receipt_matches_deterministic_archive(self) -> None:
         receipt = json.loads(
             REPAIR_RECEIPT_PATH.read_text(encoding="utf-8")
@@ -216,6 +251,24 @@ class Task18BackupRestoreTests(unittest.TestCase):
         self.assertFalse(authority["push"])
         self.assertFalse(authority["pull_request"])
         self.assertFalse(authority["merge"])
+
+    def test_missing_raw_source_fails_closed(self) -> None:
+        repair = FROZEN_REPAIR_CONTRACT
+        with tempfile.TemporaryDirectory() as directory:
+            clean_root = Path(directory)
+            for key in ("quality_contract_path", "quality_audit_path"):
+                relative = repair["frozen_inputs"][key]
+                destination = clean_root / relative
+                destination.parent.mkdir(parents=True, exist_ok=True)
+                shutil.copyfile(ROOT / relative, destination)
+            with self.assertRaisesRegex(
+                Task18BackupError,
+                "^source_missing:",
+            ):
+                build_archive_bytes(
+                    repository_root=clean_root,
+                    repair_contract_path=REPAIR_CONTRACT_PATH,
+                )
 
 
 if __name__ == "__main__":
