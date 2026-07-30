@@ -1,0 +1,167 @@
+schema: smial.task21.thin-forward-collector-offline
+schema_version: '1.0'
+task_id: TASK-21
+atom_id: T21-A4_THIN_COLLECTOR_AND_OFFLINE_DRY_RUN_V1
+status: FROZEN_OFFLINE_DRY_RUN_CONTRACT
+as_of: '2026-07-30'
+
+frozen_inputs:
+- asset_id: CONFIG-T21-FORWARD-COLLECTION-RUN-PLAN-001
+  path: configs/task21_forward_collection_run_plan_v1.yaml
+  sha256: 0f6bc1a748d80aaa8aeaed53551687304f467ccf9622b598d591f78317f419f5
+- asset_id: EVIDENCE-T21-RUNTIME-RECOVERY-GATE-001
+  path: docs/evidence/task21/runtime_recovery_gate_receipt_v1.json
+  sha256: b30081d22dafaf7c4a6d7c1d1aa952bdee48df504773c4264702b639d7cd8013
+- asset_id: MODULE-T10-JUPITER-QUOTE-LOGGER-001
+  path: src/solana_alpha_lab/jupiter_quote_logger.py
+  sha256: 811f08e43eb26c99ef93dccfade372cbae5adb1c1ee718c7ff6d3ce543a9d507
+- asset_id: MODULE-T12-PILOT-SUPERVISOR-001
+  path: src/solana_alpha_lab/pilot_supervisor.py
+  sha256: b235b7b19fab79a888a4fb55afbe50d0f62868588f227473297ea7278f7849da
+- asset_id: MODULE-T06-RAW-ENVELOPE-001
+  path: src/solana_alpha_lab/storage/raw_envelope.py
+  sha256: f4c40bbb89fb943d73b5b1b2ef0aa7687a6566eac0a959ce24b480b2b10a451d
+- asset_id: CONTRACT-T17A-BOUNDED-EXECUTION-CAPACITY-PANEL-001
+  path: src/solana_alpha_lab/task17a_execution_capacity_panel.py
+  sha256: 277abeb2177d958d4ec06fb754a61914ba4f864621b7629b10091e78efae9c31
+
+population:
+  fixture_path: tests/fixtures/task21/forward_collector_offline_population_v1.json
+  bytes: 10101
+  sha256: 305ff0220072c9fc9f69c9ce90cfd681770678b8f022589c171d7f632058af3c
+  synthetic_only: true
+  evaluated_candidates: 8
+  active_members: 5
+  rejected_candidates: 2
+  not_evaluable_candidates: 1
+  outcome_fields_allowed: false
+
+dry_run:
+  execution_mode: FOREGROUND_SINGLE_PROCESS_IN_MEMORY_THEN_CREATE_ONLY_LOCAL_MATERIALIZATION
+  adapter: DETERMINISTIC_SYNTHETIC_JUPITER_COMPATIBLE_QUOTE_ADAPTER
+  provider_selected: null
+  credentials_required: false
+  network_enabled: false
+  active_members: 5
+  windows_per_member: 3
+  complete_panels_expected: 15
+  quote_pairs_per_panel: 4
+  complete_quote_pairs_expected: 60
+  offline_adapter_calls_expected: 120
+  provider_calls_expected: 0
+  theoretical_task_provider_call_cap: 192
+  retries: 0
+  concurrency: 1
+  background_process: false
+  deterministic_output_files:
+  - records.jsonl
+  - manifest.json
+  - receipt.json
+  ignored_runtime_root: local/task21_collector/offline_dry_run
+  synthetic_materialized_bytes_max: 4194304
+
+supervision:
+  reuse_mode: COMPOSE_TASK12_LIMITS_AND_HEALTH_VOCABULARY
+  task12_launcher_allowlist_is_task11_specific: true
+  task12_module_modified: false
+  foreground_only: true
+  start_reserve_fixed_bytes: 536870912
+  runtime_reserve_fixed_bytes: 268435456
+  plan_min_free_space_bytes_after_write: 2147483648
+  duplicate_identity: SHA256_OF_CONFIG_PLAN_RECOVERY_POPULATION
+  exact_complete_restart_behavior: READBACK_AND_DEDUPLICATE_NO_REEXECUTION
+  incomplete_or_conflicting_restart_behavior: FAIL_CLOSED
+
+offline_fault_acceptance:
+  required_cases:
+  - EXACT_DUPLICATE_RESTART_DEDUPLICATED
+  - INCOMPLETE_RESTART_FAILS_CLOSED
+  - CONFLICTING_RESTART_FAILS_CLOSED
+  - MISSING_WINDOW_RETAINED_NO_SILENT_RESCHEDULE
+  - LATE_EVIDENCE_RETAINED
+  - DISK_PRESSURE_BLOCKS_BEFORE_EXECUTION
+  - CALL_CAP_EXHAUSTION_BLOCKS_BEFORE_MATERIALIZATION
+  - UNHEALTHY_RECOVERY_GATE_BLOCKS
+  - OUTCOME_FIELD_REJECTED
+  - DETERMINISTIC_MANIFESTS_BYTE_IDENTICAL
+
+reuse:
+  adopt:
+  - MODULE-T10-JUPITER-QUOTE-LOGGER-001
+  - MODULE-T06-RAW-ENVELOPE-001
+  - MODULE-T12-PILOT-SUPERVISOR-001
+  - CONTRACT-T17A-BOUNDED-EXECUTION-CAPACITY-PANEL-001
+  wrap:
+  - PROVIDER_NEUTRAL_QUOTE_ADAPTER_PROTOCOL
+  - TASK21_WATCHLIST_AND_RUN_PLAN_BINDING
+  build:
+  - THIN_TASK21_FOREGROUND_ORCHESTRATOR
+  fork: []
+  new_dependencies: 0
+
+catalog:
+  status: CATALOG_TRANSACTION_PENDING_T21_A7
+  blocks_atom4: false
+  blocks_task21_done: true
+  planned_asset_ids:
+  - CONTRACT-T21-THIN-COLLECTOR-OFFLINE-001
+  - CONFIG-T21-THIN-COLLECTOR-OFFLINE-001
+  - MODULE-T21-THIN-FORWARD-COLLECTOR-001
+  - FIXTURE-T21-OFFLINE-COLLECTOR-POPULATION-001
+  - SCRIPT-T21-OFFLINE-COLLECTOR-001
+  - TEST-T21-OFFLINE-COLLECTOR-001
+  - EVIDENCE-T21-OFFLINE-COLLECTOR-001
+
+authority:
+  class: LOCAL_WRITE_ONLY
+  source: REPO_STANDING_AUTONOMY_AFTER_DIRECT_TASK_CONTINUE
+  managed_files:
+  - docs/contracts/task21_thin_collector_offline_contract_v1.md
+  - configs/task21_thin_collector_offline_v1.yaml
+  - src/solana_alpha_lab/task21_forward_collector.py
+  - tests/fixtures/task21/forward_collector_offline_population_v1.json
+  - scripts/run_task21_forward_collector_offline.py
+  - tests/test_task21_forward_collector_offline.py
+  - docs/evidence/task21/thin_collector_offline_dry_run_receipt_v1.json
+  local_runtime_root: local/task21_collector/offline_dry_run
+  offline_dry_run_executions_max: 1
+  synthetic_candidate_evaluations: 8
+  synthetic_watchlist_members: 5
+  synthetic_local_artifact_files_max: 3
+  network_calls: 0
+  provider_api_rpc_wss_calls: 0
+  drive_reads: 0
+  drive_writes: 0
+  credential_use: 0
+  real_candidate_admissions: 0
+  live_collector_executions: 0
+  forward_raw_or_dataset_writes: 0
+  cash_spend_usd_cents: 0
+  provider_credits: 0
+  dependency_changes: 0
+  commit: false
+  push: false
+  pull_request: false
+  merge: false
+  wallet_actions: false
+  signer_actions: false
+  transaction_actions: false
+  deployment: false
+  background_process: false
+  destructive_actions: false
+
+non_claims:
+- NO_LIVE_PROVIDER_OR_COLLECTION_EXECUTION
+- NO_REAL_WATCHLIST_ADMISSION
+- NO_FORWARD_DATASET_BYTES
+- NO_PROVIDER_SELECTION_OR_ENDPOINT_FREEZE
+- NO_SCHEDULER_DEPLOYMENT
+- NO_DATASET_RECOVERY_OR_RESEARCH_READINESS_CLAIM
+
+next_atom:
+  atom_id: T21-A5_BOUNDED_LIVE_SHAKEDOWN_V1
+  authority_required:
+  - PROVIDER_API_RPC_WSS
+  - BOUNDED_COLLECTION_WRITE
+  - EXACT_PROVIDER_AND_CAPS
+  authorized_by_atom4: false

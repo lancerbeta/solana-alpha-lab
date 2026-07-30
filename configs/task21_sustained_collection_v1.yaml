@@ -1,0 +1,224 @@
+schema: smial.task21_sustained_collection_control
+schema_version: '1.0'
+control_id: SUSTAINED-FORWARD-COLLECTION-T21-001
+control_version: '1.0'
+task_id: TASK-21
+atom_id: T21-A6_SUSTAINED_FORWARD_COLLECTION_AND_MONITORING_V1
+status: PREPARED_LOCAL_CONTROL_PLANE_NO_FORWARD_COLLECTION
+as_of: '2026-07-30'
+contains_secrets: false
+
+entry_gate:
+  verdict: START_WITH_PATCH
+  execution_shape: STAGED
+  patch:
+    reason: ZERO_REAL_TASK21_WATCHLIST_MEMBERS
+    local_preparation_allowed: true
+    real_launch_blocked: true
+    technical_probe_automatic_carry_forward: false
+    required_before_real_launch:
+    - REAL_VERSIONED_NOMINATION_AND_MEMBERSHIP_SET
+    - CURRENT_RECOVERY_HEALTHY
+    - SUSTAINED_PROVIDER_ENDPOINT_AND_SCHEMA_FROZEN
+    - EXACT_EXTERNAL_COLLECTION_AUTHORITY
+
+frozen_inputs:
+- asset_id: CONFIG-T20-COLLECTION-SPEC-001
+  path: configs/collection_spec_v1.yaml
+  sha256: c8c734eb76a5c13e7c49d0954e10e777d2f2a1cfe858ed688146a7c84269199d
+- asset_id: CONFIG-T20-RETENTION-RECOVERY-POLICY-001
+  path: configs/task20_retention_recovery_policy_v1.yaml
+  sha256: 3810a5674f2479e460c7b3883a58c0cf5d22f7902c0cfc8606aaeb990f95914f
+- asset_id: CONFIG-T21-FORWARD-COLLECTION-RUN-PLAN-001
+  path: configs/task21_forward_collection_run_plan_v1.yaml
+  sha256: 0f6bc1a748d80aaa8aeaed53551687304f467ccf9622b598d591f78317f419f5
+- asset_id: EVIDENCE-T21-RUNTIME-RECOVERY-GATE-001
+  path: docs/evidence/task21/runtime_recovery_gate_receipt_v1.json
+  sha256: b30081d22dafaf7c4a6d7c1d1aa952bdee48df504773c4264702b639d7cd8013
+- asset_id: EVIDENCE-T21-THIN-COLLECTOR-OFFLINE-001
+  path: docs/evidence/task21/thin_collector_offline_dry_run_receipt_v1.json
+  sha256: 4a26589308e5a73292de49e0babe39fdef988452fc6d0269d0e0cbbd4738770f
+- asset_id: EVIDENCE-T21-BOUNDED-LIVE-SHAKEDOWN-001
+  path: docs/evidence/task21/live_shakedown_acceptance_receipt_v1.json
+  sha256: 315785113e2312adcbd75d232be00fa0908b75393f69b101e8ad872f1d1fc8b0
+
+stages:
+- stage_id: A6_LOCAL_CONTROL_PLANE
+  status: AUTHORIZED_BY_STANDING_LOCAL_AUTONOMY
+  external_calls: 0
+- stage_id: A6_REAL_NOMINATION_AND_ADMISSION
+  status: BLOCKED_EXACT_REAL_INPUT_AND_AUTHORITY_REQUIRED
+  synthetic_fixture_may_authorize: false
+- stage_id: A6_SUSTAINED_CAPTURE
+  status: BLOCKED_EXACT_EXTERNAL_AUTHORITY_REQUIRED
+  unattended_process_authorized: false
+- stage_id: A6_DAY30_REVIEW
+  status: FUTURE
+  outcome_unsealing_authorized: false
+- stage_id: A6_DAY45_HARD_STOP
+  status: FUTURE
+  automatic_extension: false
+- stage_id: A7_FREEZE_ACCEPTANCE_AND_CATALOG
+  status: NOT_AUTHORIZED_BY_A6
+
+population:
+  nomination_event_model: APPEND_ONLY
+  membership_event_model: APPEND_ONLY
+  exact_duplicate_behavior: IDEMPOTENT_DEDUPLICATE
+  conflicting_duplicate_behavior: FAIL_CLOSED
+  real_current_member_count: 0
+  minimum_complete_members: 5
+  maximum_active_members: 8
+  unused_slots_authorize_discovery: false
+  prior_task_member_automatic_carry_forward: false
+  technical_probe_automatic_carry_forward: false
+  synthetic_fixture:
+    path: tests/fixtures/task21/sustained_collection_offline_scenario_v1.json
+    market_data: false
+    authority: TEST_ONLY
+
+collection:
+  mode: EVENT_TRIGGERED_FOREGROUND_PANELS
+  continuous_polling: false
+  market_wide_feed: false
+  minimum_calendar_days: 30
+  maximum_calendar_days: 45
+  windows_per_complete_member: 3
+  quote_pairs_per_complete_panel: 4
+  provider_calls_per_complete_panel_max: 8
+  missed_window_policy: RETAIN_EXPLICIT_COVERAGE_LOSS_NO_SILENT_RESCHEDULE
+  retries: 0
+  concurrency: 1
+
+lifecycle:
+  PREPARED:
+    enter_when: REAL_LAUNCH_NOT_AUTHORIZED
+  ACTIVE:
+    enter_when: REAL_LAUNCH_AUTHORIZED_AND_ELAPSED_DAY_LT_30
+  DAY30_REVIEW:
+    enter_when: ELAPSED_DAY_GTE_30_AND_LT_45
+    sufficient_action: DATASET_READY_FOR_A7_FREEZE_REQUIRES_SEPARATE_AUTHORITY
+    insufficient_action: CONTINUE_UNCHANGED_TO_DAY45
+  DAY45_STOPPED:
+    enter_when: ELAPSED_DAY_GTE_45
+    automatic_extension: false
+    next_decision_requires_owner: true
+
+information_sufficiency:
+  minimum_complete_members: 5
+  minimum_complete_panels: 15
+  minimum_complete_quote_pairs: 60
+  minimum_distinct_admission_dates_utc: 3
+  minimum_distinct_admission_weeks_utc: 3
+  recovery_health_required: HEALTHY
+  physical_cap_reconciliation_required: true
+  positive_hypothesis_result_required: false
+
+monitoring:
+  frequency: AFTER_EACH_EVENT_OR_CLOSED_PANEL_AND_DAILY_WHILE_ACTIVE
+  allowed_views:
+  - LIFECYCLE_AND_STOP_STATE
+  - COVERAGE_MISSINGNESS_AND_FRESHNESS
+  - REQUEST_CREDIT_BYTE_DISK_AND_CASH_CAPS
+  - RECOVERY_BACKUP_AND_RESTORE_HEALTH
+  - TERMINAL_CLASS_COUNTS
+  - INCIDENT_AND_GAP_COUNTS
+  required_append_only_evidence:
+  - NOMINATION_EVENTS
+  - MEMBERSHIP_EVENTS
+  - PANEL_RECEIPTS
+  - GAP_EVENTS
+  - INCIDENT_EVENTS
+  - DAILY_HEALTH_RECEIPTS
+
+outcome_blindness:
+  active_until_a7_freeze: true
+  forbidden_active_fields:
+  - alpha
+  - cost_bps
+  - hypothesis_verdict
+  - pnl
+  - profit
+  - rank
+  - return
+  - roi
+  - score
+  - sharpe
+  - token_ranking
+  tuning_during_collection_allowed: false
+
+recovery:
+  required_health: HEALTHY
+  backup_maximum_age_hours: 24
+  backup_overdue_after_hours: 26
+  disable_new_admissions_after_overdue_hours: 48
+  restore_proof_maximum_age_hours: 168
+  unhealthy_blocks_new_windows: true
+  full_restore_required_before_a7_freeze: true
+
+physical_caps:
+  max_provider_requests: 192
+  max_provider_credits: 192
+  max_response_bytes: 25165824
+  max_stored_bytes: 125829120
+  max_active_entities: 8
+  max_wall_clock_seconds: 3888000
+  max_concurrency: 1
+  max_retries: 0
+  max_dataset_bytes: 268435456
+  min_free_space_bytes_after_write: 2147483648
+  cash_spend_usd_cents: 0
+  wallet_signer_transaction_actions: 0
+
+local_acceptance:
+  fixture_elapsed_days: 30
+  expected_complete_members: 5
+  expected_complete_panels: 15
+  expected_complete_quote_pairs: 60
+  expected_provider_calls: 120
+  expected_distinct_admission_dates_utc: 3
+  expected_distinct_admission_weeks_utc: 3
+  expected_lifecycle: DAY30_REVIEW
+  expected_decision: DATASET_READY_FOR_A7_FREEZE_REQUIRES_SEPARATE_AUTHORITY
+
+authority:
+  class: LOCAL_WRITE_ONLY
+  source: REPO_STANDING_AUTONOMY_AFTER_DIRECT_CONTINUE
+  managed_files:
+  - configs/task21_sustained_collection_v1.yaml
+  - docs/contracts/task21_sustained_collection_contract_v1.md
+  - src/solana_alpha_lab/task21_sustained_collection.py
+  - tests/fixtures/task21/sustained_collection_offline_scenario_v1.json
+  - scripts/run_task21_sustained_collection_offline.py
+  - tests/test_task21_sustained_collection.py
+  - docs/evidence/task21/sustained_collection_offline_acceptance_v1.json
+  network_calls: 0
+  provider_api_rpc_wss_calls: 0
+  drive_reads: 0
+  drive_writes: 0
+  credential_use: 0
+  real_candidate_admissions: 0
+  live_collector_executions: 0
+  forward_raw_or_dataset_writes: 0
+  backup_executions: 0
+  restore_executions: 0
+  provider_credits: 0
+  cash_spend_usd_cents: 0
+  dependency_changes: 0
+  scheduler_or_background_process: false
+  commit: false
+  push: false
+  pull_request: false
+  merge: false
+  wallet_actions: false
+  signer_actions: false
+  transaction_actions: false
+  ui_changes: false
+  destructive_actions: false
+
+next_boundary:
+  id: T21-A6_REAL_NOMINATION_AND_LAUNCH_GATE_V1
+  status: NOT_AUTHORIZED
+  requires_exact_real_nomination_set: true
+  requires_exact_external_authority: true
+  a7_authorized: false

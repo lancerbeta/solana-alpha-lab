@@ -1,0 +1,143 @@
+schema: smial.task21.runtime-recovery-gate
+schema_version: '1.0'
+task_id: TASK-21
+atom_id: T21-A3_PRE_COLLECTION_RUNTIME_RECOVERY_GATE_V1
+gate_id: TASK21_PRE_COLLECTION_RUNTIME_RECOVERY_GATE
+status: FROZEN_RUNTIME_RECOVERY_GATE_CONTRACT
+as_of: '2026-07-30'
+
+frozen_inputs:
+- asset_id: CONFIG-T21-FORWARD-COLLECTION-RUN-PLAN-001
+  path: configs/task21_forward_collection_run_plan_v1.yaml
+  sha256: 0f6bc1a748d80aaa8aeaed53551687304f467ccf9622b598d591f78317f419f5
+- asset_id: MODULE-T18-BACKUP-RESTORE-001
+  path: src/solana_alpha_lab/task18_backup_restore.py
+  sha256: dfe4f4e497788939e910ab0f0decf9b5ca85ee57567647d073145656cb1a4f02
+- asset_id: CONFIG-T20-RETENTION-RECOVERY-POLICY-001
+  path: configs/task20_retention_recovery_policy_v1.yaml
+  sha256: 3810a5674f2479e460c7b3883a58c0cf5d22f7902c0cfc8606aaeb990f95914f
+
+probe:
+  source_path: tests/fixtures/task21/runtime_recovery_probe_v1.json
+  bytes: 560
+  sha256: 1a6619d928f426d2b8ffdedc192db67ef0be1ea99c0a9f38b0e66f977f833425
+  content_addressed_filename: TASK21_RUNTIME_RECOVERY_PROBE_v1_1a6619d928f426d2b8ffdedc192db67ef0be1ea99c0a9f38b0e66f977f833425.json
+  mime_type: application/json
+  contains_secrets: false
+  contains_personal_data: false
+  contains_market_data: false
+  deterministic: true
+
+destination:
+  adapter: GOOGLE_DRIVE
+  topology: PRIVATE_SEPARATE_FAILURE_DOMAIN
+  root_scope: MY_DRIVE_ROOT
+  folder_name: SOLANA_ALPHA_LAB_TASK21_RECOVERY_V1
+  folder_collision_behavior: FAIL_CLOSED_NO_SECOND_FOLDER
+  folder_shared_required: false
+  file_shared_required: false
+  write_behavior: CREATE_ONLY_CONTENT_HASH_NAMED
+  existing_file_update_allowed: false
+  sharing_change_allowed: false
+
+acceptance:
+  required_evidence:
+  - PRIVATE_SEPARATE_FAILURE_DOMAIN_DESTINATION
+  - CREATE_ONLY_CONTENT_ADDRESSED_BACKUP
+  - EXACT_REMOTE_READBACK
+  - ISOLATED_SAMPLE_RESTORE
+  - BACKUP_AND_RESTORE_HEALTH_ALERTS
+  - NO_SECRET_MATERIAL_IN_EVIDENCE
+  exact_remote_identity:
+  - FILE_NAME_MATCH
+  - FILE_SIZE_MATCH
+  - SHA256_RAW_READBACK_MATCH
+  - PARENT_FOLDER_MATCH
+  isolated_restore_root: local/task21_recovery/isolated_restore
+  pass_requires_all_evidence: true
+
+health:
+  inherited_policy_asset_id: RETENTION-RECOVERY-T20-001
+  backup_maximum_age_hours: 24
+  backup_overdue_after_hours: 26
+  disable_new_t2_after_overdue_hours: 48
+  disable_new_t2_at_total_backup_age_hours: 74
+  routine_sample_restore_cadence: P7D
+  restore_overdue_after_hours: 168
+  allowed_states:
+  - HEALTHY
+  - BACKUP_OVERDUE
+  - RESTORE_OVERDUE
+  - EVIDENCE_AT_RISK
+  - EVIDENCE_CONFLICT
+  - STORAGE_HARD_STOP
+  current_gate_pass_requires: HEALTHY
+
+reuse:
+  method: ADOPT_PATTERN_THEN_WRAP_MISSING_RUNTIME_PIECES
+  adopted:
+  - MODULE-T18-BACKUP-RESTORE-001
+  - CONFIG-T20-RETENTION-RECOVERY-POLICY-001
+  new_dependencies: 0
+
+catalog:
+  status: CATALOG_TRANSACTION_PENDING_T21_A7
+  blocks_atom3: false
+  blocks_task21_done: true
+  planned_asset_ids:
+  - CONTRACT-T21-RUNTIME-RECOVERY-GATE-001
+  - CONFIG-T21-RUNTIME-RECOVERY-GATE-001
+  - MODULE-T21-RUNTIME-RECOVERY-001
+  - FIXTURE-T21-RUNTIME-RECOVERY-PROBE-001
+  - TEST-T21-RUNTIME-RECOVERY-GATE-001
+  - EVIDENCE-T21-RUNTIME-RECOVERY-GATE-001
+
+authority:
+  class: LOCAL_WRITE_PLUS_GOOGLE_DRIVE_WRITE
+  source: EXPLICIT_USER
+  managed_files:
+  - docs/contracts/task21_runtime_recovery_gate_contract_v1.md
+  - configs/task21_runtime_recovery_gate_v1.yaml
+  - src/solana_alpha_lab/task21_runtime_recovery.py
+  - tests/fixtures/task21/runtime_recovery_probe_v1.json
+  - tests/test_task21_runtime_recovery_gate.py
+  - docs/evidence/task21/runtime_recovery_gate_receipt_v1.json
+  local_runtime_root: local/task21_recovery
+  google_drive_connector_operations_max: 7
+  google_drive_searches_max: 1
+  google_drive_folder_creations_max: 1
+  google_drive_file_uploads_max: 1
+  google_drive_metadata_readbacks_max: 2
+  google_drive_raw_downloads_max: 2
+  google_drive_file_updates: 0
+  google_drive_deletions: 0
+  sharing_changes: 0
+  source_mutations: 0
+  source_deletions: 0
+  provider_api_rpc_wss_calls: 0
+  candidate_admissions: 0
+  collector_executions: 0
+  forward_raw_or_dataset_writes: 0
+  cash_spend_usd_cents: 0
+  provider_credits: 0
+  dependency_changes: 0
+  commit: false
+  push: false
+  pull_request: false
+  merge: false
+  wallet_actions: false
+  signer_actions: false
+  transaction_actions: false
+  destructive_actions: false
+
+non_claims:
+- NO_FORWARD_COLLECTION_STARTED
+- NO_PROVIDER_SELECTED_OR_CALLED
+- NO_DATASET_BACKUP_PROVEN
+- NO_FULL_DATASET_RECOVERY_PROVEN
+- PROBE_PASS_PROVES_ONLY_DRIVE_ADAPTER_PATH_AND_EXECUTABLE_HEALTH_GUARD
+
+next_atom:
+  atom_id: T21-A4_THIN_COLLECTOR_AND_OFFLINE_DRY_RUN_V1
+  authorized_by_atom3: false
+  provider_or_forward_collection_authorized: false

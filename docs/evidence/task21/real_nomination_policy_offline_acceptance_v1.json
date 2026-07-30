@@ -1,0 +1,299 @@
+{
+  "schema": "smial.task21.real-nomination-policy-offline-acceptance",
+  "schema_version": "1.0",
+  "evidence_id": "EVIDENCE-T21-REAL-NOMINATION-POLICY-OFFLINE-001",
+  "evidence_version": "1.0",
+  "task_id": "TASK-21",
+  "atom_id": "T21-A6R_FROZEN_REAL_NOMINATION_POLICY_V1",
+  "status": "PASS",
+  "verdict": "POLICY_FROZEN_REAL_NOMINATIONS_AND_COLLECTION_NOT_STARTED",
+  "frozen_artifacts": {
+    "config": {
+      "path": "configs/task21_real_nomination_policy_v1.yaml",
+      "sha256": "04061dacee8e78811d7d9fa0a92308b2f6d1bc43c4789a894420e92bcf4fb979"
+    },
+    "contract": {
+      "path": "docs/contracts/task21_real_nomination_policy_contract_v1.md",
+      "sha256": "1f7684b8bdea603fab86b1f1bca3547bbfc3a76db090db45891c2b1dd25f500a"
+    },
+    "module": {
+      "path": "src/solana_alpha_lab/task21_real_nomination.py",
+      "sha256": "8eaced64ed5cd9a32f568f926f195dc7aebf05ca18058abe73ce5bfac2f1c4d6"
+    },
+    "fixture": {
+      "path": "tests/fixtures/task21/real_nomination_policy_offline_batch_v1.json",
+      "sha256": "b1e9380aadf46d3b058021bcf8511fff569d43fbc6ab82ba49a0a9fb38fe7fe6"
+    }
+  },
+  "offline_receipt_sha256": "d6b0fbf024dee3880de3fbfb08b9274c9e169bf2b0ac2efd9c8974c15013f5dd",
+  "offline_receipt": {
+    "active_members": 5,
+    "active_members_by_tranche": {
+      "T1": 2,
+      "T2": 2,
+      "T3": 1
+    },
+    "active_tranches": 3,
+    "actual_actions": {
+      "cash_spend_usd_cents": 0,
+      "credential_use": 0,
+      "drive_reads": 0,
+      "drive_writes": 0,
+      "network_calls": 0,
+      "provider_api_rpc_wss_calls": 0,
+      "provider_credits": 0,
+      "scheduler_or_background_process": false,
+      "wallet_signer_transaction_actions": 0
+    },
+    "atom_id": "T21-A6R_FROZEN_REAL_NOMINATION_POLICY_V1",
+    "batch_sha256": "b1e9380aadf46d3b058021bcf8511fff569d43fbc6ab82ba49a0a9fb38fe7fe6",
+    "config_sha256": "04061dacee8e78811d7d9fa0a92308b2f6d1bc43c4789a894420e92bcf4fb979",
+    "contains_market_data": false,
+    "evaluated_nominations": 8,
+    "evaluations": [
+      {
+        "evaluation_state": "WATCHLIST_ACTIVE",
+        "mint": "4vJ9JU1bJJE96FWSJKvHsmmFADCg4gpZQff4P3bkLKi",
+        "nomination_event_id": "T21-A6R-SYN-NOM-001",
+        "reason_codes": [
+          "POLICY_ELIGIBLE_PREOUTCOME_NOMINATION"
+        ],
+        "tranche_id": "T1"
+      },
+      {
+        "evaluation_state": "WATCHLIST_ACTIVE",
+        "mint": "8qbHbw2BbbTHBW1sbeqakYXVKRQM8Ne7pLK7m6CVfeR",
+        "nomination_event_id": "T21-A6R-SYN-NOM-002",
+        "reason_codes": [
+          "POLICY_ELIGIBLE_PREOUTCOME_NOMINATION"
+        ],
+        "tranche_id": "T1"
+      },
+      {
+        "evaluation_state": "EVALUATED_REJECTED",
+        "mint": "CktRuQ2mttgRGkXJtyksdKHjUdc2C4TgDzyB98oEzy8",
+        "nomination_event_id": "T21-A6R-SYN-NOM-003",
+        "reason_codes": [
+          "PRIOR_RELEVANT_QUOTE_OUTCOME_EXPOSURE"
+        ],
+        "tranche_id": "T1"
+      },
+      {
+        "evaluation_state": "WATCHLIST_ACTIVE",
+        "mint": "GgBaCs3NCBuZN12kCJgAW63ydqohFkHEdfdEXBPzLHq",
+        "nomination_event_id": "T21-A6R-SYN-NOM-004",
+        "reason_codes": [
+          "POLICY_ELIGIBLE_PREOUTCOME_NOMINATION"
+        ],
+        "tranche_id": "T2"
+      },
+      {
+        "evaluation_state": "EVALUATED_NOT_EVALUABLE",
+        "mint": "LbUiWL3xVV8hTFYBVdbTNrpDo41NKS6o3LHHuDzjfcY",
+        "nomination_event_id": "T21-A6R-SYN-NOM-005",
+        "reason_codes": [
+          "MINT_DECIMALS_UNKNOWN"
+        ],
+        "tranche_id": "T2"
+      },
+      {
+        "evaluation_state": "WATCHLIST_ACTIVE",
+        "mint": "QWmroo4YnnMqYW3cnxWkFdaTxGD3P7vMSzwMHGbUzwF",
+        "nomination_event_id": "T21-A6R-SYN-NOM-006",
+        "reason_codes": [
+          "POLICY_ELIGIBLE_PREOUTCOME_NOMINATION"
+        ],
+        "tranche_id": "T2"
+      },
+      {
+        "evaluation_state": "WATCHLIST_ACTIVE",
+        "mint": "US517G5965aydkZ46HS38QLi7UQiSojurfbQfKCELFx",
+        "nomination_event_id": "T21-A6R-SYN-NOM-007",
+        "reason_codes": [
+          "POLICY_ELIGIBLE_PREOUTCOME_NOMINATION"
+        ],
+        "tranche_id": "T3"
+      },
+      {
+        "evaluation_state": "EVALUATED_REJECTED",
+        "mint": "US517G5965aydkZ46HS38QLi7UQiSojurfbQfKCELFx",
+        "nomination_event_id": "T21-A6R-SYN-NOM-008",
+        "reason_codes": [
+          "DUPLICATE_MINT_FIRST_NOMINATION_WINS"
+        ],
+        "tranche_id": "T3"
+      }
+    ],
+    "exact_duplicate_events_deduplicated": 0,
+    "membership_events": [
+      {
+        "entered_at": "2026-08-10T00:00:00Z",
+        "evidence_checkpoint": "SYN-CHECKPOINT-001",
+        "exited_at": null,
+        "first_reliable_available_at": "2026-08-10T00:00:00Z",
+        "hypothesis_version_id": "HYP-VERSION-EXECUTION-CAPACITY-CURVATURE-V1",
+        "member_id": "T21-WATCH-e23d7c1565d21a2f42c1",
+        "mint": "4vJ9JU1bJJE96FWSJKvHsmmFADCg4gpZQff4P3bkLKi",
+        "mint_decimals": 6,
+        "nomination_event_id": "T21-A6R-SYN-NOM-001",
+        "policy_version": "1.0",
+        "reason_codes": [
+          "POLICY_ELIGIBLE_PREOUTCOME_NOMINATION"
+        ]
+      },
+      {
+        "entered_at": "2026-08-10T00:00:00Z",
+        "evidence_checkpoint": "SYN-CHECKPOINT-002",
+        "exited_at": null,
+        "first_reliable_available_at": "2026-08-10T00:00:00Z",
+        "hypothesis_version_id": "HYP-VERSION-EXECUTION-CAPACITY-CURVATURE-V1",
+        "member_id": "T21-WATCH-16f4a6733b47dbf92631",
+        "mint": "8qbHbw2BbbTHBW1sbeqakYXVKRQM8Ne7pLK7m6CVfeR",
+        "mint_decimals": 6,
+        "nomination_event_id": "T21-A6R-SYN-NOM-002",
+        "policy_version": "1.0",
+        "reason_codes": [
+          "POLICY_ELIGIBLE_PREOUTCOME_NOMINATION"
+        ]
+      },
+      {
+        "entered_at": "2026-08-17T00:00:00Z",
+        "evidence_checkpoint": "SYN-CHECKPOINT-004",
+        "exited_at": null,
+        "first_reliable_available_at": "2026-08-17T00:00:00Z",
+        "hypothesis_version_id": "HYP-VERSION-EXECUTION-CAPACITY-CURVATURE-V1",
+        "member_id": "T21-WATCH-def68576795277c047b8",
+        "mint": "GgBaCs3NCBuZN12kCJgAW63ydqohFkHEdfdEXBPzLHq",
+        "mint_decimals": 6,
+        "nomination_event_id": "T21-A6R-SYN-NOM-004",
+        "policy_version": "1.0",
+        "reason_codes": [
+          "POLICY_ELIGIBLE_PREOUTCOME_NOMINATION"
+        ]
+      },
+      {
+        "entered_at": "2026-08-17T00:00:00Z",
+        "evidence_checkpoint": "SYN-CHECKPOINT-006",
+        "exited_at": null,
+        "first_reliable_available_at": "2026-08-17T00:00:00Z",
+        "hypothesis_version_id": "HYP-VERSION-EXECUTION-CAPACITY-CURVATURE-V1",
+        "member_id": "T21-WATCH-e932b341a278b2b01e08",
+        "mint": "QWmroo4YnnMqYW3cnxWkFdaTxGD3P7vMSzwMHGbUzwF",
+        "mint_decimals": 6,
+        "nomination_event_id": "T21-A6R-SYN-NOM-006",
+        "policy_version": "1.0",
+        "reason_codes": [
+          "POLICY_ELIGIBLE_PREOUTCOME_NOMINATION"
+        ]
+      },
+      {
+        "entered_at": "2026-08-24T00:00:00Z",
+        "evidence_checkpoint": "SYN-CHECKPOINT-007",
+        "exited_at": null,
+        "first_reliable_available_at": "2026-08-24T00:00:00Z",
+        "hypothesis_version_id": "HYP-VERSION-EXECUTION-CAPACITY-CURVATURE-V1",
+        "member_id": "T21-WATCH-3b9b0b03e57dd1fef55c",
+        "mint": "US517G5965aydkZ46HS38QLi7UQiSojurfbQfKCELFx",
+        "mint_decimals": 6,
+        "nomination_event_id": "T21-A6R-SYN-NOM-007",
+        "policy_version": "1.0",
+        "reason_codes": [
+          "POLICY_ELIGIBLE_PREOUTCOME_NOMINATION"
+        ]
+      }
+    ],
+    "next_boundary": {
+      "atom_id": "T21-A6S_BOUNDED_REAL_NOMINATION_AND_COLLECTION_LAUNCH_V1",
+      "authorized": false,
+      "external_authority_required": true,
+      "real_candidate_input_required": true
+    },
+    "non_claims": [
+      "NO_REAL_TOKEN_SELECTED",
+      "NO_REAL_TASK21_NOMINATION_OR_MEMBER_CREATED",
+      "NO_PROVIDER_ROUTE_AVAILABILITY_PRECHECK",
+      "NO_FORWARD_COLLECTION_STARTED",
+      "NO_HYPOTHESIS_OUTCOME_UNSEALED",
+      "NO_A7_CATALOG_TRANSACTION"
+    ],
+    "ordering": [
+      "tranche_id",
+      "first_reliable_available_at",
+      "observed_at",
+      "nomination_event_id"
+    ],
+    "policy_id": "HYP-WATCHLIST-EXECUTION-CAPACITY-FORWARD-V1",
+    "policy_version": "1.0",
+    "real_world_state": {
+      "real_candidate_admissions_created": 0,
+      "real_candidate_nominations_created": 0,
+      "real_collection_authorized": false,
+      "real_watchlist_member_count": 0
+    },
+    "schema": "smial.task21.real-nomination-policy-offline-receipt",
+    "schema_version": "1.0",
+    "source_class_counts": {
+      "FACTORY_HYPOTHESIS_CANDIDATE": 3,
+      "OWNER_RESEARCH_NOMINATION": 3,
+      "PREDECLARED_CONTROL_COHORT": 2
+    },
+    "state_counts": {
+      "EVALUATED_NOT_EVALUABLE": 1,
+      "EVALUATED_REJECTED": 2,
+      "WATCHLIST_ACTIVE": 5
+    },
+    "status": "PASS",
+    "synthetic_dataset_population_sufficient": true,
+    "synthetic_only": true,
+    "task_id": "TASK-21"
+  },
+  "offline_fault_acceptance": {
+    "INPUT_ORDER_INDEPENDENT_CHRONOLOGICAL_SORT": "PASS",
+    "PRIOR_OUTCOME_EXPOSURE_REJECTED": "PASS",
+    "UNKNOWN_DECIMALS_NOT_EVALUABLE": "PASS",
+    "DUPLICATE_MINT_FIRST_EVENT_WINS": "PASS",
+    "REFERENCE_ASSET_REJECTED": "PASS",
+    "OUTCOME_DEPENDENT_SELECTION_REJECTED": "PASS",
+    "FORBIDDEN_OUTCOME_PAYLOAD_FAILS_CLOSED": "PASS",
+    "EXACT_DUPLICATE_EVENT_DEDUPLICATED": "PASS",
+    "CONFLICTING_DUPLICATE_EVENT_FAILS_CLOSED": "PASS",
+    "TRANCHE_CAP_ENFORCED": "PASS",
+    "LATE_EVENT_REJECTED": "PASS",
+    "TRANCHE_CLOSE_DRIFT_FAILS_CLOSED": "PASS",
+    "UNSEALED_OUTCOME_FAILS_CLOSED": "PASS",
+    "EIGHT_EVENT_OUTER_CAP_ENFORCED": "PASS",
+    "MEMBERSHIP_IDENTITIES_DETERMINISTIC": "PASS"
+  },
+  "actual_authority": {
+    "class": "LOCAL_WRITE_ONLY",
+    "network_calls": 0,
+    "provider_api_rpc_wss_calls": 0,
+    "drive_reads": 0,
+    "drive_writes": 0,
+    "credential_use": 0,
+    "real_candidate_nominations": 0,
+    "real_candidate_admissions": 0,
+    "live_collector_executions": 0,
+    "forward_raw_or_dataset_writes": 0,
+    "provider_credits": 0,
+    "cash_spend_usd_cents": 0,
+    "scheduler_or_background_process": false,
+    "wallet_signer_transaction_actions": 0,
+    "dependency_changes": 0,
+    "commit": false,
+    "push": false,
+    "pull_request": false,
+    "merge": false
+  },
+  "catalog": {
+    "version_before": "0.25.0",
+    "changed_in_atom": false,
+    "transaction_owner": "T21-A7"
+  },
+  "next_boundary": {
+    "atom_id": "T21-A6S_BOUNDED_REAL_NOMINATION_AND_COLLECTION_LAUNCH_V1",
+    "status": "NOT_AUTHORIZED",
+    "real_candidate_input_required": true,
+    "external_authority_required": true
+  }
+}

@@ -1,0 +1,209 @@
+{
+  "schema": "smial.task21.real-nomination-source-offline-acceptance",
+  "schema_version": "1.1",
+  "task_id": "TASK-21",
+  "parent_atom_id": "T21-A6S_BOUNDED_REAL_NOMINATION_AND_COLLECTION_LAUNCH_V1",
+  "source_atom_id": "T21-A6S_T1_SOURCE_RESELECTION_V1",
+  "atom_id": "T21-A6S_T1_TOKEN2022_REPLAY_AND_BACKUP_V1",
+  "stage": "T1_ONLY",
+  "status": "OFFLINE_AND_T1_TOKEN2022_REPLAY_PASS",
+  "artifacts": [
+    {
+      "path": "configs/task21_real_nomination_source_v1.yaml",
+      "sha256": "362e86055a27c6e96402e7048a92a9b4786931fd36ca385e6ed1c38cff7a8d88"
+    },
+    {
+      "path": "docs/contracts/task21_real_nomination_source_contract_v1.md",
+      "sha256": "338ef6e490c649c4b7312b22802d1fd159a2d03954df5157f2dc7002e14a37eb"
+    },
+    {
+      "path": "src/solana_alpha_lab/task21_real_nomination_source.py",
+      "sha256": "7c8e21c460c6f6c4fc87d7e64d3ee0623c47325a1d1aef6ad12baad2d51fadc0"
+    },
+    {
+      "path": "tests/fixtures/task21/geckoterminal_new_pools_offline_v1.json",
+      "sha256": "e66a959c1753b618ddc4e728a1bf14c720c47226ba7e895814703cb148553209"
+    },
+    {
+      "path": "tests/test_task21_real_nomination_source.py",
+      "sha256": "8d01baed38a74ca0b25831f28745c77237d0720ea4e546536a713ee1b3ea4ec7"
+    },
+    {
+      "path": "scripts/run_task21_t1_nomination_launch.py",
+      "sha256": "1b78972c862cba0227a367d05b202243e22bc2fb2cd7d4a15fefcdbec6fc6623"
+    }
+  ],
+  "offline_receipt": {
+    "schema": "smial.task21.real-nomination-source-offline-receipt",
+    "schema_version": "1.1",
+    "task_id": "TASK-21",
+    "parent_atom_id": "T21-A6S_BOUNDED_REAL_NOMINATION_AND_COLLECTION_LAUNCH_V1",
+    "source_atom_id": "T21-A6S_T1_SOURCE_RESELECTION_V1",
+    "atom_id": "T21-A6S_T1_TOKEN2022_REPLAY_AND_BACKUP_V1",
+    "stage": "T1_ONLY",
+    "status": "PASS",
+    "cohort_id": "DEXSCREENER_LATEST_PROFILE_SOLANA_CONTROL_ONLY",
+    "synthetic_only": true,
+    "contains_market_data": false,
+    "rpc_context_slot": 371000000,
+    "rpc_candidate_count": 4,
+    "selected_count": 3,
+    "selected_by_program": {
+      "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA": 1,
+      "TokenzQdBNbLqP5VEhdkAS6EPFLC1PHnBqCXEpPxuEb": 2
+    },
+    "selected_structural_candidates": [
+      {
+        "mint": "4vJ9JU1bJJE96FWSJKvHsmmFADCg4gpZQff4P3bkLKi",
+        "mint_decimals": 6,
+        "token_program": "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA"
+      },
+      {
+        "mint": "8qbHbw2BbbTHBW1sbeqakYXVKRQM8Ne7pLK7m6CVfeR",
+        "mint_decimals": 6,
+        "token_program": "TokenzQdBNbLqP5VEhdkAS6EPFLC1PHnBqCXEpPxuEb"
+      },
+      {
+        "mint": "CktRuQ2mttgRGkXJtyksdKHjUdc2C4TgDzyB98oEzy8",
+        "mint_decimals": 9,
+        "token_program": "TokenzQdBNbLqP5VEhdkAS6EPFLC1PHnBqCXEpPxuEb"
+      }
+    ],
+    "selection_ignores_profile_marketing_fields": true,
+    "selection_ignores_response_order": true,
+    "mint_header_requires_initialized_state": true,
+    "legacy_requires_exact_82_byte_account": true,
+    "token2022_requires_program_owner_and_valid_82_byte_mint_header": true,
+    "actual_actions": {
+      "network_calls": 0,
+      "provider_api_rpc_wss_calls": 0,
+      "drive_reads": 0,
+      "drive_writes": 0,
+      "real_candidate_nominations": 0,
+      "real_candidate_admissions": 0,
+      "cash_spend_usd_cents": 0,
+      "credentials_used": 0,
+      "wallet_signer_transaction_actions": 0
+    }
+  },
+  "offline_receipt_sha256": "c7ba5c124541712373e1d215fac5784b03ccb48ec40331a3a3ccc99d66936fec",
+  "retained_source_history": {
+    "geckoterminal_calls": 2,
+    "geckoterminal_outcome": "HTTP_403_BOTH_CALLS",
+    "dexscreener_calls": 1,
+    "solana_public_rpc_calls": 1,
+    "task21_external_requests_cumulative": 4,
+    "profile_rows": 30,
+    "rpc_requested_mints": 23,
+    "legacy_spl_mint_accounts": 1,
+    "token_2022_owned_accounts_with_82_byte_prefix": 22,
+    "original_frozen_nomination_events": 1,
+    "t1_anchor_established": false
+  },
+  "retained_source_partition": {
+    "path": "local/task21_forward/t1_nomination/TASK21_T1_NOMINATION_PARTITION_v1_b334eac617fefdfcd6b6f51e41697c7e1c56daff873b6a8587328c66dcfa759d.json",
+    "bytes": 47195,
+    "sha256": "b334eac617fefdfcd6b6f51e41697c7e1c56daff873b6a8587328c66dcfa759d",
+    "contains_both_exact_raw_responses": true,
+    "contains_exact_capture_times": true,
+    "immutable": true,
+    "google_drive": {
+      "file_id": "123PIEMHLc2pY0Kmzm9hLhU57sd5a5KXF",
+      "name": "TASK21_T1_NOMINATION_PARTITION_v1_b334eac617fefdfcd6b6f51e41697c7e1c56daff873b6a8587328c66dcfa759d.json",
+      "bytes": 47195,
+      "parent_folder_id": "1EISgmsB8nt2pkU4uBUO6Sav1Fzbo6Hw3",
+      "shared": false,
+      "visibility": "not_shared",
+      "exact_inline_raw_readback": {
+        "completed": true,
+        "bytes": 47195,
+        "sha256": "b334eac617fefdfcd6b6f51e41697c7e1c56daff873b6a8587328c66dcfa759d",
+        "complete_byte_identity": true
+      }
+    }
+  },
+  "live_replay_receipt": {
+    "completed_at": "2026-07-30T16:31:08.666Z",
+    "status": "PASS",
+    "verdict": "T1_NOMINATIONS_FROZEN_AWAITING_CLOSE",
+    "anchor_at": "2026-07-30T16:28:59.084Z",
+    "t1_close_at": "2026-08-06T16:28:59.084Z",
+    "source_partition_sha256": "b334eac617fefdfcd6b6f51e41697c7e1c56daff873b6a8587328c66dcfa759d",
+    "derived_partition": {
+      "path": "local/task21_forward/t1_replay/TASK21_T1_TOKEN2022_REPLAY_PARTITION_v1_c4dbd8340253f137f6778434a1175f27494a0c01871aae80aa973b4565ca26dc.json",
+      "name": "TASK21_T1_TOKEN2022_REPLAY_PARTITION_v1_c4dbd8340253f137f6778434a1175f27494a0c01871aae80aa973b4565ca26dc.json",
+      "bytes": 50548,
+      "sha256": "c4dbd8340253f137f6778434a1175f27494a0c01871aae80aa973b4565ca26dc",
+      "status": "T1_NOMINATIONS_FROZEN_AWAITING_CLOSE",
+      "nomination_events": 3,
+      "nomination_program_counts": {
+        "TokenzQdBNbLqP5VEhdkAS6EPFLC1PHnBqCXEpPxuEb": 3
+      },
+      "a6r_event_contracts": "PASS",
+      "backdating_allowed": false,
+      "contains_complete_retained_source_observation": true
+    },
+    "google_drive": {
+      "file_id": "1xv2kS2I0TmCpBwi74aHbBLVjxWSgqj-O",
+      "name": "TASK21_T1_TOKEN2022_REPLAY_PARTITION_v1_c4dbd8340253f137f6778434a1175f27494a0c01871aae80aa973b4565ca26dc.json",
+      "mime_type": "application/json",
+      "bytes": 50548,
+      "parent_folder_id": "1EISgmsB8nt2pkU4uBUO6Sav1Fzbo6Hw3",
+      "created_time": "2026-07-30T16:31:08.666Z",
+      "modified_time": "2026-07-30T16:31:08.666Z",
+      "shared": false,
+      "visibility": "not_shared",
+      "raw_readback": {
+        "bytes": 50548,
+        "sha256": "c4dbd8340253f137f6778434a1175f27494a0c01871aae80aa973b4565ca26dc",
+        "complete_byte_identity": true
+      },
+      "successful_file_uploads": 1,
+      "metadata_readbacks": 1,
+      "raw_readbacks": 1,
+      "objects_created": 1,
+      "file_updates": 0,
+      "deletions": 0,
+      "sharing_changes": 0,
+      "client_repair_receipt": {
+        "nested_upload_result_was_not_parseable_by_wrapper": true,
+        "exact_name_absence_check_before_successful_upload": 1,
+        "objects_found_before_successful_upload": 0,
+        "duplicate_objects_created": 0
+      }
+    }
+  },
+  "current_atom_actual_actions": {
+    "old_drive_raw_inline_readbacks": 1,
+    "provider_api_rpc_wss_calls": 0,
+    "local_derived_partition_writes": 1,
+    "new_drive_file_uploads": 1,
+    "new_drive_metadata_readbacks": 1,
+    "new_drive_raw_readbacks": 1,
+    "drive_exact_name_absence_checks_for_client_repair": 1,
+    "real_candidate_nominations": 3,
+    "real_candidate_admissions": 0,
+    "jupiter_api_calls": 0,
+    "credentials_used": 0,
+    "cash_spend_usd_cents": 0,
+    "scheduler_or_background_process": false,
+    "wallet_signer_transaction_actions": 0
+  },
+  "non_claims": [
+    "NO_SOURCE_API_OR_RPC_CALLED_BY_REPLAY_ACCEPTANCE",
+    "NO_SOURCE_API_OR_RPC_CALL_DURING_TOKEN_2022_REPLAY",
+    "NO_WATCHLIST_MEMBER_ADMITTED",
+    "NO_JUPITER_QUOTE_CALLED",
+    "NO_ALPHA_OR_MARKET_WIDE_CLAIM",
+    "NO_ALPHA_OR_MARKET_WIDE_REPRESENTATIVENESS_CLAIM"
+  ],
+  "next_runtime_step": {
+    "stage": "T1_CLOSE_EVALUATION_AND_BOUNDED_PANEL_CAPTURE",
+    "status": "NOT_AUTHORIZED_BEFORE_EXACT_CLOSE",
+    "atom_id": "T21-A6S_T1_CLOSE_EVALUATION_AND_BOUNDED_PANEL_CAPTURE_V1",
+    "earliest_at": "2026-08-06T16:28:59.084Z",
+    "candidate_admissions_authorized": false,
+    "jupiter_api_calls_authorized": false,
+    "a7_authorized": false
+  }
+}

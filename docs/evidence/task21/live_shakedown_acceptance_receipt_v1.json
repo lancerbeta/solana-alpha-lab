@@ -1,0 +1,143 @@
+{
+  "schema": "smial.task21.bounded-live-shakedown-acceptance-receipt",
+  "schema_version": "1.0",
+  "evidence_id": "EVIDENCE-T21-BOUNDED-LIVE-SHAKEDOWN-001",
+  "evidence_version": "1.0",
+  "task_id": "TASK-21",
+  "atom_id": "T21-A5_BOUNDED_LIVE_SHAKEDOWN_V1",
+  "status": "PASS",
+  "verdict": "LIVE_TRANSPORT_AND_CREATE_ONLY_DURABILITY_COMPATIBLE",
+  "triggered_at": "2026-07-30T12:00:52.092837Z",
+  "authority": {
+    "source": "EXPLICIT_USER_CONFIRMATION_OF_PRECEDING_EXACT_ENVELOPE",
+    "exact_phrase": "T21-A5_BOUNDED_LIVE_SHAKEDOWN_V1",
+    "provider_api_rpc_wss_calls_max": 8,
+    "modeled_provider_credits_max": 8,
+    "live_executions_max": 1,
+    "local_live_windows_max": 1,
+    "durable_bytes_max": 5242880,
+    "cash_spend_usd_cents": 0,
+    "drive_reads": 0,
+    "drive_writes": 0,
+    "credential_use": 0,
+    "real_candidate_admissions": 0,
+    "forward_dataset_writes": 0,
+    "wallet_signer_transaction_actions": 0,
+    "scheduler_or_background_process": false
+  },
+  "frozen_artifacts": {
+    "config": {
+      "path": "configs/task21_live_shakedown_v1.yaml",
+      "sha256": "00df74647bdfa279acd084f91df1e40cfa860c84387c9a76960913ff57ff12b2"
+    },
+    "contract": {
+      "path": "docs/contracts/task21_live_shakedown_contract_v1.md",
+      "sha256": "a20fe57ce73258cc8ad3fddc8dabc4e686cee5f7fe9fc37aef309fe3e38ba081"
+    },
+    "module": {
+      "path": "src/solana_alpha_lab/task21_live_shakedown.py",
+      "sha256": "6b4a7ab0af670531a47fc2c23e5411a0076b5bf12040a7e4f23e475042c745bb"
+    },
+    "script": {
+      "path": "scripts/run_task21_live_shakedown.py",
+      "sha256": "48263b2b960ee1044b85edf4f21dd8b209042cde395eed5b6e803d4a437c70e7"
+    }
+  },
+  "preflight": {
+    "recovery_receipt_sha256": "b30081d22dafaf7c4a6d7c1d1aa952bdee48df504773c4264702b639d7cd8013",
+    "recovery_verdict": "PASS",
+    "recovery_health": "HEALTHY",
+    "backup_age_hours_at_start": 2.11112,
+    "restore_proof_age_hours_at_start": 2.082062,
+    "disk_pressure_blocked": false,
+    "output_collision": false,
+    "api_keys_or_accounts_required": false
+  },
+  "provider": {
+    "provider": "JUPITER",
+    "surface": "METIS_SWAP_V1_QUOTE",
+    "base_url": "https://api.jup.ag",
+    "method": "GET",
+    "path": "/swap/v1/quote",
+    "official_readback_as_of": "2026-07-30",
+    "current_status": "AVAILABLE_SUPERSEDED_NOT_ACTIVELY_MAINTAINED",
+    "keyless": true,
+    "minimum_interval_seconds": 2.2,
+    "retries": 0,
+    "concurrency": 1,
+    "provider_billed_credit_claim": "NOT_AVAILABLE_KEYLESS_NO_ACCOUNT"
+  },
+  "technical_probe": {
+    "isolation": "TECHNICAL_PROBE_NOT_WATCHLIST_ADMISSION",
+    "source_task": "TASK-17A",
+    "source_member_id": "HYP-WATCH-MEMBER-T10-001",
+    "task21_watchlist_members_created": 0,
+    "real_candidate_admissions": 0,
+    "forward_dataset_rows": 0,
+    "hypothesis_result_claim": false
+  },
+  "runtime": {
+    "execution_count": 1,
+    "window_id": "T21-A5-WINDOW-01",
+    "status": "COMPLETE",
+    "stop_reason": null,
+    "provider_api_rpc_wss_calls": 8,
+    "modeled_provider_credits": 8,
+    "received_bytes": 12924,
+    "stored_bytes": 44720,
+    "raw_rows": 8,
+    "buy_attempts": 4,
+    "sell_attempts": 4,
+    "sell_not_attempted": 0,
+    "terminal_counts": {
+      "QUOTE_AVAILABLE": 8
+    },
+    "cash_spend_usd_cents": 0,
+    "credentials_used": 0,
+    "drive_reads": 0,
+    "drive_writes": 0,
+    "wallet_signer_transaction_actions": 0,
+    "scheduler_or_background_process": false,
+    "auto_escalated_to_atom6": false
+  },
+  "local_create_only_evidence": {
+    "logical_root": "local/task21_collector/live_shakedown/task21_live_shakedown_v1/window=T21-A5-WINDOW-01",
+    "tracked_in_git": false,
+    "files": [
+      {
+        "path": "manifest.json",
+        "bytes": 637,
+        "sha256": "30009cc4872e6d3f1052883bdb1a08a99de250a80e048233b71042ed263526b2"
+      },
+      {
+        "path": "raw_events.jsonl",
+        "bytes": 43408,
+        "sha256": "caadf38649806a6486907e832680104fab28e3aa685fa097197502eff4c24b8e"
+      },
+      {
+        "path": "receipt.json",
+        "bytes": 675,
+        "sha256": "69bd1cea2c9edfb40aed583b8fafc8dcd6abfcd082512b1ff3deca75460a3dc3"
+      }
+    ],
+    "exact_readback": true,
+    "secret_assignment_detected": false,
+    "transaction_or_instruction_payload_detected": false,
+    "typed_instruction_version_metadata_only": true,
+    "new_bytes_backed_up_in_atom5": false,
+    "result_backup_claim": "NOT_PROVEN_BY_SHAKEDOWN"
+  },
+  "non_claims": [
+    "NO_SUSTAINED_FORWARD_COLLECTION_STARTED",
+    "NO_TASK21_WATCHLIST_ADMISSION",
+    "NO_FORWARD_DATASET_PARTITION_CREATED",
+    "NO_HYPOTHESIS_FILL_STRATEGY_PNL_OR_ALPHA_RESULT",
+    "NO_NEW_SHAKEDOWN_BYTES_BACKUP_OR_RESTORE_CLAIM",
+    "NO_SWAP_TRANSACTION_OR_EXECUTION"
+  ],
+  "next_atom": {
+    "atom_id": "T21-A6_SUSTAINED_FORWARD_COLLECTION_AND_MONITORING_V1",
+    "authorized_by_atom5": false,
+    "requires_separate_exact_authority": true
+  }
+}

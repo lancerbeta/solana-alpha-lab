@@ -1,0 +1,169 @@
+{
+  "schema": "smial.task21.sustained-collection-offline-acceptance",
+  "schema_version": "1.0",
+  "evidence_id": "EVIDENCE-T21-SUSTAINED-COLLECTION-LOCAL-CONTROL-001",
+  "evidence_version": "1.0",
+  "task_id": "TASK-21",
+  "atom_id": "T21-A6_SUSTAINED_FORWARD_COLLECTION_AND_MONITORING_V1",
+  "status": "PASS",
+  "verdict": "LOCAL_CONTROL_PLANE_PREPARED_REAL_COLLECTION_NOT_STARTED",
+  "entry_gate": {
+    "verdict": "START_WITH_PATCH",
+    "execution_shape": "STAGED",
+    "patch_reason": "ZERO_REAL_TASK21_WATCHLIST_MEMBERS",
+    "real_launch_blocked": true
+  },
+  "frozen_artifacts": {
+    "config": {
+      "path": "configs/task21_sustained_collection_v1.yaml",
+      "sha256": "07bae50b28043576942064b39b6230ed784d1f72237eeb7edde1144a7c2ff499"
+    },
+    "contract": {
+      "path": "docs/contracts/task21_sustained_collection_contract_v1.md",
+      "sha256": "a380108b8a6e1da159c8f75b0ada412b6e110bcdeaeb5a87181a0a4373cff161"
+    },
+    "module": {
+      "path": "src/solana_alpha_lab/task21_sustained_collection.py",
+      "sha256": "82a333b6f8e0f167cfda25a601cfeeabc0369eda524ad1812624e69d3d9d351c"
+    },
+    "scenario": {
+      "path": "tests/fixtures/task21/sustained_collection_offline_scenario_v1.json",
+      "sha256": "ad0f3230725664a4ff5671cfb7b461594586fdc8cca167a4d84cd42f54ab40bd"
+    },
+    "script": {
+      "path": "scripts/run_task21_sustained_collection_offline.py",
+      "sha256": "b7a7a00f9a86a3a0d451d72e021d35cb4158acdc144ac1c7cab2e31d03907328"
+    }
+  },
+  "runtime_state_receipt_sha256": "0c992ca45c1f39bdae486dc4a525829cd8fcc129a2f3d07bafbe46c1b5c5b92a",
+  "runtime_manifest_sha256": "832bad8fef54c022fd94f8ea3f0fb230a701fd416454427303bad9e8a981907d",
+  "offline_state_receipt": {
+    "actual_actions": {
+      "backup_executions": 0,
+      "cash_spend_usd_cents": 0,
+      "credential_use": 0,
+      "drive_reads": 0,
+      "drive_writes": 0,
+      "forward_raw_or_dataset_writes": 0,
+      "live_collector_executions": 0,
+      "network_calls": 0,
+      "provider_api_rpc_wss_calls": 0,
+      "real_candidate_admissions": 0,
+      "restore_executions": 0,
+      "scheduler_or_background_process": false,
+      "wallet_signer_transaction_actions": 0
+    },
+    "append_only_evidence": {
+      "exact_duplicate_memberships_deduplicated": 0,
+      "exact_duplicate_nominations_deduplicated": 0,
+      "exact_duplicate_panels_deduplicated": 0,
+      "gap_events_retained": 0,
+      "incident_events_retained": 0
+    },
+    "atom_id": "T21-A6_SUSTAINED_FORWARD_COLLECTION_AND_MONITORING_V1",
+    "config_sha256": "07bae50b28043576942064b39b6230ed784d1f72237eeb7edde1144a7c2ff499",
+    "consumption": {
+      "cash_spend_usd_cents": 0,
+      "dataset_bytes": 30000,
+      "modeled_provider_calls": 120,
+      "modeled_provider_credits": 120,
+      "modeled_response_bytes": 15000,
+      "modeled_stored_bytes": 30000
+    },
+    "coverage": {
+      "active_members": 5,
+      "complete_members": 5,
+      "complete_panels": 15,
+      "complete_panels_by_member": {
+        "T21-SYN-MEMBER-001": 3,
+        "T21-SYN-MEMBER-002": 3,
+        "T21-SYN-MEMBER-003": 3,
+        "T21-SYN-MEMBER-004": 3,
+        "T21-SYN-MEMBER-005": 3
+      },
+      "complete_quote_pairs": 60,
+      "distinct_admission_dates_utc": 3,
+      "distinct_admission_weeks_utc": 3,
+      "evaluated_nominations": 5,
+      "missed_panels": 0
+    },
+    "decision": "DATASET_READY_FOR_A7_FREEZE_REQUIRES_SEPARATE_AUTHORITY",
+    "information_sufficient": true,
+    "lifecycle": "DAY30_REVIEW",
+    "local_control_plane_only": true,
+    "non_claims": [
+      "NO_SUSTAINED_FORWARD_COLLECTION_STARTED",
+      "NO_REAL_TASK21_WATCHLIST_MEMBER_CREATED",
+      "NO_FORWARD_DATASET_CREATED",
+      "NO_HYPOTHESIS_RESULT_UNSEALED",
+      "NO_A7_FREEZE_OR_CATALOG_TRANSACTION"
+    ],
+    "real_launch": {
+      "authorized": false,
+      "blockers": [
+        "REAL_VERSIONED_NOMINATION_AND_MEMBERSHIP_SET",
+        "CURRENT_RECOVERY_HEALTHY",
+        "SUSTAINED_PROVIDER_ENDPOINT_AND_SCHEMA_FROZEN",
+        "EXACT_EXTERNAL_COLLECTION_AUTHORITY"
+      ],
+      "real_task21_watchlist_members": 0,
+      "technical_probe_automatic_carry_forward": false
+    },
+    "recovery": {
+      "backup_age_hours": 1,
+      "health_state": "HEALTHY",
+      "healthy_for_new_windows": true,
+      "restore_proof_age_hours": 24
+    },
+    "scenario_sha256": "ad0f3230725664a4ff5671cfb7b461594586fdc8cca167a4d84cd42f54ab40bd",
+    "schema": "smial.task21.sustained-collection-offline-state-receipt",
+    "schema_version": "1.0",
+    "simulated_elapsed_days": 30,
+    "status": "PASS",
+    "synthetic_only": true,
+    "task_id": "TASK-21"
+  },
+  "offline_fault_acceptance": {
+    "DAY29_CONTINUES_UNCHANGED": "PASS",
+    "DAY30_INSUFFICIENT_CONTINUES_TO_DAY45": "PASS",
+    "DAY45_STOPS_WITHOUT_AUTOEXTENSION": "PASS",
+    "UNHEALTHY_RECOVERY_BLOCKS_SUFFICIENCY": "PASS",
+    "PHYSICAL_CAP_BREACH_FAILS_CLOSED": "PASS",
+    "OUTCOME_FIELDS_REJECTED_WHILE_ACTIVE": "PASS",
+    "TECHNICAL_PROBE_AUTO_CARRY_REJECTED": "PASS",
+    "EXACT_DUPLICATE_IDEMPOTENT": "PASS",
+    "CONFLICTING_DUPLICATE_FAILS_CLOSED": "PASS",
+    "GAPS_AND_INCIDENTS_RETAINED": "PASS",
+    "CREATE_ONCE_RESTART_DEDUPLICATED": "PASS",
+    "DETERMINISTIC_BYTES_IDENTICAL": "PASS"
+  },
+  "actual_authority": {
+    "class": "LOCAL_WRITE_ONLY",
+    "network_calls": 0,
+    "provider_api_rpc_wss_calls": 0,
+    "drive_reads": 0,
+    "drive_writes": 0,
+    "credential_use": 0,
+    "real_candidate_admissions": 0,
+    "live_collector_executions": 0,
+    "forward_raw_or_dataset_writes": 0,
+    "backup_executions": 0,
+    "restore_executions": 0,
+    "provider_credits": 0,
+    "cash_spend_usd_cents": 0,
+    "scheduler_or_background_process": false,
+    "wallet_signer_transaction_actions": 0,
+    "dependency_changes": 0,
+    "commit": false,
+    "push": false,
+    "pull_request": false,
+    "merge": false
+  },
+  "next_boundary": {
+    "id": "T21-A6_REAL_NOMINATION_AND_LAUNCH_GATE_V1",
+    "status": "NOT_AUTHORIZED",
+    "requires_exact_real_nomination_set": true,
+    "requires_exact_external_authority": true,
+    "a7_authorized": false
+  }
+}

@@ -1,0 +1,17 @@
+{
+  "atom_id": "T21-A3_PRE_COLLECTION_RUNTIME_RECOVERY_GATE_V1",
+  "authorizes_forward_collection": false,
+  "authorizes_provider_calls": false,
+  "contains_market_data": false,
+  "contains_personal_data": false,
+  "contains_secrets": false,
+  "payload": {
+    "ordinal": 1,
+    "sentinel": "SOLANA_ALPHA_LAB_TASK21_RECOVERY_V1"
+  },
+  "probe_id": "TASK21_PRE_COLLECTION_RUNTIME_RECOVERY_GATE",
+  "purpose": "NON_SECRET_CREATE_ONLY_READBACK_RESTORE_PROBE",
+  "schema": "smial.task21.runtime-recovery-probe",
+  "schema_version": "1.0",
+  "task_id": "TASK-21"
+}

@@ -1,0 +1,184 @@
+{
+  "schema": "smial.task21.owner-pulse-read-model-acceptance",
+  "schema_version": "1.0",
+  "evidence_id": "EVIDENCE-T21-OWNER-PULSE-READ-MODEL-001",
+  "evidence_version": "1.1",
+  "task_id": "TASK-21",
+  "atom_id": "T21-P2R_OWNER_PULSE_PRODUCTION_MEMORY_BINDING_V1",
+  "completed_at": "2026-07-30T21:22:00.000Z",
+  "status": "PASS",
+  "verdict": "LOCAL_OWNER_PULSE_PRODUCTION_MEMORY_BOUND",
+  "targeted_validation": "12_OF_12_PASS",
+  "validation": {
+    "owner_pulse_targeted": "12_OF_12_PASS",
+    "task21_regression": "86_OF_86_PASS",
+    "ctrl_agents_catalog_integrity": "PASS",
+    "catalog_validation": "PASS_340_ASSETS_4_SHARDS_4_SCHEMAS_8_QUERIES",
+    "generated_navigation_check": "PASS"
+  },
+  "artifacts": [
+    {
+      "path": "configs/task21_owner_pulse_read_model_v1.yaml",
+      "bytes": 4346,
+      "sha256": "5a203b922a840b7745962f46481800119fcb00b043da3d2d204785b3bec7e602"
+    },
+    {
+      "path": "docs/contracts/task21_owner_pulse_read_model_contract_v1.md",
+      "bytes": 4640,
+      "sha256": "7928f48e4b760c80cc41d7860809f7503ec3bba9ba9526124a969caae7d80cbc"
+    },
+    {
+      "path": "src/solana_alpha_lab/task21_owner_pulse.py",
+      "bytes": 22904,
+      "sha256": "5f29e0d6c8e93d08f42f019da7b020eca07d891990ff1cb3443d18e2eeeff090"
+    },
+    {
+      "path": "tests/test_task21_owner_pulse.py",
+      "bytes": 13692,
+      "sha256": "e254382982d527b03962d65e54a1083980e9b0945ad7c67971e33b41b3489040"
+    }
+  ],
+  "protected_inputs": [
+    {
+      "path": "docs/evidence/task17/first_bounded_hypothesis_cycle_v1.json",
+      "bytes": 9758,
+      "sha256": "8c9da2232ab0feec86da130985eaa4e5168539adaa036d0c48f44b00567c06b6"
+    },
+    {
+      "path": "registries/hypotheses.yaml",
+      "bytes": 161,
+      "sha256": "9ee9f983fa6869c0ee1ff6a249e06dd38fc059a956943cfea8539822054236d9"
+    },
+    {
+      "path": "registries/research_cycles.yaml",
+      "bytes": 171,
+      "sha256": "2ca0195a7617f2f95b7334291c776b78b447ea854b4c43b48dbe0f25fe08f797"
+    },
+    {
+      "path": "registries/strategies.yaml",
+      "bytes": 161,
+      "sha256": "82518f4016ae746f40a2e7fff107365a98287111bf56b2648b3207e4e3c7cb36"
+    },
+    {
+      "path": "registries/bot_instances.yaml",
+      "bytes": 167,
+      "sha256": "25622701c6dfbe077f9b1b7e0d79fabe7be248412d94ee3f2ec0d15f5fff7dd8"
+    },
+    {
+      "path": "control/active_time_gates.json",
+      "bytes": 1662,
+      "sha256": "8b05eedf4d98274a26825e8562a729645494556b9291be8cc9d7ae8eeb8ff997"
+    },
+    {
+      "path": "AGENTS.md",
+      "bytes": 9376,
+      "sha256": "4fb3a6c1322bf35265b65aefc870c8d8f27aab1a3d7f4ee97ee86b977aafb714"
+    },
+    {
+      "path": "catalog/assets/core.yaml",
+      "bytes": 331062,
+      "sha256": "ecc8a0a20f3235df1f7b7b45985a2f001fc84e9eece6b50413bed2bc41cb10e4"
+    }
+  ],
+  "deterministic_acceptance": {
+    "waiting_as_of": "2026-07-31T12:00:00.000Z",
+    "waiting_pulse_sha256": "2e333a6af201b0d44b601924c2dc4b7f82680fa7934cc0d5417bf1936a5af5f7",
+    "waiting_state": "WAITING_PARALLEL_WORK_ALLOWED",
+    "due_as_of": "2026-08-06T16:28:59.084Z",
+    "due_pulse_sha256": "9b5d004819b781f61958b7b1f42df6cb7acf9b7019d8f01bc2a792bbccd2ea3c",
+    "due_state": "DUE_PREEMPT_PARALLEL_WORK",
+    "due_attention_priority": "CRITICAL_TASK21_T1_CLOSE_DUE_FIRST",
+    "fixed_free_disk_bytes": 9000000000
+  },
+  "durable_resume_gate": {
+    "marker_path": "control/active_time_gates.json",
+    "entry_rule_path": "AGENTS.md",
+    "gate_id": "TASK21-T1-CLOSE-2026-08-06",
+    "earliest_at": "2026-08-06T16:28:59.084Z",
+    "required_next_atom": "T21-A6S_T1_CLOSE_EVALUATION_AND_BOUNDED_PANEL_CAPTURE_V1",
+    "preempts_new_parallel_mutation_when_due": true,
+    "automatic_execution": false,
+    "external_authority_granted": false,
+    "resolution_owner": "T21-A6S_T1_CLOSE_EVALUATION_AND_BOUNDED_PANEL_CAPTURE_V1"
+  },
+  "accepted_current_pulse": {
+    "t1_state": "WAITING_PARALLEL_WORK_ALLOWED",
+    "real_nominations": 3,
+    "real_admissions": 0,
+    "panels_captured": 0,
+    "provider_or_source_requests_used": 4,
+    "provider_or_source_requests_cap": 192,
+    "cash_spend_usd_cents": 0,
+    "production_hypothesis_memory_asset_id": "DATA-T17-HYPOTHESIS-RESEARCH-MEMORY-001",
+    "production_hypothesis_version_id": "HYP-VERSION-EXECUTION-CAPACITY-CURVATURE-V1",
+    "production_hypothesis_state": "PAUSED",
+    "production_memory_runtime_binding_consistent": true,
+    "legacy_lifecycle_registries_intentionally_empty": true,
+    "open_positions": "NOT_IMPLEMENTED",
+    "realized_pnl": "NOT_IMPLEMENTED",
+    "alpha": "NOT_ESTABLISHED"
+  },
+  "reconciliation_patch": {
+    "changed_files": 5,
+    "production_memory_modified": false,
+    "legacy_registries_modified": false,
+    "active_time_gate_modified": false,
+    "catalog_modified": false,
+    "agents_instruction_modified": false,
+    "ambiguous_empty_registry_attention_removed": true
+  },
+  "local_changes": {
+    "new_files": 7,
+    "modified_files": 2,
+    "modified_existing_files": [
+      "AGENTS.md",
+      "catalog/assets/core.yaml"
+    ],
+    "existing_task21_receipts_modified": 0,
+    "existing_raw_or_dataset_partitions_modified": 0
+  },
+  "actual_actions": {
+    "network_calls": 0,
+    "provider_api_rpc_wss_calls": 0,
+    "drive_reads": 0,
+    "drive_writes": 0,
+    "raw_or_dataset_writes": 0,
+    "scheduler_or_background_process": false,
+    "credentials_used": 0,
+    "cash_spend_usd_cents": 0,
+    "wallet_signer_transaction_actions": 0,
+    "dependency_changes": 0,
+    "commit": 0,
+    "push": 0,
+    "pull_request": 0,
+    "merge": 0,
+    "destructive_actions": 0
+  },
+  "catalog": {
+    "status": "NEW_T21_ASSETS_PENDING_A7_UNCHANGED_BY_P2R",
+    "current_catalog_modified": false,
+    "direct_integrity_repair": {
+      "asset_id": "CTRL-AGENTS-001",
+      "record_version": "1.8",
+      "new_sha256": "4fb3a6c1322bf35265b65aefc870c8d8f27aab1a3d7f4ee97ee86b977aafb714"
+    },
+    "new_task21_assets_registered": 0,
+    "catalog_count_or_version_advanced": false
+  },
+  "non_claims": [
+    "NO_WEB_UI_IMPLEMENTED",
+    "NO_NEW_TRUTH_OWNER_CREATED",
+    "NO_BACKGROUND_REMINDER_OR_SCHEDULER_CREATED",
+    "NO_HYPOTHESIS_REGISTRY_PROMOTION",
+    "NO_SYNTHETIC_LEGACY_REGISTRY_BACKFILL",
+    "NO_PRODUCTION_MEMORY_MUTATION",
+    "NO_POSITION_OR_PNL_ENGINE_IMPLEMENTED",
+    "NO_EXTERNAL_OR_TRADING_AUTHORITY_GRANTED"
+  ],
+  "next_boundary": {
+    "before_due": "SEPARATE_NON_INTERFERING_PARALLEL_OBJECTIVE_REQUIRED",
+    "when_due": "RETURN_TO_T21_A6S_T1_CLOSE_BEFORE_NEW_PARALLEL_MUTATION",
+    "provider_or_panel_capture_authority": "NOT_GRANTED",
+    "catalog_or_repository_delivery_authority": "NOT_GRANTED_BY_THIS_ATOM"
+  }
+}

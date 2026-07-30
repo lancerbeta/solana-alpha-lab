@@ -1,0 +1,258 @@
+{
+  "schema": "smial.task21.forward-collector-offline-population",
+  "schema_version": "1.0",
+  "task_id": "TASK-21",
+  "atom_id": "T21-A4_THIN_COLLECTOR_AND_OFFLINE_DRY_RUN_V1",
+  "synthetic_only": true,
+  "contains_market_data": false,
+  "hypothesis_version_id": "HYP-VERSION-EXECUTION-CAPACITY-CURVATURE-V1",
+  "watchlist_policy_version": "1.0",
+  "candidates": [
+    {
+      "nomination": {
+        "nomination_event_id": "T21-SYNTH-NOM-01",
+        "source_asset_id": "SYNTHETIC-CANDIDATE-SOURCE-01",
+        "source_version": "1.0",
+        "source_content_sha256": "0000000000000000000000000000000000000000000000000000000000000001",
+        "observed_at": "2026-06-01T00:00:00Z",
+        "first_reliable_available_at": "2026-06-01T00:00:01Z",
+        "hypothesis_version_id": "HYP-VERSION-EXECUTION-CAPACITY-CURVATURE-V1",
+        "watchlist_policy_version": "1.0",
+        "exact_rule_input_values": {
+          "synthetic_liquidity_bucket": "ELIGIBLE",
+          "synthetic_volume_bucket": "ELIGIBLE"
+        },
+        "reason_codes": [
+          "SYNTHETIC_RULE_PASS"
+        ],
+        "evidence_checkpoint": "SYNTHETIC_OFFLINE_FIXTURE_V1"
+      },
+      "evaluation_state": "WATCHLIST_ACTIVE",
+      "member": {
+        "member_id": "T21-SYNTH-MEMBER-01",
+        "mint": "task21-synthetic-mint-01",
+        "mint_decimals": 6,
+        "nomination_event_id": "T21-SYNTH-NOM-01",
+        "hypothesis_version_id": "HYP-VERSION-EXECUTION-CAPACITY-CURVATURE-V1",
+        "policy_version": "1.0",
+        "entered_at": "2026-06-01T00:00:01Z",
+        "exited_at": null,
+        "first_reliable_available_at": "2026-06-01T00:00:01Z",
+        "reason_codes": [
+          "SYNTHETIC_RULE_PASS"
+        ],
+        "evidence_checkpoint": "SYNTHETIC_OFFLINE_FIXTURE_V1"
+      }
+    },
+    {
+      "nomination": {
+        "nomination_event_id": "T21-SYNTH-NOM-02",
+        "source_asset_id": "SYNTHETIC-CANDIDATE-SOURCE-02",
+        "source_version": "1.0",
+        "source_content_sha256": "0000000000000000000000000000000000000000000000000000000000000002",
+        "observed_at": "2026-06-08T00:00:00Z",
+        "first_reliable_available_at": "2026-06-08T00:00:01Z",
+        "hypothesis_version_id": "HYP-VERSION-EXECUTION-CAPACITY-CURVATURE-V1",
+        "watchlist_policy_version": "1.0",
+        "exact_rule_input_values": {
+          "synthetic_liquidity_bucket": "ELIGIBLE",
+          "synthetic_volume_bucket": "ELIGIBLE"
+        },
+        "reason_codes": [
+          "SYNTHETIC_RULE_PASS"
+        ],
+        "evidence_checkpoint": "SYNTHETIC_OFFLINE_FIXTURE_V1"
+      },
+      "evaluation_state": "WATCHLIST_ACTIVE",
+      "member": {
+        "member_id": "T21-SYNTH-MEMBER-02",
+        "mint": "task21-synthetic-mint-02",
+        "mint_decimals": 6,
+        "nomination_event_id": "T21-SYNTH-NOM-02",
+        "hypothesis_version_id": "HYP-VERSION-EXECUTION-CAPACITY-CURVATURE-V1",
+        "policy_version": "1.0",
+        "entered_at": "2026-06-08T00:00:01Z",
+        "exited_at": null,
+        "first_reliable_available_at": "2026-06-08T00:00:01Z",
+        "reason_codes": [
+          "SYNTHETIC_RULE_PASS"
+        ],
+        "evidence_checkpoint": "SYNTHETIC_OFFLINE_FIXTURE_V1"
+      }
+    },
+    {
+      "nomination": {
+        "nomination_event_id": "T21-SYNTH-NOM-03",
+        "source_asset_id": "SYNTHETIC-CANDIDATE-SOURCE-03",
+        "source_version": "1.0",
+        "source_content_sha256": "0000000000000000000000000000000000000000000000000000000000000003",
+        "observed_at": "2026-06-15T00:00:00Z",
+        "first_reliable_available_at": "2026-06-15T00:00:01Z",
+        "hypothesis_version_id": "HYP-VERSION-EXECUTION-CAPACITY-CURVATURE-V1",
+        "watchlist_policy_version": "1.0",
+        "exact_rule_input_values": {
+          "synthetic_liquidity_bucket": "ELIGIBLE",
+          "synthetic_volume_bucket": "ELIGIBLE"
+        },
+        "reason_codes": [
+          "SYNTHETIC_RULE_PASS"
+        ],
+        "evidence_checkpoint": "SYNTHETIC_OFFLINE_FIXTURE_V1"
+      },
+      "evaluation_state": "WATCHLIST_ACTIVE",
+      "member": {
+        "member_id": "T21-SYNTH-MEMBER-03",
+        "mint": "task21-synthetic-mint-03",
+        "mint_decimals": 6,
+        "nomination_event_id": "T21-SYNTH-NOM-03",
+        "hypothesis_version_id": "HYP-VERSION-EXECUTION-CAPACITY-CURVATURE-V1",
+        "policy_version": "1.0",
+        "entered_at": "2026-06-15T00:00:01Z",
+        "exited_at": null,
+        "first_reliable_available_at": "2026-06-15T00:00:01Z",
+        "reason_codes": [
+          "SYNTHETIC_RULE_PASS"
+        ],
+        "evidence_checkpoint": "SYNTHETIC_OFFLINE_FIXTURE_V1"
+      }
+    },
+    {
+      "nomination": {
+        "nomination_event_id": "T21-SYNTH-NOM-04",
+        "source_asset_id": "SYNTHETIC-CANDIDATE-SOURCE-04",
+        "source_version": "1.0",
+        "source_content_sha256": "0000000000000000000000000000000000000000000000000000000000000004",
+        "observed_at": "2026-06-22T00:00:00Z",
+        "first_reliable_available_at": "2026-06-22T00:00:01Z",
+        "hypothesis_version_id": "HYP-VERSION-EXECUTION-CAPACITY-CURVATURE-V1",
+        "watchlist_policy_version": "1.0",
+        "exact_rule_input_values": {
+          "synthetic_liquidity_bucket": "ELIGIBLE",
+          "synthetic_volume_bucket": "ELIGIBLE"
+        },
+        "reason_codes": [
+          "SYNTHETIC_RULE_PASS"
+        ],
+        "evidence_checkpoint": "SYNTHETIC_OFFLINE_FIXTURE_V1"
+      },
+      "evaluation_state": "WATCHLIST_ACTIVE",
+      "member": {
+        "member_id": "T21-SYNTH-MEMBER-04",
+        "mint": "task21-synthetic-mint-04",
+        "mint_decimals": 6,
+        "nomination_event_id": "T21-SYNTH-NOM-04",
+        "hypothesis_version_id": "HYP-VERSION-EXECUTION-CAPACITY-CURVATURE-V1",
+        "policy_version": "1.0",
+        "entered_at": "2026-06-22T00:00:01Z",
+        "exited_at": null,
+        "first_reliable_available_at": "2026-06-22T00:00:01Z",
+        "reason_codes": [
+          "SYNTHETIC_RULE_PASS"
+        ],
+        "evidence_checkpoint": "SYNTHETIC_OFFLINE_FIXTURE_V1"
+      }
+    },
+    {
+      "nomination": {
+        "nomination_event_id": "T21-SYNTH-NOM-05",
+        "source_asset_id": "SYNTHETIC-CANDIDATE-SOURCE-05",
+        "source_version": "1.0",
+        "source_content_sha256": "0000000000000000000000000000000000000000000000000000000000000005",
+        "observed_at": "2026-06-29T00:00:00Z",
+        "first_reliable_available_at": "2026-06-29T00:00:01Z",
+        "hypothesis_version_id": "HYP-VERSION-EXECUTION-CAPACITY-CURVATURE-V1",
+        "watchlist_policy_version": "1.0",
+        "exact_rule_input_values": {
+          "synthetic_liquidity_bucket": "ELIGIBLE",
+          "synthetic_volume_bucket": "ELIGIBLE"
+        },
+        "reason_codes": [
+          "SYNTHETIC_RULE_PASS"
+        ],
+        "evidence_checkpoint": "SYNTHETIC_OFFLINE_FIXTURE_V1"
+      },
+      "evaluation_state": "WATCHLIST_ACTIVE",
+      "member": {
+        "member_id": "T21-SYNTH-MEMBER-05",
+        "mint": "task21-synthetic-mint-05",
+        "mint_decimals": 6,
+        "nomination_event_id": "T21-SYNTH-NOM-05",
+        "hypothesis_version_id": "HYP-VERSION-EXECUTION-CAPACITY-CURVATURE-V1",
+        "policy_version": "1.0",
+        "entered_at": "2026-06-29T00:00:01Z",
+        "exited_at": null,
+        "first_reliable_available_at": "2026-06-29T00:00:01Z",
+        "reason_codes": [
+          "SYNTHETIC_RULE_PASS"
+        ],
+        "evidence_checkpoint": "SYNTHETIC_OFFLINE_FIXTURE_V1"
+      }
+    },
+    {
+      "nomination": {
+        "nomination_event_id": "T21-SYNTH-NOM-06",
+        "source_asset_id": "SYNTHETIC-CANDIDATE-SOURCE-06",
+        "source_version": "1.0",
+        "source_content_sha256": "0000000000000000000000000000000000000000000000000000000000000006",
+        "observed_at": "2026-07-06T00:00:00Z",
+        "first_reliable_available_at": "2026-07-06T00:00:01Z",
+        "hypothesis_version_id": "HYP-VERSION-EXECUTION-CAPACITY-CURVATURE-V1",
+        "watchlist_policy_version": "1.0",
+        "exact_rule_input_values": {
+          "synthetic_liquidity_bucket": "REJECT",
+          "synthetic_volume_bucket": "ELIGIBLE"
+        },
+        "reason_codes": [
+          "SYNTHETIC_LIQUIDITY_REJECT"
+        ],
+        "evidence_checkpoint": "SYNTHETIC_OFFLINE_FIXTURE_V1"
+      },
+      "evaluation_state": "EVALUATED_REJECTED",
+      "member": null
+    },
+    {
+      "nomination": {
+        "nomination_event_id": "T21-SYNTH-NOM-07",
+        "source_asset_id": "SYNTHETIC-CANDIDATE-SOURCE-07",
+        "source_version": "1.0",
+        "source_content_sha256": "0000000000000000000000000000000000000000000000000000000000000007",
+        "observed_at": "2026-07-13T00:00:00Z",
+        "first_reliable_available_at": "2026-07-13T00:00:01Z",
+        "hypothesis_version_id": "HYP-VERSION-EXECUTION-CAPACITY-CURVATURE-V1",
+        "watchlist_policy_version": "1.0",
+        "exact_rule_input_values": {
+          "synthetic_liquidity_bucket": "ELIGIBLE",
+          "synthetic_volume_bucket": "REJECT"
+        },
+        "reason_codes": [
+          "SYNTHETIC_VOLUME_REJECT"
+        ],
+        "evidence_checkpoint": "SYNTHETIC_OFFLINE_FIXTURE_V1"
+      },
+      "evaluation_state": "EVALUATED_REJECTED",
+      "member": null
+    },
+    {
+      "nomination": {
+        "nomination_event_id": "T21-SYNTH-NOM-08",
+        "source_asset_id": "SYNTHETIC-CANDIDATE-SOURCE-08",
+        "source_version": "1.0",
+        "source_content_sha256": "0000000000000000000000000000000000000000000000000000000000000008",
+        "observed_at": "2026-07-20T00:00:00Z",
+        "first_reliable_available_at": "2026-07-20T00:00:01Z",
+        "hypothesis_version_id": "HYP-VERSION-EXECUTION-CAPACITY-CURVATURE-V1",
+        "watchlist_policy_version": "1.0",
+        "exact_rule_input_values": {
+          "synthetic_liquidity_bucket": null,
+          "synthetic_volume_bucket": "ELIGIBLE"
+        },
+        "reason_codes": [
+          "SYNTHETIC_REQUIRED_INPUT_MISSING"
+        ],
+        "evidence_checkpoint": "SYNTHETIC_OFFLINE_FIXTURE_V1"
+      },
+      "evaluation_state": "EVALUATED_NOT_EVALUABLE",
+      "member": null
+    }
+  ]
+}

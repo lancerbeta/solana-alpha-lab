@@ -1,0 +1,41 @@
+{
+  "schema": "smial.active-time-gates",
+  "schema_version": "1.0",
+  "as_of": "2026-07-30T16:31:08.666Z",
+  "contains_secrets": false,
+  "gates": [
+    {
+      "gate_id": "TASK21-T1-CLOSE-2026-08-06",
+      "task_id": "TASK-21",
+      "status": "ACTIVE_WAITING",
+      "earliest_at": "2026-08-06T16:28:59.084Z",
+      "required_next_atom": "T21-A6S_T1_CLOSE_EVALUATION_AND_BOUNDED_PANEL_CAPTURE_V1",
+      "preemption_rule": "PREEMPT_ANY_NEW_PARALLEL_ATOM_AT_OR_AFTER_EARLIEST_AT",
+      "parallel_work_before_due": "ALLOWED_ONLY_IF_NON_INTERFERING_WITH_FROZEN_T1",
+      "resolution_owner": "T21-A6S_T1_CLOSE_EVALUATION_AND_BOUNDED_PANEL_CAPTURE_V1",
+      "resolution_requires": [
+        "EXACT_CLOSE_TIME_REACHED",
+        "SEPARATE_EXTERNAL_AUTHORITY_IF_PANEL_CAPTURE_REQUIRES_PROVIDER_CALLS",
+        "RESULT_RECEIPT_POINTER",
+        "NO_BACKDATING"
+      ],
+      "source_receipt": {
+        "path": "docs/evidence/task21/real_nomination_source_offline_acceptance_v1.json",
+        "sha256": "e372cbca4e844ecceb0d15ddb56db40ea2a3e8b53cd8ea28d1a7119860baa67a"
+      },
+      "frozen_replay_partition": {
+        "path": "local/task21_forward/t1_replay/TASK21_T1_TOKEN2022_REPLAY_PARTITION_v1_c4dbd8340253f137f6778434a1175f27494a0c01871aae80aa973b4565ca26dc.json",
+        "bytes": 50548,
+        "sha256": "c4dbd8340253f137f6778434a1175f27494a0c01871aae80aa973b4565ca26dc"
+      },
+      "authority_granted_by_marker": {
+        "local_writes": 0,
+        "provider_api_rpc_wss_calls": 0,
+        "drive_actions": 0,
+        "candidate_admissions": 0,
+        "cash_spend_usd_cents": 0,
+        "wallet_signer_transaction_actions": 0
+      }
+    }
+  ]
+}

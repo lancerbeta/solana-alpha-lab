@@ -1,0 +1,193 @@
+{
+  "schema": "smial.task21.real-nomination-policy-offline-batch",
+  "schema_version": "1.0",
+  "task_id": "TASK-21",
+  "atom_id": "T21-A6R_FROZEN_REAL_NOMINATION_POLICY_V1",
+  "synthetic_only": true,
+  "contains_market_data": false,
+  "anchor_at": "2026-08-03T00:00:00Z",
+  "tranche_closed_at": {
+    "T1": "2026-08-10T00:00:00Z",
+    "T2": "2026-08-17T00:00:00Z",
+    "T3": "2026-08-24T00:00:00Z"
+  },
+  "hypothesis_outcome_unsealed": false,
+  "nomination_events": [
+    {
+      "nomination_event_id": "T21-A6R-SYN-NOM-001",
+      "source_asset_id": "SYNTHETIC-FACTORY-CANDIDATE-SOURCE",
+      "source_version": "1.0",
+      "source_content_sha256": "1111111111111111111111111111111111111111111111111111111111111111",
+      "observed_at": "2026-08-03T01:00:00Z",
+      "first_reliable_available_at": "2026-08-03T01:00:01Z",
+      "hypothesis_version_id": "HYP-VERSION-EXECUTION-CAPACITY-CURVATURE-V1",
+      "watchlist_policy_version": "1.0",
+      "exact_rule_input_values": {
+        "mint": "4vJ9JU1bJJE96FWSJKvHsmmFADCg4gpZQff4P3bkLKi",
+        "mint_decimals": 6,
+        "nomination_source_class": "FACTORY_HYPOTHESIS_CANDIDATE",
+        "tranche_id": "T1",
+        "source_observation_id": "SYN-OBS-001",
+        "selection_basis_codes": ["SYNTHETIC_FACTORY_CANDIDATE"],
+        "prior_relevant_quote_outcome_exposure": false,
+        "uses_task21_quote_route_or_price_outcome": false
+      },
+      "reason_codes": ["SYNTHETIC_OFFLINE_ACCEPTANCE"],
+      "evidence_checkpoint": "SYN-CHECKPOINT-001"
+    },
+    {
+      "nomination_event_id": "T21-A6R-SYN-NOM-002",
+      "source_asset_id": "SYNTHETIC-OWNER-NOMINATION-SOURCE",
+      "source_version": "1.0",
+      "source_content_sha256": "2222222222222222222222222222222222222222222222222222222222222222",
+      "observed_at": "2026-08-04T01:00:00Z",
+      "first_reliable_available_at": "2026-08-04T01:00:01Z",
+      "hypothesis_version_id": "HYP-VERSION-EXECUTION-CAPACITY-CURVATURE-V1",
+      "watchlist_policy_version": "1.0",
+      "exact_rule_input_values": {
+        "mint": "8qbHbw2BbbTHBW1sbeqakYXVKRQM8Ne7pLK7m6CVfeR",
+        "mint_decimals": 6,
+        "nomination_source_class": "OWNER_RESEARCH_NOMINATION",
+        "tranche_id": "T1",
+        "source_observation_id": "SYN-OBS-002",
+        "selection_basis_codes": ["SYNTHETIC_OWNER_NOMINATION"],
+        "prior_relevant_quote_outcome_exposure": false,
+        "uses_task21_quote_route_or_price_outcome": false
+      },
+      "reason_codes": ["SYNTHETIC_OFFLINE_ACCEPTANCE"],
+      "evidence_checkpoint": "SYN-CHECKPOINT-002"
+    },
+    {
+      "nomination_event_id": "T21-A6R-SYN-NOM-003",
+      "source_asset_id": "SYNTHETIC-PRIOR-EXPOSURE-SOURCE",
+      "source_version": "1.0",
+      "source_content_sha256": "3333333333333333333333333333333333333333333333333333333333333333",
+      "observed_at": "2026-08-05T01:00:00Z",
+      "first_reliable_available_at": "2026-08-05T01:00:01Z",
+      "hypothesis_version_id": "HYP-VERSION-EXECUTION-CAPACITY-CURVATURE-V1",
+      "watchlist_policy_version": "1.0",
+      "exact_rule_input_values": {
+        "mint": "CktRuQ2mttgRGkXJtyksdKHjUdc2C4TgDzyB98oEzy8",
+        "mint_decimals": 6,
+        "nomination_source_class": "PREDECLARED_CONTROL_COHORT",
+        "tranche_id": "T1",
+        "source_observation_id": "SYN-OBS-003",
+        "selection_basis_codes": ["SYNTHETIC_PRIOR_EXPOSURE_CASE"],
+        "prior_relevant_quote_outcome_exposure": true,
+        "uses_task21_quote_route_or_price_outcome": false
+      },
+      "reason_codes": ["SYNTHETIC_OFFLINE_ACCEPTANCE"],
+      "evidence_checkpoint": "SYN-CHECKPOINT-003"
+    },
+    {
+      "nomination_event_id": "T21-A6R-SYN-NOM-004",
+      "source_asset_id": "SYNTHETIC-FACTORY-CANDIDATE-SOURCE",
+      "source_version": "1.0",
+      "source_content_sha256": "4444444444444444444444444444444444444444444444444444444444444444",
+      "observed_at": "2026-08-10T01:00:00Z",
+      "first_reliable_available_at": "2026-08-10T01:00:01Z",
+      "hypothesis_version_id": "HYP-VERSION-EXECUTION-CAPACITY-CURVATURE-V1",
+      "watchlist_policy_version": "1.0",
+      "exact_rule_input_values": {
+        "mint": "GgBaCs3NCBuZN12kCJgAW63ydqohFkHEdfdEXBPzLHq",
+        "mint_decimals": 6,
+        "nomination_source_class": "FACTORY_HYPOTHESIS_CANDIDATE",
+        "tranche_id": "T2",
+        "source_observation_id": "SYN-OBS-004",
+        "selection_basis_codes": ["SYNTHETIC_FACTORY_CANDIDATE"],
+        "prior_relevant_quote_outcome_exposure": false,
+        "uses_task21_quote_route_or_price_outcome": false
+      },
+      "reason_codes": ["SYNTHETIC_OFFLINE_ACCEPTANCE"],
+      "evidence_checkpoint": "SYN-CHECKPOINT-004"
+    },
+    {
+      "nomination_event_id": "T21-A6R-SYN-NOM-005",
+      "source_asset_id": "SYNTHETIC-OWNER-NOMINATION-SOURCE",
+      "source_version": "1.0",
+      "source_content_sha256": "5555555555555555555555555555555555555555555555555555555555555555",
+      "observed_at": "2026-08-11T01:00:00Z",
+      "first_reliable_available_at": "2026-08-11T01:00:01Z",
+      "hypothesis_version_id": "HYP-VERSION-EXECUTION-CAPACITY-CURVATURE-V1",
+      "watchlist_policy_version": "1.0",
+      "exact_rule_input_values": {
+        "mint": "LbUiWL3xVV8hTFYBVdbTNrpDo41NKS6o3LHHuDzjfcY",
+        "mint_decimals": null,
+        "nomination_source_class": "OWNER_RESEARCH_NOMINATION",
+        "tranche_id": "T2",
+        "source_observation_id": "SYN-OBS-005",
+        "selection_basis_codes": ["SYNTHETIC_UNKNOWN_DECIMALS_CASE"],
+        "prior_relevant_quote_outcome_exposure": false,
+        "uses_task21_quote_route_or_price_outcome": false
+      },
+      "reason_codes": ["SYNTHETIC_OFFLINE_ACCEPTANCE"],
+      "evidence_checkpoint": "SYN-CHECKPOINT-005"
+    },
+    {
+      "nomination_event_id": "T21-A6R-SYN-NOM-006",
+      "source_asset_id": "SYNTHETIC-CONTROL-SOURCE",
+      "source_version": "1.0",
+      "source_content_sha256": "6666666666666666666666666666666666666666666666666666666666666666",
+      "observed_at": "2026-08-12T01:00:00Z",
+      "first_reliable_available_at": "2026-08-12T01:00:01Z",
+      "hypothesis_version_id": "HYP-VERSION-EXECUTION-CAPACITY-CURVATURE-V1",
+      "watchlist_policy_version": "1.0",
+      "exact_rule_input_values": {
+        "mint": "QWmroo4YnnMqYW3cnxWkFdaTxGD3P7vMSzwMHGbUzwF",
+        "mint_decimals": 6,
+        "nomination_source_class": "PREDECLARED_CONTROL_COHORT",
+        "tranche_id": "T2",
+        "source_observation_id": "SYN-OBS-006",
+        "selection_basis_codes": ["SYNTHETIC_PREDECLARED_CONTROL"],
+        "prior_relevant_quote_outcome_exposure": false,
+        "uses_task21_quote_route_or_price_outcome": false
+      },
+      "reason_codes": ["SYNTHETIC_OFFLINE_ACCEPTANCE"],
+      "evidence_checkpoint": "SYN-CHECKPOINT-006"
+    },
+    {
+      "nomination_event_id": "T21-A6R-SYN-NOM-007",
+      "source_asset_id": "SYNTHETIC-FACTORY-CANDIDATE-SOURCE",
+      "source_version": "1.0",
+      "source_content_sha256": "7777777777777777777777777777777777777777777777777777777777777777",
+      "observed_at": "2026-08-17T01:00:00Z",
+      "first_reliable_available_at": "2026-08-17T01:00:01Z",
+      "hypothesis_version_id": "HYP-VERSION-EXECUTION-CAPACITY-CURVATURE-V1",
+      "watchlist_policy_version": "1.0",
+      "exact_rule_input_values": {
+        "mint": "US517G5965aydkZ46HS38QLi7UQiSojurfbQfKCELFx",
+        "mint_decimals": 6,
+        "nomination_source_class": "FACTORY_HYPOTHESIS_CANDIDATE",
+        "tranche_id": "T3",
+        "source_observation_id": "SYN-OBS-007",
+        "selection_basis_codes": ["SYNTHETIC_FACTORY_CANDIDATE"],
+        "prior_relevant_quote_outcome_exposure": false,
+        "uses_task21_quote_route_or_price_outcome": false
+      },
+      "reason_codes": ["SYNTHETIC_OFFLINE_ACCEPTANCE"],
+      "evidence_checkpoint": "SYN-CHECKPOINT-007"
+    },
+    {
+      "nomination_event_id": "T21-A6R-SYN-NOM-008",
+      "source_asset_id": "SYNTHETIC-DUPLICATE-MINT-SOURCE",
+      "source_version": "1.0",
+      "source_content_sha256": "8888888888888888888888888888888888888888888888888888888888888888",
+      "observed_at": "2026-08-18T01:00:00Z",
+      "first_reliable_available_at": "2026-08-18T01:00:01Z",
+      "hypothesis_version_id": "HYP-VERSION-EXECUTION-CAPACITY-CURVATURE-V1",
+      "watchlist_policy_version": "1.0",
+      "exact_rule_input_values": {
+        "mint": "US517G5965aydkZ46HS38QLi7UQiSojurfbQfKCELFx",
+        "mint_decimals": 6,
+        "nomination_source_class": "OWNER_RESEARCH_NOMINATION",
+        "tranche_id": "T3",
+        "source_observation_id": "SYN-OBS-008",
+        "selection_basis_codes": ["SYNTHETIC_DUPLICATE_MINT_CASE"],
+        "prior_relevant_quote_outcome_exposure": false,
+        "uses_task21_quote_route_or_price_outcome": false
+      },
+      "reason_codes": ["SYNTHETIC_OFFLINE_ACCEPTANCE"],
+      "evidence_checkpoint": "SYN-CHECKPOINT-008"
+    }
+  ]
+}

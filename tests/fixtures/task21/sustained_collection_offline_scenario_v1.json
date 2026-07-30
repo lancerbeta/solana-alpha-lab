@@ -1,0 +1,51 @@
+{
+  "schema": "smial.task21.sustained-collection-offline-scenario",
+  "schema_version": "1.0",
+  "task_id": "TASK-21",
+  "atom_id": "T21-A6_SUSTAINED_FORWARD_COLLECTION_AND_MONITORING_V1",
+  "synthetic_only": true,
+  "contains_market_data": false,
+  "technical_probe_automatic_carry_forward": false,
+  "simulated_elapsed_days": 30,
+  "nomination_events": [
+    {"nomination_event_id":"T21-SYN-NOM-001","source_asset_id":"SYNTHETIC-TEST-SOURCE","source_version":"1.0","source_content_sha256":"1111111111111111111111111111111111111111111111111111111111111111","observed_at":"2026-06-01T00:00:00Z","first_reliable_available_at":"2026-06-01T00:00:01Z","hypothesis_version_id":"HYP-VERSION-EXECUTION-CAPACITY-CURVATURE-V1","watchlist_policy_version":"1.0","exact_rule_input_values":{"synthetic_candidate_ordinal":1},"reason_codes":["SYNTHETIC_ACCEPTANCE_MEMBER"],"evidence_checkpoint":"SYNTHETIC-CHECKPOINT-001"},
+    {"nomination_event_id":"T21-SYN-NOM-002","source_asset_id":"SYNTHETIC-TEST-SOURCE","source_version":"1.0","source_content_sha256":"2222222222222222222222222222222222222222222222222222222222222222","observed_at":"2026-06-08T00:00:00Z","first_reliable_available_at":"2026-06-08T00:00:01Z","hypothesis_version_id":"HYP-VERSION-EXECUTION-CAPACITY-CURVATURE-V1","watchlist_policy_version":"1.0","exact_rule_input_values":{"synthetic_candidate_ordinal":2},"reason_codes":["SYNTHETIC_ACCEPTANCE_MEMBER"],"evidence_checkpoint":"SYNTHETIC-CHECKPOINT-002"},
+    {"nomination_event_id":"T21-SYN-NOM-003","source_asset_id":"SYNTHETIC-TEST-SOURCE","source_version":"1.0","source_content_sha256":"3333333333333333333333333333333333333333333333333333333333333333","observed_at":"2026-06-15T00:00:00Z","first_reliable_available_at":"2026-06-15T00:00:01Z","hypothesis_version_id":"HYP-VERSION-EXECUTION-CAPACITY-CURVATURE-V1","watchlist_policy_version":"1.0","exact_rule_input_values":{"synthetic_candidate_ordinal":3},"reason_codes":["SYNTHETIC_ACCEPTANCE_MEMBER"],"evidence_checkpoint":"SYNTHETIC-CHECKPOINT-003"},
+    {"nomination_event_id":"T21-SYN-NOM-004","source_asset_id":"SYNTHETIC-TEST-SOURCE","source_version":"1.0","source_content_sha256":"4444444444444444444444444444444444444444444444444444444444444444","observed_at":"2026-06-15T01:00:00Z","first_reliable_available_at":"2026-06-15T01:00:01Z","hypothesis_version_id":"HYP-VERSION-EXECUTION-CAPACITY-CURVATURE-V1","watchlist_policy_version":"1.0","exact_rule_input_values":{"synthetic_candidate_ordinal":4},"reason_codes":["SYNTHETIC_ACCEPTANCE_MEMBER"],"evidence_checkpoint":"SYNTHETIC-CHECKPOINT-004"},
+    {"nomination_event_id":"T21-SYN-NOM-005","source_asset_id":"SYNTHETIC-TEST-SOURCE","source_version":"1.0","source_content_sha256":"5555555555555555555555555555555555555555555555555555555555555555","observed_at":"2026-06-15T02:00:00Z","first_reliable_available_at":"2026-06-15T02:00:01Z","hypothesis_version_id":"HYP-VERSION-EXECUTION-CAPACITY-CURVATURE-V1","watchlist_policy_version":"1.0","exact_rule_input_values":{"synthetic_candidate_ordinal":5},"reason_codes":["SYNTHETIC_ACCEPTANCE_MEMBER"],"evidence_checkpoint":"SYNTHETIC-CHECKPOINT-005"}
+  ],
+  "membership_events": [
+    {"membership_event_id":"T21-SYN-MEMBERSHIP-001","member_id":"T21-SYN-MEMBER-001","mint":"SyntheticMint111111111111111111111111111111111","mint_decimals":6,"nomination_event_id":"T21-SYN-NOM-001","hypothesis_version_id":"HYP-VERSION-EXECUTION-CAPACITY-CURVATURE-V1","policy_version":"1.0","state":"WATCHLIST_ACTIVE","entered_at":"2026-06-01T00:00:02Z","first_reliable_available_at":"2026-06-01T00:00:03Z","reason_codes":["SYNTHETIC_ACCEPTANCE_MEMBER"],"evidence_checkpoint":"SYNTHETIC-CHECKPOINT-001"},
+    {"membership_event_id":"T21-SYN-MEMBERSHIP-002","member_id":"T21-SYN-MEMBER-002","mint":"SyntheticMint222222222222222222222222222222222","mint_decimals":6,"nomination_event_id":"T21-SYN-NOM-002","hypothesis_version_id":"HYP-VERSION-EXECUTION-CAPACITY-CURVATURE-V1","policy_version":"1.0","state":"WATCHLIST_ACTIVE","entered_at":"2026-06-08T00:00:02Z","first_reliable_available_at":"2026-06-08T00:00:03Z","reason_codes":["SYNTHETIC_ACCEPTANCE_MEMBER"],"evidence_checkpoint":"SYNTHETIC-CHECKPOINT-002"},
+    {"membership_event_id":"T21-SYN-MEMBERSHIP-003","member_id":"T21-SYN-MEMBER-003","mint":"SyntheticMint333333333333333333333333333333333","mint_decimals":6,"nomination_event_id":"T21-SYN-NOM-003","hypothesis_version_id":"HYP-VERSION-EXECUTION-CAPACITY-CURVATURE-V1","policy_version":"1.0","state":"WATCHLIST_ACTIVE","entered_at":"2026-06-15T00:00:02Z","first_reliable_available_at":"2026-06-15T00:00:03Z","reason_codes":["SYNTHETIC_ACCEPTANCE_MEMBER"],"evidence_checkpoint":"SYNTHETIC-CHECKPOINT-003"},
+    {"membership_event_id":"T21-SYN-MEMBERSHIP-004","member_id":"T21-SYN-MEMBER-004","mint":"SyntheticMint444444444444444444444444444444444","mint_decimals":6,"nomination_event_id":"T21-SYN-NOM-004","hypothesis_version_id":"HYP-VERSION-EXECUTION-CAPACITY-CURVATURE-V1","policy_version":"1.0","state":"WATCHLIST_ACTIVE","entered_at":"2026-06-15T01:00:02Z","first_reliable_available_at":"2026-06-15T01:00:03Z","reason_codes":["SYNTHETIC_ACCEPTANCE_MEMBER"],"evidence_checkpoint":"SYNTHETIC-CHECKPOINT-004"},
+    {"membership_event_id":"T21-SYN-MEMBERSHIP-005","member_id":"T21-SYN-MEMBER-005","mint":"SyntheticMint555555555555555555555555555555555","mint_decimals":6,"nomination_event_id":"T21-SYN-NOM-005","hypothesis_version_id":"HYP-VERSION-EXECUTION-CAPACITY-CURVATURE-V1","policy_version":"1.0","state":"WATCHLIST_ACTIVE","entered_at":"2026-06-15T02:00:02Z","first_reliable_available_at":"2026-06-15T02:00:03Z","reason_codes":["SYNTHETIC_ACCEPTANCE_MEMBER"],"evidence_checkpoint":"SYNTHETIC-CHECKPOINT-005"}
+  ],
+  "panel_receipts": [
+    {"window_id":"T21-SYN-MEMBER-001-W1","member_id":"T21-SYN-MEMBER-001","status":"COMPLETE","quote_pairs":4,"provider_calls":8,"provider_credits":8,"response_bytes":1000,"stored_bytes":2000},
+    {"window_id":"T21-SYN-MEMBER-001-W2","member_id":"T21-SYN-MEMBER-001","status":"COMPLETE","quote_pairs":4,"provider_calls":8,"provider_credits":8,"response_bytes":1000,"stored_bytes":2000},
+    {"window_id":"T21-SYN-MEMBER-001-W3","member_id":"T21-SYN-MEMBER-001","status":"COMPLETE","quote_pairs":4,"provider_calls":8,"provider_credits":8,"response_bytes":1000,"stored_bytes":2000},
+    {"window_id":"T21-SYN-MEMBER-002-W1","member_id":"T21-SYN-MEMBER-002","status":"COMPLETE","quote_pairs":4,"provider_calls":8,"provider_credits":8,"response_bytes":1000,"stored_bytes":2000},
+    {"window_id":"T21-SYN-MEMBER-002-W2","member_id":"T21-SYN-MEMBER-002","status":"COMPLETE","quote_pairs":4,"provider_calls":8,"provider_credits":8,"response_bytes":1000,"stored_bytes":2000},
+    {"window_id":"T21-SYN-MEMBER-002-W3","member_id":"T21-SYN-MEMBER-002","status":"COMPLETE","quote_pairs":4,"provider_calls":8,"provider_credits":8,"response_bytes":1000,"stored_bytes":2000},
+    {"window_id":"T21-SYN-MEMBER-003-W1","member_id":"T21-SYN-MEMBER-003","status":"COMPLETE","quote_pairs":4,"provider_calls":8,"provider_credits":8,"response_bytes":1000,"stored_bytes":2000},
+    {"window_id":"T21-SYN-MEMBER-003-W2","member_id":"T21-SYN-MEMBER-003","status":"COMPLETE","quote_pairs":4,"provider_calls":8,"provider_credits":8,"response_bytes":1000,"stored_bytes":2000},
+    {"window_id":"T21-SYN-MEMBER-003-W3","member_id":"T21-SYN-MEMBER-003","status":"COMPLETE","quote_pairs":4,"provider_calls":8,"provider_credits":8,"response_bytes":1000,"stored_bytes":2000},
+    {"window_id":"T21-SYN-MEMBER-004-W1","member_id":"T21-SYN-MEMBER-004","status":"COMPLETE","quote_pairs":4,"provider_calls":8,"provider_credits":8,"response_bytes":1000,"stored_bytes":2000},
+    {"window_id":"T21-SYN-MEMBER-004-W2","member_id":"T21-SYN-MEMBER-004","status":"COMPLETE","quote_pairs":4,"provider_calls":8,"provider_credits":8,"response_bytes":1000,"stored_bytes":2000},
+    {"window_id":"T21-SYN-MEMBER-004-W3","member_id":"T21-SYN-MEMBER-004","status":"COMPLETE","quote_pairs":4,"provider_calls":8,"provider_credits":8,"response_bytes":1000,"stored_bytes":2000},
+    {"window_id":"T21-SYN-MEMBER-005-W1","member_id":"T21-SYN-MEMBER-005","status":"COMPLETE","quote_pairs":4,"provider_calls":8,"provider_credits":8,"response_bytes":1000,"stored_bytes":2000},
+    {"window_id":"T21-SYN-MEMBER-005-W2","member_id":"T21-SYN-MEMBER-005","status":"COMPLETE","quote_pairs":4,"provider_calls":8,"provider_credits":8,"response_bytes":1000,"stored_bytes":2000},
+    {"window_id":"T21-SYN-MEMBER-005-W3","member_id":"T21-SYN-MEMBER-005","status":"COMPLETE","quote_pairs":4,"provider_calls":8,"provider_credits":8,"response_bytes":1000,"stored_bytes":2000}
+  ],
+  "gap_events": [],
+  "incident_events": [],
+  "health": {
+    "health_state": "HEALTHY",
+    "backup_age_hours": 1,
+    "restore_proof_age_hours": 24,
+    "free_disk_bytes": 10737418240,
+    "dataset_bytes": 30000,
+    "cash_spend_usd_cents": 0
+  }
+}
