@@ -34,8 +34,8 @@
     },
     {
       "path": "tests/test_task21_owner_pulse.py",
-      "bytes": 13692,
-      "sha256": "e254382982d527b03962d65e54a1083980e9b0945ad7c67971e33b41b3489040"
+      "bytes": 14461,
+      "sha256": "6c470bb98e9b641ed04311bc49b66c0f7f7642a114dc6154b79bb0685a1498a2"
     }
   ],
   "protected_inputs": [

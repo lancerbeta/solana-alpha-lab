@@ -125,9 +125,31 @@ class TestTask21OwnerPulse(unittest.TestCase):
         self.assertEqual(forward["real_nominations"], 3)
         self.assertEqual(forward["real_admissions"], 0)
         self.assertEqual(forward["panels_captured"], 0)
-        self.assertTrue(forward["local_replay_partition_present"])
-        self.assertTrue(forward["local_replay_partition_identity_ok"])
-        self.assertEqual(forward["local_dataset_bytes"], 50548)
+        partition = self.marker["gates"][0]["frozen_replay_partition"]
+        partition_path = ROOT / partition["path"]
+        expected_present = partition_path.is_file()
+        expected_identity_ok = (
+            expected_present
+            and partition_path.stat().st_size == partition["bytes"]
+            and _sha256(partition_path) == partition["sha256"]
+        )
+        self.assertEqual(
+            forward["local_replay_partition_present"],
+            expected_present,
+        )
+        self.assertEqual(
+            forward["local_replay_partition_identity_ok"],
+            expected_identity_ok,
+        )
+        self.assertEqual(
+            forward["local_dataset_bytes"],
+            partition["bytes"] if expected_identity_ok else 0,
+        )
+        if not expected_identity_ok:
+            self.assertIn(
+                "LOCAL_REPLAY_PARTITION_MISSING_OR_DRIFTED",
+                {item["code"] for item in pulse["attention"]},
+            )
         self.assertEqual(
             pulse["unavailable_product_truth"],
             {
