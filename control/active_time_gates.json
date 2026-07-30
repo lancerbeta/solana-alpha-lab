@@ -1,24 +1,49 @@
 {
   "schema": "smial.active-time-gates",
   "schema_version": "1.0",
-  "as_of": "2026-07-30T16:31:08.666Z",
+  "as_of": "2026-07-30T22:30:02.046Z",
   "contains_secrets": false,
   "gates": [
     {
       "gate_id": "TASK21-T1-CLOSE-2026-08-06",
       "task_id": "TASK-21",
-      "status": "ACTIVE_WAITING",
+      "status": "SUPERSEDED_WITH_EVIDENCE",
       "earliest_at": "2026-08-06T16:28:59.084Z",
       "required_next_atom": "T21-A6S_T1_CLOSE_EVALUATION_AND_BOUNDED_PANEL_CAPTURE_V1",
-      "preemption_rule": "PREEMPT_ANY_NEW_PARALLEL_ATOM_AT_OR_AFTER_EARLIEST_AT",
-      "parallel_work_before_due": "ALLOWED_ONLY_IF_NON_INTERFERING_WITH_FROZEN_T1",
+      "preemption_rule": "NO_CALENDAR_PREEMPTION_AFTER_EVIDENCED_CORRECTION",
+      "original_preemption_rule": "PREEMPT_ANY_NEW_PARALLEL_ATOM_AT_OR_AFTER_EARLIEST_AT",
+      "parallel_work": "ALLOWED_WHILE_SEPARATE_CAPTURE_AUTHORITY_IS_WITHHELD",
+      "original_parallel_work_before_due": "ALLOWED_ONLY_IF_NON_INTERFERING_WITH_FROZEN_T1",
       "resolution_owner": "T21-A6S_T1_CLOSE_EVALUATION_AND_BOUNDED_PANEL_CAPTURE_V1",
-      "resolution_requires": [
+      "original_resolution_requires": [
         "EXACT_CLOSE_TIME_REACHED",
         "SEPARATE_EXTERNAL_AUTHORITY_IF_PANEL_CAPTURE_REQUIRES_PROVIDER_CALLS",
         "RESULT_RECEIPT_POINTER",
         "NO_BACKDATING"
       ],
+      "resolution": {
+        "resolved_at": "2026-07-30T22:30:02.046Z",
+        "disposition": "P7D_EXCLUSIVE_WAIT_SUPERSEDED_FORWARD_ONLY",
+        "reason": "ELAPSED_TIME_ALONE_ADDS_NO_EVIDENCE_WITH_ZERO_INTERMEDIATE_OBSERVATIONS",
+        "original_timestamp_retained": true,
+        "historical_receipts_rewritten": false,
+        "backdating": false,
+        "result_receipt": {
+          "path": "docs/evidence/task21/observation_horizon_policy_acceptance_v1.json",
+          "sha256": "18e149713cc276428f96ef8fd06aefa9e0ad4ce21ebe8a484fb776829741c2f6"
+        },
+        "replacement_policy": {
+          "path": "configs/task21_observation_horizon_policy_v1.yaml",
+          "sha256": "45591b9b469acb99d0ff3d789bfb03796bcd339067631d1bbcb02c58db5f71c8"
+        }
+      },
+      "effective_next_boundary": {
+        "status": "READY_FOR_SEPARATE_ADMISSION_AND_CAPTURE_AUTHORITY",
+        "required_next_atom": "T21-A6S_BOUNDED_ADMISSION_AND_MULTI_HORIZON_CAPTURE_V1",
+        "calendar_wait_required": false,
+        "parallel_work_allowed": true,
+        "external_authority_granted": false
+      },
       "source_receipt": {
         "path": "docs/evidence/task21/real_nomination_source_offline_acceptance_v1.json",
         "sha256": "e372cbca4e844ecceb0d15ddb56db40ea2a3e8b53cd8ea28d1a7119860baa67a"

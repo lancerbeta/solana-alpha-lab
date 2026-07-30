@@ -1,7 +1,7 @@
 schema: smial.task21_owner_pulse_read_model
 schema_version: '1.0'
 read_model_id: OWNER-PULSE-T21-001
-read_model_version: '1.1'
+read_model_version: '1.2'
 task_id: TASK-21
 atom_id: T21-P2R_OWNER_PULSE_PRODUCTION_MEMORY_BINDING_V1
 status: FROZEN_LOCAL_READ_MODEL
@@ -14,6 +14,8 @@ purpose:
   canonical_status_owner: GPT_CONTROL_PLANE
   runtime_truth_owners:
   - control/active_time_gates.json
+  - docs/evidence/task21/observation_horizon_policy_acceptance_v1.json
+  - configs/task21_observation_horizon_policy_v1.yaml
   - docs/evidence/task21/real_nomination_source_offline_acceptance_v1.json
   - docs/evidence/task21/runtime_recovery_gate_receipt_v1.json
   - configs/task21_forward_collection_run_plan_v1.yaml
@@ -30,6 +32,9 @@ time_gate:
   terminal_states:
   - RESOLVED
   - CANCELLED_WITH_EVIDENCE
+  - SUPERSEDED_WITH_EVIDENCE
+  corrected_state: READY_FOR_ADMISSION_AND_CAPTURE_AUTHORITY
+  corrected_next_atom: T21-A6S_BOUNDED_ADMISSION_AND_MULTI_HORIZON_CAPTURE_V1
   due_action: RETURN_TO_EXACT_REQUIRED_NEXT_ATOM_BEFORE_NEW_MUTATION
   automatic_execution: false
   grants_external_authority: false
@@ -71,6 +76,8 @@ fail_closed:
 - INVALID_UTC_TIMESTAMP
 - NOMINATION_RECEIPT_NOT_PASS
 - T1_CLOSE_MISMATCH
+- GATE_CORRECTION_RECEIPT_HASH_DRIFT
+- HORIZON_POLICY_HASH_DRIFT
 - NEGATIVE_OR_IMPOSSIBLE_COUNTER
 - EXTERNAL_AUTHORITY_INFERRED_FROM_MARKER
 - PRODUCTION_HYPOTHESIS_MEMORY_HASH_OR_IDENTITY_DRIFT
@@ -128,7 +135,9 @@ authority:
   destructive_actions: false
 
 next_boundary:
-  normal_parallel_work: REQUIRES_SEPARATE_OBJECTIVE
-  time_gate_due: T21-A6S_T1_CLOSE_EVALUATION_AND_BOUNDED_PANEL_CAPTURE_V1
-  time_gate_due_external_authority: NOT_GRANTED
+  normal_parallel_work: ALLOWED
+  time_gate_status: SUPERSEDED_WITH_EVIDENCE
+  exact_next_atom: T21-A6S_BOUNDED_ADMISSION_AND_MULTI_HORIZON_CAPTURE_V1
+  calendar_wait_required: false
+  admission_and_capture_authority: NOT_GRANTED
   catalog_or_repository_delivery: NOT_AUTHORIZED_BY_THIS_ATOM

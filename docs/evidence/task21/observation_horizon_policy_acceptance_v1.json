@@ -1,0 +1,162 @@
+{
+  "schema": "smial.task21.observation-horizon-policy-acceptance",
+  "schema_version": "1.0",
+  "evidence_id": "EVIDENCE-T21-OBSERVATION-HORIZON-CORRECTION-001",
+  "evidence_version": "1.0",
+  "task_id": "TASK-21",
+  "atom_id": "T21-A6S_T1_HORIZON_GATE_CORRECTION_V1",
+  "completed_at": "2026-07-30T22:30:02.046Z",
+  "status": "PASS",
+  "verdict": "P7D_EXCLUSIVE_WAIT_SUPERSEDED_FORWARD_ONLY",
+  "finding": {
+    "classification": "DESIGN_ERROR_CORRECTED",
+    "original_rule": "P7D_AS_EXCLUSIVE_FIRST_OBSERVATION_GATE",
+    "observations_during_wait": 0,
+    "database_or_continuous_collector_active": false,
+    "decision_relevant_evidence_added_by_elapsed_time_alone": false,
+    "impact_if_unfixed": [
+      "SIX_PLUS_DAYS_OF_AVOIDABLE_IDLE_TIME",
+      "FALSE_IMPRESSION_OF_DATA_ACCUMULATION",
+      "SINGLE_ARBITRARY_HORIZON",
+      "DELAYED_HYPOTHESIS_FEEDBACK"
+    ]
+  },
+  "preserved_truth": {
+    "original_source_receipt": {
+      "path": "docs/evidence/task21/real_nomination_source_offline_acceptance_v1.json",
+      "sha256": "e372cbca4e844ecceb0d15ddb56db40ea2a3e8b53cd8ea28d1a7119860baa67a"
+    },
+    "original_replay_partition": {
+      "path": "local/task21_forward/t1_replay/TASK21_T1_TOKEN2022_REPLAY_PARTITION_v1_c4dbd8340253f137f6778434a1175f27494a0c01871aae80aa973b4565ca26dc.json",
+      "bytes": 50548,
+      "sha256": "c4dbd8340253f137f6778434a1175f27494a0c01871aae80aa973b4565ca26dc"
+    },
+    "original_anchor_at": "2026-07-30T16:28:59.084Z",
+    "original_p7d_at": "2026-08-06T16:28:59.084Z",
+    "nominations": 3,
+    "admissions": 0,
+    "panels": 0,
+    "historical_receipts_rewritten": false,
+    "backdating": false,
+    "quote_outcomes_observed_before_correction": false
+  },
+  "replacement": {
+    "policy_id": "OBSERVATION-HORIZON-POLICY-T21-001",
+    "policy_version": "1.0",
+    "first_capture_anchor": "FIRST_AUTHORIZED_CAPTURE",
+    "calendar_wait_before_first_capture": false,
+    "offset_seconds": [
+      0,
+      3600,
+      21600,
+      86400,
+      259200,
+      604800
+    ],
+    "p7d_retained_as_one_horizon": true,
+    "future_horizons_owned_by_hypothesis_version": true,
+    "missed_window_policy": "RETAIN_EXPLICIT_GAP_NO_BACKFILL"
+  },
+  "artifacts": [
+    {
+      "path": "configs/task21_observation_horizon_policy_v1.yaml",
+      "bytes": 3058,
+      "sha256": "45591b9b469acb99d0ff3d789bfb03796bcd339067631d1bbcb02c58db5f71c8"
+    },
+    {
+      "path": "docs/contracts/task21_observation_horizon_policy_contract_v1.md",
+      "bytes": 2007,
+      "sha256": "2a55683ef91c1ee7910c6d95143900f18873f71a136b6528204095d6e60f6300"
+    },
+    {
+      "path": "src/solana_alpha_lab/task21_observation_horizon.py",
+      "bytes": 7471,
+      "sha256": "515f08ab69f81e480fb0a05559eea610853f779422508b8f5d913567182745e3"
+    },
+    {
+      "path": "tests/test_task21_observation_horizon.py",
+      "bytes": 5742,
+      "sha256": "9fc223a31ac4074a991fc4c1621c1009afd95f2459be3dcf5782ebcd99a70460"
+    },
+    {
+      "path": "configs/task21_owner_pulse_read_model_v1.yaml",
+      "bytes": 4760,
+      "sha256": "18010b514cc6233757de0d1187b68b4091c867f9112743fda51cb5a27a6bbed9"
+    },
+    {
+      "path": "docs/contracts/task21_owner_pulse_read_model_contract_v1.md",
+      "bytes": 5322,
+      "sha256": "a5047333a230cca7f5f73fb550edba8c90a48537efc76a98286dbea0308961e0"
+    },
+    {
+      "path": "src/solana_alpha_lab/task21_owner_pulse.py",
+      "bytes": 26631,
+      "sha256": "f0f47c02dda8a4112f06b61fb7a57dd04d129268aee7d7a173aa4a9fc009811a"
+    },
+    {
+      "path": "tests/test_task21_owner_pulse.py",
+      "bytes": 15406,
+      "sha256": "9c8ea049f07c3b1e8b173419ef30edccbc40c6ca89b9f6084250649fcc38e81e"
+    }
+  ],
+  "validation": {
+    "observation_horizon_targeted": "10_OF_10_PASS",
+    "owner_pulse_targeted": "12_OF_12_PASS",
+    "task21_regression": "96_OF_96_PASS",
+    "full_validation": "DELEGATED_TO_FUTURE_STACKED_CI"
+  },
+  "active_gate_resolution": {
+    "gate_id": "TASK21-T1-CLOSE-2026-08-06",
+    "new_status": "SUPERSEDED_WITH_EVIDENCE",
+    "original_timestamp_retained": true,
+    "preempts_parallel_work": false,
+    "calendar_wait_required": false
+  },
+  "next_boundary": {
+    "status": "READY_FOR_SEPARATE_ADMISSION_AND_CAPTURE_AUTHORITY",
+    "atom_id": "T21-A6S_BOUNDED_ADMISSION_AND_MULTI_HORIZON_CAPTURE_V1",
+    "real_candidate_admissions_authorized": false,
+    "provider_api_rpc_wss_calls_authorized": false,
+    "jupiter_quote_calls_authorized": false,
+    "raw_or_dataset_writes_authorized": false,
+    "scheduler_or_background_process_authorized": false,
+    "catalog_a7_authorized": false
+  },
+  "actual_actions": {
+    "provider_api_rpc_wss_calls": 0,
+    "drive_reads": 0,
+    "drive_writes": 0,
+    "real_candidate_admissions": 0,
+    "raw_or_dataset_writes": 0,
+    "scheduler_or_background_process": false,
+    "credentials_used": 0,
+    "cash_spend_usd_cents": 0,
+    "wallet_signer_transaction_actions": 0,
+    "dependency_changes": 0,
+    "destructive_actions": 0
+  },
+  "catalog": {
+    "status": "PENDING_T21_A7",
+    "version": "0.25.0",
+    "assets": 340,
+    "shards": 4,
+    "schemas": 4,
+    "queries": 8,
+    "version_or_count_advanced": false
+  },
+  "repository_topology": {
+    "parent_checkpoint_branch": "task21/forward-collection",
+    "parent_checkpoint_head": "9db04dd63280ed9783fb5044f9dfcb0b5e7c93c6",
+    "parent_pr": 25,
+    "parent_pr_exact_51_file_checkpoint_preserved": true,
+    "correction_branch": "task21/horizon-gate-correction"
+  },
+  "non_claims": [
+    "NO_DATASET_ACCUMULATED_DURING_ORIGINAL_WAIT",
+    "NO_REAL_CANDIDATE_ADMITTED",
+    "NO_QUOTE_OR_ROUTE_CAPTURED",
+    "NO_ALPHA_OR_PNL_ESTABLISHED",
+    "NO_TASK21_A7_CATALOG_FINALIZATION",
+    "NO_MERGE_AUTHORIZED"
+  ]
+}

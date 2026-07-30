@@ -1,0 +1,92 @@
+schema: smial.task21_observation_horizon_policy
+schema_version: '1.0'
+policy_id: OBSERVATION-HORIZON-POLICY-T21-001
+policy_version: '1.0'
+task_id: TASK-21
+atom_id: T21-A6S_T1_HORIZON_GATE_CORRECTION_V1
+status: FROZEN_FORWARD_ONLY_CORRECTION
+effective_at: '2026-07-30T22:30:02.046Z'
+contains_secrets: false
+
+correction:
+  finding: P7D_EXCLUSIVE_WAIT_HAS_NO_INTERMEDIATE_OBSERVATIONS
+  original_gate_id: TASK21-T1-CLOSE-2026-08-06
+  original_anchor_at: '2026-07-30T16:28:59.084Z'
+  original_earliest_at: '2026-08-06T16:28:59.084Z'
+  original_required_atom: T21-A6S_T1_CLOSE_EVALUATION_AND_BOUNDED_PANEL_CAPTURE_V1
+  disposition: SUPERSEDE_P7D_AS_EXCLUSIVE_START_GATE
+  no_backdating: true
+  historical_receipts_rewritten: false
+  original_p7d_retained_as_observation_horizon: true
+
+protected_inputs:
+  source_receipt:
+    path: docs/evidence/task21/real_nomination_source_offline_acceptance_v1.json
+    sha256: e372cbca4e844ecceb0d15ddb56db40ea2a3e8b53cd8ea28d1a7119860baa67a
+  replay_partition:
+    path: local/task21_forward/t1_replay/TASK21_T1_TOKEN2022_REPLAY_PARTITION_v1_c4dbd8340253f137f6778434a1175f27494a0c01871aae80aa973b4565ca26dc.json
+    bytes: 50548
+    sha256: c4dbd8340253f137f6778434a1175f27494a0c01871aae80aa973b4565ca26dc
+  nomination_count: 3
+  admission_count: 0
+  panel_count: 0
+  quote_outcomes_observed_before_correction: false
+
+capture_clock:
+  anchor: FIRST_AUTHORIZED_CAPTURE
+  wait_before_first_capture: NONE
+  offsets:
+  - window_id: H0
+    offset_seconds: 0
+    purpose: BASELINE_AT_FIRST_AUTHORIZED_CAPTURE
+  - window_id: H1
+    offset_seconds: 3600
+    purpose: EARLY_ROUTE_AND_EXECUTION_CHANGE
+  - window_id: H6
+    offset_seconds: 21600
+    purpose: INTRADAY_PERSISTENCE
+  - window_id: H24
+    offset_seconds: 86400
+    purpose: FIRST_DAY_SURVIVAL
+  - window_id: H72
+    offset_seconds: 259200
+    purpose: SHORT_LIVED_PATTERN_DECAY
+  - window_id: H168
+    offset_seconds: 604800
+    purpose: SEVEN_DAY_PERSISTENCE
+  missed_window_policy: RETAIN_EXPLICIT_GAP_NO_BACKFILL
+  reschedule_after_miss: false
+  future_cohort_policy: HYPOTHESIS_VERSION_OWNS_HORIZONS
+  global_magic_horizon_allowed: false
+
+next_boundary:
+  status: READY_FOR_SEPARATE_ADMISSION_AND_CAPTURE_AUTHORITY
+  atom_id: T21-A6S_BOUNDED_ADMISSION_AND_MULTI_HORIZON_CAPTURE_V1
+  calendar_wait_required: false
+  real_candidate_admissions_authorized: false
+  provider_api_rpc_wss_calls_authorized: false
+  jupiter_quote_calls_authorized: false
+  raw_or_dataset_writes_authorized: false
+  scheduler_or_background_process_authorized: false
+  a7_authorized: false
+
+catalog:
+  status: PENDING_T21_A7
+  version_advanced: false
+  new_assets_registered: 0
+
+authority:
+  source: EXPLICIT_USER
+  gate_phrase: T21-A6S_T1_HORIZON_GATE_CORRECTION_V1
+  class: LOCAL_WRITE_ONLY
+  provider_api_rpc_wss_calls: 0
+  drive_reads: 0
+  drive_writes: 0
+  real_candidate_admissions: 0
+  raw_or_dataset_writes: 0
+  cash_spend_usd_cents: 0
+  credentials: 0
+  wallet_signer_transaction_actions: 0
+  dependency_changes: 0
+  scheduler_or_background_process: false
+  destructive_actions: false

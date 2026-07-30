@@ -17,6 +17,7 @@ if str(SRC) not in sys.path:
     sys.path.insert(0, str(SRC))
 
 from solana_alpha_lab.task21_owner_pulse import (
+    CORRECTED_NEXT_ATOM,
     EXPECTED_GATE_ID,
     EXPECTED_NEXT_ATOM,
     Task21OwnerPulseError,
@@ -71,8 +72,15 @@ class TestTask21OwnerPulse(unittest.TestCase):
         self.assertEqual(len(self.marker["gates"]), 1)
         gate = self.marker["gates"][0]
         self.assertEqual(gate["gate_id"], EXPECTED_GATE_ID)
-        self.assertEqual(gate["status"], "ACTIVE_WAITING")
+        self.assertEqual(gate["status"], "SUPERSEDED_WITH_EVIDENCE")
         self.assertEqual(gate["required_next_atom"], EXPECTED_NEXT_ATOM)
+        self.assertEqual(
+            gate["effective_next_boundary"]["required_next_atom"],
+            CORRECTED_NEXT_ATOM,
+        )
+        self.assertFalse(
+            gate["effective_next_boundary"]["calendar_wait_required"]
+        )
         self.assertEqual(
             _sha256(SOURCE_RECEIPT_PATH),
             gate["source_receipt"]["sha256"],
@@ -85,8 +93,10 @@ class TestTask21OwnerPulse(unittest.TestCase):
         )
 
     def test_waiting_gate_allows_only_non_interfering_parallel_work(self) -> None:
+        historical = copy.deepcopy(self.marker["gates"][0])
+        historical["status"] = "ACTIVE_WAITING"
         gate = evaluate_time_gate(
-            self.marker["gates"][0],
+            historical,
             as_of=WAITING_AT,
         )
         self.assertEqual(gate["state"], "WAITING_PARALLEL_WORK_ALLOWED")
@@ -96,8 +106,10 @@ class TestTask21OwnerPulse(unittest.TestCase):
         self.assertFalse(gate["external_authority_granted"])
 
     def test_due_gate_preempts_new_parallel_mutation(self) -> None:
+        historical = copy.deepcopy(self.marker["gates"][0])
+        historical["status"] = "ACTIVE_WAITING"
         gate = evaluate_time_gate(
-            self.marker["gates"][0],
+            historical,
             as_of=DUE_AT,
         )
         self.assertEqual(gate["state"], "DUE_PREEMPT_PARALLEL_WORK")
@@ -125,6 +137,12 @@ class TestTask21OwnerPulse(unittest.TestCase):
         self.assertEqual(forward["real_nominations"], 3)
         self.assertEqual(forward["real_admissions"], 0)
         self.assertEqual(forward["panels_captured"], 0)
+        self.assertFalse(forward["exclusive_p7d_wait_active"])
+        self.assertFalse(forward["next_capture_wait_required"])
+        self.assertEqual(
+            forward["observation_horizon_policy_id"],
+            "OBSERVATION-HORIZON-POLICY-T21-001",
+        )
         partition = self.marker["gates"][0]["frozen_replay_partition"]
         partition_path = ROOT / partition["path"]
         expected_present = partition_path.is_file()
@@ -230,7 +248,7 @@ class TestTask21OwnerPulse(unittest.TestCase):
         self.assertEqual(costs["cash_spend_usd_cents"], 0)
         self.assertFalse(costs["external_authority_granted_by_pulse"])
 
-    def test_due_attention_has_priority_over_recovery_staleness(self) -> None:
+    def test_corrected_gate_requests_authority_without_calendar_block(self) -> None:
         pulse = build_owner_pulse(
             repository_root=ROOT,
             as_of=DUE_AT,
@@ -239,14 +257,17 @@ class TestTask21OwnerPulse(unittest.TestCase):
         self.assertEqual(
             pulse["attention"][0],
             {
-                "severity": "CRITICAL",
-                "code": "TASK21_T1_CLOSE_DUE",
-                "action": EXPECTED_NEXT_ATOM,
+                "severity": "HIGH",
+                "code": "TASK21_CAPTURE_AUTHORITY_REQUIRED",
+                "action": CORRECTED_NEXT_ATOM,
             },
         )
         self.assertEqual(
             pulse["active_time_gates"][0]["state"],
-            "DUE_PREEMPT_PARALLEL_WORK",
+            "READY_FOR_ADMISSION_AND_CAPTURE_AUTHORITY",
+        )
+        self.assertTrue(
+            pulse["active_time_gates"][0]["parallel_work_allowed"]
         )
 
     def test_output_is_deterministic_relative_and_sanitized(self) -> None:
@@ -265,6 +286,7 @@ class TestTask21OwnerPulse(unittest.TestCase):
             self.assertFalse(Path(source["path"]).is_absolute())
         text = render_owner_pulse_text(first)
         self.assertIn("TASK-21 OWNER PULSE", text)
+        self.assertIn("READY_FOR_ADMISSION_AND_CAPTURE_AUTHORITY", text)
         self.assertIn("nominations=3, admissions=0, panels=0", text)
         self.assertIn(
             "Production memory: "
@@ -286,7 +308,7 @@ class TestTask21OwnerPulse(unittest.TestCase):
             self.assertNotIn(candidate["mint"], text)
 
     def test_config_authority_and_agent_entry_rule_are_exact(self) -> None:
-        self.assertEqual(self.config["read_model_version"], "1.1")
+        self.assertEqual(self.config["read_model_version"], "1.2")
         authority = self.config["authority"]
         self.assertEqual(authority["class"], "LOCAL_WRITE_ONLY")
         self.assertEqual(
@@ -359,7 +381,7 @@ class TestTask21OwnerPulse(unittest.TestCase):
         self.assertEqual(receipt["status"], "PASS")
         self.assertEqual(
             receipt["verdict"],
-            "LOCAL_OWNER_PULSE_PRODUCTION_MEMORY_BOUND",
+            "LOCAL_OWNER_PULSE_HORIZON_CORRECTION_BOUND",
         )
         self.assertEqual(receipt["targeted_validation"], "12_OF_12_PASS")
         for artifact in receipt["artifacts"]:
@@ -376,13 +398,13 @@ class TestTask21OwnerPulse(unittest.TestCase):
             )
         self.assertEqual(
             receipt["durable_resume_gate"]["required_next_atom"],
-            EXPECTED_NEXT_ATOM,
+            CORRECTED_NEXT_ATOM,
         )
         self.assertEqual(
             receipt["durable_resume_gate"]["earliest_at"],
             "2026-08-06T16:28:59.084Z",
         )
-        self.assertTrue(
+        self.assertFalse(
             receipt["durable_resume_gate"][
                 "preempts_new_parallel_mutation_when_due"
             ]
