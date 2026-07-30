@@ -9812,14 +9812,14 @@ records:
   evidence: []
   classification: *t19_internal
 - asset_id: TEST-T19-ACCEPTANCE-CATALOG-FACTORY-FIT-001
-  record_version: '1.0'
+  record_version: '1.1'
   asset_type: script
   purpose: Exact hash-bound acceptance tests for TASK-19 Catalog registration,
     lineage reconciliation, bounded claims, Factory Fit, generated navigation
     and zero external authority.
   status: IMPLEMENTED_UNVERIFIED
   origin: REPOSITORY
-  as_of: '2026-07-29'
+  as_of: '2026-07-30'
   truth_owner: TASK-19
   location:
     kind: git_path
@@ -9827,7 +9827,7 @@ records:
     repository_path: tests/test_task19_acceptance_catalog_factory_fit.py
   integrity:
     kind: sha256
-    sha256: f64ba844a6f3bc8553af0573e58b3f1ce3376f51b6d119b4b69ec85c5a47bf5d
+    sha256: 4e3812a8191d9336ca8820457ac0b597bdcd172e9cb5c66f5711b1ba7a61c35e
   access:
     mode: read_only
     method: file
