@@ -1,0 +1,265 @@
+{
+  "receipt_id": "T20-A4-ACCEPTANCE-CATALOG-FACTORY-FIT-RECEIPT-001",
+  "receipt_version": "1.0",
+  "task_id": "TASK-20",
+  "atom_id": "T20-A4_DETERMINISTIC_ACCEPTANCE_CATALOG_AND_FACTORY_FIT_V1",
+  "status": "PASS",
+  "as_of": "2026-07-30",
+  "repository_base": {
+    "branch": "task20/freeze-collection-spec",
+    "head": "0284a684c8791b8a06296e6c5f8546c8dd913198",
+    "tree": "8837e888559be8945fffb4d4110268cc44ad2848",
+    "upstream": "origin/main"
+  },
+  "accepted_result": {
+    "owner_verdict": "SPEC_READY_WITH_LIMITATIONS",
+    "collection_spec_id": "COLLECTION-SPEC-T20-001",
+    "collection_spec_version": "1.0",
+    "retention_recovery_policy_id": "RETENTION-RECOVERY-T20-001",
+    "retention_recovery_policy_version": "1.0",
+    "collection_plan_input_eligible": true,
+    "forward_collection_authorized": false,
+    "collector_or_scheduler_implemented": false,
+    "provider_selected": false,
+    "dataset_recovery_proven": false,
+    "field_count": 40,
+    "tier_counts": {
+      "T0": 17,
+      "T1": 11,
+      "T2": 12
+    },
+    "backup_maximum_age_hours": 24,
+    "backup_overdue_after_hours": 26,
+    "disable_new_t2_admissions_after_overdue_hours": 48,
+    "routine_restore_sample_cadence": "P7D",
+    "adversarial_vectors_passed": 8,
+    "adversarial_vectors_total": 8,
+    "limitations": [
+      "NO_RUNTIME_COLLECTOR_OR_SCHEDULER",
+      "NO_PROVIDER_OR_REMOTE_DESTINATION_SELECTED",
+      "NO_BACKUP_ADAPTER_OR_AUTOMATION_PROVEN",
+      "NO_REAL_FULL_DATASET_RESTORE_PROOF",
+      "T2_SCOPE_IS_ONE_NAMED_HYPOTHESIS_VERSION",
+      "SEPARATE_EXTERNAL_AUTHORITY_REQUIRED_BEFORE_FORWARD_COLLECTION"
+    ]
+  },
+  "frozen_artifacts": [
+    {
+      "asset_id": "CONTRACT-T20-COLLECTION-SPEC-001",
+      "path": "docs/contracts/task20_collection_spec_contract_v1.md",
+      "sha256": "33a7317ade7ab0239c7ba7e84bbde02cf1f9d9a5199c713140388ab10b1b2d79"
+    },
+    {
+      "asset_id": "CONFIG-T20-COLLECTION-SPEC-001",
+      "path": "configs/collection_spec_v1.yaml",
+      "sha256": "c8c734eb76a5c13e7c49d0954e10e777d2f2a1cfe858ed688146a7c84269199d"
+    },
+    {
+      "asset_id": "TEST-T20-COLLECTION-SPEC-CONTRACT-001",
+      "path": "tests/test_task20_collection_spec_contract.py",
+      "sha256": "21279e1aadbda01ee2a68c33799d4870ac8b6d144bada8ad4c04d84d18e91adb"
+    },
+    {
+      "asset_id": "CONTRACT-T20-COVERAGE-RETENTION-RECOVERY-001",
+      "path": "docs/contracts/task20_coverage_retention_recovery_policy_v1.md",
+      "sha256": "d10fe7bfb24c9e2ce1ccf1e219229b0d9f4e251c93ec2bc3c8101a4953409fe7"
+    },
+    {
+      "asset_id": "ARCH-T20-HYPOTHESIS-DATA-COVERAGE-MATRIX-001",
+      "path": "docs/architecture/hypothesis_data_coverage_matrix_v1.md",
+      "sha256": "4c50a77333b1cdde42af8da09b1a27e34d3937cc9b8101351dc65884d08f8024"
+    },
+    {
+      "asset_id": "CONFIG-T20-RETENTION-RECOVERY-POLICY-001",
+      "path": "configs/task20_retention_recovery_policy_v1.yaml",
+      "sha256": "3810a5674f2479e460c7b3883a58c0cf5d22f7902c0cfc8606aaeb990f95914f"
+    },
+    {
+      "asset_id": "TEST-T20-COVERAGE-RETENTION-RECOVERY-001",
+      "path": "tests/test_task20_coverage_retention_recovery_policy.py",
+      "sha256": "c16ff29fd1a9ebb22d9e8a29df93101846260654767beecd481177d62badfac8"
+    }
+  ],
+  "catalog": {
+    "status": "REGISTERED_IN_TASK20_CATALOG_TRANSACTION",
+    "catalog_version": "0.25.0",
+    "assets": 340,
+    "asset_registries": 4,
+    "schemas": 4,
+    "queries": 8,
+    "lifecycle_registries": 9,
+    "lifecycle_records": 52,
+    "registered_asset_ids": [
+      "CONTRACT-T20-COLLECTION-SPEC-001",
+      "CONFIG-T20-COLLECTION-SPEC-001",
+      "TEST-T20-COLLECTION-SPEC-CONTRACT-001",
+      "CONTRACT-T20-COVERAGE-RETENTION-RECOVERY-001",
+      "ARCH-T20-HYPOTHESIS-DATA-COVERAGE-MATRIX-001",
+      "CONFIG-T20-RETENTION-RECOVERY-POLICY-001",
+      "TEST-T20-COVERAGE-RETENTION-RECOVERY-001",
+      "EVIDENCE-T20-ACCEPTANCE-CATALOG-FACTORY-FIT-001",
+      "TEST-T20-ACCEPTANCE-CATALOG-FACTORY-FIT-001"
+    ],
+    "named_consumers": [
+      "TASK-20",
+      "TASK-21",
+      "FACTORY-001",
+      "REG-RESEARCH-001"
+    ]
+  },
+  "factory_fit": {
+    "mode": "FULL_REVIEW",
+    "verdict": "PASS_WITH_DURABLE_FOLLOWUP",
+    "trigger": "SHARED_DATA_CONTRACT_RETENTION_AND_PRE_COLLECTION_RECOVERY_BOUNDARY",
+    "bounded_correction": "NONE",
+    "checks": [
+      {
+        "check_id": "GOAL_FIT",
+        "status": "PASS",
+        "evidence": "The spec funds named hypothesis decisions rather than indiscriminate market recording."
+      },
+      {
+        "check_id": "COMPATIBILITY",
+        "status": "PASS",
+        "evidence": "TASK-15 acquisition, TASK-18 content-addressed recovery and TASK-19 PIT replay constraints remain bound without rewriting their evidence."
+      },
+      {
+        "check_id": "FLEXIBILITY_AND_REUSE",
+        "status": "PASS",
+        "evidence": "Field-level consumers, source versions and provider-neutral backup topology allow later hypothesis and adapter changes through versioning."
+      },
+      {
+        "check_id": "EFFICIENCY",
+        "status": "PASS",
+        "evidence": "T0 stays thin, T1 hydrates historical/cache data on demand and T2 exists only after cheaper paths fail."
+      },
+      {
+        "check_id": "HONEST_CLOSURE",
+        "status": "PASS",
+        "evidence": "Policy text is not claimed as a collector, backup execution, restore proof, provider decision or collection authority."
+      },
+      {
+        "check_id": "OWNER_JOURNEY",
+        "status": "PASS",
+        "evidence": "The owner pulse exposes coverage, missingness, freshness, cost caps, backup age, restore scope and conflicts."
+      },
+      {
+        "check_id": "HYPOTHESIS_LIFECYCLE",
+        "status": "PASS",
+        "evidence": "Every field has named consumers and T2 is bound to one immutable hypothesis version and exact membership."
+      },
+      {
+        "check_id": "DATA_FITNESS",
+        "status": "PASS",
+        "evidence": "Forty fields bind PIT availability, revision, missingness, quality, freshness, retention and physical-cost attribution."
+      },
+      {
+        "check_id": "TRADING_BRIDGE",
+        "status": "NOT_APPLICABLE",
+        "evidence": "TASK-20 specifies evidence acquisition and authorizes no signal, fill, position, PnL or cashflow claim."
+      },
+      {
+        "check_id": "POSITION_AND_RISK_TRUTH",
+        "status": "NOT_APPLICABLE",
+        "evidence": "No position, inventory, risk, signer or transaction state is created or inferred."
+      },
+      {
+        "check_id": "MONITORING_AND_RECOVERY",
+        "status": "PASS",
+        "evidence": "Backup deadlines, restore cadence, health states, owner escalation and hard-stop behavior are explicit and fail closed."
+      },
+      {
+        "check_id": "FAILURE_RED_TEAM",
+        "status": "PASS",
+        "evidence": "Eight deterministic vectors reject unversioned fields, unnamed consumers, broad capture, expiry, overwrite, delayed backup, missing full restore and authority leakage."
+      },
+      {
+        "check_id": "BUILD_VERSUS_BUY",
+        "status": "PASS",
+        "evidence": "Existing contracts and content-addressed recovery are adopted or wrapped; no dependency, provider adapter or generic data platform is added."
+      },
+      {
+        "check_id": "MIGRATION_AND_ROLLBACK",
+        "status": "PASS",
+        "evidence": "The change is additive, content-bound and reversible; future semantic changes require a new spec or policy version."
+      },
+      {
+        "check_id": "CONTRADICTION_SCAN",
+        "status": "PASS",
+        "evidence": "A2, A3, owner verdict, non-claims, Catalog consumers and generated navigation agree."
+      }
+    ],
+    "previous_durable_followup": {
+      "followup_id": "TASK20_FUTURE_COLLECTION_BACKUP_RESTORE_AUTOMATION_POLICY",
+      "status": "POLICY_SATISFIED_RUNTIME_TRIGGER_PRESERVED",
+      "owner": "TASK-20",
+      "activation_trigger": "BEFORE_ANY_FORWARD_COLLECTION",
+      "evidence": "RETENTION-RECOVERY-T20-001",
+      "reason": "A3 freezes the policy, but no remote adapter, scheduled backup or real restore proof exists yet."
+    },
+    "new_followup": {
+      "followup_id": "TASK21_PRE_COLLECTION_RUNTIME_RECOVERY_GATE",
+      "owner": "TASK-21",
+      "activation_trigger": "BEFORE_FIRST_FORWARD_COLLECTION_WRITE",
+      "minimum_evidence": [
+        "PRIVATE_SEPARATE_FAILURE_DOMAIN_DESTINATION",
+        "CREATE_ONLY_CONTENT_ADDRESSED_BACKUP",
+        "EXACT_REMOTE_READBACK",
+        "P7D_ISOLATED_SAMPLE_RESTORE",
+        "BACKUP_AND_RESTORE_HEALTH_ALERTS",
+        "NO_SECRET_MATERIAL_IN_EVIDENCE"
+      ]
+    }
+  },
+  "validation": {
+    "task20_a2_a3_suite": "PASS_33_OF_33",
+    "task20_a4_acceptance_suite": "PASS_5_OF_5",
+    "task20_targeted_suite": "PASS_38_OF_38",
+    "catalog_validation": "PASS_0_25_0_340_ASSETS",
+    "generated_navigation": "PASS",
+    "secret_scan": "PASS",
+    "file_hygiene": "PASS",
+    "full_repository_validation": "DEFERRED_TO_T20_REPOSITORY_DELIVERY_CI_SAME_CANDIDATE"
+  },
+  "authority": {
+    "local_write_only": true,
+    "network_calls": 0,
+    "provider_api_rpc_wss_calls": 0,
+    "drive_reads": 0,
+    "drive_writes": 0,
+    "collector_executions": 0,
+    "raw_or_dataset_writes": 0,
+    "backup_executions": 0,
+    "restore_executions": 0,
+    "cash_spend_usd_cents": 0,
+    "provider_credits": 0,
+    "credential_use": 0,
+    "dependency_changes": 0,
+    "wallet_signer_transaction_actions": 0,
+    "commit": false,
+    "push": false,
+    "pull_request": false,
+    "merge": false
+  },
+  "nonclaims": [
+    "NOT_MARKET_WIDE_COLLECTION",
+    "NOT_ALWAYS_ON_COLLECTION",
+    "NOT_PROVIDER_RELIABILITY",
+    "NOT_BACKUP_EXECUTION",
+    "NOT_FULL_DATASET_RECOVERY_PROOF",
+    "NOT_SIGNAL_OR_STRATEGY",
+    "NOT_EXECUTION_OR_POSITION",
+    "NOT_NET_RETURN",
+    "NOT_OWNER_CASHFLOW",
+    "NOT_ALPHA",
+    "NOT_PRODUCTION_READINESS",
+    "NOT_FORWARD_COLLECTION_AUTHORITY"
+  ],
+  "canonical_status_candidate": "TASK20_A4_LOCAL_CANDIDATE_READY_FOR_REPOSITORY_DELIVERY",
+  "next_gate": {
+    "atom_id": "T20-A5_REPOSITORY_DELIVERY_V1",
+    "authority": "COMMIT_AND_NON_FORCE_TASK_BRANCH_PUSH_DRAFT_PR_CI",
+    "authorized_by_t20_a4": false
+  },
+  "state_change": "LOCAL_FILES_ONLY"
+}

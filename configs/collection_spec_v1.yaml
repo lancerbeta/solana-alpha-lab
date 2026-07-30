@@ -1,0 +1,354 @@
+schema: smial.collection_spec
+schema_version: '1.0'
+spec_id: COLLECTION-SPEC-T20-001
+spec_version: '1.0'
+task_id: TASK-20
+atom_id: T20-A2_FROZEN_COLLECTION_SPEC_CONTRACT_V1
+status: FROZEN_CONTRACT_NO_COLLECTION
+as_of: '2026-07-30'
+contains_secrets: false
+entry_gate:
+  verdict: START_AS_WRITTEN
+  source_activation: ACTIVATION_CONFIRMED_USER_SMOKE
+  accepted_main_commit: 0284a684c8791b8a06296e6c5f8546c8dd913198
+  accepted_main_tree: 8837e888559be8945fffb4d4110268cc44ad2848
+  catalog:
+    version: 0.24.0
+    assets: 331
+    asset_registries: 4
+    schemas: 4
+    queries: 8
+  control_plane: LOCAL_WORK_PRIMARY
+  repository_route: LOCAL_WORK_CODEX
+  execution_shape: STAGED
+owner_decision:
+  question: CAN_A_VERSIONED_HYPOTHESIS_OWNED_BOUNDED_RECOVERABLE_SPEC_BECOME_A_FUTURE_COLLECTION_PLAN_INPUT
+  allowed_verdicts:
+  - SPEC_READY
+  - SPEC_READY_WITH_LIMITATIONS
+  - SPEC_INCOMPLETE
+  - COLLECTION_NOT_JUSTIFIED
+  atom2_result: CONTRACT_FROZEN_NOT_YET_ACCEPTED_FOR_COLLECTION
+frozen_inputs:
+- asset_id: ARCH-INTENT-002
+  path: docs/architecture/intents/ARCH-INTENT-002-hypothesis-factory-operating-model.md
+  sha256: ea094d88abf635fbe4df3b1ff9b3f0e80cb87dfa836f67505173766e69708639
+- asset_id: CONTRACT-T15-BOUNDED-SUSTAINED-COLLECTION-001
+  path: docs/contracts/bounded_sustained_collection_contract_v1.md
+  sha256: 65f0ca725e8e3a28976d3f7286c8f8cea49180588704b12d75ddc7d12be7310e
+- asset_id: CONTRACT-T06-RAW-STORAGE-001
+  path: docs/contracts/raw_storage_contract_v1.md
+  sha256: 4a87ffa1abad5b14fedd5af315794155f076a3c8269b6eb4a3259323f5c77a84
+- asset_id: CONTRACT-T06-DATASET-MANIFEST-001
+  path: docs/contracts/dataset_manifest_contract_v1.md
+  sha256: 6482e695f39985e93a729ea7846347daaf4949dfa40a0da9fb187af5f72d1769
+- asset_id: CONTRACT-T06-STORAGE-BUDGET-001
+  path: docs/contracts/storage_budget_contract_v1.md
+  sha256: 40ccbf82b55004fdd34632f99ef645d4d44c49e9eb3b6811f32f56653b966815
+- asset_id: CONTRACT-T18-CONTENT-ADDRESSED-BACKUP-RESTORE-001
+  path: docs/contracts/task18_content_addressed_backup_restore_contract_v1.md
+  sha256: dec80ed2e4f340668663f9431f01bdca1d31dcd767666a34b89a964566293f23
+- asset_id: EVIDENCE-T19-ACCEPTANCE-CATALOG-FACTORY-FIT-001
+  path: docs/evidence/task19/acceptance_catalog_factory_fit_v1.json
+  sha256: fd1a18a6439c040a0b9b1fab6f175643969629c94249db0fe6ebcb2daad2b735
+acquisition_precedence:
+- THIN_ONLINE_DECISION_LEDGER
+- HISTORICAL_BATCH_FIRST
+- REUSABLE_CONTENT_ADDRESSED_CACHE
+- HYPOTHESIS_DATASET
+- TRIGGERED_LIVE_CAPTURE_ONLY_IF_HISTORY_IS_INSUFFICIENT
+universe_contract:
+  global_solana_universe_authorized: false
+  market_wide_tick_capture_authorized: false
+  admission_unit: NAMED_HYPOTHESIS_VERSION_EVALUATES_MINT_OR_POOL
+  detailed_data_authority_inherits_across_hypotheses: false
+  multi_hypothesis_membership_allowed: true
+  required_membership_identity:
+  - hypothesis_id
+  - hypothesis_version
+  - trial_id_or_activation_epoch
+  - policy_version
+  - mint
+  - pool_identity_if_applicable
+  - evaluation_event_id
+  - evidence_checkpoint
+membership_lifecycle:
+  event_model: APPEND_ONLY
+  initial_state: OUTSIDE
+  states:
+  - OUTSIDE
+  - EVALUATED_REJECTED
+  - EVALUATED_NOT_EVALUABLE
+  - WATCHLIST_ACTIVE
+  - WATCHLIST_EXITED
+  allowed_transitions:
+  - from: OUTSIDE
+    to:
+    - EVALUATED_REJECTED
+    - EVALUATED_NOT_EVALUABLE
+    - WATCHLIST_ACTIVE
+  - from: EVALUATED_REJECTED
+    to:
+    - EVALUATED_REJECTED
+    - EVALUATED_NOT_EVALUABLE
+    - WATCHLIST_ACTIVE
+  - from: EVALUATED_NOT_EVALUABLE
+    to:
+    - EVALUATED_REJECTED
+    - EVALUATED_NOT_EVALUABLE
+    - WATCHLIST_ACTIVE
+  - from: WATCHLIST_ACTIVE
+    to:
+    - WATCHLIST_ACTIVE
+    - WATCHLIST_EXITED
+  - from: WATCHLIST_EXITED
+    to:
+    - WATCHLIST_EXITED
+  reactivation_after_exit: NEW_ACTIVATION_EPOCH_STARTS_FROM_OUTSIDE
+  historical_transition_rewrite_allowed: false
+  rejected_and_not_evaluable_retained: true
+data_tiers:
+  T0:
+    name: THIN_DECISION_LEDGER
+    mode: EVENT_DRIVEN
+    eligibility: CANDIDATE_EVALUATED_BY_NAMED_HYPOTHESIS
+    global_always_on_feed: false
+    cadence: ON_EVALUATION_OR_MEMBERSHIP_TRANSITION
+    required_fields:
+    - evaluated_at
+    - hypothesis_id
+    - hypothesis_version
+    - trial_id_or_activation_epoch
+    - policy_version
+    - mint
+    - pool_identity_if_applicable
+    - exact_rule_input_values
+    - input_feature_and_source_versions
+    - evaluation_result
+    - reason_codes
+    - missingness_codes
+    - coverage_gap_codes
+    - membership_transition
+    - first_reliable_available_at
+    - evidence_checkpoint
+    conditional_fields:
+      quote_or_liquidity_snapshot: ONLY_IF_USED_BY_DECISION
+    named_consumers:
+    - FACTORY-001
+    - TASK-21
+    - FUTURE-OWNER-PULSE
+    retention: APPEND_ONLY_DECISION_LINEAGE
+    forbidden:
+    - CONTINUOUS_ALL_TOKEN_PRICE_TICKS
+    - RICH_DATA_FOR_EVERY_DISCOVERED_TOKEN
+    - PROVIDER_ENVELOPES_WITHOUT_DECISION_USE
+  T1:
+    name: REUSABLE_HISTORICAL_AND_CACHE
+    mode: HYDRATE_ON_DEMAND
+    named_consumer_required: true
+    source_precedence:
+    - HISTORICAL_BATCH
+    - CONTENT_ADDRESSED_CACHE
+    - NEW_FETCH_ONLY_IF_CACHE_INCOMPATIBLE
+    default_bar_candidate:
+      cadence: PT1M
+      authority: CANDIDATE_ONLY_NOT_GLOBAL_DEFAULT
+      applies_when: NAMED_INTRADAY_BAR_CONSUMER_REQUIRES_IT
+    allowed_populations:
+    - ADMITTED_WATCHLIST_MEMBERS
+    - RELEVANT_REJECTED_CANDIDATES
+    - RELEVANT_NOT_EVALUABLE_CANDIDATES
+    - EXPLICIT_CONTROL_COHORT
+    - BOUNDED_BROAD_HISTORICAL_UNIVERSE_FOR_PATTERN_DISCOVERY
+    winner_only_population_allowed: false
+    historical_availability_backdating_allowed: false
+  T2:
+    name: TRIGGERED_LIVE_EVIDENCE
+    mode: SEPARATELY_AUTHORIZED_EXTERNAL_CAPTURE
+    speculative_collection_allowed: false
+    market_wide_capture_allowed: false
+    all_admission_conditions:
+    - NAMED_IMMUTABLE_HYPOTHESIS_DATA_REQUIREMENT_MANIFEST
+    - FIELD_FORWARD_ONLY_OR_HISTORICAL_INADEQUACY_PROVEN
+    - FIELD_CAN_CHANGE_HYPOTHESIS_OR_EXECUTION_VERDICT
+    - CHEAPER_CADENCE_NARROWER_POPULATION_BATCH_AND_CACHE_FALSIFIED
+    - EXACT_WATCHLIST_OR_CONTROL_MEMBERSHIP
+    - HARD_PHYSICAL_BUDGETS_FROZEN
+    - SEPARATE_EXTERNAL_ATOM_AUTHORIZED
+    stop_policy: STOP_WITH_HYPOTHESIS_OR_EPOCH_UNLESS_ANOTHER_IMMUTABLE_CONSUMER_EXISTS
+field_contract:
+  every_field_requires:
+  - field_id
+  - description
+  - units
+  - natural_keys
+  - tier
+  - named_consumers
+  - source_asset_id
+  - source_version
+  - purpose_and_decision_impact
+  - event_time_semantics
+  - observed_time_semantics
+  - ingested_time_semantics
+  - first_reliable_available_at_semantics
+  - availability_class
+  - cadence_mode
+  - exact_cadence_if_scheduled
+  - retention_class
+  - revision_policy
+  - quality_checks
+  - freshness_rule
+  - missingness_policy
+  - request_credit_byte_storage_time_attribution
+  availability_classes:
+  - RECONSTRUCTIBLE_LATER
+  - FORWARD_ONLY
+  - PARTIAL_OR_VENDOR_DEPENDENT
+  - DERIVED_PIT
+  missing_named_consumer: EXCLUDED
+  missing_decision_impact: EXCLUDED
+  missing_availability_semantics: EXCLUDED
+  missing_bounded_cost_attribution: EXCLUDED
+availability_contract:
+  timezone: UTC
+  required_time_axes:
+  - event_at
+  - observed_at
+  - first_reliable_available_at
+  - available_to_strategy_at
+  - ingested_at
+  event_time_grants_strategy_availability: false
+  historical_fetch_backdates_availability: false
+  late_revised_duplicate_unavailable_rows: RETAIN_TYPED_STATE
+  runtime_maximum_selects_cutoff: false
+  field_first_availability_owned_by: VERSIONED_FIELD_CONTRACT
+budget_contract:
+  physical_units_are_authority:
+  - provider_requests
+  - provider_credits
+  - response_bytes
+  - stored_bytes
+  - active_entities
+  - wall_clock_seconds
+  - concurrency
+  - retry_count
+  - dataset_bytes
+  - minimum_free_space_bytes
+  future_plan_required_caps:
+  - max_provider_requests
+  - max_provider_credits
+  - max_response_bytes
+  - max_stored_bytes
+  - max_active_entities
+  - max_wall_clock_seconds
+  - max_concurrency
+  - max_retries
+  - max_dataset_bytes
+  - min_free_space_bytes_after_write
+  unlimited_or_missing_cap_allowed: false
+  volatile_price_metadata:
+    authority: ADVISORY_ONLY
+    required_fields:
+    - currency
+    - amount
+    - as_of
+    - expires_at
+    - source_reference
+    purchase_authority: false
+  inherited_pre_task21_measurement_ceiling:
+    source_asset_id: CONTRACT-T15-BOUNDED-SUSTAINED-COLLECTION-001
+    status: REFERENCE_MAXIMUM_NOT_TASK21_BUDGET_OR_AUTHORITY
+    max_hypothesis_versions: 1
+    max_active_candidate_mints: 10
+    max_provider_credits: 40000
+    max_local_dataset_bytes: 268435456
+    min_free_disk_bytes_after_allocation: 2147483648
+    max_concurrency: 1
+    max_retries: 0
+identity_and_change_policy:
+  semantic_change: NEW_SPEC_VERSION_DECISION_AND_CONTENT_HASH
+  accepted_prior_bytes_mutable: false
+  mutable_alias_selects_runtime_contract: false
+  ui_filename_suffix_is_version: false
+  future_plan_run_dataset_partition_and_backup_bind:
+  - collection_spec_id
+  - collection_spec_version
+  - collection_spec_sha256
+  - hypothesis_data_manifest_id
+  - hypothesis_data_manifest_version
+  - hypothesis_data_manifest_sha256
+  - hypothesis_id
+  - hypothesis_version
+  - trial_id_or_activation_epoch
+  - membership_evidence_id
+  - source_and_revision_policy
+  - availability_contract_version
+  - budget_policy_version
+  - observed_consumption
+recovery_policy_handoff:
+  status: REQUIRED_IN_T20_A3_BEFORE_ANY_FORWARD_COLLECTION
+  required_dimensions:
+  - retention_class_and_backup_eligibility
+  - content_addressed_destination_identity
+  - no_clobber_and_duplicate_behavior
+  - backup_cadence_and_trigger
+  - manifest_and_readback_verification
+  - isolated_restore_test_cadence
+  - restore_success_evidence
+  - degraded_overdue_and_evidence_loss_states
+  - owner_escalation_and_recovery_deadline
+reuse:
+  adopt:
+  - ARCH-INTENT-002
+  - CONTRACT-T15-BOUNDED-SUSTAINED-COLLECTION-001
+  - CONTRACT-T06-RAW-STORAGE-001
+  - CONTRACT-T06-DATASET-MANIFEST-001
+  - CONTRACT-T06-STORAGE-BUDGET-001
+  - CONTRACT-T18-CONTENT-ADDRESSED-BACKUP-RESTORE-001
+  - EVIDENCE-T19-ACCEPTANCE-CATALOG-FACTORY-FIT-001
+  wrap:
+  - DECLARATIVE_COLLECTION_SPECIFICATION
+  - DETERMINISTIC_CONTRACT_TESTS
+  fork: []
+  build: []
+  new_dependency_count: 0
+  collector_built: false
+  scheduler_built: false
+  generic_data_platform_built: false
+catalog:
+  registered_in_atom2: false
+  status: CATALOG_TRANSACTION_PENDING_T20_A4
+  blocks_contract_freeze: false
+  blocks_task20_done: true
+  planned_asset_ids:
+  - CONTRACT-T20-COLLECTION-SPEC-001
+  - CONFIG-T20-COLLECTION-SPEC-001
+  - TEST-T20-COLLECTION-SPEC-CONTRACT-001
+authority:
+  class: LOCAL_WRITE_ONLY
+  source: REPO_STANDING_AUTONOMY_AFTER_EXPLICIT_CONTINUE
+  managed_files:
+  - docs/contracts/task20_collection_spec_contract_v1.md
+  - configs/collection_spec_v1.yaml
+  - tests/test_task20_collection_spec_contract.py
+  network_calls: 0
+  provider_api_rpc_wss_calls: 0
+  drive_reads: 0
+  drive_writes: 0
+  credential_use: 0
+  collector_executions: 0
+  raw_or_dataset_writes: 0
+  cash_spend_usd_cents: 0
+  provider_credits: 0
+  dependency_changes: 0
+  commit: false
+  push: false
+  pull_request: false
+  merge: false
+  ui_changes: false
+  destructive_actions: false
+next_atom:
+  atom_id: T20-A3_COVERAGE_RETENTION_AND_RECOVERY_POLICY_V1
+  implementation_authorized_by_atom2: false
+  external_calls_authorized: false
+  forward_collection_authorized: false

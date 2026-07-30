@@ -1,0 +1,545 @@
+schema: smial.coverage_retention_recovery_policy
+schema_version: '1.0'
+policy_id: RETENTION-RECOVERY-T20-001
+policy_version: '1.0'
+task_id: TASK-20
+atom_id: T20-A3_COVERAGE_RETENTION_AND_RECOVERY_POLICY_V1
+status: FROZEN_POLICY_NO_COLLECTION
+as_of: '2026-07-30'
+contains_secrets: false
+
+frozen_collection_spec:
+  spec_id: COLLECTION-SPEC-T20-001
+  spec_version: '1.0'
+  contract_path: docs/contracts/task20_collection_spec_contract_v1.md
+  contract_sha256: 33a7317ade7ab0239c7ba7e84bbde02cf1f9d9a5199c713140388ab10b1b2d79
+  config_path: configs/collection_spec_v1.yaml
+  config_sha256: c8c734eb76a5c13e7c49d0954e10e777d2f2a1cfe858ed688146a7c84269199d
+  test_path: tests/test_task20_collection_spec_contract.py
+  test_sha256: 21279e1aadbda01ee2a68c33799d4870ac8b6d144bada8ad4c04d84d18e91adb
+
+scope:
+  matrix_is_exhaustive_for_spec_version: true
+  future_field_requires_new_collection_spec_version: true
+  global_solana_universe_authorized: false
+  market_wide_tick_capture_authorized: false
+  collector_or_scheduler_authorized: false
+
+field_templates:
+  t0: &t0_field
+    description: THIN_DECISION_LEDGER_FIELD
+    units: TYPED_VALUE
+    natural_keys:
+    - hypothesis_id
+    - hypothesis_version
+    - trial_id_or_activation_epoch
+    - evaluation_event_id
+    tier: T0
+    named_consumers:
+    - FACTORY-001
+    - TASK-21
+    source_asset_id: COLLECTION-SPEC-T20-001
+    source_version: '1.0'
+    purpose_and_decision_impact: REPRODUCE_ADMISSION_OR_MEMBERSHIP_DECISION
+    event_time_semantics: TIME_OF_CANDIDATE_EVALUATION_OR_MEMBERSHIP_TRANSITION
+    observed_time_semantics: TIME_VALUE_WAS_OBSERVED_BY_EVALUATOR
+    ingested_time_semantics: TIME_APPEND_ONLY_LEDGER_ACCEPTED_THE_EVENT
+    first_reliable_available_at_semantics: EARLIEST_TIME_THE_VALUE_WAS_DECISION_SAFE
+    availability_class: DERIVED_PIT
+    cadence_mode: EVENT_DRIVEN
+    exact_cadence_if_scheduled: NOT_SCHEDULED
+    retention_class: DECISION_LINEAGE
+    revision_policy: APPEND_CORRECTION_NEVER_REWRITE_ACCEPTED_EVENT
+    quality_checks:
+    - TYPE_VALID
+    - NATURAL_KEY_UNIQUE
+    - PIT_ORDER_VALID
+    freshness_rule: AVAILABLE_TO_STRATEGY_AT_MUST_NOT_PRECEDE_FIRST_RELIABLE_AVAILABLE_AT
+    missingness_policy: RETAIN_TYPED_MISSINGNESS_AND_REASON
+    request_credit_byte_storage_time_attribution: ATTRIBUTE_TO_EVALUATION_EVENT_AND_HYPOTHESIS_VERSION
+  t1_bar: &t1_bar_field
+    description: REUSABLE_HISTORICAL_BAR_FIELD
+    units: TYPED_VALUE
+    natural_keys:
+    - source_asset_id
+    - source_version
+    - mint
+    - pool_identity_if_applicable
+    - bar_event_minute
+    tier: T1
+    named_consumers:
+    - FACTORY-001
+    - TASK-21
+    - REG-RESEARCH-001
+    source_asset_id: NAMED_HISTORICAL_BAR_SOURCE
+    source_version: IMMUTABLE_SOURCE_VERSION_REQUIRED
+    purpose_and_decision_impact: SUPPORT_INTRADAY_DISCOVERY_REPLAY_AND_CONTROL_COHORTS
+    event_time_semantics: UTC_MINUTE_BUCKET_START
+    observed_time_semantics: SOURCE_OBSERVATION_OR_PUBLICATION_TIME
+    ingested_time_semantics: LOCAL_CONTENT_CACHE_ACCEPTANCE_TIME
+    first_reliable_available_at_semantics: SOURCE_PUBLICATION_OR_REVISION_TIME_NOT_EVENT_TIME
+    availability_class: RECONSTRUCTIBLE_LATER
+    cadence_mode: HISTORICAL_BATCH_ON_DEMAND
+    exact_cadence_if_scheduled: PT1M_CANDIDATE_ONLY_FOR_NAMED_INTRADAY_BAR_CONSUMER
+    retention_class: RECONSTRUCTIBLE_CONTENT_CACHE
+    revision_policy: NEW_SOURCE_REVISION_AND_CONTENT_HASH_NEVER_IN_PLACE
+    quality_checks:
+    - OHLC_VALID
+    - NATURAL_KEY_UNIQUE_PER_SOURCE_REVISION
+    - UTC_MINUTE_ALIGNED
+    freshness_rule: DECLARED_BY_NAMED_CONSUMER_DATA_REQUIREMENT
+    missingness_policy: RETAIN_GAP_AND_SOURCE_COVERAGE_STATE
+    request_credit_byte_storage_time_attribution: ATTRIBUTE_TO_HYDRATION_RUN_SOURCE_AND_CONSUMERS
+  t1_lifecycle: &t1_lifecycle_field
+    description: REUSABLE_HISTORICAL_LIFECYCLE_FIELD
+    units: TYPED_VALUE
+    natural_keys:
+    - source_asset_id
+    - source_version
+    - mint
+    - pool_identity_if_applicable
+    - lifecycle_event_type
+    - lifecycle_event_at
+    tier: T1
+    named_consumers:
+    - FACTORY-001
+    - TASK-21
+    - REG-RESEARCH-001
+    source_asset_id: NAMED_HISTORICAL_LIFECYCLE_SOURCE
+    source_version: IMMUTABLE_SOURCE_VERSION_REQUIRED
+    purpose_and_decision_impact: CONTROL_LIFECYCLE_BIAS_AND_DEFINE_ELIGIBLE_TIME_WINDOWS
+    event_time_semantics: TIME_THE_LIFECYCLE_EVENT_OCCURRED
+    observed_time_semantics: TIME_SOURCE_FIRST_EXPOSED_THE_EVENT
+    ingested_time_semantics: LOCAL_CONTENT_CACHE_ACCEPTANCE_TIME
+    first_reliable_available_at_semantics: EARLIEST_RELIABLE_SOURCE_PUBLICATION_TIME
+    availability_class: PARTIAL_OR_VENDOR_DEPENDENT
+    cadence_mode: HISTORICAL_BATCH_ON_DEMAND
+    exact_cadence_if_scheduled: NOT_SCHEDULED
+    retention_class: UNIQUE_RAW_EVIDENCE
+    revision_policy: APPEND_SOURCE_REVISION_NEVER_REWRITE_PRIOR_ASSERTION
+    quality_checks:
+    - EVENT_TYPE_VALID
+    - PIT_ORDER_VALID
+    - NATURAL_KEY_UNIQUE_PER_SOURCE_REVISION
+    freshness_rule: DECLARED_BY_NAMED_CONSUMER_DATA_REQUIREMENT
+    missingness_policy: RETAIN_UNKNOWN_NOT_OBSERVED_AND_SOURCE_GAP_SEPARATELY
+    request_credit_byte_storage_time_attribution: ATTRIBUTE_TO_HYDRATION_RUN_SOURCE_AND_CONSUMERS
+  t2: &t2_field
+    description: TRIGGERED_LIVE_QUOTE_FIELD
+    units: TYPED_VALUE
+    natural_keys:
+    - hypothesis_id
+    - hypothesis_version
+    - trial_id_or_activation_epoch
+    - mint
+    - pool_identity_if_applicable
+    - quote_request_id
+    tier: T2
+    named_consumers:
+    - HYP-VERSION-EXECUTION-CAPACITY-CURVATURE-V1
+    - TASK-21
+    - FACTORY-001
+    source_asset_id: SEPARATELY_AUTHORIZED_LIVE_QUOTE_SOURCE
+    source_version: IMMUTABLE_PROVIDER_AND_REQUEST_CONTRACT_VERSION_REQUIRED
+    purpose_and_decision_impact: TEST_EXECUTION_CAPACITY_CURVATURE_FOR_EXACT_WATCHLIST_MEMBERSHIP
+    event_time_semantics: QUOTE_REQUEST_OR_PROVIDER_CALCULATION_TIME
+    observed_time_semantics: LOCAL_RESPONSE_RECEIPT_TIME
+    ingested_time_semantics: IMMUTABLE_PARTITION_ACCEPTANCE_TIME
+    first_reliable_available_at_semantics: MAXIMUM_OF_VALID_RESPONSE_RECEIPT_AND_REQUIRED_VALIDATION_COMPLETION
+    availability_class: FORWARD_ONLY
+    cadence_mode: TRIGGERED_LIVE_ONLY
+    exact_cadence_if_scheduled: NAMED_IMMUTABLE_HYPOTHESIS_MANIFEST_ONLY
+    retention_class: UNIQUE_RAW_EVIDENCE
+    revision_policy: NEW_REQUEST_AND_CONTENT_HASH_NEVER_REWRITE_PRIOR_RESPONSE
+    quality_checks:
+    - RESPONSE_SCHEMA_VALID
+    - REQUEST_RESPONSE_IDENTITY_VALID
+    - CONTENT_HASH_VALID
+    - PIT_ORDER_VALID
+    freshness_rule: NAMED_HYPOTHESIS_MANIFEST_MAX_QUOTE_AGE
+    missingness_policy: RETAIN_TIMEOUT_ERROR_UNAVAILABLE_AND_NOT_REQUESTED_SEPARATELY
+    request_credit_byte_storage_time_attribution: ATTRIBUTE_TO_REQUEST_HYPOTHESIS_MEMBERSHIP_AND_PHYSICAL_BUDGET
+
+coverage_matrix:
+- <<: *t0_field
+  field_id: evaluated_at
+  description: UTC_TIME_OF_EVALUATION
+  units: UTC_TIMESTAMP
+- <<: *t0_field
+  field_id: hypothesis_id
+  description: STABLE_HYPOTHESIS_IDENTITY
+  units: IDENTIFIER
+- <<: *t0_field
+  field_id: hypothesis_version
+  description: IMMUTABLE_HYPOTHESIS_VERSION
+  units: SEMANTIC_VERSION
+- <<: *t0_field
+  field_id: trial_id_or_activation_epoch
+  description: TRIAL_OR_FORWARD_ACTIVATION_BOUNDARY
+  units: IDENTIFIER
+- <<: *t0_field
+  field_id: policy_version
+  description: MEMBERSHIP_POLICY_VERSION
+  units: SEMANTIC_VERSION
+- <<: *t0_field
+  field_id: mint
+  description: SOLANA_TOKEN_MINT
+  units: BASE58_PUBLIC_KEY
+- <<: *t0_field
+  field_id: pool_identity_if_applicable
+  description: EXACT_POOL_WHEN_DECISION_IS_POOL_SCOPED
+  units: OPTIONAL_IDENTIFIER
+- <<: *t0_field
+  field_id: exact_rule_input_values
+  description: EXACT_VALUES_CONSUMED_BY_MEMBERSHIP_RULES
+  units: TYPED_MAP
+- <<: *t0_field
+  field_id: input_feature_and_source_versions
+  description: FEATURE_AND_SOURCE_LINEAGE_USED_BY_RULES
+  units: IDENTIFIER_MAP
+- <<: *t0_field
+  field_id: evaluation_result
+  description: REJECT_NOT_EVALUABLE_ADMIT_OR_EXIT_RESULT
+  units: ENUM
+- <<: *t0_field
+  field_id: reason_codes
+  description: MACHINE_READABLE_DECISION_REASONS
+  units: ENUM_LIST
+- <<: *t0_field
+  field_id: missingness_codes
+  description: TYPED_INPUT_MISSINGNESS
+  units: ENUM_LIST
+- <<: *t0_field
+  field_id: coverage_gap_codes
+  description: KNOWN_SOURCE_OR_TIME_COVERAGE_GAPS
+  units: ENUM_LIST
+- <<: *t0_field
+  field_id: membership_transition
+  description: APPEND_ONLY_FROM_AND_TO_STATE
+  units: STATE_TRANSITION
+- <<: *t0_field
+  field_id: first_reliable_available_at
+  description: DECISION_SAFE_AVAILABILITY_CUTOFF
+  units: UTC_TIMESTAMP
+- <<: *t0_field
+  field_id: evidence_checkpoint
+  description: CONTENT_BOUND_EVIDENCE_REFERENCE
+  units: IDENTIFIER_AND_SHA256
+- <<: *t0_field
+  field_id: quote_or_liquidity_snapshot_sha256
+  description: CONDITIONAL_CONTENT_HASH_ONLY_WHEN_DECISION_CONSUMED_SNAPSHOT
+  units: OPTIONAL_SHA256
+  purpose_and_decision_impact: PROVE_THE_EXACT_QUOTE_OR_LIQUIDITY_INPUT_USED_BY_THE_DECISION
+  missingness_policy: ABSENT_UNLESS_SNAPSHOT_WAS_A_RULE_INPUT
+
+- <<: *t1_bar_field
+  field_id: bar_event_minute
+  description: UTC_MINUTE_BUCKET_START
+  units: UTC_TIMESTAMP
+- <<: *t1_bar_field
+  field_id: bar_open
+  description: FIRST_PRICE_IN_MINUTE_BUCKET
+  units: QUOTE_UNITS_PER_BASE_UNIT
+- <<: *t1_bar_field
+  field_id: bar_high
+  description: MAXIMUM_PRICE_IN_MINUTE_BUCKET
+  units: QUOTE_UNITS_PER_BASE_UNIT
+- <<: *t1_bar_field
+  field_id: bar_low
+  description: MINIMUM_PRICE_IN_MINUTE_BUCKET
+  units: QUOTE_UNITS_PER_BASE_UNIT
+- <<: *t1_bar_field
+  field_id: bar_close
+  description: LAST_PRICE_IN_MINUTE_BUCKET
+  units: QUOTE_UNITS_PER_BASE_UNIT
+- <<: *t1_bar_field
+  field_id: bar_volume
+  description: TRADED_VOLUME_IN_MINUTE_BUCKET
+  units: SOURCE_DECLARED_BASE_OR_QUOTE_UNITS
+- <<: *t1_bar_field
+  field_id: bar_source_revision
+  description: IMMUTABLE_SOURCE_REVISION_ID
+  units: IDENTIFIER
+- <<: *t1_bar_field
+  field_id: bar_first_reliable_available_at
+  description: EARLIEST_TIME_BAR_WAS_DECISION_SAFE
+  units: UTC_TIMESTAMP
+
+- <<: *t1_lifecycle_field
+  field_id: lifecycle_event_type
+  description: POOL_OR_TOKEN_LIFECYCLE_EVENT_CLASS
+  units: ENUM
+- <<: *t1_lifecycle_field
+  field_id: lifecycle_event_at
+  description: UTC_TIME_LIFECYCLE_EVENT_OCCURRED
+  units: UTC_TIMESTAMP
+- <<: *t1_lifecycle_field
+  field_id: lifecycle_first_reliable_available_at
+  description: EARLIEST_TIME_LIFECYCLE_EVENT_WAS_DECISION_SAFE
+  units: UTC_TIMESTAMP
+
+- <<: *t2_field
+  field_id: quote_side
+  description: BUY_OR_SELL_DIRECTION
+  units: ENUM
+- <<: *t2_field
+  field_id: quote_notional_usd
+  description: REQUESTED_REFERENCE_NOTIONAL
+  units: USD_DECIMAL
+- <<: *t2_field
+  field_id: quote_input_atomic
+  description: EXACT_INPUT_AMOUNT
+  units: ATOMIC_TOKEN_UNITS
+- <<: *t2_field
+  field_id: quote_output_atomic
+  description: EXACT_QUOTED_OUTPUT_AMOUNT
+  units: ATOMIC_TOKEN_UNITS
+- <<: *t2_field
+  field_id: quote_route_identity
+  description: EXACT_PROVIDER_ROUTE_OR_POOL_SEQUENCE
+  units: IDENTIFIER_LIST
+- <<: *t2_field
+  field_id: quote_requested_at
+  description: LOCAL_UTC_REQUEST_TIME
+  units: UTC_TIMESTAMP
+- <<: *t2_field
+  field_id: quote_response_at
+  description: LOCAL_UTC_RESPONSE_RECEIPT_TIME
+  units: UTC_TIMESTAMP
+- <<: *t2_field
+  field_id: quote_first_reliable_available_at
+  description: EARLIEST_TIME_VALIDATED_QUOTE_WAS_DECISION_SAFE
+  units: UTC_TIMESTAMP
+- <<: *t2_field
+  field_id: quote_provider_status
+  description: SUCCESS_TIMEOUT_ERROR_OR_UNAVAILABLE_STATE
+  units: ENUM
+- <<: *t2_field
+  field_id: quote_raw_content_sha256
+  description: SHA256_OF_EXACT_RAW_RESPONSE_BYTES
+  units: SHA256
+- <<: *t2_field
+  field_id: quote_cost_credits
+  description: PROVIDER_CREDITS_CHARGED_TO_REQUEST
+  units: PROVIDER_CREDITS
+- <<: *t2_field
+  field_id: quote_response_bytes
+  description: RAW_RESPONSE_SIZE
+  units: BYTES
+
+retention_classes:
+  DECISION_LINEAGE:
+    minimum_retention: PROJECT_LIFETIME
+    automatic_expiry: false
+    eviction_allowed: false
+    rationale: PREVENT_REPEAT_WORK_AND_PRESERVE_WHY_EACH_CANDIDATE_CHANGED_STATE
+  UNIQUE_RAW_EVIDENCE:
+    minimum_retention: UNTIL_HYPOTHESIS_RETIRED_AND_ALL_DEPENDENT_DATASETS_HOLDOUTS_AND_REPLAYS_EXPIRE
+    automatic_expiry: false
+    eviction_allowed: false
+    deletion_requires:
+    - ALL_NAMED_CONSUMERS_RELEASED
+    - VERIFIED_BACKUP_AND_FULL_RESTORE_PROOF_CURRENT
+    - SEPARATE_OWNER_DELETION_DECISION
+  RECONSTRUCTIBLE_CONTENT_CACHE:
+    minimum_retention: WHILE_ANY_NAMED_CONSUMER_OR_UNIQUE_AVAILABILITY_EVIDENCE_DEPENDS_ON_BYTES
+    automatic_expiry: false
+    eviction_allowed: true
+    eviction_requires:
+    - SOURCE_RECONSTRUCTIBILITY_PROVEN
+    - NO_UNIQUE_FIRST_AVAILABILITY_EVIDENCE
+    - NO_ACTIVE_NAMED_CONSUMER
+    - DETERMINISTIC_CACHE_MANIFEST
+    - SEPARATE_DESTRUCTIVE_AUTHORITY
+  DERIVED_DATASET:
+    minimum_retention: THROUGH_DEPENDENT_TRIAL_HOLDOUT_REPLAY_AND_AUDIT_LIFECYCLE
+    automatic_expiry: false
+    eviction_allowed: false
+  BACKUP_MANIFEST_AND_RECEIPT:
+    minimum_retention: PROJECT_LIFETIME
+    automatic_expiry: false
+    eviction_allowed: false
+
+immutable_storage:
+  primary_identity: SHA256_OF_EXACT_BYTES_PLUS_TYPED_MANIFEST
+  canonical_write_behavior: CREATE_ONLY_CONTENT_ADDRESSED
+  identical_identity_and_bytes: IDEMPOTENT_ACCEPT
+  same_semantic_identity_different_bytes: FAIL_CLOSED_EVIDENCE_CONFLICT
+  accepted_bytes_overwrite_allowed: false
+  mutable_alias_selects_evidence: false
+  source_bytes_deleted_after_backup: false
+
+backup:
+  destination:
+    topology: PRIVATE_SEPARATE_FAILURE_DOMAIN
+    provider_neutral: true
+    google_drive_is_candidate_not_required_provider: true
+    credentials_in_manifest_allowed: false
+  trigger: EACH_CLOSED_IMMUTABLE_PARTITION_OR_24_HOURS_WHICHEVER_COMES_FIRST
+  maximum_age_hours: 24
+  grace_hours: 2
+  overdue_after_hours: 26
+  disable_new_t2_admissions_after_overdue_hours: 48
+  remote_write_behavior: CREATE_ONLY_CONTENT_HASH_NAMED
+  existing_same_hash_behavior: DEDUPLICATE_ONLY_AFTER_EXACT_REMOTE_READBACK
+  required_every_backup:
+  - EXACT_RAW_BYTE_READBACK
+  - SHA256_MATCH
+  - TYPED_MANIFEST_MATCH
+  - DESTINATION_IDENTITY_RECEIPT
+  - BACKUP_TIMESTAMP
+  current_atom_executes_backup: false
+
+restore_proof:
+  routine_sample:
+    cadence: P7D
+    environment: ISOLATED_EMPTY_RESTORE_ROOT
+    algorithm:
+      ordered_partitions: SORT_BY_CONTENT_ADDRESS_ASCENDING
+      selected_indexes:
+      - FIRST
+      - LAST
+      - SHA256_MANIFEST_MOD_PARTITION_COUNT
+      deduplicate_indexes: true
+      fewer_than_three_partitions: RESTORE_ALL
+    proves: SAMPLED_OBJECT_PERSISTENCE_ONLY
+    does_not_prove: FULL_DATASET_RECOVERABILITY
+  full_restore:
+    environment: ISOLATED_EMPTY_RESTORE_ROOT
+    required_before:
+    - DATASET_FREEZE
+    - DATASET_PROMOTION
+    required_after:
+    - BACKUP_OR_RESTORE_INCIDENT
+    - BACKUP_POLICY_CHANGE
+    - BACKUP_RUNTIME_CHANGE
+    success_state: DATASET_RECOVERY_PROVEN
+    success_requires:
+    - ALL_MANIFEST_OBJECTS_RESTORED
+    - ALL_RAW_BYTE_SHA256_VALUES_MATCH
+    - MANIFEST_IDENTITY_MATCHES
+    - DATASET_INVARIANTS_PASS
+  current_atom_executes_restore: false
+
+degraded_behavior:
+  health_states:
+  - HEALTHY
+  - BACKUP_OVERDUE
+  - RESTORE_OVERDUE
+  - EVIDENCE_AT_RISK
+  - EVIDENCE_CONFLICT
+  - STORAGE_HARD_STOP
+  BACKUP_OVERDUE:
+    enter_when: LAST_SUCCESSFUL_BACKUP_AGE_EXCEEDS_26_HOURS
+    block:
+    - DATASET_FREEZE
+    - DATASET_PROMOTION
+    - DELETION
+    owner_escalation_deadline_hours: 2
+  BACKUP_OVERDUE_48H:
+    enter_when: BACKUP_OVERDUE_DURATION_REACHES_48_HOURS
+    disable:
+    - NEW_T2_ADMISSIONS
+    existing_active_capture: MAY_CONTINUE_ONLY_IF_PRIMARY_STORAGE_AND_INTEGRITY_ARE_HEALTHY
+  RESTORE_OVERDUE:
+    enter_when: ROUTINE_SAMPLE_RESTORE_AGE_EXCEEDS_P7D
+    block:
+    - DATASET_FREEZE
+    - DATASET_PROMOTION
+    owner_escalation_deadline_hours: 24
+  EVIDENCE_AT_RISK:
+    enter_when: BACKUP_FAILED_OR_PRIMARY_REDUNDANCY_LOST
+    disable:
+    - NEW_T2_ADMISSIONS
+    block:
+    - DATASET_FREEZE
+    - DATASET_PROMOTION
+    owner_escalation_deadline_hours: 2
+  EVIDENCE_CONFLICT:
+    enter_when: SAME_SEMANTIC_IDENTITY_HAS_DIFFERENT_BYTES
+    action:
+    - STOP_WRITES_TO_AFFECTED_DATASET
+    - PRESERVE_ALL_CONFLICTING_BYTES
+    - REQUIRE_OWNER_RECONCILIATION
+    owner_escalation_deadline_hours: 0
+  STORAGE_HARD_STOP:
+    enter_when: STORAGE_BUDGET_GUARD_REJECTS_NEXT_WRITE
+    action:
+    - STOP_NEW_CAPTURE
+    - PRESERVE_ACCEPTED_BYTES
+    owner_escalation_deadline_hours: 0
+
+owner_pulse:
+  required_metrics:
+  - last_closed_partition_at
+  - last_successful_backup_at
+  - last_successful_backup_sha256
+  - backup_age_hours
+  - backup_readback_status
+  - restore_proof_age_hours
+  - restore_proof_scope
+  - consecutive_failed_backups
+  - local_dataset_bytes
+  - free_disk_bytes
+  - active_t2_memberships
+  - provider_requests_used_and_cap
+  - provider_credits_used_and_cap
+  - response_bytes_used_and_cap
+  - coverage_by_required_field
+  - missingness_by_required_field
+  - freshness_by_required_field
+  - evidence_conflict_state
+
+policy_non_claims:
+- NO_BACKUP_EXECUTED
+- NO_RESTORE_EXECUTED
+- NO_COLLECTOR_OR_SCHEDULER_BUILT
+- NO_FORWARD_COLLECTION_AUTHORIZED
+- NO_PROVIDER_SELECTED
+- NO_STORAGE_PURCHASE_JUSTIFIED
+- NO_DATASET_RECOVERY_PROVEN_BY_POLICY_TEXT
+
+catalog:
+  registered_in_atom3: false
+  status: CATALOG_TRANSACTION_PENDING_T20_A4
+  planned_asset_ids:
+  - CONTRACT-T20-COVERAGE-RETENTION-RECOVERY-001
+  - ARCH-T20-HYPOTHESIS-DATA-COVERAGE-MATRIX-001
+  - CONFIG-T20-RETENTION-RECOVERY-POLICY-001
+  - TEST-T20-COVERAGE-RETENTION-RECOVERY-001
+
+authority:
+  class: LOCAL_WRITE_ONLY
+  source: EXPLICIT_USER_APPROVAL_T20_A3
+  managed_files:
+  - docs/contracts/task20_coverage_retention_recovery_policy_v1.md
+  - docs/architecture/hypothesis_data_coverage_matrix_v1.md
+  - configs/task20_retention_recovery_policy_v1.yaml
+  - tests/test_task20_coverage_retention_recovery_policy.py
+  network_calls: 0
+  provider_api_rpc_wss_calls: 0
+  drive_reads: 0
+  drive_writes: 0
+  credential_use: 0
+  collector_executions: 0
+  raw_or_dataset_writes: 0
+  backup_executions: 0
+  restore_executions: 0
+  cash_spend_usd_cents: 0
+  provider_credits: 0
+  dependency_changes: 0
+  commit: false
+  push: false
+  pull_request: false
+  merge: false
+  wallet_actions: false
+  signer_actions: false
+  transaction_actions: false
+  ui_changes: false
+  destructive_actions: false
+
+next_atom:
+  atom_id: T20-A4_DETERMINISTIC_ACCEPTANCE_CATALOG_AND_FACTORY_FIT_V1
+  implementation_authorized_by_atom3: false
+  external_calls_authorized: false
+  forward_collection_authorized: false

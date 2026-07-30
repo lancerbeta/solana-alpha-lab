@@ -63,6 +63,21 @@
       "target_asset_id": "TEST-T15-HYPOTHESIS-DRIVEN-ACQUISITION-ACCEPTANCE-001"
     },
     {
+      "source_asset_id": "ARCH-T20-HYPOTHESIS-DATA-COVERAGE-MATRIX-001",
+      "relation": "depends_on",
+      "target_asset_id": "CONFIG-T20-COLLECTION-SPEC-001"
+    },
+    {
+      "source_asset_id": "ARCH-T20-HYPOTHESIS-DATA-COVERAGE-MATRIX-001",
+      "relation": "governed_by",
+      "target_asset_id": "CONTRACT-T20-COVERAGE-RETENTION-RECOVERY-001"
+    },
+    {
+      "source_asset_id": "ARCH-T20-HYPOTHESIS-DATA-COVERAGE-MATRIX-001",
+      "relation": "validated_by",
+      "target_asset_id": "TEST-T20-COVERAGE-RETENTION-RECOVERY-001"
+    },
+    {
       "source_asset_id": "BUNDLE-T18-CONTENT-ADDRESSED-RAW-BACKUP-001",
       "relation": "derived_from",
       "target_asset_id": "DATA-T17A-EXECUTION-CAPACITY-RAW-001"
@@ -316,6 +331,31 @@
       "source_asset_id": "CI-WORKFLOW-001",
       "relation": "governed_by",
       "target_asset_id": "CTRL-AGENTS-001"
+    },
+    {
+      "source_asset_id": "CONFIG-T20-COLLECTION-SPEC-001",
+      "relation": "governed_by",
+      "target_asset_id": "CONTRACT-T20-COLLECTION-SPEC-001"
+    },
+    {
+      "source_asset_id": "CONFIG-T20-COLLECTION-SPEC-001",
+      "relation": "validated_by",
+      "target_asset_id": "TEST-T20-COLLECTION-SPEC-CONTRACT-001"
+    },
+    {
+      "source_asset_id": "CONFIG-T20-RETENTION-RECOVERY-POLICY-001",
+      "relation": "depends_on",
+      "target_asset_id": "CONFIG-T20-COLLECTION-SPEC-001"
+    },
+    {
+      "source_asset_id": "CONFIG-T20-RETENTION-RECOVERY-POLICY-001",
+      "relation": "governed_by",
+      "target_asset_id": "CONTRACT-T20-COVERAGE-RETENTION-RECOVERY-001"
+    },
+    {
+      "source_asset_id": "CONFIG-T20-RETENTION-RECOVERY-POLICY-001",
+      "relation": "validated_by",
+      "target_asset_id": "TEST-T20-COVERAGE-RETENTION-RECOVERY-001"
     },
     {
       "source_asset_id": "CONTRACT-T05-DATA-001",
@@ -706,6 +746,41 @@
       "source_asset_id": "CONTRACT-T19-POINT-IN-TIME-REPLAY-001",
       "relation": "validated_by",
       "target_asset_id": "TEST-T19-POINT-IN-TIME-REPLAY-CONTRACT-001"
+    },
+    {
+      "source_asset_id": "CONTRACT-T20-COLLECTION-SPEC-001",
+      "relation": "derived_from",
+      "target_asset_id": "ARCH-INTENT-002"
+    },
+    {
+      "source_asset_id": "CONTRACT-T20-COLLECTION-SPEC-001",
+      "relation": "derived_from",
+      "target_asset_id": "CONTRACT-T15-BOUNDED-SUSTAINED-COLLECTION-001"
+    },
+    {
+      "source_asset_id": "CONTRACT-T20-COLLECTION-SPEC-001",
+      "relation": "derived_from",
+      "target_asset_id": "EVIDENCE-T19-ACCEPTANCE-CATALOG-FACTORY-FIT-001"
+    },
+    {
+      "source_asset_id": "CONTRACT-T20-COLLECTION-SPEC-001",
+      "relation": "validated_by",
+      "target_asset_id": "TEST-T20-COLLECTION-SPEC-CONTRACT-001"
+    },
+    {
+      "source_asset_id": "CONTRACT-T20-COVERAGE-RETENTION-RECOVERY-001",
+      "relation": "derived_from",
+      "target_asset_id": "CONTRACT-T18-CONTENT-ADDRESSED-BACKUP-RESTORE-001"
+    },
+    {
+      "source_asset_id": "CONTRACT-T20-COVERAGE-RETENTION-RECOVERY-001",
+      "relation": "governed_by",
+      "target_asset_id": "CONTRACT-T20-COLLECTION-SPEC-001"
+    },
+    {
+      "source_asset_id": "CONTRACT-T20-COVERAGE-RETENTION-RECOVERY-001",
+      "relation": "validated_by",
+      "target_asset_id": "TEST-T20-COVERAGE-RETENTION-RECOVERY-001"
     },
     {
       "source_asset_id": "CTRL-AGENTS-001",
@@ -1586,6 +1661,21 @@
       "source_asset_id": "EVIDENCE-T19-POINT-IN-TIME-REPLAY-SUMMARY-001",
       "relation": "validated_by",
       "target_asset_id": "TEST-T19-POINT-IN-TIME-REPLAY-001"
+    },
+    {
+      "source_asset_id": "EVIDENCE-T20-ACCEPTANCE-CATALOG-FACTORY-FIT-001",
+      "relation": "derived_from",
+      "target_asset_id": "CONTRACT-T20-COLLECTION-SPEC-001"
+    },
+    {
+      "source_asset_id": "EVIDENCE-T20-ACCEPTANCE-CATALOG-FACTORY-FIT-001",
+      "relation": "derived_from",
+      "target_asset_id": "CONTRACT-T20-COVERAGE-RETENTION-RECOVERY-001"
+    },
+    {
+      "source_asset_id": "EVIDENCE-T20-ACCEPTANCE-CATALOG-FACTORY-FIT-001",
+      "relation": "validated_by",
+      "target_asset_id": "TEST-T20-ACCEPTANCE-CATALOG-FACTORY-FIT-001"
     },
     {
       "source_asset_id": "FIXTURE-BATON-SUITE-001",
@@ -4171,6 +4261,46 @@
       "source_asset_id": "TEST-T19-POINT-IN-TIME-REPLAY-CONTRACT-001",
       "relation": "depends_on",
       "target_asset_id": "FIXTURE-T19-POINT-IN-TIME-REPLAY-001"
+    },
+    {
+      "source_asset_id": "TEST-T20-ACCEPTANCE-CATALOG-FACTORY-FIT-001",
+      "relation": "depends_on",
+      "target_asset_id": "EVIDENCE-T20-ACCEPTANCE-CATALOG-FACTORY-FIT-001"
+    },
+    {
+      "source_asset_id": "TEST-T20-ACCEPTANCE-CATALOG-FACTORY-FIT-001",
+      "relation": "depends_on",
+      "target_asset_id": "TEST-T20-COLLECTION-SPEC-CONTRACT-001"
+    },
+    {
+      "source_asset_id": "TEST-T20-ACCEPTANCE-CATALOG-FACTORY-FIT-001",
+      "relation": "depends_on",
+      "target_asset_id": "TEST-T20-COVERAGE-RETENTION-RECOVERY-001"
+    },
+    {
+      "source_asset_id": "TEST-T20-COLLECTION-SPEC-CONTRACT-001",
+      "relation": "depends_on",
+      "target_asset_id": "CONFIG-T20-COLLECTION-SPEC-001"
+    },
+    {
+      "source_asset_id": "TEST-T20-COLLECTION-SPEC-CONTRACT-001",
+      "relation": "depends_on",
+      "target_asset_id": "CONTRACT-T20-COLLECTION-SPEC-001"
+    },
+    {
+      "source_asset_id": "TEST-T20-COVERAGE-RETENTION-RECOVERY-001",
+      "relation": "depends_on",
+      "target_asset_id": "ARCH-T20-HYPOTHESIS-DATA-COVERAGE-MATRIX-001"
+    },
+    {
+      "source_asset_id": "TEST-T20-COVERAGE-RETENTION-RECOVERY-001",
+      "relation": "depends_on",
+      "target_asset_id": "CONFIG-T20-RETENTION-RECOVERY-POLICY-001"
+    },
+    {
+      "source_asset_id": "TEST-T20-COVERAGE-RETENTION-RECOVERY-001",
+      "relation": "depends_on",
+      "target_asset_id": "CONTRACT-T20-COVERAGE-RETENTION-RECOVERY-001"
     },
     {
       "source_asset_id": "VALIDATOR-REPOSITORY-STATE-001",

@@ -68,19 +68,22 @@ class Task19AcceptanceCatalogFactoryFitTests(unittest.TestCase):
             set(receipt["catalog"]["registered_asset_ids"]),
             EXPECTED_IDS,
         )
-        self.assertEqual(manifest["catalog_version"], "0.24.0")
-        self.assertEqual(
-            manifest["current_checkpoint"],
-            {
-                "assets": 331,
-                "asset_registries": 4,
-                "schemas": 4,
-                "queries": 8,
-                "lifecycle_registries": 9,
-                "lifecycle_records": 52,
-            },
+        historical = receipt["catalog"]
+        self.assertEqual(historical["catalog_version"], "0.24.0")
+        self.assertEqual(historical["assets"], 331)
+        self.assertGreaterEqual(
+            tuple(map(int, manifest["catalog_version"].split("."))),
+            tuple(map(int, historical["catalog_version"].split("."))),
         )
-        self.assertEqual(len(records), 331)
+        checkpoint = manifest["current_checkpoint"]
+        self.assertGreaterEqual(checkpoint["assets"], historical["assets"])
+        for field in ("asset_registries", "schemas", "queries"):
+            with self.subTest(field=field):
+                self.assertEqual(checkpoint[field], historical[field])
+        self.assertEqual(
+            len(records),
+            checkpoint["assets"],
+        )
         self.assertTrue(EXPECTED_IDS.issubset(records))
         for asset_id in EXPECTED_IDS:
             with self.subTest(asset_id=asset_id):
