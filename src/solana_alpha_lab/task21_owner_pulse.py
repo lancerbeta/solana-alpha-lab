@@ -21,7 +21,16 @@ EXPECTED_GATE_ID = "TASK21-T1-CLOSE-2026-08-06"
 EXPECTED_NEXT_ATOM = (
     "T21-A6S_T1_CLOSE_EVALUATION_AND_BOUNDED_PANEL_CAPTURE_V1"
 )
+CORRECTED_NEXT_ATOM = (
+    "T21-A6S_BOUNDED_ADMISSION_AND_MULTI_HORIZON_CAPTURE_V1"
+)
 EXPECTED_NOMINATION_STATUS = "OFFLINE_AND_T1_TOKEN2022_REPLAY_PASS"
+CORRECTION_RECEIPT_RELATIVE_PATH = (
+    "docs/evidence/task21/observation_horizon_policy_acceptance_v1.json"
+)
+HORIZON_POLICY_RELATIVE_PATH = (
+    "configs/task21_observation_horizon_policy_v1.yaml"
+)
 PRODUCTION_MEMORY_RELATIVE_PATH = (
     "docs/evidence/task17/first_bounded_hypothesis_cycle_v1.json"
 )
@@ -40,7 +49,11 @@ DECISION_STATE = {
     "RETIRE": "RETIRED",
     "REACTIVATE": "REACTIVATED",
 }
-TERMINAL_GATE_STATES = {"RESOLVED", "CANCELLED_WITH_EVIDENCE"}
+TERMINAL_GATE_STATES = {
+    "RESOLVED",
+    "CANCELLED_WITH_EVIDENCE",
+    "SUPERSEDED_WITH_EVIDENCE",
+}
 
 
 class Task21OwnerPulseError(ValueError):
@@ -138,6 +151,19 @@ def evaluate_time_gate(gate: JsonObject, *, as_of: datetime) -> JsonObject:
             state = "WAITING_PARALLEL_WORK_ALLOWED"
             parallel_work_allowed = True
             owner_action_required = False
+    elif status == "SUPERSEDED_WITH_EVIDENCE":
+        resolution = gate.get("resolution", {})
+        boundary = gate.get("effective_next_boundary", {})
+        if (
+            resolution.get("disposition")
+            != "P7D_EXCLUSIVE_WAIT_SUPERSEDED_FORWARD_ONLY"
+            or boundary.get("required_next_atom") != CORRECTED_NEXT_ATOM
+            or boundary.get("calendar_wait_required") is not False
+        ):
+            raise Task21OwnerPulseError("invalid_gate_correction")
+        state = "READY_FOR_ADMISSION_AND_CAPTURE_AUTHORITY"
+        parallel_work_allowed = True
+        owner_action_required = True
     elif status in TERMINAL_GATE_STATES:
         state = status
         parallel_work_allowed = True
@@ -153,7 +179,12 @@ def evaluate_time_gate(gate: JsonObject, *, as_of: datetime) -> JsonObject:
         "remaining_seconds": remaining_seconds,
         "parallel_work_allowed": parallel_work_allowed,
         "owner_action_required": owner_action_required,
-        "required_next_atom": gate["required_next_atom"],
+        "required_next_atom": (
+            CORRECTED_NEXT_ATOM
+            if status == "SUPERSEDED_WITH_EVIDENCE"
+            else gate["required_next_atom"]
+        ),
+        "original_required_next_atom": gate["required_next_atom"],
         "preemption_rule": gate["preemption_rule"],
         "external_authority_granted": False,
     }
@@ -309,6 +340,33 @@ def build_owner_pulse(
     if replay.get("t1_close_at") != gate_source.get("earliest_at"):
         raise Task21OwnerPulseError("t1_close_mismatch")
 
+    correction_receipt: JsonObject | None = None
+    horizon_policy: JsonObject | None = None
+    if gate_source.get("status") == "SUPERSEDED_WITH_EVIDENCE":
+        resolution = gate_source.get("resolution", {})
+        receipt_binding = resolution.get("result_receipt", {})
+        policy_binding = resolution.get("replacement_policy", {})
+        if (
+            receipt_binding.get("path") != CORRECTION_RECEIPT_RELATIVE_PATH
+            or policy_binding.get("path") != HORIZON_POLICY_RELATIVE_PATH
+        ):
+            raise Task21OwnerPulseError("invalid_gate_correction_pointer")
+        correction_path = root / CORRECTION_RECEIPT_RELATIVE_PATH
+        policy_path = root / HORIZON_POLICY_RELATIVE_PATH
+        if _sha256(correction_path) != receipt_binding.get("sha256"):
+            raise Task21OwnerPulseError("gate_correction_receipt_hash_drift")
+        if _sha256(policy_path) != policy_binding.get("sha256"):
+            raise Task21OwnerPulseError("horizon_policy_hash_drift")
+        correction_receipt = _load_json(correction_path)
+        horizon_policy = _load_yaml(policy_path)
+        if (
+            correction_receipt.get("verdict")
+            != "P7D_EXCLUSIVE_WAIT_SUPERSEDED_FORWARD_ONLY"
+            or horizon_policy.get("policy_id")
+            != "OBSERVATION-HORIZON-POLICY-T21-001"
+        ):
+            raise Task21OwnerPulseError("invalid_gate_correction_evidence")
+
     derived = replay.get("derived_partition", {})
     nomination_count = _validate_non_negative(
         "nomination_events",
@@ -402,6 +460,14 @@ def build_owner_pulse(
                 "action": EXPECTED_NEXT_ATOM,
             }
         )
+    if gate["state"] == "READY_FOR_ADMISSION_AND_CAPTURE_AUTHORITY":
+        attention.append(
+            {
+                "severity": "HIGH",
+                "code": "TASK21_CAPTURE_AUTHORITY_REQUIRED",
+                "action": CORRECTED_NEXT_ATOM,
+            }
+        )
     if not partition_present or not partition_identity_ok:
         attention.append(
             {
@@ -429,7 +495,7 @@ def build_owner_pulse(
 
     pulse: JsonObject = {
         "schema": "smial.task21.owner-pulse",
-        "schema_version": "1.1",
+        "schema_version": "1.2",
         "read_model_id": "OWNER-PULSE-T21-001",
         "task_id": EXPECTED_TASK_ID,
         "atom_id": "T21-P2R_OWNER_PULSE_PRODUCTION_MEMORY_BINDING_V1",
@@ -438,9 +504,24 @@ def build_owner_pulse(
         "attention": attention,
         "active_time_gates": [gate],
         "task21_forward_state": {
-            "state": replay["verdict"],
+            "state": (
+                "T1_NOMINATIONS_READY_FOR_ADMISSION_AND_CAPTURE_AUTHORITY"
+                if correction_receipt is not None
+                else replay["verdict"]
+            ),
             "t1_anchor_at": replay["anchor_at"],
             "t1_close_at": replay["t1_close_at"],
+            "exclusive_p7d_wait_active": correction_receipt is None,
+            "observation_horizon_policy_id": (
+                horizon_policy.get("policy_id")
+                if horizon_policy is not None
+                else None
+            ),
+            "next_capture_wait_required": (
+                None
+                if horizon_policy is None
+                else horizon_policy["next_boundary"]["calendar_wait_required"]
+            ),
             "real_nominations": nomination_count,
             "real_admissions": admissions,
             "panels_captured": 0,
@@ -510,6 +591,14 @@ def build_owner_pulse(
         "evidence_sources": [
             _source_entry(root, "control/active_time_gates.json"),
             _source_entry(root, receipt_relative),
+            *(
+                [
+                    _source_entry(root, CORRECTION_RECEIPT_RELATIVE_PATH),
+                    _source_entry(root, HORIZON_POLICY_RELATIVE_PATH),
+                ]
+                if correction_receipt is not None
+                else []
+            ),
             _source_entry(
                 root,
                 "docs/evidence/task21/runtime_recovery_gate_receipt_v1.json",
@@ -561,7 +650,7 @@ def render_owner_pulse_text(pulse: JsonObject) -> str:
         [
             "",
             (
-                f"T1: {gate['state']}; close={gate['earliest_at']}; "
+                f"T1: {gate['state']}; original_p7d={gate['earliest_at']}; "
                 f"remaining_seconds={gate['remaining_seconds']}"
             ),
             (

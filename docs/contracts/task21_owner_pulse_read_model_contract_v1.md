@@ -1,4 +1,4 @@
-# TASK-21 Owner Pulse Read Model Contract v1.1
+# TASK-21 Owner Pulse Read Model Contract v1.2
 
 ## 1. Purpose
 
@@ -11,7 +11,7 @@ This atom also installs one durable project-local reminder:
 future local agent to read this marker before selecting or starting another
 task or parallel atom.
 
-## 2. Time-gate precedence
+## 2. Time-gate precedence and correction
 
 The active gate is `TASK21-T1-CLOSE-2026-08-06`.
 
@@ -25,14 +25,25 @@ The active gate is `TASK21-T1-CLOSE-2026-08-06`.
 - Only the declared resolution owner may close or cancel the marker, and it
   must attach an exact evidence pointer.
 
-This prevents a long conversation or a new thread from silently skipping the
-forward-test close while preserving useful parallel work during the wait.
+The original gate is preserved as historical evidence. The forward-only
+`T21-A6S_T1_HORIZON_GATE_CORRECTION_V1` supersedes P7D as the exclusive start
+gate because no observations occur during that wait. P7D remains one horizon
+in a multi-horizon measurement grid.
+
+After exact correction evidence is attached, the pulse returns
+`READY_FOR_ADMISSION_AND_CAPTURE_AUTHORITY`, permits non-interfering parallel
+work and points to
+`T21-A6S_BOUNDED_ADMISSION_AND_MULTI_HORIZON_CAPTURE_V1`. It still grants zero
+admission, provider or capture authority.
 
 ## 3. Truth boundaries
 
 The pulse derives:
 
 - gate state from `control/active_time_gates.json`;
+- the forward-only horizon correction from
+  `observation_horizon_policy_acceptance_v1.json` and
+  `task21_observation_horizon_policy_v1.yaml`;
 - nomination, replay, backup and current external-consumption facts from
   `real_nomination_source_offline_acceptance_v1.json`;
 - restore proof from `runtime_recovery_gate_receipt_v1.json`;
@@ -64,10 +75,11 @@ authority to write to Drive.
 Attention ordering is deterministic:
 
 1. due unresolved time gate;
-2. source/receipt integrity failure;
-3. recovery proof at risk or overdue;
-4. waiting time gate;
-5. informational product gaps.
+2. corrected gate awaiting separate admission/capture authority;
+3. source/receipt integrity failure;
+4. recovery proof at risk or overdue;
+5. waiting time gate;
+6. informational product gaps.
 
 ## 5. Output
 
@@ -87,6 +99,7 @@ The pulse fails closed for:
 - source receipt hash drift;
 - a non-PASS nomination receipt;
 - mismatch between marker and receipt T1 close;
+- correction receipt or observation-horizon policy hash drift;
 - negative counters;
 - any attempt to infer external authority from the marker;
 - production-memory content, identity or append-only drift;
