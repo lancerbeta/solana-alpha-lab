@@ -1,0 +1,193 @@
+schema: smial.task21.bounded-live-shakedown
+schema_version: '1.0'
+task_id: TASK-21
+atom_id: T21-A5_BOUNDED_LIVE_SHAKEDOWN_V1
+status: FROZEN_AWAITING_EXACT_EXTERNAL_AUTHORITY
+as_of: '2026-07-30'
+
+purpose:
+  owner_question: CAN_THE_ACCEPTED_THIN_COLLECTOR_OBSERVE_ONE_EXACT_LIVE_WINDOW_WITH_CURRENT_PROVIDER_CONTRACT_CAP_AND_RECOVERY_GUARDS
+  claim_scope: TRANSPORT_AND_DURABILITY_COMPATIBILITY_ONLY
+  result_is_forward_dataset: false
+  result_is_hypothesis_evidence: false
+  auto_escalation_to_sustained_collection: false
+
+frozen_inputs:
+- asset_id: CONFIG-T21-FORWARD-COLLECTION-RUN-PLAN-001
+  path: configs/task21_forward_collection_run_plan_v1.yaml
+  sha256: 0f6bc1a748d80aaa8aeaed53551687304f467ccf9622b598d591f78317f419f5
+- asset_id: EVIDENCE-T21-RUNTIME-RECOVERY-GATE-001
+  path: docs/evidence/task21/runtime_recovery_gate_receipt_v1.json
+  sha256: b30081d22dafaf7c4a6d7c1d1aa952bdee48df504773c4264702b639d7cd8013
+- asset_id: CONFIG-T21-THIN-COLLECTOR-OFFLINE-001
+  path: configs/task21_thin_collector_offline_v1.yaml
+  sha256: 339205b9c40d5bdb7cf7859dedcea1c1e7f69b34e5ed6a13fe38f724129b04ae
+- asset_id: MODULE-T21-THIN-FORWARD-COLLECTOR-001
+  path: src/solana_alpha_lab/task21_forward_collector.py
+  sha256: da19230498b714b5cbda8043c05aa08b658b97541b0459c9a9d3700cac309ba4
+- asset_id: EVIDENCE-T21-OFFLINE-COLLECTOR-001
+  path: docs/evidence/task21/thin_collector_offline_dry_run_receipt_v1.json
+  sha256: 4a26589308e5a73292de49e0babe39fdef988452fc6d0269d0e0cbbd4738770f
+- asset_id: CONTRACT-T17A-BOUNDED-EXECUTION-CAPACITY-PANEL-001
+  path: tests/fixtures/task17a/bounded_execution_capacity_quote_panel_contract_v1.json
+  sha256: ac7a191f4a5888681fa2b90ea33261271d0d7d4a44c81653dbfc6d902fa6871f
+- asset_id: MODULE-T17A-EXECUTION-CAPACITY-PANEL-001
+  path: src/solana_alpha_lab/task17a_execution_capacity_panel.py
+  sha256: 277abeb2177d958d4ec06fb754a61914ba4f864621b7629b10091e78efae9c31
+- asset_id: MODULE-T10-JUPITER-QUOTE-TRANSPORT-001
+  path: src/solana_alpha_lab/jupiter_quote_transport.py
+  sha256: dd47c8368b84b190fd2312e1486a08c1b5e7301db036391b30b2d8ac22399ff4
+- asset_id: MODULE-T10-JUPITER-QUOTE-LOGGER-001
+  path: src/solana_alpha_lab/jupiter_quote_logger.py
+  sha256: 811f08e43eb26c99ef93dccfade372cbae5adb1c1ee718c7ff6d3ce543a9d507
+
+official_provider_readback:
+  provider: JUPITER
+  surface: METIS_SWAP_V1_QUOTE
+  base_url: https://api.jup.ag
+  method: GET
+  path: /swap/v1/quote
+  as_of: '2026-07-30'
+  current_status: AVAILABLE_SUPERSEDED_NOT_ACTIVELY_MAINTAINED
+  superseded_by: SWAP_V2
+  keyless_allowed: true
+  keyless_rate_limit_rps: 0.5
+  minimum_interval_seconds: 2.2
+  endpoint_modeled_credits_per_request: 1
+  keyless_billed_credit_claim: NOT_AVAILABLE_NO_ACCOUNT_METER
+  official_sources:
+  - https://developers.jup.ag/docs/swap/v1/get-quote
+  - https://developers.jup.ag/docs/portal/setup
+  - https://developers.jup.ag/docs/portal/plans
+
+technical_probe:
+  isolation: TECHNICAL_PROBE_NOT_WATCHLIST_ADMISSION
+  source_task: TASK-17A
+  source_contract_asset_id: CONTRACT-T17A-BOUNDED-EXECUTION-CAPACITY-PANEL-001
+  source_member_id: HYP-WATCH-MEMBER-T10-001
+  mint: 4vXNhA6ncbx8usZ14CfxkYeQKdaQYgrLfJXNyWcVpump
+  mint_decimals: 6
+  selection_rule: REUSE_ACCEPTED_TASK17A_TRANSPORT_PROBE_NO_NEW_SELECTION
+  real_candidate_admissions: 0
+  task21_watchlist_members_created: 0
+  forward_dataset_rows: 0
+
+run:
+  execution_mode: FOREGROUND_SINGLE_WINDOW_CREATE_ONLY
+  window_id: T21-A5-WINDOW-01
+  output_root: local/task21_collector/live_shakedown
+  logical_root: task21_live_shakedown_v1
+  provider_calls_max: 8
+  modeled_provider_credits_max: 8
+  concurrency: 1
+  retries: 0
+  request_timeout_seconds: 20
+  wall_seconds_max: 300
+  minimum_interval_seconds: 2.2
+  received_response_bytes_max: 1048576
+  durable_bytes_max: 5242880
+  min_free_space_bytes_after_write: 2147483648
+  api_keys: 0
+  accounts: 0
+  credentials: 0
+  cash_spend_usd_cents: 0
+  wallet_signer_transaction_actions: 0
+  scheduler: false
+  background_process: false
+  executions_max: 1
+
+recovery_gate:
+  receipt: docs/evidence/task21/runtime_recovery_gate_receipt_v1.json
+  required_verdict: PASS
+  required_health: HEALTHY
+  backup_age_hours_max_at_start: 24
+  restore_proof_age_hours_max_at_start: 168
+  no_new_drive_operation_in_atom5: true
+  result_backup_claim: NOT_PROVEN_BY_SHAKEDOWN
+
+stop_conditions:
+- EXACT_EXTERNAL_AUTHORITY_ABSENT_OR_MISMATCHED
+- RECOVERY_GATE_UNHEALTHY_OR_STALE
+- OUTPUT_ALREADY_EXISTS
+- DISK_PRESSURE
+- AUTHENTICATION_ACCOUNT_OR_API_KEY_REQUIRED
+- PROVIDER_ENDPOINT_OR_RESPONSE_SCHEMA_DRIFT
+- PROVIDER_CALL_RESPONSE_BYTE_DURABLE_BYTE_TIMEOUT_OR_WALL_CAP
+- REDIRECT_OR_HOST_PATH_DRIFT
+- DEPENDENCY_OR_SCHEMA_CHANGE_REQUIRED
+- TRANSACTION_OR_INSTRUCTION_PAYLOAD
+- WALLET_SIGNER_TRANSACTION_DEPLOYMENT_OR_REAL_MONEY_REQUIRED
+
+reuse:
+  adopt:
+  - MODULE-T10-JUPITER-QUOTE-TRANSPORT-001
+  - MODULE-T10-JUPITER-QUOTE-LOGGER-001
+  - MODULE-T17A-EXECUTION-CAPACITY-PANEL-001
+  - MODULE-T21-THIN-FORWARD-COLLECTOR-001
+  wrap:
+  - TASK21_EXTERNAL_AUTHORITY_AND_RECOVERY_FRESHNESS_GATE
+  - TASK21_TECHNICAL_PROBE_ISOLATION_RECEIPT
+  fork: []
+  build: []
+  new_dependencies: 0
+
+catalog:
+  status: CATALOG_TRANSACTION_PENDING_T21_A7
+  blocks_atom5_preparation: false
+  blocks_task21_done: true
+  planned_asset_ids:
+  - CONTRACT-T21-BOUNDED-LIVE-SHAKEDOWN-001
+  - CONFIG-T21-BOUNDED-LIVE-SHAKEDOWN-001
+  - MODULE-T21-BOUNDED-LIVE-SHAKEDOWN-001
+  - SCRIPT-T21-BOUNDED-LIVE-SHAKEDOWN-001
+  - TEST-T21-BOUNDED-LIVE-SHAKEDOWN-001
+  - EVIDENCE-T21-BOUNDED-LIVE-SHAKEDOWN-001
+
+pre_external_authority:
+  source: REPO_STANDING_AUTONOMY
+  class: LOCAL_WRITE_AND_OFFLINE_TEST_ONLY
+  provider_api_rpc_wss_calls: 0
+  live_collector_executions: 0
+  live_collection_writes: 0
+
+external_authority_required:
+  exact_phrase: T21-A5_BOUNDED_LIVE_SHAKEDOWN_V1
+  classes:
+  - PROVIDER_API_RPC_WSS
+  - CREATE_ONLY_LOCAL_LIVE_EVIDENCE_WRITE
+  proposed_caps:
+    provider_api_rpc_wss_calls_max: 8
+    modeled_provider_credits_max: 8
+    cash_spend_usd_cents: 0
+    live_executions_max: 1
+    local_live_windows_max: 1
+    durable_bytes_max: 5242880
+    drive_reads: 0
+    drive_writes: 0
+    credential_use: 0
+    real_candidate_admissions: 0
+    forward_dataset_writes: 0
+    wallet_signer_transaction_actions: 0
+    scheduler_or_background_process: false
+  authorized: false
+
+authority:
+  managed_files:
+  - configs/task21_live_shakedown_v1.yaml
+  - docs/contracts/task21_live_shakedown_contract_v1.md
+  - src/solana_alpha_lab/task21_live_shakedown.py
+  - scripts/run_task21_live_shakedown.py
+  - tests/test_task21_live_shakedown.py
+  - docs/evidence/task21/live_shakedown_acceptance_receipt_v1.json
+  dependency_changes: 0
+  commit: false
+  push: false
+  pull_request: false
+  merge: false
+  deployment: false
+  destructive_actions: false
+
+next_atom:
+  atom_id: T21-A6_SUSTAINED_FORWARD_COLLECTION_AND_MONITORING_V1
+  authorized_by_atom5: false
+  requires_separate_exact_authority: true

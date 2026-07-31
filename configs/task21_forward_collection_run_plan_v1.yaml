@@ -1,0 +1,311 @@
+schema: smial.task21_forward_collection_run_plan
+schema_version: '1.0'
+plan_id: FORWARD-COLLECTION-RUN-PLAN-T21-001
+plan_version: '1.0'
+task_id: TASK-21
+atom_id: T21-A2_FROZEN_FORWARD_COLLECTION_RUN_PLAN_V1
+status: FROZEN_PLAN_NO_COLLECTION
+as_of: '2026-07-30'
+contains_secrets: false
+
+entry_gate:
+  verdict: START_WITH_PATCH
+  source_activation: ACTIVATION_CONFIRMED_USER_SMOKE
+  canonical_manifest_version: '3.8'
+  accepted_main_commit: 072b98a14c17e188107c9399669f8ade511f7834
+  accepted_main_tree: aa20c6f05af2e3d148c502eef3f329f66e039a92
+  catalog:
+    version: 0.25.0
+    assets: 340
+    asset_registries: 4
+    schemas: 4
+    queries: 8
+  control_plane: LOCAL_WORK_PRIMARY
+  repository_route: LOCAL_WORK_CODEX
+  execution_shape: STAGED
+  now_patch:
+    patch_id: T21_A2_PRECOMMITTED_RUN_PLAN_INTEGRITY_PATCH
+    requirements:
+    - DOCUMENT_CANDIDATE_SUPPLY_AND_SELECTION_BIAS
+    - PRESERVE_ACCEPTED_192_CALL_OUTER_CEILING
+    - TREAT_30_45_DAYS_AS_EVENT_WINDOW_NOT_CONTINUOUS_POLLING
+    - SEAL_HYPOTHESIS_OUTCOMES_UNTIL_DATASET_FREEZE
+  catalog_compatibility_debt:
+    status: REPAIR_BEFORE_FIRST_T21_CATALOG_BUMP
+    owner_test: tests/test_task20_acceptance_catalog_factory_fit.py
+    required_behavior: HISTORICAL_RECEIPT_EXACT_CURRENT_CATALOG_MONOTONIC_OWN_ASSETS_EXACT
+
+owner_decision:
+  question: CAN_ONE_EXACT_BOUNDED_RUN_PLAN_PRODUCE_DECISION_RELEVANT_PIT_EVIDENCE_WITHOUT_SELECTION_LAUNDERING_BUDGET_INFLATION_OR_FUTURE_OUTCOME_TUNING
+  allowed_final_verdicts:
+  - DATASET_READY
+  - EXTEND_EVIDENCE
+  - REDESIGN_DATA
+  - COLLECTION_NOT_JUSTIFIED
+  - STOPPED_SAFELY
+  atom2_result: RUN_PLAN_FROZEN_NOT_AUTHORIZED_FOR_EXECUTION
+
+frozen_inputs:
+- asset_id: CONFIG-T20-COLLECTION-SPEC-001
+  path: configs/collection_spec_v1.yaml
+  sha256: c8c734eb76a5c13e7c49d0954e10e777d2f2a1cfe858ed688146a7c84269199d
+- asset_id: CONFIG-T20-RETENTION-RECOVERY-POLICY-001
+  path: configs/task20_retention_recovery_policy_v1.yaml
+  sha256: 3810a5674f2479e460c7b3883a58c0cf5d22f7902c0cfc8606aaeb990f95914f
+- asset_id: EVIDENCE-T20-ACCEPTANCE-CATALOG-FACTORY-FIT-001
+  path: docs/evidence/task20/acceptance_catalog_factory_fit_v1.json
+  sha256: 23ce57e4a65aa37a8bbcb662077d14e3f6827da76ead3cae3ff339ad0fecc886
+- asset_id: DATA-REQUIREMENT-T17-EXECUTION-CAPACITY-001
+  path: docs/evidence/task17/first_bounded_hypothesis_cycle_v1.md
+  sha256: 83f309a4c657edddca4ea3c80dcec8b881b631b9dee9459757d99a4e7a8f1004
+- asset_id: CONTRACT-T17A-BOUNDED-EXECUTION-CAPACITY-PANEL-001
+  path: tests/fixtures/task17a/bounded_execution_capacity_quote_panel_contract_v1.json
+  sha256: ac7a191f4a5888681fa2b90ea33261271d0d7d4a44c81653dbfc6d902fa6871f
+- asset_id: MODULE-T12-PILOT-SUPERVISOR-001
+  path: src/solana_alpha_lab/pilot_supervisor.py
+  sha256: b235b7b19fab79a888a4fb55afbe50d0f62868588f227473297ea7278f7849da
+- asset_id: MODULE-T18-BACKUP-RESTORE-001
+  path: src/solana_alpha_lab/task18_backup_restore.py
+  sha256: dfe4f4e497788939e910ab0f0decf9b5ca85ee57567647d073145656cb1a4f02
+- asset_id: EVIDENCE-T14-PROVIDER-PURCHASE-ACCEPTANCE-001
+  path: docs/evidence/task14/provider_purchase_decision_acceptance_receipt_v1.json
+  sha256: 47d950c863822bcfa72ade4172d1b834f029ac1198e05af6986939c2de94eb9e
+
+hypothesis_scope:
+  family_id: HYP-FAMILY-EXECUTION-CAPACITY-CURVATURE
+  hypothesis_version_id: HYP-VERSION-EXECUTION-CAPACITY-CURVATURE-V1
+  definition_sha256: 5672d63dd8dbf8cc67a041cc1cc7fd75948de17e3a1c7cbaeb8a488ad790220b
+  current_state: PAUSED
+  primary_estimand: MEDIAN_COMPLETE_PANEL_COST_BPS_USD100_MINUS_USD10
+  statement_or_estimand_change_allowed: false
+  live_activation_created_by_plan: false
+  live_capture_eligibility: BLOCKED_UNTIL_SEPARATE_RUNTIME_AND_EXTERNAL_AUTHORITY
+
+candidate_supply:
+  mode: REGISTERED_FORWARD_CANDIDATE_NOMINATION_EVENTS
+  global_solana_feed: false
+  market_wide_tick_capture: false
+  unused_slots_authorize_discovery: false
+  max_unique_evaluated_candidates: 8
+  required_nomination_fields:
+  - nomination_event_id
+  - source_asset_id
+  - source_version
+  - source_content_sha256
+  - observed_at
+  - first_reliable_available_at
+  - hypothesis_version_id
+  - watchlist_policy_version
+  - exact_rule_input_values
+  - reason_codes
+  - evidence_checkpoint
+  retain_evaluation_states:
+  - EVALUATED_REJECTED
+  - EVALUATED_NOT_EVALUABLE
+  - WATCHLIST_ACTIVE
+  - WATCHLIST_EXITED
+  winner_only_retention_allowed: false
+  generalization_boundary: DOCUMENTED_NOMINATION_AND_ADMISSION_PROCESS_ONLY
+  market_wide_prevalence_claim_allowed: false
+
+watchlist:
+  policy_id: HYP-WATCHLIST-EXECUTION-CAPACITY-FORWARD-V1
+  policy_version: '1.0'
+  owner_hypothesis_version_id: HYP-VERSION-EXECUTION-CAPACITY-CURVATURE-V1
+  event_model: APPEND_ONLY
+  current_member_count: 0
+  prior_member_automatic_carry_forward: false
+  max_active_members: 8
+  membership_change_after_outcome_visibility_allowed: false
+  required_member_fields:
+  - member_id
+  - mint
+  - mint_decimals
+  - nomination_event_id
+  - hypothesis_version_id
+  - policy_version
+  - entered_at
+  - exited_at
+  - first_reliable_available_at
+  - reason_codes
+  - evidence_checkpoint
+
+collection_window:
+  mode: EVENT_TRIGGERED_FOREGROUND_PANELS
+  continuous_polling: false
+  always_on_market_feed: false
+  minimum_calendar_days: 30
+  maximum_calendar_days: 45
+  maximum_wall_clock_seconds: 3888000
+  start_requires:
+  - TASK21_PRE_COLLECTION_RUNTIME_RECOVERY_GATE_PASS
+  - THIN_COLLECTOR_OFFLINE_DRY_RUN_PASS
+  - SEPARATE_BOUNDED_LIVE_SHAKEDOWN_AUTHORITY
+  automatic_extension_after_day_45: false
+
+panel:
+  windows_per_member: 3
+  minimum_window_separation_seconds: 1801
+  member_total_span_seconds_max: 86400
+  notionals_usd:
+  - 10
+  - 25
+  - 50
+  - 100
+  legs_per_notional: 2
+  leg_order:
+  - BUY
+  - DEPENDENT_REVERSE_SELL
+  reverse_sell_input: EXACT_ACCEPTED_BUY_OUT_AMOUNT_ATOMIC
+  unavailable_buy_behavior: NOT_ATTEMPTED_BUY_PREREQUISITE_FAILED
+  provider_calls_per_window_max: 8
+  missed_window_policy: RETAIN_EXPLICIT_COVERAGE_LOSS_NO_SILENT_RESCHEDULE
+  retries: 0
+  concurrency: 1
+
+provider_boundary:
+  selected_provider: null
+  candidate_surface: JUPITER_QUOTE_COMPATIBLE_KEYLESS_OR_FREE_PORTAL
+  endpoint_version: MUST_BE_FROZEN_AFTER_CURRENT_OFFICIAL_READBACK
+  pricing_snapshot:
+    as_of: '2026-07-29'
+    expires_at: '2026-08-28'
+    source_asset_id: EVIDENCE-T14-PROVIDER-PURCHASE-ACCEPTANCE-001
+  refresh_required_before_live_shakedown: true
+  purchase_authority: false
+  paid_plan_selected: false
+  credentials_authorized: false
+  fallback_provider_authorized: false
+
+physical_caps:
+  max_provider_requests: 192
+  max_provider_credits: 192
+  provider_credit_semantics: GENERIC_ONE_PER_ATTEMPT_MODEL_NOT_BILLED_CLAIM
+  max_response_bytes: 25165824
+  max_stored_bytes: 125829120
+  max_active_entities: 8
+  max_wall_clock_seconds: 3888000
+  max_concurrency: 1
+  max_retries: 0
+  max_dataset_bytes: 268435456
+  min_free_space_bytes_after_write: 2147483648
+  cash_spend_usd_cents: 0
+  wallet_signer_transaction_actions: 0
+  unlimited_or_missing_cap_allowed: false
+
+information_sufficiency:
+  earliest_decision_day: 30
+  hard_stop_day: 45
+  minimum_complete_members: 5
+  panels_per_complete_member: 3
+  minimum_complete_panels: 15
+  quote_pairs_per_complete_panel: 4
+  minimum_complete_quote_pairs: 60
+  minimum_distinct_admission_dates_utc: 3
+  minimum_distinct_admission_weeks_utc: 3
+  recovery_health_required: HEALTHY
+  physical_cap_reconciliation_required: true
+  positive_hypothesis_result_required: false
+  provider_failure_quota_required: false
+  day_30_if_insufficient: CONTINUE_UNCHANGED_TO_DAY_45
+  day_45_if_insufficient:
+  - EXTEND_EVIDENCE_REQUIRES_NEW_PLAN_AND_OWNER_DECISION
+  - REDESIGN_DATA
+  - COLLECTION_NOT_JUSTIFIED
+  - STOPPED_SAFELY
+
+outcome_blindness:
+  active: true
+  operational_views_allowed:
+  - PROCESS_AND_RECOVERY_HEALTH
+  - REQUEST_BYTE_DISK_AND_CREDIT_CAPS
+  - COVERAGE_MISSINGNESS_AND_FRESHNESS
+  - TERMINAL_CLASS_COUNTS
+  - INCIDENT_STATE
+  sealed_until_collection_stop:
+  - COST_BPS_BY_NOTIONAL
+  - CAPACITY_CURVE_SLOPE
+  - HYPOTHESIS_VERDICT
+  - TOKEN_RANKING
+  tuning_during_collection_allowed: false
+  task22_owns_split_and_holdout_ledger: true
+
+runtime_recovery_gate:
+  gate_id: TASK21_PRE_COLLECTION_RUNTIME_RECOVERY_GATE
+  status: REQUIRED_NOT_EXECUTED
+  must_pass_before_first_forward_write: true
+  minimum_evidence:
+  - PRIVATE_SEPARATE_FAILURE_DOMAIN_DESTINATION
+  - CREATE_ONLY_CONTENT_ADDRESSED_BACKUP
+  - EXACT_REMOTE_READBACK
+  - ISOLATED_SAMPLE_RESTORE
+  - BACKUP_AND_RESTORE_HEALTH_ALERTS
+  - NO_SECRET_MATERIAL_IN_EVIDENCE
+  inherited_policy:
+    backup_maximum_age_hours: 24
+    backup_overdue_after_hours: 26
+    disable_new_t2_admissions_after_overdue_hours: 48
+    routine_sample_restore_cadence: P7D
+    full_restore_before_dataset_freeze: true
+
+reuse:
+  adopt:
+  - MODULE-T06-STORAGE-API-001
+  - MODULE-T12-PILOT-SUPERVISOR-001
+  - DATA-REQUIREMENT-T17-EXECUTION-CAPACITY-001
+  - CONTRACT-T17A-BOUNDED-EXECUTION-CAPACITY-PANEL-001
+  - MODULE-T18-BACKUP-RESTORE-001
+  - CONFIG-T20-COLLECTION-SPEC-001
+  - CONFIG-T20-RETENTION-RECOVERY-POLICY-001
+  wrap:
+  - PROVIDER_NEUTRAL_RUN_PLAN_BINDING
+  - DETERMINISTIC_PLAN_VALIDATION
+  fork: []
+  build: []
+  a4_build_decision: RECHECK_ONLY_MISSING_RUNTIME_PIECES
+  new_dependency_count: 0
+
+catalog:
+  status: CATALOG_TRANSACTION_PENDING_T21_A7
+  blocks_atom2: false
+  blocks_task21_done: true
+  planned_asset_ids:
+  - CONTRACT-T21-FORWARD-COLLECTION-RUN-PLAN-001
+  - CONFIG-T21-FORWARD-COLLECTION-RUN-PLAN-001
+  - TEST-T21-FORWARD-COLLECTION-RUN-PLAN-001
+
+authority:
+  class: LOCAL_WRITE_ONLY
+  source: REPO_STANDING_AUTONOMY_AFTER_DIRECT_TASK_CONTINUE
+  managed_files:
+  - docs/contracts/task21_forward_collection_run_plan_contract_v1.md
+  - configs/task21_forward_collection_run_plan_v1.yaml
+  - tests/test_task21_forward_collection_run_plan.py
+  network_calls: 0
+  provider_api_rpc_wss_calls: 0
+  drive_reads: 0
+  drive_writes: 0
+  credential_use: 0
+  candidate_admissions: 0
+  collector_executions: 0
+  raw_or_dataset_writes: 0
+  backup_executions: 0
+  restore_executions: 0
+  cash_spend_usd_cents: 0
+  provider_credits: 0
+  dependency_changes: 0
+  commit: false
+  push: false
+  pull_request: false
+  merge: false
+  wallet_actions: false
+  signer_actions: false
+  transaction_actions: false
+  ui_changes: false
+  destructive_actions: false
+
+next_atom:
+  atom_id: T21-A3_PRE_COLLECTION_RUNTIME_RECOVERY_GATE_V1
+  implementation_authorized_by_atom2: false
+  drive_or_remote_write_authorized: false
+  forward_collection_authorized: false

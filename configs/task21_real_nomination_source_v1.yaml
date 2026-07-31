@@ -1,0 +1,210 @@
+schema: smial.task21_real_nomination_source
+schema_version: '1.1'
+source_binding_id: TASK21-DEXSCREENER-LATEST-PROFILES-SOLANA-RPC-MINT-V1
+source_binding_version: '1.1'
+task_id: TASK-21
+parent_atom_id: T21-A6S_BOUNDED_REAL_NOMINATION_AND_COLLECTION_LAUNCH_V1
+source_atom_id: T21-A6S_T1_SOURCE_RESELECTION_V1
+atom_id: T21-A6S_T1_TOKEN2022_REPLAY_AND_BACKUP_V1
+stage: T1_ONLY
+status: FROZEN_TOKEN2022_REPLAY_AND_BACKUP_BOUNDARY
+as_of: '2026-07-30'
+contains_secrets: false
+
+entry_gate:
+  verdict: START_WITH_PATCH
+  execution_shape: STAGED
+  patch:
+    problem: LEGACY_ONLY_MINT_VALIDATION_YIELDED_ONE_OF_THREE_REQUIRED_NOMINATIONS
+    observed_evidence: TWENTY_TWO_RETAINED_ACCOUNTS_OWNED_BY_TOKEN_2022_PROGRAM
+    solution: OFFLINE_REPLAY_WITH_COMMON_82_BYTE_INITIALIZED_MINT_HEADER_VALIDATION
+    cohort: DEXSCREENER_LATEST_PROFILE_SOLANA_CONTROL_ONLY
+    backdating_allowed: false
+    market_wide_or_alpha_claim_allowed: false
+
+frozen_inputs:
+- asset_id: CONFIG-T21-FORWARD-COLLECTION-RUN-PLAN-001
+  path: configs/task21_forward_collection_run_plan_v1.yaml
+  sha256: 0f6bc1a748d80aaa8aeaed53551687304f467ccf9622b598d591f78317f419f5
+- asset_id: CONFIG-T21-SUSTAINED-COLLECTION-CONTROL-001
+  path: configs/task21_sustained_collection_v1.yaml
+  sha256: 07bae50b28043576942064b39b6230ed784d1f72237eeb7edde1144a7c2ff499
+- asset_id: CONFIG-T21-REAL-NOMINATION-POLICY-001
+  path: configs/task21_real_nomination_policy_v1.yaml
+  sha256: 04061dacee8e78811d7d9fa0a92308b2f6d1bc43c4789a894420e92bcf4fb979
+- asset_id: EVIDENCE-T21-RUNTIME-RECOVERY-GATE-001
+  path: docs/evidence/task21/runtime_recovery_gate_receipt_v1.json
+  sha256: b30081d22dafaf7c4a6d7c1d1aa952bdee48df504773c4264702b639d7cd8013
+
+source:
+  cohort_id: DEXSCREENER_LATEST_PROFILE_SOLANA_CONTROL_ONLY
+  authentication: NONE
+  account: NONE
+  credential_use: 0
+  cash_spend_usd_cents: 0
+  profile_endpoint:
+    provider: DEXSCREENER
+    url: https://api.dexscreener.com/token-profiles/latest/v1
+    method: GET
+    response_rows_max: 200
+    official_reference: https://docs.dexscreener.com/api/reference
+  mint_validation_rpc:
+    provider: SOLANA_PUBLIC_RPC
+    url: https://api.mainnet-beta.solana.com
+    method: getMultipleAccounts
+    commitment: finalized
+    encoding: base64
+    data_slice:
+      offset: 0
+      length: 82
+    account_count_max: 100
+    official_reference: https://solana.com/docs/rpc/http/getmultipleaccounts
+  token_program_reference: https://www.solana-program.com/docs/token-2022
+
+selection:
+  nomination_source_class: PREDECLARED_CONTROL_COHORT
+  cohort_id: DEXSCREENER_LATEST_PROFILE_SOLANA_CONTROL_ONLY
+  tranche_id: T1
+  target_nomination_count: 3
+  rpc_candidate_mints_max: 100
+  required_chain_id: solana
+  allowed_token_programs:
+  - TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA
+  - TokenzQdBNbLqP5VEhdkAS6EPFLC1PHnBqCXEpPxuEb
+  legacy_token_program_requires_exact_space_bytes: 82
+  token_2022_program_requires_minimum_space_bytes: 82
+  common_mint_header_bytes: 82
+  common_mint_header_validation:
+  - MINT_AUTHORITY_COPTION_TAG_IS_ZERO_OR_ONE
+  - DECIMALS_IS_ZERO_TO_THIRTY
+  - IS_INITIALIZED_EQUALS_ONE
+  - FREEZE_AUTHORITY_COPTION_TAG_IS_ZERO_OR_ONE
+  excluded_mints:
+  - So11111111111111111111111111111111111111112
+  - EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v
+  deterministic_sort:
+  - mint_asc
+  ignored_for_selection:
+  - response_order
+  - url
+  - icon
+  - header
+  - description
+  - links
+  - paid_status
+  - price
+  - volume
+  - liquidity
+  - market_cap
+  - route_availability
+  - task21_quote_output
+
+replay:
+  retained_source_partition:
+    path: local/task21_forward/t1_nomination/TASK21_T1_NOMINATION_PARTITION_v1_b334eac617fefdfcd6b6f51e41697c7e1c56daff873b6a8587328c66dcfa759d.json
+    bytes: 47195
+    sha256: b334eac617fefdfcd6b6f51e41697c7e1c56daff873b6a8587328c66dcfa759d
+    drive_file_id: 123PIEMHLc2pY0Kmzm9hLhU57sd5a5KXF
+    drive_exact_raw_readback: true
+    immutable: true
+  network_calls: 0
+  output_root: local/task21_forward/t1_replay
+  write_behavior: CREATE_ONLY_CONTENT_ADDRESSED
+  copy_retained_source_observation_into_derived_partition: true
+  first_reliable_available_at: REPLAY_COMPLETION_TIME
+  source_capture_time_is_not_nomination_availability: true
+
+timeline:
+  anchor: TOKEN2022_REPLAY_COMPLETION_TIME
+  t1_close: ANCHOR_PLUS_P7D
+  nominations_created_at_replay: true
+  admissions_created_at_replay: false
+  evaluation_before_t1_close_allowed: false
+  quote_collection_before_t1_close_allowed: false
+  scheduler_or_background_process: false
+
+budget_reconciliation:
+  accepted_task21_external_request_ceiling: 192
+  source_requests_whole_task_max: 8
+  quote_requests_whole_task_max: 184
+  arithmetic: 8_PLUS_184_EQUALS_192
+  external_requests_consumed_before_replay: 4
+  external_requests_in_replay: 0
+  future_source_capacity_after_replay: 4
+  future_quote_capacity_after_replay: 184
+  concurrency: 1
+  retries: 0
+
+runtime:
+  output_root: local/task21_forward/t1_replay
+  write_behavior: CREATE_ONLY_CONTENT_ADDRESSED
+  partition_mime_type: application/json
+  min_free_space_bytes_after_write: 2147483648
+  secrets_allowed: false
+  personal_data_expected: false
+
+backup:
+  destination_receipt_asset_id: EVIDENCE-T21-RUNTIME-RECOVERY-GATE-001
+  destination_folder_id: 1EISgmsB8nt2pkU4uBUO6Sav1Fzbo6Hw3
+  object_count_max: 1
+  write_behavior: CREATE_ONLY_CONTENT_HASH_NAMED
+  metadata_readbacks_max: 1
+  raw_downloads_max: 1
+  file_updates: 0
+  deletions: 0
+  sharing_changes: 0
+  exact_readback_required: true
+
+catalog:
+  status: CATALOG_TRANSACTION_PENDING_T21_A7
+  planned_asset_ids:
+  - CONTRACT-T21-REAL-NOMINATION-SOURCE-001
+  - CONFIG-T21-REAL-NOMINATION-SOURCE-001
+  - MODULE-T21-REAL-NOMINATION-SOURCE-001
+  - TEST-T21-REAL-NOMINATION-SOURCE-001
+  - EVIDENCE-T21-REAL-NOMINATION-SOURCE-OFFLINE-001
+  runtime_partition_registration: T21_A7_DATASET_FREEZE
+
+authority:
+  source: EXPLICIT_USER
+  gate_phrase: T21-A6S_T1_TOKEN2022_REPLAY_AND_BACKUP_V1
+  managed_files:
+  - configs/task21_real_nomination_source_v1.yaml
+  - docs/contracts/task21_real_nomination_source_contract_v1.md
+  - src/solana_alpha_lab/task21_real_nomination_source.py
+  - tests/fixtures/task21/geckoterminal_new_pools_offline_v1.json
+  - tests/test_task21_real_nomination_source.py
+  - scripts/run_task21_t1_nomination_launch.py
+  - docs/evidence/task21/real_nomination_source_offline_acceptance_v1.json
+  provider_api_rpc_wss_calls: 0
+  dexscreener_api_calls: 0
+  solana_public_rpc_calls: 0
+  jupiter_api_calls: 0
+  wss_calls: 0
+  old_drive_raw_inline_readbacks_max: 1
+  local_derived_partition_writes_max: 1
+  new_drive_file_uploads_max: 1
+  new_drive_metadata_readbacks_max: 1
+  new_drive_raw_readbacks_max: 1
+  real_candidate_nominations_max: 3
+  real_candidate_admissions: 0
+  credentials: 0
+  cash_spend_usd_cents: 0
+  retries: 0
+  concurrency: 1
+  scheduler_or_background_process: false
+  wallet_signer_transaction_actions: 0
+  dependency_changes: 0
+  commit: false
+  push: false
+  pull_request: false
+  merge: false
+  destructive_actions: false
+
+next_boundary:
+  atom_id: T21-A6S_T1_CLOSE_EVALUATION_AND_BOUNDED_PANEL_CAPTURE_V1
+  status: NOT_AUTHORIZED
+  earliest_at: T1_ANCHOR_PLUS_P7D
+  candidate_admissions_authorized: false
+  jupiter_quote_calls_authorized: false
+  a7_authorized: false

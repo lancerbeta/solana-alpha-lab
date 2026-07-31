@@ -575,13 +575,13 @@ records:
     contains_raw_data: false
     sensitivity: INTERNAL_NON_SECRET
 - asset_id: CTRL-AGENTS-001
-  record_version: '1.7'
+  record_version: '1.8'
   asset_type: control_document
   purpose: Repository-level agent contract for standing routine autonomy, scope,
     safety, JIT validation, and status ownership.
   status: IMPLEMENTED_UNVERIFIED
   origin: REPOSITORY
-  as_of: '2026-07-28'
+  as_of: '2026-07-30'
   truth_owner: CTRL-BATON-SETUP
   location:
     kind: git_path
@@ -589,7 +589,7 @@ records:
     repository_path: AGENTS.md
   integrity:
     kind: sha256
-    sha256: d844e75f9d584625d7e0a576aae7061b4f803f68f5dd4f0e80aa11770e3d3a03
+    sha256: 4fb3a6c1322bf35265b65aefc870c8d8f27aab1a3d7f4ee97ee86b977aafb714
   access:
     mode: read_only
     method: file

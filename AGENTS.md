@@ -165,3 +165,18 @@ pausing for routine microsteps. Cursor stops before merge; Codex merges only
 after exact per-PR confirmation. Do not cross a stricter task cap, perform an
 excluded authority class, or change canonical status. The GPT control plane
 owns canonical status and acceptance.
+
+## ACTIVE_TIME_GATE_CHECK
+
+Before selecting or starting a new task or parallel atom, read
+`control/active_time_gates.json` when it exists.
+
+- An `ACTIVE_WAITING` gate does not block non-interfering parallel work before
+  its `earliest_at`.
+- When current UTC is at or after `earliest_at`, stop before any new mutation
+  and return to the marker's exact `required_next_atom`.
+- A marker is a durable reminder and precedence rule, not authority for
+  provider/API/RPC/WSS calls, candidate admission, spend, deployment,
+  credentials, wallet, signer, transaction, merge or destructive action.
+- Only the marker's declared `resolution_owner` may move it from
+  `ACTIVE_WAITING` to a terminal state, with an exact evidence pointer.

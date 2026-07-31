@@ -1,0 +1,101 @@
+{
+  "schema": "smial.task21.dexscreener-solana-rpc-offline-fixture",
+  "schema_version": "1.0",
+  "synthetic_only": true,
+  "contains_market_data": false,
+  "legacy_filename_reason": "BOUNDED_IN_PLACE_SOURCE_RESELECTION_WITHOUT_WRITE_SET_EXPANSION",
+  "dexscreener_response": [
+    {
+      "chainId": "solana",
+      "tokenAddress": "CktRuQ2mttgRGkXJtyksdKHjUdc2C4TgDzyB98oEzy8",
+      "url": "https://example.invalid/profile-3",
+      "icon": "https://example.invalid/icon-3",
+      "header": "https://example.invalid/header-3",
+      "description": "Synthetic marketing field 3",
+      "links": [{"label": "ignored", "url": "https://example.invalid/3"}]
+    },
+    {
+      "chainId": "ethereum",
+      "tokenAddress": "0x0000000000000000000000000000000000000000",
+      "description": "Wrong chain"
+    },
+    {
+      "chainId": "solana",
+      "tokenAddress": "11111111111111111111111111111111",
+      "description": "Valid public key but not a token mint"
+    },
+    {
+      "chainId": "solana",
+      "tokenAddress": "4vJ9JU1bJJE96FWSJKvHsmmFADCg4gpZQff4P3bkLKi",
+      "url": "https://example.invalid/profile-1",
+      "description": "Synthetic marketing field 1"
+    },
+    {
+      "chainId": "solana",
+      "tokenAddress": "8qbHbw2BbbTHBW1sbeqakYXVKRQM8Ne7pLK7m6CVfeR",
+      "url": "https://example.invalid/profile-2",
+      "description": "Synthetic marketing field 2"
+    },
+    {
+      "chainId": "solana",
+      "tokenAddress": "4vJ9JU1bJJE96FWSJKvHsmmFADCg4gpZQff4P3bkLKi",
+      "description": "Duplicate"
+    },
+    {
+      "chainId": "solana",
+      "tokenAddress": "So11111111111111111111111111111111111111112",
+      "description": "Reference asset excluded"
+    },
+    {
+      "chainId": "solana",
+      "tokenAddress": "not-a-public-key",
+      "description": "Invalid identity"
+    }
+  ],
+  "solana_rpc_response": {
+    "jsonrpc": "2.0",
+    "id": 1,
+    "result": {
+      "context": {
+        "apiVersion": "3.0.10",
+        "slot": 371000000
+      },
+      "value": [
+        null,
+        {
+          "data": [
+            "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAGAQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
+            "base64"
+          ],
+          "executable": false,
+          "lamports": 1461600,
+          "owner": "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA",
+          "rentEpoch": 18446744073709551615,
+          "space": 82
+        },
+        {
+          "data": [
+            "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAGAQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
+            "base64"
+          ],
+          "executable": false,
+          "lamports": 1461600,
+          "owner": "TokenzQdBNbLqP5VEhdkAS6EPFLC1PHnBqCXEpPxuEb",
+          "rentEpoch": 18446744073709551615,
+          "space": 412
+        },
+        {
+          "data": [
+            "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAJAQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
+            "base64"
+          ],
+          "executable": false,
+          "lamports": 1461600,
+          "owner": "TokenzQdBNbLqP5VEhdkAS6EPFLC1PHnBqCXEpPxuEb",
+          "rentEpoch": 18446744073709551615,
+          "space": 385
+        }
+      ]
+    }
+  }
+}

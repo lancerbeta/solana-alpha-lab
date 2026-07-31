@@ -1,0 +1,131 @@
+{
+  "schema": "smial.task21.runtime-recovery-gate-receipt",
+  "schema_version": "1.0",
+  "evidence_id": "EVIDENCE-T21-RUNTIME-RECOVERY-GATE-001",
+  "evidence_version": "1.0",
+  "task_id": "TASK-21",
+  "atom_id": "T21-A3_PRE_COLLECTION_RUNTIME_RECOVERY_GATE_V1",
+  "gate_id": "TASK21_PRE_COLLECTION_RUNTIME_RECOVERY_GATE",
+  "status": "ACCEPTED_LOCAL_CANDIDATE",
+  "as_of": "2026-07-30T09:55:56.668Z",
+  "verdict": "PASS",
+  "satisfied_evidence": [
+    "PRIVATE_SEPARATE_FAILURE_DOMAIN_DESTINATION",
+    "CREATE_ONLY_CONTENT_ADDRESSED_BACKUP",
+    "EXACT_REMOTE_READBACK",
+    "ISOLATED_SAMPLE_RESTORE",
+    "BACKUP_AND_RESTORE_HEALTH_ALERTS",
+    "NO_SECRET_MATERIAL_IN_EVIDENCE"
+  ],
+  "probe": {
+    "source_path": "tests/fixtures/task21/runtime_recovery_probe_v1.json",
+    "filename": "TASK21_RUNTIME_RECOVERY_PROBE_v1_1a6619d928f426d2b8ffdedc192db67ef0be1ea99c0a9f38b0e66f977f833425.json",
+    "mime_type": "application/json",
+    "bytes": 560,
+    "sha256": "1a6619d928f426d2b8ffdedc192db67ef0be1ea99c0a9f38b0e66f977f833425",
+    "contains_secrets": false,
+    "contains_personal_data": false,
+    "contains_market_data": false,
+    "authorizes_forward_collection": false,
+    "authorizes_provider_calls": false
+  },
+  "google_drive": {
+    "connector_operations": 7,
+    "operation_breakdown": {
+      "exact_name_searches": 1,
+      "folder_creations": 1,
+      "file_uploads": 1,
+      "metadata_readbacks": 2,
+      "raw_fetches": 2
+    },
+    "pre_create_search": {
+      "folder_name": "SOLANA_ALPHA_LAB_TASK21_RECOVERY_V1",
+      "result": "ABSENT",
+      "collision": false
+    },
+    "folder": {
+      "id": "1EISgmsB8nt2pkU4uBUO6Sav1Fzbo6Hw3",
+      "name": "SOLANA_ALPHA_LAB_TASK21_RECOVERY_V1",
+      "mime_type": "application/vnd.google-apps.folder",
+      "parent_id": "0AN6PxR_CesUzUk9PVA",
+      "created_time": "2026-07-30T09:53:56.768Z",
+      "modified_time": "2026-07-30T09:53:56.768Z",
+      "shared": false,
+      "visibility": "not_shared",
+      "url": "https://drive.google.com/drive/folders/1EISgmsB8nt2pkU4uBUO6Sav1Fzbo6Hw3"
+    },
+    "file": {
+      "id": "1sXE4GLf_VCIrwGXIakFcnpwTdiqBjiqw",
+      "name": "TASK21_RUNTIME_RECOVERY_PROBE_v1_1a6619d928f426d2b8ffdedc192db67ef0be1ea99c0a9f38b0e66f977f833425.json",
+      "mime_type": "application/json",
+      "size": 560,
+      "parent_folder_id": "1EISgmsB8nt2pkU4uBUO6Sav1Fzbo6Hw3",
+      "created_time": "2026-07-30T09:54:12.062Z",
+      "modified_time": "2026-07-30T09:54:12.062Z",
+      "shared": false,
+      "visibility": "not_shared",
+      "url": "https://drive.google.com/file/d/1sXE4GLf_VCIrwGXIakFcnpwTdiqBjiqw/view?usp=drivesdk"
+    },
+    "raw_readback": {
+      "first_fetch_mode": "STREAM_REFERENCE_NO_INLINE_BYTES",
+      "second_fetch_mode": "INLINE_BASE64_FOR_EXACT_HASH",
+      "decoded_bytes": 560,
+      "sha256": "1a6619d928f426d2b8ffdedc192db67ef0be1ea99c0a9f38b0e66f977f833425",
+      "complete_byte_identity": true
+    },
+    "project_task_metadata_in_folder_name_acknowledged_by_user": true,
+    "file_updates": 0,
+    "deletions": 0,
+    "sharing_changes": 0
+  },
+  "isolated_restore": {
+    "logical_root": "local/task21_recovery/isolated_restore",
+    "filename": "TASK21_RUNTIME_RECOVERY_PROBE_v1_1a6619d928f426d2b8ffdedc192db67ef0be1ea99c0a9f38b0e66f977f833425.json",
+    "completed_at": "2026-07-30T09:55:56.668Z",
+    "bytes": 560,
+    "sha256": "1a6619d928f426d2b8ffdedc192db67ef0be1ea99c0a9f38b0e66f977f833425",
+    "probe_schema_valid": true,
+    "contains_secrets": false,
+    "source_mutations": 0,
+    "source_deletions": 0
+  },
+  "health": {
+    "observed_at": "2026-07-30T09:55:56.668Z",
+    "last_successful_backup_at": "2026-07-30T09:54:12.062Z",
+    "last_successful_restore_at": "2026-07-30T09:55:56.668Z",
+    "health_state": "HEALTHY",
+    "alerts": [],
+    "backup_age_hours": 0.029057,
+    "restore_proof_age_hours": 0.0,
+    "new_t2_admissions_allowed": true,
+    "dataset_freeze_allowed": true,
+    "dataset_promotion_allowed": true
+  },
+  "source_mutations": 0,
+  "source_deletions": 0,
+  "candidate_admissions": 0,
+  "collector_executions": 0,
+  "forward_raw_or_dataset_writes": 0,
+  "provider_api_rpc_wss_calls": 0,
+  "cash_spend_usd_cents": 0,
+  "provider_credits": 0,
+  "wallet_signer_transaction_actions": 0,
+  "dependency_changes": 0,
+  "commit": false,
+  "push": false,
+  "pull_request": false,
+  "merge": false,
+  "destructive_actions": false,
+  "non_claims": [
+    "NO_FORWARD_COLLECTION_STARTED",
+    "NO_PROVIDER_SELECTED_OR_CALLED",
+    "NO_DATASET_BACKUP_PROVEN",
+    "NO_FULL_DATASET_RECOVERY_PROVEN",
+    "PROBE_PASS_PROVES_ONLY_DRIVE_ADAPTER_PATH_AND_EXECUTABLE_HEALTH_GUARD"
+  ],
+  "next_atom": {
+    "atom_id": "T21-A4_THIN_COLLECTOR_AND_OFFLINE_DRY_RUN_V1",
+    "authorized_by_this_receipt": false,
+    "provider_or_forward_collection_authorized": false
+  }
+}

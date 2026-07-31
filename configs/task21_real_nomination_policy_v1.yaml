@@ -1,0 +1,252 @@
+schema: smial.task21_real_nomination_policy
+schema_version: '1.0'
+policy_id: HYP-WATCHLIST-EXECUTION-CAPACITY-FORWARD-V1
+policy_version: '1.0'
+task_id: TASK-21
+atom_id: T21-A6R_FROZEN_REAL_NOMINATION_POLICY_V1
+status: FROZEN_POLICY_NO_REAL_NOMINATIONS
+as_of: '2026-07-30'
+contains_secrets: false
+
+entry_gate:
+  verdict: START_WITH_PATCH
+  execution_shape: STAGED
+  patch:
+    problem: ZERO_REAL_TASK21_WATCHLIST_MEMBERS_AND_UNFROZEN_SUPPLY_RULE
+    solution: PREOUTCOME_CHRONOLOGICAL_THREE_TRANCHE_NOMINATION_POLICY
+    actual_candidate_selection_in_atom: false
+    external_collection_in_atom: false
+
+frozen_inputs:
+- asset_id: CONFIG-T20-COLLECTION-SPEC-001
+  path: configs/collection_spec_v1.yaml
+  sha256: c8c734eb76a5c13e7c49d0954e10e777d2f2a1cfe858ed688146a7c84269199d
+- asset_id: DATA-REQUIREMENT-T17-EXECUTION-CAPACITY-001
+  path: docs/evidence/task17/first_bounded_hypothesis_cycle_v1.md
+  sha256: 83f309a4c657edddca4ea3c80dcec8b881b631b9dee9459757d99a4e7a8f1004
+- asset_id: CONFIG-T21-FORWARD-COLLECTION-RUN-PLAN-001
+  path: configs/task21_forward_collection_run_plan_v1.yaml
+  sha256: 0f6bc1a748d80aaa8aeaed53551687304f467ccf9622b598d591f78317f419f5
+- asset_id: CONFIG-T21-SUSTAINED-COLLECTION-CONTROL-001
+  path: configs/task21_sustained_collection_v1.yaml
+  sha256: 07bae50b28043576942064b39b6230ed784d1f72237eeb7edde1144a7c2ff499
+- asset_id: EVIDENCE-T21-SUSTAINED-COLLECTION-LOCAL-CONTROL-001
+  path: docs/evidence/task21/sustained_collection_offline_acceptance_v1.json
+  sha256: c4a1e1c4c2029e28602fe29e660970071c60341087ebf04589dff4b4c05192a4
+
+hypothesis_binding:
+  hypothesis_version_id: HYP-VERSION-EXECUTION-CAPACITY-CURVATURE-V1
+  hypothesis_definition_sha256: 5672d63dd8dbf8cc67a041cc1cc7fd75948de17e3a1c7cbaeb8a488ad790220b
+  population_claim: DOCUMENTED_FORWARD_NOMINATIONS_ONLY
+  market_wide_prevalence_claim_allowed: false
+  cross_token_generalization_beyond_documented_supply_allowed: false
+
+supply:
+  mode: REGISTERED_FORWARD_CANDIDATE_NOMINATION_EVENTS
+  maximum_evaluated_nominations: 8
+  minimum_active_members_for_dataset_sufficiency: 5
+  maximum_active_members: 8
+  winner_only_retention_allowed: false
+  unused_slots_authorize_discovery: false
+  global_solana_feed: false
+  market_wide_tick_capture: false
+  allowed_source_classes:
+  - FACTORY_HYPOTHESIS_CANDIDATE
+  - OWNER_RESEARCH_NOMINATION
+  - PREDECLARED_CONTROL_COHORT
+  source_requirements:
+  - VERSIONED_SOURCE_ASSET
+  - EXACT_SOURCE_CONTENT_SHA256
+  - OBSERVED_AND_FIRST_RELIABLE_AVAILABLE_TIMES
+  - SOURCE_OBSERVATION_ID
+  - SELECTION_BASIS_CODES
+  - EVIDENCE_CHECKPOINT
+  manual_nomination_allowed: true
+  manual_nomination_claim_scope: OWNER_NOMINATED_RESEARCH_POPULATION_ONLY
+
+tranches:
+  anchor: RUNTIME_INPUT_FROZEN_BEFORE_FIRST_NOMINATION
+  evaluation_time: AFTER_TRANCHE_CLOSE_BEFORE_ANY_PANEL_FOR_THAT_TRANCHE
+  order:
+  - tranche_id: T1
+    start_day_inclusive: 0
+    end_day_exclusive: 7
+    active_member_cap: 3
+  - tranche_id: T2
+    start_day_inclusive: 7
+    end_day_exclusive: 14
+    active_member_cap: 3
+  - tranche_id: T3
+    start_day_inclusive: 14
+    end_day_exclusive: 21
+    active_member_cap: 2
+  sort_key:
+  - first_reliable_available_at
+  - observed_at
+  - nomination_event_id
+  minimum_distinct_active_tranches_for_dataset_sufficiency: 3
+  late_or_backdated_reordering_after_close_allowed: false
+  unused_tranche_capacity_transfer_allowed: false
+
+nomination_event:
+  required_root_fields:
+  - nomination_event_id
+  - source_asset_id
+  - source_version
+  - source_content_sha256
+  - observed_at
+  - first_reliable_available_at
+  - hypothesis_version_id
+  - watchlist_policy_version
+  - exact_rule_input_values
+  - reason_codes
+  - evidence_checkpoint
+  required_exact_rule_input_fields:
+  - mint
+  - mint_decimals
+  - nomination_source_class
+  - tranche_id
+  - source_observation_id
+  - selection_basis_codes
+  - prior_relevant_quote_outcome_exposure
+  - uses_task21_quote_route_or_price_outcome
+  maximum_reason_codes: 8
+  maximum_selection_basis_codes: 8
+
+eligibility:
+  all_required:
+  - EVENT_IDENTITY_AND_SOURCE_LINEAGE_VALID
+  - SOLANA_MINT_FORMAT_VALID
+  - MINT_DECIMALS_KNOWN
+  - NOT_REFERENCE_ASSET
+  - ALLOWED_SOURCE_CLASS
+  - OBSERVED_WITHIN_DECLARED_TRANCHE
+  - FIRST_RELIABLE_AVAILABLE_BEFORE_TRANCHE_CLOSE
+  - NO_PRIOR_RELEVANT_QUOTE_OUTCOME_EXPOSURE
+  - NO_TASK21_QUOTE_ROUTE_PRICE_OR_TERMINAL_OUTCOME_USED
+  - FIRST_NOMINATION_FOR_MINT
+  reference_assets_excluded:
+  - EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v
+  - So11111111111111111111111111111111111111112
+  route_availability_precheck_required: false
+  route_availability_precheck_allowed: false
+  no_route_is_future_terminal_observation: true
+  technical_probe_automatic_carry_forward: false
+  prior_task_member_automatic_carry_forward: false
+
+evaluation:
+  event_model: APPEND_ONLY
+  exact_duplicate_event: IDEMPOTENT_DEDUPLICATE
+  conflicting_duplicate_event: FAIL_CLOSED
+  duplicate_mint: EVALUATED_REJECTED_FIRST_NOMINATION_WINS
+  missing_mint_decimals: EVALUATED_NOT_EVALUABLE
+  prior_relevant_outcome_exposure: EVALUATED_REJECTED
+  reference_asset: EVALUATED_REJECTED
+  invalid_lineage_or_contract: FAIL_CLOSED
+  tranche_cap_reached: EVALUATED_REJECTED
+  retained_states:
+  - EVALUATED_REJECTED
+  - EVALUATED_NOT_EVALUABLE
+  - WATCHLIST_ACTIVE
+  membership_change_after_sealed_raw_capture_allowed: true
+  membership_change_after_hypothesis_outcome_unsealed_allowed: false
+
+membership_event:
+  required_fields:
+  - member_id
+  - mint
+  - mint_decimals
+  - nomination_event_id
+  - hypothesis_version_id
+  - policy_version
+  - entered_at
+  - exited_at
+  - first_reliable_available_at
+  - reason_codes
+  - evidence_checkpoint
+  member_id: CONTENT_ADDRESSED_FROM_POLICY_NOMINATION_AND_MINT
+  entered_at: DECLARED_TRANCHE_CLOSE
+  exited_at_on_admission: null
+
+outcome_blindness:
+  active: true
+  forbidden_nomination_inputs:
+  - alpha
+  - cost_bps
+  - pnl
+  - price
+  - profit
+  - quote_output
+  - quote_status
+  - return
+  - roi
+  - route_available
+  - score
+  - sharpe
+  - terminal_class
+  - token_rank
+  operational_capture_visibility_does_not_unseal_hypothesis_outcome: true
+  policy_or_order_change_after_any_tranche_evaluation_allowed: false
+
+readiness:
+  policy_ready_when:
+  - OFFLINE_ACCEPTANCE_PASS
+  - HASH_AND_CONSUMER_CONSISTENCY_PASS
+  real_nomination_set_ready_when:
+  - AT_LEAST_FIVE_ACTIVE_MEMBERS
+  - ACTIVE_MEMBERS_SPAN_ALL_THREE_TRANCHES
+  - ALL_EVENTS_RETAINED
+  - EXACT_EXTERNAL_AUTHORITY_PRESENT
+  policy_acceptance_creates_real_members: false
+  synthetic_fixture_creates_real_members: false
+
+catalog:
+  status: CATALOG_TRANSACTION_PENDING_T21_A7
+  planned_asset_ids:
+  - CONTRACT-T21-REAL-NOMINATION-POLICY-001
+  - CONFIG-T21-REAL-NOMINATION-POLICY-001
+  - MODULE-T21-REAL-NOMINATION-EVALUATOR-001
+  - TEST-T21-REAL-NOMINATION-POLICY-001
+  - EVIDENCE-T21-REAL-NOMINATION-POLICY-OFFLINE-001
+
+authority:
+  class: LOCAL_WRITE_ONLY
+  source: EXPLICIT_USER_CONFIRMATION_OF_PRECEDING_EXACT_GATE
+  managed_files:
+  - configs/task21_real_nomination_policy_v1.yaml
+  - docs/contracts/task21_real_nomination_policy_contract_v1.md
+  - src/solana_alpha_lab/task21_real_nomination.py
+  - tests/fixtures/task21/real_nomination_policy_offline_batch_v1.json
+  - tests/test_task21_real_nomination_policy.py
+  - docs/evidence/task21/real_nomination_policy_offline_acceptance_v1.json
+  network_calls: 0
+  provider_api_rpc_wss_calls: 0
+  drive_reads: 0
+  drive_writes: 0
+  credential_use: 0
+  real_candidate_nominations: 0
+  real_candidate_admissions: 0
+  live_collector_executions: 0
+  forward_raw_or_dataset_writes: 0
+  provider_credits: 0
+  cash_spend_usd_cents: 0
+  scheduler_or_background_process: false
+  dependency_changes: 0
+  commit: false
+  push: false
+  pull_request: false
+  merge: false
+  wallet_actions: false
+  signer_actions: false
+  transaction_actions: false
+  ui_changes: false
+  destructive_actions: false
+
+next_boundary:
+  atom_id: T21-A6S_BOUNDED_REAL_NOMINATION_AND_COLLECTION_LAUNCH_V1
+  status: NOT_AUTHORIZED
+  real_candidate_input_required: true
+  provider_api_rpc_wss_authority_required: true
+  drive_write_authority_required_if_new_partitions_are_backed_up: true
+  scheduler_or_unattended_process_authorized: false
+  a7_authorized: false
