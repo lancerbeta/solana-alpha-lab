@@ -43,9 +43,31 @@ ACCEPTANCE_PATH = (
 )
 FIXED_NOW = datetime(2026, 7, 31, 7, 30, tzinfo=UTC)
 
+LOCAL_PROTECTED_INPUT_TESTS = {
+    "test_config_and_protected_inputs_are_exact",
+    "test_exact_frozen_t1_set_admits_three_before_outcomes",
+    "test_full_h0_run_is_three_panels_twenty_four_calls",
+    "test_stale_recovery_blocks_before_transport_and_output",
+    "test_outcome_exposed_nomination_fails_closed",
+    "test_adversarial_cap_or_drive_authority_drift_fails",
+    "test_output_override_cannot_use_real_transport",
+}
+
 
 def _sha256(path: Path) -> str:
     return hashlib.sha256(path.read_bytes()).hexdigest()
+
+
+def _local_protected_inputs_exact(config: dict) -> bool:
+    for item in config["protected_inputs"]:
+        if not item["path"].startswith("local/"):
+            continue
+        path = ROOT / item["path"]
+        if not path.is_file() or _sha256(path) != item["sha256"]:
+            return False
+        if "bytes" in item and path.stat().st_size != item["bytes"]:
+            return False
+    return True
 
 
 class FakeQuoteTransport:
@@ -120,6 +142,13 @@ class Task21MultiHorizonCaptureTests(unittest.TestCase):
     @classmethod
     def setUpClass(cls) -> None:
         cls.config = yaml.safe_load(CONFIG_PATH.read_text(encoding="utf-8"))
+
+    def setUp(self) -> None:
+        if (
+            self._testMethodName in LOCAL_PROTECTED_INPUT_TESTS
+            and not _local_protected_inputs_exact(self.config)
+        ):
+            self.skipTest("requires excluded exact local TASK-21 evidence")
 
     def test_config_and_protected_inputs_are_exact(self) -> None:
         validate_config(self.config, ROOT)

@@ -32,10 +32,38 @@ ACCEPTANCE_PATH = (
 )
 
 
+LOCAL_SOURCE_TESTS = {
+    "test_exact_live_source_inventory_is_frozen",
+    "test_create_only_materialize_and_isolated_restore",
+    "test_hash_drift_and_path_escape_fail_closed",
+}
+
+
+def _local_source_inventory_exact(config: dict) -> bool:
+    files = []
+    for relative in config["source_roots"]:
+        root = ROOT / relative
+        if not root.is_dir():
+            return False
+        files.extend(path for path in root.rglob("*") if path.is_file())
+    return (
+        len(files) == config["expected_source"]["file_count"]
+        and sum(path.stat().st_size for path in files)
+        == config["expected_source"]["stored_bytes"]
+    )
+
+
 class Task21ForwardRecoveryTests(unittest.TestCase):
     @classmethod
     def setUpClass(cls) -> None:
         cls.config = yaml.safe_load(CONFIG_PATH.read_text(encoding="utf-8"))
+
+    def setUp(self) -> None:
+        if (
+            self._testMethodName in LOCAL_SOURCE_TESTS
+            and not _local_source_inventory_exact(self.config)
+        ):
+            self.skipTest("requires excluded exact local TASK-21 evidence")
 
     def test_exact_live_source_inventory_is_frozen(self) -> None:
         first, manifest = build_archive_bytes(

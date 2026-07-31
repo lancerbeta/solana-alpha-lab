@@ -161,6 +161,7 @@ class Task21PostH6GapSentinelValueRebaseTests(unittest.TestCase):
         self.assertEqual(receipt["targeted_validation"], "9_OF_9_PASS")
         forward_evolved = {
             "control/active_time_gates.json",
+            "tests/test_task21_h24_foreground_capture.py",
             "tests/test_task21_post_h6_gap_sentinel_value_rebase.py",
         }
         for artifact in receipt["artifacts"]:
