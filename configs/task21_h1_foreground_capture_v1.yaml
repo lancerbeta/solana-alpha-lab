@@ -1,0 +1,106 @@
+schema: smial.task21_h1_foreground_capture
+schema_version: '1.0'
+task_id: TASK-21
+atom_id: T21-A6S_H1_FOREGROUND_CAPTURE_V1
+stage_id: H1_FOREGROUND_CAPTURE
+status: FROZEN_PENDING_EXACT_TIME_AND_PROVIDER_AUTHORITY
+contains_secrets: false
+
+protected_inputs:
+- role: H0_TRACKED_ACCEPTANCE
+  path: docs/evidence/task21/h0_admission_capture_runtime_acceptance_v1.json
+  sha256: 7e28fc61a85d77648d865a1e784ac6a7a1df7bd753b05b9dff48bba2a5206c16
+- role: H0_LOCAL_RUNTIME_RECEIPT
+  path: local/task21_forward/h0_capture/run=h0-20260731T074954402486Z-78d2d1b62d99/runtime_receipt.json
+  sha256: a815653f3f9f7ef8e9ad5916fd131c6b4a072da00e265a2f2fc5758529498c67
+- role: H0_ADMISSION_EVENTS
+  path: local/task21_forward/h0_capture/run=h0-20260731T074954402486Z-78d2d1b62d99/admission_events.jsonl
+  sha256: 8132418e90aea9871663a2b578db088a125e23733a562e6669b2cd22b3160e3a
+- role: ACTIVE_TIME_GATES
+  path: control/active_time_gates.json
+  sha256: 8e035024ee177f44af35814b1bd5cb6e89a2acf4b09c11aea5b881ca89c7dd70
+- role: RUNTIME_RECOVERY_RECEIPT
+  path: docs/evidence/task21/runtime_recovery_gate_receipt_v1.json
+  sha256: b30081d22dafaf7c4a6d7c1d1aa952bdee48df504773c4264702b639d7cd8013
+- role: JUPITER_QUOTE_TRANSPORT
+  path: src/solana_alpha_lab/jupiter_quote_transport.py
+  sha256: dd47c8368b84b190fd2312e1486a08c1b5e7301db036391b30b2d8ac22399ff4
+- role: JUPITER_QUOTE_LOGGER
+  path: src/solana_alpha_lab/jupiter_quote_logger.py
+  sha256: 811f08e43eb26c99ef93dccfade372cbae5adb1c1ee718c7ff6d3ce543a9d507
+
+time_gate:
+  gate_id: TASK21-H1-2026-07-31T08-50-34Z
+  earliest_at: '2026-07-31T08:50:34.414367Z'
+  latest_at: '2026-07-31T09:00:34.414367Z'
+  before_earliest: FAIL_CLOSED_NO_WRITE_NO_CALL
+  after_latest: WRITE_EXPLICIT_GAP_NO_PROVIDER_NO_BACKFILL
+
+population:
+  source: EXACT_H0_ADMISSION_EVENTS
+  members: 3
+  member_ids:
+  - T21-WATCH-4646910e9ea14e84d646
+  - T21-WATCH-7bfebd2c448c165d7527
+  - T21-WATCH-5630c96c741142a47a23
+  outcome_or_route_selection_allowed: false
+
+provider:
+  base_url: https://api.jup.ag
+  method: GET
+  path: /swap/v1/quote
+  keyless: true
+  credentials: 0
+  concurrency: 1
+  retries: 0
+  minimum_interval_seconds: 2.2
+  request_timeout_seconds: 20
+
+h1:
+  horizon_id: H1
+  panels_max: 3
+  provider_calls_per_panel_max: 8
+  provider_calls_total_max: 24
+  modeled_provider_credits_max: 24
+  notionals_usd: [10, 25, 50, 100]
+  legs: [BUY, DEPENDENT_REVERSE_SELL]
+  reverse_sell_input: EXACT_ACCEPTED_BUY_OUTPUT_ATOMIC
+  wall_seconds_max: 300
+  received_response_bytes_max: 3145728
+  durable_local_bytes_max: 16777216
+  local_output_root: local/task21_forward/h1_capture
+  write_behavior: CREATE_ONLY_CONTENT_ADDRESSED_RUN
+
+recovery:
+  required_health: HEALTHY
+  backup_age_hours_max_at_start: 24
+  restore_age_hours_max_at_start: 168
+  drive_actions: 0
+
+next_boundary:
+  atom_id: T21-A6S_H6_FOREGROUND_CAPTURE_V1
+  offset_from_latest_h0_seconds: 21600
+  grace_seconds: 600
+  authority_granted_by_h1: false
+  missed_window_policy: RETAIN_EXPLICIT_GAP_NO_BACKFILL
+
+authority:
+  source: EXPLICIT_USER
+  exact_phrase: T21-A6S_H1_FOREGROUND_CAPTURE_V1
+  provider_api_rpc_wss_calls_max: 24
+  modeled_provider_credits_max: 24
+  local_live_windows_max: 3
+  local_durable_bytes_max: 16777216
+  drive_reads: 0
+  drive_writes: 0
+  credentials: 0
+  cash_spend_usd_cents: 0
+  scheduler_or_background_process: false
+  wallet_signer_transaction_actions: 0
+  dependency_changes: 0
+  deployment: false
+  destructive_actions: false
+
+catalog:
+  status: CATALOG_TRANSACTION_PENDING_T21_A7
+  version_or_count_advanced: false

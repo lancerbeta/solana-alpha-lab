@@ -1,0 +1,102 @@
+schema: smial.task21_durable_resume_router_binding
+schema_version: '1.0'
+router_id: TASK21-DURABLE-RESUME-ROUTER-001
+router_version: '1.0'
+task_id: TASK-21
+atom_id: T21-P7_DURABLE_RESUME_ROUTER_BINDING_V1
+status: LOCAL_ACCEPTED_PENDING_REPOSITORY_DELIVERY
+as_of: '2026-07-31'
+contains_secrets: false
+
+purpose:
+  owner_question: WHAT_MUST_A_NEW_THREAD_READ_AND_DO_BEFORE_CONTINUING_TASK21
+  decision: ROUTE_TO_CURRENT_OWNER_PULSE_AND_OBEY_DUE_GATE_PRECEDENCE
+  creates_second_truth_owner: false
+
+discovery_binding:
+  repository_entrypoint: AGENTS.md
+  repository_section: ACTIVE_TIME_GATE_CHECK
+  mandatory_marker: control/active_time_gates.json
+  marker_field: resume_router
+  marker_hash_policy: DYNAMIC_SEMANTIC_MARKER_NOT_PINNED_HERE
+  same_checkout_visibility: IMMEDIATE
+  fresh_clone_visibility: REQUIRES_FUTURE_COMMIT_AND_TRANSPORT
+
+read_route:
+  mode: READ_ONLY
+  command:
+  - uv
+  - run
+  - --locked
+  - --managed-python
+  - python
+  - -B
+  - scripts/show_task21_owner_pulse.py
+  - --json
+  required_sequence:
+  - READ_REPOSITORY_AGENTS
+  - READ_ACTIVE_TIME_GATE_MARKER
+  - RUN_OWNER_PULSE_READ_ONLY
+  - IF_ANY_GATE_IS_DUE_ROUTE_EXACT_REQUIRED_NEXT_ATOM_BEFORE_NEW_MUTATION
+  - OTHERWISE_RESUME_ONLY_EXPLICITLY_AUTHORIZED_NON_INTERFERING_WORK
+  fallback_read_set:
+  - control/active_time_gates.json
+  - configs/task21_owner_pulse_read_model_v1.yaml
+  - scripts/show_task21_owner_pulse.py
+
+fail_closed:
+- MISSING_RESUME_ROUTER
+- ROUTER_CONFIG_HASH_DRIFT
+- OWNER_PULSE_ENTRYPOINT_HASH_DRIFT
+- NON_RELATIVE_PATH
+- DUE_GATE_BYPASS
+- AUTHORITY_INFERRED_FROM_ROUTER
+- FRESH_CLONE_VISIBILITY_CLAIM_BEFORE_COMMIT
+
+non_claims:
+- DOES_NOT_CHANGE_H24_SEMANTICS
+- DOES_NOT_ACTIVATE_H72_OR_H168
+- DOES_NOT_START_COLLECTION
+- DOES_NOT_GRANT_EXTERNAL_AUTHORITY
+- DOES_NOT_ADVANCE_CATALOG
+- DOES_NOT_CREATE_A_SCHEDULER
+
+authority:
+  source: EXPLICIT_USER
+  gate_phrase: T21-P7_DURABLE_RESUME_ROUTER_BINDING_V1
+  class: LOCAL_WRITE_ONLY
+  managed_files:
+  - control/active_time_gates.json
+  - configs/task21_durable_resume_router_binding_v1.yaml
+  - docs/contracts/task21_durable_resume_router_binding_contract_v1.md
+  - tests/test_task21_durable_resume_router_binding.py
+  - tests/test_task21_post_h6_gap_sentinel_value_rebase.py
+  - docs/evidence/task21/durable_resume_router_binding_acceptance_v1.json
+  network_calls: 0
+  provider_api_rpc_wss_calls: 0
+  drive_reads: 0
+  drive_writes: 0
+  raw_or_dataset_writes: 0
+  candidate_admissions: 0
+  cash_spend_usd_cents: 0
+  credentials: 0
+  dependency_changes: 0
+  scheduler_or_background_process: false
+  wallet_signer_transaction_actions: 0
+  commit: false
+  push: false
+  pull_request: false
+  merge: false
+  ui_changes: false
+  destructive_actions: false
+
+catalog:
+  checkpoint: 0.25.0 / 340 / 4 / 4 / 8
+  transaction: DEFERRED_TO_T21_A7
+  version_or_count_advanced: false
+
+next_boundary:
+  active_gate_id: TASK21-H24-2026-08-01T07-50-34Z
+  exact_next_atom_when_due: T21-A6S_H24_FOREGROUND_CAPTURE_V1
+  not_before_at: '2026-08-01T07:50:34.414367Z'
+  provider_api_rpc_wss_calls_authorized: false

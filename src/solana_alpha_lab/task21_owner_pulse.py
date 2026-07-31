@@ -5,7 +5,7 @@ from __future__ import annotations
 import hashlib
 import json
 import shutil
-from datetime import datetime, timezone
+from datetime import datetime, timedelta, timezone
 from pathlib import Path
 from typing import Any
 
@@ -24,12 +24,46 @@ EXPECTED_NEXT_ATOM = (
 CORRECTED_NEXT_ATOM = (
     "T21-A6S_BOUNDED_ADMISSION_AND_MULTI_HORIZON_CAPTURE_V1"
 )
+H1_GATE_PREFIX = "TASK21-H1-"
+H1_NEXT_ATOM = "T21-A6S_H1_FOREGROUND_CAPTURE_V1"
+H6_GATE_PREFIX = "TASK21-H6-"
+H6_NEXT_ATOM = "T21-A6S_H6_FOREGROUND_CAPTURE_V1"
+H24_GATE_PREFIX = "TASK21-H24-"
+H24_NEXT_ATOM = "T21-A6S_H24_FOREGROUND_CAPTURE_V1"
+H72_NEXT_ATOM = "T21-A6S_H72_FOREGROUND_CAPTURE_V1"
+H168_NEXT_ATOM = "T21-A6S_H168_FOREGROUND_CAPTURE_V1"
+MOSCOW = timezone(timedelta(hours=3))
+FROZEN_SENTINEL_OFFSETS_SECONDS = {
+    "H24": 86_400,
+    "H72": 259_200,
+    "H168": 604_800,
+}
+FUTURE_HORIZON_ATOMS = {
+    "H24": H24_NEXT_ATOM,
+    "H72": H72_NEXT_ATOM,
+    "H168": H168_NEXT_ATOM,
+}
+H0_RECEIPT_RELATIVE_PATH = (
+    "docs/evidence/task21/h0_admission_capture_runtime_acceptance_v1.json"
+)
+H1_RECEIPT_RELATIVE_PATH = (
+    "docs/evidence/task21/h1_foreground_capture_runtime_acceptance_v1.json"
+)
+H6_RECEIPT_RELATIVE_PATH = (
+    "docs/evidence/task21/h6_foreground_capture_runtime_acceptance_v1.json"
+)
+PRE_H24_RECOVERY_RELATIVE_PATH = (
+    "docs/evidence/task21/pre_h24_recovery_refresh_acceptance_v1.json"
+)
 EXPECTED_NOMINATION_STATUS = "OFFLINE_AND_T1_TOKEN2022_REPLAY_PASS"
 CORRECTION_RECEIPT_RELATIVE_PATH = (
     "docs/evidence/task21/observation_horizon_policy_acceptance_v1.json"
 )
 HORIZON_POLICY_RELATIVE_PATH = (
     "configs/task21_observation_horizon_policy_v1.yaml"
+)
+SENTINEL_REBASE_RELATIVE_PATH = (
+    "configs/task21_post_h6_gap_sentinel_value_rebase_v1.yaml"
 )
 PRODUCTION_MEMORY_RELATIVE_PATH = (
     "docs/evidence/task17/first_bounded_hypothesis_cycle_v1.json"
@@ -53,6 +87,8 @@ TERMINAL_GATE_STATES = {
     "RESOLVED",
     "CANCELLED_WITH_EVIDENCE",
     "SUPERSEDED_WITH_EVIDENCE",
+    "RESOLVED_WITH_EVIDENCE",
+    "RESOLVED_WITH_GAP_EVIDENCE",
 }
 
 
@@ -109,6 +145,130 @@ def format_utc(value: datetime) -> str:
     )
 
 
+def _format_exact(value: datetime, *, zone: timezone = UTC) -> str:
+    if value.tzinfo is None:
+        raise Task21OwnerPulseError("naive_schedule_timestamp")
+    return value.astimezone(zone).isoformat(timespec="microseconds").replace(
+        "+00:00", "Z"
+    )
+
+
+def build_observation_schedule(
+    *,
+    horizon_policy: JsonObject,
+    sentinel_rebase: JsonObject,
+    h0_receipt: JsonObject,
+    active_gate: JsonObject,
+    evaluated_gate: JsonObject,
+    as_of: datetime,
+) -> JsonObject:
+    """Show one minimum-age H24 gate and dormant future candidates."""
+
+    capture_clock = horizon_policy.get("capture_clock")
+    if not isinstance(capture_clock, dict):
+        raise Task21OwnerPulseError("horizon_schedule_clock_missing")
+    raw_offsets = capture_clock.get("offsets")
+    if not isinstance(raw_offsets, list):
+        raise Task21OwnerPulseError("horizon_schedule_offsets_missing")
+    offsets = {
+        item.get("window_id"): item.get("offset_seconds")
+        for item in raw_offsets
+        if isinstance(item, dict)
+    }
+    if any(
+        offsets.get(horizon_id) != expected
+        for horizon_id, expected in FROZEN_SENTINEL_OFFSETS_SECONDS.items()
+    ):
+        raise Task21OwnerPulseError("horizon_schedule_offset_drift")
+    if capture_clock.get("anchor") != "FIRST_AUTHORIZED_CAPTURE":
+        raise Task21OwnerPulseError("horizon_schedule_policy_drift")
+    h24_rebase = sentinel_rebase.get("h24_rebase", {})
+    future_rebase = sentinel_rebase.get("future_horizons", {})
+    if (
+        sentinel_rebase.get("atom_id")
+        != "T21-A6S_POST_H6_GAP_SENTINEL_VALUE_REBASE_V1"
+        or sentinel_rebase.get("status")
+        != "FROZEN_FORWARD_ONLY_LOCAL_REPAIR"
+        or h24_rebase.get("horizon_semantics") != "MINIMUM_AGE_24H_PLUS"
+        or h24_rebase.get("latest_at") is not None
+        or h24_rebase.get("narrow_expiry_window_used") is not False
+        or future_rebase.get("mandatory") != []
+        or future_rebase.get("active_time_gates_created") != 0
+    ):
+        raise Task21OwnerPulseError("sentinel_value_rebase_drift")
+
+    windows = h0_receipt.get("h0", {}).get("windows")
+    if not isinstance(windows, list) or len(windows) != 3:
+        raise Task21OwnerPulseError("horizon_schedule_h0_population_drift")
+    trigger_times = [
+        parse_utc(item.get("triggered_at"))
+        for item in windows
+        if isinstance(item, dict)
+    ]
+    if len(trigger_times) != 3:
+        raise Task21OwnerPulseError("horizon_schedule_h0_trigger_drift")
+    anchor = max(trigger_times)
+
+    h24_earliest = anchor + timedelta(
+        seconds=FROZEN_SENTINEL_OFFSETS_SECONDS["H24"]
+    )
+    if (
+        not str(active_gate.get("gate_id", "")).startswith(H24_GATE_PREFIX)
+        or active_gate.get("required_next_atom") != H24_NEXT_ATOM
+        or parse_utc(active_gate.get("earliest_at")) != h24_earliest
+        or active_gate.get("latest_at") is not None
+        or active_gate.get("time_semantics")
+        != "MINIMUM_AGE_NO_EXPIRY_RECORD_ACTUAL_ELAPSED_SECONDS"
+        or evaluated_gate.get("gate_id") != active_gate.get("gate_id")
+    ):
+        raise Task21OwnerPulseError("horizon_schedule_active_gate_drift")
+
+    normalized_as_of = as_of.astimezone(UTC)
+    schedule: list[JsonObject] = []
+    for horizon_id, offset_seconds in FROZEN_SENTINEL_OFFSETS_SECONDS.items():
+        earliest = anchor + timedelta(seconds=offset_seconds)
+        is_active = horizon_id == "H24"
+        schedule.append(
+            {
+                "horizon_id": horizon_id,
+                "state": (
+                    evaluated_gate["state"]
+                    if is_active
+                    else "DEFERRED_TRIGGER_ONLY"
+                ),
+                "source": (
+                    "ACTIVE_TIME_GATE"
+                    if is_active
+                    else "POST_H6_REBASE_CANDIDATE_HORIZON"
+                ),
+                "earliest_at": _format_exact(earliest),
+                "latest_at": None,
+                "earliest_at_msk": _format_exact(earliest, zone=MOSCOW),
+                "latest_at_msk": None,
+                "remaining_seconds": max(
+                    0, int((earliest - normalized_as_of).total_seconds())
+                ),
+                "required_next_atom": FUTURE_HORIZON_ATOMS[horizon_id],
+                "activation_trigger": (
+                    "EXACT_ACTIVE_GATE_PLUS_SEPARATE_USER_AUTHORITY"
+                    if is_active
+                    else "NAMED_NEED_PLUS_FRESH_BUDGET_PLUS_EXACT_AUTHORITY"
+                ),
+                "external_authority_granted": False,
+                "automatic_execution": False,
+            }
+        )
+    return {
+        "status": "H24_MINIMUM_AGE_ACTIVE_H72_H168_TRIGGER_ONLY",
+        "basis": "LATEST_H0_TRIGGER_PLUS_POST_H6_VALUE_REBASE",
+        "h0_anchor_at": _format_exact(anchor),
+        "timing_default": "NOT_BEFORE_PLUS_ACTUAL_ELAPSED_TIME",
+        "narrow_expiry_window_used": False,
+        "scheduler_or_background_process": False,
+        "windows": schedule,
+    }
+
+
 def canonical_json_bytes(value: object) -> bytes:
     return (
         json.dumps(
@@ -122,11 +282,20 @@ def canonical_json_bytes(value: object) -> bytes:
 
 
 def evaluate_time_gate(gate: JsonObject, *, as_of: datetime) -> JsonObject:
-    if gate.get("gate_id") != EXPECTED_GATE_ID:
+    gate_id = gate.get("gate_id")
+    if gate_id == EXPECTED_GATE_ID:
+        expected_next_atom = EXPECTED_NEXT_ATOM
+    elif isinstance(gate_id, str) and gate_id.startswith(H1_GATE_PREFIX):
+        expected_next_atom = H1_NEXT_ATOM
+    elif isinstance(gate_id, str) and gate_id.startswith(H6_GATE_PREFIX):
+        expected_next_atom = H6_NEXT_ATOM
+    elif isinstance(gate_id, str) and gate_id.startswith(H24_GATE_PREFIX):
+        expected_next_atom = H24_NEXT_ATOM
+    else:
         raise Task21OwnerPulseError("unexpected_gate_id")
     if gate.get("task_id") != EXPECTED_TASK_ID:
         raise Task21OwnerPulseError("unexpected_gate_task")
-    if gate.get("required_next_atom") != EXPECTED_NEXT_ATOM:
+    if gate.get("required_next_atom") != expected_next_atom:
         raise Task21OwnerPulseError("unexpected_required_next_atom")
     if any(
         value != 0
@@ -143,7 +312,17 @@ def evaluate_time_gate(gate: JsonObject, *, as_of: datetime) -> JsonObject:
     status = gate.get("status")
 
     if status == "ACTIVE_WAITING":
-        if normalized_as_of >= earliest_at:
+        latest_raw = gate.get("latest_at")
+        latest_at = (
+            None
+            if latest_raw is None
+            else parse_utc(latest_raw)
+        )
+        if latest_at is not None and normalized_as_of > latest_at:
+            state = "MISSED_WINDOW_GAP_CLOSE_REQUIRED"
+            parallel_work_allowed = False
+            owner_action_required = True
+        elif normalized_as_of >= earliest_at:
             state = "DUE_PREEMPT_PARALLEL_WORK"
             parallel_work_allowed = False
             owner_action_required = True
@@ -154,16 +333,28 @@ def evaluate_time_gate(gate: JsonObject, *, as_of: datetime) -> JsonObject:
     elif status == "SUPERSEDED_WITH_EVIDENCE":
         resolution = gate.get("resolution", {})
         boundary = gate.get("effective_next_boundary", {})
+        historical_boundary = (
+            boundary.get("required_next_atom") == CORRECTED_NEXT_ATOM
+            and boundary.get("calendar_wait_required") is False
+        )
+        h0_resolved_boundary = (
+            boundary.get("status") == "RESOLVED_BY_EXACT_H0_RUNTIME_RECEIPT"
+            and boundary.get("required_next_atom") == H1_NEXT_ATOM
+            and boundary.get("calendar_wait_required") is True
+        )
         if (
             resolution.get("disposition")
             != "P7D_EXCLUSIVE_WAIT_SUPERSEDED_FORWARD_ONLY"
-            or boundary.get("required_next_atom") != CORRECTED_NEXT_ATOM
-            or boundary.get("calendar_wait_required") is not False
+            or not (historical_boundary or h0_resolved_boundary)
         ):
             raise Task21OwnerPulseError("invalid_gate_correction")
-        state = "READY_FOR_ADMISSION_AND_CAPTURE_AUTHORITY"
+        state = (
+            "H0_RESOLVED_H1_GATE_OWNS_NEXT"
+            if h0_resolved_boundary
+            else "READY_FOR_ADMISSION_AND_CAPTURE_AUTHORITY"
+        )
         parallel_work_allowed = True
-        owner_action_required = True
+        owner_action_required = not h0_resolved_boundary
     elif status in TERMINAL_GATE_STATES:
         state = status
         parallel_work_allowed = True
@@ -172,7 +363,7 @@ def evaluate_time_gate(gate: JsonObject, *, as_of: datetime) -> JsonObject:
         raise Task21OwnerPulseError("invalid_gate_status")
 
     return {
-        "gate_id": gate["gate_id"],
+        "gate_id": gate_id,
         "source_status": status,
         "state": state,
         "earliest_at": format_utc(earliest_at),
@@ -321,10 +512,20 @@ def build_owner_pulse(
     ]
     if len(matching) != 1:
         raise Task21OwnerPulseError("missing_or_duplicate_active_time_gate")
-    gate_source = matching[0]
+    historical_gate_source = matching[0]
+    active_gates = [
+        item
+        for item in gates
+        if isinstance(item, dict) and item.get("status") == "ACTIVE_WAITING"
+    ]
+    if len(active_gates) > 1:
+        raise Task21OwnerPulseError("multiple_unresolved_active_time_gates")
+    gate_source = (
+        active_gates[0] if active_gates else historical_gate_source
+    )
     gate = evaluate_time_gate(gate_source, as_of=observed_at)
 
-    source_receipt_binding = gate_source.get("source_receipt", {})
+    source_receipt_binding = historical_gate_source.get("source_receipt", {})
     receipt_relative = source_receipt_binding.get("path")
     if not isinstance(receipt_relative, str):
         raise Task21OwnerPulseError("missing_source_receipt_path")
@@ -337,13 +538,14 @@ def build_owner_pulse(
     replay = nomination.get("live_replay_receipt")
     if not isinstance(replay, dict) or replay.get("status") != "PASS":
         raise Task21OwnerPulseError("nomination_receipt_not_pass")
-    if replay.get("t1_close_at") != gate_source.get("earliest_at"):
+    if replay.get("t1_close_at") != historical_gate_source.get("earliest_at"):
         raise Task21OwnerPulseError("t1_close_mismatch")
 
     correction_receipt: JsonObject | None = None
     horizon_policy: JsonObject | None = None
-    if gate_source.get("status") == "SUPERSEDED_WITH_EVIDENCE":
-        resolution = gate_source.get("resolution", {})
+    sentinel_rebase: JsonObject | None = None
+    if historical_gate_source.get("status") == "SUPERSEDED_WITH_EVIDENCE":
+        resolution = historical_gate_source.get("resolution", {})
         receipt_binding = resolution.get("result_receipt", {})
         policy_binding = resolution.get("replacement_policy", {})
         if (
@@ -359,6 +561,7 @@ def build_owner_pulse(
             raise Task21OwnerPulseError("horizon_policy_hash_drift")
         correction_receipt = _load_json(correction_path)
         horizon_policy = _load_yaml(policy_path)
+        sentinel_rebase = _load_yaml(root / SENTINEL_REBASE_RELATIVE_PATH)
         if (
             correction_receipt.get("verdict")
             != "P7D_EXCLUSIVE_WAIT_SUPERSEDED_FORWARD_ONLY"
@@ -387,6 +590,141 @@ def build_owner_pulse(
         "cash_spend_usd_cents",
         actual_actions.get("cash_spend_usd_cents"),
     )
+    h0_receipt: JsonObject | None = None
+    h1_receipt: JsonObject | None = None
+    h6_receipt: JsonObject | None = None
+    h0_panels = 0
+    h0_stored_bytes = 0
+    h0_response_bytes = 0
+    h0_provider_calls = 0
+    h1_gate_sources = [
+        item
+        for item in gates
+        if isinstance(item, dict)
+        and isinstance(item.get("gate_id"), str)
+        and item["gate_id"].startswith(H1_GATE_PREFIX)
+    ]
+    if len(h1_gate_sources) > 1:
+        raise Task21OwnerPulseError("duplicate_h1_gate")
+    if h1_gate_sources:
+        h0_binding = h1_gate_sources[0].get("h0_result_receipt", {})
+        if h0_binding.get("path") != H0_RECEIPT_RELATIVE_PATH:
+            raise Task21OwnerPulseError("h0_receipt_pointer_invalid")
+        h0_path = root / H0_RECEIPT_RELATIVE_PATH
+        if _sha256(h0_path) != h0_binding.get("sha256"):
+            raise Task21OwnerPulseError("h0_receipt_hash_drift")
+        h0_receipt = _load_json(h0_path)
+        if (
+            h0_receipt.get("status") != "PASS"
+            or h0_receipt.get("verdict")
+            != "THREE_REAL_T1_MEMBERS_ADMITTED_AND_H0_CAPTURED"
+        ):
+            raise Task21OwnerPulseError("h0_receipt_not_pass")
+        h0_actions = h0_receipt.get("actual_actions", {})
+        admissions = _validate_non_negative(
+            "h0_real_candidate_admissions",
+            h0_actions.get("real_candidate_admissions"),
+        )
+        h0_panels = _validate_non_negative(
+            "h0_panels_complete",
+            h0_receipt.get("h0", {}).get("panels_complete"),
+        )
+        h0_stored_bytes = _validate_non_negative(
+            "h0_local_stored_bytes",
+            h0_actions.get("local_stored_bytes"),
+        )
+        h0_response_bytes = _validate_non_negative(
+            "h0_received_bytes",
+            h0_receipt.get("h0", {}).get("received_bytes"),
+        )
+        h0_provider_calls = _validate_non_negative(
+            "h0_provider_calls",
+            h0_actions.get("provider_api_rpc_wss_calls"),
+        )
+        external_requests += h0_provider_calls
+        cash_spend += _validate_non_negative(
+            "h0_cash_spend_usd_cents",
+            h0_actions.get("cash_spend_usd_cents"),
+        )
+    h6_gate_sources = [
+        item
+        for item in gates
+        if isinstance(item, dict)
+        and isinstance(item.get("gate_id"), str)
+        and item["gate_id"].startswith(H6_GATE_PREFIX)
+    ]
+    if len(h6_gate_sources) > 1:
+        raise Task21OwnerPulseError("duplicate_h6_gate")
+    if h6_gate_sources:
+        h1_binding = h6_gate_sources[0].get("h1_result_receipt", {})
+        if h1_binding.get("path") != H1_RECEIPT_RELATIVE_PATH:
+            raise Task21OwnerPulseError("h1_receipt_pointer_invalid")
+        h1_path = root / H1_RECEIPT_RELATIVE_PATH
+        if _sha256(h1_path) != h1_binding.get("sha256"):
+            raise Task21OwnerPulseError("h1_receipt_hash_drift")
+        h1_receipt = _load_json(h1_path)
+        if (
+            h1_receipt.get("status") != "PASS"
+            or h1_receipt.get("verdict")
+            != "EXACT_H0_POPULATION_CAPTURED_AT_H1"
+        ):
+            raise Task21OwnerPulseError("h1_receipt_not_pass")
+        h1_actions = h1_receipt.get("actual_actions", {})
+        h1_panels = _validate_non_negative(
+            "h1_panels_complete",
+            h1_receipt.get("h1", {}).get("panels_complete"),
+        )
+        h1_stored_bytes = _validate_non_negative(
+            "h1_local_stored_bytes",
+            h1_actions.get("local_stored_bytes"),
+        )
+        h1_response_bytes = _validate_non_negative(
+            "h1_received_bytes",
+            h1_receipt.get("h1", {}).get("received_bytes"),
+        )
+        h1_provider_calls = _validate_non_negative(
+            "h1_provider_calls",
+            h1_actions.get("provider_api_rpc_wss_calls"),
+        )
+        h0_panels += h1_panels
+        h0_stored_bytes += h1_stored_bytes
+        h0_response_bytes += h1_response_bytes
+        h0_provider_calls += h1_provider_calls
+        external_requests += h1_provider_calls
+        cash_spend += _validate_non_negative(
+            "h1_cash_spend_usd_cents",
+            h1_actions.get("cash_spend_usd_cents"),
+        )
+    if isinstance(gate_source.get("gate_id"), str) and gate_source[
+        "gate_id"
+    ].startswith(H24_GATE_PREFIX):
+        h6_binding = gate_source.get("h6_result_receipt", {})
+        if h6_binding.get("path") != H6_RECEIPT_RELATIVE_PATH:
+            raise Task21OwnerPulseError("h6_receipt_pointer_invalid")
+        h6_path = root / H6_RECEIPT_RELATIVE_PATH
+        if _sha256(h6_path) != h6_binding.get("sha256"):
+            raise Task21OwnerPulseError("h6_receipt_hash_drift")
+        h6_receipt = _load_json(h6_path)
+        if (
+            h6_receipt.get("status") != "PASS"
+            or h6_receipt.get("verdict")
+            != "H6_EXPLICIT_GAP_RECORDED_NO_BACKFILL"
+            or h6_receipt.get("h6", {}).get("status") != "GAP"
+        ):
+            raise Task21OwnerPulseError("h6_receipt_not_gap_pass")
+        h6_actions = h6_receipt.get("actual_actions", {})
+        h0_stored_bytes += _validate_non_negative(
+            "h6_local_stored_bytes",
+            h6_actions.get("local_stored_bytes"),
+        )
+        external_requests += _validate_non_negative(
+            "h6_provider_calls",
+            h6_actions.get("provider_api_rpc_wss_calls"),
+        )
+        cash_spend += _validate_non_negative(
+            "h6_cash_spend_usd_cents",
+            h6_actions.get("cash_spend_usd_cents"),
+        )
 
     run_plan_path = root / "configs" / "task21_forward_collection_run_plan_v1.yaml"
     run_plan = _load_yaml(run_plan_path)
@@ -399,20 +737,24 @@ def build_owner_pulse(
     if external_requests > max_requests:
         raise Task21OwnerPulseError("external_request_cap_exceeded")
 
-    recovery_path = (
-        root
-        / "docs"
-        / "evidence"
-        / "task21"
-        / "runtime_recovery_gate_receipt_v1.json"
-    )
+    recovery_path = root / PRE_H24_RECOVERY_RELATIVE_PATH
     recovery = _load_json(recovery_path)
     if recovery.get("verdict") != "PASS":
         raise Task21OwnerPulseError("runtime_recovery_receipt_not_pass")
-    remote_backup = replay.get("google_drive", {})
+    current_recovery_pointer = gate_source.get("recovery_prerequisite", {}).get(
+        "result_receipt", {}
+    )
+    if (
+        current_recovery_pointer.get("path") != PRE_H24_RECOVERY_RELATIVE_PATH
+        or current_recovery_pointer.get("sha256") != _sha256(recovery_path)
+    ):
+        raise Task21OwnerPulseError("current_recovery_receipt_pointer_drift")
+    remote_backup = recovery.get("google_drive", {})
     raw_readback = remote_backup.get("raw_readback", {})
     exact_backup_readback = bool(raw_readback.get("complete_byte_identity"))
-    latest_backup_at = parse_utc(remote_backup["created_time"])
+    latest_backup_at = parse_utc(
+        recovery["health"]["last_successful_backup_at"]
+    )
     latest_restore_at = parse_utc(
         recovery["health"]["last_successful_restore_at"]
     )
@@ -424,7 +766,9 @@ def build_owner_pulse(
         restore_ok=bool(recovery["isolated_restore"]["completed_at"]),
     )
 
-    partition_binding = gate_source.get("frozen_replay_partition", {})
+    partition_binding = historical_gate_source.get(
+        "frozen_replay_partition", {}
+    )
     partition_relative = partition_binding.get("path")
     if not isinstance(partition_relative, str):
         raise Task21OwnerPulseError("missing_partition_path")
@@ -450,14 +794,52 @@ def build_owner_pulse(
         "bot_instances": _registry_count(root, "registries/bot_instances.yaml"),
     }
     production_memory = _production_memory_binding(root, hypothesis)
+    if horizon_policy is None or sentinel_rebase is None or h0_receipt is None:
+        raise Task21OwnerPulseError("observation_schedule_inputs_unavailable")
+    observation_schedule = build_observation_schedule(
+        horizon_policy=horizon_policy,
+        sentinel_rebase=sentinel_rebase,
+        h0_receipt=h0_receipt,
+        active_gate=gate_source,
+        evaluated_gate=gate,
+        as_of=observed_at,
+    )
 
     attention: list[JsonObject] = []
     if gate["state"] == "DUE_PREEMPT_PARALLEL_WORK":
         attention.append(
             {
                 "severity": "CRITICAL",
-                "code": "TASK21_T1_CLOSE_DUE",
-                "action": EXPECTED_NEXT_ATOM,
+                "code": (
+                    "TASK21_H24_CAPTURE_DUE"
+                    if gate["gate_id"].startswith(H24_GATE_PREFIX)
+                    else (
+                        "TASK21_H6_CAPTURE_DUE"
+                        if gate["gate_id"].startswith(H6_GATE_PREFIX)
+                        else (
+                        "TASK21_H1_CAPTURE_DUE"
+                        if gate["gate_id"].startswith(H1_GATE_PREFIX)
+                        else "TASK21_T1_CLOSE_DUE"
+                        )
+                    )
+                ),
+                "action": gate["required_next_atom"],
+            }
+        )
+    if gate["state"] == "MISSED_WINDOW_GAP_CLOSE_REQUIRED":
+        attention.append(
+            {
+                "severity": "CRITICAL",
+                "code": (
+                    "TASK21_H24_WINDOW_MISSED"
+                    if gate["gate_id"].startswith(H24_GATE_PREFIX)
+                    else (
+                        "TASK21_H6_WINDOW_MISSED"
+                        if gate["gate_id"].startswith(H6_GATE_PREFIX)
+                        else "TASK21_H1_WINDOW_MISSED"
+                    )
+                ),
+                "action": gate["required_next_atom"],
             }
         )
     if gate["state"] == "READY_FOR_ADMISSION_AND_CAPTURE_AUTHORITY":
@@ -488,26 +870,56 @@ def build_owner_pulse(
         attention.append(
             {
                 "severity": "INFO",
-                "code": "TASK21_T1_FORWARD_WAIT_ACTIVE",
+                "code": (
+                    "TASK21_H24_FORWARD_WAIT_ACTIVE"
+                    if gate["gate_id"].startswith(H24_GATE_PREFIX)
+                    else (
+                        "TASK21_H6_FORWARD_WAIT_ACTIVE"
+                        if gate["gate_id"].startswith(H6_GATE_PREFIX)
+                        else (
+                        "TASK21_H1_FORWARD_WAIT_ACTIVE"
+                        if gate["gate_id"].startswith(H1_GATE_PREFIX)
+                        else "TASK21_T1_FORWARD_WAIT_ACTIVE"
+                        )
+                    )
+                ),
                 "action": "NON_INTERFERING_PARALLEL_WORK_ONLY",
             }
         )
 
     pulse: JsonObject = {
         "schema": "smial.task21.owner-pulse",
-        "schema_version": "1.2",
+        "schema_version": "1.7",
         "read_model_id": "OWNER-PULSE-T21-001",
         "task_id": EXPECTED_TASK_ID,
-        "atom_id": "T21-P2R_OWNER_PULSE_PRODUCTION_MEMORY_BINDING_V1",
+        "atom_id": "T21-P4_MULTI_HORIZON_OWNER_SCHEDULE_V1",
         "as_of": format_utc(observed_at),
         "truth_ownership": "DERIVED_READ_MODEL_ONLY",
         "attention": attention,
         "active_time_gates": [gate],
+        "observation_schedule": observation_schedule,
         "task21_forward_state": {
             "state": (
-                "T1_NOMINATIONS_READY_FOR_ADMISSION_AND_CAPTURE_AUTHORITY"
-                if correction_receipt is not None
-                else replay["verdict"]
+                {
+                    "WAITING_PARALLEL_WORK_ALLOWED": (
+                        "H24_WAITING" if h6_receipt is not None else
+                        ("H6_WAITING" if h1_receipt is not None else "H1_WAITING")
+                    ),
+                    "DUE_PREEMPT_PARALLEL_WORK": (
+                        "H24_CAPTURE_DUE" if h6_receipt is not None else
+                        ("H6_CAPTURE_DUE" if h1_receipt is not None else "H1_CAPTURE_DUE")
+                    ),
+                    "MISSED_WINDOW_GAP_CLOSE_REQUIRED": (
+                        "H24_MISSED_GAP_CLOSE_REQUIRED" if h6_receipt is not None else
+                        ("H6_MISSED_GAP_CLOSE_REQUIRED" if h1_receipt is not None else "H1_MISSED_GAP_CLOSE_REQUIRED")
+                    ),
+                }.get(gate["state"], gate["state"])
+                if h0_receipt is not None
+                else (
+                    "T1_NOMINATIONS_READY_FOR_ADMISSION_AND_CAPTURE_AUTHORITY"
+                    if correction_receipt is not None
+                    else replay["verdict"]
+                )
             ),
             "t1_anchor_at": replay["anchor_at"],
             "t1_close_at": replay["t1_close_at"],
@@ -518,21 +930,52 @@ def build_owner_pulse(
                 else None
             ),
             "next_capture_wait_required": (
-                None
-                if horizon_policy is None
-                else horizon_policy["next_boundary"]["calendar_wait_required"]
+                gate["state"] == "WAITING_PARALLEL_WORK_ALLOWED"
+                if h0_receipt is not None
+                else (
+                    None
+                    if horizon_policy is None
+                    else horizon_policy["next_boundary"][
+                        "calendar_wait_required"
+                    ]
+                )
             ),
             "real_nominations": nomination_count,
             "real_admissions": admissions,
-            "panels_captured": 0,
+            "panels_captured": h0_panels,
             "local_replay_partition_present": partition_present,
             "local_replay_partition_identity_ok": partition_identity_ok,
             "local_dataset_bytes": (
-                partition_binding["bytes"] if partition_identity_ok else 0
+                (partition_binding["bytes"] if partition_identity_ok else 0)
+                + h0_stored_bytes
             ),
-            "coverage_by_required_field": "NOT_AVAILABLE_BEFORE_PANEL_CAPTURE",
-            "missingness_by_required_field": "NOT_AVAILABLE_BEFORE_PANEL_CAPTURE",
-            "freshness_by_required_field": "NOT_AVAILABLE_BEFORE_PANEL_CAPTURE",
+            "coverage_by_required_field": (
+                "H0_H1_6_OF_9_CAPTURED_H6_EXPLICIT_GAP_DETAILS_SEALED"
+                if h6_receipt is not None
+                else "H0_H1_6_OF_6_CAPTURED_DETAILS_SEALED"
+                if h1_receipt is not None
+                else (
+                    "H0_3_OF_3_CAPTURED_DETAILS_SEALED"
+                    if h0_receipt is not None
+                    else "NOT_AVAILABLE_BEFORE_PANEL_CAPTURE"
+                )
+            ),
+            "missingness_by_required_field": (
+                "H6_THREE_PANELS_MISSING_EXPLICIT_GAP_NO_BACKFILL"
+                if h6_receipt is not None
+                else "H0_H1_NO_MISSING_PANELS"
+                if h1_receipt is not None
+                else (
+                    "H0_NO_MISSING_PANELS"
+                    if h0_receipt is not None
+                    else "NOT_AVAILABLE_BEFORE_PANEL_CAPTURE"
+                )
+            ),
+            "freshness_by_required_field": (
+                gate["state"]
+                if h0_receipt is not None
+                else "NOT_AVAILABLE_BEFORE_PANEL_CAPTURE"
+            ),
         },
         "hypothesis_factory_state": {
             "runtime_binding": {
@@ -558,7 +1001,17 @@ def build_owner_pulse(
         },
         "recovery_and_storage": {
             **recovery_health,
-            "last_closed_partition_at": None,
+            "last_closed_partition_at": (
+                None
+                if h0_receipt is None
+                else (
+                    h6_receipt.get("completed_at")
+                    if h6_receipt is not None
+                    else h1_receipt.get("completed_at")
+                    if h1_receipt is not None
+                    else h0_receipt.get("completed_at")
+                )
+            ),
             "last_successful_backup_at": format_utc(latest_backup_at),
             "last_successful_backup_sha256": raw_readback.get("sha256"),
             "backup_readback_status": (
@@ -571,12 +1024,28 @@ def build_owner_pulse(
         "cost_and_authority": {
             "provider_or_source_requests_used": external_requests,
             "provider_or_source_requests_cap": max_requests,
-            "provider_credits_used": 0,
+            "provider_credits_used": h0_provider_calls,
             "provider_credits_cap": caps.get("max_provider_credits"),
-            "provider_credit_claim": "NO_BILLED_CREDITS_EVIDENCED",
-            "response_bytes_used": None,
+            "provider_credit_claim": (
+                "MODELED_ONLY_NO_BILLED_CREDIT_CLAIM"
+                if h0_receipt is not None
+                else "NO_BILLED_CREDITS_EVIDENCED"
+            ),
+            "response_bytes_used": (
+                h0_response_bytes if h0_receipt is not None else None
+            ),
             "response_bytes_cap": caps.get("max_response_bytes"),
-            "response_bytes_state": "NOT_RECONCILED_BY_CURRENT_RECEIPT",
+            "response_bytes_state": (
+                "H0_H1_RECEIPTS_RECONCILED_H6_GAP_RETAINED"
+                if h6_receipt is not None
+                else "H0_H1_RECEIPTS_RECONCILED"
+                if h1_receipt is not None
+                else (
+                    "H0_RECEIPT_RECONCILED"
+                    if h0_receipt is not None
+                    else "NOT_RECONCILED_BY_CURRENT_RECEIPT"
+                )
+            ),
             "cash_spend_usd_cents": cash_spend,
             "credentials_used": 0,
             "wallet_signer_transaction_actions": 0,
@@ -595,14 +1064,27 @@ def build_owner_pulse(
                 [
                     _source_entry(root, CORRECTION_RECEIPT_RELATIVE_PATH),
                     _source_entry(root, HORIZON_POLICY_RELATIVE_PATH),
+                    _source_entry(root, SENTINEL_REBASE_RELATIVE_PATH),
                 ]
                 if correction_receipt is not None
                 else []
             ),
-            _source_entry(
-                root,
-                "docs/evidence/task21/runtime_recovery_gate_receipt_v1.json",
+            *(
+                [_source_entry(root, H0_RECEIPT_RELATIVE_PATH)]
+                if h0_receipt is not None
+                else []
             ),
+            *(
+                [_source_entry(root, H1_RECEIPT_RELATIVE_PATH)]
+                if h1_receipt is not None
+                else []
+            ),
+            *(
+                [_source_entry(root, H6_RECEIPT_RELATIVE_PATH)]
+                if h6_receipt is not None
+                else []
+            ),
+            _source_entry(root, PRE_H24_RECOVERY_RELATIVE_PATH),
             _source_entry(
                 root,
                 "configs/task21_forward_collection_run_plan_v1.yaml",
@@ -636,6 +1118,7 @@ def render_owner_pulse_text(pulse: JsonObject) -> str:
     factory = pulse["hypothesis_factory_state"]
     memory = factory["production_hypothesis_memory"]
     registry = factory["legacy_lifecycle_registries"]["counts"]
+    schedule = pulse["observation_schedule"]
     lines = [
         "TASK-21 OWNER PULSE",
         f"Срез: {pulse['as_of']}",
@@ -650,9 +1133,20 @@ def render_owner_pulse_text(pulse: JsonObject) -> str:
         [
             "",
             (
-                f"T1: {gate['state']}; original_p7d={gate['earliest_at']}; "
+                f"TASK-21 forward: {task['state']}; gate={gate['state']}; "
+                f"earliest={gate['earliest_at']}; "
                 f"remaining_seconds={gate['remaining_seconds']}"
             ),
+            "Расписание наблюдений (MSK):",
+            *[
+                (
+                    f"- {item['horizon_id']}: {item['state']}; "
+                    f"not_before={item['earliest_at_msk']}; "
+                    "expires=NO; "
+                    f"action={item['required_next_atom']}"
+                )
+                for item in schedule["windows"]
+            ],
             (
                 f"Кандидаты: nominations={task['real_nominations']}, "
                 f"admissions={task['real_admissions']}, "

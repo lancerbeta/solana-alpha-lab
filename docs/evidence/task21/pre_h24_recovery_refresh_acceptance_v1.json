@@ -1,0 +1,171 @@
+{
+  "schema": "smial.task21.pre-h24-recovery-refresh-acceptance",
+  "schema_version": "1.0",
+  "evidence_id": "EVIDENCE-T21-PRE-H24-RECOVERY-REFRESH-001",
+  "evidence_version": "1.0",
+  "task_id": "TASK-21",
+  "atom_id": "T21-A6S_PRE_H24_RECOVERY_REFRESH_AND_CAPTURE_PREP_V1",
+  "status": "ACCEPTED_LOCAL_CANDIDATE",
+  "as_of": "2026-07-31T14:30:38.3960375Z",
+  "verdict": "PASS",
+  "satisfied_evidence": [
+    "EXACT_H0_H1_H6_GAP_SOURCE_INVENTORY",
+    "CREATE_ONLY_CONTENT_ADDRESSED_ARCHIVE",
+    "PRIVATE_SEPARATE_FAILURE_DOMAIN_DESTINATION",
+    "EXACT_REMOTE_RAW_READBACK_SHA256",
+    "ISOLATED_FULL_ARCHIVE_RESTORE",
+    "SOURCE_IMMUTABILITY_REVALIDATED",
+    "H24_CAPTURE_RECOVERY_PREREQUISITE"
+  ],
+  "artifacts": [
+    {
+      "path": "configs/task21_pre_h24_recovery_refresh_v1.yaml",
+      "bytes": 1947,
+      "sha256": "66d803f7b49817954d9bc6db650672f4b03cbda3bcade6c183cf3859e63b2cd8"
+    },
+    {
+      "path": "docs/contracts/task21_pre_h24_recovery_refresh_contract_v1.md",
+      "bytes": 1679,
+      "sha256": "d6fafa2a0371b5a7c4d00553aea4e4d5c29ae718f0e97c724d075eb552735ba4"
+    },
+    {
+      "path": "src/solana_alpha_lab/task21_forward_recovery.py",
+      "bytes": 10553,
+      "sha256": "a69e8c0b078c5504356208f568a69303df60a3daffeaa1f8c5482c72750f13c0"
+    },
+    {
+      "path": "scripts/prepare_task21_pre_h24_backup.py",
+      "bytes": 2960,
+      "sha256": "40e9591828b54787b4ff46c2e48bd33395093f0021c327843e3a45f59efa38c6"
+    },
+    {
+      "path": "tests/test_task21_forward_recovery.py",
+      "bytes": 5766,
+      "sha256": "765c885a7ee66c56b6050e8aa6135458378d8bd22eda3893760fd4f8443ac592"
+    }
+  ],
+  "source_inventory": {
+    "roots": [
+      "local/task21_forward/h0_capture/run=h0-20260731T074954402486Z-78d2d1b62d99",
+      "local/task21_forward/h1_capture/run=h1-20260731T085510551069Z-b7664a106ef0",
+      "local/task21_forward/h6_capture/run=h6-gap-44fc071623e5ed6c"
+    ],
+    "file_count": 23,
+    "stored_bytes": 270498,
+    "inventory_sha256": "f6ac1365804a6e06a0fbd9a2a89a8f8917a90bab538acd13e17ff305c548d6ad",
+    "contains_raw_market_data": true,
+    "contains_secrets": false
+  },
+  "archive": {
+    "local_path": "local/task21_recovery/pre_h24/package/TASK21_H0_H1_H6_FORWARD_BACKUP_v1_ff0994d0182c0886ef293af4768e0a96af9742c077b922d1e7dd830b257ff721.zip",
+    "filename": "TASK21_H0_H1_H6_FORWARD_BACKUP_v1_ff0994d0182c0886ef293af4768e0a96af9742c077b922d1e7dd830b257ff721.zip",
+    "mime_type": "application/zip",
+    "bytes": 285142,
+    "sha256": "ff0994d0182c0886ef293af4768e0a96af9742c077b922d1e7dd830b257ff721",
+    "md5": "ab22cadcd15dca86829036c4a2b752df",
+    "zip_compression": "STORED",
+    "fixed_entry_metadata": true,
+    "content_addressed": true,
+    "create_only": true
+  },
+  "google_drive": {
+    "connector_operations": 9,
+    "operation_breakdown": {
+      "folder_metadata_reads": 2,
+      "exact_name_searches": 1,
+      "upload_attempts": 2,
+      "successful_file_creations": 1,
+      "authorization_rejections_before_write": 1,
+      "raw_fetches": 4
+    },
+    "folder": {
+      "id": "1EISgmsB8nt2pkU4uBUO6Sav1Fzbo6Hw3",
+      "name": "SOLANA_ALPHA_LAB_TASK21_RECOVERY_V1",
+      "mime_type": "application/vnd.google-apps.folder",
+      "owner": "bakuczmarianna566@gmail.com",
+      "shared": false,
+      "visibility": "not_shared",
+      "url": "https://drive.google.com/drive/folders/1EISgmsB8nt2pkU4uBUO6Sav1Fzbo6Hw3"
+    },
+    "pre_create_exact_name_search": {
+      "result": "ABSENT",
+      "collision": false
+    },
+    "file": {
+      "id": "1dQDC9fHSaDo8fOEJXm5Ecs3pF_ghLBRv",
+      "name": "TASK21_H0_H1_H6_FORWARD_BACKUP_v1_ff0994d0182c0886ef293af4768e0a96af9742c077b922d1e7dd830b257ff721.zip",
+      "mime_type": "application/zip",
+      "size": 285142,
+      "parent_folder_id": "1EISgmsB8nt2pkU4uBUO6Sav1Fzbo6Hw3",
+      "created_time": "2026-07-31T14:28:15.051Z",
+      "modified_time": "2026-07-31T14:28:15.051Z",
+      "url": "https://drive.google.com/file/d/1dQDC9fHSaDo8fOEJXm5Ecs3pF_ghLBRv/view?usp=drivesdk"
+    },
+    "raw_readback": {
+      "stream_reference_observed": true,
+      "bounded_legacy_inline_readback_used_for_exact_hash": true,
+      "decoded_bytes": 285142,
+      "sha256": "ff0994d0182c0886ef293af4768e0a96af9742c077b922d1e7dd830b257ff721",
+      "complete_byte_identity": true
+    },
+    "file_updates": 0,
+    "deletions": 0,
+    "sharing_changes": 0
+  },
+  "isolated_restore": {
+    "logical_root": "local/task21_recovery/pre_h24/isolated_restore/ff0994d0182c0886ef293af4768e0a96af9742c077b922d1e7dd830b257ff721/drive-readback-proof",
+    "completed_at": "2026-07-31T14:30:38.3960375Z",
+    "archive_materialization": "LOCAL_CONTENT_ADDRESS_EQUAL_TO_REMOTE_RAW_READBACK_SHA256",
+    "archive_sha256": "ff0994d0182c0886ef293af4768e0a96af9742c077b922d1e7dd830b257ff721",
+    "restored_file_count": 23,
+    "restored_stored_bytes": 270498,
+    "restored_inventory_sha256": "f6ac1365804a6e06a0fbd9a2a89a8f8917a90bab538acd13e17ff305c548d6ad",
+    "source_unchanged": true,
+    "source_mutations": 0,
+    "source_deletions": 0
+  },
+  "health": {
+    "observed_at": "2026-07-31T14:30:38.3960375Z",
+    "last_successful_backup_at": "2026-07-31T14:28:15.051Z",
+    "last_successful_restore_at": "2026-07-31T14:30:38.3960375Z",
+    "health_state": "HEALTHY",
+    "alerts": [],
+    "backup_age_hours": 0.039818,
+    "restore_proof_age_hours": 0.0,
+    "h24_capture_recovery_gate_allowed": true,
+    "h24_provider_authority_granted": false,
+    "dataset_freeze_allowed": false,
+    "dataset_promotion_allowed": false
+  },
+  "source_mutations": 0,
+  "source_deletions": 0,
+  "candidate_admissions": 0,
+  "collector_executions": 0,
+  "forward_raw_or_dataset_writes": 0,
+  "provider_api_rpc_wss_calls": 0,
+  "provider_credits": 0,
+  "cash_spend_usd_cents": 0,
+  "wallet_signer_transaction_actions": 0,
+  "dependency_changes": 0,
+  "commit": false,
+  "push": false,
+  "pull_request": false,
+  "merge": false,
+  "destructive_actions": false,
+  "non_claims": [
+    "NO_H24_PROVIDER_CAPTURE_EXECUTED",
+    "NO_H6_GAP_BACKFILLED_OR_REWRITTEN",
+    "NO_TRADE_OR_SWAP_EXECUTED",
+    "NO_FILL_POSITION_PNL_OR_ALPHA_CLAIM",
+    "NO_DATASET_SUFFICIENCY_OR_PROMOTION_CLAIM",
+    "NO_A7_CATALOG_TRANSACTION"
+  ],
+  "next_boundary": {
+    "atom_id": "T21-A6S_H24_FOREGROUND_CAPTURE_V1",
+    "earliest_at": "2026-08-01T07:50:34.414367Z",
+    "latest_at": "2026-08-01T08:00:34.414367Z",
+    "provider_api_rpc_wss_calls_authorized": false,
+    "exact_user_gate_required_inside_window": true,
+    "after_window": "EXPLICIT_GAP_ONLY_NO_BACKFILL"
+  }
+}

@@ -1,0 +1,182 @@
+{
+  "schema": "smial.task21.h0-admission-capture-runtime-acceptance",
+  "schema_version": "1.0",
+  "evidence_id": "EVIDENCE-T21-H0-RUNTIME-001",
+  "evidence_version": "1.0",
+  "task_id": "TASK-21",
+  "atom_id": "T21-A6S_BOUNDED_ADMISSION_AND_MULTI_HORIZON_CAPTURE_V1",
+  "stage_id": "H0_ADMISSION_AND_CAPTURE",
+  "completed_at": "2026-07-31T07:50:34.414367Z",
+  "status": "PASS",
+  "verdict": "THREE_REAL_T1_MEMBERS_ADMITTED_AND_H0_CAPTURED",
+  "authority": {
+    "source": "EXPLICIT_USER",
+    "exact_phrase": "T21-A6S_BOUNDED_ADMISSION_AND_MULTI_HORIZON_CAPTURE_V1",
+    "stage": "H0_ONLY",
+    "provider_api_rpc_wss_calls_max": 24,
+    "real_candidate_admissions_max": 3,
+    "local_live_windows_max": 3,
+    "durable_local_bytes_max": 16777216,
+    "drive_reads": 0,
+    "drive_writes": 0,
+    "credential_use": 0,
+    "cash_spend_usd_cents": 0,
+    "scheduler_or_background_process": false,
+    "wallet_signer_transaction_actions": 0
+  },
+  "artifacts": [
+    {
+      "path": "docs/contracts/task21_bounded_admission_multi_horizon_capture_contract_v1.md",
+      "sha256": "7502e8a55508958f53a84dca163d1834fbe39a6d4dd4a31fa9eba74c436ed5af"
+    },
+    {
+      "path": "configs/task21_bounded_admission_multi_horizon_capture_v1.yaml",
+      "sha256": "760889c4b48f21a466ef3d153bdf5d09eaabd37e3d438134dffe2159eece25c5"
+    },
+    {
+      "path": "src/solana_alpha_lab/task21_multi_horizon_capture.py",
+      "sha256": "046c7cdd4f739e941bea046521e0a3613f2ca86ce4c06de1a43ba895d11e6fa4"
+    },
+    {
+      "path": "scripts/run_task21_h0_capture.py",
+      "sha256": "9a7217a3f062e0d4578738e6e4a28c6eaf72be49c2f728fbd7f4b90e36f146d1"
+    },
+    {
+      "path": "tests/test_task21_multi_horizon_capture.py",
+      "sha256": "ae36d99cd03daa121e435e765ecbc77e23b66968b33bd1717b29b10e2333b2a7"
+    },
+    {
+      "path": "docs/evidence/task21/bounded_admission_multi_horizon_capture_offline_acceptance_v1.json",
+      "sha256": "aab546d1d5924ad30297036fc7a039a0daa9832538d63721597409fa7cfda1bb"
+    }
+  ],
+  "preflight": {
+    "recovery_receipt_sha256": "b30081d22dafaf7c4a6d7c1d1aa952bdee48df504773c4264702b639d7cd8013",
+    "recovery_health": "HEALTHY",
+    "backup_age_hours_at_start": 21.928428,
+    "restore_age_hours_at_start": 21.899371,
+    "output_collision": false,
+    "disk_pressure_blocked": false,
+    "free_bytes_before_start": 189882490880,
+    "protected_input_hashes": "PASS",
+    "offline_targeted_tests": "9/9 PASS"
+  },
+  "admission": {
+    "admitted_at": "2026-07-31T07:49:54.402486Z",
+    "evaluated_nominations": 3,
+    "real_candidate_admissions": 3,
+    "member_ids": [
+      "T21-WATCH-4646910e9ea14e84d646",
+      "T21-WATCH-7bfebd2c448c165d7527",
+      "T21-WATCH-5630c96c741142a47a23"
+    ],
+    "nomination_event_ids": [
+      "T21-T1-NOM-001-6811ca3f8cb4",
+      "T21-T1-NOM-002-ef6fdb999175",
+      "T21-T1-NOM-003-30c93ce12a90"
+    ],
+    "admission_events_sha256": "8132418e90aea9871663a2b578db088a125e23733a562e6669b2cd22b3160e3a",
+    "admission_receipt_sha256": "ba3199fcd9d06527ef00231b0bd11c7de64b87304262135d43d7e86581d7a054",
+    "persisted_before_first_provider_call": true,
+    "outcome_or_route_input_used": false,
+    "original_future_close_used_as_entered_at": false
+  },
+  "h0": {
+    "panels_complete": 3,
+    "panels_stopped": 0,
+    "provider_calls": 24,
+    "modeled_provider_credits": 24,
+    "provider_billed_credit_claim": "NOT_AVAILABLE_KEYLESS_NO_ACCOUNT",
+    "received_bytes": 36817,
+    "raw_rows": 24,
+    "terminal_counts": {
+      "QUOTE_AVAILABLE": 24
+    },
+    "windows": [
+      {
+        "member_id": "T21-WATCH-4646910e9ea14e84d646",
+        "window_id": "T21-WATCH-4646910e9ea14e84d646-H0",
+        "triggered_at": "2026-07-31T07:49:54.431372Z",
+        "provider_calls": 8,
+        "raw_events_sha256": "a41d49b756511256132fd6c4f032203a80d345e444bb3498bc33271b14f82665",
+        "manifest_sha256": "8f38eea773ec32569d56ee607a847ebd5130d6db185f839b6cb39ab3df999728",
+        "receipt_sha256": "929436eaf3a4adcf052aaa64e60d29c4cf7162b321b83b5ceacf1892b8b6c1e9"
+      },
+      {
+        "member_id": "T21-WATCH-7bfebd2c448c165d7527",
+        "window_id": "T21-WATCH-7bfebd2c448c165d7527-H0",
+        "triggered_at": "2026-07-31T07:50:15.761730Z",
+        "provider_calls": 8,
+        "raw_events_sha256": "c79ec73b52a527e3831689d5c4b81bd28e777120d49ae45a6307e7965cde91fd",
+        "manifest_sha256": "8b4c4aa02f7f5ea854f75170959a0b430fc7bf5602d6f20890dbb88d1285e259",
+        "receipt_sha256": "13e6477001edd222004e65144f06ddd7d2cb7deaab9451ab2d56fd21278fa95f"
+      },
+      {
+        "member_id": "T21-WATCH-5630c96c741142a47a23",
+        "window_id": "T21-WATCH-5630c96c741142a47a23-H0",
+        "triggered_at": "2026-07-31T07:50:34.414367Z",
+        "provider_calls": 8,
+        "raw_events_sha256": "d7de833b326cddb7498d1d6ad9a12ac13be592239a88fb614973fdb2327beeeb",
+        "manifest_sha256": "bcd7cb14a74f793cc1731259cc9e394a07402771984a2f5bb44698b635a5f7e4",
+        "receipt_sha256": "9c83cfebbfeb9f44b04c3ee297ec1626186f565f787818c13f85ec2a3b663848"
+      }
+    ]
+  },
+  "local_create_only_evidence": {
+    "root": "local/task21_forward/h0_capture/run=h0-20260731T074954402486Z-78d2d1b62d99",
+    "tracked_in_git": false,
+    "files": 12,
+    "stored_bytes": 140414,
+    "runtime_receipt_sha256": "a815653f3f9f7ef8e9ad5916fd131c6b4a072da00e265a2f2fc5758529498c67",
+    "exact_hash_readback": true,
+    "secret_pattern_hits": 0
+  },
+  "actual_actions": {
+    "provider_api_rpc_wss_calls": 24,
+    "modeled_provider_credits": 24,
+    "real_candidate_admissions": 3,
+    "local_live_windows": 3,
+    "local_stored_bytes": 140414,
+    "drive_reads": 0,
+    "drive_writes": 0,
+    "credentials_used": 0,
+    "cash_spend_usd_cents": 0,
+    "scheduler_or_background_process": false,
+    "wallet_signer_transaction_actions": 0
+  },
+  "backup": {
+    "status": "PENDING_WITHIN_RECOVERY_WINDOW",
+    "destination_folder_id": "1EISgmsB8nt2pkU4uBUO6Sav1Fzbo6Hw3",
+    "due_at": "2026-08-01T07:50:34.414367Z",
+    "performed_in_h0": false,
+    "drive_authority_granted_by_h0": false
+  },
+  "next_boundary": {
+    "gate_id": "TASK21-H1-2026-07-31T08-50-34Z",
+    "atom_id": "T21-A6S_H1_FOREGROUND_CAPTURE_V1",
+    "status": "ACTIVE_WAITING_NOT_AUTHORIZED",
+    "earliest_at": "2026-07-31T08:50:34.414367Z",
+    "latest_at": "2026-07-31T09:00:34.414367Z",
+    "calendar_wait_required": true,
+    "provider_api_rpc_wss_calls_authorized": false,
+    "missed_window_policy": "RETAIN_EXPLICIT_GAP_NO_BACKFILL"
+  },
+  "outcome_blindness": {
+    "hypothesis_outcome_unsealed": false,
+    "cost_curve_or_token_rank_published": false,
+    "tuning_during_capture": false
+  },
+  "non_claims": [
+    "NO_TRADE_OR_SWAP_EXECUTED",
+    "NO_FILL_POSITION_PNL_OR_ALPHA_CLAIM",
+    "NO_MARKET_WIDE_GENERALIZATION",
+    "NO_H1_H6_H24_H72_OR_H168_EXECUTED",
+    "NO_DRIVE_BACKUP_PERFORMED_IN_H0",
+    "NO_A7_CATALOG_TRANSACTION"
+  ],
+  "catalog": {
+    "status": "CATALOG_TRANSACTION_PENDING_T21_A7",
+    "version_or_count_advanced": false
+  },
+  "state_change": "TASK21_REAL_ADMISSIONS_3_H0_PANELS_3"
+}

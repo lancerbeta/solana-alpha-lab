@@ -1,8 +1,73 @@
 {
   "schema": "smial.active-time-gates",
   "schema_version": "1.0",
-  "as_of": "2026-07-30T22:30:02.046Z",
+  "as_of": "2026-07-31T17:48:15.5501529Z",
   "contains_secrets": false,
+  "resume_router": {
+    "router_id": "TASK21-DURABLE-RESUME-ROUTER-001",
+    "router_version": "1.0",
+    "task_id": "TASK-21",
+    "status": "ACTIVE_LOCAL_CHECKOUT",
+    "entry_rule": "READ_MARKER_THEN_RUN_OWNER_PULSE_BEFORE_TASK21_CONTINUATION",
+    "read_only_command": [
+      "uv",
+      "run",
+      "--locked",
+      "--managed-python",
+      "python",
+      "-B",
+      "scripts/show_task21_owner_pulse.py",
+      "--json"
+    ],
+    "required_sequence": [
+      "READ_REPOSITORY_AGENTS",
+      "READ_ACTIVE_TIME_GATE_MARKER",
+      "RUN_OWNER_PULSE_READ_ONLY",
+      "IF_ANY_GATE_IS_DUE_ROUTE_EXACT_REQUIRED_NEXT_ATOM_BEFORE_NEW_MUTATION",
+      "OTHERWISE_RESUME_ONLY_EXPLICITLY_AUTHORIZED_NON_INTERFERING_WORK"
+    ],
+    "due_gate_precedence": "AT_OR_AFTER_EARLIEST_AT_ROUTE_REQUIRED_NEXT_ATOM_BEFORE_NEW_MUTATION",
+    "active_gate_id": "TASK21-H24-2026-08-01T07-50-34Z",
+    "fallback_read_set": [
+      "control/active_time_gates.json",
+      "configs/task21_owner_pulse_read_model_v1.yaml",
+      "scripts/show_task21_owner_pulse.py"
+    ],
+    "binding": {
+      "config": {
+        "path": "configs/task21_durable_resume_router_binding_v1.yaml",
+        "sha256": "c57562bfa23365afa641ff3e333b0edea168c5e1ad7509d3fd001273a5a4672d"
+      },
+      "contract": {
+        "path": "docs/contracts/task21_durable_resume_router_binding_contract_v1.md",
+        "sha256": "3079b8773a2293b32973ebbe4d75ee79b21d7c5c8e14e5444e1a1d875e7f4283"
+      },
+      "owner_pulse_entrypoint": {
+        "path": "scripts/show_task21_owner_pulse.py",
+        "sha256": "1fc62b00f18cee26a64355ebdc475dd7ac25cbcbf98fb24cfe9c87e9478da0d2"
+      },
+      "marker_hash_policy": "DYNAMIC_SEMANTIC"
+    },
+    "transport_visibility": {
+      "same_checkout": "IMMEDIATE",
+      "fresh_clone": "REQUIRES_FUTURE_COMMIT_AND_TRANSPORT",
+      "commit_authorized_by_router": false
+    },
+    "authority_granted_by_router": {
+      "local_writes": 0,
+      "provider_api_rpc_wss_calls": 0,
+      "drive_actions": 0,
+      "candidate_admissions": 0,
+      "cash_spend_usd_cents": 0,
+      "credentials": 0,
+      "wallet_signer_transaction_actions": 0,
+      "commit": false,
+      "push": false,
+      "pull_request": false,
+      "merge": false,
+      "destructive_actions": false
+    }
+  },
   "gates": [
     {
       "gate_id": "TASK21-T1-CLOSE-2026-08-06",
@@ -38,11 +103,15 @@
         }
       },
       "effective_next_boundary": {
-        "status": "READY_FOR_SEPARATE_ADMISSION_AND_CAPTURE_AUTHORITY",
-        "required_next_atom": "T21-A6S_BOUNDED_ADMISSION_AND_MULTI_HORIZON_CAPTURE_V1",
-        "calendar_wait_required": false,
-        "parallel_work_allowed": true,
-        "external_authority_granted": false
+        "status": "RESOLVED_BY_EXACT_H0_RUNTIME_RECEIPT",
+        "required_next_atom": "T21-A6S_H1_FOREGROUND_CAPTURE_V1",
+        "calendar_wait_required": true,
+        "parallel_work_allowed_before_next_earliest_at": true,
+        "external_authority_granted_by_marker": false,
+        "result_receipt": {
+          "path": "docs/evidence/task21/h0_admission_capture_runtime_acceptance_v1.json",
+          "sha256": "7e28fc61a85d77648d865a1e784ac6a7a1df7bd753b05b9dff48bba2a5206c16"
+        }
       },
       "source_receipt": {
         "path": "docs/evidence/task21/real_nomination_source_offline_acceptance_v1.json",
@@ -52,6 +121,260 @@
         "path": "local/task21_forward/t1_replay/TASK21_T1_TOKEN2022_REPLAY_PARTITION_v1_c4dbd8340253f137f6778434a1175f27494a0c01871aae80aa973b4565ca26dc.json",
         "bytes": 50548,
         "sha256": "c4dbd8340253f137f6778434a1175f27494a0c01871aae80aa973b4565ca26dc"
+      },
+      "authority_granted_by_marker": {
+        "local_writes": 0,
+        "provider_api_rpc_wss_calls": 0,
+        "drive_actions": 0,
+        "candidate_admissions": 0,
+        "cash_spend_usd_cents": 0,
+        "wallet_signer_transaction_actions": 0
+      }
+    },
+    {
+      "gate_id": "TASK21-H1-2026-07-31T08-50-34Z",
+      "task_id": "TASK-21",
+      "status": "RESOLVED_WITH_EVIDENCE",
+      "earliest_at": "2026-07-31T08:50:34.414367Z",
+      "latest_at": "2026-07-31T09:00:34.414367Z",
+      "required_next_atom": "T21-A6S_H1_FOREGROUND_CAPTURE_V1",
+      "preemption_rule": "PREEMPT_NEW_MUTATION_AT_OR_AFTER_EARLIEST_AT_UNTIL_CAPTURE_OR_GAP_CLOSE",
+      "parallel_work_before_due": "ALLOWED_ONLY_IF_NON_INTERFERING_WITH_FROZEN_H0_AND_H1_INPUTS",
+      "after_latest_at": "H1_PROVIDER_CAPTURE_FORBIDDEN_RECORD_EXPLICIT_GAP_NO_BACKFILL",
+      "resolution_owner": "T21-A6S_H1_FOREGROUND_CAPTURE_V1",
+      "resolution_requires": [
+        "LIVE_TIME_REVALIDATION",
+        "EXACT_H0_RECEIPT_HASH_MATCH",
+        "CURRENT_RECOVERY_HEALTH",
+        "SEPARATE_EXACT_PROVIDER_AUTHORITY_IF_WITHIN_WINDOW",
+        "EXPLICIT_GAP_RECEIPT_IF_AFTER_LATEST_AT",
+        "NO_BACKDATING",
+        "NO_SILENT_RESCHEDULE"
+      ],
+      "h0_result_receipt": {
+        "path": "docs/evidence/task21/h0_admission_capture_runtime_acceptance_v1.json",
+        "sha256": "7e28fc61a85d77648d865a1e784ac6a7a1df7bd753b05b9dff48bba2a5206c16"
+      },
+      "local_h0_evidence": {
+        "root": "local/task21_forward/h0_capture/run=h0-20260731T074954402486Z-78d2d1b62d99",
+        "runtime_receipt_sha256": "a815653f3f9f7ef8e9ad5916fd131c6b4a072da00e265a2f2fc5758529498c67",
+        "stored_bytes": 140414,
+        "immutable": true
+      },
+      "future_chain": {
+        "h6_offset_seconds": 21600,
+        "sentinel_offsets_seconds": [
+          86400,
+          259200,
+          604800
+        ],
+        "scheduler_or_background_process": false,
+        "foreground_only": true,
+        "missed_window_policy": "RETAIN_EXPLICIT_GAP_NO_BACKFILL"
+      },
+      "backup_obligation": {
+        "status": "SATISFIED_WITH_EVIDENCE",
+        "due_at": "2026-08-01T07:50:34.414367Z",
+        "drive_authority_granted_by_marker": false,
+        "satisfied_at": "2026-07-31T14:30:38.3960375Z",
+        "result_receipt": {
+          "path": "docs/evidence/task21/pre_h24_recovery_refresh_acceptance_v1.json",
+          "sha256": "08f977ca926a6ba572e3cb5f4bea352d5e87e04a85f4e6c71c56f3a2ccf5b999"
+        }
+      },
+      "resolution": {
+        "resolved_at": "2026-07-31T08:56:52.259316Z",
+        "disposition": "EXACT_H0_POPULATION_CAPTURED_AT_H1",
+        "inside_declared_window": true,
+        "provider_calls": 24,
+        "panels_complete": 3,
+        "backfill": false,
+        "rescheduled": false,
+        "result_receipt": {
+          "path": "docs/evidence/task21/h1_foreground_capture_runtime_acceptance_v1.json",
+          "sha256": "2a1d97d79ce873e0343c5d9afabbc8a7729a24e8b49f30e848905a121682d638"
+        },
+        "local_evidence": {
+          "root": "local/task21_forward/h1_capture/run=h1-20260731T085510551069Z-b7664a106ef0",
+          "runtime_receipt_sha256": "f9a8c3f6fe1713a6398b49b13dda746e901d6d1fd9b541dc05e64ba1f9a8d0b3",
+          "stored_bytes": 128958,
+          "immutable": true
+        }
+      },
+      "authority_granted_by_marker": {
+        "local_writes": 0,
+        "provider_api_rpc_wss_calls": 0,
+        "drive_actions": 0,
+        "candidate_admissions": 0,
+        "cash_spend_usd_cents": 0,
+        "wallet_signer_transaction_actions": 0
+      }
+    },
+    {
+      "gate_id": "TASK21-H6-2026-07-31T13-50-34Z",
+      "task_id": "TASK-21",
+      "status": "RESOLVED_WITH_GAP_EVIDENCE",
+      "earliest_at": "2026-07-31T13:50:34.414367Z",
+      "latest_at": "2026-07-31T14:00:34.414367Z",
+      "required_next_atom": "T21-A6S_H6_FOREGROUND_CAPTURE_V1",
+      "preemption_rule": "PREEMPT_NEW_MUTATION_AT_OR_AFTER_EARLIEST_AT_UNTIL_CAPTURE_OR_GAP_CLOSE",
+      "parallel_work_before_due": "ALLOWED_ONLY_IF_NON_INTERFERING_WITH_FROZEN_H0_H1_INPUTS",
+      "after_latest_at": "H6_PROVIDER_CAPTURE_FORBIDDEN_RECORD_EXPLICIT_GAP_NO_BACKFILL",
+      "resolution_owner": "T21-A6S_H6_FOREGROUND_CAPTURE_V1",
+      "resolution_requires": [
+        "LIVE_TIME_REVALIDATION",
+        "EXACT_H1_RECEIPT_HASH_MATCH",
+        "CURRENT_RECOVERY_HEALTH",
+        "SEPARATE_EXACT_PROVIDER_AUTHORITY_IF_WITHIN_WINDOW",
+        "EXPLICIT_GAP_RECEIPT_IF_AFTER_LATEST_AT",
+        "NO_BACKDATING",
+        "NO_SILENT_RESCHEDULE"
+      ],
+      "h1_result_receipt": {
+        "path": "docs/evidence/task21/h1_foreground_capture_runtime_acceptance_v1.json",
+        "sha256": "2a1d97d79ce873e0343c5d9afabbc8a7729a24e8b49f30e848905a121682d638"
+      },
+      "local_h1_evidence": {
+        "root": "local/task21_forward/h1_capture/run=h1-20260731T085510551069Z-b7664a106ef0",
+        "runtime_receipt_sha256": "f9a8c3f6fe1713a6398b49b13dda746e901d6d1fd9b541dc05e64ba1f9a8d0b3",
+        "stored_bytes": 128958,
+        "immutable": true
+      },
+      "future_chain": {
+        "sentinel_offsets_seconds": [
+          86400,
+          259200,
+          604800
+        ],
+        "scheduler_or_background_process": false,
+        "foreground_only": true,
+        "missed_window_policy": "RETAIN_EXPLICIT_GAP_NO_BACKFILL"
+      },
+      "backup_obligation": {
+        "status": "SATISFIED_WITH_EVIDENCE",
+        "due_at": "2026-08-01T07:50:34.414367Z",
+        "drive_authority_granted_by_marker": false,
+        "satisfied_at": "2026-07-31T14:30:38.3960375Z",
+        "result_receipt": {
+          "path": "docs/evidence/task21/pre_h24_recovery_refresh_acceptance_v1.json",
+          "sha256": "08f977ca926a6ba572e3cb5f4bea352d5e87e04a85f4e6c71c56f3a2ccf5b999"
+        }
+      },
+      "resolution": {
+        "resolved_at": "2026-07-31T14:00:58.279996Z",
+        "disposition": "H6_EXPLICIT_GAP_NO_BACKFILL",
+        "inside_declared_window": false,
+        "provider_calls": 0,
+        "backfill": false,
+        "rescheduled": false,
+        "observed_blockers": {
+          "recovery_backup_fresh_at_window_open": false,
+          "recovery_backup_age_hours_at_window_open": 27.939542,
+          "separate_provider_authority_present": false
+        },
+        "result_receipt": {
+          "path": "docs/evidence/task21/h6_foreground_capture_runtime_acceptance_v1.json",
+          "sha256": "c0189c96d8fc8f84cd6b0d6653a8d3dd07656adf04b5d89ae5baae21a662f058"
+        },
+        "local_evidence": {
+          "root": "local/task21_forward/h6_capture/run=h6-gap-44fc071623e5ed6c",
+          "gap_receipt_sha256": "c3b8ecef288cbce2f7bdf26e937ea1907087d8ac05c64102c6600ae94f1e2fbb",
+          "stored_bytes": 1126,
+          "immutable": true
+        }
+      },
+      "authority_granted_by_marker": {
+        "local_writes": 0,
+        "provider_api_rpc_wss_calls": 0,
+        "drive_actions": 0,
+        "candidate_admissions": 0,
+        "cash_spend_usd_cents": 0,
+        "wallet_signer_transaction_actions": 0
+      }
+    },
+    {
+      "gate_id": "TASK21-H24-2026-08-01T07-50-34Z",
+      "task_id": "TASK-21",
+      "status": "ACTIVE_WAITING",
+      "earliest_at": "2026-08-01T07:50:34.414367Z",
+      "latest_at": null,
+      "required_next_atom": "T21-A6S_H24_FOREGROUND_CAPTURE_V1",
+      "preemption_rule": "PREEMPT_NEW_MUTATION_AT_OR_AFTER_NOT_BEFORE_UNTIL_CAPTURE_OR_EVIDENCED_SKIP",
+      "parallel_work_before_due": "ALLOWED_ONLY_IF_NON_INTERFERING_WITH_FROZEN_H0_H1_AND_H6_GAP_INPUTS",
+      "time_semantics": "MINIMUM_AGE_NO_EXPIRY_RECORD_ACTUAL_ELAPSED_SECONDS",
+      "after_not_before": "H24_SENTINEL_ELIGIBLE_ONLY_WITH_SEPARATE_PROVIDER_AUTHORITY",
+      "resolution_owner": "T21-A6S_H24_FOREGROUND_CAPTURE_V1",
+      "resolution_requires": [
+        "LIVE_TIME_REVALIDATION",
+        "EXACT_H6_GAP_RECEIPT_HASH_MATCH",
+        "CURRENT_RECOVERY_HEALTH",
+        "SEPARATE_EXACT_PROVIDER_AUTHORITY_AFTER_NOT_BEFORE",
+        "EXACT_ACTUAL_ELAPSED_SECONDS_RECORDED",
+        "NO_BACKDATING",
+        "NO_NARROW_EXPIRY_INFERENCE"
+      ],
+      "h6_result_receipt": {
+        "path": "docs/evidence/task21/h6_foreground_capture_runtime_acceptance_v1.json",
+        "sha256": "c0189c96d8fc8f84cd6b0d6653a8d3dd07656adf04b5d89ae5baae21a662f058"
+      },
+      "local_h6_evidence": {
+        "root": "local/task21_forward/h6_capture/run=h6-gap-44fc071623e5ed6c",
+        "gap_receipt_sha256": "c3b8ecef288cbce2f7bdf26e937ea1907087d8ac05c64102c6600ae94f1e2fbb",
+        "stored_bytes": 1126,
+        "immutable": true
+      },
+      "future_chain": {
+        "status": "DEFERRED_TRIGGER_ONLY",
+        "candidate_minimum_age_offsets_seconds": [
+          259200,
+          604800
+        ],
+        "mandatory_horizons": [],
+        "active_time_gates_created": 0,
+        "scheduler_or_background_process": false,
+        "foreground_only": true,
+        "activation_requires": [
+          "NAMED_CONSUMER_OR_HYPOTHESIS_NEED",
+          "FRESH_WHOLE_TASK_BUDGET_PROOF",
+          "SEPARATE_EXACT_USER_PROVIDER_AUTHORITY"
+        ]
+      },
+      "recovery_prerequisite": {
+        "status": "SATISFIED_WITH_EVIDENCE",
+        "current_last_successful_backup_at": "2026-07-31T14:28:15.051Z",
+        "current_last_successful_restore_at": "2026-07-31T14:30:38.3960375Z",
+        "backup_age_hours_max_at_start": 24,
+        "restore_age_hours_max_at_start": 168,
+        "drive_authority_granted_by_marker": false,
+        "result_receipt": {
+          "path": "docs/evidence/task21/pre_h24_recovery_refresh_acceptance_v1.json",
+          "sha256": "08f977ca926a6ba572e3cb5f4bea352d5e87e04a85f4e6c71c56f3a2ccf5b999"
+        },
+        "drive_file": {
+          "id": "1dQDC9fHSaDo8fOEJXm5Ecs3pF_ghLBRv",
+          "sha256": "ff0994d0182c0886ef293af4768e0a96af9742c077b922d1e7dd830b257ff721",
+          "bytes": 285142
+        }
+      },
+      "capture_prep": {
+        "status": "READY_NOT_AUTHORIZED",
+        "value_rebase": {
+          "path": "configs/task21_post_h6_gap_sentinel_value_rebase_v1.yaml",
+          "sha256": "9598af58452f49853d447f9b4b125ed7b9de70b1643204a3bc3e4e213c01276f"
+        },
+        "config": {
+          "path": "configs/task21_h24_foreground_capture_v1.yaml",
+          "sha256": "1c0db3ca1083711114a07ddaaecc40d362d4e758c7f4e18ce4c27d7ff4e8a0e1"
+        },
+        "acceptance": {
+          "path": "docs/evidence/task21/h24_minimum_age_sentinel_offline_acceptance_v2.json",
+          "sha256": "a7df6c5d870c21cda567a1c0900eeab45689ffc5e5aa837ee29ade1e00b4bbf8"
+        },
+        "sentinel_members_exact": 1,
+        "provider_api_rpc_wss_calls_max": 8,
+        "narrow_expiry_window": false,
+        "provider_api_rpc_wss_calls_authorized": false,
+        "automatic_execution": false
       },
       "authority_granted_by_marker": {
         "local_writes": 0,

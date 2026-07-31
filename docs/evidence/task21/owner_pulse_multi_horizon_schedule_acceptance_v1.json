@@ -1,0 +1,91 @@
+{
+  "schema": "smial.task21.owner-pulse-multi-horizon-schedule-acceptance",
+  "schema_version": "1.0",
+  "evidence_id": "EVIDENCE-T21-OWNER-PULSE-MULTI-HORIZON-SCHEDULE-001",
+  "evidence_version": "1.0",
+  "task_id": "TASK-21",
+  "atom_id": "T21-P4_MULTI_HORIZON_OWNER_SCHEDULE_V1",
+  "completed_at": "2026-07-31T14:59:46.9090128Z",
+  "status": "PASS",
+  "verdict": "OWNER_PULSE_MULTI_HORIZON_SCHEDULE_VISIBLE_FAIL_CLOSED",
+  "targeted_validation": "15_OF_15_PASS",
+  "artifacts": [
+    {
+      "path": "configs/task21_owner_pulse_read_model_v1.yaml",
+      "bytes": 5688,
+      "sha256": "3bf08e7558b492d574828c2d4bb37485a9cb026e0789eafb101fe1c7200a2a2b"
+    },
+    {
+      "path": "docs/contracts/task21_owner_pulse_read_model_contract_v1.md",
+      "bytes": 7114,
+      "sha256": "f512356ab96f08bfaefe109416ce149ac7c05b957a56169f97b64fc1385ade23"
+    },
+    {
+      "path": "src/solana_alpha_lab/task21_owner_pulse.py",
+      "bytes": 45813,
+      "sha256": "0cf0110189caf9a4015427535ab3b11f9d0bd5e6075a9f29a223e2e88fe11695"
+    },
+    {
+      "path": "tests/test_task21_owner_pulse.py",
+      "bytes": 21185,
+      "sha256": "1126b28ac821d03c5976cd08bf2b103896c990aea9c70ddc6a2c0fe311a925c4"
+    }
+  ],
+  "protected_inputs": [
+    {
+      "path": "control/active_time_gates.json",
+      "bytes": 13292,
+      "sha256": "726b1722adc50c77bf0ed7cd434b0e39a935d9a1cd4d2d3cbe5335697388dc7b"
+    },
+    {
+      "path": "configs/task21_observation_horizon_policy_v1.yaml",
+      "bytes": 3058,
+      "sha256": "45591b9b469acb99d0ff3d789bfb03796bcd339067631d1bbcb02c58db5f71c8"
+    },
+    {
+      "path": "docs/evidence/task21/h0_admission_capture_runtime_acceptance_v1.json",
+      "bytes": 7042,
+      "sha256": "7e28fc61a85d77648d865a1e784ac6a7a1df7bd753b05b9dff48bba2a5206c16"
+    }
+  ],
+  "schedule": {
+    "basis": "LATEST_H0_TRIGGER_PLUS_FROZEN_OFFSETS",
+    "h0_anchor_at": "2026-07-31T07:50:34.414367Z",
+    "horizons": [
+      "H24",
+      "H72",
+      "H168"
+    ],
+    "h24_window_utc": "2026-08-01T07:50:34.414367Z/2026-08-01T08:00:34.414367Z",
+    "h72_window_utc": "2026-08-03T07:50:34.414367Z/2026-08-03T08:00:34.414367Z",
+    "h168_window_utc": "2026-08-07T07:50:34.414367Z/2026-08-07T08:00:34.414367Z",
+    "h24_active_gate_preserved": true,
+    "h72_active_gate_created": false,
+    "h168_active_gate_created": false,
+    "future_horizons_grant_authority": false,
+    "automatic_execution": false,
+    "missed_window_policy": "RETAIN_EXPLICIT_GAP_NO_BACKFILL"
+  },
+  "catalog": {
+    "status": "PENDING_T21_A7",
+    "version_or_count_advanced": false,
+    "new_assets_registered": 0
+  },
+  "actual_actions": {
+    "network_calls": 0,
+    "provider_api_rpc_wss_calls": 0,
+    "drive_reads": 0,
+    "drive_writes": 0,
+    "raw_or_dataset_writes": 0,
+    "credentials": 0,
+    "cash_spend_usd_cents": 0,
+    "scheduler_or_background_process": false,
+    "wallet_signer_transaction_actions": 0,
+    "dependency_changes": 0,
+    "commit": 0,
+    "push": 0,
+    "pull_request": 0,
+    "merge": 0,
+    "destructive_actions": 0
+  }
+}

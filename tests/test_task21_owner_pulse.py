@@ -17,10 +17,15 @@ if str(SRC) not in sys.path:
     sys.path.insert(0, str(SRC))
 
 from solana_alpha_lab.task21_owner_pulse import (
-    CORRECTED_NEXT_ATOM,
     EXPECTED_GATE_ID,
     EXPECTED_NEXT_ATOM,
+    H1_NEXT_ATOM,
+    H6_NEXT_ATOM,
+    H24_NEXT_ATOM,
+    H72_NEXT_ATOM,
+    H168_NEXT_ATOM,
     Task21OwnerPulseError,
+    build_observation_schedule,
     build_owner_pulse,
     canonical_json_bytes,
     evaluate_time_gate,
@@ -51,10 +56,31 @@ ACCEPTANCE_PATH = (
     / "docs"
     / "evidence"
     / "task21"
-    / "owner_pulse_read_model_acceptance_v1.json"
+    / "owner_pulse_pre_h24_recovery_binding_acceptance_v1.json"
 )
-WAITING_AT = datetime(2026, 7, 31, 12, tzinfo=timezone.utc)
-DUE_AT = datetime(2026, 8, 6, 16, 28, 59, 84_000, tzinfo=timezone.utc)
+SCHEDULE_ACCEPTANCE_PATH = (
+    ROOT
+    / "docs"
+    / "evidence"
+    / "task21"
+    / "owner_pulse_post_h6_sentinel_rebase_acceptance_v2.json"
+)
+HORIZON_POLICY_PATH = (
+    ROOT / "configs" / "task21_observation_horizon_policy_v1.yaml"
+)
+SENTINEL_REBASE_PATH = (
+    ROOT / "configs" / "task21_post_h6_gap_sentinel_value_rebase_v1.yaml"
+)
+H0_RECEIPT_PATH = (
+    ROOT
+    / "docs"
+    / "evidence"
+    / "task21"
+    / "h0_admission_capture_runtime_acceptance_v1.json"
+)
+WAITING_AT = datetime(2026, 7, 31, 15, 0, tzinfo=timezone.utc)
+DUE_AT = datetime(2026, 8, 1, 7, 55, tzinfo=timezone.utc)
+MISSED_AT = datetime(2026, 8, 1, 8, 5, tzinfo=timezone.utc)
 
 
 def _sha256(path: Path) -> str:
@@ -69,21 +95,27 @@ class TestTask21OwnerPulse(unittest.TestCase):
 
     def test_marker_is_exact_and_source_receipt_is_pinned(self) -> None:
         self.assertEqual(self.marker["schema_version"], "1.0")
-        self.assertEqual(len(self.marker["gates"]), 1)
-        gate = self.marker["gates"][0]
-        self.assertEqual(gate["gate_id"], EXPECTED_GATE_ID)
-        self.assertEqual(gate["status"], "SUPERSEDED_WITH_EVIDENCE")
-        self.assertEqual(gate["required_next_atom"], EXPECTED_NEXT_ATOM)
+        self.assertEqual(len(self.marker["gates"]), 4)
+        historical, h1_gate, h6_gate, gate = self.marker["gates"]
+        self.assertEqual(historical["gate_id"], EXPECTED_GATE_ID)
+        self.assertEqual(historical["status"], "SUPERSEDED_WITH_EVIDENCE")
+        self.assertEqual(historical["required_next_atom"], EXPECTED_NEXT_ATOM)
         self.assertEqual(
-            gate["effective_next_boundary"]["required_next_atom"],
-            CORRECTED_NEXT_ATOM,
+            historical["effective_next_boundary"]["required_next_atom"],
+            H1_NEXT_ATOM,
         )
-        self.assertFalse(
-            gate["effective_next_boundary"]["calendar_wait_required"]
+        self.assertTrue(
+            historical["effective_next_boundary"]["calendar_wait_required"]
         )
+        self.assertEqual(h1_gate["status"], "RESOLVED_WITH_EVIDENCE")
+        self.assertEqual(h1_gate["required_next_atom"], H1_NEXT_ATOM)
+        self.assertEqual(h6_gate["status"], "RESOLVED_WITH_GAP_EVIDENCE")
+        self.assertEqual(h6_gate["required_next_atom"], H6_NEXT_ATOM)
+        self.assertEqual(gate["status"], "ACTIVE_WAITING")
+        self.assertEqual(gate["required_next_atom"], H24_NEXT_ATOM)
         self.assertEqual(
             _sha256(SOURCE_RECEIPT_PATH),
-            gate["source_receipt"]["sha256"],
+            historical["source_receipt"]["sha256"],
         )
         self.assertTrue(
             all(
@@ -93,10 +125,8 @@ class TestTask21OwnerPulse(unittest.TestCase):
         )
 
     def test_waiting_gate_allows_only_non_interfering_parallel_work(self) -> None:
-        historical = copy.deepcopy(self.marker["gates"][0])
-        historical["status"] = "ACTIVE_WAITING"
         gate = evaluate_time_gate(
-            historical,
+            copy.deepcopy(self.marker["gates"][3]),
             as_of=WAITING_AT,
         )
         self.assertEqual(gate["state"], "WAITING_PARALLEL_WORK_ALLOWED")
@@ -106,20 +136,27 @@ class TestTask21OwnerPulse(unittest.TestCase):
         self.assertFalse(gate["external_authority_granted"])
 
     def test_due_gate_preempts_new_parallel_mutation(self) -> None:
-        historical = copy.deepcopy(self.marker["gates"][0])
-        historical["status"] = "ACTIVE_WAITING"
         gate = evaluate_time_gate(
-            historical,
+            copy.deepcopy(self.marker["gates"][3]),
             as_of=DUE_AT,
         )
         self.assertEqual(gate["state"], "DUE_PREEMPT_PARALLEL_WORK")
         self.assertFalse(gate["parallel_work_allowed"])
         self.assertTrue(gate["owner_action_required"])
         self.assertEqual(gate["remaining_seconds"], 0)
-        self.assertEqual(gate["required_next_atom"], EXPECTED_NEXT_ATOM)
+        self.assertEqual(gate["required_next_atom"], H24_NEXT_ATOM)
+
+    def test_late_h24_remains_due_without_expiry(self) -> None:
+        gate = evaluate_time_gate(
+            copy.deepcopy(self.marker["gates"][3]),
+            as_of=MISSED_AT,
+        )
+        self.assertEqual(gate["state"], "DUE_PREEMPT_PARALLEL_WORK")
+        self.assertFalse(gate["parallel_work_allowed"])
+        self.assertTrue(gate["owner_action_required"])
 
     def test_marker_cannot_grant_external_authority(self) -> None:
-        changed = copy.deepcopy(self.marker["gates"][0])
+        changed = copy.deepcopy(self.marker["gates"][3])
         changed["authority_granted_by_marker"]["provider_api_rpc_wss_calls"] = 1
         with self.assertRaisesRegex(
             Task21OwnerPulseError,
@@ -135,10 +172,10 @@ class TestTask21OwnerPulse(unittest.TestCase):
         )
         forward = pulse["task21_forward_state"]
         self.assertEqual(forward["real_nominations"], 3)
-        self.assertEqual(forward["real_admissions"], 0)
-        self.assertEqual(forward["panels_captured"], 0)
+        self.assertEqual(forward["real_admissions"], 3)
+        self.assertEqual(forward["panels_captured"], 6)
         self.assertFalse(forward["exclusive_p7d_wait_active"])
-        self.assertFalse(forward["next_capture_wait_required"])
+        self.assertTrue(forward["next_capture_wait_required"])
         self.assertEqual(
             forward["observation_horizon_policy_id"],
             "OBSERVATION-HORIZON-POLICY-T21-001",
@@ -161,7 +198,10 @@ class TestTask21OwnerPulse(unittest.TestCase):
         )
         self.assertEqual(
             forward["local_dataset_bytes"],
-            partition["bytes"] if expected_identity_ok else 0,
+            (partition["bytes"] if expected_identity_ok else 0)
+            + 140414
+            + 128958
+            + 1126,
         )
         if not expected_identity_ok:
             self.assertIn(
@@ -177,6 +217,70 @@ class TestTask21OwnerPulse(unittest.TestCase):
                 "alpha": "NOT_ESTABLISHED",
             },
         )
+        schedule = pulse["observation_schedule"]
+        self.assertEqual(
+            schedule["status"],
+            "H24_MINIMUM_AGE_ACTIVE_H72_H168_TRIGGER_ONLY",
+        )
+        self.assertEqual(schedule["h0_anchor_at"], "2026-07-31T07:50:34.414367Z")
+        self.assertEqual(
+            [item["horizon_id"] for item in schedule["windows"]],
+            ["H24", "H72", "H168"],
+        )
+        h24, h72, h168 = schedule["windows"]
+        self.assertEqual(h24["state"], "WAITING_PARALLEL_WORK_ALLOWED")
+        self.assertEqual(h24["required_next_atom"], H24_NEXT_ATOM)
+        self.assertEqual(h72["state"], "DEFERRED_TRIGGER_ONLY")
+        self.assertEqual(h72["required_next_atom"], H72_NEXT_ATOM)
+        self.assertEqual(h72["earliest_at"], "2026-08-03T07:50:34.414367Z")
+        self.assertEqual(h72["earliest_at_msk"], "2026-08-03T10:50:34.414367+03:00")
+        self.assertEqual(h168["required_next_atom"], H168_NEXT_ATOM)
+        self.assertEqual(h168["earliest_at"], "2026-08-07T07:50:34.414367Z")
+        self.assertEqual(h168["earliest_at_msk"], "2026-08-07T10:50:34.414367+03:00")
+        self.assertTrue(all(item["latest_at"] is None for item in schedule["windows"]))
+        self.assertFalse(schedule["narrow_expiry_window_used"])
+        self.assertTrue(
+            all(
+                item["external_authority_granted"] is False
+                and item["automatic_execution"] is False
+                for item in schedule["windows"]
+            )
+        )
+
+    def test_schedule_fails_closed_for_offset_or_active_gate_drift(self) -> None:
+        policy = yaml.safe_load(HORIZON_POLICY_PATH.read_text(encoding="utf-8"))
+        sentinel_rebase = yaml.safe_load(
+            SENTINEL_REBASE_PATH.read_text(encoding="utf-8")
+        )
+        h0_receipt = json.loads(H0_RECEIPT_PATH.read_text(encoding="utf-8"))
+        active_gate = copy.deepcopy(self.marker["gates"][3])
+        evaluated = evaluate_time_gate(active_gate, as_of=WAITING_AT)
+        changed_policy = copy.deepcopy(policy)
+        changed_policy["capture_clock"]["offsets"][4]["offset_seconds"] += 1
+        with self.assertRaisesRegex(
+            Task21OwnerPulseError, "horizon_schedule_offset_drift"
+        ):
+            build_observation_schedule(
+                horizon_policy=changed_policy,
+                sentinel_rebase=sentinel_rebase,
+                h0_receipt=h0_receipt,
+                active_gate=active_gate,
+                evaluated_gate=evaluated,
+                as_of=WAITING_AT,
+            )
+        changed_gate = copy.deepcopy(active_gate)
+        changed_gate["latest_at"] = "2026-08-01T08:00:35.414367Z"
+        with self.assertRaisesRegex(
+            Task21OwnerPulseError, "horizon_schedule_active_gate_drift"
+        ):
+            build_observation_schedule(
+                horizon_policy=policy,
+                sentinel_rebase=sentinel_rebase,
+                h0_receipt=h0_receipt,
+                active_gate=changed_gate,
+                evaluated_gate=evaluated,
+                as_of=WAITING_AT,
+            )
 
     def test_runtime_binding_matches_production_memory_and_preserves_legacy(
         self,
@@ -243,12 +347,14 @@ class TestTask21OwnerPulse(unittest.TestCase):
         self.assertEqual(recovery["backup_readback_status"], "EXACT_MATCH")
         self.assertEqual(recovery["free_disk_bytes"], 9_000_000_000)
         costs = pulse["cost_and_authority"]
-        self.assertEqual(costs["provider_or_source_requests_used"], 4)
+        self.assertEqual(costs["provider_or_source_requests_used"], 52)
         self.assertEqual(costs["provider_or_source_requests_cap"], 192)
+        self.assertEqual(costs["provider_credits_used"], 48)
+        self.assertEqual(costs["response_bytes_used"], 73975)
         self.assertEqual(costs["cash_spend_usd_cents"], 0)
         self.assertFalse(costs["external_authority_granted_by_pulse"])
 
-    def test_corrected_gate_requests_authority_without_calendar_block(self) -> None:
+    def test_h24_due_gate_requests_exact_foreground_capture(self) -> None:
         pulse = build_owner_pulse(
             repository_root=ROOT,
             as_of=DUE_AT,
@@ -257,16 +363,16 @@ class TestTask21OwnerPulse(unittest.TestCase):
         self.assertEqual(
             pulse["attention"][0],
             {
-                "severity": "HIGH",
-                "code": "TASK21_CAPTURE_AUTHORITY_REQUIRED",
-                "action": CORRECTED_NEXT_ATOM,
+                "severity": "CRITICAL",
+                "code": "TASK21_H24_CAPTURE_DUE",
+                "action": H24_NEXT_ATOM,
             },
         )
         self.assertEqual(
             pulse["active_time_gates"][0]["state"],
-            "READY_FOR_ADMISSION_AND_CAPTURE_AUTHORITY",
+            "DUE_PREEMPT_PARALLEL_WORK",
         )
-        self.assertTrue(
+        self.assertFalse(
             pulse["active_time_gates"][0]["parallel_work_allowed"]
         )
 
@@ -286,8 +392,12 @@ class TestTask21OwnerPulse(unittest.TestCase):
             self.assertFalse(Path(source["path"]).is_absolute())
         text = render_owner_pulse_text(first)
         self.assertIn("TASK-21 OWNER PULSE", text)
-        self.assertIn("READY_FOR_ADMISSION_AND_CAPTURE_AUTHORITY", text)
-        self.assertIn("nominations=3, admissions=0, panels=0", text)
+        self.assertIn("H24_WAITING", text)
+        self.assertIn("Расписание наблюдений (MSK)", text)
+        self.assertIn("H72: DEFERRED_TRIGGER_ONLY", text)
+        self.assertIn("H168: DEFERRED_TRIGGER_ONLY", text)
+        self.assertIn("expires=NO", text)
+        self.assertIn("nominations=3, admissions=3, panels=6", text)
         self.assertIn(
             "Production memory: "
             "HYP-VERSION-EXECUTION-CAPACITY-CURVATURE-V1; state=PAUSED",
@@ -308,12 +418,12 @@ class TestTask21OwnerPulse(unittest.TestCase):
             self.assertNotIn(candidate["mint"], text)
 
     def test_config_authority_and_agent_entry_rule_are_exact(self) -> None:
-        self.assertEqual(self.config["read_model_version"], "1.2")
+        self.assertEqual(self.config["read_model_version"], "1.8")
         authority = self.config["authority"]
         self.assertEqual(authority["class"], "LOCAL_WRITE_ONLY")
         self.assertEqual(
             authority["gate_phrase"],
-            "T21-P2R_OWNER_PULSE_PRODUCTION_MEMORY_BINDING_V1",
+            "T21-A6S_POST_H6_GAP_SENTINEL_VALUE_REBASE_V1",
         )
         self.assertEqual(
             authority["managed_files"],
@@ -322,14 +432,13 @@ class TestTask21OwnerPulse(unittest.TestCase):
                 "docs/contracts/task21_owner_pulse_read_model_contract_v1.md",
                 "src/solana_alpha_lab/task21_owner_pulse.py",
                 "tests/test_task21_owner_pulse.py",
-                "docs/evidence/task21/owner_pulse_read_model_acceptance_v1.json",
+                "docs/evidence/task21/observation_horizon_consumer_reconciliation_acceptance_v1.json",
+                "docs/evidence/task21/owner_pulse_multi_horizon_schedule_acceptance_v1.json",
             ],
         )
         for key in (
             "network_calls",
             "provider_api_rpc_wss_calls",
-            "drive_reads",
-            "drive_writes",
             "raw_or_dataset_writes",
             "credentials",
             "cash_spend_usd_cents",
@@ -337,6 +446,8 @@ class TestTask21OwnerPulse(unittest.TestCase):
             "dependency_changes",
         ):
             self.assertEqual(authority[key], 0, key)
+        self.assertEqual(authority["drive_reads"], 0)
+        self.assertEqual(authority["drive_writes"], 0)
         for key in (
             "scheduler_or_background_process",
             "commit",
@@ -376,44 +487,82 @@ class TestTask21OwnerPulse(unittest.TestCase):
             else:
                 self.assertEqual(value, 0, key)
 
-    def test_acceptance_receipt_binds_exact_candidate(self) -> None:
+    def test_historical_acceptance_receipt_remains_audit_only(self) -> None:
         receipt = json.loads(ACCEPTANCE_PATH.read_text(encoding="utf-8"))
+        self.assertEqual(
+            _sha256(ACCEPTANCE_PATH),
+            "ebfc7fd85a2e5fd20f2444a2618056f3a1d7f1d4750f355da8e662d2e1fed634",
+        )
         self.assertEqual(receipt["status"], "PASS")
         self.assertEqual(
             receipt["verdict"],
-            "LOCAL_OWNER_PULSE_HORIZON_CORRECTION_BOUND",
+            "LOCAL_OWNER_PULSE_H24_RECOVERY_REFRESH_BOUND",
         )
-        self.assertEqual(receipt["targeted_validation"], "12_OF_12_PASS")
+        self.assertEqual(receipt["targeted_validation"], "13_OF_13_PASS")
+        for artifact in receipt["protected_inputs"]:
+            if artifact["path"] != "control/active_time_gates.json":
+                self.assertEqual(
+                    _sha256(ROOT / artifact["path"]),
+                    artifact["sha256"],
+                    artifact["path"],
+                )
+        self.assertEqual(
+            receipt["durable_resume_gate"]["required_next_atom"],
+            H24_NEXT_ATOM,
+        )
+        self.assertEqual(
+            receipt["durable_resume_gate"]["earliest_at"],
+            "2026-08-01T07:50:34.414367Z",
+        )
+        self.assertTrue(
+            receipt["durable_resume_gate"]["preempts_new_mutation_when_due"]
+        )
+        actions = receipt["actual_actions"]
+        self.assertEqual(actions["network_calls"], 9)
+        self.assertEqual(actions["drive_reads"], 7)
+        self.assertEqual(actions["drive_upload_attempts"], 2)
+        self.assertEqual(actions["drive_writes"], 1)
+        for key in (
+            "provider_api_rpc_wss_calls",
+            "raw_or_dataset_writes",
+            "credentials",
+            "cash_spend_usd_cents",
+            "wallet_signer_transaction_actions",
+            "dependency_changes",
+            "commit",
+            "push",
+            "pull_request",
+            "merge",
+            "destructive_actions",
+        ):
+            self.assertEqual(actions[key], 0, key)
+        self.assertFalse(actions["scheduler_or_background_process"])
+
+    def test_rebased_schedule_acceptance_binds_exact_candidate(self) -> None:
+        receipt = json.loads(SCHEDULE_ACCEPTANCE_PATH.read_text(encoding="utf-8"))
+        self.assertEqual(receipt["status"], "PASS")
+        self.assertEqual(
+            receipt["verdict"],
+            "OWNER_PULSE_H24_MINIMUM_AGE_H72_H168_TRIGGER_ONLY",
+        )
+        self.assertEqual(receipt["targeted_validation"], "15_OF_15_PASS")
         for artifact in receipt["artifacts"]:
             self.assertEqual(
                 _sha256(ROOT / artifact["path"]),
                 artifact["sha256"],
                 artifact["path"],
             )
-        for artifact in receipt["protected_inputs"]:
-            self.assertEqual(
-                _sha256(ROOT / artifact["path"]),
-                artifact["sha256"],
-                artifact["path"],
-            )
         self.assertEqual(
-            receipt["durable_resume_gate"]["required_next_atom"],
-            CORRECTED_NEXT_ATOM,
+            receipt["schedule"]["horizons"], ["H24", "H72", "H168"]
         )
-        self.assertEqual(
-            receipt["durable_resume_gate"]["earliest_at"],
-            "2026-08-06T16:28:59.084Z",
-        )
-        self.assertFalse(
-            receipt["durable_resume_gate"][
-                "preempts_new_parallel_mutation_when_due"
-            ]
-        )
-        for key, value in receipt["actual_actions"].items():
-            if key == "scheduler_or_background_process":
+        self.assertFalse(receipt["schedule"]["h72_active_gate_created"])
+        self.assertFalse(receipt["schedule"]["h168_active_gate_created"])
+        self.assertFalse(receipt["schedule"]["narrow_expiry_window_used"])
+        for value in receipt["actual_actions"].values():
+            if isinstance(value, bool):
                 self.assertFalse(value)
             else:
-                self.assertEqual(value, 0, key)
+                self.assertEqual(value, 0)
 
 
 if __name__ == "__main__":

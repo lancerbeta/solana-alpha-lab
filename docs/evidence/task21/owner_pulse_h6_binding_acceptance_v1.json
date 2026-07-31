@@ -1,0 +1,103 @@
+{
+  "schema": "smial.task21.owner-pulse-h6-binding-acceptance",
+  "schema_version": "1.0",
+  "evidence_id": "EVIDENCE-T21-OWNER-PULSE-H6-BINDING-001",
+  "evidence_version": "1.0",
+  "task_id": "TASK-21",
+  "atom_id": "T21-A6S_H1_FOREGROUND_CAPTURE_V1",
+  "completed_at": "2026-07-31T08:56:52.259316Z",
+  "status": "PASS",
+  "verdict": "LOCAL_OWNER_PULSE_H6_GATE_AND_H0_H1_RUNTIME_BOUND",
+  "targeted_validation": "13_OF_13_PASS",
+  "artifacts": [
+    {
+      "path": "configs/task21_owner_pulse_read_model_v1.yaml",
+      "bytes": 5310,
+      "sha256": "4578be8936393c01c4860e0df77e32a7596ab65bcbf7e7edea42a25f11a3bd39"
+    },
+    {
+      "path": "docs/contracts/task21_owner_pulse_read_model_contract_v1.md",
+      "bytes": 5909,
+      "sha256": "a22b3915df0a617974a0f17349465ea075c659493461e4a66c7a10bc765a734e"
+    },
+    {
+      "path": "src/solana_alpha_lab/task21_owner_pulse.py",
+      "bytes": 36505,
+      "sha256": "a6b7979122be8d933b83a8a65c93356e157d24b8d4f86090c4c8a2f9dbebc0f1"
+    },
+    {
+      "path": "tests/test_task21_owner_pulse.py",
+      "bytes": 16049,
+      "sha256": "0ed2a40da410fc458869a91cc4f3cc6360f8fa6dd7938dd7f01f758e886fb02a"
+    }
+  ],
+  "protected_inputs": [
+    {
+      "path": "control/active_time_gates.json",
+      "bytes": 8431,
+      "sha256": "69cc1d2fa344d80c5ed868cdc000762be773be44653ed8a90e1b2886521b4584"
+    },
+    {
+      "path": "docs/evidence/task21/h0_admission_capture_runtime_acceptance_v1.json",
+      "bytes": 7042,
+      "sha256": "7e28fc61a85d77648d865a1e784ac6a7a1df7bd753b05b9dff48bba2a5206c16"
+    },
+    {
+      "path": "docs/evidence/task21/h1_foreground_capture_runtime_acceptance_v1.json",
+      "bytes": 4016,
+      "sha256": "2a1d97d79ce873e0343c5d9afabbc8a7729a24e8b49f30e848905a121682d638"
+    }
+  ],
+  "accepted_current_pulse": {
+    "state_before_h6": "H6_WAITING",
+    "state_within_h6_window": "H6_CAPTURE_DUE",
+    "state_after_h6_window": "H6_MISSED_GAP_CLOSE_REQUIRED",
+    "real_nominations": 3,
+    "real_admissions": 3,
+    "panels_captured": 6,
+    "provider_or_source_requests_used": 52,
+    "provider_or_source_requests_cap": 192,
+    "modeled_provider_credits_used": 48,
+    "response_bytes_used": 73975,
+    "cash_spend_usd_cents": 0,
+    "hypothesis_outcome_unsealed": false
+  },
+  "durable_resume_gate": {
+    "marker_path": "control/active_time_gates.json",
+    "gate_id": "TASK21-H6-2026-07-31T13-50-34Z",
+    "earliest_at": "2026-07-31T13:50:34.414367Z",
+    "latest_at": "2026-07-31T14:00:34.414367Z",
+    "required_next_atom": "T21-A6S_H6_FOREGROUND_CAPTURE_V1",
+    "preempts_new_mutation_when_due": true,
+    "after_latest_records_gap": true,
+    "automatic_execution": false,
+    "external_authority_granted": false
+  },
+  "actual_actions": {
+    "network_calls": 0,
+    "provider_api_rpc_wss_calls": 0,
+    "drive_reads": 0,
+    "drive_writes": 0,
+    "raw_or_dataset_writes": 0,
+    "scheduler_or_background_process": false,
+    "credentials_used": 0,
+    "cash_spend_usd_cents": 0,
+    "wallet_signer_transaction_actions": 0,
+    "dependency_changes": 0,
+    "commit": 0,
+    "push": 0,
+    "pull_request": 0,
+    "merge": 0,
+    "destructive_actions": 0
+  },
+  "catalog": {
+    "status": "CATALOG_TRANSACTION_PENDING_T21_A7",
+    "version_or_count_advanced": false
+  },
+  "non_claims": [
+    "NO_SECOND_TRUTH_OWNER_CREATED",
+    "NO_BACKGROUND_REMINDER_OR_SCHEDULER_CREATED",
+    "NO_HYPOTHESIS_OUTCOME_UNSEALED",
+    "NO_PROVIDER_OR_LATER_HORIZON_AUTHORITY_GRANTED_BY_PULSE"
+  ]
+}

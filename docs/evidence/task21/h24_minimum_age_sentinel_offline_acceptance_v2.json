@@ -1,0 +1,99 @@
+{
+  "schema": "smial.task21.h24-minimum-age-sentinel-offline-acceptance",
+  "schema_version": "1.0",
+  "task_id": "TASK-21",
+  "atom_id": "T21-A6S_POST_H6_GAP_SENTINEL_VALUE_REBASE_V1",
+  "runtime_atom_id": "T21-A6S_H24_FOREGROUND_CAPTURE_V1",
+  "status": "PASS",
+  "verdict": "H24_ONE_SENTINEL_MINIMUM_AGE_NO_EXPIRY_OFFLINE_VALIDATED",
+  "accepted_at": "2026-07-31T17:15:42.592Z",
+  "targeted_validation": "7_OF_7_PASS",
+  "artifacts": [
+    {
+      "path": "configs/task21_h24_foreground_capture_v1.yaml",
+      "bytes": 4807,
+      "sha256": "1c0db3ca1083711114a07ddaaecc40d362d4e758c7f4e18ce4c27d7ff4e8a0e1"
+    },
+    {
+      "path": "docs/contracts/task21_h24_foreground_capture_contract_v1.md",
+      "bytes": 2077,
+      "sha256": "57dc69bd0e8773f052dc1d4b1034aad603899fcd57aff83b73177dfdf9513012"
+    },
+    {
+      "path": "src/solana_alpha_lab/task21_h24_foreground_capture.py",
+      "bytes": 23342,
+      "sha256": "6cefcdf813ed209bf023659c0f5c195abef8c6ce05b9de531240522d07ab5637"
+    },
+    {
+      "path": "scripts/run_task21_h24_capture.py",
+      "bytes": 1713,
+      "sha256": "e3476b7946b01734963db97141bd206193b80c8052738a343a89c22867240426"
+    },
+    {
+      "path": "tests/test_task21_h24_foreground_capture.py",
+      "bytes": 11666,
+      "sha256": "7282bae1be07f637313615299ac30f70d3345c6a111a161a6305124de0f02120"
+    }
+  ],
+  "protected_inputs": [
+    {
+      "path": "configs/task21_post_h6_gap_sentinel_value_rebase_v1.yaml",
+      "bytes": 4991,
+      "sha256": "9598af58452f49853d447f9b4b125ed7b9de70b1643204a3bc3e4e213c01276f"
+    },
+    {
+      "path": "docs/evidence/task21/h0_admission_capture_runtime_acceptance_v1.json",
+      "bytes": 7042,
+      "sha256": "7e28fc61a85d77648d865a1e784ac6a7a1df7bd753b05b9dff48bba2a5206c16"
+    },
+    {
+      "path": "docs/evidence/task21/h6_foreground_capture_runtime_acceptance_v1.json",
+      "bytes": 4363,
+      "sha256": "c0189c96d8fc8f84cd6b0d6653a8d3dd07656adf04b5d89ae5baae21a662f058"
+    },
+    {
+      "path": "docs/evidence/task21/pre_h24_recovery_refresh_acceptance_v1.json",
+      "bytes": 6544,
+      "sha256": "08f977ca926a6ba572e3cb5f4bea352d5e87e04a85f4e6c71c56f3a2ccf5b999"
+    }
+  ],
+  "dynamic_control": {
+    "path": "control/active_time_gates.json",
+    "gate_id": "TASK21-H24-2026-08-01T07-50-34Z",
+    "hash_policy": "DYNAMIC_SEMANTIC_GATE_NO_CIRCULAR_PIN"
+  },
+  "accepted_behavior": {
+    "h24_executed": false,
+    "sentinel_members_exact": 1,
+    "provider_calls_per_panel_max": 8,
+    "provider_calls_total_max": 8,
+    "not_before_at": "2026-08-01T07:50:34.414367Z",
+    "latest_at": null,
+    "late_capture_allowed": true,
+    "actual_elapsed_seconds_required": true,
+    "h72_h168_status": "DEFERRED_TRIGGER_ONLY"
+  },
+  "actual_actions": {
+    "network_calls": 0,
+    "provider_api_rpc_wss_calls": 0,
+    "drive_reads": 0,
+    "drive_writes": 0,
+    "candidate_admissions": 0,
+    "raw_or_dataset_writes": 0,
+    "provider_credits": 0,
+    "cash_spend_usd_cents": 0,
+    "credentials": 0,
+    "scheduler_or_background_process": false,
+    "wallet_signer_transaction_actions": 0,
+    "commit": false,
+    "push": false,
+    "pull_request": false,
+    "merge": false,
+    "ui_changes": false,
+    "destructive_actions": false
+  },
+  "catalog": {
+    "status": "CATALOG_TRANSACTION_PENDING_T21_A7",
+    "version_or_count_advanced": false
+  }
+}

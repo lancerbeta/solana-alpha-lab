@@ -1,0 +1,82 @@
+{
+  "schema": "smial.task21.owner-pulse-post-h6-sentinel-rebase-acceptance",
+  "schema_version": "1.0",
+  "task_id": "TASK-21",
+  "atom_id": "T21-A6S_POST_H6_GAP_SENTINEL_VALUE_REBASE_V1",
+  "status": "PASS",
+  "verdict": "OWNER_PULSE_H24_MINIMUM_AGE_H72_H168_TRIGGER_ONLY",
+  "accepted_at": "2026-07-31T17:15:42.592Z",
+  "targeted_validation": "15_OF_15_PASS",
+  "artifacts": [
+    {
+      "path": "configs/task21_owner_pulse_read_model_v1.yaml",
+      "bytes": 5859,
+      "sha256": "f69abae794444b8d165ea87f871264fd83c1ec5d60d9a108167354c981842d7c"
+    },
+    {
+      "path": "docs/contracts/task21_owner_pulse_read_model_contract_v1.md",
+      "bytes": 7304,
+      "sha256": "f4d1eb7770004347566bc9b9ef162aeb26c0bd9f17a3625389f57bcf5febca4d"
+    },
+    {
+      "path": "src/solana_alpha_lab/task21_owner_pulse.py",
+      "bytes": 46586,
+      "sha256": "44f82431cb4cc39034b072bbcbb7593a0d9431ccd6718b61ad6f740258fbaaac"
+    },
+    {
+      "path": "scripts/show_task21_owner_pulse.py",
+      "bytes": 1464,
+      "sha256": "1fc62b00f18cee26a64355ebdc475dd7ac25cbcbf98fb24cfe9c87e9478da0d2"
+    },
+    {
+      "path": "tests/test_task21_owner_pulse.py",
+      "bytes": 21990,
+      "sha256": "52968c20ecf04a0d682c556fa51d37e509ac431487101e327f17ac843a3f7f25"
+    }
+  ],
+  "protected_inputs": [
+    {
+      "path": "configs/task21_post_h6_gap_sentinel_value_rebase_v1.yaml",
+      "bytes": 4991,
+      "sha256": "9598af58452f49853d447f9b4b125ed7b9de70b1643204a3bc3e4e213c01276f"
+    },
+    {
+      "path": "control/active_time_gates.json",
+      "bytes": 13921,
+      "sha256": "16e809c03bf571a2e0fc4c70539bb84816848cc24d9b29060ba7c3b7bf04f9fc"
+    }
+  ],
+  "schedule": {
+    "horizons": ["H24", "H72", "H168"],
+    "h24_semantics": "MINIMUM_AGE_24H_PLUS",
+    "h24_latest_at": null,
+    "narrow_expiry_window_used": false,
+    "h72_state": "DEFERRED_TRIGGER_ONLY",
+    "h168_state": "DEFERRED_TRIGGER_ONLY",
+    "h72_active_gate_created": false,
+    "h168_active_gate_created": false,
+    "scheduler_or_background_process": false
+  },
+  "actual_actions": {
+    "network_calls": 0,
+    "provider_api_rpc_wss_calls": 0,
+    "drive_reads": 0,
+    "drive_writes": 0,
+    "raw_or_dataset_writes": 0,
+    "provider_credits": 0,
+    "cash_spend_usd_cents": 0,
+    "credentials": 0,
+    "scheduler_or_background_process": false,
+    "wallet_signer_transaction_actions": 0,
+    "commit": false,
+    "push": false,
+    "pull_request": false,
+    "merge": false,
+    "ui_changes": false,
+    "destructive_actions": false
+  },
+  "catalog": {
+    "status": "CATALOG_TRANSACTION_PENDING_T21_A7",
+    "version_or_count_advanced": false
+  }
+}

@@ -1,0 +1,136 @@
+{
+  "schema": "smial.task21.post-h6-gap-sentinel-value-rebase-acceptance",
+  "schema_version": "1.0",
+  "task_id": "TASK-21",
+  "atom_id": "T21-A6S_POST_H6_GAP_SENTINEL_VALUE_REBASE_V1",
+  "status": "PASS",
+  "verdict": "POST_H6_GAP_SENTINEL_VALUE_REBASE_ACCEPTED_FORWARD_ONLY",
+  "accepted_at": "2026-07-31T17:15:42.592Z",
+  "targeted_validation": "9_OF_9_PASS",
+  "artifacts": [
+    {
+      "path": "configs/task21_post_h6_gap_sentinel_value_rebase_v1.yaml",
+      "bytes": 4991,
+      "sha256": "9598af58452f49853d447f9b4b125ed7b9de70b1643204a3bc3e4e213c01276f"
+    },
+    {
+      "path": "docs/contracts/task21_post_h6_gap_sentinel_value_rebase_contract_v1.md",
+      "bytes": 3246,
+      "sha256": "95d1507a44128bf34ca52dbc9d26d44e2d20b6ef693862a701236f20cf09f624"
+    },
+    {
+      "path": "tests/test_task21_post_h6_gap_sentinel_value_rebase.py",
+      "bytes": 6785,
+      "sha256": "c00e4afa7c79b0bdb208309fa64eb058b28bb68a48706bc54fd842b797234e53"
+    },
+    {
+      "path": "control/active_time_gates.json",
+      "bytes": 13921,
+      "sha256": "16e809c03bf571a2e0fc4c70539bb84816848cc24d9b29060ba7c3b7bf04f9fc"
+    },
+    {
+      "path": "configs/task21_h24_foreground_capture_v1.yaml",
+      "bytes": 4807,
+      "sha256": "1c0db3ca1083711114a07ddaaecc40d362d4e758c7f4e18ce4c27d7ff4e8a0e1"
+    },
+    {
+      "path": "docs/contracts/task21_h24_foreground_capture_contract_v1.md",
+      "bytes": 2077,
+      "sha256": "57dc69bd0e8773f052dc1d4b1034aad603899fcd57aff83b73177dfdf9513012"
+    },
+    {
+      "path": "src/solana_alpha_lab/task21_h24_foreground_capture.py",
+      "bytes": 23342,
+      "sha256": "6cefcdf813ed209bf023659c0f5c195abef8c6ce05b9de531240522d07ab5637"
+    },
+    {
+      "path": "tests/test_task21_h24_foreground_capture.py",
+      "bytes": 11666,
+      "sha256": "7282bae1be07f637313615299ac30f70d3345c6a111a161a6305124de0f02120"
+    },
+    {
+      "path": "docs/evidence/task21/h24_minimum_age_sentinel_offline_acceptance_v2.json",
+      "bytes": 3349,
+      "sha256": "a7df6c5d870c21cda567a1c0900eeab45689ffc5e5aa837ee29ade1e00b4bbf8"
+    },
+    {
+      "path": "configs/task21_owner_pulse_read_model_v1.yaml",
+      "bytes": 5859,
+      "sha256": "f69abae794444b8d165ea87f871264fd83c1ec5d60d9a108167354c981842d7c"
+    },
+    {
+      "path": "docs/contracts/task21_owner_pulse_read_model_contract_v1.md",
+      "bytes": 7304,
+      "sha256": "f4d1eb7770004347566bc9b9ef162aeb26c0bd9f17a3625389f57bcf5febca4d"
+    },
+    {
+      "path": "src/solana_alpha_lab/task21_owner_pulse.py",
+      "bytes": 46586,
+      "sha256": "44f82431cb4cc39034b072bbcbb7593a0d9431ccd6718b61ad6f740258fbaaac"
+    },
+    {
+      "path": "tests/test_task21_owner_pulse.py",
+      "bytes": 21990,
+      "sha256": "52968c20ecf04a0d682c556fa51d37e509ac431487101e327f17ac843a3f7f25"
+    },
+    {
+      "path": "docs/evidence/task21/owner_pulse_post_h6_sentinel_rebase_acceptance_v2.json",
+      "bytes": 2629,
+      "sha256": "f5ca3d4c86793214bbae786f1a190454219d3f4197b359134461921f7c22d6df"
+    },
+    {
+      "path": "tests/test_task21_future_sentinel_capture.py",
+      "bytes": 22910,
+      "sha256": "d5583c09f7ec399d0da583170d6eb826503bc391a0a827b48deeaec954c480b1"
+    },
+    {
+      "path": "tests/test_task21_observation_horizon.py",
+      "bytes": 7465,
+      "sha256": "70393f4019984b958adcae68901982f398ca30230659e22b46cca33195429fe8"
+    }
+  ],
+  "decisions": {
+    "h24_sentinel_members_exact": 1,
+    "h24_provider_calls_max": 8,
+    "h24_timing": "MINIMUM_AGE_24H_PLUS_NO_EXPIRY",
+    "h72_h168": "DEFERRED_TRIGGER_ONLY",
+    "whole_task_worst_case_requests": 180,
+    "whole_task_request_cap": 192,
+    "headroom": 12,
+    "historical_receipts_rewritten": false,
+    "dataset_sufficiency_weakened": false
+  },
+  "actual_actions": {
+    "network_calls": 0,
+    "provider_api_rpc_wss_calls": 0,
+    "drive_reads": 0,
+    "drive_writes": 0,
+    "candidate_admissions": 0,
+    "raw_or_dataset_writes": 0,
+    "provider_credits": 0,
+    "cash_spend_usd_cents": 0,
+    "credentials": 0,
+    "scheduler_or_background_process": false,
+    "wallet_signer_transaction_actions": 0,
+    "commit": false,
+    "push": false,
+    "pull_request": false,
+    "merge": false,
+    "ui_changes": false,
+    "destructive_actions": false
+  },
+  "catalog": {
+    "version": "0.25.0",
+    "counts": "340 / 4 / 4 / 8",
+    "status": "CATALOG_TRANSACTION_PENDING_T21_A7",
+    "version_or_count_advanced": false
+  },
+  "next_boundary": {
+    "atom_id": "T21-A6S_H24_FOREGROUND_CAPTURE_V1",
+    "status": "ACTIVE_WAITING_NOT_BEFORE",
+    "not_before_at": "2026-08-01T07:50:34.414367Z",
+    "latest_at": null,
+    "provider_api_rpc_wss_calls_authorized": false,
+    "recovery_health_revalidation_required": true
+  }
+}

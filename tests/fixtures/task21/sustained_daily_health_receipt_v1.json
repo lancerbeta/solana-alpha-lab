@@ -1,0 +1,19 @@
+{
+  "as_of_utc": "2026-08-29T12:00:00Z",
+  "collection_day": 30,
+  "contains_market_data": false,
+  "contains_secrets": false,
+  "expected_terminal_panels_to_date": 15,
+  "last_collection_event_at_utc": "2026-08-29T10:00:00Z",
+  "retained_gap_event_ids": [],
+  "retained_incident_event_ids": [],
+  "schema": "smial.task21.sustained-daily-health-input",
+  "schema_version": "1.0",
+  "source_receipt": {
+    "json_pointer": "/offline_state_receipt",
+    "path": "docs/evidence/task21/sustained_collection_offline_acceptance_v1.json",
+    "sha256": "c4a1e1c4c2029e28602fe29e660970071c60341087ebf04589dff4b4c05192a4"
+  },
+  "synthetic_only": true,
+  "task_id": "TASK-21"
+}
