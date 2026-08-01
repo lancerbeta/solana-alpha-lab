@@ -93,11 +93,22 @@ class Task16HypothesisResearchMemoryAcceptanceTests(unittest.TestCase):
         for source in migration["sources"]:
             with self.subTest(path=source["path"]):
                 path = ROOT / source["path"]
-                self.assertEqual(sha256(path), source["sha256"])
                 document = yaml.safe_load(path.read_text(encoding="utf-8"))
                 self.assertEqual(document["schema_version"], "1.0")
-                self.assertEqual(document["records"], [])
                 self.assertEqual(source["records"], 0)
+                if source["path"] == "registries/global_trial_ledger.yaml":
+                    records = document["records"]
+                    self.assertTrue(
+                        all(
+                            record["record_kind"] == "trial"
+                            and record["status"] == "RECORDED"
+                            and record["created_at"] > "2026-07-29T00:00:00Z"
+                            for record in records
+                        )
+                    )
+                else:
+                    self.assertEqual(sha256(path), source["sha256"])
+                    self.assertEqual(document["records"], [])
 
     def test_bounded_query_reproduces_evidence_bearing_result(self) -> None:
         document, content_sha256 = memory.load_memory(MEMORY_PATH)

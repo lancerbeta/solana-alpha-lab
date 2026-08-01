@@ -1,0 +1,176 @@
+{
+  "atom_id": "T23-A3_DETERMINISTIC_R2_DIAGNOSTIC_PROJECTION_V1",
+  "bindings": {
+    "config": {
+      "path": "configs/task23_bounded_diagnostics_v1.yaml",
+      "sha256": "33cd3cd81833d578c0a3be240fa443f196a5b3dca946f4ba8315749c7b67f0bf"
+    },
+    "contract": {
+      "path": "docs/contracts/task23_bounded_diagnostics_contract_v1.md",
+      "sha256": "0b8327b9926506a4ea57afee291a7217222ff7dd5aa10c77044db6dcaba64780"
+    },
+    "dataset_identity": {
+      "consumer_profile_id": "TASK23-COHORT-DIAGNOSTICS-THREE-PANEL-001",
+      "dataset_inventory_sha256": "aaa605eabdb62c38d218b40e768669db460c6fa419c4086d5412547b7f2fffae",
+      "split_content_sha256": "63b6d63895bdd6d25b68501619bca21e10f476a95ad8d27611f356a26cccee2d",
+      "split_id": "T22-SPLIT-T21-FROZEN-002",
+      "split_manifest_sha256": "973a9ff6dd2a376e62dee9289a57cbb62f06c8efb5a619fa6b7b2a7914dd0683"
+    },
+    "member_set": [
+      "T21-WATCH-29e2b75994975253bd74",
+      "T21-WATCH-6f21dec76d05f5831216",
+      "T21-WATCH-61ce24fc3fa04e3eaba7"
+    ],
+    "pre_read_receipt": {
+      "path": "docs/evidence/task23/a3_r2_development_read_receipt_v2.json",
+      "sha256": "6b8071aa85f6227a46d55c08ba5a1fe4beccf66902f338bd3735c3a171778ea1"
+    },
+    "projection_code": {
+      "path": "src/solana_alpha_lab/task23_diagnostic_projection.py",
+      "sha256": "728fa77fc82a3e27245a908cfecc2a50e7df82c5813e6b90d4ad8ff0870e57f9"
+    }
+  },
+  "created_at": "2026-08-01T22:10:00Z",
+  "denominator_policy": {
+    "missing_is_zero": false,
+    "publish_with_every_rate": [
+      "numerator",
+      "denominator",
+      "denominator_definition",
+      "excluded_typed_states"
+    ],
+    "required": [
+      "planned_panels",
+      "observed_panels",
+      "planned_buy_legs",
+      "observed_buy_legs",
+      "eligible_dependent_sell_legs",
+      "observed_dependent_sell_legs"
+    ],
+    "retain_negative_results": true,
+    "retained_states": [
+      "QUOTE_AVAILABLE",
+      "NO_ROUTE",
+      "PROVIDER_ERROR",
+      "INVALID_RESPONSE",
+      "TIMEOUT",
+      "SELL_NOT_ATTEMPTED",
+      "PANEL_MISSING",
+      "CAPTURE_DEAD",
+      "CAPTURE_STOPPED",
+      "TIMESTAMP_INVALID"
+    ]
+  },
+  "next_boundary": {
+    "atom_id": "T23-A4_BOUNDED_ANALYSIS_AND_ADVERSARIAL_ACCEPTANCE_V1",
+    "authorized": false,
+    "owner_decision": null,
+    "r3_access": "DENY"
+  },
+  "nonclaims": [
+    "NOT_POOL_LIQUIDITY",
+    "NOT_MARKET_DEPTH",
+    "NOT_FILLABLE_SIZE",
+    "NOT_REALIZED_VWAP",
+    "NOT_EXECUTION_CAPACITY",
+    "NOT_NET_RETURN",
+    "NOT_ALPHA",
+    "NOT_POPULATION_GENERALIZATION"
+  ],
+  "outputs": [
+    {
+      "bytes": 1657,
+      "path": "docs/evidence/task23/a3_projection_v1_attempt_02/panel_diagnostics_v1.csv",
+      "rows": 9,
+      "sha256": "20cefa9332f2074042f9168ef2c1448bcbe8db281f49a55123f84d8389994c4d"
+    },
+    {
+      "bytes": 3638,
+      "path": "docs/evidence/task23/a3_projection_v1_attempt_02/panel_inventory_v1.csv",
+      "rows": 9,
+      "sha256": "a623b70543a74c63df41bb45c83074541fa98ac105fdeb611b7e02723014b4ec"
+    },
+    {
+      "bytes": 9657,
+      "path": "docs/evidence/task23/a3_projection_v1_attempt_02/quote_pair_availability_v1.csv",
+      "rows": 36,
+      "sha256": "5b525a9602f32b6c654a9bf87c0a783212046cee8f292d13838e160ec9788273"
+    }
+  ],
+  "raw_inputs": [
+    {
+      "bytes": 43519,
+      "line_count": 8,
+      "path": "local/task21_forward/final_cohort/r2/p1/run=p1-20260801T122606020085Z-c66cbd9193f1/member=T21-WATCH-29e2b75994975253bd74/horizon=P1/raw_events.jsonl",
+      "sha256": "e4216ee65212eaf2143174b3dacfa31b6c198f7ebd24a81b9f4166f95472d950"
+    },
+    {
+      "bytes": 42708,
+      "line_count": 8,
+      "path": "local/task21_forward/final_cohort/r2/p1/run=p1-20260801T122606020085Z-c66cbd9193f1/member=T21-WATCH-61ce24fc3fa04e3eaba7/horizon=P1/raw_events.jsonl",
+      "sha256": "146d759f9223eb5fcae4ba94a3431765f7c37c1442a2211730a098f4214c5d36"
+    },
+    {
+      "bytes": 43567,
+      "line_count": 8,
+      "path": "local/task21_forward/final_cohort/r2/p1/run=p1-20260801T122606020085Z-c66cbd9193f1/member=T21-WATCH-6f21dec76d05f5831216/horizon=P1/raw_events.jsonl",
+      "sha256": "b84bace925142e8550eb4e75a2e9b45b034732625885ff817ce5941df5983fa0"
+    },
+    {
+      "bytes": 43108,
+      "line_count": 8,
+      "path": "local/task21_forward/final_cohort/r2/p2/run=p2-20260801T131100955007Z-1e6e05144f30/member=T21-WATCH-29e2b75994975253bd74/horizon=P2/raw_events.jsonl",
+      "sha256": "65050b7e36b62114b1ed8753dea730eafbcfad70d79053d129758dea87615eec"
+    },
+    {
+      "bytes": 43925,
+      "line_count": 8,
+      "path": "local/task21_forward/final_cohort/r2/p2/run=p2-20260801T131100955007Z-1e6e05144f30/member=T21-WATCH-61ce24fc3fa04e3eaba7/horizon=P2/raw_events.jsonl",
+      "sha256": "d66347571e142a68c682492790af799854c95fd646537dddc99fc07d9a44b3d1"
+    },
+    {
+      "bytes": 43905,
+      "line_count": 8,
+      "path": "local/task21_forward/final_cohort/r2/p2/run=p2-20260801T131100955007Z-1e6e05144f30/member=T21-WATCH-6f21dec76d05f5831216/horizon=P2/raw_events.jsonl",
+      "sha256": "6859ba724a7602000cca93435b978fc253b5a80a0c3b2b4ecf4ff3567084e101"
+    },
+    {
+      "bytes": 43115,
+      "line_count": 8,
+      "path": "local/task21_forward/final_cohort/r2/run=r2-20260801T114657421057Z-7882ff946449/member=T21-WATCH-29e2b75994975253bd74/horizon=P0/raw_events.jsonl",
+      "sha256": "9a880c74657ac25693d4804411da385e247aa637e511a91c2ff320d256ac5278"
+    },
+    {
+      "bytes": 44397,
+      "line_count": 8,
+      "path": "local/task21_forward/final_cohort/r2/run=r2-20260801T114657421057Z-7882ff946449/member=T21-WATCH-61ce24fc3fa04e3eaba7/horizon=P0/raw_events.jsonl",
+      "sha256": "b0f61b312defd68341b1282ad40a80e6dc865ad23a279a85b0dc6abac3a8863f"
+    },
+    {
+      "bytes": 43990,
+      "line_count": 8,
+      "path": "local/task21_forward/final_cohort/r2/run=r2-20260801T114657421057Z-7882ff946449/member=T21-WATCH-6f21dec76d05f5831216/horizon=P0/raw_events.jsonl",
+      "sha256": "ce0009934f2bfabf449e62fe2eae6b1cab9ab739084c6025da6095472af4ca01"
+    }
+  ],
+  "schema": "smial.task23.r2-diagnostic-projection",
+  "schema_version": "1.0.0",
+  "status": "MATERIALIZED_DETERMINISTIC_R2_ONLY",
+  "summary": {
+    "capture_clusters": 1,
+    "eligible_dependent_sell_legs": 36,
+    "inference_mode": "DESCRIPTIVE_ONLY",
+    "members": 3,
+    "observed_buy_legs": 36,
+    "observed_dependent_sell_legs": 36,
+    "observed_panels": 9,
+    "outcome_paths_outside_r2_opened": 0,
+    "planned_buy_legs": 36,
+    "planned_panels": 9,
+    "r2_value_files_opened": 9,
+    "r3_paths_discovered": 0,
+    "r3_value_files_opened": 0,
+    "validation_population": "NONE"
+  },
+  "task_id": "TASK-23"
+}

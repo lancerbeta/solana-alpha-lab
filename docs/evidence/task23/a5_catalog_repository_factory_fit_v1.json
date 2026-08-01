@@ -1,0 +1,337 @@
+{
+  "receipt_id": "T23-A5-CATALOG-REPOSITORY-FACTORY-FIT-RECEIPT-001",
+  "receipt_version": "1.0",
+  "task_id": "TASK-23",
+  "atom_id": "T23-A5_CATALOG_REPOSITORY_FACTORY_FIT_V1",
+  "status": "PASS_DIAGNOSTICS_READY_WITH_LIMITATIONS",
+  "as_of": "2026-08-02",
+  "repository_base": {
+    "branch": "task23/cohort-diagnostics",
+    "head": "90575accefbba7da534a6bd89b3652b2644a278b",
+    "tree": "f9cdd82ad8df427abe35e577889adaaca22b2d12",
+    "upstream": "origin/main"
+  },
+  "accepted_result": {
+    "owner_decision": "DIAGNOSTICS_READY_WITH_LIMITATIONS",
+    "development": "T21-R2",
+    "validation": "NONE",
+    "holdout": "T21-R3",
+    "holdout_state": "UNTOUCHED",
+    "holdout_access": "DENY",
+    "r3_paths_discovered": 0,
+    "r3_value_files_opened": 0,
+    "outcome_paths_outside_r2_opened": 0,
+    "members": 3,
+    "panels": 9,
+    "quote_pairs": 36,
+    "capture_clusters": 1,
+    "effective_independent_cluster_count_upper_bound": 1,
+    "inference_mode": "DESCRIPTIVE_ONLY",
+    "capacity_proxy_test_ceiling_usd": 100,
+    "capacity_proxy_right_censored": true,
+    "route_id_continuity_materialized": false,
+    "route_id_continuity_claim": false,
+    "a3_manifest_sha256": "06702bba94e9a895d340598f2fa722eeed6dd5ce9cd324d699918ac6a8a95ff9",
+    "a4_analysis_sha256": "9bf332fc1a302984750890a6ce8220b6038dc602dc259fb3f261ade0b6e46489",
+    "a4_report_sha256": "2964fc1c6051772b1d9fef2d973df49d1155e89efb30207263f91297630b898f",
+    "a4_adversarial_acceptance_sha256": "d3d039af89c882f80a935b0567edf60355a6ea8f4699ed75f46bcd520ab6bd48"
+  },
+  "frozen_a1_a4_artifacts": [
+    {
+      "asset_id": "CONTRACT-T23-BOUNDED-DIAGNOSTICS-001",
+      "path": "docs/contracts/task23_bounded_diagnostics_contract_v1.md",
+      "sha256": "0b8327b9926506a4ea57afee291a7217222ff7dd5aa10c77044db6dcaba64780"
+    },
+    {
+      "asset_id": "CONFIG-T23-BOUNDED-DIAGNOSTICS-001",
+      "path": "configs/task23_bounded_diagnostics_v1.yaml",
+      "sha256": "33cd3cd81833d578c0a3be240fa443f196a5b3dca946f4ba8315749c7b67f0bf"
+    },
+    {
+      "asset_id": "TEST-T23-BOUNDED-DIAGNOSTICS-CONTRACT-001",
+      "path": "tests/test_task23_bounded_diagnostics_contract.py",
+      "sha256": "e343e9d56d409e74f126d87487ccc288468a6b63a49cfa918b0b0df7caa5f12d"
+    },
+    {
+      "asset_id": "QUERY-T23-R2-DIAGNOSTIC-PROJECTION-001",
+      "path": "src/solana_alpha_lab/task23_diagnostic_projection.py",
+      "sha256": "728fa77fc82a3e27245a908cfecc2a50e7df82c5813e6b90d4ad8ff0870e57f9"
+    },
+    {
+      "asset_id": "EVIDENCE-T23-A3-PRE-READ-RECEIPT-001",
+      "path": "docs/evidence/task23/a3_r2_development_read_receipt_v1.json",
+      "sha256": "4489c29a320e23e0578d853c851c50ee9f26aafe1ffba798610b4e47a5e3e10d"
+    },
+    {
+      "asset_id": "EVIDENCE-T23-A3-ATTEMPT-01-FAILURE-001",
+      "path": "docs/evidence/task23/a3_projection_attempt_01_failure_receipt_v1.json",
+      "sha256": "b28d3bca76291397181568cc8dc923c75e07cf71fea9b4cfa70179b629f5bfe5"
+    },
+    {
+      "asset_id": "EVIDENCE-T23-A3-PRE-READ-RECEIPT-002",
+      "path": "docs/evidence/task23/a3_r2_development_read_receipt_v2.json",
+      "sha256": "6b8071aa85f6227a46d55c08ba5a1fe4beccf66902f338bd3735c3a171778ea1"
+    },
+    {
+      "asset_id": "DATA-T23-PANEL-INVENTORY-001",
+      "path": "docs/evidence/task23/a3_projection_v1_attempt_02/panel_inventory_v1.csv",
+      "sha256": "a623b70543a74c63df41bb45c83074541fa98ac105fdeb611b7e02723014b4ec"
+    },
+    {
+      "asset_id": "DATA-T23-QUOTE-PAIR-AVAILABILITY-001",
+      "path": "docs/evidence/task23/a3_projection_v1_attempt_02/quote_pair_availability_v1.csv",
+      "sha256": "5b525a9602f32b6c654a9bf87c0a783212046cee8f292d13838e160ec9788273"
+    },
+    {
+      "asset_id": "DATA-T23-PANEL-DIAGNOSTICS-001",
+      "path": "docs/evidence/task23/a3_projection_v1_attempt_02/panel_diagnostics_v1.csv",
+      "sha256": "20cefa9332f2074042f9168ef2c1448bcbe8db281f49a55123f84d8389994c4d"
+    },
+    {
+      "asset_id": "EVIDENCE-T23-A3-PROJECTION-MANIFEST-001",
+      "path": "docs/evidence/task23/a3_projection_v1_attempt_02/projection_manifest_v1.json",
+      "sha256": "06702bba94e9a895d340598f2fa722eeed6dd5ce9cd324d699918ac6a8a95ff9"
+    },
+    {
+      "asset_id": "TEST-T23-DIAGNOSTIC-PROJECTION-001",
+      "path": "tests/test_task23_diagnostic_projection.py",
+      "sha256": "8bbc2b35ee7a69a2b9c544ae6416c0f35072b714ae5afb6a6e7b8e5498fbf1f0"
+    },
+    {
+      "asset_id": "MODULE-T23-BOUNDED-ANALYSIS-001",
+      "path": "src/solana_alpha_lab/task23_bounded_analysis.py",
+      "sha256": "5be63e5a2d91307cf6c9e0a7d7232d6cd5b70db30018d39e4cb6ea514629a1ce"
+    },
+    {
+      "asset_id": "EVIDENCE-T23-A4-BOUNDED-ANALYSIS-001",
+      "path": "docs/evidence/task23/a4_bounded_analysis_v1.json",
+      "sha256": "9bf332fc1a302984750890a6ce8220b6038dc602dc259fb3f261ade0b6e46489"
+    },
+    {
+      "asset_id": "REPORT-T23-COHORT-DIAGNOSTICS-001",
+      "path": "docs/reports/task23_cohort_diagnostics_v1.md",
+      "sha256": "2964fc1c6051772b1d9fef2d973df49d1155e89efb30207263f91297630b898f"
+    },
+    {
+      "asset_id": "EVIDENCE-T23-A4-ADVERSARIAL-ACCEPTANCE-001",
+      "path": "docs/evidence/task23/a4_adversarial_acceptance_v1.json",
+      "sha256": "d3d039af89c882f80a935b0567edf60355a6ea8f4699ed75f46bcd520ab6bd48"
+    },
+    {
+      "asset_id": "TEST-T23-BOUNDED-ANALYSIS-001",
+      "path": "tests/test_task23_bounded_analysis.py",
+      "sha256": "e1f14ced1bf9697de89a7e1a4528847c8da5aefdd25f7a47f415382171d2a8ae"
+    }
+  ],
+  "retained_noncanonical_attempt_outputs": [
+    {
+      "path": "docs/evidence/task23/a3_projection_v1/panel_inventory_v1.csv",
+      "sha256": "a623b70543a74c63df41bb45c83074541fa98ac105fdeb611b7e02723014b4ec",
+      "status": "PARTIAL_ATTEMPT_RETAINED_NOT_ACCEPTED"
+    },
+    {
+      "path": "docs/evidence/task23/a3_projection_v1/quote_pair_availability_v1.csv",
+      "sha256": "5b525a9602f32b6c654a9bf87c0a783212046cee8f292d13838e160ec9788273",
+      "status": "PARTIAL_ATTEMPT_RETAINED_NOT_ACCEPTED"
+    },
+    {
+      "path": "docs/evidence/task23/a3_projection_v1/panel_diagnostics_v1.csv",
+      "sha256": "20cefa9332f2074042f9168ef2c1448bcbe8db281f49a55123f84d8389994c4d",
+      "status": "PARTIAL_ATTEMPT_RETAINED_NOT_ACCEPTED"
+    }
+  ],
+  "catalog": {
+    "status": "REGISTERED_IN_TASK23_A5_TRANSACTION",
+    "catalog_version": "0.28.0",
+    "assets": 415,
+    "asset_registries": 4,
+    "schemas": 7,
+    "queries": 8,
+    "lifecycle_registries": 9,
+    "lifecycle_records": 55,
+    "registered_asset_ids": [
+      "CONTRACT-T23-BOUNDED-DIAGNOSTICS-001",
+      "CONFIG-T23-BOUNDED-DIAGNOSTICS-001",
+      "TEST-T23-BOUNDED-DIAGNOSTICS-CONTRACT-001",
+      "QUERY-T23-R2-DIAGNOSTIC-PROJECTION-001",
+      "EVIDENCE-T23-A3-PRE-READ-RECEIPT-001",
+      "EVIDENCE-T23-A3-ATTEMPT-01-FAILURE-001",
+      "EVIDENCE-T23-A3-PRE-READ-RECEIPT-002",
+      "DATA-T23-PANEL-INVENTORY-001",
+      "DATA-T23-QUOTE-PAIR-AVAILABILITY-001",
+      "DATA-T23-PANEL-DIAGNOSTICS-001",
+      "EVIDENCE-T23-A3-PROJECTION-MANIFEST-001",
+      "TEST-T23-DIAGNOSTIC-PROJECTION-001",
+      "MODULE-T23-BOUNDED-ANALYSIS-001",
+      "EVIDENCE-T23-A4-BOUNDED-ANALYSIS-001",
+      "REPORT-T23-COHORT-DIAGNOSTICS-001",
+      "EVIDENCE-T23-A4-ADVERSARIAL-ACCEPTANCE-001",
+      "TEST-T23-BOUNDED-ANALYSIS-001",
+      "EVIDENCE-T23-A5-CATALOG-FACTORY-FIT-001",
+      "TEST-T23-A5-CATALOG-FACTORY-FIT-001"
+    ],
+    "updated_asset_ids": [
+      "REGISTRY-GLOBAL-TRIAL-LEDGER-001",
+      "VALIDATOR-T04-ARCHITECTURE-001",
+      "TEST-T16-HYPOTHESIS-RESEARCH-MEMORY-ACCEPTANCE-001",
+      "TEST-T18-CATALOG-REPOSITORY-FINALIZATION-001",
+      "TEST-T20-ACCEPTANCE-CATALOG-FACTORY-FIT-001",
+      "TEST-T22-A6-ACCEPTANCE-001",
+      "GENERATED-PROJECT-MAP-001",
+      "GENERATED-EDGE-PROJECTION-001"
+    ],
+    "named_consumers": [
+      "TASK-23",
+      "TASK-24",
+      "TASK-25",
+      "FACTORY-001",
+      "REG-RESEARCH-001"
+    ]
+  },
+  "factory_fit": {
+    "mode": "FULL_REVIEW",
+    "verdict": "PASS_WITH_LIMITATIONS_AND_DURABLE_FOLLOWUP",
+    "bounded_correction": "CATALOG_LINEAGE_AND_MONOTONIC_HISTORICAL_CONSUMERS",
+    "checks": [
+      {
+        "check_id": "GOAL_FIT",
+        "status": "PASS",
+        "evidence": "The owner receives one bounded decision about whether R2 is informative enough for downstream entity and outcome design."
+      },
+      {
+        "check_id": "RESEARCH_TRUTH",
+        "status": "PASS",
+        "evidence": "Only exact content-addressed R2-derived outputs are accepted; validation is NONE and R3 remains untouched and default deny."
+      },
+      {
+        "check_id": "DATA_FITNESS",
+        "status": "PASS_WITH_LIMITATION",
+        "evidence": "All planned R2 panels and quote pairs are present, but the sample contains one dependent cluster and no failure-state variation."
+      },
+      {
+        "check_id": "DEPENDENCE_AND_MISSINGNESS",
+        "status": "PASS_WITH_LIMITATION",
+        "evidence": "Effective independent cluster count is at most one; typed missing states remain visible and zero observed failures is not zero failure probability."
+      },
+      {
+        "check_id": "COMPATIBILITY_AND_HISTORY",
+        "status": "PASS",
+        "evidence": "Historical Catalog receipts remain exact while current assertions permit only monotonic Catalog and append-only lifecycle growth."
+      },
+      {
+        "check_id": "FLEXIBILITY_AND_REUSE",
+        "status": "PASS",
+        "evidence": "Existing split, schemas, quote classifier, Catalog and lifecycle ledger are adopted or wrapped without a new service or dependency."
+      },
+      {
+        "check_id": "EFFICIENCY_AND_PARETO",
+        "status": "PASS",
+        "evidence": "The analysis is a deterministic projection over three small tables; no notebook, dashboard, provider call or expanded collection is needed."
+      },
+      {
+        "check_id": "OWNER_JOURNEY",
+        "status": "PASS",
+        "evidence": "The Markdown report exposes one decision, actual-time ranges, denominators, negative results, limitations and the next safe boundary."
+      },
+      {
+        "check_id": "CATALOG_AND_LINEAGE",
+        "status": "PASS",
+        "evidence": "Contracts, query code, both read receipts, failed trial evidence, accepted datasets, analysis, report, tests and downstream consumers have stable relations."
+      },
+      {
+        "check_id": "EXECUTION_TO_CASHFLOW",
+        "status": "NOT_APPLICABLE",
+        "evidence": "No signal, order, fill, position, realized PnL, NetReturn or owner-cashflow claim is created."
+      },
+      {
+        "check_id": "POSITION_AND_RISK_TRUTH",
+        "status": "NOT_APPLICABLE",
+        "evidence": "No inventory, signer, transaction, capital or real-money authority exists."
+      },
+      {
+        "check_id": "MONITORING_AND_RECOVERY",
+        "status": "PASS",
+        "evidence": "Content hashes, create-only accepted outputs, retained failed-attempt evidence and deterministic regeneration provide bounded drift and recovery checks."
+      },
+      {
+        "check_id": "BUILD_VERSUS_BUY",
+        "status": "PASS",
+        "evidence": "The accepted ADOPT and WRAP route uses existing local Python, schemas and Catalog machinery with zero dependency changes."
+      },
+      {
+        "check_id": "FAILURE_RED_TEAM",
+        "status": "PASS",
+        "evidence": "Tests reject R3 access, row loss or duplication, missing-as-zero, nominal-time substitution, invented precision, alpha claims and route-continuity overclaim."
+      },
+      {
+        "check_id": "CONTRADICTION_SCAN",
+        "status": "PASS",
+        "evidence": "A2 contract, A3 manifest, A4 analysis, trial ledger, Catalog relations, R3 boundary and downstream nonclaims agree."
+      }
+    ],
+    "durable_followup": {
+      "followup_id": "FIRST_R3_OUTCOME_ACCESS_CONSUMES_HOLDOUT",
+      "owner": "TASK-25_ENTRY_GATE",
+      "activation_trigger": "BEFORE_FIRST_EXACT_R3_OUTCOME_VALUE_READ",
+      "required_action": "APPEND_CONSUMED_EVENT_TO_HOLDOUT_LEDGER_AND_TASK03_REGISTRY_BOUND_TO_EXACT_HYPOTHESIS_TRIAL_QUERY_ACTOR_AND_TIME_BEFORE_VALUE_READ",
+      "destination": "TASK-25_OUTCOME_CONTRACT_AND_HOLDOUT_CONSUMPTION_GATE",
+      "cannot_be_satisfied_by": [
+        "READING_R3_OUTCOMES_FIRST",
+        "EDITING_PRIOR_LEDGER_BYTES",
+        "RESETTING_CONSUMED_TO_UNTOUCHED",
+        "USING_NOMINAL_PANEL_LABELS_AS_EXACT_HORIZONS"
+      ]
+    }
+  },
+  "validation": {
+    "task23_a2_a5_suite": "PASS",
+    "catalog_validation": "PASS_0_28_0_415_ASSETS",
+    "generated_navigation": "PASS",
+    "full_repository_unit_suite": "PASS",
+    "diff_check": "PASS"
+  },
+  "authority": {
+    "local_write_only": true,
+    "network_calls": 0,
+    "provider_api_rpc_wss_calls": 0,
+    "drive_reads": 0,
+    "drive_writes": 0,
+    "r2_raw_value_reads": 0,
+    "r3_path_discovery": 0,
+    "r3_value_reads": 0,
+    "outcome_reads": 0,
+    "raw_or_dataset_writes": 0,
+    "additional_collection": 0,
+    "cash_spend_usd_cents": 0,
+    "provider_credits": 0,
+    "credential_use": 0,
+    "dependency_changes": 0,
+    "wallet_signer_transaction_actions": 0,
+    "commit": false,
+    "push": false,
+    "pull_request": false,
+    "merge": false,
+    "destructive_actions": false
+  },
+  "nonclaims": [
+    "NOT_R3_OR_OUTCOME_ANALYSIS",
+    "NOT_ALPHA_OR_STRATEGY_PROMOTION",
+    "NOT_MARKET_DEPTH_OR_FILLABLE_SIZE",
+    "NOT_REALIZED_VWAP_NET_RETURN_OR_OWNER_CASHFLOW",
+    "NOT_MARKET_WIDE_OR_CROSS_REGIME_GENERALIZATION",
+    "NOT_INDEPENDENT_SAMPLE_OR_STATISTICAL_POWER",
+    "NOT_ROUTE_ID_CONTINUITY",
+    "NOT_TASK24_TASK25_OR_HOLDOUT_ACCESS_AUTHORITY",
+    "NOT_PROVIDER_COLLECTION_DEPLOYMENT_OR_PRODUCTION_READINESS"
+  ],
+  "canonical_status_candidate": "TASK23_TECHNICAL_DOD_PENDING_REPOSITORY_DELIVERY",
+  "next_gate": {
+    "atom_id": "T23-A6_REPOSITORY_DELIVERY_V1",
+    "authorized": false,
+    "merge_authorized": false,
+    "task24_authorized": false,
+    "task25_authorized": false,
+    "r3_access_authorized": false
+  },
+  "state_change": "LOCAL_FILES_CATALOG_AND_GENERATED_CONSUMERS_ONLY"
+}

@@ -418,6 +418,11 @@
       "target_asset_id": "CONTRACT-T22-GROUP-AWARE-SPLIT-001"
     },
     {
+      "source_asset_id": "CONFIG-T23-BOUNDED-DIAGNOSTICS-001",
+      "relation": "governed_by",
+      "target_asset_id": "CONTRACT-T23-BOUNDED-DIAGNOSTICS-001"
+    },
+    {
       "source_asset_id": "CONTRACT-T05-DATA-001",
       "relation": "depends_on",
       "target_asset_id": "ADR-MVP-STACK-002"
@@ -858,6 +863,16 @@
       "target_asset_id": "HANDOFF-T21-TASK22-001"
     },
     {
+      "source_asset_id": "CONTRACT-T23-BOUNDED-DIAGNOSTICS-001",
+      "relation": "derived_from",
+      "target_asset_id": "EVIDENCE-T22-A6-ACCEPTANCE-001"
+    },
+    {
+      "source_asset_id": "CONTRACT-T23-BOUNDED-DIAGNOSTICS-001",
+      "relation": "validated_by",
+      "target_asset_id": "TEST-T23-BOUNDED-DIAGNOSTICS-CONTRACT-001"
+    },
+    {
       "source_asset_id": "CONTROL-T21-ACTIVE-TIME-GATE-001",
       "relation": "governed_by",
       "target_asset_id": "CONTRACT-T21-A7-ACCEPTANCE-001"
@@ -1261,6 +1276,36 @@
       "source_asset_id": "DATA-T22-SPLIT-MANIFEST-002",
       "relation": "governed_by",
       "target_asset_id": "SCHEMA-T22-SPLIT-RESOLUTION-001"
+    },
+    {
+      "source_asset_id": "DATA-T23-PANEL-DIAGNOSTICS-001",
+      "relation": "derived_from",
+      "target_asset_id": "EVIDENCE-T23-A3-PRE-READ-RECEIPT-002"
+    },
+    {
+      "source_asset_id": "DATA-T23-PANEL-DIAGNOSTICS-001",
+      "relation": "governed_by",
+      "target_asset_id": "EVIDENCE-T23-A3-PROJECTION-MANIFEST-001"
+    },
+    {
+      "source_asset_id": "DATA-T23-PANEL-INVENTORY-001",
+      "relation": "derived_from",
+      "target_asset_id": "EVIDENCE-T23-A3-PRE-READ-RECEIPT-002"
+    },
+    {
+      "source_asset_id": "DATA-T23-PANEL-INVENTORY-001",
+      "relation": "governed_by",
+      "target_asset_id": "EVIDENCE-T23-A3-PROJECTION-MANIFEST-001"
+    },
+    {
+      "source_asset_id": "DATA-T23-QUOTE-PAIR-AVAILABILITY-001",
+      "relation": "derived_from",
+      "target_asset_id": "EVIDENCE-T23-A3-PRE-READ-RECEIPT-002"
+    },
+    {
+      "source_asset_id": "DATA-T23-QUOTE-PAIR-AVAILABILITY-001",
+      "relation": "governed_by",
+      "target_asset_id": "EVIDENCE-T23-A3-PROJECTION-MANIFEST-001"
     },
     {
       "source_asset_id": "DECISION-T14-PROVIDER-PURCHASE-001",
@@ -1886,6 +1931,96 @@
       "source_asset_id": "EVIDENCE-T22-HOLDOUT-LEDGER-002",
       "relation": "governed_by",
       "target_asset_id": "SCHEMA-T22-SPLIT-RESOLUTION-001"
+    },
+    {
+      "source_asset_id": "EVIDENCE-T23-A3-ATTEMPT-01-FAILURE-001",
+      "relation": "derived_from",
+      "target_asset_id": "EVIDENCE-T23-A3-PRE-READ-RECEIPT-001"
+    },
+    {
+      "source_asset_id": "EVIDENCE-T23-A3-ATTEMPT-01-FAILURE-001",
+      "relation": "governed_by",
+      "target_asset_id": "REGISTRY-GLOBAL-TRIAL-LEDGER-001"
+    },
+    {
+      "source_asset_id": "EVIDENCE-T23-A3-PRE-READ-RECEIPT-001",
+      "relation": "depends_on",
+      "target_asset_id": "QUERY-T23-R2-DIAGNOSTIC-PROJECTION-001"
+    },
+    {
+      "source_asset_id": "EVIDENCE-T23-A3-PRE-READ-RECEIPT-001",
+      "relation": "governed_by",
+      "target_asset_id": "CONFIG-T23-BOUNDED-DIAGNOSTICS-001"
+    },
+    {
+      "source_asset_id": "EVIDENCE-T23-A3-PRE-READ-RECEIPT-002",
+      "relation": "depends_on",
+      "target_asset_id": "QUERY-T23-R2-DIAGNOSTIC-PROJECTION-001"
+    },
+    {
+      "source_asset_id": "EVIDENCE-T23-A3-PRE-READ-RECEIPT-002",
+      "relation": "derived_from",
+      "target_asset_id": "EVIDENCE-T23-A3-ATTEMPT-01-FAILURE-001"
+    },
+    {
+      "source_asset_id": "EVIDENCE-T23-A3-PROJECTION-MANIFEST-001",
+      "relation": "contains",
+      "target_asset_id": "DATA-T23-PANEL-DIAGNOSTICS-001"
+    },
+    {
+      "source_asset_id": "EVIDENCE-T23-A3-PROJECTION-MANIFEST-001",
+      "relation": "contains",
+      "target_asset_id": "DATA-T23-PANEL-INVENTORY-001"
+    },
+    {
+      "source_asset_id": "EVIDENCE-T23-A3-PROJECTION-MANIFEST-001",
+      "relation": "contains",
+      "target_asset_id": "DATA-T23-QUOTE-PAIR-AVAILABILITY-001"
+    },
+    {
+      "source_asset_id": "EVIDENCE-T23-A3-PROJECTION-MANIFEST-001",
+      "relation": "derived_from",
+      "target_asset_id": "EVIDENCE-T23-A3-PRE-READ-RECEIPT-002"
+    },
+    {
+      "source_asset_id": "EVIDENCE-T23-A3-PROJECTION-MANIFEST-001",
+      "relation": "validated_by",
+      "target_asset_id": "TEST-T23-DIAGNOSTIC-PROJECTION-001"
+    },
+    {
+      "source_asset_id": "EVIDENCE-T23-A4-ADVERSARIAL-ACCEPTANCE-001",
+      "relation": "derived_from",
+      "target_asset_id": "EVIDENCE-T23-A4-BOUNDED-ANALYSIS-001"
+    },
+    {
+      "source_asset_id": "EVIDENCE-T23-A4-ADVERSARIAL-ACCEPTANCE-001",
+      "relation": "validated_by",
+      "target_asset_id": "TEST-T23-BOUNDED-ANALYSIS-001"
+    },
+    {
+      "source_asset_id": "EVIDENCE-T23-A4-BOUNDED-ANALYSIS-001",
+      "relation": "derived_from",
+      "target_asset_id": "EVIDENCE-T23-A3-PROJECTION-MANIFEST-001"
+    },
+    {
+      "source_asset_id": "EVIDENCE-T23-A4-BOUNDED-ANALYSIS-001",
+      "relation": "validated_by",
+      "target_asset_id": "TEST-T23-BOUNDED-ANALYSIS-001"
+    },
+    {
+      "source_asset_id": "EVIDENCE-T23-A5-CATALOG-FACTORY-FIT-001",
+      "relation": "derived_from",
+      "target_asset_id": "EVIDENCE-T23-A4-ADVERSARIAL-ACCEPTANCE-001"
+    },
+    {
+      "source_asset_id": "EVIDENCE-T23-A5-CATALOG-FACTORY-FIT-001",
+      "relation": "derived_from",
+      "target_asset_id": "EVIDENCE-T23-A4-BOUNDED-ANALYSIS-001"
+    },
+    {
+      "source_asset_id": "EVIDENCE-T23-A5-CATALOG-FACTORY-FIT-001",
+      "relation": "validated_by",
+      "target_asset_id": "TEST-T23-A5-CATALOG-FACTORY-FIT-001"
     },
     {
       "source_asset_id": "FIXTURE-BATON-SUITE-001",
@@ -2908,6 +3043,31 @@
       "target_asset_id": "EVIDENCE-T22-HOLDOUT-LEDGER-002"
     },
     {
+      "source_asset_id": "MODULE-T23-BOUNDED-ANALYSIS-001",
+      "relation": "depends_on",
+      "target_asset_id": "EVIDENCE-T23-A3-PROJECTION-MANIFEST-001"
+    },
+    {
+      "source_asset_id": "MODULE-T23-BOUNDED-ANALYSIS-001",
+      "relation": "produces",
+      "target_asset_id": "EVIDENCE-T23-A4-ADVERSARIAL-ACCEPTANCE-001"
+    },
+    {
+      "source_asset_id": "MODULE-T23-BOUNDED-ANALYSIS-001",
+      "relation": "produces",
+      "target_asset_id": "EVIDENCE-T23-A4-BOUNDED-ANALYSIS-001"
+    },
+    {
+      "source_asset_id": "MODULE-T23-BOUNDED-ANALYSIS-001",
+      "relation": "produces",
+      "target_asset_id": "REPORT-T23-COHORT-DIAGNOSTICS-001"
+    },
+    {
+      "source_asset_id": "MODULE-T23-BOUNDED-ANALYSIS-001",
+      "relation": "validated_by",
+      "target_asset_id": "TEST-T23-BOUNDED-ANALYSIS-001"
+    },
+    {
       "source_asset_id": "PRE-GIT-TASK01-A017",
       "relation": "derived_from",
       "target_asset_id": "BUNDLE-TASK01-COMPLETION-001"
@@ -3153,6 +3313,21 @@
       "target_asset_id": "TEST-T05-CATALOG-QUERIES-001"
     },
     {
+      "source_asset_id": "QUERY-T23-R2-DIAGNOSTIC-PROJECTION-001",
+      "relation": "governed_by",
+      "target_asset_id": "CONFIG-T23-BOUNDED-DIAGNOSTICS-001"
+    },
+    {
+      "source_asset_id": "QUERY-T23-R2-DIAGNOSTIC-PROJECTION-001",
+      "relation": "produces",
+      "target_asset_id": "EVIDENCE-T23-A3-PROJECTION-MANIFEST-001"
+    },
+    {
+      "source_asset_id": "QUERY-T23-R2-DIAGNOSTIC-PROJECTION-001",
+      "relation": "validated_by",
+      "target_asset_id": "TEST-T23-DIAGNOSTIC-PROJECTION-001"
+    },
+    {
       "source_asset_id": "REGISTRY-BOT-INSTANCES-001",
       "relation": "depends_on",
       "target_asset_id": "CATALOG-SCHEMA-LIFECYCLE-001"
@@ -3216,6 +3391,11 @@
       "source_asset_id": "REGISTRY-STRATEGIES-001",
       "relation": "depends_on",
       "target_asset_id": "CATALOG-SCHEMA-LIFECYCLE-001"
+    },
+    {
+      "source_asset_id": "REPORT-T23-COHORT-DIAGNOSTICS-001",
+      "relation": "derived_from",
+      "target_asset_id": "EVIDENCE-T23-A4-BOUNDED-ANALYSIS-001"
     },
     {
       "source_asset_id": "ROADMAP-PATCH-T21-PRODUCT-VISION-001",
@@ -4716,6 +4896,41 @@
       "source_asset_id": "TEST-T22-SPLIT-RESOLUTION-001",
       "relation": "depends_on",
       "target_asset_id": "EVIDENCE-T22-HOLDOUT-LEDGER-002"
+    },
+    {
+      "source_asset_id": "TEST-T23-A5-CATALOG-FACTORY-FIT-001",
+      "relation": "depends_on",
+      "target_asset_id": "EVIDENCE-T23-A5-CATALOG-FACTORY-FIT-001"
+    },
+    {
+      "source_asset_id": "TEST-T23-A5-CATALOG-FACTORY-FIT-001",
+      "relation": "depends_on",
+      "target_asset_id": "TEST-T23-BOUNDED-ANALYSIS-001"
+    },
+    {
+      "source_asset_id": "TEST-T23-BOUNDED-ANALYSIS-001",
+      "relation": "depends_on",
+      "target_asset_id": "EVIDENCE-T23-A4-ADVERSARIAL-ACCEPTANCE-001"
+    },
+    {
+      "source_asset_id": "TEST-T23-BOUNDED-ANALYSIS-001",
+      "relation": "depends_on",
+      "target_asset_id": "EVIDENCE-T23-A4-BOUNDED-ANALYSIS-001"
+    },
+    {
+      "source_asset_id": "TEST-T23-BOUNDED-DIAGNOSTICS-CONTRACT-001",
+      "relation": "depends_on",
+      "target_asset_id": "CONFIG-T23-BOUNDED-DIAGNOSTICS-001"
+    },
+    {
+      "source_asset_id": "TEST-T23-DIAGNOSTIC-PROJECTION-001",
+      "relation": "depends_on",
+      "target_asset_id": "EVIDENCE-T23-A3-ATTEMPT-01-FAILURE-001"
+    },
+    {
+      "source_asset_id": "TEST-T23-DIAGNOSTIC-PROJECTION-001",
+      "relation": "depends_on",
+      "target_asset_id": "EVIDENCE-T23-A3-PROJECTION-MANIFEST-001"
     },
     {
       "source_asset_id": "VALIDATOR-REPOSITORY-STATE-001",

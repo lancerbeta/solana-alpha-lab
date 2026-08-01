@@ -1,0 +1,98 @@
+{
+  "atom_id": "T23-A4_BOUNDED_ANALYSIS_AND_ADVERSARIAL_ACCEPTANCE_V1",
+  "checks": [
+    {
+      "check_id": "A3_CONTENT_ADDRESSING",
+      "status": "PASS"
+    },
+    {
+      "check_id": "R2_POPULATION_EXACT",
+      "status": "PASS"
+    },
+    {
+      "check_id": "R3_ZERO",
+      "status": "PASS"
+    },
+    {
+      "check_id": "NO_SURVIVORSHIP_DENOMINATOR",
+      "status": "PASS"
+    },
+    {
+      "check_id": "MISSING_NOT_ZERO",
+      "status": "PASS"
+    },
+    {
+      "check_id": "ACTUAL_TIME_ONLY",
+      "status": "PASS"
+    },
+    {
+      "check_id": "DEPENDENCE_EXPLICIT",
+      "status": "PASS"
+    },
+    {
+      "check_id": "NO_INVENTED_PRECISION",
+      "status": "PASS"
+    },
+    {
+      "check_id": "NO_EXECUTION_ALPHA_CLAIM",
+      "status": "PASS"
+    },
+    {
+      "check_id": "NEGATIVE_RESULTS_RETAINED",
+      "status": "PASS"
+    },
+    {
+      "check_id": "OWNER_DECISION_SINGLE",
+      "status": "PASS"
+    },
+    {
+      "check_id": "ROUTE_CONTINUITY_NO_CLAIM",
+      "status": "PASS"
+    },
+    {
+      "check_id": "CATALOG_DEFERRED_EXPLICIT",
+      "status": "PASS"
+    },
+    {
+      "check_id": "CAPACITY_RIGHT_CENSORED",
+      "status": "PASS"
+    },
+    {
+      "check_id": "NEXT_BOUNDARY_NOT_SELF_AUTHORIZED",
+      "status": "PASS"
+    }
+  ],
+  "external_actions": {
+    "dependency_installs": 0,
+    "network_calls": 0,
+    "provider_calls": 0,
+    "r3_path_discovery": 0,
+    "r3_value_reads": 0,
+    "wallet_or_transaction_actions": 0
+  },
+  "limitations_carried": [
+    "ONE_DEPENDENT_CAPTURE_CLUSTER",
+    "DESCRIPTIVE_ONLY_NO_P_VALUES_OR_CONFIDENCE_INTERVALS",
+    "NO_R3_OR_OUTCOME_VALIDATION",
+    "NO_OBSERVED_FAILURE_VARIATION",
+    "CAPACITY_PROXY_RIGHT_CENSORED_AT_100_USD",
+    "QUOTE_ONLY_NOT_TOUCH_FILLABLE_REALIZED_VWAP_OR_NET",
+    "PROVIDER_PRICE_IMPACT_FIELD_NOT_REINTERPRETED",
+    "ROUTE_ID_CONTINUITY_NOT_MATERIALIZED_NO_CLAIM",
+    "CATALOG_REGISTRATION_AND_INTEGRITY_REFRESH_DEFERRED_TO_A5"
+  ],
+  "next_boundary": {
+    "atom_id": "T23-A5_REGISTER_ASSETS_UPDATE_CATALOG_AND_FULL_FACTORY_FIT_REVIEW_V1",
+    "authorized_by_a4": false,
+    "r3_access": "DENY"
+  },
+  "output_bindings": {
+    "analysis_sha256": "9bf332fc1a302984750890a6ce8220b6038dc602dc259fb3f261ade0b6e46489",
+    "owner_report_sha256": "2964fc1c6051772b1d9fef2d973df49d1155e89efb30207263f91297630b898f"
+  },
+  "owner_decision": "DIAGNOSTICS_READY_WITH_LIMITATIONS",
+  "schema": "smial.task23.adversarial-acceptance",
+  "schema_version": "1.0.0",
+  "status": "PASS_WITH_DECLARED_LIMITATIONS",
+  "task_id": "TASK-23"
+}

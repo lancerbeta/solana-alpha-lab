@@ -39,13 +39,25 @@ class CatalogImportTests(unittest.TestCase):
             if document["registry_type"] == "reuse_candidates"
         )
         self.assertEqual(len(reuse["records"]), 52)
+        production_records = {
+            document["registry_type"]: document["records"]
+            for document in self.snapshot.lifecycle_documents
+            if document["registry_type"] != "reuse_candidates"
+        }
         self.assertEqual(
-            sum(
-                len(document["records"])
-                for document in self.snapshot.lifecycle_documents
-                if document["registry_type"] != "reuse_candidates"
-            ),
-            0,
+            [record["record_id"] for record in production_records["global_trial_ledger"]],
+            [
+                "TRIAL-T23-R2-DIAGNOSTIC-PROJECTION-ATTEMPT-01",
+                "TRIAL-T23-R2-DIAGNOSTIC-PROJECTION-ATTEMPT-02",
+                "TRIAL-T23-BOUNDED-ANALYSIS-ADVERSARIAL-ACCEPTANCE-001",
+            ],
+        )
+        self.assertTrue(
+            all(
+                not records
+                for registry_type, records in production_records.items()
+                if registry_type != "global_trial_ledger"
+            )
         )
 
     def test_current_checkpoint_drift_fails_closed(self) -> None:

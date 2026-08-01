@@ -1,6 +1,6 @@
 schema_version: '1.1'
 registry_id: CATALOG-ASSET-REGISTRY-CORE-001
-as_of: '2026-07-29'
+as_of: '2026-08-02'
 records:
 - asset_id: SCM-BASELINE-COMMIT-001
   record_version: '1.0'
@@ -1977,7 +1977,7 @@ records:
     contains_raw_data: false
     sensitivity: INTERNAL_NON_SECRET
 - asset_id: VALIDATOR-T04-ARCHITECTURE-001
-  record_version: '2.1'
+  record_version: '2.2'
   asset_type: script
   purpose: Fail-closed TASK-04 replay, architecture, matrix, registry, dependency,
     evidence and SBOM validator.
@@ -1991,7 +1991,7 @@ records:
     repository_path: scripts/validate_task04.py
   integrity:
     kind: sha256
-    sha256: 5a7287a13517c978edd3fb668bc5b772762f345e60e6ba39586f32eadff81143
+    sha256: 3635955f1439b7787bcfdfc064dd2ba5cf97009117121c80f2cd732e16ce4622
   access:
     mode: read_only
     method: command
@@ -8009,7 +8009,7 @@ records:
   evidence: []
   classification: *t16_internal
 - asset_id: TEST-T16-HYPOTHESIS-RESEARCH-MEMORY-ACCEPTANCE-001
-  record_version: '1.1'
+  record_version: '1.2'
   asset_type: script
   purpose: Deterministic TASK-16 acceptance tests binding upstream
     fingerprints, empty legacy migration disposition, query evidence,
@@ -8025,7 +8025,7 @@ records:
     repository_path: tests/test_task16_hypothesis_research_memory_acceptance.py
   integrity:
     kind: sha256
-    sha256: 428c23b072b44f9338029f156f654bea59c6cb68bac0e43c79570315d3f6bfdd
+    sha256: aa905aba09ca05b53f3c1c47e8cd0b6ba470e915d4615235e703e5e198336bee
   access:
     mode: read_only
     method: file
@@ -9476,7 +9476,7 @@ records:
   evidence: []
   classification: *t18_internal
 - asset_id: TEST-T18-CATALOG-REPOSITORY-FINALIZATION-001
-  record_version: '1.0'
+  record_version: '1.1'
   asset_type: script
   purpose: Exact hash-bound Catalog, external-bundle, bounded-claim and
     generated-navigation acceptance tests for TASK-18 A4.
@@ -9490,7 +9490,7 @@ records:
     repository_path: tests/test_task18_catalog_repository_finalization.py
   integrity:
     kind: sha256
-    sha256: 548d193a3f2307650dce6fa3f66c6335d09dee516bbef7087a6b79eb7eb778af
+    sha256: 5f585b803715bdb752de534fdebbc39131644af3e94d5375592cf7480a5eeb16
   access:
     mode: read_only
     method: file
@@ -11325,7 +11325,7 @@ records:
   evidence: []
   classification: *t20_internal
 - asset_id: TEST-T20-ACCEPTANCE-CATALOG-FACTORY-FIT-001
-  record_version: '1.2'
+  record_version: '1.3'
   asset_type: script
   purpose: Exact hash-bound TASK-20 acceptance tests for eight adversarial
     vectors, Catalog consistency, Factory Fit, generated navigation, non-claims
@@ -11340,7 +11340,7 @@ records:
     repository_path: tests/test_task20_acceptance_catalog_factory_fit.py
   integrity:
     kind: sha256
-    sha256: 79f4d1fadd1ac8010d1a04d7354a9bd964ddd2995ae638d1a202c410e5cfa010
+    sha256: c3a53a72560f10af982ac95919b9952434036e170aa1188d1c08ed8f02e38928
   access:
     mode: read_only
     method: file
@@ -11572,7 +11572,7 @@ records:
   evidence: []
   classification: *t22_internal
 - asset_id: TEST-T22-A6-ACCEPTANCE-001
-  record_version: '1.0'
+  record_version: '1.1'
   asset_type: script
   purpose: Hash-bound A6 tests for split acceptance Catalog monotonicity Factory Fit authority and first-outcome-access governance.
   status: IMPLEMENTED_UNVERIFIED
@@ -11585,7 +11585,7 @@ records:
     repository_path: tests/test_task22_split_resolution_acceptance_catalog_factory_fit.py
   integrity:
     kind: sha256
-    sha256: b545adbbf37e48ed7c4ea654a4429dfeb573ccee84bfc60323ef265404c928bf
+    sha256: 60cf774bbe2bebc0df014baa17b0ecfccb6fb5d2b0ee726f34a3cdbcc02d9cb2
   access: *t22_read_file
   relations:
   - relation_type: depends_on
@@ -11596,3 +11596,534 @@ records:
   - TASK-22
   evidence: []
   classification: *t22_internal
+- asset_id: CONTRACT-T23-BOUNDED-DIAGNOSTICS-001
+  record_version: '1.0'
+  asset_type: control_document
+  purpose: Frozen development-only TASK-23 diagnostic questions population actual-time missingness dependence outputs and nonclaims.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-08-02'
+  truth_owner: TASK-23
+  location:
+    kind: git_path
+    logical_uri: repo://docs/contracts/task23_bounded_diagnostics_contract_v1.md
+    repository_path: docs/contracts/task23_bounded_diagnostics_contract_v1.md
+  integrity:
+    kind: sha256
+    sha256: 0b8327b9926506a4ea57afee291a7217222ff7dd5aa10c77044db6dcaba64780
+  access: &t23_read_file
+    mode: read_only
+    method: file
+    network_required: false
+    secrets_required: false
+  relations:
+  - relation_type: derived_from
+    target_asset_id: EVIDENCE-T22-A6-ACCEPTANCE-001
+  - relation_type: validated_by
+    target_asset_id: TEST-T23-BOUNDED-DIAGNOSTICS-CONTRACT-001
+  consumers:
+  - TASK-23
+  - TASK-24
+  - TASK-25
+  - FACTORY-001
+  - REG-RESEARCH-001
+  evidence: []
+  classification: &t23_internal
+    contains_secrets: false
+    contains_raw_data: false
+    sensitivity: INTERNAL_NON_SECRET
+- asset_id: CONFIG-T23-BOUNDED-DIAGNOSTICS-001
+  record_version: '1.0'
+  asset_type: configuration
+  purpose: Machine-readable TASK-23 R2-only diagnostic population fields panels denominator rules query identity and R3 default-deny boundary.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-08-02'
+  truth_owner: TASK-23
+  location:
+    kind: git_path
+    logical_uri: repo://configs/task23_bounded_diagnostics_v1.yaml
+    repository_path: configs/task23_bounded_diagnostics_v1.yaml
+  integrity:
+    kind: sha256
+    sha256: 33cd3cd81833d578c0a3be240fa443f196a5b3dca946f4ba8315749c7b67f0bf
+  access: *t23_read_file
+  relations:
+  - relation_type: governed_by
+    target_asset_id: CONTRACT-T23-BOUNDED-DIAGNOSTICS-001
+  consumers:
+  - TASK-23
+  - REG-RESEARCH-001
+  evidence: []
+  classification: *t23_internal
+- asset_id: TEST-T23-BOUNDED-DIAGNOSTICS-CONTRACT-001
+  record_version: '1.0'
+  asset_type: script
+  purpose: Hash-bound tests for TASK-23 frozen R2 population fields actual-time semantics missingness dependence nonclaims and R3 denial.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-08-02'
+  truth_owner: TASK-23
+  location:
+    kind: git_path
+    logical_uri: repo://tests/test_task23_bounded_diagnostics_contract.py
+    repository_path: tests/test_task23_bounded_diagnostics_contract.py
+  integrity:
+    kind: sha256
+    sha256: e343e9d56d409e74f126d87487ccc288468a6b63a49cfa918b0b0df7caa5f12d
+  access: *t23_read_file
+  relations:
+  - relation_type: depends_on
+    target_asset_id: CONFIG-T23-BOUNDED-DIAGNOSTICS-001
+  consumers:
+  - TASK-23
+  evidence: []
+  classification: *t23_internal
+- asset_id: QUERY-T23-R2-DIAGNOSTIC-PROJECTION-001
+  record_version: '1.0'
+  asset_type: script
+  purpose: Deterministic offline query and projection over the exact sealed R2 roots producing typed panel and quote diagnostics without R3 discovery.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-08-02'
+  truth_owner: TASK-23
+  location:
+    kind: git_path
+    logical_uri: repo://src/solana_alpha_lab/task23_diagnostic_projection.py
+    repository_path: src/solana_alpha_lab/task23_diagnostic_projection.py
+  integrity:
+    kind: sha256
+    sha256: 728fa77fc82a3e27245a908cfecc2a50e7df82c5813e6b90d4ad8ff0870e57f9
+  access: *t23_read_file
+  relations:
+  - relation_type: governed_by
+    target_asset_id: CONFIG-T23-BOUNDED-DIAGNOSTICS-001
+  - relation_type: produces
+    target_asset_id: EVIDENCE-T23-A3-PROJECTION-MANIFEST-001
+  - relation_type: validated_by
+    target_asset_id: TEST-T23-DIAGNOSTIC-PROJECTION-001
+  consumers:
+  - TASK-23
+  - REG-RESEARCH-001
+  evidence: []
+  classification: *t23_internal
+- asset_id: EVIDENCE-T23-A3-PRE-READ-RECEIPT-001
+  record_version: '1.0'
+  asset_type: evidence
+  purpose: First immutable pre-read receipt binding actor reason code config data identity exact R2 roots and zero R3 access before attempt one.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-08-02'
+  truth_owner: TASK-23
+  location:
+    kind: git_path
+    logical_uri: repo://docs/evidence/task23/a3_r2_development_read_receipt_v1.json
+    repository_path: docs/evidence/task23/a3_r2_development_read_receipt_v1.json
+  integrity:
+    kind: sha256
+    sha256: 4489c29a320e23e0578d853c851c50ee9f26aafe1ffba798610b4e47a5e3e10d
+  access: *t23_read_file
+  relations:
+  - relation_type: governed_by
+    target_asset_id: CONFIG-T23-BOUNDED-DIAGNOSTICS-001
+  - relation_type: depends_on
+    target_asset_id: QUERY-T23-R2-DIAGNOSTIC-PROJECTION-001
+  consumers:
+  - TASK-23
+  - REG-RESEARCH-001
+  evidence: []
+  classification: *t23_internal
+- asset_id: EVIDENCE-T23-A3-ATTEMPT-01-FAILURE-001
+  record_version: '1.0'
+  asset_type: evidence
+  purpose: Retained negative-result receipt for the first R2 projection attempt that failed after table writes and forbids result use.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-08-02'
+  truth_owner: TASK-23
+  location:
+    kind: git_path
+    logical_uri: repo://docs/evidence/task23/a3_projection_attempt_01_failure_receipt_v1.json
+    repository_path: docs/evidence/task23/a3_projection_attempt_01_failure_receipt_v1.json
+  integrity:
+    kind: sha256
+    sha256: b28d3bca76291397181568cc8dc923c75e07cf71fea9b4cfa70179b629f5bfe5
+  access: *t23_read_file
+  relations:
+  - relation_type: derived_from
+    target_asset_id: EVIDENCE-T23-A3-PRE-READ-RECEIPT-001
+  - relation_type: governed_by
+    target_asset_id: REGISTRY-GLOBAL-TRIAL-LEDGER-001
+  consumers:
+  - TASK-23
+  - REG-RESEARCH-001
+  evidence: []
+  classification: *t23_internal
+- asset_id: EVIDENCE-T23-A3-PRE-READ-RECEIPT-002
+  record_version: '1.0'
+  asset_type: evidence
+  purpose: Retry pre-read receipt binding unchanged R2 scope corrected projection code and the retained failed attempt before the second value read.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-08-02'
+  truth_owner: TASK-23
+  location:
+    kind: git_path
+    logical_uri: repo://docs/evidence/task23/a3_r2_development_read_receipt_v2.json
+    repository_path: docs/evidence/task23/a3_r2_development_read_receipt_v2.json
+  integrity:
+    kind: sha256
+    sha256: 6b8071aa85f6227a46d55c08ba5a1fe4beccf66902f338bd3735c3a171778ea1
+  access: *t23_read_file
+  relations:
+  - relation_type: derived_from
+    target_asset_id: EVIDENCE-T23-A3-ATTEMPT-01-FAILURE-001
+  - relation_type: depends_on
+    target_asset_id: QUERY-T23-R2-DIAGNOSTIC-PROJECTION-001
+  consumers:
+  - TASK-23
+  - REG-RESEARCH-001
+  evidence: []
+  classification: *t23_internal
+- asset_id: DATA-T23-PANEL-INVENTORY-001
+  record_version: '1.0'
+  asset_type: evidence
+  purpose: Accepted nine-row R2 member and actual-time panel inventory retaining typed observed missing and failure-state counts.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-08-02'
+  truth_owner: TASK-23
+  location:
+    kind: git_path
+    logical_uri: repo://docs/evidence/task23/a3_projection_v1_attempt_02/panel_inventory_v1.csv
+    repository_path: docs/evidence/task23/a3_projection_v1_attempt_02/panel_inventory_v1.csv
+  integrity:
+    kind: sha256
+    sha256: a623b70543a74c63df41bb45c83074541fa98ac105fdeb611b7e02723014b4ec
+  access: *t23_read_file
+  relations:
+  - relation_type: derived_from
+    target_asset_id: EVIDENCE-T23-A3-PRE-READ-RECEIPT-002
+  - relation_type: governed_by
+    target_asset_id: EVIDENCE-T23-A3-PROJECTION-MANIFEST-001
+  consumers:
+  - TASK-23
+  - TASK-24
+  - TASK-25
+  - FACTORY-001
+  - REG-RESEARCH-001
+  evidence: []
+  classification: *t23_internal
+- asset_id: DATA-T23-QUOTE-PAIR-AVAILABILITY-001
+  record_version: '1.0'
+  asset_type: evidence
+  purpose: Accepted thirty-six-row R2 buy and dependent-sell quote-pair availability table with actual timestamps tested notionals and typed states.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-08-02'
+  truth_owner: TASK-23
+  location:
+    kind: git_path
+    logical_uri: repo://docs/evidence/task23/a3_projection_v1_attempt_02/quote_pair_availability_v1.csv
+    repository_path: docs/evidence/task23/a3_projection_v1_attempt_02/quote_pair_availability_v1.csv
+  integrity:
+    kind: sha256
+    sha256: 5b525a9602f32b6c654a9bf87c0a783212046cee8f292d13838e160ec9788273
+  access: *t23_read_file
+  relations:
+  - relation_type: derived_from
+    target_asset_id: EVIDENCE-T23-A3-PRE-READ-RECEIPT-002
+  - relation_type: governed_by
+    target_asset_id: EVIDENCE-T23-A3-PROJECTION-MANIFEST-001
+  consumers:
+  - TASK-23
+  - TASK-24
+  - TASK-25
+  - FACTORY-001
+  - REG-RESEARCH-001
+  evidence: []
+  classification: *t23_internal
+- asset_id: DATA-T23-PANEL-DIAGNOSTICS-001
+  record_version: '1.0'
+  asset_type: evidence
+  purpose: Accepted nine-row descriptive R2 panel diagnostics with explicit planned observed eligible denominators and one-cluster inference mode.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-08-02'
+  truth_owner: TASK-23
+  location:
+    kind: git_path
+    logical_uri: repo://docs/evidence/task23/a3_projection_v1_attempt_02/panel_diagnostics_v1.csv
+    repository_path: docs/evidence/task23/a3_projection_v1_attempt_02/panel_diagnostics_v1.csv
+  integrity:
+    kind: sha256
+    sha256: 20cefa9332f2074042f9168ef2c1448bcbe8db281f49a55123f84d8389994c4d
+  access: *t23_read_file
+  relations:
+  - relation_type: derived_from
+    target_asset_id: EVIDENCE-T23-A3-PRE-READ-RECEIPT-002
+  - relation_type: governed_by
+    target_asset_id: EVIDENCE-T23-A3-PROJECTION-MANIFEST-001
+  consumers:
+  - TASK-23
+  - TASK-24
+  - TASK-25
+  - FACTORY-001
+  - REG-RESEARCH-001
+  evidence: []
+  classification: *t23_internal
+- asset_id: EVIDENCE-T23-A3-PROJECTION-MANIFEST-001
+  record_version: '1.0'
+  asset_type: evidence
+  purpose: Content-addressed accepted A3 manifest binding exact R2-derived tables denominators nonclaims one cluster and zero R3 or outcome access.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-08-02'
+  truth_owner: TASK-23
+  location:
+    kind: git_path
+    logical_uri: repo://docs/evidence/task23/a3_projection_v1_attempt_02/projection_manifest_v1.json
+    repository_path: docs/evidence/task23/a3_projection_v1_attempt_02/projection_manifest_v1.json
+  integrity:
+    kind: sha256
+    sha256: 06702bba94e9a895d340598f2fa722eeed6dd5ce9cd324d699918ac6a8a95ff9
+  access: *t23_read_file
+  relations:
+  - relation_type: derived_from
+    target_asset_id: EVIDENCE-T23-A3-PRE-READ-RECEIPT-002
+  - relation_type: contains
+    target_asset_id: DATA-T23-PANEL-INVENTORY-001
+  - relation_type: contains
+    target_asset_id: DATA-T23-QUOTE-PAIR-AVAILABILITY-001
+  - relation_type: contains
+    target_asset_id: DATA-T23-PANEL-DIAGNOSTICS-001
+  - relation_type: validated_by
+    target_asset_id: TEST-T23-DIAGNOSTIC-PROJECTION-001
+  consumers:
+  - TASK-23
+  - TASK-24
+  - TASK-25
+  - FACTORY-001
+  - REG-RESEARCH-001
+  evidence: []
+  classification: *t23_internal
+- asset_id: TEST-T23-DIAGNOSTIC-PROJECTION-001
+  record_version: '1.0'
+  asset_type: script
+  purpose: Deterministic projection tests for content identity exact R2 rows create-only materialization retained failure states and R3 rejection.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-08-02'
+  truth_owner: TASK-23
+  location:
+    kind: git_path
+    logical_uri: repo://tests/test_task23_diagnostic_projection.py
+    repository_path: tests/test_task23_diagnostic_projection.py
+  integrity:
+    kind: sha256
+    sha256: 8bbc2b35ee7a69a2b9c544ae6416c0f35072b714ae5afb6a6e7b8e5498fbf1f0
+  access: *t23_read_file
+  relations:
+  - relation_type: depends_on
+    target_asset_id: EVIDENCE-T23-A3-PROJECTION-MANIFEST-001
+  - relation_type: depends_on
+    target_asset_id: EVIDENCE-T23-A3-ATTEMPT-01-FAILURE-001
+  consumers:
+  - TASK-23
+  evidence: []
+  classification: *t23_internal
+- asset_id: MODULE-T23-BOUNDED-ANALYSIS-001
+  record_version: '1.0'
+  asset_type: script
+  purpose: Deterministic A4 owner-analysis module over only the three content-addressed A3-derived tables with fail-closed claim checks.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-08-02'
+  truth_owner: TASK-23
+  location:
+    kind: git_path
+    logical_uri: repo://src/solana_alpha_lab/task23_bounded_analysis.py
+    repository_path: src/solana_alpha_lab/task23_bounded_analysis.py
+  integrity:
+    kind: sha256
+    sha256: 5be63e5a2d91307cf6c9e0a7d7232d6cd5b70db30018d39e4cb6ea514629a1ce
+  access: *t23_read_file
+  relations:
+  - relation_type: depends_on
+    target_asset_id: EVIDENCE-T23-A3-PROJECTION-MANIFEST-001
+  - relation_type: produces
+    target_asset_id: EVIDENCE-T23-A4-BOUNDED-ANALYSIS-001
+  - relation_type: produces
+    target_asset_id: REPORT-T23-COHORT-DIAGNOSTICS-001
+  - relation_type: produces
+    target_asset_id: EVIDENCE-T23-A4-ADVERSARIAL-ACCEPTANCE-001
+  - relation_type: validated_by
+    target_asset_id: TEST-T23-BOUNDED-ANALYSIS-001
+  consumers:
+  - TASK-23
+  - REG-RESEARCH-001
+  evidence: []
+  classification: *t23_internal
+- asset_id: EVIDENCE-T23-A4-BOUNDED-ANALYSIS-001
+  record_version: '1.0'
+  asset_type: evidence
+  purpose: Machine-readable bounded R2 findings denominators actual-time ranges negative results limitations and one owner decision.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-08-02'
+  truth_owner: TASK-23
+  location:
+    kind: git_path
+    logical_uri: repo://docs/evidence/task23/a4_bounded_analysis_v1.json
+    repository_path: docs/evidence/task23/a4_bounded_analysis_v1.json
+  integrity:
+    kind: sha256
+    sha256: 9bf332fc1a302984750890a6ce8220b6038dc602dc259fb3f261ade0b6e46489
+  access: *t23_read_file
+  relations:
+  - relation_type: derived_from
+    target_asset_id: EVIDENCE-T23-A3-PROJECTION-MANIFEST-001
+  - relation_type: validated_by
+    target_asset_id: TEST-T23-BOUNDED-ANALYSIS-001
+  consumers:
+  - TASK-23
+  - TASK-24
+  - TASK-25
+  - FACTORY-001
+  - REG-RESEARCH-001
+  evidence: []
+  classification: *t23_internal
+- asset_id: REPORT-T23-COHORT-DIAGNOSTICS-001
+  record_version: '1.0'
+  asset_type: evidence
+  purpose: Compact owner-readable TASK-23 diagnostics report with actual-time findings effective sample negative results limitations and stop boundary.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-08-02'
+  truth_owner: TASK-23
+  location:
+    kind: git_path
+    logical_uri: repo://docs/reports/task23_cohort_diagnostics_v1.md
+    repository_path: docs/reports/task23_cohort_diagnostics_v1.md
+  integrity:
+    kind: sha256
+    sha256: 2964fc1c6051772b1d9fef2d973df49d1155e89efb30207263f91297630b898f
+  access: *t23_read_file
+  relations:
+  - relation_type: derived_from
+    target_asset_id: EVIDENCE-T23-A4-BOUNDED-ANALYSIS-001
+  consumers:
+  - TASK-23
+  - TASK-24
+  - TASK-25
+  - FACTORY-001
+  evidence: []
+  classification: *t23_internal
+- asset_id: EVIDENCE-T23-A4-ADVERSARIAL-ACCEPTANCE-001
+  record_version: '1.0'
+  asset_type: evidence
+  purpose: Adversarial acceptance receipt rejecting R3 access survivorship missing-as-zero nominal time invented precision execution and alpha claims.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-08-02'
+  truth_owner: TASK-23
+  location:
+    kind: git_path
+    logical_uri: repo://docs/evidence/task23/a4_adversarial_acceptance_v1.json
+    repository_path: docs/evidence/task23/a4_adversarial_acceptance_v1.json
+  integrity:
+    kind: sha256
+    sha256: d3d039af89c882f80a935b0567edf60355a6ea8f4699ed75f46bcd520ab6bd48
+  access: *t23_read_file
+  relations:
+  - relation_type: derived_from
+    target_asset_id: EVIDENCE-T23-A4-BOUNDED-ANALYSIS-001
+  - relation_type: validated_by
+    target_asset_id: TEST-T23-BOUNDED-ANALYSIS-001
+  consumers:
+  - TASK-23
+  - FACTORY-001
+  - REG-RESEARCH-001
+  evidence: []
+  classification: *t23_internal
+- asset_id: TEST-T23-BOUNDED-ANALYSIS-001
+  record_version: '1.0'
+  asset_type: script
+  purpose: Fail-closed A4 tests for row loss duplication R3 counters missingness time semantics dependence precision claims and deterministic output bindings.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-08-02'
+  truth_owner: TASK-23
+  location:
+    kind: git_path
+    logical_uri: repo://tests/test_task23_bounded_analysis.py
+    repository_path: tests/test_task23_bounded_analysis.py
+  integrity:
+    kind: sha256
+    sha256: e1f14ced1bf9697de89a7e1a4528847c8da5aefdd25f7a47f415382171d2a8ae
+  access: *t23_read_file
+  relations:
+  - relation_type: depends_on
+    target_asset_id: EVIDENCE-T23-A4-ADVERSARIAL-ACCEPTANCE-001
+  - relation_type: depends_on
+    target_asset_id: EVIDENCE-T23-A4-BOUNDED-ANALYSIS-001
+  consumers:
+  - TASK-23
+  evidence: []
+  classification: *t23_internal
+- asset_id: EVIDENCE-T23-A5-CATALOG-FACTORY-FIT-001
+  record_version: '1.0'
+  asset_type: evidence
+  purpose: TASK-23 A5 Catalog transaction full Factory Fit receipt downstream holdout gate bounded authority and repository-validation evidence.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-08-02'
+  truth_owner: TASK-23
+  location:
+    kind: git_path
+    logical_uri: repo://docs/evidence/task23/a5_catalog_repository_factory_fit_v1.json
+    repository_path: docs/evidence/task23/a5_catalog_repository_factory_fit_v1.json
+  integrity:
+    kind: sha256
+    sha256: 7f840ac5fbdc6481dec592e529588b99d53a65e314587adeee98605dc94bab14
+  access: *t23_read_file
+  relations:
+  - relation_type: derived_from
+    target_asset_id: EVIDENCE-T23-A4-ADVERSARIAL-ACCEPTANCE-001
+  - relation_type: derived_from
+    target_asset_id: EVIDENCE-T23-A4-BOUNDED-ANALYSIS-001
+  - relation_type: validated_by
+    target_asset_id: TEST-T23-A5-CATALOG-FACTORY-FIT-001
+  consumers:
+  - TASK-23
+  - TASK-24
+  - TASK-25
+  - FACTORY-001
+  - REG-RESEARCH-001
+  evidence: []
+  classification: *t23_internal
+- asset_id: TEST-T23-A5-CATALOG-FACTORY-FIT-001
+  record_version: '1.0'
+  asset_type: script
+  purpose: Hash-bound A5 tests for exact assets append-only trials Catalog lineage generated navigation Factory Fit holdout governance and authority.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-08-02'
+  truth_owner: TASK-23
+  location:
+    kind: git_path
+    logical_uri: repo://tests/test_task23_catalog_repository_factory_fit.py
+    repository_path: tests/test_task23_catalog_repository_factory_fit.py
+  integrity:
+    kind: sha256
+    sha256: 2ef8f75278c00b07cc40f5d035ff2b256979022051787c5596a8ec6269602e47
+  access: *t23_read_file
+  relations:
+  - relation_type: depends_on
+    target_asset_id: EVIDENCE-T23-A5-CATALOG-FACTORY-FIT-001
+  - relation_type: depends_on
+    target_asset_id: TEST-T23-BOUNDED-ANALYSIS-001
+  consumers:
+  - TASK-23
+  evidence: []
+  classification: *t23_internal

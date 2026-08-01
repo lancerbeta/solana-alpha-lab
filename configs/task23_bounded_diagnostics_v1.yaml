@@ -1,0 +1,432 @@
+schema: smial.task23.bounded-diagnostics-contract
+schema_version: 1.0.0
+task_id: TASK-23
+atom_id: T23-A2_FROZEN_BOUNDED_DIAGNOSTICS_CONTRACT_V1
+status: FROZEN_PRE_READ
+
+entry_gate:
+  route_owner: LOCAL_WORK_PRIMARY
+  execution_route: LOCAL_WORK_CODEX
+  verdict: START_AS_WRITTEN
+  source_activation: ACTIVATION_CONFIRMED_READBACK
+  canonical_manifest_version: "4.0"
+  canonical_manifest_sha256: e5d3ed71480819bee4ac051625cc4ffadc51e44ec995aab87c507e7f6d14fc47
+  accepted_main_commit: 90575accefbba7da534a6bd89b3652b2644a278b
+  accepted_main_tree: f9cdd82ad8df427abe35e577889adaaca22b2d12
+  catalog_checkpoint:
+    version: 0.27.1
+    assets: 396
+    registries: 4
+    schemas: 7
+    queries: 8
+    lifecycle_done: 9
+    lifecycle_total: 52
+
+owner_decision:
+  question: >-
+    Does the accepted three-member R2 development cohort contain enough
+    reproducible descriptive evidence to continue TASK-23 without touching R3?
+  allowed_terminal_decisions:
+    - DIAGNOSTICS_READY_WITH_LIMITATIONS
+    - EXTEND_EVIDENCE
+    - REDESIGN_DATA
+    - STOP_NO_INFORMATION
+  forbidden_claims:
+    - ALPHA_CONFIRMED
+    - PROFITABILITY_CONFIRMED
+    - EXECUTION_CONFIRMED
+    - NET_RETURN_CONFIRMED
+    - POPULATION_GENERALIZATION
+
+frozen_inputs:
+  - role: TASK22_CONSUMER_TIME_PROFILE
+    path: configs/task22_task23_consumer_time_profile_v1.yaml
+    sha256: 71a253d8b94f32a954d0195d2d544fdfb94e1b41ae680313bb48caa115ed01a0
+    bytes: 5118
+  - role: TASK22_DATASET_SPLIT_MANIFEST
+    path: docs/evidence/task22/dataset_split_manifest_v2.json
+    sha256: 973a9ff6dd2a376e62dee9289a57cbb62f06c8efb5a619fa6b7b2a7914dd0683
+    bytes: 7266
+  - role: TASK22_HOLDOUT_ACCESS_LEDGER
+    path: docs/evidence/task22/holdout_access_ledger_v2.json
+    sha256: 2282e5d1eac09a0ce940a5700f04b03ff4d75fc9cd4d65e08e5fe7deda88ca51
+    bytes: 1852
+  - role: TASK22_A6_ACCEPTANCE
+    path: docs/evidence/task22/a6_split_resolution_acceptance_catalog_factory_fit_v1.json
+    sha256: 29c1ad28d06430b74864b745ef50bf0315fcbfcfb5a7534e54b1692a3f15a019
+    bytes: 9593
+  - role: TASK21_PANEL_CAPTURE
+    path: src/solana_alpha_lab/task21_event_triggered_panel_capture.py
+    sha256: cbce387163a5625a0be124559987e50577375c517b5939db838e4660236aa8c4
+    bytes: 9741
+  - role: TASK21_FOLLOWUP_CAPTURE
+    path: src/solana_alpha_lab/task21_event_triggered_followup_capture.py
+    sha256: 06783b78eba49d8dc85e28e47de12c310cf2a07f194abab4ad4b92fcfa35b264
+    bytes: 36124
+  - role: TASK10_JUPITER_QUOTE_LOGGER
+    path: src/solana_alpha_lab/jupiter_quote_logger.py
+    sha256: 811f08e43eb26c99ef93dccfade372cbae5adb1c1ee718c7ff6d3ce543a9d507
+    bytes: 39800
+  - role: TASK05_QUOTE_ATTEMPT_SCHEMA
+    path: src/solana_alpha_lab/contracts/schema_v1.py
+    sha256: ef9435fc0aa6df1d880714e97d3312e068dc82806a8c6ba1ed2d74c9929684ad
+    bytes: 32794
+  - role: GLOBAL_TRIAL_LEDGER
+    path: registries/global_trial_ledger.yaml
+    sha256: 41b2f3cd1e2303f90318d0295c36c390999c7539031cb52db1a03779be56b671
+    bytes: 179
+    mutation_policy: APPEND_ONLY_AFTER_A2
+
+dataset_identity:
+  dataset_inventory_sha256: aaa605eabdb62c38d218b40e768669db460c6fa419c4086d5412547b7f2fffae
+  split_id: T22-SPLIT-T21-FROZEN-002
+  split_manifest_sha256: 973a9ff6dd2a376e62dee9289a57cbb62f06c8efb5a619fa6b7b2a7914dd0683
+  split_content_sha256: 63b6d63895bdd6d25b68501619bca21e10f476a95ad8d27611f356a26cccee2d
+  consumer_profile_id: TASK23-COHORT-DIAGNOSTICS-THREE-PANEL-001
+
+population:
+  primary_development:
+    split: R2
+    batch_id: T21-R2
+    cluster_count: 1
+    member_count: 3
+    members:
+      - T21-WATCH-29e2b75994975253bd74
+      - T21-WATCH-6f21dec76d05f5831216
+      - T21-WATCH-61ce24fc3fa04e3eaba7
+    pooling_policy: MEMBER_LEVEL_VISIBLE_SINGLE_CLUSTER_DESCRIPTIVE_ONLY
+  auxiliary_gap_metadata_only:
+    split: R1
+    member_count: 3
+    missing_panel_count: 3
+    value_read: false
+    pool_with_primary: false
+    allowed_use: GAP_AND_COVERAGE_METADATA_ONLY
+  validation:
+    split: NONE
+    member_count: 0
+    value_read: false
+  untouched_holdout:
+    split: R3
+    batch_id: T21-R3
+    state: UNTOUCHED
+    access: DENY
+    path_discovery: false
+    value_read: false
+    outcome_read: false
+    statistics: false
+    joins: false
+    derived_inspection: false
+    ledger_mutation_in_a2: false
+
+r2_read_boundary:
+  value_read_in_a2: false
+  metadata_only_root_binding: true
+  allowed_roots_after_a3_pre_read_receipt:
+    - local/task21_forward/final_cohort/r2/run=r2-20260801T114657421057Z-7882ff946449
+    - local/task21_forward/final_cohort/r2/p1/run=p1-20260801T122606020085Z-c66cbd9193f1
+    - local/task21_forward/final_cohort/r2/p2/run=p2-20260801T131100955007Z-1e6e05144f30
+  root_bindings:
+    - panel_id: P0
+      root: local/task21_forward/final_cohort/r2/run=r2-20260801T114657421057Z-7882ff946449
+    - panel_id: P1
+      root: local/task21_forward/final_cohort/r2/p1/run=p1-20260801T122606020085Z-c66cbd9193f1
+    - panel_id: P2
+      root: local/task21_forward/final_cohort/r2/p2/run=p2-20260801T131100955007Z-1e6e05144f30
+  allowed_value_filename: raw_events.jsonl
+  resolved_path_policy: EXACT_ROOT_DESCENDANT_NO_SYMLINK_OR_REPARSE_ESCAPE
+  forbidden_path_fragments:
+    - /r1/
+    - /r3/
+    - outcomes
+  acceptance_receipts:
+    P0: 5c69ba68348b63976a54b8e69974d5cfd406c375d4688601d78bbddcbe8eee9c
+    P1: fedb97b9bd8bb8d8d7a7650ba47e958d0b6d7659cb4fcfdaa1c73de6c31ffd54
+    P2: 76644640134dc186fc4d65e98814f39ef5546695fce10bc385b1b8e9f469e1f1
+
+diagnostic_questions:
+  - id: Q1_PANEL_COMPLETENESS
+    scope: Planned versus observed panels and typed terminal states.
+  - id: Q2_ROUTE_AVAILABILITY
+    scope: Buy and eligible dependent-sell route availability by tested notional.
+  - id: Q3_QUOTE_NOTIONAL_CAPACITY_PROXY
+    scope: Largest tested notional with both buy and dependent sell quotes available.
+  - id: Q4_ACTUAL_TIME_CHANGE
+    scope: Descriptive quote-only change by actual elapsed and availability time.
+  - id: Q5_INFORMATION_LIMITS
+    scope: Missingness, dependence, and sample-size limits on the owner decision.
+
+time_semantics:
+  window_ids:
+    - P0
+    - P1
+    - P2
+  window_ids_are_nominal_horizons: false
+  forbidden_nominal_horizon_claims:
+    - 15m
+    - 30m
+    - 60m
+    - 4h
+  required_timestamp_fields:
+    - requested_at
+    - response_at
+    - first_reliable_available_at
+    - available_to_strategy_at
+    - ingested_at
+  elapsed_unit: seconds
+  ordering_policy: INVALID_ORDER_IS_TYPED_FAILURE_NO_IMPUTATION
+
+quote_panel:
+  input_asset: USDC
+  input_decimals: 6
+  tested_notionals_usd:
+    - 10
+    - 25
+    - 50
+    - 100
+  tested_input_atomic:
+    - 10000000
+    - 25000000
+    - 50000000
+    - 100000000
+  planned_pairs_per_panel: 4
+  maximum_provider_calls_per_panel: 8
+  sell_dependency: EXACT_ACCEPTED_BUY_OUTPUT_ATOMIC
+  buy_failure_sell_state: SELL_NOT_ATTEMPTED
+  quote_statuses:
+    - QUOTE_AVAILABLE
+    - NO_ROUTE
+    - PROVIDER_ERROR
+    - INVALID_RESPONSE
+    - TIMEOUT
+
+allowed_fields:
+  envelope:
+    - schema
+    - schema_version
+    - task_id
+    - atom_id
+    - hypothesis_version_id
+    - batch_id
+    - member_id
+    - nomination_event_id
+    - horizon_id
+    - window_id
+    - call_ordinal
+    - provider
+    - provider_version
+    - request_hash
+    - idempotency_key
+    - raw_content_sha256
+    - requested_at
+    - response_at
+    - first_reliable_available_at
+    - available_to_strategy_at
+    - ingested_at
+    - latency_ms
+    - response_status
+    - terminal_class
+    - error_class
+    - route_id
+    - route_count
+    - context_slot
+    - stop_reason
+  quote_attempt:
+    - quote_attempt_id
+    - idempotency_key
+    - business_key
+    - request_hash
+    - provider
+    - provider_version
+    - side
+    - input_mint
+    - input_requested_atomic
+    - input_decimals
+    - output_mint
+    - output_quoted_atomic
+    - output_decimals
+    - route_id
+    - route_count
+    - context_slot
+    - requested_at
+    - response_at
+    - available_to_strategy_at
+    - ingested_at
+    - first_reliable_available_at
+    - quote_age_ms
+    - provider_latency_ms
+    - status
+    - error_class
+    - raw_event_id
+    - response_content_sha256
+    - schema_version
+    - quality_flags
+  validated_raw_response:
+    - inputMint
+    - inAmount
+    - outputMint
+    - outAmount
+    - otherAmountThreshold
+    - swapMode
+    - slippageBps
+    - platformFee
+    - priceImpactPct
+    - routePlan
+    - contextSlot
+    - timeTaken
+  raw_route_plan_retention: ROUTE_COUNT_AND_CONTENT_HASH_ONLY
+  decimal_policy: DECIMAL_STRING_NO_BINARY_FLOAT
+
+derived_metrics:
+  - id: panel_completeness
+    kind: descriptive
+  - id: route_availability_rate
+    kind: descriptive_with_explicit_denominator
+  - id: quote_notional_capacity_proxy_usd
+    kind: maximum_tested_grid_point_with_buy_and_dependent_sell_available
+    censoring: TESTED_GRID_CENSORED
+  - id: roundtrip_quote_retention_bps
+    kind: quote_only
+    formula: dependent_sell_output_atomic * 10000 / original_buy_input_atomic
+  - id: price_impact_pct
+    kind: raw_provider_decimal_descriptive_only
+  - id: actual_elapsed_seconds
+    kind: actual_timestamp_difference
+  - id: route_count
+    kind: descriptive
+  - id: route_id_continuity
+    kind: descriptive_noncausal
+
+denominators:
+  required:
+    - planned_panels
+    - observed_panels
+    - planned_buy_legs
+    - observed_buy_legs
+    - eligible_dependent_sell_legs
+    - observed_dependent_sell_legs
+  publish_with_every_rate:
+    - numerator
+    - denominator
+    - denominator_definition
+    - excluded_typed_states
+  missing_is_zero: false
+  retained_states:
+    - QUOTE_AVAILABLE
+    - NO_ROUTE
+    - PROVIDER_ERROR
+    - INVALID_RESPONSE
+    - TIMEOUT
+    - SELL_NOT_ATTEMPTED
+    - PANEL_MISSING
+    - CAPTURE_DEAD
+    - CAPTURE_STOPPED
+    - TIMESTAMP_INVALID
+  retain_negative_results: true
+
+dependence:
+  capture_clusters: 1
+  members: 3
+  iid_assumption: false
+  mode: DESCRIPTIVE_ONLY
+  keep_member_rows_visible: true
+  forbidden:
+    - P_VALUES
+    - CONFIDENCE_INTERVALS
+    - STANDARD_ERRORS
+    - POWER_CLAIMS
+    - CAUSAL_CLAIMS
+    - POPULATION_GENERALIZATION
+    - REPEATED_OBSERVATIONS_AS_INDEPENDENT_SAMPLES
+
+pre_read_protocol:
+  required_before_first_value_open: true
+  write_before_open: true
+  fail_closed_on_write_failure: true
+  immutable_receipt_fields:
+    - contract_sha256
+    - config_sha256
+    - frozen_input_hashes
+    - split
+    - allowed_roots
+    - member_set
+    - actor
+    - reason
+    - timestamp
+    - holdout_ledger_sha256
+    - r3_access_deny
+  a2_receipt_created: false
+  rationale: A2 performs no value read.
+
+trial_protocol:
+  ledger: registries/global_trial_ledger.yaml
+  ledger_write_in_a2: false
+  append_only: true
+  log_before_result_use: true
+  selection_affecting_changes:
+    - RERUN
+    - PARSER_CHANGE
+    - METRIC_CHANGE
+    - EXCLUSION_CHANGE
+    - QUESTION_CHANGE
+  query_and_config_content_addressed: true
+  retain_failed_runs: true
+
+reuse_route:
+  ADOPT:
+    - TASK22_SPLIT_AND_TIME_PROFILE
+    - TASK22_HOLDOUT_LEDGER_AND_A6_ACCEPTANCE
+    - MODULE-T10-JUPITER-QUOTE-LOGGER-001
+    - SCHEMA-T05-PYDANTIC-BOUNDARIES-001
+    - PIT_REPLAY_QUERY_PRIMITIVES
+    - REGISTRY-GLOBAL-TRIAL-LEDGER-001
+  WRAP:
+    - CONTRACT-T23-BOUNDED-DIAGNOSTICS-001
+    - CONFIG-T23-BOUNDED-DIAGNOSTICS-001
+    - TEST-T23-BOUNDED-DIAGNOSTICS-CONTRACT-001
+  FORK: []
+  BUILD: []
+  reuse_gate_status: PASS_EXISTING_COMPONENTS_SUFFICIENT_FOR_CONTRACT
+  full_software_reuse_gate_status: NOT_TRIGGERED_NO_NEW_DEPENDENCY_OR_EXTERNAL_SERVICE
+
+catalog:
+  registration_stage: A5
+  mutation_in_a2: false
+  planned_ids:
+    - CONTRACT-T23-BOUNDED-DIAGNOSTICS-001
+    - CONFIG-T23-BOUNDED-DIAGNOSTICS-001
+    - TEST-T23-BOUNDED-DIAGNOSTICS-CONTRACT-001
+
+authority:
+  class: LOCAL_WRITE_ONLY
+  source: EXPLICIT_USER_AND_REPOSITORY_STANDING_AUTONOMY
+  managed_write_set:
+    - docs/contracts/task23_bounded_diagnostics_contract_v1.md
+    - configs/task23_bounded_diagnostics_v1.yaml
+    - tests/test_task23_bounded_diagnostics_contract.py
+  local_file_write: true
+  local_offline_test: true
+  branch_binding: task23/cohort-diagnostics
+  network: false
+  provider_call: false
+  credential_use: false
+  drive_read: false
+  external_api: false
+  dependency_change: false
+  raw_value_read: false
+  outcome_read: false
+  r3_read: false
+  wallet_or_signer: false
+  cash_or_credits: false
+  commit: false
+  push: false
+  pull_request: false
+  merge: false
+  next_atom_authorized: false
+
+next_boundary:
+  atom: T23-A3_DETERMINISTIC_R2_DIAGNOSTIC_PROJECTION_V1
+  requires_separate_owner_continuation: true
+  first_action: WRITE_IMMUTABLE_PRE_READ_RECEIPT
+  value_read_before_receipt: false
+  r3_access: DENY

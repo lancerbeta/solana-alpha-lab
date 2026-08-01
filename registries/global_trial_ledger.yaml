@@ -1,7 +1,32 @@
 schema_version: '1.0'
 registry_id: SMIAL-REGISTRY-GLOBAL-TRIAL-LEDGER
 registry_type: global_trial_ledger
-as_of: '2026-07-21'
+as_of: '2026-08-02'
 truth_owner: TASK-03
 source_asset_ids: []
-records: []
+records:
+- record_kind: trial
+  record_id: TRIAL-T23-R2-DIAGNOSTIC-PROJECTION-ATTEMPT-01
+  status: RECORDED
+  created_at: '2026-08-01T22:08:28Z'
+  evidence_asset_ids:
+  - EVIDENCE-T23-A3-ATTEMPT-01-FAILURE-001
+  hypothesis_id: HYP-VERSION-EXECUTION-CAPACITY-CURVATURE-V1
+  outcome: FAIL
+- record_kind: trial
+  record_id: TRIAL-T23-R2-DIAGNOSTIC-PROJECTION-ATTEMPT-02
+  status: RECORDED
+  created_at: '2026-08-01T22:11:34Z'
+  evidence_asset_ids:
+  - EVIDENCE-T23-A3-PROJECTION-MANIFEST-001
+  hypothesis_id: HYP-VERSION-EXECUTION-CAPACITY-CURVATURE-V1
+  outcome: INCONCLUSIVE
+- record_kind: trial
+  record_id: TRIAL-T23-BOUNDED-ANALYSIS-ADVERSARIAL-ACCEPTANCE-001
+  status: RECORDED
+  created_at: '2026-08-01T22:25:34Z'
+  evidence_asset_ids:
+  - EVIDENCE-T23-A4-BOUNDED-ANALYSIS-001
+  - EVIDENCE-T23-A4-ADVERSARIAL-ACCEPTANCE-001
+  hypothesis_id: HYP-VERSION-EXECUTION-CAPACITY-CURVATURE-V1
+  outcome: INCONCLUSIVE

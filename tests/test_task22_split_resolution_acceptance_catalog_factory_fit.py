@@ -151,19 +151,24 @@ class Task22SplitResolutionAcceptanceCatalogFactoryFitTests(
 
     def test_catalog_transaction_is_exact_and_hash_bound(self) -> None:
         manifest, records = load_catalog()
-        self.assertEqual(manifest["catalog_version"], "0.27.1")
-        self.assertEqual(
-            manifest["current_checkpoint"],
-            {
-                "assets": 396,
-                "asset_registries": 4,
-                "schemas": 7,
-                "queries": 8,
-                "lifecycle_registries": 9,
-                "lifecycle_records": 52,
-            },
+        self.assertGreaterEqual(
+            tuple(map(int, manifest["catalog_version"].split("."))),
+            (0, 27, 1),
         )
-        self.assertEqual(len(records), 396)
+        historical = {
+            "assets": 396,
+            "asset_registries": 4,
+            "schemas": 7,
+            "queries": 8,
+            "lifecycle_registries": 9,
+            "lifecycle_records": 52,
+        }
+        for field, value in historical.items():
+            with self.subTest(field=field):
+                self.assertGreaterEqual(
+                    manifest["current_checkpoint"][field], value
+                )
+        self.assertEqual(len(records), manifest["current_checkpoint"]["assets"])
         self.assertEqual(
             set(self.receipt["catalog"]["registered_asset_ids"]),
             NEW_IDS,
@@ -184,13 +189,14 @@ class Task22SplitResolutionAcceptanceCatalogFactoryFitTests(
             set(self.receipt["catalog"]["updated_forward_compatibility_asset_ids"]),
             set(UPDATED_TESTS),
         )
-        for asset_id, (relative, expected_hash) in UPDATED_TESTS.items():
+        for asset_id, (relative, historical_hash) in UPDATED_TESTS.items():
             with self.subTest(asset_id=asset_id):
-                self.assertEqual(sha256(ROOT / relative), expected_hash)
+                current_hash = sha256(ROOT / relative)
                 self.assertEqual(
-                    records[asset_id]["integrity"]["sha256"],
-                    expected_hash,
+                    records[asset_id]["integrity"]["sha256"], current_hash
                 )
+                if current_hash != historical_hash:
+                    self.assertNotEqual(records[asset_id]["record_version"], "1.0")
                 text = (ROOT / relative).read_text(encoding="utf-8")
                 self.assertNotIn(
                     'assertEqual(checkpoint["schemas"], 4)',
