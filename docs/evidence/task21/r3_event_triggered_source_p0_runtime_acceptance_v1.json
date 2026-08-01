@@ -1,0 +1,213 @@
+{
+  "schema": "smial.task21.r3-event-triggered-source-p0-runtime-acceptance",
+  "schema_version": "1.0",
+  "evidence_id": "EVIDENCE-T21-R3-SOURCE-P0-RUNTIME-001",
+  "evidence_version": "1.0",
+  "task_id": "TASK-21",
+  "atom_id": "T21-A6S_R3_EVENT_TRIGGERED_SOURCE_AND_P0_CAPTURE_V1",
+  "status": "PASS",
+  "as_of": "2026-08-01T13:40:50.040339Z",
+  "verdict": "R3_SOURCE_ADMISSION_AND_P0_CAPTURE_ACCEPTED",
+  "protected_inputs": [
+    {
+      "path": "configs/task21_event_triggered_final_cohort_runtime_v1.yaml",
+      "sha256": "7e818f032cc0505b1dce6ac6b94c4b193b2eeecd2c34702de344a606a29888f1"
+    },
+    {
+      "path": "docs/evidence/task21/event_triggered_final_cohort_runtime_prep_acceptance_v1.json",
+      "sha256": "5e18a8bcf66e4504177a2d74ba38f2a0945730b726dcc11c80b11464762d2728"
+    },
+    {
+      "path": "docs/evidence/task21/r2_event_triggered_source_p0_runtime_acceptance_v1.json",
+      "sha256": "5c69ba68348b63976a54b8e69974d5cfd406c375d4688601d78bbddcbe8eee9c"
+    },
+    {
+      "path": "docs/evidence/task21/r2_p1_event_triggered_capture_runtime_acceptance_v1.json",
+      "sha256": "fedb97b9bd8bb8d8d7a7650ba47e958d0b6d7659cb4fcfdaa1c73de6c31ffd54"
+    },
+    {
+      "path": "docs/evidence/task21/r2_p2_event_triggered_capture_runtime_acceptance_v1.json",
+      "sha256": "76644640134dc186fc4d65e98814f39ef5546695fce10bc385b1b8e9f469e1f1"
+    },
+    {
+      "path": "docs/evidence/task21/r2_complete_review_r3_entry_gate_v1.json",
+      "sha256": "b23ad74233401ea4164db92831da1ddfffe244458141dbf2ade2610db0822d01"
+    },
+    {
+      "path": "docs/evidence/task21/pre_h24_recovery_refresh_acceptance_v1.json",
+      "sha256": "08f977ca926a6ba572e3cb5f4bea352d5e87e04a85f4e6c71c56f3a2ccf5b999"
+    },
+    {
+      "path": "configs/task21_r3_event_triggered_source_p0_v1.yaml",
+      "sha256": "b82a984f3958129e4c01c8987da648d63a4d0f7a6bb439d0d3c6182da52a1383"
+    },
+    {
+      "path": "docs/evidence/task21/r3_event_triggered_source_p0_offline_acceptance_v1.json",
+      "sha256": "4d9f22b5a8c72e0095ae5818dce278e882ce15e7491560fbb694b92f3f85568f"
+    }
+  ],
+  "runtime_preflight": {
+    "started_at": "2026-08-01T13:40:14.806103Z",
+    "r2_outcome_blind_state_replay": "PASS",
+    "r2_members_replayed": 3,
+    "prior_seen_mints": 6,
+    "recovery_health": "HEALTHY",
+    "backup_age_hours": 23.199931973,
+    "backup_age_hours_max": 24,
+    "restore_proof_age_hours": 23.160113907,
+    "restore_proof_age_hours_max": 168,
+    "free_disk_bytes_at_last_fresh_preflight": 185424101376,
+    "minimum_free_space_bytes_after_write": 2147483648,
+    "repository_head": "84287cd266c5cba2edc0e68cf10fd7625c854614",
+    "repository_tree": "f1239ae99c68587ea5fd57807a952cf93c38a3af",
+    "remote_pr": 28,
+    "remote_head": "84287cd266c5cba2edc0e68cf10fd7625c854614",
+    "remote_state": "OPEN_DRAFT_CLEAN"
+  },
+  "source": {
+    "source_observation_id": "T21-R3-SOURCE-572abd0dbe29acf14247",
+    "source_content_sha256": "806447ca11d6ded349e19e4caa777dfbcac8d376bab1be2f7954c58609e74e82",
+    "observed_at": "2026-08-01T13:40:15.363386Z",
+    "rpc_context_slot": 436571537,
+    "requested_mints": 17,
+    "structurally_valid_mints": 15,
+    "unseen_eligible_mints": 2,
+    "partition_sha256": "e696b9b6fa2dba9178e78360643accac11ce78c297e8a49ee73e0e97931ae9e2"
+  },
+  "admission": {
+    "nominations": 2,
+    "admissions": 2,
+    "persisted_before_first_jupiter_call": true,
+    "outcome_or_route_input_used": false,
+    "nomination_events_sha256": "a4d5054fe9494d6059ec75da4dd33dbbb2cfe9ee28fc48e008f4d25f2af1c5e3",
+    "admission_events_sha256": "9dde9b9501214877470a42910b90ec2d08e47d17a1d60b325ef3df6cc8de4bd4",
+    "admission_receipt_sha256": "446fc97a2b131b1d89e2936f7fe0d023ef9ded562e0c9c3d214ee9d3a1f248b9",
+    "members": [
+      {
+        "member_id": "T21-WATCH-7a678b1052ac10b7d492",
+        "mint": "CWfuB1HDEp9W3xT3prBX8EPa1TQWKh1PmWFot3Gkpump",
+        "mint_decimals": 6,
+        "nomination_event_id": "T21-R3-NOM-0d8cbfac225007f093cb"
+      },
+      {
+        "member_id": "T21-WATCH-2c5632a2ba71c8e44637",
+        "mint": "8LRXPgAdhFktQzXjRVWgqWBWnMZTexjxsMrtQTQ6pump",
+        "mint_decimals": 6,
+        "nomination_event_id": "T21-R3-NOM-924c8d05d1001c080722"
+      }
+    ]
+  },
+  "p0": {
+    "panels_complete": 2,
+    "panels_stopped": 0,
+    "quote_pairs_complete": 8,
+    "quote_attempts_complete": 16,
+    "terminal_counts": {
+      "QUOTE_AVAILABLE": 16
+    },
+    "windows": [
+      {
+        "member_id": "T21-WATCH-7a678b1052ac10b7d492",
+        "triggered_at": "2026-08-01T13:40:15.413110Z",
+        "completed_at": "2026-08-01T13:40:31.564666Z",
+        "provider_calls": 8,
+        "received_bytes": 12557,
+        "raw_events_sha256": "ebda077db26d62f565e0564717d9f7f35519db3a438b592fb5cf56fb33f50065",
+        "manifest_sha256": "d4d0f939581327c81c7c9928b5a47e65359f00b152800911ee3f76664dd249f1",
+        "receipt_sha256": "f2d651268ab9cc7e440d4f681badd59614d28a64b4f65d73b854a357e4823e7b"
+      },
+      {
+        "member_id": "T21-WATCH-2c5632a2ba71c8e44637",
+        "triggered_at": "2026-08-01T13:40:33.808430Z",
+        "completed_at": "2026-08-01T13:40:50.040339Z",
+        "provider_calls": 8,
+        "received_bytes": 12485,
+        "raw_events_sha256": "e146f14f76a8ed9858d0af1ae74f3dfada202163b94fef6f762fb11ca240afbf",
+        "manifest_sha256": "c7e0d134de329683197f34e89bede230849c4eb2ff670b0b7427c301d888807b",
+        "receipt_sha256": "42dd3721513ecfc4b8e60ee855313c297a09133160e44231985baf543364cf26"
+      }
+    ]
+  },
+  "local_evidence": {
+    "root": "local/task21_forward/final_cohort/r3/run=r3-20260801T134014806103Z-ac917cf4f972",
+    "file_count": 11,
+    "stored_bytes": 140965,
+    "runtime_receipt_sha256": "5fab10b5aa502583b6616c8e950c46e139b62f52b87ee9b0d92de261540fe114",
+    "exact_readback": "PASS",
+    "create_only": true,
+    "tracked_in_git": false
+  },
+  "budget_after_r3_p0": {
+    "external_requests": 152,
+    "external_requests_cap": 192,
+    "source_requests": 8,
+    "source_requests_cap": 8,
+    "quote_requests": 144,
+    "quote_requests_cap": 184,
+    "response_bytes": 283442,
+    "response_bytes_cap": 25165824,
+    "reserved_r3_p1_p2_quote_requests": 32
+  },
+  "actual_actions": {
+    "provider_api_rpc_wss_calls": 18,
+    "dexscreener_calls": 1,
+    "solana_public_rpc_calls": 1,
+    "jupiter_calls": 16,
+    "modeled_provider_credits": 16,
+    "billed_provider_credit_claim": "NOT_AVAILABLE_KEYLESS_NO_ACCOUNT",
+    "received_bytes": 54184,
+    "candidate_nominations": 2,
+    "candidate_admissions": 2,
+    "local_raw_or_dataset_writes": 11,
+    "local_durable_bytes": 140965,
+    "retries": 0,
+    "concurrency": 1,
+    "cash_spend_usd_cents": 0,
+    "credentials_used": 0,
+    "drive_reads": 0,
+    "drive_writes": 0,
+    "scheduler_or_background_process": false,
+    "deploy": false,
+    "catalog_mutation": false,
+    "source_mutation": false,
+    "wallet_signer_transaction_actions": 0,
+    "destructive_actions": false,
+    "merge": false
+  },
+  "next_boundary": {
+    "status": "P1_EVENT_TRIGGER_READY_AFTER_MINIMUM_SEPARATION",
+    "atom_id": "T21-A6S_R3_P1_EVENT_TRIGGERED_FOREGROUND_CAPTURE_V1",
+    "minimum_separation_seconds": 1801,
+    "member_not_before": [
+      {
+        "member_id": "T21-WATCH-7a678b1052ac10b7d492",
+        "not_before_at": "2026-08-01T14:10:32.564666Z"
+      },
+      {
+        "member_id": "T21-WATCH-2c5632a2ba71c8e44637",
+        "not_before_at": "2026-08-01T14:10:51.040339Z"
+      }
+    ],
+    "external_authority_granted": false,
+    "task22_authorized": false,
+    "a7_authorized": false
+  },
+  "catalog": {
+    "version": "0.25.0",
+    "status": "PENDING_T21_A7",
+    "mutation_performed": false
+  },
+  "delivery": {
+    "branch": "task21/final-cohort-extension",
+    "pull_request": 28,
+    "status": "PENDING_COMMIT_NON_FORCE_PUSH_AND_CI",
+    "merge_authorized": false
+  },
+  "non_claims": [
+    "NO_TRADE_SWAP_FILL_POSITION_PNL_OR_ALPHA_CLAIM",
+    "NO_OUTCOME_BASED_R3_SELECTION",
+    "NO_MARKET_WIDE_OR_CROSS_REGIME_CLAIM",
+    "NO_DRIVE_CATALOG_SOURCE_OR_DEPLOY_ACTION",
+    "NO_TASK22_OR_A7_AUTHORITY"
+  ]
+}

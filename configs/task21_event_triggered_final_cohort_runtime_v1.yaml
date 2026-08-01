@@ -1,0 +1,178 @@
+schema: smial.task21_event_triggered_final_cohort_runtime
+schema_version: '1.0'
+runtime_id: T21-EVENT-TRIGGERED-FINAL-COHORT-001
+runtime_version: '1.0'
+task_id: TASK-21
+atom_id: T21-A6S_EVENT_TRIGGERED_FINAL_COHORT_RUNTIME_PREP_V1
+status: OFFLINE_RUNTIME_PREP_ONLY
+as_of: '2026-08-01'
+contains_secrets: false
+transport: null
+scheduler: null
+
+protected_inputs:
+- role: INFORMATION_SUFFICIENCY_REBASE
+  path: configs/task21_information_sufficiency_rebase_v1.yaml
+  sha256: 62fcbc91c30c7ac4a22fab422711272f66b44b116c33a9c3aa3b0884e854ab70
+- role: INFORMATION_SUFFICIENCY_ACCEPTANCE
+  path: docs/evidence/task21/information_sufficiency_rebase_acceptance_v1.json
+  sha256: 0c7da799509797aa453877a352add93832b1e7e7a8dee747e0a09b41e475db6c
+- role: ACCEPTED_H0_RUNTIME
+  path: docs/evidence/task21/h0_admission_capture_runtime_acceptance_v1.json
+  sha256: 7e28fc61a85d77648d865a1e784ac6a7a1df7bd753b05b9dff48bba2a5206c16
+
+history:
+  mode: FORWARD_ONLY_ADAPTER
+  historical_modules_modified: false
+  historical_artifacts_rewritten: false
+  sealed_outcomes_read: false
+  hypothesis_definition_changed: false
+  primary_estimand_changed: false
+  h6_gap_retained: true
+  h24_supplemental_semantics_retained: true
+  h72_h168_auto_capture: false
+
+cohort:
+  policy_version: '1.0'
+  evaluated_candidates_used: 3
+  evaluated_candidates_cap: 8
+  new_member_cap: 5
+  batches:
+  - batch_id: T21-R2
+    member_cap: 3
+    source_calls_max: 2
+  - batch_id: T21-R3
+    member_cap: 2
+    source_calls_max: 2
+  deterministic_order:
+  - first_reliable_available_at
+  - observed_at
+  - nomination_event_id
+  - mint
+  novelty_requirements:
+  - NEW_SOURCE_OBSERVATION_ID
+  - NEW_SOURCE_CONTENT_SHA256
+  - OBSERVED_AT_STRICTLY_AFTER_PRIOR_BATCH
+  - AT_LEAST_ONE_PREVIOUSLY_UNSEEN_ELIGIBLE_MINT
+  identical_or_non_novel_observation: RETAIN_AND_STOP_WITHOUT_ADMISSION
+  candidate_states_retained: true
+  minimum_calendar_wait: null
+
+initial_state:
+  accepted_source_observations:
+  - batch_id: T21-R1
+    source_observation_id: T21-DSRPC-T1-808b5f9b79b41b8b8478
+    source_content_sha256: 808b5f9b79b41b8b847821bfd4d1f720a57147a2d637c0f46934d231d1fbd8dc
+    observed_at: '2026-07-30T16:28:59.084Z'
+  seen_mints:
+  - 2MUB7LUviPc5hmEKKuogxdDQhEAEC3QRBbeTB7bUpump
+  - 2zRj2vtREeogejN4zuYtBd9drCma7GtaWmUSdz28pump
+  - 35CeebrkDFt6RhtpkAj19f7JStnxBjkyVcuLDH2dpump
+
+panels:
+  order: [P0, P1, P2]
+  P0: ON_ADMISSION_FOREGROUND
+  P1_P2: EVENT_TRIGGERED_FOREGROUND_AFTER_PREDECESSOR
+  minimum_separation_seconds: 1801
+  member_total_span_seconds_max: 86400
+  provider_calls_per_panel_max: 8
+  quote_pairs_per_panel: 4
+  retries: 0
+  concurrency: 1
+  narrow_expiry_window_used: false
+  missed_span_policy: RETAIN_GAP_STOP_NO_BACKFILL
+  automatic_background_execution: false
+
+budget:
+  caps:
+    external_requests: 192
+    source_requests: 8
+    quote_requests: 184
+  used:
+    external_requests: 60
+    source_requests: 4
+    quote_requests: 56
+  projected_after_full_plan:
+    external_requests: 184
+    source_requests: 8
+    quote_requests: 176
+  headroom_not_authority: true
+  bytes_and_storage:
+    response_bytes_cap: 25165824
+    stored_bytes_cap: 125829120
+    dataset_bytes_cap: 268435456
+    min_free_space_bytes_after_write: 2147483648
+    runtime_behavior: FAIL_CLOSED_ON_MEASURED_CAP
+
+outcome_blindness:
+  active: true
+  admissions_may_use:
+  - SOURCE_LINEAGE
+  - SOURCE_CONTENT_HASH
+  - OBSERVATION_AND_AVAILABILITY_TIME
+  - FROZEN_STRUCTURAL_ELIGIBILITY
+  - MINT_IDENTITY_AND_DECIMALS
+  - PRIOR_SEEN_MINT_SET
+  forbidden_until_collection_stop:
+  - QUOTE_OR_ROUTE_VALUES
+  - COST_BPS
+  - TOKEN_RANK_OR_SCORE
+  - HYPOTHESIS_VERDICT
+  - PNL_OR_RETURN
+
+stop_rules:
+  stop_on_first:
+  - SOURCE_OBSERVATION_NOT_NOVEL
+  - OBSERVED_AT_NOT_AFTER_PRIOR_BATCH
+  - NO_PREVIOUSLY_UNSEEN_ELIGIBLE_MINT
+  - EVALUATED_CANDIDATE_CAP_REACHED
+  - SOURCE_REQUEST_CAP_REACHED
+  - REMAINING_BUDGET_CANNOT_COMPLETE_MEMBER
+  - RECOVERY_HEALTH_NOT_HEALTHY
+  - RESPONSE_STORAGE_OR_DISK_CAP_REACHED
+  - MEMBER_TOTAL_SPAN_EXPIRED
+  - SOURCE_OR_POLICY_CONTRACT_DRIFT
+  automatic_extension: false
+  calendar_elapsed_alone_is_evidence: false
+
+success_gate:
+  complete_new_members: 5
+  complete_panels: 15
+  complete_quote_pairs: 60
+  independent_nomination_batches_total: 3
+  maximum_member_share_one_batch: 0.6
+  disposition: DATASET_READY_FOR_NARROW_CONDITIONAL_ANALYSIS
+  market_wide_claim: false
+  cross_regime_claim: false
+
+authority:
+  class: LOCAL_WRITE_ONLY
+  source: EXPLICIT_USER
+  gate_phrase: T21-A6S_EVENT_TRIGGERED_FINAL_COHORT_RUNTIME_PREP_V1
+  network_calls: 0
+  provider_api_rpc_wss_calls: 0
+  drive_reads: 0
+  drive_writes: 0
+  credential_use: 0
+  candidate_nominations: 0
+  candidate_admissions: 0
+  collector_executions: 0
+  raw_or_dataset_writes: 0
+  provider_credits: 0
+  cash_spend_usd_cents: 0
+  commit: false
+  push: false
+  pull_request: false
+  merge: false
+  wallet_signer_transaction_actions: 0
+  destructive_actions: false
+
+next_boundary:
+  atom_id: T21-A6S_R2_EVENT_TRIGGERED_SOURCE_AND_P0_CAPTURE_V1
+  status: NOT_AUTHORIZED
+  separate_external_authority_required: true
+  exact_runtime_revalidation_required: true
+  provider_api_rpc_wss_calls_authorized: false
+  raw_or_dataset_writes_authorized: false
+  task22_authorized: false
+  a7_authorized: false

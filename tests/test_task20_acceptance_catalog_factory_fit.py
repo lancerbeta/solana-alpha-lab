@@ -174,19 +174,18 @@ class Task20AcceptanceCatalogFactoryFitTests(unittest.TestCase):
 
     def test_catalog_transaction_is_exact_hash_bound_and_complete(self) -> None:
         manifest, records = load_catalog()
-        self.assertEqual(manifest["catalog_version"], "0.25.0")
-        self.assertEqual(
-            manifest["current_checkpoint"],
-            {
-                "assets": 340,
-                "asset_registries": 4,
-                "schemas": 4,
-                "queries": 8,
-                "lifecycle_registries": 9,
-                "lifecycle_records": 52,
-            },
-        )
-        self.assertEqual(len(records), 340)
+        version = tuple(int(part) for part in manifest["catalog_version"].split("."))
+        self.assertGreaterEqual(version, (0, 25, 0))
+        checkpoint = manifest["current_checkpoint"]
+        self.assertGreaterEqual(checkpoint["assets"], 340)
+        self.assertEqual(checkpoint["asset_registries"], 4)
+        self.assertEqual(checkpoint["schemas"], 4)
+        self.assertEqual(checkpoint["queries"], 8)
+        self.assertEqual(checkpoint["lifecycle_registries"], 9)
+        self.assertEqual(checkpoint["lifecycle_records"], 52)
+        self.assertEqual(len(records), checkpoint["assets"])
+        self.assertEqual(self.receipt["catalog"]["catalog_version"], "0.25.0")
+        self.assertEqual(self.receipt["catalog"]["assets"], 340)
         self.assertEqual(
             set(self.receipt["catalog"]["registered_asset_ids"]),
             EXPECTED_IDS,

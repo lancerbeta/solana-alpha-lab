@@ -1,0 +1,141 @@
+{
+  "schema": "smial.task21.information-sufficiency-rebase-acceptance",
+  "schema_version": "1.0",
+  "evidence_id": "EVIDENCE-T21-INFORMATION-SUFFICIENCY-REBASE-001",
+  "evidence_version": "1.0",
+  "task_id": "TASK-21",
+  "atom_id": "T21-A6S_INFORMATION_SUFFICIENCY_REBASE_V1",
+  "completed_at": "2026-08-01T10:29:12.716Z",
+  "status": "PASS",
+  "verdict": "INFORMATION_SUFFICIENCY_REBASED_TO_EVENT_TRIGGERED_FINAL_COHORT",
+  "repository_base": {
+    "head": "f3e60e40c8de401b725fa0241c7c3b7f0ffa44c9",
+    "tree": "40ac1e819c687520f2fea9e8e6e41c7cdbea0ab6",
+    "accepted_main": "bb269f86397ba518da5f76d4a651b3c51ec85744"
+  },
+  "decision": {
+    "entry_gate": "START_WITH_PATCH",
+    "dataset_ready": false,
+    "task22_eligible": false,
+    "current_complete_base_members_exact": 0,
+    "current_base_panels_exact": 6,
+    "current_supplemental_panels_exact": 1,
+    "final_new_member_cap": 5,
+    "final_new_base_panels_max": 15,
+    "minimum_calendar_wait_required": false,
+    "new_source_requests_max": 4,
+    "new_quote_requests_max": 120,
+    "projected_external_requests_whole_task_max": 184,
+    "external_request_outer_cap": 192,
+    "external_request_headroom": 8,
+    "response_bytes_remaining": 25079733,
+    "stored_bytes_remaining": 125464222,
+    "dataset_bytes_remaining": 268070558,
+    "free_disk_bytes_observed": 186280022016,
+    "success_disposition": "DATASET_READY_FOR_NARROW_CONDITIONAL_ANALYSIS",
+    "market_wide_or_cross_regime_claim": false,
+    "sealed_outcomes_read": false
+  },
+  "artifacts": [
+    {
+      "asset_id": "CONTRACT-T21-INFORMATION-SUFFICIENCY-REBASE-001",
+      "path": "docs/contracts/task21_information_sufficiency_rebase_contract_v1.md",
+      "bytes": 4673,
+      "sha256": "6e51069aa061ec14784753fbe781016b1245429fcaadd98ac151fb7fc262e700"
+    },
+    {
+      "asset_id": "CONFIG-T21-INFORMATION-SUFFICIENCY-REBASE-001",
+      "path": "configs/task21_information_sufficiency_rebase_v1.yaml",
+      "bytes": 10157,
+      "sha256": "62fcbc91c30c7ac4a22fab422711272f66b44b116c33a9c3aa3b0884e854ab70"
+    },
+    {
+      "asset_id": "MODULE-T21-INFORMATION-SUFFICIENCY-REBASE-001",
+      "path": "src/solana_alpha_lab/task21_information_sufficiency.py",
+      "bytes": 8292,
+      "sha256": "3d0ff00021b3a6541b521a2bb420feea6583f649bfc8876790a2bc75796e1154"
+    },
+    {
+      "asset_id": "TEST-T21-INFORMATION-SUFFICIENCY-REBASE-001",
+      "path": "tests/test_task21_information_sufficiency.py",
+      "bytes": 8178,
+      "sha256": "dec354d3a55d88219adf85dd8e8c3b442882a0d612814b73da905c171c580e50"
+    }
+  ],
+  "targeted_validation": "12_OF_12_PASS",
+  "validation": {
+    "completed_at": "2026-08-01T10:44:38.510Z",
+    "targeted": {
+      "command": "uv run --locked --managed-python python -m unittest tests.test_task21_information_sufficiency -q",
+      "result": "12_OF_12_PASS"
+    },
+    "task21_regression": {
+      "command": "uv run --locked --managed-python python -m unittest discover -s tests -p test_task21*.py -q",
+      "result": "206_OF_206_PASS"
+    },
+    "full_unit_regression": {
+      "command": "uv run --locked --managed-python python -m unittest discover -s tests -q",
+      "result": "1340_OF_1340_PASS"
+    },
+    "secret_scan": {
+      "command": "uv run --locked --managed-python python -B scripts/secret_scan.py --self-test --scan-repository",
+      "result": "PASS"
+    },
+    "repository_wrapper": {
+      "command": "pwsh -NoProfile -File scripts/validate.ps1",
+      "result": "FAIL",
+      "exact_failure": "branch_main_or_ci_detached",
+      "interpretation": "NON_MAIN_LOCAL_BRANCH_POLICY_REJECTION_NO_BYPASS_OR_BRANCH_CHANGE_USED"
+    }
+  },
+  "catalog": {
+    "accepted_checkpoint": "0.25.0 / 340 / 4 / 4 / 8",
+    "status": "CATALOG_TRANSACTION_PENDING_T21_A7",
+    "version_or_count_advanced": false
+  },
+  "product_vision": {
+    "marker_id": "SMIAL-PRODUCT-VISION-RECONCILIATION-2026-07-31",
+    "status": "UNRESOLVED_NONBLOCKING_FOR_THIS_LOCAL_REBASE",
+    "terminal_reconciliation_required_at": "T21-A7"
+  },
+  "actual_actions": {
+    "network_calls": 0,
+    "provider_api_rpc_wss_calls": 0,
+    "drive_reads": 0,
+    "drive_writes": 0,
+    "credential_use": 0,
+    "candidate_nominations": 0,
+    "candidate_admissions": 0,
+    "collector_executions": 0,
+    "raw_or_dataset_writes": 0,
+    "backup_executions": 0,
+    "restore_executions": 0,
+    "provider_credits": 0,
+    "cash_spend_usd_cents": 0,
+    "scheduler_or_background_process": false,
+    "dependency_changes": 0,
+    "commit": false,
+    "push": false,
+    "pull_request": false,
+    "merge": false,
+    "wallet_signer_transaction_actions": 0,
+    "ui_changes": false,
+    "destructive_actions": false
+  },
+  "non_claims": [
+    "DATASET_READY",
+    "TASK22_ELIGIBLE_OR_STARTED",
+    "HYPOTHESIS_OUTCOME_OR_VERDICT",
+    "MARKET_WIDE_OR_CROSS_REGIME_GENERALIZATION",
+    "PROVIDER_OR_COLLECTION_AUTHORITY",
+    "CATALOG_OR_CANONICAL_SOURCE_FINALIZATION"
+  ],
+  "next_boundary": {
+    "atom_id": "T21-A6S_EVENT_TRIGGERED_FINAL_COHORT_RUNTIME_PREP_V1",
+    "authority": "LOCAL_WRITE_ONLY_REQUIRES_SEPARATE_OWNER_OK",
+    "authorized": false,
+    "external_actions_authorized": false,
+    "task22_authorized": false
+  },
+  "state_change": "LOCAL_REBASE_ACCEPTED_TASK21_REMAINS_IN_PROGRESS"
+}

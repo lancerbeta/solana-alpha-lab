@@ -1,14 +1,14 @@
 {
   "schema": "smial.active-time-gates",
   "schema_version": "1.0",
-  "as_of": "2026-08-01T09:00:48.126089Z",
+  "as_of": "2026-08-01T16:51:09.862800Z",
   "contains_secrets": false,
   "resume_router": {
     "router_id": "TASK21-DURABLE-RESUME-ROUTER-001",
     "router_version": "1.0",
     "task_id": "TASK-21",
-    "status": "NO_ACTIVE_TIME_GATE_FUTURE_HORIZONS_TRIGGER_ONLY",
-    "entry_rule": "READ_MARKER_THEN_RUN_OWNER_PULSE_BEFORE_TASK21_CONTINUATION",
+    "status": "A7_ACCEPTED_PENDING_REPOSITORY_DELIVERY",
+    "entry_rule": "READ_MARKER_THEN_RUN_FINAL_OWNER_PULSE_BEFORE_TASK21_CONTINUATION",
     "read_only_command": [
       "uv",
       "run",
@@ -16,35 +16,37 @@
       "--managed-python",
       "python",
       "-B",
-      "scripts/show_task21_owner_pulse.py",
+      "scripts/show_task21_final_owner_pulse.py",
       "--json"
     ],
     "required_sequence": [
       "READ_REPOSITORY_AGENTS",
       "READ_ACTIVE_TIME_GATE_MARKER",
       "RUN_OWNER_PULSE_READ_ONLY",
-      "IF_ANY_GATE_IS_DUE_ROUTE_EXACT_REQUIRED_NEXT_ATOM_BEFORE_NEW_MUTATION",
-      "OTHERWISE_RESUME_ONLY_EXPLICITLY_AUTHORIZED_NON_INTERFERING_WORK"
+      "CONFIRM_A7_ACCEPTANCE_AND_FINAL_RECOVERY_IDENTITY",
+      "ROUTE_TO_T21_A8_ONLY_AFTER_EXPLICIT_AUTHORITY",
+      "DO_NOT_START_TASK22_BEFORE_A8_AND_TASK21_FINISH_GATE"
     ],
     "due_gate_precedence": "AT_OR_AFTER_EARLIEST_AT_ROUTE_REQUIRED_NEXT_ATOM_BEFORE_NEW_MUTATION",
     "active_gate_id": null,
     "fallback_read_set": [
       "control/active_time_gates.json",
-      "configs/task21_owner_pulse_read_model_v1.yaml",
-      "scripts/show_task21_owner_pulse.py"
+      "configs/task21_final_owner_pulse_v1.yaml",
+      "docs/evidence/task21/a7_acceptance_catalog_factory_fit_v1.json",
+      "scripts/show_task21_final_owner_pulse.py"
     ],
     "binding": {
       "config": {
-        "path": "configs/task21_durable_resume_router_binding_v1.yaml",
-        "sha256": "c57562bfa23365afa641ff3e333b0edea168c5e1ad7509d3fd001273a5a4672d"
+          "path": "configs/task21_final_owner_pulse_v1.yaml",
+          "sha256": "051e5974b147699e509d03303e59853b5b21b16840e67401b90cf1489cba155d"
       },
       "contract": {
-        "path": "docs/contracts/task21_durable_resume_router_binding_contract_v1.md",
-        "sha256": "3079b8773a2293b32973ebbe4d75ee79b21d7c5c8e14e5444e1a1d875e7f4283"
+          "path": "docs/contracts/task21_dataset_freeze_acceptance_contract_v1.md",
+          "sha256": "d3679f074c17b9da95b956ae4ac8919ac1fb48fe1bb2683f60465a73b3c8a85b"
       },
       "owner_pulse_entrypoint": {
-        "path": "scripts/show_task21_owner_pulse.py",
-        "sha256": "1fc62b00f18cee26a64355ebdc475dd7ac25cbcbf98fb24cfe9c87e9478da0d2"
+          "path": "scripts/show_task21_final_owner_pulse.py",
+          "sha256": "6ce80ede9d761280a9a8b7d8fa17def7f823216aac1639a0d2a3956b0832adee"
       },
       "marker_hash_policy": "DYNAMIC_SEMANTIC"
     },
@@ -66,6 +68,32 @@
       "pull_request": false,
       "merge": false,
       "destructive_actions": false
+    },
+    "a7_resolution": {
+      "status": "PASS_LOCAL_CANDIDATE",
+      "resolved_at": "2026-08-01T16:51:09.862800Z",
+      "owner_verdict": "DATASET_READY_FOR_NARROW_CONDITIONAL_ANALYSIS_WITH_LIMITATIONS",
+      "dataset_inventory_sha256": "aaa605eabdb62c38d218b40e768669db460c6fa419c4086d5412547b7f2fffae",
+      "acceptance_receipt": {
+        "path": "docs/evidence/task21/a7_acceptance_catalog_factory_fit_v1.json",
+        "sha256": "e73f5b0c1f3b85ab19d7cf4a0ef460c681ce7b418a516db1a36b901d62b2454a"
+      },
+      "product_vision_gate": {
+        "gate_id": "SMIAL-PRODUCT-VISION-RECONCILIATION-2026-07-31",
+        "terminal_result": "CANONICALIZED_WITH_PATCH",
+        "architecture_intent": {
+          "path": "docs/architecture/intents/ARCH-INTENT-003-product-owner-operating-topology.md",
+          "sha256": "6aa26738a363cd8ccbc93d722082c3a551a88b5a1c6d20e2614585f5f6debdf3"
+        },
+        "roadmap_patch": {
+          "path": "docs/roadmap_patches/task21_product_vision_followups_v1.md",
+          "sha256": "925b6398056b81c7baa71b5a7217dd50aaf2408a4bf199aac55cdd52302542a5"
+        },
+        "project_source_activation": "PENDING_TASK21_FINISH_BUNDLE_AND_USER_SMOKE"
+      },
+      "next_atom": "T21-A8_REPOSITORY_DELIVERY_V1",
+      "next_atom_authorized": false,
+      "task22_started": false
     }
   },
   "gates": [

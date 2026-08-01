@@ -1,0 +1,92 @@
+{
+  "schema": "smial.task21.r2-p2-event-triggered-capture-offline-acceptance",
+  "schema_version": "1.0",
+  "evidence_id": "EVIDENCE-T21-R2-P2-OFFLINE-PREP-001",
+  "evidence_version": "1.0",
+  "task_id": "TASK-21",
+  "atom_id": "T21-A6S_R2_P2_EVENT_TRIGGERED_FOREGROUND_CAPTURE_V1",
+  "status": "PASS",
+  "as_of": "2026-08-01",
+  "verdict": "LOCAL_RUNTIME_PREP_ACCEPTED_EXTERNAL_AUTHORITY_REQUIRED",
+  "artifacts": [
+    {
+      "path": "configs/task21_r2_p2_event_triggered_capture_v1.yaml",
+      "bytes": 4651,
+      "sha256": "c4293af993bfcc7ba5d1dd3ab7bcac0a4836c5244e1b9afbe20325e4fdaa68b9"
+    },
+    {
+      "path": "docs/contracts/task21_r2_p2_event_triggered_capture_contract_v1.md",
+      "bytes": 2515,
+      "sha256": "abf60aadc7736f4070b15009885aa0800050e85a3cd033189e93310432b8cc38"
+    },
+    {
+      "path": "src/solana_alpha_lab/task21_r2_p2_event_triggered_capture.py",
+      "bytes": 20594,
+      "sha256": "74783a76fd747ca00d8c2710dadf71d176f6d9ecca1988b123ee3389edf7de09"
+    },
+    {
+      "path": "scripts/run_task21_r2_p2_capture.py",
+      "bytes": 1636,
+      "sha256": "e7733d002afddec916a9d4656fb298a04478c565632ca80540a08a4c629050e3"
+    },
+    {
+      "path": "tests/test_task21_r2_p2_event_triggered_capture.py",
+      "bytes": 12618,
+      "sha256": "48a98d5218c83369d15e527303e9e919cbdda58e25184dd1cee90b7afbd3444c"
+    }
+  ],
+  "offline_acceptance": {
+    "exact_live_config_and_protected_inputs": "PASS",
+    "exact_authority_phrase": "PASS",
+    "all_member_eligibility_before_transport": "PASS",
+    "recovery_freshness_before_transport": "PASS",
+    "three_member_twenty_four_call_happy_path": "PASS",
+    "outcome_blind_population_immutability": "PASS",
+    "partial_failure_evidence_retention_no_retry": "PASS",
+    "create_only_and_byte_caps": "PASS",
+    "p1_regression_tests": 7,
+    "p2_targeted_tests": 7,
+    "targeted_tests_total": 14
+  },
+  "actual_actions": {
+    "provider_api_rpc_wss_calls": 0,
+    "jupiter_calls": 0,
+    "modeled_provider_credits": 0,
+    "candidate_nominations": 0,
+    "candidate_admissions": 0,
+    "raw_or_dataset_writes": 0,
+    "drive_reads": 0,
+    "drive_writes": 0,
+    "credentials_used": 0,
+    "cash_spend_usd_cents": 0,
+    "scheduler_or_background_process": false,
+    "deploy": false,
+    "catalog_mutation": false,
+    "source_mutation": false,
+    "wallet_signer_transaction_actions": 0,
+    "destructive_actions": false,
+    "commit": false,
+    "push": false,
+    "pull_request": false,
+    "merge": false
+  },
+  "next_boundary": {
+    "atom_id": "T21-A6S_R2_P2_EVENT_TRIGGERED_FOREGROUND_CAPTURE_V1",
+    "status": "EXACT_PROVIDER_AUTHORITY_REQUIRED_AFTER_FRESH_PREFLIGHT",
+    "provider_api_rpc_wss_calls_authorized": false,
+    "jupiter_calls_max_if_authorized": 24,
+    "member_count_exact": 3,
+    "retries": 0,
+    "concurrency": 1,
+    "r3_authorized": false,
+    "task22_authorized": false,
+    "a7_authorized": false
+  },
+  "non_claims": [
+    "NO_LIVE_P2_CAPTURE_EXECUTED",
+    "NO_TRADE_SWAP_FILL_POSITION_PNL_OR_ALPHA_CLAIM",
+    "NO_OUTCOME_BASED_RESELECTION",
+    "NO_DRIVE_CATALOG_SOURCE_OR_DEPLOY_ACTION",
+    "NO_R3_TASK22_OR_A7_AUTHORITY"
+  ]
+}

@@ -9915,6 +9915,742 @@ records:
   - FACTORY-001
   evidence: []
   classification: *t20_internal
+- asset_id: CONTRACT-T21-FORWARD-COLLECTION-RUN-PLAN-001
+  record_version: '1.0'
+  asset_type: control_document
+  purpose: Frozen bounded run contract for TASK-21 forward collection and honest stop conditions.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-08-01'
+  truth_owner: TASK-21
+  location:
+    kind: git_path
+    logical_uri: repo://docs/contracts/task21_forward_collection_run_plan_contract_v1.md
+    repository_path: docs/contracts/task21_forward_collection_run_plan_contract_v1.md
+  integrity:
+    kind: sha256
+    sha256: d8f3cae47f522d490c8549b3fb98874c6b67f7f39eca26fdbfafda80a317b8a4
+  access: &t21_read_file
+    mode: read_only
+    method: file
+    network_required: false
+    secrets_required: false
+  relations:
+  - relation_type: derived_from
+    target_asset_id: ARCH-INTENT-002
+  consumers:
+  - TASK-21
+  - FACTORY-001
+  evidence: []
+  classification: &t21_internal
+    contains_secrets: false
+    contains_raw_data: false
+    sensitivity: INTERNAL_NON_SECRET
+- asset_id: CONFIG-T21-FORWARD-COLLECTION-RUN-PLAN-001
+  record_version: '1.0'
+  asset_type: configuration
+  purpose: Machine-readable TASK-21 run plan with cohort budget recovery and non-claim boundaries.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-08-01'
+  truth_owner: TASK-21
+  location:
+    kind: git_path
+    logical_uri: repo://configs/task21_forward_collection_run_plan_v1.yaml
+    repository_path: configs/task21_forward_collection_run_plan_v1.yaml
+  integrity:
+    kind: sha256
+    sha256: 0f6bc1a748d80aaa8aeaed53551687304f467ccf9622b598d591f78317f419f5
+  access: *t21_read_file
+  relations:
+  - relation_type: governed_by
+    target_asset_id: CONTRACT-T21-FORWARD-COLLECTION-RUN-PLAN-001
+  consumers:
+  - TASK-21
+  evidence: []
+  classification: *t21_internal
+- asset_id: MODULE-T21-THIN-FORWARD-COLLECTOR-001
+  record_version: '1.0'
+  asset_type: script
+  purpose: Provider-neutral thin collector implementing immutable TASK-21 observation receipts.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-08-01'
+  truth_owner: TASK-21
+  location:
+    kind: git_path
+    logical_uri: repo://src/solana_alpha_lab/task21_forward_collector.py
+    repository_path: src/solana_alpha_lab/task21_forward_collector.py
+  integrity:
+    kind: sha256
+    sha256: da19230498b714b5cbda8043c05aa08b658b97541b0459c9a9d3700cac309ba4
+  access: *t21_read_file
+  relations:
+  - relation_type: governed_by
+    target_asset_id: CONTRACT-T21-FORWARD-COLLECTION-RUN-PLAN-001
+  consumers:
+  - TASK-21
+  evidence: []
+  classification: *t21_internal
+- asset_id: SCRIPT-T21-OFFLINE-COLLECTOR-001
+  record_version: '1.0'
+  asset_type: script
+  purpose: Offline deterministic launcher for the TASK-21 thin collector.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-08-01'
+  truth_owner: TASK-21
+  location:
+    kind: git_path
+    logical_uri: repo://scripts/run_task21_forward_collector_offline.py
+    repository_path: scripts/run_task21_forward_collector_offline.py
+  integrity:
+    kind: sha256
+    sha256: bc2df21c2d597964ed44800132c0d00c0094854a9dbebce12cd5cd3e0903819a
+  access: *t21_read_file
+  relations:
+  - relation_type: depends_on
+    target_asset_id: MODULE-T21-THIN-FORWARD-COLLECTOR-001
+  consumers:
+  - TASK-21
+  evidence: []
+  classification: *t21_internal
+- asset_id: CONFIG-T21-RUNTIME-RECOVERY-GATE-001
+  record_version: '1.0'
+  asset_type: configuration
+  purpose: Frozen pre-collection recovery and independent failure-domain requirements.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-08-01'
+  truth_owner: TASK-21
+  location:
+    kind: git_path
+    logical_uri: repo://configs/task21_runtime_recovery_gate_v1.yaml
+    repository_path: configs/task21_runtime_recovery_gate_v1.yaml
+  integrity:
+    kind: sha256
+    sha256: 68dc299ffb53afac9592142a722980ad88692b9b59d69abfbbf98d18748cec91
+  access: *t21_read_file
+  relations:
+  - relation_type: governed_by
+    target_asset_id: CONTRACT-T21-FORWARD-COLLECTION-RUN-PLAN-001
+  consumers:
+  - TASK-21
+  - FACTORY-001
+  evidence: []
+  classification: *t21_internal
+- asset_id: MODULE-T21-RUNTIME-RECOVERY-001
+  record_version: '1.0'
+  asset_type: script
+  purpose: Deterministic content-addressed inventory backup read-back and isolated restore logic.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-08-01'
+  truth_owner: TASK-21
+  location:
+    kind: git_path
+    logical_uri: repo://src/solana_alpha_lab/task21_forward_recovery.py
+    repository_path: src/solana_alpha_lab/task21_forward_recovery.py
+  integrity:
+    kind: sha256
+    sha256: ce29d4db551e7c54ccf0568b3a448e47eb55a51ba9e85fa2abac6f0522e832b0
+  access: *t21_read_file
+  relations:
+  - relation_type: governed_by
+    target_asset_id: CONFIG-T21-RUNTIME-RECOVERY-GATE-001
+  consumers:
+  - TASK-21
+  - FACTORY-001
+  evidence: []
+  classification: *t21_internal
+- asset_id: CONFIG-T21-OWNER-PULSE-READ-MODEL-001
+  record_version: '1.0'
+  asset_type: configuration
+  purpose: Historical TASK-21 owner pulse contract retained as the pre-A7 projection.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-08-01'
+  truth_owner: TASK-21
+  location:
+    kind: git_path
+    logical_uri: repo://configs/task21_owner_pulse_read_model_v1.yaml
+    repository_path: configs/task21_owner_pulse_read_model_v1.yaml
+  integrity:
+    kind: sha256
+    sha256: f69abae794444b8d165ea87f871264fd83c1ec5d60d9a108167354c981842d7c
+  access: *t21_read_file
+  relations:
+  - relation_type: depends_on
+    target_asset_id: CONFIG-T21-FORWARD-COLLECTION-RUN-PLAN-001
+  consumers:
+  - TASK-21
+  evidence: []
+  classification: *t21_internal
+- asset_id: MODULE-T21-OWNER-PULSE-READ-MODEL-001
+  record_version: '1.0'
+  asset_type: script
+  purpose: Historical derived owner pulse implementation preserved for lineage and final overlay.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-08-01'
+  truth_owner: TASK-21
+  location:
+    kind: git_path
+    logical_uri: repo://src/solana_alpha_lab/task21_owner_pulse.py
+    repository_path: src/solana_alpha_lab/task21_owner_pulse.py
+  integrity:
+    kind: sha256
+    sha256: faa94db1c52b40e823c95134505637154af39dc613f878ef7aab339e08762823
+  access: *t21_read_file
+  relations:
+  - relation_type: governed_by
+    target_asset_id: CONFIG-T21-OWNER-PULSE-READ-MODEL-001
+  consumers:
+  - TASK-21
+  evidence: []
+  classification: *t21_internal
+- asset_id: SCRIPT-T21-OWNER-PULSE-READ-MODEL-001
+  record_version: '1.0'
+  asset_type: script
+  purpose: Read-only historical TASK-21 owner pulse entrypoint retained for audit.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-08-01'
+  truth_owner: TASK-21
+  location:
+    kind: git_path
+    logical_uri: repo://scripts/show_task21_owner_pulse.py
+    repository_path: scripts/show_task21_owner_pulse.py
+  integrity:
+    kind: sha256
+    sha256: 1fc62b00f18cee26a64355ebdc475dd7ac25cbcbf98fb24cfe9c87e9478da0d2
+  access: *t21_read_file
+  relations:
+  - relation_type: depends_on
+    target_asset_id: MODULE-T21-OWNER-PULSE-READ-MODEL-001
+  consumers:
+  - TASK-21
+  evidence: []
+  classification: *t21_internal
+- asset_id: CONTROL-T21-ACTIVE-TIME-GATE-001
+  record_version: '1.0'
+  asset_type: control_document
+  purpose: Durable TASK-21 resume router with resolved horizons A7 result and exact next boundary.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-08-01'
+  truth_owner: TASK-21
+  location:
+    kind: git_path
+    logical_uri: repo://control/active_time_gates.json
+    repository_path: control/active_time_gates.json
+  integrity:
+    kind: sha256
+    sha256: 050467dea2a6c78034b0a7d92622fc931952ea8b02e721ba0cd98c40e083704c
+  access: *t21_read_file
+  relations:
+  - relation_type: governed_by
+    target_asset_id: CONTRACT-T21-A7-ACCEPTANCE-001
+  consumers:
+  - TASK-21
+  - TASK-22
+  - FACTORY-001
+  evidence: []
+  classification: *t21_internal
+- asset_id: EVIDENCE-T21-FINAL-COHORT-FREEZE-001
+  record_version: '1.0'
+  asset_type: evidence
+  purpose: Accepted five-member final cohort review with exact usage and bounded eligibility.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-08-01'
+  truth_owner: TASK-21
+  location:
+    kind: git_path
+    logical_uri: repo://docs/evidence/task21/final_cohort_freeze_acceptance_v1.json
+    repository_path: docs/evidence/task21/final_cohort_freeze_acceptance_v1.json
+  integrity:
+    kind: sha256
+    sha256: 1327bb63c454885ade548d327d0f87fd2722d733bb9a493112ade5250f9cc36e
+  access: *t21_read_file
+  relations:
+  - relation_type: derived_from
+    target_asset_id: CONFIG-T21-FORWARD-COLLECTION-RUN-PLAN-001
+  consumers:
+  - TASK-21
+  - TASK-22
+  evidence: []
+  classification: *t21_internal
+- asset_id: EVIDENCE-T21-FINAL-DATASET-RECOVERY-001
+  record_version: '1.0'
+  asset_type: evidence
+  purpose: Remote byte read-back and isolated restore proof for the exact final TASK-21 dataset.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-08-01'
+  truth_owner: TASK-21
+  location:
+    kind: git_path
+    logical_uri: repo://docs/evidence/task21/final_dataset_recovery_acceptance_v1.json
+    repository_path: docs/evidence/task21/final_dataset_recovery_acceptance_v1.json
+  integrity:
+    kind: sha256
+    sha256: 5f1e5a6f67716941889e870b07871996649d53084ce124bd95a7e4038a5c29ad
+  access: *t21_read_file
+  relations:
+  - relation_type: derived_from
+    target_asset_id: EVIDENCE-T21-FINAL-COHORT-FREEZE-001
+  - relation_type: validated_by
+    target_asset_id: MODULE-T21-RUNTIME-RECOVERY-001
+  consumers:
+  - TASK-21
+  - TASK-22
+  - FACTORY-001
+  evidence: []
+  classification: *t21_internal
+- asset_id: DATA-T21-FINAL-DATASET-FREEZE-MANIFEST-001
+  record_version: '1.0'
+  asset_type: evidence
+  purpose: Per-file path size and SHA-256 manifest for the immutable 91-file TASK-21 dataset.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-08-01'
+  truth_owner: TASK-21
+  location:
+    kind: git_path
+    logical_uri: repo://docs/evidence/task21/final_dataset_freeze_manifest_v1.json
+    repository_path: docs/evidence/task21/final_dataset_freeze_manifest_v1.json
+  integrity:
+    kind: sha256
+    sha256: 295d29354554247e08ddd39cd9f6b642e262869f22a0da9925227e6fab378a0f
+  access: *t21_read_file
+  relations:
+  - relation_type: derived_from
+    target_asset_id: EVIDENCE-T21-FINAL-DATASET-RECOVERY-001
+  consumers:
+  - TASK-21
+  - TASK-22
+  evidence: []
+  classification: *t21_internal
+- asset_id: EVIDENCE-T21-EFFECTIVE-SAMPLE-SUMMARY-001
+  record_version: '1.0'
+  asset_type: evidence
+  purpose: Owner-readable effective sample gaps dependence and bounded analysis eligibility.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-08-01'
+  truth_owner: TASK-21
+  location:
+    kind: git_path
+    logical_uri: repo://docs/evidence/task21/effective_sample_summary_v1.json
+    repository_path: docs/evidence/task21/effective_sample_summary_v1.json
+  integrity:
+    kind: sha256
+    sha256: 63ddb790dcd54191ac342aa8add5889c8647d2cf09d91c4d9ca14c67ca8b51fb
+  access: *t21_read_file
+  relations:
+  - relation_type: derived_from
+    target_asset_id: EVIDENCE-T21-FINAL-COHORT-FREEZE-001
+  consumers:
+  - TASK-21
+  - TASK-22
+  - FACTORY-001
+  evidence: []
+  classification: *t21_internal
+- asset_id: GENERATED-T21-ARTIFACT-INDEX-001
+  record_version: '1.0'
+  asset_type: generated_view
+  purpose: Content-addressed index of every pre-A7 TASK-21 repository artifact and planned-ID reconciliation.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-08-01'
+  truth_owner: TASK-21
+  location:
+    kind: git_path
+    logical_uri: repo://docs/evidence/task21/task21_artifact_index_v1.json
+    repository_path: docs/evidence/task21/task21_artifact_index_v1.json
+  integrity:
+    kind: sha256
+    sha256: 60885db2dc4877581da4273f8f09762636737fead949cd962bd34f143ce44f78
+  access: *t21_read_file
+  relations:
+  - relation_type: governed_by
+    target_asset_id: CONTRACT-T21-A7-ACCEPTANCE-001
+  consumers:
+  - TASK-21
+  - TASK-22
+  - FACTORY-001
+  evidence: []
+  classification: *t21_internal
+- asset_id: HANDOFF-T21-TASK22-001
+  record_version: '1.0'
+  asset_type: control_document
+  purpose: Exact dataset identity limitations and split-before-outcome obligations for TASK-22.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-08-01'
+  truth_owner: TASK-21
+  location:
+    kind: git_path
+    logical_uri: repo://docs/handoffs/task21_to_task22_v1.md
+    repository_path: docs/handoffs/task21_to_task22_v1.md
+  integrity:
+    kind: sha256
+    sha256: 4c3863996cb91ae0600506fe1c8575795e6f6c2a725cfb4fa670fde2caf7bdeb
+  access: *t21_read_file
+  relations:
+  - relation_type: derived_from
+    target_asset_id: DATA-T21-FINAL-DATASET-FREEZE-MANIFEST-001
+  - relation_type: derived_from
+    target_asset_id: EVIDENCE-T21-EFFECTIVE-SAMPLE-SUMMARY-001
+  consumers:
+  - TASK-22
+  evidence: []
+  classification: *t21_internal
+- asset_id: ARCH-INTENT-T21-PRODUCT-VISION-001
+  record_version: '1.0'
+  asset_type: architecture_intent
+  purpose: Accepted three-plane Alpha Factory and owner operating topology with authority separation.
+  status: ACCEPTED_DIRECTION_NOT_IMPLEMENTED
+  origin: PROJECT_SOURCE
+  as_of: '2026-08-01'
+  truth_owner: TASK-21
+  location:
+    kind: git_path
+    logical_uri: repo://docs/architecture/intents/ARCH-INTENT-003-product-owner-operating-topology.md
+    repository_path: docs/architecture/intents/ARCH-INTENT-003-product-owner-operating-topology.md
+  integrity:
+    kind: sha256
+    sha256: 6aa26738a363cd8ccbc93d722082c3a551a88b5a1c6d20e2614585f5f6debdf3
+  access: *t21_read_file
+  relations:
+  - relation_type: derived_from
+    target_asset_id: ARCH-INTENT-002
+  consumers:
+  - FACTORY-001
+  - TASK-21
+  - TASK-35A
+  evidence: []
+  classification: *t21_internal
+  provenance:
+    created_at: '2026-08-01'
+    first_reliable_available_at: '2026-08-01'
+    imported_by_task: TASK-21
+    import_mode: REGISTERED_CURRENT_INTENT
+    past_availability_claim: NO_PAST_AVAILABILITY_CLAIM
+    retention: TRACKED_REFERENCE
+    canonicality: CURRENT_INTENT
+    availability_note: Local accepted architecture candidate pending Project Source activation at TASK-21 finish.
+- asset_id: ROADMAP-PATCH-T21-PRODUCT-VISION-001
+  record_version: '1.0'
+  asset_type: decision
+  purpose: Durable roadmap candidate for documentation production-lite cockpit and meta-research triggers.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-08-01'
+  truth_owner: TASK-21
+  location:
+    kind: git_path
+    logical_uri: repo://docs/roadmap_patches/task21_product_vision_followups_v1.md
+    repository_path: docs/roadmap_patches/task21_product_vision_followups_v1.md
+  integrity:
+    kind: sha256
+    sha256: 925b6398056b81c7baa71b5a7217dd50aaf2408a4bf199aac55cdd52302542a5
+  access: *t21_read_file
+  relations:
+  - relation_type: advises
+    target_asset_id: ARCH-INTENT-T21-PRODUCT-VISION-001
+  consumers:
+  - TASK-21
+  - TASK-34A
+  - TASK-35A
+  evidence: []
+  classification: *t21_internal
+- asset_id: CONFIG-T21-FINAL-OWNER-PULSE-001
+  record_version: '1.0'
+  asset_type: configuration
+  purpose: Frozen final Owner Pulse projection over accepted A7 dataset and recovery truth.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-08-01'
+  truth_owner: TASK-21
+  location:
+    kind: git_path
+    logical_uri: repo://configs/task21_final_owner_pulse_v1.yaml
+    repository_path: configs/task21_final_owner_pulse_v1.yaml
+  integrity:
+    kind: sha256
+    sha256: 051e5974b147699e509d03303e59853b5b21b16840e67401b90cf1489cba155d
+  access: *t21_read_file
+  relations:
+  - relation_type: depends_on
+    target_asset_id: EVIDENCE-T21-EFFECTIVE-SAMPLE-SUMMARY-001
+  - relation_type: depends_on
+    target_asset_id: EVIDENCE-T21-FINAL-DATASET-RECOVERY-001
+  consumers:
+  - TASK-21
+  - FACTORY-001
+  evidence: []
+  classification: *t21_internal
+- asset_id: MODULE-T21-FINAL-OWNER-PULSE-001
+  record_version: '1.0'
+  asset_type: script
+  purpose: Final derived Owner Pulse overlay replacing the stale pre-H24 operational projection.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-08-01'
+  truth_owner: TASK-21
+  location:
+    kind: git_path
+    logical_uri: repo://src/solana_alpha_lab/task21_final_owner_pulse.py
+    repository_path: src/solana_alpha_lab/task21_final_owner_pulse.py
+  integrity:
+    kind: sha256
+    sha256: dfba7ef16ba698e55d88cc984fc30c35e5644482a12480a1db72136571f737fe
+  access: *t21_read_file
+  relations:
+  - relation_type: governed_by
+    target_asset_id: CONFIG-T21-FINAL-OWNER-PULSE-001
+  consumers:
+  - TASK-21
+  - FACTORY-001
+  evidence: []
+  classification: *t21_internal
+- asset_id: SCRIPT-T21-FINAL-OWNER-PULSE-001
+  record_version: '1.0'
+  asset_type: script
+  purpose: Read-only Russian text or canonical JSON final TASK-21 owner pulse entrypoint.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-08-01'
+  truth_owner: TASK-21
+  location:
+    kind: git_path
+    logical_uri: repo://scripts/show_task21_final_owner_pulse.py
+    repository_path: scripts/show_task21_final_owner_pulse.py
+  integrity:
+    kind: sha256
+    sha256: 6ce80ede9d761280a9a8b7d8fa17def7f823216aac1639a0d2a3956b0832adee
+  access: *t21_read_file
+  relations:
+  - relation_type: depends_on
+    target_asset_id: MODULE-T21-FINAL-OWNER-PULSE-001
+  consumers:
+  - TASK-21
+  - FACTORY-001
+  evidence: []
+  classification: *t21_internal
+- asset_id: TEST-T21-FINAL-OWNER-PULSE-001
+  record_version: '1.0'
+  asset_type: script
+  purpose: Deterministic tests for final counts recovery next action and zero read-model authority.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-08-01'
+  truth_owner: TASK-21
+  location:
+    kind: git_path
+    logical_uri: repo://tests/test_task21_final_owner_pulse.py
+    repository_path: tests/test_task21_final_owner_pulse.py
+  integrity:
+    kind: sha256
+    sha256: a9e035b733b82134f92d1bb7a2b80c9288859cd7144ab138f6c223ab8394d643
+  access: *t21_read_file
+  relations:
+  - relation_type: validated_by
+    target_asset_id: SCRIPT-T21-FINAL-OWNER-PULSE-001
+  consumers:
+  - TASK-21
+  evidence: []
+  classification: *t21_internal
+- asset_id: CONFIG-T21-A7-ACCEPTANCE-001
+  record_version: '1.0'
+  asset_type: configuration
+  purpose: Machine-readable A7 source bindings dataset identity sample usage Catalog and authority plan.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-08-01'
+  truth_owner: TASK-21
+  location:
+    kind: git_path
+    logical_uri: repo://configs/task21_dataset_freeze_acceptance_v1.yaml
+    repository_path: configs/task21_dataset_freeze_acceptance_v1.yaml
+  integrity:
+    kind: sha256
+    sha256: 8400f6c80f90fd708963e6c3d4c66de09ad4da550e5d57ff63180a5161a0bd04
+  access: *t21_read_file
+  relations:
+  - relation_type: depends_on
+    target_asset_id: EVIDENCE-T21-FINAL-DATASET-RECOVERY-001
+  consumers:
+  - TASK-21
+  - TASK-22
+  evidence: []
+  classification: *t21_internal
+- asset_id: CONTRACT-T21-A7-ACCEPTANCE-001
+  record_version: '1.0'
+  asset_type: control_document
+  purpose: Dataset freeze Catalog economy product reconciliation and Factory Fit acceptance contract.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-08-01'
+  truth_owner: TASK-21
+  location:
+    kind: git_path
+    logical_uri: repo://docs/contracts/task21_dataset_freeze_acceptance_contract_v1.md
+    repository_path: docs/contracts/task21_dataset_freeze_acceptance_contract_v1.md
+  integrity:
+    kind: sha256
+    sha256: d3679f074c17b9da95b956ae4ac8919ac1fb48fe1bb2683f60465a73b3c8a85b
+  access: *t21_read_file
+  relations:
+  - relation_type: derived_from
+    target_asset_id: ARCH-INTENT-T21-PRODUCT-VISION-001
+  consumers:
+  - TASK-21
+  - TASK-22
+  - FACTORY-001
+  evidence: []
+  classification: *t21_internal
+- asset_id: MODULE-T21-A7-ACCEPTANCE-001
+  record_version: '1.0'
+  asset_type: script
+  purpose: Deterministic A7 freeze summary index and acceptance evidence builder.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-08-01'
+  truth_owner: TASK-21
+  location:
+    kind: git_path
+    logical_uri: repo://src/solana_alpha_lab/task21_dataset_freeze_acceptance.py
+    repository_path: src/solana_alpha_lab/task21_dataset_freeze_acceptance.py
+  integrity:
+    kind: sha256
+    sha256: aa47753253a26fa733ebd5cd436144c1b1158f89be6fd2042d609a6c762e525a
+  access: *t21_read_file
+  relations:
+  - relation_type: governed_by
+    target_asset_id: CONTRACT-T21-A7-ACCEPTANCE-001
+  consumers:
+  - TASK-21
+  evidence: []
+  classification: *t21_internal
+- asset_id: SCRIPT-T21-A7-ACCEPTANCE-001
+  record_version: '1.0'
+  asset_type: script
+  purpose: Bounded local materializer for the four deterministic A7 JSON outputs.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-08-01'
+  truth_owner: TASK-21
+  location:
+    kind: git_path
+    logical_uri: repo://scripts/finalize_task21_a7.py
+    repository_path: scripts/finalize_task21_a7.py
+  integrity:
+    kind: sha256
+    sha256: 9ae956dad7f262f4ce031bcf9b5bdf37a9e249f7243e4e262979a2d133997761
+  access: *t21_read_file
+  relations:
+  - relation_type: depends_on
+    target_asset_id: MODULE-T21-A7-ACCEPTANCE-001
+  consumers:
+  - TASK-21
+  evidence: []
+  classification: *t21_internal
+- asset_id: EVIDENCE-T21-A7-ACCEPTANCE-001
+  record_version: '1.0'
+  asset_type: evidence
+  purpose: A7 receipt for bounded dataset eligibility Catalog transaction product gate and full Factory Fit.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-08-01'
+  truth_owner: TASK-21
+  location:
+    kind: git_path
+    logical_uri: repo://docs/evidence/task21/a7_acceptance_catalog_factory_fit_v1.json
+    repository_path: docs/evidence/task21/a7_acceptance_catalog_factory_fit_v1.json
+  integrity:
+    kind: sha256
+    sha256: e73f5b0c1f3b85ab19d7cf4a0ef460c681ce7b418a516db1a36b901d62b2454a
+  access: *t21_read_file
+  relations:
+  - relation_type: derived_from
+    target_asset_id: DATA-T21-FINAL-DATASET-FREEZE-MANIFEST-001
+  - relation_type: derived_from
+    target_asset_id: EVIDENCE-T21-EFFECTIVE-SAMPLE-SUMMARY-001
+  consumers:
+  - TASK-21
+  - TASK-22
+  - FACTORY-001
+  evidence: []
+  classification: *t21_internal
+- asset_id: TEST-T21-A7-ACCEPTANCE-001
+  record_version: '1.0'
+  asset_type: script
+  purpose: Hash-bound A7 tests for dataset sample index Catalog product gate Factory Fit and resume route.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-08-01'
+  truth_owner: TASK-21
+  location:
+    kind: git_path
+    logical_uri: repo://tests/test_task21_dataset_freeze_acceptance.py
+    repository_path: tests/test_task21_dataset_freeze_acceptance.py
+  integrity:
+    kind: sha256
+    sha256: 49b9426f00155de0df9298960da7a3efdcb6013afe87e8610a3359a63790a8fa
+  access: *t21_read_file
+  relations:
+  - relation_type: depends_on
+    target_asset_id: EVIDENCE-T21-A7-ACCEPTANCE-001
+  consumers:
+  - TASK-21
+  evidence: []
+  classification: *t21_internal
+- asset_id: BUNDLE-T21-FINAL-DATASET-001
+  record_version: '1.0'
+  asset_type: external_bundle
+  purpose: Private content-addressed recovery bundle for the exact accepted 91-file TASK-21 dataset.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: EXTERNAL
+  as_of: '2026-08-01'
+  truth_owner: TASK-21
+  location:
+    kind: external_bundle
+    logical_uri: gdrive://1bv0ypgLdoYdrXODIUx5J4Lkj9Y-JsBLm/TASK21_FINAL_DATASET_RECOVERY_v1_6d895f259f0316df442932b38abf44a963a79e16e24793a4eb1af2c5f6748361.zip
+  integrity:
+    kind: sha256
+    sha256: 6d895f259f0316df442932b38abf44a963a79e16e24793a4eb1af2c5f6748361
+  access:
+    mode: read_only
+    method: external_reference
+    network_required: true
+    secrets_required: false
+  relations:
+  - relation_type: derived_from
+    target_asset_id: DATA-T21-FINAL-DATASET-FREEZE-MANIFEST-001
+  - relation_type: evidenced_by
+    target_asset_id: EVIDENCE-T21-FINAL-DATASET-RECOVERY-001
+  consumers:
+  - TASK-21
+  - TASK-22
+  evidence:
+  - evidence_id: EVIDENCE-T21-FINAL-DATASET-RECOVERY-001
+    kind: runtime_receipt
+    reference: docs/evidence/task21/final_dataset_recovery_acceptance_v1.json
+    result: PASS
+  classification: *t21_internal
+  provenance:
+    created_at: '2026-08-01'
+    first_reliable_available_at: '2026-08-01'
+    imported_by_task: TASK-21
+    import_mode: BUNDLE_ONLY
+    past_availability_claim: PRESERVED
+    retention: EXTERNAL_IMMUTABLE_BUNDLE
+    canonicality: EXTERNAL_BUNDLE
+    availability_note: Exact bytes remain outside Git in a private Drive object with byte read-back and isolated restore evidence.
+
 - asset_id: TEST-T20-COLLECTION-SPEC-CONTRACT-001
   record_version: '1.0'
   asset_type: script
@@ -10122,14 +10858,14 @@ records:
   evidence: []
   classification: *t20_internal
 - asset_id: TEST-T20-ACCEPTANCE-CATALOG-FACTORY-FIT-001
-  record_version: '1.0'
+  record_version: '1.1'
   asset_type: script
   purpose: Exact hash-bound TASK-20 acceptance tests for eight adversarial
     vectors, Catalog consistency, Factory Fit, generated navigation, non-claims
     and zero external authority.
   status: IMPLEMENTED_UNVERIFIED
   origin: REPOSITORY
-  as_of: '2026-07-30'
+  as_of: '2026-08-01'
   truth_owner: TASK-20
   location:
     kind: git_path
@@ -10137,7 +10873,7 @@ records:
     repository_path: tests/test_task20_acceptance_catalog_factory_fit.py
   integrity:
     kind: sha256
-    sha256: 985a2187f06ef1dff217aff0f003af6754ecf9d3d86a638f007e1a359c232c7a
+    sha256: edc29f415113619232e96eee898df3a17d47d290f3e8aa15c48c456d0fc908b0
   access:
     mode: read_only
     method: file

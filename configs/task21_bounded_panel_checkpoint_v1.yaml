@@ -1,0 +1,98 @@
+schema: smial.task21_bounded_panel_checkpoint
+schema_version: '1.0'
+checkpoint_id: TASK21-BOUNDED-PANEL-CHECKPOINT-001
+checkpoint_version: '1.0'
+task_id: TASK-21
+atom_id: T21-A7A_BOUNDED_PANEL_CHECKPOINT_AND_EXTEND_EVIDENCE_V1
+status: FROZEN_LOCAL_CHECKPOINT_PLAN
+as_of: '2026-08-01'
+contains_secrets: false
+
+repository_base:
+  main_commit: bb269f86397ba518da5f76d4a651b3c51ec85744
+  main_tree: 40ac1e819c687520f2fea9e8e6e41c7cdbea0ab6
+  task21_checkpoint_head: f3e60e40c8de401b725fa0241c7c3b7f0ffa44c9
+
+frozen_inputs:
+  run_plan:
+    path: configs/task21_forward_collection_run_plan_v1.yaml
+    sha256: 0f6bc1a748d80aaa8aeaed53551687304f467ccf9622b598d591f78317f419f5
+  hypothesis_memory:
+    path: docs/evidence/task17/first_bounded_hypothesis_cycle_v1.json
+    sha256: 8c9da2232ab0feec86da130985eaa4e5168539adaa036d0c48f44b00567c06b6
+    state: PAUSED
+  h24_acceptance:
+    path: docs/evidence/task21/h24_foreground_capture_runtime_acceptance_v1.json
+    sha256: 0ed61827124394f3d2649ec5f0ee112843f56e313330cf2d6d824805e8c32d08
+  active_time_gates:
+    path: control/active_time_gates.json
+    semantic_status: NO_ACTIVE_TIME_GATE_FUTURE_HORIZONS_TRIGGER_ONLY
+
+observed_operational_evidence:
+  real_admissions: 3
+  captured_panels: 7
+  complete_members_upper_bound: 2
+  distinct_admission_dates_utc_upper_bound: 1
+  distinct_admission_weeks_utc_upper_bound: 1
+  observed_market_states_established: 0
+  h6_gap_retained: true
+  h24_sentinel_complete: true
+
+decision:
+  disposition: EXTEND_EVIDENCE
+  checkpoint_class: BOUNDED_FORWARD_PILOT_NOT_RESEARCH_GRADE
+  dataset_ready: false
+  task22_eligible: false
+  hypothesis_outcomes_unsealed: false
+  calendar_wait_is_evidence: false
+  h72_h168_status: DEFERRED_TRIGGER_ONLY
+  catalog_status: PENDING_FINAL_T21_A7
+  product_vision_gate_status: PENDING_FINAL_T21_A7
+
+source_roots:
+- local/task21_collector/live_shakedown/task21_live_shakedown_v1
+- local/task21_forward/t1_nomination
+- local/task21_forward/t1_replay
+- local/task21_forward/h0_capture
+- local/task21_forward/h1_capture
+- local/task21_forward/h6_capture
+- local/task21_forward/h24_capture
+
+local_recovery:
+  package_root: local/task21_recovery/a7_checkpoint/package
+  isolated_restore_root: local/task21_recovery/a7_checkpoint/isolated_restore
+  archive_prefix: TASK21_BOUNDED_PANEL_CHECKPOINT_v1
+  create_only: true
+  source_overwrite_allowed: false
+  source_deletion_allowed: false
+  remote_status_after_local_pass: REMOTE_RECOVERY_PENDING
+
+next_boundary:
+  atom_id: T21-A7R_CHECKPOINT_REMOTE_READBACK_AND_RESTORE_V1
+  purpose: Bind the exact local archive to independent recovery evidence before final A7.
+  requires_exact_external_authority: true
+  following_design_atom: T21-A6S_INFORMATION_SUFFICIENCY_REBASE_V1
+  design_question: MORE_INDEPENDENT_MEMBERS_AND_STATES_OR_NARROWER_ESTIMAND_OR_STOP
+
+authority:
+  local_writes: true
+  provider_api_rpc_wss_calls: 0
+  drive_reads: 0
+  drive_writes: 0
+  credentials: 0
+  cash_spend_usd_cents: 0
+  scheduler_or_background_process: false
+  wallet_signer_transaction_actions: 0
+  commit: false
+  push: false
+  pull_request: false
+  merge: false
+  destructive_actions: false
+
+planned_catalog_asset_ids:
+- CONTRACT-T21-BOUNDED-PANEL-CHECKPOINT-001
+- CONFIG-T21-BOUNDED-PANEL-CHECKPOINT-001
+- MODULE-T21-BOUNDED-PANEL-CHECKPOINT-001
+- SCRIPT-T21-BOUNDED-PANEL-CHECKPOINT-001
+- TEST-T21-BOUNDED-PANEL-CHECKPOINT-001
+- EVIDENCE-T21-BOUNDED-PANEL-CHECKPOINT-001

@@ -1,0 +1,79 @@
+{
+  "schema": "smial.task21.r3-p2-event-triggered-capture-offline-acceptance",
+  "schema_version": "1.0",
+  "evidence_id": "EVIDENCE-T21-R3-P2-OFFLINE-PREP-001",
+  "evidence_version": "1.0",
+  "task_id": "TASK-21",
+  "atom_id": "T21-A6S_R3_P2_RECOVERY_REFRESH_AND_FOREGROUND_CAPTURE_V1",
+  "status": "PASS",
+  "as_of": "2026-08-01",
+  "verdict": "LOCAL_RUNTIME_PREP_ACCEPTED_COMBINED_USER_AUTHORITY_BOUND",
+  "artifacts": [
+    {
+      "path": "configs/task21_r3_p2_event_triggered_capture_v1.yaml",
+      "bytes": 4363,
+      "sha256": "be9117a142c79c4b4d996eafdc8c1f94549a09e6abe8f96f871fd03cf7e7a53e"
+    },
+    {
+      "path": "docs/contracts/task21_r3_p2_event_triggered_capture_contract_v1.md",
+      "bytes": 1447,
+      "sha256": "0c31bcb2e178d41431743d8856ecca1f967b591aedcd06cc7e9a39d0132766d4"
+    },
+    {
+      "path": "src/solana_alpha_lab/task21_r2_p2_event_triggered_capture.py",
+      "bytes": 22688,
+      "sha256": "53fc9e5fc94e36dfbbc934f622ac21ba8e88221096f1fa74b872fde0460dcaf1"
+    },
+    {
+      "path": "scripts/run_task21_r3_p2_capture.py",
+      "bytes": 1546,
+      "sha256": "615d640b83bbc3ee46d3dea9a3fac0bf9afccd1492e35661de51e2255a3ae195"
+    },
+    {
+      "path": "tests/test_task21_r3_p2_event_triggered_capture.py",
+      "bytes": 4892,
+      "sha256": "2380f29cf4762d90d3973bf4aba171bfb537e3eafc27904ea58de5cecd397168"
+    },
+    {
+      "path": "docs/evidence/task21/r3_pre_p2_recovery_refresh_acceptance_v1.json",
+      "bytes": 6290,
+      "sha256": "521d7f3b61945ab8313bfb55750e047c08fb1a99b52651d5509525d71e02c43c"
+    },
+    {
+      "path": "docs/evidence/task21/p2_multi_batch_compatibility_v1.json",
+      "bytes": 1307,
+      "sha256": "5a048df7b2de7c130b42ff41a19a6876e7d7b24bfe3c2e8d6db66e2b7d949b21"
+    }
+  ],
+  "offline_acceptance": {
+    "exact_live_config_and_protected_inputs": "PASS",
+    "combined_authority_phrase": "PASS",
+    "all_member_eligibility_before_transport": "PASS",
+    "fresh_remote_recovery_before_transport": "PASS",
+    "two_member_sixteen_call_happy_path": "PASS",
+    "outcome_blind_population_immutability": "PASS",
+    "minimum_separation_blocks_before_transport": "PASS",
+    "r2_multi_batch_regression": "PASS",
+    "recovery_targeted_tests": 7,
+    "p2_targeted_tests": 10,
+    "targeted_tests_total": 17
+  },
+  "actual_actions": {
+    "provider_api_rpc_wss_calls": 0,
+    "jupiter_calls": 0,
+    "candidate_nominations": 0,
+    "candidate_admissions": 0,
+    "raw_or_dataset_writes": 0,
+    "drive_reads": 0,
+    "drive_writes": 0,
+    "credentials_used": 0,
+    "cash_spend_usd_cents": 0,
+    "scheduler_or_background_process": false,
+    "deploy": false,
+    "catalog_mutation": false,
+    "source_mutation": false,
+    "wallet_signer_transaction_actions": 0,
+    "destructive_actions": false,
+    "merge": false
+  }
+}

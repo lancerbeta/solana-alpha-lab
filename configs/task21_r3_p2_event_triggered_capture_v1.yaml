@@ -1,0 +1,127 @@
+schema: smial.task21_event_triggered_followup_capture
+schema_version: '1.0'
+runtime_id: T21-R3-P2-EVENT-TRIGGERED-CAPTURE-001
+runtime_version: '1.0'
+task_id: TASK-21
+atom_id: T21-A6S_R3_P2_RECOVERY_REFRESH_AND_FOREGROUND_CAPTURE_V1
+status: FROZEN_FOR_SEPARATE_EXACT_PROVIDER_AUTHORITY
+as_of: '2026-08-01'
+contains_secrets: false
+
+panel:
+  batch_id: T21-R3
+  panel_id: P2
+  predecessor_panel_id: P1
+  next_panel_id: null
+  next_atom_id: null
+  population_members_exact: 2
+  minimum_separation_seconds: 1801
+  member_total_span_seconds_max: 86400
+  narrow_expiry_window: null
+  late_policy: ALLOW_UNTIL_MEMBER_TOTAL_SPAN_DEADLINE
+  admission_outcome_reselection_allowed: false
+
+protected_inputs:
+- role: EVENT_TRIGGERED_RUNTIME_PLAN
+  path: configs/task21_event_triggered_final_cohort_runtime_v1.yaml
+  sha256: 7e818f032cc0505b1dce6ac6b94c4b193b2eeecd2c34702de344a606a29888f1
+- role: R3_P0_RUNTIME_ACCEPTANCE
+  path: docs/evidence/task21/r3_event_triggered_source_p0_runtime_acceptance_v1.json
+  sha256: 7ecac36cd890106096ebb96c539ab6a48e49ddb2341821de06ced523c4552ec0
+- role: R3_P1_RUNTIME_ACCEPTANCE
+  path: docs/evidence/task21/r3_p1_event_triggered_capture_runtime_acceptance_v1.json
+  sha256: aca3f231a4996a221c249dffd830b4456ffb2399db6ac398b8f33474f40cd767
+- role: R3_ADMISSION_EVENTS
+  path: local/task21_forward/final_cohort/r3/run=r3-20260801T134014806103Z-ac917cf4f972/admission/admission_events.jsonl
+  sha256: 9dde9b9501214877470a42910b90ec2d08e47d17a1d60b325ef3df6cc8de4bd4
+
+predecessor_receipts:
+- member_id: T21-WATCH-7a678b1052ac10b7d492
+  path: local/task21_forward/final_cohort/r3/p1/run=p1-20260801T142017719450Z-8bb3c0961780/member=T21-WATCH-7a678b1052ac10b7d492/horizon=P1/receipt.json
+  sha256: 86a3ac57e576e76ee2aff4f464a4f6c557fdbdcd7225041a3247887b5482de91
+- member_id: T21-WATCH-2c5632a2ba71c8e44637
+  path: local/task21_forward/final_cohort/r3/p1/run=p1-20260801T142017719450Z-8bb3c0961780/member=T21-WATCH-2c5632a2ba71c8e44637/horizon=P1/receipt.json
+  sha256: 424156c3649e86cd192749433f682b84a821f2faeff8632d97c7c6dc3ed23d4c
+
+population:
+  member_ids:
+  - T21-WATCH-7a678b1052ac10b7d492
+  - T21-WATCH-2c5632a2ba71c8e44637
+  deterministic_order: [entered_at, nomination_event_id, mint]
+  outcome_or_route_input_used: false
+
+capture:
+  provider: JUPITER
+  endpoint: https://api.jup.ag/swap/v1/quote
+  authentication: NONE
+  notionals_usd: [10, 25, 50, 100]
+  quote_pairs_per_panel: 4
+  provider_calls_per_panel_max: 8
+  provider_calls_total_max: 16
+  modeled_provider_credits_max: 16
+  received_response_bytes_max: 9437184
+  durable_local_bytes_max: 16777216
+  wall_seconds_max: 300
+  minimum_interval_seconds: 2.2
+  retries: 0
+  concurrency: 1
+
+budget:
+  whole_task_caps:
+    external_requests: 192
+    source_requests: 8
+    quote_requests: 184
+    response_bytes: 25165824
+    stored_bytes: 125829120
+    dataset_bytes: 268435456
+  used_before_p2:
+    external_requests: 168
+    source_requests: 8
+    quote_requests: 160
+    response_bytes: 310396
+  minimum_free_space_bytes_after_write: 2147483648
+  cap_behavior: FAIL_CLOSED_NO_RETRY
+
+recovery:
+  receipt_path: docs/evidence/task21/r3_pre_p2_recovery_refresh_acceptance_v1.json
+  receipt_sha256: 521d7f3b61945ab8313bfb55750e047c08fb1a99b52651d5509525d71e02c43c
+  required_health: HEALTHY
+  backup_age_hours_max_at_start: 24
+  restore_age_hours_max_at_start: 168
+  drive_actions: 0
+
+runtime:
+  output_root: local/task21_forward/final_cohort/r3/p2
+  write_behavior: CREATE_ONLY_CONTENT_ADDRESSED
+  all_members_eligible_before_first_provider_call: true
+  partial_failure_policy: RETAIN_EVIDENCE_AND_STOP_NO_RETRY
+  scheduler_or_background_process: false
+
+authority:
+  source: AUTHORIZATION_REQUIRED
+  exact_phrase: T21-A6S_R3_P2_RECOVERY_REFRESH_AND_FOREGROUND_CAPTURE_V1
+  provider_api_rpc_wss_calls_max: 16
+  jupiter_calls_max: 16
+  nominations: 0
+  admissions: 0
+  retries: 0
+  concurrency: 1
+  drive_reads: 0
+  drive_writes: 0
+  credentials: 0
+  cash_spend_usd_cents: 0
+  scheduler_or_background_process: false
+  deploy: false
+  catalog_mutation: false
+  source_mutation: false
+  wallet_signer_transaction_actions: 0
+  destructive_actions: false
+  merge: false
+
+next_boundary:
+  complete: R3_COMPLETE_FINAL_COHORT_REVIEW_AND_FREEZE_REQUIRED
+  next_atom_id: null
+  external_authority_granted: false
+  stopped: R3_P2_REVIEW_REQUIRED
+  task22_authorized: false
+  a7_authorized: false

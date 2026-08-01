@@ -1,0 +1,281 @@
+schema: smial.task21_information_sufficiency_rebase
+schema_version: '1.0'
+rebase_id: INFORMATION-SUFFICIENCY-REBASE-T21-001
+rebase_version: '1.0'
+task_id: TASK-21
+atom_id: T21-A6S_INFORMATION_SUFFICIENCY_REBASE_V1
+status: FROZEN_LOCAL_REBASE_NO_EXTERNAL_ACTION
+as_of: '2026-08-01'
+contains_secrets: false
+
+entry_gate:
+  verdict: START_WITH_PATCH
+  execution_shape: SINGLE_PASS
+  reasoning_recommendation: MAXIMUM
+  observed_problem: CALENDAR_AND_UNDEFINED_MARKET_STATE_PROXIES_DO_NOT_PROVE_INFORMATION_SUFFICIENCY
+  patch: EVENT_TRIGGERED_FINAL_COHORT_WITH_EXACT_SAMPLE_AND_BUDGET_STOP_RULES
+  plugin_or_connector: NONE
+
+protected_inputs:
+- role: FORWARD_COLLECTION_RUN_PLAN
+  path: configs/task21_forward_collection_run_plan_v1.yaml
+  sha256: 0f6bc1a748d80aaa8aeaed53551687304f467ccf9622b598d591f78317f419f5
+- role: REAL_NOMINATION_POLICY
+  path: configs/task21_real_nomination_policy_v1.yaml
+  sha256: 04061dacee8e78811d7d9fa0a92308b2f6d1bc43c4789a894420e92bcf4fb979
+- role: ADMISSION_HORIZON_RECONCILIATION_CURRENT
+  path: configs/task21_admission_horizon_budget_reconciliation_v1.yaml
+  sha256: 26276c663c56387186e52e2d57e38b49dbd8e1ab7c4259dce6b7a7cd4aced32d
+- role: POST_H6_GAP_REBASE
+  path: configs/task21_post_h6_gap_sentinel_value_rebase_v1.yaml
+  sha256: 9598af58452f49853d447f9b4b125ed7b9de70b1643204a3bc3e4e213c01276f
+- role: H0_RUNTIME_ACCEPTANCE
+  path: docs/evidence/task21/h0_admission_capture_runtime_acceptance_v1.json
+  sha256: 7e28fc61a85d77648d865a1e784ac6a7a1df7bd753b05b9dff48bba2a5206c16
+- role: H1_RUNTIME_ACCEPTANCE
+  path: docs/evidence/task21/h1_foreground_capture_runtime_acceptance_v1.json
+  sha256: 2a1d97d79ce873e0343c5d9afabbc8a7729a24e8b49f30e848905a121682d638
+- role: H6_RUNTIME_ACCEPTANCE
+  path: docs/evidence/task21/h6_foreground_capture_runtime_acceptance_v1.json
+  sha256: c0189c96d8fc8f84cd6b0d6653a8d3dd07656adf04b5d89ae5baae21a662f058
+- role: H24_RUNTIME_ACCEPTANCE
+  path: docs/evidence/task21/h24_foreground_capture_runtime_acceptance_v1.json
+  sha256: 0ed61827124394f3d2649ec5f0ee112843f56e313330cf2d6d824805e8c32d08
+- role: BOUNDED_PANEL_CHECKPOINT
+  path: docs/evidence/task21/bounded_panel_checkpoint_acceptance_v1.json
+  sha256: b83febcbabca6f5b16fa2f68d788e0852ecce63b609c95ef8134ddfd216d761b
+- role: REMOTE_RECOVERY_ACCEPTANCE
+  path: docs/evidence/task21/checkpoint_remote_recovery_acceptance_v1.json
+  sha256: f268aad8577175c694ca3d0d65f985c8fcdfaa2aaf38c9acb3b2ce4336c746fb
+
+protected_history:
+  mode: FORWARD_ONLY_OVERLAY
+  historical_artifacts_rewritten: false
+  sealed_outcomes_read: false
+  hypothesis_definition_changed: false
+  primary_estimand: MEDIAN_COMPLETE_PANEL_COST_BPS_USD100_MINUS_USD10
+  primary_estimand_changed: false
+  h6_gap_retained: true
+  h24_sentinel_semantics_retained: true
+  h72_h168_mandatory: false
+
+current_evidence:
+  real_admissions: 3
+  evaluated_candidates_used: 3
+  base_panels_by_horizon:
+    H0: 3
+    H1: 3
+    H6: 0
+  base_panels_exact: 6
+  h6_gap_retained: true
+  supplemental_panels_exact: 1
+  supplemental_panel_horizon: H24
+  supplemental_panels_count_toward_complete_member: false
+  complete_base_members_exact: 0
+  checkpoint_arithmetic_upper_bound_members: 2
+  outcome_values_read: false
+  recovery_health: HEALTHY_REMOTE_READBACK_AND_ISOLATED_RESTORE_PROVEN
+
+superseded_sufficiency_proxies:
+  earliest_decision_day_30: REMOVED_AS_MINIMUM_WAIT
+  minimum_distinct_admission_dates_utc_3: REPLACED_BY_CONTENT_DISTINCT_NOMINATION_BATCHES
+  minimum_distinct_admission_weeks_utc_3: REMOVED_AS_CALENDAR_PROXY
+  multiple_observed_market_states_undefined: REPLACED_BY_CONDITIONAL_CLAIM_AND_DESCRIPTIVE_REPORTING
+  maximum_wall_clock_day_45: RETAINED_AS_SAFETY_CEILING_NOT_READINESS_REQUIREMENT
+  historical_contracts_rewritten: false
+
+final_extension:
+  disposition: ONE_FINAL_EVENT_TRIGGERED_COHORT
+  new_member_cap: 5
+  evaluated_candidates_used: 3
+  evaluated_candidates_whole_task_cap: 8
+  batches:
+  - batch_id: T21-R2
+    member_cap: 3
+    source_calls_max: 2
+  - batch_id: T21-R3
+    member_cap: 2
+    source_calls_max: 2
+  batch_admission_requires:
+  - NEW_SOURCE_OBSERVATION_ID
+  - SOURCE_CONTENT_SHA256_NOT_PREVIOUSLY_ACCEPTED
+  - OBSERVED_AT_STRICTLY_AFTER_PRIOR_BATCH
+  - AT_LEAST_ONE_PREVIOUSLY_UNSEEN_ELIGIBLE_MINT
+  - FROZEN_POLICY_AND_DETERMINISTIC_SORT
+  - ZERO_TASK21_QUOTE_ROUTE_PRICE_OR_TERMINAL_OUTCOME_INPUT
+  identical_or_non_novel_source_observation: RETAIN_AND_STOP_WITHOUT_ADMISSION
+  minimum_calendar_wait_required: false
+  panel_schedule:
+    windows_per_member: 3
+    panels_per_member: 3
+    window_labels: [P0, P1, P2]
+    P0: ON_ADMISSION
+    P1_P2: FOREGROUND_WHEN_MINIMUM_SEPARATION_SATISFIED
+    minimum_separation_seconds: 1801
+    member_total_span_seconds_max: 86400
+    narrow_expiry_window_used: false
+    missed_or_expired_span_policy: RETAIN_GAP_NO_BACKFILL
+    provider_calls_per_panel_max: 8
+    quote_pairs_per_complete_panel: 4
+    retries: 0
+    concurrency: 1
+  scheduler_or_background_process: false
+
+budget:
+  whole_task_caps:
+    external_requests: 192
+    source_requests: 8
+    quote_requests: 184
+  used_before_rebase:
+    external_requests: 60
+    source_requests: 4
+    quote_requests: 56
+  remaining_before_rebase:
+    external_requests: 132
+    source_requests: 4
+    quote_requests: 128
+  proposed_final_extension_max:
+    external_requests: 124
+    source_requests: 4
+    quote_requests: 120
+  projected_whole_task_max:
+    external_requests: 184
+    source_requests: 8
+    quote_requests: 176
+  headroom_after_projected_max:
+    external_requests: 8
+    source_requests: 0
+    quote_requests: 8
+  headroom_is_not_reassignable_authority: true
+  provider_credits_model_max_new: 120
+  cash_spend_usd_cents: 0
+  retries: 0
+  bytes_and_storage:
+    response_bytes_cap: 25165824
+    response_bytes_used: 86091
+    response_bytes_remaining: 25079733
+    stored_bytes_cap: 125829120
+    stored_bytes_used: 364898
+    stored_bytes_remaining: 125464222
+    dataset_bytes_cap: 268435456
+    dataset_bytes_used: 364898
+    dataset_bytes_remaining: 268070558
+    free_disk_bytes_observed: 186280022016
+    min_free_space_bytes_after_write: 2147483648
+    future_write_behavior: FAIL_CLOSED_AT_EXACT_RUNTIME_CAP
+    observed_at: '2026-08-01T10:16:30.955Z'
+    projection_claim: NONE_VARIABLE_RESPONSE_SIZE_RUNTIME_GUARD_OWNS_CAP
+
+information_sufficiency:
+  decision_unit: COMPLETE_MEMBER_CLUSTERED_BY_NOMINATION_BATCH
+  minimum_complete_members: 5
+  minimum_complete_panels: 15
+  minimum_complete_quote_pairs: 60
+  minimum_independent_nomination_batches: 3
+  maximum_complete_member_share_one_batch: 0.6
+  minimum_calendar_days: null
+  minimum_calendar_weeks: null
+  recovery_health_required: HEALTHY
+  physical_cap_reconciliation_required: true
+  candidate_state_retention_required: true
+  outcome_blindness_required_until_stop: true
+  market_state_handling: REPORT_OBSERVED_STATES_WITHOUT_FORCING_OR_GENERALIZING
+  generalization_boundary: DOCUMENTED_FORWARD_NOMINATION_PROCESS_AND_OBSERVED_CONTEXTS_ONLY
+  market_wide_prevalence_claim_allowed: false
+  cross_regime_claim_allowed: false
+  success_disposition: DATASET_READY_FOR_NARROW_CONDITIONAL_ANALYSIS
+  failure_dispositions:
+  - REDESIGN_DATA
+  - COLLECTION_NOT_JUSTIFIED
+  - STOPPED_SAFELY
+
+stop_rules:
+  stop_on_first:
+  - SUFFICIENCY_GATE_PASS
+  - EIGHT_EVALUATED_CANDIDATE_CAP_REACHED
+  - FOUR_REMAINING_SOURCE_CALLS_CONSUMED
+  - REMAINING_BUDGET_CANNOT_COMPLETE_NEXT_MEMBER
+  - RECOVERY_HEALTH_NOT_HEALTHY
+  - SOURCE_CONTRACT_OR_PROVIDER_CONTRACT_DRIFT
+  - MEMBER_TOTAL_SPAN_EXPIRED
+  - ORIGINAL_DAY_45_SAFETY_CEILING_REACHED
+  automatic_extension_allowed: false
+  calendar_elapsed_alone_is_evidence: false
+  h72_h168_auto_capture_allowed: false
+  cap_exhaustion_disposition: STOPPED_SAFELY_OR_REDESIGN_DATA
+  additional_collection_after_stop: NEW_PLAN_AND_OWNER_DECISION_REQUIRED
+
+outcome_blindness:
+  active: true
+  allowed_operational_inputs:
+  - SOURCE_LINEAGE_AND_CONTENT_HASH
+  - ADMISSION_AND_MEMBER_IDS
+  - COVERAGE_GAPS_AND_PANEL_COUNTS
+  - REQUEST_CREDIT_BYTE_AND_STORAGE_COUNTS
+  - RECOVERY_AND_INCIDENT_HEALTH
+  sealed:
+  - COST_BPS_BY_NOTIONAL
+  - CAPACITY_CURVE_SLOPE
+  - HYPOTHESIS_VERDICT
+  - TOKEN_RANKING
+  - ROUTE_OR_PRICE_BASED_ADMISSION
+  tuning_during_extension_allowed: false
+
+catalog:
+  status: CATALOG_TRANSACTION_PENDING_T21_A7
+  version_or_count_advanced: false
+  planned_asset_ids:
+  - CONTRACT-T21-INFORMATION-SUFFICIENCY-REBASE-001
+  - CONFIG-T21-INFORMATION-SUFFICIENCY-REBASE-001
+  - MODULE-T21-INFORMATION-SUFFICIENCY-REBASE-001
+  - TEST-T21-INFORMATION-SUFFICIENCY-REBASE-001
+  - EVIDENCE-T21-INFORMATION-SUFFICIENCY-REBASE-001
+
+product_vision:
+  marker_id: SMIAL-PRODUCT-VISION-RECONCILIATION-2026-07-31
+  current_status: UNRESOLVED_NONBLOCKING_FOR_THIS_LOCAL_REBASE
+  terminal_reconciliation_required_at: T21-A7
+
+authority:
+  class: LOCAL_WRITE_ONLY
+  source: EXPLICIT_USER
+  gate_phrase: T21-A6S_INFORMATION_SUFFICIENCY_REBASE_V1
+  managed_files:
+  - docs/contracts/task21_information_sufficiency_rebase_contract_v1.md
+  - configs/task21_information_sufficiency_rebase_v1.yaml
+  - src/solana_alpha_lab/task21_information_sufficiency.py
+  - tests/test_task21_information_sufficiency.py
+  - docs/evidence/task21/information_sufficiency_rebase_acceptance_v1.json
+  network_calls: 0
+  provider_api_rpc_wss_calls: 0
+  drive_reads: 0
+  drive_writes: 0
+  credential_use: 0
+  candidate_nominations: 0
+  candidate_admissions: 0
+  collector_executions: 0
+  raw_or_dataset_writes: 0
+  backup_executions: 0
+  restore_executions: 0
+  provider_credits: 0
+  cash_spend_usd_cents: 0
+  scheduler_or_background_process: false
+  dependency_changes: 0
+  commit: false
+  push: false
+  pull_request: false
+  merge: false
+  wallet_signer_transaction_actions: 0
+  ui_changes: false
+  destructive_actions: false
+
+next_boundary:
+  atom_id: T21-A6S_EVENT_TRIGGERED_FINAL_COHORT_RUNTIME_PREP_V1
+  status: NOT_AUTHORIZED
+  purpose: Bind the rebase to reusable nomination and foreground-panel runtime with offline adversarial acceptance.
+  external_actions_authorized: false
+  provider_api_rpc_wss_calls_authorized: false
+  raw_or_dataset_writes_authorized: false
+  drive_actions_authorized: false
+  task22_authorized: false
+  a7_authorized: false

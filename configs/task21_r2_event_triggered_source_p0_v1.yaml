@@ -1,0 +1,155 @@
+schema: smial.task21_r2_event_triggered_source_p0
+schema_version: '1.0'
+runtime_id: T21-R2-EVENT-TRIGGERED-SOURCE-P0-001
+runtime_version: '1.0'
+task_id: TASK-21
+atom_id: T21-A6S_R2_EVENT_TRIGGERED_SOURCE_AND_P0_CAPTURE_V1
+status: FROZEN_FOR_EXACT_USER_AUTHORIZED_R2_EXECUTION
+as_of: '2026-08-01'
+contains_secrets: false
+
+protected_inputs:
+- role: EVENT_TRIGGERED_RUNTIME_PLAN
+  path: configs/task21_event_triggered_final_cohort_runtime_v1.yaml
+  sha256: 7e818f032cc0505b1dce6ac6b94c4b193b2eeecd2c34702de344a606a29888f1
+- role: EVENT_TRIGGERED_RUNTIME_PREP_ACCEPTANCE
+  path: docs/evidence/task21/event_triggered_final_cohort_runtime_prep_acceptance_v1.json
+  sha256: 5e18a8bcf66e4504177a2d74ba38f2a0945730b726dcc11c80b11464762d2728
+- role: ACCEPTED_R1_H0_RUNTIME
+  path: docs/evidence/task21/h0_admission_capture_runtime_acceptance_v1.json
+  sha256: 7e28fc61a85d77648d865a1e784ac6a7a1df7bd753b05b9dff48bba2a5206c16
+- role: CURRENT_RECOVERY_PROOF
+  path: docs/evidence/task21/pre_h24_recovery_refresh_acceptance_v1.json
+  sha256: 08f977ca926a6ba572e3cb5f4bea352d5e87e04a85f4e6c71c56f3a2ccf5b999
+
+source:
+  source_version: DEXSCREENER-LATEST-PROFILES-SOLANA-RPC-MINT-V1.1
+  cohort_id: DEXSCREENER_LATEST_PROFILE_SOLANA_CONTROL_ONLY
+  authentication: NONE
+  profile_endpoint:
+    provider: DEXSCREENER
+    url: https://api.dexscreener.com/token-profiles/latest/v1
+    method: GET
+    response_rows_max: 200
+    response_bytes_max: 2097152
+  mint_validation_rpc:
+    provider: SOLANA_PUBLIC_RPC
+    url: https://api.mainnet-beta.solana.com
+    method: getMultipleAccounts
+    commitment: finalized
+    encoding: base64
+    data_slice: {offset: 0, length: 82}
+    account_count_max: 100
+    response_bytes_max: 6291456
+  selection:
+    required_chain_id: solana
+    rpc_candidate_mints_max: 100
+    structural_candidates_max: 100
+    allowed_token_programs:
+    - TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA
+    - TokenzQdBNbLqP5VEhdkAS6EPFLC1PHnBqCXEpPxuEb
+    excluded_mints:
+    - So11111111111111111111111111111111111111112
+    - EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v
+    deterministic_order: [mint]
+    outcome_or_route_inputs_allowed: false
+
+cohort:
+  batch_id: T21-R2
+  policy_version: '1.0'
+  nomination_cap: 3
+  admission_cap: 3
+  prior_seen_mints:
+  - 2MUB7LUviPc5hmEKKuogxdDQhEAEC3QRBbeTB7bUpump
+  - 2zRj2vtREeogejN4zuYtBd9drCma7GtaWmUSdz28pump
+  - 35CeebrkDFt6RhtpkAj19f7JStnxBjkyVcuLDH2dpump
+  novelty:
+    prior_source_observation_id: T21-DSRPC-T1-808b5f9b79b41b8b8478
+    prior_source_content_sha256: 808b5f9b79b41b8b847821bfd4d1f720a57147a2d637c0f46934d231d1fbd8dc
+    prior_observed_at: '2026-07-30T16:28:59.084Z'
+    require_new_source_observation_id: true
+    require_new_source_content_sha256: true
+    require_observed_at_strictly_after_prior: true
+    require_previously_unseen_eligible_mint: true
+
+p0:
+  horizon_id: P0
+  semantics: ON_ADMISSION_FOREGROUND
+  notionals_usd: [10, 25, 50, 100]
+  quote_pairs_per_panel: 4
+  provider_calls_per_panel_max: 8
+  provider_calls_total_max: 24
+  provider: JUPITER
+  endpoint: https://api.jup.ag/swap/v1/quote
+  authentication: NONE
+  retries: 0
+  concurrency: 1
+  minimum_interval_seconds: 2.2
+  wall_seconds_max: 300
+
+budget:
+  whole_task_caps:
+    external_requests: 192
+    source_requests: 8
+    quote_requests: 184
+    response_bytes: 25165824
+    stored_bytes: 125829120
+    dataset_bytes: 268435456
+  used_before_r2:
+    external_requests: 60
+    source_requests: 4
+    quote_requests: 56
+    response_bytes: 86091
+    dataset_bytes: 364898
+  this_atom_caps:
+    external_requests: 26
+    source_requests: 2
+    quote_requests: 24
+    durable_local_bytes: 16777216
+  minimum_free_space_bytes_after_write: 2147483648
+  cap_behavior: FAIL_CLOSED_NO_RETRY
+
+recovery:
+  required_health: HEALTHY
+  backup_age_hours_max_at_start: 24
+  restore_age_hours_max_at_start: 168
+  drive_actions: 0
+
+runtime:
+  output_root: local/task21_forward/final_cohort/r2
+  write_behavior: CREATE_ONLY_CONTENT_ADDRESSED
+  admission_must_be_persisted_before_first_quote_call: true
+  partial_failure_policy: RETAIN_EVIDENCE_AND_STOP_NO_RETRY
+  scheduler_or_background_process: false
+
+authority:
+  source: EXPLICIT_USER
+  exact_phrase: T21-A6S_R2_EVENT_TRIGGERED_SOURCE_AND_P0_CAPTURE_V1
+  provider_api_rpc_wss_calls_max: 26
+  dexscreener_calls_max: 1
+  solana_public_rpc_calls_max: 1
+  jupiter_calls_max: 24
+  nominations_max: 3
+  admissions_max: 3
+  durable_local_bytes_max: 16777216
+  retries: 0
+  concurrency: 1
+  drive_reads: 0
+  drive_writes: 0
+  credentials: 0
+  cash_spend_usd_cents: 0
+  scheduler_or_background_process: false
+  deploy: false
+  catalog_mutation: false
+  source_mutation: false
+  wallet_signer_transaction_actions: 0
+  destructive_actions: false
+  merge: false
+
+next_boundary:
+  complete: T21-A6S_R2_P1_EVENT_TRIGGERED_FOREGROUND_CAPTURE_V1
+  minimum_separation_seconds: 1801
+  external_authority_granted: false
+  stopped: R2_REVIEW_REQUIRED
+  task22_authorized: false
+  a7_authorized: false

@@ -1,0 +1,46 @@
+schema: smial.task21_r3_pre_p2_recovery_refresh
+schema_version: '1.0'
+task_id: TASK-21
+atom_id: T21-A6S_R3_P2_RECOVERY_REFRESH_AND_FOREGROUND_CAPTURE_V1
+status: FROZEN_CREATE_ONLY
+contains_secrets: false
+
+source_roots:
+- local/task21_forward/final_cohort/r3/run=r3-20260801T134014806103Z-ac917cf4f972
+- local/task21_forward/final_cohort/r3/p1/run=p1-20260801T142017719450Z-8bb3c0961780
+
+expected_source:
+  file_count: 18
+  stored_bytes: 237983
+  p0_runtime_receipt_sha256: 5fab10b5aa502583b6616c8e950c46e139b62f52b87ee9b0d92de261540fe114
+  p1_runtime_receipt_sha256: 5f457005e6d1488c851b5233103b78be25fbd2f82d096765a89d768f8668e9bf
+
+local:
+  package_root: local/task21_recovery/pre_r3_p2/package
+  isolated_restore_root: local/task21_recovery/pre_r3_p2/isolated_restore
+  archive_prefix: TASK21_R3_P0_P1_FORWARD_BACKUP_v1
+  durable_bytes_max: 16777216
+  write_behavior: CREATE_ONLY_CONTENT_ADDRESSED
+
+google_drive:
+  folder_id: 1EISgmsB8nt2pkU4uBUO6Sav1Fzbo6Hw3
+  folder_name: SOLANA_ALPHA_LAB_TASK21_RECOVERY_V1
+  sharing: PRIVATE_UNCHANGED
+  operation: CREATE_NEW_FILE_ONLY
+
+authority:
+  source: EXACT_USER_GATE
+  exact_phrase: T21-A6S_R3_P2_RECOVERY_REFRESH_AND_FOREGROUND_CAPTURE_V1
+  local_writes: true
+  google_drive_writes_max: 1
+  jupiter_calls_max_after_recovery: 16
+  credentials: 0
+  cash_spend_usd_cents: 0
+  scheduler_or_background_process: false
+  deploy: false
+  catalog_mutation: false
+  source_mutation: false
+  wallet_signer_transaction_actions: 0
+  delete: false
+  overwrite: false
+  merge: false

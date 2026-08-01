@@ -1,0 +1,166 @@
+{
+  "schema": "smial.task21_final_dataset_recovery_acceptance",
+  "schema_version": "1.0",
+  "task_id": "TASK-21",
+  "atom_id": "T21-A7R_FINAL_DATASET_RECOVERY_PROOF_V1",
+  "status": "PASS_REMOTE_RECOVERY_PROVEN",
+  "as_of": "2026-08-01T19:25:26.3755290+03:00",
+  "repository": {
+    "branch": "task21/final-cohort-extension",
+    "head": "66382bfc8395e0efc36e5c026f259ea214f01bdf",
+    "head_tree": "2a7d983af02c1086560021ee11f46b733689c07b",
+    "commit_created": false
+  },
+  "full_dataset": {
+    "root_count": 13,
+    "file_count": 91,
+    "stored_bytes": 1263895,
+    "source_inventory_sha256": "aaa605eabdb62c38d218b40e768669db460c6fa419c4086d5412547b7f2fffae",
+    "outcome_values_read": false
+  },
+  "components": [
+    {
+      "component_id": "T21-BOUNDED-CHECKPOINT",
+      "root_count": 7,
+      "file_count": 32,
+      "stored_bytes": 456813,
+      "source_inventory_sha256": "64033b77e4fc8b797600a7083a6681db88a7a21b5950541785dd13c7767e968c"
+    },
+    {
+      "component_id": "T21-FINAL-COHORT-EXTENSION",
+      "root_count": 6,
+      "file_count": 59,
+      "stored_bytes": 807082,
+      "source_inventory_sha256": "49ecbd1a44805f06a4e47aad7646f854b3a009c79670037028a5a85db487a850"
+    }
+  ],
+  "content_addressed_archive": {
+    "filename": "TASK21_FINAL_DATASET_RECOVERY_v1_6d895f259f0316df442932b38abf44a963a79e16e24793a4eb1af2c5f6748361.zip",
+    "repository_relative_path": "local/task21_recovery/final_dataset/package/TASK21_FINAL_DATASET_RECOVERY_v1_6d895f259f0316df442932b38abf44a963a79e16e24793a4eb1af2c5f6748361.zip",
+    "bytes": 1320744,
+    "sha256": "6d895f259f0316df442932b38abf44a963a79e16e24793a4eb1af2c5f6748361",
+    "md5": "3b90480ef53d4caa6d942f55a033f2f9",
+    "create_only": true
+  },
+  "local_packaging_check": {
+    "restore_root": "local/task21_recovery/final_dataset/local_restore/6d895f259f0316df442932b38abf44a963a79e16e24793a4eb1af2c5f6748361/local-build-proof",
+    "restored_file_count": 91,
+    "restored_stored_bytes": 1263895,
+    "restored_inventory_sha256": "aaa605eabdb62c38d218b40e768669db460c6fa419c4086d5412547b7f2fffae",
+    "source_unchanged": true
+  },
+  "google_drive": {
+    "connected_account": "bakuczmarianna566@gmail.com",
+    "parent_folder_id": "1EISgmsB8nt2pkU4uBUO6Sav1Fzbo6Hw3",
+    "pre_create_exact_name_matches": 0,
+    "upload_mode": "CREATE_NEW_FILE_ONLY",
+    "file": {
+      "id": "1bv0ypgLdoYdrXODIUx5J4Lkj9Y-JsBLm",
+      "name": "TASK21_FINAL_DATASET_RECOVERY_v1_6d895f259f0316df442932b38abf44a963a79e16e24793a4eb1af2c5f6748361.zip",
+      "mime_type": "application/zip",
+      "bytes": 1320744,
+      "parent_folder_id": "1EISgmsB8nt2pkU4uBUO6Sav1Fzbo6Hw3",
+      "created_time": "2026-08-01T16:20:22.567Z",
+      "modified_time": "2026-08-01T16:20:22.567Z",
+      "shared": false,
+      "visibility": "not_shared",
+      "url": "https://drive.google.com/file/d/1bv0ypgLdoYdrXODIUx5J4Lkj9Y-JsBLm/view?usp=drivesdk"
+    },
+    "metadata_readback": {
+      "exact_id": true,
+      "exact_name": true,
+      "exact_size": true,
+      "exact_parent": true,
+      "private": true
+    },
+    "raw_readback": {
+      "complete_byte_identity": true,
+      "materialized_repository_relative_path": "local/task21_recovery/final_dataset/remote_readback_6d895f259f0316df442932b38abf44a963a79e16e24793a4eb1af2c5f6748361.zip",
+      "bytes": 1320744,
+      "sha256": "6d895f259f0316df442932b38abf44a963a79e16e24793a4eb1af2c5f6748361",
+      "md5": "3b90480ef53d4caa6d942f55a033f2f9",
+      "raw_fetch_calls": 4
+    },
+    "connector_guard_rejected_upload_attempts": 1,
+    "connector_guard_rejected_attempt_mutated_drive": false
+  },
+  "isolated_restore": {
+    "source": "GOOGLE_DRIVE_RAW_READBACK_BYTES",
+    "restore_root": "local/task21_recovery/final_dataset/remote_restore/6d895f259f0316df442932b38abf44a963a79e16e24793a4eb1af2c5f6748361/drive-readback-proof",
+    "restored_file_count": 91,
+    "restored_stored_bytes": 1263895,
+    "restored_inventory_sha256": "aaa605eabdb62c38d218b40e768669db460c6fa419c4086d5412547b7f2fffae",
+    "source_unchanged": true,
+    "source_mutations": 0,
+    "source_deletions": 0,
+    "restore_overwrites": 0
+  },
+  "actual_actions": {
+    "local_create_only_archive_and_restore_writes": true,
+    "drive_reads": 7,
+    "drive_writes": 1,
+    "drive_file_creations": 1,
+    "drive_updates": 0,
+    "drive_deletions": 0,
+    "sharing_changes": 0,
+    "provider_api_rpc_wss_calls": 0,
+    "provider_credits": 0,
+    "cash_spend_usd_cents": 0,
+    "credential_or_permission_changes": 0,
+    "candidate_admissions": 0,
+    "collector_executions": 0,
+    "catalog_mutation": false,
+    "source_mutation": false,
+    "commit": false,
+    "push": false,
+    "pull_request": false,
+    "merge": false,
+    "wallet_signer_transaction_actions": 0,
+    "destructive_actions": false
+  },
+  "artifacts": [
+    {
+      "path": "configs/task21_final_dataset_recovery_v1.yaml",
+      "sha256": "4c0244d2ee9198ec28e8d7727b46b3ac19e46ab4c9d09a0643c5f3a7dd0f7b9e"
+    },
+    {
+      "path": "docs/contracts/task21_final_dataset_recovery_contract_v1.md",
+      "sha256": "714bce69622f6e45d9410d48ac88a847f4f62d5d3da36cdc074f29a809cf6ccc"
+    },
+    {
+      "path": "scripts/prepare_task21_final_dataset_recovery.py",
+      "sha256": "cc08283277e1506292a6fa2a91caa217514f2da181a67ee23972fac8e6d25be9"
+    },
+    {
+      "path": "tests/test_task21_final_dataset_recovery.py",
+      "sha256": "1b4a7c3d3405d32fa6519c0cfeaac65dced7c1cb14655357e22044255e55806a"
+    }
+  ],
+  "targeted_validation": {
+    "own_tests": "7/7 PASS",
+    "final_cohort_freeze_regression": "17/17 PASS",
+    "combined": "24/24 PASS",
+    "full_repository_validation": "DEFERRED_TO_COMMITTED_CANDIDATE_AND_CI"
+  },
+  "canonical_state": {
+    "dataset_frozen": false,
+    "task21_done": false,
+    "catalog_version": "0.25.0_PENDING_A7",
+    "sources_mutated": false,
+    "task22_authorized": false
+  },
+  "durable_watches": [
+    "A7 must reconcile the current OWNER_PULSE read model with the accepted 91-file dataset identity.",
+    "A7 must close the SMIAL-PRODUCT-VISION-RECONCILIATION-2026-07-31 terminal marker and bind the planned documentation owner/trigger."
+  ],
+  "non_claims": [
+    "No hypothesis outcome was opened or evaluated.",
+    "Recoverability does not canonically freeze or accept the TASK-21 dataset.",
+    "No trade, fill, position, PnL, NetReturn, alpha, market-wide or cross-regime claim is made."
+  ],
+  "next_boundary": {
+    "atom_id": "T21-A7_DATASET_FREEZE_ACCEPTANCE_CATALOG_FACTORY_FIT_V1",
+    "authorized": false,
+    "reasoning_recommendation": "SOL_MAXIMUM"
+  }
+}

@@ -1,0 +1,89 @@
+{
+  "as_of": "2026-08-01",
+  "atom_id": "T21-A7_DATASET_FREEZE_ACCEPTANCE_CATALOG_FACTORY_FIT_V1",
+  "gaps": [
+    "R1_H6_THREE_PANELS_EXPLICIT_GAP_NO_BACKFILL",
+    "R1_H24_ONE_SENTINEL_NOT_FULL_COHORT",
+    "ONLY_TWO_COMPLETE_NOMINATION_CLUSTERS",
+    "NO_MARKET_WIDE_OR_CROSS_REGIME_SAMPLE",
+    "NO_STATISTICAL_POWER_CLAIM"
+  ],
+  "non_claims": [
+    "MARKET_WIDE_REPRESENTATIVENESS",
+    "CROSS_REGIME_GENERALIZATION",
+    "STATISTICAL_POWER_SUFFICIENCY",
+    "ALPHA",
+    "EXECUTABLE_NET_RETURN"
+  ],
+  "observation_span": {
+    "elapsed_seconds": 111768.010179,
+    "elapsed_time_is_not_a_sufficiency_proxy": true,
+    "forward_first_observed_at": "2026-07-31T07:49:54.402486Z",
+    "forward_last_observed_at": "2026-08-01T14:52:42.412665Z"
+  },
+  "owner_verdict": "DATASET_READY_FOR_NARROW_CONDITIONAL_ANALYSIS_WITH_LIMITATIONS",
+  "population": {
+    "complete_member_clusters": 2,
+    "complete_members": 5,
+    "content_distinct_nomination_batches": 3,
+    "incomplete_members": 3,
+    "maximum_complete_member_share_one_batch": 0.6,
+    "nominated_and_admitted_members": 8
+  },
+  "schema": "smial.task21.effective-sample-summary",
+  "schema_version": "1.0",
+  "selection_and_dependence": {
+    "cross_regime_claim_allowed": false,
+    "member_iid_assumption_allowed": false,
+    "nomination_batch_grouping_required": true,
+    "same_day_sequential_batches": true,
+    "watchlist_conditioned": true
+  },
+  "status": "PASS_WITH_LIMITATIONS",
+  "strata": [
+    {
+      "batch_id": "R1",
+      "complete_members": 0,
+      "members": 3,
+      "missing_panels": 3,
+      "observed_panels": 7,
+      "quote_attempts": 56,
+      "quote_pairs": 28,
+      "role": "PARTIAL_AND_GAP_EVIDENCE_ONLY"
+    },
+    {
+      "batch_id": "R2",
+      "complete_members": 3,
+      "members": 3,
+      "missing_panels": 0,
+      "observed_panels": 9,
+      "quote_attempts": 72,
+      "quote_pairs": 36,
+      "role": "COMPLETE_COHORT_CLUSTER"
+    },
+    {
+      "batch_id": "R3",
+      "complete_members": 2,
+      "members": 2,
+      "missing_panels": 0,
+      "observed_panels": 6,
+      "quote_attempts": 48,
+      "quote_pairs": 24,
+      "role": "COMPLETE_COHORT_CLUSTER"
+    }
+  ],
+  "task22_eligibility": {
+    "alpha_claim_allowed": false,
+    "group_by_nomination_batch_required": true,
+    "outcomes_opened": false,
+    "split_before_outcome_required": true,
+    "status": "ELIGIBLE_FOR_DETERMINISTIC_SPLIT_AND_HOLDOUT_LEDGER_ONLY"
+  },
+  "task_id": "TASK-21",
+  "totals": {
+    "explicit_missing_panels": 3,
+    "observed_panels": 22,
+    "quote_attempts": 176,
+    "quote_pairs": 88
+  }
+}

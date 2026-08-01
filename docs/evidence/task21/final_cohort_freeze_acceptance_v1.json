@@ -1,0 +1,188 @@
+{
+  "schema": "smial.task21.final-cohort-freeze-acceptance",
+  "schema_version": "1.0",
+  "evidence_id": "EVIDENCE-T21-FINAL-COHORT-FREEZE-001",
+  "evidence_version": "1.0",
+  "task_id": "TASK-21",
+  "atom_id": "T21-A6S_R3_COMPLETE_FINAL_COHORT_REVIEW_AND_FREEZE_V1",
+  "status": "PASS",
+  "as_of": "2026-08-01T15:40:09.016656Z",
+  "verdict": "FINAL_COHORT_COMPLETE_AND_EVIDENCE_SET_FROZEN_PENDING_A7_RECOVERY",
+  "repository_checkpoint": {
+    "branch": "task21/final-cohort-extension",
+    "head": "66382bfc8395e0efc36e5c026f259ea214f01bdf",
+    "tree": "2a7d983af02c1086560021ee11f46b733689c07b",
+    "head_changed_by_atom": false
+  },
+  "review_result": {
+    "cohort_evidence_frozen": true,
+    "dataset_frozen": false,
+    "a7_review_eligible": true,
+    "task22_eligible": false,
+    "new_members_complete": 5,
+    "complete_panels": 15,
+    "complete_quote_pairs": 60,
+    "complete_quote_attempts": 120,
+    "independent_nomination_batches_total": 3,
+    "maximum_member_share_one_batch": 0.6,
+    "quote_route_price_cost_values_read": false,
+    "additional_collection_authorized": false,
+    "full_dataset_remote_restore_required": true
+  },
+  "frozen_member_ids": [
+    "T21-WATCH-29e2b75994975253bd74",
+    "T21-WATCH-6f21dec76d05f5831216",
+    "T21-WATCH-61ce24fc3fa04e3eaba7",
+    "T21-WATCH-7a678b1052ac10b7d492",
+    "T21-WATCH-2c5632a2ba71c8e44637"
+  ],
+  "extension_usage": {
+    "provider_api_rpc_wss_calls": 124,
+    "source_requests": 4,
+    "jupiter_calls": 120,
+    "received_bytes": 249726,
+    "local_durable_bytes": 807082,
+    "local_file_count": 59
+  },
+  "whole_task_usage_at_stop": {
+    "external_requests": 184,
+    "external_requests_cap": 192,
+    "source_requests": 8,
+    "source_requests_cap": 8,
+    "quote_requests": 176,
+    "quote_requests_cap": 184,
+    "response_bytes": 335817,
+    "response_bytes_cap": 25165824
+  },
+  "local_inventory": {
+    "status": "PASS",
+    "root_count": 6,
+    "file_count": 59,
+    "stored_bytes": 807082,
+    "inventory_sha256": "d357200d1cf479e63ae967b7c46aead5d2cefd811662ec9b11965a2c064c10b4",
+    "roots": [
+      {
+        "root": "local/task21_forward/final_cohort/r2/run=r2-20260801T114657421057Z-7882ff946449",
+        "file_count": 14,
+        "stored_bytes": 191744,
+        "inventory_sha256": "dc961bcac16f88f0c82f3be86e1ca3545ea9596176dc61a66ae034dc71925392"
+      },
+      {
+        "root": "local/task21_forward/final_cohort/r2/p1/run=p1-20260801T122606020085Z-c66cbd9193f1",
+        "file_count": 10,
+        "stored_bytes": 140663,
+        "inventory_sha256": "fce7a66d2d9a297a2794748600007b51c1fc199f40bf3b49eb98fc1eda819c68"
+      },
+      {
+        "root": "local/task21_forward/final_cohort/r2/p2/run=p2-20260801T131100955007Z-1e6e05144f30",
+        "file_count": 10,
+        "stored_bytes": 141454,
+        "inventory_sha256": "eb1e380362522e7d66f3ff1f8bf27ddbdd44d48e6a824d20b6924b7ab7849907"
+      },
+      {
+        "root": "local/task21_forward/final_cohort/r3/run=r3-20260801T134014806103Z-ac917cf4f972",
+        "file_count": 11,
+        "stored_bytes": 140965,
+        "inventory_sha256": "30bb50301b4bb752bac5989249d727421cf8181f7261ecf27bbf9e3910684ed5"
+      },
+      {
+        "root": "local/task21_forward/final_cohort/r3/p1/run=p1-20260801T142017719450Z-8bb3c0961780",
+        "file_count": 7,
+        "stored_bytes": 97018,
+        "inventory_sha256": "b1e8aeb59f0e373e64b8db95bbb83cef4674459918aad851631d8ba7be1823ab"
+      },
+      {
+        "root": "local/task21_forward/final_cohort/r3/p2/run=p2-20260801T145207273594Z-879d05d421ca",
+        "file_count": 7,
+        "stored_bytes": 95238,
+        "inventory_sha256": "8d3225b1c681f7804e7600bf2f8e2b41f62a1f5eaa0c2dff168b6f118acb61bc"
+      }
+    ]
+  },
+  "recovery": {
+    "r3_p0_p1_remote_readback_and_restore": "PASS",
+    "r3_p2_included": false,
+    "entire_final_dataset_included": false,
+    "full_final_dataset_remote_readback_and_restore_before_a7": "REQUIRED"
+  },
+  "artifacts": [
+    {
+      "path": "configs/task21_final_cohort_freeze_v1.yaml",
+      "sha256": "d644c3432241a8ebbe74373038cfe0c15b87872e7afc6e96b6fade49e82d6fde"
+    },
+    {
+      "path": "docs/contracts/task21_final_cohort_freeze_contract_v1.md",
+      "sha256": "349dd83364666cf97dc040bf7b6f114f5e1797dfb866d810c2d5e0ee90bf7cb4"
+    },
+    {
+      "path": "src/solana_alpha_lab/task21_final_cohort_freeze.py",
+      "sha256": "ad106579c8e794e80e345ca0e6342208256511cbb7a8fa068d2aa8ff8d094836"
+    },
+    {
+      "path": "tests/test_task21_final_cohort_freeze.py",
+      "sha256": "5f64ddbf93068b2b9835df8f39bf8bb92acd0eefcf9a380f6e8d73140eed9881"
+    }
+  ],
+  "targeted_validation": "17_OF_17_PASS",
+  "full_validation": {
+    "status": "DEFERRED_TO_COMMITTED_CI_CANDIDATE",
+    "local_attempt": "BLOCKED_BY_REPOSITORY_POLICY",
+    "blocking_check": "branch_main_or_ci_detached",
+    "failure_in_candidate_logic": false,
+    "passed_before_policy_gate": [
+      "PYTHON_RUNTIME",
+      "UV_RUNTIME",
+      "EXECUTABLE_CONTRACT",
+      "WORKFLOW_STATIC_VALIDATION",
+      "PYTHON_LOCK",
+      "UV_LOCK_IMMUTABLE",
+      "SECRET_REJECTION",
+      "BATON_VALIDATION",
+      "CATALOG_VALIDATION",
+      "CATALOG_RESOLUTION",
+      "GENERATED_NAVIGATION",
+      "PRE_GIT_IMPORT_VALIDATION",
+      "TASK04_ARCHITECTURE"
+    ],
+    "unit_discovery": "TIMEOUT_300_SECONDS_WITH_NO_OBSERVED_FAILURE",
+    "full_pass_claimed": false
+  },
+  "local_changes": {
+    "files_created": 5,
+    "historical_files_modified": 0,
+    "raw_or_dataset_files_modified": 0
+  },
+  "actual_actions": {
+    "network_calls": 0,
+    "provider_api_rpc_wss_calls": 0,
+    "drive_reads": 0,
+    "drive_writes": 0,
+    "credentials_used": 0,
+    "provider_credits": 0,
+    "cash_spend_usd_cents": 0,
+    "commit": false,
+    "push": false,
+    "pull_request": false,
+    "merge": false,
+    "catalog_mutation": false,
+    "source_mutation": false,
+    "wallet_signer_transaction_actions": 0,
+    "destructive_actions": false
+  },
+  "catalog": {
+    "version": "0.25.0",
+    "status": "PENDING_T21_A7",
+    "mutation_performed": false
+  },
+  "durable_watches": {
+    "product_vision_reconciliation_at_a7": "REQUIRED",
+    "documentation_owner_and_trigger_binding_at_a7": "REQUIRED"
+  },
+  "next_boundary": {
+    "atom_id": "T21-A7_DATASET_FREEZE_ACCEPTANCE_CATALOG_FACTORY_FIT_V1",
+    "authorized": false,
+    "full_final_dataset_recovery_proof_required_first": true,
+    "task22_authorized": false
+  },
+  "state_change": "LOCAL_COHORT_EVIDENCE_SET_FROZEN_PENDING_A7_RECOVERY"
+}

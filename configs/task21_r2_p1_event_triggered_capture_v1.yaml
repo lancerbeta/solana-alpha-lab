@@ -1,0 +1,128 @@
+schema: smial.task21_event_triggered_followup_capture
+schema_version: '1.0'
+runtime_id: T21-R2-P1-EVENT-TRIGGERED-CAPTURE-001
+runtime_version: '1.0'
+task_id: TASK-21
+atom_id: T21-A6S_R2_P1_EVENT_TRIGGERED_FOREGROUND_CAPTURE_V1
+status: FROZEN_FOR_SEPARATE_EXACT_PROVIDER_AUTHORITY
+as_of: '2026-08-01'
+contains_secrets: false
+
+panel:
+  batch_id: T21-R2
+  panel_id: P1
+  predecessor_panel_id: P0
+  next_panel_id: P2
+  next_atom_id: T21-A6S_R2_P2_EVENT_TRIGGERED_FOREGROUND_CAPTURE_V1
+  population_members_exact: 3
+  minimum_separation_seconds: 1801
+  member_total_span_seconds_max: 86400
+  narrow_expiry_window: null
+  late_policy: ALLOW_UNTIL_MEMBER_TOTAL_SPAN_DEADLINE
+  admission_outcome_reselection_allowed: false
+
+protected_inputs:
+- role: EVENT_TRIGGERED_RUNTIME_PLAN
+  path: configs/task21_event_triggered_final_cohort_runtime_v1.yaml
+  sha256: 7e818f032cc0505b1dce6ac6b94c4b193b2eeecd2c34702de344a606a29888f1
+- role: R2_P0_RUNTIME_ACCEPTANCE
+  path: docs/evidence/task21/r2_event_triggered_source_p0_runtime_acceptance_v1.json
+  sha256: 5c69ba68348b63976a54b8e69974d5cfd406c375d4688601d78bbddcbe8eee9c
+- role: R2_ADMISSION_EVENTS
+  path: local/task21_forward/final_cohort/r2/run=r2-20260801T114657421057Z-7882ff946449/admission/admission_events.jsonl
+  sha256: 443f090f2ce8e5a24c420fd76a0adb70b269e9343c1770e39a76b11702e190d4
+
+predecessor_receipts:
+- member_id: T21-WATCH-29e2b75994975253bd74
+  path: local/task21_forward/final_cohort/r2/run=r2-20260801T114657421057Z-7882ff946449/member=T21-WATCH-29e2b75994975253bd74/horizon=P0/receipt.json
+  sha256: b7908613cd03e16d768c586f89dd1455d667eda884d5eb1ac26eea2d4d6b6145
+- member_id: T21-WATCH-6f21dec76d05f5831216
+  path: local/task21_forward/final_cohort/r2/run=r2-20260801T114657421057Z-7882ff946449/member=T21-WATCH-6f21dec76d05f5831216/horizon=P0/receipt.json
+  sha256: 4b00a23c69a8ab6fe61a05bb6e46d198d350c38b49992ac8c111309d63521a76
+- member_id: T21-WATCH-61ce24fc3fa04e3eaba7
+  path: local/task21_forward/final_cohort/r2/run=r2-20260801T114657421057Z-7882ff946449/member=T21-WATCH-61ce24fc3fa04e3eaba7/horizon=P0/receipt.json
+  sha256: a8021d98b1294098691409fcd0e65a3a58038c43259349c2dea6515ca9c558d6
+
+population:
+  member_ids:
+  - T21-WATCH-29e2b75994975253bd74
+  - T21-WATCH-6f21dec76d05f5831216
+  - T21-WATCH-61ce24fc3fa04e3eaba7
+  deterministic_order: [entered_at, nomination_event_id, mint]
+  outcome_or_route_input_used: false
+
+capture:
+  provider: JUPITER
+  endpoint: https://api.jup.ag/swap/v1/quote
+  authentication: NONE
+  notionals_usd: [10, 25, 50, 100]
+  quote_pairs_per_panel: 4
+  provider_calls_per_panel_max: 8
+  provider_calls_total_max: 24
+  modeled_provider_credits_max: 24
+  received_response_bytes_max: 9437184
+  durable_local_bytes_max: 16777216
+  wall_seconds_max: 300
+  minimum_interval_seconds: 2.2
+  retries: 0
+  concurrency: 1
+
+budget:
+  whole_task_caps:
+    external_requests: 192
+    source_requests: 8
+    quote_requests: 184
+    response_bytes: 25165824
+    stored_bytes: 125829120
+    dataset_bytes: 268435456
+  used_before_p1:
+    external_requests: 86
+    source_requests: 6
+    quote_requests: 80
+    response_bytes: 154740
+  minimum_free_space_bytes_after_write: 2147483648
+  cap_behavior: FAIL_CLOSED_NO_RETRY
+
+recovery:
+  receipt_path: docs/evidence/task21/pre_h24_recovery_refresh_acceptance_v1.json
+  receipt_sha256: 08f977ca926a6ba572e3cb5f4bea352d5e87e04a85f4e6c71c56f3a2ccf5b999
+  required_health: HEALTHY
+  backup_age_hours_max_at_start: 24
+  restore_age_hours_max_at_start: 168
+  drive_actions: 0
+
+runtime:
+  output_root: local/task21_forward/final_cohort/r2/p1
+  write_behavior: CREATE_ONLY_CONTENT_ADDRESSED
+  all_members_eligible_before_first_provider_call: true
+  partial_failure_policy: RETAIN_EVIDENCE_AND_STOP_NO_RETRY
+  scheduler_or_background_process: false
+
+authority:
+  source: AUTHORIZATION_REQUIRED
+  exact_phrase: T21-A6S_R2_P1_EVENT_TRIGGERED_FOREGROUND_CAPTURE_V1
+  provider_api_rpc_wss_calls_max: 24
+  jupiter_calls_max: 24
+  nominations: 0
+  admissions: 0
+  retries: 0
+  concurrency: 1
+  drive_reads: 0
+  drive_writes: 0
+  credentials: 0
+  cash_spend_usd_cents: 0
+  scheduler_or_background_process: false
+  deploy: false
+  catalog_mutation: false
+  source_mutation: false
+  wallet_signer_transaction_actions: 0
+  destructive_actions: false
+  merge: false
+
+next_boundary:
+  complete: T21-A6S_R2_P2_EVENT_TRIGGERED_FOREGROUND_CAPTURE_V1
+  minimum_separation_seconds: 1801
+  external_authority_granted: false
+  stopped: R2_P1_REVIEW_REQUIRED
+  task22_authorized: false
+  a7_authorized: false

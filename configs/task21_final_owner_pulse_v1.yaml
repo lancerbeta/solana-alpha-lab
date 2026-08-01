@@ -1,0 +1,48 @@
+schema: smial.task21_final_owner_pulse
+schema_version: '1.0'
+read_model_id: OWNER-PULSE-T21-FINAL-001
+read_model_version: '1.0'
+task_id: TASK-21
+atom_id: T21-A7_DATASET_FREEZE_ACCEPTANCE_CATALOG_FACTORY_FIT_V1
+status: FROZEN_FINAL_READ_MODEL
+as_of: '2026-08-01'
+contains_secrets: false
+
+truth_sources:
+- docs/evidence/task21/final_dataset_freeze_manifest_v1.json
+- docs/evidence/task21/effective_sample_summary_v1.json
+- docs/evidence/task21/final_dataset_recovery_acceptance_v1.json
+- docs/evidence/task21/a7_acceptance_catalog_factory_fit_v1.json
+- control/active_time_gates.json
+
+required_projection:
+  nominated_and_admitted_members: 8
+  complete_members: 5
+  complete_member_clusters: 2
+  panels_captured: 22
+  quote_pairs: 88
+  quote_attempts: 176
+  local_dataset_bytes: 1263895
+  collection_external_requests: 184
+  collection_external_requests_cap: 192
+  separate_shakedown_requests: 8
+  task21_provider_api_rpc_wss_calls_total: 192
+  recovery_health: FINAL_DATASET_REMOTE_RECOVERY_PROVEN
+  dataset_freeze_state: A7_ACCEPTED_LOCAL_CANDIDATE
+  next_owner_action: AUTHORIZE_T21_A8_REPOSITORY_DELIVERY
+
+authority:
+  class: READ_ONLY
+  network_calls: 0
+  provider_api_rpc_wss_calls: 0
+  drive_reads: 0
+  drive_writes: 0
+  raw_or_dataset_writes: 0
+  cash_spend_usd_cents: 0
+  credentials: 0
+  wallet_signer_transaction_actions: 0
+  commit: false
+  push: false
+  pull_request: false
+  merge: false
+  destructive_actions: false

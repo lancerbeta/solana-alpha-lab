@@ -10,6 +10,7 @@ import yaml
 
 ROOT = Path(__file__).resolve().parents[1]
 CONFIG_PATH = ROOT / "configs" / "task21_durable_resume_router_binding_v1.yaml"
+FINAL_CONFIG_PATH = ROOT / "configs" / "task21_final_owner_pulse_v1.yaml"
 MARKER_PATH = ROOT / "control" / "active_time_gates.json"
 ACCEPTANCE_PATH = (
     ROOT
@@ -19,7 +20,7 @@ ACCEPTANCE_PATH = (
     / "durable_resume_router_binding_acceptance_v1.json"
 )
 AGENTS_PATH = ROOT / "AGENTS.md"
-OWNER_PULSE_SCRIPT = ROOT / "scripts" / "show_task21_owner_pulse.py"
+OWNER_PULSE_SCRIPT = ROOT / "scripts" / "show_task21_final_owner_pulse.py"
 
 
 def _sha256(path: Path) -> str:
@@ -41,16 +42,20 @@ class Task21DurableResumeRouterBindingTests(unittest.TestCase):
         self.assertEqual(self.router["router_version"], "1.0")
         self.assertEqual(
             self.router["status"],
-            "NO_ACTIVE_TIME_GATE_FUTURE_HORIZONS_TRIGGER_ONLY",
+            "A7_ACCEPTED_PENDING_REPOSITORY_DELIVERY",
         )
         self.assertEqual(
             self.router["entry_rule"],
-            "READ_MARKER_THEN_RUN_OWNER_PULSE_BEFORE_TASK21_CONTINUATION",
+            "READ_MARKER_THEN_RUN_FINAL_OWNER_PULSE_BEFORE_TASK21_CONTINUATION",
         )
 
     def test_router_binds_exact_config_and_owner_pulse_entrypoint(self) -> None:
         binding = self.router["binding"]
-        self.assertEqual(binding["config"]["sha256"], _sha256(CONFIG_PATH))
+        self.assertEqual(
+            binding["config"]["path"],
+            "configs/task21_final_owner_pulse_v1.yaml",
+        )
+        self.assertEqual(binding["config"]["sha256"], _sha256(FINAL_CONFIG_PATH))
         self.assertEqual(
             binding["owner_pulse_entrypoint"]["sha256"],
             _sha256(OWNER_PULSE_SCRIPT),
@@ -67,7 +72,7 @@ class Task21DurableResumeRouterBindingTests(unittest.TestCase):
                 "--managed-python",
                 "python",
                 "-B",
-                "scripts/show_task21_owner_pulse.py",
+                "scripts/show_task21_final_owner_pulse.py",
                 "--json",
             ],
         )
