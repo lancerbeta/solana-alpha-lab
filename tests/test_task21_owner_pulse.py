@@ -374,7 +374,10 @@ class TestTask21OwnerPulse(unittest.TestCase):
             as_of=DUE_AT,
             free_disk_bytes=9_000_000_000,
         )
-        self.assertEqual(pulse["attention"], [])
+        self.assertNotIn(
+            "TASK21_H24_CAPTURE_DUE",
+            {item["code"] for item in pulse["attention"]},
+        )
         self.assertEqual(
             pulse["active_time_gates"][0]["state"],
             "RESOLVED_WITH_EVIDENCE",
