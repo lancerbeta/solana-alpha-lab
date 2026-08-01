@@ -1,0 +1,150 @@
+schema: smial.task21_final_cohort_freeze
+schema_version: '1.0'
+freeze_id: T21-FINAL-COHORT-FREEZE-001
+freeze_version: '1.0'
+task_id: TASK-21
+atom_id: T21-A6S_R3_COMPLETE_FINAL_COHORT_REVIEW_AND_FREEZE_V1
+status: FROZEN_LOCAL_FINAL_COHORT_REVIEW_PLAN
+as_of: '2026-08-01'
+contains_secrets: false
+
+protected_inputs:
+- role: INFORMATION_SUFFICIENCY_REBASE
+  path: configs/task21_information_sufficiency_rebase_v1.yaml
+  sha256: 62fcbc91c30c7ac4a22fab422711272f66b44b116c33a9c3aa3b0884e854ab70
+- role: FINAL_COHORT_RUNTIME_PLAN
+  path: configs/task21_event_triggered_final_cohort_runtime_v1.yaml
+  sha256: 7e818f032cc0505b1dce6ac6b94c4b193b2eeecd2c34702de344a606a29888f1
+- role: R1_H0_RUNTIME_ACCEPTANCE
+  path: docs/evidence/task21/h0_admission_capture_runtime_acceptance_v1.json
+  sha256: 7e28fc61a85d77648d865a1e784ac6a7a1df7bd753b05b9dff48bba2a5206c16
+- role: R2_SOURCE_P0_RUNTIME_ACCEPTANCE
+  path: docs/evidence/task21/r2_event_triggered_source_p0_runtime_acceptance_v1.json
+  sha256: 5c69ba68348b63976a54b8e69974d5cfd406c375d4688601d78bbddcbe8eee9c
+- role: R2_P1_RUNTIME_ACCEPTANCE
+  path: docs/evidence/task21/r2_p1_event_triggered_capture_runtime_acceptance_v1.json
+  sha256: fedb97b9bd8bb8d8d7a7650ba47e958d0b6d7659cb4fcfdaa1c73de6c31ffd54
+- role: R2_P2_RUNTIME_ACCEPTANCE
+  path: docs/evidence/task21/r2_p2_event_triggered_capture_runtime_acceptance_v1.json
+  sha256: 76644640134dc186fc4d65e98814f39ef5546695fce10bc385b1b8e9f469e1f1
+- role: R3_SOURCE_P0_RUNTIME_ACCEPTANCE
+  path: docs/evidence/task21/r3_event_triggered_source_p0_runtime_acceptance_v1.json
+  sha256: 7ecac36cd890106096ebb96c539ab6a48e49ddb2341821de06ced523c4552ec0
+- role: R3_P1_RUNTIME_ACCEPTANCE
+  path: docs/evidence/task21/r3_p1_event_triggered_capture_runtime_acceptance_v1.json
+  sha256: aca3f231a4996a221c249dffd830b4456ffb2399db6ac398b8f33474f40cd767
+- role: R3_P2_RUNTIME_ACCEPTANCE
+  path: docs/evidence/task21/r3_p2_event_triggered_capture_runtime_acceptance_v1.json
+  sha256: 40ef6884736a90aad98ecacf6e8fe52d2464a808e99075c775418f454b81fa9a
+- role: R3_PRE_P2_RECOVERY_ACCEPTANCE
+  path: docs/evidence/task21/r3_pre_p2_recovery_refresh_acceptance_v1.json
+  sha256: 521d7f3b61945ab8313bfb55750e047c08fb1a99b52651d5509525d71e02c43c
+
+protected_history:
+  outcome_blindness_preserved: true
+  historical_artifacts_rewritten: false
+  hypothesis_definition_changed: false
+  primary_estimand_changed: false
+  quote_route_price_cost_values_read: false
+
+frozen_batches:
+- batch_id: T21-R2
+  member_ids:
+  - T21-WATCH-29e2b75994975253bd74
+  - T21-WATCH-6f21dec76d05f5831216
+  - T21-WATCH-61ce24fc3fa04e3eaba7
+  mints:
+  - 2Ezm4w3gFdymRAyhx9KEsbJV9NA79Y7UoiNWeXNFpump
+  - 2HU2VftbJ7Fp9P5pEbneNsRhax8boHhTVS1KLnYrpump
+  - 2JdM5MHiXjsQz5QgnSQfbidZDTVXCLki74jMYgJapump
+- batch_id: T21-R3
+  member_ids:
+  - T21-WATCH-7a678b1052ac10b7d492
+  - T21-WATCH-2c5632a2ba71c8e44637
+  mints:
+  - CWfuB1HDEp9W3xT3prBX8EPa1TQWKh1PmWFot3Gkpump
+  - 8LRXPgAdhFktQzXjRVWgqWBWnMZTexjxsMrtQTQ6pump
+
+source_batches:
+- batch_id: T21-R1
+  source_observation_id: T21-DSRPC-T1-808b5f9b79b41b8b8478
+  source_content_sha256: 808b5f9b79b41b8b847821bfd4d1f720a57147a2d637c0f46934d231d1fbd8dc
+  observed_at: '2026-07-30T16:28:59.084Z'
+- batch_id: T21-R2
+  source_observation_id: T21-R2-SOURCE-8b4ef3fefa34efd6d56e
+  source_content_sha256: 9d0ed987289b32a899fe08bfcddecc952ed80ef69c338429a79de8e16a315a9f
+  observed_at: '2026-08-01T11:46:58.123523Z'
+- batch_id: T21-R3
+  source_observation_id: T21-R3-SOURCE-572abd0dbe29acf14247
+  source_content_sha256: 806447ca11d6ded349e19e4caa777dfbcac8d376bab1be2f7954c58609e74e82
+  observed_at: '2026-08-01T13:40:15.363386Z'
+
+panel_rules:
+  minimum_separation_seconds: 1801
+  member_total_span_seconds_max: 86400
+
+success_gate:
+  complete_new_members: 5
+  complete_panels: 15
+  complete_quote_pairs: 60
+  complete_quote_attempts: 120
+  independent_nomination_batches_total: 3
+  maximum_member_share_one_batch: 0.6
+  disposition: DATASET_READY_FOR_NARROW_CONDITIONAL_ANALYSIS_PENDING_A7
+  market_wide_claim: false
+  cross_regime_claim: false
+
+extension_usage:
+  provider_api_rpc_wss_calls: 124
+  source_requests: 4
+  jupiter_calls: 120
+  received_bytes: 249726
+  local_durable_bytes: 807082
+  local_file_count: 59
+
+whole_task_usage_at_stop:
+  external_requests: 184
+  source_requests: 8
+  quote_requests: 176
+  response_bytes: 335817
+
+recovery:
+  r3_p0_p1_remote_restore: PASS
+  r3_p2_included_in_that_restore: false
+  entire_final_dataset_included_in_that_restore: false
+  full_dataset_restore_before_a7: REQUIRED
+  dataset_frozen_now: false
+
+authority:
+  class: LOCAL_WRITE_ONLY
+  source: REPO_STANDING_AUTONOMY
+  gate_phrase: T21-A6S_R3_COMPLETE_FINAL_COHORT_REVIEW_AND_FREEZE_V1
+  managed_files:
+  - configs/task21_final_cohort_freeze_v1.yaml
+  - docs/contracts/task21_final_cohort_freeze_contract_v1.md
+  - src/solana_alpha_lab/task21_final_cohort_freeze.py
+  - tests/test_task21_final_cohort_freeze.py
+  - docs/evidence/task21/final_cohort_freeze_acceptance_v1.json
+  network_calls: 0
+  provider_api_rpc_wss_calls: 0
+  drive_reads: 0
+  drive_writes: 0
+  credential_use: 0
+  raw_or_dataset_writes: 0
+  provider_credits: 0
+  cash_spend_usd_cents: 0
+  commit: false
+  push: false
+  pull_request: false
+  merge: false
+  wallet_signer_transaction_actions: 0
+  destructive_actions: false
+
+next_boundary:
+  atom_id: T21-A7_DATASET_FREEZE_ACCEPTANCE_CATALOG_FACTORY_FIT_V1
+  status: NOT_AUTHORIZED
+  full_dataset_remote_readback_and_isolated_restore_required_first: true
+  product_vision_reconciliation_required: true
+  documentation_watch_binding_required: true
+  catalog_finalization_required: true
+  task22_authorized: false

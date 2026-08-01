@@ -63,6 +63,11 @@
       "target_asset_id": "TEST-T15-HYPOTHESIS-DRIVEN-ACQUISITION-ACCEPTANCE-001"
     },
     {
+      "source_asset_id": "ARCH-INTENT-T21-PRODUCT-VISION-001",
+      "relation": "derived_from",
+      "target_asset_id": "ARCH-INTENT-002"
+    },
+    {
       "source_asset_id": "ARCH-T20-HYPOTHESIS-DATA-COVERAGE-MATRIX-001",
       "relation": "depends_on",
       "target_asset_id": "CONFIG-T20-COLLECTION-SPEC-001"
@@ -96,6 +101,16 @@
       "source_asset_id": "BUNDLE-T18-CONTENT-ADDRESSED-RAW-BACKUP-001",
       "relation": "validated_by",
       "target_asset_id": "TEST-T18-BACKUP-RESTORE-001"
+    },
+    {
+      "source_asset_id": "BUNDLE-T21-FINAL-DATASET-001",
+      "relation": "derived_from",
+      "target_asset_id": "DATA-T21-FINAL-DATASET-FREEZE-MANIFEST-001"
+    },
+    {
+      "source_asset_id": "BUNDLE-T21-FINAL-DATASET-001",
+      "relation": "evidenced_by",
+      "target_asset_id": "EVIDENCE-T21-FINAL-DATASET-RECOVERY-001"
     },
     {
       "source_asset_id": "BUNDLE-TASK01-COMPLETION-001",
@@ -356,6 +371,36 @@
       "source_asset_id": "CONFIG-T20-RETENTION-RECOVERY-POLICY-001",
       "relation": "validated_by",
       "target_asset_id": "TEST-T20-COVERAGE-RETENTION-RECOVERY-001"
+    },
+    {
+      "source_asset_id": "CONFIG-T21-A7-ACCEPTANCE-001",
+      "relation": "depends_on",
+      "target_asset_id": "EVIDENCE-T21-FINAL-DATASET-RECOVERY-001"
+    },
+    {
+      "source_asset_id": "CONFIG-T21-FINAL-OWNER-PULSE-001",
+      "relation": "depends_on",
+      "target_asset_id": "EVIDENCE-T21-EFFECTIVE-SAMPLE-SUMMARY-001"
+    },
+    {
+      "source_asset_id": "CONFIG-T21-FINAL-OWNER-PULSE-001",
+      "relation": "depends_on",
+      "target_asset_id": "EVIDENCE-T21-FINAL-DATASET-RECOVERY-001"
+    },
+    {
+      "source_asset_id": "CONFIG-T21-FORWARD-COLLECTION-RUN-PLAN-001",
+      "relation": "governed_by",
+      "target_asset_id": "CONTRACT-T21-FORWARD-COLLECTION-RUN-PLAN-001"
+    },
+    {
+      "source_asset_id": "CONFIG-T21-OWNER-PULSE-READ-MODEL-001",
+      "relation": "depends_on",
+      "target_asset_id": "CONFIG-T21-FORWARD-COLLECTION-RUN-PLAN-001"
+    },
+    {
+      "source_asset_id": "CONFIG-T21-RUNTIME-RECOVERY-GATE-001",
+      "relation": "governed_by",
+      "target_asset_id": "CONTRACT-T21-FORWARD-COLLECTION-RUN-PLAN-001"
     },
     {
       "source_asset_id": "CONTRACT-T05-DATA-001",
@@ -783,6 +828,21 @@
       "target_asset_id": "TEST-T20-COVERAGE-RETENTION-RECOVERY-001"
     },
     {
+      "source_asset_id": "CONTRACT-T21-A7-ACCEPTANCE-001",
+      "relation": "derived_from",
+      "target_asset_id": "ARCH-INTENT-T21-PRODUCT-VISION-001"
+    },
+    {
+      "source_asset_id": "CONTRACT-T21-FORWARD-COLLECTION-RUN-PLAN-001",
+      "relation": "derived_from",
+      "target_asset_id": "ARCH-INTENT-002"
+    },
+    {
+      "source_asset_id": "CONTROL-T21-ACTIVE-TIME-GATE-001",
+      "relation": "governed_by",
+      "target_asset_id": "CONTRACT-T21-A7-ACCEPTANCE-001"
+    },
+    {
       "source_asset_id": "CTRL-AGENTS-001",
       "relation": "governed_by",
       "target_asset_id": "CTRL-TASK-04-001"
@@ -1151,6 +1211,11 @@
       "source_asset_id": "DATA-T17A-EXECUTION-CAPACITY-RAW-001",
       "relation": "validated_by",
       "target_asset_id": "TEST-T17A-EXECUTION-CAPACITY-AUDIT-001"
+    },
+    {
+      "source_asset_id": "DATA-T21-FINAL-DATASET-FREEZE-MANIFEST-001",
+      "relation": "derived_from",
+      "target_asset_id": "EVIDENCE-T21-FINAL-DATASET-RECOVERY-001"
     },
     {
       "source_asset_id": "DECISION-T14-PROVIDER-PURCHASE-001",
@@ -1678,6 +1743,36 @@
       "target_asset_id": "TEST-T20-ACCEPTANCE-CATALOG-FACTORY-FIT-001"
     },
     {
+      "source_asset_id": "EVIDENCE-T21-A7-ACCEPTANCE-001",
+      "relation": "derived_from",
+      "target_asset_id": "DATA-T21-FINAL-DATASET-FREEZE-MANIFEST-001"
+    },
+    {
+      "source_asset_id": "EVIDENCE-T21-A7-ACCEPTANCE-001",
+      "relation": "derived_from",
+      "target_asset_id": "EVIDENCE-T21-EFFECTIVE-SAMPLE-SUMMARY-001"
+    },
+    {
+      "source_asset_id": "EVIDENCE-T21-EFFECTIVE-SAMPLE-SUMMARY-001",
+      "relation": "derived_from",
+      "target_asset_id": "EVIDENCE-T21-FINAL-COHORT-FREEZE-001"
+    },
+    {
+      "source_asset_id": "EVIDENCE-T21-FINAL-COHORT-FREEZE-001",
+      "relation": "derived_from",
+      "target_asset_id": "CONFIG-T21-FORWARD-COLLECTION-RUN-PLAN-001"
+    },
+    {
+      "source_asset_id": "EVIDENCE-T21-FINAL-DATASET-RECOVERY-001",
+      "relation": "derived_from",
+      "target_asset_id": "EVIDENCE-T21-FINAL-COHORT-FREEZE-001"
+    },
+    {
+      "source_asset_id": "EVIDENCE-T21-FINAL-DATASET-RECOVERY-001",
+      "relation": "validated_by",
+      "target_asset_id": "MODULE-T21-RUNTIME-RECOVERY-001"
+    },
+    {
       "source_asset_id": "FIXTURE-BATON-SUITE-001",
       "relation": "governed_by",
       "target_asset_id": "CTRL-BATON-SETUP-001"
@@ -2168,6 +2263,11 @@
       "target_asset_id": "GENERATOR-CATALOG-NAVIGATION-001"
     },
     {
+      "source_asset_id": "GENERATED-T21-ARTIFACT-INDEX-001",
+      "relation": "governed_by",
+      "target_asset_id": "CONTRACT-T21-A7-ACCEPTANCE-001"
+    },
+    {
       "source_asset_id": "GENERATOR-CATALOG-NAVIGATION-001",
       "relation": "depends_on",
       "target_asset_id": "CATALOG-VALIDATOR-001"
@@ -2181,6 +2281,16 @@
       "source_asset_id": "GENERATOR-CATALOG-NAVIGATION-001",
       "relation": "produces",
       "target_asset_id": "GENERATED-PROJECT-MAP-001"
+    },
+    {
+      "source_asset_id": "HANDOFF-T21-TASK22-001",
+      "relation": "derived_from",
+      "target_asset_id": "DATA-T21-FINAL-DATASET-FREEZE-MANIFEST-001"
+    },
+    {
+      "source_asset_id": "HANDOFF-T21-TASK22-001",
+      "relation": "derived_from",
+      "target_asset_id": "EVIDENCE-T21-EFFECTIVE-SAMPLE-SUMMARY-001"
     },
     {
       "source_asset_id": "LEDGER-T05-MIGRATIONS-001",
@@ -2618,6 +2728,31 @@
       "target_asset_id": "TEST-T19-POINT-IN-TIME-REPLAY-001"
     },
     {
+      "source_asset_id": "MODULE-T21-A7-ACCEPTANCE-001",
+      "relation": "governed_by",
+      "target_asset_id": "CONTRACT-T21-A7-ACCEPTANCE-001"
+    },
+    {
+      "source_asset_id": "MODULE-T21-FINAL-OWNER-PULSE-001",
+      "relation": "governed_by",
+      "target_asset_id": "CONFIG-T21-FINAL-OWNER-PULSE-001"
+    },
+    {
+      "source_asset_id": "MODULE-T21-OWNER-PULSE-READ-MODEL-001",
+      "relation": "governed_by",
+      "target_asset_id": "CONFIG-T21-OWNER-PULSE-READ-MODEL-001"
+    },
+    {
+      "source_asset_id": "MODULE-T21-RUNTIME-RECOVERY-001",
+      "relation": "governed_by",
+      "target_asset_id": "CONFIG-T21-RUNTIME-RECOVERY-GATE-001"
+    },
+    {
+      "source_asset_id": "MODULE-T21-THIN-FORWARD-COLLECTOR-001",
+      "relation": "governed_by",
+      "target_asset_id": "CONTRACT-T21-FORWARD-COLLECTION-RUN-PLAN-001"
+    },
+    {
       "source_asset_id": "PRE-GIT-TASK01-A017",
       "relation": "derived_from",
       "target_asset_id": "BUNDLE-TASK01-COMPLETION-001"
@@ -2926,6 +3061,11 @@
       "source_asset_id": "REGISTRY-STRATEGIES-001",
       "relation": "depends_on",
       "target_asset_id": "CATALOG-SCHEMA-LIFECYCLE-001"
+    },
+    {
+      "source_asset_id": "ROADMAP-PATCH-T21-PRODUCT-VISION-001",
+      "relation": "advises",
+      "target_asset_id": "ARCH-INTENT-T21-PRODUCT-VISION-001"
     },
     {
       "source_asset_id": "SBOM-T04-CORE-STACK-001",
@@ -3531,6 +3671,26 @@
       "source_asset_id": "SCRIPT-T19-POINT-IN-TIME-REPLAY-001",
       "relation": "validated_by",
       "target_asset_id": "TEST-T19-POINT-IN-TIME-REPLAY-001"
+    },
+    {
+      "source_asset_id": "SCRIPT-T21-A7-ACCEPTANCE-001",
+      "relation": "depends_on",
+      "target_asset_id": "MODULE-T21-A7-ACCEPTANCE-001"
+    },
+    {
+      "source_asset_id": "SCRIPT-T21-FINAL-OWNER-PULSE-001",
+      "relation": "depends_on",
+      "target_asset_id": "MODULE-T21-FINAL-OWNER-PULSE-001"
+    },
+    {
+      "source_asset_id": "SCRIPT-T21-OFFLINE-COLLECTOR-001",
+      "relation": "depends_on",
+      "target_asset_id": "MODULE-T21-THIN-FORWARD-COLLECTOR-001"
+    },
+    {
+      "source_asset_id": "SCRIPT-T21-OWNER-PULSE-READ-MODEL-001",
+      "relation": "depends_on",
+      "target_asset_id": "MODULE-T21-OWNER-PULSE-READ-MODEL-001"
     },
     {
       "source_asset_id": "TEMPLATE-BATON-ISSUE-FORM-001",
@@ -4301,6 +4461,16 @@
       "source_asset_id": "TEST-T20-COVERAGE-RETENTION-RECOVERY-001",
       "relation": "depends_on",
       "target_asset_id": "CONTRACT-T20-COVERAGE-RETENTION-RECOVERY-001"
+    },
+    {
+      "source_asset_id": "TEST-T21-A7-ACCEPTANCE-001",
+      "relation": "depends_on",
+      "target_asset_id": "EVIDENCE-T21-A7-ACCEPTANCE-001"
+    },
+    {
+      "source_asset_id": "TEST-T21-FINAL-OWNER-PULSE-001",
+      "relation": "validated_by",
+      "target_asset_id": "SCRIPT-T21-FINAL-OWNER-PULSE-001"
     },
     {
       "source_asset_id": "VALIDATOR-REPOSITORY-STATE-001",

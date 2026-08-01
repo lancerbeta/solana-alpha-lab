@@ -206,12 +206,12 @@ records:
   evidence: []
   classification: *id004
 - asset_id: GENERATED-PROJECT-MAP-001
-  record_version: '1.35'
+  record_version: '1.36'
   asset_type: generated_view
   purpose: Deterministic human-readable navigation projected only from the Catalog.
   status: IMPLEMENTED_UNVERIFIED
   origin: REPOSITORY
-  as_of: '2026-07-30'
+  as_of: '2026-08-01'
   truth_owner: TASK-04
   location:
     kind: git_path
@@ -219,7 +219,7 @@ records:
     repository_path: docs/PROJECT_MAP.md
   integrity:
     kind: sha256
-    sha256: 74fb525513e59f5e9c74e2ef91515923e47a8a7b7377574af581eb7d405db295
+    sha256: fe3c8640959bfa1668f53b2f4653073271e607d56471a89addf5a1341c93b462
   access:
     mode: read_only
     method: file
@@ -250,12 +250,12 @@ records:
   evidence: []
   classification: *id004
 - asset_id: GENERATED-EDGE-PROJECTION-001
-  record_version: '1.26'
+  record_version: '1.27'
   asset_type: generated_view
   purpose: Deterministic machine-readable projection of Catalog asset relations.
   status: IMPLEMENTED_UNVERIFIED
   origin: REPOSITORY
-  as_of: '2026-07-30'
+  as_of: '2026-08-01'
   truth_owner: TASK-04
   location:
     kind: git_path
@@ -263,7 +263,7 @@ records:
     repository_path: catalog/generated/asset_edges.json
   integrity:
     kind: sha256
-    sha256: ba5febd37f5afaed7946725bc3be4be9a52450e0f455fe970783ef00774f10ea
+    sha256: 1eab8fe6199048f78c8d5911c4f564c71cc3495cc8dbe720b3eb010dd57b1cd1
   access:
     mode: read_only
     method: file

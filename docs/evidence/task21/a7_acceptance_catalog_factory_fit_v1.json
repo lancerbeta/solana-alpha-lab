@@ -1,0 +1,301 @@
+{
+  "actual_actions": {
+    "cash_spend_usd_cents": 0,
+    "collector_executions": 0,
+    "commit": false,
+    "credentials": 0,
+    "destructive_actions": false,
+    "drive_reads": 0,
+    "drive_writes": 0,
+    "local_write_only": true,
+    "merge": false,
+    "network_calls": 0,
+    "provider_api_rpc_wss_calls": 0,
+    "pull_request": false,
+    "push": false,
+    "raw_or_dataset_writes": 0,
+    "source_mutation": false,
+    "wallet_signer_transaction_actions": 0
+  },
+  "as_of": "2026-08-01",
+  "atom_id": "T21-A7_DATASET_FREEZE_ACCEPTANCE_CATALOG_FACTORY_FIT_V1",
+  "catalog": {
+    "asset_registries": 4,
+    "assets": 369,
+    "lifecycle_records": 52,
+    "lifecycle_registries": 9,
+    "planned_id_policy": "SUPERSEDED_BY_TASK21_ARTIFACT_INDEX_EXCEPT_REGISTERED_STABLE_ASSETS",
+    "queries": 8,
+    "registered_asset_ids": [
+      "CONTRACT-T21-FORWARD-COLLECTION-RUN-PLAN-001",
+      "CONFIG-T21-FORWARD-COLLECTION-RUN-PLAN-001",
+      "MODULE-T21-THIN-FORWARD-COLLECTOR-001",
+      "SCRIPT-T21-OFFLINE-COLLECTOR-001",
+      "CONFIG-T21-RUNTIME-RECOVERY-GATE-001",
+      "MODULE-T21-RUNTIME-RECOVERY-001",
+      "CONFIG-T21-OWNER-PULSE-READ-MODEL-001",
+      "MODULE-T21-OWNER-PULSE-READ-MODEL-001",
+      "SCRIPT-T21-OWNER-PULSE-READ-MODEL-001",
+      "CONTROL-T21-ACTIVE-TIME-GATE-001",
+      "EVIDENCE-T21-FINAL-COHORT-FREEZE-001",
+      "EVIDENCE-T21-FINAL-DATASET-RECOVERY-001",
+      "DATA-T21-FINAL-DATASET-FREEZE-MANIFEST-001",
+      "EVIDENCE-T21-EFFECTIVE-SAMPLE-SUMMARY-001",
+      "GENERATED-T21-ARTIFACT-INDEX-001",
+      "HANDOFF-T21-TASK22-001",
+      "ARCH-INTENT-T21-PRODUCT-VISION-001",
+      "ROADMAP-PATCH-T21-PRODUCT-VISION-001",
+      "CONFIG-T21-FINAL-OWNER-PULSE-001",
+      "MODULE-T21-FINAL-OWNER-PULSE-001",
+      "SCRIPT-T21-FINAL-OWNER-PULSE-001",
+      "TEST-T21-FINAL-OWNER-PULSE-001",
+      "CONFIG-T21-A7-ACCEPTANCE-001",
+      "CONTRACT-T21-A7-ACCEPTANCE-001",
+      "MODULE-T21-A7-ACCEPTANCE-001",
+      "SCRIPT-T21-A7-ACCEPTANCE-001",
+      "EVIDENCE-T21-A7-ACCEPTANCE-001",
+      "TEST-T21-A7-ACCEPTANCE-001",
+      "BUNDLE-T21-FINAL-DATASET-001"
+    ],
+    "schemas": 4,
+    "status": "REGISTERED_IN_TASK21_A7_CATALOG_TRANSACTION",
+    "version": "0.26.0"
+  },
+  "dataset": {
+    "file_count": 91,
+    "isolated_restore": "PASS",
+    "outcomes_opened": false,
+    "remote_archive_bytes": 1320744,
+    "remote_archive_sha256": "6d895f259f0316df442932b38abf44a963a79e16e24793a4eb1af2c5f6748361",
+    "remote_file_id": "1bv0ypgLdoYdrXODIUx5J4Lkj9Y-JsBLm",
+    "remote_readback": "PASS",
+    "root_count": 13,
+    "source_inventory_sha256": "aaa605eabdb62c38d218b40e768669db460c6fa419c4086d5412547b7f2fffae",
+    "stored_bytes": 1263895
+  },
+  "effective_sample": {
+    "complete_member_clusters": 2,
+    "complete_members": 5,
+    "content_distinct_nomination_batches": 3,
+    "eligible_claim": "DATASET_READY_FOR_NARROW_CONDITIONAL_ANALYSIS_WITH_LIMITATIONS",
+    "explicit_missing_panels": 3,
+    "incomplete_members": 3,
+    "maximum_complete_member_share_one_batch": 0.6,
+    "nominated_and_admitted_members": 8,
+    "observed_panels": 22,
+    "prohibited_claims": [
+      "MARKET_WIDE_REPRESENTATIVENESS",
+      "CROSS_REGIME_GENERALIZATION",
+      "STATISTICAL_POWER_SUFFICIENCY",
+      "ALPHA",
+      "EXECUTABLE_NET_RETURN"
+    ],
+    "quote_attempts": 176,
+    "quote_pairs": 88
+  },
+  "factory_fit": {
+    "checks": [
+      {
+        "check_id": "MISSION_AND_ESTIMAND",
+        "evidence": "The freeze serves a named split/holdout decision and claims no alpha.",
+        "status": "PASS"
+      },
+      {
+        "check_id": "FLEXIBILITY_AND_REUSE",
+        "evidence": "Provider-neutral manifests preserve members, batches, attempts and recovery identity.",
+        "status": "PASS"
+      },
+      {
+        "check_id": "COMPATIBILITY_AND_HISTORY",
+        "evidence": "Forward-only rebase and explicit H6 gap remain intact without rewriting prior receipts.",
+        "status": "PASS"
+      },
+      {
+        "check_id": "EFFICIENCY",
+        "evidence": "Collection stopped at the event-triggered sufficiency boundary; no calendar waiting or extra calls were added.",
+        "status": "PASS"
+      },
+      {
+        "check_id": "RESEARCH_TRUTH",
+        "evidence": "Outcomes remain unopened and TASK-22 must freeze a group-aware split before analysis.",
+        "status": "PASS"
+      },
+      {
+        "check_id": "OWNER_OPERABILITY_AND_UX",
+        "evidence": "Final Owner Pulse exposes dataset identity, limitations, recovery and exact next action.",
+        "status": "PASS"
+      },
+      {
+        "check_id": "EXECUTION_TO_CASHFLOW",
+        "evidence": "TASK-21 measures quote evidence and makes no fill, position, NetReturn or cashflow claim.",
+        "status": "NOT_APPLICABLE"
+      },
+      {
+        "check_id": "MONITORING_AND_RECOVERY",
+        "evidence": "The exact 91-file dataset has private byte read-back and isolated full restore proof.",
+        "status": "PASS"
+      },
+      {
+        "check_id": "BUILD_VERSUS_BUY",
+        "evidence": "Existing collector, recovery and Catalog machinery is wrapped; no platform or dependency was added.",
+        "status": "PASS"
+      },
+      {
+        "check_id": "SECURITY_AND_AUTHORITY",
+        "evidence": "A7 is local-only with zero provider, Drive, credential, cash, signer and transaction actions.",
+        "status": "PASS"
+      },
+      {
+        "check_id": "FAILURE_RED_TEAM",
+        "evidence": "Acceptance fails on hash drift, restore drift, outcome opening, batch leakage, backfill or claim expansion.",
+        "status": "PASS"
+      },
+      {
+        "check_id": "PRODUCT_HORIZON",
+        "evidence": "Documentation and production-lite cockpit gaps have durable triggers without implementation leakage.",
+        "status": "PASS"
+      },
+      {
+        "check_id": "CATALOG_ECONOMY",
+        "evidence": "One content-addressed index replaces atom-level registration bureaucracy while preserving every path/hash.",
+        "status": "PASS"
+      },
+      {
+        "check_id": "CONTRADICTION_SCAN",
+        "evidence": "Freeze, sample, recovery, handoff, product intent and next gate use one bounded claim.",
+        "status": "PASS"
+      },
+      {
+        "check_id": "MIGRATION_AND_ROLLBACK",
+        "evidence": "All changes are additive; prior evidence and external bytes remain immutable.",
+        "status": "PASS"
+      }
+    ],
+    "durable_followups": [
+      {
+        "destination": "ROADMAP_PATCH_AND_TASK21_FINISH_SOURCE_CANDIDATE",
+        "owner": "TASK-34A",
+        "trigger": "FIRST_UNATTENDED_RUNTIME_OR_SECOND_OPERATOR_OR_REPEATED_DOC_FRICTION"
+      },
+      {
+        "destination": "ROADMAP_PATCH_AND_TASK21_FINISH_SOURCE_CANDIDATE",
+        "owner": "TASK-35A",
+        "trigger": "STABLE_READ_CONTRACTS_BEFORE_TASK38_SHADOW_OBSERVATION"
+      },
+      {
+        "destination": "PRODUCT_VISION_ARCHITECTURE_INTENT",
+        "owner": "CROSS_HYPOTHESIS_REVIEW_WATCH",
+        "trigger": "MULTI_FAMILY_EVIDENCE_OR_SECOND_SYNTHESIS_OR_MEASURED_TRIAGE_DELAY"
+      }
+    ],
+    "mode": "FULL_REVIEW",
+    "verdict": "PASS_WITH_DURABLE_FOLLOWUPS"
+  },
+  "frozen_artifacts": [
+    {
+      "path": "configs/task21_dataset_freeze_acceptance_v1.yaml",
+      "sha256": "0fdeec071b75a10b5762a952888e5353637b678ada04df26720b8cd15d48ddb8"
+    },
+    {
+      "path": "docs/contracts/task21_dataset_freeze_acceptance_contract_v1.md",
+      "sha256": "d3679f074c17b9da95b956ae4ac8919ac1fb48fe1bb2683f60465a73b3c8a85b"
+    },
+    {
+      "path": "docs/evidence/task21/final_dataset_freeze_manifest_v1.json",
+      "sha256": "295d29354554247e08ddd39cd9f6b642e262869f22a0da9925227e6fab378a0f"
+    },
+    {
+      "path": "docs/evidence/task21/effective_sample_summary_v1.json",
+      "sha256": "63ddb790dcd54191ac342aa8add5889c8647d2cf09d91c4d9ca14c67ca8b51fb"
+    },
+    {
+      "path": "docs/evidence/task21/task21_artifact_index_v1.json",
+      "sha256": "811f6cc94d0994b31d9a5349eb37612ecd2554ecd96db30f716de15c9dce959d"
+    },
+    {
+      "path": "docs/handoffs/task21_to_task22_v1.md",
+      "sha256": "4c3863996cb91ae0600506fe1c8575795e6f6c2a725cfb4fa670fde2caf7bdeb"
+    },
+    {
+      "path": "docs/architecture/intents/ARCH-INTENT-003-product-owner-operating-topology.md",
+      "sha256": "6aa26738a363cd8ccbc93d722082c3a551a88b5a1c6d20e2614585f5f6debdf3"
+    },
+    {
+      "path": "docs/roadmap_patches/task21_product_vision_followups_v1.md",
+      "sha256": "925b6398056b81c7baa71b5a7217dd50aaf2408a4bf199aac55cdd52302542a5"
+    },
+    {
+      "path": "configs/task21_final_owner_pulse_v1.yaml",
+      "sha256": "051e5974b147699e509d03303e59853b5b21b16840e67401b90cf1489cba155d"
+    },
+    {
+      "path": "src/solana_alpha_lab/task21_final_owner_pulse.py",
+      "sha256": "dfba7ef16ba698e55d88cc984fc30c35e5644482a12480a1db72136571f737fe"
+    },
+    {
+      "path": "scripts/show_task21_final_owner_pulse.py",
+      "sha256": "6ce80ede9d761280a9a8b7d8fa17def7f823216aac1639a0d2a3956b0832adee"
+    }
+  ],
+  "next_boundary": {
+    "atom_id": "T21-A8_REPOSITORY_DELIVERY_V1",
+    "status": "NOT_AUTHORIZED",
+    "task22_status": "ELIGIBLE_AFTER_A8_AND_TASK21_FINISH_GATE_WITH_SEPARATE_ENTRY_GATE"
+  },
+  "non_claims": [
+    "NOT_MARKET_WIDE_REPRESENTATIVENESS",
+    "NOT_CROSS_REGIME_GENERALIZATION",
+    "NOT_STATISTICAL_POWER_SUFFICIENCY",
+    "NOT_ALPHA",
+    "NOT_EXECUTABLE_NET_RETURN",
+    "NOT_STRATEGY_OR_POSITION",
+    "NOT_PRODUCTION_READINESS",
+    "NOT_TASK22_STARTED",
+    "NOT_TASK21_DONE",
+    "NOT_PROJECT_SOURCE_ACTIVATED"
+  ],
+  "owner_verdict": "DATASET_READY_FOR_NARROW_CONDITIONAL_ANALYSIS_WITH_LIMITATIONS",
+  "product_vision_reconciliation": {
+    "activation_state": "LOCAL_CANONICAL_CANDIDATE_PENDING_PROJECT_SOURCE_REPLACEMENT",
+    "architecture_intent": "docs/architecture/intents/ARCH-INTENT-003-product-owner-operating-topology.md",
+    "gate_id": "SMIAL-PRODUCT-VISION-RECONCILIATION-2026-07-31",
+    "roadmap_patch": "docs/roadmap_patches/task21_product_vision_followups_v1.md",
+    "terminal_result": "CANONICALIZED_WITH_PATCH"
+  },
+  "schema": "smial.task21.a7-acceptance-catalog-factory-fit",
+  "schema_version": "1.0",
+  "state_change": "LOCAL_FILES_AND_CATALOG_ONLY",
+  "status": "PASS",
+  "task_id": "TASK-21",
+  "usage": {
+    "billed_provider_credit_claim": "NOT_AVAILABLE_KEYLESS_NO_ACCOUNT",
+    "cash_spend_usd_cents": 0,
+    "collection_external_requests": 184,
+    "collection_external_requests_cap": 192,
+    "credential_or_permission_changes": 0,
+    "drive_deletions": 0,
+    "drive_file_creations": 5,
+    "drive_folder_creations": 1,
+    "drive_reads": 34,
+    "drive_updates": 0,
+    "drive_writes": 6,
+    "live_shakedown_requests_separate_authority": 8,
+    "modeled_quote_credits": 184,
+    "quote_requests": 176,
+    "received_bytes_total": 348741,
+    "sharing_changes": 0,
+    "source_requests": 8,
+    "task21_provider_api_rpc_wss_calls_total": 192,
+    "wallet_signer_transaction_actions": 0
+  },
+  "validation": {
+    "a7_targeted_suite": "PASS_10_OF_10",
+    "catalog_validation": "PASS_0_26_0_369_ASSETS",
+    "diff_check": "PASS",
+    "full_repository_unit_suite": "PASS_1431_OF_1431",
+    "generated_navigation": "PASS",
+    "repository_state_validator": "DEFERRED_TO_A8_EXACT_STAGED_OR_CI_CHECKPOINT_CURRENT_DIRTY_TASK_BRANCH_IS_OUTSIDE_ACCEPTED_TOPOLOGY",
+    "secret_scan": "PASS",
+    "task21_combined_suite": "PASS_297_OF_297"
+  }
+}

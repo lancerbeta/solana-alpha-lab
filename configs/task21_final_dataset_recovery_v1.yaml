@@ -1,0 +1,123 @@
+schema: smial.task21_final_dataset_recovery
+schema_version: '1.0'
+recovery_id: T21-FINAL-DATASET-RECOVERY-001
+recovery_version: '1.0'
+task_id: TASK-21
+atom_id: T21-A7R_FINAL_DATASET_RECOVERY_PROOF_V1
+status: FROZEN_EXECUTION_PLAN
+as_of: '2026-08-01'
+contains_secrets: false
+
+protected_inputs:
+- role: BOUNDED_CHECKPOINT_PLAN
+  path: configs/task21_bounded_panel_checkpoint_v1.yaml
+  sha256: 556293fa037e082754774e900195103e6ddef2b2e4234f5ad226ec053003396a
+- role: BOUNDED_CHECKPOINT_ACCEPTANCE
+  path: docs/evidence/task21/bounded_panel_checkpoint_acceptance_v1.json
+  sha256: b83febcbabca6f5b16fa2f68d788e0852ecce63b609c95ef8134ddfd216d761b
+- role: BOUNDED_CHECKPOINT_REMOTE_RECOVERY
+  path: docs/evidence/task21/checkpoint_remote_recovery_acceptance_v1.json
+  sha256: f268aad8577175c694ca3d0d65f985c8fcdfaa2aaf38c9acb3b2ce4336c746fb
+- role: FINAL_COHORT_FREEZE_PLAN
+  path: configs/task21_final_cohort_freeze_v1.yaml
+  sha256: d644c3432241a8ebbe74373038cfe0c15b87872e7afc6e96b6fade49e82d6fde
+- role: FINAL_COHORT_FREEZE_ACCEPTANCE
+  path: docs/evidence/task21/final_cohort_freeze_acceptance_v1.json
+  sha256: 1327bb63c454885ade548d327d0f87fd2722d733bb9a493112ade5250f9cc36e
+- role: RECOVERY_MODULE
+  path: src/solana_alpha_lab/task21_forward_recovery.py
+  sha256: ce29d4db551e7c54ccf0568b3a448e47eb55a51ba9e85fa2abac6f0522e832b0
+- role: RETENTION_RECOVERY_POLICY
+  path: configs/task20_retention_recovery_policy_v1.yaml
+  sha256: 3810a5674f2479e460c7b3883a58c0cf5d22f7902c0cfc8606aaeb990f95914f
+
+components:
+- component_id: T21-BOUNDED-CHECKPOINT
+  expected_file_count: 32
+  expected_stored_bytes: 456813
+  expected_inventory_sha256: 64033b77e4fc8b797600a7083a6681db88a7a21b5950541785dd13c7767e968c
+  source_roots:
+  - local/task21_collector/live_shakedown/task21_live_shakedown_v1
+  - local/task21_forward/t1_nomination
+  - local/task21_forward/t1_replay
+  - local/task21_forward/h0_capture
+  - local/task21_forward/h1_capture
+  - local/task21_forward/h6_capture
+  - local/task21_forward/h24_capture
+- component_id: T21-FINAL-COHORT-EXTENSION
+  expected_file_count: 59
+  expected_stored_bytes: 807082
+  expected_inventory_sha256: 49ecbd1a44805f06a4e47aad7646f854b3a009c79670037028a5a85db487a850
+  source_roots:
+  - local/task21_forward/final_cohort/r2/run=r2-20260801T114657421057Z-7882ff946449
+  - local/task21_forward/final_cohort/r2/p1/run=p1-20260801T122606020085Z-c66cbd9193f1
+  - local/task21_forward/final_cohort/r2/p2/run=p2-20260801T131100955007Z-1e6e05144f30
+  - local/task21_forward/final_cohort/r3/run=r3-20260801T134014806103Z-ac917cf4f972
+  - local/task21_forward/final_cohort/r3/p1/run=p1-20260801T142017719450Z-8bb3c0961780
+  - local/task21_forward/final_cohort/r3/p2/run=p2-20260801T145207273594Z-879d05d421ca
+
+full_dataset_identity:
+  root_count: 13
+  file_count: 91
+  stored_bytes: 1263895
+  source_inventory_sha256: aaa605eabdb62c38d218b40e768669db460c6fa419c4086d5412547b7f2fffae
+  outcome_values_read: false
+  source_mutation_allowed: false
+  source_deletion_allowed: false
+
+local_recovery:
+  package_root: local/task21_recovery/final_dataset/package
+  local_restore_root: local/task21_recovery/final_dataset/local_restore
+  remote_restore_root: local/task21_recovery/final_dataset/remote_restore
+  archive_prefix: TASK21_FINAL_DATASET_RECOVERY_v1
+  create_only: true
+  overwrite_allowed: false
+
+google_drive:
+  connected_account: bakuczmarianna566@gmail.com
+  parent_folder_id: 1EISgmsB8nt2pkU4uBUO6Sav1Fzbo6Hw3
+  parent_folder_url: https://drive.google.com/drive/folders/1EISgmsB8nt2pkU4uBUO6Sav1Fzbo6Hw3
+  pre_create_exact_name_absence_required: true
+  upload_mode: CREATE_NEW_FILE_ONLY
+  raw_byte_readback_required: true
+  metadata_parent_readback_required: true
+  sharing_change_allowed: false
+
+authority:
+  class: LOCAL_WRITE_PLUS_GOOGLE_DRIVE_WRITE
+  source: EXPLICIT_USER
+  gate_phrase: T21-A7R_FINAL_DATASET_RECOVERY_PROOF_V1
+  managed_files:
+  - configs/task21_final_dataset_recovery_v1.yaml
+  - docs/contracts/task21_final_dataset_recovery_contract_v1.md
+  - scripts/prepare_task21_final_dataset_recovery.py
+  - tests/test_task21_final_dataset_recovery.py
+  - docs/evidence/task21/final_dataset_recovery_acceptance_v1.json
+  local_package_and_restore_writes: true
+  drive_reads_max: 8
+  drive_writes_max: 1
+  drive_file_creations_max: 1
+  drive_updates: 0
+  drive_deletions: 0
+  sharing_changes: 0
+  provider_api_rpc_wss_calls: 0
+  provider_credits: 0
+  cash_spend_usd_cents: 0
+  credential_or_permission_changes: 0
+  candidate_admissions: 0
+  collector_executions: 0
+  catalog_mutation: false
+  source_mutation: false
+  commit: false
+  push: false
+  pull_request: false
+  merge: false
+  wallet_signer_transaction_actions: 0
+  destructive_actions: false
+
+next_boundary:
+  atom_id: T21-A7_DATASET_FREEZE_ACCEPTANCE_CATALOG_FACTORY_FIT_V1
+  status: NOT_AUTHORIZED
+  catalog_finalization_authorized: false
+  source_reconciliation_authorized: false
+  task22_authorized: false

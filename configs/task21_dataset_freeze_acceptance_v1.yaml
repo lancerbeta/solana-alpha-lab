@@ -1,0 +1,182 @@
+schema: smial.task21_dataset_freeze_acceptance
+schema_version: '1.0'
+acceptance_id: T21-DATASET-FREEZE-ACCEPTANCE-001
+acceptance_version: '1.0'
+task_id: TASK-21
+atom_id: T21-A7_DATASET_FREEZE_ACCEPTANCE_CATALOG_FACTORY_FIT_V1
+status: FROZEN_LOCAL_ACCEPTANCE_PLAN
+as_of: '2026-08-01'
+contains_secrets: false
+
+source_binding:
+  activation_receipt: ACTIVATION_CONFIRMED_USER_SMOKE
+  source_count: 7
+  canonical_manifest:
+    semantic_version: '3.8'
+    sha256: 41bf4dfc281920f1a7463345a0ce163d2f217fb0bfe866f3945a4dd8e1dcef2e
+  operating_system:
+    semantic_version: '8.5'
+    sha256: 187aa5d1405c55868d7147a7cdf9e0605a9a51f613ab5597ae44682fcbc67c84
+  roadmap:
+    semantic_version: '3.8'
+    sha256: f1268e3b482bfc33289d1a56446010565cb7df2da2d2ef481a675bc4db78b968
+  current_system_state:
+    semantic_version: '3.4'
+    sha256: 7e236a93c7e0f666b8653d8cdd2b9613eb03be3d7c099200d34db2a7405f1171
+  latest_archive:
+    semantic_version: '27.0'
+    sha256: ad637db8d9e4fa2044921aa2e7d28556721c30a141ca5732ff99596ad8aa7b30
+  active_task:
+    semantic_version: '1.0'
+    sha256: eb4e755c4a213370af241abbb9d7cc131430f73ff31b0926115175dc49ef15a6
+  synthesis_blueprint:
+    semantic_version: '2.3'
+    sha256: ec756d5be0196dd8207ac08512af5e3a9a5032eb5b0b40e3f8fcca2beb170ba1
+
+frozen_inputs:
+- role: INFORMATION_SUFFICIENCY_REBASE
+  path: configs/task21_information_sufficiency_rebase_v1.yaml
+  sha256: 62fcbc91c30c7ac4a22fab422711272f66b44b116c33a9c3aa3b0884e854ab70
+- role: INFORMATION_SUFFICIENCY_ACCEPTANCE
+  path: docs/evidence/task21/information_sufficiency_rebase_acceptance_v1.json
+  sha256: 0c7da799509797aa453877a352add93832b1e7e7a8dee747e0a09b41e475db6c
+- role: FINAL_COHORT_FREEZE_PLAN
+  path: configs/task21_final_cohort_freeze_v1.yaml
+  sha256: d644c3432241a8ebbe74373038cfe0c15b87872e7afc6e96b6fade49e82d6fde
+- role: FINAL_COHORT_FREEZE_ACCEPTANCE
+  path: docs/evidence/task21/final_cohort_freeze_acceptance_v1.json
+  sha256: 1327bb63c454885ade548d327d0f87fd2722d733bb9a493112ade5250f9cc36e
+- role: FINAL_DATASET_RECOVERY_PLAN
+  path: configs/task21_final_dataset_recovery_v1.yaml
+  sha256: 4c0244d2ee9198ec28e8d7727b46b3ac19e46ab4c9d09a0643c5f3a7dd0f7b9e
+- role: FINAL_DATASET_RECOVERY_ACCEPTANCE
+  path: docs/evidence/task21/final_dataset_recovery_acceptance_v1.json
+  sha256: ed34be8deb7f64a93e750ce7e5ff131582e68ae4188d75af2accc4f75c4db4b9
+- role: FORWARD_COLLECTION_RUN_PLAN
+  path: configs/task21_forward_collection_run_plan_v1.yaml
+  sha256: 0f6bc1a748d80aaa8aeaed53551687304f467ccf9622b598d591f78317f419f5
+
+accepted_dataset_identity:
+  root_count: 13
+  file_count: 91
+  stored_bytes: 1263895
+  source_inventory_sha256: aaa605eabdb62c38d218b40e768669db460c6fa419c4086d5412547b7f2fffae
+  remote_archive_sha256: 6d895f259f0316df442932b38abf44a963a79e16e24793a4eb1af2c5f6748361
+  remote_archive_bytes: 1320744
+  remote_file_id: 1bv0ypgLdoYdrXODIUx5J4Lkj9Y-JsBLm
+  remote_readback: PASS
+  isolated_restore: PASS
+  outcomes_opened: false
+
+effective_sample:
+  nominated_and_admitted_members: 8
+  complete_members: 5
+  incomplete_members: 3
+  content_distinct_nomination_batches: 3
+  complete_member_clusters: 2
+  observed_panels: 22
+  quote_pairs: 88
+  quote_attempts: 176
+  explicit_missing_panels: 3
+  maximum_complete_member_share_one_batch: 0.6
+  eligible_claim: DATASET_READY_FOR_NARROW_CONDITIONAL_ANALYSIS_WITH_LIMITATIONS
+  prohibited_claims:
+  - MARKET_WIDE_REPRESENTATIVENESS
+  - CROSS_REGIME_GENERALIZATION
+  - STATISTICAL_POWER_SUFFICIENCY
+  - ALPHA
+  - EXECUTABLE_NET_RETURN
+
+task_usage_reconciliation:
+  collection_external_requests: 184
+  collection_external_requests_cap: 192
+  source_requests: 8
+  quote_requests: 176
+  live_shakedown_requests_separate_authority: 8
+  task21_provider_api_rpc_wss_calls_total: 192
+  modeled_quote_credits: 184
+  billed_provider_credit_claim: NOT_AVAILABLE_KEYLESS_NO_ACCOUNT
+  received_bytes_total: 348741
+  drive_reads: 34
+  drive_writes: 6
+  drive_folder_creations: 1
+  drive_file_creations: 5
+  drive_updates: 0
+  drive_deletions: 0
+  sharing_changes: 0
+  cash_spend_usd_cents: 0
+  credential_or_permission_changes: 0
+  wallet_signer_transaction_actions: 0
+
+catalog_transaction:
+  base_version: 0.25.0
+  target_version: 0.26.0
+  base_assets: 340
+  target_assets: 369
+  asset_registries: 4
+  schemas: 4
+  queries: 8
+  lifecycle_registries: 9
+  lifecycle_records: 52
+  planned_id_policy: SUPERSEDED_BY_TASK21_ARTIFACT_INDEX_EXCEPT_REGISTERED_STABLE_ASSETS
+  registered_asset_ids:
+  - CONTRACT-T21-FORWARD-COLLECTION-RUN-PLAN-001
+  - CONFIG-T21-FORWARD-COLLECTION-RUN-PLAN-001
+  - MODULE-T21-THIN-FORWARD-COLLECTOR-001
+  - SCRIPT-T21-OFFLINE-COLLECTOR-001
+  - CONFIG-T21-RUNTIME-RECOVERY-GATE-001
+  - MODULE-T21-RUNTIME-RECOVERY-001
+  - CONFIG-T21-OWNER-PULSE-READ-MODEL-001
+  - MODULE-T21-OWNER-PULSE-READ-MODEL-001
+  - SCRIPT-T21-OWNER-PULSE-READ-MODEL-001
+  - CONTROL-T21-ACTIVE-TIME-GATE-001
+  - EVIDENCE-T21-FINAL-COHORT-FREEZE-001
+  - EVIDENCE-T21-FINAL-DATASET-RECOVERY-001
+  - DATA-T21-FINAL-DATASET-FREEZE-MANIFEST-001
+  - EVIDENCE-T21-EFFECTIVE-SAMPLE-SUMMARY-001
+  - GENERATED-T21-ARTIFACT-INDEX-001
+  - HANDOFF-T21-TASK22-001
+  - ARCH-INTENT-T21-PRODUCT-VISION-001
+  - ROADMAP-PATCH-T21-PRODUCT-VISION-001
+  - CONFIG-T21-FINAL-OWNER-PULSE-001
+  - MODULE-T21-FINAL-OWNER-PULSE-001
+  - SCRIPT-T21-FINAL-OWNER-PULSE-001
+  - TEST-T21-FINAL-OWNER-PULSE-001
+  - CONFIG-T21-A7-ACCEPTANCE-001
+  - CONTRACT-T21-A7-ACCEPTANCE-001
+  - MODULE-T21-A7-ACCEPTANCE-001
+  - SCRIPT-T21-A7-ACCEPTANCE-001
+  - EVIDENCE-T21-A7-ACCEPTANCE-001
+  - TEST-T21-A7-ACCEPTANCE-001
+  - BUNDLE-T21-FINAL-DATASET-001
+
+product_vision_reconciliation:
+  gate_id: SMIAL-PRODUCT-VISION-RECONCILIATION-2026-07-31
+  terminal_result: CANONICALIZED_WITH_PATCH
+  activation_state: LOCAL_CANONICAL_CANDIDATE_PENDING_PROJECT_SOURCE_REPLACEMENT
+  architecture_intent: docs/architecture/intents/ARCH-INTENT-003-product-owner-operating-topology.md
+  roadmap_patch: docs/roadmap_patches/task21_product_vision_followups_v1.md
+
+authority:
+  class: LOCAL_WRITE_ONLY
+  source: EXPLICIT_USER
+  gate_phrase: T21-A7_DATASET_FREEZE_ACCEPTANCE_CATALOG_FACTORY_FIT_V1
+  provider_api_rpc_wss_calls: 0
+  drive_reads: 0
+  drive_writes: 0
+  cash_spend_usd_cents: 0
+  credentials: 0
+  wallet_signer_transaction_actions: 0
+  collector_executions: 0
+  raw_or_dataset_writes: 0
+  source_mutation: false
+  commit: false
+  push: false
+  pull_request: false
+  merge: false
+  destructive_actions: false
+
+next_boundary:
+  atom_id: T21-A8_REPOSITORY_DELIVERY_V1
+  status: NOT_AUTHORIZED
+  task22_status: ELIGIBLE_FOR_SEPARATE_ENTRY_GATE_AFTER_A8_AND_TASK21_FINISH_GATE
