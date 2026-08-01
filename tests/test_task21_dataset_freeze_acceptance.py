@@ -182,11 +182,11 @@ class Task21DatasetFreezeAcceptanceTests(unittest.TestCase):
         manifest, records = load_catalog()
         expected_ids = set(self.plan["catalog_transaction"]["registered_asset_ids"])
         self.assertEqual(len(expected_ids), 29)
-        self.assertEqual(manifest["catalog_version"], "0.26.0")
+        self.assertEqual(manifest["catalog_version"], "0.26.1")
         self.assertEqual(
             manifest["current_checkpoint"],
             {
-                "assets": 369,
+                "assets": 374,
                 "asset_registries": 4,
                 "schemas": 4,
                 "queries": 8,
@@ -194,7 +194,7 @@ class Task21DatasetFreezeAcceptanceTests(unittest.TestCase):
                 "lifecycle_records": 52,
             },
         )
-        self.assertEqual(len(records), 369)
+        self.assertEqual(len(records), 374)
         self.assertTrue(expected_ids.issubset(records))
         for asset_id in expected_ids:
             record = records[asset_id]
@@ -208,10 +208,13 @@ class Task21DatasetFreezeAcceptanceTests(unittest.TestCase):
     def test_resume_route_next_boundary_and_hygiene_fail_closed(self) -> None:
         marker = load_json(ROOT / "control/active_time_gates.json")
         router = marker["resume_router"]
-        self.assertEqual(router["status"], "A7_ACCEPTED_PENDING_REPOSITORY_DELIVERY")
+        self.assertEqual(
+            router["status"],
+            "A8_MERGED_PENDING_TASK21_FINISH_SOURCE_ACTIVATION",
+        )
         self.assertEqual(
             router["read_only_command"][-2:],
-            ["scripts/show_task21_final_owner_pulse.py", "--json"],
+            ["scripts/show_t21_finish_gate.py", "--json"],
         )
         resolution = router["a7_resolution"]
         self.assertEqual(resolution["status"], "PASS_LOCAL_CANDIDATE")

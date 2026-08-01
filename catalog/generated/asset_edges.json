@@ -388,6 +388,11 @@
       "target_asset_id": "EVIDENCE-T21-FINAL-DATASET-RECOVERY-001"
     },
     {
+      "source_asset_id": "CONFIG-T21-FINISH-GATE-001",
+      "relation": "derived_from",
+      "target_asset_id": "EVIDENCE-T21-A7-ACCEPTANCE-001"
+    },
+    {
       "source_asset_id": "CONFIG-T21-FORWARD-COLLECTION-RUN-PLAN-001",
       "relation": "governed_by",
       "target_asset_id": "CONTRACT-T21-FORWARD-COLLECTION-RUN-PLAN-001"
@@ -1773,6 +1778,16 @@
       "target_asset_id": "MODULE-T21-RUNTIME-RECOVERY-001"
     },
     {
+      "source_asset_id": "EVIDENCE-T21-FINISH-GATE-001",
+      "relation": "derived_from",
+      "target_asset_id": "EVIDENCE-T21-A7-ACCEPTANCE-001"
+    },
+    {
+      "source_asset_id": "EVIDENCE-T21-FINISH-GATE-001",
+      "relation": "validated_by",
+      "target_asset_id": "TEST-T21-FINISH-GATE-001"
+    },
+    {
       "source_asset_id": "FIXTURE-BATON-SUITE-001",
       "relation": "governed_by",
       "target_asset_id": "CTRL-BATON-SETUP-001"
@@ -2738,6 +2753,16 @@
       "target_asset_id": "CONFIG-T21-FINAL-OWNER-PULSE-001"
     },
     {
+      "source_asset_id": "MODULE-T21-FINISH-GATE-001",
+      "relation": "derived_from",
+      "target_asset_id": "MODULE-T21-FINAL-OWNER-PULSE-001"
+    },
+    {
+      "source_asset_id": "MODULE-T21-FINISH-GATE-001",
+      "relation": "governed_by",
+      "target_asset_id": "CONFIG-T21-FINISH-GATE-001"
+    },
+    {
       "source_asset_id": "MODULE-T21-OWNER-PULSE-READ-MODEL-001",
       "relation": "governed_by",
       "target_asset_id": "CONFIG-T21-OWNER-PULSE-READ-MODEL-001"
@@ -3683,6 +3708,11 @@
       "target_asset_id": "MODULE-T21-FINAL-OWNER-PULSE-001"
     },
     {
+      "source_asset_id": "SCRIPT-T21-FINISH-GATE-001",
+      "relation": "depends_on",
+      "target_asset_id": "MODULE-T21-FINISH-GATE-001"
+    },
+    {
       "source_asset_id": "SCRIPT-T21-OFFLINE-COLLECTOR-001",
       "relation": "depends_on",
       "target_asset_id": "MODULE-T21-THIN-FORWARD-COLLECTOR-001"
@@ -4471,6 +4501,16 @@
       "source_asset_id": "TEST-T21-FINAL-OWNER-PULSE-001",
       "relation": "validated_by",
       "target_asset_id": "SCRIPT-T21-FINAL-OWNER-PULSE-001"
+    },
+    {
+      "source_asset_id": "TEST-T21-FINISH-GATE-001",
+      "relation": "depends_on",
+      "target_asset_id": "EVIDENCE-T21-FINISH-GATE-001"
+    },
+    {
+      "source_asset_id": "TEST-T21-FINISH-GATE-001",
+      "relation": "depends_on",
+      "target_asset_id": "SCRIPT-T21-FINISH-GATE-001"
     },
     {
       "source_asset_id": "VALIDATOR-REPOSITORY-STATE-001",

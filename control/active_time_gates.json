@@ -1,14 +1,14 @@
 {
   "schema": "smial.active-time-gates",
   "schema_version": "1.0",
-  "as_of": "2026-08-01T16:51:09.862800Z",
+  "as_of": "2026-08-01T18:13:07.833538Z",
   "contains_secrets": false,
   "resume_router": {
     "router_id": "TASK21-DURABLE-RESUME-ROUTER-001",
     "router_version": "1.0",
     "task_id": "TASK-21",
-    "status": "A7_ACCEPTED_PENDING_REPOSITORY_DELIVERY",
-    "entry_rule": "READ_MARKER_THEN_RUN_FINAL_OWNER_PULSE_BEFORE_TASK21_CONTINUATION",
+    "status": "A8_MERGED_PENDING_TASK21_FINISH_SOURCE_ACTIVATION",
+    "entry_rule": "READ_MARKER_THEN_RUN_FINISH_GATE_PULSE_BEFORE_TASK21_OR_TASK22_CONTINUATION",
     "read_only_command": [
       "uv",
       "run",
@@ -16,43 +16,45 @@
       "--managed-python",
       "python",
       "-B",
-      "scripts/show_task21_final_owner_pulse.py",
+      "scripts/show_t21_finish_gate.py",
       "--json"
     ],
     "required_sequence": [
       "READ_REPOSITORY_AGENTS",
       "READ_ACTIVE_TIME_GATE_MARKER",
-      "RUN_OWNER_PULSE_READ_ONLY",
+      "RUN_FINISH_GATE_PULSE_READ_ONLY",
       "CONFIRM_A7_ACCEPTANCE_AND_FINAL_RECOVERY_IDENTITY",
-      "ROUTE_TO_T21_A8_ONLY_AFTER_EXPLICIT_AUTHORITY",
-      "DO_NOT_START_TASK22_BEFORE_A8_AND_TASK21_FINISH_GATE"
+      "CONFIRM_PR28_A8_MERGE_TREE_AND_MAIN_CI",
+      "COMPLETE_TASK21_FINISH_SOURCE_ACTIVATION_AND_USER_SMOKE",
+      "DO_NOT_START_TASK22_BEFORE_TASK21_DONE_CONFIRMED"
     ],
     "due_gate_precedence": "AT_OR_AFTER_EARLIEST_AT_ROUTE_REQUIRED_NEXT_ATOM_BEFORE_NEW_MUTATION",
     "active_gate_id": null,
     "fallback_read_set": [
       "control/active_time_gates.json",
-      "configs/task21_final_owner_pulse_v1.yaml",
+      "configs/t21_finish_gate_read_model_v1.yaml",
       "docs/evidence/task21/a7_acceptance_catalog_factory_fit_v1.json",
-      "scripts/show_task21_final_owner_pulse.py"
+      "docs/evidence/finish_gates/task21_finish_gate_reconciliation_v1.json",
+      "scripts/show_t21_finish_gate.py"
     ],
     "binding": {
       "config": {
-          "path": "configs/task21_final_owner_pulse_v1.yaml",
-          "sha256": "051e5974b147699e509d03303e59853b5b21b16840e67401b90cf1489cba155d"
+          "path": "configs/t21_finish_gate_read_model_v1.yaml",
+          "sha256": "d7ebb3ab547717f6fc33fcd6b2249ec43db2dc0ba9facc40d133f3150a7efbdf"
       },
       "contract": {
           "path": "docs/contracts/task21_dataset_freeze_acceptance_contract_v1.md",
           "sha256": "d3679f074c17b9da95b956ae4ac8919ac1fb48fe1bb2683f60465a73b3c8a85b"
       },
       "owner_pulse_entrypoint": {
-          "path": "scripts/show_task21_final_owner_pulse.py",
-          "sha256": "6ce80ede9d761280a9a8b7d8fa17def7f823216aac1639a0d2a3956b0832adee"
+          "path": "scripts/show_t21_finish_gate.py",
+          "sha256": "cb366b025e690a8c8fe3a2b998e7267aaba577e8ce471bb299541dbf27dadd7a"
       },
       "marker_hash_policy": "DYNAMIC_SEMANTIC"
     },
     "transport_visibility": {
       "same_checkout": "IMMEDIATE",
-      "fresh_clone": "REQUIRES_FUTURE_COMMIT_AND_TRANSPORT",
+      "fresh_clone": "REQUIRES_ACCEPTED_MAIN_CONTAINING_FINISH_REPAIR_COMMIT",
       "commit_authorized_by_router": false
     },
     "authority_granted_by_router": {
@@ -94,6 +96,23 @@
       "next_atom": "T21-A8_REPOSITORY_DELIVERY_V1",
       "next_atom_authorized": false,
       "task22_started": false
+    },
+    "a8_resolution": {
+      "status": "MERGED_MAIN_CI_PASS",
+      "resolved_at": "2026-08-01T18:02:15Z",
+      "pull_request": 28,
+      "feature_head": "7158d6ba51cdb24e9177902c75c7d302f4b69bc3",
+      "merge_commit": "6ff5392436477b0a780f80427f86b43dd0443b53",
+      "merge_tree": "4547c1f0b638ad3911e82303cb2807a72952c469",
+      "ordered_parents": [
+        "bb269f86397ba518da5f76d4a651b3c51ec85744",
+        "7158d6ba51cdb24e9177902c75c7d302f4b69bc3"
+      ],
+      "pull_request_ci_run": 30711288276,
+      "main_ci_run": 30711629023,
+      "branch_preserved": true,
+      "task22_started": false,
+      "next_boundary": "TASK21_FINISH_SOURCE_ACTIVATION_AND_SMOKE"
     }
   },
   "gates": [

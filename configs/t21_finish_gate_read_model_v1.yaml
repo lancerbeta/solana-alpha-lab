@@ -1,0 +1,48 @@
+schema: smial.t21_finish_gate_read_model
+schema_version: '1.0'
+read_model_id: OWNER-PULSE-T21-FINISH-001
+read_model_version: '1.0'
+task_id: TASK-21
+atom_id: TASK21_FINISH_GATE_RECONCILIATION_V1
+status: FORWARD_ONLY_POST_A8_READ_MODEL
+as_of: '2026-08-01'
+contains_secrets: false
+
+truth_sources:
+- docs/evidence/task21/a7_acceptance_catalog_factory_fit_v1.json
+- control/active_time_gates.json
+
+required_repository_delivery:
+  pull_request: 28
+  feature_head: 7158d6ba51cdb24e9177902c75c7d302f4b69bc3
+  merge_commit: 6ff5392436477b0a780f80427f86b43dd0443b53
+  merge_tree: 4547c1f0b638ad3911e82303cb2807a72952c469
+  ordered_parents:
+  - bb269f86397ba518da5f76d4a651b3c51ec85744
+  - 7158d6ba51cdb24e9177902c75c7d302f4b69bc3
+  pull_request_ci_run: 30711288276
+  main_ci_run: 30711629023
+  branch_preserved: true
+
+required_projection:
+  task21_state: A8_MERGED_PENDING_FINISH_SOURCE_ACTIVATION
+  next_owner_action: ACTIVATE_TASK21_FINISH_SOURCE_BUNDLE_AND_RUN_SMOKE
+  task22_started: false
+  active_time_gates: 0
+  product_vision_terminal_result: CANONICALIZED_WITH_PATCH
+
+authority:
+  class: READ_ONLY
+  network_calls: 0
+  provider_api_rpc_wss_calls: 0
+  drive_reads: 0
+  drive_writes: 0
+  raw_or_dataset_writes: 0
+  cash_spend_usd_cents: 0
+  credentials: 0
+  wallet_signer_transaction_actions: 0
+  commit: false
+  push: false
+  pull_request: false
+  merge: false
+  destructive_actions: false

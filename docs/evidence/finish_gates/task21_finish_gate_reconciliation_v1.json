@@ -1,0 +1,108 @@
+{
+  "schema": "smial.task21.finish-gate-reconciliation",
+  "schema_version": "1.0",
+  "task_id": "TASK-21",
+  "atom_id": "TASK21_FINISH_GATE_RECONCILIATION_V1",
+  "as_of": "2026-08-01",
+  "status": "FINALIZATION_REQUIRED_PENDING_FINISH_REPAIR_MERGE_AND_PROJECT_SOURCE_ACTIVATION",
+  "repository_delivery": {
+    "pull_request": 28,
+    "feature_head": "7158d6ba51cdb24e9177902c75c7d302f4b69bc3",
+    "merge_commit": "6ff5392436477b0a780f80427f86b43dd0443b53",
+    "merge_tree": "4547c1f0b638ad3911e82303cb2807a72952c469",
+    "ordered_parents": [
+      "bb269f86397ba518da5f76d4a651b3c51ec85744",
+      "7158d6ba51cdb24e9177902c75c7d302f4b69bc3"
+    ],
+    "pull_request_ci_run": 30711288276,
+    "main_ci_run": 30711629023,
+    "pull_request_ci": "PASS",
+    "main_ci": "PASS",
+    "branch_preserved": true
+  },
+  "accepted_task_result": {
+    "a7_receipt_sha256": "e73f5b0c1f3b85ab19d7cf4a0ef460c681ce7b418a516db1a36b901d62b2454a",
+    "dataset_inventory_sha256": "aaa605eabdb62c38d218b40e768669db460c6fa419c4086d5412547b7f2fffae",
+    "remote_recovery_archive_sha256": "6d895f259f0316df442932b38abf44a963a79e16e24793a4eb1af2c5f6748361",
+    "owner_verdict": "DATASET_READY_FOR_NARROW_CONDITIONAL_ANALYSIS_WITH_LIMITATIONS",
+    "outcomes_opened": false,
+    "task22_started": false
+  },
+  "product_vision_reconciliation": {
+    "gate_id": "SMIAL-PRODUCT-VISION-RECONCILIATION-2026-07-31",
+    "terminal_result": "CANONICALIZED_WITH_PATCH",
+    "architecture_intent_sha256": "6aa26738a363cd8ccbc93d722082c3a551a88b5a1c6d20e2614585f5f6debdf3",
+    "roadmap_patch_sha256": "925b6398056b81c7baa71b5a7217dd50aaf2408a4bf199aac55cdd52302542a5"
+  },
+  "factory_fit": {
+    "mode": "FULL_REVIEW",
+    "verdict": "PASS_WITH_DURABLE_FOLLOWUPS",
+    "closure_drift_found": "HISTORICAL_A7_OWNER_PULSE_WAS_STILL_ROUTED_AFTER_A8_MERGE",
+    "repair": "FORWARD_ONLY_POST_A8_OWNER_PULSE_WITH_A7_HASHES_PRESERVED",
+    "checks": {
+      "mission_and_estimand": "PASS",
+      "flexibility_and_reuse": "PASS",
+      "compatibility_and_history": "PASS",
+      "efficiency": "PASS",
+      "research_truth": "PASS",
+      "owner_operability_and_ux": "PASS_AFTER_FORWARD_ONLY_REPAIR",
+      "execution_to_cashflow": "NOT_APPLICABLE",
+      "monitoring_and_recovery": "PASS",
+      "build_versus_buy": "PASS",
+      "security_and_authority": "PASS",
+      "failure_red_team": "PASS",
+      "product_horizon": "PASS",
+      "catalog_economy": "PASS",
+      "contradiction_scan": "PASS_AFTER_FORWARD_ONLY_REPAIR",
+      "migration_and_rollback": "PASS"
+    },
+    "durable_followups": [
+      {
+        "owner": "TASK-34A",
+        "trigger": "FIRST_UNATTENDED_RUNTIME_OR_SECOND_OPERATOR_OR_REPEATED_DOC_FRICTION",
+        "destination": "TASK21_FINISH_ROADMAP_SOURCE_CANDIDATE"
+      },
+      {
+        "owner": "TASK-35A",
+        "trigger": "STABLE_READ_CONTRACTS_BEFORE_TASK38_SHADOW_OBSERVATION",
+        "destination": "TASK21_FINISH_ROADMAP_SOURCE_CANDIDATE"
+      },
+      {
+        "owner": "CROSS_HYPOTHESIS_REVIEW_WATCH",
+        "trigger": "MULTI_FAMILY_EVIDENCE_OR_SECOND_SYNTHESIS_OR_MEASURED_TRIAGE_DELAY",
+        "destination": "ARCH_INTENT_003_AND_TASK21_FINISH_ROADMAP_SOURCE_CANDIDATE"
+      }
+    ]
+  },
+  "catalog": {
+    "version": "0.26.1",
+    "assets": 374,
+    "asset_registries": 4,
+    "schemas": 4,
+    "queries": 8,
+    "lifecycle_registries": 9,
+    "lifecycle_records": 52
+  },
+  "non_claims": [
+    "NOT_TASK21_DONE_BEFORE_PROJECT_SOURCE_SMOKE",
+    "NOT_TASK22_STARTED",
+    "NOT_ALPHA",
+    "NOT_EXECUTABLE_NET_RETURN",
+    "NOT_PRODUCTION_READINESS"
+  ],
+  "actual_actions": {
+    "provider_api_rpc_wss_calls": 0,
+    "drive_reads": 0,
+    "drive_writes": 0,
+    "cash_spend_usd_cents": 0,
+    "credentials": 0,
+    "wallet_signer_transaction_actions": 0,
+    "raw_or_dataset_writes": 0,
+    "destructive_actions": false,
+    "source_mutation": false
+  },
+  "next_boundary": {
+    "step": "MERGE_EXACT_FINISH_REPAIR_PR_THEN_BUILD_AND_ACTIVATE_TASK21_SOURCE_BUNDLE",
+    "task22_entry_gate": "AFTER_TASK21_DONE_CONFIRMED_ONLY"
+  }
+}

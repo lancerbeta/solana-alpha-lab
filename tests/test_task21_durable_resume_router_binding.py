@@ -10,7 +10,7 @@ import yaml
 
 ROOT = Path(__file__).resolve().parents[1]
 CONFIG_PATH = ROOT / "configs" / "task21_durable_resume_router_binding_v1.yaml"
-FINAL_CONFIG_PATH = ROOT / "configs" / "task21_final_owner_pulse_v1.yaml"
+FINISH_CONFIG_PATH = ROOT / "configs" / "t21_finish_gate_read_model_v1.yaml"
 MARKER_PATH = ROOT / "control" / "active_time_gates.json"
 ACCEPTANCE_PATH = (
     ROOT
@@ -20,7 +20,7 @@ ACCEPTANCE_PATH = (
     / "durable_resume_router_binding_acceptance_v1.json"
 )
 AGENTS_PATH = ROOT / "AGENTS.md"
-OWNER_PULSE_SCRIPT = ROOT / "scripts" / "show_task21_final_owner_pulse.py"
+OWNER_PULSE_SCRIPT = ROOT / "scripts" / "show_t21_finish_gate.py"
 
 
 def _sha256(path: Path) -> str:
@@ -42,20 +42,20 @@ class Task21DurableResumeRouterBindingTests(unittest.TestCase):
         self.assertEqual(self.router["router_version"], "1.0")
         self.assertEqual(
             self.router["status"],
-            "A7_ACCEPTED_PENDING_REPOSITORY_DELIVERY",
+            "A8_MERGED_PENDING_TASK21_FINISH_SOURCE_ACTIVATION",
         )
         self.assertEqual(
             self.router["entry_rule"],
-            "READ_MARKER_THEN_RUN_FINAL_OWNER_PULSE_BEFORE_TASK21_CONTINUATION",
+            "READ_MARKER_THEN_RUN_FINISH_GATE_PULSE_BEFORE_TASK21_OR_TASK22_CONTINUATION",
         )
 
     def test_router_binds_exact_config_and_owner_pulse_entrypoint(self) -> None:
         binding = self.router["binding"]
         self.assertEqual(
             binding["config"]["path"],
-            "configs/task21_final_owner_pulse_v1.yaml",
+            "configs/t21_finish_gate_read_model_v1.yaml",
         )
-        self.assertEqual(binding["config"]["sha256"], _sha256(FINAL_CONFIG_PATH))
+        self.assertEqual(binding["config"]["sha256"], _sha256(FINISH_CONFIG_PATH))
         self.assertEqual(
             binding["owner_pulse_entrypoint"]["sha256"],
             _sha256(OWNER_PULSE_SCRIPT),
@@ -72,7 +72,7 @@ class Task21DurableResumeRouterBindingTests(unittest.TestCase):
                 "--managed-python",
                 "python",
                 "-B",
-                "scripts/show_task21_final_owner_pulse.py",
+                "scripts/show_t21_finish_gate.py",
                 "--json",
             ],
         )
@@ -117,9 +117,30 @@ class Task21DurableResumeRouterBindingTests(unittest.TestCase):
         transport = self.router["transport_visibility"]
         self.assertEqual(transport["same_checkout"], "IMMEDIATE")
         self.assertEqual(
-            transport["fresh_clone"], "REQUIRES_FUTURE_COMMIT_AND_TRANSPORT"
+            transport["fresh_clone"],
+            "REQUIRES_ACCEPTED_MAIN_CONTAINING_FINISH_REPAIR_COMMIT",
         )
         self.assertFalse(transport["commit_authorized_by_router"])
+
+    def test_a8_resolution_is_exact_and_does_not_start_task22(self) -> None:
+        delivery = self.router["a8_resolution"]
+        self.assertEqual(delivery["status"], "MERGED_MAIN_CI_PASS")
+        self.assertEqual(delivery["pull_request"], 28)
+        self.assertEqual(
+            delivery["feature_head"],
+            "7158d6ba51cdb24e9177902c75c7d302f4b69bc3",
+        )
+        self.assertEqual(
+            delivery["merge_commit"],
+            "6ff5392436477b0a780f80427f86b43dd0443b53",
+        )
+        self.assertEqual(
+            delivery["merge_tree"],
+            "4547c1f0b638ad3911e82303cb2807a72952c469",
+        )
+        self.assertEqual(delivery["main_ci_run"], 30711629023)
+        self.assertTrue(delivery["branch_preserved"])
+        self.assertFalse(delivery["task22_started"])
 
     def test_acceptance_binds_exact_forward_candidate(self) -> None:
         receipt = json.loads(ACCEPTANCE_PATH.read_text(encoding="utf-8"))
