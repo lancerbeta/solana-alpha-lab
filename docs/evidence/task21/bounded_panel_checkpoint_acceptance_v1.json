@@ -1,0 +1,140 @@
+{
+  "schema": "smial.task21.bounded-panel-checkpoint-acceptance",
+  "schema_version": "1.0",
+  "evidence_id": "EVIDENCE-T21-BOUNDED-PANEL-CHECKPOINT-001",
+  "evidence_version": "1.0",
+  "task_id": "TASK-21",
+  "atom_id": "T21-A7A_BOUNDED_PANEL_CHECKPOINT_AND_EXTEND_EVIDENCE_V1",
+  "completed_at": "2026-08-01T09:58:51.6381059Z",
+  "status": "PASS_LOCAL_CHECKPOINT_REMOTE_RECOVERY_PENDING",
+  "repository_base": {
+    "main_commit": "bb269f86397ba518da5f76d4a651b3c51ec85744",
+    "main_tree": "40ac1e819c687520f2fea9e8e6e41c7cdbea0ab6",
+    "task21_checkpoint_head": "f3e60e40c8de401b725fa0241c7c3b7f0ffa44c9"
+  },
+  "decision": {
+    "disposition": "EXTEND_EVIDENCE",
+    "checkpoint_class": "BOUNDED_FORWARD_PILOT_NOT_RESEARCH_GRADE",
+    "dataset_ready": false,
+    "task22_eligible": false,
+    "hypothesis_outcomes_read": false,
+    "h72_h168_required": false,
+    "shortfalls": [
+      "MINIMUM_COMPLETE_MEMBERS",
+      "MINIMUM_COMPLETE_PANELS",
+      "MINIMUM_DISTINCT_ADMISSION_DATES_UTC",
+      "MINIMUM_DISTINCT_ADMISSION_WEEKS_UTC",
+      "MULTIPLE_OBSERVED_MARKET_STATES_NOT_ESTABLISHED"
+    ],
+    "observed": {
+      "real_admissions": 3,
+      "captured_panels": 7,
+      "complete_members_upper_bound": 2,
+      "distinct_admission_dates_utc_upper_bound": 1,
+      "distinct_admission_weeks_utc_upper_bound": 1,
+      "observed_market_states_established": 0
+    },
+    "required": {
+      "minimum_complete_members": 5,
+      "minimum_complete_panels": 15,
+      "minimum_distinct_admission_dates_utc": 3,
+      "minimum_distinct_admission_weeks_utc": 3,
+      "multiple_observed_market_states": true
+    }
+  },
+  "tracked_artifacts": [
+    {
+      "path": "docs/contracts/task21_bounded_panel_checkpoint_contract_v1.md",
+      "bytes": 2433,
+      "sha256": "2aa1791aa4fc5f7744259eb5781e4e3fd147779b0c25a233ff59446c2eb153e1"
+    },
+    {
+      "path": "configs/task21_bounded_panel_checkpoint_v1.yaml",
+      "bytes": 3413,
+      "sha256": "556293fa037e082754774e900195103e6ddef2b2e4234f5ad226ec053003396a"
+    },
+    {
+      "path": "src/solana_alpha_lab/task21_bounded_panel_checkpoint.py",
+      "bytes": 9997,
+      "sha256": "66aa312652ada2a3e812229dd572dbe23d7c3346553fc081e995bf0ade8f5d58"
+    },
+    {
+      "path": "scripts/prepare_task21_a7_checkpoint.py",
+      "bytes": 3151,
+      "sha256": "e769b7219468fd64fca3892f5bbf5cda346d4d83528e1840dd71b9b18ea747be"
+    }
+  ],
+  "local_checkpoint": {
+    "archive_path": "local/task21_recovery/a7_checkpoint/package/TASK21_BOUNDED_PANEL_CHECKPOINT_v1_57b7dc01a247ec3dde7ac05d3380824b73db5f1ebb6148f5be34264741427f00.zip",
+    "archive_filename": "TASK21_BOUNDED_PANEL_CHECKPOINT_v1_57b7dc01a247ec3dde7ac05d3380824b73db5f1ebb6148f5be34264741427f00.zip",
+    "archive_bytes": 476814,
+    "archive_sha256": "57b7dc01a247ec3dde7ac05d3380824b73db5f1ebb6148f5be34264741427f00",
+    "archive_md5": "b49086e787b9fb5a03edcfaaf9e986b7",
+    "source_file_count": 32,
+    "source_stored_bytes": 456813,
+    "source_inventory_sha256": "64033b77e4fc8b797600a7083a6681db88a7a21b5950541785dd13c7767e968c",
+    "isolated_restore": "PASS",
+    "restored_file_count": 32,
+    "restored_stored_bytes": 456813,
+    "restored_inventory_sha256": "64033b77e4fc8b797600a7083a6681db88a7a21b5950541785dd13c7767e968c",
+    "source_unchanged": true,
+    "source_mutations": 0,
+    "source_deletions": 0,
+    "remote_recovery_status": "REMOTE_RECOVERY_PENDING"
+  },
+  "validation": {
+    "targeted": "3_OF_3_PASS",
+    "deterministic_repeat": "PASS",
+    "local_isolated_restore": "PASS",
+    "full_repository_validation": "NOT_REQUIRED_FOR_LOCAL_CHECKPOINT_ATOM"
+  },
+  "catalog": {
+    "status": "PENDING_FINAL_T21_A7",
+    "version": "0.25.0",
+    "assets": 340,
+    "shards": 4,
+    "schemas": 4,
+    "queries": 8,
+    "version_or_count_advanced": false
+  },
+  "product_vision_gate": {
+    "gate_id": "SMIAL-PRODUCT-VISION-RECONCILIATION-2026-07-31",
+    "status": "PENDING_FINAL_T21_A7",
+    "terminal_result_recorded": false
+  },
+  "next_boundary": {
+    "atom_id": "T21-A7R_CHECKPOINT_REMOTE_READBACK_AND_RESTORE_V1",
+    "requires_exact_external_authority": true,
+    "archive_sha256": "57b7dc01a247ec3dde7ac05d3380824b73db5f1ebb6148f5be34264741427f00",
+    "after_remote_pass": "T21-A6S_INFORMATION_SUFFICIENCY_REBASE_V1"
+  },
+  "actual_actions": {
+    "local_archive_creations": 1,
+    "local_isolated_restores": 1,
+    "provider_api_rpc_wss_calls": 0,
+    "drive_reads": 0,
+    "drive_writes": 0,
+    "credentials_used": 0,
+    "cash_spend_usd_cents": 0,
+    "scheduler_or_background_process": false,
+    "wallet_signer_transaction_actions": 0,
+    "commit": false,
+    "push": false,
+    "pull_request": false,
+    "merge": false,
+    "destructive_actions": 0
+  },
+  "non_claims": [
+    "NOT_RESEARCH_GRADE_DATASET",
+    "NOT_DATASET_READY",
+    "NOT_TASK22_ELIGIBLE",
+    "NO_HYPOTHESIS_OUTCOME_UNSEALED",
+    "NO_H72_OR_H168_REQUIREMENT",
+    "NO_REMOTE_RECOVERY_PROOF",
+    "NO_CATALOG_FINALIZATION",
+    "NO_CANONICAL_SOURCE_RECONCILIATION",
+    "NO_PRODUCT_VISION_TERMINAL_RESULT",
+    "NO_TASK21_DONE"
+  ],
+  "state_change": "TASK21_LOCAL_BOUNDED_CHECKPOINT_PRESERVED_EXTEND_EVIDENCE"
+}

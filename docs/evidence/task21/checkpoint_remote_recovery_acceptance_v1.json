@@ -1,0 +1,150 @@
+{
+  "schema": "smial.task21.checkpoint-remote-recovery-acceptance",
+  "schema_version": "1.0",
+  "evidence_id": "EVIDENCE-T21-CHECKPOINT-REMOTE-RECOVERY-001",
+  "evidence_version": "1.0",
+  "task_id": "TASK-21",
+  "atom_id": "T21-A7R_CHECKPOINT_REMOTE_READBACK_AND_RESTORE_V1",
+  "completed_at": "2026-08-01T10:09:47.9103851Z",
+  "status": "PASS_REMOTE_RECOVERY_PROVEN",
+  "verdict": "PASS",
+  "proof_method": "DRIVE_RAW_BYTE_IDENTITY_PLUS_DETERMINISTIC_LOCAL_RESTORE",
+  "contract": {
+    "path": "docs/contracts/task21_checkpoint_remote_recovery_contract_v1.md",
+    "bytes": 2780,
+    "sha256": "629985949a48d08d12624ae2e6ff5402a9afd02ecbd6c02016b175eb4bedbe2a"
+  },
+  "source_checkpoint": {
+    "evidence_path": "docs/evidence/task21/bounded_panel_checkpoint_acceptance_v1.json",
+    "evidence_sha256": "b83febcbabca6f5b16fa2f68d788e0852ecce63b609c95ef8134ddfd216d761b",
+    "disposition": "EXTEND_EVIDENCE",
+    "dataset_ready": false,
+    "task22_eligible": false,
+    "remote_status_before": "REMOTE_RECOVERY_PENDING"
+  },
+  "archive": {
+    "local_repository_relative_path": "local/task21_recovery/a7_checkpoint/package/TASK21_BOUNDED_PANEL_CHECKPOINT_v1_57b7dc01a247ec3dde7ac05d3380824b73db5f1ebb6148f5be34264741427f00.zip",
+    "filename": "TASK21_BOUNDED_PANEL_CHECKPOINT_v1_57b7dc01a247ec3dde7ac05d3380824b73db5f1ebb6148f5be34264741427f00.zip",
+    "mime_type": "application/zip",
+    "bytes": 476814,
+    "sha256": "57b7dc01a247ec3dde7ac05d3380824b73db5f1ebb6148f5be34264741427f00",
+    "md5": "b49086e787b9fb5a03edcfaaf9e986b7",
+    "source_file_count": 32,
+    "source_stored_bytes": 456813,
+    "source_inventory_sha256": "64033b77e4fc8b797600a7083a6681db88a7a21b5950541785dd13c7767e968c",
+    "content_addressed": true,
+    "create_only": true
+  },
+  "google_drive": {
+    "connected_account": "bakuczmarianna566@gmail.com",
+    "folder": {
+      "id": "1EISgmsB8nt2pkU4uBUO6Sav1Fzbo6Hw3",
+      "url": "https://drive.google.com/drive/folders/1EISgmsB8nt2pkU4uBUO6Sav1Fzbo6Hw3"
+    },
+    "pre_create_exact_name_check": {
+      "result": "ABSENT",
+      "collision": false
+    },
+    "file": {
+      "id": "1ZRkbY7-Fzxj9MmNGIlBBS6ScTwdgqWip",
+      "url": "https://drive.google.com/file/d/1ZRkbY7-Fzxj9MmNGIlBBS6ScTwdgqWip/view?usp=drivesdk",
+      "name": "TASK21_BOUNDED_PANEL_CHECKPOINT_v1_57b7dc01a247ec3dde7ac05d3380824b73db5f1ebb6148f5be34264741427f00.zip",
+      "mime_type": "application/zip",
+      "size": 476814,
+      "parent_folder_id": "1EISgmsB8nt2pkU4uBUO6Sav1Fzbo6Hw3",
+      "created_time": "2026-08-01T10:05:17.574Z",
+      "modified_time": "2026-08-01T10:05:17.574Z",
+      "new_file_upload": true,
+      "existing_file_updated": false,
+      "visibility_metadata": "ACCESS_NOT_VERIFIED",
+      "sharing_change_performed": false
+    },
+    "raw_readback": {
+      "decoded_bytes": 476814,
+      "sha256": "57b7dc01a247ec3dde7ac05d3380824b73db5f1ebb6148f5be34264741427f00",
+      "size_match": true,
+      "sha256_match": true,
+      "complete_byte_identity": true,
+      "stream_reference_observed": true
+    },
+    "operation_count": 8,
+    "operation_breakdown": {
+      "profile_reads": 1,
+      "folder_list_reads": 1,
+      "metadata_reads": 1,
+      "raw_fetches": 4,
+      "successful_file_creations": 1,
+      "file_updates": 0,
+      "file_deletions": 0,
+      "sharing_changes": 0,
+      "local_hash_postprocessing_retries": 2
+    }
+  },
+  "isolated_restore": {
+    "repository_relative_root": "local/task21_recovery/a7_checkpoint/remote_restore/57b7dc01a247ec3dde7ac05d3380824b73db5f1ebb6148f5be34264741427f00/drive-readback-proof",
+    "archive_materialization": "LOCAL_CONTENT_ADDRESS_EQUAL_TO_REMOTE_RAW_READBACK_SHA256",
+    "archive_bytes": 476814,
+    "archive_sha256": "57b7dc01a247ec3dde7ac05d3380824b73db5f1ebb6148f5be34264741427f00",
+    "restored_file_count": 32,
+    "restored_stored_bytes": 456813,
+    "restored_inventory_sha256": "64033b77e4fc8b797600a7083a6681db88a7a21b5950541785dd13c7767e968c",
+    "source_unchanged": true,
+    "source_mutations": 0,
+    "source_deletions": 0,
+    "restore_target_existed_before": false,
+    "restore_overwrites": 0
+  },
+  "checkpoint_state_after": {
+    "remote_recovery_status": "REMOTE_RECOVERY_PROVEN",
+    "disposition": "EXTEND_EVIDENCE",
+    "dataset_ready": false,
+    "task22_eligible": false,
+    "catalog_status": "PENDING_FINAL_T21_A7",
+    "product_vision_gate_status": "PENDING_FINAL_T21_A7"
+  },
+  "validation": {
+    "targeted_runner": "python -m unittest discover",
+    "targeted_result": "7_OF_7_PASS",
+    "a7a_regression_tests": "4_OF_4_PASS",
+    "a7r_acceptance_tests": "3_OF_3_PASS",
+    "initial_pytest_attempt": "NOT_RUN_PYTEST_NOT_IN_LOCKED_ENVIRONMENT",
+    "full_repository_validation": "DEFERRED_TO_FINAL_TASK21_CANDIDATE"
+  },
+  "actual_actions": {
+    "drive_reads": 7,
+    "drive_writes": 1,
+    "drive_file_creations": 1,
+    "drive_updates": 0,
+    "drive_deletions": 0,
+    "local_isolated_restores": 1,
+    "local_source_overwrites": 0,
+    "provider_api_rpc_wss_calls": 0,
+    "cash_spend_usd_cents": 0,
+    "credential_or_permission_changes": 0,
+    "candidate_admissions": 0,
+    "collector_executions": 0,
+    "wallet_signer_transaction_actions": 0,
+    "commit": false,
+    "push": false,
+    "pull_request": false,
+    "merge": false,
+    "destructive_actions": 0
+  },
+  "non_claims": [
+    "NOT_RESEARCH_GRADE_DATASET",
+    "NOT_DATASET_READY",
+    "NOT_TASK22_ELIGIBLE",
+    "NO_INFORMATION_SUFFICIENCY_REBASE_YET",
+    "NO_H72_OR_H168_REQUIREMENT",
+    "NO_CATALOG_FINALIZATION",
+    "NO_CANONICAL_SOURCE_RECONCILIATION",
+    "NO_PRODUCT_VISION_TERMINAL_RESULT",
+    "NO_TASK21_DONE"
+  ],
+  "next_boundary": {
+    "atom_id": "T21-A6S_INFORMATION_SUFFICIENCY_REBASE_V1",
+    "authority": "LOCAL_WRITE_ONLY_REQUIRES_SEPARATE_EXPLICIT_START",
+    "decision": "MORE_INDEPENDENT_MEMBERS_AND_STATES_OR_NARROWER_ESTIMAND_OR_STOP"
+  },
+  "state_change": "TASK21_CHECKPOINT_REMOTE_RECOVERY_PROVEN_EXTEND_EVIDENCE"
+}

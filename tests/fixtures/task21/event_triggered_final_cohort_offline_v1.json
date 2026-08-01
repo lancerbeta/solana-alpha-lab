@@ -1,0 +1,94 @@
+{
+  "schema": "smial.task21.event-triggered-final-cohort-offline-scenario",
+  "schema_version": "1.0",
+  "task_id": "TASK-21",
+  "atom_id": "T21-A6S_EVENT_TRIGGERED_FINAL_COHORT_RUNTIME_PREP_V1",
+  "synthetic_only": true,
+  "contains_market_data": false,
+  "hypothesis_outcome_unsealed": false,
+  "happy_path_observations": [
+    {
+      "batch_id": "T21-R2",
+      "source_observation_id": "SYN-T21-R2-OBS-001",
+      "source_content_sha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "observed_at": "2026-08-01T11:00:00Z",
+      "source_calls": 2,
+      "candidates": [
+        {
+          "nomination_event_id": "SYN-T21-R2-NOM-001",
+          "mint": "4vJ9JU1bJJE96FWSJKvHsmmFADCg4gpZQff4P3bkLKi",
+          "mint_decimals": 6,
+          "eligible": true,
+          "first_reliable_available_at": "2026-08-01T11:00:01Z",
+          "observed_at": "2026-08-01T11:00:00Z",
+          "exact_rule_input_values": {
+            "selection_basis_codes": ["SYNTHETIC_STRUCTURAL_ELIGIBILITY"],
+            "prior_relevant_quote_outcome_exposure": false,
+            "uses_task21_quote_route_or_price_outcome": false
+          }
+        },
+        {
+          "nomination_event_id": "SYN-T21-R2-NOM-002",
+          "mint": "8qbHbw2BbbTHBW1sbeqakYXVKRQM8Ne7pLK7m6CVfeR",
+          "mint_decimals": 6,
+          "eligible": true,
+          "first_reliable_available_at": "2026-08-01T11:00:02Z",
+          "observed_at": "2026-08-01T11:00:00Z",
+          "exact_rule_input_values": {
+            "selection_basis_codes": ["SYNTHETIC_STRUCTURAL_ELIGIBILITY"],
+            "prior_relevant_quote_outcome_exposure": false,
+            "uses_task21_quote_route_or_price_outcome": false
+          }
+        },
+        {
+          "nomination_event_id": "SYN-T21-R2-NOM-003",
+          "mint": "CktRuQ2mttgRGkXJtyksdKHjUdc2C4TgDzyB98oEzy8",
+          "mint_decimals": 6,
+          "eligible": true,
+          "first_reliable_available_at": "2026-08-01T11:00:03Z",
+          "observed_at": "2026-08-01T11:00:00Z",
+          "exact_rule_input_values": {
+            "selection_basis_codes": ["SYNTHETIC_STRUCTURAL_ELIGIBILITY"],
+            "prior_relevant_quote_outcome_exposure": false,
+            "uses_task21_quote_route_or_price_outcome": false
+          }
+        }
+      ]
+    },
+    {
+      "batch_id": "T21-R3",
+      "source_observation_id": "SYN-T21-R3-OBS-001",
+      "source_content_sha256": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+      "observed_at": "2026-08-01T12:30:00Z",
+      "source_calls": 2,
+      "candidates": [
+        {
+          "nomination_event_id": "SYN-T21-R3-NOM-001",
+          "mint": "GgBaCs3NCBuZN12kCJgAW63ydqohFkHEdfdEXBPzLHq",
+          "mint_decimals": 6,
+          "eligible": true,
+          "first_reliable_available_at": "2026-08-01T12:30:01Z",
+          "observed_at": "2026-08-01T12:30:00Z",
+          "exact_rule_input_values": {
+            "selection_basis_codes": ["SYNTHETIC_STRUCTURAL_ELIGIBILITY"],
+            "prior_relevant_quote_outcome_exposure": false,
+            "uses_task21_quote_route_or_price_outcome": false
+          }
+        },
+        {
+          "nomination_event_id": "SYN-T21-R3-NOM-002",
+          "mint": "QWmroo4YnnMqYW3cnxWkFdaTxGD3P7vMSzwMHGbUzwF",
+          "mint_decimals": 6,
+          "eligible": true,
+          "first_reliable_available_at": "2026-08-01T12:30:02Z",
+          "observed_at": "2026-08-01T12:30:00Z",
+          "exact_rule_input_values": {
+            "selection_basis_codes": ["SYNTHETIC_STRUCTURAL_ELIGIBILITY"],
+            "prior_relevant_quote_outcome_exposure": false,
+            "uses_task21_quote_route_or_price_outcome": false
+          }
+        }
+      ]
+    }
+  ]
+}

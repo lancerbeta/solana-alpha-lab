@@ -1,0 +1,187 @@
+{
+  "schema": "smial.task21.event-triggered-final-cohort-runtime-prep-acceptance",
+  "schema_version": "1.0",
+  "evidence_id": "EVIDENCE-T21-EVENT-TRIGGERED-FINAL-COHORT-RUNTIME-PREP-001",
+  "evidence_version": "1.0",
+  "task_id": "TASK-21",
+  "atom_id": "T21-A6S_EVENT_TRIGGERED_FINAL_COHORT_RUNTIME_PREP_V1",
+  "completed_at": "2026-08-01T11:10:40.924Z",
+  "status": "PASS",
+  "verdict": "EVENT_TRIGGERED_FINAL_COHORT_RUNTIME_READY_OFFLINE_ONLY",
+  "entry_gate": {
+    "verdict": "START_AS_WRITTEN",
+    "execution_shape": "SINGLE_PASS",
+    "reasoning_used": "VERY_HIGH",
+    "reasoning_adequacy": "SUFFICIENT_NO_MODE_SWITCH",
+    "tool_or_plugin": "NONE"
+  },
+  "repository_base": {
+    "head": "f3e60e40c8de401b725fa0241c7c3b7f0ffa44c9",
+    "tree": "40ac1e819c687520f2fea9e8e6e41c7cdbea0ab6",
+    "accepted_main": "bb269f86397ba518da5f76d4a651b3c51ec85744"
+  },
+  "decision": {
+    "implementation_mode": "FORWARD_ONLY_ADAPTER_NO_HISTORICAL_REWRITE",
+    "real_candidate_nominations": 0,
+    "real_candidate_admissions": 0,
+    "synthetic_batches": [
+      {
+        "batch_id": "T21-R2",
+        "planned_members": 3
+      },
+      {
+        "batch_id": "T21-R3",
+        "planned_members": 2
+      }
+    ],
+    "planned_new_members": 5,
+    "planned_panels": 15,
+    "planned_quote_pairs": 60,
+    "minimum_panel_separation_seconds": 1801,
+    "member_total_span_seconds_max": 86400,
+    "minimum_calendar_wait": null,
+    "narrow_expiry_window": false,
+    "scheduler_or_background_process": false,
+    "projected_budget": {
+      "external_requests": 184,
+      "source_requests": 8,
+      "quote_requests": 176,
+      "external_request_cap": 192,
+      "external_request_headroom": 8,
+      "headroom_is_authority": false
+    },
+    "current_free_disk_bytes": 186215161856,
+    "dataset_ready": false,
+    "task22_eligible": false,
+    "market_wide_or_cross_regime_claim": false,
+    "sealed_outcomes_read": false
+  },
+  "artifacts": [
+    {
+      "asset_id": "CONTRACT-T21-EVENT-TRIGGERED-FINAL-COHORT-RUNTIME-001",
+      "path": "docs/contracts/task21_event_triggered_final_cohort_runtime_contract_v1.md",
+      "bytes": 4110,
+      "sha256": "58661421aa64b6aa173e3a201f7c4c1bbea1755b7aef56c034cf7b01548b8494"
+    },
+    {
+      "asset_id": "CONFIG-T21-EVENT-TRIGGERED-FINAL-COHORT-RUNTIME-001",
+      "path": "configs/task21_event_triggered_final_cohort_runtime_v1.yaml",
+      "bytes": 5225,
+      "sha256": "7e818f032cc0505b1dce6ac6b94c4b193b2eeecd2c34702de344a606a29888f1"
+    },
+    {
+      "asset_id": "MODULE-T21-EVENT-TRIGGERED-FINAL-COHORT-RUNTIME-001",
+      "path": "src/solana_alpha_lab/task21_event_triggered_final_cohort.py",
+      "bytes": 24934,
+      "sha256": "d2f5a6a13b96eb93134d1aade7da68fdb776c16105af8afdca61ee016ed8b327"
+    },
+    {
+      "asset_id": "FIXTURE-T21-EVENT-TRIGGERED-FINAL-COHORT-RUNTIME-001",
+      "path": "tests/fixtures/task21/event_triggered_final_cohort_offline_v1.json",
+      "bytes": 3720,
+      "sha256": "8325db5d5b19785c137e9090ba782826bf5a07319aaf4ce463f7c16a012d2f86"
+    },
+    {
+      "asset_id": "TEST-T21-EVENT-TRIGGERED-FINAL-COHORT-RUNTIME-001",
+      "path": "tests/test_task21_event_triggered_final_cohort.py",
+      "bytes": 11414,
+      "sha256": "298704ee8a2d61196073d02d24353bc1fb6f138fdb44fb5669ba78baffdb06a7"
+    }
+  ],
+  "validation": {
+    "targeted": {
+      "command": "$env:PYTHONPATH='src'; uv run --locked --managed-python python -m unittest tests.test_task21_event_triggered_final_cohort -q",
+      "result": "16_OF_16_PASS"
+    },
+    "task21_regression": {
+      "command": "$env:PYTHONPATH='src'; uv run --locked --managed-python python -m unittest discover -s tests -p 'test_task21*.py' -q",
+      "result": "222_OF_222_PASS"
+    },
+    "full_unit_regression": {
+      "current_result": "NOT_CLAIMED_TWO_BOUNDED_TIMEOUTS_NO_FAILURE_REPORTED",
+      "attempts": [
+        "TIMEOUT_AFTER_120_SECONDS",
+        "TIMEOUT_AFTER_300_SECONDS"
+      ],
+      "accepted_unchanged_base": "1340_OF_1340_PASS_FROM_INFORMATION_SUFFICIENCY_ACCEPTANCE",
+      "risk_focused_current_coverage": "TARGETED_PLUS_ALL_TASK21_PASS",
+      "interpretation": "PROPORTIONAL_LOCAL_GATE_PASS_FULL_SUITE_REMAINS_FUTURE_CI_OWNER"
+    },
+    "linter": {
+      "result": "NOT_AVAILABLE_IN_LOCKED_ENVIRONMENT",
+      "dependency_install_attempted": false
+    },
+    "secret_scan": {
+      "command": "uv run --locked --managed-python python -B scripts/secret_scan.py --self-test --scan-repository",
+      "result": "PASS"
+    }
+  },
+  "factory_fit_review": {
+    "mode": "FULL_REVIEW",
+    "status": "PASS",
+    "mission": "PASS_NARROW_DATA_DECISION_PATH_IMPROVED_NO_DATA_VOLUME_GOAL",
+    "flexibility": "PASS_BATCH_AND_PANEL_STATE_MACHINE_REUSABLE_WITH_FROZEN_CAPS",
+    "compatibility_and_history": "PASS_FORWARD_ONLY_ADAPTER_OLD_T1_RUNTIME_UNCHANGED",
+    "efficiency": "PASS_NO_CALENDAR_PROXY_NO_BACKGROUND_SCHEDULER_NO_NEW_DEPENDENCY",
+    "research_truth": "PASS_OUTCOME_BLIND_ADMISSION_AND_CONDITIONAL_CLAIM_ONLY",
+    "owner_operability_and_ux": "PASS_EXPLICIT_WAIT_READY_STOP_AND_GAP_DECISIONS",
+    "execution_to_cashflow": "NOT_APPLICABLE_COLLECTION_EVIDENCE_ONLY_NO_TRADE_AUTHORITY",
+    "monitoring_and_recovery": "PASS_RECOVERY_AND_PHYSICAL_CAPS_FAIL_CLOSED",
+    "build_vs_buy": "PASS_PURE_LOCAL_ADAPTER_SMALLER_THAN_NEW_PLATFORM_OR_SERVICE",
+    "red_team": "PASS_DUPLICATE_STALE_LEAK_ORDER_BUDGET_HEALTH_AND_EXPIRY_CASES"
+  },
+  "catalog": {
+    "accepted_checkpoint": "0.25.0 / 340 / 4 / 4 / 8",
+    "status": "CATALOG_TRANSACTION_PENDING_T21_A7",
+    "version_or_count_advanced": false
+  },
+  "product_vision": {
+    "marker_id": "SMIAL-PRODUCT-VISION-RECONCILIATION-2026-07-31",
+    "status": "UNRESOLVED_NONBLOCKING_FOR_THIS_RUNTIME_PREP",
+    "terminal_reconciliation_required_at": "T21-A7"
+  },
+  "actual_actions": {
+    "network_calls": 0,
+    "provider_api_rpc_wss_calls": 0,
+    "drive_reads": 0,
+    "drive_writes": 0,
+    "credential_use": 0,
+    "candidate_nominations": 0,
+    "candidate_admissions": 0,
+    "collector_executions": 0,
+    "raw_or_dataset_writes": 0,
+    "provider_credits": 0,
+    "cash_spend_usd_cents": 0,
+    "scheduler_or_background_process": false,
+    "dependency_changes": 0,
+    "commit": false,
+    "push": false,
+    "pull_request": false,
+    "merge": false,
+    "wallet_signer_transaction_actions": 0,
+    "ui_changes": false,
+    "destructive_actions": false
+  },
+  "non_claims": [
+    "REAL_NOMINATION_OR_ADMISSION",
+    "PROVIDER_OR_COLLECTION_AUTHORITY",
+    "DATASET_READY",
+    "TASK22_ELIGIBLE_OR_STARTED",
+    "HYPOTHESIS_OUTCOME_OR_VERDICT",
+    "MARKET_WIDE_OR_CROSS_REGIME_GENERALIZATION",
+    "H72_OR_H168_CAPTURE",
+    "CATALOG_OR_CANONICAL_SOURCE_FINALIZATION"
+  ],
+  "next_boundary": {
+    "atom_id": "T21-A6S_R2_EVENT_TRIGGERED_SOURCE_AND_P0_CAPTURE_V1",
+    "status": "NOT_AUTHORIZED",
+    "purpose": "Revalidate current state, obtain one new R2 nomination observation, admit at most three eligible unseen mints, and capture their P0 panels under exact external and local-write caps.",
+    "separate_external_authority_required": true,
+    "provider_api_rpc_wss_calls_authorized": false,
+    "raw_or_dataset_writes_authorized": false,
+    "drive_actions_authorized": false,
+    "task22_authorized": false,
+    "a7_authorized": false
+  },
+  "state_change": "LOCAL_EVENT_TRIGGERED_RUNTIME_PREP_ACCEPTED_TASK21_REMAINS_IN_PROGRESS"
+}
