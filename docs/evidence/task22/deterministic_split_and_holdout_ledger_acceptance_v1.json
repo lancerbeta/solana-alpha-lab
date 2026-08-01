@@ -1,0 +1,92 @@
+{
+  "acceptance": {
+    "append_only_ledger_extension": "PASS",
+    "base_registry_compatibility": "PASS",
+    "catalog_registration": "DEFERRED_T22_A4",
+    "content_addressed_split_manifest": "PASS",
+    "deterministic_rebuild": "PASS",
+    "group_integrity": "PASS",
+    "holdout_access": "DENY",
+    "validation_role": "NONE"
+  },
+  "artifacts": [
+    {
+      "path": "catalog/schemas/task22_holdout_ledger_extension.schema.json",
+      "sha256": "b83cbd54a37a08296dee4329afbec97c917f26fdfd2f67158d0eb6bfac354080"
+    },
+    {
+      "path": "catalog/schemas/task22_split_manifest.schema.json",
+      "sha256": "b764cfc0b50ebb99cd88cd7be27c2f7aa1367028f180d48c29baa0a313baacc5"
+    },
+    {
+      "path": "configs/task22_group_aware_split_v1.yaml",
+      "sha256": "43e71918e4da1150defc97b812ea648fac9f3a3c567dba379f6948b0ac007272"
+    },
+    {
+      "path": "docs/evidence/task22/dataset_split_manifest_v1.json",
+      "sha256": "d00c14b8f5e7f0f9bf21d124d4830a016fe4f18f0da09e0e87483af6fdff77e8"
+    },
+    {
+      "path": "docs/evidence/task22/holdout_access_ledger_v1.json",
+      "sha256": "d21bf93227cf77895a29d1f6e02559c1ac94c40d803e4dd073003e7ce5d0ddfd"
+    },
+    {
+      "path": "scripts/build_task22_dataset_split.py",
+      "sha256": "401fe7bd2272456421865666a70d19130eda6f2209b408bc932f47b88e81738d"
+    },
+    {
+      "path": "src/solana_alpha_lab/task22_dataset_split.py",
+      "sha256": "5f8dad5dffb23ec896d8dc104ce4652b6b8d943a7143f81246dd6006eaea4d82"
+    },
+    {
+      "path": "tests/test_task22_deterministic_split_and_holdout_ledger.py",
+      "sha256": "be9cffc74075039e38bc384ab2aa4ad0bf3f3c814cc6d5b87dc674134b186840"
+    }
+  ],
+  "as_of": "2026-08-01",
+  "atom_id": "T22-A3_DETERMINISTIC_SPLIT_AND_HOLDOUT_LEDGER_V1",
+  "authority": {
+    "cash_spend_usd_cents": 0,
+    "class": "LOCAL_WRITE_ONLY",
+    "commit": false,
+    "credential_use": 0,
+    "dependency_changes": 0,
+    "destructive_actions": false,
+    "drive_reads": 0,
+    "drive_writes": 0,
+    "gate_phrase": "T22-A3_DETERMINISTIC_SPLIT_AND_HOLDOUT_LEDGER_V1",
+    "managed_file_count": 8,
+    "merge": false,
+    "network_calls": 0,
+    "outcome_reads": 0,
+    "provider_api_rpc_wss_calls": 0,
+    "pull_request": false,
+    "push": false,
+    "raw_or_dataset_writes": 0,
+    "source": "EXPLICIT_USER",
+    "ui_changes": false,
+    "wallet_signer_transaction_actions": 0
+  },
+  "next_boundary": {
+    "atom_id": "T22-A4_ACCEPTANCE_CATALOG_FACTORY_FIT_V1",
+    "authorized": false,
+    "external_calls_authorized": false,
+    "outcome_reads_authorized": false
+  },
+  "outcome_seal": {
+    "outcome_paths_opened": [],
+    "outcome_values_read": false,
+    "state": "UNOPENED"
+  },
+  "owner_verdict": "EXTEND_EVIDENCE",
+  "reason_codes": [
+    "CONSUMER_TIME_CONTRACT_MISSING",
+    "SOURCE_START_GAP_LT_MAX_PROJECT_HORIZON"
+  ],
+  "schema": "smial.task22.split-ledger-acceptance",
+  "schema_version": "1.0",
+  "split_content_sha256": "9f8b4affc821685ca1737716c748779e71ecbeef45bfafaf0ed4a1d5fd799458",
+  "split_id": "T22-SPLIT-T21-FROZEN-001",
+  "status": "PASS_EXTEND_EVIDENCE",
+  "task_id": "TASK-22"
+}

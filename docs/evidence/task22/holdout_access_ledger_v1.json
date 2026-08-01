@@ -1,0 +1,46 @@
+{
+  "append_only_contract": {
+    "allowed_transitions": [
+      "UNASSIGNED_UNOPENED->UNTOUCHED",
+      "UNTOUCHED->CONSUMED"
+    ],
+    "base_registry_projection": "APPEND_BASE_REGISTRY_RECORD_ONLY_AFTER_VALID_CONSUMPTION",
+    "consumed_to_untouched_allowed": false,
+    "prior_records_must_be_exact_prefix": true,
+    "snapshot_files_are_create_only": true
+  },
+  "as_of": "2026-08-01",
+  "atom_id": "T22-A3_DETERMINISTIC_SPLIT_AND_HOLDOUT_LEDGER_V1",
+  "catalog": {
+    "registered_in_atom3": false,
+    "status": "CATALOG_TRANSACTION_PENDING_T22_A4"
+  },
+  "ledger_id": "T22-HOLDOUT-ACCESS-LEDGER-001",
+  "ledger_version": 1,
+  "previous_ledger_sha256": null,
+  "records": [],
+  "registry_binding": {
+    "historical_bytes_mutable": false,
+    "path": "registries/holdout_consumption.yaml",
+    "registry_id": "SMIAL-REGISTRY-HOLDOUT-CONSUMPTION",
+    "registry_type": "holdout_consumption",
+    "sha256": "863d68e53861c4aa30f6afa1a512ec5ab84c8966273cee6d42ca1519ef5fa07a",
+    "truth_owner": "TASK-03"
+  },
+  "role": "COMPANION_EVIDENCE_NOT_SECOND_TRUTH_OWNER",
+  "schema": "smial.task22.holdout-ledger-extension",
+  "schema_version": "1.0",
+  "split_binding": {
+    "path": "docs/evidence/task22/dataset_split_manifest_v1.json",
+    "sha256": "d00c14b8f5e7f0f9bf21d124d4830a016fe4f18f0da09e0e87483af6fdff77e8",
+    "split_content_sha256": "9f8b4affc821685ca1737716c748779e71ecbeef45bfafaf0ed4a1d5fd799458",
+    "split_id": "T22-SPLIT-T21-FROZEN-001"
+  },
+  "state": {
+    "access_default": "DENY",
+    "current": "UNASSIGNED_UNOPENED",
+    "outcome_paths_opened": [],
+    "outcome_values_read": false
+  },
+  "task_id": "TASK-22"
+}

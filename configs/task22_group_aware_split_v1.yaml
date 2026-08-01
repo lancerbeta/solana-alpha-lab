@@ -1,0 +1,273 @@
+schema: smial.task22_group_aware_split_contract
+schema_version: '1.0'
+contract_id: CONTRACT-T22-GROUP-AWARE-SPLIT-001
+contract_version: '1.0'
+task_id: TASK-22
+atom_id: T22-A2_FROZEN_GROUP_AWARE_SPLIT_CONTRACT_V1
+status: FROZEN_CONTRACT_OUTCOMES_SEALED
+as_of: '2026-08-01'
+contains_secrets: false
+
+entry_gate:
+  verdict: START_WITH_PATCH
+  source_activation: ACTIVATION_CONFIRMED_USER_SMOKE
+  canonical_manifest:
+    semantic_version: '3.9'
+    sha256: 44c49445299dcb275281bba4f8083bc779cd3f9818daa6af2426cc4f6dafd0b6
+  accepted_main_commit: 2ff5a9de4e78a8e64b23754ff59680a33c01d3cc
+  accepted_main_tree: 3af1179da534972ccf82073dfe1594858c69516e
+  catalog:
+    version: 0.26.1
+    assets: 374
+    asset_registries: 4
+    schemas: 4
+    queries: 8
+  control_plane: LOCAL_WORK_PRIMARY
+  repository_route: LOCAL_WORK_CODEX
+  execution_shape: STAGED
+
+contract_patch:
+  observed_complete_cluster_count: 2
+  three_nonempty_independent_roles_required: false
+  validation_none_allowed: true
+  extend_evidence_allowed: true
+  dataset_not_splittable_allowed: true
+  force_three_way_split_forbidden: true
+  reason: TWO_COMPLETE_CLUSTERS_CANNOT_SUPPORT_THREE_INDEPENDENT_NONEMPTY_ROLES
+
+owner_decision:
+  question: CAN_THE_FROZEN_TASK21_DATASET_SUPPORT_AN_OUTCOME_BLIND_GROUP_AWARE_TIME_ORDERED_SPLIT
+  allowed_verdicts:
+  - SPLIT_READY_WITH_LIMITATIONS
+  - EXTEND_EVIDENCE
+  - DATASET_NOT_SPLITTABLE
+  - REDESIGN_SPLIT
+  atom2_result: CONTRACT_FROZEN_SPLIT_NOT_MATERIALIZED
+
+frozen_inputs:
+- asset_id: EVIDENCE-T21-FINAL-COHORT-FREEZE-001
+  path: configs/task21_final_cohort_freeze_v1.yaml
+  sha256: d644c3432241a8ebbe74373038cfe0c15b87872e7afc6e96b6fade49e82d6fde
+- asset_id: DATA-T21-FINAL-DATASET-FREEZE-MANIFEST-001
+  path: docs/evidence/task21/final_dataset_freeze_manifest_v1.json
+  sha256: 295d29354554247e08ddd39cd9f6b642e262869f22a0da9925227e6fab378a0f
+- asset_id: EVIDENCE-T21-EFFECTIVE-SAMPLE-SUMMARY-001
+  path: docs/evidence/task21/effective_sample_summary_v1.json
+  sha256: 63ddb790dcd54191ac342aa8add5889c8647d2cf09d91c4d9ca14c67ca8b51fb
+- asset_id: EVIDENCE-T21-A7-ACCEPTANCE-001
+  path: docs/evidence/task21/a7_acceptance_catalog_factory_fit_v1.json
+  sha256: e73f5b0c1f3b85ab19d7cf4a0ef460c681ce7b418a516db1a36b901d62b2454a
+- asset_id: EVIDENCE-T21-FINISH-GATE-001
+  path: docs/evidence/finish_gates/task21_finish_gate_reconciliation_v1.json
+  sha256: 2c268aa91f3eef0b1c81ede0f1d7ad51a5aae0bc6370b3cdf7f6d5e1d6524292
+- asset_id: HANDOFF-T21-TASK22-001
+  path: docs/handoffs/task21_to_task22_v1.md
+  sha256: 4c3863996cb91ae0600506fe1c8575795e6f6c2a725cfb4fa670fde2caf7bdeb
+- asset_id: REGISTRY-HOLDOUT-CONSUMPTION-001
+  path: registries/holdout_consumption.yaml
+  sha256: 863d68e53861c4aa30f6afa1a512ec5ab84c8966273cee6d42ca1519ef5fa07a
+- asset_id: CATALOG-SCHEMA-LIFECYCLE-001
+  path: catalog/schemas/lifecycle_registry.schema.json
+  sha256: eeb60a4364e472f37eca323681bd5c14e98cc49199d9777c025a4f0e94798b80
+
+accepted_dataset:
+  source_inventory_sha256: aaa605eabdb62c38d218b40e768669db460c6fa419c4086d5412547b7f2fffae
+  remote_recovery_sha256: 6d895f259f0316df442932b38abf44a963a79e16e24793a4eb1af2c5f6748361
+  root_count: 13
+  file_count: 91
+  stored_bytes: 1263895
+  nominated_and_admitted_members: 8
+  complete_members: 5
+  incomplete_members: 3
+  complete_member_clusters: 2
+  observed_panels: 22
+  quote_pairs: 88
+  quote_attempts: 176
+  explicit_missing_panels: 3
+
+outcome_seal:
+  state: UNOPENED
+  outcome_values_read: false
+  outcome_paths_opened: []
+  split_before_outcome_required: true
+  feature_threshold_or_strategy_tuning_allowed: false
+  seal_break_before_a3: FAIL_CLOSED_DATASET_NOT_SPLITTABLE
+
+grouping_contract:
+  primary_group_key: nomination_batch_id
+  nested_member_key: member_id
+  row_level_random_split_allowed: false
+  member_cross_fold_allowed: false
+  nomination_batch_cross_fold_allowed: false
+  member_iid_assumption_allowed: false
+  incomplete_evidence_retention: REQUIRED
+  complete_groups:
+  - batch_id: T21-R2
+    source_observed_at: '2026-08-01T11:46:58.123523Z'
+    member_ids:
+    - T21-WATCH-29e2b75994975253bd74
+    - T21-WATCH-6f21dec76d05f5831216
+    - T21-WATCH-61ce24fc3fa04e3eaba7
+  - batch_id: T21-R3
+    source_observed_at: '2026-08-01T13:40:15.363386Z'
+    member_ids:
+    - T21-WATCH-7a678b1052ac10b7d492
+    - T21-WATCH-2c5632a2ba71c8e44637
+  incomplete_groups:
+  - batch_id: T21-R1
+    source_observed_at: '2026-07-30T16:28:59.084Z'
+    member_count: 3
+    role: PARTIAL_AND_GAP_EVIDENCE_ONLY
+    missing_panels: 3
+    eligible_for_outcome_evaluable_fold: false
+
+deterministic_candidate_rule:
+  complete_group_order:
+  - source_observed_at_ascending
+  - batch_id_ascending_tiebreak
+  two_complete_groups:
+    development: EARLIEST_COMPLETE_GROUP
+    validation: NONE
+    holdout: LATEST_COMPLETE_GROUP
+    provisional_assignment_only: true
+  three_or_more_complete_groups:
+    assignment: DEFER_TO_VERSIONED_A3_ALGORITHM
+  fewer_than_two_complete_groups:
+    verdict: EXTEND_EVIDENCE
+  incomplete_groups:
+    role: AUXILIARY_GAP_AND_COVERAGE_EVIDENCE
+    outcome_values_accessible: false
+
+chronology_and_purge_contract:
+  timezone: UTC
+  same_day_sequential_batches: true
+  source_observed_at_is_ordering_evidence_not_OUTCOME_AVAILABILITY: true
+  consumer_horizon_required_before_analysis_eligibility: true
+  required_consumer_fields:
+  - feature_max_lookback_seconds
+  - label_horizon_seconds
+  - label_first_reliable_available_at_rule
+  - execution_or_settlement_lag_seconds_if_applicable
+  project_horizon_bounds_seconds:
+    minimum: 900
+    maximum: 14400
+  purge_rule: REMOVE_DEVELOPMENT_UNITS_WHOSE_LABEL_AVAILABILITY_OVERLAPS_HOLDOUT_FEATURE_OR_LABEL_WINDOW
+  embargo_rule: HOLDOUT_ACCESS_STARTS_ONLY_AFTER_DECLARED_LABEL_AND_AVAILABILITY_BOUNDARY
+  unknown_or_infeasible_purge_result: EXTEND_EVIDENCE
+  assumed_time_gap_grants_independence: false
+  overlap_or_same_regime_claim_allowed: false
+
+split_feasibility_rules:
+- when: EXACT_TWO_COMPLETE_GROUPS_AND_TIME_RULES_PASS
+  verdict: SPLIT_READY_WITH_LIMITATIONS
+  roles:
+    development: REQUIRED
+    validation: NONE
+    holdout: REQUIRED_UNTOUCHED
+- when: EXACT_TWO_COMPLETE_GROUPS_BUT_TIME_RULES_UNKNOWN_OR_FAIL
+  verdict: EXTEND_EVIDENCE
+  roles:
+    development: PROVISIONAL_ONLY
+    validation: NONE
+    holdout: UNASSIGNED_UNOPENED
+- when: FEWER_THAN_TWO_COMPLETE_GROUPS_OR_IDENTITY_DRIFT
+  verdict: DATASET_NOT_SPLITTABLE
+- when: THREE_OR_MORE_COMPLETE_GROUPS
+  verdict: REDESIGN_SPLIT
+  reason: REEVALUATE_GROUP_AND_CHRONOLOGY_WITH_NEW_DATASET_IDENTITY
+
+holdout_access_contract:
+  initial_state: UNTOUCHED
+  terminal_state_after_first_access: CONSUMED
+  reset_consumed_to_untouched_allowed: false
+  event_model: APPEND_ONLY
+  access_default: DENY
+  access_requires:
+  - split_id
+  - dataset_inventory_sha256
+  - holdout_partition_sha256
+  - research_cycle_id
+  - hypothesis_id
+  - hypothesis_version
+  - trial_id
+  - actor_id
+  - opened_at
+  - reason
+  - exact_query_or_code_sha256
+  - decision_receipt_id
+  - prior_state
+  - resulting_state
+  existing_registry_fit: INSUFFICIENT_REQUIRES_ADDITIVE_TASK22_SCHEMA_OR_VALIDATED_COMPANION_RECORD
+  historical_registry_bytes_mutable: false
+
+claim_boundary:
+  allowed:
+  - GROUP_AWARE_SPLIT_FEASIBILITY
+  - SPLIT_READY_WITH_LIMITATIONS
+  - PIPELINE_VALIDATION
+  forbidden:
+  - MARKET_WIDE_REPRESENTATIVENESS
+  - CROSS_REGIME_GENERALIZATION
+  - STATISTICAL_POWER_SUFFICIENCY
+  - ALPHA
+  - EXECUTABLE_NET_RETURN
+  - STRATEGY_READINESS
+  - POSITION_OR_PNL
+  - PRODUCTION_READINESS
+
+reuse:
+  adopt:
+  - DATA-T21-FINAL-DATASET-FREEZE-MANIFEST-001
+  - EVIDENCE-T21-EFFECTIVE-SAMPLE-SUMMARY-001
+  - REGISTRY-HOLDOUT-CONSUMPTION-001
+  - CATALOG-SCHEMA-LIFECYCLE-001
+  wrap:
+  - TASK22_GROUP_AWARE_SPLIT_CONTRACT
+  - DETERMINISTIC_CONTRACT_TESTS
+  fork: []
+  build: []
+  new_dependency_count: 0
+  existing_holdout_registry_reused_as_append_only_destination: true
+  existing_holdout_schema_sufficient_without_additive_extension: false
+
+catalog:
+  registered_in_atom2: false
+  status: CATALOG_TRANSACTION_PENDING_T22_A4
+  blocks_contract_freeze: false
+  blocks_task22_done: true
+  planned_asset_ids:
+  - CONTRACT-T22-GROUP-AWARE-SPLIT-001
+  - CONFIG-T22-GROUP-AWARE-SPLIT-001
+  - TEST-T22-GROUP-AWARE-SPLIT-CONTRACT-001
+
+authority:
+  class: LOCAL_WRITE_ONLY
+  source: EXPLICIT_USER
+  gate_phrase: T22-A2_FROZEN_GROUP_AWARE_SPLIT_CONTRACT_V1
+  managed_files:
+  - docs/contracts/task22_group_aware_split_contract_v1.md
+  - configs/task22_group_aware_split_v1.yaml
+  - tests/test_task22_group_aware_split_contract.py
+  network_calls: 0
+  provider_api_rpc_wss_calls: 0
+  drive_reads: 0
+  drive_writes: 0
+  credential_use: 0
+  outcome_reads: 0
+  raw_or_dataset_writes: 0
+  cash_spend_usd_cents: 0
+  dependency_changes: 0
+  commit: false
+  push: false
+  pull_request: false
+  merge: false
+  ui_changes: false
+  wallet_signer_transaction_actions: 0
+  destructive_actions: false
+
+next_atom:
+  atom_id: T22-A3_DETERMINISTIC_SPLIT_AND_HOLDOUT_LEDGER_V1
+  implementation_authorized_by_atom2: false
+  outcome_reads_authorized: false
+  external_calls_authorized: false
+  required_result: CONTENT_ADDRESSED_SPLIT_MANIFEST_AND_APPEND_ONLY_LEDGER_WITHOUT_OUTCOME_ACCESS

@@ -252,7 +252,7 @@ class Task17AExecutionCapacityAuditTests(unittest.TestCase):
         checkpoint = catalog.observed_catalog_checkpoint(snapshot)
         self.assertGreaterEqual(checkpoint["assets"], 321)
         self.assertEqual(checkpoint["asset_registries"], 4)
-        self.assertEqual(checkpoint["schemas"], 4)
+        self.assertGreaterEqual(checkpoint["schemas"], 4)
         self.assertEqual(checkpoint["queries"], 8)
         expected = {
             "CONTRACT-T17A-TIMING-REPAIR-001":

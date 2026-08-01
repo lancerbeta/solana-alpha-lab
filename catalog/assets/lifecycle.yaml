@@ -206,7 +206,7 @@ records:
   evidence: []
   classification: *id004
 - asset_id: GENERATED-PROJECT-MAP-001
-  record_version: '1.37'
+  record_version: '1.39'
   asset_type: generated_view
   purpose: Deterministic human-readable navigation projected only from the Catalog.
   status: IMPLEMENTED_UNVERIFIED
@@ -219,7 +219,7 @@ records:
     repository_path: docs/PROJECT_MAP.md
   integrity:
     kind: sha256
-    sha256: 95bdbb5453f93acc8cbc86a442da89fb93874fc5136cca5cdb7905d40108c5ee
+    sha256: d070eb3ba0f43a7b0d3f04e95d3dadb9510ddfb80fff8cd5a5a4ee8a062d1af9
   access:
     mode: read_only
     method: file
@@ -250,7 +250,7 @@ records:
   evidence: []
   classification: *id004
 - asset_id: GENERATED-EDGE-PROJECTION-001
-  record_version: '1.28'
+  record_version: '1.30'
   asset_type: generated_view
   purpose: Deterministic machine-readable projection of Catalog asset relations.
   status: IMPLEMENTED_UNVERIFIED
@@ -263,7 +263,7 @@ records:
     repository_path: catalog/generated/asset_edges.json
   integrity:
     kind: sha256
-    sha256: 30832ad03586a96c5aca6c635a874a17f756790eecfe6d909b229ba4b45ebd56
+    sha256: 9b75841a9639e9471ae759de4902c900deb02f5663083433257556f8be14af93
   access:
     mode: read_only
     method: file

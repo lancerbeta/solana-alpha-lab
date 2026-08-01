@@ -1,0 +1,130 @@
+schema: smial.task22_consumer_time_profile
+schema_version: '1.0'
+profile_id: TASK23-COHORT-DIAGNOSTICS-THREE-PANEL-001
+profile_version: '1.0'
+task_id: TASK-22
+atom_id: T22-A5_CONSUMER_TIME_PROFILE_AND_SPLIT_RESOLUTION_V1
+status: FROZEN_OUTCOME_BLIND_CONSUMER_PROFILE
+as_of: '2026-08-01'
+contains_secrets: false
+
+accepted_baseline:
+  a4_receipt:
+    path: docs/evidence/task22/a4_acceptance_catalog_factory_fit_v1.json
+    sha256: 23e11802e9239f3f97b9395f28beffc190e85dcad2c51c7403a875077accd7c3
+  parent_split:
+    path: docs/evidence/task22/dataset_split_manifest_v1.json
+    sha256: d00c14b8f5e7f0f9bf21d124d4830a016fe4f18f0da09e0e87483af6fdff77e8
+    split_id: T22-SPLIT-T21-FROZEN-001
+    split_content_sha256: 9f8b4affc821685ca1737716c748779e71ecbeef45bfafaf0ed4a1d5fd799458
+    verdict: EXTEND_EVIDENCE
+  parent_ledger:
+    path: docs/evidence/task22/holdout_access_ledger_v1.json
+    sha256: d21bf93227cf77895a29d1f6e02559c1ac94c40d803e4dd073003e7ce5d0ddfd
+    state: UNASSIGNED_UNOPENED
+
+frozen_timing_inputs:
+- batch_id: T21-R2
+  panel_id: P0
+  path: docs/evidence/task21/r2_event_triggered_source_p0_runtime_acceptance_v1.json
+  sha256: 5c69ba68348b63976a54b8e69974d5cfd406c375d4688601d78bbddcbe8eee9c
+- batch_id: T21-R2
+  panel_id: P1
+  path: docs/evidence/task21/r2_p1_event_triggered_capture_runtime_acceptance_v1.json
+  sha256: fedb97b9bd8bb8d8d7a7650ba47e958d0b6d7659cb4fcfdaa1c73de6c31ffd54
+- batch_id: T21-R2
+  panel_id: P2
+  path: docs/evidence/task21/r2_p2_event_triggered_capture_runtime_acceptance_v1.json
+  sha256: 76644640134dc186fc4d65e98814f39ef5546695fce10bc385b1b8e9f469e1f1
+- batch_id: T21-R3
+  panel_id: P0
+  path: docs/evidence/task21/r3_event_triggered_source_p0_runtime_acceptance_v1.json
+  sha256: 7ecac36cd890106096ebb96c539ab6a48e49ddb2341821de06ced523c4552ec0
+- batch_id: T21-R3
+  panel_id: P1
+  path: docs/evidence/task21/r3_p1_event_triggered_capture_runtime_acceptance_v1.json
+  sha256: aca3f231a4996a221c249dffd830b4456ffb2399db6ac398b8f33474f40cd767
+- batch_id: T21-R3
+  panel_id: P2
+  path: docs/evidence/task21/r3_p2_event_triggered_capture_runtime_acceptance_v1.json
+  sha256: 40ef6884736a90aad98ecacf6e8fe52d2464a808e99075c775418f454b81fa9a
+
+consumer:
+  consumer_task_id: TASK-23
+  consumer_decision: DESCRIBE_CONDITIONED_COHORT_SURVIVAL_ROUTE_AVAILABILITY_LIQUIDITY_DEPTH_MISSINGNESS_AND_DEPENDENCE
+  optimization_or_strategy_selection_allowed: false
+  feature_source: ACCEPTED_P0_PANEL_AT_ACTUAL_TIMESTAMP
+  outcome_sources:
+  - ACCEPTED_P1_PANEL_AT_ACTUAL_TIMESTAMP
+  - ACCEPTED_P2_PANEL_AT_ACTUAL_TIMESTAMP
+  elapsed_time_semantics: ACTUAL_EVENT_TIMESTAMPS_NEVER_NOMINAL_PANEL_LABELS
+  feature_max_lookback_seconds: 0
+  label_horizon_seconds: 5400
+  label_first_reliable_available_at_rule: MAX_ACCEPTED_P2_COMPLETED_AT_PER_BATCH
+  execution_or_settlement_lag_seconds_if_applicable: 0
+  embargo_seconds: 900
+  exact_horizon_claims_allowed: false
+  allowed_elapsed_range_claim: OBSERVED_THREE_PANEL_WINDOW_UP_TO_90_MINUTES
+  forbidden_claims:
+  - EXACT_15_MINUTE_OUTCOME
+  - EXACT_30_MINUTE_OUTCOME
+  - EXACT_60_MINUTE_OUTCOME
+  - FOUR_HOUR_OUTCOME
+  - STRATEGY_OPTIMIZATION
+  - ALPHA
+  - CROSS_REGIME_GENERALIZATION
+
+resolution_rules:
+  development_batch_id: T21-R2
+  validation: NONE
+  holdout_batch_id: T21-R3
+  purge_rule: REJECT_DEVELOPMENT_MEMBER_IF_ITS_ACCEPTED_P2_COMPLETED_AT_IS_NOT_BEFORE_HOLDOUT_SELECTION_TIME
+  embargo_rule: HOLDOUT_SELECTION_TIME_MUST_BE_AT_LEAST_900_SECONDS_AFTER_LATEST_ACCEPTED_DEVELOPMENT_P2_COMPLETION
+  actual_timestamp_required: true
+  source_start_gap_alone_sufficient: false
+  pass_result: SPLIT_READY_WITH_LIMITATIONS
+  fail_result: ADDITIONAL_INDEPENDENT_COHORT_REQUIRED_FOR_THIS_CONSUMER
+  holdout_state_on_pass: UNTOUCHED
+  holdout_access_on_pass: DENY
+  outcome_read_during_resolution_allowed: false
+
+outputs:
+  schema_path: catalog/schemas/task22_split_resolution.schema.json
+  split_manifest_path: docs/evidence/task22/dataset_split_manifest_v2.json
+  ledger_path: docs/evidence/task22/holdout_access_ledger_v2.json
+  catalog_registration: PENDING_T22_A6
+
+authority:
+  class: LOCAL_WRITE_ONLY
+  source: EXPLICIT_USER
+  gate_phrase: T22-A5_CONSUMER_TIME_PROFILE_AND_SPLIT_RESOLUTION_V1
+  managed_files:
+  - configs/task22_task23_consumer_time_profile_v1.yaml
+  - catalog/schemas/task22_split_resolution.schema.json
+  - src/solana_alpha_lab/task22_split_resolution.py
+  - scripts/build_task22_split_resolution.py
+  - docs/evidence/task22/dataset_split_manifest_v2.json
+  - docs/evidence/task22/holdout_access_ledger_v2.json
+  - tests/test_task22_consumer_time_profile_split_resolution.py
+  network_calls: 0
+  provider_api_rpc_wss_calls: 0
+  drive_reads: 0
+  drive_writes: 0
+  credential_use: 0
+  outcome_reads: 0
+  raw_or_dataset_writes: 0
+  additional_collection: 0
+  cash_spend_usd_cents: 0
+  dependency_changes: 0
+  commit: false
+  push: false
+  pull_request: false
+  merge: false
+  wallet_signer_transaction_actions: 0
+  destructive_actions: false
+
+next_boundary:
+  atom_id: T22-A6_SPLIT_RESOLUTION_ACCEPTANCE_CATALOG_FACTORY_FIT_V1
+  authorized: false
+  outcome_reads_authorized: false
+  external_calls_authorized: false

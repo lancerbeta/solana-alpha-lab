@@ -1,0 +1,279 @@
+{
+  "receipt_id": "T22-A4-ACCEPTANCE-CATALOG-FACTORY-FIT-RECEIPT-001",
+  "receipt_version": "1.0",
+  "task_id": "TASK-22",
+  "atom_id": "T22-A4_ACCEPTANCE_CATALOG_FACTORY_FIT_V1",
+  "status": "PASS_WITH_DURABLE_FOLLOWUP",
+  "as_of": "2026-08-01",
+  "repository_base": {
+    "branch": "task22/dataset-split",
+    "head": "2ff5a9de4e78a8e64b23754ff59680a33c01d3cc",
+    "tree": "3af1179da534972ccf82073dfe1594858c69516e",
+    "upstream": "origin/main"
+  },
+  "accepted_result": {
+    "owner_verdict": "EXTEND_EVIDENCE",
+    "split_id": "T22-SPLIT-T21-FROZEN-001",
+    "split_content_sha256": "9f8b4affc821685ca1737716c748779e71ecbeef45bfafaf0ed4a1d5fd799458",
+    "dataset_inventory_sha256": "aaa605eabdb62c38d218b40e768669db460c6fa419c4086d5412547b7f2fffae",
+    "development_candidate": "T21-R2",
+    "validation": "NONE",
+    "holdout_candidate": "T21-R3",
+    "holdout_state": "UNASSIGNED_UNOPENED",
+    "holdout_access": "DENY",
+    "outcome_values_read": false,
+    "outcome_paths_opened": [],
+    "source_start_gap_seconds": 6797.239863,
+    "maximum_project_horizon_seconds": 14400,
+    "task23_outcome_analysis_authorized": false,
+    "additional_collection_authorized": false,
+    "reason_codes": [
+      "CONSUMER_TIME_CONTRACT_MISSING",
+      "SOURCE_START_GAP_LT_MAX_PROJECT_HORIZON"
+    ]
+  },
+  "frozen_artifacts": [
+    {
+      "asset_id": "CONTRACT-T22-GROUP-AWARE-SPLIT-001",
+      "path": "docs/contracts/task22_group_aware_split_contract_v1.md",
+      "sha256": "75ecf347dc92e2ff7b08825e13be093a9f34f93b77dc989591d11083bd53c96f"
+    },
+    {
+      "asset_id": "CONFIG-T22-GROUP-AWARE-SPLIT-001",
+      "path": "configs/task22_group_aware_split_v1.yaml",
+      "sha256": "43e71918e4da1150defc97b812ea648fac9f3a3c567dba379f6948b0ac007272"
+    },
+    {
+      "asset_id": "TEST-T22-GROUP-AWARE-SPLIT-CONTRACT-001",
+      "path": "tests/test_task22_group_aware_split_contract.py",
+      "sha256": "c07c9ef73858fe1bd9d62eb6e97b47bb3e2b031886d7aa629fe6b2c76eba6bae"
+    },
+    {
+      "asset_id": "SCHEMA-T22-SPLIT-MANIFEST-001",
+      "path": "catalog/schemas/task22_split_manifest.schema.json",
+      "sha256": "b764cfc0b50ebb99cd88cd7be27c2f7aa1367028f180d48c29baa0a313baacc5"
+    },
+    {
+      "asset_id": "SCHEMA-T22-HOLDOUT-LEDGER-EXTENSION-001",
+      "path": "catalog/schemas/task22_holdout_ledger_extension.schema.json",
+      "sha256": "b83cbd54a37a08296dee4329afbec97c917f26fdfd2f67158d0eb6bfac354080"
+    },
+    {
+      "asset_id": "MODULE-T22-DATASET-SPLIT-001",
+      "path": "src/solana_alpha_lab/task22_dataset_split.py",
+      "sha256": "5f8dad5dffb23ec896d8dc104ce4652b6b8d943a7143f81246dd6006eaea4d82"
+    },
+    {
+      "asset_id": "SCRIPT-T22-DATASET-SPLIT-001",
+      "path": "scripts/build_task22_dataset_split.py",
+      "sha256": "401fe7bd2272456421865666a70d19130eda6f2209b408bc932f47b88e81738d"
+    },
+    {
+      "asset_id": "DATA-T22-SPLIT-MANIFEST-001",
+      "path": "docs/evidence/task22/dataset_split_manifest_v1.json",
+      "sha256": "d00c14b8f5e7f0f9bf21d124d4830a016fe4f18f0da09e0e87483af6fdff77e8"
+    },
+    {
+      "asset_id": "EVIDENCE-T22-HOLDOUT-LEDGER-001",
+      "path": "docs/evidence/task22/holdout_access_ledger_v1.json",
+      "sha256": "d21bf93227cf77895a29d1f6e02559c1ac94c40d803e4dd073003e7ce5d0ddfd"
+    },
+    {
+      "asset_id": "EVIDENCE-T22-A3-ACCEPTANCE-001",
+      "path": "docs/evidence/task22/deterministic_split_and_holdout_ledger_acceptance_v1.json",
+      "sha256": "14480399ba90c89d1947627ba225417ff79ba135d5edd27e91aedba1c8bef1a6"
+    },
+    {
+      "asset_id": "TEST-T22-DATASET-SPLIT-001",
+      "path": "tests/test_task22_deterministic_split_and_holdout_ledger.py",
+      "sha256": "be9cffc74075039e38bc384ab2aa4ad0bf3f3c814cc6d5b87dc674134b186840"
+    }
+  ],
+  "catalog": {
+    "status": "REGISTERED_IN_TASK22_CATALOG_TRANSACTION",
+    "catalog_version": "0.27.0",
+    "assets": 387,
+    "asset_registries": 4,
+    "schemas": 6,
+    "queries": 8,
+    "lifecycle_registries": 9,
+    "lifecycle_records": 52,
+    "registered_asset_ids": [
+      "CONTRACT-T22-GROUP-AWARE-SPLIT-001",
+      "CONFIG-T22-GROUP-AWARE-SPLIT-001",
+      "TEST-T22-GROUP-AWARE-SPLIT-CONTRACT-001",
+      "SCHEMA-T22-SPLIT-MANIFEST-001",
+      "SCHEMA-T22-HOLDOUT-LEDGER-EXTENSION-001",
+      "MODULE-T22-DATASET-SPLIT-001",
+      "SCRIPT-T22-DATASET-SPLIT-001",
+      "DATA-T22-SPLIT-MANIFEST-001",
+      "EVIDENCE-T22-HOLDOUT-LEDGER-001",
+      "EVIDENCE-T22-A3-ACCEPTANCE-001",
+      "TEST-T22-DATASET-SPLIT-001",
+      "EVIDENCE-T22-A4-ACCEPTANCE-001",
+      "TEST-T22-A4-ACCEPTANCE-001"
+    ],
+    "named_consumers": [
+      "TASK-22",
+      "TASK-23",
+      "FACTORY-001",
+      "REG-RESEARCH-001"
+    ]
+  },
+  "factory_fit": {
+    "mode": "FULL_REVIEW",
+    "verdict": "PASS_WITH_DURABLE_FOLLOWUP",
+    "trigger": "RESEARCH_TRUTH_HOLDOUT_AND_DOWNSTREAM_ANALYSIS_BOUNDARY",
+    "bounded_correction": "HORIZON_PROFILE_FIRST_NO_BLIND_RECOLLECTION",
+    "checks": [
+      {
+        "check_id": "GOAL_FIT",
+        "status": "PASS",
+        "evidence": "The split protects hypothesis evaluation from answer leakage rather than maximizing dataset or control volume."
+      },
+      {
+        "check_id": "RESEARCH_TRUTH",
+        "status": "PASS",
+        "evidence": "Outcomes remain unopened and missing temporal assumptions cannot silently become independence claims."
+      },
+      {
+        "check_id": "GROUP_AND_LEAKAGE_INTEGRITY",
+        "status": "PASS",
+        "evidence": "Nomination batches never cross candidate roles, validation is honestly NONE and R1 stays auxiliary gap evidence."
+      },
+      {
+        "check_id": "HOLDOUT_GOVERNANCE",
+        "status": "PASS",
+        "evidence": "Default access is DENY, first valid access is append-only CONSUMED and no reset to UNTOUCHED exists."
+      },
+      {
+        "check_id": "COMPATIBILITY_AND_HISTORY",
+        "status": "PASS",
+        "evidence": "The companion event embeds a record valid under the unchanged TASK-03 registry schema while retaining richer TASK-22 access evidence."
+      },
+      {
+        "check_id": "FLEXIBILITY_AND_REUSE",
+        "status": "PASS",
+        "evidence": "Content-addressed group candidates can be evaluated under later versioned consumer profiles without rewriting TASK-21 evidence."
+      },
+      {
+        "check_id": "EFFICIENCY_AND_PARETO",
+        "status": "PASS",
+        "evidence": "The next step tests a local horizon profile before authorizing any new provider calls or cohort collection."
+      },
+      {
+        "check_id": "OWNER_JOURNEY",
+        "status": "PASS",
+        "evidence": "The owner sees a binary next decision: a named consumer fits the honest temporal envelope or it needs new independent evidence."
+      },
+      {
+        "check_id": "DATA_FITNESS",
+        "status": "PASS_WITH_LIMITATION",
+        "evidence": "Five complete members in two clusters support narrow conditional work but not a generic 15m to 4h holdout claim."
+      },
+      {
+        "check_id": "EXECUTION_TO_CASHFLOW",
+        "status": "NOT_APPLICABLE",
+        "evidence": "TASK-22 protects research evaluation and creates no signal order fill position PnL or cashflow truth."
+      },
+      {
+        "check_id": "POSITION_AND_RISK_TRUTH",
+        "status": "NOT_APPLICABLE",
+        "evidence": "No position inventory signer transaction or real-money authority is created or inferred."
+      },
+      {
+        "check_id": "MONITORING_AND_RECOVERY",
+        "status": "PASS",
+        "evidence": "Content hashes detect drift and append-only snapshots preserve audit and recovery history."
+      },
+      {
+        "check_id": "BUILD_VERSUS_BUY",
+        "status": "PASS",
+        "evidence": "Existing JSON Schema Catalog and lifecycle registry are adopted or wrapped with no dependency or service addition."
+      },
+      {
+        "check_id": "FAILURE_RED_TEAM",
+        "status": "PASS",
+        "evidence": "Tests reject group mixing invented validation outcome access history mutation reset and incompatible registry projection."
+      },
+      {
+        "check_id": "CONTRADICTION_SCAN",
+        "status": "PASS",
+        "evidence": "A2 contract A3 manifest ledger acceptance Catalog consumers and non-claims agree on EXTEND_EVIDENCE."
+      }
+    ],
+    "durable_followup": {
+      "followup_id": "TASK22_CONSUMER_TIME_PROFILE_BEFORE_OUTCOME_ACCESS",
+      "owner": "TASK-22",
+      "activation_trigger": "BEFORE_ANY_OUTCOME_READ_OR_TASK23_OUTCOME_ANALYSIS",
+      "next_atom": "T22-A5_CONSUMER_TIME_PROFILE_AND_SPLIT_RESOLUTION_V1",
+      "minimum_evidence": [
+        "NAMED_CONSUMER_AND_DECISION",
+        "FEATURE_MAX_LOOKBACK_SECONDS",
+        "LABEL_HORIZON_SECONDS",
+        "LABEL_FIRST_RELIABLE_AVAILABLE_AT_RULE",
+        "EXECUTION_OR_SETTLEMENT_LAG_SECONDS_IF_APPLICABLE",
+        "DETERMINISTIC_PURGE_AND_EMBARGO_RESULT"
+      ],
+      "decision_branches": [
+        {
+          "when": "PROFILE_FITS_EXISTING_TEMPORAL_ENVELOPE",
+          "result": "NEW_SPLIT_VERSION_READY_WITH_LIMITATIONS_AND_R3_UNTOUCHED"
+        },
+        {
+          "when": "PROFILE_DOES_NOT_FIT_AND_CONSUMER_REMAINS_VALUABLE",
+          "result": "ADDITIONAL_INDEPENDENT_COHORT_REQUIRES_SEPARATE_PROVIDER_AUTHORITY"
+        },
+        {
+          "when": "NO_VALID_CONSUMER_CONTRACT",
+          "result": "DATASET_NOT_SPLITTABLE_FOR_THAT_CONSUMER"
+        }
+      ]
+    }
+  },
+  "validation": {
+    "task22_a2_a3_suite": "PASS_23_OF_23",
+    "task22_a4_acceptance_suite": "PASS_6_OF_6",
+    "catalog_validation": "PASS_0_27_0_387_ASSETS",
+    "generated_navigation": "PASS",
+    "full_repository_validation": "DEFERRED_TO_REPOSITORY_DELIVERY_CI_SAME_CANDIDATE"
+  },
+  "authority": {
+    "local_write_only": true,
+    "network_calls": 0,
+    "provider_api_rpc_wss_calls": 0,
+    "drive_reads": 0,
+    "drive_writes": 0,
+    "outcome_reads": 0,
+    "raw_or_dataset_writes": 0,
+    "additional_collection": 0,
+    "cash_spend_usd_cents": 0,
+    "provider_credits": 0,
+    "credential_use": 0,
+    "dependency_changes": 0,
+    "wallet_signer_transaction_actions": 0,
+    "commit": false,
+    "push": false,
+    "pull_request": false,
+    "merge": false
+  },
+  "nonclaims": [
+    "NOT_OUTCOME_ANALYSIS",
+    "NOT_ALPHA",
+    "NOT_STRATEGY_OR_SIGNAL",
+    "NOT_EXECUTION_OR_POSITION",
+    "NOT_NET_RETURN_OR_OWNER_CASHFLOW",
+    "NOT_MARKET_WIDE_OR_CROSS_REGIME_GENERALIZATION",
+    "NOT_GENERIC_15M_TO_4H_HOLDOUT_READINESS",
+    "NOT_ADDITIONAL_COLLECTION_AUTHORITY",
+    "NOT_TASK23_START_AUTHORITY",
+    "NOT_PRODUCTION_READINESS"
+  ],
+  "canonical_status_candidate": "TASK22_A4_LOCAL_CANDIDATE_READY_FOR_SPLIT_RESOLUTION",
+  "next_gate": {
+    "atom_id": "T22-A5_CONSUMER_TIME_PROFILE_AND_SPLIT_RESOLUTION_V1",
+    "authority": "LOCAL_WRITE_ONLY_OUTCOMES_AND_EXTERNAL_CALLS_ZERO",
+    "authorized_by_t22_a4": false
+  },
+  "state_change": "LOCAL_FILES_AND_CATALOG_ONLY"
+}

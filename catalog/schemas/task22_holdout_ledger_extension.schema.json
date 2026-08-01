@@ -1,0 +1,145 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "repo://catalog/schemas/task22_holdout_ledger_extension.schema.json",
+  "title": "TASK-22 append-only holdout access companion ledger",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema",
+    "schema_version",
+    "task_id",
+    "atom_id",
+    "as_of",
+    "ledger_id",
+    "ledger_version",
+    "previous_ledger_sha256",
+    "role",
+    "registry_binding",
+    "split_binding",
+    "state",
+    "append_only_contract",
+    "records",
+    "catalog"
+  ],
+  "properties": {
+    "schema": {"const": "smial.task22.holdout-ledger-extension"},
+    "schema_version": {"const": "1.0"},
+    "task_id": {"const": "TASK-22"},
+    "atom_id": {"const": "T22-A3_DETERMINISTIC_SPLIT_AND_HOLDOUT_LEDGER_V1"},
+    "as_of": {"type": "string", "format": "date"},
+    "ledger_id": {"const": "T22-HOLDOUT-ACCESS-LEDGER-001"},
+    "ledger_version": {"type": "integer", "minimum": 1},
+    "previous_ledger_sha256": {"oneOf": [{"type": "null"}, {"$ref": "#/$defs/sha256"}]},
+    "role": {"const": "COMPANION_EVIDENCE_NOT_SECOND_TRUTH_OWNER"},
+    "registry_binding": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["registry_id", "registry_type", "truth_owner", "path", "sha256", "historical_bytes_mutable"],
+      "properties": {
+        "registry_id": {"const": "SMIAL-REGISTRY-HOLDOUT-CONSUMPTION"},
+        "registry_type": {"const": "holdout_consumption"},
+        "truth_owner": {"const": "TASK-03"},
+        "path": {"const": "registries/holdout_consumption.yaml"},
+        "sha256": {"$ref": "#/$defs/sha256"},
+        "historical_bytes_mutable": {"const": false}
+      }
+    },
+    "split_binding": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["split_id", "path", "sha256", "split_content_sha256"],
+      "properties": {
+        "split_id": {"const": "T22-SPLIT-T21-FROZEN-001"},
+        "path": {"const": "docs/evidence/task22/dataset_split_manifest_v1.json"},
+        "sha256": {"$ref": "#/$defs/sha256"},
+        "split_content_sha256": {"$ref": "#/$defs/sha256"}
+      }
+    },
+    "state": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["current", "access_default", "outcome_values_read", "outcome_paths_opened"],
+      "properties": {
+        "current": {"enum": ["UNASSIGNED_UNOPENED", "UNTOUCHED", "CONSUMED"]},
+        "access_default": {"const": "DENY"},
+        "outcome_values_read": {"type": "boolean"},
+        "outcome_paths_opened": {"type": "array", "items": {"type": "string"}}
+      }
+    },
+    "append_only_contract": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["snapshot_files_are_create_only", "prior_records_must_be_exact_prefix", "allowed_transitions", "consumed_to_untouched_allowed", "base_registry_projection"],
+      "properties": {
+        "snapshot_files_are_create_only": {"const": true},
+        "prior_records_must_be_exact_prefix": {"const": true},
+        "allowed_transitions": {"const": ["UNASSIGNED_UNOPENED->UNTOUCHED", "UNTOUCHED->CONSUMED"]},
+        "consumed_to_untouched_allowed": {"const": false},
+        "base_registry_projection": {"const": "APPEND_BASE_REGISTRY_RECORD_ONLY_AFTER_VALID_CONSUMPTION"}
+      }
+    },
+    "records": {
+      "type": "array",
+      "items": {"$ref": "#/$defs/consumption_event"}
+    },
+    "catalog": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["registered_in_atom3", "status"],
+      "properties": {
+        "registered_in_atom3": {"const": false},
+        "status": {"const": "CATALOG_TRANSACTION_PENDING_T22_A4"}
+      }
+    }
+  },
+  "$defs": {
+    "sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+    "stable_id": {"type": "string", "pattern": "^[A-Z][A-Z0-9]*(?:-[A-Z0-9]+)+$"},
+    "timestamp": {"type": "string", "format": "date-time"},
+    "base_registry_record": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["record_kind", "record_id", "status", "created_at", "evidence_asset_ids", "research_cycle_id", "consumed_at"],
+      "properties": {
+        "record_kind": {"const": "holdout_consumption"},
+        "record_id": {"$ref": "#/$defs/stable_id"},
+        "status": {"const": "RECORDED"},
+        "created_at": {"$ref": "#/$defs/timestamp"},
+        "evidence_asset_ids": {"type": "array", "uniqueItems": true, "items": {"$ref": "#/$defs/stable_id"}},
+        "research_cycle_id": {"$ref": "#/$defs/stable_id"},
+        "consumed_at": {"$ref": "#/$defs/timestamp"}
+      }
+    },
+    "access_receipt": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["split_id", "dataset_inventory_sha256", "holdout_partition_sha256", "hypothesis_id", "hypothesis_version", "trial_id", "actor_id", "opened_at", "reason", "exact_query_or_code_sha256", "decision_receipt_id", "outcome_paths_opened"],
+      "properties": {
+        "split_id": {"const": "T22-SPLIT-T21-FROZEN-001"},
+        "dataset_inventory_sha256": {"$ref": "#/$defs/sha256"},
+        "holdout_partition_sha256": {"$ref": "#/$defs/sha256"},
+        "hypothesis_id": {"$ref": "#/$defs/stable_id"},
+        "hypothesis_version": {"type": "string", "pattern": "^[0-9]+\\.[0-9]+(?:\\.[0-9]+)?$"},
+        "trial_id": {"$ref": "#/$defs/stable_id"},
+        "actor_id": {"$ref": "#/$defs/stable_id"},
+        "opened_at": {"$ref": "#/$defs/timestamp"},
+        "reason": {"type": "string", "minLength": 8},
+        "exact_query_or_code_sha256": {"$ref": "#/$defs/sha256"},
+        "decision_receipt_id": {"$ref": "#/$defs/stable_id"},
+        "outcome_paths_opened": {"type": "array", "minItems": 1, "uniqueItems": true, "items": {"type": "string", "minLength": 3}}
+      }
+    },
+    "consumption_event": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["event_sequence", "prior_state", "resulting_state", "base_registry_record", "access_receipt"],
+      "properties": {
+        "event_sequence": {"type": "integer", "minimum": 1},
+        "prior_state": {"const": "UNTOUCHED"},
+        "resulting_state": {"const": "CONSUMED"},
+        "base_registry_record": {"$ref": "#/$defs/base_registry_record"},
+        "access_receipt": {"$ref": "#/$defs/access_receipt"}
+      }
+    }
+  }
+}

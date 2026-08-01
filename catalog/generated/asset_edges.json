@@ -408,6 +408,16 @@
       "target_asset_id": "CONTRACT-T21-FORWARD-COLLECTION-RUN-PLAN-001"
     },
     {
+      "source_asset_id": "CONFIG-T22-CONSUMER-TIME-PROFILE-001",
+      "relation": "derived_from",
+      "target_asset_id": "EVIDENCE-T22-A4-ACCEPTANCE-001"
+    },
+    {
+      "source_asset_id": "CONFIG-T22-GROUP-AWARE-SPLIT-001",
+      "relation": "governed_by",
+      "target_asset_id": "CONTRACT-T22-GROUP-AWARE-SPLIT-001"
+    },
+    {
       "source_asset_id": "CONTRACT-T05-DATA-001",
       "relation": "depends_on",
       "target_asset_id": "ADR-MVP-STACK-002"
@@ -843,6 +853,11 @@
       "target_asset_id": "ARCH-INTENT-002"
     },
     {
+      "source_asset_id": "CONTRACT-T22-GROUP-AWARE-SPLIT-001",
+      "relation": "derived_from",
+      "target_asset_id": "HANDOFF-T21-TASK22-001"
+    },
+    {
       "source_asset_id": "CONTROL-T21-ACTIVE-TIME-GATE-001",
       "relation": "governed_by",
       "target_asset_id": "CONTRACT-T21-A7-ACCEPTANCE-001"
@@ -1221,6 +1236,31 @@
       "source_asset_id": "DATA-T21-FINAL-DATASET-FREEZE-MANIFEST-001",
       "relation": "derived_from",
       "target_asset_id": "EVIDENCE-T21-FINAL-DATASET-RECOVERY-001"
+    },
+    {
+      "source_asset_id": "DATA-T22-SPLIT-MANIFEST-001",
+      "relation": "derived_from",
+      "target_asset_id": "DATA-T21-FINAL-DATASET-FREEZE-MANIFEST-001"
+    },
+    {
+      "source_asset_id": "DATA-T22-SPLIT-MANIFEST-001",
+      "relation": "governed_by",
+      "target_asset_id": "SCHEMA-T22-SPLIT-MANIFEST-001"
+    },
+    {
+      "source_asset_id": "DATA-T22-SPLIT-MANIFEST-002",
+      "relation": "derived_from",
+      "target_asset_id": "CONFIG-T22-CONSUMER-TIME-PROFILE-001"
+    },
+    {
+      "source_asset_id": "DATA-T22-SPLIT-MANIFEST-002",
+      "relation": "derived_from",
+      "target_asset_id": "DATA-T22-SPLIT-MANIFEST-001"
+    },
+    {
+      "source_asset_id": "DATA-T22-SPLIT-MANIFEST-002",
+      "relation": "governed_by",
+      "target_asset_id": "SCHEMA-T22-SPLIT-RESOLUTION-001"
     },
     {
       "source_asset_id": "DECISION-T14-PROVIDER-PURCHASE-001",
@@ -1786,6 +1826,66 @@
       "source_asset_id": "EVIDENCE-T21-FINISH-GATE-001",
       "relation": "validated_by",
       "target_asset_id": "TEST-T21-FINISH-GATE-001"
+    },
+    {
+      "source_asset_id": "EVIDENCE-T22-A3-ACCEPTANCE-001",
+      "relation": "derived_from",
+      "target_asset_id": "DATA-T22-SPLIT-MANIFEST-001"
+    },
+    {
+      "source_asset_id": "EVIDENCE-T22-A3-ACCEPTANCE-001",
+      "relation": "derived_from",
+      "target_asset_id": "EVIDENCE-T22-HOLDOUT-LEDGER-001"
+    },
+    {
+      "source_asset_id": "EVIDENCE-T22-A4-ACCEPTANCE-001",
+      "relation": "derived_from",
+      "target_asset_id": "EVIDENCE-T22-A3-ACCEPTANCE-001"
+    },
+    {
+      "source_asset_id": "EVIDENCE-T22-A4-ACCEPTANCE-001",
+      "relation": "validated_by",
+      "target_asset_id": "TEST-T22-A4-ACCEPTANCE-001"
+    },
+    {
+      "source_asset_id": "EVIDENCE-T22-A6-ACCEPTANCE-001",
+      "relation": "derived_from",
+      "target_asset_id": "DATA-T22-SPLIT-MANIFEST-002"
+    },
+    {
+      "source_asset_id": "EVIDENCE-T22-A6-ACCEPTANCE-001",
+      "relation": "derived_from",
+      "target_asset_id": "EVIDENCE-T22-HOLDOUT-LEDGER-002"
+    },
+    {
+      "source_asset_id": "EVIDENCE-T22-A6-ACCEPTANCE-001",
+      "relation": "validated_by",
+      "target_asset_id": "TEST-T22-A6-ACCEPTANCE-001"
+    },
+    {
+      "source_asset_id": "EVIDENCE-T22-HOLDOUT-LEDGER-001",
+      "relation": "depends_on",
+      "target_asset_id": "DATA-T22-SPLIT-MANIFEST-001"
+    },
+    {
+      "source_asset_id": "EVIDENCE-T22-HOLDOUT-LEDGER-001",
+      "relation": "governed_by",
+      "target_asset_id": "SCHEMA-T22-HOLDOUT-LEDGER-EXTENSION-001"
+    },
+    {
+      "source_asset_id": "EVIDENCE-T22-HOLDOUT-LEDGER-002",
+      "relation": "depends_on",
+      "target_asset_id": "DATA-T22-SPLIT-MANIFEST-002"
+    },
+    {
+      "source_asset_id": "EVIDENCE-T22-HOLDOUT-LEDGER-002",
+      "relation": "derived_from",
+      "target_asset_id": "EVIDENCE-T22-HOLDOUT-LEDGER-001"
+    },
+    {
+      "source_asset_id": "EVIDENCE-T22-HOLDOUT-LEDGER-002",
+      "relation": "governed_by",
+      "target_asset_id": "SCHEMA-T22-SPLIT-RESOLUTION-001"
     },
     {
       "source_asset_id": "FIXTURE-BATON-SUITE-001",
@@ -2778,6 +2878,36 @@
       "target_asset_id": "CONTRACT-T21-FORWARD-COLLECTION-RUN-PLAN-001"
     },
     {
+      "source_asset_id": "MODULE-T22-DATASET-SPLIT-001",
+      "relation": "governed_by",
+      "target_asset_id": "CONFIG-T22-GROUP-AWARE-SPLIT-001"
+    },
+    {
+      "source_asset_id": "MODULE-T22-DATASET-SPLIT-001",
+      "relation": "produces",
+      "target_asset_id": "DATA-T22-SPLIT-MANIFEST-001"
+    },
+    {
+      "source_asset_id": "MODULE-T22-DATASET-SPLIT-001",
+      "relation": "produces",
+      "target_asset_id": "EVIDENCE-T22-HOLDOUT-LEDGER-001"
+    },
+    {
+      "source_asset_id": "MODULE-T22-SPLIT-RESOLUTION-001",
+      "relation": "governed_by",
+      "target_asset_id": "CONFIG-T22-CONSUMER-TIME-PROFILE-001"
+    },
+    {
+      "source_asset_id": "MODULE-T22-SPLIT-RESOLUTION-001",
+      "relation": "produces",
+      "target_asset_id": "DATA-T22-SPLIT-MANIFEST-002"
+    },
+    {
+      "source_asset_id": "MODULE-T22-SPLIT-RESOLUTION-001",
+      "relation": "produces",
+      "target_asset_id": "EVIDENCE-T22-HOLDOUT-LEDGER-002"
+    },
+    {
       "source_asset_id": "PRE-GIT-TASK01-A017",
       "relation": "derived_from",
       "target_asset_id": "BUNDLE-TASK01-COMPLETION-001"
@@ -3378,6 +3508,31 @@
       "target_asset_id": "TEST-T16-HYPOTHESIS-LIFECYCLE-RESEARCH-MEMORY-CONTRACT-001"
     },
     {
+      "source_asset_id": "SCHEMA-T22-HOLDOUT-LEDGER-EXTENSION-001",
+      "relation": "depends_on",
+      "target_asset_id": "REGISTRY-HOLDOUT-CONSUMPTION-001"
+    },
+    {
+      "source_asset_id": "SCHEMA-T22-HOLDOUT-LEDGER-EXTENSION-001",
+      "relation": "governed_by",
+      "target_asset_id": "CONTRACT-T22-GROUP-AWARE-SPLIT-001"
+    },
+    {
+      "source_asset_id": "SCHEMA-T22-SPLIT-MANIFEST-001",
+      "relation": "governed_by",
+      "target_asset_id": "CONTRACT-T22-GROUP-AWARE-SPLIT-001"
+    },
+    {
+      "source_asset_id": "SCHEMA-T22-SPLIT-RESOLUTION-001",
+      "relation": "depends_on",
+      "target_asset_id": "REGISTRY-HOLDOUT-CONSUMPTION-001"
+    },
+    {
+      "source_asset_id": "SCHEMA-T22-SPLIT-RESOLUTION-001",
+      "relation": "governed_by",
+      "target_asset_id": "CONFIG-T22-CONSUMER-TIME-PROFILE-001"
+    },
+    {
       "source_asset_id": "SCM-BASELINE-COMMIT-001",
       "relation": "governed_by",
       "target_asset_id": "CTRL-TASK-03-001"
@@ -3721,6 +3876,16 @@
       "source_asset_id": "SCRIPT-T21-OWNER-PULSE-READ-MODEL-001",
       "relation": "depends_on",
       "target_asset_id": "MODULE-T21-OWNER-PULSE-READ-MODEL-001"
+    },
+    {
+      "source_asset_id": "SCRIPT-T22-DATASET-SPLIT-001",
+      "relation": "depends_on",
+      "target_asset_id": "MODULE-T22-DATASET-SPLIT-001"
+    },
+    {
+      "source_asset_id": "SCRIPT-T22-SPLIT-RESOLUTION-001",
+      "relation": "depends_on",
+      "target_asset_id": "MODULE-T22-SPLIT-RESOLUTION-001"
     },
     {
       "source_asset_id": "TEMPLATE-BATON-ISSUE-FORM-001",
@@ -4511,6 +4676,46 @@
       "source_asset_id": "TEST-T21-FINISH-GATE-001",
       "relation": "depends_on",
       "target_asset_id": "SCRIPT-T21-FINISH-GATE-001"
+    },
+    {
+      "source_asset_id": "TEST-T22-A4-ACCEPTANCE-001",
+      "relation": "depends_on",
+      "target_asset_id": "EVIDENCE-T22-A4-ACCEPTANCE-001"
+    },
+    {
+      "source_asset_id": "TEST-T22-A4-ACCEPTANCE-001",
+      "relation": "depends_on",
+      "target_asset_id": "TEST-T22-DATASET-SPLIT-001"
+    },
+    {
+      "source_asset_id": "TEST-T22-A6-ACCEPTANCE-001",
+      "relation": "depends_on",
+      "target_asset_id": "EVIDENCE-T22-A6-ACCEPTANCE-001"
+    },
+    {
+      "source_asset_id": "TEST-T22-A6-ACCEPTANCE-001",
+      "relation": "depends_on",
+      "target_asset_id": "TEST-T22-SPLIT-RESOLUTION-001"
+    },
+    {
+      "source_asset_id": "TEST-T22-DATASET-SPLIT-001",
+      "relation": "depends_on",
+      "target_asset_id": "EVIDENCE-T22-A3-ACCEPTANCE-001"
+    },
+    {
+      "source_asset_id": "TEST-T22-GROUP-AWARE-SPLIT-CONTRACT-001",
+      "relation": "depends_on",
+      "target_asset_id": "CONFIG-T22-GROUP-AWARE-SPLIT-001"
+    },
+    {
+      "source_asset_id": "TEST-T22-SPLIT-RESOLUTION-001",
+      "relation": "depends_on",
+      "target_asset_id": "DATA-T22-SPLIT-MANIFEST-002"
+    },
+    {
+      "source_asset_id": "TEST-T22-SPLIT-RESOLUTION-001",
+      "relation": "depends_on",
+      "target_asset_id": "EVIDENCE-T22-HOLDOUT-LEDGER-002"
     },
     {
       "source_asset_id": "VALIDATOR-REPOSITORY-STATE-001",

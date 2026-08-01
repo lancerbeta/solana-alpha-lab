@@ -1,0 +1,170 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "repo://catalog/schemas/task22_split_resolution.schema.json",
+  "title": "TASK-22 consumer-specific split resolution artifacts",
+  "oneOf": [
+    {"$ref": "#/$defs/split_manifest"},
+    {"$ref": "#/$defs/holdout_ledger"}
+  ],
+  "$defs": {
+    "sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+    "binding": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["path", "sha256"],
+      "properties": {
+        "path": {"type": "string", "minLength": 3},
+        "sha256": {"$ref": "#/$defs/sha256"}
+      }
+    },
+    "split_manifest": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "schema",
+        "schema_version",
+        "task_id",
+        "atom_id",
+        "as_of",
+        "split_id",
+        "parent_split",
+        "status",
+        "consumer_profile",
+        "content_addressing",
+        "temporal_resolution",
+        "roles",
+        "outcome_seal",
+        "claim_boundary",
+        "acceptance",
+        "catalog"
+      ],
+      "properties": {
+        "schema": {"const": "smial.task22.dataset-split-manifest-v2"},
+        "schema_version": {"const": "2.0"},
+        "task_id": {"const": "TASK-22"},
+        "atom_id": {"const": "T22-A5_CONSUMER_TIME_PROFILE_AND_SPLIT_RESOLUTION_V1"},
+        "as_of": {"type": "string", "format": "date"},
+        "split_id": {"const": "T22-SPLIT-T21-FROZEN-002"},
+        "parent_split": {"type": "object"},
+        "status": {"const": "SPLIT_READY_WITH_LIMITATIONS"},
+        "consumer_profile": {"type": "object"},
+        "content_addressing": {
+          "type": "object",
+          "required": ["digest_algorithm", "identity_payload", "split_content_sha256", "dataset_inventory_sha256"],
+          "properties": {
+            "digest_algorithm": {"const": "SHA-256"},
+            "identity_payload": {"type": "object"},
+            "split_content_sha256": {"$ref": "#/$defs/sha256"},
+            "dataset_inventory_sha256": {"$ref": "#/$defs/sha256"}
+          }
+        },
+        "temporal_resolution": {
+          "type": "object",
+          "required": ["verdict", "development_label_available_at", "holdout_selection_at", "pre_embargo_gap_seconds", "required_embargo_seconds", "post_embargo_slack_seconds", "purged_development_members", "actual_timestamps_used"],
+          "properties": {
+            "verdict": {"const": "PASS"},
+            "development_label_available_at": {"type": "string", "format": "date-time"},
+            "holdout_selection_at": {"type": "string", "format": "date-time"},
+            "pre_embargo_gap_seconds": {"type": "number", "minimum": 900},
+            "required_embargo_seconds": {"const": 900},
+            "post_embargo_slack_seconds": {"type": "number", "minimum": 0},
+            "purged_development_members": {"type": "array", "maxItems": 0},
+            "actual_timestamps_used": {"const": true}
+          }
+        },
+        "roles": {
+          "type": "object",
+          "required": ["development", "validation", "holdout", "auxiliary_gap_evidence"],
+          "properties": {
+            "development": {"type": "object"},
+            "validation": {
+              "type": "object",
+              "properties": {"state": {"const": "NONE"}},
+              "required": ["state"]
+            },
+            "holdout": {
+              "type": "object",
+              "properties": {
+                "state": {"const": "UNTOUCHED"},
+                "access": {"const": "DENY"}
+              },
+              "required": ["state", "access"]
+            },
+            "auxiliary_gap_evidence": {"type": "array", "minItems": 1}
+          }
+        },
+        "outcome_seal": {
+          "type": "object",
+          "required": ["state", "outcome_values_read", "outcome_paths_opened", "access_default"],
+          "properties": {
+            "state": {"const": "UNOPENED"},
+            "outcome_values_read": {"const": false},
+            "outcome_paths_opened": {"type": "array", "maxItems": 0},
+            "access_default": {"const": "DENY"}
+          }
+        },
+        "claim_boundary": {"type": "object"},
+        "acceptance": {"type": "object"},
+        "catalog": {"type": "object"}
+      }
+    },
+    "holdout_ledger": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "schema",
+        "schema_version",
+        "task_id",
+        "atom_id",
+        "as_of",
+        "ledger_id",
+        "ledger_version",
+        "previous_ledger",
+        "role",
+        "registry_binding",
+        "split_binding",
+        "assignment_receipt",
+        "state",
+        "records",
+        "catalog"
+      ],
+      "properties": {
+        "schema": {"const": "smial.task22.holdout-ledger-extension-v2"},
+        "schema_version": {"const": "2.0"},
+        "task_id": {"const": "TASK-22"},
+        "atom_id": {"const": "T22-A5_CONSUMER_TIME_PROFILE_AND_SPLIT_RESOLUTION_V1"},
+        "as_of": {"type": "string", "format": "date"},
+        "ledger_id": {"const": "T22-HOLDOUT-ACCESS-LEDGER-001"},
+        "ledger_version": {"const": 2},
+        "previous_ledger": {"$ref": "#/$defs/binding"},
+        "role": {"const": "COMPANION_EVIDENCE_NOT_SECOND_TRUTH_OWNER"},
+        "registry_binding": {"type": "object"},
+        "split_binding": {"type": "object"},
+        "assignment_receipt": {
+          "type": "object",
+          "required": ["assignment_id", "prior_state", "resulting_state", "holdout_batch_id", "consumer_profile_id", "outcome_values_read"],
+          "properties": {
+            "assignment_id": {"const": "T22-HOLDOUT-ASSIGNMENT-001"},
+            "prior_state": {"const": "UNASSIGNED_UNOPENED"},
+            "resulting_state": {"const": "UNTOUCHED"},
+            "holdout_batch_id": {"const": "T21-R3"},
+            "consumer_profile_id": {"const": "TASK23-COHORT-DIAGNOSTICS-THREE-PANEL-001"},
+            "outcome_values_read": {"const": false}
+          }
+        },
+        "state": {
+          "type": "object",
+          "required": ["current", "access_default", "outcome_values_read", "outcome_paths_opened"],
+          "properties": {
+            "current": {"const": "UNTOUCHED"},
+            "access_default": {"const": "DENY"},
+            "outcome_values_read": {"const": false},
+            "outcome_paths_opened": {"type": "array", "maxItems": 0}
+          }
+        },
+        "records": {"type": "array", "maxItems": 0},
+        "catalog": {"type": "object"}
+      }
+    }
+  }
+}

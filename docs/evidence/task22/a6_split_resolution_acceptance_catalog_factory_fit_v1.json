@@ -1,0 +1,195 @@
+{
+  "receipt_id": "T22-A6-SPLIT-RESOLUTION-ACCEPTANCE-CATALOG-FACTORY-FIT-RECEIPT-001",
+  "receipt_version": "1.0",
+  "task_id": "TASK-22",
+  "atom_id": "T22-A6_SPLIT_RESOLUTION_ACCEPTANCE_CATALOG_FACTORY_FIT_V1",
+  "status": "PASS_SPLIT_READY_WITH_LIMITATIONS",
+  "as_of": "2026-08-01",
+  "repository_base": {
+    "branch": "task22/dataset-split",
+    "head": "2ff5a9de4e78a8e64b23754ff59680a33c01d3cc",
+    "tree": "3af1179da534972ccf82073dfe1594858c69516e",
+    "upstream": "origin/main"
+  },
+  "accepted_result": {
+    "owner_verdict": "SPLIT_READY_WITH_LIMITATIONS",
+    "split_id": "T22-SPLIT-T21-FROZEN-002",
+    "split_manifest_sha256": "973a9ff6dd2a376e62dee9289a57cbb62f06c8efb5a619fa6b7b2a7914dd0683",
+    "split_content_sha256": "63b6d63895bdd6d25b68501619bca21e10f476a95ad8d27611f356a26cccee2d",
+    "dataset_inventory_sha256": "aaa605eabdb62c38d218b40e768669db460c6fa419c4086d5412547b7f2fffae",
+    "consumer_profile_id": "TASK23-COHORT-DIAGNOSTICS-THREE-PANEL-001",
+    "consumer_profile_sha256": "71a253d8b94f32a954d0195d2d544fdfb94e1b41ae680313bb48caa115ed01a0",
+    "development": "T21-R2",
+    "validation": "NONE",
+    "holdout": "T21-R3",
+    "holdout_state": "UNTOUCHED",
+    "holdout_access": "DENY",
+    "outcome_state": "UNOPENED",
+    "outcome_values_read": false,
+    "outcome_paths_opened": [],
+    "development_label_available_at": "2026-08-01T13:11:54.057142Z",
+    "holdout_selection_at": "2026-08-01T13:40:15.363386Z",
+    "pre_embargo_gap_seconds": 1701.306244,
+    "required_embargo_seconds": 900,
+    "post_embargo_slack_seconds": 801.306244,
+    "purged_development_members": [],
+    "additional_collection_required": false,
+    "additional_collection_authorized": false,
+    "task23_started": false,
+    "task23_outcome_access_authorized": false
+  },
+  "frozen_a5_artifacts": [
+    {
+      "asset_id": "CONFIG-T22-CONSUMER-TIME-PROFILE-001",
+      "path": "configs/task22_task23_consumer_time_profile_v1.yaml",
+      "sha256": "71a253d8b94f32a954d0195d2d544fdfb94e1b41ae680313bb48caa115ed01a0"
+    },
+    {
+      "asset_id": "SCHEMA-T22-SPLIT-RESOLUTION-001",
+      "path": "catalog/schemas/task22_split_resolution.schema.json",
+      "sha256": "b52d92128c104989291da46c9ce335e2b8f2b24a46e9b0acecc44da60c327cc0"
+    },
+    {
+      "asset_id": "MODULE-T22-SPLIT-RESOLUTION-001",
+      "path": "src/solana_alpha_lab/task22_split_resolution.py",
+      "sha256": "4c6886141666f5533f2c92396cc4dcc9eb4941677e63e28437fb513da10dc249"
+    },
+    {
+      "asset_id": "SCRIPT-T22-SPLIT-RESOLUTION-001",
+      "path": "scripts/build_task22_split_resolution.py",
+      "sha256": "f9cf6ebdcea5c570001a2df57238cf688cece48e15a840921853574d6a7086bb"
+    },
+    {
+      "asset_id": "DATA-T22-SPLIT-MANIFEST-002",
+      "path": "docs/evidence/task22/dataset_split_manifest_v2.json",
+      "sha256": "973a9ff6dd2a376e62dee9289a57cbb62f06c8efb5a619fa6b7b2a7914dd0683"
+    },
+    {
+      "asset_id": "EVIDENCE-T22-HOLDOUT-LEDGER-002",
+      "path": "docs/evidence/task22/holdout_access_ledger_v2.json",
+      "sha256": "2282e5d1eac09a0ce940a5700f04b03ff4d75fc9cd4d65e08e5fe7deda88ca51"
+    },
+    {
+      "asset_id": "TEST-T22-SPLIT-RESOLUTION-001",
+      "path": "tests/test_task22_consumer_time_profile_split_resolution.py",
+      "sha256": "72139cd917f5a923a6423f2447ce1e0012ebe3a74181c28f5574e100bdf90206"
+    }
+  ],
+  "catalog": {
+    "status": "REGISTERED_IN_TASK22_SPLIT_RESOLUTION_TRANSACTION",
+    "catalog_version": "0.27.1",
+    "assets": 396,
+    "asset_registries": 4,
+    "schemas": 7,
+    "queries": 8,
+    "lifecycle_registries": 9,
+    "lifecycle_records": 52,
+    "registered_asset_ids": [
+      "CONFIG-T22-CONSUMER-TIME-PROFILE-001",
+      "SCHEMA-T22-SPLIT-RESOLUTION-001",
+      "MODULE-T22-SPLIT-RESOLUTION-001",
+      "SCRIPT-T22-SPLIT-RESOLUTION-001",
+      "DATA-T22-SPLIT-MANIFEST-002",
+      "EVIDENCE-T22-HOLDOUT-LEDGER-002",
+      "TEST-T22-SPLIT-RESOLUTION-001",
+      "EVIDENCE-T22-A6-ACCEPTANCE-001",
+      "TEST-T22-A6-ACCEPTANCE-001"
+    ],
+    "updated_forward_compatibility_asset_ids": [
+      "TEST-T17A-EXECUTION-CAPACITY-AUDIT-001",
+      "TEST-T19-ACCEPTANCE-CATALOG-FACTORY-FIT-001",
+      "TEST-T20-ACCEPTANCE-CATALOG-FACTORY-FIT-001",
+      "TEST-T21-A7-ACCEPTANCE-001",
+      "TEST-T22-A4-ACCEPTANCE-001"
+    ],
+    "named_consumers": [
+      "TASK-22",
+      "TASK-23",
+      "FACTORY-001",
+      "REG-RESEARCH-001"
+    ]
+  },
+  "factory_fit": {
+    "mode": "FULL_REVIEW",
+    "verdict": "PASS_WITH_LIMITATIONS_AND_DURABLE_FOLLOWUP",
+    "trigger": "HOLDOUT_ROLE_ASSIGNMENT_AND_DOWNSTREAM_OUTCOME_BOUNDARY",
+    "bounded_correction": "FORWARD_COMPATIBLE_HISTORICAL_CATALOG_ASSERTIONS",
+    "checks": [
+      {"check_id": "GOAL_FIT", "status": "PASS", "evidence": "The accepted split protects the first narrow hypothesis analysis from answer leakage without collecting more data."},
+      {"check_id": "RESEARCH_TRUTH", "status": "PASS", "evidence": "R3 is assigned only from frozen timing metadata; outcome values remain unopened and access remains default deny."},
+      {"check_id": "GROUP_AND_LEAKAGE_INTEGRITY", "status": "PASS", "evidence": "R2 and R3 batches remain intact, validation is honestly NONE and the measured embargo has positive slack."},
+      {"check_id": "HOLDOUT_GOVERNANCE", "status": "PASS", "evidence": "The append-only assignment moves R3 from UNASSIGNED_UNOPENED to UNTOUCHED; first outcome access must append CONSUMED and cannot reset history."},
+      {"check_id": "COMPATIBILITY_AND_HISTORY", "status": "PASS", "evidence": "Historical acceptance receipts retain their original Catalog facts while tests accept monotonic future Catalog growth."},
+      {"check_id": "FLEXIBILITY_AND_REUSE", "status": "PASS", "evidence": "A versioned consumer time profile resolves one named analysis without redefining the immutable TASK-21 dataset."},
+      {"check_id": "EFFICIENCY_AND_PARETO", "status": "PASS", "evidence": "Local metadata resolution avoids unnecessary provider calls and a third cohort."},
+      {"check_id": "OWNER_JOURNEY", "status": "PASS", "evidence": "The owner gets a clear transition from sealed dataset to one bounded TASK-23 consumer, with an explicit first-access gate."},
+      {"check_id": "DATA_FITNESS", "status": "PASS_WITH_LIMITATION", "evidence": "Five members in two batches support narrow conditional diagnostics only; actual panel timestamps replace nominal 15m 30m or 60m claims."},
+      {"check_id": "EXECUTION_TO_CASHFLOW", "status": "NOT_APPLICABLE", "evidence": "No signal order fill position PnL or owner cashflow claim is created."},
+      {"check_id": "POSITION_AND_RISK_TRUTH", "status": "NOT_APPLICABLE", "evidence": "No position inventory signer transaction or real-money authority exists."},
+      {"check_id": "MONITORING_AND_RECOVERY", "status": "PASS", "evidence": "Content hashes detect drift and append-only ledger versions preserve recovery and audit history."},
+      {"check_id": "BUILD_VERSUS_BUY", "status": "PASS", "evidence": "Existing JSON Schema and Catalog machinery are wrapped without a new dependency or service."},
+      {"check_id": "FAILURE_RED_TEAM", "status": "PASS", "evidence": "Tests reject lookback leakage strategy optimization nominal horizons short label envelopes insufficient embargo outcome access and Catalog regression."},
+      {"check_id": "CONTRADICTION_SCAN", "status": "PASS", "evidence": "A4 follow-up A5 profile split ledger Catalog and TASK-23 boundary agree on SPLIT_READY_WITH_LIMITATIONS."}
+    ],
+    "durable_followup": {
+      "followup_id": "TASK23_FIRST_OUTCOME_ACCESS_CONSUMES_R3_HOLDOUT",
+      "owner": "TASK-23",
+      "activation_trigger": "BEFORE_FIRST_OUTCOME_VALUE_READ_FOR_T22_SPLIT_T21_FROZEN_002",
+      "required_action": "APPEND_CONSUMED_EVENT_TO_HOLDOUT_LEDGER_AND_TASK03_REGISTRY_PROJECTION_BOUND_TO_EXACT_HYPOTHESIS_TRIAL_QUERY_AND_ACTOR",
+      "destination": "TASK-23 ENTRY CONTRACT AND HOLDOUT CONSUMPTION REGISTRY",
+      "cannot_be_satisfied_by": [
+        "READING_OUTCOMES_FIRST",
+        "EDITING_PRIOR_LEDGER_BYTES",
+        "RESETTING_CONSUMED_TO_UNTOUCHED",
+        "USING_NOMINAL_PANEL_LABELS_AS_EXACT_HORIZONS"
+      ]
+    }
+  },
+  "validation": {
+    "task22_a2_a6_suite": "PASS_49_OF_49",
+    "catalog_validation": "PASS_0_27_1_396_ASSETS",
+    "generated_navigation": "PASS",
+    "full_repository_unit_suite": "PASS_1485_OF_1485",
+    "diff_check": "PASS"
+  },
+  "authority": {
+    "local_write_only": true,
+    "network_calls": 0,
+    "provider_api_rpc_wss_calls": 0,
+    "drive_reads": 0,
+    "drive_writes": 0,
+    "outcome_reads": 0,
+    "raw_or_dataset_writes": 0,
+    "additional_collection": 0,
+    "cash_spend_usd_cents": 0,
+    "provider_credits": 0,
+    "credential_use": 0,
+    "dependency_changes": 0,
+    "wallet_signer_transaction_actions": 0,
+    "commit": false,
+    "push": false,
+    "pull_request": false,
+    "merge": false,
+    "destructive_actions": false
+  },
+  "nonclaims": [
+    "NOT_OUTCOME_ANALYSIS",
+    "NOT_ALPHA",
+    "NOT_STRATEGY_OR_SIGNAL",
+    "NOT_EXECUTION_OR_POSITION",
+    "NOT_NET_RETURN_OR_OWNER_CASHFLOW",
+    "NOT_MARKET_WIDE_OR_CROSS_REGIME_GENERALIZATION",
+    "NOT_EXACT_15M_30M_60M_OR_4H_OUTCOME",
+    "NOT_TASK23_START_OR_OUTCOME_ACCESS_AUTHORITY",
+    "NOT_ADDITIONAL_COLLECTION_AUTHORITY",
+    "NOT_PRODUCTION_READINESS"
+  ],
+  "canonical_status_candidate": "TASK22_SPLIT_READY_WITH_LIMITATIONS_PENDING_REPOSITORY_DELIVERY",
+  "next_gate": {
+    "atom_id": "T22-A7_REPOSITORY_DELIVERY_V1",
+    "authorized": false,
+    "merge_authorized": false,
+    "task23_authorized": false
+  },
+  "state_change": "LOCAL_FILES_AND_CATALOG_ONLY"
+}
