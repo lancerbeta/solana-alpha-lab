@@ -48,6 +48,7 @@ from solana_alpha_lab.task21_multi_horizon_capture import (
 
 TASK_ID = "TASK-21"
 ATOM_ID = "T21-A6S_R2_P1_EVENT_TRIGGERED_FOREGROUND_CAPTURE_V1"
+R3_P1_ATOM_ID = "T21-A6S_R3_P1_EVENT_TRIGGERED_FOREGROUND_CAPTURE_V1"
 SCHEMA_VERSION = "1.0"
 MEMBERS_EXACT = 3
 CALLS_PER_PANEL_MAX = 8
@@ -57,6 +58,39 @@ RECEIVED_BYTES_MAX = 9_437_184
 MIN_FREE_SPACE_AFTER_WRITE = 2_147_483_648
 WALL_SECONDS_MAX = 300
 MINIMUM_INTERVAL_SECONDS = 2.2
+
+FOLLOWUP_BINDINGS = {
+    ATOM_ID: {
+        "batch_id": "T21-R2",
+        "members_exact": 3,
+        "calls_total_max": 24,
+        "acceptance_role": "R2_P0_RUNTIME_ACCEPTANCE",
+        "admission_role": "R2_ADMISSION_EVENTS",
+        "next_atom_id": "T21-A6S_R2_P2_EVENT_TRIGGERED_FOREGROUND_CAPTURE_V1",
+        "output_root": "local/task21_forward/final_cohort/r2/p1",
+        "used_before": {
+            "external_requests": 86,
+            "source_requests": 6,
+            "quote_requests": 80,
+            "response_bytes": 154_740,
+        },
+    },
+    R3_P1_ATOM_ID: {
+        "batch_id": "T21-R3",
+        "members_exact": 2,
+        "calls_total_max": 16,
+        "acceptance_role": "R3_P0_RUNTIME_ACCEPTANCE",
+        "admission_role": "R3_ADMISSION_EVENTS",
+        "next_atom_id": "T21-A6S_R3_P2_EVENT_TRIGGERED_FOREGROUND_CAPTURE_V1",
+        "output_root": "local/task21_forward/final_cohort/r3/p1",
+        "used_before": {
+            "external_requests": 152,
+            "source_requests": 8,
+            "quote_requests": 144,
+            "response_bytes": 283_442,
+        },
+    },
+}
 
 
 class Task21FollowupError(RuntimeError):
@@ -72,10 +106,17 @@ class Task21FollowupExecutionGate:
     authority_phrase: str
 
     def __post_init__(self) -> None:
-        if self.authority_phrase != ATOM_ID:
+        if self.authority_phrase not in FOLLOWUP_BINDINGS:
             raise Task21FollowupAuthorityRequired(
                 "task21_followup_authority_phrase_mismatch"
             )
+
+
+def _binding(config: Mapping[str, Any]) -> Mapping[str, Any]:
+    value = FOLLOWUP_BINDINGS.get(config.get("atom_id"))
+    if value is None:
+        raise Task21FollowupError("followup_config_identity_drift")
+    return value
 
 
 def _load_yaml(path: Path) -> dict[str, Any]:
@@ -187,14 +228,14 @@ def _protected_path(
 def validate_followup_config(
     config: Mapping[str, Any], repo_root: Path
 ) -> None:
-    """Validate the generic contract and the exact current P1 binding."""
+    """Validate the generic contract and an exact frozen P1 binding."""
 
+    binding = _binding(config)
     if (
         config.get("schema")
         != "smial.task21_event_triggered_followup_capture"
         or config.get("schema_version") != SCHEMA_VERSION
         or config.get("task_id") != TASK_ID
-        or config.get("atom_id") != ATOM_ID
         or config.get("status")
         != "FROZEN_FOR_SEPARATE_EXACT_PROVIDER_AUTHORITY"
     ):
@@ -205,8 +246,8 @@ def validate_followup_config(
     roles = [item.get("role") for item in protected if isinstance(item, Mapping)]
     if roles != [
         "EVENT_TRIGGERED_RUNTIME_PLAN",
-        "R2_P0_RUNTIME_ACCEPTANCE",
-        "R2_ADMISSION_EVENTS",
+        binding["acceptance_role"],
+        binding["admission_role"],
     ]:
         raise Task21FollowupError("followup_protected_role_order_drift")
     for role in roles:
@@ -214,12 +255,12 @@ def validate_followup_config(
 
     panel = config.get("panel", {})
     expected_panel = {
-        "batch_id": "T21-R2",
+        "batch_id": binding["batch_id"],
         "panel_id": "P1",
         "predecessor_panel_id": "P0",
         "next_panel_id": "P2",
-        "next_atom_id": "T21-A6S_R2_P2_EVENT_TRIGGERED_FOREGROUND_CAPTURE_V1",
-        "population_members_exact": MEMBERS_EXACT,
+        "next_atom_id": binding["next_atom_id"],
+        "population_members_exact": binding["members_exact"],
         "minimum_separation_seconds": 1801,
         "member_total_span_seconds_max": 86400,
         "narrow_expiry_window": None,
@@ -233,15 +274,18 @@ def validate_followup_config(
     member_ids = population.get("member_ids")
     if (
         not isinstance(member_ids, list)
-        or len(member_ids) != MEMBERS_EXACT
-        or len(set(member_ids)) != MEMBERS_EXACT
+        or len(member_ids) != binding["members_exact"]
+        or len(set(member_ids)) != binding["members_exact"]
         or population.get("deterministic_order")
         != ["entered_at", "nomination_event_id", "mint"]
         or population.get("outcome_or_route_input_used") is not False
     ):
         raise Task21FollowupError("followup_population_contract_drift")
     predecessor = config.get("predecessor_receipts")
-    if not isinstance(predecessor, list) or len(predecessor) != MEMBERS_EXACT:
+    if (
+        not isinstance(predecessor, list)
+        or len(predecessor) != binding["members_exact"]
+    ):
         raise Task21FollowupError("followup_predecessor_receipts_drift")
     if [item.get("member_id") for item in predecessor] != member_ids:
         raise Task21FollowupError("followup_predecessor_order_drift")
@@ -265,8 +309,8 @@ def validate_followup_config(
         "notionals_usd": [10, 25, 50, 100],
         "quote_pairs_per_panel": 4,
         "provider_calls_per_panel_max": CALLS_PER_PANEL_MAX,
-        "provider_calls_total_max": CALLS_TOTAL_MAX,
-        "modeled_provider_credits_max": CALLS_TOTAL_MAX,
+        "provider_calls_total_max": binding["calls_total_max"],
+        "modeled_provider_credits_max": binding["calls_total_max"],
         "received_response_bytes_max": RECEIVED_BYTES_MAX,
         "durable_local_bytes_max": DURABLE_BYTES_MAX,
         "wall_seconds_max": WALL_SECONDS_MAX,
@@ -287,16 +331,11 @@ def validate_followup_config(
         or caps.get("response_bytes") != 25_165_824
         or caps.get("stored_bytes") != 125_829_120
         or caps.get("dataset_bytes") != 268_435_456
-        or used
-        != {
-            "external_requests": 86,
-            "source_requests": 6,
-            "quote_requests": 80,
-            "response_bytes": 154_740,
-        }
-        or used["external_requests"] + CALLS_TOTAL_MAX
+        or used != binding["used_before"]
+        or used["external_requests"] + binding["calls_total_max"]
         > caps["external_requests"]
-        or used["quote_requests"] + CALLS_TOTAL_MAX > caps["quote_requests"]
+        or used["quote_requests"] + binding["calls_total_max"]
+        > caps["quote_requests"]
         or used["response_bytes"] + RECEIVED_BYTES_MAX
         > caps["response_bytes"]
         or budget.get("minimum_free_space_bytes_after_write")
@@ -322,8 +361,7 @@ def validate_followup_config(
 
     runtime = config.get("runtime", {})
     if (
-        runtime.get("output_root")
-        != "local/task21_forward/final_cohort/r2/p1"
+        runtime.get("output_root") != binding["output_root"]
         or runtime.get("write_behavior") != "CREATE_ONLY_CONTENT_ADDRESSED"
         or runtime.get("all_members_eligible_before_first_provider_call")
         is not True
@@ -336,9 +374,9 @@ def validate_followup_config(
     authority = config.get("authority", {})
     expected_authority = {
         "source": "AUTHORIZATION_REQUIRED",
-        "exact_phrase": ATOM_ID,
-        "provider_api_rpc_wss_calls_max": CALLS_TOTAL_MAX,
-        "jupiter_calls_max": CALLS_TOTAL_MAX,
+        "exact_phrase": config["atom_id"],
+        "provider_api_rpc_wss_calls_max": binding["calls_total_max"],
+        "jupiter_calls_max": binding["calls_total_max"],
         "nominations": 0,
         "admissions": 0,
         "retries": 0,
@@ -362,7 +400,8 @@ def validate_followup_config(
 def _load_members(
     config: Mapping[str, Any], repo_root: Path
 ) -> list[dict[str, Any]]:
-    path = _protected_path(config, repo_root, "R2_ADMISSION_EVENTS")
+    binding = _binding(config)
+    path = _protected_path(config, repo_root, str(binding["admission_role"]))
     members: list[dict[str, Any]] = []
     for line in path.read_text(encoding="utf-8").splitlines():
         value = json.loads(line)
@@ -374,7 +413,7 @@ def _load_members(
         raise Task21FollowupError("followup_population_order_drift")
     for member in members:
         if (
-            member.get("batch_id") != "T21-R2"
+            member.get("batch_id") != binding["batch_id"]
             or not isinstance(member.get("mint"), str)
             or not isinstance(member.get("mint_decimals"), int)
             or not isinstance(member.get("entered_at"), str)
@@ -425,7 +464,7 @@ def _projection_envelope(
         "task_id": TASK_ID,
         "atom_id": atom_id,
         "hypothesis_version_id": member["hypothesis_version_id"],
-        "batch_id": "T21-R2",
+        "batch_id": member["batch_id"],
         "member_id": member["member_id"],
         "nomination_event_id": member["nomination_event_id"],
         "horizon_id": panel_id,
@@ -550,7 +589,7 @@ def _capture_member(
         "schema_version": SCHEMA_VERSION,
         "task_id": TASK_ID,
         "atom_id": atom_id,
-        "batch_id": "T21-R2",
+        "batch_id": member["batch_id"],
         "horizon_id": panel_id,
         "config_sha256": config_hash,
         "member_id": member_id,
@@ -573,7 +612,7 @@ def _capture_member(
         "schema_version": SCHEMA_VERSION,
         "task_id": TASK_ID,
         "atom_id": atom_id,
-        "batch_id": "T21-R2",
+        "batch_id": member["batch_id"],
         "horizon_id": panel_id,
         "window_id": window_id,
         "member_id": member_id,
@@ -687,6 +726,11 @@ def run_event_triggered_followup_capture(
         raise Task21FollowupError("followup_config_outside_repository")
     config = _load_yaml(config_path)
     validate_followup_config(config, repo_root)
+    binding = _binding(config)
+    if gate.authority_phrase != config["atom_id"]:
+        raise Task21FollowupAuthorityRequired(
+            "task21_followup_authority_phrase_mismatch"
+        )
     observed_at = now()
     if observed_at.tzinfo is None or observed_at.utcoffset() is None:
         raise Task21FollowupError("followup_now_must_be_timezone_aware")
@@ -710,20 +754,20 @@ def run_event_triggered_followup_capture(
 
     members = _load_members(config, repo_root)
     predecessors = _load_predecessors(config, repo_root)
-    r2_acceptance = _load_json(
-        _protected_path(config, repo_root, "R2_P0_RUNTIME_ACCEPTANCE")
+    predecessor_acceptance = _load_json(
+        _protected_path(config, repo_root, str(binding["acceptance_role"]))
     )
-    admission = r2_acceptance.get("admission", {})
+    admission = predecessor_acceptance.get("admission", {})
     accepted_member_ids = admission.get("member_ids")
     if accepted_member_ids is None:
         accepted_member_ids = [
             item.get("member_id") for item in admission.get("members", [])
         ]
     if (
-        r2_acceptance.get("status") != "PASS"
+        predecessor_acceptance.get("status") != "PASS"
         or accepted_member_ids != config["population"]["member_ids"]
     ):
-        raise Task21FollowupError("followup_r2_acceptance_drift")
+        raise Task21FollowupError("followup_predecessor_acceptance_drift")
     event_config = _load_yaml(
         _protected_path(config, repo_root, "EVENT_TRIGGERED_RUNTIME_PLAN")
     )
@@ -796,11 +840,11 @@ def run_event_triggered_followup_capture(
 
     calls = sum(int(item["provider_calls"]) for item in summaries)
     received = sum(int(item["received_bytes"]) for item in summaries)
-    if calls > CALLS_TOTAL_MAX:
+    if calls > binding["calls_total_max"]:
         raise Task21FollowupError("followup_total_call_cap_exceeded")
     if received > RECEIVED_BYTES_MAX:
         raise Task21FollowupError("followup_total_received_cap_exceeded")
-    complete = len(summaries) == MEMBERS_EXACT and all(
+    complete = len(summaries) == binding["members_exact"] and all(
         item["status"] == "COMPLETE" for item in summaries
     )
     stop_reason = None
@@ -892,7 +936,7 @@ def run_event_triggered_followup_capture(
             "status": (
                 "P2_EVENT_TRIGGER_READY_AFTER_MINIMUM_SEPARATION"
                 if complete
-                else "R2_P1_REVIEW_REQUIRED"
+                else f"{binding['batch_id']}_P1_REVIEW_REQUIRED"
             ),
             "atom_id": config["panel"]["next_atom_id"] if complete else None,
             "member_not_before": next_members,

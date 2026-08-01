@@ -34,6 +34,10 @@ ACCEPTANCE = (
     ROOT
     / "docs/evidence/task21/r2_p1_event_triggered_capture_offline_acceptance_v1.json"
 )
+COMPATIBILITY = (
+    ROOT
+    / "docs/evidence/task21/followup_capture_multi_batch_compatibility_v1.json"
+)
 FIXED_NOW = datetime(2026, 8, 1, 12, 20, tzinfo=UTC)
 MEMBERS = [
     {
@@ -406,8 +410,23 @@ class Task21EventTriggeredFollowupTests(unittest.TestCase):
         receipt = json.loads(ACCEPTANCE.read_text(encoding="utf-8"))
         self.assertEqual(receipt["status"], "PASS")
         self.assertEqual(receipt["actual_actions"]["provider_api_rpc_wss_calls"], 0)
+        compatibility = (
+            json.loads(COMPATIBILITY.read_text(encoding="utf-8"))
+            if COMPATIBILITY.is_file()
+            else None
+        )
         for item in receipt["artifacts"]:
-            self.assertEqual(digest(ROOT / item["path"]), item["sha256"])
+            current = digest(ROOT / item["path"])
+            if current == item["sha256"]:
+                continue
+            self.assertIsNotNone(compatibility)
+            superseded = next(
+                value
+                for value in compatibility["superseded_bindings"]
+                if value["path"] == item["path"]
+                and value["previous_sha256"] == item["sha256"]
+            )
+            self.assertEqual(current, superseded["current_sha256"])
 
 
 if __name__ == "__main__":

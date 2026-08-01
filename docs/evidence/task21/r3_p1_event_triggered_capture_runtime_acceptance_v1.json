@@ -1,0 +1,183 @@
+{
+  "schema": "smial.task21.r3-p1-event-triggered-capture-runtime-acceptance",
+  "schema_version": "1.0",
+  "evidence_id": "EVIDENCE-T21-R3-P1-RUNTIME-001",
+  "evidence_version": "1.0",
+  "task_id": "TASK-21",
+  "atom_id": "T21-A6S_R3_P1_EVENT_TRIGGERED_FOREGROUND_CAPTURE_V1",
+  "status": "PASS",
+  "as_of": "2026-08-01T14:20:52.407346Z",
+  "verdict": "R3_P1_EVENT_TRIGGERED_CAPTURE_ACCEPTED",
+  "protected_inputs": [
+    {
+      "path": "configs/task21_r3_p1_event_triggered_capture_v1.yaml",
+      "sha256": "95acc019dbe1dafeb553b921d5609fe81b29d5e896a3cb7c0125620296a9dc12"
+    },
+    {
+      "path": "docs/evidence/task21/r3_event_triggered_source_p0_runtime_acceptance_v1.json",
+      "sha256": "7ecac36cd890106096ebb96c539ab6a48e49ddb2341821de06ced523c4552ec0"
+    },
+    {
+      "path": "docs/evidence/task21/r3_p1_event_triggered_capture_offline_acceptance_v1.json",
+      "sha256": "bd389c2899fba42974b494ba20c5fa784b2671dfcd866dab0bcfcf54ed4ace9e"
+    },
+    {
+      "path": "docs/evidence/task21/followup_capture_multi_batch_compatibility_v1.json",
+      "sha256": "f557e247c44a5a0233560e30abccfc2ac8f227b5d64612370a15daf228bc347f"
+    },
+    {
+      "path": "src/solana_alpha_lab/task21_event_triggered_followup_capture.py",
+      "sha256": "d07eafddd1694dd9ec193bc2ba2b68a87cb8e69c19ab9a6a03364af7a16d3453"
+    },
+    {
+      "path": "docs/evidence/task21/pre_h24_recovery_refresh_acceptance_v1.json",
+      "sha256": "08f977ca926a6ba572e3cb5f4bea352d5e87e04a85f4e6c71c56f3a2ccf5b999"
+    }
+  ],
+  "runtime_preflight": {
+    "started_at": "2026-08-01T14:20:17.719450Z",
+    "all_two_members_eligible": true,
+    "member_total_span_deadline_at": "2026-08-02T13:40:15.366598Z",
+    "narrow_expiry_window": null,
+    "recovery_health": "HEALTHY",
+    "last_successful_backup_at": "2026-07-31T14:28:15.051Z",
+    "backup_age_hours": 23.867407903,
+    "backup_age_hours_max": 24,
+    "last_successful_restore_at": "2026-07-31T14:30:38.396037Z",
+    "restore_proof_age_hours": 23.827589837,
+    "restore_proof_age_hours_max": 168,
+    "repository_head": "5880021b8a65cff96ad3ca70fd88ba614fdf8a94",
+    "repository_tree": "7c00b7de5cbaedb2c2d6352909f68279cb064fd5"
+  },
+  "population": {
+    "batch_id": "T21-R3",
+    "member_count": 2,
+    "member_ids": [
+      "T21-WATCH-7a678b1052ac10b7d492",
+      "T21-WATCH-2c5632a2ba71c8e44637"
+    ],
+    "changed": false,
+    "candidate_nominations": 0,
+    "candidate_admissions": 0,
+    "outcome_or_route_selection_used": false,
+    "all_members_eligible_before_first_provider_call": true
+  },
+  "p1": {
+    "panels_complete": 2,
+    "panels_stopped": 0,
+    "quote_pairs_complete": 8,
+    "quote_attempts_complete": 16,
+    "terminal_counts": {
+      "QUOTE_AVAILABLE": 16
+    },
+    "windows": [
+      {
+        "member_id": "T21-WATCH-7a678b1052ac10b7d492",
+        "triggered_at": "2026-08-01T14:20:17.760182Z",
+        "completed_at": "2026-08-01T14:20:33.971358Z",
+        "provider_calls": 8,
+        "received_bytes": 13621,
+        "raw_events_sha256": "334ad3a7f18f1d5665317b38f44b5a71ebec34c822c028cb8f4371a39efb88c7",
+        "manifest_sha256": "a23dae1bf7a30cf2ede520c442323be13d3e55bc733c316403b683c0c9fa0a3f",
+        "receipt_sha256": "86a3ac57e576e76ee2aff4f464a4f6c557fdbdcd7225041a3247887b5482de91"
+      },
+      {
+        "member_id": "T21-WATCH-2c5632a2ba71c8e44637",
+        "triggered_at": "2026-08-01T14:20:36.187833Z",
+        "completed_at": "2026-08-01T14:20:52.407346Z",
+        "provider_calls": 8,
+        "received_bytes": 13333,
+        "raw_events_sha256": "d7325bccf05e20ab6971de9c9ec166649c4ab2bdb7883c7b9aa9903ea4e5cceb",
+        "manifest_sha256": "6023c9f8e9aad457569ca4885e2d4f1127bea735f62650442aad7edfeed5e5e8",
+        "receipt_sha256": "424156c3649e86cd192749433f682b84a821f2faeff8632d97c7c6dc3ed23d4c"
+      }
+    ]
+  },
+  "local_evidence": {
+    "root": "local/task21_forward/final_cohort/r3/p1/run=p1-20260801T142017719450Z-8bb3c0961780",
+    "file_count": 7,
+    "stored_bytes": 97018,
+    "runtime_receipt_sha256": "5f457005e6d1488c851b5233103b78be25fbd2f82d096765a89d768f8668e9bf",
+    "exact_readback": "PASS",
+    "hash_mismatches": 0,
+    "create_only": true,
+    "tracked_in_git": false
+  },
+  "budget_after_p1": {
+    "external_requests": 168,
+    "external_requests_cap": 192,
+    "source_requests": 8,
+    "source_requests_cap": 8,
+    "quote_requests": 160,
+    "quote_requests_cap": 184,
+    "response_bytes": 310396,
+    "response_bytes_cap": 25165824,
+    "reserved_r3_p2_quote_requests": 16
+  },
+  "actual_actions": {
+    "provider_api_rpc_wss_calls": 16,
+    "jupiter_calls": 16,
+    "modeled_provider_credits": 16,
+    "billed_provider_credit_claim": "NOT_AVAILABLE_KEYLESS_NO_ACCOUNT",
+    "received_bytes": 26954,
+    "candidate_nominations": 0,
+    "candidate_admissions": 0,
+    "local_raw_or_dataset_writes": 7,
+    "local_durable_bytes": 97018,
+    "retries": 0,
+    "concurrency": 1,
+    "cash_spend_usd_cents": 0,
+    "credentials_used": 0,
+    "drive_reads": 0,
+    "drive_writes": 0,
+    "scheduler_or_background_process": false,
+    "deploy": false,
+    "catalog_mutation": false,
+    "source_mutation": false,
+    "wallet_signer_transaction_actions": 0,
+    "destructive_actions": false,
+    "merge": false
+  },
+  "next_boundary": {
+    "status": "RECOVERY_REFRESH_THEN_P2_AFTER_MINIMUM_SEPARATION",
+    "atom_id": "T21-A6S_R3_P2_EVENT_TRIGGERED_FOREGROUND_CAPTURE_V1",
+    "minimum_separation_seconds": 1801,
+    "all_members_not_before_at": "2026-08-01T14:50:53.407346Z",
+    "all_members_not_before_at_msk": "2026-08-01T17:50:53.407346+03:00",
+    "current_backup_freshness_expires_at": "2026-08-01T14:28:15.051Z",
+    "recovery_refresh_required_before_p2": true,
+    "external_authority_granted": false,
+    "task22_authorized": false,
+    "a7_authorized": false
+  },
+  "catalog": {
+    "version": "0.25.0",
+    "status": "PENDING_T21_A7",
+    "mutation_performed": false
+  },
+  "product_horizon_watch": {
+    "watch_id": "SMIAL-AI-FIRST-DOCUMENTATION-SYSTEM-WATCH-001",
+    "status": "WATCH_TRIGGER",
+    "owner": "GPT_CONTROL_PLANE_AT_ROADMAP_RECONCILIATION",
+    "activation_trigger": "FOUNDATION_CONTRACTS_STABLE_AND_FIRST_REPEATING_OWNER_OR_AI_WORKFLOWS_EXIST",
+    "latest_binding_point": "TASK21_A7_CANONICAL_RECONCILIATION",
+    "planned_outcome": "VERSIONED_AI_AND_OWNER_DOCUMENTATION_WITH_METHODS_EXAMPLES_LIMITATIONS_AND_WORKING_SCENARIOS",
+    "delivery_preference": "DOCS_AS_CODE_WITH_FREE_STATIC_HOSTING_CANDIDATE_RESEARCH_AT_TRIGGER_TIME",
+    "vendor_selected": false,
+    "implementation_authorized": false,
+    "reason_not_now": "PREMATURE_PORTAL_STRUCTURE_WOULD_CHURN_WHILE_FOUNDATION_CONTRACTS_ARE_STILL_MOVING"
+  },
+  "delivery": {
+    "branch": "task21/final-cohort-extension",
+    "pull_request": 28,
+    "status": "PENDING_COMMIT_NON_FORCE_PUSH_AND_CI",
+    "merge_authorized": false
+  },
+  "non_claims": [
+    "NO_TRADE_SWAP_FILL_POSITION_PNL_OR_ALPHA_CLAIM",
+    "NO_OUTCOME_BASED_RESELECTION",
+    "NO_MARKET_WIDE_OR_CROSS_REGIME_CLAIM",
+    "NO_DRIVE_CATALOG_SOURCE_OR_DEPLOY_ACTION",
+    "NO_TASK22_OR_A7_AUTHORITY"
+  ]
+}

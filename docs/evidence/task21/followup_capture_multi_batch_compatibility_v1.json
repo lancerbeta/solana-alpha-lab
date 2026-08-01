@@ -1,0 +1,56 @@
+{
+  "schema": "smial.task21.followup-capture-multi-batch-compatibility",
+  "schema_version": "1.0",
+  "evidence_id": "EVIDENCE-T21-FOLLOWUP-MULTI-BATCH-COMPATIBILITY-001",
+  "evidence_version": "1.0",
+  "task_id": "TASK-21",
+  "atom_id": "T21-A6S_R3_P1_EVENT_TRIGGERED_FOREGROUND_CAPTURE_V1",
+  "status": "PASS",
+  "as_of": "2026-08-01",
+  "verdict": "R2_BEHAVIOR_PRESERVED_R3_EXACT_BINDING_ADDED",
+  "historical_evidence": {
+    "path": "docs/evidence/task21/r2_p1_event_triggered_capture_offline_acceptance_v1.json",
+    "sha256": "398c97fa1ab0263d5f56078367bd5976dc5a89d765cf22b236799a504f72b1a7",
+    "mutated": false
+  },
+  "superseded_bindings": [
+    {
+      "path": "src/solana_alpha_lab/task21_event_triggered_followup_capture.py",
+      "previous_sha256": "5f2bcbc584343bc025ab0906039a8613e58ec9b72fbe480ac600826c910e6c50",
+      "current_sha256": "d07eafddd1694dd9ec193bc2ba2b68a87cb8e69c19ab9a6a03364af7a16d3453",
+      "reason": "GENERALIZED_EXACT_BINDING_FROM_R2_ONLY_TO_R2_AND_R3"
+    },
+    {
+      "path": "tests/test_task21_event_triggered_followup_capture.py",
+      "previous_sha256": "05dff37365759e67663d84dfb337e39a3e1f265ffbd4526a581f7df20ae9a548",
+      "current_sha256": "d206edf40c2edd767587aecf32b3b6b6cf215d11feba84e3ab01eb8b080226ca",
+      "reason": "VERIFY_APPEND_ONLY_COMPATIBILITY_RECEIPT_FOR_SUPERSEDED_BINDINGS"
+    }
+  ],
+  "compatibility_invariants": {
+    "r2_atom_and_limits_unchanged": true,
+    "r2_exact_population_unchanged": true,
+    "r2_runtime_output_root_unchanged": true,
+    "r3_binding_is_separate_and_exact": true,
+    "authority_phrase_must_match_loaded_config": true,
+    "outcome_based_reselection_allowed": false,
+    "historical_receipt_rewritten": false
+  },
+  "validation": {
+    "r2_regression_tests": 7,
+    "r3_binding_tests": 4,
+    "result": "PASS"
+  },
+  "actual_actions": {
+    "provider_api_rpc_wss_calls": 0,
+    "drive_reads": 0,
+    "drive_writes": 0,
+    "credentials_used": 0,
+    "cash_spend_usd_cents": 0,
+    "catalog_mutation": false,
+    "source_mutation": false,
+    "wallet_signer_transaction_actions": 0,
+    "destructive_actions": false,
+    "merge": false
+  }
+}
