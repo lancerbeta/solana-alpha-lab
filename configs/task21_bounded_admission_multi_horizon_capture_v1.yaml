@@ -1,0 +1,183 @@
+schema: smial.task21_bounded_admission_multi_horizon_capture
+schema_version: '1.0'
+task_id: TASK-21
+atom_id: T21-A6S_BOUNDED_ADMISSION_AND_MULTI_HORIZON_CAPTURE_V1
+stage_id: H0_ADMISSION_AND_CAPTURE
+status: FROZEN_FOR_EXACT_USER_AUTHORIZED_H0_EXECUTION
+as_of: '2026-07-31'
+contains_secrets: false
+
+protected_inputs:
+- role: ADMISSION_HORIZON_BUDGET_RECONCILIATION
+  path: configs/task21_admission_horizon_budget_reconciliation_v1.yaml
+  sha256: 26276c663c56387186e52e2d57e38b49dbd8e1ab7c4259dce6b7a7cd4aced32d
+- role: REAL_NOMINATION_POLICY
+  path: configs/task21_real_nomination_policy_v1.yaml
+  sha256: 04061dacee8e78811d7d9fa0a92308b2f6d1bc43c4789a894420e92bcf4fb979
+- role: REAL_NOMINATION_EVALUATOR
+  path: src/solana_alpha_lab/task21_real_nomination.py
+  sha256: 8eaced64ed5cd9a32f568f926f195dc7aebf05ca18058abe73ce5bfac2f1c4d6
+- role: FROZEN_T1_REPLAY
+  path: local/task21_forward/t1_replay/TASK21_T1_TOKEN2022_REPLAY_PARTITION_v1_c4dbd8340253f137f6778434a1175f27494a0c01871aae80aa973b4565ca26dc.json
+  bytes: 50548
+  sha256: c4dbd8340253f137f6778434a1175f27494a0c01871aae80aa973b4565ca26dc
+- role: RUNTIME_RECOVERY_RECEIPT
+  path: docs/evidence/task21/runtime_recovery_gate_receipt_v1.json
+  sha256: b30081d22dafaf7c4a6d7c1d1aa952bdee48df504773c4264702b639d7cd8013
+- role: LIVE_TRANSPORT_ACCEPTANCE
+  path: docs/evidence/task21/live_shakedown_acceptance_receipt_v1.json
+  sha256: 315785113e2312adcbd75d232be00fa0908b75393f69b101e8ad872f1d1fc8b0
+- role: JUPITER_QUOTE_TRANSPORT
+  path: src/solana_alpha_lab/jupiter_quote_transport.py
+  sha256: dd47c8368b84b190fd2312e1486a08c1b5e7301db036391b30b2d8ac22399ff4
+- role: JUPITER_QUOTE_LOGGER
+  path: src/solana_alpha_lab/jupiter_quote_logger.py
+  sha256: 811f08e43eb26c99ef93dccfade372cbae5adb1c1ee718c7ff6d3ce543a9d507
+
+admission:
+  source: EXACT_FROZEN_T1_REPLAY_ONLY
+  frozen_nomination_count: 3
+  candidate_admissions_max: 3
+  order:
+  - first_reliable_available_at
+  - observed_at
+  - nomination_event_id
+  evaluation_time: ACTUAL_RUNTIME_BEFORE_FIRST_QUOTE
+  entered_at: ACTUAL_EVALUATION_AND_ADMISSION_TIME
+  original_t1_anchor_at: '2026-07-30T16:28:59.084Z'
+  original_t1_close_at: '2026-08-06T16:28:59.084Z'
+  original_future_close_used_as_entered_at: false
+  outcome_or_route_input_allowed: false
+
+provider:
+  provider: JUPITER
+  surface: METIS_SWAP_V1_QUOTE
+  base_url: https://api.jup.ag
+  method: GET
+  path: /swap/v1/quote
+  provider_version: legacy_metis_v1_quote
+  keyless: true
+  credentials: 0
+  accounts: 0
+  fallback_provider: null
+  minimum_interval_seconds: 2.2
+  retries: 0
+  concurrency: 1
+  request_timeout_seconds: 20
+
+h0:
+  horizon_id: H0
+  panels_max: 3
+  provider_calls_per_panel_max: 8
+  provider_calls_total_max: 24
+  modeled_provider_credits_max: 24
+  notionals_usd:
+  - 10
+  - 25
+  - 50
+  - 100
+  legs:
+  - BUY
+  - DEPENDENT_REVERSE_SELL
+  reverse_sell_input: EXACT_ACCEPTED_BUY_OUTPUT_ATOMIC
+  wall_seconds_max: 300
+  received_response_bytes_max: 3145728
+  durable_local_bytes_max: 16777216
+  local_output_root: local/task21_forward/h0_capture
+  write_behavior: CREATE_ONLY_CONTENT_ADDRESSED_RUN
+  raw_evidence_tracked_in_git: false
+
+recovery:
+  required_health: HEALTHY
+  backup_age_hours_max_at_start: 24
+  restore_age_hours_max_at_start: 168
+  backup_destination:
+    adapter: GOOGLE_DRIVE
+    folder_id: 1EISgmsB8nt2pkU4uBUO6Sav1Fzbo6Hw3
+    visibility: not_shared
+    source_receipt_role: RUNTIME_RECOVERY_RECEIPT
+  drive_actions_in_h0: 0
+  h0_backup_required_before: EARLIER_OF_24_HOURS_AFTER_H0_OR_NEXT_RECOVERY_HARD_GATE
+
+later_horizons:
+  scheduler_or_background_process: false
+  foreground_only: true
+  missed_window_policy: RETAIN_EXPLICIT_GAP_NO_BACKFILL
+  h1:
+    offset_seconds: 3600
+    grace_seconds: 600
+    authority_granted_by_h0: false
+  h6:
+    offset_seconds: 21600
+    grace_seconds: 600
+    authority_granted_by_h0: false
+  sentinel:
+    selection: FIRST_ADMITTED_BY_FROZEN_ORDER
+    horizons:
+    - horizon_id: H24
+      offset_seconds: 86400
+    - horizon_id: H72
+      offset_seconds: 259200
+    - horizon_id: H168
+      offset_seconds: 604800
+    authority_granted_by_h0: false
+
+stop_conditions:
+- EXTERNAL_AUTHORITY_PHRASE_MISMATCH
+- PROTECTED_INPUT_HASH_DRIFT
+- FROZEN_NOMINATION_OR_ORDER_DRIFT
+- RECOVERY_UNHEALTHY_OR_STALE
+- OUTPUT_COLLISION
+- DISK_PRESSURE
+- AUTHENTICATION_ACCOUNT_OR_API_KEY_REQUIRED
+- PROVIDER_HOST_PATH_OR_RESPONSE_SCHEMA_DRIFT
+- REQUEST_CREDIT_BYTE_WALL_OR_DURABLE_CAP
+- TRANSACTION_OR_INSTRUCTION_PAYLOAD
+- DEPENDENCY_OR_SCHEMA_CHANGE_REQUIRED
+- WALLET_SIGNER_TRANSACTION_DEPLOYMENT_OR_REAL_MONEY_REQUIRED
+
+catalog:
+  status: CATALOG_TRANSACTION_PENDING_T21_A7
+  version_or_count_advanced: false
+  planned_asset_ids:
+  - CONTRACT-T21-BOUNDED-ADMISSION-MULTI-HORIZON-CAPTURE-001
+  - CONFIG-T21-BOUNDED-ADMISSION-MULTI-HORIZON-CAPTURE-001
+  - MODULE-T21-BOUNDED-ADMISSION-MULTI-HORIZON-CAPTURE-001
+  - SCRIPT-T21-H0-ADMISSION-CAPTURE-001
+  - TEST-T21-BOUNDED-ADMISSION-MULTI-HORIZON-CAPTURE-001
+  - EVIDENCE-T21-BOUNDED-ADMISSION-MULTI-HORIZON-OFFLINE-001
+  - EVIDENCE-T21-H0-RUNTIME-001
+
+authority:
+  source: EXPLICIT_USER
+  exact_phrase: T21-A6S_BOUNDED_ADMISSION_AND_MULTI_HORIZON_CAPTURE_V1
+  stage: H0_ONLY
+  candidate_admissions_max: 3
+  provider_api_rpc_wss_calls_max: 24
+  modeled_provider_credits_max: 24
+  local_live_windows_max: 3
+  local_live_runs_max: 1
+  local_durable_bytes_max: 16777216
+  sanitized_runtime_receipts_max: 1
+  active_time_gate_updates_max: 1
+  drive_reads: 0
+  drive_writes: 0
+  credential_use: 0
+  cash_spend_usd_cents: 0
+  scheduler_or_background_process: false
+  wallet_signer_transaction_actions: 0
+  dependency_changes: 0
+  commit: false
+  push: false
+  pull_request: false
+  merge: false
+  deployment: false
+  destructive_actions: false
+
+next_boundary:
+  on_three_h0_panels_complete: T21-A6S_H1_FOREGROUND_CAPTURE_V1
+  status: NOT_AUTHORIZED
+  due_marker_required: true
+  provider_api_rpc_wss_calls_authorized: false
+  drive_actions_authorized: false
+  a7_authorized: false

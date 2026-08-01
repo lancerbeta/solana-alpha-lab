@@ -1,0 +1,121 @@
+{
+  "schema": "smial.task21.h1-foreground-capture-runtime-acceptance",
+  "schema_version": "1.0",
+  "evidence_id": "EVIDENCE-T21-H1-RUNTIME-001",
+  "evidence_version": "1.0",
+  "task_id": "TASK-21",
+  "atom_id": "T21-A6S_H1_FOREGROUND_CAPTURE_V1",
+  "completed_at": "2026-07-31T08:56:52.259316Z",
+  "status": "PASS",
+  "verdict": "EXACT_H0_POPULATION_CAPTURED_AT_H1",
+  "authority": {
+    "source": "EXPLICIT_USER",
+    "wake_message": "го",
+    "named_atom_in_preceding_user_instruction": "T21-A6S_H1_FOREGROUND_CAPTURE_V1",
+    "provider_api_rpc_wss_calls_max": 24,
+    "drive_actions": 0,
+    "cash_spend_usd_cents": 0,
+    "credentials": 0,
+    "wallet_signer_transaction_actions": 0
+  },
+  "execution_artifacts": [
+    {
+      "path": "docs/contracts/task21_h1_foreground_capture_contract_v1.md",
+      "bytes": 2450,
+      "sha256": "73258e3c76b2441e728ff13a2f299cdc1feb256aa9988dfe781736f2ff9d19dc"
+    },
+    {
+      "path": "configs/task21_h1_foreground_capture_v1.yaml",
+      "bytes": 3524,
+      "sha256": "5beb947dccbacc24b4ac92d865e10719422a7458066af3ec58597a02302bab44"
+    },
+    {
+      "path": "src/solana_alpha_lab/task21_h1_foreground_capture.py",
+      "bytes": 21613,
+      "sha256": "098c4d330bd716b50650a0f8e0d6969213d70bbe3884a33cd54bcdea6df5e74c"
+    },
+    {
+      "path": "scripts/run_task21_h1_capture.py",
+      "bytes": 1551,
+      "sha256": "5b968e1b04d622aa32fda0b6ac79e2485f96ac9b173dfbd8fa029302af4e5871"
+    }
+  ],
+  "preflight": {
+    "observed_at": "2026-07-31T08:55:02.221438Z",
+    "inside_window": true,
+    "gate_sha256": "8e035024ee177f44af35814b1bd5cb6e89a2acf4b09c11aea5b881ca89c7dd70",
+    "h0_acceptance_sha256": "7e28fc61a85d77648d865a1e784ac6a7a1df7bd753b05b9dff48bba2a5206c16",
+    "recovery_freshness": "PASS",
+    "output_collision": false
+  },
+  "population": {
+    "members": 3,
+    "changed_from_h0": false,
+    "outcome_or_route_selection_used": false,
+    "member_ids": [
+      "T21-WATCH-4646910e9ea14e84d646",
+      "T21-WATCH-7bfebd2c448c165d7527",
+      "T21-WATCH-5630c96c741142a47a23"
+    ]
+  },
+  "h1": {
+    "run_id": "h1-20260731T085510551069Z-b7664a106ef0",
+    "panels_complete": 3,
+    "panels_stopped": 0,
+    "provider_calls": 24,
+    "modeled_provider_credits": 24,
+    "received_bytes": 37158,
+    "raw_rows": 24,
+    "terminal_counts": {
+      "QUOTE_AVAILABLE": 24
+    },
+    "first_triggered_at": "2026-07-31T08:55:10.567055Z",
+    "last_triggered_at": "2026-07-31T08:55:47.332561Z"
+  },
+  "local_create_only_evidence": {
+    "root": "local/task21_forward/h1_capture/run=h1-20260731T085510551069Z-b7664a106ef0",
+    "tracked_in_git": false,
+    "files": 10,
+    "stored_bytes": 128958,
+    "runtime_receipt_sha256": "f9a8c3f6fe1713a6398b49b13dda746e901d6d1fd9b541dc05e64ba1f9a8d0b3",
+    "exact_hash_readback": true,
+    "secret_pattern_hits": 0
+  },
+  "actual_actions": {
+    "provider_api_rpc_wss_calls": 24,
+    "modeled_provider_credits": 24,
+    "local_live_windows": 3,
+    "local_stored_bytes": 128958,
+    "drive_reads": 0,
+    "drive_writes": 0,
+    "credentials_used": 0,
+    "cash_spend_usd_cents": 0,
+    "scheduler_or_background_process": false,
+    "wallet_signer_transaction_actions": 0
+  },
+  "next_boundary": {
+    "gate_id": "TASK21-H6-2026-07-31T13-50-34Z",
+    "atom_id": "T21-A6S_H6_FOREGROUND_CAPTURE_V1",
+    "earliest_at": "2026-07-31T13:50:34.414367Z",
+    "latest_at": "2026-07-31T14:00:34.414367Z",
+    "provider_api_rpc_wss_calls_authorized": false,
+    "missed_window_policy": "RETAIN_EXPLICIT_GAP_NO_BACKFILL"
+  },
+  "backup": {
+    "status": "PENDING_WITHIN_RECOVERY_WINDOW",
+    "due_at": "2026-08-01T07:50:34.414367Z",
+    "drive_authority_granted": false
+  },
+  "catalog": {
+    "status": "CATALOG_TRANSACTION_PENDING_T21_A7",
+    "version_or_count_advanced": false
+  },
+  "state_change": "TASK21_H1_PANELS_3",
+  "non_claims": [
+    "NO_TRADE_OR_SWAP_EXECUTED",
+    "NO_FILL_POSITION_PNL_OR_ALPHA_CLAIM",
+    "NO_HYPOTHESIS_OUTCOME_UNSEALED",
+    "NO_DRIVE_ACTION",
+    "NO_A7_CATALOG_TRANSACTION"
+  ]
+}

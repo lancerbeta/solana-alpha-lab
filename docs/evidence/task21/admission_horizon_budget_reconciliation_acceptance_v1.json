@@ -1,0 +1,99 @@
+{
+  "schema": "smial.task21.admission-horizon-budget-reconciliation-acceptance",
+  "schema_version": "1.0",
+  "evidence_id": "EVIDENCE-T21-ADMISSION-HORIZON-BUDGET-RECONCILIATION-001",
+  "evidence_version": "1.0",
+  "task_id": "TASK-21",
+  "atom_id": "T21-A6S_C0_ADMISSION_HORIZON_BUDGET_RECONCILIATION_V1",
+  "completed_at": "2026-07-31T07:16:13.140Z",
+  "status": "PASS",
+  "verdict": "ADMISSION_HORIZON_BUDGET_RECONCILED_FORWARD_ONLY",
+  "artifacts": [
+    {
+      "path": "docs/contracts/task21_admission_horizon_budget_reconciliation_contract_v1.md",
+      "sha256": "6f55a2ce464c4dacaa0f148baf6ca386826061b88f43b672d18d62569cc25a6c"
+    },
+    {
+      "path": "configs/task21_admission_horizon_budget_reconciliation_v1.yaml",
+      "sha256": "51c5f404f54f587a1be4aa405f329266ee11ec971a96908c35bbd9d7f7f21c66"
+    },
+    {
+      "path": "tests/test_task21_admission_horizon_budget_reconciliation.py",
+      "sha256": "00b511eb531de5327b040ffaafaaa2cd65b384fe27c0889ff7a506e94d989210"
+    }
+  ],
+  "accepted_reconciliation": {
+    "historical_artifacts_rewritten": false,
+    "t1_capacity_close": "EXACT_THREE_FROZEN_NOMINATIONS_ONLY",
+    "admission_time": "ACTUAL_EVALUATION_AND_ADMISSION_TIME",
+    "t2_t3_schedule": "PRESERVED_FROM_ORIGINAL_T1_ANCHOR",
+    "base_horizons": [
+      "H0",
+      "H1",
+      "H6"
+    ],
+    "sentinel_supplemental_horizons": [
+      "H24",
+      "H72",
+      "H168"
+    ],
+    "maximum_base_capture_members": 6,
+    "minimum_sufficiency_external_reservation": 152,
+    "minimum_sufficiency_headroom": 40,
+    "overlay_operational_external_maximum": 176,
+    "overlay_operational_headroom": 16,
+    "next_h0_quote_calls_max": 24,
+    "scheduler": false,
+    "missed_window_policy": "RETAIN_EXPLICIT_GAP_NO_BACKFILL"
+  },
+  "validation": {
+    "targeted_command": ".venv\\Scripts\\python.exe -B -m unittest tests.test_task21_admission_horizon_budget_reconciliation -v",
+    "targeted_tests": 12,
+    "targeted_result": "PASS",
+    "related_command": ".venv\\Scripts\\python.exe -B -m unittest tests.test_task21_admission_horizon_budget_reconciliation tests.test_task21_observation_horizon tests.test_task21_real_nomination_policy tests.test_task21_forward_collection_run_plan -v",
+    "related_result": "PASS",
+    "adversarial_cases": [
+      "ALL_MEMBERS_RECEIVE_SIX_HORIZONS",
+      "UNSEALED_T1_EARLY_CLOSE",
+      "T2_T3_SCHEDULE_COMPRESSION",
+      "OUTCOME_SELECTED_SENTINEL",
+      "CAPTURE_MEMBER_OR_REQUEST_BUDGET_INFLATION",
+      "SCHEDULER_OR_EXTERNAL_AUTHORITY_LEAK"
+    ]
+  },
+  "actual_actions": {
+    "network_calls": 0,
+    "provider_api_rpc_wss_calls": 0,
+    "drive_reads": 0,
+    "drive_writes": 0,
+    "candidate_admissions": 0,
+    "live_collector_executions": 0,
+    "raw_or_dataset_writes": 0,
+    "provider_credits": 0,
+    "cash_spend_usd_cents": 0,
+    "credential_uses": 0,
+    "scheduler_or_background_process": false,
+    "wallet_signer_transaction_actions": 0,
+    "dependency_changes": 0,
+    "commit": false,
+    "push": false,
+    "pull_request": false,
+    "merge": false,
+    "ui_changes": false,
+    "destructive_actions": false
+  },
+  "catalog": {
+    "status": "CATALOG_TRANSACTION_PENDING_T21_A7",
+    "version_or_count_advanced": false,
+    "new_assets_registered": 0
+  },
+  "next_boundary": {
+    "atom_id": "T21-A6S_BOUNDED_ADMISSION_AND_MULTI_HORIZON_CAPTURE_V1",
+    "status": "NOT_AUTHORIZED",
+    "authorized": false,
+    "calendar_wait_required": false,
+    "recovery_revalidation_required": true,
+    "exact_external_and_storage_caps_required": true
+  },
+  "state_change": "NONE"
+}

@@ -1,0 +1,185 @@
+{
+  "actual_actions": {
+    "cash_spend_usd_cents": 0,
+    "commit": false,
+    "credential_use": 0,
+    "destructive_actions": 0,
+    "drive_reads": 0,
+    "drive_writes": 0,
+    "forward_raw_or_dataset_writes": 0,
+    "live_collection_actions": 0,
+    "merge": false,
+    "network_calls": 0,
+    "provider_api_rpc_wss_calls": 0,
+    "pull_request": false,
+    "push": false,
+    "scheduler_or_background_process": false,
+    "wallet_signer_transaction_actions": 0
+  },
+  "artifact_sha256": {
+    "config": "c98e3b7d69d51a9186c5f9b5d9106b9103c92d97b9efa6fdc1e61f9e27ecbb20",
+    "contract": "e2b11a0f98b47b43b7dcbe12cabc09a468ffcc3c216b17cdc11603660dba9649",
+    "fixture": "5cacacb6e1b9e6740de16e7776f2822aff160fb648d24dd76e127c4acd8dd6f4",
+    "module": "725c9b835c9c3226bba385ed2bb7e4e8647a976b75daa01ff956ed282e705c16",
+    "script": "05e78c9d18928e088bd36dada5395e07903734abe08d8739d5db1bd9610a59eb",
+    "tests": "ac0974fb13ab5e555525ce0b883ce12d7088c0f43c645bce5e5f2e89bebeda75"
+  },
+  "atom_id": "T21-P6_SUSTAINED_COLLECTION_DAILY_HEALTH_READ_MODEL_V1",
+  "catalog": {
+    "checkpoint": "0.25.0 / 340 / 4 / 4 / 8",
+    "transaction": "DEFERRED_TO_T21_A7"
+  },
+  "contains_market_data": false,
+  "contains_secrets": false,
+  "evidence_id": "EVIDENCE-T21-SUSTAINED-DAILY-HEALTH-OFFLINE-001",
+  "h24_inputs_changed": false,
+  "non_claims": [
+    "NOT_LIVE_MONITORING",
+    "NO_DATASET_FREEZE",
+    "NO_A7_AUTHORITY",
+    "NO_HYPOTHESIS_RESULT",
+    "NO_PNL_ALPHA_SIGNAL_OR_POSITION_CLAIM"
+  ],
+  "projection": {
+    "actual_actions": {
+      "cash_spend_usd_cents": 0,
+      "drive_reads": 0,
+      "drive_writes": 0,
+      "forward_raw_or_dataset_writes": 0,
+      "live_collection_actions": 0,
+      "network_calls": 0,
+      "provider_api_rpc_wss_calls": 0,
+      "scheduler_or_background_process": false,
+      "wallet_signer_transaction_actions": 0
+    },
+    "as_of_utc": "2026-08-29T12:00:00Z",
+    "atom_id": "T21-P6_SUSTAINED_COLLECTION_DAILY_HEALTH_READ_MODEL_V1",
+    "collection": {
+      "day": 30,
+      "information_sufficient": true,
+      "lifecycle": "DAY30_REVIEW",
+      "source_decision": "DATASET_READY_FOR_A7_FREEZE_REQUIRES_SEPARATE_AUTHORITY"
+    },
+    "coverage": {
+      "complete_panels": 15,
+      "coverage_basis_points": 10000,
+      "expected_terminal_panels_to_date": 15,
+      "missed_panels": 0,
+      "missing_total": 0,
+      "retained_gap_event_ids": [],
+      "unaccounted_due_panels": 0
+    },
+    "freshness": {
+      "age_seconds": 7200,
+      "last_collection_event_at_utc": "2026-08-29T10:00:00Z",
+      "stale_after_hours": 26,
+      "state": "FRESH",
+      "warning_after_hours": 24
+    },
+    "incidents": {
+      "retained_count": 0,
+      "retained_incident_event_ids": []
+    },
+    "mode": "OFFLINE_SYNTHETIC",
+    "non_claims": [
+      "NOT_LIVE_MONITORING",
+      "NO_DATASET_FREEZE",
+      "NO_A7_AUTHORITY",
+      "NO_HYPOTHESIS_RESULT",
+      "NO_PNL_ALPHA_SIGNAL_OR_POSITION_CLAIM"
+    ],
+    "owner_decision": {
+      "exact_action_code": "REQUEST_A7_FREEZE_REVIEW",
+      "exact_action_ru": "Запросить отдельный A7 freeze review; не замораживать dataset автоматически.",
+      "grants_runtime_authority": false,
+      "operating_state": "REVIEW_REQUIRED",
+      "reason_codes": [
+        "A7_REVIEW_ELIGIBLE_NOT_AUTHORIZED"
+      ]
+    },
+    "quota_and_storage": {
+      "cash_spend_usd_cents": {
+        "cap": 0,
+        "remaining": 0,
+        "state": "ZERO_CAP_RESPECTED",
+        "used": 0,
+        "utilization_basis_points": 0
+      },
+      "dataset_bytes": {
+        "cap": 268435456,
+        "remaining": 268405456,
+        "state": "OK",
+        "used": 30000,
+        "utilization_basis_points": 1
+      },
+      "provider_credits": {
+        "cap": 192,
+        "remaining": 72,
+        "state": "OK",
+        "used": 120,
+        "utilization_basis_points": 6250
+      },
+      "provider_requests": {
+        "cap": 192,
+        "remaining": 72,
+        "state": "OK",
+        "used": 120,
+        "utilization_basis_points": 6250
+      },
+      "response_bytes": {
+        "cap": 25165824,
+        "remaining": 25150824,
+        "state": "OK",
+        "used": 15000,
+        "utilization_basis_points": 5
+      },
+      "stored_bytes": {
+        "cap": 125829120,
+        "remaining": 125799120,
+        "state": "OK",
+        "used": 30000,
+        "utilization_basis_points": 2
+      }
+    },
+    "recovery": {
+      "backup_age_hours": 1,
+      "backup_maximum_age_hours": 24,
+      "health_state": "HEALTHY",
+      "healthy_for_new_windows": true,
+      "restore_proof_age_hours": 24,
+      "restore_proof_maximum_age_hours": 168
+    },
+    "schema": "smial.task21.sustained-daily-health-read-model",
+    "schema_version": "1.0",
+    "source": {
+      "acceptance_path": "docs/evidence/task21/sustained_collection_offline_acceptance_v1.json",
+      "acceptance_sha256": "c4a1e1c4c2029e28602fe29e660970071c60341087ebf04589dff4b4c05192a4",
+      "state_receipt_sha256": "0c992ca45c1f39bdae486dc4a525829cd8fcc129a2f3d07bafbe46c1b5c5b92a"
+    },
+    "status": "PASS",
+    "task_id": "TASK-21",
+    "truth_role": "DERIVED_READ_MODEL_ONLY"
+  },
+  "projection_sha256": "8efaa3aeb2a2ca78c0fc0bd091ff128a1759bb2f3857c22d716339eb04e899d2",
+  "schema": "smial.task21.sustained-daily-health-offline-acceptance",
+  "schema_version": "1.0",
+  "status": "PASS",
+  "synthetic_only": true,
+  "task_id": "TASK-21",
+  "validation": {
+    "adversarial_cases": [
+      "EXPLICIT_GAP_NO_BACKFILL",
+      "UNACCOUNTED_DUE_PANEL",
+      "STALE_COLLECTION",
+      "FRESHNESS_AND_BUDGET_WARNING_ROUTING",
+      "FUTURE_TIMESTAMP",
+      "RECOVERY_UNHEALTHY",
+      "CAP_BREACH",
+      "OPEN_INCIDENT",
+      "OUTCOME_FIELD",
+      "NONZERO_SYNTHETIC_ACTION"
+    ],
+    "targeted_tests": "14_OF_14_PASS"
+  },
+  "verdict": "OFFLINE_DAILY_HEALTH_READ_MODEL_READY_NOT_LIVE"
+}

@@ -1,0 +1,147 @@
+schema: smial.task21_sustained_daily_health_read_model_control
+schema_version: '1.0'
+control_id: SUSTAINED-DAILY-HEALTH-READ-MODEL-T21-001
+control_version: '1.0'
+task_id: TASK-21
+atom_id: T21-P6_SUSTAINED_COLLECTION_DAILY_HEALTH_READ_MODEL_V1
+status: OFFLINE_SYNTHETIC_ACCEPTANCE_ONLY
+as_of: '2026-07-31'
+contains_secrets: false
+
+truth_boundary:
+  role: DERIVED_READ_MODEL_ONLY
+  owns_collection_truth: false
+  owns_recovery_truth: false
+  owns_budget_truth: false
+  input_mode: OFFLINE_SYNTHETIC
+  live_monitoring_claim_allowed: false
+
+frozen_inputs:
+- asset_id: CONFIG-T21-SUSTAINED-COLLECTION-001
+  path: configs/task21_sustained_collection_v1.yaml
+  sha256: 07bae50b28043576942064b39b6230ed784d1f72237eeb7edde1144a7c2ff499
+- asset_id: EVIDENCE-T21-SUSTAINED-COLLECTION-LOCAL-CONTROL-001
+  path: docs/evidence/task21/sustained_collection_offline_acceptance_v1.json
+  sha256: c4a1e1c4c2029e28602fe29e660970071c60341087ebf04589dff4b4c05192a4
+
+input_contract:
+  fixture_path: tests/fixtures/task21/sustained_daily_health_receipt_v1.json
+  required_source_schema: smial.task21.sustained-collection-offline-state-receipt
+  required_source_schema_version: '1.0'
+  required_daily_schema: smial.task21.sustained-daily-health-input
+  required_daily_schema_version: '1.0'
+  missing_is_zero: false
+  future_timestamps_allowed: false
+  exact_duplicate_event_ids_allowed: false
+
+freshness:
+  warning_after_hours: 24
+  stale_after_hours: 26
+  stopped_collection_is_not_stale: true
+
+budget:
+  warning_utilization_basis_points: 8000
+  exhausted_utilization_basis_points: 10000
+  source_caps_path: configs/task21_sustained_collection_v1.yaml
+  tracked_metrics:
+  - provider_requests
+  - provider_credits
+  - response_bytes
+  - stored_bytes
+  - dataset_bytes
+  - cash_spend_usd_cents
+
+coverage:
+  maximum_total_panels: 24
+  missed_panels_require_exact_gap_ids: true
+  unaccounted_due_panels_block_new_windows: true
+  silent_backfill_allowed: false
+
+decision_priority:
+- CAP_OR_RECOVERY_BREACH
+- OPEN_INCIDENT
+- STALE_COLLECTION
+- UNACCOUNTED_DUE_PANEL
+- DAY45_STOP
+- RETAINED_GAP
+- A7_REVIEW_ELIGIBLE
+- BUDGET_WARNING
+- HEALTHY_CONTINUE
+
+owner_actions:
+  SAFE_STOP_RECOVERY_OR_CAP:
+    operating_state: SAFE_STOP
+    text_ru: Остановить новые окна; восстановить recovery или соблюдение cap и только затем продолжать.
+  RESOLVE_OPEN_INCIDENT:
+    operating_state: DEGRADED_NO_NEW_WINDOWS
+    text_ru: Разобрать открытый incident и подтвердить recovery до следующего окна.
+  INVESTIGATE_STALE_COLLECTION:
+    operating_state: DEGRADED_NO_NEW_WINDOWS
+    text_ru: Проверить причину устаревания и append-only зафиксировать gap либо incident; не делать backfill задним числом.
+  RECONCILE_UNACCOUNTED_PANEL:
+    operating_state: DEGRADED_NO_NEW_WINDOWS
+    text_ru: Сопоставить пропавшее окно и append-only записать gap либо incident до продолжения.
+  KEEP_STOPPED_REQUEST_DECISION:
+    operating_state: COLLECTION_STOPPED
+    text_ru: Не возобновлять сбор автоматически; запросить отдельное решение A7 либо новый план.
+  REVIEW_GAPS_CONTINUE_NO_BACKFILL:
+    operating_state: DEGRADED_CONTINUE_NO_BACKFILL
+    text_ru: Проверить сохранённые gaps, не бэкфиллить их и продолжать только следующие разрешённые окна.
+  REQUEST_A7_FREEZE_REVIEW:
+    operating_state: REVIEW_REQUIRED
+    text_ru: Запросить отдельный A7 freeze review; не замораживать dataset автоматически.
+  WATCH_HEALTH_CONTINUE:
+    operating_state: WATCH_BUDGET
+    text_ru: Продолжать без расширения scope и повторно проверить freshness и quota/caps после следующего события.
+  CONTINUE_AND_RECHECK:
+    operating_state: HEALTHY
+    text_ru: Продолжать по замороженному плану и повторить health read после следующего события либо UTC-дня.
+
+output_contract:
+  schema: smial.task21.sustained-daily-health-read-model
+  schema_version: '1.0'
+  formats:
+  - CANONICAL_JSON
+  - RUSSIAN_OWNER_TEXT
+  forbidden_claims:
+  - LIVE_MONITORING_ACTIVE
+  - DATASET_FROZEN
+  - A7_AUTHORIZED
+  - HYPOTHESIS_RESULT
+  - PNL
+  - ALPHA
+  - SIGNAL
+  - POSITION
+
+authority:
+  class: LOCAL_WRITE_ONLY
+  source: EXPLICIT_USER
+  managed_files:
+  - configs/task21_sustained_daily_health_read_model_v1.yaml
+  - docs/contracts/task21_sustained_daily_health_read_model_contract_v1.md
+  - src/solana_alpha_lab/task21_sustained_daily_health.py
+  - scripts/show_task21_sustained_daily_health.py
+  - tests/fixtures/task21/sustained_daily_health_receipt_v1.json
+  - tests/test_task21_sustained_daily_health.py
+  - docs/evidence/task21/sustained_daily_health_offline_acceptance_v1.json
+  network_calls: 0
+  provider_api_rpc_wss_calls: 0
+  drive_reads: 0
+  drive_writes: 0
+  credential_use: 0
+  live_collection_actions: 0
+  forward_raw_or_dataset_writes: 0
+  cash_spend_usd_cents: 0
+  dependency_changes: 0
+  scheduler_or_background_process: false
+  commit: false
+  push: false
+  pull_request: false
+  merge: false
+  wallet_signer_transaction_actions: 0
+  destructive_actions: false
+
+next_boundary:
+  catalog_registration: DEFER_TO_T21_A7
+  live_receipt_binding: REQUIRES_FIRST_ACCEPTED_REAL_SUSTAINED_DAILY_RECEIPT
+  h24_inputs_changed: false

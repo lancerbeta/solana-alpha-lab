@@ -1,0 +1,163 @@
+{
+  "schema": "smial.task21.h24-foreground-capture-runtime-acceptance",
+  "schema_version": "1.0",
+  "evidence_id": "EVIDENCE-T21-H24-RUNTIME-001",
+  "evidence_version": "1.0",
+  "task_id": "TASK-21",
+  "atom_id": "T21-A6S_H24_FOREGROUND_CAPTURE_V1",
+  "completed_at": "2026-08-01T09:00:48.126089Z",
+  "status": "PASS",
+  "verdict": "ONE_FROZEN_SENTINEL_CAPTURED_AT_H24_PLUS",
+  "authority": {
+    "source": "EXPLICIT_USER",
+    "provider_api_rpc_wss_calls_max": 8,
+    "keyless_jupiter_panels_max": 1,
+    "local_create_only_bytes_max": 16777216,
+    "drive_actions_max": 0,
+    "credentials_max": 0,
+    "cash_spend_usd_cents_max": 0,
+    "wallet_signer_transaction_actions_max": 0,
+    "commit": true,
+    "non_force_push": true,
+    "update_draft_pr_27": true,
+    "merge": false
+  },
+  "execution_artifacts": [
+    {
+      "path": "docs/contracts/task21_h24_foreground_capture_contract_v1.md",
+      "bytes": 2077,
+      "sha256": "57dc69bd0e8773f052dc1d4b1034aad603899fcd57aff83b73177dfdf9513012"
+    },
+    {
+      "path": "configs/task21_h24_foreground_capture_v1.yaml",
+      "bytes": 4807,
+      "sha256": "1c0db3ca1083711114a07ddaaecc40d362d4e758c7f4e18ce4c27d7ff4e8a0e1"
+    },
+    {
+      "path": "src/solana_alpha_lab/task21_h24_foreground_capture.py",
+      "bytes": 23342,
+      "sha256": "6cefcdf813ed209bf023659c0f5c195abef8c6ce05b9de531240522d07ab5637"
+    },
+    {
+      "path": "scripts/run_task21_h24_capture.py",
+      "bytes": 1713,
+      "sha256": "e3476b7946b01734963db97141bd206193b80c8052738a343a89c22867240426"
+    },
+    {
+      "path": "docs/evidence/task21/h24_minimum_age_sentinel_offline_acceptance_v2.json",
+      "bytes": 3349,
+      "sha256": "a7df6c5d870c21cda567a1c0900eeab45689ffc5e5aa837ee29ade1e00b4bbf8"
+    }
+  ],
+  "preflight": {
+    "observed_at": "2026-08-01T09:00:19.707734Z",
+    "branch": "task21/pre-h24-checkpoint",
+    "head": "cd024458e49ca2c211fe52ca7f6381fc4651920c",
+    "tree": "179de8563573c8dfdd04015b88a65a04d1e5ad7e",
+    "worktree_clean": true,
+    "gate_state": "DUE_PREEMPT_PARALLEL_WORK",
+    "gate_sha256": "5a08123ec499c27505ceddec84349f0514a2573c2fa9e16cd42c75d7c7955d4d",
+    "recovery_freshness": "PASS",
+    "backup_age_hours": 18.534611,
+    "output_collision": false
+  },
+  "population": {
+    "source_members": 3,
+    "sentinel_members": 1,
+    "changed_from_h0": false,
+    "outcome_or_route_selection_used": false,
+    "member_ids": [
+      "T21-WATCH-4646910e9ea14e84d646"
+    ]
+  },
+  "h24": {
+    "run_id": "h24-20260801T090031939952Z-4af89d17b0ae",
+    "h0_anchor_at": "2026-07-31T07:50:34.414367Z",
+    "not_before_at": "2026-08-01T07:50:34.414367Z",
+    "started_at": "2026-08-01T09:00:31.939952Z",
+    "actual_elapsed_seconds": 90597,
+    "semantics": "MINIMUM_AGE_24H_PLUS",
+    "narrow_expiry_window_used": false,
+    "panels_complete": 1,
+    "panels_stopped": 0,
+    "provider_calls": 8,
+    "modeled_provider_credits": 8,
+    "received_bytes": 12116,
+    "raw_rows": 8,
+    "terminal_counts": {
+      "QUOTE_AVAILABLE": 8
+    }
+  },
+  "local_create_only_evidence": {
+    "root": "local/task21_forward/h24_capture/run=h24-20260801T090031939952Z-4af89d17b0ae",
+    "tracked_in_git": false,
+    "files": 4,
+    "stored_bytes": 43852,
+    "runtime_receipt_sha256": "b4eb861f80f6e243aa52c8e9f5994c8e7fc094f35d6d209beb78103589792d0e",
+    "panel_manifest_sha256": "9b51713e5f1286ea8d31a78e1e1c3fcb7880a46f4b3271591c6d4c438a7dcd74",
+    "raw_events_sha256": "c25d4670f940b1f26d3b41a4c7fd9be1919aac6b048472c915f14c865a652dbe",
+    "panel_receipt_sha256": "8118d55a98d5208b2507ac04aa201acfeac46d2bfeecf216f3a37dad0a17de08",
+    "exact_hash_readback": true,
+    "secret_pattern_hits": 0
+  },
+  "actual_actions": {
+    "provider_api_rpc_wss_calls": 8,
+    "modeled_provider_credits": 8,
+    "local_live_windows": 1,
+    "local_stored_bytes": 43852,
+    "drive_reads": 0,
+    "drive_writes": 0,
+    "credentials_used": 0,
+    "cash_spend_usd_cents": 0,
+    "scheduler_or_background_process": false,
+    "wallet_signer_transaction_actions": 0
+  },
+  "next_boundary": {
+    "status": "DEFERRED_TRIGGER_ONLY",
+    "candidate_horizons": [
+      "H72",
+      "H168"
+    ],
+    "mandatory_horizons": [],
+    "active_time_gate_created": false,
+    "provider_api_rpc_wss_calls_authorized": false,
+    "activation_requires": [
+      "NAMED_CONSUMER_OR_HYPOTHESIS_NEED",
+      "FRESH_WHOLE_TASK_BUDGET_PROOF",
+      "SEPARATE_EXACT_USER_AUTHORITY"
+    ]
+  },
+  "catalog": {
+    "status": "CATALOG_TRANSACTION_PENDING_T21_A7",
+    "version_or_count_advanced": false
+  },
+  "validation": {
+    "targeted_task21": "187_OF_187_PASS",
+    "staged_diff_check": "PASS",
+    "repository_secret_scan": "PASS",
+    "local_full_gate": "DELEGATED_TO_CI_BRANCH_POLICY_REQUIRES_MAIN_OR_CI_DETACHED",
+    "ci_required_on_exact_pushed_commit": true
+  },
+  "control_repair": {
+    "trigger": "HOST_POWERSHELL_ADVANCED_TO_7_6_4",
+    "previous_rule": "EXACT_7_6_3",
+    "replacement_rule": ">=7.6.0,<8.0.0",
+    "reason": "ALLOW_STABLE_PATCH_UPDATES_WITHOUT_WEAKENING_CORE_WINDOWS_X64_RUNTIME_CHECKS",
+    "historical_evidence_rewritten": false,
+    "active_files": [
+      "pyproject.toml",
+      "scripts/validate.ps1",
+      "scripts/validate_task04.py",
+      "scripts/validate_baseline.py"
+    ]
+  },
+  "state_change": "TASK21_H24_ONE_SENTINEL_PANEL_CAPTURED",
+  "non_claims": [
+    "NO_TRADE_OR_SWAP_EXECUTED",
+    "NO_FILL_POSITION_PNL_OR_ALPHA_CLAIM",
+    "NO_HYPOTHESIS_OUTCOME_UNSEALED",
+    "NO_H72_OR_H168_ACTIVATION",
+    "NO_DRIVE_ACTION_IN_H24",
+    "NO_A7_CATALOG_TRANSACTION"
+  ]
+}

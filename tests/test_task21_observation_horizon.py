@@ -35,6 +35,13 @@ ACCEPTANCE_PATH = (
     / "task21"
     / "observation_horizon_policy_acceptance_v1.json"
 )
+CONSUMER_RECONCILIATION_PATH = (
+    ROOT
+    / "docs"
+    / "evidence"
+    / "task21"
+    / "observation_horizon_consumer_reconciliation_acceptance_v1.json"
+)
 EFFECTIVE_AT = datetime(
     2026,
     7,
@@ -156,7 +163,7 @@ class TestTask21ObservationHorizon(unittest.TestCase):
         )
         self.assertEqual(canonical_json_bytes(first), canonical_json_bytes(second))
 
-    def test_acceptance_receipt_binds_exact_artifacts_and_zero_actions(
+    def test_historical_acceptance_and_current_consumer_reconciliation_bind(
         self,
     ) -> None:
         receipt = json.loads(ACCEPTANCE_PATH.read_text(encoding="utf-8"))
@@ -165,12 +172,52 @@ class TestTask21ObservationHorizon(unittest.TestCase):
             receipt["verdict"],
             "P7D_EXCLUSIVE_WAIT_SUPERSEDED_FORWARD_ONLY",
         )
-        for artifact in receipt["artifacts"]:
+        historical_core = receipt["artifacts"][:3]
+        self.assertEqual(
+            [artifact["path"] for artifact in historical_core],
+            [
+                "configs/task21_observation_horizon_policy_v1.yaml",
+                "docs/contracts/task21_observation_horizon_policy_contract_v1.md",
+                "src/solana_alpha_lab/task21_observation_horizon.py",
+            ],
+        )
+        for artifact in historical_core:
             self.assertEqual(
                 sha256_file(ROOT / artifact["path"]),
                 artifact["sha256"],
                 artifact["path"],
             )
+        reconciliation = json.loads(
+            CONSUMER_RECONCILIATION_PATH.read_text(encoding="utf-8")
+        )
+        self.assertEqual(
+            sha256_file(CONSUMER_RECONCILIATION_PATH),
+            "083781cdffee14fa6edd3f60d350a1073f991b0888f8bdbb77fae7d994cc5a22",
+        )
+        self.assertEqual(reconciliation["status"], "PASS")
+        self.assertEqual(
+            reconciliation["verdict"],
+            "HISTORICAL_HORIZON_RECEIPT_PRESERVED_CURRENT_CONSUMERS_REBOUND",
+        )
+        for protected_input in reconciliation["protected_inputs"]:
+            self.assertEqual(
+                sha256_file(ROOT / protected_input["path"]),
+                protected_input["sha256"],
+                protected_input["path"],
+            )
+        current = json.loads(
+            (
+                ROOT
+                / "docs"
+                / "evidence"
+                / "task21"
+                / "owner_pulse_post_h6_sentinel_rebase_acceptance_v2.json"
+            ).read_text(encoding="utf-8")
+        )
+        self.assertEqual(
+            current["verdict"],
+            "OWNER_PULSE_H24_MINIMUM_AGE_H72_H168_TRIGGER_ONLY",
+        )
         for key, value in receipt["actual_actions"].items():
             if key == "scheduler_or_background_process":
                 self.assertFalse(value)

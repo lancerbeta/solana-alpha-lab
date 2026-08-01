@@ -1,0 +1,140 @@
+schema: smial.task21_post_h6_gap_sentinel_value_rebase
+schema_version: '1.0'
+rebase_id: POST-H6-GAP-SENTINEL-VALUE-REBASE-T21-001
+rebase_version: '1.0'
+task_id: TASK-21
+atom_id: T21-A6S_POST_H6_GAP_SENTINEL_VALUE_REBASE_V1
+status: FROZEN_FORWARD_ONLY_LOCAL_REPAIR
+as_of: '2026-07-31'
+contains_secrets: false
+
+protected_history:
+  historical_receipts_rewritten: false
+  h0_h1_h6_runtime_evidence_rewritten: false
+  original_admission_reconciliation:
+    path: configs/task21_admission_horizon_budget_reconciliation_v1.yaml
+    sha256: 51c5f404f54f587a1be4aa405f329266ee11ec971a96908c35bbd9d7f7f21c66
+  superseded_h24_config_sha256: 39672e97844636a0e59b845264a352e5442b3fdfa0fd451110c69e5a6692cd34
+  superseded_h24_module_sha256: d31145309233262685e7a6b288a7a43c521e48afd165b83bc4083a91eb76f921
+  superseded_h24_acceptance:
+    path: docs/evidence/task21/h24_foreground_capture_offline_acceptance_v1.json
+    sha256: 4726eedcd024392ec9094d3eec46c9c79c7d6576b63decd2a414305388dd6b71
+  historical_future_core:
+    path: configs/task21_future_sentinel_capture_core_v1.yaml
+    sha256: fe6350e78d708d9d6781e82f171a2746e64069c2d3f449cca6af5611dc4ccd3b
+    disposition: OFFLINE_HISTORICAL_NOT_RUNTIME_BOUND
+
+finding:
+  h6_disposition: EXPLICIT_GAP_NO_BACKFILL
+  task_requests_used_before_rebase: 52
+  source_requests_used: 4
+  quote_requests_used: 48
+  original_h24_runtime_members: 3
+  original_h24_quote_calls_max: 24
+  original_h72_h168_additional_quote_calls_max: 48
+  conflict: CURRENT_SENTINEL_IMPLEMENTATION_EXCEEDS_ONE_MEMBER_AND_WORST_CASE_BUDGET
+
+post_gap_budget:
+  outer_external_requests_max: 192
+  requests_used_before_rebase: 52
+  future_base_members_max: 5
+  future_base_panels_max: 15
+  provider_calls_per_panel_max: 8
+  future_base_quote_calls_max: 120
+  h24_sentinel_members_exact: 1
+  h24_sentinel_quote_calls_max: 8
+  mandatory_h72_h168_quote_calls: 0
+  worst_case_total_after_h24_and_future_base: 180
+  remaining_headroom: 12
+  budget_formula: 52_CURRENT_PLUS_120_FUTURE_BASE_PLUS_8_H24_EQUALS_180
+  minimum_complete_members_reduced: false
+  minimum_distinct_tranches_reduced: false
+  future_capture_failure_tolerance: ZERO_FOR_FIVE_COMPLETE_MEMBER_TARGET
+  insufficiency_disposition_if_future_base_incomplete: EXTEND_EVIDENCE_OR_REDESIGN_DATA
+
+h24_rebase:
+  horizon_semantics: MINIMUM_AGE_24H_PLUS
+  anchor: LATEST_IMMUTABLE_H0_TRIGGER
+  not_before_offset_seconds: 86400
+  not_before_at: '2026-08-01T07:50:34.414367Z'
+  latest_at: null
+  narrow_expiry_window_used: false
+  due_behavior: OWNER_ATTENTION_PREEMPTS_NEW_MUTATION_UNTIL_RESOLVED
+  late_capture_policy: ALLOW_AND_RECORD_ACTUAL_ELAPSED_SECONDS
+  sentinel_selection_key:
+  - first_reliable_available_at
+  - observed_at
+  - nomination_event_id
+  sentinel_member_id: T21-WATCH-4646910e9ea14e84d646
+  outcome_or_route_selection_allowed: false
+  provider_calls_max: 8
+  provider_authority_separately_required: true
+  recovery_health_revalidation_at_execution_required: true
+
+future_horizons:
+  mandatory: []
+  deferred_trigger_only:
+  - horizon_id: H72
+    candidate_minimum_age_seconds: 259200
+  - horizon_id: H168
+    candidate_minimum_age_seconds: 604800
+  active_time_gates_created: 0
+  provider_calls_reserved: 0
+  scheduler_or_background_process: false
+  activation_requires:
+  - NAMED_CONSUMER_OR_HYPOTHESIS_PERSISTENCE_NEED
+  - FRESH_WHOLE_TASK_BUDGET_PROOF_WITH_HEADROOM
+  - SEPARATE_EXACT_USER_PROVIDER_AUTHORITY
+  - MINIMUM_AGE_SEMANTICS_UNLESS_CAUSAL_WINDOW_IS_JUSTIFIED
+
+time_gate_design_rule:
+  default: NOT_BEFORE_PLUS_ACTUAL_ELAPSED_TIME
+  narrow_window_allowed_only_when:
+  - CAUSAL_ESTIMAND_REQUIRES_FIXED_CLOCK_BAND
+  - WINDOW_WIDTH_HAS_EXPLICIT_JUSTIFICATION
+  - MISSED_WINDOW_COST_IS_ACCEPTED_BEFORE_COLLECTION
+  operator_lateness_without_causal_window: NOT_A_DATA_GAP
+  no_backdating: true
+  no_silent_relabeling: true
+
+catalog:
+  status: CATALOG_TRANSACTION_PENDING_T21_A7
+  version_or_count_advanced: false
+  planned_asset_ids:
+  - CONTRACT-T21-POST-H6-GAP-SENTINEL-VALUE-REBASE-001
+  - CONFIG-T21-POST-H6-GAP-SENTINEL-VALUE-REBASE-001
+  - TEST-T21-POST-H6-GAP-SENTINEL-VALUE-REBASE-001
+  - EVIDENCE-T21-POST-H6-GAP-SENTINEL-VALUE-REBASE-001
+
+authority:
+  class: LOCAL_WRITE_ONLY
+  source: EXPLICIT_USER
+  gate_phrase: T21-A6S_POST_H6_GAP_SENTINEL_VALUE_REBASE_V1
+  network_calls: 0
+  provider_api_rpc_wss_calls: 0
+  drive_reads: 0
+  drive_writes: 0
+  credential_use: 0
+  candidate_admissions: 0
+  raw_or_dataset_writes: 0
+  provider_credits: 0
+  cash_spend_usd_cents: 0
+  scheduler_or_background_process: false
+  dependency_changes: 0
+  commit: false
+  push: false
+  pull_request: false
+  merge: false
+  wallet_signer_transaction_actions: 0
+  ui_changes: false
+  destructive_actions: false
+
+next_boundary:
+  atom_id: T21-A6S_H24_FOREGROUND_CAPTURE_V1
+  status: ACTIVE_WAITING_NOT_BEFORE
+  earliest_at: '2026-08-01T07:50:34.414367Z'
+  latest_at: null
+  provider_api_rpc_wss_calls_authorized: false
+  recovery_refresh_may_be_required_when_due: true
+  h72_h168_mandatory: false
+  a7_authorized: false

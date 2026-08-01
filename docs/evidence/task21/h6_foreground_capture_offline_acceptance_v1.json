@@ -1,0 +1,76 @@
+{
+  "schema": "smial.task21.h6-foreground-capture-offline-acceptance",
+  "schema_version": "1.0",
+  "evidence_id": "EVIDENCE-T21-H6-FOREGROUND-CAPTURE-OFFLINE-001",
+  "evidence_version": "1.0",
+  "task_id": "TASK-21",
+  "atom_id": "T21-A6S_H6_FOREGROUND_CAPTURE_V1",
+  "completed_at": "2026-07-31T14:01:20.000Z",
+  "status": "PASS",
+  "verdict": "H6_FORWARD_ONLY_CAPTURE_OR_GAP_CLOSE_IMPLEMENTED",
+  "targeted_validation": "8_OF_8_PASS",
+  "artifacts": [
+    {
+      "path": "docs/contracts/task21_h6_foreground_capture_contract_v1.md",
+      "bytes": 2164,
+      "sha256": "3ad3c0db5ae35d272315fc9bd8d2733dc9b4e56eb2f7d9395339b492d25171ee"
+    },
+    {
+      "path": "configs/task21_h6_foreground_capture_v1.yaml",
+      "bytes": 3891,
+      "sha256": "7f5863841f5a29b66cee9c1b45165d09ea1dcac390618d49c417cb420854604c"
+    },
+    {
+      "path": "src/solana_alpha_lab/task21_h6_foreground_capture.py",
+      "bytes": 23037,
+      "sha256": "3dc630c2b59bb56b0b6c5d4caaba1ee38f1fe19ec7d1adef71ff69486c6e71db"
+    },
+    {
+      "path": "scripts/run_task21_h6_capture.py",
+      "bytes": 1637,
+      "sha256": "95b935cef912ace8f64e08bc0de9689c16f1601ff0d5fda304060dfd2946ecc3"
+    },
+    {
+      "path": "tests/test_task21_h6_foreground_capture.py",
+      "bytes": 13481,
+      "sha256": "424a085a3c1c03da9088a17a58e4039a13a8ce7a8698b268391b717b09b44d5a"
+    }
+  ],
+  "accepted_invariants": {
+    "exact_h0_population_reused": true,
+    "before_window_no_write_no_call": true,
+    "within_window_requires_exact_provider_gate": true,
+    "within_window_requires_fresh_recovery": true,
+    "after_window_gap_requires_no_provider_gate": true,
+    "after_window_gap_only_no_backfill": true,
+    "h24_gate_is_forward_only": true
+  },
+  "actual_actions": {
+    "network_calls": 0,
+    "provider_api_rpc_wss_calls": 0,
+    "modeled_provider_credits": 0,
+    "drive_reads": 0,
+    "drive_writes": 0,
+    "cash_spend_usd_cents": 0,
+    "credentials_used": 0,
+    "scheduler_or_background_process": false,
+    "wallet_signer_transaction_actions": 0,
+    "commit": 0,
+    "push": 0,
+    "pull_request": 0,
+    "merge": 0,
+    "destructive_actions": 0
+  },
+  "next_boundary": {
+    "horizon_id": "H24",
+    "earliest_at": "2026-08-01T07:50:34.414367Z",
+    "latest_at": "2026-08-01T08:00:34.414367Z",
+    "exact_provider_authority_required": "T21-A6S_H24_FOREGROUND_CAPTURE_V1",
+    "fresh_recovery_required": true,
+    "provider_authority_granted_by_this_receipt": false
+  },
+  "catalog": {
+    "status": "CATALOG_TRANSACTION_PENDING_T21_A7",
+    "version_or_count_advanced": false
+  }
+}

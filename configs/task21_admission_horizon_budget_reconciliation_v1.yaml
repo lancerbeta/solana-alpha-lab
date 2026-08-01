@@ -1,0 +1,241 @@
+schema: smial.task21_admission_horizon_budget_reconciliation
+schema_version: '1.0'
+plan_id: ADMISSION-HORIZON-BUDGET-RECONCILIATION-T21-001
+plan_version: '1.0'
+task_id: TASK-21
+atom_id: T21-A6S_C0_ADMISSION_HORIZON_BUDGET_RECONCILIATION_V1
+status: FROZEN_FORWARD_ONLY_RECONCILIATION_NO_EXTERNAL_ACTION
+as_of: '2026-07-31'
+contains_secrets: false
+
+protected_inputs:
+- role: FORWARD_COLLECTION_RUN_PLAN
+  path: configs/task21_forward_collection_run_plan_v1.yaml
+  sha256: 0f6bc1a748d80aaa8aeaed53551687304f467ccf9622b598d591f78317f419f5
+- role: REAL_NOMINATION_POLICY
+  path: configs/task21_real_nomination_policy_v1.yaml
+  sha256: 04061dacee8e78811d7d9fa0a92308b2f6d1bc43c4789a894420e92bcf4fb979
+- role: REAL_NOMINATION_SOURCE
+  path: configs/task21_real_nomination_source_v1.yaml
+  sha256: 362e86055a27c6e96402e7048a92a9b4786931fd36ca385e6ed1c38cff7a8d88
+- role: REAL_NOMINATION_SOURCE_RECEIPT
+  path: docs/evidence/task21/real_nomination_source_offline_acceptance_v1.json
+  sha256: e372cbca4e844ecceb0d15ddb56db40ea2a3e8b53cd8ea28d1a7119860baa67a
+- role: FROZEN_T1_REPLAY_PARTITION
+  path: local/task21_forward/t1_replay/TASK21_T1_TOKEN2022_REPLAY_PARTITION_v1_c4dbd8340253f137f6778434a1175f27494a0c01871aae80aa973b4565ca26dc.json
+  bytes: 50548
+  sha256: c4dbd8340253f137f6778434a1175f27494a0c01871aae80aa973b4565ca26dc
+- role: OBSERVATION_HORIZON_POLICY
+  path: configs/task21_observation_horizon_policy_v1.yaml
+  sha256: 45591b9b469acb99d0ff3d789bfb03796bcd339067631d1bbcb02c58db5f71c8
+- role: OBSERVATION_HORIZON_ACCEPTANCE
+  path: docs/evidence/task21/observation_horizon_policy_acceptance_v1.json
+  sha256: 18e149713cc276428f96ef8fd06aefa9e0ad4ce21ebe8a484fb776829741c2f6
+- role: RUNTIME_RECOVERY_GATE_RECEIPT
+  path: docs/evidence/task21/runtime_recovery_gate_receipt_v1.json
+  sha256: b30081d22dafaf7c4a6d7c1d1aa952bdee48df504773c4264702b639d7cd8013
+
+conflict_resolution:
+  mode: FORWARD_ONLY_OVERLAY
+  historical_artifacts_rewritten: false
+  precedence_scope:
+  - T1_CAPACITY_CLOSE
+  - ACTUAL_ADMISSION_TIME
+  - BASE_VERSUS_SUPPLEMENTAL_HORIZONS
+  - WHOLE_TASK_REQUEST_BUDGET
+  preserved_rules:
+  - OUTCOME_BLIND_SELECTION
+  - APPEND_ONLY_EVENTS
+  - NO_BACKDATING
+  - NO_BACKFILL
+  - T2_T3_ORIGINAL_SCHEDULE
+  - THREE_BASE_PANELS_DEFINE_COMPLETE_MEMBER
+  - MINIMUM_FIVE_COMPLETE_MEMBERS
+  - MINIMUM_THREE_DISTINCT_TRANCHES
+  - OUTER_EXTERNAL_REQUEST_CEILING_192
+  - CASH_SPEND_ZERO
+  - WALLET_SIGNER_TRANSACTION_ACTIONS_ZERO
+
+t1_capacity_close:
+  disposition: EARLY_CAPACITY_CLOSE_FOR_EXACT_FROZEN_SET
+  enabled_for_external_execution: false
+  original_anchor_at: '2026-07-30T16:28:59.084Z'
+  original_close_at: '2026-08-06T16:28:59.084Z'
+  exact_frozen_nomination_count: 3
+  accepted_t1_active_member_cap: 3
+  exact_set_sealed_before_reconciliation: true
+  quote_outcomes_observed_before_reconciliation: false
+  prior_relevant_quote_outcome_exposure: false
+  later_or_backdated_nomination_can_reorder: false
+  evaluation_order:
+  - first_reliable_available_at
+  - observed_at
+  - nomination_event_id
+  entered_at: ACTUAL_EVALUATION_AND_ADMISSION_TIME
+  original_future_close_used_as_entered_at: false
+  candidate_admissions_max: 3
+
+future_tranches:
+  anchor: ORIGINAL_T1_ANCHOR
+  schedule_compressed: false
+  unused_capacity_transfer_allowed: false
+  tranches:
+  - tranche_id: T2
+    start_day_inclusive: 7
+    end_day_exclusive: 14
+    active_member_cap: 3
+  - tranche_id: T3
+    start_day_inclusive: 14
+    end_day_exclusive: 21
+    active_member_cap: 2
+
+capture_allocation:
+  allocation_time: BEFORE_ANY_RELEVANT_QUOTE_OUTCOME
+  maximum_retained_watchlist_members: 8
+  maximum_base_capture_members: 6
+  minimum_complete_members_for_sufficiency: 5
+  minimum_distinct_tranches_for_sufficiency: 3
+  reserve_at_least_one_base_capture_slot_per_tranche: true
+  base_horizons:
+  - window_id: H0
+    offset_seconds: 0
+  - window_id: H1
+    offset_seconds: 3600
+  - window_id: H6
+    offset_seconds: 21600
+  base_panels_per_complete_member: 3
+  base_minimum_window_separation_seconds: 1801
+  base_member_total_span_seconds_max: 86400
+  sentinel:
+    maximum_members: 1
+    selection_key:
+    - first_reliable_available_at
+    - observed_at
+    - nomination_event_id
+    outcome_or_route_input_allowed: false
+    supplemental_horizons:
+    - window_id: H24
+      offset_seconds: 86400
+    - window_id: H72
+      offset_seconds: 259200
+    - window_id: H168
+      offset_seconds: 604800
+    supplemental_panels_count_toward_complete_member: false
+    supplemental_panels_count_toward_minimum_complete_panels: false
+  missed_window_policy: RETAIN_EXPLICIT_GAP_NO_BACKFILL
+  silent_reschedule_allowed: false
+  scheduler_or_background_process: false
+  later_windows:
+    anchor: ACTUAL_H0_CAPTURE_TIME
+    durable_due_marker_required: true
+    foreground_execution_only: true
+    separately_authorized_each_execution: true
+
+budget:
+  accepted_external_requests_whole_task_max: 192
+  source_requests_reserved_max: 8
+  quote_requests_reserved_max: 184
+  provider_calls_per_panel_max: 8
+  minimum_sufficient_dataset:
+    complete_members: 5
+    base_panels: 15
+    base_quote_calls_max: 120
+    sentinel_supplemental_panels: 3
+    sentinel_supplemental_quote_calls_max: 24
+    source_plus_quote_calls_max: 152
+    outer_ceiling_headroom: 40
+  overlay_operational_maximum:
+    base_capture_members: 6
+    base_panels: 18
+    base_quote_calls_max: 144
+    sentinel_supplemental_quote_calls_max: 24
+    quote_calls_max: 168
+    source_plus_quote_calls_max: 176
+    outer_ceiling_headroom: 16
+  next_h0_stage:
+    t1_candidate_admissions_max: 3
+    h0_panels_max: 3
+    quote_calls_max: 24
+    authorized: false
+
+outcome_blindness:
+  active: true
+  forbidden_for_admission_allocation_or_sentinel_selection:
+  - ALPHA
+  - COST_BPS
+  - PNL
+  - PRICE
+  - PROFIT
+  - QUOTE_OUTPUT
+  - QUOTE_STATUS
+  - RETURN
+  - ROI
+  - ROUTE_AVAILABLE
+  - SCORE
+  - SHARPE
+  - TERMINAL_CLASS
+  - TOKEN_RANK
+  tuning_during_collection_allowed: false
+
+pre_external_launch:
+  runtime_recovery_health_revalidation_required: true
+  exact_provider_and_endpoint_freeze_required: true
+  exact_request_credit_and_byte_caps_required: true
+  exact_raw_and_backup_destinations_required: true
+  exact_admission_input_required: true
+  rollback_and_stop_conditions_required: true
+
+catalog:
+  status: CATALOG_TRANSACTION_PENDING_T21_A7
+  version_or_count_advanced: false
+  planned_asset_ids:
+  - CONTRACT-T21-ADMISSION-HORIZON-BUDGET-RECONCILIATION-001
+  - CONFIG-T21-ADMISSION-HORIZON-BUDGET-RECONCILIATION-001
+  - TEST-T21-ADMISSION-HORIZON-BUDGET-RECONCILIATION-001
+  - EVIDENCE-T21-ADMISSION-HORIZON-BUDGET-RECONCILIATION-001
+
+authority:
+  class: LOCAL_WRITE_ONLY
+  source: EXPLICIT_USER
+  gate_phrase: T21-A6S_C0_ADMISSION_HORIZON_BUDGET_RECONCILIATION_V1
+  managed_files:
+  - docs/contracts/task21_admission_horizon_budget_reconciliation_contract_v1.md
+  - configs/task21_admission_horizon_budget_reconciliation_v1.yaml
+  - tests/test_task21_admission_horizon_budget_reconciliation.py
+  - docs/evidence/task21/admission_horizon_budget_reconciliation_acceptance_v1.json
+  network_calls: 0
+  provider_api_rpc_wss_calls: 0
+  drive_reads: 0
+  drive_writes: 0
+  credential_use: 0
+  candidate_admissions: 0
+  live_collector_executions: 0
+  raw_or_dataset_writes: 0
+  backup_executions: 0
+  restore_executions: 0
+  provider_credits: 0
+  cash_spend_usd_cents: 0
+  scheduler_or_background_process: false
+  dependency_changes: 0
+  commit: false
+  push: false
+  pull_request: false
+  merge: false
+  wallet_actions: false
+  signer_actions: false
+  transaction_actions: false
+  ui_changes: false
+  destructive_actions: false
+
+next_boundary:
+  atom_id: T21-A6S_BOUNDED_ADMISSION_AND_MULTI_HORIZON_CAPTURE_V1
+  status: NOT_AUTHORIZED
+  calendar_wait_required: false
+  provider_endpoint_selected: false
+  candidate_admissions_authorized: false
+  provider_api_rpc_wss_calls_authorized: false
+  jupiter_quote_calls_authorized: false
+  raw_or_dataset_writes_authorized: false
+  drive_actions_authorized: false
+  scheduler_or_background_process_authorized: false
+  a7_authorized: false

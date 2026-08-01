@@ -621,7 +621,7 @@ def validate_dependency_contract(document: dict[str, Any]) -> None:
         raise Task04ValidationError("uv_pin_mismatch")
     expected_tool = {
         "exact_python_pin": "3.13.14",
-        "exact_powershell_pin": "7.6.3",
+        "powershell_compatibility": ">=7.6.0,<8.0.0",
         "provider_calls_allowed": False,
         "real_money_allowed": False,
     }

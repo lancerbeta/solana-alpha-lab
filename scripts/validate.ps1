@@ -41,7 +41,8 @@ $env:UV_MANAGED_PYTHON = "1"
 try {
     if (
         $PSVersionTable.PSEdition -ne "Core" -or
-        $PSVersionTable.PSVersion.ToString() -ne "7.6.3" -or
+        $PSVersionTable.PSVersion -lt [version]"7.6.0" -or
+        $PSVersionTable.PSVersion -ge [version]"8.0.0" -or
         $PSVersionTable.Platform -ne "Win32NT" -or
         -not [Environment]::Is64BitProcess
     ) {

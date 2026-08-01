@@ -1,0 +1,57 @@
+schema: smial.task21_pre_h24_recovery_refresh
+schema_version: '1.0'
+task_id: TASK-21
+atom_id: T21-A6S_PRE_H24_RECOVERY_REFRESH_AND_CAPTURE_PREP_V1
+status: FROZEN_CREATE_ONLY
+contains_secrets: false
+
+source_roots:
+- local/task21_forward/h0_capture/run=h0-20260731T074954402486Z-78d2d1b62d99
+- local/task21_forward/h1_capture/run=h1-20260731T085510551069Z-b7664a106ef0
+- local/task21_forward/h6_capture/run=h6-gap-44fc071623e5ed6c
+
+expected_source:
+  file_count: 23
+  stored_bytes: 270498
+  h0_runtime_receipt_sha256: a815653f3f9f7ef8e9ad5916fd131c6b4a072da00e265a2f2fc5758529498c67
+  h1_runtime_receipt_sha256: f9a8c3f6fe1713a6398b49b13dda746e901d6d1fd9b541dc05e64ba1f9a8d0b3
+  h6_gap_receipt_sha256: c3b8ecef288cbce2f7bdf26e937ea1907087d8ac05c64102c6600ae94f1e2fbb
+
+local:
+  package_root: local/task21_recovery/pre_h24/package
+  isolated_restore_root: local/task21_recovery/pre_h24/isolated_restore
+  write_behavior: CREATE_ONLY_CONTENT_ADDRESSED
+
+google_drive:
+  folder_id: 1EISgmsB8nt2pkU4uBUO6Sav1Fzbo6Hw3
+  folder_name: SOLANA_ALPHA_LAB_TASK21_RECOVERY_V1
+  sharing: PRIVATE_UNCHANGED
+  operation: CREATE_NEW_FILE_ONLY
+
+authority:
+  source: EXACT_USER_GATE
+  exact_phrase: T21-A6S_PRE_H24_RECOVERY_REFRESH_AND_CAPTURE_PREP_V1
+  local_writes: true
+  google_drive_reads_max: 7
+  google_drive_upload_attempts_max: 2
+  google_drive_writes_max: 1
+  provider_api_rpc_wss_calls: 0
+  credentials_for_market_provider: 0
+  cash_spend_usd_cents: 0
+  wallet_signer_transaction_actions: 0
+  source_mutation: false
+  source_deletion: false
+  overwrite: false
+  destructive_actions: false
+
+h24:
+  gate_id: TASK21-H24-2026-08-01T07-50-34Z
+  earliest_at: '2026-08-01T07:50:34.414367Z'
+  latest_at: '2026-08-01T08:00:34.414367Z'
+  capture_atom: T21-A6S_H24_FOREGROUND_CAPTURE_V1
+  provider_authority_granted: false
+  missed_window_policy: RETAIN_EXPLICIT_GAP_NO_BACKFILL
+
+catalog:
+  status: CATALOG_TRANSACTION_PENDING_T21_A7
+  version_or_count_advanced: false

@@ -1,0 +1,128 @@
+{
+  "schema": "smial.task21.h6-foreground-capture-runtime-acceptance",
+  "schema_version": "1.0",
+  "evidence_id": "EVIDENCE-T21-H6-RUNTIME-001",
+  "evidence_version": "1.0",
+  "task_id": "TASK-21",
+  "atom_id": "T21-A6S_H6_FOREGROUND_CAPTURE_V1",
+  "completed_at": "2026-07-31T14:00:58.279996Z",
+  "status": "PASS",
+  "verdict": "H6_EXPLICIT_GAP_RECORDED_NO_BACKFILL",
+  "authority": {
+    "local_preparation_source": "STANDING_PROJECT_AUTONOMY_AND_USER_GO",
+    "provider_authority": "NOT_GRANTED",
+    "drive_authority": "NOT_GRANTED",
+    "provider_api_rpc_wss_calls_max_effective": 0,
+    "drive_actions_max_effective": 0,
+    "cash_spend_usd_cents_max": 0,
+    "credentials_max": 0,
+    "wallet_signer_transaction_actions_max": 0
+  },
+  "execution_artifacts": [
+    {
+      "path": "docs/contracts/task21_h6_foreground_capture_contract_v1.md",
+      "bytes": 2164,
+      "sha256": "3ad3c0db5ae35d272315fc9bd8d2733dc9b4e56eb2f7d9395339b492d25171ee"
+    },
+    {
+      "path": "configs/task21_h6_foreground_capture_v1.yaml",
+      "bytes": 3891,
+      "sha256": "7f5863841f5a29b66cee9c1b45165d09ea1dcac390618d49c417cb420854604c"
+    },
+    {
+      "path": "src/solana_alpha_lab/task21_h6_foreground_capture.py",
+      "bytes": 23037,
+      "sha256": "3dc630c2b59bb56b0b6c5d4caaba1ee38f1fe19ec7d1adef71ff69486c6e71db"
+    },
+    {
+      "path": "scripts/run_task21_h6_capture.py",
+      "bytes": 1637,
+      "sha256": "95b935cef912ace8f64e08bc0de9689c16f1601ff0d5fda304060dfd2946ecc3"
+    },
+    {
+      "path": "docs/evidence/task21/h6_foreground_capture_offline_acceptance_v1.json",
+      "bytes": 2575,
+      "sha256": "45fc1bdf02e1f16af709f425921b353e47da1b1944ada63c39aa5733a5432bef"
+    }
+  ],
+  "time_gate": {
+    "gate_id": "TASK21-H6-2026-07-31T13-50-34Z",
+    "earliest_at": "2026-07-31T13:50:34.414367Z",
+    "latest_at": "2026-07-31T14:00:34.414367Z",
+    "gap_observed_at": "2026-07-31T14:00:58.279996Z",
+    "inside_capture_window": false,
+    "backfill": false,
+    "rescheduled": false
+  },
+  "preflight_observations": {
+    "recovery_receipt_sha256": "b30081d22dafaf7c4a6d7c1d1aa952bdee48df504773c4264702b639d7cd8013",
+    "last_successful_backup_at": "2026-07-30T09:54:12.062Z",
+    "backup_age_hours_at_h6_open": 27.939542,
+    "backup_maximum_age_hours": 24,
+    "recovery_backup_fresh_at_h6_open": false,
+    "separate_provider_authority_present": false,
+    "capture_was_safe_to_start": false
+  },
+  "population": {
+    "members": 3,
+    "changed_from_h0": false,
+    "outcome_or_route_selection_used": false,
+    "member_ids": [
+      "T21-WATCH-4646910e9ea14e84d646",
+      "T21-WATCH-7bfebd2c448c165d7527",
+      "T21-WATCH-5630c96c741142a47a23"
+    ]
+  },
+  "h6": {
+    "status": "GAP",
+    "reason": "H6_WINDOW_MISSED_NO_BACKFILL",
+    "panels_complete": 0,
+    "provider_calls": 0,
+    "modeled_provider_credits": 0,
+    "raw_rows": 0
+  },
+  "local_create_only_evidence": {
+    "root": "local/task21_forward/h6_capture/run=h6-gap-44fc071623e5ed6c",
+    "tracked_in_git": false,
+    "files": 1,
+    "stored_bytes": 1126,
+    "gap_receipt_sha256": "c3b8ecef288cbce2f7bdf26e937ea1907087d8ac05c64102c6600ae94f1e2fbb",
+    "exact_hash_readback": true,
+    "secret_pattern_hits": 0
+  },
+  "actual_actions": {
+    "provider_api_rpc_wss_calls": 0,
+    "modeled_provider_credits": 0,
+    "local_live_windows": 0,
+    "local_stored_bytes": 1126,
+    "drive_reads": 0,
+    "drive_writes": 0,
+    "credentials_used": 0,
+    "cash_spend_usd_cents": 0,
+    "scheduler_or_background_process": false,
+    "wallet_signer_transaction_actions": 0
+  },
+  "next_boundary": {
+    "gate_id": "TASK21-H24-2026-08-01T07-50-34Z",
+    "atom_id": "T21-A6S_H24_FOREGROUND_CAPTURE_V1",
+    "earliest_at": "2026-08-01T07:50:34.414367Z",
+    "latest_at": "2026-08-01T08:00:34.414367Z",
+    "provider_api_rpc_wss_calls_authorized": false,
+    "fresh_recovery_required": true,
+    "missed_window_policy": "RETAIN_EXPLICIT_GAP_NO_BACKFILL"
+  },
+  "catalog": {
+    "status": "CATALOG_TRANSACTION_PENDING_T21_A7",
+    "version_or_count_advanced": false
+  },
+  "state_change": "TASK21_H6_EXPLICIT_GAP_RECORDED",
+  "non_claims": [
+    "NO_H6_QUOTES_CAPTURED",
+    "NO_H6_BACKFILL_OR_RESCHEDULE",
+    "NO_TRADE_OR_SWAP_EXECUTED",
+    "NO_FILL_POSITION_PNL_OR_ALPHA_CLAIM",
+    "NO_HYPOTHESIS_OUTCOME_UNSEALED",
+    "NO_DRIVE_ACTION",
+    "NO_A7_CATALOG_TRANSACTION"
+  ]
+}

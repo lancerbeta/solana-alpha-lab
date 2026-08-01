@@ -25,6 +25,6 @@ required-version = "==0.11.29"
 
 [tool.solana-alpha-lab]
 exact_python_pin = "3.13.14"
-exact_powershell_pin = "7.6.3"
+powershell_compatibility = ">=7.6.0,<8.0.0"
 provider_calls_allowed = false
 real_money_allowed = false

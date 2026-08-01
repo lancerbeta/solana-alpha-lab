@@ -639,12 +639,12 @@ records:
     contains_raw_data: false
     sensitivity: INTERNAL_NON_SECRET
 - asset_id: CTRL-PYPROJECT-001
-  record_version: '1.2'
+  record_version: '1.3'
   asset_type: configuration
   purpose: Exact project runtime and dependency declaration for the repository.
   status: IMPLEMENTED_UNVERIFIED
   origin: REPOSITORY
-  as_of: '2026-07-22'
+  as_of: '2026-08-01'
   truth_owner: TASK-04
   location:
     kind: git_path
@@ -652,7 +652,7 @@ records:
     repository_path: pyproject.toml
   integrity:
     kind: sha256
-    sha256: 6f6c5dfce0d9828a74872f2e0a3644f8925fa10f91792224f79ed6f7d076756d
+    sha256: 647a6a2d4f3c45c88872cc7d07fbdfdb035db0ee5aa6e27371bd1a235d6db0c2
   access:
     mode: read_only
     method: file
@@ -705,13 +705,13 @@ records:
     contains_raw_data: false
     sensitivity: INTERNAL_NON_SECRET
 - asset_id: CTRL-QUALITY-GATE-001
-  record_version: '1.2'
+  record_version: '1.3'
   asset_type: script
   purpose: Windows wrapper for the cheap pre-commit staged/secret checks and the
     explicit platform-neutral full repository gate.
   status: VALIDATED_ACTIVE
   origin: REPOSITORY
-  as_of: '2026-07-28'
+  as_of: '2026-08-01'
   truth_owner: TASK-03
   location:
     kind: git_path
@@ -719,7 +719,7 @@ records:
     repository_path: scripts/validate.ps1
   integrity:
     kind: sha256
-    sha256: a293f8ee733fc6995463bc8863d25bf847fcfbce234e1be42aba5f37e5bd14e9
+    sha256: 9ff25add15508c93fab60af271304162160db73ab1637cb8ea0c2d22a453e2d7
   access:
     mode: read_only
     method: command
@@ -1977,13 +1977,13 @@ records:
     contains_raw_data: false
     sensitivity: INTERNAL_NON_SECRET
 - asset_id: VALIDATOR-T04-ARCHITECTURE-001
-  record_version: '2.0'
+  record_version: '2.1'
   asset_type: script
   purpose: Fail-closed TASK-04 replay, architecture, matrix, registry, dependency,
     evidence and SBOM validator.
   status: IMPLEMENTED_UNVERIFIED
   origin: REPOSITORY
-  as_of: '2026-07-28'
+  as_of: '2026-08-01'
   truth_owner: TASK-04
   location:
     kind: git_path
@@ -1991,7 +1991,7 @@ records:
     repository_path: scripts/validate_task04.py
   integrity:
     kind: sha256
-    sha256: 4783be0ef02893c8bfd1da946d7ea785289c93815afe2ee15e27d87b45427fa5
+    sha256: 5a7287a13517c978edd3fb668bc5b772762f345e60e6ba39586f32eadff81143
   access:
     mode: read_only
     method: command
@@ -2011,13 +2011,13 @@ records:
     contains_raw_data: false
     sensitivity: INTERNAL_NON_SECRET
 - asset_id: VALIDATOR-REPOSITORY-STATE-001
-  record_version: '2.5'
+  record_version: '2.6'
   asset_type: script
   purpose: Fail-closed historical and compositional repository-state/topology
     validator through CTRL-BATON A6.4.
   status: IMPLEMENTED_UNVERIFIED
   origin: REPOSITORY
-  as_of: '2026-07-29'
+  as_of: '2026-08-01'
   truth_owner: TASK-04
   location:
     kind: git_path
@@ -2025,7 +2025,7 @@ records:
     repository_path: scripts/validate_baseline.py
   integrity:
     kind: sha256
-    sha256: d4aeebc44e8ce5f1ba2dd20a61baec412c3b586f57590a58cddc18e4a3ec9c9c
+    sha256: c0cab359225c3e5a22d03ff8018ee5ab95504b1b7cc5c943974f7b7f1ebfd779
   access:
     mode: read_only
     method: command

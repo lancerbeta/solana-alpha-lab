@@ -1,0 +1,76 @@
+schema: smial.task21_future_sentinel_capture_core
+schema_version: '1.0'
+core_id: TASK21-FUTURE-SENTINEL-CAPTURE-CORE-001
+core_version: '1.0'
+task_id: TASK-21
+atom_id: T21-P5_FUTURE_SENTINEL_CAPTURE_CORE_V1
+status: OFFLINE_VALIDATED_NOT_RUNTIME_BOUND
+contains_secrets: false
+
+profiles:
+- horizon_id: H72
+  predecessor_horizon_id: H24
+  predecessor_runtime_atom_id: T21-A6S_H24_FOREGROUND_CAPTURE_V1
+  runtime_atom_id: T21-A6S_H72_FOREGROUND_CAPTURE_V1
+  gate_id_prefix: TASK21-H72-
+  offset_seconds_from_latest_h0: 259200
+  output_relative_root: local/task21_forward/h72_capture
+  next_horizon_id: H168
+  next_runtime_atom_id: T21-A6S_H168_FOREGROUND_CAPTURE_V1
+  next_offset_seconds_from_latest_h0: 604800
+- horizon_id: H168
+  predecessor_horizon_id: H72
+  predecessor_runtime_atom_id: T21-A6S_H72_FOREGROUND_CAPTURE_V1
+  runtime_atom_id: T21-A6S_H168_FOREGROUND_CAPTURE_V1
+  gate_id_prefix: TASK21-H168-
+  offset_seconds_from_latest_h0: 604800
+  output_relative_root: local/task21_forward/h168_capture
+  next_horizon_id: null
+  next_runtime_atom_id: null
+  next_offset_seconds_from_latest_h0: null
+
+runtime_contract:
+  population_members_exact: 3
+  panels_max: 3
+  provider_calls_per_panel_max: 8
+  provider_calls_total_max: 24
+  modeled_provider_credits_max: 24
+  wall_seconds_max: 300
+  received_response_bytes_max: 3145728
+  durable_local_bytes_max: 16777216
+  minimum_interval_seconds: 2.2
+  minimum_free_space_after_write: 2147483648
+  window_grace_seconds: 600
+  notionals_usd: [10, 25, 50, 100]
+  write_behavior: CREATE_ONLY_CONTENT_ADDRESSED_RUN
+  missed_window_policy: RETAIN_EXPLICIT_GAP_NO_BACKFILL
+  scheduler_or_background_process: false
+
+runtime_binding_requirements:
+- EXACT_PREDECESSOR_RUNTIME_OR_GAP_ACCEPTANCE
+- EXACT_H0_ACCEPTANCE_AND_ADMISSION_POPULATION
+- ACTIVE_TIME_GATE_OWNED_BY_EXACT_RUNTIME_ATOM
+- CURRENT_HEALTHY_RECOVERY_RECEIPT
+- SEPARATE_EXACT_PROVIDER_AUTHORITY_INSIDE_WINDOW
+- NO_PROVIDER_CALL_AFTER_LATEST_AT
+- NO_BACKFILL_OR_SILENT_RESCHEDULE
+
+catalog:
+  status: CATALOG_TRANSACTION_PENDING_T21_A7
+  version_or_count_advanced: false
+
+authority:
+  source: REPO_STANDING_AUTONOMY_NON_INTERFERING_PARALLEL_ATOM
+  class: LOCAL_WRITE_ONLY
+  network_calls: 0
+  provider_api_rpc_wss_calls: 0
+  drive_reads: 0
+  drive_writes: 0
+  raw_or_dataset_writes: 0
+  credentials: 0
+  cash_spend_usd_cents: 0
+  scheduler_or_background_process: false
+  wallet_signer_transaction_actions: 0
+  dependency_changes: 0
+  deployment: false
+  destructive_actions: false

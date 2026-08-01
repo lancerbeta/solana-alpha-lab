@@ -1,0 +1,85 @@
+{
+  "schema": "smial.task21.bounded-admission-multi-horizon-offline-acceptance",
+  "schema_version": "1.0",
+  "evidence_id": "EVIDENCE-T21-BOUNDED-ADMISSION-MULTI-HORIZON-OFFLINE-001",
+  "evidence_version": "1.0",
+  "task_id": "TASK-21",
+  "atom_id": "T21-A6S_BOUNDED_ADMISSION_AND_MULTI_HORIZON_CAPTURE_V1",
+  "stage_id": "H0_ADMISSION_AND_CAPTURE",
+  "completed_at": "2026-07-31T07:47:46.629Z",
+  "status": "PASS",
+  "verdict": "H0_ADMISSION_AND_CAPTURE_CONTRACT_READY_FOR_EXACT_EXECUTION",
+  "artifacts": [
+    {
+      "path": "docs/contracts/task21_bounded_admission_multi_horizon_capture_contract_v1.md",
+      "sha256": "7502e8a55508958f53a84dca163d1834fbe39a6d4dd4a31fa9eba74c436ed5af"
+    },
+    {
+      "path": "configs/task21_bounded_admission_multi_horizon_capture_v1.yaml",
+      "sha256": "760889c4b48f21a466ef3d153bdf5d09eaabd37e3d438134dffe2159eece25c5"
+    },
+    {
+      "path": "src/solana_alpha_lab/task21_multi_horizon_capture.py",
+      "sha256": "046c7cdd4f739e941bea046521e0a3613f2ca86ce4c06de1a43ba895d11e6fa4"
+    },
+    {
+      "path": "scripts/run_task21_h0_capture.py",
+      "sha256": "9a7217a3f062e0d4578738e6e4a28c6eaf72be49c2f728fbd7f4b90e36f146d1"
+    },
+    {
+      "path": "tests/test_task21_multi_horizon_capture.py",
+      "sha256": "ae36d99cd03daa121e435e765ecbc77e23b66968b33bd1717b29b10e2333b2a7"
+    }
+  ],
+  "accepted_scope": {
+    "frozen_t1_nominations": 3,
+    "real_candidate_admissions_max": 3,
+    "h0_panels_max": 3,
+    "provider_calls_per_panel_max": 8,
+    "provider_calls_total_max": 24,
+    "modeled_provider_credits_max": 24,
+    "received_response_bytes_max": 3145728,
+    "durable_local_bytes_max": 16777216,
+    "cash_spend_usd_cents": 0,
+    "credentials": 0,
+    "drive_actions": 0,
+    "wallet_signer_transaction_actions": 0,
+    "scheduler_or_background_process": false
+  },
+  "validation": {
+    "command": ".venv\\Scripts\\python.exe -B -m unittest tests.test_task21_multi_horizon_capture -v",
+    "tests": 9,
+    "result": "PASS",
+    "adversarial_cases": [
+      "AUTHORITY_MISMATCH",
+      "STALE_RECOVERY",
+      "OUTCOME_EXPOSED_NOMINATION",
+      "REQUEST_CAP_INFLATION",
+      "DRIVE_AUTHORITY_LEAK",
+      "REAL_TRANSPORT_WITH_TEST_OUTPUT_OVERRIDE"
+    ]
+  },
+  "actual_actions": {
+    "provider_api_rpc_wss_calls": 0,
+    "real_candidate_admissions": 0,
+    "live_collector_executions": 0,
+    "raw_or_dataset_writes": 0,
+    "drive_reads": 0,
+    "drive_writes": 0,
+    "credentials_used": 0,
+    "provider_credits": 0,
+    "cash_spend_usd_cents": 0,
+    "scheduler_or_background_process": false,
+    "wallet_signer_transaction_actions": 0
+  },
+  "next_boundary": {
+    "stage": "EXACT_H0_RUNTIME_EXECUTION",
+    "exact_phrase": "T21-A6S_BOUNDED_ADMISSION_AND_MULTI_HORIZON_CAPTURE_V1",
+    "authorized_by_offline_acceptance": false
+  },
+  "catalog": {
+    "status": "CATALOG_TRANSACTION_PENDING_T21_A7",
+    "version_or_count_advanced": false
+  },
+  "state_change": "NONE"
+}
