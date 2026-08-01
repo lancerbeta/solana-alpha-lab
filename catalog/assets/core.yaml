@@ -10133,9 +10133,9 @@ records:
   evidence: []
   classification: *t21_internal
 - asset_id: CONTROL-T21-ACTIVE-TIME-GATE-001
-  record_version: '1.0'
+  record_version: '1.1'
   asset_type: control_document
-  purpose: Durable TASK-21 resume router with resolved horizons A7 result and exact next boundary.
+  purpose: Durable TASK-21 resume router with resolved horizons, accepted A7 and A8 results, and exact Finish Gate boundary.
   status: IMPLEMENTED_UNVERIFIED
   origin: REPOSITORY
   as_of: '2026-08-01'
@@ -10146,7 +10146,7 @@ records:
     repository_path: control/active_time_gates.json
   integrity:
     kind: sha256
-    sha256: 050467dea2a6c78034b0a7d92622fc931952ea8b02e721ba0cd98c40e083704c
+    sha256: e451019df62df6b09a7f51ef88da1f0036a66eebca308b88de9b5f766520238c
   access: *t21_read_file
   relations:
   - relation_type: governed_by
@@ -10586,9 +10586,9 @@ records:
   evidence: []
   classification: *t21_internal
 - asset_id: TEST-T21-A7-ACCEPTANCE-001
-  record_version: '1.0'
+  record_version: '1.1'
   asset_type: script
-  purpose: Hash-bound A7 tests for dataset sample index Catalog product gate Factory Fit and resume route.
+  purpose: Hash-bound A7 historical acceptance tests plus forward-only Catalog and Finish Gate route compatibility.
   status: IMPLEMENTED_UNVERIFIED
   origin: REPOSITORY
   as_of: '2026-08-01'
@@ -10599,7 +10599,7 @@ records:
     repository_path: tests/test_task21_dataset_freeze_acceptance.py
   integrity:
     kind: sha256
-    sha256: 49b9426f00155de0df9298960da7a3efdcb6013afe87e8610a3359a63790a8fa
+    sha256: e0b2074aea3ea63b62f7827bc921114d7eb852dd846faddde311b4612010e0ee
   access: *t21_read_file
   relations:
   - relation_type: depends_on
@@ -10650,6 +10650,136 @@ records:
     retention: EXTERNAL_IMMUTABLE_BUNDLE
     canonicality: EXTERNAL_BUNDLE
     availability_note: Exact bytes remain outside Git in a private Drive object with byte read-back and isolated restore evidence.
+
+- asset_id: CONFIG-T21-FINISH-GATE-001
+  record_version: '1.0'
+  asset_type: configuration
+  purpose: Forward-only post-A8 Finish Gate projection with exact repository delivery and Source activation boundary.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-08-01'
+  truth_owner: TASK-21
+  location:
+    kind: git_path
+    logical_uri: repo://configs/t21_finish_gate_read_model_v1.yaml
+    repository_path: configs/t21_finish_gate_read_model_v1.yaml
+  integrity:
+    kind: sha256
+    sha256: d7ebb3ab547717f6fc33fcd6b2249ec43db2dc0ba9facc40d133f3150a7efbdf
+  access: *t21_read_file
+  relations:
+  - relation_type: derived_from
+    target_asset_id: EVIDENCE-T21-A7-ACCEPTANCE-001
+  consumers:
+  - TASK-21
+  - TASK-22
+  - FACTORY-001
+  evidence: []
+  classification: *t21_internal
+- asset_id: MODULE-T21-FINISH-GATE-001
+  record_version: '1.0'
+  asset_type: script
+  purpose: Deterministic forward-only overlay that reconciles A7 evidence with accepted A8 merge topology.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-08-01'
+  truth_owner: TASK-21
+  location:
+    kind: git_path
+    logical_uri: repo://src/solana_alpha_lab/t21_finish_gate.py
+    repository_path: src/solana_alpha_lab/t21_finish_gate.py
+  integrity:
+    kind: sha256
+    sha256: ddb6b2431d89bef482a6e1bd55d08bec76757ab23c997b67b87b357f91e0cf46
+  access: *t21_read_file
+  relations:
+  - relation_type: governed_by
+    target_asset_id: CONFIG-T21-FINISH-GATE-001
+  - relation_type: derived_from
+    target_asset_id: MODULE-T21-FINAL-OWNER-PULSE-001
+  consumers:
+  - TASK-21
+  - TASK-22
+  - FACTORY-001
+  evidence: []
+  classification: *t21_internal
+- asset_id: SCRIPT-T21-FINISH-GATE-001
+  record_version: '1.0'
+  asset_type: script
+  purpose: Read-only Russian text or canonical JSON entrypoint for the current TASK-21 Finish Gate state.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-08-01'
+  truth_owner: TASK-21
+  location:
+    kind: git_path
+    logical_uri: repo://scripts/show_t21_finish_gate.py
+    repository_path: scripts/show_t21_finish_gate.py
+  integrity:
+    kind: sha256
+    sha256: cb366b025e690a8c8fe3a2b998e7267aaba577e8ce471bb299541dbf27dadd7a
+  access: *t21_read_file
+  relations:
+  - relation_type: depends_on
+    target_asset_id: MODULE-T21-FINISH-GATE-001
+  consumers:
+  - TASK-21
+  - TASK-22
+  - FACTORY-001
+  evidence: []
+  classification: *t21_internal
+- asset_id: EVIDENCE-T21-FINISH-GATE-001
+  record_version: '1.0'
+  asset_type: evidence
+  purpose: Exact A8 merge read-back, Finish Gate Factory Fit review, durable follow-ups, non-claims and next boundary.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-08-01'
+  truth_owner: TASK-21
+  location:
+    kind: git_path
+    logical_uri: repo://docs/evidence/finish_gates/task21_finish_gate_reconciliation_v1.json
+    repository_path: docs/evidence/finish_gates/task21_finish_gate_reconciliation_v1.json
+  integrity:
+    kind: sha256
+    sha256: 2c268aa91f3eef0b1c81ede0f1d7ad51a5aae0bc6370b3cdf7f6d5e1d6524292
+  access: *t21_read_file
+  relations:
+  - relation_type: derived_from
+    target_asset_id: EVIDENCE-T21-A7-ACCEPTANCE-001
+  - relation_type: validated_by
+    target_asset_id: TEST-T21-FINISH-GATE-001
+  consumers:
+  - TASK-21
+  - TASK-22
+  - FACTORY-001
+  evidence: []
+  classification: *t21_internal
+- asset_id: TEST-T21-FINISH-GATE-001
+  record_version: '1.0'
+  asset_type: script
+  purpose: Deterministic tests for exact A8 topology, preserved A7 hashes, current owner action and zero external authority.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-08-01'
+  truth_owner: TASK-21
+  location:
+    kind: git_path
+    logical_uri: repo://tests/test_t21_finish_gate.py
+    repository_path: tests/test_t21_finish_gate.py
+  integrity:
+    kind: sha256
+    sha256: ee989a2f28a3d639432d422b24d7549162b5bfab3a415d2ae7337609bfe6e74d
+  access: *t21_read_file
+  relations:
+  - relation_type: depends_on
+    target_asset_id: SCRIPT-T21-FINISH-GATE-001
+  - relation_type: depends_on
+    target_asset_id: EVIDENCE-T21-FINISH-GATE-001
+  consumers:
+  - TASK-21
+  evidence: []
+  classification: *t21_internal
 
 - asset_id: TEST-T20-COLLECTION-SPEC-CONTRACT-001
   record_version: '1.0'
