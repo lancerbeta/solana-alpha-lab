@@ -51,7 +51,7 @@ frozen_inputs:
   sha256: 4c0244d2ee9198ec28e8d7727b46b3ac19e46ab4c9d09a0643c5f3a7dd0f7b9e
 - role: FINAL_DATASET_RECOVERY_ACCEPTANCE
   path: docs/evidence/task21/final_dataset_recovery_acceptance_v1.json
-  sha256: ed34be8deb7f64a93e750ce7e5ff131582e68ae4188d75af2accc4f75c4db4b9
+  sha256: 5f1e5a6f67716941889e870b07871996649d53084ce124bd95a7e4038a5c29ad
 - role: FORWARD_COLLECTION_RUN_PLAN
   path: configs/task21_forward_collection_run_plan_v1.yaml
   sha256: 0f6bc1a748d80aaa8aeaed53551687304f467ccf9622b598d591f78317f419f5

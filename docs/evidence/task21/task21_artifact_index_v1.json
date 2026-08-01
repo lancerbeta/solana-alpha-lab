@@ -1,5 +1,5 @@
 {
-  "artifact_set_sha256": "665ef9169d6de2d883e966494be7ed9a5cd4a5ef22e57bdd40bfdfeba02cbc11",
+  "artifact_set_sha256": "f582c3602873769aab0d6afe461cdd174ebcb4510a1c690efb130d8d9c5a43de",
   "as_of": "2026-08-01",
   "atom_id": "T21-A7_DATASET_FREEZE_ACCEPTANCE_CATALOG_FACTORY_FIT_V1",
   "contains_secrets": false,
@@ -358,7 +358,7 @@
     {
       "bytes": 6559,
       "path": "docs/evidence/task21/final_dataset_recovery_acceptance_v1.json",
-      "sha256": "ed34be8deb7f64a93e750ce7e5ff131582e68ae4188d75af2accc4f75c4db4b9"
+      "sha256": "5f1e5a6f67716941889e870b07871996649d53084ce124bd95a7e4038a5c29ad"
     },
     {
       "bytes": 2187,
@@ -866,9 +866,9 @@
       "sha256": "5f64ddbf93068b2b9835df8f39bf8bb92acd0eefcf9a380f6e8d73140eed9881"
     },
     {
-      "bytes": 6510,
+      "bytes": 8456,
       "path": "tests/test_task21_final_dataset_recovery.py",
-      "sha256": "2a93640055c0538b2bb2e35171775bc5f919a7f3603970d11b8dbb13380f417f"
+      "sha256": "1b4a7c3d3405d32fa6519c0cfeaac65dced7c1cb14655357e22044255e55806a"
     },
     {
       "bytes": 11130,
@@ -1078,6 +1078,6 @@
   "schema_version": "1.0",
   "selection_rule": "ALL_PRE_A7_TASK21_CONFIG_CONTRACT_EVIDENCE_SCRIPT_MODULE_TEST_FIXTURE_FILES_EXCLUDING_A7_DERIVED_AND_A7_MUTATED_OUTPUTS",
   "status": "CONTENT_ADDRESSED_COMPLETE_PRE_A7_INDEX",
-  "stored_bytes": 1498589,
+  "stored_bytes": 1500535,
   "task_id": "TASK-21"
 }

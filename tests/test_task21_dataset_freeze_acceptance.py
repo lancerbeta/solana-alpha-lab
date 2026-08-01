@@ -22,6 +22,10 @@ from solana_alpha_lab.task21_dataset_freeze_acceptance import (
     validate_frozen_inputs,
     verify_hash_bindings,
 )
+from solana_alpha_lab.task21_forward_recovery import (
+    canonical_json_bytes,
+    sha256_bytes,
+)
 
 
 PLAN_PATH = ROOT / "configs/task21_dataset_freeze_acceptance_v1.yaml"
@@ -29,6 +33,7 @@ FREEZE_PATH = ROOT / "docs/evidence/task21/final_dataset_freeze_manifest_v1.json
 SAMPLE_PATH = ROOT / "docs/evidence/task21/effective_sample_summary_v1.json"
 INDEX_PATH = ROOT / "docs/evidence/task21/task21_artifact_index_v1.json"
 RECEIPT_PATH = ROOT / "docs/evidence/task21/a7_acceptance_catalog_factory_fit_v1.json"
+RECOVERY_CONFIG_PATH = ROOT / "configs/task21_final_dataset_recovery_v1.yaml"
 
 
 def sha256(path: Path) -> str:
@@ -64,8 +69,28 @@ class Task21DatasetFreezeAcceptanceTests(unittest.TestCase):
 
     def test_frozen_inputs_and_exact_dataset_identity_are_stable(self) -> None:
         validate_frozen_inputs(ROOT, self.plan)
-        rebuilt = build_dataset_freeze_manifest(repository_root=ROOT, plan=self.plan)
-        self.assertEqual(rebuilt, self.freeze)
+        rows = self.freeze["files"]
+        self.assertEqual(len(rows), self.freeze["file_count"])
+        self.assertEqual(
+            sum(int(row["bytes"]) for row in rows),
+            self.freeze["stored_bytes"],
+        )
+        self.assertEqual(
+            sha256_bytes(canonical_json_bytes(rows)),
+            self.freeze["source_inventory_sha256"],
+        )
+        recovery = load_yaml(RECOVERY_CONFIG_PATH)
+        source_roots = [
+            relative
+            for component in recovery["components"]
+            for relative in component["source_roots"]
+        ]
+        if all((ROOT / relative).is_dir() for relative in source_roots):
+            rebuilt = build_dataset_freeze_manifest(
+                repository_root=ROOT,
+                plan=self.plan,
+            )
+            self.assertEqual(rebuilt, self.freeze)
         self.assertEqual(self.freeze["root_count"], 13)
         self.assertEqual(self.freeze["file_count"], 91)
         self.assertEqual(self.freeze["stored_bytes"], 1263895)

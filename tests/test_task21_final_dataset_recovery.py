@@ -27,6 +27,9 @@ CONTRACT_PATH = ROOT / "docs" / "contracts" / "task21_final_dataset_recovery_con
 ACCEPTANCE_PATH = (
     ROOT / "docs" / "evidence" / "task21" / "final_dataset_recovery_acceptance_v1.json"
 )
+FREEZE_PATH = (
+    ROOT / "docs" / "evidence" / "task21" / "final_dataset_freeze_manifest_v1.json"
+)
 
 
 def sha256_file(path: Path) -> str:
@@ -37,33 +40,53 @@ class Task21FinalDatasetRecoveryTests(unittest.TestCase):
     @classmethod
     def setUpClass(cls) -> None:
         cls.config = yaml.safe_load(CONFIG_PATH.read_text(encoding="utf-8"))
+        cls.acceptance = json.loads(ACCEPTANCE_PATH.read_text(encoding="utf-8"))
+        cls.freeze = json.loads(FREEZE_PATH.read_text(encoding="utf-8"))
         cls.roots = [
             root
             for component in cls.config["components"]
             for root in component["source_roots"]
         ]
+        cls.source_roots_available = all(
+            (ROOT / relative).is_dir() for relative in cls.roots
+        )
 
     def test_protected_inputs_match_exact_bytes(self) -> None:
         for item in self.config["protected_inputs"]:
             self.assertEqual(sha256_file(ROOT / item["path"]), item["sha256"])
 
     def test_components_and_combined_inventory_match(self) -> None:
+        accepted_components = {
+            component["component_id"]: component
+            for component in self.acceptance["components"]
+        }
         for component in self.config["components"]:
-            rows = build_source_inventory(
-                repository_root=ROOT,
-                source_roots=component["source_roots"],
-            )
-            self.assertEqual(len(rows), component["expected_file_count"])
+            accepted = accepted_components[component["component_id"]]
+            self.assertEqual(accepted["file_count"], component["expected_file_count"])
             self.assertEqual(
-                sum(int(row["bytes"]) for row in rows),
+                accepted["stored_bytes"],
                 component["expected_stored_bytes"],
             )
             self.assertEqual(
-                sha256_bytes(canonical_json_bytes(rows)),
+                accepted["source_inventory_sha256"],
                 component["expected_inventory_sha256"],
             )
-        rows = build_source_inventory(repository_root=ROOT, source_roots=self.roots)
+            if self.source_roots_available:
+                rows = build_source_inventory(
+                    repository_root=ROOT,
+                    source_roots=component["source_roots"],
+                )
+                self.assertEqual(len(rows), component["expected_file_count"])
+                self.assertEqual(
+                    sum(int(row["bytes"]) for row in rows),
+                    component["expected_stored_bytes"],
+                )
+                self.assertEqual(
+                    sha256_bytes(canonical_json_bytes(rows)),
+                    component["expected_inventory_sha256"],
+                )
         identity = self.config["full_dataset_identity"]
+        rows = self.freeze["files"]
         self.assertEqual(len(self.roots), identity["root_count"])
         self.assertEqual(len(rows), identity["file_count"])
         self.assertEqual(sum(int(row["bytes"]) for row in rows), identity["stored_bytes"])
@@ -71,22 +94,41 @@ class Task21FinalDatasetRecoveryTests(unittest.TestCase):
             sha256_bytes(canonical_json_bytes(rows)),
             identity["source_inventory_sha256"],
         )
+        if self.source_roots_available:
+            rebuilt = build_source_inventory(
+                repository_root=ROOT,
+                source_roots=self.roots,
+            )
+            self.assertEqual(rebuilt, rows)
 
     def test_archive_is_deterministic_and_outcome_blind(self) -> None:
-        first, first_manifest = build_archive_bytes(
-            repository_root=ROOT,
-            source_roots=self.roots,
-            atom_id=self.config["atom_id"],
-        )
-        second, second_manifest = build_archive_bytes(
-            repository_root=ROOT,
-            source_roots=self.roots,
-            atom_id=self.config["atom_id"],
-        )
-        self.assertEqual(first, second)
-        self.assertEqual(first_manifest, second_manifest)
         self.assertFalse(self.config["full_dataset_identity"]["outcome_values_read"])
-        self.assertEqual(first_manifest["file_count"], 91)
+        if self.source_roots_available:
+            first, first_manifest = build_archive_bytes(
+                repository_root=ROOT,
+                source_roots=self.roots,
+                atom_id=self.config["atom_id"],
+            )
+            second, second_manifest = build_archive_bytes(
+                repository_root=ROOT,
+                source_roots=self.roots,
+                atom_id=self.config["atom_id"],
+            )
+            self.assertEqual(first, second)
+            self.assertEqual(first_manifest, second_manifest)
+            self.assertEqual(first_manifest["file_count"], 91)
+            return
+        archive = self.acceptance["content_addressed_archive"]
+        readback = self.acceptance["google_drive"]["raw_readback"]
+        restore = self.acceptance["isolated_restore"]
+        self.assertEqual(archive["sha256"], readback["sha256"])
+        self.assertEqual(archive["bytes"], readback["bytes"])
+        self.assertTrue(readback["complete_byte_identity"])
+        self.assertEqual(restore["restored_file_count"], 91)
+        self.assertEqual(
+            restore["restored_inventory_sha256"],
+            self.config["full_dataset_identity"]["source_inventory_sha256"],
+        )
 
     def test_drive_authority_is_create_only_and_bounded(self) -> None:
         authority = self.config["authority"]

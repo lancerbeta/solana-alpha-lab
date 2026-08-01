@@ -76,7 +76,7 @@
       "dataset_inventory_sha256": "aaa605eabdb62c38d218b40e768669db460c6fa419c4086d5412547b7f2fffae",
       "acceptance_receipt": {
         "path": "docs/evidence/task21/a7_acceptance_catalog_factory_fit_v1.json",
-        "sha256": "fbee87696c9802b9bcaf6296fbc93ce5abddc1e64ee117950f2e3cffcf65ed05"
+        "sha256": "e73f5b0c1f3b85ab19d7cf4a0ef460c681ce7b418a516db1a36b901d62b2454a"
       },
       "product_vision_gate": {
         "gate_id": "SMIAL-PRODUCT-VISION-RECONCILIATION-2026-07-31",

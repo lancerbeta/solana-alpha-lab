@@ -194,7 +194,7 @@
   "frozen_artifacts": [
     {
       "path": "configs/task21_dataset_freeze_acceptance_v1.yaml",
-      "sha256": "0fdeec071b75a10b5762a952888e5353637b678ada04df26720b8cd15d48ddb8"
+      "sha256": "8400f6c80f90fd708963e6c3d4c66de09ad4da550e5d57ff63180a5161a0bd04"
     },
     {
       "path": "docs/contracts/task21_dataset_freeze_acceptance_contract_v1.md",
@@ -210,7 +210,7 @@
     },
     {
       "path": "docs/evidence/task21/task21_artifact_index_v1.json",
-      "sha256": "811f6cc94d0994b31d9a5349eb37612ecd2554ecd96db30f716de15c9dce959d"
+      "sha256": "60885db2dc4877581da4273f8f09762636737fead949cd962bd34f143ce44f78"
     },
     {
       "path": "docs/handoffs/task21_to_task22_v1.md",
