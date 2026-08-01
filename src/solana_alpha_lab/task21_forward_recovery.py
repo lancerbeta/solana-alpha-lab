@@ -105,6 +105,7 @@ def build_backup_manifest(
     *,
     repository_root: Path,
     source_roots: Iterable[str],
+    atom_id: str = "T21-A6S_PRE_H24_RECOVERY_REFRESH_AND_CAPTURE_PREP_V1",
 ) -> JsonObject:
     roots = list(source_roots)
     files = build_source_inventory(
@@ -116,7 +117,7 @@ def build_backup_manifest(
         "schema": "smial.task21.forward-recovery-manifest",
         "schema_version": "1.0",
         "task_id": "TASK-21",
-        "atom_id": "T21-A6S_PRE_H24_RECOVERY_REFRESH_AND_CAPTURE_PREP_V1",
+        "atom_id": atom_id,
         "source_roots": roots,
         "file_count": len(files),
         "stored_bytes": sum(int(row["bytes"]) for row in files),
@@ -135,10 +136,12 @@ def build_archive_bytes(
     *,
     repository_root: Path,
     source_roots: Iterable[str],
+    atom_id: str = "T21-A6S_PRE_H24_RECOVERY_REFRESH_AND_CAPTURE_PREP_V1",
 ) -> tuple[bytes, JsonObject]:
     manifest = build_backup_manifest(
         repository_root=repository_root,
         source_roots=source_roots,
+        atom_id=atom_id,
     )
     manifest_bytes = canonical_json_bytes(manifest) + b"\n"
     buffer = io.BytesIO()
@@ -159,15 +162,18 @@ def materialize_archive(
     repository_root: Path,
     source_roots: Iterable[str],
     output_directory: Path,
+    atom_id: str = "T21-A6S_PRE_H24_RECOVERY_REFRESH_AND_CAPTURE_PREP_V1",
+    archive_prefix: str = ARCHIVE_PREFIX,
 ) -> JsonObject:
     """Create one content-addressed ZIP without replacing existing bytes."""
 
     archive_bytes, manifest = build_archive_bytes(
         repository_root=repository_root,
         source_roots=source_roots,
+        atom_id=atom_id,
     )
     archive_sha256 = sha256_bytes(archive_bytes)
-    filename = f"{ARCHIVE_PREFIX}_{archive_sha256}.zip"
+    filename = f"{archive_prefix}_{archive_sha256}.zip"
     output_directory.mkdir(parents=True, exist_ok=True)
     path = output_directory / filename
     created = False

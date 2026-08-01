@@ -39,6 +39,9 @@ ACCEPTANCE = (
     ROOT
     / "docs/evidence/task21/r2_p2_event_triggered_capture_offline_acceptance_v1.json"
 )
+COMPATIBILITY = (
+    ROOT / "docs/evidence/task21/p2_multi_batch_compatibility_v1.json"
+)
 FIXED_NOW = datetime(2026, 8, 1, 13, 0, tzinfo=UTC)
 P1_COMPLETED = [
     "2026-08-01T12:26:22.220156Z",
@@ -52,11 +55,26 @@ def digest(path: Path) -> str:
 
 
 class SyntheticP2Repository:
-    def __init__(self, root: Path) -> None:
+    def __init__(
+        self,
+        root: Path,
+        *,
+        config_path: Path = CONFIG,
+        members: list[dict] = MEMBERS,
+        p0_completed: list[str] = P0_COMPLETED,
+        p1_completed: list[str] = P1_COMPLETED,
+        recovery_backup_at: str = "2026-07-31T14:28:15.051Z",
+        recovery_restore_at: str = "2026-07-31T14:30:38.396037Z",
+    ) -> None:
         self.root = root
         self.config = copy.deepcopy(
-            yaml.safe_load(CONFIG.read_text(encoding="utf-8"))
+            yaml.safe_load(config_path.read_text(encoding="utf-8"))
         )
+        self.members = members
+        self.p0_completed = p0_completed
+        self.p1_completed = p1_completed
+        self.recovery_backup_at = recovery_backup_at
+        self.recovery_restore_at = recovery_restore_at
         self.config_path = root / "configs/p2.yaml"
         self.output = root / "test-output"
         self._build()
@@ -75,6 +93,10 @@ class SyntheticP2Repository:
         return path
 
     def _build(self) -> None:
+        roles = [item["role"] for item in self.config["protected_inputs"]]
+        p0_role = next(role for role in roles if role.endswith("P0_RUNTIME_ACCEPTANCE"))
+        p1_role = next(role for role in roles if role.endswith("P1_RUNTIME_ACCEPTANCE"))
+        admission_role = next(role for role in roles if role.endswith("ADMISSION_EVENTS"))
         event_path = (
             ROOT / "configs/task21_event_triggered_final_cohort_runtime_v1.yaml"
         )
@@ -92,13 +114,13 @@ class SyntheticP2Repository:
                         "completed_at": completed_at,
                     }
                     for member, completed_at in zip(
-                        MEMBERS, P0_COMPLETED, strict=True
+                        self.members, self.p0_completed, strict=True
                     )
                 ]
             },
         }
         self._bind(
-            "R2_P0_RUNTIME_ACCEPTANCE",
+            p0_role,
             "inputs/p0_acceptance.json",
             (
                 json.dumps(
@@ -109,11 +131,13 @@ class SyntheticP2Repository:
         )
         p1_acceptance = {
             "status": "PASS",
-            "population": {"member_ids": [item["member_id"] for item in MEMBERS]},
-            "p1": {"panels_complete": 3, "panels_stopped": 0},
+            "population": {
+                "member_ids": [item["member_id"] for item in self.members]
+            },
+            "p1": {"panels_complete": len(self.members), "panels_stopped": 0},
         }
         self._bind(
-            "R2_P1_RUNTIME_ACCEPTANCE",
+            p1_role,
             "inputs/p1_acceptance.json",
             (
                 json.dumps(
@@ -127,25 +151,25 @@ class SyntheticP2Repository:
                 json.dumps(member, sort_keys=True, separators=(",", ":"))
                 + "\n"
             ).encode()
-            for member in MEMBERS
+            for member in self.members
         )
         self._bind(
-            "R2_ADMISSION_EVENTS",
+            admission_role,
             "inputs/admissions.jsonl",
             admission_payload,
         )
         for index, (item, member, completed_at) in enumerate(
             zip(
                 self.config["predecessor_receipts"],
-                MEMBERS,
-                P1_COMPLETED,
+                self.members,
+                self.p1_completed,
                 strict=True,
             )
         ):
             relative = f"inputs/p1-{index}.json"
             receipt = {
                 "task_id": "TASK-21",
-                "batch_id": "T21-R2",
+                "batch_id": self.config["panel"]["batch_id"],
                 "horizon_id": "P1",
                 "member_id": member["member_id"],
                 "status": "COMPLETE",
@@ -162,8 +186,8 @@ class SyntheticP2Repository:
             "provider_api_rpc_wss_calls": 0,
             "health": {
                 "health_state": "HEALTHY",
-                "last_successful_backup_at": "2026-07-31T14:28:15.051Z",
-                "last_successful_restore_at": "2026-07-31T14:30:38.396037Z",
+                "last_successful_backup_at": self.recovery_backup_at,
+                "last_successful_restore_at": self.recovery_restore_at,
             },
         }
         recovery_path = self.root / "inputs/recovery.json"
@@ -321,8 +345,26 @@ class Task21R2P2CaptureTests(unittest.TestCase):
         receipt = json.loads(ACCEPTANCE.read_text(encoding="utf-8"))
         self.assertEqual(receipt["status"], "PASS")
         self.assertEqual(receipt["actual_actions"]["provider_api_rpc_wss_calls"], 0)
+        evolving = {
+            "src/solana_alpha_lab/task21_r2_p2_event_triggered_capture.py",
+            "tests/test_task21_r2_p2_event_triggered_capture.py",
+        }
         for item in receipt["artifacts"]:
-            self.assertEqual(digest(ROOT / item["path"]), item["sha256"])
+            if item["path"] not in evolving:
+                self.assertEqual(digest(ROOT / item["path"]), item["sha256"])
+        compatibility = json.loads(COMPATIBILITY.read_text(encoding="utf-8"))
+        self.assertEqual(compatibility["status"], "PASS")
+        module = compatibility["module"]
+        self.assertEqual(
+            module["historical_r2_sha256"],
+            next(
+                item["sha256"]
+                for item in receipt["artifacts"]
+                if item["path"]
+                == "src/solana_alpha_lab/task21_r2_p2_event_triggered_capture.py"
+            ),
+        )
+        self.assertEqual(digest(ROOT / module["path"]), module["delivered_sha256"])
 
 
 if __name__ == "__main__":

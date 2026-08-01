@@ -1,0 +1,37 @@
+{
+  "schema": "smial.task21.p2-multi-batch-compatibility",
+  "schema_version": "1.0",
+  "evidence_id": "EVIDENCE-T21-P2-MULTI-BATCH-COMPATIBILITY-001",
+  "evidence_version": "1.0",
+  "task_id": "TASK-21",
+  "atom_id": "T21-A6S_R3_P2_RECOVERY_REFRESH_AND_FOREGROUND_CAPTURE_V1",
+  "status": "PASS",
+  "as_of": "2026-08-01",
+  "module": {
+    "path": "src/solana_alpha_lab/task21_r2_p2_event_triggered_capture.py",
+    "historical_r2_sha256": "74783a76fd747ca00d8c2710dadf71d176f6d9ecca1988b123ee3389edf7de09",
+    "delivered_sha256": "53fc9e5fc94e36dfbbc934f622ac21ba8e88221096f1fa74b872fde0460dcaf1",
+    "historical_r2_capture_semantics_changed": false,
+    "r2_runtime_replay_required": false,
+    "r2_runtime_replay_performed": false
+  },
+  "compatibility": {
+    "shared_core": "P2_CONFIG_VALIDATION_PREFLIGHT_CAPTURE_AND_RECEIPT",
+    "r2_member_count": 3,
+    "r2_call_cap": 24,
+    "r3_member_count": 2,
+    "r3_call_cap": 16,
+    "binding_selection": "FROZEN_ATOM_ID_TO_BATCH_SPECIFIC_CONSTANTS",
+    "r2_synthetic_regression_tests": 5,
+    "r3_synthetic_tests": 3,
+    "result": "PASS"
+  },
+  "actual_actions": {
+    "provider_api_rpc_wss_calls": 0,
+    "retries": 0,
+    "catalog_mutation": false,
+    "source_mutation": false,
+    "wallet_signer_transaction_actions": 0,
+    "merge": false
+  }
+}

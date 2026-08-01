@@ -1,4 +1,4 @@
-"""Bounded event-triggered R2 P2 capture for TASK-21."""
+"""Bounded event-triggered P2 captures for TASK-21 final cohorts."""
 
 from __future__ import annotations
 
@@ -21,9 +21,7 @@ from solana_alpha_lab.task21_event_triggered_final_cohort import (
 )
 from solana_alpha_lab.task21_event_triggered_followup_capture import (
     CALLS_PER_PANEL_MAX,
-    CALLS_TOTAL_MAX,
     DURABLE_BYTES_MAX,
-    MEMBERS_EXACT,
     MIN_FREE_SPACE_AFTER_WRITE,
     MINIMUM_INTERVAL_SECONDS,
     RECEIVED_BYTES_MAX,
@@ -56,6 +54,46 @@ from solana_alpha_lab.task21_multi_horizon_capture import (
 
 
 ATOM_ID = "T21-A6S_R2_P2_EVENT_TRIGGERED_FOREGROUND_CAPTURE_V1"
+R3_P2_ATOM_ID = "T21-A6S_R3_P2_RECOVERY_REFRESH_AND_FOREGROUND_CAPTURE_V1"
+
+P2_BINDINGS = {
+    ATOM_ID: {
+        "batch_id": "T21-R2",
+        "members_exact": 3,
+        "calls_total_max": 24,
+        "p0_role": "R2_P0_RUNTIME_ACCEPTANCE",
+        "p1_role": "R2_P1_RUNTIME_ACCEPTANCE",
+        "admission_role": "R2_ADMISSION_EVENTS",
+        "output_root": "local/task21_forward/final_cohort/r2/p2",
+        "recovery_receipt_path": "docs/evidence/task21/pre_h24_recovery_refresh_acceptance_v1.json",
+        "used_before": {
+            "external_requests": 110,
+            "source_requests": 6,
+            "quote_requests": 104,
+            "response_bytes": 191_486,
+        },
+        "next_complete": "R2_COMPLETE_REVIEW_REQUIRED_FOR_R3_SOURCE_P0",
+        "next_stopped": "R2_P2_REVIEW_REQUIRED",
+    },
+    R3_P2_ATOM_ID: {
+        "batch_id": "T21-R3",
+        "members_exact": 2,
+        "calls_total_max": 16,
+        "p0_role": "R3_P0_RUNTIME_ACCEPTANCE",
+        "p1_role": "R3_P1_RUNTIME_ACCEPTANCE",
+        "admission_role": "R3_ADMISSION_EVENTS",
+        "output_root": "local/task21_forward/final_cohort/r3/p2",
+        "recovery_receipt_path": "docs/evidence/task21/r3_pre_p2_recovery_refresh_acceptance_v1.json",
+        "used_before": {
+            "external_requests": 168,
+            "source_requests": 8,
+            "quote_requests": 160,
+            "response_bytes": 310_396,
+        },
+        "next_complete": "R3_COMPLETE_FINAL_COHORT_REVIEW_AND_FREEZE_REQUIRED",
+        "next_stopped": "R3_P2_REVIEW_REQUIRED",
+    },
+}
 
 
 class Task21P2Error(Task21FollowupError):
@@ -71,17 +109,24 @@ class Task21P2ExecutionGate:
     authority_phrase: str
 
     def __post_init__(self) -> None:
-        if self.authority_phrase != ATOM_ID:
+        if self.authority_phrase not in P2_BINDINGS:
             raise Task21P2AuthorityRequired("task21_p2_authority_phrase_mismatch")
 
 
+def _p2_binding(config: Mapping[str, Any]) -> Mapping[str, Any]:
+    value = P2_BINDINGS.get(config.get("atom_id"))
+    if value is None:
+        raise Task21P2Error("p2_config_identity_drift")
+    return value
+
+
 def validate_p2_config(config: Mapping[str, Any], repo_root: Path) -> None:
+    binding = _p2_binding(config)
     if (
         config.get("schema")
         != "smial.task21_event_triggered_followup_capture"
         or config.get("schema_version") != SCHEMA_VERSION
         or config.get("task_id") != TASK_ID
-        or config.get("atom_id") != ATOM_ID
         or config.get("status")
         != "FROZEN_FOR_SEPARATE_EXACT_PROVIDER_AUTHORITY"
     ):
@@ -92,9 +137,9 @@ def validate_p2_config(config: Mapping[str, Any], repo_root: Path) -> None:
     roles = [item.get("role") for item in protected if isinstance(item, Mapping)]
     expected_roles = [
         "EVENT_TRIGGERED_RUNTIME_PLAN",
-        "R2_P0_RUNTIME_ACCEPTANCE",
-        "R2_P1_RUNTIME_ACCEPTANCE",
-        "R2_ADMISSION_EVENTS",
+        binding["p0_role"],
+        binding["p1_role"],
+        binding["admission_role"],
     ]
     if roles != expected_roles:
         raise Task21P2Error("p2_protected_role_order_drift")
@@ -103,12 +148,12 @@ def validate_p2_config(config: Mapping[str, Any], repo_root: Path) -> None:
 
     panel = config.get("panel", {})
     expected_panel = {
-        "batch_id": "T21-R2",
+        "batch_id": binding["batch_id"],
         "panel_id": "P2",
         "predecessor_panel_id": "P1",
         "next_panel_id": None,
         "next_atom_id": None,
-        "population_members_exact": MEMBERS_EXACT,
+        "population_members_exact": binding["members_exact"],
         "minimum_separation_seconds": 1801,
         "member_total_span_seconds_max": 86400,
         "narrow_expiry_window": None,
@@ -122,15 +167,18 @@ def validate_p2_config(config: Mapping[str, Any], repo_root: Path) -> None:
     member_ids = population.get("member_ids")
     if (
         not isinstance(member_ids, list)
-        or len(member_ids) != MEMBERS_EXACT
-        or len(set(member_ids)) != MEMBERS_EXACT
+        or len(member_ids) != binding["members_exact"]
+        or len(set(member_ids)) != binding["members_exact"]
         or population.get("deterministic_order")
         != ["entered_at", "nomination_event_id", "mint"]
         or population.get("outcome_or_route_input_used") is not False
     ):
         raise Task21P2Error("p2_population_contract_drift")
     predecessor = config.get("predecessor_receipts")
-    if not isinstance(predecessor, list) or len(predecessor) != MEMBERS_EXACT:
+    if (
+        not isinstance(predecessor, list)
+        or len(predecessor) != binding["members_exact"]
+    ):
         raise Task21P2Error("p2_predecessor_receipts_drift")
     if [item.get("member_id") for item in predecessor] != member_ids:
         raise Task21P2Error("p2_predecessor_order_drift")
@@ -154,8 +202,8 @@ def validate_p2_config(config: Mapping[str, Any], repo_root: Path) -> None:
         "notionals_usd": [10, 25, 50, 100],
         "quote_pairs_per_panel": 4,
         "provider_calls_per_panel_max": CALLS_PER_PANEL_MAX,
-        "provider_calls_total_max": CALLS_TOTAL_MAX,
-        "modeled_provider_credits_max": CALLS_TOTAL_MAX,
+        "provider_calls_total_max": binding["calls_total_max"],
+        "modeled_provider_credits_max": binding["calls_total_max"],
         "received_response_bytes_max": RECEIVED_BYTES_MAX,
         "durable_local_bytes_max": DURABLE_BYTES_MAX,
         "wall_seconds_max": WALL_SECONDS_MAX,
@@ -179,16 +227,11 @@ def validate_p2_config(config: Mapping[str, Any], repo_root: Path) -> None:
             "stored_bytes": 125_829_120,
             "dataset_bytes": 268_435_456,
         }
-        or used
-        != {
-            "external_requests": 110,
-            "source_requests": 6,
-            "quote_requests": 104,
-            "response_bytes": 191_486,
-        }
-        or used["external_requests"] + CALLS_TOTAL_MAX
+        or used != binding["used_before"]
+        or used["external_requests"] + binding["calls_total_max"]
         > caps["external_requests"]
-        or used["quote_requests"] + CALLS_TOTAL_MAX > caps["quote_requests"]
+        or used["quote_requests"] + binding["calls_total_max"]
+        > caps["quote_requests"]
         or used["response_bytes"] + RECEIVED_BYTES_MAX > caps["response_bytes"]
         or budget.get("minimum_free_space_bytes_after_write")
         != MIN_FREE_SPACE_AFTER_WRITE
@@ -215,8 +258,7 @@ def validate_p2_config(config: Mapping[str, Any], repo_root: Path) -> None:
 
     runtime = config.get("runtime", {})
     if (
-        runtime.get("output_root")
-        != "local/task21_forward/final_cohort/r2/p2"
+        runtime.get("output_root") != binding["output_root"]
         or runtime.get("write_behavior") != "CREATE_ONLY_CONTENT_ADDRESSED"
         or runtime.get("all_members_eligible_before_first_provider_call")
         is not True
@@ -229,9 +271,9 @@ def validate_p2_config(config: Mapping[str, Any], repo_root: Path) -> None:
     authority = config.get("authority", {})
     expected_authority = {
         "source": "AUTHORIZATION_REQUIRED",
-        "exact_phrase": ATOM_ID,
-        "provider_api_rpc_wss_calls_max": CALLS_TOTAL_MAX,
-        "jupiter_calls_max": CALLS_TOTAL_MAX,
+        "exact_phrase": config["atom_id"],
+        "provider_api_rpc_wss_calls_max": binding["calls_total_max"],
+        "jupiter_calls_max": binding["calls_total_max"],
         "nominations": 0,
         "admissions": 0,
         "retries": 0,
@@ -252,10 +294,10 @@ def validate_p2_config(config: Mapping[str, Any], repo_root: Path) -> None:
         raise Task21P2Error("p2_authority_boundary_drift")
     next_boundary = config.get("next_boundary", {})
     if next_boundary != {
-        "complete": "R2_COMPLETE_REVIEW_REQUIRED_FOR_R3_SOURCE_P0",
+        "complete": binding["next_complete"],
         "next_atom_id": None,
         "external_authority_granted": False,
-        "stopped": "R2_P2_REVIEW_REQUIRED",
+        "stopped": binding["next_stopped"],
         "task22_authorized": False,
         "a7_authorized": False,
     }:
@@ -265,8 +307,9 @@ def validate_p2_config(config: Mapping[str, Any], repo_root: Path) -> None:
 def _p0_history(
     config: Mapping[str, Any], repo_root: Path
 ) -> dict[str, str]:
+    binding = _p2_binding(config)
     acceptance = _load_json(
-        _protected_path(config, repo_root, "R2_P0_RUNTIME_ACCEPTANCE")
+        _protected_path(config, repo_root, str(binding["p0_role"]))
     )
     if acceptance.get("status") != "PASS":
         raise Task21P2Error("p2_p0_acceptance_not_pass")
@@ -286,14 +329,16 @@ def _p0_history(
 def _validate_p1_acceptance(
     config: Mapping[str, Any], repo_root: Path
 ) -> None:
+    binding = _p2_binding(config)
     acceptance = _load_json(
-        _protected_path(config, repo_root, "R2_P1_RUNTIME_ACCEPTANCE")
+        _protected_path(config, repo_root, str(binding["p1_role"]))
     )
     if (
         acceptance.get("status") != "PASS"
         or acceptance.get("population", {}).get("member_ids")
         != config["population"]["member_ids"]
-        or acceptance.get("p1", {}).get("panels_complete") != MEMBERS_EXACT
+        or acceptance.get("p1", {}).get("panels_complete")
+        != binding["members_exact"]
         or acceptance.get("p1", {}).get("panels_stopped") != 0
     ):
         raise Task21P2Error("p2_p1_acceptance_drift")
@@ -347,7 +392,7 @@ def _preflight_p2(
     return decisions
 
 
-def run_r2_p2_capture(
+def run_event_triggered_p2_capture(
     *,
     gate: Task21P2ExecutionGate | None,
     repo_root: Path,
@@ -366,6 +411,7 @@ def run_r2_p2_capture(
         raise Task21P2Error("p2_config_outside_repository")
     config = _load_yaml(config_path)
     validate_p2_config(config, repo_root)
+    binding = _p2_binding(config)
     observed_at = now()
     if observed_at.tzinfo is None or observed_at.utcoffset() is None:
         raise Task21P2Error("p2_now_must_be_timezone_aware")
@@ -416,7 +462,7 @@ def run_r2_p2_capture(
         )
     )
     claim = {
-        "atom_id": ATOM_ID,
+        "atom_id": config["atom_id"],
         "config_sha256": sha256_file(config_path),
         "started_at": _utc_text(observed_at),
     }
@@ -447,7 +493,7 @@ def run_r2_p2_capture(
         summary = _capture_member(
             run_root=run_root,
             config_hash=sha256_file(config_path),
-            atom_id=ATOM_ID,
+            atom_id=str(config["atom_id"]),
             panel_id="P2",
             member=member,
             transport=transport,
@@ -460,11 +506,11 @@ def run_r2_p2_capture(
 
     calls = sum(int(item["provider_calls"]) for item in summaries)
     received = sum(int(item["received_bytes"]) for item in summaries)
-    if calls > CALLS_TOTAL_MAX:
+    if calls > binding["calls_total_max"]:
         raise Task21P2Error("p2_total_call_cap_exceeded")
     if received > RECEIVED_BYTES_MAX:
         raise Task21P2Error("p2_total_received_cap_exceeded")
-    complete = len(summaries) == MEMBERS_EXACT and all(
+    complete = len(summaries) == binding["members_exact"] and all(
         item["status"] == "COMPLETE" for item in summaries
     )
     stop_reason = None
@@ -478,11 +524,11 @@ def run_r2_p2_capture(
         )
     used = config["budget"]["used_before_p2"]
     receipt = {
-        "schema": "smial.task21.r2-p2-runtime-receipt",
+        "schema": "smial.task21.event-triggered-p2-runtime-receipt",
         "schema_version": SCHEMA_VERSION,
         "task_id": TASK_ID,
-        "atom_id": ATOM_ID,
-        "batch_id": "T21-R2",
+        "atom_id": config["atom_id"],
+        "batch_id": binding["batch_id"],
         "panel_id": "P2",
         "run_id": run_id,
         "status": "PASS" if complete else "STOPPED",
@@ -573,3 +619,9 @@ def run_r2_p2_capture(
         "create_only": True,
     }
     return result
+
+
+def run_r2_p2_capture(**kwargs: Any) -> dict[str, Any]:
+    """Backward-compatible name for existing R2 callers and receipts."""
+
+    return run_event_triggered_p2_capture(**kwargs)
