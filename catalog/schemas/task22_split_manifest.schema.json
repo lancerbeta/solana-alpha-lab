@@ -1,0 +1,176 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "repo://catalog/schemas/task22_split_manifest.schema.json",
+  "title": "TASK-22 outcome-blind dataset split manifest",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema",
+    "schema_version",
+    "task_id",
+    "atom_id",
+    "as_of",
+    "split_id",
+    "status",
+    "owner_verdict",
+    "reason_codes",
+    "content_addressing",
+    "outcome_seal",
+    "grouping",
+    "roles",
+    "chronology",
+    "claim_boundary",
+    "catalog"
+  ],
+  "properties": {
+    "schema": {"const": "smial.task22.dataset-split-manifest"},
+    "schema_version": {"const": "1.0"},
+    "task_id": {"const": "TASK-22"},
+    "atom_id": {"const": "T22-A3_DETERMINISTIC_SPLIT_AND_HOLDOUT_LEDGER_V1"},
+    "as_of": {"type": "string", "format": "date"},
+    "split_id": {"const": "T22-SPLIT-T21-FROZEN-001"},
+    "status": {"enum": ["SPLIT_READY_WITH_LIMITATIONS", "EXTEND_EVIDENCE"]},
+    "owner_verdict": {"enum": ["SPLIT_READY_WITH_LIMITATIONS", "EXTEND_EVIDENCE"]},
+    "reason_codes": {
+      "type": "array",
+      "minItems": 1,
+      "uniqueItems": true,
+      "items": {"type": "string", "minLength": 3}
+    },
+    "content_addressing": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "digest_algorithm",
+        "identity_payload",
+        "split_content_sha256",
+        "dataset_manifest",
+        "dataset_inventory_sha256",
+        "a2_contract_spec"
+      ],
+      "properties": {
+        "digest_algorithm": {"const": "SHA-256"},
+        "identity_payload": {"type": "object"},
+        "split_content_sha256": {"$ref": "#/$defs/sha256"},
+        "dataset_manifest": {"$ref": "#/$defs/binding"},
+        "dataset_inventory_sha256": {"$ref": "#/$defs/sha256"},
+        "a2_contract_spec": {"$ref": "#/$defs/binding"}
+      }
+    },
+    "outcome_seal": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["state", "outcome_values_read", "outcome_paths_opened", "analysis_access_allowed"],
+      "properties": {
+        "state": {"const": "UNOPENED"},
+        "outcome_values_read": {"const": false},
+        "outcome_paths_opened": {"type": "array", "maxItems": 0},
+        "analysis_access_allowed": {"const": false}
+      }
+    },
+    "grouping": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["primary_group_key", "member_cross_fold_allowed", "batch_cross_fold_allowed", "member_iid_assumption_allowed"],
+      "properties": {
+        "primary_group_key": {"const": "nomination_batch_id"},
+        "member_cross_fold_allowed": {"const": false},
+        "batch_cross_fold_allowed": {"const": false},
+        "member_iid_assumption_allowed": {"const": false}
+      }
+    },
+    "roles": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["development", "validation", "holdout", "holdout_candidate", "auxiliary_gap_evidence"],
+      "properties": {
+        "development": {"$ref": "#/$defs/group"},
+        "validation": {"$ref": "#/$defs/empty_role"},
+        "holdout": {"$ref": "#/$defs/unassigned_holdout"},
+        "holdout_candidate": {"$ref": "#/$defs/holdout_candidate"},
+        "auxiliary_gap_evidence": {"type": "array", "minItems": 1, "items": {"type": "object"}}
+      }
+    },
+    "chronology": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "source_start_gap_seconds",
+        "source_start_gap_is_independence_proof",
+        "consumer_time_contract_present",
+        "minimum_project_horizon_seconds",
+        "maximum_project_horizon_seconds",
+        "minimum_horizon_check",
+        "maximum_horizon_check",
+        "purge_status",
+        "embargo_status"
+      ],
+      "properties": {
+        "source_start_gap_seconds": {"type": "number", "exclusiveMinimum": 0},
+        "source_start_gap_is_independence_proof": {"const": false},
+        "consumer_time_contract_present": {"type": "boolean"},
+        "minimum_project_horizon_seconds": {"const": 900},
+        "maximum_project_horizon_seconds": {"const": 14400},
+        "minimum_horizon_check": {"type": "string"},
+        "maximum_horizon_check": {"type": "string"},
+        "purge_status": {"enum": ["PASS", "NOT_COMPUTABLE"]},
+        "embargo_status": {"enum": ["PASS", "NOT_COMPUTABLE"]}
+      }
+    },
+    "claim_boundary": {"type": "object"},
+    "catalog": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["registered_in_atom3", "status"],
+      "properties": {
+        "registered_in_atom3": {"const": false},
+        "status": {"const": "CATALOG_TRANSACTION_PENDING_T22_A4"}
+      }
+    }
+  },
+  "$defs": {
+    "sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+    "binding": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["path", "sha256"],
+      "properties": {
+        "path": {"type": "string", "minLength": 3},
+        "sha256": {"$ref": "#/$defs/sha256"}
+      }
+    },
+    "group": {
+      "type": "object",
+      "required": ["state", "batch_id", "source_observed_at", "member_ids", "member_count", "partition_sha256"]
+    },
+    "empty_role": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["state", "batch_id", "member_ids"],
+      "properties": {
+        "state": {"const": "NONE"},
+        "batch_id": {"type": "null"},
+        "member_ids": {"type": "array", "maxItems": 0}
+      }
+    },
+    "unassigned_holdout": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["state", "batch_id", "member_ids", "access"],
+      "properties": {
+        "state": {"const": "UNASSIGNED_UNOPENED"},
+        "batch_id": {"type": "null"},
+        "member_ids": {"type": "array", "maxItems": 0},
+        "access": {"const": "DENY"}
+      }
+    },
+    "holdout_candidate": {
+      "type": "object",
+      "required": ["state", "access", "batch_id", "source_observed_at", "member_ids", "member_count", "partition_sha256"],
+      "properties": {
+        "state": {"const": "CANDIDATE_NOT_ASSIGNED"},
+        "access": {"const": "DENY"}
+      }
+    }
+  }
+}

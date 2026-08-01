@@ -1,0 +1,49 @@
+{
+  "as_of": "2026-08-01",
+  "assignment_receipt": {
+    "assigned_on": "2026-08-01",
+    "assignment_id": "T22-HOLDOUT-ASSIGNMENT-001",
+    "consumer_profile_id": "TASK23-COHORT-DIAGNOSTICS-THREE-PANEL-001",
+    "consumer_profile_sha256": "71a253d8b94f32a954d0195d2d544fdfb94e1b41ae680313bb48caa115ed01a0",
+    "holdout_batch_id": "T21-R3",
+    "outcome_paths_opened": [],
+    "outcome_values_read": false,
+    "prior_state": "UNASSIGNED_UNOPENED",
+    "resulting_state": "UNTOUCHED",
+    "temporal_resolution_sha256": "cfaf1edb4aa35e2a132ae4f12a9281b1405409c8a0319d798db3be2be7ee8aaa"
+  },
+  "atom_id": "T22-A5_CONSUMER_TIME_PROFILE_AND_SPLIT_RESOLUTION_V1",
+  "catalog": {
+    "registered_in_atom5": false,
+    "status": "CATALOG_TRANSACTION_PENDING_T22_A6"
+  },
+  "ledger_id": "T22-HOLDOUT-ACCESS-LEDGER-001",
+  "ledger_version": 2,
+  "previous_ledger": {
+    "path": "docs/evidence/task22/holdout_access_ledger_v1.json",
+    "sha256": "d21bf93227cf77895a29d1f6e02559c1ac94c40d803e4dd073003e7ce5d0ddfd"
+  },
+  "records": [],
+  "registry_binding": {
+    "consumption_record_appended_in_atom5": false,
+    "historical_bytes_mutable": false,
+    "registry_id": "SMIAL-REGISTRY-HOLDOUT-CONSUMPTION",
+    "truth_owner": "TASK-03"
+  },
+  "role": "COMPANION_EVIDENCE_NOT_SECOND_TRUTH_OWNER",
+  "schema": "smial.task22.holdout-ledger-extension-v2",
+  "schema_version": "2.0",
+  "split_binding": {
+    "path": "docs/evidence/task22/dataset_split_manifest_v2.json",
+    "sha256": "973a9ff6dd2a376e62dee9289a57cbb62f06c8efb5a619fa6b7b2a7914dd0683",
+    "split_content_sha256": "63b6d63895bdd6d25b68501619bca21e10f476a95ad8d27611f356a26cccee2d",
+    "split_id": "T22-SPLIT-T21-FROZEN-002"
+  },
+  "state": {
+    "access_default": "DENY",
+    "current": "UNTOUCHED",
+    "outcome_paths_opened": [],
+    "outcome_values_read": false
+  },
+  "task_id": "TASK-22"
+}

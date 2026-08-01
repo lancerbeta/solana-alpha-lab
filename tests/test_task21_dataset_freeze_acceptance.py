@@ -182,19 +182,23 @@ class Task21DatasetFreezeAcceptanceTests(unittest.TestCase):
         manifest, records = load_catalog()
         expected_ids = set(self.plan["catalog_transaction"]["registered_asset_ids"])
         self.assertEqual(len(expected_ids), 29)
-        self.assertEqual(manifest["catalog_version"], "0.26.1")
-        self.assertEqual(
-            manifest["current_checkpoint"],
-            {
-                "assets": 374,
-                "asset_registries": 4,
-                "schemas": 4,
-                "queries": 8,
-                "lifecycle_registries": 9,
-                "lifecycle_records": 52,
-            },
+        self.assertGreaterEqual(
+            tuple(map(int, manifest["catalog_version"].split("."))),
+            (0, 26, 1),
         )
-        self.assertEqual(len(records), 374)
+        checkpoint = manifest["current_checkpoint"]
+        historical = {
+            "assets": 374,
+            "asset_registries": 4,
+            "schemas": 4,
+            "queries": 8,
+            "lifecycle_registries": 9,
+            "lifecycle_records": 52,
+        }
+        for field, value in historical.items():
+            with self.subTest(field=field):
+                self.assertGreaterEqual(checkpoint[field], value)
+        self.assertEqual(len(records), checkpoint["assets"])
         self.assertTrue(expected_ids.issubset(records))
         for asset_id in expected_ids:
             record = records[asset_id]

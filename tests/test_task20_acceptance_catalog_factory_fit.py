@@ -179,7 +179,7 @@ class Task20AcceptanceCatalogFactoryFitTests(unittest.TestCase):
         checkpoint = manifest["current_checkpoint"]
         self.assertGreaterEqual(checkpoint["assets"], 340)
         self.assertEqual(checkpoint["asset_registries"], 4)
-        self.assertEqual(checkpoint["schemas"], 4)
+        self.assertGreaterEqual(checkpoint["schemas"], 4)
         self.assertEqual(checkpoint["queries"], 8)
         self.assertEqual(checkpoint["lifecycle_registries"], 9)
         self.assertEqual(checkpoint["lifecycle_records"], 52)

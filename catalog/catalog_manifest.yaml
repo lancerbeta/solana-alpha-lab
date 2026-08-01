@@ -1,12 +1,12 @@
 schema_version: '1.0'
 catalog_id: SMIAL-PROJECT-ASSET-CATALOG
-catalog_version: 0.26.1
+catalog_version: 0.27.1
 as_of: '2026-08-01'
 implementation_status: VALIDATED_ACTIVE
 current_checkpoint:
-  assets: 374
+  assets: 396
   asset_registries: 4
-  schemas: 4
+  schemas: 7
   queries: 8
   lifecycle_registries: 9
   lifecycle_records: 52
@@ -33,6 +33,9 @@ root_resolver:
   - catalog/schemas/asset_catalog.schema.json
   - catalog/schemas/query_recipe.schema.json
   - catalog/schemas/lifecycle_registry.schema.json
+  - catalog/schemas/task22_split_manifest.schema.json
+  - catalog/schemas/task22_holdout_ledger_extension.schema.json
+  - catalog/schemas/task22_split_resolution.schema.json
   commands:
     validate:
     - uv
@@ -435,5 +438,27 @@ mandatory_asset_ids:
 - SCRIPT-T21-FINISH-GATE-001
 - EVIDENCE-T21-FINISH-GATE-001
 - TEST-T21-FINISH-GATE-001
+- CONTRACT-T22-GROUP-AWARE-SPLIT-001
+- CONFIG-T22-GROUP-AWARE-SPLIT-001
+- TEST-T22-GROUP-AWARE-SPLIT-CONTRACT-001
+- SCHEMA-T22-SPLIT-MANIFEST-001
+- SCHEMA-T22-HOLDOUT-LEDGER-EXTENSION-001
+- MODULE-T22-DATASET-SPLIT-001
+- SCRIPT-T22-DATASET-SPLIT-001
+- DATA-T22-SPLIT-MANIFEST-001
+- EVIDENCE-T22-HOLDOUT-LEDGER-001
+- EVIDENCE-T22-A3-ACCEPTANCE-001
+- TEST-T22-DATASET-SPLIT-001
+- EVIDENCE-T22-A4-ACCEPTANCE-001
+- TEST-T22-A4-ACCEPTANCE-001
+- CONFIG-T22-CONSUMER-TIME-PROFILE-001
+- SCHEMA-T22-SPLIT-RESOLUTION-001
+- MODULE-T22-SPLIT-RESOLUTION-001
+- SCRIPT-T22-SPLIT-RESOLUTION-001
+- DATA-T22-SPLIT-MANIFEST-002
+- EVIDENCE-T22-HOLDOUT-LEDGER-002
+- TEST-T22-SPLIT-RESOLUTION-001
+- EVIDENCE-T22-A6-ACCEPTANCE-001
+- TEST-T22-A6-ACCEPTANCE-001
 deferred_capabilities:
 - GRAPH_DATABASE

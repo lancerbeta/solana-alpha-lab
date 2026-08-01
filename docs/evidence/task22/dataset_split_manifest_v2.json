@@ -1,0 +1,191 @@
+{
+  "acceptance": {
+    "additional_collection_required_for_this_consumer": false,
+    "outcome_access_authorized": false,
+    "outcome_reads": 0,
+    "owner_verdict": "SPLIT_READY_WITH_LIMITATIONS",
+    "provider_calls": 0,
+    "status": "PASS",
+    "task23_started": false
+  },
+  "as_of": "2026-08-01",
+  "atom_id": "T22-A5_CONSUMER_TIME_PROFILE_AND_SPLIT_RESOLUTION_V1",
+  "catalog": {
+    "registered_in_atom5": false,
+    "status": "CATALOG_TRANSACTION_PENDING_T22_A6"
+  },
+  "claim_boundary": {
+    "allowed": [
+      "TASK23_THREE_PANEL_COHORT_DIAGNOSTICS_ELIGIBILITY",
+      "SPLIT_READY_WITH_LIMITATIONS",
+      "R3_HOLDOUT_UNTOUCHED"
+    ],
+    "forbidden": [
+      "EXACT_15_MINUTE_OUTCOME",
+      "EXACT_30_MINUTE_OUTCOME",
+      "EXACT_60_MINUTE_OUTCOME",
+      "FOUR_HOUR_OUTCOME",
+      "STRATEGY_OPTIMIZATION",
+      "ALPHA",
+      "CROSS_REGIME_GENERALIZATION"
+    ]
+  },
+  "consumer_profile": {
+    "consumer_task_id": "TASK-23",
+    "elapsed_time_semantics": "ACTUAL_EVENT_TIMESTAMPS_NEVER_NOMINAL_PANEL_LABELS",
+    "exact_horizon_claims_allowed": false,
+    "execution_or_settlement_lag_seconds_if_applicable": 0,
+    "feature_max_lookback_seconds": 0,
+    "label_first_reliable_available_at_rule": "MAX_ACCEPTED_P2_COMPLETED_AT_PER_BATCH",
+    "label_horizon_seconds": 5400,
+    "path": "configs/task22_task23_consumer_time_profile_v1.yaml",
+    "profile_id": "TASK23-COHORT-DIAGNOSTICS-THREE-PANEL-001",
+    "profile_version": "1.0",
+    "sha256": "71a253d8b94f32a954d0195d2d544fdfb94e1b41ae680313bb48caa115ed01a0"
+  },
+  "content_addressing": {
+    "dataset_inventory_sha256": "aaa605eabdb62c38d218b40e768669db460c6fa419c4086d5412547b7f2fffae",
+    "digest_algorithm": "SHA-256",
+    "identity_payload": {
+      "algorithm_id": "SMIAL-T22-CONSUMER-SPECIFIC-GROUP-TIME-SPLIT",
+      "algorithm_version": "2.0",
+      "consumer_profile_id": "TASK23-COHORT-DIAGNOSTICS-THREE-PANEL-001",
+      "consumer_profile_sha256": "71a253d8b94f32a954d0195d2d544fdfb94e1b41ae680313bb48caa115ed01a0",
+      "dataset_inventory_sha256": "aaa605eabdb62c38d218b40e768669db460c6fa419c4086d5412547b7f2fffae",
+      "development_batch_id": "T21-R2",
+      "holdout_batch_id": "T21-R3",
+      "outcome_state": "UNOPENED",
+      "parent_split_content_sha256": "9f8b4affc821685ca1737716c748779e71ecbeef45bfafaf0ed4a1d5fd799458",
+      "temporal_resolution": {
+        "actual_timestamps_used": true,
+        "development_label_available_at": "2026-08-01T13:11:54.057142Z",
+        "embargo_boundary_at": "2026-08-01T13:26:54.057142Z",
+        "holdout_selection_at": "2026-08-01T13:40:15.363386Z",
+        "post_embargo_slack_seconds": 801.3062440000001,
+        "pre_embargo_gap_seconds": 1701.306244,
+        "purged_development_members": [],
+        "required_embargo_seconds": 900,
+        "source_start_gap_alone_used": false,
+        "verdict": "PASS"
+      },
+      "validation": "NONE"
+    },
+    "split_content_sha256": "63b6d63895bdd6d25b68501619bca21e10f476a95ad8d27611f356a26cccee2d"
+  },
+  "outcome_seal": {
+    "access_default": "DENY",
+    "first_access_requires_append_only_consumption_event": true,
+    "outcome_paths_opened": [],
+    "outcome_values_read": false,
+    "state": "UNOPENED"
+  },
+  "parent_split": {
+    "historical_bytes_rewritten": false,
+    "path": "docs/evidence/task22/dataset_split_manifest_v1.json",
+    "sha256": "d00c14b8f5e7f0f9bf21d124d4830a016fe4f18f0da09e0e87483af6fdff77e8",
+    "split_content_sha256": "9f8b4affc821685ca1737716c748779e71ecbeef45bfafaf0ed4a1d5fd799458",
+    "split_id": "T22-SPLIT-T21-FROZEN-001"
+  },
+  "roles": {
+    "auxiliary_gap_evidence": [
+      {
+        "batch_id": "T21-R1",
+        "member_count": 3,
+        "missing_panels": 3,
+        "outcome_access": "DENY"
+      }
+    ],
+    "development": {
+      "batch_id": "T21-R2",
+      "label_first_reliable_available_at": "2026-08-01T13:11:54.057142Z",
+      "maximum_p2_available_elapsed_seconds": 5059.070428,
+      "member_count": 3,
+      "member_ids": [
+        "T21-WATCH-29e2b75994975253bd74",
+        "T21-WATCH-61ce24fc3fa04e3eaba7",
+        "T21-WATCH-6f21dec76d05f5831216"
+      ],
+      "members": [
+        {
+          "member_id": "T21-WATCH-29e2b75994975253bd74",
+          "p0_triggered_at": "2026-08-01T11:46:58.173291Z",
+          "p1_elapsed_seconds": 2347.87846,
+          "p1_triggered_at": "2026-08-01T12:26:06.051751Z",
+          "p2_available_elapsed_seconds": 5058.973469,
+          "p2_completed_at": "2026-08-01T13:11:17.146760Z"
+        },
+        {
+          "member_id": "T21-WATCH-61ce24fc3fa04e3eaba7",
+          "p0_triggered_at": "2026-08-01T11:47:34.986714Z",
+          "p1_elapsed_seconds": 2347.967928,
+          "p1_triggered_at": "2026-08-01T12:26:42.954642Z",
+          "p2_available_elapsed_seconds": 5059.070428,
+          "p2_completed_at": "2026-08-01T13:11:54.057142Z"
+        },
+        {
+          "member_id": "T21-WATCH-6f21dec76d05f5831216",
+          "p0_triggered_at": "2026-08-01T11:47:16.580150Z",
+          "p1_elapsed_seconds": 2347.889129,
+          "p1_triggered_at": "2026-08-01T12:26:24.469279Z",
+          "p2_available_elapsed_seconds": 5059.059961,
+          "p2_completed_at": "2026-08-01T13:11:35.640111Z"
+        }
+      ],
+      "selection_observed_at": "2026-08-01T11:46:58.123523Z",
+      "state": "ASSIGNED"
+    },
+    "holdout": {
+      "access": "DENY",
+      "batch_id": "T21-R3",
+      "label_first_reliable_available_at": "2026-08-01T14:52:42.412665Z",
+      "maximum_p2_available_elapsed_seconds": 4328.604235,
+      "member_count": 2,
+      "member_ids": [
+        "T21-WATCH-2c5632a2ba71c8e44637",
+        "T21-WATCH-7a678b1052ac10b7d492"
+      ],
+      "members": [
+        {
+          "member_id": "T21-WATCH-2c5632a2ba71c8e44637",
+          "p0_triggered_at": "2026-08-01T13:40:33.808430Z",
+          "p1_elapsed_seconds": 2402.379403,
+          "p1_triggered_at": "2026-08-01T14:20:36.187833Z",
+          "p2_available_elapsed_seconds": 4328.604235,
+          "p2_completed_at": "2026-08-01T14:52:42.412665Z"
+        },
+        {
+          "member_id": "T21-WATCH-7a678b1052ac10b7d492",
+          "p0_triggered_at": "2026-08-01T13:40:15.413110Z",
+          "p1_elapsed_seconds": 2402.347072,
+          "p1_triggered_at": "2026-08-01T14:20:17.760182Z",
+          "p2_available_elapsed_seconds": 4328.365106,
+          "p2_completed_at": "2026-08-01T14:52:23.778216Z"
+        }
+      ],
+      "selection_observed_at": "2026-08-01T13:40:15.363386Z",
+      "state": "UNTOUCHED"
+    },
+    "validation": {
+      "batch_id": null,
+      "member_ids": [],
+      "state": "NONE"
+    }
+  },
+  "schema": "smial.task22.dataset-split-manifest-v2",
+  "schema_version": "2.0",
+  "split_id": "T22-SPLIT-T21-FROZEN-002",
+  "status": "SPLIT_READY_WITH_LIMITATIONS",
+  "task_id": "TASK-22",
+  "temporal_resolution": {
+    "actual_timestamps_used": true,
+    "development_label_available_at": "2026-08-01T13:11:54.057142Z",
+    "embargo_boundary_at": "2026-08-01T13:26:54.057142Z",
+    "holdout_selection_at": "2026-08-01T13:40:15.363386Z",
+    "post_embargo_slack_seconds": 801.3062440000001,
+    "pre_embargo_gap_seconds": 1701.306244,
+    "purged_development_members": [],
+    "required_embargo_seconds": 900,
+    "source_start_gap_alone_used": false,
+    "verdict": "PASS"
+  }
+}

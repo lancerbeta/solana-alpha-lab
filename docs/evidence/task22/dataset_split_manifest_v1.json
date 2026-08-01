@@ -1,0 +1,145 @@
+{
+  "as_of": "2026-08-01",
+  "atom_id": "T22-A3_DETERMINISTIC_SPLIT_AND_HOLDOUT_LEDGER_V1",
+  "catalog": {
+    "registered_in_atom3": false,
+    "status": "CATALOG_TRANSACTION_PENDING_T22_A4"
+  },
+  "chronology": {
+    "consumer_time_contract_present": false,
+    "embargo_status": "NOT_COMPUTABLE",
+    "maximum_horizon_check": "FAIL_SOURCE_START_GAP_LT_HORIZON",
+    "maximum_project_horizon_seconds": 14400,
+    "minimum_horizon_check": "UNKNOWN_CONSUMER_AVAILABILITY_RULE",
+    "minimum_project_horizon_seconds": 900,
+    "purge_status": "NOT_COMPUTABLE",
+    "source_start_gap_is_independence_proof": false,
+    "source_start_gap_seconds": 6797.239863
+  },
+  "claim_boundary": {
+    "allowed": [
+      "GROUP_AWARE_SPLIT_PIPELINE_MATERIALIZED",
+      "EXTEND_EVIDENCE",
+      "OUTCOMES_REMAIN_SEALED"
+    ],
+    "forbidden": [
+      "MARKET_WIDE_REPRESENTATIVENESS",
+      "CROSS_REGIME_GENERALIZATION",
+      "STATISTICAL_POWER_SUFFICIENCY",
+      "ALPHA",
+      "EXECUTABLE_NET_RETURN",
+      "STRATEGY_READINESS",
+      "POSITION_OR_PNL",
+      "PRODUCTION_READINESS"
+    ]
+  },
+  "content_addressing": {
+    "a2_contract_spec": {
+      "path": "configs/task22_group_aware_split_v1.yaml",
+      "sha256": "43e71918e4da1150defc97b812ea648fac9f3a3c567dba379f6948b0ac007272"
+    },
+    "dataset_inventory_sha256": "aaa605eabdb62c38d218b40e768669db460c6fa419c4086d5412547b7f2fffae",
+    "dataset_manifest": {
+      "path": "docs/evidence/task21/final_dataset_freeze_manifest_v1.json",
+      "sha256": "295d29354554247e08ddd39cd9f6b642e262869f22a0da9925227e6fab378a0f"
+    },
+    "digest_algorithm": "SHA-256",
+    "identity_payload": {
+      "algorithm_id": "SMIAL-T22-GROUP-TIME-SPLIT",
+      "algorithm_version": "1.0",
+      "dataset_inventory_sha256": "aaa605eabdb62c38d218b40e768669db460c6fa419c4086d5412547b7f2fffae",
+      "development_candidate": {
+        "batch_id": "T21-R2",
+        "member_count": 3,
+        "member_ids": [
+          "T21-WATCH-29e2b75994975253bd74",
+          "T21-WATCH-61ce24fc3fa04e3eaba7",
+          "T21-WATCH-6f21dec76d05f5831216"
+        ],
+        "partition_sha256": "ad17fb5ea1771d1748638aac72375cd5b8124f026b3fdc6c74b9266b49c32059",
+        "source_observed_at": "2026-08-01T11:46:58.123523Z"
+      },
+      "holdout_candidate": {
+        "batch_id": "T21-R3",
+        "member_count": 2,
+        "member_ids": [
+          "T21-WATCH-2c5632a2ba71c8e44637",
+          "T21-WATCH-7a678b1052ac10b7d492"
+        ],
+        "partition_sha256": "5daba136daa44d765147e680ab1e0d4b693b6c0511acc143f3e04d339ead4416",
+        "source_observed_at": "2026-08-01T13:40:15.363386Z"
+      },
+      "outcome_state": "UNOPENED",
+      "validation": "NONE",
+      "verdict": "EXTEND_EVIDENCE"
+    },
+    "split_content_sha256": "9f8b4affc821685ca1737716c748779e71ecbeef45bfafaf0ed4a1d5fd799458"
+  },
+  "grouping": {
+    "batch_cross_fold_allowed": false,
+    "member_cross_fold_allowed": false,
+    "member_iid_assumption_allowed": false,
+    "primary_group_key": "nomination_batch_id"
+  },
+  "outcome_seal": {
+    "analysis_access_allowed": false,
+    "outcome_paths_opened": [],
+    "outcome_values_read": false,
+    "state": "UNOPENED"
+  },
+  "owner_verdict": "EXTEND_EVIDENCE",
+  "reason_codes": [
+    "CONSUMER_TIME_CONTRACT_MISSING",
+    "SOURCE_START_GAP_LT_MAX_PROJECT_HORIZON"
+  ],
+  "roles": {
+    "auxiliary_gap_evidence": [
+      {
+        "batch_id": "T21-R1",
+        "member_count": 3,
+        "missing_panels": 3,
+        "outcome_access": "DENY"
+      }
+    ],
+    "development": {
+      "batch_id": "T21-R2",
+      "member_count": 3,
+      "member_ids": [
+        "T21-WATCH-29e2b75994975253bd74",
+        "T21-WATCH-61ce24fc3fa04e3eaba7",
+        "T21-WATCH-6f21dec76d05f5831216"
+      ],
+      "partition_sha256": "ad17fb5ea1771d1748638aac72375cd5b8124f026b3fdc6c74b9266b49c32059",
+      "source_observed_at": "2026-08-01T11:46:58.123523Z",
+      "state": "PROVISIONAL_ONLY"
+    },
+    "holdout": {
+      "access": "DENY",
+      "batch_id": null,
+      "member_ids": [],
+      "state": "UNASSIGNED_UNOPENED"
+    },
+    "holdout_candidate": {
+      "access": "DENY",
+      "batch_id": "T21-R3",
+      "member_count": 2,
+      "member_ids": [
+        "T21-WATCH-2c5632a2ba71c8e44637",
+        "T21-WATCH-7a678b1052ac10b7d492"
+      ],
+      "partition_sha256": "5daba136daa44d765147e680ab1e0d4b693b6c0511acc143f3e04d339ead4416",
+      "source_observed_at": "2026-08-01T13:40:15.363386Z",
+      "state": "CANDIDATE_NOT_ASSIGNED"
+    },
+    "validation": {
+      "batch_id": null,
+      "member_ids": [],
+      "state": "NONE"
+    }
+  },
+  "schema": "smial.task22.dataset-split-manifest",
+  "schema_version": "1.0",
+  "split_id": "T22-SPLIT-T21-FROZEN-001",
+  "status": "EXTEND_EVIDENCE",
+  "task_id": "TASK-22"
+}

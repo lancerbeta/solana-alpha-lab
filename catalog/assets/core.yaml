@@ -8883,7 +8883,7 @@ records:
   evidence: []
   classification: *t17a_internal
 - asset_id: TEST-T17A-EXECUTION-CAPACITY-AUDIT-001
-  record_version: '1.3'
+  record_version: '1.4'
   asset_type: script
   purpose: Deterministic acceptance tests for original timing failure,
     replacement-window replay, raw tamper failure, tracked receipt equality,
@@ -8899,7 +8899,7 @@ records:
     repository_path: tests/test_task17a_execution_capacity_audit.py
   integrity:
     kind: sha256
-    sha256: ebe36545dc7e2668707b564c76de07a71b6d4a59a358bdf9a3047ac766f80a1f
+    sha256: 26db813bea589de2e352f3cad6996b6e8ae24875989bfc8ebe63bfe2a82d8879
   access:
     mode: read_only
     method: file
@@ -9812,7 +9812,7 @@ records:
   evidence: []
   classification: *t19_internal
 - asset_id: TEST-T19-ACCEPTANCE-CATALOG-FACTORY-FIT-001
-  record_version: '1.1'
+  record_version: '1.2'
   asset_type: script
   purpose: Exact hash-bound acceptance tests for TASK-19 Catalog registration,
     lineage reconciliation, bounded claims, Factory Fit, generated navigation
@@ -9827,7 +9827,7 @@ records:
     repository_path: tests/test_task19_acceptance_catalog_factory_fit.py
   integrity:
     kind: sha256
-    sha256: 4e3812a8191d9336ca8820457ac0b597bdcd172e9cb5c66f5711b1ba7a61c35e
+    sha256: 6abf34a1533c3f95c46ec48bdfeb93b2cdd27b54d8c757b41ad297c49338ee44
   access:
     mode: read_only
     method: file
@@ -9915,6 +9915,343 @@ records:
   - FACTORY-001
   evidence: []
   classification: *t20_internal
+- asset_id: CONTRACT-T22-GROUP-AWARE-SPLIT-001
+  record_version: '1.0'
+  asset_type: control_document
+  purpose: Frozen outcome-blind group-aware split and holdout-access contract for the accepted TASK-21 dataset.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-08-01'
+  truth_owner: TASK-22
+  location:
+    kind: git_path
+    logical_uri: repo://docs/contracts/task22_group_aware_split_contract_v1.md
+    repository_path: docs/contracts/task22_group_aware_split_contract_v1.md
+  integrity:
+    kind: sha256
+    sha256: 75ecf347dc92e2ff7b08825e13be093a9f34f93b77dc989591d11083bd53c96f
+  access: &t22_read_file
+    mode: read_only
+    method: file
+    network_required: false
+    secrets_required: false
+  relations:
+  - relation_type: derived_from
+    target_asset_id: HANDOFF-T21-TASK22-001
+  consumers:
+  - TASK-22
+  - TASK-23
+  - FACTORY-001
+  evidence: []
+  classification: &t22_internal
+    contains_secrets: false
+    contains_raw_data: false
+    sensitivity: INTERNAL_NON_SECRET
+- asset_id: CONFIG-T22-GROUP-AWARE-SPLIT-001
+  record_version: '1.0'
+  asset_type: configuration
+  purpose: Machine-readable TASK-22 group split chronology holdout access non-claim and authority contract.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-08-01'
+  truth_owner: TASK-22
+  location:
+    kind: git_path
+    logical_uri: repo://configs/task22_group_aware_split_v1.yaml
+    repository_path: configs/task22_group_aware_split_v1.yaml
+  integrity:
+    kind: sha256
+    sha256: 43e71918e4da1150defc97b812ea648fac9f3a3c567dba379f6948b0ac007272
+  access: *t22_read_file
+  relations:
+  - relation_type: governed_by
+    target_asset_id: CONTRACT-T22-GROUP-AWARE-SPLIT-001
+  consumers:
+  - TASK-22
+  - TASK-23
+  evidence: []
+  classification: *t22_internal
+- asset_id: TEST-T22-GROUP-AWARE-SPLIT-CONTRACT-001
+  record_version: '1.0'
+  asset_type: script
+  purpose: Hash-bound tests for TASK-22 grouping chronology holdout non-claims and local authority.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-08-01'
+  truth_owner: TASK-22
+  location:
+    kind: git_path
+    logical_uri: repo://tests/test_task22_group_aware_split_contract.py
+    repository_path: tests/test_task22_group_aware_split_contract.py
+  integrity:
+    kind: sha256
+    sha256: c07c9ef73858fe1bd9d62eb6e97b47bb3e2b031886d7aa629fe6b2c76eba6bae
+  access: *t22_read_file
+  relations:
+  - relation_type: depends_on
+    target_asset_id: CONFIG-T22-GROUP-AWARE-SPLIT-001
+  consumers:
+  - TASK-22
+  evidence: []
+  classification: *t22_internal
+- asset_id: SCHEMA-T22-SPLIT-MANIFEST-001
+  record_version: '1.0'
+  asset_type: schema
+  purpose: JSON Schema for content-addressed outcome-blind TASK-22 split manifests and honest role states.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-08-01'
+  truth_owner: TASK-22
+  location:
+    kind: git_path
+    logical_uri: repo://catalog/schemas/task22_split_manifest.schema.json
+    repository_path: catalog/schemas/task22_split_manifest.schema.json
+  integrity:
+    kind: sha256
+    sha256: b764cfc0b50ebb99cd88cd7be27c2f7aa1367028f180d48c29baa0a313baacc5
+  access: *t22_read_file
+  relations:
+  - relation_type: governed_by
+    target_asset_id: CONTRACT-T22-GROUP-AWARE-SPLIT-001
+  consumers:
+  - TASK-22
+  - TASK-23
+  - REG-RESEARCH-001
+  evidence: []
+  classification: *t22_internal
+- asset_id: SCHEMA-T22-HOLDOUT-LEDGER-EXTENSION-001
+  record_version: '1.0'
+  asset_type: schema
+  purpose: Additive companion schema for append-only holdout access evidence compatible with the existing lifecycle registry.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-08-01'
+  truth_owner: TASK-22
+  location:
+    kind: git_path
+    logical_uri: repo://catalog/schemas/task22_holdout_ledger_extension.schema.json
+    repository_path: catalog/schemas/task22_holdout_ledger_extension.schema.json
+  integrity:
+    kind: sha256
+    sha256: b83cbd54a37a08296dee4329afbec97c917f26fdfd2f67158d0eb6bfac354080
+  access: *t22_read_file
+  relations:
+  - relation_type: governed_by
+    target_asset_id: CONTRACT-T22-GROUP-AWARE-SPLIT-001
+  - relation_type: depends_on
+    target_asset_id: REGISTRY-HOLDOUT-CONSUMPTION-001
+  consumers:
+  - TASK-22
+  - TASK-23
+  - REG-RESEARCH-001
+  evidence: []
+  classification: *t22_internal
+- asset_id: MODULE-T22-DATASET-SPLIT-001
+  record_version: '1.0'
+  asset_type: script
+  purpose: Deterministic TASK-22 builder for group candidates content identity ledger snapshots and acceptance evidence.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-08-01'
+  truth_owner: TASK-22
+  location:
+    kind: git_path
+    logical_uri: repo://src/solana_alpha_lab/task22_dataset_split.py
+    repository_path: src/solana_alpha_lab/task22_dataset_split.py
+  integrity:
+    kind: sha256
+    sha256: 5f8dad5dffb23ec896d8dc104ce4652b6b8d943a7143f81246dd6006eaea4d82
+  access: *t22_read_file
+  relations:
+  - relation_type: governed_by
+    target_asset_id: CONFIG-T22-GROUP-AWARE-SPLIT-001
+  - relation_type: produces
+    target_asset_id: DATA-T22-SPLIT-MANIFEST-001
+  - relation_type: produces
+    target_asset_id: EVIDENCE-T22-HOLDOUT-LEDGER-001
+  consumers:
+  - TASK-22
+  evidence: []
+  classification: *t22_internal
+- asset_id: SCRIPT-T22-DATASET-SPLIT-001
+  record_version: '1.0'
+  asset_type: script
+  purpose: Local deterministic render check and create-only materializer for TASK-22 split artifacts.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-08-01'
+  truth_owner: TASK-22
+  location:
+    kind: git_path
+    logical_uri: repo://scripts/build_task22_dataset_split.py
+    repository_path: scripts/build_task22_dataset_split.py
+  integrity:
+    kind: sha256
+    sha256: 401fe7bd2272456421865666a70d19130eda6f2209b408bc932f47b88e81738d
+  access: *t22_read_file
+  relations:
+  - relation_type: depends_on
+    target_asset_id: MODULE-T22-DATASET-SPLIT-001
+  consumers:
+  - TASK-22
+  evidence: []
+  classification: *t22_internal
+- asset_id: DATA-T22-SPLIT-MANIFEST-001
+  record_version: '1.0'
+  asset_type: evidence
+  purpose: Content-addressed group-aware split candidate with validation NONE sealed outcomes and explicit temporal limitations.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-08-01'
+  truth_owner: TASK-22
+  location:
+    kind: git_path
+    logical_uri: repo://docs/evidence/task22/dataset_split_manifest_v1.json
+    repository_path: docs/evidence/task22/dataset_split_manifest_v1.json
+  integrity:
+    kind: sha256
+    sha256: d00c14b8f5e7f0f9bf21d124d4830a016fe4f18f0da09e0e87483af6fdff77e8
+  access: *t22_read_file
+  relations:
+  - relation_type: derived_from
+    target_asset_id: DATA-T21-FINAL-DATASET-FREEZE-MANIFEST-001
+  - relation_type: governed_by
+    target_asset_id: SCHEMA-T22-SPLIT-MANIFEST-001
+  consumers:
+  - TASK-22
+  - TASK-23
+  - FACTORY-001
+  - REG-RESEARCH-001
+  evidence: []
+  classification: *t22_internal
+- asset_id: EVIDENCE-T22-HOLDOUT-LEDGER-001
+  record_version: '1.0'
+  asset_type: evidence
+  purpose: Empty create-only companion ledger snapshot proving default-deny holdout state without becoming a second truth owner.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-08-01'
+  truth_owner: TASK-22
+  location:
+    kind: git_path
+    logical_uri: repo://docs/evidence/task22/holdout_access_ledger_v1.json
+    repository_path: docs/evidence/task22/holdout_access_ledger_v1.json
+  integrity:
+    kind: sha256
+    sha256: d21bf93227cf77895a29d1f6e02559c1ac94c40d803e4dd073003e7ce5d0ddfd
+  access: *t22_read_file
+  relations:
+  - relation_type: governed_by
+    target_asset_id: SCHEMA-T22-HOLDOUT-LEDGER-EXTENSION-001
+  - relation_type: depends_on
+    target_asset_id: DATA-T22-SPLIT-MANIFEST-001
+  consumers:
+  - TASK-22
+  - TASK-23
+  - REG-RESEARCH-001
+  evidence: []
+  classification: *t22_internal
+- asset_id: EVIDENCE-T22-A3-ACCEPTANCE-001
+  record_version: '1.0'
+  asset_type: evidence
+  purpose: Deterministic A3 acceptance receipt for EXTEND_EVIDENCE group integrity registry compatibility and zero outcome access.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-08-01'
+  truth_owner: TASK-22
+  location:
+    kind: git_path
+    logical_uri: repo://docs/evidence/task22/deterministic_split_and_holdout_ledger_acceptance_v1.json
+    repository_path: docs/evidence/task22/deterministic_split_and_holdout_ledger_acceptance_v1.json
+  integrity:
+    kind: sha256
+    sha256: 14480399ba90c89d1947627ba225417ff79ba135d5edd27e91aedba1c8bef1a6
+  access: *t22_read_file
+  relations:
+  - relation_type: derived_from
+    target_asset_id: DATA-T22-SPLIT-MANIFEST-001
+  - relation_type: derived_from
+    target_asset_id: EVIDENCE-T22-HOLDOUT-LEDGER-001
+  consumers:
+  - TASK-22
+  - FACTORY-001
+  evidence: []
+  classification: *t22_internal
+- asset_id: TEST-T22-DATASET-SPLIT-001
+  record_version: '1.0'
+  asset_type: script
+  purpose: Deterministic schema content-addressing append-only compatibility leakage and authority tests for TASK-22 A3.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-08-01'
+  truth_owner: TASK-22
+  location:
+    kind: git_path
+    logical_uri: repo://tests/test_task22_deterministic_split_and_holdout_ledger.py
+    repository_path: tests/test_task22_deterministic_split_and_holdout_ledger.py
+  integrity:
+    kind: sha256
+    sha256: be9cffc74075039e38bc384ab2aa4ad0bf3f3c814cc6d5b87dc674134b186840
+  access: *t22_read_file
+  relations:
+  - relation_type: depends_on
+    target_asset_id: EVIDENCE-T22-A3-ACCEPTANCE-001
+  consumers:
+  - TASK-22
+  evidence: []
+  classification: *t22_internal
+- asset_id: EVIDENCE-T22-A4-ACCEPTANCE-001
+  record_version: '1.0'
+  asset_type: evidence
+  purpose: TASK-22 A4 acceptance Catalog and full Factory Fit receipt with a durable horizon-profile-first resolution route.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-08-01'
+  truth_owner: TASK-22
+  location:
+    kind: git_path
+    logical_uri: repo://docs/evidence/task22/a4_acceptance_catalog_factory_fit_v1.json
+    repository_path: docs/evidence/task22/a4_acceptance_catalog_factory_fit_v1.json
+  integrity:
+    kind: sha256
+    sha256: 23e11802e9239f3f97b9395f28beffc190e85dcad2c51c7403a875077accd7c3
+  access: *t22_read_file
+  relations:
+  - relation_type: derived_from
+    target_asset_id: EVIDENCE-T22-A3-ACCEPTANCE-001
+  - relation_type: validated_by
+    target_asset_id: TEST-T22-A4-ACCEPTANCE-001
+  consumers:
+  - TASK-22
+  - TASK-23
+  - FACTORY-001
+  evidence: []
+  classification: *t22_internal
+- asset_id: TEST-T22-A4-ACCEPTANCE-001
+  record_version: '1.1'
+  asset_type: script
+  purpose: Exact hash-bound A4 tests for six adversarial vectors Catalog integrity Factory Fit and zero external authority.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-08-01'
+  truth_owner: TASK-22
+  location:
+    kind: git_path
+    logical_uri: repo://tests/test_task22_acceptance_catalog_factory_fit.py
+    repository_path: tests/test_task22_acceptance_catalog_factory_fit.py
+  integrity:
+    kind: sha256
+    sha256: 8921fd3971dbee8eaa68b255300d8de4ae350998b325eda7b20265d12c1473f4
+  access: *t22_read_file
+  relations:
+  - relation_type: depends_on
+    target_asset_id: EVIDENCE-T22-A4-ACCEPTANCE-001
+  - relation_type: depends_on
+    target_asset_id: TEST-T22-DATASET-SPLIT-001
+  consumers:
+  - TASK-22
+  evidence: []
+  classification: *t22_internal
 - asset_id: CONTRACT-T21-FORWARD-COLLECTION-RUN-PLAN-001
   record_version: '1.0'
   asset_type: control_document
@@ -10586,7 +10923,7 @@ records:
   evidence: []
   classification: *t21_internal
 - asset_id: TEST-T21-A7-ACCEPTANCE-001
-  record_version: '1.1'
+  record_version: '1.2'
   asset_type: script
   purpose: Hash-bound A7 historical acceptance tests plus forward-only Catalog and Finish Gate route compatibility.
   status: IMPLEMENTED_UNVERIFIED
@@ -10599,7 +10936,7 @@ records:
     repository_path: tests/test_task21_dataset_freeze_acceptance.py
   integrity:
     kind: sha256
-    sha256: e0b2074aea3ea63b62f7827bc921114d7eb852dd846faddde311b4612010e0ee
+    sha256: 654638663901460ca136e40d006632719d939e1a3f2dd064afaed5f881b04471
   access: *t21_read_file
   relations:
   - relation_type: depends_on
@@ -10988,7 +11325,7 @@ records:
   evidence: []
   classification: *t20_internal
 - asset_id: TEST-T20-ACCEPTANCE-CATALOG-FACTORY-FIT-001
-  record_version: '1.1'
+  record_version: '1.2'
   asset_type: script
   purpose: Exact hash-bound TASK-20 acceptance tests for eight adversarial
     vectors, Catalog consistency, Factory Fit, generated navigation, non-claims
@@ -11003,7 +11340,7 @@ records:
     repository_path: tests/test_task20_acceptance_catalog_factory_fit.py
   integrity:
     kind: sha256
-    sha256: edc29f415113619232e96eee898df3a17d47d290f3e8aa15c48c456d0fc908b0
+    sha256: 79f4d1fadd1ac8010d1a04d7354a9bd964ddd2995ae638d1a202c410e5cfa010
   access:
     mode: read_only
     method: file
@@ -11020,3 +11357,242 @@ records:
   - TASK-20
   evidence: []
   classification: *t20_internal
+- asset_id: CONFIG-T22-CONSUMER-TIME-PROFILE-001
+  record_version: '1.0'
+  asset_type: configuration
+  purpose: Frozen outcome-blind time profile for the first named TASK-23 three-panel cohort diagnostics consumer.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-08-01'
+  truth_owner: TASK-22
+  location:
+    kind: git_path
+    logical_uri: repo://configs/task22_task23_consumer_time_profile_v1.yaml
+    repository_path: configs/task22_task23_consumer_time_profile_v1.yaml
+  integrity:
+    kind: sha256
+    sha256: 71a253d8b94f32a954d0195d2d544fdfb94e1b41ae680313bb48caa115ed01a0
+  access: *t22_read_file
+  relations:
+  - relation_type: derived_from
+    target_asset_id: EVIDENCE-T22-A4-ACCEPTANCE-001
+  consumers:
+  - TASK-22
+  - TASK-23
+  evidence: []
+  classification: *t22_internal
+- asset_id: SCHEMA-T22-SPLIT-RESOLUTION-001
+  record_version: '1.0'
+  asset_type: schema
+  purpose: JSON Schema for the consumer-specific split manifest and append-only holdout assignment ledger.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-08-01'
+  truth_owner: TASK-22
+  location:
+    kind: git_path
+    logical_uri: repo://catalog/schemas/task22_split_resolution.schema.json
+    repository_path: catalog/schemas/task22_split_resolution.schema.json
+  integrity:
+    kind: sha256
+    sha256: b52d92128c104989291da46c9ce335e2b8f2b24a46e9b0acecc44da60c327cc0
+  access: *t22_read_file
+  relations:
+  - relation_type: governed_by
+    target_asset_id: CONFIG-T22-CONSUMER-TIME-PROFILE-001
+  - relation_type: depends_on
+    target_asset_id: REGISTRY-HOLDOUT-CONSUMPTION-001
+  consumers:
+  - TASK-22
+  - TASK-23
+  - REG-RESEARCH-001
+  evidence: []
+  classification: *t22_internal
+- asset_id: MODULE-T22-SPLIT-RESOLUTION-001
+  record_version: '1.0'
+  asset_type: script
+  purpose: Deterministic outcome-blind resolver for actual panel timing purge embargo group roles and holdout assignment.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-08-01'
+  truth_owner: TASK-22
+  location:
+    kind: git_path
+    logical_uri: repo://src/solana_alpha_lab/task22_split_resolution.py
+    repository_path: src/solana_alpha_lab/task22_split_resolution.py
+  integrity:
+    kind: sha256
+    sha256: 4c6886141666f5533f2c92396cc4dcc9eb4941677e63e28437fb513da10dc249
+  access: *t22_read_file
+  relations:
+  - relation_type: governed_by
+    target_asset_id: CONFIG-T22-CONSUMER-TIME-PROFILE-001
+  - relation_type: produces
+    target_asset_id: DATA-T22-SPLIT-MANIFEST-002
+  - relation_type: produces
+    target_asset_id: EVIDENCE-T22-HOLDOUT-LEDGER-002
+  consumers:
+  - TASK-22
+  evidence: []
+  classification: *t22_internal
+- asset_id: SCRIPT-T22-SPLIT-RESOLUTION-001
+  record_version: '1.0'
+  asset_type: script
+  purpose: Create-only renderer and deterministic read-back checker for TASK-22 split resolution artifacts.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-08-01'
+  truth_owner: TASK-22
+  location:
+    kind: git_path
+    logical_uri: repo://scripts/build_task22_split_resolution.py
+    repository_path: scripts/build_task22_split_resolution.py
+  integrity:
+    kind: sha256
+    sha256: f9cf6ebdcea5c570001a2df57238cf688cece48e15a840921853574d6a7086bb
+  access: *t22_read_file
+  relations:
+  - relation_type: depends_on
+    target_asset_id: MODULE-T22-SPLIT-RESOLUTION-001
+  consumers:
+  - TASK-22
+  evidence: []
+  classification: *t22_internal
+- asset_id: DATA-T22-SPLIT-MANIFEST-002
+  record_version: '1.0'
+  asset_type: evidence
+  purpose: Content-addressed consumer-specific split assigning R2 development and R3 untouched holdout with validation NONE.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-08-01'
+  truth_owner: TASK-22
+  location:
+    kind: git_path
+    logical_uri: repo://docs/evidence/task22/dataset_split_manifest_v2.json
+    repository_path: docs/evidence/task22/dataset_split_manifest_v2.json
+  integrity:
+    kind: sha256
+    sha256: 973a9ff6dd2a376e62dee9289a57cbb62f06c8efb5a619fa6b7b2a7914dd0683
+  access: *t22_read_file
+  relations:
+  - relation_type: derived_from
+    target_asset_id: DATA-T22-SPLIT-MANIFEST-001
+  - relation_type: governed_by
+    target_asset_id: SCHEMA-T22-SPLIT-RESOLUTION-001
+  - relation_type: derived_from
+    target_asset_id: CONFIG-T22-CONSUMER-TIME-PROFILE-001
+  consumers:
+  - TASK-22
+  - TASK-23
+  - FACTORY-001
+  - REG-RESEARCH-001
+  evidence: []
+  classification: *t22_internal
+- asset_id: EVIDENCE-T22-HOLDOUT-LEDGER-002
+  record_version: '1.0'
+  asset_type: evidence
+  purpose: Append-only holdout assignment snapshot proving R3 untouched default-deny state and zero outcome consumption.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-08-01'
+  truth_owner: TASK-22
+  location:
+    kind: git_path
+    logical_uri: repo://docs/evidence/task22/holdout_access_ledger_v2.json
+    repository_path: docs/evidence/task22/holdout_access_ledger_v2.json
+  integrity:
+    kind: sha256
+    sha256: 2282e5d1eac09a0ce940a5700f04b03ff4d75fc9cd4d65e08e5fe7deda88ca51
+  access: *t22_read_file
+  relations:
+  - relation_type: derived_from
+    target_asset_id: EVIDENCE-T22-HOLDOUT-LEDGER-001
+  - relation_type: depends_on
+    target_asset_id: DATA-T22-SPLIT-MANIFEST-002
+  - relation_type: governed_by
+    target_asset_id: SCHEMA-T22-SPLIT-RESOLUTION-001
+  consumers:
+  - TASK-22
+  - TASK-23
+  - REG-RESEARCH-001
+  evidence: []
+  classification: *t22_internal
+- asset_id: TEST-T22-SPLIT-RESOLUTION-001
+  record_version: '1.0'
+  asset_type: script
+  purpose: Deterministic and adversarial tests for actual-time split resolution embargo outcome sealing and Catalog deferral.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-08-01'
+  truth_owner: TASK-22
+  location:
+    kind: git_path
+    logical_uri: repo://tests/test_task22_consumer_time_profile_split_resolution.py
+    repository_path: tests/test_task22_consumer_time_profile_split_resolution.py
+  integrity:
+    kind: sha256
+    sha256: 72139cd917f5a923a6423f2447ce1e0012ebe3a74181c28f5574e100bdf90206
+  access: *t22_read_file
+  relations:
+  - relation_type: depends_on
+    target_asset_id: DATA-T22-SPLIT-MANIFEST-002
+  - relation_type: depends_on
+    target_asset_id: EVIDENCE-T22-HOLDOUT-LEDGER-002
+  consumers:
+  - TASK-22
+  evidence: []
+  classification: *t22_internal
+- asset_id: EVIDENCE-T22-A6-ACCEPTANCE-001
+  record_version: '1.0'
+  asset_type: evidence
+  purpose: TASK-22 A6 acceptance Catalog and Factory Fit receipt for the named-consumer split resolution and first-access boundary.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-08-01'
+  truth_owner: TASK-22
+  location:
+    kind: git_path
+    logical_uri: repo://docs/evidence/task22/a6_split_resolution_acceptance_catalog_factory_fit_v1.json
+    repository_path: docs/evidence/task22/a6_split_resolution_acceptance_catalog_factory_fit_v1.json
+  integrity:
+    kind: sha256
+    sha256: 29c1ad28d06430b74864b745ef50bf0315fcbfcfb5a7534e54b1692a3f15a019
+  access: *t22_read_file
+  relations:
+  - relation_type: derived_from
+    target_asset_id: DATA-T22-SPLIT-MANIFEST-002
+  - relation_type: derived_from
+    target_asset_id: EVIDENCE-T22-HOLDOUT-LEDGER-002
+  - relation_type: validated_by
+    target_asset_id: TEST-T22-A6-ACCEPTANCE-001
+  consumers:
+  - TASK-22
+  - TASK-23
+  - FACTORY-001
+  evidence: []
+  classification: *t22_internal
+- asset_id: TEST-T22-A6-ACCEPTANCE-001
+  record_version: '1.0'
+  asset_type: script
+  purpose: Hash-bound A6 tests for split acceptance Catalog monotonicity Factory Fit authority and first-outcome-access governance.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-08-01'
+  truth_owner: TASK-22
+  location:
+    kind: git_path
+    logical_uri: repo://tests/test_task22_split_resolution_acceptance_catalog_factory_fit.py
+    repository_path: tests/test_task22_split_resolution_acceptance_catalog_factory_fit.py
+  integrity:
+    kind: sha256
+    sha256: b545adbbf37e48ed7c4ea654a4429dfeb573ccee84bfc60323ef265404c928bf
+  access: *t22_read_file
+  relations:
+  - relation_type: depends_on
+    target_asset_id: EVIDENCE-T22-A6-ACCEPTANCE-001
+  - relation_type: depends_on
+    target_asset_id: TEST-T22-SPLIT-RESOLUTION-001
+  consumers:
+  - TASK-22
+  evidence: []
+  classification: *t22_internal

@@ -79,7 +79,7 @@ class Task19AcceptanceCatalogFactoryFitTests(unittest.TestCase):
         self.assertGreaterEqual(checkpoint["assets"], historical["assets"])
         for field in ("asset_registries", "schemas", "queries"):
             with self.subTest(field=field):
-                self.assertEqual(checkpoint[field], historical[field])
+                self.assertGreaterEqual(checkpoint[field], historical[field])
         self.assertEqual(
             len(records),
             checkpoint["assets"],
