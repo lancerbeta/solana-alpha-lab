@@ -39,7 +39,10 @@ class Task21DurableResumeRouterBindingTests(unittest.TestCase):
         self.assertIn("control/active_time_gates.json", agents)
         self.assertEqual(self.router["router_id"], self.config["router_id"])
         self.assertEqual(self.router["router_version"], "1.0")
-        self.assertEqual(self.router["status"], "ACTIVE_LOCAL_CHECKOUT")
+        self.assertEqual(
+            self.router["status"],
+            "NO_ACTIVE_TIME_GATE_FUTURE_HORIZONS_TRIGGER_ONLY",
+        )
         self.assertEqual(
             self.router["entry_rule"],
             "READ_MARKER_THEN_RUN_OWNER_PULSE_BEFORE_TASK21_CONTINUATION",
@@ -73,7 +76,7 @@ class Task21DurableResumeRouterBindingTests(unittest.TestCase):
             self.assertFalse(path.is_absolute())
             self.assertTrue((ROOT / path).is_file(), value)
 
-    def test_due_gate_precedence_routes_exact_h24_atom(self) -> None:
+    def test_due_gate_precedence_is_clear_after_h24_resolution(self) -> None:
         self.assertEqual(
             self.router["due_gate_precedence"],
             "AT_OR_AFTER_EARLIEST_AT_ROUTE_REQUIRED_NEXT_ATOM_BEFORE_NEW_MUTATION",
@@ -81,15 +84,21 @@ class Task21DurableResumeRouterBindingTests(unittest.TestCase):
         active = [
             gate for gate in self.marker["gates"] if gate["status"] == "ACTIVE_WAITING"
         ]
-        self.assertEqual(len(active), 1)
-        self.assertEqual(active[0]["gate_id"], self.router["active_gate_id"])
+        self.assertEqual(active, [])
+        self.assertIsNone(self.router["active_gate_id"])
+        h24 = next(
+            gate
+            for gate in self.marker["gates"]
+            if gate["gate_id"] == "TASK21-H24-2026-08-01T07-50-34Z"
+        )
+        self.assertEqual(h24["status"], "RESOLVED_WITH_EVIDENCE")
         self.assertEqual(
-            active[0]["required_next_atom"],
+            h24["required_next_atom"],
             "T21-A6S_H24_FOREGROUND_CAPTURE_V1",
         )
-        self.assertEqual(active[0]["latest_at"], None)
+        self.assertEqual(h24["latest_at"], None)
         self.assertEqual(
-            active[0]["future_chain"]["status"], "DEFERRED_TRIGGER_ONLY"
+            h24["future_chain"]["status"], "DEFERRED_TRIGGER_ONLY"
         )
 
     def test_router_grants_zero_authority(self) -> None:
@@ -116,6 +125,7 @@ class Task21DurableResumeRouterBindingTests(unittest.TestCase):
         )
         self.assertEqual(receipt["targeted_validation"], "31_OF_31_PASS")
         forward_evolved = {
+            "control/active_time_gates.json",
             "tests/test_task21_durable_resume_router_binding.py",
             "tests/test_task21_post_h6_gap_sentinel_value_rebase.py",
         }

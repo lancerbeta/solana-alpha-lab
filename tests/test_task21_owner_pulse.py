@@ -87,6 +87,14 @@ def _sha256(path: Path) -> str:
     return hashlib.sha256(path.read_bytes()).hexdigest()
 
 
+def _unresolved_h24_gate(marker: dict) -> dict:
+    gate = copy.deepcopy(marker["gates"][3])
+    gate["status"] = "ACTIVE_WAITING"
+    gate.pop("resolution", None)
+    gate["capture_prep"]["status"] = "READY_NOT_AUTHORIZED"
+    return gate
+
+
 class TestTask21OwnerPulse(unittest.TestCase):
     @classmethod
     def setUpClass(cls) -> None:
@@ -111,8 +119,13 @@ class TestTask21OwnerPulse(unittest.TestCase):
         self.assertEqual(h1_gate["required_next_atom"], H1_NEXT_ATOM)
         self.assertEqual(h6_gate["status"], "RESOLVED_WITH_GAP_EVIDENCE")
         self.assertEqual(h6_gate["required_next_atom"], H6_NEXT_ATOM)
-        self.assertEqual(gate["status"], "ACTIVE_WAITING")
+        self.assertEqual(gate["status"], "RESOLVED_WITH_EVIDENCE")
         self.assertEqual(gate["required_next_atom"], H24_NEXT_ATOM)
+        self.assertEqual(
+            gate["resolution"]["disposition"],
+            "ONE_FROZEN_SENTINEL_CAPTURED_AT_H24_PLUS",
+        )
+        self.assertEqual(gate["resolution"]["actual_elapsed_seconds"], 90597)
         self.assertEqual(
             _sha256(SOURCE_RECEIPT_PATH),
             historical["source_receipt"]["sha256"],
@@ -126,7 +139,7 @@ class TestTask21OwnerPulse(unittest.TestCase):
 
     def test_waiting_gate_allows_only_non_interfering_parallel_work(self) -> None:
         gate = evaluate_time_gate(
-            copy.deepcopy(self.marker["gates"][3]),
+            _unresolved_h24_gate(self.marker),
             as_of=WAITING_AT,
         )
         self.assertEqual(gate["state"], "WAITING_PARALLEL_WORK_ALLOWED")
@@ -137,7 +150,7 @@ class TestTask21OwnerPulse(unittest.TestCase):
 
     def test_due_gate_preempts_new_parallel_mutation(self) -> None:
         gate = evaluate_time_gate(
-            copy.deepcopy(self.marker["gates"][3]),
+            _unresolved_h24_gate(self.marker),
             as_of=DUE_AT,
         )
         self.assertEqual(gate["state"], "DUE_PREEMPT_PARALLEL_WORK")
@@ -148,7 +161,7 @@ class TestTask21OwnerPulse(unittest.TestCase):
 
     def test_late_h24_remains_due_without_expiry(self) -> None:
         gate = evaluate_time_gate(
-            copy.deepcopy(self.marker["gates"][3]),
+            _unresolved_h24_gate(self.marker),
             as_of=MISSED_AT,
         )
         self.assertEqual(gate["state"], "DUE_PREEMPT_PARALLEL_WORK")
@@ -156,7 +169,7 @@ class TestTask21OwnerPulse(unittest.TestCase):
         self.assertTrue(gate["owner_action_required"])
 
     def test_marker_cannot_grant_external_authority(self) -> None:
-        changed = copy.deepcopy(self.marker["gates"][3])
+        changed = _unresolved_h24_gate(self.marker)
         changed["authority_granted_by_marker"]["provider_api_rpc_wss_calls"] = 1
         with self.assertRaisesRegex(
             Task21OwnerPulseError,
@@ -173,9 +186,9 @@ class TestTask21OwnerPulse(unittest.TestCase):
         forward = pulse["task21_forward_state"]
         self.assertEqual(forward["real_nominations"], 3)
         self.assertEqual(forward["real_admissions"], 3)
-        self.assertEqual(forward["panels_captured"], 6)
+        self.assertEqual(forward["panels_captured"], 7)
         self.assertFalse(forward["exclusive_p7d_wait_active"])
-        self.assertTrue(forward["next_capture_wait_required"])
+        self.assertFalse(forward["next_capture_wait_required"])
         self.assertEqual(
             forward["observation_horizon_policy_id"],
             "OBSERVATION-HORIZON-POLICY-T21-001",
@@ -201,7 +214,8 @@ class TestTask21OwnerPulse(unittest.TestCase):
             (partition["bytes"] if expected_identity_ok else 0)
             + 140414
             + 128958
-            + 1126,
+            + 1126
+            + 43852,
         )
         if not expected_identity_ok:
             self.assertIn(
@@ -220,7 +234,7 @@ class TestTask21OwnerPulse(unittest.TestCase):
         schedule = pulse["observation_schedule"]
         self.assertEqual(
             schedule["status"],
-            "H24_MINIMUM_AGE_ACTIVE_H72_H168_TRIGGER_ONLY",
+            "H24_CAPTURED_H72_H168_TRIGGER_ONLY",
         )
         self.assertEqual(schedule["h0_anchor_at"], "2026-07-31T07:50:34.414367Z")
         self.assertEqual(
@@ -228,7 +242,7 @@ class TestTask21OwnerPulse(unittest.TestCase):
             ["H24", "H72", "H168"],
         )
         h24, h72, h168 = schedule["windows"]
-        self.assertEqual(h24["state"], "WAITING_PARALLEL_WORK_ALLOWED")
+        self.assertEqual(h24["state"], "RESOLVED_WITH_EVIDENCE")
         self.assertEqual(h24["required_next_atom"], H24_NEXT_ATOM)
         self.assertEqual(h72["state"], "DEFERRED_TRIGGER_ONLY")
         self.assertEqual(h72["required_next_atom"], H72_NEXT_ATOM)
@@ -347,32 +361,25 @@ class TestTask21OwnerPulse(unittest.TestCase):
         self.assertEqual(recovery["backup_readback_status"], "EXACT_MATCH")
         self.assertEqual(recovery["free_disk_bytes"], 9_000_000_000)
         costs = pulse["cost_and_authority"]
-        self.assertEqual(costs["provider_or_source_requests_used"], 52)
+        self.assertEqual(costs["provider_or_source_requests_used"], 60)
         self.assertEqual(costs["provider_or_source_requests_cap"], 192)
-        self.assertEqual(costs["provider_credits_used"], 48)
-        self.assertEqual(costs["response_bytes_used"], 73975)
+        self.assertEqual(costs["provider_credits_used"], 56)
+        self.assertEqual(costs["response_bytes_used"], 86091)
         self.assertEqual(costs["cash_spend_usd_cents"], 0)
         self.assertFalse(costs["external_authority_granted_by_pulse"])
 
-    def test_h24_due_gate_requests_exact_foreground_capture(self) -> None:
+    def test_h24_resolution_clears_due_attention(self) -> None:
         pulse = build_owner_pulse(
             repository_root=ROOT,
             as_of=DUE_AT,
             free_disk_bytes=9_000_000_000,
         )
-        self.assertEqual(
-            pulse["attention"][0],
-            {
-                "severity": "CRITICAL",
-                "code": "TASK21_H24_CAPTURE_DUE",
-                "action": H24_NEXT_ATOM,
-            },
-        )
+        self.assertEqual(pulse["attention"], [])
         self.assertEqual(
             pulse["active_time_gates"][0]["state"],
-            "DUE_PREEMPT_PARALLEL_WORK",
+            "RESOLVED_WITH_EVIDENCE",
         )
-        self.assertFalse(
+        self.assertTrue(
             pulse["active_time_gates"][0]["parallel_work_allowed"]
         )
 
@@ -392,12 +399,12 @@ class TestTask21OwnerPulse(unittest.TestCase):
             self.assertFalse(Path(source["path"]).is_absolute())
         text = render_owner_pulse_text(first)
         self.assertIn("TASK-21 OWNER PULSE", text)
-        self.assertIn("H24_WAITING", text)
+        self.assertIn("H24_CAPTURED_FUTURE_SENTINELS_TRIGGER_ONLY", text)
         self.assertIn("Расписание наблюдений (MSK)", text)
         self.assertIn("H72: DEFERRED_TRIGGER_ONLY", text)
         self.assertIn("H168: DEFERRED_TRIGGER_ONLY", text)
         self.assertIn("expires=NO", text)
-        self.assertIn("nominations=3, admissions=3, panels=6", text)
+        self.assertIn("nominations=3, admissions=3, panels=7", text)
         self.assertIn(
             "Production memory: "
             "HYP-VERSION-EXECUTION-CAPACITY-CURVATURE-V1; state=PAUSED",
@@ -546,7 +553,13 @@ class TestTask21OwnerPulse(unittest.TestCase):
             "OWNER_PULSE_H24_MINIMUM_AGE_H72_H168_TRIGGER_ONLY",
         )
         self.assertEqual(receipt["targeted_validation"], "15_OF_15_PASS")
+        forward_evolved = {
+            "src/solana_alpha_lab/task21_owner_pulse.py",
+            "tests/test_task21_owner_pulse.py",
+        }
         for artifact in receipt["artifacts"]:
+            if artifact["path"] in forward_evolved:
+                continue
             self.assertEqual(
                 _sha256(ROOT / artifact["path"]),
                 artifact["sha256"],

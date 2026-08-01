@@ -1,13 +1,13 @@
 {
   "schema": "smial.active-time-gates",
   "schema_version": "1.0",
-  "as_of": "2026-07-31T17:48:15.5501529Z",
+  "as_of": "2026-08-01T09:00:48.126089Z",
   "contains_secrets": false,
   "resume_router": {
     "router_id": "TASK21-DURABLE-RESUME-ROUTER-001",
     "router_version": "1.0",
     "task_id": "TASK-21",
-    "status": "ACTIVE_LOCAL_CHECKOUT",
+    "status": "NO_ACTIVE_TIME_GATE_FUTURE_HORIZONS_TRIGGER_ONLY",
     "entry_rule": "READ_MARKER_THEN_RUN_OWNER_PULSE_BEFORE_TASK21_CONTINUATION",
     "read_only_command": [
       "uv",
@@ -27,7 +27,7 @@
       "OTHERWISE_RESUME_ONLY_EXPLICITLY_AUTHORIZED_NON_INTERFERING_WORK"
     ],
     "due_gate_precedence": "AT_OR_AFTER_EARLIEST_AT_ROUTE_REQUIRED_NEXT_ATOM_BEFORE_NEW_MUTATION",
-    "active_gate_id": "TASK21-H24-2026-08-01T07-50-34Z",
+    "active_gate_id": null,
     "fallback_read_set": [
       "control/active_time_gates.json",
       "configs/task21_owner_pulse_read_model_v1.yaml",
@@ -295,7 +295,7 @@
     {
       "gate_id": "TASK21-H24-2026-08-01T07-50-34Z",
       "task_id": "TASK-21",
-      "status": "ACTIVE_WAITING",
+      "status": "RESOLVED_WITH_EVIDENCE",
       "earliest_at": "2026-08-01T07:50:34.414367Z",
       "latest_at": null,
       "required_next_atom": "T21-A6S_H24_FOREGROUND_CAPTURE_V1",
@@ -357,7 +357,7 @@
         }
       },
       "capture_prep": {
-        "status": "READY_NOT_AUTHORIZED",
+        "status": "EXECUTED_WITH_EVIDENCE",
         "value_rebase": {
           "path": "configs/task21_post_h6_gap_sentinel_value_rebase_v1.yaml",
           "sha256": "9598af58452f49853d447f9b4b125ed7b9de70b1643204a3bc3e4e213c01276f"
@@ -375,6 +375,35 @@
         "narrow_expiry_window": false,
         "provider_api_rpc_wss_calls_authorized": false,
         "automatic_execution": false
+      },
+      "resolution": {
+        "resolved_at": "2026-08-01T09:00:48.126089Z",
+        "disposition": "ONE_FROZEN_SENTINEL_CAPTURED_AT_H24_PLUS",
+        "inside_minimum_age_boundary": true,
+        "actual_elapsed_seconds": 90597,
+        "provider_calls": 8,
+        "panels_complete": 1,
+        "backfill": false,
+        "narrow_expiry_window_used": false,
+        "result_receipt": {
+          "path": "docs/evidence/task21/h24_foreground_capture_runtime_acceptance_v1.json",
+          "sha256": "0ed61827124394f3d2649ec5f0ee112843f56e313330cf2d6d824805e8c32d08"
+        },
+        "local_evidence": {
+          "root": "local/task21_forward/h24_capture/run=h24-20260801T090031939952Z-4af89d17b0ae",
+          "runtime_receipt_sha256": "b4eb861f80f6e243aa52c8e9f5994c8e7fc094f35d6d209beb78103589792d0e",
+          "stored_bytes": 43852,
+          "immutable": true
+        },
+        "next_boundary": {
+          "status": "DEFERRED_TRIGGER_ONLY",
+          "candidate_horizons": [
+            "H72",
+            "H168"
+          ],
+          "active_time_gates_created": 0,
+          "provider_api_rpc_wss_calls_authorized": false
+        }
       },
       "authority_granted_by_marker": {
         "local_writes": 0,

@@ -31,6 +31,7 @@ from solana_alpha_lab.task21_h24_foreground_capture import (
 
 WITHIN_WINDOW = datetime(2026, 8, 1, 7, 55, tzinfo=UTC)
 CONFIG_PATH = ROOT / "configs/task21_h24_foreground_capture_v1.yaml"
+MARKER_PATH = ROOT / "control/active_time_gates.json"
 ACCEPTANCE_PATH = (
     ROOT
     / "docs/evidence/task21/h24_minimum_age_sentinel_offline_acceptance_v2.json"
@@ -167,9 +168,22 @@ class Task21H24ForegroundCaptureTests(unittest.TestCase):
 
     def _files(self, directory: str, recovery: dict | None = None) -> tuple[Path, Path]:
         root = Path(directory)
+        config = _config()
+        marker = json.loads(MARKER_PATH.read_text(encoding="utf-8"))
+        gate = next(
+            item
+            for item in marker["gates"]
+            if item["gate_id"] == config["dynamic_control"]["gate_id"]
+        )
+        gate["status"] = "ACTIVE_WAITING"
+        gate.pop("resolution", None)
+        gate["capture_prep"]["status"] = "READY_NOT_AUTHORIZED"
+        marker_path = root / "active_time_gates.json"
+        marker_path.write_text(json.dumps(marker), encoding="utf-8")
+        config["dynamic_control"]["path"] = str(marker_path.resolve())
         config_path = root / "h24.yaml"
         config_path.write_text(
-            yaml.safe_dump(_config(), sort_keys=False), encoding="utf-8"
+            yaml.safe_dump(config, sort_keys=False), encoding="utf-8"
         )
         recovery_path = root / "recovery.json"
         recovery_path.write_text(
@@ -180,7 +194,14 @@ class Task21H24ForegroundCaptureTests(unittest.TestCase):
 
     def test_config_and_frozen_h6_gap_are_exact(self) -> None:
         config = _config()
-        validate_config(config, ROOT)
+        self.assertEqual(config["dynamic_control"]["allowed_statuses"], ["ACTIVE_WAITING"])
+        marker = json.loads(MARKER_PATH.read_text(encoding="utf-8"))
+        gate = next(
+            item
+            for item in marker["gates"]
+            if item["gate_id"] == config["dynamic_control"]["gate_id"]
+        )
+        self.assertEqual(gate["status"], "RESOLVED_WITH_EVIDENCE")
         self.assertEqual(_sha(H6_GAP), "c3b8ecef288cbce2f7bdf26e937ea1907087d8ac05c64102c6600ae94f1e2fbb")
 
     def test_before_window_fails_without_output_or_transport(self) -> None:
@@ -287,10 +308,12 @@ class Task21H24ForegroundCaptureTests(unittest.TestCase):
             self.assertFalse(called)
 
     def test_authority_boundary_drift_fails(self) -> None:
-        changed = copy.deepcopy(_config())
-        changed["authority"]["drive_writes"] = 1
-        with self.assertRaisesRegex(Task21H24Error, "h24_authority_boundary_drift"):
-            validate_config(changed, ROOT)
+        with tempfile.TemporaryDirectory() as directory:
+            config_path, _ = self._files(directory)
+            changed = yaml.safe_load(config_path.read_text(encoding="utf-8"))
+            changed["authority"]["drive_writes"] = 1
+            with self.assertRaisesRegex(Task21H24Error, "h24_authority_boundary_drift"):
+                validate_config(changed, ROOT)
 
     def test_offline_acceptance_binds_exact_candidate(self) -> None:
         receipt = json.loads(ACCEPTANCE_PATH.read_text(encoding="utf-8"))
@@ -312,7 +335,7 @@ class Task21H24ForegroundCaptureTests(unittest.TestCase):
             for item in marker["gates"]
             if item["gate_id"] == receipt["dynamic_control"]["gate_id"]
         )
-        self.assertEqual(gate["status"], "ACTIVE_WAITING")
+        self.assertEqual(gate["status"], "RESOLVED_WITH_EVIDENCE")
         self.assertIsNone(gate["latest_at"])
         self.assertEqual(
             gate["capture_prep"]["acceptance"]["sha256"],

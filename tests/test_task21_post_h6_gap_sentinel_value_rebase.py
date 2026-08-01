@@ -98,7 +98,7 @@ class Task21PostH6GapSentinelValueRebaseTests(unittest.TestCase):
             for gate in self.marker["gates"]
             if gate["status"] == "ACTIVE_WAITING"
         }
-        self.assertEqual(active_ids, {"TASK21-H24-2026-08-01T07-50-34Z"})
+        self.assertEqual(active_ids, set())
         self.assertFalse(any("H72" in gate_id or "H168" in gate_id for gate_id in active_ids))
 
     def test_active_marker_uses_not_before_without_expiry_or_authority(self) -> None:
@@ -116,15 +116,16 @@ class Task21PostH6GapSentinelValueRebaseTests(unittest.TestCase):
             all(value == 0 for value in gate["authority_granted_by_marker"].values())
         )
 
-    def test_owner_pulse_routes_due_late_without_missed_window(self) -> None:
+    def test_owner_pulse_retains_resolved_h24_without_future_activation(self) -> None:
         pulse = build_owner_pulse(
             repository_root=ROOT,
             as_of=datetime(2026, 8, 2, 8, 5, tzinfo=timezone.utc),
             free_disk_bytes=9_000_000_000,
         )
         gate = pulse["active_time_gates"][0]
-        self.assertEqual(gate["state"], "DUE_PREEMPT_PARALLEL_WORK")
+        self.assertEqual(gate["state"], "RESOLVED_WITH_EVIDENCE")
         schedule = pulse["observation_schedule"]
+        self.assertEqual(schedule["status"], "H24_CAPTURED_H72_H168_TRIGGER_ONLY")
         self.assertFalse(schedule["narrow_expiry_window_used"])
         self.assertEqual(schedule["windows"][1]["state"], "DEFERRED_TRIGGER_ONLY")
         self.assertEqual(schedule["windows"][2]["state"], "DEFERRED_TRIGGER_ONLY")
@@ -161,7 +162,9 @@ class Task21PostH6GapSentinelValueRebaseTests(unittest.TestCase):
         self.assertEqual(receipt["targeted_validation"], "9_OF_9_PASS")
         forward_evolved = {
             "control/active_time_gates.json",
+            "src/solana_alpha_lab/task21_owner_pulse.py",
             "tests/test_task21_h24_foreground_capture.py",
+            "tests/test_task21_owner_pulse.py",
             "tests/test_task21_post_h6_gap_sentinel_value_rebase.py",
         }
         for artifact in receipt["artifacts"]:

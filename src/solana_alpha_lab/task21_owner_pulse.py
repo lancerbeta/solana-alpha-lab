@@ -52,6 +52,9 @@ H1_RECEIPT_RELATIVE_PATH = (
 H6_RECEIPT_RELATIVE_PATH = (
     "docs/evidence/task21/h6_foreground_capture_runtime_acceptance_v1.json"
 )
+H24_RECEIPT_RELATIVE_PATH = (
+    "docs/evidence/task21/h24_foreground_capture_runtime_acceptance_v1.json"
+)
 PRE_H24_RECOVERY_RELATIVE_PATH = (
     "docs/evidence/task21/pre_h24_recovery_refresh_acceptance_v1.json"
 )
@@ -224,6 +227,9 @@ def build_observation_schedule(
         raise Task21OwnerPulseError("horizon_schedule_active_gate_drift")
 
     normalized_as_of = as_of.astimezone(UTC)
+    h24_resolved = (
+        evaluated_gate.get("source_status") == "RESOLVED_WITH_EVIDENCE"
+    )
     schedule: list[JsonObject] = []
     for horizon_id, offset_seconds in FROZEN_SENTINEL_OFFSETS_SECONDS.items():
         earliest = anchor + timedelta(seconds=offset_seconds)
@@ -250,7 +256,9 @@ def build_observation_schedule(
                 ),
                 "required_next_atom": FUTURE_HORIZON_ATOMS[horizon_id],
                 "activation_trigger": (
-                    "EXACT_ACTIVE_GATE_PLUS_SEPARATE_USER_AUTHORITY"
+                    "ALREADY_RESOLVED_WITH_EVIDENCE"
+                    if is_active and h24_resolved
+                    else "EXACT_ACTIVE_GATE_PLUS_SEPARATE_USER_AUTHORITY"
                     if is_active
                     else "NAMED_NEED_PLUS_FRESH_BUDGET_PLUS_EXACT_AUTHORITY"
                 ),
@@ -259,7 +267,11 @@ def build_observation_schedule(
             }
         )
     return {
-        "status": "H24_MINIMUM_AGE_ACTIVE_H72_H168_TRIGGER_ONLY",
+        "status": (
+            "H24_CAPTURED_H72_H168_TRIGGER_ONLY"
+            if h24_resolved
+            else "H24_MINIMUM_AGE_ACTIVE_H72_H168_TRIGGER_ONLY"
+        ),
         "basis": "LATEST_H0_TRIGGER_PLUS_POST_H6_VALUE_REBASE",
         "h0_anchor_at": _format_exact(anchor),
         "timing_default": "NOT_BEFORE_PLUS_ACTUAL_ELAPSED_TIME",
@@ -520,8 +532,21 @@ def build_owner_pulse(
     ]
     if len(active_gates) > 1:
         raise Task21OwnerPulseError("multiple_unresolved_active_time_gates")
+    h24_gate_sources = [
+        item
+        for item in gates
+        if isinstance(item, dict)
+        and isinstance(item.get("gate_id"), str)
+        and item["gate_id"].startswith(H24_GATE_PREFIX)
+    ]
+    if len(h24_gate_sources) > 1:
+        raise Task21OwnerPulseError("duplicate_h24_gate")
     gate_source = (
-        active_gates[0] if active_gates else historical_gate_source
+        active_gates[0]
+        if active_gates
+        else h24_gate_sources[0]
+        if h24_gate_sources
+        else historical_gate_source
     )
     gate = evaluate_time_gate(gate_source, as_of=observed_at)
 
@@ -593,6 +618,7 @@ def build_owner_pulse(
     h0_receipt: JsonObject | None = None
     h1_receipt: JsonObject | None = None
     h6_receipt: JsonObject | None = None
+    h24_receipt: JsonObject | None = None
     h0_panels = 0
     h0_stored_bytes = 0
     h0_response_bytes = 0
@@ -724,6 +750,56 @@ def build_owner_pulse(
         cash_spend += _validate_non_negative(
             "h6_cash_spend_usd_cents",
             h6_actions.get("cash_spend_usd_cents"),
+        )
+
+    if (
+        isinstance(gate_source.get("gate_id"), str)
+        and gate_source["gate_id"].startswith(H24_GATE_PREFIX)
+        and gate_source.get("status") == "RESOLVED_WITH_EVIDENCE"
+    ):
+        h24_binding = gate_source.get("resolution", {}).get(
+            "result_receipt", {}
+        )
+        if h24_binding.get("path") != H24_RECEIPT_RELATIVE_PATH:
+            raise Task21OwnerPulseError("h24_receipt_pointer_invalid")
+        h24_path = root / H24_RECEIPT_RELATIVE_PATH
+        if _sha256(h24_path) != h24_binding.get("sha256"):
+            raise Task21OwnerPulseError("h24_receipt_hash_drift")
+        h24_receipt = _load_json(h24_path)
+        if (
+            h24_receipt.get("status") != "PASS"
+            or h24_receipt.get("verdict")
+            != "ONE_FROZEN_SENTINEL_CAPTURED_AT_H24_PLUS"
+            or h24_receipt.get("h24", {}).get("panels_complete") != 1
+            or h24_receipt.get("h24", {}).get("actual_elapsed_seconds", 0)
+            < FROZEN_SENTINEL_OFFSETS_SECONDS["H24"]
+        ):
+            raise Task21OwnerPulseError("h24_receipt_not_pass")
+        h24_actions = h24_receipt.get("actual_actions", {})
+        h24_panels = _validate_non_negative(
+            "h24_panels_complete",
+            h24_receipt.get("h24", {}).get("panels_complete"),
+        )
+        h24_stored_bytes = _validate_non_negative(
+            "h24_local_stored_bytes",
+            h24_actions.get("local_stored_bytes"),
+        )
+        h24_response_bytes = _validate_non_negative(
+            "h24_received_bytes",
+            h24_receipt.get("h24", {}).get("received_bytes"),
+        )
+        h24_provider_calls = _validate_non_negative(
+            "h24_provider_calls",
+            h24_actions.get("provider_api_rpc_wss_calls"),
+        )
+        h0_panels += h24_panels
+        h0_stored_bytes += h24_stored_bytes
+        h0_response_bytes += h24_response_bytes
+        h0_provider_calls += h24_provider_calls
+        external_requests += h24_provider_calls
+        cash_spend += _validate_non_negative(
+            "h24_cash_spend_usd_cents",
+            h24_actions.get("cash_spend_usd_cents"),
         )
 
     run_plan_path = root / "configs" / "task21_forward_collection_run_plan_v1.yaml"
@@ -900,7 +976,9 @@ def build_owner_pulse(
         "observation_schedule": observation_schedule,
         "task21_forward_state": {
             "state": (
-                {
+                "H24_CAPTURED_FUTURE_SENTINELS_TRIGGER_ONLY"
+                if h24_receipt is not None
+                else {
                     "WAITING_PARALLEL_WORK_ALLOWED": (
                         "H24_WAITING" if h6_receipt is not None else
                         ("H6_WAITING" if h1_receipt is not None else "H1_WAITING")
@@ -930,7 +1008,9 @@ def build_owner_pulse(
                 else None
             ),
             "next_capture_wait_required": (
-                gate["state"] == "WAITING_PARALLEL_WORK_ALLOWED"
+                False
+                if h24_receipt is not None
+                else gate["state"] == "WAITING_PARALLEL_WORK_ALLOWED"
                 if h0_receipt is not None
                 else (
                     None
@@ -950,7 +1030,9 @@ def build_owner_pulse(
                 + h0_stored_bytes
             ),
             "coverage_by_required_field": (
-                "H0_H1_6_OF_9_CAPTURED_H6_EXPLICIT_GAP_DETAILS_SEALED"
+                "H0_H1_6_PLUS_H24_SENTINEL_1_CAPTURED_H6_EXPLICIT_GAP_DETAILS_SEALED"
+                if h24_receipt is not None
+                else "H0_H1_6_OF_9_CAPTURED_H6_EXPLICIT_GAP_DETAILS_SEALED"
                 if h6_receipt is not None
                 else "H0_H1_6_OF_6_CAPTURED_DETAILS_SEALED"
                 if h1_receipt is not None
@@ -961,7 +1043,9 @@ def build_owner_pulse(
                 )
             ),
             "missingness_by_required_field": (
-                "H6_THREE_PANELS_MISSING_EXPLICIT_GAP_NO_BACKFILL"
+                "H6_THREE_PANELS_MISSING_EXPLICIT_GAP_NO_BACKFILL_H24_SENTINEL_COMPLETE"
+                if h24_receipt is not None
+                else "H6_THREE_PANELS_MISSING_EXPLICIT_GAP_NO_BACKFILL"
                 if h6_receipt is not None
                 else "H0_H1_NO_MISSING_PANELS"
                 if h1_receipt is not None
@@ -1005,7 +1089,9 @@ def build_owner_pulse(
                 None
                 if h0_receipt is None
                 else (
-                    h6_receipt.get("completed_at")
+                    h24_receipt.get("completed_at")
+                    if h24_receipt is not None
+                    else h6_receipt.get("completed_at")
                     if h6_receipt is not None
                     else h1_receipt.get("completed_at")
                     if h1_receipt is not None
@@ -1036,7 +1122,9 @@ def build_owner_pulse(
             ),
             "response_bytes_cap": caps.get("max_response_bytes"),
             "response_bytes_state": (
-                "H0_H1_RECEIPTS_RECONCILED_H6_GAP_RETAINED"
+                "H0_H1_H24_RECEIPTS_RECONCILED_H6_GAP_RETAINED"
+                if h24_receipt is not None
+                else "H0_H1_RECEIPTS_RECONCILED_H6_GAP_RETAINED"
                 if h6_receipt is not None
                 else "H0_H1_RECEIPTS_RECONCILED"
                 if h1_receipt is not None
@@ -1082,6 +1170,11 @@ def build_owner_pulse(
             *(
                 [_source_entry(root, H6_RECEIPT_RELATIVE_PATH)]
                 if h6_receipt is not None
+                else []
+            ),
+            *(
+                [_source_entry(root, H24_RECEIPT_RELATIVE_PATH)]
+                if h24_receipt is not None
                 else []
             ),
             _source_entry(root, PRE_H24_RECOVERY_RELATIVE_PATH),
