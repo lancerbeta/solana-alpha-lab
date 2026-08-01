@@ -1,0 +1,169 @@
+schema: smial.task21_r3_event_triggered_source_p0
+schema_version: '1.0'
+runtime_id: T21-R3-EVENT-TRIGGERED-SOURCE-P0-001
+runtime_version: '1.0'
+task_id: TASK-21
+atom_id: T21-A6S_R3_EVENT_TRIGGERED_SOURCE_AND_P0_CAPTURE_V1
+status: FROZEN_FOR_SEPARATE_EXACT_PROVIDER_AUTHORITY
+as_of: '2026-08-01'
+contains_secrets: false
+
+protected_inputs:
+- role: EVENT_TRIGGERED_RUNTIME_PLAN
+  path: configs/task21_event_triggered_final_cohort_runtime_v1.yaml
+  sha256: 7e818f032cc0505b1dce6ac6b94c4b193b2eeecd2c34702de344a606a29888f1
+- role: EVENT_TRIGGERED_RUNTIME_PREP_ACCEPTANCE
+  path: docs/evidence/task21/event_triggered_final_cohort_runtime_prep_acceptance_v1.json
+  sha256: 5e18a8bcf66e4504177a2d74ba38f2a0945730b726dcc11c80b11464762d2728
+- role: R2_SOURCE_P0_RUNTIME_ACCEPTANCE
+  path: docs/evidence/task21/r2_event_triggered_source_p0_runtime_acceptance_v1.json
+  sha256: 5c69ba68348b63976a54b8e69974d5cfd406c375d4688601d78bbddcbe8eee9c
+- role: R2_P1_RUNTIME_ACCEPTANCE
+  path: docs/evidence/task21/r2_p1_event_triggered_capture_runtime_acceptance_v1.json
+  sha256: fedb97b9bd8bb8d8d7a7650ba47e958d0b6d7659cb4fcfdaa1c73de6c31ffd54
+- role: R2_P2_RUNTIME_ACCEPTANCE
+  path: docs/evidence/task21/r2_p2_event_triggered_capture_runtime_acceptance_v1.json
+  sha256: 76644640134dc186fc4d65e98814f39ef5546695fce10bc385b1b8e9f469e1f1
+- role: R2_COMPLETE_REVIEW
+  path: docs/evidence/task21/r2_complete_review_r3_entry_gate_v1.json
+  sha256: b23ad74233401ea4164db92831da1ddfffe244458141dbf2ade2610db0822d01
+- role: CURRENT_RECOVERY_PROOF
+  path: docs/evidence/task21/pre_h24_recovery_refresh_acceptance_v1.json
+  sha256: 08f977ca926a6ba572e3cb5f4bea352d5e87e04a85f4e6c71c56f3a2ccf5b999
+
+source:
+  source_version: DEXSCREENER-LATEST-PROFILES-SOLANA-RPC-MINT-V1.1
+  authentication: NONE
+  profile_endpoint:
+    provider: DEXSCREENER
+    url: https://api.dexscreener.com/token-profiles/latest/v1
+    method: GET
+    response_rows_max: 200
+    response_bytes_max: 2097152
+  mint_validation_rpc:
+    provider: SOLANA_PUBLIC_RPC
+    url: https://api.mainnet-beta.solana.com
+    method: getMultipleAccounts
+    commitment: finalized
+    encoding: base64
+    data_slice: {offset: 0, length: 82}
+    account_count_max: 100
+    response_bytes_max: 6291456
+  selection:
+    required_chain_id: solana
+    rpc_candidate_mints_max: 100
+    structural_candidates_max: 100
+    allowed_token_programs:
+    - TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA
+    - TokenzQdBNbLqP5VEhdkAS6EPFLC1PHnBqCXEpPxuEb
+    excluded_mints:
+    - So11111111111111111111111111111111111111112
+    - EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v
+    deterministic_order: [mint]
+    outcome_or_route_inputs_allowed: false
+
+cohort:
+  batch_id: T21-R3
+  policy_version: '1.0'
+  nomination_cap: 2
+  admission_cap: 2
+  prior_seen_mints:
+  - 2MUB7LUviPc5hmEKKuogxdDQhEAEC3QRBbeTB7bUpump
+  - 2zRj2vtREeogejN4zuYtBd9drCma7GtaWmUSdz28pump
+  - 35CeebrkDFt6RhtpkAj19f7JStnxBjkyVcuLDH2dpump
+  - 2Ezm4w3gFdymRAyhx9KEsbJV9NA79Y7UoiNWeXNFpump
+  - 2HU2VftbJ7Fp9P5pEbneNsRhax8boHhTVS1KLnYrpump
+  - 2JdM5MHiXjsQz5QgnSQfbidZDTVXCLki74jMYgJapump
+  novelty:
+    prior_source_observation_id: T21-R2-SOURCE-8b4ef3fefa34efd6d56e
+    prior_source_content_sha256: 9d0ed987289b32a899fe08bfcddecc952ed80ef69c338429a79de8e16a315a9f
+    prior_observed_at: '2026-08-01T11:46:58.123523Z'
+    require_new_source_observation_id: true
+    require_new_source_content_sha256: true
+    require_observed_at_strictly_after_prior: true
+    require_previously_unseen_eligible_mint: true
+
+p0:
+  horizon_id: P0
+  semantics: ON_ADMISSION_FOREGROUND
+  notionals_usd: [10, 25, 50, 100]
+  quote_pairs_per_panel: 4
+  provider_calls_per_panel_max: 8
+  provider_calls_total_max: 16
+  provider: JUPITER
+  endpoint: https://api.jup.ag/swap/v1/quote
+  authentication: NONE
+  retries: 0
+  concurrency: 1
+  minimum_interval_seconds: 2.2
+  wall_seconds_max: 300
+
+budget:
+  whole_task_caps:
+    external_requests: 192
+    source_requests: 8
+    quote_requests: 184
+    response_bytes: 25165824
+    stored_bytes: 125829120
+    dataset_bytes: 268435456
+  used_before_r3:
+    external_requests: 134
+    source_requests: 6
+    quote_requests: 128
+    response_bytes: 229258
+    dataset_bytes: 885954
+  this_atom_caps:
+    external_requests: 18
+    source_requests: 2
+    quote_requests: 16
+    durable_local_bytes: 16777216
+  remaining_followup_reservation:
+    external_requests: 32
+    quote_requests: 32
+  minimum_free_space_bytes_after_write: 2147483648
+  cap_behavior: FAIL_CLOSED_NO_RETRY
+
+recovery:
+  required_health: HEALTHY
+  backup_age_hours_max_at_start: 24
+  restore_age_hours_max_at_start: 168
+  drive_actions: 0
+
+runtime:
+  output_root: local/task21_forward/final_cohort/r3
+  write_behavior: CREATE_ONLY_CONTENT_ADDRESSED
+  admission_must_be_persisted_before_first_quote_call: true
+  partial_failure_policy: RETAIN_EVIDENCE_AND_STOP_NO_RETRY
+  scheduler_or_background_process: false
+
+authority:
+  source: AUTHORIZATION_REQUIRED
+  exact_phrase: T21-A6S_R3_EVENT_TRIGGERED_SOURCE_AND_P0_CAPTURE_V1
+  provider_api_rpc_wss_calls_max: 18
+  dexscreener_calls_max: 1
+  solana_public_rpc_calls_max: 1
+  jupiter_calls_max: 16
+  nominations_max: 2
+  admissions_max: 2
+  durable_local_bytes_max: 16777216
+  retries: 0
+  concurrency: 1
+  drive_reads: 0
+  drive_writes: 0
+  credentials: 0
+  cash_spend_usd_cents: 0
+  scheduler_or_background_process: false
+  deploy: false
+  catalog_mutation: false
+  source_mutation: false
+  wallet_signer_transaction_actions: 0
+  destructive_actions: false
+  merge: false
+
+next_boundary:
+  complete: T21-A6S_R3_P1_EVENT_TRIGGERED_FOREGROUND_CAPTURE_V1
+  minimum_separation_seconds: 1801
+  external_authority_granted: false
+  stopped: R3_REVIEW_REQUIRED
+  task22_authorized: false
+  a7_authorized: false

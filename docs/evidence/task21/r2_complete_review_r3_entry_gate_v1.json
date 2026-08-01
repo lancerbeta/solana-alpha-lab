@@ -1,0 +1,151 @@
+{
+  "schema": "smial.task21.r2-complete-r3-entry-gate",
+  "schema_version": "1.0",
+  "evidence_id": "EVIDENCE-T21-R2-COMPLETE-R3-ENTRY-001",
+  "evidence_version": "1.0",
+  "task_id": "TASK-21",
+  "atom_id": "T21-A6S_R2_COMPLETE_REVIEW_AND_R3_ENTRY_GATE_V1",
+  "status": "PASS",
+  "as_of": "2026-08-01T13:27:00.607174Z",
+  "verdict": "PROCEED_TO_R3_SOURCE_P0_PREP",
+  "protected_inputs": [
+    {
+      "role": "R2_SOURCE_P0_RUNTIME_ACCEPTANCE",
+      "path": "docs/evidence/task21/r2_event_triggered_source_p0_runtime_acceptance_v1.json",
+      "sha256": "5c69ba68348b63976a54b8e69974d5cfd406c375d4688601d78bbddcbe8eee9c"
+    },
+    {
+      "role": "R2_P1_RUNTIME_ACCEPTANCE",
+      "path": "docs/evidence/task21/r2_p1_event_triggered_capture_runtime_acceptance_v1.json",
+      "sha256": "fedb97b9bd8bb8d8d7a7650ba47e958d0b6d7659cb4fcfdaa1c73de6c31ffd54"
+    },
+    {
+      "role": "R2_P2_RUNTIME_ACCEPTANCE",
+      "path": "docs/evidence/task21/r2_p2_event_triggered_capture_runtime_acceptance_v1.json",
+      "sha256": "76644640134dc186fc4d65e98814f39ef5546695fce10bc385b1b8e9f469e1f1"
+    }
+  ],
+  "review": {
+    "members_complete": 3,
+    "panels_per_member_complete": 3,
+    "panels_complete": 9,
+    "quote_attempts_complete": 72,
+    "source_observation_independent_from_r1": true,
+    "admission_persisted_before_first_quote": true,
+    "population_changed_after_admission": false,
+    "gaps_or_partial_panels": 0,
+    "exact_local_readback": "PASS",
+    "exact_repository_ci": "PASS",
+    "r2_quote_route_price_or_cost_values_read_for_r3_selection": false
+  },
+  "r2_outcome_blind_replay_seed": {
+    "batch_id": "T21-R2",
+    "source_calls": 2,
+    "source_observation_id": "T21-R2-SOURCE-8b4ef3fefa34efd6d56e",
+    "source_content_sha256": "9d0ed987289b32a899fe08bfcddecc952ed80ef69c338429a79de8e16a315a9f",
+    "observed_at": "2026-08-01T11:46:58.123523Z",
+    "admitted_at": "2026-08-01T11:46:58.126216Z",
+    "nomination_events_sha256": "1a6733e572318ef4989332046bece57196792ee87733a62f6a9f13046fef9c1a",
+    "candidates": [
+      {
+        "eligible": true,
+        "exact_rule_input_values": {
+          "prior_relevant_quote_outcome_exposure": false,
+          "source_class": "PREDECLARED_CONTROL_COHORT",
+          "structural_mint_initialized": true,
+          "token_program": "TokenzQdBNbLqP5VEhdkAS6EPFLC1PHnBqCXEpPxuEb",
+          "uses_task21_quote_route_or_price_outcome": false
+        },
+        "first_reliable_available_at": "2026-08-01T11:46:58.123523Z",
+        "mint": "2Ezm4w3gFdymRAyhx9KEsbJV9NA79Y7UoiNWeXNFpump",
+        "mint_decimals": 6,
+        "nomination_event_id": "T21-R2-NOM-26050ca18b538565aa6d",
+        "observed_at": "2026-08-01T11:46:58.123523Z"
+      },
+      {
+        "eligible": true,
+        "exact_rule_input_values": {
+          "prior_relevant_quote_outcome_exposure": false,
+          "source_class": "PREDECLARED_CONTROL_COHORT",
+          "structural_mint_initialized": true,
+          "token_program": "TokenzQdBNbLqP5VEhdkAS6EPFLC1PHnBqCXEpPxuEb",
+          "uses_task21_quote_route_or_price_outcome": false
+        },
+        "first_reliable_available_at": "2026-08-01T11:46:58.123523Z",
+        "mint": "2HU2VftbJ7Fp9P5pEbneNsRhax8boHhTVS1KLnYrpump",
+        "mint_decimals": 6,
+        "nomination_event_id": "T21-R2-NOM-8cec7d1e03ba1dadf98b",
+        "observed_at": "2026-08-01T11:46:58.123523Z"
+      },
+      {
+        "eligible": true,
+        "exact_rule_input_values": {
+          "prior_relevant_quote_outcome_exposure": false,
+          "source_class": "PREDECLARED_CONTROL_COHORT",
+          "structural_mint_initialized": true,
+          "token_program": "TokenzQdBNbLqP5VEhdkAS6EPFLC1PHnBqCXEpPxuEb",
+          "uses_task21_quote_route_or_price_outcome": false
+        },
+        "first_reliable_available_at": "2026-08-01T11:46:58.123523Z",
+        "mint": "2JdM5MHiXjsQz5QgnSQfbidZDTVXCLki74jMYgJapump",
+        "mint_decimals": 6,
+        "nomination_event_id": "T21-R2-NOM-bb5769dfb751cb4cfb37",
+        "observed_at": "2026-08-01T11:46:58.123523Z"
+      }
+    ]
+  },
+  "information_gain": {
+    "r3_required_for_frozen_success_gate": true,
+    "reason": "R2 leaves the frozen plan at three of five new members and two of three independent nomination batches; R3 can add the final two members and third batch without using R2 outcomes.",
+    "cheapest_falsifier": "One new bounded structural source observation; retain and stop if content is non-novel or no unseen eligible mint exists.",
+    "minimum_calendar_wait": null
+  },
+  "budget_before_r3": {
+    "external_requests": 134,
+    "external_requests_cap": 192,
+    "source_requests": 6,
+    "source_requests_cap": 8,
+    "quote_requests": 128,
+    "quote_requests_cap": 184,
+    "response_bytes": 229258,
+    "response_bytes_cap": 25165824,
+    "local_task21_forward_bytes": 885954
+  },
+  "projected_after_complete_r3": {
+    "external_requests": 184,
+    "source_requests": 8,
+    "quote_requests": 176,
+    "new_members_total": 5,
+    "independent_nomination_batches_total": 3,
+    "panels_total": 15,
+    "quote_pairs_total": 60,
+    "within_frozen_caps": true
+  },
+  "actual_actions": {
+    "provider_api_rpc_wss_calls": 0,
+    "candidate_nominations": 0,
+    "candidate_admissions": 0,
+    "raw_or_dataset_writes": 0,
+    "drive_reads": 0,
+    "drive_writes": 0,
+    "credentials_used": 0,
+    "cash_spend_usd_cents": 0,
+    "wallet_signer_transaction_actions": 0,
+    "catalog_mutation": false,
+    "source_mutation": false,
+    "merge": false
+  },
+  "next_boundary": {
+    "atom_id": "T21-A6S_R3_EVENT_TRIGGERED_SOURCE_AND_P0_CAPTURE_V1",
+    "status": "LOCAL_PREP_ALLOWED_EXTERNAL_AUTHORITY_REQUIRED",
+    "provider_api_rpc_wss_calls_authorized": false,
+    "task22_authorized": false,
+    "a7_authorized": false
+  },
+  "non_claims": [
+    "NO_R2_ALPHA_PNL_COST_OR_MARKET_WIDE_EVALUATION",
+    "NO_OUTCOME_BASED_R3_SELECTION",
+    "NO_R3_SOURCE_OR_CAPTURE_EXECUTION",
+    "NO_TASK22_OR_A7_AUTHORITY"
+  ]
+}
