@@ -1,6 +1,6 @@
 schema_version: '1.1'
 registry_id: CATALOG-ASSET-REGISTRY-LIFECYCLE-001
-as_of: '2026-07-28'
+as_of: '2026-08-02'
 records:
 - asset_id: REGISTRY-RESEARCH-CYCLES-001
   record_version: '1.0'
@@ -53,12 +53,12 @@ records:
   evidence: []
   classification: *id004
 - asset_id: REGISTRY-GLOBAL-TRIAL-LEDGER-001
-  record_version: '1.0'
+  record_version: '1.1'
   asset_type: lifecycle_registry
   purpose: Active global ledger for trial outcomes and lifecycle evidence.
   status: VALIDATED_ACTIVE
   origin: REPOSITORY
-  as_of: '2026-07-22'
+  as_of: '2026-08-02'
   truth_owner: TASK-03
   location:
     kind: git_path
@@ -66,10 +66,13 @@ records:
     repository_path: registries/global_trial_ledger.yaml
   integrity:
     kind: sha256
-    sha256: 41b2f3cd1e2303f90318d0295c36c390999c7539031cb52db1a03779be56b671
+    sha256: 5881fd21e92baee46f1af90e0c2e00109c1d75d73d99f167b00aceac07495008
   access: *id001
   relations: *id002
-  consumers: *id003
+  consumers:
+  - TASK-03
+  - TASK-23
+  - REG-RESEARCH-001
   evidence: []
   classification: *id004
 - asset_id: REGISTRY-FEATURE-CATALOG-001
@@ -206,12 +209,12 @@ records:
   evidence: []
   classification: *id004
 - asset_id: GENERATED-PROJECT-MAP-001
-  record_version: '1.39'
+  record_version: '1.40'
   asset_type: generated_view
   purpose: Deterministic human-readable navigation projected only from the Catalog.
   status: IMPLEMENTED_UNVERIFIED
   origin: REPOSITORY
-  as_of: '2026-08-01'
+  as_of: '2026-08-02'
   truth_owner: TASK-04
   location:
     kind: git_path
@@ -219,7 +222,7 @@ records:
     repository_path: docs/PROJECT_MAP.md
   integrity:
     kind: sha256
-    sha256: d070eb3ba0f43a7b0d3f04e95d3dadb9510ddfb80fff8cd5a5a4ee8a062d1af9
+    sha256: 7abe07d6abafe0730a4be30fe16fb68fe876075bfbf08cb0d809682a57a841d4
   access:
     mode: read_only
     method: file
@@ -247,15 +250,19 @@ records:
   - TASK-17
   - TASK-18
   - TASK-19
+  - TASK-20
+  - TASK-21
+  - TASK-22
+  - TASK-23
   evidence: []
   classification: *id004
 - asset_id: GENERATED-EDGE-PROJECTION-001
-  record_version: '1.30'
+  record_version: '1.31'
   asset_type: generated_view
   purpose: Deterministic machine-readable projection of Catalog asset relations.
   status: IMPLEMENTED_UNVERIFIED
   origin: REPOSITORY
-  as_of: '2026-08-01'
+  as_of: '2026-08-02'
   truth_owner: TASK-04
   location:
     kind: git_path
@@ -263,7 +270,7 @@ records:
     repository_path: catalog/generated/asset_edges.json
   integrity:
     kind: sha256
-    sha256: 9b75841a9639e9471ae759de4902c900deb02f5663083433257556f8be14af93
+    sha256: 4366864e2bcb734dc0d960329f7ba23810af8118cf045d187f2f3e8194c180f4
   access:
     mode: read_only
     method: file
@@ -291,5 +298,9 @@ records:
   - TASK-17
   - TASK-18
   - TASK-19
+  - TASK-20
+  - TASK-21
+  - TASK-22
+  - TASK-23
   evidence: []
   classification: *id004

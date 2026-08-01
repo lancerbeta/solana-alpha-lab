@@ -1,0 +1,267 @@
+{
+  "actual_time": {
+    "by_panel_seconds": {
+      "P0": {
+        "max": "0.0",
+        "median": "0.0",
+        "min": "0.0"
+      },
+      "P1": {
+        "max": "2347.885847",
+        "median": "2347.867203",
+        "min": "2347.843352"
+      },
+      "P2": {
+        "max": "5042.839916",
+        "median": "5042.823468",
+        "min": "5042.775573"
+      }
+    },
+    "semantic": "actual elapsed seconds from each member's first reliable P0 observation; panel IDs are labels, not nominal elapsed time"
+  },
+  "atom_id": "T23-A4_BOUNDED_ANALYSIS_AND_ADVERSARIAL_ACCEPTANCE_V1",
+  "claims": [
+    "DIAGNOSTICS_READY_WITH_LIMITATIONS"
+  ],
+  "denominators": {
+    "buy_route_availability_observed": {
+      "definition": "QUOTE_AVAILABLE buy legs / observed buy legs",
+      "denominator": 36,
+      "excluded_typed_states": [],
+      "numerator": 36,
+      "rate": "1.000000"
+    },
+    "buy_route_availability_planned": {
+      "definition": "QUOTE_AVAILABLE buy legs / all planned buy legs",
+      "denominator": 36,
+      "excluded_typed_states": [],
+      "numerator": 36,
+      "rate": "1.000000"
+    },
+    "observed_missing": {
+      "buy_legs": 0,
+      "eligible_sell_legs": 0,
+      "interpretation": "No typed failure or missing state was observed in R2; this is not an estimate of zero future failure probability.",
+      "missing_is_zero": false,
+      "panels": 0,
+      "retained_states": [
+        "CAPTURE_DEAD",
+        "CAPTURE_STOPPED",
+        "INVALID_RESPONSE",
+        "NO_ROUTE",
+        "PANEL_MISSING",
+        "PROVIDER_ERROR",
+        "QUOTE_AVAILABLE",
+        "SELL_NOT_ATTEMPTED",
+        "TIMEOUT",
+        "TIMESTAMP_INVALID"
+      ]
+    },
+    "panels": {
+      "definition": "all 3 frozen R2 members x P0/P1/P2",
+      "denominator_planned": 9,
+      "excluded_typed_states": [],
+      "numerator_observed": 9
+    },
+    "sell_route_availability_eligible": {
+      "definition": "QUOTE_AVAILABLE dependent sell legs / buy-success-eligible sell legs",
+      "denominator": 36,
+      "excluded_typed_states": [],
+      "numerator": 36,
+      "rate": "1.000000"
+    },
+    "sell_route_availability_observed": {
+      "definition": "QUOTE_AVAILABLE dependent sell legs / observed dependent sell legs",
+      "denominator": 36,
+      "excluded_typed_states": [],
+      "numerator": 36,
+      "rate": "1.000000"
+    }
+  },
+  "descriptive_findings": {
+    "provider_price_impact_pct_raw": {
+      "buy_by_panel": {
+        "P0": {
+          "max": "0.0602717176160986740282273747",
+          "median": "0.02910070574135483061945441875",
+          "min": "0.0158774578305509523377785855"
+        },
+        "P1": {
+          "max": "0.0478798033361864953299852417",
+          "median": "0.0188902833126575160591180718",
+          "min": "0.0103797691124292708068805367"
+        },
+        "P2": {
+          "max": "0.0503071520394427991567645056",
+          "median": "0.0221094617913446687710988986",
+          "min": "0"
+        }
+      },
+      "sell_by_panel": {
+        "P0": {
+          "max": "0.0361765348662274279731709045",
+          "median": "0.01521691496464699138128301395",
+          "min": "0.0023546482470084864102152455"
+        },
+        "P1": {
+          "max": "0.0501239831179261402501383354",
+          "median": "0.0246643389884868147571966055",
+          "min": "0.0147378751541272529038995522"
+        },
+        "P2": {
+          "max": "0.0519971778945187076818504547",
+          "median": "0.0228482146588583994366847038",
+          "min": "0.0112106460549054869177653739"
+        }
+      },
+      "unit_interpretation": "PROVIDER_FIELD_RETAINED_AS_IS_NO_UNIT_REINTERPRETATION"
+    },
+    "quote_notional_capacity_proxy_usd": {
+      "interpretation": "All panels returned quotes through the largest tested notional; the maximum is a test ceiling, not measured market depth or fillable size.",
+      "observed_all_panels": "100",
+      "right_censored": true,
+      "tested_max_usd": "100"
+    },
+    "roundtrip_quote_retention_bps": {
+      "all": {
+        "max": "10061.125",
+        "median": "9586.8422",
+        "min": "8528.697"
+      },
+      "by_panel": {
+        "P0": {
+          "max": "10061.125",
+          "median": "9602.6652",
+          "min": "8528.697"
+        },
+        "P1": {
+          "max": "9734.704",
+          "median": "9580.6056",
+          "min": "9043.9614"
+        },
+        "P2": {
+          "max": "9904.5576",
+          "median": "9576.9382",
+          "min": "9003.115"
+        }
+      },
+      "interpretation": "Quote-only round-trip output/input ratio. It is not realized PnL, NetReturn, or evidence of executable profit.",
+      "median_by_tested_notional_usd": {
+        "10": "9689.222",
+        "100": "9165.1924",
+        "25": "9599.1048",
+        "50": "9450.1846"
+      }
+    },
+    "route_count_pair_distribution": {
+      "buy_2__sell_2": 9,
+      "buy_2__sell_3": 6,
+      "buy_3__sell_2": 20,
+      "buy_3__sell_3": 1
+    }
+  },
+  "evidence_as_of": "2026-08-01T22:10:00Z",
+  "input_bindings": {
+    "a3_manifest": {
+      "path": "docs/evidence/task23/a3_projection_v1_attempt_02/projection_manifest_v1.json",
+      "sha256": "06702bba94e9a895d340598f2fa722eeed6dd5ce9cd324d699918ac6a8a95ff9"
+    },
+    "a3_outputs": [
+      {
+        "filename": "panel_diagnostics_v1.csv",
+        "rows": 9,
+        "sha256": "20cefa9332f2074042f9168ef2c1448bcbe8db281f49a55123f84d8389994c4d"
+      },
+      {
+        "filename": "panel_inventory_v1.csv",
+        "rows": 9,
+        "sha256": "a623b70543a74c63df41bb45c83074541fa98ac105fdeb611b7e02723014b4ec"
+      },
+      {
+        "filename": "quote_pair_availability_v1.csv",
+        "rows": 36,
+        "sha256": "5b525a9602f32b6c654a9bf87c0a783212046cee8f292d13838e160ec9788273"
+      }
+    ],
+    "outcome_paths_outside_r2_opened_by_a4": 0,
+    "r3_paths_discovered_by_a4": 0,
+    "r3_value_files_opened_by_a4": 0,
+    "raw_r2_value_files_opened_by_a4": 0
+  },
+  "limitations": [
+    "ONE_DEPENDENT_CAPTURE_CLUSTER",
+    "DESCRIPTIVE_ONLY_NO_P_VALUES_OR_CONFIDENCE_INTERVALS",
+    "NO_R3_OR_OUTCOME_VALIDATION",
+    "NO_OBSERVED_FAILURE_VARIATION",
+    "CAPACITY_PROXY_RIGHT_CENSORED_AT_100_USD",
+    "QUOTE_ONLY_NOT_TOUCH_FILLABLE_REALIZED_VWAP_OR_NET",
+    "PROVIDER_PRICE_IMPACT_FIELD_NOT_REINTERPRETED",
+    "ROUTE_ID_CONTINUITY_NOT_MATERIALIZED_NO_CLAIM",
+    "CATALOG_REGISTRATION_AND_INTEGRITY_REFRESH_DEFERRED_TO_A5"
+  ],
+  "negative_results_and_coverage_gaps": [
+    {
+      "finding": "No NO_ROUTE, provider error, invalid response, timeout, or missing panel/leg occurred in the accepted R2 projection.",
+      "id": "NO_FAILURE_STATE_OBSERVED",
+      "interpretation": "The failure taxonomy remains preserved, but failure probability cannot be estimated from this single all-success capture cluster."
+    },
+    {
+      "finding": "No R3 or other validation/outcome population was accessed.",
+      "id": "NO_VALIDATION_POPULATION",
+      "interpretation": "No out-of-sample or outcome claim is available."
+    },
+    {
+      "finding": "A3 did not materialize route identifiers or a route-continuity metric.",
+      "id": "ROUTE_ID_CONTINUITY_NOT_MATERIALIZED_NO_CLAIM",
+      "interpretation": "A4 makes no route-continuity claim; repairing this would require a separately authorized raw-R2 projection revision."
+    },
+    {
+      "finding": "A3/A4 evidence IDs and the append-only trial-ledger hash are not registered in Catalog during A4.",
+      "id": "CATALOG_REGISTRATION_AND_INTEGRITY_REFRESH_DEFERRED_TO_A5",
+      "interpretation": "Catalog integrity remains fail-closed until the separately authorized A5 registration and generated-consumer refresh."
+    }
+  ],
+  "next_boundary": {
+    "atom_id": "T23-A5_REGISTER_ASSETS_UPDATE_CATALOG_AND_FULL_FACTORY_FIT_REVIEW_V1",
+    "authorized_by_a4": false,
+    "r3_access": "DENY"
+  },
+  "owner_decision": {
+    "decision": "DIAGNOSTICS_READY_WITH_LIMITATIONS",
+    "does_not_permit": [
+      "ALPHA_OR_STRATEGY_PROMOTION",
+      "EXECUTION_CAPACITY_OR_FILLABILITY_CLAIM",
+      "NET_RETURN_CLAIM",
+      "R3_OR_OUTCOME_ACCESS",
+      "MARKET_WIDE_OR_CROSS_REGIME_GENERALIZATION"
+    ],
+    "meaning": "R2 diagnostics are reproducible enough to register and use for bounded next-step design, with the stated limitations.",
+    "permits": [
+      "T23_A5_REGISTRATION_AND_FACTORY_FIT_REVIEW"
+    ]
+  },
+  "population_and_dependence": {
+    "capture_clusters": 1,
+    "effective_independent_cluster_count_upper_bound": 1,
+    "iid_assumption": false,
+    "inference_mode": "DESCRIPTIVE_ONLY",
+    "interpretation": "The 3 members, 9 panels, and 36 quote pairs are repeated descriptive rows from one capture cluster, not independent n.",
+    "members": 3,
+    "panels": 9,
+    "quote_pairs": 36,
+    "validation_population": "NONE"
+  },
+  "prohibited_claims": [
+    "ALPHA_CONFIRMED",
+    "FILLABLE_SIZE_CONFIRMED",
+    "IID_SAMPLE",
+    "MARKET_DEPTH_MEASURED",
+    "NET_RETURN_POSITIVE",
+    "POPULATION_GENERALIZATION_VALID",
+    "R3_VALIDATED"
+  ],
+  "schema": "smial.task23.bounded-analysis",
+  "schema_version": "1.0.0",
+  "status": "DIAGNOSTICS_READY_WITH_LIMITATIONS",
+  "task_id": "TASK-23"
+}

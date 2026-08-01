@@ -136,6 +136,19 @@ class LifecycleRegistryTests(unittest.TestCase):
                 if registry_type == "reuse_candidates":
                     self.assertEqual(document["schema_version"], "1.1")
                     self.assertEqual(len(document["records"]), 52)
+                elif registry_type == "global_trial_ledger":
+                    self.assertEqual(
+                        [record["record_id"] for record in document["records"]],
+                        [
+                            "TRIAL-T23-R2-DIAGNOSTIC-PROJECTION-ATTEMPT-01",
+                            "TRIAL-T23-R2-DIAGNOSTIC-PROJECTION-ATTEMPT-02",
+                            "TRIAL-T23-BOUNDED-ANALYSIS-ADVERSARIAL-ACCEPTANCE-001",
+                        ],
+                    )
+                    self.assertEqual(
+                        [record["outcome"] for record in document["records"]],
+                        ["FAIL", "INCONCLUSIVE", "INCONCLUSIVE"],
+                    )
                 else:
                     self.assertEqual(document["schema_version"], "1.0")
                     self.assertEqual(document["records"], [])

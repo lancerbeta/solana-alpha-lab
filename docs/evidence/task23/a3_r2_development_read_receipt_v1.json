@@ -1,0 +1,136 @@
+{
+  "actor": "LOCAL_WORK_PRIMARY",
+  "atom_id": "T23-A3_DETERMINISTIC_R2_DIAGNOSTIC_PROJECTION_V1",
+  "authority": {
+    "cash_or_credits": false,
+    "credential_use": false,
+    "dependency_change": false,
+    "drive_read": false,
+    "external_api": false,
+    "network": false,
+    "outcome_path_read_outside_r2": false,
+    "provider_call": false,
+    "r2_value_files_max": 9,
+    "r2_value_read": true,
+    "r3_read": false,
+    "wallet_or_signer": false
+  },
+  "bindings": {
+    "allowed_value_filename": "raw_events.jsonl",
+    "config": {
+      "path": "configs/task23_bounded_diagnostics_v1.yaml",
+      "sha256": "33cd3cd81833d578c0a3be240fa443f196a5b3dca946f4ba8315749c7b67f0bf"
+    },
+    "contract": {
+      "path": "docs/contracts/task23_bounded_diagnostics_contract_v1.md",
+      "sha256": "0b8327b9926506a4ea57afee291a7217222ff7dd5aa10c77044db6dcaba64780"
+    },
+    "dataset_identity": {
+      "consumer_profile_id": "TASK23-COHORT-DIAGNOSTICS-THREE-PANEL-001",
+      "dataset_inventory_sha256": "aaa605eabdb62c38d218b40e768669db460c6fa419c4086d5412547b7f2fffae",
+      "split_content_sha256": "63b6d63895bdd6d25b68501619bca21e10f476a95ad8d27611f356a26cccee2d",
+      "split_id": "T22-SPLIT-T21-FROZEN-002",
+      "split_manifest_sha256": "973a9ff6dd2a376e62dee9289a57cbb62f06c8efb5a619fa6b7b2a7914dd0683"
+    },
+    "frozen_inputs": [
+      {
+        "path": "configs/task22_task23_consumer_time_profile_v1.yaml",
+        "sha256": "71a253d8b94f32a954d0195d2d544fdfb94e1b41ae680313bb48caa115ed01a0"
+      },
+      {
+        "path": "docs/evidence/task22/dataset_split_manifest_v2.json",
+        "sha256": "973a9ff6dd2a376e62dee9289a57cbb62f06c8efb5a619fa6b7b2a7914dd0683"
+      },
+      {
+        "path": "docs/evidence/task22/holdout_access_ledger_v2.json",
+        "sha256": "2282e5d1eac09a0ce940a5700f04b03ff4d75fc9cd4d65e08e5fe7deda88ca51"
+      },
+      {
+        "path": "docs/evidence/task22/a6_split_resolution_acceptance_catalog_factory_fit_v1.json",
+        "sha256": "29c1ad28d06430b74864b745ef50bf0315fcbfcfb5a7534e54b1692a3f15a019"
+      },
+      {
+        "path": "src/solana_alpha_lab/task21_event_triggered_panel_capture.py",
+        "sha256": "cbce387163a5625a0be124559987e50577375c517b5939db838e4660236aa8c4"
+      },
+      {
+        "path": "src/solana_alpha_lab/task21_event_triggered_followup_capture.py",
+        "sha256": "06783b78eba49d8dc85e28e47de12c310cf2a07f194abab4ad4b92fcfa35b264"
+      },
+      {
+        "path": "src/solana_alpha_lab/jupiter_quote_logger.py",
+        "sha256": "811f08e43eb26c99ef93dccfade372cbae5adb1c1ee718c7ff6d3ce543a9d507"
+      },
+      {
+        "path": "src/solana_alpha_lab/contracts/schema_v1.py",
+        "sha256": "ef9435fc0aa6df1d880714e97d3312e068dc82806a8c6ba1ed2d74c9929684ad"
+      },
+      {
+        "path": "registries/global_trial_ledger.yaml",
+        "sha256": "41b2f3cd1e2303f90318d0295c36c390999c7539031cb52db1a03779be56b671"
+      }
+    ],
+    "holdout_ledger": {
+      "path": "docs/evidence/task22/holdout_access_ledger_v2.json",
+      "sha256": "2282e5d1eac09a0ce940a5700f04b03ff4d75fc9cd4d65e08e5fe7deda88ca51"
+    },
+    "member_set": [
+      "T21-WATCH-29e2b75994975253bd74",
+      "T21-WATCH-6f21dec76d05f5831216",
+      "T21-WATCH-61ce24fc3fa04e3eaba7"
+    ],
+    "projection_code": {
+      "path": "src/solana_alpha_lab/task23_diagnostic_projection.py",
+      "sha256": "3b4c2570601f410197b9988b22161421393262e4201dcda7e970e3c8f5b663e1"
+    },
+    "root_bindings": [
+      {
+        "panel_id": "P0",
+        "root": "local/task21_forward/final_cohort/r2/run=r2-20260801T114657421057Z-7882ff946449"
+      },
+      {
+        "panel_id": "P1",
+        "root": "local/task21_forward/final_cohort/r2/p1/run=p1-20260801T122606020085Z-c66cbd9193f1"
+      },
+      {
+        "panel_id": "P2",
+        "root": "local/task21_forward/final_cohort/r2/p2/run=p2-20260801T131100955007Z-1e6e05144f30"
+      }
+    ],
+    "trial_ledger_before_run": {
+      "path": "registries/global_trial_ledger.yaml",
+      "sha256": "41b2f3cd1e2303f90318d0295c36c390999c7539031cb52db1a03779be56b671"
+    }
+  },
+  "created_at": "2026-08-01T22:06:48Z",
+  "ordering": {
+    "raw_value_files_opened_at_seal": 0,
+    "receipt_written_before_value_open": true
+  },
+  "projection_command": [
+    "python",
+    "-B",
+    "-m",
+    "solana_alpha_lab.task23_diagnostic_projection",
+    "--config",
+    "configs/task23_bounded_diagnostics_v1.yaml",
+    "--pre-read-receipt",
+    "docs/evidence/task23/a3_r2_development_read_receipt_v1.json",
+    "--output-dir",
+    "docs/evidence/task23/a3_projection_v1"
+  ],
+  "r3_boundary": {
+    "access": "DENY",
+    "outcome_read": false,
+    "path_discovery": false,
+    "split": "R3",
+    "state": "UNTOUCHED",
+    "value_read": false
+  },
+  "reason": "MATERIALIZE_FROZEN_DEVELOPMENT_ONLY_DIAGNOSTICS_WITH_EXPLICIT_DENOMINATORS",
+  "receipt_id": "T23-R2-FIRST-DEVELOPMENT-READ-20260801T220648Z-001",
+  "schema": "smial.task23.r2-development-read-receipt",
+  "schema_version": "1.0.0",
+  "status": "SEALED_BEFORE_FIRST_R2_VALUE_READ",
+  "task_id": "TASK-23"
+}

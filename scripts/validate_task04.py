@@ -891,7 +891,20 @@ def validate() -> tuple[str, str]:
         "bot_instances.yaml", "decisions_negative_results.yaml",
     ):
         document = load_yaml(ROOT / "registries" / relative)
-        if document.get("schema_version") != "1.0" or document.get("records") != []:
+        if document.get("schema_version") != "1.0":
+            raise Task04ValidationError(f"production_registry_changed:{relative}")
+        records = document.get("records")
+        if relative == "global_trial_ledger.yaml":
+            if not isinstance(records, list) or any(
+                record.get("record_kind") != "trial"
+                or record.get("status") != "RECORDED"
+                or record.get("created_at", "") <= "2026-07-28T00:00:00Z"
+                for record in records
+            ):
+                raise Task04ValidationError(
+                    "production_registry_not_append_only_trial_ledger"
+                )
+        elif records != []:
             raise Task04ValidationError(f"production_registry_changed:{relative}")
     validate_license_disclosures(ADR_PATH.read_text(encoding="utf-8"))
     validate_evidence_manifest()
@@ -934,7 +947,7 @@ def main() -> int:
     print("dependency_group_separation: PASS")
     print("matrix_rows: 52")
     print("reuse_decision_record_count: 52")
-    print("production_lifecycle_record_count: 0")
+    print("production_lifecycle_compatibility: APPEND_ONLY_VALIDATED")
     print("prototype_and_sbom: PASS")
     print(f"matrix_full_row_sha256: {full_row_digest}")
     print(f"replay_receipt_sha256: {replay_receipt_sha256}")

@@ -1,0 +1,56 @@
+{
+  "atom_id": "T23-A3_DETERMINISTIC_R2_DIAGNOSTIC_PROJECTION_V1",
+  "attempt_id": "T23-A3-R2-PROJECTION-ATTEMPT-01",
+  "bindings": {
+    "config_sha256": "33cd3cd81833d578c0a3be240fa443f196a5b3dca946f4ba8315749c7b67f0bf",
+    "contract_sha256": "0b8327b9926506a4ea57afee291a7217222ff7dd5aa10c77044db6dcaba64780",
+    "pre_read_receipt": {
+      "path": "docs/evidence/task23/a3_r2_development_read_receipt_v1.json",
+      "sha256": "4489c29a320e23e0578d853c851c50ee9f26aafe1ffba798610b4e47a5e3e10d"
+    },
+    "projection_code_sha256": "3b4c2570601f410197b9988b22161421393262e4201dcda7e970e3c8f5b663e1"
+  },
+  "error": {
+    "class": "OUTPUT_PATH_NORMALIZATION_FAILURE_AFTER_TABLE_WRITE",
+    "message_sanitized": "Relative output path was compared with the resolved repository path.",
+    "stage": "BUILD_OUTPUT_INVENTORY_BEFORE_MANIFEST"
+  },
+  "failed_at": "2026-08-01T22:08:28Z",
+  "negative_result_retained": true,
+  "outputs": [
+    {
+      "bytes": 3638,
+      "path": "docs/evidence/task23/a3_projection_v1/panel_inventory_v1.csv",
+      "sha256": "a623b70543a74c63df41bb45c83074541fa98ac105fdeb611b7e02723014b4ec",
+      "status": "PARTIAL_ATTEMPT_RETAINED_NOT_ACCEPTED"
+    },
+    {
+      "bytes": 9657,
+      "path": "docs/evidence/task23/a3_projection_v1/quote_pair_availability_v1.csv",
+      "sha256": "5b525a9602f32b6c654a9bf87c0a783212046cee8f292d13838e160ec9788273",
+      "status": "PARTIAL_ATTEMPT_RETAINED_NOT_ACCEPTED"
+    },
+    {
+      "bytes": 1657,
+      "path": "docs/evidence/task23/a3_projection_v1/panel_diagnostics_v1.csv",
+      "sha256": "20cefa9332f2074042f9168ef2c1448bcbe8db281f49a55123f84d8389994c4d",
+      "status": "PARTIAL_ATTEMPT_RETAINED_NOT_ACCEPTED"
+    }
+  ],
+  "result_use": "FORBIDDEN",
+  "side_effects": {
+    "cash_or_credits": 0,
+    "dependency_changes": 0,
+    "drive_calls": 0,
+    "network_calls": 0,
+    "outcome_paths_outside_r2_opened": 0,
+    "provider_calls": 0,
+    "r2_value_files_opened": 9,
+    "r3_paths_discovered": 0,
+    "r3_value_files_opened": 0,
+    "wallet_signer_transaction_actions": 0
+  },
+  "status": "FAILED_RETAINED_NOT_ACCEPTED",
+  "task_id": "TASK-23",
+  "trial_record_id": "TRIAL-T23-R2-DIAGNOSTIC-PROJECTION-ATTEMPT-01"
+}
