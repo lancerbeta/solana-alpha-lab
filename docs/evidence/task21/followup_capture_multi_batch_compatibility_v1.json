@@ -17,7 +17,7 @@
     {
       "path": "src/solana_alpha_lab/task21_event_triggered_followup_capture.py",
       "previous_sha256": "5f2bcbc584343bc025ab0906039a8613e58ec9b72fbe480ac600826c910e6c50",
-      "current_sha256": "d07eafddd1694dd9ec193bc2ba2b68a87cb8e69c19ab9a6a03364af7a16d3453",
+      "current_sha256": "06783b78eba49d8dc85e28e47de12c310cf2a07f194abab4ad4b92fcfa35b264",
       "reason": "GENERALIZED_EXACT_BINDING_FROM_R2_ONLY_TO_R2_AND_R3"
     },
     {
@@ -38,6 +38,7 @@
   },
   "validation": {
     "r2_regression_tests": 7,
+    "r2_p2_consumer_regression_tests": 7,
     "r3_binding_tests": 4,
     "result": "PASS"
   },

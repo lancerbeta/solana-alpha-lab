@@ -19,15 +19,17 @@
     },
     {
       "path": "docs/evidence/task21/r3_p1_event_triggered_capture_offline_acceptance_v1.json",
-      "sha256": "bd389c2899fba42974b494ba20c5fa784b2671dfcd866dab0bcfcf54ed4ace9e"
+      "sha256": "2ae3d6ef964e990ace597a1be6ca8e95fa3ba8370c9bf4c3b3975997cc698da8"
     },
     {
       "path": "docs/evidence/task21/followup_capture_multi_batch_compatibility_v1.json",
-      "sha256": "f557e247c44a5a0233560e30abccfc2ac8f227b5d64612370a15daf228bc347f"
+      "sha256": "6d533621834a4dbdc2b395d732f1148b603bde9f27c4847a78ec6bca5d49c957"
     },
     {
-      "path": "src/solana_alpha_lab/task21_event_triggered_followup_capture.py",
-      "sha256": "d07eafddd1694dd9ec193bc2ba2b68a87cb8e69c19ab9a6a03364af7a16d3453"
+      "path_at_capture": "src/solana_alpha_lab/task21_event_triggered_followup_capture.py",
+      "sha256_at_capture": "d07eafddd1694dd9ec193bc2ba2b68a87cb8e69c19ab9a6a03364af7a16d3453",
+      "binding": "EXECUTION_CODE_BYTES_AT_CAPTURE",
+      "superseded_after_capture": true
     },
     {
       "path": "docs/evidence/task21/pre_h24_recovery_refresh_acceptance_v1.json",
@@ -48,6 +50,18 @@
     "restore_proof_age_hours_max": 168,
     "repository_head": "5880021b8a65cff96ad3ca70fd88ba614fdf8a94",
     "repository_tree": "7c00b7de5cbaedb2c2d6352909f68279cb064fd5"
+  },
+  "post_capture_delivery_repair": {
+    "status": "PASS",
+    "root_cause": "MULTI_BATCH_MEMBER_LOADER_INCORRECTLY_REQUIRED_A_P1_ONLY_BINDING_AND_BROKE_THE_EXISTING_R2_P2_CONSUMER_IN_CLEAN_CLONE",
+    "scope": "DERIVE_THE_SINGLE_ADMISSION_ROLE_AND_BATCH_ID_FROM_THE_ALREADY_VALIDATED_CONFIG",
+    "runtime_execution_sha256": "d07eafddd1694dd9ec193bc2ba2b68a87cb8e69c19ab9a6a03364af7a16d3453",
+    "delivered_runtime_sha256": "06783b78eba49d8dc85e28e47de12c310cf2a07f194abab4ad4b92fcfa35b264",
+    "r3_capture_semantics_changed": false,
+    "provider_replay_required": false,
+    "provider_replay_performed": false,
+    "targeted_unit_tests": 18,
+    "targeted_result": "PASS"
   },
   "population": {
     "batch_id": "T21-R3",

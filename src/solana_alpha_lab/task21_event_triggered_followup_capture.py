@@ -400,8 +400,21 @@ def validate_followup_config(
 def _load_members(
     config: Mapping[str, Any], repo_root: Path
 ) -> list[dict[str, Any]]:
-    binding = _binding(config)
-    path = _protected_path(config, repo_root, str(binding["admission_role"]))
+    protected = config.get("protected_inputs", [])
+    admission_roles = [
+        item.get("role")
+        for item in protected
+        if isinstance(item, Mapping)
+        and isinstance(item.get("role"), str)
+        and str(item["role"]).endswith("_ADMISSION_EVENTS")
+    ]
+    if len(admission_roles) != 1:
+        raise Task21FollowupError("followup_admission_role_drift")
+    path = _protected_path(config, repo_root, admission_roles[0])
+    panel = config.get("panel", {})
+    batch_id = panel.get("batch_id")
+    if not isinstance(batch_id, str) or not batch_id:
+        raise Task21FollowupError("followup_batch_id_invalid")
     members: list[dict[str, Any]] = []
     for line in path.read_text(encoding="utf-8").splitlines():
         value = json.loads(line)
@@ -413,7 +426,7 @@ def _load_members(
         raise Task21FollowupError("followup_population_order_drift")
     for member in members:
         if (
-            member.get("batch_id") != binding["batch_id"]
+            member.get("batch_id") != batch_id
             or not isinstance(member.get("mint"), str)
             or not isinstance(member.get("mint_decimals"), int)
             or not isinstance(member.get("entered_at"), str)
