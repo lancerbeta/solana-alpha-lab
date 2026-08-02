@@ -216,6 +216,24 @@ RESULT: PASS
             summary["missing_local_inputs"],
             ["ignored local A3 raw population is unavailable"],
         )
+        self.assertEqual(summary["failure_diagnostics"], [])
+
+    def test_validation_summary_bounds_failure_diagnostics(self) -> None:
+        summary = ci.parse_validation_summary(
+            """\
+FAIL: test_exact_contract (test_example.ExampleTests.test_exact_contract)
+AssertionError: expected immutable receipt bytes
+FAILED (failures=1)
+"""
+        )
+        self.assertEqual(
+            summary["failure_diagnostics"],
+            [
+                "FAIL: test_exact_contract (test_example.ExampleTests.test_exact_contract)",
+                "AssertionError: expected immutable receipt bytes",
+                "FAILED (failures=1)",
+            ],
+        )
 
     def test_delivery_mode_is_opt_in_and_base_ref_is_explicit(self) -> None:
         ordinary = ci.parse_args([])

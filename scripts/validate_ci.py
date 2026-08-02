@@ -150,11 +150,27 @@ def parse_validation_summary(output: str) -> dict[str, Any]:
         for match in re.findall(r"skipped ['\"]([^'\"]+)['\"]", output)
         if any(marker in match.lower() for marker in missing_markers)
     }
+    diagnostic_patterns = (
+        r"(?m)^(?:FAIL|ERROR): .+$",
+        r"(?m)^(?:AssertionError|[A-Za-z][A-Za-z0-9_]*(?:Error|Exception)): .+$",
+        r"(?m)^FAILED \(.+\)$",
+    )
+    failure_diagnostics: list[str] = []
+    for pattern in diagnostic_patterns:
+        for value in re.findall(pattern, output):
+            normalized = " ".join(value.strip().split())[:500]
+            if normalized and normalized not in failure_diagnostics:
+                failure_diagnostics.append(normalized)
+            if len(failure_diagnostics) == 20:
+                break
+        if len(failure_diagnostics) == 20:
+            break
     return {
         "tests_run": max(test_counts) if test_counts else None,
         "skipped": max(skip_counts) if skip_counts else 0,
         "pass_labels": len(re.findall(r"(?m)^[-A-Z0-9_ ]+: PASS$", output)),
         "missing_local_inputs": sorted(reasons),
+        "failure_diagnostics": failure_diagnostics,
     }
 
 
@@ -205,6 +221,7 @@ def run_tracked_only_delivery_preflight(*, base_ref: str = "origin/main") -> Non
         "skipped": None,
         "pass_labels": 0,
         "missing_local_inputs": [],
+        "failure_diagnostics": [],
     }
     error: str | None = None
     temporary_root: Path | None = None
