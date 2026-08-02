@@ -236,6 +236,14 @@ def run_tracked_only_delivery_preflight(*, base_ref: str = "origin/main") -> Non
                 ["for-each-ref", "--format=%(refname)", "refs/heads"], cwd=checkout
             ).splitlines():
                 git_text(["branch", "main", "origin/main"], cwd=checkout)
+            git_text(
+                [
+                    "symbolic-ref",
+                    "refs/remotes/origin/HEAD",
+                    "refs/remotes/origin/main",
+                ],
+                cwd=checkout,
+            )
             git_text(["config", "--local", "core.hooksPath", ".githooks"], cwd=checkout)
             observed_commit = git_text(["rev-parse", "HEAD"], cwd=checkout)
             observed_tree = git_text(["show", "-s", "--format=%T", "HEAD"], cwd=checkout)
@@ -246,6 +254,7 @@ def run_tracked_only_delivery_preflight(*, base_ref: str = "origin/main") -> Non
             environment["UV_MANAGED_PYTHON"] = "1"
             environment["UV_NO_ENV_FILE"] = "1"
             environment["UV_OFFLINE"] = "1"
+            environment.pop("VIRTUAL_ENV", None)
             try:
                 completed = subprocess.run(
                     VALIDATION_COMMAND.split(),
