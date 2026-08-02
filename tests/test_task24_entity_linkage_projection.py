@@ -19,6 +19,7 @@ if str(SRC) not in sys.path:
 
 from solana_alpha_lab.storage.parquet_store import _events_from_table  # noqa: E402
 from solana_alpha_lab.task24_entity_linkage_capture import (  # noqa: E402
+    Task24HistoryCaptureError,
     load_frozen_population,
 )
 from solana_alpha_lab.task24_entity_linkage_projection import (  # noqa: E402
@@ -275,7 +276,12 @@ class Task24EntityLinkageProjectionTests(unittest.TestCase):
         for node in self.nodes:
             self.assertRegex(str(node["business_key"]).rsplit(":", 1)[1], digest)
         persisted = b"".join((OUTPUT_DIR / name).read_bytes() for name in EXPECTED_OUTPUTS)
-        population = load_frozen_population(ROOT)
+        try:
+            population = load_frozen_population(ROOT)
+        except Task24HistoryCaptureError as exc:
+            if str(exc) != "raw_partition_missing":
+                raise
+            self.skipTest("ignored local A3 raw population is unavailable")
         for subject in population.subjects:
             self.assertNotIn(subject.raw_public_key.encode("utf-8"), persisted)
         self.assertEqual(self.manifest["privacy"]["raw_public_addresses_persisted"], 0)

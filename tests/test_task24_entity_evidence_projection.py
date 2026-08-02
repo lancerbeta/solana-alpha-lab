@@ -116,6 +116,17 @@ class Task24EntityEvidenceProjectionTests(unittest.TestCase):
             (OUTPUT_DIR / "projection_manifest_v1.json").read_bytes()
         )
 
+    def require_local_inputs(self) -> None:
+        missing = [
+            role
+            for role, (relative, _, _) in EXPECTED_INPUTS.items()
+            if not (ROOT / relative).is_file()
+        ]
+        if missing:
+            self.skipTest(
+                "ignored local A3 evidence is unavailable: " + ",".join(missing)
+            )
+
     def test_pre_read_manifest_is_exact_and_authorizes_only_partial_raw_projection(self) -> None:
         self.assertEqual(sha256(MANIFEST_PATH), PRE_READ_MANIFEST_SHA256)
         self.assertEqual(self.manifest["status"], "PASS_ADMISSIBLE_LOCAL_INPUTS")
@@ -141,6 +152,7 @@ class Task24EntityEvidenceProjectionTests(unittest.TestCase):
             for item in self.manifest["inputs"]
         }
         self.assertEqual(actual, EXPECTED_INPUTS)
+        self.require_local_inputs()
         for role, (relative, expected_hash, expected_bytes) in EXPECTED_INPUTS.items():
             path = ROOT / relative
             self.assertTrue(path.is_file(), role)
@@ -223,6 +235,7 @@ class Task24EntityEvidenceProjectionTests(unittest.TestCase):
             )
 
     def test_raw_public_addresses_are_not_persisted_in_projection_outputs(self) -> None:
+        self.require_local_inputs()
         supply_path = ROOT / EXPECTED_INPUTS["TOKEN_SUPPLY_RAW_EVENT"][0]
         largest_path = ROOT / EXPECTED_INPUTS["LARGEST_TOKEN_ACCOUNTS_RAW_EVENT"][0]
         owner_path = ROOT / EXPECTED_INPUTS["TOKEN_ACCOUNT_OWNER_RAW_EVENT"][0]
@@ -281,7 +294,8 @@ class Task24EntityEvidenceProjectionTests(unittest.TestCase):
             self.assertEqual(value, 0)
 
     def test_rebuild_is_deterministic_for_core_outputs(self) -> None:
-        with tempfile.TemporaryDirectory(prefix="task24-a3-", dir=ROOT / "local") as tmp:
+        self.require_local_inputs()
+        with tempfile.TemporaryDirectory(prefix="task24-a3-", dir=ROOT) as tmp:
             output = Path(tmp) / "projection"
             result = build_task24_projection(
                 repo_root=ROOT,
@@ -298,7 +312,7 @@ class Task24EntityEvidenceProjectionTests(unittest.TestCase):
                 self.assertEqual(sha256(output / name), EXPECTED_OUTPUTS[name][0])
 
     def test_unbound_manifest_mutation_is_rejected_before_projection(self) -> None:
-        with tempfile.TemporaryDirectory(prefix="task24-a3-", dir=ROOT / "local") as tmp:
+        with tempfile.TemporaryDirectory(prefix="task24-a3-", dir=ROOT) as tmp:
             changed_path = Path(tmp) / "manifest.json"
             changed = copy.deepcopy(self.manifest)
             changed["scope"]["dataset_version"] = "MUTATED"
@@ -321,7 +335,7 @@ class Task24EntityEvidenceProjectionTests(unittest.TestCase):
                 "owner_address_persistence_enabled",
             ),
         ]
-        with tempfile.TemporaryDirectory(prefix="task24-a3-", dir=ROOT / "local") as tmp:
+        with tempfile.TemporaryDirectory(prefix="task24-a3-", dir=ROOT) as tmp:
             for index, (section, key, value, error) in enumerate(mutations):
                 with self.subTest(section=section, key=key):
                     changed = copy.deepcopy(self.manifest)

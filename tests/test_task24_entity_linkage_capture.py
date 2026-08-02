@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import copy
+import hashlib
 import json
 import sys
 import tempfile
@@ -38,6 +39,30 @@ from solana_alpha_lab.task24_entity_linkage_capture import (  # noqa: E402
 
 
 FIXED_NOW = datetime(2026, 8, 2, 12, 0, tzinfo=UTC)
+
+
+def synthetic_population() -> FrozenPopulation:
+    raw_keys = ("ci-fixture-mint",) + tuple(
+        f"ci-fixture-wallet-{index:02d}" for index in range(20)
+    )
+    subjects = tuple(
+        FrozenSubject(
+            subject_id=(
+                f"t24-{'token-mint' if index == 0 else 'wallet'}-"
+                + hashlib.sha256(raw.encode("utf-8")).hexdigest()
+            ),
+            node_type="TOKEN_MINT" if index == 0 else "WALLET",
+            raw_public_key=raw,
+        )
+        for index, raw in enumerate(raw_keys)
+    )
+    fingerprint = hashlib.sha256(
+        json.dumps(
+            [subject.subject_id for subject in subjects],
+            separators=(",", ":"),
+        ).encode("utf-8")
+    ).hexdigest()
+    return FrozenPopulation(subjects=subjects, fingerprint_sha256=fingerprint)
 
 
 def response_for_request(
@@ -88,7 +113,15 @@ def transaction(slot: int, signature: str) -> dict:
 class Task24EntityLinkageCaptureTests(unittest.TestCase):
     @classmethod
     def setUpClass(cls) -> None:
-        cls.population = load_frozen_population(ROOT)
+        try:
+            cls.population = load_frozen_population(ROOT)
+        except Task24HistoryCaptureError as exc:
+            if str(exc) != "raw_partition_missing":
+                raise
+            cls.local_raw_population_available = False
+            cls.population = synthetic_population()
+        else:
+            cls.local_raw_population_available = True
 
     def test_content_bindings_and_frozen_population_are_exact(self) -> None:
         import hashlib
@@ -111,6 +144,8 @@ class Task24EntityLinkageCaptureTests(unittest.TestCase):
             sha(ROOT / "docs/evidence/task24/a3_entity_evidence_pre_read_manifest_v1.json"),
             A3_MANIFEST_SHA256,
         )
+        if not self.local_raw_population_available:
+            self.skipTest("ignored local A3 raw population is unavailable")
         self.assertEqual(len(self.population.subjects), 21)
         self.assertEqual(len(self.population.wallets), 20)
         self.assertEqual(len({item.subject_id for item in self.population.subjects}), 21)

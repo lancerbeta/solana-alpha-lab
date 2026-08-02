@@ -8009,7 +8009,7 @@ records:
   evidence: []
   classification: *t16_internal
 - asset_id: TEST-T16-HYPOTHESIS-RESEARCH-MEMORY-ACCEPTANCE-001
-  record_version: '1.2'
+  record_version: '1.3'
   asset_type: script
   purpose: Deterministic TASK-16 acceptance tests binding upstream
     fingerprints, empty legacy migration disposition, query evidence,
@@ -8017,7 +8017,7 @@ records:
     navigation and zero authority.
   status: IMPLEMENTED_UNVERIFIED
   origin: REPOSITORY
-  as_of: '2026-07-29'
+  as_of: '2026-08-02'
   truth_owner: TASK-16
   location:
     kind: git_path
@@ -8025,7 +8025,7 @@ records:
     repository_path: tests/test_task16_hypothesis_research_memory_acceptance.py
   integrity:
     kind: sha256
-    sha256: aa905aba09ca05b53f3c1c47e8cd0b6ba470e915d4615235e703e5e198336bee
+    sha256: 342058b93b92185834a1579fce2a807210a2e3152a2f01a22c52bc6fd77fccab
   access:
     mode: read_only
     method: file
@@ -11793,7 +11793,7 @@ records:
   evidence: []
   classification: *t24_internal
 - asset_id: TEST-T24-ENTITY-EVIDENCE-PROJECTION-001
-  record_version: '1.0'
+  record_version: '1.1'
   asset_type: script
   purpose: Deterministic tests for TASK-24 A3 pseudonymization graph projection null semantics and downstream nonclaims.
   status: IMPLEMENTED_UNVERIFIED
@@ -11806,7 +11806,7 @@ records:
     repository_path: tests/test_task24_entity_evidence_projection.py
   integrity:
     kind: sha256
-    sha256: f6eeab206dd28e6984127bebfceb2ec845c031c8012696449383cff0ff6194ea
+    sha256: 8588c9c77fd2deeb91ff187ba22ef0d65deaa64adb262733d05d5383be76a417
   access: *t24_read_file
   relations:
   - relation_type: depends_on
@@ -12020,7 +12020,7 @@ records:
   evidence: []
   classification: *t24_internal
 - asset_id: TEST-T24-ENTITY-LINKAGE-CAPTURE-001
-  record_version: '1.0'
+  record_version: '1.1'
   asset_type: script
   purpose: Tests for bounded TASK-24 history capture request caps exact-wire retention privacy and fail-closed behavior.
   status: IMPLEMENTED_UNVERIFIED
@@ -12033,7 +12033,7 @@ records:
     repository_path: tests/test_task24_entity_linkage_capture.py
   integrity:
     kind: sha256
-    sha256: 021c56cd8bee349d45964d8682104fe05593c29184037cc063cf48cedc1213f0
+    sha256: b9827193e366d20df27d6068df3c9a8c1f8246eca27ba56ba89f643087eb70f0
   access: *t24_read_file
   relations:
   - relation_type: depends_on
@@ -12074,7 +12074,7 @@ records:
   evidence: []
   classification: *t24_internal
 - asset_id: TEST-T24-ENTITY-LINKAGE-PROJECTION-001
-  record_version: '1.0'
+  record_version: '1.1'
   asset_type: script
   purpose: Deterministic tests for TASK-24 transaction parsing evidence independence projection and insufficient-capacity semantics.
   status: IMPLEMENTED_UNVERIFIED
@@ -12087,7 +12087,7 @@ records:
     repository_path: tests/test_task24_entity_linkage_projection.py
   integrity:
     kind: sha256
-    sha256: ceaac39e9a39b4fb11257d8010a083adf7d030661b2ed7d70b3dc387938568ce
+    sha256: 0f4ec480a247c4898194cb400cec319504e0868b2ffd2241f50074df22440c23
   access: *t24_read_file
   relations:
   - relation_type: depends_on
@@ -12970,7 +12970,7 @@ records:
   evidence: []
   classification: *t23_internal
 - asset_id: TEST-T23-A5-CATALOG-FACTORY-FIT-001
-  record_version: '1.0'
+  record_version: '1.1'
   asset_type: script
   purpose: Hash-bound A5 tests for exact assets append-only trials Catalog lineage generated navigation Factory Fit holdout governance and authority.
   status: IMPLEMENTED_UNVERIFIED
@@ -12983,7 +12983,7 @@ records:
     repository_path: tests/test_task23_catalog_repository_factory_fit.py
   integrity:
     kind: sha256
-    sha256: f71eec7329572612d020a1bd8760d865b1e045c5cc12b9f03e587078eddaf47e
+    sha256: c45e873d20c778454066ba1fa6d06070023ee60661260de94715cf87621b9db5
   access: *t23_read_file
   relations:
   - relation_type: depends_on
