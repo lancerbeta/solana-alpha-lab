@@ -1,0 +1,399 @@
+schema_version: "1.0"
+contract_id: T24-ENTITY-GRAPH-AND-FALSE-POSITIVE-CONTRACT-001
+task_id: TASK-24
+task_name: Entity graph v1
+atom: T24-A2_FROZEN_ENTITY_GRAPH_AND_FALSE_POSITIVE_CONTRACT_V1
+status: VALIDATED_CONTRACT_ONLY
+as_of: "2026-08-02"
+
+entry_gate:
+  route_owner: LOCAL_WORK_PRIMARY
+  execution_route: LOCAL_WORK_CODEX
+  verdict: START_WITH_PATCH
+  patch: FREEZE_ENTITY_GRAPH_AND_FALSE_POSITIVE_CONTRACT_BEFORE_VALUE_READ
+  user_atom_approval: CONFIRMED
+  canonical_task_source_activation: NOT_CLAIMED
+  accepted_main_commit: 31c01640499be6b7e86a2fe638d9217c202861cc
+  accepted_main_tree: 6677878eb2b8195018ab217c6a9a429de5726563
+  branch: task24/entity-graph-contract
+  dependencies:
+    TASK-21: DONE
+    TASK-23: DONE_DIAGNOSTICS_READY_WITH_LIMITATIONS
+  catalog_checkpoint:
+    version: 0.28.0
+    implementation_status: VALIDATED_ACTIVE
+    assets: 415
+    asset_registries: 4
+    schemas: 7
+    queries: 8
+    lifecycle_registries: 9
+    lifecycle_records: 55
+  product_vision_terminal: CANONICALIZED_WITH_PATCH
+  active_time_gate: NONE
+  reasoning: VERY_HIGH_SUFFICIENT
+  tool_decision: NONE
+
+owner_decision:
+  question: >-
+    Is entity evidence reliable enough to improve adjusted concentration or
+    eligibility without promoting an observed relation to ownership truth?
+  allowed_terminal_decisions:
+    - ENTITY_EVIDENCE_READY_WITH_LIMITATIONS
+    - EXTEND_EVIDENCE
+    - REDESIGN_DATA
+    - STOP_NO_RELIABLE_ENTITY_SIGNAL
+  forbidden_claims:
+    - ECONOMIC_OR_BENEFICIAL_OWNERSHIP
+    - INSIDER_GROUND_TRUTH
+    - DEPLOYER_FUNDER_OR_BUNDLER_GROUND_TRUTH
+    - COMPLETE_HOLDER_DISTRIBUTION
+    - ADJUSTED_CONCENTRATION_ESTABLISHED_IN_A2
+    - TOXICITY_OR_STRATEGY_VETO
+    - ALPHA_OR_CAUSALITY
+    - POPULATION_GENERALIZATION
+    - EXECUTION_PNL_NETRETURN_OR_OWNER_CASHFLOW
+    - R3_OR_OUTCOME_ACCESS
+    - CANONICAL_TASK24_DONE
+
+reuse_decision:
+  adopt:
+    - TASK05_ENTITY_INPUT_SNAPSHOT_SCHEMA
+    - TASK11_ENTITY_INPUT_EVIDENCE_SEMANTICS
+    - TASK23_BOUNDED_NON_GENERALIZATION_DISCIPLINE
+  wrap:
+    - THIN_DECLARATIVE_GRAPH_EDGE_AND_CANDIDATE_CONTRACT
+  fork: []
+  build: []
+  graph_database_required: false
+
+managed_write_set:
+  - docs/contracts/task24_entity_graph_and_false_positive_contract_v1.md
+  - configs/task24_entity_graph_v1.yaml
+  - tests/test_task24_entity_graph_contract.py
+  - docs/evidence/task24/a2_frozen_entity_graph_contract_acceptance_v1.json
+
+frozen_inputs:
+  - path: docs/contracts/entity_input_observation_contract_v1.md
+    sha256: 5d92f8dae8860043dae3115fb5a7cb4deb50de48c8efb2a6bca46fc47987d8e4
+    bytes: 7635
+    use: EVIDENCE_CLASSES_EXCLUSIONS_AND_NOT_TESTABLE_SEMANTICS
+  - path: docs/evidence/task11/entity_input_pilot_execution_receipt_v1.json
+    sha256: 324c9ace8c49668864c274de19c09d42a7e794169f9a5ad619df8b47f3209ff4
+    bytes: 5950
+    use: RAW_PILOT_LIMITS_AND_LOGICAL_RUNTIME_REFS
+  - path: tests/fixtures/task11/entity_input_live_evidence_v1.json
+    sha256: 2c0e00c1aacb32a75cbe5807517e5e514751cec0271a540594147390e8fbf7b2
+    bytes: 6805
+    use: SANITIZED_SCHEMA_PROVENANCE_NULL_AND_LIMITATION_TESTS_ONLY
+  - path: schemas/schema_v1.sql
+    sha256: eae9d1544b11cffc03afba1e263153168a11dc6f648df9117a55a4cae5d23f09
+    bytes: 28962
+    use: ENTITY_INPUT_RELATION_CONTRACT
+  - path: src/solana_alpha_lab/contracts/schema_v1.py
+    sha256: ef9435fc0aa6df1d880714e97d3312e068dc82806a8c6ba1ed2d74c9929684ad
+    bytes: 32794
+    use: ENTITY_INPUT_MODEL_AND_AVAILABILITY_VALIDATION
+  - path: docs/reports/task23_cohort_diagnostics_v1.md
+    sha256: 2964fc1c6051772b1d9fef2d973df49d1155e89efb30207263f91297630b898f
+    bytes: 3337
+    use: UPSTREAM_LIMITATIONS_AND_NO_GENERALIZATION
+  - path: docs/evidence/task23/a5_catalog_repository_factory_fit_v1.json
+    sha256: 7f840ac5fbdc6481dec592e529588b99d53a65e314587adeee98605dc94bab14
+    bytes: 13979
+    use: ACCEPTED_TASK23_TERMINAL_BINDING
+
+data_feasibility:
+  value_read_in_a2: false
+  new_entity_values_read_in_a2: 0
+  tracked_task11_fixture:
+    status: AVAILABLE_SANITIZED
+    owner_addresses: 0
+    provider_bodies: 0
+    allowed_use:
+      - SCHEMA
+      - PROVENANCE
+      - NULL_SEMANTICS
+      - LIMITATION_TESTS
+    forbidden_use:
+      - GRAPH_CONSTRUCTION
+      - ENTITY_VALIDATION
+      - ADDRESS_RECONSTRUCTION_FROM_HASHES
+  task11_logical_raw_runtime:
+    status: NOT_AVAILABLE_CURRENT_WORKSPACE_AT_ENTRY_GATE
+    in_git: false
+    fabricate_or_infer_from_hashes: false
+  pre_read_manifest_required_for_a3: true
+  pre_read_manifest_required_fields:
+    - exact_local_path
+    - bytes
+    - sha256
+    - scope
+    - retention
+    - provenance
+    - permitted_fields
+    - no_r3_no_outcome_assertion
+  unavailable_input_decisions:
+    - REDESIGN_DATA
+    - STOP_NO_RELIABLE_ENTITY_SIGNAL
+
+evidence_classes:
+  - RAW_ONCHAIN
+  - DERIVED_ADJUSTED
+  - VENDOR_LABEL
+  - PROJECT_INFERENCE
+promotion_rules:
+  vendor_to_raw: false
+  inference_to_raw: false
+  confidence_repairs_missing_provenance: false
+  preserve_raw_after_derivation: true
+  preserve_conflicts: true
+
+graph_contract:
+  interpretation: VERSIONED_EVIDENCE_READ_MODEL_NOT_OWNERSHIP_TRUTH
+  destructive_node_merge: false
+  node_types:
+    - TOKEN_MINT
+    - TOKEN_ACCOUNT
+    - WALLET
+    - PROGRAM_OR_POOL
+    - TRANSACTION
+    - ENTITY_CANDIDATE
+  node_required_fields:
+    - node_id
+    - node_type
+    - business_key
+    - event_at
+    - observed_at
+    - first_reliable_available_at
+    - available_to_strategy_at
+    - ingested_at
+    - source
+    - source_version
+    - evidence_class
+    - revision_number
+    - revision_of
+    - content_sha256
+    - quality_flags
+  edge_required_fields:
+    - edge_id
+    - source_node_id
+    - source_node_type
+    - target_node_id
+    - target_node_type
+    - edge_type
+    - evidence_class
+    - confidence_class
+    - rule_version
+    - supporting_raw_event_ids
+    - supporting_edge_ids
+    - event_at
+    - observed_at
+    - first_reliable_available_at
+    - available_to_strategy_at
+    - ingested_at
+    - source
+    - source_version
+    - revision_number
+    - revision_of
+    - content_sha256
+    - quality_flags
+    - conflict_set_id
+  edge_types:
+    - id: RAW_TOKEN_ACCOUNT_FOR_MINT
+      source_type: TOKEN_ACCOUNT
+      target_type: TOKEN_MINT
+      evidence_class: RAW_ONCHAIN
+      allowed_confidence: [DIRECT]
+    - id: RAW_TOKEN_ACCOUNT_OWNER
+      source_type: TOKEN_ACCOUNT
+      target_type: WALLET
+      evidence_class: RAW_ONCHAIN
+      allowed_confidence: [DIRECT]
+    - id: RAW_MINT_CREATED_BY_WALLET
+      source_type: TOKEN_MINT
+      target_type: WALLET
+      evidence_class: RAW_ONCHAIN
+      allowed_confidence: [DIRECT]
+    - id: RAW_IMMEDIATE_FUNDER
+      source_type: WALLET
+      target_type: WALLET
+      evidence_class: RAW_ONCHAIN
+      allowed_confidence: [DIRECT]
+    - id: RAW_COMMON_TRANSACTION_SIGNER
+      source_type: WALLET
+      target_type: TRANSACTION
+      evidence_class: RAW_ONCHAIN
+      allowed_confidence: [DIRECT]
+    - id: RAW_SAME_BUNDLE_MEMBERSHIP
+      source_type: TRANSACTION
+      target_type: ENTITY_CANDIDATE
+      evidence_class: RAW_ONCHAIN
+      allowed_confidence: [DIRECT]
+    - id: DERIVED_SHARED_IMMEDIATE_FUNDER
+      source_type: WALLET
+      target_type: WALLET
+      evidence_class: DERIVED_ADJUSTED
+      allowed_confidence: [CORROBORATED, INFERRED]
+    - id: VENDOR_BUNDLE_LABEL
+      source_type: WALLET
+      target_type: ENTITY_CANDIDATE
+      evidence_class: VENDOR_LABEL
+      allowed_confidence: [VENDOR_ONLY]
+    - id: PROJECT_ENTITY_MEMBERSHIP_CANDIDATE
+      source_type: WALLET
+      target_type: ENTITY_CANDIDATE
+      evidence_class: PROJECT_INFERENCE
+      allowed_confidence: [CORROBORATED, INFERRED, UNKNOWN]
+  semantic_guards:
+    immediate_funder_is_ultimate_funder: false
+    mint_creator_is_beneficial_owner: false
+    common_signer_is_common_owner: false
+    bundle_label_is_common_owner: false
+    missing_evidence_representation: NOT_TESTABLE
+
+confidence_contract:
+  ordered_classes:
+    - DIRECT
+    - CORROBORATED
+    - INFERRED
+    - VENDOR_ONLY
+    - UNKNOWN
+  direct_requires_exact_raw_event: true
+  direct_allowed_for_raw_edges_only: true
+  corroborated_minimum_independent_raw_edge_families: 2
+  duplicate_providers_same_event_are_independent: false
+  unresolved_conflict_allows_corroborated: false
+  vendor_only_can_merge_exclude_veto_or_trade: false
+  unknown_can_merge_exclude_veto_or_trade: false
+
+point_in_time_contract:
+  required_timestamps:
+    - event_at
+    - observed_at
+    - first_reliable_available_at
+    - available_to_strategy_at
+    - ingested_at
+  derived_availability_rule: MAX_OF_ALL_REQUIRED_INPUT_AVAILABILITY
+  event_time_proxy_requires_quality_flag: true
+  future_labels_allowed: false
+  strategy_outcomes_allowed: false
+  pnl_or_netreturn_allowed: false
+  r3_allowed: false
+  revisions_append_only: true
+  overwrite_raw_observations: false
+  conflict_set_required_on_disagreement: true
+
+exclusion_contract:
+  raw_and_adjusted_are_separate_durable_fields: true
+  raw_overwrite_allowed: false
+  adjusted_requires_complete_inventory: true
+  adjusted_requires_direct_or_corroborated_evidence: true
+  roles:
+    - PROGRAM_OR_POOL
+    - BURN
+    - LOCKER_OR_ESCROW
+    - TREASURY
+    - MARKET_MAKER_OR_EXCHANGE
+    - UNRESOLVED
+  unresolved_is_excluded: false
+  vendor_only_can_exclude: false
+  common_funder_alone_can_exclude: false
+  common_signer_alone_can_exclude: false
+  bundle_label_alone_can_exclude: false
+  entity_candidate_alone_can_exclude: false
+  retained_fields:
+    - exclusion_inventory
+    - evidence_refs
+    - rule_version
+    - raw_metric
+    - adjusted_metric
+    - unresolved_count
+
+false_positive_audit:
+  audit_unit: PREDICTED_MEMBERSHIP_CLAIM
+  identity_fields:
+    - wallet_id
+    - candidate_id
+    - membership_edge_id
+    - revision_number
+  frozen_before_graph_value_read: true
+  seed: TASK24_FALSE_POSITIVE_AUDIT_V1
+  selection_key: SHA256(seed|stratum|candidate_id|membership_edge_id|revision_number)
+  within_stratum_selection: LOWEST_HASHES
+  target_sample_size: 24
+  strata:
+    - id: CORROBORATED_POSITIVE
+      target: 8
+    - id: INFERRED_OR_VENDOR_POSITIVE
+      target: 8
+    - id: NEGATIVE_CONTROL_OR_AMBIGUOUS
+      target: 8
+  undersized_stratum_rule: USE_ALL_WITHOUT_CROSS_STRATUM_SUBSTITUTION
+  minimum_reviewed_predicted_positive: 12
+  reviewer_blinding:
+    - STRATEGY_IDENTITY
+    - ENTRY_EXIT_DECISIONS
+    - OUTCOME
+    - PNL
+    - NETRETURN
+    - R3_MEMBERSHIP
+    - FUTURE_VENDOR_LABELS
+  allowed_judgments:
+    - SUPPORTED
+    - REJECTED_FALSE_POSITIVE
+    - AMBIGUOUS
+    - NOT_TESTABLE
+  acceptance:
+    all_reviewed_claims_traceable: true
+    max_critical_violations: 0
+    max_false_positive_count: 1
+    max_ambiguous_share: 0.25
+    systematic_false_positive_mechanism_unresolved: false
+    report_wilson_95_interval: true
+  critical_violations:
+    - DESTRUCTIVE_MERGE
+    - HIDDEN_EVIDENCE_PROMOTION
+    - FORBIDDEN_FUTURE_OR_OUTCOME_INPUT
+    - EXCLUSION_FROM_VENDOR_ONLY_OR_INFERRED_EVIDENCE
+  tune_on_validation_sample: false
+  changed_rule_requires_new_version_and_sample_epoch: true
+
+future_outputs:
+  materialized_in_a2: false
+  names:
+    - entity_nodes_v1
+    - entity_edges_v1
+    - entity_candidates_v1
+    - entity_adjusted_concentration_v1
+    - entity_false_positive_audit_v1
+  consumers:
+    - TASK-24
+    - TASK-25
+    - TASK-29
+
+authority:
+  local_declared_write_set: true
+  offline_validation: true
+  provider_api_rpc_wss_calls: false
+  credential_use: false
+  dependency_changes: false
+  catalog_or_registry_mutation: false
+  r3_or_outcome_access: false
+  wallet_signer_transaction_actions: false
+  cash_spend_usd_cents: 0
+  deploy_or_release: false
+  commit: false
+  push: false
+  pull_request: false
+  merge: false
+
+next_boundary:
+  atom: T24-A3_DETERMINISTIC_ENTITY_EVIDENCE_FEASIBILITY_AND_PROJECTION_V1
+  authorized_by_a2: false
+  preconditions:
+    - EXACT_PRE_READ_MANIFEST_PASS
+    - ADMISSIBLE_LOCAL_INPUTS_AVAILABLE
+    - NO_R3_NO_OUTCOME_ASSERTION
+  stop_if_preconditions_fail:
+    - REDESIGN_DATA
+    - STOP_NO_RELIABLE_ENTITY_SIGNAL

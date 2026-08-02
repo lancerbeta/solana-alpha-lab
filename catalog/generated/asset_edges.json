@@ -423,6 +423,26 @@
       "target_asset_id": "CONTRACT-T23-BOUNDED-DIAGNOSTICS-001"
     },
     {
+      "source_asset_id": "CONFIG-T24-DATA-REDESIGN-OR-STOP-001",
+      "relation": "governed_by",
+      "target_asset_id": "DECISION-T24-DATA-REDESIGN-OR-STOP-001"
+    },
+    {
+      "source_asset_id": "CONFIG-T24-ENTITY-GRAPH-001",
+      "relation": "governed_by",
+      "target_asset_id": "CONTRACT-T24-ENTITY-GRAPH-001"
+    },
+    {
+      "source_asset_id": "CONFIG-T24-ENTITY-LINKAGE-EXTENSION-001",
+      "relation": "governed_by",
+      "target_asset_id": "CONTRACT-T24-ENTITY-GRAPH-001"
+    },
+    {
+      "source_asset_id": "CONFIG-T24-ENTITY-LINKAGE-EXTENSION-001",
+      "relation": "governed_by",
+      "target_asset_id": "DECISION-T24-ENTITY-LINKAGE-EXTENSION-001"
+    },
+    {
       "source_asset_id": "CONTRACT-T05-DATA-001",
       "relation": "depends_on",
       "target_asset_id": "ADR-MVP-STACK-002"
@@ -873,6 +893,16 @@
       "target_asset_id": "TEST-T23-BOUNDED-DIAGNOSTICS-CONTRACT-001"
     },
     {
+      "source_asset_id": "CONTRACT-T24-ENTITY-GRAPH-001",
+      "relation": "derived_from",
+      "target_asset_id": "EVIDENCE-T23-A5-CATALOG-FACTORY-FIT-001"
+    },
+    {
+      "source_asset_id": "CONTRACT-T24-ENTITY-GRAPH-001",
+      "relation": "validated_by",
+      "target_asset_id": "TEST-T24-ENTITY-GRAPH-CONTRACT-001"
+    },
+    {
       "source_asset_id": "CONTROL-T21-ACTIVE-TIME-GATE-001",
       "relation": "governed_by",
       "target_asset_id": "CONTRACT-T21-A7-ACCEPTANCE-001"
@@ -1308,6 +1338,56 @@
       "target_asset_id": "EVIDENCE-T23-A3-PROJECTION-MANIFEST-001"
     },
     {
+      "source_asset_id": "DATA-T24-ADJUSTED-CONCENTRATION-001",
+      "relation": "derived_from",
+      "target_asset_id": "EVIDENCE-T24-A5R1-PROJECTION-MANIFEST-001"
+    },
+    {
+      "source_asset_id": "DATA-T24-ADJUSTED-CONCENTRATION-001",
+      "relation": "governed_by",
+      "target_asset_id": "EVIDENCE-T24-A6-STOP-DECISION-001"
+    },
+    {
+      "source_asset_id": "DATA-T24-ADJUSTED-CONCENTRATION-001",
+      "relation": "validated_by",
+      "target_asset_id": "TEST-T24-A5R1-RECAPTURE-001"
+    },
+    {
+      "source_asset_id": "DATA-T24-ENTITY-CANDIDATES-001",
+      "relation": "derived_from",
+      "target_asset_id": "EVIDENCE-T24-A5R1-PROJECTION-MANIFEST-001"
+    },
+    {
+      "source_asset_id": "DATA-T24-ENTITY-CANDIDATES-001",
+      "relation": "governed_by",
+      "target_asset_id": "EVIDENCE-T24-A6-STOP-DECISION-001"
+    },
+    {
+      "source_asset_id": "DATA-T24-ENTITY-CANDIDATES-001",
+      "relation": "validated_by",
+      "target_asset_id": "TEST-T24-A5R1-RECAPTURE-001"
+    },
+    {
+      "source_asset_id": "DATA-T24-ENTITY-EDGES-001",
+      "relation": "derived_from",
+      "target_asset_id": "EVIDENCE-T24-A5R1-PROJECTION-MANIFEST-001"
+    },
+    {
+      "source_asset_id": "DATA-T24-ENTITY-EDGES-001",
+      "relation": "validated_by",
+      "target_asset_id": "TEST-T24-A5R1-RECAPTURE-001"
+    },
+    {
+      "source_asset_id": "DATA-T24-ENTITY-NODES-001",
+      "relation": "derived_from",
+      "target_asset_id": "EVIDENCE-T24-A5R1-PROJECTION-MANIFEST-001"
+    },
+    {
+      "source_asset_id": "DATA-T24-ENTITY-NODES-001",
+      "relation": "validated_by",
+      "target_asset_id": "TEST-T24-A5R1-RECAPTURE-001"
+    },
+    {
       "source_asset_id": "DECISION-T14-PROVIDER-PURCHASE-001",
       "relation": "derived_from",
       "target_asset_id": "EVIDENCE-T13-PILOT-AUDIT-OFFLINE-ACCEPTANCE-001"
@@ -1321,6 +1401,26 @@
       "source_asset_id": "DECISION-T14-PROVIDER-PURCHASE-001",
       "relation": "validated_by",
       "target_asset_id": "TEST-T14-PROVIDER-PURCHASE-DECISION-001"
+    },
+    {
+      "source_asset_id": "DECISION-T24-DATA-REDESIGN-OR-STOP-001",
+      "relation": "derived_from",
+      "target_asset_id": "EVIDENCE-T24-A5R1-ACCEPTANCE-001"
+    },
+    {
+      "source_asset_id": "DECISION-T24-DATA-REDESIGN-OR-STOP-001",
+      "relation": "validated_by",
+      "target_asset_id": "TEST-T24-DATA-REDESIGN-OR-STOP-001"
+    },
+    {
+      "source_asset_id": "DECISION-T24-ENTITY-LINKAGE-EXTENSION-001",
+      "relation": "derived_from",
+      "target_asset_id": "EVIDENCE-T24-A3-ACCEPTANCE-001"
+    },
+    {
+      "source_asset_id": "DECISION-T24-ENTITY-LINKAGE-EXTENSION-001",
+      "relation": "validated_by",
+      "target_asset_id": "TEST-T24-ENTITY-LINKAGE-EXTENSION-001"
     },
     {
       "source_asset_id": "ENV-WORKSTATION-001",
@@ -2021,6 +2121,146 @@
       "source_asset_id": "EVIDENCE-T23-A5-CATALOG-FACTORY-FIT-001",
       "relation": "validated_by",
       "target_asset_id": "TEST-T23-A5-CATALOG-FACTORY-FIT-001"
+    },
+    {
+      "source_asset_id": "EVIDENCE-T24-A2-ACCEPTANCE-001",
+      "relation": "depends_on",
+      "target_asset_id": "CONFIG-T24-ENTITY-GRAPH-001"
+    },
+    {
+      "source_asset_id": "EVIDENCE-T24-A2-ACCEPTANCE-001",
+      "relation": "depends_on",
+      "target_asset_id": "CONTRACT-T24-ENTITY-GRAPH-001"
+    },
+    {
+      "source_asset_id": "EVIDENCE-T24-A2-ACCEPTANCE-001",
+      "relation": "validated_by",
+      "target_asset_id": "TEST-T24-ENTITY-GRAPH-CONTRACT-001"
+    },
+    {
+      "source_asset_id": "EVIDENCE-T24-A3-ACCEPTANCE-001",
+      "relation": "depends_on",
+      "target_asset_id": "EVIDENCE-T24-A3-PROJECTION-MANIFEST-001"
+    },
+    {
+      "source_asset_id": "EVIDENCE-T24-A3-ACCEPTANCE-001",
+      "relation": "validated_by",
+      "target_asset_id": "TEST-T24-ENTITY-EVIDENCE-PROJECTION-001"
+    },
+    {
+      "source_asset_id": "EVIDENCE-T24-A3-PRE-READ-MANIFEST-001",
+      "relation": "derived_from",
+      "target_asset_id": "EVIDENCE-T24-A2-ACCEPTANCE-001"
+    },
+    {
+      "source_asset_id": "EVIDENCE-T24-A3-PROJECTION-MANIFEST-001",
+      "relation": "derived_from",
+      "target_asset_id": "EVIDENCE-T24-A3-PRE-READ-MANIFEST-001"
+    },
+    {
+      "source_asset_id": "EVIDENCE-T24-A3-PROJECTION-MANIFEST-001",
+      "relation": "superseded_by",
+      "target_asset_id": "EVIDENCE-T24-A5R1-PROJECTION-MANIFEST-001"
+    },
+    {
+      "source_asset_id": "EVIDENCE-T24-A3-PROJECTION-MANIFEST-001",
+      "relation": "validated_by",
+      "target_asset_id": "TEST-T24-ENTITY-EVIDENCE-PROJECTION-001"
+    },
+    {
+      "source_asset_id": "EVIDENCE-T24-A4-DECISION-001",
+      "relation": "depends_on",
+      "target_asset_id": "DECISION-T24-ENTITY-LINKAGE-EXTENSION-001"
+    },
+    {
+      "source_asset_id": "EVIDENCE-T24-A4-DECISION-001",
+      "relation": "validated_by",
+      "target_asset_id": "TEST-T24-ENTITY-LINKAGE-EXTENSION-001"
+    },
+    {
+      "source_asset_id": "EVIDENCE-T24-A5-CAPTURE-FAILURE-001",
+      "relation": "derived_from",
+      "target_asset_id": "EVIDENCE-T24-A4-DECISION-001"
+    },
+    {
+      "source_asset_id": "EVIDENCE-T24-A5-CAPTURE-FAILURE-001",
+      "relation": "superseded_by",
+      "target_asset_id": "EVIDENCE-T24-A5R1-ACCEPTANCE-001"
+    },
+    {
+      "source_asset_id": "EVIDENCE-T24-A5-QUARANTINED-PROJECTION-001",
+      "relation": "derived_from",
+      "target_asset_id": "EVIDENCE-T24-A5-CAPTURE-FAILURE-001"
+    },
+    {
+      "source_asset_id": "EVIDENCE-T24-A5-QUARANTINED-PROJECTION-001",
+      "relation": "superseded_by",
+      "target_asset_id": "EVIDENCE-T24-A5R1-PROJECTION-MANIFEST-001"
+    },
+    {
+      "source_asset_id": "EVIDENCE-T24-A5R1-ACCEPTANCE-001",
+      "relation": "depends_on",
+      "target_asset_id": "EVIDENCE-T24-A5R1-PROJECTION-MANIFEST-001"
+    },
+    {
+      "source_asset_id": "EVIDENCE-T24-A5R1-ACCEPTANCE-001",
+      "relation": "derived_from",
+      "target_asset_id": "EVIDENCE-T24-A5-CAPTURE-FAILURE-001"
+    },
+    {
+      "source_asset_id": "EVIDENCE-T24-A5R1-ACCEPTANCE-001",
+      "relation": "validated_by",
+      "target_asset_id": "TEST-T24-A5R1-RECAPTURE-001"
+    },
+    {
+      "source_asset_id": "EVIDENCE-T24-A5R1-PREFLIGHT-001",
+      "relation": "derived_from",
+      "target_asset_id": "EVIDENCE-T24-A5-CAPTURE-FAILURE-001"
+    },
+    {
+      "source_asset_id": "EVIDENCE-T24-A5R1-PREFLIGHT-001",
+      "relation": "governed_by",
+      "target_asset_id": "CONFIG-T24-ENTITY-LINKAGE-EXTENSION-001"
+    },
+    {
+      "source_asset_id": "EVIDENCE-T24-A5R1-PROJECTION-MANIFEST-001",
+      "relation": "derived_from",
+      "target_asset_id": "EVIDENCE-T24-A5R1-PREFLIGHT-001"
+    },
+    {
+      "source_asset_id": "EVIDENCE-T24-A5R1-PROJECTION-MANIFEST-001",
+      "relation": "validated_by",
+      "target_asset_id": "TEST-T24-A5R1-RECAPTURE-001"
+    },
+    {
+      "source_asset_id": "EVIDENCE-T24-A6-STOP-DECISION-001",
+      "relation": "depends_on",
+      "target_asset_id": "DECISION-T24-DATA-REDESIGN-OR-STOP-001"
+    },
+    {
+      "source_asset_id": "EVIDENCE-T24-A6-STOP-DECISION-001",
+      "relation": "depends_on",
+      "target_asset_id": "EVIDENCE-T24-A5R1-ACCEPTANCE-001"
+    },
+    {
+      "source_asset_id": "EVIDENCE-T24-A6-STOP-DECISION-001",
+      "relation": "validated_by",
+      "target_asset_id": "TEST-T24-DATA-REDESIGN-OR-STOP-001"
+    },
+    {
+      "source_asset_id": "EVIDENCE-T24-A7-CATALOG-FACTORY-FIT-001",
+      "relation": "depends_on",
+      "target_asset_id": "REGISTRY-DECISIONS-NEGATIVE-RESULTS-001"
+    },
+    {
+      "source_asset_id": "EVIDENCE-T24-A7-CATALOG-FACTORY-FIT-001",
+      "relation": "derived_from",
+      "target_asset_id": "EVIDENCE-T24-A6-STOP-DECISION-001"
+    },
+    {
+      "source_asset_id": "EVIDENCE-T24-A7-CATALOG-FACTORY-FIT-001",
+      "relation": "validated_by",
+      "target_asset_id": "TEST-T24-A7-CATALOG-FACTORY-FIT-001"
     },
     {
       "source_asset_id": "FIXTURE-BATON-SUITE-001",
@@ -3066,6 +3306,56 @@
       "source_asset_id": "MODULE-T23-BOUNDED-ANALYSIS-001",
       "relation": "validated_by",
       "target_asset_id": "TEST-T23-BOUNDED-ANALYSIS-001"
+    },
+    {
+      "source_asset_id": "MODULE-T24-ENTITY-EVIDENCE-PROJECTION-001",
+      "relation": "governed_by",
+      "target_asset_id": "CONFIG-T24-ENTITY-GRAPH-001"
+    },
+    {
+      "source_asset_id": "MODULE-T24-ENTITY-EVIDENCE-PROJECTION-001",
+      "relation": "produces",
+      "target_asset_id": "EVIDENCE-T24-A3-PROJECTION-MANIFEST-001"
+    },
+    {
+      "source_asset_id": "MODULE-T24-ENTITY-EVIDENCE-PROJECTION-001",
+      "relation": "validated_by",
+      "target_asset_id": "TEST-T24-ENTITY-EVIDENCE-PROJECTION-001"
+    },
+    {
+      "source_asset_id": "MODULE-T24-ENTITY-LINKAGE-CAPTURE-001",
+      "relation": "evidenced_by",
+      "target_asset_id": "EVIDENCE-T24-A5R1-ACCEPTANCE-001"
+    },
+    {
+      "source_asset_id": "MODULE-T24-ENTITY-LINKAGE-CAPTURE-001",
+      "relation": "governed_by",
+      "target_asset_id": "CONFIG-T24-ENTITY-LINKAGE-EXTENSION-001"
+    },
+    {
+      "source_asset_id": "MODULE-T24-ENTITY-LINKAGE-CAPTURE-001",
+      "relation": "validated_by",
+      "target_asset_id": "TEST-T24-ENTITY-LINKAGE-CAPTURE-001"
+    },
+    {
+      "source_asset_id": "MODULE-T24-ENTITY-LINKAGE-PROJECTION-001",
+      "relation": "consumes",
+      "target_asset_id": "EVIDENCE-T24-A5R1-PREFLIGHT-001"
+    },
+    {
+      "source_asset_id": "MODULE-T24-ENTITY-LINKAGE-PROJECTION-001",
+      "relation": "governed_by",
+      "target_asset_id": "CONFIG-T24-ENTITY-LINKAGE-EXTENSION-001"
+    },
+    {
+      "source_asset_id": "MODULE-T24-ENTITY-LINKAGE-PROJECTION-001",
+      "relation": "produces",
+      "target_asset_id": "EVIDENCE-T24-A5R1-PROJECTION-MANIFEST-001"
+    },
+    {
+      "source_asset_id": "MODULE-T24-ENTITY-LINKAGE-PROJECTION-001",
+      "relation": "validated_by",
+      "target_asset_id": "TEST-T24-ENTITY-LINKAGE-PROJECTION-001"
     },
     {
       "source_asset_id": "PRE-GIT-TASK01-A017",
@@ -4931,6 +5221,96 @@
       "source_asset_id": "TEST-T23-DIAGNOSTIC-PROJECTION-001",
       "relation": "depends_on",
       "target_asset_id": "EVIDENCE-T23-A3-PROJECTION-MANIFEST-001"
+    },
+    {
+      "source_asset_id": "TEST-T24-A5R1-RECAPTURE-001",
+      "relation": "depends_on",
+      "target_asset_id": "EVIDENCE-T24-A5R1-PREFLIGHT-001"
+    },
+    {
+      "source_asset_id": "TEST-T24-A5R1-RECAPTURE-001",
+      "relation": "depends_on",
+      "target_asset_id": "MODULE-T24-ENTITY-LINKAGE-CAPTURE-001"
+    },
+    {
+      "source_asset_id": "TEST-T24-A5R1-RECAPTURE-001",
+      "relation": "depends_on",
+      "target_asset_id": "MODULE-T24-ENTITY-LINKAGE-PROJECTION-001"
+    },
+    {
+      "source_asset_id": "TEST-T24-A7-CATALOG-FACTORY-FIT-001",
+      "relation": "depends_on",
+      "target_asset_id": "CATALOG-ROOT-001"
+    },
+    {
+      "source_asset_id": "TEST-T24-A7-CATALOG-FACTORY-FIT-001",
+      "relation": "depends_on",
+      "target_asset_id": "EVIDENCE-T24-A7-CATALOG-FACTORY-FIT-001"
+    },
+    {
+      "source_asset_id": "TEST-T24-A7-CATALOG-FACTORY-FIT-001",
+      "relation": "depends_on",
+      "target_asset_id": "TEST-T24-DATA-REDESIGN-OR-STOP-001"
+    },
+    {
+      "source_asset_id": "TEST-T24-DATA-REDESIGN-OR-STOP-001",
+      "relation": "depends_on",
+      "target_asset_id": "CONFIG-T24-DATA-REDESIGN-OR-STOP-001"
+    },
+    {
+      "source_asset_id": "TEST-T24-DATA-REDESIGN-OR-STOP-001",
+      "relation": "depends_on",
+      "target_asset_id": "DECISION-T24-DATA-REDESIGN-OR-STOP-001"
+    },
+    {
+      "source_asset_id": "TEST-T24-ENTITY-EVIDENCE-PROJECTION-001",
+      "relation": "depends_on",
+      "target_asset_id": "EVIDENCE-T24-A2-ACCEPTANCE-001"
+    },
+    {
+      "source_asset_id": "TEST-T24-ENTITY-EVIDENCE-PROJECTION-001",
+      "relation": "depends_on",
+      "target_asset_id": "MODULE-T24-ENTITY-EVIDENCE-PROJECTION-001"
+    },
+    {
+      "source_asset_id": "TEST-T24-ENTITY-GRAPH-CONTRACT-001",
+      "relation": "depends_on",
+      "target_asset_id": "CONFIG-T24-ENTITY-GRAPH-001"
+    },
+    {
+      "source_asset_id": "TEST-T24-ENTITY-GRAPH-CONTRACT-001",
+      "relation": "depends_on",
+      "target_asset_id": "CONTRACT-T24-ENTITY-GRAPH-001"
+    },
+    {
+      "source_asset_id": "TEST-T24-ENTITY-LINKAGE-CAPTURE-001",
+      "relation": "depends_on",
+      "target_asset_id": "CONFIG-T24-ENTITY-LINKAGE-EXTENSION-001"
+    },
+    {
+      "source_asset_id": "TEST-T24-ENTITY-LINKAGE-CAPTURE-001",
+      "relation": "depends_on",
+      "target_asset_id": "MODULE-T24-ENTITY-LINKAGE-CAPTURE-001"
+    },
+    {
+      "source_asset_id": "TEST-T24-ENTITY-LINKAGE-EXTENSION-001",
+      "relation": "depends_on",
+      "target_asset_id": "CONFIG-T24-ENTITY-LINKAGE-EXTENSION-001"
+    },
+    {
+      "source_asset_id": "TEST-T24-ENTITY-LINKAGE-EXTENSION-001",
+      "relation": "depends_on",
+      "target_asset_id": "DECISION-T24-ENTITY-LINKAGE-EXTENSION-001"
+    },
+    {
+      "source_asset_id": "TEST-T24-ENTITY-LINKAGE-PROJECTION-001",
+      "relation": "depends_on",
+      "target_asset_id": "MODULE-T24-ENTITY-LINKAGE-PROJECTION-001"
+    },
+    {
+      "source_asset_id": "TEST-T24-ENTITY-LINKAGE-PROJECTION-001",
+      "relation": "depends_on",
+      "target_asset_id": "TEST-T24-ENTITY-LINKAGE-CAPTURE-001"
     },
     {
       "source_asset_id": "VALIDATOR-REPOSITORY-STATE-001",

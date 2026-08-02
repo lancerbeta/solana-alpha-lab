@@ -1,0 +1,292 @@
+{
+  "receipt_id": "T24-A5-BOUNDED-RAW-HISTORY-FEASIBILITY-CAPTURE-001",
+  "schema_version": "1.0",
+  "task_id": "TASK-24",
+  "atom": "T24-A5_BOUNDED_RAW_HISTORY_FEASIBILITY_CAPTURE_V1",
+  "as_of": "2026-08-02",
+  "status": "FAIL_CURRENT_RUN_EXACT_WIRE_RETENTION_CONTRACT",
+  "owner_decision": "RECAPTURE_EXACT_WIRE_OR_STOP",
+  "provisional_structure_decision": "REDESIGN_DATA_NON_ADMISSIBLE",
+  "entry_gate": {
+    "verdict": "START_AS_WRITTEN",
+    "route_owner": "LOCAL_WORK_PRIMARY",
+    "execution_route": "LOCAL_WORK_CODEX",
+    "accepted_main_commit": "31c01640499be6b7e86a2fe638d9217c202861cc",
+    "accepted_main_tree": "6677878eb2b8195018ab217c6a9a429de5726563",
+    "branch": "task24/entity-graph-contract",
+    "active_time_gates": 0,
+    "reasoning": "VERY_HIGH_SUFFICIENT",
+    "mode_switch": "NONE"
+  },
+  "frozen_input_bindings": {
+    "a4_config": {
+      "path": "configs/task24_entity_linkage_evidence_extension_v1.yaml",
+      "sha256": "2db333e179ecc54cced41128b5a8c97825fc970d46af66be8660db9ee963791b"
+    },
+    "a4_receipt": {
+      "path": "docs/evidence/task24/a4_bounded_entity_linkage_evidence_extension_decision_v1.json",
+      "sha256": "7169c2894929d8e5571635b11b75cb4ec7dbd89a543d164d54f8fab552504f1e"
+    },
+    "a3_pre_read_manifest": {
+      "path": "docs/evidence/task24/a3_entity_evidence_pre_read_manifest_v1.json",
+      "sha256": "f889c0f28d3259cc61681ba6cc56dc53686d2375ce98826ca572dc5d5720846d"
+    },
+    "a3_nodes": {
+      "path": "docs/evidence/task24/a3_projection_v1/entity_nodes_v1.jsonl",
+      "sha256": "fdb169bd3f639c42b350de5eae41fc280061f5682fb3ea2605fcad2408ff3af7"
+    },
+    "a3_edges": {
+      "path": "docs/evidence/task24/a3_projection_v1/entity_edges_v1.jsonl",
+      "sha256": "fa19151a85d43783c37f6d0d99101baeaf2c755e4fe9536792872451af3d39c4"
+    },
+    "a3_adjusted_concentration": {
+      "path": "docs/evidence/task24/a3_projection_v1/entity_adjusted_concentration_v1.json",
+      "sha256": "644b148f17fe437118196dabdb4185886117086aab1fe1b77f7965621a06f4ad"
+    },
+    "population_fingerprint_sha256": "c513e589184c0d774a23ed00c94daf87a19518e9a3f02374349697d5ad8ef1f0"
+  },
+  "capture_execution": {
+    "provider": "HELIUS",
+    "method": "getTransactionsForAddress",
+    "run_id": "t24a5-20260802T081138Z",
+    "raw_logical_root": "data/raw/task24_entity_linkage_history_v1/run=t24a5-20260802T081138Z",
+    "raw_root_git_ignored": true,
+    "raw_receipt": {
+      "path": "data/raw/task24_entity_linkage_history_v1/run=t24a5-20260802T081138Z/receipts/capture.receipt.json",
+      "sha256": "512d0cc6687229d0e68d887ea85afeb96f636f23aa48f48358a676d4bfce593a",
+      "bytes": 29496
+    },
+    "terminal": "RAW_HISTORY_CAPTURED_REQUIRES_PROJECTION",
+    "admissibility": "FAIL_EXACT_RAW_RESPONSE_BYTES_NOT_RETAINED",
+    "canonical_redacted_full_json_retained": true,
+    "original_wire_sha256_retained": true,
+    "original_wire_bytes_retained": false,
+    "population": {
+      "token_mints": 1,
+      "wallets": 20,
+      "total_subjects": 21
+    },
+    "provider_calls": 21,
+    "planned_calls": 21,
+    "successful_http_200_responses": 21,
+    "provider_credits_modeled": 210,
+    "cash_spend_usd_cents": 0,
+    "retries": 0,
+    "pagination_requests": 0,
+    "fallback_provider_calls": 0,
+    "response_pages": 21,
+    "transactions_returned": 1939,
+    "unique_transactions": 1936,
+    "duplicate_transaction_payload_conflicts": 0,
+    "received_bytes": 21386958,
+    "stored_partition_bytes": 21553474,
+    "stored_receipt_bytes": 29496,
+    "stored_bytes_total_computed": 21582970,
+    "truncated_subjects": 21,
+    "history_completeness": "BOUNDED_OLDEST_100_WINDOW_COMPLETE_ACCOUNT_HISTORY_TRUNCATED",
+    "raw_partition_file_and_content_hashes_verified": 21,
+    "oldest_first_slot_transaction_index_order_violations": 0
+  },
+  "secret_and_privacy_receipt": {
+    "credential_input_mode": "LOCAL_INTERACTIVE_HIDDEN_INPUT",
+    "dashboard_credit_readback_completed": true,
+    "credential_supplied_once": true,
+    "credential_bearing_provider_calls": 21,
+    "credential_persisted": false,
+    "credential_printed": false,
+    "credential_values_exposed": 0,
+    "raw_public_addresses_in_tracked_outputs": 0,
+    "raw_transaction_signatures_in_tracked_outputs": 0,
+    "tracked_identity_mode": "STABLE_SHA256_PSEUDONYMS",
+    "repository_secret_scan": "PASS"
+  },
+  "projection_result": {
+    "status": "QUARANTINED_CAPTURE_RETENTION_CONTRACT_FAILED",
+    "nodes": 78,
+    "edges": 65,
+    "raw_immediate_funder_edges": 18,
+    "immediate_funder_absent": 2,
+    "immediate_funder_ambiguous": 0,
+    "raw_common_transaction_signer_edges": 0,
+    "raw_mint_created_by_wallet_edges": 1,
+    "derived_shared_immediate_funder_edges": 2,
+    "entity_candidates": 2,
+    "membership_claims": 4,
+    "corroborated_positive_claims": 0,
+    "inferred_or_vendor_positive_claims": 4,
+    "capacity_formula": "MIN(CORROBORATED_COUNT,8)+MIN(INFERRED_OR_VENDOR_COUNT,8)",
+    "selected_predicted_positive_capacity": 4,
+    "minimum_required_to_open_false_positive_audit": 12,
+    "capacity_shortfall": 8,
+    "false_positive_audit": "NOT_TESTABLE_CAPTURE_RETENTION_CONTRACT_FAILED",
+    "manual_labels_opened": 0,
+    "mint_creator_status": "DIRECT_IMMEDIATE_CREATOR_ROLE_PROJECTED_NOT_BENEFICIAL_OWNERSHIP",
+    "adjusted_concentration": "UNCHANGED_NOT_AVAILABLE_EXCLUSION_INVENTORY_INCOMPLETE",
+    "holder_exclusions_changed": 0
+  },
+  "artifact_bindings": {
+    "capture_preflight": {
+      "path": "docs/evidence/task24/a5_raw_history_capture_preflight_v1.json",
+      "sha256": "0493f62c9c91b38d483cac40abb25f585c0de316eec894e02309d62377866468",
+      "bytes": 6308
+    },
+    "capture_module": {
+      "path": "src/solana_alpha_lab/task24_entity_linkage_capture.py",
+      "sha256": "3a53da7dcc459e9fd0bb499f57c91282f03b779587fbe75fe546cb917ab1e804",
+      "bytes": 32713,
+      "role": "A5R1_REPAIR_IMPLEMENTATION_NOT_EXECUTED"
+    },
+    "capture_launcher": {
+      "path": "scripts/run_task24_entity_linkage_capture.py",
+      "sha256": "5e4dd4e48d93f69ff106905bdea7aff952c2dc2947cb6e609bac251ea9016b53",
+      "bytes": 4618,
+      "role": "A5R1_REPAIR_IMPLEMENTATION_NOT_EXECUTED"
+    },
+    "capture_tests": {
+      "path": "tests/test_task24_entity_linkage_capture.py",
+      "sha256": "20f1eb41ad287534f002605e89549b4f491407fee8eb42c8529d5013bb00245f",
+      "bytes": 17668,
+      "role": "A5R1_REPAIR_VALIDATION"
+    },
+    "projection_module": {
+      "path": "src/solana_alpha_lab/task24_entity_linkage_projection.py",
+      "sha256": "17076f656225dce6e8e64d627ccf73447a592d7ab2b0fc5431cae5dd09b7a7a5",
+      "bytes": 47190
+    },
+    "projection_launcher": {
+      "path": "scripts/build_task24_entity_linkage_projection.py",
+      "sha256": "583f9eb5a7fac6ca9e86b8a6b25a7b253a65ce6eca204a92d1712666378965f5",
+      "bytes": 1138
+    },
+    "projection_tests": {
+      "path": "tests/test_task24_entity_linkage_projection.py",
+      "sha256": "e88e69fd30557c1e85c7333daca89f8309c105a0fa13868d19988c85f1fd195e",
+      "bytes": 15296
+    },
+    "entity_nodes": {
+      "path": "docs/evidence/task24/a5_projection_v1/entity_nodes_v1.jsonl",
+      "sha256": "acf5fc59baf1c6b7c90df78274cee6716bb9607a9965a322523292be4a17fa32",
+      "bytes": 61586,
+      "rows": 78
+    },
+    "entity_edges": {
+      "path": "docs/evidence/task24/a5_projection_v1/entity_edges_v1.jsonl",
+      "sha256": "020411c32a06f19f98ba60ac3940e34d5ef0925c52096070cc7294ee6cbab095",
+      "bytes": 85900,
+      "rows": 65
+    },
+    "entity_candidates": {
+      "path": "docs/evidence/task24/a5_projection_v1/entity_candidates_v1.json",
+      "sha256": "8fc6f5fca446191b56ad30cf4e68f4c5df3f9708f94f4d7f18a55517a74f872f",
+      "bytes": 3552,
+      "rows": 2
+    },
+    "adjusted_concentration": {
+      "path": "docs/evidence/task24/a5_projection_v1/entity_adjusted_concentration_v1.json",
+      "sha256": "644b148f17fe437118196dabdb4185886117086aab1fe1b77f7965621a06f4ad",
+      "bytes": 323,
+      "rows": 1
+    },
+    "projection_manifest": {
+      "path": "docs/evidence/task24/a5_projection_v1/projection_manifest_v1.json",
+      "sha256": "64d58868c96da4d560f0a12f63010343a19c1d6df6674c3a5857c1b7738e1825",
+      "bytes": 5960,
+      "rows": 1
+    }
+  },
+  "validation": {
+    "status": "PASS_REPAIR_TESTS_FAIL_CURRENT_EXECUTION",
+    "targeted_command": "uv run --locked --managed-python python -B -m unittest tests.test_task24_entity_linkage_capture tests.test_task24_entity_linkage_projection",
+    "targeted_tests_passed": 29,
+    "targeted_failures": 0,
+    "targeted_errors": 0,
+    "adjacent_compatibility_command": "uv run --locked --managed-python python -B -m unittest tests.test_task05_schema_contract tests.test_task11_entity_inputs tests.test_task11_entity_input_replay tests.test_task11_entity_input_transport tests.test_task23_bounded_diagnostics_contract tests.test_task24_entity_graph_contract tests.test_task24_entity_evidence_projection tests.test_task24_entity_linkage_evidence_extension_decision tests.test_task24_entity_linkage_capture tests.test_task24_entity_linkage_projection",
+    "adjacent_compatibility_tests_passed": 138,
+    "adjacent_compatibility_failures": 0,
+    "adjacent_compatibility_errors": 0,
+    "legacy_capture_rejected_by_repaired_projector": "PASS_EXACT_WIRE_RESPONSE_NOT_RETAINED",
+    "exact_wire_dual_retention_repair_unit_test": "PASS_NOT_EXTERNALLY_EXECUTED",
+    "raw_wire_and_canonical_envelope_hash_domains_separated": "FAIL_CURRENT_RUN_PASS_REPAIR_GUARD",
+    "zero_lamport_system_transfer_is_non_evidence": "PASS",
+    "provider_parsed_instruction_rejected": "PASS",
+    "raw_addresses_and_signatures_absent_from_tracked_projection": "PASS",
+    "file_hygiene": "PASS_NO_BOM_NO_CRLF_FINAL_LF",
+    "secret_scan": "PASS",
+    "full_repository_gate": "DEFERRED_TO_DELIVERY_OR_TASK_FINALIZATION"
+  },
+  "factory_fit_checkpoint": {
+    "status": "FAIL_CURRENT_RUN_PASS_REPAIR_IMPLEMENTATION_NOT_EXECUTED",
+    "review_depth": "FULL_REVIEW_ATOM_LEVEL",
+    "mission": "The probe cheaply tested whether the frozen entity population can support the required false-positive audit without inventing ownership or alpha claims.",
+    "flexibility": "Raw transport, deterministic parser, reversible project inference and audit selection remain separate versioned layers.",
+    "compatibility_history": "A3 pseudonyms and base graph are retained; adjusted concentration remains byte-identical. The A5 projection is quarantined rather than promoted.",
+    "efficiency": "Execution stopped at the authorized 21 calls and 210 modeled existing credits with no pagination, retry, fallback or cash spend.",
+    "research_truth": "Only explicit native transfers and required signers from compiled on-chain instructions are raw evidence; shared funder remains inferred and same-event evidence is not double-counted.",
+    "owner_operability": "The outcome is a binary REDESIGN_DATA decision with a measured 4-of-12 capacity and an eight-claim shortfall.",
+    "execution_to_cashflow": "No strategy, execution, PnL, NetReturn or owner-cashflow claim is made.",
+    "monitoring_recovery": "The current run retains full canonical JSON, original wire hashes, 21 partition hashes and truncation flags, but cannot reproduce the exact original provider bytes. The repaired sink stores both domains on future runs.",
+    "build_vs_buy": "ADOPT the provider's bounded history transport and WRAP it with project-owned compiled-instruction parsing; no additional provider or package is justified in A5.",
+    "red_team": "A4 exact-wire retention failed despite green semantic tests. The projector now rejects such legacy captures; all account histories are also visibly truncated at the frozen oldest-100 window.",
+    "full_pre_done_review": "REQUIRED_LATER"
+  },
+  "non_claims": [
+    "ADMISSIBLE_A5_CAPTURE",
+    "EXACT_ORIGINAL_PROVIDER_WIRE_BYTES_RETAINED",
+    "FULL_ACCOUNT_HISTORY",
+    "BENEFICIAL_OWNERSHIP",
+    "ULTIMATE_FUNDER",
+    "AUTHORITATIVE_BUNDLE_MEMBERSHIP",
+    "HOLDER_EXCLUSION_OR_STRATEGY_VETO",
+    "FALSE_POSITIVE_RATE",
+    "ALPHA_OR_GENERALIZATION",
+    "EXECUTION_PNL_NETRETURN_OR_CASHFLOW",
+    "TASK24_DONE"
+  ],
+  "managed_write_set": [
+    "src/solana_alpha_lab/task24_entity_linkage_capture.py",
+    "scripts/run_task24_entity_linkage_capture.py",
+    "tests/test_task24_entity_linkage_capture.py",
+    "docs/evidence/task24/a5_raw_history_capture_preflight_v1.json",
+    "src/solana_alpha_lab/task24_entity_linkage_projection.py",
+    "scripts/build_task24_entity_linkage_projection.py",
+    "tests/test_task24_entity_linkage_projection.py",
+    "docs/evidence/task24/a5_projection_v1/entity_nodes_v1.jsonl",
+    "docs/evidence/task24/a5_projection_v1/entity_edges_v1.jsonl",
+    "docs/evidence/task24/a5_projection_v1/entity_candidates_v1.json",
+    "docs/evidence/task24/a5_projection_v1/entity_adjusted_concentration_v1.json",
+    "docs/evidence/task24/a5_projection_v1/projection_manifest_v1.json",
+    "docs/evidence/task24/a5_bounded_raw_history_feasibility_capture_v1.json"
+  ],
+  "authority": {
+    "provider_api_rpc_calls": 21,
+    "provider_credits_modeled": 210,
+    "credential_values_exposed": 0,
+    "dependency_changes": 0,
+    "catalog_or_registry_mutations": 0,
+    "r3_or_outcome_reads": 0,
+    "wallet_signer_transaction_actions": 0,
+    "cash_spend_usd_cents": 0,
+    "deploy_release_actions": 0,
+    "commit": false,
+    "push": false,
+    "pull_request": false,
+    "merge": false
+  },
+  "state_change": {
+    "task24": "IN_PROGRESS",
+    "atom_a5": "IMPLEMENTED_UNVERIFIED",
+    "canonical_task24_done": false,
+    "false_positive_audit_opened": false,
+    "a5_projection": "QUARANTINED",
+    "catalog_registration": "DEFERRED_TO_TASK24_FINALIZATION"
+  },
+  "next_boundary": {
+    "atom": "T24-A5R1_EXACT_WIRE_RETENTION_RECAPTURE_V1",
+    "authorized": false,
+    "reason": "A4 required exact provider response bytes. The current run retained full canonical JSON and original wire hashes but not the original wire byte sequences; the repaired dual-retention sink has not been externally executed.",
+    "must_decide_before_any_new_external_call": [
+      "AUTHORIZE_EXACTLY_21_REPLACEMENT_CALLS_AND_AT_MOST_210_EXISTING_CREDITS_WITH_ZERO_CASH_SPEND",
+      "STOP_AND_RETAIN_CURRENT_RUN_AS_NON_ADMISSIBLE_DIAGNOSTIC_ONLY"
+    ]
+  }
+}

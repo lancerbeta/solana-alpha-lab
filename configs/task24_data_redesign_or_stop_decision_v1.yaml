@@ -1,0 +1,186 @@
+schema_version: "1.0"
+decision_id: T24-DATA-REDESIGN-OR-STOP-DECISION-001
+task_id: TASK-24
+atom: T24-A6_BOUNDED_DATA_REDESIGN_OR_STOP_DECISION_V1
+status: VALIDATED_STOP_DECISION_ONLY
+as_of: "2026-08-02"
+owner_decision: STOP_NO_RELIABLE_ENTITY_SIGNAL
+
+entry_gate:
+  verdict: START_AS_WRITTEN
+  route_owner: LOCAL_WORK_PRIMARY
+  execution_route: LOCAL_WORK_CODEX
+  accepted_main_commit: 31c01640499be6b7e86a2fe638d9217c202861cc
+  accepted_main_tree: 6677878eb2b8195018ab217c6a9a429de5726563
+  branch: task24/entity-graph-contract
+  active_time_gates: 0
+  reasoning: VERY_HIGH_SUFFICIENT
+  mode_switch: NONE
+
+managed_write_set:
+  - docs/decisions/task24_data_redesign_or_stop_decision_v1.md
+  - configs/task24_data_redesign_or_stop_decision_v1.yaml
+  - tests/test_task24_data_redesign_or_stop_decision.py
+  - docs/evidence/task24/a6_bounded_data_redesign_or_stop_decision_v1.json
+
+frozen_inputs:
+  a2_contract:
+    path: docs/contracts/task24_entity_graph_and_false_positive_contract_v1.md
+    sha256: 14614796dfc17aeef907e6b1d863814cbfb52e8f188704b70f17d99a78b862a8
+  a2_config:
+    path: configs/task24_entity_graph_v1.yaml
+    sha256: a294d9c8507777581bec8217f4127e16a76788b243250a1eb57e6bff9b69ed25
+  a4_decision:
+    path: docs/decisions/task24_entity_linkage_evidence_extension_decision_v1.md
+    sha256: a13523b86272c39976ab6a11a0332180cced51fde54c185a381e0034ec416fda
+  a4_config:
+    path: configs/task24_entity_linkage_evidence_extension_v1.yaml
+    sha256: 2db333e179ecc54cced41128b5a8c97825fc970d46af66be8660db9ee963791b
+  a4_receipt:
+    path: docs/evidence/task24/a4_bounded_entity_linkage_evidence_extension_decision_v1.json
+    sha256: 7169c2894929d8e5571635b11b75cb4ec7dbd89a543d164d54f8fab552504f1e
+  a5_receipt:
+    path: docs/evidence/task24/a5_bounded_raw_history_feasibility_capture_v1.json
+    sha256: d7ccdc033918ae8f045ad8c1776d6520ffcec86e6707677f84941a685ac76c02
+  a5r1_preflight:
+    path: docs/evidence/task24/a5r1_exact_wire_recapture_preflight_v1.json
+    sha256: f1b4964768b7db1474ea6c0199bebbad37c264adf9a37c4b6697b151afe27250
+  a5r1_receipt:
+    path: docs/evidence/task24/a5r1_exact_wire_retention_recapture_v1.json
+    sha256: 318fdd6b755e887965feeb78a035f6f83497253b75290652ea32b6fc42d2da7a
+  a5r1_manifest:
+    path: docs/evidence/task24/a5r1_projection_v1/projection_manifest_v1.json
+    sha256: a6489a33d7bad02ffeb0fd70f3912e46c1175bcb0b21691005414a6448e57b6e
+  a5r1_candidates:
+    path: docs/evidence/task24/a5r1_projection_v1/entity_candidates_v1.json
+    sha256: e21c37b074ae623a359ed1d4228f95333706ce7b4f26f607bbd2789ba6b1b1de
+
+measured_result:
+  token_mints: 1
+  population_wallets: 20
+  provider_calls: 21
+  provider_credits_modeled: 210
+  cash_spend_usd_cents: 0
+  transactions_returned: 1939
+  unique_transactions: 1936
+  truncated_subjects: 21
+  exact_wire_files_verified: 21
+  exact_wire_bytes_verified: 21386958
+  raw_immediate_funder: 18
+  immediate_funder_absent: 2
+  raw_common_transaction_signer: 0
+  derived_shared_immediate_funder: 2
+  entity_candidates: 2
+  corroborated_positive_claims: 0
+  inferred_or_vendor_positive_claims: 4
+  selected_predicted_positive_capacity: 4
+  false_positive_minimum_reviewed_positive: 12
+  false_positive_gate: NOT_TESTABLE_INSUFFICIENT_PREDICTED_POSITIVES
+  manual_labels_opened: 0
+
+structural_deficit:
+  capacity_formula: MIN(CORROBORATED_COUNT,8)+MIN(INFERRED_OR_VENDOR_COUNT,8)
+  current_corroborated: 0
+  current_inferred_or_vendor: 4
+  current_capacity: 4
+  required_capacity: 12
+  minimum_additional_eligible_claims: 8
+  minimum_corroborated_required: 4
+  inferred_only_maximum_capacity: 8
+  population_expansion_alone_can_open_gate: false
+  same_provider_pagination_is_independent_family: false
+  duplicate_provider_same_event_is_independent_family: false
+  vendor_label_can_create_corroborated: false
+  threshold_relaxation_allowed_after_value_read: false
+
+route_decision:
+  selected: STOP_CURRENT_V1_EVIDENCE_EXTENSION
+  alternatives:
+    - id: SAME_PROVIDER_PAGINATION
+      disposition: REJECT_CURRENT_TASK
+      reason: UNKNOWN_YIELD_NO_NEW_INDEPENDENT_EVENT_FAMILY_AND_NEW_CALL_CREDIT_BOUNDARY
+    - id: INCREASE_PER_ADDRESS_LIMIT
+      disposition: REJECT_CURRENT_TASK
+      reason: SAME_STRUCTURAL_DEFICIT_AND_NEW_CALL_CREDIT_BOUNDARY
+    - id: EXPAND_WALLET_OR_MINT_POPULATION
+      disposition: REJECT_CURRENT_TASK
+      reason: POST_VALUE_POPULATION_CHANGE_AND_INFERRED_ONLY_CANNOT_OPEN_GATE
+    - id: DUPLICATE_PROVIDER_READ
+      disposition: REJECT
+      reason: SAME_RAW_EVENT_NOT_INDEPENDENT
+    - id: VENDOR_CLUSTER_OR_BUNDLE_LABELS
+      disposition: REJECT_AS_CORROBORATION
+      reason: VENDOR_LABEL_CANNOT_PROMOTE_CONFIDENCE_OR_CONTROL_ACTION
+    - id: JITO_STATUS_WITHOUT_RETAINED_BUNDLE_ID
+      disposition: REJECT
+      reason: NO_HISTORICAL_DISCOVERY_CONTRACT
+    - id: RELAX_AUDIT_OR_CONFIDENCE_THRESHOLDS
+      disposition: FORBIDDEN
+      reason: TARGET_DRIVEN_RULE_TUNING_AFTER_VALUE_READ
+
+partial_asset_disposition:
+  graph_contract: VALIDATED_RETAIN
+  raw_edges: VALIDATED_RETAIN
+  inferred_candidates: VALIDATED_PARTIAL_REVERSIBLE
+  exact_wire_capture: VALIDATED_RETAIN_LOCAL_RAW_PER_RETENTION
+  blinded_false_positive_audit: NOT_OPENED
+  adjusted_concentration_change: FORBIDDEN
+  holder_exclusion_or_eligibility_change: FORBIDDEN
+  strategy_veto_or_enablement: FORBIDDEN
+  ownership_truth_claim: FORBIDDEN
+  downstream_decision_admissibility: NOT_ADMISSIBLE
+
+reactivation_contract:
+  new_versioned_objective_required: true
+  rewrite_a2_through_a6_receipts: false
+  requirements:
+    - NAMED_DOWNSTREAM_HYPOTHESIS_OR_OWNER_DECISION
+    - PROSPECTIVE_POPULATION_AND_SAMPLING_RULE_FROZEN_BEFORE_VALUE_READ
+    - SECOND_INDEPENDENT_RAW_EVENT_FAMILY_AVAILABLE
+    - CREDIBLE_PATH_TO_AT_LEAST_12_SELECTED_POSITIVES
+    - CREDIBLE_PATH_TO_AT_LEAST_4_CORROBORATED_POSITIVES
+    - BLINDED_MANUAL_JUDGMENT_PLAN
+    - PIT_RETENTION_PROVIDER_AND_COST_CONTRACT
+    - SEPARATE_EXTERNAL_AUTHORITY_WHEN_APPLICABLE
+
+authority:
+  local_declared_write_set: true
+  offline_validation: true
+  public_official_docs_reads: 0
+  provider_api_rpc_wss_calls: 0
+  credential_uses: 0
+  provider_credits_consumed: 0
+  dependency_changes: 0
+  catalog_or_registry_mutations: 0
+  r3_or_outcome_reads: 0
+  wallet_signer_transaction_actions: 0
+  cash_spend_usd_cents: 0
+  deploy_release_actions: 0
+  commit: false
+  push: false
+  pull_request: false
+  merge: false
+
+non_claims:
+  - ENTITY_MEMBERSHIP_ESTABLISHED
+  - ECONOMIC_OR_BENEFICIAL_OWNERSHIP
+  - DEPLOYER_FUNDER_OR_BUNDLER_GROUND_TRUTH
+  - COMPLETE_HOLDER_DISTRIBUTION
+  - ADJUSTED_CONCENTRATION
+  - HOLDER_EXCLUSION_OR_STRATEGY_VETO
+  - ALPHA_CAUSALITY_OR_GENERALIZATION
+  - EXECUTION_PNL_NETRETURN_OR_OWNER_CASHFLOW
+  - R3_OR_OUTCOME_ACCESS
+  - CANONICAL_TASK24_DONE
+
+state_change:
+  task24: IN_PROGRESS
+  atom_a6: VALIDATED
+  owner_decision: STOP_NO_RELIABLE_ENTITY_SIGNAL
+  canonical_task24_done: false
+  catalog_registration: DEFERRED_TO_TASK24_A7
+
+next_boundary:
+  atom: T24-A7_REGISTER_PARTIAL_ASSETS_UPDATE_CATALOG_AND_FULL_FACTORY_FIT_REVIEW_V1
+  authorized: false
+  purpose: REGISTER_PARTIAL_OUTPUTS_LIMITATIONS_AND_LIFECYCLE_THEN_RUN_FULL_REVIEW

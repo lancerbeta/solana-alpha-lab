@@ -106,6 +106,17 @@ class Task16HypothesisResearchMemoryAcceptanceTests(unittest.TestCase):
                             for record in records
                         )
                     )
+                elif source["path"] == "registries/decisions_negative_results.yaml":
+                    records = document["records"]
+                    self.assertTrue(
+                        all(
+                            record["record_kind"] in {"decision", "negative_result"}
+                            and record["status"] == "RECORDED"
+                            and record["created_at"] > "2026-07-29T00:00:00Z"
+                            and bool(record["evidence_asset_ids"])
+                            for record in records
+                        )
+                    )
                 else:
                     self.assertEqual(sha256(path), source["sha256"])
                     self.assertEqual(document["records"], [])

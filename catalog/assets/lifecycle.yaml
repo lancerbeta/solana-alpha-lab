@@ -189,12 +189,12 @@ records:
   evidence: []
   classification: *id004
 - asset_id: REGISTRY-DECISIONS-NEGATIVE-RESULTS-001
-  record_version: '1.0'
+  record_version: '1.1'
   asset_type: lifecycle_registry
   purpose: Active registry for decisions and durable negative research results.
   status: VALIDATED_ACTIVE
   origin: REPOSITORY
-  as_of: '2026-07-22'
+  as_of: '2026-08-02'
   truth_owner: TASK-03
   location:
     kind: git_path
@@ -202,14 +202,14 @@ records:
     repository_path: registries/decisions_negative_results.yaml
   integrity:
     kind: sha256
-    sha256: 6396b1ef361c86ff39be917992eb723afda94d2280599cbee66cdbd184a4ef35
+    sha256: 2a7a8c2384d6d98bf083477ca50ea8937b9d124c6177b43337b4f70d30cac175
   access: *id001
   relations: *id002
   consumers: *id003
   evidence: []
   classification: *id004
 - asset_id: GENERATED-PROJECT-MAP-001
-  record_version: '1.40'
+  record_version: '1.41'
   asset_type: generated_view
   purpose: Deterministic human-readable navigation projected only from the Catalog.
   status: IMPLEMENTED_UNVERIFIED
@@ -222,7 +222,7 @@ records:
     repository_path: docs/PROJECT_MAP.md
   integrity:
     kind: sha256
-    sha256: 7abe07d6abafe0730a4be30fe16fb68fe876075bfbf08cb0d809682a57a841d4
+    sha256: 8af3b2426988206d2a2886ff5443b009c5240f35cf4d16157a9e276341f5cb3b
   access:
     mode: read_only
     method: file
@@ -254,10 +254,11 @@ records:
   - TASK-21
   - TASK-22
   - TASK-23
+  - TASK-24
   evidence: []
   classification: *id004
 - asset_id: GENERATED-EDGE-PROJECTION-001
-  record_version: '1.31'
+  record_version: '1.32'
   asset_type: generated_view
   purpose: Deterministic machine-readable projection of Catalog asset relations.
   status: IMPLEMENTED_UNVERIFIED
@@ -270,7 +271,7 @@ records:
     repository_path: catalog/generated/asset_edges.json
   integrity:
     kind: sha256
-    sha256: 4366864e2bcb734dc0d960329f7ba23810af8118cf045d187f2f3e8194c180f4
+    sha256: cfc18793abc1831a2019132b24eb48aec247e0dd469fae79a8b232ad700c9133
   access:
     mode: read_only
     method: file
@@ -302,5 +303,6 @@ records:
   - TASK-21
   - TASK-22
   - TASK-23
+  - TASK-24
   evidence: []
   classification: *id004

@@ -1,0 +1,186 @@
+{
+  "receipt_id": "T24-A3-DETERMINISTIC-ENTITY-EVIDENCE-FEASIBILITY-AND-PROJECTION-001",
+  "schema_version": "1.0",
+  "task_id": "TASK-24",
+  "atom": "T24-A3_DETERMINISTIC_ENTITY_EVIDENCE_FEASIBILITY_AND_PROJECTION_V1",
+  "as_of": "2026-08-02",
+  "status": "PASS_PARTIAL_RAW_RELATION_PROJECTION",
+  "owner_decision": "EXTEND_EVIDENCE",
+  "entry_gate": {
+    "verdict": "START_AS_WRITTEN",
+    "route_owner": "LOCAL_WORK_PRIMARY",
+    "execution_route": "LOCAL_WORK_CODEX",
+    "accepted_main_commit": "31c01640499be6b7e86a2fe638d9217c202861cc",
+    "accepted_main_tree": "6677878eb2b8195018ab217c6a9a429de5726563",
+    "branch": "task24/entity-graph-contract",
+    "active_time_gates": 0,
+    "reasoning": "VERY_HIGH_SUFFICIENT",
+    "mode_switch": "NONE"
+  },
+  "pre_read_gate": {
+    "status": "PASS_ADMISSIBLE_LOCAL_INPUTS",
+    "manifest_path": "docs/evidence/task24/a3_entity_evidence_pre_read_manifest_v1.json",
+    "manifest_sha256": "f889c0f28d3259cc61681ba6cc56dc53686d2375ce98826ca572dc5d5720846d",
+    "manifest_bytes": 8909,
+    "exact_inputs_checked": 5,
+    "missing_inputs": 0,
+    "hash_or_size_mismatches": 0,
+    "symlink_inputs": 0,
+    "r3_or_outcome_inputs": 0,
+    "projection_authorized": "PARTIAL_RAW_RELATIONS_ONLY"
+  },
+  "implementation_artifacts": {
+    "module": {
+      "path": "src/solana_alpha_lab/task24_entity_evidence_projection.py",
+      "sha256": "843bd9b34f107a40f7c274f6fe54a6b33fcf7c5550ccdba8e53c849d28557e3f",
+      "bytes": 18930
+    },
+    "runner": {
+      "path": "scripts/build_task24_entity_evidence_projection.py",
+      "sha256": "73108cb995a955dfcb0265f1994fd9a0a2f3e29c21848108802a11fe489463a1",
+      "bytes": 1198
+    },
+    "test": {
+      "path": "tests/test_task24_entity_evidence_projection.py",
+      "sha256": "f6eeab206dd28e6984127bebfceb2ec845c031c8012696449383cff0ff6194ea",
+      "bytes": 14908
+    }
+  },
+  "projection_artifacts": {
+    "entity_nodes_v1": {
+      "path": "docs/evidence/task24/a3_projection_v1/entity_nodes_v1.jsonl",
+      "sha256": "fdb169bd3f639c42b350de5eae41fc280061f5682fb3ea2605fcad2408ff3af7",
+      "bytes": 32620,
+      "rows": 41
+    },
+    "entity_edges_v1": {
+      "path": "docs/evidence/task24/a3_projection_v1/entity_edges_v1.jsonl",
+      "sha256": "fa19151a85d43783c37f6d0d99101baeaf2c755e4fe9536792872451af3d39c4",
+      "bytes": 48100,
+      "rows": 40
+    },
+    "entity_candidates_v1": {
+      "path": "docs/evidence/task24/a3_projection_v1/entity_candidates_v1.json",
+      "sha256": "ca5942bab810ab72949455f46947c068cb42664b173101633a641b4547755c81",
+      "bytes": 262,
+      "rows": 0
+    },
+    "entity_adjusted_concentration_v1": {
+      "path": "docs/evidence/task24/a3_projection_v1/entity_adjusted_concentration_v1.json",
+      "sha256": "644b148f17fe437118196dabdb4185886117086aab1fe1b77f7965621a06f4ad",
+      "bytes": 323,
+      "rows": 1
+    },
+    "projection_manifest_v1": {
+      "path": "docs/evidence/task24/a3_projection_v1/projection_manifest_v1.json",
+      "sha256": "85803b180144c4c2581f9f9d6d81d4048408e12f1e25bde17478b51eb7674e80",
+      "bytes": 2042,
+      "rows": 1
+    }
+  },
+  "measured_result": {
+    "input_raw_events_read_offline": 3,
+    "token_mint_nodes": 1,
+    "token_account_nodes": 20,
+    "wallet_nodes": 20,
+    "total_nodes": 41,
+    "raw_token_account_for_mint_edges": 20,
+    "raw_token_account_owner_edges": 20,
+    "total_edges": 40,
+    "entity_candidates": 0,
+    "vendor_or_project_inferences": 0,
+    "raw_public_addresses_persisted": 0,
+    "holder_exclusions_changed": 0,
+    "adjusted_top_accounts_supply_share": null,
+    "unresolved_exclusion_account_count": 20
+  },
+  "feasibility_decision": {
+    "raw_account_to_mint_projection": "FEASIBLE_VALIDATED",
+    "raw_account_to_wallet_projection": "FEASIBLE_VALIDATED",
+    "deployer_projection": "NOT_TESTABLE",
+    "immediate_or_ultimate_funder_projection": "NOT_TESTABLE",
+    "authoritative_bundle_projection": "NOT_TESTABLE",
+    "common_ownership_candidate_projection": "NOT_TESTABLE",
+    "false_positive_audit": "NOT_TESTABLE_ZERO_PREDICTED_POSITIVES",
+    "adjusted_concentration": "NOT_AVAILABLE_EXCLUSION_INVENTORY_INCOMPLETE",
+    "task24_done_implied": false
+  },
+  "validation": {
+    "status": "PASS",
+    "targeted_command": "uv run --locked --managed-python python -B -m unittest tests.test_task24_entity_evidence_projection",
+    "targeted_tests_passed": 14,
+    "targeted_failures": 0,
+    "targeted_errors": 0,
+    "adjacent_compatibility_tests_passed": 95,
+    "adjacent_compatibility_failures": 0,
+    "adjacent_compatibility_errors": 0,
+    "deterministic_rebuild": "PASS_CORE_OUTPUT_HASHES_EXACT",
+    "adversarial_manifest_hash": "PASS_REJECTED",
+    "adversarial_r3_authority_privacy": "PASS_REJECTED",
+    "file_hygiene": "PASS_NO_BOM_NO_CRLF_FINAL_LF",
+    "secret_scan": "PASS",
+    "ruff": "NOT_AVAILABLE_PROGRAM_NOT_FOUND_NO_DEPENDENCY_CHANGE",
+    "baseline_validator": "NOT_APPLICABLE_TASK_BRANCH_REQUIRES_MAIN_OR_CI_DETACHED",
+    "full_repository_gate": "DEFERRED_TO_DELIVERY_OR_FINALIZATION"
+  },
+  "factory_fit_checkpoint": {
+    "status": "PASS_FOR_A3_NOT_TASK_DONE",
+    "mission": "Separates a usable raw ownership-field relation from unsupported linked-wallet claims.",
+    "flexibility": "Stable pseudonyms and append-only raw-event lineage permit later evidence families without rewriting raw nodes.",
+    "compatibility_history": "Reuses the TASK-11 replay, parser and TASK-05 timing semantics.",
+    "efficiency": "Consumes retained local bytes with zero new provider calls or dependencies.",
+    "research_truth": "Returns EXTEND_EVIDENCE because funder, deployer and bundle inputs are absent.",
+    "owner_operability": "Exposes exact supported edges, missing evidence and the blocked false-positive gate.",
+    "privacy": "Raw public addresses are read offline but only stable one-way pseudonyms are persisted.",
+    "execution_to_cashflow": "No strategy, execution, PnL, NetReturn or cashflow claim is made.",
+    "monitoring_recovery": "Every output is content-bound and deterministically rebuildable from retained immutable inputs.",
+    "build_vs_buy": "ADOPT existing parsers and replay; WRAP only a thin projection; no graph platform or vendor added.",
+    "red_team": "Manifest mutation, R3 enablement, provider authority expansion and raw-address persistence fail closed.",
+    "full_pre_done_review": "REQUIRED_LATER"
+  },
+  "managed_write_set": [
+    "docs/evidence/task24/a3_entity_evidence_pre_read_manifest_v1.json",
+    "src/solana_alpha_lab/task24_entity_evidence_projection.py",
+    "scripts/build_task24_entity_evidence_projection.py",
+    "tests/test_task24_entity_evidence_projection.py",
+    "docs/evidence/task24/a3_projection_v1/entity_nodes_v1.jsonl",
+    "docs/evidence/task24/a3_projection_v1/entity_edges_v1.jsonl",
+    "docs/evidence/task24/a3_projection_v1/entity_candidates_v1.json",
+    "docs/evidence/task24/a3_projection_v1/entity_adjusted_concentration_v1.json",
+    "docs/evidence/task24/a3_projection_v1/projection_manifest_v1.json",
+    "docs/evidence/task24/a3_deterministic_entity_evidence_feasibility_and_projection_v1.json"
+  ],
+  "authority": {
+    "offline_local_value_reads": 3,
+    "provider_api_rpc_wss_calls": 0,
+    "credential_uses": 0,
+    "dependency_changes": 0,
+    "catalog_or_registry_mutations": 0,
+    "r3_or_outcome_reads": 0,
+    "wallet_signer_transaction_actions": 0,
+    "cash_spend_usd_cents": 0,
+    "deploy_release_actions": 0,
+    "commit": false,
+    "push": false,
+    "pull_request": false,
+    "merge": false
+  },
+  "state_change": {
+    "task24": "IN_PROGRESS",
+    "atom_a3": "VALIDATED",
+    "canonical_task24_done": false,
+    "catalog_registration": "DEFERRED_TO_TASK24_FINALIZATION"
+  },
+  "next_boundary": {
+    "recommended_atom": "T24-A4_BOUNDED_ENTITY_LINKAGE_EVIDENCE_EXTENSION_DECISION_V1",
+    "reason": "The frozen false-positive audit requires at least 12 reviewed predicted-positive claims; A3 produced zero because no deployer, funder or bundle evidence exists in the retained inputs.",
+    "owner_decisions": [
+      "ADOPT_EXISTING_LOCAL_OR_HISTORICAL_EVIDENCE",
+      "AUTHORIZE_BOUNDED_EXTERNAL_CAPTURE_LATER",
+      "STOP_NO_RELIABLE_ENTITY_SIGNAL"
+    ],
+    "provider_api_rpc_wss_execution_authorized": false,
+    "false_positive_audit_activation_trigger": "AT_LEAST_12_FROZEN_PREDICTED_POSITIVE_CLAIMS",
+    "authorized_by_a3": false
+  }
+}

@@ -1,0 +1,235 @@
+{
+  "receipt_id": "T24-A6-BOUNDED-DATA-REDESIGN-OR-STOP-DECISION-001",
+  "schema_version": "1.0",
+  "task_id": "TASK-24",
+  "atom": "T24-A6_BOUNDED_DATA_REDESIGN_OR_STOP_DECISION_V1",
+  "as_of": "2026-08-02",
+  "status": "PASS_VALIDATED_STOP_DECISION_ONLY",
+  "owner_decision": "STOP_NO_RELIABLE_ENTITY_SIGNAL",
+  "selected_route": "STOP_CURRENT_V1_EVIDENCE_EXTENSION",
+  "entry_gate": {
+    "verdict": "START_AS_WRITTEN",
+    "route_owner": "LOCAL_WORK_PRIMARY",
+    "execution_route": "LOCAL_WORK_CODEX",
+    "accepted_main_commit": "31c01640499be6b7e86a2fe638d9217c202861cc",
+    "accepted_main_tree": "6677878eb2b8195018ab217c6a9a429de5726563",
+    "branch": "task24/entity-graph-contract",
+    "active_time_gates": 0,
+    "reasoning": "VERY_HIGH_SUFFICIENT",
+    "mode_switch": "NONE"
+  },
+  "frozen_input_bindings": {
+    "a2_contract": {
+      "path": "docs/contracts/task24_entity_graph_and_false_positive_contract_v1.md",
+      "sha256": "14614796dfc17aeef907e6b1d863814cbfb52e8f188704b70f17d99a78b862a8"
+    },
+    "a2_config": {
+      "path": "configs/task24_entity_graph_v1.yaml",
+      "sha256": "a294d9c8507777581bec8217f4127e16a76788b243250a1eb57e6bff9b69ed25"
+    },
+    "a4_decision": {
+      "path": "docs/decisions/task24_entity_linkage_evidence_extension_decision_v1.md",
+      "sha256": "a13523b86272c39976ab6a11a0332180cced51fde54c185a381e0034ec416fda"
+    },
+    "a4_config": {
+      "path": "configs/task24_entity_linkage_evidence_extension_v1.yaml",
+      "sha256": "2db333e179ecc54cced41128b5a8c97825fc970d46af66be8660db9ee963791b"
+    },
+    "a4_receipt": {
+      "path": "docs/evidence/task24/a4_bounded_entity_linkage_evidence_extension_decision_v1.json",
+      "sha256": "7169c2894929d8e5571635b11b75cb4ec7dbd89a543d164d54f8fab552504f1e"
+    },
+    "a5_receipt": {
+      "path": "docs/evidence/task24/a5_bounded_raw_history_feasibility_capture_v1.json",
+      "sha256": "d7ccdc033918ae8f045ad8c1776d6520ffcec86e6707677f84941a685ac76c02"
+    },
+    "a5r1_preflight": {
+      "path": "docs/evidence/task24/a5r1_exact_wire_recapture_preflight_v1.json",
+      "sha256": "f1b4964768b7db1474ea6c0199bebbad37c264adf9a37c4b6697b151afe27250"
+    },
+    "a5r1_receipt": {
+      "path": "docs/evidence/task24/a5r1_exact_wire_retention_recapture_v1.json",
+      "sha256": "318fdd6b755e887965feeb78a035f6f83497253b75290652ea32b6fc42d2da7a"
+    },
+    "a5r1_manifest": {
+      "path": "docs/evidence/task24/a5r1_projection_v1/projection_manifest_v1.json",
+      "sha256": "a6489a33d7bad02ffeb0fd70f3912e46c1175bcb0b21691005414a6448e57b6e"
+    },
+    "a5r1_candidates": {
+      "path": "docs/evidence/task24/a5r1_projection_v1/entity_candidates_v1.json",
+      "sha256": "e21c37b074ae623a359ed1d4228f95333706ce7b4f26f607bbd2789ba6b1b1de"
+    }
+  },
+  "artifact_bindings": {
+    "decision": {
+      "path": "docs/decisions/task24_data_redesign_or_stop_decision_v1.md",
+      "sha256": "6c15e823d8240366745b9deb9f1c44b70c80d4a5ffb3093b91bc38f9324a87f5",
+      "bytes": 6399
+    },
+    "config": {
+      "path": "configs/task24_data_redesign_or_stop_decision_v1.yaml",
+      "sha256": "b68cdebbdc9399cd72c5b03ce586b87dac0496b293be2f64ecff0898e346f2e3",
+      "bytes": 7109
+    },
+    "test": {
+      "path": "tests/test_task24_data_redesign_or_stop_decision.py",
+      "sha256": "d53e1020149ec2eac6850d85c7ccd6ab4f50cf1666aee46ce2dbf5b5ed5b6795",
+      "bytes": 9670
+    }
+  },
+  "measured_result": {
+    "population": {
+      "token_mints": 1,
+      "wallets": 20,
+      "subjects": 21
+    },
+    "capture": {
+      "provider_calls": 21,
+      "provider_credits_modeled": 210,
+      "cash_spend_usd_cents": 0,
+      "transactions_returned": 1939,
+      "unique_transactions": 1936,
+      "truncated_subjects": 21,
+      "exact_wire_files_verified": 21,
+      "exact_wire_bytes_verified": 21386958
+    },
+    "projection": {
+      "raw_immediate_funder": 18,
+      "immediate_funder_absent": 2,
+      "raw_common_transaction_signer": 0,
+      "derived_shared_immediate_funder": 2,
+      "entity_candidates": 2,
+      "corroborated_positive_claims": 0,
+      "inferred_or_vendor_positive_claims": 4,
+      "selected_predicted_positive_capacity": 4
+    },
+    "false_positive_audit": {
+      "minimum_reviewed_predicted_positive": 12,
+      "status": "NOT_TESTABLE_INSUFFICIENT_PREDICTED_POSITIVES",
+      "manual_labels_opened": 0
+    }
+  },
+  "structural_deficit": {
+    "formula": "MIN(CORROBORATED_COUNT,8)+MIN(INFERRED_OR_VENDOR_COUNT,8)",
+    "current_corroborated": 0,
+    "current_inferred_or_vendor": 4,
+    "current_capacity": 4,
+    "required_capacity": 12,
+    "minimum_additional_eligible_claims": 8,
+    "minimum_corroborated_required": 4,
+    "inferred_only_maximum_capacity": 8,
+    "available_bounded_current_contract_repair": false
+  },
+  "route_evaluation": {
+    "same_provider_pagination": "REJECT_CURRENT_TASK_UNKNOWN_YIELD_NO_NEW_INDEPENDENT_FAMILY",
+    "increase_per_address_limit": "REJECT_CURRENT_TASK_SAME_STRUCTURAL_DEFICIT",
+    "expand_population": "REJECT_CURRENT_TASK_POST_VALUE_POPULATION_CHANGE_AND_INFERRED_ONLY_INSUFFICIENT",
+    "duplicate_provider": "REJECT_SAME_EVENT_NOT_INDEPENDENT",
+    "vendor_labels": "REJECT_AS_CORROBORATION",
+    "jito_without_retained_bundle_id": "REJECT_NO_HISTORICAL_DISCOVERY_TRUTH",
+    "relax_thresholds": "FORBIDDEN_TARGET_DRIVEN_TUNING"
+  },
+  "partial_asset_disposition": {
+    "graph_contract": "VALIDATED_RETAIN",
+    "raw_edges": "VALIDATED_RETAIN",
+    "inferred_candidates": "VALIDATED_PARTIAL_REVERSIBLE",
+    "blinded_false_positive_audit": "NOT_OPENED",
+    "adjusted_concentration_change": "FORBIDDEN",
+    "holder_exclusion_or_eligibility_change": "FORBIDDEN",
+    "strategy_veto_or_enablement": "FORBIDDEN",
+    "ownership_truth_claim": "FORBIDDEN",
+    "downstream_decision_admissibility": "NOT_ADMISSIBLE"
+  },
+  "reactivation_contract": {
+    "new_versioned_objective_required": true,
+    "rewrite_a2_through_a6_receipts": false,
+    "minimum_requirements": [
+      "NAMED_DOWNSTREAM_HYPOTHESIS_OR_OWNER_DECISION",
+      "PROSPECTIVE_POPULATION_AND_SAMPLING_RULE_FROZEN_BEFORE_VALUE_READ",
+      "SECOND_INDEPENDENT_RAW_EVENT_FAMILY_AVAILABLE",
+      "CREDIBLE_PATH_TO_AT_LEAST_12_SELECTED_POSITIVES",
+      "CREDIBLE_PATH_TO_AT_LEAST_4_CORROBORATED_POSITIVES",
+      "BLINDED_MANUAL_JUDGMENT_PLAN",
+      "PIT_RETENTION_PROVIDER_AND_COST_CONTRACT",
+      "SEPARATE_EXTERNAL_AUTHORITY_WHEN_APPLICABLE"
+    ]
+  },
+  "validation": {
+    "status": "PASS",
+    "targeted_command": "uv run --locked --managed-python python -B -m unittest tests.test_task24_data_redesign_or_stop_decision",
+    "targeted_tests_passed": 10,
+    "targeted_failures": 0,
+    "targeted_errors": 0,
+    "adjacent_compatibility_command": "uv run --locked --managed-python python -B -m unittest tests.test_task24_entity_graph_contract tests.test_task24_entity_evidence_projection tests.test_task24_entity_linkage_evidence_extension_decision tests.test_task24_entity_linkage_capture tests.test_task24_entity_linkage_projection tests.test_task24_entity_linkage_recapture tests.test_task24_data_redesign_or_stop_decision",
+    "adjacent_compatibility_tests_passed": 91,
+    "adjacent_compatibility_failures": 0,
+    "adjacent_compatibility_errors": 0,
+    "adversarial_fake_independence": "PASS_REJECTED",
+    "adversarial_vendor_promotion": "PASS_REJECTED",
+    "adversarial_threshold_tuning": "PASS_REJECTED",
+    "adversarial_external_authority": "PASS_REJECTED",
+    "file_hygiene": "PASS_NO_BOM_NO_CRLF_FINAL_LF",
+    "secret_scan": "PASS_NO_SECRET_VALUES",
+    "full_repository_gate": "DEFERRED_TO_TASK24_DELIVERY_OR_FINALIZATION"
+  },
+  "factory_fit_checkpoint": {
+    "status": "PASS_FOR_A6_NOT_TASK_DONE",
+    "mission": "Stops a low-yield evidence route before more provider cost and prevents a partial graph from contaminating research or owner decisions.",
+    "flexibility": "Retains exact raw and reversible inferred outputs while requiring a new versioned objective for any future redesign.",
+    "compatibility_history": "Does not rewrite A2 through A5R1 contracts, captures or projections.",
+    "efficiency": "Rejects pagination and population expansion without a credible two-stratum capacity path.",
+    "research_truth": "Keeps four inferred claims separate from corroboration and leaves the false-positive audit unopened.",
+    "owner_operability": "Returns an explicit stop, retained-value boundary and reactivation trigger.",
+    "execution_to_cashflow": "No strategy, execution, PnL, NetReturn or cashflow claim is made.",
+    "monitoring_recovery": "Exact-wire evidence and immutable receipts remain retained under the established policy.",
+    "build_vs_buy": "No new provider, parser, dependency or service is adopted.",
+    "red_team": "Blocks duplicate-event independence, vendor-label promotion, threshold relaxation, silent pagination and post-value population expansion.",
+    "full_pre_done_review": "REQUIRED_IN_TASK24_A7"
+  },
+  "managed_write_set": [
+    "docs/decisions/task24_data_redesign_or_stop_decision_v1.md",
+    "configs/task24_data_redesign_or_stop_decision_v1.yaml",
+    "tests/test_task24_data_redesign_or_stop_decision.py",
+    "docs/evidence/task24/a6_bounded_data_redesign_or_stop_decision_v1.json"
+  ],
+  "authority": {
+    "public_official_docs_reads": 0,
+    "provider_api_rpc_wss_calls": 0,
+    "credential_uses": 0,
+    "provider_credits_consumed": 0,
+    "dependency_changes": 0,
+    "catalog_or_registry_mutations": 0,
+    "r3_or_outcome_reads": 0,
+    "wallet_signer_transaction_actions": 0,
+    "cash_spend_usd_cents": 0,
+    "deploy_release_actions": 0,
+    "commit": false,
+    "push": false,
+    "pull_request": false,
+    "merge": false
+  },
+  "non_claims": [
+    "ENTITY_MEMBERSHIP_ESTABLISHED",
+    "ECONOMIC_OR_BENEFICIAL_OWNERSHIP",
+    "DEPLOYER_FUNDER_OR_BUNDLER_GROUND_TRUTH",
+    "COMPLETE_HOLDER_DISTRIBUTION",
+    "ADJUSTED_CONCENTRATION",
+    "HOLDER_EXCLUSION_OR_STRATEGY_VETO",
+    "ALPHA_CAUSALITY_OR_GENERALIZATION",
+    "EXECUTION_PNL_NETRETURN_OR_OWNER_CASHFLOW",
+    "R3_OR_OUTCOME_ACCESS",
+    "CANONICAL_TASK24_DONE"
+  ],
+  "state_change": {
+    "task24": "IN_PROGRESS",
+    "atom_a6": "VALIDATED",
+    "owner_decision": "STOP_NO_RELIABLE_ENTITY_SIGNAL",
+    "canonical_task24_done": false,
+    "catalog_registration": "DEFERRED_TO_TASK24_A7"
+  },
+  "next_boundary": {
+    "atom": "T24-A7_REGISTER_PARTIAL_ASSETS_UPDATE_CATALOG_AND_FULL_FACTORY_FIT_REVIEW_V1",
+    "authorized": false,
+    "reason": "Register the retained partial graph, explicit limitations and stopped lifecycle before the required full Factory Fit review."
+  }
+}

@@ -1,0 +1,142 @@
+{
+  "receipt_id": "T24-A2-FROZEN-ENTITY-GRAPH-CONTRACT-ACCEPTANCE-001",
+  "schema_version": "1.0",
+  "task_id": "TASK-24",
+  "atom": "T24-A2_FROZEN_ENTITY_GRAPH_AND_FALSE_POSITIVE_CONTRACT_V1",
+  "as_of": "2026-08-02",
+  "status": "PASS_VALIDATED_CONTRACT_ONLY",
+  "entry_gate": {
+    "verdict": "START_WITH_PATCH",
+    "accepted_main_commit": "31c01640499be6b7e86a2fe638d9217c202861cc",
+    "accepted_main_tree": "6677878eb2b8195018ab217c6a9a429de5726563",
+    "branch": "task24/entity-graph-contract",
+    "source_activation_claimed": false,
+    "reasoning": "VERY_HIGH_SUFFICIENT"
+  },
+  "artifact_bindings": {
+    "contract": {
+      "path": "docs/contracts/task24_entity_graph_and_false_positive_contract_v1.md",
+      "sha256": "14614796dfc17aeef907e6b1d863814cbfb52e8f188704b70f17d99a78b862a8",
+      "bytes": 11055
+    },
+    "config": {
+      "path": "configs/task24_entity_graph_v1.yaml",
+      "sha256": "a294d9c8507777581bec8217f4127e16a76788b243250a1eb57e6bff9b69ed25",
+      "bytes": 11982
+    },
+    "test": {
+      "path": "tests/test_task24_entity_graph_contract.py",
+      "sha256": "ba7e97a3c2ebc372269d0c16e6779c32edafd4782e68e09a51bfacc3188170fe",
+      "bytes": 17245
+    }
+  },
+  "measured_boundary": {
+    "new_entity_values_read": 0,
+    "owner_addresses_in_tracked_task11_fixture": 0,
+    "tracked_provider_bodies_read": 0,
+    "task11_raw_runtime_available_in_current_workspace": false,
+    "graph_nodes_materialized": 0,
+    "graph_edges_materialized": 0,
+    "entity_candidates_materialized": 0,
+    "holder_exclusions_changed": 0,
+    "r3_or_outcome_reads": 0
+  },
+  "frozen_decisions": {
+    "graph_interpretation": "VERSIONED_EVIDENCE_READ_MODEL_NOT_OWNERSHIP_TRUTH",
+    "node_type_count": 6,
+    "edge_type_count": 9,
+    "evidence_class_count": 4,
+    "confidence_class_count": 5,
+    "raw_and_adjusted_retained_separately": true,
+    "destructive_merge_allowed": false,
+    "vendor_only_merge_or_exclusion_allowed": false,
+    "missing_entity_evidence": "NOT_TESTABLE",
+    "false_positive_target_sample_size": 24,
+    "false_positive_minimum_reviewed_positive": 12,
+    "false_positive_max_count": 1,
+    "false_positive_max_ambiguous_share": 0.25,
+    "audit_blinded_from_outcome_pnl_and_r3": true,
+    "tuning_on_validation_sample_allowed": false
+  },
+  "validation": {
+    "status": "PASS",
+    "command": "uv run --locked --managed-python python -B -m unittest tests.test_task24_entity_graph_contract",
+    "tests_expected": 16,
+    "tests_passed": 16,
+    "failures": 0,
+    "errors": 0,
+    "adjacent_compatibility_command": "uv run --locked --managed-python python -B -m unittest tests.test_task05_schema_contract tests.test_task11_entity_inputs tests.test_task11_entity_input_replay tests.test_task11_entity_input_transport tests.test_task23_bounded_diagnostics_contract tests.test_task24_entity_graph_contract",
+    "adjacent_compatibility_tests_passed": 81,
+    "adjacent_compatibility_failures": 0,
+    "adjacent_compatibility_errors": 0,
+    "tracked_diff_check": "PASS_NO_TRACKED_DIFF",
+    "untracked_format_check": "PASS",
+    "frozen_input_hashes_checked": 7
+  },
+  "factory_fit_checkpoint": {
+    "status": "PASS_FOR_A2_NOT_TASK_DONE",
+    "mission": "Protects research truth before entity evidence can affect holder risk or eligibility.",
+    "flexibility": "Raw nodes and edges remain stable while candidate rules and providers can version independently.",
+    "compatibility_history": "Adopts TASK-05 and TASK-11 contracts without rewriting their evidence.",
+    "efficiency": "Uses declarative files and tables; no graph database or new dependency.",
+    "research_truth": "Freezes PIT, provenance, conflict, blinding and no-hindsight rules before value reads.",
+    "owner_operability": "Returns one of four explicit owner decisions and exposes NOT_TESTABLE rather than false certainty.",
+    "execution_to_cashflow": "Makes no alpha, execution, PnL, NetReturn or cashflow claim.",
+    "monitoring_recovery": "Append-only revisions and conflict sets preserve rollback and auditability.",
+    "build_vs_buy": "ADOPT schema and evidence semantics; WRAP a thin graph contract; no vendor or graph platform added.",
+    "red_team": "Common funders, fee payers, vendor labels and missing data are explicitly blocked from silent ownership promotion.",
+    "full_pre_done_review": "REQUIRED_LATER"
+  },
+  "product_horizon_radar": {
+    "now": {
+      "candidate": "FREEZE_EVIDENCE_GRAPH_AND_FALSE_POSITIVE_AUDIT",
+      "value": "Prevents false wallet linkage from contaminating adjusted concentration and downstream research.",
+      "evidence": "TASK-11 has only raw top-20 feasibility; deployer, funder and bundler evidence is NOT_TESTED.",
+      "cost_risk": "Four local files, no value read, no external action.",
+      "owner": "TASK-24",
+      "activation_trigger": "USER_APPROVED_T24_A2",
+      "why_now": "The contract must precede the first entity-value read."
+    },
+    "watch": {
+      "candidate": "CATALOG_PROPAGATION_AND_EXACT_COUNT_GUARDS",
+      "value": "Reduces asset-registration drift when TASK-24 outputs become durable.",
+      "evidence": "TASK-23 closed with Catalog 0.28.0 and generated consumers; no TASK-24 asset exists yet.",
+      "cost_risk": "Small validation hardening only if A5 registers new assets.",
+      "owner": "TASK-24_A5",
+      "activation_trigger": "FIRST_TASK24_CATALOG_REGISTRATION",
+      "why_not_now": "A2 creates a contract checkpoint, not the final asset set."
+    }
+  },
+  "authority": {
+    "provider_api_rpc_wss_calls": 0,
+    "credential_uses": 0,
+    "dependency_changes": 0,
+    "catalog_or_registry_mutations": 0,
+    "wallet_signer_transaction_actions": 0,
+    "cash_spend_usd_cents": 0,
+    "deploy_release_actions": 0,
+    "commit": false,
+    "push": false,
+    "pull_request": false,
+    "merge": false
+  },
+  "state_change": {
+    "task24": "IN_PROGRESS",
+    "atom_a2": "VALIDATED",
+    "canonical_task24_done": false,
+    "catalog_registration": "DEFERRED_TO_TASK24_A5"
+  },
+  "next_boundary": {
+    "atom": "T24-A3_DETERMINISTIC_ENTITY_EVIDENCE_FEASIBILITY_AND_PROJECTION_V1",
+    "authorized": false,
+    "requires": [
+      "EXACT_PRE_READ_MANIFEST_PASS",
+      "ADMISSIBLE_LOCAL_INPUTS_AVAILABLE",
+      "NO_R3_NO_OUTCOME_ASSERTION"
+    ],
+    "fail_closed_decisions": [
+      "REDESIGN_DATA",
+      "STOP_NO_RELIABLE_ENTITY_SIGNAL"
+    ]
+  }
+}

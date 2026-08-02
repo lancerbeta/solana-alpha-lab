@@ -904,6 +904,17 @@ def validate() -> tuple[str, str]:
                 raise Task04ValidationError(
                     "production_registry_not_append_only_trial_ledger"
                 )
+        elif relative == "decisions_negative_results.yaml":
+            if not isinstance(records, list) or any(
+                record.get("record_kind") not in {"decision", "negative_result"}
+                or record.get("status") != "RECORDED"
+                or record.get("created_at", "") <= "2026-07-28T00:00:00Z"
+                or not record.get("evidence_asset_ids")
+                for record in records
+            ):
+                raise Task04ValidationError(
+                    "production_registry_not_append_only_decisions_negative_results"
+                )
         elif records != []:
             raise Task04ValidationError(f"production_registry_changed:{relative}")
     validate_license_disclosures(ADR_PATH.read_text(encoding="utf-8"))

@@ -1,0 +1,251 @@
+schema_version: "1.0"
+decision_id: T24-ENTITY-LINKAGE-EVIDENCE-EXTENSION-001
+task_id: TASK-24
+atom: T24-A4_BOUNDED_ENTITY_LINKAGE_EVIDENCE_EXTENSION_DECISION_V1
+status: VALIDATED_DECISION_ONLY
+as_of: "2026-08-02"
+
+entry_gate:
+  verdict: START_AS_WRITTEN
+  route_owner: LOCAL_WORK_PRIMARY
+  execution_route: LOCAL_WORK_CODEX
+  accepted_main_commit: 31c01640499be6b7e86a2fe638d9217c202861cc
+  accepted_main_tree: 6677878eb2b8195018ab217c6a9a429de5726563
+  branch: task24/entity-graph-contract
+  active_time_gates: 0
+  catalog_checkpoint:
+    version: 0.28.0
+    assets: 415
+  product_vision_terminal: CANONICALIZED_WITH_PATCH
+  reasoning: VERY_HIGH_SUFFICIENT
+  mode_switch: NONE
+
+managed_write_set:
+  - docs/decisions/task24_entity_linkage_evidence_extension_decision_v1.md
+  - configs/task24_entity_linkage_evidence_extension_v1.yaml
+  - tests/test_task24_entity_linkage_evidence_extension_decision.py
+  - docs/evidence/task24/a4_bounded_entity_linkage_evidence_extension_decision_v1.json
+
+frozen_inputs:
+  a2_contract:
+    path: docs/contracts/task24_entity_graph_and_false_positive_contract_v1.md
+    sha256: 14614796dfc17aeef907e6b1d863814cbfb52e8f188704b70f17d99a78b862a8
+  a2_config:
+    path: configs/task24_entity_graph_v1.yaml
+    sha256: a294d9c8507777581bec8217f4127e16a76788b243250a1eb57e6bff9b69ed25
+  a3_receipt:
+    path: docs/evidence/task24/a3_deterministic_entity_evidence_feasibility_and_projection_v1.json
+    sha256: 30324bd751faafb050ccf644d739f3a5ecc45ecece0f846d23f7e792eb212a5f
+  a3_pre_read_manifest:
+    path: docs/evidence/task24/a3_entity_evidence_pre_read_manifest_v1.json
+    sha256: f889c0f28d3259cc61681ba6cc56dc53686d2375ce98826ca572dc5d5720846d
+
+measured_gap:
+  token_mints: 1
+  population_wallets: 20
+  projected_nodes: 41
+  projected_edges: 40
+  entity_candidates: 0
+  corroborated_positive_claims: 0
+  inferred_or_vendor_positive_claims: 0
+  selected_predicted_positive_capacity: 0
+  false_positive_minimum_reviewed_positive: 12
+  false_positive_gate: NOT_TESTABLE_ZERO_PREDICTED_POSITIVES
+
+audit_capacity:
+  corroborated_stratum_target: 8
+  inferred_or_vendor_stratum_target: 8
+  undersized_stratum_substitution_allowed: false
+  formula: MIN(CORROBORATED_COUNT,8)+MIN(INFERRED_OR_VENDOR_COUNT,8)
+  minimum_to_open_gate: 12
+  inferred_only_maximum_selected_positive: 8
+  minimum_corroborated_when_other_positive_stratum_full: 4
+  vendor_labels_can_repair_corroborated_shortage: false
+
+official_sources:
+  as_of: "2026-08-02"
+  public_docs_only: true
+  credentialed_calls: 0
+  sources:
+    - id: SOLANA_GET_SIGNATURES_FOR_ADDRESS
+      url: https://solana.com/docs/rpc/http/getsignaturesforaddress
+      facts:
+        - RETURNS_REFERENCING_SIGNATURES_NEWEST_FIRST
+        - SUPPORTS_BEFORE_UNTIL_AND_LIMIT
+    - id: SOLANA_GET_TRANSACTION
+      url: https://solana.com/docs/rpc/http/gettransaction
+      facts:
+        - RESOLVES_ONE_KNOWN_SIGNATURE
+        - MAY_RETURN_NULL
+    - id: HELIUS_GET_TRANSACTIONS_FOR_ADDRESS
+      url: https://www.helius.dev/docs/rpc/gettransactionsforaddress
+      facts:
+        - HELIUS_EXCLUSIVE_NOT_STANDARD_SOLANA_RPC
+        - SUPPORTS_OLDEST_FIRST_FULL_TRANSACTIONS
+        - UP_TO_1000_FULL_TRANSACTIONS_PER_CALL
+        - ONE_ADDRESS_PER_REQUEST
+        - FULL_RESULTS_10_CREDITS_PER_100_ROUNDED_UP_MINIMUM_10
+    - id: HELIUS_ENHANCED_TRANSACTIONS_OVERVIEW
+      url: https://www.helius.dev/docs/enhanced-transactions/overview
+      facts:
+        - DEPRECATED_FOR_NEW_INTEGRATIONS
+    - id: JITO_BUNDLE_API
+      url: https://docs.jito.wtf/lowlatencytxnsend/
+      facts:
+        - STATUS_QUERY_REQUIRES_KNOWN_BUNDLE_ID
+        - MAXIMUM_5_BUNDLE_IDS_PER_STATUS_REQUEST
+        - GET_BUNDLE_STATUSES_USES_RECENT_SIGNATURE_HISTORY
+        - INFLIGHT_LOOKBACK_5_MINUTES
+
+route_evaluation:
+  selected: BOUNDED_RAW_HISTORY_FEASIBILITY_PROBE
+  candidates:
+    - id: STANDARD_SOLANA_RPC_HISTORY
+      evidence_output: RAW_ONCHAIN_TRANSPORT
+      role: SELECTED_SIGNATURE_READBACK_OR_FALLBACK_ONLY
+      primary: false
+      reason: NEWEST_FIRST_PAGINATION_PLUS_PER_SIGNATURE_CALL_AMPLIFICATION
+    - id: HELIUS_GET_TRANSACTIONS_FOR_ADDRESS
+      evidence_output: RAW_FULL_TRANSACTION_TRANSPORT
+      role: PRIMARY_BOUNDED_HISTORY_PROBE
+      primary: true
+      adopt_wrap: ADOPT_TRANSPORT_WRAP_DETERMINISTIC_PROJECT_PARSER
+      provider_labels_as_raw: false
+    - id: HELIUS_ENHANCED_TRANSACTIONS_V1
+      evidence_output: PROVIDER_PARSED
+      role: REJECTED
+      primary: false
+      reason: DEPRECATED_AND_AVOIDABLE_PARSER_SEMANTIC_RISK
+    - id: JITO_BUNDLE_STATUS
+      evidence_output: AUTHORITATIVE_ONLY_WITH_EXACT_RETAINED_BUNDLE_ID
+      role: NOT_CALLED_INITIAL_PROBE
+      primary: false
+      reason: NO_RETAINED_BUNDLE_ID_AND_NO_HISTORICAL_DISCOVERY_CONTRACT
+    - id: VENDOR_CLUSTER_LABEL
+      evidence_output: VENDOR_LABEL
+      role: OPTIONAL_FUTURE_CONFLICT_OR_TRIAGE_ONLY
+      primary: false
+      can_create_corroborated: false
+      can_merge_exclude_veto_or_trade: false
+
+probe_contract:
+  next_atom: T24-A5_BOUNDED_RAW_HISTORY_FEASIBILITY_CAPTURE_V1
+  authorized_by_a4: false
+  population:
+    source: A3_FROZEN_PSEUDONYMIZED_POPULATION
+    token_mints: 1
+    wallets: 20
+    expansion_allowed: false
+  provider_method: HELIUS_GET_TRANSACTIONS_FOR_ADDRESS
+  request_parameters:
+    transactionDetails: full
+    sortOrder: asc
+    limit: 100
+    commitment: finalized
+    maxSupportedTransactionVersion: 0
+    status_filter: succeeded
+    pagination: false
+  caps:
+    provider_api_rpc_calls: 21
+    returned_transactions: 2100
+    provider_credits: 210
+    retries: 0
+    fallback_provider_calls: 0
+    cash_spend_usd_cents: 0
+  retention:
+    exact_raw_response_bytes: true
+    request_parameters: true
+    sha256_and_bytes: true
+    pit_timestamps: true
+    truncation_null_and_error_flags: true
+    secrets_or_key_in_url: false
+    durable_raw_public_addresses: false
+
+evidence_family_rules:
+  independence_unit: DISTINCT_RAW_EVENT_FAMILY
+  duplicate_provider_same_transaction_independent: false
+  multiple_fields_same_transaction_independent: false
+  immediate_funder:
+    rule_id: IMMEDIATE_FUNDER_V1
+    evidence_class: RAW_ONCHAIN
+    confidence: DIRECT
+    rule: FIRST_SUCCESSFUL_FINALIZED_EXPLICIT_NATIVE_SOL_TRANSFER_INTO_TARGET
+    implies_ultimate_funder: false
+    implies_ownership: false
+  common_signer:
+    rule_id: COMMON_SIGNER_SEPARATE_EVENT_V1
+    evidence_class: RAW_ONCHAIN
+    confidence: DIRECT
+    minimum_population_wallet_signers: 2
+    same_event_as_funder_counts_as_independent: false
+    implies_ownership: false
+  authoritative_bundle:
+    rule_id: AUTHORITATIVE_BUNDLE_V1
+    evidence_class: RAW_ONCHAIN
+    requires_exact_bundle_id_and_signature_membership: true
+    available_initial_probe: false
+    vendor_label_substitution_allowed: false
+  mint_creator:
+    evidence_class: RAW_ONCHAIN
+    discriminating_membership_family_for_one_mint_population: false
+    implies_beneficial_ownership: false
+  candidate_confidence:
+    shared_immediate_funder_alone: INFERRED
+    corroborated_minimum_independent_raw_families: 2
+    corroborated_requires_disjoint_raw_events: true
+    unresolved_conflict_allows_corroborated: false
+
+post_probe_decision:
+  capacity_formula: MIN(CORROBORATED_COUNT,8)+MIN(INFERRED_OR_VENDOR_COUNT,8)
+  if_capacity_at_least_12: FREEZE_CANDIDATES_AND_ROUTE_TO_BLINDED_AUDIT
+  if_capacity_below_12: NO_AUTOMATIC_EXPANSION_OR_TUNING
+  valid_history_but_insufficient_structure: REDESIGN_DATA
+  incomplete_contradictory_or_unreliable_history: STOP_NO_RELIABLE_ENTITY_SIGNAL
+  wider_population_pagination_provider_or_credit_cap: NEW_USER_APPROVED_BOUNDARY
+
+authority:
+  local_declared_write_set: true
+  offline_validation: true
+  public_official_docs_read: true
+  provider_api_rpc_wss_calls: false
+  credential_use: false
+  provider_credits: 0
+  dependency_changes: false
+  catalog_or_registry_mutation: false
+  r3_or_outcome_access: false
+  wallet_signer_transaction_actions: false
+  cash_spend_usd_cents: 0
+  deploy_or_release: false
+  commit: false
+  push: false
+  pull_request: false
+  merge: false
+
+non_claims:
+  - ENTITY_MEMBERSHIP_ESTABLISHED
+  - ECONOMIC_OR_BENEFICIAL_OWNERSHIP
+  - DEPLOYER_FUNDER_OR_BUNDLER_GROUND_TRUTH
+  - COMPLETE_HOLDER_DISTRIBUTION
+  - ADJUSTED_CONCENTRATION
+  - HOLDER_EXCLUSION_OR_STRATEGY_VETO
+  - ALPHA_CAUSALITY_OR_GENERALIZATION
+  - EXECUTION_PNL_NETRETURN_OR_OWNER_CASHFLOW
+  - R3_OR_OUTCOME_ACCESS
+  - CANONICAL_TASK24_DONE
+
+state_change:
+  task24: IN_PROGRESS
+  atom_a4: VALIDATED
+  owner_decision: EXTEND_EVIDENCE
+  catalog_registration: DEFERRED_TO_TASK24_FINALIZATION
+
+next_boundary:
+  atom: T24-A5_BOUNDED_RAW_HISTORY_FEASIBILITY_CAPTURE_V1
+  authorized: false
+  exact_gate_requires:
+    - PROVIDER_API_RPC_EXECUTION
+    - LOCAL_SECRET_BOUNDARY
+    - MAXIMUM_21_CALLS
+    - MAXIMUM_210_PROVIDER_CREDITS
+    - MAXIMUM_CASH_SPEND_USD_CENTS_0
+  no_secret_in_chat_repo_logs_or_retained_urls: true

@@ -149,6 +149,15 @@ class LifecycleRegistryTests(unittest.TestCase):
                         [record["outcome"] for record in document["records"]],
                         ["FAIL", "INCONCLUSIVE", "INCONCLUSIVE"],
                     )
+                elif registry_type == "decisions_negative_results":
+                    self.assertEqual(
+                        [record["record_id"] for record in document["records"]],
+                        ["NEGATIVE-T24-ENTITY-SIGNAL-V1-001"],
+                    )
+                    self.assertEqual(
+                        [record["record_kind"] for record in document["records"]],
+                        ["negative_result"],
+                    )
                 else:
                     self.assertEqual(document["schema_version"], "1.0")
                     self.assertEqual(document["records"], [])

@@ -1,0 +1,178 @@
+{
+  "receipt_id": "T24-A5R1-EXACT-WIRE-RECAPTURE-PREFLIGHT-001",
+  "schema_version": "1.0",
+  "task_id": "TASK-24",
+  "atom": "T24-A5R1_EXACT_WIRE_RETENTION_RECAPTURE_V1",
+  "as_of": "2026-08-02",
+  "status": "PASS_READY_FOR_EXACT_EXTERNAL_EXECUTION",
+  "entry_gate": {
+    "verdict": "START_AS_WRITTEN",
+    "execution_shape": "SINGLE_PASS",
+    "route_owner": "LOCAL_WORK_PRIMARY",
+    "execution_route": "LOCAL_WORK_CODEX",
+    "accepted_main_commit": "31c01640499be6b7e86a2fe638d9217c202861cc",
+    "accepted_main_tree": "6677878eb2b8195018ab217c6a9a429de5726563",
+    "branch": "task24/entity-graph-contract",
+    "active_time_gates": 0,
+    "product_vision_gate": "CANONICALIZED_WITH_PATCH",
+    "reasoning": "VERY_HIGH_SUFFICIENT",
+    "mode_switch": "NONE"
+  },
+  "authority": {
+    "source": "EXPLICIT_USER_OK_T24_A5R1",
+    "exact_phrase": "T24-A5R1_EXACT_WIRE_RETENTION_RECAPTURE_V1",
+    "provider_api_rpc_calls_authorized": 21,
+    "provider_credits_authorized": 210,
+    "cash_spend_usd_cents_authorized": 0,
+    "retries_authorized": 0,
+    "pagination_authorized": false,
+    "fallback_provider_calls_authorized": 0,
+    "population_expansion_authorized": false,
+    "r3_or_outcome_reads_authorized": 0,
+    "wallet_signer_transaction_actions_authorized": 0,
+    "commit": false,
+    "push": false,
+    "pull_request": false,
+    "merge": false
+  },
+  "repair_origin": {
+    "a5_acceptance": {
+      "path": "docs/evidence/task24/a5_bounded_raw_history_feasibility_capture_v1.json",
+      "sha256": "d7ccdc033918ae8f045ad8c1776d6520ffcec86e6707677f84941a685ac76c02",
+      "status": "FAIL_CURRENT_RUN_EXACT_WIRE_RETENTION_CONTRACT"
+    },
+    "failed_requirement": "EXACT_RAW_RESPONSE_BYTES",
+    "legacy_run_retention": "CANONICAL_FULL_JSON_PLUS_ORIGINAL_WIRE_HASH_ONLY",
+    "repair": "DUAL_IMMUTABLE_EXACT_WIRE_AND_CANONICAL_ENVELOPE_RETENTION"
+  },
+  "implementation_bindings": {
+    "capture_module": {
+      "path": "src/solana_alpha_lab/task24_entity_linkage_capture.py",
+      "sha256": "82cea86523ee70fbdfed154597f43a4660a850847bb1eeaf3d14755bd417ad49",
+      "bytes": 32717
+    },
+    "capture_launcher": {
+      "path": "scripts/run_task24_entity_linkage_capture.py",
+      "sha256": "5e4dd4e48d93f69ff106905bdea7aff952c2dc2947cb6e609bac251ea9016b53",
+      "bytes": 4618
+    },
+    "capture_tests": {
+      "path": "tests/test_task24_entity_linkage_capture.py",
+      "sha256": "021c56cd8bee349d45964d8682104fe05593c29184037cc063cf48cedc1213f0",
+      "bytes": 17672
+    },
+    "projection_module": {
+      "path": "src/solana_alpha_lab/task24_entity_linkage_projection.py",
+      "sha256": "7cc483485fbf31823c0464eb9800f3e919819f88fce34db7ae481b8e591d8048",
+      "bytes": 47486
+    },
+    "projection_launcher": {
+      "path": "scripts/build_task24_entity_linkage_projection.py",
+      "sha256": "583f9eb5a7fac6ca9e86b8a6b25a7b253a65ce6eca204a92d1712666378965f5",
+      "bytes": 1138
+    },
+    "projection_tests": {
+      "path": "tests/test_task24_entity_linkage_projection.py",
+      "sha256": "ceaac39e9a39b4fb11257d8010a083adf7d030661b2ed7d70b3dc387938568ce",
+      "bytes": 15458
+    }
+  },
+  "capture_plan": {
+    "provider": "HELIUS",
+    "method": "getTransactionsForAddress",
+    "dataset_version": "1.1",
+    "canonical_envelope_root": "data/raw/task24_entity_linkage_history_v1_1",
+    "exact_wire_root": "data/raw/task24_entity_linkage_history_wire_v1_1",
+    "roots_existed_before_execution": false,
+    "roots_git_ignored": true,
+    "transaction_details": "full",
+    "sort_order": "asc",
+    "limit_each": 100,
+    "commitment": "finalized",
+    "encoding": "json",
+    "max_supported_transaction_version": 0,
+    "status_filter": "succeeded",
+    "token_accounts_filter": "none",
+    "population": {
+      "token_mints": 1,
+      "wallets": 20,
+      "total_subjects": 21,
+      "fingerprint_sha256": "c513e589184c0d774a23ed00c94daf87a19518e9a3f02374349697d5ad8ef1f0"
+    },
+    "provider_calls": 21,
+    "maximum_returned_transactions": 2100,
+    "maximum_provider_credits": 210,
+    "retries": 0,
+    "pagination": false,
+    "fallback_provider_calls": 0,
+    "cash_spend_usd_cents": 0,
+    "minimum_free_bytes": 1073741824,
+    "observed_free_bytes": 186715070464
+  },
+  "dual_retention_contract": {
+    "exact_wire_bytes": "IMMUTABLE_EXCLUSIVE_CREATE",
+    "exact_wire_sha256_and_bytes": true,
+    "canonical_redacted_full_json": "IMMUTABLE_PARQUET_RAW_EVENT",
+    "canonical_file_and_content_hashes": true,
+    "wire_to_canonical_semantic_equality_required": true,
+    "projector_rejects_missing_wire_domain": true,
+    "raw_public_addresses_in_tracked_outputs": 0,
+    "raw_transaction_signatures_in_tracked_outputs": 0
+  },
+  "secret_boundary": {
+    "matching_environment_variable_present": false,
+    "mode": "LOCAL_INTERACTIVE_HIDDEN_INPUT",
+    "dashboard_credit_readback_required": true,
+    "minimum_attested_remaining_credits": 210,
+    "credential_persisted": false,
+    "credential_printed": false,
+    "credential_in_safe_receipt": false,
+    "credential_in_tracked_file": false
+  },
+  "validation": {
+    "preflight_status": "PASS",
+    "targeted_command": "uv run --locked --managed-python python -B -m unittest tests.test_task24_entity_linkage_capture tests.test_task24_entity_linkage_projection",
+    "tests_passed": 29,
+    "failures": 0,
+    "errors": 0,
+    "synthetic_exact_wire_files": 21,
+    "legacy_capture_rejection": "PASS_EXACT_WIRE_RESPONSE_NOT_RETAINED",
+    "raw_root_version_separation": "PASS"
+  },
+  "managed_write_set": [
+    "src/solana_alpha_lab/task24_entity_linkage_capture.py",
+    "scripts/run_task24_entity_linkage_capture.py",
+    "tests/test_task24_entity_linkage_capture.py",
+    "src/solana_alpha_lab/task24_entity_linkage_projection.py",
+    "scripts/build_task24_entity_linkage_projection.py",
+    "tests/test_task24_entity_linkage_projection.py",
+    "tests/test_task24_entity_linkage_recapture.py",
+    "docs/evidence/task24/a5r1_exact_wire_recapture_preflight_v1.json",
+    "docs/evidence/task24/a5r1_projection_v1/entity_nodes_v1.jsonl",
+    "docs/evidence/task24/a5r1_projection_v1/entity_edges_v1.jsonl",
+    "docs/evidence/task24/a5r1_projection_v1/entity_candidates_v1.json",
+    "docs/evidence/task24/a5r1_projection_v1/entity_adjusted_concentration_v1.json",
+    "docs/evidence/task24/a5r1_projection_v1/projection_manifest_v1.json",
+    "docs/evidence/task24/a5r1_exact_wire_retention_recapture_v1.json",
+    "data/raw/task24_entity_linkage_history_v1_1/run=<runtime-id>",
+    "data/raw/task24_entity_linkage_history_wire_v1_1/run=<runtime-id>"
+  ],
+  "stop_conditions": [
+    "AUTHORITY_PHRASE_MISMATCH",
+    "DASHBOARD_CREDITS_BELOW_210",
+    "CREDENTIAL_INVALID",
+    "FROZEN_POPULATION_OR_HASH_DRIFT",
+    "HTTP_OR_PROVIDER_ERROR",
+    "PAYLOAD_SCHEMA_OR_OLDEST_FIRST_ORDER_DRIFT",
+    "EXACT_WIRE_OR_CANONICAL_STORAGE_FAILURE",
+    "WIRE_CANONICAL_SEMANTIC_DRIFT",
+    "CALL_21_COMPLETED"
+  ],
+  "current_boundary": {
+    "status": "LOCAL_HIDDEN_INPUT_REQUIRED",
+    "provider_calls_executed": 0,
+    "provider_credits_consumed": 0,
+    "cash_spend_usd_cents": 0,
+    "next_action": "RUN_EXECUTE_LAUNCHER_AND_ENTER_AUTHORITY_CREDITS_AND_HIDDEN_KEY"
+  }
+}
