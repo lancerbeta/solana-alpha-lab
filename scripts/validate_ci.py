@@ -232,10 +232,11 @@ def run_tracked_only_delivery_preflight(*, base_ref: str = "origin/main") -> Non
             if clone.returncode != 0:
                 raise CiValidationError("delivery_tracked_clone_failed")
             git_text(["remote", "set-url", "origin", origin_url], cwd=checkout)
-            if "refs/heads/main" not in git_text(
-                ["for-each-ref", "--format=%(refname)", "refs/heads"], cwd=checkout
-            ).splitlines():
-                git_text(["branch", "main", "origin/main"], cwd=checkout)
+            git_text(
+                ["update-ref", "refs/remotes/origin/main", base_commit],
+                cwd=checkout,
+            )
+            git_text(["branch", "-f", "main", base_commit], cwd=checkout)
             git_text(
                 [
                     "symbolic-ref",
