@@ -39,7 +39,7 @@ NEW_IDS = {
 UPDATED_FILES = {
     "VALIDATOR-T04-ARCHITECTURE-001": (
         "scripts/validate_task04.py",
-        "3635955f1439b7787bcfdfc064dd2ba5cf97009117121c80f2cd732e16ce4622",
+        "c8ab8c3f7116050f20cdbc6cf5aa708de4a3c6e01912670970c167087020c06b",
     ),
     "TEST-T16-HYPOTHESIS-RESEARCH-MEMORY-ACCEPTANCE-001": (
         "tests/test_task16_hypothesis_research_memory_acceptance.py",

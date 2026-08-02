@@ -12404,7 +12404,7 @@ records:
     repository_path: configs/task24_data_redesign_or_stop_decision_v1.yaml
   integrity:
     kind: sha256
-    sha256: 0bafb705f0909fb4593fcdadc3803cfca3832773f25748477c713ed97cd25188
+    sha256: b68cdebbdc9399cd72c5b03ce586b87dac0496b293be2f64ecff0898e346f2e3
   access: *t24_read_file
   relations:
   - relation_type: governed_by
@@ -12427,7 +12427,7 @@ records:
     repository_path: tests/test_task24_data_redesign_or_stop_decision.py
   integrity:
     kind: sha256
-    sha256: 1fbfe712154f3383744af773164126314ef8771af553695dc6a00e2c4d88be9a
+    sha256: d53e1020149ec2eac6850d85c7ccd6ab4f50cf1666aee46ce2dbf5b5ed5b6795
   access: *t24_read_file
   relations:
   - relation_type: depends_on
@@ -12452,7 +12452,7 @@ records:
     repository_path: docs/evidence/task24/a6_bounded_data_redesign_or_stop_decision_v1.json
   integrity:
     kind: sha256
-    sha256: 031ea9c5564fbbe9020a11695daeb4661794acb21c793075ab636fcc7380fae1
+    sha256: 442350624eef0625da3415692c48d2544c4d46c8edd21c5b7051098f7501d455
   access: *t24_read_file
   relations:
   - relation_type: depends_on
@@ -12983,7 +12983,7 @@ records:
     repository_path: tests/test_task23_catalog_repository_factory_fit.py
   integrity:
     kind: sha256
-    sha256: d3040bb8b269371282e228d0bd5f15c5b9609dd631713d94cab1dfbeb8c289e4
+    sha256: f71eec7329572612d020a1bd8760d865b1e045c5cc12b9f03e587078eddaf47e
   access: *t23_read_file
   relations:
   - relation_type: depends_on

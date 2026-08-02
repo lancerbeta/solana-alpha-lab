@@ -68,13 +68,13 @@
     },
     "config": {
       "path": "configs/task24_data_redesign_or_stop_decision_v1.yaml",
-      "sha256": "0bafb705f0909fb4593fcdadc3803cfca3832773f25748477c713ed97cd25188",
-      "bytes": 7110
+      "sha256": "b68cdebbdc9399cd72c5b03ce586b87dac0496b293be2f64ecff0898e346f2e3",
+      "bytes": 7109
     },
     "test": {
       "path": "tests/test_task24_data_redesign_or_stop_decision.py",
-      "sha256": "1fbfe712154f3383744af773164126314ef8771af553695dc6a00e2c4d88be9a",
-      "bytes": 9671
+      "sha256": "d53e1020149ec2eac6850d85c7ccd6ab4f50cf1666aee46ce2dbf5b5ed5b6795",
+      "bytes": 9670
     }
   },
   "measured_result": {
