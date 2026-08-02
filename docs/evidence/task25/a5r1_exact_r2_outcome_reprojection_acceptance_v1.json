@@ -1,0 +1,203 @@
+{
+  "acceptance_checks": [
+    {
+      "check_id": "PRE_READ_SEALED_BEFORE_RAW_REOPEN",
+      "status": "PASS"
+    },
+    {
+      "check_id": "NINE_RAW_HASHES_AND_72_LINES_EXACT",
+      "status": "PASS"
+    },
+    {
+      "check_id": "EXACT_MINT_ATOMIC_AND_PAIR_IDENTITY_RETAINED",
+      "status": "PASS"
+    },
+    {
+      "check_id": "PIT_ORDER_AND_EVALUATION_CUTOFF_VALID",
+      "status": "PASS"
+    },
+    {
+      "check_id": "FILLABLE_35_SUPPORTED_ONE_LATENCY_UNKNOWN",
+      "status": "PASS"
+    },
+    {
+      "check_id": "QUOTE_EXIT_36_SUPPORTED_INVENTORY_REMAINS_OPEN",
+      "status": "PASS"
+    },
+    {
+      "check_id": "TOUCH_REALIZED_VWAP_NET_REMAIN_UNKNOWN",
+      "status": "PASS"
+    },
+    {
+      "check_id": "PATH_RISK_DISCRETE_ONLY",
+      "status": "PASS"
+    },
+    {
+      "check_id": "R3_UNTOUCHED",
+      "status": "PASS"
+    },
+    {
+      "check_id": "CI_PORTABLE_SYNTHETIC_TRANSFORM_COVERAGE",
+      "status": "PASS"
+    }
+  ],
+  "atom_id": "T25-A5R1_EXACT_R2_OUTCOME_SURFACE_REPROJECTION_V1",
+  "implementation": {
+    "module": {
+      "path": "src/solana_alpha_lab/task25_exact_r2_outcome_reprojection.py",
+      "sha256": "8291042a23acd9c10ccc424e4978b101d47741c2994906ba1eb5b65eb0c259a9"
+    },
+    "tests": {
+      "path": "tests/test_task25_exact_r2_outcome_reprojection.py",
+      "sha256": "6b5749d1206292cdaae1e272c2e387e74e7fc71362c9bcabcb01bfb77e5ff94a"
+    },
+    "upstream_parser": {
+      "path": "src/solana_alpha_lab/task23_diagnostic_projection.py",
+      "sha256": "728fa77fc82a3e27245a908cfecc2a50e7df82c5813e6b90d4ad8ff0870e57f9"
+    }
+  },
+  "input_bindings": {
+    "pre_read_manifest": {
+      "path": "docs/evidence/task25/a5r1_exact_r2_pre_read_manifest_v1.json",
+      "sha256": "ba6a2b8b8af550ce613860a250fc5e1be57109d89bb76dbb21644da1b96f3fc2"
+    },
+    "raw_inputs": [
+      {
+        "bytes": 43519,
+        "line_count": 8,
+        "path": "local/task21_forward/final_cohort/r2/p1/run=p1-20260801T122606020085Z-c66cbd9193f1/member=T21-WATCH-29e2b75994975253bd74/horizon=P1/raw_events.jsonl",
+        "sha256": "e4216ee65212eaf2143174b3dacfa31b6c198f7ebd24a81b9f4166f95472d950"
+      },
+      {
+        "bytes": 42708,
+        "line_count": 8,
+        "path": "local/task21_forward/final_cohort/r2/p1/run=p1-20260801T122606020085Z-c66cbd9193f1/member=T21-WATCH-61ce24fc3fa04e3eaba7/horizon=P1/raw_events.jsonl",
+        "sha256": "146d759f9223eb5fcae4ba94a3431765f7c37c1442a2211730a098f4214c5d36"
+      },
+      {
+        "bytes": 43567,
+        "line_count": 8,
+        "path": "local/task21_forward/final_cohort/r2/p1/run=p1-20260801T122606020085Z-c66cbd9193f1/member=T21-WATCH-6f21dec76d05f5831216/horizon=P1/raw_events.jsonl",
+        "sha256": "b84bace925142e8550eb4e75a2e9b45b034732625885ff817ce5941df5983fa0"
+      },
+      {
+        "bytes": 43108,
+        "line_count": 8,
+        "path": "local/task21_forward/final_cohort/r2/p2/run=p2-20260801T131100955007Z-1e6e05144f30/member=T21-WATCH-29e2b75994975253bd74/horizon=P2/raw_events.jsonl",
+        "sha256": "65050b7e36b62114b1ed8753dea730eafbcfad70d79053d129758dea87615eec"
+      },
+      {
+        "bytes": 43925,
+        "line_count": 8,
+        "path": "local/task21_forward/final_cohort/r2/p2/run=p2-20260801T131100955007Z-1e6e05144f30/member=T21-WATCH-61ce24fc3fa04e3eaba7/horizon=P2/raw_events.jsonl",
+        "sha256": "d66347571e142a68c682492790af799854c95fd646537dddc99fc07d9a44b3d1"
+      },
+      {
+        "bytes": 43905,
+        "line_count": 8,
+        "path": "local/task21_forward/final_cohort/r2/p2/run=p2-20260801T131100955007Z-1e6e05144f30/member=T21-WATCH-6f21dec76d05f5831216/horizon=P2/raw_events.jsonl",
+        "sha256": "6859ba724a7602000cca93435b978fc253b5a80a0c3b2b4ecf4ff3567084e101"
+      },
+      {
+        "bytes": 43115,
+        "line_count": 8,
+        "path": "local/task21_forward/final_cohort/r2/run=r2-20260801T114657421057Z-7882ff946449/member=T21-WATCH-29e2b75994975253bd74/horizon=P0/raw_events.jsonl",
+        "sha256": "9a880c74657ac25693d4804411da385e247aa637e511a91c2ff320d256ac5278"
+      },
+      {
+        "bytes": 44397,
+        "line_count": 8,
+        "path": "local/task21_forward/final_cohort/r2/run=r2-20260801T114657421057Z-7882ff946449/member=T21-WATCH-61ce24fc3fa04e3eaba7/horizon=P0/raw_events.jsonl",
+        "sha256": "b0f61b312defd68341b1282ad40a80e6dc865ad23a279a85b0dc6abac3a8863f"
+      },
+      {
+        "bytes": 43990,
+        "line_count": 8,
+        "path": "local/task21_forward/final_cohort/r2/run=r2-20260801T114657421057Z-7882ff946449/member=T21-WATCH-6f21dec76d05f5831216/horizon=P0/raw_events.jsonl",
+        "sha256": "ce0009934f2bfabf449e62fe2eae6b1cab9ab739084c6025da6095472af4ca01"
+      }
+    ]
+  },
+  "limitations": [
+    "ONE_CAPTURE_CLUSTER_DESCRIPTIVE_ONLY",
+    "DEVELOPMENT_LIMITS_REUSE_A2_GOLDEN_NUMERIC_PARAMETERS",
+    "ONE_BUY_QUOTE_EXCEEDS_1000_MS_LATENCY_AND_REMAINS_UNKNOWN",
+    "NO_ACTUAL_FILLS_OR_SETTLED_CASHFLOW",
+    "TOUCH_THRESHOLD_NOT_FROZEN"
+  ],
+  "next_boundary": {
+    "authorized_by_a5r1": false,
+    "candidate_atom": "T25-A6_REGISTER_ASSETS_UPDATE_CATALOG_AND_FULL_FACTORY_FIT_REVIEW_V1",
+    "r3_access": "DENY"
+  },
+  "schema": "smial.task25.exact-r2-outcome-reprojection-acceptance",
+  "schema_version": "1.0",
+  "side_effects": {
+    "cash_or_credits_spent": 0,
+    "catalog_changed": 0,
+    "commit_push_pr_merge_actions": 0,
+    "dependencies_added": 0,
+    "new_collection": 0,
+    "provider_api_rpc_wss_calls": 0,
+    "r3_paths_or_values_read": 0,
+    "raw_r2_bytes_read_for_generation": 392234,
+    "raw_r2_value_files_opened_for_generation": 9,
+    "sources_changed": 0,
+    "wallet_signer_transaction_actions": 0
+  },
+  "status": "PASS_EXACT_R2_OUTCOME_SURFACE_WITH_BOUNDED_DEVELOPMENT_LABELS",
+  "surface": {
+    "path": "docs/evidence/task25/a5r1_exact_r2_outcome_surface_v1.json",
+    "sha256": "20b5a611895b35856192b274e8954b34e4794e593605b9c3962d2115d4fbd59f",
+    "summary": {
+      "assessment_reasons": {
+        "ACTUAL_RECONCILED_FILLS_NOT_OBSERVED": 9,
+        "EXACT_QUOTE_RETENTION_ON_ACTUAL_SPARSE_GRID": 9,
+        "EXACT_QUOTE_WITHIN_FROZEN_LIMITS": 71,
+        "NO_FROZEN_REFERENCE_THRESHOLD_OR_CROSS_FIELD": 9,
+        "PROVIDER_LATENCY_LIMIT_EXCEEDED": 1,
+        "SETTLED_CASHFLOW_AND_TASK26_COST_MODEL_NOT_AVAILABLE": 9
+      },
+      "assessments": {
+        "SUPPORTED": 80,
+        "UNKNOWN": 28
+      },
+      "fillable_supported": 35,
+      "freshness_limit_exceeded_attempts": 0,
+      "future_rows_consumed": 0,
+      "labels": {
+        "FILLABLE": 36,
+        "NET": 9,
+        "PATH_RISK": 9,
+        "QUOTE_EXIT": 36,
+        "REALIZED_VWAP": 9,
+        "TOUCH": 9
+      },
+      "latency_limit_exceeded_attempts": 1,
+      "members": 3,
+      "net_supported": 0,
+      "outcomes_dropped": 0,
+      "outcomes_input": 108,
+      "outcomes_output": 108,
+      "panels": 9,
+      "quote_attempts": 72,
+      "quote_exit_supported": 36,
+      "quote_pairs": 36,
+      "r3_paths_or_values_read": 0,
+      "raw_r2_bytes_read": 392234,
+      "raw_r2_lines_read": 72,
+      "raw_r2_value_files_opened": 9,
+      "realized_vwap_supported": 0,
+      "unknown_values_coerced_to_zero": 0
+    }
+  },
+  "synthetic_delivery_fixture": {
+    "classification_cases": 12,
+    "decision_critical_skip_count": 0,
+    "pair_identity_cases": 2,
+    "path": "tests/fixtures/task25/a5r1_exact_r2_quote_fixture_v1.json",
+    "raw_local_dependency_required_by_ci": false,
+    "sha256": "bbb7aefc1a3a313479757bd1e288fe733393b9e0a2fece24e425f6aa3f8a7556"
+  },
+  "task_id": "TASK-25"
+}

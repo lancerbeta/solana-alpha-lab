@@ -1,0 +1,588 @@
+{
+  "atom_id": "T25-A3_DETERMINISTIC_OUTCOME_ENGINE_AND_GOLDEN_ACCEPTANCE_V1",
+  "claims": [
+    "SYNTHETIC_OUTCOME_ENGINE_CONTRACT_ACCEPTED"
+  ],
+  "engine_version": "1.0.0",
+  "evaluation_cutoff_at": "2026-01-01T00:15:00Z",
+  "input_bindings": {
+    "config": {
+      "path": "configs/task25_outcome_label_and_pit_contract_v1.yaml",
+      "sha256": "18a605cc3380d060b6e443430e33b22b49a59fca6d20ddc28078faec2ae5a483"
+    },
+    "contract": {
+      "path": "docs/contracts/task25_outcome_label_and_pit_contract_v1.md",
+      "sha256": "04e4397e69d554463a09564bdb1cbbb2ac41ce8662277d05e4565c178e94c801"
+    },
+    "fixture": {
+      "path": "tests/fixtures/task25/outcome_label_contract_v1.json",
+      "sha256": "269896634d1225f9b606cc12c13fcea6e624143bfe35413c3ad1acf9b8dcb917"
+    },
+    "schema": {
+      "path": "catalog/schemas/task25_outcome_evidence.schema.json",
+      "sha256": "d8c4cae7f5e8004a6d7606acc78e344186bf24a95ccb1696cce5575979c4aff3"
+    }
+  },
+  "limitations": [
+    "SYNTHETIC_ONLY_NO_R2_OUTCOME_PROJECTION",
+    "QUOTE_EVIDENCE_IS_NOT_EXECUTION_OR_SETTLEMENT",
+    "REALIZED_VWAP_AND_NET_SUPPORTED_CASES_ARE_SYNTHETIC_GOLDEN_ONLY",
+    "SPARSE_PANEL_PATH_CLAIMS_REMAIN_DISCRETE_ONLY",
+    "CATALOG_REGISTRATION_DEFERRED_TO_T25_A6"
+  ],
+  "next_boundary": {
+    "atom": "T25-A4_BOUNDED_R2_OUTCOME_PROJECTION_AND_READ_RECEIPT_V1",
+    "authorized_by_a3": false,
+    "r3_access": "DENY",
+    "requires_exact_pre_read_receipt": true
+  },
+  "outcomes": [
+    {
+      "assessment": "SUPPORTED",
+      "available_to_strategy_at": "2026-01-01T00:01:03Z",
+      "case_id": "touch_continuous_supported",
+      "cashflow_state": "NOT_APPLICABLE",
+      "claim_scope": "TOUCH_WITHIN_HORIZON",
+      "evidence_basis": "REFERENCE_PRICE_PATH",
+      "fill_state": "NOT_APPLICABLE",
+      "inventory": {
+        "failed_exit_state": null,
+        "recovery_currency_or_mint": null,
+        "recovery_lower_bound_decimal": null,
+        "recovery_unit": null,
+        "recovery_upper_bound_decimal": null,
+        "remaining_inventory_atomic": "0",
+        "remaining_inventory_decimals": null,
+        "remaining_inventory_mint": null,
+        "state": "NOT_APPLICABLE"
+      },
+      "label": "TOUCH",
+      "notional": null,
+      "path_state": "CONTINUOUS_COMPLETE",
+      "quality_flags": [
+        "COMPLETE_REFERENCE_PATH",
+        "OBSERVED_THRESHOLD_CROSS"
+      ],
+      "record_id": "T25-GOLDEN-001",
+      "route_state": "NOT_APPLICABLE",
+      "source_content_sha256": "1111111111111111111111111111111111111111111111111111111111111111",
+      "unit": "RETURN_DECIMAL",
+      "value_decimal": "0.250000"
+    },
+    {
+      "assessment": "SUPPORTED",
+      "available_to_strategy_at": "2026-01-01T00:02:03Z",
+      "case_id": "touch_sparse_observed_cross_supported",
+      "cashflow_state": "NOT_APPLICABLE",
+      "claim_scope": "OBSERVED_GRID_CROSSING",
+      "evidence_basis": "DISCRETE_PANEL_GRID",
+      "fill_state": "NOT_APPLICABLE",
+      "inventory": {
+        "failed_exit_state": null,
+        "recovery_currency_or_mint": null,
+        "recovery_lower_bound_decimal": null,
+        "recovery_unit": null,
+        "recovery_upper_bound_decimal": null,
+        "remaining_inventory_atomic": "0",
+        "remaining_inventory_decimals": null,
+        "remaining_inventory_mint": null,
+        "state": "NOT_APPLICABLE"
+      },
+      "label": "TOUCH",
+      "notional": null,
+      "path_state": "SPARSE_DISCRETE",
+      "quality_flags": [
+        "SPARSE_PANEL",
+        "OBSERVED_THRESHOLD_CROSS"
+      ],
+      "record_id": "T25-GOLDEN-002",
+      "route_state": "NOT_APPLICABLE",
+      "source_content_sha256": "2222222222222222222222222222222222222222222222222222222222222222",
+      "unit": "RETURN_DECIMAL",
+      "value_decimal": "0.220000"
+    },
+    {
+      "assessment": "UNKNOWN",
+      "available_to_strategy_at": "2026-01-01T00:03:03Z",
+      "case_id": "touch_sparse_no_cross_unknown",
+      "cashflow_state": "NOT_APPLICABLE",
+      "claim_scope": "TOUCH_WITHIN_HORIZON",
+      "evidence_basis": "DISCRETE_PANEL_GRID",
+      "fill_state": "NOT_APPLICABLE",
+      "inventory": {
+        "failed_exit_state": null,
+        "recovery_currency_or_mint": null,
+        "recovery_lower_bound_decimal": null,
+        "recovery_unit": null,
+        "recovery_upper_bound_decimal": null,
+        "remaining_inventory_atomic": "0",
+        "remaining_inventory_decimals": null,
+        "remaining_inventory_mint": null,
+        "state": "NOT_APPLICABLE"
+      },
+      "label": "TOUCH",
+      "notional": null,
+      "path_state": "SPARSE_DISCRETE",
+      "quality_flags": [
+        "SPARSE_PANEL",
+        "NO_OBSERVED_THRESHOLD_CROSS",
+        "INTER_PANEL_PATH_UNOBSERVED"
+      ],
+      "record_id": "T25-GOLDEN-003",
+      "route_state": "NOT_APPLICABLE",
+      "source_content_sha256": "3333333333333333333333333333333333333333333333333333333333333333",
+      "unit": null,
+      "value_decimal": null
+    },
+    {
+      "assessment": "SUPPORTED",
+      "available_to_strategy_at": "2026-01-01T00:04:03Z",
+      "case_id": "fillable_quote_supported_exact_notional",
+      "cashflow_state": "CASHFLOW_NOT_OBSERVED",
+      "claim_scope": "POINT_IN_TIME_QUOTE",
+      "evidence_basis": "CONTEMPORANEOUS_QUOTE",
+      "fill_state": "ACTUAL_FILLS_NOT_OBSERVED",
+      "inventory": {
+        "failed_exit_state": null,
+        "recovery_currency_or_mint": null,
+        "recovery_lower_bound_decimal": null,
+        "recovery_unit": null,
+        "recovery_upper_bound_decimal": null,
+        "remaining_inventory_atomic": "0",
+        "remaining_inventory_decimals": null,
+        "remaining_inventory_mint": null,
+        "state": "NOT_APPLICABLE"
+      },
+      "label": "FILLABLE",
+      "notional": {
+        "freshness_max_age_ms": 5000,
+        "input_amount_atomic": "25000000",
+        "input_decimals": 6,
+        "input_mint": "USDC_SYNTHETIC",
+        "latency_budget_ms": 1000,
+        "observed_age_ms": 250,
+        "quote_decimals": 6,
+        "quote_mint": "TOKEN_SYNTHETIC"
+      },
+      "path_state": "NOT_APPLICABLE",
+      "quality_flags": [
+        "EXACT_ATOMIC_NOTIONAL",
+        "FRESH_QUOTE"
+      ],
+      "record_id": "T25-GOLDEN-004",
+      "route_state": "QUOTE_AVAILABLE",
+      "source_content_sha256": "4444444444444444444444444444444444444444444444444444444444444444",
+      "unit": "RETURN_DECIMAL",
+      "value_decimal": "0.180000"
+    },
+    {
+      "assessment": "SUPPORTED",
+      "available_to_strategy_at": "2026-01-01T00:05:03Z",
+      "case_id": "quote_exit_supported_inventory_stays_open",
+      "cashflow_state": "CASHFLOW_NOT_OBSERVED",
+      "claim_scope": "POINT_IN_TIME_QUOTE",
+      "evidence_basis": "CONTEMPORANEOUS_QUOTE",
+      "fill_state": "ACTUAL_FILLS_NOT_OBSERVED",
+      "inventory": {
+        "failed_exit_state": null,
+        "recovery_currency_or_mint": null,
+        "recovery_lower_bound_decimal": null,
+        "recovery_unit": null,
+        "recovery_upper_bound_decimal": null,
+        "remaining_inventory_atomic": "9000000",
+        "remaining_inventory_decimals": 6,
+        "remaining_inventory_mint": "TOKEN_SYNTHETIC",
+        "state": "OPEN"
+      },
+      "label": "QUOTE_EXIT",
+      "notional": {
+        "freshness_max_age_ms": 5000,
+        "input_amount_atomic": "9000000",
+        "input_decimals": 6,
+        "input_mint": "TOKEN_SYNTHETIC",
+        "latency_budget_ms": 1000,
+        "observed_age_ms": 300,
+        "quote_decimals": 6,
+        "quote_mint": "USDC_SYNTHETIC"
+      },
+      "path_state": "NOT_APPLICABLE",
+      "quality_flags": [
+        "EXACT_ATOMIC_NOTIONAL",
+        "FRESH_QUOTE",
+        "QUOTE_IS_NOT_FILL"
+      ],
+      "record_id": "T25-GOLDEN-005",
+      "route_state": "QUOTE_AVAILABLE",
+      "source_content_sha256": "5555555555555555555555555555555555555555555555555555555555555555",
+      "unit": "RETURN_DECIMAL",
+      "value_decimal": "0.110000"
+    },
+    {
+      "assessment": "REFUTED",
+      "available_to_strategy_at": "2026-01-01T00:06:03Z",
+      "case_id": "quote_exit_explicit_no_route_refuted",
+      "cashflow_state": "CASHFLOW_NOT_OBSERVED",
+      "claim_scope": "POINT_IN_TIME_QUOTE",
+      "evidence_basis": "CONTEMPORANEOUS_QUOTE",
+      "fill_state": "ACTUAL_FILLS_NOT_OBSERVED",
+      "inventory": {
+        "failed_exit_state": "NO_ROUTE",
+        "recovery_currency_or_mint": "USDC_SYNTHETIC",
+        "recovery_lower_bound_decimal": "-1.000000",
+        "recovery_unit": "RETURN_DECIMAL",
+        "recovery_upper_bound_decimal": "0.110000",
+        "remaining_inventory_atomic": "9000000",
+        "remaining_inventory_decimals": 6,
+        "remaining_inventory_mint": "TOKEN_SYNTHETIC",
+        "state": "UNRESOLVED_REQUIRES_RECOVERY"
+      },
+      "label": "QUOTE_EXIT",
+      "notional": {
+        "freshness_max_age_ms": 5000,
+        "input_amount_atomic": "9000000",
+        "input_decimals": 6,
+        "input_mint": "TOKEN_SYNTHETIC",
+        "latency_budget_ms": 1000,
+        "observed_age_ms": 350,
+        "quote_decimals": 6,
+        "quote_mint": "USDC_SYNTHETIC"
+      },
+      "path_state": "MISSING_EXIT",
+      "quality_flags": [
+        "EXACT_NO_ROUTE_RESPONSE",
+        "MISSING_EXIT_RETAINED"
+      ],
+      "record_id": "T25-GOLDEN-006",
+      "route_state": "NO_ROUTE",
+      "source_content_sha256": "6666666666666666666666666666666666666666666666666666666666666666",
+      "unit": null,
+      "value_decimal": null
+    },
+    {
+      "assessment": "UNKNOWN",
+      "available_to_strategy_at": "2026-01-01T00:07:03Z",
+      "case_id": "quote_exit_provider_error_unknown",
+      "cashflow_state": "CASHFLOW_NOT_OBSERVED",
+      "claim_scope": "POINT_IN_TIME_QUOTE",
+      "evidence_basis": "CONTEMPORANEOUS_QUOTE",
+      "fill_state": "ACTUAL_FILLS_NOT_OBSERVED",
+      "inventory": {
+        "failed_exit_state": null,
+        "recovery_currency_or_mint": null,
+        "recovery_lower_bound_decimal": null,
+        "recovery_unit": null,
+        "recovery_upper_bound_decimal": null,
+        "remaining_inventory_atomic": "9000000",
+        "remaining_inventory_decimals": 6,
+        "remaining_inventory_mint": "TOKEN_SYNTHETIC",
+        "state": "OPEN"
+      },
+      "label": "QUOTE_EXIT",
+      "notional": {
+        "freshness_max_age_ms": 5000,
+        "input_amount_atomic": "9000000",
+        "input_decimals": 6,
+        "input_mint": "TOKEN_SYNTHETIC",
+        "latency_budget_ms": 1000,
+        "observed_age_ms": 400,
+        "quote_decimals": 6,
+        "quote_mint": "USDC_SYNTHETIC"
+      },
+      "path_state": "UNOBSERVED",
+      "quality_flags": [
+        "PROVIDER_ERROR_OBSERVED",
+        "NO_ROUTE_NOT_ESTABLISHED"
+      ],
+      "record_id": "T25-GOLDEN-007",
+      "route_state": "PROVIDER_ERROR",
+      "source_content_sha256": "7777777777777777777777777777777777777777777777777777777777777777",
+      "unit": null,
+      "value_decimal": null
+    },
+    {
+      "assessment": "UNKNOWN",
+      "available_to_strategy_at": "2026-01-01T00:08:03Z",
+      "case_id": "fillable_stale_quote_unknown",
+      "cashflow_state": "CASHFLOW_NOT_OBSERVED",
+      "claim_scope": "POINT_IN_TIME_QUOTE",
+      "evidence_basis": "CONTEMPORANEOUS_QUOTE",
+      "fill_state": "ACTUAL_FILLS_NOT_OBSERVED",
+      "inventory": {
+        "failed_exit_state": null,
+        "recovery_currency_or_mint": null,
+        "recovery_lower_bound_decimal": null,
+        "recovery_unit": null,
+        "recovery_upper_bound_decimal": null,
+        "remaining_inventory_atomic": "0",
+        "remaining_inventory_decimals": null,
+        "remaining_inventory_mint": null,
+        "state": "NOT_APPLICABLE"
+      },
+      "label": "FILLABLE",
+      "notional": {
+        "freshness_max_age_ms": 5000,
+        "input_amount_atomic": "25000000",
+        "input_decimals": 6,
+        "input_mint": "USDC_SYNTHETIC",
+        "latency_budget_ms": 1000,
+        "observed_age_ms": 8000,
+        "quote_decimals": 6,
+        "quote_mint": "TOKEN_SYNTHETIC"
+      },
+      "path_state": "NOT_APPLICABLE",
+      "quality_flags": [
+        "STALE_QUOTE",
+        "NO_FILLABILITY_CLAIM"
+      ],
+      "record_id": "T25-GOLDEN-008",
+      "route_state": "STALE_QUOTE",
+      "source_content_sha256": "8888888888888888888888888888888888888888888888888888888888888888",
+      "unit": null,
+      "value_decimal": null
+    },
+    {
+      "assessment": "UNKNOWN",
+      "available_to_strategy_at": "2026-01-01T00:09:03Z",
+      "case_id": "realized_vwap_unknown_without_fills",
+      "cashflow_state": "CASHFLOW_NOT_OBSERVED",
+      "claim_scope": "ACTUAL_FILL_SERIES",
+      "evidence_basis": "NONE",
+      "fill_state": "ACTUAL_FILLS_NOT_OBSERVED",
+      "inventory": {
+        "failed_exit_state": null,
+        "recovery_currency_or_mint": null,
+        "recovery_lower_bound_decimal": null,
+        "recovery_unit": null,
+        "recovery_upper_bound_decimal": null,
+        "remaining_inventory_atomic": "0",
+        "remaining_inventory_decimals": null,
+        "remaining_inventory_mint": null,
+        "state": "NOT_APPLICABLE"
+      },
+      "label": "REALIZED_VWAP",
+      "notional": null,
+      "path_state": "NOT_APPLICABLE",
+      "quality_flags": [
+        "QUOTE_ONLY",
+        "ACTUAL_FILLS_ABSENT"
+      ],
+      "record_id": "T25-GOLDEN-009",
+      "route_state": "NOT_APPLICABLE",
+      "source_content_sha256": "9999999999999999999999999999999999999999999999999999999999999999",
+      "unit": null,
+      "value_decimal": null
+    },
+    {
+      "assessment": "SUPPORTED",
+      "available_to_strategy_at": "2026-01-01T00:10:03Z",
+      "case_id": "realized_vwap_supported_reconciled_fills",
+      "cashflow_state": "CASHFLOW_NOT_OBSERVED",
+      "claim_scope": "ACTUAL_FILL_SERIES",
+      "evidence_basis": "ACTUAL_RECONCILED_FILLS",
+      "fill_state": "ACTUAL_FILLS_RECONCILED",
+      "inventory": {
+        "failed_exit_state": null,
+        "recovery_currency_or_mint": null,
+        "recovery_lower_bound_decimal": null,
+        "recovery_unit": null,
+        "recovery_upper_bound_decimal": null,
+        "remaining_inventory_atomic": "0",
+        "remaining_inventory_decimals": null,
+        "remaining_inventory_mint": null,
+        "state": "RECOVERED"
+      },
+      "label": "REALIZED_VWAP",
+      "notional": null,
+      "path_state": "NOT_APPLICABLE",
+      "quality_flags": [
+        "ACTUAL_FILLS_RECONCILED",
+        "SYNTHETIC_ONLY"
+      ],
+      "record_id": "T25-GOLDEN-010",
+      "route_state": "NOT_APPLICABLE",
+      "source_content_sha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "unit": "RETURN_DECIMAL",
+      "value_decimal": "0.120000"
+    },
+    {
+      "assessment": "UNKNOWN",
+      "available_to_strategy_at": "2026-01-01T00:11:03Z",
+      "case_id": "net_unknown_fee_model_unavailable",
+      "cashflow_state": "FEE_MODEL_UNAVAILABLE",
+      "claim_scope": "SETTLED_CASHFLOW",
+      "evidence_basis": "NONE",
+      "fill_state": "ACTUAL_FILLS_RECONCILED",
+      "inventory": {
+        "failed_exit_state": null,
+        "recovery_currency_or_mint": null,
+        "recovery_lower_bound_decimal": null,
+        "recovery_unit": null,
+        "recovery_upper_bound_decimal": null,
+        "remaining_inventory_atomic": "0",
+        "remaining_inventory_decimals": null,
+        "remaining_inventory_mint": null,
+        "state": "FLAT"
+      },
+      "label": "NET",
+      "notional": null,
+      "path_state": "NOT_APPLICABLE",
+      "quality_flags": [
+        "FEE_MODEL_UNAVAILABLE",
+        "NET_UNKNOWN"
+      ],
+      "record_id": "T25-GOLDEN-011",
+      "route_state": "NOT_APPLICABLE",
+      "source_content_sha256": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+      "unit": null,
+      "value_decimal": null
+    },
+    {
+      "assessment": "SUPPORTED",
+      "available_to_strategy_at": "2026-01-01T00:12:03Z",
+      "case_id": "net_supported_settled_cashflow",
+      "cashflow_state": "SETTLED_COMPLETE",
+      "claim_scope": "SETTLED_CASHFLOW",
+      "evidence_basis": "SETTLED_CASHFLOW",
+      "fill_state": "ACTUAL_FILLS_RECONCILED",
+      "inventory": {
+        "failed_exit_state": null,
+        "recovery_currency_or_mint": null,
+        "recovery_lower_bound_decimal": null,
+        "recovery_unit": null,
+        "recovery_upper_bound_decimal": null,
+        "remaining_inventory_atomic": "0",
+        "remaining_inventory_decimals": null,
+        "remaining_inventory_mint": null,
+        "state": "FLAT"
+      },
+      "label": "NET",
+      "notional": null,
+      "path_state": "NOT_APPLICABLE",
+      "quality_flags": [
+        "SETTLED_COMPLETE",
+        "ALL_DECLARED_COSTS_ATTRIBUTED"
+      ],
+      "record_id": "T25-GOLDEN-012",
+      "route_state": "NOT_APPLICABLE",
+      "source_content_sha256": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+      "unit": "RETURN_DECIMAL",
+      "value_decimal": "0.070000"
+    },
+    {
+      "assessment": "SUPPORTED",
+      "available_to_strategy_at": "2026-01-01T00:13:03Z",
+      "case_id": "path_risk_sparse_grid_partial",
+      "cashflow_state": "NOT_APPLICABLE",
+      "claim_scope": "DISCRETE_PATH_GRID",
+      "evidence_basis": "DISCRETE_PANEL_GRID",
+      "fill_state": "NOT_APPLICABLE",
+      "inventory": {
+        "failed_exit_state": null,
+        "recovery_currency_or_mint": null,
+        "recovery_lower_bound_decimal": null,
+        "recovery_unit": null,
+        "recovery_upper_bound_decimal": null,
+        "remaining_inventory_atomic": "0",
+        "remaining_inventory_decimals": null,
+        "remaining_inventory_mint": null,
+        "state": "NOT_APPLICABLE"
+      },
+      "label": "PATH_RISK",
+      "notional": null,
+      "path_state": "SPARSE_DISCRETE",
+      "quality_flags": [
+        "DISCRETE_GRID_ONLY",
+        "CONTINUOUS_MAE_MFE_FORBIDDEN"
+      ],
+      "record_id": "T25-GOLDEN-013",
+      "route_state": "NOT_APPLICABLE",
+      "source_content_sha256": "dddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd",
+      "unit": "PATH_RISK_SCORE",
+      "value_decimal": "0.300000"
+    },
+    {
+      "assessment": "SUPPORTED",
+      "available_to_strategy_at": "2026-01-01T00:14:03Z",
+      "case_id": "path_risk_pool_dead_inventory_unresolved",
+      "cashflow_state": "CASHFLOW_NOT_OBSERVED",
+      "claim_scope": "TERMINAL_PATH_STATE",
+      "evidence_basis": "PATH_STATE_EVIDENCE",
+      "fill_state": "ACTUAL_FILLS_NOT_OBSERVED",
+      "inventory": {
+        "failed_exit_state": "POOL_DEAD",
+        "recovery_currency_or_mint": "USDC_SYNTHETIC",
+        "recovery_lower_bound_decimal": "-1.000000",
+        "recovery_unit": "RETURN_DECIMAL",
+        "recovery_upper_bound_decimal": "0.000000",
+        "remaining_inventory_atomic": "7000000",
+        "remaining_inventory_decimals": 6,
+        "remaining_inventory_mint": "TOKEN_SYNTHETIC",
+        "state": "UNRESOLVED_REQUIRES_RECOVERY"
+      },
+      "label": "PATH_RISK",
+      "notional": null,
+      "path_state": "POOL_DEAD",
+      "quality_flags": [
+        "POOL_DEAD_OBSERVED",
+        "MISSING_EXIT_RETAINED",
+        "RECOVERY_REQUIRED"
+      ],
+      "record_id": "T25-GOLDEN-014",
+      "route_state": "NO_ROUTE",
+      "source_content_sha256": "eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee",
+      "unit": "PATH_RISK_SCORE",
+      "value_decimal": "1.000000"
+    }
+  ],
+  "prohibited_claims": [
+    "ACTUAL_R2_FILL_OBSERVED",
+    "ACTUAL_R2_NETRETURN_OBSERVED",
+    "ALPHA_OR_PROFITABILITY",
+    "CONTINUOUS_PATH_FROM_SPARSE_PANELS",
+    "ENTITY_FEATURE_ADMISSIBLE",
+    "R3_VALIDATED_OR_CONSUMED",
+    "SETTLED_OWNER_CASHFLOW"
+  ],
+  "schema": "smial.task25.golden-outcome-projection",
+  "schema_version": "1.0",
+  "status": "PASS_SYNTHETIC_GOLDEN_WITH_LIMITATIONS",
+  "summary": {
+    "assessments": {
+      "REFUTED": 1,
+      "SUPPORTED": 8,
+      "UNKNOWN": 5
+    },
+    "entity_graph_values_read": 0,
+    "fee_double_count_events": 0,
+    "future_rows_consumed": 0,
+    "inventory_states": {
+      "FLAT": 2,
+      "NOT_APPLICABLE": 7,
+      "OPEN": 2,
+      "RECOVERED": 1,
+      "UNRESOLVED_REQUIRES_RECOVERY": 2
+    },
+    "labels": {
+      "FILLABLE": 2,
+      "NET": 2,
+      "PATH_RISK": 2,
+      "QUOTE_EXIT": 3,
+      "REALIZED_VWAP": 2,
+      "TOUCH": 3
+    },
+    "r2_values_read": 0,
+    "r3_paths_or_values_read": 0,
+    "records_dropped": 0,
+    "records_input": 14,
+    "records_output": 14,
+    "route_states": {
+      "NOT_APPLICABLE": 8,
+      "NO_ROUTE": 2,
+      "PROVIDER_ERROR": 1,
+      "QUOTE_AVAILABLE": 2,
+      "STALE_QUOTE": 1
+    },
+    "unknown_values_coerced_to_zero": 0
+  },
+  "task_id": "TASK-25"
+}

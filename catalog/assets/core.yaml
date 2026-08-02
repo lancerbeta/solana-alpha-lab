@@ -12499,7 +12499,7 @@ records:
   evidence: []
   classification: *t24_internal
 - asset_id: TEST-T24-A7-CATALOG-FACTORY-FIT-001
-  record_version: '1.1'
+  record_version: '1.2'
   asset_type: script
   purpose: Hash-bound A7 tests for the immutable TASK-24 transaction plus monotonic
     current Catalog growth, lifecycle, generated navigation, Full Factory Fit and
@@ -12514,7 +12514,7 @@ records:
     repository_path: tests/test_task24_catalog_factory_fit.py
   integrity:
     kind: sha256
-    sha256: e395a3a6c42b26a118b5fcc9ae3ae49fbb8972025ef7d0089b55f5ba93e43dc0
+    sha256: 6a44a4a709e22cb16c664268b4ac24eb0452473397dcaa765a34396ba68cfb28
   access: *t24_read_file
   relations:
   - relation_type: depends_on
@@ -12974,7 +12974,7 @@ records:
   evidence: []
   classification: *t23_internal
 - asset_id: TEST-T23-A5-CATALOG-FACTORY-FIT-001
-  record_version: '1.1'
+  record_version: '1.2'
   asset_type: script
   purpose: Hash-bound A5 tests for exact assets append-only trials Catalog lineage generated navigation Factory Fit holdout governance and authority.
   status: IMPLEMENTED_UNVERIFIED
@@ -12987,7 +12987,7 @@ records:
     repository_path: tests/test_task23_catalog_repository_factory_fit.py
   integrity:
     kind: sha256
-    sha256: c45e873d20c778454066ba1fa6d06070023ee60661260de94715cf87621b9db5
+    sha256: 58232b162185c79fd2f83aff0c2c3b23b0a26352c1cd2830fe0f01c1a17d1858
   access: *t23_read_file
   relations:
   - relation_type: depends_on
@@ -12998,3 +12998,480 @@ records:
   - TASK-23
   evidence: []
   classification: *t23_internal
+- asset_id: CONTRACT-T25-OUTCOME-LABEL-PIT-001
+  record_version: '1.0'
+  asset_type: control_document
+  purpose: Frozen TASK-25 label, PIT, missingness, quote, inventory, path-risk and holdout truth contract.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-08-02'
+  truth_owner: TASK-25
+  location:
+    kind: git_path
+    logical_uri: repo://docs/contracts/task25_outcome_label_and_pit_contract_v1.md
+    repository_path: docs/contracts/task25_outcome_label_and_pit_contract_v1.md
+  integrity: {kind: sha256, sha256: 04e4397e69d554463a09564bdb1cbbb2ac41ce8662277d05e4565c178e94c801}
+  access: &t25_read_file {mode: read_only, method: file, network_required: false, secrets_required: false}
+  relations:
+  - {relation_type: derived_from, target_asset_id: EVIDENCE-T23-A5-CATALOG-FACTORY-FIT-001}
+  consumers: [TASK-25, TASK-26, FACTORY-001]
+  evidence: []
+  classification: &t25_internal {contains_secrets: false, contains_raw_data: false, sensitivity: INTERNAL_NON_SECRET}
+- asset_id: CONFIG-T25-OUTCOME-LABEL-PIT-001
+  record_version: '1.0'
+  asset_type: configuration
+  purpose: Machine-readable TASK-25 outcome-label, exact-notional, PIT, authority and acceptance policy.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-08-02'
+  truth_owner: TASK-25
+  location: {kind: git_path, logical_uri: 'repo://configs/task25_outcome_label_and_pit_contract_v1.yaml', repository_path: configs/task25_outcome_label_and_pit_contract_v1.yaml}
+  integrity: {kind: sha256, sha256: 18a605cc3380d060b6e443430e33b22b49a59fca6d20ddc28078faec2ae5a483}
+  access: *t25_read_file
+  relations: [{relation_type: governed_by, target_asset_id: CONTRACT-T25-OUTCOME-LABEL-PIT-001}]
+  consumers: [TASK-25, TASK-26]
+  evidence: []
+  classification: *t25_internal
+- asset_id: SCHEMA-T25-OUTCOME-EVIDENCE-001
+  record_version: '1.0'
+  asset_type: schema
+  purpose: JSON Schema for typed synthetic TASK-25 outcome evidence and adversarial contract fixtures.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-08-02'
+  truth_owner: TASK-25
+  location: {kind: git_path, logical_uri: 'repo://catalog/schemas/task25_outcome_evidence.schema.json', repository_path: catalog/schemas/task25_outcome_evidence.schema.json}
+  integrity: {kind: sha256, sha256: d8c4cae7f5e8004a6d7606acc78e344186bf24a95ccb1696cce5575979c4aff3}
+  access: *t25_read_file
+  relations: [{relation_type: governed_by, target_asset_id: CONTRACT-T25-OUTCOME-LABEL-PIT-001}]
+  consumers: [TASK-25, TASK-26, FACTORY-001]
+  evidence: []
+  classification: *t25_internal
+- asset_id: FIXTURE-T25-OUTCOME-LABEL-CONTRACT-001
+  record_version: '1.0'
+  asset_type: evidence
+  purpose: Synthetic golden outcome rows and adversarial mutations for all six TASK-25 labels.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-08-02'
+  truth_owner: TASK-25
+  location: {kind: git_path, logical_uri: 'repo://tests/fixtures/task25/outcome_label_contract_v1.json', repository_path: tests/fixtures/task25/outcome_label_contract_v1.json}
+  integrity: {kind: sha256, sha256: 269896634d1225f9b606cc12c13fcea6e624143bfe35413c3ad1acf9b8dcb917}
+  access: *t25_read_file
+  relations:
+  - {relation_type: governed_by, target_asset_id: SCHEMA-T25-OUTCOME-EVIDENCE-001}
+  - {relation_type: derived_from, target_asset_id: CONTRACT-T25-OUTCOME-LABEL-PIT-001}
+  consumers: [TASK-25]
+  evidence: []
+  classification: *t25_internal
+- asset_id: TEST-T25-OUTCOME-LABEL-PIT-CONTRACT-001
+  record_version: '1.0'
+  asset_type: script
+  purpose: Hash-bound contract tests for label separation, PIT, missingness, quote identity, inventory and A6 schema registration.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-08-02'
+  truth_owner: TASK-25
+  location: {kind: git_path, logical_uri: 'repo://tests/test_task25_outcome_label_and_pit_contract.py', repository_path: tests/test_task25_outcome_label_and_pit_contract.py}
+  integrity: {kind: sha256, sha256: 8a388e7e91a203f512f6aca9833e8f0b30e85f22a9a83fcde006cc298b65429b}
+  access: *t25_read_file
+  relations:
+  - {relation_type: depends_on, target_asset_id: CONTRACT-T25-OUTCOME-LABEL-PIT-001}
+  - {relation_type: depends_on, target_asset_id: CONFIG-T25-OUTCOME-LABEL-PIT-001}
+  - {relation_type: depends_on, target_asset_id: SCHEMA-T25-OUTCOME-EVIDENCE-001}
+  - {relation_type: depends_on, target_asset_id: FIXTURE-T25-OUTCOME-LABEL-CONTRACT-001}
+  consumers: [TASK-25]
+  evidence: []
+  classification: *t25_internal
+- asset_id: EVIDENCE-T25-A2-ACCEPTANCE-001
+  record_version: '1.0'
+  asset_type: evidence
+  purpose: TASK-25 A2 acceptance for the frozen label, PIT, missingness and authority contract.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-08-02'
+  truth_owner: TASK-25
+  location: {kind: git_path, logical_uri: 'repo://docs/evidence/task25/a2_outcome_label_and_pit_contract_acceptance_v1.json', repository_path: docs/evidence/task25/a2_outcome_label_and_pit_contract_acceptance_v1.json}
+  integrity: {kind: sha256, sha256: 3be9a63724ecca4d8730e56db1ee077211361cd93f739a13ae28b392f8c72736}
+  access: *t25_read_file
+  relations:
+  - {relation_type: derived_from, target_asset_id: CONTRACT-T25-OUTCOME-LABEL-PIT-001}
+  - {relation_type: validated_by, target_asset_id: TEST-T25-OUTCOME-LABEL-PIT-CONTRACT-001}
+  consumers: [TASK-25, FACTORY-001]
+  evidence: []
+  classification: *t25_internal
+- asset_id: MODULE-T25-OUTCOME-ENGINE-001
+  record_version: '1.0'
+  asset_type: script
+  purpose: Deterministic TASK-25 outcome classifier and golden projection engine.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-08-02'
+  truth_owner: TASK-25
+  location: {kind: git_path, logical_uri: 'repo://src/solana_alpha_lab/task25_outcome_engine.py', repository_path: src/solana_alpha_lab/task25_outcome_engine.py}
+  integrity: {kind: sha256, sha256: 9f67b35a2e480a6ada215e6dea6c16ab5db61e5e0ce39a2f3cf9546d85cad3b9}
+  access: *t25_read_file
+  relations:
+  - {relation_type: governed_by, target_asset_id: CONTRACT-T25-OUTCOME-LABEL-PIT-001}
+  - {relation_type: produces, target_asset_id: DATA-T25-GOLDEN-OUTCOME-PROJECTION-001}
+  consumers: [TASK-25, TASK-26]
+  evidence: []
+  classification: *t25_internal
+- asset_id: TEST-T25-OUTCOME-ENGINE-001
+  record_version: '1.0'
+  asset_type: script
+  purpose: Deterministic and adversarial tests for the synthetic TASK-25 outcome engine.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-08-02'
+  truth_owner: TASK-25
+  location: {kind: git_path, logical_uri: 'repo://tests/test_task25_outcome_engine.py', repository_path: tests/test_task25_outcome_engine.py}
+  integrity: {kind: sha256, sha256: 9d9df11632d37b845e96cbee561edc8d05b59c70d5dea43cdc5081c5f81ef74a}
+  access: *t25_read_file
+  relations:
+  - {relation_type: depends_on, target_asset_id: MODULE-T25-OUTCOME-ENGINE-001}
+  - {relation_type: depends_on, target_asset_id: FIXTURE-T25-OUTCOME-LABEL-CONTRACT-001}
+  consumers: [TASK-25]
+  evidence: []
+  classification: *t25_internal
+- asset_id: DATA-T25-GOLDEN-OUTCOME-PROJECTION-001
+  record_version: '1.0'
+  asset_type: evidence
+  purpose: Deterministic synthetic projection proving separate label, truth-state, PIT and missingness behavior.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-08-02'
+  truth_owner: TASK-25
+  location: {kind: git_path, logical_uri: 'repo://docs/evidence/task25/a3_golden_outcome_projection_v1.json', repository_path: docs/evidence/task25/a3_golden_outcome_projection_v1.json}
+  integrity: {kind: sha256, sha256: 8c43ac0bd0402e92a1d15a86a7222927053321ac0b7501bc5d25bd533c822c33}
+  access: *t25_read_file
+  relations:
+  - {relation_type: derived_from, target_asset_id: FIXTURE-T25-OUTCOME-LABEL-CONTRACT-001}
+  - {relation_type: validated_by, target_asset_id: TEST-T25-OUTCOME-ENGINE-001}
+  consumers: [TASK-25, FACTORY-001]
+  evidence: []
+  classification: *t25_internal
+- asset_id: EVIDENCE-T25-A3-ACCEPTANCE-001
+  record_version: '1.0'
+  asset_type: evidence
+  purpose: TASK-25 A3 deterministic engine and golden acceptance receipt.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-08-02'
+  truth_owner: TASK-25
+  location: {kind: git_path, logical_uri: 'repo://docs/evidence/task25/a3_deterministic_outcome_engine_and_golden_acceptance_v1.json', repository_path: docs/evidence/task25/a3_deterministic_outcome_engine_and_golden_acceptance_v1.json}
+  integrity: {kind: sha256, sha256: ef33b842418b016dd8e3c6d8c9131a9f41b44134e0029fea27fe54bf84ecc83d}
+  access: *t25_read_file
+  relations:
+  - {relation_type: derived_from, target_asset_id: DATA-T25-GOLDEN-OUTCOME-PROJECTION-001}
+  - {relation_type: validated_by, target_asset_id: TEST-T25-OUTCOME-ENGINE-001}
+  consumers: [TASK-25, FACTORY-001]
+  evidence: []
+  classification: *t25_internal
+- asset_id: MODULE-T25-R2-OUTCOME-PROJECTION-001
+  record_version: '1.0'
+  asset_type: script
+  purpose: Deterministic projection of tracked TASK-23 R2 diagnostic tables into bounded TASK-25 outcome labels.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-08-02'
+  truth_owner: TASK-25
+  location: {kind: git_path, logical_uri: 'repo://src/solana_alpha_lab/task25_r2_outcome_projection.py', repository_path: src/solana_alpha_lab/task25_r2_outcome_projection.py}
+  integrity: {kind: sha256, sha256: 6675b1670dada0864e8553212e86117332fd7d192d05793d86886410e25ff4b5}
+  access: *t25_read_file
+  relations:
+  - {relation_type: governed_by, target_asset_id: CONTRACT-T25-OUTCOME-LABEL-PIT-001}
+  - {relation_type: consumes, target_asset_id: EVIDENCE-T23-A3-PROJECTION-MANIFEST-001}
+  consumers: [TASK-25]
+  evidence: []
+  classification: *t25_internal
+- asset_id: TEST-T25-R2-OUTCOME-PROJECTION-001
+  record_version: '1.0'
+  asset_type: script
+  purpose: Fail-closed tests for exact denominators, sparse-path scope, PIT and limitations of the first tracked R2 projection.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-08-02'
+  truth_owner: TASK-25
+  location: {kind: git_path, logical_uri: 'repo://tests/test_task25_r2_outcome_projection.py', repository_path: tests/test_task25_r2_outcome_projection.py}
+  integrity: {kind: sha256, sha256: 468b69096351ec34cfbc63c4f56837b7f05762a195884afdaa1040bbff88101f}
+  access: *t25_read_file
+  relations:
+  - {relation_type: depends_on, target_asset_id: MODULE-T25-R2-OUTCOME-PROJECTION-001}
+  - {relation_type: depends_on, target_asset_id: DATA-T25-R2-OUTCOME-PROJECTION-001}
+  consumers: [TASK-25]
+  evidence: []
+  classification: *t25_internal
+- asset_id: EVIDENCE-T25-A4-PRE-READ-MANIFEST-001
+  record_version: '1.0'
+  asset_type: evidence
+  purpose: Sealed A4 pre-read manifest binding the exact tracked R2-derived value surface and R3 denial.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-08-02'
+  truth_owner: TASK-25
+  location: {kind: git_path, logical_uri: 'repo://docs/evidence/task25/a4_r2_outcome_pre_read_manifest_v1.json', repository_path: docs/evidence/task25/a4_r2_outcome_pre_read_manifest_v1.json}
+  integrity: {kind: sha256, sha256: 647d2c769762a6f08fd767436799604a8fdc53e70f181d895e1c82ecb6bae565}
+  access: *t25_read_file
+  relations:
+  - {relation_type: derived_from, target_asset_id: EVIDENCE-T25-A3-ACCEPTANCE-001}
+  - {relation_type: derived_from, target_asset_id: EVIDENCE-T23-A3-PROJECTION-MANIFEST-001}
+  consumers: [TASK-25]
+  evidence: []
+  classification: *t25_internal
+- asset_id: DATA-T25-R2-OUTCOME-PROJECTION-001
+  record_version: '1.0'
+  asset_type: evidence
+  purpose: Retained initial R2 outcome projection with 108 rows and explicit exact-identity limitations.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-08-02'
+  truth_owner: TASK-25
+  location: {kind: git_path, logical_uri: 'repo://docs/evidence/task25/a4_r2_outcome_projection_v1.json', repository_path: docs/evidence/task25/a4_r2_outcome_projection_v1.json}
+  integrity: {kind: sha256, sha256: 59cbb0bdeea6a80d184ea3c3fdbb3827ff2b23951d2a93a483198374d85da075}
+  access: *t25_read_file
+  relations:
+  - {relation_type: derived_from, target_asset_id: EVIDENCE-T25-A4-PRE-READ-MANIFEST-001}
+  - {relation_type: validated_by, target_asset_id: TEST-T25-R2-OUTCOME-PROJECTION-001}
+  - {relation_type: superseded_by, target_asset_id: DATA-T25-EXACT-R2-OUTCOME-SURFACE-001}
+  consumers: [TASK-25, REG-RESEARCH-001]
+  evidence: []
+  classification: *t25_internal
+- asset_id: EVIDENCE-T25-A4-ACCEPTANCE-001
+  record_version: '1.0'
+  asset_type: evidence
+  purpose: A4 read receipt retaining 108 rows, 9 discrete path-risk labels and 99 explicit unknown labels.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-08-02'
+  truth_owner: TASK-25
+  location: {kind: git_path, logical_uri: 'repo://docs/evidence/task25/a4_bounded_r2_outcome_projection_and_read_receipt_v1.json', repository_path: docs/evidence/task25/a4_bounded_r2_outcome_projection_and_read_receipt_v1.json}
+  integrity: {kind: sha256, sha256: ec2ef9425911e116271b94ee65371ef88bdf52db9e5ba732b6fe2ffc97a358df}
+  access: *t25_read_file
+  relations:
+  - {relation_type: derived_from, target_asset_id: DATA-T25-R2-OUTCOME-PROJECTION-001}
+  - {relation_type: validated_by, target_asset_id: TEST-T25-R2-OUTCOME-PROJECTION-001}
+  consumers: [TASK-25, REG-RESEARCH-001]
+  evidence: []
+  classification: *t25_internal
+- asset_id: DECISION-T25-R2-OUTCOME-REDESIGN-001
+  record_version: '1.0'
+  asset_type: decision
+  purpose: Owner decision to redesign the tracked R2 outcome surface before bounded comparison.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-08-02'
+  truth_owner: TASK-25
+  location: {kind: git_path, logical_uri: 'repo://docs/decisions/task25_r2_outcome_owner_decision_v1.md', repository_path: docs/decisions/task25_r2_outcome_owner_decision_v1.md}
+  integrity: {kind: sha256, sha256: 5a0da8e9ef69d0900b5edda876dfce929ea08b8064621741435707caf245f978}
+  access: *t25_read_file
+  relations: [{relation_type: derived_from, target_asset_id: EVIDENCE-T25-A4-ACCEPTANCE-001}]
+  consumers: [TASK-25, REG-RESEARCH-001]
+  evidence: []
+  classification: *t25_internal
+- asset_id: FIXTURE-T25-A5-ADVERSARIAL-MATRIX-001
+  record_version: '1.0'
+  asset_type: evidence
+  purpose: Frozen A5 adversarial mutation matrix for quote promotion, missingness, sparse path, identity and R3 boundaries.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-08-02'
+  truth_owner: TASK-25
+  location: {kind: git_path, logical_uri: 'repo://tests/fixtures/task25/a5_r2_outcome_adversarial_matrix_v1.json', repository_path: tests/fixtures/task25/a5_r2_outcome_adversarial_matrix_v1.json}
+  integrity: {kind: sha256, sha256: c4963a351e407e74ac07d637831bfed3a33dc52233f65307f73f2424ee48e0a6}
+  access: *t25_read_file
+  relations: [{relation_type: derived_from, target_asset_id: DATA-T25-R2-OUTCOME-PROJECTION-001}]
+  consumers: [TASK-25]
+  evidence: []
+  classification: *t25_internal
+- asset_id: MODULE-T25-ADVERSARIAL-ACCEPTANCE-001
+  record_version: '1.0'
+  asset_type: script
+  purpose: A5 adversarial acceptance evaluator and exact one-decision validator.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-08-02'
+  truth_owner: TASK-25
+  location: {kind: git_path, logical_uri: 'repo://src/solana_alpha_lab/task25_adversarial_acceptance.py', repository_path: src/solana_alpha_lab/task25_adversarial_acceptance.py}
+  integrity: {kind: sha256, sha256: 80bcbbdc6c86eb62c520ccddc0ef7948ef81c0c9e5216fab532d31a688d97e4b}
+  access: *t25_read_file
+  relations:
+  - {relation_type: governed_by, target_asset_id: DECISION-T25-R2-OUTCOME-REDESIGN-001}
+  - {relation_type: consumes, target_asset_id: FIXTURE-T25-A5-ADVERSARIAL-MATRIX-001}
+  consumers: [TASK-25]
+  evidence: []
+  classification: *t25_internal
+- asset_id: TEST-T25-ADVERSARIAL-ACCEPTANCE-001
+  record_version: '1.0'
+  asset_type: script
+  purpose: Tests rejecting 14 A5 semantic promotions and enforcing one owner decision and R3 denial.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-08-02'
+  truth_owner: TASK-25
+  location: {kind: git_path, logical_uri: 'repo://tests/test_task25_adversarial_acceptance_and_owner_decision.py', repository_path: tests/test_task25_adversarial_acceptance_and_owner_decision.py}
+  integrity: {kind: sha256, sha256: 398106088dc090253344fae782d53c9d18eb20233e33a5f6a65daf5df9bded3c}
+  access: *t25_read_file
+  relations:
+  - {relation_type: depends_on, target_asset_id: MODULE-T25-ADVERSARIAL-ACCEPTANCE-001}
+  - {relation_type: depends_on, target_asset_id: FIXTURE-T25-A5-ADVERSARIAL-MATRIX-001}
+  consumers: [TASK-25]
+  evidence: []
+  classification: *t25_internal
+- asset_id: EVIDENCE-T25-A5-DECISION-001
+  record_version: '1.0'
+  asset_type: evidence
+  purpose: A5 adversarial acceptance and owner decision receipt requiring exact R2 surface reprojection.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-08-02'
+  truth_owner: TASK-25
+  location: {kind: git_path, logical_uri: 'repo://docs/evidence/task25/a5_adversarial_acceptance_and_owner_decision_v1.json', repository_path: docs/evidence/task25/a5_adversarial_acceptance_and_owner_decision_v1.json}
+  integrity: {kind: sha256, sha256: 2a9fe466ea41e20dc7a9edd24ac53918bb378451f22e761274ef38cbc8e252f7}
+  access: *t25_read_file
+  relations:
+  - {relation_type: derived_from, target_asset_id: EVIDENCE-T25-A4-ACCEPTANCE-001}
+  - {relation_type: derived_from, target_asset_id: DECISION-T25-R2-OUTCOME-REDESIGN-001}
+  - {relation_type: validated_by, target_asset_id: TEST-T25-ADVERSARIAL-ACCEPTANCE-001}
+  consumers: [TASK-25, FACTORY-001, REG-RESEARCH-001]
+  evidence: []
+  classification: *t25_internal
+- asset_id: EVIDENCE-T25-A5R1-PRE-READ-MANIFEST-001
+  record_version: '1.0'
+  asset_type: evidence
+  purpose: Sealed A5R1 manifest fixing nine exact R2 raw files, 72 lines, policy limits and the no-R3 boundary before value reopen.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-08-02'
+  truth_owner: TASK-25
+  location: {kind: git_path, logical_uri: 'repo://docs/evidence/task25/a5r1_exact_r2_pre_read_manifest_v1.json', repository_path: docs/evidence/task25/a5r1_exact_r2_pre_read_manifest_v1.json}
+  integrity: {kind: sha256, sha256: ba6a2b8b8af550ce613860a250fc5e1be57109d89bb76dbb21644da1b96f3fc2}
+  access: *t25_read_file
+  relations:
+  - {relation_type: derived_from, target_asset_id: EVIDENCE-T25-A5-DECISION-001}
+  - {relation_type: derived_from, target_asset_id: EVIDENCE-T23-A3-PRE-READ-RECEIPT-002}
+  consumers: [TASK-25]
+  evidence: []
+  classification: *t25_internal
+- asset_id: MODULE-T25-EXACT-R2-OUTCOME-REPROJECTION-001
+  record_version: '1.0'
+  asset_type: script
+  purpose: Exact bounded raw-to-tracked R2 outcome reprojection with CI-portable stored-output validation.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-08-02'
+  truth_owner: TASK-25
+  location: {kind: git_path, logical_uri: 'repo://src/solana_alpha_lab/task25_exact_r2_outcome_reprojection.py', repository_path: src/solana_alpha_lab/task25_exact_r2_outcome_reprojection.py}
+  integrity: {kind: sha256, sha256: 8291042a23acd9c10ccc424e4978b101d47741c2994906ba1eb5b65eb0c259a9}
+  access: *t25_read_file
+  relations:
+  - {relation_type: governed_by, target_asset_id: CONTRACT-T25-OUTCOME-LABEL-PIT-001}
+  - {relation_type: derived_from, target_asset_id: EVIDENCE-T25-A5-DECISION-001}
+  - {relation_type: produces, target_asset_id: DATA-T25-EXACT-R2-OUTCOME-SURFACE-001}
+  consumers: [TASK-25, TASK-26]
+  evidence: []
+  classification: *t25_internal
+- asset_id: FIXTURE-T25-A5R1-QUOTE-CLASSIFIER-001
+  record_version: '1.0'
+  asset_type: evidence
+  purpose: Synthetic CI fixture covering quote freshness, latency, identity, PIT, provider-failure and dependent-sell identity boundaries.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-08-02'
+  truth_owner: TASK-25
+  location: {kind: git_path, logical_uri: 'repo://tests/fixtures/task25/a5r1_exact_r2_quote_fixture_v1.json', repository_path: tests/fixtures/task25/a5r1_exact_r2_quote_fixture_v1.json}
+  integrity: {kind: sha256, sha256: bbb7aefc1a3a313479757bd1e288fe733393b9e0a2fece24e425f6aa3f8a7556}
+  access: *t25_read_file
+  relations: [{relation_type: governed_by, target_asset_id: CONTRACT-T25-OUTCOME-LABEL-PIT-001}]
+  consumers: [TASK-25]
+  evidence: []
+  classification: *t25_internal
+- asset_id: TEST-T25-EXACT-R2-OUTCOME-REPROJECTION-001
+  record_version: '1.0'
+  asset_type: script
+  purpose: CI-portable tests for exact R2 identity, PIT, 80 supported and 28 unknown outcomes, raw-body exclusion and R3 denial.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-08-02'
+  truth_owner: TASK-25
+  location: {kind: git_path, logical_uri: 'repo://tests/test_task25_exact_r2_outcome_reprojection.py', repository_path: tests/test_task25_exact_r2_outcome_reprojection.py}
+  integrity: {kind: sha256, sha256: 6b5749d1206292cdaae1e272c2e387e74e7fc71362c9bcabcb01bfb77e5ff94a}
+  access: *t25_read_file
+  relations:
+  - {relation_type: depends_on, target_asset_id: MODULE-T25-EXACT-R2-OUTCOME-REPROJECTION-001}
+  - {relation_type: depends_on, target_asset_id: FIXTURE-T25-A5R1-QUOTE-CLASSIFIER-001}
+  - {relation_type: depends_on, target_asset_id: DATA-T25-EXACT-R2-OUTCOME-SURFACE-001}
+  consumers: [TASK-25]
+  evidence: []
+  classification: *t25_internal
+- asset_id: DATA-T25-EXACT-R2-OUTCOME-SURFACE-001
+  record_version: '1.0'
+  asset_type: evidence
+  purpose: Exact tracked R2 development surface with 72 attempts, 36 pairs, 108 typed outcomes, atomic identity, PIT lineage and explicit nonclaims.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-08-02'
+  truth_owner: TASK-25
+  location: {kind: git_path, logical_uri: 'repo://docs/evidence/task25/a5r1_exact_r2_outcome_surface_v1.json', repository_path: docs/evidence/task25/a5r1_exact_r2_outcome_surface_v1.json}
+  integrity: {kind: sha256, sha256: 20b5a611895b35856192b274e8954b34e4794e593605b9c3962d2115d4fbd59f}
+  access: *t25_read_file
+  relations:
+  - {relation_type: derived_from, target_asset_id: EVIDENCE-T25-A5R1-PRE-READ-MANIFEST-001}
+  - {relation_type: derived_from, target_asset_id: MODULE-T25-EXACT-R2-OUTCOME-REPROJECTION-001}
+  - {relation_type: validated_by, target_asset_id: TEST-T25-EXACT-R2-OUTCOME-REPROJECTION-001}
+  - {relation_type: evidenced_by, target_asset_id: EVIDENCE-T25-A5R1-ACCEPTANCE-001}
+  consumers: [TASK-25, TASK-26, FACTORY-001, REG-RESEARCH-001]
+  evidence: []
+  classification: *t25_internal
+- asset_id: EVIDENCE-T25-A5R1-ACCEPTANCE-001
+  record_version: '1.0'
+  asset_type: evidence
+  purpose: A5R1 acceptance binding exact raw parity, bounded quote labels, CI portability, limitations and zero R3 access.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-08-02'
+  truth_owner: TASK-25
+  location: {kind: git_path, logical_uri: 'repo://docs/evidence/task25/a5r1_exact_r2_outcome_reprojection_acceptance_v1.json', repository_path: docs/evidence/task25/a5r1_exact_r2_outcome_reprojection_acceptance_v1.json}
+  integrity: {kind: sha256, sha256: 32c8b75023754afa7fdbe6a5578e009d8856cb1d514fbd60954544b503f6ef7b}
+  access: *t25_read_file
+  relations:
+  - {relation_type: derived_from, target_asset_id: DATA-T25-EXACT-R2-OUTCOME-SURFACE-001}
+  - {relation_type: validated_by, target_asset_id: TEST-T25-EXACT-R2-OUTCOME-REPROJECTION-001}
+  consumers: [TASK-25, TASK-26, FACTORY-001, REG-RESEARCH-001]
+  evidence: []
+  classification: *t25_internal
+- asset_id: EVIDENCE-T25-A6-CATALOG-FACTORY-FIT-001
+  record_version: '1.0'
+  asset_type: evidence
+  purpose: TASK-25 A6 Catalog transaction, Full Factory Fit, durable TASK-26 follow-up, authority and delivery-boundary receipt.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-08-02'
+  truth_owner: TASK-25
+  location: {kind: git_path, logical_uri: 'repo://docs/evidence/task25/a6_catalog_factory_fit_v1.json', repository_path: docs/evidence/task25/a6_catalog_factory_fit_v1.json}
+  integrity: {kind: sha256, sha256: 187a508abb78b9f5548ec0d9677424ddfc60c746b51ee3975c5794b30745b41a}
+  access: *t25_read_file
+  relations:
+  - {relation_type: derived_from, target_asset_id: EVIDENCE-T25-A5R1-ACCEPTANCE-001}
+  - {relation_type: validated_by, target_asset_id: TEST-T25-A6-CATALOG-FACTORY-FIT-001}
+  consumers: [TASK-25, TASK-26, FACTORY-001, REG-RESEARCH-001]
+  evidence: []
+  classification: *t25_internal
+- asset_id: TEST-T25-A6-CATALOG-FACTORY-FIT-001
+  record_version: '1.0'
+  asset_type: script
+  purpose: Hash-bound A6 tests for exact Catalog inventory, Full Factory Fit, generated navigation, R3 denial and delivery boundary.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-08-02'
+  truth_owner: TASK-25
+  location: {kind: git_path, logical_uri: 'repo://tests/test_task25_catalog_factory_fit.py', repository_path: tests/test_task25_catalog_factory_fit.py}
+  integrity: {kind: sha256, sha256: ce14fcc15a5dfdcca0fa78b054e169a365c6aa3bb18f63c3774079bf2222ff4d}
+  access: *t25_read_file
+  relations:
+  - {relation_type: depends_on, target_asset_id: EVIDENCE-T25-A6-CATALOG-FACTORY-FIT-001}
+  - {relation_type: depends_on, target_asset_id: DATA-T25-EXACT-R2-OUTCOME-SURFACE-001}
+  - {relation_type: depends_on, target_asset_id: CATALOG-ROOT-001}
+  consumers: [TASK-25]
+  evidence: []
+  classification: *t25_internal

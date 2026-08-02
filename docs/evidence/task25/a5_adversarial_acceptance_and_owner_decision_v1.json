@@ -1,0 +1,192 @@
+{
+  "adversarial_acceptance": {
+    "mutations_accepted": 0,
+    "mutations_declared": 14,
+    "mutations_rejected": 14,
+    "results": [
+      {
+        "expected_error": "fillable_exact_identity_missing",
+        "mutation_id": "A5-MUT-001",
+        "observed_error": "fillable_exact_identity_missing",
+        "status": "PASS_REJECTED"
+      },
+      {
+        "expected_error": "quote_exit_exact_inventory_missing",
+        "mutation_id": "A5-MUT-002",
+        "observed_error": "quote_exit_exact_inventory_missing",
+        "status": "PASS_REJECTED"
+      },
+      {
+        "expected_error": "realized_vwap_requires_actual_fills",
+        "mutation_id": "A5-MUT-003",
+        "observed_error": "realized_vwap_requires_actual_fills",
+        "status": "PASS_REJECTED"
+      },
+      {
+        "expected_error": "net_requires_settled_cashflow",
+        "mutation_id": "A5-MUT-004",
+        "observed_error": "net_requires_settled_cashflow",
+        "status": "PASS_REJECTED"
+      },
+      {
+        "expected_error": "sparse_projection_continuous_path_forbidden",
+        "mutation_id": "A5-MUT-005",
+        "observed_error": "sparse_projection_continuous_path_forbidden",
+        "status": "PASS_REJECTED"
+      },
+      {
+        "expected_error": "touch_threshold_evidence_missing",
+        "mutation_id": "A5-MUT-006",
+        "observed_error": "touch_threshold_evidence_missing",
+        "status": "PASS_REJECTED"
+      },
+      {
+        "expected_error": "unknown_coerced_to_value",
+        "mutation_id": "A5-MUT-007",
+        "observed_error": "unknown_coerced_to_value",
+        "status": "PASS_REJECTED"
+      },
+      {
+        "expected_error": "nominal_horizon_claim_forbidden",
+        "mutation_id": "A5-MUT-008",
+        "observed_error": "nominal_horizon_claim_forbidden",
+        "status": "PASS_REJECTED"
+      },
+      {
+        "expected_error": "provider_error_not_no_route",
+        "mutation_id": "A5-MUT-009",
+        "observed_error": "provider_error_not_no_route",
+        "status": "PASS_REJECTED"
+      },
+      {
+        "expected_error": "outcome_denominator_drift",
+        "mutation_id": "A5-MUT-010",
+        "observed_error": "outcome_denominator_drift",
+        "status": "PASS_REJECTED"
+      },
+      {
+        "expected_error": "outcome_field_set_drift",
+        "mutation_id": "A5-MUT-011",
+        "observed_error": "outcome_field_set_drift",
+        "status": "PASS_REJECTED"
+      },
+      {
+        "expected_error": "quote_promoted_to_fill_or_settlement",
+        "mutation_id": "A5-MUT-012",
+        "observed_error": "quote_promoted_to_fill_or_settlement",
+        "status": "PASS_REJECTED"
+      },
+      {
+        "expected_error": "r3_access_forbidden",
+        "mutation_id": "A5-MUT-013",
+        "observed_error": "r3_access_forbidden",
+        "status": "PASS_REJECTED"
+      },
+      {
+        "expected_error": "a5_raw_r2_reopen_forbidden",
+        "mutation_id": "A5-MUT-014",
+        "observed_error": "a5_raw_r2_reopen_forbidden",
+        "status": "PASS_REJECTED"
+      }
+    ],
+    "status": "PASS_14_OF_14_REJECTED"
+  },
+  "atom_id": "T25-A5_ADVERSARIAL_ACCEPTANCE_AND_OWNER_DECISION_V1",
+  "baseline_acceptance": {
+    "a4_status": "PASS_BOUNDED_R2_DEVELOPMENT_WITH_LIMITATIONS",
+    "fillable_supported": 0,
+    "net_supported": 0,
+    "outcomes": 108,
+    "quote_exit_supported": 0,
+    "r3_paths_or_values_read": 0,
+    "raw_r2_value_files_reopened_in_a5": 0,
+    "realized_vwap_supported": 0,
+    "supported": 9,
+    "unknown": 99
+  },
+  "implementation": {
+    "module": {
+      "path": "src/solana_alpha_lab/task25_adversarial_acceptance.py",
+      "sha256": "80bcbbdc6c86eb62c520ccddc0ef7948ef81c0c9e5216fab532d31a688d97e4b"
+    },
+    "tests": {
+      "path": "tests/test_task25_adversarial_acceptance_and_owner_decision.py",
+      "sha256": "398106088dc090253344fae782d53c9d18eb20233e33a5f6a65daf5df9bded3c"
+    }
+  },
+  "input_bindings": {
+    "a4_engine": {
+      "path": "src/solana_alpha_lab/task25_r2_outcome_projection.py",
+      "sha256": "6675b1670dada0864e8553212e86117332fd7d192d05793d86886410e25ff4b5"
+    },
+    "a4_projection": {
+      "path": "docs/evidence/task25/a4_r2_outcome_projection_v1.json",
+      "sha256": "59cbb0bdeea6a80d184ea3c3fdbb3827ff2b23951d2a93a483198374d85da075"
+    },
+    "a4_receipt": {
+      "path": "docs/evidence/task25/a4_bounded_r2_outcome_projection_and_read_receipt_v1.json",
+      "sha256": "ec2ef9425911e116271b94ee65371ef88bdf52db9e5ba732b6fe2ffc97a358df"
+    },
+    "adversarial_matrix": {
+      "path": "tests/fixtures/task25/a5_r2_outcome_adversarial_matrix_v1.json",
+      "sha256": "c4963a351e407e74ac07d637831bfed3a33dc52233f65307f73f2424ee48e0a6"
+    },
+    "decision": {
+      "path": "docs/decisions/task25_r2_outcome_owner_decision_v1.md",
+      "sha256": "5a0da8e9ef69d0900b5edda876dfce929ea08b8064621741435707caf245f978"
+    },
+    "quote_contract_model": {
+      "path": "src/solana_alpha_lab/contracts/schema_v1.py",
+      "sha256": "ef9435fc0aa6df1d880714e97d3312e068dc82806a8c6ba1ed2d74c9929684ad"
+    },
+    "task23_projection_engine": {
+      "path": "src/solana_alpha_lab/task23_diagnostic_projection.py",
+      "sha256": "728fa77fc82a3e27245a908cfecc2a50e7df82c5813e6b90d4ad8ff0870e57f9"
+    }
+  },
+  "next_boundary": {
+    "authorized_by_a5": false,
+    "candidate_atom": "T25-A5R1_EXACT_R2_OUTCOME_SURFACE_REPROJECTION_V1",
+    "r3_access": "DENY",
+    "raw_r2_scope": "NINE_HASH_BOUND_FILES_ONLY",
+    "requires_new_pre_read_receipt": true
+  },
+  "owner_decision": {
+    "count": 1,
+    "current_projection_disposition": "ACCEPT_AS_NEGATIVE_RESULT_NOT_DECISION_SURFACE",
+    "decision": "REDESIGN_TRACKED_R2_OUTCOME_SURFACE_BEFORE_OWNER_COMPARISON",
+    "decision_id": "T25-OWNER-DECISION-001",
+    "decision_scope": "R2_TRACKED_DERIVATION_ONLY",
+    "r3_disposition": "UNTOUCHED_DENY",
+    "underlying_r2_disposition": "BOUNDED_REPROJECTION_CANDIDATE_NOT_YET_ACCEPTED"
+  },
+  "rejected_alternatives": [
+    "ACCEPT_CURRENT_TRACKED_PROJECTION_FOR_OWNER_COMPARISON",
+    "STOP_UNDERLYING_R2_AS_INFEASIBLE",
+    "OPEN_R3_OR_COLLECT_MORE_DATA"
+  ],
+  "schema": "smial.task25.adversarial-acceptance-owner-decision",
+  "schema_version": "1.0",
+  "side_effects": {
+    "cash_or_credits_spent": 0,
+    "catalog_changed": 0,
+    "commit_push_pr_merge_actions": 0,
+    "dependencies_added": 0,
+    "provider_api_rpc_wss_calls": 0,
+    "r3_paths_or_values_read": 0,
+    "raw_r2_value_files_opened": 0,
+    "sources_changed": 0,
+    "wallet_signer_transaction_actions": 0
+  },
+  "status": "PASS_ADVERSARIAL_ACCEPTANCE_WITH_REDIRECTED_REDESIGN",
+  "task_id": "TASK-25",
+  "upstream_capability": {
+    "checks": [
+      "EXACT_MINT_AND_ATOMIC_AMOUNT_VALIDATION_PRESENT",
+      "EXACT_BUY_TO_DEPENDENT_SELL_LINK_VALIDATION_PRESENT",
+      "QUOTE_ID_FRESHNESS_LATENCY_AND_PIT_FIELDS_PRESENT"
+    ],
+    "inference": "LOSS_OCCURS_IN_TRACKED_TASK23_DERIVATION_SURFACE",
+    "status": "PRESENT_IN_HASH_BOUND_CODE_NOT_REOPENED_AS_RAW_VALUES"
+  }
+}

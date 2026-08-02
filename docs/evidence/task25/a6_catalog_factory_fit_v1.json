@@ -1,0 +1,296 @@
+{
+  "receipt_id": "T25-A6-CATALOG-FACTORY-FIT-RECEIPT-001",
+  "receipt_version": "1.0",
+  "task_id": "TASK-25",
+  "atom_id": "T25-A6_REGISTER_ASSETS_UPDATE_CATALOG_AND_FULL_FACTORY_FIT_REVIEW_V1",
+  "status": "PASS_EXACT_R2_OUTCOME_SURFACE_REGISTERED_WITH_LIMITATIONS",
+  "as_of": "2026-08-02",
+  "repository_base": {
+    "branch": "task25/outcome-engine",
+    "head": "be15889e103caaf92b7e34c9f98b7fd6378eed2e",
+    "tree": "ed5d2a788080f1535074e78e0f66ffbe07afbab8",
+    "upstream": "origin/main"
+  },
+  "accepted_result": {
+    "owner_decision": "R2_OUTCOME_SURFACE_READY_FOR_BOUNDED_OWNER_COMPARISON_WITH_LIMITATIONS",
+    "development_population": "T21-R2",
+    "validation_population": "NONE",
+    "holdout_population": "T21-R3",
+    "holdout_access": "DENY",
+    "r3_paths_or_values_read": 0,
+    "raw_r2_files_reopened_by_a6": 0,
+    "members": 3,
+    "panels": 9,
+    "quote_attempts": 72,
+    "quote_pairs": 36,
+    "outcomes": 108,
+    "supported": 80,
+    "unknown": 28,
+    "fillable_supported": 35,
+    "fillable_unknown": 1,
+    "quote_exit_supported": 36,
+    "path_risk_discrete_supported": 9,
+    "touch_supported": 0,
+    "realized_vwap_supported": 0,
+    "net_supported": 0,
+    "latency_limit_exceeded_attempts": 1,
+    "freshness_limit_exceeded_attempts": 0,
+    "unknown_values_coerced_to_zero": 0,
+    "actual_fills_observed": 0,
+    "settled_cashflow_observed": 0,
+    "owner_comparison_admissibility": "R2_DEVELOPMENT_QUOTE_AND_DISCRETE_PATH_ONLY",
+    "strategy_or_live_promotion_admissibility": "NOT_ADMISSIBLE"
+  },
+  "critical_bindings": [
+    {
+      "asset_id": "CONTRACT-T25-OUTCOME-LABEL-PIT-001",
+      "path": "docs/contracts/task25_outcome_label_and_pit_contract_v1.md",
+      "sha256": "04e4397e69d554463a09564bdb1cbbb2ac41ce8662277d05e4565c178e94c801"
+    },
+    {
+      "asset_id": "SCHEMA-T25-OUTCOME-EVIDENCE-001",
+      "path": "catalog/schemas/task25_outcome_evidence.schema.json",
+      "sha256": "d8c4cae7f5e8004a6d7606acc78e344186bf24a95ccb1696cce5575979c4aff3"
+    },
+    {
+      "asset_id": "EVIDENCE-T25-A5-DECISION-001",
+      "path": "docs/evidence/task25/a5_adversarial_acceptance_and_owner_decision_v1.json",
+      "sha256": "2a9fe466ea41e20dc7a9edd24ac53918bb378451f22e761274ef38cbc8e252f7"
+    },
+    {
+      "asset_id": "EVIDENCE-T25-A5R1-PRE-READ-MANIFEST-001",
+      "path": "docs/evidence/task25/a5r1_exact_r2_pre_read_manifest_v1.json",
+      "sha256": "ba6a2b8b8af550ce613860a250fc5e1be57109d89bb76dbb21644da1b96f3fc2"
+    },
+    {
+      "asset_id": "DATA-T25-EXACT-R2-OUTCOME-SURFACE-001",
+      "path": "docs/evidence/task25/a5r1_exact_r2_outcome_surface_v1.json",
+      "sha256": "20b5a611895b35856192b274e8954b34e4794e593605b9c3962d2115d4fbd59f"
+    },
+    {
+      "asset_id": "EVIDENCE-T25-A5R1-ACCEPTANCE-001",
+      "path": "docs/evidence/task25/a5r1_exact_r2_outcome_reprojection_acceptance_v1.json",
+      "sha256": "32c8b75023754afa7fdbe6a5578e009d8856cb1d514fbd60954544b503f6ef7b"
+    }
+  ],
+  "catalog": {
+    "status": "REGISTERED_IN_TASK25_A6_TRANSACTION",
+    "before_version": "0.29.2",
+    "after_version": "0.30.0",
+    "before_assets": 448,
+    "after_assets": 476,
+    "asset_registries": 4,
+    "before_schemas": 7,
+    "after_schemas": 8,
+    "queries": 8,
+    "lifecycle_registries": 9,
+    "lifecycle_records": 56,
+    "registered_asset_ids": [
+      "CONTRACT-T25-OUTCOME-LABEL-PIT-001",
+      "CONFIG-T25-OUTCOME-LABEL-PIT-001",
+      "SCHEMA-T25-OUTCOME-EVIDENCE-001",
+      "FIXTURE-T25-OUTCOME-LABEL-CONTRACT-001",
+      "TEST-T25-OUTCOME-LABEL-PIT-CONTRACT-001",
+      "EVIDENCE-T25-A2-ACCEPTANCE-001",
+      "MODULE-T25-OUTCOME-ENGINE-001",
+      "TEST-T25-OUTCOME-ENGINE-001",
+      "DATA-T25-GOLDEN-OUTCOME-PROJECTION-001",
+      "EVIDENCE-T25-A3-ACCEPTANCE-001",
+      "MODULE-T25-R2-OUTCOME-PROJECTION-001",
+      "TEST-T25-R2-OUTCOME-PROJECTION-001",
+      "EVIDENCE-T25-A4-PRE-READ-MANIFEST-001",
+      "DATA-T25-R2-OUTCOME-PROJECTION-001",
+      "EVIDENCE-T25-A4-ACCEPTANCE-001",
+      "DECISION-T25-R2-OUTCOME-REDESIGN-001",
+      "FIXTURE-T25-A5-ADVERSARIAL-MATRIX-001",
+      "MODULE-T25-ADVERSARIAL-ACCEPTANCE-001",
+      "TEST-T25-ADVERSARIAL-ACCEPTANCE-001",
+      "EVIDENCE-T25-A5-DECISION-001",
+      "EVIDENCE-T25-A5R1-PRE-READ-MANIFEST-001",
+      "MODULE-T25-EXACT-R2-OUTCOME-REPROJECTION-001",
+      "FIXTURE-T25-A5R1-QUOTE-CLASSIFIER-001",
+      "TEST-T25-EXACT-R2-OUTCOME-REPROJECTION-001",
+      "DATA-T25-EXACT-R2-OUTCOME-SURFACE-001",
+      "EVIDENCE-T25-A5R1-ACCEPTANCE-001",
+      "EVIDENCE-T25-A6-CATALOG-FACTORY-FIT-001",
+      "TEST-T25-A6-CATALOG-FACTORY-FIT-001"
+    ],
+    "updated_asset_ids": [
+      "TEST-T23-A5-CATALOG-FACTORY-FIT-001",
+      "TEST-T24-A7-CATALOG-FACTORY-FIT-001",
+      "GENERATED-PROJECT-MAP-001",
+      "GENERATED-EDGE-PROJECTION-001"
+    ],
+    "named_consumers": [
+      "TASK-25",
+      "TASK-26",
+      "FACTORY-001",
+      "REG-RESEARCH-001"
+    ],
+    "generated_navigation": "PASS"
+  },
+  "factory_fit": {
+    "mode": "FULL_REVIEW",
+    "verdict": "PASS_WITH_FOLLOWUP",
+    "checks": [
+      {
+        "check_id": "GOAL_FIT",
+        "status": "PASS",
+        "evidence": "The exact R2 surface turns the prior all-unknown quote projection into a bounded owner-comparison input without claiming realized or net returns."
+      },
+      {
+        "check_id": "COMPATIBILITY",
+        "status": "PASS",
+        "evidence": "A2 through A5 history is retained, A5R1 is a new content-addressed projection, and historical Catalog tests now require monotonic schema growth rather than frozen current counts."
+      },
+      {
+        "check_id": "FLEXIBILITY_AND_REUSE",
+        "status": "PASS",
+        "evidence": "The project reuses the existing quote schema, TASK-23 parser, Catalog, synthetic fixtures and deterministic navigation without a new provider, service or dependency."
+      },
+      {
+        "check_id": "EFFICIENCY",
+        "status": "PASS",
+        "evidence": "The transformation is offline and deterministic; CI validates tracked outputs and a synthetic classifier fixture without copying ignored raw evidence."
+      },
+      {
+        "check_id": "HONEST_CLOSURE",
+        "status": "PASS",
+        "evidence": "One latency breach remains UNKNOWN, quote exit keeps inventory OPEN, and fills, settlement, NetReturn, alpha, strategy promotion and TASK-25 DONE remain explicit nonclaims."
+      },
+      {
+        "check_id": "OWNER_JOURNEY",
+        "status": "PASS",
+        "evidence": "The owner receives a compact 35 of 36 fillable and 36 of 36 quote-exit development surface with one exact exception and a clear next delivery boundary."
+      },
+      {
+        "check_id": "HYPOTHESIS_LIFECYCLE",
+        "status": "PASS",
+        "evidence": "The redesign decision, prior limited projection, adversarial acceptance, exact reprojection and limitations remain separately addressable; no trial or hypothesis history is rewritten."
+      },
+      {
+        "check_id": "DATA_FITNESS",
+        "status": "PASS",
+        "evidence": "Exact mint, atomic amount, quote identity, PIT timestamps, freshness, latency and raw-file lineage are retained for 72 attempts while R3 remains default deny."
+      },
+      {
+        "check_id": "TRADING_BRIDGE",
+        "status": "FOLLOWUP",
+        "evidence": "The surface reaches quote and open-inventory truth only; actual attempts, fills, settlement, fees, reconciliation, NetReturn and owner cashflow require the next execution-cost objective."
+      },
+      {
+        "check_id": "POSITION_AND_RISK_TRUTH",
+        "status": "NOT_APPLICABLE",
+        "evidence": "No actual position, capital, account exposure, signer, wallet, transaction or real-money authority is created."
+      },
+      {
+        "check_id": "MONITORING_AND_RECOVERY",
+        "status": "PASS",
+        "evidence": "Content hashes, a sealed pre-read manifest, exact raw parity and a tracked-only CI path provide reproducible drift detection without requiring local raw files in delivery."
+      },
+      {
+        "check_id": "FAILURE_RED_TEAM",
+        "status": "PASS",
+        "evidence": "Tests reject stale or slow quote promotion, missing identity, PIT invalidity, provider failure as no-route, atomic pair drift, missing-as-zero, continuous-path claims and automatic continuation."
+      },
+      {
+        "check_id": "BUILD_VS_BUY",
+        "status": "PASS",
+        "evidence": "Project-owned outcome semantics stay local while existing commodity parsing and validation plumbing are wrapped; no package or hosted component is adopted."
+      },
+      {
+        "check_id": "MIGRATION_AND_ROLLBACK",
+        "status": "PASS",
+        "evidence": "A4 remains retained as the limited predecessor, A5R1 is additive, generated views are reproducible, and rollback is removal of the A6 Catalog transaction without rewriting evidence."
+      },
+      {
+        "check_id": "CONTRADICTION_SCAN",
+        "status": "PASS",
+        "evidence": "Contract, decision, exact surface, acceptance, Catalog relations, generated navigation and tests agree on 80 supported, 28 unknown, one latency exception and zero R3 or execution truth."
+      }
+    ],
+    "durable_followup": {
+      "followup_id": "T25_ACTUAL_EXECUTION_AND_NETRETURN_COMPLETION_V1",
+      "owner": "TASK-26_ENTRY_GATE",
+      "reason": "TASK-25 contains contemporaneous quote and discrete path evidence but no actual fills, settled cashflow, complete fees or owner-cashflow truth.",
+      "activation_trigger": "BEFORE_ANY_REALIZED_VWAP_NETRETURN_OWNER_COMPARISON_OR_STRATEGY_PROMOTION",
+      "required_action": "FREEZE_ACTUAL_EXECUTION_RECONCILIATION_FEE_AND_CASHFLOW_CONTRACT_AND_KEEP_QUOTE_FILL_SETTLEMENT_AND_NET_LABELS_SEPARATE",
+      "destination": "TASK-26_EXECUTION_COST_AND_NETRETURN_MODEL",
+      "cannot_be_satisfied_by": [
+        "PROMOTING_QUOTES_TO_FILLS",
+        "TREATING_OPEN_INVENTORY_AS_FLAT",
+        "USING_MISSING_FEES_AS_ZERO",
+        "CLAIMING_NETRETURN_FROM_ROUNDTRIP_QUOTE_RETENTION",
+        "OPENING_R3_WITHOUT_A_SEPARATE_CONSUMPTION_GATE"
+      ]
+    }
+  },
+  "validation": {
+    "status": "PASS",
+    "task25_a2_a6_suite": "PASS_108_TESTS",
+    "catalog_validation": "PASS_0_30_0_476_ASSETS_8_SCHEMAS",
+    "generated_navigation": "PASS",
+    "historical_catalog_consumers": "PASS",
+    "full_repository_unit_suite": "DEFERRED_TO_A7_DELIVERY_TRACKED_ONLY_PREFLIGHT",
+    "diff_check": "PASS_NO_WHITESPACE_ERRORS",
+    "targeted_tests_passed": 108,
+    "targeted_failures": 0,
+    "targeted_errors": 0,
+    "decision_critical_skips": 0
+  },
+  "managed_write_set": [
+    "catalog/catalog_manifest.yaml",
+    "catalog/assets/core.yaml",
+    "catalog/assets/lifecycle.yaml",
+    "docs/PROJECT_MAP.md",
+    "catalog/generated/asset_edges.json",
+    "tests/test_task23_catalog_repository_factory_fit.py",
+    "tests/test_task24_catalog_factory_fit.py",
+    "tests/test_task25_outcome_label_and_pit_contract.py",
+    "tests/test_task25_catalog_factory_fit.py",
+    "docs/evidence/task25/a6_catalog_factory_fit_v1.json"
+  ],
+  "authority": {
+    "local_write_only": true,
+    "catalog_mutations": 1,
+    "raw_r2_value_reads": 0,
+    "r3_path_or_value_reads": 0,
+    "provider_api_rpc_wss_calls": 0,
+    "credential_uses": 0,
+    "provider_credits_consumed": 0,
+    "wallet_signer_transaction_actions": 0,
+    "cash_spend_usd_cents": 0,
+    "dependency_changes": 0,
+    "sources_changed": 0,
+    "commit": false,
+    "push": false,
+    "pull_request": false,
+    "merge": false,
+    "destructive_actions": false
+  },
+  "nonclaims": [
+    "R3_HOLDOUT_RESULT_OR_CONSUMPTION",
+    "ORDER_ATTEMPT_FILL_OR_SETTLEMENT",
+    "FLAT_INVENTORY_OR_POSITION_RECONCILIATION",
+    "REALIZED_VWAP_NETRETURN_OR_OWNER_CASHFLOW",
+    "CONTINUOUS_TOUCH_MAE_OR_MFE",
+    "MARKET_WIDE_CROSS_REGIME_OR_ALPHA_GENERALIZATION",
+    "STRATEGY_PAPER_SHADOW_LIVE_OR_REAL_MONEY_PROMOTION",
+    "CANONICAL_TASK25_DONE"
+  ],
+  "state_change": {
+    "task25": "IN_PROGRESS",
+    "atom_a6": "VALIDATED",
+    "catalog_registration": "VALIDATED_LOCAL_CANDIDATE",
+    "owner_comparison": "R2_DEVELOPMENT_ONLY_READY_WITH_LIMITATIONS",
+    "canonical_task25_done": false
+  },
+  "finish_gate": "CONTINUE_CURRENT_TASK",
+  "next_boundary": {
+    "atom": "T25-A7_REPOSITORY_DELIVERY_V1",
+    "authorized": false,
+    "merge_authorized": false,
+    "r3_access": "DENY",
+    "reason": "A6 registered the exact R2 outcome surface and passed Full Factory Fit; repository delivery, tracked-only full gate and remote read-back remain."
+  }
+}

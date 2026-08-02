@@ -443,6 +443,11 @@
       "target_asset_id": "DECISION-T24-ENTITY-LINKAGE-EXTENSION-001"
     },
     {
+      "source_asset_id": "CONFIG-T25-OUTCOME-LABEL-PIT-001",
+      "relation": "governed_by",
+      "target_asset_id": "CONTRACT-T25-OUTCOME-LABEL-PIT-001"
+    },
+    {
       "source_asset_id": "CONTRACT-T05-DATA-001",
       "relation": "depends_on",
       "target_asset_id": "ADR-MVP-STACK-002"
@@ -901,6 +906,11 @@
       "source_asset_id": "CONTRACT-T24-ENTITY-GRAPH-001",
       "relation": "validated_by",
       "target_asset_id": "TEST-T24-ENTITY-GRAPH-CONTRACT-001"
+    },
+    {
+      "source_asset_id": "CONTRACT-T25-OUTCOME-LABEL-PIT-001",
+      "relation": "derived_from",
+      "target_asset_id": "EVIDENCE-T23-A5-CATALOG-FACTORY-FIT-001"
     },
     {
       "source_asset_id": "CONTROL-T21-ACTIVE-TIME-GATE-001",
@@ -1388,6 +1398,51 @@
       "target_asset_id": "TEST-T24-A5R1-RECAPTURE-001"
     },
     {
+      "source_asset_id": "DATA-T25-EXACT-R2-OUTCOME-SURFACE-001",
+      "relation": "derived_from",
+      "target_asset_id": "EVIDENCE-T25-A5R1-PRE-READ-MANIFEST-001"
+    },
+    {
+      "source_asset_id": "DATA-T25-EXACT-R2-OUTCOME-SURFACE-001",
+      "relation": "derived_from",
+      "target_asset_id": "MODULE-T25-EXACT-R2-OUTCOME-REPROJECTION-001"
+    },
+    {
+      "source_asset_id": "DATA-T25-EXACT-R2-OUTCOME-SURFACE-001",
+      "relation": "evidenced_by",
+      "target_asset_id": "EVIDENCE-T25-A5R1-ACCEPTANCE-001"
+    },
+    {
+      "source_asset_id": "DATA-T25-EXACT-R2-OUTCOME-SURFACE-001",
+      "relation": "validated_by",
+      "target_asset_id": "TEST-T25-EXACT-R2-OUTCOME-REPROJECTION-001"
+    },
+    {
+      "source_asset_id": "DATA-T25-GOLDEN-OUTCOME-PROJECTION-001",
+      "relation": "derived_from",
+      "target_asset_id": "FIXTURE-T25-OUTCOME-LABEL-CONTRACT-001"
+    },
+    {
+      "source_asset_id": "DATA-T25-GOLDEN-OUTCOME-PROJECTION-001",
+      "relation": "validated_by",
+      "target_asset_id": "TEST-T25-OUTCOME-ENGINE-001"
+    },
+    {
+      "source_asset_id": "DATA-T25-R2-OUTCOME-PROJECTION-001",
+      "relation": "derived_from",
+      "target_asset_id": "EVIDENCE-T25-A4-PRE-READ-MANIFEST-001"
+    },
+    {
+      "source_asset_id": "DATA-T25-R2-OUTCOME-PROJECTION-001",
+      "relation": "superseded_by",
+      "target_asset_id": "DATA-T25-EXACT-R2-OUTCOME-SURFACE-001"
+    },
+    {
+      "source_asset_id": "DATA-T25-R2-OUTCOME-PROJECTION-001",
+      "relation": "validated_by",
+      "target_asset_id": "TEST-T25-R2-OUTCOME-PROJECTION-001"
+    },
+    {
       "source_asset_id": "DECISION-T14-PROVIDER-PURCHASE-001",
       "relation": "derived_from",
       "target_asset_id": "EVIDENCE-T13-PILOT-AUDIT-OFFLINE-ACCEPTANCE-001"
@@ -1421,6 +1476,11 @@
       "source_asset_id": "DECISION-T24-ENTITY-LINKAGE-EXTENSION-001",
       "relation": "validated_by",
       "target_asset_id": "TEST-T24-ENTITY-LINKAGE-EXTENSION-001"
+    },
+    {
+      "source_asset_id": "DECISION-T25-R2-OUTCOME-REDESIGN-001",
+      "relation": "derived_from",
+      "target_asset_id": "EVIDENCE-T25-A4-ACCEPTANCE-001"
     },
     {
       "source_asset_id": "ENV-WORKSTATION-001",
@@ -2263,6 +2323,91 @@
       "target_asset_id": "TEST-T24-A7-CATALOG-FACTORY-FIT-001"
     },
     {
+      "source_asset_id": "EVIDENCE-T25-A2-ACCEPTANCE-001",
+      "relation": "derived_from",
+      "target_asset_id": "CONTRACT-T25-OUTCOME-LABEL-PIT-001"
+    },
+    {
+      "source_asset_id": "EVIDENCE-T25-A2-ACCEPTANCE-001",
+      "relation": "validated_by",
+      "target_asset_id": "TEST-T25-OUTCOME-LABEL-PIT-CONTRACT-001"
+    },
+    {
+      "source_asset_id": "EVIDENCE-T25-A3-ACCEPTANCE-001",
+      "relation": "derived_from",
+      "target_asset_id": "DATA-T25-GOLDEN-OUTCOME-PROJECTION-001"
+    },
+    {
+      "source_asset_id": "EVIDENCE-T25-A3-ACCEPTANCE-001",
+      "relation": "validated_by",
+      "target_asset_id": "TEST-T25-OUTCOME-ENGINE-001"
+    },
+    {
+      "source_asset_id": "EVIDENCE-T25-A4-ACCEPTANCE-001",
+      "relation": "derived_from",
+      "target_asset_id": "DATA-T25-R2-OUTCOME-PROJECTION-001"
+    },
+    {
+      "source_asset_id": "EVIDENCE-T25-A4-ACCEPTANCE-001",
+      "relation": "validated_by",
+      "target_asset_id": "TEST-T25-R2-OUTCOME-PROJECTION-001"
+    },
+    {
+      "source_asset_id": "EVIDENCE-T25-A4-PRE-READ-MANIFEST-001",
+      "relation": "derived_from",
+      "target_asset_id": "EVIDENCE-T23-A3-PROJECTION-MANIFEST-001"
+    },
+    {
+      "source_asset_id": "EVIDENCE-T25-A4-PRE-READ-MANIFEST-001",
+      "relation": "derived_from",
+      "target_asset_id": "EVIDENCE-T25-A3-ACCEPTANCE-001"
+    },
+    {
+      "source_asset_id": "EVIDENCE-T25-A5-DECISION-001",
+      "relation": "derived_from",
+      "target_asset_id": "DECISION-T25-R2-OUTCOME-REDESIGN-001"
+    },
+    {
+      "source_asset_id": "EVIDENCE-T25-A5-DECISION-001",
+      "relation": "derived_from",
+      "target_asset_id": "EVIDENCE-T25-A4-ACCEPTANCE-001"
+    },
+    {
+      "source_asset_id": "EVIDENCE-T25-A5-DECISION-001",
+      "relation": "validated_by",
+      "target_asset_id": "TEST-T25-ADVERSARIAL-ACCEPTANCE-001"
+    },
+    {
+      "source_asset_id": "EVIDENCE-T25-A5R1-ACCEPTANCE-001",
+      "relation": "derived_from",
+      "target_asset_id": "DATA-T25-EXACT-R2-OUTCOME-SURFACE-001"
+    },
+    {
+      "source_asset_id": "EVIDENCE-T25-A5R1-ACCEPTANCE-001",
+      "relation": "validated_by",
+      "target_asset_id": "TEST-T25-EXACT-R2-OUTCOME-REPROJECTION-001"
+    },
+    {
+      "source_asset_id": "EVIDENCE-T25-A5R1-PRE-READ-MANIFEST-001",
+      "relation": "derived_from",
+      "target_asset_id": "EVIDENCE-T23-A3-PRE-READ-RECEIPT-002"
+    },
+    {
+      "source_asset_id": "EVIDENCE-T25-A5R1-PRE-READ-MANIFEST-001",
+      "relation": "derived_from",
+      "target_asset_id": "EVIDENCE-T25-A5-DECISION-001"
+    },
+    {
+      "source_asset_id": "EVIDENCE-T25-A6-CATALOG-FACTORY-FIT-001",
+      "relation": "derived_from",
+      "target_asset_id": "EVIDENCE-T25-A5R1-ACCEPTANCE-001"
+    },
+    {
+      "source_asset_id": "EVIDENCE-T25-A6-CATALOG-FACTORY-FIT-001",
+      "relation": "validated_by",
+      "target_asset_id": "TEST-T25-A6-CATALOG-FACTORY-FIT-001"
+    },
+    {
       "source_asset_id": "FIXTURE-BATON-SUITE-001",
       "relation": "governed_by",
       "target_asset_id": "CTRL-BATON-SETUP-001"
@@ -2731,6 +2876,26 @@
       "source_asset_id": "FIXTURE-T19-POINT-IN-TIME-REPLAY-001",
       "relation": "validated_by",
       "target_asset_id": "TEST-T19-POINT-IN-TIME-REPLAY-CONTRACT-001"
+    },
+    {
+      "source_asset_id": "FIXTURE-T25-A5-ADVERSARIAL-MATRIX-001",
+      "relation": "derived_from",
+      "target_asset_id": "DATA-T25-R2-OUTCOME-PROJECTION-001"
+    },
+    {
+      "source_asset_id": "FIXTURE-T25-A5R1-QUOTE-CLASSIFIER-001",
+      "relation": "governed_by",
+      "target_asset_id": "CONTRACT-T25-OUTCOME-LABEL-PIT-001"
+    },
+    {
+      "source_asset_id": "FIXTURE-T25-OUTCOME-LABEL-CONTRACT-001",
+      "relation": "derived_from",
+      "target_asset_id": "CONTRACT-T25-OUTCOME-LABEL-PIT-001"
+    },
+    {
+      "source_asset_id": "FIXTURE-T25-OUTCOME-LABEL-CONTRACT-001",
+      "relation": "governed_by",
+      "target_asset_id": "SCHEMA-T25-OUTCOME-EVIDENCE-001"
     },
     {
       "source_asset_id": "GENERATED-EDGE-PROJECTION-001",
@@ -3356,6 +3521,51 @@
       "source_asset_id": "MODULE-T24-ENTITY-LINKAGE-PROJECTION-001",
       "relation": "validated_by",
       "target_asset_id": "TEST-T24-ENTITY-LINKAGE-PROJECTION-001"
+    },
+    {
+      "source_asset_id": "MODULE-T25-ADVERSARIAL-ACCEPTANCE-001",
+      "relation": "consumes",
+      "target_asset_id": "FIXTURE-T25-A5-ADVERSARIAL-MATRIX-001"
+    },
+    {
+      "source_asset_id": "MODULE-T25-ADVERSARIAL-ACCEPTANCE-001",
+      "relation": "governed_by",
+      "target_asset_id": "DECISION-T25-R2-OUTCOME-REDESIGN-001"
+    },
+    {
+      "source_asset_id": "MODULE-T25-EXACT-R2-OUTCOME-REPROJECTION-001",
+      "relation": "derived_from",
+      "target_asset_id": "EVIDENCE-T25-A5-DECISION-001"
+    },
+    {
+      "source_asset_id": "MODULE-T25-EXACT-R2-OUTCOME-REPROJECTION-001",
+      "relation": "governed_by",
+      "target_asset_id": "CONTRACT-T25-OUTCOME-LABEL-PIT-001"
+    },
+    {
+      "source_asset_id": "MODULE-T25-EXACT-R2-OUTCOME-REPROJECTION-001",
+      "relation": "produces",
+      "target_asset_id": "DATA-T25-EXACT-R2-OUTCOME-SURFACE-001"
+    },
+    {
+      "source_asset_id": "MODULE-T25-OUTCOME-ENGINE-001",
+      "relation": "governed_by",
+      "target_asset_id": "CONTRACT-T25-OUTCOME-LABEL-PIT-001"
+    },
+    {
+      "source_asset_id": "MODULE-T25-OUTCOME-ENGINE-001",
+      "relation": "produces",
+      "target_asset_id": "DATA-T25-GOLDEN-OUTCOME-PROJECTION-001"
+    },
+    {
+      "source_asset_id": "MODULE-T25-R2-OUTCOME-PROJECTION-001",
+      "relation": "consumes",
+      "target_asset_id": "EVIDENCE-T23-A3-PROJECTION-MANIFEST-001"
+    },
+    {
+      "source_asset_id": "MODULE-T25-R2-OUTCOME-PROJECTION-001",
+      "relation": "governed_by",
+      "target_asset_id": "CONTRACT-T25-OUTCOME-LABEL-PIT-001"
     },
     {
       "source_asset_id": "PRE-GIT-TASK01-A017",
@@ -4001,6 +4211,11 @@
       "source_asset_id": "SCHEMA-T22-SPLIT-RESOLUTION-001",
       "relation": "governed_by",
       "target_asset_id": "CONFIG-T22-CONSUMER-TIME-PROFILE-001"
+    },
+    {
+      "source_asset_id": "SCHEMA-T25-OUTCOME-EVIDENCE-001",
+      "relation": "governed_by",
+      "target_asset_id": "CONTRACT-T25-OUTCOME-LABEL-PIT-001"
     },
     {
       "source_asset_id": "SCM-BASELINE-COMMIT-001",
@@ -5311,6 +5526,86 @@
       "source_asset_id": "TEST-T24-ENTITY-LINKAGE-PROJECTION-001",
       "relation": "depends_on",
       "target_asset_id": "TEST-T24-ENTITY-LINKAGE-CAPTURE-001"
+    },
+    {
+      "source_asset_id": "TEST-T25-A6-CATALOG-FACTORY-FIT-001",
+      "relation": "depends_on",
+      "target_asset_id": "CATALOG-ROOT-001"
+    },
+    {
+      "source_asset_id": "TEST-T25-A6-CATALOG-FACTORY-FIT-001",
+      "relation": "depends_on",
+      "target_asset_id": "DATA-T25-EXACT-R2-OUTCOME-SURFACE-001"
+    },
+    {
+      "source_asset_id": "TEST-T25-A6-CATALOG-FACTORY-FIT-001",
+      "relation": "depends_on",
+      "target_asset_id": "EVIDENCE-T25-A6-CATALOG-FACTORY-FIT-001"
+    },
+    {
+      "source_asset_id": "TEST-T25-ADVERSARIAL-ACCEPTANCE-001",
+      "relation": "depends_on",
+      "target_asset_id": "FIXTURE-T25-A5-ADVERSARIAL-MATRIX-001"
+    },
+    {
+      "source_asset_id": "TEST-T25-ADVERSARIAL-ACCEPTANCE-001",
+      "relation": "depends_on",
+      "target_asset_id": "MODULE-T25-ADVERSARIAL-ACCEPTANCE-001"
+    },
+    {
+      "source_asset_id": "TEST-T25-EXACT-R2-OUTCOME-REPROJECTION-001",
+      "relation": "depends_on",
+      "target_asset_id": "DATA-T25-EXACT-R2-OUTCOME-SURFACE-001"
+    },
+    {
+      "source_asset_id": "TEST-T25-EXACT-R2-OUTCOME-REPROJECTION-001",
+      "relation": "depends_on",
+      "target_asset_id": "FIXTURE-T25-A5R1-QUOTE-CLASSIFIER-001"
+    },
+    {
+      "source_asset_id": "TEST-T25-EXACT-R2-OUTCOME-REPROJECTION-001",
+      "relation": "depends_on",
+      "target_asset_id": "MODULE-T25-EXACT-R2-OUTCOME-REPROJECTION-001"
+    },
+    {
+      "source_asset_id": "TEST-T25-OUTCOME-ENGINE-001",
+      "relation": "depends_on",
+      "target_asset_id": "FIXTURE-T25-OUTCOME-LABEL-CONTRACT-001"
+    },
+    {
+      "source_asset_id": "TEST-T25-OUTCOME-ENGINE-001",
+      "relation": "depends_on",
+      "target_asset_id": "MODULE-T25-OUTCOME-ENGINE-001"
+    },
+    {
+      "source_asset_id": "TEST-T25-OUTCOME-LABEL-PIT-CONTRACT-001",
+      "relation": "depends_on",
+      "target_asset_id": "CONFIG-T25-OUTCOME-LABEL-PIT-001"
+    },
+    {
+      "source_asset_id": "TEST-T25-OUTCOME-LABEL-PIT-CONTRACT-001",
+      "relation": "depends_on",
+      "target_asset_id": "CONTRACT-T25-OUTCOME-LABEL-PIT-001"
+    },
+    {
+      "source_asset_id": "TEST-T25-OUTCOME-LABEL-PIT-CONTRACT-001",
+      "relation": "depends_on",
+      "target_asset_id": "FIXTURE-T25-OUTCOME-LABEL-CONTRACT-001"
+    },
+    {
+      "source_asset_id": "TEST-T25-OUTCOME-LABEL-PIT-CONTRACT-001",
+      "relation": "depends_on",
+      "target_asset_id": "SCHEMA-T25-OUTCOME-EVIDENCE-001"
+    },
+    {
+      "source_asset_id": "TEST-T25-R2-OUTCOME-PROJECTION-001",
+      "relation": "depends_on",
+      "target_asset_id": "DATA-T25-R2-OUTCOME-PROJECTION-001"
+    },
+    {
+      "source_asset_id": "TEST-T25-R2-OUTCOME-PROJECTION-001",
+      "relation": "depends_on",
+      "target_asset_id": "MODULE-T25-R2-OUTCOME-PROJECTION-001"
     },
     {
       "source_asset_id": "VALIDATOR-REPOSITORY-STATE-001",

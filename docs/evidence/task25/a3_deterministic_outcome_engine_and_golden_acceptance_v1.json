@@ -1,0 +1,132 @@
+{
+  "adversarial_guards": [
+    "FUTURE_ROW_FOR_CUTOFF_FAILS_CLOSED",
+    "PROVIDER_ERROR_IS_NOT_NO_ROUTE",
+    "FEE_DOUBLE_COUNTING_FAILS_CLOSED",
+    "RECOVERY_BOUNDS_FAIL_CLOSED",
+    "UNSUPPORTED_REALIZED_VWAP_FAILS_CLOSED",
+    "UNSUPPORTED_NET_FAILS_CLOSED",
+    "UNKNOWN_TO_ZERO_FAILS_CLOSED"
+  ],
+  "as_of": "2026-08-02",
+  "atom_id": "T25-A3_DETERMINISTIC_OUTCOME_ENGINE_AND_GOLDEN_ACCEPTANCE_V1",
+  "checks": [
+    {
+      "check_id": "A2_INPUT_HASHES_EXACT",
+      "status": "PASS"
+    },
+    {
+      "check_id": "SYNTHETIC_RECORDS_14",
+      "status": "PASS"
+    },
+    {
+      "check_id": "NO_ROWS_DROPPED",
+      "status": "PASS"
+    },
+    {
+      "check_id": "LABELS_SEPARATE",
+      "status": "PASS"
+    },
+    {
+      "check_id": "MISSING_NOT_ZERO",
+      "status": "PASS"
+    },
+    {
+      "check_id": "ROUTE_FAILURES_RETAINED",
+      "status": "PASS"
+    },
+    {
+      "check_id": "QUOTE_EXIT_DOES_NOT_IMPLY_FLAT",
+      "status": "PASS"
+    },
+    {
+      "check_id": "SPARSE_PATH_DISCRETE_ONLY",
+      "status": "PASS"
+    },
+    {
+      "check_id": "RECOVERY_INVENTORY_BOUNDED",
+      "status": "PASS"
+    },
+    {
+      "check_id": "REALIZED_VWAP_TRUTH_OWNER",
+      "status": "PASS"
+    },
+    {
+      "check_id": "NET_TRUTH_OWNER",
+      "status": "PASS"
+    },
+    {
+      "check_id": "FUTURE_ROWS_ZERO",
+      "status": "PASS"
+    },
+    {
+      "check_id": "FEE_DOUBLE_COUNT_ZERO",
+      "status": "PASS"
+    },
+    {
+      "check_id": "R2_R3_ENTITY_ZERO",
+      "status": "PASS"
+    },
+    {
+      "check_id": "NEXT_BOUNDARY_NOT_AUTHORIZED",
+      "status": "PASS"
+    }
+  ],
+  "code_bindings": {
+    "module": {
+      "bytes": 23772,
+      "path": "src/solana_alpha_lab/task25_outcome_engine.py",
+      "sha256": "9f67b35a2e480a6ada215e6dea6c16ab5db61e5e0ce39a2f3cf9546d85cad3b9"
+    },
+    "test": {
+      "bytes": 9240,
+      "path": "tests/test_task25_outcome_engine.py",
+      "sha256": "9d9df11632d37b845e96cbee561edc8d05b59c70d5dea43cdc5081c5f81ef74a"
+    }
+  },
+  "measured_boundary": {
+    "cash_spend_usd_cents": 0,
+    "catalog_or_registry_mutations": 0,
+    "dependency_changes": 0,
+    "entity_graph_values_read": 0,
+    "holdout_consumption_records_added": 0,
+    "project_source_changes": 0,
+    "provider_api_rpc_wss_calls": 0,
+    "r2_values_or_paths_read": 0,
+    "r3_values_or_paths_read": 0,
+    "records_dropped": 0,
+    "synthetic_records_processed": 14,
+    "wallet_signer_transaction_actions": 0
+  },
+  "next_boundary": {
+    "atom": "T25-A4_BOUNDED_R2_OUTCOME_PROJECTION_AND_READ_RECEIPT_V1",
+    "authorized_by_a3": false,
+    "r3_access": "DENY",
+    "requires_exact_pre_read_receipt": true
+  },
+  "output_binding": {
+    "path": "docs/evidence/task25/a3_golden_outcome_projection_v1.json",
+    "sha256": "8c43ac0bd0402e92a1d15a86a7222927053321ac0b7501bc5d25bd533c822c33"
+  },
+  "schema": "smial.task25.a3-golden-acceptance",
+  "schema_version": "1.0",
+  "state_change": {
+    "atom_a3": "VALIDATED",
+    "canonical_task25_done": false,
+    "catalog_registration": "DEFERRED_TO_T25_A6",
+    "task25": "IN_PROGRESS"
+  },
+  "status": "PASS_SYNTHETIC_ENGINE_WITH_LIMITATIONS",
+  "task_id": "TASK-25",
+  "validation": {
+    "a2_a3_regression_command": "uv run --locked --managed-python python -B -m unittest tests.test_task25_outcome_label_and_pit_contract tests.test_task25_outcome_engine",
+    "a2_a3_regression_tests_passed": 35,
+    "a2_a3_regression_tests_run": 35,
+    "a3_targeted_command": "uv run --locked --managed-python python -B -m unittest tests.test_task25_outcome_engine",
+    "a3_tests_passed": 17,
+    "a3_tests_run": 17,
+    "full_validation": "DEFERRED_TO_DELIVERY_GATE",
+    "status": "PASS",
+    "stored_output_check": "PASS"
+  }
+}

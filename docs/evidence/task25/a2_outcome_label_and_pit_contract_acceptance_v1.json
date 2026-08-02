@@ -1,0 +1,90 @@
+{
+  "schema": "smial.task25.a2-outcome-label-and-pit-contract-acceptance",
+  "schema_version": "1.0",
+  "task_id": "TASK-25",
+  "atom_id": "T25-A2_FROZEN_OUTCOME_LABEL_AND_PIT_CONTRACT_V1",
+  "as_of": "2026-08-02",
+  "status": "PASS_VALIDATED_CONTRACT_ONLY",
+  "entry_binding": {
+    "accepted_main_commit": "be15889e103caaf92b7e34c9f98b7fd6378eed2e",
+    "accepted_main_tree": "ed5d2a788080f1535074e78e0f66ffbe07afbab8",
+    "branch": "task25/outcome-engine",
+    "source_activation_receipt": "ACTIVATION_CONFIRMED_USER_SMOKE",
+    "source_manifest_version": "4.1",
+    "source_manifest_sha256": "9a97d6b4857ede4fc0be4381d0a5c5bb060e093bfe1a46e86533af36e13438d5",
+    "active_task_source_version": "1.0",
+    "active_task_source_sha256": "fa802dbb4538b47efa094fc36e56e3df058e6eaac81fe35d381ffaa95fe18444"
+  },
+  "artifact_bindings": {
+    "contract": {
+      "path": "docs/contracts/task25_outcome_label_and_pit_contract_v1.md",
+      "sha256": "04e4397e69d554463a09564bdb1cbbb2ac41ce8662277d05e4565c178e94c801"
+    },
+    "config": {
+      "path": "configs/task25_outcome_label_and_pit_contract_v1.yaml",
+      "sha256": "18a605cc3380d060b6e443430e33b22b49a59fca6d20ddc28078faec2ae5a483"
+    },
+    "schema": {
+      "path": "catalog/schemas/task25_outcome_evidence.schema.json",
+      "sha256": "d8c4cae7f5e8004a6d7606acc78e344186bf24a95ccb1696cce5575979c4aff3"
+    },
+    "fixture": {
+      "path": "tests/fixtures/task25/outcome_label_contract_v1.json",
+      "sha256": "269896634d1225f9b606cc12c13fcea6e624143bfe35413c3ad1acf9b8dcb917"
+    },
+    "test": {
+      "path": "tests/test_task25_outcome_label_and_pit_contract.py",
+      "sha256": "998380f55482fa9a7be5506be133b7432519635af6fcd54e9f9e338d3332fe43"
+    }
+  },
+  "validation": {
+    "status": "PASS",
+    "targeted_command": "uv run --locked --managed-python python -B -m unittest tests.test_task25_outcome_label_and_pit_contract",
+    "targeted_tests_run": 18,
+    "targeted_tests_passed": 18,
+    "schema_draft": "2020-12",
+    "valid_synthetic_records": 14,
+    "adversarial_mutations_rejected": 12,
+    "catalog_direct_consumer_command": "uv run --locked --managed-python python -B scripts/validate_catalog.py",
+    "catalog_direct_consumer_status": "PASS",
+    "full_validation": "DEFERRED_TO_DELIVERY_GATE"
+  },
+  "semantic_acceptance": {
+    "touch_does_not_imply_fillable": "PASS",
+    "quote_does_not_imply_fill_or_settlement": "PASS",
+    "missing_does_not_imply_zero": "PASS",
+    "sparse_absence_does_not_refute_continuous_touch": "PASS",
+    "sparse_panel_does_not_claim_continuous_path": "PASS",
+    "provider_failure_remains_distinct_from_no_route": "PASS",
+    "actual_fills_and_settled_cashflow_have_separate_truth_owners": "PASS",
+    "missing_exit_and_pool_death_retain_recovery_inventory": "PASS",
+    "pit_order_and_availability_are_frozen": "PASS"
+  },
+  "measured_boundary": {
+    "synthetic_records_validated": 14,
+    "adversarial_mutations_rejected": 12,
+    "r2_values_read": 0,
+    "r2_paths_opened": 0,
+    "r3_values_or_paths_read": 0,
+    "holdout_consumption_records_added": 0,
+    "provider_api_rpc_wss_calls": 0,
+    "dependency_changes": 0,
+    "project_source_changes": 0,
+    "entity_graph_values_read": 0,
+    "catalog_or_registry_mutations": 0,
+    "wallet_signer_transaction_actions": 0,
+    "cash_spend_usd_cents": 0
+  },
+  "state_change": {
+    "task25": "IN_PROGRESS",
+    "atom_a2": "VALIDATED",
+    "canonical_task25_done": false,
+    "catalog_registration": "DEFERRED_TO_T25_A6"
+  },
+  "next_boundary": {
+    "atom": "T25-A3_DETERMINISTIC_OUTCOME_ENGINE_AND_GOLDEN_ACCEPTANCE_V1",
+    "authorized": false,
+    "r2_value_read_allowed": false,
+    "r3_access_allowed": false
+  }
+}

@@ -1,0 +1,158 @@
+{
+  "schema": "smial.task25.exact-r2-quote-synthetic-fixture",
+  "schema_version": "1.0",
+  "task_id": "TASK-25",
+  "atom_id": "T25-A5R1_EXACT_R2_OUTCOME_SURFACE_REPROJECTION_V1",
+  "classification_policy": {
+    "latency_budget_ms": 1000,
+    "freshness_max_age_ms": 5000
+  },
+  "classification_cases": [
+    {
+      "case_id": "available_within_limits",
+      "status": "QUOTE_AVAILABLE",
+      "quote_age_ms": 0,
+      "provider_latency_ms": 900,
+      "exact_identity": true,
+      "pit_valid": true,
+      "expected_assessment": "SUPPORTED",
+      "expected_reason": "EXACT_QUOTE_WITHIN_FROZEN_LIMITS"
+    },
+    {
+      "case_id": "available_at_latency_boundary",
+      "status": "QUOTE_AVAILABLE",
+      "quote_age_ms": 5000,
+      "provider_latency_ms": 1000,
+      "exact_identity": true,
+      "pit_valid": true,
+      "expected_assessment": "SUPPORTED",
+      "expected_reason": "EXACT_QUOTE_WITHIN_FROZEN_LIMITS"
+    },
+    {
+      "case_id": "latency_exceeded",
+      "status": "QUOTE_AVAILABLE",
+      "quote_age_ms": 0,
+      "provider_latency_ms": 1001,
+      "exact_identity": true,
+      "pit_valid": true,
+      "expected_assessment": "UNKNOWN",
+      "expected_reason": "PROVIDER_LATENCY_LIMIT_EXCEEDED"
+    },
+    {
+      "case_id": "freshness_exceeded",
+      "status": "QUOTE_AVAILABLE",
+      "quote_age_ms": 5001,
+      "provider_latency_ms": 900,
+      "exact_identity": true,
+      "pit_valid": true,
+      "expected_assessment": "UNKNOWN",
+      "expected_reason": "QUOTE_FRESHNESS_LIMIT_EXCEEDED"
+    },
+    {
+      "case_id": "freshness_missing",
+      "status": "QUOTE_AVAILABLE",
+      "quote_age_ms": null,
+      "provider_latency_ms": 900,
+      "exact_identity": true,
+      "pit_valid": true,
+      "expected_assessment": "UNKNOWN",
+      "expected_reason": "QUOTE_AGE_UNOBSERVED"
+    },
+    {
+      "case_id": "latency_missing",
+      "status": "QUOTE_AVAILABLE",
+      "quote_age_ms": 0,
+      "provider_latency_ms": null,
+      "exact_identity": true,
+      "pit_valid": true,
+      "expected_assessment": "UNKNOWN",
+      "expected_reason": "PROVIDER_LATENCY_UNOBSERVED"
+    },
+    {
+      "case_id": "identity_missing",
+      "status": "QUOTE_AVAILABLE",
+      "quote_age_ms": 0,
+      "provider_latency_ms": 900,
+      "exact_identity": false,
+      "pit_valid": true,
+      "expected_assessment": "UNKNOWN",
+      "expected_reason": "EXACT_QUOTE_IDENTITY_MISSING"
+    },
+    {
+      "case_id": "pit_invalid",
+      "status": "QUOTE_AVAILABLE",
+      "quote_age_ms": 0,
+      "provider_latency_ms": 900,
+      "exact_identity": true,
+      "pit_valid": false,
+      "expected_assessment": "UNKNOWN",
+      "expected_reason": "PIT_ORDER_OR_CUTOFF_INVALID"
+    },
+    {
+      "case_id": "explicit_no_route",
+      "status": "NO_ROUTE",
+      "quote_age_ms": 0,
+      "provider_latency_ms": 900,
+      "exact_identity": true,
+      "pit_valid": true,
+      "expected_assessment": "REFUTED",
+      "expected_reason": "EXPLICIT_NO_ROUTE"
+    },
+    {
+      "case_id": "provider_error",
+      "status": "PROVIDER_ERROR",
+      "quote_age_ms": null,
+      "provider_latency_ms": 900,
+      "exact_identity": true,
+      "pit_valid": true,
+      "expected_assessment": "UNKNOWN",
+      "expected_reason": "PROVIDER_FAILURE_NOT_NO_ROUTE"
+    },
+    {
+      "case_id": "invalid_response",
+      "status": "INVALID_RESPONSE",
+      "quote_age_ms": null,
+      "provider_latency_ms": 900,
+      "exact_identity": true,
+      "pit_valid": true,
+      "expected_assessment": "UNKNOWN",
+      "expected_reason": "PROVIDER_FAILURE_NOT_NO_ROUTE"
+    },
+    {
+      "case_id": "timeout",
+      "status": "TIMEOUT",
+      "quote_age_ms": null,
+      "provider_latency_ms": null,
+      "exact_identity": true,
+      "pit_valid": true,
+      "expected_assessment": "UNKNOWN",
+      "expected_reason": "PROVIDER_FAILURE_NOT_NO_ROUTE"
+    }
+  ],
+  "pair_identity_cases": [
+    {
+      "case_id": "exact_dependent_sell",
+      "buy_input_mint": "USDC_SYNTHETIC",
+      "buy_output_mint": "TOKEN_SYNTHETIC",
+      "buy_output_atomic": "9000000",
+      "buy_output_decimals": 6,
+      "sell_input_mint": "TOKEN_SYNTHETIC",
+      "sell_input_atomic": "9000000",
+      "sell_input_decimals": 6,
+      "sell_output_mint": "USDC_SYNTHETIC",
+      "expected_exact": true
+    },
+    {
+      "case_id": "wrong_sell_inventory",
+      "buy_input_mint": "USDC_SYNTHETIC",
+      "buy_output_mint": "TOKEN_SYNTHETIC",
+      "buy_output_atomic": "9000000",
+      "buy_output_decimals": 6,
+      "sell_input_mint": "TOKEN_SYNTHETIC",
+      "sell_input_atomic": "8999999",
+      "sell_input_decimals": 6,
+      "sell_output_mint": "USDC_SYNTHETIC",
+      "expected_exact": false
+    }
+  ]
+}

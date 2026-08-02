@@ -1,0 +1,307 @@
+schema_version: "1.0"
+contract_id: T25-OUTCOME-LABEL-AND-PIT-CONTRACT-001
+task_id: TASK-25
+task_name: Outcome engine v1
+atom: T25-A2_FROZEN_OUTCOME_LABEL_AND_PIT_CONTRACT_V1
+status: VALIDATED_CONTRACT_ONLY
+as_of: "2026-08-02"
+
+entry_gate:
+  route_owner: LOCAL_WORK_PRIMARY
+  execution_route: LOCAL_WORK_CODEX
+  verdict: START_WITH_PATCH
+  patch: FREEZE_OUTCOME_LABEL_AND_PIT_CONTRACT_BEFORE_R2_VALUE_READ
+  user_atom_approval: CONFIRMED
+  source_activation_receipt: ACTIVATION_CONFIRMED_USER_SMOKE
+  source_manifest_version: "4.1"
+  source_manifest_sha256: 9a97d6b4857ede4fc0be4381d0a5c5bb060e093bfe1a46e86533af36e13438d5
+  active_task_source_version: "1.0"
+  active_task_source_sha256: fa802dbb4538b47efa094fc36e56e3df058e6eaac81fe35d381ffaa95fe18444
+  accepted_main_commit: be15889e103caaf92b7e34c9f98b7fd6378eed2e
+  accepted_main_tree: ed5d2a788080f1535074e78e0f66ffbe07afbab8
+  branch: task25/outcome-engine
+  dependencies:
+    TASK-22: DONE_SPLIT_RESOLUTION_ACCEPTED
+    TASK-23: DONE_DIAGNOSTICS_READY_WITH_LIMITATIONS
+    TASK-24: DONE_STOP_NO_RELIABLE_ENTITY_SIGNAL
+  catalog_checkpoint:
+    version: 0.29.2
+    implementation_status: VALIDATED_ACTIVE
+    assets: 448
+    asset_registries: 4
+    schemas: 7
+    queries: 8
+    lifecycle_registries: 9
+    lifecycle_records: 56
+  product_vision_terminal: CANONICALIZED_WITH_PATCH
+  active_time_gate: NONE
+  reasoning: VERY_HIGH_SUFFICIENT
+  tool_decision: NONE
+
+owner_decision:
+  question: >-
+    Can frozen R2 evidence support a narrow point-in-time-safe outcome
+    comparison without promoting price observation to execution truth?
+  allowed_terminal_decisions:
+    - OUTCOME_ENGINE_READY_WITH_LIMITATIONS
+    - REDESIGN_LABEL_OR_DATA_CONTRACT
+    - STOP_NO_ADMISSIBLE_OUTCOME_EVIDENCE
+  forbidden_claims:
+    - TOUCH_IMPLIES_FILLABLE
+    - QUOTE_IMPLIES_FILL_OR_SETTLEMENT
+    - MISSING_IMPLIES_ZERO
+    - SPARSE_PANEL_IMPLIES_CONTINUOUS_PATH
+    - R2_ACTUAL_FILL_OR_SETTLED_CASHFLOW
+    - R3_ACCESS_OR_HOLDOUT_CONSUMPTION
+    - ENTITY_FEATURE_ADMISSIBILITY
+    - ALPHA_CAUSALITY_OR_GENERALIZATION
+    - REALIZED_PNL_NETRETURN_OR_OWNER_CASHFLOW
+    - CANONICAL_TASK25_DONE
+
+managed_write_set:
+  - docs/contracts/task25_outcome_label_and_pit_contract_v1.md
+  - configs/task25_outcome_label_and_pit_contract_v1.yaml
+  - catalog/schemas/task25_outcome_evidence.schema.json
+  - tests/fixtures/task25/outcome_label_contract_v1.json
+  - tests/test_task25_outcome_label_and_pit_contract.py
+  - docs/evidence/task25/a2_outcome_label_and_pit_contract_acceptance_v1.json
+
+reuse_decision:
+  reuse_gate_status: PASS_EXISTING_COMPONENTS_SUFFICIENT
+  full_software_reuse_gate_status: NOT_TRIGGERED_NO_NEW_DEPENDENCY_OR_SERVICE
+  adopt:
+    - PYTHON_STDLIB
+    - JSONSCHEMA_4_26_0
+    - PYYAML_6_0_3
+    - CONTRACT_T05_DATA_001
+    - SCHEMA_T05_REL_STRATEGY_OUTCOMES_001
+    - CONTRACT_T10_JUPITER_QUOTE_OBSERVATION_001
+    - DATA_T22_SPLIT_MANIFEST_002
+    - TASK23_SPARSE_PANEL_LIMITATIONS
+  wrap:
+    - TASK05_STRATEGY_OUTCOME_RELATION_WITH_TASK25_EVIDENCE_SCHEMA
+    - TASK10_QUOTE_STATES_WITH_EXACT_NOTIONAL_AND_PIT_GUARDS
+  fork: []
+  build:
+    - PURE_TASK25_OUTCOME_LABEL_CONTRACT
+    - SYNTHETIC_ADVERSARIAL_GOLDEN_MATRIX
+  new_dependency_or_service: false
+
+frozen_upstream_bindings:
+  - asset_id: SCHEMA-T05-CANONICAL-DDL-001
+    path: schemas/schema_v1.sql
+    sha256: eae9d1544b11cffc03afba1e263153168a11dc6f648df9117a55a4cae5d23f09
+    bytes: 28962
+    use: STRATEGY_OUTCOMES_COMPATIBILITY_SURFACE
+  - asset_id: CONTRACT-T10-JUPITER-QUOTE-OBSERVATION-001
+    path: docs/contracts/jupiter_quote_observation_contract_v1.md
+    sha256: 86e7a5264ae6a2cde3e95fe450f853d9e2cda01623164f39bde55162a6c3aa64
+    bytes: 8913
+    use: QUOTE_TERMINAL_STATE_SEMANTICS
+  - asset_id: EVIDENCE-T22-A6-ACCEPTANCE-001
+    path: docs/evidence/task22/a6_split_resolution_acceptance_catalog_factory_fit_v1.json
+    sha256: 29c1ad28d06430b74864b745ef50bf0315fcbfcfb5a7534e54b1692a3f15a019
+    bytes: 9593
+    use: SPLIT_HOLDOUT_AND_R3_DEFAULT_DENY
+  - asset_id: EVIDENCE-T23-A3-PROJECTION-MANIFEST-001
+    path: docs/evidence/task23/a3_projection_v1_attempt_02/projection_manifest_v1.json
+    sha256: 06702bba94e9a895d340598f2fa722eeed6dd5ce9cd324d699918ac6a8a95ff9
+    bytes: 6658
+    use: SPARSE_PANEL_AND_QUOTE_PAIR_CAPABILITY_METADATA_ONLY
+label_contract:
+  labels:
+    TOUCH:
+      minimum_basis: [REFERENCE_PRICE_PATH, DISCRETE_PANEL_GRID]
+      supported_means: THRESHOLD_CROSS_OBSERVED_UNDER_DECLARED_SCOPE
+      never_implies: [FILLABLE, QUOTE_EXIT, REALIZED_VWAP, NET]
+    FILLABLE:
+      minimum_basis: [CONTEMPORANEOUS_QUOTE]
+      supported_means: EXACT_NOTIONAL_BUY_QUOTE_AVAILABLE_WITHIN_LIMITS
+      never_implies: [ORDER_ATTEMPT, FILL, SETTLEMENT, FLAT_INVENTORY]
+    QUOTE_EXIT:
+      minimum_basis: [CONTEMPORANEOUS_QUOTE]
+      supported_means: EXACT_INVENTORY_SELL_QUOTE_AVAILABLE_WITHIN_LIMITS
+      never_implies: [LIQUIDATION, FILL, SETTLEMENT, FLAT_INVENTORY]
+    REALIZED_VWAP:
+      minimum_basis: [ACTUAL_RECONCILED_FILLS]
+      supported_means: ACTUAL_FILLS_RECONCILED_WITH_EXECUTION_REFERENCES
+      quote_only_allowed: false
+    NET:
+      minimum_basis: [SETTLED_CASHFLOW]
+      supported_means: COMPLETE_SETTLED_CASHFLOW_AND_COST_ATTRIBUTION
+      missing_fee_or_cost_allowed: false
+    PATH_RISK:
+      minimum_basis: [REFERENCE_PRICE_PATH, DISCRETE_PANEL_GRID, PATH_STATE_EVIDENCE]
+      supported_means: PATH_EVIDENCE_ONLY_AT_EXPLICIT_COVERAGE_SCOPE
+      sparse_panel_continuous_metrics_allowed: false
+  assessments: [SUPPORTED, REFUTED, UNKNOWN, NOT_APPLICABLE]
+  missing_representation: NULL_WITH_EXPLICIT_UNKNOWN_STATE
+  missing_is_zero: false
+
+state_contract:
+  route_states:
+    - QUOTE_AVAILABLE
+    - NO_ROUTE
+    - STALE_QUOTE
+    - PROVIDER_ERROR
+    - INVALID_RESPONSE
+    - TIMEOUT
+    - NOT_APPLICABLE
+  fill_states:
+    - ACTUAL_FILLS_RECONCILED
+    - ACTUAL_FILLS_NOT_OBSERVED
+    - NOT_APPLICABLE
+  cashflow_states:
+    - SETTLED_COMPLETE
+    - FEE_MODEL_UNAVAILABLE
+    - CASHFLOW_NOT_OBSERVED
+    - NOT_APPLICABLE
+  path_states:
+    - CONTINUOUS_COMPLETE
+    - SPARSE_DISCRETE
+    - POOL_DEAD
+    - MISSING_EXIT
+    - UNOBSERVED
+    - NOT_APPLICABLE
+  provider_failure_is_no_route: false
+  stale_is_quote_available: false
+  missing_exit_row_dropped: false
+  pool_death_is_zero_return: false
+
+quote_contract:
+  exact_notional_required_for: [FILLABLE, QUOTE_EXIT]
+  exact_notional_fields:
+    - input_amount_atomic
+    - input_mint
+    - input_decimals
+    - quote_mint
+    - quote_decimals
+    - latency_budget_ms
+    - freshness_max_age_ms
+    - observed_age_ms
+  supported_requires_route_state: QUOTE_AVAILABLE
+  refuted_requires_route_state: NO_ROUTE
+  failure_states_remain_unknown:
+    - STALE_QUOTE
+    - PROVIDER_ERROR
+    - INVALID_RESPONSE
+    - TIMEOUT
+  actual_transaction_inference: false
+
+path_contract:
+  sparse_panel_capability: DISCRETE_OBSERVED_GRID_ONLY
+  observed_cross_can_support: OBSERVED_GRID_CROSSING
+  sparse_no_cross_touch_assessment: UNKNOWN
+  sparse_no_cross_refutes_continuous_touch: false
+  sparse_panel_continuous_mae_mfe_allowed: false
+  sparse_panel_continuous_path_claim_allowed: false
+  retained_terminal_states: [POOL_DEAD, MISSING_EXIT]
+
+inventory_contract:
+  states: [FLAT, OPEN, UNRESOLVED_REQUIRES_RECOVERY, RECOVERED, NOT_APPLICABLE]
+  unresolved_requires_positive_remaining_atomic: true
+  unresolved_requires_recovery_bounds: true
+  recovery_lower_must_not_exceed_upper: true
+  quote_exit_supported_implies_flat: false
+  missing_exit_retains_inventory: true
+
+point_in_time_contract:
+  required_timestamps:
+    - event_at
+    - observed_at
+    - first_reliable_available_at
+    - available_to_strategy_at
+    - ingested_at
+    - measured_as_of
+  timestamp_order: >-
+    event_at<=observed_at<=first_reliable_available_at<=available_to_strategy_at<=ingested_at
+  nullable_event_time: true
+  measured_as_of_rule: measured_as_of<=available_to_strategy_at
+  derived_availability_rule: MAX_OF_ALL_REQUIRED_INPUT_AVAILABILITY
+  future_labels_allowed: false
+  revisions_append_only: true
+  missing_is_zero: false
+
+data_capability:
+  synthetic_golden:
+    status: ADMISSIBLE_FOR_CONTRACT_AND_ADVERSARIAL_TESTS
+    values_read: 14
+  r2_development:
+    values_read_in_a2: 0
+    paths_opened_in_a2: 0
+    known_panel_shape: SPARSE_DISCRETE
+    quote_attempt_evidence: AVAILABLE_AFTER_SEPARATE_PRE_READ_GATE
+    actual_fills: NOT_AVAILABLE
+    settled_cashflow: NOT_AVAILABLE
+    continuous_path: NOT_AVAILABLE
+  r3_holdout:
+    access: DENY
+    values_read_in_a2: 0
+    paths_discovered_in_a2: 0
+    holdout_consumption_records_added: 0
+  entity_graph:
+    admissible: false
+    values_read_in_a2: 0
+
+pre_read_policy:
+  r2_exact_roots_metadata_bound: true
+  r2_value_read_allowed_in_a2: false
+  r3_path_or_value_discovery_allowed: false
+  a3_requires_exact_pre_read_receipt: false
+  a4_requires_exact_pre_read_receipt: true
+  no_future_labels: true
+
+golden_matrix:
+  fixture_scope: SYNTHETIC_GOLDEN_ONLY
+  valid_records: 14
+  required_adversarial_mutations: 12
+  required_rejections:
+    - TOUCH_DOES_NOT_IMPLY_FILLABLE
+    - QUOTE_DOES_NOT_IMPLY_SETTLEMENT
+    - MISSING_IS_NOT_ZERO
+    - SPARSE_ABSENCE_CANNOT_REFUTE_CONTINUOUS_TOUCH
+    - SPARSE_PANEL_CANNOT_CLAIM_CONTINUOUS_PATH
+    - PROVIDER_FAILURE_IS_NOT_NO_ROUTE
+    - PIT_ORDER_INVALID
+    - EXACT_NOTIONAL_REQUIRED
+    - STALE_QUOTE_CANNOT_SUPPORT_FILLABLE
+    - ACTUAL_EXECUTION_REFERENCES_REQUIRED
+    - SETTLED_CASHFLOW_REQUIRED
+    - UNRESOLVED_INVENTORY_MUST_BE_POSITIVE
+
+catalog_impact:
+  schema_file_created: catalog/schemas/task25_outcome_evidence.schema.json
+  root_resolver_changed_in_a2: false
+  asset_registration_changed_in_a2: false
+  generated_navigation_changed_in_a2: false
+  checkpoint_remains: 0.29.2
+  registration_owner: T25-A6_REGISTER_ASSETS_UPDATE_CATALOG_AND_FULL_FACTORY_FIT_REVIEW_V1
+
+authority:
+  local_declared_write_set: true
+  offline_targeted_validation: true
+  synthetic_fixture_values: 14
+  r2_value_reads: 0
+  r3_value_or_path_reads: 0
+  provider_api_rpc_wss_calls: 0
+  credential_use: false
+  dependency_changes: false
+  project_source_changes: false
+  entity_graph_reads: 0
+  catalog_or_registry_mutation: false
+  wallet_signer_transaction_actions: 0
+  cash_spend_usd_cents: 0
+  deploy_or_release: false
+  commit: false
+  push: false
+  pull_request: false
+  merge: false
+
+next_boundary:
+  atom: T25-A3_DETERMINISTIC_OUTCOME_ENGINE_AND_GOLDEN_ACCEPTANCE_V1
+  authorized_by_a2: false
+  required_inputs:
+    - VALIDATED_A2_CONTRACT
+    - VALIDATED_SYNTHETIC_GOLDEN_MATRIX
+  r2_value_read_allowed: false
+  r3_access_allowed: false

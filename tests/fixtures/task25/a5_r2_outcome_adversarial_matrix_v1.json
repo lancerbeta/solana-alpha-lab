@@ -1,0 +1,108 @@
+{
+  "schema": "smial.task25.r2-outcome-adversarial-matrix",
+  "schema_version": "1.0",
+  "task_id": "TASK-25",
+  "atom_id": "T25-A5_ADVERSARIAL_ACCEPTANCE_AND_OWNER_DECISION_V1",
+  "base_projection": {
+    "path": "docs/evidence/task25/a4_r2_outcome_projection_v1.json",
+    "sha256": "59cbb0bdeea6a80d184ea3c3fdbb3827ff2b23951d2a93a483198374d85da075"
+  },
+  "decision": "REDESIGN_TRACKED_R2_OUTCOME_SURFACE_BEFORE_OWNER_COMPARISON",
+  "mutations": [
+    {
+      "mutation_id": "A5-MUT-001",
+      "operation": "CHANGE_RECORD",
+      "record_id": "T25-R2-0002",
+      "changes": {"assessment": "SUPPORTED", "value_decimal": "1.000000", "unit": "PRICE_RATIO"},
+      "expected_error": "fillable_exact_identity_missing"
+    },
+    {
+      "mutation_id": "A5-MUT-002",
+      "operation": "CHANGE_RECORD",
+      "record_id": "T25-R2-0003",
+      "changes": {"assessment": "SUPPORTED", "value_decimal": "0.970304", "unit": "PRICE_RATIO"},
+      "expected_error": "quote_exit_exact_inventory_missing"
+    },
+    {
+      "mutation_id": "A5-MUT-003",
+      "operation": "CHANGE_RECORD",
+      "record_id": "T25-R2-0010",
+      "changes": {"assessment": "SUPPORTED", "value_decimal": "-0.029696", "unit": "RETURN_DECIMAL", "evidence_basis": "CONTEMPORANEOUS_QUOTE"},
+      "expected_error": "realized_vwap_requires_actual_fills"
+    },
+    {
+      "mutation_id": "A5-MUT-004",
+      "operation": "CHANGE_RECORD",
+      "record_id": "T25-R2-0011",
+      "changes": {"assessment": "SUPPORTED", "value_decimal": "-0.029696", "unit": "RETURN_DECIMAL", "evidence_basis": "CONTEMPORANEOUS_QUOTE"},
+      "expected_error": "net_requires_settled_cashflow"
+    },
+    {
+      "mutation_id": "A5-MUT-005",
+      "operation": "CHANGE_RECORD",
+      "record_id": "T25-R2-0012",
+      "changes": {"claim_scope": "CONTINUOUS_PATH_METRICS", "path_state": "CONTINUOUS_COMPLETE"},
+      "expected_error": "sparse_projection_continuous_path_forbidden"
+    },
+    {
+      "mutation_id": "A5-MUT-006",
+      "operation": "CHANGE_RECORD",
+      "record_id": "T25-R2-0001",
+      "changes": {"assessment": "SUPPORTED", "value_decimal": "0.250000", "unit": "RETURN_DECIMAL"},
+      "expected_error": "touch_threshold_evidence_missing"
+    },
+    {
+      "mutation_id": "A5-MUT-007",
+      "operation": "CHANGE_RECORD",
+      "record_id": "T25-R2-0002",
+      "changes": {"value_decimal": "0.000000", "unit": "RETURN_DECIMAL"},
+      "expected_error": "unknown_coerced_to_value"
+    },
+    {
+      "mutation_id": "A5-MUT-008",
+      "operation": "CHANGE_DATASET",
+      "changes": {"panel_semantics": "EXACT_NOMINAL_HORIZONS"},
+      "expected_error": "nominal_horizon_claim_forbidden"
+    },
+    {
+      "mutation_id": "A5-MUT-009",
+      "operation": "CHANGE_RECORD",
+      "record_id": "T25-R2-0003",
+      "changes": {"route_state_observed": "PROVIDER_ERROR", "assessment": "REFUTED"},
+      "expected_error": "provider_error_not_no_route"
+    },
+    {
+      "mutation_id": "A5-MUT-010",
+      "operation": "DROP_RECORD",
+      "record_id": "T25-R2-0002",
+      "changes": {},
+      "expected_error": "outcome_denominator_drift"
+    },
+    {
+      "mutation_id": "A5-MUT-011",
+      "operation": "CHANGE_RECORD",
+      "record_id": "T25-R2-0002",
+      "changes": {"invented_exact_identity": {"output_mint": "INVENTED", "quote_age_ms": 0}},
+      "expected_error": "outcome_field_set_drift"
+    },
+    {
+      "mutation_id": "A5-MUT-012",
+      "operation": "CHANGE_RECORD",
+      "record_id": "T25-R2-0003",
+      "changes": {"fill_state": "ACTUAL_FILLS_RECONCILED", "cashflow_state": "SETTLED_COMPLETE"},
+      "expected_error": "quote_promoted_to_fill_or_settlement"
+    },
+    {
+      "mutation_id": "A5-MUT-013",
+      "operation": "CHANGE_SUMMARY",
+      "changes": {"r3_paths_or_values_read": 1},
+      "expected_error": "r3_access_forbidden"
+    },
+    {
+      "mutation_id": "A5-MUT-014",
+      "operation": "CHANGE_SUMMARY",
+      "changes": {"raw_r2_value_files_reopened": 1},
+      "expected_error": "a5_raw_r2_reopen_forbidden"
+    }
+  ]
+}
