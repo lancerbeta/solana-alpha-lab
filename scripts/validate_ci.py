@@ -3,11 +3,16 @@
 
 from __future__ import annotations
 
+import argparse
+import json
 import os
 import re
 import subprocess
 import sys
+import tempfile
+import time
 import tomllib
+from datetime import UTC, datetime
 from pathlib import Path
 from typing import Any, Callable
 
@@ -22,10 +27,319 @@ CHECKOUT_PIN = "actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0"
 SETUP_UV_PIN = "astral-sh/setup-uv@11f9893b081a58869d3b5fccaea48c9e9e46f990"
 LINUX_UV_CHECKSUM = "04f8b82f5d47f0512dcd32c67a4a6f16a0ea27c81537c338fd0ad6b23cebe829"
 VALIDATION_COMMAND = "uv run --locked --managed-python python -B scripts/validate_ci.py"
+DELIVERY_PREFLIGHT_COMMAND = (
+    VALIDATION_COMMAND + " --tracked-only-delivery"
+)
+DELIVERY_PREFLIGHT_SCHEMA = (
+    "solana-alpha-lab.tracked-only-delivery-preflight.v1"
+)
+DELIVERY_PREFLIGHT_TIMEOUT_SECONDS = 900
+DELIVERY_PREFLIGHT_RECEIPT_DIR = ROOT / "local/delivery_preflight"
+DELIVERY_SKIP_CALL = re.compile(
+    r"(?:\.skipTest\s*\(|@(?:unittest\.)?skip(?:If|Unless)?\s*\("
+    r"|pytest\.(?:skip|importorskip)\s*\()"
+)
+DELIVERY_SKIP_PROOF = re.compile(
+    r"DELIVERY_PREFLIGHT_NONCRITICAL_SKIP:\s*([A-Za-z0-9_./-]+)"
+)
+DELIVERY_SKIP_PROOF_PREFIXES = ("docs/decisions/", "docs/evidence/")
 
 
 class CiValidationError(RuntimeError):
     """Fail-closed CI or repository contract violation."""
+
+
+def utc_now() -> str:
+    return datetime.now(UTC).isoformat().replace("+00:00", "Z")
+
+
+def git_text(
+    args: list[str],
+    *,
+    cwd: Path = ROOT,
+    runner: Callable[..., subprocess.CompletedProcess[str]] | None = None,
+) -> str:
+    execute = runner or subprocess.run
+    completed = execute(
+        ["git", *args],
+        cwd=cwd,
+        text=True,
+        stdout=subprocess.PIPE,
+        stderr=subprocess.PIPE,
+        check=False,
+        shell=False,
+    )
+    if completed.returncode != 0:
+        detail = completed.stderr.strip().splitlines()
+        suffix = detail[-1] if detail else "unknown"
+        raise CiValidationError(f"git_command_failed:{args[0]}:{suffix}")
+    return completed.stdout.strip()
+
+
+def parse_added_test_hunks(diff_text: str) -> list[tuple[str, list[str]]]:
+    hunks: list[tuple[str, list[str]]] = []
+    path: str | None = None
+    additions: list[str] | None = None
+    for line in diff_text.splitlines():
+        if line.startswith("+++ b/"):
+            path = line[6:]
+            additions = None
+        elif line.startswith("@@"):
+            if path and path.startswith("tests/") and path.endswith(".py"):
+                additions = []
+                hunks.append((path, additions))
+            else:
+                additions = None
+        elif additions is not None and line.startswith("+"):
+            additions.append(line[1:])
+    return hunks
+
+
+def validate_new_test_skip_policy(
+    diff_text: str,
+    *,
+    proof_exists: Callable[[str], bool],
+) -> list[dict[str, str]]:
+    """Reject newly added skips unless a tracked non-critical proof is adjacent."""
+    waivers: list[dict[str, str]] = []
+    violations: list[str] = []
+    for path, additions in parse_added_test_hunks(diff_text):
+        for index, line in enumerate(additions):
+            if not DELIVERY_SKIP_CALL.search(line):
+                continue
+            window = "\n".join(
+                additions[max(0, index - 3) : min(len(additions), index + 4)]
+            )
+            match = DELIVERY_SKIP_PROOF.search(window)
+            if not match:
+                violations.append(f"{path}:{index + 1}:new_skip_without_proof")
+                continue
+            proof = match.group(1)
+            if (
+                proof.startswith("/")
+                or "\\" in proof
+                or ".." in Path(proof).parts
+                or not proof.startswith(DELIVERY_SKIP_PROOF_PREFIXES)
+                or not proof_exists(proof)
+            ):
+                violations.append(f"{path}:{index + 1}:invalid_skip_proof:{proof}")
+                continue
+            waivers.append({"test_path": path, "proof_path": proof})
+    if violations:
+        raise CiValidationError(
+            "delivery_new_skip_policy_failed:" + ",".join(sorted(violations))
+        )
+    return waivers
+
+
+def parse_validation_summary(output: str) -> dict[str, Any]:
+    test_counts = [int(value) for value in re.findall(r"Ran (\d+) tests?", output)]
+    skip_counts = [
+        int(value) for value in re.findall(r"OK \(skipped=(\d+)\)", output)
+    ]
+    missing_markers = (
+        "ignored",
+        "local",
+        "raw",
+        "excluded",
+        "unavailable",
+        "not present",
+    )
+    reasons = {
+        match.strip()
+        for match in re.findall(r"skipped ['\"]([^'\"]+)['\"]", output)
+        if any(marker in match.lower() for marker in missing_markers)
+    }
+    diagnostic_patterns = (
+        r"(?m)^(?:FAIL|ERROR): .+$",
+        r"(?m)^(?:AssertionError|[A-Za-z][A-Za-z0-9_]*(?:Error|Exception)): .+$",
+        r"(?m)^FAILED \(.+\)$",
+    )
+    failure_diagnostics: list[str] = []
+    for pattern in diagnostic_patterns:
+        for value in re.findall(pattern, output):
+            normalized = " ".join(value.strip().split())[:500]
+            if normalized and normalized not in failure_diagnostics:
+                failure_diagnostics.append(normalized)
+            if len(failure_diagnostics) == 20:
+                break
+        if len(failure_diagnostics) == 20:
+            break
+    return {
+        "tests_run": max(test_counts) if test_counts else None,
+        "skipped": max(skip_counts) if skip_counts else 0,
+        "pass_labels": len(re.findall(r"(?m)^[-A-Z0-9_ ]+: PASS$", output)),
+        "missing_local_inputs": sorted(reasons),
+        "failure_diagnostics": failure_diagnostics,
+    }
+
+
+def write_delivery_receipt(payload: dict[str, Any], candidate: str) -> Path:
+    DELIVERY_PREFLIGHT_RECEIPT_DIR.mkdir(parents=True, exist_ok=True)
+    path = DELIVERY_PREFLIGHT_RECEIPT_DIR / f"{candidate}.json"
+    path.write_text(
+        json.dumps(payload, indent=2, sort_keys=True) + "\n",
+        encoding="utf-8",
+        newline="\n",
+    )
+    return path
+
+
+def run_tracked_only_delivery_preflight(*, base_ref: str = "origin/main") -> None:
+    started = time.monotonic()
+    candidate = git_text(["rev-parse", "HEAD"])
+    tree = git_text(["show", "-s", "--format=%T", candidate])
+    branch = git_text(["symbolic-ref", "--quiet", "--short", "HEAD"])
+    tracked_dirty = git_text(["status", "--porcelain=v1", "--untracked-files=no"])
+    if tracked_dirty:
+        raise CiValidationError("delivery_candidate_has_tracked_changes")
+    base_commit = git_text(["merge-base", base_ref, candidate])
+    tracked_count = len(
+        git_text(["ls-tree", "-r", "--name-only", candidate]).splitlines()
+    )
+    origin_url = git_text(["remote", "get-url", "origin"])
+    diff_text = git_text(
+        ["diff", "--unified=3", f"{base_commit}..{candidate}", "--", "tests"]
+    )
+
+    def proof_exists(path: str) -> bool:
+        completed = subprocess.run(
+            ["git", "cat-file", "-e", f"{candidate}:{path}"],
+            cwd=ROOT,
+            stdout=subprocess.DEVNULL,
+            stderr=subprocess.DEVNULL,
+            check=False,
+            shell=False,
+        )
+        return completed.returncode == 0
+
+    waivers = validate_new_test_skip_policy(diff_text, proof_exists=proof_exists)
+    status = "FAIL"
+    checkout_removed = False
+    summary: dict[str, Any] = {
+        "tests_run": None,
+        "skipped": None,
+        "pass_labels": 0,
+        "missing_local_inputs": [],
+        "failure_diagnostics": [],
+    }
+    error: str | None = None
+    temporary_root: Path | None = None
+    exit_code: int | None = None
+    try:
+        with tempfile.TemporaryDirectory(prefix="smial-delivery-preflight-") as tmp:
+            temporary_root = Path(tmp)
+            checkout = temporary_root / "checkout"
+            clone = subprocess.run(
+                [
+                    "git",
+                    "clone",
+                    "--no-local",
+                    "--branch",
+                    branch,
+                    str(ROOT),
+                    str(checkout),
+                ],
+                text=True,
+                stdout=subprocess.PIPE,
+                stderr=subprocess.PIPE,
+                check=False,
+                shell=False,
+            )
+            if clone.returncode != 0:
+                raise CiValidationError("delivery_tracked_clone_failed")
+            git_text(["remote", "set-url", "origin", origin_url], cwd=checkout)
+            git_text(
+                ["update-ref", "refs/remotes/origin/main", base_commit],
+                cwd=checkout,
+            )
+            git_text(["branch", "-f", "main", base_commit], cwd=checkout)
+            git_text(
+                [
+                    "symbolic-ref",
+                    "refs/remotes/origin/HEAD",
+                    "refs/remotes/origin/main",
+                ],
+                cwd=checkout,
+            )
+            git_text(["config", "--local", "core.hooksPath", ".githooks"], cwd=checkout)
+            observed_commit = git_text(["rev-parse", "HEAD"], cwd=checkout)
+            observed_tree = git_text(["show", "-s", "--format=%T", "HEAD"], cwd=checkout)
+            if observed_commit != candidate or observed_tree != tree:
+                raise CiValidationError("delivery_tracked_clone_identity_mismatch")
+            environment = os.environ.copy()
+            environment["PYTHONDONTWRITEBYTECODE"] = "1"
+            environment["UV_MANAGED_PYTHON"] = "1"
+            environment["UV_NO_ENV_FILE"] = "1"
+            environment["UV_OFFLINE"] = "1"
+            environment.pop("VIRTUAL_ENV", None)
+            try:
+                completed = subprocess.run(
+                    VALIDATION_COMMAND.split(),
+                    cwd=checkout,
+                    env=environment,
+                    text=True,
+                    stdout=subprocess.PIPE,
+                    stderr=subprocess.PIPE,
+                    check=False,
+                    shell=False,
+                    timeout=DELIVERY_PREFLIGHT_TIMEOUT_SECONDS,
+                )
+            except subprocess.TimeoutExpired as exc:
+                raise CiValidationError("delivery_full_gate_timeout") from exc
+            exit_code = completed.returncode
+            output = completed.stdout + "\n" + completed.stderr
+            if output.strip():
+                print(output.strip())
+            summary = parse_validation_summary(output)
+            if completed.returncode != 0:
+                raise CiValidationError(
+                    f"delivery_full_gate_failed:{completed.returncode}"
+                )
+            status = "PASS"
+        checkout_removed = temporary_root is not None and not temporary_root.exists()
+    except Exception as exc:
+        error = f"{type(exc).__name__}:{exc}"
+        raise
+    finally:
+        if temporary_root is not None:
+            checkout_removed = not temporary_root.exists()
+        elapsed = round(time.monotonic() - started, 3)
+        payload = {
+            "schema": DELIVERY_PREFLIGHT_SCHEMA,
+            "status": status,
+            "observed_at": utc_now(),
+            "candidate": {
+                "branch": branch,
+                "commit": candidate,
+                "tree": tree,
+                "base_ref": base_ref,
+                "base_commit": base_commit,
+                "tracked_file_count": tracked_count,
+                "tracked_worktree_clean": True,
+                "untracked_or_ignored_inputs_copied": False,
+            },
+            "gate": {
+                "command": VALIDATION_COMMAND,
+                "exit_code": exit_code,
+                "timeout_seconds": DELIVERY_PREFLIGHT_TIMEOUT_SECONDS,
+                "wall_seconds": elapsed,
+                **summary,
+            },
+            "new_skip_policy": {
+                "status": "PASS",
+                "tracked_noncritical_waivers": waivers,
+            },
+            "cleanup": {"temporary_checkout_removed": checkout_removed},
+            "network": {
+                "repository_clone": "LOCAL_NO_LOCAL_OBJECT_COPY",
+                "uv_offline": True,
+            },
+            "error": error,
+        }
+        receipt = write_delivery_receipt(payload, candidate)
+        print(f"DELIVERY_PREFLIGHT_RECEIPT: {receipt.relative_to(ROOT).as_posix()}")
+    print("TRACKED_ONLY_DELIVERY_PREFLIGHT: PASS")
 
 
 def expected_workflow() -> dict[str, Any]:
@@ -236,9 +550,28 @@ def validate() -> None:
     print("RESULT: PASS")
 
 
-def main() -> int:
+def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument(
+        "--tracked-only-delivery",
+        action="store_true",
+        help="validate exact committed bytes in an isolated tracked-only clone",
+    )
+    parser.add_argument(
+        "--base-ref",
+        default="origin/main",
+        help="merge-base reference for new-test skip policy",
+    )
+    return parser.parse_args(argv)
+
+
+def main(argv: list[str] | None = None) -> int:
+    args = parse_args(argv)
     try:
-        validate()
+        if args.tracked_only_delivery:
+            run_tracked_only_delivery_preflight(base_ref=args.base_ref)
+        else:
+            validate()
     except Exception as exc:
         print("RESULT: FAIL")
         print(f"ERROR_TYPE: {type(exc).__name__}")

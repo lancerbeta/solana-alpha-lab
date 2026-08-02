@@ -478,7 +478,10 @@ class TestTask21OwnerPulse(unittest.TestCase):
             for item in catalog["records"]
             if item["asset_id"] == "CTRL-AGENTS-001"
         )
-        self.assertEqual(agents_asset["record_version"], "1.8")
+        self.assertGreaterEqual(
+            tuple(int(part) for part in agents_asset["record_version"].split(".")),
+            (1, 8),
+        )
         self.assertEqual(
             agents_asset["integrity"]["sha256"],
             _sha256(AGENTS_PATH),

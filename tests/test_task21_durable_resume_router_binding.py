@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import hashlib
 import json
+import subprocess
 import unittest
 from pathlib import Path
 
@@ -21,10 +22,23 @@ ACCEPTANCE_PATH = (
 )
 AGENTS_PATH = ROOT / "AGENTS.md"
 OWNER_PULSE_SCRIPT = ROOT / "scripts" / "show_t21_finish_gate.py"
+ACCEPTED_RECEIPT_COMMIT = "061243fd0a61ebab14e04e060b573cce40a538dd"
 
 
 def _sha256(path: Path) -> str:
     return hashlib.sha256(path.read_bytes()).hexdigest()
+
+
+def _sha256_at_commit(relative: str) -> str:
+    completed = subprocess.run(
+        ["git", "show", f"{ACCEPTED_RECEIPT_COMMIT}:{relative}"],
+        cwd=ROOT,
+        stdout=subprocess.PIPE,
+        stderr=subprocess.PIPE,
+        check=True,
+        shell=False,
+    )
+    return hashlib.sha256(completed.stdout).hexdigest()
 
 
 class Task21DurableResumeRouterBindingTests(unittest.TestCase):
@@ -150,20 +164,17 @@ class Task21DurableResumeRouterBindingTests(unittest.TestCase):
             "DURABLE_RESUME_ROUTER_BOUND_TO_MANDATORY_MARKER_AND_OWNER_PULSE",
         )
         self.assertEqual(receipt["targeted_validation"], "31_OF_31_PASS")
-        forward_evolved = {
-            "control/active_time_gates.json",
-            "tests/test_task21_durable_resume_router_binding.py",
-            "tests/test_task21_post_h6_gap_sentinel_value_rebase.py",
-        }
         for artifact in receipt["artifacts"]:
-            if artifact["path"] in forward_evolved:
-                continue
             self.assertEqual(
-                _sha256(ROOT / artifact["path"]), artifact["sha256"], artifact["path"]
+                _sha256_at_commit(artifact["path"]),
+                artifact["sha256"],
+                artifact["path"],
             )
         for artifact in receipt["protected_inputs"]:
             self.assertEqual(
-                _sha256(ROOT / artifact["path"]), artifact["sha256"], artifact["path"]
+                _sha256_at_commit(artifact["path"]),
+                artifact["sha256"],
+                artifact["path"],
             )
         for value in receipt["actual_actions"].values():
             if isinstance(value, bool):

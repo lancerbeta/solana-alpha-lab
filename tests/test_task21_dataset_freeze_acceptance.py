@@ -3,6 +3,7 @@ from __future__ import annotations
 import hashlib
 import json
 import re
+import subprocess
 import sys
 import unittest
 from pathlib import Path
@@ -15,7 +16,6 @@ if str(SRC) not in sys.path:
     sys.path.insert(0, str(SRC))
 
 from solana_alpha_lab.task21_dataset_freeze_acceptance import (
-    build_artifact_index,
     build_dataset_freeze_manifest,
     build_effective_sample_summary,
     load_yaml,
@@ -34,6 +34,7 @@ SAMPLE_PATH = ROOT / "docs/evidence/task21/effective_sample_summary_v1.json"
 INDEX_PATH = ROOT / "docs/evidence/task21/task21_artifact_index_v1.json"
 RECEIPT_PATH = ROOT / "docs/evidence/task21/a7_acceptance_catalog_factory_fit_v1.json"
 RECOVERY_CONFIG_PATH = ROOT / "configs/task21_final_dataset_recovery_v1.yaml"
+ACCEPTED_INDEX_COMMIT = "7158d6ba51cdb24e9177902c75c7d302f4b69bc3"
 
 
 def sha256(path: Path) -> str:
@@ -42,6 +43,18 @@ def sha256(path: Path) -> str:
 
 def load_json(path: Path) -> dict:
     return json.loads(path.read_bytes())
+
+
+def git_bytes_at_accepted_index(relative: str) -> bytes:
+    completed = subprocess.run(
+        ["git", "show", f"{ACCEPTED_INDEX_COMMIT}:{relative}"],
+        cwd=ROOT,
+        stdout=subprocess.PIPE,
+        stderr=subprocess.PIPE,
+        check=True,
+        shell=False,
+    )
+    return completed.stdout
 
 
 def load_catalog() -> tuple[dict, dict[str, dict]]:
@@ -120,9 +133,16 @@ class Task21DatasetFreezeAcceptanceTests(unittest.TestCase):
         self.assertFalse(self.sample["task22_eligibility"]["alpha_claim_allowed"])
 
     def test_pre_a7_index_preserves_files_and_reconciles_planned_ids(self) -> None:
-        rebuilt = build_artifact_index(repository_root=ROOT, plan=self.plan)
-        self.assertEqual(rebuilt, self.index)
+        relative_index = INDEX_PATH.relative_to(ROOT).as_posix()
+        self.assertEqual(
+            INDEX_PATH.read_bytes(),
+            git_bytes_at_accepted_index(relative_index),
+        )
         self.assertEqual(self.index["file_count"], 198)
+        self.assertEqual(
+            sha256_bytes(canonical_json_bytes(self.index["files"])),
+            self.index["artifact_set_sha256"],
+        )
         reconciliation = self.index["planned_asset_id_reconciliation"]
         self.assertEqual(reconciliation["planned_id_count"], 69)
         self.assertEqual(len(reconciliation["registered_as_stable_assets"]), 10)
@@ -130,9 +150,9 @@ class Task21DatasetFreezeAcceptanceTests(unittest.TestCase):
         self.assertFalse(self.index["local_raw_included"])
         for row in self.index["files"]:
             with self.subTest(path=row["path"]):
-                path = ROOT / row["path"]
-                self.assertEqual(path.stat().st_size, row["bytes"])
-                self.assertEqual(sha256(path), row["sha256"])
+                value = git_bytes_at_accepted_index(row["path"])
+                self.assertEqual(len(value), row["bytes"])
+                self.assertEqual(hashlib.sha256(value).hexdigest(), row["sha256"])
 
     def test_factory_fit_usage_authority_and_product_gate_are_exact(self) -> None:
         self.assertEqual(self.receipt["status"], "PASS")

@@ -140,6 +140,31 @@ Windows compatibility wrapper:
 pwsh -NoProfile -ExecutionPolicy Bypass -File .\scripts\validate.ps1
 ```
 
+Tracked-only delivery preflight:
+
+```text
+uv run --locked --managed-python python -B scripts/validate_ci.py --tracked-only-delivery
+```
+
+## TRACKED_ONLY_DELIVERY_PREFLIGHT
+
+- Run the tracked-only delivery preflight once for the exact committed
+  candidate before its first push. It creates an isolated local clone from Git
+  objects, copies no untracked or ignored inputs, runs the full locked gate
+  offline, removes the temporary checkout, and writes a compact ignored receipt
+  under `local/delivery_preflight/`.
+- The candidate must have no staged or unstaged tracked changes. Untracked and
+  ignored local evidence may remain in the source workspace because it is not
+  copied into the isolated checkout.
+- A delivery diff must not introduce a test skip as a substitute for absent
+  local/raw evidence. Prefer a tracked synthetic fixture. A genuinely
+  non-decision-critical skip requires an adjacent
+  `DELIVERY_PREFLIGHT_NONCRITICAL_SKIP: <tracked docs/decisions or docs/evidence path>`
+  marker and an existing tracked proof reviewed with the candidate.
+- This is a delivery gate, not an implementation-loop or per-atom hook. Its
+  wall-time cap is 15 minutes. Do not run the ordinary full gate in the source
+  workspace for the same candidate first.
+
 ## VALIDATION_ECONOMY
 
 - During implementation, run the smallest targeted checks for the changed
@@ -150,6 +175,9 @@ pwsh -NoProfile -ExecutionPolicy Bypass -File .\scripts\validate.ps1
 - When the route guarantees full validation on the same pushed head, Cursor may
   return targeted evidence plus `FULL_VALIDATION=DELEGATED_TO_CI`, then read
   back CI when transport is available. Delegation is not a blocker.
+- For a delivery candidate, the tracked-only preflight is the local full-gate
+  owner. GitHub CI remains the independent remote read-back; do not add another
+  local full-gate run for unchanged bytes.
 - Re-run a failed check only after its root cause changed; re-run a passed full
   gate only when the candidate fingerprint, dependencies, relevant runtime, or
   validation policy changed.
