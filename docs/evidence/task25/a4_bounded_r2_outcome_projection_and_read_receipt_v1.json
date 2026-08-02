@@ -1,0 +1,150 @@
+{
+  "atom_id": "T25-A4_BOUNDED_R2_OUTCOME_PROJECTION_AND_READ_RECEIPT_V1",
+  "checks": [
+    {
+      "check_id": "PRE_READ_MANIFEST_SEALED_FIRST",
+      "status": "PASS"
+    },
+    {
+      "check_id": "EXACT_TRACKED_R2_INPUT_SET",
+      "status": "PASS"
+    },
+    {
+      "check_id": "OUTCOME_DENOMINATOR_EXACT",
+      "status": "PASS"
+    },
+    {
+      "check_id": "MISSING_NOT_COERCED_TO_ZERO",
+      "status": "PASS"
+    },
+    {
+      "check_id": "QUOTE_NOT_UPGRADED_TO_FILL_OR_SETTLEMENT",
+      "status": "PASS"
+    },
+    {
+      "check_id": "REALIZED_VWAP_AND_NET_UNKNOWN",
+      "status": "PASS"
+    },
+    {
+      "check_id": "PATH_RISK_DISCRETE_ONLY",
+      "status": "PASS"
+    },
+    {
+      "check_id": "FUTURE_ROWS_REJECTED",
+      "status": "PASS"
+    },
+    {
+      "check_id": "RAW_R2_NOT_REOPENED",
+      "status": "PASS"
+    },
+    {
+      "check_id": "R3_UNTOUCHED",
+      "status": "PASS"
+    }
+  ],
+  "holdout_boundary": {
+    "ledger_path": "docs/evidence/task22/holdout_access_ledger_v2.json",
+    "ledger_sha256": "2282e5d1eac09a0ce940a5700f04b03ff4d75fc9cd4d65e08e5fe7deda88ca51",
+    "r3_paths_or_values_read": 0,
+    "records": 0,
+    "state": "UNTOUCHED"
+  },
+  "implementation": {
+    "module": {
+      "path": "src/solana_alpha_lab/task25_r2_outcome_projection.py",
+      "sha256": "6675b1670dada0864e8553212e86117332fd7d192d05793d86886410e25ff4b5"
+    },
+    "tests": {
+      "path": "tests/test_task25_r2_outcome_projection.py",
+      "sha256": "468b69096351ec34cfbc63c4f56837b7f05762a195884afdaa1040bbff88101f"
+    }
+  },
+  "next_boundary": {
+    "atom": "T25-A5_ADVERSARIAL_ACCEPTANCE_AND_OWNER_DECISION_V1",
+    "authorized_by_a4": false,
+    "r3_access": "DENY"
+  },
+  "pre_read_manifest": {
+    "path": "docs/evidence/task25/a4_r2_outcome_pre_read_manifest_v1.json",
+    "sealed_before_value_read": true,
+    "sha256": "647d2c769762a6f08fd767436799604a8fdc53e70f181d895e1c82ecb6bae565"
+  },
+  "projection": {
+    "path": "docs/evidence/task25/a4_r2_outcome_projection_v1.json",
+    "sha256": "59cbb0bdeea6a80d184ea3c3fdbb3827ff2b23951d2a93a483198374d85da075",
+    "summary": {
+      "assessments": {
+        "SUPPORTED": 9,
+        "UNKNOWN": 99
+      },
+      "entity_graph_values_read": 0,
+      "fillable_supported": 0,
+      "future_rows_consumed": 0,
+      "labels": {
+        "FILLABLE": 36,
+        "NET": 9,
+        "PATH_RISK": 9,
+        "QUOTE_EXIT": 36,
+        "REALIZED_VWAP": 9,
+        "TOUCH": 9
+      },
+      "members": 3,
+      "net_supported": 0,
+      "observed_buy_quote_available": 36,
+      "observed_sell_quote_available": 36,
+      "outcomes_dropped": 0,
+      "outcomes_input": 108,
+      "outcomes_output": 108,
+      "panels": 9,
+      "path_risk_discrete_supported": 9,
+      "quote_exit_supported": 0,
+      "quote_pairs": 36,
+      "r3_paths_or_values_read": 0,
+      "raw_r2_value_files_reopened": 0,
+      "realized_vwap_supported": 0,
+      "unknown_values_coerced_to_zero": 0
+    }
+  },
+  "schema": "smial.task25.r2-outcome-projection-read-receipt",
+  "schema_version": "1.0",
+  "side_effects": {
+    "cash_or_credits_spent": 0,
+    "catalog_changed": 0,
+    "commit_push_pr_merge_actions": 0,
+    "dependencies_added": 0,
+    "provider_api_rpc_wss_calls": 0,
+    "sources_changed": 0,
+    "wallet_signer_transaction_actions": 0
+  },
+  "status": "PASS_WITH_EXPLICIT_PROJECTION_LIMITATIONS",
+  "task_id": "TASK-25",
+  "value_read_receipt": {
+    "access_surface": "TRACKED_CONTENT_ADDRESSED_TASK23_R2_PROJECTION_ONLY",
+    "distinct_r2_derived_value_files_opened": 3,
+    "inputs": [
+      {
+        "bytes": 3638,
+        "data_rows": 9,
+        "path": "docs/evidence/task23/a3_projection_v1_attempt_02/panel_inventory_v1.csv",
+        "sha256": "a623b70543a74c63df41bb45c83074541fa98ac105fdeb611b7e02723014b4ec"
+      },
+      {
+        "bytes": 9657,
+        "data_rows": 36,
+        "path": "docs/evidence/task23/a3_projection_v1_attempt_02/quote_pair_availability_v1.csv",
+        "sha256": "5b525a9602f32b6c654a9bf87c0a783212046cee8f292d13838e160ec9788273"
+      },
+      {
+        "bytes": 1657,
+        "data_rows": 9,
+        "path": "docs/evidence/task23/a3_projection_v1_attempt_02/panel_diagnostics_v1.csv",
+        "sha256": "20cefa9332f2074042f9168ef2c1448bcbe8db281f49a55123f84d8389994c4d"
+      }
+    ],
+    "network_calls": 0,
+    "provider_calls": 0,
+    "r3_paths_discovered": 0,
+    "r3_value_files_opened": 0,
+    "raw_r2_value_files_opened": 0
+  }
+}

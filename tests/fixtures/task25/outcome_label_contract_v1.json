@@ -1,0 +1,742 @@
+{
+  "schema": "smial.task25.outcome-evidence",
+  "schema_version": "1.0",
+  "task_id": "TASK-25",
+  "atom_id": "T25-A2_FROZEN_OUTCOME_LABEL_AND_PIT_CONTRACT_V1",
+  "fixture_kind": "SYNTHETIC_GOLDEN_ONLY",
+  "records": [
+    {
+      "record_id": "T25-GOLDEN-001",
+      "case_id": "touch_continuous_supported",
+      "source_scope": "SYNTHETIC_GOLDEN",
+      "label": "TOUCH",
+      "assessment": "SUPPORTED",
+      "evidence_basis": "REFERENCE_PRICE_PATH",
+      "claim_scope": "TOUCH_WITHIN_HORIZON",
+      "value_decimal": "0.250000",
+      "unit": "RETURN_DECIMAL",
+      "route_state": "NOT_APPLICABLE",
+      "fill_state": "NOT_APPLICABLE",
+      "cashflow_state": "NOT_APPLICABLE",
+      "path_state": "CONTINUOUS_COMPLETE",
+      "notional": null,
+      "inventory": {
+        "state": "NOT_APPLICABLE",
+        "remaining_inventory_atomic": "0",
+        "remaining_inventory_mint": null,
+        "remaining_inventory_decimals": null,
+        "recovery_lower_bound_decimal": null,
+        "recovery_upper_bound_decimal": null,
+        "recovery_unit": null,
+        "recovery_currency_or_mint": null,
+        "failed_exit_state": null
+      },
+      "timestamps": {
+        "event_at": "2026-01-01T00:01:00Z",
+        "observed_at": "2026-01-01T00:01:01Z",
+        "first_reliable_available_at": "2026-01-01T00:01:02Z",
+        "available_to_strategy_at": "2026-01-01T00:01:03Z",
+        "ingested_at": "2026-01-01T00:01:04Z",
+        "measured_as_of": "2026-01-01T00:01:00Z"
+      },
+      "lineage": {
+        "source_asset_ids": ["SYNTHETIC-CONTINUOUS-PATH-001"],
+        "quote_attempt_ids": [],
+        "execution_attempt_ids": [],
+        "cashflow_reference_ids": [],
+        "content_sha256": "1111111111111111111111111111111111111111111111111111111111111111"
+      },
+      "quality_flags": ["COMPLETE_REFERENCE_PATH", "OBSERVED_THRESHOLD_CROSS"]
+    },
+    {
+      "record_id": "T25-GOLDEN-002",
+      "case_id": "touch_sparse_observed_cross_supported",
+      "source_scope": "SYNTHETIC_GOLDEN",
+      "label": "TOUCH",
+      "assessment": "SUPPORTED",
+      "evidence_basis": "DISCRETE_PANEL_GRID",
+      "claim_scope": "OBSERVED_GRID_CROSSING",
+      "value_decimal": "0.220000",
+      "unit": "RETURN_DECIMAL",
+      "route_state": "NOT_APPLICABLE",
+      "fill_state": "NOT_APPLICABLE",
+      "cashflow_state": "NOT_APPLICABLE",
+      "path_state": "SPARSE_DISCRETE",
+      "notional": null,
+      "inventory": {
+        "state": "NOT_APPLICABLE",
+        "remaining_inventory_atomic": "0",
+        "remaining_inventory_mint": null,
+        "remaining_inventory_decimals": null,
+        "recovery_lower_bound_decimal": null,
+        "recovery_upper_bound_decimal": null,
+        "recovery_unit": null,
+        "recovery_currency_or_mint": null,
+        "failed_exit_state": null
+      },
+      "timestamps": {
+        "event_at": "2026-01-01T00:02:00Z",
+        "observed_at": "2026-01-01T00:02:01Z",
+        "first_reliable_available_at": "2026-01-01T00:02:02Z",
+        "available_to_strategy_at": "2026-01-01T00:02:03Z",
+        "ingested_at": "2026-01-01T00:02:04Z",
+        "measured_as_of": "2026-01-01T00:02:00Z"
+      },
+      "lineage": {
+        "source_asset_ids": ["SYNTHETIC-SPARSE-PANEL-001"],
+        "quote_attempt_ids": [],
+        "execution_attempt_ids": [],
+        "cashflow_reference_ids": [],
+        "content_sha256": "2222222222222222222222222222222222222222222222222222222222222222"
+      },
+      "quality_flags": ["SPARSE_PANEL", "OBSERVED_THRESHOLD_CROSS"]
+    },
+    {
+      "record_id": "T25-GOLDEN-003",
+      "case_id": "touch_sparse_no_cross_unknown",
+      "source_scope": "SYNTHETIC_GOLDEN",
+      "label": "TOUCH",
+      "assessment": "UNKNOWN",
+      "evidence_basis": "DISCRETE_PANEL_GRID",
+      "claim_scope": "TOUCH_WITHIN_HORIZON",
+      "value_decimal": null,
+      "unit": null,
+      "route_state": "NOT_APPLICABLE",
+      "fill_state": "NOT_APPLICABLE",
+      "cashflow_state": "NOT_APPLICABLE",
+      "path_state": "SPARSE_DISCRETE",
+      "notional": null,
+      "inventory": {
+        "state": "NOT_APPLICABLE",
+        "remaining_inventory_atomic": "0",
+        "remaining_inventory_mint": null,
+        "remaining_inventory_decimals": null,
+        "recovery_lower_bound_decimal": null,
+        "recovery_upper_bound_decimal": null,
+        "recovery_unit": null,
+        "recovery_currency_or_mint": null,
+        "failed_exit_state": null
+      },
+      "timestamps": {
+        "event_at": null,
+        "observed_at": "2026-01-01T00:03:01Z",
+        "first_reliable_available_at": "2026-01-01T00:03:02Z",
+        "available_to_strategy_at": "2026-01-01T00:03:03Z",
+        "ingested_at": "2026-01-01T00:03:04Z",
+        "measured_as_of": "2026-01-01T00:03:00Z"
+      },
+      "lineage": {
+        "source_asset_ids": ["SYNTHETIC-SPARSE-PANEL-002"],
+        "quote_attempt_ids": [],
+        "execution_attempt_ids": [],
+        "cashflow_reference_ids": [],
+        "content_sha256": "3333333333333333333333333333333333333333333333333333333333333333"
+      },
+      "quality_flags": ["SPARSE_PANEL", "NO_OBSERVED_THRESHOLD_CROSS", "INTER_PANEL_PATH_UNOBSERVED"]
+    },
+    {
+      "record_id": "T25-GOLDEN-004",
+      "case_id": "fillable_quote_supported_exact_notional",
+      "source_scope": "SYNTHETIC_GOLDEN",
+      "label": "FILLABLE",
+      "assessment": "SUPPORTED",
+      "evidence_basis": "CONTEMPORANEOUS_QUOTE",
+      "claim_scope": "POINT_IN_TIME_QUOTE",
+      "value_decimal": "0.180000",
+      "unit": "RETURN_DECIMAL",
+      "route_state": "QUOTE_AVAILABLE",
+      "fill_state": "ACTUAL_FILLS_NOT_OBSERVED",
+      "cashflow_state": "CASHFLOW_NOT_OBSERVED",
+      "path_state": "NOT_APPLICABLE",
+      "notional": {
+        "input_amount_atomic": "25000000",
+        "input_mint": "USDC_SYNTHETIC",
+        "input_decimals": 6,
+        "quote_mint": "TOKEN_SYNTHETIC",
+        "quote_decimals": 6,
+        "latency_budget_ms": 1000,
+        "freshness_max_age_ms": 5000,
+        "observed_age_ms": 250
+      },
+      "inventory": {
+        "state": "NOT_APPLICABLE",
+        "remaining_inventory_atomic": "0",
+        "remaining_inventory_mint": null,
+        "remaining_inventory_decimals": null,
+        "recovery_lower_bound_decimal": null,
+        "recovery_upper_bound_decimal": null,
+        "recovery_unit": null,
+        "recovery_currency_or_mint": null,
+        "failed_exit_state": null
+      },
+      "timestamps": {
+        "event_at": "2026-01-01T00:04:00Z",
+        "observed_at": "2026-01-01T00:04:01Z",
+        "first_reliable_available_at": "2026-01-01T00:04:02Z",
+        "available_to_strategy_at": "2026-01-01T00:04:03Z",
+        "ingested_at": "2026-01-01T00:04:04Z",
+        "measured_as_of": "2026-01-01T00:04:00Z"
+      },
+      "lineage": {
+        "source_asset_ids": ["SYNTHETIC-QUOTE-001"],
+        "quote_attempt_ids": ["QUOTE-BUY-SYNTHETIC-001"],
+        "execution_attempt_ids": [],
+        "cashflow_reference_ids": [],
+        "content_sha256": "4444444444444444444444444444444444444444444444444444444444444444"
+      },
+      "quality_flags": ["EXACT_ATOMIC_NOTIONAL", "FRESH_QUOTE"]
+    },
+    {
+      "record_id": "T25-GOLDEN-005",
+      "case_id": "quote_exit_supported_inventory_stays_open",
+      "source_scope": "SYNTHETIC_GOLDEN",
+      "label": "QUOTE_EXIT",
+      "assessment": "SUPPORTED",
+      "evidence_basis": "CONTEMPORANEOUS_QUOTE",
+      "claim_scope": "POINT_IN_TIME_QUOTE",
+      "value_decimal": "0.110000",
+      "unit": "RETURN_DECIMAL",
+      "route_state": "QUOTE_AVAILABLE",
+      "fill_state": "ACTUAL_FILLS_NOT_OBSERVED",
+      "cashflow_state": "CASHFLOW_NOT_OBSERVED",
+      "path_state": "NOT_APPLICABLE",
+      "notional": {
+        "input_amount_atomic": "9000000",
+        "input_mint": "TOKEN_SYNTHETIC",
+        "input_decimals": 6,
+        "quote_mint": "USDC_SYNTHETIC",
+        "quote_decimals": 6,
+        "latency_budget_ms": 1000,
+        "freshness_max_age_ms": 5000,
+        "observed_age_ms": 300
+      },
+      "inventory": {
+        "state": "OPEN",
+        "remaining_inventory_atomic": "9000000",
+        "remaining_inventory_mint": "TOKEN_SYNTHETIC",
+        "remaining_inventory_decimals": 6,
+        "recovery_lower_bound_decimal": null,
+        "recovery_upper_bound_decimal": null,
+        "recovery_unit": null,
+        "recovery_currency_or_mint": null,
+        "failed_exit_state": null
+      },
+      "timestamps": {
+        "event_at": "2026-01-01T00:05:00Z",
+        "observed_at": "2026-01-01T00:05:01Z",
+        "first_reliable_available_at": "2026-01-01T00:05:02Z",
+        "available_to_strategy_at": "2026-01-01T00:05:03Z",
+        "ingested_at": "2026-01-01T00:05:04Z",
+        "measured_as_of": "2026-01-01T00:05:00Z"
+      },
+      "lineage": {
+        "source_asset_ids": ["SYNTHETIC-QUOTE-002"],
+        "quote_attempt_ids": ["QUOTE-SELL-SYNTHETIC-001"],
+        "execution_attempt_ids": [],
+        "cashflow_reference_ids": [],
+        "content_sha256": "5555555555555555555555555555555555555555555555555555555555555555"
+      },
+      "quality_flags": ["EXACT_ATOMIC_NOTIONAL", "FRESH_QUOTE", "QUOTE_IS_NOT_FILL"]
+    },
+    {
+      "record_id": "T25-GOLDEN-006",
+      "case_id": "quote_exit_explicit_no_route_refuted",
+      "source_scope": "SYNTHETIC_GOLDEN",
+      "label": "QUOTE_EXIT",
+      "assessment": "REFUTED",
+      "evidence_basis": "CONTEMPORANEOUS_QUOTE",
+      "claim_scope": "POINT_IN_TIME_QUOTE",
+      "value_decimal": null,
+      "unit": null,
+      "route_state": "NO_ROUTE",
+      "fill_state": "ACTUAL_FILLS_NOT_OBSERVED",
+      "cashflow_state": "CASHFLOW_NOT_OBSERVED",
+      "path_state": "MISSING_EXIT",
+      "notional": {
+        "input_amount_atomic": "9000000",
+        "input_mint": "TOKEN_SYNTHETIC",
+        "input_decimals": 6,
+        "quote_mint": "USDC_SYNTHETIC",
+        "quote_decimals": 6,
+        "latency_budget_ms": 1000,
+        "freshness_max_age_ms": 5000,
+        "observed_age_ms": 350
+      },
+      "inventory": {
+        "state": "UNRESOLVED_REQUIRES_RECOVERY",
+        "remaining_inventory_atomic": "9000000",
+        "remaining_inventory_mint": "TOKEN_SYNTHETIC",
+        "remaining_inventory_decimals": 6,
+        "recovery_lower_bound_decimal": "-1.000000",
+        "recovery_upper_bound_decimal": "0.110000",
+        "recovery_unit": "RETURN_DECIMAL",
+        "recovery_currency_or_mint": "USDC_SYNTHETIC",
+        "failed_exit_state": "NO_ROUTE"
+      },
+      "timestamps": {
+        "event_at": "2026-01-01T00:06:00Z",
+        "observed_at": "2026-01-01T00:06:01Z",
+        "first_reliable_available_at": "2026-01-01T00:06:02Z",
+        "available_to_strategy_at": "2026-01-01T00:06:03Z",
+        "ingested_at": "2026-01-01T00:06:04Z",
+        "measured_as_of": "2026-01-01T00:06:00Z"
+      },
+      "lineage": {
+        "source_asset_ids": ["SYNTHETIC-QUOTE-003"],
+        "quote_attempt_ids": ["QUOTE-SELL-SYNTHETIC-002"],
+        "execution_attempt_ids": [],
+        "cashflow_reference_ids": [],
+        "content_sha256": "6666666666666666666666666666666666666666666666666666666666666666"
+      },
+      "quality_flags": ["EXACT_NO_ROUTE_RESPONSE", "MISSING_EXIT_RETAINED"]
+    },
+    {
+      "record_id": "T25-GOLDEN-007",
+      "case_id": "quote_exit_provider_error_unknown",
+      "source_scope": "SYNTHETIC_GOLDEN",
+      "label": "QUOTE_EXIT",
+      "assessment": "UNKNOWN",
+      "evidence_basis": "CONTEMPORANEOUS_QUOTE",
+      "claim_scope": "POINT_IN_TIME_QUOTE",
+      "value_decimal": null,
+      "unit": null,
+      "route_state": "PROVIDER_ERROR",
+      "fill_state": "ACTUAL_FILLS_NOT_OBSERVED",
+      "cashflow_state": "CASHFLOW_NOT_OBSERVED",
+      "path_state": "UNOBSERVED",
+      "notional": {
+        "input_amount_atomic": "9000000",
+        "input_mint": "TOKEN_SYNTHETIC",
+        "input_decimals": 6,
+        "quote_mint": "USDC_SYNTHETIC",
+        "quote_decimals": 6,
+        "latency_budget_ms": 1000,
+        "freshness_max_age_ms": 5000,
+        "observed_age_ms": 400
+      },
+      "inventory": {
+        "state": "OPEN",
+        "remaining_inventory_atomic": "9000000",
+        "remaining_inventory_mint": "TOKEN_SYNTHETIC",
+        "remaining_inventory_decimals": 6,
+        "recovery_lower_bound_decimal": null,
+        "recovery_upper_bound_decimal": null,
+        "recovery_unit": null,
+        "recovery_currency_or_mint": null,
+        "failed_exit_state": null
+      },
+      "timestamps": {
+        "event_at": "2026-01-01T00:07:00Z",
+        "observed_at": "2026-01-01T00:07:01Z",
+        "first_reliable_available_at": "2026-01-01T00:07:02Z",
+        "available_to_strategy_at": "2026-01-01T00:07:03Z",
+        "ingested_at": "2026-01-01T00:07:04Z",
+        "measured_as_of": "2026-01-01T00:07:00Z"
+      },
+      "lineage": {
+        "source_asset_ids": ["SYNTHETIC-QUOTE-004"],
+        "quote_attempt_ids": ["QUOTE-SELL-SYNTHETIC-003"],
+        "execution_attempt_ids": [],
+        "cashflow_reference_ids": [],
+        "content_sha256": "7777777777777777777777777777777777777777777777777777777777777777"
+      },
+      "quality_flags": ["PROVIDER_ERROR_OBSERVED", "NO_ROUTE_NOT_ESTABLISHED"]
+    },
+    {
+      "record_id": "T25-GOLDEN-008",
+      "case_id": "fillable_stale_quote_unknown",
+      "source_scope": "SYNTHETIC_GOLDEN",
+      "label": "FILLABLE",
+      "assessment": "UNKNOWN",
+      "evidence_basis": "CONTEMPORANEOUS_QUOTE",
+      "claim_scope": "POINT_IN_TIME_QUOTE",
+      "value_decimal": null,
+      "unit": null,
+      "route_state": "STALE_QUOTE",
+      "fill_state": "ACTUAL_FILLS_NOT_OBSERVED",
+      "cashflow_state": "CASHFLOW_NOT_OBSERVED",
+      "path_state": "NOT_APPLICABLE",
+      "notional": {
+        "input_amount_atomic": "25000000",
+        "input_mint": "USDC_SYNTHETIC",
+        "input_decimals": 6,
+        "quote_mint": "TOKEN_SYNTHETIC",
+        "quote_decimals": 6,
+        "latency_budget_ms": 1000,
+        "freshness_max_age_ms": 5000,
+        "observed_age_ms": 8000
+      },
+      "inventory": {
+        "state": "NOT_APPLICABLE",
+        "remaining_inventory_atomic": "0",
+        "remaining_inventory_mint": null,
+        "remaining_inventory_decimals": null,
+        "recovery_lower_bound_decimal": null,
+        "recovery_upper_bound_decimal": null,
+        "recovery_unit": null,
+        "recovery_currency_or_mint": null,
+        "failed_exit_state": null
+      },
+      "timestamps": {
+        "event_at": "2026-01-01T00:08:00Z",
+        "observed_at": "2026-01-01T00:08:01Z",
+        "first_reliable_available_at": "2026-01-01T00:08:02Z",
+        "available_to_strategy_at": "2026-01-01T00:08:03Z",
+        "ingested_at": "2026-01-01T00:08:04Z",
+        "measured_as_of": "2026-01-01T00:08:00Z"
+      },
+      "lineage": {
+        "source_asset_ids": ["SYNTHETIC-QUOTE-005"],
+        "quote_attempt_ids": ["QUOTE-BUY-SYNTHETIC-002"],
+        "execution_attempt_ids": [],
+        "cashflow_reference_ids": [],
+        "content_sha256": "8888888888888888888888888888888888888888888888888888888888888888"
+      },
+      "quality_flags": ["STALE_QUOTE", "NO_FILLABILITY_CLAIM"]
+    },
+    {
+      "record_id": "T25-GOLDEN-009",
+      "case_id": "realized_vwap_unknown_without_fills",
+      "source_scope": "SYNTHETIC_GOLDEN",
+      "label": "REALIZED_VWAP",
+      "assessment": "UNKNOWN",
+      "evidence_basis": "NONE",
+      "claim_scope": "ACTUAL_FILL_SERIES",
+      "value_decimal": null,
+      "unit": null,
+      "route_state": "NOT_APPLICABLE",
+      "fill_state": "ACTUAL_FILLS_NOT_OBSERVED",
+      "cashflow_state": "CASHFLOW_NOT_OBSERVED",
+      "path_state": "NOT_APPLICABLE",
+      "notional": null,
+      "inventory": {
+        "state": "NOT_APPLICABLE",
+        "remaining_inventory_atomic": "0",
+        "remaining_inventory_mint": null,
+        "remaining_inventory_decimals": null,
+        "recovery_lower_bound_decimal": null,
+        "recovery_upper_bound_decimal": null,
+        "recovery_unit": null,
+        "recovery_currency_or_mint": null,
+        "failed_exit_state": null
+      },
+      "timestamps": {
+        "event_at": null,
+        "observed_at": "2026-01-01T00:09:01Z",
+        "first_reliable_available_at": "2026-01-01T00:09:02Z",
+        "available_to_strategy_at": "2026-01-01T00:09:03Z",
+        "ingested_at": "2026-01-01T00:09:04Z",
+        "measured_as_of": "2026-01-01T00:09:00Z"
+      },
+      "lineage": {
+        "source_asset_ids": ["SYNTHETIC-NO-FILL-001"],
+        "quote_attempt_ids": ["QUOTE-BUY-SYNTHETIC-001"],
+        "execution_attempt_ids": [],
+        "cashflow_reference_ids": [],
+        "content_sha256": "9999999999999999999999999999999999999999999999999999999999999999"
+      },
+      "quality_flags": ["QUOTE_ONLY", "ACTUAL_FILLS_ABSENT"]
+    },
+    {
+      "record_id": "T25-GOLDEN-010",
+      "case_id": "realized_vwap_supported_reconciled_fills",
+      "source_scope": "SYNTHETIC_GOLDEN",
+      "label": "REALIZED_VWAP",
+      "assessment": "SUPPORTED",
+      "evidence_basis": "ACTUAL_RECONCILED_FILLS",
+      "claim_scope": "ACTUAL_FILL_SERIES",
+      "value_decimal": "0.120000",
+      "unit": "RETURN_DECIMAL",
+      "route_state": "NOT_APPLICABLE",
+      "fill_state": "ACTUAL_FILLS_RECONCILED",
+      "cashflow_state": "CASHFLOW_NOT_OBSERVED",
+      "path_state": "NOT_APPLICABLE",
+      "notional": null,
+      "inventory": {
+        "state": "RECOVERED",
+        "remaining_inventory_atomic": "0",
+        "remaining_inventory_mint": null,
+        "remaining_inventory_decimals": null,
+        "recovery_lower_bound_decimal": null,
+        "recovery_upper_bound_decimal": null,
+        "recovery_unit": null,
+        "recovery_currency_or_mint": null,
+        "failed_exit_state": null
+      },
+      "timestamps": {
+        "event_at": "2026-01-01T00:10:00Z",
+        "observed_at": "2026-01-01T00:10:01Z",
+        "first_reliable_available_at": "2026-01-01T00:10:02Z",
+        "available_to_strategy_at": "2026-01-01T00:10:03Z",
+        "ingested_at": "2026-01-01T00:10:04Z",
+        "measured_as_of": "2026-01-01T00:10:00Z"
+      },
+      "lineage": {
+        "source_asset_ids": ["SYNTHETIC-FILL-SERIES-001"],
+        "quote_attempt_ids": ["QUOTE-BUY-SYNTHETIC-010", "QUOTE-SELL-SYNTHETIC-010"],
+        "execution_attempt_ids": ["EXECUTION-SYNTHETIC-010-BUY", "EXECUTION-SYNTHETIC-010-SELL"],
+        "cashflow_reference_ids": [],
+        "content_sha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+      },
+      "quality_flags": ["ACTUAL_FILLS_RECONCILED", "SYNTHETIC_ONLY"]
+    },
+    {
+      "record_id": "T25-GOLDEN-011",
+      "case_id": "net_unknown_fee_model_unavailable",
+      "source_scope": "SYNTHETIC_GOLDEN",
+      "label": "NET",
+      "assessment": "UNKNOWN",
+      "evidence_basis": "NONE",
+      "claim_scope": "SETTLED_CASHFLOW",
+      "value_decimal": null,
+      "unit": null,
+      "route_state": "NOT_APPLICABLE",
+      "fill_state": "ACTUAL_FILLS_RECONCILED",
+      "cashflow_state": "FEE_MODEL_UNAVAILABLE",
+      "path_state": "NOT_APPLICABLE",
+      "notional": null,
+      "inventory": {
+        "state": "FLAT",
+        "remaining_inventory_atomic": "0",
+        "remaining_inventory_mint": null,
+        "remaining_inventory_decimals": null,
+        "recovery_lower_bound_decimal": null,
+        "recovery_upper_bound_decimal": null,
+        "recovery_unit": null,
+        "recovery_currency_or_mint": null,
+        "failed_exit_state": null
+      },
+      "timestamps": {
+        "event_at": null,
+        "observed_at": "2026-01-01T00:11:01Z",
+        "first_reliable_available_at": "2026-01-01T00:11:02Z",
+        "available_to_strategy_at": "2026-01-01T00:11:03Z",
+        "ingested_at": "2026-01-01T00:11:04Z",
+        "measured_as_of": "2026-01-01T00:11:00Z"
+      },
+      "lineage": {
+        "source_asset_ids": ["SYNTHETIC-UNSETTLED-CASHFLOW-001"],
+        "quote_attempt_ids": [],
+        "execution_attempt_ids": ["EXECUTION-SYNTHETIC-011"],
+        "cashflow_reference_ids": [],
+        "content_sha256": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"
+      },
+      "quality_flags": ["FEE_MODEL_UNAVAILABLE", "NET_UNKNOWN"]
+    },
+    {
+      "record_id": "T25-GOLDEN-012",
+      "case_id": "net_supported_settled_cashflow",
+      "source_scope": "SYNTHETIC_GOLDEN",
+      "label": "NET",
+      "assessment": "SUPPORTED",
+      "evidence_basis": "SETTLED_CASHFLOW",
+      "claim_scope": "SETTLED_CASHFLOW",
+      "value_decimal": "0.070000",
+      "unit": "RETURN_DECIMAL",
+      "route_state": "NOT_APPLICABLE",
+      "fill_state": "ACTUAL_FILLS_RECONCILED",
+      "cashflow_state": "SETTLED_COMPLETE",
+      "path_state": "NOT_APPLICABLE",
+      "notional": null,
+      "inventory": {
+        "state": "FLAT",
+        "remaining_inventory_atomic": "0",
+        "remaining_inventory_mint": null,
+        "remaining_inventory_decimals": null,
+        "recovery_lower_bound_decimal": null,
+        "recovery_upper_bound_decimal": null,
+        "recovery_unit": null,
+        "recovery_currency_or_mint": null,
+        "failed_exit_state": null
+      },
+      "timestamps": {
+        "event_at": "2026-01-01T00:12:00Z",
+        "observed_at": "2026-01-01T00:12:01Z",
+        "first_reliable_available_at": "2026-01-01T00:12:02Z",
+        "available_to_strategy_at": "2026-01-01T00:12:03Z",
+        "ingested_at": "2026-01-01T00:12:04Z",
+        "measured_as_of": "2026-01-01T00:12:00Z"
+      },
+      "lineage": {
+        "source_asset_ids": ["SYNTHETIC-SETTLED-CASHFLOW-001"],
+        "quote_attempt_ids": [],
+        "execution_attempt_ids": ["EXECUTION-SYNTHETIC-012"],
+        "cashflow_reference_ids": ["CASHFLOW-SYNTHETIC-012"],
+        "content_sha256": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc"
+      },
+      "quality_flags": ["SETTLED_COMPLETE", "ALL_DECLARED_COSTS_ATTRIBUTED"]
+    },
+    {
+      "record_id": "T25-GOLDEN-013",
+      "case_id": "path_risk_sparse_grid_partial",
+      "source_scope": "SYNTHETIC_GOLDEN",
+      "label": "PATH_RISK",
+      "assessment": "SUPPORTED",
+      "evidence_basis": "DISCRETE_PANEL_GRID",
+      "claim_scope": "DISCRETE_PATH_GRID",
+      "value_decimal": "0.300000",
+      "unit": "PATH_RISK_SCORE",
+      "route_state": "NOT_APPLICABLE",
+      "fill_state": "NOT_APPLICABLE",
+      "cashflow_state": "NOT_APPLICABLE",
+      "path_state": "SPARSE_DISCRETE",
+      "notional": null,
+      "inventory": {
+        "state": "NOT_APPLICABLE",
+        "remaining_inventory_atomic": "0",
+        "remaining_inventory_mint": null,
+        "remaining_inventory_decimals": null,
+        "recovery_lower_bound_decimal": null,
+        "recovery_upper_bound_decimal": null,
+        "recovery_unit": null,
+        "recovery_currency_or_mint": null,
+        "failed_exit_state": null
+      },
+      "timestamps": {
+        "event_at": null,
+        "observed_at": "2026-01-01T00:13:01Z",
+        "first_reliable_available_at": "2026-01-01T00:13:02Z",
+        "available_to_strategy_at": "2026-01-01T00:13:03Z",
+        "ingested_at": "2026-01-01T00:13:04Z",
+        "measured_as_of": "2026-01-01T00:13:00Z"
+      },
+      "lineage": {
+        "source_asset_ids": ["SYNTHETIC-SPARSE-PANEL-003"],
+        "quote_attempt_ids": [],
+        "execution_attempt_ids": [],
+        "cashflow_reference_ids": [],
+        "content_sha256": "dddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd"
+      },
+      "quality_flags": ["DISCRETE_GRID_ONLY", "CONTINUOUS_MAE_MFE_FORBIDDEN"]
+    },
+    {
+      "record_id": "T25-GOLDEN-014",
+      "case_id": "path_risk_pool_dead_inventory_unresolved",
+      "source_scope": "SYNTHETIC_GOLDEN",
+      "label": "PATH_RISK",
+      "assessment": "SUPPORTED",
+      "evidence_basis": "PATH_STATE_EVIDENCE",
+      "claim_scope": "TERMINAL_PATH_STATE",
+      "value_decimal": "1.000000",
+      "unit": "PATH_RISK_SCORE",
+      "route_state": "NO_ROUTE",
+      "fill_state": "ACTUAL_FILLS_NOT_OBSERVED",
+      "cashflow_state": "CASHFLOW_NOT_OBSERVED",
+      "path_state": "POOL_DEAD",
+      "notional": null,
+      "inventory": {
+        "state": "UNRESOLVED_REQUIRES_RECOVERY",
+        "remaining_inventory_atomic": "7000000",
+        "remaining_inventory_mint": "TOKEN_SYNTHETIC",
+        "remaining_inventory_decimals": 6,
+        "recovery_lower_bound_decimal": "-1.000000",
+        "recovery_upper_bound_decimal": "0.000000",
+        "recovery_unit": "RETURN_DECIMAL",
+        "recovery_currency_or_mint": "USDC_SYNTHETIC",
+        "failed_exit_state": "POOL_DEAD"
+      },
+      "timestamps": {
+        "event_at": "2026-01-01T00:14:00Z",
+        "observed_at": "2026-01-01T00:14:01Z",
+        "first_reliable_available_at": "2026-01-01T00:14:02Z",
+        "available_to_strategy_at": "2026-01-01T00:14:03Z",
+        "ingested_at": "2026-01-01T00:14:04Z",
+        "measured_as_of": "2026-01-01T00:14:00Z"
+      },
+      "lineage": {
+        "source_asset_ids": ["SYNTHETIC-PATH-STATE-001"],
+        "quote_attempt_ids": ["QUOTE-SELL-SYNTHETIC-014"],
+        "execution_attempt_ids": [],
+        "cashflow_reference_ids": [],
+        "content_sha256": "eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee"
+      },
+      "quality_flags": ["POOL_DEAD_OBSERVED", "MISSING_EXIT_RETAINED", "RECOVERY_REQUIRED"]
+    }
+  ],
+  "adversarial_mutations": [
+    {
+      "mutation_id": "ADV-01-TOUCH_TO_FILLABLE",
+      "base_record_id": "T25-GOLDEN-001",
+      "json_pointer": "/label",
+      "replacement": "FILLABLE",
+      "expected_error": "TOUCH_DOES_NOT_IMPLY_FILLABLE"
+    },
+    {
+      "mutation_id": "ADV-02-QUOTE_TO_REALIZED",
+      "base_record_id": "T25-GOLDEN-005",
+      "json_pointer": "/label",
+      "replacement": "REALIZED_VWAP",
+      "expected_error": "QUOTE_DOES_NOT_IMPLY_SETTLEMENT"
+    },
+    {
+      "mutation_id": "ADV-03-MISSING_TO_ZERO",
+      "base_record_id": "T25-GOLDEN-011",
+      "json_pointer": "/value_decimal",
+      "replacement": "0",
+      "expected_error": "MISSING_IS_NOT_ZERO"
+    },
+    {
+      "mutation_id": "ADV-04-SPARSE_ABSENCE_REFUTED",
+      "base_record_id": "T25-GOLDEN-003",
+      "json_pointer": "/assessment",
+      "replacement": "REFUTED",
+      "expected_error": "SPARSE_ABSENCE_CANNOT_REFUTE_CONTINUOUS_TOUCH"
+    },
+    {
+      "mutation_id": "ADV-05-SPARSE_TO_CONTINUOUS_PATH",
+      "base_record_id": "T25-GOLDEN-013",
+      "json_pointer": "/claim_scope",
+      "replacement": "CONTINUOUS_PATH_METRICS",
+      "expected_error": "SPARSE_PANEL_CANNOT_CLAIM_CONTINUOUS_PATH"
+    },
+    {
+      "mutation_id": "ADV-06-PROVIDER_ERROR_TO_NO_ROUTE",
+      "base_record_id": "T25-GOLDEN-007",
+      "json_pointer": "/route_state",
+      "replacement": "NO_ROUTE",
+      "expected_error": "PROVIDER_FAILURE_IS_NOT_NO_ROUTE"
+    },
+    {
+      "mutation_id": "ADV-07-PIT_FUTURE_AVAILABILITY",
+      "base_record_id": "T25-GOLDEN-001",
+      "json_pointer": "/timestamps/available_to_strategy_at",
+      "replacement": "2026-01-01T00:01:01Z",
+      "expected_error": "PIT_ORDER_INVALID"
+    },
+    {
+      "mutation_id": "ADV-08-EXACT_NOTIONAL_REMOVED",
+      "base_record_id": "T25-GOLDEN-004",
+      "json_pointer": "/notional",
+      "replacement": null,
+      "expected_error": "EXACT_NOTIONAL_REQUIRED"
+    },
+    {
+      "mutation_id": "ADV-09-STALE_QUOTE_SUPPORTED",
+      "base_record_id": "T25-GOLDEN-008",
+      "json_pointer": "/assessment",
+      "replacement": "SUPPORTED",
+      "expected_error": "STALE_QUOTE_CANNOT_SUPPORT_FILLABLE"
+    },
+    {
+      "mutation_id": "ADV-10-REALIZED_WITHOUT_EXECUTION_REFS",
+      "base_record_id": "T25-GOLDEN-010",
+      "json_pointer": "/lineage/execution_attempt_ids",
+      "replacement": [],
+      "expected_error": "ACTUAL_EXECUTION_REFERENCES_REQUIRED"
+    },
+    {
+      "mutation_id": "ADV-11-NET_WITHOUT_SETTLEMENT",
+      "base_record_id": "T25-GOLDEN-012",
+      "json_pointer": "/cashflow_state",
+      "replacement": "FEE_MODEL_UNAVAILABLE",
+      "expected_error": "SETTLED_CASHFLOW_REQUIRED"
+    },
+    {
+      "mutation_id": "ADV-12-UNRESOLVED_INVENTORY_ZERO",
+      "base_record_id": "T25-GOLDEN-014",
+      "json_pointer": "/inventory/remaining_inventory_atomic",
+      "replacement": "0",
+      "expected_error": "UNRESOLVED_INVENTORY_MUST_BE_POSITIVE"
+    }
+  ]
+}

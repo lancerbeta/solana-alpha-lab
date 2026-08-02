@@ -1,0 +1,181 @@
+{
+  "schema": "smial.task25.r2-outcome-pre-read-manifest",
+  "schema_version": "1.0",
+  "task_id": "TASK-25",
+  "atom_id": "T25-A4_BOUNDED_R2_OUTCOME_PROJECTION_AND_READ_RECEIPT_V1",
+  "status": "SEALED_BEFORE_R2_DERIVED_VALUE_READ",
+  "sealed_at": "2026-08-02T14:01:14.5230948Z",
+  "actor": "LOCAL_WORK_PRIMARY",
+  "route": "LOCAL_WORK_CODEX",
+  "authority": {
+    "user_authorized_atom": "T25-A4_BOUNDED_R2_OUTCOME_PROJECTION_AND_READ_RECEIPT_V1",
+    "access_surface": "TRACKED_CONTENT_ADDRESSED_TASK23_R2_PROJECTION_ONLY",
+    "r2_derived_value_files_max": 3,
+    "raw_r2_value_files_reopened_max": 0,
+    "r3_path_discovery": false,
+    "r3_value_read": false,
+    "provider_calls": 0,
+    "network_calls": 0,
+    "dependencies_added": 0,
+    "sources_changed": 0,
+    "entity_graph_values_read": 0,
+    "catalog_mutation": false
+  },
+  "prerequisite_bindings": [
+    {
+      "role": "A2_ACCEPTANCE",
+      "path": "docs/evidence/task25/a2_outcome_label_and_pit_contract_acceptance_v1.json",
+      "sha256": "3be9a63724ecca4d8730e56db1ee077211361cd93f739a13ae28b392f8c72736"
+    },
+    {
+      "role": "A3_ACCEPTANCE",
+      "path": "docs/evidence/task25/a3_deterministic_outcome_engine_and_golden_acceptance_v1.json",
+      "sha256": "ef33b842418b016dd8e3c6d8c9131a9f41b44134e0029fea27fe54bf84ecc83d"
+    },
+    {
+      "role": "TASK23_R2_PROJECTION_MANIFEST",
+      "path": "docs/evidence/task23/a3_projection_v1_attempt_02/projection_manifest_v1.json",
+      "sha256": "06702bba94e9a895d340598f2fa722eeed6dd5ce9cd324d699918ac6a8a95ff9"
+    },
+    {
+      "role": "FROZEN_SPLIT_MANIFEST",
+      "path": "docs/evidence/task22/dataset_split_manifest_v2.json",
+      "sha256": "973a9ff6dd2a376e62dee9289a57cbb62f06c8efb5a619fa6b7b2a7914dd0683"
+    },
+    {
+      "role": "HOLDOUT_ACCESS_LEDGER",
+      "path": "docs/evidence/task22/holdout_access_ledger_v2.json",
+      "sha256": "2282e5d1eac09a0ce940a5700f04b03ff4d75fc9cd4d65e08e5fe7deda88ca51"
+    }
+  ],
+  "dataset_identity": {
+    "split_id": "T22-SPLIT-T21-FROZEN-002",
+    "split_content_sha256": "63b6d63895bdd6d25b68501619bca21e10f476a95ad8d27611f356a26cccee2d",
+    "dataset_inventory_sha256": "aaa605eabdb62c38d218b40e768669db460c6fa419c4086d5412547b7f2fffae",
+    "role": "R2_PRIMARY_DEVELOPMENT",
+    "members": [
+      "T21-WATCH-29e2b75994975253bd74",
+      "T21-WATCH-61ce24fc3fa04e3eaba7",
+      "T21-WATCH-6f21dec76d05f5831216"
+    ],
+    "panel_ids": [
+      "P0",
+      "P1",
+      "P2"
+    ],
+    "panel_semantics": "ACTUAL_SPARSE_OBSERVATION_TIMES_NOT_EXACT_NOMINAL_HORIZONS"
+  },
+  "permitted_value_inputs": [
+    {
+      "path": "docs/evidence/task23/a3_projection_v1_attempt_02/panel_inventory_v1.csv",
+      "sha256": "a623b70543a74c63df41bb45c83074541fa98ac105fdeb611b7e02723014b4ec",
+      "bytes": 3638,
+      "data_rows": 9,
+      "permitted_columns": [
+        "member_id",
+        "panel_id",
+        "window_id",
+        "panel_state",
+        "raw_path",
+        "raw_sha256",
+        "observed_attempts",
+        "observed_buy_legs",
+        "observed_sell_legs",
+        "quote_available",
+        "no_route",
+        "provider_error",
+        "invalid_response",
+        "timeout",
+        "first_reliable_available_at",
+        "last_reliable_available_at",
+        "actual_elapsed_from_member_p0_seconds",
+        "stop_reasons"
+      ]
+    },
+    {
+      "path": "docs/evidence/task23/a3_projection_v1_attempt_02/quote_pair_availability_v1.csv",
+      "sha256": "5b525a9602f32b6c654a9bf87c0a783212046cee8f292d13838e160ec9788273",
+      "bytes": 9657,
+      "data_rows": 36,
+      "permitted_columns": [
+        "member_id",
+        "panel_id",
+        "window_id",
+        "tested_notional_usd",
+        "buy_input_atomic",
+        "buy_status",
+        "sell_eligible",
+        "sell_status",
+        "buy_route_count",
+        "sell_route_count",
+        "buy_price_impact_pct",
+        "sell_price_impact_pct",
+        "roundtrip_quote_retention_bps",
+        "buy_first_reliable_available_at",
+        "sell_first_reliable_available_at",
+        "actual_elapsed_from_member_p0_seconds",
+        "buy_error_class",
+        "sell_error_class"
+      ]
+    },
+    {
+      "path": "docs/evidence/task23/a3_projection_v1_attempt_02/panel_diagnostics_v1.csv",
+      "sha256": "20cefa9332f2074042f9168ef2c1448bcbe8db281f49a55123f84d8389994c4d",
+      "bytes": 1657,
+      "data_rows": 9,
+      "permitted_columns": [
+        "member_id",
+        "panel_id",
+        "panel_state",
+        "planned_buy_legs",
+        "observed_buy_legs",
+        "available_buy_routes",
+        "buy_route_availability_rate_observed",
+        "eligible_dependent_sell_legs",
+        "observed_dependent_sell_legs",
+        "available_dependent_sell_routes",
+        "sell_route_availability_rate_eligible",
+        "quote_notional_capacity_proxy_usd",
+        "missing_buy_legs",
+        "missing_eligible_sell_legs",
+        "actual_elapsed_from_member_p0_seconds",
+        "cluster_id",
+        "inference_mode"
+      ]
+    }
+  ],
+  "permitted_projection": {
+    "unit_of_analysis": "MEMBER_PANEL_LABEL_OR_MEMBER_PANEL_NOTIONAL_LABEL",
+    "labels": [
+      "TOUCH",
+      "FILLABLE",
+      "QUOTE_EXIT",
+      "REALIZED_VWAP",
+      "NET",
+      "PATH_RISK"
+    ],
+    "fillable_and_quote_exit_truth_basis": "CONTEMPORANEOUS_QUOTE_ONLY",
+    "continuous_touch_claim": false,
+    "realized_vwap_claim": false,
+    "net_return_claim": false,
+    "continuous_path_metrics_claim": false,
+    "missing_coerced_to_zero": false,
+    "nominal_horizon_claim": false
+  },
+  "managed_write_set": [
+    "docs/evidence/task25/a4_r2_outcome_pre_read_manifest_v1.json",
+    "src/solana_alpha_lab/task25_r2_outcome_projection.py",
+    "tests/test_task25_r2_outcome_projection.py",
+    "docs/evidence/task25/a4_r2_outcome_projection_v1.json",
+    "docs/evidence/task25/a4_bounded_r2_outcome_projection_and_read_receipt_v1.json"
+  ],
+  "seal_assertions": {
+    "receipt_written_before_value_open": true,
+    "permitted_input_hashes_verified_before_value_open": true,
+    "r2_derived_value_files_opened_before_seal": 0,
+    "raw_r2_value_files_opened_before_seal": 0,
+    "r3_paths_or_values_opened_before_seal": 0,
+    "holdout_ledger_records_before_read": 0,
+    "holdout_state_before_read": "UNTOUCHED"
+  }
+}

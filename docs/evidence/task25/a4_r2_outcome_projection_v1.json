@@ -1,0 +1,3419 @@
+{
+  "atom_id": "T25-A4_BOUNDED_R2_OUTCOME_PROJECTION_AND_READ_RECEIPT_V1",
+  "claims": [
+    "R2_TRACKED_PROJECTION_READ_IS_CONTENT_ADDRESSED_AND_PIT_BOUNDED",
+    "DISCRETE_QUOTE_IMPLIED_PATH_RISK_AVAILABLE_FOR_NINE_MEMBER_PANELS",
+    "OBSERVED_QUOTE_AVAILABLE_STATE_RETAINED_WITHOUT_FILLABILITY_UPGRADE"
+  ],
+  "dataset_identity": {
+    "dataset_inventory_sha256": "aaa605eabdb62c38d218b40e768669db460c6fa419c4086d5412547b7f2fffae",
+    "members": [
+      "T21-WATCH-29e2b75994975253bd74",
+      "T21-WATCH-61ce24fc3fa04e3eaba7",
+      "T21-WATCH-6f21dec76d05f5831216"
+    ],
+    "panel_ids": [
+      "P0",
+      "P1",
+      "P2"
+    ],
+    "panel_semantics": "ACTUAL_SPARSE_OBSERVATION_TIMES_NOT_EXACT_NOMINAL_HORIZONS",
+    "role": "R2_PRIMARY_DEVELOPMENT",
+    "split_content_sha256": "63b6d63895bdd6d25b68501619bca21e10f476a95ad8d27611f356a26cccee2d",
+    "split_id": "T22-SPLIT-T21-FROZEN-002"
+  },
+  "engine_version": "task25-r2-outcome-projection-v1",
+  "evaluation_cutoff_at": "2026-08-01T13:11:54.057142Z",
+  "input_bindings": {
+    "pre_read_manifest": {
+      "path": "docs/evidence/task25/a4_r2_outcome_pre_read_manifest_v1.json",
+      "sha256": "647d2c769762a6f08fd767436799604a8fdc53e70f181d895e1c82ecb6bae565"
+    },
+    "r2_derived_value_inputs": [
+      {
+        "bytes": 3638,
+        "data_rows": 9,
+        "path": "docs/evidence/task23/a3_projection_v1_attempt_02/panel_inventory_v1.csv",
+        "sha256": "a623b70543a74c63df41bb45c83074541fa98ac105fdeb611b7e02723014b4ec"
+      },
+      {
+        "bytes": 9657,
+        "data_rows": 36,
+        "path": "docs/evidence/task23/a3_projection_v1_attempt_02/quote_pair_availability_v1.csv",
+        "sha256": "5b525a9602f32b6c654a9bf87c0a783212046cee8f292d13838e160ec9788273"
+      },
+      {
+        "bytes": 1657,
+        "data_rows": 9,
+        "path": "docs/evidence/task23/a3_projection_v1_attempt_02/panel_diagnostics_v1.csv",
+        "sha256": "20cefa9332f2074042f9168ef2c1448bcbe8db281f49a55123f84d8389994c4d"
+      }
+    ]
+  },
+  "limitations": [
+    "TRACKED_TASK23_PROJECTION_OMITS_EXACT_OUTPUT_MINT_AND_SELL_INVENTORY_ATOMIC_IDENTITY",
+    "TRACKED_TASK23_PROJECTION_OMITS_FULL_FRESHNESS_LATENCY_AND_PIT_TIMESTAMP_BLOCK",
+    "FILLABLE_AND_QUOTE_EXIT_REMAIN_UNKNOWN_DESPITE_OBSERVED_QUOTE_AVAILABLE_STATES",
+    "TOUCH_REMAINS_UNKNOWN_WITHOUT_FROZEN_REFERENCE_THRESHOLD_OR_CROSS_FIELD",
+    "REALIZED_VWAP_REQUIRES_ACTUAL_RECONCILED_FILLS",
+    "NET_REQUIRES_TASK26_SETTLED_CASHFLOW_AND_COST_MODEL",
+    "ONE_CAPTURE_CLUSTER_DESCRIPTIVE_ONLY"
+  ],
+  "next_boundary": {
+    "atom": "T25-A5_ADVERSARIAL_ACCEPTANCE_AND_OWNER_DECISION_V1",
+    "authorized_by_a4": false,
+    "r3_access": "DENY"
+  },
+  "outcomes": [
+    {
+      "assessment": "UNKNOWN",
+      "cashflow_state": "NOT_APPLICABLE",
+      "claim_scope": "TOUCH_WITHIN_HORIZON",
+      "evidence_basis": "DISCRETE_PANEL_GRID",
+      "fill_state": "NOT_APPLICABLE",
+      "first_reliable_available_at": "2026-08-01T11:47:14.333631Z",
+      "label": "TOUCH",
+      "member_id": "T21-WATCH-29e2b75994975253bd74",
+      "observed_measures": {
+        "actual_elapsed_from_member_p0_seconds": "0.0",
+        "panel_state": "OBSERVED"
+      },
+      "panel_id": "P0",
+      "path_state": "SPARSE_DISCRETE",
+      "quality_flags": [
+        "NO_FROZEN_REFERENCE_THRESHOLD_IN_TRACKED_PROJECTION",
+        "NO_OBSERVED_THRESHOLD_CROSS_FIELD",
+        "SPARSE_PANEL"
+      ],
+      "record_id": "T25-R2-0001",
+      "route_state_observed": "NOT_APPLICABLE",
+      "source_content_sha256": "9a880c74657ac25693d4804411da385e247aa637e511a91c2ff320d256ac5278",
+      "source_scope": "T21_R2_DEVELOPMENT",
+      "tested_notional_usd": null,
+      "unit": null,
+      "value_decimal": null
+    },
+    {
+      "assessment": "UNKNOWN",
+      "cashflow_state": "NOT_APPLICABLE",
+      "claim_scope": "POINT_IN_TIME_QUOTE",
+      "evidence_basis": "CONTEMPORANEOUS_QUOTE",
+      "fill_state": "ACTUAL_FILLS_NOT_OBSERVED",
+      "first_reliable_available_at": "2026-08-01T11:46:59.010691Z",
+      "label": "FILLABLE",
+      "member_id": "T21-WATCH-29e2b75994975253bd74",
+      "observed_measures": {
+        "actual_elapsed_from_member_p0_seconds": "0.0",
+        "buy_input_atomic": "10000000",
+        "buy_price_impact_pct": "0.0158774578305509523377785855",
+        "buy_route_count": "3",
+        "panel_state": "OBSERVED"
+      },
+      "panel_id": "P0",
+      "path_state": "NOT_APPLICABLE",
+      "quality_flags": [
+        "BUY_QUOTE_STATE_OBSERVED",
+        "EXACT_OUTPUT_MINT_AND_FRESHNESS_BLOCK_NOT_RETAINED",
+        "QUOTE_IS_NOT_FILL"
+      ],
+      "record_id": "T25-R2-0002",
+      "route_state_observed": "QUOTE_AVAILABLE",
+      "source_content_sha256": "9a880c74657ac25693d4804411da385e247aa637e511a91c2ff320d256ac5278",
+      "source_scope": "T21_R2_DEVELOPMENT",
+      "tested_notional_usd": 10,
+      "unit": null,
+      "value_decimal": null
+    },
+    {
+      "assessment": "UNKNOWN",
+      "cashflow_state": "NOT_APPLICABLE",
+      "claim_scope": "POINT_IN_TIME_QUOTE",
+      "evidence_basis": "CONTEMPORANEOUS_QUOTE",
+      "fill_state": "ACTUAL_FILLS_NOT_OBSERVED",
+      "first_reliable_available_at": "2026-08-01T11:47:01.122461Z",
+      "label": "QUOTE_EXIT",
+      "member_id": "T21-WATCH-29e2b75994975253bd74",
+      "observed_measures": {
+        "actual_elapsed_from_member_p0_seconds": "0.0",
+        "panel_state": "OBSERVED",
+        "roundtrip_quote_retention_bps": "9703.037",
+        "sell_route_count": "2"
+      },
+      "panel_id": "P0",
+      "path_state": "UNOBSERVED",
+      "quality_flags": [
+        "DEPENDENT_SELL_QUOTE_STATE_OBSERVED",
+        "EXACT_FRESHNESS_BLOCK_NOT_RETAINED",
+        "EXACT_SELL_INVENTORY_ATOMIC_IDENTITY_NOT_RETAINED",
+        "QUOTE_EXIT_IS_NOT_LIQUIDATION"
+      ],
+      "record_id": "T25-R2-0003",
+      "route_state_observed": "QUOTE_AVAILABLE",
+      "source_content_sha256": "9a880c74657ac25693d4804411da385e247aa637e511a91c2ff320d256ac5278",
+      "source_scope": "T21_R2_DEVELOPMENT",
+      "tested_notional_usd": 10,
+      "unit": null,
+      "value_decimal": null
+    },
+    {
+      "assessment": "UNKNOWN",
+      "cashflow_state": "NOT_APPLICABLE",
+      "claim_scope": "POINT_IN_TIME_QUOTE",
+      "evidence_basis": "CONTEMPORANEOUS_QUOTE",
+      "fill_state": "ACTUAL_FILLS_NOT_OBSERVED",
+      "first_reliable_available_at": "2026-08-01T11:47:03.321867Z",
+      "label": "FILLABLE",
+      "member_id": "T21-WATCH-29e2b75994975253bd74",
+      "observed_measures": {
+        "actual_elapsed_from_member_p0_seconds": "0.0",
+        "buy_input_atomic": "25000000",
+        "buy_price_impact_pct": "0.0197441809032527779577242931",
+        "buy_route_count": "2",
+        "panel_state": "OBSERVED"
+      },
+      "panel_id": "P0",
+      "path_state": "NOT_APPLICABLE",
+      "quality_flags": [
+        "BUY_QUOTE_STATE_OBSERVED",
+        "EXACT_OUTPUT_MINT_AND_FRESHNESS_BLOCK_NOT_RETAINED",
+        "QUOTE_IS_NOT_FILL"
+      ],
+      "record_id": "T25-R2-0004",
+      "route_state_observed": "QUOTE_AVAILABLE",
+      "source_content_sha256": "9a880c74657ac25693d4804411da385e247aa637e511a91c2ff320d256ac5278",
+      "source_scope": "T21_R2_DEVELOPMENT",
+      "tested_notional_usd": 25,
+      "unit": null,
+      "value_decimal": null
+    },
+    {
+      "assessment": "UNKNOWN",
+      "cashflow_state": "NOT_APPLICABLE",
+      "claim_scope": "POINT_IN_TIME_QUOTE",
+      "evidence_basis": "CONTEMPORANEOUS_QUOTE",
+      "fill_state": "ACTUAL_FILLS_NOT_OBSERVED",
+      "first_reliable_available_at": "2026-08-01T11:47:05.600341Z",
+      "label": "QUOTE_EXIT",
+      "member_id": "T21-WATCH-29e2b75994975253bd74",
+      "observed_measures": {
+        "actual_elapsed_from_member_p0_seconds": "0.0",
+        "panel_state": "OBSERVED",
+        "roundtrip_quote_retention_bps": "9627.3504",
+        "sell_route_count": "2"
+      },
+      "panel_id": "P0",
+      "path_state": "UNOBSERVED",
+      "quality_flags": [
+        "DEPENDENT_SELL_QUOTE_STATE_OBSERVED",
+        "EXACT_FRESHNESS_BLOCK_NOT_RETAINED",
+        "EXACT_SELL_INVENTORY_ATOMIC_IDENTITY_NOT_RETAINED",
+        "QUOTE_EXIT_IS_NOT_LIQUIDATION"
+      ],
+      "record_id": "T25-R2-0005",
+      "route_state_observed": "QUOTE_AVAILABLE",
+      "source_content_sha256": "9a880c74657ac25693d4804411da385e247aa637e511a91c2ff320d256ac5278",
+      "source_scope": "T21_R2_DEVELOPMENT",
+      "tested_notional_usd": 25,
+      "unit": null,
+      "value_decimal": null
+    },
+    {
+      "assessment": "UNKNOWN",
+      "cashflow_state": "NOT_APPLICABLE",
+      "claim_scope": "POINT_IN_TIME_QUOTE",
+      "evidence_basis": "CONTEMPORANEOUS_QUOTE",
+      "fill_state": "ACTUAL_FILLS_NOT_OBSERVED",
+      "first_reliable_available_at": "2026-08-01T11:47:07.744577Z",
+      "label": "FILLABLE",
+      "member_id": "T21-WATCH-29e2b75994975253bd74",
+      "observed_measures": {
+        "actual_elapsed_from_member_p0_seconds": "0.0",
+        "buy_input_atomic": "50000000",
+        "buy_price_impact_pct": "0.0261122327475519007127504206",
+        "buy_route_count": "2",
+        "panel_state": "OBSERVED"
+      },
+      "panel_id": "P0",
+      "path_state": "NOT_APPLICABLE",
+      "quality_flags": [
+        "BUY_QUOTE_STATE_OBSERVED",
+        "EXACT_OUTPUT_MINT_AND_FRESHNESS_BLOCK_NOT_RETAINED",
+        "QUOTE_IS_NOT_FILL"
+      ],
+      "record_id": "T25-R2-0006",
+      "route_state_observed": "QUOTE_AVAILABLE",
+      "source_content_sha256": "9a880c74657ac25693d4804411da385e247aa637e511a91c2ff320d256ac5278",
+      "source_scope": "T21_R2_DEVELOPMENT",
+      "tested_notional_usd": 50,
+      "unit": null,
+      "value_decimal": null
+    },
+    {
+      "assessment": "UNKNOWN",
+      "cashflow_state": "NOT_APPLICABLE",
+      "claim_scope": "POINT_IN_TIME_QUOTE",
+      "evidence_basis": "CONTEMPORANEOUS_QUOTE",
+      "fill_state": "ACTUAL_FILLS_NOT_OBSERVED",
+      "first_reliable_available_at": "2026-08-01T11:47:09.925733Z",
+      "label": "QUOTE_EXIT",
+      "member_id": "T21-WATCH-29e2b75994975253bd74",
+      "observed_measures": {
+        "actual_elapsed_from_member_p0_seconds": "0.0",
+        "panel_state": "OBSERVED",
+        "roundtrip_quote_retention_bps": "9503.8062",
+        "sell_route_count": "2"
+      },
+      "panel_id": "P0",
+      "path_state": "UNOBSERVED",
+      "quality_flags": [
+        "DEPENDENT_SELL_QUOTE_STATE_OBSERVED",
+        "EXACT_FRESHNESS_BLOCK_NOT_RETAINED",
+        "EXACT_SELL_INVENTORY_ATOMIC_IDENTITY_NOT_RETAINED",
+        "QUOTE_EXIT_IS_NOT_LIQUIDATION"
+      ],
+      "record_id": "T25-R2-0007",
+      "route_state_observed": "QUOTE_AVAILABLE",
+      "source_content_sha256": "9a880c74657ac25693d4804411da385e247aa637e511a91c2ff320d256ac5278",
+      "source_scope": "T21_R2_DEVELOPMENT",
+      "tested_notional_usd": 50,
+      "unit": null,
+      "value_decimal": null
+    },
+    {
+      "assessment": "UNKNOWN",
+      "cashflow_state": "NOT_APPLICABLE",
+      "claim_scope": "POINT_IN_TIME_QUOTE",
+      "evidence_basis": "CONTEMPORANEOUS_QUOTE",
+      "fill_state": "ACTUAL_FILLS_NOT_OBSERVED",
+      "first_reliable_available_at": "2026-08-01T11:47:12.184896Z",
+      "label": "FILLABLE",
+      "member_id": "T21-WATCH-29e2b75994975253bd74",
+      "observed_measures": {
+        "actual_elapsed_from_member_p0_seconds": "0.0",
+        "buy_input_atomic": "100000000",
+        "buy_price_impact_pct": "0.0385794665505593366716219172",
+        "buy_route_count": "3",
+        "panel_state": "OBSERVED"
+      },
+      "panel_id": "P0",
+      "path_state": "NOT_APPLICABLE",
+      "quality_flags": [
+        "BUY_QUOTE_STATE_OBSERVED",
+        "EXACT_OUTPUT_MINT_AND_FRESHNESS_BLOCK_NOT_RETAINED",
+        "QUOTE_IS_NOT_FILL"
+      ],
+      "record_id": "T25-R2-0008",
+      "route_state_observed": "QUOTE_AVAILABLE",
+      "source_content_sha256": "9a880c74657ac25693d4804411da385e247aa637e511a91c2ff320d256ac5278",
+      "source_scope": "T21_R2_DEVELOPMENT",
+      "tested_notional_usd": 100,
+      "unit": null,
+      "value_decimal": null
+    },
+    {
+      "assessment": "UNKNOWN",
+      "cashflow_state": "NOT_APPLICABLE",
+      "claim_scope": "POINT_IN_TIME_QUOTE",
+      "evidence_basis": "CONTEMPORANEOUS_QUOTE",
+      "fill_state": "ACTUAL_FILLS_NOT_OBSERVED",
+      "first_reliable_available_at": "2026-08-01T11:47:14.333631Z",
+      "label": "QUOTE_EXIT",
+      "member_id": "T21-WATCH-29e2b75994975253bd74",
+      "observed_measures": {
+        "actual_elapsed_from_member_p0_seconds": "0.0",
+        "panel_state": "OBSERVED",
+        "roundtrip_quote_retention_bps": "9266.3967",
+        "sell_route_count": "2"
+      },
+      "panel_id": "P0",
+      "path_state": "UNOBSERVED",
+      "quality_flags": [
+        "DEPENDENT_SELL_QUOTE_STATE_OBSERVED",
+        "EXACT_FRESHNESS_BLOCK_NOT_RETAINED",
+        "EXACT_SELL_INVENTORY_ATOMIC_IDENTITY_NOT_RETAINED",
+        "QUOTE_EXIT_IS_NOT_LIQUIDATION"
+      ],
+      "record_id": "T25-R2-0009",
+      "route_state_observed": "QUOTE_AVAILABLE",
+      "source_content_sha256": "9a880c74657ac25693d4804411da385e247aa637e511a91c2ff320d256ac5278",
+      "source_scope": "T21_R2_DEVELOPMENT",
+      "tested_notional_usd": 100,
+      "unit": null,
+      "value_decimal": null
+    },
+    {
+      "assessment": "UNKNOWN",
+      "cashflow_state": "NOT_APPLICABLE",
+      "claim_scope": "ACTUAL_FILL_SERIES",
+      "evidence_basis": "NONE",
+      "fill_state": "ACTUAL_FILLS_NOT_OBSERVED",
+      "first_reliable_available_at": "2026-08-01T11:47:14.333631Z",
+      "label": "REALIZED_VWAP",
+      "member_id": "T21-WATCH-29e2b75994975253bd74",
+      "observed_measures": {
+        "actual_elapsed_from_member_p0_seconds": "0.0",
+        "panel_state": "OBSERVED"
+      },
+      "panel_id": "P0",
+      "path_state": "NOT_APPLICABLE",
+      "quality_flags": [
+        "ACTUAL_FILLS_NOT_OBSERVED",
+        "QUOTE_RETENTION_IS_NOT_REALIZED_VWAP"
+      ],
+      "record_id": "T25-R2-0010",
+      "route_state_observed": "NOT_APPLICABLE",
+      "source_content_sha256": "9a880c74657ac25693d4804411da385e247aa637e511a91c2ff320d256ac5278",
+      "source_scope": "T21_R2_DEVELOPMENT",
+      "tested_notional_usd": null,
+      "unit": null,
+      "value_decimal": null
+    },
+    {
+      "assessment": "UNKNOWN",
+      "cashflow_state": "CASHFLOW_NOT_OBSERVED",
+      "claim_scope": "SETTLED_CASHFLOW",
+      "evidence_basis": "NONE",
+      "fill_state": "NOT_APPLICABLE",
+      "first_reliable_available_at": "2026-08-01T11:47:14.333631Z",
+      "label": "NET",
+      "member_id": "T21-WATCH-29e2b75994975253bd74",
+      "observed_measures": {
+        "actual_elapsed_from_member_p0_seconds": "0.0",
+        "panel_state": "OBSERVED"
+      },
+      "panel_id": "P0",
+      "path_state": "NOT_APPLICABLE",
+      "quality_flags": [
+        "SETTLED_CASHFLOW_NOT_OBSERVED",
+        "TASK26_FEE_AND_CASHFLOW_MODEL_NOT_AVAILABLE"
+      ],
+      "record_id": "T25-R2-0011",
+      "route_state_observed": "NOT_APPLICABLE",
+      "source_content_sha256": "9a880c74657ac25693d4804411da385e247aa637e511a91c2ff320d256ac5278",
+      "source_scope": "T21_R2_DEVELOPMENT",
+      "tested_notional_usd": null,
+      "unit": null,
+      "value_decimal": null
+    },
+    {
+      "assessment": "SUPPORTED",
+      "cashflow_state": "NOT_APPLICABLE",
+      "claim_scope": "DISCRETE_PATH_GRID",
+      "evidence_basis": "DISCRETE_PANEL_GRID",
+      "fill_state": "NOT_APPLICABLE",
+      "first_reliable_available_at": "2026-08-01T11:47:14.333631Z",
+      "label": "PATH_RISK",
+      "member_id": "T21-WATCH-29e2b75994975253bd74",
+      "observed_measures": {
+        "actual_elapsed_from_member_p0_seconds": "0.0",
+        "notionals_usd": [
+          10,
+          25,
+          50,
+          100
+        ],
+        "panel_state": "OBSERVED",
+        "quote_notional_capacity_proxy_usd": "100",
+        "worst_observed_roundtrip_quote_return_decimal": "-0.073360"
+      },
+      "panel_id": "P0",
+      "path_state": "SPARSE_DISCRETE",
+      "quality_flags": [
+        "ACTUAL_SPARSE_PANEL_TIMES",
+        "CONTINUOUS_MAE_MFE_FORBIDDEN",
+        "QUOTE_IMPLIED_NOT_REALIZED",
+        "WORST_NOTIONAL_DETERIORATION_FROM_MEMBER_P0"
+      ],
+      "record_id": "T25-R2-0012",
+      "route_state_observed": "NOT_APPLICABLE",
+      "source_content_sha256": "9a880c74657ac25693d4804411da385e247aa637e511a91c2ff320d256ac5278",
+      "source_scope": "T21_R2_DEVELOPMENT",
+      "tested_notional_usd": null,
+      "unit": "RETURN_DECIMAL",
+      "value_decimal": "0.000000"
+    },
+    {
+      "assessment": "UNKNOWN",
+      "cashflow_state": "NOT_APPLICABLE",
+      "claim_scope": "TOUCH_WITHIN_HORIZON",
+      "evidence_basis": "DISCRETE_PANEL_GRID",
+      "fill_state": "NOT_APPLICABLE",
+      "first_reliable_available_at": "2026-08-01T12:26:22.218696Z",
+      "label": "TOUCH",
+      "member_id": "T21-WATCH-29e2b75994975253bd74",
+      "observed_measures": {
+        "actual_elapsed_from_member_p0_seconds": "2347.867203",
+        "panel_state": "OBSERVED"
+      },
+      "panel_id": "P1",
+      "path_state": "SPARSE_DISCRETE",
+      "quality_flags": [
+        "NO_FROZEN_REFERENCE_THRESHOLD_IN_TRACKED_PROJECTION",
+        "NO_OBSERVED_THRESHOLD_CROSS_FIELD",
+        "SPARSE_PANEL"
+      ],
+      "record_id": "T25-R2-0013",
+      "route_state_observed": "NOT_APPLICABLE",
+      "source_content_sha256": "e4216ee65212eaf2143174b3dacfa31b6c198f7ebd24a81b9f4166f95472d950",
+      "source_scope": "T21_R2_DEVELOPMENT",
+      "tested_notional_usd": null,
+      "unit": null,
+      "value_decimal": null
+    },
+    {
+      "assessment": "UNKNOWN",
+      "cashflow_state": "NOT_APPLICABLE",
+      "claim_scope": "POINT_IN_TIME_QUOTE",
+      "evidence_basis": "CONTEMPORANEOUS_QUOTE",
+      "fill_state": "ACTUAL_FILLS_NOT_OBSERVED",
+      "first_reliable_available_at": "2026-08-01T12:26:06.877894Z",
+      "label": "FILLABLE",
+      "member_id": "T21-WATCH-29e2b75994975253bd74",
+      "observed_measures": {
+        "actual_elapsed_from_member_p0_seconds": "2347.867203",
+        "buy_input_atomic": "10000000",
+        "buy_price_impact_pct": "0.0103797691124292708068805367",
+        "buy_route_count": "3",
+        "panel_state": "OBSERVED"
+      },
+      "panel_id": "P1",
+      "path_state": "NOT_APPLICABLE",
+      "quality_flags": [
+        "BUY_QUOTE_STATE_OBSERVED",
+        "EXACT_OUTPUT_MINT_AND_FRESHNESS_BLOCK_NOT_RETAINED",
+        "QUOTE_IS_NOT_FILL"
+      ],
+      "record_id": "T25-R2-0014",
+      "route_state_observed": "QUOTE_AVAILABLE",
+      "source_content_sha256": "e4216ee65212eaf2143174b3dacfa31b6c198f7ebd24a81b9f4166f95472d950",
+      "source_scope": "T21_R2_DEVELOPMENT",
+      "tested_notional_usd": 10,
+      "unit": null,
+      "value_decimal": null
+    },
+    {
+      "assessment": "UNKNOWN",
+      "cashflow_state": "NOT_APPLICABLE",
+      "claim_scope": "POINT_IN_TIME_QUOTE",
+      "evidence_basis": "CONTEMPORANEOUS_QUOTE",
+      "fill_state": "ACTUAL_FILLS_NOT_OBSERVED",
+      "first_reliable_available_at": "2026-08-01T12:26:09.086299Z",
+      "label": "QUOTE_EXIT",
+      "member_id": "T21-WATCH-29e2b75994975253bd74",
+      "observed_measures": {
+        "actual_elapsed_from_member_p0_seconds": "2347.867203",
+        "panel_state": "OBSERVED",
+        "roundtrip_quote_retention_bps": "9689.222",
+        "sell_route_count": "2"
+      },
+      "panel_id": "P1",
+      "path_state": "UNOBSERVED",
+      "quality_flags": [
+        "DEPENDENT_SELL_QUOTE_STATE_OBSERVED",
+        "EXACT_FRESHNESS_BLOCK_NOT_RETAINED",
+        "EXACT_SELL_INVENTORY_ATOMIC_IDENTITY_NOT_RETAINED",
+        "QUOTE_EXIT_IS_NOT_LIQUIDATION"
+      ],
+      "record_id": "T25-R2-0015",
+      "route_state_observed": "QUOTE_AVAILABLE",
+      "source_content_sha256": "e4216ee65212eaf2143174b3dacfa31b6c198f7ebd24a81b9f4166f95472d950",
+      "source_scope": "T21_R2_DEVELOPMENT",
+      "tested_notional_usd": 10,
+      "unit": null,
+      "value_decimal": null
+    },
+    {
+      "assessment": "UNKNOWN",
+      "cashflow_state": "NOT_APPLICABLE",
+      "claim_scope": "POINT_IN_TIME_QUOTE",
+      "evidence_basis": "CONTEMPORANEOUS_QUOTE",
+      "fill_state": "ACTUAL_FILLS_NOT_OBSERVED",
+      "first_reliable_available_at": "2026-08-01T12:26:11.216736Z",
+      "label": "FILLABLE",
+      "member_id": "T21-WATCH-29e2b75994975253bd74",
+      "observed_measures": {
+        "actual_elapsed_from_member_p0_seconds": "2347.867203",
+        "buy_input_atomic": "25000000",
+        "buy_price_impact_pct": "0.0152475894558204684964948567",
+        "buy_route_count": "3",
+        "panel_state": "OBSERVED"
+      },
+      "panel_id": "P1",
+      "path_state": "NOT_APPLICABLE",
+      "quality_flags": [
+        "BUY_QUOTE_STATE_OBSERVED",
+        "EXACT_OUTPUT_MINT_AND_FRESHNESS_BLOCK_NOT_RETAINED",
+        "QUOTE_IS_NOT_FILL"
+      ],
+      "record_id": "T25-R2-0016",
+      "route_state_observed": "QUOTE_AVAILABLE",
+      "source_content_sha256": "e4216ee65212eaf2143174b3dacfa31b6c198f7ebd24a81b9f4166f95472d950",
+      "source_scope": "T21_R2_DEVELOPMENT",
+      "tested_notional_usd": 25,
+      "unit": null,
+      "value_decimal": null
+    },
+    {
+      "assessment": "UNKNOWN",
+      "cashflow_state": "NOT_APPLICABLE",
+      "claim_scope": "POINT_IN_TIME_QUOTE",
+      "evidence_basis": "CONTEMPORANEOUS_QUOTE",
+      "fill_state": "ACTUAL_FILLS_NOT_OBSERVED",
+      "first_reliable_available_at": "2026-08-01T12:26:13.499328Z",
+      "label": "QUOTE_EXIT",
+      "member_id": "T21-WATCH-29e2b75994975253bd74",
+      "observed_measures": {
+        "actual_elapsed_from_member_p0_seconds": "2347.867203",
+        "panel_state": "OBSERVED",
+        "roundtrip_quote_retention_bps": "9595.7044",
+        "sell_route_count": "2"
+      },
+      "panel_id": "P1",
+      "path_state": "UNOBSERVED",
+      "quality_flags": [
+        "DEPENDENT_SELL_QUOTE_STATE_OBSERVED",
+        "EXACT_FRESHNESS_BLOCK_NOT_RETAINED",
+        "EXACT_SELL_INVENTORY_ATOMIC_IDENTITY_NOT_RETAINED",
+        "QUOTE_EXIT_IS_NOT_LIQUIDATION"
+      ],
+      "record_id": "T25-R2-0017",
+      "route_state_observed": "QUOTE_AVAILABLE",
+      "source_content_sha256": "e4216ee65212eaf2143174b3dacfa31b6c198f7ebd24a81b9f4166f95472d950",
+      "source_scope": "T21_R2_DEVELOPMENT",
+      "tested_notional_usd": 25,
+      "unit": null,
+      "value_decimal": null
+    },
+    {
+      "assessment": "UNKNOWN",
+      "cashflow_state": "NOT_APPLICABLE",
+      "claim_scope": "POINT_IN_TIME_QUOTE",
+      "evidence_basis": "CONTEMPORANEOUS_QUOTE",
+      "fill_state": "ACTUAL_FILLS_NOT_OBSERVED",
+      "first_reliable_available_at": "2026-08-01T12:26:15.612794Z",
+      "label": "FILLABLE",
+      "member_id": "T21-WATCH-29e2b75994975253bd74",
+      "observed_measures": {
+        "actual_elapsed_from_member_p0_seconds": "2347.867203",
+        "buy_input_atomic": "50000000",
+        "buy_price_impact_pct": "0.0232443289800450998758383033",
+        "buy_route_count": "3",
+        "panel_state": "OBSERVED"
+      },
+      "panel_id": "P1",
+      "path_state": "NOT_APPLICABLE",
+      "quality_flags": [
+        "BUY_QUOTE_STATE_OBSERVED",
+        "EXACT_OUTPUT_MINT_AND_FRESHNESS_BLOCK_NOT_RETAINED",
+        "QUOTE_IS_NOT_FILL"
+      ],
+      "record_id": "T25-R2-0018",
+      "route_state_observed": "QUOTE_AVAILABLE",
+      "source_content_sha256": "e4216ee65212eaf2143174b3dacfa31b6c198f7ebd24a81b9f4166f95472d950",
+      "source_scope": "T21_R2_DEVELOPMENT",
+      "tested_notional_usd": 50,
+      "unit": null,
+      "value_decimal": null
+    },
+    {
+      "assessment": "UNKNOWN",
+      "cashflow_state": "NOT_APPLICABLE",
+      "claim_scope": "POINT_IN_TIME_QUOTE",
+      "evidence_basis": "CONTEMPORANEOUS_QUOTE",
+      "fill_state": "ACTUAL_FILLS_NOT_OBSERVED",
+      "first_reliable_available_at": "2026-08-01T12:26:17.841377Z",
+      "label": "QUOTE_EXIT",
+      "member_id": "T21-WATCH-29e2b75994975253bd74",
+      "observed_measures": {
+        "actual_elapsed_from_member_p0_seconds": "2347.867203",
+        "panel_state": "OBSERVED",
+        "roundtrip_quote_retention_bps": "9441.5362",
+        "sell_route_count": "2"
+      },
+      "panel_id": "P1",
+      "path_state": "UNOBSERVED",
+      "quality_flags": [
+        "DEPENDENT_SELL_QUOTE_STATE_OBSERVED",
+        "EXACT_FRESHNESS_BLOCK_NOT_RETAINED",
+        "EXACT_SELL_INVENTORY_ATOMIC_IDENTITY_NOT_RETAINED",
+        "QUOTE_EXIT_IS_NOT_LIQUIDATION"
+      ],
+      "record_id": "T25-R2-0019",
+      "route_state_observed": "QUOTE_AVAILABLE",
+      "source_content_sha256": "e4216ee65212eaf2143174b3dacfa31b6c198f7ebd24a81b9f4166f95472d950",
+      "source_scope": "T21_R2_DEVELOPMENT",
+      "tested_notional_usd": 50,
+      "unit": null,
+      "value_decimal": null
+    },
+    {
+      "assessment": "UNKNOWN",
+      "cashflow_state": "NOT_APPLICABLE",
+      "claim_scope": "POINT_IN_TIME_QUOTE",
+      "evidence_basis": "CONTEMPORANEOUS_QUOTE",
+      "fill_state": "ACTUAL_FILLS_NOT_OBSERVED",
+      "first_reliable_available_at": "2026-08-01T12:26:20.089402Z",
+      "label": "FILLABLE",
+      "member_id": "T21-WATCH-29e2b75994975253bd74",
+      "observed_measures": {
+        "actual_elapsed_from_member_p0_seconds": "2347.867203",
+        "buy_input_atomic": "100000000",
+        "buy_price_impact_pct": "0.0388161955576196977626492803",
+        "buy_route_count": "2",
+        "panel_state": "OBSERVED"
+      },
+      "panel_id": "P1",
+      "path_state": "NOT_APPLICABLE",
+      "quality_flags": [
+        "BUY_QUOTE_STATE_OBSERVED",
+        "EXACT_OUTPUT_MINT_AND_FRESHNESS_BLOCK_NOT_RETAINED",
+        "QUOTE_IS_NOT_FILL"
+      ],
+      "record_id": "T25-R2-0020",
+      "route_state_observed": "QUOTE_AVAILABLE",
+      "source_content_sha256": "e4216ee65212eaf2143174b3dacfa31b6c198f7ebd24a81b9f4166f95472d950",
+      "source_scope": "T21_R2_DEVELOPMENT",
+      "tested_notional_usd": 100,
+      "unit": null,
+      "value_decimal": null
+    },
+    {
+      "assessment": "UNKNOWN",
+      "cashflow_state": "NOT_APPLICABLE",
+      "claim_scope": "POINT_IN_TIME_QUOTE",
+      "evidence_basis": "CONTEMPORANEOUS_QUOTE",
+      "fill_state": "ACTUAL_FILLS_NOT_OBSERVED",
+      "first_reliable_available_at": "2026-08-01T12:26:22.218696Z",
+      "label": "QUOTE_EXIT",
+      "member_id": "T21-WATCH-29e2b75994975253bd74",
+      "observed_measures": {
+        "actual_elapsed_from_member_p0_seconds": "2347.867203",
+        "panel_state": "OBSERVED",
+        "roundtrip_quote_retention_bps": "9149.551",
+        "sell_route_count": "2"
+      },
+      "panel_id": "P1",
+      "path_state": "UNOBSERVED",
+      "quality_flags": [
+        "DEPENDENT_SELL_QUOTE_STATE_OBSERVED",
+        "EXACT_FRESHNESS_BLOCK_NOT_RETAINED",
+        "EXACT_SELL_INVENTORY_ATOMIC_IDENTITY_NOT_RETAINED",
+        "QUOTE_EXIT_IS_NOT_LIQUIDATION"
+      ],
+      "record_id": "T25-R2-0021",
+      "route_state_observed": "QUOTE_AVAILABLE",
+      "source_content_sha256": "e4216ee65212eaf2143174b3dacfa31b6c198f7ebd24a81b9f4166f95472d950",
+      "source_scope": "T21_R2_DEVELOPMENT",
+      "tested_notional_usd": 100,
+      "unit": null,
+      "value_decimal": null
+    },
+    {
+      "assessment": "UNKNOWN",
+      "cashflow_state": "NOT_APPLICABLE",
+      "claim_scope": "ACTUAL_FILL_SERIES",
+      "evidence_basis": "NONE",
+      "fill_state": "ACTUAL_FILLS_NOT_OBSERVED",
+      "first_reliable_available_at": "2026-08-01T12:26:22.218696Z",
+      "label": "REALIZED_VWAP",
+      "member_id": "T21-WATCH-29e2b75994975253bd74",
+      "observed_measures": {
+        "actual_elapsed_from_member_p0_seconds": "2347.867203",
+        "panel_state": "OBSERVED"
+      },
+      "panel_id": "P1",
+      "path_state": "NOT_APPLICABLE",
+      "quality_flags": [
+        "ACTUAL_FILLS_NOT_OBSERVED",
+        "QUOTE_RETENTION_IS_NOT_REALIZED_VWAP"
+      ],
+      "record_id": "T25-R2-0022",
+      "route_state_observed": "NOT_APPLICABLE",
+      "source_content_sha256": "e4216ee65212eaf2143174b3dacfa31b6c198f7ebd24a81b9f4166f95472d950",
+      "source_scope": "T21_R2_DEVELOPMENT",
+      "tested_notional_usd": null,
+      "unit": null,
+      "value_decimal": null
+    },
+    {
+      "assessment": "UNKNOWN",
+      "cashflow_state": "CASHFLOW_NOT_OBSERVED",
+      "claim_scope": "SETTLED_CASHFLOW",
+      "evidence_basis": "NONE",
+      "fill_state": "NOT_APPLICABLE",
+      "first_reliable_available_at": "2026-08-01T12:26:22.218696Z",
+      "label": "NET",
+      "member_id": "T21-WATCH-29e2b75994975253bd74",
+      "observed_measures": {
+        "actual_elapsed_from_member_p0_seconds": "2347.867203",
+        "panel_state": "OBSERVED"
+      },
+      "panel_id": "P1",
+      "path_state": "NOT_APPLICABLE",
+      "quality_flags": [
+        "SETTLED_CASHFLOW_NOT_OBSERVED",
+        "TASK26_FEE_AND_CASHFLOW_MODEL_NOT_AVAILABLE"
+      ],
+      "record_id": "T25-R2-0023",
+      "route_state_observed": "NOT_APPLICABLE",
+      "source_content_sha256": "e4216ee65212eaf2143174b3dacfa31b6c198f7ebd24a81b9f4166f95472d950",
+      "source_scope": "T21_R2_DEVELOPMENT",
+      "tested_notional_usd": null,
+      "unit": null,
+      "value_decimal": null
+    },
+    {
+      "assessment": "SUPPORTED",
+      "cashflow_state": "NOT_APPLICABLE",
+      "claim_scope": "DISCRETE_PATH_GRID",
+      "evidence_basis": "DISCRETE_PANEL_GRID",
+      "fill_state": "NOT_APPLICABLE",
+      "first_reliable_available_at": "2026-08-01T12:26:22.218696Z",
+      "label": "PATH_RISK",
+      "member_id": "T21-WATCH-29e2b75994975253bd74",
+      "observed_measures": {
+        "actual_elapsed_from_member_p0_seconds": "2347.867203",
+        "notionals_usd": [
+          10,
+          25,
+          50,
+          100
+        ],
+        "panel_state": "OBSERVED",
+        "quote_notional_capacity_proxy_usd": "100",
+        "worst_observed_roundtrip_quote_return_decimal": "-0.085045"
+      },
+      "panel_id": "P1",
+      "path_state": "SPARSE_DISCRETE",
+      "quality_flags": [
+        "ACTUAL_SPARSE_PANEL_TIMES",
+        "CONTINUOUS_MAE_MFE_FORBIDDEN",
+        "QUOTE_IMPLIED_NOT_REALIZED",
+        "WORST_NOTIONAL_DETERIORATION_FROM_MEMBER_P0"
+      ],
+      "record_id": "T25-R2-0024",
+      "route_state_observed": "NOT_APPLICABLE",
+      "source_content_sha256": "e4216ee65212eaf2143174b3dacfa31b6c198f7ebd24a81b9f4166f95472d950",
+      "source_scope": "T21_R2_DEVELOPMENT",
+      "tested_notional_usd": null,
+      "unit": "RETURN_DECIMAL",
+      "value_decimal": "0.011685"
+    },
+    {
+      "assessment": "UNKNOWN",
+      "cashflow_state": "NOT_APPLICABLE",
+      "claim_scope": "TOUCH_WITHIN_HORIZON",
+      "evidence_basis": "DISCRETE_PANEL_GRID",
+      "fill_state": "NOT_APPLICABLE",
+      "first_reliable_available_at": "2026-08-01T13:11:17.144558Z",
+      "label": "TOUCH",
+      "member_id": "T21-WATCH-29e2b75994975253bd74",
+      "observed_measures": {
+        "actual_elapsed_from_member_p0_seconds": "5042.823468",
+        "panel_state": "OBSERVED"
+      },
+      "panel_id": "P2",
+      "path_state": "SPARSE_DISCRETE",
+      "quality_flags": [
+        "NO_FROZEN_REFERENCE_THRESHOLD_IN_TRACKED_PROJECTION",
+        "NO_OBSERVED_THRESHOLD_CROSS_FIELD",
+        "SPARSE_PANEL"
+      ],
+      "record_id": "T25-R2-0025",
+      "route_state_observed": "NOT_APPLICABLE",
+      "source_content_sha256": "65050b7e36b62114b1ed8753dea730eafbcfad70d79053d129758dea87615eec",
+      "source_scope": "T21_R2_DEVELOPMENT",
+      "tested_notional_usd": null,
+      "unit": null,
+      "value_decimal": null
+    },
+    {
+      "assessment": "UNKNOWN",
+      "cashflow_state": "NOT_APPLICABLE",
+      "claim_scope": "POINT_IN_TIME_QUOTE",
+      "evidence_basis": "CONTEMPORANEOUS_QUOTE",
+      "fill_state": "ACTUAL_FILLS_NOT_OBSERVED",
+      "first_reliable_available_at": "2026-08-01T13:11:01.834159Z",
+      "label": "FILLABLE",
+      "member_id": "T21-WATCH-29e2b75994975253bd74",
+      "observed_measures": {
+        "actual_elapsed_from_member_p0_seconds": "5042.823468",
+        "buy_input_atomic": "10000000",
+        "buy_price_impact_pct": "0.015511832772130680926430091",
+        "buy_route_count": "2",
+        "panel_state": "OBSERVED"
+      },
+      "panel_id": "P2",
+      "path_state": "NOT_APPLICABLE",
+      "quality_flags": [
+        "BUY_QUOTE_STATE_OBSERVED",
+        "EXACT_OUTPUT_MINT_AND_FRESHNESS_BLOCK_NOT_RETAINED",
+        "QUOTE_IS_NOT_FILL"
+      ],
+      "record_id": "T25-R2-0026",
+      "route_state_observed": "QUOTE_AVAILABLE",
+      "source_content_sha256": "65050b7e36b62114b1ed8753dea730eafbcfad70d79053d129758dea87615eec",
+      "source_scope": "T21_R2_DEVELOPMENT",
+      "tested_notional_usd": 10,
+      "unit": null,
+      "value_decimal": null
+    },
+    {
+      "assessment": "UNKNOWN",
+      "cashflow_state": "NOT_APPLICABLE",
+      "claim_scope": "POINT_IN_TIME_QUOTE",
+      "evidence_basis": "CONTEMPORANEOUS_QUOTE",
+      "fill_state": "ACTUAL_FILLS_NOT_OBSERVED",
+      "first_reliable_available_at": "2026-08-01T13:11:03.961256Z",
+      "label": "QUOTE_EXIT",
+      "member_id": "T21-WATCH-29e2b75994975253bd74",
+      "observed_measures": {
+        "actual_elapsed_from_member_p0_seconds": "5042.823468",
+        "panel_state": "OBSERVED",
+        "roundtrip_quote_retention_bps": "9691.11",
+        "sell_route_count": "2"
+      },
+      "panel_id": "P2",
+      "path_state": "UNOBSERVED",
+      "quality_flags": [
+        "DEPENDENT_SELL_QUOTE_STATE_OBSERVED",
+        "EXACT_FRESHNESS_BLOCK_NOT_RETAINED",
+        "EXACT_SELL_INVENTORY_ATOMIC_IDENTITY_NOT_RETAINED",
+        "QUOTE_EXIT_IS_NOT_LIQUIDATION"
+      ],
+      "record_id": "T25-R2-0027",
+      "route_state_observed": "QUOTE_AVAILABLE",
+      "source_content_sha256": "65050b7e36b62114b1ed8753dea730eafbcfad70d79053d129758dea87615eec",
+      "source_scope": "T21_R2_DEVELOPMENT",
+      "tested_notional_usd": 10,
+      "unit": null,
+      "value_decimal": null
+    },
+    {
+      "assessment": "UNKNOWN",
+      "cashflow_state": "NOT_APPLICABLE",
+      "claim_scope": "POINT_IN_TIME_QUOTE",
+      "evidence_basis": "CONTEMPORANEOUS_QUOTE",
+      "fill_state": "ACTUAL_FILLS_NOT_OBSERVED",
+      "first_reliable_available_at": "2026-08-01T13:11:06.149069Z",
+      "label": "FILLABLE",
+      "member_id": "T21-WATCH-29e2b75994975253bd74",
+      "observed_measures": {
+        "actual_elapsed_from_member_p0_seconds": "5042.823468",
+        "buy_input_atomic": "25000000",
+        "buy_price_impact_pct": "0.0202218894885072369995113926",
+        "buy_route_count": "3",
+        "panel_state": "OBSERVED"
+      },
+      "panel_id": "P2",
+      "path_state": "NOT_APPLICABLE",
+      "quality_flags": [
+        "BUY_QUOTE_STATE_OBSERVED",
+        "EXACT_OUTPUT_MINT_AND_FRESHNESS_BLOCK_NOT_RETAINED",
+        "QUOTE_IS_NOT_FILL"
+      ],
+      "record_id": "T25-R2-0028",
+      "route_state_observed": "QUOTE_AVAILABLE",
+      "source_content_sha256": "65050b7e36b62114b1ed8753dea730eafbcfad70d79053d129758dea87615eec",
+      "source_scope": "T21_R2_DEVELOPMENT",
+      "tested_notional_usd": 25,
+      "unit": null,
+      "value_decimal": null
+    },
+    {
+      "assessment": "UNKNOWN",
+      "cashflow_state": "NOT_APPLICABLE",
+      "claim_scope": "POINT_IN_TIME_QUOTE",
+      "evidence_basis": "CONTEMPORANEOUS_QUOTE",
+      "fill_state": "ACTUAL_FILLS_NOT_OBSERVED",
+      "first_reliable_available_at": "2026-08-01T13:11:08.401725Z",
+      "label": "QUOTE_EXIT",
+      "member_id": "T21-WATCH-29e2b75994975253bd74",
+      "observed_measures": {
+        "actual_elapsed_from_member_p0_seconds": "5042.823468",
+        "panel_state": "OBSERVED",
+        "roundtrip_quote_retention_bps": "9599.1048",
+        "sell_route_count": "2"
+      },
+      "panel_id": "P2",
+      "path_state": "UNOBSERVED",
+      "quality_flags": [
+        "DEPENDENT_SELL_QUOTE_STATE_OBSERVED",
+        "EXACT_FRESHNESS_BLOCK_NOT_RETAINED",
+        "EXACT_SELL_INVENTORY_ATOMIC_IDENTITY_NOT_RETAINED",
+        "QUOTE_EXIT_IS_NOT_LIQUIDATION"
+      ],
+      "record_id": "T25-R2-0029",
+      "route_state_observed": "QUOTE_AVAILABLE",
+      "source_content_sha256": "65050b7e36b62114b1ed8753dea730eafbcfad70d79053d129758dea87615eec",
+      "source_scope": "T21_R2_DEVELOPMENT",
+      "tested_notional_usd": 25,
+      "unit": null,
+      "value_decimal": null
+    },
+    {
+      "assessment": "UNKNOWN",
+      "cashflow_state": "NOT_APPLICABLE",
+      "claim_scope": "POINT_IN_TIME_QUOTE",
+      "evidence_basis": "CONTEMPORANEOUS_QUOTE",
+      "fill_state": "ACTUAL_FILLS_NOT_OBSERVED",
+      "first_reliable_available_at": "2026-08-01T13:11:10.551416Z",
+      "label": "FILLABLE",
+      "member_id": "T21-WATCH-29e2b75994975253bd74",
+      "observed_measures": {
+        "actual_elapsed_from_member_p0_seconds": "5042.823468",
+        "buy_input_atomic": "50000000",
+        "buy_price_impact_pct": "0.0280007482862223050238188031",
+        "buy_route_count": "2",
+        "panel_state": "OBSERVED"
+      },
+      "panel_id": "P2",
+      "path_state": "NOT_APPLICABLE",
+      "quality_flags": [
+        "BUY_QUOTE_STATE_OBSERVED",
+        "EXACT_OUTPUT_MINT_AND_FRESHNESS_BLOCK_NOT_RETAINED",
+        "QUOTE_IS_NOT_FILL"
+      ],
+      "record_id": "T25-R2-0030",
+      "route_state_observed": "QUOTE_AVAILABLE",
+      "source_content_sha256": "65050b7e36b62114b1ed8753dea730eafbcfad70d79053d129758dea87615eec",
+      "source_scope": "T21_R2_DEVELOPMENT",
+      "tested_notional_usd": 50,
+      "unit": null,
+      "value_decimal": null
+    },
+    {
+      "assessment": "UNKNOWN",
+      "cashflow_state": "NOT_APPLICABLE",
+      "claim_scope": "POINT_IN_TIME_QUOTE",
+      "evidence_basis": "CONTEMPORANEOUS_QUOTE",
+      "fill_state": "ACTUAL_FILLS_NOT_OBSERVED",
+      "first_reliable_available_at": "2026-08-01T13:11:12.750902Z",
+      "label": "QUOTE_EXIT",
+      "member_id": "T21-WATCH-29e2b75994975253bd74",
+      "observed_measures": {
+        "actual_elapsed_from_member_p0_seconds": "5042.823468",
+        "panel_state": "OBSERVED",
+        "roundtrip_quote_retention_bps": "9450.1846",
+        "sell_route_count": "2"
+      },
+      "panel_id": "P2",
+      "path_state": "UNOBSERVED",
+      "quality_flags": [
+        "DEPENDENT_SELL_QUOTE_STATE_OBSERVED",
+        "EXACT_FRESHNESS_BLOCK_NOT_RETAINED",
+        "EXACT_SELL_INVENTORY_ATOMIC_IDENTITY_NOT_RETAINED",
+        "QUOTE_EXIT_IS_NOT_LIQUIDATION"
+      ],
+      "record_id": "T25-R2-0031",
+      "route_state_observed": "QUOTE_AVAILABLE",
+      "source_content_sha256": "65050b7e36b62114b1ed8753dea730eafbcfad70d79053d129758dea87615eec",
+      "source_scope": "T21_R2_DEVELOPMENT",
+      "tested_notional_usd": 50,
+      "unit": null,
+      "value_decimal": null
+    },
+    {
+      "assessment": "UNKNOWN",
+      "cashflow_state": "NOT_APPLICABLE",
+      "claim_scope": "POINT_IN_TIME_QUOTE",
+      "evidence_basis": "CONTEMPORANEOUS_QUOTE",
+      "fill_state": "ACTUAL_FILLS_NOT_OBSERVED",
+      "first_reliable_available_at": "2026-08-01T13:11:15.225493Z",
+      "label": "FILLABLE",
+      "member_id": "T21-WATCH-29e2b75994975253bd74",
+      "observed_measures": {
+        "actual_elapsed_from_member_p0_seconds": "5042.823468",
+        "buy_input_atomic": "100000000",
+        "buy_price_impact_pct": "0.0431494787841547127098818095",
+        "buy_route_count": "2",
+        "panel_state": "OBSERVED"
+      },
+      "panel_id": "P2",
+      "path_state": "NOT_APPLICABLE",
+      "quality_flags": [
+        "BUY_QUOTE_STATE_OBSERVED",
+        "EXACT_OUTPUT_MINT_AND_FRESHNESS_BLOCK_NOT_RETAINED",
+        "QUOTE_IS_NOT_FILL"
+      ],
+      "record_id": "T25-R2-0032",
+      "route_state_observed": "QUOTE_AVAILABLE",
+      "source_content_sha256": "65050b7e36b62114b1ed8753dea730eafbcfad70d79053d129758dea87615eec",
+      "source_scope": "T21_R2_DEVELOPMENT",
+      "tested_notional_usd": 100,
+      "unit": null,
+      "value_decimal": null
+    },
+    {
+      "assessment": "UNKNOWN",
+      "cashflow_state": "NOT_APPLICABLE",
+      "claim_scope": "POINT_IN_TIME_QUOTE",
+      "evidence_basis": "CONTEMPORANEOUS_QUOTE",
+      "fill_state": "ACTUAL_FILLS_NOT_OBSERVED",
+      "first_reliable_available_at": "2026-08-01T13:11:17.144558Z",
+      "label": "QUOTE_EXIT",
+      "member_id": "T21-WATCH-29e2b75994975253bd74",
+      "observed_measures": {
+        "actual_elapsed_from_member_p0_seconds": "5042.823468",
+        "panel_state": "OBSERVED",
+        "roundtrip_quote_retention_bps": "9165.1924",
+        "sell_route_count": "3"
+      },
+      "panel_id": "P2",
+      "path_state": "UNOBSERVED",
+      "quality_flags": [
+        "DEPENDENT_SELL_QUOTE_STATE_OBSERVED",
+        "EXACT_FRESHNESS_BLOCK_NOT_RETAINED",
+        "EXACT_SELL_INVENTORY_ATOMIC_IDENTITY_NOT_RETAINED",
+        "QUOTE_EXIT_IS_NOT_LIQUIDATION"
+      ],
+      "record_id": "T25-R2-0033",
+      "route_state_observed": "QUOTE_AVAILABLE",
+      "source_content_sha256": "65050b7e36b62114b1ed8753dea730eafbcfad70d79053d129758dea87615eec",
+      "source_scope": "T21_R2_DEVELOPMENT",
+      "tested_notional_usd": 100,
+      "unit": null,
+      "value_decimal": null
+    },
+    {
+      "assessment": "UNKNOWN",
+      "cashflow_state": "NOT_APPLICABLE",
+      "claim_scope": "ACTUAL_FILL_SERIES",
+      "evidence_basis": "NONE",
+      "fill_state": "ACTUAL_FILLS_NOT_OBSERVED",
+      "first_reliable_available_at": "2026-08-01T13:11:17.144558Z",
+      "label": "REALIZED_VWAP",
+      "member_id": "T21-WATCH-29e2b75994975253bd74",
+      "observed_measures": {
+        "actual_elapsed_from_member_p0_seconds": "5042.823468",
+        "panel_state": "OBSERVED"
+      },
+      "panel_id": "P2",
+      "path_state": "NOT_APPLICABLE",
+      "quality_flags": [
+        "ACTUAL_FILLS_NOT_OBSERVED",
+        "QUOTE_RETENTION_IS_NOT_REALIZED_VWAP"
+      ],
+      "record_id": "T25-R2-0034",
+      "route_state_observed": "NOT_APPLICABLE",
+      "source_content_sha256": "65050b7e36b62114b1ed8753dea730eafbcfad70d79053d129758dea87615eec",
+      "source_scope": "T21_R2_DEVELOPMENT",
+      "tested_notional_usd": null,
+      "unit": null,
+      "value_decimal": null
+    },
+    {
+      "assessment": "UNKNOWN",
+      "cashflow_state": "CASHFLOW_NOT_OBSERVED",
+      "claim_scope": "SETTLED_CASHFLOW",
+      "evidence_basis": "NONE",
+      "fill_state": "NOT_APPLICABLE",
+      "first_reliable_available_at": "2026-08-01T13:11:17.144558Z",
+      "label": "NET",
+      "member_id": "T21-WATCH-29e2b75994975253bd74",
+      "observed_measures": {
+        "actual_elapsed_from_member_p0_seconds": "5042.823468",
+        "panel_state": "OBSERVED"
+      },
+      "panel_id": "P2",
+      "path_state": "NOT_APPLICABLE",
+      "quality_flags": [
+        "SETTLED_CASHFLOW_NOT_OBSERVED",
+        "TASK26_FEE_AND_CASHFLOW_MODEL_NOT_AVAILABLE"
+      ],
+      "record_id": "T25-R2-0035",
+      "route_state_observed": "NOT_APPLICABLE",
+      "source_content_sha256": "65050b7e36b62114b1ed8753dea730eafbcfad70d79053d129758dea87615eec",
+      "source_scope": "T21_R2_DEVELOPMENT",
+      "tested_notional_usd": null,
+      "unit": null,
+      "value_decimal": null
+    },
+    {
+      "assessment": "SUPPORTED",
+      "cashflow_state": "NOT_APPLICABLE",
+      "claim_scope": "DISCRETE_PATH_GRID",
+      "evidence_basis": "DISCRETE_PANEL_GRID",
+      "fill_state": "NOT_APPLICABLE",
+      "first_reliable_available_at": "2026-08-01T13:11:17.144558Z",
+      "label": "PATH_RISK",
+      "member_id": "T21-WATCH-29e2b75994975253bd74",
+      "observed_measures": {
+        "actual_elapsed_from_member_p0_seconds": "5042.823468",
+        "notionals_usd": [
+          10,
+          25,
+          50,
+          100
+        ],
+        "panel_state": "OBSERVED",
+        "quote_notional_capacity_proxy_usd": "100",
+        "worst_observed_roundtrip_quote_return_decimal": "-0.083481"
+      },
+      "panel_id": "P2",
+      "path_state": "SPARSE_DISCRETE",
+      "quality_flags": [
+        "ACTUAL_SPARSE_PANEL_TIMES",
+        "CONTINUOUS_MAE_MFE_FORBIDDEN",
+        "QUOTE_IMPLIED_NOT_REALIZED",
+        "WORST_NOTIONAL_DETERIORATION_FROM_MEMBER_P0"
+      ],
+      "record_id": "T25-R2-0036",
+      "route_state_observed": "NOT_APPLICABLE",
+      "source_content_sha256": "65050b7e36b62114b1ed8753dea730eafbcfad70d79053d129758dea87615eec",
+      "source_scope": "T21_R2_DEVELOPMENT",
+      "tested_notional_usd": null,
+      "unit": "RETURN_DECIMAL",
+      "value_decimal": "0.010120"
+    },
+    {
+      "assessment": "UNKNOWN",
+      "cashflow_state": "NOT_APPLICABLE",
+      "claim_scope": "TOUCH_WITHIN_HORIZON",
+      "evidence_basis": "DISCRETE_PANEL_GRID",
+      "fill_state": "NOT_APPLICABLE",
+      "first_reliable_available_at": "2026-08-01T11:47:51.204253Z",
+      "label": "TOUCH",
+      "member_id": "T21-WATCH-61ce24fc3fa04e3eaba7",
+      "observed_measures": {
+        "actual_elapsed_from_member_p0_seconds": "0.0",
+        "panel_state": "OBSERVED"
+      },
+      "panel_id": "P0",
+      "path_state": "SPARSE_DISCRETE",
+      "quality_flags": [
+        "NO_FROZEN_REFERENCE_THRESHOLD_IN_TRACKED_PROJECTION",
+        "NO_OBSERVED_THRESHOLD_CROSS_FIELD",
+        "SPARSE_PANEL"
+      ],
+      "record_id": "T25-R2-0037",
+      "route_state_observed": "NOT_APPLICABLE",
+      "source_content_sha256": "b0f61b312defd68341b1282ad40a80e6dc865ad23a279a85b0dc6abac3a8863f",
+      "source_scope": "T21_R2_DEVELOPMENT",
+      "tested_notional_usd": null,
+      "unit": null,
+      "value_decimal": null
+    },
+    {
+      "assessment": "UNKNOWN",
+      "cashflow_state": "NOT_APPLICABLE",
+      "claim_scope": "POINT_IN_TIME_QUOTE",
+      "evidence_basis": "CONTEMPORANEOUS_QUOTE",
+      "fill_state": "ACTUAL_FILLS_NOT_OBSERVED",
+      "first_reliable_available_at": "2026-08-01T11:47:35.811752Z",
+      "label": "FILLABLE",
+      "member_id": "T21-WATCH-61ce24fc3fa04e3eaba7",
+      "observed_measures": {
+        "actual_elapsed_from_member_p0_seconds": "0.0",
+        "buy_input_atomic": "10000000",
+        "buy_price_impact_pct": "0.0294531034514023176578597119",
+        "buy_route_count": "3",
+        "panel_state": "OBSERVED"
+      },
+      "panel_id": "P0",
+      "path_state": "NOT_APPLICABLE",
+      "quality_flags": [
+        "BUY_QUOTE_STATE_OBSERVED",
+        "EXACT_OUTPUT_MINT_AND_FRESHNESS_BLOCK_NOT_RETAINED",
+        "QUOTE_IS_NOT_FILL"
+      ],
+      "record_id": "T25-R2-0038",
+      "route_state_observed": "QUOTE_AVAILABLE",
+      "source_content_sha256": "b0f61b312defd68341b1282ad40a80e6dc865ad23a279a85b0dc6abac3a8863f",
+      "source_scope": "T21_R2_DEVELOPMENT",
+      "tested_notional_usd": 10,
+      "unit": null,
+      "value_decimal": null
+    },
+    {
+      "assessment": "UNKNOWN",
+      "cashflow_state": "NOT_APPLICABLE",
+      "claim_scope": "POINT_IN_TIME_QUOTE",
+      "evidence_basis": "CONTEMPORANEOUS_QUOTE",
+      "fill_state": "ACTUAL_FILLS_NOT_OBSERVED",
+      "first_reliable_available_at": "2026-08-01T11:47:38.007940Z",
+      "label": "QUOTE_EXIT",
+      "member_id": "T21-WATCH-61ce24fc3fa04e3eaba7",
+      "observed_measures": {
+        "actual_elapsed_from_member_p0_seconds": "0.0",
+        "panel_state": "OBSERVED",
+        "roundtrip_quote_retention_bps": "9682.616",
+        "sell_route_count": "3"
+      },
+      "panel_id": "P0",
+      "path_state": "UNOBSERVED",
+      "quality_flags": [
+        "DEPENDENT_SELL_QUOTE_STATE_OBSERVED",
+        "EXACT_FRESHNESS_BLOCK_NOT_RETAINED",
+        "EXACT_SELL_INVENTORY_ATOMIC_IDENTITY_NOT_RETAINED",
+        "QUOTE_EXIT_IS_NOT_LIQUIDATION"
+      ],
+      "record_id": "T25-R2-0039",
+      "route_state_observed": "QUOTE_AVAILABLE",
+      "source_content_sha256": "b0f61b312defd68341b1282ad40a80e6dc865ad23a279a85b0dc6abac3a8863f",
+      "source_scope": "T21_R2_DEVELOPMENT",
+      "tested_notional_usd": 10,
+      "unit": null,
+      "value_decimal": null
+    },
+    {
+      "assessment": "UNKNOWN",
+      "cashflow_state": "NOT_APPLICABLE",
+      "claim_scope": "POINT_IN_TIME_QUOTE",
+      "evidence_basis": "CONTEMPORANEOUS_QUOTE",
+      "fill_state": "ACTUAL_FILLS_NOT_OBSERVED",
+      "first_reliable_available_at": "2026-08-01T11:47:40.192135Z",
+      "label": "FILLABLE",
+      "member_id": "T21-WATCH-61ce24fc3fa04e3eaba7",
+      "observed_measures": {
+        "actual_elapsed_from_member_p0_seconds": "0.0",
+        "buy_input_atomic": "25000000",
+        "buy_price_impact_pct": "0.0347305180397079641043566261",
+        "buy_route_count": "3",
+        "panel_state": "OBSERVED"
+      },
+      "panel_id": "P0",
+      "path_state": "NOT_APPLICABLE",
+      "quality_flags": [
+        "BUY_QUOTE_STATE_OBSERVED",
+        "EXACT_OUTPUT_MINT_AND_FRESHNESS_BLOCK_NOT_RETAINED",
+        "QUOTE_IS_NOT_FILL"
+      ],
+      "record_id": "T25-R2-0040",
+      "route_state_observed": "QUOTE_AVAILABLE",
+      "source_content_sha256": "b0f61b312defd68341b1282ad40a80e6dc865ad23a279a85b0dc6abac3a8863f",
+      "source_scope": "T21_R2_DEVELOPMENT",
+      "tested_notional_usd": 25,
+      "unit": null,
+      "value_decimal": null
+    },
+    {
+      "assessment": "UNKNOWN",
+      "cashflow_state": "NOT_APPLICABLE",
+      "claim_scope": "POINT_IN_TIME_QUOTE",
+      "evidence_basis": "CONTEMPORANEOUS_QUOTE",
+      "fill_state": "ACTUAL_FILLS_NOT_OBSERVED",
+      "first_reliable_available_at": "2026-08-01T11:47:42.405226Z",
+      "label": "QUOTE_EXIT",
+      "member_id": "T21-WATCH-61ce24fc3fa04e3eaba7",
+      "observed_measures": {
+        "actual_elapsed_from_member_p0_seconds": "0.0",
+        "panel_state": "OBSERVED",
+        "roundtrip_quote_retention_bps": "9577.98",
+        "sell_route_count": "2"
+      },
+      "panel_id": "P0",
+      "path_state": "UNOBSERVED",
+      "quality_flags": [
+        "DEPENDENT_SELL_QUOTE_STATE_OBSERVED",
+        "EXACT_FRESHNESS_BLOCK_NOT_RETAINED",
+        "EXACT_SELL_INVENTORY_ATOMIC_IDENTITY_NOT_RETAINED",
+        "QUOTE_EXIT_IS_NOT_LIQUIDATION"
+      ],
+      "record_id": "T25-R2-0041",
+      "route_state_observed": "QUOTE_AVAILABLE",
+      "source_content_sha256": "b0f61b312defd68341b1282ad40a80e6dc865ad23a279a85b0dc6abac3a8863f",
+      "source_scope": "T21_R2_DEVELOPMENT",
+      "tested_notional_usd": 25,
+      "unit": null,
+      "value_decimal": null
+    },
+    {
+      "assessment": "UNKNOWN",
+      "cashflow_state": "NOT_APPLICABLE",
+      "claim_scope": "POINT_IN_TIME_QUOTE",
+      "evidence_basis": "CONTEMPORANEOUS_QUOTE",
+      "fill_state": "ACTUAL_FILLS_NOT_OBSERVED",
+      "first_reliable_available_at": "2026-08-01T11:47:44.734963Z",
+      "label": "FILLABLE",
+      "member_id": "T21-WATCH-61ce24fc3fa04e3eaba7",
+      "observed_measures": {
+        "actual_elapsed_from_member_p0_seconds": "0.0",
+        "buy_input_atomic": "50000000",
+        "buy_price_impact_pct": "0.043397818947027856253849252",
+        "buy_route_count": "3",
+        "panel_state": "OBSERVED"
+      },
+      "panel_id": "P0",
+      "path_state": "NOT_APPLICABLE",
+      "quality_flags": [
+        "BUY_QUOTE_STATE_OBSERVED",
+        "EXACT_OUTPUT_MINT_AND_FRESHNESS_BLOCK_NOT_RETAINED",
+        "QUOTE_IS_NOT_FILL"
+      ],
+      "record_id": "T25-R2-0042",
+      "route_state_observed": "QUOTE_AVAILABLE",
+      "source_content_sha256": "b0f61b312defd68341b1282ad40a80e6dc865ad23a279a85b0dc6abac3a8863f",
+      "source_scope": "T21_R2_DEVELOPMENT",
+      "tested_notional_usd": 50,
+      "unit": null,
+      "value_decimal": null
+    },
+    {
+      "assessment": "UNKNOWN",
+      "cashflow_state": "NOT_APPLICABLE",
+      "claim_scope": "POINT_IN_TIME_QUOTE",
+      "evidence_basis": "CONTEMPORANEOUS_QUOTE",
+      "fill_state": "ACTUAL_FILLS_NOT_OBSERVED",
+      "first_reliable_available_at": "2026-08-01T11:47:46.771406Z",
+      "label": "QUOTE_EXIT",
+      "member_id": "T21-WATCH-61ce24fc3fa04e3eaba7",
+      "observed_measures": {
+        "actual_elapsed_from_member_p0_seconds": "0.0",
+        "panel_state": "OBSERVED",
+        "roundtrip_quote_retention_bps": "9409.2152",
+        "sell_route_count": "2"
+      },
+      "panel_id": "P0",
+      "path_state": "UNOBSERVED",
+      "quality_flags": [
+        "DEPENDENT_SELL_QUOTE_STATE_OBSERVED",
+        "EXACT_FRESHNESS_BLOCK_NOT_RETAINED",
+        "EXACT_SELL_INVENTORY_ATOMIC_IDENTITY_NOT_RETAINED",
+        "QUOTE_EXIT_IS_NOT_LIQUIDATION"
+      ],
+      "record_id": "T25-R2-0043",
+      "route_state_observed": "QUOTE_AVAILABLE",
+      "source_content_sha256": "b0f61b312defd68341b1282ad40a80e6dc865ad23a279a85b0dc6abac3a8863f",
+      "source_scope": "T21_R2_DEVELOPMENT",
+      "tested_notional_usd": 50,
+      "unit": null,
+      "value_decimal": null
+    },
+    {
+      "assessment": "UNKNOWN",
+      "cashflow_state": "NOT_APPLICABLE",
+      "claim_scope": "POINT_IN_TIME_QUOTE",
+      "evidence_basis": "CONTEMPORANEOUS_QUOTE",
+      "fill_state": "ACTUAL_FILLS_NOT_OBSERVED",
+      "first_reliable_available_at": "2026-08-01T11:47:48.944597Z",
+      "label": "FILLABLE",
+      "member_id": "T21-WATCH-61ce24fc3fa04e3eaba7",
+      "observed_measures": {
+        "actual_elapsed_from_member_p0_seconds": "0.0",
+        "buy_input_atomic": "100000000",
+        "buy_price_impact_pct": "0.0602717176160986740282273747",
+        "buy_route_count": "3",
+        "panel_state": "OBSERVED"
+      },
+      "panel_id": "P0",
+      "path_state": "NOT_APPLICABLE",
+      "quality_flags": [
+        "BUY_QUOTE_STATE_OBSERVED",
+        "EXACT_OUTPUT_MINT_AND_FRESHNESS_BLOCK_NOT_RETAINED",
+        "QUOTE_IS_NOT_FILL"
+      ],
+      "record_id": "T25-R2-0044",
+      "route_state_observed": "QUOTE_AVAILABLE",
+      "source_content_sha256": "b0f61b312defd68341b1282ad40a80e6dc865ad23a279a85b0dc6abac3a8863f",
+      "source_scope": "T21_R2_DEVELOPMENT",
+      "tested_notional_usd": 100,
+      "unit": null,
+      "value_decimal": null
+    },
+    {
+      "assessment": "UNKNOWN",
+      "cashflow_state": "NOT_APPLICABLE",
+      "claim_scope": "POINT_IN_TIME_QUOTE",
+      "evidence_basis": "CONTEMPORANEOUS_QUOTE",
+      "fill_state": "ACTUAL_FILLS_NOT_OBSERVED",
+      "first_reliable_available_at": "2026-08-01T11:47:51.204253Z",
+      "label": "QUOTE_EXIT",
+      "member_id": "T21-WATCH-61ce24fc3fa04e3eaba7",
+      "observed_measures": {
+        "actual_elapsed_from_member_p0_seconds": "0.0",
+        "panel_state": "OBSERVED",
+        "roundtrip_quote_retention_bps": "9088.7244",
+        "sell_route_count": "2"
+      },
+      "panel_id": "P0",
+      "path_state": "UNOBSERVED",
+      "quality_flags": [
+        "DEPENDENT_SELL_QUOTE_STATE_OBSERVED",
+        "EXACT_FRESHNESS_BLOCK_NOT_RETAINED",
+        "EXACT_SELL_INVENTORY_ATOMIC_IDENTITY_NOT_RETAINED",
+        "QUOTE_EXIT_IS_NOT_LIQUIDATION"
+      ],
+      "record_id": "T25-R2-0045",
+      "route_state_observed": "QUOTE_AVAILABLE",
+      "source_content_sha256": "b0f61b312defd68341b1282ad40a80e6dc865ad23a279a85b0dc6abac3a8863f",
+      "source_scope": "T21_R2_DEVELOPMENT",
+      "tested_notional_usd": 100,
+      "unit": null,
+      "value_decimal": null
+    },
+    {
+      "assessment": "UNKNOWN",
+      "cashflow_state": "NOT_APPLICABLE",
+      "claim_scope": "ACTUAL_FILL_SERIES",
+      "evidence_basis": "NONE",
+      "fill_state": "ACTUAL_FILLS_NOT_OBSERVED",
+      "first_reliable_available_at": "2026-08-01T11:47:51.204253Z",
+      "label": "REALIZED_VWAP",
+      "member_id": "T21-WATCH-61ce24fc3fa04e3eaba7",
+      "observed_measures": {
+        "actual_elapsed_from_member_p0_seconds": "0.0",
+        "panel_state": "OBSERVED"
+      },
+      "panel_id": "P0",
+      "path_state": "NOT_APPLICABLE",
+      "quality_flags": [
+        "ACTUAL_FILLS_NOT_OBSERVED",
+        "QUOTE_RETENTION_IS_NOT_REALIZED_VWAP"
+      ],
+      "record_id": "T25-R2-0046",
+      "route_state_observed": "NOT_APPLICABLE",
+      "source_content_sha256": "b0f61b312defd68341b1282ad40a80e6dc865ad23a279a85b0dc6abac3a8863f",
+      "source_scope": "T21_R2_DEVELOPMENT",
+      "tested_notional_usd": null,
+      "unit": null,
+      "value_decimal": null
+    },
+    {
+      "assessment": "UNKNOWN",
+      "cashflow_state": "CASHFLOW_NOT_OBSERVED",
+      "claim_scope": "SETTLED_CASHFLOW",
+      "evidence_basis": "NONE",
+      "fill_state": "NOT_APPLICABLE",
+      "first_reliable_available_at": "2026-08-01T11:47:51.204253Z",
+      "label": "NET",
+      "member_id": "T21-WATCH-61ce24fc3fa04e3eaba7",
+      "observed_measures": {
+        "actual_elapsed_from_member_p0_seconds": "0.0",
+        "panel_state": "OBSERVED"
+      },
+      "panel_id": "P0",
+      "path_state": "NOT_APPLICABLE",
+      "quality_flags": [
+        "SETTLED_CASHFLOW_NOT_OBSERVED",
+        "TASK26_FEE_AND_CASHFLOW_MODEL_NOT_AVAILABLE"
+      ],
+      "record_id": "T25-R2-0047",
+      "route_state_observed": "NOT_APPLICABLE",
+      "source_content_sha256": "b0f61b312defd68341b1282ad40a80e6dc865ad23a279a85b0dc6abac3a8863f",
+      "source_scope": "T21_R2_DEVELOPMENT",
+      "tested_notional_usd": null,
+      "unit": null,
+      "value_decimal": null
+    },
+    {
+      "assessment": "SUPPORTED",
+      "cashflow_state": "NOT_APPLICABLE",
+      "claim_scope": "DISCRETE_PATH_GRID",
+      "evidence_basis": "DISCRETE_PANEL_GRID",
+      "fill_state": "NOT_APPLICABLE",
+      "first_reliable_available_at": "2026-08-01T11:47:51.204253Z",
+      "label": "PATH_RISK",
+      "member_id": "T21-WATCH-61ce24fc3fa04e3eaba7",
+      "observed_measures": {
+        "actual_elapsed_from_member_p0_seconds": "0.0",
+        "notionals_usd": [
+          10,
+          25,
+          50,
+          100
+        ],
+        "panel_state": "OBSERVED",
+        "quote_notional_capacity_proxy_usd": "100",
+        "worst_observed_roundtrip_quote_return_decimal": "-0.091128"
+      },
+      "panel_id": "P0",
+      "path_state": "SPARSE_DISCRETE",
+      "quality_flags": [
+        "ACTUAL_SPARSE_PANEL_TIMES",
+        "CONTINUOUS_MAE_MFE_FORBIDDEN",
+        "QUOTE_IMPLIED_NOT_REALIZED",
+        "WORST_NOTIONAL_DETERIORATION_FROM_MEMBER_P0"
+      ],
+      "record_id": "T25-R2-0048",
+      "route_state_observed": "NOT_APPLICABLE",
+      "source_content_sha256": "b0f61b312defd68341b1282ad40a80e6dc865ad23a279a85b0dc6abac3a8863f",
+      "source_scope": "T21_R2_DEVELOPMENT",
+      "tested_notional_usd": null,
+      "unit": "RETURN_DECIMAL",
+      "value_decimal": "0.000000"
+    },
+    {
+      "assessment": "UNKNOWN",
+      "cashflow_state": "NOT_APPLICABLE",
+      "claim_scope": "TOUCH_WITHIN_HORIZON",
+      "evidence_basis": "DISCRETE_PANEL_GRID",
+      "fill_state": "NOT_APPLICABLE",
+      "first_reliable_available_at": "2026-08-01T12:26:59.211463Z",
+      "label": "TOUCH",
+      "member_id": "T21-WATCH-61ce24fc3fa04e3eaba7",
+      "observed_measures": {
+        "actual_elapsed_from_member_p0_seconds": "2347.885847",
+        "panel_state": "OBSERVED"
+      },
+      "panel_id": "P1",
+      "path_state": "SPARSE_DISCRETE",
+      "quality_flags": [
+        "NO_FROZEN_REFERENCE_THRESHOLD_IN_TRACKED_PROJECTION",
+        "NO_OBSERVED_THRESHOLD_CROSS_FIELD",
+        "SPARSE_PANEL"
+      ],
+      "record_id": "T25-R2-0049",
+      "route_state_observed": "NOT_APPLICABLE",
+      "source_content_sha256": "146d759f9223eb5fcae4ba94a3431765f7c37c1442a2211730a098f4214c5d36",
+      "source_scope": "T21_R2_DEVELOPMENT",
+      "tested_notional_usd": null,
+      "unit": null,
+      "value_decimal": null
+    },
+    {
+      "assessment": "UNKNOWN",
+      "cashflow_state": "NOT_APPLICABLE",
+      "claim_scope": "POINT_IN_TIME_QUOTE",
+      "evidence_basis": "CONTEMPORANEOUS_QUOTE",
+      "fill_state": "ACTUAL_FILLS_NOT_OBSERVED",
+      "first_reliable_available_at": "2026-08-01T12:26:43.697599Z",
+      "label": "FILLABLE",
+      "member_id": "T21-WATCH-61ce24fc3fa04e3eaba7",
+      "observed_measures": {
+        "actual_elapsed_from_member_p0_seconds": "2347.885847",
+        "buy_input_atomic": "10000000",
+        "buy_price_impact_pct": "0.0144215667989287348657124834",
+        "buy_route_count": "2",
+        "panel_state": "OBSERVED"
+      },
+      "panel_id": "P1",
+      "path_state": "NOT_APPLICABLE",
+      "quality_flags": [
+        "BUY_QUOTE_STATE_OBSERVED",
+        "EXACT_OUTPUT_MINT_AND_FRESHNESS_BLOCK_NOT_RETAINED",
+        "QUOTE_IS_NOT_FILL"
+      ],
+      "record_id": "T25-R2-0050",
+      "route_state_observed": "QUOTE_AVAILABLE",
+      "source_content_sha256": "146d759f9223eb5fcae4ba94a3431765f7c37c1442a2211730a098f4214c5d36",
+      "source_scope": "T21_R2_DEVELOPMENT",
+      "tested_notional_usd": 10,
+      "unit": null,
+      "value_decimal": null
+    },
+    {
+      "assessment": "UNKNOWN",
+      "cashflow_state": "NOT_APPLICABLE",
+      "claim_scope": "POINT_IN_TIME_QUOTE",
+      "evidence_basis": "CONTEMPORANEOUS_QUOTE",
+      "fill_state": "ACTUAL_FILLS_NOT_OBSERVED",
+      "first_reliable_available_at": "2026-08-01T12:26:45.956558Z",
+      "label": "QUOTE_EXIT",
+      "member_id": "T21-WATCH-61ce24fc3fa04e3eaba7",
+      "observed_measures": {
+        "actual_elapsed_from_member_p0_seconds": "2347.885847",
+        "panel_state": "OBSERVED",
+        "roundtrip_quote_retention_bps": "9677.226",
+        "sell_route_count": "2"
+      },
+      "panel_id": "P1",
+      "path_state": "UNOBSERVED",
+      "quality_flags": [
+        "DEPENDENT_SELL_QUOTE_STATE_OBSERVED",
+        "EXACT_FRESHNESS_BLOCK_NOT_RETAINED",
+        "EXACT_SELL_INVENTORY_ATOMIC_IDENTITY_NOT_RETAINED",
+        "QUOTE_EXIT_IS_NOT_LIQUIDATION"
+      ],
+      "record_id": "T25-R2-0051",
+      "route_state_observed": "QUOTE_AVAILABLE",
+      "source_content_sha256": "146d759f9223eb5fcae4ba94a3431765f7c37c1442a2211730a098f4214c5d36",
+      "source_scope": "T21_R2_DEVELOPMENT",
+      "tested_notional_usd": 10,
+      "unit": null,
+      "value_decimal": null
+    },
+    {
+      "assessment": "UNKNOWN",
+      "cashflow_state": "NOT_APPLICABLE",
+      "claim_scope": "POINT_IN_TIME_QUOTE",
+      "evidence_basis": "CONTEMPORANEOUS_QUOTE",
+      "fill_state": "ACTUAL_FILLS_NOT_OBSERVED",
+      "first_reliable_available_at": "2026-08-01T12:26:48.132028Z",
+      "label": "FILLABLE",
+      "member_id": "T21-WATCH-61ce24fc3fa04e3eaba7",
+      "observed_measures": {
+        "actual_elapsed_from_member_p0_seconds": "2347.885847",
+        "buy_input_atomic": "25000000",
+        "buy_price_impact_pct": "0.0201717379991904240048736444",
+        "buy_route_count": "2",
+        "panel_state": "OBSERVED"
+      },
+      "panel_id": "P1",
+      "path_state": "NOT_APPLICABLE",
+      "quality_flags": [
+        "BUY_QUOTE_STATE_OBSERVED",
+        "EXACT_OUTPUT_MINT_AND_FRESHNESS_BLOCK_NOT_RETAINED",
+        "QUOTE_IS_NOT_FILL"
+      ],
+      "record_id": "T25-R2-0052",
+      "route_state_observed": "QUOTE_AVAILABLE",
+      "source_content_sha256": "146d759f9223eb5fcae4ba94a3431765f7c37c1442a2211730a098f4214c5d36",
+      "source_scope": "T21_R2_DEVELOPMENT",
+      "tested_notional_usd": 25,
+      "unit": null,
+      "value_decimal": null
+    },
+    {
+      "assessment": "UNKNOWN",
+      "cashflow_state": "NOT_APPLICABLE",
+      "claim_scope": "POINT_IN_TIME_QUOTE",
+      "evidence_basis": "CONTEMPORANEOUS_QUOTE",
+      "fill_state": "ACTUAL_FILLS_NOT_OBSERVED",
+      "first_reliable_available_at": "2026-08-01T12:26:50.306481Z",
+      "label": "QUOTE_EXIT",
+      "member_id": "T21-WATCH-61ce24fc3fa04e3eaba7",
+      "observed_measures": {
+        "actual_elapsed_from_member_p0_seconds": "2347.885847",
+        "panel_state": "OBSERVED",
+        "roundtrip_quote_retention_bps": "9565.5068",
+        "sell_route_count": "2"
+      },
+      "panel_id": "P1",
+      "path_state": "UNOBSERVED",
+      "quality_flags": [
+        "DEPENDENT_SELL_QUOTE_STATE_OBSERVED",
+        "EXACT_FRESHNESS_BLOCK_NOT_RETAINED",
+        "EXACT_SELL_INVENTORY_ATOMIC_IDENTITY_NOT_RETAINED",
+        "QUOTE_EXIT_IS_NOT_LIQUIDATION"
+      ],
+      "record_id": "T25-R2-0053",
+      "route_state_observed": "QUOTE_AVAILABLE",
+      "source_content_sha256": "146d759f9223eb5fcae4ba94a3431765f7c37c1442a2211730a098f4214c5d36",
+      "source_scope": "T21_R2_DEVELOPMENT",
+      "tested_notional_usd": 25,
+      "unit": null,
+      "value_decimal": null
+    },
+    {
+      "assessment": "UNKNOWN",
+      "cashflow_state": "NOT_APPLICABLE",
+      "claim_scope": "POINT_IN_TIME_QUOTE",
+      "evidence_basis": "CONTEMPORANEOUS_QUOTE",
+      "fill_state": "ACTUAL_FILLS_NOT_OBSERVED",
+      "first_reliable_available_at": "2026-08-01T12:26:52.586948Z",
+      "label": "FILLABLE",
+      "member_id": "T21-WATCH-61ce24fc3fa04e3eaba7",
+      "observed_measures": {
+        "actual_elapsed_from_member_p0_seconds": "2347.885847",
+        "buy_input_atomic": "50000000",
+        "buy_price_impact_pct": "0.0295867878944403646679026305",
+        "buy_route_count": "2",
+        "panel_state": "OBSERVED"
+      },
+      "panel_id": "P1",
+      "path_state": "NOT_APPLICABLE",
+      "quality_flags": [
+        "BUY_QUOTE_STATE_OBSERVED",
+        "EXACT_OUTPUT_MINT_AND_FRESHNESS_BLOCK_NOT_RETAINED",
+        "QUOTE_IS_NOT_FILL"
+      ],
+      "record_id": "T25-R2-0054",
+      "route_state_observed": "QUOTE_AVAILABLE",
+      "source_content_sha256": "146d759f9223eb5fcae4ba94a3431765f7c37c1442a2211730a098f4214c5d36",
+      "source_scope": "T21_R2_DEVELOPMENT",
+      "tested_notional_usd": 50,
+      "unit": null,
+      "value_decimal": null
+    },
+    {
+      "assessment": "UNKNOWN",
+      "cashflow_state": "NOT_APPLICABLE",
+      "claim_scope": "POINT_IN_TIME_QUOTE",
+      "evidence_basis": "CONTEMPORANEOUS_QUOTE",
+      "fill_state": "ACTUAL_FILLS_NOT_OBSERVED",
+      "first_reliable_available_at": "2026-08-01T12:26:54.804019Z",
+      "label": "QUOTE_EXIT",
+      "member_id": "T21-WATCH-61ce24fc3fa04e3eaba7",
+      "observed_measures": {
+        "actual_elapsed_from_member_p0_seconds": "2347.885847",
+        "panel_state": "OBSERVED",
+        "roundtrip_quote_retention_bps": "9384.9738",
+        "sell_route_count": "2"
+      },
+      "panel_id": "P1",
+      "path_state": "UNOBSERVED",
+      "quality_flags": [
+        "DEPENDENT_SELL_QUOTE_STATE_OBSERVED",
+        "EXACT_FRESHNESS_BLOCK_NOT_RETAINED",
+        "EXACT_SELL_INVENTORY_ATOMIC_IDENTITY_NOT_RETAINED",
+        "QUOTE_EXIT_IS_NOT_LIQUIDATION"
+      ],
+      "record_id": "T25-R2-0055",
+      "route_state_observed": "QUOTE_AVAILABLE",
+      "source_content_sha256": "146d759f9223eb5fcae4ba94a3431765f7c37c1442a2211730a098f4214c5d36",
+      "source_scope": "T21_R2_DEVELOPMENT",
+      "tested_notional_usd": 50,
+      "unit": null,
+      "value_decimal": null
+    },
+    {
+      "assessment": "UNKNOWN",
+      "cashflow_state": "NOT_APPLICABLE",
+      "claim_scope": "POINT_IN_TIME_QUOTE",
+      "evidence_basis": "CONTEMPORANEOUS_QUOTE",
+      "fill_state": "ACTUAL_FILLS_NOT_OBSERVED",
+      "first_reliable_available_at": "2026-08-01T12:26:56.904401Z",
+      "label": "FILLABLE",
+      "member_id": "T21-WATCH-61ce24fc3fa04e3eaba7",
+      "observed_measures": {
+        "actual_elapsed_from_member_p0_seconds": "2347.885847",
+        "buy_input_atomic": "100000000",
+        "buy_price_impact_pct": "0.0478798033361864953299852417",
+        "buy_route_count": "3",
+        "panel_state": "OBSERVED"
+      },
+      "panel_id": "P1",
+      "path_state": "NOT_APPLICABLE",
+      "quality_flags": [
+        "BUY_QUOTE_STATE_OBSERVED",
+        "EXACT_OUTPUT_MINT_AND_FRESHNESS_BLOCK_NOT_RETAINED",
+        "QUOTE_IS_NOT_FILL"
+      ],
+      "record_id": "T25-R2-0056",
+      "route_state_observed": "QUOTE_AVAILABLE",
+      "source_content_sha256": "146d759f9223eb5fcae4ba94a3431765f7c37c1442a2211730a098f4214c5d36",
+      "source_scope": "T21_R2_DEVELOPMENT",
+      "tested_notional_usd": 100,
+      "unit": null,
+      "value_decimal": null
+    },
+    {
+      "assessment": "UNKNOWN",
+      "cashflow_state": "NOT_APPLICABLE",
+      "claim_scope": "POINT_IN_TIME_QUOTE",
+      "evidence_basis": "CONTEMPORANEOUS_QUOTE",
+      "fill_state": "ACTUAL_FILLS_NOT_OBSERVED",
+      "first_reliable_available_at": "2026-08-01T12:26:59.211463Z",
+      "label": "QUOTE_EXIT",
+      "member_id": "T21-WATCH-61ce24fc3fa04e3eaba7",
+      "observed_measures": {
+        "actual_elapsed_from_member_p0_seconds": "2347.885847",
+        "panel_state": "OBSERVED",
+        "roundtrip_quote_retention_bps": "9043.9614",
+        "sell_route_count": "2"
+      },
+      "panel_id": "P1",
+      "path_state": "UNOBSERVED",
+      "quality_flags": [
+        "DEPENDENT_SELL_QUOTE_STATE_OBSERVED",
+        "EXACT_FRESHNESS_BLOCK_NOT_RETAINED",
+        "EXACT_SELL_INVENTORY_ATOMIC_IDENTITY_NOT_RETAINED",
+        "QUOTE_EXIT_IS_NOT_LIQUIDATION"
+      ],
+      "record_id": "T25-R2-0057",
+      "route_state_observed": "QUOTE_AVAILABLE",
+      "source_content_sha256": "146d759f9223eb5fcae4ba94a3431765f7c37c1442a2211730a098f4214c5d36",
+      "source_scope": "T21_R2_DEVELOPMENT",
+      "tested_notional_usd": 100,
+      "unit": null,
+      "value_decimal": null
+    },
+    {
+      "assessment": "UNKNOWN",
+      "cashflow_state": "NOT_APPLICABLE",
+      "claim_scope": "ACTUAL_FILL_SERIES",
+      "evidence_basis": "NONE",
+      "fill_state": "ACTUAL_FILLS_NOT_OBSERVED",
+      "first_reliable_available_at": "2026-08-01T12:26:59.211463Z",
+      "label": "REALIZED_VWAP",
+      "member_id": "T21-WATCH-61ce24fc3fa04e3eaba7",
+      "observed_measures": {
+        "actual_elapsed_from_member_p0_seconds": "2347.885847",
+        "panel_state": "OBSERVED"
+      },
+      "panel_id": "P1",
+      "path_state": "NOT_APPLICABLE",
+      "quality_flags": [
+        "ACTUAL_FILLS_NOT_OBSERVED",
+        "QUOTE_RETENTION_IS_NOT_REALIZED_VWAP"
+      ],
+      "record_id": "T25-R2-0058",
+      "route_state_observed": "NOT_APPLICABLE",
+      "source_content_sha256": "146d759f9223eb5fcae4ba94a3431765f7c37c1442a2211730a098f4214c5d36",
+      "source_scope": "T21_R2_DEVELOPMENT",
+      "tested_notional_usd": null,
+      "unit": null,
+      "value_decimal": null
+    },
+    {
+      "assessment": "UNKNOWN",
+      "cashflow_state": "CASHFLOW_NOT_OBSERVED",
+      "claim_scope": "SETTLED_CASHFLOW",
+      "evidence_basis": "NONE",
+      "fill_state": "NOT_APPLICABLE",
+      "first_reliable_available_at": "2026-08-01T12:26:59.211463Z",
+      "label": "NET",
+      "member_id": "T21-WATCH-61ce24fc3fa04e3eaba7",
+      "observed_measures": {
+        "actual_elapsed_from_member_p0_seconds": "2347.885847",
+        "panel_state": "OBSERVED"
+      },
+      "panel_id": "P1",
+      "path_state": "NOT_APPLICABLE",
+      "quality_flags": [
+        "SETTLED_CASHFLOW_NOT_OBSERVED",
+        "TASK26_FEE_AND_CASHFLOW_MODEL_NOT_AVAILABLE"
+      ],
+      "record_id": "T25-R2-0059",
+      "route_state_observed": "NOT_APPLICABLE",
+      "source_content_sha256": "146d759f9223eb5fcae4ba94a3431765f7c37c1442a2211730a098f4214c5d36",
+      "source_scope": "T21_R2_DEVELOPMENT",
+      "tested_notional_usd": null,
+      "unit": null,
+      "value_decimal": null
+    },
+    {
+      "assessment": "SUPPORTED",
+      "cashflow_state": "NOT_APPLICABLE",
+      "claim_scope": "DISCRETE_PATH_GRID",
+      "evidence_basis": "DISCRETE_PANEL_GRID",
+      "fill_state": "NOT_APPLICABLE",
+      "first_reliable_available_at": "2026-08-01T12:26:59.211463Z",
+      "label": "PATH_RISK",
+      "member_id": "T21-WATCH-61ce24fc3fa04e3eaba7",
+      "observed_measures": {
+        "actual_elapsed_from_member_p0_seconds": "2347.885847",
+        "notionals_usd": [
+          10,
+          25,
+          50,
+          100
+        ],
+        "panel_state": "OBSERVED",
+        "quote_notional_capacity_proxy_usd": "100",
+        "worst_observed_roundtrip_quote_return_decimal": "-0.095604"
+      },
+      "panel_id": "P1",
+      "path_state": "SPARSE_DISCRETE",
+      "quality_flags": [
+        "ACTUAL_SPARSE_PANEL_TIMES",
+        "CONTINUOUS_MAE_MFE_FORBIDDEN",
+        "QUOTE_IMPLIED_NOT_REALIZED",
+        "WORST_NOTIONAL_DETERIORATION_FROM_MEMBER_P0"
+      ],
+      "record_id": "T25-R2-0060",
+      "route_state_observed": "NOT_APPLICABLE",
+      "source_content_sha256": "146d759f9223eb5fcae4ba94a3431765f7c37c1442a2211730a098f4214c5d36",
+      "source_scope": "T21_R2_DEVELOPMENT",
+      "tested_notional_usd": null,
+      "unit": "RETURN_DECIMAL",
+      "value_decimal": "0.004476"
+    },
+    {
+      "assessment": "UNKNOWN",
+      "cashflow_state": "NOT_APPLICABLE",
+      "claim_scope": "TOUCH_WITHIN_HORIZON",
+      "evidence_basis": "DISCRETE_PANEL_GRID",
+      "fill_state": "NOT_APPLICABLE",
+      "first_reliable_available_at": "2026-08-01T13:11:54.055152Z",
+      "label": "TOUCH",
+      "member_id": "T21-WATCH-61ce24fc3fa04e3eaba7",
+      "observed_measures": {
+        "actual_elapsed_from_member_p0_seconds": "5042.839916",
+        "panel_state": "OBSERVED"
+      },
+      "panel_id": "P2",
+      "path_state": "SPARSE_DISCRETE",
+      "quality_flags": [
+        "NO_FROZEN_REFERENCE_THRESHOLD_IN_TRACKED_PROJECTION",
+        "NO_OBSERVED_THRESHOLD_CROSS_FIELD",
+        "SPARSE_PANEL"
+      ],
+      "record_id": "T25-R2-0061",
+      "route_state_observed": "NOT_APPLICABLE",
+      "source_content_sha256": "d66347571e142a68c682492790af799854c95fd646537dddc99fc07d9a44b3d1",
+      "source_scope": "T21_R2_DEVELOPMENT",
+      "tested_notional_usd": null,
+      "unit": null,
+      "value_decimal": null
+    },
+    {
+      "assessment": "UNKNOWN",
+      "cashflow_state": "NOT_APPLICABLE",
+      "claim_scope": "POINT_IN_TIME_QUOTE",
+      "evidence_basis": "CONTEMPORANEOUS_QUOTE",
+      "fill_state": "ACTUAL_FILLS_NOT_OBSERVED",
+      "first_reliable_available_at": "2026-08-01T13:11:38.651668Z",
+      "label": "FILLABLE",
+      "member_id": "T21-WATCH-61ce24fc3fa04e3eaba7",
+      "observed_measures": {
+        "actual_elapsed_from_member_p0_seconds": "5042.839916",
+        "buy_input_atomic": "10000000",
+        "buy_price_impact_pct": "0.0148894071342523124590994694",
+        "buy_route_count": "3",
+        "panel_state": "OBSERVED"
+      },
+      "panel_id": "P2",
+      "path_state": "NOT_APPLICABLE",
+      "quality_flags": [
+        "BUY_QUOTE_STATE_OBSERVED",
+        "EXACT_OUTPUT_MINT_AND_FRESHNESS_BLOCK_NOT_RETAINED",
+        "QUOTE_IS_NOT_FILL"
+      ],
+      "record_id": "T25-R2-0062",
+      "route_state_observed": "QUOTE_AVAILABLE",
+      "source_content_sha256": "d66347571e142a68c682492790af799854c95fd646537dddc99fc07d9a44b3d1",
+      "source_scope": "T21_R2_DEVELOPMENT",
+      "tested_notional_usd": 10,
+      "unit": null,
+      "value_decimal": null
+    },
+    {
+      "assessment": "UNKNOWN",
+      "cashflow_state": "NOT_APPLICABLE",
+      "claim_scope": "POINT_IN_TIME_QUOTE",
+      "evidence_basis": "CONTEMPORANEOUS_QUOTE",
+      "fill_state": "ACTUAL_FILLS_NOT_OBSERVED",
+      "first_reliable_available_at": "2026-08-01T13:11:40.902580Z",
+      "label": "QUOTE_EXIT",
+      "member_id": "T21-WATCH-61ce24fc3fa04e3eaba7",
+      "observed_measures": {
+        "actual_elapsed_from_member_p0_seconds": "5042.839916",
+        "panel_state": "OBSERVED",
+        "roundtrip_quote_retention_bps": "9672.547",
+        "sell_route_count": "2"
+      },
+      "panel_id": "P2",
+      "path_state": "UNOBSERVED",
+      "quality_flags": [
+        "DEPENDENT_SELL_QUOTE_STATE_OBSERVED",
+        "EXACT_FRESHNESS_BLOCK_NOT_RETAINED",
+        "EXACT_SELL_INVENTORY_ATOMIC_IDENTITY_NOT_RETAINED",
+        "QUOTE_EXIT_IS_NOT_LIQUIDATION"
+      ],
+      "record_id": "T25-R2-0063",
+      "route_state_observed": "QUOTE_AVAILABLE",
+      "source_content_sha256": "d66347571e142a68c682492790af799854c95fd646537dddc99fc07d9a44b3d1",
+      "source_scope": "T21_R2_DEVELOPMENT",
+      "tested_notional_usd": 10,
+      "unit": null,
+      "value_decimal": null
+    },
+    {
+      "assessment": "UNKNOWN",
+      "cashflow_state": "NOT_APPLICABLE",
+      "claim_scope": "POINT_IN_TIME_QUOTE",
+      "evidence_basis": "CONTEMPORANEOUS_QUOTE",
+      "fill_state": "ACTUAL_FILLS_NOT_OBSERVED",
+      "first_reliable_available_at": "2026-08-01T13:11:43.076488Z",
+      "label": "FILLABLE",
+      "member_id": "T21-WATCH-61ce24fc3fa04e3eaba7",
+      "observed_measures": {
+        "actual_elapsed_from_member_p0_seconds": "5042.839916",
+        "buy_input_atomic": "25000000",
+        "buy_price_impact_pct": "0.0209045934852089608197554851",
+        "buy_route_count": "2",
+        "panel_state": "OBSERVED"
+      },
+      "panel_id": "P2",
+      "path_state": "NOT_APPLICABLE",
+      "quality_flags": [
+        "BUY_QUOTE_STATE_OBSERVED",
+        "EXACT_OUTPUT_MINT_AND_FRESHNESS_BLOCK_NOT_RETAINED",
+        "QUOTE_IS_NOT_FILL"
+      ],
+      "record_id": "T25-R2-0064",
+      "route_state_observed": "QUOTE_AVAILABLE",
+      "source_content_sha256": "d66347571e142a68c682492790af799854c95fd646537dddc99fc07d9a44b3d1",
+      "source_scope": "T21_R2_DEVELOPMENT",
+      "tested_notional_usd": 25,
+      "unit": null,
+      "value_decimal": null
+    },
+    {
+      "assessment": "UNKNOWN",
+      "cashflow_state": "NOT_APPLICABLE",
+      "claim_scope": "POINT_IN_TIME_QUOTE",
+      "evidence_basis": "CONTEMPORANEOUS_QUOTE",
+      "fill_state": "ACTUAL_FILLS_NOT_OBSERVED",
+      "first_reliable_available_at": "2026-08-01T13:11:45.248070Z",
+      "label": "QUOTE_EXIT",
+      "member_id": "T21-WATCH-61ce24fc3fa04e3eaba7",
+      "observed_measures": {
+        "actual_elapsed_from_member_p0_seconds": "5042.839916",
+        "panel_state": "OBSERVED",
+        "roundtrip_quote_retention_bps": "9554.7716",
+        "sell_route_count": "3"
+      },
+      "panel_id": "P2",
+      "path_state": "UNOBSERVED",
+      "quality_flags": [
+        "DEPENDENT_SELL_QUOTE_STATE_OBSERVED",
+        "EXACT_FRESHNESS_BLOCK_NOT_RETAINED",
+        "EXACT_SELL_INVENTORY_ATOMIC_IDENTITY_NOT_RETAINED",
+        "QUOTE_EXIT_IS_NOT_LIQUIDATION"
+      ],
+      "record_id": "T25-R2-0065",
+      "route_state_observed": "QUOTE_AVAILABLE",
+      "source_content_sha256": "d66347571e142a68c682492790af799854c95fd646537dddc99fc07d9a44b3d1",
+      "source_scope": "T21_R2_DEVELOPMENT",
+      "tested_notional_usd": 25,
+      "unit": null,
+      "value_decimal": null
+    },
+    {
+      "assessment": "UNKNOWN",
+      "cashflow_state": "NOT_APPLICABLE",
+      "claim_scope": "POINT_IN_TIME_QUOTE",
+      "evidence_basis": "CONTEMPORANEOUS_QUOTE",
+      "fill_state": "ACTUAL_FILLS_NOT_OBSERVED",
+      "first_reliable_available_at": "2026-08-01T13:11:47.502559Z",
+      "label": "FILLABLE",
+      "member_id": "T21-WATCH-61ce24fc3fa04e3eaba7",
+      "observed_measures": {
+        "actual_elapsed_from_member_p0_seconds": "5042.839916",
+        "buy_input_atomic": "50000000",
+        "buy_price_impact_pct": "0.030908375576972292152960444",
+        "buy_route_count": "2",
+        "panel_state": "OBSERVED"
+      },
+      "panel_id": "P2",
+      "path_state": "NOT_APPLICABLE",
+      "quality_flags": [
+        "BUY_QUOTE_STATE_OBSERVED",
+        "EXACT_OUTPUT_MINT_AND_FRESHNESS_BLOCK_NOT_RETAINED",
+        "QUOTE_IS_NOT_FILL"
+      ],
+      "record_id": "T25-R2-0066",
+      "route_state_observed": "QUOTE_AVAILABLE",
+      "source_content_sha256": "d66347571e142a68c682492790af799854c95fd646537dddc99fc07d9a44b3d1",
+      "source_scope": "T21_R2_DEVELOPMENT",
+      "tested_notional_usd": 50,
+      "unit": null,
+      "value_decimal": null
+    },
+    {
+      "assessment": "UNKNOWN",
+      "cashflow_state": "NOT_APPLICABLE",
+      "claim_scope": "POINT_IN_TIME_QUOTE",
+      "evidence_basis": "CONTEMPORANEOUS_QUOTE",
+      "fill_state": "ACTUAL_FILLS_NOT_OBSERVED",
+      "first_reliable_available_at": "2026-08-01T13:11:49.739276Z",
+      "label": "QUOTE_EXIT",
+      "member_id": "T21-WATCH-61ce24fc3fa04e3eaba7",
+      "observed_measures": {
+        "actual_elapsed_from_member_p0_seconds": "5042.839916",
+        "panel_state": "OBSERVED",
+        "roundtrip_quote_retention_bps": "9363.509",
+        "sell_route_count": "3"
+      },
+      "panel_id": "P2",
+      "path_state": "UNOBSERVED",
+      "quality_flags": [
+        "DEPENDENT_SELL_QUOTE_STATE_OBSERVED",
+        "EXACT_FRESHNESS_BLOCK_NOT_RETAINED",
+        "EXACT_SELL_INVENTORY_ATOMIC_IDENTITY_NOT_RETAINED",
+        "QUOTE_EXIT_IS_NOT_LIQUIDATION"
+      ],
+      "record_id": "T25-R2-0067",
+      "route_state_observed": "QUOTE_AVAILABLE",
+      "source_content_sha256": "d66347571e142a68c682492790af799854c95fd646537dddc99fc07d9a44b3d1",
+      "source_scope": "T21_R2_DEVELOPMENT",
+      "tested_notional_usd": 50,
+      "unit": null,
+      "value_decimal": null
+    },
+    {
+      "assessment": "UNKNOWN",
+      "cashflow_state": "NOT_APPLICABLE",
+      "claim_scope": "POINT_IN_TIME_QUOTE",
+      "evidence_basis": "CONTEMPORANEOUS_QUOTE",
+      "fill_state": "ACTUAL_FILLS_NOT_OBSERVED",
+      "first_reliable_available_at": "2026-08-01T13:11:51.925132Z",
+      "label": "FILLABLE",
+      "member_id": "T21-WATCH-61ce24fc3fa04e3eaba7",
+      "observed_measures": {
+        "actual_elapsed_from_member_p0_seconds": "5042.839916",
+        "buy_input_atomic": "100000000",
+        "buy_price_impact_pct": "0.0503071520394427991567645056",
+        "buy_route_count": "2",
+        "panel_state": "OBSERVED"
+      },
+      "panel_id": "P2",
+      "path_state": "NOT_APPLICABLE",
+      "quality_flags": [
+        "BUY_QUOTE_STATE_OBSERVED",
+        "EXACT_OUTPUT_MINT_AND_FRESHNESS_BLOCK_NOT_RETAINED",
+        "QUOTE_IS_NOT_FILL"
+      ],
+      "record_id": "T25-R2-0068",
+      "route_state_observed": "QUOTE_AVAILABLE",
+      "source_content_sha256": "d66347571e142a68c682492790af799854c95fd646537dddc99fc07d9a44b3d1",
+      "source_scope": "T21_R2_DEVELOPMENT",
+      "tested_notional_usd": 100,
+      "unit": null,
+      "value_decimal": null
+    },
+    {
+      "assessment": "UNKNOWN",
+      "cashflow_state": "NOT_APPLICABLE",
+      "claim_scope": "POINT_IN_TIME_QUOTE",
+      "evidence_basis": "CONTEMPORANEOUS_QUOTE",
+      "fill_state": "ACTUAL_FILLS_NOT_OBSERVED",
+      "first_reliable_available_at": "2026-08-01T13:11:54.055152Z",
+      "label": "QUOTE_EXIT",
+      "member_id": "T21-WATCH-61ce24fc3fa04e3eaba7",
+      "observed_measures": {
+        "actual_elapsed_from_member_p0_seconds": "5042.839916",
+        "panel_state": "OBSERVED",
+        "roundtrip_quote_retention_bps": "9003.115",
+        "sell_route_count": "3"
+      },
+      "panel_id": "P2",
+      "path_state": "UNOBSERVED",
+      "quality_flags": [
+        "DEPENDENT_SELL_QUOTE_STATE_OBSERVED",
+        "EXACT_FRESHNESS_BLOCK_NOT_RETAINED",
+        "EXACT_SELL_INVENTORY_ATOMIC_IDENTITY_NOT_RETAINED",
+        "QUOTE_EXIT_IS_NOT_LIQUIDATION"
+      ],
+      "record_id": "T25-R2-0069",
+      "route_state_observed": "QUOTE_AVAILABLE",
+      "source_content_sha256": "d66347571e142a68c682492790af799854c95fd646537dddc99fc07d9a44b3d1",
+      "source_scope": "T21_R2_DEVELOPMENT",
+      "tested_notional_usd": 100,
+      "unit": null,
+      "value_decimal": null
+    },
+    {
+      "assessment": "UNKNOWN",
+      "cashflow_state": "NOT_APPLICABLE",
+      "claim_scope": "ACTUAL_FILL_SERIES",
+      "evidence_basis": "NONE",
+      "fill_state": "ACTUAL_FILLS_NOT_OBSERVED",
+      "first_reliable_available_at": "2026-08-01T13:11:54.055152Z",
+      "label": "REALIZED_VWAP",
+      "member_id": "T21-WATCH-61ce24fc3fa04e3eaba7",
+      "observed_measures": {
+        "actual_elapsed_from_member_p0_seconds": "5042.839916",
+        "panel_state": "OBSERVED"
+      },
+      "panel_id": "P2",
+      "path_state": "NOT_APPLICABLE",
+      "quality_flags": [
+        "ACTUAL_FILLS_NOT_OBSERVED",
+        "QUOTE_RETENTION_IS_NOT_REALIZED_VWAP"
+      ],
+      "record_id": "T25-R2-0070",
+      "route_state_observed": "NOT_APPLICABLE",
+      "source_content_sha256": "d66347571e142a68c682492790af799854c95fd646537dddc99fc07d9a44b3d1",
+      "source_scope": "T21_R2_DEVELOPMENT",
+      "tested_notional_usd": null,
+      "unit": null,
+      "value_decimal": null
+    },
+    {
+      "assessment": "UNKNOWN",
+      "cashflow_state": "CASHFLOW_NOT_OBSERVED",
+      "claim_scope": "SETTLED_CASHFLOW",
+      "evidence_basis": "NONE",
+      "fill_state": "NOT_APPLICABLE",
+      "first_reliable_available_at": "2026-08-01T13:11:54.055152Z",
+      "label": "NET",
+      "member_id": "T21-WATCH-61ce24fc3fa04e3eaba7",
+      "observed_measures": {
+        "actual_elapsed_from_member_p0_seconds": "5042.839916",
+        "panel_state": "OBSERVED"
+      },
+      "panel_id": "P2",
+      "path_state": "NOT_APPLICABLE",
+      "quality_flags": [
+        "SETTLED_CASHFLOW_NOT_OBSERVED",
+        "TASK26_FEE_AND_CASHFLOW_MODEL_NOT_AVAILABLE"
+      ],
+      "record_id": "T25-R2-0071",
+      "route_state_observed": "NOT_APPLICABLE",
+      "source_content_sha256": "d66347571e142a68c682492790af799854c95fd646537dddc99fc07d9a44b3d1",
+      "source_scope": "T21_R2_DEVELOPMENT",
+      "tested_notional_usd": null,
+      "unit": null,
+      "value_decimal": null
+    },
+    {
+      "assessment": "SUPPORTED",
+      "cashflow_state": "NOT_APPLICABLE",
+      "claim_scope": "DISCRETE_PATH_GRID",
+      "evidence_basis": "DISCRETE_PANEL_GRID",
+      "fill_state": "NOT_APPLICABLE",
+      "first_reliable_available_at": "2026-08-01T13:11:54.055152Z",
+      "label": "PATH_RISK",
+      "member_id": "T21-WATCH-61ce24fc3fa04e3eaba7",
+      "observed_measures": {
+        "actual_elapsed_from_member_p0_seconds": "5042.839916",
+        "notionals_usd": [
+          10,
+          25,
+          50,
+          100
+        ],
+        "panel_state": "OBSERVED",
+        "quote_notional_capacity_proxy_usd": "100",
+        "worst_observed_roundtrip_quote_return_decimal": "-0.099689"
+      },
+      "panel_id": "P2",
+      "path_state": "SPARSE_DISCRETE",
+      "quality_flags": [
+        "ACTUAL_SPARSE_PANEL_TIMES",
+        "CONTINUOUS_MAE_MFE_FORBIDDEN",
+        "QUOTE_IMPLIED_NOT_REALIZED",
+        "WORST_NOTIONAL_DETERIORATION_FROM_MEMBER_P0"
+      ],
+      "record_id": "T25-R2-0072",
+      "route_state_observed": "NOT_APPLICABLE",
+      "source_content_sha256": "d66347571e142a68c682492790af799854c95fd646537dddc99fc07d9a44b3d1",
+      "source_scope": "T21_R2_DEVELOPMENT",
+      "tested_notional_usd": null,
+      "unit": "RETURN_DECIMAL",
+      "value_decimal": "0.008561"
+    },
+    {
+      "assessment": "UNKNOWN",
+      "cashflow_state": "NOT_APPLICABLE",
+      "claim_scope": "TOUCH_WITHIN_HORIZON",
+      "evidence_basis": "DISCRETE_PANEL_GRID",
+      "fill_state": "NOT_APPLICABLE",
+      "first_reliable_available_at": "2026-08-01T11:47:32.738221Z",
+      "label": "TOUCH",
+      "member_id": "T21-WATCH-6f21dec76d05f5831216",
+      "observed_measures": {
+        "actual_elapsed_from_member_p0_seconds": "0.0",
+        "panel_state": "OBSERVED"
+      },
+      "panel_id": "P0",
+      "path_state": "SPARSE_DISCRETE",
+      "quality_flags": [
+        "NO_FROZEN_REFERENCE_THRESHOLD_IN_TRACKED_PROJECTION",
+        "NO_OBSERVED_THRESHOLD_CROSS_FIELD",
+        "SPARSE_PANEL"
+      ],
+      "record_id": "T25-R2-0073",
+      "route_state_observed": "NOT_APPLICABLE",
+      "source_content_sha256": "ce0009934f2bfabf449e62fe2eae6b1cab9ab739084c6025da6095472af4ca01",
+      "source_scope": "T21_R2_DEVELOPMENT",
+      "tested_notional_usd": null,
+      "unit": null,
+      "value_decimal": null
+    },
+    {
+      "assessment": "UNKNOWN",
+      "cashflow_state": "NOT_APPLICABLE",
+      "claim_scope": "POINT_IN_TIME_QUOTE",
+      "evidence_basis": "CONTEMPORANEOUS_QUOTE",
+      "fill_state": "ACTUAL_FILLS_NOT_OBSERVED",
+      "first_reliable_available_at": "2026-08-01T11:47:17.444729Z",
+      "label": "FILLABLE",
+      "member_id": "T21-WATCH-6f21dec76d05f5831216",
+      "observed_measures": {
+        "actual_elapsed_from_member_p0_seconds": "0.0",
+        "buy_input_atomic": "10000000",
+        "buy_price_impact_pct": "0.0200935029295779039552806075",
+        "buy_route_count": "3",
+        "panel_state": "OBSERVED"
+      },
+      "panel_id": "P0",
+      "path_state": "NOT_APPLICABLE",
+      "quality_flags": [
+        "BUY_QUOTE_STATE_OBSERVED",
+        "EXACT_OUTPUT_MINT_AND_FRESHNESS_BLOCK_NOT_RETAINED",
+        "QUOTE_IS_NOT_FILL"
+      ],
+      "record_id": "T25-R2-0074",
+      "route_state_observed": "QUOTE_AVAILABLE",
+      "source_content_sha256": "ce0009934f2bfabf449e62fe2eae6b1cab9ab739084c6025da6095472af4ca01",
+      "source_scope": "T21_R2_DEVELOPMENT",
+      "tested_notional_usd": 10,
+      "unit": null,
+      "value_decimal": null
+    },
+    {
+      "assessment": "UNKNOWN",
+      "cashflow_state": "NOT_APPLICABLE",
+      "claim_scope": "POINT_IN_TIME_QUOTE",
+      "evidence_basis": "CONTEMPORANEOUS_QUOTE",
+      "fill_state": "ACTUAL_FILLS_NOT_OBSERVED",
+      "first_reliable_available_at": "2026-08-01T11:47:19.526994Z",
+      "label": "QUOTE_EXIT",
+      "member_id": "T21-WATCH-6f21dec76d05f5831216",
+      "observed_measures": {
+        "actual_elapsed_from_member_p0_seconds": "0.0",
+        "panel_state": "OBSERVED",
+        "roundtrip_quote_retention_bps": "8528.697",
+        "sell_route_count": "2"
+      },
+      "panel_id": "P0",
+      "path_state": "UNOBSERVED",
+      "quality_flags": [
+        "DEPENDENT_SELL_QUOTE_STATE_OBSERVED",
+        "EXACT_FRESHNESS_BLOCK_NOT_RETAINED",
+        "EXACT_SELL_INVENTORY_ATOMIC_IDENTITY_NOT_RETAINED",
+        "QUOTE_EXIT_IS_NOT_LIQUIDATION"
+      ],
+      "record_id": "T25-R2-0075",
+      "route_state_observed": "QUOTE_AVAILABLE",
+      "source_content_sha256": "ce0009934f2bfabf449e62fe2eae6b1cab9ab739084c6025da6095472af4ca01",
+      "source_scope": "T21_R2_DEVELOPMENT",
+      "tested_notional_usd": 10,
+      "unit": null,
+      "value_decimal": null
+    },
+    {
+      "assessment": "UNKNOWN",
+      "cashflow_state": "NOT_APPLICABLE",
+      "claim_scope": "POINT_IN_TIME_QUOTE",
+      "evidence_basis": "CONTEMPORANEOUS_QUOTE",
+      "fill_state": "ACTUAL_FILLS_NOT_OBSERVED",
+      "first_reliable_available_at": "2026-08-01T11:47:21.720001Z",
+      "label": "FILLABLE",
+      "member_id": "T21-WATCH-6f21dec76d05f5831216",
+      "observed_measures": {
+        "actual_elapsed_from_member_p0_seconds": "0.0",
+        "buy_input_atomic": "25000000",
+        "buy_price_impact_pct": "0.0181903284630149662083759468",
+        "buy_route_count": "3",
+        "panel_state": "OBSERVED"
+      },
+      "panel_id": "P0",
+      "path_state": "NOT_APPLICABLE",
+      "quality_flags": [
+        "BUY_QUOTE_STATE_OBSERVED",
+        "EXACT_OUTPUT_MINT_AND_FRESHNESS_BLOCK_NOT_RETAINED",
+        "QUOTE_IS_NOT_FILL"
+      ],
+      "record_id": "T25-R2-0076",
+      "route_state_observed": "QUOTE_AVAILABLE",
+      "source_content_sha256": "ce0009934f2bfabf449e62fe2eae6b1cab9ab739084c6025da6095472af4ca01",
+      "source_scope": "T21_R2_DEVELOPMENT",
+      "tested_notional_usd": 25,
+      "unit": null,
+      "value_decimal": null
+    },
+    {
+      "assessment": "UNKNOWN",
+      "cashflow_state": "NOT_APPLICABLE",
+      "claim_scope": "POINT_IN_TIME_QUOTE",
+      "evidence_basis": "CONTEMPORANEOUS_QUOTE",
+      "fill_state": "ACTUAL_FILLS_NOT_OBSERVED",
+      "first_reliable_available_at": "2026-08-01T11:47:24.002832Z",
+      "label": "QUOTE_EXIT",
+      "member_id": "T21-WATCH-6f21dec76d05f5831216",
+      "observed_measures": {
+        "actual_elapsed_from_member_p0_seconds": "0.0",
+        "panel_state": "OBSERVED",
+        "roundtrip_quote_retention_bps": "9826.4332",
+        "sell_route_count": "2"
+      },
+      "panel_id": "P0",
+      "path_state": "UNOBSERVED",
+      "quality_flags": [
+        "DEPENDENT_SELL_QUOTE_STATE_OBSERVED",
+        "EXACT_FRESHNESS_BLOCK_NOT_RETAINED",
+        "EXACT_SELL_INVENTORY_ATOMIC_IDENTITY_NOT_RETAINED",
+        "QUOTE_EXIT_IS_NOT_LIQUIDATION"
+      ],
+      "record_id": "T25-R2-0077",
+      "route_state_observed": "QUOTE_AVAILABLE",
+      "source_content_sha256": "ce0009934f2bfabf449e62fe2eae6b1cab9ab739084c6025da6095472af4ca01",
+      "source_scope": "T21_R2_DEVELOPMENT",
+      "tested_notional_usd": 25,
+      "unit": null,
+      "value_decimal": null
+    },
+    {
+      "assessment": "UNKNOWN",
+      "cashflow_state": "NOT_APPLICABLE",
+      "claim_scope": "POINT_IN_TIME_QUOTE",
+      "evidence_basis": "CONTEMPORANEOUS_QUOTE",
+      "fill_state": "ACTUAL_FILLS_NOT_OBSERVED",
+      "first_reliable_available_at": "2026-08-01T11:47:26.210618Z",
+      "label": "FILLABLE",
+      "member_id": "T21-WATCH-6f21dec76d05f5831216",
+      "observed_measures": {
+        "actual_elapsed_from_member_p0_seconds": "0.0",
+        "buy_input_atomic": "50000000",
+        "buy_price_impact_pct": "0.0380656733630640934624374818",
+        "buy_route_count": "3",
+        "panel_state": "OBSERVED"
+      },
+      "panel_id": "P0",
+      "path_state": "NOT_APPLICABLE",
+      "quality_flags": [
+        "BUY_QUOTE_STATE_OBSERVED",
+        "EXACT_OUTPUT_MINT_AND_FRESHNESS_BLOCK_NOT_RETAINED",
+        "QUOTE_IS_NOT_FILL"
+      ],
+      "record_id": "T25-R2-0078",
+      "route_state_observed": "QUOTE_AVAILABLE",
+      "source_content_sha256": "ce0009934f2bfabf449e62fe2eae6b1cab9ab739084c6025da6095472af4ca01",
+      "source_scope": "T21_R2_DEVELOPMENT",
+      "tested_notional_usd": 50,
+      "unit": null,
+      "value_decimal": null
+    },
+    {
+      "assessment": "UNKNOWN",
+      "cashflow_state": "NOT_APPLICABLE",
+      "claim_scope": "POINT_IN_TIME_QUOTE",
+      "evidence_basis": "CONTEMPORANEOUS_QUOTE",
+      "fill_state": "ACTUAL_FILLS_NOT_OBSERVED",
+      "first_reliable_available_at": "2026-08-01T11:47:28.336130Z",
+      "label": "QUOTE_EXIT",
+      "member_id": "T21-WATCH-6f21dec76d05f5831216",
+      "observed_measures": {
+        "actual_elapsed_from_member_p0_seconds": "0.0",
+        "panel_state": "OBSERVED",
+        "roundtrip_quote_retention_bps": "9639.8322",
+        "sell_route_count": "2"
+      },
+      "panel_id": "P0",
+      "path_state": "UNOBSERVED",
+      "quality_flags": [
+        "DEPENDENT_SELL_QUOTE_STATE_OBSERVED",
+        "EXACT_FRESHNESS_BLOCK_NOT_RETAINED",
+        "EXACT_SELL_INVENTORY_ATOMIC_IDENTITY_NOT_RETAINED",
+        "QUOTE_EXIT_IS_NOT_LIQUIDATION"
+      ],
+      "record_id": "T25-R2-0079",
+      "route_state_observed": "QUOTE_AVAILABLE",
+      "source_content_sha256": "ce0009934f2bfabf449e62fe2eae6b1cab9ab739084c6025da6095472af4ca01",
+      "source_scope": "T21_R2_DEVELOPMENT",
+      "tested_notional_usd": 50,
+      "unit": null,
+      "value_decimal": null
+    },
+    {
+      "assessment": "UNKNOWN",
+      "cashflow_state": "NOT_APPLICABLE",
+      "claim_scope": "POINT_IN_TIME_QUOTE",
+      "evidence_basis": "CONTEMPORANEOUS_QUOTE",
+      "fill_state": "ACTUAL_FILLS_NOT_OBSERVED",
+      "first_reliable_available_at": "2026-08-01T11:47:30.584372Z",
+      "label": "FILLABLE",
+      "member_id": "T21-WATCH-6f21dec76d05f5831216",
+      "observed_measures": {
+        "actual_elapsed_from_member_p0_seconds": "0.0",
+        "buy_input_atomic": "100000000",
+        "buy_price_impact_pct": "0.0287483080313073435810491256",
+        "buy_route_count": "3",
+        "panel_state": "OBSERVED"
+      },
+      "panel_id": "P0",
+      "path_state": "NOT_APPLICABLE",
+      "quality_flags": [
+        "BUY_QUOTE_STATE_OBSERVED",
+        "EXACT_OUTPUT_MINT_AND_FRESHNESS_BLOCK_NOT_RETAINED",
+        "QUOTE_IS_NOT_FILL"
+      ],
+      "record_id": "T25-R2-0080",
+      "route_state_observed": "QUOTE_AVAILABLE",
+      "source_content_sha256": "ce0009934f2bfabf449e62fe2eae6b1cab9ab739084c6025da6095472af4ca01",
+      "source_scope": "T21_R2_DEVELOPMENT",
+      "tested_notional_usd": 100,
+      "unit": null,
+      "value_decimal": null
+    },
+    {
+      "assessment": "UNKNOWN",
+      "cashflow_state": "NOT_APPLICABLE",
+      "claim_scope": "POINT_IN_TIME_QUOTE",
+      "evidence_basis": "CONTEMPORANEOUS_QUOTE",
+      "fill_state": "ACTUAL_FILLS_NOT_OBSERVED",
+      "first_reliable_available_at": "2026-08-01T11:47:32.738221Z",
+      "label": "QUOTE_EXIT",
+      "member_id": "T21-WATCH-6f21dec76d05f5831216",
+      "observed_measures": {
+        "actual_elapsed_from_member_p0_seconds": "0.0",
+        "panel_state": "OBSERVED",
+        "roundtrip_quote_retention_bps": "10061.125",
+        "sell_route_count": "2"
+      },
+      "panel_id": "P0",
+      "path_state": "UNOBSERVED",
+      "quality_flags": [
+        "DEPENDENT_SELL_QUOTE_STATE_OBSERVED",
+        "EXACT_FRESHNESS_BLOCK_NOT_RETAINED",
+        "EXACT_SELL_INVENTORY_ATOMIC_IDENTITY_NOT_RETAINED",
+        "QUOTE_EXIT_IS_NOT_LIQUIDATION"
+      ],
+      "record_id": "T25-R2-0081",
+      "route_state_observed": "QUOTE_AVAILABLE",
+      "source_content_sha256": "ce0009934f2bfabf449e62fe2eae6b1cab9ab739084c6025da6095472af4ca01",
+      "source_scope": "T21_R2_DEVELOPMENT",
+      "tested_notional_usd": 100,
+      "unit": null,
+      "value_decimal": null
+    },
+    {
+      "assessment": "UNKNOWN",
+      "cashflow_state": "NOT_APPLICABLE",
+      "claim_scope": "ACTUAL_FILL_SERIES",
+      "evidence_basis": "NONE",
+      "fill_state": "ACTUAL_FILLS_NOT_OBSERVED",
+      "first_reliable_available_at": "2026-08-01T11:47:32.738221Z",
+      "label": "REALIZED_VWAP",
+      "member_id": "T21-WATCH-6f21dec76d05f5831216",
+      "observed_measures": {
+        "actual_elapsed_from_member_p0_seconds": "0.0",
+        "panel_state": "OBSERVED"
+      },
+      "panel_id": "P0",
+      "path_state": "NOT_APPLICABLE",
+      "quality_flags": [
+        "ACTUAL_FILLS_NOT_OBSERVED",
+        "QUOTE_RETENTION_IS_NOT_REALIZED_VWAP"
+      ],
+      "record_id": "T25-R2-0082",
+      "route_state_observed": "NOT_APPLICABLE",
+      "source_content_sha256": "ce0009934f2bfabf449e62fe2eae6b1cab9ab739084c6025da6095472af4ca01",
+      "source_scope": "T21_R2_DEVELOPMENT",
+      "tested_notional_usd": null,
+      "unit": null,
+      "value_decimal": null
+    },
+    {
+      "assessment": "UNKNOWN",
+      "cashflow_state": "CASHFLOW_NOT_OBSERVED",
+      "claim_scope": "SETTLED_CASHFLOW",
+      "evidence_basis": "NONE",
+      "fill_state": "NOT_APPLICABLE",
+      "first_reliable_available_at": "2026-08-01T11:47:32.738221Z",
+      "label": "NET",
+      "member_id": "T21-WATCH-6f21dec76d05f5831216",
+      "observed_measures": {
+        "actual_elapsed_from_member_p0_seconds": "0.0",
+        "panel_state": "OBSERVED"
+      },
+      "panel_id": "P0",
+      "path_state": "NOT_APPLICABLE",
+      "quality_flags": [
+        "SETTLED_CASHFLOW_NOT_OBSERVED",
+        "TASK26_FEE_AND_CASHFLOW_MODEL_NOT_AVAILABLE"
+      ],
+      "record_id": "T25-R2-0083",
+      "route_state_observed": "NOT_APPLICABLE",
+      "source_content_sha256": "ce0009934f2bfabf449e62fe2eae6b1cab9ab739084c6025da6095472af4ca01",
+      "source_scope": "T21_R2_DEVELOPMENT",
+      "tested_notional_usd": null,
+      "unit": null,
+      "value_decimal": null
+    },
+    {
+      "assessment": "SUPPORTED",
+      "cashflow_state": "NOT_APPLICABLE",
+      "claim_scope": "DISCRETE_PATH_GRID",
+      "evidence_basis": "DISCRETE_PANEL_GRID",
+      "fill_state": "NOT_APPLICABLE",
+      "first_reliable_available_at": "2026-08-01T11:47:32.738221Z",
+      "label": "PATH_RISK",
+      "member_id": "T21-WATCH-6f21dec76d05f5831216",
+      "observed_measures": {
+        "actual_elapsed_from_member_p0_seconds": "0.0",
+        "notionals_usd": [
+          10,
+          25,
+          50,
+          100
+        ],
+        "panel_state": "OBSERVED",
+        "quote_notional_capacity_proxy_usd": "100",
+        "worst_observed_roundtrip_quote_return_decimal": "-0.147130"
+      },
+      "panel_id": "P0",
+      "path_state": "SPARSE_DISCRETE",
+      "quality_flags": [
+        "ACTUAL_SPARSE_PANEL_TIMES",
+        "CONTINUOUS_MAE_MFE_FORBIDDEN",
+        "QUOTE_IMPLIED_NOT_REALIZED",
+        "WORST_NOTIONAL_DETERIORATION_FROM_MEMBER_P0"
+      ],
+      "record_id": "T25-R2-0084",
+      "route_state_observed": "NOT_APPLICABLE",
+      "source_content_sha256": "ce0009934f2bfabf449e62fe2eae6b1cab9ab739084c6025da6095472af4ca01",
+      "source_scope": "T21_R2_DEVELOPMENT",
+      "tested_notional_usd": null,
+      "unit": "RETURN_DECIMAL",
+      "value_decimal": "0.000000"
+    },
+    {
+      "assessment": "UNKNOWN",
+      "cashflow_state": "NOT_APPLICABLE",
+      "claim_scope": "TOUCH_WITHIN_HORIZON",
+      "evidence_basis": "DISCRETE_PANEL_GRID",
+      "fill_state": "NOT_APPLICABLE",
+      "first_reliable_available_at": "2026-08-01T12:26:40.698493Z",
+      "label": "TOUCH",
+      "member_id": "T21-WATCH-6f21dec76d05f5831216",
+      "observed_measures": {
+        "actual_elapsed_from_member_p0_seconds": "2347.843352",
+        "panel_state": "OBSERVED"
+      },
+      "panel_id": "P1",
+      "path_state": "SPARSE_DISCRETE",
+      "quality_flags": [
+        "NO_FROZEN_REFERENCE_THRESHOLD_IN_TRACKED_PROJECTION",
+        "NO_OBSERVED_THRESHOLD_CROSS_FIELD",
+        "SPARSE_PANEL"
+      ],
+      "record_id": "T25-R2-0085",
+      "route_state_observed": "NOT_APPLICABLE",
+      "source_content_sha256": "b84bace925142e8550eb4e75a2e9b45b034732625885ff817ce5941df5983fa0",
+      "source_scope": "T21_R2_DEVELOPMENT",
+      "tested_notional_usd": null,
+      "unit": null,
+      "value_decimal": null
+    },
+    {
+      "assessment": "UNKNOWN",
+      "cashflow_state": "NOT_APPLICABLE",
+      "claim_scope": "POINT_IN_TIME_QUOTE",
+      "evidence_basis": "CONTEMPORANEOUS_QUOTE",
+      "fill_state": "ACTUAL_FILLS_NOT_OBSERVED",
+      "first_reliable_available_at": "2026-08-01T12:26:25.288081Z",
+      "label": "FILLABLE",
+      "member_id": "T21-WATCH-6f21dec76d05f5831216",
+      "observed_measures": {
+        "actual_elapsed_from_member_p0_seconds": "2347.843352",
+        "buy_input_atomic": "10000000",
+        "buy_price_impact_pct": "0.011968109347263662360153523",
+        "buy_route_count": "3",
+        "panel_state": "OBSERVED"
+      },
+      "panel_id": "P1",
+      "path_state": "NOT_APPLICABLE",
+      "quality_flags": [
+        "BUY_QUOTE_STATE_OBSERVED",
+        "EXACT_OUTPUT_MINT_AND_FRESHNESS_BLOCK_NOT_RETAINED",
+        "QUOTE_IS_NOT_FILL"
+      ],
+      "record_id": "T25-R2-0086",
+      "route_state_observed": "QUOTE_AVAILABLE",
+      "source_content_sha256": "b84bace925142e8550eb4e75a2e9b45b034732625885ff817ce5941df5983fa0",
+      "source_scope": "T21_R2_DEVELOPMENT",
+      "tested_notional_usd": 10,
+      "unit": null,
+      "value_decimal": null
+    },
+    {
+      "assessment": "UNKNOWN",
+      "cashflow_state": "NOT_APPLICABLE",
+      "claim_scope": "POINT_IN_TIME_QUOTE",
+      "evidence_basis": "CONTEMPORANEOUS_QUOTE",
+      "fill_state": "ACTUAL_FILLS_NOT_OBSERVED",
+      "first_reliable_available_at": "2026-08-01T12:26:27.441859Z",
+      "label": "QUOTE_EXIT",
+      "member_id": "T21-WATCH-6f21dec76d05f5831216",
+      "observed_measures": {
+        "actual_elapsed_from_member_p0_seconds": "2347.843352",
+        "panel_state": "OBSERVED",
+        "roundtrip_quote_retention_bps": "9734.704",
+        "sell_route_count": "2"
+      },
+      "panel_id": "P1",
+      "path_state": "UNOBSERVED",
+      "quality_flags": [
+        "DEPENDENT_SELL_QUOTE_STATE_OBSERVED",
+        "EXACT_FRESHNESS_BLOCK_NOT_RETAINED",
+        "EXACT_SELL_INVENTORY_ATOMIC_IDENTITY_NOT_RETAINED",
+        "QUOTE_EXIT_IS_NOT_LIQUIDATION"
+      ],
+      "record_id": "T25-R2-0087",
+      "route_state_observed": "QUOTE_AVAILABLE",
+      "source_content_sha256": "b84bace925142e8550eb4e75a2e9b45b034732625885ff817ce5941df5983fa0",
+      "source_scope": "T21_R2_DEVELOPMENT",
+      "tested_notional_usd": 10,
+      "unit": null,
+      "value_decimal": null
+    },
+    {
+      "assessment": "UNKNOWN",
+      "cashflow_state": "NOT_APPLICABLE",
+      "claim_scope": "POINT_IN_TIME_QUOTE",
+      "evidence_basis": "CONTEMPORANEOUS_QUOTE",
+      "fill_state": "ACTUAL_FILLS_NOT_OBSERVED",
+      "first_reliable_available_at": "2026-08-01T12:26:29.686705Z",
+      "label": "FILLABLE",
+      "member_id": "T21-WATCH-6f21dec76d05f5831216",
+      "observed_measures": {
+        "actual_elapsed_from_member_p0_seconds": "2347.843352",
+        "buy_input_atomic": "25000000",
+        "buy_price_impact_pct": "0.0140930043568085553805912698",
+        "buy_route_count": "3",
+        "panel_state": "OBSERVED"
+      },
+      "panel_id": "P1",
+      "path_state": "NOT_APPLICABLE",
+      "quality_flags": [
+        "BUY_QUOTE_STATE_OBSERVED",
+        "EXACT_OUTPUT_MINT_AND_FRESHNESS_BLOCK_NOT_RETAINED",
+        "QUOTE_IS_NOT_FILL"
+      ],
+      "record_id": "T25-R2-0088",
+      "route_state_observed": "QUOTE_AVAILABLE",
+      "source_content_sha256": "b84bace925142e8550eb4e75a2e9b45b034732625885ff817ce5941df5983fa0",
+      "source_scope": "T21_R2_DEVELOPMENT",
+      "tested_notional_usd": 25,
+      "unit": null,
+      "value_decimal": null
+    },
+    {
+      "assessment": "UNKNOWN",
+      "cashflow_state": "NOT_APPLICABLE",
+      "claim_scope": "POINT_IN_TIME_QUOTE",
+      "evidence_basis": "CONTEMPORANEOUS_QUOTE",
+      "fill_state": "ACTUAL_FILLS_NOT_OBSERVED",
+      "first_reliable_available_at": "2026-08-01T12:26:31.825397Z",
+      "label": "QUOTE_EXIT",
+      "member_id": "T21-WATCH-6f21dec76d05f5831216",
+      "observed_measures": {
+        "actual_elapsed_from_member_p0_seconds": "2347.843352",
+        "panel_state": "OBSERVED",
+        "roundtrip_quote_retention_bps": "9693.0324",
+        "sell_route_count": "2"
+      },
+      "panel_id": "P1",
+      "path_state": "UNOBSERVED",
+      "quality_flags": [
+        "DEPENDENT_SELL_QUOTE_STATE_OBSERVED",
+        "EXACT_FRESHNESS_BLOCK_NOT_RETAINED",
+        "EXACT_SELL_INVENTORY_ATOMIC_IDENTITY_NOT_RETAINED",
+        "QUOTE_EXIT_IS_NOT_LIQUIDATION"
+      ],
+      "record_id": "T25-R2-0089",
+      "route_state_observed": "QUOTE_AVAILABLE",
+      "source_content_sha256": "b84bace925142e8550eb4e75a2e9b45b034732625885ff817ce5941df5983fa0",
+      "source_scope": "T21_R2_DEVELOPMENT",
+      "tested_notional_usd": 25,
+      "unit": null,
+      "value_decimal": null
+    },
+    {
+      "assessment": "UNKNOWN",
+      "cashflow_state": "NOT_APPLICABLE",
+      "claim_scope": "POINT_IN_TIME_QUOTE",
+      "evidence_basis": "CONTEMPORANEOUS_QUOTE",
+      "fill_state": "ACTUAL_FILLS_NOT_OBSERVED",
+      "first_reliable_available_at": "2026-08-01T12:26:34.018902Z",
+      "label": "FILLABLE",
+      "member_id": "T21-WATCH-6f21dec76d05f5831216",
+      "observed_measures": {
+        "actual_elapsed_from_member_p0_seconds": "2347.843352",
+        "buy_input_atomic": "50000000",
+        "buy_price_impact_pct": "0.0176088286261246081133624992",
+        "buy_route_count": "3",
+        "panel_state": "OBSERVED"
+      },
+      "panel_id": "P1",
+      "path_state": "NOT_APPLICABLE",
+      "quality_flags": [
+        "BUY_QUOTE_STATE_OBSERVED",
+        "EXACT_OUTPUT_MINT_AND_FRESHNESS_BLOCK_NOT_RETAINED",
+        "QUOTE_IS_NOT_FILL"
+      ],
+      "record_id": "T25-R2-0090",
+      "route_state_observed": "QUOTE_AVAILABLE",
+      "source_content_sha256": "b84bace925142e8550eb4e75a2e9b45b034732625885ff817ce5941df5983fa0",
+      "source_scope": "T21_R2_DEVELOPMENT",
+      "tested_notional_usd": 50,
+      "unit": null,
+      "value_decimal": null
+    },
+    {
+      "assessment": "UNKNOWN",
+      "cashflow_state": "NOT_APPLICABLE",
+      "claim_scope": "POINT_IN_TIME_QUOTE",
+      "evidence_basis": "CONTEMPORANEOUS_QUOTE",
+      "fill_state": "ACTUAL_FILLS_NOT_OBSERVED",
+      "first_reliable_available_at": "2026-08-01T12:26:36.302793Z",
+      "label": "QUOTE_EXIT",
+      "member_id": "T21-WATCH-6f21dec76d05f5831216",
+      "observed_measures": {
+        "actual_elapsed_from_member_p0_seconds": "2347.843352",
+        "panel_state": "OBSERVED",
+        "roundtrip_quote_retention_bps": "9624.2222",
+        "sell_route_count": "2"
+      },
+      "panel_id": "P1",
+      "path_state": "UNOBSERVED",
+      "quality_flags": [
+        "DEPENDENT_SELL_QUOTE_STATE_OBSERVED",
+        "EXACT_FRESHNESS_BLOCK_NOT_RETAINED",
+        "EXACT_SELL_INVENTORY_ATOMIC_IDENTITY_NOT_RETAINED",
+        "QUOTE_EXIT_IS_NOT_LIQUIDATION"
+      ],
+      "record_id": "T25-R2-0091",
+      "route_state_observed": "QUOTE_AVAILABLE",
+      "source_content_sha256": "b84bace925142e8550eb4e75a2e9b45b034732625885ff817ce5941df5983fa0",
+      "source_scope": "T21_R2_DEVELOPMENT",
+      "tested_notional_usd": 50,
+      "unit": null,
+      "value_decimal": null
+    },
+    {
+      "assessment": "UNKNOWN",
+      "cashflow_state": "NOT_APPLICABLE",
+      "claim_scope": "POINT_IN_TIME_QUOTE",
+      "evidence_basis": "CONTEMPORANEOUS_QUOTE",
+      "fill_state": "ACTUAL_FILLS_NOT_OBSERVED",
+      "first_reliable_available_at": "2026-08-01T12:26:38.414709Z",
+      "label": "FILLABLE",
+      "member_id": "T21-WATCH-6f21dec76d05f5831216",
+      "observed_measures": {
+        "actual_elapsed_from_member_p0_seconds": "2347.843352",
+        "buy_input_atomic": "100000000",
+        "buy_price_impact_pct": "0.0245683228454954642400209011",
+        "buy_route_count": "2",
+        "panel_state": "OBSERVED"
+      },
+      "panel_id": "P1",
+      "path_state": "NOT_APPLICABLE",
+      "quality_flags": [
+        "BUY_QUOTE_STATE_OBSERVED",
+        "EXACT_OUTPUT_MINT_AND_FRESHNESS_BLOCK_NOT_RETAINED",
+        "QUOTE_IS_NOT_FILL"
+      ],
+      "record_id": "T25-R2-0092",
+      "route_state_observed": "QUOTE_AVAILABLE",
+      "source_content_sha256": "b84bace925142e8550eb4e75a2e9b45b034732625885ff817ce5941df5983fa0",
+      "source_scope": "T21_R2_DEVELOPMENT",
+      "tested_notional_usd": 100,
+      "unit": null,
+      "value_decimal": null
+    },
+    {
+      "assessment": "UNKNOWN",
+      "cashflow_state": "NOT_APPLICABLE",
+      "claim_scope": "POINT_IN_TIME_QUOTE",
+      "evidence_basis": "CONTEMPORANEOUS_QUOTE",
+      "fill_state": "ACTUAL_FILLS_NOT_OBSERVED",
+      "first_reliable_available_at": "2026-08-01T12:26:40.698493Z",
+      "label": "QUOTE_EXIT",
+      "member_id": "T21-WATCH-6f21dec76d05f5831216",
+      "observed_measures": {
+        "actual_elapsed_from_member_p0_seconds": "2347.843352",
+        "panel_state": "OBSERVED",
+        "roundtrip_quote_retention_bps": "9489.6751",
+        "sell_route_count": "2"
+      },
+      "panel_id": "P1",
+      "path_state": "UNOBSERVED",
+      "quality_flags": [
+        "DEPENDENT_SELL_QUOTE_STATE_OBSERVED",
+        "EXACT_FRESHNESS_BLOCK_NOT_RETAINED",
+        "EXACT_SELL_INVENTORY_ATOMIC_IDENTITY_NOT_RETAINED",
+        "QUOTE_EXIT_IS_NOT_LIQUIDATION"
+      ],
+      "record_id": "T25-R2-0093",
+      "route_state_observed": "QUOTE_AVAILABLE",
+      "source_content_sha256": "b84bace925142e8550eb4e75a2e9b45b034732625885ff817ce5941df5983fa0",
+      "source_scope": "T21_R2_DEVELOPMENT",
+      "tested_notional_usd": 100,
+      "unit": null,
+      "value_decimal": null
+    },
+    {
+      "assessment": "UNKNOWN",
+      "cashflow_state": "NOT_APPLICABLE",
+      "claim_scope": "ACTUAL_FILL_SERIES",
+      "evidence_basis": "NONE",
+      "fill_state": "ACTUAL_FILLS_NOT_OBSERVED",
+      "first_reliable_available_at": "2026-08-01T12:26:40.698493Z",
+      "label": "REALIZED_VWAP",
+      "member_id": "T21-WATCH-6f21dec76d05f5831216",
+      "observed_measures": {
+        "actual_elapsed_from_member_p0_seconds": "2347.843352",
+        "panel_state": "OBSERVED"
+      },
+      "panel_id": "P1",
+      "path_state": "NOT_APPLICABLE",
+      "quality_flags": [
+        "ACTUAL_FILLS_NOT_OBSERVED",
+        "QUOTE_RETENTION_IS_NOT_REALIZED_VWAP"
+      ],
+      "record_id": "T25-R2-0094",
+      "route_state_observed": "NOT_APPLICABLE",
+      "source_content_sha256": "b84bace925142e8550eb4e75a2e9b45b034732625885ff817ce5941df5983fa0",
+      "source_scope": "T21_R2_DEVELOPMENT",
+      "tested_notional_usd": null,
+      "unit": null,
+      "value_decimal": null
+    },
+    {
+      "assessment": "UNKNOWN",
+      "cashflow_state": "CASHFLOW_NOT_OBSERVED",
+      "claim_scope": "SETTLED_CASHFLOW",
+      "evidence_basis": "NONE",
+      "fill_state": "NOT_APPLICABLE",
+      "first_reliable_available_at": "2026-08-01T12:26:40.698493Z",
+      "label": "NET",
+      "member_id": "T21-WATCH-6f21dec76d05f5831216",
+      "observed_measures": {
+        "actual_elapsed_from_member_p0_seconds": "2347.843352",
+        "panel_state": "OBSERVED"
+      },
+      "panel_id": "P1",
+      "path_state": "NOT_APPLICABLE",
+      "quality_flags": [
+        "SETTLED_CASHFLOW_NOT_OBSERVED",
+        "TASK26_FEE_AND_CASHFLOW_MODEL_NOT_AVAILABLE"
+      ],
+      "record_id": "T25-R2-0095",
+      "route_state_observed": "NOT_APPLICABLE",
+      "source_content_sha256": "b84bace925142e8550eb4e75a2e9b45b034732625885ff817ce5941df5983fa0",
+      "source_scope": "T21_R2_DEVELOPMENT",
+      "tested_notional_usd": null,
+      "unit": null,
+      "value_decimal": null
+    },
+    {
+      "assessment": "SUPPORTED",
+      "cashflow_state": "NOT_APPLICABLE",
+      "claim_scope": "DISCRETE_PATH_GRID",
+      "evidence_basis": "DISCRETE_PANEL_GRID",
+      "fill_state": "NOT_APPLICABLE",
+      "first_reliable_available_at": "2026-08-01T12:26:40.698493Z",
+      "label": "PATH_RISK",
+      "member_id": "T21-WATCH-6f21dec76d05f5831216",
+      "observed_measures": {
+        "actual_elapsed_from_member_p0_seconds": "2347.843352",
+        "notionals_usd": [
+          10,
+          25,
+          50,
+          100
+        ],
+        "panel_state": "OBSERVED",
+        "quote_notional_capacity_proxy_usd": "100",
+        "worst_observed_roundtrip_quote_return_decimal": "-0.051032"
+      },
+      "panel_id": "P1",
+      "path_state": "SPARSE_DISCRETE",
+      "quality_flags": [
+        "ACTUAL_SPARSE_PANEL_TIMES",
+        "CONTINUOUS_MAE_MFE_FORBIDDEN",
+        "QUOTE_IMPLIED_NOT_REALIZED",
+        "WORST_NOTIONAL_DETERIORATION_FROM_MEMBER_P0"
+      ],
+      "record_id": "T25-R2-0096",
+      "route_state_observed": "NOT_APPLICABLE",
+      "source_content_sha256": "b84bace925142e8550eb4e75a2e9b45b034732625885ff817ce5941df5983fa0",
+      "source_scope": "T21_R2_DEVELOPMENT",
+      "tested_notional_usd": null,
+      "unit": "RETURN_DECIMAL",
+      "value_decimal": "0.057145"
+    },
+    {
+      "assessment": "UNKNOWN",
+      "cashflow_state": "NOT_APPLICABLE",
+      "claim_scope": "TOUCH_WITHIN_HORIZON",
+      "evidence_basis": "DISCRETE_PANEL_GRID",
+      "fill_state": "NOT_APPLICABLE",
+      "first_reliable_available_at": "2026-08-01T13:11:35.638603Z",
+      "label": "TOUCH",
+      "member_id": "T21-WATCH-6f21dec76d05f5831216",
+      "observed_measures": {
+        "actual_elapsed_from_member_p0_seconds": "5042.775573",
+        "panel_state": "OBSERVED"
+      },
+      "panel_id": "P2",
+      "path_state": "SPARSE_DISCRETE",
+      "quality_flags": [
+        "NO_FROZEN_REFERENCE_THRESHOLD_IN_TRACKED_PROJECTION",
+        "NO_OBSERVED_THRESHOLD_CROSS_FIELD",
+        "SPARSE_PANEL"
+      ],
+      "record_id": "T25-R2-0097",
+      "route_state_observed": "NOT_APPLICABLE",
+      "source_content_sha256": "6859ba724a7602000cca93435b978fc253b5a80a0c3b2b4ecf4ff3567084e101",
+      "source_scope": "T21_R2_DEVELOPMENT",
+      "tested_notional_usd": null,
+      "unit": null,
+      "value_decimal": null
+    },
+    {
+      "assessment": "UNKNOWN",
+      "cashflow_state": "NOT_APPLICABLE",
+      "claim_scope": "POINT_IN_TIME_QUOTE",
+      "evidence_basis": "CONTEMPORANEOUS_QUOTE",
+      "fill_state": "ACTUAL_FILLS_NOT_OBSERVED",
+      "first_reliable_available_at": "2026-08-01T13:11:20.220302Z",
+      "label": "FILLABLE",
+      "member_id": "T21-WATCH-6f21dec76d05f5831216",
+      "observed_measures": {
+        "actual_elapsed_from_member_p0_seconds": "5042.775573",
+        "buy_input_atomic": "10000000",
+        "buy_price_impact_pct": "0",
+        "buy_route_count": "2",
+        "panel_state": "OBSERVED"
+      },
+      "panel_id": "P2",
+      "path_state": "NOT_APPLICABLE",
+      "quality_flags": [
+        "BUY_QUOTE_STATE_OBSERVED",
+        "EXACT_OUTPUT_MINT_AND_FRESHNESS_BLOCK_NOT_RETAINED",
+        "QUOTE_IS_NOT_FILL"
+      ],
+      "record_id": "T25-R2-0098",
+      "route_state_observed": "QUOTE_AVAILABLE",
+      "source_content_sha256": "6859ba724a7602000cca93435b978fc253b5a80a0c3b2b4ecf4ff3567084e101",
+      "source_scope": "T21_R2_DEVELOPMENT",
+      "tested_notional_usd": 10,
+      "unit": null,
+      "value_decimal": null
+    },
+    {
+      "assessment": "UNKNOWN",
+      "cashflow_state": "NOT_APPLICABLE",
+      "claim_scope": "POINT_IN_TIME_QUOTE",
+      "evidence_basis": "CONTEMPORANEOUS_QUOTE",
+      "fill_state": "ACTUAL_FILLS_NOT_OBSERVED",
+      "first_reliable_available_at": "2026-08-01T13:11:22.367109Z",
+      "label": "QUOTE_EXIT",
+      "member_id": "T21-WATCH-6f21dec76d05f5831216",
+      "observed_measures": {
+        "actual_elapsed_from_member_p0_seconds": "5042.775573",
+        "panel_state": "OBSERVED",
+        "roundtrip_quote_retention_bps": "9737.002",
+        "sell_route_count": "3"
+      },
+      "panel_id": "P2",
+      "path_state": "UNOBSERVED",
+      "quality_flags": [
+        "DEPENDENT_SELL_QUOTE_STATE_OBSERVED",
+        "EXACT_FRESHNESS_BLOCK_NOT_RETAINED",
+        "EXACT_SELL_INVENTORY_ATOMIC_IDENTITY_NOT_RETAINED",
+        "QUOTE_EXIT_IS_NOT_LIQUIDATION"
+      ],
+      "record_id": "T25-R2-0099",
+      "route_state_observed": "QUOTE_AVAILABLE",
+      "source_content_sha256": "6859ba724a7602000cca93435b978fc253b5a80a0c3b2b4ecf4ff3567084e101",
+      "source_scope": "T21_R2_DEVELOPMENT",
+      "tested_notional_usd": 10,
+      "unit": null,
+      "value_decimal": null
+    },
+    {
+      "assessment": "UNKNOWN",
+      "cashflow_state": "NOT_APPLICABLE",
+      "claim_scope": "POINT_IN_TIME_QUOTE",
+      "evidence_basis": "CONTEMPORANEOUS_QUOTE",
+      "fill_state": "ACTUAL_FILLS_NOT_OBSERVED",
+      "first_reliable_available_at": "2026-08-01T13:11:24.655186Z",
+      "label": "FILLABLE",
+      "member_id": "T21-WATCH-6f21dec76d05f5831216",
+      "observed_measures": {
+        "actual_elapsed_from_member_p0_seconds": "5042.775573",
+        "buy_input_atomic": "25000000",
+        "buy_price_impact_pct": "0",
+        "buy_route_count": "3",
+        "panel_state": "OBSERVED"
+      },
+      "panel_id": "P2",
+      "path_state": "NOT_APPLICABLE",
+      "quality_flags": [
+        "BUY_QUOTE_STATE_OBSERVED",
+        "EXACT_OUTPUT_MINT_AND_FRESHNESS_BLOCK_NOT_RETAINED",
+        "QUOTE_IS_NOT_FILL"
+      ],
+      "record_id": "T25-R2-0100",
+      "route_state_observed": "QUOTE_AVAILABLE",
+      "source_content_sha256": "6859ba724a7602000cca93435b978fc253b5a80a0c3b2b4ecf4ff3567084e101",
+      "source_scope": "T21_R2_DEVELOPMENT",
+      "tested_notional_usd": 25,
+      "unit": null,
+      "value_decimal": null
+    },
+    {
+      "assessment": "UNKNOWN",
+      "cashflow_state": "NOT_APPLICABLE",
+      "claim_scope": "POINT_IN_TIME_QUOTE",
+      "evidence_basis": "CONTEMPORANEOUS_QUOTE",
+      "fill_state": "ACTUAL_FILLS_NOT_OBSERVED",
+      "first_reliable_available_at": "2026-08-01T13:11:26.975345Z",
+      "label": "QUOTE_EXIT",
+      "member_id": "T21-WATCH-6f21dec76d05f5831216",
+      "observed_measures": {
+        "actual_elapsed_from_member_p0_seconds": "5042.775573",
+        "panel_state": "OBSERVED",
+        "roundtrip_quote_retention_bps": "9904.5576",
+        "sell_route_count": "2"
+      },
+      "panel_id": "P2",
+      "path_state": "UNOBSERVED",
+      "quality_flags": [
+        "DEPENDENT_SELL_QUOTE_STATE_OBSERVED",
+        "EXACT_FRESHNESS_BLOCK_NOT_RETAINED",
+        "EXACT_SELL_INVENTORY_ATOMIC_IDENTITY_NOT_RETAINED",
+        "QUOTE_EXIT_IS_NOT_LIQUIDATION"
+      ],
+      "record_id": "T25-R2-0101",
+      "route_state_observed": "QUOTE_AVAILABLE",
+      "source_content_sha256": "6859ba724a7602000cca93435b978fc253b5a80a0c3b2b4ecf4ff3567084e101",
+      "source_scope": "T21_R2_DEVELOPMENT",
+      "tested_notional_usd": 25,
+      "unit": null,
+      "value_decimal": null
+    },
+    {
+      "assessment": "UNKNOWN",
+      "cashflow_state": "NOT_APPLICABLE",
+      "claim_scope": "POINT_IN_TIME_QUOTE",
+      "evidence_basis": "CONTEMPORANEOUS_QUOTE",
+      "fill_state": "ACTUAL_FILLS_NOT_OBSERVED",
+      "first_reliable_available_at": "2026-08-01T13:11:28.973459Z",
+      "label": "FILLABLE",
+      "member_id": "T21-WATCH-6f21dec76d05f5831216",
+      "observed_measures": {
+        "actual_elapsed_from_member_p0_seconds": "5042.775573",
+        "buy_input_atomic": "50000000",
+        "buy_price_impact_pct": "0.0233143300974803767224423121",
+        "buy_route_count": "2",
+        "panel_state": "OBSERVED"
+      },
+      "panel_id": "P2",
+      "path_state": "NOT_APPLICABLE",
+      "quality_flags": [
+        "BUY_QUOTE_STATE_OBSERVED",
+        "EXACT_OUTPUT_MINT_AND_FRESHNESS_BLOCK_NOT_RETAINED",
+        "QUOTE_IS_NOT_FILL"
+      ],
+      "record_id": "T25-R2-0102",
+      "route_state_observed": "QUOTE_AVAILABLE",
+      "source_content_sha256": "6859ba724a7602000cca93435b978fc253b5a80a0c3b2b4ecf4ff3567084e101",
+      "source_scope": "T21_R2_DEVELOPMENT",
+      "tested_notional_usd": 50,
+      "unit": null,
+      "value_decimal": null
+    },
+    {
+      "assessment": "UNKNOWN",
+      "cashflow_state": "NOT_APPLICABLE",
+      "claim_scope": "POINT_IN_TIME_QUOTE",
+      "evidence_basis": "CONTEMPORANEOUS_QUOTE",
+      "fill_state": "ACTUAL_FILLS_NOT_OBSERVED",
+      "first_reliable_available_at": "2026-08-01T13:11:31.217625Z",
+      "label": "QUOTE_EXIT",
+      "member_id": "T21-WATCH-6f21dec76d05f5831216",
+      "observed_measures": {
+        "actual_elapsed_from_member_p0_seconds": "5042.775573",
+        "panel_state": "OBSERVED",
+        "roundtrip_quote_retention_bps": "9623.532",
+        "sell_route_count": "3"
+      },
+      "panel_id": "P2",
+      "path_state": "UNOBSERVED",
+      "quality_flags": [
+        "DEPENDENT_SELL_QUOTE_STATE_OBSERVED",
+        "EXACT_FRESHNESS_BLOCK_NOT_RETAINED",
+        "EXACT_SELL_INVENTORY_ATOMIC_IDENTITY_NOT_RETAINED",
+        "QUOTE_EXIT_IS_NOT_LIQUIDATION"
+      ],
+      "record_id": "T25-R2-0103",
+      "route_state_observed": "QUOTE_AVAILABLE",
+      "source_content_sha256": "6859ba724a7602000cca93435b978fc253b5a80a0c3b2b4ecf4ff3567084e101",
+      "source_scope": "T21_R2_DEVELOPMENT",
+      "tested_notional_usd": 50,
+      "unit": null,
+      "value_decimal": null
+    },
+    {
+      "assessment": "UNKNOWN",
+      "cashflow_state": "NOT_APPLICABLE",
+      "claim_scope": "POINT_IN_TIME_QUOTE",
+      "evidence_basis": "CONTEMPORANEOUS_QUOTE",
+      "fill_state": "ACTUAL_FILLS_NOT_OBSERVED",
+      "first_reliable_available_at": "2026-08-01T13:11:33.351120Z",
+      "label": "FILLABLE",
+      "member_id": "T21-WATCH-6f21dec76d05f5831216",
+      "observed_measures": {
+        "actual_elapsed_from_member_p0_seconds": "5042.775573",
+        "buy_input_atomic": "100000000",
+        "buy_price_impact_pct": "0.0302954397609419765004297001",
+        "buy_route_count": "3",
+        "panel_state": "OBSERVED"
+      },
+      "panel_id": "P2",
+      "path_state": "NOT_APPLICABLE",
+      "quality_flags": [
+        "BUY_QUOTE_STATE_OBSERVED",
+        "EXACT_OUTPUT_MINT_AND_FRESHNESS_BLOCK_NOT_RETAINED",
+        "QUOTE_IS_NOT_FILL"
+      ],
+      "record_id": "T25-R2-0104",
+      "route_state_observed": "QUOTE_AVAILABLE",
+      "source_content_sha256": "6859ba724a7602000cca93435b978fc253b5a80a0c3b2b4ecf4ff3567084e101",
+      "source_scope": "T21_R2_DEVELOPMENT",
+      "tested_notional_usd": 100,
+      "unit": null,
+      "value_decimal": null
+    },
+    {
+      "assessment": "UNKNOWN",
+      "cashflow_state": "NOT_APPLICABLE",
+      "claim_scope": "POINT_IN_TIME_QUOTE",
+      "evidence_basis": "CONTEMPORANEOUS_QUOTE",
+      "fill_state": "ACTUAL_FILLS_NOT_OBSERVED",
+      "first_reliable_available_at": "2026-08-01T13:11:35.638603Z",
+      "label": "QUOTE_EXIT",
+      "member_id": "T21-WATCH-6f21dec76d05f5831216",
+      "observed_measures": {
+        "actual_elapsed_from_member_p0_seconds": "5042.775573",
+        "panel_state": "OBSERVED",
+        "roundtrip_quote_retention_bps": "9487.8424",
+        "sell_route_count": "2"
+      },
+      "panel_id": "P2",
+      "path_state": "UNOBSERVED",
+      "quality_flags": [
+        "DEPENDENT_SELL_QUOTE_STATE_OBSERVED",
+        "EXACT_FRESHNESS_BLOCK_NOT_RETAINED",
+        "EXACT_SELL_INVENTORY_ATOMIC_IDENTITY_NOT_RETAINED",
+        "QUOTE_EXIT_IS_NOT_LIQUIDATION"
+      ],
+      "record_id": "T25-R2-0105",
+      "route_state_observed": "QUOTE_AVAILABLE",
+      "source_content_sha256": "6859ba724a7602000cca93435b978fc253b5a80a0c3b2b4ecf4ff3567084e101",
+      "source_scope": "T21_R2_DEVELOPMENT",
+      "tested_notional_usd": 100,
+      "unit": null,
+      "value_decimal": null
+    },
+    {
+      "assessment": "UNKNOWN",
+      "cashflow_state": "NOT_APPLICABLE",
+      "claim_scope": "ACTUAL_FILL_SERIES",
+      "evidence_basis": "NONE",
+      "fill_state": "ACTUAL_FILLS_NOT_OBSERVED",
+      "first_reliable_available_at": "2026-08-01T13:11:35.638603Z",
+      "label": "REALIZED_VWAP",
+      "member_id": "T21-WATCH-6f21dec76d05f5831216",
+      "observed_measures": {
+        "actual_elapsed_from_member_p0_seconds": "5042.775573",
+        "panel_state": "OBSERVED"
+      },
+      "panel_id": "P2",
+      "path_state": "NOT_APPLICABLE",
+      "quality_flags": [
+        "ACTUAL_FILLS_NOT_OBSERVED",
+        "QUOTE_RETENTION_IS_NOT_REALIZED_VWAP"
+      ],
+      "record_id": "T25-R2-0106",
+      "route_state_observed": "NOT_APPLICABLE",
+      "source_content_sha256": "6859ba724a7602000cca93435b978fc253b5a80a0c3b2b4ecf4ff3567084e101",
+      "source_scope": "T21_R2_DEVELOPMENT",
+      "tested_notional_usd": null,
+      "unit": null,
+      "value_decimal": null
+    },
+    {
+      "assessment": "UNKNOWN",
+      "cashflow_state": "CASHFLOW_NOT_OBSERVED",
+      "claim_scope": "SETTLED_CASHFLOW",
+      "evidence_basis": "NONE",
+      "fill_state": "NOT_APPLICABLE",
+      "first_reliable_available_at": "2026-08-01T13:11:35.638603Z",
+      "label": "NET",
+      "member_id": "T21-WATCH-6f21dec76d05f5831216",
+      "observed_measures": {
+        "actual_elapsed_from_member_p0_seconds": "5042.775573",
+        "panel_state": "OBSERVED"
+      },
+      "panel_id": "P2",
+      "path_state": "NOT_APPLICABLE",
+      "quality_flags": [
+        "SETTLED_CASHFLOW_NOT_OBSERVED",
+        "TASK26_FEE_AND_CASHFLOW_MODEL_NOT_AVAILABLE"
+      ],
+      "record_id": "T25-R2-0107",
+      "route_state_observed": "NOT_APPLICABLE",
+      "source_content_sha256": "6859ba724a7602000cca93435b978fc253b5a80a0c3b2b4ecf4ff3567084e101",
+      "source_scope": "T21_R2_DEVELOPMENT",
+      "tested_notional_usd": null,
+      "unit": null,
+      "value_decimal": null
+    },
+    {
+      "assessment": "SUPPORTED",
+      "cashflow_state": "NOT_APPLICABLE",
+      "claim_scope": "DISCRETE_PATH_GRID",
+      "evidence_basis": "DISCRETE_PANEL_GRID",
+      "fill_state": "NOT_APPLICABLE",
+      "first_reliable_available_at": "2026-08-01T13:11:35.638603Z",
+      "label": "PATH_RISK",
+      "member_id": "T21-WATCH-6f21dec76d05f5831216",
+      "observed_measures": {
+        "actual_elapsed_from_member_p0_seconds": "5042.775573",
+        "notionals_usd": [
+          10,
+          25,
+          50,
+          100
+        ],
+        "panel_state": "OBSERVED",
+        "quote_notional_capacity_proxy_usd": "100",
+        "worst_observed_roundtrip_quote_return_decimal": "-0.051216"
+      },
+      "panel_id": "P2",
+      "path_state": "SPARSE_DISCRETE",
+      "quality_flags": [
+        "ACTUAL_SPARSE_PANEL_TIMES",
+        "CONTINUOUS_MAE_MFE_FORBIDDEN",
+        "QUOTE_IMPLIED_NOT_REALIZED",
+        "WORST_NOTIONAL_DETERIORATION_FROM_MEMBER_P0"
+      ],
+      "record_id": "T25-R2-0108",
+      "route_state_observed": "NOT_APPLICABLE",
+      "source_content_sha256": "6859ba724a7602000cca93435b978fc253b5a80a0c3b2b4ecf4ff3567084e101",
+      "source_scope": "T21_R2_DEVELOPMENT",
+      "tested_notional_usd": null,
+      "unit": "RETURN_DECIMAL",
+      "value_decimal": "0.057328"
+    }
+  ],
+  "prohibited_claims": [
+    "CONTINUOUS_TOUCH",
+    "EXACT_NOMINAL_HORIZON",
+    "FILL_OR_SETTLEMENT",
+    "REALIZED_VWAP",
+    "NET_RETURN",
+    "OWNER_CASHFLOW",
+    "CONTINUOUS_MAE_MFE",
+    "GENERALIZATION_OR_ALPHA",
+    "R3_HOLDOUT_RESULT"
+  ],
+  "schema": "smial.task25.r2-outcome-projection",
+  "schema_version": "1.0",
+  "status": "PASS_BOUNDED_R2_DEVELOPMENT_WITH_LIMITATIONS",
+  "summary": {
+    "assessments": {
+      "SUPPORTED": 9,
+      "UNKNOWN": 99
+    },
+    "entity_graph_values_read": 0,
+    "fillable_supported": 0,
+    "future_rows_consumed": 0,
+    "labels": {
+      "FILLABLE": 36,
+      "NET": 9,
+      "PATH_RISK": 9,
+      "QUOTE_EXIT": 36,
+      "REALIZED_VWAP": 9,
+      "TOUCH": 9
+    },
+    "members": 3,
+    "net_supported": 0,
+    "observed_buy_quote_available": 36,
+    "observed_sell_quote_available": 36,
+    "outcomes_dropped": 0,
+    "outcomes_input": 108,
+    "outcomes_output": 108,
+    "panels": 9,
+    "path_risk_discrete_supported": 9,
+    "quote_exit_supported": 0,
+    "quote_pairs": 36,
+    "r3_paths_or_values_read": 0,
+    "raw_r2_value_files_reopened": 0,
+    "realized_vwap_supported": 0,
+    "unknown_values_coerced_to_zero": 0
+  },
+  "task_id": "TASK-25"
+}
