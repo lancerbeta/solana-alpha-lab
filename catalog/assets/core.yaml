@@ -575,13 +575,13 @@ records:
     contains_raw_data: false
     sensitivity: INTERNAL_NON_SECRET
 - asset_id: CTRL-AGENTS-001
-  record_version: '1.8'
+  record_version: '1.9'
   asset_type: control_document
   purpose: Repository-level agent contract for standing routine autonomy, scope,
-    safety, JIT validation, and status ownership.
+    safety, JIT validation, tracked-only delivery preflight, and status ownership.
   status: IMPLEMENTED_UNVERIFIED
   origin: REPOSITORY
-  as_of: '2026-07-30'
+  as_of: '2026-08-02'
   truth_owner: CTRL-BATON-SETUP
   location:
     kind: git_path
@@ -589,7 +589,7 @@ records:
     repository_path: AGENTS.md
   integrity:
     kind: sha256
-    sha256: 4fb3a6c1322bf35265b65aefc870c8d8f27aab1a3d7f4ee97ee86b977aafb714
+    sha256: d0abf3d107f35c0845614be500d46ea7edcc399dfd4f6f810f30399ef07b642d
   access:
     mode: read_only
     method: file
@@ -774,13 +774,14 @@ records:
     contains_raw_data: false
     sensitivity: INTERNAL_NON_SECRET
 - asset_id: CI-VALIDATOR-001
-  record_version: '1.3'
+  record_version: '1.4'
   asset_type: script
   purpose: Single platform-neutral gate for runtime, lock, secrets, Catalog, generated
-    views, repository policy, baton machine-layer checks, and tests.
+    views, repository policy, baton machine-layer checks, tests, and one isolated
+    tracked-only delivery preflight.
   status: IMPLEMENTED_UNVERIFIED
   origin: REPOSITORY
-  as_of: '2026-07-25'
+  as_of: '2026-08-02'
   truth_owner: TASK-04
   location:
     kind: git_path
@@ -788,7 +789,7 @@ records:
     repository_path: scripts/validate_ci.py
   integrity:
     kind: sha256
-    sha256: c5415cff29ab3d92d8b00d18cc3e8bf7cc050f21e21fe7ccffdf3a850b8718f1
+    sha256: 0a5749c6651885f0cd7f38560efb604fef8b569b5dd9c60301da1f1ff24e931a
   access:
     mode: read_only
     method: command
@@ -12497,9 +12498,11 @@ records:
   evidence: []
   classification: *t24_internal
 - asset_id: TEST-T24-A7-CATALOG-FACTORY-FIT-001
-  record_version: '1.0'
+  record_version: '1.1'
   asset_type: script
-  purpose: Hash-bound A7 tests for exact partial assets Catalog lifecycle generated navigation Full Factory Fit and authority boundaries.
+  purpose: Hash-bound A7 tests for the immutable TASK-24 transaction plus monotonic
+    current Catalog growth, lifecycle, generated navigation, Full Factory Fit and
+    authority boundaries.
   status: IMPLEMENTED_UNVERIFIED
   origin: REPOSITORY
   as_of: '2026-08-02'
@@ -12510,7 +12513,7 @@ records:
     repository_path: tests/test_task24_catalog_factory_fit.py
   integrity:
     kind: sha256
-    sha256: b205f8937d167dd3085ae7c1ad284e0986a1acc941439212c05c39e6c87a5fe2
+    sha256: e395a3a6c42b26a118b5fcc9ae3ae49fbb8972025ef7d0089b55f5ba93e43dc0
   access: *t24_read_file
   relations:
   - relation_type: depends_on

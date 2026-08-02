@@ -115,20 +115,29 @@ class Task24CatalogFactoryFitTests(unittest.TestCase):
 
     def test_catalog_transaction_and_all_registered_hashes_are_exact(self) -> None:
         manifest, records = load_catalog()
-        self.assertEqual(manifest["catalog_version"], "0.29.0")
-        self.assertEqual(
-            manifest["current_checkpoint"],
-            {
-                "assets": 448,
-                "asset_registries": 4,
-                "schemas": 7,
-                "queries": 8,
-                "lifecycle_registries": 9,
-                "lifecycle_records": 56,
-            },
+        transaction = self.receipt["catalog"]
+        current_version = tuple(
+            int(part) for part in manifest["catalog_version"].split(".")
         )
-        self.assertEqual(len(records), 448)
-        self.assertEqual(set(self.receipt["catalog"]["registered_asset_ids"]), NEW_IDS)
+        accepted_version = tuple(
+            int(part) for part in transaction["after_version"].split(".")
+        )
+        self.assertGreaterEqual(current_version, accepted_version)
+        checkpoint = manifest["current_checkpoint"]
+        self.assertGreaterEqual(checkpoint["assets"], transaction["after_assets"])
+        self.assertEqual(checkpoint["asset_registries"], transaction["asset_registries"])
+        self.assertEqual(checkpoint["schemas"], transaction["schemas"])
+        self.assertEqual(checkpoint["queries"], transaction["queries"])
+        self.assertEqual(
+            checkpoint["lifecycle_registries"],
+            transaction["lifecycle_registries"],
+        )
+        self.assertGreaterEqual(
+            checkpoint["lifecycle_records"],
+            transaction["after_lifecycle_records"],
+        )
+        self.assertEqual(len(records), checkpoint["assets"])
+        self.assertEqual(set(transaction["registered_asset_ids"]), NEW_IDS)
         self.assertTrue(NEW_IDS.issubset(records))
         for asset_id in NEW_IDS:
             with self.subTest(asset_id=asset_id):

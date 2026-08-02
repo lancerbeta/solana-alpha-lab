@@ -1,6 +1,6 @@
 schema_version: '1.0'
 catalog_id: SMIAL-PROJECT-ASSET-CATALOG
-catalog_version: 0.29.0
+catalog_version: 0.29.1
 as_of: '2026-08-02'
 implementation_status: VALIDATED_ACTIVE
 current_checkpoint:

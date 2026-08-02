@@ -25,6 +25,7 @@ def load_module(name: str, relative: str):
 
 ci = load_module("validate_ci", "scripts/validate_ci.py")
 secret_scan = load_module("secret_scan_for_ci", "scripts/secret_scan.py")
+SKIP_CALL_TEXT = "self." + "skip" + "Test"
 
 
 class CiWorkflowTests(unittest.TestCase):
@@ -131,6 +132,99 @@ class CleanCloneDocumentationTests(unittest.TestCase):
             text,
         )
         self.assertIn("Keep `main` attached to `origin/main`", text)
+
+
+class TrackedOnlyDeliveryPreflightTests(unittest.TestCase):
+    def test_agents_contract_selects_one_delivery_only_gate(self) -> None:
+        text = (ROOT / "AGENTS.md").read_text(encoding="utf-8")
+        self.assertIn("## TRACKED_ONLY_DELIVERY_PREFLIGHT", text)
+        self.assertIn(ci.DELIVERY_PREFLIGHT_COMMAND, text)
+        self.assertIn("wall-time cap is 15 minutes", text)
+        self.assertIn("copies no untracked or ignored inputs", text)
+        self.assertIn("not an implementation-loop or per-atom hook", text)
+
+    def test_new_skip_without_tracked_noncritical_proof_fails(self) -> None:
+        diff = f"""\
+diff --git a/tests/test_example.py b/tests/test_example.py
+--- a/tests/test_example.py
++++ b/tests/test_example.py
+@@ -1,2 +1,4 @@
+ class Example:
++    def test_raw(self):
++        {SKIP_CALL_TEXT}("ignored local raw input is unavailable")
+"""
+        with self.assertRaisesRegex(
+            ci.CiValidationError,
+            "delivery_new_skip_policy_failed",
+        ):
+            ci.validate_new_test_skip_policy(
+                diff,
+                proof_exists=lambda _path: False,
+            )
+
+    def test_adjacent_tracked_noncritical_proof_is_explicit(self) -> None:
+        proof = "docs/decisions/noncritical-clean-checkout.md"
+        diff = f"""\
+diff --git a/tests/test_example.py b/tests/test_example.py
+--- a/tests/test_example.py
++++ b/tests/test_example.py
+@@ -1,2 +1,5 @@
+ class Example:
++    # DELIVERY_PREFLIGHT_NONCRITICAL_SKIP: {proof}
++    def test_optional(self):
++        {SKIP_CALL_TEXT}("optional external observation")
+"""
+        self.assertEqual(
+            ci.validate_new_test_skip_policy(
+                diff,
+                proof_exists=lambda path: path == proof,
+            ),
+            [{"test_path": "tests/test_example.py", "proof_path": proof}],
+        )
+
+    def test_invalid_or_untracked_skip_proof_fails_closed(self) -> None:
+        diff = f"""\
+diff --git a/tests/test_example.py b/tests/test_example.py
+--- a/tests/test_example.py
++++ b/tests/test_example.py
+@@ -1,2 +1,5 @@
+ class Example:
++    # DELIVERY_PREFLIGHT_NONCRITICAL_SKIP: ../../local/raw.md
++    def test_optional(self):
++        {SKIP_CALL_TEXT}("optional external observation")
+"""
+        with self.assertRaisesRegex(ci.CiValidationError, "invalid_skip_proof"):
+            ci.validate_new_test_skip_policy(
+                diff,
+                proof_exists=lambda _path: True,
+            )
+
+    def test_validation_summary_preserves_skip_and_missing_input_evidence(self) -> None:
+        summary = ci.parse_validation_summary(
+            """\
+REPOSITORY_POLICY: PASS
+Ran 1626 tests in 4.2s
+OK (skipped=61)
+test_raw skipped 'ignored local A3 raw population is unavailable'
+RESULT: PASS
+"""
+        )
+        self.assertEqual(summary["tests_run"], 1626)
+        self.assertEqual(summary["skipped"], 61)
+        self.assertEqual(summary["pass_labels"], 2)
+        self.assertEqual(
+            summary["missing_local_inputs"],
+            ["ignored local A3 raw population is unavailable"],
+        )
+
+    def test_delivery_mode_is_opt_in_and_base_ref_is_explicit(self) -> None:
+        ordinary = ci.parse_args([])
+        delivery = ci.parse_args(
+            ["--tracked-only-delivery", "--base-ref", "origin/main"]
+        )
+        self.assertFalse(ordinary.tracked_only_delivery)
+        self.assertTrue(delivery.tracked_only_delivery)
+        self.assertEqual(delivery.base_ref, "origin/main")
 
 
 class PlatformGateContractTests(unittest.TestCase):
