@@ -52,11 +52,19 @@ class CatalogImportTests(unittest.TestCase):
                 "TRIAL-T23-BOUNDED-ANALYSIS-ADVERSARIAL-ACCEPTANCE-001",
             ],
         )
+        self.assertEqual(
+            [
+                record["record_id"]
+                for record in production_records["decisions_negative_results"]
+            ],
+            ["NEGATIVE-T24-ENTITY-SIGNAL-V1-001"],
+        )
         self.assertTrue(
             all(
                 not records
                 for registry_type, records in production_records.items()
-                if registry_type != "global_trial_ledger"
+                if registry_type
+                not in {"global_trial_ledger", "decisions_negative_results"}
             )
         )
 

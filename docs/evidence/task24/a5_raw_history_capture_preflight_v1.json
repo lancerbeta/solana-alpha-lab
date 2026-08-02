@@ -1,0 +1,159 @@
+{
+  "receipt_id": "T24-A5-RAW-HISTORY-CAPTURE-PREFLIGHT-001",
+  "schema_version": "1.0",
+  "task_id": "TASK-24",
+  "atom": "T24-A5_BOUNDED_RAW_HISTORY_FEASIBILITY_CAPTURE_V1",
+  "as_of": "2026-08-02",
+  "status": "PASS_DRY_RUN_READY_EXTERNAL",
+  "entry_gate": {
+    "verdict": "START_AS_WRITTEN",
+    "route_owner": "LOCAL_WORK_PRIMARY",
+    "execution_route": "LOCAL_WORK_CODEX",
+    "accepted_main_commit": "31c01640499be6b7e86a2fe638d9217c202861cc",
+    "accepted_main_tree": "6677878eb2b8195018ab217c6a9a429de5726563",
+    "branch": "task24/entity-graph-contract",
+    "active_time_gates": 0,
+    "reasoning": "VERY_HIGH_SUFFICIENT",
+    "mode_switch": "NONE"
+  },
+  "authority": {
+    "source": "EXPLICIT_USER_OK_T24_A5_PLUS_A4_FROZEN_ENVELOPE",
+    "external_authority_phrase": "T24-A5_BOUNDED_RAW_HISTORY_FEASIBILITY_CAPTURE_V1",
+    "provider_api_rpc_calls_authorized": 21,
+    "provider_credits_authorized": 210,
+    "cash_spend_usd_cents_authorized": 0,
+    "retries_authorized": 0,
+    "pagination_authorized": false,
+    "fallback_provider_calls_authorized": 0,
+    "population_expansion_authorized": false,
+    "r3_or_outcome_reads_authorized": 0,
+    "wallet_signer_transaction_actions_authorized": 0,
+    "commit": false,
+    "push": false,
+    "pull_request": false,
+    "merge": false
+  },
+  "frozen_bindings": {
+    "a4_config": {
+      "path": "configs/task24_entity_linkage_evidence_extension_v1.yaml",
+      "sha256": "2db333e179ecc54cced41128b5a8c97825fc970d46af66be8660db9ee963791b"
+    },
+    "a4_receipt": {
+      "path": "docs/evidence/task24/a4_bounded_entity_linkage_evidence_extension_decision_v1.json",
+      "sha256": "7169c2894929d8e5571635b11b75cb4ec7dbd89a543d164d54f8fab552504f1e"
+    },
+    "a3_manifest": {
+      "path": "docs/evidence/task24/a3_entity_evidence_pre_read_manifest_v1.json",
+      "sha256": "f889c0f28d3259cc61681ba6cc56dc53686d2375ce98826ca572dc5d5720846d"
+    }
+  },
+  "implementation_bindings": {
+    "capture_module": {
+      "path": "src/solana_alpha_lab/task24_entity_linkage_capture.py",
+      "sha256": "04196f3f163993535b9b6d9316e63371981cbd8a2634ef30b6dd2f41d8e53885",
+      "bytes": 30904
+    },
+    "capture_launcher": {
+      "path": "scripts/run_task24_entity_linkage_capture.py",
+      "sha256": "6836282b105566e624ce86b3162ea4c6adbcfadd9ffe58d1c1910df148fb2295",
+      "bytes": 4591
+    },
+    "capture_tests": {
+      "path": "tests/test_task24_entity_linkage_capture.py",
+      "sha256": "140c7480625853b8d320ac872369f99c5a74741e9762a335bb92457abe13da3a",
+      "bytes": 14695
+    }
+  },
+  "population": {
+    "source": "A3_FROZEN_PSEUDONYMIZED_POPULATION",
+    "fingerprint_sha256": "c513e589184c0d774a23ed00c94daf87a19518e9a3f02374349697d5ad8ef1f0",
+    "token_mints": 1,
+    "wallets": 20,
+    "total_subjects": 21,
+    "raw_public_addresses_in_tracked_output": 0
+  },
+  "capture_plan": {
+    "provider": "HELIUS",
+    "method": "getTransactionsForAddress",
+    "transaction_details": "full",
+    "sort_order": "asc",
+    "limit_each": 100,
+    "commitment": "finalized",
+    "encoding": "json",
+    "max_supported_transaction_version": 0,
+    "status_filter": "succeeded",
+    "token_accounts_filter": "none",
+    "provider_calls": 21,
+    "maximum_returned_transactions": 2100,
+    "maximum_provider_credits": 210,
+    "retries": 0,
+    "pagination": false,
+    "fallback_provider_calls": 0,
+    "cash_spend_usd_cents": 0,
+    "response_bytes_each_cap": 8388608,
+    "received_bytes_total_cap": 176160768,
+    "elapsed_seconds_cap": 900,
+    "raw_dataset_id": "SMIAL_TASK24_ENTITY_LINKAGE_HISTORY_RAW",
+    "raw_dataset_version": "1.0",
+    "raw_logical_root": "task24_entity_linkage_history_v1",
+    "raw_root_git_ignored": true
+  },
+  "secret_boundary": {
+    "matching_environment_variable_present": false,
+    "mode": "LOCAL_INTERACTIVE_HIDDEN_INPUT",
+    "dashboard_credit_readback_required": true,
+    "minimum_attested_remaining_credits": 210,
+    "credential_persisted": false,
+    "credential_printed": false,
+    "credential_in_safe_receipt": false,
+    "credential_in_tracked_file": false
+  },
+  "dry_run_validation": {
+    "preflight_command": "uv run --locked --managed-python python -B scripts/run_task24_entity_linkage_capture.py",
+    "preflight_status": "PASS",
+    "targeted_command": "uv run --locked --managed-python python -B -m unittest tests.test_task24_entity_linkage_capture",
+    "tests_passed": 14,
+    "failures": 0,
+    "errors": 0,
+    "synthetic_full_capture_calls": 21,
+    "synthetic_full_capture_partitions": 21,
+    "adversarial_twenty_second_call": "PASS_REJECTED",
+    "adversarial_retry_or_pagination": "PASS_REJECTED",
+    "adversarial_credit_or_cash_cap": "PASS_REJECTED",
+    "adversarial_payload_error": "PASS_PERSISTED_ONCE_AND_STOPPED",
+    "raw_address_in_safe_receipt": 0,
+    "credential_value_in_safe_receipt": 0
+  },
+  "managed_write_set": [
+    "src/solana_alpha_lab/task24_entity_linkage_capture.py",
+    "scripts/run_task24_entity_linkage_capture.py",
+    "tests/test_task24_entity_linkage_capture.py",
+    "docs/evidence/task24/a5_raw_history_capture_preflight_v1.json",
+    "src/solana_alpha_lab/task24_entity_linkage_projection.py",
+    "scripts/build_task24_entity_linkage_projection.py",
+    "tests/test_task24_entity_linkage_projection.py",
+    "docs/evidence/task24/a5_projection_v1/entity_nodes_v1.jsonl",
+    "docs/evidence/task24/a5_projection_v1/entity_edges_v1.jsonl",
+    "docs/evidence/task24/a5_projection_v1/entity_candidates_v1.json",
+    "docs/evidence/task24/a5_projection_v1/entity_adjusted_concentration_v1.json",
+    "docs/evidence/task24/a5_projection_v1/projection_manifest_v1.json",
+    "docs/evidence/task24/a5_bounded_raw_history_feasibility_capture_v1.json"
+  ],
+  "stop_conditions": [
+    "AUTHORITY_PHRASE_MISMATCH",
+    "DASHBOARD_CREDITS_BELOW_210",
+    "CREDENTIAL_INVALID",
+    "FROZEN_POPULATION_OR_HASH_DRIFT",
+    "HTTP_OR_PROVIDER_ERROR",
+    "PAYLOAD_SCHEMA_OR_OLDEST_FIRST_ORDER_DRIFT",
+    "RESPONSE_STORAGE_OR_DISK_CAP",
+    "CALL_21_COMPLETED"
+  ],
+  "current_boundary": {
+    "status": "LOCAL_HIDDEN_INPUT_REQUIRED",
+    "provider_calls_executed": 0,
+    "provider_credits_consumed": 0,
+    "cash_spend_usd_cents": 0,
+    "next_action": "RUN_EXECUTE_LAUNCHER_IN_VISIBLE_LOCAL_POWERSHELL_AND_ENTER_AUTHORITY_CREDITS_AND_HIDDEN_KEY"
+  }
+}

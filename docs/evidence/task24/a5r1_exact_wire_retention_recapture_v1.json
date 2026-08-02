@@ -1,0 +1,303 @@
+{
+  "receipt_id": "T24-A5R1-EXACT-WIRE-RETENTION-RECAPTURE-001",
+  "schema_version": "1.0",
+  "task_id": "TASK-24",
+  "atom": "T24-A5R1_EXACT_WIRE_RETENTION_RECAPTURE_V1",
+  "as_of": "2026-08-02",
+  "status": "PASS_VALIDATED_EXACT_WIRE_RECAPTURE_REDESIGN_DATA",
+  "owner_decision": "REDESIGN_DATA",
+  "entry_gate": {
+    "verdict": "START_AS_WRITTEN",
+    "execution_shape": "SINGLE_PASS",
+    "route_owner": "LOCAL_WORK_PRIMARY",
+    "execution_route": "LOCAL_WORK_CODEX",
+    "accepted_main_commit": "31c01640499be6b7e86a2fe638d9217c202861cc",
+    "accepted_main_tree": "6677878eb2b8195018ab217c6a9a429de5726563",
+    "branch": "task24/entity-graph-contract",
+    "active_time_gates": 0,
+    "product_vision_gate": "CANONICALIZED_WITH_PATCH",
+    "reasoning": "VERY_HIGH_SUFFICIENT",
+    "mode_switch": "NONE"
+  },
+  "authority": {
+    "source": "EXPLICIT_USER_OK_T24_A5R1",
+    "exact_phrase": "T24-A5R1_EXACT_WIRE_RETENTION_RECAPTURE_V1",
+    "provider_api_rpc_calls": 21,
+    "provider_credits_modeled": 210,
+    "cash_spend_usd_cents": 0,
+    "retries": 0,
+    "pagination_requests": 0,
+    "fallback_provider_calls": 0,
+    "population_expansion": 0,
+    "r3_or_outcome_reads": 0,
+    "wallet_signer_transaction_actions": 0,
+    "dependency_changes": 0,
+    "catalog_or_registry_mutations": 0,
+    "deploy_release_actions": 0,
+    "commit": false,
+    "push": false,
+    "pull_request": false,
+    "merge": false
+  },
+  "preflight_binding": {
+    "path": "docs/evidence/task24/a5r1_exact_wire_recapture_preflight_v1.json",
+    "sha256": "f1b4964768b7db1474ea6c0199bebbad37c264adf9a37c4b6697b151afe27250",
+    "bytes": 7172
+  },
+  "repair_origin": {
+    "legacy_a5_acceptance": {
+      "path": "docs/evidence/task24/a5_bounded_raw_history_feasibility_capture_v1.json",
+      "sha256": "d7ccdc033918ae8f045ad8c1776d6520ffcec86e6707677f84941a685ac76c02",
+      "status": "FAIL_CURRENT_RUN_EXACT_WIRE_RETENTION_CONTRACT"
+    },
+    "legacy_projection_manifest": {
+      "path": "docs/evidence/task24/a5_projection_v1/projection_manifest_v1.json",
+      "sha256": "64d58868c96da4d560f0a12f63010343a19c1d6df6674c3a5857c1b7738e1825",
+      "status": "QUARANTINED_CAPTURE_RETENTION_CONTRACT_FAILED"
+    },
+    "failed_requirement_repaired": "EXACT_RAW_RESPONSE_BYTES",
+    "legacy_artifacts_rewritten": false
+  },
+  "capture_execution": {
+    "provider": "HELIUS",
+    "method": "getTransactionsForAddress",
+    "run_id": "t24a5-20260802T084813Z",
+    "capture_contract_version": "1.1",
+    "dataset_version": "1.1",
+    "canonical_envelope_root": "data/raw/task24_entity_linkage_history_v1_1/run=t24a5-20260802T084813Z",
+    "exact_wire_root": "data/raw/task24_entity_linkage_history_wire_v1_1/run=t24a5-20260802T084813Z",
+    "raw_roots_git_ignored": true,
+    "raw_receipt": {
+      "path": "data/raw/task24_entity_linkage_history_v1_1/run=t24a5-20260802T084813Z/receipts/capture.receipt.json",
+      "sha256": "c52f7892e3227adba0afa2a6afc6bcf872f258313be2e14745a6420a32c5c829",
+      "bytes": 34939
+    },
+    "terminal": "RAW_HISTORY_CAPTURED_REQUIRES_PROJECTION",
+    "population": {
+      "token_mints": 1,
+      "wallets": 20,
+      "total_subjects": 21,
+      "fingerprint_sha256": "c513e589184c0d774a23ed00c94daf87a19518e9a3f02374349697d5ad8ef1f0"
+    },
+    "provider_calls": 21,
+    "planned_calls": 21,
+    "successful_http_200_responses": 21,
+    "provider_credits_modeled": 210,
+    "cash_spend_usd_cents": 0,
+    "retries": 0,
+    "pagination_requests": 0,
+    "fallback_provider_calls": 0,
+    "response_pages": 21,
+    "transactions_returned": 1939,
+    "unique_transactions": 1936,
+    "duplicate_transaction_payload_conflicts": 0,
+    "received_exact_wire_bytes": 21386958,
+    "stored_exact_wire_bytes": 21386958,
+    "stored_canonical_partition_bytes": 21553474,
+    "stored_receipt_bytes": 34939,
+    "stored_bytes_total_computed": 42975371,
+    "exact_wire_files": 21,
+    "canonical_partitions": 21,
+    "wire_canonical_semantic_equalities_verified": 21,
+    "truncated_subjects": 21,
+    "history_completeness": "BOUNDED_OLDEST_100_WINDOW_COMPLETE_ACCOUNT_HISTORY_TRUNCATED",
+    "oldest_first_slot_transaction_index_order_violations": 0
+  },
+  "replacement_equivalence": {
+    "legacy_run_id": "t24a5-20260802T081138Z",
+    "replacement_original_wire_sha256_matches": 21,
+    "pages_compared": 21,
+    "received_bytes_equal": true,
+    "transactions_returned_equal": true,
+    "interpretation": "THE_RECAPTURE_RETAINED_THE_EXACT_BYTES_FOR_THE_SAME_PROVIDER_PAYLOAD_SNAPSHOT"
+  },
+  "secret_and_privacy_receipt": {
+    "credential_input_mode": "LOCAL_INTERACTIVE_HIDDEN_INPUT",
+    "dashboard_credit_readback_completed": true,
+    "credential_supplied_once": true,
+    "credential_bearing_provider_calls": 21,
+    "credential_persisted": false,
+    "credential_printed": false,
+    "credential_values_exposed": 0,
+    "raw_public_addresses_in_tracked_outputs": 0,
+    "raw_transaction_signatures_in_tracked_outputs": 0,
+    "tracked_identity_mode": "STABLE_SHA256_PSEUDONYMS",
+    "repository_secret_scan": "PASS"
+  },
+  "projection_result": {
+    "manifest_id": "T24-A5R1-EXACT-WIRE-RECAPTURE-PROJECTION-001",
+    "status": "PASS_BOUNDED_HISTORY_PROJECTION_INSUFFICIENT_CAPACITY",
+    "admissibility": "PASS_EXACT_WIRE_AND_CANONICAL_DOMAINS_VERIFIED",
+    "nodes": 78,
+    "edges": 65,
+    "raw_immediate_funder_edges": 18,
+    "immediate_funder_absent": 2,
+    "immediate_funder_ambiguous": 0,
+    "raw_common_transaction_signer_edges": 0,
+    "raw_mint_created_by_wallet_edges": 1,
+    "derived_shared_immediate_funder_edges": 2,
+    "entity_candidates": 2,
+    "membership_claims": 4,
+    "corroborated_positive_claims": 0,
+    "inferred_or_vendor_positive_claims": 4,
+    "capacity_formula": "MIN(CORROBORATED_COUNT,8)+MIN(INFERRED_OR_VENDOR_COUNT,8)",
+    "selected_predicted_positive_capacity": 4,
+    "minimum_required_to_open_false_positive_audit": 12,
+    "capacity_shortfall": 8,
+    "false_positive_audit": "NOT_TESTABLE_INSUFFICIENT_PREDICTED_POSITIVES",
+    "manual_labels_opened": 0,
+    "mint_creator_status": "DIRECT_IMMEDIATE_CREATOR_ROLE_PROJECTED_NOT_BENEFICIAL_OWNERSHIP",
+    "adjusted_concentration": "UNCHANGED_NOT_AVAILABLE_EXCLUSION_INVENTORY_INCOMPLETE",
+    "holder_exclusions_changed": 0
+  },
+  "artifact_bindings": {
+    "capture_module": {
+      "path": "src/solana_alpha_lab/task24_entity_linkage_capture.py",
+      "sha256": "82cea86523ee70fbdfed154597f43a4660a850847bb1eeaf3d14755bd417ad49",
+      "bytes": 32717
+    },
+    "capture_launcher": {
+      "path": "scripts/run_task24_entity_linkage_capture.py",
+      "sha256": "5e4dd4e48d93f69ff106905bdea7aff952c2dc2947cb6e609bac251ea9016b53",
+      "bytes": 4618
+    },
+    "capture_tests": {
+      "path": "tests/test_task24_entity_linkage_capture.py",
+      "sha256": "021c56cd8bee349d45964d8682104fe05593c29184037cc063cf48cedc1213f0",
+      "bytes": 17672
+    },
+    "projection_module": {
+      "path": "src/solana_alpha_lab/task24_entity_linkage_projection.py",
+      "sha256": "e6272cb3120f1f8b9307a48dce0937a8a175edb684201d80e38bbd339d5854c1",
+      "bytes": 48875
+    },
+    "projection_launcher": {
+      "path": "scripts/build_task24_entity_linkage_projection.py",
+      "sha256": "583f9eb5a7fac6ca9e86b8a6b25a7b253a65ce6eca204a92d1712666378965f5",
+      "bytes": 1138
+    },
+    "projection_tests": {
+      "path": "tests/test_task24_entity_linkage_projection.py",
+      "sha256": "ceaac39e9a39b4fb11257d8010a083adf7d030661b2ed7d70b3dc387938568ce",
+      "bytes": 15458
+    },
+    "recapture_tests": {
+      "path": "tests/test_task24_entity_linkage_recapture.py",
+      "sha256": "3db2fb752526a00a4eeb3383b9ac2a6e75ed36b1900884bd92d0e44926c34e5a",
+      "bytes": 10099
+    },
+    "entity_nodes": {
+      "path": "docs/evidence/task24/a5r1_projection_v1/entity_nodes_v1.jsonl",
+      "sha256": "8bc35e1ae3678b1b282ff42a6450a759627c48e75f4d8cbb3bb79a7809f6410a",
+      "bytes": 61586,
+      "rows": 78
+    },
+    "entity_edges": {
+      "path": "docs/evidence/task24/a5r1_projection_v1/entity_edges_v1.jsonl",
+      "sha256": "24ce894f08f689002a131f7d7bbfe80ec9021d46536d6cb0ffc89847bf16ea9b",
+      "bytes": 85900,
+      "rows": 65
+    },
+    "entity_candidates": {
+      "path": "docs/evidence/task24/a5r1_projection_v1/entity_candidates_v1.json",
+      "sha256": "e21c37b074ae623a359ed1d4228f95333706ce7b4f26f607bbd2789ba6b1b1de",
+      "bytes": 3552,
+      "rows": 2
+    },
+    "adjusted_concentration": {
+      "path": "docs/evidence/task24/a5r1_projection_v1/entity_adjusted_concentration_v1.json",
+      "sha256": "644b148f17fe437118196dabdb4185886117086aab1fe1b77f7965621a06f4ad",
+      "bytes": 323,
+      "rows": 1
+    },
+    "projection_manifest": {
+      "path": "docs/evidence/task24/a5r1_projection_v1/projection_manifest_v1.json",
+      "sha256": "a6489a33d7bad02ffeb0fd70f3912e46c1175bcb0b21691005414a6448e57b6e",
+      "bytes": 4857,
+      "rows": 1
+    }
+  },
+  "validation": {
+    "status": "PASS",
+    "targeted_command": "uv run --locked --managed-python python -B -m unittest tests.test_task24_entity_linkage_capture tests.test_task24_entity_linkage_projection tests.test_task24_entity_linkage_recapture",
+    "targeted_tests_passed": 37,
+    "targeted_failures": 0,
+    "targeted_errors": 0,
+    "adjacent_compatibility_command": "uv run --locked --managed-python python -B -m unittest tests.test_task05_schema_contract tests.test_task11_entity_inputs tests.test_task11_entity_input_replay tests.test_task11_entity_input_transport tests.test_task23_bounded_diagnostics_contract tests.test_task24_entity_graph_contract tests.test_task24_entity_evidence_projection tests.test_task24_entity_linkage_evidence_extension_decision tests.test_task24_entity_linkage_capture tests.test_task24_entity_linkage_projection tests.test_task24_entity_linkage_recapture",
+    "adjacent_compatibility_tests_passed": 146,
+    "adjacent_compatibility_failures": 0,
+    "adjacent_compatibility_errors": 0,
+    "deterministic_core_projection_rebuild": "PASS",
+    "exact_wire_file_hash_and_size_checks": "PASS_21_OF_21",
+    "canonical_partition_file_and_content_checks": "PASS_21_OF_21",
+    "wire_canonical_semantic_equality": "PASS_21_OF_21",
+    "raw_addresses_and_signatures_absent_from_tracked_projection": "PASS",
+    "legacy_projection_quarantine_unchanged": "PASS",
+    "secret_scan": "PASS",
+    "full_repository_gate": "DEFERRED_TO_DELIVERY_OR_TASK_FINALIZATION"
+  },
+  "factory_fit_checkpoint": {
+    "status": "PASS_FOR_A5R1_NOT_TASK_DONE",
+    "review_depth": "FULL_REVIEW_ATOM_LEVEL",
+    "mission": "Repairs auditability of the cheapest entity-evidence feasibility probe without changing its population, method or inference rules.",
+    "flexibility": "Exact provider wire bytes, canonical envelopes, project parsing and reversible entity inference remain separate versioned layers.",
+    "compatibility_history": "The legacy A5 run remains quarantined and immutable; A5R1 uses separate versioned raw roots and a separate tracked projection directory.",
+    "efficiency": "The repair used exactly 21 replacement calls and 210 modeled existing credits with no pagination, retry, fallback or cash spend.",
+    "research_truth": "The replacement payload matches all 21 legacy wire hashes, so the prior 4-of-12 structural result is now supported by admissible retained bytes rather than changed observations.",
+    "owner_operability": "The owner receives one explicit decision: current evidence cannot open the frozen false-positive audit and must be redesigned or stopped.",
+    "execution_to_cashflow": "No strategy, execution, PnL, NetReturn or owner-cashflow claim is made.",
+    "monitoring_recovery": "Every request has immutable exact wire bytes, a canonical raw event, separate hashes and a semantic equality check; both raw roots are Git-ignored and replayable locally.",
+    "build_vs_buy": "The adopted provider transport remains thin; project-owned parsing and evidence semantics prevent vendor labels from becoming ownership truth.",
+    "red_team": "All 21 histories remain visibly truncated at oldest-100, shared-funder evidence stays inferred, no corroborated claims exist and no holder exclusion or audit is opened.",
+    "full_pre_done_review": "REQUIRED_LATER"
+  },
+  "non_claims": [
+    "FULL_ACCOUNT_HISTORY",
+    "BENEFICIAL_OWNERSHIP",
+    "ULTIMATE_FUNDER",
+    "AUTHORITATIVE_BUNDLE_MEMBERSHIP",
+    "HOLDER_EXCLUSION_OR_STRATEGY_VETO",
+    "FALSE_POSITIVE_RATE",
+    "ALPHA_OR_GENERALIZATION",
+    "EXECUTION_PNL_NETRETURN_OR_CASHFLOW",
+    "TASK24_DONE"
+  ],
+  "managed_write_set": [
+    "src/solana_alpha_lab/task24_entity_linkage_capture.py",
+    "scripts/run_task24_entity_linkage_capture.py",
+    "tests/test_task24_entity_linkage_capture.py",
+    "src/solana_alpha_lab/task24_entity_linkage_projection.py",
+    "scripts/build_task24_entity_linkage_projection.py",
+    "tests/test_task24_entity_linkage_projection.py",
+    "tests/test_task24_entity_linkage_recapture.py",
+    "docs/evidence/task24/a5r1_exact_wire_recapture_preflight_v1.json",
+    "docs/evidence/task24/a5r1_projection_v1/entity_nodes_v1.jsonl",
+    "docs/evidence/task24/a5r1_projection_v1/entity_edges_v1.jsonl",
+    "docs/evidence/task24/a5r1_projection_v1/entity_candidates_v1.json",
+    "docs/evidence/task24/a5r1_projection_v1/entity_adjusted_concentration_v1.json",
+    "docs/evidence/task24/a5r1_projection_v1/projection_manifest_v1.json",
+    "docs/evidence/task24/a5r1_exact_wire_retention_recapture_v1.json"
+  ],
+  "cumulative_a5_family_receipt": {
+    "provider_api_rpc_calls": 42,
+    "provider_credits_modeled": 420,
+    "cash_spend_usd_cents": 0,
+    "legacy_calls_quarantined": 21,
+    "admissible_replacement_calls": 21
+  },
+  "state_change": {
+    "task24": "IN_PROGRESS",
+    "atom_a5": "IMPLEMENTED_UNVERIFIED_LEGACY_RUN_QUARANTINED",
+    "atom_a5r1": "VALIDATED",
+    "a5r1_projection": "ADMISSIBLE_INSUFFICIENT_AUDIT_CAPACITY",
+    "false_positive_audit_opened": false,
+    "canonical_task24_done": false,
+    "catalog_registration": "DEFERRED_TO_TASK24_FINALIZATION"
+  },
+  "next_boundary": {
+    "atom": "T24-A6_BOUNDED_DATA_REDESIGN_OR_STOP_DECISION_V1",
+    "authorized": false,
+    "reason": "The admissible exact-wire recapture yields four inferred predicted-positive claims, zero corroborated claims and an eight-claim shortfall against the frozen minimum of twelve.",
+    "decision_only_before_any_new_external_call": true
+  }
+}

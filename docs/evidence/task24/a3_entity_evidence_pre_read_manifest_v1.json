@@ -1,0 +1,227 @@
+{
+  "manifest_id": "T24-A3-ENTITY-EVIDENCE-PRE-READ-MANIFEST-001",
+  "schema_version": "1.0",
+  "task_id": "TASK-24",
+  "atom": "T24-A3_DETERMINISTIC_ENTITY_EVIDENCE_FEASIBILITY_AND_PROJECTION_V1",
+  "as_of": "2026-08-02T07:21:14.8981552Z",
+  "status": "PASS_ADMISSIBLE_LOCAL_INPUTS",
+  "accepted_base": {
+    "commit": "31c01640499be6b7e86a2fe638d9217c202861cc",
+    "tree": "6677878eb2b8195018ab217c6a9a429de5726563",
+    "branch": "task24/entity-graph-contract"
+  },
+  "governing_contracts": [
+    {
+      "path": "docs/contracts/task24_entity_graph_and_false_positive_contract_v1.md",
+      "sha256": "14614796dfc17aeef907e6b1d863814cbfb52e8f188704b70f17d99a78b862a8"
+    },
+    {
+      "path": "configs/task24_entity_graph_v1.yaml",
+      "sha256": "a294d9c8507777581bec8217f4127e16a76788b243250a1eb57e6bff9b69ed25"
+    },
+    {
+      "path": "docs/evidence/task11/entity_input_pilot_execution_receipt_v1.json",
+      "sha256": "324c9ace8c49668864c274de19c09d42a7e794169f9a5ad619df8b47f3209ff4"
+    },
+    {
+      "path": "tests/fixtures/task11/entity_input_pilot_plan_v1.json",
+      "sha256": "ff0524ab2a77b517f8796ff54a753842306b83de9be6e8d4c391776afba0cf1d"
+    }
+  ],
+  "scope": {
+    "dataset_id": "SMIAL_TASK11_ENTITY_INPUT_PROBE_RAW",
+    "dataset_version": "1.0",
+    "run_id": "t11a3-20260728T102537Z",
+    "logical_root": "task11_entity_input_probe_v1/run=t11a3-20260728T102537Z",
+    "selected_mint": "4vXNhA6ncbx8usZ14CfxkYeQKdaQYgrLfJXNyWcVpump",
+    "availability_class": "PARTIAL_CURRENT_SNAPSHOT",
+    "allowed_projection": [
+      "RAW_TOKEN_ACCOUNT_FOR_MINT",
+      "RAW_TOKEN_ACCOUNT_OWNER"
+    ],
+    "forbidden_projection": [
+      "RAW_MINT_CREATED_BY_WALLET",
+      "RAW_IMMEDIATE_FUNDER",
+      "RAW_COMMON_TRANSACTION_SIGNER",
+      "RAW_SAME_BUNDLE_MEMBERSHIP",
+      "DERIVED_SHARED_IMMEDIATE_FUNDER",
+      "VENDOR_BUNDLE_LABEL",
+      "PROJECT_ENTITY_MEMBERSHIP_CANDIDATE"
+    ]
+  },
+  "search_receipt": {
+    "repo_relative_search_root": "data/raw",
+    "task11_name_candidates_under_local": 0,
+    "parquet_files_under_local": 0,
+    "exact_partition_name_matches_under_repository": 3,
+    "runtime_receipt_matches_under_repository": 1,
+    "absolute_paths_persisted": 0
+  },
+  "retention": {
+    "class": "UNIQUE_RAW_EVIDENCE",
+    "minimum": "UNTIL_HYPOTHESIS_RETIRED_AND_ALL_DEPENDENT_DATASETS_HOLDOUTS_AND_REPLAYS_EXPIRE",
+    "automatic_expiry": false,
+    "destructive_action_authorized": false
+  },
+  "parquet_schema": [
+    ["raw_event_id", "VARCHAR"],
+    ["idempotency_key", "VARCHAR"],
+    ["source", "VARCHAR"],
+    ["source_version", "VARCHAR"],
+    ["endpoint_or_method", "VARCHAR"],
+    ["request_hash", "VARCHAR"],
+    ["response_status", "VARCHAR"],
+    ["error_class", "VARCHAR"],
+    ["redacted_body", "BLOB"],
+    ["content_sha256", "VARCHAR"],
+    ["redaction_version", "VARCHAR"],
+    ["event_time", "TIMESTAMP WITH TIME ZONE"],
+    ["observed_at", "TIMESTAMP WITH TIME ZONE"],
+    ["available_to_strategy_at", "TIMESTAMP WITH TIME ZONE"],
+    ["ingested_at", "TIMESTAMP WITH TIME ZONE"],
+    ["first_reliable_available_at", "TIMESTAMP WITH TIME ZONE"],
+    ["provider_version", "VARCHAR"],
+    ["schema_version", "VARCHAR"],
+    ["protocol_version", "VARCHAR"],
+    ["revision_number", "BIGINT"],
+    ["revision_of", "VARCHAR"],
+    ["quality_flags", "VARCHAR"],
+    ["run", "VARCHAR"]
+  ],
+  "inputs": [
+    {
+      "role": "PILOT_PLAN",
+      "exact_local_path": "tests/fixtures/task11/entity_input_pilot_plan_v1.json",
+      "bytes": 2533,
+      "sha256": "ff0524ab2a77b517f8796ff54a753842306b83de9be6e8d4c391776afba0cf1d",
+      "provenance": "FIXTURE-T11-ENTITY-INPUT-PILOT-PLAN-001",
+      "permitted_fields": [
+        "dataset identity",
+        "selected mint and decimals",
+        "logical root",
+        "method sequence",
+        "offline caps"
+      ]
+    },
+    {
+      "role": "RUNTIME_RECEIPT",
+      "exact_local_path": "data/raw/task11_entity_input_probe_v1/run=t11a3-20260728T102537Z/receipts/probe.receipt.json",
+      "bytes": 4225,
+      "sha256": "0cad0cb9fac95475691ab9f71fac01a29ae63b87a8910647e0a0afcc23d233f1",
+      "provenance": "DATA-T11-ENTITY-INPUT-PILOT-RAW-001",
+      "permitted_fields": [
+        "run_id",
+        "logical_root",
+        "dataset_id",
+        "dataset_version",
+        "selected_mint",
+        "attempts",
+        "PIT timestamps",
+        "caps and zero-action receipts"
+      ]
+    },
+    {
+      "role": "TOKEN_SUPPLY_RAW_EVENT",
+      "method": "getTokenSupply",
+      "exact_local_path": "data/raw/task11_entity_input_probe_v1/run=t11a3-20260728T102537Z/partitions/01-getTokenSupply.parquet",
+      "bytes": 8852,
+      "sha256": "819fbfe6f76a11fa9c9c834cfb9fb78952fcfdc1ac354031c75f88922a872a29",
+      "content_sha256": "730b754f5bc3126070bd81249f23ba2fb76beda850a9af943bdcc8837852e401",
+      "raw_event_id": "raw-98f385729bef65c47885188266f1f5a4dd5f3f95b4e10c9c6fada2f62f4972bc",
+      "rows": 1,
+      "provenance": "DATA-T11-ENTITY-INPUT-PILOT-RAW-001",
+      "permitted_fields": [
+        "result.context.slot",
+        "result.value.amount",
+        "result.value.decimals"
+      ]
+    },
+    {
+      "role": "LARGEST_TOKEN_ACCOUNTS_RAW_EVENT",
+      "method": "getTokenLargestAccounts",
+      "exact_local_path": "data/raw/task11_entity_input_probe_v1/run=t11a3-20260728T102537Z/partitions/02-getTokenLargestAccounts.parquet",
+      "bytes": 24019,
+      "sha256": "847f9a7f406adf65d58e75095c1acc410807b5f68933bd99106757f2dd09aaa9",
+      "content_sha256": "7cbd1d5d5a86e5d08b39869f900a2930bfcd694bb00d585c64c39d161f80ff99",
+      "raw_event_id": "raw-c0a889ff026a57cf7dccba6fa1eb8a56e41a94868d0bf30b50445833ca9bfcd7",
+      "rows": 1,
+      "provenance": "DATA-T11-ENTITY-INPUT-PILOT-RAW-001",
+      "permitted_fields": [
+        "result.context.slot",
+        "result.value[].address",
+        "result.value[].amount",
+        "result.value[].decimals"
+      ]
+    },
+    {
+      "role": "TOKEN_ACCOUNT_OWNER_RAW_EVENT",
+      "method": "getMultipleAccounts",
+      "exact_local_path": "data/raw/task11_entity_input_probe_v1/run=t11a3-20260728T102537Z/partitions/03-getMultipleAccounts.parquet",
+      "bytes": 18570,
+      "sha256": "5a01c427070c2ff50d8d208fc02f4cbd6c1b567aa89ef1d1e0499271e66e919b",
+      "content_sha256": "64464f0bb61f168415e82ff9bcf5c3dd8dd18d2037fbe735beb14b52b7062fa7",
+      "raw_event_id": "raw-b89f6bc28b51460e37851636a53bb4335c37f2cd15070a1ad4ac452cbfc5ca66",
+      "rows": 1,
+      "provenance": "DATA-T11-ENTITY-INPUT-PILOT-RAW-001",
+      "permitted_fields": [
+        "result.context.slot",
+        "result.value[].data.parsed.info.mint",
+        "result.value[].data.parsed.info.owner",
+        "result.value[].data.parsed.info.tokenAmount.amount",
+        "result.value[].data.parsed.info.tokenAmount.decimals"
+      ]
+    }
+  ],
+  "privacy_and_output_policy": {
+    "raw_owner_addresses_may_be_read_offline": true,
+    "raw_owner_addresses_may_be_persisted_in_git": false,
+    "raw_token_account_addresses_may_be_persisted_in_git": false,
+    "stable_pseudonym_rule": "SHA256(TASK24_ENTITY_GRAPH_V1|node_type|raw_public_key)",
+    "raw_event_ids_retained": true,
+    "content_hashes_retained": true,
+    "credential_or_header_fields_permitted": false
+  },
+  "no_r3_no_outcome_assertion": {
+    "r3_paths_allowed": false,
+    "outcome_fields_allowed": false,
+    "strategy_identity_allowed": false,
+    "pnl_netreturn_cashflow_allowed": false,
+    "future_labels_allowed": false
+  },
+  "projection_gate": {
+    "all_required_files_present": true,
+    "all_sizes_match": true,
+    "all_sha256_match": true,
+    "all_schemas_match": true,
+    "symlink_inputs": 0,
+    "admissible_local_inputs": true,
+    "projection_authorized": "PARTIAL_RAW_RELATIONS_ONLY",
+    "expected_terminal_decision": "EXTEND_EVIDENCE"
+  },
+  "managed_write_set_after_manifest": [
+    "src/solana_alpha_lab/task24_entity_evidence_projection.py",
+    "scripts/build_task24_entity_evidence_projection.py",
+    "tests/test_task24_entity_evidence_projection.py",
+    "docs/evidence/task24/a3_projection_v1/entity_nodes_v1.jsonl",
+    "docs/evidence/task24/a3_projection_v1/entity_edges_v1.jsonl",
+    "docs/evidence/task24/a3_projection_v1/entity_candidates_v1.json",
+    "docs/evidence/task24/a3_projection_v1/entity_adjusted_concentration_v1.json",
+    "docs/evidence/task24/a3_projection_v1/projection_manifest_v1.json",
+    "docs/evidence/task24/a3_deterministic_entity_evidence_feasibility_and_projection_v1.json"
+  ],
+  "authority": {
+    "source": "EXPLICIT_USER_T24_A3_PLUS_REPO_STANDING_AUTONOMY",
+    "offline_local_value_read": true,
+    "provider_api_rpc_wss_calls": 0,
+    "credential_uses": 0,
+    "r3_or_outcome_reads": 0,
+    "wallet_signer_transaction_actions": 0,
+    "cash_spend_usd_cents": 0,
+    "dependency_changes": 0,
+    "catalog_or_registry_mutation": 0,
+    "commit": false,
+    "push": false,
+    "pull_request": false,
+    "merge": false
+  }
+}

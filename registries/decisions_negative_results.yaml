@@ -1,7 +1,16 @@
 schema_version: '1.0'
 registry_id: SMIAL-REGISTRY-DECISIONS-NEGATIVE-RESULTS
 registry_type: decisions_negative_results
-as_of: '2026-07-21'
+as_of: '2026-08-02'
 truth_owner: TASK-03
-source_asset_ids: []
-records: []
+source_asset_ids:
+- EVIDENCE-T24-A6-STOP-DECISION-001
+records:
+- record_kind: negative_result
+  record_id: NEGATIVE-T24-ENTITY-SIGNAL-V1-001
+  status: RECORDED
+  created_at: '2026-08-02T09:19:30Z'
+  evidence_asset_ids:
+  - EVIDENCE-T24-A5R1-ACCEPTANCE-001
+  - EVIDENCE-T24-A6-STOP-DECISION-001
+  summary: TASK-24 v1 stopped after admissible exact-wire evidence produced 4/12 predicted-positive capacity, zero corroborated claims and no defensible bounded repair; partial graph is not downstream-decision admissible.

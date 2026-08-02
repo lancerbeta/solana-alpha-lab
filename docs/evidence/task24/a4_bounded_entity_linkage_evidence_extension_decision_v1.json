@@ -1,0 +1,208 @@
+{
+  "receipt_id": "T24-A4-BOUNDED-ENTITY-LINKAGE-EVIDENCE-EXTENSION-DECISION-001",
+  "schema_version": "1.0",
+  "task_id": "TASK-24",
+  "atom": "T24-A4_BOUNDED_ENTITY_LINKAGE_EVIDENCE_EXTENSION_DECISION_V1",
+  "as_of": "2026-08-02",
+  "status": "PASS_VALIDATED_DECISION_ONLY",
+  "owner_decision": "EXTEND_EVIDENCE",
+  "selected_route": "BOUNDED_RAW_HISTORY_FEASIBILITY_PROBE",
+  "entry_gate": {
+    "verdict": "START_AS_WRITTEN",
+    "route_owner": "LOCAL_WORK_PRIMARY",
+    "execution_route": "LOCAL_WORK_CODEX",
+    "accepted_main_commit": "31c01640499be6b7e86a2fe638d9217c202861cc",
+    "accepted_main_tree": "6677878eb2b8195018ab217c6a9a429de5726563",
+    "branch": "task24/entity-graph-contract",
+    "active_time_gates": 0,
+    "catalog_version": "0.28.0",
+    "catalog_assets": 415,
+    "reasoning": "VERY_HIGH_SUFFICIENT",
+    "mode_switch": "NONE"
+  },
+  "frozen_input_bindings": {
+    "a2_contract": {
+      "path": "docs/contracts/task24_entity_graph_and_false_positive_contract_v1.md",
+      "sha256": "14614796dfc17aeef907e6b1d863814cbfb52e8f188704b70f17d99a78b862a8"
+    },
+    "a2_config": {
+      "path": "configs/task24_entity_graph_v1.yaml",
+      "sha256": "a294d9c8507777581bec8217f4127e16a76788b243250a1eb57e6bff9b69ed25"
+    },
+    "a3_receipt": {
+      "path": "docs/evidence/task24/a3_deterministic_entity_evidence_feasibility_and_projection_v1.json",
+      "sha256": "30324bd751faafb050ccf644d739f3a5ecc45ecece0f846d23f7e792eb212a5f"
+    },
+    "a3_pre_read_manifest": {
+      "path": "docs/evidence/task24/a3_entity_evidence_pre_read_manifest_v1.json",
+      "sha256": "f889c0f28d3259cc61681ba6cc56dc53686d2375ce98826ca572dc5d5720846d"
+    }
+  },
+  "artifact_bindings": {
+    "decision": {
+      "path": "docs/decisions/task24_entity_linkage_evidence_extension_decision_v1.md",
+      "sha256": "a13523b86272c39976ab6a11a0332180cced51fde54c185a381e0034ec416fda",
+      "bytes": 9183
+    },
+    "config": {
+      "path": "configs/task24_entity_linkage_evidence_extension_v1.yaml",
+      "sha256": "2db333e179ecc54cced41128b5a8c97825fc970d46af66be8660db9ee963791b",
+      "bytes": 8889
+    },
+    "test": {
+      "path": "tests/test_task24_entity_linkage_evidence_extension_decision.py",
+      "sha256": "b10313a3e2405ab9c4af40c78e920ca0e9ad30d36b6513ce9ace08a8dbacbed0",
+      "bytes": 14510
+    }
+  },
+  "measured_gap": {
+    "frozen_token_mints": 1,
+    "frozen_population_wallets": 20,
+    "a3_entity_candidates": 0,
+    "a3_corroborated_positive_claims": 0,
+    "a3_inferred_or_vendor_positive_claims": 0,
+    "a3_selected_predicted_positive_capacity": 0,
+    "minimum_reviewed_predicted_positive": 12,
+    "false_positive_gate": "NOT_TESTABLE_ZERO_PREDICTED_POSITIVES"
+  },
+  "audit_capacity_decision": {
+    "formula": "MIN(CORROBORATED_COUNT,8)+MIN(INFERRED_OR_VENDOR_COUNT,8)",
+    "minimum_to_open_gate": 12,
+    "inferred_only_maximum_selected_positive": 8,
+    "minimum_corroborated_when_other_positive_stratum_full": 4,
+    "shared_funder_only_route_sufficient": false,
+    "vendor_labels_can_repair_corroborated_shortage": false,
+    "duplicate_providers_same_event_are_independent": false
+  },
+  "official_research": {
+    "as_of": "2026-08-02",
+    "public_official_docs_read": 5,
+    "credentialed_provider_calls": 0,
+    "findings": {
+      "standard_solana_rpc": "SEMANTIC_READBACK_OR_FALLBACK_NOT_PRIMARY_HISTORY_PROBE",
+      "helius_get_transactions_for_address": "PRIMARY_BOUNDED_RAW_FULL_TRANSACTION_TRANSPORT",
+      "helius_enhanced_transactions_v1": "REJECTED_DEPRECATED_FOR_NEW_INTEGRATIONS",
+      "jito_bundle_status": "NOT_HISTORICAL_DISCOVERY_REQUIRES_KNOWN_ID_AND_RECENT_STATUS",
+      "vendor_cluster_labels": "VENDOR_LABEL_ONLY_NO_CONFIDENCE_PROMOTION"
+    },
+    "sources": [
+      "https://solana.com/docs/rpc/http/getsignaturesforaddress",
+      "https://solana.com/docs/rpc/http/gettransaction",
+      "https://www.helius.dev/docs/rpc/gettransactionsforaddress",
+      "https://www.helius.dev/docs/enhanced-transactions/overview",
+      "https://docs.jito.wtf/lowlatencytxnsend/"
+    ],
+    "live_provider_completeness_or_entitlement_verified": false
+  },
+  "probe_decision": {
+    "next_atom": "T24-A5_BOUNDED_RAW_HISTORY_FEASIBILITY_CAPTURE_V1",
+    "authorized_by_a4": false,
+    "population_expansion_allowed": false,
+    "provider_method": "HELIUS_GET_TRANSACTIONS_FOR_ADDRESS",
+    "requests": 21,
+    "request_population": {
+      "mint": 1,
+      "wallets": 20
+    },
+    "request_limit_each": 100,
+    "oldest_first": true,
+    "pagination": false,
+    "retries": 0,
+    "fallback_provider_calls": 0,
+    "maximum_returned_transactions": 2100,
+    "maximum_provider_credits": 210,
+    "maximum_cash_spend_usd_cents": 0,
+    "exact_raw_response_retention_required": true,
+    "provider_labels_as_raw": false,
+    "secret_in_chat_repo_logs_or_retained_urls": false
+  },
+  "evidence_independence": {
+    "shared_immediate_funder_alone": "INFERRED",
+    "corroborated_minimum_independent_raw_families": 2,
+    "common_signer_same_event_as_funder_is_independent": false,
+    "duplicate_provider_same_event_is_independent": false,
+    "mint_creator_for_single_mint_population_is_discriminating_membership_family": false,
+    "authoritative_bundle_available_initial_probe": false,
+    "vendor_bundle_label_substitution_allowed": false
+  },
+  "post_probe_stop_logic": {
+    "capacity_at_least_12": "FREEZE_CANDIDATES_AND_ROUTE_TO_BLINDED_AUDIT",
+    "capacity_below_12": "NO_AUTOMATIC_EXPANSION_OR_TUNING",
+    "valid_history_but_insufficient_structure": "REDESIGN_DATA",
+    "incomplete_contradictory_or_unreliable_history": "STOP_NO_RELIABLE_ENTITY_SIGNAL",
+    "wider_population_pagination_provider_or_credit_cap": "NEW_USER_APPROVED_BOUNDARY"
+  },
+  "validation": {
+    "status": "PASS",
+    "targeted_command": "uv run --locked --managed-python python -B -m unittest tests.test_task24_entity_linkage_evidence_extension_decision",
+    "targeted_tests_passed": 14,
+    "targeted_failures": 0,
+    "targeted_errors": 0,
+    "adjacent_compatibility_command": "uv run --locked --managed-python python -B -m unittest tests.test_task05_schema_contract tests.test_task11_entity_inputs tests.test_task11_entity_input_replay tests.test_task11_entity_input_transport tests.test_task23_bounded_diagnostics_contract tests.test_task24_entity_graph_contract tests.test_task24_entity_evidence_projection tests.test_task24_entity_linkage_evidence_extension_decision",
+    "adjacent_compatibility_tests_passed": 109,
+    "adjacent_compatibility_failures": 0,
+    "adjacent_compatibility_errors": 0,
+    "adversarial_external_authority": "PASS_REJECTED",
+    "adversarial_population_expansion": "PASS_REJECTED",
+    "adversarial_pagination_or_spend": "PASS_REJECTED",
+    "adversarial_false_independence": "PASS_REJECTED",
+    "adversarial_vendor_promotion": "PASS_REJECTED",
+    "file_hygiene": "PASS_NO_BOM_NO_CRLF_FINAL_LF",
+    "secret_scan": "PASS",
+    "full_repository_gate": "DEFERRED_TO_DELIVERY_OR_FINALIZATION"
+  },
+  "factory_fit_checkpoint": {
+    "status": "PASS_FOR_A4_NOT_TASK_DONE",
+    "mission": "Chooses the cheapest test that can falsify whether entity evidence can open the frozen audit without contaminating downstream research truth.",
+    "flexibility": "Provider transport, project parsing and candidate inference remain separately versioned.",
+    "compatibility_history": "Retains A2 evidence classes and A3 stable pseudonyms; no existing output is rewritten.",
+    "efficiency": "Caps the first probe at 21 calls, 2,100 returned transactions and 210 existing credits with no pagination.",
+    "research_truth": "Proves why funder-only evidence cannot satisfy the stratified audit and requires distinct raw events for corroboration.",
+    "owner_operability": "Returns explicit pass, redesign and stop paths rather than an open-ended data hunt.",
+    "execution_to_cashflow": "No strategy, execution, PnL, NetReturn or cashflow claim is made.",
+    "monitoring_recovery": "Exact raw bytes, timestamps, truncation flags and immutable run identity are required before projection.",
+    "build_vs_buy": "ADOPT Helius history transport; WRAP a thin deterministic project parser; reject deprecated enhanced parsing and historical Jito guessing.",
+    "red_team": "Blocks vendor-label promotion, same-event double counting, silent population expansion, pagination, spend and external execution.",
+    "full_pre_done_review": "REQUIRED_LATER"
+  },
+  "managed_write_set": [
+    "docs/decisions/task24_entity_linkage_evidence_extension_decision_v1.md",
+    "configs/task24_entity_linkage_evidence_extension_v1.yaml",
+    "tests/test_task24_entity_linkage_evidence_extension_decision.py",
+    "docs/evidence/task24/a4_bounded_entity_linkage_evidence_extension_decision_v1.json"
+  ],
+  "authority": {
+    "public_official_docs_reads": 5,
+    "provider_api_rpc_wss_calls": 0,
+    "credential_uses": 0,
+    "provider_credits_consumed": 0,
+    "dependency_changes": 0,
+    "catalog_or_registry_mutations": 0,
+    "r3_or_outcome_reads": 0,
+    "wallet_signer_transaction_actions": 0,
+    "cash_spend_usd_cents": 0,
+    "deploy_release_actions": 0,
+    "commit": false,
+    "push": false,
+    "pull_request": false,
+    "merge": false
+  },
+  "state_change": {
+    "task24": "IN_PROGRESS",
+    "atom_a4": "VALIDATED",
+    "canonical_task24_done": false,
+    "catalog_registration": "DEFERRED_TO_TASK24_FINALIZATION"
+  },
+  "next_boundary": {
+    "atom": "T24-A5_BOUNDED_RAW_HISTORY_FEASIBILITY_CAPTURE_V1",
+    "authorized": false,
+    "requires_exact_user_gate": [
+      "PROVIDER_API_RPC_EXECUTION",
+      "LOCAL_SECRET_BOUNDARY",
+      "MAXIMUM_21_CALLS",
+      "MAXIMUM_210_PROVIDER_CREDITS",
+      "MAXIMUM_CASH_SPEND_USD_CENTS_0"
+    ],
+    "reason": "Only a bounded raw-history probe can determine whether the frozen 20-wallet population contains enough inferred and independently corroborated claims to reach the 12-positive audit gate."
+  }
+}

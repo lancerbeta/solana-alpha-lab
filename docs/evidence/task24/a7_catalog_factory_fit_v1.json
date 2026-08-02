@@ -1,0 +1,242 @@
+{
+  "receipt_id": "T24-A7-CATALOG-FACTORY-FIT-001",
+  "schema_version": "1.0",
+  "task_id": "TASK-24",
+  "atom": "T24-A7_REGISTER_PARTIAL_ASSETS_UPDATE_CATALOG_AND_FULL_FACTORY_FIT_REVIEW_V1",
+  "as_of": "2026-08-02",
+  "status": "PASS_CATALOG_REGISTERED_FULL_FACTORY_FIT",
+  "finish_gate": "CONTINUE_CURRENT_TASK",
+  "accepted_result": {
+    "owner_decision": "STOP_NO_RELIABLE_ENTITY_SIGNAL",
+    "population_mints": 1,
+    "population_wallets": 20,
+    "selected_predicted_positive_capacity": 4,
+    "false_positive_minimum_reviewed_positive": 12,
+    "corroborated_positive_claims": 0,
+    "inferred_positive_claims": 4,
+    "false_positive_audit_opened": false,
+    "manual_labels_opened": 0,
+    "adjusted_concentration_changed": false,
+    "holder_exclusions_changed": 0,
+    "downstream_decision_admissibility": "NOT_ADMISSIBLE",
+    "partial_graph_disposition": "RETAIN_VERSIONED_REVERSIBLE_EVIDENCE",
+    "legacy_a5_projection": "QUARANTINED_CAPTURE_RETENTION_CONTRACT_FAILED",
+    "a5r1_projection": "ADMISSIBLE_INSUFFICIENT_AUDIT_CAPACITY"
+  },
+  "catalog": {
+    "before_version": "0.28.0",
+    "after_version": "0.29.0",
+    "before_assets": 415,
+    "after_assets": 448,
+    "asset_registries": 4,
+    "schemas": 7,
+    "queries": 8,
+    "lifecycle_registries": 9,
+    "before_lifecycle_records": 55,
+    "after_lifecycle_records": 56,
+    "registered_asset_ids": [
+      "CONTRACT-T24-ENTITY-GRAPH-001",
+      "CONFIG-T24-ENTITY-GRAPH-001",
+      "TEST-T24-ENTITY-GRAPH-CONTRACT-001",
+      "EVIDENCE-T24-A2-ACCEPTANCE-001",
+      "MODULE-T24-ENTITY-EVIDENCE-PROJECTION-001",
+      "TEST-T24-ENTITY-EVIDENCE-PROJECTION-001",
+      "EVIDENCE-T24-A3-PRE-READ-MANIFEST-001",
+      "EVIDENCE-T24-A3-PROJECTION-MANIFEST-001",
+      "EVIDENCE-T24-A3-ACCEPTANCE-001",
+      "DECISION-T24-ENTITY-LINKAGE-EXTENSION-001",
+      "CONFIG-T24-ENTITY-LINKAGE-EXTENSION-001",
+      "TEST-T24-ENTITY-LINKAGE-EXTENSION-001",
+      "EVIDENCE-T24-A4-DECISION-001",
+      "MODULE-T24-ENTITY-LINKAGE-CAPTURE-001",
+      "TEST-T24-ENTITY-LINKAGE-CAPTURE-001",
+      "MODULE-T24-ENTITY-LINKAGE-PROJECTION-001",
+      "TEST-T24-ENTITY-LINKAGE-PROJECTION-001",
+      "EVIDENCE-T24-A5-CAPTURE-FAILURE-001",
+      "EVIDENCE-T24-A5-QUARANTINED-PROJECTION-001",
+      "EVIDENCE-T24-A5R1-PREFLIGHT-001",
+      "TEST-T24-A5R1-RECAPTURE-001",
+      "DATA-T24-ENTITY-NODES-001",
+      "DATA-T24-ENTITY-EDGES-001",
+      "DATA-T24-ENTITY-CANDIDATES-001",
+      "DATA-T24-ADJUSTED-CONCENTRATION-001",
+      "EVIDENCE-T24-A5R1-PROJECTION-MANIFEST-001",
+      "EVIDENCE-T24-A5R1-ACCEPTANCE-001",
+      "DECISION-T24-DATA-REDESIGN-OR-STOP-001",
+      "CONFIG-T24-DATA-REDESIGN-OR-STOP-001",
+      "TEST-T24-DATA-REDESIGN-OR-STOP-001",
+      "EVIDENCE-T24-A6-STOP-DECISION-001",
+      "EVIDENCE-T24-A7-CATALOG-FACTORY-FIT-001",
+      "TEST-T24-A7-CATALOG-FACTORY-FIT-001"
+    ],
+    "updated_asset_ids": [
+      "REGISTRY-DECISIONS-NEGATIVE-RESULTS-001",
+      "GENERATED-PROJECT-MAP-001",
+      "GENERATED-EDGE-PROJECTION-001",
+      "TEST-T23-A5-CATALOG-FACTORY-FIT-001",
+      "VALIDATOR-T04-ARCHITECTURE-001"
+    ],
+    "negative_result_record_id": "NEGATIVE-T24-ENTITY-SIGNAL-V1-001",
+    "generated_navigation": "PASS"
+  },
+  "factory_fit": {
+    "mode": "FULL_REVIEW",
+    "verdict": "PASS_WITH_FOLLOWUP",
+    "checks": [
+      {
+        "check_id": "GOAL_FIT",
+        "status": "PASS",
+        "evidence": "Stopping a structurally underpowered entity route protects owner cashflow from further provider cost and false confidence."
+      },
+      {
+        "check_id": "COMPATIBILITY",
+        "status": "PASS",
+        "evidence": "A2 through A6 receipts remain immutable; A5 stays quarantined and A5R1 is registered as the admissible replacement."
+      },
+      {
+        "check_id": "FLEXIBILITY_REUSE",
+        "status": "PASS",
+        "evidence": "Raw transport, project parsing, evidence classes and reversible graph projections remain separately versioned without a graph database."
+      },
+      {
+        "check_id": "EFFICIENCY",
+        "status": "PASS",
+        "evidence": "The result rejects pagination, population expansion and provider duplication without a credible two-stratum capacity path."
+      },
+      {
+        "check_id": "HONEST_CLOSURE",
+        "status": "PASS",
+        "evidence": "Four inferred claims are retained while ownership, false-positive rate, concentration, eligibility, alpha and TASK-24 DONE remain explicit nonclaims."
+      },
+      {
+        "check_id": "OWNER_JOURNEY",
+        "status": "PASS",
+        "evidence": "The owner receives one clear stop decision, retained-value boundary and exact reactivation trigger rather than an open-ended data hunt."
+      },
+      {
+        "check_id": "HYPOTHESIS_LIFECYCLE",
+        "status": "PASS",
+        "evidence": "The stopped v1 route is appended to the durable negative-results registry with exact A6 evidence and no history rewrite."
+      },
+      {
+        "check_id": "DATA_FITNESS",
+        "status": "FOLLOWUP",
+        "evidence": "Tracked projections and receipts are durable, but ignored raw wire roots are local-only and all 21 histories are truncated; any reactivation requires a new capture and retention contract."
+      },
+      {
+        "check_id": "TRADING_BRIDGE",
+        "status": "NOT_APPLICABLE",
+        "evidence": "No signal, order, quote, fill, position, PnL, NetReturn or owner-cashflow decision is created."
+      },
+      {
+        "check_id": "POSITION_RISK",
+        "status": "NOT_APPLICABLE",
+        "evidence": "No capital, inventory, signer, wallet, transaction or real-money authority exists."
+      },
+      {
+        "check_id": "MONITORING_RECOVERY",
+        "status": "PASS",
+        "evidence": "Exact hashes, immutable receipts, retained tracked projections and deterministic local replay checks preserve the accepted negative result without claiming external raw backup."
+      },
+      {
+        "check_id": "FAILURE_RED_TEAM",
+        "status": "PASS",
+        "evidence": "Tests reject audit threshold relaxation, vendor promotion, same-event independence, partial-graph downstream use and automatic continuation."
+      },
+      {
+        "check_id": "BUILD_VS_BUY",
+        "status": "PASS",
+        "evidence": "No new provider, dependency, database or service is adopted; the existing provider was transport only and project evidence semantics remain authoritative."
+      },
+      {
+        "check_id": "MIGRATION_ROLLBACK",
+        "status": "PASS",
+        "evidence": "A5 quarantine, A5R1 separate roots and append-only A6/A7 records preserve forward history; future work must use a new versioned objective."
+      },
+      {
+        "check_id": "CONTRADICTION_SCAN",
+        "status": "PASS",
+        "evidence": "Contract, projections, receipts, Catalog lifecycle and tests agree on 4/12 capacity, zero corroboration, no audit and no downstream admissibility."
+      }
+    ],
+    "durable_followup": {
+      "followup_id": "T24_ENTITY_EVIDENCE_REACTIVATION_V1",
+      "owner": "FUTURE_ENTITY_EVIDENCE_ENTRY_GATE",
+      "reason": "The current sample has zero corroborated claims, local-only raw roots and no defensible bounded repair inside TASK-24 v1.",
+      "activation_trigger": "NAMED_CONSUMER_AND_SECOND_INDEPENDENT_RAW_EVENT_FAMILY_AVAILABLE",
+      "required_action": "CREATE_NEW_VERSIONED_PROSPECTIVE_POPULATION_AUDIT_CAPACITY_PIT_RETENTION_COST_AND_MANUAL_LABEL_CONTRACT_BEFORE_VALUE_READ",
+      "destination": "NEW_VERSIONED_ENTITY_EVIDENCE_OBJECTIVE",
+      "cannot_be_satisfied_by": [
+        "PAGINATING_CURRENT_SAMPLE_WITHOUT_NEW_CONTRACT",
+        "PROMOTING_VENDOR_LABELS",
+        "COUNTING_DUPLICATE_PROVIDER_EVENTS_AS_INDEPENDENT",
+        "RELAXING_AUDIT_THRESHOLDS",
+        "REWRITING_A2_THROUGH_A7_HISTORY"
+      ]
+    }
+  },
+  "validation": {
+    "status": "PASS",
+    "task24_a2_a7_suite": "PASS_108_TESTS",
+    "catalog_validation": "PASS_0_29_0_448_ASSETS_56_LIFECYCLE_RECORDS",
+    "generated_navigation": "PASS",
+    "full_repository_unit_suite": "DEFERRED_TO_A8_DELIVERY",
+    "diff_check": "PASS_NO_WHITESPACE_ERRORS",
+    "targeted_tests_passed": 108,
+    "targeted_failures": 0,
+    "targeted_errors": 0
+  },
+  "managed_write_set": [
+    "catalog/catalog_manifest.yaml",
+    "catalog/assets/core.yaml",
+    "catalog/assets/lifecycle.yaml",
+    "registries/decisions_negative_results.yaml",
+    "docs/PROJECT_MAP.md",
+    "catalog/generated/asset_edges.json",
+    "scripts/validate_task04.py",
+    "tests/test_catalog.py",
+    "tests/test_lifecycle_registries.py",
+    "tests/test_task23_catalog_repository_factory_fit.py",
+    "tests/test_task24_catalog_factory_fit.py",
+    "docs/evidence/task24/a7_catalog_factory_fit_v1.json"
+  ],
+  "authority": {
+    "local_write_only": true,
+    "catalog_or_registry_mutations": 1,
+    "provider_api_rpc_wss_calls": 0,
+    "credential_uses": 0,
+    "provider_credits_consumed": 0,
+    "r3_or_outcome_reads": 0,
+    "wallet_signer_transaction_actions": 0,
+    "cash_spend_usd_cents": 0,
+    "dependency_changes": 0,
+    "commit": false,
+    "push": false,
+    "pull_request": false,
+    "merge": false
+  },
+  "nonclaims": [
+    "ENTITY_MEMBERSHIP_ESTABLISHED",
+    "ECONOMIC_OR_BENEFICIAL_OWNERSHIP",
+    "FALSE_POSITIVE_RATE",
+    "ADJUSTED_CONCENTRATION",
+    "HOLDER_EXCLUSION_OR_STRATEGY_VETO",
+    "ALPHA_CAUSALITY_OR_GENERALIZATION",
+    "EXECUTION_PNL_NETRETURN_OR_OWNER_CASHFLOW",
+    "EXTERNALLY_RECOVERABLE_RAW_BACKUP",
+    "CANONICAL_TASK24_DONE"
+  ],
+  "state_change": {
+    "task24": "IN_PROGRESS",
+    "atom_a7": "VALIDATED",
+    "owner_decision": "STOP_NO_RELIABLE_ENTITY_SIGNAL",
+    "catalog_registration": "VALIDATED_LOCAL_CANDIDATE",
+    "negative_result_lifecycle": "RECORDED",
+    "canonical_task24_done": false
+  },
+  "next_boundary": {
+    "atom": "T24-A8_REPOSITORY_DELIVERY_V1",
+    "authorized": false,
+    "reason": "A7 registered the stopped partial result and passed Full Factory Fit; repository delivery, full gate and remote read-back remain."
+  }
+}

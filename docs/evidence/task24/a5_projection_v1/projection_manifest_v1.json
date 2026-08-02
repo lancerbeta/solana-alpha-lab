@@ -1,0 +1,139 @@
+{
+  "manifest_id": "T24-A5-BOUNDED-RAW-HISTORY-PROJECTION-001",
+  "schema_version": "1.0",
+  "task_id": "TASK-24",
+  "atom": "T24-A5_BOUNDED_RAW_HISTORY_FEASIBILITY_CAPTURE_V1",
+  "as_of": "2026-08-02",
+  "status": "QUARANTINED_CAPTURE_RETENTION_CONTRACT_FAILED",
+  "owner_decision": "RECAPTURE_EXACT_WIRE_OR_STOP",
+  "provisional_structure_decision": "REDESIGN_DATA_NON_ADMISSIBLE",
+  "admissibility": {
+    "status": "FAIL",
+    "failed_requirement": "EXACT_RAW_RESPONSE_BYTES",
+    "canonical_redacted_full_json_retained": true,
+    "original_wire_sha256_retained": true,
+    "original_wire_bytes_retained": false,
+    "projection_may_open_false_positive_audit": false
+  },
+  "capture": {
+    "run_id": "t24a5-20260802T081138Z",
+    "receipt_sha256": "512d0cc6687229d0e68d887ea85afeb96f636f23aa48f48358a676d4bfce593a",
+    "provider_calls": 21,
+    "provider_credits_modeled": 210,
+    "cash_spend_usd_cents": 0,
+    "transactions_returned": 1939,
+    "unique_transactions": 1936,
+    "truncated_subjects": 21,
+    "retries": 0
+  },
+  "population": {
+    "fingerprint_sha256": "c513e589184c0d774a23ed00c94daf87a19518e9a3f02374349697d5ad8ef1f0",
+    "mint_subject_id": "t24-token-mint-8c755447264bbe443fe0bf82e70690153d18e8c7a53caa20055232eab3d0c795",
+    "subject_count": 21,
+    "wallet_subject_ids": [
+      "t24-wallet-1886ef6bf35747fc432d9b7edd8d3884fd2b3016fe215fcc53ad85b54944fbd7",
+      "t24-wallet-1be40ba5a9f3fbda614f90dfb2e3a6401e1b6e5e57a48d25cee551f410036bda",
+      "t24-wallet-258e230bd6ca2ebc90bee1571225e54a851adff8404e8944a4308f778ae69852",
+      "t24-wallet-2c0a99ce8783daa2fe97c414ad307d7201b04e0e912a877167f9cc3ff743ddb6",
+      "t24-wallet-38edecc5f4c1151078ca48e94daeeb283b02f72e122ac0286c5720060eec3e5d",
+      "t24-wallet-3f220bb0053ef26daba850a101da1bbd99fb1757f7bbf174a20cfc5b62c62b9e",
+      "t24-wallet-40b14ed76c71b3e8eaae72996fcfbef31a8b49e8216ffdd0f3338d4cc91cade1",
+      "t24-wallet-504f0d8740b952e1153001dee7b139037542e4a98ac628934ddaf3e1f92f9b0d",
+      "t24-wallet-54cff4ebe510f45d6f0d033d5cbbcf98b3c56483bc03cb0c08772e3e41aed8a7",
+      "t24-wallet-69d9f86c146ef57453e3bd896aa035565dbe92368a12a465cc8e05326b959d68",
+      "t24-wallet-6b259cfc18ecc416491c10896cece88b5e259b901ede2511af1bfa847d7c78c7",
+      "t24-wallet-71135ff93f6a4dc16e8a1e52b4296f95817e1a60df13529b6d0b0a2968d32c3a",
+      "t24-wallet-7f7e98b8c909188a0c5e370f5d54156c10cec6464a23ea4e57333dc268cf7163",
+      "t24-wallet-9e285316c647e1fbe97d1e890eaf3b25a6834d2cd0c9611e3d13d820433ce9d3",
+      "t24-wallet-a418eebdcc145a75546a4a3eda05b0be3e3ac3eb51bcb007480682afc02a7747",
+      "t24-wallet-ae8ccf1a824ca6f8ea13b05a3d1e1bf3ba4c0a50ff57c4ea664758dd4372ab38",
+      "t24-wallet-ba0ff0f0a00139ece3adbbcbaa8d13780aad5d6c05bac7fef09b3d47db98b623",
+      "t24-wallet-c1420621881c2b02ff2a8b235edf32f3640af077f3aa0c826a267c3d9699ce54",
+      "t24-wallet-e5722624e9f15a075f00727fe65818f4007befb2590f08a84705bbda2d637a6f",
+      "t24-wallet-fa54ffc0bc0e326739eb66f9eff0bef0eff874a2302135b33d5765a93c156d3f"
+    ]
+  },
+  "counts": {
+    "nodes": 78,
+    "edges": 65,
+    "raw_immediate_funder": 18,
+    "immediate_funder_absent": 2,
+    "immediate_funder_ambiguous": 0,
+    "raw_common_transaction_signer": 0,
+    "raw_mint_created_by_wallet": 1,
+    "derived_shared_immediate_funder": 2,
+    "entity_candidates": 2,
+    "membership_claims": 4,
+    "corroborated_positive_claims": 0,
+    "inferred_or_vendor_positive_claims": 4,
+    "selected_predicted_positive_capacity": 4,
+    "duplicate_transaction_payload_conflicts": 0
+  },
+  "mint_creator_status": "DIRECT_IMMEDIATE_CREATOR_ROLE_PROJECTED",
+  "artifacts": {
+    "entity_adjusted_concentration_v1": {
+      "bytes": 323,
+      "path": "docs/evidence/task24/a5_projection_v1/entity_adjusted_concentration_v1.json",
+      "rows": 1,
+      "sha256": "644b148f17fe437118196dabdb4185886117086aab1fe1b77f7965621a06f4ad"
+    },
+    "entity_candidates_v1": {
+      "bytes": 3552,
+      "path": "docs/evidence/task24/a5_projection_v1/entity_candidates_v1.json",
+      "rows": 2,
+      "sha256": "8fc6f5fca446191b56ad30cf4e68f4c5df3f9708f94f4d7f18a55517a74f872f"
+    },
+    "entity_edges_v1": {
+      "bytes": 85900,
+      "path": "docs/evidence/task24/a5_projection_v1/entity_edges_v1.jsonl",
+      "rows": 65,
+      "sha256": "020411c32a06f19f98ba60ac3940e34d5ef0925c52096070cc7294ee6cbab095"
+    },
+    "entity_nodes_v1": {
+      "bytes": 61586,
+      "path": "docs/evidence/task24/a5_projection_v1/entity_nodes_v1.jsonl",
+      "rows": 78,
+      "sha256": "acf5fc59baf1c6b7c90df78274cee6716bb9607a9965a322523292be4a17fa32"
+    }
+  },
+  "false_positive_audit": {
+    "status": "NOT_TESTABLE_CAPTURE_RETENTION_CONTRACT_FAILED",
+    "minimum_required": 12,
+    "provisional_capacity": 4,
+    "manual_labels_opened": 0
+  },
+  "adjusted_concentration": {
+    "status": "UNCHANGED_NOT_AVAILABLE_EXCLUSION_INVENTORY_INCOMPLETE",
+    "holder_exclusions_changed": 0
+  },
+  "privacy": {
+    "raw_public_addresses_persisted": 0,
+    "raw_transaction_signatures_persisted": 0,
+    "pseudonym_rule": "SHA256(TASK24_ENTITY_GRAPH_V1|node_type|raw_public_key)"
+  },
+  "non_claims": [
+    "FULL_ACCOUNT_HISTORY",
+    "ADMISSIBLE_ENTITY_MEMBERSHIP",
+    "BENEFICIAL_OWNERSHIP",
+    "ULTIMATE_FUNDER",
+    "AUTHORITATIVE_BUNDLE_MEMBERSHIP",
+    "HOLDER_EXCLUSION_OR_STRATEGY_VETO",
+    "FALSE_POSITIVE_RATE",
+    "ALPHA_OR_GENERALIZATION",
+    "EXECUTION_PNL_NETRETURN_OR_CASHFLOW",
+    "TASK24_DONE"
+  ],
+  "authority": {
+    "provider_api_rpc_calls": 21,
+    "provider_credits_modeled": 210,
+    "credential_values_exposed": 0,
+    "cash_spend_usd_cents": 0,
+    "r3_or_outcome_reads": 0,
+    "wallet_signer_transaction_actions": 0
+  },
+  "next_boundary": {
+    "recommended_atom": "T24-A5R1_EXACT_WIRE_RETENTION_RECAPTURE_V1",
+    "authorized": false,
+    "reason": "A4 required exact provider wire bytes. The current run retained canonical full JSON and original wire hashes, but not the original wire bytes themselves."
+  }
+}

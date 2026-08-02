@@ -1977,13 +1977,13 @@ records:
     contains_raw_data: false
     sensitivity: INTERNAL_NON_SECRET
 - asset_id: VALIDATOR-T04-ARCHITECTURE-001
-  record_version: '2.2'
+  record_version: '2.3'
   asset_type: script
   purpose: Fail-closed TASK-04 replay, architecture, matrix, registry, dependency,
     evidence and SBOM validator.
   status: IMPLEMENTED_UNVERIFIED
   origin: REPOSITORY
-  as_of: '2026-08-01'
+  as_of: '2026-08-02'
   truth_owner: TASK-04
   location:
     kind: git_path
@@ -1991,7 +1991,7 @@ records:
     repository_path: scripts/validate_task04.py
   integrity:
     kind: sha256
-    sha256: 3635955f1439b7787bcfdfc064dd2ba5cf97009117121c80f2cd732e16ce4622
+    sha256: c8ab8c3f7116050f20cdbc6cf5aa708de4a3c6e01912670970c167087020c06b
   access:
     mode: read_only
     method: command
@@ -11656,6 +11656,873 @@ records:
   - REG-RESEARCH-001
   evidence: []
   classification: *t23_internal
+- asset_id: CONTRACT-T24-ENTITY-GRAPH-001
+  record_version: '1.0'
+  asset_type: control_document
+  purpose: Frozen TASK-24 graph evidence classes confidence PIT exclusion and blinded false-positive audit contract.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-08-02'
+  truth_owner: TASK-24
+  location:
+    kind: git_path
+    logical_uri: repo://docs/contracts/task24_entity_graph_and_false_positive_contract_v1.md
+    repository_path: docs/contracts/task24_entity_graph_and_false_positive_contract_v1.md
+  integrity:
+    kind: sha256
+    sha256: 14614796dfc17aeef907e6b1d863814cbfb52e8f188704b70f17d99a78b862a8
+  access: &t24_read_file
+    mode: read_only
+    method: file
+    network_required: false
+    secrets_required: false
+  relations:
+  - relation_type: derived_from
+    target_asset_id: EVIDENCE-T23-A5-CATALOG-FACTORY-FIT-001
+  - relation_type: validated_by
+    target_asset_id: TEST-T24-ENTITY-GRAPH-CONTRACT-001
+  consumers:
+  - TASK-24
+  - FACTORY-001
+  - REG-RESEARCH-001
+  evidence: []
+  classification: &t24_internal
+    contains_secrets: false
+    contains_raw_data: false
+    sensitivity: INTERNAL_NON_SECRET
+- asset_id: CONFIG-T24-ENTITY-GRAPH-001
+  record_version: '1.0'
+  asset_type: configuration
+  purpose: Machine-readable frozen TASK-24 graph edge confidence PIT exclusion audit and authority contract.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-08-02'
+  truth_owner: TASK-24
+  location:
+    kind: git_path
+    logical_uri: repo://configs/task24_entity_graph_v1.yaml
+    repository_path: configs/task24_entity_graph_v1.yaml
+  integrity:
+    kind: sha256
+    sha256: a294d9c8507777581bec8217f4127e16a76788b243250a1eb57e6bff9b69ed25
+  access: *t24_read_file
+  relations:
+  - relation_type: governed_by
+    target_asset_id: CONTRACT-T24-ENTITY-GRAPH-001
+  consumers:
+  - TASK-24
+  evidence: []
+  classification: *t24_internal
+- asset_id: TEST-T24-ENTITY-GRAPH-CONTRACT-001
+  record_version: '1.0'
+  asset_type: script
+  purpose: Hash-bound adversarial tests for the frozen TASK-24 graph and false-positive audit contract.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-08-02'
+  truth_owner: TASK-24
+  location:
+    kind: git_path
+    logical_uri: repo://tests/test_task24_entity_graph_contract.py
+    repository_path: tests/test_task24_entity_graph_contract.py
+  integrity:
+    kind: sha256
+    sha256: ba7e97a3c2ebc372269d0c16e6779c32edafd4782e68e09a51bfacc3188170fe
+  access: *t24_read_file
+  relations:
+  - relation_type: depends_on
+    target_asset_id: CONFIG-T24-ENTITY-GRAPH-001
+  - relation_type: depends_on
+    target_asset_id: CONTRACT-T24-ENTITY-GRAPH-001
+  consumers:
+  - TASK-24
+  evidence: []
+  classification: *t24_internal
+- asset_id: EVIDENCE-T24-A2-ACCEPTANCE-001
+  record_version: '1.0'
+  asset_type: evidence
+  purpose: TASK-24 A2 acceptance binding the frozen graph contract audit arithmetic authority and nonclaims.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-08-02'
+  truth_owner: TASK-24
+  location:
+    kind: git_path
+    logical_uri: repo://docs/evidence/task24/a2_frozen_entity_graph_contract_acceptance_v1.json
+    repository_path: docs/evidence/task24/a2_frozen_entity_graph_contract_acceptance_v1.json
+  integrity:
+    kind: sha256
+    sha256: 2f9498a02ad41c915c80c99b01c7cd47e401d4a75985dc562e71d6d5ed87b07e
+  access: *t24_read_file
+  relations:
+  - relation_type: depends_on
+    target_asset_id: CONTRACT-T24-ENTITY-GRAPH-001
+  - relation_type: depends_on
+    target_asset_id: CONFIG-T24-ENTITY-GRAPH-001
+  - relation_type: validated_by
+    target_asset_id: TEST-T24-ENTITY-GRAPH-CONTRACT-001
+  consumers:
+  - TASK-24
+  evidence: []
+  classification: *t24_internal
+- asset_id: MODULE-T24-ENTITY-EVIDENCE-PROJECTION-001
+  record_version: '1.0'
+  asset_type: script
+  purpose: Deterministic pseudonymized projection of retained TASK-11 entity input relations into the frozen TASK-24 graph contract.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-08-02'
+  truth_owner: TASK-24
+  location:
+    kind: git_path
+    logical_uri: repo://src/solana_alpha_lab/task24_entity_evidence_projection.py
+    repository_path: src/solana_alpha_lab/task24_entity_evidence_projection.py
+  integrity:
+    kind: sha256
+    sha256: 843bd9b34f107a40f7c274f6fe54a6b33fcf7c5550ccdba8e53c849d28557e3f
+  access: *t24_read_file
+  relations:
+  - relation_type: governed_by
+    target_asset_id: CONFIG-T24-ENTITY-GRAPH-001
+  - relation_type: produces
+    target_asset_id: EVIDENCE-T24-A3-PROJECTION-MANIFEST-001
+  - relation_type: validated_by
+    target_asset_id: TEST-T24-ENTITY-EVIDENCE-PROJECTION-001
+  consumers:
+  - TASK-24
+  evidence: []
+  classification: *t24_internal
+- asset_id: TEST-T24-ENTITY-EVIDENCE-PROJECTION-001
+  record_version: '1.0'
+  asset_type: script
+  purpose: Deterministic tests for TASK-24 A3 pseudonymization graph projection null semantics and downstream nonclaims.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-08-02'
+  truth_owner: TASK-24
+  location:
+    kind: git_path
+    logical_uri: repo://tests/test_task24_entity_evidence_projection.py
+    repository_path: tests/test_task24_entity_evidence_projection.py
+  integrity:
+    kind: sha256
+    sha256: f6eeab206dd28e6984127bebfceb2ec845c031c8012696449383cff0ff6194ea
+  access: *t24_read_file
+  relations:
+  - relation_type: depends_on
+    target_asset_id: MODULE-T24-ENTITY-EVIDENCE-PROJECTION-001
+  - relation_type: depends_on
+    target_asset_id: EVIDENCE-T24-A2-ACCEPTANCE-001
+  consumers:
+  - TASK-24
+  evidence: []
+  classification: *t24_internal
+- asset_id: EVIDENCE-T24-A3-PRE-READ-MANIFEST-001
+  record_version: '1.0'
+  asset_type: evidence
+  purpose: Immutable TASK-24 A3 pre-read manifest binding the exact retained raw input scope hashes and no-outcome boundary.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-08-02'
+  truth_owner: TASK-24
+  location:
+    kind: git_path
+    logical_uri: repo://docs/evidence/task24/a3_entity_evidence_pre_read_manifest_v1.json
+    repository_path: docs/evidence/task24/a3_entity_evidence_pre_read_manifest_v1.json
+  integrity:
+    kind: sha256
+    sha256: f889c0f28d3259cc61681ba6cc56dc53686d2375ce98826ca572dc5d5720846d
+  access: *t24_read_file
+  relations:
+  - relation_type: derived_from
+    target_asset_id: EVIDENCE-T24-A2-ACCEPTANCE-001
+  consumers:
+  - TASK-24
+  evidence: []
+  classification: *t24_internal
+- asset_id: EVIDENCE-T24-A3-PROJECTION-MANIFEST-001
+  record_version: '1.0'
+  asset_type: evidence
+  purpose: TASK-24 A3 deterministic graph projection manifest proving zero entity candidates and zero predicted-positive audit capacity.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-08-02'
+  truth_owner: TASK-24
+  location:
+    kind: git_path
+    logical_uri: repo://docs/evidence/task24/a3_projection_v1/projection_manifest_v1.json
+    repository_path: docs/evidence/task24/a3_projection_v1/projection_manifest_v1.json
+  integrity:
+    kind: sha256
+    sha256: 85803b180144c4c2581f9f9d6d81d4048408e12f1e25bde17478b51eb7674e80
+  access: *t24_read_file
+  relations:
+  - relation_type: derived_from
+    target_asset_id: EVIDENCE-T24-A3-PRE-READ-MANIFEST-001
+  - relation_type: superseded_by
+    target_asset_id: EVIDENCE-T24-A5R1-PROJECTION-MANIFEST-001
+  - relation_type: validated_by
+    target_asset_id: TEST-T24-ENTITY-EVIDENCE-PROJECTION-001
+  consumers:
+  - TASK-24
+  evidence: []
+  classification: *t24_internal
+- asset_id: EVIDENCE-T24-A3-ACCEPTANCE-001
+  record_version: '1.0'
+  asset_type: evidence
+  purpose: TASK-24 A3 acceptance for deterministic feasibility projection measured gap and bounded next decision.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-08-02'
+  truth_owner: TASK-24
+  location:
+    kind: git_path
+    logical_uri: repo://docs/evidence/task24/a3_deterministic_entity_evidence_feasibility_and_projection_v1.json
+    repository_path: docs/evidence/task24/a3_deterministic_entity_evidence_feasibility_and_projection_v1.json
+  integrity:
+    kind: sha256
+    sha256: 30324bd751faafb050ccf644d739f3a5ecc45ecece0f846d23f7e792eb212a5f
+  access: *t24_read_file
+  relations:
+  - relation_type: depends_on
+    target_asset_id: EVIDENCE-T24-A3-PROJECTION-MANIFEST-001
+  - relation_type: validated_by
+    target_asset_id: TEST-T24-ENTITY-EVIDENCE-PROJECTION-001
+  consumers:
+  - TASK-24
+  evidence: []
+  classification: *t24_internal
+- asset_id: DECISION-T24-ENTITY-LINKAGE-EXTENSION-001
+  record_version: '1.0'
+  asset_type: decision
+  purpose: Bounded TASK-24 A4 decision selecting the cheapest raw-history probe without promoting provider labels to ownership truth.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-08-02'
+  truth_owner: TASK-24
+  location:
+    kind: git_path
+    logical_uri: repo://docs/decisions/task24_entity_linkage_evidence_extension_decision_v1.md
+    repository_path: docs/decisions/task24_entity_linkage_evidence_extension_decision_v1.md
+  integrity:
+    kind: sha256
+    sha256: a13523b86272c39976ab6a11a0332180cced51fde54c185a381e0034ec416fda
+  access: *t24_read_file
+  relations:
+  - relation_type: derived_from
+    target_asset_id: EVIDENCE-T24-A3-ACCEPTANCE-001
+  - relation_type: validated_by
+    target_asset_id: TEST-T24-ENTITY-LINKAGE-EXTENSION-001
+  consumers:
+  - TASK-24
+  evidence: []
+  classification: *t24_internal
+- asset_id: CONFIG-T24-ENTITY-LINKAGE-EXTENSION-001
+  record_version: '1.0'
+  asset_type: configuration
+  purpose: Machine-readable TASK-24 A4 population request caps evidence-family independence and post-probe stop contract.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-08-02'
+  truth_owner: TASK-24
+  location:
+    kind: git_path
+    logical_uri: repo://configs/task24_entity_linkage_evidence_extension_v1.yaml
+    repository_path: configs/task24_entity_linkage_evidence_extension_v1.yaml
+  integrity:
+    kind: sha256
+    sha256: 2db333e179ecc54cced41128b5a8c97825fc970d46af66be8660db9ee963791b
+  access: *t24_read_file
+  relations:
+  - relation_type: governed_by
+    target_asset_id: DECISION-T24-ENTITY-LINKAGE-EXTENSION-001
+  - relation_type: governed_by
+    target_asset_id: CONTRACT-T24-ENTITY-GRAPH-001
+  consumers:
+  - TASK-24
+  evidence: []
+  classification: *t24_internal
+- asset_id: TEST-T24-ENTITY-LINKAGE-EXTENSION-001
+  record_version: '1.0'
+  asset_type: script
+  purpose: Adversarial tests for TASK-24 A4 provider caps evidence independence vendor-label and authority boundaries.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-08-02'
+  truth_owner: TASK-24
+  location:
+    kind: git_path
+    logical_uri: repo://tests/test_task24_entity_linkage_evidence_extension_decision.py
+    repository_path: tests/test_task24_entity_linkage_evidence_extension_decision.py
+  integrity:
+    kind: sha256
+    sha256: b10313a3e2405ab9c4af40c78e920ca0e9ad30d36b6513ce9ace08a8dbacbed0
+  access: *t24_read_file
+  relations:
+  - relation_type: depends_on
+    target_asset_id: DECISION-T24-ENTITY-LINKAGE-EXTENSION-001
+  - relation_type: depends_on
+    target_asset_id: CONFIG-T24-ENTITY-LINKAGE-EXTENSION-001
+  consumers:
+  - TASK-24
+  evidence: []
+  classification: *t24_internal
+- asset_id: EVIDENCE-T24-A4-DECISION-001
+  record_version: '1.0'
+  asset_type: evidence
+  purpose: TASK-24 A4 acceptance binding the raw-history route caps audit arithmetic evidence rules and zero external execution.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-08-02'
+  truth_owner: TASK-24
+  location:
+    kind: git_path
+    logical_uri: repo://docs/evidence/task24/a4_bounded_entity_linkage_evidence_extension_decision_v1.json
+    repository_path: docs/evidence/task24/a4_bounded_entity_linkage_evidence_extension_decision_v1.json
+  integrity:
+    kind: sha256
+    sha256: 7169c2894929d8e5571635b11b75cb4ec7dbd89a543d164d54f8fab552504f1e
+  access: *t24_read_file
+  relations:
+  - relation_type: depends_on
+    target_asset_id: DECISION-T24-ENTITY-LINKAGE-EXTENSION-001
+  - relation_type: validated_by
+    target_asset_id: TEST-T24-ENTITY-LINKAGE-EXTENSION-001
+  consumers:
+  - TASK-24
+  evidence: []
+  classification: *t24_internal
+- asset_id: MODULE-T24-ENTITY-LINKAGE-CAPTURE-001
+  record_version: '1.0'
+  asset_type: script
+  purpose: Bounded provider transport retaining exact wire bytes canonical envelopes hashes timestamps truncation and secret boundaries.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-08-02'
+  truth_owner: TASK-24
+  location:
+    kind: git_path
+    logical_uri: repo://src/solana_alpha_lab/task24_entity_linkage_capture.py
+    repository_path: src/solana_alpha_lab/task24_entity_linkage_capture.py
+  integrity:
+    kind: sha256
+    sha256: 82cea86523ee70fbdfed154597f43a4660a850847bb1eeaf3d14755bd417ad49
+  access: *t24_read_file
+  relations:
+  - relation_type: governed_by
+    target_asset_id: CONFIG-T24-ENTITY-LINKAGE-EXTENSION-001
+  - relation_type: evidenced_by
+    target_asset_id: EVIDENCE-T24-A5R1-ACCEPTANCE-001
+  - relation_type: validated_by
+    target_asset_id: TEST-T24-ENTITY-LINKAGE-CAPTURE-001
+  consumers:
+  - TASK-24
+  evidence: []
+  classification: *t24_internal
+- asset_id: TEST-T24-ENTITY-LINKAGE-CAPTURE-001
+  record_version: '1.0'
+  asset_type: script
+  purpose: Tests for bounded TASK-24 history capture request caps exact-wire retention privacy and fail-closed behavior.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-08-02'
+  truth_owner: TASK-24
+  location:
+    kind: git_path
+    logical_uri: repo://tests/test_task24_entity_linkage_capture.py
+    repository_path: tests/test_task24_entity_linkage_capture.py
+  integrity:
+    kind: sha256
+    sha256: 021c56cd8bee349d45964d8682104fe05593c29184037cc063cf48cedc1213f0
+  access: *t24_read_file
+  relations:
+  - relation_type: depends_on
+    target_asset_id: MODULE-T24-ENTITY-LINKAGE-CAPTURE-001
+  - relation_type: depends_on
+    target_asset_id: CONFIG-T24-ENTITY-LINKAGE-EXTENSION-001
+  consumers:
+  - TASK-24
+  evidence: []
+  classification: *t24_internal
+- asset_id: MODULE-T24-ENTITY-LINKAGE-PROJECTION-001
+  record_version: '1.0'
+  asset_type: script
+  purpose: Deterministic parser and reversible graph projection over exact retained TASK-24 history evidence.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-08-02'
+  truth_owner: TASK-24
+  location:
+    kind: git_path
+    logical_uri: repo://src/solana_alpha_lab/task24_entity_linkage_projection.py
+    repository_path: src/solana_alpha_lab/task24_entity_linkage_projection.py
+  integrity:
+    kind: sha256
+    sha256: e6272cb3120f1f8b9307a48dce0937a8a175edb684201d80e38bbd339d5854c1
+  access: *t24_read_file
+  relations:
+  - relation_type: governed_by
+    target_asset_id: CONFIG-T24-ENTITY-LINKAGE-EXTENSION-001
+  - relation_type: consumes
+    target_asset_id: EVIDENCE-T24-A5R1-PREFLIGHT-001
+  - relation_type: produces
+    target_asset_id: EVIDENCE-T24-A5R1-PROJECTION-MANIFEST-001
+  - relation_type: validated_by
+    target_asset_id: TEST-T24-ENTITY-LINKAGE-PROJECTION-001
+  consumers:
+  - TASK-24
+  evidence: []
+  classification: *t24_internal
+- asset_id: TEST-T24-ENTITY-LINKAGE-PROJECTION-001
+  record_version: '1.0'
+  asset_type: script
+  purpose: Deterministic tests for TASK-24 transaction parsing evidence independence projection and insufficient-capacity semantics.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-08-02'
+  truth_owner: TASK-24
+  location:
+    kind: git_path
+    logical_uri: repo://tests/test_task24_entity_linkage_projection.py
+    repository_path: tests/test_task24_entity_linkage_projection.py
+  integrity:
+    kind: sha256
+    sha256: ceaac39e9a39b4fb11257d8010a083adf7d030661b2ed7d70b3dc387938568ce
+  access: *t24_read_file
+  relations:
+  - relation_type: depends_on
+    target_asset_id: MODULE-T24-ENTITY-LINKAGE-PROJECTION-001
+  - relation_type: depends_on
+    target_asset_id: TEST-T24-ENTITY-LINKAGE-CAPTURE-001
+  consumers:
+  - TASK-24
+  evidence: []
+  classification: *t24_internal
+- asset_id: EVIDENCE-T24-A5-CAPTURE-FAILURE-001
+  record_version: '1.0'
+  asset_type: evidence
+  purpose: Retained TASK-24 A5 negative receipt proving the first capture failed the exact-wire retention contract without rewriting observations.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-08-02'
+  truth_owner: TASK-24
+  location:
+    kind: git_path
+    logical_uri: repo://docs/evidence/task24/a5_bounded_raw_history_feasibility_capture_v1.json
+    repository_path: docs/evidence/task24/a5_bounded_raw_history_feasibility_capture_v1.json
+  integrity:
+    kind: sha256
+    sha256: d7ccdc033918ae8f045ad8c1776d6520ffcec86e6707677f84941a685ac76c02
+  access: *t24_read_file
+  relations:
+  - relation_type: derived_from
+    target_asset_id: EVIDENCE-T24-A4-DECISION-001
+  - relation_type: superseded_by
+    target_asset_id: EVIDENCE-T24-A5R1-ACCEPTANCE-001
+  consumers:
+  - TASK-24
+  - REG-RESEARCH-001
+  evidence: []
+  classification: *t24_internal
+- asset_id: EVIDENCE-T24-A5-QUARANTINED-PROJECTION-001
+  record_version: '1.0'
+  asset_type: evidence
+  purpose: Quarantined legacy TASK-24 projection manifest retained only as failed-retention lineage and never as admissible entity evidence.
+  status: DEPRECATED
+  origin: REPOSITORY
+  as_of: '2026-08-02'
+  truth_owner: TASK-24
+  location:
+    kind: git_path
+    logical_uri: repo://docs/evidence/task24/a5_projection_v1/projection_manifest_v1.json
+    repository_path: docs/evidence/task24/a5_projection_v1/projection_manifest_v1.json
+  integrity:
+    kind: sha256
+    sha256: 64d58868c96da4d560f0a12f63010343a19c1d6df6674c3a5857c1b7738e1825
+  access: *t24_read_file
+  relations:
+  - relation_type: derived_from
+    target_asset_id: EVIDENCE-T24-A5-CAPTURE-FAILURE-001
+  - relation_type: superseded_by
+    target_asset_id: EVIDENCE-T24-A5R1-PROJECTION-MANIFEST-001
+  consumers:
+  - TASK-24
+  - REG-RESEARCH-001
+  evidence: []
+  classification: *t24_internal
+- asset_id: EVIDENCE-T24-A5R1-PREFLIGHT-001
+  record_version: '1.0'
+  asset_type: evidence
+  purpose: Immutable TASK-24 A5R1 recapture preflight binding frozen population exact request retention and repair-only scope.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-08-02'
+  truth_owner: TASK-24
+  location:
+    kind: git_path
+    logical_uri: repo://docs/evidence/task24/a5r1_exact_wire_recapture_preflight_v1.json
+    repository_path: docs/evidence/task24/a5r1_exact_wire_recapture_preflight_v1.json
+  integrity:
+    kind: sha256
+    sha256: f1b4964768b7db1474ea6c0199bebbad37c264adf9a37c4b6697b151afe27250
+  access: *t24_read_file
+  relations:
+  - relation_type: derived_from
+    target_asset_id: EVIDENCE-T24-A5-CAPTURE-FAILURE-001
+  - relation_type: governed_by
+    target_asset_id: CONFIG-T24-ENTITY-LINKAGE-EXTENSION-001
+  consumers:
+  - TASK-24
+  evidence: []
+  classification: *t24_internal
+- asset_id: TEST-T24-A5R1-RECAPTURE-001
+  record_version: '1.0'
+  asset_type: script
+  purpose: Hash-bound replay tests for A5R1 exact wire and canonical retention deterministic outputs privacy and legacy quarantine.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-08-02'
+  truth_owner: TASK-24
+  location:
+    kind: git_path
+    logical_uri: repo://tests/test_task24_entity_linkage_recapture.py
+    repository_path: tests/test_task24_entity_linkage_recapture.py
+  integrity:
+    kind: sha256
+    sha256: 3db2fb752526a00a4eeb3383b9ac2a6e75ed36b1900884bd92d0e44926c34e5a
+  access: *t24_read_file
+  relations:
+  - relation_type: depends_on
+    target_asset_id: MODULE-T24-ENTITY-LINKAGE-CAPTURE-001
+  - relation_type: depends_on
+    target_asset_id: MODULE-T24-ENTITY-LINKAGE-PROJECTION-001
+  - relation_type: depends_on
+    target_asset_id: EVIDENCE-T24-A5R1-PREFLIGHT-001
+  consumers:
+  - TASK-24
+  evidence: []
+  classification: *t24_internal
+- asset_id: DATA-T24-ENTITY-NODES-001
+  record_version: '1.0'
+  asset_type: evidence
+  purpose: Current pseudonymized TASK-24 A5R1 graph node projection with typed timestamps evidence classes and revisions.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-08-02'
+  truth_owner: TASK-24
+  location:
+    kind: git_path
+    logical_uri: repo://docs/evidence/task24/a5r1_projection_v1/entity_nodes_v1.jsonl
+    repository_path: docs/evidence/task24/a5r1_projection_v1/entity_nodes_v1.jsonl
+  integrity:
+    kind: sha256
+    sha256: 8bc35e1ae3678b1b282ff42a6450a759627c48e75f4d8cbb3bb79a7809f6410a
+  access: *t24_read_file
+  relations:
+  - relation_type: derived_from
+    target_asset_id: EVIDENCE-T24-A5R1-PROJECTION-MANIFEST-001
+  - relation_type: validated_by
+    target_asset_id: TEST-T24-A5R1-RECAPTURE-001
+  consumers:
+  - TASK-24
+  - REG-RESEARCH-001
+  evidence: []
+  classification: *t24_internal
+- asset_id: DATA-T24-ENTITY-EDGES-001
+  record_version: '1.0'
+  asset_type: evidence
+  purpose: Current pseudonymized TASK-24 A5R1 graph edges preserving direct raw relations reversible inferences conflicts and provenance.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-08-02'
+  truth_owner: TASK-24
+  location:
+    kind: git_path
+    logical_uri: repo://docs/evidence/task24/a5r1_projection_v1/entity_edges_v1.jsonl
+    repository_path: docs/evidence/task24/a5r1_projection_v1/entity_edges_v1.jsonl
+  integrity:
+    kind: sha256
+    sha256: 24ce894f08f689002a131f7d7bbfe80ec9021d46536d6cb0ffc89847bf16ea9b
+  access: *t24_read_file
+  relations:
+  - relation_type: derived_from
+    target_asset_id: EVIDENCE-T24-A5R1-PROJECTION-MANIFEST-001
+  - relation_type: validated_by
+    target_asset_id: TEST-T24-A5R1-RECAPTURE-001
+  consumers:
+  - TASK-24
+  - REG-RESEARCH-001
+  evidence: []
+  classification: *t24_internal
+- asset_id: DATA-T24-ENTITY-CANDIDATES-001
+  record_version: '1.0'
+  asset_type: evidence
+  purpose: Two reversible TASK-24 shared-immediate-funder candidates containing four inferred memberships and zero corroborated claims.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-08-02'
+  truth_owner: TASK-24
+  location:
+    kind: git_path
+    logical_uri: repo://docs/evidence/task24/a5r1_projection_v1/entity_candidates_v1.json
+    repository_path: docs/evidence/task24/a5r1_projection_v1/entity_candidates_v1.json
+  integrity:
+    kind: sha256
+    sha256: e21c37b074ae623a359ed1d4228f95333706ce7b4f26f607bbd2789ba6b1b1de
+  access: *t24_read_file
+  relations:
+  - relation_type: derived_from
+    target_asset_id: EVIDENCE-T24-A5R1-PROJECTION-MANIFEST-001
+  - relation_type: governed_by
+    target_asset_id: EVIDENCE-T24-A6-STOP-DECISION-001
+  - relation_type: validated_by
+    target_asset_id: TEST-T24-A5R1-RECAPTURE-001
+  consumers:
+  - TASK-24
+  - REG-RESEARCH-001
+  evidence: []
+  classification: *t24_internal
+- asset_id: DATA-T24-ADJUSTED-CONCENTRATION-001
+  record_version: '1.0'
+  asset_type: evidence
+  purpose: Explicit TASK-24 result preserving unchanged adjusted concentration because exclusion inventory and corroborated evidence are incomplete.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-08-02'
+  truth_owner: TASK-24
+  location:
+    kind: git_path
+    logical_uri: repo://docs/evidence/task24/a5r1_projection_v1/entity_adjusted_concentration_v1.json
+    repository_path: docs/evidence/task24/a5r1_projection_v1/entity_adjusted_concentration_v1.json
+  integrity:
+    kind: sha256
+    sha256: 644b148f17fe437118196dabdb4185886117086aab1fe1b77f7965621a06f4ad
+  access: *t24_read_file
+  relations:
+  - relation_type: derived_from
+    target_asset_id: EVIDENCE-T24-A5R1-PROJECTION-MANIFEST-001
+  - relation_type: governed_by
+    target_asset_id: EVIDENCE-T24-A6-STOP-DECISION-001
+  - relation_type: validated_by
+    target_asset_id: TEST-T24-A5R1-RECAPTURE-001
+  consumers:
+  - TASK-24
+  - REG-RESEARCH-001
+  evidence: []
+  classification: *t24_internal
+- asset_id: EVIDENCE-T24-A5R1-PROJECTION-MANIFEST-001
+  record_version: '1.0'
+  asset_type: evidence
+  purpose: Current admissible TASK-24 graph projection manifest binding exact-wire capture lineage counts privacy and 4-of-12 capacity.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-08-02'
+  truth_owner: TASK-24
+  location:
+    kind: git_path
+    logical_uri: repo://docs/evidence/task24/a5r1_projection_v1/projection_manifest_v1.json
+    repository_path: docs/evidence/task24/a5r1_projection_v1/projection_manifest_v1.json
+  integrity:
+    kind: sha256
+    sha256: a6489a33d7bad02ffeb0fd70f3912e46c1175bcb0b21691005414a6448e57b6e
+  access: *t24_read_file
+  relations:
+  - relation_type: derived_from
+    target_asset_id: EVIDENCE-T24-A5R1-PREFLIGHT-001
+  - relation_type: validated_by
+    target_asset_id: TEST-T24-A5R1-RECAPTURE-001
+  consumers:
+  - TASK-24
+  - REG-RESEARCH-001
+  evidence: []
+  classification: *t24_internal
+- asset_id: EVIDENCE-T24-A5R1-ACCEPTANCE-001
+  record_version: '1.0'
+  asset_type: evidence
+  purpose: TASK-24 A5R1 acceptance proving repaired exact-wire retention deterministic projection privacy and insufficient audit capacity.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-08-02'
+  truth_owner: TASK-24
+  location:
+    kind: git_path
+    logical_uri: repo://docs/evidence/task24/a5r1_exact_wire_retention_recapture_v1.json
+    repository_path: docs/evidence/task24/a5r1_exact_wire_retention_recapture_v1.json
+  integrity:
+    kind: sha256
+    sha256: 318fdd6b755e887965feeb78a035f6f83497253b75290652ea32b6fc42d2da7a
+  access: *t24_read_file
+  relations:
+  - relation_type: depends_on
+    target_asset_id: EVIDENCE-T24-A5R1-PROJECTION-MANIFEST-001
+  - relation_type: derived_from
+    target_asset_id: EVIDENCE-T24-A5-CAPTURE-FAILURE-001
+  - relation_type: validated_by
+    target_asset_id: TEST-T24-A5R1-RECAPTURE-001
+  consumers:
+  - TASK-24
+  - REG-RESEARCH-001
+  evidence: []
+  classification: *t24_internal
+- asset_id: DECISION-T24-DATA-REDESIGN-OR-STOP-001
+  record_version: '1.0'
+  asset_type: decision
+  purpose: TASK-24 A6 decision stopping the structurally underpowered v1 entity route while retaining reversible partial evidence.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-08-02'
+  truth_owner: TASK-24
+  location:
+    kind: git_path
+    logical_uri: repo://docs/decisions/task24_data_redesign_or_stop_decision_v1.md
+    repository_path: docs/decisions/task24_data_redesign_or_stop_decision_v1.md
+  integrity:
+    kind: sha256
+    sha256: 6c15e823d8240366745b9deb9f1c44b70c80d4a5ffb3093b91bc38f9324a87f5
+  access: *t24_read_file
+  relations:
+  - relation_type: derived_from
+    target_asset_id: EVIDENCE-T24-A5R1-ACCEPTANCE-001
+  - relation_type: validated_by
+    target_asset_id: TEST-T24-DATA-REDESIGN-OR-STOP-001
+  consumers:
+  - TASK-24
+  - REG-RESEARCH-001
+  evidence: []
+  classification: *t24_internal
+- asset_id: CONFIG-T24-DATA-REDESIGN-OR-STOP-001
+  record_version: '1.0'
+  asset_type: configuration
+  purpose: Machine-readable TASK-24 A6 measured deficit rejected redesigns partial disposition reactivation and authority contract.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-08-02'
+  truth_owner: TASK-24
+  location:
+    kind: git_path
+    logical_uri: repo://configs/task24_data_redesign_or_stop_decision_v1.yaml
+    repository_path: configs/task24_data_redesign_or_stop_decision_v1.yaml
+  integrity:
+    kind: sha256
+    sha256: 0bafb705f0909fb4593fcdadc3803cfca3832773f25748477c713ed97cd25188
+  access: *t24_read_file
+  relations:
+  - relation_type: governed_by
+    target_asset_id: DECISION-T24-DATA-REDESIGN-OR-STOP-001
+  consumers:
+  - TASK-24
+  evidence: []
+  classification: *t24_internal
+- asset_id: TEST-T24-DATA-REDESIGN-OR-STOP-001
+  record_version: '1.0'
+  asset_type: script
+  purpose: Adversarial tests for TASK-24 A6 stop decision structural capacity no false independence and no downstream promotion.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-08-02'
+  truth_owner: TASK-24
+  location:
+    kind: git_path
+    logical_uri: repo://tests/test_task24_data_redesign_or_stop_decision.py
+    repository_path: tests/test_task24_data_redesign_or_stop_decision.py
+  integrity:
+    kind: sha256
+    sha256: 1fbfe712154f3383744af773164126314ef8771af553695dc6a00e2c4d88be9a
+  access: *t24_read_file
+  relations:
+  - relation_type: depends_on
+    target_asset_id: DECISION-T24-DATA-REDESIGN-OR-STOP-001
+  - relation_type: depends_on
+    target_asset_id: CONFIG-T24-DATA-REDESIGN-OR-STOP-001
+  consumers:
+  - TASK-24
+  evidence: []
+  classification: *t24_internal
+- asset_id: EVIDENCE-T24-A6-STOP-DECISION-001
+  record_version: '1.0'
+  asset_type: evidence
+  purpose: TASK-24 A6 acceptance binding STOP_NO_RELIABLE_ENTITY_SIGNAL structural deficit retained partial evidence and reactivation gate.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-08-02'
+  truth_owner: TASK-24
+  location:
+    kind: git_path
+    logical_uri: repo://docs/evidence/task24/a6_bounded_data_redesign_or_stop_decision_v1.json
+    repository_path: docs/evidence/task24/a6_bounded_data_redesign_or_stop_decision_v1.json
+  integrity:
+    kind: sha256
+    sha256: 031ea9c5564fbbe9020a11695daeb4661794acb21c793075ab636fcc7380fae1
+  access: *t24_read_file
+  relations:
+  - relation_type: depends_on
+    target_asset_id: DECISION-T24-DATA-REDESIGN-OR-STOP-001
+  - relation_type: depends_on
+    target_asset_id: EVIDENCE-T24-A5R1-ACCEPTANCE-001
+  - relation_type: validated_by
+    target_asset_id: TEST-T24-DATA-REDESIGN-OR-STOP-001
+  consumers:
+  - TASK-24
+  - REG-RESEARCH-001
+  - FACTORY-001
+  evidence: []
+  classification: *t24_internal
+- asset_id: EVIDENCE-T24-A7-CATALOG-FACTORY-FIT-001
+  record_version: '1.0'
+  asset_type: evidence
+  purpose: TASK-24 A7 Catalog transaction negative-result lifecycle Full Factory Fit follow-up bounded authority and validation receipt.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-08-02'
+  truth_owner: TASK-24
+  location:
+    kind: git_path
+    logical_uri: repo://docs/evidence/task24/a7_catalog_factory_fit_v1.json
+    repository_path: docs/evidence/task24/a7_catalog_factory_fit_v1.json
+  integrity:
+    kind: sha256
+    sha256: 63b6feb5a1d084e27a51a40c3223c06a298cdb74ef40f85107221ce57b4b9fec
+  access: *t24_read_file
+  relations:
+  - relation_type: derived_from
+    target_asset_id: EVIDENCE-T24-A6-STOP-DECISION-001
+  - relation_type: depends_on
+    target_asset_id: REGISTRY-DECISIONS-NEGATIVE-RESULTS-001
+  - relation_type: validated_by
+    target_asset_id: TEST-T24-A7-CATALOG-FACTORY-FIT-001
+  consumers:
+  - TASK-24
+  - FACTORY-001
+  - REG-RESEARCH-001
+  evidence: []
+  classification: *t24_internal
+- asset_id: TEST-T24-A7-CATALOG-FACTORY-FIT-001
+  record_version: '1.0'
+  asset_type: script
+  purpose: Hash-bound A7 tests for exact partial assets Catalog lifecycle generated navigation Full Factory Fit and authority boundaries.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-08-02'
+  truth_owner: TASK-24
+  location:
+    kind: git_path
+    logical_uri: repo://tests/test_task24_catalog_factory_fit.py
+    repository_path: tests/test_task24_catalog_factory_fit.py
+  integrity:
+    kind: sha256
+    sha256: b205f8937d167dd3085ae7c1ad284e0986a1acc941439212c05c39e6c87a5fe2
+  access: *t24_read_file
+  relations:
+  - relation_type: depends_on
+    target_asset_id: EVIDENCE-T24-A7-CATALOG-FACTORY-FIT-001
+  - relation_type: depends_on
+    target_asset_id: TEST-T24-DATA-REDESIGN-OR-STOP-001
+  - relation_type: depends_on
+    target_asset_id: CATALOG-ROOT-001
+  consumers:
+  - TASK-24
+  evidence: []
+  classification: *t24_internal
 - asset_id: TEST-T23-BOUNDED-DIAGNOSTICS-CONTRACT-001
   record_version: '1.0'
   asset_type: script
@@ -12116,7 +12983,7 @@ records:
     repository_path: tests/test_task23_catalog_repository_factory_fit.py
   integrity:
     kind: sha256
-    sha256: 2ef8f75278c00b07cc40f5d035ff2b256979022051787c5596a8ec6269602e47
+    sha256: d3040bb8b269371282e228d0bd5f15c5b9609dd631713d94cab1dfbeb8c289e4
   access: *t23_read_file
   relations:
   - relation_type: depends_on
