@@ -13475,3 +13475,381 @@ records:
   consumers: [TASK-25]
   evidence: []
   classification: *t25_internal
+- asset_id: CONTRACT-T26-EXECUTION-COST-NETRETURN-001
+  record_version: '1.0'
+  asset_type: control_document
+  purpose: Frozen TASK-26 execution-cost, terminal-state, inventory, cashflow and NetReturn truth contract.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-08-03'
+  truth_owner: TASK-26
+  location: {kind: git_path, logical_uri: 'repo://docs/contracts/task26_execution_cost_and_netreturn_contract_v1.md', repository_path: docs/contracts/task26_execution_cost_and_netreturn_contract_v1.md}
+  integrity: {kind: sha256, sha256: aac003cf7ba2742d310893c81af3ae4a032a52b719f2f56d80171a6486351efd}
+  access: *t25_read_file
+  relations:
+  - {relation_type: derived_from, target_asset_id: CONTRACT-T25-OUTCOME-LABEL-PIT-001}
+  - {relation_type: derived_from, target_asset_id: EVIDENCE-T25-A6-CATALOG-FACTORY-FIT-001}
+  consumers: [TASK-26, TASK-27, FACTORY-001]
+  evidence: []
+  classification: *t25_internal
+- asset_id: CONFIG-T26-EXECUTION-COST-NETRETURN-001
+  record_version: '1.0'
+  asset_type: configuration
+  purpose: Machine-readable TASK-26 contract, authority, truth-boundary and acceptance policy.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-08-03'
+  truth_owner: TASK-26
+  location: {kind: git_path, logical_uri: 'repo://configs/task26_execution_cost_and_netreturn_contract_v1.yaml', repository_path: configs/task26_execution_cost_and_netreturn_contract_v1.yaml}
+  integrity: {kind: sha256, sha256: 1107b286248036f4e3ef0a5610b80e7cec8362269ecb2ba835e5040dc3210574}
+  access: *t25_read_file
+  relations: [{relation_type: governed_by, target_asset_id: CONTRACT-T26-EXECUTION-COST-NETRETURN-001}]
+  consumers: [TASK-26, TASK-27, FACTORY-001]
+  evidence: []
+  classification: *t25_internal
+- asset_id: SCHEMA-T26-EXECUTION-COST-NETRETURN-001
+  record_version: '1.0'
+  asset_type: schema
+  purpose: JSON Schema for TASK-26 synthetic execution-cost and NetReturn contract records.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-08-03'
+  truth_owner: TASK-26
+  location: {kind: git_path, logical_uri: 'repo://catalog/schemas/task26_execution_cost_and_netreturn.schema.json', repository_path: catalog/schemas/task26_execution_cost_and_netreturn.schema.json}
+  integrity: {kind: sha256, sha256: f3e9b34ccf8adff60cc1abb6e3fa37dfa59310e479eb7654a8d780e5d0cbf083}
+  access: *t25_read_file
+  relations: [{relation_type: governed_by, target_asset_id: CONTRACT-T26-EXECUTION-COST-NETRETURN-001}]
+  consumers: [TASK-26, TASK-27, FACTORY-001]
+  evidence: []
+  classification: *t25_internal
+- asset_id: FIXTURE-T26-EXECUTION-COST-NETRETURN-001
+  record_version: '1.0'
+  asset_type: evidence
+  purpose: Synthetic golden and adversarial fixture for frozen TASK-26 cost and NetReturn semantics.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-08-03'
+  truth_owner: TASK-26
+  location: {kind: git_path, logical_uri: 'repo://tests/fixtures/task26/execution_cost_and_netreturn_contract_v1.json', repository_path: tests/fixtures/task26/execution_cost_and_netreturn_contract_v1.json}
+  integrity: {kind: sha256, sha256: 7d9e341a603a4c9de32feea58bb169c916864705ddb64ec1dc5853b501fa7bac}
+  access: *t25_read_file
+  relations: [{relation_type: derived_from, target_asset_id: CONFIG-T26-EXECUTION-COST-NETRETURN-001}]
+  consumers: [TASK-26]
+  evidence: []
+  classification: *t25_internal
+- asset_id: TEST-T26-EXECUTION-COST-NETRETURN-001
+  record_version: '1.0'
+  asset_type: script
+  purpose: Hash-bound tests for TASK-26 contract, schema, fixture and authority boundaries.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-08-03'
+  truth_owner: TASK-26
+  location: {kind: git_path, logical_uri: 'repo://tests/test_task26_execution_cost_and_netreturn_contract.py', repository_path: tests/test_task26_execution_cost_and_netreturn_contract.py}
+  integrity: {kind: sha256, sha256: 84624564a4d5f934f952424aca13e816bac19af9e78424f0ab8fc11690b28129}
+  access: *t25_read_file
+  relations:
+  - {relation_type: depends_on, target_asset_id: CONFIG-T26-EXECUTION-COST-NETRETURN-001}
+  - {relation_type: depends_on, target_asset_id: SCHEMA-T26-EXECUTION-COST-NETRETURN-001}
+  - {relation_type: depends_on, target_asset_id: FIXTURE-T26-EXECUTION-COST-NETRETURN-001}
+  consumers: [TASK-26]
+  evidence: []
+  classification: *t25_internal
+- asset_id: EVIDENCE-T26-A2-ACCEPTANCE-001
+  record_version: '1.0'
+  asset_type: evidence
+  purpose: TASK-26 A2 frozen contract acceptance receipt with zero external authority use.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-08-03'
+  truth_owner: TASK-26
+  location: {kind: git_path, logical_uri: 'repo://docs/evidence/task26/a2_execution_cost_and_netreturn_contract_acceptance_v1.json', repository_path: docs/evidence/task26/a2_execution_cost_and_netreturn_contract_acceptance_v1.json}
+  integrity: {kind: sha256, sha256: ad79108c07c98797f24cc1c061474413e130309253eb00d4797017e26256b0ce}
+  access: *t25_read_file
+  relations:
+  - {relation_type: derived_from, target_asset_id: CONTRACT-T26-EXECUTION-COST-NETRETURN-001}
+  - {relation_type: validated_by, target_asset_id: TEST-T26-EXECUTION-COST-NETRETURN-001}
+  consumers: [TASK-26, FACTORY-001]
+  evidence: []
+  classification: *t25_internal
+- asset_id: MODULE-T26-EXECUTION-COST-MODEL-001
+  record_version: '1.0'
+  asset_type: script
+  purpose: Deterministic synthetic TASK-26 execution-cost and NetReturn projection model.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-08-03'
+  truth_owner: TASK-26
+  location: {kind: git_path, logical_uri: 'repo://src/solana_alpha_lab/task26_execution_cost_model.py', repository_path: src/solana_alpha_lab/task26_execution_cost_model.py}
+  integrity: {kind: sha256, sha256: ea205679f82781b27270d99e581a1412c959823c4a891d81a6855e6673f500b5}
+  access: *t25_read_file
+  relations:
+  - {relation_type: governed_by, target_asset_id: CONFIG-T26-EXECUTION-COST-NETRETURN-001}
+  - {relation_type: produces, target_asset_id: DATA-T26-SYNTHETIC-EXECUTION-COST-PROJECTION-001}
+  consumers: [TASK-26, TASK-27]
+  evidence: []
+  classification: *t25_internal
+- asset_id: TEST-T26-EXECUTION-COST-MODEL-001
+  record_version: '1.0'
+  asset_type: script
+  purpose: Tests for TASK-26 deterministic golden execution-cost model and typed unknowns.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-08-03'
+  truth_owner: TASK-26
+  location: {kind: git_path, logical_uri: 'repo://tests/test_task26_execution_cost_model.py', repository_path: tests/test_task26_execution_cost_model.py}
+  integrity: {kind: sha256, sha256: 11680da3919102b0c058b56e0f35f28d66d4910f360a003b76499b6c82209d1b}
+  access: *t25_read_file
+  relations:
+  - {relation_type: depends_on, target_asset_id: MODULE-T26-EXECUTION-COST-MODEL-001}
+  - {relation_type: depends_on, target_asset_id: FIXTURE-T26-EXECUTION-COST-NETRETURN-001}
+  consumers: [TASK-26]
+  evidence: []
+  classification: *t25_internal
+- asset_id: DATA-T26-SYNTHETIC-EXECUTION-COST-PROJECTION-001
+  record_version: '1.0'
+  asset_type: evidence
+  purpose: Content-addressed synthetic projection of modeled and non-computable TASK-26 cost states.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-08-03'
+  truth_owner: TASK-26
+  location: {kind: git_path, logical_uri: 'repo://docs/evidence/task26/a3_execution_cost_projection_v1.json', repository_path: docs/evidence/task26/a3_execution_cost_projection_v1.json}
+  integrity: {kind: sha256, sha256: df7025c489627b77cc3748c495ca8852ad3a79262048e0780115f0d7d086165f}
+  access: *t25_read_file
+  relations:
+  - {relation_type: derived_from, target_asset_id: FIXTURE-T26-EXECUTION-COST-NETRETURN-001}
+  - {relation_type: validated_by, target_asset_id: TEST-T26-EXECUTION-COST-MODEL-001}
+  consumers: [TASK-26, TASK-27, FACTORY-001]
+  evidence: []
+  classification: *t25_internal
+- asset_id: EVIDENCE-T26-A3-ACCEPTANCE-001
+  record_version: '1.0'
+  asset_type: evidence
+  purpose: TASK-26 A3 deterministic execution-cost and golden acceptance receipt.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-08-03'
+  truth_owner: TASK-26
+  location: {kind: git_path, logical_uri: 'repo://docs/evidence/task26/a3_deterministic_execution_cost_and_golden_acceptance_v1.json', repository_path: docs/evidence/task26/a3_deterministic_execution_cost_and_golden_acceptance_v1.json}
+  integrity: {kind: sha256, sha256: c543f0c273a5a09a16b9ca2e9d96bc0c61343eac236894d161f247d14b3b53bf}
+  access: *t25_read_file
+  relations:
+  - {relation_type: derived_from, target_asset_id: DATA-T26-SYNTHETIC-EXECUTION-COST-PROJECTION-001}
+  - {relation_type: validated_by, target_asset_id: TEST-T26-EXECUTION-COST-MODEL-001}
+  consumers: [TASK-26, FACTORY-001]
+  evidence: []
+  classification: *t25_internal
+- asset_id: MODULE-T26-ADVERSARIAL-ACCEPTANCE-001
+  record_version: '1.0'
+  asset_type: script
+  purpose: Frozen synthetic adversarial acceptance for TASK-26 execution-cost truth boundaries.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-08-03'
+  truth_owner: TASK-26
+  location: {kind: git_path, logical_uri: 'repo://src/solana_alpha_lab/task26_adversarial_acceptance.py', repository_path: src/solana_alpha_lab/task26_adversarial_acceptance.py}
+  integrity: {kind: sha256, sha256: 5d4dcef41243bfc2120028081ddeb45e5251334d6f787e84225f1c093959a7cf}
+  access: *t25_read_file
+  relations: [{relation_type: derived_from, target_asset_id: EVIDENCE-T26-A3-ACCEPTANCE-001}]
+  consumers: [TASK-26]
+  evidence: []
+  classification: *t25_internal
+- asset_id: TEST-T26-ADVERSARIAL-ACCEPTANCE-001
+  record_version: '1.0'
+  asset_type: script
+  purpose: Tests that exact synthetic TASK-26 false-positive mutations fail closed.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-08-03'
+  truth_owner: TASK-26
+  location: {kind: git_path, logical_uri: 'repo://tests/test_task26_execution_cost_adversarial_acceptance.py', repository_path: tests/test_task26_execution_cost_adversarial_acceptance.py}
+  integrity: {kind: sha256, sha256: 29493fc8c829be89c6d2d8da3eafcf8d76660ee99748be53db24b33d17e0afd3}
+  access: *t25_read_file
+  relations: [{relation_type: depends_on, target_asset_id: MODULE-T26-ADVERSARIAL-ACCEPTANCE-001}]
+  consumers: [TASK-26]
+  evidence: []
+  classification: *t25_internal
+- asset_id: EVIDENCE-T26-A4-ACCEPTANCE-001
+  record_version: '1.0'
+  asset_type: evidence
+  purpose: TASK-26 A4 adversarial receipt preserving modeled versus observed and unknown distinctions.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-08-03'
+  truth_owner: TASK-26
+  location: {kind: git_path, logical_uri: 'repo://docs/evidence/task26/a4_adversarial_execution_cost_acceptance_v1.json', repository_path: docs/evidence/task26/a4_adversarial_execution_cost_acceptance_v1.json}
+  integrity: {kind: sha256, sha256: 86b09e393c0a811c7f8b260eb1e5f7236351ea5d8d56000fea873195c1355d82}
+  access: *t25_read_file
+  relations:
+  - {relation_type: derived_from, target_asset_id: EVIDENCE-T26-A3-ACCEPTANCE-001}
+  - {relation_type: validated_by, target_asset_id: TEST-T26-ADVERSARIAL-ACCEPTANCE-001}
+  consumers: [TASK-26, FACTORY-001]
+  evidence: []
+  classification: *t25_internal
+- asset_id: MODULE-T26-R2-EXECUTION-COST-PROJECTION-001
+  record_version: '1.0'
+  asset_type: script
+  purpose: Bounded TASK-26 projection from the exact TASK-25 R2 aggregate quote surface without raw reopening.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-08-03'
+  truth_owner: TASK-26
+  location: {kind: git_path, logical_uri: 'repo://src/solana_alpha_lab/task26_r2_execution_cost_projection.py', repository_path: src/solana_alpha_lab/task26_r2_execution_cost_projection.py}
+  integrity: {kind: sha256, sha256: 9fafb247ed7b35c40eae5cdf7182a56d77a7f85749e36bdcf32d479c954cdcf2}
+  access: *t25_read_file
+  relations:
+  - {relation_type: derived_from, target_asset_id: EVIDENCE-T26-A4-ACCEPTANCE-001}
+  - {relation_type: derived_from, target_asset_id: DATA-T25-EXACT-R2-OUTCOME-SURFACE-001}
+  - {relation_type: produces, target_asset_id: DATA-T26-R2-EXECUTION-COST-INPUT-PROJECTION-001}
+  consumers: [TASK-26, TASK-27]
+  evidence: []
+  classification: *t25_internal
+- asset_id: TEST-T26-R2-EXECUTION-COST-PROJECTION-001
+  record_version: '1.0'
+  asset_type: script
+  purpose: Tests for bounded TASK-26 R2 quote-cost input projection and R3 denial.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-08-03'
+  truth_owner: TASK-26
+  location: {kind: git_path, logical_uri: 'repo://tests/test_task26_r2_execution_cost_projection.py', repository_path: tests/test_task26_r2_execution_cost_projection.py}
+  integrity: {kind: sha256, sha256: 0db645afba58ec2dfb697b3eddf917dcec3e229b63a67cf4bc9ca0237b458f6b}
+  access: *t25_read_file
+  relations: [{relation_type: depends_on, target_asset_id: MODULE-T26-R2-EXECUTION-COST-PROJECTION-001}]
+  consumers: [TASK-26]
+  evidence: []
+  classification: *t25_internal
+- asset_id: DATA-T26-R2-EXECUTION-COST-INPUT-PROJECTION-001
+  record_version: '1.0'
+  asset_type: evidence
+  purpose: Exact R2 aggregate quote-cost input projection with 35 ready pairs, one latency block and no numeric NetReturn.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-08-03'
+  truth_owner: TASK-26
+  location: {kind: git_path, logical_uri: 'repo://docs/evidence/task26/a5_bounded_r2_execution_cost_projection_v1.json', repository_path: docs/evidence/task26/a5_bounded_r2_execution_cost_projection_v1.json}
+  integrity: {kind: sha256, sha256: 670d1b280aacdca0ef4db1994ff9bc535a8f640c4db2e688a4322ee9807b0b37}
+  access: *t25_read_file
+  relations:
+  - {relation_type: derived_from, target_asset_id: DATA-T25-EXACT-R2-OUTCOME-SURFACE-001}
+  - {relation_type: validated_by, target_asset_id: TEST-T26-R2-EXECUTION-COST-PROJECTION-001}
+  consumers: [TASK-26, TASK-27, FACTORY-001]
+  evidence: []
+  classification: *t25_internal
+- asset_id: EVIDENCE-T26-A5-ACCEPTANCE-001
+  record_version: '1.0'
+  asset_type: evidence
+  purpose: TASK-26 A5 bounded R2 quote-cost projection acceptance and nonclaim receipt.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-08-03'
+  truth_owner: TASK-26
+  location: {kind: git_path, logical_uri: 'repo://docs/evidence/task26/a5_bounded_r2_execution_cost_projection_acceptance_v1.json', repository_path: docs/evidence/task26/a5_bounded_r2_execution_cost_projection_acceptance_v1.json}
+  integrity: {kind: sha256, sha256: f14d2655b281fd2b1eb02adfc843bff2578632580109fe516b7f5fc88fa646b9}
+  access: *t25_read_file
+  relations:
+  - {relation_type: derived_from, target_asset_id: DATA-T26-R2-EXECUTION-COST-INPUT-PROJECTION-001}
+  - {relation_type: validated_by, target_asset_id: TEST-T26-R2-EXECUTION-COST-PROJECTION-001}
+  consumers: [TASK-26, FACTORY-001]
+  evidence: []
+  classification: *t25_internal
+- asset_id: FIXTURE-T26-R2-EXECUTION-COST-ADVERSARIAL-MATRIX-001
+  record_version: '1.0'
+  asset_type: evidence
+  purpose: Twelve synthetic false-positive mutations against the bounded TASK-26 R2 cost projection.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-08-03'
+  truth_owner: TASK-26
+  location: {kind: git_path, logical_uri: 'repo://tests/fixtures/task26/r2_execution_cost_adversarial_matrix_v1.json', repository_path: tests/fixtures/task26/r2_execution_cost_adversarial_matrix_v1.json}
+  integrity: {kind: sha256, sha256: 51f1664438eb17c3a2052d803ecd6a18eca059ef9637a73f1996e6ac22e9225e}
+  access: *t25_read_file
+  relations: [{relation_type: derived_from, target_asset_id: DATA-T26-R2-EXECUTION-COST-INPUT-PROJECTION-001}]
+  consumers: [TASK-26]
+  evidence: []
+  classification: *t25_internal
+- asset_id: MODULE-T26-R2-ADVERSARIAL-ACCEPTANCE-001
+  record_version: '1.0'
+  asset_type: script
+  purpose: Exact adversarial acceptance for TASK-26 R2 quote-cost projection boundaries and owner decision.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-08-03'
+  truth_owner: TASK-26
+  location: {kind: git_path, logical_uri: 'repo://src/solana_alpha_lab/task26_r2_adversarial_acceptance.py', repository_path: src/solana_alpha_lab/task26_r2_adversarial_acceptance.py}
+  integrity: {kind: sha256, sha256: d889e7abfe3a47e9c8e26db8eb52e1a99e893457d5ecf5ed84f77e4509600349}
+  access: *t25_read_file
+  relations:
+  - {relation_type: depends_on, target_asset_id: FIXTURE-T26-R2-EXECUTION-COST-ADVERSARIAL-MATRIX-001}
+  - {relation_type: derived_from, target_asset_id: EVIDENCE-T26-A5-ACCEPTANCE-001}
+  consumers: [TASK-26]
+  evidence: []
+  classification: *t25_internal
+- asset_id: TEST-T26-R2-ADVERSARIAL-ACCEPTANCE-001
+  record_version: '1.0'
+  asset_type: script
+  purpose: Tests for exact rejection of TASK-26 R2 semantic inflation and boundary leaks.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-08-03'
+  truth_owner: TASK-26
+  location: {kind: git_path, logical_uri: 'repo://tests/test_task26_r2_execution_cost_adversarial_acceptance.py', repository_path: tests/test_task26_r2_execution_cost_adversarial_acceptance.py}
+  integrity: {kind: sha256, sha256: f3b7ac19730c1d3ebc10afc19c957e8350539dc4850d7a2057f97b7b6f9f1000}
+  access: *t25_read_file
+  relations: [{relation_type: depends_on, target_asset_id: MODULE-T26-R2-ADVERSARIAL-ACCEPTANCE-001}]
+  consumers: [TASK-26]
+  evidence: []
+  classification: *t25_internal
+- asset_id: EVIDENCE-T26-A6-ACCEPTANCE-001
+  record_version: '1.0'
+  asset_type: evidence
+  purpose: TASK-26 A6 adversarial R2 acceptance proving Extend Execution Evidence without R3 access.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-08-03'
+  truth_owner: TASK-26
+  location: {kind: git_path, logical_uri: 'repo://docs/evidence/task26/a6_r2_adversarial_execution_cost_acceptance_v1.json', repository_path: docs/evidence/task26/a6_r2_adversarial_execution_cost_acceptance_v1.json}
+  integrity: {kind: sha256, sha256: 866366fa94329c142a57f2d5bfc1d0f7f3c32badf5e4408dc033e605a5089f69}
+  access: *t25_read_file
+  relations:
+  - {relation_type: derived_from, target_asset_id: EVIDENCE-T26-A5-ACCEPTANCE-001}
+  - {relation_type: validated_by, target_asset_id: TEST-T26-R2-ADVERSARIAL-ACCEPTANCE-001}
+  consumers: [TASK-26, FACTORY-001]
+  evidence: []
+  classification: *t25_internal
+- asset_id: EVIDENCE-T26-A7-CATALOG-FACTORY-FIT-001
+  record_version: '1.0'
+  asset_type: evidence
+  purpose: TASK-26 A7 Catalog transaction, Full Factory Fit, durable execution-evidence follow-up and delivery boundary receipt.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-08-03'
+  truth_owner: TASK-26
+  location: {kind: git_path, logical_uri: 'repo://docs/evidence/task26/a7_catalog_factory_fit_v1.json', repository_path: docs/evidence/task26/a7_catalog_factory_fit_v1.json}
+  integrity: {kind: sha256, sha256: 74fc6fc5086014ca33a7db8bf5de566c7a7639dc2aced5f5c02253286cb7b1bc}
+  access: *t25_read_file
+  relations:
+  - {relation_type: derived_from, target_asset_id: EVIDENCE-T26-A6-ACCEPTANCE-001}
+  - {relation_type: validated_by, target_asset_id: TEST-T26-A7-CATALOG-FACTORY-FIT-001}
+  consumers: [TASK-26, TASK-27, FACTORY-001]
+  evidence: []
+  classification: *t25_internal
+- asset_id: TEST-T26-A7-CATALOG-FACTORY-FIT-001
+  record_version: '1.0'
+  asset_type: script
+  purpose: Hash-bound TASK-26 A7 tests for Catalog inventory, Full Factory Fit, navigation and delivery boundary.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-08-03'
+  truth_owner: TASK-26
+  location: {kind: git_path, logical_uri: 'repo://tests/test_task26_catalog_factory_fit.py', repository_path: tests/test_task26_catalog_factory_fit.py}
+  integrity: {kind: sha256, sha256: 7b3ee547e7ab178c3f16af45c15223d6b24383cb520a6d41caa2cc33892735e4}
+  access: *t25_read_file
+  relations:
+  - {relation_type: depends_on, target_asset_id: EVIDENCE-T26-A7-CATALOG-FACTORY-FIT-001}
+  - {relation_type: depends_on, target_asset_id: DATA-T26-R2-EXECUTION-COST-INPUT-PROJECTION-001}
+  - {relation_type: depends_on, target_asset_id: CATALOG-ROOT-001}
+  consumers: [TASK-26]
+  evidence: []
+  classification: *t25_internal

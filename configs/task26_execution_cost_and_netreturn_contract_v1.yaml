@@ -1,0 +1,232 @@
+schema_version: "1.0"
+contract_id: T26-EXECUTION-COST-AND-NETRETURN-CONTRACT-001
+task_id: TASK-26
+task_name: Execution cost and NetReturn model
+atom: T26-A2_FROZEN_EXECUTION_COST_RECONCILIATION_AND_NETRETURN_CONTRACT_V1
+status: VALIDATED_CONTRACT_ONLY
+as_of: "2026-08-03"
+
+entry_gate:
+  route_owner: LOCAL_WORK_PRIMARY
+  execution_route: LOCAL_WORK_CODEX
+  verdict: START_WITH_PATCH
+  patch: FREEZE_EXECUTION_FEE_TERMINAL_STATE_RETRY_INVENTORY_RECONCILIATION_AND_NETRETURN_CONTRACT_BEFORE_MODELED_VALUES
+  user_atom_approval: CONFIRMED
+  source_activation_receipt: ACTIVATION_CONFIRMED_USER_SMOKE
+  source_manifest_version: "4.2"
+  active_task_source_version: "1.0"
+  active_task_source_sha256: 733932fee9ff117ea80a205a93fc754f10b690ec29698bd22f1bc410acf3e47d
+  accepted_main_commit: a1c7e40f4febeee78ab544ee89edf248c4cd0454
+  accepted_main_tree: b4280469913ae6463a9fd3f97870f62c594795d8
+  branch: task26/execution-cost-netreturn
+  dependencies:
+    TASK-25: DONE_OUTCOME_SURFACE_READY_WITH_LIMITATIONS
+  catalog_checkpoint:
+    version: 0.30.0
+    implementation_status: VALIDATED_ACTIVE
+    assets: 476
+    asset_registries: 4
+    schemas: 8
+    queries: 8
+    lifecycle_registries: 9
+    lifecycle_records: 56
+  product_vision_terminal: CANONICALIZED_WITH_PATCH
+  active_time_gate: NONE
+  reasoning: VERY_HIGH_SUFFICIENT
+  tool_decision: NONE
+
+owner_decision:
+  question: >-
+    Can the accepted TASK-25 quote/path surface support a point-in-time-safe,
+    strategy-specific modeled execution-cost result without turning quote truth
+    into fill, settlement or observed NetReturn truth?
+  allowed_terminal_decisions:
+    - EXECUTION_COST_MODEL_READY_WITH_LIMITATIONS
+    - REDESIGN_EXECUTION_ESTIMAND
+    - EXTEND_EXECUTION_EVIDENCE
+    - STOP_NO_RELIABLE_NETRETURN_INPUT
+  forbidden_claims:
+    - QUOTE_IMPLIES_ATTEMPT_OR_FILL
+    - LANDING_IMPLIES_RECONCILED_FILL
+    - EXIT_QUOTE_IMPLIES_FLAT_INVENTORY
+    - MISSING_FEE_IMPLIES_ZERO
+    - DROPPED_OR_EXPIRED_IMPLIES_UNCHARGED
+    - UNKNOWN_TERMINAL_PERMITS_RETRY_OR_ACCOUNTING_CLOSURE
+    - MODELED_IMPLIES_OBSERVED_NETRETURN
+    - R2_VALUE_READ_OR_R3_ACCESS_IN_A2
+    - ACTUAL_EXECUTION_OR_OWNER_CASHFLOW
+    - CANONICAL_TASK26_DONE
+
+managed_write_set:
+  - docs/contracts/task26_execution_cost_and_netreturn_contract_v1.md
+  - configs/task26_execution_cost_and_netreturn_contract_v1.yaml
+  - catalog/schemas/task26_execution_cost_and_netreturn.schema.json
+  - tests/fixtures/task26/execution_cost_and_netreturn_contract_v1.json
+  - tests/test_task26_execution_cost_and_netreturn_contract.py
+  - docs/evidence/task26/a2_execution_cost_and_netreturn_contract_acceptance_v1.json
+
+reuse_decision:
+  reuse_gate_status: PASS_EXISTING_COMPONENTS_SUFFICIENT
+  full_software_reuse_gate_status: NOT_TRIGGERED_NO_NEW_DEPENDENCY_OR_SERVICE
+  adopt:
+    - PYTHON_STDLIB
+    - JSONSCHEMA_4_26_0
+    - PYYAML_6_0_3
+    - SCHEMA_T05_REL_STRATEGY_OUTCOMES_001
+    - CONTRACT_T10_JUPITER_QUOTE_OBSERVATION_001
+    - DATA_T22_SPLIT_MANIFEST_002
+    - CONTRACT_T25_OUTCOME_LABEL_AND_PIT_001
+  wrap:
+    - TASK25_QUOTE_AND_PIT_TRUTH_WITH_EXECUTION_TERMINAL_FEE_INVENTORY_GUARDS
+    - TASK05_OUTCOME_RELATION_WITH_TASK26_MODELED_VS_OBSERVED_NETRETURN_BOUNDARY
+  fork: []
+  build:
+    - PURE_TASK26_EXECUTION_COST_AND_RECONCILIATION_CONTRACT
+    - SYNTHETIC_ADVERSARIAL_GOLDEN_MATRIX
+  new_dependency_or_service: false
+
+frozen_upstream_bindings:
+  - asset_id: CONTRACT-T25-OUTCOME-LABEL-AND-PIT-001
+    path: docs/contracts/task25_outcome_label_and_pit_contract_v1.md
+    sha256: 04e4397e69d554463a09564bdb1cbbb2ac41ce8662277d05e4565c178e94c801
+    bytes: 9216
+    use: QUOTE_VS_FILL_VS_SETTLEMENT_AND_PIT_BOUNDARY
+  - asset_id: EVIDENCE-T25-A6-CATALOG-FACTORY-FIT-001
+    path: docs/evidence/task25/a6_catalog_factory_fit_v1.json
+    sha256: 187a508abb78b9f5548ec0d9677424ddfc60c746b51ee3975c5794b30745b41a
+    bytes: 12471
+    use: TASK25_COMPLETION_LIMITATIONS_AND_DURABLE_TASK26_FOLLOWUP
+  - asset_id: CONTRACT-T10-JUPITER-QUOTE-OBSERVATION-001
+    path: docs/contracts/jupiter_quote_observation_contract_v1.md
+    sha256: 86e7a5264ae6a2cde3e95fe450f853d9e2cda01623164f39bde55162a6c3aa64
+    bytes: 8913
+    use: QUOTE_TERMINAL_STATE_AND_EXACT_NOTIONAL_SEMANTICS
+  - asset_id: SCHEMA-T05-CANONICAL-DDL-001
+    path: schemas/schema_v1.sql
+    sha256: eae9d1544b11cffc03afba1e263153168a11dc6f648df9117a55a4cae5d23f09
+    bytes: 28962
+    use: STRATEGY_OUTCOMES_AND_NETRETURN_COMPATIBILITY_SURFACE
+  - asset_id: EVIDENCE-T22-A6-ACCEPTANCE-001
+    path: docs/evidence/task22/a6_split_resolution_acceptance_catalog_factory_fit_v1.json
+    sha256: 29c1ad28d06430b74864b745ef50bf0315fcbfcfb5a7534e54b1692a3f15a019
+    bytes: 9593
+    use: R2_DEVELOPMENT_AND_R3_DEFAULT_DENY_BOUNDARY
+
+execution_contract:
+  quote:
+    exact_notional_required: true
+    required_fields: [quote_id, route_id, input_amount_atomic, input_mint, input_decimals, output_mint, output_decimals, observed_at, freshness_max_age_ms, observed_age_ms, latency_ms]
+    quote_is_fill: false
+  attempt:
+    phases: [ENTRY, EXIT]
+    terminal_states: [NOT_ATTEMPTED, PROCESSED, CONFIRMED, FINALIZED, DROPPED, EXPIRED, FAILED, UNKNOWN]
+    unknown_blocks_retry: true
+    unknown_blocks_accounting_closure: true
+    retry_requires_retry_of: true
+    retry_requires_shared_chain_id: true
+  fill:
+    states: [NOT_OBSERVED, MODELED_FROM_QUOTE, ACTUAL_RECONCILED, PARTIAL_MODELED, UNRESOLVED]
+    actual_reconciled_requires_execution_reference: true
+    quote_is_actual_fill: false
+  fees:
+    component_kinds: [BASE_NETWORK, PRIORITY, RELAY_TIP, RENT_OR_ACCOUNT, PLATFORM, QUOTE_EMBEDDED, INFRASTRUCTURE]
+    charge_states: [DOCUMENTED_CHARGED, MODELED, UNKNOWN, NOT_APPLICABLE]
+    missing_is_zero: false
+    dropped_or_expired_assumed_uncharged: false
+    processed_failure_may_have_documented_fee: true
+    quote_embedded_fee_double_count_allowed: false
+    infrastructure_in_trade_cashflow_allowed: false
+  inventory:
+    states: [NO_POSITION, OPEN_MODELED, PARTIAL_OPEN, FLAT_MODELED, FLAT_ACTUAL, UNRESOLVED_REQUIRES_RECOVERY]
+    exit_quote_implies_flat: false
+    unresolved_blocks_accounting_closure: true
+    unresolved_requires_nonzero_or_bounded_quantity: true
+  cashflow:
+    states: [NOT_OBSERVED, MODELED_COMPLETE, SETTLED_COMPLETE, UNRESOLVED]
+    trading_and_infrastructure_separate: true
+    normalized_accounting_currency_required: true
+    normalized_accounting_decimals_required: true
+    observed_netreturn_requires_settled_complete: true
+  netreturn:
+    classifications: [NOT_COMPUTABLE, MODELED, OBSERVED]
+    modeled_requires_modeled_complete: true
+    observed_requires_actual_reconciled_fill: true
+    observed_requires_flat_actual_inventory: true
+    observed_requires_settled_complete: true
+
+point_in_time_contract:
+  required_timestamps: [event_at, observed_at, first_reliable_available_at, available_to_strategy_at, ingested_at, measured_as_of]
+  timestamp_order: event_at<=observed_at<=first_reliable_available_at<=available_to_strategy_at<=ingested_at
+  measured_as_of_rule: measured_as_of<=available_to_strategy_at
+  derived_availability_rule: MAX_OF_ALL_REQUIRED_INPUT_AVAILABILITY
+  future_labels_allowed: false
+  revisions_append_only: true
+
+data_capability:
+  synthetic_golden:
+    status: ADMISSIBLE_FOR_CONTRACT_AND_ADVERSARIAL_TESTS
+    scenario_count: 9
+  r2_development:
+    values_read_in_a2: 0
+    paths_opened_in_a2: 0
+    quote_path_metadata_only: true
+    actual_fills: NOT_AVAILABLE
+    settled_cashflow: NOT_AVAILABLE
+  r3_holdout:
+    access: DENY
+    values_read_in_a2: 0
+    paths_discovered_in_a2: 0
+    holdout_consumption_records_added: 0
+
+golden_matrix:
+  fixture_scope: SYNTHETIC_GOLDEN_ONLY
+  valid_scenarios: 9
+  required_adversarial_mutations: 12
+  required_rejections:
+    - QUOTE_ONLY_CANNOT_BE_OBSERVED_NETRETURN
+    - UNKNOWN_TERMINAL_BLOCKS_RETRY
+    - UNKNOWN_TERMINAL_BLOCKS_ACCOUNTING_CLOSURE
+    - DROPPED_OR_EXPIRED_CHARGE_CANNOT_BE_ASSUMED_ZERO
+    - PARTIAL_OR_UNRESOLVED_INVENTORY_CANNOT_BE_FLAT
+    - RETRY_CHAIN_FEE_DUPLICATE_FORBIDDEN
+    - QUOTE_EMBEDDED_FEE_DOUBLE_COUNT_FORBIDDEN
+    - OBSERVED_NETRETURN_REQUIRES_ACTUAL_FILL
+    - OBSERVED_NETRETURN_REQUIRES_SETTLED_CASHFLOW
+    - INFRASTRUCTURE_COST_SEPARATE_FROM_TRADE_CASHFLOW
+    - INCOMPLETE_MODEL_CANNOT_EMIT_NUMERIC_NETRETURN
+    - PIT_ORDER_INVALID
+
+catalog_impact:
+  schema_file_created: catalog/schemas/task26_execution_cost_and_netreturn.schema.json
+  root_resolver_changed_in_a2: false
+  asset_registration_changed_in_a2: false
+  generated_navigation_changed_in_a2: false
+  checkpoint_remains: 0.30.0
+  registration_owner: T26-A6_REGISTER_ASSETS_UPDATE_CATALOG_AND_FULL_FACTORY_FIT_REVIEW_V1
+
+authority:
+  local_declared_write_set: true
+  offline_targeted_validation: true
+  synthetic_fixture_scenarios: 9
+  r2_value_reads: 0
+  r2_paths_opened: 0
+  r3_value_or_path_reads: 0
+  holdout_consumption_records_added: 0
+  provider_api_rpc_wss_calls: 0
+  credential_use: false
+  dependency_changes: false
+  project_source_changes: false
+  catalog_or_registry_mutation: false
+  wallet_signer_transaction_actions: 0
+  cash_spend_usd_cents: 0
+  deploy_or_release: false
+  commit: false
+  push: false
+  pull_request: false
+  merge: false
+
+next_boundary:
+  atom: T26-A3_DETERMINISTIC_EXECUTION_COST_AND_GOLDEN_ACCEPTANCE_V1
+  authorized_by_a2: false
+  r2_value_read_allowed: false
+  r3_access_allowed: false

@@ -1,0 +1,79 @@
+{
+  "fixture_kind": "SYNTHETIC_ADVERSARIAL_MUTATIONS_ONLY",
+  "schema": "smial.task26.r2-execution-cost-adversarial-matrix",
+  "schema_version": "1.0",
+  "mutations": [
+    {
+      "mutation_id": "m01_quote_to_actual_fill",
+      "json_pointer": "/truth_boundary/quote_truth",
+      "replacement": "ACTUAL_FILL",
+      "expected_error": "QUOTE_TRUTH_NOT_POINT_IN_TIME_ONLY"
+    },
+    {
+      "mutation_id": "m02_claim_actual_settlement",
+      "json_pointer": "/truth_boundary/actual_fill_or_settlement_observed",
+      "replacement": true,
+      "expected_error": "ACTUAL_FILL_OR_SETTLEMENT_CLAIM_FORBIDDEN"
+    },
+    {
+      "mutation_id": "m03_emit_numeric_netreturn",
+      "json_pointer": "/net_return_surface/amount_atomic",
+      "replacement": "0",
+      "expected_error": "NUMERIC_NETRETURN_FORBIDDEN"
+    },
+    {
+      "mutation_id": "m04_reclassify_netreturn_observed",
+      "json_pointer": "/net_return_surface/classification",
+      "replacement": "OBSERVED",
+      "expected_error": "NETRETURN_CLASSIFICATION_NOT_COMPUTABLE"
+    },
+    {
+      "mutation_id": "m05_erase_latency_unknown",
+      "json_pointer": "/summary/execution_cost_input_states/NOT_COMPUTABLE",
+      "replacement": 0,
+      "expected_error": "NOT_COMPUTABLE_COUNT_INVALID"
+    },
+    {
+      "mutation_id": "m06_open_raw_r2",
+      "json_pointer": "/summary/r2_raw_files_opened",
+      "replacement": 1,
+      "expected_error": "R2_RAW_FILES_OPENED_FORBIDDEN"
+    },
+    {
+      "mutation_id": "m07_open_r3",
+      "json_pointer": "/summary/r3_paths_or_values_read",
+      "replacement": 1,
+      "expected_error": "R3_PATHS_OR_VALUES_READ_FORBIDDEN"
+    },
+    {
+      "mutation_id": "m08_allow_r3_boundary",
+      "json_pointer": "/next_boundary/r3_access",
+      "replacement": "ALLOW",
+      "expected_error": "R3_ACCESS_NOT_DENY"
+    },
+    {
+      "mutation_id": "m09_self_authorize_next",
+      "json_pointer": "/next_boundary/authorized_by_a5",
+      "replacement": true,
+      "expected_error": "NEXT_BOUNDARY_SELF_AUTHORIZED"
+    },
+    {
+      "mutation_id": "m10_drop_pair",
+      "json_pointer": "/summary/records_dropped",
+      "replacement": 1,
+      "expected_error": "RECORDS_DROPPED_FORBIDDEN"
+    },
+    {
+      "mutation_id": "m11_duplicate_ready_pair",
+      "json_pointer": "/pair_readiness/quote_cost_input_ready_pair_ids/1",
+      "replacement": "T25-R2-PAIR-05dff75ecec52b0d24bd6933",
+      "expected_error": "READY_PAIR_ID_DUPLICATE"
+    },
+    {
+      "mutation_id": "m12_clear_latency_blocker",
+      "json_pointer": "/pair_readiness/not_computable_pairs/0/blocked_reason",
+      "replacement": null,
+      "expected_error": "LATENCY_BLOCKER_MISSING"
+    }
+  ]
+}

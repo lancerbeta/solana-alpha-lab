@@ -1,0 +1,162 @@
+{
+  "adversarial_cases": [
+    {
+      "expected_error": "QUOTE_TRUTH_NOT_POINT_IN_TIME_ONLY",
+      "mutation_id": "m01_quote_to_actual_fill",
+      "status": "PASS_EXACT_REJECTION"
+    },
+    {
+      "expected_error": "ACTUAL_FILL_OR_SETTLEMENT_CLAIM_FORBIDDEN",
+      "mutation_id": "m02_claim_actual_settlement",
+      "status": "PASS_EXACT_REJECTION"
+    },
+    {
+      "expected_error": "NUMERIC_NETRETURN_FORBIDDEN",
+      "mutation_id": "m03_emit_numeric_netreturn",
+      "status": "PASS_EXACT_REJECTION"
+    },
+    {
+      "expected_error": "NETRETURN_CLASSIFICATION_NOT_COMPUTABLE",
+      "mutation_id": "m04_reclassify_netreturn_observed",
+      "status": "PASS_EXACT_REJECTION"
+    },
+    {
+      "expected_error": "NOT_COMPUTABLE_COUNT_INVALID",
+      "mutation_id": "m05_erase_latency_unknown",
+      "status": "PASS_EXACT_REJECTION"
+    },
+    {
+      "expected_error": "R2_RAW_FILES_OPENED_FORBIDDEN",
+      "mutation_id": "m06_open_raw_r2",
+      "status": "PASS_EXACT_REJECTION"
+    },
+    {
+      "expected_error": "R3_PATHS_OR_VALUES_READ_FORBIDDEN",
+      "mutation_id": "m07_open_r3",
+      "status": "PASS_EXACT_REJECTION"
+    },
+    {
+      "expected_error": "R3_ACCESS_NOT_DENY",
+      "mutation_id": "m08_allow_r3_boundary",
+      "status": "PASS_EXACT_REJECTION"
+    },
+    {
+      "expected_error": "NEXT_BOUNDARY_SELF_AUTHORIZED",
+      "mutation_id": "m09_self_authorize_next",
+      "status": "PASS_EXACT_REJECTION"
+    },
+    {
+      "expected_error": "RECORDS_DROPPED_FORBIDDEN",
+      "mutation_id": "m10_drop_pair",
+      "status": "PASS_EXACT_REJECTION"
+    },
+    {
+      "expected_error": "READY_PAIR_ID_DUPLICATE",
+      "mutation_id": "m11_duplicate_ready_pair",
+      "status": "PASS_EXACT_REJECTION"
+    },
+    {
+      "expected_error": "LATENCY_BLOCKER_MISSING",
+      "mutation_id": "m12_clear_latency_blocker",
+      "status": "PASS_EXACT_REJECTION"
+    }
+  ],
+  "as_of": "2026-08-03",
+  "atom_id": "T26-A6_ADVERSARIAL_R2_EXECUTION_COST_ACCEPTANCE_AND_OWNER_DECISION_V1",
+  "checks": [
+    {
+      "check_id": "A5_AND_MATRIX_BINDINGS_EXACT",
+      "status": "PASS"
+    },
+    {
+      "check_id": "FROZEN_MUTATIONS_12",
+      "status": "PASS"
+    },
+    {
+      "check_id": "EVERY_MUTATION_REJECTED_EXACT",
+      "status": "PASS"
+    },
+    {
+      "check_id": "QUOTE_CANNOT_BECOME_FILL_OR_NETRETURN",
+      "status": "PASS"
+    },
+    {
+      "check_id": "R2_EXECUTION_EVIDENCE_LIMITATION_RETAINED",
+      "status": "PASS"
+    },
+    {
+      "check_id": "ALL_PAIRS_RETAINED_WITH_LATENCY_BLOCKER",
+      "status": "PASS"
+    },
+    {
+      "check_id": "R3_PROVIDER_WALLET_CASH_ZERO",
+      "status": "PASS"
+    }
+  ],
+  "code_bindings": {
+    "a6_module": {
+      "bytes": 14424,
+      "path": "src/solana_alpha_lab/task26_r2_adversarial_acceptance.py",
+      "sha256": "d889e7abfe3a47e9c8e26db8eb52e1a99e893457d5ecf5ed84f77e4509600349"
+    },
+    "a6_test": {
+      "bytes": 3255,
+      "path": "tests/test_task26_r2_execution_cost_adversarial_acceptance.py",
+      "sha256": "f3b7ac19730c1d3ebc10afc19c957e8350539dc4850d7a2057f97b7b6f9f1000"
+    }
+  },
+  "frozen_input_bindings": {
+    "a5_acceptance": {
+      "path": "docs/evidence/task26/a5_bounded_r2_execution_cost_projection_acceptance_v1.json",
+      "sha256": "f14d2655b281fd2b1eb02adfc843bff2578632580109fe516b7f5fc88fa646b9"
+    },
+    "a5_projection": {
+      "path": "docs/evidence/task26/a5_bounded_r2_execution_cost_projection_v1.json",
+      "sha256": "670d1b280aacdca0ef4db1994ff9bc535a8f640c4db2e688a4322ee9807b0b37"
+    },
+    "adversarial_fixture": {
+      "path": "tests/fixtures/task26/r2_execution_cost_adversarial_matrix_v1.json",
+      "sha256": "51f1664438eb17c3a2052d803ecd6a18eca059ef9637a73f1996e6ac22e9225e"
+    }
+  },
+  "measured_boundary": {
+    "a5_projection_files_read": 1,
+    "cash_spend_usd_cents": 0,
+    "dependency_changes": 0,
+    "holdout_consumption_records_added": 0,
+    "provider_api_rpc_wss_calls": 0,
+    "r2_raw_files_opened": 0,
+    "r2_surface_files_read_directly": 0,
+    "r3_paths_or_values_read": 0,
+    "synthetic_mutations_evaluated": 12,
+    "wallet_signer_transaction_actions": 0
+  },
+  "next_boundary": {
+    "atom": "T26-A7_REGISTER_ASSETS_UPDATE_CATALOG_AND_FULL_FACTORY_FIT_REVIEW_V1",
+    "authorized_by_a6": false,
+    "r3_access": "DENY"
+  },
+  "owner_decision": {
+    "decision": "EXTEND_EXECUTION_EVIDENCE",
+    "decision_basis": "35 exact R2 quote pairs are cost-input ready, but all 36 pairs lack complete fee or settled-cashflow evidence and one pair remains latency-blocked.",
+    "does_not_require_or_authorize": [
+      "R3 read",
+      "provider calls",
+      "wallet, signing, or execution"
+    ],
+    "minimum_required_evidence": [
+      "versioned fee components with units, source, timing, and normalization",
+      "attempt or landing evidence with inventory reconciliation",
+      "complete modeled-cost parameterization before any modeled numeric NetReturn"
+    ]
+  },
+  "schema": "smial.task26.a6-r2-adversarial-execution-cost-acceptance",
+  "schema_version": "1.0",
+  "status": "PASS_R2_EXECUTION_COST_ADVERSARIAL_ACCEPTANCE_EXTEND_EVIDENCE",
+  "task_id": "TASK-26",
+  "validation": {
+    "full_validation": "DEFERRED_TO_DELIVERY_GATE",
+    "status": "PASS",
+    "targeted_command": "uv run --locked --managed-python python -B -m unittest tests.test_task26_r2_execution_cost_adversarial_acceptance"
+  }
+}

@@ -1,0 +1,192 @@
+{
+  "a3_bindings": {
+    "a2_fixture": {
+      "path": "tests/fixtures/task26/execution_cost_and_netreturn_contract_v1.json",
+      "sha256": "7d9e341a603a4c9de32feea58bb169c916864705ddb64ec1dc5853b501fa7bac"
+    },
+    "a3_acceptance": {
+      "path": "docs/evidence/task26/a3_deterministic_execution_cost_and_golden_acceptance_v1.json",
+      "sha256": "c543f0c273a5a09a16b9ca2e9d96bc0c61343eac236894d161f247d14b3b53bf"
+    },
+    "a3_model": {
+      "path": "src/solana_alpha_lab/task26_execution_cost_model.py",
+      "sha256": "ea205679f82781b27270d99e581a1412c959823c4a891d81a6855e6673f500b5"
+    },
+    "a3_projection": {
+      "path": "docs/evidence/task26/a3_execution_cost_projection_v1.json",
+      "sha256": "df7025c489627b77cc3748c495ca8852ad3a79262048e0780115f0d7d086165f"
+    }
+  },
+  "adversarial_cases": [
+    {
+      "base_result_state": "NOT_COMPUTABLE",
+      "base_scenario_id": "quote_only_not_computable",
+      "expected_error": "QUOTE_ONLY_CANNOT_BE_OBSERVED_NETRETURN",
+      "mutation_id": "m01_quote_to_observed",
+      "status": "PASS_EXACT_REJECTION"
+    },
+    {
+      "base_result_state": "NOT_COMPUTABLE",
+      "base_scenario_id": "unknown_terminal_blocks_retry_and_closure",
+      "expected_error": "UNKNOWN_TERMINAL_BLOCKS_RETRY",
+      "mutation_id": "m02_unknown_allows_retry",
+      "status": "PASS_EXACT_REJECTION"
+    },
+    {
+      "base_result_state": "NOT_COMPUTABLE",
+      "base_scenario_id": "unknown_terminal_blocks_retry_and_closure",
+      "expected_error": "UNKNOWN_TERMINAL_BLOCKS_ACCOUNTING_CLOSURE",
+      "mutation_id": "m03_unknown_closes_accounting",
+      "status": "PASS_EXACT_REJECTION"
+    },
+    {
+      "base_result_state": "NOT_COMPUTABLE",
+      "base_scenario_id": "dropped_attempt_charge_unknown",
+      "expected_error": "DROPPED_OR_EXPIRED_CHARGE_CANNOT_BE_ASSUMED_ZERO",
+      "mutation_id": "m04_dropped_assumed_zero",
+      "status": "PASS_EXACT_REJECTION"
+    },
+    {
+      "base_result_state": "NOT_COMPUTABLE",
+      "base_scenario_id": "partial_fill_residual_inventory",
+      "expected_error": "PARTIAL_OR_UNRESOLVED_INVENTORY_CANNOT_BE_FLAT",
+      "mutation_id": "m05_partial_becomes_flat",
+      "status": "PASS_EXACT_REJECTION"
+    },
+    {
+      "base_result_state": "MODELED_COMPLETE",
+      "base_scenario_id": "retry_chain_no_double_count",
+      "expected_error": "RETRY_CHAIN_FEE_DUPLICATE_FORBIDDEN",
+      "mutation_id": "m06_duplicate_retry_fee",
+      "status": "PASS_EXACT_REJECTION"
+    },
+    {
+      "base_result_state": "MODELED_COMPLETE",
+      "base_scenario_id": "modeled_flat_round_trip_all_costs",
+      "expected_error": "QUOTE_EMBEDDED_FEE_DOUBLE_COUNT_FORBIDDEN",
+      "mutation_id": "m07_quote_embedded_double_count",
+      "status": "PASS_EXACT_REJECTION"
+    },
+    {
+      "base_result_state": "SYNTHETIC_OBSERVED_SEMANTICS_ONLY",
+      "base_scenario_id": "synthetic_observed_complete_reconciliation",
+      "expected_error": "OBSERVED_NETRETURN_REQUIRES_ACTUAL_FILL",
+      "mutation_id": "m08_observed_without_actual_fill",
+      "status": "PASS_EXACT_REJECTION"
+    },
+    {
+      "base_result_state": "SYNTHETIC_OBSERVED_SEMANTICS_ONLY",
+      "base_scenario_id": "synthetic_observed_complete_reconciliation",
+      "expected_error": "OBSERVED_NETRETURN_REQUIRES_SETTLED_CASHFLOW",
+      "mutation_id": "m09_observed_without_settlement",
+      "status": "PASS_EXACT_REJECTION"
+    },
+    {
+      "base_result_state": "MODELED_COMPLETE",
+      "base_scenario_id": "infrastructure_cost_separate_from_trade_cashflow",
+      "expected_error": "INFRASTRUCTURE_COST_SEPARATE_FROM_TRADE_CASHFLOW",
+      "mutation_id": "m10_infra_in_trade_cashflow",
+      "status": "PASS_EXACT_REJECTION"
+    },
+    {
+      "base_result_state": "NOT_COMPUTABLE",
+      "base_scenario_id": "dropped_attempt_charge_unknown",
+      "expected_error": "INCOMPLETE_MODEL_CANNOT_EMIT_NUMERIC_NETRETURN",
+      "mutation_id": "m11_incomplete_numeric_net",
+      "status": "PASS_EXACT_REJECTION"
+    },
+    {
+      "base_result_state": "MODELED_COMPLETE",
+      "base_scenario_id": "modeled_flat_round_trip_all_costs",
+      "expected_error": "PIT_ORDER_INVALID",
+      "mutation_id": "m12_invalid_pit_order",
+      "status": "PASS_EXACT_REJECTION"
+    }
+  ],
+  "as_of": "2026-08-03",
+  "atom_id": "T26-A4_ADVERSARIAL_EXECUTION_COST_ACCEPTANCE_AND_OWNER_DECISION_V1",
+  "checks": [
+    {
+      "check_id": "A3_BINDINGS_EXACT",
+      "status": "PASS"
+    },
+    {
+      "check_id": "FROZEN_MUTATIONS_12",
+      "status": "PASS"
+    },
+    {
+      "check_id": "EVERY_MUTATION_REJECTED_EXACT",
+      "status": "PASS"
+    },
+    {
+      "check_id": "BASELINES_STAY_VALID",
+      "status": "PASS"
+    },
+    {
+      "check_id": "QUOTE_CANNOT_BECOME_OBSERVED_NETRETURN",
+      "status": "PASS"
+    },
+    {
+      "check_id": "UNKNOWN_AND_PARTIAL_STAY_BLOCKED",
+      "status": "PASS"
+    },
+    {
+      "check_id": "SYNTHETIC_OBSERVED_REMAINS_NONCLAIM",
+      "status": "PASS"
+    },
+    {
+      "check_id": "R2_R3_PROVIDER_WALLET_CASH_ZERO",
+      "status": "PASS"
+    }
+  ],
+  "code_bindings": {
+    "a4_module": {
+      "bytes": 10644,
+      "path": "src/solana_alpha_lab/task26_adversarial_acceptance.py",
+      "sha256": "5d4dcef41243bfc2120028081ddeb45e5251334d6f787e84225f1c093959a7cf"
+    },
+    "a4_test": {
+      "bytes": 2897,
+      "path": "tests/test_task26_execution_cost_adversarial_acceptance.py",
+      "sha256": "29493fc8c829be89c6d2d8da3eafcf8d76660ee99748be53db24b33d17e0afd3"
+    }
+  },
+  "measured_boundary": {
+    "cash_spend_usd_cents": 0,
+    "dependency_changes": 0,
+    "holdout_consumption_records_added": 0,
+    "provider_api_rpc_wss_calls": 0,
+    "r2_values_or_paths_read": 0,
+    "r3_values_or_paths_read": 0,
+    "synthetic_mutations_evaluated": 12,
+    "wallet_signer_transaction_actions": 0
+  },
+  "next_boundary": {
+    "action": "propose a separate bounded exact-R2 quote-evidence projection atom",
+    "authorized_by_a4": false,
+    "requires": [
+      "fresh explicit owner start",
+      "development-only content-addressed R2 input",
+      "R3 remains sealed"
+    ]
+  },
+  "owner_decision": {
+    "decision": "EXECUTION_COST_MODEL_READY_WITH_LIMITATIONS",
+    "decision_basis": "All 12 frozen false-positive mutations are rejected exactly; model/unknown/observed semantic boundaries remain distinct.",
+    "does_not_establish": [
+      "actual fills or settlement",
+      "observed NetReturn",
+      "owner cashflow",
+      "strategy profitability or alpha"
+    ]
+  },
+  "schema": "smial.task26.a4-adversarial-execution-cost-acceptance",
+  "schema_version": "1.0",
+  "status": "PASS_EXECUTION_COST_MODEL_READY_WITH_LIMITATIONS",
+  "task_id": "TASK-26",
+  "validation": {
+    "full_validation": "DEFERRED_TO_DELIVERY_GATE",
+    "status": "PASS",
+    "targeted_command": "uv run --locked --managed-python python -B -m unittest tests.test_task26_execution_cost_adversarial_acceptance"
+  }
+}

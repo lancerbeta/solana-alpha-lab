@@ -1,0 +1,114 @@
+{
+  "atom_id": "T26-A5_BOUNDED_R2_QUOTE_EVIDENCE_PROJECTION_V1",
+  "input_bindings": {
+    "a4_acceptance": {
+      "path": "docs/evidence/task26/a4_adversarial_execution_cost_acceptance_v1.json",
+      "sha256": "86b09e393c0a811c7f8b260eb1e5f7236351ea5d8d56000fea873195c1355d82"
+    },
+    "r2_acceptance": {
+      "asset_id": "EVIDENCE-T25-A5R1-ACCEPTANCE-001",
+      "path": "docs/evidence/task25/a5r1_exact_r2_outcome_reprojection_acceptance_v1.json",
+      "sha256": "32c8b75023754afa7fdbe6a5578e009d8856cb1d514fbd60954544b503f6ef7b"
+    },
+    "r2_surface": {
+      "asset_id": "DATA-T25-EXACT-R2-OUTCOME-SURFACE-001",
+      "path": "docs/evidence/task25/a5r1_exact_r2_outcome_surface_v1.json",
+      "sha256": "20b5a611895b35856192b274e8954b34e4794e593605b9c3962d2115d4fbd59f"
+    }
+  },
+  "net_return_surface": {
+    "amount_atomic": null,
+    "classification": "NOT_COMPUTABLE",
+    "currency": null,
+    "reason": "R2_NO_COMPLETE_FEE_OR_SETTLED_CASHFLOW",
+    "records_covered": 36
+  },
+  "next_boundary": {
+    "atom": "T26-A6_ADVERSARIAL_R2_EXECUTION_COST_ACCEPTANCE_AND_OWNER_DECISION_V1",
+    "authorized_by_a5": false,
+    "r3_access": "DENY"
+  },
+  "nonclaims": [
+    "ACTUAL_FILL_OR_SETTLEMENT",
+    "OBSERVED_NETRETURN",
+    "OWNER_CASHFLOW",
+    "STRATEGY_PROFITABILITY_OR_ALPHA",
+    "R3_VALUE_OR_PATH_READ"
+  ],
+  "pair_readiness": {
+    "not_computable_pairs": [
+      {
+        "blocked_reason": "ENTRY_PROVIDER_LATENCY_LIMIT_EXCEEDED",
+        "entry_assessment_reason": "PROVIDER_LATENCY_LIMIT_EXCEEDED",
+        "pair_id": "T25-R2-PAIR-1afd5c77ae7cfe7c5287cf66",
+        "source_outcome_record_ids": {
+          "fillable": "T25-R2-EXACT-0032",
+          "quote_exit": "T25-R2-EXACT-0033"
+        }
+      }
+    ],
+    "projection_records_sha256": "d89dce360746d4cacb8b6336598142f3aa3e106dc4d57ca6abda453d3e99aab2",
+    "quote_cost_input_ready_pair_ids": [
+      "T25-R2-PAIR-05dff75ecec52b0d24bd6933",
+      "T25-R2-PAIR-140319f15937d27ebfce13da",
+      "T25-R2-PAIR-15d68a8fb0fe9be0fbf9ca77",
+      "T25-R2-PAIR-1bbb690e536bbc4a3f9ee675",
+      "T25-R2-PAIR-1d52ecf8cf5ab72ce8603877",
+      "T25-R2-PAIR-2797a0d6aec692c6306d000a",
+      "T25-R2-PAIR-359c21f570b3f4a2e0731396",
+      "T25-R2-PAIR-3f7620175c3b6eeab7b368a0",
+      "T25-R2-PAIR-46549731f30d2ef037e24dd7",
+      "T25-R2-PAIR-4dc3863df991e73b5d5142c2",
+      "T25-R2-PAIR-54822986b4df14941408d2c3",
+      "T25-R2-PAIR-658832eecb01dad099f233a4",
+      "T25-R2-PAIR-6b66de158f7fe355afb3907e",
+      "T25-R2-PAIR-7269c4f25ff0dc50e1115483",
+      "T25-R2-PAIR-73a72a603e918c458fce32b0",
+      "T25-R2-PAIR-7991336ba0a76b7317e98e85",
+      "T25-R2-PAIR-852f09b1676775046641bf8e",
+      "T25-R2-PAIR-8727bb1bf59e61780580c8bf",
+      "T25-R2-PAIR-923d520c988fc64b87b4a9c5",
+      "T25-R2-PAIR-95a9f0bc3a56f95fd8a2dc3d",
+      "T25-R2-PAIR-9e565544aa5a18969f03d15c",
+      "T25-R2-PAIR-a75943d4e18eaca69ea4c9e4",
+      "T25-R2-PAIR-b9f2f7910c93fcd8dfb07ce7",
+      "T25-R2-PAIR-ccc0cd156f1ed215f7edb383",
+      "T25-R2-PAIR-d1d3015427ed4591bf683ae4",
+      "T25-R2-PAIR-d3f14b13d70f01df680691ca",
+      "T25-R2-PAIR-d46ed1ce46e60e3b388e04e2",
+      "T25-R2-PAIR-de46cb28596696335f9b3c20",
+      "T25-R2-PAIR-de57b372ab8126adda8eec16",
+      "T25-R2-PAIR-e06998f298e0c13be25d84b0",
+      "T25-R2-PAIR-e06e98425993098d8ca3ce7d",
+      "T25-R2-PAIR-e6a2b1b220f573d1c6724660",
+      "T25-R2-PAIR-f667e287f29ee6653d96a9c7",
+      "T25-R2-PAIR-fdbc8b3604b36153a8778dc9",
+      "T25-R2-PAIR-fe10307371ab0f5aea785c90"
+    ]
+  },
+  "schema": "smial.task26.bounded-r2-execution-cost-input-projection",
+  "schema_version": "1.0",
+  "status": "PASS_BOUNDED_R2_QUOTE_EXECUTION_COST_INPUT_SURFACE_WITH_LIMITATIONS",
+  "summary": {
+    "actual_fill_or_settlement_claims": 0,
+    "cash_spend_usd_cents": 0,
+    "execution_cost_input_states": {
+      "NOT_COMPUTABLE": 1,
+      "QUOTE_COST_INPUT_READY": 35
+    },
+    "numeric_netreturn_claims": 0,
+    "pairs_input": 36,
+    "pairs_output": 36,
+    "provider_api_rpc_wss_calls": 0,
+    "r2_raw_files_opened": 0,
+    "r2_surface_files_read": 1,
+    "r3_paths_or_values_read": 0,
+    "records_dropped": 0,
+    "wallet_signer_transaction_actions": 0
+  },
+  "task_id": "TASK-26",
+  "truth_boundary": {
+    "actual_fill_or_settlement_observed": false,
+    "quote_truth": "POINT_IN_TIME_QUOTE_ONLY"
+  }
+}

@@ -1,0 +1,114 @@
+{
+  "artifact_bindings": {
+    "a2_config": {
+      "path": "configs/task26_execution_cost_and_netreturn_contract_v1.yaml",
+      "sha256": "1107b286248036f4e3ef0a5610b80e7cec8362269ecb2ba835e5040dc3210574"
+    },
+    "a2_contract": {
+      "path": "docs/contracts/task26_execution_cost_and_netreturn_contract_v1.md",
+      "sha256": "aac003cf7ba2742d310893c81af3ae4a032a52b719f2f56d80171a6486351efd"
+    },
+    "a2_fixture": {
+      "path": "tests/fixtures/task26/execution_cost_and_netreturn_contract_v1.json",
+      "sha256": "7d9e341a603a4c9de32feea58bb169c916864705ddb64ec1dc5853b501fa7bac"
+    },
+    "a2_schema": {
+      "path": "catalog/schemas/task26_execution_cost_and_netreturn.schema.json",
+      "sha256": "f3e9b34ccf8adff60cc1abb6e3fa37dfa59310e479eb7654a8d780e5d0cbf083"
+    },
+    "projection": {
+      "path": "docs/evidence/task26/a3_execution_cost_projection_v1.json",
+      "sha256": "df7025c489627b77cc3748c495ca8852ad3a79262048e0780115f0d7d086165f"
+    }
+  },
+  "as_of": "2026-08-03",
+  "atom_id": "T26-A3_DETERMINISTIC_EXECUTION_COST_AND_GOLDEN_ACCEPTANCE_V1",
+  "checks": [
+    {
+      "check_id": "A2_INPUT_HASHES_EXACT",
+      "status": "PASS"
+    },
+    {
+      "check_id": "SYNTHETIC_SCENARIOS_9",
+      "status": "PASS"
+    },
+    {
+      "check_id": "NO_SCENARIOS_DROPPED",
+      "status": "PASS"
+    },
+    {
+      "check_id": "MODELED_SCENARIOS_3",
+      "status": "PASS"
+    },
+    {
+      "check_id": "SYNTHETIC_OBSERVED_CASE_1",
+      "status": "PASS"
+    },
+    {
+      "check_id": "OBSERVED_CLAIMS_ZERO",
+      "status": "PASS"
+    },
+    {
+      "check_id": "R2_R3_PROVIDER_WALLET_CASH_ZERO",
+      "status": "PASS"
+    },
+    {
+      "check_id": "NORMALIZED_CASHFLOW_CURRENCY",
+      "status": "PASS"
+    },
+    {
+      "check_id": "UNRESOLVED_STATES_RETAINED",
+      "status": "PASS"
+    },
+    {
+      "check_id": "NEXT_BOUNDARY_NOT_AUTHORIZED",
+      "status": "PASS"
+    }
+  ],
+  "code_bindings": {
+    "module": {
+      "bytes": 21644,
+      "path": "src/solana_alpha_lab/task26_execution_cost_model.py",
+      "sha256": "ea205679f82781b27270d99e581a1412c959823c4a891d81a6855e6673f500b5"
+    },
+    "test": {
+      "bytes": 6569,
+      "path": "tests/test_task26_execution_cost_model.py",
+      "sha256": "11680da3919102b0c058b56e0f35f28d66d4910f360a003b76499b6c82209d1b"
+    }
+  },
+  "measured_boundary": {
+    "cash_spend_usd_cents": 0,
+    "catalog_or_registry_mutations": 0,
+    "dependency_changes": 0,
+    "holdout_consumption_records_added": 0,
+    "project_source_changes": 0,
+    "provider_api_rpc_wss_calls": 0,
+    "r2_values_or_paths_read": 0,
+    "r3_values_or_paths_read": 0,
+    "scenarios_dropped": 0,
+    "synthetic_scenarios_processed": 9,
+    "wallet_signer_transaction_actions": 0
+  },
+  "next_boundary": {
+    "atom": "T26-A4_ADVERSARIAL_EXECUTION_COST_ACCEPTANCE_AND_OWNER_DECISION_V1",
+    "authorized_by_a3": false,
+    "r2_value_read_allowed": false,
+    "r3_access": "DENY"
+  },
+  "schema": "smial.task26.a3-deterministic-execution-cost-acceptance",
+  "schema_version": "1.0",
+  "state_change": {
+    "atom_a3": "VALIDATED",
+    "canonical_task26_done": false,
+    "catalog_registration": "DEFERRED_TO_T26_A6",
+    "task26": "IN_PROGRESS"
+  },
+  "status": "PASS_SYNTHETIC_EXECUTION_COST_MODEL_WITH_LIMITATIONS",
+  "task_id": "TASK-26",
+  "validation": {
+    "full_validation": "DEFERRED_TO_DELIVERY_GATE",
+    "status": "PASS",
+    "targeted_command": "uv run --locked --managed-python python -B -m unittest tests.test_task26_execution_cost_model"
+  }
+}

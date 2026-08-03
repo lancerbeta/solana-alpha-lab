@@ -1,0 +1,89 @@
+{
+  "schema": "smial.task26.a2-execution-cost-and-netreturn-contract-acceptance",
+  "schema_version": "1.0",
+  "task_id": "TASK-26",
+  "atom_id": "T26-A2_FROZEN_EXECUTION_COST_RECONCILIATION_AND_NETRETURN_CONTRACT_V1",
+  "as_of": "2026-08-03",
+  "status": "PASS_VALIDATED_CONTRACT_ONLY",
+  "entry_binding": {
+    "accepted_main_commit": "a1c7e40f4febeee78ab544ee89edf248c4cd0454",
+    "accepted_main_tree": "b4280469913ae6463a9fd3f97870f62c594795d8",
+    "branch": "task26/execution-cost-netreturn",
+    "source_activation_receipt": "ACTIVATION_CONFIRMED_USER_SMOKE",
+    "source_manifest_version": "4.2",
+    "active_task_source_version": "1.0",
+    "active_task_source_sha256": "733932fee9ff117ea80a205a93fc754f10b690ec29698bd22f1bc410acf3e47d"
+  },
+  "artifact_bindings": {
+    "contract": {
+      "path": "docs/contracts/task26_execution_cost_and_netreturn_contract_v1.md",
+      "sha256": "aac003cf7ba2742d310893c81af3ae4a032a52b719f2f56d80171a6486351efd"
+    },
+    "config": {
+      "path": "configs/task26_execution_cost_and_netreturn_contract_v1.yaml",
+      "sha256": "1107b286248036f4e3ef0a5610b80e7cec8362269ecb2ba835e5040dc3210574"
+    },
+    "schema": {
+      "path": "catalog/schemas/task26_execution_cost_and_netreturn.schema.json",
+      "sha256": "f3e9b34ccf8adff60cc1abb6e3fa37dfa59310e479eb7654a8d780e5d0cbf083"
+    },
+    "fixture": {
+      "path": "tests/fixtures/task26/execution_cost_and_netreturn_contract_v1.json",
+      "sha256": "7d9e341a603a4c9de32feea58bb169c916864705ddb64ec1dc5853b501fa7bac"
+    },
+    "test": {
+      "path": "tests/test_task26_execution_cost_and_netreturn_contract.py",
+      "sha256": "84624564a4d5f934f952424aca13e816bac19af9e78424f0ab8fc11690b28129"
+    }
+  },
+  "validation": {
+    "status": "PASS",
+    "targeted_command": "uv run --locked --managed-python python -B -m unittest tests.test_task26_execution_cost_and_netreturn_contract",
+    "targeted_tests_run": 13,
+    "targeted_tests_passed": 13,
+    "schema_draft": "2020-12",
+    "valid_synthetic_scenarios": 9,
+    "adversarial_mutations_rejected": 12,
+    "catalog_direct_consumer_command": "uv run --locked --managed-python python -B scripts/validate_catalog.py",
+    "catalog_direct_consumer_status": "PASS",
+    "full_validation": "DEFERRED_TO_DELIVERY_GATE"
+  },
+  "semantic_acceptance": {
+    "quote_does_not_imply_attempt_fill_or_settlement": "PASS",
+    "unknown_terminal_blocks_retry_and_accounting_closure": "PASS",
+    "dropped_or_expired_charge_is_not_assumed_zero": "PASS",
+    "partial_and_unresolved_inventory_remain_open": "PASS",
+    "retry_chains_cannot_duplicate_fee_ids": "PASS",
+    "quote_embedded_fee_cannot_double_count": "PASS",
+    "infrastructure_cost_is_separate_from_trade_cashflow": "PASS",
+    "observed_netreturn_requires_actual_fill_flat_inventory_and_settlement": "PASS",
+    "incomplete_model_cannot_emit_numeric_netreturn": "PASS",
+    "pit_order_and_availability_are_frozen": "PASS"
+  },
+  "measured_boundary": {
+    "synthetic_scenarios_validated": 9,
+    "adversarial_mutations_rejected": 12,
+    "r2_values_read": 0,
+    "r2_paths_opened": 0,
+    "r3_values_or_paths_read": 0,
+    "holdout_consumption_records_added": 0,
+    "provider_api_rpc_wss_calls": 0,
+    "dependency_changes": 0,
+    "project_source_changes": 0,
+    "catalog_or_registry_mutations": 0,
+    "wallet_signer_transaction_actions": 0,
+    "cash_spend_usd_cents": 0
+  },
+  "state_change": {
+    "task26": "IN_PROGRESS",
+    "atom_a2": "VALIDATED",
+    "canonical_task26_done": false,
+    "catalog_registration": "DEFERRED_TO_T26_A6"
+  },
+  "next_boundary": {
+    "atom": "T26-A3_DETERMINISTIC_EXECUTION_COST_AND_GOLDEN_ACCEPTANCE_V1",
+    "authorized": false,
+    "r2_value_read_allowed": false,
+    "r3_access_allowed": false
+  }
+}

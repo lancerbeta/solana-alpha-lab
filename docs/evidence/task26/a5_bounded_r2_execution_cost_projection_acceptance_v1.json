@@ -1,0 +1,99 @@
+{
+  "artifact_bindings": {
+    "a4_acceptance": {
+      "path": "docs/evidence/task26/a4_adversarial_execution_cost_acceptance_v1.json",
+      "sha256": "86b09e393c0a811c7f8b260eb1e5f7236351ea5d8d56000fea873195c1355d82"
+    },
+    "projection": {
+      "path": "docs/evidence/task26/a5_bounded_r2_execution_cost_projection_v1.json",
+      "sha256": "670d1b280aacdca0ef4db1994ff9bc535a8f640c4db2e688a4322ee9807b0b37"
+    },
+    "r2_acceptance": {
+      "asset_id": "EVIDENCE-T25-A5R1-ACCEPTANCE-001",
+      "path": "docs/evidence/task25/a5r1_exact_r2_outcome_reprojection_acceptance_v1.json",
+      "sha256": "32c8b75023754afa7fdbe6a5578e009d8856cb1d514fbd60954544b503f6ef7b"
+    },
+    "r2_surface": {
+      "asset_id": "DATA-T25-EXACT-R2-OUTCOME-SURFACE-001",
+      "path": "docs/evidence/task25/a5r1_exact_r2_outcome_surface_v1.json",
+      "sha256": "20b5a611895b35856192b274e8954b34e4794e593605b9c3962d2115d4fbd59f"
+    }
+  },
+  "as_of": "2026-08-03",
+  "atom_id": "T26-A5_BOUNDED_R2_QUOTE_EVIDENCE_PROJECTION_V1",
+  "checks": [
+    {
+      "check_id": "FROZEN_R2_AND_A4_BINDINGS_EXACT",
+      "status": "PASS"
+    },
+    {
+      "check_id": "R2_AGGREGATE_SURFACE_ONLY",
+      "status": "PASS"
+    },
+    {
+      "check_id": "ALL_36_PAIRS_RETAINED",
+      "status": "PASS"
+    },
+    {
+      "check_id": "QUOTE_COST_INPUT_READY_35",
+      "status": "PASS"
+    },
+    {
+      "check_id": "LATENCY_UNKNOWN_REMAINS_NOT_COMPUTABLE",
+      "status": "PASS"
+    },
+    {
+      "check_id": "NO_NUMERIC_NETRETURN",
+      "status": "PASS"
+    },
+    {
+      "check_id": "NO_FILL_OR_SETTLEMENT_CLAIMS",
+      "status": "PASS"
+    },
+    {
+      "check_id": "R3_PROVIDER_WALLET_CASH_ZERO",
+      "status": "PASS"
+    }
+  ],
+  "code_bindings": {
+    "module": {
+      "bytes": 15027,
+      "path": "src/solana_alpha_lab/task26_r2_execution_cost_projection.py",
+      "sha256": "9fafb247ed7b35c40eae5cdf7182a56d77a7f85749e36bdcf32d479c954cdcf2"
+    },
+    "test": {
+      "bytes": 3286,
+      "path": "tests/test_task26_r2_execution_cost_projection.py",
+      "sha256": "0db645afba58ec2dfb697b3eddf917dcec3e229b63a67cf4bc9ca0237b458f6b"
+    }
+  },
+  "measured_boundary": {
+    "cash_spend_usd_cents": 0,
+    "dependency_changes": 0,
+    "holdout_consumption_records_added": 0,
+    "provider_api_rpc_wss_calls": 0,
+    "r2_raw_files_opened": 0,
+    "r2_surface_files_read": 1,
+    "r3_paths_or_values_read": 0,
+    "wallet_signer_transaction_actions": 0
+  },
+  "next_boundary": {
+    "atom": "T26-A6_ADVERSARIAL_R2_EXECUTION_COST_ACCEPTANCE_AND_OWNER_DECISION_V1",
+    "authorized_by_a5": false,
+    "r3_access": "DENY"
+  },
+  "schema": "smial.task26.a5-bounded-r2-execution-cost-projection-acceptance",
+  "schema_version": "1.0",
+  "state_change": {
+    "atom_a5": "VALIDATED",
+    "canonical_task26_done": false,
+    "task26": "IN_PROGRESS"
+  },
+  "status": "PASS_BOUNDED_R2_QUOTE_EXECUTION_COST_INPUT_SURFACE_WITH_LIMITATIONS",
+  "task_id": "TASK-26",
+  "validation": {
+    "full_validation": "DEFERRED_TO_DELIVERY_GATE",
+    "status": "PASS",
+    "targeted_command": "uv run --locked --managed-python python -B -m unittest tests.test_task26_r2_execution_cost_projection"
+  }
+}
