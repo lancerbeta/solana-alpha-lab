@@ -1,0 +1,267 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://solana-alpha-lab.local/schemas/task26_execution_cost_and_netreturn.schema.json",
+  "title": "TASK-26 synthetic execution cost and NetReturn contract",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "fixture_kind",
+    "contract_id",
+    "task_id",
+    "atom",
+    "scenarios",
+    "adversarial_mutations"
+  ],
+  "properties": {
+    "fixture_kind": {"const": "SYNTHETIC_GOLDEN_ONLY"},
+    "contract_id": {"const": "T26-EXECUTION-COST-AND-NETRETURN-CONTRACT-001"},
+    "task_id": {"const": "TASK-26"},
+    "atom": {"const": "T26-A2_FROZEN_EXECUTION_COST_RECONCILIATION_AND_NETRETURN_CONTRACT_V1"},
+    "scenarios": {
+      "type": "array",
+      "minItems": 1,
+      "items": {"$ref": "#/$defs/scenario"}
+    },
+    "adversarial_mutations": {
+      "type": "array",
+      "minItems": 1,
+      "items": {"$ref": "#/$defs/mutation"}
+    }
+  },
+  "$defs": {
+    "atomicAmount": {
+      "type": ["string", "null"],
+      "pattern": "^-?[0-9]+$"
+    },
+    "timestamp": {"type": "string", "format": "date-time"},
+    "timeline": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "event_at",
+        "observed_at",
+        "first_reliable_available_at",
+        "available_to_strategy_at",
+        "ingested_at",
+        "measured_as_of"
+      ],
+      "properties": {
+        "event_at": {"$ref": "#/$defs/timestamp"},
+        "observed_at": {"$ref": "#/$defs/timestamp"},
+        "first_reliable_available_at": {"$ref": "#/$defs/timestamp"},
+        "available_to_strategy_at": {"$ref": "#/$defs/timestamp"},
+        "ingested_at": {"$ref": "#/$defs/timestamp"},
+        "measured_as_of": {"$ref": "#/$defs/timestamp"}
+      }
+    },
+    "quote": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "quote_id",
+        "route_id",
+        "input_amount_atomic",
+        "input_mint",
+        "input_decimals",
+        "output_mint",
+        "output_decimals",
+        "observed_at",
+        "freshness_max_age_ms",
+        "observed_age_ms",
+        "latency_ms",
+        "quote_embedded_fee_ids"
+      ],
+      "properties": {
+        "quote_id": {"type": "string", "minLength": 1},
+        "route_id": {"type": "string", "minLength": 1},
+        "input_amount_atomic": {"$ref": "#/$defs/atomicAmount"},
+        "input_mint": {"type": "string", "minLength": 1},
+        "input_decimals": {"type": "integer", "minimum": 0},
+        "output_mint": {"type": "string", "minLength": 1},
+        "output_decimals": {"type": "integer", "minimum": 0},
+        "observed_at": {"$ref": "#/$defs/timestamp"},
+        "freshness_max_age_ms": {"type": "integer", "minimum": 0},
+        "observed_age_ms": {"type": "integer", "minimum": 0},
+        "latency_ms": {"type": "integer", "minimum": 0},
+        "quote_embedded_fee_ids": {
+          "type": "array",
+          "items": {"type": "string", "minLength": 1},
+          "uniqueItems": true
+        }
+      }
+    },
+    "attempt": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "attempt_id",
+        "phase",
+        "retry_chain_id",
+        "retry_of",
+        "terminal_state",
+        "execution_reference_ids"
+      ],
+      "properties": {
+        "attempt_id": {"type": "string", "minLength": 1},
+        "phase": {"enum": ["ENTRY", "EXIT"]},
+        "retry_chain_id": {"type": "string", "minLength": 1},
+        "retry_of": {"type": ["string", "null"]},
+        "terminal_state": {
+          "enum": ["NOT_ATTEMPTED", "PROCESSED", "CONFIRMED", "FINALIZED", "DROPPED", "EXPIRED", "FAILED", "UNKNOWN"]
+        },
+        "execution_reference_ids": {
+          "type": "array",
+          "items": {"type": "string", "minLength": 1},
+          "uniqueItems": true
+        }
+      }
+    },
+    "fill": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["state", "fill_reference_ids", "filled_input_atomic", "filled_output_atomic"],
+      "properties": {
+        "state": {"enum": ["NOT_OBSERVED", "MODELED_FROM_QUOTE", "ACTUAL_RECONCILED", "PARTIAL_MODELED", "UNRESOLVED"]},
+        "fill_reference_ids": {
+          "type": "array",
+          "items": {"type": "string", "minLength": 1},
+          "uniqueItems": true
+        },
+        "filled_input_atomic": {"$ref": "#/$defs/atomicAmount"},
+        "filled_output_atomic": {"$ref": "#/$defs/atomicAmount"}
+      }
+    },
+    "fee": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "fee_id",
+        "component_kind",
+        "currency",
+        "amount_atomic",
+        "charge_state",
+        "source",
+        "charged_attempt_id",
+        "included_in_quote",
+        "included_in_trade_cashflow"
+      ],
+      "properties": {
+        "fee_id": {"type": "string", "minLength": 1},
+        "component_kind": {"enum": ["BASE_NETWORK", "PRIORITY", "RELAY_TIP", "RENT_OR_ACCOUNT", "PLATFORM", "QUOTE_EMBEDDED", "INFRASTRUCTURE"]},
+        "currency": {"type": "string", "minLength": 1},
+        "amount_atomic": {"$ref": "#/$defs/atomicAmount"},
+        "charge_state": {"enum": ["DOCUMENTED_CHARGED", "MODELED", "UNKNOWN", "NOT_APPLICABLE"]},
+        "source": {"type": "string", "minLength": 1},
+        "charged_attempt_id": {"type": ["string", "null"]},
+        "included_in_quote": {"type": "boolean"},
+        "included_in_trade_cashflow": {"type": "boolean"}
+      }
+    },
+    "inventory": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["state", "remaining_inventory_atomic", "mint", "decimals", "recovery_lower_atomic", "recovery_upper_atomic"],
+      "properties": {
+        "state": {"enum": ["NO_POSITION", "OPEN_MODELED", "PARTIAL_OPEN", "FLAT_MODELED", "FLAT_ACTUAL", "UNRESOLVED_REQUIRES_RECOVERY"]},
+        "remaining_inventory_atomic": {"$ref": "#/$defs/atomicAmount"},
+        "mint": {"type": "string", "minLength": 1},
+        "decimals": {"type": "integer", "minimum": 0},
+        "recovery_lower_atomic": {"$ref": "#/$defs/atomicAmount"},
+        "recovery_upper_atomic": {"$ref": "#/$defs/atomicAmount"}
+      }
+    },
+    "cashflow": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "state",
+        "currency",
+        "decimals",
+        "trade_cashflow_atomic",
+        "infrastructure_cashflow_atomic",
+        "settled_reference_ids",
+        "fee_ids_in_trade_cashflow",
+        "fee_ids_in_infrastructure_cashflow"
+      ],
+      "properties": {
+        "state": {"enum": ["NOT_OBSERVED", "MODELED_COMPLETE", "SETTLED_COMPLETE", "UNRESOLVED"]},
+        "currency": {"type": "string", "minLength": 1},
+        "decimals": {"type": "integer", "minimum": 0},
+        "trade_cashflow_atomic": {"$ref": "#/$defs/atomicAmount"},
+        "infrastructure_cashflow_atomic": {"$ref": "#/$defs/atomicAmount"},
+        "settled_reference_ids": {
+          "type": "array",
+          "items": {"type": "string", "minLength": 1},
+          "uniqueItems": true
+        },
+        "fee_ids_in_trade_cashflow": {
+          "type": "array",
+          "items": {"type": "string", "minLength": 1},
+          "uniqueItems": true
+        },
+        "fee_ids_in_infrastructure_cashflow": {
+          "type": "array",
+          "items": {"type": "string", "minLength": 1},
+          "uniqueItems": true
+        }
+      }
+    },
+    "netreturn": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["classification", "amount_atomic", "currency", "basis"],
+      "properties": {
+        "classification": {"enum": ["NOT_COMPUTABLE", "MODELED", "OBSERVED"]},
+        "amount_atomic": {"$ref": "#/$defs/atomicAmount"},
+        "currency": {"type": ["string", "null"]},
+        "basis": {"type": "string", "minLength": 1}
+      }
+    },
+    "scenario": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "scenario_id",
+        "source_scope",
+        "intent_id",
+        "timeline",
+        "quote",
+        "attempts",
+        "retry_permitted",
+        "accounting_closed",
+        "fill",
+        "fees",
+        "inventory",
+        "cashflow",
+        "net_return"
+      ],
+      "properties": {
+        "scenario_id": {"type": "string", "minLength": 1},
+        "source_scope": {"const": "SYNTHETIC_GOLDEN"},
+        "intent_id": {"type": "string", "minLength": 1},
+        "timeline": {"$ref": "#/$defs/timeline"},
+        "quote": {"$ref": "#/$defs/quote"},
+        "attempts": {"type": "array", "minItems": 1, "items": {"$ref": "#/$defs/attempt"}},
+        "retry_permitted": {"type": "boolean"},
+        "accounting_closed": {"type": "boolean"},
+        "fill": {"$ref": "#/$defs/fill"},
+        "fees": {"type": "array", "items": {"$ref": "#/$defs/fee"}},
+        "inventory": {"$ref": "#/$defs/inventory"},
+        "cashflow": {"$ref": "#/$defs/cashflow"},
+        "net_return": {"$ref": "#/$defs/netreturn"}
+      }
+    },
+    "mutation": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["mutation_id", "base_scenario_id", "json_pointer", "replacement", "expected_error"],
+      "properties": {
+        "mutation_id": {"type": "string", "minLength": 1},
+        "base_scenario_id": {"type": "string", "minLength": 1},
+        "json_pointer": {"type": "string", "pattern": "^/"},
+        "replacement": {},
+        "expected_error": {"type": "string", "minLength": 1}
+      }
+    }
+  }
+}

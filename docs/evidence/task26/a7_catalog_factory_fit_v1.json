@@ -1,0 +1,273 @@
+{
+  "accepted_result": {
+    "actual_fill_or_settlement_claims": 0,
+    "cash_spend_usd_cents": 0,
+    "development_population": "T21-R2",
+    "execution_cost_model": "READY_WITH_LIMITATIONS",
+    "latency_blocked_pairs": 1,
+    "modeled_numeric_netreturn_claims": 0,
+    "netreturn_surface": "NOT_COMPUTABLE_FOR_36_OF_36_R2_PAIRS",
+    "owner_decision": "EXTEND_EXECUTION_EVIDENCE",
+    "provider_api_rpc_wss_calls": 0,
+    "quote_cost_input_ready_pairs": 35,
+    "quote_pairs": 36,
+    "r2_raw_files_opened": 0,
+    "r3_paths_or_values_read": 0,
+    "settled_cashflow_observed": 0,
+    "validation_population": "NONE",
+    "wallet_signer_transaction_actions": 0
+  },
+  "as_of": "2026-08-03",
+  "atom_id": "T26-A7_REGISTER_ASSETS_UPDATE_CATALOG_AND_FULL_FACTORY_FIT_REVIEW_V1",
+  "authority": {
+    "catalog_mutations": 1,
+    "cash_spend_usd_cents": 0,
+    "commit": false,
+    "dependency_changes": 0,
+    "local_write_only": true,
+    "provider_api_rpc_wss_calls": 0,
+    "pull_request": false,
+    "push": false,
+    "r2_raw_files_opened": 0,
+    "r3_paths_or_values_read": 0,
+    "source_files_changed": 0,
+    "wallet_signer_transaction_actions": 0
+  },
+  "catalog": {
+    "after_assets": 499,
+    "after_schemas": 9,
+    "after_version": "0.31.0",
+    "asset_registries": 4,
+    "before_assets": 476,
+    "before_schemas": 8,
+    "before_version": "0.30.0",
+    "generated_navigation": "PASS",
+    "lifecycle_records": 56,
+    "lifecycle_registries": 9,
+    "named_consumers": [
+      "TASK-26",
+      "TASK-27",
+      "FACTORY-001"
+    ],
+    "queries": 8,
+    "registered_asset_ids": [
+      "CONTRACT-T26-EXECUTION-COST-NETRETURN-001",
+      "CONFIG-T26-EXECUTION-COST-NETRETURN-001",
+      "SCHEMA-T26-EXECUTION-COST-NETRETURN-001",
+      "FIXTURE-T26-EXECUTION-COST-NETRETURN-001",
+      "TEST-T26-EXECUTION-COST-NETRETURN-001",
+      "EVIDENCE-T26-A2-ACCEPTANCE-001",
+      "MODULE-T26-EXECUTION-COST-MODEL-001",
+      "TEST-T26-EXECUTION-COST-MODEL-001",
+      "DATA-T26-SYNTHETIC-EXECUTION-COST-PROJECTION-001",
+      "EVIDENCE-T26-A3-ACCEPTANCE-001",
+      "MODULE-T26-ADVERSARIAL-ACCEPTANCE-001",
+      "TEST-T26-ADVERSARIAL-ACCEPTANCE-001",
+      "EVIDENCE-T26-A4-ACCEPTANCE-001",
+      "MODULE-T26-R2-EXECUTION-COST-PROJECTION-001",
+      "TEST-T26-R2-EXECUTION-COST-PROJECTION-001",
+      "DATA-T26-R2-EXECUTION-COST-INPUT-PROJECTION-001",
+      "EVIDENCE-T26-A5-ACCEPTANCE-001",
+      "FIXTURE-T26-R2-EXECUTION-COST-ADVERSARIAL-MATRIX-001",
+      "MODULE-T26-R2-ADVERSARIAL-ACCEPTANCE-001",
+      "TEST-T26-R2-ADVERSARIAL-ACCEPTANCE-001",
+      "EVIDENCE-T26-A6-ACCEPTANCE-001",
+      "EVIDENCE-T26-A7-CATALOG-FACTORY-FIT-001",
+      "TEST-T26-A7-CATALOG-FACTORY-FIT-001"
+    ],
+    "updated_asset_ids": [
+      "CATALOG-ROOT-001",
+      "GENERATED-PROJECT-MAP-001",
+      "GENERATED-EDGE-PROJECTION-001"
+    ]
+  },
+  "critical_bindings": [
+    {
+      "asset_id": "CONTRACT-T25-OUTCOME-LABEL-PIT-001",
+      "path": "docs/contracts/task25_outcome_label_and_pit_contract_v1.md",
+      "sha256": "04e4397e69d554463a09564bdb1cbbb2ac41ce8662277d05e4565c178e94c801"
+    },
+    {
+      "asset_id": "EVIDENCE-T25-A6-CATALOG-FACTORY-FIT-001",
+      "path": "docs/evidence/task25/a6_catalog_factory_fit_v1.json",
+      "sha256": "187a508abb78b9f5548ec0d9677424ddfc60c746b51ee3975c5794b30745b41a"
+    },
+    {
+      "asset_id": "CONTRACT-T26-EXECUTION-COST-NETRETURN-001",
+      "path": "docs/contracts/task26_execution_cost_and_netreturn_contract_v1.md",
+      "sha256": "aac003cf7ba2742d310893c81af3ae4a032a52b719f2f56d80171a6486351efd"
+    },
+    {
+      "asset_id": "CONFIG-T26-EXECUTION-COST-NETRETURN-001",
+      "path": "configs/task26_execution_cost_and_netreturn_contract_v1.yaml",
+      "sha256": "1107b286248036f4e3ef0a5610b80e7cec8362269ecb2ba835e5040dc3210574"
+    },
+    {
+      "asset_id": "SCHEMA-T26-EXECUTION-COST-NETRETURN-001",
+      "path": "catalog/schemas/task26_execution_cost_and_netreturn.schema.json",
+      "sha256": "f3e9b34ccf8adff60cc1abb6e3fa37dfa59310e479eb7654a8d780e5d0cbf083"
+    },
+    {
+      "asset_id": "EVIDENCE-T26-A2-ACCEPTANCE-001",
+      "path": "docs/evidence/task26/a2_execution_cost_and_netreturn_contract_acceptance_v1.json",
+      "sha256": "ad79108c07c98797f24cc1c061474413e130309253eb00d4797017e26256b0ce"
+    },
+    {
+      "asset_id": "DATA-T26-SYNTHETIC-EXECUTION-COST-PROJECTION-001",
+      "path": "docs/evidence/task26/a3_execution_cost_projection_v1.json",
+      "sha256": "df7025c489627b77cc3748c495ca8852ad3a79262048e0780115f0d7d086165f"
+    },
+    {
+      "asset_id": "EVIDENCE-T26-A3-ACCEPTANCE-001",
+      "path": "docs/evidence/task26/a3_deterministic_execution_cost_and_golden_acceptance_v1.json",
+      "sha256": "c543f0c273a5a09a16b9ca2e9d96bc0c61343eac236894d161f247d14b3b53bf"
+    },
+    {
+      "asset_id": "EVIDENCE-T26-A4-ACCEPTANCE-001",
+      "path": "docs/evidence/task26/a4_adversarial_execution_cost_acceptance_v1.json",
+      "sha256": "86b09e393c0a811c7f8b260eb1e5f7236351ea5d8d56000fea873195c1355d82"
+    },
+    {
+      "asset_id": "DATA-T26-R2-EXECUTION-COST-INPUT-PROJECTION-001",
+      "path": "docs/evidence/task26/a5_bounded_r2_execution_cost_projection_v1.json",
+      "sha256": "670d1b280aacdca0ef4db1994ff9bc535a8f640c4db2e688a4322ee9807b0b37"
+    },
+    {
+      "asset_id": "EVIDENCE-T26-A5-ACCEPTANCE-001",
+      "path": "docs/evidence/task26/a5_bounded_r2_execution_cost_projection_acceptance_v1.json",
+      "sha256": "f14d2655b281fd2b1eb02adfc843bff2578632580109fe516b7f5fc88fa646b9"
+    },
+    {
+      "asset_id": "EVIDENCE-T26-A6-ACCEPTANCE-001",
+      "path": "docs/evidence/task26/a6_r2_adversarial_execution_cost_acceptance_v1.json",
+      "sha256": "866366fa94329c142a57f2d5bfc1d0f7f3c32badf5e4408dc033e605a5089f69"
+    }
+  ],
+  "factory_fit": {
+    "checks": [
+      {
+        "check_id": "GOAL_FIT",
+        "evidence": "The task creates a shared execution-cost vocabulary while explicitly refusing a false NetReturn result.",
+        "status": "PASS"
+      },
+      {
+        "check_id": "COMPATIBILITY_AND_HISTORY",
+        "evidence": "A2 through A6 receipts remain immutable and addressable; the Catalog transaction is additive.",
+        "status": "PASS"
+      },
+      {
+        "check_id": "FLEXIBILITY_AND_REUSE",
+        "evidence": "Existing Catalog, Python standard library, synthetic fixtures and TASK-25 R2 aggregate surface are reused without a new provider, service or package.",
+        "status": "PASS"
+      },
+      {
+        "check_id": "EFFICIENCY",
+        "evidence": "All transformations and acceptance checks are deterministic and offline; only the exact R2 aggregate output is consumed.",
+        "status": "PASS"
+      },
+      {
+        "check_id": "RESEARCH_TRUTH",
+        "evidence": "Quote, modeled, observed and unknown states remain distinct; 36 of 36 R2 pairs remain non-computable for numeric NetReturn.",
+        "status": "PASS"
+      },
+      {
+        "check_id": "OWNER_OPERABILITY",
+        "evidence": "The owner decision is compact: extend execution evidence, not promote quote data or open R3.",
+        "status": "PASS"
+      },
+      {
+        "check_id": "HYPOTHESIS_LIFECYCLE",
+        "evidence": "No trial, holdout or hypothesis history is rewritten; R2 stays development-only and R3 stays sealed.",
+        "status": "PASS"
+      },
+      {
+        "check_id": "DATA_FITNESS",
+        "evidence": "The exact R2 aggregate retains 36 pairs, 35 ready quote-cost inputs and one explicit latency blocker without reopening raw data.",
+        "status": "PASS"
+      },
+      {
+        "check_id": "TRADING_BRIDGE",
+        "evidence": "Complete fee components, attempt or landing evidence and inventory reconciliation are still absent before modeled numeric NetReturn.",
+        "status": "FOLLOWUP"
+      },
+      {
+        "check_id": "POSITION_AND_RISK_TRUTH",
+        "evidence": "No actual position, account exposure, signer, wallet, transaction or real-money authority is created.",
+        "status": "NOT_APPLICABLE"
+      },
+      {
+        "check_id": "MONITORING_AND_RECOVERY",
+        "evidence": "Content bindings, deterministic projections and adversarial mutations give a local drift-detection and recovery path.",
+        "status": "PASS"
+      },
+      {
+        "check_id": "FAILURE_RED_TEAM",
+        "evidence": "Twelve R2 mutations reject quote-to-fill, numeric-NetReturn, R3, raw-data, pair-loss and latency-blocker inflation.",
+        "status": "PASS"
+      },
+      {
+        "check_id": "BUILD_VS_BUY",
+        "evidence": "Project-owned truth semantics remain local; no generic simulator, hosted service or new dependency was adopted prematurely.",
+        "status": "PASS"
+      },
+      {
+        "check_id": "MIGRATION_AND_ROLLBACK",
+        "evidence": "The transaction only adds records and generated navigation; removing its Catalog records leaves earlier A2-A6 evidence intact.",
+        "status": "PASS"
+      },
+      {
+        "check_id": "CONTRADICTION_SCAN",
+        "evidence": "Contract, projections, adversarial receipts, Catalog relations and generated navigation agree on zero actual execution or NetReturn claims.",
+        "status": "PASS"
+      }
+    ],
+    "durable_followup": {
+      "activation_trigger": "BEFORE_ANY_MODELED_NUMERIC_NETRETURN_OBSERVED_NETRETURN_OWNER_COMPARISON_OR_STRATEGY_PROMOTION",
+      "cannot_be_satisfied_by": [
+        "promoting quotes to fills",
+        "treating missing fees as zero",
+        "opening R3 without a separate consumption gate",
+        "treating open or unresolved inventory as flat"
+      ],
+      "destination": "TASK26_EXECUTION_EVIDENCE_EXTENSION_DECISION",
+      "followup_id": "T26_EXECUTION_EVIDENCE_COMPLETION_V1",
+      "owner": "TASK-26_OWNER_DECISION",
+      "reason": "The model semantics are validated, but 36 R2 pairs lack complete fee and settled-cashflow evidence; one pair also remains latency-blocked.",
+      "required_action": "FREEZE_VERSIONED_FEE_ATTEMPT_LANDING_INVENTORY_AND_CASHFLOW_EVIDENCE_BEFORE_A_MODELED_NUMERIC_NETRETURN"
+    },
+    "mode": "FULL_REVIEW",
+    "verdict": "PASS_WITH_FOLLOWUP"
+  },
+  "finish_gate": "CONTINUE_CURRENT_TASK",
+  "historical_contract_reconciliation": {
+    "actual_registration_atom": "T26-A7_REGISTER_ASSETS_UPDATE_CATALOG_AND_FULL_FACTORY_FIT_REVIEW_V1",
+    "historical_config_registration_owner": "T26-A6_REGISTER_ASSETS_UPDATE_CATALOG_AND_FULL_FACTORY_FIT_REVIEW_V1",
+    "resolution": "A6 was expanded into exact R2 adversarial acceptance and A7 performs the additive Catalog transaction; frozen A2 bytes are not rewritten."
+  },
+  "managed_write_set": [
+    "catalog/assets/core.yaml",
+    "catalog/assets/lifecycle.yaml",
+    "catalog/catalog_manifest.yaml",
+    "catalog/generated/asset_edges.json",
+    "docs/PROJECT_MAP.md",
+    "docs/evidence/task26/a7_catalog_factory_fit_v1.json",
+    "tests/test_task26_catalog_factory_fit.py"
+  ],
+  "next_boundary": {
+    "atom": "T26-A8_REPOSITORY_DELIVERY_V1",
+    "authorized": false,
+    "r3_access": "DENY"
+  },
+  "receipt_id": "T26-A7-CATALOG-FACTORY-FIT-RECEIPT-001",
+  "receipt_version": "1.0",
+  "schema": "smial.task26.a7-catalog-factory-fit-receipt",
+  "schema_version": "1.0",
+  "status": "PASS_EXECUTION_COST_MODEL_REGISTERED_EXTEND_EVIDENCE",
+  "task_id": "TASK-26",
+  "validation": {
+    "catalog_validation": "PASS_0_31_0_499_ASSETS_9_SCHEMAS",
+    "decision_critical_skips": 0,
+    "full_repository_unit_suite": "DEFERRED_TO_A8_DELIVERY_TRACKED_ONLY_PREFLIGHT",
+    "targeted_suite": "PASS_A7_CATALOG_FACTORY_FIT"
+  }
+}

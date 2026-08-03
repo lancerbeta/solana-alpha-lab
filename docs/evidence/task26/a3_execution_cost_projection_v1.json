@@ -1,0 +1,246 @@
+{
+  "atom_id": "T26-A3_DETERMINISTIC_EXECUTION_COST_AND_GOLDEN_ACCEPTANCE_V1",
+  "engine_version": "1.0.0",
+  "input_bindings": {
+    "config": {
+      "path": "configs/task26_execution_cost_and_netreturn_contract_v1.yaml",
+      "sha256": "1107b286248036f4e3ef0a5610b80e7cec8362269ecb2ba835e5040dc3210574"
+    },
+    "contract": {
+      "path": "docs/contracts/task26_execution_cost_and_netreturn_contract_v1.md",
+      "sha256": "aac003cf7ba2742d310893c81af3ae4a032a52b719f2f56d80171a6486351efd"
+    },
+    "fixture": {
+      "path": "tests/fixtures/task26/execution_cost_and_netreturn_contract_v1.json",
+      "sha256": "7d9e341a603a4c9de32feea58bb169c916864705ddb64ec1dc5853b501fa7bac"
+    },
+    "schema": {
+      "path": "catalog/schemas/task26_execution_cost_and_netreturn.schema.json",
+      "sha256": "f3e9b34ccf8adff60cc1abb6e3fa37dfa59310e479eb7654a8d780e5d0cbf083"
+    }
+  },
+  "next_boundary": {
+    "atom": "T26-A4_ADVERSARIAL_EXECUTION_COST_ACCEPTANCE_AND_OWNER_DECISION_V1",
+    "authorized_by_a3": false,
+    "r2_value_read_allowed": false,
+    "r3_access": "DENY"
+  },
+  "nonclaims": [
+    "R2_EXECUTION_OR_CASHFLOW_OBSERVED",
+    "R3_VALUE_OR_PATH_READ",
+    "ACTUAL_NETWORK_EXECUTION",
+    "REALIZED_VWAP_OR_OBSERVED_NETRETURN",
+    "OWNER_CASHFLOW",
+    "STRATEGY_PROFITABILITY_OR_ALPHA"
+  ],
+  "projection_results": [
+    {
+      "accounting_closed": false,
+      "attempt_terminal_states": [
+        "DROPPED"
+      ],
+      "blocked_reason": "CASHFLOW_OR_FEE_INCOMPLETE",
+      "cashflow_currency": "SYNTHETIC_USDC",
+      "cashflow_decimals": 6,
+      "classification": "NOT_COMPUTABLE",
+      "fee_ids": [
+        "fee-dropped-unknown-001"
+      ],
+      "infrastructure_cashflow_atomic": "0",
+      "inventory_state": "NO_POSITION",
+      "net_return_atomic": null,
+      "result_state": "NOT_COMPUTABLE",
+      "scenario_id": "dropped_attempt_charge_unknown",
+      "trade_cashflow_atomic": null
+    },
+    {
+      "accounting_closed": true,
+      "attempt_terminal_states": [
+        "FINALIZED"
+      ],
+      "blocked_reason": null,
+      "cashflow_currency": "SYNTHETIC_USDC",
+      "cashflow_decimals": 6,
+      "classification": "MODELED",
+      "fee_ids": [
+        "fee-infra-host-001",
+        "fee-infra-trade-001"
+      ],
+      "infrastructure_cashflow_atomic": "-2000",
+      "inventory_state": "FLAT_MODELED",
+      "net_return_atomic": "7000",
+      "result_state": "MODELED_COMPLETE",
+      "scenario_id": "infrastructure_cost_separate_from_trade_cashflow",
+      "trade_cashflow_atomic": "9000"
+    },
+    {
+      "accounting_closed": true,
+      "attempt_terminal_states": [
+        "FINALIZED"
+      ],
+      "blocked_reason": null,
+      "cashflow_currency": "SYNTHETIC_USDC",
+      "cashflow_decimals": 6,
+      "classification": "MODELED",
+      "fee_ids": [
+        "fee-base-001",
+        "fee-platform-001",
+        "fee-q-embedded-001"
+      ],
+      "infrastructure_cashflow_atomic": "0",
+      "inventory_state": "FLAT_MODELED",
+      "net_return_atomic": "39000",
+      "result_state": "MODELED_COMPLETE",
+      "scenario_id": "modeled_flat_round_trip_all_costs",
+      "trade_cashflow_atomic": "39000"
+    },
+    {
+      "accounting_closed": false,
+      "attempt_terminal_states": [
+        "FAILED",
+        "FINALIZED"
+      ],
+      "blocked_reason": "OPEN_OR_UNRESOLVED_INVENTORY",
+      "cashflow_currency": "SYNTHETIC_USDC",
+      "cashflow_decimals": 6,
+      "classification": "NOT_COMPUTABLE",
+      "fee_ids": [
+        "fee-partial-base-001"
+      ],
+      "infrastructure_cashflow_atomic": "0",
+      "inventory_state": "PARTIAL_OPEN",
+      "net_return_atomic": null,
+      "result_state": "NOT_COMPUTABLE",
+      "scenario_id": "partial_fill_residual_inventory",
+      "trade_cashflow_atomic": null
+    },
+    {
+      "accounting_closed": false,
+      "attempt_terminal_states": [
+        "FAILED"
+      ],
+      "blocked_reason": "CASHFLOW_OR_FEE_INCOMPLETE",
+      "cashflow_currency": "SYNTHETIC_USDC",
+      "cashflow_decimals": 6,
+      "classification": "NOT_COMPUTABLE",
+      "fee_ids": [
+        "fee-processed-failure-001"
+      ],
+      "infrastructure_cashflow_atomic": "0",
+      "inventory_state": "NO_POSITION",
+      "net_return_atomic": null,
+      "result_state": "NOT_COMPUTABLE",
+      "scenario_id": "processed_failure_documented_fee",
+      "trade_cashflow_atomic": null
+    },
+    {
+      "accounting_closed": false,
+      "attempt_terminal_states": [
+        "NOT_ATTEMPTED"
+      ],
+      "blocked_reason": "QUOTE_ONLY_NO_ATTEMPT",
+      "cashflow_currency": "SYNTHETIC_USDC",
+      "cashflow_decimals": 6,
+      "classification": "NOT_COMPUTABLE",
+      "fee_ids": [],
+      "infrastructure_cashflow_atomic": "0",
+      "inventory_state": "NO_POSITION",
+      "net_return_atomic": null,
+      "result_state": "NOT_COMPUTABLE",
+      "scenario_id": "quote_only_not_computable",
+      "trade_cashflow_atomic": null
+    },
+    {
+      "accounting_closed": true,
+      "attempt_terminal_states": [
+        "DROPPED",
+        "FINALIZED"
+      ],
+      "blocked_reason": null,
+      "cashflow_currency": "SYNTHETIC_USDC",
+      "cashflow_decimals": 6,
+      "classification": "MODELED",
+      "fee_ids": [
+        "fee-retry-001",
+        "fee-retry-002"
+      ],
+      "infrastructure_cashflow_atomic": "0",
+      "inventory_state": "FLAT_MODELED",
+      "net_return_atomic": "10000",
+      "result_state": "MODELED_COMPLETE",
+      "scenario_id": "retry_chain_no_double_count",
+      "trade_cashflow_atomic": "10000"
+    },
+    {
+      "accounting_closed": true,
+      "attempt_terminal_states": [
+        "FINALIZED"
+      ],
+      "blocked_reason": null,
+      "cashflow_currency": "SYNTHETIC_USDC",
+      "cashflow_decimals": 6,
+      "classification": "OBSERVED",
+      "fee_ids": [
+        "fee-observed-base-001"
+      ],
+      "infrastructure_cashflow_atomic": "0",
+      "inventory_state": "FLAT_ACTUAL",
+      "net_return_atomic": "25000",
+      "result_state": "SYNTHETIC_OBSERVED_SEMANTICS_ONLY",
+      "scenario_id": "synthetic_observed_complete_reconciliation",
+      "trade_cashflow_atomic": "25000"
+    },
+    {
+      "accounting_closed": false,
+      "attempt_terminal_states": [
+        "UNKNOWN"
+      ],
+      "blocked_reason": "UNKNOWN_TERMINAL_REQUIRES_RECONCILIATION",
+      "cashflow_currency": "SYNTHETIC_USDC",
+      "cashflow_decimals": 6,
+      "classification": "NOT_COMPUTABLE",
+      "fee_ids": [
+        "fee-unknown-001"
+      ],
+      "infrastructure_cashflow_atomic": "0",
+      "inventory_state": "UNRESOLVED_REQUIRES_RECOVERY",
+      "net_return_atomic": null,
+      "result_state": "NOT_COMPUTABLE",
+      "scenario_id": "unknown_terminal_blocks_retry_and_closure",
+      "trade_cashflow_atomic": null
+    }
+  ],
+  "schema": "smial.task26.synthetic-execution-cost-projection",
+  "schema_version": "1.0",
+  "status": "PASS_SYNTHETIC_EXECUTION_COST_MODEL_WITH_LIMITATIONS",
+  "summary": {
+    "blocked_reasons": {
+      "CASHFLOW_OR_FEE_INCOMPLETE": 2,
+      "OPEN_OR_UNRESOLVED_INVENTORY": 1,
+      "QUOTE_ONLY_NO_ATTEMPT": 1,
+      "UNKNOWN_TERMINAL_REQUIRES_RECONCILIATION": 1
+    },
+    "cash_spend_usd_cents": 0,
+    "classifications": {
+      "MODELED": 3,
+      "NOT_COMPUTABLE": 5,
+      "OBSERVED": 1
+    },
+    "input_scenarios": 9,
+    "modeled_netreturn_scenarios": 3,
+    "observed_netreturn_claims": 0,
+    "output_scenarios": 9,
+    "provider_api_rpc_wss_calls": 0,
+    "r2_values_read": 0,
+    "r3_paths_or_values_read": 0,
+    "result_states": {
+      "MODELED_COMPLETE": 3,
+      "NOT_COMPUTABLE": 5,
+      "SYNTHETIC_OBSERVED_SEMANTICS_ONLY": 1
+    },
+    "scenarios_dropped": 0,
+    "synthetic_observed_semantic_cases": 1,
+    "wallet_signer_transaction_actions": 0
+  },
+  "task_id": "TASK-26"
+}
