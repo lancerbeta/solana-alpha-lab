@@ -1,0 +1,85 @@
+{
+  "artifact_bindings": {
+    "config": {
+      "path": "configs/task26a_execution_evidence_completion_contract_v1.yaml",
+      "sha256": "fe3d4150613125f92d7c7233e0a3f0086ddb2394619a01abd861c4aba55286b5"
+    },
+    "inventory": {
+      "path": "docs/evidence/task26a/a1_execution_evidence_inventory_v1.json",
+      "sha256": "ce97c1aa4cb4fc43d6cdb588728885d1175474f3872b678894ec3b19d0b2e681"
+    }
+  },
+  "as_of": "2026-08-04",
+  "atom_id": "T26A-A1_EXECUTION_EVIDENCE_CONTRACT_AND_INVENTORY_V1",
+  "checks": [
+    {
+      "check_id": "TRACKED_INPUT_BINDINGS_EXACT",
+      "status": "PASS"
+    },
+    {
+      "check_id": "EVIDENCE_CLASSES_COMPLETE",
+      "status": "PASS"
+    },
+    {
+      "check_id": "REQUIRED_COMPONENT_GAPS_RECORDED",
+      "status": "PASS"
+    },
+    {
+      "check_id": "NO_NUMERIC_NETRETURN",
+      "status": "PASS"
+    },
+    {
+      "check_id": "NO_R2_RAW_OR_R3",
+      "status": "PASS"
+    },
+    {
+      "check_id": "DECISION_EXTEND_EXECUTION_EVIDENCE",
+      "status": "PASS"
+    },
+    {
+      "check_id": "NO_TASK27_AUTHORITY",
+      "status": "PASS"
+    }
+  ],
+  "decision": {
+    "basis": "35 exact R2 quote pairs are cost-input ready, but all 36 pairs lack complete fee, attempt, landing, inventory, and settled-cashflow evidence; one pair also remains latency-blocked.",
+    "promotion_authority": false,
+    "result": "EXTEND_EXECUTION_EVIDENCE",
+    "task27_authority": false
+  },
+  "nonclaims": [
+    "NUMERIC_MODELED_NETRETURN",
+    "OBSERVED_NETRETURN",
+    "QUOTE_TO_FILL_PROMOTION",
+    "MISSING_FEE_ZEROING",
+    "PROCESSED_ONLY_LANDING_INFERENCE",
+    "UNRESOLVED_INVENTORY_FLATTENING",
+    "R3_VALUE_OR_PATH_READ",
+    "TASK27_BASELINE_EXECUTION"
+  ],
+  "population_summary": {
+    "latency_blocked_pairs": 1,
+    "numeric_modeled_netreturn_claims": 0,
+    "observed_netreturn_claims": 0,
+    "pairs_with_complete_attempt_evidence": 0,
+    "pairs_with_complete_fee_evidence": 0,
+    "pairs_with_complete_landing_evidence": 0,
+    "pairs_with_reconciled_inventory": 0,
+    "pairs_with_settled_cashflow": 0,
+    "quote_cost_input_ready_pairs": 35,
+    "quote_pairs": 36
+  },
+  "schema": "smial.task26a.a1-execution-evidence-inventory-acceptance",
+  "schema_version": "1.0",
+  "side_effect_counters": {
+    "cash_spend_usd_cents": 0,
+    "dependency_changes": 0,
+    "provider_api_rpc_wss_calls": 0,
+    "r3_paths_or_values_read": 0,
+    "raw_r2_files_opened": 0,
+    "simulation_build_send": 0,
+    "wallet_signer_transaction_actions": 0
+  },
+  "status": "PASS_TRACKED_ONLY_INVENTORY_EXTEND_EXECUTION_EVIDENCE",
+  "task_id": "TASK-26A"
+}

@@ -1,0 +1,229 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://solana-alpha-lab.local/schemas/task26a_execution_evidence_completion.schema.json",
+  "title": "TASK-26A execution evidence completion inventory",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema",
+    "schema_version",
+    "task_id",
+    "atom_id",
+    "as_of",
+    "input_bindings",
+    "evidence_classes",
+    "component_inventory",
+    "gap_matrix",
+    "population_summary",
+    "decision",
+    "side_effect_counters",
+    "nonclaims"
+  ],
+  "properties": {
+    "schema": {
+      "const": "smial.task26a.execution-evidence-inventory"
+    },
+    "schema_version": {
+      "const": "1.0"
+    },
+    "task_id": {
+      "const": "TASK-26A"
+    },
+    "atom_id": {
+      "const": "T26A-A1_EXECUTION_EVIDENCE_CONTRACT_AND_INVENTORY_V1"
+    },
+    "as_of": {
+      "type": "string",
+      "minLength": 10
+    },
+    "input_bindings": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["asset_id", "path", "sha256", "bytes"],
+        "properties": {
+          "asset_id": {"type": "string", "minLength": 1},
+          "path": {"type": "string", "minLength": 1},
+          "sha256": {
+            "type": "string",
+            "pattern": "^[0-9a-f]{64}$"
+          },
+          "bytes": {"type": "integer", "minimum": 1}
+        }
+      }
+    },
+    "evidence_classes": {
+      "type": "array",
+      "minItems": 13,
+      "maxItems": 13,
+      "uniqueItems": true,
+      "items": {
+        "type": "string",
+        "enum": [
+          "QUOTE",
+          "BUILD",
+          "SIMULATION",
+          "SEND_ATTEMPT",
+          "PROCESSED_TERMINAL",
+          "LANDING",
+          "FILL",
+          "FEE_CHARGEABILITY",
+          "INVENTORY",
+          "SETTLEMENT",
+          "MODELED_NETRETURN",
+          "OBSERVED_NETRETURN",
+          "UNKNOWN"
+        ]
+      }
+    },
+    "component_inventory": {
+      "type": "array",
+      "minItems": 5,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "component_id",
+          "evidence_class",
+          "source_binding",
+          "availability_status",
+          "missingness_reason",
+          "consumer",
+          "pair_coverage"
+        ],
+        "properties": {
+          "component_id": {"type": "string", "minLength": 1},
+          "evidence_class": {"type": "string", "minLength": 1},
+          "source_binding": {"type": "string", "minLength": 1},
+          "availability_status": {
+            "type": "string",
+            "enum": [
+              "PRESENT",
+              "PARTIAL",
+              "MISSING",
+              "UNKNOWN",
+              "INELIGIBLE"
+            ]
+          },
+          "missingness_reason": {"type": ["string", "null"]},
+          "consumer": {"type": "string", "minLength": 1},
+          "pair_coverage": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["pairs_total", "pairs_complete", "pairs_incomplete"],
+            "properties": {
+              "pairs_total": {"type": "integer", "minimum": 0},
+              "pairs_complete": {"type": "integer", "minimum": 0},
+              "pairs_incomplete": {"type": "integer", "minimum": 0}
+            }
+          }
+        }
+      }
+    },
+    "gap_matrix": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "gap_id",
+          "component_id",
+          "evidence_class",
+          "severity",
+          "blocks_modeled_netreturn",
+          "blocks_observed_netreturn",
+          "reason"
+        ],
+        "properties": {
+          "gap_id": {"type": "string", "minLength": 1},
+          "component_id": {"type": "string", "minLength": 1},
+          "evidence_class": {"type": "string", "minLength": 1},
+          "severity": {
+            "type": "string",
+            "enum": ["BLOCKER", "HIGH", "MEDIUM", "LOW"]
+          },
+          "blocks_modeled_netreturn": {"type": "boolean"},
+          "blocks_observed_netreturn": {"type": "boolean"},
+          "reason": {"type": "string", "minLength": 1}
+        }
+      }
+    },
+    "population_summary": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "quote_pairs",
+        "quote_cost_input_ready_pairs",
+        "latency_blocked_pairs",
+        "pairs_with_complete_fee_evidence",
+        "pairs_with_complete_attempt_evidence",
+        "pairs_with_complete_landing_evidence",
+        "pairs_with_reconciled_inventory",
+        "pairs_with_settled_cashflow",
+        "numeric_modeled_netreturn_claims",
+        "observed_netreturn_claims"
+      ],
+      "properties": {
+        "quote_pairs": {"type": "integer", "const": 36},
+        "quote_cost_input_ready_pairs": {"type": "integer", "const": 35},
+        "latency_blocked_pairs": {"type": "integer", "const": 1},
+        "pairs_with_complete_fee_evidence": {"type": "integer", "const": 0},
+        "pairs_with_complete_attempt_evidence": {"type": "integer", "const": 0},
+        "pairs_with_complete_landing_evidence": {"type": "integer", "const": 0},
+        "pairs_with_reconciled_inventory": {"type": "integer", "const": 0},
+        "pairs_with_settled_cashflow": {"type": "integer", "const": 0},
+        "numeric_modeled_netreturn_claims": {"type": "integer", "const": 0},
+        "observed_netreturn_claims": {"type": "integer", "const": 0}
+      }
+    },
+    "decision": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["result", "basis", "promotion_authority", "task27_authority"],
+      "properties": {
+        "result": {
+          "type": "string",
+          "enum": [
+            "FIT_FOR_MODELED_NETRETURN_COMPARISON_WITH_LIMITATIONS",
+            "EXTEND_EXECUTION_EVIDENCE",
+            "REDESIGN_EVIDENCE",
+            "PAUSE"
+          ]
+        },
+        "basis": {"type": "string", "minLength": 1},
+        "promotion_authority": {"const": false},
+        "task27_authority": {"const": false}
+      }
+    },
+    "side_effect_counters": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "provider_api_rpc_wss_calls",
+        "raw_r2_files_opened",
+        "r3_paths_or_values_read",
+        "simulation_build_send",
+        "wallet_signer_transaction_actions",
+        "cash_spend_usd_cents",
+        "dependency_changes"
+      ],
+      "properties": {
+        "provider_api_rpc_wss_calls": {"const": 0},
+        "raw_r2_files_opened": {"const": 0},
+        "r3_paths_or_values_read": {"const": 0},
+        "simulation_build_send": {"const": 0},
+        "wallet_signer_transaction_actions": {"const": 0},
+        "cash_spend_usd_cents": {"const": 0},
+        "dependency_changes": {"const": 0}
+      }
+    },
+    "nonclaims": {
+      "type": "array",
+      "minItems": 1,
+      "items": {"type": "string", "minLength": 1}
+    }
+  }
+}

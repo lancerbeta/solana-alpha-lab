@@ -453,6 +453,11 @@
       "target_asset_id": "CONTRACT-T26-EXECUTION-COST-NETRETURN-001"
     },
     {
+      "source_asset_id": "CONFIG-T26A-EXECUTION-EVIDENCE-001",
+      "relation": "governed_by",
+      "target_asset_id": "CONTRACT-T26A-EXECUTION-EVIDENCE-001"
+    },
+    {
       "source_asset_id": "CONTRACT-T05-DATA-001",
       "relation": "depends_on",
       "target_asset_id": "ADR-MVP-STACK-002"
@@ -926,6 +931,16 @@
       "source_asset_id": "CONTRACT-T26-EXECUTION-COST-NETRETURN-001",
       "relation": "derived_from",
       "target_asset_id": "EVIDENCE-T25-A6-CATALOG-FACTORY-FIT-001"
+    },
+    {
+      "source_asset_id": "CONTRACT-T26A-EXECUTION-EVIDENCE-001",
+      "relation": "derived_from",
+      "target_asset_id": "CONTRACT-T26-EXECUTION-COST-NETRETURN-001"
+    },
+    {
+      "source_asset_id": "CONTRACT-T26A-EXECUTION-EVIDENCE-001",
+      "relation": "derived_from",
+      "target_asset_id": "EVIDENCE-T26-A7-CATALOG-FACTORY-FIT-001"
     },
     {
       "source_asset_id": "CONTROL-T21-ACTIVE-TIME-GATE-001",
@@ -1516,6 +1531,11 @@
       "source_asset_id": "DECISION-T25-R2-OUTCOME-REDESIGN-001",
       "relation": "derived_from",
       "target_asset_id": "EVIDENCE-T25-A4-ACCEPTANCE-001"
+    },
+    {
+      "source_asset_id": "DOC-T26A-TASK-001",
+      "relation": "derived_from",
+      "target_asset_id": "EVIDENCE-T26-A7-CATALOG-FACTORY-FIT-001"
     },
     {
       "source_asset_id": "ENV-WORKSTATION-001",
@@ -2503,6 +2523,46 @@
       "target_asset_id": "TEST-T26-A7-CATALOG-FACTORY-FIT-001"
     },
     {
+      "source_asset_id": "EVIDENCE-T26A-A1-ACCEPTANCE-001",
+      "relation": "derived_from",
+      "target_asset_id": "EVIDENCE-T26A-A1-INVENTORY-001"
+    },
+    {
+      "source_asset_id": "EVIDENCE-T26A-A1-ACCEPTANCE-001",
+      "relation": "validated_by",
+      "target_asset_id": "TEST-T26A-EXECUTION-EVIDENCE-INVENTORY-001"
+    },
+    {
+      "source_asset_id": "EVIDENCE-T26A-A1-INVENTORY-001",
+      "relation": "derived_from",
+      "target_asset_id": "EVIDENCE-T26-A7-CATALOG-FACTORY-FIT-001"
+    },
+    {
+      "source_asset_id": "EVIDENCE-T26A-A1-INVENTORY-001",
+      "relation": "derived_from",
+      "target_asset_id": "MODULE-T26A-EXECUTION-EVIDENCE-INVENTORY-001"
+    },
+    {
+      "source_asset_id": "EVIDENCE-T26A-A2-ADVERSARIAL-001",
+      "relation": "derived_from",
+      "target_asset_id": "EVIDENCE-T26A-A1-INVENTORY-001"
+    },
+    {
+      "source_asset_id": "EVIDENCE-T26A-A2-ADVERSARIAL-001",
+      "relation": "validated_by",
+      "target_asset_id": "TEST-T26A-ADVERSARIAL-ACCEPTANCE-001"
+    },
+    {
+      "source_asset_id": "EVIDENCE-T26A-A3-CATALOG-FACTORY-FIT-001",
+      "relation": "derived_from",
+      "target_asset_id": "EVIDENCE-T26A-A2-ADVERSARIAL-001"
+    },
+    {
+      "source_asset_id": "EVIDENCE-T26A-A3-CATALOG-FACTORY-FIT-001",
+      "relation": "validated_by",
+      "target_asset_id": "TEST-T26A-A3-CATALOG-FACTORY-FIT-001"
+    },
+    {
       "source_asset_id": "FIXTURE-BATON-SUITE-001",
       "relation": "governed_by",
       "target_asset_id": "CTRL-BATON-SETUP-001"
@@ -3001,6 +3061,16 @@
       "source_asset_id": "FIXTURE-T26-R2-EXECUTION-COST-ADVERSARIAL-MATRIX-001",
       "relation": "derived_from",
       "target_asset_id": "DATA-T26-R2-EXECUTION-COST-INPUT-PROJECTION-001"
+    },
+    {
+      "source_asset_id": "FIXTURE-T26A-EXECUTION-EVIDENCE-ADVERSARIAL-MATRIX-001",
+      "relation": "derived_from",
+      "target_asset_id": "CONFIG-T26A-EXECUTION-EVIDENCE-001"
+    },
+    {
+      "source_asset_id": "FIXTURE-T26A-EXECUTION-EVIDENCE-INVENTORY-001",
+      "relation": "derived_from",
+      "target_asset_id": "CONFIG-T26A-EXECUTION-EVIDENCE-001"
     },
     {
       "source_asset_id": "GENERATED-EDGE-PROJECTION-001",
@@ -3713,6 +3783,26 @@
       "target_asset_id": "DATA-T26-R2-EXECUTION-COST-INPUT-PROJECTION-001"
     },
     {
+      "source_asset_id": "MODULE-T26A-ADVERSARIAL-ACCEPTANCE-001",
+      "relation": "depends_on",
+      "target_asset_id": "MODULE-T26A-EXECUTION-EVIDENCE-INVENTORY-001"
+    },
+    {
+      "source_asset_id": "MODULE-T26A-ADVERSARIAL-ACCEPTANCE-001",
+      "relation": "produces",
+      "target_asset_id": "EVIDENCE-T26A-A2-ADVERSARIAL-001"
+    },
+    {
+      "source_asset_id": "MODULE-T26A-EXECUTION-EVIDENCE-INVENTORY-001",
+      "relation": "governed_by",
+      "target_asset_id": "CONFIG-T26A-EXECUTION-EVIDENCE-001"
+    },
+    {
+      "source_asset_id": "MODULE-T26A-EXECUTION-EVIDENCE-INVENTORY-001",
+      "relation": "produces",
+      "target_asset_id": "EVIDENCE-T26A-A1-INVENTORY-001"
+    },
+    {
       "source_asset_id": "PRE-GIT-TASK01-A017",
       "relation": "derived_from",
       "target_asset_id": "BUNDLE-TASK01-COMPLETION-001"
@@ -4366,6 +4456,11 @@
       "source_asset_id": "SCHEMA-T26-EXECUTION-COST-NETRETURN-001",
       "relation": "governed_by",
       "target_asset_id": "CONTRACT-T26-EXECUTION-COST-NETRETURN-001"
+    },
+    {
+      "source_asset_id": "SCHEMA-T26A-EXECUTION-EVIDENCE-001",
+      "relation": "governed_by",
+      "target_asset_id": "CONTRACT-T26A-EXECUTION-EVIDENCE-001"
     },
     {
       "source_asset_id": "SCM-BASELINE-COMMIT-001",
@@ -5811,6 +5906,51 @@
       "source_asset_id": "TEST-T26-R2-EXECUTION-COST-PROJECTION-001",
       "relation": "depends_on",
       "target_asset_id": "MODULE-T26-R2-EXECUTION-COST-PROJECTION-001"
+    },
+    {
+      "source_asset_id": "TEST-T26A-A3-CATALOG-FACTORY-FIT-001",
+      "relation": "depends_on",
+      "target_asset_id": "CATALOG-ROOT-001"
+    },
+    {
+      "source_asset_id": "TEST-T26A-A3-CATALOG-FACTORY-FIT-001",
+      "relation": "depends_on",
+      "target_asset_id": "EVIDENCE-T26A-A3-CATALOG-FACTORY-FIT-001"
+    },
+    {
+      "source_asset_id": "TEST-T26A-ADVERSARIAL-ACCEPTANCE-001",
+      "relation": "depends_on",
+      "target_asset_id": "FIXTURE-T26A-EXECUTION-EVIDENCE-ADVERSARIAL-MATRIX-001"
+    },
+    {
+      "source_asset_id": "TEST-T26A-ADVERSARIAL-ACCEPTANCE-001",
+      "relation": "depends_on",
+      "target_asset_id": "MODULE-T26A-ADVERSARIAL-ACCEPTANCE-001"
+    },
+    {
+      "source_asset_id": "TEST-T26A-EXECUTION-EVIDENCE-CONTRACT-001",
+      "relation": "depends_on",
+      "target_asset_id": "CONFIG-T26A-EXECUTION-EVIDENCE-001"
+    },
+    {
+      "source_asset_id": "TEST-T26A-EXECUTION-EVIDENCE-CONTRACT-001",
+      "relation": "depends_on",
+      "target_asset_id": "FIXTURE-T26A-EXECUTION-EVIDENCE-INVENTORY-001"
+    },
+    {
+      "source_asset_id": "TEST-T26A-EXECUTION-EVIDENCE-CONTRACT-001",
+      "relation": "depends_on",
+      "target_asset_id": "SCHEMA-T26A-EXECUTION-EVIDENCE-001"
+    },
+    {
+      "source_asset_id": "TEST-T26A-EXECUTION-EVIDENCE-INVENTORY-001",
+      "relation": "depends_on",
+      "target_asset_id": "EVIDENCE-T26A-A1-INVENTORY-001"
+    },
+    {
+      "source_asset_id": "TEST-T26A-EXECUTION-EVIDENCE-INVENTORY-001",
+      "relation": "depends_on",
+      "target_asset_id": "MODULE-T26A-EXECUTION-EVIDENCE-INVENTORY-001"
     },
     {
       "source_asset_id": "VALIDATOR-REPOSITORY-STATE-001",

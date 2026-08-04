@@ -1,0 +1,39 @@
+{
+  "mutations": [
+    {
+      "expected_error": "QUOTE_TO_FILL_PROMOTION_FORBIDDEN",
+      "mutation_id": "m01_quote_to_fill"
+    },
+    {
+      "expected_error": "MISSING_FEE_ZEROING_FORBIDDEN",
+      "mutation_id": "m02_missing_fee_zeroed"
+    },
+    {
+      "expected_error": "PROCESSED_ONLY_LANDING_INFERENCE_FORBIDDEN",
+      "mutation_id": "m03_processed_only_landing"
+    },
+    {
+      "expected_error": "DOUBLE_COUNTED_ROUTE_COST_FORBIDDEN",
+      "mutation_id": "m04_double_count_route_cost"
+    },
+    {
+      "expected_error": "UNRESOLVED_INVENTORY_FLATTENING_FORBIDDEN",
+      "mutation_id": "m05_unresolved_inventory_flat"
+    },
+    {
+      "expected_error": "R3_PATHS_OR_VALUES_READ_FORBIDDEN",
+      "mutation_id": "m06_r3_access"
+    },
+    {
+      "expected_error": "UNTRACKED_OR_RAW_INPUT_FORBIDDEN",
+      "mutation_id": "m07_untracked_or_raw_input"
+    },
+    {
+      "expected_error": "NUMERIC_NETRETURN_WITHOUT_COMPLETE_RECONCILIATION_FORBIDDEN",
+      "mutation_id": "m08_numeric_netreturn_without_reconciliation"
+    }
+  ],
+  "schema": "smial.task26a.execution-evidence-adversarial-matrix",
+  "schema_version": "1.0",
+  "task_id": "TASK-26A"
+}

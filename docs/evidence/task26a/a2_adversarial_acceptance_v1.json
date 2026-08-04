@@ -1,0 +1,94 @@
+{
+  "adversarial_cases": [
+    {
+      "expected_error": "QUOTE_TO_FILL_PROMOTION_FORBIDDEN",
+      "mutation_id": "m01_quote_to_fill",
+      "observed_error": "QUOTE_TO_FILL_PROMOTION_FORBIDDEN",
+      "status": "PASS_EXACT_REJECTION"
+    },
+    {
+      "expected_error": "MISSING_FEE_ZEROING_FORBIDDEN",
+      "mutation_id": "m02_missing_fee_zeroed",
+      "observed_error": "MISSING_FEE_ZEROING_FORBIDDEN",
+      "status": "PASS_EXACT_REJECTION"
+    },
+    {
+      "expected_error": "PROCESSED_ONLY_LANDING_INFERENCE_FORBIDDEN",
+      "mutation_id": "m03_processed_only_landing",
+      "observed_error": "PROCESSED_ONLY_LANDING_INFERENCE_FORBIDDEN",
+      "status": "PASS_EXACT_REJECTION"
+    },
+    {
+      "expected_error": "DOUBLE_COUNTED_ROUTE_COST_FORBIDDEN",
+      "mutation_id": "m04_double_count_route_cost",
+      "observed_error": "DOUBLE_COUNTED_ROUTE_COST_FORBIDDEN",
+      "status": "PASS_EXACT_REJECTION"
+    },
+    {
+      "expected_error": "UNRESOLVED_INVENTORY_FLATTENING_FORBIDDEN",
+      "mutation_id": "m05_unresolved_inventory_flat",
+      "observed_error": "UNRESOLVED_INVENTORY_FLATTENING_FORBIDDEN",
+      "status": "PASS_EXACT_REJECTION"
+    },
+    {
+      "expected_error": "R3_PATHS_OR_VALUES_READ_FORBIDDEN",
+      "mutation_id": "m06_r3_access",
+      "observed_error": "R3_PATHS_OR_VALUES_READ_FORBIDDEN",
+      "status": "PASS_EXACT_REJECTION"
+    },
+    {
+      "expected_error": "UNTRACKED_OR_RAW_INPUT_FORBIDDEN",
+      "mutation_id": "m07_untracked_or_raw_input",
+      "observed_error": "UNTRACKED_OR_RAW_INPUT_FORBIDDEN",
+      "status": "PASS_EXACT_REJECTION"
+    },
+    {
+      "expected_error": "NUMERIC_NETRETURN_WITHOUT_COMPLETE_RECONCILIATION_FORBIDDEN",
+      "mutation_id": "m08_numeric_netreturn_without_reconciliation",
+      "observed_error": "NUMERIC_NETRETURN_WITHOUT_COMPLETE_RECONCILIATION_FORBIDDEN",
+      "status": "PASS_EXACT_REJECTION"
+    }
+  ],
+  "as_of": "2026-08-04",
+  "atom_id": "T26A-A1_EXECUTION_EVIDENCE_CONTRACT_AND_INVENTORY_V1",
+  "checks": [
+    {
+      "check_id": "FROZEN_MUTATIONS_8",
+      "status": "PASS"
+    },
+    {
+      "check_id": "EVERY_MUTATION_REJECTED_EXACT",
+      "status": "PASS"
+    },
+    {
+      "check_id": "NO_NUMERIC_NETRETURN",
+      "status": "PASS"
+    },
+    {
+      "check_id": "NO_R3_OR_RAW_INPUT",
+      "status": "PASS"
+    },
+    {
+      "check_id": "DECISION_REMAINS_EXTEND",
+      "status": "PASS"
+    }
+  ],
+  "decision": {
+    "promotion_authority": false,
+    "result": "EXTEND_EXECUTION_EVIDENCE",
+    "task27_authority": false
+  },
+  "schema": "smial.task26a.a2-adversarial-acceptance",
+  "schema_version": "1.0",
+  "side_effect_counters": {
+    "cash_spend_usd_cents": 0,
+    "dependency_changes": 0,
+    "provider_api_rpc_wss_calls": 0,
+    "r3_paths_or_values_read": 0,
+    "raw_r2_files_opened": 0,
+    "simulation_build_send": 0,
+    "wallet_signer_transaction_actions": 0
+  },
+  "status": "PASS_ALL_MUTATIONS_REJECTED",
+  "task_id": "TASK-26A"
+}
