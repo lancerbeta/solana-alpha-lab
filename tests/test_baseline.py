@@ -28,6 +28,14 @@ class GenericControlBranchPolicyTests(unittest.TestCase):
 
 
 class TrackedOnlyDeliveryStateTests(unittest.TestCase):
+    def test_tracked_only_delivery_uses_current_runtime_contract(self) -> None:
+        self.assertTrue(
+            module.uses_current_runtime_contract(
+                "TRACKED_ONLY_DELIVERY_CANDIDATE"
+            )
+        )
+        self.assertFalse(module.uses_current_runtime_contract("ATOM5_STAGED"))
+
     def test_accepts_only_clean_attached_delivery_clone(self) -> None:
         self.assertEqual(
             module.classify_tracked_only_delivery_state(

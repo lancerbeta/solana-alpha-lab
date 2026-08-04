@@ -857,6 +857,17 @@ CTRL_GENERIC_REPOSITORY_STATES = {
     "CTRL_GENERIC_CONTROL_PR_MERGE_CHECKOUT",
     "CTRL_GENERIC_CONTROL_MAIN_MERGE_COMMITTED",
 }
+CURRENT_RUNTIME_CONTRACT_STATES = (
+    TASK04_REPOSITORY_STATES
+    | TASK05_REPOSITORY_STATES
+    | TASK06_REPOSITORY_STATES
+    | TASK07_REPOSITORY_STATES
+    | TASK08_REPOSITORY_STATES
+    | TASK09_REPOSITORY_STATES
+    | CTRL_BATON_A62_REPOSITORY_STATES
+    | CTRL_GENERIC_REPOSITORY_STATES
+    | {"TRACKED_ONLY_DELIVERY_CANDIDATE"}
+)
 CTRL_GENERIC_LIFECYCLE_COMBINATIONS = {
     (
         "CTRL_GENERIC_PROJECT_FEATURE_INITIAL_STAGED",
@@ -3458,6 +3469,12 @@ def classify_tracked_only_delivery_state(
     return None
 
 
+def uses_current_runtime_contract(state: str) -> bool:
+    """Return whether a state must satisfy the current locked runtime contract."""
+
+    return state in CURRENT_RUNTIME_CONTRACT_STATES
+
+
 def tree_files(treeish: str) -> set[str]:
     code, files = command_set(["git", "ls-tree", "-r", "--name-only", treeish])
     if code != 0:
@@ -5629,29 +5646,11 @@ def validate() -> None:
     with (ROOT/"pyproject.toml").open("rb") as handle: metadata = tomllib.load(handle)
     expected_dependencies = (
         TASK04_EXPECTED_RUNTIME_DEPENDENCIES
-        if state
-        in TASK04_REPOSITORY_STATES
-        | TASK05_REPOSITORY_STATES
-        | TASK06_REPOSITORY_STATES
-        | TASK07_REPOSITORY_STATES
-        | TASK08_REPOSITORY_STATES
-        | TASK09_REPOSITORY_STATES
-        | CTRL_BATON_A62_REPOSITORY_STATES
-        | CTRL_GENERIC_REPOSITORY_STATES
+        if uses_current_runtime_contract(state)
         else {f"PyYAML=={EXPECTED_PYYAML}", f"jsonschema=={EXPECTED_JSONSCHEMA}"}
     )
     assert_check("dependency_contract", set(metadata["project"]["dependencies"]) == expected_dependencies)
-    if (
-        state
-        in TASK04_REPOSITORY_STATES
-        | TASK05_REPOSITORY_STATES
-        | TASK06_REPOSITORY_STATES
-        | TASK07_REPOSITORY_STATES
-        | TASK08_REPOSITORY_STATES
-        | TASK09_REPOSITORY_STATES
-        | CTRL_BATON_A62_REPOSITORY_STATES
-        | CTRL_GENERIC_REPOSITORY_STATES
-    ):
+    if uses_current_runtime_contract(state):
         assert_check(
             "security_dependency_group",
             metadata.get("dependency-groups") == {"security": ["pip-audit==2.10.1"]},
