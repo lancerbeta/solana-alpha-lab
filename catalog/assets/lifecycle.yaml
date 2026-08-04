@@ -189,12 +189,12 @@ records:
   evidence: []
   classification: *id004
 - asset_id: REGISTRY-DECISIONS-NEGATIVE-RESULTS-001
-  record_version: '1.1'
+  record_version: '1.2'
   asset_type: lifecycle_registry
   purpose: Active registry for decisions and durable negative research results.
   status: VALIDATED_ACTIVE
   origin: REPOSITORY
-  as_of: '2026-08-02'
+  as_of: '2026-08-05'
   truth_owner: TASK-03
   location:
     kind: git_path
@@ -202,19 +202,19 @@ records:
     repository_path: registries/decisions_negative_results.yaml
   integrity:
     kind: sha256
-    sha256: 2a7a8c2384d6d98bf083477ca50ea8937b9d124c6177b43337b4f70d30cac175
+    sha256: 91f38287c20a1269d315de4806317c4a345dc8f1fa5d05f6fc519b4fafc82a40
   access: *id001
   relations: *id002
   consumers: *id003
   evidence: []
   classification: *id004
 - asset_id: GENERATED-PROJECT-MAP-001
-  record_version: '1.48'
+  record_version: '1.51'
   asset_type: generated_view
   purpose: Deterministic human-readable navigation projected only from the Catalog.
   status: IMPLEMENTED_UNVERIFIED
   origin: REPOSITORY
-  as_of: '2026-08-04'
+  as_of: '2026-08-05'
   truth_owner: TASK-04
   location:
     kind: git_path
@@ -222,7 +222,7 @@ records:
     repository_path: docs/PROJECT_MAP.md
   integrity:
     kind: sha256
-    sha256: 59f5577e1b6f68be4a34cce1d763c57cf02f4d382727f696b120e4272e5c8cd6
+    sha256: 58a6adc84891bf1dbd7011076798204c8a7cfcf9ba1e76c03f9981f41f914bdf
   access:
     mode: read_only
     method: file
@@ -260,10 +260,11 @@ records:
   - TASK-26A
   - TASK-26B
   - TASK-26C
+  - OWNER-AUTHORITY-PACKET-BINDING-V1
   evidence: []
   classification: *id004
 - asset_id: GENERATED-EDGE-PROJECTION-001
-  record_version: '1.37'
+  record_version: '1.38'
   asset_type: generated_view
   purpose: Deterministic machine-readable projection of Catalog asset relations.
   status: IMPLEMENTED_UNVERIFIED
@@ -276,7 +277,7 @@ records:
     repository_path: catalog/generated/asset_edges.json
   integrity:
     kind: sha256
-    sha256: 711301c87145d2a45bfbb852548c45be56de9114dfbb83c726624a2d32b6ee44
+    sha256: 548967c10f6208da4046d609a8770c019cbd4a7d001c9b472546e89e4d27a985
   access:
     mode: read_only
     method: file
@@ -314,5 +315,6 @@ records:
   - TASK-26A
   - TASK-26B
   - TASK-26C
+  - OWNER-AUTHORITY-PACKET-BINDING-V1
   evidence: []
   classification: *id004

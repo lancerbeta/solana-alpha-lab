@@ -57,7 +57,10 @@ class CatalogImportTests(unittest.TestCase):
                 record["record_id"]
                 for record in production_records["decisions_negative_results"]
             ],
-            ["NEGATIVE-T24-ENTITY-SIGNAL-V1-001"],
+            [
+                "NEGATIVE-T24-ENTITY-SIGNAL-V1-001",
+                "DECISION-OWNER-AUTHORITY-PACKET-001",
+            ],
         )
         self.assertTrue(
             all(

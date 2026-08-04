@@ -1,0 +1,96 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:smial:owner-authority-packet-binding:1.0",
+  "title": "Owner authority packet binding acceptance evidence",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema",
+    "schema_version",
+    "task_id",
+    "atom_id",
+    "as_of",
+    "status",
+    "input_bindings",
+    "decision",
+    "owner_packet",
+    "exit_policy",
+    "case_results",
+    "nonclaims",
+    "side_effect_counters"
+  ],
+  "properties": {
+    "schema": {"const": "smial.owner-authority-packet-binding.a1"},
+    "schema_version": {"const": "1.0"},
+    "task_id": {"const": "OWNER_AUTHORITY_PACKET_BINDING_V1"},
+    "atom_id": {"const": "OWNER_AUTHORITY_PACKET_BINDING_V1"},
+    "as_of": {"const": "2026-08-05"},
+    "status": {"const": "PASS_OFFLINE_OWNER_PACKET_REVIEW_ONLY_NO_AUTHORITY"},
+    "input_bindings": {"type": "array", "minItems": 2},
+    "decision": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "task_id",
+        "packet_state",
+        "decision",
+        "canary_authority",
+        "task27_authority",
+        "execution_action",
+        "next_action",
+        "numeric_netreturn"
+      ],
+      "properties": {
+        "task_id": {"const": "OWNER_AUTHORITY_PACKET_BINDING_V1"},
+        "packet_state": {"const": "DRAFT_OWNER_INPUT_REQUIRED"},
+        "decision": {"const": "OWNER_INPUT_REQUIRED"},
+        "canary_authority": {"const": false},
+        "task27_authority": {"const": false},
+        "execution_action": {"const": "NONE"},
+        "next_action": {"const": "OWNER_INPUT_REQUIRED"},
+        "numeric_netreturn": {"const": "FORBIDDEN"}
+      }
+    },
+    "owner_packet": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "status",
+        "flow",
+        "all_in_cash_at_risk_cap_usd_cents",
+        "required_owner_input_fields",
+        "synthetic_values_only"
+      ],
+      "properties": {
+        "status": {"const": "DRAFT_OWNER_INPUT_REQUIRED"},
+        "flow": {"const": "SOL_TO_EXACT_MEMECOIN_TO_SOL_IMMEDIATE_EXIT"},
+        "all_in_cash_at_risk_cap_usd_cents": {"const": 300},
+        "required_owner_input_fields": {"type": "array", "minItems": 12},
+        "synthetic_values_only": {"const": true}
+      }
+    },
+    "exit_policy": {"type": "object"},
+    "case_results": {"type": "array", "minItems": 10},
+    "nonclaims": {"type": "array", "minItems": 10},
+    "side_effect_counters": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "provider_api_rpc_wss_calls",
+        "r3_paths_or_values_read",
+        "wallet_signer_transaction_actions",
+        "transaction_build_sign_simulate_send",
+        "cash_spend_usd_cents",
+        "dependency_changes"
+      ],
+      "properties": {
+        "provider_api_rpc_wss_calls": {"const": 0},
+        "r3_paths_or_values_read": {"const": 0},
+        "wallet_signer_transaction_actions": {"const": 0},
+        "transaction_build_sign_simulate_send": {"const": 0},
+        "cash_spend_usd_cents": {"const": 0},
+        "dependency_changes": {"const": 0}
+      }
+    }
+  }
+}

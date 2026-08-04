@@ -774,14 +774,14 @@ records:
     contains_raw_data: false
     sensitivity: INTERNAL_NON_SECRET
 - asset_id: CI-VALIDATOR-001
-  record_version: '1.5'
+  record_version: '1.8'
   asset_type: script
   purpose: Single platform-neutral gate for runtime, lock, secrets, Catalog, generated
     views, repository policy, baton machine-layer checks, tests, and one isolated
     tracked-only delivery preflight.
   status: IMPLEMENTED_UNVERIFIED
   origin: REPOSITORY
-  as_of: '2026-08-02'
+  as_of: '2026-08-05'
   truth_owner: TASK-04
   location:
     kind: git_path
@@ -789,7 +789,7 @@ records:
     repository_path: scripts/validate_ci.py
   integrity:
     kind: sha256
-    sha256: 164c981bacf1240bf2497ee5d5e7b849a6896a9a3e7aade9cc393c4542a75314
+    sha256: 5b4a8bffaeb52802d7f13fa1acde1f8e4a651bdfd01716e9a9ec01832db1ce65
   access:
     mode: read_only
     method: command
@@ -2012,13 +2012,15 @@ records:
     contains_raw_data: false
     sensitivity: INTERNAL_NON_SECRET
 - asset_id: VALIDATOR-REPOSITORY-STATE-001
-  record_version: '2.6'
+  record_version: '3.1'
   asset_type: script
   purpose: Fail-closed historical and compositional repository-state/topology
-    validator through CTRL-BATON A6.4.
+    validator through CTRL-BATON A6.4, including current runtime constraints
+    for isolated tracked-only delivery clones and GitHub pull-request merge
+    checkouts.
   status: IMPLEMENTED_UNVERIFIED
   origin: REPOSITORY
-  as_of: '2026-08-01'
+  as_of: '2026-08-05'
   truth_owner: TASK-04
   location:
     kind: git_path
@@ -2026,7 +2028,7 @@ records:
     repository_path: scripts/validate_baseline.py
   integrity:
     kind: sha256
-    sha256: c0cab359225c3e5a22d03ff8018ee5ab95504b1b7cc5c943974f7b7f1ebfd779
+    sha256: a1b68232b3bc4dab92cc86f834dc90d2aff6332a58f10cacaf26678c4be56a0d
   access:
     mode: read_only
     method: command
@@ -12499,14 +12501,14 @@ records:
   evidence: []
   classification: *t24_internal
 - asset_id: TEST-T24-A7-CATALOG-FACTORY-FIT-001
-  record_version: '1.2'
+  record_version: '1.3'
   asset_type: script
   purpose: Hash-bound A7 tests for the immutable TASK-24 transaction plus monotonic
     current Catalog growth, lifecycle, generated navigation, Full Factory Fit and
     authority boundaries.
   status: IMPLEMENTED_UNVERIFIED
   origin: REPOSITORY
-  as_of: '2026-08-02'
+  as_of: '2026-08-05'
   truth_owner: TASK-24
   location:
     kind: git_path
@@ -12514,7 +12516,7 @@ records:
     repository_path: tests/test_task24_catalog_factory_fit.py
   integrity:
     kind: sha256
-    sha256: 6a44a4a709e22cb16c664268b4ac24eb0452473397dcaa765a34396ba68cfb28
+    sha256: 928ca368dd49468368b1a69d4cabfaffebb0a2031ab914d57f5cfe961ab8869d
   access: *t24_read_file
   relations:
   - relation_type: depends_on
@@ -14470,5 +14472,181 @@ records:
   - {relation_type: depends_on, target_asset_id: EVIDENCE-T26C-A3-CATALOG-FACTORY-FIT-001}
   - {relation_type: depends_on, target_asset_id: CATALOG-ROOT-001}
   consumers: [TASK-26C, FACTORY-001]
+  evidence: []
+  classification: *t25_internal
+
+- asset_id: DOC-OWNER-AUTHORITY-PACKET-001
+  record_version: '1.0'
+  asset_type: control_document
+  purpose: Offline owner packet task scope, decision and non-claim boundary.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-08-05'
+  truth_owner: OWNER_AUTHORITY_PACKET_BINDING_V1
+  location: {kind: git_path, logical_uri: 'repo://docs/tasks/OWNER_AUTHORITY_PACKET_BINDING_V1.md', repository_path: docs/tasks/OWNER_AUTHORITY_PACKET_BINDING_V1.md}
+  integrity: {kind: sha256, sha256: 2f25ab5ca2044b82ef321b6e2e008cddf146d2b914ebe7b8772cf8221044dbce}
+  access: *t25_read_file
+  relations:
+  - {relation_type: derived_from, target_asset_id: EVIDENCE-T26C-A3-CATALOG-FACTORY-FIT-001}
+  consumers: [OWNER-AUTHORITY-PACKET-BINDING-V1, FACTORY-001]
+  evidence: []
+  classification: *t25_internal
+
+- asset_id: CONTRACT-OWNER-AUTHORITY-PACKET-001
+  record_version: '1.0'
+  asset_type: control_document
+  purpose: Versioned offline owner authority packet contract and non-authority states.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-08-05'
+  truth_owner: OWNER_AUTHORITY_PACKET_BINDING_V1
+  location: {kind: git_path, logical_uri: 'repo://docs/contracts/owner_authority_packet_binding_contract_v1.md', repository_path: docs/contracts/owner_authority_packet_binding_contract_v1.md}
+  integrity: {kind: sha256, sha256: 485c573eac8411eb193b6beb2b4a2046cba6308e7fbc49d5de2063227e8600c1}
+  access: *t25_read_file
+  relations:
+  - {relation_type: derived_from, target_asset_id: CONTRACT-T26C-OWNED-CANARY-READINESS-001}
+  consumers: [OWNER-AUTHORITY-PACKET-BINDING-V1, FACTORY-001]
+  evidence: []
+  classification: *t25_internal
+
+- asset_id: CONFIG-OWNER-AUTHORITY-PACKET-001
+  record_version: '1.0'
+  asset_type: configuration
+  purpose: Machine-readable owner packet cap, fields, authority and input-hash policy.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-08-05'
+  truth_owner: OWNER_AUTHORITY_PACKET_BINDING_V1
+  location: {kind: git_path, logical_uri: 'repo://configs/owner_authority_packet_binding_v1.yaml', repository_path: configs/owner_authority_packet_binding_v1.yaml}
+  integrity: {kind: sha256, sha256: adf2e4848731efda561fc10362ae062470d2e96cfd47e71c8a23d2a39d3ff55e}
+  access: *t25_read_file
+  relations:
+  - {relation_type: governed_by, target_asset_id: CONTRACT-OWNER-AUTHORITY-PACKET-001}
+  consumers: [OWNER-AUTHORITY-PACKET-BINDING-V1, FACTORY-001]
+  evidence: []
+  classification: *t25_internal
+
+- asset_id: SCHEMA-OWNER-AUTHORITY-PACKET-001
+  record_version: '1.0'
+  asset_type: schema
+  purpose: JSON Schema for offline owner packet binding acceptance evidence.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-08-05'
+  truth_owner: OWNER_AUTHORITY_PACKET_BINDING_V1
+  location: {kind: git_path, logical_uri: 'repo://catalog/schemas/owner_authority_packet_binding.schema.json', repository_path: catalog/schemas/owner_authority_packet_binding.schema.json}
+  integrity: {kind: sha256, sha256: 81cc65992c0d9ea0c160c3665cb9a8e71f81ac007fe2731afe00afa6c1473b39}
+  access: *t25_read_file
+  relations:
+  - {relation_type: governed_by, target_asset_id: CONTRACT-OWNER-AUTHORITY-PACKET-001}
+  consumers: [OWNER-AUTHORITY-PACKET-BINDING-V1, FACTORY-001]
+  evidence: []
+  classification: *t25_internal
+
+- asset_id: FIXTURE-OWNER-AUTHORITY-PACKET-001
+  record_version: '1.0'
+  asset_type: evidence
+  purpose: Synthetic adversarial matrix for owner packet and exit-shape safety checks.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-08-05'
+  truth_owner: OWNER_AUTHORITY_PACKET_BINDING_V1
+  location: {kind: git_path, logical_uri: 'repo://tests/fixtures/owner_authority_packet_binding/packet_binding_matrix_v1.json', repository_path: tests/fixtures/owner_authority_packet_binding/packet_binding_matrix_v1.json}
+  integrity: {kind: sha256, sha256: 0c43d223a0449a54d2dadd257c147636251aa74dde51189bd95045d4e7c36097}
+  access: *t25_read_file
+  relations:
+  - {relation_type: derived_from, target_asset_id: CONFIG-OWNER-AUTHORITY-PACKET-001}
+  consumers: [OWNER-AUTHORITY-PACKET-BINDING-V1, FACTORY-001]
+  evidence: []
+  classification: *t25_internal
+
+- asset_id: MODULE-OWNER-AUTHORITY-PACKET-001
+  record_version: '1.0'
+  asset_type: script
+  purpose: Deterministic offline owner packet evaluator and evidence writer with no execution path.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-08-05'
+  truth_owner: OWNER_AUTHORITY_PACKET_BINDING_V1
+  location: {kind: git_path, logical_uri: 'repo://src/solana_alpha_lab/owner_authority_packet_binding.py', repository_path: src/solana_alpha_lab/owner_authority_packet_binding.py}
+  integrity: {kind: sha256, sha256: 5ea27c894ebd8e59bda44d413098d98729d4f4be881e2f14d463c49ded221537}
+  access: *t25_read_file
+  relations:
+  - {relation_type: governed_by, target_asset_id: CONFIG-OWNER-AUTHORITY-PACKET-001}
+  - {relation_type: produces, target_asset_id: EVIDENCE-OWNER-AUTHORITY-PACKET-A1-001}
+  consumers: [OWNER-AUTHORITY-PACKET-BINDING-V1, FACTORY-001]
+  evidence: []
+  classification: *t25_internal
+
+- asset_id: TEST-OWNER-AUTHORITY-PACKET-001
+  record_version: '1.0'
+  asset_type: script
+  purpose: Hash-bound tests for offline packet states, cash cap, recovery and zero-side-effect evidence.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-08-05'
+  truth_owner: OWNER_AUTHORITY_PACKET_BINDING_V1
+  location: {kind: git_path, logical_uri: 'repo://tests/test_owner_authority_packet_binding.py', repository_path: tests/test_owner_authority_packet_binding.py}
+  integrity: {kind: sha256, sha256: ff4c25f138e0f48c8a67f5b1eaffbae0ab85ae8ead427a0987f129884518f105}
+  access: *t25_read_file
+  relations:
+  - {relation_type: depends_on, target_asset_id: MODULE-OWNER-AUTHORITY-PACKET-001}
+  - {relation_type: depends_on, target_asset_id: SCHEMA-OWNER-AUTHORITY-PACKET-001}
+  - {relation_type: depends_on, target_asset_id: FIXTURE-OWNER-AUTHORITY-PACKET-001}
+  consumers: [OWNER-AUTHORITY-PACKET-BINDING-V1, FACTORY-001]
+  evidence: []
+  classification: *t25_internal
+
+- asset_id: EVIDENCE-OWNER-AUTHORITY-PACKET-A1-001
+  record_version: '1.0'
+  asset_type: evidence
+  purpose: Deterministic offline packet-binding acceptance receipt with no authority.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-08-05'
+  truth_owner: OWNER_AUTHORITY_PACKET_BINDING_V1
+  location: {kind: git_path, logical_uri: 'repo://docs/evidence/owner_authority_packet_binding/a1_offline_packet_binding_acceptance_v1.json', repository_path: docs/evidence/owner_authority_packet_binding/a1_offline_packet_binding_acceptance_v1.json}
+  integrity: {kind: sha256, sha256: da445122dd58382d18aed59487cb0f0e554f26c26b24eabbc89223256b8cec73}
+  access: *t25_read_file
+  relations:
+  - {relation_type: derived_from, target_asset_id: MODULE-OWNER-AUTHORITY-PACKET-001}
+  - {relation_type: validated_by, target_asset_id: TEST-OWNER-AUTHORITY-PACKET-001}
+  consumers: [OWNER-AUTHORITY-PACKET-BINDING-V1, FACTORY-001]
+  evidence: []
+  classification: *t25_internal
+
+- asset_id: EVIDENCE-OWNER-AUTHORITY-PACKET-A2-001
+  record_version: '1.0'
+  asset_type: evidence
+  purpose: FULL Factory Fit and Catalog registration receipt for offline owner packet binding.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-08-05'
+  truth_owner: OWNER_AUTHORITY_PACKET_BINDING_V1
+  location: {kind: git_path, logical_uri: 'repo://docs/evidence/owner_authority_packet_binding/a2_catalog_factory_fit_v1.json', repository_path: docs/evidence/owner_authority_packet_binding/a2_catalog_factory_fit_v1.json}
+  integrity: {kind: sha256, sha256: 4165393b9af4f847030443f19d223873dfb02f2fb513798c0a2a894c294ec677}
+  access: *t25_read_file
+  relations:
+  - {relation_type: derived_from, target_asset_id: EVIDENCE-OWNER-AUTHORITY-PACKET-A1-001}
+  - {relation_type: validated_by, target_asset_id: TEST-OWNER-AUTHORITY-PACKET-A2-001}
+  consumers: [OWNER-AUTHORITY-PACKET-BINDING-V1, FACTORY-001]
+  evidence: []
+  classification: *t25_internal
+
+- asset_id: TEST-OWNER-AUTHORITY-PACKET-A2-001
+  record_version: '1.0'
+  asset_type: script
+  purpose: Hash-bound Catalog and FULL Factory Fit tests for offline owner packet binding.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-08-05'
+  truth_owner: OWNER_AUTHORITY_PACKET_BINDING_V1
+  location: {kind: git_path, logical_uri: 'repo://tests/test_owner_authority_packet_binding_catalog_factory_fit.py', repository_path: tests/test_owner_authority_packet_binding_catalog_factory_fit.py}
+  integrity: {kind: sha256, sha256: 231049f79419675811e4082c84591f08c8a2b842074e49f60478482b9991b3ea}
+  access: *t25_read_file
+  relations:
+  - {relation_type: depends_on, target_asset_id: EVIDENCE-OWNER-AUTHORITY-PACKET-A2-001}
+  - {relation_type: depends_on, target_asset_id: CATALOG-ROOT-001}
+  consumers: [OWNER-AUTHORITY-PACKET-BINDING-V1, FACTORY-001]
   evidence: []
   classification: *t25_internal

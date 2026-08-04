@@ -1,0 +1,205 @@
+{
+  "schema": "smial.owner-authority-packet-binding-fixture",
+  "schema_version": "1.0",
+  "synthetic_only": true,
+  "cases": [
+    {
+      "case_id": "draft_owner_inputs_remain_explicit",
+      "kind": "packet",
+      "input": {
+        "packet_state": "DRAFT_OWNER_INPUT_REQUIRED",
+        "flow": "SOL_TO_EXACT_MEMECOIN_TO_SOL_IMMEDIATE_EXIT",
+        "total_cash_at_risk_cap_usd_cents": 300,
+        "owner_input_fields": [
+          "token",
+          "program",
+          "route",
+          "wallet_public_address",
+          "proposed_notional_usd_cents",
+          "maximum_separate_fees_usd_cents",
+          "quote_basis",
+          "expires_at",
+          "monitoring_reference",
+          "reconciliation_reference",
+          "stop_and_recovery_procedure",
+          "exact_owner_approval_phrase"
+        ]
+      },
+      "expected_values": {
+        "decision": "OWNER_INPUT_REQUIRED",
+        "canary_authority": false,
+        "task27_authority": false,
+        "execution_action": "NONE"
+      }
+    },
+    {
+      "case_id": "complete_synthetic_packet_is_review_only",
+      "kind": "packet",
+      "input": {
+        "packet_state": "READY_FOR_OWNER_EXACT_APPROVAL_NOT_EXECUTION",
+        "flow": "SOL_TO_EXACT_MEMECOIN_TO_SOL_IMMEDIATE_EXIT",
+        "total_cash_at_risk_cap_usd_cents": 300,
+        "token": "SYNTHETIC_EXACT_TOKEN",
+        "program": "SYNTHETIC_ALLOWED_PROGRAM",
+        "route": "SYNTHETIC_ALLOWED_ROUTE",
+        "wallet_public_address": "SYNTHETIC_OWNER_CONTROLLED_PUBLIC_ADDRESS",
+        "proposed_notional_usd_cents": 250,
+        "estimated_total_cost_usd_cents": 300,
+        "maximum_separate_fees_usd_cents": 1,
+        "quote_basis": "SYNTHETIC_BOUND_QUOTE_BASIS",
+        "expires_at": "SYNTHETIC_EXPIRY",
+        "monitoring_reference": "SYNTHETIC_MONITORING_REFERENCE",
+        "reconciliation_reference": "SYNTHETIC_RECONCILIATION_REFERENCE",
+        "stop_and_recovery_procedure": "SYNTHETIC_STOP_AND_RECOVERY",
+        "exact_owner_approval_phrase": "SYNTHETIC_OWNER_APPROVAL_PHRASE"
+      },
+      "expected_values": {
+        "decision": "OWNER_EXACT_APPROVAL_REQUIRED",
+        "canary_authority": false,
+        "task27_authority": false,
+        "execution_action": "NONE"
+      }
+    },
+    {
+      "case_id": "cash_cap_breach_rejected",
+      "kind": "packet",
+      "input": {
+        "packet_state": "READY_FOR_OWNER_EXACT_APPROVAL_NOT_EXECUTION",
+        "flow": "SOL_TO_EXACT_MEMECOIN_TO_SOL_IMMEDIATE_EXIT",
+        "total_cash_at_risk_cap_usd_cents": 300,
+        "token": "SYNTHETIC_EXACT_TOKEN",
+        "program": "SYNTHETIC_ALLOWED_PROGRAM",
+        "route": "SYNTHETIC_ALLOWED_ROUTE",
+        "wallet_public_address": "SYNTHETIC_OWNER_CONTROLLED_PUBLIC_ADDRESS",
+        "proposed_notional_usd_cents": 250,
+        "estimated_total_cost_usd_cents": 301,
+        "maximum_separate_fees_usd_cents": 1,
+        "quote_basis": "SYNTHETIC_BOUND_QUOTE_BASIS",
+        "expires_at": "SYNTHETIC_EXPIRY",
+        "monitoring_reference": "SYNTHETIC_MONITORING_REFERENCE",
+        "reconciliation_reference": "SYNTHETIC_RECONCILIATION_REFERENCE",
+        "stop_and_recovery_procedure": "SYNTHETIC_STOP_AND_RECOVERY",
+        "exact_owner_approval_phrase": "SYNTHETIC_OWNER_APPROVAL_PHRASE"
+      },
+      "expected_error": "cash_cap_breach"
+    },
+    {
+      "case_id": "duplicate_draft_input_rejected",
+      "kind": "packet",
+      "input": {
+        "packet_state": "DRAFT_OWNER_INPUT_REQUIRED",
+        "flow": "SOL_TO_EXACT_MEMECOIN_TO_SOL_IMMEDIATE_EXIT",
+        "total_cash_at_risk_cap_usd_cents": 300,
+        "owner_input_fields": [
+          "token",
+          "token",
+          "program",
+          "route",
+          "wallet_public_address",
+          "proposed_notional_usd_cents",
+          "maximum_separate_fees_usd_cents",
+          "quote_basis",
+          "expires_at",
+          "monitoring_reference",
+          "reconciliation_reference",
+          "stop_and_recovery_procedure",
+          "exact_owner_approval_phrase"
+        ]
+      },
+      "expected_error": "duplicate_draft_owner_input"
+    },
+    {
+      "case_id": "unknown_blocks_exit",
+      "kind": "exit_precondition",
+      "input": {
+        "terminal_state": "UNKNOWN_REQUIRES_RECONCILIATION",
+        "reconciled": false,
+        "monitoring_healthy": true,
+        "inventory_match": true,
+        "allowlist_match": true,
+        "fee_cap_ok": true
+      },
+      "expected_error": "exit_requires_landed_success_first_leg"
+    },
+    {
+      "case_id": "unreconciled_success_blocks_exit",
+      "kind": "exit_precondition",
+      "input": {
+        "terminal_state": "LANDED_SUCCESS",
+        "reconciled": false,
+        "monitoring_healthy": true,
+        "inventory_match": true,
+        "allowlist_match": true,
+        "fee_cap_ok": true
+      },
+      "expected_error": "exit_before_first_leg_reconciliation"
+    },
+    {
+      "case_id": "monitoring_loss_blocks_exit",
+      "kind": "exit_precondition",
+      "input": {
+        "terminal_state": "LANDED_SUCCESS",
+        "reconciled": true,
+        "monitoring_healthy": false,
+        "inventory_match": true,
+        "allowlist_match": true,
+        "fee_cap_ok": true
+      },
+      "expected_error": "exit_blocked_monitoring_loss"
+    },
+    {
+      "case_id": "inventory_mismatch_blocks_exit",
+      "kind": "exit_precondition",
+      "input": {
+        "terminal_state": "LANDED_SUCCESS",
+        "reconciled": true,
+        "monitoring_healthy": true,
+        "inventory_match": false,
+        "allowlist_match": true,
+        "fee_cap_ok": true
+      },
+      "expected_error": "exit_blocked_inventory_mismatch"
+    },
+    {
+      "case_id": "route_program_mismatch_blocks_exit",
+      "kind": "exit_precondition",
+      "input": {
+        "terminal_state": "LANDED_SUCCESS",
+        "reconciled": true,
+        "monitoring_healthy": true,
+        "inventory_match": true,
+        "allowlist_match": false,
+        "fee_cap_ok": true
+      },
+      "expected_error": "exit_blocked_route_program_mismatch"
+    },
+    {
+      "case_id": "fee_cap_breach_blocks_exit",
+      "kind": "exit_precondition",
+      "input": {
+        "terminal_state": "LANDED_SUCCESS",
+        "reconciled": true,
+        "monitoring_healthy": true,
+        "inventory_match": true,
+        "allowlist_match": true,
+        "fee_cap_ok": false
+      },
+      "expected_error": "exit_blocked_fee_cap_breach"
+    },
+    {
+      "case_id": "reconciled_healthy_exit_shape_only",
+      "kind": "exit_precondition",
+      "input": {
+        "terminal_state": "LANDED_SUCCESS",
+        "reconciled": true,
+        "monitoring_healthy": true,
+        "inventory_match": true,
+        "allowlist_match": true,
+        "fee_cap_ok": true
+      },
+      "expected_values": {
+        "outcome": "EXIT_LEG_SHAPE_VALIDATED_NOT_AUTHORIZED"
+      }
+    }
+  ]
+}

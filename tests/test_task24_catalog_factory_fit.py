@@ -152,8 +152,11 @@ class Task24CatalogFactoryFitTests(unittest.TestCase):
                 encoding="utf-8"
             )
         )
-        self.assertEqual(len(registry["records"]), 1)
-        row = registry["records"][0]
+        row = next(
+            record
+            for record in registry["records"]
+            if record["record_id"] == "NEGATIVE-T24-ENTITY-SIGNAL-V1-001"
+        )
         self.assertEqual(row["record_id"], "NEGATIVE-T24-ENTITY-SIGNAL-V1-001")
         self.assertEqual(row["record_kind"], "negative_result")
         self.assertEqual(row["status"], "RECORDED")

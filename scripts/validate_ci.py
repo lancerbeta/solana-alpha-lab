@@ -76,6 +76,21 @@ def git_text(
     return completed.stdout.strip()
 
 
+def normalize_tracked_only_checkout(*, branch: str, checkout: Path) -> None:
+    """Normalize only the temporary clone to the attached-main repository contract."""
+
+    remote_refs = git_text(
+        ["for-each-ref", "--format=%(refname)", "refs/remotes/origin"],
+        cwd=checkout,
+    ).splitlines()
+    if branch != "main":
+        git_text(["branch", "-m", "main"], cwd=checkout)
+    git_text(["branch", "--set-upstream-to=origin/main", "main"], cwd=checkout)
+    for ref in remote_refs:
+        if ref != "refs/remotes/origin/main":
+            git_text(["update-ref", "-d", ref], cwd=checkout)
+
+
 def parse_added_test_hunks(diff_text: str) -> list[tuple[str, list[str]]]:
     hunks: list[tuple[str, list[str]]] = []
     path: str | None = None
@@ -253,7 +268,7 @@ def run_tracked_only_delivery_preflight(*, base_ref: str = "origin/main") -> Non
                 ["update-ref", "refs/remotes/origin/main", base_commit],
                 cwd=checkout,
             )
-            git_text(["branch", "-f", "main", base_commit], cwd=checkout)
+            normalize_tracked_only_checkout(branch=branch, checkout=checkout)
             git_text(
                 [
                     "symbolic-ref",
@@ -272,6 +287,7 @@ def run_tracked_only_delivery_preflight(*, base_ref: str = "origin/main") -> Non
             environment["UV_MANAGED_PYTHON"] = "1"
             environment["UV_NO_ENV_FILE"] = "1"
             environment["UV_OFFLINE"] = "1"
+            environment["SMIAL_TRACKED_ONLY_DELIVERY"] = "1"
             environment.pop("VIRTUAL_ENV", None)
             try:
                 completed = subprocess.run(

@@ -1,0 +1,122 @@
+{
+  "accepted_result": {
+    "canary_authority": false,
+    "decision": "OWNER_INPUT_REQUIRED",
+    "execution_action": "NONE",
+    "numeric_netreturn": "FORBIDDEN",
+    "packet_state": "DRAFT_OWNER_INPUT_REQUIRED",
+    "task27_authority": false
+  },
+  "as_of": "2026-08-05",
+  "catalog": {
+    "after_assets": 544,
+    "after_lifecycle_records": 57,
+    "after_schemas": 13,
+    "after_version": "0.35.0",
+    "before_assets": 534,
+    "before_lifecycle_records": 56,
+    "before_schemas": 12,
+    "before_version": "0.34.0",
+    "registered_asset_ids": [
+      "DOC-OWNER-AUTHORITY-PACKET-001",
+      "CONTRACT-OWNER-AUTHORITY-PACKET-001",
+      "CONFIG-OWNER-AUTHORITY-PACKET-001",
+      "SCHEMA-OWNER-AUTHORITY-PACKET-001",
+      "FIXTURE-OWNER-AUTHORITY-PACKET-001",
+      "MODULE-OWNER-AUTHORITY-PACKET-001",
+      "TEST-OWNER-AUTHORITY-PACKET-001",
+      "EVIDENCE-OWNER-AUTHORITY-PACKET-A1-001",
+      "EVIDENCE-OWNER-AUTHORITY-PACKET-A2-001",
+      "TEST-OWNER-AUTHORITY-PACKET-A2-001"
+    ]
+  },
+  "confirmations": [
+    "OFFLINE_ONLY",
+    "SYNTHETIC_FIXTURES_ONLY",
+    "NO_PROVIDER_API_RPC_WSS",
+    "NO_WALLET",
+    "NO_SIGNER",
+    "NO_TRANSACTION_OR_SIGNED_BYTES",
+    "NO_SIMULATION_OR_SEND",
+    "NO_CASH_SPEND",
+    "NO_R3",
+    "NO_NUMERIC_NETRETURN",
+    "NO_TASK27",
+    "READY_DOES_NOT_GRANT_AUTHORITY"
+  ],
+  "critical_bindings": [
+    {
+      "asset_id": "CONTRACT-T26C-OWNED-CANARY-READINESS-001",
+      "path": "docs/contracts/task26c_owned_execution_canary_readiness_contract_v1.md",
+      "sha256": "161c6eb2073f0175169384eeeaa95cc5ae4464a2a0bf44a9c1ea39d521a470bc"
+    },
+    {
+      "asset_id": "EVIDENCE-T26C-A3-CATALOG-FACTORY-FIT-001",
+      "path": "docs/evidence/task26c/a3_catalog_factory_fit_v1.json",
+      "sha256": "959b70e4e0e9e4f5450db2b0a657fd7d07d87b3d096e806964477908b2e040e1"
+    },
+    {
+      "asset_id": "CONFIG-OWNER-AUTHORITY-PACKET-001",
+      "path": "configs/owner_authority_packet_binding_v1.yaml",
+      "sha256": "adf2e4848731efda561fc10362ae062470d2e96cfd47e71c8a23d2a39d3ff55e"
+    },
+    {
+      "asset_id": "EVIDENCE-OWNER-AUTHORITY-PACKET-A1-001",
+      "path": "docs/evidence/owner_authority_packet_binding/a1_offline_packet_binding_acceptance_v1.json",
+      "sha256": "da445122dd58382d18aed59487cb0f0e554f26c26b24eabbc89223256b8cec73"
+    }
+  ],
+  "factory_fit": {
+    "execution_to_cashflow": "PASS_WITH_LIMITATION: binds the owner decision before any future cash exposure but produces neither trade nor cashflow.",
+    "flexibility": "PASS: one packet and one bounded route shape; no generic execution platform is created.",
+    "mode": "FULL_REVIEW",
+    "monitoring_recovery": "PASS: UNKNOWN, missing reconciliation, monitoring loss, inventory mismatch, route/program mismatch and fee breach all block exit or retry shape.",
+    "owner_operability": "PASS_WITH_LIMITATION: the owner sees one explicit draft checklist and must separately approve one exact future action.",
+    "research_truth": "PASS: draft, review, quote, execution, landing and settlement remain distinct.",
+    "result": "PASS_WITH_FOLLOWUP",
+    "security": "PASS: no wallet, signer, secret, signed bytes or network client exists."
+  },
+  "lifecycle_decision": {
+    "decision": "OFFLINE_OWNER_PACKET_READY_NO_EXECUTION_AUTHORITY",
+    "record_id": "DECISION-OWNER-AUTHORITY-PACKET-001",
+    "status": "RECORDED"
+  },
+  "owner_packet": {
+    "all_in_cash_at_risk_cap_usd_cents": 300,
+    "required_owner_input_fields": 12,
+    "status": "DRAFT_OWNER_INPUT_REQUIRED"
+  },
+  "product_horizon_radar": {
+    "now": {
+      "activation_trigger": "Goal owner elects to supply exact synthetic-to-real packet inputs for a later separately approved canary gate.",
+      "authority": "OWNER_INPUT_REQUIRED",
+      "candidate": "EXACT_OWNER_PACKET_INPUT_AND_SEPARATE_CANARY_GATE",
+      "cost_risk": "Requires explicit owner choices and a later material approval; no execution is permitted by this task.",
+      "evidence": "TASK-26C supplied the offline readiness boundary; this packet supplies the missing exact owner-input shape.",
+      "owner": "goal_owner",
+      "value": "Makes every missing authority input visible before wallet, route or cash boundaries are considered.",
+      "why_now": "The bottleneck is one auditable owner decision, not another historical reconstruction."
+    },
+    "watch": {
+      "candidate": "TASK-27_EXECUTION_TRUTH_EVALUATION",
+      "cost_risk": "Real execution, cash and safety exposure remain forbidden.",
+      "owner": "goal_owner",
+      "trigger": "Only after one separately authorized canary has complete reconciled witness evidence and a new Entry Gate confirms its estimand.",
+      "value": "Could assess execution truth on the hypothesis-to-cashflow path.",
+      "why_not_now": "No exact owner authority or reconciled canary witness exists."
+    }
+  },
+  "receipt_sha256": "21dcd59c0f89d24172ee47728a86455879c9353a787a21863fbd041648d89f01",
+  "schema": "smial.owner-authority-packet-binding.a2-catalog-factory-fit",
+  "schema_version": "1.0",
+  "side_effect_counters": {
+    "cash_spend_usd_cents": 0,
+    "dependency_changes": 0,
+    "provider_api_rpc_wss_calls": 0,
+    "r3_paths_or_values_read": 0,
+    "transaction_build_sign_simulate_send": 0,
+    "wallet_signer_transaction_actions": 0
+  },
+  "status": "PASS_CATALOG_REGISTERED_OFFLINE_OWNER_PACKET_NO_EXECUTION_AUTHORITY",
+  "task_id": "OWNER_AUTHORITY_PACKET_BINDING_V1"
+}
