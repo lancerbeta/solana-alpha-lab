@@ -5059,6 +5059,8 @@ def validate() -> None:
         expected_file_count = ctrl_baton_a62r_expected_repository_file_count()
     elif state == "CTRL_GENERIC_PROJECT_FEATURE_INITIAL_STAGED":
         expected_file_count = len(baton_view.tracked)
+    elif state == "TRACKED_ONLY_DELIVERY_CANDIDATE":
+        expected_file_count = baton_view.head_tree_path_count
     elif state in CTRL_GENERIC_REPOSITORY_STATES:
         # Fail-closed against the actual committed tree, not historical Baton 225.
         expected_file_count = baton_view.head_tree_path_count
