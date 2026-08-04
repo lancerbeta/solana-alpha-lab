@@ -14128,7 +14128,7 @@ records:
   as_of: '2026-08-04'
   truth_owner: TASK-26A
   location: {kind: git_path, logical_uri: 'repo://tests/test_task26a_catalog_factory_fit.py', repository_path: tests/test_task26a_catalog_factory_fit.py}
-  integrity: {kind: sha256, sha256: 590f031ea93771baf346555877d27d08eb58fbb5ec78c91ab6bd22eccda6c44c}
+  integrity: {kind: sha256, sha256: cb007db23d51427d9b1d3cafcc373e5b91e3b4a5d3c39149af6adf308fef178d}
   access: *t25_read_file
   relations:
   - {relation_type: depends_on, target_asset_id: EVIDENCE-T26A-A3-CATALOG-FACTORY-FIT-001}
