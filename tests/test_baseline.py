@@ -99,7 +99,7 @@ class GitHubActionsPullRequestStateTests(unittest.TestCase):
         )
         self.assertEqual(topology, "GITHUB_ACTIONS_PR_CHECKOUT")
         self.assertEqual(
-            module.classify_github_actions_pr_state(
+            module.classify_github_actions_runtime_state(
                 github_actions=True,
                 github_repository=module.EXPECTED_GITHUB_REPOSITORY,
                 github_ref="refs/pull/41/merge",
@@ -190,7 +190,7 @@ class GitHubActionsPullRequestStateTests(unittest.TestCase):
         )
         self.assertEqual(topology, "INVALID_GIT_TOPOLOGY")
         self.assertIsNone(
-            module.classify_github_actions_pr_state(
+            module.classify_github_actions_runtime_state(
                 github_actions=True,
                 github_repository=module.EXPECTED_GITHUB_REPOSITORY,
                 github_ref="refs/pull/41/merge",
@@ -206,6 +206,22 @@ class GitHubActionsPullRequestStateTests(unittest.TestCase):
 
 
 class GitHubActionsMainStateTests(unittest.TestCase):
+    def test_classifies_clean_full_depth_main_checkout_as_runtime_candidate(self) -> None:
+        state = module.classify_github_actions_runtime_state(
+            github_actions=True,
+            github_repository=module.EXPECTED_GITHUB_REPOSITORY,
+            github_ref="refs/heads/main",
+            github_sha="a" * 40,
+            branch=None,
+            head_oid="a" * 40,
+            topology="GITHUB_ACTIONS_CHECKOUT",
+            staged=set(),
+            untracked=set(),
+            unstaged=set(),
+        )
+
+        self.assertEqual("GITHUB_ACTIONS_MAIN_CANDIDATE", state)
+
     def test_accepts_fetch_depth_zero_origin_inventory_for_main_checkout(self) -> None:
         remote_tracking_refs = {
             "origin/HEAD",
@@ -254,6 +270,22 @@ class GitHubActionsMainStateTests(unittest.TestCase):
             github_sha="a" * 40,
         )
         self.assertEqual(topology, "INVALID_GIT_TOPOLOGY")
+
+    def test_rejects_dirty_main_checkout(self) -> None:
+        self.assertIsNone(
+            module.classify_github_actions_runtime_state(
+                github_actions=True,
+                github_repository=module.EXPECTED_GITHUB_REPOSITORY,
+                github_ref="refs/heads/main",
+                github_sha="a" * 40,
+                branch=None,
+                head_oid="a" * 40,
+                topology="GITHUB_ACTIONS_CHECKOUT",
+                staged=set(),
+                untracked={"local/receipt.json"},
+                unstaged=set(),
+            )
+        )
 
 
 class RepositoryStatePolicyTests(unittest.TestCase):

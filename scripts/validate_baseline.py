@@ -868,6 +868,7 @@ CURRENT_RUNTIME_CONTRACT_STATES = (
     | CTRL_GENERIC_REPOSITORY_STATES
     | {
         "TRACKED_ONLY_DELIVERY_CANDIDATE",
+        "GITHUB_ACTIONS_MAIN_CANDIDATE",
         "GITHUB_ACTIONS_PR_CANDIDATE",
     }
 )
@@ -3520,7 +3521,13 @@ def classify_tracked_only_delivery_state(
     return None
 
 
-def classify_github_actions_pr_state(
+GITHUB_ACTIONS_RUNTIME_STATE_TOPOLOGY = {
+    "GITHUB_ACTIONS_MAIN_CANDIDATE": "GITHUB_ACTIONS_CHECKOUT",
+    "GITHUB_ACTIONS_PR_CANDIDATE": "GITHUB_ACTIONS_PR_CHECKOUT",
+}
+
+
+def classify_github_actions_runtime_state(
     *,
     github_actions: bool,
     github_repository: str | None,
@@ -3533,19 +3540,33 @@ def classify_github_actions_pr_state(
     untracked: set[str],
     unstaged: set[str],
 ) -> str | None:
-    """Recognize only a clean GitHub pull-request merge checkout."""
+    """Recognize only clean GitHub Actions main or pull-request checkouts."""
 
-    if (
+    common_runtime_contract = (
         github_actions
         and github_repository == EXPECTED_GITHUB_REPOSITORY
-        and re.fullmatch(r"refs/pull/[1-9][0-9]*/merge", github_ref or "")
         and github_sha == head_oid
         and re.fullmatch(r"[0-9a-f]{40}", head_oid) is not None
-        and branch is None
-        and topology == "GITHUB_ACTIONS_PR_CHECKOUT"
         and not staged
         and not untracked
         and not unstaged
+    )
+    if not common_runtime_contract:
+        return None
+    if (
+        github_ref == "refs/heads/main"
+        and branch in {None, "main"}
+        and topology == GITHUB_ACTIONS_RUNTIME_STATE_TOPOLOGY[
+            "GITHUB_ACTIONS_MAIN_CANDIDATE"
+        ]
+    ):
+        return "GITHUB_ACTIONS_MAIN_CANDIDATE"
+    if (
+        re.fullmatch(r"refs/pull/[1-9][0-9]*/merge", github_ref or "")
+        and branch is None
+        and topology == GITHUB_ACTIONS_RUNTIME_STATE_TOPOLOGY[
+            "GITHUB_ACTIONS_PR_CANDIDATE"
+        ]
     ):
         return "GITHUB_ACTIONS_PR_CANDIDATE"
     return None
@@ -4887,7 +4908,7 @@ def validate() -> None:
         untracked=untracked,
         unstaged=unstaged,
     )
-    github_actions_pr_state = classify_github_actions_pr_state(
+    github_actions_runtime_state = classify_github_actions_runtime_state(
         github_actions=github_actions,
         github_repository=os.environ.get("GITHUB_REPOSITORY"),
         github_ref=os.environ.get("GITHUB_REF"),
@@ -4911,8 +4932,8 @@ def validate() -> None:
     elif (baton_state, baton_topology) in CTRL_BATON_OR_GENERIC_LIFECYCLE_COMBINATIONS:
         state = baton_state
         topology = baton_topology
-    elif github_actions_pr_state is not None:
-        state = github_actions_pr_state
+    elif github_actions_runtime_state is not None:
+        state = github_actions_runtime_state
         topology = legacy_topology
     else:
         assert_check(
@@ -4949,6 +4970,7 @@ def validate() -> None:
         "ATOM7_SINGLE_BRANCH_REFSPEC_REPAIR_STAGED",
         "ATOM7_SINGLE_BRANCH_REFSPEC_REPAIR_COMMITTED",
         "TRACKED_ONLY_DELIVERY_CANDIDATE",
+        "GITHUB_ACTIONS_MAIN_CANDIDATE",
         "GITHUB_ACTIONS_PR_CANDIDATE",
     } | (
         TASK04_REPOSITORY_STATES
@@ -4963,10 +4985,10 @@ def validate() -> None:
     assert_check("repository_state", state in valid_states, state)
     if state == "TRACKED_ONLY_DELIVERY_CANDIDATE":
         assert_check("tracked_only_delivery_topology", topology == "CLEAN_CLONE", topology)
-    if state == "GITHUB_ACTIONS_PR_CANDIDATE":
+    if state in GITHUB_ACTIONS_RUNTIME_STATE_TOPOLOGY:
         assert_check(
-            "github_actions_pr_topology",
-            topology == "GITHUB_ACTIONS_PR_CHECKOUT",
+            "github_actions_runtime_topology",
+            topology == GITHUB_ACTIONS_RUNTIME_STATE_TOPOLOGY[state],
             topology,
         )
     if state in CTRL_BATON_A62_REPOSITORY_STATES:
@@ -5182,6 +5204,7 @@ def validate() -> None:
         expected_file_count = len(baton_view.tracked)
     elif state in {
         "TRACKED_ONLY_DELIVERY_CANDIDATE",
+        "GITHUB_ACTIONS_MAIN_CANDIDATE",
         "GITHUB_ACTIONS_PR_CANDIDATE",
     }:
         expected_file_count = baton_view.head_tree_path_count
