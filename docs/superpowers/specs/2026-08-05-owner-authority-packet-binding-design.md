@@ -1,5 +1,5 @@
 ---
-title: Owner Authority Packet Binding v1 — approved design
+title: Owner Authority Packet Binding v1 — одобренный дизайн
 status: DESIGN_APPROVED_PENDING_USER_SPEC_REVIEW
 candidate_task_id: OWNER_AUTHORITY_PACKET_BINDING_V1
 as_of: 2026-08-05
@@ -11,121 +11,127 @@ wallet_signer_transaction_actions: 0
 cash_spend_usd_cents: 0
 ---
 
-# Owner Authority Packet Binding v1 — design
+# Owner Authority Packet Binding v1 — дизайн
 
-## Decision this design supports
+## Какое решение поддерживает этот дизайн
 
-The goal owner may later decide whether one bounded technical DEX canary is
-specified precisely enough to review. This document does not grant that
-authority, create a wallet, connect a signer, obtain a quote, build a
-transaction, spend money, or begin TASK-27.
+Владелец цели позже сможет решить, достаточно ли точно описан один
+ограниченный технический DEX-canary для рассмотрения. Этот документ не даёт
+такого разрешения, не создаёт кошелёк, не подключает signer, не получает
+котировку, не строит транзакцию, не тратит деньги и не начинает TASK-27.
 
-## Agreed future canary shape
+## Согласованная форма будущего canary
 
-The future technical canary is a two-leg, owner-operated round trip:
+Будущий технический canary — это двухэтапный круговой маршрут, которым
+управляет владелец:
 
 ```text
 SOL -> one exact memecoin -> SOL
 ```
 
-The second leg is an immediate exit for execution verification, not a trading
-hold. It may begin only after the first leg is terminally observed and its
-token/SOL inventory has been reconciled. An `UNKNOWN`, failed reconciliation,
-unexpected balance delta, monitoring loss, route mismatch, or cap breach stops
-the sequence; it never causes an automatic retry or an improvised exit.
+Второй этап — немедленный выход для проверки исполнения, а не удержание позиции
+ради торговли. Он может начаться только после финального наблюдения первого
+этапа и сверки token/SOL inventory. `UNKNOWN`, неудачная сверка, неожиданное
+изменение баланса, потеря monitoring, несовпадение route или превышение лимита
+останавливают последовательность; они никогда не вызывают автоматический retry
+или импровизированный выход.
 
-The owner-selected all-in cash-at-risk cap is **USD 3.00**. At future execution
-time this cap must include input notional, network fees, relay or priority fees,
-ATA rent, and every other separately charged amount. If a fresh, recorded
-preflight cannot prove the proposed sequence is within the cap, the canary is
-rejected before the first send.
+Выбранный владельцем all-in лимит cash-at-risk — **USD 3.00**. Во время
+будущего исполнения он обязан включать input notional, network fees, relay или
+priority fees, ATA rent и любое другое отдельное списание. Если свежий
+зафиксированный preflight не может доказать, что предложенная последовательность
+укладывается в лимит, canary отклоняется до первой отправки.
 
-## Chosen approach
+## Выбранный подход
 
-Use a manually created, dedicated technical wallet only after a separately
-approved owner packet. The owner controls it through an ordinary wallet
-application and manually confirms any later action. It must not be the owner's
-main asset-holding wallet, and its seed phrase or private key must never enter
-chat, repository, logs, URLs, or project files.
+Использовать вручную созданный отдельный технический кошелёк только после
+отдельно одобренного owner-packet. Владелец управляет им через обычное
+wallet-приложение и вручную подтверждает каждое будущее действие. Это не должен
+быть основной кошелёк владельца с активами; seed phrase и private key никогда
+не попадают в чат, репозиторий, логи, URL или файлы проекта.
 
-This is deliberately narrower than an automated isolated signer. Automation
-would add a new key-handling and deployment boundary before the project has
-even observed one reconciled route. A main wallet is rejected because it mixes
-the bounded canary with unrelated assets and risk.
+Это намеренно уже, чем автоматизированный isolated signer. Автоматизация добавит
+новую границу работы с ключами и deployment до того, как проект увидит хотя бы
+один сверенный маршрут. Основной кошелёк отвергнут: он смешивает ограниченный
+canary с несвязанными активами и риском.
 
-## Packet contract to implement after this design review
+## Контракт packet, который будет реализован после review этого дизайна
 
-The future offline binding artifact must have two states.
+Будущий offline binding-артефакт обязан иметь два состояния.
 
 1. `DRAFT_OWNER_INPUT_REQUIRED`
-   - Records the agreed flow, immediate-exit rule, and USD 3.00 proposed cap.
-   - Keeps `token`, `program`, `route`, wallet public address, exact notional,
-     maximum separate fees, quote basis, expiry, and stop/recovery procedure as
-     explicit `OWNER_INPUT_REQUIRED` values.
-   - Is never executable and must be rejected by the validator as authority.
+   - Хранит согласованный маршрут, правило немедленного выхода и предложенный
+     лимит USD 3.00.
+   - Оставляет `token`, `program`, `route`, публичный адрес кошелька, точный
+     notional, максимум отдельных fees, quote basis, срок действия и процедуру
+     stop/recovery явными значениями `OWNER_INPUT_REQUIRED`.
+   - Никогда не является исполнимым и должен отвергаться validator'ом как
+     authority.
 
 2. `READY_FOR_OWNER_EXACT_APPROVAL_NOT_EXECUTION`
-   - Exists only when every required field is bound to one canary ID.
-   - Contains the exact action, token mint, program, route, proposed notional,
-     all-in cap, maximum separately charged fees, expected inventories before
-     and after each leg, monitoring/reconciliation references, expiry, and the
-     exact owner approval phrase.
-   - Remains a review packet. A separate explicit approval is still required
-     before any wallet creation, funding, quote request, signer use,
-     transaction, provider call, or cash action.
+   - Существует, только когда каждое обязательное поле связано с одним
+     canary ID.
+   - Содержит exact action, token mint, program, route, proposed notional,
+     all-in cap, максимум отдельных fees, ожидаемые inventory до и после
+     каждого этапа, ссылки на monitoring/reconciliation, срок действия и
+     точную фразу owner approval.
+   - Остаётся packet для review. Перед созданием или funding кошелька,
+     запросом котировки, использованием signer, транзакцией, provider call
+     или cash-action всё равно требуется отдельное явное одобрение.
 
-Missing values are not defaults. They must remain visible as
-`OWNER_INPUT_REQUIRED`; a validator must reject missing, zero-substituted, or
-ambiguous fields.
+Отсутствующие значения — не значения по умолчанию. Они должны оставаться
+видимыми как `OWNER_INPUT_REQUIRED`; validator обязан отвергать отсутствующие,
+подменённые нулём или неоднозначные поля.
 
-## Future execution sequence — not authorized by this design
+## Будущая последовательность исполнения — не разрешена этим дизайном
 
-1. Re-run a fresh Entry Gate for the exact token/program/route and current
-   execution conditions.
-2. Bind the final packet and obtain the owner's exact one-time approval.
-3. The owner creates and funds a dedicated wallet outside this project, within
-   the approved cap, without disclosing secret material.
-4. Perform the first leg only if health, monitoring, quote freshness, allowlist,
-   and cap checks pass.
-5. Reconcile the first leg. `UNKNOWN` blocks retry and the planned exit until
-   reconciliation resolves the actual inventory and fees.
-6. Perform the immediate exit only when the first leg is reconciled and every
-   health/cap/inventory rule still passes.
-7. Reconcile the full round trip and retain the witness. Only then can a new
-   Entry Gate assess whether TASK-27 is admissible.
+1. Повторно выполнить свежий Entry Gate для exact token/program/route и текущих
+   условий исполнения.
+2. Связать финальный packet и получить точное одноразовое approval владельца.
+3. Владелец создаёт и пополняет отдельный кошелёк вне проекта, в пределах
+   одобренного лимита и без раскрытия секретного материала.
+4. Выполнить первый этап, только если прошли health, monitoring, quote
+   freshness, allowlist и cap checks.
+5. Провести reconciliation первого этапа. `UNKNOWN` блокирует retry и
+   запланированный выход, пока reconciliation не установит фактические
+   inventory и fees.
+6. Выполнить немедленный выход, только когда первый этап reconciled и все
+   health/cap/inventory правила по-прежнему проходят.
+7. Провести reconciliation полного round-trip и сохранить witness. Лишь после
+   этого новый Entry Gate может оценить допустимость TASK-27.
 
-## Proposed bounded implementation
+## Предлагаемая ограниченная реализация
 
-After user review of this design, implement only an offline binding contract,
-schema, synthetic fixture, deterministic validator, adversarial tests, and
-Catalog transaction. The validator will cover at least:
+После user review этого дизайна реализовать только offline binding contract,
+schema, synthetic fixture, deterministic validator, adversarial tests и Catalog
+transaction. Validator как минимум покроет:
 
-- a draft with intentionally missing owner inputs;
-- a complete packet that remains non-executable;
-- USD 3.00 cap and separate-fee accounting requirements;
-- no token/program/route substitution;
-- immediate-exit only after first-leg reconciliation;
-- block on `UNKNOWN`, monitoring loss, inventory mismatch, route mismatch, or
-  cap breach;
-- no wallet, seed, private key, signed bytes, provider/API/RPC/WSS call, or
-  transaction path.
+- draft с намеренно отсутствующими owner inputs;
+- complete packet, остающийся неисполняемым;
+- требования USD 3.00 cap и учёта отдельных fees;
+- запрет подмены token/program/route;
+- immediate exit только после reconciliation первого этапа;
+- блокировку при `UNKNOWN`, потере monitoring, inventory mismatch, route
+  mismatch или cap breach;
+- отсутствие wallet, seed, private key, signed bytes, provider/API/RPC/WSS
+  call или transaction path.
 
-No generic execution platform, provider adapter, wallet connector, signer,
-price feed, deployment, or strategy logic is in scope.
+Generic execution platform, provider adapter, wallet connector, signer, price
+feed, deployment и strategy logic — вне scope.
 
-## Definition of done for the later implementation task
+## Definition of Done будущей implementation-задачи
 
-The offline packet has a versioned contract and schema; deterministic tests
-prove that incomplete or unsafe packets cannot appear ready; Catalog and
-generated consumers describe the new assets; and acceptance evidence records
-zero external, wallet, signer, transaction, and cash side effects. The result
-must retain `TASK-27_authority=false`.
+Offline packet имеет versioned contract и schema; deterministic tests доказывают,
+что неполные или небезопасные packet не могут выглядеть готовыми; Catalog и
+generated consumers описывают новые assets; а acceptance evidence фиксирует
+ноль external, wallet, signer, transaction и cash side effects. Результат
+обязан сохранить `TASK-27_authority=false`.
 
-## Review checklist
+## Чек-лист review
 
-- The USD 3.00 cap is a ceiling, not a permission to spend.
-- The round trip is execution verification, not an alpha trade.
-- The dedicated technical wallet is a future user-only action, not an output
-  of this task.
-- Every unknown is explicit and fail-closed.
-- No wording grants canary or TASK-27 authority.
+- Лимит USD 3.00 — потолок, а не разрешение тратить.
+- Round-trip — проверка исполнения, а не alpha trade.
+- Отдельный технический кошелёк — будущее user-only действие, а не output этой
+  задачи.
+- Каждая неизвестность явная и fail-closed.
+- Ни одна формулировка не даёт authority для canary или TASK-27.
