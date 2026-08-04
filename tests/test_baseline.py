@@ -205,6 +205,57 @@ class GitHubActionsPullRequestStateTests(unittest.TestCase):
         )
 
 
+class GitHubActionsMainStateTests(unittest.TestCase):
+    def test_accepts_fetch_depth_zero_origin_inventory_for_main_checkout(self) -> None:
+        remote_tracking_refs = {
+            "origin/HEAD",
+            "origin/main",
+            "origin/owner-authority-packet-binding",
+        }
+        topology = module.classify_git_topology(
+            branch=None,
+            head_oid="a" * 40,
+            remotes={"origin"},
+            fetch_urls=("https://github.com/lancerbeta/solana-alpha-lab",),
+            push_urls=("https://github.com/lancerbeta/solana-alpha-lab",),
+            fetch_refspecs=(module.EXPECTED_ORIGIN_FETCH_REFSPEC,),
+            push_refspecs=(),
+            upstream=None,
+            local_branches=set(),
+            remote_tracking_refs=remote_tracking_refs,
+            tags=set(),
+            all_refs={f"refs/remotes/{ref}" for ref in remote_tracking_refs},
+            github_actions=True,
+            github_repository=module.EXPECTED_GITHUB_REPOSITORY,
+            github_ref="refs/heads/main",
+            github_sha="a" * 40,
+            remote_head_target="refs/remotes/origin/main",
+        )
+        self.assertEqual(topology, "GITHUB_ACTIONS_CHECKOUT")
+
+    def test_rejects_pull_ref_in_full_depth_main_checkout(self) -> None:
+        remote_tracking_refs = {"origin/main", "pull/41/merge"}
+        topology = module.classify_git_topology(
+            branch=None,
+            head_oid="a" * 40,
+            remotes={"origin"},
+            fetch_urls=("https://github.com/lancerbeta/solana-alpha-lab",),
+            push_urls=("https://github.com/lancerbeta/solana-alpha-lab",),
+            fetch_refspecs=(module.EXPECTED_ORIGIN_FETCH_REFSPEC,),
+            push_refspecs=(),
+            upstream=None,
+            local_branches=set(),
+            remote_tracking_refs=remote_tracking_refs,
+            tags=set(),
+            all_refs={f"refs/remotes/{ref}" for ref in remote_tracking_refs},
+            github_actions=True,
+            github_repository=module.EXPECTED_GITHUB_REPOSITORY,
+            github_ref="refs/heads/main",
+            github_sha="a" * 40,
+        )
+        self.assertEqual(topology, "INVALID_GIT_TOPOLOGY")
+
+
 class RepositoryStatePolicyTests(unittest.TestCase):
     def classify_atom5(self, **overrides: object) -> str:
         arguments = {

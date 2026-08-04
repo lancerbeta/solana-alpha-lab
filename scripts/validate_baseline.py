@@ -3359,17 +3359,23 @@ def classify_git_topology(
             and origin_url_is_safe(fetch_urls[0], github_actions=True)
         )
         main_origin_identity_ok = (
-            origin_identity_common_ok and remote_head_target is None
+            origin_identity_common_ok
+            and remote_head_target in {None, "refs/remotes/origin/main"}
         )
         refspec_policy_ok = fetch_refspecs == (
             EXPECTED_ORIGIN_FETCH_REFSPEC,
         )
+        expected_main_refs = {
+            f"refs/remotes/{ref}" for ref in remote_tracking_refs
+        }
+        if "main" in local_branches:
+            expected_main_refs.add("refs/heads/main")
         refs_ok = (
             branch in {None, "main"}
             and local_branches <= {"main"}
-            and remote_tracking_refs <= {"origin/main"}
-            and repository_refs
-            <= {"refs/heads/main", "refs/remotes/origin/main"}
+            and "origin/main" in remote_tracking_refs
+            and all(ref.startswith("origin/") for ref in remote_tracking_refs)
+            and repository_refs == expected_main_refs
         )
         upstream_ok = (
             (branch is None and upstream is None)
