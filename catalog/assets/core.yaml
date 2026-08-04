@@ -13853,3 +13853,286 @@ records:
   consumers: [TASK-26]
   evidence: []
   classification: *t25_internal
+- asset_id: DOC-T26A-TASK-001
+  record_version: '1.0'
+  asset_type: control_document
+  purpose: TASK-26A execution-evidence completion task scaffold and non-claim boundary.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-08-04'
+  truth_owner: TASK-26A
+  location: {kind: git_path, logical_uri: 'repo://docs/tasks/TASK-26A-execution-evidence-completion.md', repository_path: docs/tasks/TASK-26A-execution-evidence-completion.md}
+  integrity: {kind: sha256, sha256: eec0d9c1f3884413954cf2f51a4c5a37343cd3b3db37aca457f789b42227cc67}
+  access: *t25_read_file
+  relations:
+  - {relation_type: derived_from, target_asset_id: EVIDENCE-T26-A7-CATALOG-FACTORY-FIT-001}
+  consumers: [TASK-26A, FACTORY-001]
+  evidence: []
+  classification: *t25_internal
+
+- asset_id: CONTRACT-T26A-EXECUTION-EVIDENCE-001
+  record_version: '1.0'
+  asset_type: control_document
+  purpose: Frozen TASK-26A execution-evidence completion contract and NetReturn eligibility vocabulary.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-08-04'
+  truth_owner: TASK-26A
+  location: {kind: git_path, logical_uri: 'repo://docs/contracts/task26a_execution_evidence_completion_contract_v1.md', repository_path: docs/contracts/task26a_execution_evidence_completion_contract_v1.md}
+  integrity: {kind: sha256, sha256: 218519777231189ca372f98462bbd3cf182de6c332c18766e968d0143e9c128b}
+  access: *t25_read_file
+  relations:
+  - {relation_type: derived_from, target_asset_id: CONTRACT-T26-EXECUTION-COST-NETRETURN-001}
+  - {relation_type: derived_from, target_asset_id: EVIDENCE-T26-A7-CATALOG-FACTORY-FIT-001}
+  consumers: [TASK-26A, TASK-27, FACTORY-001]
+  evidence: []
+  classification: *t25_internal
+
+- asset_id: CONFIG-T26A-EXECUTION-EVIDENCE-001
+  record_version: '1.0'
+  asset_type: configuration
+  purpose: Machine-readable TASK-26A evidence-completion contract, bindings and adversarial policy.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-08-04'
+  truth_owner: TASK-26A
+  location: {kind: git_path, logical_uri: 'repo://configs/task26a_execution_evidence_completion_contract_v1.yaml', repository_path: configs/task26a_execution_evidence_completion_contract_v1.yaml}
+  integrity: {kind: sha256, sha256: fe3d4150613125f92d7c7233e0a3f0086ddb2394619a01abd861c4aba55286b5}
+  access: *t25_read_file
+  relations:
+  - {relation_type: governed_by, target_asset_id: CONTRACT-T26A-EXECUTION-EVIDENCE-001}
+  consumers: [TASK-26A, FACTORY-001]
+  evidence: []
+  classification: *t25_internal
+
+- asset_id: SCHEMA-T26A-EXECUTION-EVIDENCE-001
+  record_version: '1.0'
+  asset_type: schema
+  purpose: JSON Schema for TASK-26A tracked-only execution-evidence inventory records.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-08-04'
+  truth_owner: TASK-26A
+  location: {kind: git_path, logical_uri: 'repo://catalog/schemas/task26a_execution_evidence_completion.schema.json', repository_path: catalog/schemas/task26a_execution_evidence_completion.schema.json}
+  integrity: {kind: sha256, sha256: c09a048f26fb0b89c007535079b4bc6aa690f83d53144c04ea69b22fd798b390}
+  access: *t25_read_file
+  relations:
+  - {relation_type: governed_by, target_asset_id: CONTRACT-T26A-EXECUTION-EVIDENCE-001}
+  consumers: [TASK-26A, FACTORY-001]
+  evidence: []
+  classification: *t25_internal
+
+- asset_id: MODULE-T26A-EXECUTION-EVIDENCE-INVENTORY-001
+  record_version: '1.0'
+  asset_type: script
+  purpose: Deterministic tracked-only TASK-26A execution-evidence inventory and gap matrix builder.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-08-04'
+  truth_owner: TASK-26A
+  location: {kind: git_path, logical_uri: 'repo://src/solana_alpha_lab/task26a_execution_evidence_inventory.py', repository_path: src/solana_alpha_lab/task26a_execution_evidence_inventory.py}
+  integrity: {kind: sha256, sha256: 1c81babaa5f2d07e9a8ab7e2748c44546a61e3f75e217e6204b2257f336d7698}
+  access: *t25_read_file
+  relations:
+  - {relation_type: governed_by, target_asset_id: CONFIG-T26A-EXECUTION-EVIDENCE-001}
+  - {relation_type: produces, target_asset_id: EVIDENCE-T26A-A1-INVENTORY-001}
+  consumers: [TASK-26A]
+  evidence: []
+  classification: *t25_internal
+
+- asset_id: MODULE-T26A-ADVERSARIAL-ACCEPTANCE-001
+  record_version: '1.0'
+  asset_type: script
+  purpose: Adversarial acceptance runner for TASK-26A inventory false-positive mutations.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-08-04'
+  truth_owner: TASK-26A
+  location: {kind: git_path, logical_uri: 'repo://src/solana_alpha_lab/task26a_adversarial_acceptance.py', repository_path: src/solana_alpha_lab/task26a_adversarial_acceptance.py}
+  integrity: {kind: sha256, sha256: f186eec0ef7a4a2d49d508cc1e3e96cb26fcee2c36e1374c1aac338ce772f371}
+  access: *t25_read_file
+  relations:
+  - {relation_type: depends_on, target_asset_id: MODULE-T26A-EXECUTION-EVIDENCE-INVENTORY-001}
+  - {relation_type: produces, target_asset_id: EVIDENCE-T26A-A2-ADVERSARIAL-001}
+  consumers: [TASK-26A]
+  evidence: []
+  classification: *t25_internal
+
+- asset_id: FIXTURE-T26A-EXECUTION-EVIDENCE-INVENTORY-001
+  record_version: '1.0'
+  asset_type: evidence
+  purpose: Frozen fixture copy of TASK-26A tracked-only execution-evidence inventory.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-08-04'
+  truth_owner: TASK-26A
+  location: {kind: git_path, logical_uri: 'repo://tests/fixtures/task26a/execution_evidence_inventory_v1.json', repository_path: tests/fixtures/task26a/execution_evidence_inventory_v1.json}
+  integrity: {kind: sha256, sha256: ce97c1aa4cb4fc43d6cdb588728885d1175474f3872b678894ec3b19d0b2e681}
+  access: *t25_read_file
+  relations:
+  - {relation_type: derived_from, target_asset_id: CONFIG-T26A-EXECUTION-EVIDENCE-001}
+  consumers: [TASK-26A]
+  evidence: []
+  classification: *t25_internal
+
+- asset_id: FIXTURE-T26A-EXECUTION-EVIDENCE-ADVERSARIAL-MATRIX-001
+  record_version: '1.0'
+  asset_type: evidence
+  purpose: Frozen adversarial mutation matrix for TASK-26A evidence-completion rejects.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-08-04'
+  truth_owner: TASK-26A
+  location: {kind: git_path, logical_uri: 'repo://tests/fixtures/task26a/execution_evidence_adversarial_matrix_v1.json', repository_path: tests/fixtures/task26a/execution_evidence_adversarial_matrix_v1.json}
+  integrity: {kind: sha256, sha256: ad4c2a94c931d8bc0e7fa68745de67adc81e7db24ddf88449616a1aa89cde6be}
+  access: *t25_read_file
+  relations:
+  - {relation_type: derived_from, target_asset_id: CONFIG-T26A-EXECUTION-EVIDENCE-001}
+  consumers: [TASK-26A]
+  evidence: []
+  classification: *t25_internal
+
+- asset_id: TEST-T26A-EXECUTION-EVIDENCE-CONTRACT-001
+  record_version: '1.0'
+  asset_type: script
+  purpose: Hash-bound tests for TASK-26A contract, schema, fixture and authority boundaries.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-08-04'
+  truth_owner: TASK-26A
+  location: {kind: git_path, logical_uri: 'repo://tests/test_task26a_execution_evidence_completion_contract.py', repository_path: tests/test_task26a_execution_evidence_completion_contract.py}
+  integrity: {kind: sha256, sha256: b7660d32beb22d3ad165a6ec9d41db6046d95bc860afb8ef88f8d9c1c3415512}
+  access: *t25_read_file
+  relations:
+  - {relation_type: depends_on, target_asset_id: CONFIG-T26A-EXECUTION-EVIDENCE-001}
+  - {relation_type: depends_on, target_asset_id: SCHEMA-T26A-EXECUTION-EVIDENCE-001}
+  - {relation_type: depends_on, target_asset_id: FIXTURE-T26A-EXECUTION-EVIDENCE-INVENTORY-001}
+  consumers: [TASK-26A]
+  evidence: []
+  classification: *t25_internal
+
+- asset_id: TEST-T26A-EXECUTION-EVIDENCE-INVENTORY-001
+  record_version: '1.0'
+  asset_type: script
+  purpose: Tests for TASK-26A deterministic inventory, gap matrix and zero side-effect counters.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-08-04'
+  truth_owner: TASK-26A
+  location: {kind: git_path, logical_uri: 'repo://tests/test_task26a_execution_evidence_inventory.py', repository_path: tests/test_task26a_execution_evidence_inventory.py}
+  integrity: {kind: sha256, sha256: e28d7f3bd50072417eed372f9588bcc46fe0f51d829f8c03f57e8603867a6a07}
+  access: *t25_read_file
+  relations:
+  - {relation_type: depends_on, target_asset_id: MODULE-T26A-EXECUTION-EVIDENCE-INVENTORY-001}
+  - {relation_type: depends_on, target_asset_id: EVIDENCE-T26A-A1-INVENTORY-001}
+  consumers: [TASK-26A]
+  evidence: []
+  classification: *t25_internal
+
+- asset_id: TEST-T26A-ADVERSARIAL-ACCEPTANCE-001
+  record_version: '1.0'
+  asset_type: script
+  purpose: Tests that TASK-26A adversarial mutations reject false NetReturn promotions.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-08-04'
+  truth_owner: TASK-26A
+  location: {kind: git_path, logical_uri: 'repo://tests/test_task26a_adversarial_acceptance.py', repository_path: tests/test_task26a_adversarial_acceptance.py}
+  integrity: {kind: sha256, sha256: 64f32b38c374540759c8f640251ece0dcc03c094281e74c86c084ecbc9a25062}
+  access: *t25_read_file
+  relations:
+  - {relation_type: depends_on, target_asset_id: MODULE-T26A-ADVERSARIAL-ACCEPTANCE-001}
+  - {relation_type: depends_on, target_asset_id: FIXTURE-T26A-EXECUTION-EVIDENCE-ADVERSARIAL-MATRIX-001}
+  consumers: [TASK-26A]
+  evidence: []
+  classification: *t25_internal
+
+- asset_id: EVIDENCE-T26A-A1-INVENTORY-001
+  record_version: '1.0'
+  asset_type: evidence
+  purpose: Deterministic tracked-only TASK-26A execution-evidence inventory and gap matrix.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-08-04'
+  truth_owner: TASK-26A
+  location: {kind: git_path, logical_uri: 'repo://docs/evidence/task26a/a1_execution_evidence_inventory_v1.json', repository_path: docs/evidence/task26a/a1_execution_evidence_inventory_v1.json}
+  integrity: {kind: sha256, sha256: ce97c1aa4cb4fc43d6cdb588728885d1175474f3872b678894ec3b19d0b2e681}
+  access: *t25_read_file
+  relations:
+  - {relation_type: derived_from, target_asset_id: MODULE-T26A-EXECUTION-EVIDENCE-INVENTORY-001}
+  - {relation_type: derived_from, target_asset_id: EVIDENCE-T26-A7-CATALOG-FACTORY-FIT-001}
+  consumers: [TASK-26A, FACTORY-001]
+  evidence: []
+  classification: *t25_internal
+
+- asset_id: EVIDENCE-T26A-A1-ACCEPTANCE-001
+  record_version: '1.0'
+  asset_type: evidence
+  purpose: TASK-26A A1 acceptance receipt for tracked-only inventory and EXTEND_EXECUTION_EVIDENCE.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-08-04'
+  truth_owner: TASK-26A
+  location: {kind: git_path, logical_uri: 'repo://docs/evidence/task26a/a1_execution_evidence_inventory_acceptance_v1.json', repository_path: docs/evidence/task26a/a1_execution_evidence_inventory_acceptance_v1.json}
+  integrity: {kind: sha256, sha256: 31f574ef219cc290f85d8905cf77d0ca64624ba67c631966904739a361c0733e}
+  access: *t25_read_file
+  relations:
+  - {relation_type: derived_from, target_asset_id: EVIDENCE-T26A-A1-INVENTORY-001}
+  - {relation_type: validated_by, target_asset_id: TEST-T26A-EXECUTION-EVIDENCE-INVENTORY-001}
+  consumers: [TASK-26A, FACTORY-001]
+  evidence: []
+  classification: *t25_internal
+
+- asset_id: EVIDENCE-T26A-A2-ADVERSARIAL-001
+  record_version: '1.0'
+  asset_type: evidence
+  purpose: TASK-26A A2 adversarial acceptance receipt rejecting false NetReturn promotions.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-08-04'
+  truth_owner: TASK-26A
+  location: {kind: git_path, logical_uri: 'repo://docs/evidence/task26a/a2_adversarial_acceptance_v1.json', repository_path: docs/evidence/task26a/a2_adversarial_acceptance_v1.json}
+  integrity: {kind: sha256, sha256: 9719478b099d3736d7063f41710cfb6ea118eeaeb5eaa8f9d2c584409c14a051}
+  access: *t25_read_file
+  relations:
+  - {relation_type: derived_from, target_asset_id: EVIDENCE-T26A-A1-INVENTORY-001}
+  - {relation_type: validated_by, target_asset_id: TEST-T26A-ADVERSARIAL-ACCEPTANCE-001}
+  consumers: [TASK-26A, FACTORY-001]
+  evidence: []
+  classification: *t25_internal
+
+- asset_id: EVIDENCE-T26A-A3-CATALOG-FACTORY-FIT-001
+  record_version: '1.0'
+  asset_type: evidence
+  purpose: TASK-26A A3 Catalog transaction and Factory Fit receipt for execution-evidence completion.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-08-04'
+  truth_owner: TASK-26A
+  location: {kind: git_path, logical_uri: 'repo://docs/evidence/task26a/a3_catalog_factory_fit_v1.json', repository_path: docs/evidence/task26a/a3_catalog_factory_fit_v1.json}
+  integrity: {kind: sha256, sha256: cb33b0081339d2d3bddd62d4354965cbbcecc902c1c58c66a3d2770a942aeb59}
+  access: *t25_read_file
+  relations:
+  - {relation_type: derived_from, target_asset_id: EVIDENCE-T26A-A2-ADVERSARIAL-001}
+  - {relation_type: validated_by, target_asset_id: TEST-T26A-A3-CATALOG-FACTORY-FIT-001}
+  consumers: [TASK-26A, TASK-27, FACTORY-001]
+  evidence: []
+  classification: *t25_internal
+
+- asset_id: TEST-T26A-A3-CATALOG-FACTORY-FIT-001
+  record_version: '1.0'
+  asset_type: script
+  purpose: Hash-bound TASK-26A A3 tests for Catalog inventory, navigation and delivery boundary.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-08-04'
+  truth_owner: TASK-26A
+  location: {kind: git_path, logical_uri: 'repo://tests/test_task26a_catalog_factory_fit.py', repository_path: tests/test_task26a_catalog_factory_fit.py}
+  integrity: {kind: sha256, sha256: 590f031ea93771baf346555877d27d08eb58fbb5ec78c91ab6bd22eccda6c44c}
+  access: *t25_read_file
+  relations:
+  - {relation_type: depends_on, target_asset_id: EVIDENCE-T26A-A3-CATALOG-FACTORY-FIT-001}
+  - {relation_type: depends_on, target_asset_id: CATALOG-ROOT-001}
+  consumers: [TASK-26A]
+  evidence: []
+  classification: *t25_internal

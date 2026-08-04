@@ -1,0 +1,262 @@
+{
+  "as_of": "2026-08-04",
+  "atom_id": "T26A-A1_EXECUTION_EVIDENCE_CONTRACT_AND_INVENTORY_V1",
+  "component_inventory": [
+    {
+      "availability_status": "MISSING",
+      "component_id": "fee_chargeability",
+      "consumer": "TASK-26A",
+      "evidence_class": "FEE_CHARGEABILITY",
+      "missingness_reason": "R2_NO_COMPLETE_FEE_OR_SETTLED_CASHFLOW",
+      "pair_coverage": {
+        "pairs_complete": 0,
+        "pairs_incomplete": 36,
+        "pairs_total": 36
+      },
+      "source_binding": "DATA-T26-R2-EXECUTION-COST-INPUT-PROJECTION-001"
+    },
+    {
+      "availability_status": "MISSING",
+      "component_id": "send_attempt",
+      "consumer": "TASK-26A",
+      "evidence_class": "SEND_ATTEMPT",
+      "missingness_reason": "NO_TRACKED_ATTEMPT_OR_RETRY_CHAIN_EVIDENCE",
+      "pair_coverage": {
+        "pairs_complete": 0,
+        "pairs_incomplete": 36,
+        "pairs_total": 36
+      },
+      "source_binding": "EVIDENCE-T26-A7-CATALOG-FACTORY-FIT-001"
+    },
+    {
+      "availability_status": "MISSING",
+      "component_id": "landing",
+      "consumer": "TASK-26A",
+      "evidence_class": "LANDING",
+      "missingness_reason": "NO_TRACKED_LANDING_EVIDENCE_PROCESSED_ONLY_INSUFFICIENT",
+      "pair_coverage": {
+        "pairs_complete": 0,
+        "pairs_incomplete": 36,
+        "pairs_total": 36
+      },
+      "source_binding": "EVIDENCE-T26-A7-CATALOG-FACTORY-FIT-001"
+    },
+    {
+      "availability_status": "UNKNOWN",
+      "component_id": "inventory",
+      "consumer": "TASK-26A",
+      "evidence_class": "INVENTORY",
+      "missingness_reason": "NO_RECONCILED_FLAT_ACTUAL_INVENTORY",
+      "pair_coverage": {
+        "pairs_complete": 0,
+        "pairs_incomplete": 36,
+        "pairs_total": 36
+      },
+      "source_binding": "CONTRACT-T26-EXECUTION-COST-NETRETURN-001"
+    },
+    {
+      "availability_status": "MISSING",
+      "component_id": "settlement",
+      "consumer": "TASK-26A",
+      "evidence_class": "SETTLEMENT",
+      "missingness_reason": "SETTLED_CASHFLOW_OBSERVED_ZERO",
+      "pair_coverage": {
+        "pairs_complete": 0,
+        "pairs_incomplete": 36,
+        "pairs_total": 36
+      },
+      "source_binding": "EVIDENCE-T26-A7-CATALOG-FACTORY-FIT-001"
+    }
+  ],
+  "decision": {
+    "basis": "35 exact R2 quote pairs are cost-input ready, but all 36 pairs lack complete fee, attempt, landing, inventory, and settled-cashflow evidence; one pair also remains latency-blocked.",
+    "promotion_authority": false,
+    "result": "EXTEND_EXECUTION_EVIDENCE",
+    "task27_authority": false
+  },
+  "evidence_classes": [
+    "QUOTE",
+    "BUILD",
+    "SIMULATION",
+    "SEND_ATTEMPT",
+    "PROCESSED_TERMINAL",
+    "LANDING",
+    "FILL",
+    "FEE_CHARGEABILITY",
+    "INVENTORY",
+    "SETTLEMENT",
+    "MODELED_NETRETURN",
+    "OBSERVED_NETRETURN",
+    "UNKNOWN"
+  ],
+  "gap_matrix": [
+    {
+      "blocks_modeled_netreturn": true,
+      "blocks_observed_netreturn": true,
+      "component_id": "fee_chargeability",
+      "evidence_class": "FEE_CHARGEABILITY",
+      "gap_id": "GAP-FEE-COMPLETE-001",
+      "reason": "All 36 R2 pairs lack complete independently evidenced fee chargeability.",
+      "severity": "BLOCKER"
+    },
+    {
+      "blocks_modeled_netreturn": true,
+      "blocks_observed_netreturn": true,
+      "component_id": "send_attempt",
+      "evidence_class": "SEND_ATTEMPT",
+      "gap_id": "GAP-ATTEMPT-001",
+      "reason": "No tracked send-attempt or retry-chain evidence exists for the R2 population.",
+      "severity": "BLOCKER"
+    },
+    {
+      "blocks_modeled_netreturn": true,
+      "blocks_observed_netreturn": true,
+      "component_id": "landing",
+      "evidence_class": "LANDING",
+      "gap_id": "GAP-LANDING-001",
+      "reason": "Landing cannot be inferred from quote or processed-only samples.",
+      "severity": "BLOCKER"
+    },
+    {
+      "blocks_modeled_netreturn": true,
+      "blocks_observed_netreturn": true,
+      "component_id": "inventory",
+      "evidence_class": "INVENTORY",
+      "gap_id": "GAP-INVENTORY-001",
+      "reason": "Reconciled flat actual inventory is absent; unresolved inventory must remain unknown.",
+      "severity": "BLOCKER"
+    },
+    {
+      "blocks_modeled_netreturn": true,
+      "blocks_observed_netreturn": true,
+      "component_id": "settlement",
+      "evidence_class": "SETTLEMENT",
+      "gap_id": "GAP-SETTLEMENT-001",
+      "reason": "Settled cashflow observed count is zero across the tracked R2 surface.",
+      "severity": "BLOCKER"
+    },
+    {
+      "blocks_modeled_netreturn": true,
+      "blocks_observed_netreturn": true,
+      "component_id": "quote",
+      "evidence_class": "QUOTE",
+      "gap_id": "GAP-LATENCY-001",
+      "reason": "One pair remains latency-blocked and is not quote-cost-input ready.",
+      "severity": "HIGH"
+    }
+  ],
+  "input_bindings": [
+    {
+      "asset_id": "CONTRACT-T25-OUTCOME-LABEL-PIT-001",
+      "bytes": 9216,
+      "path": "docs/contracts/task25_outcome_label_and_pit_contract_v1.md",
+      "sha256": "04e4397e69d554463a09564bdb1cbbb2ac41ce8662277d05e4565c178e94c801"
+    },
+    {
+      "asset_id": "EVIDENCE-T25-A6-CATALOG-FACTORY-FIT-001",
+      "bytes": 12471,
+      "path": "docs/evidence/task25/a6_catalog_factory_fit_v1.json",
+      "sha256": "187a508abb78b9f5548ec0d9677424ddfc60c746b51ee3975c5794b30745b41a"
+    },
+    {
+      "asset_id": "CONTRACT-T26-EXECUTION-COST-NETRETURN-001",
+      "bytes": 8862,
+      "path": "docs/contracts/task26_execution_cost_and_netreturn_contract_v1.md",
+      "sha256": "aac003cf7ba2742d310893c81af3ae4a032a52b719f2f56d80171a6486351efd"
+    },
+    {
+      "asset_id": "CONFIG-T26-EXECUTION-COST-NETRETURN-001",
+      "bytes": 9334,
+      "path": "configs/task26_execution_cost_and_netreturn_contract_v1.yaml",
+      "sha256": "1107b286248036f4e3ef0a5610b80e7cec8362269ecb2ba835e5040dc3210574"
+    },
+    {
+      "asset_id": "SCHEMA-T26-EXECUTION-COST-NETRETURN-001",
+      "bytes": 9480,
+      "path": "catalog/schemas/task26_execution_cost_and_netreturn.schema.json",
+      "sha256": "f3e9b34ccf8adff60cc1abb6e3fa37dfa59310e479eb7654a8d780e5d0cbf083"
+    },
+    {
+      "asset_id": "EVIDENCE-T26-A2-ACCEPTANCE-001",
+      "bytes": 3753,
+      "path": "docs/evidence/task26/a2_execution_cost_and_netreturn_contract_acceptance_v1.json",
+      "sha256": "ad79108c07c98797f24cc1c061474413e130309253eb00d4797017e26256b0ce"
+    },
+    {
+      "asset_id": "DATA-T26-SYNTHETIC-EXECUTION-COST-PROJECTION-001",
+      "bytes": 7747,
+      "path": "docs/evidence/task26/a3_execution_cost_projection_v1.json",
+      "sha256": "df7025c489627b77cc3748c495ca8852ad3a79262048e0780115f0d7d086165f"
+    },
+    {
+      "asset_id": "EVIDENCE-T26-A3-ACCEPTANCE-001",
+      "bytes": 3524,
+      "path": "docs/evidence/task26/a3_deterministic_execution_cost_and_golden_acceptance_v1.json",
+      "sha256": "c543f0c273a5a09a16b9ca2e9d96bc0c61343eac236894d161f247d14b3b53bf"
+    },
+    {
+      "asset_id": "EVIDENCE-T26-A4-ACCEPTANCE-001",
+      "bytes": 6905,
+      "path": "docs/evidence/task26/a4_adversarial_execution_cost_acceptance_v1.json",
+      "sha256": "86b09e393c0a811c7f8b260eb1e5f7236351ea5d8d56000fea873195c1355d82"
+    },
+    {
+      "asset_id": "DATA-T26-R2-EXECUTION-COST-INPUT-PROJECTION-001",
+      "bytes": 4314,
+      "path": "docs/evidence/task26/a5_bounded_r2_execution_cost_projection_v1.json",
+      "sha256": "670d1b280aacdca0ef4db1994ff9bc535a8f640c4db2e688a4322ee9807b0b37"
+    },
+    {
+      "asset_id": "EVIDENCE-T26-A5-ACCEPTANCE-001",
+      "bytes": 3171,
+      "path": "docs/evidence/task26/a5_bounded_r2_execution_cost_projection_acceptance_v1.json",
+      "sha256": "f14d2655b281fd2b1eb02adfc843bff2578632580109fe516b7f5fc88fa646b9"
+    },
+    {
+      "asset_id": "EVIDENCE-T26-A6-ACCEPTANCE-001",
+      "bytes": 5385,
+      "path": "docs/evidence/task26/a6_r2_adversarial_execution_cost_acceptance_v1.json",
+      "sha256": "866366fa94329c142a57f2d5bfc1d0f7f3c32badf5e4408dc033e605a5089f69"
+    },
+    {
+      "asset_id": "EVIDENCE-T26-A7-CATALOG-FACTORY-FIT-001",
+      "bytes": 11501,
+      "path": "docs/evidence/task26/a7_catalog_factory_fit_v1.json",
+      "sha256": "74fc6fc5086014ca33a7db8bf5de566c7a7639dc2aced5f5c02253286cb7b1bc"
+    }
+  ],
+  "nonclaims": [
+    "NUMERIC_MODELED_NETRETURN",
+    "OBSERVED_NETRETURN",
+    "QUOTE_TO_FILL_PROMOTION",
+    "MISSING_FEE_ZEROING",
+    "PROCESSED_ONLY_LANDING_INFERENCE",
+    "UNRESOLVED_INVENTORY_FLATTENING",
+    "R3_VALUE_OR_PATH_READ",
+    "TASK27_BASELINE_EXECUTION"
+  ],
+  "population_summary": {
+    "latency_blocked_pairs": 1,
+    "numeric_modeled_netreturn_claims": 0,
+    "observed_netreturn_claims": 0,
+    "pairs_with_complete_attempt_evidence": 0,
+    "pairs_with_complete_fee_evidence": 0,
+    "pairs_with_complete_landing_evidence": 0,
+    "pairs_with_reconciled_inventory": 0,
+    "pairs_with_settled_cashflow": 0,
+    "quote_cost_input_ready_pairs": 35,
+    "quote_pairs": 36
+  },
+  "schema": "smial.task26a.execution-evidence-inventory",
+  "schema_version": "1.0",
+  "side_effect_counters": {
+    "cash_spend_usd_cents": 0,
+    "dependency_changes": 0,
+    "provider_api_rpc_wss_calls": 0,
+    "r3_paths_or_values_read": 0,
+    "raw_r2_files_opened": 0,
+    "simulation_build_send": 0,
+    "wallet_signer_transaction_actions": 0
+  },
+  "task_id": "TASK-26A"
+}

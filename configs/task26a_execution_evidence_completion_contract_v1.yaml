@@ -1,0 +1,127 @@
+schema: smial.task26a.execution-evidence-completion-contract
+schema_version: "1.0"
+contract_id: T26A-EXECUTION-EVIDENCE-COMPLETION-CONTRACT-001
+task_id: TASK-26A
+atom_id: T26A-A1_EXECUTION_EVIDENCE_CONTRACT_AND_INVENTORY_V1
+as_of: "2026-08-04"
+base:
+  head: 62513091ae97419c753ae3630beb79c2b317c769
+  tree: f176a90d5ff462c8a994b155228e27bc743743b9
+  branch: main
+  upstream: origin/main
+authority:
+  provider_api_rpc_wss_calls: 0
+  raw_r2_reads: 0
+  r3_paths_or_values_reads: 0
+  simulation_build_send: 0
+  wallet_signer_transaction_actions: 0
+  cash_spend_usd_cents: 0
+  dependency_changes: 0
+  numeric_modeled_netreturn: forbidden
+  observed_netreturn: forbidden
+  task27: forbidden
+evidence_classes:
+  - QUOTE
+  - BUILD
+  - SIMULATION
+  - SEND_ATTEMPT
+  - PROCESSED_TERMINAL
+  - LANDING
+  - FILL
+  - FEE_CHARGEABILITY
+  - INVENTORY
+  - SETTLEMENT
+  - MODELED_NETRETURN
+  - OBSERVED_NETRETURN
+  - UNKNOWN
+required_components_for_modeled_netreturn:
+  - component_id: fee_chargeability
+    evidence_class: FEE_CHARGEABILITY
+    consumer: TASK-26A
+  - component_id: send_attempt
+    evidence_class: SEND_ATTEMPT
+    consumer: TASK-26A
+  - component_id: landing
+    evidence_class: LANDING
+    consumer: TASK-26A
+  - component_id: inventory
+    evidence_class: INVENTORY
+    consumer: TASK-26A
+  - component_id: settlement
+    evidence_class: SETTLEMENT
+    consumer: TASK-26A
+availability_statuses:
+  - PRESENT
+  - PARTIAL
+  - MISSING
+  - UNKNOWN
+  - INELIGIBLE
+result_enum:
+  - FIT_FOR_MODELED_NETRETURN_COMPARISON_WITH_LIMITATIONS
+  - EXTEND_EXECUTION_EVIDENCE
+  - REDESIGN_EVIDENCE
+  - PAUSE
+truth_boundaries:
+  - absence_or_unknown_never_becomes_zero_false_landed_flat_or_settled
+  - quote_cannot_establish_fill_settlement_or_landing_probability
+  - processed_only_cannot_estimate_dropped_or_rejected_probability
+  - amm_or_route_economics_must_not_be_double_counted
+  - unresolved_inventory_cannot_be_reported_flat
+  - tracked_repository_bytes_only
+frozen_input_bindings:
+  - asset_id: CONTRACT-T25-OUTCOME-LABEL-PIT-001
+    path: docs/contracts/task25_outcome_label_and_pit_contract_v1.md
+    sha256: 04e4397e69d554463a09564bdb1cbbb2ac41ce8662277d05e4565c178e94c801
+  - asset_id: EVIDENCE-T25-A6-CATALOG-FACTORY-FIT-001
+    path: docs/evidence/task25/a6_catalog_factory_fit_v1.json
+    sha256: 187a508abb78b9f5548ec0d9677424ddfc60c746b51ee3975c5794b30745b41a
+  - asset_id: CONTRACT-T26-EXECUTION-COST-NETRETURN-001
+    path: docs/contracts/task26_execution_cost_and_netreturn_contract_v1.md
+    sha256: aac003cf7ba2742d310893c81af3ae4a032a52b719f2f56d80171a6486351efd
+  - asset_id: CONFIG-T26-EXECUTION-COST-NETRETURN-001
+    path: configs/task26_execution_cost_and_netreturn_contract_v1.yaml
+    sha256: 1107b286248036f4e3ef0a5610b80e7cec8362269ecb2ba835e5040dc3210574
+  - asset_id: SCHEMA-T26-EXECUTION-COST-NETRETURN-001
+    path: catalog/schemas/task26_execution_cost_and_netreturn.schema.json
+    sha256: f3e9b34ccf8adff60cc1abb6e3fa37dfa59310e479eb7654a8d780e5d0cbf083
+  - asset_id: EVIDENCE-T26-A2-ACCEPTANCE-001
+    path: docs/evidence/task26/a2_execution_cost_and_netreturn_contract_acceptance_v1.json
+    sha256: ad79108c07c98797f24cc1c061474413e130309253eb00d4797017e26256b0ce
+  - asset_id: DATA-T26-SYNTHETIC-EXECUTION-COST-PROJECTION-001
+    path: docs/evidence/task26/a3_execution_cost_projection_v1.json
+    sha256: df7025c489627b77cc3748c495ca8852ad3a79262048e0780115f0d7d086165f
+  - asset_id: EVIDENCE-T26-A3-ACCEPTANCE-001
+    path: docs/evidence/task26/a3_deterministic_execution_cost_and_golden_acceptance_v1.json
+    sha256: c543f0c273a5a09a16b9ca2e9d96bc0c61343eac236894d161f247d14b3b53bf
+  - asset_id: EVIDENCE-T26-A4-ACCEPTANCE-001
+    path: docs/evidence/task26/a4_adversarial_execution_cost_acceptance_v1.json
+    sha256: 86b09e393c0a811c7f8b260eb1e5f7236351ea5d8d56000fea873195c1355d82
+  - asset_id: DATA-T26-R2-EXECUTION-COST-INPUT-PROJECTION-001
+    path: docs/evidence/task26/a5_bounded_r2_execution_cost_projection_v1.json
+    sha256: 670d1b280aacdca0ef4db1994ff9bc535a8f640c4db2e688a4322ee9807b0b37
+  - asset_id: EVIDENCE-T26-A5-ACCEPTANCE-001
+    path: docs/evidence/task26/a5_bounded_r2_execution_cost_projection_acceptance_v1.json
+    sha256: f14d2655b281fd2b1eb02adfc843bff2578632580109fe516b7f5fc88fa646b9
+  - asset_id: EVIDENCE-T26-A6-ACCEPTANCE-001
+    path: docs/evidence/task26/a6_r2_adversarial_execution_cost_acceptance_v1.json
+    sha256: 866366fa94329c142a57f2d5bfc1d0f7f3c32badf5e4408dc033e605a5089f69
+  - asset_id: EVIDENCE-T26-A7-CATALOG-FACTORY-FIT-001
+    path: docs/evidence/task26/a7_catalog_factory_fit_v1.json
+    sha256: 74fc6fc5086014ca33a7db8bf5de566c7a7639dc2aced5f5c02253286cb7b1bc
+adversarial_mutations:
+  - mutation_id: m01_quote_to_fill
+    expected_error: QUOTE_TO_FILL_PROMOTION_FORBIDDEN
+  - mutation_id: m02_missing_fee_zeroed
+    expected_error: MISSING_FEE_ZEROING_FORBIDDEN
+  - mutation_id: m03_processed_only_landing
+    expected_error: PROCESSED_ONLY_LANDING_INFERENCE_FORBIDDEN
+  - mutation_id: m04_double_count_route_cost
+    expected_error: DOUBLE_COUNTED_ROUTE_COST_FORBIDDEN
+  - mutation_id: m05_unresolved_inventory_flat
+    expected_error: UNRESOLVED_INVENTORY_FLATTENING_FORBIDDEN
+  - mutation_id: m06_r3_access
+    expected_error: R3_PATHS_OR_VALUES_READ_FORBIDDEN
+  - mutation_id: m07_untracked_or_raw_input
+    expected_error: UNTRACKED_OR_RAW_INPUT_FORBIDDEN
+  - mutation_id: m08_numeric_netreturn_without_reconciliation
+    expected_error: NUMERIC_NETRETURN_WITHOUT_COMPLETE_RECONCILIATION_FORBIDDEN
