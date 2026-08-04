@@ -72,12 +72,15 @@ class Task26ACatalogFactoryFitTests(unittest.TestCase):
 
     def test_02_catalog_transaction_exact(self) -> None:
         catalog = self.receipt["catalog"]
-        self.assertEqual(self.manifest["catalog_version"], catalog["after_version"])
-        self.assertEqual(
+        self.assertGreaterEqual(
+            tuple(map(int, self.manifest["catalog_version"].split("."))),
+            tuple(map(int, catalog["after_version"].split("."))),
+        )
+        self.assertGreaterEqual(
             self.manifest["current_checkpoint"]["assets"],
             catalog["after_assets"],
         )
-        self.assertEqual(
+        self.assertGreaterEqual(
             self.manifest["current_checkpoint"]["schemas"],
             catalog["after_schemas"],
         )

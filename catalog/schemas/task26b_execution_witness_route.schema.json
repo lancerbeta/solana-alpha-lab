@@ -1,0 +1,124 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:smial:task26b:execution-witness-route:1.0",
+  "title": "TASK-26B execution witness route decision",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema",
+    "schema_version",
+    "task_id",
+    "atom_id",
+    "as_of",
+    "status",
+    "input_bindings",
+    "task26a_facts",
+    "route_evaluation_order",
+    "route_matrix",
+    "historical_cache_first_falsifier",
+    "decision",
+    "future_owned_witness",
+    "nonclaims",
+    "side_effect_counters",
+    "r3_access"
+  ],
+  "properties": {
+    "schema": {
+      "const": "smial.task26b.a1-execution-witness-route-decision"
+    },
+    "schema_version": {
+      "const": "1.0"
+    },
+    "task_id": {
+      "const": "TASK-26B"
+    },
+    "atom_id": {
+      "const": "T26B-A1_FREEZE_MINIMAL_EXECUTION_WITNESS_ROUTE_V1"
+    },
+    "as_of": {
+      "type": "string",
+      "minLength": 10
+    },
+    "status": {
+      "type": "string",
+      "minLength": 3
+    },
+    "input_bindings": {
+      "type": "array",
+      "minItems": 1
+    },
+    "task26a_facts": {
+      "type": "object"
+    },
+    "route_evaluation_order": {
+      "type": "array",
+      "minItems": 4,
+      "maxItems": 4,
+      "items": {
+        "enum": [
+          "HISTORICAL_THIRD_PARTY_CHAIN",
+          "QUOTE_ONLY",
+          "BUILD_SIMULATION",
+          "OWNED_INSTRUMENTED_CANARY"
+        ]
+      }
+    },
+    "route_matrix": {
+      "type": "array",
+      "minItems": 24,
+      "maxItems": 24
+    },
+    "historical_cache_first_falsifier": {
+      "type": "object"
+    },
+    "decision": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "result",
+        "canary_authority",
+        "promotion_authority",
+        "task27_authority",
+        "basis"
+      ],
+      "properties": {
+        "result": {
+          "enum": [
+            "HISTORICAL_RECONSTRUCTION_SUFFICIENT",
+            "OWNED_CANARY_REQUIRED",
+            "REDESIGN_ESTIMAND",
+            "PAUSE"
+          ]
+        },
+        "canary_authority": {
+          "const": false
+        },
+        "promotion_authority": {
+          "const": false
+        },
+        "task27_authority": {
+          "const": false
+        },
+        "basis": {
+          "type": "string",
+          "minLength": 1
+        }
+      }
+    },
+    "future_owned_witness": {
+      "type": "object"
+    },
+    "nonclaims": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "side_effect_counters": {
+      "type": "object"
+    },
+    "r3_access": {
+      "const": "UNTOUCHED_DEFAULT_DENY"
+    }
+  }
+}

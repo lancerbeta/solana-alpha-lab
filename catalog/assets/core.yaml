@@ -14128,11 +14128,170 @@ records:
   as_of: '2026-08-04'
   truth_owner: TASK-26A
   location: {kind: git_path, logical_uri: 'repo://tests/test_task26a_catalog_factory_fit.py', repository_path: tests/test_task26a_catalog_factory_fit.py}
-  integrity: {kind: sha256, sha256: 590f031ea93771baf346555877d27d08eb58fbb5ec78c91ab6bd22eccda6c44c}
+  integrity: {kind: sha256, sha256: cb007db23d51427d9b1d3cafcc373e5b91e3b4a5d3c39149af6adf308fef178d}
   access: *t25_read_file
   relations:
   - {relation_type: depends_on, target_asset_id: EVIDENCE-T26A-A3-CATALOG-FACTORY-FIT-001}
   - {relation_type: depends_on, target_asset_id: CATALOG-ROOT-001}
   consumers: [TASK-26A]
+  evidence: []
+  classification: *t25_internal
+
+- asset_id: DOC-T26B-TASK-001
+  record_version: '1.0'
+  asset_type: control_document
+  purpose: TASK-26B minimal execution-witness route task scaffold and non-claim boundary.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-08-04'
+  truth_owner: TASK-26B
+  location: {kind: git_path, logical_uri: 'repo://docs/tasks/TASK-26B-minimal-execution-witness-route.md', repository_path: docs/tasks/TASK-26B-minimal-execution-witness-route.md}
+  integrity: {kind: sha256, sha256: 1d17ef21cf92876ab1506c6ccce8268bea9ec7be7588e485175534043cf39d94}
+  access: *t25_read_file
+  relations:
+  - {relation_type: derived_from, target_asset_id: EVIDENCE-T26A-A3-CATALOG-FACTORY-FIT-001}
+  consumers: [TASK-26B, FACTORY-001]
+  evidence: []
+  classification: *t25_internal
+
+- asset_id: CONTRACT-T26B-EXECUTION-WITNESS-ROUTE-001
+  record_version: '1.0'
+  asset_type: control_document
+  purpose: Frozen TASK-26B historical/cache-first execution-witness route decision contract.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-08-04'
+  truth_owner: TASK-26B
+  location: {kind: git_path, logical_uri: 'repo://docs/contracts/task26b_minimal_execution_witness_route_contract_v1.md', repository_path: docs/contracts/task26b_minimal_execution_witness_route_contract_v1.md}
+  integrity: {kind: sha256, sha256: 7d8fbe07c28304a7dd45e4bf1edc83c3efb93fccf2c358e3c65ba1a03f1ea6a0}
+  access: *t25_read_file
+  relations:
+  - {relation_type: derived_from, target_asset_id: CONTRACT-T26A-EXECUTION-EVIDENCE-001}
+  - {relation_type: derived_from, target_asset_id: EVIDENCE-T26A-A1-INVENTORY-001}
+  consumers: [TASK-26B, TASK-27, FACTORY-001]
+  evidence: []
+  classification: *t25_internal
+
+- asset_id: CONFIG-T26B-EXECUTION-WITNESS-ROUTE-001
+  record_version: '1.0'
+  asset_type: configuration
+  purpose: Machine-readable TASK-26B route contract, bindings and decision policy.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-08-04'
+  truth_owner: TASK-26B
+  location: {kind: git_path, logical_uri: 'repo://configs/task26b_minimal_execution_witness_route_contract_v1.yaml', repository_path: configs/task26b_minimal_execution_witness_route_contract_v1.yaml}
+  integrity: {kind: sha256, sha256: 8a349a72efefa1121728f4f68a7c534a77cf10655ed69d83cf247d0e23bd8176}
+  access: *t25_read_file
+  relations:
+  - {relation_type: governed_by, target_asset_id: CONTRACT-T26B-EXECUTION-WITNESS-ROUTE-001}
+  consumers: [TASK-26B, FACTORY-001]
+  evidence: []
+  classification: *t25_internal
+
+- asset_id: SCHEMA-T26B-EXECUTION-WITNESS-ROUTE-001
+  record_version: '1.0'
+  asset_type: schema
+  purpose: JSON Schema for TASK-26B execution-witness route decision evidence.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-08-04'
+  truth_owner: TASK-26B
+  location: {kind: git_path, logical_uri: 'repo://catalog/schemas/task26b_execution_witness_route.schema.json', repository_path: catalog/schemas/task26b_execution_witness_route.schema.json}
+  integrity: {kind: sha256, sha256: 4e34b82744d1da7edc2241124f4de962490c680c02c21a0cffa5e80cd1fa8789}
+  access: *t25_read_file
+  relations:
+  - {relation_type: governed_by, target_asset_id: CONTRACT-T26B-EXECUTION-WITNESS-ROUTE-001}
+  consumers: [TASK-26B, FACTORY-001]
+  evidence: []
+  classification: *t25_internal
+
+- asset_id: MODULE-T26B-EXECUTION-WITNESS-ROUTE-001
+  record_version: '1.0'
+  asset_type: script
+  purpose: Deterministic TASK-26B historical/cache-first route matrix and decision builder.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-08-04'
+  truth_owner: TASK-26B
+  location: {kind: git_path, logical_uri: 'repo://src/solana_alpha_lab/task26b_execution_witness_route.py', repository_path: src/solana_alpha_lab/task26b_execution_witness_route.py}
+  integrity: {kind: sha256, sha256: 47667e00c44975759855173723dd0e92744ffedd5bf0781111f3f22eae12fe8f}
+  access: *t25_read_file
+  relations:
+  - {relation_type: governed_by, target_asset_id: CONFIG-T26B-EXECUTION-WITNESS-ROUTE-001}
+  - {relation_type: produces, target_asset_id: EVIDENCE-T26B-A1-DECISION-001}
+  consumers: [TASK-26B, FACTORY-001]
+  evidence: []
+  classification: *t25_internal
+
+- asset_id: FIXTURE-T26B-EXECUTION-WITNESS-ROUTE-001
+  record_version: '1.0'
+  asset_type: evidence
+  purpose: Frozen TASK-26B route-matrix fixture for deterministic acceptance.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-08-04'
+  truth_owner: TASK-26B
+  location: {kind: git_path, logical_uri: 'repo://tests/fixtures/task26b/execution_witness_route_matrix_v1.json', repository_path: tests/fixtures/task26b/execution_witness_route_matrix_v1.json}
+  integrity: {kind: sha256, sha256: 48beeeab61a3467512fae2d903c6fbb053de4cd0e696658c0d1bd3e1c04124a9}
+  access: *t25_read_file
+  relations:
+  - {relation_type: derived_from, target_asset_id: CONFIG-T26B-EXECUTION-WITNESS-ROUTE-001}
+  consumers: [TASK-26B, FACTORY-001]
+  evidence: []
+  classification: *t25_internal
+
+- asset_id: TEST-T26B-EXECUTION-WITNESS-ROUTE-001
+  record_version: '1.0'
+  asset_type: script
+  purpose: Hash-bound tests for TASK-26B route matrix, historical falsifier and no-authority witness.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-08-04'
+  truth_owner: TASK-26B
+  location: {kind: git_path, logical_uri: 'repo://tests/test_task26b_execution_witness_route.py', repository_path: tests/test_task26b_execution_witness_route.py}
+  integrity: {kind: sha256, sha256: 48f477536e66c925d040dd6701792dd1cfdfffd2cf55b5bcf3a216d9d2e08dd6}
+  access: *t25_read_file
+  relations:
+  - {relation_type: depends_on, target_asset_id: MODULE-T26B-EXECUTION-WITNESS-ROUTE-001}
+  - {relation_type: depends_on, target_asset_id: SCHEMA-T26B-EXECUTION-WITNESS-ROUTE-001}
+  - {relation_type: depends_on, target_asset_id: FIXTURE-T26B-EXECUTION-WITNESS-ROUTE-001}
+  consumers: [TASK-26B, FACTORY-001]
+  evidence: []
+  classification: *t25_internal
+
+- asset_id: EVIDENCE-T26B-A1-DECISION-001
+  record_version: '1.0'
+  asset_type: evidence
+  purpose: TASK-26B A1 route-matrix decision evidence with OWNED_CANARY_REQUIRED and no authority.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-08-04'
+  truth_owner: TASK-26B
+  location: {kind: git_path, logical_uri: 'repo://docs/evidence/task26b/a1_execution_witness_route_decision_v1.json', repository_path: docs/evidence/task26b/a1_execution_witness_route_decision_v1.json}
+  integrity: {kind: sha256, sha256: c6df17bb1b8f2f361bb0e25b801d8d5a71440e42fe4e95ccd0c55ab5e33630de}
+  access: *t25_read_file
+  relations:
+  - {relation_type: derived_from, target_asset_id: MODULE-T26B-EXECUTION-WITNESS-ROUTE-001}
+  - {relation_type: derived_from, target_asset_id: EVIDENCE-T26A-A1-INVENTORY-001}
+  consumers: [TASK-26B, TASK-27, FACTORY-001]
+  evidence: []
+  classification: *t25_internal
+
+- asset_id: EVIDENCE-T26B-A1-ACCEPTANCE-001
+  record_version: '1.0'
+  asset_type: evidence
+  purpose: TASK-26B A1 acceptance receipt for route decision and zero excluded-action counters.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-08-04'
+  truth_owner: TASK-26B
+  location: {kind: git_path, logical_uri: 'repo://docs/evidence/task26b/a1_execution_witness_route_acceptance_v1.json', repository_path: docs/evidence/task26b/a1_execution_witness_route_acceptance_v1.json}
+  integrity: {kind: sha256, sha256: 86cd5d33f3e29f9c3d365afc1aca511b212d6a809fa7be3ea2c6e65ffebd4b73}
+  access: *t25_read_file
+  relations:
+  - {relation_type: derived_from, target_asset_id: EVIDENCE-T26B-A1-DECISION-001}
+  - {relation_type: validated_by, target_asset_id: TEST-T26B-EXECUTION-WITNESS-ROUTE-001}
+  consumers: [TASK-26B, FACTORY-001]
   evidence: []
   classification: *t25_internal

@@ -1,0 +1,60 @@
+schema: smial.task26b.minimal-execution-witness-route-contract
+schema_version: "1.0"
+contract_id: T26B-MINIMAL-EXECUTION-WITNESS-ROUTE-CONTRACT-001
+task_id: TASK-26B
+atom_id: T26B-A1_FREEZE_MINIMAL_EXECUTION_WITNESS_ROUTE_V1
+as_of: "2026-08-04"
+base:
+  head: ccfd5a16340ca8d02c81d1362632df51eb283937
+  tree: e7dbb89850c657133d8b61b04f6a070b83c8b106
+  branch: main
+  upstream: origin/main
+authority:
+  provider_api_rpc_wss_calls: 0
+  raw_r2_reads: 0
+  r3_paths_or_values_reads: 0
+  simulation_build_send: 0
+  wallet_signer_transaction_actions: 0
+  cash_spend_usd_cents: 0
+  dependency_changes: 0
+  canary_authority: false
+  numeric_modeled_netreturn: forbidden
+  observed_netreturn: forbidden
+  task27: forbidden
+routes:
+  - HISTORICAL_THIRD_PARTY_CHAIN
+  - QUOTE_ONLY
+  - BUILD_SIMULATION
+  - OWNED_INSTRUMENTED_CANARY
+evidence_classes:
+  - FEE_CHARGEABILITY
+  - SEND_ATTEMPT
+  - LANDING
+  - FILL
+  - INVENTORY
+  - SETTLEMENT
+result_enum:
+  - HISTORICAL_RECONSTRUCTION_SUFFICIENT
+  - OWNED_CANARY_REQUIRED
+  - REDESIGN_ESTIMAND
+  - PAUSE
+expected_decision_when_task26a_zero_complete: OWNED_CANARY_REQUIRED
+frozen_input_bindings:
+  - asset_id: CONTRACT-T25-OUTCOME-LABEL-PIT-001
+    path: docs/contracts/task25_outcome_label_and_pit_contract_v1.md
+    sha256: 04e4397e69d554463a09564bdb1cbbb2ac41ce8662277d05e4565c178e94c801
+  - asset_id: CONTRACT-T26-EXECUTION-COST-NETRETURN-001
+    path: docs/contracts/task26_execution_cost_and_netreturn_contract_v1.md
+    sha256: aac003cf7ba2742d310893c81af3ae4a032a52b719f2f56d80171a6486351efd
+  - asset_id: CONTRACT-T26A-EXECUTION-EVIDENCE-001
+    path: docs/contracts/task26a_execution_evidence_completion_contract_v1.md
+    sha256: 218519777231189ca372f98462bbd3cf182de6c332c18766e968d0143e9c128b
+  - asset_id: EVIDENCE-T26A-A1-INVENTORY-001
+    path: docs/evidence/task26a/a1_execution_evidence_inventory_v1.json
+    sha256: ce97c1aa4cb4fc43d6cdb588728885d1175474f3872b678894ec3b19d0b2e681
+  - asset_id: EVIDENCE-T26A-A3-CATALOG-FACTORY-FIT-001
+    path: docs/evidence/task26a/a3_catalog_factory_fit_v1.json
+    sha256: cb33b0081339d2d3bddd62d4354965cbbcecc902c1c58c66a3d2770a942aeb59
+  - asset_id: CTRL-SCHEMA-SQL-001
+    path: schemas/schema_v1.sql
+    sha256: eae9d1544b11cffc03afba1e263153168a11dc6f648df9117a55a4cae5d23f09

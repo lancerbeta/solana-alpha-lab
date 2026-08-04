@@ -1,0 +1,108 @@
+{
+  "as_of": "2026-08-04",
+  "atom_id": "T26B-A1_FREEZE_MINIMAL_EXECUTION_WITNESS_ROUTE_V1",
+  "checks": [
+    {
+      "check_id": "TRACKED_INPUT_BINDINGS_EXACT",
+      "status": "PASS"
+    },
+    {
+      "check_id": "HISTORICAL_ROUTE_TESTED_FIRST",
+      "status": "PASS"
+    },
+    {
+      "check_id": "ROUTE_MATRIX_COMPLETE",
+      "status": "PASS"
+    },
+    {
+      "check_id": "HISTORICAL_INSUFFICIENT",
+      "status": "PASS"
+    },
+    {
+      "check_id": "DECISION_OWNED_CANARY_REQUIRED",
+      "status": "PASS"
+    },
+    {
+      "check_id": "NO_CANARY_AUTHORITY",
+      "status": "PASS"
+    },
+    {
+      "check_id": "NO_NUMERIC_NETRETURN",
+      "status": "PASS"
+    },
+    {
+      "check_id": "NO_WALLET_SIGNER_TRANSACTION",
+      "status": "PASS"
+    },
+    {
+      "check_id": "NO_TASK27_AUTHORITY",
+      "status": "PASS"
+    },
+    {
+      "check_id": "R3_UNTOUCHED_DEFAULT_DENY",
+      "status": "PASS"
+    }
+  ],
+  "confirmations": [
+    "HISTORICAL_ROUTE_TESTED_FIRST",
+    "NO_RAW_R2",
+    "NO_R3",
+    "NO_PROVIDER_EXECUTION",
+    "NO_WALLET",
+    "NO_SIGNER",
+    "NO_TRANSACTION",
+    "NO_CASH_SPEND",
+    "NO_NUMERIC_NETRETURN",
+    "NO_TASK27",
+    "NO_CANARY_AUTHORITY"
+  ],
+  "decision": {
+    "basis": "TASK-26A retains 36 quote pairs, 35 quote-cost-ready, 1 latency-blocked, and zero complete fee/attempt/landing/inventory/settlement evidence; historical/cache-first reconstruction remains insufficient for the owner estimand, so an owned instrumented canary is required but not authorized.",
+    "canary_authority": false,
+    "promotion_authority": false,
+    "result": "OWNED_CANARY_REQUIRED",
+    "task27_authority": false
+  },
+  "future_owned_witness_status": "SPEC_ONLY_NO_AUTHORITY",
+  "historical_cache_first_falsifier": {
+    "closes_all_required_classes": false,
+    "falsifier": "Tracked historical third-party reconstruction cannot establish rejected/dropped attempt denominator, retry intent, owner inventory, or owner settlement for the 36-pair TASK-26A surface.",
+    "insufficient_or_non_owner_classes": [
+      "SEND_ATTEMPT",
+      "INVENTORY",
+      "SETTLEMENT"
+    ],
+    "partial_selected_tx_only_classes": [
+      "FEE_CHARGEABILITY",
+      "LANDING",
+      "FILL"
+    ],
+    "result": "HISTORICAL_INSUFFICIENT_FOR_OWNER_ESTIMAND",
+    "route_tested_first": "HISTORICAL_THIRD_PARTY_CHAIN"
+  },
+  "schema": "smial.task26b.a1-execution-witness-route-acceptance",
+  "schema_version": "1.0",
+  "side_effect_counters": {
+    "cash_spend_usd_cents": 0,
+    "dependency_changes": 0,
+    "provider_api_rpc_wss_calls": 0,
+    "r3_paths_or_values_read": 0,
+    "raw_r2_files_opened": 0,
+    "simulation_build_send": 0,
+    "wallet_signer_transaction_actions": 0
+  },
+  "status": "PASS_ROUTE_DECISION_OWNED_CANARY_REQUIRED",
+  "task26a_facts": {
+    "latency_blocked_pairs": 1,
+    "numeric_modeled_netreturn_claims": 0,
+    "observed_netreturn_claims": 0,
+    "pairs_with_complete_attempt_evidence": 0,
+    "pairs_with_complete_fee_evidence": 0,
+    "pairs_with_complete_landing_evidence": 0,
+    "pairs_with_reconciled_inventory": 0,
+    "pairs_with_settled_cashflow": 0,
+    "quote_cost_input_ready_pairs": 35,
+    "quote_pairs": 36
+  },
+  "task_id": "TASK-26B"
+}
