@@ -251,6 +251,18 @@ FAILED (failures=1)
         def recorder(arguments: list[str], *, cwd: Path | None = None) -> str:
             self.assertEqual(cwd, Path("synthetic-checkout"))
             calls.append(arguments)
+            if arguments == [
+                "for-each-ref",
+                "--format=%(refname)",
+                "refs/remotes/origin",
+            ]:
+                return "\n".join(
+                    [
+                        "refs/remotes/origin/HEAD",
+                        "refs/remotes/origin/main",
+                        "refs/remotes/origin/owner-authority-packet-binding-impl",
+                    ]
+                )
             return ""
 
         ci.git_text = recorder
@@ -265,8 +277,14 @@ FAILED (failures=1)
         self.assertEqual(
             calls,
             [
+                [
+                    "for-each-ref",
+                    "--format=%(refname)",
+                    "refs/remotes/origin",
+                ],
                 ["branch", "-m", "main"],
                 ["branch", "--set-upstream-to=origin/main", "main"],
+                ["update-ref", "-d", "refs/remotes/origin/HEAD"],
                 [
                     "update-ref",
                     "-d",

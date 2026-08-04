@@ -79,11 +79,16 @@ def git_text(
 def normalize_tracked_only_checkout(*, branch: str, checkout: Path) -> None:
     """Normalize only the temporary clone to the attached-main repository contract."""
 
-    if branch == "main":
-        return
-    git_text(["branch", "-m", "main"], cwd=checkout)
+    remote_refs = git_text(
+        ["for-each-ref", "--format=%(refname)", "refs/remotes/origin"],
+        cwd=checkout,
+    ).splitlines()
+    if branch != "main":
+        git_text(["branch", "-m", "main"], cwd=checkout)
     git_text(["branch", "--set-upstream-to=origin/main", "main"], cwd=checkout)
-    git_text(["update-ref", "-d", f"refs/remotes/origin/{branch}"], cwd=checkout)
+    for ref in remote_refs:
+        if ref != "refs/remotes/origin/main":
+            git_text(["update-ref", "-d", ref], cwd=checkout)
 
 
 def parse_added_test_hunks(diff_text: str) -> list[tuple[str, list[str]]]:

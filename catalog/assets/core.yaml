@@ -774,7 +774,7 @@ records:
     contains_raw_data: false
     sensitivity: INTERNAL_NON_SECRET
 - asset_id: CI-VALIDATOR-001
-  record_version: '1.6'
+  record_version: '1.7'
   asset_type: script
   purpose: Single platform-neutral gate for runtime, lock, secrets, Catalog, generated
     views, repository policy, baton machine-layer checks, tests, and one isolated
@@ -789,7 +789,7 @@ records:
     repository_path: scripts/validate_ci.py
   integrity:
     kind: sha256
-    sha256: 766e2626d649704eb06138a7f77148d9b0b833ce9eca0fc62f81575af556c271
+    sha256: 8ad6f21fb27e94e9c395402a0ed26c572f4b3e382a71760d01f659bbf459b7c1
   access:
     mode: read_only
     method: command
