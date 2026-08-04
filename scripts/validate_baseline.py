@@ -3433,6 +3433,31 @@ def classify_git_topology(
     return "INVALID_GIT_TOPOLOGY"
 
 
+def classify_tracked_only_delivery_state(
+    *,
+    marker: bool,
+    branch: str | None,
+    head_oid: str,
+    topology: str,
+    staged: set[str],
+    untracked: set[str],
+    unstaged: set[str],
+) -> str | None:
+    """Recognize only the preflight's clean temporary checkout shape."""
+
+    if (
+        marker
+        and branch == "main"
+        and re.fullmatch(r"[0-9a-f]{40}", head_oid) is not None
+        and topology == "CLEAN_CLONE"
+        and not staged
+        and not untracked
+        and not unstaged
+    ):
+        return "TRACKED_ONLY_DELIVERY_CANDIDATE"
+    return None
+
+
 def tree_files(treeish: str) -> set[str]:
     code, files = command_set(["git", "ls-tree", "-r", "--name-only", treeish])
     if code != 0:
@@ -4618,6 +4643,9 @@ def validate_task09_finalization_staged_style_policy() -> None:
 
 def validate() -> None:
     github_actions = os.environ.get("GITHUB_ACTIONS", "").lower() == "true"
+    tracked_only_delivery_marker = (
+        os.environ.get("SMIAL_TRACKED_ONLY_DELIVERY", "") == "1"
+    )
     branch_result = run(["git", "symbolic-ref", "--short", "HEAD"])
     branch_name = (
         branch_result.stdout.strip() if branch_result.returncode == 0 else None
@@ -4751,7 +4779,19 @@ def validate() -> None:
         commit_changed=commit_changed,
     )
     task09_topology = classify_task09_topology(baton_view, github_context)
-    if (
+    tracked_only_delivery_state = classify_tracked_only_delivery_state(
+        marker=tracked_only_delivery_marker,
+        branch=branch_name,
+        head_oid=head_oid,
+        topology=legacy_topology,
+        staged=staged,
+        untracked=untracked,
+        unstaged=unstaged,
+    )
+    if tracked_only_delivery_state is not None:
+        state = tracked_only_delivery_state
+        topology = legacy_topology
+    elif (
         legacy_state,
         task09_topology,
     ) in TASK09_LIFECYCLE_COMBINATIONS:
@@ -4794,6 +4834,7 @@ def validate() -> None:
         "ATOM7_REF_NORMALIZATION_REPAIR_COMMITTED",
         "ATOM7_SINGLE_BRANCH_REFSPEC_REPAIR_STAGED",
         "ATOM7_SINGLE_BRANCH_REFSPEC_REPAIR_COMMITTED",
+        "TRACKED_ONLY_DELIVERY_CANDIDATE",
     } | (
         TASK04_REPOSITORY_STATES
         | TASK05_REPOSITORY_STATES
@@ -4805,6 +4846,8 @@ def validate() -> None:
         | CTRL_GENERIC_REPOSITORY_STATES
     )
     assert_check("repository_state", state in valid_states, state)
+    if state == "TRACKED_ONLY_DELIVERY_CANDIDATE":
+        assert_check("tracked_only_delivery_topology", topology == "CLEAN_CLONE", topology)
     if state in CTRL_BATON_A62_REPOSITORY_STATES:
         assert_check(
             "ctrl_baton_state_topology_combination",

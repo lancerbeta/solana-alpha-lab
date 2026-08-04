@@ -27,6 +27,48 @@ class GenericControlBranchPolicyTests(unittest.TestCase):
         self.assertFalse(module.is_ctrl_generic_control_branch("task17A/pilot"))
 
 
+class TrackedOnlyDeliveryStateTests(unittest.TestCase):
+    def test_accepts_only_clean_attached_delivery_clone(self) -> None:
+        self.assertEqual(
+            module.classify_tracked_only_delivery_state(
+                marker=True,
+                branch="main",
+                head_oid="a" * 40,
+                topology="CLEAN_CLONE",
+                staged=set(),
+                untracked=set(),
+                unstaged=set(),
+            ),
+            "TRACKED_ONLY_DELIVERY_CANDIDATE",
+        )
+
+    def test_rejects_missing_marker_dirty_or_non_clean_clone(self) -> None:
+        baseline = {
+            "marker": True,
+            "branch": "main",
+            "head_oid": "a" * 40,
+            "topology": "CLEAN_CLONE",
+            "staged": set(),
+            "untracked": set(),
+            "unstaged": set(),
+        }
+        for override in (
+            {"marker": False},
+            {"branch": "topic"},
+            {"head_oid": "not-a-commit"},
+            {"topology": "PUBLISHED_LOCAL"},
+            {"staged": {"tests/test_ci.py"}},
+            {"untracked": {"local/receipt.json"}},
+            {"unstaged": {"scripts/validate_ci.py"}},
+        ):
+            with self.subTest(override=override):
+                self.assertIsNone(
+                    module.classify_tracked_only_delivery_state(
+                        **{**baseline, **override}
+                    )
+                )
+
+
 class RepositoryStatePolicyTests(unittest.TestCase):
     def classify_atom5(self, **overrides: object) -> str:
         arguments = {

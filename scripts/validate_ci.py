@@ -287,6 +287,7 @@ def run_tracked_only_delivery_preflight(*, base_ref: str = "origin/main") -> Non
             environment["UV_MANAGED_PYTHON"] = "1"
             environment["UV_NO_ENV_FILE"] = "1"
             environment["UV_OFFLINE"] = "1"
+            environment["SMIAL_TRACKED_ONLY_DELIVERY"] = "1"
             environment.pop("VIRTUAL_ENV", None)
             try:
                 completed = subprocess.run(
