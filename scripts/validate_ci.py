@@ -76,6 +76,16 @@ def git_text(
     return completed.stdout.strip()
 
 
+def normalize_tracked_only_checkout(*, branch: str, checkout: Path) -> None:
+    """Normalize only the temporary clone to the attached-main repository contract."""
+
+    if branch == "main":
+        return
+    git_text(["branch", "-m", "main"], cwd=checkout)
+    git_text(["branch", "--set-upstream-to=origin/main", "main"], cwd=checkout)
+    git_text(["update-ref", "-d", f"refs/remotes/origin/{branch}"], cwd=checkout)
+
+
 def parse_added_test_hunks(diff_text: str) -> list[tuple[str, list[str]]]:
     hunks: list[tuple[str, list[str]]] = []
     path: str | None = None
@@ -253,7 +263,7 @@ def run_tracked_only_delivery_preflight(*, base_ref: str = "origin/main") -> Non
                 ["update-ref", "refs/remotes/origin/main", base_commit],
                 cwd=checkout,
             )
-            git_text(["branch", "-f", "main", base_commit], cwd=checkout)
+            normalize_tracked_only_checkout(branch=branch, checkout=checkout)
             git_text(
                 [
                     "symbolic-ref",

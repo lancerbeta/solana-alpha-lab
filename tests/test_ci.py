@@ -244,6 +244,37 @@ FAILED (failures=1)
         self.assertTrue(delivery.tracked_only_delivery)
         self.assertEqual(delivery.base_ref, "origin/main")
 
+    def test_tracked_only_clone_is_normalized_to_attached_main(self) -> None:
+        calls: list[list[str]] = []
+        original = ci.git_text
+
+        def recorder(arguments: list[str], *, cwd: Path | None = None) -> str:
+            self.assertEqual(cwd, Path("synthetic-checkout"))
+            calls.append(arguments)
+            return ""
+
+        ci.git_text = recorder
+        try:
+            ci.normalize_tracked_only_checkout(
+                branch="owner-authority-packet-binding-impl",
+                checkout=Path("synthetic-checkout"),
+            )
+        finally:
+            ci.git_text = original
+
+        self.assertEqual(
+            calls,
+            [
+                ["branch", "-m", "main"],
+                ["branch", "--set-upstream-to=origin/main", "main"],
+                [
+                    "update-ref",
+                    "-d",
+                    "refs/remotes/origin/owner-authority-packet-binding-impl",
+                ],
+            ],
+        )
+
 
 class PlatformGateContractTests(unittest.TestCase):
     def test_python_and_uv_mismatch_fail(self) -> None:
