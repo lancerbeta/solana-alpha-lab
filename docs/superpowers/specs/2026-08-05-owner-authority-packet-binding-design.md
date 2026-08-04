@@ -1,6 +1,6 @@
 ---
 title: Owner Authority Packet Binding v1 — одобренный дизайн
-status: DESIGN_APPROVED_PENDING_USER_SPEC_REVIEW
+status: DESIGN_APPROVED_USER_REVIEWED
 candidate_task_id: OWNER_AUTHORITY_PACKET_BINDING_V1
 as_of: 2026-08-05
 classification: EPHEMERAL_DESIGN_ARTIFACT_NOT_A_CANARY_AUTHORIZATION
