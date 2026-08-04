@@ -1,0 +1,190 @@
+{
+  "evidence_classes": [
+    "FEE_CHARGEABILITY",
+    "SEND_ATTEMPT",
+    "LANDING",
+    "FILL",
+    "INVENTORY",
+    "SETTLEMENT"
+  ],
+  "expected_canary_authority": false,
+  "expected_decision": "OWNED_CANARY_REQUIRED",
+  "route_matrix": [
+    {
+      "capability": "PARTIAL_SELECTED_TX_CHAIN_FEES_ONLY",
+      "closes_owner_gap": false,
+      "evidence_class": "FEE_CHARGEABILITY",
+      "historical_cache_first_order": 1,
+      "route": "HISTORICAL_THIRD_PARTY_CHAIN"
+    },
+    {
+      "capability": "INSUFFICIENT_NO_REJECTED_DROPPED_DENOMINATOR",
+      "closes_owner_gap": false,
+      "evidence_class": "SEND_ATTEMPT",
+      "historical_cache_first_order": 1,
+      "route": "HISTORICAL_THIRD_PARTY_CHAIN"
+    },
+    {
+      "capability": "PARTIAL_OBSERVED_PROCESSED_ONLY",
+      "closes_owner_gap": false,
+      "evidence_class": "LANDING",
+      "historical_cache_first_order": 1,
+      "route": "HISTORICAL_THIRD_PARTY_CHAIN"
+    },
+    {
+      "capability": "PARTIAL_SELECTED_TX_TOKEN_DELTAS_ONLY",
+      "closes_owner_gap": false,
+      "evidence_class": "FILL",
+      "historical_cache_first_order": 1,
+      "route": "HISTORICAL_THIRD_PARTY_CHAIN"
+    },
+    {
+      "capability": "INSUFFICIENT_NO_OWNER_INVENTORY_STATE",
+      "closes_owner_gap": false,
+      "evidence_class": "INVENTORY",
+      "historical_cache_first_order": 1,
+      "route": "HISTORICAL_THIRD_PARTY_CHAIN"
+    },
+    {
+      "capability": "INSUFFICIENT_NO_OWNER_SETTLEMENT",
+      "closes_owner_gap": false,
+      "evidence_class": "SETTLEMENT",
+      "historical_cache_first_order": 1,
+      "route": "HISTORICAL_THIRD_PARTY_CHAIN"
+    },
+    {
+      "capability": "INSUFFICIENT",
+      "closes_owner_gap": false,
+      "evidence_class": "FEE_CHARGEABILITY",
+      "historical_cache_first_order": 2,
+      "route": "QUOTE_ONLY"
+    },
+    {
+      "capability": "INSUFFICIENT",
+      "closes_owner_gap": false,
+      "evidence_class": "SEND_ATTEMPT",
+      "historical_cache_first_order": 2,
+      "route": "QUOTE_ONLY"
+    },
+    {
+      "capability": "INSUFFICIENT",
+      "closes_owner_gap": false,
+      "evidence_class": "LANDING",
+      "historical_cache_first_order": 2,
+      "route": "QUOTE_ONLY"
+    },
+    {
+      "capability": "INSUFFICIENT",
+      "closes_owner_gap": false,
+      "evidence_class": "FILL",
+      "historical_cache_first_order": 2,
+      "route": "QUOTE_ONLY"
+    },
+    {
+      "capability": "INSUFFICIENT",
+      "closes_owner_gap": false,
+      "evidence_class": "INVENTORY",
+      "historical_cache_first_order": 2,
+      "route": "QUOTE_ONLY"
+    },
+    {
+      "capability": "INSUFFICIENT",
+      "closes_owner_gap": false,
+      "evidence_class": "SETTLEMENT",
+      "historical_cache_first_order": 2,
+      "route": "QUOTE_ONLY"
+    },
+    {
+      "capability": "INSUFFICIENT_MODELED_ONLY",
+      "closes_owner_gap": false,
+      "evidence_class": "FEE_CHARGEABILITY",
+      "historical_cache_first_order": 3,
+      "route": "BUILD_SIMULATION"
+    },
+    {
+      "capability": "INSUFFICIENT",
+      "closes_owner_gap": false,
+      "evidence_class": "SEND_ATTEMPT",
+      "historical_cache_first_order": 3,
+      "route": "BUILD_SIMULATION"
+    },
+    {
+      "capability": "INSUFFICIENT_NOT_ACTUAL",
+      "closes_owner_gap": false,
+      "evidence_class": "LANDING",
+      "historical_cache_first_order": 3,
+      "route": "BUILD_SIMULATION"
+    },
+    {
+      "capability": "INSUFFICIENT_NOT_ACTUAL",
+      "closes_owner_gap": false,
+      "evidence_class": "FILL",
+      "historical_cache_first_order": 3,
+      "route": "BUILD_SIMULATION"
+    },
+    {
+      "capability": "INSUFFICIENT_NOT_ACTUAL",
+      "closes_owner_gap": false,
+      "evidence_class": "INVENTORY",
+      "historical_cache_first_order": 3,
+      "route": "BUILD_SIMULATION"
+    },
+    {
+      "capability": "INSUFFICIENT_NOT_ACTUAL",
+      "closes_owner_gap": false,
+      "evidence_class": "SETTLEMENT",
+      "historical_cache_first_order": 3,
+      "route": "BUILD_SIMULATION"
+    },
+    {
+      "capability": "FUTURE_SUFFICIENT_IF_AUTHORIZED",
+      "closes_owner_gap": true,
+      "evidence_class": "FEE_CHARGEABILITY",
+      "historical_cache_first_order": 4,
+      "route": "OWNED_INSTRUMENTED_CANARY"
+    },
+    {
+      "capability": "FUTURE_SUFFICIENT_IF_AUTHORIZED",
+      "closes_owner_gap": true,
+      "evidence_class": "SEND_ATTEMPT",
+      "historical_cache_first_order": 4,
+      "route": "OWNED_INSTRUMENTED_CANARY"
+    },
+    {
+      "capability": "FUTURE_SUFFICIENT_IF_AUTHORIZED",
+      "closes_owner_gap": true,
+      "evidence_class": "LANDING",
+      "historical_cache_first_order": 4,
+      "route": "OWNED_INSTRUMENTED_CANARY"
+    },
+    {
+      "capability": "FUTURE_SUFFICIENT_IF_AUTHORIZED",
+      "closes_owner_gap": true,
+      "evidence_class": "FILL",
+      "historical_cache_first_order": 4,
+      "route": "OWNED_INSTRUMENTED_CANARY"
+    },
+    {
+      "capability": "FUTURE_SUFFICIENT_IF_AUTHORIZED",
+      "closes_owner_gap": true,
+      "evidence_class": "INVENTORY",
+      "historical_cache_first_order": 4,
+      "route": "OWNED_INSTRUMENTED_CANARY"
+    },
+    {
+      "capability": "FUTURE_SUFFICIENT_IF_AUTHORIZED",
+      "closes_owner_gap": true,
+      "evidence_class": "SETTLEMENT",
+      "historical_cache_first_order": 4,
+      "route": "OWNED_INSTRUMENTED_CANARY"
+    }
+  ],
+  "routes": [
+    "HISTORICAL_THIRD_PARTY_CHAIN",
+    "QUOTE_ONLY",
+    "BUILD_SIMULATION",
+    "OWNED_INSTRUMENTED_CANARY"
+  ],
+  "schema": "smial.task26b.execution-witness-route-matrix-fixture",
+  "schema_version": "1.0"
+}
