@@ -1,0 +1,135 @@
+{
+  "as_of": "2026-08-05",
+  "atom_id": "OWNER_AUTHORITY_PACKET_BINDING_V1",
+  "case_results": [
+    {
+      "case_id": "draft_owner_inputs_remain_explicit",
+      "outcome": "OWNER_INPUT_REQUIRED",
+      "result": "PASS"
+    },
+    {
+      "case_id": "complete_synthetic_packet_is_review_only",
+      "outcome": "OWNER_EXACT_APPROVAL_REQUIRED",
+      "result": "PASS"
+    },
+    {
+      "case_id": "cash_cap_breach_rejected",
+      "code": "cash_cap_breach",
+      "result": "REJECTED"
+    },
+    {
+      "case_id": "duplicate_draft_input_rejected",
+      "code": "duplicate_draft_owner_input",
+      "result": "REJECTED"
+    },
+    {
+      "case_id": "unknown_blocks_exit",
+      "code": "exit_requires_landed_success_first_leg",
+      "result": "REJECTED"
+    },
+    {
+      "case_id": "unreconciled_success_blocks_exit",
+      "code": "exit_before_first_leg_reconciliation",
+      "result": "REJECTED"
+    },
+    {
+      "case_id": "monitoring_loss_blocks_exit",
+      "code": "exit_blocked_monitoring_loss",
+      "result": "REJECTED"
+    },
+    {
+      "case_id": "inventory_mismatch_blocks_exit",
+      "code": "exit_blocked_inventory_mismatch",
+      "result": "REJECTED"
+    },
+    {
+      "case_id": "route_program_mismatch_blocks_exit",
+      "code": "exit_blocked_route_program_mismatch",
+      "result": "REJECTED"
+    },
+    {
+      "case_id": "fee_cap_breach_blocks_exit",
+      "code": "exit_blocked_fee_cap_breach",
+      "result": "REJECTED"
+    },
+    {
+      "case_id": "reconciled_healthy_exit_shape_only",
+      "outcome": "EXIT_LEG_SHAPE_VALIDATED_NOT_AUTHORIZED",
+      "result": "PASS"
+    }
+  ],
+  "decision": {
+    "canary_authority": false,
+    "decision": "OWNER_INPUT_REQUIRED",
+    "execution_action": "NONE",
+    "next_action": "OWNER_INPUT_REQUIRED",
+    "numeric_netreturn": "FORBIDDEN",
+    "packet_state": "DRAFT_OWNER_INPUT_REQUIRED",
+    "task27_authority": false,
+    "task_id": "OWNER_AUTHORITY_PACKET_BINDING_V1"
+  },
+  "exit_policy": {
+    "exit_shape_only": "EXIT_LEG_SHAPE_VALIDATED_NOT_AUTHORIZED",
+    "first_leg_requires": "LANDED_SUCCESS_AND_RECONCILED",
+    "unknown_blocks_exit_and_retry": true
+  },
+  "input_bindings": [
+    {
+      "asset_id": "CONTRACT-T26C-OWNED-CANARY-READINESS-001",
+      "bytes": 3849,
+      "path": "docs/contracts/task26c_owned_execution_canary_readiness_contract_v1.md",
+      "sha256": "161c6eb2073f0175169384eeeaa95cc5ae4464a2a0bf44a9c1ea39d521a470bc"
+    },
+    {
+      "asset_id": "EVIDENCE-T26C-A3-CATALOG-FACTORY-FIT-001",
+      "bytes": 5847,
+      "path": "docs/evidence/task26c/a3_catalog_factory_fit_v1.json",
+      "sha256": "959b70e4e0e9e4f5450db2b0a657fd7d07d87b3d096e806964477908b2e040e1"
+    }
+  ],
+  "nonclaims": [
+    "NO_PROVIDER_API_RPC_WSS",
+    "NO_WALLET",
+    "NO_SIGNER",
+    "NO_TRANSACTION_OR_SIGNED_BYTES",
+    "NO_SIMULATION_OR_SEND",
+    "NO_CASH_SPEND",
+    "NO_R3",
+    "NO_NUMERIC_NETRETURN",
+    "NO_TASK27",
+    "READY_DOES_NOT_GRANT_AUTHORITY",
+    "UNKNOWN_BLOCKS_EXIT_AND_RETRY"
+  ],
+  "owner_packet": {
+    "all_in_cash_at_risk_cap_usd_cents": 300,
+    "flow": "SOL_TO_EXACT_MEMECOIN_TO_SOL_IMMEDIATE_EXIT",
+    "required_owner_input_fields": [
+      "exact_owner_approval_phrase",
+      "expires_at",
+      "maximum_separate_fees_usd_cents",
+      "monitoring_reference",
+      "program",
+      "proposed_notional_usd_cents",
+      "quote_basis",
+      "reconciliation_reference",
+      "route",
+      "stop_and_recovery_procedure",
+      "token",
+      "wallet_public_address"
+    ],
+    "status": "DRAFT_OWNER_INPUT_REQUIRED",
+    "synthetic_values_only": true
+  },
+  "schema": "smial.owner-authority-packet-binding.a1",
+  "schema_version": "1.0",
+  "side_effect_counters": {
+    "cash_spend_usd_cents": 0,
+    "dependency_changes": 0,
+    "provider_api_rpc_wss_calls": 0,
+    "r3_paths_or_values_read": 0,
+    "transaction_build_sign_simulate_send": 0,
+    "wallet_signer_transaction_actions": 0
+  },
+  "status": "PASS_OFFLINE_OWNER_PACKET_REVIEW_ONLY_NO_AUTHORITY",
+  "task_id": "OWNER_AUTHORITY_PACKET_BINDING_V1"
+}

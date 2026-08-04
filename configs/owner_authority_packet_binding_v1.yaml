@@ -1,0 +1,57 @@
+schema: smial.owner-authority-packet-binding-contract
+schema_version: "1.0"
+contract_id: OWNER-AUTHORITY-PACKET-BINDING-CONTRACT-001
+task_id: OWNER_AUTHORITY_PACKET_BINDING_V1
+atom_id: OWNER_AUTHORITY_PACKET_BINDING_V1
+as_of: "2026-08-05"
+base:
+  head: df06b18056740cb3ce6372b7db45f28f0b631e2a
+  tree: f42a98dbfa5ea83c43fa023c7b124c980427fb3b
+  branch: main
+  upstream: origin/main
+flow: SOL_TO_EXACT_MEMECOIN_TO_SOL_IMMEDIATE_EXIT
+cash_cap:
+  total_cash_at_risk_usd_cents: 300
+  owner_input_required: true
+authority:
+  provider_api_rpc_wss_calls: 0
+  r3_paths_or_values_read: 0
+  wallet_signer_transaction_actions: 0
+  transaction_build_sign_simulate_send: 0
+  cash_spend_usd_cents: 0
+  dependency_changes: 0
+  canary_authority: false
+  task27_authority: false
+  numeric_netreturn: forbidden
+packet_states:
+  - DRAFT_OWNER_INPUT_REQUIRED
+  - READY_FOR_OWNER_EXACT_APPROVAL_NOT_EXECUTION
+required_owner_input_fields:
+  - token
+  - program
+  - route
+  - wallet_public_address
+  - proposed_notional_usd_cents
+  - maximum_separate_fees_usd_cents
+  - quote_basis
+  - expires_at
+  - monitoring_reference
+  - reconciliation_reference
+  - stop_and_recovery_procedure
+  - exact_owner_approval_phrase
+exit_precondition:
+  first_leg_terminal_state: LANDED_SUCCESS
+  reconciliation_required: true
+  monitoring_healthy_required: true
+  inventory_match_required: true
+  allowlist_match_required: true
+  fee_cap_ok_required: true
+  outcome: EXIT_LEG_SHAPE_VALIDATED_NOT_AUTHORIZED
+  unknown_blocks_exit_and_retry: true
+frozen_input_bindings:
+  - asset_id: CONTRACT-T26C-OWNED-CANARY-READINESS-001
+    path: docs/contracts/task26c_owned_execution_canary_readiness_contract_v1.md
+    sha256: 161c6eb2073f0175169384eeeaa95cc5ae4464a2a0bf44a9c1ea39d521a470bc
+  - asset_id: EVIDENCE-T26C-A3-CATALOG-FACTORY-FIT-001
+    path: docs/evidence/task26c/a3_catalog_factory_fit_v1.json
+    sha256: 959b70e4e0e9e4f5450db2b0a657fd7d07d87b3d096e806964477908b2e040e1
