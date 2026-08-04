@@ -12500,14 +12500,14 @@ records:
   evidence: []
   classification: *t24_internal
 - asset_id: TEST-T24-A7-CATALOG-FACTORY-FIT-001
-  record_version: '1.2'
+  record_version: '1.3'
   asset_type: script
   purpose: Hash-bound A7 tests for the immutable TASK-24 transaction plus monotonic
     current Catalog growth, lifecycle, generated navigation, Full Factory Fit and
     authority boundaries.
   status: IMPLEMENTED_UNVERIFIED
   origin: REPOSITORY
-  as_of: '2026-08-02'
+  as_of: '2026-08-05'
   truth_owner: TASK-24
   location:
     kind: git_path
@@ -12515,7 +12515,7 @@ records:
     repository_path: tests/test_task24_catalog_factory_fit.py
   integrity:
     kind: sha256
-    sha256: 6a44a4a709e22cb16c664268b4ac24eb0452473397dcaa765a34396ba68cfb28
+    sha256: 928ca368dd49468368b1a69d4cabfaffebb0a2031ab914d57f5cfe961ab8869d
   access: *t24_read_file
   relations:
   - relation_type: depends_on
