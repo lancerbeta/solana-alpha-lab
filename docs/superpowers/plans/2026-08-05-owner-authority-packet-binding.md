@@ -1,47 +1,47 @@
-# Owner Authority Packet Binding v1 Implementation Plan
+# Owner Authority Packet Binding v1 — план реализации
 
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
 
-**Goal:** Build an offline, deterministic validator that turns the owner-agreed USD 3.00 technical-canary shape into a fail-closed review packet without granting wallet, signer, transaction, provider, cash, or TASK-27 authority.
+**Цель:** Построить offline детерминированный validator, который превращает согласованную владельцем форму technical canary с лимитом USD 3.00 в fail-closed packet для review, не выдавая authority для wallet, signer, transaction, provider, cash или TASK-27.
 
-**Architecture:** A new `owner_authority_packet_binding` module reads only tracked YAML/JSON fixtures, classifies a packet as an incomplete owner draft or a complete review packet, and emits deterministic acceptance evidence. A JSON Schema validates the evidence, while a second test suite binds the new assets to the existing Catalog and runs the existing navigation generator.
+**Архитектура:** Новый модуль `owner_authority_packet_binding` читает только tracked YAML/JSON fixtures, классифицирует packet как неполный owner draft или complete packet для review и выдаёт детерминированное acceptance evidence. JSON Schema валидирует evidence, а второй test suite связывает новые assets с существующим Catalog и запускает существующий navigation generator.
 
-**Tech Stack:** Python 3 standard library, PyYAML, jsonschema, unittest, JSON Schema Draft 2020-12, YAML/JSON/Markdown, existing Catalog generator.
+**Стек:** Python 3 standard library, PyYAML, jsonschema, unittest, JSON Schema Draft 2020-12, YAML/JSON/Markdown и существующий Catalog generator.
 
-## Global Constraints
+## Глобальные ограничения
 
-- The future flow is exactly `SOL -> one exact memecoin -> SOL`; the exit is immediate after first-leg terminal observation and inventory reconciliation.
-- `total_cash_at_risk_cap_usd_cents` is exactly `300`; input notional, network, relay/priority, ATA rent, and all separate fees must be accounted for before a packet can be review-ready.
-- Missing token, program, route, wallet public address, notional, fee cap, quote basis, expiry, monitoring/reconciliation references, or recovery procedure is `OWNER_INPUT_REQUIRED`, never a default or zero.
-- `DRAFT_OWNER_INPUT_REQUIRED` and `READY_FOR_OWNER_EXACT_APPROVAL_NOT_EXECUTION` are both non-executable states: `canary_authority=false`, `task27_authority=false`, and numeric NetReturn is forbidden.
-- No wallet creation, funding, seed/private key, signed bytes, transaction, simulation, provider/API/RPC/WSS call, cash spend, R3 read, dependency, deployment, or strategy logic.
-- `UNKNOWN`, first-leg reconciliation failure, monitoring loss, inventory mismatch, route/program mismatch, or cap breach blocks the planned exit and every retry.
-- Reuse `TASK-26C` contracts as hash-bound inputs; do not modify `TASK-26C` artifacts or build a generic execution platform.
+- Будущий flow строго `SOL -> one exact memecoin -> SOL`; выход немедленный после terminal observation первого этапа и inventory reconciliation.
+- `total_cash_at_risk_cap_usd_cents` строго равен `300`; input notional, network, relay/priority, ATA rent и все отдельные fees учитываются до того, как packet может стать готовым к review.
+- Отсутствующий token, program, route, публичный адрес wallet, notional, fee cap, quote basis, expiry, monitoring/reconciliation reference или recovery procedure — это `OWNER_INPUT_REQUIRED`, а не default и не ноль.
+- `DRAFT_OWNER_INPUT_REQUIRED` и `READY_FOR_OWNER_EXACT_APPROVAL_NOT_EXECUTION` — оба неисполняемые состояния: `canary_authority=false`, `task27_authority=false`, numeric NetReturn запрещён.
+- Запрещены создание и funding wallet, seed/private key, signed bytes, transaction, simulation, provider/API/RPC/WSS call, cash spend, R3 read, dependency, deployment и strategy logic.
+- `UNKNOWN`, неудачная reconciliation первого этапа, monitoring loss, inventory mismatch, route/program mismatch или cap breach блокируют planned exit и каждый retry.
+- Использовать контракты `TASK-26C` как hash-bound inputs; не менять артефакты `TASK-26C` и не строить generic execution platform.
 
 ---
 
-## File Map
+## Карта файлов
 
-| Path | Role |
+| Путь | Роль |
 |---|---|
-| `docs/tasks/OWNER_AUTHORITY_PACKET_BINDING_V1.md` | Human-readable scope, owner decision, non-claims, lifecycle and Definition of Done. |
-| `docs/contracts/owner_authority_packet_binding_contract_v1.md` | Versioned offline packet contract and exact state/field semantics. |
-| `configs/owner_authority_packet_binding_v1.yaml` | Machine-readable constants, owner-agreed cap, required fields, health blocks and TASK-26C hash bindings. |
-| `catalog/schemas/owner_authority_packet_binding.schema.json` | JSON Schema for deterministic acceptance evidence. |
-| `tests/fixtures/owner_authority_packet_binding/packet_binding_matrix_v1.json` | Synthetic draft, complete-review, cap-breach, unknown, monitoring, inventory and route-negative cases. |
-| `src/solana_alpha_lab/owner_authority_packet_binding.py` | Pure parser/evaluator/evidence writer; no network or signer imports. |
-| `tests/test_owner_authority_packet_binding.py` | Contract, fixture, schema, evaluator and deterministic-evidence tests. |
-| `docs/evidence/owner_authority_packet_binding/a1_offline_packet_binding_acceptance_v1.json` | Generated deterministic acceptance receipt. |
-| `tests/test_owner_authority_packet_binding_catalog_factory_fit.py` | Hash-bound Catalog/Factory-Fit receipt tests. |
-| `docs/evidence/owner_authority_packet_binding/a2_catalog_factory_fit_v1.json` | Full Factory Fit, Product Horizon and zero-side-effect receipt. |
-| `catalog/assets/core.yaml` | Catalog records and relations for the new task outputs. |
-| `catalog/assets/lifecycle.yaml` | Lifecycle record identifying this as an authority-preparation task with no execution authority. |
-| `catalog/catalog_manifest.yaml` | Version/checkpoint/schema registration. |
-| `catalog/generated/asset_edges.json`, `docs/PROJECT_MAP.md` | Generated Catalog projections; regenerate, never hand-edit. |
+| `docs/tasks/OWNER_AUTHORITY_PACKET_BINDING_V1.md` | Человеко-читаемые scope, owner decision, non-claims, lifecycle и Definition of Done. |
+| `docs/contracts/owner_authority_packet_binding_contract_v1.md` | Versioned offline packet contract и точная семантика state/field. |
+| `configs/owner_authority_packet_binding_v1.yaml` | Machine-readable constants, согласованный owner cap, required fields, health blocks и TASK-26C hash bindings. |
+| `catalog/schemas/owner_authority_packet_binding.schema.json` | JSON Schema для детерминированного acceptance evidence. |
+| `tests/fixtures/owner_authority_packet_binding/packet_binding_matrix_v1.json` | Synthetic draft, complete-review, cap-breach, unknown, monitoring, inventory и route-negative cases. |
+| `src/solana_alpha_lab/owner_authority_packet_binding.py` | Чистый parser/evaluator/evidence writer; без network или signer imports. |
+| `tests/test_owner_authority_packet_binding.py` | Тесты contract, fixture, schema, evaluator и deterministic evidence. |
+| `docs/evidence/owner_authority_packet_binding/a1_offline_packet_binding_acceptance_v1.json` | Сгенерированный детерминированный acceptance receipt. |
+| `tests/test_owner_authority_packet_binding_catalog_factory_fit.py` | Hash-bound тесты Catalog/Factory-Fit receipt. |
+| `docs/evidence/owner_authority_packet_binding/a2_catalog_factory_fit_v1.json` | Full Factory Fit, Product Horizon и zero-side-effect receipt. |
+| `catalog/assets/core.yaml` | Catalog records и relations для outputs новой задачи. |
+| `catalog/assets/lifecycle.yaml` | Lifecycle record, помечающий задачу как authority preparation без execution authority. |
+| `catalog/catalog_manifest.yaml` | Регистрация version/checkpoint/schema. |
+| `catalog/generated/asset_edges.json`, `docs/PROJECT_MAP.md` | Generated Catalog projections; только регенерировать, не править вручную. |
 
-## Task 1: Offline packet evaluator, contract, schema and adversarial matrix
+## Task 1: Offline packet evaluator, contract, schema и adversarial matrix
 
-**Files:**
+**Файлы:**
 - Create: `docs/tasks/OWNER_AUTHORITY_PACKET_BINDING_V1.md`
 - Create: `docs/contracts/owner_authority_packet_binding_contract_v1.md`
 - Create: `configs/owner_authority_packet_binding_v1.yaml`
@@ -50,12 +50,12 @@
 - Create: `src/solana_alpha_lab/owner_authority_packet_binding.py`
 - Create: `tests/test_owner_authority_packet_binding.py`
 
-**Interfaces:**
-- Consumes: `CONTRACT-T26C-OWNED-CANARY-READINESS-001` and `EVIDENCE-T26C-A3-CATALOG-FACTORY-FIT-001` by exact SHA-256 from the config.
-- Produces: `PacketBindingError`, `evaluate_packet(packet) -> dict[str, object]`, `evaluate_exit_precondition(first_leg) -> dict[str, str]`, `build_binding_evidence(repo_root) -> dict[str, object]`, and `write_outputs(repo_root) -> str`.
-- Invariant: every return value is an offline classification, never an execution command.
+**Интерфейсы:**
+- Потребляет: `CONTRACT-T26C-OWNED-CANARY-READINESS-001` и `EVIDENCE-T26C-A3-CATALOG-FACTORY-FIT-001` по exact SHA-256 из config.
+- Производит: `PacketBindingError`, `evaluate_packet(packet) -> dict[str, object]`, `evaluate_exit_precondition(first_leg) -> dict[str, str]`, `build_binding_evidence(repo_root) -> dict[str, object]` и `write_outputs(repo_root) -> str`.
+- Инвариант: каждое return value — offline classification, никогда не execution command.
 
-- [ ] **Step 1: Write the failing evaluator/schema tests**
+- [ ] **Шаг 1: Написать падающие evaluator/schema tests**
 
 ```python
 import unittest
@@ -90,9 +90,9 @@ class OwnerAuthorityPacketBindingTests(unittest.TestCase):
             evaluate_exit_precondition({"terminal_state": "LANDED_SUCCESS", "reconciled": False})
 ```
 
-Add tests that reject: cap `301`, zero-substituted fees, a missing exact token/program/route, a duplicate/ambiguous owner input list, `UNKNOWN_REQUIRES_RECONCILIATION`, `NO_MONITORING`, `INVENTORY_MISMATCH`, and `ROUTE_PROGRAM_MISMATCH`. Validate the generated evidence with `Draft202012Validator` and prove all side-effect counters equal zero.
+Добавить tests, которые отвергают: cap `301`, fees, подменённые нулём, отсутствующий exact token/program/route, duplicate/ambiguous owner input list, `UNKNOWN_REQUIRES_RECONCILIATION`, `NO_MONITORING`, `INVENTORY_MISMATCH` и `ROUTE_PROGRAM_MISMATCH`. Валидировать generated evidence через `Draft202012Validator` и доказать, что все side-effect counters равны нулю.
 
-- [ ] **Step 2: Run the tests before implementation**
+- [ ] **Шаг 2: Запустить tests до implementation**
 
 Run:
 
@@ -100,11 +100,11 @@ Run:
 uv run --locked --managed-python python -m unittest tests.test_owner_authority_packet_binding -v
 ```
 
-Expected: FAIL because `solana_alpha_lab.owner_authority_packet_binding` and the named contract files do not yet exist.
+Ожидание: FAIL, потому что `solana_alpha_lab.owner_authority_packet_binding` и перечисленных contract files ещё не существует.
 
-- [ ] **Step 3: Implement the minimal pure evaluator**
+- [ ] **Шаг 3: Реализовать минимальный чистый evaluator**
 
-Create `src/solana_alpha_lab/owner_authority_packet_binding.py` with no imports beyond `hashlib`, `json`, `pathlib`, `typing`, and `yaml`. Define exact constants:
+Создать `src/solana_alpha_lab/owner_authority_packet_binding.py` без imports помимо `hashlib`, `json`, `pathlib`, `typing` и `yaml`. Определить exact constants:
 
 ```python
 TASK_ID = "OWNER_AUTHORITY_PACKET_BINDING_V1"
@@ -130,11 +130,11 @@ def evaluate_packet(packet: Mapping[str, Any]) -> dict[str, object]:
     return _decision(state, "OWNER_EXACT_APPROVAL_REQUIRED")
 ```
 
-`_decision` must always set `canary_authority=False`, `task27_authority=False`, `numeric_netreturn="FORBIDDEN"`, and `execution_action="NONE"`. `evaluate_exit_precondition` must accept only `LANDED_SUCCESS` with `reconciled=True`, `monitoring_healthy=True`, `inventory_match=True`, `allowlist_match=True`, and `fee_cap_ok=True`; it returns `EXIT_LEG_SHAPE_VALIDATED_NOT_AUTHORIZED`.
+`_decision` всегда обязан устанавливать `canary_authority=False`, `task27_authority=False`, `numeric_netreturn="FORBIDDEN"` и `execution_action="NONE"`. `evaluate_exit_precondition` принимает только `LANDED_SUCCESS` с `reconciled=True`, `monitoring_healthy=True`, `inventory_match=True`, `allowlist_match=True` и `fee_cap_ok=True`; он возвращает `EXIT_LEG_SHAPE_VALIDATED_NOT_AUTHORIZED`.
 
-Model the config and contract around those constants. The fixture must be synthetic and include no public wallet address, token mint, real route, quote, signature, or secret. The schema must require `side_effect_counters` with six zero-valued counters matching TASK-26C.
+Построить config и contract вокруг этих constants. Fixture должна быть synthetic и не содержать публичный адрес wallet, token mint, реальный route, quote, signature или secret. Schema обязана требовать `side_effect_counters` с шестью нулевыми counters, совпадающими с TASK-26C.
 
-- [ ] **Step 4: Generate and validate deterministic evidence**
+- [ ] **Шаг 4: Сгенерировать и валидировать deterministic evidence**
 
 Run:
 
@@ -143,18 +143,18 @@ uv run --locked --managed-python python -c "from pathlib import Path; from solan
 uv run --locked --managed-python python -m unittest tests.test_owner_authority_packet_binding -v
 ```
 
-Expected: the receipt is canonical JSON, validates against the new schema, all synthetic cases match, and every authority counter is zero.
+Ожидание: receipt — canonical JSON, проходит новую schema, все synthetic cases совпадают, каждый authority counter равен нулю.
 
-- [ ] **Step 5: Commit the self-contained offline contract slice**
+- [ ] **Шаг 5: Закоммитить self-contained offline contract slice**
 
 ```powershell
 git add docs/tasks/OWNER_AUTHORITY_PACKET_BINDING_V1.md docs/contracts/owner_authority_packet_binding_contract_v1.md configs/owner_authority_packet_binding_v1.yaml catalog/schemas/owner_authority_packet_binding.schema.json tests/fixtures/owner_authority_packet_binding/packet_binding_matrix_v1.json src/solana_alpha_lab/owner_authority_packet_binding.py tests/test_owner_authority_packet_binding.py docs/evidence/owner_authority_packet_binding/a1_offline_packet_binding_acceptance_v1.json
 git commit -m "feat: add owner authority packet binding contract"
 ```
 
-## Task 2: Full Factory Fit receipt and Catalog transaction
+## Task 2: Full Factory Fit receipt и Catalog transaction
 
-**Files:**
+**Файлы:**
 - Create: `docs/evidence/owner_authority_packet_binding/a2_catalog_factory_fit_v1.json`
 - Create: `tests/test_owner_authority_packet_binding_catalog_factory_fit.py`
 - Modify: `catalog/assets/core.yaml`
@@ -163,12 +163,12 @@ git commit -m "feat: add owner authority packet binding contract"
 - Regenerate: `catalog/generated/asset_edges.json`
 - Regenerate: `docs/PROJECT_MAP.md`
 
-**Interfaces:**
-- Consumes: Task 1 receipt, config, schema, fixture, module and test hashes; TASK-26C Factory Fit receipt.
-- Produces: ten registered assets: task doc, contract, config, schema, fixture, module, evaluator test, A1 evidence, A2 evidence, and A2 Catalog/Factory-Fit test.
-- Invariant: the receipt verdict may be `PASS_WITH_FOLLOWUP`, but `canary_authority` and `task27_authority` remain false.
+**Интерфейсы:**
+- Потребляет: Task 1 receipt, config, schema, fixture, module и test hashes; TASK-26C Factory Fit receipt.
+- Производит: десять registered assets: task doc, contract, config, schema, fixture, module, evaluator test, A1 evidence, A2 evidence и A2 Catalog/Factory-Fit test.
+- Инвариант: verdict receipt может быть `PASS_WITH_FOLLOWUP`, но `canary_authority` и `task27_authority` остаются false.
 
-- [ ] **Step 1: Write failing Catalog/Factory-Fit tests**
+- [ ] **Шаг 1: Написать падающие Catalog/Factory-Fit tests**
 
 ```python
 NEW_IDS = {
@@ -192,9 +192,9 @@ def test_full_factory_fit_keeps_execution_forbidden() -> None:
     assert receipt["owner_packet"]["status"] == "DRAFT_OWNER_INPUT_REQUIRED"
 ```
 
-The test must recompute the receipt SHA-256 after removing `receipt_sha256`, assert every registered asset hash matches its physical file, require the generated navigation to list every new ID, and require a Product Horizon with exactly `now` and `watch`.
+Test обязан пересчитать SHA-256 receipt после удаления `receipt_sha256`, проверить, что hash каждого registered asset совпадает с физическим файлом, потребовать, чтобы generated navigation перечисляла каждый новый ID, и потребовать Product Horizon с ровно `now` и `watch`.
 
-- [ ] **Step 2: Run the Catalog test before adding records**
+- [ ] **Шаг 2: Запустить Catalog test до добавления records**
 
 Run:
 
@@ -202,19 +202,19 @@ Run:
 uv run --locked --managed-python python -m unittest tests.test_owner_authority_packet_binding_catalog_factory_fit -v
 ```
 
-Expected: FAIL because the receipt, registered IDs, and Catalog records do not exist.
+Ожидание: FAIL, потому что receipt, registered IDs и Catalog records ещё не существуют.
 
-- [ ] **Step 3: Add the deterministic Catalog and Factory-Fit receipt**
+- [ ] **Шаг 3: Добавить deterministic Catalog и Factory-Fit receipt**
 
-Create A2 with `FULL_REVIEW`, one durable NOW follow-up named
+Создать A2 с `FULL_REVIEW`, одним durable NOW follow-up с именем
 `EXACT_OWNER_PACKET_INPUT_AND_SEPARATE_CANARY_GATE`, and one WATCH item
-`TASK-27_EXECUTION_TRUTH_EVALUATION`. State explicitly that the first item
-requires owner inputs and a later separate authority; it is not an execution
-task. Set all side-effect counters to zero.
+`TASK-27_EXECUTION_TRUTH_EVALUATION`. Явно указать, что первый item требует
+owner inputs и более поздний separate authority; это не execution task. Все
+side-effect counters установить в ноль.
 
-In `core.yaml`, create the ten IDs above with `record_version: '1.0'`, exact
-file SHA-256 values, `consumers: [OWNER_AUTHORITY_PACKET_BINDING_V1, FACTORY-001]`,
-and these relations:
+В `core.yaml` создать десять перечисленных ID с `record_version: '1.0'`, exact
+file SHA-256 values, `consumers: [OWNER_AUTHORITY_PACKET_BINDING_V1, FACTORY-001]`
+и следующими relations:
 
 ```yaml
 - {relation_type: derived_from, target_asset_id: CONTRACT-T26C-OWNED-CANARY-READINESS-001}
@@ -223,15 +223,15 @@ and these relations:
 - {relation_type: produces, target_asset_id: EVIDENCE-OWNER-AUTHORITY-PACKET-A1-001}
 ```
 
-Register the schema in `catalog_manifest.yaml`, increment the version and
-checkpoint counts monotonically, add one lifecycle record with decision
-`OFFLINE_OWNER_PACKET_READY_NO_EXECUTION_AUTHORITY`, then regenerate views:
+Зарегистрировать schema в `catalog_manifest.yaml`, монотонно увеличить version
+и checkpoint counts, добавить один lifecycle record с decision
+`OFFLINE_OWNER_PACKET_READY_NO_EXECUTION_AUTHORITY`, затем регенерировать views:
 
 ```powershell
 uv run --locked --managed-python python scripts/generate_navigation.py --write
 ```
 
-- [ ] **Step 4: Validate the Catalog transaction**
+- [ ] **Шаг 4: Валидировать Catalog transaction**
 
 Run:
 
@@ -240,27 +240,27 @@ uv run --locked --managed-python python -m unittest tests.test_owner_authority_p
 uv run --locked --managed-python python scripts/generate_navigation.py --check
 ```
 
-Expected: both suites pass; navigation is current; every receipt hash and asset hash agrees.
+Ожидание: обе suites проходят; navigation актуальна; каждый receipt hash и asset hash совпадает.
 
-- [ ] **Step 5: Commit Catalog closure**
+- [ ] **Шаг 5: Закоммитить Catalog closure**
 
 ```powershell
 git add docs/evidence/owner_authority_packet_binding/a2_catalog_factory_fit_v1.json tests/test_owner_authority_packet_binding_catalog_factory_fit.py catalog/assets/core.yaml catalog/assets/lifecycle.yaml catalog/catalog_manifest.yaml catalog/generated/asset_edges.json docs/PROJECT_MAP.md
 git commit -m "feat: register owner authority packet binding"
 ```
 
-## Task 3: Bounded delivery and semantic acceptance
+## Task 3: Ограниченная delivery и semantic acceptance
 
-**Files:**
-- Modify only if validation identifies a directly affected defect: files from Tasks 1–2.
-- Do not create: wallet, signer, route provider, deployment, UI, Source bundle, or TASK-27 artifact.
+**Файлы:**
+- Менять только если validation выявит непосредственно затронутый дефект: файлы из Tasks 1–2.
+- Не создавать: wallet, signer, route provider, deployment, UI, Source bundle или TASK-27 artifact.
 
-**Interfaces:**
-- Consumes: both local commits and deterministic receipts from Tasks 1–2.
-- Produces: a clean, validated delivery candidate plus an exact no-side-effect report.
-- Stop boundary: before any external provider, wallet, funding, transaction, merge, or Project Sources action.
+**Интерфейсы:**
+- Потребляет: оба local commits и deterministic receipts из Tasks 1–2.
+- Производит: чистый validated delivery candidate плюс exact no-side-effect report.
+- Stop boundary: до любого external provider, wallet, funding, transaction, merge или Project Sources action.
 
-- [ ] **Step 1: Inspect exact change scope**
+- [ ] **Шаг 1: Проверить exact change scope**
 
 Run:
 
@@ -270,9 +270,9 @@ git diff --name-only origin/main...HEAD
 git status --porcelain
 ```
 
-Expected: only the design, plan, and Task 1–2 paths are changed; no local secret, wallet, or raw-data path appears.
+Ожидание: изменены только пути design, plan и Tasks 1–2; не появляется local secret, wallet или raw-data path.
 
-- [ ] **Step 2: Run targeted and full delivery validation once**
+- [ ] **Шаг 2: Один раз запустить targeted и full delivery validation**
 
 Run:
 
@@ -281,11 +281,11 @@ uv run --locked --managed-python python -m unittest tests.test_owner_authority_p
 uv run --locked --managed-python python -B scripts/validate_ci.py --tracked-only-delivery
 ```
 
-Expected: targeted tests pass; tracked-only gate copies no ignored/local inputs and reports no new skip used to hide missing evidence.
+Ожидание: targeted tests проходят; tracked-only gate не копирует ignored/local inputs и не сообщает о новом skip, скрывающем missing evidence.
 
-- [ ] **Step 3: Produce the semantic acceptance checklist**
+- [ ] **Шаг 3: Провести semantic acceptance checklist**
 
-Verify all of the following against actual bytes before any push:
+Проверить все следующие пункты по actual bytes до любого push:
 
 ```text
 packet states are draft/review only
@@ -299,11 +299,11 @@ task27_authority=false
 no seed/private key/signed bytes/provider path exists
 ```
 
-If any line fails, repair only the directly responsible Task 1–2 file, rerun its targeted test, then rerun the unchanged delivery gate only if the candidate fingerprint changed.
+Если любой пункт не проходит, исправить только непосредственно ответственный Task 1–2 file, повторить его targeted test, затем повторить delivery gate, только если candidate fingerprint изменился.
 
-- [ ] **Step 4: Commit any validation repair, then push and open a draft PR**
+- [ ] **Шаг 4: Закоммитить validation repair, затем push и открыть draft PR**
 
-Run only after the semantic checklist passes:
+Запускать только после прохождения semantic checklist:
 
 ```powershell
 git status --porcelain
@@ -311,10 +311,10 @@ git push -u origin owner-authority-packet-binding
 gh pr create --draft --base main --head owner-authority-packet-binding --title "feat: bind owner authority packet offline" --body-file docs/superpowers/plans/2026-08-05-owner-authority-packet-binding.md
 ```
 
-Expected: one draft PR with the exact head; stop before Ready/merge. The pull request description must state that the implementation grants no canary, wallet, signer, transaction, provider, cash, or TASK-27 authority.
+Ожидание: один draft PR с exact head; остановиться до Ready/merge. Pull request description обязан сообщать, что implementation не даёт authority для canary, wallet, signer, transaction, provider, cash или TASK-27.
 
-## Plan self-review
+## Самопроверка плана
 
-- **Spec coverage:** Task 1 implements both packet states, the USD 3.00 cap, immediate-exit precondition, explicit missing inputs, schema, and adversarial cases. Task 2 implements Catalog, Factory Fit, Product Horizon, and durable no-authority evidence. Task 3 verifies exact scope and delivery without widening to external execution.
-- **Placeholder scan:** no `TODO`, `TBD`, undefined interface, or implicit external action is present. `OWNER_INPUT_REQUIRED` is a deliberate runtime value, not a placeholder.
-- **Type consistency:** Task 1 defines every module symbol used by its tests. Task 2 reads Task 1 hashes and receipt. Task 3 invokes only the two test modules and the repository’s existing validation commands.
+- **Покрытие spec:** Task 1 реализует оба packet states, USD 3.00 cap, immediate-exit precondition, явные missing inputs, schema и adversarial cases. Task 2 реализует Catalog, Factory Fit, Product Horizon и durable no-authority evidence. Task 3 проверяет exact scope и delivery без расширения в external execution.
+- **Проверка placeholders:** нет `TODO`, `TBD`, undefined interface или implicit external action. `OWNER_INPUT_REQUIRED` — намеренное runtime value, не placeholder.
+- **Согласованность типов:** Task 1 определяет каждый module symbol, используемый его tests. Task 2 читает Task 1 hashes и receipt. Task 3 вызывает только два test modules и существующие validation commands репозитория.
