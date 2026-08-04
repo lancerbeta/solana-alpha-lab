@@ -1,0 +1,69 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:smial:task26c:owned-execution-canary-readiness:1.0",
+  "title": "TASK-26C owned execution canary readiness evidence",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema",
+    "schema_version",
+    "task_id",
+    "atom_id",
+    "as_of",
+    "status",
+    "input_bindings",
+    "decision",
+    "authority",
+    "role_boundaries",
+    "future_witness_contract",
+    "reconciliation_before_retry",
+    "allowlist_policy",
+    "owner_approval_packet",
+    "health_blocks",
+    "case_results",
+    "nonclaims",
+    "side_effect_counters"
+  ],
+  "properties": {
+    "schema": {"const": "smial.task26c.a1-owned-execution-canary-readiness"},
+    "schema_version": {"const": "1.0"},
+    "task_id": {"const": "TASK-26C"},
+    "atom_id": {"const": "T26C-A1_OFFLINE_CANARY_READINESS_AND_AUTHORITY_GATE_V1"},
+    "as_of": {"type": "string", "minLength": 10},
+    "status": {"const": "PASS_READY_FOR_OWNER_AUTHORITY_WITH_LIMITATIONS_NO_AUTHORITY"},
+    "input_bindings": {"type": "array", "minItems": 6},
+    "decision": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["result", "canary_authority", "task27_authority", "numeric_netreturn"],
+      "properties": {
+        "result": {"enum": ["READY_FOR_OWNER_CANARY_AUTHORITY_WITH_LIMITATIONS", "REDESIGN_CANARY", "PAUSE", "CLOSE_CANARY_ROUTE"]},
+        "canary_authority": {"const": false},
+        "task27_authority": {"const": false},
+        "numeric_netreturn": {"const": "FORBIDDEN"}
+      }
+    },
+    "authority": {"type": "object"},
+    "role_boundaries": {"type": "object"},
+    "future_witness_contract": {"type": "object"},
+    "reconciliation_before_retry": {"type": "object"},
+    "allowlist_policy": {"type": "object"},
+    "owner_approval_packet": {"type": "object"},
+    "health_blocks": {"type": "array", "minItems": 7},
+    "case_results": {"type": "array", "minItems": 11},
+    "nonclaims": {"type": "array", "minItems": 8},
+    "side_effect_counters": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["provider_api_rpc_wss_calls", "r3_paths_or_values_read", "wallet_signer_transaction_actions", "transaction_build_sign_simulate_send", "cash_spend_usd_cents", "dependency_changes"],
+      "properties": {
+        "provider_api_rpc_wss_calls": {"const": 0},
+        "r3_paths_or_values_read": {"const": 0},
+        "wallet_signer_transaction_actions": {"const": 0},
+        "transaction_build_sign_simulate_send": {"const": 0},
+        "cash_spend_usd_cents": {"const": 0},
+        "dependency_changes": {"const": 0}
+      }
+    }
+  }
+}

@@ -1,0 +1,210 @@
+{
+  "allowlist_policy": {
+    "exact_program": "OWNER_INPUT_REQUIRED",
+    "exact_route": "OWNER_INPUT_REQUIRED",
+    "exact_token": "OWNER_INPUT_REQUIRED",
+    "status": "DENY_BY_DEFAULT_OWNER_INPUT_REQUIRED"
+  },
+  "as_of": "2026-08-04",
+  "atom_id": "T26C-A1_OFFLINE_CANARY_READINESS_AND_AUTHORITY_GATE_V1",
+  "authority": {
+    "canary_authority": false,
+    "cash_spend_usd_cents": 0,
+    "dependency_changes": 0,
+    "numeric_modeled_netreturn": "forbidden",
+    "observed_netreturn": "forbidden",
+    "provider_api_rpc_wss_calls": 0,
+    "r3_paths_or_values_reads": 0,
+    "raw_r2_reads": 0,
+    "task27": "forbidden",
+    "transaction_build_sign_simulate_send": 0,
+    "wallet_signer_transaction_actions": 0
+  },
+  "case_results": [
+    {
+      "case_id": "happy_reconciled_success",
+      "outcome": "CLOSED_RECONCILED_NO_RETRY",
+      "result": "PASS"
+    },
+    {
+      "case_id": "rejected_before_send",
+      "outcome": "REJECTED_BEFORE_SEND_RECORDED",
+      "result": "PASS"
+    },
+    {
+      "case_id": "dropped_requires_reconciliation",
+      "code": "retry_before_reconciliation",
+      "result": "REJECTED"
+    },
+    {
+      "case_id": "landed_failed_requires_reconciliation",
+      "outcome": "RECONCILIATION_REQUIRED",
+      "result": "PASS"
+    },
+    {
+      "case_id": "landed_success_requires_reconciliation",
+      "outcome": "RECONCILIATION_REQUIRED",
+      "result": "PASS"
+    },
+    {
+      "case_id": "unknown_requires_reconciliation",
+      "code": "retry_before_reconciliation",
+      "result": "REJECTED"
+    },
+    {
+      "case_id": "duplicate_send_rejected",
+      "code": "duplicate_attempt_id",
+      "result": "REJECTED"
+    },
+    {
+      "case_id": "residual_inventory_blocks",
+      "outcome": "BLOCKED_INVENTORY_MISMATCH",
+      "result": "PASS"
+    },
+    {
+      "case_id": "fee_cap_breach_blocks",
+      "outcome": "BLOCKED_FEE_CAP",
+      "result": "PASS"
+    },
+    {
+      "case_id": "monitoring_loss_blocks",
+      "outcome": "BLOCKED_MONITORING",
+      "result": "PASS"
+    },
+    {
+      "case_id": "route_mismatch_blocks",
+      "outcome": "BLOCKED_ROUTE_MISMATCH",
+      "result": "PASS"
+    },
+    {
+      "case_id": "provider_divergence_blocks",
+      "outcome": "BLOCKED_PROVIDER_DIVERGENCE",
+      "result": "PASS"
+    }
+  ],
+  "decision": {
+    "canary_authority": false,
+    "numeric_netreturn": "FORBIDDEN",
+    "result": "READY_FOR_OWNER_CANARY_AUTHORITY_WITH_LIMITATIONS",
+    "task27_authority": false
+  },
+  "future_witness_contract": {
+    "required_fields": [
+      "stable_attempt_id",
+      "retry_chain_id",
+      "quote_build_context",
+      "submitted_at",
+      "terminal_at",
+      "terminal_state",
+      "transaction_signature",
+      "processed_on_chain",
+      "token_and_sol_deltas",
+      "network_relay_tip_ata_rent_and_separate_fees",
+      "inventory_before_after",
+      "settlement_accounting_basis",
+      "reconciliation_reference",
+      "source_raw_hashes",
+      "unknown_recovery_path"
+    ],
+    "status": "FUTURE_ONLY_NO_ATTEMPT_OR_SIGNATURE"
+  },
+  "health_blocks": [
+    "STALE_DATA",
+    "NO_MONITORING",
+    "UNRESOLVED_PRIOR_ATTEMPT",
+    "INVENTORY_MISMATCH",
+    "FEE_CAP_BREACH",
+    "ROUTE_PROGRAM_MISMATCH",
+    "PROVIDER_DISAGREEMENT"
+  ],
+  "input_bindings": [
+    {
+      "asset_id": "CONTRACT-T26-EXECUTION-COST-NETRETURN-001",
+      "bytes": 8862,
+      "path": "docs/contracts/task26_execution_cost_and_netreturn_contract_v1.md",
+      "sha256": "aac003cf7ba2742d310893c81af3ae4a032a52b719f2f56d80171a6486351efd"
+    },
+    {
+      "asset_id": "CONTRACT-T26A-EXECUTION-EVIDENCE-001",
+      "bytes": 4008,
+      "path": "docs/contracts/task26a_execution_evidence_completion_contract_v1.md",
+      "sha256": "218519777231189ca372f98462bbd3cf182de6c332c18766e968d0143e9c128b"
+    },
+    {
+      "asset_id": "CONTRACT-T26B-EXECUTION-WITNESS-ROUTE-001",
+      "bytes": 2066,
+      "path": "docs/contracts/task26b_minimal_execution_witness_route_contract_v1.md",
+      "sha256": "7d8fbe07c28304a7dd45e4bf1edc83c3efb93fccf2c358e3c65ba1a03f1ea6a0"
+    },
+    {
+      "asset_id": "EVIDENCE-T26B-A1-DECISION-001",
+      "bytes": 10310,
+      "path": "docs/evidence/task26b/a1_execution_witness_route_decision_v1.json",
+      "sha256": "c6df17bb1b8f2f361bb0e25b801d8d5a71440e42fe4e95ccd0c55ab5e33630de"
+    },
+    {
+      "asset_id": "EVIDENCE-T26B-A1-ACCEPTANCE-001",
+      "bytes": 3210,
+      "path": "docs/evidence/task26b/a1_execution_witness_route_acceptance_v1.json",
+      "sha256": "86cd5d33f3e29f9c3d365afc1aca511b212d6a809fa7be3ea2c6e65ffebd4b73"
+    },
+    {
+      "asset_id": "CTRL-SCHEMA-SQL-001",
+      "bytes": 28962,
+      "path": "schemas/schema_v1.sql",
+      "sha256": "eae9d1544b11cffc03afba1e263153168a11dc6f648df9117a55a4cae5d23f09"
+    }
+  ],
+  "nonclaims": [
+    "NO_PROVIDER_EXECUTION",
+    "NO_WALLET",
+    "NO_SIGNER",
+    "NO_TRANSACTION_OR_SIGNED_BYTES",
+    "NO_CASH_SPEND",
+    "NO_R3",
+    "NO_NUMERIC_NETRETURN",
+    "NO_TASK27",
+    "UNKNOWN_BLOCKS_RETRY"
+  ],
+  "owner_approval_packet": {
+    "approval_phrase_template": "I APPROVE ONE EXACT TECHNICAL CANARY {canary_id}; token={token}; program={program}; route={route}; notional={notional}; total_cash_at_risk_cap={cap}; max_separate_fees={fees}. This approval expires on {expires_at} and does not authorize strategy trading, retries before reconciliation, or any different route.",
+    "required_fields": [
+      "exact_planned_action",
+      "exact_token_program_route",
+      "proposed_notional",
+      "proposed_total_cash_at_risk_cap",
+      "maximum_separately_charged_fees",
+      "expected_inventory_before_after",
+      "stop_and_recovery_procedure",
+      "exact_approval_phrase"
+    ],
+    "status": "TEMPLATE_ONLY_OWNER_INPUT_REQUIRED"
+  },
+  "reconciliation_before_retry": {
+    "required_basis": [
+      "terminal_state",
+      "fee_treatment",
+      "inventory_basis"
+    ],
+    "retry_requires_bound_reconciliation": true,
+    "unknown_blocks_retry_and_new_action": true
+  },
+  "role_boundaries": {
+    "goal_owner": "EXACT_FUTURE_APPROVAL_REQUIRED",
+    "isolated_signer": "FUTURE_OWNER_CONTROLLED_BOUNDARY_NOT_CREATED_OR_ACTIVATED",
+    "research_process": "OFFLINE_EVALUATION_ONLY_NO_BUILD_SIGN_SEND",
+    "transaction_builder": "FUTURE_SHAPE_VALIDATION_ONLY_NO_KEY_OR_SEND"
+  },
+  "schema": "smial.task26c.a1-owned-execution-canary-readiness",
+  "schema_version": "1.0",
+  "side_effect_counters": {
+    "cash_spend_usd_cents": 0,
+    "dependency_changes": 0,
+    "provider_api_rpc_wss_calls": 0,
+    "r3_paths_or_values_read": 0,
+    "transaction_build_sign_simulate_send": 0,
+    "wallet_signer_transaction_actions": 0
+  },
+  "status": "PASS_READY_FOR_OWNER_AUTHORITY_WITH_LIMITATIONS_NO_AUTHORITY",
+  "task_id": "TASK-26C"
+}

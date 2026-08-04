@@ -14295,3 +14295,180 @@ records:
   consumers: [TASK-26B, FACTORY-001]
   evidence: []
   classification: *t25_internal
+
+- asset_id: DOC-T26C-TASK-001
+  record_version: '1.0'
+  asset_type: control_document
+  purpose: TASK-26C offline owned-canary readiness task, scope and non-claim boundary.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-08-04'
+  truth_owner: TASK-26C
+  location: {kind: git_path, logical_uri: 'repo://docs/tasks/TASK-26C-minimal-owned-execution-canary-readiness.md', repository_path: docs/tasks/TASK-26C-minimal-owned-execution-canary-readiness.md}
+  integrity: {kind: sha256, sha256: 26959784f013587b54ed0db87cfcbe83b46f4703c7fdecd956506c983558cdc6}
+  access: *t25_read_file
+  relations:
+  - {relation_type: derived_from, target_asset_id: EVIDENCE-T26B-A1-ACCEPTANCE-001}
+  consumers: [TASK-26C, FACTORY-001]
+  evidence: []
+  classification: *t25_internal
+
+- asset_id: CONTRACT-T26C-OWNED-CANARY-READINESS-001
+  record_version: '1.0'
+  asset_type: control_document
+  purpose: Versioned offline contract for future owned-canary authority, witness and recovery boundaries.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-08-04'
+  truth_owner: TASK-26C
+  location: {kind: git_path, logical_uri: 'repo://docs/contracts/task26c_owned_execution_canary_readiness_contract_v1.md', repository_path: docs/contracts/task26c_owned_execution_canary_readiness_contract_v1.md}
+  integrity: {kind: sha256, sha256: 161c6eb2073f0175169384eeeaa95cc5ae4464a2a0bf44a9c1ea39d521a470bc}
+  access: *t25_read_file
+  relations:
+  - {relation_type: derived_from, target_asset_id: CONTRACT-T26B-EXECUTION-WITNESS-ROUTE-001}
+  - {relation_type: derived_from, target_asset_id: EVIDENCE-T26B-A1-DECISION-001}
+  consumers: [TASK-26C, FACTORY-001]
+  evidence: []
+  classification: *t25_internal
+
+- asset_id: CONFIG-T26C-OWNED-CANARY-READINESS-001
+  record_version: '1.0'
+  asset_type: configuration
+  purpose: Machine-readable TASK-26C authority, health-block and future-witness policy.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-08-04'
+  truth_owner: TASK-26C
+  location: {kind: git_path, logical_uri: 'repo://configs/task26c_owned_execution_canary_readiness_contract_v1.yaml', repository_path: configs/task26c_owned_execution_canary_readiness_contract_v1.yaml}
+  integrity: {kind: sha256, sha256: 88005a85b428817b775da757d9f18e9e26073327b6ca919c87b14b9c46963b16}
+  access: *t25_read_file
+  relations:
+  - {relation_type: governed_by, target_asset_id: CONTRACT-T26C-OWNED-CANARY-READINESS-001}
+  consumers: [TASK-26C, FACTORY-001]
+  evidence: []
+  classification: *t25_internal
+
+- asset_id: SCHEMA-T26C-OWNED-CANARY-READINESS-001
+  record_version: '1.0'
+  asset_type: schema
+  purpose: JSON Schema for TASK-26C safe offline canary-readiness evidence.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-08-04'
+  truth_owner: TASK-26C
+  location: {kind: git_path, logical_uri: 'repo://catalog/schemas/task26c_owned_execution_canary_readiness.schema.json', repository_path: catalog/schemas/task26c_owned_execution_canary_readiness.schema.json}
+  integrity: {kind: sha256, sha256: 13bd58ea64bf61dde477bce394da210be2e437268f28e248ddd09ce1b9018a06}
+  access: *t25_read_file
+  relations:
+  - {relation_type: governed_by, target_asset_id: CONTRACT-T26C-OWNED-CANARY-READINESS-001}
+  consumers: [TASK-26C, FACTORY-001]
+  evidence: []
+  classification: *t25_internal
+
+- asset_id: MODULE-T26C-OWNED-CANARY-READINESS-001
+  record_version: '1.0'
+  asset_type: script
+  purpose: Deterministic offline canary-readiness state evaluator with fail-closed fake test doubles.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-08-04'
+  truth_owner: TASK-26C
+  location: {kind: git_path, logical_uri: 'repo://src/solana_alpha_lab/task26c_owned_execution_canary_readiness.py', repository_path: src/solana_alpha_lab/task26c_owned_execution_canary_readiness.py}
+  integrity: {kind: sha256, sha256: e3b7957327c3a557df292c7bfaaa314520ab91cec22c7b8f7db2435c2b2c0834}
+  access: *t25_read_file
+  relations:
+  - {relation_type: governed_by, target_asset_id: CONFIG-T26C-OWNED-CANARY-READINESS-001}
+  - {relation_type: produces, target_asset_id: EVIDENCE-T26C-A2-READINESS-001}
+  consumers: [TASK-26C, FACTORY-001]
+  evidence: []
+  classification: *t25_internal
+
+- asset_id: FIXTURE-T26C-OWNED-CANARY-READINESS-001
+  record_version: '1.0'
+  asset_type: evidence
+  purpose: Frozen twelve-case offline matrix for canary readiness, recovery and kill switches.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-08-04'
+  truth_owner: TASK-26C
+  location: {kind: git_path, logical_uri: 'repo://tests/fixtures/task26c/owned_execution_canary_readiness_matrix_v1.json', repository_path: tests/fixtures/task26c/owned_execution_canary_readiness_matrix_v1.json}
+  integrity: {kind: sha256, sha256: cca7c7397f9b7153f7c4330274a80b4cc5c381c62f1158dfafa62f5c309474c5}
+  access: *t25_read_file
+  relations:
+  - {relation_type: derived_from, target_asset_id: CONFIG-T26C-OWNED-CANARY-READINESS-001}
+  consumers: [TASK-26C, FACTORY-001]
+  evidence: []
+  classification: *t25_internal
+
+- asset_id: TEST-T26C-OWNED-CANARY-READINESS-001
+  record_version: '1.0'
+  asset_type: script
+  purpose: Hash-bound tests for TASK-26C readiness evaluator, fake-only boundary and no-authority decision.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-08-04'
+  truth_owner: TASK-26C
+  location: {kind: git_path, logical_uri: 'repo://tests/test_task26c_owned_execution_canary_readiness.py', repository_path: tests/test_task26c_owned_execution_canary_readiness.py}
+  integrity: {kind: sha256, sha256: f5b29f290be9558048fbece34dd5f21c429cd352de623a2c3cd46c26120ed418}
+  access: *t25_read_file
+  relations:
+  - {relation_type: depends_on, target_asset_id: MODULE-T26C-OWNED-CANARY-READINESS-001}
+  - {relation_type: depends_on, target_asset_id: SCHEMA-T26C-OWNED-CANARY-READINESS-001}
+  - {relation_type: depends_on, target_asset_id: FIXTURE-T26C-OWNED-CANARY-READINESS-001}
+  consumers: [TASK-26C, FACTORY-001]
+  evidence: []
+  classification: *t25_internal
+
+- asset_id: EVIDENCE-T26C-A2-READINESS-001
+  record_version: '1.0'
+  asset_type: evidence
+  purpose: TASK-26C deterministic acceptance receipt for a future canary authority gate without authority.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-08-04'
+  truth_owner: TASK-26C
+  location: {kind: git_path, logical_uri: 'repo://docs/evidence/task26c/a2_owned_canary_readiness_acceptance_v1.json', repository_path: docs/evidence/task26c/a2_owned_canary_readiness_acceptance_v1.json}
+  integrity: {kind: sha256, sha256: 71b95244d3a0f9438d1b38989701d4e38d0d6dc27bfdaddcea42225c79fc9b7a}
+  access: *t25_read_file
+  relations:
+  - {relation_type: derived_from, target_asset_id: MODULE-T26C-OWNED-CANARY-READINESS-001}
+  - {relation_type: validated_by, target_asset_id: TEST-T26C-OWNED-CANARY-READINESS-001}
+  consumers: [TASK-26C, FACTORY-001]
+  evidence: []
+  classification: *t25_internal
+
+- asset_id: EVIDENCE-T26C-A3-CATALOG-FACTORY-FIT-001
+  record_version: '1.0'
+  asset_type: evidence
+  purpose: TASK-26C FULL Factory Fit and Catalog registration receipt with owner-authority boundary.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-08-04'
+  truth_owner: TASK-26C
+  location: {kind: git_path, logical_uri: 'repo://docs/evidence/task26c/a3_catalog_factory_fit_v1.json', repository_path: docs/evidence/task26c/a3_catalog_factory_fit_v1.json}
+  integrity: {kind: sha256, sha256: 959b70e4e0e9e4f5450db2b0a657fd7d07d87b3d096e806964477908b2e040e1}
+  access: *t25_read_file
+  relations:
+  - {relation_type: derived_from, target_asset_id: EVIDENCE-T26C-A2-READINESS-001}
+  - {relation_type: validated_by, target_asset_id: TEST-T26C-A3-CATALOG-FACTORY-FIT-001}
+  consumers: [TASK-26C, FACTORY-001]
+  evidence: []
+  classification: *t25_internal
+
+- asset_id: TEST-T26C-A3-CATALOG-FACTORY-FIT-001
+  record_version: '1.0'
+  asset_type: script
+  purpose: Hash-bound tests for TASK-26C Catalog registration, Factory Fit receipt and non-authority hold.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-08-04'
+  truth_owner: TASK-26C
+  location: {kind: git_path, logical_uri: 'repo://tests/test_task26c_catalog_factory_fit.py', repository_path: tests/test_task26c_catalog_factory_fit.py}
+  integrity: {kind: sha256, sha256: f78a07c733124d04c6c1df16d6120fcd2a0acfffd61aa07d38ff2d380a4bd531}
+  access: *t25_read_file
+  relations:
+  - {relation_type: depends_on, target_asset_id: EVIDENCE-T26C-A3-CATALOG-FACTORY-FIT-001}
+  - {relation_type: depends_on, target_asset_id: CATALOG-ROOT-001}
+  consumers: [TASK-26C, FACTORY-001]
+  evidence: []
+  classification: *t25_internal

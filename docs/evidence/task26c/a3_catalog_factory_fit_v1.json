@@ -1,0 +1,128 @@
+{
+  "accepted_result": {
+    "canary_authority": false,
+    "decision": "READY_FOR_OWNER_CANARY_AUTHORITY_WITH_LIMITATIONS",
+    "numeric_netreturn": "FORBIDDEN",
+    "task27_authority": false
+  },
+  "as_of": "2026-08-04",
+  "atom_id": "T26C-A3_CATALOG_FACTORY_FIT_V1",
+  "catalog": {
+    "after_assets": 534,
+    "after_schemas": 12,
+    "after_version": "0.34.0",
+    "before_assets": 524,
+    "before_schemas": 11,
+    "before_version": "0.33.0",
+    "registered_asset_ids": [
+      "DOC-T26C-TASK-001",
+      "CONTRACT-T26C-OWNED-CANARY-READINESS-001",
+      "CONFIG-T26C-OWNED-CANARY-READINESS-001",
+      "SCHEMA-T26C-OWNED-CANARY-READINESS-001",
+      "MODULE-T26C-OWNED-CANARY-READINESS-001",
+      "FIXTURE-T26C-OWNED-CANARY-READINESS-001",
+      "TEST-T26C-OWNED-CANARY-READINESS-001",
+      "EVIDENCE-T26C-A2-READINESS-001",
+      "EVIDENCE-T26C-A3-CATALOG-FACTORY-FIT-001",
+      "TEST-T26C-A3-CATALOG-FACTORY-FIT-001"
+    ]
+  },
+  "confirmations": [
+    "OFFLINE_ONLY",
+    "NO_PROVIDER_EXECUTION",
+    "NO_WALLET",
+    "NO_SIGNER",
+    "NO_TRANSACTION",
+    "NO_CASH_SPEND",
+    "NO_R3",
+    "NO_NUMERIC_NETRETURN",
+    "NO_TASK27",
+    "READY_DOES_NOT_GRANT_AUTHORITY",
+    "UNKNOWN_BLOCKS_RETRY"
+  ],
+  "critical_bindings": [
+    {
+      "asset_id": "CONTRACT-T26B-EXECUTION-WITNESS-ROUTE-001",
+      "path": "docs/contracts/task26b_minimal_execution_witness_route_contract_v1.md",
+      "sha256": "7d8fbe07c28304a7dd45e4bf1edc83c3efb93fccf2c358e3c65ba1a03f1ea6a0"
+    },
+    {
+      "asset_id": "EVIDENCE-T26B-A1-DECISION-001",
+      "path": "docs/evidence/task26b/a1_execution_witness_route_decision_v1.json",
+      "sha256": "c6df17bb1b8f2f361bb0e25b801d8d5a71440e42fe4e95ccd0c55ab5e33630de"
+    },
+    {
+      "asset_id": "CONTRACT-T26C-OWNED-CANARY-READINESS-001",
+      "path": "docs/contracts/task26c_owned_execution_canary_readiness_contract_v1.md",
+      "sha256": "161c6eb2073f0175169384eeeaa95cc5ae4464a2a0bf44a9c1ea39d521a470bc"
+    },
+    {
+      "asset_id": "CONFIG-T26C-OWNED-CANARY-READINESS-001",
+      "path": "configs/task26c_owned_execution_canary_readiness_contract_v1.yaml",
+      "sha256": "88005a85b428817b775da757d9f18e9e26073327b6ca919c87b14b9c46963b16"
+    },
+    {
+      "asset_id": "SCHEMA-T26C-OWNED-CANARY-READINESS-001",
+      "path": "catalog/schemas/task26c_owned_execution_canary_readiness.schema.json",
+      "sha256": "13bd58ea64bf61dde477bce394da210be2e437268f28e248ddd09ce1b9018a06"
+    },
+    {
+      "asset_id": "MODULE-T26C-OWNED-CANARY-READINESS-001",
+      "path": "src/solana_alpha_lab/task26c_owned_execution_canary_readiness.py",
+      "sha256": "e3b7957327c3a557df292c7bfaaa314520ab91cec22c7b8f7db2435c2b2c0834"
+    },
+    {
+      "asset_id": "EVIDENCE-T26C-A2-READINESS-001",
+      "path": "docs/evidence/task26c/a2_owned_canary_readiness_acceptance_v1.json",
+      "sha256": "71b95244d3a0f9438d1b38989701d4e38d0d6dc27bfdaddcea42225c79fc9b7a"
+    }
+  ],
+  "factory_fit": {
+    "execution_to_cashflow": "PASS_WITH_LIMITATION: records the evidence required before cashflow, but creates neither trade nor cashflow.",
+    "flexibility": "PASS: explicit future witness, role boundaries and deny-by-default allowlist avoid a generic platform.",
+    "mode": "FULL_REVIEW",
+    "monitoring_recovery": "PASS: monitoring loss, UNKNOWN, provider divergence and inventory mismatch block action.",
+    "owner_operability": "PASS_WITH_LIMITATION: manual approval is a template and remains OWNER_INPUT_REQUIRED.",
+    "research_truth": "PASS: quote, simulation, attempt, landing, inventory and settlement remain distinct.",
+    "result": "PASS_WITH_FOLLOWUP",
+    "security": "PASS: fake signer refuses every signature; no wallet or signed bytes exist."
+  },
+  "next_boundary": {
+    "action": "Do not execute a canary. A future owner-reviewed authority packet must bind one exact route, program, token, notional, cash cap, fee cap and recovery path.",
+    "authority": "OWNER_INPUT_REQUIRED",
+    "r3_access": "DENY"
+  },
+  "product_horizon_radar": {
+    "now": {
+      "activation_trigger": "Only after TASK-26C is accepted and the goal owner elects to review a future authority packet.",
+      "authority": "OWNER_INPUT_REQUIRED",
+      "candidate": "OWNER_AUTHORITY_PACKET_BINDING_V1",
+      "cost_risk": "Requires exact owner inputs; it remains review-only and cannot activate a signer, provider or transaction.",
+      "evidence": "TASK-26B requires an owned canary; TASK-26C now supplies the fail-closed witness, recovery and approval template.",
+      "owner": "goal_owner",
+      "value": "Turns an abstract future canary into one auditable owner decision without confusing readiness with permission.",
+      "why_now": "The missing bottleneck is explicit owner-bound authority, not another historical reconstruction."
+    },
+    "watch": {
+      "candidate": "TASK-27_EXECUTION_TRUTH_EVALUATION",
+      "cost_risk": "Material execution, cash and safety exposure; it remains forbidden.",
+      "owner": "goal_owner",
+      "trigger": "Only after one separately authorized canary has complete reconciled witness evidence and a new Entry Gate confirms the estimand.",
+      "value": "Could assess execution truth for the hypothesis-to-cashflow path.",
+      "why_not_now": "No owner authority, no canary witness and no settled execution evidence exist."
+    }
+  },
+  "receipt_sha256": "f0db8e76e8679f1103ecf8949bcd8c108f81f3bc6ff8909bfcc0656574574a9c",
+  "schema": "smial.task26c.a3-catalog-factory-fit",
+  "schema_version": "1.0",
+  "side_effect_counters": {
+    "cash_spend_usd_cents": 0,
+    "dependency_changes": 0,
+    "provider_api_rpc_wss_calls": 0,
+    "r3_paths_or_values_read": 0,
+    "transaction_build_sign_simulate_send": 0,
+    "wallet_signer_transaction_actions": 0
+  },
+  "status": "PASS_CATALOG_REGISTERED_READY_FOR_OWNER_AUTHORITY_NO_AUTHORITY",
+  "task_id": "TASK-26C"
+}
