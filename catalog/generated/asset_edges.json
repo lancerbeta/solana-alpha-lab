@@ -348,6 +348,11 @@
       "target_asset_id": "CTRL-AGENTS-001"
     },
     {
+      "source_asset_id": "CONFIG-OWNER-AUTHORITY-PACKET-001",
+      "relation": "governed_by",
+      "target_asset_id": "CONTRACT-OWNER-AUTHORITY-PACKET-001"
+    },
+    {
       "source_asset_id": "CONFIG-T20-COLLECTION-SPEC-001",
       "relation": "governed_by",
       "target_asset_id": "CONTRACT-T20-COLLECTION-SPEC-001"
@@ -465,6 +470,11 @@
     {
       "source_asset_id": "CONFIG-T26C-OWNED-CANARY-READINESS-001",
       "relation": "governed_by",
+      "target_asset_id": "CONTRACT-T26C-OWNED-CANARY-READINESS-001"
+    },
+    {
+      "source_asset_id": "CONTRACT-OWNER-AUTHORITY-PACKET-001",
+      "relation": "derived_from",
       "target_asset_id": "CONTRACT-T26C-OWNED-CANARY-READINESS-001"
     },
     {
@@ -1563,6 +1573,11 @@
       "target_asset_id": "EVIDENCE-T25-A4-ACCEPTANCE-001"
     },
     {
+      "source_asset_id": "DOC-OWNER-AUTHORITY-PACKET-001",
+      "relation": "derived_from",
+      "target_asset_id": "EVIDENCE-T26C-A3-CATALOG-FACTORY-FIT-001"
+    },
+    {
       "source_asset_id": "DOC-T26A-TASK-001",
       "relation": "derived_from",
       "target_asset_id": "EVIDENCE-T26-A7-CATALOG-FACTORY-FIT-001"
@@ -1596,6 +1611,26 @@
       "source_asset_id": "EVIDENCE-BATON-A62-001",
       "relation": "derived_from",
       "target_asset_id": "SCRIPT-BATON-VALIDATE-001"
+    },
+    {
+      "source_asset_id": "EVIDENCE-OWNER-AUTHORITY-PACKET-A1-001",
+      "relation": "derived_from",
+      "target_asset_id": "MODULE-OWNER-AUTHORITY-PACKET-001"
+    },
+    {
+      "source_asset_id": "EVIDENCE-OWNER-AUTHORITY-PACKET-A1-001",
+      "relation": "validated_by",
+      "target_asset_id": "TEST-OWNER-AUTHORITY-PACKET-001"
+    },
+    {
+      "source_asset_id": "EVIDENCE-OWNER-AUTHORITY-PACKET-A2-001",
+      "relation": "derived_from",
+      "target_asset_id": "EVIDENCE-OWNER-AUTHORITY-PACKET-A1-001"
+    },
+    {
+      "source_asset_id": "EVIDENCE-OWNER-AUTHORITY-PACKET-A2-001",
+      "relation": "validated_by",
+      "target_asset_id": "TEST-OWNER-AUTHORITY-PACKET-A2-001"
     },
     {
       "source_asset_id": "EVIDENCE-T04-A4R-SBOM-001",
@@ -2653,6 +2688,11 @@
       "target_asset_id": "CTRL-BATON-SETUP-001"
     },
     {
+      "source_asset_id": "FIXTURE-OWNER-AUTHORITY-PACKET-001",
+      "relation": "derived_from",
+      "target_asset_id": "CONFIG-OWNER-AUTHORITY-PACKET-001"
+    },
+    {
       "source_asset_id": "FIXTURE-T04-PIT-001",
       "relation": "derived_from",
       "target_asset_id": "PROTOTYPE-T04-CORE-NATIVE-STACK-001"
@@ -3246,6 +3286,16 @@
       "source_asset_id": "MIGRATION-T05-0001-001",
       "relation": "validated_by",
       "target_asset_id": "TEST-T05-MIGRATIONS-001"
+    },
+    {
+      "source_asset_id": "MODULE-OWNER-AUTHORITY-PACKET-001",
+      "relation": "governed_by",
+      "target_asset_id": "CONFIG-OWNER-AUTHORITY-PACKET-001"
+    },
+    {
+      "source_asset_id": "MODULE-OWNER-AUTHORITY-PACKET-001",
+      "relation": "produces",
+      "target_asset_id": "EVIDENCE-OWNER-AUTHORITY-PACKET-A1-001"
     },
     {
       "source_asset_id": "MODULE-T06-STORAGE-API-001",
@@ -4273,6 +4323,11 @@
       "target_asset_id": "CTRL-BATON-SETUP-001"
     },
     {
+      "source_asset_id": "SCHEMA-OWNER-AUTHORITY-PACKET-001",
+      "relation": "governed_by",
+      "target_asset_id": "CONTRACT-OWNER-AUTHORITY-PACKET-001"
+    },
+    {
       "source_asset_id": "SCHEMA-T05-CANONICAL-DDL-001",
       "relation": "governed_by",
       "target_asset_id": "CTRL-TASK-05-001"
@@ -4976,6 +5031,31 @@
       "source_asset_id": "TEST-BATON-SCOPE-001",
       "relation": "governed_by",
       "target_asset_id": "CTRL-BATON-SETUP-001"
+    },
+    {
+      "source_asset_id": "TEST-OWNER-AUTHORITY-PACKET-001",
+      "relation": "depends_on",
+      "target_asset_id": "FIXTURE-OWNER-AUTHORITY-PACKET-001"
+    },
+    {
+      "source_asset_id": "TEST-OWNER-AUTHORITY-PACKET-001",
+      "relation": "depends_on",
+      "target_asset_id": "MODULE-OWNER-AUTHORITY-PACKET-001"
+    },
+    {
+      "source_asset_id": "TEST-OWNER-AUTHORITY-PACKET-001",
+      "relation": "depends_on",
+      "target_asset_id": "SCHEMA-OWNER-AUTHORITY-PACKET-001"
+    },
+    {
+      "source_asset_id": "TEST-OWNER-AUTHORITY-PACKET-A2-001",
+      "relation": "depends_on",
+      "target_asset_id": "CATALOG-ROOT-001"
+    },
+    {
+      "source_asset_id": "TEST-OWNER-AUTHORITY-PACKET-A2-001",
+      "relation": "depends_on",
+      "target_asset_id": "EVIDENCE-OWNER-AUTHORITY-PACKET-A2-001"
     },
     {
       "source_asset_id": "TEST-T04-CORE-STACK-001",
