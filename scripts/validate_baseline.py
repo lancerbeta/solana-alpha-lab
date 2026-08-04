@@ -3352,12 +3352,14 @@ def classify_git_topology(
         return "INVALID_GIT_TOPOLOGY"
 
     if github_actions:
-        origin_identity_ok = (
+        origin_identity_common_ok = (
             remotes == {"origin"}
             and len(fetch_urls) == 1
             and fetch_urls == push_urls
             and origin_url_is_safe(fetch_urls[0], github_actions=True)
-            and remote_head_target is None
+        )
+        main_origin_identity_ok = (
+            origin_identity_common_ok and remote_head_target is None
         )
         refspec_policy_ok = fetch_refspecs == (
             EXPECTED_ORIGIN_FETCH_REFSPEC,
@@ -3379,7 +3381,7 @@ def classify_git_topology(
             and github_sha == head_oid
         )
         if (
-            origin_identity_ok
+            main_origin_identity_ok
             and refspec_policy_ok
             and refs_ok
             and upstream_ok
@@ -3391,18 +3393,29 @@ def classify_git_topology(
             pull_number = pull_match.group(1)
             pull_remote_ref = f"pull/{pull_number}/merge"
             pull_full_ref = f"refs/remotes/{pull_remote_ref}"
+            pull_remote_refs = {pull_remote_ref}
+            allowed_pull_remote_refs_ok = all(
+                ref == pull_remote_ref or ref.startswith("origin/")
+                for ref in remote_tracking_refs
+            )
             pull_refs_ok = (
                 branch is None
                 and local_branches == set()
-                and remote_tracking_refs == {pull_remote_ref}
-                and repository_refs == {pull_full_ref}
+                and pull_remote_refs <= remote_tracking_refs
+                and allowed_pull_remote_refs_ok
+                and repository_refs
+                == {f"refs/remotes/{ref}" for ref in remote_tracking_refs}
             )
             pull_context_ok = (
                 github_repository == EXPECTED_GITHUB_REPOSITORY
                 and github_sha == head_oid
             )
+            pull_origin_identity_ok = (
+                origin_identity_common_ok
+                and remote_head_target in {None, "refs/remotes/origin/main"}
+            )
             if (
-                origin_identity_ok
+                pull_origin_identity_ok
                 and refspec_policy_ok
                 and pull_refs_ok
                 and upstream is None
