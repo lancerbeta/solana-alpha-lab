@@ -77,6 +77,84 @@ class TrackedOnlyDeliveryStateTests(unittest.TestCase):
                 )
 
 
+class GitHubActionsPullRequestStateTests(unittest.TestCase):
+    def test_accepts_only_clean_detached_pull_request_merge_checkout(self) -> None:
+        topology = module.classify_git_topology(
+            branch=None,
+            head_oid="a" * 40,
+            remotes={"origin"},
+            fetch_urls=("https://github.com/lancerbeta/solana-alpha-lab",),
+            push_urls=("https://github.com/lancerbeta/solana-alpha-lab",),
+            fetch_refspecs=(module.EXPECTED_ORIGIN_FETCH_REFSPEC,),
+            push_refspecs=(),
+            upstream=None,
+            local_branches=set(),
+            remote_tracking_refs={"pull/41/merge"},
+            tags=set(),
+            all_refs={"refs/remotes/pull/41/merge"},
+            github_actions=True,
+            github_repository=module.EXPECTED_GITHUB_REPOSITORY,
+            github_ref="refs/pull/41/merge",
+            github_sha="a" * 40,
+        )
+        self.assertEqual(topology, "GITHUB_ACTIONS_PR_CHECKOUT")
+        self.assertEqual(
+            module.classify_github_actions_pr_state(
+                github_actions=True,
+                github_repository=module.EXPECTED_GITHUB_REPOSITORY,
+                github_ref="refs/pull/41/merge",
+                github_sha="a" * 40,
+                branch=None,
+                head_oid="a" * 40,
+                topology=topology,
+                staged=set(),
+                untracked=set(),
+                unstaged=set(),
+            ),
+            "GITHUB_ACTIONS_PR_CANDIDATE",
+        )
+        self.assertTrue(
+            module.uses_current_runtime_contract(
+                "GITHUB_ACTIONS_PR_CANDIDATE"
+            )
+        )
+
+    def test_rejects_non_merge_ref_and_dirty_pull_request_checkout(self) -> None:
+        topology = module.classify_git_topology(
+            branch=None,
+            head_oid="a" * 40,
+            remotes={"origin"},
+            fetch_urls=("https://github.com/lancerbeta/solana-alpha-lab",),
+            push_urls=("https://github.com/lancerbeta/solana-alpha-lab",),
+            fetch_refspecs=(module.EXPECTED_ORIGIN_FETCH_REFSPEC,),
+            push_refspecs=(),
+            upstream=None,
+            local_branches=set(),
+            remote_tracking_refs={"pull/41/merge"},
+            tags=set(),
+            all_refs={"refs/remotes/pull/41/merge"},
+            github_actions=True,
+            github_repository=module.EXPECTED_GITHUB_REPOSITORY,
+            github_ref="refs/pull/41/head",
+            github_sha="a" * 40,
+        )
+        self.assertEqual(topology, "INVALID_GIT_TOPOLOGY")
+        self.assertIsNone(
+            module.classify_github_actions_pr_state(
+                github_actions=True,
+                github_repository=module.EXPECTED_GITHUB_REPOSITORY,
+                github_ref="refs/pull/41/merge",
+                github_sha="a" * 40,
+                branch=None,
+                head_oid="a" * 40,
+                topology="GITHUB_ACTIONS_PR_CHECKOUT",
+                staged={"scripts/validate_baseline.py"},
+                untracked=set(),
+                unstaged=set(),
+            )
+        )
+
+
 class RepositoryStatePolicyTests(unittest.TestCase):
     def classify_atom5(self, **overrides: object) -> str:
         arguments = {

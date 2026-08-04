@@ -866,7 +866,10 @@ CURRENT_RUNTIME_CONTRACT_STATES = (
     | TASK09_REPOSITORY_STATES
     | CTRL_BATON_A62_REPOSITORY_STATES
     | CTRL_GENERIC_REPOSITORY_STATES
-    | {"TRACKED_ONLY_DELIVERY_CANDIDATE"}
+    | {
+        "TRACKED_ONLY_DELIVERY_CANDIDATE",
+        "GITHUB_ACTIONS_PR_CANDIDATE",
+    }
 )
 CTRL_GENERIC_LIFECYCLE_COMBINATIONS = {
     (
@@ -3370,13 +3373,42 @@ def classify_git_topology(
             (branch is None and upstream is None)
             or (branch == "main" and upstream in {None, "origin/main"})
         )
-        context_ok = (
+        main_context_ok = (
             github_repository == EXPECTED_GITHUB_REPOSITORY
             and github_ref == "refs/heads/main"
             and github_sha == head_oid
         )
-        if origin_identity_ok and refspec_policy_ok and refs_ok and upstream_ok and context_ok:
+        if (
+            origin_identity_ok
+            and refspec_policy_ok
+            and refs_ok
+            and upstream_ok
+            and main_context_ok
+        ):
             return "GITHUB_ACTIONS_CHECKOUT"
+        pull_match = re.fullmatch(r"refs/pull/([1-9][0-9]*)/merge", github_ref or "")
+        if pull_match is not None:
+            pull_number = pull_match.group(1)
+            pull_remote_ref = f"pull/{pull_number}/merge"
+            pull_full_ref = f"refs/remotes/{pull_remote_ref}"
+            pull_refs_ok = (
+                branch is None
+                and local_branches == set()
+                and remote_tracking_refs == {pull_remote_ref}
+                and repository_refs == {pull_full_ref}
+            )
+            pull_context_ok = (
+                github_repository == EXPECTED_GITHUB_REPOSITORY
+                and github_sha == head_oid
+            )
+            if (
+                origin_identity_ok
+                and refspec_policy_ok
+                and pull_refs_ok
+                and upstream is None
+                and pull_context_ok
+            ):
+                return "GITHUB_ACTIONS_PR_CHECKOUT"
         return "INVALID_GIT_TOPOLOGY"
 
     if branch != "main" or local_branches != {"main"}:
@@ -3466,6 +3498,37 @@ def classify_tracked_only_delivery_state(
         and not unstaged
     ):
         return "TRACKED_ONLY_DELIVERY_CANDIDATE"
+    return None
+
+
+def classify_github_actions_pr_state(
+    *,
+    github_actions: bool,
+    github_repository: str | None,
+    github_ref: str | None,
+    github_sha: str | None,
+    branch: str | None,
+    head_oid: str,
+    topology: str,
+    staged: set[str],
+    untracked: set[str],
+    unstaged: set[str],
+) -> str | None:
+    """Recognize only a clean GitHub pull-request merge checkout."""
+
+    if (
+        github_actions
+        and github_repository == EXPECTED_GITHUB_REPOSITORY
+        and re.fullmatch(r"refs/pull/[1-9][0-9]*/merge", github_ref or "")
+        and github_sha == head_oid
+        and re.fullmatch(r"[0-9a-f]{40}", head_oid) is not None
+        and branch is None
+        and topology == "GITHUB_ACTIONS_PR_CHECKOUT"
+        and not staged
+        and not untracked
+        and not unstaged
+    ):
+        return "GITHUB_ACTIONS_PR_CANDIDATE"
     return None
 
 
@@ -4805,6 +4868,18 @@ def validate() -> None:
         untracked=untracked,
         unstaged=unstaged,
     )
+    github_actions_pr_state = classify_github_actions_pr_state(
+        github_actions=github_actions,
+        github_repository=os.environ.get("GITHUB_REPOSITORY"),
+        github_ref=os.environ.get("GITHUB_REF"),
+        github_sha=os.environ.get("GITHUB_SHA"),
+        branch=branch_name,
+        head_oid=head_oid,
+        topology=legacy_topology,
+        staged=staged,
+        untracked=untracked,
+        unstaged=unstaged,
+    )
     if tracked_only_delivery_state is not None:
         state = tracked_only_delivery_state
         topology = legacy_topology
@@ -4817,6 +4892,9 @@ def validate() -> None:
     elif (baton_state, baton_topology) in CTRL_BATON_OR_GENERIC_LIFECYCLE_COMBINATIONS:
         state = baton_state
         topology = baton_topology
+    elif github_actions_pr_state is not None:
+        state = github_actions_pr_state
+        topology = legacy_topology
     else:
         assert_check(
             "branch_main_or_ci_detached",
@@ -4852,6 +4930,7 @@ def validate() -> None:
         "ATOM7_SINGLE_BRANCH_REFSPEC_REPAIR_STAGED",
         "ATOM7_SINGLE_BRANCH_REFSPEC_REPAIR_COMMITTED",
         "TRACKED_ONLY_DELIVERY_CANDIDATE",
+        "GITHUB_ACTIONS_PR_CANDIDATE",
     } | (
         TASK04_REPOSITORY_STATES
         | TASK05_REPOSITORY_STATES
@@ -4865,6 +4944,12 @@ def validate() -> None:
     assert_check("repository_state", state in valid_states, state)
     if state == "TRACKED_ONLY_DELIVERY_CANDIDATE":
         assert_check("tracked_only_delivery_topology", topology == "CLEAN_CLONE", topology)
+    if state == "GITHUB_ACTIONS_PR_CANDIDATE":
+        assert_check(
+            "github_actions_pr_topology",
+            topology == "GITHUB_ACTIONS_PR_CHECKOUT",
+            topology,
+        )
     if state in CTRL_BATON_A62_REPOSITORY_STATES:
         assert_check(
             "ctrl_baton_state_topology_combination",
@@ -5076,7 +5161,10 @@ def validate() -> None:
         expected_file_count = ctrl_baton_a62r_expected_repository_file_count()
     elif state == "CTRL_GENERIC_PROJECT_FEATURE_INITIAL_STAGED":
         expected_file_count = len(baton_view.tracked)
-    elif state == "TRACKED_ONLY_DELIVERY_CANDIDATE":
+    elif state in {
+        "TRACKED_ONLY_DELIVERY_CANDIDATE",
+        "GITHUB_ACTIONS_PR_CANDIDATE",
+    }:
         expected_file_count = baton_view.head_tree_path_count
     elif state in CTRL_GENERIC_REPOSITORY_STATES:
         # Fail-closed against the actual committed tree, not historical Baton 225.
