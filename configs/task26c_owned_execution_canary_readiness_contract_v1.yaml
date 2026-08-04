@@ -1,0 +1,106 @@
+schema: smial.task26c.owned-execution-canary-readiness-contract
+schema_version: "1.0"
+contract_id: T26C-OWNED-EXECUTION-CANARY-READINESS-CONTRACT-001
+task_id: TASK-26C
+atom_id: T26C-A1_OFFLINE_CANARY_READINESS_AND_AUTHORITY_GATE_V1
+as_of: "2026-08-04"
+base:
+  head: 40ec682e11bfc4bbc8fa7c9c1155a145762b0db0
+  tree: bd7f3f05b3a2e6e2334405f3d74473156af0d68a
+  branch: main
+  upstream: origin/main
+authority:
+  provider_api_rpc_wss_calls: 0
+  raw_r2_reads: 0
+  r3_paths_or_values_reads: 0
+  transaction_build_sign_simulate_send: 0
+  wallet_signer_transaction_actions: 0
+  cash_spend_usd_cents: 0
+  dependency_changes: 0
+  canary_authority: false
+  numeric_modeled_netreturn: forbidden
+  observed_netreturn: forbidden
+  task27: forbidden
+decision_enum:
+  - READY_FOR_OWNER_CANARY_AUTHORITY_WITH_LIMITATIONS
+  - REDESIGN_CANARY
+  - PAUSE
+  - CLOSE_CANARY_ROUTE
+terminal_states:
+  - REJECTED_BEFORE_SEND
+  - DROPPED_OR_EXPIRED_NOT_PROCESSED
+  - LANDED_FAILED
+  - LANDED_SUCCESS
+  - UNKNOWN_REQUIRES_RECONCILIATION
+future_witness_required_fields:
+  - stable_attempt_id
+  - retry_chain_id
+  - quote_build_context
+  - submitted_at
+  - terminal_at
+  - terminal_state
+  - transaction_signature
+  - processed_on_chain
+  - token_and_sol_deltas
+  - network_relay_tip_ata_rent_and_separate_fees
+  - inventory_before_after
+  - settlement_accounting_basis
+  - reconciliation_reference
+  - source_raw_hashes
+  - unknown_recovery_path
+threats:
+  - SECRET_OR_KEY_COMPROMISE
+  - WRONG_PROGRAM_OR_ROUTE
+  - STALE_QUOTE_OR_BLOCKHASH
+  - DUPLICATE_SEND
+  - TIMEOUT_OR_UNKNOWN_TRANSACTION
+  - RETRY_BEFORE_RECONCILIATION
+  - UNEXPECTED_TOKEN_OR_SOL_DELTA
+  - RESIDUAL_INVENTORY
+  - MONITORING_LOSS
+  - PROVIDER_DIVERGENCE
+  - FEE_OR_CASH_CAP_BREACH
+allowlist_policy:
+  status: DENY_BY_DEFAULT_OWNER_INPUT_REQUIRED
+  exact_program: OWNER_INPUT_REQUIRED
+  exact_route: OWNER_INPUT_REQUIRED
+  exact_token: OWNER_INPUT_REQUIRED
+health_blocks:
+  - STALE_DATA
+  - NO_MONITORING
+  - UNRESOLVED_PRIOR_ATTEMPT
+  - INVENTORY_MISMATCH
+  - FEE_CAP_BREACH
+  - ROUTE_PROGRAM_MISMATCH
+  - PROVIDER_DISAGREEMENT
+owner_approval_packet:
+  status: TEMPLATE_ONLY_OWNER_INPUT_REQUIRED
+  required_fields:
+    - exact_planned_action
+    - exact_token_program_route
+    - proposed_notional
+    - proposed_total_cash_at_risk_cap
+    - maximum_separately_charged_fees
+    - expected_inventory_before_after
+    - stop_and_recovery_procedure
+    - exact_approval_phrase
+  approval_phrase_template: "I APPROVE ONE EXACT TECHNICAL CANARY {canary_id}; token={token}; program={program}; route={route}; notional={notional}; total_cash_at_risk_cap={cap}; max_separate_fees={fees}. This approval expires on {expires_at} and does not authorize strategy trading, retries before reconciliation, or any different route."
+frozen_input_bindings:
+  - asset_id: CONTRACT-T26-EXECUTION-COST-NETRETURN-001
+    path: docs/contracts/task26_execution_cost_and_netreturn_contract_v1.md
+    sha256: aac003cf7ba2742d310893c81af3ae4a032a52b719f2f56d80171a6486351efd
+  - asset_id: CONTRACT-T26A-EXECUTION-EVIDENCE-001
+    path: docs/contracts/task26a_execution_evidence_completion_contract_v1.md
+    sha256: 218519777231189ca372f98462bbd3cf182de6c332c18766e968d0143e9c128b
+  - asset_id: CONTRACT-T26B-EXECUTION-WITNESS-ROUTE-001
+    path: docs/contracts/task26b_minimal_execution_witness_route_contract_v1.md
+    sha256: 7d8fbe07c28304a7dd45e4bf1edc83c3efb93fccf2c358e3c65ba1a03f1ea6a0
+  - asset_id: EVIDENCE-T26B-A1-DECISION-001
+    path: docs/evidence/task26b/a1_execution_witness_route_decision_v1.json
+    sha256: c6df17bb1b8f2f361bb0e25b801d8d5a71440e42fe4e95ccd0c55ab5e33630de
+  - asset_id: EVIDENCE-T26B-A1-ACCEPTANCE-001
+    path: docs/evidence/task26b/a1_execution_witness_route_acceptance_v1.json
+    sha256: 86cd5d33f3e29f9c3d365afc1aca511b212d6a809fa7be3ea2c6e65ffebd4b73
+  - asset_id: CTRL-SCHEMA-SQL-001
+    path: schemas/schema_v1.sql
+    sha256: eae9d1544b11cffc03afba1e263153168a11dc6f648df9117a55a4cae5d23f09
