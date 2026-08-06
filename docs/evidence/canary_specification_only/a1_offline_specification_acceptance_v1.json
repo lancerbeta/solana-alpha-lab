@@ -1,0 +1,113 @@
+{
+  "as_of": "2026-08-06",
+  "atom_id": "CANARY_SPECIFICATION_ONLY_V1",
+  "case_results": [
+    {
+      "case_class": "NON_DRAFT_STATE",
+      "result": "REJECTED"
+    },
+    {
+      "case_class": "NON_300_CASH_CAP",
+      "result": "REJECTED"
+    },
+    {
+      "case_class": "MISSING_OWNER_INPUT",
+      "result": "REJECTED"
+    },
+    {
+      "case_class": "TRUE_AUTHORITY",
+      "result": "REJECTED"
+    },
+    {
+      "case_class": "NONZERO_PROVIDER_COUNT",
+      "result": "REJECTED"
+    },
+    {
+      "case_class": "REAL_WALLET_OR_ENDPOINT_TEXT",
+      "result": "REJECTED"
+    }
+  ],
+  "decision": {
+    "canary_authority": false,
+    "execution_action": "NONE",
+    "numeric_netreturn": "FORBIDDEN",
+    "specification_state": "DRAFT_OWNER_INPUT_REQUIRED",
+    "task27_authority": false
+  },
+  "input_bindings": [
+    {
+      "asset_id": "DOC-CANARY-SPECIFICATION-ONLY-001",
+      "path": "docs/tasks/CANARY_SPECIFICATION_ONLY_V1.md",
+      "sha256": "bab285936b3192cf8f0c5d883a4c95d344b881c884a114f68363395dab32a79e"
+    },
+    {
+      "asset_id": "CONTRACT-CANARY-SPECIFICATION-ONLY-001",
+      "path": "docs/contracts/canary_specification_only_contract_v1.md",
+      "sha256": "bf294ab6a658a1657acc92273528c583e2e79d2ae30652c92af3fbd7e427e559"
+    },
+    {
+      "asset_id": "CONFIG-CANARY-SPECIFICATION-ONLY-001",
+      "path": "configs/canary_specification_only_v1.yaml",
+      "sha256": "1296e0a107e308b9dd913f3e57d844fef36bbd50d6802cf4697d536b4c6cc8eb"
+    },
+    {
+      "asset_id": "SCHEMA-CANARY-SPECIFICATION-ONLY-001",
+      "path": "catalog/schemas/canary_specification_only.schema.json",
+      "sha256": "82c015056936b7ba267de0fb4721ff190f05de9975a10c343288e0e0b038c865"
+    },
+    {
+      "asset_id": "FIXTURE-CANARY-SPECIFICATION-ONLY-001",
+      "path": "tests/fixtures/canary_specification_only/specification_negative_matrix_v1.json",
+      "sha256": "a33191706f3898a9594350059e76aa7c456399c9080876a4a9db0a2e012040da"
+    },
+    {
+      "asset_id": "TEST-CANARY-SPECIFICATION-ONLY-001",
+      "path": "tests/test_canary_specification_only.py",
+      "sha256": "72f115e71197efc1fe5f93db57c5b952d80a084ce167c691824876d90a8ec228"
+    }
+  ],
+  "nonclaims": [
+    "NO_PROVIDER_API_RPC_WSS",
+    "NO_WALLET_OR_SIGNER",
+    "NO_TRANSACTION_ACTION",
+    "NO_CASH_SPEND",
+    "NO_R3",
+    "NO_NUMERIC_NETRETURN",
+    "NO_TASK27_AUTHORITY"
+  ],
+  "schema": "smial.canary-specification-only.a1",
+  "schema_version": "1.0",
+  "side_effect_counters": {
+    "cash_spend_usd_cents": 0,
+    "dependency_changes": 0,
+    "provider_api_rpc_wss_calls": 0,
+    "r3_paths_or_values_read": 0,
+    "transaction_build_sign_simulate_send": 0,
+    "wallet_signer_transaction_actions": 0
+  },
+  "specification": {
+    "flow": "SOL_TO_EXACT_MEMECOIN_TO_SOL_IMMEDIATE_EXIT",
+    "owner_input_required": [
+      "exact_owner_approval_phrase",
+      "expires_at",
+      "maximum_separate_fees_usd_cents",
+      "monitoring_reference",
+      "program",
+      "proposed_notional_usd_cents",
+      "quote_basis",
+      "reconciliation_reference",
+      "route",
+      "stop_and_recovery_procedure",
+      "token",
+      "wallet_public_address"
+    ],
+    "technical_wallet": {
+      "alias": "OWNER_LOCAL_ONLY",
+      "public_address": "OWNER_LOCAL_ONLY",
+      "verification_hash": "OWNER_LOCAL_ONLY"
+    },
+    "total_cash_at_risk_usd_cents": 300
+  },
+  "status": "PASS_OFFLINE_SPECIFICATION_DRAFT_ONLY_NO_AUTHORITY",
+  "task_id": "CANARY_SPECIFICATION_ONLY_V1"
+}

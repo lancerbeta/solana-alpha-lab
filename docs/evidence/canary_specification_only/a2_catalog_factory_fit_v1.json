@@ -1,0 +1,120 @@
+{
+  "accepted_result": {
+    "canary_authority": false,
+    "decision": "OWNER_INPUT_REQUIRED",
+    "execution_action": "NONE",
+    "numeric_netreturn": "FORBIDDEN",
+    "specification_state": "DRAFT_OWNER_INPUT_REQUIRED",
+    "task27_authority": false,
+    "total_cash_at_risk_usd_cents": 300
+  },
+  "as_of": "2026-08-06",
+  "catalog": {
+    "after_assets": 553,
+    "after_lifecycle_records": 58,
+    "after_schemas": 14,
+    "after_version": "0.36.0",
+    "before_assets": 544,
+    "before_lifecycle_records": 57,
+    "before_schemas": 13,
+    "before_version": "0.35.0",
+    "registered_asset_ids": [
+      "DOC-CANARY-SPECIFICATION-ONLY-001",
+      "CONTRACT-CANARY-SPECIFICATION-ONLY-001",
+      "CONFIG-CANARY-SPECIFICATION-ONLY-001",
+      "SCHEMA-CANARY-SPECIFICATION-ONLY-001",
+      "FIXTURE-CANARY-SPECIFICATION-ONLY-001",
+      "TEST-CANARY-SPECIFICATION-ONLY-001",
+      "EVIDENCE-CANARY-SPECIFICATION-ONLY-A1-001",
+      "EVIDENCE-CANARY-SPECIFICATION-ONLY-A2-001",
+      "TEST-CANARY-SPECIFICATION-ONLY-A2-001"
+    ]
+  },
+  "confirmations": [
+    "OFFLINE_ONLY",
+    "SYNTHETIC_FIXTURES_ONLY",
+    "NO_PROVIDER_API_RPC_WSS",
+    "NO_WALLET_OR_SIGNER",
+    "NO_TRANSACTION_ACTION",
+    "NO_CASH_SPEND",
+    "NO_R3",
+    "NO_NUMERIC_NETRETURN",
+    "NO_TASK27_AUTHORITY",
+    "NO_STRATEGY_PROMOTION"
+  ],
+  "critical_bindings": [
+    {
+      "asset_id": "CONTRACT-OWNER-AUTHORITY-PACKET-001",
+      "path": "docs/contracts/owner_authority_packet_binding_contract_v1.md",
+      "sha256": "485c573eac8411eb193b6beb2b4a2046cba6308e7fbc49d5de2063227e8600c1"
+    },
+    {
+      "asset_id": "CONFIG-CANARY-SPECIFICATION-ONLY-001",
+      "path": "configs/canary_specification_only_v1.yaml",
+      "sha256": "1296e0a107e308b9dd913f3e57d844fef36bbd50d6802cf4697d536b4c6cc8eb"
+    },
+    {
+      "asset_id": "EVIDENCE-CANARY-SPECIFICATION-ONLY-A1-001",
+      "path": "docs/evidence/canary_specification_only/a1_offline_specification_acceptance_v1.json",
+      "sha256": "e99d59662f3e1982f9d3c8380fd6fd4e91883882fad566caf1410baeb839023f"
+    },
+    {
+      "asset_id": "TEST-CANARY-SPECIFICATION-ONLY-001",
+      "path": "tests/test_canary_specification_only.py",
+      "sha256": "72f115e71197efc1fe5f93db57c5b952d80a084ce167c691824876d90a8ec228"
+    }
+  ],
+  "factory_fit": {
+    "build_vs_buy": "PASS: reuses the existing owner packet evaluator and adds only declarative specification artifacts; no execution platform is built.",
+    "compatibility_history": "PASS: binds to the accepted owner-packet contract and preserves its draft-only, zero-authority semantics.",
+    "efficiency": "PASS: one static configuration and two deterministic tests replace repeated informal restatement without provider cost or runtime burden.",
+    "execution_to_cashflow": "PASS_WITH_LIMITATION: clarifies a future owner decision before any cash exposure, but produces no execution, settlement or cashflow.",
+    "flexibility": "PASS: one route shape and one cap are frozen while exact owner values remain local and untracked.",
+    "mission": "PASS: reduces authority ambiguity on the hypothesis-to-cashflow path without pretending that a specification is a trade.",
+    "mode": "FULL_REVIEW",
+    "monitoring_recovery": "PASS_WITH_LIMITATION: no live monitoring exists because no live action is permitted; a future canary remains blocked behind its own health and reconciliation gate.",
+    "owner_operability": "PASS: the owner sees one short list of values that remain local and one explicit next decision.",
+    "red_team": "PASS: the adversarial fixture rejects elevated authority, changed cap/state, missing owner input, nonzero provider count and material identity/endpoint text.",
+    "research_truth": "PASS: specification, owner packet, quote, execution, settlement and NetReturn remain explicitly separate.",
+    "result": "PASS_WITH_FOLLOWUP",
+    "security": "PASS: no wallet material, signer, signed bytes, provider endpoint or external client is created."
+  },
+  "lifecycle_decision": {
+    "decision": "OFFLINE_SPECIFICATION_READY_NO_EXECUTION_AUTHORITY",
+    "record_id": "DECISION-CANARY-SPECIFICATION-ONLY-001",
+    "status": "RECORDED"
+  },
+  "product_horizon_radar": {
+    "now": {
+      "activation_trigger": "Goal owner elects to prepare local owner inputs without placing their values into Git or chat.",
+      "authority": "OWNER_INPUT_REQUIRED",
+      "candidate": "OWNER_LOCAL_INPUT_PREPARATION",
+      "cost_risk": "No financial or provider cost; actual values remain owner-local and are not an execution permission.",
+      "evidence": "The owner-packet evaluator and this frozen specification agree on the twelve required input names, flow shape and 300-cent cap.",
+      "owner": "goal_owner",
+      "value": "Makes the exact missing inputs visible without weakening the canary safety boundary.",
+      "why_now": "The remaining safe bottleneck is owner-local preparation, not another historical reconstruction or execution build."
+    },
+    "watch": {
+      "candidate": "SEPARATE_OWNED_CANARY_AUTHORITY_GATE",
+      "cost_risk": "Would cross wallet, provider, transaction and cash boundaries and therefore requires a new exact owner decision.",
+      "owner": "goal_owner",
+      "trigger": "Only after the owner supplies local inputs, issues a new exact authority, and a fresh Entry Gate validates an instrumented canary route.",
+      "value": "Could collect the first reconciled execution witness.",
+      "why_not_now": "This task has no authority for wallet, network, quote, transaction, cash or TASK-27."
+    }
+  },
+  "receipt_sha256": "d48e47090c1bbdfc5b3b2d6e61dde48d59ac32904eb5803eff8243cbcdc7afbe",
+  "schema": "smial.canary-specification-only.a2-catalog-factory-fit",
+  "schema_version": "1.0",
+  "side_effect_counters": {
+    "cash_spend_usd_cents": 0,
+    "dependency_changes": 0,
+    "provider_api_rpc_wss_calls": 0,
+    "r3_paths_or_values_read": 0,
+    "transaction_build_sign_simulate_send": 0,
+    "wallet_signer_transaction_actions": 0
+  },
+  "status": "PASS_CATALOG_REGISTERED_OFFLINE_SPECIFICATION_NO_EXECUTION_AUTHORITY",
+  "task_id": "CANARY_SPECIFICATION_ONLY_V1"
+}

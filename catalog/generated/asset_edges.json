@@ -348,6 +348,11 @@
       "target_asset_id": "CTRL-AGENTS-001"
     },
     {
+      "source_asset_id": "CONFIG-CANARY-SPECIFICATION-ONLY-001",
+      "relation": "governed_by",
+      "target_asset_id": "CONTRACT-CANARY-SPECIFICATION-ONLY-001"
+    },
+    {
       "source_asset_id": "CONFIG-OWNER-AUTHORITY-PACKET-001",
       "relation": "governed_by",
       "target_asset_id": "CONTRACT-OWNER-AUTHORITY-PACKET-001"
@@ -471,6 +476,11 @@
       "source_asset_id": "CONFIG-T26C-OWNED-CANARY-READINESS-001",
       "relation": "governed_by",
       "target_asset_id": "CONTRACT-T26C-OWNED-CANARY-READINESS-001"
+    },
+    {
+      "source_asset_id": "CONTRACT-CANARY-SPECIFICATION-ONLY-001",
+      "relation": "derived_from",
+      "target_asset_id": "CONTRACT-OWNER-AUTHORITY-PACKET-001"
     },
     {
       "source_asset_id": "CONTRACT-OWNER-AUTHORITY-PACKET-001",
@@ -1573,6 +1583,11 @@
       "target_asset_id": "EVIDENCE-T25-A4-ACCEPTANCE-001"
     },
     {
+      "source_asset_id": "DOC-CANARY-SPECIFICATION-ONLY-001",
+      "relation": "derived_from",
+      "target_asset_id": "EVIDENCE-OWNER-AUTHORITY-PACKET-A2-001"
+    },
+    {
       "source_asset_id": "DOC-OWNER-AUTHORITY-PACKET-001",
       "relation": "derived_from",
       "target_asset_id": "EVIDENCE-T26C-A3-CATALOG-FACTORY-FIT-001"
@@ -1611,6 +1626,26 @@
       "source_asset_id": "EVIDENCE-BATON-A62-001",
       "relation": "derived_from",
       "target_asset_id": "SCRIPT-BATON-VALIDATE-001"
+    },
+    {
+      "source_asset_id": "EVIDENCE-CANARY-SPECIFICATION-ONLY-A1-001",
+      "relation": "derived_from",
+      "target_asset_id": "CONFIG-CANARY-SPECIFICATION-ONLY-001"
+    },
+    {
+      "source_asset_id": "EVIDENCE-CANARY-SPECIFICATION-ONLY-A1-001",
+      "relation": "validated_by",
+      "target_asset_id": "TEST-CANARY-SPECIFICATION-ONLY-001"
+    },
+    {
+      "source_asset_id": "EVIDENCE-CANARY-SPECIFICATION-ONLY-A2-001",
+      "relation": "derived_from",
+      "target_asset_id": "EVIDENCE-CANARY-SPECIFICATION-ONLY-A1-001"
+    },
+    {
+      "source_asset_id": "EVIDENCE-CANARY-SPECIFICATION-ONLY-A2-001",
+      "relation": "validated_by",
+      "target_asset_id": "TEST-CANARY-SPECIFICATION-ONLY-A2-001"
     },
     {
       "source_asset_id": "EVIDENCE-OWNER-AUTHORITY-PACKET-A1-001",
@@ -2686,6 +2721,11 @@
       "source_asset_id": "FIXTURE-BATON-VALID-CONTRACT-001",
       "relation": "governed_by",
       "target_asset_id": "CTRL-BATON-SETUP-001"
+    },
+    {
+      "source_asset_id": "FIXTURE-CANARY-SPECIFICATION-ONLY-001",
+      "relation": "derived_from",
+      "target_asset_id": "CONFIG-CANARY-SPECIFICATION-ONLY-001"
     },
     {
       "source_asset_id": "FIXTURE-OWNER-AUTHORITY-PACKET-001",
@@ -4323,6 +4363,11 @@
       "target_asset_id": "CTRL-BATON-SETUP-001"
     },
     {
+      "source_asset_id": "SCHEMA-CANARY-SPECIFICATION-ONLY-001",
+      "relation": "governed_by",
+      "target_asset_id": "CONTRACT-CANARY-SPECIFICATION-ONLY-001"
+    },
+    {
       "source_asset_id": "SCHEMA-OWNER-AUTHORITY-PACKET-001",
       "relation": "governed_by",
       "target_asset_id": "CONTRACT-OWNER-AUTHORITY-PACKET-001"
@@ -5031,6 +5076,26 @@
       "source_asset_id": "TEST-BATON-SCOPE-001",
       "relation": "governed_by",
       "target_asset_id": "CTRL-BATON-SETUP-001"
+    },
+    {
+      "source_asset_id": "TEST-CANARY-SPECIFICATION-ONLY-001",
+      "relation": "depends_on",
+      "target_asset_id": "FIXTURE-CANARY-SPECIFICATION-ONLY-001"
+    },
+    {
+      "source_asset_id": "TEST-CANARY-SPECIFICATION-ONLY-001",
+      "relation": "depends_on",
+      "target_asset_id": "SCHEMA-CANARY-SPECIFICATION-ONLY-001"
+    },
+    {
+      "source_asset_id": "TEST-CANARY-SPECIFICATION-ONLY-A2-001",
+      "relation": "depends_on",
+      "target_asset_id": "CATALOG-ROOT-001"
+    },
+    {
+      "source_asset_id": "TEST-CANARY-SPECIFICATION-ONLY-A2-001",
+      "relation": "depends_on",
+      "target_asset_id": "EVIDENCE-CANARY-SPECIFICATION-ONLY-A2-001"
     },
     {
       "source_asset_id": "TEST-OWNER-AUTHORITY-PACKET-001",

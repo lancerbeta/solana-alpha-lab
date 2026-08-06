@@ -14650,3 +14650,160 @@ records:
   consumers: [OWNER-AUTHORITY-PACKET-BINDING-V1, FACTORY-001]
   evidence: []
   classification: *t25_internal
+
+- asset_id: DOC-CANARY-SPECIFICATION-ONLY-001
+  record_version: '1.0'
+  asset_type: control_document
+  purpose: Offline-only micro-canary task scope, owner decision and non-claim boundary.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-08-06'
+  truth_owner: CANARY_SPECIFICATION_ONLY_V1
+  location: {kind: git_path, logical_uri: 'repo://docs/tasks/CANARY_SPECIFICATION_ONLY_V1.md', repository_path: docs/tasks/CANARY_SPECIFICATION_ONLY_V1.md}
+  integrity: {kind: sha256, sha256: bab285936b3192cf8f0c5d883a4c95d344b881c884a114f68363395dab32a79e}
+  access: *t25_read_file
+  relations:
+  - {relation_type: derived_from, target_asset_id: EVIDENCE-OWNER-AUTHORITY-PACKET-A2-001}
+  consumers: [CANARY-SPECIFICATION-ONLY-V1, FACTORY-001]
+  evidence: []
+  classification: *t25_internal
+
+- asset_id: CONTRACT-CANARY-SPECIFICATION-ONLY-001
+  record_version: '1.0'
+  asset_type: control_document
+  purpose: Versioned offline draft specification contract and explicit non-authority boundary.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-08-06'
+  truth_owner: CANARY_SPECIFICATION_ONLY_V1
+  location: {kind: git_path, logical_uri: 'repo://docs/contracts/canary_specification_only_contract_v1.md', repository_path: docs/contracts/canary_specification_only_contract_v1.md}
+  integrity: {kind: sha256, sha256: bf294ab6a658a1657acc92273528c583e2e79d2ae30652c92af3fbd7e427e559}
+  access: *t25_read_file
+  relations:
+  - {relation_type: derived_from, target_asset_id: CONTRACT-OWNER-AUTHORITY-PACKET-001}
+  consumers: [CANARY-SPECIFICATION-ONLY-V1, FACTORY-001]
+  evidence: []
+  classification: *t25_internal
+
+- asset_id: CONFIG-CANARY-SPECIFICATION-ONLY-001
+  record_version: '1.0'
+  asset_type: configuration
+  purpose: Machine-readable draft state, 300-cent cap, local-only identity and zero-authority policy.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-08-06'
+  truth_owner: CANARY_SPECIFICATION_ONLY_V1
+  location: {kind: git_path, logical_uri: 'repo://configs/canary_specification_only_v1.yaml', repository_path: configs/canary_specification_only_v1.yaml}
+  integrity: {kind: sha256, sha256: 1296e0a107e308b9dd913f3e57d844fef36bbd50d6802cf4697d536b4c6cc8eb}
+  access: *t25_read_file
+  relations:
+  - {relation_type: governed_by, target_asset_id: CONTRACT-CANARY-SPECIFICATION-ONLY-001}
+  consumers: [CANARY-SPECIFICATION-ONLY-V1, FACTORY-001]
+  evidence: []
+  classification: *t25_internal
+
+- asset_id: SCHEMA-CANARY-SPECIFICATION-ONLY-001
+  record_version: '1.0'
+  asset_type: schema
+  purpose: JSON Schema for offline canary specification acceptance evidence.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-08-06'
+  truth_owner: CANARY_SPECIFICATION_ONLY_V1
+  location: {kind: git_path, logical_uri: 'repo://catalog/schemas/canary_specification_only.schema.json', repository_path: catalog/schemas/canary_specification_only.schema.json}
+  integrity: {kind: sha256, sha256: 82c015056936b7ba267de0fb4721ff190f05de9975a10c343288e0e0b038c865}
+  access: *t25_read_file
+  relations:
+  - {relation_type: governed_by, target_asset_id: CONTRACT-CANARY-SPECIFICATION-ONLY-001}
+  consumers: [CANARY-SPECIFICATION-ONLY-V1, FACTORY-001]
+  evidence: []
+  classification: *t25_internal
+
+- asset_id: FIXTURE-CANARY-SPECIFICATION-ONLY-001
+  record_version: '1.0'
+  asset_type: evidence
+  purpose: Synthetic adversarial matrix for unsafe draft-specification mutations.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-08-06'
+  truth_owner: CANARY_SPECIFICATION_ONLY_V1
+  location: {kind: git_path, logical_uri: 'repo://tests/fixtures/canary_specification_only/specification_negative_matrix_v1.json', repository_path: tests/fixtures/canary_specification_only/specification_negative_matrix_v1.json}
+  integrity: {kind: sha256, sha256: a33191706f3898a9594350059e76aa7c456399c9080876a4a9db0a2e012040da}
+  access: *t25_read_file
+  relations:
+  - {relation_type: derived_from, target_asset_id: CONFIG-CANARY-SPECIFICATION-ONLY-001}
+  consumers: [CANARY-SPECIFICATION-ONLY-V1, FACTORY-001]
+  evidence: []
+  classification: *t25_internal
+
+- asset_id: TEST-CANARY-SPECIFICATION-ONLY-001
+  record_version: '1.0'
+  asset_type: script
+  purpose: Deterministic tests for draft state, cap, evaluator binding and zero authority.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-08-06'
+  truth_owner: CANARY_SPECIFICATION_ONLY_V1
+  location: {kind: git_path, logical_uri: 'repo://tests/test_canary_specification_only.py', repository_path: tests/test_canary_specification_only.py}
+  integrity: {kind: sha256, sha256: 72f115e71197efc1fe5f93db57c5b952d80a084ce167c691824876d90a8ec228}
+  access: *t25_read_file
+  relations:
+  - {relation_type: depends_on, target_asset_id: SCHEMA-CANARY-SPECIFICATION-ONLY-001}
+  - {relation_type: depends_on, target_asset_id: FIXTURE-CANARY-SPECIFICATION-ONLY-001}
+  consumers: [CANARY-SPECIFICATION-ONLY-V1, FACTORY-001]
+  evidence: []
+  classification: *t25_internal
+
+- asset_id: EVIDENCE-CANARY-SPECIFICATION-ONLY-A1-001
+  record_version: '1.0'
+  asset_type: evidence
+  purpose: Hash-bound offline specification acceptance receipt with zero authority.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-08-06'
+  truth_owner: CANARY_SPECIFICATION_ONLY_V1
+  location: {kind: git_path, logical_uri: 'repo://docs/evidence/canary_specification_only/a1_offline_specification_acceptance_v1.json', repository_path: docs/evidence/canary_specification_only/a1_offline_specification_acceptance_v1.json}
+  integrity: {kind: sha256, sha256: e99d59662f3e1982f9d3c8380fd6fd4e91883882fad566caf1410baeb839023f}
+  access: *t25_read_file
+  relations:
+  - {relation_type: derived_from, target_asset_id: CONFIG-CANARY-SPECIFICATION-ONLY-001}
+  - {relation_type: validated_by, target_asset_id: TEST-CANARY-SPECIFICATION-ONLY-001}
+  consumers: [CANARY-SPECIFICATION-ONLY-V1, FACTORY-001]
+  evidence: []
+  classification: *t25_internal
+
+- asset_id: EVIDENCE-CANARY-SPECIFICATION-ONLY-A2-001
+  record_version: '1.0'
+  asset_type: evidence
+  purpose: FULL Factory Fit and Catalog registration receipt for offline specification.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-08-06'
+  truth_owner: CANARY_SPECIFICATION_ONLY_V1
+  location: {kind: git_path, logical_uri: 'repo://docs/evidence/canary_specification_only/a2_catalog_factory_fit_v1.json', repository_path: docs/evidence/canary_specification_only/a2_catalog_factory_fit_v1.json}
+  integrity: {kind: sha256, sha256: c9bba074c8d1ba53fca9e4fb0056add88629f74904e3b7229d7c1fde4a3008c0}
+  access: *t25_read_file
+  relations:
+  - {relation_type: derived_from, target_asset_id: EVIDENCE-CANARY-SPECIFICATION-ONLY-A1-001}
+  - {relation_type: validated_by, target_asset_id: TEST-CANARY-SPECIFICATION-ONLY-A2-001}
+  consumers: [CANARY-SPECIFICATION-ONLY-V1, FACTORY-001]
+  evidence: []
+  classification: *t25_internal
+
+- asset_id: TEST-CANARY-SPECIFICATION-ONLY-A2-001
+  record_version: '1.0'
+  asset_type: script
+  purpose: Hash-bound Catalog and FULL Factory Fit tests for offline canary specification.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-08-06'
+  truth_owner: CANARY_SPECIFICATION_ONLY_V1
+  location: {kind: git_path, logical_uri: 'repo://tests/test_canary_specification_only_catalog_factory_fit.py', repository_path: tests/test_canary_specification_only_catalog_factory_fit.py}
+  integrity: {kind: sha256, sha256: f6e6b0a9a739ff3c2ac5911dfd7718a1be9c1765e07a36172626a081fec071ee}
+  access: *t25_read_file
+  relations:
+  - {relation_type: depends_on, target_asset_id: EVIDENCE-CANARY-SPECIFICATION-ONLY-A2-001}
+  - {relation_type: depends_on, target_asset_id: CATALOG-ROOT-001}
+  consumers: [CANARY-SPECIFICATION-ONLY-V1, FACTORY-001]
+  evidence: []
+  classification: *t25_internal
