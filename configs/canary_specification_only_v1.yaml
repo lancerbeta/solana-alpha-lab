@@ -1,0 +1,52 @@
+schema: smial.canary-specification-only-contract
+schema_version: "1.0"
+contract_id: CANARY-SPECIFICATION-ONLY-CONTRACT-001
+task_id: CANARY_SPECIFICATION_ONLY_V1
+atom_id: CANARY_SPECIFICATION_ONLY_V1
+as_of: "2026-08-06"
+safety_truth_owner:
+  task_id: OWNER_AUTHORITY_PACKET_BINDING_V1
+  contract_path: docs/contracts/owner_authority_packet_binding_contract_v1.md
+  contract_sha256: 485c573eac8411eb193b6beb2b4a2046cba6308e7fbc49d5de2063227e8600c1
+  evaluator_module: solana_alpha_lab.owner_authority_packet_binding
+specification_state: DRAFT_OWNER_INPUT_REQUIRED
+flow: SOL_TO_EXACT_MEMECOIN_TO_SOL_IMMEDIATE_EXIT
+cash_cap:
+  total_cash_at_risk_usd_cents: 300
+  owner_input_required: true
+owner_input_required:
+  - token
+  - program
+  - route
+  - wallet_public_address
+  - proposed_notional_usd_cents
+  - maximum_separate_fees_usd_cents
+  - quote_basis
+  - expires_at
+  - monitoring_reference
+  - reconciliation_reference
+  - stop_and_recovery_procedure
+  - exact_owner_approval_phrase
+technical_wallet:
+  alias: OWNER_LOCAL_ONLY
+  public_address: OWNER_LOCAL_ONLY
+  verification_hash: OWNER_LOCAL_ONLY
+authority:
+  canary_authority: false
+  task27_authority: false
+  execution_action: NONE
+  numeric_netreturn: FORBIDDEN
+side_effect_counters:
+  provider_api_rpc_wss_calls: 0
+  r3_paths_or_values_read: 0
+  wallet_signer_transaction_actions: 0
+  transaction_build_sign_simulate_send: 0
+  cash_spend_usd_cents: 0
+  dependency_changes: 0
+nonclaims:
+  - NO_PROVIDER_API_RPC_WSS
+  - NO_WALLET_OR_SIGNER
+  - NO_TRANSACTION_ACTION
+  - NO_CASH_SPEND
+  - NO_TASK27_AUTHORITY
+  - NO_NUMERIC_NETRETURN

@@ -1,0 +1,44 @@
+{
+  "schema": "smial.canary-specification-only-negative-matrix",
+  "schema_version": "1.0",
+  "task_id": "CANARY_SPECIFICATION_ONLY_V1",
+  "fixture_id": "CANARY-SPECIFICATION-ONLY-NEGATIVE-MATRIX-001",
+  "cases": [
+    {
+      "case_id": "CSP-NEG-001",
+      "case_class": "NON_DRAFT_STATE",
+      "prohibited_mutation": "specification_state_not_draft",
+      "expected_result": "REJECTED"
+    },
+    {
+      "case_id": "CSP-NEG-002",
+      "case_class": "NON_300_CASH_CAP",
+      "prohibited_mutation": "cash_cap_not_300_usd_cents",
+      "expected_result": "REJECTED"
+    },
+    {
+      "case_id": "CSP-NEG-003",
+      "case_class": "MISSING_OWNER_INPUT",
+      "prohibited_mutation": "required_owner_input_name_missing",
+      "expected_result": "REJECTED"
+    },
+    {
+      "case_id": "CSP-NEG-004",
+      "case_class": "TRUE_AUTHORITY",
+      "prohibited_mutation": "canary_or_task27_authority_true",
+      "expected_result": "REJECTED"
+    },
+    {
+      "case_id": "CSP-NEG-005",
+      "case_class": "NONZERO_PROVIDER_COUNT",
+      "prohibited_mutation": "provider_api_rpc_wss_count_nonzero",
+      "expected_result": "REJECTED"
+    },
+    {
+      "case_id": "CSP-NEG-006",
+      "case_class": "REAL_WALLET_OR_ENDPOINT_TEXT",
+      "prohibited_mutation": "material_wallet_or_provider_endpoint_present",
+      "expected_result": "REJECTED"
+    }
+  ]
+}

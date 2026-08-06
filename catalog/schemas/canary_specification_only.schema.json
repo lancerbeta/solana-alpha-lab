@@ -1,0 +1,124 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:smial:canary-specification-only:1.0",
+  "title": "Canary specification-only acceptance evidence",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema",
+    "schema_version",
+    "task_id",
+    "atom_id",
+    "as_of",
+    "status",
+    "input_bindings",
+    "decision",
+    "specification",
+    "case_results",
+    "nonclaims",
+    "side_effect_counters"
+  ],
+  "properties": {
+    "schema": {"const": "smial.canary-specification-only.a1"},
+    "schema_version": {"const": "1.0"},
+    "task_id": {"const": "CANARY_SPECIFICATION_ONLY_V1"},
+    "atom_id": {"const": "CANARY_SPECIFICATION_ONLY_V1"},
+    "as_of": {"const": "2026-08-06"},
+    "status": {"const": "PASS_OFFLINE_SPECIFICATION_DRAFT_ONLY_NO_AUTHORITY"},
+    "input_bindings": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["asset_id", "path", "sha256"],
+        "properties": {
+          "asset_id": {"type": "string"},
+          "path": {"type": "string"},
+          "sha256": {"type": "string", "pattern": "^[a-f0-9]{64}$"}
+        }
+      }
+    },
+    "decision": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "specification_state",
+        "canary_authority",
+        "task27_authority",
+        "execution_action",
+        "numeric_netreturn"
+      ],
+      "properties": {
+        "specification_state": {"const": "DRAFT_OWNER_INPUT_REQUIRED"},
+        "canary_authority": {"const": false},
+        "task27_authority": {"const": false},
+        "execution_action": {"const": "NONE"},
+        "numeric_netreturn": {"const": "FORBIDDEN"}
+      }
+    },
+    "specification": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "flow",
+        "total_cash_at_risk_usd_cents",
+        "owner_input_required",
+        "technical_wallet"
+      ],
+      "properties": {
+        "flow": {"const": "SOL_TO_EXACT_MEMECOIN_TO_SOL_IMMEDIATE_EXIT"},
+        "total_cash_at_risk_usd_cents": {"const": 300},
+        "owner_input_required": {
+          "type": "array",
+          "minItems": 12,
+          "uniqueItems": true
+        },
+        "technical_wallet": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["alias", "public_address", "verification_hash"],
+          "properties": {
+            "alias": {"const": "OWNER_LOCAL_ONLY"},
+            "public_address": {"const": "OWNER_LOCAL_ONLY"},
+            "verification_hash": {"const": "OWNER_LOCAL_ONLY"}
+          }
+        }
+      }
+    },
+    "case_results": {
+      "type": "array",
+      "minItems": 6,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["case_class", "result"],
+        "properties": {
+          "case_class": {"type": "string"},
+          "result": {"const": "REJECTED"}
+        }
+      }
+    },
+    "nonclaims": {"type": "array", "minItems": 5},
+    "side_effect_counters": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "provider_api_rpc_wss_calls",
+        "r3_paths_or_values_read",
+        "wallet_signer_transaction_actions",
+        "transaction_build_sign_simulate_send",
+        "cash_spend_usd_cents",
+        "dependency_changes"
+      ],
+      "properties": {
+        "provider_api_rpc_wss_calls": {"const": 0},
+        "r3_paths_or_values_read": {"const": 0},
+        "wallet_signer_transaction_actions": {"const": 0},
+        "transaction_build_sign_simulate_send": {"const": 0},
+        "cash_spend_usd_cents": {"const": 0},
+        "dependency_changes": {"const": 0}
+      }
+    }
+  }
+}

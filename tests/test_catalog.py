@@ -60,6 +60,7 @@ class CatalogImportTests(unittest.TestCase):
             [
                 "NEGATIVE-T24-ENTITY-SIGNAL-V1-001",
                 "DECISION-OWNER-AUTHORITY-PACKET-001",
+                "DECISION-CANARY-SPECIFICATION-ONLY-001",
             ],
         )
         self.assertTrue(
