@@ -1,0 +1,44 @@
+{
+  "schema": "smial.task27.price_volume_research_screen.fixture",
+  "schema_version": "1.0",
+  "fixture_kind": "SYNTHETIC_GOLDEN_ONLY",
+  "valid_panels": [
+    {
+      "case_id": "PV-GOLDEN-001",
+      "source_scope": "SYNTHETIC_GOLDEN",
+      "identity": {
+        "network": "solana",
+        "pool_id": "pool_synthetic_001",
+        "base_token_id": "base_synthetic_001",
+        "quote_token_id": "quote_synthetic_001",
+        "dex_id": "dex_synthetic_001",
+        "observation_scope": "POOL"
+      },
+      "interval_seconds": 900,
+      "bars": [
+        {"interval_start_at": "2026-01-01T00:00:00Z", "event_time": "2026-01-01T00:15:00Z", "observed_at": "2026-01-01T00:15:01Z", "available_at": "2026-01-01T00:15:02Z", "ingested_at": "2026-01-01T00:15:03Z", "data_state": "OBSERVED", "open": "100", "high": "101", "low": "99", "close": "100", "volume": "10", "volume_currency": "USD", "carried_forward": false},
+        {"interval_start_at": "2026-01-01T00:15:00Z", "event_time": "2026-01-01T00:30:00Z", "observed_at": "2026-01-01T00:30:01Z", "available_at": "2026-01-01T00:30:02Z", "ingested_at": "2026-01-01T00:30:03Z", "data_state": "OBSERVED", "open": "100", "high": "102", "low": "100", "close": "102", "volume": "11", "volume_currency": "USD", "carried_forward": false},
+        {"interval_start_at": "2026-01-01T00:30:00Z", "event_time": "2026-01-01T00:45:00Z", "observed_at": "2026-01-01T00:45:01Z", "available_at": "2026-01-01T00:45:02Z", "ingested_at": "2026-01-01T00:45:03Z", "data_state": "OBSERVED", "open": "102", "high": "104", "low": "102", "close": "103", "volume": "12", "volume_currency": "USD", "carried_forward": false},
+        {"interval_start_at": "2026-01-01T00:45:00Z", "event_time": "2026-01-01T01:00:00Z", "observed_at": "2026-01-01T01:00:01Z", "available_at": "2026-01-01T01:00:02Z", "ingested_at": "2026-01-01T01:00:03Z", "data_state": "OBSERVED", "open": "103", "high": "105", "low": "103", "close": "104", "volume": "13", "volume_currency": "USD", "carried_forward": false},
+        {"interval_start_at": "2026-01-01T01:00:00Z", "event_time": "2026-01-01T01:15:00Z", "observed_at": "2026-01-01T01:15:01Z", "available_at": "2026-01-01T01:15:02Z", "ingested_at": "2026-01-01T01:15:03Z", "data_state": "OBSERVED", "open": "104", "high": "106", "low": "104", "close": "105", "volume": "14", "volume_currency": "USD", "carried_forward": false}
+      ],
+      "label": {
+        "kind": "FORWARD_CLOSE_RETURN_1H",
+        "entry_interval_start_at": "2026-01-01T00:00:00Z",
+        "terminal_interval_start_at": "2026-01-01T01:00:00Z",
+        "state": "KNOWN",
+        "value_decimal": "0.050000",
+        "claim_scope": "RESEARCH_SCREEN_ONLY"
+      }
+    }
+  ],
+  "adversarial_cases": [
+    {"case_id": "ADV-01-MISSING-TO-ZERO", "expected_error": "MISSING_IS_NOT_ZERO", "mutations": [{"json_pointer": "/bars/1/data_state", "replacement": "MISSING_UNKNOWN"}, {"json_pointer": "/bars/1/volume", "replacement": "0"}, {"json_pointer": "/bars/1/open", "replacement": null}, {"json_pointer": "/bars/1/high", "replacement": null}, {"json_pointer": "/bars/1/low", "replacement": null}, {"json_pointer": "/bars/1/close", "replacement": null}]},
+    {"case_id": "ADV-02-CARRIED-FORWARD", "expected_error": "CARRIED_FORWARD_PRICE_FORBIDDEN", "mutations": [{"json_pointer": "/bars/1/data_state", "replacement": "MISSING_UNKNOWN"}, {"json_pointer": "/bars/1/open", "replacement": null}, {"json_pointer": "/bars/1/high", "replacement": null}, {"json_pointer": "/bars/1/low", "replacement": null}, {"json_pointer": "/bars/1/close", "replacement": null}, {"json_pointer": "/bars/1/carried_forward", "replacement": true}]},
+    {"case_id": "ADV-03-GAPPED-WINDOW", "expected_error": "NONCONTIGUOUS_FORWARD_WINDOW", "mutations": [{"json_pointer": "/bars/2/interval_start_at", "replacement": "2026-01-01T00:45:00Z"}]},
+    {"case_id": "ADV-04-UNKNOWN-AVAILABILITY", "expected_error": "PIT_AVAILABILITY_UNKNOWN", "mutations": [{"json_pointer": "/bars/1/available_at", "replacement": null}]},
+    {"case_id": "ADV-05-TOKEN-NOT-POOL", "expected_error": "POOL_TOKEN_IDENTITY_MISMATCH", "mutations": [{"json_pointer": "/identity/observation_scope", "replacement": "TOKEN"}]},
+    {"case_id": "ADV-06-PRICE-IS-NOT-EXECUTION", "expected_error": "PRICE_LABEL_IS_NOT_EXECUTION", "mutations": [{"json_pointer": "/label/claim_scope", "replacement": "EXECUTION_CLAIM"}]},
+    {"case_id": "ADV-07-INCOMPLETE-LABEL", "expected_error": "INCOMPLETE_FORWARD_WINDOW_UNKNOWN", "mutations": [{"json_pointer": "/bars/4/data_state", "replacement": "MISSING_UNKNOWN"}, {"json_pointer": "/bars/4/open", "replacement": null}, {"json_pointer": "/bars/4/high", "replacement": null}, {"json_pointer": "/bars/4/low", "replacement": null}, {"json_pointer": "/bars/4/close", "replacement": null}]}
+  ]
+}

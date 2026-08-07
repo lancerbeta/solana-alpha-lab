@@ -1,0 +1,169 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:smial:task27:price-volume-research-screen:1.0",
+  "title": "TASK-27 Synthetic Historical Price/Volume Research Screen",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema",
+    "schema_version",
+    "fixture_kind",
+    "valid_panels",
+    "adversarial_cases"
+  ],
+  "properties": {
+    "schema": {
+      "const": "smial.task27.price_volume_research_screen.fixture"
+    },
+    "schema_version": {
+      "const": "1.0"
+    },
+    "fixture_kind": {
+      "const": "SYNTHETIC_GOLDEN_ONLY"
+    },
+    "valid_panels": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "$ref": "#/$defs/panel"
+      }
+    },
+    "adversarial_cases": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "$ref": "#/$defs/adversarial_case"
+      }
+    }
+  },
+  "$defs": {
+    "decimal_or_null": {
+      "type": ["string", "null"],
+      "pattern": "^[0-9]+(?:\\.[0-9]+)?$"
+    },
+    "timestamp_or_null": {
+      "type": ["string", "null"],
+      "format": "date-time"
+    },
+    "bar": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "interval_start_at",
+        "event_time",
+        "observed_at",
+        "available_at",
+        "ingested_at",
+        "data_state",
+        "open",
+        "high",
+        "low",
+        "close",
+        "volume",
+        "volume_currency",
+        "carried_forward"
+      ],
+      "properties": {
+        "interval_start_at": {"type": "string", "format": "date-time"},
+        "event_time": {"type": "string", "format": "date-time"},
+        "observed_at": {"type": "string", "format": "date-time"},
+        "available_at": {"$ref": "#/$defs/timestamp_or_null"},
+        "ingested_at": {"type": "string", "format": "date-time"},
+        "data_state": {
+          "enum": ["OBSERVED", "EXPLICIT_NO_TRADE", "MISSING_UNKNOWN"]
+        },
+        "open": {"$ref": "#/$defs/decimal_or_null"},
+        "high": {"$ref": "#/$defs/decimal_or_null"},
+        "low": {"$ref": "#/$defs/decimal_or_null"},
+        "close": {"$ref": "#/$defs/decimal_or_null"},
+        "volume": {"$ref": "#/$defs/decimal_or_null"},
+        "volume_currency": {"type": "string", "minLength": 1},
+        "carried_forward": {"type": "boolean"}
+      }
+    },
+    "panel": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "case_id",
+        "source_scope",
+        "identity",
+        "interval_seconds",
+        "bars",
+        "label"
+      ],
+      "properties": {
+        "case_id": {"type": "string", "minLength": 1},
+        "source_scope": {"const": "SYNTHETIC_GOLDEN"},
+        "identity": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "network",
+            "pool_id",
+            "base_token_id",
+            "quote_token_id",
+            "dex_id",
+            "observation_scope"
+          ],
+          "properties": {
+            "network": {"const": "solana"},
+            "pool_id": {"type": "string", "minLength": 1},
+            "base_token_id": {"type": "string", "minLength": 1},
+            "quote_token_id": {"type": "string", "minLength": 1},
+            "dex_id": {"type": "string", "minLength": 1},
+            "observation_scope": {"const": "POOL"}
+          }
+        },
+        "interval_seconds": {"const": 900},
+        "bars": {
+          "type": "array",
+          "minItems": 5,
+          "items": {"$ref": "#/$defs/bar"}
+        },
+        "label": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "kind",
+            "entry_interval_start_at",
+            "terminal_interval_start_at",
+            "state",
+            "value_decimal",
+            "claim_scope"
+          ],
+          "properties": {
+            "kind": {"const": "FORWARD_CLOSE_RETURN_1H"},
+            "entry_interval_start_at": {"type": "string", "format": "date-time"},
+            "terminal_interval_start_at": {"type": "string", "format": "date-time"},
+            "state": {"enum": ["KNOWN", "UNKNOWN"]},
+            "value_decimal": {"type": ["string", "null"], "pattern": "^-?[0-9]+(?:\\.[0-9]+)?$"},
+            "claim_scope": {"const": "RESEARCH_SCREEN_ONLY"}
+          }
+        }
+      }
+    },
+    "adversarial_case": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["case_id", "expected_error", "mutations"],
+      "properties": {
+        "case_id": {"type": "string", "minLength": 1},
+        "expected_error": {"type": "string", "minLength": 1},
+        "mutations": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["json_pointer", "replacement"],
+            "properties": {
+              "json_pointer": {"type": "string", "pattern": "^/"},
+              "replacement": {}
+            }
+          }
+        }
+      }
+    }
+  }
+}

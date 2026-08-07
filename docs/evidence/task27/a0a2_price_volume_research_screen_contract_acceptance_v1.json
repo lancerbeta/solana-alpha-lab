@@ -1,0 +1,88 @@
+{
+  "schema": "smial.task27.a0a2.price_volume_research_screen.acceptance",
+  "schema_version": "1.0",
+  "task_id": "TASK-27",
+  "atom_id": "T27-A0-A2_HISTORICAL_PRICE_VOLUME_CONTRACT_V1",
+  "status": "PASS_VALIDATED_OFFLINE_CONTRACT_ONLY",
+  "implementation_base": {
+    "commit": "d8b3a85a731c1df5224e36e1a9c7fadc5eb3854d",
+    "tree": "5660e1996de498dd339909c98820693ea17c8699",
+    "branch": "task27/price-volume-contract"
+  },
+  "authority": {
+    "user_authority": "T27-A0-A2_OFFLINE_CONTRACT_AND_SYNTHETIC_TESTS_ONLY",
+    "provider_api_rpc_wss_calls": 0,
+    "r2_value_reads": 0,
+    "r3_value_or_path_reads": 0,
+    "wallet_signer_transaction_actions": 0,
+    "cash_spend_usd_cents": 0,
+    "credential_use": false,
+    "dependency_changes": false,
+    "catalog_or_registry_mutation": false,
+    "project_source_changes": false
+  },
+  "managed_write_set": [
+    "docs/contracts/task27_price_volume_research_screen_contract_v1.md",
+    "configs/task27_price_volume_research_screen_contract_v1.yaml",
+    "catalog/schemas/task27_price_volume_research_screen.schema.json",
+    "tests/fixtures/task27/price_volume_research_screen_v1.json",
+    "tests/test_task27_price_volume_research_screen_contract.py",
+    "docs/evidence/task27/a0a2_price_volume_research_screen_contract_acceptance_v1.json"
+  ],
+  "artifact_bindings": {
+    "contract": {
+      "path": "docs/contracts/task27_price_volume_research_screen_contract_v1.md",
+      "sha256": "e4938def6e0a45d4b5c392ef5a94978ee3f12e6e03127306498f1302813d83b4"
+    },
+    "config": {
+      "path": "configs/task27_price_volume_research_screen_contract_v1.yaml",
+      "sha256": "87bd90952c7c9e1c063513bf390d7d81f919145498d55ddeaeabfaa58c1de441"
+    },
+    "schema": {
+      "path": "catalog/schemas/task27_price_volume_research_screen.schema.json",
+      "sha256": "de60a90b85e78073bc625473aec9c55b528d994decb1b664aadf9b42a912ad66"
+    },
+    "fixture": {
+      "path": "tests/fixtures/task27/price_volume_research_screen_v1.json",
+      "sha256": "072a76035f97e1fb9c4976adc04e09b632cb5edcf2fc9dd276693e066f1b5a0b"
+    }
+  },
+  "validation": {
+    "targeted_command": "uv run --locked --managed-python python -B -m unittest tests.test_task27_price_volume_research_screen_contract",
+    "targeted_tests_run": 7,
+    "targeted_tests_passed": 7,
+    "schema_draft": "2020-12",
+    "valid_synthetic_panels": 1,
+    "adversarial_cases_rejected": 7,
+    "full_validation": "PENDING_TRACKED_ONLY_DELIVERY_GATE"
+  },
+  "semantic_acceptance": {
+    "pool_interval_identity_is_required": "PASS",
+    "fifteen_minute_grid_is_frozen": "PASS",
+    "one_hour_forward_close_label_is_hand_derived": "PASS",
+    "missing_is_not_zero": "PASS",
+    "carried_forward_price_is_rejected": "PASS",
+    "gap_or_unknown_availability_makes_label_unknown": "PASS",
+    "token_scope_cannot_substitute_for_pool_scope": "PASS",
+    "price_label_does_not_imply_execution_or_netreturn": "PASS"
+  },
+  "measured_boundary": {
+    "synthetic_panels_validated": 1,
+    "adversarial_cases_rejected": 7,
+    "provider_api_rpc_wss_calls": 0,
+    "r2_value_reads": 0,
+    "r3_value_or_path_reads": 0,
+    "wallet_signer_transaction_actions": 0,
+    "cash_spend_usd_cents": 0,
+    "raw_provider_responses_retained": 0,
+    "dependency_changes": 0,
+    "catalog_or_registry_mutations": 0,
+    "project_source_changes": 0
+  },
+  "state_change": "NONE",
+  "next_boundary": {
+    "task27_authority_granted": false,
+    "provider_read_authority_granted": false,
+    "future_data_collection_requires_new_exact_authority": true
+  }
+}
