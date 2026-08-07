@@ -285,8 +285,8 @@ requires exact owner confirmation of that PR and head.
   raw manifest, retention, PIT semantics, non-claims and adversarial guards.
   Task 2 covers content binding, compatibility, tracked-only delivery and
   remote-readback stop.
-- **No placeholder scan:** no `TODO`, `TBD`, generic validation or unspecified
-  error path remains.
+- **No placeholder scan:** no unfinished marker, generic validation or
+  unspecified error path remains.
 - **Type consistency:** `semantic_errors(packet)` is declared and used only by
   the focused test module; all receipt and fixture paths match the managed
   write set.
