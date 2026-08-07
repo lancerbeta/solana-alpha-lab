@@ -14791,15 +14791,15 @@ records:
   classification: *t25_internal
 
 - asset_id: TEST-CANARY-SPECIFICATION-ONLY-A2-001
-  record_version: '1.0'
+  record_version: '1.1'
   asset_type: script
   purpose: Hash-bound Catalog and FULL Factory Fit tests for offline canary specification.
   status: IMPLEMENTED_UNVERIFIED
   origin: REPOSITORY
-  as_of: '2026-08-06'
+  as_of: '2026-08-07'
   truth_owner: CANARY_SPECIFICATION_ONLY_V1
   location: {kind: git_path, logical_uri: 'repo://tests/test_canary_specification_only_catalog_factory_fit.py', repository_path: tests/test_canary_specification_only_catalog_factory_fit.py}
-  integrity: {kind: sha256, sha256: f6e6b0a9a739ff3c2ac5911dfd7718a1be9c1765e07a36172626a081fec071ee}
+  integrity: {kind: sha256, sha256: 96d17ed348d65b669c6aca4c8089ef770f6dec4e7f752ec66e8774b0de029f88}
   access: *t25_read_file
   relations:
   - {relation_type: depends_on, target_asset_id: EVIDENCE-CANARY-SPECIFICATION-ONLY-A2-001}
