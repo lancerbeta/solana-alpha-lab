@@ -198,6 +198,10 @@ class Task27PriceVolumeResearchScreenContractTests(unittest.TestCase):
         self.assertEqual(receipt["managed_write_set"], EXPECTED_WRITE_SET)
         self.assertEqual(receipt["validation"]["targeted_tests_run"], 7)
         self.assertEqual(receipt["validation"]["adversarial_cases_rejected"], 7)
+        self.assertEqual(
+            receipt["validation"]["full_validation"],
+            "PASS_TRACKED_ONLY_DELIVERY_PREFLIGHT",
+        )
         for key in (
             "provider_api_rpc_wss_calls",
             "r2_value_reads",

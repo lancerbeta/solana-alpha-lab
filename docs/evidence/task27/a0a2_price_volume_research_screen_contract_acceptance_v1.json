@@ -54,7 +54,7 @@
     "schema_draft": "2020-12",
     "valid_synthetic_panels": 1,
     "adversarial_cases_rejected": 7,
-    "full_validation": "PENDING_TRACKED_ONLY_DELIVERY_GATE"
+    "full_validation": "PASS_TRACKED_ONLY_DELIVERY_PREFLIGHT"
   },
   "semantic_acceptance": {
     "pool_interval_identity_is_required": "PASS",
