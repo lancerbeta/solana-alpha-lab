@@ -1,0 +1,47 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "smial.task27.permanent_sources_reconciliation.fixture.v1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["fixture_kind", "valid_packets", "adversarial_cases"],
+  "properties": {
+    "fixture_kind": {"const": "SYNTHETIC_GOLDEN_ONLY"},
+    "valid_packets": {
+      "type": "array",
+      "minItems": 1,
+      "items": {"$ref": "#/$defs/packet"}
+    },
+    "adversarial_cases": {
+      "type": "array",
+      "minItems": 1,
+      "items": {"$ref": "#/$defs/adversarial_case"}
+    }
+  },
+  "$defs": {
+    "packet": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["bundle_status", "mutable_roles", "active_task_id", "immutable_role_hashes", "repository_evidence", "smoke_prompt_id", "authority", "claims"],
+      "properties": {
+        "bundle_status": {"const": "VALIDATED_CANDIDATE_UI_ACTIVATION_PENDING"},
+        "mutable_roles": {"type": "array", "items": {"type": "string"}},
+        "active_task_id": {"type": "string", "minLength": 1},
+        "immutable_role_hashes": {"type": "object"},
+        "repository_evidence": {"type": "object"},
+        "smoke_prompt_id": {"type": ["string", "null"]},
+        "authority": {"type": "object"},
+        "claims": {"type": "object"}
+      }
+    },
+    "adversarial_case": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["case_id", "expected_error", "mutations"],
+      "properties": {
+        "case_id": {"type": "string", "minLength": 1},
+        "expected_error": {"type": "string", "minLength": 1},
+        "mutations": {"type": "array", "minItems": 1}
+      }
+    }
+  }
+}

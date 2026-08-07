@@ -1,0 +1,91 @@
+{
+  "fixture_kind": "SYNTHETIC_GOLDEN_ONLY",
+  "valid_packets": [
+    {
+      "bundle_status": "VALIDATED_CANDIDATE_UI_ACTIVATION_PENDING",
+      "mutable_roles": [
+        "canonical_manifest",
+        "roadmap",
+        "current_system_state",
+        "phase_archive",
+        "active_task"
+      ],
+      "active_task_id": "TASK-27",
+      "immutable_role_hashes": {
+        "operating_system": "187aa5d1405c55868d7147a7cdf9e0605a9a51f613ab5597ae44682fcbc67c84",
+        "research_blueprint": "ec756d5be0196dd8207ac08512af5e3a9a5032eb5b0b40e3f8fcca2beb170ba1"
+      },
+      "repository_evidence": {
+        "main_commit": "082f3f8184e84c31c876a484cf8e876a40691f62",
+        "main_ci_run_id": 31224401848,
+        "main_ci_conclusion": "success"
+      },
+      "smoke_prompt_id": "FRESH_CHAT_SMOKE",
+      "authority": {
+        "provider_read_authority": false,
+        "provider_api_rpc_wss_calls": 0
+      },
+      "claims": {
+        "pit_admissible": false
+      }
+    }
+  ],
+  "adversarial_cases": [
+    {
+      "case_id": "extra_mutable_role",
+      "expected_error": "MUTABLE_ROLE_SET_MISMATCH",
+      "mutations": [
+        {"json_pointer": "/mutable_roles", "replacement": ["canonical_manifest", "roadmap", "current_system_state", "phase_archive", "active_task", "operating_system"]}
+      ]
+    },
+    {
+      "case_id": "old_active_task",
+      "expected_error": "OLD_ACTIVE_TASK_FORBIDDEN",
+      "mutations": [
+        {"json_pointer": "/active_task_id", "replacement": "OWNER_AUTHORITY_PACKET_BINDING_V1"}
+      ]
+    },
+    {
+      "case_id": "immutable_hash_drift",
+      "expected_error": "IMMUTABLE_ROLE_HASH_DRIFT",
+      "mutations": [
+        {"json_pointer": "/immutable_role_hashes/operating_system", "replacement": "0"}
+      ]
+    },
+    {
+      "case_id": "false_ui_activation",
+      "expected_error": "UI_ACTIVATION_CLAIM_FORBIDDEN",
+      "mutations": [
+        {"json_pointer": "/bundle_status", "replacement": "UI_ACTIVATION_CONFIRMED"}
+      ]
+    },
+    {
+      "case_id": "missing_smoke_prompt",
+      "expected_error": "SMOKE_PROMPT_REQUIRED",
+      "mutations": [
+        {"json_pointer": "/smoke_prompt_id", "replacement": null}
+      ]
+    },
+    {
+      "case_id": "wrong_main_ci_binding",
+      "expected_error": "REPOSITORY_EVIDENCE_MISMATCH",
+      "mutations": [
+        {"json_pointer": "/repository_evidence/main_ci_run_id", "replacement": 0}
+      ]
+    },
+    {
+      "case_id": "provider_authority_promotion",
+      "expected_error": "EXTERNAL_AUTHORITY_PROMOTION_FORBIDDEN",
+      "mutations": [
+        {"json_pointer": "/authority/provider_read_authority", "replacement": true}
+      ]
+    },
+    {
+      "case_id": "pit_claim",
+      "expected_error": "PIT_CLAIM_FORBIDDEN",
+      "mutations": [
+        {"json_pointer": "/claims/pit_admissible", "replacement": true}
+      ]
+    }
+  ]
+}

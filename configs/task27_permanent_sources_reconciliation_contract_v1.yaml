@@ -1,0 +1,44 @@
+schema: smial.task27.permanent_sources_reconciliation.contract
+schema_version: '1.0'
+task_id: TASK-27
+atom_id: T27-A0-A5_PERMANENT_SOURCES_RECONCILIATION_AND_SMOKE_V1
+bundle_status: VALIDATED_CANDIDATE_UI_ACTIVATION_PENDING
+baseline_source_candidate:
+  manifest_version: '4.6'
+  roadmap_version: '4.6'
+  current_system_state_version: '4.2'
+  phase_archive_version: '36.0'
+  active_task_id: OWNER_AUTHORITY_PACKET_BINDING_V1
+mutable_roles:
+  - canonical_manifest
+  - roadmap
+  - current_system_state
+  - phase_archive
+  - active_task
+immutable_roles:
+  operating_system:
+    semantic_version: '8.5'
+    sha256: 187aa5d1405c55868d7147a7cdf9e0605a9a51f613ab5597ae44682fcbc67c84
+  research_blueprint:
+    semantic_version: '2.3'
+    sha256: ec756d5be0196dd8207ac08512af5e3a9a5032eb5b0b40e3f8fcca2beb170ba1
+repository_evidence:
+  main_commit: 082f3f8184e84c31c876a484cf8e876a40691f62
+  main_ci_run_id: 31224401848
+  main_ci_conclusion: success
+authority:
+  provider_api_rpc_wss_calls: 0
+  provider_read_authority: false
+  r2_value_reads: 0
+  r3_value_or_path_reads: 0
+  wallet_signer_transaction_actions: 0
+  cash_spend_usd_cents: 0
+  credential_use: false
+  raw_provider_responses_retained: 0
+  dependency_changes: false
+  catalog_root_mutation: false
+  project_sources_ui_changes: false
+next_boundary:
+  user_smoke_required: true
+  provider_read_authority_granted: false
+  separate_exact_owner_external_read_review_required: true
