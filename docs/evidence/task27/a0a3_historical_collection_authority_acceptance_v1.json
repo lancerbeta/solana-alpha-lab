@@ -53,7 +53,11 @@
     "schema_draft": "2020-12",
     "valid_synthetic_packets": 1,
     "adversarial_cases_rejected": 8,
-    "full_validation": "PENDING_TRACKED_ONLY_DELIVERY_PREFLIGHT"
+    "full_validation": "PASS_TRACKED_ONLY_DELIVERY_PREFLIGHT",
+    "tracked_only_tests_run": 1863,
+    "tracked_only_skipped": 61,
+    "tracked_only_pass_labels": 24,
+    "tracked_only_wall_seconds": 405.313
   },
   "semantic_acceptance": {
     "descriptive_history_is_not_pit_claim": "PASS",
