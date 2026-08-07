@@ -288,6 +288,99 @@ class GitHubActionsMainStateTests(unittest.TestCase):
         )
 
 
+class GitHubActionsManualDispatchStateTests(unittest.TestCase):
+    def test_accepts_only_clean_manual_checkout_of_its_exact_feature_branch(self) -> None:
+        branch = "ci-recovery-trigger"
+        remote_tracking_refs = {"origin/HEAD", "origin/main", f"origin/{branch}"}
+        topology = module.classify_git_topology(
+            branch=branch,
+            head_oid="a" * 40,
+            remotes={"origin"},
+            fetch_urls=("https://github.com/lancerbeta/solana-alpha-lab",),
+            push_urls=("https://github.com/lancerbeta/solana-alpha-lab",),
+            fetch_refspecs=(module.EXPECTED_ORIGIN_FETCH_REFSPEC,),
+            push_refspecs=(),
+            upstream=f"origin/{branch}",
+            local_branches={branch},
+            remote_tracking_refs=remote_tracking_refs,
+            tags=set(),
+            all_refs={f"refs/heads/{branch}"}
+            | {f"refs/remotes/{ref}" for ref in remote_tracking_refs},
+            github_actions=True,
+            github_repository=module.EXPECTED_GITHUB_REPOSITORY,
+            github_ref=f"refs/heads/{branch}",
+            github_sha="a" * 40,
+            remote_head_target="refs/remotes/origin/main",
+        )
+
+        self.assertEqual("GITHUB_ACTIONS_BRANCH_CHECKOUT", topology)
+        self.assertEqual(
+            "GITHUB_ACTIONS_MANUAL_CANDIDATE",
+            module.classify_github_actions_runtime_state(
+                github_actions=True,
+                github_repository=module.EXPECTED_GITHUB_REPOSITORY,
+                github_ref=f"refs/heads/{branch}",
+                github_sha="a" * 40,
+                github_event_name="workflow_dispatch",
+                branch=branch,
+                head_oid="a" * 40,
+                topology=topology,
+                staged=set(),
+                untracked=set(),
+                unstaged=set(),
+            ),
+        )
+
+    def test_rejects_feature_branch_checkout_without_manual_dispatch_event(self) -> None:
+        self.assertIsNone(
+            module.classify_github_actions_runtime_state(
+                github_actions=True,
+                github_repository=module.EXPECTED_GITHUB_REPOSITORY,
+                github_ref="refs/heads/ci-recovery-trigger",
+                github_sha="a" * 40,
+                github_event_name="push",
+                branch="ci-recovery-trigger",
+                head_oid="a" * 40,
+                topology="GITHUB_ACTIONS_BRANCH_CHECKOUT",
+                staged=set(),
+                untracked=set(),
+                unstaged=set(),
+            )
+        )
+
+    def test_rejects_manual_checkout_when_ref_and_branch_differ(self) -> None:
+        topology = module.classify_git_topology(
+            branch="ci-recovery-trigger",
+            head_oid="a" * 40,
+            remotes={"origin"},
+            fetch_urls=("https://github.com/lancerbeta/solana-alpha-lab",),
+            push_urls=("https://github.com/lancerbeta/solana-alpha-lab",),
+            fetch_refspecs=(module.EXPECTED_ORIGIN_FETCH_REFSPEC,),
+            push_refspecs=(),
+            upstream="origin/ci-recovery-trigger",
+            local_branches={"ci-recovery-trigger"},
+            remote_tracking_refs={
+                "origin/HEAD",
+                "origin/main",
+                "origin/ci-recovery-trigger",
+            },
+            tags=set(),
+            all_refs={
+                "refs/heads/ci-recovery-trigger",
+                "refs/remotes/origin/HEAD",
+                "refs/remotes/origin/main",
+                "refs/remotes/origin/ci-recovery-trigger",
+            },
+            github_actions=True,
+            github_repository=module.EXPECTED_GITHUB_REPOSITORY,
+            github_ref="refs/heads/other-branch",
+            github_sha="a" * 40,
+            remote_head_target="refs/remotes/origin/main",
+        )
+
+        self.assertEqual("INVALID_GIT_TOPOLOGY", topology)
+
+
 class RepositoryStatePolicyTests(unittest.TestCase):
     def classify_atom5(self, **overrides: object) -> str:
         arguments = {

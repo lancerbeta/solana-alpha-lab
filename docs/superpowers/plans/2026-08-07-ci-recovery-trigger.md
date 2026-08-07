@@ -175,7 +175,7 @@ Expected: remote PR head equals local committed HEAD and CI reports success.
 
 Dispatch `Repository validation` using the PR branch ref with no inputs, then read back its run ID, event `workflow_dispatch`, exact head SHA and conclusion.
 
-Expected: the same read-only `validate` job passes. If dispatch fails to create a run or the run fails, stop before Ready/merge and report the exact external or code blocker; do not add a no-op commit.
+Expected: the same read-only `validate` job passes. If dispatch fails to create a run or the run fails, stop before Ready/merge and report the exact external or code blocker; do not add a no-op commit. If the failure is specifically a clean manual feature-branch checkout rejected by the repository-state validator, add a deterministic red/green test matrix for the exact `workflow_dispatch` branch shape, extend only the matching runtime contract, rebind `VALIDATOR-REPOSITORY-STATE-001`, regenerate the Catalog projection and repeat this step.
 
 - [ ] **Step 5: Prepare merge handoff**
 

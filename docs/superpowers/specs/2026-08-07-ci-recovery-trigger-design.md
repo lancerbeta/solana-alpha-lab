@@ -61,6 +61,14 @@ that the current validator rejects the desired parameterless dispatch; the
 minimal implementation then admits it. Separate negative mutations prove that
 inputs and the existing dangerous patterns remain rejected.
 
+The repository-state validator also has a runtime contract. A manual Actions
+dispatch checks out its selected feature branch rather than the detached
+pull-request merge ref. It therefore admits this third checkout shape only
+when the checkout is clean, belongs to the expected repository, its Git ref
+and local branch agree exactly, its SHA agrees with `HEAD`, and
+`GITHUB_EVENT_NAME` is exactly `workflow_dispatch`. A feature-branch checkout
+from any other event remains rejected.
+
 ## Catalog and generated consumers
 
 `CI-WORKFLOW-001` and `CI-VALIDATOR-001` are durable, hash-bound assets. Their
@@ -82,7 +90,10 @@ evidence. After CI is healthy, one parameterless manual dispatch on the PR
 branch proves the recovery path without touching `main`. Merge remains a
 separate exact owner confirmation. If the manual dispatch does not create a
 run, stop and report the GitHub-side gap; do not add empty commits or broaden
-the workflow.
+the workflow. A failure caused specifically by the baseline validator rejecting
+the clean manual feature-branch checkout is an in-scope control defect: cover
+it with deterministic baseline tests, extend only that exact runtime contract,
+rebind its Catalog asset and repeat the same manual-dispatch proof.
 
 Rollback is a normal revert of this small PR. It removes the manual entrypoint
 and restores the previous exact validator contract without affecting data,
