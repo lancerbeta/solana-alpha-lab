@@ -1,0 +1,71 @@
+schema: smial.task27.price_volume_research_screen.contract
+schema_version: '1.0'
+task_id: TASK-27
+atom_id: T27-A0-A2_HISTORICAL_PRICE_VOLUME_CONTRACT_V1
+status: OFFLINE_CONTRACT_ONLY
+managed_write_set:
+  - docs/contracts/task27_price_volume_research_screen_contract_v1.md
+  - configs/task27_price_volume_research_screen_contract_v1.yaml
+  - catalog/schemas/task27_price_volume_research_screen.schema.json
+  - tests/fixtures/task27/price_volume_research_screen_v1.json
+  - tests/test_task27_price_volume_research_screen_contract.py
+  - docs/evidence/task27/a0a2_price_volume_research_screen_contract_acceptance_v1.json
+data_contract:
+  observation_unit: pool_interval
+  observation_scope: POOL
+  network: solana
+  interval_seconds: 900
+  primary_label: FORWARD_CLOSE_RETURN_1H
+  successor_intervals_required: 4
+  missing_result: UNKNOWN
+  required_identity_fields:
+    - network
+    - pool_id
+    - base_token_id
+    - quote_token_id
+    - dex_id
+    - interval_start_at
+  required_value_fields:
+    - open
+    - high
+    - low
+    - close
+    - volume
+    - volume_currency
+  required_time_fields:
+    - event_time
+    - observed_at
+    - available_at
+    - ingested_at
+quality_rules:
+  missing_is_not_zero: true
+  carried_forward_price_forbidden: true
+  incomplete_forward_window_is_unknown: true
+  pool_token_identity_mixing_forbidden: true
+  price_label_is_not_execution: true
+authority:
+  provider_api_rpc_wss_calls: 0
+  r2_value_reads: 0
+  r3_value_or_path_reads: 0
+  wallet_signer_transaction_actions: 0
+  cash_spend_usd_cents: 0
+  credential_use: false
+  dependency_changes: false
+  catalog_or_registry_mutation: false
+  project_source_changes: false
+  commit: false
+  push: false
+  pull_request: false
+  merge: false
+catalog_impact:
+  registration: DEFERRED_TO_FUTURE_TASK
+  root_resolver_mutation: false
+  generated_project_map_mutation: false
+non_claims:
+  - no_provider_data_collected
+  - no_execution_or_fill_claim
+  - no_pnl_or_netreturn_claim
+  - no_strategy_or_task27_acceptance
+next_boundary:
+  later_provider_read_requires_new_explicit_authority: true
+  task27_authority_granted: false
