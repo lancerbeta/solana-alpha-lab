@@ -870,6 +870,7 @@ CURRENT_RUNTIME_CONTRACT_STATES = (
         "TRACKED_ONLY_DELIVERY_CANDIDATE",
         "GITHUB_ACTIONS_MAIN_CANDIDATE",
         "GITHUB_ACTIONS_PR_CANDIDATE",
+        "GITHUB_ACTIONS_MANUAL_CANDIDATE",
     }
 )
 CTRL_GENERIC_LIFECYCLE_COMBINATIONS = {
@@ -3429,6 +3430,29 @@ def classify_git_topology(
                 and pull_context_ok
             ):
                 return "GITHUB_ACTIONS_PR_CHECKOUT"
+        if branch is not None and branch != "main":
+            branch_remote_ref = f"origin/{branch}"
+            branch_refs_ok = (
+                local_branches == {branch}
+                and {"origin/main", branch_remote_ref} <= remote_tracking_refs
+                and all(ref.startswith("origin/") for ref in remote_tracking_refs)
+                and repository_refs
+                == {f"refs/heads/{branch}"}
+                | {f"refs/remotes/{ref}" for ref in remote_tracking_refs}
+            )
+            branch_context_ok = (
+                github_repository == EXPECTED_GITHUB_REPOSITORY
+                and github_ref == f"refs/heads/{branch}"
+                and github_sha == head_oid
+            )
+            if (
+                main_origin_identity_ok
+                and refspec_policy_ok
+                and branch_refs_ok
+                and upstream in {None, branch_remote_ref}
+                and branch_context_ok
+            ):
+                return "GITHUB_ACTIONS_BRANCH_CHECKOUT"
         return "INVALID_GIT_TOPOLOGY"
 
     if branch != "main" or local_branches != {"main"}:
@@ -3524,6 +3548,7 @@ def classify_tracked_only_delivery_state(
 GITHUB_ACTIONS_RUNTIME_STATE_TOPOLOGY = {
     "GITHUB_ACTIONS_MAIN_CANDIDATE": "GITHUB_ACTIONS_CHECKOUT",
     "GITHUB_ACTIONS_PR_CANDIDATE": "GITHUB_ACTIONS_PR_CHECKOUT",
+    "GITHUB_ACTIONS_MANUAL_CANDIDATE": "GITHUB_ACTIONS_BRANCH_CHECKOUT",
 }
 
 
@@ -3539,8 +3564,9 @@ def classify_github_actions_runtime_state(
     staged: set[str],
     untracked: set[str],
     unstaged: set[str],
+    github_event_name: str | None = None,
 ) -> str | None:
-    """Recognize only clean GitHub Actions main or pull-request checkouts."""
+    """Recognize only clean GitHub Actions main, PR, or manual checkouts."""
 
     common_runtime_contract = (
         github_actions
@@ -3569,6 +3595,16 @@ def classify_github_actions_runtime_state(
         ]
     ):
         return "GITHUB_ACTIONS_PR_CANDIDATE"
+    if (
+        github_event_name == "workflow_dispatch"
+        and branch is not None
+        and branch != "main"
+        and github_ref == f"refs/heads/{branch}"
+        and topology == GITHUB_ACTIONS_RUNTIME_STATE_TOPOLOGY[
+            "GITHUB_ACTIONS_MANUAL_CANDIDATE"
+        ]
+    ):
+        return "GITHUB_ACTIONS_MANUAL_CANDIDATE"
     return None
 
 
@@ -4919,6 +4955,7 @@ def validate() -> None:
         staged=staged,
         untracked=untracked,
         unstaged=unstaged,
+        github_event_name=os.environ.get("GITHUB_EVENT_NAME"),
     )
     if tracked_only_delivery_state is not None:
         state = tracked_only_delivery_state
@@ -4972,6 +5009,7 @@ def validate() -> None:
         "TRACKED_ONLY_DELIVERY_CANDIDATE",
         "GITHUB_ACTIONS_MAIN_CANDIDATE",
         "GITHUB_ACTIONS_PR_CANDIDATE",
+        "GITHUB_ACTIONS_MANUAL_CANDIDATE",
     } | (
         TASK04_REPOSITORY_STATES
         | TASK05_REPOSITORY_STATES
@@ -5206,6 +5244,7 @@ def validate() -> None:
         "TRACKED_ONLY_DELIVERY_CANDIDATE",
         "GITHUB_ACTIONS_MAIN_CANDIDATE",
         "GITHUB_ACTIONS_PR_CANDIDATE",
+        "GITHUB_ACTIONS_MANUAL_CANDIDATE",
     }:
         expected_file_count = baton_view.head_tree_path_count
     elif state in CTRL_GENERIC_REPOSITORY_STATES:

@@ -737,13 +737,13 @@ records:
     contains_raw_data: false
     sensitivity: INTERNAL_NON_SECRET
 - asset_id: CI-WORKFLOW-001
-  record_version: '1.1'
+  record_version: '1.2'
   asset_type: script
-  purpose: Immutable-pinned GitHub Actions workflow for pull_request and push validation
-    on main.
+  purpose: Immutable-pinned GitHub Actions workflow for parameterless manual recovery,
+    pull_request and push validation on main.
   status: VALIDATED_ACTIVE
   origin: REPOSITORY
-  as_of: '2026-07-25'
+  as_of: '2026-08-07'
   truth_owner: TASK-03
   location:
     kind: git_path
@@ -751,7 +751,7 @@ records:
     repository_path: .github/workflows/ci.yml
   integrity:
     kind: sha256
-    sha256: 8b8139bc64091126dcddec10bd9c32bd962080836fb56badf959af7187bfb8fe
+    sha256: f3cf61f9d5efa6b36596f4f52d76e9713fc3946fb12595b1182a91aa28c1a8c2
   access:
     mode: read_only
     method: file
@@ -774,14 +774,14 @@ records:
     contains_raw_data: false
     sensitivity: INTERNAL_NON_SECRET
 - asset_id: CI-VALIDATOR-001
-  record_version: '1.8'
+  record_version: '1.9'
   asset_type: script
   purpose: Single platform-neutral gate for runtime, lock, secrets, Catalog, generated
     views, repository policy, baton machine-layer checks, tests, and one isolated
-    tracked-only delivery preflight.
+    tracked-only delivery preflight, including exact bounded manual-dispatch validation.
   status: IMPLEMENTED_UNVERIFIED
   origin: REPOSITORY
-  as_of: '2026-08-05'
+  as_of: '2026-08-07'
   truth_owner: TASK-04
   location:
     kind: git_path
@@ -789,7 +789,7 @@ records:
     repository_path: scripts/validate_ci.py
   integrity:
     kind: sha256
-    sha256: 5b4a8bffaeb52802d7f13fa1acde1f8e4a651bdfd01716e9a9ec01832db1ce65
+    sha256: c68915046fbbdefa06a9d07ce684f860b6101872405e20e648799e7b0b32c072
   access:
     mode: read_only
     method: command
@@ -2012,15 +2012,16 @@ records:
     contains_raw_data: false
     sensitivity: INTERNAL_NON_SECRET
 - asset_id: VALIDATOR-REPOSITORY-STATE-001
-  record_version: '3.3'
+  record_version: '3.5'
   asset_type: script
   purpose: Fail-closed historical and compositional repository-state/topology
     validator through CTRL-BATON A6.4, including current runtime constraints
     for isolated tracked-only delivery clones and GitHub Actions main and
-    pull-request merge checkouts.
+    pull-request merge checkouts plus clean parameterless manual-dispatch
+    feature-branch checkouts.
   status: IMPLEMENTED_UNVERIFIED
   origin: REPOSITORY
-  as_of: '2026-08-05'
+  as_of: '2026-08-07'
   truth_owner: TASK-04
   location:
     kind: git_path
@@ -2028,7 +2029,7 @@ records:
     repository_path: scripts/validate_baseline.py
   integrity:
     kind: sha256
-    sha256: f93d4fdc62f481f7e9f5d84e648d647cbe65617ec65294b6a4a4bb60a75fde20
+    sha256: 1765437f8a757e24a8032766c020c5143f1efd4801095bc4509cb53250900d92
   access:
     mode: read_only
     method: command
@@ -14791,15 +14792,15 @@ records:
   classification: *t25_internal
 
 - asset_id: TEST-CANARY-SPECIFICATION-ONLY-A2-001
-  record_version: '1.0'
+  record_version: '1.1'
   asset_type: script
   purpose: Hash-bound Catalog and FULL Factory Fit tests for offline canary specification.
   status: IMPLEMENTED_UNVERIFIED
   origin: REPOSITORY
-  as_of: '2026-08-06'
+  as_of: '2026-08-07'
   truth_owner: CANARY_SPECIFICATION_ONLY_V1
   location: {kind: git_path, logical_uri: 'repo://tests/test_canary_specification_only_catalog_factory_fit.py', repository_path: tests/test_canary_specification_only_catalog_factory_fit.py}
-  integrity: {kind: sha256, sha256: f6e6b0a9a739ff3c2ac5911dfd7718a1be9c1765e07a36172626a081fec071ee}
+  integrity: {kind: sha256, sha256: 96d17ed348d65b669c6aca4c8089ef770f6dec4e7f752ec66e8774b0de029f88}
   access: *t25_read_file
   relations:
   - {relation_type: depends_on, target_asset_id: EVIDENCE-CANARY-SPECIFICATION-ONLY-A2-001}

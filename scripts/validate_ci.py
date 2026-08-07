@@ -362,6 +362,7 @@ def expected_workflow() -> dict[str, Any]:
     return {
         "name": "Repository validation",
         "on": {
+            "workflow_dispatch": "",
             "pull_request": {"branches": ["main"]},
             "push": {"branches": ["main"]},
         },
@@ -416,7 +417,6 @@ def validate_workflow_text(text: str) -> None:
     forbidden = (
         "secrets.",
         "pull_request_target",
-        "workflow_dispatch",
         "id-token:",
         "actions/cache@",
         "actions/upload-artifact@",

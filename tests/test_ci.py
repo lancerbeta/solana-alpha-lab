@@ -40,6 +40,13 @@ class CiWorkflowTests(unittest.TestCase):
     def test_exact_workflow_contract_passes(self) -> None:
         ci.validate_workflow_text(self.text)
 
+    def test_parameterless_manual_dispatch_is_admitted(self) -> None:
+        candidate = self.text.replace(
+            "  pull_request:\n",
+            "  workflow_dispatch:\n  pull_request:\n",
+        )
+        ci.validate_workflow_text(candidate)
+
     def test_action_pins_and_linux_checksum_are_exact(self) -> None:
         self.assertIn(ci.CHECKOUT_PIN, self.text)
         self.assertIn(ci.SETUP_UV_PIN, self.text)
@@ -52,6 +59,7 @@ class CiWorkflowTests(unittest.TestCase):
         self.assertEqual(
             document["on"],
             {
+                "workflow_dispatch": "",
                 "pull_request": {"branches": ["main"]},
                 "push": {"branches": ["main"]},
             },
@@ -85,7 +93,10 @@ class CiWorkflowTests(unittest.TestCase):
             self.text + "\n# " + "secr" + "ets.REPOSITORY_TOKEN\n",
             self.text.replace("contents: read", "contents: write"),
             self.text.replace("push:\n", "pull_request_target:\n"),
-            self.text.replace("push:\n", "workflow_dispatch:\n"),
+            self.text.replace(
+                "  workflow_dispatch:\n",
+                "  workflow_dispatch:\n    inputs:\n      branch:\n        description: forbidden\n",
+            ),
             self.text.replace("contents: read", "contents: read\n  id-token: write"),
         )
         for mutation in mutations:
