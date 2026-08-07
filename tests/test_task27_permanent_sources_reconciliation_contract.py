@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import copy
+import hashlib
 import json
 import unittest
 from pathlib import Path
@@ -14,6 +15,17 @@ CONTRACT_PATH = ROOT / "docs/contracts/task27_permanent_sources_reconciliation_c
 CONFIG_PATH = ROOT / "configs/task27_permanent_sources_reconciliation_contract_v1.yaml"
 SCHEMA_PATH = ROOT / "catalog/schemas/task27_permanent_sources_reconciliation.schema.json"
 FIXTURE_PATH = ROOT / "tests/fixtures/task27/permanent_sources_reconciliation_v1.json"
+SOURCE_BUNDLE_ROOT = ROOT / "docs/source_bundles/task27_a0a5_permanent_sources_v1"
+BUNDLE_MANIFEST_PATH = SOURCE_BUNDLE_ROOT / "canonical_manifest.yaml"
+CHECKSUMS_PATH = SOURCE_BUNDLE_ROOT / "CHECKSUMS_SHA256.txt"
+SMOKE_PATH = SOURCE_BUNDLE_ROOT / "FRESH_CHAT_SMOKE.md"
+EXPECTED_SOURCE_FILES = {
+    "canonical_manifest": "canonical_manifest.yaml",
+    "roadmap": "roadmap.md",
+    "current_system_state": "current_system_state.md",
+    "phase_archive": "task_archive_P0_P1_v37.md",
+    "active_task": "task_27_public_history_feasibility.md",
+}
 REQUIRED_PATHS = [CONTRACT_PATH, CONFIG_PATH, SCHEMA_PATH, FIXTURE_PATH]
 EXPECTED_MUTABLE_ROLES = [
     "canonical_manifest",
@@ -73,6 +85,10 @@ def semantic_errors(packet: dict) -> set[str]:
     return errors
 
 
+def sha256(path: Path) -> str:
+    return hashlib.sha256(path.read_bytes()).hexdigest()
+
+
 class Task27PermanentSourcesReconciliationContractTests(unittest.TestCase):
     def test_contract_artifacts_exist_and_do_not_grant_external_authority(self) -> None:
         missing = [str(path) for path in REQUIRED_PATHS if not path.exists()]
@@ -98,6 +114,35 @@ class Task27PermanentSourcesReconciliationContractTests(unittest.TestCase):
                 for mutation in case["mutations"]:
                     apply_json_pointer(changed, mutation["json_pointer"], mutation["replacement"])
                 self.assertIn(case["expected_error"], semantic_errors(changed))
+
+    def test_bundle_has_exactly_five_replacements_and_retains_two_immutable_roles(self) -> None:
+        self.assertTrue(BUNDLE_MANIFEST_PATH.exists(), BUNDLE_MANIFEST_PATH)
+        self.assertTrue(CHECKSUMS_PATH.exists(), CHECKSUMS_PATH)
+        self.assertTrue(SMOKE_PATH.exists(), SMOKE_PATH)
+
+        bundle_manifest = yaml.safe_load(BUNDLE_MANIFEST_PATH.read_text(encoding="utf-8"))
+        self.assertEqual(bundle_manifest["status"], "VALIDATED_CANDIDATE_UI_ACTIVATION_PENDING")
+        self.assertEqual(bundle_manifest["activation_map"]["replace_source_roles"], EXPECTED_MUTABLE_ROLES)
+        self.assertEqual(
+            bundle_manifest["activation_map"]["keep_byte_for_byte"],
+            ["operating_system", "research_blueprint"],
+        )
+        self.assertEqual(bundle_manifest["current_state"]["active_task_id"], "TASK-27")
+        self.assertEqual(
+            bundle_manifest["current_state"]["last_validated_repository_commit"],
+            "082f3f8184e84c31c876a484cf8e876a40691f62",
+        )
+        self.assertEqual(bundle_manifest["current_state"]["main_ci_run_id"], 31224401848)
+        for role, filename in EXPECTED_SOURCE_FILES.items():
+            with self.subTest(role=role):
+                role_binding = bundle_manifest["canonical"][role]
+                path = SOURCE_BUNDLE_ROOT / filename
+                self.assertTrue(path.exists(), path)
+                self.assertEqual(role_binding["current_filename"], filename)
+                if role == "canonical_manifest":
+                    self.assertEqual(role_binding["self_checksum_policy"], "CHECKSUMS_SHA256")
+                else:
+                    self.assertEqual(role_binding["sha256"], sha256(path))
 
 
 if __name__ == "__main__":
