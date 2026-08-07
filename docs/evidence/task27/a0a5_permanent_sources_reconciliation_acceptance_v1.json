@@ -1,0 +1,89 @@
+{
+  "schema": "smial.task27.a0a5.permanent_sources_reconciliation.acceptance",
+  "schema_version": "1.0",
+  "task_id": "TASK-27",
+  "atom_id": "T27-A0-A5_PERMANENT_SOURCES_RECONCILIATION_AND_SMOKE_V1",
+  "status": "PASS_TARGETED_VALIDATION_PENDING_DELIVERY",
+  "authority": {
+    "user_authority": "INLINE_EXECUTION_APPROVED",
+    "provider_api_rpc_wss_calls": 0,
+    "provider_read_authority": false,
+    "r2_value_reads": 0,
+    "r3_value_or_path_reads": 0,
+    "wallet_signer_transaction_actions": 0,
+    "cash_spend_usd_cents": 0,
+    "credential_use": false,
+    "raw_provider_responses_retained": 0,
+    "dependency_changes": false,
+    "catalog_root_mutation": false,
+    "project_sources_ui_changes": false
+  },
+  "repository_evidence": {
+    "main_commit": "082f3f8184e84c31c876a484cf8e876a40691f62",
+    "main_ci_run_id": 31224401848,
+    "main_ci_conclusion": "success"
+  },
+  "bundle_artifact_bindings": {
+    "canonical_manifest.yaml": {
+      "path": "docs/source_bundles/task27_a0a5_permanent_sources_v1/canonical_manifest.yaml",
+      "sha256": "eaee5a1a5c25d8c13b5dec750b4a3814a2272b032f2615179b6cc469114d7c87"
+    },
+    "CHECKSUMS_SHA256.txt": {
+      "path": "docs/source_bundles/task27_a0a5_permanent_sources_v1/CHECKSUMS_SHA256.txt",
+      "sha256": "20dabda6bc764495ae12ff54c7df8023575261269ba2a9ab5be05df6d5786a3a"
+    },
+    "FRESH_CHAT_SMOKE.md": {
+      "path": "docs/source_bundles/task27_a0a5_permanent_sources_v1/FRESH_CHAT_SMOKE.md",
+      "sha256": "716b1076e50725fd8d0a67378548b77e79ae1b2f11afd28789d449594368fe08"
+    }
+  },
+  "source_bundle": {
+    "status": "VALIDATED_CANDIDATE_UI_ACTIVATION_PENDING",
+    "mutable_roles": [
+      "canonical_manifest",
+      "roadmap",
+      "current_system_state",
+      "phase_archive",
+      "active_task"
+    ],
+    "immutable_roles": [
+      "operating_system",
+      "research_blueprint"
+    ],
+    "expected_source_count": 7
+  },
+  "validation": {
+    "targeted_command": "uv run --locked --managed-python python -B -m unittest tests.test_task27_permanent_sources_reconciliation_contract",
+    "targeted_tests_run": 4,
+    "targeted_tests_passed": 4,
+    "adversarial_cases_rejected": 8,
+    "full_validation": "PENDING_TRACKED_ONLY_DELIVERY"
+  },
+  "semantic_acceptance": {
+    "five_mutable_roles_only": "PASS",
+    "immutable_roles_hash_bound": "PASS",
+    "merged_main_and_ci_bound": "PASS",
+    "ui_activation_not_claimed": "PASS",
+    "fresh_seven_role_smoke_required": "PASS",
+    "external_read_authority_not_granted": "PASS",
+    "historical_pit_alpha_execution_netreturn_claims_forbidden": "PASS"
+  },
+  "measured_boundary": {
+    "provider_api_rpc_wss_calls": 0,
+    "r2_value_reads": 0,
+    "r3_value_or_path_reads": 0,
+    "wallet_signer_transaction_actions": 0,
+    "cash_spend_usd_cents": 0,
+    "raw_provider_responses_retained": 0,
+    "dependency_changes": 0,
+    "catalog_root_mutations": 0,
+    "project_sources_ui_changes": 0
+  },
+  "ui_activation": "PENDING_USER_REPLACEMENT_AND_SMOKE",
+  "next_boundary": {
+    "owner_action": "replace_exact_five_mutable_roles_keep_two_immutable_roles_run_seven_role_smoke",
+    "provider_read_authority_granted": false,
+    "separate_exact_owner_external_read_review_required": true
+  },
+  "state_change": "NONE"
+}

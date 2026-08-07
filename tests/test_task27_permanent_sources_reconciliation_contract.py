@@ -19,6 +19,7 @@ SOURCE_BUNDLE_ROOT = ROOT / "docs/source_bundles/task27_a0a5_permanent_sources_v
 BUNDLE_MANIFEST_PATH = SOURCE_BUNDLE_ROOT / "canonical_manifest.yaml"
 CHECKSUMS_PATH = SOURCE_BUNDLE_ROOT / "CHECKSUMS_SHA256.txt"
 SMOKE_PATH = SOURCE_BUNDLE_ROOT / "FRESH_CHAT_SMOKE.md"
+RECEIPT_PATH = ROOT / "docs/evidence/task27/a0a5_permanent_sources_reconciliation_acceptance_v1.json"
 EXPECTED_SOURCE_FILES = {
     "canonical_manifest": "canonical_manifest.yaml",
     "roadmap": "roadmap.md",
@@ -143,6 +144,22 @@ class Task27PermanentSourcesReconciliationContractTests(unittest.TestCase):
                     self.assertEqual(role_binding["self_checksum_policy"], "CHECKSUMS_SHA256")
                 else:
                     self.assertEqual(role_binding["sha256"], sha256(path))
+
+    def test_acceptance_receipt_binds_bundle_and_stops_before_ui_activation(self) -> None:
+        self.assertTrue(RECEIPT_PATH.exists(), RECEIPT_PATH)
+        receipt = json.loads(RECEIPT_PATH.read_text(encoding="utf-8"))
+        self.assertEqual(receipt["state_change"], "NONE")
+        self.assertEqual(receipt["ui_activation"], "PENDING_USER_REPLACEMENT_AND_SMOKE")
+        self.assertFalse(receipt["next_boundary"]["provider_read_authority_granted"])
+        self.assertEqual(
+            receipt["repository_evidence"]["main_commit"],
+            "082f3f8184e84c31c876a484cf8e876a40691f62",
+        )
+        self.assertEqual(receipt["repository_evidence"]["main_ci_run_id"], 31224401848)
+        for path in [BUNDLE_MANIFEST_PATH, CHECKSUMS_PATH, SMOKE_PATH]:
+            with self.subTest(path=path):
+                binding = receipt["bundle_artifact_bindings"][path.name]
+                self.assertEqual(binding["sha256"], sha256(path))
 
 
 if __name__ == "__main__":
