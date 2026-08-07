@@ -1,0 +1,53 @@
+{
+  "schema": "smial.task27.bounded_public_history_feasibility_authority.fixture",
+  "schema_version": "1.0",
+  "fixture_kind": "SYNTHETIC_GOLDEN_ONLY",
+  "valid_packets": [
+    {
+      "case_id": "BPHA-GOLDEN-001",
+      "proposal": {
+        "source_candidate": "GECKOTERMINAL_PUBLIC_POOL_OHLCV_CANDIDATE",
+        "selection_snapshot_id": "synthetic-selection-snapshot-001",
+        "selection_snapshot_sha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "selection_snapshot_at": "2026-08-08T00:00:00Z",
+        "universe_description": "SYNTHETIC_POOL_UNIVERSE_ONLY",
+        "discovery_requests": 6,
+        "ohlcv_requests": 24,
+        "complete_panels": 12,
+        "panel_duration_hours": 24,
+        "interval_seconds": 900,
+        "automatic_fallback_provider": false
+      },
+      "evidence": {
+        "grade": "DESCRIPTIVE_ONLY",
+        "availability_proof": null,
+        "raw_evidence_manifest_id": "synthetic-raw-manifest-001"
+      },
+      "retention": {
+        "failed_or_unusable_probe_days": 30,
+        "dependent_research_retention": "RETAIN_WITH_DEPENDENT_RESEARCH_AND_HASHES"
+      },
+      "source_binding": {
+        "state": "ACTIVATION_CONFIRMED_USER_SMOKE",
+        "receipt_reference": "synthetic-seven-role-source-smoke-001"
+      },
+      "decision": {
+        "outcome": "READY_FOR_EXACT_OWNER_EXTERNAL_READ_REVIEW",
+        "claim_scope": "HISTORICAL_FEASIBILITY_ONLY",
+        "provider_read_authority": false
+      }
+    }
+  ],
+  "adversarial_cases": [
+    {"case_id": "ADV-01-SOURCE-ALIGNMENT", "expected_error": "SOURCE_ALIGNMENT_REQUIRED", "mutations": [{"json_pointer": "/source_binding/state", "replacement": "SOURCE_ALIGNMENT_REQUIRED"}]},
+    {"case_id": "ADV-02-DISCOVERY-CAP", "expected_error": "DISCOVERY_CAP_EXCEEDED", "mutations": [{"json_pointer": "/proposal/discovery_requests", "replacement": 7}]},
+    {"case_id": "ADV-03-OHLCV-CAP", "expected_error": "OHLCV_CAP_EXCEEDED", "mutations": [{"json_pointer": "/proposal/ohlcv_requests", "replacement": 25}]},
+    {"case_id": "ADV-04-TOO-FEW-PANELS", "expected_error": "INSUFFICIENT_COMPLETE_PANELS", "mutations": [{"json_pointer": "/proposal/complete_panels", "replacement": 11}]},
+    {"case_id": "ADV-05-NO-SELECTION-HASH", "expected_error": "UNFROZEN_SELECTION_SNAPSHOT", "mutations": [{"json_pointer": "/proposal/selection_snapshot_sha256", "replacement": ""}]},
+    {"case_id": "ADV-06-FALLBACK-PROVIDER", "expected_error": "AUTO_FALLBACK_PROVIDER_FORBIDDEN", "mutations": [{"json_pointer": "/proposal/automatic_fallback_provider", "replacement": true}]},
+    {"case_id": "ADV-07-NO-RAW-MANIFEST", "expected_error": "RAW_EVIDENCE_MANIFEST_REQUIRED", "mutations": [{"json_pointer": "/evidence/raw_evidence_manifest_id", "replacement": ""}]},
+    {"case_id": "ADV-08-PIT-WITHOUT-AVAILABILITY", "expected_error": "PIT_CLAIM_WITHOUT_AVAILABILITY_PROOF", "mutations": [{"json_pointer": "/evidence/grade", "replacement": "PIT_ADMISSIBLE"}]},
+    {"case_id": "ADV-09-FORBIDDEN-CLAIM", "expected_error": "FORBIDDEN_CLAIM_SCOPE", "mutations": [{"json_pointer": "/decision/claim_scope", "replacement": "ALPHA_OR_EXECUTION_CLAIM"}]},
+    {"case_id": "ADV-10-AUTHORITY-PROMOTION", "expected_error": "EXTERNAL_AUTHORITY_PROMOTION_FORBIDDEN", "mutations": [{"json_pointer": "/decision/provider_read_authority", "replacement": true}]}
+  ]
+}

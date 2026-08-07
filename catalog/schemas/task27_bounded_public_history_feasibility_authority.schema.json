@@ -1,0 +1,106 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://lancerbeta.github.io/solana-alpha-lab/schemas/task27_bounded_public_history_feasibility_authority.schema.json",
+  "title": "Task 27 bounded public-history feasibility authority synthetic fixture",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema", "schema_version", "fixture_kind", "valid_packets", "adversarial_cases"],
+  "properties": {
+    "schema": {"const": "smial.task27.bounded_public_history_feasibility_authority.fixture"},
+    "schema_version": {"const": "1.0"},
+    "fixture_kind": {"const": "SYNTHETIC_GOLDEN_ONLY"},
+    "valid_packets": {"type": "array", "minItems": 1, "items": {"$ref": "#/$defs/packet"}},
+    "adversarial_cases": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["case_id", "expected_error", "mutations"],
+        "properties": {
+          "case_id": {"type": "string", "minLength": 1},
+          "expected_error": {"type": "string", "minLength": 1},
+          "mutations": {
+            "type": "array",
+            "minItems": 1,
+            "items": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": ["json_pointer", "replacement"],
+              "properties": {
+                "json_pointer": {"type": "string", "pattern": "^/"},
+                "replacement": {}
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "$defs": {
+    "packet": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["case_id", "proposal", "evidence", "retention", "source_binding", "decision"],
+      "properties": {
+        "case_id": {"type": "string", "minLength": 1},
+        "proposal": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["source_candidate", "selection_snapshot_id", "selection_snapshot_sha256", "selection_snapshot_at", "universe_description", "discovery_requests", "ohlcv_requests", "complete_panels", "panel_duration_hours", "interval_seconds", "automatic_fallback_provider"],
+          "properties": {
+            "source_candidate": {"const": "GECKOTERMINAL_PUBLIC_POOL_OHLCV_CANDIDATE"},
+            "selection_snapshot_id": {"type": "string", "minLength": 1},
+            "selection_snapshot_sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+            "selection_snapshot_at": {"type": "string", "format": "date-time"},
+            "universe_description": {"type": "string", "minLength": 1},
+            "discovery_requests": {"type": "integer", "minimum": 0},
+            "ohlcv_requests": {"type": "integer", "minimum": 0},
+            "complete_panels": {"type": "integer", "minimum": 0},
+            "panel_duration_hours": {"type": "integer", "minimum": 1},
+            "interval_seconds": {"const": 900},
+            "automatic_fallback_provider": {"type": "boolean"}
+          }
+        },
+        "evidence": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["grade", "availability_proof", "raw_evidence_manifest_id"],
+          "properties": {
+            "grade": {"enum": ["DESCRIPTIVE_ONLY", "PIT_ADMISSIBLE"]},
+            "availability_proof": {"type": ["string", "null"]},
+            "raw_evidence_manifest_id": {"type": "string"}
+          }
+        },
+        "retention": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["failed_or_unusable_probe_days", "dependent_research_retention"],
+          "properties": {
+            "failed_or_unusable_probe_days": {"const": 30},
+            "dependent_research_retention": {"const": "RETAIN_WITH_DEPENDENT_RESEARCH_AND_HASHES"}
+          }
+        },
+        "source_binding": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["state", "receipt_reference"],
+          "properties": {
+            "state": {"enum": ["ACTIVATION_CONFIRMED_USER_SMOKE", "SOURCE_ALIGNMENT_REQUIRED"]},
+            "receipt_reference": {"type": ["string", "null"]}
+          }
+        },
+        "decision": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["outcome", "claim_scope", "provider_read_authority"],
+          "properties": {
+            "outcome": {"enum": ["READY_FOR_EXACT_OWNER_EXTERNAL_READ_REVIEW", "REDESIGN", "CLOSE_DATA_ROUTE"]},
+            "claim_scope": {"type": "string", "minLength": 1},
+            "provider_read_authority": {"type": "boolean"}
+          }
+        }
+      }
+    }
+  }
+}
