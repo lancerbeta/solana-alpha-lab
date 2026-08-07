@@ -330,6 +330,11 @@ class GitHubActionsManualDispatchStateTests(unittest.TestCase):
                 unstaged=set(),
             ),
         )
+        self.assertTrue(
+            module.uses_current_runtime_contract(
+                "GITHUB_ACTIONS_MANUAL_CANDIDATE"
+            )
+        )
 
     def test_rejects_feature_branch_checkout_without_manual_dispatch_event(self) -> None:
         self.assertIsNone(

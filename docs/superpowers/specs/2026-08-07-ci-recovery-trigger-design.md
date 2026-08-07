@@ -66,7 +66,8 @@ dispatch checks out its selected feature branch rather than the detached
 pull-request merge ref. It therefore admits this third checkout shape only
 when the checkout is clean, belongs to the expected repository, its Git ref
 and local branch agree exactly, its SHA agrees with `HEAD`, and
-`GITHUB_EVENT_NAME` is exactly `workflow_dispatch`. A feature-branch checkout
+`GITHUB_EVENT_NAME` is exactly `workflow_dispatch`. It uses the same current
+dependency contract as main and pull-request CI. A feature-branch checkout
 from any other event remains rejected.
 
 ## Catalog and generated consumers
