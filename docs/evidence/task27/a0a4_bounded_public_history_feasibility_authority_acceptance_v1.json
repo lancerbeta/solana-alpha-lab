@@ -1,0 +1,91 @@
+{
+  "schema": "smial.task27.a0a4.bounded_public_history_feasibility_authority.acceptance",
+  "schema_version": "1.0",
+  "task_id": "TASK-27",
+  "atom_id": "T27-A0-A4_BOUNDED_PUBLIC_HISTORY_FEASIBILITY_AUTHORITY_PACKET_V1",
+  "status": "PASS_TARGETED_VALIDATION_PENDING_DELIVERY",
+  "implementation_base": {
+    "commit": "1703a991a7b3a1ab2ef456a17cc04fe27bdb2429",
+    "branch": "task27/bounded-history-authority"
+  },
+  "authority": {
+    "user_authority": "T27-A0-A4_OFFLINE_AUTHORITY_PACKET_AND_SYNTHETIC_TESTS_ONLY",
+    "provider_api_rpc_wss_calls": 0,
+    "provider_read_authority": false,
+    "r2_value_reads": 0,
+    "r3_value_or_path_reads": 0,
+    "wallet_signer_transaction_actions": 0,
+    "cash_spend_usd_cents": 0,
+    "credential_use": false,
+    "raw_provider_responses_retained": 0,
+    "dependency_changes": false,
+    "catalog_or_registry_mutation": false,
+    "project_source_changes": false
+  },
+  "managed_write_set": [
+    "docs/contracts/task27_bounded_public_history_feasibility_authority_contract_v1.md",
+    "configs/task27_bounded_public_history_feasibility_authority_contract_v1.yaml",
+    "catalog/schemas/task27_bounded_public_history_feasibility_authority.schema.json",
+    "tests/fixtures/task27/bounded_public_history_feasibility_authority_v1.json",
+    "tests/test_task27_bounded_public_history_feasibility_authority_contract.py",
+    "docs/evidence/task27/a0a4_bounded_public_history_feasibility_authority_acceptance_v1.json"
+  ],
+  "artifact_bindings": {
+    "contract": {
+      "path": "docs/contracts/task27_bounded_public_history_feasibility_authority_contract_v1.md",
+      "sha256": "e7d3a44e53fd937f472aec8e58b432cf6850b952b58f9a143996955010f3b653"
+    },
+    "config": {
+      "path": "configs/task27_bounded_public_history_feasibility_authority_contract_v1.yaml",
+      "sha256": "9c5e2b6f483e0e7fde3bcb5b02b0bab6197fe096e1c55bcf79dce24b8b72b153"
+    },
+    "schema": {
+      "path": "catalog/schemas/task27_bounded_public_history_feasibility_authority.schema.json",
+      "sha256": "10cb25ff3f77812448864335d461bdd27300ba707aa470b0481c84e0d0f025a1"
+    },
+    "fixture": {
+      "path": "tests/fixtures/task27/bounded_public_history_feasibility_authority_v1.json",
+      "sha256": "7e05f168ec66786c9d0d10eee370b4d089a8a2c9c21be3815091888ecaa07187"
+    }
+  },
+  "validation": {
+    "targeted_command": "uv run --locked --managed-python python -B -m unittest tests.test_task27_bounded_public_history_feasibility_authority_contract",
+    "targeted_tests_run": 9,
+    "targeted_tests_passed": 9,
+    "adversarial_cases_rejected": 10,
+    "schema_draft": "2020-12",
+    "valid_synthetic_packets": 1,
+    "full_validation": "PENDING_TRACKED_ONLY_DELIVERY"
+  },
+  "semantic_acceptance": {
+    "source_smoke_binding_is_required_for_ready_review": "PASS",
+    "ready_review_is_not_provider_authority": "PASS",
+    "descriptive_history_is_not_pit_claim": "PASS",
+    "pit_claim_requires_availability_proof": "PASS",
+    "discovery_and_ohlcv_caps_are_enforced": "PASS",
+    "selection_snapshot_time_and_universe_are_required": "PASS",
+    "incomplete_panel_threshold_is_rejected": "PASS",
+    "automatic_provider_fallback_is_rejected": "PASS",
+    "raw_evidence_manifest_is_required": "PASS",
+    "historical_feasibility_is_not_alpha_execution_or_netreturn": "PASS"
+  },
+  "measured_boundary": {
+    "synthetic_packets_validated": 1,
+    "adversarial_cases_rejected": 10,
+    "provider_api_rpc_wss_calls": 0,
+    "r2_value_reads": 0,
+    "r3_value_or_path_reads": 0,
+    "wallet_signer_transaction_actions": 0,
+    "cash_spend_usd_cents": 0,
+    "raw_provider_responses_retained": 0,
+    "dependency_changes": 0,
+    "catalog_or_registry_mutations": 0,
+    "project_source_changes": 0
+  },
+  "state_change": "NONE",
+  "next_boundary": {
+    "provider_read_authority_granted": false,
+    "requires_fresh_source_smoke_before_external_request": true,
+    "future_data_collection_requires_new_exact_owner_authority": true
+  }
+}

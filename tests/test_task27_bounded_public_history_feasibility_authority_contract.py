@@ -16,6 +16,7 @@ CONTRACT_PATH = ROOT / "docs/contracts/task27_bounded_public_history_feasibility
 CONFIG_PATH = ROOT / "configs/task27_bounded_public_history_feasibility_authority_contract_v1.yaml"
 SCHEMA_PATH = ROOT / "catalog/schemas/task27_bounded_public_history_feasibility_authority.schema.json"
 FIXTURE_PATH = ROOT / "tests/fixtures/task27/bounded_public_history_feasibility_authority_v1.json"
+RECEIPT_PATH = ROOT / "docs/evidence/task27/a0a4_bounded_public_history_feasibility_authority_acceptance_v1.json"
 REQUIRED_PATHS = [CONTRACT_PATH, CONFIG_PATH, SCHEMA_PATH, FIXTURE_PATH]
 EXPECTED_WRITE_SET = [
     "docs/contracts/task27_bounded_public_history_feasibility_authority_contract_v1.md",
@@ -162,8 +163,40 @@ class Task27BoundedPublicHistoryFeasibilityAuthorityContractTests(unittest.TestC
         self.assertFalse(config["authority"]["catalog_or_registry_mutation"])
         self.assertFalse(config["authority"]["project_source_changes"])
 
+    def test_receipt_binds_artifacts_and_preserves_external_read_gate(self) -> None:
+        self.assertTrue(RECEIPT_PATH.exists(), RECEIPT_PATH)
+        receipt = json.loads(RECEIPT_PATH.read_text(encoding="utf-8"))
+        for key, path in {
+            "contract": CONTRACT_PATH,
+            "config": CONFIG_PATH,
+            "schema": SCHEMA_PATH,
+            "fixture": FIXTURE_PATH,
+        }.items():
+            binding = receipt["artifact_bindings"][key]
+            self.assertEqual(binding["path"], path.relative_to(ROOT).as_posix())
+            self.assertEqual(binding["sha256"], sha256(path))
+        self.assertEqual(receipt["managed_write_set"], EXPECTED_WRITE_SET)
+        self.assertEqual(receipt["validation"]["targeted_tests_run"], 9)
+        self.assertEqual(receipt["validation"]["targeted_tests_passed"], 9)
+        self.assertEqual(receipt["validation"]["adversarial_cases_rejected"], 10)
+        for key in (
+            "provider_api_rpc_wss_calls",
+            "r2_value_reads",
+            "r3_value_or_path_reads",
+            "wallet_signer_transaction_actions",
+            "cash_spend_usd_cents",
+            "raw_provider_responses_retained",
+            "dependency_changes",
+            "catalog_or_registry_mutations",
+            "project_source_changes",
+        ):
+            self.assertEqual(receipt["measured_boundary"][key], 0, key)
+        self.assertEqual(receipt["state_change"], "NONE")
+        self.assertFalse(receipt["next_boundary"]["provider_read_authority_granted"])
+        self.assertTrue(receipt["next_boundary"]["requires_fresh_source_smoke_before_external_request"])
+
     def test_artifacts_are_normalized(self) -> None:
-        for path in REQUIRED_PATHS:
+        for path in [*REQUIRED_PATHS, RECEIPT_PATH]:
             with self.subTest(path=path):
                 payload = path.read_bytes()
                 self.assertTrue(payload.endswith(b"\n"))
