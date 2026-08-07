@@ -1,0 +1,43 @@
+schema: smial.task27.historical_collection_authority.contract
+schema_version: '1.0'
+task_id: TASK-27
+atom_id: T27-A0-A3_HISTORICAL_COLLECTION_AUTHORITY_CONTRACT_V1
+source_candidate: GECKOTERMINAL_PUBLIC_POOL_OHLCV_CANDIDATE
+evidence_grades:
+  - DESCRIPTIVE_ONLY
+  - PIT_ADMISSIBLE
+decision_outcomes:
+  - AUTHORIZE_FEASIBILITY_CAPTURE
+  - REDESIGN
+  - CLOSE_DATA_ROUTE
+sampling_plan:
+  discovery_requests_max: 6
+  ohlcv_requests_max: 24
+  complete_panels_min: 12
+  panel_duration_hours: 24
+  interval_seconds: 900
+  selection_snapshot_required: true
+  automatic_fallback_provider_forbidden: true
+retention:
+  failed_or_unusable_probe_days: 30
+  dependent_research: RETAIN_WITH_DEPENDENT_RESEARCH_AND_HASHES
+authority:
+  user_authority: T27-A0-A3_OFFLINE_AUTHORITY_CONTRACT_AND_SYNTHETIC_TESTS_ONLY
+  provider_api_rpc_wss_calls: 0
+  r2_value_reads: 0
+  r3_value_or_path_reads: 0
+  wallet_signer_transaction_actions: 0
+  cash_spend_usd_cents: 0
+  credential_use: false
+  raw_provider_responses_retained: 0
+  dependency_changes: false
+  catalog_or_registry_mutation: false
+  project_source_changes: false
+claim_scope: HISTORICAL_FEASIBILITY_ONLY
+managed_write_set:
+  - docs/contracts/task27_historical_collection_authority_contract_v1.md
+  - configs/task27_historical_collection_authority_contract_v1.yaml
+  - catalog/schemas/task27_historical_collection_authority.schema.json
+  - tests/fixtures/task27/historical_collection_authority_v1.json
+  - tests/test_task27_historical_collection_authority_contract.py
+  - docs/evidence/task27/a0a3_historical_collection_authority_acceptance_v1.json

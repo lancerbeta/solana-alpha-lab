@@ -1,0 +1,44 @@
+{
+  "schema": "smial.task27.historical_collection_authority.fixture",
+  "schema_version": "1.0",
+  "fixture_kind": "SYNTHETIC_GOLDEN_ONLY",
+  "valid_packets": [
+    {
+      "case_id": "HCA-GOLDEN-001",
+      "proposal": {
+        "source_candidate": "GECKOTERMINAL_PUBLIC_POOL_OHLCV_CANDIDATE",
+        "selection_snapshot_id": "synthetic-selection-snapshot-001",
+        "selection_snapshot_sha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "discovery_requests": 6,
+        "ohlcv_requests": 24,
+        "complete_panels": 12,
+        "panel_duration_hours": 24,
+        "interval_seconds": 900,
+        "automatic_fallback_provider": false
+      },
+      "evidence": {
+        "grade": "DESCRIPTIVE_ONLY",
+        "availability_proof": null,
+        "raw_evidence_manifest_id": "synthetic-raw-manifest-001"
+      },
+      "retention": {
+        "failed_or_unusable_probe_days": 30,
+        "dependent_research_retention": "RETAIN_WITH_DEPENDENT_RESEARCH_AND_HASHES"
+      },
+      "decision": {
+        "outcome": "AUTHORIZE_FEASIBILITY_CAPTURE",
+        "claim_scope": "HISTORICAL_FEASIBILITY_ONLY"
+      }
+    }
+  ],
+  "adversarial_cases": [
+    {"case_id": "ADV-01-PIT-WITHOUT-AVAILABILITY", "expected_error": "PIT_CLAIM_WITHOUT_AVAILABILITY_PROOF", "mutations": [{"json_pointer": "/evidence/grade", "replacement": "PIT_ADMISSIBLE"}]},
+    {"case_id": "ADV-02-DISCOVERY-CAP", "expected_error": "DISCOVERY_CAP_EXCEEDED", "mutations": [{"json_pointer": "/proposal/discovery_requests", "replacement": 7}]},
+    {"case_id": "ADV-03-OHLCV-CAP", "expected_error": "OHLCV_CAP_EXCEEDED", "mutations": [{"json_pointer": "/proposal/ohlcv_requests", "replacement": 25}]},
+    {"case_id": "ADV-04-TOO-FEW-PANELS", "expected_error": "INSUFFICIENT_COMPLETE_PANELS", "mutations": [{"json_pointer": "/proposal/complete_panels", "replacement": 11}]},
+    {"case_id": "ADV-05-NO-SELECTION-HASH", "expected_error": "UNFROZEN_SELECTION_SNAPSHOT", "mutations": [{"json_pointer": "/proposal/selection_snapshot_sha256", "replacement": ""}]},
+    {"case_id": "ADV-06-FALLBACK-PROVIDER", "expected_error": "AUTO_FALLBACK_PROVIDER_FORBIDDEN", "mutations": [{"json_pointer": "/proposal/automatic_fallback_provider", "replacement": true}]},
+    {"case_id": "ADV-07-NO-RAW-MANIFEST", "expected_error": "RAW_EVIDENCE_MANIFEST_REQUIRED", "mutations": [{"json_pointer": "/evidence/raw_evidence_manifest_id", "replacement": ""}]},
+    {"case_id": "ADV-08-ALPHA-CLAIM", "expected_error": "FORBIDDEN_CLAIM_SCOPE", "mutations": [{"json_pointer": "/decision/claim_scope", "replacement": "ALPHA_OR_EXECUTION_CLAIM"}]}
+  ]
+}
