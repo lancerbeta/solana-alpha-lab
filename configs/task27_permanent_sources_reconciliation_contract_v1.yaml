@@ -3,6 +3,12 @@ schema_version: '1.0'
 task_id: TASK-27
 atom_id: T27-A0-A5_PERMANENT_SOURCES_RECONCILIATION_AND_SMOKE_V1
 bundle_status: VALIDATED_CANDIDATE_UI_ACTIVATION_PENDING
+source_release:
+  release_id: PSR-0001-T27-A0-A5
+  registry_path: docs/project_sources/release_registry_v1.yaml
+  bundle_path: docs/project_sources/releases/PSR-0001-T27-A0-A5
+  active_ui_release_id: null
+  active_ui_state: PRE_REGISTRY_EXTERNAL_STATE
 baseline_source_candidate:
   manifest_version: '4.6'
   roadmap_version: '4.6'

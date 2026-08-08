@@ -209,12 +209,12 @@ records:
   evidence: []
   classification: *id004
 - asset_id: GENERATED-PROJECT-MAP-001
-  record_version: '1.55'
+  record_version: '1.56'
   asset_type: generated_view
   purpose: Deterministic human-readable navigation projected only from the Catalog.
   status: IMPLEMENTED_UNVERIFIED
   origin: REPOSITORY
-  as_of: '2026-08-07'
+  as_of: '2026-08-08'
   truth_owner: TASK-04
   location:
     kind: git_path
@@ -222,7 +222,7 @@ records:
     repository_path: docs/PROJECT_MAP.md
   integrity:
     kind: sha256
-    sha256: d1d4507a206a2fd16b0225eb99c18fd86d2c374083a718d790543635ab52bc2b
+    sha256: acd701aed14e139e7985d125715ec0d0f6decfc786201f68bb8b09bfb1309be4
   access:
     mode: read_only
     method: file

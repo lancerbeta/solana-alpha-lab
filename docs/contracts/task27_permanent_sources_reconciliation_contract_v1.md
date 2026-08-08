@@ -10,6 +10,19 @@ v4.6 candidate to the merged TASK-27 offline foundation.
 The candidate is not a Project Sources UI action. It cannot activate itself,
 does not contact a provider, and does not authorize a provider request.
 
+## Release registration
+
+This candidate is the first repository-tracked Project Sources release,
+`PSR-0001-T27-A0-A5`. Its sole discovery index is
+`docs/project_sources/release_registry_v1.yaml`, and its immutable candidate
+bytes live at `docs/project_sources/releases/PSR-0001-T27-A0-A5/`.
+
+The registry intentionally distinguishes the next candidate from the cloud UI
+state. `active_ui_release_id` is `null` and the prior cloud state is
+`PRE_REGISTRY_EXTERNAL_STATE`; no absent historical bundle is fabricated. This
+release remains `VALIDATED_CANDIDATE_UI_ACTIVATION_PENDING` until the owner
+performs the separate replacement and seven-role smoke.
+
 ## Candidate boundary
 
 The candidate may replace only these roles:

@@ -94,14 +94,13 @@ git commit -m "feat: freeze task27 source reconciliation contract"
 ### Task 2: Build the five-role replacement candidate and smoke assets
 
 **Files:**
-- Create: `docs/source_bundles/task27_a0a5_permanent_sources_v1/canonical_manifest.yaml`
-- Create: `docs/source_bundles/task27_a0a5_permanent_sources_v1/roadmap.md`
-- Create: `docs/source_bundles/task27_a0a5_permanent_sources_v1/current_system_state.md`
-- Create: `docs/source_bundles/task27_a0a5_permanent_sources_v1/task_archive_P0_P1_v37.md`
-- Create: `docs/source_bundles/task27_a0a5_permanent_sources_v1/task_27_public_history_feasibility.md`
-- Create: `docs/source_bundles/task27_a0a5_permanent_sources_v1/CHECKSUMS_SHA256.txt`
-- Create: `docs/source_bundles/task27_a0a5_permanent_sources_v1/VALIDATION_RECEIPT.json`
-- Create: `docs/source_bundles/task27_a0a5_permanent_sources_v1/FRESH_CHAT_SMOKE.md`
+- Create: `docs/project_sources/releases/PSR-0001-T27-A0-A5/canonical_manifest.yaml`
+- Create: `docs/project_sources/releases/PSR-0001-T27-A0-A5/roadmap.md`
+- Create: `docs/project_sources/releases/PSR-0001-T27-A0-A5/current_system_state.md`
+- Create: `docs/project_sources/releases/PSR-0001-T27-A0-A5/task_archive_P0_P1_v37.md`
+- Create: `docs/project_sources/releases/PSR-0001-T27-A0-A5/task_27_public_history_feasibility.md`
+- Create: `docs/project_sources/releases/PSR-0001-T27-A0-A5/CHECKSUMS_SHA256.txt`
+- Create: `docs/project_sources/releases/PSR-0001-T27-A0-A5/FRESH_CHAT_SMOKE.md`
 
 **Interfaces:**
 - Consumes: Task 1 contract fields, immutable-role hash bindings, A2/A3/A4 evidence and the exact merged-main CI identity.
@@ -134,8 +133,8 @@ the canary decision or independently permit execution.
 
 - [ ] **Step 3: Create checksums, validation receipt and smoke prompt**
 
-`CHECKSUMS_SHA256.txt` must bind the manifest and all five mutable files.
-`VALIDATION_RECEIPT.json` must bind their paths/hashes, immutable-role hashes,
+`CHECKSUMS_SHA256.txt` must bind the manifest and all five mutable files. The
+repository acceptance receipt binds their paths/hashes, immutable-role hashes,
 main SHA, CI run, zero side effects and `UI_ACTIVATION_PENDING`.
 `FRESH_CHAT_SMOKE.md` must ask for role → semantic version → required header →
 actual SHA-256 → physical filename for all seven roles and require explicit
@@ -149,7 +148,7 @@ candidate says `UI_ACTIVATION_PENDING`, and no provider authority is present.
 - [ ] **Step 5: Commit the bundle bytes**
 
 ```text
-git add docs/source_bundles/task27_a0a5_permanent_sources_v1 tests/test_task27_permanent_sources_reconciliation_contract.py
+git add docs/project_sources/releases/PSR-0001-T27-A0-A5 tests/test_task27_permanent_sources_reconciliation_contract.py
 git commit -m "docs: prepare task27 source reconciliation bundle"
 ```
 

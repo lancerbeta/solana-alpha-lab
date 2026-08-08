@@ -575,13 +575,14 @@ records:
     contains_raw_data: false
     sensitivity: INTERNAL_NON_SECRET
 - asset_id: CTRL-AGENTS-001
-  record_version: '1.9'
+  record_version: '2.0'
   asset_type: control_document
   purpose: Repository-level agent contract for standing routine autonomy, scope,
-    safety, JIT validation, tracked-only delivery preflight, and status ownership.
+    safety, JIT validation, tracked-only delivery preflight, status ownership,
+    and Project Sources release control.
   status: IMPLEMENTED_UNVERIFIED
   origin: REPOSITORY
-  as_of: '2026-08-02'
+  as_of: '2026-08-08'
   truth_owner: CTRL-BATON-SETUP
   location:
     kind: git_path
@@ -589,7 +590,7 @@ records:
     repository_path: AGENTS.md
   integrity:
     kind: sha256
-    sha256: d0abf3d107f35c0845614be500d46ea7edcc399dfd4f6f810f30399ef07b642d
+    sha256: dfed8b94e7923ac39142a04fe51d86245b330a5a983e4fd46c846dc5d96aee49
   access:
     mode: read_only
     method: file
@@ -3991,13 +3992,14 @@ records:
     contains_raw_data: false
     sensitivity: INTERNAL_NON_SECRET
 - asset_id: PROTOCOL-EXECUTION-ROUTER-001
-  record_version: '1.2'
+  record_version: '1.3'
   asset_type: control_document
   purpose: Execution router combining GPT control ownership with standing routine
-    autonomy across local and GitHub baton routes.
+    autonomy across local and GitHub baton routes, including Project Sources
+    release disposition.
   status: IMPLEMENTED_UNVERIFIED
   origin: REPOSITORY
-  as_of: '2026-07-28'
+  as_of: '2026-08-08'
   truth_owner: ChatGPT_Project_GPT_Control_Plane
   location:
     kind: git_path
@@ -4005,7 +4007,7 @@ records:
     repository_path: docs/agent/EXECUTION_ROUTER_PROTOCOL.md
   integrity:
     kind: sha256
-    sha256: 83f1a64bf106b4b3676653923f9daa49a57754a6a613698da044c6300c30c151
+    sha256: 41b7f3948ea6f5632e804af57dae9027a44249ccb4dd95e3d451c313a0916ad7
   access:
     mode: read_only
     method: file

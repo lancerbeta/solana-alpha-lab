@@ -77,8 +77,10 @@ VALIDATED_CANDIDATE_UI_ACTIVATION_PENDING
 
 There may be zero or one candidate, and zero or one repository-tracked active
 release.  A superseded release remains byte-addressable and is never displayed
-as current.  A candidate cannot be described as active, and a repository or
-CI receipt cannot substitute for the owner cloud smoke.
+as current. Its `superseded_by_release_id` must name the active successor,
+which in turn names it as `supersedes_release_id`. A candidate cannot be
+described as active, and a repository or CI receipt cannot substitute for the
+owner cloud smoke.
 
 No automatic deletion is part of this design.  These are small text snapshots,
 not raw provider data; their retained bytes provide rollback and explain why a
@@ -99,10 +101,11 @@ new or modified task acceptance receipt in a pull request:
 - `ACTIVATION_RECEIPT`: the owner has performed the separate UI replacement
   and seven-role smoke, and the registry records that receipt.
 
-The check is deliberately limited to acceptance receipts changed by the PR
-relative to its merge base, preserving backward compatibility for older
-receipts.  The gate fails closed if that merge base cannot be resolved in a
-delivery context.
+The check is deliberately limited to acceptance receipts changed after the
+registry's `enforcement_start_commit`. On ordinary later PRs that is the PR
+merge base; on this first transition PR it is the first policy commit, so
+earlier A2–A4 receipts are not rewritten retroactively. The gate fails closed
+if that baseline cannot be resolved in a delivery context.
 
 ## CI invariants
 
@@ -139,5 +142,7 @@ release bytes are rewritten or deleted.
 
 This patch moves the A5 candidate into the release layout, adds the registry,
 schema/fixture/test, the current A5 receipt disposition, and the two protocol
-rules.  It does not backfill 27 historical tasks, alter Project Sources in the
-cloud, or begin the next external-read task.
+rules. Their existing hash-bound Catalog records and generated navigation views
+are propagated as a direct integrity repair. It does not backfill 27 historical
+tasks, alter Project Sources in the cloud, or begin the next external-read
+task.

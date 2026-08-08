@@ -128,10 +128,23 @@ per-PR confirmation and performs the merge.
 Cursor never:
 
 - chooses TASK-XX or CTRL-XX as “next”;
-- updates canonical Project Sources as permanent-memory truth;
+- activates canonical Project Sources in the cloud UI or represents a
+  repository candidate as activated truth;
 - widens product semantics or adds unrelated truth owners;
 - performs network/provider/RPC calls without an explicit
   GPT-control-plane-approved atom.
+
+## Project Sources release control
+
+At Entry Gate, read `docs/project_sources/release_registry_v1.yaml` before
+relying on a repository-authored Source release. At Finish Gate, a changed
+acceptance receipt must declare exactly one project-Sources disposition:
+`NO_CHANGE`, `RELEASE_CANDIDATE` or `ACTIVATION_RECEIPT`.
+
+Only a registered candidate under `docs/project_sources/releases/` may be
+prepared by the repository route. The owner separately replaces cloud UI
+roles and returns the manifest-first seven-role smoke. A PR, merge or CI run
+does not activate cloud Project Sources.
 
 ## Validation ownership
 

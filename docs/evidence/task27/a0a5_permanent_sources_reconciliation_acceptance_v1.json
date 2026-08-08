@@ -25,19 +25,21 @@
   },
   "bundle_artifact_bindings": {
     "canonical_manifest.yaml": {
-      "path": "docs/source_bundles/task27_a0a5_permanent_sources_v1/canonical_manifest.yaml",
+      "path": "docs/project_sources/releases/PSR-0001-T27-A0-A5/canonical_manifest.yaml",
       "sha256": "eaee5a1a5c25d8c13b5dec750b4a3814a2272b032f2615179b6cc469114d7c87"
     },
     "CHECKSUMS_SHA256.txt": {
-      "path": "docs/source_bundles/task27_a0a5_permanent_sources_v1/CHECKSUMS_SHA256.txt",
+      "path": "docs/project_sources/releases/PSR-0001-T27-A0-A5/CHECKSUMS_SHA256.txt",
       "sha256": "20dabda6bc764495ae12ff54c7df8023575261269ba2a9ab5be05df6d5786a3a"
     },
     "FRESH_CHAT_SMOKE.md": {
-      "path": "docs/source_bundles/task27_a0a5_permanent_sources_v1/FRESH_CHAT_SMOKE.md",
+      "path": "docs/project_sources/releases/PSR-0001-T27-A0-A5/FRESH_CHAT_SMOKE.md",
       "sha256": "716b1076e50725fd8d0a67378548b77e79ae1b2f11afd28789d449594368fe08"
     }
   },
   "source_bundle": {
+    "release_id": "PSR-0001-T27-A0-A5",
+    "registry_path": "docs/project_sources/release_registry_v1.yaml",
     "status": "VALIDATED_CANDIDATE_UI_ACTIVATION_PENDING",
     "mutable_roles": [
       "canonical_manifest",
@@ -51,6 +53,11 @@
       "research_blueprint"
     ],
     "expected_source_count": 7
+  },
+  "project_sources_disposition": {
+    "kind": "RELEASE_CANDIDATE",
+    "release_id": "PSR-0001-T27-A0-A5",
+    "registry_path": "docs/project_sources/release_registry_v1.yaml"
   },
   "validation": {
     "targeted_command": "uv run --locked --managed-python python -B -m unittest tests.test_task27_permanent_sources_reconciliation_contract",
