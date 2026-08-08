@@ -123,7 +123,10 @@ class CanarySpecificationOnlyCatalogFactoryFitTests(unittest.TestCase):
             tuple(map(int, manifest["catalog_version"].split("."))),
             tuple(map(int, a2["catalog"]["after_version"].split("."))),
         )
-        self.assertEqual(manifest["current_checkpoint"]["assets"], 553)
+        self.assertGreaterEqual(
+            manifest["current_checkpoint"]["assets"],
+            a2["catalog"]["after_assets"],
+        )
         self.assertEqual(manifest["current_checkpoint"]["schemas"], 14)
         self.assertEqual(manifest["current_checkpoint"]["lifecycle_records"], 58)
         self.assertEqual(set(a2["catalog"]["registered_asset_ids"]), NEW_IDS)

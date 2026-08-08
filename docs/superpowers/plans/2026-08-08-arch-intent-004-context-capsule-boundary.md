@@ -279,6 +279,15 @@ Expected: the design and plan support documents plus exactly seven Task 1 files;
 the working tree is clean; no provider, raw, source-release or generated file
 outside the generator pair changed.
 
+**Delivery-gate repair, if observed:** a historical Factory Fit test may preserve
+its original receipt while still incorrectly require that the live Catalog asset
+count never grows. Replace only that absolute live-count assertion with a
+monotonic comparison against the receipt's recorded `after_assets`; retain the
+historical receipt unchanged. If that test is itself content-bound by the
+Catalog, refresh only its current Catalog SHA-256 record and record version.
+This preserves the test's non-authority semantics while allowing later
+direction-only registrations.
+
 - [ ] **Step 2: Run the one full delivery gate**
 
 Run:
