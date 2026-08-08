@@ -1,0 +1,35 @@
+{
+  "schema": "smial.project_sources.activation.receipt",
+  "schema_version": "1.0",
+  "task_id": "TASK-27",
+  "atom_id": "T27-A0-A5R1_PROJECT_SOURCES_ACTIVATION_RECEIPT_V1",
+  "release_id": "PSR-0001-T27-A0-A5",
+  "status": "ACTIVATED_BY_OWNER_SMOKE",
+  "activation_evidence": {
+    "class": "OWNER_ATTESTATION",
+    "smoke_outcome": "PASS",
+    "reported_at": "2026-08-08",
+    "raw_smoke_transcript": "NOT_RETAINED_IN_REPOSITORY",
+    "scope": "exact five mutable roles replaced; Operating System v8.5 and Research Blueprint v2.3 retained; seven-role smoke passed"
+  },
+  "manifest_binding": {
+    "path": "docs/project_sources/releases/PSR-0001-T27-A0-A5/canonical_manifest.yaml",
+    "sha256": "eaee5a1a5c25d8c13b5dec750b4a3814a2272b032f2615179b6cc469114d7c87"
+  },
+  "authority": {
+    "provider_read_authority": false,
+    "provider_api_rpc_wss_calls": 0,
+    "credential_use": false,
+    "r2_value_reads": 0,
+    "r3_value_or_path_reads": 0,
+    "wallet_signer_transaction_actions": 0,
+    "cash_spend_usd_cents": 0
+  },
+  "project_sources_disposition": {
+    "kind": "ACTIVATION_RECEIPT",
+    "release_id": "PSR-0001-T27-A0-A5",
+    "registry_path": "docs/project_sources/release_registry_v1.yaml"
+  },
+  "state_change": "ACTIVATION_CONFIRMED_USER_SMOKE",
+  "next_boundary": "SEPARATE_EXACT_OWNER_EXTERNAL_READ_REVIEW_REQUIRED"
+}

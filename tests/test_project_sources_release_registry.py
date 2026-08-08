@@ -17,6 +17,7 @@ REGISTRY_PATH = PROJECT_SOURCES_ROOT / "release_registry_v1.yaml"
 SCHEMA_PATH = ROOT / "catalog/schemas/project_sources_release_registry.schema.json"
 RELEASES_ROOT = PROJECT_SOURCES_ROOT / "releases"
 A5_RECEIPT_PATH = ROOT / "docs/evidence/task27/a0a5_permanent_sources_reconciliation_acceptance_v1.json"
+ACTIVATION_RECEIPT_PATH = ROOT / "docs/evidence/task27/a0a5r1_project_sources_activation_receipt_v1.json"
 FIRST_RELEASE_ID = "PSR-0001-T27-A0-A5"
 CANDIDATE_STATUS = "VALIDATED_CANDIDATE_UI_ACTIVATION_PENDING"
 ACTIVE_STATUS = "ACTIVATED_BY_OWNER_SMOKE"
@@ -38,6 +39,21 @@ def release_by_id(registry: dict, release_id: str) -> dict:
     return next(release for release in registry["releases"] if release["release_id"] == release_id)
 
 
+def activation_receipt_errors(receipt: dict, release: dict) -> set[str]:
+    errors: set[str] = set()
+    if receipt.get("schema") != "smial.project_sources.activation.receipt":
+        errors.add("ACTIVE_RECEIPT_SCHEMA_MISMATCH")
+    if receipt.get("release_id") != release["release_id"]:
+        errors.add("ACTIVE_RECEIPT_RELEASE_MISMATCH")
+    if receipt.get("activation_evidence", {}).get("class") != "OWNER_ATTESTATION":
+        errors.add("ACTIVE_RECEIPT_EVIDENCE_CLASS_MISMATCH")
+    if receipt.get("activation_evidence", {}).get("smoke_outcome") != "PASS":
+        errors.add("ACTIVE_RECEIPT_SMOKE_NOT_PASS")
+    if receipt.get("manifest_binding") != release["artifact_bindings"]["canonical_manifest"]:
+        errors.add("ACTIVE_RECEIPT_MANIFEST_BINDING_MISMATCH")
+    return errors
+
+
 def semantic_errors(registry: dict, root: Path = ROOT) -> set[str]:
     errors: set[str] = set()
     releases = registry.get("releases", [])
@@ -55,10 +71,16 @@ def semantic_errors(registry: dict, root: Path = ROOT) -> set[str]:
         errors.add("MULTIPLE_ACTIVE_RELEASES")
     if registry.get("latest_candidate_release_id") not in {None, *[release.get("release_id") for release in candidate_releases]}:
         errors.add("CANDIDATE_POINTER_MISMATCH")
-    if registry.get("active_ui_release_id") not in {None, *[release.get("release_id") for release in active_releases]}:
-        errors.add("ACTIVE_POINTER_MISMATCH")
-    if registry.get("active_ui_release_id") is None and registry.get("active_ui_state") != "PRE_REGISTRY_EXTERNAL_STATE":
-        errors.add("PRE_REGISTRY_STATE_REQUIRED")
+    if active_releases:
+        if registry.get("active_ui_release_id") != active_releases[0].get("release_id"):
+            errors.add("ACTIVE_POINTER_MISMATCH")
+        if registry.get("active_ui_state") != "REGISTRY_ACTIVATION_CONFIRMED":
+            errors.add("ACTIVE_STATE_MISMATCH")
+    else:
+        if registry.get("active_ui_release_id") is not None:
+            errors.add("ACTIVE_POINTER_MISMATCH")
+        if registry.get("active_ui_state") != "PRE_REGISTRY_EXTERNAL_STATE":
+            errors.add("PRE_REGISTRY_STATE_REQUIRED")
 
     releases_root = root / "docs/project_sources/releases"
     if releases_root.exists():
@@ -87,6 +109,8 @@ def semantic_errors(registry: dict, root: Path = ROOT) -> set[str]:
             activation_receipt = release.get("activation_receipt")
             if not activation_receipt or not (root / activation_receipt).is_file():
                 errors.add("ACTIVE_RECEIPT_REQUIRED")
+            else:
+                errors.update(activation_receipt_errors(load_json(root / activation_receipt), release))
         if release["status"] == CANDIDATE_STATUS and release.get("activation_receipt") is not None:
             errors.add("CANDIDATE_CANNOT_HAVE_ACTIVATION_RECEIPT")
         if release["status"] == "SUPERSEDED":
@@ -119,7 +143,13 @@ def acceptance_errors(receipt: dict, registry: dict | None = None, changed_relea
             except (KeyError, StopIteration):
                 errors.add("CANDIDATE_RELEASE_UNKNOWN")
             else:
-                if release["status"] != CANDIDATE_STATUS or registry.get("latest_candidate_release_id") != release_id:
+                if release["status"] == CANDIDATE_STATUS:
+                    is_current_or_historical = registry.get("latest_candidate_release_id") == release_id
+                elif release["status"] == ACTIVE_STATUS:
+                    is_current_or_historical = registry.get("active_ui_release_id") == release_id
+                else:
+                    is_current_or_historical = False
+                if not is_current_or_historical:
                     errors.add("CANDIDATE_RELEASE_NOT_CURRENT")
                 if disposition.get("registry_path") != "docs/project_sources/release_registry_v1.yaml":
                     errors.add("CANDIDATE_REGISTRY_PATH_MISMATCH")
@@ -174,17 +204,35 @@ def changed_paths_since_enforcement(registry: dict) -> set[str]:
 
 
 class ProjectSourcesReleaseRegistryTests(unittest.TestCase):
-    def test_first_release_is_registered_and_pending_not_active(self) -> None:
+    def test_first_release_is_registered_and_activated_by_owner_smoke(self) -> None:
         self.assertTrue(REGISTRY_PATH.is_file(), REGISTRY_PATH)
         self.assertTrue(SCHEMA_PATH.is_file(), SCHEMA_PATH)
         registry = load_yaml(REGISTRY_PATH)
         release = release_by_id(registry, FIRST_RELEASE_ID)
         self.assertEqual(registry["registry_version"], 1)
-        self.assertIsNone(registry["active_ui_release_id"])
-        self.assertEqual(registry["active_ui_state"], "PRE_REGISTRY_EXTERNAL_STATE")
-        self.assertEqual(registry["latest_candidate_release_id"], FIRST_RELEASE_ID)
-        self.assertEqual(release["status"], CANDIDATE_STATUS)
+        self.assertEqual(registry["active_ui_release_id"], FIRST_RELEASE_ID)
+        self.assertEqual(registry["active_ui_state"], "REGISTRY_ACTIVATION_CONFIRMED")
+        self.assertIsNone(registry["latest_candidate_release_id"])
+        self.assertEqual(release["status"], ACTIVE_STATUS)
+        self.assertEqual(release["activation_receipt"], ACTIVATION_RECEIPT_PATH.relative_to(ROOT).as_posix())
         self.assertTrue((ROOT / release["bundle_path"] / "canonical_manifest.yaml").is_file())
+
+    def test_active_release_receipt_rejects_wrong_smoke_or_manifest_binding(self) -> None:
+        registry = load_yaml(REGISTRY_PATH)
+        release = release_by_id(registry, FIRST_RELEASE_ID)
+        receipt = load_json(ACTIVATION_RECEIPT_PATH)
+        self.assertEqual(activation_receipt_errors(receipt, release), set())
+
+        failed_smoke = copy.deepcopy(receipt)
+        failed_smoke["activation_evidence"]["smoke_outcome"] = "FAIL"
+        self.assertIn("ACTIVE_RECEIPT_SMOKE_NOT_PASS", activation_receipt_errors(failed_smoke, release))
+
+        wrong_manifest = copy.deepcopy(receipt)
+        wrong_manifest["manifest_binding"]["sha256"] = "0" * 64
+        self.assertIn(
+            "ACTIVE_RECEIPT_MANIFEST_BINDING_MISMATCH",
+            activation_receipt_errors(wrong_manifest, release),
+        )
 
     def test_registry_rejects_unregistered_payload_and_two_candidates(self) -> None:
         registry = load_yaml(REGISTRY_PATH)
@@ -193,6 +241,11 @@ class ProjectSourcesReleaseRegistryTests(unittest.TestCase):
         self.assertIn("UNREGISTERED_RELEASE_PAYLOAD", semantic_errors(unregistered))
 
         two_candidates = copy.deepcopy(registry)
+        two_candidates["active_ui_release_id"] = None
+        two_candidates["active_ui_state"] = "PRE_REGISTRY_EXTERNAL_STATE"
+        two_candidates["latest_candidate_release_id"] = FIRST_RELEASE_ID
+        two_candidates["releases"][0]["status"] = CANDIDATE_STATUS
+        two_candidates["releases"][0]["activation_receipt"] = None
         duplicate = copy.deepcopy(two_candidates["releases"][0])
         duplicate["release_id"] = "PSR-0002-TEST"
         two_candidates["releases"].append(duplicate)
@@ -205,7 +258,7 @@ class ProjectSourcesReleaseRegistryTests(unittest.TestCase):
         self.assertIn("RELEASE_ARTIFACT_HASH_MISMATCH", semantic_errors(hash_drift))
 
         false_active = copy.deepcopy(registry)
-        false_active["active_ui_release_id"] = FIRST_RELEASE_ID
+        false_active["active_ui_release_id"] = None
         self.assertIn("ACTIVE_POINTER_MISMATCH", semantic_errors(false_active))
 
     def test_registry_rejects_a_superseded_release_without_its_successor(self) -> None:
