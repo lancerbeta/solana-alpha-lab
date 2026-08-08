@@ -115,7 +115,17 @@ separately gated.
 ## PRE_GIT_PROVENANCE
 
 - Exact imported bytes live under `docs/evidence/pre_git/`.
-- Source completion bundles stay outside Git and are registered by exact SHA-256.
+- Repository-authored Project Sources release candidates live only under
+  `docs/project_sources/releases/` and are discoverable only through
+  `docs/project_sources/release_registry_v1.yaml`; their manifest and
+  checksums are exact SHA-256 bindings.
+- Cloud Project Sources activation stays outside Git. A release is active only
+  after the owner reports its exact seven-role smoke; Git, PR and CI prove a
+  candidate, never UI activation.
+- At Entry Gate read the release registry. At Finish Gate every new or modified
+  task acceptance receipt declares `NO_CHANGE`, `RELEASE_CANDIDATE` or
+  `ACTIVATION_RECEIPT`; the registry test rejects an unregistered release or
+  a missing disposition after its enforcement start.
 - Every imported record preserves origin task, source path, legacy ID where available, creation date, `first_reliable_available_at`, retention, and named consumers.
 - Import/backfill never creates past availability.
 - Exact imported evidence is content-addressed and exempt from style normalization; repository-authored files remain subject to whitespace diff checks.

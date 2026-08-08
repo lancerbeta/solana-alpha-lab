@@ -1,0 +1,120 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "smial.project_sources.release_registry.v1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema",
+    "schema_version",
+    "registry_version",
+    "release_root",
+    "enforcement_start_commit",
+    "active_ui_release_id",
+    "active_ui_state",
+    "active_ui_note",
+    "latest_candidate_release_id",
+    "compaction_review",
+    "releases"
+  ],
+  "properties": {
+    "schema": {"const": "smial.project_sources.release_registry"},
+    "schema_version": {"const": "1.0"},
+    "registry_version": {"const": 1},
+    "release_root": {"const": "docs/project_sources/releases"},
+    "enforcement_start_commit": {"type": "string", "pattern": "^[a-f0-9]{40}$"},
+    "active_ui_release_id": {"type": ["string", "null"]},
+    "active_ui_state": {"enum": ["PRE_REGISTRY_EXTERNAL_STATE", "REGISTRY_ACTIVATION_CONFIRMED"]},
+    "active_ui_note": {"type": "string", "minLength": 1},
+    "latest_candidate_release_id": {"type": ["string", "null"]},
+    "compaction_review": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["aggregate_payload_bytes_limit", "status", "trigger"],
+      "properties": {
+        "aggregate_payload_bytes_limit": {"const": 52428800},
+        "status": {"enum": ["NOT_REQUIRED", "COMPACTION_REVIEW_REQUIRED"]},
+        "trigger": {"const": "COMPACTION_REVIEW_REQUIRED"}
+      }
+    },
+    "releases": {
+      "type": "array",
+      "items": {"$ref": "#/$defs/release"}
+    }
+  },
+  "$defs": {
+    "sha256": {"type": "string", "pattern": "^[a-f0-9]{64}$"},
+    "artifact_binding": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["path", "sha256"],
+      "properties": {
+        "path": {"type": "string", "minLength": 1},
+        "sha256": {"$ref": "#/$defs/sha256"}
+      }
+    },
+    "release": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "release_id",
+        "task_id",
+        "atom_id",
+        "status",
+        "bundle_path",
+        "activation_receipt",
+        "supersedes_release_id",
+        "superseded_by_release_id",
+        "owner_next_action",
+        "source_set",
+        "artifact_bindings"
+      ],
+      "properties": {
+        "release_id": {"type": "string", "pattern": "^PSR-[0-9]{4}-[A-Z0-9-]+$"},
+        "task_id": {"type": "string", "pattern": "^TASK-[0-9]+[A-Z]*$"},
+        "atom_id": {"type": "string", "minLength": 1},
+        "status": {
+          "enum": [
+            "VALIDATED_CANDIDATE_UI_ACTIVATION_PENDING",
+            "ACTIVATED_BY_OWNER_SMOKE",
+            "SUPERSEDED",
+            "INVALIDATED_BEFORE_ACTIVATION"
+          ]
+        },
+        "bundle_path": {"type": "string", "pattern": "^docs/project_sources/releases/PSR-[0-9]{4}-[A-Z0-9-]+$"},
+        "activation_receipt": {"type": ["string", "null"]},
+        "supersedes_release_id": {"type": ["string", "null"]},
+        "superseded_by_release_id": {"type": ["string", "null"]},
+        "owner_next_action": {"type": "string", "minLength": 1},
+        "source_set": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["expected_source_count", "mutable_roles", "immutable_roles"],
+          "properties": {
+            "expected_source_count": {"const": 7},
+            "mutable_roles": {
+              "const": ["canonical_manifest", "roadmap", "current_system_state", "phase_archive", "active_task"]
+            },
+            "immutable_roles": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": ["operating_system", "research_blueprint"],
+              "properties": {
+                "operating_system": {"$ref": "#/$defs/sha256"},
+                "research_blueprint": {"$ref": "#/$defs/sha256"}
+              }
+            }
+          }
+        },
+        "artifact_bindings": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["canonical_manifest", "checksums"],
+          "properties": {
+            "canonical_manifest": {"$ref": "#/$defs/artifact_binding"},
+            "checksums": {"$ref": "#/$defs/artifact_binding"}
+          }
+        }
+      }
+    }
+  }
+}
