@@ -252,6 +252,28 @@ class ExactSinglePoolSelectionAndPilotReadPacketTests(unittest.TestCase):
                 self.assertIn(case["expected_error"], errors)
                 self.assertTrue(errors <= EXPECTED_ERRORS)
 
+    def test_acceptance_receipt_binds_assets_and_preserves_offline_boundary(self) -> None:
+        self.assertTrue(ACCEPTANCE_PATH.is_file(), ACCEPTANCE_PATH)
+        receipt = load_json(ACCEPTANCE_PATH)
+        expected_bindings = {
+            CONTRACT_PATH.relative_to(ROOT).as_posix(): sha256(CONTRACT_PATH),
+            CONFIG_PATH.relative_to(ROOT).as_posix(): sha256(CONFIG_PATH),
+            SCHEMA_PATH.relative_to(ROOT).as_posix(): sha256(SCHEMA_PATH),
+            FIXTURE_PATH.relative_to(ROOT).as_posix(): sha256(FIXTURE_PATH),
+        }
+        actual_bindings = {
+            binding["path"]: binding["sha256"]
+            for binding in receipt["artifact_bindings"].values()
+        }
+        self.assertEqual(actual_bindings, expected_bindings)
+        self.assertEqual(receipt["project_sources_disposition"]["kind"], "NO_CHANGE")
+        self.assertEqual(receipt["validation"]["targeted_tests_run"], 5)
+        self.assertEqual(receipt["validation"]["adversarial_cases_rejected"], 18)
+        self.assertEqual(receipt["state_change"], "NONE")
+        self.assertFalse(receipt["next_boundary"]["provider_read_authority_granted"])
+        for value in receipt["measured_boundary"].values():
+            self.assertIn(value, (0, False))
+
 
 if __name__ == "__main__":
     unittest.main()
