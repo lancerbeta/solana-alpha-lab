@@ -1,0 +1,61 @@
+schema: smial.task27.exact_owner_external_read_review.contract
+schema_version: '1.0'
+task_id: TASK-27
+atom_id: T27-A0-A6_EXACT_OWNER_EXTERNAL_READ_REVIEW_V1
+consumer: OWNER_EXTERNAL_READ_REVIEW
+inherits:
+  a4_contract:
+    path: docs/contracts/task27_bounded_public_history_feasibility_authority_contract_v1.md
+    sha256: e7d3a44e53fd937f472aec8e58b432cf6850b952b58f9a143996955010f3b653
+  a4_config:
+    path: configs/task27_bounded_public_history_feasibility_authority_contract_v1.yaml
+    sha256: 9c5e2b6f483e0e7fde3bcb5b02b0bab6197fe096e1c55bcf79dce24b8b72b153
+source_candidate: GECKOTERMINAL_PUBLIC_POOL_OHLCV_CANDIDATE
+source_smoke:
+  required_state: ACTIVATION_CONFIRMED_USER_SMOKE
+  receipt_path: docs/evidence/task27/a0a5r1_project_sources_activation_receipt_v1.json
+  receipt_sha256: 8ef3acf01a1eecd6d826bc95fb365d56571f02355b4f903fcac93c485c0c95ac
+inherited_capture_caps:
+  discovery_requests_max: 6
+  ohlcv_requests_max: 24
+  interval_seconds: 900
+  panel_duration_hours: 24
+  complete_panels_min: 12
+future_request:
+  placeholder: OWNER_INPUT_REQUIRED
+  required_owner_input_fields:
+    - request_id
+    - pool_identity
+    - selection_snapshot_id
+    - selection_snapshot_sha256
+    - selection_time
+    - universe_description
+    - raw_evidence_manifest_id
+  approval_template_state: TEMPLATE_INVALID_UNTIL_EXACT_OWNER_APPROVAL
+  fallback_provider: null
+review_outcomes:
+  - READY_FOR_OWNER_EXTERNAL_READ_DECISION
+  - REDESIGN_EXTERNAL_READ_PACKET
+  - CLOSE_PUBLIC_HISTORY_ROUTE
+authority:
+  user_authority: T27-A0-A6_OFFLINE_OWNER_EXTERNAL_READ_REVIEW_ONLY
+  provider_api_rpc_wss_calls: 0
+  provider_read_authority: false
+  credential_use: false
+  r2_value_reads: 0
+  r3_value_or_path_reads: 0
+  wallet_signer_transaction_actions: 0
+  cash_spend_usd_cents: 0
+  raw_provider_responses_retained: 0
+  dependency_changes: false
+  catalog_or_registry_mutation: false
+  project_source_changes: false
+claim_scope: HISTORICAL_FEASIBILITY_ONLY
+history_grade: DESCRIPTIVE_ONLY
+managed_write_set:
+  - docs/contracts/task27_exact_owner_external_read_review_contract_v1.md
+  - configs/task27_exact_owner_external_read_review_contract_v1.yaml
+  - catalog/schemas/task27_exact_owner_external_read_review.schema.json
+  - tests/fixtures/task27/exact_owner_external_read_review_v1.json
+  - tests/test_task27_exact_owner_external_read_review_contract.py
+  - docs/evidence/task27/a0a6_exact_owner_external_read_review_acceptance_v1.json

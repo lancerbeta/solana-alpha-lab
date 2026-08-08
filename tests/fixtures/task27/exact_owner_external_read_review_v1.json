@@ -1,0 +1,111 @@
+{
+  "fixture_kind": "SYNTHETIC_GOLDEN_ONLY",
+  "valid_packet": {
+    "fixture_kind": "SYNTHETIC_GOLDEN_ONLY",
+    "review": {
+      "outcome": "READY_FOR_OWNER_EXTERNAL_READ_DECISION",
+      "source_candidate": "GECKOTERMINAL_PUBLIC_POOL_OHLCV_CANDIDATE",
+      "fallback_provider": null,
+      "source_smoke_state": "ACTIVATION_CONFIRMED_USER_SMOKE",
+      "source_smoke_receipt_path": "docs/evidence/task27/a0a5r1_project_sources_activation_receipt_v1.json",
+      "source_smoke_receipt_sha256": "8ef3acf01a1eecd6d826bc95fb365d56571f02355b4f903fcac93c485c0c95ac",
+      "future_request": {
+        "request_id": "OWNER_INPUT_REQUIRED",
+        "pool_identity": "OWNER_INPUT_REQUIRED",
+        "selection_snapshot_id": "OWNER_INPUT_REQUIRED",
+        "selection_snapshot_sha256": "OWNER_INPUT_REQUIRED",
+        "selection_time": "OWNER_INPUT_REQUIRED",
+        "universe_description": "OWNER_INPUT_REQUIRED",
+        "raw_evidence_manifest_id": "OWNER_INPUT_REQUIRED"
+      }
+    },
+    "inherited_capture": {
+      "discovery_requests_max": 6,
+      "ohlcv_requests_max": 24,
+      "interval_seconds": 900,
+      "panel_duration_hours": 24,
+      "complete_panels_min": 12
+    },
+    "authority": {
+      "provider_read_authority": false,
+      "provider_api_rpc_wss_calls": 0,
+      "raw_provider_responses_retained": 0
+    },
+    "claims": {
+      "scope": "HISTORICAL_FEASIBILITY_ONLY",
+      "history_grade": "DESCRIPTIVE_ONLY",
+      "alpha_claim": false,
+      "execution_claim": false,
+      "pnl_claim": false,
+      "netreturn_claim": false,
+      "cashflow_claim": false
+    },
+    "future_owner_approval": {
+      "state": "TEMPLATE_INVALID_UNTIL_EXACT_OWNER_APPROVAL",
+      "approval_granted": false,
+      "phrase_template": "I may later approve exactly one request only after every OWNER_INPUT_REQUIRED field is replaced and separately reviewed."
+    }
+  },
+  "adversarial_cases": [
+    {
+      "case_id": "authority-promotion",
+      "pointer": "/authority/provider_read_authority",
+      "value": true,
+      "expected_error": "AUTHORITY_PROMOTION_FORBIDDEN"
+    },
+    {
+      "case_id": "external-action",
+      "pointer": "/authority/provider_api_rpc_wss_calls",
+      "value": 1,
+      "expected_error": "EXTERNAL_ACTION_IN_A6_FORBIDDEN"
+    },
+    {
+      "case_id": "raw-retention",
+      "pointer": "/authority/raw_provider_responses_retained",
+      "value": 1,
+      "expected_error": "RAW_RETENTION_IN_A6_FORBIDDEN"
+    },
+    {
+      "case_id": "missing-source-smoke",
+      "pointer": "/review/source_smoke_state",
+      "value": "SOURCE_ALIGNMENT_REQUIRED",
+      "expected_error": "SOURCE_SMOKE_BINDING_REQUIRED"
+    },
+    {
+      "case_id": "unbound-future-request",
+      "pointer": "/review/future_request/request_id",
+      "value": "UNBOUND",
+      "expected_error": "UNBOUND_FUTURE_REQUEST_FORBIDDEN"
+    },
+    {
+      "case_id": "actual-pool-claim",
+      "pointer": "/review/future_request/pool_identity",
+      "value": "SYNTHETIC_REAL_POOL_NOT_ALLOWED",
+      "expected_error": "ACTUAL_EVIDENCE_CLAIM_FORBIDDEN"
+    },
+    {
+      "case_id": "fallback-provider",
+      "pointer": "/review/fallback_provider",
+      "value": "OTHER_PROVIDER",
+      "expected_error": "FALLBACK_PROVIDER_FORBIDDEN"
+    },
+    {
+      "case_id": "ohlcv-cap-breach",
+      "pointer": "/inherited_capture/ohlcv_requests_max",
+      "value": 25,
+      "expected_error": "INHERITED_CAP_BREACH"
+    },
+    {
+      "case_id": "alpha-claim",
+      "pointer": "/claims/alpha_claim",
+      "value": true,
+      "expected_error": "FORBIDDEN_DECISION_CLAIM"
+    },
+    {
+      "case_id": "premature-approval",
+      "pointer": "/future_owner_approval/approval_granted",
+      "value": true,
+      "expected_error": "PREMATURE_APPROVAL_PHRASE_FORBIDDEN"
+    }
+  ]
+}

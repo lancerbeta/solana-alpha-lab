@@ -1,0 +1,98 @@
+{
+  "schema": "smial.task27.a0a6.exact_owner_external_read_review.acceptance",
+  "schema_version": "1.0",
+  "task_id": "TASK-27",
+  "atom_id": "T27-A0-A6_EXACT_OWNER_EXTERNAL_READ_REVIEW_V1",
+  "status": "PASS_TARGETED_VALIDATION_PENDING_DELIVERY",
+  "implementation_base": {
+    "commit": "4d1c7577e193f5e2f6504a734061f6eb97787a6a",
+    "branch": "task27/external-read-review"
+  },
+  "authority": {
+    "user_authority": "T27-A0-A6_OFFLINE_OWNER_EXTERNAL_READ_REVIEW_ONLY",
+    "provider_api_rpc_wss_calls": 0,
+    "provider_read_authority": false,
+    "credential_use": false,
+    "r2_value_reads": 0,
+    "r3_value_or_path_reads": 0,
+    "wallet_signer_transaction_actions": 0,
+    "cash_spend_usd_cents": 0,
+    "raw_provider_responses_retained": 0,
+    "dependency_changes": false,
+    "catalog_or_registry_mutation": false,
+    "project_source_changes": false
+  },
+  "managed_write_set": [
+    "docs/contracts/task27_exact_owner_external_read_review_contract_v1.md",
+    "configs/task27_exact_owner_external_read_review_contract_v1.yaml",
+    "catalog/schemas/task27_exact_owner_external_read_review.schema.json",
+    "tests/fixtures/task27/exact_owner_external_read_review_v1.json",
+    "tests/test_task27_exact_owner_external_read_review_contract.py",
+    "docs/evidence/task27/a0a6_exact_owner_external_read_review_acceptance_v1.json"
+  ],
+  "artifact_bindings": {
+    "contract": {
+      "path": "docs/contracts/task27_exact_owner_external_read_review_contract_v1.md",
+      "sha256": "d0942963f5e98bb0a80cacef79aa5c1c2fac47323a3e0a474facdd89f0a87342"
+    },
+    "config": {
+      "path": "configs/task27_exact_owner_external_read_review_contract_v1.yaml",
+      "sha256": "f82c80194068ed7e51efac0126383453eb3f505357233d576afe85fe996eb683"
+    },
+    "schema": {
+      "path": "catalog/schemas/task27_exact_owner_external_read_review.schema.json",
+      "sha256": "b751e274e662f668aea007ee2a5685f80abb13317514a199aba39b5880271c54"
+    },
+    "fixture": {
+      "path": "tests/fixtures/task27/exact_owner_external_read_review_v1.json",
+      "sha256": "40f8b8ae93d597c774039e2859f687656d27c01abc569664fde3cc4ec0c31ac9"
+    }
+  },
+  "source_smoke_binding": {
+    "state": "ACTIVATION_CONFIRMED_USER_SMOKE",
+    "receipt_path": "docs/evidence/task27/a0a5r1_project_sources_activation_receipt_v1.json",
+    "receipt_sha256": "8ef3acf01a1eecd6d826bc95fb365d56571f02355b4f903fcac93c485c0c95ac"
+  },
+  "validation": {
+    "targeted_command": "uv run --locked --managed-python python -B -m unittest tests.test_task27_exact_owner_external_read_review_contract",
+    "targeted_tests_run": 5,
+    "targeted_tests_passed": 5,
+    "adversarial_cases_rejected": 10,
+    "schema_draft": "2020-12",
+    "valid_synthetic_packets": 1,
+    "full_validation": "PENDING_TRACKED_ONLY_DELIVERY"
+  },
+  "semantic_acceptance": {
+    "source_smoke_receipt_is_content_bound": "PASS",
+    "ready_review_is_not_provider_authority": "PASS",
+    "future_request_fields_remain_owner_input_required": "PASS",
+    "placeholder_replacement_is_rejected": "PASS",
+    "provider_fallback_is_rejected": "PASS",
+    "a4_caps_are_not_widened": "PASS",
+    "raw_retention_in_a6_is_rejected": "PASS",
+    "pit_alpha_execution_pnl_netreturn_cashflow_claims_are_rejected": "PASS",
+    "premature_owner_approval_phrase_is_rejected": "PASS"
+  },
+  "project_sources_disposition": {
+    "kind": "NO_CHANGE",
+    "reason": "A6 creates an offline review template only; no Project Source role or release payload changes."
+  },
+  "measured_boundary": {
+    "provider_api_rpc_wss_calls": 0,
+    "r2_value_reads": 0,
+    "r3_value_or_path_reads": 0,
+    "wallet_signer_transaction_actions": 0,
+    "cash_spend_usd_cents": 0,
+    "raw_provider_responses_retained": 0,
+    "dependency_changes": 0,
+    "catalog_or_registry_mutations": 0,
+    "project_source_changes": 0
+  },
+  "state_change": "NONE",
+  "next_boundary": {
+    "provider_read_authority_granted": false,
+    "requires_new_exact_owner_instruction": true,
+    "requires_actual_pool_and_selection_snapshot": true,
+    "requires_raw_evidence_retention_authority": true
+  }
+}

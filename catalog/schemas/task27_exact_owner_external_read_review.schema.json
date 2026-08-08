@@ -1,0 +1,164 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://schemas.solana-alpha-lab.local/task27/exact-owner-external-read-review-v1.json",
+  "title": "TASK-27 exact owner external-read review fixture",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["fixture_kind", "valid_packet", "adversarial_cases"],
+  "properties": {
+    "fixture_kind": {"const": "SYNTHETIC_GOLDEN_ONLY"},
+    "valid_packet": {"$ref": "#/$defs/packet"},
+    "adversarial_cases": {
+      "type": "array",
+      "minItems": 10,
+      "items": {"$ref": "#/$defs/adversarial_case"}
+    }
+  },
+  "$defs": {
+    "adversarial_case": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["case_id", "pointer", "value", "expected_error"],
+      "properties": {
+        "case_id": {"type": "string", "minLength": 1},
+        "pointer": {"type": "string", "pattern": "^/"},
+        "value": {},
+        "expected_error": {"type": "string", "minLength": 1}
+      }
+    },
+    "packet": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "fixture_kind",
+        "review",
+        "inherited_capture",
+        "authority",
+        "claims",
+        "future_owner_approval"
+      ],
+      "properties": {
+        "fixture_kind": {"const": "SYNTHETIC_GOLDEN_ONLY"},
+        "review": {"$ref": "#/$defs/review"},
+        "inherited_capture": {"$ref": "#/$defs/inherited_capture"},
+        "authority": {"$ref": "#/$defs/authority"},
+        "claims": {"$ref": "#/$defs/claims"},
+        "future_owner_approval": {"$ref": "#/$defs/future_owner_approval"}
+      }
+    },
+    "review": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "outcome",
+        "source_candidate",
+        "fallback_provider",
+        "source_smoke_state",
+        "source_smoke_receipt_path",
+        "source_smoke_receipt_sha256",
+        "future_request"
+      ],
+      "properties": {
+        "outcome": {
+          "enum": [
+            "READY_FOR_OWNER_EXTERNAL_READ_DECISION",
+            "REDESIGN_EXTERNAL_READ_PACKET",
+            "CLOSE_PUBLIC_HISTORY_ROUTE"
+          ]
+        },
+        "source_candidate": {"type": "string", "minLength": 1},
+        "fallback_provider": {"type": ["null", "string"]},
+        "source_smoke_state": {"type": "string", "minLength": 1},
+        "source_smoke_receipt_path": {"type": "string", "minLength": 1},
+        "source_smoke_receipt_sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+        "future_request": {"$ref": "#/$defs/future_request"}
+      }
+    },
+    "future_request": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "request_id",
+        "pool_identity",
+        "selection_snapshot_id",
+        "selection_snapshot_sha256",
+        "selection_time",
+        "universe_description",
+        "raw_evidence_manifest_id"
+      ],
+      "properties": {
+        "request_id": {"type": "string", "minLength": 1},
+        "pool_identity": {"type": "string", "minLength": 1},
+        "selection_snapshot_id": {"type": "string", "minLength": 1},
+        "selection_snapshot_sha256": {"type": "string", "minLength": 1},
+        "selection_time": {"type": "string", "minLength": 1},
+        "universe_description": {"type": "string", "minLength": 1},
+        "raw_evidence_manifest_id": {"type": "string", "minLength": 1}
+      }
+    },
+    "inherited_capture": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "discovery_requests_max",
+        "ohlcv_requests_max",
+        "interval_seconds",
+        "panel_duration_hours",
+        "complete_panels_min"
+      ],
+      "properties": {
+        "discovery_requests_max": {"type": "integer", "minimum": 0},
+        "ohlcv_requests_max": {"type": "integer", "minimum": 0},
+        "interval_seconds": {"type": "integer", "minimum": 1},
+        "panel_duration_hours": {"type": "integer", "minimum": 1},
+        "complete_panels_min": {"type": "integer", "minimum": 1}
+      }
+    },
+    "authority": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "provider_read_authority",
+        "provider_api_rpc_wss_calls",
+        "raw_provider_responses_retained"
+      ],
+      "properties": {
+        "provider_read_authority": {"type": "boolean"},
+        "provider_api_rpc_wss_calls": {"type": "integer", "minimum": 0},
+        "raw_provider_responses_retained": {"type": "integer", "minimum": 0}
+      }
+    },
+    "claims": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "scope",
+        "history_grade",
+        "alpha_claim",
+        "execution_claim",
+        "pnl_claim",
+        "netreturn_claim",
+        "cashflow_claim"
+      ],
+      "properties": {
+        "scope": {"type": "string", "minLength": 1},
+        "history_grade": {"type": "string", "minLength": 1},
+        "alpha_claim": {"type": "boolean"},
+        "execution_claim": {"type": "boolean"},
+        "pnl_claim": {"type": "boolean"},
+        "netreturn_claim": {"type": "boolean"},
+        "cashflow_claim": {"type": "boolean"}
+      }
+    },
+    "future_owner_approval": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["state", "approval_granted", "phrase_template"],
+      "properties": {
+        "state": {"type": "string", "minLength": 1},
+        "approval_granted": {"type": "boolean"},
+        "phrase_template": {"type": "string", "minLength": 1}
+      }
+    }
+  }
+}
