@@ -258,8 +258,9 @@ Markdown; no new dependencies or runtime/provider component.
 - **Spec coverage:** Task 1 implements all packet semantics and false-positive
   guards; Task 2 binds durable evidence and delivery.  Every design requirement
   has a task.
-- **Placeholder scan:** no TBD/TODO, unspecified validation, or “similar to”
-  instruction remains.  Future external action is explicitly absent.
+- **Placeholder scan:** no unresolved implementation markers, unspecified
+  validation, or cross-task shortcut instruction remains.  Future external
+  action is explicitly absent.
 - **Type consistency:** the six error strings, explanation IDs, and decision
   literals are defined once and used consistently in policy, schema, fixture,
   test, and receipt.
