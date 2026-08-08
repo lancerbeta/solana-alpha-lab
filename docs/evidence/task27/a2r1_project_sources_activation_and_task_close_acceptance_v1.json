@@ -1,0 +1,101 @@
+{
+  "schema": "smial.project_sources.activation.receipt",
+  "schema_version": "1.0",
+  "task_id": "TASK-27",
+  "atom_id": "T27-A2R1_PROJECT_SOURCES_ACTIVATION_AND_TASK_CLOSE_V1",
+  "release_id": "PSR-0002-T27-CLOSE",
+  "status": "ACTIVATED_BY_OWNER_SMOKE",
+  "activation_evidence": {
+    "class": "OWNER_ATTESTATION",
+    "smoke_outcome": "PASS",
+    "reported_at": "2026-08-09",
+    "raw_smoke_transcript": "NOT_RETAINED_IN_REPOSITORY",
+    "scope": "exact five mutable roles replaced; Operating System v8.5 and Research Blueprint v2.3 retained; exact seven-role smoke passed"
+  },
+  "source_bindings": [
+    {
+      "semantic_role": "canonical_manifest",
+      "semantic_version": "4.8",
+      "required_header": "schema: solana_alpha_lab.canonical_manifest",
+      "sha256": "8a0e5c8ac5cf7351e15c290214800cf5736457a135c9820f25add392d466d78e",
+      "physical_filename": "canonical_manifest.yaml"
+    },
+    {
+      "semantic_role": "operating_system",
+      "semantic_version": "8.5",
+      "required_header": "# SOLANA ALPHA LAB OPERATING SYSTEM v8.5",
+      "sha256": "187aa5d1405c55868d7147a7cdf9e0605a9a51f613ab5597ae44682fcbc67c84",
+      "physical_filename": "Solana_Memecoin_Intraday_Alpha_Lab_Operating_System_v8_5.md"
+    },
+    {
+      "semantic_role": "research_blueprint",
+      "semantic_version": "2.3",
+      "required_header": "contains Синтетическая версия v2.3",
+      "sha256": "ec756d5be0196dd8207ac08512af5e3a9a5032eb5b0b40e3f8fcca2beb170ba1",
+      "physical_filename": "Solana_Memecoin_Intraday_Alpha_Lab_Synthesis_v2_3_2026-07-18.md"
+    },
+    {
+      "semantic_role": "roadmap",
+      "semantic_version": "4.8",
+      "required_header": "contains Версия 4.8",
+      "sha256": "53bb688334ecd98bac53b31fd19c20fdbcad31b7b132cd50e5d1f52003dfb66e",
+      "physical_filename": "roadmap.md"
+    },
+    {
+      "semantic_role": "current_system_state",
+      "semantic_version": "4.4",
+      "required_header": "contains CURRENT SYSTEM STATE — SOLANA MEMECOIN INTRADAY ALPHA LAB v4.4",
+      "sha256": "17ece52a06f166c7e3e32593fa5cfaf20a6113d97cb0b40029d7c831b7543a7d",
+      "physical_filename": "current_system_state.md"
+    },
+    {
+      "semantic_role": "phase_archive",
+      "semantic_version": "38.0",
+      "required_header": "contains TASK ARCHIVE P0/P1 v38",
+      "sha256": "2b2cc851fd825aa55286e4101e6e0fd4a1d04734464aa8e545fb058a7b8ba864",
+      "physical_filename": "task_archive_P0_P1_v38.md"
+    },
+    {
+      "semantic_role": "active_task",
+      "semantic_version": "TASK-27 / 1.1",
+      "required_header": "# TASK-27 — Bounded public historical price/volume feasibility",
+      "sha256": "439d7668304938ef4f252f9ca87a00a2fbd7ce72eda9de24d94563e54244731a",
+      "physical_filename": "task_27_public_history_feasibility.md"
+    }
+  ],
+  "manifest_binding": {
+    "path": "docs/project_sources/releases/PSR-0002-T27-CLOSE/canonical_manifest.yaml",
+    "sha256": "8a0e5c8ac5cf7351e15c290214800cf5736457a135c9820f25add392d466d78e"
+  },
+  "decision": {
+    "task27_outcome": "CLOSE_WITH_LIMITED_NEGATIVE_RESULT",
+    "terminal_result": "NO_FEASIBLE_PUBLIC_HISTORY_ROUTE_DEMONSTRATED_WITHIN_AUTHORIZED_SCOPE",
+    "task_status": "DONE",
+    "next_task_selected": false
+  },
+  "authority": {
+    "provider_read_authority": false,
+    "provider_api_rpc_wss_calls": 0,
+    "credential_use": false,
+    "r2_value_reads": 0,
+    "r3_value_or_path_reads": 0,
+    "wallet_signer_transaction_actions": 0,
+    "cash_spend_usd_cents": 0
+  },
+  "factory_fit_review": "FULL_REVIEW",
+  "factory_fit": {
+    "verdict": "PASS",
+    "goal_fit": "PASS_ROUTE_SPECIFIC_NEGATIVE_RESULT_IS_PRESERVED_WITHOUT_GLOBAL_OR_ALPHA_CLAIM",
+    "compatibility": "PASS_ACTIVATION_OVERLAY_SUPERSEDES_PACKAGING_LABELS_WITHOUT_REWRITING_RELEASE_BYTES",
+    "data_fitness": "PASS_33_OF_96_OBSERVED_AND_63_MISSING_UNKNOWN_REMAIN_EXPLICIT",
+    "owner_journey": "PASS_SOURCE_ACTIVATION_IS_TERMINAL_AND_NO_OPEN_PROVIDER_ACTION_REMAINS",
+    "monitoring_recovery": "NOT_APPLICABLE_NO_RUNTIME_POSITION_OR_EXTERNAL_PROCESS_CREATED"
+  },
+  "project_sources_disposition": {
+    "kind": "ACTIVATION_RECEIPT",
+    "release_id": "PSR-0002-T27-CLOSE",
+    "registry_path": "docs/project_sources/release_registry_v1.yaml"
+  },
+  "state_change": "ACTIVATION_CONFIRMED_USER_SMOKE_AND_TASK27_DONE",
+  "next_boundary": "READ_ONLY_NEXT_TASK_ENTRY_GATE"
+}

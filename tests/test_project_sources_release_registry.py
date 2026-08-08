@@ -15,10 +15,12 @@ ROOT = Path(__file__).resolve().parents[1]
 PROJECT_SOURCES_ROOT = ROOT / "docs/project_sources"
 REGISTRY_PATH = PROJECT_SOURCES_ROOT / "release_registry_v1.yaml"
 SCHEMA_PATH = ROOT / "catalog/schemas/project_sources_release_registry.schema.json"
+CATALOG_CORE_PATH = ROOT / "catalog/assets/core.yaml"
 RELEASES_ROOT = PROJECT_SOURCES_ROOT / "releases"
 A5_RECEIPT_PATH = ROOT / "docs/evidence/task27/a0a5_permanent_sources_reconciliation_acceptance_v1.json"
-ACTIVATION_RECEIPT_PATH = ROOT / "docs/evidence/task27/a0a5r1_project_sources_activation_receipt_v1.json"
+ACTIVATION_RECEIPT_PATH = ROOT / "docs/evidence/task27/a2r1_project_sources_activation_and_task_close_acceptance_v1.json"
 FIRST_RELEASE_ID = "PSR-0001-T27-A0-A5"
+ACTIVE_RELEASE_ID = "PSR-0002-T27-CLOSE"
 CANDIDATE_STATUS = "VALIDATED_CANDIDATE_UI_ACTIVATION_PENDING"
 ACTIVE_STATUS = "ACTIVATED_BY_OWNER_SMOKE"
 
@@ -147,6 +149,8 @@ def acceptance_errors(receipt: dict, registry: dict | None = None, changed_relea
                     is_current_or_historical = registry.get("latest_candidate_release_id") == release_id
                 elif release["status"] == ACTIVE_STATUS:
                     is_current_or_historical = registry.get("active_ui_release_id") == release_id
+                elif release["status"] == "SUPERSEDED":
+                    is_current_or_historical = True
                 else:
                     is_current_or_historical = False
                 if not is_current_or_historical:
@@ -204,22 +208,26 @@ def changed_paths_since_enforcement(registry: dict) -> set[str]:
 
 
 class ProjectSourcesReleaseRegistryTests(unittest.TestCase):
-    def test_first_release_is_registered_and_activated_by_owner_smoke(self) -> None:
+    def test_latest_release_is_activated_and_prior_release_is_superseded(self) -> None:
         self.assertTrue(REGISTRY_PATH.is_file(), REGISTRY_PATH)
         self.assertTrue(SCHEMA_PATH.is_file(), SCHEMA_PATH)
         registry = load_yaml(REGISTRY_PATH)
-        release = release_by_id(registry, FIRST_RELEASE_ID)
+        release = release_by_id(registry, ACTIVE_RELEASE_ID)
+        prior_release = release_by_id(registry, FIRST_RELEASE_ID)
         self.assertEqual(registry["registry_version"], 1)
-        self.assertEqual(registry["active_ui_release_id"], FIRST_RELEASE_ID)
+        self.assertEqual(registry["active_ui_release_id"], ACTIVE_RELEASE_ID)
         self.assertEqual(registry["active_ui_state"], "REGISTRY_ACTIVATION_CONFIRMED")
-        self.assertEqual(registry["latest_candidate_release_id"], "PSR-0002-T27-CLOSE")
+        self.assertIsNone(registry["latest_candidate_release_id"])
         self.assertEqual(release["status"], ACTIVE_STATUS)
         self.assertEqual(release["activation_receipt"], ACTIVATION_RECEIPT_PATH.relative_to(ROOT).as_posix())
+        self.assertEqual(prior_release["status"], "SUPERSEDED")
+        self.assertEqual(prior_release["superseded_by_release_id"], ACTIVE_RELEASE_ID)
         self.assertTrue((ROOT / release["bundle_path"] / "canonical_manifest.yaml").is_file())
 
     def test_active_release_receipt_rejects_wrong_smoke_or_manifest_binding(self) -> None:
         registry = load_yaml(REGISTRY_PATH)
-        release = release_by_id(registry, FIRST_RELEASE_ID)
+        release = release_by_id(registry, ACTIVE_RELEASE_ID)
+        self.assertTrue(ACTIVATION_RECEIPT_PATH.is_file(), ACTIVATION_RECEIPT_PATH)
         receipt = load_json(ACTIVATION_RECEIPT_PATH)
         self.assertEqual(activation_receipt_errors(receipt, release), set())
 
@@ -233,6 +241,23 @@ class ProjectSourcesReleaseRegistryTests(unittest.TestCase):
             "ACTIVE_RECEIPT_MANIFEST_BINDING_MISMATCH",
             activation_receipt_errors(wrong_manifest, release),
         )
+
+    def test_task27_close_activation_receipt_is_hash_bound_in_catalog(self) -> None:
+        catalog_records = load_yaml(CATALOG_CORE_PATH)["records"]
+        record = next(
+            (
+                item
+                for item in catalog_records
+                if item["asset_id"] == "EVIDENCE-T27-A2R1-SOURCE-ACTIVATION-CLOSE-001"
+            ),
+            None,
+        )
+        self.assertIsNotNone(record)
+        self.assertEqual(
+            record["location"]["repository_path"],
+            ACTIVATION_RECEIPT_PATH.relative_to(ROOT).as_posix(),
+        )
+        self.assertEqual(record["integrity"]["sha256"], sha256(ACTIVATION_RECEIPT_PATH))
 
     def test_registry_rejects_unregistered_payload_and_two_candidates(self) -> None:
         registry = load_yaml(REGISTRY_PATH)
@@ -264,7 +289,7 @@ class ProjectSourcesReleaseRegistryTests(unittest.TestCase):
     def test_registry_rejects_a_superseded_release_without_its_successor(self) -> None:
         registry = load_yaml(REGISTRY_PATH)
         orphaned_supersession = copy.deepcopy(registry)
-        orphaned_supersession["releases"][0]["status"] = "SUPERSEDED"
+        orphaned_supersession["releases"][0]["superseded_by_release_id"] = "PSR-9999-MISSING"
         self.assertIn("SUPERSEDED_SUCCESSOR_REQUIRED", semantic_errors(orphaned_supersession))
 
     def test_a5_receipt_requires_registered_candidate_disposition(self) -> None:
