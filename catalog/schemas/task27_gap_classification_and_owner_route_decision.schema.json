@@ -1,0 +1,131 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "smial.task27.gap-classification-and-owner-route-decision.schema.v1",
+  "title": "TASK-27 A1S3 gap classification and owner route decision",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "fixture_kind",
+    "source_bindings",
+    "observation",
+    "explanations",
+    "decision",
+    "claims"
+  ],
+  "properties": {
+    "fixture_kind": {"const": "SYNTHETIC_GOLDEN_ONLY"},
+    "source_bindings": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["stage_a_receipt", "stage_b_receipt", "stage_b_raw_evidence"],
+      "properties": {
+        "stage_a_receipt": {"$ref": "#/$defs/path_hash"},
+        "stage_b_receipt": {"$ref": "#/$defs/path_hash"},
+        "stage_b_raw_evidence": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["raw_manifest_sha256", "panel_projection_sha256"],
+          "properties": {
+            "raw_manifest_sha256": {"$ref": "#/$defs/sha256"},
+            "panel_projection_sha256": {"$ref": "#/$defs/sha256"}
+          }
+        }
+      }
+    },
+    "observation": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "expected_natural_bars",
+        "observed_bars",
+        "missing_natural_bars",
+        "returned_zero_volume_bars",
+        "internal_gap_regions",
+        "largest_gap_seconds",
+        "missing_data_state",
+        "missing_as_zero"
+      ],
+      "properties": {
+        "expected_natural_bars": {"const": 96},
+        "observed_bars": {"const": 33},
+        "missing_natural_bars": {"const": 63},
+        "returned_zero_volume_bars": {"const": 18},
+        "internal_gap_regions": {"const": 21},
+        "largest_gap_seconds": {"const": 8100},
+        "missing_data_state": {"const": "MISSING_UNKNOWN"},
+        "missing_as_zero": {"const": false}
+      }
+    },
+    "explanations": {
+      "type": "array",
+      "minItems": 4,
+      "maxItems": 4,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["id", "classification"],
+        "properties": {
+          "id": {
+            "enum": [
+              "trade_only_endpoint_emission",
+              "low_activity_correlated_missingness",
+              "provider_aggregation_or_coverage",
+              "market_label_difference"
+            ]
+          },
+          "classification": {
+            "enum": ["POSSIBLE_NOT_PROVEN", "NARROW_FORM_FALSIFIED", "NOT_TESTED"]
+          }
+        }
+      }
+    },
+    "decision": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "current_route_disposition",
+        "future_boundary",
+        "task27_status",
+        "provider_selected",
+        "provider_read_authority",
+        "external_actions",
+        "raw_provider_responses_retained"
+      ],
+      "properties": {
+        "current_route_disposition": {"const": "CLOSE_CURRENT_SOLANA_TRACKER_15M_POOL_HISTORY_ROUTE_NOT_FEASIBLE"},
+        "future_boundary": {"const": "SEPARATE_OWNER_EXTERNAL_READ_DECISION_REQUIRED"},
+        "task27_status": {"const": "IN_PROGRESS_NO_ACCEPTANCE"},
+        "provider_selected": {"type": "null"},
+        "provider_read_authority": {"const": false},
+        "external_actions": {"const": 0},
+        "raw_provider_responses_retained": {"const": 0}
+      }
+    },
+    "claims": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["history_grade", "pit_admissible", "alpha", "execution", "pnl", "netreturn", "cashflow"],
+      "properties": {
+        "history_grade": {"const": "ONE_INCOMPLETE_PANEL_OBSERVED_NOT_PIT_ADMISSIBLE"},
+        "pit_admissible": {"const": false},
+        "alpha": {"const": false},
+        "execution": {"const": false},
+        "pnl": {"const": false},
+        "netreturn": {"const": false},
+        "cashflow": {"const": false}
+      }
+    }
+  },
+  "$defs": {
+    "sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+    "path_hash": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["path", "sha256"],
+      "properties": {
+        "path": {"type": "string", "minLength": 1},
+        "sha256": {"$ref": "#/$defs/sha256"}
+      }
+    }
+  }
+}
