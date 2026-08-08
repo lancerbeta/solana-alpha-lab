@@ -1,0 +1,66 @@
+{
+  "schema": "smial.task27.gap-classification-and-owner-route-decision.fixture",
+  "schema_version": "1.0",
+  "fixture_kind": "SYNTHETIC_GOLDEN_ONLY",
+  "valid_packets": [
+    {
+      "fixture_kind": "SYNTHETIC_GOLDEN_ONLY",
+      "source_bindings": {
+        "stage_a_receipt": {
+          "path": "docs/evidence/task27/a1_stage_a_public_pair_identity_runtime_receipt_v1.json",
+          "sha256": "fd315f72c8590b9b0de6e2a1231dca7f701e5cd517f343b3f97f44d17719c3e4"
+        },
+        "stage_b_receipt": {
+          "path": "docs/evidence/task27/a1s2_stage_b_pool_history_runtime_receipt_v1.json",
+          "sha256": "d7b83afa6d8bed68b38e620ef40f7e1fd647bf6053274b9a603b2945894815ec"
+        },
+        "stage_b_raw_evidence": {
+          "raw_manifest_sha256": "9f0503175d84bbb4ece777b962b1bbdb61a951f10268203d4c43d26f65d1851f",
+          "panel_projection_sha256": "9caa0b4e4727ab79d3169f365fe4753459f6b8f4482f44d567e6e6579a602f9c"
+        }
+      },
+      "observation": {
+        "expected_natural_bars": 96,
+        "observed_bars": 33,
+        "missing_natural_bars": 63,
+        "returned_zero_volume_bars": 18,
+        "internal_gap_regions": 21,
+        "largest_gap_seconds": 8100,
+        "missing_data_state": "MISSING_UNKNOWN",
+        "missing_as_zero": false
+      },
+      "explanations": [
+        {"id": "trade_only_endpoint_emission", "classification": "NARROW_FORM_FALSIFIED"},
+        {"id": "low_activity_correlated_missingness", "classification": "POSSIBLE_NOT_PROVEN"},
+        {"id": "provider_aggregation_or_coverage", "classification": "POSSIBLE_NOT_PROVEN"},
+        {"id": "market_label_difference", "classification": "NOT_TESTED"}
+      ],
+      "decision": {
+        "current_route_disposition": "CLOSE_CURRENT_SOLANA_TRACKER_15M_POOL_HISTORY_ROUTE_NOT_FEASIBLE",
+        "future_boundary": "SEPARATE_OWNER_EXTERNAL_READ_DECISION_REQUIRED",
+        "task27_status": "IN_PROGRESS_NO_ACCEPTANCE",
+        "provider_selected": null,
+        "provider_read_authority": false,
+        "external_actions": 0,
+        "raw_provider_responses_retained": 0
+      },
+      "claims": {
+        "history_grade": "ONE_INCOMPLETE_PANEL_OBSERVED_NOT_PIT_ADMISSIBLE",
+        "pit_admissible": false,
+        "alpha": false,
+        "execution": false,
+        "pnl": false,
+        "netreturn": false,
+        "cashflow": false
+      }
+    }
+  ],
+  "adversarial_cases": [
+    {"case_id": "missing-to-zero", "pointer": "/observation/missing_as_zero", "replacement": true},
+    {"case_id": "trade-only-cause", "pointer": "/explanations/0/classification", "replacement": "POSSIBLE_NOT_PROVEN"},
+    {"case_id": "proven-cause", "pointer": "/explanations/1/classification", "replacement": "PROVEN_CAUSE"},
+    {"case_id": "pit-promotion", "pointer": "/claims/pit_admissible", "replacement": true},
+    {"case_id": "automatic-provider", "pointer": "/decision/provider_selected", "replacement": "UNAPPROVED_PROVIDER"},
+    {"case_id": "task-close-promotion", "pointer": "/decision/task27_status", "replacement": "DONE"}
+  ]
+}
