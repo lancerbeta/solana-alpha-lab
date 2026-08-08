@@ -20,6 +20,18 @@ ACCEPTANCE_PATH = ROOT / "docs/evidence/task27/a2_terminal_reconciliation_and_so
 A1S4_ACCEPTANCE_PATH = ROOT / "docs/evidence/task27/a1s4_owner_route_close_and_task_outcome_acceptance_v1.json"
 REGISTRY_PATH = ROOT / "docs/project_sources/release_registry_v1.yaml"
 RELEASE_ROOT = ROOT / "docs/project_sources/releases/PSR-0002-T27-CLOSE"
+CATALOG_MANIFEST_PATH = ROOT / "catalog/catalog_manifest.yaml"
+DECISIONS_REGISTRY_PATH = ROOT / "registries/decisions_negative_results.yaml"
+
+EXPECTED_CATALOG_ASSET_IDS = {
+    "EVIDENCE-T27-A1S4-OWNER-ROUTE-CLOSE-001",
+    "CONTRACT-T27-TERMINAL-RECONCILIATION-001",
+    "CONFIG-T27-TERMINAL-RECONCILIATION-001",
+    "SCHEMA-T27-TERMINAL-RECONCILIATION-001",
+    "FIXTURE-T27-TERMINAL-RECONCILIATION-001",
+    "TEST-T27-TERMINAL-RECONCILIATION-001",
+    "EVIDENCE-T27-A2-TERMINAL-RECONCILIATION-001",
+}
 
 TERMINAL_RESULT = "NO_FEASIBLE_PUBLIC_HISTORY_ROUTE_DEMONSTRATED_WITHIN_AUTHORIZED_SCOPE"
 EXPECTED_ADVERSARIAL_ERRORS = {
@@ -154,6 +166,50 @@ class Task27TerminalReconciliationAndSourcesReleaseTests(unittest.TestCase):
         candidate = releases["PSR-0002-T27-CLOSE"]
         self.assertEqual(candidate["status"], "VALIDATED_CANDIDATE_UI_ACTIVATION_PENDING")
         self.assertIsNone(candidate["activation_receipt"])
+
+    def test_catalog_records_terminal_evidence_and_limited_negative_result(self) -> None:
+        self.assertTrue(CATALOG_MANIFEST_PATH.is_file(), CATALOG_MANIFEST_PATH)
+        self.assertTrue(DECISIONS_REGISTRY_PATH.is_file(), DECISIONS_REGISTRY_PATH)
+        manifest = load_yaml(CATALOG_MANIFEST_PATH)
+        self.assertIn(
+            "catalog/schemas/task27_terminal_reconciliation_and_sources_release.schema.json",
+            manifest["root_resolver"]["schemas"],
+        )
+        self.assertEqual(manifest["current_checkpoint"]["assets"], 568)
+        self.assertEqual(manifest["current_checkpoint"]["schemas"], 15)
+        asset_documents = [
+            load_yaml(ROOT / path)
+            for path in manifest["root_resolver"]["asset_registries"]
+        ]
+        assets = {
+            record["asset_id"]: record
+            for document in asset_documents
+            for record in document["records"]
+        }
+        self.assertTrue(EXPECTED_CATALOG_ASSET_IDS.issubset(assets))
+        self.assertEqual(
+            assets["EVIDENCE-T27-A2-TERMINAL-RECONCILIATION-001"]["relations"],
+            [
+                {
+                    "relation_type": "derived_from",
+                    "target_asset_id": "EVIDENCE-T27-A1S4-OWNER-ROUTE-CLOSE-001",
+                },
+                {
+                    "relation_type": "validated_by",
+                    "target_asset_id": "TEST-T27-TERMINAL-RECONCILIATION-001",
+                },
+            ],
+        )
+        decisions = load_yaml(DECISIONS_REGISTRY_PATH)
+        negative = next(
+            record
+            for record in decisions["records"]
+            if record["record_id"] == "NEGATIVE-T27-PUBLIC-HISTORY-ROUTE-V1-001"
+        )
+        self.assertEqual(negative["record_kind"], "negative_result")
+        self.assertEqual(negative["evidence_asset_ids"], ["EVIDENCE-T27-A2-TERMINAL-RECONCILIATION-001"])
+        self.assertIn("MISSING_UNKNOWN", negative["summary"])
+        self.assertIn("not a claim about all public history", negative["summary"])
 
 
 if __name__ == "__main__":
