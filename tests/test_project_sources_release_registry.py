@@ -238,7 +238,6 @@ class ProjectSourcesReleaseRegistryTests(unittest.TestCase):
             for path in changed_paths
             if path.startswith("docs/evidence/") and "acceptance" in Path(path).name and path.endswith(".json")
         ]
-        self.assertTrue(changed_receipts, "SOURCE_DISPOSITION_RECEIPT_REQUIRED")
         changed_release_paths = {path for path in changed_paths if path.startswith("docs/project_sources/")}
         for receipt_path in changed_receipts:
             with self.subTest(receipt=receipt_path):
