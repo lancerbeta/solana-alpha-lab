@@ -16,6 +16,7 @@ CONTRACT_PATH = ROOT / "docs/contracts/task27_exact_owner_external_read_review_c
 CONFIG_PATH = ROOT / "configs/task27_exact_owner_external_read_review_contract_v1.yaml"
 SCHEMA_PATH = ROOT / "catalog/schemas/task27_exact_owner_external_read_review.schema.json"
 FIXTURE_PATH = ROOT / "tests/fixtures/task27/exact_owner_external_read_review_v1.json"
+ACCEPTANCE_PATH = ROOT / "docs/evidence/task27/a0a6_exact_owner_external_read_review_acceptance_v1.json"
 SOURCE_SMOKE_RECEIPT_PATH = ROOT / "docs/evidence/task27/a0a5r1_project_sources_activation_receipt_v1.json"
 REQUIRED_PATHS = (
     CONTRACT_PATH,
@@ -178,6 +179,28 @@ class ExactOwnerExternalReadReviewContractTests(unittest.TestCase):
                 apply_json_pointer(packet, case["pointer"], case["value"])
                 self.assertEqual(list(validator.iter_errors(packet)), [])
                 self.assertEqual(semantic_errors(packet, policy), {case["expected_error"]})
+
+    def test_acceptance_receipt_binds_assets_and_preserves_offline_boundary(self) -> None:
+        self.assertTrue(ACCEPTANCE_PATH.is_file(), ACCEPTANCE_PATH)
+        receipt = load_json(ACCEPTANCE_PATH)
+        expected_bindings = {
+            CONTRACT_PATH.relative_to(ROOT).as_posix(): sha256(CONTRACT_PATH),
+            CONFIG_PATH.relative_to(ROOT).as_posix(): sha256(CONFIG_PATH),
+            SCHEMA_PATH.relative_to(ROOT).as_posix(): sha256(SCHEMA_PATH),
+            FIXTURE_PATH.relative_to(ROOT).as_posix(): sha256(FIXTURE_PATH),
+        }
+        actual_bindings = {
+            binding["path"]: binding["sha256"]
+            for binding in receipt["artifact_bindings"].values()
+        }
+        self.assertEqual(actual_bindings, expected_bindings)
+        self.assertEqual(receipt["project_sources_disposition"]["kind"], "NO_CHANGE")
+        self.assertEqual(receipt["validation"]["targeted_tests_run"], 5)
+        self.assertEqual(receipt["validation"]["adversarial_cases_rejected"], 10)
+        self.assertEqual(receipt["state_change"], "NONE")
+        self.assertFalse(receipt["next_boundary"]["provider_read_authority_granted"])
+        for value in receipt["measured_boundary"].values():
+            self.assertIn(value, (0, False))
 
 
 if __name__ == "__main__":
