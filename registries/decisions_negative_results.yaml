@@ -1,12 +1,14 @@
 schema_version: '1.0'
 registry_id: SMIAL-REGISTRY-DECISIONS-NEGATIVE-RESULTS
 registry_type: decisions_negative_results
-as_of: '2026-08-06'
-truth_owner: TASK-26
+as_of: '2026-08-08'
+truth_owner: TASK-27
 source_asset_ids:
 - EVIDENCE-T24-A6-STOP-DECISION-001
 - EVIDENCE-OWNER-AUTHORITY-PACKET-A2-001
 - EVIDENCE-CANARY-SPECIFICATION-ONLY-A2-001
+- EVIDENCE-T27-A1S4-OWNER-ROUTE-CLOSE-001
+- EVIDENCE-T27-A2-TERMINAL-RECONCILIATION-001
 records:
 - record_kind: negative_result
   record_id: NEGATIVE-T24-ENTITY-SIGNAL-V1-001
@@ -32,3 +34,10 @@ records:
   - EVIDENCE-CANARY-SPECIFICATION-ONLY-A1-001
   - EVIDENCE-CANARY-SPECIFICATION-ONLY-A2-001
   summary: "OFFLINE_SPECIFICATION_READY_NO_EXECUTION_AUTHORITY: a single 300-cent draft specification is hash-bound, owner values remain local, and no wallet, signer, provider, transaction, cash or TASK-27 authority is created."
+- record_kind: negative_result
+  record_id: NEGATIVE-T27-PUBLIC-HISTORY-ROUTE-V1-001
+  status: RECORDED
+  created_at: '2026-08-08T00:00:00Z'
+  evidence_asset_ids:
+  - EVIDENCE-T27-A2-TERMINAL-RECONCILIATION-001
+  summary: "TASK-27 closed only the named authorized public 15-minute pool-history route: 33 of 96 required bars were observed, 63 remain MISSING_UNKNOWN, and no new provider read was authorized. This is not a claim about all public history, alpha, execution, PnL, NetReturn, or cashflow."

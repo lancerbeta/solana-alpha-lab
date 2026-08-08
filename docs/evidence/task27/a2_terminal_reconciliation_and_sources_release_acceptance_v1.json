@@ -1,0 +1,112 @@
+{
+  "schema": "smial.task27.terminal-reconciliation-and-sources-release.acceptance",
+  "schema_version": "1.0",
+  "task_id": "TASK-27",
+  "atom_id": "T27-A2_TERMINAL_RECONCILIATION_AND_SOURCES_RELEASE_CANDIDATE_V1",
+  "evidence_id": "T27-A2-TERMINAL-RECONCILIATION-001",
+  "status": "PASS_OFFLINE_TERMINAL_RECONCILIATION_PENDING_DELIVERY",
+  "artifact_bindings": {
+    "contract": {
+      "path": "docs/contracts/task27_terminal_reconciliation_and_sources_release_contract_v1.md",
+      "sha256": "d5c68188060a5a7e3e329c9bebea46d1e720e0610acd0c42b60a485f366775af"
+    },
+    "config": {
+      "path": "configs/task27_terminal_reconciliation_and_sources_release_v1.yaml",
+      "sha256": "77ad5dc7b0b3697aa7d29d95995074a66c6c5881c1f02cd03e26f199fac79fad"
+    },
+    "schema": {
+      "path": "catalog/schemas/task27_terminal_reconciliation_and_sources_release.schema.json",
+      "sha256": "76ae3f83336ea45de02eed47de584fc2cffc8868849720aa63a3f3215add8e8b"
+    },
+    "fixture": {
+      "path": "tests/fixtures/task27/terminal_reconciliation_and_sources_release_v1.json",
+      "sha256": "741093f4e55b3448b4adf0207daf922b05604ce1e3ee681b46a726a51d0fe515"
+    },
+    "a1s4_acceptance": {
+      "path": "docs/evidence/task27/a1s4_owner_route_close_and_task_outcome_acceptance_v1.json",
+      "sha256": "e901a59a72da29b3eb4a90e24a7d3bde91a4fc00c023310086376747ebe47e6d"
+    }
+  },
+  "valid_fixture_count": 1,
+  "adversarial_rejection_count": 6,
+  "adversarial_rejections": [
+    "A1S4_BINDING_DRIFT",
+    "GLOBAL_HISTORY_CLAIM_FORBIDDEN",
+    "NEW_PROVIDER_AUTHORITY_FORBIDDEN",
+    "MISSING_TO_ZERO_FORBIDDEN",
+    "PREMATURE_UI_ACTIVATION_FORBIDDEN",
+    "INVENTED_NEXT_TASK_FORBIDDEN"
+  ],
+  "decision": {
+    "task27_outcome": "CLOSE_WITH_LIMITED_NEGATIVE_RESULT",
+    "terminal_result": "NO_FEASIBLE_PUBLIC_HISTORY_ROUTE_DEMONSTRATED_WITHIN_AUTHORIZED_SCOPE",
+    "task27_repository_state": "TECHNICALLY_RECONCILED_PENDING_SOURCE_ACTIVATION",
+    "next_task_selected": false
+  },
+  "authority": {
+    "provider_api_rpc_wss_calls": 0,
+    "credential_use": false,
+    "raw_provider_responses_retained": 0,
+    "r2_value_reads": 0,
+    "r3_value_or_path_reads": 0,
+    "wallet_signer_transaction_actions": 0,
+    "cash_spend_usd_cents": 0
+  },
+  "side_effect_counters": {
+    "provider_api_rpc_wss_calls": 0,
+    "credential_uses": 0,
+    "raw_provider_responses_retained": 0,
+    "r2_value_reads": 0,
+    "r3_value_or_path_reads": 0,
+    "wallet_signer_transaction_actions": 0,
+    "cash_spend_usd_cents": 0,
+    "dependency_changes": 0,
+    "project_sources_ui_changes": 0
+  },
+  "claims": {
+    "public_history_globally_infeasible": false,
+    "pit_admissible": false,
+    "alpha": false,
+    "execution": false,
+    "pnl": false,
+    "netreturn": false,
+    "cashflow": false
+  },
+  "factory_fit_review": "FULL_REVIEW",
+  "factory_fit": {
+    "verdict": "PASS_WITH_LIMITATIONS",
+    "mission": "PASS_CLOSES_ONE_DISPROVEN_ROUTE_WITHOUT_CONFLATING_ROUTE_FAILURE_WITH_ALPHA_FAILURE",
+    "research_truth": "PASS_PRESERVES_33_OF_96_AND_63_MISSING_UNKNOWN_AS_ROUTE_SPECIFIC_EVIDENCE",
+    "owner_operability": "PASS_REDUCES_THE_OPEN_ROUTE_TO_ONE_FUTURE_OWNER_SMOKE_ACTION",
+    "efficiency": "PASS_REUSES_A1S4_WITH_ZERO_EXTERNAL_COST_OR_NEW_COLLECTION",
+    "flexibility": "PASS_NEW_HISTORY_SOURCE_REMAINS_OPTIONAL_AND_REQUIRES_A_NAMED_CONSUMER_AND_NEW_AUTHORITY",
+    "execution_to_cashflow": "NOT_IN_SCOPE_NO_CLAIM",
+    "monitoring_recovery": "PASS_NO_PROCESS_PROVIDER_OR_OPEN_STATE_WAS_CREATED"
+  },
+  "product_horizon_radar": {
+    "now": {
+      "candidate": "TASK27_TERMINAL_RECONCILIATION",
+      "value": "Makes the factory remember a bounded failed route instead of leaving a stale external-read request open.",
+      "evidence": "A1S2 observed 33 of 96 required bars and A1S4 binds NO_NEW_PROVIDER_READ.",
+      "cost_risk": "Zero provider, credential, wallet or cash action.",
+      "owner": "Goal owner",
+      "activation_trigger": "A1S4 accepted route close.",
+      "why_now": "The prior external-read review is no longer owner intent."
+    },
+    "watch": {
+      "candidate": "NEW_HISTORY_SOURCE_ONLY_FOR_A_NAMED_CONSUMER",
+      "value": "Keeps future price-volume research available without treating it as an automatic fallback.",
+      "evidence": "No authorized comparison of another provider exists.",
+      "cost_risk": "Requires a separate data contract and exact owner external-read authority.",
+      "owner": "Goal owner",
+      "activation_trigger": "A named hypothesis cannot proceed without a continuous PIT-admissible history panel.",
+      "why_not_now": "The owner selected no new provider read."
+    }
+  },
+  "project_sources_disposition": {
+    "kind": "RELEASE_CANDIDATE",
+    "release_id": "PSR-0002-T27-CLOSE",
+    "registry_path": "docs/project_sources/release_registry_v1.yaml"
+  },
+  "state_change": "NONE"
+}

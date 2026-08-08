@@ -1,0 +1,66 @@
+{
+  "schema": "smial.task27.terminal-reconciliation-and-sources-release.fixture",
+  "schema_version": "1.0",
+  "fixture_kind": "SYNTHETIC_GOLDEN_ONLY",
+  "valid_packets": [
+    {
+      "fixture_kind": "SYNTHETIC_GOLDEN_ONLY",
+      "source_bindings": {
+        "a1s4_acceptance": {
+          "path": "docs/evidence/task27/a1s4_owner_route_close_and_task_outcome_acceptance_v1.json",
+          "sha256": "e901a59a72da29b3eb4a90e24a7d3bde91a4fc00c023310086376747ebe47e6d"
+        }
+      },
+      "result": "NO_FEASIBLE_PUBLIC_HISTORY_ROUTE_DEMONSTRATED_WITHIN_AUTHORIZED_SCOPE",
+      "owner_decision": {
+        "route_close": "ACCEPTED",
+        "new_provider_read": "NO_NEW_PROVIDER_READ"
+      },
+      "missingness": {
+        "state": "MISSING_UNKNOWN",
+        "missing_as_zero": false
+      },
+      "decision": {
+        "task27_outcome": "CLOSE_WITH_LIMITED_NEGATIVE_RESULT",
+        "task27_repository_state": "TECHNICALLY_RECONCILED_PENDING_SOURCE_ACTIVATION",
+        "next_task_selected": false
+      },
+      "authority": {
+        "provider_api_rpc_wss_calls": 0,
+        "credential_use": false,
+        "raw_provider_responses_retained": 0,
+        "r2_value_reads": 0,
+        "r3_value_or_path_reads": 0,
+        "wallet_signer_transaction_actions": 0,
+        "cash_spend_usd_cents": 0
+      },
+      "claims": {
+        "public_history_globally_infeasible": false,
+        "pit_admissible": false,
+        "alpha": false,
+        "execution": false,
+        "pnl": false,
+        "netreturn": false,
+        "cashflow": false
+      },
+      "source_release": {
+        "release_id": "PSR-0002-T27-CLOSE",
+        "activation_state": "UI_ACTIVATION_PENDING_OWNER_SMOKE",
+        "mutable_roles": ["canonical_manifest", "roadmap", "current_system_state", "phase_archive", "active_task"],
+        "immutable_roles": ["operating_system", "research_blueprint"]
+      },
+      "next_task": {
+        "selected": false,
+        "task_id": null
+      }
+    }
+  ],
+  "adversarial_cases": [
+    {"case_id": "a1s4-binding-drift", "pointer": "/source_bindings/a1s4_acceptance/sha256", "replacement": "0000000000000000000000000000000000000000000000000000000000000000"},
+    {"case_id": "global-history", "pointer": "/claims/public_history_globally_infeasible", "replacement": true},
+    {"case_id": "new-provider", "pointer": "/authority/provider_api_rpc_wss_calls", "replacement": 1},
+    {"case_id": "missing-to-zero", "pointer": "/missingness/missing_as_zero", "replacement": true},
+    {"case_id": "premature-ui", "pointer": "/source_release/activation_state", "replacement": "ACTIVATED_BY_OWNER_SMOKE"},
+    {"case_id": "invented-next-task", "pointer": "/next_task/selected", "replacement": true}
+  ]
+}

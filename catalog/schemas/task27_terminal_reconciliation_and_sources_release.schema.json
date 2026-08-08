@@ -1,0 +1,117 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "smial.task27.terminal-reconciliation-and-sources-release.schema.v1",
+  "title": "TASK-27 terminal reconciliation and Project Sources release",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "fixture_kind",
+    "source_bindings",
+    "result",
+    "owner_decision",
+    "missingness",
+    "decision",
+    "authority",
+    "claims",
+    "source_release",
+    "next_task"
+  ],
+  "properties": {
+    "fixture_kind": {"const": "SYNTHETIC_GOLDEN_ONLY"},
+    "source_bindings": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["a1s4_acceptance"],
+      "properties": {"a1s4_acceptance": {"$ref": "#/$defs/path_hash"}}
+    },
+    "result": {"const": "NO_FEASIBLE_PUBLIC_HISTORY_ROUTE_DEMONSTRATED_WITHIN_AUTHORIZED_SCOPE"},
+    "owner_decision": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["route_close", "new_provider_read"],
+      "properties": {
+        "route_close": {"const": "ACCEPTED"},
+        "new_provider_read": {"const": "NO_NEW_PROVIDER_READ"}
+      }
+    },
+    "missingness": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["state", "missing_as_zero"],
+      "properties": {
+        "state": {"const": "MISSING_UNKNOWN"},
+        "missing_as_zero": {"const": false}
+      }
+    },
+    "decision": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["task27_outcome", "task27_repository_state", "next_task_selected"],
+      "properties": {
+        "task27_outcome": {"const": "CLOSE_WITH_LIMITED_NEGATIVE_RESULT"},
+        "task27_repository_state": {"const": "TECHNICALLY_RECONCILED_PENDING_SOURCE_ACTIVATION"},
+        "next_task_selected": {"const": false}
+      }
+    },
+    "authority": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["provider_api_rpc_wss_calls", "credential_use", "raw_provider_responses_retained", "r2_value_reads", "r3_value_or_path_reads", "wallet_signer_transaction_actions", "cash_spend_usd_cents"],
+      "properties": {
+        "provider_api_rpc_wss_calls": {"const": 0},
+        "credential_use": {"const": false},
+        "raw_provider_responses_retained": {"const": 0},
+        "r2_value_reads": {"const": 0},
+        "r3_value_or_path_reads": {"const": 0},
+        "wallet_signer_transaction_actions": {"const": 0},
+        "cash_spend_usd_cents": {"const": 0}
+      }
+    },
+    "claims": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["public_history_globally_infeasible", "pit_admissible", "alpha", "execution", "pnl", "netreturn", "cashflow"],
+      "properties": {
+        "public_history_globally_infeasible": {"const": false},
+        "pit_admissible": {"const": false},
+        "alpha": {"const": false},
+        "execution": {"const": false},
+        "pnl": {"const": false},
+        "netreturn": {"const": false},
+        "cashflow": {"const": false}
+      }
+    },
+    "source_release": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["release_id", "activation_state", "mutable_roles", "immutable_roles"],
+      "properties": {
+        "release_id": {"const": "PSR-0002-T27-CLOSE"},
+        "activation_state": {"const": "UI_ACTIVATION_PENDING_OWNER_SMOKE"},
+        "mutable_roles": {"const": ["canonical_manifest", "roadmap", "current_system_state", "phase_archive", "active_task"]},
+        "immutable_roles": {"const": ["operating_system", "research_blueprint"]}
+      }
+    },
+    "next_task": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["selected", "task_id"],
+      "properties": {
+        "selected": {"const": false},
+        "task_id": {"type": "null"}
+      }
+    }
+  },
+  "$defs": {
+    "sha256": {"type": "string", "pattern": "^[a-f0-9]{64}$"},
+    "path_hash": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["path", "sha256"],
+      "properties": {
+        "path": {"type": "string", "minLength": 1},
+        "sha256": {"$ref": "#/$defs/sha256"}
+      }
+    }
+  }
+}

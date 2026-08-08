@@ -1,6 +1,6 @@
 schema_version: '1.1'
 registry_id: CATALOG-ASSET-REGISTRY-CORE-001
-as_of: '2026-08-02'
+as_of: '2026-08-08'
 records:
 - asset_id: SCM-BASELINE-COMMIT-001
   record_version: '1.0'
@@ -14807,7 +14807,7 @@ records:
   as_of: '2026-08-08'
   truth_owner: CANARY_SPECIFICATION_ONLY_V1
   location: {kind: git_path, logical_uri: 'repo://tests/test_canary_specification_only_catalog_factory_fit.py', repository_path: tests/test_canary_specification_only_catalog_factory_fit.py}
-  integrity: {kind: sha256, sha256: 340118ab84e8be1fe2a5693898983cd892f350310624ab798cf1fde14ff90b77}
+  integrity: {kind: sha256, sha256: 4579023260c3baaa387275c1a97b9acd3e1d23369400c7fc2bee91ac54eab8fc}
   access: *t25_read_file
   relations:
   - {relation_type: depends_on, target_asset_id: EVIDENCE-CANARY-SPECIFICATION-ONLY-A2-001}
@@ -14939,5 +14939,125 @@ records:
   - {relation_type: derived_from, target_asset_id: POLICY-OWNER-ATTENTION-GATE-001}
   - {relation_type: validated_by, target_asset_id: TEST-OWNER-ATTENTION-GATE-001}
   consumers: [FACTORY-001, CTRL-OWNER-ATTENTION-GATE]
+  evidence: []
+  classification: *t25_internal
+
+- asset_id: EVIDENCE-T27-A1S4-OWNER-ROUTE-CLOSE-001
+  record_version: '1.0'
+  asset_type: evidence
+  purpose: Accepted owner route-close and limited-outcome decision retained as TASK-27 terminal input.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-08-08'
+  truth_owner: TASK-27
+  location: {kind: git_path, logical_uri: 'repo://docs/evidence/task27/a1s4_owner_route_close_and_task_outcome_acceptance_v1.json', repository_path: docs/evidence/task27/a1s4_owner_route_close_and_task_outcome_acceptance_v1.json}
+  integrity: {kind: sha256, sha256: e901a59a72da29b3eb4a90e24a7d3bde91a4fc00c023310086376747ebe47e6d}
+  access: *t25_read_file
+  relations: []
+  consumers: [TASK-27, FACTORY-001]
+  evidence: []
+  classification: *t25_internal
+
+- asset_id: CONTRACT-T27-TERMINAL-RECONCILIATION-001
+  record_version: '1.0'
+  asset_type: control_document
+  purpose: Versioned offline contract for TASK-27 route-specific terminal reconciliation and Source release boundary.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-08-08'
+  truth_owner: TASK-27
+  location: {kind: git_path, logical_uri: 'repo://docs/contracts/task27_terminal_reconciliation_and_sources_release_contract_v1.md', repository_path: docs/contracts/task27_terminal_reconciliation_and_sources_release_contract_v1.md}
+  integrity: {kind: sha256, sha256: d5c68188060a5a7e3e329c9bebea46d1e720e0610acd0c42b60a485f366775af}
+  access: *t25_read_file
+  relations:
+  - {relation_type: derived_from, target_asset_id: EVIDENCE-T27-A1S4-OWNER-ROUTE-CLOSE-001}
+  consumers: [TASK-27, FACTORY-001]
+  evidence: []
+  classification: *t25_internal
+
+- asset_id: CONFIG-T27-TERMINAL-RECONCILIATION-001
+  record_version: '1.0'
+  asset_type: configuration
+  purpose: Machine-readable limited outcome, no-authority and Source activation-pending policy for TASK-27.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-08-08'
+  truth_owner: TASK-27
+  location: {kind: git_path, logical_uri: 'repo://configs/task27_terminal_reconciliation_and_sources_release_v1.yaml', repository_path: configs/task27_terminal_reconciliation_and_sources_release_v1.yaml}
+  integrity: {kind: sha256, sha256: 77ad5dc7b0b3697aa7d29d95995074a66c6c5881c1f02cd03e26f199fac79fad}
+  access: *t25_read_file
+  relations:
+  - {relation_type: governed_by, target_asset_id: CONTRACT-T27-TERMINAL-RECONCILIATION-001}
+  consumers: [TASK-27, FACTORY-001]
+  evidence: []
+  classification: *t25_internal
+
+- asset_id: SCHEMA-T27-TERMINAL-RECONCILIATION-001
+  record_version: '1.0'
+  asset_type: schema
+  purpose: JSON Schema for TASK-27 limited terminal reconciliation and Source candidate fixture.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-08-08'
+  truth_owner: TASK-27
+  location: {kind: git_path, logical_uri: 'repo://catalog/schemas/task27_terminal_reconciliation_and_sources_release.schema.json', repository_path: catalog/schemas/task27_terminal_reconciliation_and_sources_release.schema.json}
+  integrity: {kind: sha256, sha256: 76ae3f83336ea45de02eed47de584fc2cffc8868849720aa63a3f3215add8e8b}
+  access: *t25_read_file
+  relations:
+  - {relation_type: governed_by, target_asset_id: CONTRACT-T27-TERMINAL-RECONCILIATION-001}
+  consumers: [TASK-27, FACTORY-001]
+  evidence: []
+  classification: *t25_internal
+
+- asset_id: FIXTURE-T27-TERMINAL-RECONCILIATION-001
+  record_version: '1.0'
+  asset_type: evidence
+  purpose: Synthetic golden and adversarial matrix for TASK-27 terminal reconciliation boundary checks.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-08-08'
+  truth_owner: TASK-27
+  location: {kind: git_path, logical_uri: 'repo://tests/fixtures/task27/terminal_reconciliation_and_sources_release_v1.json', repository_path: tests/fixtures/task27/terminal_reconciliation_and_sources_release_v1.json}
+  integrity: {kind: sha256, sha256: 741093f4e55b3448b4adf0207daf922b05604ce1e3ee681b46a726a51d0fe515}
+  access: *t25_read_file
+  relations:
+  - {relation_type: derived_from, target_asset_id: CONFIG-T27-TERMINAL-RECONCILIATION-001}
+  consumers: [TASK-27, FACTORY-001]
+  evidence: []
+  classification: *t25_internal
+
+- asset_id: TEST-T27-TERMINAL-RECONCILIATION-001
+  record_version: '1.0'
+  asset_type: script
+  purpose: Deterministic adversarial tests for TASK-27 route-specific closure, Catalog and Source candidate state.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-08-08'
+  truth_owner: TASK-27
+  location: {kind: git_path, logical_uri: 'repo://tests/test_task27_terminal_reconciliation_and_sources_release.py', repository_path: tests/test_task27_terminal_reconciliation_and_sources_release.py}
+  integrity: {kind: sha256, sha256: 3ba4f33c3fb9880c73b86568926d9d891ac11068b9ca8d7e5fd12399256da9e5}
+  access: *t25_read_file
+  relations:
+  - {relation_type: depends_on, target_asset_id: SCHEMA-T27-TERMINAL-RECONCILIATION-001}
+  - {relation_type: depends_on, target_asset_id: FIXTURE-T27-TERMINAL-RECONCILIATION-001}
+  consumers: [TASK-27, FACTORY-001]
+  evidence: []
+  classification: *t25_internal
+
+- asset_id: EVIDENCE-T27-A2-TERMINAL-RECONCILIATION-001
+  record_version: '1.0'
+  asset_type: evidence
+  purpose: FULL Factory Fit acceptance receipt for TASK-27 limited terminal result and pending Source candidate.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-08-08'
+  truth_owner: TASK-27
+  location: {kind: git_path, logical_uri: 'repo://docs/evidence/task27/a2_terminal_reconciliation_and_sources_release_acceptance_v1.json', repository_path: docs/evidence/task27/a2_terminal_reconciliation_and_sources_release_acceptance_v1.json}
+  integrity: {kind: sha256, sha256: e598e7ac1779bf7ab7993def4d1474a70ef12cc36a2abccb8132adf9a4bcda5e}
+  access: *t25_read_file
+  relations:
+  - {relation_type: derived_from, target_asset_id: EVIDENCE-T27-A1S4-OWNER-ROUTE-CLOSE-001}
+  - {relation_type: validated_by, target_asset_id: TEST-T27-TERMINAL-RECONCILIATION-001}
+  consumers: [TASK-27, FACTORY-001]
   evidence: []
   classification: *t25_internal
