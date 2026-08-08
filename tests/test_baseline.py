@@ -2758,6 +2758,30 @@ class GitTopologyPolicyTests(unittest.TestCase):
     def test_bound_pre_push_state_passes(self) -> None:
         self.assertEqual(self.classify_topology(), "BOUND_PRE_PUSH")
 
+    def test_exact_ssh_origin_is_an_allowed_local_transport(self) -> None:
+        self.assertEqual(
+            self.classify_topology(
+                fetch_urls=(module.EXPECTED_SSH_ORIGIN_URL,),
+                push_urls=(module.EXPECTED_SSH_ORIGIN_URL,),
+            ),
+            "BOUND_PRE_PUSH",
+        )
+
+    def test_ssh_origin_near_misses_fail(self) -> None:
+        for url in (
+            "git@github.com:lancerbeta/other.git",
+            "git@github.com:other/solana-alpha-lab.git",
+            "ssh://git@github.com/lancerbeta/solana-alpha-lab.git",
+        ):
+            with self.subTest(url=url):
+                self.assertEqual(
+                    self.classify_topology(
+                        fetch_urls=(url,),
+                        push_urls=(url,),
+                    ),
+                    "INVALID_GIT_TOPOLOGY",
+                )
+
     def test_bounded_codex_capture_ref_passes(self) -> None:
         capture_ref = (
             "refs/codex/turn-diffs/captures/1784666116506/"

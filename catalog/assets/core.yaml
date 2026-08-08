@@ -2015,16 +2015,17 @@ records:
     contains_raw_data: false
     sensitivity: INTERNAL_NON_SECRET
 - asset_id: VALIDATOR-REPOSITORY-STATE-001
-  record_version: '3.5'
+  record_version: '3.6'
   asset_type: script
   purpose: Fail-closed historical and compositional repository-state/topology
     validator through CTRL-BATON A6.4, including current runtime constraints
     for isolated tracked-only delivery clones and GitHub Actions main and
     pull-request merge checkouts plus clean parameterless manual-dispatch
-    feature-branch checkouts.
+    feature-branch checkouts and exact HTTPS/SSH local transports for the
+    canonical repository.
   status: IMPLEMENTED_UNVERIFIED
   origin: REPOSITORY
-  as_of: '2026-08-07'
+  as_of: '2026-08-08'
   truth_owner: TASK-04
   location:
     kind: git_path
@@ -2032,7 +2033,7 @@ records:
     repository_path: scripts/validate_baseline.py
   integrity:
     kind: sha256
-    sha256: 1765437f8a757e24a8032766c020c5143f1efd4801095bc4509cb53250900d92
+    sha256: 01015422e37cc3099813c2fc5dd134902d73fae2163f549597ef1fa08c55ddca
   access:
     mode: read_only
     method: command
