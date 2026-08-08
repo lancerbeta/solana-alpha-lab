@@ -1,0 +1,80 @@
+{
+  "valid_packet": {
+    "stage_a_receipt_sha256": "fd315f72c8590b9b0de6e2a1231dca7f701e5cd517f343b3f97f44d17719c3e4",
+    "identity": {
+      "network": "solana",
+      "pool_address": "URqx24yyYxtXXhTbBQnbtPLhtLWYoaDaRxuQuLpNS3S",
+      "base_mint": "DMwbVy48dWVKGe9z1pcVnwF3HLMLrqWdDLfbvx8RchhK",
+      "quote_mint": "So11111111111111111111111111111111111111112",
+      "dex_id": "pumpswap"
+    },
+    "frozen_window": {
+      "source": "A7_OWNER_NOMINATED_BEFORE_TIMESTAMP",
+      "approval_state": "PROPOSED_PENDING_NEW_STAGE_B_OWNER_AUTHORITY",
+      "time_from": 1786100400,
+      "time_to": 1786186800,
+      "lower_bound_inclusive": true,
+      "upper_bound_exclusive": true,
+      "timezone": "UTC",
+      "interval_seconds": 900,
+      "expected_natural_bars": 96
+    },
+    "requests": [
+      {
+        "request_id": "T27-A1S2-STAGE-B-TOKEN-001",
+        "kind": "TOKEN_IDENTITY",
+        "method": "GET",
+        "url": "https://data.solanatracker.io/tokens/DMwbVy48dWVKGe9z1pcVnwF3HLMLrqWdDLfbvx8RchhK",
+        "query": {}
+      },
+      {
+        "request_id": "T27-A1S2-STAGE-B-POOL-OHLCV-001",
+        "kind": "POOL_OHLCV",
+        "method": "GET",
+        "url": "https://data.solanatracker.io/chart/DMwbVy48dWVKGe9z1pcVnwF3HLMLrqWdDLfbvx8RchhK/URqx24yyYxtXXhTbBQnbtPLhtLWYoaDaRxuQuLpNS3S",
+        "query": {
+          "type": "15m",
+          "time_from": 1786100400,
+          "time_to": 1786186800,
+          "currency": "usd",
+          "removeOutliers": false,
+          "fastCache": false
+        }
+      }
+    ],
+    "fallback_provider": null,
+    "helius_reconstruction": "FORBIDDEN",
+    "authority": {
+      "provider_api_rpc_wss_calls": 0,
+      "credential_use": false,
+      "cash_spend_usd_cents": 0
+    },
+    "claims": {
+      "history_grade": "NO_HISTORY_COLLECTED",
+      "pit_admissible": false,
+      "alpha": false,
+      "execution": false,
+      "pnl": false,
+      "netreturn": false,
+      "cashflow": false
+    },
+    "future_owner_approval": {
+      "approval_granted": false,
+      "stage_b_request_authorized": false
+    },
+    "future_outcome": "OWNER_EXTERNAL_AUTHORITY_REQUIRED"
+  },
+  "adversarial_cases": [
+    {"case_id": "stage_a_hash_drift", "pointer": "/stage_a_receipt_sha256", "value": "0000000000000000000000000000000000000000000000000000000000000000", "expected_error": "STAGE_A_BINDING_MISMATCH"},
+    {"case_id": "base_mint_drift", "pointer": "/identity/base_mint", "value": "WrongMint", "expected_error": "IDENTITY_DRIFT"},
+    {"case_id": "floating_window", "pointer": "/frozen_window/time_to", "value": 1786187700, "expected_error": "WINDOW_DRIFT"},
+    {"case_id": "third_request", "pointer": "/requests", "value": [], "expected_error": "REQUEST_CAP_BREACH"},
+    {"case_id": "token_only_chart", "pointer": "/requests/1/url", "value": "https://data.solanatracker.io/chart/DMwbVy48dWVKGe9z1pcVnwF3HLMLrqWdDLfbvx8RchhK", "expected_error": "ENDPOINT_SCOPE_DRIFT"},
+    {"case_id": "outlier_filter_enabled", "pointer": "/requests/1/query/removeOutliers", "value": true, "expected_error": "TRANSFORMATION_OR_CACHE_DRIFT"},
+    {"case_id": "secret_marker_in_packet", "pointer": "/requests/0/query", "value": {"api_key": "redacted"}, "expected_error": "SECRET_EXPOSURE"},
+    {"case_id": "fallback_enabled", "pointer": "/fallback_provider", "value": "other", "expected_error": "FALLBACK_OR_HELIUS_FORBIDDEN"},
+    {"case_id": "offline_call_claim", "pointer": "/authority/provider_api_rpc_wss_calls", "value": 1, "expected_error": "OFFLINE_AUTHORITY_PROMOTION"},
+    {"case_id": "history_claim", "pointer": "/claims/history_grade", "value": "DESCRIPTIVE_ONLY", "expected_error": "PREMATURE_HISTORY_OR_ACCEPTANCE_CLAIM"},
+    {"case_id": "approval_promoted", "pointer": "/future_owner_approval/stage_b_request_authorized", "value": true, "expected_error": "OWNER_APPROVAL_PROMOTION"}
+  ]
+}
