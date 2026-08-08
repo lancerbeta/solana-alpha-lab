@@ -28,6 +28,7 @@
 - Create: `docs/architecture/intents/ARCH-INTENT-004-factory-context-capsule-and-workbench-boundary.md`
 - Modify: `catalog/assets/architecture.yaml`
 - Modify: `catalog/catalog_manifest.yaml`
+- Modify: `catalog/assets/lifecycle.yaml`
 - Generate: `catalog/generated/asset_edges.json`
 - Generate: `docs/PROJECT_MAP.md`
 
@@ -238,6 +239,13 @@ Expected: generated edge and Project Map files are changed only by the
 generator; Catalog validation reports 554 assets; all focused tests pass; the
 final generator check reports `GENERATOR_CHECK: PASS`.
 
+The generated views are content-bound Catalog assets. After the generator
+changes either view, refresh only the corresponding `GENERATED-PROJECT-MAP-001`
+and `GENERATED-EDGE-PROJECTION-001` SHA-256 records in
+`catalog/assets/lifecycle.yaml`, then rerun the strict Catalog validator. This
+is required to preserve the existing self-integrity contract; it does not
+implement the Context Capsule or add authority.
+
 - [ ] **Step 5: Commit the checked architecture registration**
 
 ```text
@@ -246,7 +254,7 @@ git diff --cached --check
 git commit -m "docs: register ARCH-INTENT-004 context boundary"
 ```
 
-Expected: one ordinary commit with exactly six files and pre-commit PASS.
+Expected: one ordinary commit with exactly seven files and pre-commit PASS.
 
 ### Task 2: Deliver the intent without widening authority
 
@@ -267,7 +275,7 @@ git diff --name-status origin/main...HEAD
 git diff --check origin/main...HEAD
 ```
 
-Expected: the design and plan support documents plus exactly six Task 1 files;
+Expected: the design and plan support documents plus exactly seven Task 1 files;
 the working tree is clean; no provider, raw, source-release or generated file
 outside the generator pair changed.
 
