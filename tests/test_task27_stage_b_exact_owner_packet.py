@@ -120,7 +120,6 @@ class StageBExactOwnerPacketTests(unittest.TestCase):
             with self.subTest(path=path):
                 self.assertTrue(path.is_file(), path)
 
-    @unittest.skipUnless(all(path.is_file() for path in REQUIRED_PATHS), "owner packet assets not implemented")
     def test_valid_packet_is_schema_valid_and_remains_offline(self) -> None:
         schema = load_json(SCHEMA_PATH)
         fixture = load_json(FIXTURE_PATH)
@@ -130,7 +129,6 @@ class StageBExactOwnerPacketTests(unittest.TestCase):
         self.assertEqual(fixture["valid_packet"]["authority"]["provider_api_rpc_wss_calls"], 0)
         self.assertFalse(fixture["valid_packet"]["authority"]["credential_use"])
 
-    @unittest.skipUnless(all(path.is_file() for path in REQUIRED_PATHS), "owner packet assets not implemented")
     def test_valid_packet_binds_stage_a_and_freezes_the_prior_window(self) -> None:
         policy = load_yaml(CONFIG_PATH)
         packet = load_json(FIXTURE_PATH)["valid_packet"]
@@ -139,7 +137,6 @@ class StageBExactOwnerPacketTests(unittest.TestCase):
         self.assertEqual(sha256(A7_CONFIG_PATH), policy["source_binding"]["a7_config"]["sha256"])
         self.assertEqual(semantic_errors(packet, policy), set())
 
-    @unittest.skipUnless(all(path.is_file() for path in REQUIRED_PATHS), "owner packet assets not implemented")
     def test_each_adversarial_packet_is_rejected_at_its_named_boundary(self) -> None:
         schema = load_json(SCHEMA_PATH)
         fixture = load_json(FIXTURE_PATH)
@@ -155,7 +152,6 @@ class StageBExactOwnerPacketTests(unittest.TestCase):
                 self.assertIn(case["expected_error"], errors)
                 self.assertTrue(errors <= EXPECTED_ERRORS)
 
-    @unittest.skipUnless(all(path.is_file() for path in REQUIRED_PATHS), "owner packet assets not implemented")
     def test_acceptance_receipt_binds_all_assets_and_no_external_action(self) -> None:
         receipt = load_json(ACCEPTANCE_PATH)
         expected_bindings = {
