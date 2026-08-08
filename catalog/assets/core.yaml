@@ -14925,7 +14925,7 @@ records:
   classification: *t25_internal
 
 - asset_id: EVIDENCE-OWNER-ATTENTION-GATE-001
-  record_version: '1.0'
+  record_version: '1.1'
   asset_type: evidence
   purpose: Local acceptance, FULL Factory Fit, lifecycle-skill alignment and delivery-pending receipt.
   status: IMPLEMENTED_UNVERIFIED
@@ -14933,7 +14933,7 @@ records:
   as_of: '2026-08-08'
   truth_owner: CTRL-OWNER-ATTENTION-GATE
   location: {kind: git_path, logical_uri: 'repo://docs/evidence/control/owner_attention_gate_acceptance_v1.json', repository_path: docs/evidence/control/owner_attention_gate_acceptance_v1.json}
-  integrity: {kind: sha256, sha256: 7245d36abf1973dd236b937a6a3de4a02ef76d8f1a6b928927da159ec3e29c6a}
+  integrity: {kind: sha256, sha256: 890ebfa4b4ae5e0de1b7db4831a3cf824ad5f9348bb287a01e599af5f736556a}
   access: *t25_read_file
   relations:
   - {relation_type: derived_from, target_asset_id: POLICY-OWNER-ATTENTION-GATE-001}

@@ -65,6 +65,10 @@
     "tracked_only_full_gate": "PENDING_EXACT_COMMITTED_CANDIDATE",
     "github_ci": "PENDING_EXACT_PR_HEAD"
   },
+  "project_sources_disposition": {
+    "kind": "NO_CHANGE",
+    "reason": "The owner-attention control patch changes repository and user-skill policy only; no permanent Project Source semantic role or release payload changes."
+  },
   "factory_fit": {
     "mode": "FULL_REVIEW",
     "verdict": "PASS_WITH_FOLLOWUP",

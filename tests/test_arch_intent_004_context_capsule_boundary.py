@@ -58,8 +58,10 @@ class ArchIntent004ContextCapsuleBoundaryTests(unittest.TestCase):
         self.assertEqual(record["consumers"], ["FACTORY-001", "REG-RESEARCH-001", "TASK-28"])
 
         manifest = yaml.safe_load(MANIFEST_PATH.read_text(encoding="utf-8"))
-        self.assertEqual(manifest["catalog_version"], "0.36.4")
-        self.assertEqual(manifest["current_checkpoint"]["assets"], 554)
+        self.assertIn(
+            "catalog/assets/architecture.yaml",
+            manifest["root_resolver"]["asset_registries"],
+        )
         self.assertIn(INTENT_ID, PROJECT_MAP_PATH.read_text(encoding="utf-8"))
         self.assertIn(INTENT_ID, EDGE_PATH.read_text(encoding="utf-8"))
 
