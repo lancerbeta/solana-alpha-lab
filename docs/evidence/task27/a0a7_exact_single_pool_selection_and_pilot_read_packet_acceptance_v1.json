@@ -1,0 +1,102 @@
+{
+  "schema": "smial.task27.a0a7.exact_single_pool_selection_and_pilot_read_packet.acceptance",
+  "schema_version": "1.0",
+  "task_id": "TASK-27",
+  "atom_id": "T27-A0-A7_EXACT_SINGLE_POOL_SELECTION_AND_PILOT_READ_PACKET_V1",
+  "status": "PASS_TARGETED_VALIDATION_PENDING_DELIVERY",
+  "implementation_base": {
+    "commit": "acbb2b1aaa0088ab1630efeedcf0c6ff62e43e27",
+    "branch": "task27/exact-single-pool-pilot-read-packet"
+  },
+  "authority": {
+    "user_authority": "T27-A0-A7_OFFLINE_PACKET_ONLY",
+    "provider_api_rpc_wss_calls": 0,
+    "provider_read_authority": false,
+    "credential_use": false,
+    "r2_value_reads": 0,
+    "r3_value_or_path_reads": 0,
+    "wallet_signer_transaction_actions": 0,
+    "cash_spend_usd_cents": 0,
+    "raw_provider_responses_retained": 0,
+    "dependency_changes": false,
+    "catalog_or_registry_mutation": false,
+    "project_source_changes": false
+  },
+  "managed_write_set": [
+    "docs/contracts/task27_exact_single_pool_selection_and_pilot_read_packet_v1.md",
+    "configs/task27_exact_single_pool_selection_and_pilot_read_packet_v1.yaml",
+    "catalog/schemas/task27_exact_single_pool_selection_and_pilot_read_packet.schema.json",
+    "tests/fixtures/task27/exact_single_pool_selection_and_pilot_read_packet_v1.json",
+    "tests/test_task27_exact_single_pool_selection_and_pilot_read_packet.py",
+    "docs/evidence/task27/a0a7_exact_single_pool_selection_and_pilot_read_packet_acceptance_v1.json"
+  ],
+  "artifact_bindings": {
+    "contract": {
+      "path": "docs/contracts/task27_exact_single_pool_selection_and_pilot_read_packet_v1.md",
+      "sha256": "147ad5a6daecd683a63a5a2e6c47c7513c21ffa107117f6712fe6ba3d29bba6e"
+    },
+    "config": {
+      "path": "configs/task27_exact_single_pool_selection_and_pilot_read_packet_v1.yaml",
+      "sha256": "971fdd4455e6e140e1f27b1a0c39ab5fa96a4b19bb0d9c18c5ac304706400c98"
+    },
+    "schema": {
+      "path": "catalog/schemas/task27_exact_single_pool_selection_and_pilot_read_packet.schema.json",
+      "sha256": "6432c016874b62972fe52fe07e443b73204e952309fd2a0c8d1aa23e4ccdb8e5"
+    },
+    "fixture": {
+      "path": "tests/fixtures/task27/exact_single_pool_selection_and_pilot_read_packet_v1.json",
+      "sha256": "65cedb74cb4eef32da64f726629400ccc2519d4c7de35a5866996b69bb5fb2d4"
+    }
+  },
+  "source_smoke_binding": {
+    "state": "ACTIVATION_CONFIRMED_USER_SMOKE",
+    "receipt_path": "docs/evidence/task27/a0a5r1_project_sources_activation_receipt_v1.json",
+    "receipt_sha256": "8ef3acf01a1eecd6d826bc95fb365d56571f02355b4f903fcac93c485c0c95ac"
+  },
+  "validation": {
+    "targeted_command": "uv run --locked --managed-python python -B -m unittest tests.test_task27_exact_single_pool_selection_and_pilot_read_packet",
+    "targeted_tests_run": 5,
+    "targeted_tests_passed": 5,
+    "adversarial_cases_rejected": 18,
+    "schema_draft": "2020-12",
+    "valid_synthetic_packets": 1,
+    "full_validation": "PENDING_TRACKED_ONLY_DELIVERY"
+  },
+  "semantic_acceptance": {
+    "owner_nominated_identity_is_content_bound": "PASS",
+    "selection_hash_is_recomputed": "PASS",
+    "source_smoke_receipt_is_content_bound": "PASS",
+    "future_pilot_is_exactly_two_get_requests": "PASS",
+    "frozen_15m_window_is_aligned": "PASS",
+    "natural_gap_free_panel_rules_are_fail_closed": "PASS",
+    "raw_manifest_is_required": "PASS",
+    "automatic_fallback_provider_is_rejected": "PASS",
+    "provider_authority_and_raw_retention_in_a7_are_rejected": "PASS",
+    "pit_alpha_execution_pnl_netreturn_cashflow_claims_are_rejected": "PASS",
+    "premature_owner_approval_is_rejected": "PASS"
+  },
+  "project_sources_disposition": {
+    "kind": "NO_CHANGE",
+    "reason": "A7 freezes an offline future-read packet only; it neither makes external reads nor changes a Project Source role or release payload."
+  },
+  "measured_boundary": {
+    "provider_api_rpc_wss_calls": 0,
+    "r2_value_reads": 0,
+    "r3_value_or_path_reads": 0,
+    "wallet_signer_transaction_actions": 0,
+    "cash_spend_usd_cents": 0,
+    "raw_provider_responses_retained": 0,
+    "dependency_changes": 0,
+    "catalog_or_registry_mutations": 0,
+    "project_source_changes": 0
+  },
+  "state_change": "NONE",
+  "next_boundary": {
+    "provider_read_authority_granted": false,
+    "requires_new_exact_owner_instruction": true,
+    "exact_future_request_id": "T27-A1-EXACT-SINGLE-POOL-PILOT-001",
+    "exact_future_request_count": 2,
+    "requires_raw_evidence_retention_authority": true,
+    "exact_approval_phrase": "Подтверждаю T27-A1_EXACT_SINGLE_POOL_PUBLIC_HISTORY_PILOT_V1: разрешаю ровно 2 публичных GET-запроса GeckoTerminal для pool URqx24yyYxtXXhTbBQnbtPLhtLWYoaDaRxuQuLpNS3S с before_timestamp=1786186800 и сохранение exact raw JSON вне Git по retention A4; без ключей, кошелька, RPC, транзакций, расходов, R3 и TASK-27 acceptance."
+  }
+}

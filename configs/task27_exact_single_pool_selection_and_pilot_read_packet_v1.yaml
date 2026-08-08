@@ -1,0 +1,109 @@
+schema: smial.task27.exact_single_pool_selection_and_pilot_read_packet.contract
+schema_version: '1.0'
+task_id: TASK-27
+atom_id: T27-A0-A7_EXACT_SINGLE_POOL_SELECTION_AND_PILOT_READ_PACKET_V1
+consumer: OWNER_EXTERNAL_READ_DECISION
+inherits:
+  a6_contract:
+    path: docs/contracts/task27_exact_owner_external_read_review_contract_v1.md
+    sha256: d0942963f5e98bb0a80cacef79aa5c1c2fac47323a3e0a474facdd89f0a87342
+  a6_config:
+    path: configs/task27_exact_owner_external_read_review_contract_v1.yaml
+    sha256: f82c80194068ed7e51efac0126383453eb3f505357233d576afe85fe996eb683
+source_candidate: GECKOTERMINAL_PUBLIC_POOL_OHLCV_CANDIDATE
+source_smoke:
+  required_state: ACTIVATION_CONFIRMED_USER_SMOKE
+  receipt_path: docs/evidence/task27/a0a5r1_project_sources_activation_receipt_v1.json
+  receipt_sha256: 8ef3acf01a1eecd6d826bc95fb365d56571f02355b4f903fcac93c485c0c95ac
+selection_snapshot:
+  id: T27-A7-OWNER-NOMINATED-POOL-001
+  canonicalization: SORTED_KEYS_MINIFIED_UTF8_V1
+  sha256: 922e2b1f529d5e1d2beab34c93320914a0ac9670a956c0123fb69ba5ad5315a2
+  content:
+    network: solana
+    owner_supplied_url: https://www.geckoterminal.com/solana/pools/URqx24yyYxtXXhTbBQnbtPLhtLWYoaDaRxuQuLpNS3S
+    pool_address: URqx24yyYxtXXhTbBQnbtPLhtLWYoaDaRxuQuLpNS3S
+    selected_at: '2026-08-08T11:03:00Z'
+    selection_class: OWNER_NOMINATED_SINGLE_POOL
+    universe_description: ONE_NON_REPRESENTATIVE_TECHNICAL_FEASIBILITY_TARGET
+  page_hints:
+    state: UNVERIFIED_HINT_ONLY
+    dex_label: PumpSwap
+    pair_label: Cope/SOL
+pilot:
+  provider: GECKOTERMINAL_KEYLESS_PUBLIC_API
+  base_url: https://api.geckoterminal.com/api/v2
+  request_id: T27-A1-EXACT-SINGLE-POOL-PILOT-001
+  raw_evidence_manifest_id: T27-A1-RAW-MANIFEST-001
+  request_count: 2
+  discovery_requests: 1
+  ohlcv_requests: 1
+  window_mode: FROZEN_BEFORE_TIMESTAMP
+  before_timestamp: 1786186800
+  interval_seconds: 900
+  panel_duration_hours: 24
+  required_natural_bars: 96
+  include_empty_intervals: false
+  automatic_fallback_provider: null
+  requests:
+    - kind: POOL_METADATA
+      method: GET
+      url: https://api.geckoterminal.com/api/v2/networks/solana/pools/URqx24yyYxtXXhTbBQnbtPLhtLWYoaDaRxuQuLpNS3S
+    - kind: POOL_OHLCV
+      method: GET
+      url: https://api.geckoterminal.com/api/v2/networks/solana/pools/URqx24yyYxtXXhTbBQnbtPLhtLWYoaDaRxuQuLpNS3S/ohlcv/minute?aggregate=15&before_timestamp=1786186800&limit=96&currency=usd&token=base&include_empty_intervals=false
+future_acceptance:
+  runtime_outcomes:
+    - READY_FOR_BOUNDED_HISTORY_CAPTURE
+    - REDESIGN_PUBLIC_HISTORY_ROUTE
+    - CLOSE_PUBLIC_HISTORY_ROUTE
+  current_state: READY_FOR_SEPARATE_OWNER_EXTERNAL_READ_DECISION
+  timestamps_unique_required: true
+  timestamps_ascending_required: true
+  timestamps_aligned_required: true
+  gaps_allowed: false
+  duplicates_allowed: false
+  natural_observations_only: true
+  ohlc_positive_required: true
+  ohlc_consistent_required: true
+  volume_currency: usd
+  missing_result: UNKNOWN
+  carried_forward_forbidden: true
+retention:
+  raw_location_pattern: local/task27_public_history_pilot/run=<run_id>/raw_manifest_v1.json
+  failed_or_unusable_probe_days: 30
+  dependent_research: RETAIN_WITH_DEPENDENT_RESEARCH_AND_HASHES
+authority:
+  user_authority: T27-A0-A7_OFFLINE_PACKET_ONLY
+  provider_read_authority: false
+  provider_api_rpc_wss_calls: 0
+  raw_provider_responses_retained: 0
+  credential_use: false
+  r2_value_reads: 0
+  r3_value_or_path_reads: 0
+  wallet_signer_transaction_actions: 0
+  cash_spend_usd_cents: 0
+  dependency_changes: false
+  catalog_or_registry_mutation: false
+  project_source_changes: false
+claims:
+  scope: HISTORICAL_FEASIBILITY_ONLY
+  history_grade: DESCRIPTIVE_ONLY
+  representative_sample: false
+  pit_admissible: false
+  alpha: false
+  execution: false
+  pnl: false
+  netreturn: false
+  cashflow: false
+future_owner_approval:
+  state: EXACT_PACKET_READY_OWNER_AUTHORITY_REQUIRED
+  approval_granted: false
+  phrase: 'Подтверждаю T27-A1_EXACT_SINGLE_POOL_PUBLIC_HISTORY_PILOT_V1: разрешаю ровно 2 публичных GET-запроса GeckoTerminal для pool URqx24yyYxtXXhTbBQnbtPLhtLWYoaDaRxuQuLpNS3S с before_timestamp=1786186800 и сохранение exact raw JSON вне Git по retention A4; без ключей, кошелька, RPC, транзакций, расходов, R3 и TASK-27 acceptance.'
+managed_write_set:
+  - docs/contracts/task27_exact_single_pool_selection_and_pilot_read_packet_v1.md
+  - configs/task27_exact_single_pool_selection_and_pilot_read_packet_v1.yaml
+  - catalog/schemas/task27_exact_single_pool_selection_and_pilot_read_packet.schema.json
+  - tests/fixtures/task27/exact_single_pool_selection_and_pilot_read_packet_v1.json
+  - tests/test_task27_exact_single_pool_selection_and_pilot_read_packet.py
+  - docs/evidence/task27/a0a7_exact_single_pool_selection_and_pilot_read_packet_acceptance_v1.json

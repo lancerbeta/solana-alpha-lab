@@ -1,0 +1,112 @@
+{
+  "fixture_kind": "SYNTHETIC_VALUES_WITH_OWNER_NOMINATED_IDENTITY",
+  "valid_packet": {
+    "fixture_kind": "SYNTHETIC_VALUES_WITH_OWNER_NOMINATED_IDENTITY",
+    "selection_snapshot": {
+      "id": "T27-A7-OWNER-NOMINATED-POOL-001",
+      "canonicalization": "SORTED_KEYS_MINIFIED_UTF8_V1",
+      "sha256": "922e2b1f529d5e1d2beab34c93320914a0ac9670a956c0123fb69ba5ad5315a2",
+      "content": {
+        "network": "solana",
+        "owner_supplied_url": "https://www.geckoterminal.com/solana/pools/URqx24yyYxtXXhTbBQnbtPLhtLWYoaDaRxuQuLpNS3S",
+        "pool_address": "URqx24yyYxtXXhTbBQnbtPLhtLWYoaDaRxuQuLpNS3S",
+        "selected_at": "2026-08-08T11:03:00Z",
+        "selection_class": "OWNER_NOMINATED_SINGLE_POOL",
+        "universe_description": "ONE_NON_REPRESENTATIVE_TECHNICAL_FEASIBILITY_TARGET"
+      },
+      "page_hints": {
+        "state": "UNVERIFIED_HINT_ONLY",
+        "dex_label": "PumpSwap",
+        "pair_label": "Cope/SOL"
+      }
+    },
+    "pilot": {
+      "provider": "GECKOTERMINAL_KEYLESS_PUBLIC_API",
+      "base_url": "https://api.geckoterminal.com/api/v2",
+      "request_id": "T27-A1-EXACT-SINGLE-POOL-PILOT-001",
+      "raw_evidence_manifest_id": "T27-A1-RAW-MANIFEST-001",
+      "request_count": 2,
+      "discovery_requests": 1,
+      "ohlcv_requests": 1,
+      "window_mode": "FROZEN_BEFORE_TIMESTAMP",
+      "before_timestamp": 1786186800,
+      "interval_seconds": 900,
+      "panel_duration_hours": 24,
+      "required_natural_bars": 96,
+      "include_empty_intervals": false,
+      "automatic_fallback_provider": null,
+      "requests": [
+        {
+          "kind": "POOL_METADATA",
+          "method": "GET",
+          "url": "https://api.geckoterminal.com/api/v2/networks/solana/pools/URqx24yyYxtXXhTbBQnbtPLhtLWYoaDaRxuQuLpNS3S"
+        },
+        {
+          "kind": "POOL_OHLCV",
+          "method": "GET",
+          "url": "https://api.geckoterminal.com/api/v2/networks/solana/pools/URqx24yyYxtXXhTbBQnbtPLhtLWYoaDaRxuQuLpNS3S/ohlcv/minute?aggregate=15&before_timestamp=1786186800&limit=96&currency=usd&token=base&include_empty_intervals=false"
+        }
+      ]
+    },
+    "future_acceptance": {
+      "runtime_outcomes": [
+        "READY_FOR_BOUNDED_HISTORY_CAPTURE",
+        "REDESIGN_PUBLIC_HISTORY_ROUTE",
+        "CLOSE_PUBLIC_HISTORY_ROUTE"
+      ],
+      "current_state": "READY_FOR_SEPARATE_OWNER_EXTERNAL_READ_DECISION",
+      "timestamps_unique_required": true,
+      "timestamps_ascending_required": true,
+      "timestamps_aligned_required": true,
+      "gaps_allowed": false,
+      "duplicates_allowed": false,
+      "natural_observations_only": true,
+      "ohlc_positive_required": true,
+      "ohlc_consistent_required": true,
+      "volume_currency": "usd",
+      "missing_result": "UNKNOWN",
+      "carried_forward_forbidden": true
+    },
+    "authority": {
+      "provider_read_authority": false,
+      "provider_api_rpc_wss_calls": 0,
+      "raw_provider_responses_retained": 0
+    },
+    "claims": {
+      "scope": "HISTORICAL_FEASIBILITY_ONLY",
+      "history_grade": "DESCRIPTIVE_ONLY",
+      "representative_sample": false,
+      "pit_admissible": false,
+      "alpha": false,
+      "execution": false,
+      "pnl": false,
+      "netreturn": false,
+      "cashflow": false
+    },
+    "future_owner_approval": {
+      "state": "EXACT_PACKET_READY_OWNER_AUTHORITY_REQUIRED",
+      "approval_granted": false,
+      "phrase": "Подтверждаю T27-A1_EXACT_SINGLE_POOL_PUBLIC_HISTORY_PILOT_V1: разрешаю ровно 2 публичных GET-запроса GeckoTerminal для pool URqx24yyYxtXXhTbBQnbtPLhtLWYoaDaRxuQuLpNS3S с before_timestamp=1786186800 и сохранение exact raw JSON вне Git по retention A4; без ключей, кошелька, RPC, транзакций, расходов, R3 и TASK-27 acceptance."
+    }
+  },
+  "adversarial_cases": [
+    {"case_id": "wrong-network", "pointer": "/selection_snapshot/content/network", "value": "other-network", "expected_error": "WRONG_NETWORK"},
+    {"case_id": "wrong-pool", "pointer": "/selection_snapshot/content/pool_address", "value": "OTHER_POOL", "expected_error": "WRONG_POOL"},
+    {"case_id": "verified-page-hint", "pointer": "/selection_snapshot/page_hints/state", "value": "VERIFIED_PROVIDER_IDENTITY", "expected_error": "UNVERIFIED_HINT_PROMOTION"},
+    {"case_id": "selection-hash-drift", "pointer": "/selection_snapshot/sha256", "value": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb", "expected_error": "SELECTION_HASH_MISMATCH"},
+    {"case_id": "unaligned-before-timestamp", "pointer": "/pilot/before_timestamp", "value": 1786186801, "expected_error": "UNALIGNED_BEFORE_TIMESTAMP"},
+    {"case_id": "floating-window", "pointer": "/pilot/window_mode", "value": "FLOATING_LATEST", "expected_error": "FLOATING_WINDOW_FORBIDDEN"},
+    {"case_id": "request-count", "pointer": "/pilot/request_count", "value": 3, "expected_error": "REQUEST_COUNT_MISMATCH"},
+    {"case_id": "non-get", "pointer": "/pilot/requests/0/method", "value": "POST", "expected_error": "NON_GET_METHOD"},
+    {"case_id": "url-drift", "pointer": "/pilot/requests/1/url", "value": "https://api.geckoterminal.com/api/v2/networks/solana/pools/URqx24yyYxtXXhTbBQnbtPLhtLWYoaDaRxuQuLpNS3S/ohlcv/minute?aggregate=15&before_timestamp=1786186800&limit=96&currency=usd&token=base&include_empty_intervals=false&unexpected=1", "expected_error": "REQUEST_URL_MISMATCH"},
+    {"case_id": "empty-interval-imputation", "pointer": "/pilot/include_empty_intervals", "value": true, "expected_error": "EMPTY_INTERVAL_IMPUTATION_FORBIDDEN"},
+    {"case_id": "panel-rule-relaxation", "pointer": "/future_acceptance/gaps_allowed", "value": true, "expected_error": "PANEL_RULE_RELAXATION_FORBIDDEN"},
+    {"case_id": "missing-raw-manifest", "pointer": "/pilot/raw_evidence_manifest_id", "value": "MISSING", "expected_error": "RAW_MANIFEST_REQUIRED"},
+    {"case_id": "fallback-provider", "pointer": "/pilot/automatic_fallback_provider", "value": "OTHER_PROVIDER", "expected_error": "FALLBACK_PROVIDER_FORBIDDEN"},
+    {"case_id": "authority-promotion", "pointer": "/authority/provider_read_authority", "value": true, "expected_error": "AUTHORITY_PROMOTION_FORBIDDEN"},
+    {"case_id": "external-action", "pointer": "/authority/provider_api_rpc_wss_calls", "value": 1, "expected_error": "EXTERNAL_ACTION_IN_A7_FORBIDDEN"},
+    {"case_id": "raw-retention", "pointer": "/authority/raw_provider_responses_retained", "value": 1, "expected_error": "RAW_RETENTION_IN_A7_FORBIDDEN"},
+    {"case_id": "alpha-claim", "pointer": "/claims/alpha", "value": true, "expected_error": "FORBIDDEN_DECISION_CLAIM"},
+    {"case_id": "premature-approval", "pointer": "/future_owner_approval/approval_granted", "value": true, "expected_error": "PREMATURE_APPROVAL_FORBIDDEN"}
+  ]
+}

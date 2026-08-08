@@ -1,0 +1,214 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://schemas.solana-alpha-lab.local/task27/exact-single-pool-selection-and-pilot-read-packet-v1.json",
+  "title": "TASK-27 exact single-pool selection and pilot-read fixture",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["fixture_kind", "valid_packet", "adversarial_cases"],
+  "properties": {
+    "fixture_kind": {"const": "SYNTHETIC_VALUES_WITH_OWNER_NOMINATED_IDENTITY"},
+    "valid_packet": {"$ref": "#/$defs/packet"},
+    "adversarial_cases": {
+      "type": "array",
+      "minItems": 18,
+      "maxItems": 18,
+      "items": {"$ref": "#/$defs/adversarial_case"}
+    }
+  },
+  "$defs": {
+    "adversarial_case": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["case_id", "pointer", "value", "expected_error"],
+      "properties": {
+        "case_id": {"type": "string", "minLength": 1},
+        "pointer": {"type": "string", "pattern": "^/"},
+        "value": {},
+        "expected_error": {"type": "string", "minLength": 1}
+      }
+    },
+    "packet": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "fixture_kind",
+        "selection_snapshot",
+        "pilot",
+        "future_acceptance",
+        "authority",
+        "claims",
+        "future_owner_approval"
+      ],
+      "properties": {
+        "fixture_kind": {"const": "SYNTHETIC_VALUES_WITH_OWNER_NOMINATED_IDENTITY"},
+        "selection_snapshot": {"$ref": "#/$defs/selection_snapshot"},
+        "pilot": {"$ref": "#/$defs/pilot"},
+        "future_acceptance": {"$ref": "#/$defs/future_acceptance"},
+        "authority": {"$ref": "#/$defs/authority"},
+        "claims": {"$ref": "#/$defs/claims"},
+        "future_owner_approval": {"$ref": "#/$defs/future_owner_approval"}
+      }
+    },
+    "selection_snapshot": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "canonicalization", "sha256", "content", "page_hints"],
+      "properties": {
+        "id": {"type": "string", "minLength": 1},
+        "canonicalization": {"type": "string", "minLength": 1},
+        "sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+        "content": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["network", "owner_supplied_url", "pool_address", "selected_at", "selection_class", "universe_description"],
+          "properties": {
+            "network": {"type": "string", "minLength": 1},
+            "owner_supplied_url": {"type": "string", "minLength": 1},
+            "pool_address": {"type": "string", "minLength": 1},
+            "selected_at": {"type": "string", "minLength": 1},
+            "selection_class": {"type": "string", "minLength": 1},
+            "universe_description": {"type": "string", "minLength": 1}
+          }
+        },
+        "page_hints": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["state", "dex_label", "pair_label"],
+          "properties": {
+            "state": {"type": "string", "minLength": 1},
+            "dex_label": {"type": "string", "minLength": 1},
+            "pair_label": {"type": "string", "minLength": 1}
+          }
+        }
+      }
+    },
+    "pilot_request": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["kind", "method", "url"],
+      "properties": {
+        "kind": {"type": "string", "minLength": 1},
+        "method": {"type": "string", "minLength": 1},
+        "url": {"type": "string", "minLength": 1}
+      }
+    },
+    "pilot": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "provider",
+        "base_url",
+        "request_id",
+        "raw_evidence_manifest_id",
+        "request_count",
+        "discovery_requests",
+        "ohlcv_requests",
+        "window_mode",
+        "before_timestamp",
+        "interval_seconds",
+        "panel_duration_hours",
+        "required_natural_bars",
+        "include_empty_intervals",
+        "automatic_fallback_provider",
+        "requests"
+      ],
+      "properties": {
+        "provider": {"type": "string", "minLength": 1},
+        "base_url": {"type": "string", "minLength": 1},
+        "request_id": {"type": "string", "minLength": 1},
+        "raw_evidence_manifest_id": {"type": "string", "minLength": 1},
+        "request_count": {"type": "integer", "minimum": 0},
+        "discovery_requests": {"type": "integer", "minimum": 0},
+        "ohlcv_requests": {"type": "integer", "minimum": 0},
+        "window_mode": {"type": "string", "minLength": 1},
+        "before_timestamp": {"type": "integer", "minimum": 0},
+        "interval_seconds": {"type": "integer", "minimum": 1},
+        "panel_duration_hours": {"type": "integer", "minimum": 1},
+        "required_natural_bars": {"type": "integer", "minimum": 1},
+        "include_empty_intervals": {"type": "boolean"},
+        "automatic_fallback_provider": {"type": ["null", "string"]},
+        "requests": {
+          "type": "array",
+          "minItems": 2,
+          "maxItems": 2,
+          "items": {"$ref": "#/$defs/pilot_request"}
+        }
+      }
+    },
+    "future_acceptance": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "runtime_outcomes",
+        "current_state",
+        "timestamps_unique_required",
+        "timestamps_ascending_required",
+        "timestamps_aligned_required",
+        "gaps_allowed",
+        "duplicates_allowed",
+        "natural_observations_only",
+        "ohlc_positive_required",
+        "ohlc_consistent_required",
+        "volume_currency",
+        "missing_result",
+        "carried_forward_forbidden"
+      ],
+      "properties": {
+        "runtime_outcomes": {
+          "type": "array",
+          "minItems": 3,
+          "maxItems": 3,
+          "items": {"type": "string", "minLength": 1}
+        },
+        "current_state": {"type": "string", "minLength": 1},
+        "timestamps_unique_required": {"type": "boolean"},
+        "timestamps_ascending_required": {"type": "boolean"},
+        "timestamps_aligned_required": {"type": "boolean"},
+        "gaps_allowed": {"type": "boolean"},
+        "duplicates_allowed": {"type": "boolean"},
+        "natural_observations_only": {"type": "boolean"},
+        "ohlc_positive_required": {"type": "boolean"},
+        "ohlc_consistent_required": {"type": "boolean"},
+        "volume_currency": {"type": "string", "minLength": 1},
+        "missing_result": {"type": "string", "minLength": 1},
+        "carried_forward_forbidden": {"type": "boolean"}
+      }
+    },
+    "authority": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["provider_read_authority", "provider_api_rpc_wss_calls", "raw_provider_responses_retained"],
+      "properties": {
+        "provider_read_authority": {"type": "boolean"},
+        "provider_api_rpc_wss_calls": {"type": "integer", "minimum": 0},
+        "raw_provider_responses_retained": {"type": "integer", "minimum": 0}
+      }
+    },
+    "claims": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["scope", "history_grade", "representative_sample", "pit_admissible", "alpha", "execution", "pnl", "netreturn", "cashflow"],
+      "properties": {
+        "scope": {"type": "string", "minLength": 1},
+        "history_grade": {"type": "string", "minLength": 1},
+        "representative_sample": {"type": "boolean"},
+        "pit_admissible": {"type": "boolean"},
+        "alpha": {"type": "boolean"},
+        "execution": {"type": "boolean"},
+        "pnl": {"type": "boolean"},
+        "netreturn": {"type": "boolean"},
+        "cashflow": {"type": "boolean"}
+      }
+    },
+    "future_owner_approval": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["state", "approval_granted", "phrase"],
+      "properties": {
+        "state": {"type": "string", "minLength": 1},
+        "approval_granted": {"type": "boolean"},
+        "phrase": {"type": "string", "minLength": 1}
+      }
+    }
+  }
+}
