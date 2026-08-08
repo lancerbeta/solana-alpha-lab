@@ -1,0 +1,132 @@
+{
+  "schema": "smial.task27.stage-b-pool-history.runtime-receipt",
+  "schema_version": "1.0",
+  "task_id": "TASK-27",
+  "atom_id": "T27-A1S2_STAGE_B_SOLANA_TRACKER_POOL_HISTORY_PILOT_V1",
+  "evidence_id": "T27-A1S2-STAGE-B-POOL-HISTORY-001",
+  "run_id": "a1s2-stage-b-20260808T175752112Z",
+  "artifact_bindings": {
+    "stage_b_config": {
+      "path": "configs/task27_stage_b_exact_owner_packet_v1.yaml",
+      "sha256": "5f9b2d1312d6ce1084d07558a62017f0ed0f5f0a9664d7c1a7b531750d29c163"
+    },
+    "stage_a_receipt": {
+      "path": "docs/evidence/task27/a1_stage_a_public_pair_identity_runtime_receipt_v1.json",
+      "sha256": "fd315f72c8590b9b0de6e2a1231dca7f701e5cd517f343b3f97f44d17719c3e4"
+    },
+    "two_stage_route_config": {
+      "path": "configs/task27_two_stage_identity_and_history_route_contract_v1.yaml",
+      "sha256": "85db1ba86b206317d5c171664e4bfee68e4d2e53dead015580c9b4356249d99a"
+    }
+  },
+  "requests": [
+    {
+      "request_id": "T27-A1S2-STAGE-B-TOKEN-001",
+      "provider": "SOLANA_TRACKER",
+      "method": "GET",
+      "url": "https://data.solanatracker.io/tokens/DMwbVy48dWVKGe9z1pcVnwF3HLMLrqWdDLfbvx8RchhK",
+      "query": {},
+      "requested_at": "2026-08-08T17:57:52.1542093Z",
+      "completed_at": "2026-08-08T17:57:52.4800939Z",
+      "retries": 0,
+      "redirect_followed": false,
+      "http_status": 200,
+      "content_type": "application/json; charset=utf-8",
+      "response_bytes": 7851,
+      "raw_sha256": "911139a37c84ea1c0fbeb249f268530fe20ca545a280158c58a5b66e6f9ae6cc"
+    },
+    {
+      "request_id": "T27-A1S2-STAGE-B-POOL-OHLCV-001",
+      "provider": "SOLANA_TRACKER",
+      "method": "GET",
+      "url": "https://data.solanatracker.io/chart/DMwbVy48dWVKGe9z1pcVnwF3HLMLrqWdDLfbvx8RchhK/URqx24yyYxtXXhTbBQnbtPLhtLWYoaDaRxuQuLpNS3S",
+      "query": {
+        "type": "15m",
+        "time_from": 1786100400,
+        "time_to": 1786186800,
+        "currency": "usd",
+        "removeOutliers": false,
+        "fastCache": false
+      },
+      "requested_at": "2026-08-08T17:58:41.2312676Z",
+      "completed_at": "2026-08-08T17:58:41.5545632Z",
+      "retries": 0,
+      "redirect_followed": false,
+      "http_status": 200,
+      "content_type": "application/json; charset=utf-8",
+      "response_bytes": 5000,
+      "raw_sha256": "721fad404e9b0ef368f99de170fb096c14e58591ecc7556e25d2146340d6b981"
+    }
+  ],
+  "identity_validation": {
+    "pool_address": "PASS",
+    "base_mint": "PASS",
+    "quote_mint": "PASS",
+    "stage_a_dex_label": "pumpswap",
+    "provider_market_label": "pumpfun-amm",
+    "market_label_reconciliation": "UNRESOLVED_NOT_USED_AS_POOL_IDENTITY"
+  },
+  "panel_observation": {
+    "expected_natural_bars": 96,
+    "observed_bars": 33,
+    "unique_timestamps": 33,
+    "first_timestamp": 1786100400,
+    "last_timestamp": 1786185900,
+    "strict_ascending": true,
+    "aligned_to_frozen_grid": true,
+    "missing_natural_bars": 63,
+    "invalid_ohlcv_rows": 0,
+    "missing_timestamps_sha256": "a9625839ce1b9169ef7a7ed6e21907158866ae21d09a0d982c522d8ff38aee96"
+  },
+  "raw_evidence": {
+    "outside_git": true,
+    "raw_manifest_id": "T27-A1S2-STAGE-B-RAW-MANIFEST-001",
+    "raw_manifest_relative_path": "local/task27_public_history_route/run=a1s2-stage-b-20260808T175752112Z/raw_manifest_v1.json",
+    "raw_manifest_sha256": "9f0503175d84bbb4ece777b962b1bbdb61a951f10268203d4c43d26f65d1851f",
+    "panel_projection_relative_path": "local/task27_public_history_route/run=a1s2-stage-b-20260808T175752112Z/panel_projection_v1.json",
+    "panel_projection_sha256": "9caa0b4e4727ab79d3169f365fe4753459f6b8f4482f44d567e6e6579a602f9c",
+    "retention": {
+      "token_identity": "RETAIN_WITH_DEPENDENT_RESEARCH_AND_HASHES",
+      "pool_ohlcv": "RETAIN_30_DAYS_UNUSABLE_PANEL",
+      "pool_ohlcv_review_after": "2026-09-07T17:58:41.5545632Z"
+    }
+  },
+  "authority": {
+    "owner_confirmation": "T27-A1S2_STAGE_B_SOLANA_TRACKER_POOL_HISTORY_PILOT_V1",
+    "provider_api_rpc_wss_calls": 2,
+    "credential_use": true,
+    "r2_value_reads": 0,
+    "r3_value_or_path_reads": 0,
+    "wallet_signer_transaction_actions": 0,
+    "cash_spend_usd_cents": 0,
+    "task27_acceptance": false
+  },
+  "claims": {
+    "history_grade": "ONE_INCOMPLETE_PANEL_OBSERVED_NOT_PIT_ADMISSIBLE",
+    "pit_admissible": false,
+    "alpha": false,
+    "execution": false,
+    "pnl": false,
+    "netreturn": false,
+    "cashflow": false
+  },
+  "decision": {
+    "second_request_condition": "TOKEN_IDENTITY_PASS",
+    "terminal_disposition": "INCOMPLETE_PANEL_NOT_FEASIBLE",
+    "state_change": "NONE",
+    "next_boundary": "OFFLINE_OWNER_DECISION_REDESIGN_OR_CLOSE_PUBLIC_HISTORY_ROUTE_REQUIRED"
+  },
+  "factory_fit_review": "FULL_REVIEW",
+  "factory_fit": {
+    "verdict": "PASS_WITH_LIMITATIONS",
+    "owner_value": "The bounded read falsified complete-panel availability before any broader capture or strategy work.",
+    "research_truth": "PASS_EXPLICIT_33_OF_96_GAP_NO_ZERO_FILL",
+    "security": "PASS_HEADER_ONLY_CREDENTIAL_NOT_RECORDED",
+    "reuse_build": "PASS_REUSES_STAGE_A_FROZEN_IDENTITY_AND_STAGE_B_PACKET",
+    "execution_to_cashflow": "NOT_IN_SCOPE_NO_CLAIM"
+  },
+  "project_sources_disposition": {
+    "kind": "NO_CHANGE",
+    "reason": "A bounded runtime receipt does not accept TASK-27 or change the active Source release."
+  }
+}
