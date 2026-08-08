@@ -1,0 +1,91 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "smial.task27.owner-route-close-and-task-outcome.schema.v1",
+  "title": "TASK-27 A1S4 owner route-close and task-outcome decision",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["fixture_kind", "source_bindings", "owner_decision", "missingness", "decision", "authority", "claims"],
+  "properties": {
+    "fixture_kind": {"const": "SYNTHETIC_GOLDEN_ONLY"},
+    "source_bindings": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["a1s3_policy", "a1s3_acceptance"],
+      "properties": {
+        "a1s3_policy": {"$ref": "#/$defs/path_hash"},
+        "a1s3_acceptance": {"$ref": "#/$defs/path_hash"}
+      }
+    },
+    "owner_decision": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["route_close", "new_provider_read"],
+      "properties": {
+        "route_close": {"const": "ROUTE_CLOSE_ACCEPTED"},
+        "new_provider_read": {"const": "NO_NEW_PROVIDER_READ"}
+      }
+    },
+    "missingness": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["state", "missing_as_zero"],
+      "properties": {
+        "state": {"const": "MISSING_UNKNOWN"},
+        "missing_as_zero": {"const": false}
+      }
+    },
+    "decision": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["current_route_disposition", "owner_route_close", "provider_selected", "new_provider_read_authority", "task27_outcome_proposal", "task27_status"],
+      "properties": {
+        "current_route_disposition": {"const": "CLOSE_CURRENT_SOLANA_TRACKER_15M_POOL_HISTORY_ROUTE_NOT_FEASIBLE"},
+        "owner_route_close": {"const": "ACCEPTED"},
+        "provider_selected": {"type": "null"},
+        "new_provider_read_authority": {"const": false},
+        "task27_outcome_proposal": {"const": "CLOSE_WITH_LIMITED_NEGATIVE_RESULT"},
+        "task27_status": {"const": "IN_PROGRESS_PENDING_TERMINAL_RECONCILIATION"}
+      }
+    },
+    "authority": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["provider_api_rpc_wss_calls", "credential_use", "raw_provider_responses_retained", "r2_value_reads", "r3_value_or_path_reads", "wallet_signer_transaction_actions", "cash_spend_usd_cents"],
+      "properties": {
+        "provider_api_rpc_wss_calls": {"const": 0},
+        "credential_use": {"const": false},
+        "raw_provider_responses_retained": {"const": 0},
+        "r2_value_reads": {"const": 0},
+        "r3_value_or_path_reads": {"const": 0},
+        "wallet_signer_transaction_actions": {"const": 0},
+        "cash_spend_usd_cents": {"const": 0}
+      }
+    },
+    "claims": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["pit_admissible", "public_history_globally_infeasible", "alpha", "execution", "pnl", "netreturn", "cashflow"],
+      "properties": {
+        "pit_admissible": {"const": false},
+        "public_history_globally_infeasible": {"const": false},
+        "alpha": {"const": false},
+        "execution": {"const": false},
+        "pnl": {"const": false},
+        "netreturn": {"const": false},
+        "cashflow": {"const": false}
+      }
+    }
+  },
+  "$defs": {
+    "sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+    "path_hash": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["path", "sha256"],
+      "properties": {
+        "path": {"type": "string", "minLength": 1},
+        "sha256": {"$ref": "#/$defs/sha256"}
+      }
+    }
+  }
+}
