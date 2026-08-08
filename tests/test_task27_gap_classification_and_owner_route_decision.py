@@ -199,7 +199,13 @@ class Task27GapClassificationAndOwnerRouteDecisionTests(unittest.TestCase):
             "cash_spend_usd_cents": 0,
         })
         self.assertEqual(receipt["factory_fit_review"], "FULL_REVIEW")
-        self.assertEqual(receipt["project_sources_disposition"], "NO_CHANGE")
+        self.assertEqual(
+            receipt["project_sources_disposition"],
+            {
+                "kind": "NO_CHANGE",
+                "reason": "A1S3 classifies one offline route decision and does not change a Project Source role or active release."
+            },
+        )
 
     def test_static_artifacts_do_not_contain_secret_markers(self) -> None:
         self.require_static_artifacts()

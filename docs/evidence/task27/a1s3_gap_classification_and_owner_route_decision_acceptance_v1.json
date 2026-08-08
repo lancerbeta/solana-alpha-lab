@@ -92,5 +92,8 @@
       "why_not_now": "No automatic source selection follows from one incomplete panel."
     }
   },
-  "project_sources_disposition": "NO_CHANGE"
+  "project_sources_disposition": {
+    "kind": "NO_CHANGE",
+    "reason": "A1S3 classifies one offline route decision and does not change a Project Source role or active release."
+  }
 }
