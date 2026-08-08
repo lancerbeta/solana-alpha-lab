@@ -1,0 +1,136 @@
+{
+  "schema": "smial.task28.rc001-registry-freeze.acceptance",
+  "schema_version": "1.0",
+  "receipt_id": "T28-A1-RC001-REGISTRY-FREEZE-001",
+  "task_id": "TASK-28",
+  "atom_id": "T28-A1_RC001_HYPOTHESIS_REGISTRY_FREEZE_V1",
+  "status": "VALIDATED_OFFLINE_REGISTRY_FREEZE",
+  "artifact_bindings": {
+    "contract": {
+      "path": "docs/contracts/task28_rc001_registry_freeze_contract_v1.md",
+      "sha256": "8c1c94db91fe7d544f7177496390ab5d25ea558927d4e068408bc495cb6a56cb"
+    },
+    "config": {
+      "path": "configs/task28_rc001_registry_freeze_v1.yaml",
+      "sha256": "c4fbb7157a13d1dee0f2b1f163e8f8fc1a38da4bc850275fba25bc0d70a785a7"
+    },
+    "schema": {
+      "path": "catalog/schemas/task28_rc001_registry_freeze.schema.json",
+      "sha256": "a17ac18af8da583a60525b33bf0907c388ab82700d67e262ced8b6547e76d217"
+    },
+    "fixture": {
+      "path": "tests/fixtures/task28/rc001_registry_freeze_v1.json",
+      "sha256": "e2ec41422b33f2ac395503ff272acb1a12e9ec56d642bc41bb73f72560993bfc"
+    },
+    "validator": {
+      "path": "src/solana_alpha_lab/task28_rc001_registry_freeze.py",
+      "sha256": "da1de849d3c1ff9cf7e4e36aac0ca17fa3aae9c82c4a3fc28c7b35b9fcfb0589"
+    },
+    "registry:research_cycles": {
+      "path": "registries/research_cycles.yaml",
+      "sha256": "2ca0195a7617f2f95b7334291c776b78b447ea854b4c43b48dbe0f25fe08f797"
+    },
+    "registry:hypotheses": {
+      "path": "registries/hypotheses.yaml",
+      "sha256": "9ee9f983fa6869c0ee1ff6a249e06dd38fc059a956943cfea8539822054236d9"
+    },
+    "registry:feature_catalog": {
+      "path": "registries/feature_catalog.yaml",
+      "sha256": "1c65b9d4a43096056686549055c5fdb259e5486f04484a73b5c7635050c89f55"
+    },
+    "registry:global_trial_ledger": {
+      "path": "registries/global_trial_ledger.yaml",
+      "sha256": "5881fd21e92baee46f1af90e0c2e00109c1d75d73d99f167b00aceac07495008"
+    },
+    "known_evidence:task24_stop": {
+      "path": "docs/evidence/task24/a6_bounded_data_redesign_or_stop_decision_v1.json",
+      "sha256": "442350624eef0625da3415692c48d2544c4d46c8edd21c5b7051098f7501d455"
+    },
+    "known_evidence:task25_factory_fit": {
+      "path": "docs/evidence/task25/a6_catalog_factory_fit_v1.json",
+      "sha256": "187a508abb78b9f5548ec0d9677424ddfc60c746b51ee3975c5794b30745b41a"
+    },
+    "known_evidence:task26b_route": {
+      "path": "docs/evidence/task26b/a1_execution_witness_route_decision_v1.json",
+      "sha256": "c6df17bb1b8f2f361bb0e25b801d8d5a71440e42fe4e95ccd0c55ab5e33630de"
+    },
+    "known_evidence:task27_route_close": {
+      "path": "docs/evidence/task27/a1s4_owner_route_close_and_task_outcome_acceptance_v1.json",
+      "sha256": "e901a59a72da29b3eb4a90e24a7d3bde91a4fc00c023310086376747ebe47e6d"
+    }
+  },
+  "research_cycle": {
+    "research_cycle_id": "RESEARCH-CYCLE-RC001-001",
+    "task_owned_register_id": "TASK28-RC001-REGISTER-001",
+    "register_kind": "TASK_OWNED_CONFIG_EVIDENCE",
+    "status": "FROZEN_NOT_STARTED",
+    "groups": {
+      "RC001-H13-COMPOSITE-VETO": {
+        "state": "BLOCKED_DATA",
+        "blocker_codes": [
+          "ENTITY_ROUTE_NOT_ADMISSIBLE",
+          "CONTINUOUS_PIT_PRICE_HISTORY_UNAVAILABLE",
+          "SETTLED_EXECUTION_TRUTH_UNAVAILABLE"
+        ]
+      },
+      "RC001-H07-H01-LIQUIDITY-RETENTION": {
+        "state": "BLOCKED_DATA",
+        "blocker_codes": [
+          "CONTINUOUS_PIT_PRICE_HISTORY_UNAVAILABLE",
+          "SETTLED_EXECUTION_TRUTH_UNAVAILABLE"
+        ]
+      },
+      "RC001-H02-H10-H14-PULLBACK-RECLAIM": {
+        "state": "BLOCKED_DATA",
+        "blocker_codes": [
+          "CONTINUOUS_PIT_PRICE_HISTORY_UNAVAILABLE",
+          "SETTLED_EXECUTION_TRUTH_UNAVAILABLE"
+        ]
+      }
+    },
+    "trial_record_count_created_by_task28": 0,
+    "holdout_consumed": false
+  },
+  "decision": {
+    "trial_record_created": false,
+    "holdout_consumed": false,
+    "task28_acceptance": false,
+    "state_change": "NONE",
+    "next_boundary": "TASK28_CATALOG_FACTORY_FIT_AND_DELIVERY"
+  },
+  "adversarial_rejections": [
+    "NUMERIC_NETRETURN_PROMOTION_FORBIDDEN",
+    "EXTERNAL_PROVIDER_AUTHORITY_FORBIDDEN",
+    "R2_R3_ACCESS_FORBIDDEN",
+    "MISSING_TO_ZERO_FORBIDDEN",
+    "UNREGISTERED_PARAMETER",
+    "FOREIGN_FEATURE_WITHOUT_VERSIONED_LINK",
+    "DUPLICATE_IMMUTABLE_DEFINITION_ID",
+    "LEGACY_LIFECYCLE_SKELETON_REWRITE_FORBIDDEN",
+    "RC001_TRIAL_RECORD_FORBIDDEN"
+  ],
+  "side_effect_counters": {
+    "provider_api_rpc_wss_calls": 0,
+    "credential_uses": 0,
+    "r2_r3_reads": 0,
+    "wallet_signer_transaction_actions": 0,
+    "cash_spend_usd_cents": 0,
+    "dependency_changes": 0,
+    "project_sources_changes": 0
+  },
+  "non_claims": [
+    "MARKET_ALPHA",
+    "NUMERIC_NETRETURN",
+    "ACTUAL_FILLS",
+    "COMPLETE_FEES",
+    "SETTLEMENT",
+    "CONTINUOUS_PATH",
+    "ENTITY_MEMBERSHIP",
+    "HOLDOUT_CONSUMPTION",
+    "TASK28_DONE"
+  ],
+  "project_sources_disposition": {
+    "kind": "NO_CHANGE",
+    "reason": "Task28 A1 freezes an offline control record and does not activate a new Project Source release."
+  }
+}

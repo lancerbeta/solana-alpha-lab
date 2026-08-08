@@ -8,20 +8,21 @@ claim unavailable evidence.
 
 **Architecture:** A task-owned YAML configuration records the immutable RC-001
 definitions, allowed search degrees, evidence requirements and non-claims. A
-small offline Python validator checks the configuration and the specialized
-lifecycle registries, emits a deterministic admissibility result, and is
-exercised by golden and adversarial fixtures. The existing Catalog remains the
-navigation layer; it receives additive records and regenerates its views.
+small offline Python validator checks the task-owned definition index while
+proving the TASK-16 lifecycle skeletons remain unchanged, then emits a
+deterministic admissibility result. The existing Catalog remains the navigation
+layer; it receives additive records and regenerates its views.
 
 **Tech Stack:** Python 3.13, `PyYAML`, `jsonschema`, `unittest`, existing
-SMIAL Catalog generator and lifecycle YAML registries.
+SMIAL Catalog generator and read-only lifecycle YAML skeletons.
 
 ## Global Constraints
 
 - Base branch: `origin/main` at `e93b651dd6d63987bb1fa2e128d322c3ac291c23`.
-- Reuse TASK-16 lifecycle identities and existing YAML registries; no second
-  research-memory service, database, notebook platform or generic experiment
-  engine.
+- Preserve TASK-16 lifecycle identities and existing YAML registries exactly as
+  historical empty skeletons. The task-owned config/evidence pair is the
+  RC-001 register; no new research-memory service, database, notebook platform
+  or generic experiment engine is introduced.
 - No provider/API/RPC/WSS calls, credentials, R2/R3 access, raw-data retention,
   holdout consumption, execution simulation, wallet, signer, transaction,
   spend, dependency, deployment, Project Sources or UI action.
@@ -58,7 +59,7 @@ SMIAL Catalog generator and lifecycle YAML registries.
   `RC001-H13-COMPOSITE-VETO`, `RC001-H07-H01-LIQUIDITY-RETENTION`, and
   `RC001-H02-H10-H14-PULLBACK-RECLAIM`.
 
-- [ ] **Step 1: Write the failing contract test**
+- [x] **Step 1: Write the failing contract test**
 
 ```python
 def test_rc001_fixture_matches_the_frozen_three_group_contract() -> None:
@@ -72,7 +73,7 @@ def test_rc001_fixture_matches_the_frozen_three_group_contract() -> None:
     self.assertEqual(config["global_search_policy"]["trial_record_creation"], "FORBIDDEN")
 ```
 
-- [ ] **Step 2: Run the test and verify RED**
+- [x] **Step 2: Run the test and verify RED**
 
 Run:
 
@@ -82,7 +83,7 @@ uv run --locked --managed-python python -B -m unittest tests.test_task28_rc001_r
 
 Expected: FAIL because the TASK-28 configuration and fixture do not exist.
 
-- [ ] **Step 3: Add the minimal versioned contract/config/schema/fixture**
+- [x] **Step 3: Add the minimal versioned contract/config/schema/fixture**
 
 The YAML must contain one `RESEARCH-CYCLE-RC001-001` record, the exact three
 group IDs above, per-group provenance labels, definition inputs, falsifier,
@@ -91,24 +92,19 @@ expected admissibility state. The schema must reject extra root keys and
 missing identities. The contract must state that a frozen plan creates no trial
 and consumes no holdout.
 
-- [ ] **Step 4: Run the contract test and verify GREEN**
+- [x] **Step 4: Run the contract test and verify GREEN**
 
 Run the exact command from Step 2. Expected: PASS.
 
-- [ ] **Step 5: Add direct boundary tests**
+- [x] **Step 5: Add direct boundary tests**
 
-```python
-def test_contract_rejects_numeric_netreturn_and_external_authority() -> None:
-    candidate = copy.deepcopy(load_yaml(CONFIG_PATH))
-    candidate["non_claims"]["numeric_netreturn"] = False
-    with self.assertRaisesRegex(ValueError, "numeric_netreturn"):
-        validate_contract(candidate)
-```
+Mutate the loaded policy at four public contract boundaries and assert that
+the strict schema rejects each candidate: numeric `NetReturn` promotion,
+provider authority, R3 access, and a missing `MISSING_UNKNOWN` preservation
+rule. These are configuration-boundary tests; the production validator added
+in Task 2 will separately test lifecycle and admissibility semantics.
 
-Add equivalent cases for provider authority, R3 access and a missing
-`MISSING_UNKNOWN` preservation rule.
-
-- [ ] **Step 6: Run the TASK-28 test module**
+- [x] **Step 6: Run the TASK-28 test module**
 
 Run:
 
@@ -118,21 +114,20 @@ uv run --locked --managed-python python -B -m unittest tests.test_task28_rc001_r
 
 Expected: PASS with every new contract-boundary case.
 
-### Task 2: Implement deterministic admissibility and registry bindings
+### Task 2: Implement deterministic admissibility and task-owned register bindings
 
 **Files:**
 - Create: `src/solana_alpha_lab/task28_rc001_registry_freeze.py`
 - Modify: `tests/test_task28_rc001_registry_freeze.py`
-- Modify: `registries/research_cycles.yaml`
-- Modify: `registries/hypotheses.yaml`
-- Modify: `registries/feature_catalog.yaml`
-- Read-only invariant: `registries/global_trial_ledger.yaml` must remain
-  unchanged; the test proves that RC-001 created no trial record.
+- Read only: `registries/research_cycles.yaml`, `registries/hypotheses.yaml`,
+  `registries/feature_catalog.yaml` and `registries/global_trial_ledger.yaml`
+  must remain unchanged; the test proves that RC-001 created no trial record
+  and did not rewrite TASK-16's historical skeletons.
 - Create: `docs/evidence/task28/a1_rc001_registry_freeze_acceptance_v1.json`
 
 **Interfaces:**
 - Consumes: `configs/task28_rc001_registry_freeze_v1.yaml` and the four
-  specialized registries.
+  read-only historical registries.
 - Produces:
   `canonical_definition_hash(group: Mapping[str, Any]) -> str`,
   `evaluate_admissibility(group: Mapping[str, Any]) -> Mapping[str, Any]`, and
@@ -141,7 +136,7 @@ Expected: PASS with every new contract-boundary case.
   `READY`, `LIMITED_DIAGNOSTIC_ONLY`, `BLOCKED_DATA`, or
   `BLOCKED_EXECUTION_TRUTH`, together with stable blocker codes.
 
-- [ ] **Step 1: Write the failing golden-admissibility test**
+- [x] **Step 1: Write the failing golden-admissibility test**
 
 ```python
 def test_frozen_group_with_known_missing_history_is_blocked_data() -> None:
@@ -151,7 +146,7 @@ def test_frozen_group_with_known_missing_history_is_blocked_data() -> None:
     self.assertIn("CONTINUOUS_PIT_PRICE_HISTORY_UNAVAILABLE", result["blocker_codes"])
 ```
 
-- [ ] **Step 2: Run the test and verify RED**
+- [x] **Step 2: Run the test and verify RED**
 
 Run:
 
@@ -161,7 +156,7 @@ uv run --locked --managed-python python -B -m unittest tests.test_task28_rc001_r
 
 Expected: FAIL because the validator function does not exist.
 
-- [ ] **Step 3: Implement the smallest offline validator**
+- [x] **Step 3: Implement the smallest offline validator**
 
 Implement only the three published functions. Canonical definition hashing
 uses deterministic UTF-8 JSON with sorted keys and sorted set-valued arrays.
@@ -170,11 +165,11 @@ is explicitly unavailable, `BLOCKED_EXECUTION_TRUTH` whenever a planned claim
 requires unsupported execution truth, and `READY` only when no requirement is
 unavailable or unsupported. It must never read a network resource.
 
-- [ ] **Step 4: Run the golden test and verify GREEN**
+- [x] **Step 4: Run the golden test and verify GREEN**
 
 Run the exact command from Step 2. Expected: PASS.
 
-- [ ] **Step 5: Write and run adversarial registry tests**
+- [x] **Step 5: Write and run adversarial register and historical-skeleton tests**
 
 ```python
 def test_validator_rejects_ready_state_without_required_entity_evidence() -> None:
@@ -189,30 +184,31 @@ definition ID, a foreign feature without a versioned link, a trial-like entry
 in the RC-001 ledger, and `MISSING_UNKNOWN` coercion. Run the full TASK-28 test
 module after each repair.
 
-- [ ] **Step 6: Add only forward registry records and acceptance evidence**
+- [x] **Step 6: Bind only the task-owned register and acceptance evidence**
 
-Append one RC-001 research-cycle record, three frozen hypothesis records and
-only their declared features. Do not create a trial record. Preserve the three
-existing TASK-23 ledger records unchanged. The acceptance receipt binds the
-config, schema, fixture, validator, all registries and known evidence by SHA-256
-and records zero external side effects.
+The config's research-cycle object and exactly three frozen groups are the
+versioned RC-001 register. Do not modify any TASK-16 skeleton or the TASK-23
+ledger. The acceptance receipt binds the config, schema, fixture, validator,
+all four preserved registries and known evidence by SHA-256 and records zero
+external side effects.
 
-- [ ] **Step 7: Verify deterministic behavior and registry preservation**
+- [x] **Step 7: Verify deterministic behavior and historical preservation**
 
 Run:
 
 ```text
 uv run --locked --managed-python python -B -m unittest tests.test_task28_rc001_registry_freeze
-uv run --locked --managed-python python -B scripts/validate_catalog.py
 ```
 
-Expected: PASS; the global ledger retains its three historical records and zero
-new RC-001 trial records.
+Expected: PASS; all four historical registry hashes remain unchanged, the
+global ledger retains its three historical records and zero new RC-001 trial
+records. Catalog validation follows the hash-updating transaction in Task 3.
 
 ### Task 3: Register Catalog outputs, perform Factory Fit and deliver
 
 **Files:**
 - Modify: `catalog/assets/core.yaml`
+- Modify: `catalog/assets/lifecycle.yaml`
 - Modify: `catalog/catalog_manifest.yaml`
 - Modify: `catalog/generated/asset_edges.json`
 - Modify: `docs/PROJECT_MAP.md`
@@ -222,11 +218,12 @@ new RC-001 trial records.
 **Interfaces:**
 - Consumes: every accepted Task 1 and Task 2 artifact.
 - Produces: Catalog records for the TASK-28 contract/config/schema/fixture/
-  module/test/registry evidence and a `FULL_REVIEW` Factory Fit receipt.
+  module/test/task-owned-register evidence and a `FULL_REVIEW` Factory Fit
+  receipt.
 - Catalog relations must point only to stable existing asset IDs or new
   TASK-28 asset IDs registered in the same transaction.
 
-- [ ] **Step 1: Write the failing Catalog/Factory-Fit test**
+- [x] **Step 1: Write the failing Catalog/Factory-Fit test**
 
 ```python
 def test_catalog_registers_all_task28_outputs_and_factory_fit_stays_offline() -> None:
@@ -238,7 +235,7 @@ def test_catalog_registers_all_task28_outputs_and_factory_fit_stays_offline() ->
     self.assertEqual(receipt["side_effect_counters"]["provider_api_rpc_wss_calls"], 0)
 ```
 
-- [ ] **Step 2: Run the test and verify RED**
+- [x] **Step 2: Run the test and verify RED**
 
 Run:
 
@@ -249,7 +246,7 @@ uv run --locked --managed-python python -B -m unittest tests.test_task28_rc001_r
 Expected: FAIL because TASK-28 Catalog records and Factory Fit receipt do not
 yet exist.
 
-- [ ] **Step 3: Add the additive Catalog transaction and Factory Fit receipt**
+- [x] **Step 3: Add the additive Catalog transaction and Factory Fit receipt**
 
 Register every Task-28 output with owner, purpose, hash/fingerprint, consumer,
 retention, sensitivity and relations. Increment the Catalog version/counts
@@ -258,7 +255,7 @@ research truth, owner operability, reuse, economics, monitoring/recovery,
 migration/rollback and red-team rejection cases; it must preserve the decision
 that blocked families are not failed market hypotheses.
 
-- [ ] **Step 4: Regenerate and validate Catalog views**
+- [x] **Step 4: Regenerate and validate Catalog views**
 
 Run:
 
@@ -270,7 +267,7 @@ uv run --locked --managed-python python -B scripts/generate_navigation.py --chec
 
 Expected: all three commands PASS; only the two declared generated files change.
 
-- [ ] **Step 5: Run targeted and full unit validation**
+- [x] **Step 5: Run targeted and full unit validation**
 
 Run:
 

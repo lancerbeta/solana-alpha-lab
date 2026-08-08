@@ -1,0 +1,147 @@
+schema: smial.task28.rc001-registry-freeze.policy
+schema_version: '1.0'
+task_id: TASK-28
+contract_id: TASK28-RC001-REGISTRY-FREEZE-V1
+consumer: NEXT_NAMED_RESEARCH_CYCLE_ENTRY_GATE
+research_cycle:
+  research_cycle_id: RESEARCH-CYCLE-RC001-001
+  task_owned_register_id: TASK28-RC001-REGISTER-001
+  register_kind: TASK_OWNED_CONFIG_EVIDENCE
+  title: RC-001 frozen hypothesis-family register
+  status: FROZEN_NOT_STARTED
+  definition_owner: TASK-28
+  trial_record_created: false
+  holdout_consumed: false
+hypothesis_groups:
+- group_id: RC001-H13-COMPOSITE-VETO
+  frozen_definition_id: DEF-RC001-H13-COMPOSITE-VETO-V1
+  feature_id: FEATURE-RC001-H13-COMPOSITE-VETO-V1
+  order: 1
+  blueprint_hypothesis_ids: [H13]
+  provenance_asset_ids:
+  - ARCH-T20-HYPOTHESIS-DATA-COVERAGE-MATRIX-001
+  - EVIDENCE-T24-A6-STOP-DECISION-001
+  - EVIDENCE-T27-A1S4-OWNER-ROUTE-CLOSE-001
+  definition_inputs:
+  - PIT price and liquidity state
+  - bounded composite toxicity-veto inputs
+  - separate entity-veto evidence when admissible
+  falsifier: Composite veto does not improve a predeclared risk outcome versus the frozen baseline without changing the population or outcome label.
+  target_metrics: [PIT_RISK_OUTCOME, ROUTE_AVAILABILITY, MISSINGNESS_RATE]
+  parameter_policy:
+    allowed_parameter_ids: [BASELINE_LOOKBACK_15M, VETO_FEATURE_SET_V1]
+    forbidden: [POST_VALUE_THRESHOLD_TUNING, ENTITY_PROXY_SUBSTITUTION, NEW_FEATURES]
+  requirements:
+  - requirement_id: ENTITY_ROUTE_NOT_ADMISSIBLE
+    domain: ENTITY
+    state: NOT_ADMISSIBLE
+  - requirement_id: CONTINUOUS_PIT_PRICE_HISTORY_UNAVAILABLE
+    domain: DATA
+    state: MISSING_UNKNOWN
+  - requirement_id: SETTLED_EXECUTION_TRUTH_UNAVAILABLE
+    domain: EXECUTION
+    state: UNSUPPORTED
+  expected_admissibility:
+    state: BLOCKED_DATA
+    blocker_codes: [ENTITY_ROUTE_NOT_ADMISSIBLE, CONTINUOUS_PIT_PRICE_HISTORY_UNAVAILABLE, SETTLED_EXECUTION_TRUTH_UNAVAILABLE]
+  definition_sha256: f1f020f4fa79acd2f2de667d71b8002d5821f45e9070a0f259c63210b23a16d0
+- group_id: RC001-H07-H01-LIQUIDITY-RETENTION
+  frozen_definition_id: DEF-RC001-H07-H01-LIQUIDITY-RETENTION-V1
+  feature_id: FEATURE-RC001-H07-H01-LIQUIDITY-RETENTION-V1
+  order: 2
+  blueprint_hypothesis_ids: [H07, H01]
+  provenance_asset_ids:
+  - ARCH-T20-HYPOTHESIS-DATA-COVERAGE-MATRIX-001
+  - EVIDENCE-T27-A1S4-OWNER-ROUTE-CLOSE-001
+  - EVIDENCE-T26B-A1-DECISION-001
+  definition_inputs:
+  - PIT liquidity-retention state
+  - multi-notional route persistence
+  - post-migration continuation context
+  falsifier: Frozen liquidity-retention features do not improve the predeclared route-aware outcome against the named baseline under the same PIT window.
+  target_metrics: [PIT_ROUTE_SURVIVAL, QUOTE_AVAILABILITY, MISSINGNESS_RATE]
+  parameter_policy:
+    allowed_parameter_ids: [OBSERVATION_WINDOW_15M, NOTIONAL_BUCKET_SET_V1]
+    forbidden: [POST_VALUE_NOTIONAL_SWEEP, CONTINUITY_IMPUTATION, NEW_FEATURES]
+  requirements:
+  - requirement_id: CONTINUOUS_PIT_PRICE_HISTORY_UNAVAILABLE
+    domain: DATA
+    state: MISSING_UNKNOWN
+  - requirement_id: SETTLED_EXECUTION_TRUTH_UNAVAILABLE
+    domain: EXECUTION
+    state: UNSUPPORTED
+  expected_admissibility:
+    state: BLOCKED_DATA
+    blocker_codes: [CONTINUOUS_PIT_PRICE_HISTORY_UNAVAILABLE, SETTLED_EXECUTION_TRUTH_UNAVAILABLE]
+  definition_sha256: 14a7387148d05773dedcb5ad6a8110a0dcab7e49da4dec77328903a5b7577df7
+- group_id: RC001-H02-H10-H14-PULLBACK-RECLAIM
+  frozen_definition_id: DEF-RC001-H02-H10-H14-PULLBACK-RECLAIM-V1
+  feature_id: FEATURE-RC001-H02-H10-H14-PULLBACK-RECLAIM-V1
+  order: 3
+  blueprint_hypothesis_ids: [H02, H10, H14]
+  provenance_asset_ids:
+  - ARCH-T20-HYPOTHESIS-DATA-COVERAGE-MATRIX-001
+  - EVIDENCE-T27-A1S4-OWNER-ROUTE-CLOSE-001
+  - EVIDENCE-T25-A6-CATALOG-FACTORY-FIT-001
+  definition_inputs:
+  - PIT controlled pullback and reclaim state
+  - sell-pressure decay
+  - repeat-buyer persistence
+  falsifier: Frozen reclaim features do not improve the predeclared route-aware outcome versus the same-drawdown cohort without expanding parameters or labels.
+  target_metrics: [PIT_RECLAIM_OUTCOME, QUOTE_AVAILABILITY, MISSINGNESS_RATE]
+  parameter_policy:
+    allowed_parameter_ids: [PULLBACK_WINDOW_15M, RECLAIM_CONFIRMATION_V1]
+    forbidden: [POST_VALUE_TRIGGER_TUNING, MISSINGNESS_COERCION, NEW_FEATURES]
+  requirements:
+  - requirement_id: CONTINUOUS_PIT_PRICE_HISTORY_UNAVAILABLE
+    domain: DATA
+    state: MISSING_UNKNOWN
+  - requirement_id: SETTLED_EXECUTION_TRUTH_UNAVAILABLE
+    domain: EXECUTION
+    state: UNSUPPORTED
+  expected_admissibility:
+    state: BLOCKED_DATA
+    blocker_codes: [CONTINUOUS_PIT_PRICE_HISTORY_UNAVAILABLE, SETTLED_EXECUTION_TRUTH_UNAVAILABLE]
+  definition_sha256: fc225417541570aa73814a4cb992f6f801a84bea1baf15696d754c706e0aa9f8
+global_search_policy:
+  trial_record_creation: FORBIDDEN
+  holdout_consumption: FORBIDDEN
+  parameter_tuning: FORBIDDEN
+  feature_expansion: FORBIDDEN
+  metric_expansion: FORBIDDEN
+  cross_group_combination: FORBIDDEN
+  replacement_rule: NEW_VERSIONED_DEFINITION_AND_OWNER_DECISION_REQUIRED
+  registered_parameter_ids:
+  - BASELINE_LOOKBACK_15M
+  - VETO_FEATURE_SET_V1
+  - OBSERVATION_WINDOW_15M
+  - NOTIONAL_BUCKET_SET_V1
+  - PULLBACK_WINDOW_15M
+  - RECLAIM_CONFIRMATION_V1
+  declared_feature_ids:
+  - FEATURE-RC001-H13-COMPOSITE-VETO-V1
+  - FEATURE-RC001-H07-H01-LIQUIDITY-RETENTION-V1
+  - FEATURE-RC001-H02-H10-H14-PULLBACK-RECLAIM-V1
+authority:
+  provider_api_rpc_wss_calls: false
+  credential_use: false
+  r2_r3_access: false
+  wallet_signer_transaction_actions: false
+  cash_spend: false
+  dependency_changes: false
+  project_sources_changes: false
+non_claims:
+  numeric_netreturn: true
+  actual_fills: true
+  complete_fees: true
+  settlement: true
+  alpha: true
+  continuous_path: true
+  missing_unknown_preserved: true
+admissibility_expectations:
+  allowed_states: [READY, LIMITED_DIAGNOSTIC_ONLY, BLOCKED_DATA, BLOCKED_EXECUTION_TRUTH]
+  blocked_data_precedence: [DATA, ENTITY]
+  missingness_state: MISSING_UNKNOWN
+  missing_to_zero_forbidden: true
+  ready_grants_authority: false
+project_sources_disposition: NO_CHANGE

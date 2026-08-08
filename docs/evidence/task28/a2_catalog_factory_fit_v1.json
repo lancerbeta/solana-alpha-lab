@@ -1,0 +1,91 @@
+{
+  "schema": "smial.task28.catalog-factory-fit.acceptance",
+  "schema_version": "1.0",
+  "receipt_id": "T28-A2-CATALOG-FACTORY-FIT-001",
+  "task_id": "TASK-28",
+  "atom_id": "T28-A2_REGISTER_RC001_ASSETS_AND_FULL_FACTORY_FIT_V1",
+  "status": "FULL_REVIEW_PASS_DELIVERY_PENDING",
+  "factory_fit": {
+    "mode": "FULL_REVIEW",
+    "verdict": "PASS_WITH_LIMITATIONS",
+    "mission": "PASS: freezes the first three research families so later evidence work cannot silently widen the search before the factory has a viable data route.",
+    "research_truth": "PASS: retains TASK-24 entity non-admissibility, TASK-27 MISSING_UNKNOWN history gaps, and TASK-25/26 execution limitations as blockers rather than observations or alpha evidence.",
+    "owner_operability": "PASS: one deterministic state and blocker list answers whether a named future entry gate may open a trial; blocked means do not start.",
+    "flexibility": "PASS: the task-owned config/evidence register preserves TASK-16's empty historical skeletons; a changed definition needs a new version instead of a rewrite.",
+    "efficiency": "PASS: reuses retained evidence and existing YAML/Catalog tooling; no provider, data store, dependency, service, or UI is added.",
+    "execution_to_cashflow": "NOT_IN_SCOPE: no fill, fee, settlement, numeric NetReturn, PnL, inventory, or owner cashflow claim is created.",
+    "monitoring_recovery": "PASS: no external process or position exists; source hash and registry drift fail offline validation before a future trial can start.",
+    "security": "PASS: no credential, wallet, signer, transaction, raw external response, or secret-bearing transport path exists.",
+    "migration_rollback": "PASS: additive records can be superseded by a new immutable definition; no historical trial, holdout, or raw evidence was changed.",
+    "red_team": [
+      "READY promotion with TASK-24 entity route still not admissible is rejected.",
+      "TASK-27 missing 15-minute bars cannot become zero, flat, continuous, or PIT-admissible.",
+      "A foreign feature, an unregistered parameter, duplicate definition identity, or RC-001 trial entry is rejected.",
+      "A schema-valid READY state grants no provider, execution, wallet, or cash authority."
+    ]
+  },
+  "catalog_transaction": {
+    "target_catalog_version": "0.40.0",
+    "expected_asset_count": 578,
+    "expected_schema_count": 16,
+    "expected_lifecycle_record_count": 59,
+    "new_asset_ids": [
+      "DOC-T28-RC001-REGISTRY-FREEZE-001",
+      "CONTRACT-T28-RC001-REGISTRY-FREEZE-001",
+      "CONFIG-T28-RC001-REGISTRY-FREEZE-001",
+      "SCHEMA-T28-RC001-REGISTRY-FREEZE-001",
+      "FIXTURE-T28-RC001-REGISTRY-FREEZE-001",
+      "MODULE-T28-RC001-REGISTRY-FREEZE-001",
+      "TEST-T28-RC001-REGISTRY-FREEZE-001",
+      "EVIDENCE-T28-A1-RC001-REGISTRY-FREEZE-001",
+      "EVIDENCE-T28-A2-CATALOG-FACTORY-FIT-001"
+    ]
+  },
+  "admissibility_summary": {
+    "READY": 0,
+    "LIMITED_DIAGNOSTIC_ONLY": 0,
+    "BLOCKED_DATA": 3,
+    "BLOCKED_EXECUTION_TRUTH": 0,
+    "trial_records_created": 0,
+    "holdouts_consumed": 0
+  },
+  "side_effect_counters": {
+    "provider_api_rpc_wss_calls": 0,
+    "credential_uses": 0,
+    "r2_r3_reads": 0,
+    "wallet_signer_transaction_actions": 0,
+    "cash_spend_usd_cents": 0,
+    "dependency_changes": 0,
+    "project_sources_changes": 0
+  },
+  "product_horizon_radar": {
+    "now": {
+      "candidate": "TASK28_DELIVERY_AND_SOURCE_RECONCILIATION",
+      "value": "Makes the first research-family register discoverable and prevents a future trial from starting against stale or absent definitions.",
+      "evidence": "Three groups are frozen, all are BLOCKED_DATA, and no trial exists.",
+      "cost_risk": "Local Catalog and Source-reconciliation work only; no provider or market action.",
+      "owner": "LOCAL_WORK_CODEX with Project Source smoke by goal owner when a release candidate exists.",
+      "activation_trigger": "Tracked-only delivery gate and exact-head CI pass.",
+      "why_now": "The control record is complete but not yet transported as a validated repository delivery."
+    },
+    "watch": {
+      "candidate": "NAMED_PIT_HISTORY_FEASIBILITY_ROUTE",
+      "value": "Could turn one frozen family from blocked to a separately reviewed evidence task.",
+      "evidence": "TASK-27's one-pool Solana Tracker route was insufficient; no alternate source is authorized or selected.",
+      "cost_risk": "Requires a new named consumer, data contract, provider authorization and preservation of MISSING_UNKNOWN.",
+      "owner": "Goal owner",
+      "activation_trigger": "A proposed experiment identifies a concrete minimal history requirement and a credible cheaper falsifier.",
+      "why_not_now": "No authorised external-data task exists, and TASK-28 must not reopen the closed route."
+    }
+  },
+  "decision": {
+    "task28_acceptance": false,
+    "state_change": "NONE",
+    "next_boundary": "TRACKED_ONLY_DELIVERY_THEN_PR_CI",
+    "canonical_task28_done": false
+  },
+  "project_sources_disposition": {
+    "kind": "CANDIDATE_ON_FINISH_GATE_ONLY",
+    "reason": "A durable task and Catalog change may require a new Project Source release after repository delivery; no Source role is changed by this local receipt."
+  }
+}

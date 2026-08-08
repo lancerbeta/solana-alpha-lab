@@ -1,6 +1,6 @@
 schema_version: '1.1'
 registry_id: CATALOG-ASSET-REGISTRY-LIFECYCLE-001
-as_of: '2026-08-06'
+as_of: '2026-08-09'
 records:
 - asset_id: REGISTRY-RESEARCH-CYCLES-001
   record_version: '1.0'
@@ -209,7 +209,7 @@ records:
   evidence: []
   classification: *id004
 - asset_id: GENERATED-PROJECT-MAP-001
-  record_version: '1.62'
+  record_version: '1.63'
   asset_type: generated_view
   purpose: Deterministic human-readable navigation projected only from the Catalog.
   status: IMPLEMENTED_UNVERIFIED
@@ -222,7 +222,7 @@ records:
     repository_path: docs/PROJECT_MAP.md
   integrity:
     kind: sha256
-    sha256: 2a3cc5029ba7948dd99e30adc8a81aac4078b2a5b0a555813264f2d2b347f02b
+    sha256: 4d929b29d83836433b5578855c349fc234c7b5817b81efcda2e79697ea009811
   access:
     mode: read_only
     method: file
@@ -263,10 +263,11 @@ records:
   - OWNER-AUTHORITY-PACKET-BINDING-V1
   - CANARY-SPECIFICATION-ONLY-V1
   - CTRL-OWNER-ATTENTION-GATE
+  - TASK-28
   evidence: []
   classification: *id004
 - asset_id: GENERATED-EDGE-PROJECTION-001
-  record_version: '1.44'
+  record_version: '1.45'
   asset_type: generated_view
   purpose: Deterministic machine-readable projection of Catalog asset relations.
   status: IMPLEMENTED_UNVERIFIED
@@ -279,7 +280,7 @@ records:
     repository_path: catalog/generated/asset_edges.json
   integrity:
     kind: sha256
-    sha256: fac966a698294cf1e157c76d3ff113f2711e74e5082bb6327af27dfa184eb356
+    sha256: 000ed8cc8c58806f926679a14942c48f4ab358759cdf94915431d80ad523ed4b
   access:
     mode: read_only
     method: file
@@ -319,5 +320,6 @@ records:
   - TASK-26C
   - OWNER-AUTHORITY-PACKET-BINDING-V1
   - CANARY-SPECIFICATION-ONLY-V1
+  - TASK-28
   evidence: []
   classification: *id004

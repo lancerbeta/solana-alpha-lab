@@ -1,0 +1,144 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "smial.task28.rc001-registry-freeze.schema.v1",
+  "title": "TASK-28 RC-001 research registry freeze",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema", "schema_version", "task_id", "contract_id", "consumer", "research_cycle", "hypothesis_groups", "global_search_policy", "authority", "non_claims", "admissibility_expectations", "project_sources_disposition"],
+  "properties": {
+    "schema": {"const": "smial.task28.rc001-registry-freeze.policy"},
+    "schema_version": {"const": "1.0"},
+    "task_id": {"const": "TASK-28"},
+    "contract_id": {"const": "TASK28-RC001-REGISTRY-FREEZE-V1"},
+    "consumer": {"const": "NEXT_NAMED_RESEARCH_CYCLE_ENTRY_GATE"},
+    "research_cycle": {"$ref": "#/$defs/research_cycle"},
+    "hypothesis_groups": {"type": "array", "minItems": 3, "maxItems": 3, "uniqueItems": true, "items": {"$ref": "#/$defs/group"}},
+    "global_search_policy": {"$ref": "#/$defs/search_policy"},
+    "authority": {"$ref": "#/$defs/authority"},
+    "non_claims": {"$ref": "#/$defs/non_claims"},
+    "admissibility_expectations": {"$ref": "#/$defs/admissibility_expectations"},
+    "project_sources_disposition": {"const": "NO_CHANGE"}
+  },
+  "$defs": {
+    "stable_id": {"type": "string", "pattern": "^[A-Z0-9][A-Z0-9-]{2,119}$"},
+    "research_cycle": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["research_cycle_id", "task_owned_register_id", "register_kind", "title", "status", "definition_owner", "trial_record_created", "holdout_consumed"],
+      "properties": {
+        "research_cycle_id": {"const": "RESEARCH-CYCLE-RC001-001"},
+        "task_owned_register_id": {"const": "TASK28-RC001-REGISTER-001"},
+        "register_kind": {"const": "TASK_OWNED_CONFIG_EVIDENCE"},
+        "title": {"type": "string", "minLength": 8},
+        "status": {"const": "FROZEN_NOT_STARTED"},
+        "definition_owner": {"const": "TASK-28"},
+        "trial_record_created": {"const": false},
+        "holdout_consumed": {"const": false}
+      }
+    },
+    "group": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["group_id", "frozen_definition_id", "feature_id", "order", "blueprint_hypothesis_ids", "provenance_asset_ids", "definition_inputs", "falsifier", "target_metrics", "parameter_policy", "requirements", "expected_admissibility", "definition_sha256"],
+      "properties": {
+        "group_id": {"enum": ["RC001-H13-COMPOSITE-VETO", "RC001-H07-H01-LIQUIDITY-RETENTION", "RC001-H02-H10-H14-PULLBACK-RECLAIM"]},
+        "frozen_definition_id": {"$ref": "#/$defs/stable_id"},
+        "feature_id": {"$ref": "#/$defs/stable_id"},
+        "order": {"enum": [1, 2, 3]},
+        "blueprint_hypothesis_ids": {"type": "array", "minItems": 1, "uniqueItems": true, "items": {"pattern": "^H[0-9]{2}$", "type": "string"}},
+        "provenance_asset_ids": {"type": "array", "minItems": 2, "uniqueItems": true, "items": {"$ref": "#/$defs/stable_id"}},
+        "definition_inputs": {"type": "array", "minItems": 2, "uniqueItems": true, "items": {"type": "string", "minLength": 8}},
+        "falsifier": {"type": "string", "minLength": 30},
+        "target_metrics": {"type": "array", "minItems": 2, "uniqueItems": true, "items": {"type": "string", "pattern": "^[A-Z0-9_]+$"}},
+        "parameter_policy": {"$ref": "#/$defs/parameter_policy"},
+        "requirements": {"type": "array", "minItems": 2, "uniqueItems": true, "items": {"$ref": "#/$defs/requirement"}},
+        "expected_admissibility": {"$ref": "#/$defs/admissibility"},
+        "definition_sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"}
+      }
+    },
+    "parameter_policy": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["allowed_parameter_ids", "forbidden"],
+      "properties": {
+        "allowed_parameter_ids": {"type": "array", "minItems": 1, "uniqueItems": true, "items": {"type": "string", "pattern": "^[A-Z0-9_]+$"}},
+        "forbidden": {"type": "array", "minItems": 2, "uniqueItems": true, "items": {"type": "string", "pattern": "^[A-Z0-9_]+$"}}
+      }
+    },
+    "requirement": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["requirement_id", "domain", "state"],
+      "properties": {
+        "requirement_id": {"type": "string", "pattern": "^[A-Z0-9_]+$"},
+        "domain": {"enum": ["DATA", "ENTITY", "EXECUTION"]},
+        "state": {"enum": ["AVAILABLE", "MISSING_UNKNOWN", "NOT_ADMISSIBLE", "UNSUPPORTED"]}
+      }
+    },
+    "admissibility": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["state", "blocker_codes"],
+      "properties": {
+        "state": {"enum": ["READY", "LIMITED_DIAGNOSTIC_ONLY", "BLOCKED_DATA", "BLOCKED_EXECUTION_TRUTH"]},
+        "blocker_codes": {"type": "array", "uniqueItems": true, "items": {"type": "string", "pattern": "^[A-Z0-9_]+$"}}
+      }
+    },
+    "search_policy": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["trial_record_creation", "holdout_consumption", "parameter_tuning", "feature_expansion", "metric_expansion", "cross_group_combination", "replacement_rule", "registered_parameter_ids", "declared_feature_ids"],
+      "properties": {
+        "trial_record_creation": {"const": "FORBIDDEN"},
+        "holdout_consumption": {"const": "FORBIDDEN"},
+        "parameter_tuning": {"const": "FORBIDDEN"},
+        "feature_expansion": {"const": "FORBIDDEN"},
+        "metric_expansion": {"const": "FORBIDDEN"},
+        "cross_group_combination": {"const": "FORBIDDEN"},
+        "replacement_rule": {"const": "NEW_VERSIONED_DEFINITION_AND_OWNER_DECISION_REQUIRED"},
+        "registered_parameter_ids": {"type": "array", "minItems": 1, "uniqueItems": true, "items": {"type": "string", "pattern": "^[A-Z0-9_]+$"}},
+        "declared_feature_ids": {"type": "array", "minItems": 3, "maxItems": 3, "uniqueItems": true, "items": {"$ref": "#/$defs/stable_id"}}
+      }
+    },
+    "authority": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["provider_api_rpc_wss_calls", "credential_use", "r2_r3_access", "wallet_signer_transaction_actions", "cash_spend", "dependency_changes", "project_sources_changes"],
+      "properties": {
+        "provider_api_rpc_wss_calls": {"const": false},
+        "credential_use": {"const": false},
+        "r2_r3_access": {"const": false},
+        "wallet_signer_transaction_actions": {"const": false},
+        "cash_spend": {"const": false},
+        "dependency_changes": {"const": false},
+        "project_sources_changes": {"const": false}
+      }
+    },
+    "non_claims": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["numeric_netreturn", "actual_fills", "complete_fees", "settlement", "alpha", "continuous_path", "missing_unknown_preserved"],
+      "properties": {
+        "numeric_netreturn": {"const": true},
+        "actual_fills": {"const": true},
+        "complete_fees": {"const": true},
+        "settlement": {"const": true},
+        "alpha": {"const": true},
+        "continuous_path": {"const": true},
+        "missing_unknown_preserved": {"const": true}
+      }
+    },
+    "admissibility_expectations": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["allowed_states", "blocked_data_precedence", "missingness_state", "missing_to_zero_forbidden", "ready_grants_authority"],
+      "properties": {
+        "allowed_states": {"const": ["READY", "LIMITED_DIAGNOSTIC_ONLY", "BLOCKED_DATA", "BLOCKED_EXECUTION_TRUTH"]},
+        "blocked_data_precedence": {"const": ["DATA", "ENTITY"]},
+        "missingness_state": {"const": "MISSING_UNKNOWN"},
+        "missing_to_zero_forbidden": {"const": true},
+        "ready_grants_authority": {"const": false}
+      }
+    }
+  }
+}

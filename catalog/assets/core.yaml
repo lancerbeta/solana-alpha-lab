@@ -15078,3 +15078,160 @@ records:
   consumers: [TASK-27, FACTORY-001, CHATGPT-PROJECT-CONTROL-PLANE]
   evidence: []
   classification: *t25_internal
+
+- asset_id: DOC-T28-RC001-REGISTRY-FREEZE-001
+  record_version: '1.0'
+  asset_type: control_document
+  purpose: TASK-28 offline scope, frozen RC-001 sequence, definition of done and future-trial boundary.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-08-09'
+  truth_owner: TASK-28
+  location: {kind: git_path, logical_uri: 'repo://docs/tasks/TASK-28-rc001-registry-freeze.md', repository_path: docs/tasks/TASK-28-rc001-registry-freeze.md}
+  integrity: {kind: sha256, sha256: cfd5bce3298018aaa58b21962315c991fde6bfadeea8cf9f87a5470aa3840bf8}
+  access: *t25_read_file
+  relations:
+  - {relation_type: derived_from, target_asset_id: EVIDENCE-T27-A2R1-SOURCE-ACTIVATION-CLOSE-001}
+  consumers: [TASK-28, FACTORY-001]
+  evidence: []
+  classification: *t25_internal
+
+- asset_id: CONTRACT-T28-RC001-REGISTRY-FREEZE-001
+  record_version: '1.0'
+  asset_type: control_document
+  purpose: Versioned immutable RC-001 definition, admissibility, authority and non-claim contract.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-08-09'
+  truth_owner: TASK-28
+  location: {kind: git_path, logical_uri: 'repo://docs/contracts/task28_rc001_registry_freeze_contract_v1.md', repository_path: docs/contracts/task28_rc001_registry_freeze_contract_v1.md}
+  integrity: {kind: sha256, sha256: 8c1c94db91fe7d544f7177496390ab5d25ea558927d4e068408bc495cb6a56cb}
+  access: *t25_read_file
+  relations:
+  - {relation_type: governed_by, target_asset_id: DOC-T28-RC001-REGISTRY-FREEZE-001}
+  - {relation_type: derived_from, target_asset_id: ARCH-T20-HYPOTHESIS-DATA-COVERAGE-MATRIX-001}
+  consumers: [TASK-28, FACTORY-001]
+  evidence: []
+  classification: *t25_internal
+
+- asset_id: CONFIG-T28-RC001-REGISTRY-FREEZE-001
+  record_version: '1.0'
+  asset_type: configuration
+  purpose: Machine-readable frozen group definitions, blocker states, registered parameters and zero-authority policy.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-08-09'
+  truth_owner: TASK-28
+  location: {kind: git_path, logical_uri: 'repo://configs/task28_rc001_registry_freeze_v1.yaml', repository_path: configs/task28_rc001_registry_freeze_v1.yaml}
+  integrity: {kind: sha256, sha256: c4fbb7157a13d1dee0f2b1f163e8f8fc1a38da4bc850275fba25bc0d70a785a7}
+  access: *t25_read_file
+  relations: [{relation_type: governed_by, target_asset_id: CONTRACT-T28-RC001-REGISTRY-FREEZE-001}]
+  consumers: [TASK-28, FACTORY-001]
+  evidence: []
+  classification: *t25_internal
+
+- asset_id: SCHEMA-T28-RC001-REGISTRY-FREEZE-001
+  record_version: '1.0'
+  asset_type: schema
+  purpose: Strict JSON Schema for the three-group RC-001 freeze and fail-closed authority boundary.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-08-09'
+  truth_owner: TASK-28
+  location: {kind: git_path, logical_uri: 'repo://catalog/schemas/task28_rc001_registry_freeze.schema.json', repository_path: catalog/schemas/task28_rc001_registry_freeze.schema.json}
+  integrity: {kind: sha256, sha256: a17ac18af8da583a60525b33bf0907c388ab82700d67e262ced8b6547e76d217}
+  access: *t25_read_file
+  relations: [{relation_type: governed_by, target_asset_id: CONTRACT-T28-RC001-REGISTRY-FREEZE-001}]
+  consumers: [TASK-28, FACTORY-001]
+  evidence: []
+  classification: *t25_internal
+
+- asset_id: FIXTURE-T28-RC001-REGISTRY-FREEZE-001
+  record_version: '1.0'
+  asset_type: evidence
+  purpose: Synthetic golden and adversarial RC-001 group, authority and missingness matrix.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-08-09'
+  truth_owner: TASK-28
+  location: {kind: git_path, logical_uri: 'repo://tests/fixtures/task28/rc001_registry_freeze_v1.json', repository_path: tests/fixtures/task28/rc001_registry_freeze_v1.json}
+  integrity: {kind: sha256, sha256: e2ec41422b33f2ac395503ff272acb1a12e9ec56d642bc41bb73f72560993bfc}
+  access: *t25_read_file
+  relations: [{relation_type: derived_from, target_asset_id: CONFIG-T28-RC001-REGISTRY-FREEZE-001}]
+  consumers: [TASK-28, FACTORY-001]
+  evidence: []
+  classification: *t25_internal
+
+- asset_id: MODULE-T28-RC001-REGISTRY-FREEZE-001
+  record_version: '1.0'
+  asset_type: script
+  purpose: Deterministic offline RC-001 definition-hash, admissibility and historical-skeleton preservation evaluator.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-08-09'
+  truth_owner: TASK-28
+  location: {kind: git_path, logical_uri: 'repo://src/solana_alpha_lab/task28_rc001_registry_freeze.py', repository_path: src/solana_alpha_lab/task28_rc001_registry_freeze.py}
+  integrity: {kind: sha256, sha256: da1de849d3c1ff9cf7e4e36aac0ca17fa3aae9c82c4a3fc28c7b35b9fcfb0589}
+  access: *t25_read_file
+  relations:
+  - {relation_type: governed_by, target_asset_id: CONFIG-T28-RC001-REGISTRY-FREEZE-001}
+  - {relation_type: produces, target_asset_id: EVIDENCE-T28-A1-RC001-REGISTRY-FREEZE-001}
+  consumers: [TASK-28, FACTORY-001]
+  evidence: []
+  classification: *t25_internal
+
+- asset_id: TEST-T28-RC001-REGISTRY-FREEZE-001
+  record_version: '1.0'
+  asset_type: script
+  purpose: Deterministic adversarial tests for frozen definitions, skeleton preservation, Catalog registration and zero-side-effect receipts.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-08-09'
+  truth_owner: TASK-28
+  location: {kind: git_path, logical_uri: 'repo://tests/test_task28_rc001_registry_freeze.py', repository_path: tests/test_task28_rc001_registry_freeze.py}
+  integrity: {kind: sha256, sha256: ae845c4ddca8bd943222e369e0f5652d1db9367c7e80ec6cb52f7cdb9961a0fc}
+  access: *t25_read_file
+  relations:
+  - {relation_type: depends_on, target_asset_id: MODULE-T28-RC001-REGISTRY-FREEZE-001}
+  - {relation_type: depends_on, target_asset_id: SCHEMA-T28-RC001-REGISTRY-FREEZE-001}
+  - {relation_type: depends_on, target_asset_id: FIXTURE-T28-RC001-REGISTRY-FREEZE-001}
+  - {relation_type: depends_on, target_asset_id: EVIDENCE-T28-A2-CATALOG-FACTORY-FIT-001}
+  consumers: [TASK-28, FACTORY-001]
+  evidence: []
+  classification: *t25_internal
+
+- asset_id: EVIDENCE-T28-A1-RC001-REGISTRY-FREEZE-001
+  record_version: '1.0'
+  asset_type: evidence
+  purpose: Hash-bound acceptance receipt for the offline RC-001 registry freeze and retained blockers.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-08-09'
+  truth_owner: TASK-28
+  location: {kind: git_path, logical_uri: 'repo://docs/evidence/task28/a1_rc001_registry_freeze_acceptance_v1.json', repository_path: docs/evidence/task28/a1_rc001_registry_freeze_acceptance_v1.json}
+  integrity: {kind: sha256, sha256: 05b12d3acd1bc9bb960ab73518e86cefcca796881ecc27e02380ff3b997118ce}
+  access: *t25_read_file
+  relations:
+  - {relation_type: derived_from, target_asset_id: MODULE-T28-RC001-REGISTRY-FREEZE-001}
+  - {relation_type: validated_by, target_asset_id: TEST-T28-RC001-REGISTRY-FREEZE-001}
+  consumers: [TASK-28, FACTORY-001]
+  evidence: []
+  classification: *t25_internal
+
+- asset_id: EVIDENCE-T28-A2-CATALOG-FACTORY-FIT-001
+  record_version: '1.0'
+  asset_type: evidence
+  purpose: FULL Factory Fit and Catalog-registration receipt for the offline RC-001 research-control layer.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-08-09'
+  truth_owner: TASK-28
+  location: {kind: git_path, logical_uri: 'repo://docs/evidence/task28/a2_catalog_factory_fit_v1.json', repository_path: docs/evidence/task28/a2_catalog_factory_fit_v1.json}
+  integrity: {kind: sha256, sha256: d432bf64fed51ff4f645e228c79d993a00db25e6968c7a347546f499e090c310}
+  access: *t25_read_file
+  relations:
+  - {relation_type: derived_from, target_asset_id: EVIDENCE-T28-A1-RC001-REGISTRY-FREEZE-001}
+  - {relation_type: validated_by, target_asset_id: TEST-T28-RC001-REGISTRY-FREEZE-001}
+  consumers: [TASK-28, FACTORY-001]
+  evidence: []
+  classification: *t25_internal
