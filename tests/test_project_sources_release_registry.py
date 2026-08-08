@@ -212,7 +212,7 @@ class ProjectSourcesReleaseRegistryTests(unittest.TestCase):
         self.assertEqual(registry["registry_version"], 1)
         self.assertEqual(registry["active_ui_release_id"], FIRST_RELEASE_ID)
         self.assertEqual(registry["active_ui_state"], "REGISTRY_ACTIVATION_CONFIRMED")
-        self.assertIsNone(registry["latest_candidate_release_id"])
+        self.assertEqual(registry["latest_candidate_release_id"], "PSR-0002-T27-CLOSE")
         self.assertEqual(release["status"], ACTIVE_STATUS)
         self.assertEqual(release["activation_receipt"], ACTIVATION_RECEIPT_PATH.relative_to(ROOT).as_posix())
         self.assertTrue((ROOT / release["bundle_path"] / "canonical_manifest.yaml").is_file())
