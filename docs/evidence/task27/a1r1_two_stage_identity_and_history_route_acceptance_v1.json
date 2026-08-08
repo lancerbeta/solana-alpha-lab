@@ -1,0 +1,127 @@
+{
+  "schema": "smial.task27.a1r1.two_stage_identity_and_history_route.acceptance",
+  "schema_version": "1.0",
+  "task_id": "TASK-27",
+  "atom_id": "T27-A1R1_TWO_STAGE_IDENTITY_AND_HISTORY_ROUTE_DESIGN_V1",
+  "status": "PASS_TARGETED_VALIDATION_PENDING_DELIVERY",
+  "implementation_base": {
+    "commit": "c8e0ddf455a9c5445dc96260cf3f1709dc676f5e",
+    "branch": "task27/two-stage-history-route-design"
+  },
+  "authority": {
+    "user_authority": "T27-A1R1_OFFLINE_ROUTE_CONTRACT_AND_SYNTHETIC_TESTS_ONLY",
+    "provider_read_authority": false,
+    "provider_api_rpc_wss_calls": 0,
+    "credential_use": false,
+    "raw_provider_responses_retained": 0,
+    "r2_value_reads": 0,
+    "r3_value_or_path_reads": 0,
+    "wallet_signer_transaction_actions": 0,
+    "cash_spend_usd_cents": 0,
+    "dependency_changes": false,
+    "catalog_or_registry_mutation": false,
+    "project_source_changes": false
+  },
+  "managed_write_set": [
+    "docs/contracts/task27_two_stage_identity_and_history_route_contract_v1.md",
+    "configs/task27_two_stage_identity_and_history_route_contract_v1.yaml",
+    "catalog/schemas/task27_two_stage_identity_and_history_route.schema.json",
+    "tests/fixtures/task27/two_stage_identity_and_history_route_v1.json",
+    "tests/test_task27_two_stage_identity_and_history_route.py",
+    "docs/evidence/task27/a1r1_two_stage_identity_and_history_route_acceptance_v1.json"
+  ],
+  "artifact_bindings": {
+    "contract": {
+      "path": "docs/contracts/task27_two_stage_identity_and_history_route_contract_v1.md",
+      "sha256": "6663e6136bee935abdc2a4f33cd6458e49e1c3c06ea894e7db7010886ccf1d2d"
+    },
+    "config": {
+      "path": "configs/task27_two_stage_identity_and_history_route_contract_v1.yaml",
+      "sha256": "85db1ba86b206317d5c171664e4bfee68e4d2e53dead015580c9b4356249d99a"
+    },
+    "schema": {
+      "path": "catalog/schemas/task27_two_stage_identity_and_history_route.schema.json",
+      "sha256": "3c5bcd597ee202854f9c7e7ee8f0cf4612c463fa28f6bb0dd53c7f98d72cc26d"
+    },
+    "fixture": {
+      "path": "tests/fixtures/task27/two_stage_identity_and_history_route_v1.json",
+      "sha256": "c13ac4264910861947cc607519b090011b90f43a890752bdb1f393c05aa6a7f1"
+    }
+  },
+  "source_binding": {
+    "a7_config": {
+      "path": "configs/task27_exact_single_pool_selection_and_pilot_read_packet_v1.yaml",
+      "sha256": "971fdd4455e6e140e1f27b1a0c39ab5fa96a4b19bb0d9c18c5ac304706400c98"
+    },
+    "source_smoke_receipt": {
+      "path": "docs/evidence/task27/a0a5r1_project_sources_activation_receipt_v1.json",
+      "sha256": "8ef3acf01a1eecd6d826bc95fb365d56571f02355b4f903fcac93c485c0c95ac"
+    }
+  },
+  "validation": {
+    "targeted_command": "uv run --locked --managed-python python -B -m unittest tests.test_task27_two_stage_identity_and_history_route",
+    "targeted_tests_run": 6,
+    "targeted_tests_passed": 6,
+    "adversarial_cases_rejected": 17,
+    "schema_draft": "2020-12",
+    "valid_synthetic_packets": 1,
+    "full_validation": "PENDING_TRACKED_ONLY_DELIVERY"
+  },
+  "factory_fit_review": "FULL_REVIEW",
+  "factory_fit": {
+    "verdict": "PASS_WITH_LIMITATIONS",
+    "mission_alignment": "PASS",
+    "research_truth": "PASS",
+    "owner_operability": "PASS",
+    "execution_to_cashflow": "NOT_IN_SCOPE_NO_CLAIM",
+    "monitoring_recovery": "PASS_FAILURE_STOPS_BEFORE_RETRY",
+    "security": "PASS_HEADER_ONLY_SECRET_BOUNDARY",
+    "reuse_build": "PASS_REUSES_EXISTING_CONTRACT_PATTERN_NO_GENERIC_ADAPTER",
+    "red_team": "PASS_17_SYNTHETIC_ADVERSARIAL_REJECTIONS"
+  },
+  "semantic_acceptance": {
+    "dexscreener_identity_is_not_history": "PASS",
+    "solana_tracker_requires_stage_a_identity_and_separate_authority": "PASS",
+    "token_only_dynamic_pool_and_hidden_transformations_are_rejected": "PASS",
+    "key_url_log_fixture_and_receipt_exposure_are_rejected": "PASS",
+    "retry_fallback_and_helius_reconstruction_are_rejected": "PASS",
+    "missing_incomplete_or_altered_panel_remains_unknown": "PASS",
+    "pit_alpha_execution_pnl_netreturn_cashflow_and_task_completion_claims_are_rejected": "PASS"
+  },
+  "product_horizon_radar": {
+    "now": {
+      "candidate": "ONE_EXACT_DEXSCREENER_IDENTITY_GET",
+      "value": "Resolve the base mint without guessing before an authenticated OHLCV decision.",
+      "activation_trigger": "Owner separately approves the exact one-GET Stage A packet and raw-retention terms."
+    },
+    "watch": {
+      "candidate": "SOLANA_TRACKER_POOL_OHLCV_PILOT",
+      "value": "Test one frozen 24-hour pool-specific 15-minute panel only after identity is retained.",
+      "activation_trigger": "Stage A identity hash exists and owner separately approves two exact credentialed GETs."
+    }
+  },
+  "project_sources_disposition": {
+    "kind": "NO_CHANGE",
+    "reason": "Offline route contract only; it changes no Project Source role or release payload."
+  },
+  "measured_boundary": {
+    "provider_api_rpc_wss_calls": 0,
+    "credential_use": false,
+    "raw_provider_responses_retained": 0,
+    "r2_value_reads": 0,
+    "r3_value_or_path_reads": 0,
+    "wallet_signer_transaction_actions": 0,
+    "cash_spend_usd_cents": 0,
+    "dependency_changes": 0,
+    "catalog_or_registry_mutations": 0,
+    "project_source_changes": 0
+  },
+  "state_change": "NONE",
+  "next_boundary": {
+    "provider_read_authority_granted": false,
+    "next_owner_gate": "ONE_EXACT_DEXSCREENER_IDENTITY_GET_REQUIRED",
+    "stage_a_request_count_max": 1,
+    "solana_tracker_stage_b_authorized": false,
+    "task27_acceptance": false
+  }
+}

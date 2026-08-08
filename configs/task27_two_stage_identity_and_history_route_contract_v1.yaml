@@ -1,0 +1,117 @@
+schema: smial.task27.two_stage_identity_and_history_route.contract
+schema_version: '1.0'
+task_id: TASK-27
+atom_id: T27-A1R1_TWO_STAGE_IDENTITY_AND_HISTORY_ROUTE_DESIGN_V1
+consumer: OWNER_EXTERNAL_READ_DECISION
+source_binding:
+  a7_config:
+    path: configs/task27_exact_single_pool_selection_and_pilot_read_packet_v1.yaml
+    sha256: 971fdd4455e6e140e1f27b1a0c39ab5fa96a4b19bb0d9c18c5ac304706400c98
+  source_smoke_receipt:
+    path: docs/evidence/task27/a0a5r1_project_sources_activation_receipt_v1.json
+    sha256: 8ef3acf01a1eecd6d826bc95fb365d56571f02355b4f903fcac93c485c0c95ac
+owner_nominated_pool:
+  network: solana
+  pool_address: URqx24yyYxtXXhTbBQnbtPLhtLWYoaDaRxuQuLpNS3S
+  selection_snapshot_sha256: 922e2b1f529d5e1d2beab34c93320914a0ac9670a956c0123fb69ba5ad5315a2
+  selection_class: OWNER_NOMINATED_SINGLE_POOL
+stage_a:
+  provider: DEXSCREENER_PUBLIC_PAIR_IDENTITY
+  request_id: T27-A1R1-STAGE-A-IDENTITY-001
+  request_count: 1
+  method: GET
+  url: https://api.dexscreener.com/latest/dex/pairs/solana/URqx24yyYxtXXhTbBQnbtPLhtLWYoaDaRxuQuLpNS3S
+  output: FROZEN_BASE_MINT_AND_POOL_IDENTITY
+  required_identity_fields:
+    - network
+    - pool_address
+    - base_mint
+    - quote_mint
+    - dex_id
+  raw_evidence_manifest_id: T27-A1R1-STAGE-A-RAW-MANIFEST-001
+  automatic_fallback_provider: null
+  provider_read_authority: false
+stage_b:
+  provider: SOLANA_TRACKER_POOL_OHLCV
+  activation_state: STAGE_A_RETAINED_IDENTITY_REQUIRED
+  request_count_max: 2
+  credential_transport: LOCAL_HEADER_FROM_ENV_REDACTED
+  token_endpoint_template: https://data.solanatracker.io/tokens/{base_mint}
+  pool_chart_endpoint_template: https://data.solanatracker.io/chart/{base_mint}/{pool_address}
+  route_kind: POOL_SPECIFIC_ONLY
+  dynamic_pool_selection: false
+  chart_parameters:
+    type: 15m
+    time_from: OWNER_FROZEN_UTC_EPOCH_REQUIRED
+    time_to: OWNER_FROZEN_UTC_EPOCH_REQUIRED
+    currency: usd
+    removeOutliers: false
+    fastCache: false
+    timezone: UTC
+  interval_seconds: 900
+  panel_duration_hours: 24
+  required_natural_bars: 96
+  raw_evidence_manifest_id: T27-A1R1-STAGE-B-RAW-MANIFEST-001
+  quota_and_cost:
+    state: OWNER_QUOTA_AND_CREDIT_BOUNDARY_REQUIRED
+    cash_cost_claim: NOT_MADE
+    automatic_spend: false
+  automatic_fallback_provider: null
+  helius_transaction_reconstruction: FORBIDDEN_BY_THIS_ATOM
+  provider_read_authority: false
+future_acceptance:
+  runtime_outcomes:
+    - READY_FOR_BOUNDED_HISTORY_CAPTURE
+    - REDESIGN_PUBLIC_HISTORY_ROUTE
+    - CLOSE_PUBLIC_HISTORY_ROUTE
+  missing_result: UNKNOWN
+  timestamps_unique_required: true
+  timestamps_ascending_required: true
+  timestamps_aligned_required: true
+  gaps_allowed: false
+  duplicates_allowed: false
+  natural_observations_only: true
+  ohlc_positive_required: true
+  ohlc_consistent_required: true
+  volume_currency: usd
+  carried_forward_forbidden: true
+retention:
+  raw_location_pattern: local/task27_public_history_route/run=<run_id>/raw_manifest_v1.json
+  failed_or_unusable_probe_days: 30
+  dependent_research: RETAIN_WITH_DEPENDENT_RESEARCH_AND_HASHES
+authority:
+  user_authority: T27-A1R1_OFFLINE_ROUTE_CONTRACT_AND_SYNTHETIC_TESTS_ONLY
+  provider_read_authority: false
+  provider_api_rpc_wss_calls: 0
+  credential_use: false
+  raw_provider_responses_retained: 0
+  r2_value_reads: 0
+  r3_value_or_path_reads: 0
+  wallet_signer_transaction_actions: 0
+  cash_spend_usd_cents: 0
+  dependency_changes: false
+  catalog_or_registry_mutation: false
+  project_source_changes: false
+claims:
+  scope: HISTORICAL_FEASIBILITY_ROUTE_DESIGN_ONLY
+  history_grade: NO_HISTORY_COLLECTED
+  representative_sample: false
+  pit_admissible: false
+  alpha: false
+  execution: false
+  pnl: false
+  netreturn: false
+  cashflow: false
+future_owner_approval:
+  state: STAGE_A_EXACT_OWNER_AUTHORITY_REQUIRED
+  approval_granted: false
+  stage_a_request_authorized: false
+  stage_b_request_authorized: false
+  phrase: OWNER_INPUT_REQUIRED_AFTER_OFFLINE_DELIVERY
+managed_write_set:
+  - docs/contracts/task27_two_stage_identity_and_history_route_contract_v1.md
+  - configs/task27_two_stage_identity_and_history_route_contract_v1.yaml
+  - catalog/schemas/task27_two_stage_identity_and_history_route.schema.json
+  - tests/fixtures/task27/two_stage_identity_and_history_route_v1.json
+  - tests/test_task27_two_stage_identity_and_history_route.py
+  - docs/evidence/task27/a1r1_two_stage_identity_and_history_route_acceptance_v1.json

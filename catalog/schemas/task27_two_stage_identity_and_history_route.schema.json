@@ -1,0 +1,168 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://schemas.solana-alpha-lab.local/task27/two-stage-identity-and-history-route-v1.json",
+  "title": "TASK-27 two-stage identity and history-route fixture",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["fixture_kind", "valid_packet", "adversarial_cases"],
+  "properties": {
+    "fixture_kind": {"const": "SYNTHETIC_VALUES_WITH_OWNER_NOMINATED_POOL"},
+    "valid_packet": {"$ref": "#/$defs/packet"},
+    "adversarial_cases": {
+      "type": "array",
+      "minItems": 17,
+      "maxItems": 17,
+      "items": {"$ref": "#/$defs/adversarial_case"}
+    }
+  },
+  "$defs": {
+    "adversarial_case": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["case_id", "pointer", "value", "expected_error"],
+      "properties": {
+        "case_id": {"type": "string", "minLength": 1},
+        "pointer": {"type": "string", "pattern": "^/"},
+        "value": {},
+        "expected_error": {"type": "string", "minLength": 1}
+      }
+    },
+    "identity": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["network", "pool_address", "base_mint", "quote_mint", "dex_id"],
+      "properties": {
+        "network": {"type": "string", "minLength": 1},
+        "pool_address": {"type": "string", "minLength": 1},
+        "base_mint": {"type": "string", "minLength": 1},
+        "quote_mint": {"type": "string", "minLength": 1},
+        "dex_id": {"type": "string", "minLength": 1}
+      }
+    },
+    "raw_manifest": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "state"],
+      "properties": {
+        "id": {"type": "string"},
+        "state": {"type": "string", "minLength": 1}
+      }
+    },
+    "stage_a": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["provider", "request_id", "method", "url", "request_count", "identity_state", "identity", "raw_manifest", "automatic_fallback_provider"],
+      "properties": {
+        "provider": {"type": "string", "minLength": 1},
+        "request_id": {"type": "string", "minLength": 1},
+        "method": {"type": "string", "minLength": 1},
+        "url": {"type": "string", "minLength": 1},
+        "request_count": {"type": "integer", "minimum": 0},
+        "identity_state": {"type": "string", "minLength": 1},
+        "identity": {"$ref": "#/$defs/identity"},
+        "raw_manifest": {"$ref": "#/$defs/raw_manifest"},
+        "automatic_fallback_provider": {"type": ["null", "string"]}
+      }
+    },
+    "stage_b": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["provider", "activation_state", "request_count_max", "credential_transport", "token_endpoint_template", "pool_chart_endpoint_template", "route_kind", "dynamic_pool_selection", "type", "time_from", "time_to", "currency", "removeOutliers", "fastCache", "timezone", "interval_seconds", "panel_duration_hours", "required_natural_bars", "quota_state", "cash_cost_claim", "automatic_fallback_provider", "helius_transaction_reconstruction", "raw_manifest"],
+      "properties": {
+        "provider": {"type": "string", "minLength": 1},
+        "activation_state": {"type": "string", "minLength": 1},
+        "request_count_max": {"type": "integer", "minimum": 0},
+        "credential_transport": {"type": "string", "minLength": 1},
+        "token_endpoint_template": {"type": "string", "minLength": 1},
+        "pool_chart_endpoint_template": {"type": "string", "minLength": 1},
+        "route_kind": {"type": "string", "minLength": 1},
+        "dynamic_pool_selection": {"type": "boolean"},
+        "type": {"type": "string", "minLength": 1},
+        "time_from": {"type": "string", "minLength": 1},
+        "time_to": {"type": "string", "minLength": 1},
+        "currency": {"type": "string", "minLength": 1},
+        "removeOutliers": {"type": "boolean"},
+        "fastCache": {"type": "boolean"},
+        "timezone": {"type": "string", "minLength": 1},
+        "interval_seconds": {"type": "integer", "minimum": 1},
+        "panel_duration_hours": {"type": "integer", "minimum": 1},
+        "required_natural_bars": {"type": "integer", "minimum": 1},
+        "quota_state": {"type": "string", "minLength": 1},
+        "cash_cost_claim": {"type": "string", "minLength": 1},
+        "automatic_fallback_provider": {"type": ["null", "string"]},
+        "helius_transaction_reconstruction": {"type": "string", "minLength": 1},
+        "raw_manifest": {"$ref": "#/$defs/raw_manifest"}
+      }
+    },
+    "future_acceptance": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["runtime_outcomes", "missing_result", "timestamps_unique_required", "timestamps_ascending_required", "timestamps_aligned_required", "gaps_allowed", "duplicates_allowed", "natural_observations_only", "ohlc_positive_required", "ohlc_consistent_required", "volume_currency", "carried_forward_forbidden"],
+      "properties": {
+        "runtime_outcomes": {"type": "array", "minItems": 3, "maxItems": 3, "items": {"type": "string", "minLength": 1}},
+        "missing_result": {"type": "string", "minLength": 1},
+        "timestamps_unique_required": {"type": "boolean"},
+        "timestamps_ascending_required": {"type": "boolean"},
+        "timestamps_aligned_required": {"type": "boolean"},
+        "gaps_allowed": {"type": "boolean"},
+        "duplicates_allowed": {"type": "boolean"},
+        "natural_observations_only": {"type": "boolean"},
+        "ohlc_positive_required": {"type": "boolean"},
+        "ohlc_consistent_required": {"type": "boolean"},
+        "volume_currency": {"type": "string", "minLength": 1},
+        "carried_forward_forbidden": {"type": "boolean"}
+      }
+    },
+    "authority": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["provider_read_authority", "provider_api_rpc_wss_calls", "raw_provider_responses_retained"],
+      "properties": {
+        "provider_read_authority": {"type": "boolean"},
+        "provider_api_rpc_wss_calls": {"type": "integer", "minimum": 0},
+        "raw_provider_responses_retained": {"type": "integer", "minimum": 0}
+      }
+    },
+    "claims": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["scope", "history_grade", "representative_sample", "pit_admissible", "alpha", "execution", "pnl", "netreturn", "cashflow"],
+      "properties": {
+        "scope": {"type": "string", "minLength": 1},
+        "history_grade": {"type": "string", "minLength": 1},
+        "representative_sample": {"type": "boolean"},
+        "pit_admissible": {"type": "boolean"},
+        "alpha": {"type": "boolean"},
+        "execution": {"type": "boolean"},
+        "pnl": {"type": "boolean"},
+        "netreturn": {"type": "boolean"},
+        "cashflow": {"type": "boolean"}
+      }
+    },
+    "future_owner_approval": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["state", "approval_granted", "stage_a_request_authorized", "stage_b_request_authorized"],
+      "properties": {
+        "state": {"type": "string", "minLength": 1},
+        "approval_granted": {"type": "boolean"},
+        "stage_a_request_authorized": {"type": "boolean"},
+        "stage_b_request_authorized": {"type": "boolean"}
+      }
+    },
+    "packet": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["fixture_kind", "stage_a", "stage_b", "future_acceptance", "authority", "claims", "future_owner_approval"],
+      "properties": {
+        "fixture_kind": {"const": "SYNTHETIC_VALUES_WITH_OWNER_NOMINATED_POOL"},
+        "stage_a": {"$ref": "#/$defs/stage_a"},
+        "stage_b": {"$ref": "#/$defs/stage_b"},
+        "future_acceptance": {"$ref": "#/$defs/future_acceptance"},
+        "authority": {"$ref": "#/$defs/authority"},
+        "claims": {"$ref": "#/$defs/claims"},
+        "future_owner_approval": {"$ref": "#/$defs/future_owner_approval"}
+      }
+    }
+  }
+}
