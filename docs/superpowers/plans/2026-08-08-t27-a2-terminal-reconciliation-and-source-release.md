@@ -164,7 +164,7 @@ Run: `git commit -m "feat: reconcile TASK-27 terminal route outcome"`
 
 - [ ] **Step 1: Update the Catalog manifest**
 
-Add the terminal schema to `root_resolver.schemas`; update `catalog_version` from `0.37.0` to `0.38.0`, `schemas` from `14` to `15`, and `assets` from `561` to `568`.
+Add the terminal schema to `root_resolver.schemas`; update `catalog_version` from `0.37.0` to `0.38.0`, `schemas` from `14` to `15`, `assets` from `561` to `568`, and `lifecycle_records` from `58` to `59` after the appended negative-result record.
 
 - [ ] **Step 2: Append seven Core asset records**
 

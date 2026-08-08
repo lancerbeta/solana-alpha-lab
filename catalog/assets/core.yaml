@@ -15035,7 +15035,7 @@ records:
   as_of: '2026-08-08'
   truth_owner: TASK-27
   location: {kind: git_path, logical_uri: 'repo://tests/test_task27_terminal_reconciliation_and_sources_release.py', repository_path: tests/test_task27_terminal_reconciliation_and_sources_release.py}
-  integrity: {kind: sha256, sha256: 97abc846b270e6b2e357b09ebd96d166a5290bf33ce0eedda64fc43087ef1388}
+  integrity: {kind: sha256, sha256: 3ba4f33c3fb9880c73b86568926d9d891ac11068b9ca8d7e5fd12399256da9e5}
   access: *t25_read_file
   relations:
   - {relation_type: depends_on, target_asset_id: SCHEMA-T27-TERMINAL-RECONCILIATION-001}

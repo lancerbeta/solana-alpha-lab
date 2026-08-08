@@ -167,6 +167,75 @@ class Task27TerminalReconciliationAndSourcesReleaseTests(unittest.TestCase):
         self.assertEqual(candidate["status"], "VALIDATED_CANDIDATE_UI_ACTIVATION_PENDING")
         self.assertIsNone(candidate["activation_receipt"])
 
+    def test_source_candidate_has_exact_five_role_payload_and_no_next_task_selection(self) -> None:
+        expected_files = {
+            "canonical_manifest.yaml",
+            "roadmap.md",
+            "current_system_state.md",
+            "task_archive_P0_P1_v38.md",
+            "task_27_public_history_feasibility.md",
+            "CHECKSUMS_SHA256.txt",
+            "FRESH_CHAT_SMOKE.md",
+        }
+        self.assertEqual(
+            {path.name for path in RELEASE_ROOT.iterdir() if path.is_file()},
+            expected_files,
+        )
+        manifest = load_yaml(RELEASE_ROOT / "canonical_manifest.yaml")
+        checksums = {
+            filename: digest
+            for line in (RELEASE_ROOT / "CHECKSUMS_SHA256.txt").read_text(encoding="utf-8").splitlines()
+            for digest, filename in [line.split("  ", maxsplit=1)]
+        }
+        self.assertEqual(
+            set(checksums),
+            {
+                "canonical_manifest.yaml",
+                "roadmap.md",
+                "current_system_state.md",
+                "task_archive_P0_P1_v38.md",
+                "task_27_public_history_feasibility.md",
+            },
+        )
+        for filename, digest in checksums.items():
+            with self.subTest(filename=filename):
+                self.assertEqual(sha256(RELEASE_ROOT / filename), digest)
+        self.assertEqual(manifest["schema_version"], "4.8")
+        self.assertEqual(
+            manifest["canonical"]["roadmap"]["sha256"],
+            checksums["roadmap.md"],
+        )
+        self.assertEqual(
+            manifest["canonical"]["current_system_state"]["sha256"],
+            checksums["current_system_state.md"],
+        )
+        self.assertEqual(
+            manifest["canonical"]["phase_archive"]["sha256"],
+            checksums["task_archive_P0_P1_v38.md"],
+        )
+        self.assertEqual(
+            manifest["canonical"]["active_task"]["sha256"],
+            checksums["task_27_public_history_feasibility.md"],
+        )
+        self.assertEqual(manifest["canonical"]["active_task"]["semantic_version"], "1.1")
+        self.assertEqual(manifest["current_state"]["next_task_id"], None)
+        self.assertEqual(manifest["current_state"]["provider_read_authority"], False)
+        self.assertEqual(manifest["current_state"]["main_ci_conclusion"], "pending")
+        self.assertIn("Версия 4.8", (RELEASE_ROOT / "roadmap.md").read_text(encoding="utf-8"))
+        self.assertIn(
+            "CURRENT SYSTEM STATE — SOLANA MEMECOIN INTRADAY ALPHA LAB v4.4",
+            (RELEASE_ROOT / "current_system_state.md").read_text(encoding="utf-8"),
+        )
+        self.assertIn("TASK ARCHIVE P0/P1 v38", (RELEASE_ROOT / "task_archive_P0_P1_v38.md").read_text(encoding="utf-8"))
+        self.assertIn(
+            "# TASK-27 — Bounded public historical price/volume feasibility",
+            (RELEASE_ROOT / "task_27_public_history_feasibility.md").read_text(encoding="utf-8"),
+        )
+        smoke = (RELEASE_ROOT / "FRESH_CHAT_SMOKE.md").read_text(encoding="utf-8")
+        self.assertIn("TASK27_CLOSE_SOURCE_SMOKE=PASS|FAIL", smoke)
+        self.assertIn("next_task_selected=false", smoke)
+        self.assertIn("provider_read_authority=false", smoke)
+
     def test_catalog_records_terminal_evidence_and_limited_negative_result(self) -> None:
         self.assertTrue(CATALOG_MANIFEST_PATH.is_file(), CATALOG_MANIFEST_PATH)
         self.assertTrue(DECISIONS_REGISTRY_PATH.is_file(), DECISIONS_REGISTRY_PATH)
