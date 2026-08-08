@@ -1,0 +1,81 @@
+{
+  "schema": "smial.task27.stage-a-public-pair-identity.runtime-receipt",
+  "schema_version": "1.0",
+  "task_id": "TASK-27",
+  "atom_id": "T27-A1_STAGE_A_PUBLIC_PAIR_IDENTITY_READ_V1",
+  "evidence_id": "T27-A1-STAGE-A-PUBLIC-PAIR-IDENTITY-001",
+  "run_id": "a1-stage-a-20260808T165503547Z",
+  "artifact_bindings": {
+    "contract": {
+      "path": "docs/contracts/task27_two_stage_identity_and_history_route_contract_v1.md",
+      "sha256": "6663e6136bee935abdc2a4f33cd6458e49e1c3c06ea894e7db7010886ccf1d2d"
+    },
+    "config": {
+      "path": "configs/task27_two_stage_identity_and_history_route_contract_v1.yaml",
+      "sha256": "85db1ba86b206317d5c171664e4bfee68e4d2e53dead015580c9b4356249d99a"
+    },
+    "source_smoke_receipt": {
+      "path": "docs/evidence/task27/a0a5r1_project_sources_activation_receipt_v1.json",
+      "sha256": "8ef3acf01a1eecd6d826bc95fb365d56571f02355b4f903fcac93c485c0c95ac"
+    }
+  },
+  "request": {
+    "provider": "DEXSCREENER_PUBLIC_PAIR_IDENTITY",
+    "request_id": "T27-A1R1-STAGE-A-IDENTITY-001",
+    "method": "GET",
+    "url": "https://api.dexscreener.com/latest/dex/pairs/solana/URqx24yyYxtXXhTbBQnbtPLhtLWYoaDaRxuQuLpNS3S",
+    "requested_at": "2026-08-08T16:55:03.5637462Z",
+    "completed_at": "2026-08-08T16:55:03.900723Z",
+    "request_count": 1,
+    "retries": 0,
+    "redirect_followed": false,
+    "http_status": 200,
+    "content_type": "application/json; charset=utf-8",
+    "response_bytes": 3152
+  },
+  "identity": {
+    "network": "solana",
+    "pool_address": "URqx24yyYxtXXhTbBQnbtPLhtLWYoaDaRxuQuLpNS3S",
+    "base_mint": "DMwbVy48dWVKGe9z1pcVnwF3HLMLrqWdDLfbvx8RchhK",
+    "quote_mint": "So11111111111111111111111111111111111111112",
+    "dex_id": "pumpswap"
+  },
+  "raw_evidence": {
+    "outside_git": true,
+    "raw_manifest_id": "T27-A1R1-STAGE-A-RAW-MANIFEST-001",
+    "raw_manifest_relative_path": "local/task27_public_history_route/run=a1-stage-a-20260808T165503547Z/raw_manifest_v1.json",
+    "raw_manifest_sha256": "b98930a5efe653d77552778303e05a66e98ebc2314d5aafd1252e5038eb01475",
+    "raw_sha256": "327c332eedec6238cb1446c5d3b21189cb402892aec597bda86cb352496af11a",
+    "identity_projection_sha256": "2b8e3bd68d38f3c35c183a370816bdfb100e330adb599c00e94393f9fffb2f0a",
+    "retention": "RETAIN_WITH_DEPENDENT_RESEARCH_AND_HASHES"
+  },
+  "authority": {
+    "owner_confirmation": "T27-A1_STAGE_A_PUBLIC_PAIR_IDENTITY_READ_V1",
+    "provider_api_rpc_wss_calls": 1,
+    "credential_use": false,
+    "r2_value_reads": 0,
+    "r3_value_or_path_reads": 0,
+    "wallet_signer_transaction_actions": 0,
+    "cash_spend_usd_cents": 0,
+    "stage_b_authorized": false,
+    "task27_acceptance": false
+  },
+  "decision": {
+    "stage_a_state": "FROZEN_BASE_MINT_AND_POOL_IDENTITY",
+    "identity_validation": "PASS",
+    "history_grade": "NO_HISTORY_COLLECTED",
+    "pit_admissible": false,
+    "alpha": false,
+    "execution": false,
+    "pnl": false,
+    "netreturn": false,
+    "cashflow": false,
+    "state_change": "NONE",
+    "next_boundary": "SEPARATE_EXACT_OWNER_SOLANA_TRACKER_STAGE_B_REVIEW_REQUIRED"
+  },
+  "factory_fit_review": "FULL_REVIEW",
+  "project_sources_disposition": {
+    "kind": "NO_CHANGE",
+    "reason": "Stage A retains one bounded external identity result but does not accept TASK-27 or change the active Source release."
+  }
+}
