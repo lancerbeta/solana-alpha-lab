@@ -1082,6 +1082,11 @@ def ctrl_baton_a62r_expected_repository_file_count() -> int:
 
 EXPECTED_DEFERRED_CAPABILITIES = {"GRAPH_DATABASE"}
 EXPECTED_ORIGIN_URL = "https://github.com/lancerbeta/solana-alpha-lab.git"
+EXPECTED_SSH_ORIGIN_URL = "git@github.com:lancerbeta/solana-alpha-lab.git"
+EXPECTED_LOCAL_ORIGIN_URLS = {
+    EXPECTED_ORIGIN_URL,
+    EXPECTED_SSH_ORIGIN_URL,
+}
 EXPECTED_CI_ORIGIN_URLS = {
     EXPECTED_ORIGIN_URL,
     "https://github.com/lancerbeta/solana-alpha-lab",
@@ -1604,11 +1609,16 @@ def canonical_catalog_integrity_sweep(
 
 
 def origin_url_is_safe(url: str, *, github_actions: bool) -> bool:
+    allowed_urls = (
+        EXPECTED_CI_ORIGIN_URLS if github_actions else EXPECTED_LOCAL_ORIGIN_URLS
+    )
+    if url not in allowed_urls:
+        return False
+    if url == EXPECTED_SSH_ORIGIN_URL:
+        return not github_actions
     parsed = urlsplit(url)
-    allowed_urls = EXPECTED_CI_ORIGIN_URLS if github_actions else {EXPECTED_ORIGIN_URL}
     return (
-        url in allowed_urls
-        and parsed.scheme == "https"
+        parsed.scheme == "https"
         and parsed.hostname == "github.com"
         and parsed.username is None
         and parsed.password is None
@@ -1711,7 +1721,9 @@ def read_ctrl_baton_github_context() -> CtrlBatonGithubContext:
 def ctrl_baton_origin_identity_ok(
     view: CtrlBatonGitView, *, github_actions: bool
 ) -> bool:
-    allowed_urls = EXPECTED_CI_ORIGIN_URLS if github_actions else {EXPECTED_ORIGIN_URL}
+    allowed_urls = (
+        EXPECTED_CI_ORIGIN_URLS if github_actions else EXPECTED_LOCAL_ORIGIN_URLS
+    )
     return (
         view.remotes == frozenset({"origin"})
         and len(view.fetch_urls) == 1
@@ -3473,8 +3485,9 @@ def classify_git_topology(
 
     origin_identity_ok = (
         remotes == {"origin"}
-        and fetch_urls == (EXPECTED_ORIGIN_URL,)
-        and push_urls == (EXPECTED_ORIGIN_URL,)
+        and len(fetch_urls) == 1
+        and fetch_urls == push_urls
+        and fetch_urls[0] in EXPECTED_LOCAL_ORIGIN_URLS
         and origin_url_is_safe(fetch_urls[0], github_actions=False)
     )
     if not origin_identity_ok:

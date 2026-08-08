@@ -17,6 +17,21 @@ must not claim acceptance. Cursor is always `EXECUTION_ONLY`: it never selects
 the current or next canonical task, never declares DONE, and never infers
 authority from an Issue, PR, commit, tests, or files alone.
 
+## OWNER_ATTENTION_GATE
+
+The goal owner owns mission, hypotheses, estimands, product meaning and
+priority, budget/cost caps, risk appetite, material data-source choices,
+external-material authority, and physically user-only UI activation. Codex
+owns routine engineering decisions and evidence quality inside the accepted
+bounded objective.
+
+Before asking for approval or performing merge, evaluate
+`control/owner_attention_gate_v1.yaml`. Its terminal decisions are
+`AUTONOMOUS`, `OWNER_ATTENTION_REQUIRED`, and `DENY`. Do not ask the user to
+override a failed machine check. Ask only when the gate identifies a material
+owner decision, authorization/access recovery, user-only activation,
+external-material action, unresolved safety/truth conflict, or stricter stop.
+
 ## STANDING_PROJECT_AUTONOMY
 
 The goal owner granted a durable project-local autonomy envelope on 2026-07-28.
@@ -43,10 +58,13 @@ execution classes and necessary direct test, Catalog, hash, and generated
 consumers. It does not let Cursor select a task, widen product semantics, or
 claim canonical acceptance or `DONE`.
 
-Codex performs a final pull-request merge only after the goal owner gives an
-explicit confirmation for that exact PR immediately before the merge. The
-confirmation is the gate; it is not an instruction for the user to click the
-merge button. Without that per-PR confirmation, stop before merge.
+On `LOCAL_WORK_CODEX`, Codex may perform an ordinary pull-request merge when
+`OWNER_ATTENTION_GATE` returns `AUTONOMOUS` for the exact PR head and every
+machine precondition is true. It then reads back the exact main commit and
+requires post-merge main CI before completion. On
+`PROJECT_CHAT_PRO_GITHUB_BATON_CURSOR`, Cursor never merges and the route has
+no Codex auto-merge grant; merge returns to the Project Chat/owner boundary.
+Passing checks or a merge never establish canonical acceptance or `DONE`.
 
 The standing grant does not authorize force push, history rewrite, destructive
 cleanup, branch deletion, repository or account settings, credentials or
@@ -199,10 +217,11 @@ uv run --locked --managed-python python -B scripts/validate_ci.py --tracked-only
 Read this file and the task/handoff explicitly named by the current prompt,
 confirm the bounded objective, apply `VALIDATION_ECONOMY`, inspect the exact
 staged or committed inventory, and use the standing autonomy envelope without
-pausing for routine microsteps. Cursor stops before merge; Codex merges only
-after exact per-PR confirmation. Do not cross a stricter task cap, perform an
-excluded authority class, or change canonical status. The GPT control plane
-owns canonical status and acceptance.
+pausing for routine microsteps. Apply `OWNER_ATTENTION_GATE` before any owner
+prompt or merge. Cursor never merges; Codex auto-merge exists only on
+`LOCAL_WORK_CODEX` after the exact machine gate passes. Do not cross a stricter
+task cap, perform an excluded authority class, or change canonical status. The
+GPT control plane owns canonical status and acceptance.
 
 ## ACTIVE_TIME_GATE_CHECK
 

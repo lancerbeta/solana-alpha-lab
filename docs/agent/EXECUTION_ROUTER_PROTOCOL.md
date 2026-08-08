@@ -122,8 +122,11 @@ inventory.
 Provider/API/RPC/WSS, credentials, spend, package adoption, deploy, wallet,
 signer, transaction, real money, settings, force/history rewrite, destructive
 cleanup, branch deletion, material product/architecture scope, and user-only
-actions remain excluded gates. Cursor stops before merge. Codex requests exact
-per-PR confirmation and performs the merge.
+actions remain owner-attention gates. Evaluate `OWNER_ATTENTION_GATE` from
+`control/owner_attention_gate_v1.yaml` before asking the user or merging.
+`LOCAL_WORK_CODEX` allows Codex ordinary merge only after all exact-head
+machine preconditions pass. Cursor never merges; the
+`PROJECT_CHAT_PRO_GITHUB_BATON_CURSOR` route has no Codex auto-merge grant.
 
 Cursor never:
 

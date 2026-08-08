@@ -19,6 +19,7 @@ alwaysApply: true
   stops. Cursor does not create or discover unrelated Issues.
 - No newest/latest discovery, unrelated GitHub writes, settings, provider,
   destructive action, or scope expansion.
-- Cursor never merges. Codex merges only after exact per-PR user confirmation.
+- Apply repository `OWNER_ATTENTION_GATE`. Cursor never merges; this baton
+  route has no Codex auto-merge grant.
 - Protocol: `docs/agent/GITHUB_BATON_PROTOCOL.md`.
 - Tooling: `scripts/baton_preflight.py` and `.cursor/commands/baton-preflight.md`.

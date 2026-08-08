@@ -60,6 +60,9 @@ REQUIRED_PATHS = [
     ROOT / "docs/agent/EXECUTION_ROUTER_PROTOCOL.md",
     ROOT / "docs/agent/GITHUB_BATON_PROTOCOL.md",
     ROOT / "docs/decisions/ADR-003-gpt-executor-routing.md",
+    ROOT / "docs/decisions/ADR-004-owner-attention-and-route-specific-merge-authority.md",
+    ROOT / "docs/tasks/CTRL-OWNER-ATTENTION-GATE.md",
+    ROOT / "control/owner_attention_gate_v1.yaml",
     ROOT / "docs/tasks/CTRL-BATON-SETUP.md",
     ROOT / ".cursor/commands/baton-preflight.md",
     ROOT / ".cursorignore",
@@ -69,6 +72,7 @@ REQUIRED_PATHS = [
     ROOT / "scripts/baton_preflight.py",
     ROOT / "scripts/baton_scope.py",
     ROOT / "scripts/baton_receipt.py",
+    ROOT / "scripts/owner_attention_gate.py",
     ROOT / "scripts/validate_baton.py",
     ROOT / "tests/fixtures/baton/valid_atom_contract.json",
     ROOT / "tests/fixtures/baton/valid_issue_body.md",
@@ -630,6 +634,7 @@ def validate_cursor_and_templates() -> None:
                 "Codex and Cursor may proceed",
                 "one full-gate owner per exact candidate fingerprint",
                 "exact Atom Contract Issue creation/update/read-back",
+                "OWNER_ATTENTION_GATE",
             ),
         ),
         "authority": (
@@ -637,7 +642,8 @@ def validate_cursor_and_templates() -> None:
             (
                 "STANDING_PROJECT_AUTONOMY",
                 "Proceed through those routine steps without asking",
-                "Cursor stops before merge",
+                "OWNER_ATTENTION_GATE",
+                "Cursor never merges",
             ),
         ),
         "validation": (
@@ -669,6 +675,7 @@ def validate_cursor_and_templates() -> None:
                 "standing project autonomy",
                 "Cursor never merges",
                 "exact receipt comment",
+                "OWNER_ATTENTION_GATE",
             ),
         ),
         "router": (
@@ -677,6 +684,7 @@ def validate_cursor_and_templates() -> None:
                 "STANDING_PROJECT_AUTONOMY",
                 "FULL_VALIDATION=DELEGATED_TO_CI",
                 "exact Atom Contract Issue creation/update/read-back",
+                "OWNER_ATTENTION_GATE",
             ),
         ),
         "protocol": (
@@ -685,6 +693,7 @@ def validate_cursor_and_templates() -> None:
                 "standing routine authority",
                 "FULL_VALIDATION=DELEGATED_TO_CI",
                 "exact named-Issue receipt comments",
+                "OWNER_ATTENTION_GATE",
             ),
         ),
         "handoff": (
@@ -749,12 +758,16 @@ def validate_cursor_and_templates() -> None:
         "expected SHA-256",
         "Single full-gate owner",
         "FULL_VALIDATION=DELEGATED_TO_CI",
+        "OWNER_ATTENTION_GATE",
     ]:
         assert_check(f"pr_template:{needle}", needle.lower() in pr.lower())
     stale_active_policy = (
         "Separate commit authorization is required",
         "LOCAL_WRITE does not grant commit",
         "merge is separately authorized",
+        "exact per-PR confirmation",
+        "exact per-PR user confirmation",
+        "explicit confirmation for that exact PR",
     )
     active_policy_texts = {
         "AGENTS.md": agents,
@@ -775,6 +788,49 @@ def validate_cursor_and_templates() -> None:
                 f"stale_cursor_policy_absent:{relative}:{phrase}",
                 phrase.lower() not in text.lower(),
             )
+
+
+def validate_owner_attention_gate() -> None:
+    policy = yaml.safe_load(
+        (ROOT / "control/owner_attention_gate_v1.yaml").read_text(
+            encoding="utf-8"
+        )
+    )
+    assert_check(
+        "owner_attention_policy_schema",
+        policy.get("schema") == "smial.owner-attention-gate"
+        and str(policy.get("schema_version")) == "1.0",
+    )
+    routes = policy.get("route_authority", {})
+    assert_check(
+        "owner_attention_local_codex_auto_merge",
+        routes.get("LOCAL_WORK_CODEX", {}).get("ordinary_merge")
+        == "AUTONOMOUS_AFTER_MACHINE_GATE",
+    )
+    assert_check(
+        "owner_attention_cursor_merge_forbidden",
+        routes.get("PROJECT_CHAT_PRO_GITHUB_BATON_CURSOR", {}).get(
+            "cursor_merge"
+        )
+        == "FORBIDDEN",
+    )
+    required_checks = set(policy.get("merge_preconditions", []))
+    assert_check(
+        "owner_attention_exact_head_ci_checks",
+        {
+            "exact_pr_head_bound",
+            "ci_exact_head_pass",
+            "full_gate_pass",
+            "factory_fit_pass",
+            "secret_scan_pass",
+            "no_unresolved_reviews",
+        }.issubset(required_checks),
+    )
+    assert_check(
+        "owner_attention_post_merge_readback",
+        policy.get("post_merge", {}).get("exact_main_readback_required") is True
+        and policy.get("post_merge", {}).get("main_ci_required") is True,
+    )
 
 
 LIVE_ROUTE_CONTROL_PATHS = (
@@ -880,6 +936,7 @@ def validate_offline_commands_have_no_hidden_network() -> None:
         "scripts/baton_contract.py",
         "scripts/baton_scope.py",
         "scripts/baton_receipt.py",
+        "scripts/owner_attention_gate.py",
         "scripts/validate_baton.py",
     ]:
         text = (ROOT / relative).read_text(encoding="utf-8")
@@ -898,6 +955,7 @@ def validate() -> None:
     validate_fixtures()
     validate_canonical_catalog_integrity()
     validate_cursor_and_templates()
+    validate_owner_attention_gate()
     validate_protocol_links()
     validate_offline_commands_have_no_hidden_network()
     print("BATON_VALIDATION: PASS")
