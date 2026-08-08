@@ -1,0 +1,45 @@
+schema: smial.task27.owner-route-close-and-task-outcome.policy
+schema_version: "1.0"
+task_id: TASK-27
+atom_id: T27-A1S4_OWNER_ROUTE_CLOSE_BINDING_AND_TASK_OUTCOME_DECISION_V1
+consumer: TASK27_TERMINAL_RECONCILIATION_DECISION
+packet:
+  fixture_kind: SYNTHETIC_GOLDEN_ONLY
+  source_bindings:
+    a1s3_policy:
+      path: configs/task27_gap_classification_and_owner_route_decision_v1.yaml
+      sha256: 247e90316df00784660ced9e325325327b1cb92fc8d6fb76cd61f076e6bb9926
+    a1s3_acceptance:
+      path: docs/evidence/task27/a1s3_gap_classification_and_owner_route_decision_acceptance_v1.json
+      sha256: f49d05ed208f6d96e352883aa2dc86b2094157bc1e0746ae1e794634a9ff6f8b
+  owner_decision:
+    route_close: ROUTE_CLOSE_ACCEPTED
+    new_provider_read: NO_NEW_PROVIDER_READ
+  missingness:
+    state: MISSING_UNKNOWN
+    missing_as_zero: false
+  decision:
+    current_route_disposition: CLOSE_CURRENT_SOLANA_TRACKER_15M_POOL_HISTORY_ROUTE_NOT_FEASIBLE
+    owner_route_close: ACCEPTED
+    provider_selected: null
+    new_provider_read_authority: false
+    task27_outcome_proposal: CLOSE_WITH_LIMITED_NEGATIVE_RESULT
+    task27_status: IN_PROGRESS_PENDING_TERMINAL_RECONCILIATION
+  authority:
+    provider_api_rpc_wss_calls: 0
+    credential_use: false
+    raw_provider_responses_retained: 0
+    r2_value_reads: 0
+    r3_value_or_path_reads: 0
+    wallet_signer_transaction_actions: 0
+    cash_spend_usd_cents: 0
+  claims:
+    pit_admissible: false
+    public_history_globally_infeasible: false
+    alpha: false
+    execution: false
+    pnl: false
+    netreturn: false
+    cashflow: false
+state_change: NONE
+project_sources_disposition: NO_CHANGE
