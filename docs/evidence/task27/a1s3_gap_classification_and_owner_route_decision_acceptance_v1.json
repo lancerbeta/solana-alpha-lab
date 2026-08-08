@@ -1,0 +1,96 @@
+{
+  "schema": "smial.task27.gap-classification-and-owner-route-decision.acceptance",
+  "schema_version": "1.0",
+  "task_id": "TASK-27",
+  "atom_id": "T27-A1S3_OFFLINE_GAP_CLASSIFICATION_AND_OWNER_ROUTE_DECISION_PACKET_V1",
+  "evidence_id": "T27-A1S3-GAP-ROUTE-DECISION-001",
+  "artifact_bindings": {
+    "contract": {
+      "path": "docs/contracts/task27_gap_classification_and_owner_route_decision_contract_v1.md",
+      "sha256": "02e4aea9798f3671809d698c91f25adaad7cb10e5c6aa64e6dc6922e0498bce2"
+    },
+    "config": {
+      "path": "configs/task27_gap_classification_and_owner_route_decision_v1.yaml",
+      "sha256": "247e90316df00784660ced9e325325327b1cb92fc8d6fb76cd61f076e6bb9926"
+    },
+    "schema": {
+      "path": "catalog/schemas/task27_gap_classification_and_owner_route_decision.schema.json",
+      "sha256": "bcb06bf53c0990e562b3d68db25a755260b2bb97729549f2ccc004be065b31a7"
+    },
+    "fixture": {
+      "path": "tests/fixtures/task27/gap_classification_and_owner_route_decision_v1.json",
+      "sha256": "cbe8d017e1e790a84555212e6a2a82e86ef0abbb085c47cc0d7e8a951ef6076b"
+    },
+    "stage_b_receipt": {
+      "path": "docs/evidence/task27/a1s2_stage_b_pool_history_runtime_receipt_v1.json",
+      "sha256": "d7b83afa6d8bed68b38e620ef40f7e1fd647bf6053274b9a603b2945894815ec"
+    }
+  },
+  "valid_fixture_count": 1,
+  "adversarial_rejection_count": 6,
+  "adversarial_rejections": [
+    "MISSING_TO_ZERO_FORBIDDEN",
+    "TRADE_ONLY_CAUSAL_OVERCLAIM",
+    "UNPROVEN_CAUSAL_ATTRIBUTION",
+    "PIT_PROMOTION_FORBIDDEN",
+    "EXTERNAL_AUTHORITY_PROMOTION_FORBIDDEN",
+    "TASK27_CLOSURE_PROMOTION_FORBIDDEN"
+  ],
+  "decision": {
+    "current_route_disposition": "CLOSE_CURRENT_SOLANA_TRACKER_15M_POOL_HISTORY_ROUTE_NOT_FEASIBLE",
+    "future_boundary": "SEPARATE_OWNER_EXTERNAL_READ_DECISION_REQUIRED",
+    "state_change": "NONE",
+    "task27_acceptance": false
+  },
+  "authority": {
+    "provider_api_rpc_wss_calls": 0,
+    "credential_use": false,
+    "raw_provider_responses_retained": 0,
+    "r2_value_reads": 0,
+    "r3_value_or_path_reads": 0,
+    "wallet_signer_transaction_actions": 0,
+    "cash_spend_usd_cents": 0
+  },
+  "claims": {
+    "cause_of_missing_intervals_known": false,
+    "pit_admissible": false,
+    "alpha": false,
+    "execution": false,
+    "pnl": false,
+    "netreturn": false,
+    "cashflow": false,
+    "representative_sample": false
+  },
+  "factory_fit_review": "FULL_REVIEW",
+  "factory_fit": {
+    "verdict": "PASS_WITH_LIMITATIONS",
+    "mission": "PASS_CHEAP_FALSE_POSITIVE_KILL_BEFORE_BROADER_COLLECTION",
+    "research_truth": "PASS_CLOSES_ONLY_THE_INCOMPLETE_CURRENT_ROUTE_AND_PRESERVES_MISSING_UNKNOWN",
+    "owner_operability": "PASS_ONE_CLEAR_ROUTE_DECISION_WITHOUT_PROVIDER_PROCUREMENT",
+    "efficiency": "PASS_REUSES_EXISTING_HASH_BOUND_EVIDENCE_WITH_ZERO_NEW_EXTERNAL_COST",
+    "flexibility": "PASS_FUTURE_DISCRIMINATOR_REMAINS_PROVIDER_NEUTRAL",
+    "execution_to_cashflow": "NOT_IN_SCOPE_NO_CLAIM",
+    "monitoring_recovery": "PASS_NO_EXTERNAL_PROCESS_OR_OPEN_STATE_CREATED"
+  },
+  "product_horizon_radar": {
+    "now": {
+      "candidate": "OWNER_ROUTE_CLOSE_REVIEW_ONLY",
+      "value": "Prevents accidental continuation with a panel that cannot support the frozen research contract.",
+      "evidence": "A1S2 observed 33 of 96 required bars; A1S3 makes the route-specific conclusion deterministic.",
+      "cost_risk": "Zero new provider, credential, wallet, or cash action.",
+      "owner": "Goal owner",
+      "activation_trigger": "Owner chooses whether to close this route or request a separately designed external discriminator.",
+      "why_now": "The current route is disproven for its stated requirement, while the cause remains unknown."
+    },
+    "watch": {
+      "candidate": "SECOND_INDEPENDENT_HISTORY_DISCRIMINATOR",
+      "value": "Could distinguish provider coverage from market-data sparsity if a named research consumer needs it.",
+      "evidence": "A1S3 proves that the current panel alone cannot identify the cause.",
+      "cost_risk": "Requires a new exact owner external-read authority and separate provider/data-contract review.",
+      "owner": "Goal owner",
+      "activation_trigger": "A named hypothesis or research screen cannot proceed without continuous PIT-admissible pool history.",
+      "why_not_now": "No automatic source selection follows from one incomplete panel."
+    }
+  },
+  "project_sources_disposition": "NO_CHANGE"
+}

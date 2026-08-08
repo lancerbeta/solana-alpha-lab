@@ -18,6 +18,7 @@ SCHEMA_PATH = ROOT / "catalog/schemas/task27_gap_classification_and_owner_route_
 FIXTURE_PATH = ROOT / "tests/fixtures/task27/gap_classification_and_owner_route_decision_v1.json"
 STAGE_A_RECEIPT_PATH = ROOT / "docs/evidence/task27/a1_stage_a_public_pair_identity_runtime_receipt_v1.json"
 STAGE_B_RECEIPT_PATH = ROOT / "docs/evidence/task27/a1s2_stage_b_pool_history_runtime_receipt_v1.json"
+ACCEPTANCE_PATH = ROOT / "docs/evidence/task27/a1s3_gap_classification_and_owner_route_decision_acceptance_v1.json"
 
 REQUIRED_PATHS = [CONTRACT_PATH, CONFIG_PATH, SCHEMA_PATH, FIXTURE_PATH]
 EXPECTED_OBSERVATION = {
@@ -148,6 +149,57 @@ class Task27GapClassificationAndOwnerRouteDecisionTests(unittest.TestCase):
         self.assertEqual(receipt["panel_observation"]["missing_natural_bars"], 63)
         self.assertEqual(receipt["decision"]["terminal_disposition"], "INCOMPLETE_PANEL_NOT_FEASIBLE")
         self.assertFalse(receipt["claims"]["pit_admissible"])
+
+    def test_acceptance_receipt_binds_offline_decision_without_task_closure(self) -> None:
+        self.assertTrue(ACCEPTANCE_PATH.is_file(), f"missing Task-27 A1S3 acceptance receipt: {ACCEPTANCE_PATH}")
+        receipt = load_json(ACCEPTANCE_PATH)
+
+        self.assertEqual(receipt["schema"], "smial.task27.gap-classification-and-owner-route-decision.acceptance")
+        self.assertEqual(receipt["task_id"], "TASK-27")
+        self.assertEqual(receipt["atom_id"], "T27-A1S3_OFFLINE_GAP_CLASSIFICATION_AND_OWNER_ROUTE_DECISION_PACKET_V1")
+        self.assertEqual(
+            receipt["artifact_bindings"],
+            {
+                "contract": {
+                    "path": CONTRACT_PATH.relative_to(ROOT).as_posix(),
+                    "sha256": sha256(CONTRACT_PATH),
+                },
+                "config": {
+                    "path": CONFIG_PATH.relative_to(ROOT).as_posix(),
+                    "sha256": sha256(CONFIG_PATH),
+                },
+                "schema": {
+                    "path": SCHEMA_PATH.relative_to(ROOT).as_posix(),
+                    "sha256": sha256(SCHEMA_PATH),
+                },
+                "fixture": {
+                    "path": FIXTURE_PATH.relative_to(ROOT).as_posix(),
+                    "sha256": sha256(FIXTURE_PATH),
+                },
+                "stage_b_receipt": {
+                    "path": STAGE_B_RECEIPT_PATH.relative_to(ROOT).as_posix(),
+                    "sha256": sha256(STAGE_B_RECEIPT_PATH),
+                },
+            },
+        )
+        self.assertEqual(receipt["adversarial_rejection_count"], len(EXPECTED_ADVERSARIAL_ERRORS))
+        self.assertEqual(receipt["decision"], {
+            "current_route_disposition": "CLOSE_CURRENT_SOLANA_TRACKER_15M_POOL_HISTORY_ROUTE_NOT_FEASIBLE",
+            "future_boundary": "SEPARATE_OWNER_EXTERNAL_READ_DECISION_REQUIRED",
+            "state_change": "NONE",
+            "task27_acceptance": False,
+        })
+        self.assertEqual(receipt["authority"], {
+            "provider_api_rpc_wss_calls": 0,
+            "credential_use": False,
+            "raw_provider_responses_retained": 0,
+            "r2_value_reads": 0,
+            "r3_value_or_path_reads": 0,
+            "wallet_signer_transaction_actions": 0,
+            "cash_spend_usd_cents": 0,
+        })
+        self.assertEqual(receipt["factory_fit_review"], "FULL_REVIEW")
+        self.assertEqual(receipt["project_sources_disposition"], "NO_CHANGE")
 
     def test_static_artifacts_do_not_contain_secret_markers(self) -> None:
         self.require_static_artifacts()

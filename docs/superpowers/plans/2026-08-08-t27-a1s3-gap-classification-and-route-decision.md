@@ -230,18 +230,8 @@ Markdown; no new dependencies or runtime/provider component.
   Expected result: all tests pass.  A prior Task-27 failure blocks delivery;
   do not reduce coverage or skip it.
 
-- [ ] **Step 4: Run the tracked-only delivery preflight**
 
-  Run:
-
-  ```powershell
-  uv run --locked --managed-python python -B scripts/validate_ci.py --tracked-only-delivery
-  ```
-
-  Expected result: PASS.  Verify the staged set contains neither an ignored A1S2
-  raw path nor a provider key nor `.worktrees` content.
-
-- [ ] **Step 5: Final review and commit**
+- [ ] **Step 4: Final review and commit**
 
   Run `git diff --check`, inspect the exact changed-file inventory, then:
 
@@ -249,6 +239,18 @@ Markdown; no new dependencies or runtime/provider component.
   git add docs/evidence/task27/a1s3_gap_classification_and_owner_route_decision_acceptance_v1.json tests/test_task27_gap_classification_and_owner_route_decision.py
   git commit -m "docs: record Task27 gap route decision"
   ```
+
+- [ ] **Step 5: Run the tracked-only delivery preflight against the commit**
+
+  Run:
+
+  ```powershell
+  uv run --locked --managed-python python -B scripts/validate_ci.py --tracked-only-delivery
+  ```
+
+  Expected result: PASS.  The preflight accepts only a clean worktree and the
+  exact committed tree.  Verify its receipt contains neither an ignored A1S2
+  raw path nor a provider key nor `.worktrees` content.
 
   Request repository review/PR under standing autonomy.  Passing PR and CI are
   implementation evidence only; they do not accept or close TASK-27.
