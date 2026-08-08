@@ -3,12 +3,12 @@ schema_version: '1.0'
 registry_version: 1
 release_root: docs/project_sources/releases
 enforcement_start_commit: 78b549aeb6f9fea9f6572e6e3768b7aff00ac1d1
-active_ui_release_id: PSR-0001-T27-A0-A5
+active_ui_release_id: PSR-0002-T27-CLOSE
 active_ui_state: REGISTRY_ACTIVATION_CONFIRMED
 active_ui_note: >-
-  Owner attested that the exact seven-role smoke for PSR-0001-T27-A0-A5 passed;
+  Owner attested that the exact seven-role smoke for PSR-0002-T27-CLOSE passed;
   the raw cloud transcript is not retained in Git.
-latest_candidate_release_id: PSR-0002-T27-CLOSE
+latest_candidate_release_id: null
 compaction_review:
   aggregate_payload_bytes_limit: 52428800
   status: NOT_REQUIRED
@@ -17,12 +17,12 @@ releases:
   - release_id: PSR-0001-T27-A0-A5
     task_id: TASK-27
     atom_id: T27-A0-A5_PERMANENT_SOURCES_RECONCILIATION_AND_SMOKE_V1
-    status: ACTIVATED_BY_OWNER_SMOKE
+    status: SUPERSEDED
     bundle_path: docs/project_sources/releases/PSR-0001-T27-A0-A5
     activation_receipt: docs/evidence/task27/a0a5r1_project_sources_activation_receipt_v1.json
     supersedes_release_id: null
-    superseded_by_release_id: null
-    owner_next_action: SEPARATE_EXACT_OWNER_EXTERNAL_READ_REVIEW_REQUIRED
+    superseded_by_release_id: PSR-0002-T27-CLOSE
+    owner_next_action: ROLLBACK_ONLY_IF_PSR0002_IS_INVALIDATED_BY_EXACT_EVIDENCE
     source_set:
       expected_source_count: 7
       mutable_roles:
@@ -44,12 +44,12 @@ releases:
   - release_id: PSR-0002-T27-CLOSE
     task_id: TASK-27
     atom_id: T27-A2_TERMINAL_RECONCILIATION_AND_SOURCES_RELEASE_CANDIDATE_V1
-    status: VALIDATED_CANDIDATE_UI_ACTIVATION_PENDING
+    status: ACTIVATED_BY_OWNER_SMOKE
     bundle_path: docs/project_sources/releases/PSR-0002-T27-CLOSE
-    activation_receipt: null
+    activation_receipt: docs/evidence/task27/a2r1_project_sources_activation_and_task_close_acceptance_v1.json
     supersedes_release_id: PSR-0001-T27-A0-A5
     superseded_by_release_id: null
-    owner_next_action: REPLACE_EXACT_FIVE_MUTABLE_ROLES_KEEP_TWO_IMMUTABLE_ROLES_RUN_SEVEN_ROLE_SMOKE
+    owner_next_action: READ_ONLY_NEXT_TASK_ENTRY_GATE
     source_set:
       expected_source_count: 7
       mutable_roles:

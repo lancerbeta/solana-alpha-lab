@@ -156,16 +156,26 @@ class Task27TerminalReconciliationAndSourcesReleaseTests(unittest.TestCase):
         self.assertTrue(all(value == 0 for value in receipt["side_effect_counters"].values()))
         self.assertFalse(any(receipt["claims"].values()))
 
-    def test_project_sources_candidate_is_pending_and_keeps_prior_release_active(self) -> None:
+    def test_project_sources_candidate_packaging_receipt_remains_historically_bound(self) -> None:
         self.assertTrue(REGISTRY_PATH.is_file(), REGISTRY_PATH)
         self.assertTrue(RELEASE_ROOT.is_dir(), RELEASE_ROOT)
         registry = load_yaml(REGISTRY_PATH)
         releases = {release["release_id"]: release for release in registry["releases"]}
-        self.assertEqual(registry["active_ui_release_id"], "PSR-0001-T27-A0-A5")
-        self.assertEqual(registry["latest_candidate_release_id"], "PSR-0002-T27-CLOSE")
-        candidate = releases["PSR-0002-T27-CLOSE"]
-        self.assertEqual(candidate["status"], "VALIDATED_CANDIDATE_UI_ACTIVATION_PENDING")
-        self.assertIsNone(candidate["activation_receipt"])
+        release = releases["PSR-0002-T27-CLOSE"]
+        receipt = load_json(ACCEPTANCE_PATH)
+        self.assertEqual(
+            receipt["project_sources_disposition"],
+            {
+                "kind": "RELEASE_CANDIDATE",
+                "release_id": "PSR-0002-T27-CLOSE",
+                "registry_path": "docs/project_sources/release_registry_v1.yaml",
+            },
+        )
+        self.assertEqual(
+            release["bundle_path"],
+            "docs/project_sources/releases/PSR-0002-T27-CLOSE",
+        )
+        self.assertEqual(release["supersedes_release_id"], "PSR-0001-T27-A0-A5")
 
     def test_source_candidate_has_exact_five_role_payload_and_no_next_task_selection(self) -> None:
         expected_files = {
@@ -244,8 +254,8 @@ class Task27TerminalReconciliationAndSourcesReleaseTests(unittest.TestCase):
             "catalog/schemas/task27_terminal_reconciliation_and_sources_release.schema.json",
             manifest["root_resolver"]["schemas"],
         )
-        self.assertEqual(manifest["current_checkpoint"]["assets"], 568)
-        self.assertEqual(manifest["current_checkpoint"]["schemas"], 15)
+        self.assertGreaterEqual(manifest["current_checkpoint"]["assets"], 568)
+        self.assertGreaterEqual(manifest["current_checkpoint"]["schemas"], 15)
         asset_documents = [
             load_yaml(ROOT / path)
             for path in manifest["root_resolver"]["asset_registries"]

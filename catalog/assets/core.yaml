@@ -15027,15 +15027,15 @@ records:
   classification: *t25_internal
 
 - asset_id: TEST-T27-TERMINAL-RECONCILIATION-001
-  record_version: '1.0'
+  record_version: '1.1'
   asset_type: script
   purpose: Deterministic adversarial tests for TASK-27 route-specific closure, Catalog and Source candidate state.
   status: IMPLEMENTED_UNVERIFIED
   origin: REPOSITORY
-  as_of: '2026-08-08'
+  as_of: '2026-08-09'
   truth_owner: TASK-27
   location: {kind: git_path, logical_uri: 'repo://tests/test_task27_terminal_reconciliation_and_sources_release.py', repository_path: tests/test_task27_terminal_reconciliation_and_sources_release.py}
-  integrity: {kind: sha256, sha256: 3ba4f33c3fb9880c73b86568926d9d891ac11068b9ca8d7e5fd12399256da9e5}
+  integrity: {kind: sha256, sha256: 15f750d58e889ff87b89ef5bec1147c89a1a397b3dcd61b87f56cb88f6f80462}
   access: *t25_read_file
   relations:
   - {relation_type: depends_on, target_asset_id: SCHEMA-T27-TERMINAL-RECONCILIATION-001}
@@ -15059,5 +15059,22 @@ records:
   - {relation_type: derived_from, target_asset_id: EVIDENCE-T27-A1S4-OWNER-ROUTE-CLOSE-001}
   - {relation_type: validated_by, target_asset_id: TEST-T27-TERMINAL-RECONCILIATION-001}
   consumers: [TASK-27, FACTORY-001]
+  evidence: []
+  classification: *t25_internal
+
+- asset_id: EVIDENCE-T27-A2R1-SOURCE-ACTIVATION-CLOSE-001
+  record_version: '1.0'
+  asset_type: evidence
+  purpose: Exact owner-smoke activation overlay for PSR-0002 and canonical TASK-27 limited-negative-result closure.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-08-09'
+  truth_owner: TASK-27
+  location: {kind: git_path, logical_uri: 'repo://docs/evidence/task27/a2r1_project_sources_activation_and_task_close_acceptance_v1.json', repository_path: docs/evidence/task27/a2r1_project_sources_activation_and_task_close_acceptance_v1.json}
+  integrity: {kind: sha256, sha256: c277eb4ec3697a15d9bbb83727bbe531e7497ff9941aae9c7e8c78e96d5f6b8a}
+  access: *t25_read_file
+  relations:
+  - {relation_type: derived_from, target_asset_id: EVIDENCE-T27-A2-TERMINAL-RECONCILIATION-001}
+  consumers: [TASK-27, FACTORY-001, CHATGPT-PROJECT-CONTROL-PLANE]
   evidence: []
   classification: *t25_internal

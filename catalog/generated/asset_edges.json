@@ -2793,6 +2793,11 @@
       "target_asset_id": "TEST-T27-TERMINAL-RECONCILIATION-001"
     },
     {
+      "source_asset_id": "EVIDENCE-T27-A2R1-SOURCE-ACTIVATION-CLOSE-001",
+      "relation": "derived_from",
+      "target_asset_id": "EVIDENCE-T27-A2-TERMINAL-RECONCILIATION-001"
+    },
+    {
       "source_asset_id": "FIXTURE-BATON-SUITE-001",
       "relation": "governed_by",
       "target_asset_id": "CTRL-BATON-SETUP-001"
