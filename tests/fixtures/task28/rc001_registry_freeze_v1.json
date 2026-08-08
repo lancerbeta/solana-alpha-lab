@@ -1,0 +1,41 @@
+{
+  "schema": "smial.task28.rc001-registry-freeze.fixture",
+  "schema_version": "1.0",
+  "expected_group_ids": [
+    "RC001-H13-COMPOSITE-VETO",
+    "RC001-H07-H01-LIQUIDITY-RETENTION",
+    "RC001-H02-H10-H14-PULLBACK-RECLAIM"
+  ],
+  "expected_initial_states": {
+    "RC001-H13-COMPOSITE-VETO": "BLOCKED_DATA",
+    "RC001-H07-H01-LIQUIDITY-RETENTION": "BLOCKED_DATA",
+    "RC001-H02-H10-H14-PULLBACK-RECLAIM": "BLOCKED_DATA"
+  },
+  "initial_global_trial_record_count": 3,
+  "adversarial_cases": [
+    {
+      "case_id": "numeric-netreturn-promotion",
+      "pointer": "/non_claims/numeric_netreturn",
+      "replacement": false,
+      "expected_error": "numeric_netreturn"
+    },
+    {
+      "case_id": "external-provider-authority",
+      "pointer": "/authority/provider_api_rpc_wss_calls",
+      "replacement": true,
+      "expected_error": "provider_api_rpc_wss_calls"
+    },
+    {
+      "case_id": "r3-access-promotion",
+      "pointer": "/authority/r2_r3_access",
+      "replacement": true,
+      "expected_error": "r2_r3_access"
+    },
+    {
+      "case_id": "missing-to-zero-coercion",
+      "pointer": "/admissibility_expectations/missing_to_zero_forbidden",
+      "replacement": false,
+      "expected_error": "missing_to_zero"
+    }
+  ]
+}
