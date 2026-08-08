@@ -1,0 +1,54 @@
+schema: smial.task27.terminal-reconciliation-and-sources-release.policy
+schema_version: '1.0'
+task_id: TASK-27
+atom_id: T27-A2_TERMINAL_RECONCILIATION_AND_SOURCES_RELEASE_CANDIDATE_V1
+consumer: TASK27_TERMINAL_RECONCILIATION
+packet:
+  fixture_kind: SYNTHETIC_GOLDEN_ONLY
+  source_bindings:
+    a1s4_acceptance:
+      path: docs/evidence/task27/a1s4_owner_route_close_and_task_outcome_acceptance_v1.json
+      sha256: e901a59a72da29b3eb4a90e24a7d3bde91a4fc00c023310086376747ebe47e6d
+  result: NO_FEASIBLE_PUBLIC_HISTORY_ROUTE_DEMONSTRATED_WITHIN_AUTHORIZED_SCOPE
+  owner_decision:
+    route_close: ACCEPTED
+    new_provider_read: NO_NEW_PROVIDER_READ
+  missingness:
+    state: MISSING_UNKNOWN
+    missing_as_zero: false
+  decision:
+    task27_outcome: CLOSE_WITH_LIMITED_NEGATIVE_RESULT
+    task27_repository_state: TECHNICALLY_RECONCILED_PENDING_SOURCE_ACTIVATION
+    next_task_selected: false
+  authority:
+    provider_api_rpc_wss_calls: 0
+    credential_use: false
+    raw_provider_responses_retained: 0
+    r2_value_reads: 0
+    r3_value_or_path_reads: 0
+    wallet_signer_transaction_actions: 0
+    cash_spend_usd_cents: 0
+  claims:
+    public_history_globally_infeasible: false
+    pit_admissible: false
+    alpha: false
+    execution: false
+    pnl: false
+    netreturn: false
+    cashflow: false
+  source_release:
+    release_id: PSR-0002-T27-CLOSE
+    activation_state: UI_ACTIVATION_PENDING_OWNER_SMOKE
+    mutable_roles:
+    - canonical_manifest
+    - roadmap
+    - current_system_state
+    - phase_archive
+    - active_task
+    immutable_roles:
+    - operating_system
+    - research_blueprint
+  next_task:
+    selected: false
+    task_id: null
+state_change: NONE
