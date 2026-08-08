@@ -1,0 +1,109 @@
+{
+  "schema": "smial.owner-attention-gate-acceptance",
+  "schema_version": "1.0",
+  "acceptance_id": "CTRL-OWNER-ATTENTION-GATE-ACCEPTANCE-V1",
+  "as_of": "2026-08-08",
+  "base_main": "3111201add92cdf1f92e50b53832b80789e7f471",
+  "owner_decision": "OWNER_ATTENTION_POLICY_DESIGN_APPROVED",
+  "result": "PASS_LOCAL_CANDIDATE",
+  "decision": "IMPLEMENTED_UNVERIFIED",
+  "implementation": {
+    "policy": {
+      "path": "control/owner_attention_gate_v1.yaml",
+      "sha256": "6705c26e464acdd6c1e63b82b9795200b750595d39eff54ad868850a16cfaaff"
+    },
+    "evaluator": {
+      "path": "scripts/owner_attention_gate.py",
+      "sha256": "f047fcb0186db68533211f0a3c4d5cb770204592856b11ec9cc6d44152131820"
+    },
+    "tests": {
+      "path": "tests/test_owner_attention_gate_policy.py",
+      "sha256": "254a274bc92399bb8d4871bd48c11a96b33cfc1010f0b4a7307ad73359885c62"
+    },
+    "project_instruction_candidate": {
+      "path": "docs/agent/PROJECT_INSTRUCTION_V3_4.md",
+      "sha256": "dafd2b8e0d2063d2a8e964f97ded75f22d2c48582d772002623d4ae8ba626fbe",
+      "characters": 7986,
+      "ui_activation": "PENDING_USER_REPLACEMENT_AND_READBACK"
+    }
+  },
+  "skill_alignment": {
+    "lifecycle_pair_validation": "PASS",
+    "quick_validate_start": "PASS",
+    "quick_validate_finish": "PASS",
+    "artifacts": [
+      {
+        "logical_uri": "user-skill://start-solana-task/SKILL.md",
+        "sha256": "d268ddc776ebf756053fc817ef4c9ea13f4fc6ec68092e52501359cfe8a492b8"
+      },
+      {
+        "logical_uri": "user-skill://start-solana-task/references/router-v3.md",
+        "sha256": "afff0bedbe3dc7b7cefd7bc3542584a3caf938132cb217e88bdd44970654271e"
+      },
+      {
+        "logical_uri": "user-skill://finish-solana-task/SKILL.md",
+        "sha256": "fdc196f56e588e297f4a3d35b0bc0d39645054f70cf9bb83db9f2c03e62a82e0"
+      },
+      {
+        "logical_uri": "user-skill://finish-solana-task/references/finish-gate-v1.md",
+        "sha256": "67a083fab588853099a01ce706745e2dc7b31f7ebc08c882a06596db4d17c394"
+      }
+    ]
+  },
+  "validation": {
+    "red_phase": {
+      "owner_attention_tests": "FAIL_EXPECTED_MISSING_EVALUATOR",
+      "lifecycle_skill_validator": "FAIL_EXPECTED_LEGACY_PER_PR_RULE"
+    },
+    "green_phase": {
+      "owner_attention_tests": "11_PASS",
+      "baton_validation": "PASS",
+      "catalog_validation": "PASS_560_ASSETS_BEFORE_ACCEPTANCE_REGISTRATION",
+      "generated_navigation": "PASS",
+      "lifecycle_skill_validator": "PASS"
+    },
+    "tracked_only_full_gate": "PENDING_EXACT_COMMITTED_CANDIDATE",
+    "github_ci": "PENDING_EXACT_PR_HEAD"
+  },
+  "factory_fit": {
+    "mode": "FULL_REVIEW",
+    "verdict": "PASS_WITH_FOLLOWUP",
+    "mission": "PASS_REDUCES_OPERATOR_ATTENTION_TAX_WITHOUT_CHANGING_ALPHA_ESTIMAND",
+    "flexibility_and_history": "PASS_ROUTE_SPECIFIC_AND_ADR_003_PARTIAL_SUPERSESSION_PRESERVED",
+    "efficiency": "PASS_ROUTINE_ENGINEERING_AND_LOCAL_CODEX_MERGE_NO_LONGER_REQUIRE_REPEAT_PROMPTS",
+    "research_truth": "PASS_NO_DATA_OUTCOME_HOLDOUT_OR_NETRETURN_SEMANTICS_CHANGED",
+    "owner_operability": "PASS_OWNER_SEES_ONLY_MATERIAL_OR_USER_ONLY_BOUNDARIES",
+    "execution_to_cashflow": "NEUTRAL_CONTROL_PLANE_ENABLER_NO_ALPHA_OR_CASHFLOW_CLAIM",
+    "monitoring_and_recovery": "PASS_POST_MERGE_MAIN_READBACK_REQUIRED_AND_DISABLE_TRIGGER_RECORDED",
+    "build_vs_buy": "PASS_SMALL_DETERMINISTIC_POLICY_AND_EVALUATOR_NO_PLUGIN_OR_SERVICE_NEEDED",
+    "red_team": "PASS_WITH_LIMITATION_EVALUATOR_REQUIRES_TRUTHFUL_EVIDENCE_BOUND_REQUEST_AND_IS_NOT_GITHUB_BRANCH_PROTECTION",
+    "followup": {
+      "owner": "CTRL-OWNER-ATTENTION-GATE",
+      "trigger": "AFTER_10_LOCAL_CODEX_DELIVERIES_OR_ANY_UNAUTHORIZED_MATERIAL_MERGE",
+      "destination": "ADR-004_TRIGGER_REVIEW",
+      "action": "MEASURE_OWNER_INTERRUPTS_REPAIR_COMMITS_FALSE_CLASSIFICATIONS_AND_DISABLE_AUTO_MERGE_ON_SAFETY_BREACH"
+    }
+  },
+  "product_horizon": {
+    "now": "ACTIVATE_OWNER_ATTENTION_GATE_IN_REPOSITORY_AND_USER_SKILLS",
+    "watch": "REVIEW_AFTER_10_LOCAL_CODEX_DELIVERIES_OR_FIRST_SAFETY_BREACH"
+  },
+  "limits_and_non_claims": [
+    "CURSOR_NEVER_MERGES",
+    "AUTO_MERGE_DOES_NOT_GRANT_CANONICAL_DONE",
+    "FAILED_MACHINE_CHECK_CANNOT_BE_OVERRIDDEN_BY_OWNER_REASSURANCE",
+    "NO_PROVIDER_API_RPC_WSS_CALLS",
+    "NO_WALLET_SIGNER_TRANSACTION_OR_CASH_ACTIONS",
+    "NO_DEPLOY_RELEASE_SETTINGS_FORCE_DESTRUCTIVE_OR_BRANCH_DELETE",
+    "PROJECT_INSTRUCTION_UI_NOT_ACTIVATED",
+    "PROJECT_SOURCES_UNCHANGED"
+  ],
+  "side_effects": {
+    "provider_calls": 0,
+    "cash_spend_usd": 0,
+    "wallet_signer_transaction_actions": 0,
+    "deploy_release_actions": 0,
+    "project_sources_changes": 0,
+    "project_instruction_ui_changes": 0
+  }
+}

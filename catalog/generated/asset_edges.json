@@ -13,6 +13,11 @@
       "target_asset_id": "CTRL-BATON-SETUP-001"
     },
     {
+      "source_asset_id": "ADR-GPT-EXECUTOR-ROUTING-003",
+      "relation": "superseded_by",
+      "target_asset_id": "ADR-OWNER-ATTENTION-GATE-004"
+    },
+    {
       "source_asset_id": "ADR-MVP-STACK-002",
       "relation": "evidenced_by",
       "target_asset_id": "EVIDENCE-T04-RESEARCH-ACCEPTANCE-001"
@@ -31,6 +36,16 @@
       "source_asset_id": "ADR-MVP-STACK-002",
       "relation": "governed_by",
       "target_asset_id": "CTRL-TASK-04-001"
+    },
+    {
+      "source_asset_id": "ADR-OWNER-ATTENTION-GATE-004",
+      "relation": "depends_on",
+      "target_asset_id": "ADR-GPT-EXECUTOR-ROUTING-003"
+    },
+    {
+      "source_asset_id": "ADR-OWNER-ATTENTION-GATE-004",
+      "relation": "governed_by",
+      "target_asset_id": "CTRL-OWNER-ATTENTION-GATE-001"
     },
     {
       "source_asset_id": "ARCH-INTENT-001",
@@ -1010,6 +1025,11 @@
     {
       "source_asset_id": "CTRL-AGENTS-001",
       "relation": "governed_by",
+      "target_asset_id": "CTRL-OWNER-ATTENTION-GATE-001"
+    },
+    {
+      "source_asset_id": "CTRL-AGENTS-001",
+      "relation": "governed_by",
       "target_asset_id": "CTRL-TASK-04-001"
     },
     {
@@ -1061,6 +1081,26 @@
       "source_asset_id": "CTRL-LATEST-HANDOFF-001",
       "relation": "validated_by",
       "target_asset_id": "TEST-T06-CATALOG-001"
+    },
+    {
+      "source_asset_id": "CTRL-OWNER-ATTENTION-GATE-001",
+      "relation": "contains",
+      "target_asset_id": "ADR-OWNER-ATTENTION-GATE-004"
+    },
+    {
+      "source_asset_id": "CTRL-OWNER-ATTENTION-GATE-001",
+      "relation": "contains",
+      "target_asset_id": "POLICY-OWNER-ATTENTION-GATE-001"
+    },
+    {
+      "source_asset_id": "CTRL-OWNER-ATTENTION-GATE-001",
+      "relation": "evidenced_by",
+      "target_asset_id": "EVIDENCE-OWNER-ATTENTION-GATE-001"
+    },
+    {
+      "source_asset_id": "CTRL-OWNER-ATTENTION-GATE-001",
+      "relation": "validated_by",
+      "target_asset_id": "TEST-OWNER-ATTENTION-GATE-001"
     },
     {
       "source_asset_id": "CTRL-PYPROJECT-001",
@@ -1656,6 +1696,16 @@
       "source_asset_id": "EVIDENCE-CANARY-SPECIFICATION-ONLY-A2-001",
       "relation": "validated_by",
       "target_asset_id": "TEST-CANARY-SPECIFICATION-ONLY-A2-001"
+    },
+    {
+      "source_asset_id": "EVIDENCE-OWNER-ATTENTION-GATE-001",
+      "relation": "derived_from",
+      "target_asset_id": "POLICY-OWNER-ATTENTION-GATE-001"
+    },
+    {
+      "source_asset_id": "EVIDENCE-OWNER-ATTENTION-GATE-001",
+      "relation": "validated_by",
+      "target_asset_id": "TEST-OWNER-ATTENTION-GATE-001"
     },
     {
       "source_asset_id": "EVIDENCE-OWNER-AUTHORITY-PACKET-A1-001",
@@ -4013,6 +4063,16 @@
       "target_asset_id": "EVIDENCE-T26C-A2-READINESS-001"
     },
     {
+      "source_asset_id": "POLICY-OWNER-ATTENTION-GATE-001",
+      "relation": "contains",
+      "target_asset_id": "SCRIPT-OWNER-ATTENTION-GATE-001"
+    },
+    {
+      "source_asset_id": "POLICY-OWNER-ATTENTION-GATE-001",
+      "relation": "validated_by",
+      "target_asset_id": "TEST-OWNER-ATTENTION-GATE-001"
+    },
+    {
       "source_asset_id": "PRE-GIT-TASK01-A017",
       "relation": "derived_from",
       "target_asset_id": "BUNDLE-TASK01-COMPLETION-001"
@@ -4221,6 +4281,11 @@
       "source_asset_id": "PRE-GIT-TASK02-VALIDATION-001",
       "relation": "evidenced_by",
       "target_asset_id": "EVIDENCE-ATOM4B-RECEIPT-001"
+    },
+    {
+      "source_asset_id": "PROJECT-INSTRUCTION-CANDIDATE-3-4-001",
+      "relation": "governed_by",
+      "target_asset_id": "POLICY-OWNER-ATTENTION-GATE-001"
     },
     {
       "source_asset_id": "PROTOCOL-EXECUTION-ROUTER-001",
@@ -4723,6 +4788,11 @@
       "target_asset_id": "CTRL-BATON-SETUP-001"
     },
     {
+      "source_asset_id": "SCRIPT-OWNER-ATTENTION-GATE-001",
+      "relation": "governed_by",
+      "target_asset_id": "POLICY-OWNER-ATTENTION-GATE-001"
+    },
+    {
       "source_asset_id": "SCRIPT-T05-MIGRATION-LEDGER-001",
       "relation": "depends_on",
       "target_asset_id": "SCHEMA-T05-CANONICAL-DDL-001"
@@ -5106,6 +5176,16 @@
       "source_asset_id": "TEST-CANARY-SPECIFICATION-ONLY-A2-001",
       "relation": "depends_on",
       "target_asset_id": "EVIDENCE-CANARY-SPECIFICATION-ONLY-A2-001"
+    },
+    {
+      "source_asset_id": "TEST-OWNER-ATTENTION-GATE-001",
+      "relation": "depends_on",
+      "target_asset_id": "POLICY-OWNER-ATTENTION-GATE-001"
+    },
+    {
+      "source_asset_id": "TEST-OWNER-ATTENTION-GATE-001",
+      "relation": "depends_on",
+      "target_asset_id": "SCRIPT-OWNER-ATTENTION-GATE-001"
     },
     {
       "source_asset_id": "TEST-OWNER-AUTHORITY-PACKET-001",

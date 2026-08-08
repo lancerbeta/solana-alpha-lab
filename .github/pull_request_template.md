@@ -52,12 +52,18 @@
 
 - Not accepted / accepted by GPT control plane:
 
-## Merge authorization status
+## OWNER_ATTENTION_GATE and merge status
 
-- Awaiting / exact per-PR user confirmation received:
+- Execution route:
+- Exact PR head:
+- Gate decision (`AUTONOMOUS` / `OWNER_ATTENTION_REQUIRED` / `DENY`):
+- Merge preconditions all PASS:
+- Post-merge exact main read-back / main CI:
 
 ---
 
 Draft PR is candidate evidence, not canonical acceptance.
-Cursor never merges; Codex merges after exact per-PR user confirmation.
+Cursor never merges. Local Codex merges only after `OWNER_ATTENTION_GATE`
+returns `AUTONOMOUS` for the exact head; baton-route merge returns to the
+Project Chat/owner boundary.
 Commit/tests/CI do not establish DONE.

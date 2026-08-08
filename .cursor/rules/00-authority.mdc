@@ -28,8 +28,9 @@ alwaysApply: true
 - Stop for material scope/estimand/data-contract/safety changes and the
   excluded provider, credential, spend, wallet, destructive, settings, and
   user-only boundaries listed in `AGENTS.md`.
-- Cursor stops before merge. Codex obtains exact per-PR confirmation and
-  performs the merge.
+- Apply repository `OWNER_ATTENTION_GATE` before any owner prompt. Cursor never merges.
+  The local Codex auto-merge grant does not transfer to the
+  `PROJECT_CHAT_PRO_GITHUB_BATON_CURSOR` route.
 - Local validation and GPT semantic acceptance are gates, not authority grants.
 - Follow `AGENTS.md` and `docs/agent/EXECUTION_ROUTER_PROTOCOL.md`.
 - Skills advise; they do not own control-plane status.

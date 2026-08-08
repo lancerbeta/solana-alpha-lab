@@ -1,0 +1,108 @@
+schema: smial.owner-attention-gate
+schema_version: '1.0'
+policy_id: OWNER_ATTENTION_GATE_V1
+as_of: '2026-08-08'
+status: OWNER_DESIGN_APPROVED_IMPLEMENTATION_CANDIDATE
+owner: GOAL_OWNER
+purpose: >-
+  Route owner attention to material decisions and user-only boundaries while
+  allowing bounded engineering work to complete without approval fatigue.
+decisions:
+  - AUTONOMOUS
+  - OWNER_ATTENTION_REQUIRED
+  - DENY
+owner_attention_triggers:
+  auth_or_access_recovery:
+    reason: AUTH_OR_ACCESS_RECOVERY
+    covers:
+      - expired_or_missing_login
+      - permission_or_keyring_recovery_requiring_user
+  material_owner_decision:
+    reason: MATERIAL_OWNER_DECISION
+    covers:
+      - mission_or_hypothesis
+      - estimand_or_product_meaning
+      - feature_priority_or_owner_ux
+      - budget_cost_cap_or_risk_appetite
+      - material_data_contract_or_source_choice
+      - irreversible_business_architecture
+  user_only_activation:
+    reason: USER_ONLY_ACTIVATION
+    covers:
+      - project_sources_or_bundle_replacement
+      - project_instruction_ui_replacement
+      - account_payment_or_permission_ui
+  external_material_action:
+    reason: EXTERNAL_MATERIAL_ACTION
+    covers:
+      - credentialed_provider_api_rpc_wss
+      - purchase_or_cash_spend
+      - deploy_or_release
+      - wallet_signer_transaction_or_real_money
+      - repository_or_account_settings
+      - force_or_history_rewrite
+      - destructive_cleanup_or_branch_deletion
+  unresolved_safety_or_truth_conflict:
+    reason: UNRESOLVED_SAFETY_OR_TRUTH_CONFLICT
+    covers:
+      - conflicting_truth_owners
+      - unknown_transaction_or_inventory
+      - irreparable_validation_or_security_failure
+route_authority:
+  LOCAL_WORK_CODEX:
+    allowed_actors:
+      - GPT
+      - CODEX
+    autonomous_action_classes:
+      - READ_ONLY
+      - ROUTINE_ENGINEERING
+      - GITHUB_TRANSPORT
+    ordinary_merge: AUTONOMOUS_AFTER_MACHINE_GATE
+    cursor_merge: FORBIDDEN
+  PROJECT_CHAT_PRO_GITHUB_BATON_CURSOR:
+    allowed_actors:
+      - GPT
+      - CODEX
+      - CURSOR
+    autonomous_action_classes:
+      - READ_ONLY
+      - ROUTINE_ENGINEERING
+      - GITHUB_TRANSPORT
+    ordinary_merge: OWNER_ATTENTION_REQUIRED
+    cursor_merge: FORBIDDEN
+  GPT_ONLY:
+    allowed_actors:
+      - GPT
+      - CODEX
+    autonomous_action_classes:
+      - READ_ONLY
+    ordinary_merge: OWNER_ATTENTION_REQUIRED
+    cursor_merge: FORBIDDEN
+merge_preconditions:
+  - exact_pr_head_bound
+  - required_tests_pass
+  - ci_exact_head_pass
+  - full_gate_pass
+  - factory_fit_pass
+  - write_set_pass
+  - secret_scan_pass
+  - mergeable
+  - no_unresolved_reviews
+  - standard_merge
+  - branch_preserved
+  - settings_unchanged
+post_merge:
+  exact_main_readback_required: true
+  main_ci_required: true
+  failed_readback_or_main_ci: TASK_NOT_DONE_REPAIR_OR_OWNER_ATTENTION
+invariants:
+  scope_must_be_bound: true
+  stricter_task_stop_wins: true
+  cursor_never_merges: true
+  passing_tests_do_not_grant_canonical_done: true
+  owner_attention_is_not_a_failed_machine_check_override: true
+  historical_receipts_are_append_only: true
+non_claims:
+  - READY_OR_AUTONOMOUS_DOES_NOT_GRANT_EXTERNAL_MATERIAL_AUTHORITY
+  - AUTO_MERGE_DOES_NOT_GRANT_CANONICAL_DONE
+  - POLICY_DOES_NOT_ACTIVATE_PROJECT_SOURCES_OR_PROJECT_INSTRUCTION_UI

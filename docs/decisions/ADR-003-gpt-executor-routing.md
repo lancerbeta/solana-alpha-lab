@@ -1,7 +1,7 @@
 ---
 adr_id: ADR-003
 title: GPT control plane and executor routing
-status: ACCEPTED_REPOSITORY_MIRROR
+status: PARTIALLY_SUPERSEDED_BY_ADR-004
 as_of: 2026-07-28
 owner_task: CTRL-BATON-SETUP
 contains_secrets: false
@@ -64,8 +64,8 @@ Non-negotiable ownership:
   `STANDING_PROJECT_AUTONOMY` covers routine local writes, direct propagation
   to tests/Catalog/generated consumers, staging, ordinary commit, fetch,
   non-force branch push, PR/review work, and CI read-back.
-- A stricter Atom Contract still wins. Cursor stops before merge; Codex asks
-  once for the exact PR and then performs the merge.
+- A stricter Atom Contract still wins. Merge authority is superseded by
+  `ADR-004` and `OWNER_ATTENTION_GATE`; Cursor never merges.
 - Provider/API/RPC/WSS or credentialed-account calls, package/dependency
   changes, purchases/deployments, wallet/signer/real-money actions,
   force/destructive operations, settings/access changes, and canonical
@@ -137,6 +137,8 @@ Repository mirrors:
 
 - As `ACCEPTED_REPOSITORY_MIRROR`, material changes require a later authorized
   atom and, when terms change, a new baton contract revision/hash.
+- `ADR-004` supersedes only this ADR's merge-authority rule; route selection,
+  baton trust and status ownership remain active.
 - Canonical Source registration and roadmap `DONE` remain GPT-owned.
 - A superseding ADR must state the replaced `adr_id`, as-of date, and what
   authority classes remain deferred.

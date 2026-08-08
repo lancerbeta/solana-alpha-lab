@@ -9,7 +9,7 @@ receipt comments by the executor, task branch, ordinary commit, non-force push,
 PR/review, and CI interaction are routine transport under
 `STANDING_PROJECT_AUTONOMY`. Unrelated Issue discovery/mutation, settings,
 provider calls, credentials, spend, destructive actions, and merge remain
-separately bounded.
+separately bounded by `OWNER_ATTENTION_GATE` and the active Atom Contract.
 
 Related:
 
@@ -72,8 +72,9 @@ Material contract changes require a new `revision` and a new hash.
    stays within the original objective, managed write set, dependency set,
    authority class, network/cost caps, and rollback boundary; otherwise a new
    contract revision/hash and explicit approval are required.
-9. Cursor stops before merge. Codex obtains exact per-PR user confirmation and
-   performs merge/read-back.
+9. Cursor stops before merge. This baton route has no Codex auto-merge grant;
+   `OWNER_ATTENTION_GATE` returns merge to the Project Chat/owner boundary,
+   after which an authorized Codex may perform merge/read-back.
 10. GPT control plane performs canonical reconciliation.
 
 The standing grant supplies exact Atom Contract Issue
@@ -179,7 +180,8 @@ When `LOCAL_WRITE` is authorized:
 
 ## Excluded and conditional boundaries
 
-- Cursor never merges; Codex merges only after exact per-PR confirmation.
+- Cursor never merges. `OWNER_ATTENTION_GATE` classifies merge on this route as
+  `OWNER_ATTENTION_REQUIRED`; passing CI is not merge authority.
 - Provider/API/RPC/WSS, credentials, spend, deploy, wallet/signer/transaction,
   settings, force/destructive/history operations, material scope change, and
   user-only actions require an exact gate.
