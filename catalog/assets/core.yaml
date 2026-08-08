@@ -14807,7 +14807,7 @@ records:
   as_of: '2026-08-08'
   truth_owner: CANARY_SPECIFICATION_ONLY_V1
   location: {kind: git_path, logical_uri: 'repo://tests/test_canary_specification_only_catalog_factory_fit.py', repository_path: tests/test_canary_specification_only_catalog_factory_fit.py}
-  integrity: {kind: sha256, sha256: 340118ab84e8be1fe2a5693898983cd892f350310624ab798cf1fde14ff90b77}
+  integrity: {kind: sha256, sha256: 4579023260c3baaa387275c1a97b9acd3e1d23369400c7fc2bee91ac54eab8fc}
   access: *t25_read_file
   relations:
   - {relation_type: depends_on, target_asset_id: EVIDENCE-CANARY-SPECIFICATION-ONLY-A2-001}
