@@ -63,6 +63,16 @@
       "target_asset_id": "TEST-T15-HYPOTHESIS-DRIVEN-ACQUISITION-ACCEPTANCE-001"
     },
     {
+      "source_asset_id": "ARCH-INTENT-004",
+      "relation": "derived_from",
+      "target_asset_id": "ARCH-INTENT-002"
+    },
+    {
+      "source_asset_id": "ARCH-INTENT-004",
+      "relation": "derived_from",
+      "target_asset_id": "ARCH-INTENT-T21-PRODUCT-VISION-001"
+    },
+    {
       "source_asset_id": "ARCH-INTENT-T21-PRODUCT-VISION-001",
       "relation": "derived_from",
       "target_asset_id": "ARCH-INTENT-002"

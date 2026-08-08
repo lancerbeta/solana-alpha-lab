@@ -1,6 +1,6 @@
 schema_version: '1.1'
 registry_id: CATALOG-ASSET-REGISTRY-ARCHITECTURE-001
-as_of: '2026-07-29'
+as_of: '2026-08-08'
 records:
 - asset_id: ARCH-INTENT-001
   record_version: '1.0'
@@ -114,3 +114,51 @@ records:
     availability_note: Current user-owned architecture direction accepted in
       TASK-15; implementation and canonical Operating System reconciliation
       remain separate.
+- asset_id: ARCH-INTENT-004
+  record_version: '1.0'
+  asset_type: architecture_intent
+  purpose: Accepted boundary for a future deterministic Factory Context Capsule and Research Workbench navigation surface.
+  status: ACCEPTED_DIRECTION_NOT_IMPLEMENTED
+  origin: PROJECT_SOURCE
+  as_of: '2026-08-08'
+  truth_owner: USER_GOAL_OWNER
+  location:
+    kind: git_path
+    logical_uri: repo://docs/architecture/intents/ARCH-INTENT-004-factory-context-capsule-and-workbench-boundary.md
+    repository_path: docs/architecture/intents/ARCH-INTENT-004-factory-context-capsule-and-workbench-boundary.md
+  integrity:
+    kind: sha256
+    sha256: 4a4ed445d64d22123c4b2501f012d10eadb020c2ba0a58e4d754b4c449b4edac
+  access:
+    mode: read_only
+    method: file
+    recipe_id: QUERY-CATALOG-RESOLVE-ASSET-001
+    network_required: false
+    secrets_required: false
+  relations:
+  - relation_type: derived_from
+    target_asset_id: ARCH-INTENT-002
+  - relation_type: derived_from
+    target_asset_id: ARCH-INTENT-T21-PRODUCT-VISION-001
+  consumers:
+  - FACTORY-001
+  - REG-RESEARCH-001
+  - TASK-28
+  evidence:
+  - evidence_id: EVIDENCE-ARCH-INTENT-004
+    kind: user_attestation
+    reference: USER_DESIGN_AND_SPEC_APPROVAL_2026-08-08
+    result: PASS
+  classification:
+    contains_secrets: false
+    contains_raw_data: false
+    sensitivity: INTERNAL_NON_SECRET
+  provenance:
+    created_at: '2026-08-08'
+    first_reliable_available_at: '2026-08-08'
+    imported_by_task: TASK-27
+    import_mode: REGISTERED_CURRENT_INTENT
+    past_availability_claim: NO_PAST_AVAILABILITY_CLAIM
+    retention: TRACKED_REFERENCE
+    canonicality: CURRENT_INTENT
+    availability_note: Current user-approved direction; it registers a future projection boundary and does not claim Capsule implementation.
