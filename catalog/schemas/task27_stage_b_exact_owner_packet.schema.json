@@ -1,0 +1,118 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "TASK-27 Stage B exact owner packet fixture",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["valid_packet", "adversarial_cases"],
+  "properties": {
+    "valid_packet": {"$ref": "#/$defs/packet"},
+    "adversarial_cases": {
+      "type": "array",
+      "minItems": 11,
+      "items": {"$ref": "#/$defs/adversarialCase"}
+    }
+  },
+  "$defs": {
+    "identity": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["network", "pool_address", "base_mint", "quote_mint", "dex_id"],
+      "properties": {
+        "network": {"type": "string", "minLength": 1},
+        "pool_address": {"type": "string", "minLength": 1},
+        "base_mint": {"type": "string", "minLength": 1},
+        "quote_mint": {"type": "string", "minLength": 1},
+        "dex_id": {"type": "string", "minLength": 1}
+      }
+    },
+    "window": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["source", "approval_state", "time_from", "time_to", "lower_bound_inclusive", "upper_bound_exclusive", "timezone", "interval_seconds", "expected_natural_bars"],
+      "properties": {
+        "source": {"type": "string", "minLength": 1},
+        "approval_state": {"type": "string", "minLength": 1},
+        "time_from": {"type": "integer"},
+        "time_to": {"type": "integer"},
+        "lower_bound_inclusive": {"type": "boolean"},
+        "upper_bound_exclusive": {"type": "boolean"},
+        "timezone": {"type": "string", "minLength": 1},
+        "interval_seconds": {"type": "integer", "minimum": 1},
+        "expected_natural_bars": {"type": "integer", "minimum": 1}
+      }
+    },
+    "request": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["request_id", "kind", "method", "url", "query"],
+      "properties": {
+        "request_id": {"type": "string", "minLength": 1},
+        "kind": {"type": "string", "minLength": 1},
+        "method": {"const": "GET"},
+        "url": {"type": "string", "format": "uri"},
+        "query": {"type": "object"}
+      }
+    },
+    "authority": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["provider_api_rpc_wss_calls", "credential_use", "cash_spend_usd_cents"],
+      "properties": {
+        "provider_api_rpc_wss_calls": {"type": "integer", "minimum": 0},
+        "credential_use": {"type": "boolean"},
+        "cash_spend_usd_cents": {"type": "integer", "minimum": 0}
+      }
+    },
+    "claims": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["history_grade", "pit_admissible", "alpha", "execution", "pnl", "netreturn", "cashflow"],
+      "properties": {
+        "history_grade": {"type": "string", "minLength": 1},
+        "pit_admissible": {"type": "boolean"},
+        "alpha": {"type": "boolean"},
+        "execution": {"type": "boolean"},
+        "pnl": {"type": "boolean"},
+        "netreturn": {"type": "boolean"},
+        "cashflow": {"type": "boolean"}
+      }
+    },
+    "approval": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["approval_granted", "stage_b_request_authorized"],
+      "properties": {
+        "approval_granted": {"type": "boolean"},
+        "stage_b_request_authorized": {"type": "boolean"}
+      }
+    },
+    "packet": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["stage_a_receipt_sha256", "identity", "frozen_window", "requests", "fallback_provider", "helius_reconstruction", "authority", "claims", "future_owner_approval", "future_outcome"],
+      "properties": {
+        "stage_a_receipt_sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+        "identity": {"$ref": "#/$defs/identity"},
+        "frozen_window": {"$ref": "#/$defs/window"},
+        "requests": {"type": "array", "items": {"$ref": "#/$defs/request"}},
+        "fallback_provider": {"type": ["null", "string"]},
+        "helius_reconstruction": {"type": "string", "minLength": 1},
+        "authority": {"$ref": "#/$defs/authority"},
+        "claims": {"$ref": "#/$defs/claims"},
+        "future_owner_approval": {"$ref": "#/$defs/approval"},
+        "future_outcome": {"type": "string", "minLength": 1}
+      }
+    },
+    "adversarialCase": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["case_id", "pointer", "value", "expected_error"],
+      "properties": {
+        "case_id": {"type": "string", "minLength": 1},
+        "pointer": {"type": "string", "pattern": "^/"},
+        "value": {},
+        "expected_error": {"type": "string", "minLength": 1}
+      }
+    }
+  }
+}

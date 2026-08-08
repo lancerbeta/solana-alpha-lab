@@ -1,0 +1,55 @@
+{
+  "schema": "smial.task27.a1s1.stage_b_exact_owner_packet.acceptance",
+  "schema_version": "1.0",
+  "task_id": "TASK-27",
+  "atom_id": "T27-A1S1_STAGE_B_EXACT_OWNER_PACKET_OFFLINE_V1",
+  "status": "PASS_TARGETED_VALIDATION_PENDING_DELIVERY",
+  "artifact_bindings": {
+    "contract": {"path": "docs/contracts/task27_stage_b_exact_owner_packet_contract_v1.md", "sha256": "8da62e74f843924a7b3e918f7a8d5b3e69fdf0437fbd41884ac09c31282eade8"},
+    "config": {"path": "configs/task27_stage_b_exact_owner_packet_v1.yaml", "sha256": "5f9b2d1312d6ce1084d07558a62017f0ed0f5f0a9664d7c1a7b531750d29c163"},
+    "schema": {"path": "catalog/schemas/task27_stage_b_exact_owner_packet.schema.json", "sha256": "7a5bd442b5a97dc595fca0893d52f51a2eab2cc4eeaf4886a818dda440b196be"},
+    "fixture": {"path": "tests/fixtures/task27/stage_b_exact_owner_packet_v1.json", "sha256": "ec04a4cb03ef7339917a338ed3638d02282f446b3fd6cb3a7b0b0156f6f28019"}
+  },
+  "validation": {
+    "targeted_command": "uv run --locked --managed-python python -B -m unittest tests.test_task27_stage_b_exact_owner_packet",
+    "targeted_tests_run": 5,
+    "targeted_tests_passed": 5,
+    "adversarial_cases_rejected": 11,
+    "full_validation": "PENDING_TRACKED_ONLY_DELIVERY"
+  },
+  "factory_fit_review": "FULL_REVIEW",
+  "factory_fit": {
+    "verdict": "PASS_WITH_LIMITATIONS",
+    "mission_alignment": "PASS",
+    "research_truth": "PASS_STAGE_A_IDENTITY_AND_A7_WINDOW_BOUND",
+    "owner_operability": "PASS_ONE_FUTURE_EXACT_APPROVAL",
+    "execution_to_cashflow": "NOT_IN_SCOPE_NO_CLAIM",
+    "monitoring_recovery": "PASS_STOP_ON_ANY_STAGE_B_FAILURE",
+    "security": "PASS_LOCAL_HEADER_ONLY_NO_SECRET_VALUE",
+    "reuse_build": "PASS_REUSES_TASK27_STAGE_CONTRACT_PATTERN",
+    "red_team": "PASS_11_SYNTHETIC_ADVERSARIAL_REJECTIONS"
+  },
+  "measured_boundary": {
+    "provider_api_rpc_wss_calls": 0,
+    "credential_use": false,
+    "raw_provider_responses_retained": 0,
+    "r2_value_reads": 0,
+    "r3_value_or_path_reads": 0,
+    "wallet_signer_transaction_actions": 0,
+    "cash_spend_usd_cents": 0,
+    "dependency_changes": 0,
+    "catalog_or_registry_mutations": 0,
+    "project_source_changes": 0
+  },
+  "project_sources_disposition": {
+    "kind": "NO_CHANGE",
+    "reason": "Offline owner packet only; the active Source release and TASK-27 acceptance remain unchanged."
+  },
+  "state_change": "NONE",
+  "next_boundary": {
+    "provider_read_authority_granted": false,
+    "credential_use_authorized": false,
+    "next_owner_gate": "EXACT_TWO_GET_SOLANA_TRACKER_STAGE_B_APPROVAL_REQUIRED",
+    "task27_acceptance": false
+  }
+}
