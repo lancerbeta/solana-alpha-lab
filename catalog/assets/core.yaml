@@ -575,12 +575,12 @@ records:
     contains_raw_data: false
     sensitivity: INTERNAL_NON_SECRET
 - asset_id: CTRL-AGENTS-001
-  record_version: '2.2'
+  record_version: '2.3'
   asset_type: control_document
   purpose: Repository-level agent contract for standing routine autonomy,
     OWNER_ATTENTION_GATE, route-specific merge authority, safety, JIT validation,
     fail-closed control-only task close, delivery preflight, status ownership, and
-    Project Sources release control.
+    Project Sources release control with reuse-first recovery decisions.
   status: IMPLEMENTED_UNVERIFIED
   origin: REPOSITORY
   as_of: '2026-08-09'
@@ -591,7 +591,7 @@ records:
     repository_path: AGENTS.md
   integrity:
     kind: sha256
-    sha256: ffe85618d7460773fd6da7c26bf42009ab480adb20363357752b012e17707888
+    sha256: 1044f26aec5fe79889194b6d598f448fb173569ba26baf151c9d194d8d69a004
   access:
     mode: read_only
     method: file
