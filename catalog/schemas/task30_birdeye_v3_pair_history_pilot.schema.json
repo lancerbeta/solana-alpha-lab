@@ -1,0 +1,95 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://solana-alpha-lab.local/schemas/task30_birdeye_v3_pair_history_pilot.schema.json",
+  "title": "TASK-30 Birdeye V3 pair history pilot offline packet",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema", "schema_version", "task_id", "atom_id", "contract_id", "consumer",
+    "frozen_identity", "authority", "owner_authority", "local_credential_presence",
+    "future_reads", "semantic_state", "non_claims", "decision",
+    "project_sources_disposition"
+  ],
+  "properties": {
+    "schema": {"const": "smial.task30.birdeye-v3-pair-history-pilot.policy"},
+    "schema_version": {"const": "1.0"},
+    "task_id": {"const": "TASK-30"},
+    "atom_id": {"const": "T30-A5_BOUNDED_BIRDEYE_V3_PAIR_HISTORY_PILOT_PREPARATION_V1"},
+    "contract_id": {"const": "TASK30-BIRDEYE-V3-PAIR-HISTORY-PILOT-V1"},
+    "consumer": {"const": "FUTURE_EXACT_OWNER_EXTERNAL_READ_GATE"},
+    "frozen_identity": {"$ref": "#/$defs/frozen_identity"},
+    "authority": {"$ref": "#/$defs/authority"},
+    "owner_authority": {"$ref": "#/$defs/owner_authority"},
+    "local_credential_presence": {"$ref": "#/$defs/local_credential_presence"},
+    "future_reads": {"$ref": "#/$defs/future_reads"},
+    "semantic_state": {"$ref": "#/$defs/semantic_state"},
+    "non_claims": {"$ref": "#/$defs/non_claims"},
+    "decision": {"const": "OFFLINE_PACKET_READY_FOR_OWNER_AUTHORITY_GATE"},
+    "project_sources_disposition": {"const": "NO_CHANGE"}
+  },
+  "$defs": {
+    "frozen_identity": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["network", "pool_address", "base_mint", "quote_mint", "dex_id", "source_receipt"],
+      "properties": {
+        "network": {"const": "solana"},
+        "pool_address": {"const": "URqx24yyYxtXXhTbBQnbtPLhtLWYoaDaRxuQuLpNS3S"},
+        "base_mint": {"const": "DMwbVy48dWVKGe9z1pcVnwF3HLMLrqWdDLfbvx8RchhK"},
+        "quote_mint": {"const": "So11111111111111111111111111111111111111112"},
+        "dex_id": {"const": "pumpswap"},
+        "source_receipt": {"const": "docs/evidence/task27/a1_stage_a_public_pair_identity_runtime_receipt_v1.json"}
+      }
+    },
+    "authority": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["provider_api_rpc_wss_calls", "credential_use", "raw_data_write", "r2_r3_access", "dependency_changes", "wallet_signer_transaction_actions", "cash_spend", "task30_trial_or_acceptance", "project_sources_changes"],
+      "properties": {
+        "provider_api_rpc_wss_calls": {"const": 0}, "credential_use": {"const": false}, "raw_data_write": {"const": false}, "r2_r3_access": {"const": false}, "dependency_changes": {"const": false}, "wallet_signer_transaction_actions": {"const": false}, "cash_spend": {"const": false}, "task30_trial_or_acceptance": {"const": false}, "project_sources_changes": {"const": false}
+      }
+    },
+    "owner_authority": {
+      "type": "object", "additionalProperties": false, "required": ["status", "future_request_cap"],
+      "properties": {"status": {"const": "NOT_GRANTED"}, "future_request_cap": {"const": 2}}
+    },
+    "local_credential_presence": {
+      "type": "object", "additionalProperties": false, "required": ["status"],
+      "properties": {"status": {"const": "UNATTESTED"}}
+    },
+    "future_reads": {
+      "type": "array", "minItems": 2, "maxItems": 2,
+      "items": {"$ref": "#/$defs/future_read"}
+    },
+    "future_read": {
+      "type": "object", "additionalProperties": false,
+      "required": ["read_id", "method", "endpoint_path", "header_policy", "query", "max_attempts", "fallback_provider", "stop_chain_on_non_200", "execute_only_if_prior", "raw_retention"],
+      "properties": {
+        "read_id": {"enum": ["PAIR_OVERVIEW_IDENTITY_READ", "PAIR_OHLCV_RANGE_READ"]},
+        "method": {"const": "GET"},
+        "endpoint_path": {"enum": ["/defi/v3/pair/overview/single", "/defi/v3/ohlcv/pair"]},
+        "header_policy": {"type": "object", "additionalProperties": false, "required": ["x_chain", "credential_transport"], "properties": {"x_chain": {"const": "solana"}, "credential_transport": {"const": "LOCAL_HEADER_ONLY_NO_VALUE"}}},
+        "query": {"type": "object"},
+        "max_attempts": {"const": 1},
+        "fallback_provider": {"const": null},
+        "stop_chain_on_non_200": {"const": true},
+        "execute_only_if_prior": {"enum": [null, "IDENTITY_READ_HTTP_200"]},
+        "raw_retention": {"const": "OUTSIDE_GIT_A4_IF_LATER_AUTHORIZED"}
+      }
+    },
+    "semantic_state": {
+      "type": "object", "additionalProperties": false,
+      "required": ["rest_15m_enum", "birdeye_pair_indexing", "price_unit", "empty_interval_meaning", "panel_completeness", "pit_admissibility"],
+      "properties": {
+        "rest_15m_enum": {"const": "UNPROVEN_PENDING_RESPONSE"}, "birdeye_pair_indexing": {"const": "UNPROVEN_PENDING_RESPONSE"}, "price_unit": {"const": "UNPROVEN_PENDING_RESPONSE"}, "empty_interval_meaning": {"const": "UNPROVEN_PENDING_RESPONSE"}, "panel_completeness": {"const": "UNPROVEN_PENDING_RESPONSE"}, "pit_admissibility": {"const": "UNPROVEN"}
+      }
+    },
+    "non_claims": {
+      "type": "object", "additionalProperties": false,
+      "required": ["continuous_panel", "explicit_no_trade", "pit_admissible", "alpha", "task30_trial", "numeric_netreturn", "execution", "actual_fills", "settlement"],
+      "properties": {
+        "continuous_panel": {"const": false}, "explicit_no_trade": {"const": false}, "pit_admissible": {"const": false}, "alpha": {"const": false}, "task30_trial": {"const": false}, "numeric_netreturn": {"const": false}, "execution": {"const": false}, "actual_fills": {"const": false}, "settlement": {"const": false}
+      }
+    }
+  }
+}

@@ -1,0 +1,97 @@
+{
+  "schema": "smial.task30.birdeye-v3-pair-history-pilot.acceptance",
+  "schema_version": "1.0",
+  "receipt_id": "T30-A5-BIRDEYE-V3-HISTORY-PILOT-001",
+  "task_id": "TASK-30",
+  "atom_id": "T30-A5_BOUNDED_BIRDEYE_V3_PAIR_HISTORY_PILOT_PREPARATION_V1",
+  "status": "VALIDATED_OFFLINE_PREPARATION",
+  "artifact_bindings": {
+    "contract": {
+      "path": "docs/contracts/task30_birdeye_v3_pair_history_pilot_contract_v1.md",
+      "sha256": "298b140843ffb9c519db853aa7f48bdc098567f3e564db058ff2e0b2ecac3b33"
+    },
+    "configuration": {
+      "path": "configs/task30_birdeye_v3_pair_history_pilot_v1.yaml",
+      "sha256": "d38a2a5c929e3323d266d5ca1d7a0e82bb08cee6bf6e1d0c03114172bfa15aa9"
+    },
+    "schema": {
+      "path": "catalog/schemas/task30_birdeye_v3_pair_history_pilot.schema.json",
+      "sha256": "6c465a7beac7019b72b5981cf84066fb9e969df8ef062aa7d24c1183bf1e7424"
+    },
+    "fixture": {
+      "path": "tests/fixtures/task30/birdeye_v3_pair_history_pilot_v1.json",
+      "sha256": "de912dd81cdc9616b4afc3758368476a31cb4f7236e21c2fca0789b21ac236a0"
+    },
+    "module": {
+      "path": "src/solana_alpha_lab/task30_birdeye_v3_pair_history_pilot.py",
+      "sha256": "4398073678cc824cb02957aa30a517afdaba8651249e3ecc2998014916dd11a6"
+    },
+    "test": {
+      "path": "tests/test_task30_birdeye_v3_pair_history_pilot.py",
+      "sha256": "694dd56e576b73a69dbc84098b6cd6aba96c8c8528c155e4a3e65d070e444671"
+    }
+  },
+  "input_evidence": {
+    "task27_pair_identity_receipt": {
+      "path": "docs/evidence/task27/a1_stage_a_public_pair_identity_runtime_receipt_v1.json",
+      "sha256": "fd315f72c8590b9b0de6e2a1231dca7f701e5cd517f343b3f97f44d17719c3e4"
+    },
+    "task30_reuse_closure_receipt": {
+      "path": "docs/evidence/task30/a4_reuse_first_pit_history_route_decision_acceptance_v1.json",
+      "sha256": "ebd43c5171eaa19453bbb3eb04b71e93eebdfac185ab11f666df861455970ec5"
+    },
+    "birdeye_pair_overview_documentation": "https://docs.birdeye.so/reference/get-defi-v3-pair-overview-single",
+    "birdeye_pair_ohlcv_documentation": "https://docs.birdeye.so/reference/get-defi-v3-ohlcv-pair"
+  },
+  "decision": {
+    "value": "OFFLINE_PACKET_READY_FOR_OWNER_AUTHORITY_GATE",
+    "future_provider": "BIRDEYE_V3_PAIR",
+    "future_provider_request_cap": 2,
+    "execution_order": [
+      "PAIR_OVERVIEW_IDENTITY_READ",
+      "PAIR_OHLCV_RANGE_READ"
+    ],
+    "actual_provider_authority": "NOT_GRANTED",
+    "state_change": "NONE"
+  },
+  "semantic_unknowns": [
+    "REST_15M_ENUM_UNPROVEN_PENDING_RESPONSE",
+    "BIRDEYE_PAIR_INDEXING_UNPROVEN_PENDING_RESPONSE",
+    "PRICE_UNIT_UNPROVEN_PENDING_RESPONSE",
+    "EMPTY_INTERVAL_MEANING_UNPROVEN_PENDING_RESPONSE",
+    "PANEL_COMPLETENESS_UNPROVEN_PENDING_RESPONSE",
+    "PIT_ADMISSIBILITY_UNPROVEN"
+  ],
+  "non_claims": {
+    "external_read_executed": false,
+    "continuous_panel": false,
+    "explicit_no_trade": false,
+    "pit_admissible": false,
+    "alpha": false,
+    "task30_trial": false,
+    "execution": false,
+    "actual_fills": false,
+    "settlement": false,
+    "numeric_netreturn": false
+  },
+  "factory_fit": {
+    "review_scope": "FULL_REVIEW",
+    "verdict": "PASS_WITH_LIMITATIONS",
+    "receipt_path": "docs/evidence/task30/a5_birdeye_v3_pair_history_pilot_preparation_factory_fit_v1.json",
+    "receipt_sha256": "ee4c4679d3411a965868894db1ffe0de4a759bfbe6356a35c22a59eadffac802"
+  },
+  "side_effect_counters": {
+    "provider_api_rpc_wss_calls": 0,
+    "credential_uses": 0,
+    "raw_data_writes": 0,
+    "r2_r3_reads": 0,
+    "wallet_signer_transaction_actions": 0,
+    "cash_spend_usd_cents": 0,
+    "dependency_changes": 0,
+    "project_sources_changes": 0
+  },
+  "project_sources_disposition": {
+    "kind": "NO_CHANGE",
+    "reason": "A5 is an offline subtask receipt, not TASK-30 completion or a Project Sources release candidate."
+  }
+}

@@ -15748,6 +15748,147 @@ records:
   evidence: []
   classification: *t25_internal
 
+- asset_id: CONTRACT-T30-BIRDEYE-V3-HISTORY-PILOT-001
+  record_version: '1.0'
+  asset_type: control_document
+  purpose: Versioned offline packet for a future two-read Birdeye V3 pair-history authority decision.
+  status: VALIDATED_ACTIVE
+  origin: REPOSITORY
+  as_of: '2026-08-09'
+  truth_owner: TASK-30
+  location: {kind: git_path, logical_uri: 'repo://docs/contracts/task30_birdeye_v3_pair_history_pilot_contract_v1.md', repository_path: docs/contracts/task30_birdeye_v3_pair_history_pilot_contract_v1.md}
+  integrity: {kind: sha256, sha256: 298b140843ffb9c519db853aa7f48bdc098567f3e564db058ff2e0b2ecac3b33}
+  access: *t25_read_file
+  relations:
+  - {relation_type: derived_from, target_asset_id: EVIDENCE-T30-A4-REUSE-FIRST-HISTORY-ROUTE-001}
+  - {relation_type: derived_from, target_asset_id: EVIDENCE-T30-A3-BIRDEYE-PILOT-READINESS-001}
+  consumers: [TASK-30, FACTORY-001]
+  evidence: []
+  classification: *t25_internal
+
+- asset_id: CONFIG-T30-BIRDEYE-V3-HISTORY-PILOT-001
+  record_version: '1.0'
+  asset_type: configuration
+  purpose: Machine-readable zero-authority policy for the future two-read Birdeye V3 pair-history packet.
+  status: VALIDATED_ACTIVE
+  origin: REPOSITORY
+  as_of: '2026-08-09'
+  truth_owner: TASK-30
+  location: {kind: git_path, logical_uri: 'repo://configs/task30_birdeye_v3_pair_history_pilot_v1.yaml', repository_path: configs/task30_birdeye_v3_pair_history_pilot_v1.yaml}
+  integrity: {kind: sha256, sha256: d38a2a5c929e3323d266d5ca1d7a0e82bb08cee6bf6e1d0c03114172bfa15aa9}
+  access: *t25_read_file
+  relations: [{relation_type: governed_by, target_asset_id: CONTRACT-T30-BIRDEYE-V3-HISTORY-PILOT-001}]
+  consumers: [TASK-30, FACTORY-001]
+  evidence: []
+  classification: *t25_internal
+
+- asset_id: SCHEMA-T30-BIRDEYE-V3-HISTORY-PILOT-001
+  record_version: '1.0'
+  asset_type: schema
+  purpose: Closed JSON Schema for the Task30 Birdeye V3 offline authority packet.
+  status: VALIDATED_ACTIVE
+  origin: REPOSITORY
+  as_of: '2026-08-09'
+  truth_owner: TASK-30
+  location: {kind: git_path, logical_uri: 'repo://catalog/schemas/task30_birdeye_v3_pair_history_pilot.schema.json', repository_path: catalog/schemas/task30_birdeye_v3_pair_history_pilot.schema.json}
+  integrity: {kind: sha256, sha256: 6c465a7beac7019b72b5981cf84066fb9e969df8ef062aa7d24c1183bf1e7424}
+  access: *t25_read_file
+  relations: [{relation_type: governed_by, target_asset_id: CONTRACT-T30-BIRDEYE-V3-HISTORY-PILOT-001}]
+  consumers: [TASK-30, FACTORY-001]
+  evidence: []
+  classification: *t25_internal
+
+- asset_id: FIXTURE-T30-BIRDEYE-V3-HISTORY-PILOT-001
+  record_version: '1.0'
+  asset_type: evidence
+  purpose: Synthetic golden result for the Task30 Birdeye V3 offline authority packet.
+  status: VALIDATED_ACTIVE
+  origin: REPOSITORY
+  as_of: '2026-08-09'
+  truth_owner: TASK-30
+  location: {kind: git_path, logical_uri: 'repo://tests/fixtures/task30/birdeye_v3_pair_history_pilot_v1.json', repository_path: tests/fixtures/task30/birdeye_v3_pair_history_pilot_v1.json}
+  integrity: {kind: sha256, sha256: de912dd81cdc9616b4afc3758368476a31cb4f7236e21c2fca0789b21ac236a0}
+  access: *t25_read_file
+  relations: [{relation_type: derived_from, target_asset_id: CONFIG-T30-BIRDEYE-V3-HISTORY-PILOT-001}]
+  consumers: [TASK-30, FACTORY-001]
+  evidence: []
+  classification: *t25_internal
+
+- asset_id: MODULE-T30-BIRDEYE-V3-HISTORY-PILOT-001
+  record_version: '1.0'
+  asset_type: script
+  purpose: Deterministic evaluator that rejects provider authority, retries, and response-semantic promotions from the offline packet.
+  status: VALIDATED_ACTIVE
+  origin: REPOSITORY
+  as_of: '2026-08-09'
+  truth_owner: TASK-30
+  location: {kind: git_path, logical_uri: 'repo://src/solana_alpha_lab/task30_birdeye_v3_pair_history_pilot.py', repository_path: src/solana_alpha_lab/task30_birdeye_v3_pair_history_pilot.py}
+  integrity: {kind: sha256, sha256: 4398073678cc824cb02957aa30a517afdaba8651249e3ecc2998014916dd11a6}
+  access: *t25_read_file
+  relations:
+  - {relation_type: governed_by, target_asset_id: CONFIG-T30-BIRDEYE-V3-HISTORY-PILOT-001}
+  - {relation_type: produces, target_asset_id: EVIDENCE-T30-A5-BIRDEYE-V3-HISTORY-PILOT-001}
+  consumers: [TASK-30, FACTORY-001]
+  evidence: []
+  classification: *t25_internal
+
+- asset_id: TEST-T30-BIRDEYE-V3-HISTORY-PILOT-001
+  record_version: '1.0'
+  asset_type: script
+  purpose: Deterministic tests for the Task30 Birdeye V3 offline packet, its receipt bindings, and Catalog discovery.
+  status: VALIDATED_ACTIVE
+  origin: REPOSITORY
+  as_of: '2026-08-09'
+  truth_owner: TASK-30
+  location: {kind: git_path, logical_uri: 'repo://tests/test_task30_birdeye_v3_pair_history_pilot.py', repository_path: tests/test_task30_birdeye_v3_pair_history_pilot.py}
+  integrity: {kind: sha256, sha256: 694dd56e576b73a69dbc84098b6cd6aba96c8c8528c155e4a3e65d070e444671}
+  access: *t25_read_file
+  relations:
+  - {relation_type: depends_on, target_asset_id: MODULE-T30-BIRDEYE-V3-HISTORY-PILOT-001}
+  - {relation_type: depends_on, target_asset_id: SCHEMA-T30-BIRDEYE-V3-HISTORY-PILOT-001}
+  - {relation_type: depends_on, target_asset_id: FIXTURE-T30-BIRDEYE-V3-HISTORY-PILOT-001}
+  - {relation_type: depends_on, target_asset_id: EVIDENCE-T30-A5-BIRDEYE-V3-HISTORY-PILOT-001}
+  consumers: [TASK-30, FACTORY-001]
+  evidence: []
+  classification: *t25_internal
+
+- asset_id: EVIDENCE-T30-A5-BIRDEYE-V3-HISTORY-PILOT-001
+  record_version: '1.0'
+  asset_type: evidence
+  purpose: Hash-bound acceptance receipt for the Task30 Birdeye V3 offline authority packet.
+  status: VALIDATED_ACTIVE
+  origin: REPOSITORY
+  as_of: '2026-08-09'
+  truth_owner: TASK-30
+  location: {kind: git_path, logical_uri: 'repo://docs/evidence/task30/a5_birdeye_v3_pair_history_pilot_preparation_acceptance_v1.json', repository_path: docs/evidence/task30/a5_birdeye_v3_pair_history_pilot_preparation_acceptance_v1.json}
+  integrity: {kind: sha256, sha256: 154c74617a9630c1da9b14fafa575aa12226be7aea555363b55770e447ebed35}
+  access: *t25_read_file
+  relations:
+  - {relation_type: derived_from, target_asset_id: MODULE-T30-BIRDEYE-V3-HISTORY-PILOT-001}
+  - {relation_type: validated_by, target_asset_id: TEST-T30-BIRDEYE-V3-HISTORY-PILOT-001}
+  consumers: [TASK-30, FACTORY-001]
+  evidence: []
+  classification: *t25_internal
+
+- asset_id: EVIDENCE-T30-A5-BIRDEYE-V3-HISTORY-PILOT-FACTORY-FIT-001
+  record_version: '1.0'
+  asset_type: evidence
+  purpose: FULL Factory Fit receipt for the Task30 Birdeye V3 offline authority packet.
+  status: VALIDATED_ACTIVE
+  origin: REPOSITORY
+  as_of: '2026-08-09'
+  truth_owner: TASK-30
+  location: {kind: git_path, logical_uri: 'repo://docs/evidence/task30/a5_birdeye_v3_pair_history_pilot_preparation_factory_fit_v1.json', repository_path: docs/evidence/task30/a5_birdeye_v3_pair_history_pilot_preparation_factory_fit_v1.json}
+  integrity: {kind: sha256, sha256: ee4c4679d3411a965868894db1ffe0de4a759bfbe6356a35c22a59eadffac802}
+  access: *t25_read_file
+  relations:
+  - {relation_type: derived_from, target_asset_id: EVIDENCE-T30-A5-BIRDEYE-V3-HISTORY-PILOT-001}
+  - {relation_type: validated_by, target_asset_id: TEST-T30-BIRDEYE-V3-HISTORY-PILOT-001}
+  consumers: [TASK-30, FACTORY-001]
+  evidence: []
+  classification: *t25_internal
+
+
 - asset_id: CONTRACT-T34A-DOCUMENTATION-FOUNDATION-001
   record_version: '1.0'
   asset_type: control_document
