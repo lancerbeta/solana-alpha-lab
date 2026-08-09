@@ -1,0 +1,101 @@
+{
+  "schema": "smial.project_sources.activation.receipt",
+  "schema_version": "1.0",
+  "task_id": "TASK-28",
+  "atom_id": "T28-A3R1_PROJECT_SOURCES_ACTIVATION_RECEIPT_V1",
+  "release_id": "PSR-0003-T28-RC001-FREEZE",
+  "status": "ACTIVATED_BY_OWNER_SMOKE",
+  "activation_evidence": {
+    "class": "OWNER_ATTESTATION",
+    "smoke_outcome": "PASS",
+    "reported_terminal": "TASK28_SOURCE_SMOKE=PASS",
+    "reported_at": "2026-08-09",
+    "raw_smoke_transcript": "NOT_RETAINED_IN_REPOSITORY",
+    "scope": "exact five mutable roles replaced; Operating System v8.5 and Research Blueprint v2.3 retained; exact seven-role smoke passed"
+  },
+  "source_bindings": [
+    {
+      "semantic_role": "canonical_manifest",
+      "semantic_version": "4.9",
+      "required_header": "schema: solana_alpha_lab.canonical_manifest",
+      "sha256": "191230d2754d243cad2f04f6efd350efb9b29372b4edcd09c88df6f076126da3",
+      "physical_filename": "canonical_manifest.yaml"
+    },
+    {
+      "semantic_role": "operating_system",
+      "semantic_version": "8.5",
+      "required_header": "# SOLANA ALPHA LAB OPERATING SYSTEM v8.5",
+      "sha256": "187aa5d1405c55868d7147a7cdf9e0605a9a51f613ab5597ae44682fcbc67c84",
+      "physical_filename": "Solana_Memecoin_Intraday_Alpha_Lab_Operating_System_v8_5.md"
+    },
+    {
+      "semantic_role": "research_blueprint",
+      "semantic_version": "2.3",
+      "required_header": "contains Синтетическая версия v2.3",
+      "sha256": "ec756d5be0196dd8207ac08512af5e3a9a5032eb5b0b40e3f8fcca2beb170ba1",
+      "physical_filename": "Solana_Memecoin_Intraday_Alpha_Lab_Synthesis_v2_3_2026-07-18.md"
+    },
+    {
+      "semantic_role": "roadmap",
+      "semantic_version": "4.9",
+      "required_header": "contains Версия 4.9",
+      "sha256": "02c0c2ce25e66acc137f2a0e3ec89eee69d2f0512da8dfdffc6aedbcd891d6b2",
+      "physical_filename": "roadmap.md"
+    },
+    {
+      "semantic_role": "current_system_state",
+      "semantic_version": "4.5",
+      "required_header": "contains CURRENT SYSTEM STATE — SOLANA MEMECOIN INTRADAY ALPHA LAB v4.5",
+      "sha256": "dfde6791e9ba11c1d771731bf4884a6a429799e90715fc90df872605f83d1a8e",
+      "physical_filename": "current_system_state.md"
+    },
+    {
+      "semantic_role": "phase_archive",
+      "semantic_version": "39.0",
+      "required_header": "contains TASK ARCHIVE P0/P1 v39",
+      "sha256": "61defb4cfd8e364705282938898717c56b99cc296dbc84508193635585a7292e",
+      "physical_filename": "task_archive_P0_P1_v39.md"
+    },
+    {
+      "semantic_role": "active_task",
+      "semantic_version": "TASK-28 / 1.0",
+      "required_header": "# TASK-28 — RC-001 research registry freeze",
+      "sha256": "6eec32612c7ca6b38cc916c449de5457a586271b52c805ad63566595b93958c0",
+      "physical_filename": "task_28_rc001_registry_freeze.md"
+    }
+  ],
+  "manifest_binding": {
+    "path": "docs/project_sources/releases/PSR-0003-T28-RC001-FREEZE/canonical_manifest.yaml",
+    "sha256": "191230d2754d243cad2f04f6efd350efb9b29372b4edcd09c88df6f076126da3"
+  },
+  "decision": {
+    "source_activation": true,
+    "task28_acceptance": false,
+    "canonical_task28_done": false,
+    "next_task_selected": false,
+    "state_change": "SOURCE_ACTIVATION_CONFIRMED_OWNER_SMOKE",
+    "next_boundary": "TASK28_CANONICAL_ACCEPTANCE_REQUIRED"
+  },
+  "authority": {
+    "provider_api_rpc_wss_calls": 0,
+    "credential_uses": 0,
+    "r2_r3_reads": 0,
+    "wallet_signer_transaction_actions": 0,
+    "cash_spend_usd_cents": 0,
+    "dependency_changes": 0
+  },
+  "factory_fit_review": "FULL_REVIEW",
+  "factory_fit": {
+    "verdict": "PASS_WITH_LIMITATIONS",
+    "goal_fit": "PASS_FROZEN_RC001_CONTROL_RECORD_IS_NOW_RECONCILED_WITH_ACTIVE_PROJECT_SOURCES",
+    "compatibility": "PASS_ACTIVATION_OVERLAY_SUPERSEDES_PACKAGING_LABELS_WITHOUT_REWRITING_RELEASE_BYTES",
+    "research_truth": "PASS_ALL_THREE_RC001_GROUPS_REMAIN_BLOCKED_DATA_AND_NO_TRIAL_OR_ALPHA_CLAIM_IS_INTRODUCED",
+    "owner_operability": "PASS_RELEASE_REGISTRY_EXPOSES_ONE_ACTIVE_SET_AND_RETAINS_EXACT_ROLLBACK_PREDECESSORS",
+    "monitoring_recovery": "NOT_APPLICABLE_NO_RUNTIME_POSITION_OR_EXTERNAL_PROCESS_CREATED"
+  },
+  "project_sources_disposition": {
+    "kind": "ACTIVATION_RECEIPT",
+    "release_id": "PSR-0003-T28-RC001-FREEZE",
+    "registry_path": "docs/project_sources/release_registry_v1.yaml"
+  }
+}

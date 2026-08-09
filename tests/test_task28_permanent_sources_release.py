@@ -16,6 +16,8 @@ RELEASE_ID = "PSR-0003-T28-RC001-FREEZE"
 RELEASE_ROOT = ROOT / "docs/project_sources/releases" / RELEASE_ID
 RECEIPT_PATH = ROOT / "docs/evidence/task28/a3_permanent_sources_release_candidate_acceptance_v1.json"
 CATALOG_ASSET_ID = "EVIDENCE-T28-A3-PERMANENT-SOURCES-RELEASE-001"
+ACTIVATION_RECEIPT_PATH = ROOT / "docs/evidence/task28/a3r1_project_sources_activation_receipt_v1.json"
+ACTIVATION_CATALOG_ASSET_ID = "EVIDENCE-T28-A3R1-SOURCE-ACTIVATION-001"
 IMMUTABLE_HASHES = {
     "operating_system": "187aa5d1405c55868d7147a7cdf9e0605a9a51f613ab5597ae44682fcbc67c84",
     "research_blueprint": "ec756d5be0196dd8207ac08512af5e3a9a5032eb5b0b40e3f8fcca2beb170ba1",
@@ -50,20 +52,31 @@ def checksum_entries(path: Path) -> dict[str, str]:
 
 
 class Task28PermanentSourcesReleaseTests(unittest.TestCase):
-    def test_task28_candidate_is_registered_without_replacing_active_psr0002(self) -> None:
-        """Catches a TASK-28 source bundle that changes cloud activation in Git."""
+    def test_task28_owner_smoke_activates_psr0003_without_rewriting_bundle_bytes(self) -> None:
+        """Catches an activation overlay that is missing the exact owner smoke binding."""
         registry = load_yaml(REGISTRY_PATH)
 
-        candidate = release_by_id(registry, RELEASE_ID)
+        release = release_by_id(registry, RELEASE_ID)
 
-        self.assertEqual(registry["active_ui_release_id"], "PSR-0002-T27-CLOSE")
-        self.assertEqual(registry["latest_candidate_release_id"], candidate["release_id"])
-        self.assertEqual(candidate["status"], "VALIDATED_CANDIDATE_UI_ACTIVATION_PENDING")
+        self.assertEqual(registry["active_ui_release_id"], RELEASE_ID)
+        self.assertIsNone(registry["latest_candidate_release_id"])
+        self.assertEqual(release["status"], "ACTIVATED_BY_OWNER_SMOKE")
+        self.assertEqual(release["activation_receipt"], ACTIVATION_RECEIPT_PATH.relative_to(ROOT).as_posix())
 
         prior_active = release_by_id(registry, "PSR-0002-T27-CLOSE")
-        self.assertEqual(prior_active["superseded_by_release_id"], None)
-        self.assertEqual(candidate["supersedes_release_id"], prior_active["release_id"])
-        self.assertEqual(candidate["activation_receipt"], None)
+        self.assertEqual(prior_active["status"], "SUPERSEDED")
+        self.assertEqual(prior_active["superseded_by_release_id"], RELEASE_ID)
+        self.assertEqual(release["supersedes_release_id"], prior_active["release_id"])
+
+        activation_receipt = json.loads(ACTIVATION_RECEIPT_PATH.read_text(encoding="utf-8"))
+        self.assertEqual(activation_receipt["release_id"], RELEASE_ID)
+        self.assertEqual(activation_receipt["activation_evidence"]["class"], "OWNER_ATTESTATION")
+        self.assertEqual(activation_receipt["activation_evidence"]["reported_terminal"], "TASK28_SOURCE_SMOKE=PASS")
+        self.assertEqual(
+            activation_receipt["manifest_binding"],
+            release["artifact_bindings"]["canonical_manifest"],
+        )
+        self.assertFalse(activation_receipt["decision"]["canonical_task28_done"])
 
     def test_candidate_bundle_is_a_complete_hash_bound_five_role_replacement(self) -> None:
         """Rejects a stale or partial source package before it can reach cloud UI."""
@@ -119,7 +132,7 @@ class Task28PermanentSourcesReleaseTests(unittest.TestCase):
         self.assertEqual(receipt["side_effect_counters"]["provider_api_rpc_wss_calls"], 0)
         self.assertEqual(receipt["side_effect_counters"]["wallet_signer_transaction_actions"], 0)
 
-    def test_candidate_receipt_is_discoverable_in_catalog_without_claiming_activation(self) -> None:
+    def test_candidate_and_activation_receipts_are_discoverable_in_catalog_without_task_done_claim(self) -> None:
         """Prevents a durable Source candidate from becoming an untracked Git island."""
         core = load_yaml(CATEGORY_CORE_PATH)
         catalog_manifest = load_yaml(CATALOG_MANIFEST_PATH)
@@ -131,6 +144,14 @@ class Task28PermanentSourcesReleaseTests(unittest.TestCase):
             {"relation_type": "derived_from", "target_asset_id": "EVIDENCE-T28-A2-CATALOG-FACTORY-FIT-001"},
             record["relations"],
         )
-        self.assertEqual(catalog_manifest["catalog_version"], "0.41.0")
-        self.assertEqual(catalog_manifest["current_checkpoint"]["assets"], 579)
+        activation_record = next(item for item in core["records"] if item["asset_id"] == ACTIVATION_CATALOG_ASSET_ID)
+        self.assertEqual(activation_record["location"]["repository_path"], ACTIVATION_RECEIPT_PATH.relative_to(ROOT).as_posix())
+        self.assertEqual(activation_record["integrity"]["sha256"], sha256(ACTIVATION_RECEIPT_PATH))
+        self.assertIn(
+            {"relation_type": "derived_from", "target_asset_id": CATALOG_ASSET_ID},
+            activation_record["relations"],
+        )
+        self.assertEqual(catalog_manifest["catalog_version"], "0.42.0")
+        self.assertEqual(catalog_manifest["current_checkpoint"]["assets"], 580)
         self.assertIn(CATALOG_ASSET_ID, catalog_manifest["mandatory_asset_ids"])
+        self.assertIn(ACTIVATION_CATALOG_ASSET_ID, catalog_manifest["mandatory_asset_ids"])
