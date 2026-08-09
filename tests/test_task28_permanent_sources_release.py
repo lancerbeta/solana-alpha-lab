@@ -16,8 +16,10 @@ RELEASE_ID = "PSR-0003-T28-RC001-FREEZE"
 RELEASE_ROOT = ROOT / "docs/project_sources/releases" / RELEASE_ID
 RECEIPT_PATH = ROOT / "docs/evidence/task28/a3_permanent_sources_release_candidate_acceptance_v1.json"
 CATALOG_ASSET_ID = "EVIDENCE-T28-A3-PERMANENT-SOURCES-RELEASE-001"
-ACTIVATION_RECEIPT_PATH = ROOT / "docs/evidence/task28/a3r1_project_sources_activation_receipt_v1.json"
+SOURCE_ACTIVATION_RECEIPT_PATH = ROOT / "docs/evidence/task28/a3r1_project_sources_activation_receipt_v1.json"
+ACTIVATION_RECEIPT_PATH = ROOT / "docs/evidence/task28/a3r2_project_sources_activation_and_task_close_acceptance_v1.json"
 ACTIVATION_CATALOG_ASSET_ID = "EVIDENCE-T28-A3R1-SOURCE-ACTIVATION-001"
+CLOSE_CATALOG_ASSET_ID = "EVIDENCE-T28-A3R2-SOURCE-ACTIVATION-CLOSE-001"
 IMMUTABLE_HASHES = {
     "operating_system": "187aa5d1405c55868d7147a7cdf9e0605a9a51f613ab5597ae44682fcbc67c84",
     "research_blueprint": "ec756d5be0196dd8207ac08512af5e3a9a5032eb5b0b40e3f8fcca2beb170ba1",
@@ -52,8 +54,8 @@ def checksum_entries(path: Path) -> dict[str, str]:
 
 
 class Task28PermanentSourcesReleaseTests(unittest.TestCase):
-    def test_task28_owner_smoke_activates_psr0003_without_rewriting_bundle_bytes(self) -> None:
-        """Catches an activation overlay that is missing the exact owner smoke binding."""
+    def test_task28_close_receipt_uses_prior_owner_smoke_without_rewriting_bundle_bytes(self) -> None:
+        """Catches a false TASK-28 close that is not bound to the earlier source activation."""
         registry = load_yaml(REGISTRY_PATH)
 
         release = release_by_id(registry, RELEASE_ID)
@@ -62,21 +64,27 @@ class Task28PermanentSourcesReleaseTests(unittest.TestCase):
         self.assertIsNone(registry["latest_candidate_release_id"])
         self.assertEqual(release["status"], "ACTIVATED_BY_OWNER_SMOKE")
         self.assertEqual(release["activation_receipt"], ACTIVATION_RECEIPT_PATH.relative_to(ROOT).as_posix())
+        self.assertEqual(release["owner_next_action"], "READ_ONLY_NEXT_TASK_ENTRY_GATE")
 
         prior_active = release_by_id(registry, "PSR-0002-T27-CLOSE")
         self.assertEqual(prior_active["status"], "SUPERSEDED")
         self.assertEqual(prior_active["superseded_by_release_id"], RELEASE_ID)
         self.assertEqual(release["supersedes_release_id"], prior_active["release_id"])
 
+        source_activation_receipt = json.loads(SOURCE_ACTIVATION_RECEIPT_PATH.read_text(encoding="utf-8"))
         activation_receipt = json.loads(ACTIVATION_RECEIPT_PATH.read_text(encoding="utf-8"))
+        self.assertEqual(source_activation_receipt["activation_evidence"]["reported_terminal"], "TASK28_SOURCE_SMOKE=PASS")
         self.assertEqual(activation_receipt["release_id"], RELEASE_ID)
+        self.assertEqual(activation_receipt["source_activation_receipt"], SOURCE_ACTIVATION_RECEIPT_PATH.relative_to(ROOT).as_posix())
         self.assertEqual(activation_receipt["activation_evidence"]["class"], "OWNER_ATTESTATION")
-        self.assertEqual(activation_receipt["activation_evidence"]["reported_terminal"], "TASK28_SOURCE_SMOKE=PASS")
+        self.assertEqual(activation_receipt["activation_evidence"]["smoke_outcome"], "PASS")
         self.assertEqual(
             activation_receipt["manifest_binding"],
             release["artifact_bindings"]["canonical_manifest"],
         )
-        self.assertFalse(activation_receipt["decision"]["canonical_task28_done"])
+        self.assertTrue(activation_receipt["decision"]["task28_acceptance"])
+        self.assertTrue(activation_receipt["decision"]["canonical_task28_done"])
+        self.assertFalse(activation_receipt["decision"]["next_task_selected"])
 
     def test_candidate_bundle_is_a_complete_hash_bound_five_role_replacement(self) -> None:
         """Rejects a stale or partial source package before it can reach cloud UI."""
@@ -145,13 +153,21 @@ class Task28PermanentSourcesReleaseTests(unittest.TestCase):
             record["relations"],
         )
         activation_record = next(item for item in core["records"] if item["asset_id"] == ACTIVATION_CATALOG_ASSET_ID)
-        self.assertEqual(activation_record["location"]["repository_path"], ACTIVATION_RECEIPT_PATH.relative_to(ROOT).as_posix())
-        self.assertEqual(activation_record["integrity"]["sha256"], sha256(ACTIVATION_RECEIPT_PATH))
+        self.assertEqual(activation_record["location"]["repository_path"], SOURCE_ACTIVATION_RECEIPT_PATH.relative_to(ROOT).as_posix())
+        self.assertEqual(activation_record["integrity"]["sha256"], sha256(SOURCE_ACTIVATION_RECEIPT_PATH))
         self.assertIn(
             {"relation_type": "derived_from", "target_asset_id": CATALOG_ASSET_ID},
             activation_record["relations"],
         )
-        self.assertEqual(catalog_manifest["catalog_version"], "0.42.0")
-        self.assertEqual(catalog_manifest["current_checkpoint"]["assets"], 580)
+        close_record = next(item for item in core["records"] if item["asset_id"] == CLOSE_CATALOG_ASSET_ID)
+        self.assertEqual(close_record["location"]["repository_path"], ACTIVATION_RECEIPT_PATH.relative_to(ROOT).as_posix())
+        self.assertEqual(close_record["integrity"]["sha256"], sha256(ACTIVATION_RECEIPT_PATH))
+        self.assertIn(
+            {"relation_type": "derived_from", "target_asset_id": ACTIVATION_CATALOG_ASSET_ID},
+            close_record["relations"],
+        )
+        self.assertEqual(catalog_manifest["catalog_version"], "0.43.0")
+        self.assertEqual(catalog_manifest["current_checkpoint"]["assets"], 581)
         self.assertIn(CATALOG_ASSET_ID, catalog_manifest["mandatory_asset_ids"])
         self.assertIn(ACTIVATION_CATALOG_ASSET_ID, catalog_manifest["mandatory_asset_ids"])
+        self.assertIn(CLOSE_CATALOG_ASSET_ID, catalog_manifest["mandatory_asset_ids"])

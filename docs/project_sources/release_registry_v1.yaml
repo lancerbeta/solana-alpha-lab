@@ -73,10 +73,10 @@ releases:
     atom_id: T28-A3_PERMANENT_SOURCES_RELEASE_CANDIDATE_V1
     status: ACTIVATED_BY_OWNER_SMOKE
     bundle_path: docs/project_sources/releases/PSR-0003-T28-RC001-FREEZE
-    activation_receipt: docs/evidence/task28/a3r1_project_sources_activation_receipt_v1.json
+    activation_receipt: docs/evidence/task28/a3r2_project_sources_activation_and_task_close_acceptance_v1.json
     supersedes_release_id: PSR-0002-T27-CLOSE
     superseded_by_release_id: null
-    owner_next_action: TASK28_CANONICAL_ACCEPTANCE_REQUIRED
+    owner_next_action: READ_ONLY_NEXT_TASK_ENTRY_GATE
     source_set:
       expected_source_count: 7
       mutable_roles:

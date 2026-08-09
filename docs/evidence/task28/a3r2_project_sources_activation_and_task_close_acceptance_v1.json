@@ -1,0 +1,53 @@
+{
+  "schema": "smial.project_sources.activation.receipt",
+  "schema_version": "1.0",
+  "task_id": "TASK-28",
+  "atom_id": "T28-A3R2_PROJECT_SOURCES_ACTIVATION_AND_TASK_CLOSE_V1",
+  "release_id": "PSR-0003-T28-RC001-FREEZE",
+  "status": "ACTIVATED_BY_OWNER_SMOKE",
+  "source_activation_receipt": "docs/evidence/task28/a3r1_project_sources_activation_receipt_v1.json",
+  "activation_evidence": {
+    "class": "OWNER_ATTESTATION",
+    "smoke_outcome": "PASS",
+    "reported_terminal": "TASK28_SOURCE_SMOKE=PASS",
+    "reported_at": "2026-08-09",
+    "raw_smoke_transcript": "NOT_RETAINED_IN_REPOSITORY",
+    "scope": "reuses the exact prior seven-role owner smoke; no new Project Sources UI action, bundle replacement or provider read occurred"
+  },
+  "manifest_binding": {
+    "path": "docs/project_sources/releases/PSR-0003-T28-RC001-FREEZE/canonical_manifest.yaml",
+    "sha256": "191230d2754d243cad2f04f6efd350efb9b29372b4edcd09c88df6f076126da3"
+  },
+  "decision": {
+    "task28_outcome": "RC001_RESEARCH_CONTROL_FREEZE_ESTABLISHED_ALL_GROUPS_BLOCKED_DATA",
+    "task28_acceptance": true,
+    "task_status": "DONE",
+    "canonical_task28_done": true,
+    "next_task_selected": false,
+    "state_change": "TASK28_DONE_AFTER_PSR0003_OWNER_SMOKE",
+    "next_boundary": "READ_ONLY_NEXT_TASK_ENTRY_GATE"
+  },
+  "authority": {
+    "provider_api_rpc_wss_calls": 0,
+    "credential_uses": 0,
+    "r2_r3_reads": 0,
+    "wallet_signer_transaction_actions": 0,
+    "cash_spend_usd_cents": 0,
+    "dependency_changes": 0,
+    "project_sources_ui_changes": 0
+  },
+  "factory_fit_review": "FULL_REVIEW",
+  "factory_fit": {
+    "verdict": "PASS_WITH_LIMITATIONS",
+    "goal_fit": "PASS_EXACT_RC001_DEFINITIONS_AND_BLOCKERS_ARE_NOW_DURABLY_DISCOVERABLE_TO_A_FUTURE_ENTRY_GATE",
+    "compatibility": "PASS_SOURCE_ACTIVATION_AND_TASK_CLOSE_ARE_APPEND_ONLY_OVERLAYS_WITHOUT_REWRITING_HISTORICAL_RELEASE_BYTES",
+    "research_truth": "PASS_NO_BLOCKED_DATA_GROUP_IS_PROMOTED_TO_TRIAL_READY_AND_NO_ALPHA_OR_EXECUTION_CLAIM_IS_MADE",
+    "owner_operability": "PASS_ONE_ACTIVE_SOURCE_RELEASE_AND_ONE_CURRENT_TASK_CLOSE_RECEIPT_ARE_DISCOVERABLE_IN_THE_CATALOG",
+    "monitoring_recovery": "NOT_APPLICABLE_NO_RUNTIME_POSITION_OR_EXTERNAL_PROCESS_CREATED"
+  },
+  "project_sources_disposition": {
+    "kind": "ACTIVATION_RECEIPT",
+    "release_id": "PSR-0003-T28-RC001-FREEZE",
+    "registry_path": "docs/project_sources/release_registry_v1.yaml"
+  }
+}
