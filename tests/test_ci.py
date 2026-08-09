@@ -1,7 +1,9 @@
 from __future__ import annotations
 
 import copy
+import contextlib
 import importlib.util
+import io
 import subprocess
 import sys
 import unittest
@@ -252,8 +254,21 @@ FAILED (failures=1)
             ["--tracked-only-delivery", "--base-ref", "origin/main"]
         )
         self.assertFalse(ordinary.tracked_only_delivery)
+        self.assertFalse(ordinary.control_only_task_close)
         self.assertTrue(delivery.tracked_only_delivery)
         self.assertEqual(delivery.base_ref, "origin/main")
+
+    def test_control_only_close_mode_is_exclusive_and_explicit(self) -> None:
+        fast_path = ci.parse_args(
+            ["--control-only-task-close", "--base-ref", "origin/main"]
+        )
+        self.assertTrue(fast_path.control_only_task_close)
+        self.assertFalse(fast_path.tracked_only_delivery)
+        with contextlib.redirect_stderr(io.StringIO()):
+            with self.assertRaises(SystemExit):
+                ci.parse_args(
+                    ["--tracked-only-delivery", "--control-only-task-close"]
+                )
 
     def test_tracked_only_clone_is_normalized_to_attached_main(self) -> None:
         calls: list[list[str]] = []
@@ -348,6 +363,26 @@ class PlatformGateContractTests(unittest.TestCase):
         changed["tool"]["uv"]["required-version"] = "==0.11.28"
         with self.assertRaises(ci.CiValidationError):
             ci.validate_project_contract(changed)
+
+
+class ControlOnlyTaskCloseDocumentationTests(unittest.TestCase):
+    def test_agents_makes_fast_path_and_fallback_unavoidable(self) -> None:
+        text = (ROOT / "AGENTS.md").read_text(encoding="utf-8")
+        self.assertIn("## CONTROL_ONLY_TASK_CLOSE_FAST_PATH", text)
+        self.assertIn("--control-only-task-close", text)
+        self.assertIn("GITHUB_PR_EXACT_HEAD_CI", text)
+        self.assertIn("--tracked-only-delivery", text)
+        self.assertIn("three eligible task closes", text)
+
+    def test_release_protocol_keeps_smoke_and_done_separate(self) -> None:
+        text = (ROOT / "docs/project_sources/RELEASES.md").read_text(
+            encoding="utf-8"
+        )
+        self.assertIn(
+            "TASK<NN>_SOURCE_SMOKE=PASS; OWNER_DONE_ACCEPTANCE", text
+        )
+        self.assertIn("a smoke PASS never implies task DONE", text)
+        self.assertIn("one combined activation-and-close receipt", text)
 
 
 if __name__ == "__main__":

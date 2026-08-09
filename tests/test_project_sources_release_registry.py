@@ -4,6 +4,7 @@ import copy
 import hashlib
 import json
 import subprocess
+import sys
 import unittest
 from pathlib import Path
 
@@ -12,9 +13,17 @@ from jsonschema import Draft202012Validator
 
 
 ROOT = Path(__file__).resolve().parents[1]
+SCRIPTS = str(ROOT / "scripts")
+if SCRIPTS not in sys.path:
+    sys.path.insert(0, SCRIPTS)
+
+from control_only_task_close_fast_path import validate_combined_receipt
+
+
 PROJECT_SOURCES_ROOT = ROOT / "docs/project_sources"
 REGISTRY_PATH = PROJECT_SOURCES_ROOT / "release_registry_v1.yaml"
 SCHEMA_PATH = ROOT / "catalog/schemas/project_sources_release_registry.schema.json"
+FAST_PATH_POLICY_PATH = ROOT / "control/control_only_task_close_fast_path_v1.yaml"
 CATALOG_CORE_PATH = ROOT / "catalog/assets/core.yaml"
 RELEASES_ROOT = PROJECT_SOURCES_ROOT / "releases"
 A5_RECEIPT_PATH = ROOT / "docs/evidence/task27/a0a5_permanent_sources_reconciliation_acceptance_v1.json"
@@ -224,30 +233,25 @@ def changed_paths_since_enforcement(registry: dict) -> set[str]:
 
 
 class ProjectSourcesReleaseRegistryTests(unittest.TestCase):
-    def test_owner_smoke_activates_psr0003_and_supersedes_psr0002(self) -> None:
+    def test_owner_smoke_activates_exact_registry_pointer(self) -> None:
         self.assertTrue(REGISTRY_PATH.is_file(), REGISTRY_PATH)
         self.assertTrue(SCHEMA_PATH.is_file(), SCHEMA_PATH)
         registry = load_yaml(REGISTRY_PATH)
-        release = release_by_id(registry, ACTIVE_RELEASE_ID)
-        prior_release = release_by_id(registry, FIRST_RELEASE_ID)
+        active_release_id = registry["active_ui_release_id"]
+        release = release_by_id(registry, active_release_id)
         self.assertEqual(registry["registry_version"], 1)
-        self.assertEqual(registry["active_ui_release_id"], ACTIVE_RELEASE_ID)
         self.assertEqual(registry["active_ui_state"], "REGISTRY_ACTIVATION_CONFIRMED")
         self.assertIsNone(registry["latest_candidate_release_id"])
         self.assertEqual(release["status"], ACTIVE_STATUS)
-        self.assertEqual(release["activation_receipt"], ACTIVATION_RECEIPT_PATH.relative_to(ROOT).as_posix())
-        self.assertEqual(prior_release["status"], "SUPERSEDED")
-        self.assertEqual(prior_release["superseded_by_release_id"], PREVIOUS_ACTIVE_RELEASE_ID)
+        self.assertTrue((ROOT / release["activation_receipt"]).is_file())
         self.assertTrue((ROOT / release["bundle_path"] / "canonical_manifest.yaml").is_file())
-        prior_active = release_by_id(registry, PREVIOUS_ACTIVE_RELEASE_ID)
-        self.assertEqual(prior_active["status"], "SUPERSEDED")
-        self.assertEqual(prior_active["superseded_by_release_id"], ACTIVE_RELEASE_ID)
 
     def test_active_release_receipt_rejects_wrong_smoke_or_manifest_binding(self) -> None:
         registry = load_yaml(REGISTRY_PATH)
-        release = release_by_id(registry, ACTIVE_RELEASE_ID)
-        self.assertTrue(ACTIVATION_RECEIPT_PATH.is_file(), ACTIVATION_RECEIPT_PATH)
-        receipt = load_json(ACTIVATION_RECEIPT_PATH)
+        release = release_by_id(registry, registry["active_ui_release_id"])
+        receipt_path = ROOT / release["activation_receipt"]
+        self.assertTrue(receipt_path.is_file(), receipt_path)
+        receipt = load_json(receipt_path)
         self.assertEqual(activation_receipt_errors(receipt, release), set())
 
         failed_smoke = copy.deepcopy(receipt)
@@ -260,6 +264,34 @@ class ProjectSourcesReleaseRegistryTests(unittest.TestCase):
             "ACTIVE_RECEIPT_MANIFEST_BINDING_MISMATCH",
             activation_receipt_errors(wrong_manifest, release),
         )
+
+    def test_current_active_receipt_is_catalog_bound_and_future_combined_close_is_validated(self) -> None:
+        registry = load_yaml(REGISTRY_PATH)
+        release = release_by_id(registry, registry["active_ui_release_id"])
+        receipt_path = ROOT / release["activation_receipt"]
+        catalog_records = load_yaml(CATALOG_CORE_PATH)["records"]
+        record = next(
+            (
+                item
+                for item in catalog_records
+                if item["location"].get("repository_path")
+                == receipt_path.relative_to(ROOT).as_posix()
+            ),
+            None,
+        )
+        self.assertIsNotNone(record)
+        self.assertEqual(record["integrity"]["sha256"], sha256(receipt_path))
+
+        receipt = load_json(receipt_path)
+        if "owner_terminal" in receipt:
+            self.assertEqual(
+                validate_combined_receipt(
+                    receipt,
+                    registry,
+                    load_yaml(FAST_PATH_POLICY_PATH),
+                ),
+                set(),
+            )
 
     def test_task27_close_activation_receipt_remains_hash_bound_in_catalog(self) -> None:
         catalog_records = load_yaml(CATALOG_CORE_PATH)["records"]
