@@ -1,0 +1,93 @@
+{
+  "schema": "smial.task28.permanent-sources-release.acceptance",
+  "schema_version": "1.0",
+  "receipt_id": "T28-A3-PERMANENT-SOURCES-RELEASE-001",
+  "task_id": "TASK-28",
+  "atom_id": "T28-A3_PERMANENT_SOURCES_RELEASE_CANDIDATE_V1",
+  "status": "VALIDATED_CANDIDATE_UI_ACTIVATION_PENDING",
+  "source_release": {
+    "release_id": "PSR-0003-T28-RC001-FREEZE",
+    "prior_active_release_id": "PSR-0002-T27-CLOSE",
+    "registry_path": "docs/project_sources/release_registry_v1.yaml",
+    "bundle_path": "docs/project_sources/releases/PSR-0003-T28-RC001-FREEZE",
+    "expected_source_count": 7,
+    "mutable_roles": [
+      "canonical_manifest",
+      "roadmap",
+      "current_system_state",
+      "phase_archive",
+      "active_task"
+    ],
+    "immutable_roles": {
+      "operating_system": "187aa5d1405c55868d7147a7cdf9e0605a9a51f613ab5597ae44682fcbc67c84",
+      "research_blueprint": "ec756d5be0196dd8207ac08512af5e3a9a5032eb5b0b40e3f8fcca2beb170ba1"
+    },
+    "owner_activation": "REPLACE_FIVE_MUTABLE_PROJECT_SOURCES_THEN_RETURN_EXACT_SEVEN_ROLE_SMOKE",
+    "activation_receipt": null
+  },
+  "artifact_bindings": {
+    "canonical_manifest": {
+      "path": "docs/project_sources/releases/PSR-0003-T28-RC001-FREEZE/canonical_manifest.yaml",
+      "sha256": "191230d2754d243cad2f04f6efd350efb9b29372b4edcd09c88df6f076126da3"
+    },
+    "roadmap": {
+      "path": "docs/project_sources/releases/PSR-0003-T28-RC001-FREEZE/roadmap.md",
+      "sha256": "02c0c2ce25e66acc137f2a0e3ec89eee69d2f0512da8dfdffc6aedbcd891d6b2"
+    },
+    "current_system_state": {
+      "path": "docs/project_sources/releases/PSR-0003-T28-RC001-FREEZE/current_system_state.md",
+      "sha256": "dfde6791e9ba11c1d771731bf4884a6a429799e90715fc90df872605f83d1a8e"
+    },
+    "phase_archive": {
+      "path": "docs/project_sources/releases/PSR-0003-T28-RC001-FREEZE/task_archive_P0_P1_v39.md",
+      "sha256": "61defb4cfd8e364705282938898717c56b99cc296dbc84508193635585a7292e"
+    },
+    "active_task": {
+      "path": "docs/project_sources/releases/PSR-0003-T28-RC001-FREEZE/task_28_rc001_registry_freeze.md",
+      "sha256": "6eec32612c7ca6b38cc916c449de5457a586271b52c805ad63566595b93958c0"
+    },
+    "source_smoke": {
+      "path": "docs/project_sources/releases/PSR-0003-T28-RC001-FREEZE/FRESH_CHAT_SMOKE.md"
+    }
+  },
+  "repository_delivery": {
+    "feature_head": "7be75652ebe8ec9d867148ad42bae2320acc067d",
+    "main_merge_commit": "3c51f02babc072cc5e202a8b15de49e874e9a529",
+    "merge_tree": "5e15f19ae2b5ed1f33dc900c140c80771015e643",
+    "main_ci_run_id": 31284090722,
+    "main_ci_conclusion": "success"
+  },
+  "factory_fit": {
+    "mode": "FULL_REVIEW",
+    "verdict": "PASS_WITH_LIMITATIONS",
+    "limitation": "The register prevents silent research-scope expansion but does not make any RC-001 group data-ready, trial-ready, executable or profitable."
+  },
+  "catalog_transaction": {
+    "target_catalog_version": "0.41.0",
+    "expected_asset_count": 579,
+    "source_release_asset_id": "EVIDENCE-T28-A3-PERMANENT-SOURCES-RELEASE-001"
+  },
+  "decision": {
+    "task28_acceptance": false,
+    "source_activation": false,
+    "canonical_task28_done": false,
+    "state_change": "NONE",
+    "next_task_selected": false,
+    "next_boundary": "OWNER_PROJECT_SOURCES_REPLACEMENT_AND_SMOKE"
+  },
+  "side_effect_counters": {
+    "provider_api_rpc_wss_calls": 0,
+    "credential_uses": 0,
+    "r2_r3_reads": 0,
+    "wallet_signer_transaction_actions": 0,
+    "cash_spend_usd_cents": 0,
+    "dependency_changes": 0,
+    "project_sources_ui_changes": 0
+  },
+  "project_sources_disposition": {
+    "kind": "RELEASE_CANDIDATE",
+    "release_id": "PSR-0003-T28-RC001-FREEZE",
+    "registry_path": "docs/project_sources/release_registry_v1.yaml",
+    "activation_required": "OWNER_SEVEN_ROLE_SMOKE"
+  }
+}

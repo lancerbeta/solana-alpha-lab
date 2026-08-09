@@ -8,7 +8,7 @@ active_ui_state: REGISTRY_ACTIVATION_CONFIRMED
 active_ui_note: >-
   Owner attested that the exact seven-role smoke for PSR-0002-T27-CLOSE passed;
   the raw cloud transcript is not retained in Git.
-latest_candidate_release_id: null
+latest_candidate_release_id: PSR-0003-T28-RC001-FREEZE
 compaction_review:
   aggregate_payload_bytes_limit: 52428800
   status: NOT_REQUIRED
@@ -68,3 +68,30 @@ releases:
       checksums:
         path: docs/project_sources/releases/PSR-0002-T27-CLOSE/CHECKSUMS_SHA256.txt
         sha256: 384dab6b4e649d572f424ceb9d79318b881ce87aeecf1bbe35cae6cdc32f14d0
+  - release_id: PSR-0003-T28-RC001-FREEZE
+    task_id: TASK-28
+    atom_id: T28-A3_PERMANENT_SOURCES_RELEASE_CANDIDATE_V1
+    status: VALIDATED_CANDIDATE_UI_ACTIVATION_PENDING
+    bundle_path: docs/project_sources/releases/PSR-0003-T28-RC001-FREEZE
+    activation_receipt: null
+    supersedes_release_id: PSR-0002-T27-CLOSE
+    superseded_by_release_id: null
+    owner_next_action: REPLACE_FIVE_MUTABLE_PROJECT_SOURCES_THEN_RETURN_EXACT_SEVEN_ROLE_SMOKE
+    source_set:
+      expected_source_count: 7
+      mutable_roles:
+        - canonical_manifest
+        - roadmap
+        - current_system_state
+        - phase_archive
+        - active_task
+      immutable_roles:
+        operating_system: 187aa5d1405c55868d7147a7cdf9e0605a9a51f613ab5597ae44682fcbc67c84
+        research_blueprint: ec756d5be0196dd8207ac08512af5e3a9a5032eb5b0b40e3f8fcca2beb170ba1
+    artifact_bindings:
+      canonical_manifest:
+        path: docs/project_sources/releases/PSR-0003-T28-RC001-FREEZE/canonical_manifest.yaml
+        sha256: 191230d2754d243cad2f04f6efd350efb9b29372b4edcd09c88df6f076126da3
+      checksums:
+        path: docs/project_sources/releases/PSR-0003-T28-RC001-FREEZE/CHECKSUMS_SHA256.txt
+        sha256: ca84e7a99d0afb38ece58d478e0ce35f539214c5794ac552a7697dd95f29a605
