@@ -15253,3 +15253,21 @@ records:
   consumers: [TASK-28, FACTORY-001]
   evidence: []
   classification: *t25_internal
+
+- asset_id: EVIDENCE-T28-A3R1-SOURCE-ACTIVATION-001
+  record_version: '1.0'
+  asset_type: evidence
+  purpose: Exact owner-smoke activation overlay for PSR-0003; it confirms the active Project Sources set without claiming TASK-28 canonical completion.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-08-09'
+  truth_owner: TASK-28
+  location: {kind: git_path, logical_uri: 'repo://docs/evidence/task28/a3r1_project_sources_activation_receipt_v1.json', repository_path: docs/evidence/task28/a3r1_project_sources_activation_receipt_v1.json}
+  integrity: {kind: sha256, sha256: 1d4d1d4f52d8170a0c21fd34ca2205b1e445edf8f2b727c1d85889a95562fabb}
+  access: *t25_read_file
+  relations:
+  - {relation_type: derived_from, target_asset_id: EVIDENCE-T28-A3-PERMANENT-SOURCES-RELEASE-001}
+  - {relation_type: validated_by, target_asset_id: TEST-T28-RC001-REGISTRY-FREEZE-001}
+  consumers: [TASK-28, FACTORY-001]
+  evidence: []
+  classification: *t25_internal

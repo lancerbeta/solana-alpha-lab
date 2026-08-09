@@ -3,12 +3,12 @@ schema_version: '1.0'
 registry_version: 1
 release_root: docs/project_sources/releases
 enforcement_start_commit: 78b549aeb6f9fea9f6572e6e3768b7aff00ac1d1
-active_ui_release_id: PSR-0002-T27-CLOSE
+active_ui_release_id: PSR-0003-T28-RC001-FREEZE
 active_ui_state: REGISTRY_ACTIVATION_CONFIRMED
 active_ui_note: >-
-  Owner attested that the exact seven-role smoke for PSR-0002-T27-CLOSE passed;
+  Owner attested TASK28_SOURCE_SMOKE=PASS for the exact seven-role PSR-0003-T28-RC001-FREEZE set;
   the raw cloud transcript is not retained in Git.
-latest_candidate_release_id: PSR-0003-T28-RC001-FREEZE
+latest_candidate_release_id: null
 compaction_review:
   aggregate_payload_bytes_limit: 52428800
   status: NOT_REQUIRED
@@ -44,12 +44,12 @@ releases:
   - release_id: PSR-0002-T27-CLOSE
     task_id: TASK-27
     atom_id: T27-A2_TERMINAL_RECONCILIATION_AND_SOURCES_RELEASE_CANDIDATE_V1
-    status: ACTIVATED_BY_OWNER_SMOKE
+    status: SUPERSEDED
     bundle_path: docs/project_sources/releases/PSR-0002-T27-CLOSE
     activation_receipt: docs/evidence/task27/a2r1_project_sources_activation_and_task_close_acceptance_v1.json
     supersedes_release_id: PSR-0001-T27-A0-A5
-    superseded_by_release_id: null
-    owner_next_action: READ_ONLY_NEXT_TASK_ENTRY_GATE
+    superseded_by_release_id: PSR-0003-T28-RC001-FREEZE
+    owner_next_action: ROLLBACK_ONLY_IF_PSR0003_IS_INVALIDATED_BY_EXACT_EVIDENCE
     source_set:
       expected_source_count: 7
       mutable_roles:
@@ -71,12 +71,12 @@ releases:
   - release_id: PSR-0003-T28-RC001-FREEZE
     task_id: TASK-28
     atom_id: T28-A3_PERMANENT_SOURCES_RELEASE_CANDIDATE_V1
-    status: VALIDATED_CANDIDATE_UI_ACTIVATION_PENDING
+    status: ACTIVATED_BY_OWNER_SMOKE
     bundle_path: docs/project_sources/releases/PSR-0003-T28-RC001-FREEZE
-    activation_receipt: null
+    activation_receipt: docs/evidence/task28/a3r1_project_sources_activation_receipt_v1.json
     supersedes_release_id: PSR-0002-T27-CLOSE
     superseded_by_release_id: null
-    owner_next_action: REPLACE_FIVE_MUTABLE_PROJECT_SOURCES_THEN_RETURN_EXACT_SEVEN_ROLE_SMOKE
+    owner_next_action: TASK28_CANONICAL_ACCEPTANCE_REQUIRED
     source_set:
       expected_source_count: 7
       mutable_roles:
