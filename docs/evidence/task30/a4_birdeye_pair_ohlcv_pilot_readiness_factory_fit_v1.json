@@ -1,0 +1,72 @@
+{
+  "schema": "smial.task30.birdeye-pair-ohlcv-pilot-readiness.factory-fit",
+  "schema_version": "1.0",
+  "receipt_id": "T30-A4-BIRDEYE-PAIR-OHLCV-PILOT-FACTORY-FIT-001",
+  "task_id": "TASK-30",
+  "atom_id": "T30-A3_BIRDEYE_PAIR_OHLCV_PILOT_READINESS_BOUNDARY_V1",
+  "review_scope": "FULL_REVIEW",
+  "verdict": "PASS_WITH_LIMITATIONS",
+  "mission_fit": {
+    "result": "PASS",
+    "reason": "The boundary prevents unverified data access from being mistaken for research truth before H07/H01 feasibility is decided."
+  },
+  "research_truth": {
+    "result": "PASS_WITH_LIMITATIONS",
+    "reason": "It preserves T30-A1 timestamp ambiguity and adds no data, panel, PIT, or alpha claim."
+  },
+  "owner_operability": {
+    "result": "PASS",
+    "reason": "A later owner receives four explicit blockers instead of an opaque request failure or a key-handling task."
+  },
+  "execution_to_cashflow": {
+    "result": "NOT_APPLICABLE",
+    "reason": "No execution, position, fee, settlement, or cashflow action is in scope."
+  },
+  "monitoring_and_recovery": {
+    "result": "PASS",
+    "reason": "Any attempted authority or claim promotion fails deterministically before a provider call; recovery is a new exact proof and owner gate."
+  },
+  "reuse_first": {
+    "trigger": "EXTERNAL_HISTORICAL_OHLCV_SURFACE_REMAINS_SEMANTICALLY_UNPROVEN",
+    "alternatives_considered": [
+      "GECKOTERMINAL_RETAINED_RESPONSE",
+      "SOLANA_TRACKER_POOL_HISTORY",
+      "DEXSCREENER_PAIR_IDENTITY",
+      "BIRDEYE_HISTORICAL_PAIR_OHLCV_REST"
+    ],
+    "outcome": "STOP",
+    "reason": "No current candidate independently proves the exact historical REST 15-minute request enum and exact Birdeye pair identity."
+  },
+  "product_horizon": {
+    "now": {
+      "candidate": "NO_PROVIDER_PILOT_UNTIL_EXACT_PROOFS",
+      "value": "Avoids spending provider quota or operator attention on a request whose key semantics are unbound.",
+      "owner": "TASK-30",
+      "activation_trigger": "ALWAYS_ACTIVE_UNTIL_SEPARATE_PROOF",
+      "why_now": "The first material data-semantics blocker has already occurred."
+    },
+    "watch": {
+      "candidate": "ONE_CREDENTIALED_BIRDEYE_REST_SURFACE_PROOF",
+      "value": "Could cheaply test an exact alternative only after its parameters and market identity are evidence-bound.",
+      "owner": "GOAL_OWNER",
+      "activation_trigger": "BIRDEYE_REST_15M_ENUM_PROOF_AND_BIRDEYE_PAIR_IDENTITY_PROOF_AVAILABLE",
+      "why_not_now": "Key availability and owner one-call authority are not yet attested or granted."
+    }
+  },
+  "build_vs_buy": {
+    "decision": "STOP",
+    "reason": "Custom OHLCV reconstruction would be a wider and less certain response than resolving the named provider evidence gaps."
+  },
+  "state_change": "NONE",
+  "project_sources_disposition": "NO_CHANGE",
+  "side_effect_counters": {
+    "provider_api_rpc_wss_calls": 0,
+    "credential_uses": 0,
+    "raw_data_writes": 0,
+    "r2_r3_reads": 0,
+    "wallet_signer_transaction_actions": 0,
+    "cash_spend_usd_cents": 0,
+    "dependency_changes": 0,
+    "project_sources_changes": 0
+  }
+}
