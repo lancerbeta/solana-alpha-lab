@@ -35,11 +35,27 @@ SCHEMA_PATH = ROOT / "catalog/schemas/task34a_documentation_foundation.schema.js
 FIXTURE_PATH = ROOT / "tests/fixtures/task34a/documentation_foundation_v1.json"
 CONTEXT_SCRIPT_PATH = ROOT / "scripts/show_task34a_context.py"
 OPERATOR_NAVIGATION_PATH = ROOT / "docs/OPERATOR_NAVIGATION.md"
+ACCEPTANCE_PATH = ROOT / "docs/evidence/task34a/a3_documentation_foundation_acceptance_v1.json"
+FACTORY_FIT_PATH = ROOT / "docs/evidence/task34a/a4_documentation_foundation_factory_fit_v1.json"
+CATALOG_CORE_PATH = ROOT / "catalog/assets/core.yaml"
 RUNBOOK_PATHS = (
     ROOT / "docs/runbooks/task_entry_and_resume.md",
     ROOT / "docs/runbooks/source_mirror_drift.md",
     ROOT / "docs/runbooks/external_authority_stop.md",
 )
+EXPECTED_ASSET_IDS = {
+    "CONTRACT-T34A-DOCUMENTATION-FOUNDATION-001",
+    "CONFIG-T34A-DOCUMENTATION-FOUNDATION-001",
+    "SCHEMA-T34A-DOCUMENTATION-FOUNDATION-001",
+    "FIXTURE-T34A-DOCUMENTATION-FOUNDATION-001",
+    "MODULE-T34A-DOCUMENTATION-FOUNDATION-001",
+    "SCRIPT-T34A-CONTEXT-001",
+    "DOC-T34A-OPERATOR-NAVIGATION-001",
+    "DOC-T34A-RUNBOOKS-001",
+    "TEST-T34A-DOCUMENTATION-FOUNDATION-001",
+    "EVIDENCE-T34A-A3-ACCEPTANCE-001",
+    "EVIDENCE-T34A-A4-FACTORY-FIT-001",
+}
 EXPECTED_MIRROR_STATES = [
     "MIRROR_MATCHES_ACTIVE_RELEASE",
     "STALE_MIRROR_ACTIVE_RELEASE_CONFIRMED",
@@ -298,6 +314,36 @@ class Task34aDocumentationFoundationTests(unittest.TestCase):
             "Do not make a provider call",
             RUNBOOK_PATHS[-1].read_text(encoding="utf-8"),
         )
+
+    def test_acceptance_receipt_binds_artifacts_and_zero_external_effects(self) -> None:
+        """Catches an unbound navigation delivery or a hidden external side effect."""
+        self.assertTrue(ACCEPTANCE_PATH.is_file(), ACCEPTANCE_PATH)
+        if not ACCEPTANCE_PATH.is_file():
+            return
+        receipt = json.loads(ACCEPTANCE_PATH.read_text(encoding="utf-8"))
+
+        for binding in receipt["artifact_bindings"].values():
+            path = ROOT / binding["path"]
+            self.assertEqual(binding["sha256"], sha256(path))
+        self.assertTrue(all(value == 0 for value in receipt["side_effect_counters"].values()))
+        self.assertEqual(receipt["project_sources_disposition"]["kind"], "NO_CHANGE")
+        self.assertEqual(receipt["active_release_input"], "PSR-0003-T28-RC001-FREEZE")
+        self.assertEqual(receipt["decision"]["value"], "VALIDATED_OFFLINE_DOCUMENTATION_FOUNDATION")
+
+    def test_factory_fit_and_catalog_register_the_documentation_foundation(self) -> None:
+        """Catches a delivered helper that cannot be discovered or is promoted as a portal."""
+        self.assertTrue(FACTORY_FIT_PATH.is_file(), FACTORY_FIT_PATH)
+        if not FACTORY_FIT_PATH.is_file():
+            return
+        factory_fit = json.loads(FACTORY_FIT_PATH.read_text(encoding="utf-8"))
+        catalog = yaml.safe_load(CATALOG_CORE_PATH.read_text(encoding="utf-8"))
+
+        self.assertEqual(factory_fit["review_scope"], "FULL_REVIEW")
+        self.assertEqual(factory_fit["verdict"], "PASS_WITH_LIMITATIONS")
+        self.assertEqual(factory_fit["reuse_first"]["outcome"], "ADOPT_EXISTING")
+        self.assertEqual(factory_fit["red_team"]["second_truth_owner"], "REJECTED")
+        assets = {asset["asset_id"] for asset in catalog["records"]}
+        self.assertTrue(EXPECTED_ASSET_IDS.issubset(assets))
 
 
 if __name__ == "__main__":
