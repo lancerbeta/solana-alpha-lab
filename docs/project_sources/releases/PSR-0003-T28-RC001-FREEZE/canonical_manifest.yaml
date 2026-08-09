@@ -1,0 +1,115 @@
+schema: solana_alpha_lab.canonical_manifest
+schema_version: '4.9'
+as_of: '2026-08-09'
+status: VALIDATED_CANDIDATE_UI_ACTIVATION_PENDING
+created_by_task: T28-A3_PERMANENT_SOURCES_RELEASE_CANDIDATE_V1
+installation_state: PREPARED_NOT_INSTALLED
+contains_secrets: false
+
+file_resolution_policy:
+  selection_priority: [canonical role and semantic version, required header, actual SHA-256, physical filename]
+  ui_numeric_suffix_is_semantic_version: false
+  generic_filename_alone_is_authority: false
+
+project_sources_budget:
+  target_max: 16
+  warning_at: 18
+  compaction_required_at: 20
+  minimum_free_reserve: 5
+  expected_source_count_after_activation: 7
+
+canonical:
+  canonical_manifest:
+    current_filename: canonical_manifest.yaml
+    semantic_version: '4.9'
+    required_header: 'schema: solana_alpha_lab.canonical_manifest'
+    self_checksum_policy: CHECKSUMS_SHA256
+    status: VALIDATED_CANDIDATE_UI_ACTIVATION_PENDING
+  operating_system:
+    current_filename: Solana_Memecoin_Intraday_Alpha_Lab_Operating_System_v8_5.md
+    semantic_version: '8.5'
+    required_header: '# SOLANA ALPHA LAB OPERATING SYSTEM v8.5'
+    sha256: 187aa5d1405c55868d7147a7cdf9e0605a9a51f613ab5597ae44682fcbc67c84
+    status: DONE_UNCHANGED
+  research_blueprint:
+    current_filename: Solana_Memecoin_Intraday_Alpha_Lab_Synthesis_v2_3_2026-07-18.md
+    semantic_version: '2.3'
+    required_header_contains: Синтетическая версия v2.3
+    sha256: ec756d5be0196dd8207ac08512af5e3a9a5032eb5b0b40e3f8fcca2beb170ba1
+    status: DONE_UNCHANGED
+  roadmap:
+    current_filename: roadmap.md
+    semantic_version: '4.9'
+    required_header_contains: Версия 4.9
+    sha256: 02c0c2ce25e66acc137f2a0e3ec89eee69d2f0512da8dfdffc6aedbcd891d6b2
+    status: VALIDATED_CANDIDATE_UI_ACTIVATION_PENDING
+  current_system_state:
+    current_filename: current_system_state.md
+    semantic_version: '4.5'
+    required_header_contains: CURRENT SYSTEM STATE — SOLANA MEMECOIN INTRADAY ALPHA LAB v4.5
+    sha256: dfde6791e9ba11c1d771731bf4884a6a429799e90715fc90df872605f83d1a8e
+    status: VALIDATED_CANDIDATE_UI_ACTIVATION_PENDING
+  phase_archive:
+    current_filename: task_archive_P0_P1_v39.md
+    semantic_version: '39.0'
+    required_header_contains: TASK ARCHIVE P0/P1 v39
+    sha256: 61defb4cfd8e364705282938898717c56b99cc296dbc84508193635585a7292e
+    status: VALIDATED_CANDIDATE_UI_ACTIVATION_PENDING
+    contains_tasks: [TASK-00A, TASK-00B, TASK-00C, TASK-00D, TASK-00E, TASK-00F, TASK-00G, TASK-01, TASK-02, TASK-03, TASK-04, TASK-05, TASK-06, TASK-07, TASK-08, TASK-09, TASK-10, TASK-11, TASK-12, TASK-13, TASK-14, TASK-15, TASK-16, TASK-17, TASK-17A, TASK-18, TASK-19, TASK-20, TASK-21, TASK-22, TASK-23, TASK-24, TASK-25, TASK-26, TASK-26A, TASK-26B, TASK-26C, OWNER_AUTHORITY_PACKET_BINDING_V1, TASK-27, TASK-28]
+  active_task:
+    task_id: TASK-28
+    current_filename: task_28_rc001_registry_freeze.md
+    semantic_version: '1.0'
+    required_header: '# TASK-28 — RC-001 research registry freeze'
+    sha256: 6eec32612c7ca6b38cc916c449de5457a586271b52c805ad63566595b93958c0
+    status: FINALIZATION_REQUIRED_SOURCE_CANDIDATE_PENDING
+    first_atom: T28-A1_RC001_HYPOTHESIS_REGISTRY_FREEZE_V1
+    terminal_atom: T28-A3_PERMANENT_SOURCES_RELEASE_CANDIDATE_V1
+    depends_on: [TASK-27]
+
+project_sources_target_set:
+  required_count: 7
+  required: [canonical_manifest.yaml, Solana_Memecoin_Intraday_Alpha_Lab_Operating_System_v8_5.md, Solana_Memecoin_Intraday_Alpha_Lab_Synthesis_v2_3_2026-07-18.md, roadmap.md, current_system_state.md, task_archive_P0_P1_v39.md, task_28_rc001_registry_freeze.md]
+
+activation_map:
+  project_instruction_action: KEEP_V3_3_BYTE_FOR_BYTE
+  replace_source_roles: [canonical_manifest, roadmap, current_system_state, phase_archive, active_task]
+  keep_byte_for_byte: [operating_system, research_blueprint]
+  expected_source_count: 7
+
+prior_activation_overlay:
+  status: ACTIVATION_CONFIRMED_USER_SMOKE
+  active_release_id: PSR-0002-T27-CLOSE
+  active_manifest_version: '4.8'
+  active_manifest_sha256: 8a0e5c8ac5cf7351e15c290214800cf5736457a135c9820f25add392d466d78e
+  source_set_state: ACTIVE_BEFORE_PSR0003_OWNER_SMOKE
+
+current_state:
+  current_phase: P4 — RC-001 RESEARCH CONTROL FREEZE; NO DATA OR EXECUTION AUTHORITY
+  active_task_id: TASK-28
+  active_status: FINALIZATION_REQUIRED_SOURCE_CANDIDATE_PENDING
+  last_validated_task_id: T28-A2
+  last_validated_repository_commit: 3c51f02babc072cc5e202a8b15de49e874e9a529
+  repository_state: TASK28_DELIVERED_PENDING_PSR0003_OWNER_SMOKE
+  main_ci_run_id: 31284090722
+  main_ci_conclusion: success
+  next_task_id: null
+  primary_blocker: OWNER_FIVE_ROLE_SOURCE_REPLACEMENT_AND_SEVEN_ROLE_SMOKE_REQUIRED
+  provider_calls_authorized: 0
+  provider_read_authority: false
+  r3_paths_or_values_opened: 0
+  real_money_authorized: false
+
+source_smoke_contract:
+  expected_result: TASK28_SOURCE_SMOKE=PASS
+  exact_source_count: 7
+  verify: [manifest 4.9, roadmap 4.9, state 4.5, archive 39.0, active TASK-28 1.0, unchanged OS 8.5, unchanged blueprint 2.3, RC-001 frozen with all three groups BLOCKED_DATA, provider authority false, no next task selected]
+  state_change_during_smoke: NONE
+
+source_replacement_rollback:
+  restore_exact_prior_five_roles_from: PSR-0002-T27-CLOSE
+  keep_byte_for_byte: [operating_system, research_blueprint]
+  rollback_smoke: rerun PSR-0002 manifest-first smoke after exact five-role restore
+
+self_checksum:
+  policy: Manifest cannot contain its own stable SHA-256; verify it in CHECKSUMS_SHA256.txt and the A3 acceptance receipt.

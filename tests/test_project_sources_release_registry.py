@@ -21,6 +21,7 @@ A5_RECEIPT_PATH = ROOT / "docs/evidence/task27/a0a5_permanent_sources_reconcilia
 ACTIVATION_RECEIPT_PATH = ROOT / "docs/evidence/task27/a2r1_project_sources_activation_and_task_close_acceptance_v1.json"
 FIRST_RELEASE_ID = "PSR-0001-T27-A0-A5"
 ACTIVE_RELEASE_ID = "PSR-0002-T27-CLOSE"
+CANDIDATE_RELEASE_ID = "PSR-0003-T28-RC001-FREEZE"
 CANDIDATE_STATUS = "VALIDATED_CANDIDATE_UI_ACTIVATION_PENDING"
 ACTIVE_STATUS = "ACTIVATED_BY_OWNER_SMOKE"
 
@@ -208,7 +209,7 @@ def changed_paths_since_enforcement(registry: dict) -> set[str]:
 
 
 class ProjectSourcesReleaseRegistryTests(unittest.TestCase):
-    def test_latest_release_is_activated_and_prior_release_is_superseded(self) -> None:
+    def test_active_release_remains_activated_while_one_new_candidate_waits_for_smoke(self) -> None:
         self.assertTrue(REGISTRY_PATH.is_file(), REGISTRY_PATH)
         self.assertTrue(SCHEMA_PATH.is_file(), SCHEMA_PATH)
         registry = load_yaml(REGISTRY_PATH)
@@ -217,12 +218,15 @@ class ProjectSourcesReleaseRegistryTests(unittest.TestCase):
         self.assertEqual(registry["registry_version"], 1)
         self.assertEqual(registry["active_ui_release_id"], ACTIVE_RELEASE_ID)
         self.assertEqual(registry["active_ui_state"], "REGISTRY_ACTIVATION_CONFIRMED")
-        self.assertIsNone(registry["latest_candidate_release_id"])
+        self.assertEqual(registry["latest_candidate_release_id"], CANDIDATE_RELEASE_ID)
         self.assertEqual(release["status"], ACTIVE_STATUS)
         self.assertEqual(release["activation_receipt"], ACTIVATION_RECEIPT_PATH.relative_to(ROOT).as_posix())
         self.assertEqual(prior_release["status"], "SUPERSEDED")
         self.assertEqual(prior_release["superseded_by_release_id"], ACTIVE_RELEASE_ID)
         self.assertTrue((ROOT / release["bundle_path"] / "canonical_manifest.yaml").is_file())
+        candidate = release_by_id(registry, CANDIDATE_RELEASE_ID)
+        self.assertEqual(candidate["status"], CANDIDATE_STATUS)
+        self.assertIsNone(candidate["activation_receipt"])
 
     def test_active_release_receipt_rejects_wrong_smoke_or_manifest_binding(self) -> None:
         registry = load_yaml(REGISTRY_PATH)
