@@ -1,0 +1,72 @@
+{
+  "schema": "smial.task30.birdeye-v3-external-read-runtime-receipt",
+  "schema_version": "1.0",
+  "receipt_id": "T30-A5R1-BIRDEYE-V3-EXTERNAL-READ-RUNTIME-001",
+  "task_id": "TASK-30",
+  "atom_id": "T30-A5R1_EXACT_BIRDEYE_EXTERNAL_READ_OUTCOME_CAPTURE_V1",
+  "status": "OBSERVED_EXTERNAL_READ_OUTCOME",
+  "a5_contract_path": "docs/contracts/task30_birdeye_v3_pair_history_pilot_contract_v1.md",
+  "a5_contract_sha256": "298b140843ffb9c519db853aa7f48bdc098567f3e564db058ff2e0b2ecac3b33",
+  "authorization": "T30-A5_EXTERNAL_READ_V1",
+  "frozen_pool_address": "URqx24yyYxtXXhTbBQnbtPLhtLWYoaDaRxuQuLpNS3S",
+  "provider": "BIRDEYE",
+  "credential_transport": "LOCAL_HEADER_ONLY_REDACTED",
+  "provider_calls_attempted": 2,
+  "reads": [
+    {
+      "read_id": "PAIR_OVERVIEW_IDENTITY_READ",
+      "method": "GET",
+      "endpoint_path": "/defi/v3/pair/overview/single",
+      "http_status": 200,
+      "response_success": true,
+      "returned_address_matches_frozen_pool": true,
+      "raw_sha256": "c27bd150f0441a036fcbdc462f1298b1141a473ceb3072b9e876e150f5ad90e5",
+      "response_bytes": 2376,
+      "limited_conclusion": "PAIR_LEVEL_INPUT_ACCEPTED_ONLY"
+    },
+    {
+      "read_id": "PAIR_OHLCV_RANGE_READ",
+      "method": "GET",
+      "endpoint_path": "/defi/v3/ohlcv/pair",
+      "http_status": 429,
+      "response_success": false,
+      "response_class": "RATE_OR_QUOTA_LIMIT",
+      "raw_sha256": "86665dfad1c781ac13c7ee1c9b6cec677341c2b99af90fda0e3dd54c9d1a8b70",
+      "response_bytes": 47,
+      "limited_conclusion": "OHLCV_OBSERVATION_UNAVAILABLE"
+    }
+  ],
+  "a4_raw_manifest": {
+    "outside_git": true,
+    "relative_path": "local/task30_birdeye_v3_pair_history_pilot/run=a5-birdeye-v3-20260809T211259Z/raw_manifest_v1.json",
+    "sha256": "4a8877e957dd43d5fa10e738c9c5af9c2a4cfd3ae619d0f357b002af04c2a7d3"
+  },
+  "decision": "PAIR_IDENTITY_ACCEPTED_OHLCV_RATE_OR_QUOTA_LIMITED",
+  "stop_conditions_applied": {
+    "no_retry_after_429": true,
+    "no_fallback": true,
+    "no_helius": true,
+    "no_solana_tracker": true,
+    "no_gecko": true
+  },
+  "claims": {
+    "historical_panel": false,
+    "rest_15m_supported": false,
+    "pair_or_provider_unsupported": false,
+    "price_unit_known": false,
+    "empty_interval_semantics_known": false,
+    "pit_admissible": false,
+    "task30_trial": false,
+    "numeric_netreturn": false
+  },
+  "side_effects": {
+    "provider_api_calls": 2,
+    "header_only_credential_uses": 2,
+    "raw_artifacts_outside_git": 3,
+    "r2_r3_reads": 0,
+    "wallet_signer_transaction_actions": 0,
+    "cash_spend_usd_cents": 0,
+    "project_sources_changes": 0
+  },
+  "project_sources_disposition": "NO_CHANGE"
+}
