@@ -1,0 +1,17 @@
+{
+  "schema": "smial.task34a.documentation-foundation.fixture",
+  "schema_version": "1.0",
+  "active_release_id": "PSR-0003-T28-RC001-FREEZE",
+  "expected_mirror_states": [
+    "MIRROR_MATCHES_ACTIVE_RELEASE",
+    "STALE_MIRROR_ACTIVE_RELEASE_CONFIRMED",
+    "MIRROR_UNAVAILABLE",
+    "MIRROR_CONFLICT_REQUIRES_CONTROL_REVIEW"
+  ],
+  "expected_role_count": 7,
+  "non_claims": {
+    "local_mirror_is_canonical": false,
+    "source_ui_was_read": false,
+    "provider_or_credential_was_used": false
+  }
+}

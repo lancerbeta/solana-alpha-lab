@@ -1,0 +1,33 @@
+schema: smial.task34a.documentation-foundation.policy
+schema_version: '1.0'
+task_id: TASK-34A
+contract_id: TASK34A-DOCUMENTATION-FOUNDATION-V1
+consumer: FUTURE_ENTRY_GATE_AND_GOAL_OWNER
+release_authority:
+  registry_path: docs/project_sources/release_registry_v1.yaml
+  required_release_status: ACTIVATED_BY_OWNER_SMOKE
+  required_receipt_schema: smial.project_sources.activation.receipt
+  required_receipt_evidence_class: OWNER_ATTESTATION
+  required_smoke_outcome: PASS
+mirror_states:
+  - MIRROR_MATCHES_ACTIVE_RELEASE
+  - STALE_MIRROR_ACTIVE_RELEASE_CONFIRMED
+  - MIRROR_UNAVAILABLE
+  - MIRROR_CONFLICT_REQUIRES_CONTROL_REVIEW
+output_policy:
+  absolute_source_directory: REDACTED
+  raw_source_bytes: NOT_RETAINED
+  task_selection_blocking_state: MIRROR_CONFLICT_REQUIRES_CONTROL_REVIEW
+authority:
+  provider_api_rpc_wss_calls: false
+  credential_use: false
+  raw_data_writes: false
+  dependency_changes: false
+  wallet_signer_transaction_actions: false
+  cash_spend: false
+  project_sources_ui_changes: false
+non_claims:
+  project_sources_ui_activation: false
+  strategy_or_alpha_readiness: false
+  transaction_or_cash_authority: false
+  live_source_mirror_authority: false

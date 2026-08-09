@@ -1,0 +1,104 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://solana-alpha-lab.local/schemas/task34a_documentation_foundation.schema.json",
+  "title": "TASK-34A documentation foundation policy",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema",
+    "schema_version",
+    "task_id",
+    "contract_id",
+    "consumer",
+    "release_authority",
+    "mirror_states",
+    "output_policy",
+    "authority",
+    "non_claims"
+  ],
+  "properties": {
+    "schema": {"const": "smial.task34a.documentation-foundation.policy"},
+    "schema_version": {"const": "1.0"},
+    "task_id": {"const": "TASK-34A"},
+    "contract_id": {"const": "TASK34A-DOCUMENTATION-FOUNDATION-V1"},
+    "consumer": {"const": "FUTURE_ENTRY_GATE_AND_GOAL_OWNER"},
+    "release_authority": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "registry_path",
+        "required_release_status",
+        "required_receipt_schema",
+        "required_receipt_evidence_class",
+        "required_smoke_outcome"
+      ],
+      "properties": {
+        "registry_path": {"const": "docs/project_sources/release_registry_v1.yaml"},
+        "required_release_status": {"const": "ACTIVATED_BY_OWNER_SMOKE"},
+        "required_receipt_schema": {"const": "smial.project_sources.activation.receipt"},
+        "required_receipt_evidence_class": {"const": "OWNER_ATTESTATION"},
+        "required_smoke_outcome": {"const": "PASS"}
+      }
+    },
+    "mirror_states": {
+      "type": "array",
+      "minItems": 4,
+      "maxItems": 4,
+      "prefixItems": [
+        {"const": "MIRROR_MATCHES_ACTIVE_RELEASE"},
+        {"const": "STALE_MIRROR_ACTIVE_RELEASE_CONFIRMED"},
+        {"const": "MIRROR_UNAVAILABLE"},
+        {"const": "MIRROR_CONFLICT_REQUIRES_CONTROL_REVIEW"}
+      ],
+      "items": false
+    },
+    "output_policy": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["absolute_source_directory", "raw_source_bytes", "task_selection_blocking_state"],
+      "properties": {
+        "absolute_source_directory": {"const": "REDACTED"},
+        "raw_source_bytes": {"const": "NOT_RETAINED"},
+        "task_selection_blocking_state": {"const": "MIRROR_CONFLICT_REQUIRES_CONTROL_REVIEW"}
+      }
+    },
+    "authority": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "provider_api_rpc_wss_calls",
+        "credential_use",
+        "raw_data_writes",
+        "dependency_changes",
+        "wallet_signer_transaction_actions",
+        "cash_spend",
+        "project_sources_ui_changes"
+      ],
+      "properties": {
+        "provider_api_rpc_wss_calls": {"const": false},
+        "credential_use": {"const": false},
+        "raw_data_writes": {"const": false},
+        "dependency_changes": {"const": false},
+        "wallet_signer_transaction_actions": {"const": false},
+        "cash_spend": {"const": false},
+        "project_sources_ui_changes": {"const": false}
+      }
+    },
+    "non_claims": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "project_sources_ui_activation",
+        "strategy_or_alpha_readiness",
+        "transaction_or_cash_authority",
+        "live_source_mirror_authority"
+      ],
+      "properties": {
+        "project_sources_ui_activation": {"const": false},
+        "strategy_or_alpha_readiness": {"const": false},
+        "transaction_or_cash_authority": {"const": false},
+        "live_source_mirror_authority": {"const": false}
+      }
+    }
+  }
+}
