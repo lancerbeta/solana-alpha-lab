@@ -1,0 +1,12 @@
+{
+  "expected_result": {
+    "decision": "T30_A0_REUSE_CLOSED_NO_PROVIDER_PILOT",
+    "route_states": {
+      "GECKO_T30_A0": "DOCUMENTED_START_LABEL_CONFLICTS_WITH_RETAINED_BOUNDARY",
+      "SOLANA_TRACKER_PAIR": "OBSERVED_INSUFFICIENT_33_OF_96",
+      "BIRDEYE_V3_PAIR": "CANDIDATE_NOT_READY"
+    },
+    "next_boundary": "NEW_NAMED_PROVIDER_CANDIDATE_REQUIRES_ENTRY_GATE",
+    "project_sources_disposition": "NO_CHANGE"
+  }
+}

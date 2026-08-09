@@ -15626,6 +15626,128 @@ records:
   evidence: []
   classification: *t25_internal
 
+- asset_id: CONTRACT-T30-REUSE-FIRST-HISTORY-ROUTE-001
+  record_version: '1.0'
+  asset_type: control_document
+  purpose: Versioned offline decision that closes unsafe reuse of the retained Task30 A0 historical response.
+  status: VALIDATED_ACTIVE
+  origin: REPOSITORY
+  as_of: '2026-08-09'
+  truth_owner: TASK-30
+  location: {kind: git_path, logical_uri: 'repo://docs/contracts/task30_reuse_first_pit_history_route_decision_contract_v1.md', repository_path: docs/contracts/task30_reuse_first_pit_history_route_decision_contract_v1.md}
+  integrity: {kind: sha256, sha256: 57b8dd2534c495690962bbd7e1185bec26c8d112d8acc01a4cf4b6e32980407d}
+  access: *t25_read_file
+  relations:
+  - {relation_type: derived_from, target_asset_id: EVIDENCE-T30-A1-BOUNDARY-SEMANTICS-001}
+  - {relation_type: derived_from, target_asset_id: EVIDENCE-T30-A4-BIRDEYE-PILOT-FACTORY-FIT-001}
+  consumers: [TASK-30, FACTORY-001]
+  evidence: []
+  classification: *t25_internal
+
+- asset_id: CONFIG-T30-REUSE-FIRST-HISTORY-ROUTE-001
+  record_version: '1.0'
+  asset_type: configuration
+  purpose: Machine-readable route-state and zero-authority policy for the Task30 A4 reuse decision.
+  status: VALIDATED_ACTIVE
+  origin: REPOSITORY
+  as_of: '2026-08-09'
+  truth_owner: TASK-30
+  location: {kind: git_path, logical_uri: 'repo://configs/task30_reuse_first_pit_history_route_decision_v1.yaml', repository_path: configs/task30_reuse_first_pit_history_route_decision_v1.yaml}
+  integrity: {kind: sha256, sha256: 0b966f204b5a273ab809316941fb92f92d992935ef8001989fe92fecd7191c94}
+  access: *t25_read_file
+  relations: [{relation_type: governed_by, target_asset_id: CONTRACT-T30-REUSE-FIRST-HISTORY-ROUTE-001}]
+  consumers: [TASK-30, FACTORY-001]
+  evidence: []
+  classification: *t25_internal
+
+- asset_id: SCHEMA-T30-REUSE-FIRST-HISTORY-ROUTE-001
+  record_version: '1.0'
+  asset_type: schema
+  purpose: Strict JSON Schema for the fail-closed Task30 A4 historical-route decision.
+  status: VALIDATED_ACTIVE
+  origin: REPOSITORY
+  as_of: '2026-08-09'
+  truth_owner: TASK-30
+  location: {kind: git_path, logical_uri: 'repo://catalog/schemas/task30_reuse_first_pit_history_route_decision.schema.json', repository_path: catalog/schemas/task30_reuse_first_pit_history_route_decision.schema.json}
+  integrity: {kind: sha256, sha256: 3d1a3843084dd8532b6413115db4f405463b11605a864632836eef1e576d75a1}
+  access: *t25_read_file
+  relations: [{relation_type: governed_by, target_asset_id: CONTRACT-T30-REUSE-FIRST-HISTORY-ROUTE-001}]
+  consumers: [TASK-30, FACTORY-001]
+  evidence: []
+  classification: *t25_internal
+
+- asset_id: FIXTURE-T30-REUSE-FIRST-HISTORY-ROUTE-001
+  record_version: '1.0'
+  asset_type: evidence
+  purpose: Synthetic golden output for the Task30 A4 closed-reuse policy.
+  status: VALIDATED_ACTIVE
+  origin: REPOSITORY
+  as_of: '2026-08-09'
+  truth_owner: TASK-30
+  location: {kind: git_path, logical_uri: 'repo://tests/fixtures/task30/reuse_first_pit_history_route_decision_v1.json', repository_path: tests/fixtures/task30/reuse_first_pit_history_route_decision_v1.json}
+  integrity: {kind: sha256, sha256: 6d382d56c22392810a1a720a3459a985cad626250c000f9d4639681bdaf8dbf3}
+  access: *t25_read_file
+  relations: [{relation_type: derived_from, target_asset_id: CONFIG-T30-REUSE-FIRST-HISTORY-ROUTE-001}]
+  consumers: [TASK-30, FACTORY-001]
+  evidence: []
+  classification: *t25_internal
+
+- asset_id: MODULE-T30-REUSE-FIRST-HISTORY-ROUTE-001
+  record_version: '1.0'
+  asset_type: script
+  purpose: Deterministic offline evaluator that rejects unsafe historical-route reuse and widened authority.
+  status: VALIDATED_ACTIVE
+  origin: REPOSITORY
+  as_of: '2026-08-09'
+  truth_owner: TASK-30
+  location: {kind: git_path, logical_uri: 'repo://src/solana_alpha_lab/task30_reuse_first_pit_history_route.py', repository_path: src/solana_alpha_lab/task30_reuse_first_pit_history_route.py}
+  integrity: {kind: sha256, sha256: e840ef90dff998e5c0afc4133aefa1971e662af0320cfe5af1d44c862d316a73}
+  access: *t25_read_file
+  relations:
+  - {relation_type: governed_by, target_asset_id: CONFIG-T30-REUSE-FIRST-HISTORY-ROUTE-001}
+  - {relation_type: produces, target_asset_id: EVIDENCE-T30-A4-REUSE-FIRST-HISTORY-ROUTE-001}
+  consumers: [TASK-30, FACTORY-001]
+  evidence: []
+  classification: *t25_internal
+
+- asset_id: TEST-T30-REUSE-FIRST-HISTORY-ROUTE-001
+  record_version: '1.0'
+  asset_type: script
+  purpose: Deterministic tests for the Task30 A4 no-pilot decision, receipt bindings and Catalog registration.
+  status: VALIDATED_ACTIVE
+  origin: REPOSITORY
+  as_of: '2026-08-09'
+  truth_owner: TASK-30
+  location: {kind: git_path, logical_uri: 'repo://tests/test_task30_reuse_first_pit_history_route_decision.py', repository_path: tests/test_task30_reuse_first_pit_history_route_decision.py}
+  integrity: {kind: sha256, sha256: a9c9c1bcfe39373aa42eeed11127f327f3b11e567f06ccff2d913a70b424b711}
+  access: *t25_read_file
+  relations:
+  - {relation_type: depends_on, target_asset_id: MODULE-T30-REUSE-FIRST-HISTORY-ROUTE-001}
+  - {relation_type: depends_on, target_asset_id: SCHEMA-T30-REUSE-FIRST-HISTORY-ROUTE-001}
+  - {relation_type: depends_on, target_asset_id: FIXTURE-T30-REUSE-FIRST-HISTORY-ROUTE-001}
+  - {relation_type: depends_on, target_asset_id: EVIDENCE-T30-A4-REUSE-FIRST-HISTORY-ROUTE-001}
+  consumers: [TASK-30, FACTORY-001]
+  evidence: []
+  classification: *t25_internal
+
+- asset_id: EVIDENCE-T30-A4-REUSE-FIRST-HISTORY-ROUTE-001
+  record_version: '1.0'
+  asset_type: evidence
+  purpose: Hash-bound FULL Factory Fit receipt for the Task30 A4 offline historical-route reuse decision.
+  status: VALIDATED_ACTIVE
+  origin: REPOSITORY
+  as_of: '2026-08-09'
+  truth_owner: TASK-30
+  location: {kind: git_path, logical_uri: 'repo://docs/evidence/task30/a4_reuse_first_pit_history_route_decision_acceptance_v1.json', repository_path: docs/evidence/task30/a4_reuse_first_pit_history_route_decision_acceptance_v1.json}
+  integrity: {kind: sha256, sha256: ebd43c5171eaa19453bbb3eb04b71e93eebdfac185ab11f666df861455970ec5}
+  access: *t25_read_file
+  relations:
+  - {relation_type: derived_from, target_asset_id: MODULE-T30-REUSE-FIRST-HISTORY-ROUTE-001}
+  - {relation_type: validated_by, target_asset_id: TEST-T30-REUSE-FIRST-HISTORY-ROUTE-001}
+  consumers: [TASK-30, FACTORY-001]
+  evidence: []
+  classification: *t25_internal
+
 - asset_id: CONTRACT-T34A-DOCUMENTATION-FOUNDATION-001
   record_version: '1.0'
   asset_type: control_document
