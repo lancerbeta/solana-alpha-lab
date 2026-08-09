@@ -114,6 +114,7 @@ Run the focused unittest module again. Expected: all cases PASS.
 - Modify: `scripts/validate_ci.py`
 - Modify: `tests/test_ci.py`
 - Modify: `tests/test_project_sources_release_registry.py`
+- Modify if the full gate proves checkpoint coupling: `tests/test_task28_permanent_sources_release.py`
 - Modify: `AGENTS.md`
 - Modify: `docs/project_sources/RELEASES.md`
 
@@ -138,6 +139,8 @@ Use an argparse mutually exclusive group. Import `run_fast_path` lazily only whe
 - [ ] **Step 3: Remove current-active-release hard-coding**
 
 Refactor `tests/test_project_sources_release_registry.py` to derive the current active release from `active_ui_release_id` and validate its receipt/Catalog hash generically. Keep explicit historical TASK-27/TASK-28 immutable-receipt assertions. Future fast-path closes must not require test edits.
+
+If the full gate exposes an older task test that requires the global Catalog to remain at its historical exact version/count, retain the task's exact receipts and minimum checkpoint while replacing equality with a monotonic lower bound. This is a direct-consumer repair, not a waiver.
 
 - [ ] **Step 4: Update operator contracts**
 

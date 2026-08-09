@@ -166,8 +166,11 @@ class Task28PermanentSourcesReleaseTests(unittest.TestCase):
             {"relation_type": "derived_from", "target_asset_id": ACTIVATION_CATALOG_ASSET_ID},
             close_record["relations"],
         )
-        self.assertEqual(catalog_manifest["catalog_version"], "0.43.0")
-        self.assertEqual(catalog_manifest["current_checkpoint"]["assets"], 581)
+        catalog_version = tuple(
+            int(part) for part in catalog_manifest["catalog_version"].split(".")
+        )
+        self.assertGreaterEqual(catalog_version, (0, 43, 0))
+        self.assertGreaterEqual(catalog_manifest["current_checkpoint"]["assets"], 581)
         self.assertIn(CATALOG_ASSET_ID, catalog_manifest["mandatory_asset_ids"])
         self.assertIn(ACTIVATION_CATALOG_ASSET_ID, catalog_manifest["mandatory_asset_ids"])
         self.assertIn(CLOSE_CATALOG_ASSET_ID, catalog_manifest["mandatory_asset_ids"])

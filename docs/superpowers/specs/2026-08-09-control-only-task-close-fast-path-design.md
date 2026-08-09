@@ -131,6 +131,8 @@ The implementation may change only:
 - focused tests for classification, receipt semantics, and CLI routing;
 - the existing Project Sources release-registry test only to remove the
   current-active-release hard-code while retaining historical assertions;
+- a historical task-close test only when it hard-codes the global Catalog
+  checkpoint and therefore blocks every legitimate later Catalog version;
 - one design and one implementation-plan document;
 - Catalog records and generated consumers strictly required to register the
   new durable policy/validator/test assets.
