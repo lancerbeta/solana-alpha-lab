@@ -1,0 +1,53 @@
+{
+  "schema": "smial.task34a.documentation-foundation.acceptance",
+  "schema_version": "1.0",
+  "task_id": "TASK-34A",
+  "atom_id": "T34A_DOCUMENTATION_FOUNDATION_AND_AI_OPERATOR_RUNBOOKS_V1",
+  "contract_id": "TASK34A-DOCUMENTATION-FOUNDATION-V1",
+  "active_release_input": "PSR-0003-T28-RC001-FREEZE",
+  "decision": {
+    "value": "VALIDATED_OFFLINE_DOCUMENTATION_FOUNDATION",
+    "task_selection_rule": "MIRROR_CONFLICT_REQUIRES_CONTROL_REVIEW_BLOCKS; stale or unavailable mirror does not demote an activated registry release"
+  },
+  "artifact_bindings": {
+    "contract": {"path": "docs/contracts/task34a_documentation_foundation_contract_v1.md", "sha256": "b49e32ce4a2b5c5ed97481efa129bb6613fe56bca3b825e4e8fde23e9173f3db"},
+    "policy": {"path": "configs/task34a_documentation_foundation_v1.yaml", "sha256": "caaeed7343bb6a420af31f8395024077563e2452271caf6d4886a2ae6c0d1826"},
+    "schema": {"path": "catalog/schemas/task34a_documentation_foundation.schema.json", "sha256": "4d943f777e10e1398d6b16ae3aa7c42990649e3da32553f16c92e4eabd04ecd1"},
+    "fixture": {"path": "tests/fixtures/task34a/documentation_foundation_v1.json", "sha256": "6493a60e5dd680d2316fe9ba039e7bd3588ef1cee2299e799107824b85b6893c"},
+    "resolver": {"path": "src/solana_alpha_lab/task34a_documentation_foundation.py", "sha256": "fccd4c7e3025d5b2ee9352268c7641f5cedb1dd9575643877ed949f81f9df0b5"},
+    "context_command": {"path": "scripts/show_task34a_context.py", "sha256": "f6d46b3a53cf9a6e48feab557900a8f8ea63ca209c115d80dfdef6e2b006cfdf"},
+    "navigation_generator": {"path": "scripts/generate_navigation.py", "sha256": "2c855150a466413fb90ea782d77fc46a74b18a7dfb013ea612181474ae2e82dd"},
+    "operator_navigation": {"path": "docs/OPERATOR_NAVIGATION.md", "sha256": "dba905ef661dcc3db74b7899ea99df56a86d807fb2eb61412864741dd12ed201"},
+    "entry_runbook": {"path": "docs/runbooks/task_entry_and_resume.md", "sha256": "c1469cdc9fe243dc289705be056c416919ef0b908ffd72258f87b281f12241a0"},
+    "mirror_runbook": {"path": "docs/runbooks/source_mirror_drift.md", "sha256": "b4e788cbe135f29d454e9c779a081c0d58e35c8f71336d3b8c486aac247a349a"},
+    "authority_runbook": {"path": "docs/runbooks/external_authority_stop.md", "sha256": "f69f44503432a3ec260946ec5a2cc05334d9f84a7ca67034c741c1870e39189d"},
+    "test": {"path": "tests/test_task34a_documentation_foundation.py", "sha256": "9fd8b1817505153239615f1f7cf1413e5e01896c8ad5c23bbaae28cc7e37286b"}
+  },
+  "validation": {
+    "focused_command": "uv run --locked --managed-python python -B -m unittest tests.test_task34a_documentation_foundation -v",
+    "focused_result": "PASS",
+    "generator_check": "PASS",
+    "catalog_validation": "PASS_REQUIRED_FOR_DELIVERY"
+  },
+  "side_effect_counters": {
+    "provider_api_rpc_wss_calls": 0,
+    "credential_reads": 0,
+    "raw_data_writes": 0,
+    "r2_r3_reads": 0,
+    "wallet_signer_transaction_actions": 0,
+    "cash_spend_usd_cents": 0,
+    "project_sources_ui_changes": 0,
+    "dependency_changes": 0
+  },
+  "project_sources_disposition": {
+    "kind": "NO_CHANGE",
+    "reason": "Repository-native documentation does not change the canonical Project Sources activation set."
+  },
+  "non_claims": {
+    "project_sources_ui_activation": false,
+    "provider_or_credential_authority": false,
+    "wallet_transaction_or_cash_authority": false,
+    "strategy_or_alpha_readiness": false,
+    "canonical_task34a_done": false
+  }
+}

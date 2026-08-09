@@ -528,6 +528,11 @@
       "target_asset_id": "CONTRACT-T30-OHLCV-BOUNDARY-SEMANTICS-001"
     },
     {
+      "source_asset_id": "CONFIG-T34A-DOCUMENTATION-FOUNDATION-001",
+      "relation": "governed_by",
+      "target_asset_id": "CONTRACT-T34A-DOCUMENTATION-FOUNDATION-001"
+    },
+    {
       "source_asset_id": "CONTRACT-CANARY-SPECIFICATION-ONLY-001",
       "relation": "derived_from",
       "target_asset_id": "CONTRACT-OWNER-AUTHORITY-PACKET-001"
@@ -1716,6 +1721,21 @@
       "source_asset_id": "DOC-T28-RC001-REGISTRY-FREEZE-001",
       "relation": "derived_from",
       "target_asset_id": "EVIDENCE-T27-A2R1-SOURCE-ACTIVATION-CLOSE-001"
+    },
+    {
+      "source_asset_id": "DOC-T34A-OPERATOR-NAVIGATION-001",
+      "relation": "derived_from",
+      "target_asset_id": "GENERATOR-CATALOG-NAVIGATION-001"
+    },
+    {
+      "source_asset_id": "DOC-T34A-OPERATOR-NAVIGATION-001",
+      "relation": "derived_from",
+      "target_asset_id": "SCRIPT-T34A-CONTEXT-001"
+    },
+    {
+      "source_asset_id": "DOC-T34A-RUNBOOKS-001",
+      "relation": "depends_on",
+      "target_asset_id": "SCRIPT-T34A-CONTEXT-001"
     },
     {
       "source_asset_id": "ENV-WORKSTATION-001",
@@ -2938,6 +2958,26 @@
       "target_asset_id": "TEST-T30-BIRDEYE-PILOT-READINESS-001"
     },
     {
+      "source_asset_id": "EVIDENCE-T34A-A3-ACCEPTANCE-001",
+      "relation": "derived_from",
+      "target_asset_id": "CONTRACT-T34A-DOCUMENTATION-FOUNDATION-001"
+    },
+    {
+      "source_asset_id": "EVIDENCE-T34A-A3-ACCEPTANCE-001",
+      "relation": "validated_by",
+      "target_asset_id": "TEST-T34A-DOCUMENTATION-FOUNDATION-001"
+    },
+    {
+      "source_asset_id": "EVIDENCE-T34A-A4-FACTORY-FIT-001",
+      "relation": "derived_from",
+      "target_asset_id": "EVIDENCE-T34A-A3-ACCEPTANCE-001"
+    },
+    {
+      "source_asset_id": "EVIDENCE-T34A-A4-FACTORY-FIT-001",
+      "relation": "validated_by",
+      "target_asset_id": "TEST-T34A-DOCUMENTATION-FOUNDATION-001"
+    },
+    {
       "source_asset_id": "FIXTURE-BATON-SUITE-001",
       "relation": "governed_by",
       "target_asset_id": "CTRL-BATON-SETUP-001"
@@ -3486,6 +3526,11 @@
       "source_asset_id": "FIXTURE-T30-OHLCV-BOUNDARY-SEMANTICS-001",
       "relation": "derived_from",
       "target_asset_id": "CONFIG-T30-OHLCV-BOUNDARY-SEMANTICS-001"
+    },
+    {
+      "source_asset_id": "FIXTURE-T34A-DOCUMENTATION-FOUNDATION-001",
+      "relation": "derived_from",
+      "target_asset_id": "CONFIG-T34A-DOCUMENTATION-FOUNDATION-001"
     },
     {
       "source_asset_id": "GENERATED-EDGE-PROJECTION-001",
@@ -4278,6 +4323,16 @@
       "target_asset_id": "EVIDENCE-T30-A1-BOUNDARY-SEMANTICS-001"
     },
     {
+      "source_asset_id": "MODULE-T34A-DOCUMENTATION-FOUNDATION-001",
+      "relation": "governed_by",
+      "target_asset_id": "CONFIG-T34A-DOCUMENTATION-FOUNDATION-001"
+    },
+    {
+      "source_asset_id": "MODULE-T34A-DOCUMENTATION-FOUNDATION-001",
+      "relation": "produces",
+      "target_asset_id": "EVIDENCE-T34A-A3-ACCEPTANCE-001"
+    },
+    {
       "source_asset_id": "POLICY-OWNER-ATTENTION-GATE-001",
       "relation": "contains",
       "target_asset_id": "SCRIPT-OWNER-ATTENTION-GATE-001"
@@ -5008,6 +5063,11 @@
       "target_asset_id": "CONTRACT-T30-OHLCV-BOUNDARY-SEMANTICS-001"
     },
     {
+      "source_asset_id": "SCHEMA-T34A-DOCUMENTATION-FOUNDATION-001",
+      "relation": "governed_by",
+      "target_asset_id": "CONTRACT-T34A-DOCUMENTATION-FOUNDATION-001"
+    },
+    {
       "source_asset_id": "SCM-BASELINE-COMMIT-001",
       "relation": "governed_by",
       "target_asset_id": "CTRL-TASK-03-001"
@@ -5366,6 +5426,11 @@
       "source_asset_id": "SCRIPT-T22-SPLIT-RESOLUTION-001",
       "relation": "depends_on",
       "target_asset_id": "MODULE-T22-SPLIT-RESOLUTION-001"
+    },
+    {
+      "source_asset_id": "SCRIPT-T34A-CONTEXT-001",
+      "relation": "depends_on",
+      "target_asset_id": "MODULE-T34A-DOCUMENTATION-FOUNDATION-001"
     },
     {
       "source_asset_id": "SCRIPT-TASK-CLOSE-FAST-PATH-001",
@@ -6671,6 +6736,26 @@
       "source_asset_id": "TEST-T30-OHLCV-BOUNDARY-SEMANTICS-001",
       "relation": "depends_on",
       "target_asset_id": "SCHEMA-T30-OHLCV-BOUNDARY-SEMANTICS-001"
+    },
+    {
+      "source_asset_id": "TEST-T34A-DOCUMENTATION-FOUNDATION-001",
+      "relation": "depends_on",
+      "target_asset_id": "EVIDENCE-T34A-A4-FACTORY-FIT-001"
+    },
+    {
+      "source_asset_id": "TEST-T34A-DOCUMENTATION-FOUNDATION-001",
+      "relation": "depends_on",
+      "target_asset_id": "FIXTURE-T34A-DOCUMENTATION-FOUNDATION-001"
+    },
+    {
+      "source_asset_id": "TEST-T34A-DOCUMENTATION-FOUNDATION-001",
+      "relation": "depends_on",
+      "target_asset_id": "MODULE-T34A-DOCUMENTATION-FOUNDATION-001"
+    },
+    {
+      "source_asset_id": "TEST-T34A-DOCUMENTATION-FOUNDATION-001",
+      "relation": "depends_on",
+      "target_asset_id": "SCHEMA-T34A-DOCUMENTATION-FOUNDATION-001"
     },
     {
       "source_asset_id": "TEST-TASK-CLOSE-FAST-PATH-001",
