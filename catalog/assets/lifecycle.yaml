@@ -209,7 +209,7 @@ records:
   evidence: []
   classification: *id004
 - asset_id: GENERATED-PROJECT-MAP-001
-  record_version: '1.68'
+  record_version: '1.69'
   asset_type: generated_view
   purpose: Deterministic human-readable navigation projected only from the Catalog.
   status: IMPLEMENTED_UNVERIFIED
@@ -222,7 +222,7 @@ records:
     repository_path: docs/PROJECT_MAP.md
   integrity:
     kind: sha256
-    sha256: 612db8b40f2838d7574fb988ab54eeec3fb9c1f912b2740df5667fe5b034fadc
+    sha256: d92894c042bea0f2eae51e4634402d277fb27fe75523383e5b78b1c6c6966eb6
   access:
     mode: read_only
     method: file
@@ -264,11 +264,12 @@ records:
   - CANARY-SPECIFICATION-ONLY-V1
   - CTRL-OWNER-ATTENTION-GATE
   - TASK-28
+  - TASK-30
   - CTRL-TASK-CLOSE-FAST-PATH
   evidence: []
   classification: *id004
 - asset_id: GENERATED-EDGE-PROJECTION-001
-  record_version: '1.49'
+  record_version: '1.50'
   asset_type: generated_view
   purpose: Deterministic machine-readable projection of Catalog asset relations.
   status: IMPLEMENTED_UNVERIFIED
@@ -281,7 +282,7 @@ records:
     repository_path: catalog/generated/asset_edges.json
   integrity:
     kind: sha256
-    sha256: b6e3f4ccda7d6b731d294bcb4ae4a6658e78097fc3f5923ae6f75b998025c1f0
+    sha256: c0e33f665dc00111fc0aad417780746e29b62ec727c2cd7ffab501d39f04ff06
   access:
     mode: read_only
     method: file
@@ -322,6 +323,7 @@ records:
   - OWNER-AUTHORITY-PACKET-BINDING-V1
   - CANARY-SPECIFICATION-ONLY-V1
   - TASK-28
+  - TASK-30
   - CTRL-TASK-CLOSE-FAST-PATH
   evidence: []
   classification: *id004

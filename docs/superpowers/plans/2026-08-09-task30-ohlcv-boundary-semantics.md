@@ -32,7 +32,7 @@
 - Consumes: a mapping matching the task-owned YAML policy.
 - Produces: `evaluate_boundary_semantics(config) -> {"decision", "candidate_models", "required_next_evidence"}`.
 
-- [ ] **Step 1: Write the failing test**
+- [x] **Step 1: Write the failing test**
 
 Require the missing evaluator module, validate the YAML against its schema,
 and assert that the synthetic A0 shape returns
@@ -44,13 +44,13 @@ Run: `uv run --locked --managed-python python -m unittest tests.test_task30_ohlc
 
 Expected: FAIL because the contract artifacts and evaluator do not yet exist.
 
-- [ ] **Step 2: Add the minimal task-owned artifacts and evaluator**
+- [x] **Step 2: Add the minimal task-owned artifacts and evaluator**
 
 Create only the policy, schema, fixture, contract and evaluator required to
 make the test pass. The evaluator must reject any configuration where the
 observed response shape selects a label model or changes the blocked decision.
 
-- [ ] **Step 3: Re-run the targeted test**
+- [x] **Step 3: Re-run the targeted test**
 
 Run: `uv run --locked --managed-python python -m unittest tests.test_task30_ohlcv_boundary_semantics_decision -q`
 
@@ -60,6 +60,7 @@ Expected: PASS.
 
 **Files:**
 - Create: `docs/evidence/task30/a1_ohlcv_boundary_semantics_decision_acceptance_v1.json`
+- Create: `docs/evidence/task30/a2_catalog_factory_fit_v1.json`
 - Modify: `catalog/assets/core.yaml`
 - Modify (generated): `catalog/catalog_manifest.yaml`, `docs/PROJECT_MAP.md`, `catalog/generated/asset_edges.json`
 
@@ -68,16 +69,19 @@ Expected: PASS.
 - Produces: stable Catalog IDs for the contract, policy, schema, fixture,
   evaluator, test and acceptance receipt.
 
-- [ ] **Step 1: Add a targeted acceptance receipt and Catalog records**
+- [x] **Step 1: Add a targeted acceptance receipt and Catalog records**
 
-The receipt must bind the A0 raw SHA-256, record zero external actions, state
-`NO_CHANGE` for Project Sources, and prohibit Task30 trial acceptance.
+The A1 receipt must bind the A0 raw SHA-256, record zero external actions,
+state `NO_CHANGE` for Project Sources, and prohibit Task30 trial acceptance.
+The A2 receipt performs `FULL_REVIEW`: it must retain the unresolved semantic
+state, verify owner operability and recovery, record the reuse-first outcome,
+and name only an independent timestamp-semantics proof as a future trigger.
 
-- [ ] **Step 2: Regenerate Catalog navigation**
+- [x] **Step 2: Regenerate Catalog navigation**
 
 Run: `uv run --locked --managed-python python -B scripts/generate_navigation.py --write`
 
-- [ ] **Step 3: Validate changed behavior and Catalog integrity**
+- [x] **Step 3: Validate changed behavior and Catalog integrity**
 
 Run:
 `uv run --locked --managed-python python -m unittest tests.test_task30_ohlcv_boundary_semantics_decision -q`

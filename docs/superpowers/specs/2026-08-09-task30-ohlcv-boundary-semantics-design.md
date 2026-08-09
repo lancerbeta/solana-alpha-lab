@@ -55,6 +55,11 @@ artifacts in the Catalog and regenerate its derived navigation views. The
 existing Project Sources release remains unchanged (`NO_CHANGE`): this is an
 in-progress offline atom, not canonical TASK-30 acceptance.
 
+Because the record sets a durable data-semantics boundary, its delivery also
+includes a `FULL_REVIEW` Factory Fit receipt. That review verifies that the
+small evaluator remains a guardrail for a future consumer rather than a hidden
+data platform or a new route authorization.
+
 No provider/API/RPC/WSS requests, credentials, R2/R3 access, dependency
 changes, wallet/signer/transaction actions, cash spending, real data values,
 numeric PnL/NetReturn, trial opening, holdout consumption, or Project Source

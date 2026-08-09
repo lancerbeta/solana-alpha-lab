@@ -1,0 +1,36 @@
+{
+  "fixture_kind": "SYNTHETIC_GOLDEN_ONLY",
+  "expected_decision": "UNRESOLVED_INTERVAL_LABEL_SEMANTICS",
+  "expected_candidate_models": [
+    "START_LABELED",
+    "END_LABELED"
+  ],
+  "expected_required_next_evidence": "INDEPENDENT_EXACT_TIMESTAMP_SEMANTICS_PROOF",
+  "bound_raw_sha256": "cce29d4e175bc81a474c699e3bb465daf8cb864f3cb195a9812bd0d3c0ca4163",
+  "adversarial_cases": [
+    {
+      "case_id": "SELECTED_MODEL",
+      "pointer": "selected_model",
+      "replacement": "END_LABELED",
+      "expected_error": "SELECTED_MODEL_FORBIDDEN"
+    },
+    {
+      "case_id": "CONTINUOUS_PANEL",
+      "pointer": "continuous_panel_claim",
+      "replacement": true,
+      "expected_error": "CONTINUOUS_PANEL_CLAIM_FORBIDDEN"
+    },
+    {
+      "case_id": "ZERO_TO_NO_TRADE",
+      "pointer": "observed_response.zero_volume_semantics",
+      "replacement": "EXPLICIT_NO_TRADE",
+      "expected_error": "ZERO_VOLUME_PROMOTION_FORBIDDEN"
+    },
+    {
+      "case_id": "EXTERNAL_AUTHORITY",
+      "pointer": "authority.provider_api_rpc_wss_calls",
+      "replacement": 1,
+      "expected_error": "EXTERNAL_AUTHORITY_FORBIDDEN"
+    }
+  ]
+}

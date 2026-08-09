@@ -15348,3 +15348,142 @@ records:
   consumers: [FACTORY-001, LOCAL-WORK-CODEX]
   evidence: []
   classification: *t25_internal
+
+- asset_id: CONTRACT-T30-OHLCV-BOUNDARY-SEMANTICS-001
+  record_version: '1.0'
+  asset_type: control_document
+  purpose: Versioned fail-closed contract for the Task30 A0 OHLCV timestamp-boundary ambiguity.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-08-09'
+  truth_owner: TASK-30
+  location: {kind: git_path, logical_uri: 'repo://docs/contracts/task30_ohlcv_boundary_semantics_decision_contract_v1.md', repository_path: docs/contracts/task30_ohlcv_boundary_semantics_decision_contract_v1.md}
+  integrity: {kind: sha256, sha256: 9cfc00b3f8008040cf2fe98ae70171d8f438d00a5359c5aa8c54e714542e9857}
+  access: *t25_read_file
+  relations:
+  - {relation_type: derived_from, target_asset_id: EVIDENCE-T27-A1S4-OWNER-ROUTE-CLOSE-001}
+  consumers: [TASK-30, FACTORY-001]
+  evidence: []
+  classification: *t25_internal
+
+- asset_id: CONFIG-T30-OHLCV-BOUNDARY-SEMANTICS-001
+  record_version: '1.0'
+  asset_type: configuration
+  purpose: Machine-readable dual-model boundary policy bound to the retained Task30 A0 raw response hash.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-08-09'
+  truth_owner: TASK-30
+  location: {kind: git_path, logical_uri: 'repo://configs/task30_ohlcv_boundary_semantics_decision_v1.yaml', repository_path: configs/task30_ohlcv_boundary_semantics_decision_v1.yaml}
+  integrity: {kind: sha256, sha256: 145bf4e6a129dd328d36ca01446072db45eb894644a1efe7c2dfd3329f79fae3}
+  access: *t25_read_file
+  relations: [{relation_type: governed_by, target_asset_id: CONTRACT-T30-OHLCV-BOUNDARY-SEMANTICS-001}]
+  consumers: [TASK-30, FACTORY-001]
+  evidence: []
+  classification: *t25_internal
+
+- asset_id: SCHEMA-T30-OHLCV-BOUNDARY-SEMANTICS-001
+  record_version: '1.0'
+  asset_type: schema
+  purpose: Strict JSON Schema for the Task30 boundary observation, dual interpretations and zero-authority decision.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-08-09'
+  truth_owner: TASK-30
+  location: {kind: git_path, logical_uri: 'repo://catalog/schemas/task30_ohlcv_boundary_semantics_decision.schema.json', repository_path: catalog/schemas/task30_ohlcv_boundary_semantics_decision.schema.json}
+  integrity: {kind: sha256, sha256: 9491426994e283ee2df7e570e4d9b76855b15e9b924562387d8737de664ba341}
+  access: *t25_read_file
+  relations: [{relation_type: governed_by, target_asset_id: CONTRACT-T30-OHLCV-BOUNDARY-SEMANTICS-001}]
+  consumers: [TASK-30, FACTORY-001]
+  evidence: []
+  classification: *t25_internal
+
+- asset_id: FIXTURE-T30-OHLCV-BOUNDARY-SEMANTICS-001
+  record_version: '1.0'
+  asset_type: evidence
+  purpose: Synthetic golden and adversarial matrix for fail-closed OHLCV timestamp-boundary semantics.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-08-09'
+  truth_owner: TASK-30
+  location: {kind: git_path, logical_uri: 'repo://tests/fixtures/task30/ohlcv_boundary_semantics_decision_v1.json', repository_path: tests/fixtures/task30/ohlcv_boundary_semantics_decision_v1.json}
+  integrity: {kind: sha256, sha256: ca2ddf1a2c16cf87f2d494fdaf67956f4e932a48ff700b44765cbdb84c3692d3}
+  access: *t25_read_file
+  relations: [{relation_type: derived_from, target_asset_id: CONFIG-T30-OHLCV-BOUNDARY-SEMANTICS-001}]
+  consumers: [TASK-30, FACTORY-001]
+  evidence: []
+  classification: *t25_internal
+
+- asset_id: MODULE-T30-OHLCV-BOUNDARY-SEMANTICS-001
+  record_version: '1.0'
+  asset_type: script
+  purpose: Deterministic offline evaluator that rejects timestamp-label promotion and external authority.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-08-09'
+  truth_owner: TASK-30
+  location: {kind: git_path, logical_uri: 'repo://src/solana_alpha_lab/task30_ohlcv_boundary_semantics.py', repository_path: src/solana_alpha_lab/task30_ohlcv_boundary_semantics.py}
+  integrity: {kind: sha256, sha256: 0f69095fa5a425f940018a02d34cbea4601e635902c7a155fe580b5d4aa33f0a}
+  access: *t25_read_file
+  relations:
+  - {relation_type: governed_by, target_asset_id: CONFIG-T30-OHLCV-BOUNDARY-SEMANTICS-001}
+  - {relation_type: produces, target_asset_id: EVIDENCE-T30-A1-BOUNDARY-SEMANTICS-001}
+  consumers: [TASK-30, FACTORY-001]
+  evidence: []
+  classification: *t25_internal
+
+- asset_id: TEST-T30-OHLCV-BOUNDARY-SEMANTICS-001
+  record_version: '1.0'
+  asset_type: script
+  purpose: Deterministic adversarial tests for the Task30 boundary decision, receipts and Catalog registration.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-08-09'
+  truth_owner: TASK-30
+  location: {kind: git_path, logical_uri: 'repo://tests/test_task30_ohlcv_boundary_semantics_decision.py', repository_path: tests/test_task30_ohlcv_boundary_semantics_decision.py}
+  integrity: {kind: sha256, sha256: 627c4151be710df2b0f987b27f92b378f6c758c4980fa7f7c876c2d20d48ccca}
+  access: *t25_read_file
+  relations:
+  - {relation_type: depends_on, target_asset_id: MODULE-T30-OHLCV-BOUNDARY-SEMANTICS-001}
+  - {relation_type: depends_on, target_asset_id: SCHEMA-T30-OHLCV-BOUNDARY-SEMANTICS-001}
+  - {relation_type: depends_on, target_asset_id: FIXTURE-T30-OHLCV-BOUNDARY-SEMANTICS-001}
+  - {relation_type: depends_on, target_asset_id: EVIDENCE-T30-A2-CATALOG-FACTORY-FIT-001}
+  consumers: [TASK-30, FACTORY-001]
+  evidence: []
+  classification: *t25_internal
+
+- asset_id: EVIDENCE-T30-A1-BOUNDARY-SEMANTICS-001
+  record_version: '1.0'
+  asset_type: evidence
+  purpose: Hash-bound acceptance receipt for the retained Task30 A0 boundary-semantics guardrail.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-08-09'
+  truth_owner: TASK-30
+  location: {kind: git_path, logical_uri: 'repo://docs/evidence/task30/a1_ohlcv_boundary_semantics_decision_acceptance_v1.json', repository_path: docs/evidence/task30/a1_ohlcv_boundary_semantics_decision_acceptance_v1.json}
+  integrity: {kind: sha256, sha256: e65b33618b1c86b4b22f57dda4e835cd438d63626b5748257c2579b095bff99b}
+  access: *t25_read_file
+  relations:
+  - {relation_type: derived_from, target_asset_id: MODULE-T30-OHLCV-BOUNDARY-SEMANTICS-001}
+  - {relation_type: validated_by, target_asset_id: TEST-T30-OHLCV-BOUNDARY-SEMANTICS-001}
+  consumers: [TASK-30, FACTORY-001]
+  evidence: []
+  classification: *t25_internal
+
+- asset_id: EVIDENCE-T30-A2-CATALOG-FACTORY-FIT-001
+  record_version: '1.0'
+  asset_type: evidence
+  purpose: FULL Factory Fit and Catalog receipt for the Task30 offline boundary-semantics guardrail.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-08-09'
+  truth_owner: TASK-30
+  location: {kind: git_path, logical_uri: 'repo://docs/evidence/task30/a2_catalog_factory_fit_v1.json', repository_path: docs/evidence/task30/a2_catalog_factory_fit_v1.json}
+  integrity: {kind: sha256, sha256: 8aed3cc19ba367c34a658cde3ae79c7cb45792f8f4499cfe0b4b278f3ea971fb}
+  access: *t25_read_file
+  relations:
+  - {relation_type: derived_from, target_asset_id: EVIDENCE-T30-A1-BOUNDARY-SEMANTICS-001}
+  - {relation_type: validated_by, target_asset_id: TEST-T30-OHLCV-BOUNDARY-SEMANTICS-001}
+  consumers: [TASK-30, FACTORY-001]
+  evidence: []
+  classification: *t25_internal

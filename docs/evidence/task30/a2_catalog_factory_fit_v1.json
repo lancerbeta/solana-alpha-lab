@@ -1,0 +1,62 @@
+{
+  "schema": "smial.task30.ohlcv-boundary-semantics.factory-fit",
+  "schema_version": "1.0",
+  "receipt_id": "T30-A2-CATALOG-FACTORY-FIT-001",
+  "task_id": "TASK-30",
+  "atom_id": "T30-A1_FROZEN_OHLCV_BOUNDARY_SEMANTICS_DECISION_V1",
+  "review_scope": "FULL_REVIEW",
+  "verdict": "PASS_WITH_LIMITATIONS",
+  "as_of": "2026-08-09",
+  "inputs": {
+    "a1_acceptance": "docs/evidence/task30/a1_ohlcv_boundary_semantics_decision_acceptance_v1.json",
+    "a0_raw_response_sha256": "cce29d4e175bc81a474c699e3bb465daf8cb864f3cb195a9812bd0d3c0ca4163",
+    "prior_negative_route": "EVIDENCE-T27-A1S4-OWNER-ROUTE-CLOSE-001"
+  },
+  "dimensions": {
+    "mission": "PASS: prevents a false continuous-history input from entering a future liquidity-retention decision.",
+    "flexibility": "PASS: exactly two explicit timestamp models keep future vendor evidence replaceable without changing the task-owned record.",
+    "compatibility_and_history": "PASS: raw remains outside Git by its existing retention rule; no historical bytes or prior negative evidence are rewritten.",
+    "efficiency": "PASS: one small evaluator, existing JSON Schema and Catalog generator; no provider switch, retry loop or data platform.",
+    "research_truth": "PASS: a conditional end-label mapping is retained without promotion to continuous, PIT, no-trade, alpha or trial evidence.",
+    "owner_operability": "PASS: one named future proof requirement and no immediate action are clear to the owner.",
+    "execution_to_cashflow": "NOT_APPLICABLE: this is upstream data semantics and creates no execution, position, settlement or cashflow claim.",
+    "monitoring_and_recovery": "PASS: raw retention review remains explicit and ambiguity blocks reuse rather than causing a silent retry.",
+    "build_vs_buy": "ADOPT_EXISTING: retain the vendor response only as bounded evidence and use existing repository validation; no custom collection component."
+  },
+  "red_team": [
+    "The result could be misread as proof that end-labelled candles are canonical; selected_model remains null.",
+    "Source-filled zero-volume records could be misread as observed no-trade events; the recorded semantic state forbids that promotion.",
+    "A future external call could be treated as a retry of T30-A0; A1 grants no provider authority and requires a new exact scope."
+  ],
+  "product_horizon": {
+    "now": null,
+    "watch": {
+      "value": "A future named consumer can reopen only the timestamp-label question, not the whole public-history route.",
+      "owner": "GOAL_OWNER_WITH_GPT_CONTROL_PLANE",
+      "trigger": "INDEPENDENT_EXACT_TIMESTAMP_SEMANTICS_PROOF_AVAILABLE",
+      "cost_risk": "Read-only evidence review first; any provider or account action requires separate exact authority.",
+      "why_not_now": "The retained single response cannot discriminate the label semantics by itself."
+    }
+  },
+  "reuse_first": {
+    "triggered": true,
+    "blocker": "EXTERNAL_DATA_SEMANTIC_AMBIGUITY",
+    "outcome": "ADOPT_EXISTING_FAIL_CLOSED_CONTRACT",
+    "cheapest_falsifier": "Independent exact vendor timestamp-semantics proof; no repeated raw download."
+  },
+  "limits": {
+    "provider_api_rpc_wss_calls": 0,
+    "credential_uses": 0,
+    "r2_r3_reads": 0,
+    "wallet_signer_transaction_actions": 0,
+    "cash_spend_usd_cents": 0,
+    "dependency_changes": 0,
+    "project_sources_changes": 0,
+    "task30_trial_or_acceptance": false
+  },
+  "project_sources_disposition": {
+    "kind": "NO_CHANGE",
+    "reason": "No canonical task status, active Source role or release candidate changes in this bounded offline atom."
+  },
+  "next_boundary": "NO_AUTOMATIC_EXTERNAL_ACTION"
+}
