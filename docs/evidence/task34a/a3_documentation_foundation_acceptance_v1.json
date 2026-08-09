@@ -16,7 +16,7 @@
     "fixture": {"path": "tests/fixtures/task34a/documentation_foundation_v1.json", "sha256": "6493a60e5dd680d2316fe9ba039e7bd3588ef1cee2299e799107824b85b6893c"},
     "resolver": {"path": "src/solana_alpha_lab/task34a_documentation_foundation.py", "sha256": "fccd4c7e3025d5b2ee9352268c7641f5cedb1dd9575643877ed949f81f9df0b5"},
     "context_command": {"path": "scripts/show_task34a_context.py", "sha256": "f6d46b3a53cf9a6e48feab557900a8f8ea63ca209c115d80dfdef6e2b006cfdf"},
-    "navigation_generator": {"path": "scripts/generate_navigation.py", "sha256": "7357278867f3ea953b3efc70581cf349e4a192add32bd7fed2aba0e75560ab27"},
+    "navigation_generator": {"path": "scripts/generate_navigation.py", "sha256": "2c855150a466413fb90ea782d77fc46a74b18a7dfb013ea612181474ae2e82dd"},
     "operator_navigation": {"path": "docs/OPERATOR_NAVIGATION.md", "sha256": "dba905ef661dcc3db74b7899ea99df56a86d807fb2eb61412864741dd12ed201"},
     "entry_runbook": {"path": "docs/runbooks/task_entry_and_resume.md", "sha256": "c1469cdc9fe243dc289705be056c416919ef0b908ffd72258f87b281f12241a0"},
     "mirror_runbook": {"path": "docs/runbooks/source_mirror_drift.md", "sha256": "b4e788cbe135f29d454e9c779a081c0d58e35c8f71336d3b8c486aac247a349a"},

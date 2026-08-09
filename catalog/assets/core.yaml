@@ -1333,7 +1333,7 @@ records:
     repository_path: scripts/generate_navigation.py
   integrity:
     kind: sha256
-    sha256: 7357278867f3ea953b3efc70581cf349e4a192add32bd7fed2aba0e75560ab27
+    sha256: 2c855150a466413fb90ea782d77fc46a74b18a7dfb013ea612181474ae2e82dd
   access:
     mode: task_write
     method: command
@@ -15787,7 +15787,7 @@ records:
   as_of: '2026-08-09'
   truth_owner: TASK-34A
   location: {kind: git_path, logical_uri: 'repo://docs/evidence/task34a/a3_documentation_foundation_acceptance_v1.json', repository_path: docs/evidence/task34a/a3_documentation_foundation_acceptance_v1.json}
-  integrity: {kind: sha256, sha256: 1bf980e064cfb32c1f99b8725927fde207a9edbb41b793c363daf88f89ef7d0a}
+  integrity: {kind: sha256, sha256: 00ae1d14b80b4d943ca7415c9ebbd00074b2d74cb8cfef95b91546bf7956d544}
   access: *t25_read_file
   relations:
   - {relation_type: derived_from, target_asset_id: CONTRACT-T34A-DOCUMENTATION-FOUNDATION-001}

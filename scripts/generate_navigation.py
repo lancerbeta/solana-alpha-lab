@@ -94,9 +94,9 @@ def render_operator_navigation(root: Path, snapshot: Any) -> bytes:
         "GENERATOR-CATALOG-NAVIGATION-001",
         "CTRL-AGENTS-001",
     )
-    missing_ids = [asset_id for asset_id in catalog_ids if asset_id not in snapshot.assets]
-    if missing_ids:
-        raise ValueError("OPERATOR_NAVIGATION_CATALOG_IDS_MISSING:" + ",".join(missing_ids))
+    available_catalog_ids = [
+        asset_id for asset_id in catalog_ids if asset_id in snapshot.assets
+    ]
     lines = [
         "# Operator navigation",
         "",
@@ -139,7 +139,10 @@ def render_operator_navigation(root: Path, snapshot: Any) -> bytes:
         "## Catalog anchors",
         "",
     ]
-    lines.extend(f"- `{asset_id}`" for asset_id in catalog_ids)
+    if available_catalog_ids:
+        lines.extend(f"- `{asset_id}`" for asset_id in available_catalog_ids)
+    else:
+        lines.append("- Catalog anchors are unavailable in this synthetic snapshot.")
     lines.extend(
         [
             "",
