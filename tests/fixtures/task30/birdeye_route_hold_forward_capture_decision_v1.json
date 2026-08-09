@@ -1,0 +1,16 @@
+{
+  "expected_result": {
+    "decision": "HOLD_BIRDEYE_ROUTE_PREPARE_FORWARD_CAPTURE_CANDIDATE",
+    "birdeye_route_state": "HOLD_NO_AUTORETRY",
+    "forward_capture_candidate": {
+      "pool_address": "URqx24yyYxtXXhTbBQnbtPLhtLWYoaDaRxuQuLpNS3S",
+      "slot_seconds": 900,
+      "initial_horizon_seconds": 86400,
+      "max_observation_slots": 96,
+      "provider_selection": "NOT_SELECTED",
+      "scheduler_state": "PLANNED_NOT_BUILT"
+    },
+    "next_boundary": "EXACT_PROVIDER_SELECTION_AND_24H_CAPTURE_GATE_REQUIRED",
+    "project_sources_disposition": "NO_CHANGE"
+  }
+}

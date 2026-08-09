@@ -1,0 +1,66 @@
+schema: smial.task30.birdeye-route-hold-forward-capture.policy
+schema_version: '1.0'
+task_id: TASK-30
+atom_id: T30-A6_BIRDEYE_ROUTE_HOLD_AND_FORWARD_PRICE_CAPTURE_DECISION_V1
+contract_id: TASK30-BIRDEYE-ROUTE-HOLD-FORWARD-CAPTURE-DECISION-V1
+consumer: FUTURE_TASK30_FORWARD_PRICE_CAPTURE_ENTRY_GATE
+evidence_as_of: '2026-08-10'
+birdeye_route:
+  state: HOLD_NO_AUTORETRY
+  observed_ohlcv_http_status: 429
+  historical_panel_claim: false
+  provider_or_pair_unsupported_claim: false
+  reopen_requires:
+    - DOCUMENTED_QUOTA_OR_ACCESS_RECOVERY
+    - NEW_EXACT_OWNER_EXTERNAL_AUTHORIZATION
+forward_capture_candidate:
+  pool_address: URqx24yyYxtXXhTbBQnbtPLhtLWYoaDaRxuQuLpNS3S
+  slot_seconds: 900
+  initial_horizon_seconds: 86400
+  max_observation_slots: 96
+  provider_selection: NOT_SELECTED
+  scheduler_state: PLANNED_NOT_BUILT
+  candle_label_policy: RETAIN_AS_RECEIVED_NO_START_END_PROMOTION
+  missing_slot_policy: RETAIN_TYPED_GAP_NO_BACKFILL
+  observation_time_fields:
+    - slot_open_at
+    - slot_close_at
+    - observed_at
+    - ingested_at
+    - request_identity
+    - response_hash
+    - provider_response_timestamp_if_present
+    - terminal_state
+reuse_boundary:
+  adopt:
+    - CONTENT_ADDRESSED_RAW_MANIFESTS
+    - IDEMPOTENT_SLOT_IDENTITY
+    - PHYSICAL_CAPS
+    - TYPED_GAPS
+    - RECOVERY_AND_DAILY_HEALTH
+  forbidden_reuse:
+    - JUPITER_QUOTE_VALUES
+    - TASK21_TECHNICAL_PROBE_AS_ADMISSION
+    - TASK21_PROVIDER_ENDPOINT
+    - TASK21_EXECUTION_CAPACITY_RUN_PLAN
+authority:
+  provider_api_rpc_wss_calls: 0
+  credential_use: false
+  raw_data_write: false
+  scheduler_or_background_process: false
+  dependency_changes: false
+  wallet_signer_transaction_actions: false
+  cash_spend_usd_cents: 0
+  task30_trial_or_acceptance: false
+  project_sources_changes: false
+non_claims:
+  continuous_panel_claim: false
+  pit_admissible_claim: false
+  explicit_no_trade_claim: false
+  provider_selected_claim: false
+  scheduler_running_claim: false
+  alpha_claim: false
+  numeric_netreturn_claim: false
+decision: HOLD_BIRDEYE_ROUTE_PREPARE_FORWARD_CAPTURE_CANDIDATE
+next_boundary: EXACT_PROVIDER_SELECTION_AND_24H_CAPTURE_GATE_REQUIRED
+project_sources_disposition: NO_CHANGE
