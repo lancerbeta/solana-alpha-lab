@@ -1333,7 +1333,7 @@ records:
     repository_path: scripts/generate_navigation.py
   integrity:
     kind: sha256
-    sha256: aa640f5f104a92e5a7117b135ba4ab9bad4b82414d3a18ded7c71e0cfb521df0
+    sha256: 7357278867f3ea953b3efc70581cf349e4a192add32bd7fed2aba0e75560ab27
   access:
     mode: task_write
     method: command

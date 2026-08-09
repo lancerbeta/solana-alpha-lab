@@ -17,18 +17,29 @@ ROOT = Path(__file__).resolve().parents[1]
 SRC = ROOT / "src"
 if str(SRC) not in sys.path:
     sys.path.insert(0, str(SRC))
+SCRIPTS = ROOT / "scripts"
+if str(SCRIPTS) not in sys.path:
+    sys.path.insert(0, str(SCRIPTS))
 
 from solana_alpha_lab.task34a_documentation_foundation import (
     ContextBindingError,
     evaluate_context,
     render_context_text,
 )
+from generate_navigation import render_operator_navigation
+from validate_catalog import load_and_validate
 
 
 CONFIG_PATH = ROOT / "configs/task34a_documentation_foundation_v1.yaml"
 SCHEMA_PATH = ROOT / "catalog/schemas/task34a_documentation_foundation.schema.json"
 FIXTURE_PATH = ROOT / "tests/fixtures/task34a/documentation_foundation_v1.json"
 CONTEXT_SCRIPT_PATH = ROOT / "scripts/show_task34a_context.py"
+OPERATOR_NAVIGATION_PATH = ROOT / "docs/OPERATOR_NAVIGATION.md"
+RUNBOOK_PATHS = (
+    ROOT / "docs/runbooks/task_entry_and_resume.md",
+    ROOT / "docs/runbooks/source_mirror_drift.md",
+    ROOT / "docs/runbooks/external_authority_stop.md",
+)
 EXPECTED_MIRROR_STATES = [
     "MIRROR_MATCHES_ACTIVE_RELEASE",
     "STALE_MIRROR_ACTIVE_RELEASE_CONFIRMED",
@@ -267,6 +278,26 @@ class Task34aDocumentationFoundationTests(unittest.TestCase):
         self.assertEqual(context["active_release_id"], "PSR-0003-T28-RC001-FREEZE")
         self.assertEqual(context["mirror_state"], "MIRROR_UNAVAILABLE")
         self.assertNotIn("C:\\Users", result.stdout)
+
+    def test_generated_navigation_is_current_and_has_no_absolute_user_path(self) -> None:
+        """Catches a stale operator card or accidental local path in a generated view."""
+        expected = render_operator_navigation(ROOT, load_and_validate())
+
+        self.assertEqual(OPERATOR_NAVIGATION_PATH.read_bytes(), expected)
+        self.assertNotIn(b"C:\\Users\\", expected)
+        self.assertIn(b"PSR-0003-T28-RC001-FREEZE", expected)
+        self.assertIn(b"show_task34a_context.py", expected)
+
+    def test_runbooks_link_to_context_command_and_external_stop(self) -> None:
+        """Catches prose-only procedures that bypass the deterministic context card."""
+        for path in RUNBOOK_PATHS:
+            with self.subTest(path=path.name):
+                text = path.read_text(encoding="utf-8")
+                self.assertIn("show_task34a_context.py", text)
+        self.assertIn(
+            "Do not make a provider call",
+            RUNBOOK_PATHS[-1].read_text(encoding="utf-8"),
+        )
 
 
 if __name__ == "__main__":

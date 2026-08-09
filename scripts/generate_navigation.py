@@ -5,13 +5,21 @@ from __future__ import annotations
 
 import argparse
 import json
+import sys
 from pathlib import Path
 from typing import Any
 
 from validate_catalog import ROOT, load_and_validate
 
+SRC = ROOT / "src"
+if str(SRC) not in sys.path:
+    sys.path.insert(0, str(SRC))
+
+from solana_alpha_lab.task34a_documentation_foundation import evaluate_context
+
 PROJECT_MAP_PATH = "docs/PROJECT_MAP.md"
 EDGE_PROJECTION_PATH = "catalog/generated/asset_edges.json"
+OPERATOR_NAVIGATION_PATH = "docs/OPERATOR_NAVIGATION.md"
 
 
 def markdown_cell(value: object) -> str:
@@ -78,10 +86,75 @@ def render_edge_projection(snapshot: Any) -> bytes:
     return (json.dumps(payload, indent=2, ensure_ascii=False) + "\n").encode("utf-8")
 
 
+def render_operator_navigation(root: Path, snapshot: Any) -> bytes:
+    """Render stable, repository-native entry points without local runtime paths."""
+    context = evaluate_context(root)
+    catalog_ids = (
+        "CATALOG-ROOT-001",
+        "GENERATOR-CATALOG-NAVIGATION-001",
+        "CTRL-AGENTS-001",
+    )
+    missing_ids = [asset_id for asset_id in catalog_ids if asset_id not in snapshot.assets]
+    if missing_ids:
+        raise ValueError("OPERATOR_NAVIGATION_CATALOG_IDS_MISSING:" + ",".join(missing_ids))
+    lines = [
+        "# Operator navigation",
+        "",
+        "Generated from the active Project Sources release and validated Catalog. Do not edit manually.",
+        "This is a short route map, not a second truth owner or a documentation portal.",
+        "",
+        "## Current binding",
+        "",
+        f"- Active Project Sources release: `{context['active_release_id']}`",
+        f"- Owner-smoke receipt: `{context['activation_receipt']}`",
+        f"- Active task in that release: `{context['active_task_id']}`",
+        f"- Bound source roles: `{context['source_role_count']}`",
+        "- A local Project Sources mirror is optional diagnostic input; it is never canonical.",
+        "",
+        "## Safe first command",
+        "",
+        "```powershell",
+        "uv run --locked --managed-python python -B scripts/show_task34a_context.py --format text",
+        "```",
+        "",
+        "To inspect an optional local mirror without printing its path:",
+        "",
+        "```powershell",
+        "uv run --locked --managed-python python -B scripts/show_task34a_context.py --format json --sources-dir <local-sources-directory>",
+        "```",
+        "",
+        "## Read the result",
+        "",
+        "- `MIRROR_MATCHES_ACTIVE_RELEASE`: the optional bytes agree with the active release.",
+        "- `STALE_MIRROR_ACTIVE_RELEASE_CONFIRMED` or `MIRROR_UNAVAILABLE`: use the activated registry/receipt; no automatic repair is needed.",
+        "- `MIRROR_CONFLICT_REQUIRES_CONTROL_REVIEW`: stop selection and resolve the conflicting Source state before proceeding.",
+        "- A `TASK34A_CONTEXT: FAIL` is a release-binding failure, not permission to choose a replacement truth owner.",
+        "",
+        "## Runbooks",
+        "",
+        "- [Start or resume a task](runbooks/task_entry_and_resume.md)",
+        "- [Handle Source mirror drift](runbooks/source_mirror_drift.md)",
+        "- [Stop at external authority](runbooks/external_authority_stop.md)",
+        "",
+        "## Catalog anchors",
+        "",
+    ]
+    lines.extend(f"- `{asset_id}`" for asset_id in catalog_ids)
+    lines.extend(
+        [
+            "",
+            "No provider, credential, wallet, transaction, cash, deployment, or Project Sources UI action is performed by these commands.",
+            "",
+        ]
+    )
+    return "\n".join(lines).encode("utf-8")
+
+
 def expected_outputs(snapshot: Any) -> dict[str, bytes]:
     return {
         PROJECT_MAP_PATH: render_project_map(snapshot),
         EDGE_PROJECTION_PATH: render_edge_projection(snapshot),
+        OPERATOR_NAVIGATION_PATH: render_operator_navigation(ROOT, snapshot),
     }
 
 
