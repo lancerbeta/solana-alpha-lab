@@ -1,0 +1,72 @@
+{
+  "schema": "smial.task30.birdeye-v3-pair-history-pilot.factory-fit",
+  "schema_version": "1.0",
+  "receipt_id": "T30-A5-BIRDEYE-V3-HISTORY-PILOT-FACTORY-FIT-001",
+  "task_id": "TASK-30",
+  "atom_id": "T30-A5_BOUNDED_BIRDEYE_V3_PAIR_HISTORY_PILOT_PREPARATION_V1",
+  "review_scope": "FULL_REVIEW",
+  "verdict": "PASS_WITH_LIMITATIONS",
+  "mission_fit": {
+    "result": "PASS",
+    "reason": "It turns a named provider candidate into a bounded falsification path instead of treating provider documentation as historical research evidence."
+  },
+  "research_truth": {
+    "result": "PASS_WITH_LIMITATIONS",
+    "reason": "All response-dependent semantics, including 15m acceptance, price unit, padded intervals, completeness, and PIT availability, remain unproven until a separately authorized observation is reviewed."
+  },
+  "owner_operability": {
+    "result": "PASS",
+    "reason": "The later owner needs one decision about a two-GET cap; key material stays local and is never copied into the packet."
+  },
+  "execution_to_cashflow": {
+    "result": "NOT_APPLICABLE",
+    "reason": "This is a historical-data feasibility boundary with no execution, inventory, position, fee, settlement, or cashflow action."
+  },
+  "monitoring_and_recovery": {
+    "result": "PASS",
+    "reason": "Any non-200 or malformed result closes the attempted route without retry or provider substitution; missing information is retained as a gap."
+  },
+  "reuse_first": {
+    "trigger": "THREE_PREVIOUS_HISTORY_ROUTES_WERE_AMBIGUOUS_OR_INSUFFICIENT",
+    "alternatives_considered": [
+      "GECKOTERMINAL_RETAINED_RESPONSE",
+      "SOLANA_TRACKER_POOL_HISTORY",
+      "HELIUS_TRANSACTION_RECONSTRUCTION",
+      "BIRDEYE_V3_PAIR_HTTP_SURFACE"
+    ],
+    "outcome": "ADOPT_EXISTING",
+    "reason": "Use Birdeye's documented pair-level API surface through a future standard header-only transport; do not build a collector or reconstruct transactions before the simple two-read falsifier."
+  },
+  "product_horizon": {
+    "now": {
+      "candidate": "OFFLINE_TWO_READ_OWNER_PACKET",
+      "value": "Removes ambiguity from the next provider decision while keeping real quota and credentials outside the current task.",
+      "owner": "WORK/CODEX",
+      "activation_trigger": "A5 offline package validation.",
+      "why_now": "The earlier routes were closed with explicit reasons, and a named alternative has a documented pair-level surface."
+    },
+    "watch": {
+      "candidate": "BIRDEYE_TWO_READ_EXTERNAL_FALSIFIER",
+      "value": "Can cheaply show whether this exact pair and 15m range are technically observable before any research trial is considered.",
+      "owner": "GOAL_OWNER",
+      "activation_trigger": "Exact credentialed-provider authority plus a local non-secret key-presence attestation.",
+      "why_not_now": "No external authority or credential-presence attestation belongs to this offline atom."
+    }
+  },
+  "build_vs_buy": {
+    "decision": "ADOPT",
+    "reason": "The documented provider endpoint and a pure policy evaluator meet the bounded need; an SDK, collector, adapter layer, or transaction reconstruction would be wider and less falsifiable."
+  },
+  "state_change": "NONE",
+  "project_sources_disposition": "NO_CHANGE",
+  "side_effect_counters": {
+    "provider_api_rpc_wss_calls": 0,
+    "credential_uses": 0,
+    "raw_data_writes": 0,
+    "r2_r3_reads": 0,
+    "wallet_signer_transaction_actions": 0,
+    "cash_spend_usd_cents": 0,
+    "dependency_changes": 0,
+    "project_sources_changes": 0
+  }
+}

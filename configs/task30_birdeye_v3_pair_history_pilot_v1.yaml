@@ -1,0 +1,82 @@
+schema: smial.task30.birdeye-v3-pair-history-pilot.policy
+schema_version: '1.0'
+task_id: TASK-30
+atom_id: T30-A5_BOUNDED_BIRDEYE_V3_PAIR_HISTORY_PILOT_PREPARATION_V1
+contract_id: TASK30-BIRDEYE-V3-PAIR-HISTORY-PILOT-V1
+consumer: FUTURE_EXACT_OWNER_EXTERNAL_READ_GATE
+frozen_identity:
+  network: solana
+  pool_address: URqx24yyYxtXXhTbBQnbtPLhtLWYoaDaRxuQuLpNS3S
+  base_mint: DMwbVy48dWVKGe9z1pcVnwF3HLMLrqWdDLfbvx8RchhK
+  quote_mint: So11111111111111111111111111111111111111112
+  dex_id: pumpswap
+  source_receipt: docs/evidence/task27/a1_stage_a_public_pair_identity_runtime_receipt_v1.json
+authority:
+  provider_api_rpc_wss_calls: 0
+  credential_use: false
+  raw_data_write: false
+  r2_r3_access: false
+  dependency_changes: false
+  wallet_signer_transaction_actions: false
+  cash_spend: false
+  task30_trial_or_acceptance: false
+  project_sources_changes: false
+owner_authority:
+  status: NOT_GRANTED
+  future_request_cap: 2
+local_credential_presence:
+  status: UNATTESTED
+future_reads:
+  - read_id: PAIR_OVERVIEW_IDENTITY_READ
+    method: GET
+    endpoint_path: /defi/v3/pair/overview/single
+    header_policy:
+      x_chain: solana
+      credential_transport: LOCAL_HEADER_ONLY_NO_VALUE
+    query:
+      address: URqx24yyYxtXXhTbBQnbtPLhtLWYoaDaRxuQuLpNS3S
+      ui_amount_mode: raw
+    max_attempts: 1
+    fallback_provider: null
+    stop_chain_on_non_200: true
+    execute_only_if_prior: null
+    raw_retention: OUTSIDE_GIT_A4_IF_LATER_AUTHORIZED
+  - read_id: PAIR_OHLCV_RANGE_READ
+    method: GET
+    endpoint_path: /defi/v3/ohlcv/pair
+    header_policy:
+      x_chain: solana
+      credential_transport: LOCAL_HEADER_ONLY_NO_VALUE
+    query:
+      address: URqx24yyYxtXXhTbBQnbtPLhtLWYoaDaRxuQuLpNS3S
+      type: 15m
+      time_from: 1786100400
+      time_to: 1786186800
+      mode: range
+      padding: true
+      outlier: true
+      inversion: false
+    max_attempts: 1
+    fallback_provider: null
+    stop_chain_on_non_200: true
+    execute_only_if_prior: IDENTITY_READ_HTTP_200
+    raw_retention: OUTSIDE_GIT_A4_IF_LATER_AUTHORIZED
+semantic_state:
+  rest_15m_enum: UNPROVEN_PENDING_RESPONSE
+  birdeye_pair_indexing: UNPROVEN_PENDING_RESPONSE
+  price_unit: UNPROVEN_PENDING_RESPONSE
+  empty_interval_meaning: UNPROVEN_PENDING_RESPONSE
+  panel_completeness: UNPROVEN_PENDING_RESPONSE
+  pit_admissibility: UNPROVEN
+non_claims:
+  continuous_panel: false
+  explicit_no_trade: false
+  pit_admissible: false
+  alpha: false
+  task30_trial: false
+  numeric_netreturn: false
+  execution: false
+  actual_fills: false
+  settlement: false
+decision: OFFLINE_PACKET_READY_FOR_OWNER_AUTHORITY_GATE
+project_sources_disposition: NO_CHANGE

@@ -1,0 +1,13 @@
+{
+  "fixture_kind": "SYNTHETIC_GOLDEN_ONLY",
+  "expected_result": {
+    "decision": "OFFLINE_PACKET_READY_FOR_OWNER_AUTHORITY_GATE",
+    "future_external_authority": "NOT_GRANTED",
+    "future_request_cap": 2,
+    "future_read_ids": [
+      "PAIR_OVERVIEW_IDENTITY_READ",
+      "PAIR_OHLCV_RANGE_READ"
+    ],
+    "project_sources_disposition": "NO_CHANGE"
+  }
+}
