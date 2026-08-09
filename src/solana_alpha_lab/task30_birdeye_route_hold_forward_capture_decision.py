@@ -39,6 +39,72 @@ FORBIDDEN_CREDENTIAL_KEYS = {
     "secret",
     "password",
 }
+TOP_LEVEL_KEYS = frozenset(
+    {
+        "schema",
+        "schema_version",
+        "task_id",
+        "atom_id",
+        "contract_id",
+        "consumer",
+        "evidence_as_of",
+        "birdeye_route",
+        "forward_capture_candidate",
+        "reuse_boundary",
+        "authority",
+        "non_claims",
+        "decision",
+        "next_boundary",
+        "project_sources_disposition",
+    }
+)
+BIRDEYE_ROUTE_KEYS = frozenset(
+    {
+        "state",
+        "observed_ohlcv_http_status",
+        "historical_panel_claim",
+        "provider_or_pair_unsupported_claim",
+        "reopen_requires",
+    }
+)
+FORWARD_CAPTURE_CANDIDATE_KEYS = frozenset(
+    {
+        "pool_address",
+        "slot_seconds",
+        "initial_horizon_seconds",
+        "max_observation_slots",
+        "provider_selection",
+        "scheduler_state",
+        "candle_label_policy",
+        "missing_slot_policy",
+        "observation_time_fields",
+    }
+)
+REUSE_BOUNDARY_KEYS = frozenset({"adopt", "forbidden_reuse"})
+AUTHORITY_KEYS = frozenset(
+    {
+        "provider_api_rpc_wss_calls",
+        "credential_use",
+        "raw_data_write",
+        "scheduler_or_background_process",
+        "dependency_changes",
+        "wallet_signer_transaction_actions",
+        "cash_spend_usd_cents",
+        "task30_trial_or_acceptance",
+        "project_sources_changes",
+    }
+)
+NON_CLAIMS_KEYS = frozenset(
+    {
+        "continuous_panel_claim",
+        "pit_admissible_claim",
+        "explicit_no_trade_claim",
+        "provider_selected_claim",
+        "scheduler_running_claim",
+        "alpha_claim",
+        "numeric_netreturn_claim",
+    }
+)
 
 
 class BirdeyeRouteHoldForwardCaptureError(ValueError):
@@ -53,6 +119,10 @@ def _require(condition: bool, code: str) -> None:
 def _mapping(value: object, code: str) -> Mapping[str, Any]:
     _require(isinstance(value, Mapping), code)
     return value
+
+
+def _exact_keys(value: Mapping[str, Any], expected: frozenset[str], code: str) -> None:
+    _require(frozenset(value) == expected, code)
 
 
 def _contains_credential_key(value: object) -> bool:
@@ -71,6 +141,7 @@ def evaluate_birdeye_route_hold_forward_capture(
     config: Mapping[str, Any],
 ) -> dict[str, Any]:
     """Return the sole permitted offline hold-and-forward-capture decision."""
+    _exact_keys(config, TOP_LEVEL_KEYS, "POLICY_KEYS_DRIFT")
     _require(
         config.get("schema") == "smial.task30.birdeye-route-hold-forward-capture.policy",
         "SCHEMA_DRIFT",
@@ -95,6 +166,7 @@ def evaluate_birdeye_route_hold_forward_capture(
     _require(not _contains_credential_key(config), "CREDENTIAL_DISCLOSURE_FORBIDDEN")
 
     route = _mapping(config.get("birdeye_route"), "BIRDEYE_ROUTE_REQUIRED")
+    _exact_keys(route, BIRDEYE_ROUTE_KEYS, "BIRDEYE_ROUTE_KEYS_DRIFT")
     _require(route.get("state") == "HOLD_NO_AUTORETRY", "BIRDEYE_AUTORETRY_FORBIDDEN")
     _require(
         route.get("observed_ohlcv_http_status") == 429
@@ -117,6 +189,11 @@ def evaluate_birdeye_route_hold_forward_capture(
 
     candidate = _mapping(
         config.get("forward_capture_candidate"), "FORWARD_CAPTURE_CANDIDATE_REQUIRED"
+    )
+    _exact_keys(
+        candidate,
+        FORWARD_CAPTURE_CANDIDATE_KEYS,
+        "FORWARD_CAPTURE_CANDIDATE_KEYS_DRIFT",
     )
     _require(candidate.get("pool_address") == FROZEN_POOL, "POOL_EXPANSION_FORBIDDEN")
     _require(
@@ -157,6 +234,7 @@ def evaluate_birdeye_route_hold_forward_capture(
     )
 
     reuse = _mapping(config.get("reuse_boundary"), "REUSE_BOUNDARY_REQUIRED")
+    _exact_keys(reuse, REUSE_BOUNDARY_KEYS, "REUSE_BOUNDARY_KEYS_DRIFT")
     _require(reuse.get("adopt") == EXPECTED_ADOPT, "REUSE_ADOPT_DRIFT")
     _require(
         reuse.get("forbidden_reuse") == EXPECTED_FORBIDDEN_REUSE,
@@ -164,6 +242,7 @@ def evaluate_birdeye_route_hold_forward_capture(
     )
 
     authority = _mapping(config.get("authority"), "AUTHORITY_REQUIRED")
+    _exact_keys(authority, AUTHORITY_KEYS, "AUTHORITY_KEYS_DRIFT")
     _require(
         authority.get("provider_api_rpc_wss_calls") == 0
         and not isinstance(authority.get("provider_api_rpc_wss_calls"), bool),
@@ -189,6 +268,7 @@ def evaluate_birdeye_route_hold_forward_capture(
         _require(authority.get(field) is False, "EXTERNAL_AUTHORITY_FORBIDDEN")
 
     non_claims = _mapping(config.get("non_claims"), "NON_CLAIMS_REQUIRED")
+    _exact_keys(non_claims, NON_CLAIMS_KEYS, "NON_CLAIMS_KEYS_DRIFT")
     for field in (
         "continuous_panel_claim",
         "pit_admissible_claim",
