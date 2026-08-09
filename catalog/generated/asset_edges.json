@@ -355,6 +355,11 @@
     {
       "source_asset_id": "CI-VALIDATOR-001",
       "relation": "depends_on",
+      "target_asset_id": "SCRIPT-TASK-CLOSE-FAST-PATH-001"
+    },
+    {
+      "source_asset_id": "CI-VALIDATOR-001",
+      "relation": "depends_on",
       "target_asset_id": "VALIDATOR-T04-ARCHITECTURE-001"
     },
     {
@@ -1056,6 +1061,11 @@
       "source_asset_id": "CTRL-AGENTS-001",
       "relation": "governed_by",
       "target_asset_id": "CTRL-TASK-04-001"
+    },
+    {
+      "source_asset_id": "CTRL-AGENTS-001",
+      "relation": "governed_by",
+      "target_asset_id": "POLICY-TASK-CLOSE-FAST-PATH-001"
     },
     {
       "source_asset_id": "CTRL-BATON-SETUP-001",
@@ -4188,6 +4198,21 @@
       "target_asset_id": "TEST-OWNER-ATTENTION-GATE-001"
     },
     {
+      "source_asset_id": "POLICY-TASK-CLOSE-FAST-PATH-001",
+      "relation": "contains",
+      "target_asset_id": "SCRIPT-TASK-CLOSE-FAST-PATH-001"
+    },
+    {
+      "source_asset_id": "POLICY-TASK-CLOSE-FAST-PATH-001",
+      "relation": "governed_by",
+      "target_asset_id": "CTRL-AGENTS-001"
+    },
+    {
+      "source_asset_id": "POLICY-TASK-CLOSE-FAST-PATH-001",
+      "relation": "validated_by",
+      "target_asset_id": "TEST-TASK-CLOSE-FAST-PATH-001"
+    },
+    {
       "source_asset_id": "PRE-GIT-TASK01-A017",
       "relation": "derived_from",
       "target_asset_id": "BUNDLE-TASK01-COMPLETION-001"
@@ -5241,6 +5266,11 @@
       "source_asset_id": "SCRIPT-T22-SPLIT-RESOLUTION-001",
       "relation": "depends_on",
       "target_asset_id": "MODULE-T22-SPLIT-RESOLUTION-001"
+    },
+    {
+      "source_asset_id": "SCRIPT-TASK-CLOSE-FAST-PATH-001",
+      "relation": "governed_by",
+      "target_asset_id": "POLICY-TASK-CLOSE-FAST-PATH-001"
     },
     {
       "source_asset_id": "TEMPLATE-BATON-ISSUE-FORM-001",
@@ -6501,6 +6531,16 @@
       "source_asset_id": "TEST-T28-RC001-REGISTRY-FREEZE-001",
       "relation": "depends_on",
       "target_asset_id": "SCHEMA-T28-RC001-REGISTRY-FREEZE-001"
+    },
+    {
+      "source_asset_id": "TEST-TASK-CLOSE-FAST-PATH-001",
+      "relation": "depends_on",
+      "target_asset_id": "POLICY-TASK-CLOSE-FAST-PATH-001"
+    },
+    {
+      "source_asset_id": "TEST-TASK-CLOSE-FAST-PATH-001",
+      "relation": "depends_on",
+      "target_asset_id": "SCRIPT-TASK-CLOSE-FAST-PATH-001"
     },
     {
       "source_asset_id": "VALIDATOR-REPOSITORY-STATE-001",

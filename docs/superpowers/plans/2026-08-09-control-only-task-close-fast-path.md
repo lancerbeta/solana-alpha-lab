@@ -170,7 +170,7 @@ Expected: all tests PASS with no new skips.
 
 - [ ] **Step 1: Add Catalog and lifecycle records**
 
-Register the policy, script, and test with truth owner `CTRL-TASK-CLOSE-FAST-PATH`, relationships `policy contains script`, `policy validated_by test`, and consumers `FACTORY-001` plus `LOCAL-WORK-CODEX`. Add one lifecycle owner record without changing research, strategy, bot, or trial registries. Bump Catalog from `0.43.0 / 581 / 59` to `0.44.0 / 584 / 60`; schemas and queries stay unchanged.
+Register the policy, script, and test with truth owner `CTRL-TASK-CLOSE-FAST-PATH`, relationships `policy contains script`, `policy validated_by test`, and consumers `FACTORY-001` plus `LOCAL-WORK-CODEX`. Do not add a lifecycle record: the patch changes control plumbing, not a hypothesis, trial, strategy, bot, or decision lifecycle. Bump Catalog from `0.43.0 / 581 / 59` to `0.44.0 / 584 / 59`; schemas and queries stay unchanged.
 
 - [ ] **Step 2: Regenerate navigation and refresh exact hashes**
 

@@ -174,9 +174,36 @@ Tracked-only delivery preflight:
 uv run --locked --managed-python python -B scripts/validate_ci.py --tracked-only-delivery
 ```
 
+Control-only task-close fast path:
+
+```text
+uv run --locked --managed-python python -B scripts/validate_ci.py --control-only-task-close
+```
+
+## CONTROL_ONLY_TASK_CLOSE_FAST_PATH
+
+- The fast path is prospective and applies only after one exact owner terminal
+  `TASK<NN>_SOURCE_SMOKE=PASS; OWNER_DONE_ACCEPTANCE`. The two clauses are
+  validated separately: Source smoke never implies task DONE, and task
+  acceptance never activates Project Sources.
+- `control/control_only_task_close_fast_path_v1.yaml` admits exactly one new
+  combined activation-and-close receipt plus the closed registry and
+  Catalog/generated write set. Product code, tests, schemas, contracts,
+  workflows, release payloads, dependencies, deletes, renames, and repairs are
+  ineligible.
+- Run the focused gate once for the exact committed candidate before push.
+  `GITHUB_PR_EXACT_HEAD_CI` is the full-suite owner; exact-main post-merge CI
+  remains mandatory.
+- Any classification or focused-check failure falls back to
+  `--tracked-only-delivery`; owner attention cannot waive a failed check.
+- Keep the fast path only if the next three eligible task closes need no
+  control/clean-checkout repair and each local focused gate finishes within
+  120 seconds. A false classification or missed drift disables the path.
+
 ## TRACKED_ONLY_DELIVERY_PREFLIGHT
 
-- Run the tracked-only delivery preflight once for the exact committed
+- Unless `CONTROL_ONLY_TASK_CLOSE_FAST_PATH` admits the exact candidate, run
+  the tracked-only delivery preflight once for the exact committed
   candidate before its first push. It creates an isolated local clone from Git
   objects, copies no untracked or ignored inputs, runs the full locked gate
   offline, removes the temporary checkout, and writes a compact ignored receipt
@@ -203,9 +230,11 @@ uv run --locked --managed-python python -B scripts/validate_ci.py --tracked-only
 - When the route guarantees full validation on the same pushed head, Cursor may
   return targeted evidence plus `FULL_VALIDATION=DELEGATED_TO_CI`, then read
   back CI when transport is available. Delegation is not a blocker.
-- For a delivery candidate, the tracked-only preflight is the local full-gate
-  owner. GitHub CI remains the independent remote read-back; do not add another
-  local full-gate run for unchanged bytes.
+- For an ordinary delivery candidate, the tracked-only preflight is the local
+  full-gate owner. For an admitted control-only close,
+  `GITHUB_PR_EXACT_HEAD_CI` is the sole full-gate owner after the focused local
+  gate. In both cases GitHub remains the independent remote read-back; do not
+  add another local full-gate run for unchanged bytes.
 - Re-run a failed check only after its root cause changed; re-run a passed full
   gate only when the candidate fingerprint, dependencies, relevant runtime, or
   validation policy changed.

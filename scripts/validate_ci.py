@@ -568,10 +568,16 @@ def validate() -> None:
 
 def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument(
+    delivery_mode = parser.add_mutually_exclusive_group()
+    delivery_mode.add_argument(
         "--tracked-only-delivery",
         action="store_true",
         help="validate exact committed bytes in an isolated tracked-only clone",
+    )
+    delivery_mode.add_argument(
+        "--control-only-task-close",
+        action="store_true",
+        help="run the fail-closed focused gate for an eligible combined task close",
     )
     parser.add_argument(
         "--base-ref",
@@ -586,6 +592,10 @@ def main(argv: list[str] | None = None) -> int:
     try:
         if args.tracked_only_delivery:
             run_tracked_only_delivery_preflight(base_ref=args.base_ref)
+        elif args.control_only_task_close:
+            from control_only_task_close_fast_path import run_fast_path
+
+            run_fast_path(base_ref=args.base_ref)
         else:
             validate()
     except Exception as exc:
