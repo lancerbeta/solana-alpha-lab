@@ -1,0 +1,135 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://solana-alpha-lab.local/schemas/task30_reuse_first_pit_history_route_decision.schema.json",
+  "title": "TASK-30 reuse-first PIT history route decision",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema", "schema_version", "task_id", "atom_id", "contract_id", "consumer",
+    "evidence_as_of", "routes", "authority", "non_claims", "decision",
+    "next_boundary", "project_sources_disposition"
+  ],
+  "properties": {
+    "schema": {"const": "smial.task30.reuse-first-pit-history-route.policy"},
+    "schema_version": {"const": "1.0"},
+    "task_id": {"const": "TASK-30"},
+    "atom_id": {"const": "T30-A4_REUSE_FIRST_PIT_HISTORY_ROUTE_DECISION_V1"},
+    "contract_id": {"const": "TASK30-REUSE-FIRST-PIT-HISTORY-ROUTE-DECISION-V1"},
+    "consumer": {"const": "FUTURE_NAMED_PROVIDER_ENTRY_GATE"},
+    "evidence_as_of": {"const": "2026-08-09"},
+    "routes": {"$ref": "#/$defs/routes"},
+    "authority": {"$ref": "#/$defs/authority"},
+    "non_claims": {"$ref": "#/$defs/non_claims"},
+    "decision": {"const": "T30_A0_REUSE_CLOSED_NO_PROVIDER_PILOT"},
+    "next_boundary": {"const": "NEW_NAMED_PROVIDER_CANDIDATE_REQUIRES_ENTRY_GATE"},
+    "project_sources_disposition": {"const": "NO_CHANGE"}
+  },
+  "$defs": {
+    "routes": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["GECKO_T30_A0", "SOLANA_TRACKER_PAIR", "BIRDEYE_V3_PAIR"],
+      "properties": {
+        "GECKO_T30_A0": {"$ref": "#/$defs/gecko_route"},
+        "SOLANA_TRACKER_PAIR": {"$ref": "#/$defs/solana_tracker_route"},
+        "BIRDEYE_V3_PAIR": {"$ref": "#/$defs/birdeye_route"}
+      }
+    },
+    "gecko_route": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["route_state", "raw_sha256", "requested_window", "observed_response", "documentation"],
+      "properties": {
+        "route_state": {"const": "DOCUMENTED_START_LABEL_CONFLICTS_WITH_RETAINED_BOUNDARY"},
+        "raw_sha256": {"const": "cce29d4e175bc81a474c699e3bb465daf8cb864f3cb195a9812bd0d3c0ca4163"},
+        "requested_window": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["start", "end_exclusive"],
+          "properties": {"start": {"const": 1786100400}, "end_exclusive": {"const": 1786186800}}
+        },
+        "observed_response": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["first_timestamp", "newest_timestamp", "boundary_conflict"],
+          "properties": {
+            "first_timestamp": {"const": 1786101300},
+            "newest_timestamp": {"const": 1786186800},
+            "boundary_conflict": {"const": "OBSERVED_CONFLICT"}
+          }
+        },
+        "documentation": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["url", "candle_timestamp", "before_timestamp", "include_empty_intervals"],
+          "properties": {
+            "url": {"const": "https://docs.coingecko.com/reference/pool-ohlcv-contract-address"},
+            "candle_timestamp": {"const": "START_OF_INTERVAL_DOCUMENTED"},
+            "before_timestamp": {"const": "STRICTLY_BEFORE_DOCUMENTED"},
+            "include_empty_intervals": {"const": "PRIOR_CLOSE_OHLC_ZERO_VOLUME_DOCUMENTED"}
+          }
+        }
+      }
+    },
+    "solana_tracker_route": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["route_state", "documentation_url", "interval_enum", "identity_input", "observed_bars", "required_bars"],
+      "properties": {
+        "route_state": {"const": "OBSERVED_INSUFFICIENT_33_OF_96"},
+        "documentation_url": {"const": "https://docs.solanatracker.io/data-api/chart/get-ohlcv-data-for-a-tokenpool-pair"},
+        "interval_enum": {"const": "15m_DOCUMENTED"},
+        "identity_input": {"const": "TOKEN_AND_POOL_DOCUMENTED"},
+        "observed_bars": {"const": 33},
+        "required_bars": {"const": 96}
+      }
+    },
+    "birdeye_route": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["route_state", "documentation_url", "padding", "rest_15m_enum", "pair_identity", "credential_presence", "owner_call_authority"],
+      "properties": {
+        "route_state": {"const": "CANDIDATE_NOT_READY"},
+        "documentation_url": {"const": "https://docs.birdeye.so/reference/get-defi-v3-ohlcv-pair"},
+        "padding": {"const": "DOCUMENTED"},
+        "rest_15m_enum": {"const": "UNPROVEN"},
+        "pair_identity": {"const": "UNPROVEN"},
+        "credential_presence": {"const": "UNATTESTED"},
+        "owner_call_authority": {"const": "NOT_GRANTED"}
+      }
+    },
+    "authority": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["provider_api_rpc_wss_calls", "credential_use", "raw_data_write", "r2_r3_access", "dependency_changes", "wallet_signer_transaction_actions", "cash_spend", "task30_trial_or_acceptance", "project_sources_changes"],
+      "properties": {
+        "provider_api_rpc_wss_calls": {"const": 0},
+        "credential_use": {"const": false},
+        "raw_data_write": {"const": false},
+        "r2_r3_access": {"const": false},
+        "dependency_changes": {"const": false},
+        "wallet_signer_transaction_actions": {"const": false},
+        "cash_spend": {"const": false},
+        "task30_trial_or_acceptance": {"const": false},
+        "project_sources_changes": {"const": false}
+      }
+    },
+    "non_claims": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["continuous_panel_claim", "pit_admissible_claim", "explicit_no_trade_claim", "alpha_claim", "strategy_claim", "execution_claim", "actual_fills_claim", "settlement_claim", "pnl_claim", "numeric_netreturn_claim"],
+      "properties": {
+        "continuous_panel_claim": {"const": false},
+        "pit_admissible_claim": {"const": false},
+        "explicit_no_trade_claim": {"const": false},
+        "alpha_claim": {"const": false},
+        "strategy_claim": {"const": false},
+        "execution_claim": {"const": false},
+        "actual_fills_claim": {"const": false},
+        "settlement_claim": {"const": false},
+        "pnl_claim": {"const": false},
+        "numeric_netreturn_claim": {"const": false}
+      }
+    }
+  }
+}

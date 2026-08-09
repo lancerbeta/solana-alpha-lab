@@ -1,0 +1,62 @@
+schema: smial.task30.reuse-first-pit-history-route.policy
+schema_version: '1.0'
+task_id: TASK-30
+atom_id: T30-A4_REUSE_FIRST_PIT_HISTORY_ROUTE_DECISION_V1
+contract_id: TASK30-REUSE-FIRST-PIT-HISTORY-ROUTE-DECISION-V1
+consumer: FUTURE_NAMED_PROVIDER_ENTRY_GATE
+evidence_as_of: '2026-08-09'
+routes:
+  GECKO_T30_A0:
+    route_state: DOCUMENTED_START_LABEL_CONFLICTS_WITH_RETAINED_BOUNDARY
+    raw_sha256: cce29d4e175bc81a474c699e3bb465daf8cb864f3cb195a9812bd0d3c0ca4163
+    requested_window:
+      start: 1786100400
+      end_exclusive: 1786186800
+    observed_response:
+      first_timestamp: 1786101300
+      newest_timestamp: 1786186800
+      boundary_conflict: OBSERVED_CONFLICT
+    documentation:
+      url: https://docs.coingecko.com/reference/pool-ohlcv-contract-address
+      candle_timestamp: START_OF_INTERVAL_DOCUMENTED
+      before_timestamp: STRICTLY_BEFORE_DOCUMENTED
+      include_empty_intervals: PRIOR_CLOSE_OHLC_ZERO_VOLUME_DOCUMENTED
+  SOLANA_TRACKER_PAIR:
+    route_state: OBSERVED_INSUFFICIENT_33_OF_96
+    documentation_url: https://docs.solanatracker.io/data-api/chart/get-ohlcv-data-for-a-tokenpool-pair
+    interval_enum: 15m_DOCUMENTED
+    identity_input: TOKEN_AND_POOL_DOCUMENTED
+    observed_bars: 33
+    required_bars: 96
+  BIRDEYE_V3_PAIR:
+    route_state: CANDIDATE_NOT_READY
+    documentation_url: https://docs.birdeye.so/reference/get-defi-v3-ohlcv-pair
+    padding: DOCUMENTED
+    rest_15m_enum: UNPROVEN
+    pair_identity: UNPROVEN
+    credential_presence: UNATTESTED
+    owner_call_authority: NOT_GRANTED
+authority:
+  provider_api_rpc_wss_calls: 0
+  credential_use: false
+  raw_data_write: false
+  r2_r3_access: false
+  dependency_changes: false
+  wallet_signer_transaction_actions: false
+  cash_spend: false
+  task30_trial_or_acceptance: false
+  project_sources_changes: false
+non_claims:
+  continuous_panel_claim: false
+  pit_admissible_claim: false
+  explicit_no_trade_claim: false
+  alpha_claim: false
+  strategy_claim: false
+  execution_claim: false
+  actual_fills_claim: false
+  settlement_claim: false
+  pnl_claim: false
+  numeric_netreturn_claim: false
+decision: T30_A0_REUSE_CLOSED_NO_PROVIDER_PILOT
+next_boundary: NEW_NAMED_PROVIDER_CANDIDATE_REQUIRES_ENTRY_GATE
+project_sources_disposition: NO_CHANGE
