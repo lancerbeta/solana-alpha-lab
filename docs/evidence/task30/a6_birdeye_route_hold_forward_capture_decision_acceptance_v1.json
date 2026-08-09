@@ -1,0 +1,128 @@
+{
+  "schema": "smial.task30.birdeye-route-hold-forward-capture-decision.acceptance",
+  "schema_version": "1.0",
+  "receipt_id": "T30-A6-BIRDEYE-ROUTE-HOLD-FORWARD-CAPTURE-001",
+  "task_id": "TASK-30",
+  "atom_id": "T30-A6_BIRDEYE_ROUTE_HOLD_AND_FORWARD_PRICE_CAPTURE_DECISION_V1",
+  "status": "VALIDATED_OFFLINE_ROUTE_HOLD_AND_FORWARD_CAPTURE_DECISION",
+  "artifact_bindings": {
+    "contract": {
+      "path": "docs/contracts/task30_birdeye_route_hold_forward_capture_decision_contract_v1.md",
+      "sha256": "3200b008ce11f6348ce6b482d199be0bbffa5ed069d553bc0c669f2bb28f997a"
+    },
+    "configuration": {
+      "path": "configs/task30_birdeye_route_hold_forward_capture_decision_v1.yaml",
+      "sha256": "c00522e9fd91b7c9c62241ae6dec79ad33df19405e99307f4f1c808ff9349489"
+    },
+    "schema": {
+      "path": "catalog/schemas/task30_birdeye_route_hold_forward_capture_decision.schema.json",
+      "sha256": "41958079a748551211ec83a1a2997c11548bad7d867198414536bf28d8e4df34"
+    },
+    "fixture": {
+      "path": "tests/fixtures/task30/birdeye_route_hold_forward_capture_decision_v1.json",
+      "sha256": "f45a94b60af95505e482d4a82bc45dd08658ac1e321d64adf9c3aa6d4397716b"
+    },
+    "module": {
+      "path": "src/solana_alpha_lab/task30_birdeye_route_hold_forward_capture_decision.py",
+      "sha256": "9a7f8e66a1fd29f0f9bc07452fbe8104db5fd711e6cd13bf7d3f141288629c87"
+    },
+    "test": {
+      "path": "tests/test_task30_birdeye_route_hold_forward_capture_decision.py",
+      "sha256": "e1dfc795dec6565efed695d4873b13b7bfaab2c87dfe2e08f280ce335f35f4f4"
+    }
+  },
+  "input_evidence": {
+    "a5r1_runtime_receipt": {
+      "path": "docs/evidence/task30/a5r1_birdeye_v3_external_read_runtime_receipt_v1.json",
+      "sha256": "a4f69df4dcff2afe88c06828884ec9155af8bfe91b659080cfed74ab1acbcdf1",
+      "decision": "PAIR_IDENTITY_ACCEPTED_OHLCV_RATE_OR_QUOTA_LIMITED"
+    },
+    "a5r1_factory_fit": {
+      "path": "docs/evidence/task30/a5r1_birdeye_v3_external_read_factory_fit_v1.json",
+      "sha256": "5570cef7754db2ce951584635718d113f00edb17046a1933f4f1ba65f38675fb",
+      "decision": "RATE_LIMITED_READ_CLOSE_NO_RETRY_OR_FALLBACK"
+    }
+  },
+  "decision": {
+    "value": "HOLD_BIRDEYE_ROUTE_PREPARE_FORWARD_CAPTURE_CANDIDATE",
+    "birdeye_route_state": "HOLD_NO_AUTORETRY",
+    "forward_capture_candidate": {
+      "pool_address": "URqx24yyYxtXXhTbBQnbtPLhtLWYoaDaRxuQuLpNS3S",
+      "slot_seconds": 900,
+      "initial_horizon_seconds": 86400,
+      "max_observation_slots": 96,
+      "provider_selection": "NOT_SELECTED",
+      "scheduler_state": "PLANNED_NOT_BUILT"
+    },
+    "next_boundary": "EXACT_PROVIDER_SELECTION_AND_24H_CAPTURE_GATE_REQUIRED",
+    "state_change": "NONE"
+  },
+  "factory_fit": {
+    "review_scope": "FULL_REVIEW",
+    "verdict": "PASS_WITH_LIMITATIONS",
+    "mission_fit": "Converts a rate-limited historical route into a narrow, future evidence decision without claiming that more free calls equal usable research data.",
+    "research_truth": "Preserves HTTP 429 as an access observation, retains unproven candle labels and makes future observation/ingestion time an explicit requirement.",
+    "owner_operability": "A future 24-hour pilot can be run by one local scheduled command rather than 96 manual clicks, while every missed slot remains visible as a gap.",
+    "reuse_build_decision": {
+      "outcome": "ADOPT_STORAGE_AND_CONTROL_CONCEPTS_ONLY",
+      "adopt": [
+        "CONTENT_ADDRESSED_RAW_MANIFESTS",
+        "IDEMPOTENT_SLOT_IDENTITY",
+        "PHYSICAL_CAPS",
+        "TYPED_GAPS",
+        "RECOVERY_AND_DAILY_HEALTH"
+      ],
+      "rejected": [
+        "JUPITER_QUOTE_VALUES",
+        "TASK21_TECHNICAL_PROBE_AS_ADMISSION",
+        "TASK21_PROVIDER_ENDPOINT",
+        "TASK21_EXECUTION_CAPACITY_RUN_PLAN",
+        "GENERIC_COLLECTOR_OR_MULTI_PROVIDER_PLATFORM"
+      ]
+    },
+    "product_horizon": {
+      "now": {
+        "candidate": "HOLD_EXACT_BIRDEYE_ROUTE_AND_FREEZE_ONE_FORWARD_CAPTURE_BOUNDARY",
+        "value": "Avoids quota-burning retries while making a useful forward history attainable.",
+        "activation_trigger": "THIS_ACCEPTANCE_RECEIPT"
+      },
+      "watch": {
+        "candidate": "EXACT_SINGLE_PROVIDER_24H_CAPTURE_GATE",
+        "value": "Can establish whether a named provider can supply honestly observed 15-minute forward inputs.",
+        "activation_trigger": "OFFICIAL_PROVIDER_SURFACE_SELECTION_AND_EXACT_OWNER_EXTERNAL_AUTHORIZATION"
+      }
+    }
+  },
+  "non_claims": {
+    "historical_panel": false,
+    "pit_admissible": false,
+    "explicit_no_trade": false,
+    "provider_selected": false,
+    "scheduler_running": false,
+    "forward_capture_started": false,
+    "alpha": false,
+    "strategy": false,
+    "execution": false,
+    "actual_fills": false,
+    "settlement": false,
+    "pnl": false,
+    "numeric_netreturn": false,
+    "task30_acceptance": false
+  },
+  "side_effect_counters": {
+    "provider_api_rpc_wss_calls": 0,
+    "credential_use": 0,
+    "raw_data_writes": 0,
+    "scheduler_or_background_processes": 0,
+    "r2_r3_access": 0,
+    "dependency_changes": 0,
+    "wallet_signer_transaction_actions": 0,
+    "cash_spend_usd_cents": 0,
+    "task30_trial_or_acceptance_actions": 0,
+    "project_sources_changes": 0
+  },
+  "project_sources_disposition": {
+    "kind": "NO_CHANGE",
+    "reason": "A6 is an offline route and forward-capture decision; it neither starts collection nor changes canonical TASK-30 status."
+  }
+}

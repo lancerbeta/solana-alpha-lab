@@ -523,6 +523,11 @@
       "target_asset_id": "CONTRACT-T30-BIRDEYE-PILOT-READINESS-001"
     },
     {
+      "source_asset_id": "CONFIG-T30-BIRDEYE-ROUTE-HOLD-FORWARD-CAPTURE-001",
+      "relation": "governed_by",
+      "target_asset_id": "CONTRACT-T30-BIRDEYE-ROUTE-HOLD-FORWARD-CAPTURE-001"
+    },
+    {
       "source_asset_id": "CONFIG-T30-BIRDEYE-V3-HISTORY-PILOT-001",
       "relation": "governed_by",
       "target_asset_id": "CONTRACT-T30-BIRDEYE-V3-HISTORY-PILOT-001"
@@ -1076,6 +1081,11 @@
       "source_asset_id": "CONTRACT-T30-BIRDEYE-PILOT-READINESS-001",
       "relation": "derived_from",
       "target_asset_id": "EVIDENCE-T30-A2-CATALOG-FACTORY-FIT-001"
+    },
+    {
+      "source_asset_id": "CONTRACT-T30-BIRDEYE-ROUTE-HOLD-FORWARD-CAPTURE-001",
+      "relation": "derived_from",
+      "target_asset_id": "EVIDENCE-T30-A5R1-BIRDEYE-EXTERNAL-READ-RUNTIME-001"
     },
     {
       "source_asset_id": "CONTRACT-T30-BIRDEYE-V3-HISTORY-PILOT-001",
@@ -3038,6 +3048,21 @@
       "target_asset_id": "TEST-T30-A5R1-BIRDEYE-EXTERNAL-READ-RUNTIME-001"
     },
     {
+      "source_asset_id": "EVIDENCE-T30-A6-BIRDEYE-ROUTE-HOLD-FORWARD-CAPTURE-001",
+      "relation": "derived_from",
+      "target_asset_id": "EVIDENCE-T30-A5R1-BIRDEYE-EXTERNAL-READ-RUNTIME-001"
+    },
+    {
+      "source_asset_id": "EVIDENCE-T30-A6-BIRDEYE-ROUTE-HOLD-FORWARD-CAPTURE-001",
+      "relation": "derived_from",
+      "target_asset_id": "MODULE-T30-BIRDEYE-ROUTE-HOLD-FORWARD-CAPTURE-001"
+    },
+    {
+      "source_asset_id": "EVIDENCE-T30-A6-BIRDEYE-ROUTE-HOLD-FORWARD-CAPTURE-001",
+      "relation": "validated_by",
+      "target_asset_id": "TEST-T30-BIRDEYE-ROUTE-HOLD-FORWARD-CAPTURE-001"
+    },
+    {
       "source_asset_id": "EVIDENCE-T34A-A3-ACCEPTANCE-001",
       "relation": "derived_from",
       "target_asset_id": "CONTRACT-T34A-DOCUMENTATION-FOUNDATION-001"
@@ -3601,6 +3626,11 @@
       "source_asset_id": "FIXTURE-T30-BIRDEYE-PILOT-READINESS-001",
       "relation": "derived_from",
       "target_asset_id": "CONFIG-T30-BIRDEYE-PILOT-READINESS-001"
+    },
+    {
+      "source_asset_id": "FIXTURE-T30-BIRDEYE-ROUTE-HOLD-FORWARD-CAPTURE-001",
+      "relation": "derived_from",
+      "target_asset_id": "CONFIG-T30-BIRDEYE-ROUTE-HOLD-FORWARD-CAPTURE-001"
     },
     {
       "source_asset_id": "FIXTURE-T30-BIRDEYE-V3-HISTORY-PILOT-001",
@@ -4403,6 +4433,16 @@
       "target_asset_id": "EVIDENCE-T30-A3-BIRDEYE-PILOT-READINESS-001"
     },
     {
+      "source_asset_id": "MODULE-T30-BIRDEYE-ROUTE-HOLD-FORWARD-CAPTURE-001",
+      "relation": "governed_by",
+      "target_asset_id": "CONFIG-T30-BIRDEYE-ROUTE-HOLD-FORWARD-CAPTURE-001"
+    },
+    {
+      "source_asset_id": "MODULE-T30-BIRDEYE-ROUTE-HOLD-FORWARD-CAPTURE-001",
+      "relation": "produces",
+      "target_asset_id": "EVIDENCE-T30-A6-BIRDEYE-ROUTE-HOLD-FORWARD-CAPTURE-001"
+    },
+    {
       "source_asset_id": "MODULE-T30-BIRDEYE-V3-HISTORY-PILOT-001",
       "relation": "governed_by",
       "target_asset_id": "CONFIG-T30-BIRDEYE-V3-HISTORY-PILOT-001"
@@ -5166,6 +5206,11 @@
       "source_asset_id": "SCHEMA-T30-BIRDEYE-PILOT-READINESS-001",
       "relation": "governed_by",
       "target_asset_id": "CONTRACT-T30-BIRDEYE-PILOT-READINESS-001"
+    },
+    {
+      "source_asset_id": "SCHEMA-T30-BIRDEYE-ROUTE-HOLD-FORWARD-CAPTURE-001",
+      "relation": "governed_by",
+      "target_asset_id": "CONTRACT-T30-BIRDEYE-ROUTE-HOLD-FORWARD-CAPTURE-001"
     },
     {
       "source_asset_id": "SCHEMA-T30-BIRDEYE-V3-HISTORY-PILOT-001",
@@ -6846,6 +6891,26 @@
       "source_asset_id": "TEST-T30-BIRDEYE-PILOT-READINESS-001",
       "relation": "depends_on",
       "target_asset_id": "SCHEMA-T30-BIRDEYE-PILOT-READINESS-001"
+    },
+    {
+      "source_asset_id": "TEST-T30-BIRDEYE-ROUTE-HOLD-FORWARD-CAPTURE-001",
+      "relation": "depends_on",
+      "target_asset_id": "EVIDENCE-T30-A6-BIRDEYE-ROUTE-HOLD-FORWARD-CAPTURE-001"
+    },
+    {
+      "source_asset_id": "TEST-T30-BIRDEYE-ROUTE-HOLD-FORWARD-CAPTURE-001",
+      "relation": "depends_on",
+      "target_asset_id": "FIXTURE-T30-BIRDEYE-ROUTE-HOLD-FORWARD-CAPTURE-001"
+    },
+    {
+      "source_asset_id": "TEST-T30-BIRDEYE-ROUTE-HOLD-FORWARD-CAPTURE-001",
+      "relation": "depends_on",
+      "target_asset_id": "MODULE-T30-BIRDEYE-ROUTE-HOLD-FORWARD-CAPTURE-001"
+    },
+    {
+      "source_asset_id": "TEST-T30-BIRDEYE-ROUTE-HOLD-FORWARD-CAPTURE-001",
+      "relation": "depends_on",
+      "target_asset_id": "SCHEMA-T30-BIRDEYE-ROUTE-HOLD-FORWARD-CAPTURE-001"
     },
     {
       "source_asset_id": "TEST-T30-BIRDEYE-V3-HISTORY-PILOT-001",

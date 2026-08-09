@@ -1,0 +1,87 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://solana-alpha-lab.local/schemas/task30_birdeye_route_hold_forward_capture_decision.schema.json",
+  "title": "TASK-30 Birdeye route hold and forward price capture decision",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema", "schema_version", "task_id", "atom_id", "contract_id", "consumer", "evidence_as_of", "birdeye_route", "forward_capture_candidate", "reuse_boundary", "authority", "non_claims", "decision", "next_boundary", "project_sources_disposition"],
+  "properties": {
+    "schema": {"const": "smial.task30.birdeye-route-hold-forward-capture.policy"},
+    "schema_version": {"const": "1.0"},
+    "task_id": {"const": "TASK-30"},
+    "atom_id": {"const": "T30-A6_BIRDEYE_ROUTE_HOLD_AND_FORWARD_PRICE_CAPTURE_DECISION_V1"},
+    "contract_id": {"const": "TASK30-BIRDEYE-ROUTE-HOLD-FORWARD-CAPTURE-DECISION-V1"},
+    "consumer": {"const": "FUTURE_TASK30_FORWARD_PRICE_CAPTURE_ENTRY_GATE"},
+    "evidence_as_of": {"const": "2026-08-10"},
+    "birdeye_route": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["state", "observed_ohlcv_http_status", "historical_panel_claim", "provider_or_pair_unsupported_claim", "reopen_requires"],
+      "properties": {
+        "state": {"const": "HOLD_NO_AUTORETRY"},
+        "observed_ohlcv_http_status": {"const": 429},
+        "historical_panel_claim": {"const": false},
+        "provider_or_pair_unsupported_claim": {"const": false},
+        "reopen_requires": {"const": ["DOCUMENTED_QUOTA_OR_ACCESS_RECOVERY", "NEW_EXACT_OWNER_EXTERNAL_AUTHORIZATION"]}
+      }
+    },
+    "forward_capture_candidate": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["pool_address", "slot_seconds", "initial_horizon_seconds", "max_observation_slots", "provider_selection", "scheduler_state", "candle_label_policy", "missing_slot_policy", "observation_time_fields"],
+      "properties": {
+        "pool_address": {"const": "URqx24yyYxtXXhTbBQnbtPLhtLWYoaDaRxuQuLpNS3S"},
+        "slot_seconds": {"const": 900},
+        "initial_horizon_seconds": {"const": 86400},
+        "max_observation_slots": {"const": 96},
+        "provider_selection": {"const": "NOT_SELECTED"},
+        "scheduler_state": {"const": "PLANNED_NOT_BUILT"},
+        "candle_label_policy": {"const": "RETAIN_AS_RECEIVED_NO_START_END_PROMOTION"},
+        "missing_slot_policy": {"const": "RETAIN_TYPED_GAP_NO_BACKFILL"},
+        "observation_time_fields": {"const": ["slot_open_at", "slot_close_at", "observed_at", "ingested_at", "request_identity", "response_hash", "provider_response_timestamp_if_present", "terminal_state"]}
+      }
+    },
+    "reuse_boundary": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["adopt", "forbidden_reuse"],
+      "properties": {
+        "adopt": {"const": ["CONTENT_ADDRESSED_RAW_MANIFESTS", "IDEMPOTENT_SLOT_IDENTITY", "PHYSICAL_CAPS", "TYPED_GAPS", "RECOVERY_AND_DAILY_HEALTH"]},
+        "forbidden_reuse": {"const": ["JUPITER_QUOTE_VALUES", "TASK21_TECHNICAL_PROBE_AS_ADMISSION", "TASK21_PROVIDER_ENDPOINT", "TASK21_EXECUTION_CAPACITY_RUN_PLAN"]}
+      }
+    },
+    "authority": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["provider_api_rpc_wss_calls", "credential_use", "raw_data_write", "scheduler_or_background_process", "dependency_changes", "wallet_signer_transaction_actions", "cash_spend_usd_cents", "task30_trial_or_acceptance", "project_sources_changes"],
+      "properties": {
+        "provider_api_rpc_wss_calls": {"const": 0},
+        "credential_use": {"const": false},
+        "raw_data_write": {"const": false},
+        "scheduler_or_background_process": {"const": false},
+        "dependency_changes": {"const": false},
+        "wallet_signer_transaction_actions": {"const": false},
+        "cash_spend_usd_cents": {"const": 0},
+        "task30_trial_or_acceptance": {"const": false},
+        "project_sources_changes": {"const": false}
+      }
+    },
+    "non_claims": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["continuous_panel_claim", "pit_admissible_claim", "explicit_no_trade_claim", "provider_selected_claim", "scheduler_running_claim", "alpha_claim", "numeric_netreturn_claim"],
+      "properties": {
+        "continuous_panel_claim": {"const": false},
+        "pit_admissible_claim": {"const": false},
+        "explicit_no_trade_claim": {"const": false},
+        "provider_selected_claim": {"const": false},
+        "scheduler_running_claim": {"const": false},
+        "alpha_claim": {"const": false},
+        "numeric_netreturn_claim": {"const": false}
+      }
+    },
+    "decision": {"const": "HOLD_BIRDEYE_ROUTE_PREPARE_FORWARD_CAPTURE_CANDIDATE"},
+    "next_boundary": {"const": "EXACT_PROVIDER_SELECTION_AND_24H_CAPTURE_GATE_REQUIRED"},
+    "project_sources_disposition": {"const": "NO_CHANGE"}
+  }
+}
