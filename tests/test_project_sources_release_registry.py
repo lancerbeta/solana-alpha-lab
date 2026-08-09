@@ -19,7 +19,8 @@ CATALOG_CORE_PATH = ROOT / "catalog/assets/core.yaml"
 RELEASES_ROOT = PROJECT_SOURCES_ROOT / "releases"
 A5_RECEIPT_PATH = ROOT / "docs/evidence/task27/a0a5_permanent_sources_reconciliation_acceptance_v1.json"
 HISTORICAL_ACTIVATION_RECEIPT_PATH = ROOT / "docs/evidence/task27/a2r1_project_sources_activation_and_task_close_acceptance_v1.json"
-ACTIVATION_RECEIPT_PATH = ROOT / "docs/evidence/task28/a3r1_project_sources_activation_receipt_v1.json"
+ACTIVATION_SOURCE_RECEIPT_PATH = ROOT / "docs/evidence/task28/a3r1_project_sources_activation_receipt_v1.json"
+ACTIVATION_RECEIPT_PATH = ROOT / "docs/evidence/task28/a3r2_project_sources_activation_and_task_close_acceptance_v1.json"
 FIRST_RELEASE_ID = "PSR-0001-T27-A0-A5"
 PREVIOUS_ACTIVE_RELEASE_ID = "PSR-0002-T27-CLOSE"
 ACTIVE_RELEASE_ID = "PSR-0003-T28-RC001-FREEZE"
@@ -277,13 +278,30 @@ class ProjectSourcesReleaseRegistryTests(unittest.TestCase):
         )
         self.assertEqual(record["integrity"]["sha256"], sha256(HISTORICAL_ACTIVATION_RECEIPT_PATH))
 
-    def test_task28_activation_receipt_is_hash_bound_in_catalog(self) -> None:
+    def test_task28_source_activation_receipt_remains_hash_bound_in_catalog(self) -> None:
         catalog_records = load_yaml(CATALOG_CORE_PATH)["records"]
         record = next(
             (
                 item
                 for item in catalog_records
                 if item["asset_id"] == "EVIDENCE-T28-A3R1-SOURCE-ACTIVATION-001"
+            ),
+            None,
+        )
+        self.assertIsNotNone(record)
+        self.assertEqual(
+            record["location"]["repository_path"],
+            ACTIVATION_SOURCE_RECEIPT_PATH.relative_to(ROOT).as_posix(),
+        )
+        self.assertEqual(record["integrity"]["sha256"], sha256(ACTIVATION_SOURCE_RECEIPT_PATH))
+
+    def test_task28_close_receipt_is_hash_bound_in_catalog(self) -> None:
+        catalog_records = load_yaml(CATALOG_CORE_PATH)["records"]
+        record = next(
+            (
+                item
+                for item in catalog_records
+                if item["asset_id"] == "EVIDENCE-T28-A3R2-SOURCE-ACTIVATION-CLOSE-001"
             ),
             None,
         )
