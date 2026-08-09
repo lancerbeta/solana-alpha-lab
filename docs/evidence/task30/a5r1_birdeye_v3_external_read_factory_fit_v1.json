@@ -1,0 +1,50 @@
+{
+  "schema": "smial.task30.birdeye-v3-external-read.factory-fit",
+  "schema_version": "1.0",
+  "receipt_id": "T30-A5R1-BIRDEYE-V3-EXTERNAL-READ-FACTORY-FIT-001",
+  "task_id": "TASK-30",
+  "atom_id": "T30-A5R1_EXACT_BIRDEYE_EXTERNAL_READ_OUTCOME_CAPTURE_V1",
+  "review_scope": "FULL_REVIEW",
+  "verdict": "PASS_WITH_LIMITATIONS",
+  "runtime_receipt_path": "docs/evidence/task30/a5r1_birdeye_v3_external_read_runtime_receipt_v1.json",
+  "runtime_receipt_sha256": "a4f69df4dcff2afe88c06828884ec9155af8bfe91b659080cfed74ab1acbcdf1",
+  "decision": "RATE_LIMITED_READ_CLOSE_NO_RETRY_OR_FALLBACK",
+  "mission_fit": "Preserves a cheap exact falsifier without turning provider quota into a research conclusion.",
+  "research_truth": {
+    "pair_level_input_accepted": true,
+    "historical_ohlcv_observed": false,
+    "rate_or_quota_limited": true,
+    "rest_15m_enum_proven": false,
+    "historical_panel_proven": false,
+    "pit_admissibility_proven": false
+  },
+  "owner_operability": {
+    "next_action": "No automatic retry. A new external request requires a separately approved owner gate after quota/recovery evidence.",
+    "recovery": "Retain the A4 raw manifest and this receipt; do not substitute a provider or reinterpret 429 as absence of history."
+  },
+  "reuse_build_decision": {
+    "outcome": "REUSE_EXISTING_BOUNDARY",
+    "reason": "The merged A5 contract already constrains the route. A new client, collector, or provider adapter would add cost without resolving the observed quota limit."
+  },
+  "product_horizon": {
+    "now": {
+      "candidate": "RETAIN_EXACT_RATE_LIMIT_OUTCOME",
+      "value": "Prevents false route closure and accidental unbounded retries.",
+      "activation_trigger": "ALWAYS_ACTIVE_FOR_THIS_EXACT_READ_CHAIN"
+    },
+    "watch": {
+      "candidate": "NEW_OWNER_GATE_AFTER_QUOTA_RECOVERY_EVIDENCE",
+      "value": "Could test the still-unproven 15m surface only after the quota blocker is materially resolved.",
+      "activation_trigger": "DOCUMENTED_QUOTA_OR_ACCESS_RECOVERY_PLUS_NEW_EXACT_OWNER_AUTHORIZATION"
+    }
+  },
+  "non_claims": [
+    "NO_RETRY_AUTHORITY",
+    "NO_FALLBACK_PROVIDER_AUTHORITY",
+    "NO_HISTORICAL_PANEL",
+    "NO_PIT_ADMISSIBILITY",
+    "NO_TASK30_TRIAL_OR_ACCEPTANCE",
+    "NO_NUMERIC_NETRETURN"
+  ],
+  "project_sources_disposition": "NO_CHANGE"
+}
