@@ -15946,6 +15946,128 @@ records:
   evidence: []
   classification: *t25_internal
 
+- asset_id: CONTRACT-T30-BIRDEYE-ROUTE-HOLD-FORWARD-CAPTURE-001
+  record_version: '1.0'
+  asset_type: control_document
+  purpose: Frozen offline contract that holds the rate-limited Birdeye route and defines one bounded future forward capture decision.
+  status: VALIDATED_ACTIVE
+  origin: REPOSITORY
+  as_of: '2026-08-10'
+  truth_owner: TASK-30
+  location: {kind: git_path, logical_uri: 'repo://docs/contracts/task30_birdeye_route_hold_forward_capture_decision_contract_v1.md', repository_path: docs/contracts/task30_birdeye_route_hold_forward_capture_decision_contract_v1.md}
+  integrity: {kind: sha256, sha256: 3200b008ce11f6348ce6b482d199be0bbffa5ed069d553bc0c669f2bb28f997a}
+  access: *t25_read_file
+  relations:
+  - {relation_type: derived_from, target_asset_id: EVIDENCE-T30-A5R1-BIRDEYE-EXTERNAL-READ-RUNTIME-001}
+  consumers: [TASK-30, FACTORY-001]
+  evidence: []
+  classification: *t25_internal
+
+- asset_id: CONFIG-T30-BIRDEYE-ROUTE-HOLD-FORWARD-CAPTURE-001
+  record_version: '1.0'
+  asset_type: configuration
+  purpose: Closed machine-readable policy for the Task30 Birdeye hold and one-pool forward capture candidate.
+  status: VALIDATED_ACTIVE
+  origin: REPOSITORY
+  as_of: '2026-08-10'
+  truth_owner: TASK-30
+  location: {kind: git_path, logical_uri: 'repo://configs/task30_birdeye_route_hold_forward_capture_decision_v1.yaml', repository_path: configs/task30_birdeye_route_hold_forward_capture_decision_v1.yaml}
+  integrity: {kind: sha256, sha256: c00522e9fd91b7c9c62241ae6dec79ad33df19405e99307f4f1c808ff9349489}
+  access: *t25_read_file
+  relations: [{relation_type: governed_by, target_asset_id: CONTRACT-T30-BIRDEYE-ROUTE-HOLD-FORWARD-CAPTURE-001}]
+  consumers: [TASK-30, FACTORY-001]
+  evidence: []
+  classification: *t25_internal
+
+- asset_id: SCHEMA-T30-BIRDEYE-ROUTE-HOLD-FORWARD-CAPTURE-001
+  record_version: '1.0'
+  asset_type: schema
+  purpose: Closed JSON Schema for the Task30 Birdeye hold and forward capture decision policy.
+  status: VALIDATED_ACTIVE
+  origin: REPOSITORY
+  as_of: '2026-08-10'
+  truth_owner: TASK-30
+  location: {kind: git_path, logical_uri: 'repo://catalog/schemas/task30_birdeye_route_hold_forward_capture_decision.schema.json', repository_path: catalog/schemas/task30_birdeye_route_hold_forward_capture_decision.schema.json}
+  integrity: {kind: sha256, sha256: 41958079a748551211ec83a1a2997c11548bad7d867198414536bf28d8e4df34}
+  access: *t25_read_file
+  relations: [{relation_type: governed_by, target_asset_id: CONTRACT-T30-BIRDEYE-ROUTE-HOLD-FORWARD-CAPTURE-001}]
+  consumers: [TASK-30, FACTORY-001]
+  evidence: []
+  classification: *t25_internal
+
+- asset_id: FIXTURE-T30-BIRDEYE-ROUTE-HOLD-FORWARD-CAPTURE-001
+  record_version: '1.0'
+  asset_type: evidence
+  purpose: Synthetic golden result for the Task30 Birdeye hold and forward capture decision evaluator.
+  status: VALIDATED_ACTIVE
+  origin: REPOSITORY
+  as_of: '2026-08-10'
+  truth_owner: TASK-30
+  location: {kind: git_path, logical_uri: 'repo://tests/fixtures/task30/birdeye_route_hold_forward_capture_decision_v1.json', repository_path: tests/fixtures/task30/birdeye_route_hold_forward_capture_decision_v1.json}
+  integrity: {kind: sha256, sha256: f45a94b60af95505e482d4a82bc45dd08658ac1e321d64adf9c3aa6d4397716b}
+  access: *t25_read_file
+  relations: [{relation_type: derived_from, target_asset_id: CONFIG-T30-BIRDEYE-ROUTE-HOLD-FORWARD-CAPTURE-001}]
+  consumers: [TASK-30, FACTORY-001]
+  evidence: []
+  classification: *t25_internal
+
+- asset_id: MODULE-T30-BIRDEYE-ROUTE-HOLD-FORWARD-CAPTURE-001
+  record_version: '1.0'
+  asset_type: script
+  purpose: Deterministic evaluator that rejects retries, pool expansion, unbounded cadence, scheduler activation and external authority.
+  status: VALIDATED_ACTIVE
+  origin: REPOSITORY
+  as_of: '2026-08-10'
+  truth_owner: TASK-30
+  location: {kind: git_path, logical_uri: 'repo://src/solana_alpha_lab/task30_birdeye_route_hold_forward_capture_decision.py', repository_path: src/solana_alpha_lab/task30_birdeye_route_hold_forward_capture_decision.py}
+  integrity: {kind: sha256, sha256: bf76f1283bf862f25e7cc81dae75f20b62aac2cfb50d9283becb9a13f1f56895}
+  access: *t25_read_file
+  relations:
+  - {relation_type: governed_by, target_asset_id: CONFIG-T30-BIRDEYE-ROUTE-HOLD-FORWARD-CAPTURE-001}
+  - {relation_type: produces, target_asset_id: EVIDENCE-T30-A6-BIRDEYE-ROUTE-HOLD-FORWARD-CAPTURE-001}
+  consumers: [TASK-30, FACTORY-001]
+  evidence: []
+  classification: *t25_internal
+
+- asset_id: TEST-T30-BIRDEYE-ROUTE-HOLD-FORWARD-CAPTURE-001
+  record_version: '1.0'
+  asset_type: script
+  purpose: Deterministic tests for the Task30 route-hold decision, non-claim boundary, evidence bindings and Catalog discovery.
+  status: VALIDATED_ACTIVE
+  origin: REPOSITORY
+  as_of: '2026-08-10'
+  truth_owner: TASK-30
+  location: {kind: git_path, logical_uri: 'repo://tests/test_task30_birdeye_route_hold_forward_capture_decision.py', repository_path: tests/test_task30_birdeye_route_hold_forward_capture_decision.py}
+  integrity: {kind: sha256, sha256: 245571821de63efbf2380aec2589e6090c9b842ce63035f07fb44feed591233a}
+  access: *t25_read_file
+  relations:
+  - {relation_type: depends_on, target_asset_id: MODULE-T30-BIRDEYE-ROUTE-HOLD-FORWARD-CAPTURE-001}
+  - {relation_type: depends_on, target_asset_id: SCHEMA-T30-BIRDEYE-ROUTE-HOLD-FORWARD-CAPTURE-001}
+  - {relation_type: depends_on, target_asset_id: FIXTURE-T30-BIRDEYE-ROUTE-HOLD-FORWARD-CAPTURE-001}
+  - {relation_type: depends_on, target_asset_id: EVIDENCE-T30-A6-BIRDEYE-ROUTE-HOLD-FORWARD-CAPTURE-001}
+  consumers: [TASK-30, FACTORY-001]
+  evidence: []
+  classification: *t25_internal
+
+- asset_id: EVIDENCE-T30-A6-BIRDEYE-ROUTE-HOLD-FORWARD-CAPTURE-001
+  record_version: '1.0'
+  asset_type: evidence
+  purpose: Hash-bound acceptance receipt for the Task30 Birdeye route hold and bounded forward capture decision.
+  status: VALIDATED_ACTIVE
+  origin: REPOSITORY
+  as_of: '2026-08-10'
+  truth_owner: TASK-30
+  location: {kind: git_path, logical_uri: 'repo://docs/evidence/task30/a6_birdeye_route_hold_forward_capture_decision_acceptance_v1.json', repository_path: docs/evidence/task30/a6_birdeye_route_hold_forward_capture_decision_acceptance_v1.json}
+  integrity: {kind: sha256, sha256: 3946e45ec3f3f53d1c3a38f5ead4be13f0600ecc0c7503ffe3330e23c08aea36}
+  access: *t25_read_file
+  relations:
+  - {relation_type: derived_from, target_asset_id: EVIDENCE-T30-A5R1-BIRDEYE-EXTERNAL-READ-RUNTIME-001}
+  - {relation_type: derived_from, target_asset_id: MODULE-T30-BIRDEYE-ROUTE-HOLD-FORWARD-CAPTURE-001}
+  - {relation_type: validated_by, target_asset_id: TEST-T30-BIRDEYE-ROUTE-HOLD-FORWARD-CAPTURE-001}
+  consumers: [TASK-30, FACTORY-001]
+  evidence: []
+  classification: *t25_internal
+
 
 - asset_id: CONTRACT-T34A-DOCUMENTATION-FOUNDATION-001
   record_version: '1.0'

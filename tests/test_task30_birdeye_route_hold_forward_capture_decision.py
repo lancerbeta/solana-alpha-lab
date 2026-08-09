@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import copy
+import hashlib
 import json
 import sys
 import unittest
@@ -28,6 +29,20 @@ SCHEMA_PATH = (
 FIXTURE_PATH = (
     ROOT / "tests/fixtures/task30/birdeye_route_hold_forward_capture_decision_v1.json"
 )
+ACCEPTANCE_PATH = (
+    ROOT / "docs/evidence/task30/a6_birdeye_route_hold_forward_capture_decision_acceptance_v1.json"
+)
+CATALOG_CORE_PATH = ROOT / "catalog/assets/core.yaml"
+
+EXPECTED_ASSET_IDS = {
+    "CONTRACT-T30-BIRDEYE-ROUTE-HOLD-FORWARD-CAPTURE-001",
+    "CONFIG-T30-BIRDEYE-ROUTE-HOLD-FORWARD-CAPTURE-001",
+    "SCHEMA-T30-BIRDEYE-ROUTE-HOLD-FORWARD-CAPTURE-001",
+    "FIXTURE-T30-BIRDEYE-ROUTE-HOLD-FORWARD-CAPTURE-001",
+    "MODULE-T30-BIRDEYE-ROUTE-HOLD-FORWARD-CAPTURE-001",
+    "TEST-T30-BIRDEYE-ROUTE-HOLD-FORWARD-CAPTURE-001",
+    "EVIDENCE-T30-A6-BIRDEYE-ROUTE-HOLD-FORWARD-CAPTURE-001",
+}
 
 
 def replace_pointer(record: dict[str, object], pointer: str, replacement: object) -> None:
@@ -36,6 +51,10 @@ def replace_pointer(record: dict[str, object], pointer: str, replacement: object
     for part in parts[:-1]:
         target = target[part]  # type: ignore[assignment,index]
     target[parts[-1]] = replacement
+
+
+def sha256(path: Path) -> str:
+    return hashlib.sha256(path.read_bytes()).hexdigest()
 
 
 class Task30BirdeyeRouteHoldForwardCaptureDecisionTests(unittest.TestCase):
@@ -106,3 +125,28 @@ class Task30BirdeyeRouteHoldForwardCaptureDecisionTests(unittest.TestCase):
             BirdeyeRouteHoldForwardCaptureError, "CREDENTIAL_DISCLOSURE_FORBIDDEN"
         ):
             evaluate_birdeye_route_hold_forward_capture(policy)
+
+    def test_acceptance_binds_artifacts_and_reports_zero_external_effects(self) -> None:
+        """Catches a route decision delivered without verifiable offline evidence."""
+        self.assertTrue(
+            ACCEPTANCE_PATH.exists(),
+            "T30-A6 must include one hash-bound offline acceptance receipt",
+        )
+        if not ACCEPTANCE_PATH.exists():
+            return
+        receipt = json.loads(ACCEPTANCE_PATH.read_text(encoding="utf-8"))
+        for binding in receipt["artifact_bindings"].values():
+            self.assertEqual(binding["sha256"], sha256(ROOT / binding["path"]))
+        self.assertTrue(
+            all(value == 0 for value in receipt["side_effect_counters"].values())
+        )
+        self.assertEqual(receipt["factory_fit"]["review_scope"], "FULL_REVIEW")
+        self.assertEqual(
+            receipt["project_sources_disposition"]["kind"], "NO_CHANGE"
+        )
+
+    def test_catalog_registers_each_t30_a6_output(self) -> None:
+        """Catches an accepted decision that future entry gates cannot resolve."""
+        catalog = yaml.safe_load(CATALOG_CORE_PATH.read_text(encoding="utf-8"))
+        asset_ids = {record["asset_id"] for record in catalog["records"]}
+        self.assertTrue(EXPECTED_ASSET_IDS.issubset(asset_ids))

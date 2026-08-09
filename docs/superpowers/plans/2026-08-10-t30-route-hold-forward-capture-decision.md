@@ -33,7 +33,7 @@
 | `tests/test_task30_birdeye_route_hold_forward_capture_decision.py` | Schema, evaluator, adversarial, evidence and Catalog checks. |
 | `docs/evidence/task30/a6_birdeye_route_hold_forward_capture_decision_acceptance_v1.json` | Hash-bound offline acceptance and Factory Fit receipt. |
 | `catalog/assets/core.yaml` | Stable records for all A6 outputs. |
-| `catalog/assets/lifecycle.yaml` | Lifecycle relation from the A5R1 external result to the A6 decision. |
+| `catalog/assets/lifecycle.yaml` | Exact hashes and record versions for regenerated Catalog navigation views. |
 | `catalog/catalog_manifest.yaml` | Updated counts and registered A6 schema. |
 | `catalog/generated/asset_edges.json` and `docs/PROJECT_MAP.md` | Generated navigation projections. |
 
@@ -331,14 +331,18 @@ counters as zero and set:
 
 Add the seven core Catalog records with `truth_owner: TASK-30`,
 `consumers: [TASK-30, FACTORY-001]`, SHA-256 integrity and relations between
-the policy artifacts, test and receipt. Add one lifecycle relation from
-`EVIDENCE-T30-A5R1-BIRDEYE-EXTERNAL-READ-RUNTIME-001` to the A6 evidence as
-`derived_to_decision`. Register the new schema, increase the exact manifest
+the policy artifacts, test and receipt. The A6 evidence record derives from
+`EVIDENCE-T30-A5R1-BIRDEYE-EXTERNAL-READ-RUNTIME-001`; do not add an invented
+lifecycle relation. Register the new schema, increase the exact manifest
 counts and regenerate navigation using:
 
 ```powershell
 uv run --locked --managed-python python -B scripts/generate_navigation.py --write
 ```
+
+Then refresh the two generated-view SHA-256 bindings in
+`catalog/assets/lifecycle.yaml` and rerun the generator/check sequence until
+the validated Catalog and generated views agree.
 
 - [ ] **Step 4: Run targeted and Catalog validation**
 
