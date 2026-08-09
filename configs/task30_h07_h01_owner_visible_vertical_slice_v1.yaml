@@ -1,0 +1,87 @@
+schema: smial.task30.h07-h01-owner-visible-vertical-slice.v1
+schema_version: '1.0'
+task_id: TASK-30
+atom_id: T30-A7_H07_H01_OWNER_VISIBLE_VERTICAL_SLICE_V1
+consumer: TASK30_H07_H01_EXACT_DATA_CONTRACT_ENTRY_GATE
+frozen_definition:
+  path: configs/task28_rc001_registry_freeze_v1.yaml
+  group_id: RC001-H07-H01-LIQUIDITY-RETENTION
+  definition_sha256: 14a7387148d05773dedcb5ad6a8110a0dcab7e49da4dec77328903a5b7577df7
+  definition_inputs:
+  - PIT liquidity-retention state
+  - multi-notional route persistence
+  - post-migration continuation context
+input_evidence:
+  task27_route_close:
+    path: docs/evidence/task27/a1s4_owner_route_close_and_task_outcome_acceptance_v1.json
+    sha256: e901a59a72da29b3eb4a90e24a7d3bde91a4fc00c023310086376747ebe47e6d
+    decision: CLOSE_CURRENT_SOLANA_TRACKER_15M_POOL_HISTORY_ROUTE_NOT_FEASIBLE
+  task26b_execution_witness:
+    path: docs/evidence/task26b/a1_execution_witness_route_acceptance_v1.json
+    sha256: 86cd5d33f3e29f9c3d365afc1aca511b212d6a809fa7be3ea2c6e65ffebd4b73
+    decision: OWNED_CANARY_REQUIRED
+  task30_a6_forward_capture:
+    path: docs/evidence/task30/a6_birdeye_route_hold_forward_capture_decision_acceptance_v1.json
+    sha256: e40b3fc46762c015f439a453f68939859114f8f498e1791a0a68f1790829e036
+    decision: HOLD_BIRDEYE_ROUTE_PREPARE_FORWARD_CAPTURE_CANDIDATE
+current_evidence:
+  requirement_states:
+    CONTINUOUS_PIT_PRICE_HISTORY_UNAVAILABLE: MISSING_UNKNOWN
+    SETTLED_EXECUTION_TRUTH_UNAVAILABLE: UNSUPPORTED
+  pit_liquidity_retention_state: MISSING_UNKNOWN
+  multi_notional_route_persistence: MISSING_UNKNOWN
+  post_migration_continuation_context: MISSING_UNKNOWN
+  settled_execution_truth: UNSUPPORTED
+  trial_admissible: false
+  provider_selection: NOT_SELECTED
+  forward_capture_state: PLANNED_NOT_STARTED
+  background_collection: false
+missingness_policy:
+  missing_to_zero: FORBIDDEN
+  unknown_to_settled: FORBIDDEN
+  continuity_imputation: FORBIDDEN
+decision_policy:
+  allowed_terminal_decisions:
+  - RUN_LIMITED_DIAGNOSTIC
+  - CAPTURE_REQUIRED
+  - REDESIGN_DATA
+  - CLOSE_ROUTE
+  current_decision: CAPTURE_REQUIRED
+  next_boundary: EXACT_H07_H01_DATA_CONTRACT_ENTRY_GATE
+  external_read_authority: REQUIRED_NOT_GRANTED
+authority:
+  provider_api_rpc_wss_calls: 0
+  credential_use: 0
+  raw_data_writes: 0
+  r2_r3_access: 0
+  scheduler_or_background_processes: 0
+  wallet_signer_transaction_actions: 0
+  cash_spend_usd_cents: 0
+  task30_trial_or_acceptance_actions: 0
+non_claims:
+  pit_admissible: false
+  price_only_is_trial: false
+  quote_only_is_settlement: false
+  missing_is_zero_or_no_trade: false
+  provider_selected: false
+  forward_capture_started: false
+  alpha: false
+  strategy: false
+  execution: false
+  pnl: false
+  numeric_netreturn: false
+  task30_acceptance: false
+side_effect_counters:
+  provider_api_rpc_wss_calls: 0
+  credential_use: 0
+  raw_data_writes: 0
+  r2_r3_access: 0
+  scheduler_or_background_processes: 0
+  dependency_changes: 0
+  wallet_signer_transaction_actions: 0
+  cash_spend_usd_cents: 0
+  task30_trial_or_acceptance_actions: 0
+  project_sources_changes: 0
+project_sources_disposition:
+  kind: NO_CHANGE
+  reason: T30-A7 is an offline evidence-readiness decision and does not change canonical TASK-30 status.

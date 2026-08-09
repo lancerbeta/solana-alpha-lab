@@ -1,0 +1,128 @@
+{
+  "schema": "smial.task30.h07-h01-owner-visible-vertical-slice.acceptance",
+  "schema_version": "1.0",
+  "receipt_id": "T30-A7-H07-H01-OWNER-VISIBLE-VERTICAL-SLICE-001",
+  "task_id": "TASK-30",
+  "atom_id": "T30-A7_H07_H01_OWNER_VISIBLE_VERTICAL_SLICE_V1",
+  "status": "VALIDATED_OFFLINE_OWNER_VISIBLE_DECISION",
+  "artifact_bindings": {
+    "task": {
+      "path": "docs/tasks/TASK-30-h07-h01-owner-visible-vertical-slice.md",
+      "sha256": "32bb1b53ff95acc147dfed7ffdc121452778ff5ac045246a57c0ea9cbcb2f6c5"
+    },
+    "contract": {
+      "path": "docs/contracts/task30_h07_h01_owner_visible_vertical_slice_contract_v1.md",
+      "sha256": "4df0d6fbd564118397afd6bd97b3a22a2fbd92465249761d595ca6ef4023b63e"
+    },
+    "configuration": {
+      "path": "configs/task30_h07_h01_owner_visible_vertical_slice_v1.yaml",
+      "sha256": "cabf1e4f46559572e4005f7e740c3709d200346b6b756a959f7a6e4746359370"
+    },
+    "module": {
+      "path": "src/solana_alpha_lab/task30_h07_h01_owner_visible_vertical_slice.py",
+      "sha256": "421fd602e1ad3e92b5a264bc630cdfdb27364490812b325a737bc52636ae2c36"
+    },
+    "script": {
+      "path": "scripts/show_task30_h07_h01_owner_readout.py",
+      "sha256": "6846278248641ba13c501d878932390800f3c6c92167d37a99c6af295c0f3153"
+    },
+    "report": {
+      "path": "docs/reports/task30/h07_h01_owner_readout_v1.md",
+      "sha256": "28c72d85469ccdf021a79128eb6801e1af7e50e9948b9202b87f94a53f116d9e"
+    },
+    "test": {
+      "path": "tests/test_task30_h07_h01_owner_visible_vertical_slice.py",
+      "sha256": "939396f735cf36b08561f933393fc01a4f8fa4de1f38bf1b24dcea156345708d"
+    }
+  },
+  "input_evidence": {
+    "task27_route_close": {
+      "path": "docs/evidence/task27/a1s4_owner_route_close_and_task_outcome_acceptance_v1.json",
+      "sha256": "e901a59a72da29b3eb4a90e24a7d3bde91a4fc00c023310086376747ebe47e6d",
+      "decision": "CLOSE_CURRENT_SOLANA_TRACKER_15M_POOL_HISTORY_ROUTE_NOT_FEASIBLE"
+    },
+    "task26b_execution_witness": {
+      "path": "docs/evidence/task26b/a1_execution_witness_route_acceptance_v1.json",
+      "sha256": "86cd5d33f3e29f9c3d365afc1aca511b212d6a809fa7be3ea2c6e65ffebd4b73",
+      "decision": "OWNED_CANARY_REQUIRED"
+    },
+    "task30_a6_forward_capture": {
+      "path": "docs/evidence/task30/a6_birdeye_route_hold_forward_capture_decision_acceptance_v1.json",
+      "sha256": "e40b3fc46762c015f439a453f68939859114f8f498e1791a0a68f1790829e036",
+      "decision": "HOLD_BIRDEYE_ROUTE_PREPARE_FORWARD_CAPTURE_CANDIDATE"
+    }
+  },
+  "decision": {
+    "value": "CAPTURE_REQUIRED",
+    "blocker_codes": [
+      "CONTINUOUS_PIT_PRICE_HISTORY_UNAVAILABLE",
+      "SETTLED_EXECUTION_TRUTH_UNAVAILABLE"
+    ],
+    "next_boundary": "EXACT_H07_H01_DATA_CONTRACT_ENTRY_GATE",
+    "state_change": "NONE"
+  },
+  "authority": {
+    "provider_api_rpc_wss_calls": 0,
+    "credential_use": 0,
+    "raw_data_writes": 0,
+    "r2_r3_access": 0,
+    "scheduler_or_background_processes": 0,
+    "wallet_signer_transaction_actions": 0,
+    "cash_spend_usd_cents": 0,
+    "task30_trial_or_acceptance_actions": 0
+  },
+  "non_claims": {
+    "pit_admissible": false,
+    "price_only_is_trial": false,
+    "quote_only_is_settlement": false,
+    "missing_is_zero_or_no_trade": false,
+    "provider_selected": false,
+    "forward_capture_started": false,
+    "alpha": false,
+    "strategy": false,
+    "execution": false,
+    "pnl": false,
+    "numeric_netreturn": false,
+    "task30_acceptance": false
+  },
+  "side_effect_counters": {
+    "provider_api_rpc_wss_calls": 0,
+    "credential_use": 0,
+    "raw_data_writes": 0,
+    "r2_r3_access": 0,
+    "scheduler_or_background_processes": 0,
+    "dependency_changes": 0,
+    "wallet_signer_transaction_actions": 0,
+    "cash_spend_usd_cents": 0,
+    "task30_trial_or_acceptance_actions": 0,
+    "project_sources_changes": 0
+  },
+  "factory_fit_review": "FULL_REVIEW",
+  "factory_fit": {
+    "verdict": "PASS_WITH_LIMITATIONS",
+    "mission": "PASS: makes the next evidence gap legible without mistaking availability work for alpha research.",
+    "research_truth": "PASS: preserves MISSING_UNKNOWN, UNSUPPORTED, frozen definitions and the no-trial boundary.",
+    "owner_operability": "PASS: one short report and one read-only command answer the immediate owner question.",
+    "efficiency": "PASS: reuses three hash-bound receipts and adds no provider, storage, scheduler or new dependency.",
+    "flexibility": "PASS: the next data contract can name another provider without changing this evaluator.",
+    "execution_to_cashflow": "NOT_IN_SCOPE: no execution, settlement, PnL or cashflow claim is made.",
+    "monitoring_recovery": "PASS: no running process or open state is created; the next boundary remains owner-gated.",
+    "reuse_build_decision": "BUILD_MINIMAL_PURE_EVALUATOR"
+  },
+  "product_horizon_radar": {
+    "now": {
+      "candidate": "EXACT_H07_H01_DATA_CONTRACT_ENTRY_GATE",
+      "value": "Converts a broad data problem into one falsifiable owner decision.",
+      "activation_trigger": "OWNER_AUTHORIZATION_FOR_A_NAMED_EXTERNAL_READ_OR_CAPTURE_CONTRACT"
+    },
+    "watch": {
+      "candidate": "SETTLED_EXECUTION_TRUTH_ROUTE",
+      "value": "Required before a route-aware outcome can become a strategy or cashflow claim.",
+      "activation_trigger": "PIT_DATA_CONTRACT_IS_ADMISSIBLE"
+    }
+  },
+  "project_sources_disposition": {
+    "kind": "NO_CHANGE",
+    "reason": "T30-A7 is an offline evidence-readiness decision and does not change canonical TASK-30 status."
+  }
+}

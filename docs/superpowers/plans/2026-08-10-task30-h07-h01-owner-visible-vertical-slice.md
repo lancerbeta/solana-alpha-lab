@@ -39,7 +39,9 @@
 - Create: `configs/task30_h07_h01_owner_visible_vertical_slice_v1.yaml`
 - Create: `src/solana_alpha_lab/task30_h07_h01_owner_visible_vertical_slice.py`
 
-- [ ] **Step 1: Write the failing unit-test scaffold first.**
+- [ ] **Step 1: Create the versioned YAML input, then write the failing unit-test scaffold.**
+
+  The YAML control record is deterministic test input rather than production code, so create it first with the exact narrow shape specified in Step 4. Do not create the evaluator or any CLI before the test is written and observed failing.
 
   Load the new YAML configuration and the frozen `RC001-H07-H01-LIQUIDITY-RETENTION` group from `configs/task28_rc001_registry_freeze_v1.yaml`. Import `evaluate_owner_visible_slice` and `validate_owner_visible_slice` conditionally, so missing implementation is a clear test failure. Assert the current result is exactly `CAPTURE_REQUIRED` with ordered blockers `CONTINUOUS_PIT_PRICE_HISTORY_UNAVAILABLE` and `SETTLED_EXECUTION_TRUTH_UNAVAILABLE`.
 
@@ -78,7 +80,7 @@
 
   Bind the contract to the immutable TASK-28 group ID and definition hash `14a7387148d05773dedcb5ad6a8110a0dcab7e49da4dec77328903a5b7577df7`. State that current evidence is price/transport feasibility only; it is neither a research trial nor evidence of alpha, execution, PnL, or NetReturn.
 
-- [ ] **Step 4: Create the YAML control record.**
+- [ ] **Step 4: Complete and review the YAML control record.**
 
   Use a narrow top-level shape:
 
