@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import copy
+import hashlib
 import json
 import sys
 import unittest
@@ -28,6 +29,20 @@ SCHEMA_PATH = (
 FIXTURE_PATH = (
     ROOT / "tests/fixtures/task30/reuse_first_pit_history_route_decision_v1.json"
 )
+ACCEPTANCE_PATH = (
+    ROOT / "docs/evidence/task30/a4_reuse_first_pit_history_route_decision_acceptance_v1.json"
+)
+CATALOG_CORE_PATH = ROOT / "catalog/assets/core.yaml"
+
+EXPECTED_ASSET_IDS = {
+    "CONTRACT-T30-REUSE-FIRST-HISTORY-ROUTE-001",
+    "CONFIG-T30-REUSE-FIRST-HISTORY-ROUTE-001",
+    "SCHEMA-T30-REUSE-FIRST-HISTORY-ROUTE-001",
+    "FIXTURE-T30-REUSE-FIRST-HISTORY-ROUTE-001",
+    "MODULE-T30-REUSE-FIRST-HISTORY-ROUTE-001",
+    "TEST-T30-REUSE-FIRST-HISTORY-ROUTE-001",
+    "EVIDENCE-T30-A4-REUSE-FIRST-HISTORY-ROUTE-001",
+}
 
 
 def replace_pointer(record: dict[str, object], pointer: str, replacement: object) -> None:
@@ -36,6 +51,10 @@ def replace_pointer(record: dict[str, object], pointer: str, replacement: object
     for part in parts[:-1]:
         target = target[part]  # type: ignore[assignment,index]
     target[parts[-1]] = replacement
+
+
+def sha256(path: Path) -> str:
+    return hashlib.sha256(path.read_bytes()).hexdigest()
 
 
 class Task30ReuseFirstPitHistoryRouteDecisionTests(unittest.TestCase):
@@ -115,3 +134,32 @@ class Task30ReuseFirstPitHistoryRouteDecisionTests(unittest.TestCase):
             ReuseFirstHistoryRouteError, "CREDENTIAL_DISCLOSURE_FORBIDDEN"
         ):
             evaluate_reuse_first_history_route(policy)
+
+    def test_acceptance_binds_artifacts_and_reports_zero_external_effects(self) -> None:
+        """Catches delivery without hash-bound evidence or a full factory review."""
+        self.assertTrue(
+            ACCEPTANCE_PATH.exists(),
+            "T30-A4 must include one hash-bound acceptance receipt",
+        )
+        if not ACCEPTANCE_PATH.exists():
+            return
+
+        receipt = json.loads(ACCEPTANCE_PATH.read_text(encoding="utf-8"))
+        for binding in receipt["artifact_bindings"].values():
+            self.assertEqual(binding["sha256"], sha256(ROOT / binding["path"]))
+        self.assertTrue(
+            all(value == 0 for value in receipt["side_effect_counters"].values())
+        )
+        self.assertEqual(
+            receipt["decision"]["value"], "T30_A0_REUSE_CLOSED_NO_PROVIDER_PILOT"
+        )
+        self.assertEqual(receipt["factory_fit"]["review_scope"], "FULL_REVIEW")
+        self.assertEqual(
+            receipt["project_sources_disposition"]["kind"], "NO_CHANGE"
+        )
+
+    def test_catalog_registers_each_t30_a4_output(self) -> None:
+        """Catches an accepted decision that future entry gates cannot discover."""
+        catalog = yaml.safe_load(CATALOG_CORE_PATH.read_text(encoding="utf-8"))
+        asset_ids = {record["asset_id"] for record in catalog["records"]}
+        self.assertTrue(EXPECTED_ASSET_IDS.issubset(asset_ids))

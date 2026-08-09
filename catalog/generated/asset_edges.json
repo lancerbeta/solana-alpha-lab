@@ -528,6 +528,11 @@
       "target_asset_id": "CONTRACT-T30-OHLCV-BOUNDARY-SEMANTICS-001"
     },
     {
+      "source_asset_id": "CONFIG-T30-REUSE-FIRST-HISTORY-ROUTE-001",
+      "relation": "governed_by",
+      "target_asset_id": "CONTRACT-T30-REUSE-FIRST-HISTORY-ROUTE-001"
+    },
+    {
       "source_asset_id": "CONFIG-T34A-DOCUMENTATION-FOUNDATION-001",
       "relation": "governed_by",
       "target_asset_id": "CONTRACT-T34A-DOCUMENTATION-FOUNDATION-001"
@@ -1071,6 +1076,16 @@
       "source_asset_id": "CONTRACT-T30-OHLCV-BOUNDARY-SEMANTICS-001",
       "relation": "derived_from",
       "target_asset_id": "EVIDENCE-T27-A1S4-OWNER-ROUTE-CLOSE-001"
+    },
+    {
+      "source_asset_id": "CONTRACT-T30-REUSE-FIRST-HISTORY-ROUTE-001",
+      "relation": "derived_from",
+      "target_asset_id": "EVIDENCE-T30-A1-BOUNDARY-SEMANTICS-001"
+    },
+    {
+      "source_asset_id": "CONTRACT-T30-REUSE-FIRST-HISTORY-ROUTE-001",
+      "relation": "derived_from",
+      "target_asset_id": "EVIDENCE-T30-A4-BIRDEYE-PILOT-FACTORY-FIT-001"
     },
     {
       "source_asset_id": "CONTROL-T21-ACTIVE-TIME-GATE-001",
@@ -2958,6 +2973,16 @@
       "target_asset_id": "TEST-T30-BIRDEYE-PILOT-READINESS-001"
     },
     {
+      "source_asset_id": "EVIDENCE-T30-A4-REUSE-FIRST-HISTORY-ROUTE-001",
+      "relation": "derived_from",
+      "target_asset_id": "MODULE-T30-REUSE-FIRST-HISTORY-ROUTE-001"
+    },
+    {
+      "source_asset_id": "EVIDENCE-T30-A4-REUSE-FIRST-HISTORY-ROUTE-001",
+      "relation": "validated_by",
+      "target_asset_id": "TEST-T30-REUSE-FIRST-HISTORY-ROUTE-001"
+    },
+    {
       "source_asset_id": "EVIDENCE-T34A-A3-ACCEPTANCE-001",
       "relation": "derived_from",
       "target_asset_id": "CONTRACT-T34A-DOCUMENTATION-FOUNDATION-001"
@@ -3526,6 +3551,11 @@
       "source_asset_id": "FIXTURE-T30-OHLCV-BOUNDARY-SEMANTICS-001",
       "relation": "derived_from",
       "target_asset_id": "CONFIG-T30-OHLCV-BOUNDARY-SEMANTICS-001"
+    },
+    {
+      "source_asset_id": "FIXTURE-T30-REUSE-FIRST-HISTORY-ROUTE-001",
+      "relation": "derived_from",
+      "target_asset_id": "CONFIG-T30-REUSE-FIRST-HISTORY-ROUTE-001"
     },
     {
       "source_asset_id": "FIXTURE-T34A-DOCUMENTATION-FOUNDATION-001",
@@ -4323,6 +4353,16 @@
       "target_asset_id": "EVIDENCE-T30-A1-BOUNDARY-SEMANTICS-001"
     },
     {
+      "source_asset_id": "MODULE-T30-REUSE-FIRST-HISTORY-ROUTE-001",
+      "relation": "governed_by",
+      "target_asset_id": "CONFIG-T30-REUSE-FIRST-HISTORY-ROUTE-001"
+    },
+    {
+      "source_asset_id": "MODULE-T30-REUSE-FIRST-HISTORY-ROUTE-001",
+      "relation": "produces",
+      "target_asset_id": "EVIDENCE-T30-A4-REUSE-FIRST-HISTORY-ROUTE-001"
+    },
+    {
       "source_asset_id": "MODULE-T34A-DOCUMENTATION-FOUNDATION-001",
       "relation": "governed_by",
       "target_asset_id": "CONFIG-T34A-DOCUMENTATION-FOUNDATION-001"
@@ -5061,6 +5101,11 @@
       "source_asset_id": "SCHEMA-T30-OHLCV-BOUNDARY-SEMANTICS-001",
       "relation": "governed_by",
       "target_asset_id": "CONTRACT-T30-OHLCV-BOUNDARY-SEMANTICS-001"
+    },
+    {
+      "source_asset_id": "SCHEMA-T30-REUSE-FIRST-HISTORY-ROUTE-001",
+      "relation": "governed_by",
+      "target_asset_id": "CONTRACT-T30-REUSE-FIRST-HISTORY-ROUTE-001"
     },
     {
       "source_asset_id": "SCHEMA-T34A-DOCUMENTATION-FOUNDATION-001",
@@ -6736,6 +6781,26 @@
       "source_asset_id": "TEST-T30-OHLCV-BOUNDARY-SEMANTICS-001",
       "relation": "depends_on",
       "target_asset_id": "SCHEMA-T30-OHLCV-BOUNDARY-SEMANTICS-001"
+    },
+    {
+      "source_asset_id": "TEST-T30-REUSE-FIRST-HISTORY-ROUTE-001",
+      "relation": "depends_on",
+      "target_asset_id": "EVIDENCE-T30-A4-REUSE-FIRST-HISTORY-ROUTE-001"
+    },
+    {
+      "source_asset_id": "TEST-T30-REUSE-FIRST-HISTORY-ROUTE-001",
+      "relation": "depends_on",
+      "target_asset_id": "FIXTURE-T30-REUSE-FIRST-HISTORY-ROUTE-001"
+    },
+    {
+      "source_asset_id": "TEST-T30-REUSE-FIRST-HISTORY-ROUTE-001",
+      "relation": "depends_on",
+      "target_asset_id": "MODULE-T30-REUSE-FIRST-HISTORY-ROUTE-001"
+    },
+    {
+      "source_asset_id": "TEST-T30-REUSE-FIRST-HISTORY-ROUTE-001",
+      "relation": "depends_on",
+      "target_asset_id": "SCHEMA-T30-REUSE-FIRST-HISTORY-ROUTE-001"
     },
     {
       "source_asset_id": "TEST-T34A-DOCUMENTATION-FOUNDATION-001",

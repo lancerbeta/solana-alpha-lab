@@ -1,0 +1,111 @@
+{
+  "schema": "smial.task30.reuse-first-pit-history-route.acceptance",
+  "schema_version": "1.0",
+  "receipt_id": "T30-A4-REUSE-FIRST-HISTORY-ROUTE-001",
+  "task_id": "TASK-30",
+  "atom_id": "T30-A4_REUSE_FIRST_PIT_HISTORY_ROUTE_DECISION_V1",
+  "status": "VALIDATED_OFFLINE_REUSE_DECISION",
+  "artifact_bindings": {
+    "contract": {
+      "path": "docs/contracts/task30_reuse_first_pit_history_route_decision_contract_v1.md",
+      "sha256": "57b8dd2534c495690962bbd7e1185bec26c8d112d8acc01a4cf4b6e32980407d"
+    },
+    "configuration": {
+      "path": "configs/task30_reuse_first_pit_history_route_decision_v1.yaml",
+      "sha256": "0b966f204b5a273ab809316941fb92f92d992935ef8001989fe92fecd7191c94"
+    },
+    "schema": {
+      "path": "catalog/schemas/task30_reuse_first_pit_history_route_decision.schema.json",
+      "sha256": "3d1a3843084dd8532b6413115db4f405463b11605a864632836eef1e576d75a1"
+    },
+    "fixture": {
+      "path": "tests/fixtures/task30/reuse_first_pit_history_route_decision_v1.json",
+      "sha256": "6d382d56c22392810a1a720a3459a985cad626250c000f9d4639681bdaf8dbf3"
+    },
+    "module": {
+      "path": "src/solana_alpha_lab/task30_reuse_first_pit_history_route.py",
+      "sha256": "e840ef90dff998e5c0afc4133aefa1971e662af0320cfe5af1d44c862d316a73"
+    },
+    "test": {
+      "path": "tests/test_task30_reuse_first_pit_history_route_decision.py",
+      "sha256": "a9c9c1bcfe39373aa42eeed11127f327f3b11e567f06ccff2d913a70b424b711"
+    }
+  },
+  "input_evidence": {
+    "gecko_t30_a0_raw_sha256": "cce29d4e175bc81a474c699e3bb465daf8cb864f3cb195a9812bd0d3c0ca4163",
+    "gecko_documentation": "https://docs.coingecko.com/reference/pool-ohlcv-contract-address",
+    "solana_tracker_documentation": "https://docs.solanatracker.io/data-api/chart/get-ohlcv-data-for-a-tokenpool-pair",
+    "birdeye_documentation": "https://docs.birdeye.so/reference/get-defi-v3-ohlcv-pair"
+  },
+  "decision": {
+    "value": "T30_A0_REUSE_CLOSED_NO_PROVIDER_PILOT",
+    "route_states": {
+      "GECKO_T30_A0": "DOCUMENTED_START_LABEL_CONFLICTS_WITH_RETAINED_BOUNDARY",
+      "SOLANA_TRACKER_PAIR": "OBSERVED_INSUFFICIENT_33_OF_96",
+      "BIRDEYE_V3_PAIR": "CANDIDATE_NOT_READY"
+    },
+    "next_boundary": "NEW_NAMED_PROVIDER_CANDIDATE_REQUIRES_ENTRY_GATE",
+    "state_change": "NONE"
+  },
+  "factory_fit": {
+    "review_scope": "FULL_REVIEW",
+    "verdict": "PASS_WITH_LIMITATIONS",
+    "mission": "Prevents the factory from treating an ambiguous or sparse historical response as point-in-time research evidence.",
+    "research_truth": "The decision preserves observed conflict, insufficiency and readiness gaps without imputing a continuous panel.",
+    "owner_operability": "A future owner decision is one named-provider Entry Gate, rather than an implicit retry or provider substitution.",
+    "reusability": {
+      "outcome": "ADOPT_EXISTING",
+      "components": [
+        "Catalog registration",
+        "JSON Schema validation",
+        "Pure Python fail-closed evaluator"
+      ],
+      "rejected": "Building a collector, provider adapter or execution system before a named data route is admissible."
+    },
+    "product_horizon": {
+      "now": {
+        "candidate": "CLOSE_UNSAFE_T30_A0_REUSE_AND_REQUIRE_A_NEW_NAMED_DATA_ROUTE",
+        "value": "Stops false continuity claims at the earliest reusable evidence boundary.",
+        "evidence": "Retained Gecko response has an observed/documented boundary conflict; Solana Tracker delivered 33 of 96 required bars; Birdeye readiness remains unproven.",
+        "cost_risk": "No provider call, credential use, raw-data write or cash cost.",
+        "owner": "WORK/CODEX",
+        "activation_trigger": "This offline acceptance receipt."
+      },
+      "watch": {
+        "candidate": "NEW_NAMED_PROVIDER_ENTRY_GATE",
+        "value": "May identify one admissible historical route without assuming that an existing provider will fit.",
+        "evidence": "Each rejected or unready route has a separate, recorded reason.",
+        "cost_risk": "Requires a new provider-specific scope, authority and cheapest falsifier before any call.",
+        "owner": "Goal owner",
+        "activation_trigger": "A concrete candidate that can state pair identity, interval semantics, coverage threshold and minimum access."
+      }
+    }
+  },
+  "non_claims": {
+    "continuous_panel": false,
+    "pit_admissible": false,
+    "explicit_no_trade": false,
+    "alpha": false,
+    "strategy": false,
+    "execution": false,
+    "actual_fills": false,
+    "settlement": false,
+    "pnl": false,
+    "numeric_netreturn": false
+  },
+  "side_effect_counters": {
+    "provider_api_rpc_wss_calls": 0,
+    "credential_use": 0,
+    "raw_data_writes": 0,
+    "r2_r3_access": 0,
+    "dependency_changes": 0,
+    "wallet_signer_transaction_actions": 0,
+    "cash_spend": 0,
+    "task30_trial_or_acceptance_actions": 0,
+    "project_sources_changes": 0
+  },
+  "project_sources_disposition": {
+    "kind": "NO_CHANGE",
+    "reason": "This is an offline subtask receipt, not canonical TASK-30 completion or an activated Source release."
+  }
+}
