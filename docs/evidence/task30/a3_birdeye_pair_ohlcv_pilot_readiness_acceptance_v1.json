@@ -1,0 +1,87 @@
+{
+  "schema": "smial.task30.birdeye-pair-ohlcv-pilot-readiness.acceptance",
+  "schema_version": "1.0",
+  "receipt_id": "T30-A3-BIRDEYE-PAIR-OHLCV-PILOT-READINESS-001",
+  "task_id": "TASK-30",
+  "atom_id": "T30-A3_BIRDEYE_PAIR_OHLCV_PILOT_READINESS_BOUNDARY_V1",
+  "status": "VALIDATED_OFFLINE_READINESS_BOUNDARY",
+  "artifact_bindings": {
+    "contract": {
+      "path": "docs/contracts/task30_birdeye_pair_ohlcv_pilot_readiness_contract_v1.md",
+      "sha256": "b5d24ad7e42c0d71293071fe00f5c0d9d3fd562102c78881197a827dd3779e06"
+    },
+    "config": {
+      "path": "configs/task30_birdeye_pair_ohlcv_pilot_readiness_v1.yaml",
+      "sha256": "8bfdcf9c7e21cfe887836c554fd4bcca898a12a216693f561f2034e9e85a3b1e"
+    },
+    "schema": {
+      "path": "catalog/schemas/task30_birdeye_pair_ohlcv_pilot_readiness.schema.json",
+      "sha256": "1261dcfbec92c1ecc9f817b7428cda9fc60a6fc961cba88a4dec18d95785a82d"
+    },
+    "fixture": {
+      "path": "tests/fixtures/task30/birdeye_pair_ohlcv_pilot_readiness_v1.json",
+      "sha256": "36eea66d79f299db34f87a4b01e7d76073061396048d81cb4300e1fbb5424c70"
+    },
+    "evaluator": {
+      "path": "src/solana_alpha_lab/task30_birdeye_pair_ohlcv_pilot_readiness.py",
+      "sha256": "c978be0331c3b9fa91fe8d1646fe5f116ac23c46ba991bc3fa42b2c0ed52ab9d"
+    },
+    "test": {
+      "path": "tests/test_task30_birdeye_pair_ohlcv_pilot_readiness.py",
+      "sha256": "8a2a72276c8b0ca925082d02750466c48b286846453e6e22c0c9c6335243e17b"
+    }
+  },
+  "prior_guardrail": {
+    "atom_id": "T30-A1_FROZEN_OHLCV_BOUNDARY_SEMANTICS_DECISION_V1",
+    "decision": "UNRESOLVED_INTERVAL_LABEL_SEMANTICS",
+    "required_next_evidence": "INDEPENDENT_EXACT_TIMESTAMP_SEMANTICS_PROOF"
+  },
+  "decision": {
+    "value": "NOT_READY_FOR_PROVIDER_PILOT",
+    "blockers": [
+      "BIRDEYE_REST_15M_ENUM_UNPROVEN",
+      "BIRDEYE_PAIR_IDENTITY_UNPROVEN",
+      "BIRDEYE_API_KEY_LOCAL_PRESENCE_UNATTESTED",
+      "OWNER_ONE_CALL_AUTHORITY_NOT_GRANTED"
+    ],
+    "task30_trial_or_acceptance": false,
+    "state_change": "NONE"
+  },
+  "adversarial_rejections": [
+    "REST_15M_ENUM_PROMOTION_FORBIDDEN",
+    "WEBSOCKET_AS_REST_PROOF_FORBIDDEN",
+    "PAIR_IDENTITY_PROMOTION_FORBIDDEN",
+    "EXTERNAL_AUTHORITY_FORBIDDEN",
+    "CREDENTIAL_DISCLOSURE_FORBIDDEN",
+    "RAW_DATA_FORBIDDEN",
+    "RETRY_OR_FALLBACK_FORBIDDEN",
+    "RESEARCH_PROMOTION_FORBIDDEN"
+  ],
+  "side_effect_counters": {
+    "provider_api_rpc_wss_calls": 0,
+    "credential_uses": 0,
+    "raw_data_writes": 0,
+    "r2_r3_reads": 0,
+    "wallet_signer_transaction_actions": 0,
+    "cash_spend_usd_cents": 0,
+    "dependency_changes": 0,
+    "project_sources_changes": 0
+  },
+  "non_claims": [
+    "HISTORICAL_REST_15M_SUPPORT",
+    "BIRDEYE_PAIR_IDENTITY",
+    "LOCAL_KEY_AVAILABILITY",
+    "PROVIDER_AUTHORITY",
+    "CONTINUOUS_PANEL",
+    "PIT_ADMISSIBILITY",
+    "MARKET_ALPHA",
+    "TASK30_TRIAL",
+    "NUMERIC_NETRETURN",
+    "ACTUAL_FILLS",
+    "SETTLEMENT"
+  ],
+  "project_sources_disposition": {
+    "kind": "NO_CHANGE",
+    "reason": "T30-A3 is an offline readiness boundary and does not change canonical task status, accepted data, or a Project Sources release."
+  }
+}

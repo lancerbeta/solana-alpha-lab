@@ -1,0 +1,13 @@
+{
+  "fixture_kind": "SYNTHETIC_GOLDEN_ONLY",
+  "expected_result": {
+    "decision": "NOT_READY_FOR_PROVIDER_PILOT",
+    "blockers": [
+      "BIRDEYE_REST_15M_ENUM_UNPROVEN",
+      "BIRDEYE_PAIR_IDENTITY_UNPROVEN",
+      "BIRDEYE_API_KEY_LOCAL_PRESENCE_UNATTESTED",
+      "OWNER_ONE_CALL_AUTHORITY_NOT_GRANTED"
+    ],
+    "project_sources_disposition": "NO_CHANGE"
+  }
+}

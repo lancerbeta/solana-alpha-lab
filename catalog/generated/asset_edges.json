@@ -518,6 +518,11 @@
       "target_asset_id": "CONTRACT-T28-RC001-REGISTRY-FREEZE-001"
     },
     {
+      "source_asset_id": "CONFIG-T30-BIRDEYE-PILOT-READINESS-001",
+      "relation": "governed_by",
+      "target_asset_id": "CONTRACT-T30-BIRDEYE-PILOT-READINESS-001"
+    },
+    {
       "source_asset_id": "CONFIG-T30-OHLCV-BOUNDARY-SEMANTICS-001",
       "relation": "governed_by",
       "target_asset_id": "CONTRACT-T30-OHLCV-BOUNDARY-SEMANTICS-001"
@@ -1051,6 +1056,11 @@
       "source_asset_id": "CONTRACT-T28-RC001-REGISTRY-FREEZE-001",
       "relation": "governed_by",
       "target_asset_id": "DOC-T28-RC001-REGISTRY-FREEZE-001"
+    },
+    {
+      "source_asset_id": "CONTRACT-T30-BIRDEYE-PILOT-READINESS-001",
+      "relation": "derived_from",
+      "target_asset_id": "EVIDENCE-T30-A2-CATALOG-FACTORY-FIT-001"
     },
     {
       "source_asset_id": "CONTRACT-T30-OHLCV-BOUNDARY-SEMANTICS-001",
@@ -2908,6 +2918,26 @@
       "target_asset_id": "TEST-T30-OHLCV-BOUNDARY-SEMANTICS-001"
     },
     {
+      "source_asset_id": "EVIDENCE-T30-A3-BIRDEYE-PILOT-READINESS-001",
+      "relation": "derived_from",
+      "target_asset_id": "MODULE-T30-BIRDEYE-PILOT-READINESS-001"
+    },
+    {
+      "source_asset_id": "EVIDENCE-T30-A3-BIRDEYE-PILOT-READINESS-001",
+      "relation": "validated_by",
+      "target_asset_id": "TEST-T30-BIRDEYE-PILOT-READINESS-001"
+    },
+    {
+      "source_asset_id": "EVIDENCE-T30-A4-BIRDEYE-PILOT-FACTORY-FIT-001",
+      "relation": "derived_from",
+      "target_asset_id": "EVIDENCE-T30-A3-BIRDEYE-PILOT-READINESS-001"
+    },
+    {
+      "source_asset_id": "EVIDENCE-T30-A4-BIRDEYE-PILOT-FACTORY-FIT-001",
+      "relation": "validated_by",
+      "target_asset_id": "TEST-T30-BIRDEYE-PILOT-READINESS-001"
+    },
+    {
       "source_asset_id": "FIXTURE-BATON-SUITE-001",
       "relation": "governed_by",
       "target_asset_id": "CTRL-BATON-SETUP-001"
@@ -3446,6 +3476,11 @@
       "source_asset_id": "FIXTURE-T28-RC001-REGISTRY-FREEZE-001",
       "relation": "derived_from",
       "target_asset_id": "CONFIG-T28-RC001-REGISTRY-FREEZE-001"
+    },
+    {
+      "source_asset_id": "FIXTURE-T30-BIRDEYE-PILOT-READINESS-001",
+      "relation": "derived_from",
+      "target_asset_id": "CONFIG-T30-BIRDEYE-PILOT-READINESS-001"
     },
     {
       "source_asset_id": "FIXTURE-T30-OHLCV-BOUNDARY-SEMANTICS-001",
@@ -4223,6 +4258,16 @@
       "target_asset_id": "EVIDENCE-T28-A1-RC001-REGISTRY-FREEZE-001"
     },
     {
+      "source_asset_id": "MODULE-T30-BIRDEYE-PILOT-READINESS-001",
+      "relation": "governed_by",
+      "target_asset_id": "CONFIG-T30-BIRDEYE-PILOT-READINESS-001"
+    },
+    {
+      "source_asset_id": "MODULE-T30-BIRDEYE-PILOT-READINESS-001",
+      "relation": "produces",
+      "target_asset_id": "EVIDENCE-T30-A3-BIRDEYE-PILOT-READINESS-001"
+    },
+    {
       "source_asset_id": "MODULE-T30-OHLCV-BOUNDARY-SEMANTICS-001",
       "relation": "governed_by",
       "target_asset_id": "CONFIG-T30-OHLCV-BOUNDARY-SEMANTICS-001"
@@ -4951,6 +4996,11 @@
       "source_asset_id": "SCHEMA-T28-RC001-REGISTRY-FREEZE-001",
       "relation": "governed_by",
       "target_asset_id": "CONTRACT-T28-RC001-REGISTRY-FREEZE-001"
+    },
+    {
+      "source_asset_id": "SCHEMA-T30-BIRDEYE-PILOT-READINESS-001",
+      "relation": "governed_by",
+      "target_asset_id": "CONTRACT-T30-BIRDEYE-PILOT-READINESS-001"
     },
     {
       "source_asset_id": "SCHEMA-T30-OHLCV-BOUNDARY-SEMANTICS-001",
@@ -6581,6 +6631,26 @@
       "source_asset_id": "TEST-T28-RC001-REGISTRY-FREEZE-001",
       "relation": "depends_on",
       "target_asset_id": "SCHEMA-T28-RC001-REGISTRY-FREEZE-001"
+    },
+    {
+      "source_asset_id": "TEST-T30-BIRDEYE-PILOT-READINESS-001",
+      "relation": "depends_on",
+      "target_asset_id": "EVIDENCE-T30-A4-BIRDEYE-PILOT-FACTORY-FIT-001"
+    },
+    {
+      "source_asset_id": "TEST-T30-BIRDEYE-PILOT-READINESS-001",
+      "relation": "depends_on",
+      "target_asset_id": "FIXTURE-T30-BIRDEYE-PILOT-READINESS-001"
+    },
+    {
+      "source_asset_id": "TEST-T30-BIRDEYE-PILOT-READINESS-001",
+      "relation": "depends_on",
+      "target_asset_id": "MODULE-T30-BIRDEYE-PILOT-READINESS-001"
+    },
+    {
+      "source_asset_id": "TEST-T30-BIRDEYE-PILOT-READINESS-001",
+      "relation": "depends_on",
+      "target_asset_id": "SCHEMA-T30-BIRDEYE-PILOT-READINESS-001"
     },
     {
       "source_asset_id": "TEST-T30-OHLCV-BOUNDARY-SEMANTICS-001",

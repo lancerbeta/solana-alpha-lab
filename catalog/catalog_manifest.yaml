@@ -1,12 +1,12 @@
 schema_version: '1.0'
 catalog_id: SMIAL-PROJECT-ASSET-CATALOG
-catalog_version: 0.45.0
+catalog_version: 0.46.0
 as_of: '2026-08-09'
 implementation_status: VALIDATED_ACTIVE
 current_checkpoint:
-  assets: 592
+  assets: 600
   asset_registries: 4
-  schemas: 17
+  schemas: 18
   queries: 8
   lifecycle_registries: 9
   lifecycle_records: 59
@@ -46,6 +46,7 @@ root_resolver:
   - catalog/schemas/task27_terminal_reconciliation_and_sources_release.schema.json
   - catalog/schemas/task28_rc001_registry_freeze.schema.json
   - catalog/schemas/task30_ohlcv_boundary_semantics_decision.schema.json
+  - catalog/schemas/task30_birdeye_pair_ohlcv_pilot_readiness.schema.json
   commands:
     validate:
     - uv
@@ -596,5 +597,13 @@ mandatory_asset_ids:
 - TEST-T30-OHLCV-BOUNDARY-SEMANTICS-001
 - EVIDENCE-T30-A1-BOUNDARY-SEMANTICS-001
 - EVIDENCE-T30-A2-CATALOG-FACTORY-FIT-001
+- CONTRACT-T30-BIRDEYE-PILOT-READINESS-001
+- CONFIG-T30-BIRDEYE-PILOT-READINESS-001
+- SCHEMA-T30-BIRDEYE-PILOT-READINESS-001
+- FIXTURE-T30-BIRDEYE-PILOT-READINESS-001
+- MODULE-T30-BIRDEYE-PILOT-READINESS-001
+- TEST-T30-BIRDEYE-PILOT-READINESS-001
+- EVIDENCE-T30-A3-BIRDEYE-PILOT-READINESS-001
+- EVIDENCE-T30-A4-BIRDEYE-PILOT-FACTORY-FIT-001
 deferred_capabilities:
 - GRAPH_DATABASE

@@ -1,0 +1,125 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://solana-alpha-lab.local/schemas/task30_birdeye_pair_ohlcv_pilot_readiness.schema.json",
+  "title": "TASK-30 Birdeye pair OHLCV pilot readiness boundary",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema", "schema_version", "task_id", "atom_id", "contract_id", "consumer",
+    "evidence", "pair_identity", "credential_probe", "owner_authority", "authority",
+    "request_shape", "non_claims", "decision", "required_next_evidence",
+    "project_sources_disposition"
+  ],
+  "properties": {
+    "schema": {"const": "smial.task30.birdeye-pair-ohlcv-pilot-readiness.policy"},
+    "schema_version": {"const": "1.0"},
+    "task_id": {"const": "TASK-30"},
+    "atom_id": {"const": "T30-A3_BIRDEYE_PAIR_OHLCV_PILOT_READINESS_BOUNDARY_V1"},
+    "contract_id": {"const": "TASK30-BIRDEYE-PAIR-OHLCV-PILOT-READINESS-V1"},
+    "consumer": {"const": "FUTURE_EXACT_OWNER_PROVIDER_AUTHORITY_GATE"},
+    "evidence": {"$ref": "#/$defs/evidence"},
+    "pair_identity": {"$ref": "#/$defs/pair_identity"},
+    "credential_probe": {"$ref": "#/$defs/credential_probe"},
+    "owner_authority": {"$ref": "#/$defs/owner_authority"},
+    "authority": {"$ref": "#/$defs/authority"},
+    "request_shape": {"$ref": "#/$defs/request_shape"},
+    "non_claims": {"$ref": "#/$defs/non_claims"},
+    "decision": {"const": "NOT_READY_FOR_PROVIDER_PILOT"},
+    "required_next_evidence": {"const": ["BIRDEYE_REST_15M_ENUM_PROOF", "BIRDEYE_PAIR_IDENTITY_PROOF"]},
+    "project_sources_disposition": {"const": "NO_CHANGE"}
+  },
+  "$defs": {
+    "evidence": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["as_of", "historical_rest_pair_ohlcv", "rest_15m_enum", "websocket_15m"],
+      "properties": {
+        "as_of": {"const": "2026-08-09"},
+        "historical_rest_pair_ohlcv": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["documentation_url", "time_parameters", "api_key_requirement", "padding_parameter"],
+          "properties": {
+            "documentation_url": {"const": "https://docs.birdeye.so/reference/get-defi-v3-ohlcv-pair"},
+            "time_parameters": {"const": "DOCUMENTED_UNIX_SECONDS"},
+            "api_key_requirement": {"const": "DOCUMENTED"},
+            "padding_parameter": {"const": "DOCUMENTED"}
+          }
+        },
+        "rest_15m_enum": {"const": "UNPROVEN"},
+        "websocket_15m": {"const": "OBSERVED_NOT_REST_ADMISSIBLE"}
+      }
+    },
+    "pair_identity": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["candidate_pool_address", "birdeye_pair_address", "status"],
+      "properties": {
+        "candidate_pool_address": {"const": "URqx24yyYxtXXhTbBQnbtPLhtLWYoaDaRxuQuLpNS3S"},
+        "birdeye_pair_address": {"const": null},
+        "status": {"const": "UNPROVEN"}
+      }
+    },
+    "credential_probe": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["local_presence_attestation"],
+      "properties": {"local_presence_attestation": {"const": "UNATTESTED"}}
+    },
+    "owner_authority": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["one_call_authority"],
+      "properties": {"one_call_authority": {"const": "NOT_GRANTED"}}
+    },
+    "authority": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "provider_api_rpc_wss_calls", "credential_use", "raw_data_write", "r2_r3_access",
+        "dependency_changes", "wallet_signer_transaction_actions", "cash_spend",
+        "task30_trial_or_acceptance", "project_sources_changes"
+      ],
+      "properties": {
+        "provider_api_rpc_wss_calls": {"const": 0},
+        "credential_use": {"const": false},
+        "raw_data_write": {"const": false},
+        "r2_r3_access": {"const": false},
+        "dependency_changes": {"const": false},
+        "wallet_signer_transaction_actions": {"const": false},
+        "cash_spend": {"const": false},
+        "task30_trial_or_acceptance": {"const": false},
+        "project_sources_changes": {"const": false}
+      }
+    },
+    "request_shape": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["construction", "raw_data_path", "retry_count", "fallback_provider", "provider_call_cap"],
+      "properties": {
+        "construction": {"const": "FORBIDDEN"},
+        "raw_data_path": {"const": null},
+        "retry_count": {"const": 0},
+        "fallback_provider": {"const": null},
+        "provider_call_cap": {"const": 0}
+      }
+    },
+    "non_claims": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "continuous_panel_claim", "pit_admissible_claim", "alpha_claim", "task30_trial_claim",
+        "numeric_netreturn_claim", "actual_fills_claim", "settlement_claim"
+      ],
+      "properties": {
+        "continuous_panel_claim": {"const": false},
+        "pit_admissible_claim": {"const": false},
+        "alpha_claim": {"const": false},
+        "task30_trial_claim": {"const": false},
+        "numeric_netreturn_claim": {"const": false},
+        "actual_fills_claim": {"const": false},
+        "settlement_claim": {"const": false}
+      }
+    }
+  }
+}

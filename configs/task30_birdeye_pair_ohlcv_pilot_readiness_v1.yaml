@@ -1,0 +1,52 @@
+schema: smial.task30.birdeye-pair-ohlcv-pilot-readiness.policy
+schema_version: '1.0'
+task_id: TASK-30
+atom_id: T30-A3_BIRDEYE_PAIR_OHLCV_PILOT_READINESS_BOUNDARY_V1
+contract_id: TASK30-BIRDEYE-PAIR-OHLCV-PILOT-READINESS-V1
+consumer: FUTURE_EXACT_OWNER_PROVIDER_AUTHORITY_GATE
+evidence:
+  as_of: '2026-08-09'
+  historical_rest_pair_ohlcv:
+    documentation_url: https://docs.birdeye.so/reference/get-defi-v3-ohlcv-pair
+    time_parameters: DOCUMENTED_UNIX_SECONDS
+    api_key_requirement: DOCUMENTED
+    padding_parameter: DOCUMENTED
+  rest_15m_enum: UNPROVEN
+  websocket_15m: OBSERVED_NOT_REST_ADMISSIBLE
+pair_identity:
+  candidate_pool_address: URqx24yyYxtXXhTbBQnbtPLhtLWYoaDaRxuQuLpNS3S
+  birdeye_pair_address: null
+  status: UNPROVEN
+credential_probe:
+  local_presence_attestation: UNATTESTED
+owner_authority:
+  one_call_authority: NOT_GRANTED
+authority:
+  provider_api_rpc_wss_calls: 0
+  credential_use: false
+  raw_data_write: false
+  r2_r3_access: false
+  dependency_changes: false
+  wallet_signer_transaction_actions: false
+  cash_spend: false
+  task30_trial_or_acceptance: false
+  project_sources_changes: false
+request_shape:
+  construction: FORBIDDEN
+  raw_data_path: null
+  retry_count: 0
+  fallback_provider: null
+  provider_call_cap: 0
+non_claims:
+  continuous_panel_claim: false
+  pit_admissible_claim: false
+  alpha_claim: false
+  task30_trial_claim: false
+  numeric_netreturn_claim: false
+  actual_fills_claim: false
+  settlement_claim: false
+decision: NOT_READY_FOR_PROVIDER_PILOT
+required_next_evidence:
+  - BIRDEYE_REST_15M_ENUM_PROOF
+  - BIRDEYE_PAIR_IDENTITY_PROOF
+project_sources_disposition: NO_CHANGE
