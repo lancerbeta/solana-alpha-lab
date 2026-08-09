@@ -1,0 +1,129 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://solana-alpha-lab.local/schemas/task30_ohlcv_boundary_semantics_decision.schema.json",
+  "title": "TASK-30 OHLCV boundary semantics decision",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema",
+    "schema_version",
+    "task_id",
+    "atom_id",
+    "contract_id",
+    "consumer",
+    "raw_binding",
+    "observed_response",
+    "candidate_models",
+    "decision",
+    "continuous_panel_claim",
+    "pit_admissible_claim",
+    "selected_model",
+    "required_next_evidence",
+    "authority",
+    "non_claims",
+    "project_sources_disposition"
+  ],
+  "properties": {
+    "schema": {"const": "smial.task30.ohlcv-boundary-semantics-decision.policy"},
+    "schema_version": {"const": "1.0"},
+    "task_id": {"const": "TASK-30"},
+    "atom_id": {"const": "T30-A1_FROZEN_OHLCV_BOUNDARY_SEMANTICS_DECISION_V1"},
+    "contract_id": {"const": "TASK30-OHLCV-BOUNDARY-SEMANTICS-DECISION-V1"},
+    "consumer": {"const": "NEXT_NAMED_HISTORY_FEASIBILITY_OR_TASK30_ENTRY_GATE"},
+    "raw_binding": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["source_atom_id", "provider", "raw_sha256", "git_tracking", "retention"],
+      "properties": {
+        "source_atom_id": {"const": "T30-A0_REUSE_FIRST_EMPTY_INTERVAL_DISCRIMINATOR_V1"},
+        "provider": {"const": "GECKOTERMINAL_PUBLIC"},
+        "raw_sha256": {"const": "cce29d4e175bc81a474c699e3bb465daf8cb864f3cb195a9812bd0d3c0ca4163"},
+        "git_tracking": {"const": "OUTSIDE_GIT"},
+        "retention": {"const": "RETAIN_30_DAYS_UNUSABLE_OR_DECISION_PENDING"}
+      }
+    },
+    "observed_response": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["interval_seconds", "record_count", "requested_window", "returned_grid", "zero_volume_record_count", "zero_volume_semantics"],
+      "properties": {
+        "interval_seconds": {"const": 900},
+        "record_count": {"const": 96},
+        "requested_window": {"$ref": "#/$defs/window"},
+        "returned_grid": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["first_timestamp", "last_timestamp"],
+          "properties": {
+            "first_timestamp": {"const": 1786101300},
+            "last_timestamp": {"const": 1786186800}
+          }
+        },
+        "zero_volume_record_count": {"const": 67},
+        "zero_volume_semantics": {"const": "OBSERVED_ZERO_VOLUME_NOT_PROVEN_NO_TRADE"}
+      }
+    },
+    "candidate_models": {
+      "type": "array",
+      "minItems": 2,
+      "maxItems": 2,
+      "items": {"$ref": "#/$defs/model"}
+    },
+    "decision": {"const": "UNRESOLVED_INTERVAL_LABEL_SEMANTICS"},
+    "continuous_panel_claim": {"const": false},
+    "pit_admissible_claim": {"const": false},
+    "selected_model": {"type": "null"},
+    "required_next_evidence": {"const": "INDEPENDENT_EXACT_TIMESTAMP_SEMANTICS_PROOF"},
+    "authority": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["provider_api_rpc_wss_calls", "credential_use", "r2_r3_access", "dependency_changes", "wallet_signer_transaction_actions", "cash_spend", "task30_trial_or_acceptance", "project_sources_changes"],
+      "properties": {
+        "provider_api_rpc_wss_calls": {"const": 0},
+        "credential_use": {"const": false},
+        "r2_r3_access": {"const": false},
+        "dependency_changes": {"const": false},
+        "wallet_signer_transaction_actions": {"const": false},
+        "cash_spend": {"const": false},
+        "task30_trial_or_acceptance": {"const": false},
+        "project_sources_changes": {"const": false}
+      }
+    },
+    "non_claims": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["explicit_no_trade", "continuous_path", "pit_admissible", "alpha", "numeric_netreturn", "actual_fills", "settlement"],
+      "properties": {
+        "explicit_no_trade": {"const": true},
+        "continuous_path": {"const": true},
+        "pit_admissible": {"const": true},
+        "alpha": {"const": true},
+        "numeric_netreturn": {"const": true},
+        "actual_fills": {"const": true},
+        "settlement": {"const": true}
+      }
+    },
+    "project_sources_disposition": {"const": "NO_CHANGE"}
+  },
+  "$defs": {
+    "window": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["start", "end_exclusive"],
+      "properties": {
+        "start": {"type": "integer"},
+        "end_exclusive": {"type": "integer"}
+      }
+    },
+    "model": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["model_id", "interval_mapping", "implied_window"],
+      "properties": {
+        "model_id": {"enum": ["START_LABELED", "END_LABELED"]},
+        "interval_mapping": {"type": "string"},
+        "implied_window": {"$ref": "#/$defs/window"}
+      }
+    }
+  }
+}

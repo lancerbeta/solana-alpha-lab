@@ -1,0 +1,57 @@
+schema: smial.task30.ohlcv-boundary-semantics-decision.policy
+schema_version: '1.0'
+task_id: TASK-30
+atom_id: T30-A1_FROZEN_OHLCV_BOUNDARY_SEMANTICS_DECISION_V1
+contract_id: TASK30-OHLCV-BOUNDARY-SEMANTICS-DECISION-V1
+consumer: NEXT_NAMED_HISTORY_FEASIBILITY_OR_TASK30_ENTRY_GATE
+raw_binding:
+  source_atom_id: T30-A0_REUSE_FIRST_EMPTY_INTERVAL_DISCRIMINATOR_V1
+  provider: GECKOTERMINAL_PUBLIC
+  raw_sha256: cce29d4e175bc81a474c699e3bb465daf8cb864f3cb195a9812bd0d3c0ca4163
+  git_tracking: OUTSIDE_GIT
+  retention: RETAIN_30_DAYS_UNUSABLE_OR_DECISION_PENDING
+observed_response:
+  interval_seconds: 900
+  record_count: 96
+  requested_window:
+    start: 1786100400
+    end_exclusive: 1786186800
+  returned_grid:
+    first_timestamp: 1786101300
+    last_timestamp: 1786186800
+  zero_volume_record_count: 67
+  zero_volume_semantics: OBSERVED_ZERO_VOLUME_NOT_PROVEN_NO_TRADE
+candidate_models:
+  - model_id: START_LABELED
+    interval_mapping: '[timestamp,timestamp_plus_interval)'
+    implied_window:
+      start: 1786101300
+      end_exclusive: 1786187700
+  - model_id: END_LABELED
+    interval_mapping: '[timestamp_minus_interval,timestamp)'
+    implied_window:
+      start: 1786100400
+      end_exclusive: 1786186800
+decision: UNRESOLVED_INTERVAL_LABEL_SEMANTICS
+continuous_panel_claim: false
+pit_admissible_claim: false
+selected_model: null
+required_next_evidence: INDEPENDENT_EXACT_TIMESTAMP_SEMANTICS_PROOF
+authority:
+  provider_api_rpc_wss_calls: 0
+  credential_use: false
+  r2_r3_access: false
+  dependency_changes: false
+  wallet_signer_transaction_actions: false
+  cash_spend: false
+  task30_trial_or_acceptance: false
+  project_sources_changes: false
+non_claims:
+  explicit_no_trade: true
+  continuous_path: true
+  pit_admissible: true
+  alpha: true
+  numeric_netreturn: true
+  actual_fills: true
+  settlement: true
+project_sources_disposition: NO_CHANGE

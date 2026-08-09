@@ -1,0 +1,91 @@
+{
+  "schema": "smial.task30.ohlcv-boundary-semantics-decision.acceptance",
+  "schema_version": "1.0",
+  "receipt_id": "T30-A1-OHLCV-BOUNDARY-SEMANTICS-001",
+  "task_id": "TASK-30",
+  "atom_id": "T30-A1_FROZEN_OHLCV_BOUNDARY_SEMANTICS_DECISION_V1",
+  "status": "VALIDATED_OFFLINE_SEMANTICS_GUARDRAIL",
+  "artifact_bindings": {
+    "contract": {
+      "path": "docs/contracts/task30_ohlcv_boundary_semantics_decision_contract_v1.md",
+      "sha256": "9cfc00b3f8008040cf2fe98ae70171d8f438d00a5359c5aa8c54e714542e9857"
+    },
+    "config": {
+      "path": "configs/task30_ohlcv_boundary_semantics_decision_v1.yaml",
+      "sha256": "145bf4e6a129dd328d36ca01446072db45eb894644a1efe7c2dfd3329f79fae3"
+    },
+    "schema": {
+      "path": "catalog/schemas/task30_ohlcv_boundary_semantics_decision.schema.json",
+      "sha256": "9491426994e283ee2df7e570e4d9b76855b15e9b924562387d8737de664ba341"
+    },
+    "fixture": {
+      "path": "tests/fixtures/task30/ohlcv_boundary_semantics_decision_v1.json",
+      "sha256": "ca2ddf1a2c16cf87f2d494fdaf67956f4e932a48ff700b44765cbdb84c3692d3"
+    },
+    "evaluator": {
+      "path": "src/solana_alpha_lab/task30_ohlcv_boundary_semantics.py",
+      "sha256": "0f69095fa5a425f940018a02d34cbea4601e635902c7a155fe580b5d4aa33f0a"
+    },
+    "a0_raw_manifest": {
+      "path": "local/task30_reuse_first_empty_interval/run=t30-a0-gecko-empty-20260809T103006703Z/raw_manifest_v1.json",
+      "sha256": "a2c4672de2b7a3775eeb6113d5f401ef44089b7b4188c4e73e871c58189426c7",
+      "git_tracking": "OUTSIDE_GIT"
+    },
+    "a0_raw_response": {
+      "sha256": "cce29d4e175bc81a474c699e3bb465daf8cb864f3cb195a9812bd0d3c0ca4163",
+      "git_tracking": "OUTSIDE_GIT"
+    }
+  },
+  "observed_response_shape": {
+    "interval_seconds": 900,
+    "record_count": 96,
+    "returned_grid": {
+      "first_timestamp": 1786101300,
+      "last_timestamp": 1786186800
+    },
+    "zero_volume_record_count": 67,
+    "zero_volume_semantics": "OBSERVED_ZERO_VOLUME_NOT_PROVEN_NO_TRADE"
+  },
+  "decision": {
+    "value": "UNRESOLVED_INTERVAL_LABEL_SEMANTICS",
+    "selected_model": null,
+    "candidate_models": [
+      "START_LABELED",
+      "END_LABELED"
+    ],
+    "required_next_evidence": "INDEPENDENT_EXACT_TIMESTAMP_SEMANTICS_PROOF",
+    "task30_trial_or_acceptance": false,
+    "state_change": "NONE"
+  },
+  "adversarial_rejections": [
+    "SELECTED_MODEL_FORBIDDEN",
+    "CONTINUOUS_PANEL_CLAIM_FORBIDDEN",
+    "PIT_ADMISSIBLE_CLAIM_FORBIDDEN",
+    "ZERO_VOLUME_PROMOTION_FORBIDDEN",
+    "EXTERNAL_AUTHORITY_FORBIDDEN"
+  ],
+  "side_effect_counters": {
+    "provider_api_rpc_wss_calls": 0,
+    "credential_uses": 0,
+    "r2_r3_reads": 0,
+    "wallet_signer_transaction_actions": 0,
+    "cash_spend_usd_cents": 0,
+    "dependency_changes": 0,
+    "project_sources_changes": 0
+  },
+  "non_claims": [
+    "CONTINUOUS_PANEL",
+    "PIT_ADMISSIBILITY",
+    "EXPLICIT_NO_TRADE",
+    "MARKET_ALPHA",
+    "TASK30_TRIAL",
+    "NUMERIC_NETRETURN",
+    "ACTUAL_FILLS",
+    "SETTLEMENT",
+    "TASK30_ACCEPTANCE"
+  ],
+  "project_sources_disposition": {
+    "kind": "NO_CHANGE",
+    "reason": "T30-A1 is an offline precondition guardrail and does not alter canonical task status or a Project Sources release."
+  }
+}
