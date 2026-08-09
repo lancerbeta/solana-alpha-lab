@@ -220,6 +220,36 @@ uv run --locked --managed-python python -B scripts/validate_ci.py --control-only
   wall-time cap is 15 minutes. Do not run the ordinary full gate in the source
   workspace for the same candidate first.
 
+## REUSE_FIRST_RECOVERY_TRIGGER
+
+After the first material, evidence-backed blocker in a bounded atom, stop
+expansion before custom construction, route widening, or infrastructure
+addition. It applies to incomplete or semantically ambiguous external data, a
+documented provider or protocol capability limit, a repeated delivery/control
+failure with the same root cause, or a concrete component gap that would
+otherwise prompt custom construction. It does not apply to a routine
+deterministic test failure, an already-known limitation, or a blocker whose
+recovery is already prescribed by an exact active gate.
+
+Preserve and classify the first result: no hidden retry or fallback. Consult
+`registries/reuse_candidates.yaml`, relevant accepted decisions including
+`ADR-002`, and only the smallest useful set of current official, OSS, or
+commercial alternatives for the named consumer. Record exactly one outcome —
+`ADOPT`, `WRAP`, `FORK`, `BUILD`, or `STOP` — with its cheapest falsifier.
+
+When the current atom's decision or acceptance receipt already exists, keep a
+compact record there containing only the blocker, alternatives considered, and
+chosen outcome with its fit rationale. It is not a registry row, permanent
+Source, or generic scan artifact for every failure. Missing, vague, stale, or
+conflicting third-party documentation produces `STOP` or an explicitly
+unresolved result; it never licenses a custom workaround by default.
+`BUILD` remains valid only for a narrow project-owned truth boundary after the
+other outcomes are evidenced unfit.
+
+This trigger does not authorize a provider, dependency, cost, security, or
+owner-boundary change. Every ordinary external, license, dependency, security,
+cost, and owner gate remains in force.
+
 ## VALIDATION_ECONOMY
 
 - During implementation, run the smallest targeted checks for the changed

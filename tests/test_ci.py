@@ -365,6 +365,33 @@ class PlatformGateContractTests(unittest.TestCase):
             ci.validate_project_contract(changed)
 
 
+class ReuseFirstRecoveryTriggerTests(unittest.TestCase):
+    def test_agents_contract_requires_reuse_first_after_material_blocker(self) -> None:
+        text = (ROOT / "AGENTS.md").read_text(encoding="utf-8")
+        normalized_text = " ".join(text.split())
+        required_fragments = (
+            "## REUSE_FIRST_RECOVERY_TRIGGER",
+            "first material, evidence-backed blocker",
+            "no hidden retry or fallback",
+            "`registries/reuse_candidates.yaml`",
+            "`ADR-002`",
+            "`ADOPT`, `WRAP`, `FORK`, `BUILD`, or `STOP`",
+            "cheapest falsifier",
+            "current atom's decision or acceptance receipt",
+            "not a registry row, permanent Source, or generic scan artifact",
+            "provider, dependency, cost, security, or owner-boundary change",
+        )
+        for fragment in required_fragments:
+            with self.subTest(fragment=fragment):
+                self.assertIn(fragment, normalized_text)
+        self.assertIn("routine deterministic test failure", normalized_text)
+        self.assertIn("already-known limitation", normalized_text)
+        self.assertLess(
+            text.index("## REUSE_FIRST_RECOVERY_TRIGGER"),
+            text.index("## VALIDATION_ECONOMY"),
+        )
+
+
 class ControlOnlyTaskCloseDocumentationTests(unittest.TestCase):
     def test_agents_makes_fast_path_and_fallback_unavoidable(self) -> None:
         text = (ROOT / "AGENTS.md").read_text(encoding="utf-8")
