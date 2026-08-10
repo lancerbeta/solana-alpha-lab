@@ -1,0 +1,76 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://solana-alpha-lab.local/schemas/task30_h07_h01_exact_data_contract_entry_gate.schema.json",
+  "title": "TASK-30 H07/H01 exact data contract entry gate",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema", "schema_version", "task_id", "atom_id", "contract_id", "consumer",
+    "frozen_definition", "input_evidence", "lanes", "requirements", "decision_policy",
+    "missingness_policy", "capture_safety", "reuse_trigger", "audit_assimilation",
+    "authority", "non_claims", "side_effect_counters", "project_sources_disposition"
+  ],
+  "properties": {
+    "schema": {"const": "smial.task30.h07-h01-exact-data-contract-entry-gate.policy"},
+    "schema_version": {"const": "1.0"},
+    "task_id": {"const": "TASK-30"},
+    "atom_id": {"const": "T30-A8_H07_H01_EXACT_DATA_CONTRACT_ENTRY_GATE_V1"},
+    "contract_id": {"const": "TASK30-H07-H01-EXACT-DATA-CONTRACT-ENTRY-GATE-V1"},
+    "consumer": {"const": "OWNER_FUTURE_PARTIAL_PIT_CAPTURE_DECISION"},
+    "frozen_definition": {"$ref": "#/$defs/frozenDefinition"},
+    "input_evidence": {"$ref": "#/$defs/inputEvidence"},
+    "lanes": {"$ref": "#/$defs/lanes"},
+    "requirements": {"$ref": "#/$defs/requirements"},
+    "decision_policy": {"$ref": "#/$defs/decisionPolicy"},
+    "missingness_policy": {"type": "object"},
+    "capture_safety": {"type": "object"},
+    "reuse_trigger": {"type": "object"},
+    "audit_assimilation": {"type": "object"},
+    "authority": {"type": "object"},
+    "non_claims": {"type": "object"},
+    "side_effect_counters": {"type": "object"},
+    "project_sources_disposition": {"type": "object"}
+  },
+  "$defs": {
+    "frozenDefinition": {
+      "type": "object", "additionalProperties": false,
+      "required": ["path", "group_id", "definition_sha256", "definition_inputs"],
+      "properties": {
+        "path": {"const": "configs/task28_rc001_registry_freeze_v1.yaml"},
+        "group_id": {"const": "RC001-H07-H01-LIQUIDITY-RETENTION"},
+        "definition_sha256": {"const": "14a7387148d05773dedcb5ad6a8110a0dcab7e49da4dec77328903a5b7577df7"},
+        "definition_inputs": {"type": "array", "minItems": 3, "maxItems": 3, "items": {"type": "string"}}
+      }
+    },
+    "inputEvidence": {
+      "type": "object", "additionalProperties": false,
+      "required": ["task27_route_close", "task26b_execution_witness", "task30_a6_forward_capture", "task30_a7_owner_visible"],
+      "properties": {
+        "task27_route_close": {"$ref": "#/$defs/evidenceBinding"},
+        "task26b_execution_witness": {"$ref": "#/$defs/evidenceBinding"},
+        "task30_a6_forward_capture": {"$ref": "#/$defs/evidenceBinding"},
+        "task30_a7_owner_visible": {"$ref": "#/$defs/evidenceBinding"}
+      }
+    },
+    "evidenceBinding": {
+      "type": "object", "additionalProperties": false,
+      "required": ["path", "sha256", "decision"],
+      "properties": {"path": {"type": "string"}, "sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"}, "decision": {"type": "string"}}
+    },
+    "lanes": {
+      "type": "object", "additionalProperties": false,
+      "required": ["PIT_MARKET", "ROUTE_FEASIBILITY", "OWNED_EXECUTION"],
+      "properties": {"PIT_MARKET": {"type": "object"}, "ROUTE_FEASIBILITY": {"type": "object"}, "OWNED_EXECUTION": {"type": "object"}}
+    },
+    "requirements": {
+      "type": "object", "additionalProperties": false,
+      "required": ["pit_liquidity_retention_state", "multi_notional_route_persistence", "post_migration_continuation_context", "settled_execution_truth"],
+      "properties": {"pit_liquidity_retention_state": {"type": "object"}, "multi_notional_route_persistence": {"type": "object"}, "post_migration_continuation_context": {"type": "object"}, "settled_execution_truth": {"type": "object"}}
+    },
+    "decisionPolicy": {
+      "type": "object", "additionalProperties": false,
+      "required": ["allowed_terminal_decisions", "current_decision", "trial_admissible", "next_boundary"],
+      "properties": {"allowed_terminal_decisions": {"type": "array", "minItems": 3, "maxItems": 3, "items": {"type": "string"}}, "current_decision": {"const": "PREPARE_PARTIAL_PIT_CAPTURE_CONTRACT"}, "trial_admissible": {"const": false}, "next_boundary": {"type": "string"}}
+    }
+  }
+}
