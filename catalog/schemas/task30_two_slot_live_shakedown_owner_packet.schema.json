@@ -1,0 +1,35 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "TASK-30 two-slot live shakedown owner packet",
+  "type": "object",
+  "required": [
+    "schema",
+    "schema_version",
+    "task_id",
+    "atom_id",
+    "status",
+    "frozen_binding",
+    "provider_candidate",
+    "provider_selected",
+    "external_capture_authorized",
+    "future_request_proposal",
+    "shakedown_shape",
+    "retention",
+    "monitoring",
+    "recovery",
+    "current_atom_authority",
+    "non_claims",
+    "project_sources_disposition"
+  ],
+  "properties": {
+    "schema": {"const": "smial.task30.two-slot-live-shakedown-owner-packet"},
+    "schema_version": {"const": "1.0"},
+    "task_id": {"const": "TASK-30"},
+    "atom_id": {"const": "T30-A11B_TWO_SLOT_LIVE_SHAKEDOWN_OWNER_PACKET_V1"},
+    "status": {"const": "OWNER_APPROVAL_REQUIRED"},
+    "provider_candidate": {"const": "GECKOTERMINAL_PUBLIC_KEYLESS"},
+    "provider_selected": {"const": false},
+    "external_capture_authorized": {"const": false},
+    "project_sources_disposition": {"const": "NO_CHANGE"}
+  }
+}
