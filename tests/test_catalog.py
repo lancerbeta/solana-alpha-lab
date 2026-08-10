@@ -62,6 +62,7 @@ class CatalogImportTests(unittest.TestCase):
                 "DECISION-OWNER-AUTHORITY-PACKET-001",
                 "DECISION-CANARY-SPECIFICATION-ONLY-001",
                 "NEGATIVE-T27-PUBLIC-HISTORY-ROUTE-V1-001",
+                "DECISION-T30-A9-NAMED-PARTIAL-CAPTURE-001",
             ],
         )
         self.assertTrue(

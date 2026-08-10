@@ -157,11 +157,12 @@ class LifecycleRegistryTests(unittest.TestCase):
                             "DECISION-OWNER-AUTHORITY-PACKET-001",
                             "DECISION-CANARY-SPECIFICATION-ONLY-001",
                             "NEGATIVE-T27-PUBLIC-HISTORY-ROUTE-V1-001",
+                            "DECISION-T30-A9-NAMED-PARTIAL-CAPTURE-001",
                         ],
                     )
                     self.assertEqual(
                         [record["record_kind"] for record in document["records"]],
-                        ["negative_result", "decision", "decision", "negative_result"],
+                        ["negative_result", "decision", "decision", "negative_result", "decision"],
                     )
                 else:
                     self.assertEqual(document["schema_version"], "1.0")

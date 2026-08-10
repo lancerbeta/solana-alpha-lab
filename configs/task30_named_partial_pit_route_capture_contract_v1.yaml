@@ -1,0 +1,92 @@
+schema: smial.task30.named-partial-pit-route-capture.policy
+schema_version: '1.0'
+task_id: TASK-30
+atom_id: T30-A9_NAMED_PARTIAL_PIT_AND_ROUTE_CAPTURE_CONTRACT_V1
+contract_id: CONTRACT-T30-NAMED-PARTIAL-CAPTURE-001
+consumer: OWNER_FUTURE_EXTERNAL_READ_REVIEW
+frozen_definition:
+  path: configs/task28_rc001_registry_freeze_v1.yaml
+  group_id: RC001-H07-H01-LIQUIDITY-RETENTION
+  definition_sha256: 14a7387148d05773dedcb5ad6a8110a0dcab7e49da4dec77328903a5b7577df7
+upstream_a8:
+  path: docs/evidence/task30/a8_h07_h01_exact_data_contract_entry_gate_acceptance_v1.json
+  sha256: 7ab838e2bb6ddb887e2567ecd2c52d86ad82bbc5797e300e9dc86bff114c4eea
+  decision: PREPARE_PARTIAL_PIT_CAPTURE_CONTRACT
+reference_subject:
+  pool_address: URqx24yyYxtXXhTbBQnbtPLhtLWYoaDaRxuQuLpNS3S
+  target_role: TECHNICAL_DATA_ROUTE_PILOT
+  representativeness: NOT_ESTABLISHED
+  identity_verification: REQUIRED_AT_LATER_OWNER_GATE
+pilot_window:
+  interval: 15m
+  expected_closed_intervals: 96
+  duration_seconds: 86400
+  slot_outcome_policy: OBSERVATION_OR_TYPED_GAP_REQUIRED
+lanes:
+  PIT_MARKET:
+    may_establish: BOUNDED_MARKET_DATA_ROUTE_CAPABILITY
+    cannot_establish:
+    - REPRESENTATIVENESS
+    - ROUTE_PERSISTENCE
+    - FILL
+    - SETTLEMENT
+    - H07_H01_EVIDENCE
+  ROUTE_FEASIBILITY:
+    state: CONDITIONAL_OWNER_PACKET
+    may_establish_after_later_gate: MULTI_NOTIONAL_ROUTE_AVAILABILITY
+    cannot_establish:
+    - FILL
+    - SETTLEMENT
+    - NETRETURN
+  OWNED_EXECUTION:
+    state: FUTURE_CANARY_ONLY
+    available_in_this_atom: false
+route_feasibility:
+  state: CONDITIONAL_OWNER_PACKET
+  notional_buckets: OWNER_INPUT_REQUIRED
+  no_implicit_notional: true
+external_owner_packet:
+  state: OWNER_INPUT_REQUIRED
+  provider_selection: OWNER_INPUT_REQUIRED
+  endpoint: OWNER_INPUT_REQUIRED
+  verified_identity: OWNER_INPUT_REQUIRED
+  exact_utc_window: OWNER_INPUT_REQUIRED
+  named_lanes_and_notionals: OWNER_INPUT_REQUIRED
+  request_cap: OWNER_INPUT_REQUIRED
+  quota_and_credential_cap: OWNER_INPUT_REQUIRED
+  fallback_policy: FORBIDDEN
+  raw_retention_location_and_hash_plan: OWNER_INPUT_REQUIRED
+  backup_or_tracked_waiver: OWNER_INPUT_REQUIRED
+  monitoring_owner: OWNER_INPUT_REQUIRED
+  recovery_path: OWNER_INPUT_REQUIRED
+  non_claims_acknowledged: OWNER_INPUT_REQUIRED
+  provider_api_rpc_wss_calls_authorized: false
+  credential_use_authorized: false
+authority:
+  provider_api_rpc_wss_calls: 0
+  credential_use: 0
+  raw_data_writes: 0
+  scheduler_or_background_processes: 0
+  provider_adapters_or_collectors: 0
+  wallet_signer_transaction_actions: 0
+  cash_spend_usd_cents: 0
+  task30_trial_or_acceptance_actions: 0
+non_claims:
+  technical_pilot_only: true
+  technical_pilot_establishes_representativeness: false
+  technical_pilot_is_h07_h01_evidence: false
+  technical_pilot_is_trial: false
+  technical_pilot_is_execution: false
+  technical_pilot_is_settlement: false
+  technical_pilot_is_pnl: false
+  missing_is_zero_or_flat: false
+  provider_selected: false
+  external_capture_authorized: false
+decision_policy:
+  decision: OWNER_PACKET_READY_EXTERNAL_AUTHORITY_REQUIRED
+  trial_admissible: false
+  next_boundary: OWNER_GATE_FOR_NAMED_EXTERNAL_READ_PACKET
+  state_change: NONE
+project_sources_disposition:
+  kind: NO_CHANGE
+  reason: Offline A9 contract does not change canonical TASK-30 acceptance or active Project Sources.

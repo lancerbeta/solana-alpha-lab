@@ -16238,6 +16238,159 @@ records:
   evidence: []
   classification: *t25_internal
 
+- asset_id: CONTRACT-T30-NAMED-PARTIAL-CAPTURE-001
+  record_version: '1.0'
+  asset_type: control_document
+  purpose: Versioned offline contract for a future named 24-hour technical PIT and route-capture pilot without implied authority.
+  status: VALIDATED_ACTIVE
+  origin: REPOSITORY
+  as_of: '2026-08-10'
+  truth_owner: TASK-30
+  location: {kind: git_path, logical_uri: 'repo://docs/contracts/task30_named_partial_pit_route_capture_contract_v1.md', repository_path: docs/contracts/task30_named_partial_pit_route_capture_contract_v1.md}
+  integrity: {kind: sha256, sha256: 889a1c8a25c0696a0546d57dac52ca953de34c8671c9df65d4fcd4bc87cae126}
+  access: *t25_read_file
+  relations: []
+  consumers: [TASK-30, FACTORY-001]
+  evidence: []
+  classification: *t25_internal
+
+- asset_id: CONFIG-T30-NAMED-PARTIAL-CAPTURE-001
+  record_version: '1.0'
+  asset_type: configuration
+  purpose: Machine-readable zero-authority policy for one future technical data-route pilot and its later owner packet.
+  status: VALIDATED_ACTIVE
+  origin: REPOSITORY
+  as_of: '2026-08-10'
+  truth_owner: TASK-30
+  location: {kind: git_path, logical_uri: 'repo://configs/task30_named_partial_pit_route_capture_contract_v1.yaml', repository_path: configs/task30_named_partial_pit_route_capture_contract_v1.yaml}
+  integrity: {kind: sha256, sha256: 571773b822e62f305800cc3c90857fbf30288c1d847d516771eeccb141c8cc8b}
+  access: *t25_read_file
+  relations: [{relation_type: governed_by, target_asset_id: CONTRACT-T30-NAMED-PARTIAL-CAPTURE-001}]
+  consumers: [TASK-30, FACTORY-001]
+  evidence: []
+  classification: *t25_internal
+
+- asset_id: SCHEMA-T30-NAMED-PARTIAL-CAPTURE-001
+  record_version: '1.0'
+  asset_type: schema
+  purpose: Closed JSON Schema for the TASK-30 A9 technical-pilot policy.
+  status: VALIDATED_ACTIVE
+  origin: REPOSITORY
+  as_of: '2026-08-10'
+  truth_owner: TASK-30
+  location: {kind: git_path, logical_uri: 'repo://catalog/schemas/task30_named_partial_pit_route_capture_contract.schema.json', repository_path: catalog/schemas/task30_named_partial_pit_route_capture_contract.schema.json}
+  integrity: {kind: sha256, sha256: 95b7f09f906779126746e129f418701d1364f90aac6d2fd68f2ffee1ad311188}
+  access: *t25_read_file
+  relations: [{relation_type: governed_by, target_asset_id: CONTRACT-T30-NAMED-PARTIAL-CAPTURE-001}]
+  consumers: [TASK-30, FACTORY-001]
+  evidence: []
+  classification: *t25_internal
+
+- asset_id: FIXTURE-T30-NAMED-PARTIAL-CAPTURE-001
+  record_version: '1.0'
+  asset_type: evidence
+  purpose: Synthetic golden output for the future owner-packet decision and its retained non-claims.
+  status: VALIDATED_ACTIVE
+  origin: REPOSITORY
+  as_of: '2026-08-10'
+  truth_owner: TASK-30
+  location: {kind: git_path, logical_uri: 'repo://tests/fixtures/task30/named_partial_pit_route_capture_contract_v1.json', repository_path: tests/fixtures/task30/named_partial_pit_route_capture_contract_v1.json}
+  integrity: {kind: sha256, sha256: dc6e1dad048436ce7015ddff19cf6bae74d1d0c3fe1bf525b5421b9b22f7aeca}
+  access: *t25_read_file
+  relations: [{relation_type: derived_from, target_asset_id: CONFIG-T30-NAMED-PARTIAL-CAPTURE-001}]
+  consumers: [TASK-30, FACTORY-001]
+  evidence: []
+  classification: *t25_internal
+
+- asset_id: MODULE-T30-NAMED-PARTIAL-CAPTURE-001
+  record_version: '1.0'
+  asset_type: script
+  purpose: Pure deterministic evaluator that rejects technical-pilot promotion, implicit authority and untyped gaps.
+  status: VALIDATED_ACTIVE
+  origin: REPOSITORY
+  as_of: '2026-08-10'
+  truth_owner: TASK-30
+  location: {kind: git_path, logical_uri: 'repo://src/solana_alpha_lab/task30_named_partial_pit_route_capture_contract.py', repository_path: src/solana_alpha_lab/task30_named_partial_pit_route_capture_contract.py}
+  integrity: {kind: sha256, sha256: d6f3df4caf91a71f65da92cd4cd2a3efb896aaf8fb96f53fc5b641e3bf490fcd}
+  access: *t25_read_file
+  relations:
+  - {relation_type: governed_by, target_asset_id: CONFIG-T30-NAMED-PARTIAL-CAPTURE-001}
+  - {relation_type: produces, target_asset_id: EVIDENCE-T30-A9-NAMED-PARTIAL-CAPTURE-001}
+  consumers: [TASK-30, FACTORY-001]
+  evidence: []
+  classification: *t25_internal
+
+- asset_id: SCRIPT-T30-NAMED-PARTIAL-CAPTURE-001
+  record_version: '1.0'
+  asset_type: script
+  purpose: Offline-only CLI that renders the deterministic TASK-30 A9 owner packet without provider or credential flags.
+  status: VALIDATED_ACTIVE
+  origin: REPOSITORY
+  as_of: '2026-08-10'
+  truth_owner: TASK-30
+  location: {kind: git_path, logical_uri: 'repo://scripts/show_task30_named_partial_pit_route_capture_contract.py', repository_path: scripts/show_task30_named_partial_pit_route_capture_contract.py}
+  integrity: {kind: sha256, sha256: 9cd7ea0ac941a14396e22040a46ea02ea4d4aee8850ec7888f97af46a7535a39}
+  access: *t25_read_file
+  relations: [{relation_type: depends_on, target_asset_id: MODULE-T30-NAMED-PARTIAL-CAPTURE-001}]
+  consumers: [TASK-30, FACTORY-001]
+  evidence: []
+  classification: *t25_internal
+
+- asset_id: REPORT-T30-NAMED-PARTIAL-CAPTURE-001
+  record_version: '1.0'
+  asset_type: generated_view
+  purpose: Russian owner-visible A9 readout separating offline readiness from external authority.
+  status: VALIDATED_ACTIVE
+  origin: REPOSITORY
+  as_of: '2026-08-10'
+  truth_owner: TASK-30
+  location: {kind: git_path, logical_uri: 'repo://docs/reports/task30/named_partial_pit_route_capture_contract_readout_v1.md', repository_path: docs/reports/task30/named_partial_pit_route_capture_contract_readout_v1.md}
+  integrity: {kind: sha256, sha256: 393a38178b24053854d5225bf08bba442f35cde0d4417c15dba4fbed02f410a9}
+  access: *t25_read_file
+  relations: [{relation_type: derived_from, target_asset_id: MODULE-T30-NAMED-PARTIAL-CAPTURE-001}]
+  consumers: [TASK-30, FACTORY-001]
+  evidence: []
+  classification: *t25_internal
+
+- asset_id: TEST-T30-NAMED-PARTIAL-CAPTURE-001
+  record_version: '1.0'
+  asset_type: script
+  purpose: Deterministic adversarial tests for A9 policy, receipt, readout and Catalog registration.
+  status: VALIDATED_ACTIVE
+  origin: REPOSITORY
+  as_of: '2026-08-10'
+  truth_owner: TASK-30
+  location: {kind: git_path, logical_uri: 'repo://tests/test_task30_named_partial_pit_route_capture_contract.py', repository_path: tests/test_task30_named_partial_pit_route_capture_contract.py}
+  integrity: {kind: sha256, sha256: dcc4d2e3884e9278b4b1ce3f0aead305427d127e60dae164869e1eca7b3c24c9}
+  access: *t25_read_file
+  relations:
+  - {relation_type: depends_on, target_asset_id: MODULE-T30-NAMED-PARTIAL-CAPTURE-001}
+  - {relation_type: depends_on, target_asset_id: SCHEMA-T30-NAMED-PARTIAL-CAPTURE-001}
+  - {relation_type: depends_on, target_asset_id: FIXTURE-T30-NAMED-PARTIAL-CAPTURE-001}
+  - {relation_type: depends_on, target_asset_id: EVIDENCE-T30-A9-NAMED-PARTIAL-CAPTURE-001}
+  consumers: [TASK-30, FACTORY-001]
+  evidence: []
+  classification: *t25_internal
+
+- asset_id: EVIDENCE-T30-A9-NAMED-PARTIAL-CAPTURE-001
+  record_version: '1.0'
+  asset_type: evidence
+  purpose: Hash-bound acceptance receipt for the offline TASK-30 A9 named partial PIT and route-capture contract.
+  status: VALIDATED_ACTIVE
+  origin: REPOSITORY
+  as_of: '2026-08-10'
+  truth_owner: TASK-30
+  location: {kind: git_path, logical_uri: 'repo://docs/evidence/task30/a9_named_partial_pit_route_capture_contract_acceptance_v1.json', repository_path: docs/evidence/task30/a9_named_partial_pit_route_capture_contract_acceptance_v1.json}
+  integrity: {kind: sha256, sha256: 377b61352d715ec8abda5c8a608b7fdb84cf7e311c81e79143e910438a17b6d0}
+  access: *t25_read_file
+  relations:
+  - {relation_type: derived_from, target_asset_id: CONTRACT-T30-NAMED-PARTIAL-CAPTURE-001}
+  - {relation_type: derived_from, target_asset_id: MODULE-T30-NAMED-PARTIAL-CAPTURE-001}
+  - {relation_type: validated_by, target_asset_id: TEST-T30-NAMED-PARTIAL-CAPTURE-001}
+  consumers: [TASK-30, FACTORY-001]
+  evidence: []
+  classification: *t25_internal
+
 - asset_id: CONFIG-T34A-DOCUMENTATION-FOUNDATION-001
   record_version: '1.0'
   asset_type: configuration
