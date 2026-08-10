@@ -1,0 +1,147 @@
+{
+  "schema": "smial.task30.h07-h01-exact-data-contract-entry-gate.acceptance",
+  "schema_version": "1.0",
+  "receipt_id": "T30-A8-H07-H01-EXACT-DATA-CONTRACT-GATE-001",
+  "task_id": "TASK-30",
+  "atom_id": "T30-A8_H07_H01_EXACT_DATA_CONTRACT_ENTRY_GATE_V1",
+  "status": "VALIDATED_OFFLINE_PARTIAL_PIT_DECISION",
+  "artifact_bindings": {
+    "task": {
+      "path": "docs/tasks/TASK-30-h07-h01-exact-data-contract-entry-gate.md",
+      "sha256": "dbffaf368ae4d8c99395a479a6dca837cffd9a94aa4bc8cf1c51330e0b5ba6a4"
+    },
+    "contract": {
+      "path": "docs/contracts/task30_h07_h01_exact_data_contract_entry_gate_contract_v1.md",
+      "sha256": "a85e5a5f34f70a19996f8dd1e64b8aebddfe0dd189631996d1cfa206b56f8681"
+    },
+    "configuration": {
+      "path": "configs/task30_h07_h01_exact_data_contract_entry_gate_v1.yaml",
+      "sha256": "fa41b4478be5b0e8291a8e55888de6e5631fe737776fc3ab98aa2a7842d93ce0"
+    },
+    "schema": {
+      "path": "catalog/schemas/task30_h07_h01_exact_data_contract_entry_gate.schema.json",
+      "sha256": "019423ec0471813a4b4cf32505d6baf0126ecc104abfe102c4969f3ab552f177"
+    },
+    "fixture": {
+      "path": "tests/fixtures/task30/h07_h01_exact_data_contract_entry_gate_v1.json",
+      "sha256": "77c5de8978c9f664a64b10a73eefdc8793e79da37c00b1b11d057eaa5489f899"
+    },
+    "module": {
+      "path": "src/solana_alpha_lab/task30_h07_h01_exact_data_contract_entry_gate.py",
+      "sha256": "ba0448f8a6e300888bf1bf7d5b2385eeea647a196af7d8fba04344a12d560e71"
+    },
+    "script": {
+      "path": "scripts/show_task30_h07_h01_data_contract_readout.py",
+      "sha256": "789d7afad6bb77655a8fb1132f8d559305c0d115b5a5cab13c382eabf2999521"
+    },
+    "report": {
+      "path": "docs/reports/task30/h07_h01_exact_data_contract_readout_v1.md",
+      "sha256": "a2ccb465b67bb6bc55fcf600f240e2e5eb141d0b210c50bcd07cd042ceb72e56"
+    },
+    "test": {
+      "path": "tests/test_task30_h07_h01_exact_data_contract_entry_gate.py",
+      "sha256": "b4a293a017de96d039a9d2505bd7829e6a8c0e7c6ec1cf093e4f55eb3e0addeb"
+    }
+  },
+  "input_evidence": {
+    "task27_route_close": {
+      "path": "docs/evidence/task27/a1s4_owner_route_close_and_task_outcome_acceptance_v1.json",
+      "sha256": "e901a59a72da29b3eb4a90e24a7d3bde91a4fc00c023310086376747ebe47e6d",
+      "decision": "CLOSE_CURRENT_SOLANA_TRACKER_15M_POOL_HISTORY_ROUTE_NOT_FEASIBLE"
+    },
+    "task26b_execution_witness": {
+      "path": "docs/evidence/task26b/a1_execution_witness_route_acceptance_v1.json",
+      "sha256": "86cd5d33f3e29f9c3d365afc1aca511b212d6a809fa7be3ea2c6e65ffebd4b73",
+      "decision": "OWNED_CANARY_REQUIRED"
+    },
+    "task30_a6_forward_capture": {
+      "path": "docs/evidence/task30/a6_birdeye_route_hold_forward_capture_decision_acceptance_v1.json",
+      "sha256": "e40b3fc46762c015f439a453f68939859114f8f498e1791a0a68f1790829e036",
+      "decision": "HOLD_BIRDEYE_ROUTE_PREPARE_FORWARD_CAPTURE_CANDIDATE"
+    },
+    "task30_a7_owner_visible": {
+      "path": "docs/evidence/task30/a7_h07_h01_owner_visible_vertical_slice_acceptance_v1.json",
+      "sha256": "394fdb8b767d0d172b5fe56cb6bf8e205fa4dcc27bec924494f3955ccf391a66",
+      "decision": "CAPTURE_REQUIRED"
+    }
+  },
+  "decision": {
+    "value": "PREPARE_PARTIAL_PIT_CAPTURE_CONTRACT",
+    "trial_admissible": false,
+    "retained_execution_blocker": "SETTLED_EXECUTION_TRUTH_UNAVAILABLE",
+    "next_boundary": "OWNER_GATE_FOR_NAMED_PARTIAL_PIT_OR_ROUTE_CAPTURE",
+    "state_change": "NONE"
+  },
+  "audit_assimilation": {
+    "input_sha256": "9ef775756f35199b073acfea0e52db228da9b4d08c30b1194e3d7b1b88886da1",
+    "accepted_now": [
+      "PROSPECTIVE_CAPTURE_REUSE_TRIGGER",
+      "BACKUP_OR_WAIVER_BEFORE_IRRECOVERABLE_CAPTURE"
+    ],
+    "deferred_trigger": "FAST_PATH_REPAIR_RECURRENCE_OR_MATERIAL_BASELINE_TOUCH"
+  },
+  "authority": {
+    "provider_api_rpc_wss_calls": 0,
+    "credential_use": 0,
+    "raw_data_writes": 0,
+    "r2_r3_access": 0,
+    "scheduler_or_background_processes": 0,
+    "wallet_signer_transaction_actions": 0,
+    "cash_spend_usd_cents": 0,
+    "task30_trial_or_acceptance_actions": 0
+  },
+  "non_claims": {
+    "pit_capture_is_trial": false,
+    "price_only_is_route_persistence": false,
+    "quote_only_is_settlement": false,
+    "missing_is_zero_or_no_trade": false,
+    "provider_selected": false,
+    "forward_capture_started": false,
+    "execution_truth_available": false,
+    "alpha": false,
+    "strategy": false,
+    "pnl": false,
+    "numeric_netreturn": false,
+    "task30_acceptance": false
+  },
+  "side_effect_counters": {
+    "provider_api_rpc_wss_calls": 0,
+    "credential_use": 0,
+    "raw_data_writes": 0,
+    "r2_r3_access": 0,
+    "scheduler_or_background_processes": 0,
+    "dependency_changes": 0,
+    "wallet_signer_transaction_actions": 0,
+    "cash_spend_usd_cents": 0,
+    "task30_trial_or_acceptance_actions": 0,
+    "project_sources_changes": 0
+  },
+  "factory_fit_review": "FULL_REVIEW",
+  "factory_fit": {
+    "verdict": "PASS_WITH_LIMITATIONS",
+    "mission": "PASS: names the cheapest next evidence lane without mistaking data availability for alpha.",
+    "research_truth": "PASS: preserves MISSING_UNKNOWN, UNSUPPORTED and the no-trial boundary.",
+    "owner_operability": "PASS: one Russian readout states what future capture may and may not prove.",
+    "efficiency": "PASS: uses synthetic fixtures and reusable A7 readout conventions with no external work.",
+    "flexibility": "PASS: provider remains unselected and lane semantics survive a provider change.",
+    "execution_to_cashflow": "NOT_IN_SCOPE: settlement remains a separate owned-canary route.",
+    "monitoring_recovery": "PASS: no live process is created; future irrecoverable capture requires backup/waiver.",
+    "reuse_build_decision": "BUILD_MINIMAL_PURE_EVALUATOR_WITH_PROSPECTIVE_REUSE_TRIGGER"
+  },
+  "product_horizon_radar": {
+    "now": {
+      "candidate": "OWNER_GATE_FOR_NAMED_PARTIAL_PIT_OR_ROUTE_CAPTURE",
+      "value": "Allows the owner to judge one exact future data request by the blocker it can actually reduce.",
+      "activation_trigger": "OWNER_AUTHORIZATION_FOR_ONE_NAMED_EXTERNAL_CAPTURE_CONTRACT"
+    },
+    "watch": {
+      "candidate": "SETTLED_EXECUTION_TRUTH_ROUTE",
+      "value": "Still required before a route-aware outcome becomes a strategy or cashflow claim.",
+      "activation_trigger": "PIT_AND_ROUTE_DATA_CONTRACT_IS_ADMISSIBLE"
+    }
+  },
+  "project_sources_disposition": {
+    "kind": "NO_CHANGE",
+    "reason": "T30-A8 is an offline data-contract decision and does not change canonical TASK-30 status."
+  }
+}

@@ -288,3 +288,48 @@ def evaluate_data_contract(
             "Owned execution truth remains future-canary-only.",
         ],
     }
+
+
+def render_data_contract_readout(result: Mapping[str, Any]) -> str:
+    """Render one stable Russian owner readout from the offline result."""
+    requirements = _mapping(result.get("requirements"), "OWNER_READOUT_REQUIREMENTS")
+    settlement = _mapping(
+        requirements.get("settled_execution_truth"), "OWNER_READOUT_SETTLEMENT"
+    )
+    if (
+        result.get("decision") != CURRENT_DECISION
+        or result.get("trial_admissible") is not False
+        or result.get("next_boundary") != NEXT_BOUNDARY
+        or settlement.get("state") != "UNSUPPORTED"
+    ):
+        raise ValueError("OWNER_READOUT_INPUT")
+
+    return "\n".join(
+        [
+            "# TASK-30 — H07/H01: какие данные нужны дальше",
+            "",
+            "## Решение",
+            "",
+            "Можно подготовить только частичный PIT-capture contract.",
+            "Он не является trial и не открывает внешние действия.",
+            "",
+            "## Что такой capture может дать",
+            "",
+            "- PIT market: наблюдаемую историю цены и liquidity с явными gaps.",
+            "- Route feasibility: доступность route для named notionals.",
+            "",
+            "## Что он не доказывает",
+            "",
+            "- Quote или route feasibility не доказывает settlement.",
+            "- Owned execution truth остаётся отдельным future-canary blocker.",
+            "- Missing/UNKNOWN не становятся нулём, no-trade или settled.",
+            "",
+            "## Безопасность будущего capture",
+            "",
+            "Decision-critical невосстановимые raw требуют backup/restore route или explicit waiver до owner gate.",
+            "",
+            "## Единственный следующий шаг",
+            "",
+            f"`{NEXT_BOUNDARY}`.",
+        ]
+    )
