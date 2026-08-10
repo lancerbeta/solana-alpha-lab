@@ -40,7 +40,7 @@
     },
     "test": {
       "path": "tests/test_task30_h07_h01_exact_data_contract_entry_gate.py",
-      "sha256": "b4a293a017de96d039a9d2505bd7829e6a8c0e7c6ec1cf093e4f55eb3e0addeb"
+      "sha256": "2aef8c116a222c40f0d0faf7d9751638d35339bb22dfa9a40131f712fb65f86c"
     }
   },
   "input_evidence": {

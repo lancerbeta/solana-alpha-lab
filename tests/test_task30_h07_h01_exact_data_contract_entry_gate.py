@@ -46,6 +46,18 @@ TASK_PATH = ROOT / "docs/tasks/TASK-30-h07-h01-exact-data-contract-entry-gate.md
 CONTRACT_PATH = ROOT / "docs/contracts/task30_h07_h01_exact_data_contract_entry_gate_contract_v1.md"
 MODULE_PATH = ROOT / "src/solana_alpha_lab/task30_h07_h01_exact_data_contract_entry_gate.py"
 ACCEPTANCE_PATH = ROOT / "docs/evidence/task30/a8_h07_h01_exact_data_contract_entry_gate_acceptance_v1.json"
+CATALOG_CORE_PATH = ROOT / "catalog/assets/core.yaml"
+EXPECTED_CATALOG_ASSETS = {
+    "CONTRACT-T30-H07-H01-DATA-CONTRACT-GATE-001": CONTRACT_PATH,
+    "CONFIG-T30-H07-H01-DATA-CONTRACT-GATE-001": CONFIG_PATH,
+    "SCHEMA-T30-H07-H01-DATA-CONTRACT-GATE-001": SCHEMA_PATH,
+    "FIXTURE-T30-H07-H01-DATA-CONTRACT-GATE-001": FIXTURE_PATH,
+    "MODULE-T30-H07-H01-DATA-CONTRACT-GATE-001": MODULE_PATH,
+    "SCRIPT-T30-H07-H01-DATA-CONTRACT-GATE-001": READOUT_SCRIPT_PATH,
+    "REPORT-T30-H07-H01-DATA-CONTRACT-GATE-001": READOUT_REPORT_PATH,
+    "TEST-T30-H07-H01-DATA-CONTRACT-GATE-001": Path(__file__),
+    "EVIDENCE-T30-A8-H07-H01-DATA-CONTRACT-GATE-001": ACCEPTANCE_PATH,
+}
 
 
 def load_yaml(path: Path) -> dict:
@@ -264,6 +276,27 @@ class Task30H07H01ExactDataContractTests(unittest.TestCase):
                 target[path[-1]] = replacement
                 with self.assertRaises(AssertionError):
                     assert_valid_acceptance(candidate)
+
+    def test_catalog_registers_each_a8_source_artifact_from_its_owner(self) -> None:
+        catalog = load_yaml(CATALOG_CORE_PATH)
+        records = catalog["records"]
+        self.assertIsInstance(records, list)
+        by_id = {record["asset_id"]: record for record in records}
+        for asset_id, path in EXPECTED_CATALOG_ASSETS.items():
+            with self.subTest(asset_id=asset_id):
+                record = by_id[asset_id]
+                self.assertEqual(
+                    record["location"]["repository_path"],
+                    path.relative_to(ROOT).as_posix(),
+                )
+        evidence = by_id["EVIDENCE-T30-A8-H07-H01-DATA-CONTRACT-GATE-001"]
+        self.assertIn(
+            {
+                "relation_type": "validated_by",
+                "target_asset_id": "TEST-T30-H07-H01-DATA-CONTRACT-GATE-001",
+            },
+            evidence["relations"],
+        )
 
 
 if __name__ == "__main__":
