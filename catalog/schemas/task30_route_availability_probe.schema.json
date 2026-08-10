@@ -1,0 +1,80 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "TASK-30 route availability probe policy",
+  "type": "object",
+  "required": ["schema", "schema_version", "task_id", "atom_id", "consumer", "frozen_group_id", "frozen_parameter_id", "interval_seconds", "upstream_a10_decision", "probe_shape", "future_external_read", "capture_states", "terminal_decisions", "authority", "claims", "project_sources_disposition"],
+  "properties": {
+    "schema": {"const": "smial.task30.route-availability-probe.policy"},
+    "schema_version": {"const": "1.0"},
+    "task_id": {"const": "TASK-30"},
+    "atom_id": {"const": "T30-A11A_ROUTE_AVAILABILITY_PROBE_OFFLINE_V1"},
+    "consumer": {"const": "OWNER_TWO_SLOT_LIVE_SHAKEDOWN_GATE"},
+    "frozen_group_id": {"const": "RC001-H07-H01-LIQUIDITY-RETENTION"},
+    "frozen_parameter_id": {"const": "OBSERVATION_WINDOW_15M"},
+    "interval_seconds": {"const": 900},
+    "upstream_a10_decision": {"const": "START_LABELED"},
+    "probe_shape": {
+      "type": "object",
+      "required": ["boundaries", "offset_seconds", "max_ohlcv_reads"],
+      "properties": {
+        "boundaries": {"const": 3},
+        "offset_seconds": {"const": [0, 15, 30, 60]},
+        "max_ohlcv_reads": {"const": 12}
+      },
+      "additionalProperties": false
+    },
+    "future_external_read": {
+      "type": "object",
+      "required": ["selected_provider", "retry", "fallback", "scheduler", "raw_retention"],
+      "properties": {
+        "selected_provider": {"type": "null"},
+        "retry": {"const": false},
+        "fallback": {"const": false},
+        "scheduler": {"const": false},
+        "raw_retention": {"const": "OWNER_PACKET_REQUIRED"}
+      },
+      "additionalProperties": false
+    },
+    "capture_states": {
+      "type": "object",
+      "required": ["valid", "typed_gap", "health_failures"],
+      "properties": {
+        "valid": {"const": "VALID_OBSERVATION"},
+        "typed_gap": {"const": "TYPED_GAP"},
+        "health_failures": {"const": ["PROCESS_NOT_STARTED", "RECEIPT_WRITE_FAILED", "PRIOR_MANIFEST_UNREADABLE", "MONITORING_LOST"]}
+      },
+      "additionalProperties": false
+    },
+    "terminal_decisions": {"const": ["READY_FOR_FIXED_DELAY_24H_TECHNICAL_CAPTURE", "ROUTE_NOT_READY_FOR_FIXED_DELAY_CAPTURE", "INCONCLUSIVE"]},
+    "authority": {
+      "type": "object",
+      "required": ["provider_api_rpc_wss_calls", "scheduler_or_background_processes", "raw_data_writes", "credential_use", "r2_r3_access", "wallet_signer_transaction_actions", "cash_spend_usd_cents", "task30_trial_or_acceptance_actions"],
+      "properties": {
+        "provider_api_rpc_wss_calls": {"const": 0},
+        "scheduler_or_background_processes": {"const": 0},
+        "raw_data_writes": {"const": 0},
+        "credential_use": {"const": 0},
+        "r2_r3_access": {"const": 0},
+        "wallet_signer_transaction_actions": {"const": 0},
+        "cash_spend_usd_cents": {"const": 0},
+        "task30_trial_or_acceptance_actions": {"const": 0}
+      },
+      "additionalProperties": false
+    },
+    "claims": {
+      "type": "object",
+      "required": ["technical_route_only", "pit_admissible", "h07_h01_evidence", "task30_trial", "execution", "numeric_netreturn"],
+      "properties": {
+        "technical_route_only": {"const": false},
+        "pit_admissible": {"const": false},
+        "h07_h01_evidence": {"const": false},
+        "task30_trial": {"const": false},
+        "execution": {"const": false},
+        "numeric_netreturn": {"const": false}
+      },
+      "additionalProperties": false
+    },
+    "project_sources_disposition": {"const": "NO_CHANGE"}
+  },
+  "additionalProperties": false
+}
