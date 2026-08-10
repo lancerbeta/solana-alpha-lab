@@ -16756,3 +16756,158 @@ records:
   consumers: [TASK-30, FACTORY-001]
   evidence: []
   classification: *t25_internal
+
+- asset_id: CONTRACT-T30-ROUTE-AVAILABILITY-PROBE-001
+  record_version: '1.0'
+  asset_type: control_document
+  purpose: Offline contract for a fail-closed three-boundary publication-availability probe without selecting or calling a provider.
+  status: VALIDATED_ACTIVE
+  origin: REPOSITORY
+  as_of: '2026-08-11'
+  truth_owner: TASK-30
+  location: {kind: git_path, logical_uri: 'repo://docs/contracts/task30_route_availability_probe_contract_v1.md', repository_path: docs/contracts/task30_route_availability_probe_contract_v1.md}
+  integrity: {kind: sha256, sha256: c1ef23dc5b4e0911f1b6ae5acea7f37b2efae8c52f0f021a8d39e5184cfb0dc8}
+  access: *t25_read_file
+  relations:
+  - {relation_type: depends_on, target_asset_id: EVIDENCE-T30-A10-GECKO-INTERVAL-SEMANTICS-RUNTIME-001}
+  consumers: [TASK-30, FACTORY-001]
+  evidence: []
+  classification: *t25_internal
+
+- asset_id: CONFIG-T30-ROUTE-AVAILABILITY-PROBE-001
+  record_version: '1.0'
+  asset_type: configuration
+  purpose: Machine-readable zero-authority policy for the offline TASK-30 A11A route availability evaluator.
+  status: VALIDATED_ACTIVE
+  origin: REPOSITORY
+  as_of: '2026-08-11'
+  truth_owner: TASK-30
+  location: {kind: git_path, logical_uri: 'repo://configs/task30_route_availability_probe_v1.yaml', repository_path: configs/task30_route_availability_probe_v1.yaml}
+  integrity: {kind: sha256, sha256: 495ddfb6ec432aca9774982588922c09ab4301c0e43b6572abee86af571c148a}
+  access: *t25_read_file
+  relations: [{relation_type: governed_by, target_asset_id: CONTRACT-T30-ROUTE-AVAILABILITY-PROBE-001}]
+  consumers: [TASK-30, FACTORY-001]
+  evidence: []
+  classification: *t25_internal
+
+- asset_id: SCHEMA-T30-ROUTE-AVAILABILITY-PROBE-001
+  record_version: '1.0'
+  asset_type: schema
+  purpose: JSON Schema binding the exact frozen 15-minute, zero-authority TASK-30 A11A policy surface.
+  status: VALIDATED_ACTIVE
+  origin: REPOSITORY
+  as_of: '2026-08-11'
+  truth_owner: TASK-30
+  location: {kind: git_path, logical_uri: 'repo://catalog/schemas/task30_route_availability_probe.schema.json', repository_path: catalog/schemas/task30_route_availability_probe.schema.json}
+  integrity: {kind: sha256, sha256: 3e04db5b40d37277ce0499938c3d9cd4a09106425ad5a41d7f3b96a7545f4995}
+  access: *t25_read_file
+  relations: [{relation_type: governed_by, target_asset_id: CONTRACT-T30-ROUTE-AVAILABILITY-PROBE-001}]
+  consumers: [TASK-30, FACTORY-001]
+  evidence: []
+  classification: *t25_internal
+
+- asset_id: FIXTURE-T30-ROUTE-AVAILABILITY-PROBE-001
+  record_version: '1.0'
+  asset_type: evidence
+  purpose: Synthetic-only stable-publication records and expected non-promoting route-readiness result for TASK-30 A11A.
+  status: VALIDATED_ACTIVE
+  origin: REPOSITORY
+  as_of: '2026-08-11'
+  truth_owner: TASK-30
+  location: {kind: git_path, logical_uri: 'repo://tests/fixtures/task30/route_availability_probe_v1.json', repository_path: tests/fixtures/task30/route_availability_probe_v1.json}
+  integrity: {kind: sha256, sha256: 74410f23b32016c24101e0525948a03255cc1e8c01d9a85a7fa53b0ddb17f5e1}
+  access: *t25_read_file
+  relations: [{relation_type: derived_from, target_asset_id: CONFIG-T30-ROUTE-AVAILABILITY-PROBE-001}]
+  consumers: [TASK-30, FACTORY-001]
+  evidence: []
+  classification: *t25_internal
+
+- asset_id: MODULE-T30-ROUTE-AVAILABILITY-PROBE-001
+  record_version: '1.0'
+  asset_type: script
+  purpose: Pure fail-closed evaluator that classifies synthetic publication, revision, typed gaps, and capture-health failures.
+  status: VALIDATED_ACTIVE
+  origin: REPOSITORY
+  as_of: '2026-08-11'
+  truth_owner: TASK-30
+  location: {kind: git_path, logical_uri: 'repo://src/solana_alpha_lab/task30_route_availability_probe.py', repository_path: src/solana_alpha_lab/task30_route_availability_probe.py}
+  integrity: {kind: sha256, sha256: 4c33446a39060665fbbc1b1ccf0894eb6a12ada421c33f2638e1f0ff31539ca3}
+  access: *t25_read_file
+  relations:
+  - {relation_type: governed_by, target_asset_id: CONFIG-T30-ROUTE-AVAILABILITY-PROBE-001}
+  - {relation_type: depends_on, target_asset_id: EVIDENCE-T30-A10-GECKO-INTERVAL-SEMANTICS-RUNTIME-001}
+  consumers: [TASK-30, FACTORY-001]
+  evidence: []
+  classification: *t25_internal
+
+- asset_id: SCRIPT-T30-ROUTE-AVAILABILITY-PROBE-001
+  record_version: '1.0'
+  asset_type: script
+  purpose: Deterministic local CLI that renders the tracked synthetic availability result without a request or scheduler.
+  status: VALIDATED_ACTIVE
+  origin: REPOSITORY
+  as_of: '2026-08-11'
+  truth_owner: TASK-30
+  location: {kind: git_path, logical_uri: 'repo://scripts/show_task30_route_availability_probe.py', repository_path: scripts/show_task30_route_availability_probe.py}
+  integrity: {kind: sha256, sha256: f9d9f5f0648cd38ca6d7d75144bea71919dee4e5affea37def89ccdc3b4401f7}
+  access: *t25_read_file
+  relations:
+  - {relation_type: depends_on, target_asset_id: MODULE-T30-ROUTE-AVAILABILITY-PROBE-001}
+  - {relation_type: governed_by, target_asset_id: CONFIG-T30-ROUTE-AVAILABILITY-PROBE-001}
+  consumers: [TASK-30, FACTORY-001]
+  evidence: []
+  classification: *t25_internal
+
+- asset_id: REPORT-T30-ROUTE-AVAILABILITY-PROBE-001
+  record_version: '1.0'
+  asset_type: control_document
+  purpose: Russian owner readout of the synthetic fixed-delay result, health stop rule, and future two-slot gate.
+  status: VALIDATED_ACTIVE
+  origin: REPOSITORY
+  as_of: '2026-08-11'
+  truth_owner: TASK-30
+  location: {kind: git_path, logical_uri: 'repo://docs/reports/task30/route_availability_probe_readout_v1.md', repository_path: docs/reports/task30/route_availability_probe_readout_v1.md}
+  integrity: {kind: sha256, sha256: 0d9d9c2eb37740e82b917625ec5fceda6a35ab7cb6bcde94088aa71af771ae82}
+  access: *t25_read_file
+  relations: [{relation_type: derived_from, target_asset_id: SCRIPT-T30-ROUTE-AVAILABILITY-PROBE-001}]
+  consumers: [TASK-30, FACTORY-001]
+  evidence: []
+  classification: *t25_internal
+
+- asset_id: TEST-T30-ROUTE-AVAILABILITY-PROBE-001
+  record_version: '1.0'
+  asset_type: script
+  purpose: Deterministic adversarial tests for policy closure, publication stability, health stop, readout, acceptance, and Catalog registration.
+  status: VALIDATED_ACTIVE
+  origin: REPOSITORY
+  as_of: '2026-08-11'
+  truth_owner: TASK-30
+  location: {kind: git_path, logical_uri: 'repo://tests/test_task30_route_availability_probe.py', repository_path: tests/test_task30_route_availability_probe.py}
+  integrity: {kind: sha256, sha256: 5400dd790a3125154a2d60f9b6c54f41a349f49104f58c70eb5a1ff97be8c02e}
+  access: *t25_read_file
+  relations:
+  - {relation_type: depends_on, target_asset_id: MODULE-T30-ROUTE-AVAILABILITY-PROBE-001}
+  - {relation_type: depends_on, target_asset_id: SCHEMA-T30-ROUTE-AVAILABILITY-PROBE-001}
+  - {relation_type: depends_on, target_asset_id: FIXTURE-T30-ROUTE-AVAILABILITY-PROBE-001}
+  consumers: [TASK-30, FACTORY-001]
+  evidence: []
+  classification: *t25_internal
+
+- asset_id: EVIDENCE-T30-A11-ROUTE-AVAILABILITY-PROBE-001
+  record_version: '1.0'
+  asset_type: evidence
+  purpose: Hash-bound FULL_REVIEW offline acceptance for TASK-30 A11A with zero external authority and side effects.
+  status: VALIDATED_ACTIVE
+  origin: REPOSITORY
+  as_of: '2026-08-11'
+  truth_owner: TASK-30
+  location: {kind: git_path, logical_uri: 'repo://docs/evidence/task30/a11_route_availability_probe_acceptance_v1.json', repository_path: docs/evidence/task30/a11_route_availability_probe_acceptance_v1.json}
+  integrity: {kind: sha256, sha256: e5162217299518cdef4706c0ba973666c13c08d217c0f8a94c4914bffd3b7756}
+  access: *t25_read_file
+  relations:
+  - {relation_type: derived_from, target_asset_id: CONTRACT-T30-ROUTE-AVAILABILITY-PROBE-001}
+  - {relation_type: derived_from, target_asset_id: EVIDENCE-T30-A10-GECKO-INTERVAL-SEMANTICS-RUNTIME-001}
+  - {relation_type: validated_by, target_asset_id: TEST-T30-ROUTE-AVAILABILITY-PROBE-001}
+  consumers: [TASK-30, FACTORY-001]
+  evidence: []
+  classification: *t25_internal
