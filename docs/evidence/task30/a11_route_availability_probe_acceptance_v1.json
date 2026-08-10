@@ -1,0 +1,92 @@
+{
+  "schema": "smial.task30.route-availability-probe.acceptance",
+  "schema_version": "1.0",
+  "receipt_id": "T30-A11A-ROUTE-AVAILABILITY-PROBE-ACCEPTANCE-001",
+  "task_id": "TASK-30",
+  "atom_id": "T30-A11A_ROUTE_AVAILABILITY_PROBE_OFFLINE_V1",
+  "validation_status": "PASS_WITH_LIMITATIONS",
+  "state_change": "NONE",
+  "frozen_definition": {
+    "group_id": "RC001-H07-H01-LIQUIDITY-RETENTION",
+    "definition_sha256": "14a7387148d05773dedcb5ad6a8110a0dcab7e49da4dec77328903a5b7577df7",
+    "parameter_id": "OBSERVATION_WINDOW_15M",
+    "interval_seconds": 900
+  },
+  "upstream_a10": {
+    "path": "docs/evidence/task30/a10_gecko_interval_semantics_runtime_receipt_v1.json",
+    "sha256": "5ba127597f448ebd8cdd3ea00d5d76722529e404084f59fea6bbbef6c598d904",
+    "decision": "START_LABELED"
+  },
+  "decision": {
+    "value": "OFFLINE_PROBE_POLICY_VALIDATED",
+    "future_external_authority_required": true,
+    "next_boundary": "OWNER_PACKET_FOR_TWO_SLOT_LIVE_SHAKEDOWN",
+    "twenty_four_hour_capture_authorized": false
+  },
+  "factory_fit_review": "FULL_REVIEW",
+  "factory_fit": {
+    "mission": "Reduces a capture-safety ambiguity before any external collection without confusing a technical probe with alpha evidence or cashflow.",
+    "flexibility": "No provider, endpoint, credential, route adapter, scheduler, database, or collector is selected or built.",
+    "research_truth": "Synthetic publication stability cannot promote PIT admissibility, H07/H01 evidence, a trial, execution, settlement, PnL, or NetReturn.",
+    "owner_operability": "The Russian readout makes the fixed-delay proposal, health stop rule, and next owner gate explicit.",
+    "recovery": "A health failure is a STOP_RUN, never a converted market gap or an implicit restart permission.",
+    "build_vs_buy": "The evaluator reuses the frozen registry and A10 semantics receipt; no generic capture platform is created.",
+    "red_team": "Revision, wrong interval, typed post-publication gap, duplicate, missing offset, retry, fallback, and monitoring loss are deterministically rejected or fail closed."
+  },
+  "product_horizon_radar": {
+    "now": "A future owner packet can decide whether one named provider route may run a two-slot live shakedown with explicit monitoring and raw-retention terms.",
+    "watch_trigger": "If that shakedown cannot produce one receipt per planned offset or exposes a health failure, stop the route and revisit reuse-first before any 24-hour capture."
+  },
+  "artifact_bindings": {
+    "task": {"path": "docs/tasks/TASK-30-route-availability-probe.md", "sha256": "b1ea962f1f8710c4dab8b68ad0a2c3fbc2e90dae8f9ab29d6a8cb42dd28b9e4d"},
+    "contract": {"path": "docs/contracts/task30_route_availability_probe_contract_v1.md", "sha256": "c1ef23dc5b4e0911f1b6ae5acea7f37b2efae8c52f0f021a8d39e5184cfb0dc8"},
+    "configuration": {"path": "configs/task30_route_availability_probe_v1.yaml", "sha256": "495ddfb6ec432aca9774982588922c09ab4301c0e43b6572abee86af571c148a"},
+    "schema": {"path": "catalog/schemas/task30_route_availability_probe.schema.json", "sha256": "3e04db5b40d37277ce0499938c3d9cd4a09106425ad5a41d7f3b96a7545f4995"},
+    "fixture": {"path": "tests/fixtures/task30/route_availability_probe_v1.json", "sha256": "74410f23b32016c24101e0525948a03255cc1e8c01d9a85a7fa53b0ddb17f5e1"},
+    "module": {"path": "src/solana_alpha_lab/task30_route_availability_probe.py", "sha256": "4c33446a39060665fbbc1b1ccf0894eb6a12ada421c33f2638e1f0ff31539ca3"},
+    "script": {"path": "scripts/show_task30_route_availability_probe.py", "sha256": "f9d9f5f0648cd38ca6d7d75144bea71919dee4e5affea37def89ccdc3b4401f7"},
+    "report": {"path": "docs/reports/task30/route_availability_probe_readout_v1.md", "sha256": "0d9d9c2eb37740e82b917625ec5fceda6a35ab7cb6bcde94088aa71af771ae82"},
+    "test": {"path": "tests/test_task30_route_availability_probe.py", "sha256": "5400dd790a3125154a2d60f9b6c54f41a349f49104f58c70eb5a1ff97be8c02e"},
+    "design": {"path": "docs/superpowers/specs/2026-08-11-task30-15m-route-availability-probe-design.md", "sha256": "eb3cf4d9eda712e9b4291643dd145bcf180297b9197c137db57d21a1f9bc6b6e"},
+    "plan": {"path": "docs/superpowers/plans/2026-08-11-task30-route-availability-probe.md", "sha256": "41c07f8bf7c62e670be81189791dcd640e870d0887eef1765343ba9bc28dbfaf"}
+  },
+  "authority": {
+    "provider_api_rpc_wss_calls": 0,
+    "credential_use": 0,
+    "raw_data_writes": 0,
+    "scheduler_or_background_processes": 0,
+    "provider_adapters_or_collectors": 0,
+    "r2_r3_access": 0,
+    "wallet_signer_transaction_actions": 0,
+    "cash_spend_usd_cents": 0,
+    "task30_trial_or_acceptance_actions": 0
+  },
+  "side_effect_counters": {
+    "provider_api_rpc_wss_calls": 0,
+    "credential_use": 0,
+    "raw_data_writes": 0,
+    "scheduler_or_background_processes": 0,
+    "dependency_changes": 0,
+    "r2_r3_access": 0,
+    "wallet_signer_transaction_actions": 0,
+    "cash_spend_usd_cents": 0,
+    "task30_trial_or_acceptance_actions": 0,
+    "project_sources_changes": 0
+  },
+  "non_claims": {
+    "pit_admissible": false,
+    "h07_h01_evidence": false,
+    "task30_trial": false,
+    "execution": false,
+    "settlement": false,
+    "pnl": false,
+    "numeric_netreturn": false,
+    "external_capture_authorized": false,
+    "provider_selected": false,
+    "missing_is_zero_or_flat": false
+  },
+  "project_sources_disposition": {
+    "kind": "NO_CHANGE",
+    "reason": "A11A is an offline policy and synthetic acceptance; it does not change canonical TASK-30 acceptance or active Project Sources."
+  }
+}

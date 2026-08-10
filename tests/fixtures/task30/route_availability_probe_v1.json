@@ -1,0 +1,43 @@
+{
+  "fixture_id": "FIXTURE-T30-ROUTE-AVAILABILITY-PROBE-001",
+  "purpose": "Synthetic-only stable publication observations for the offline TASK-30 A11A evaluator.",
+  "non_claims": {
+    "provider_response": false,
+    "historical_panel": false,
+    "trial": false,
+    "execution": false,
+    "numeric_netreturn": false
+  },
+  "records": [
+    {"slot_start": 1800, "offset_seconds": 0, "capture_state": "TYPED_GAP"},
+    {"slot_start": 1800, "offset_seconds": 15, "capture_state": "VALID_OBSERVATION", "expected_interval_start": 1800, "observed_interval_start": 1800, "candle_fingerprint": "synthetic-candle-1800"},
+    {"slot_start": 1800, "offset_seconds": 30, "capture_state": "VALID_OBSERVATION", "expected_interval_start": 1800, "observed_interval_start": 1800, "candle_fingerprint": "synthetic-candle-1800"},
+    {"slot_start": 1800, "offset_seconds": 60, "capture_state": "VALID_OBSERVATION", "expected_interval_start": 1800, "observed_interval_start": 1800, "candle_fingerprint": "synthetic-candle-1800"},
+    {"slot_start": 2700, "offset_seconds": 0, "capture_state": "TYPED_GAP"},
+    {"slot_start": 2700, "offset_seconds": 15, "capture_state": "TYPED_GAP"},
+    {"slot_start": 2700, "offset_seconds": 30, "capture_state": "VALID_OBSERVATION", "expected_interval_start": 2700, "observed_interval_start": 2700, "candle_fingerprint": "synthetic-candle-2700"},
+    {"slot_start": 2700, "offset_seconds": 60, "capture_state": "VALID_OBSERVATION", "expected_interval_start": 2700, "observed_interval_start": 2700, "candle_fingerprint": "synthetic-candle-2700"},
+    {"slot_start": 3600, "offset_seconds": 0, "capture_state": "TYPED_GAP"},
+    {"slot_start": 3600, "offset_seconds": 15, "capture_state": "TYPED_GAP"},
+    {"slot_start": 3600, "offset_seconds": 30, "capture_state": "VALID_OBSERVATION", "expected_interval_start": 3600, "observed_interval_start": 3600, "candle_fingerprint": "synthetic-candle-3600"},
+    {"slot_start": 3600, "offset_seconds": 60, "capture_state": "VALID_OBSERVATION", "expected_interval_start": 3600, "observed_interval_start": 3600, "candle_fingerprint": "synthetic-candle-3600"}
+  ],
+  "expected_result": {
+    "decision": "READY_FOR_FIXED_DELAY_24H_TECHNICAL_CAPTURE",
+    "execution_disposition": "CONTINUE",
+    "recommended_fixed_delay_seconds": 30,
+    "slots": [
+      {"slot_start": 1800, "first_valid_offset_seconds": 15, "candle_fingerprint": "synthetic-candle-1800", "stable_after_first_valid": true},
+      {"slot_start": 2700, "first_valid_offset_seconds": 30, "candle_fingerprint": "synthetic-candle-2700", "stable_after_first_valid": true},
+      {"slot_start": 3600, "first_valid_offset_seconds": 30, "candle_fingerprint": "synthetic-candle-3600", "stable_after_first_valid": true}
+    ],
+    "claims": {
+      "technical_route_only": true,
+      "pit_admissible": false,
+      "h07_h01_evidence": false,
+      "task30_trial": false,
+      "execution": false,
+      "numeric_netreturn": false
+    }
+  }
+}

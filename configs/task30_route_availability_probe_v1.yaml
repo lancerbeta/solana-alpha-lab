@@ -1,0 +1,48 @@
+schema: smial.task30.route-availability-probe.policy
+schema_version: '1.0'
+task_id: TASK-30
+atom_id: T30-A11A_ROUTE_AVAILABILITY_PROBE_OFFLINE_V1
+consumer: OWNER_TWO_SLOT_LIVE_SHAKEDOWN_GATE
+frozen_group_id: RC001-H07-H01-LIQUIDITY-RETENTION
+frozen_parameter_id: OBSERVATION_WINDOW_15M
+interval_seconds: 900
+upstream_a10_decision: START_LABELED
+probe_shape:
+  boundaries: 3
+  offset_seconds: [0, 15, 30, 60]
+  max_ohlcv_reads: 12
+future_external_read:
+  selected_provider: null
+  retry: false
+  fallback: false
+  scheduler: false
+  raw_retention: OWNER_PACKET_REQUIRED
+capture_states:
+  valid: VALID_OBSERVATION
+  typed_gap: TYPED_GAP
+  health_failures:
+  - PROCESS_NOT_STARTED
+  - RECEIPT_WRITE_FAILED
+  - PRIOR_MANIFEST_UNREADABLE
+  - MONITORING_LOST
+terminal_decisions:
+- READY_FOR_FIXED_DELAY_24H_TECHNICAL_CAPTURE
+- ROUTE_NOT_READY_FOR_FIXED_DELAY_CAPTURE
+- INCONCLUSIVE
+authority:
+  provider_api_rpc_wss_calls: 0
+  scheduler_or_background_processes: 0
+  raw_data_writes: 0
+  credential_use: 0
+  r2_r3_access: 0
+  wallet_signer_transaction_actions: 0
+  cash_spend_usd_cents: 0
+  task30_trial_or_acceptance_actions: 0
+claims:
+  technical_route_only: false
+  pit_admissible: false
+  h07_h01_evidence: false
+  task30_trial: false
+  execution: false
+  numeric_netreturn: false
+project_sources_disposition: NO_CHANGE
