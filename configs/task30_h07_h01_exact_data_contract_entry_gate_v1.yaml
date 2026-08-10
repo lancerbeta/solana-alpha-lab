@@ -1,0 +1,171 @@
+schema: smial.task30.h07-h01-exact-data-contract-entry-gate.policy
+schema_version: '1.0'
+task_id: TASK-30
+atom_id: T30-A8_H07_H01_EXACT_DATA_CONTRACT_ENTRY_GATE_V1
+contract_id: TASK30-H07-H01-EXACT-DATA-CONTRACT-ENTRY-GATE-V1
+consumer: OWNER_FUTURE_PARTIAL_PIT_CAPTURE_DECISION
+frozen_definition:
+  path: configs/task28_rc001_registry_freeze_v1.yaml
+  group_id: RC001-H07-H01-LIQUIDITY-RETENTION
+  definition_sha256: 14a7387148d05773dedcb5ad6a8110a0dcab7e49da4dec77328903a5b7577df7
+  definition_inputs:
+  - PIT liquidity-retention state
+  - multi-notional route persistence
+  - post-migration continuation context
+input_evidence:
+  task27_route_close:
+    path: docs/evidence/task27/a1s4_owner_route_close_and_task_outcome_acceptance_v1.json
+    sha256: e901a59a72da29b3eb4a90e24a7d3bde91a4fc00c023310086376747ebe47e6d
+    decision: CLOSE_CURRENT_SOLANA_TRACKER_15M_POOL_HISTORY_ROUTE_NOT_FEASIBLE
+  task26b_execution_witness:
+    path: docs/evidence/task26b/a1_execution_witness_route_acceptance_v1.json
+    sha256: 86cd5d33f3e29f9c3d365afc1aca511b212d6a809fa7be3ea2c6e65ffebd4b73
+    decision: OWNED_CANARY_REQUIRED
+  task30_a6_forward_capture:
+    path: docs/evidence/task30/a6_birdeye_route_hold_forward_capture_decision_acceptance_v1.json
+    sha256: e40b3fc46762c015f439a453f68939859114f8f498e1791a0a68f1790829e036
+    decision: HOLD_BIRDEYE_ROUTE_PREPARE_FORWARD_CAPTURE_CANDIDATE
+  task30_a7_owner_visible:
+    path: docs/evidence/task30/a7_h07_h01_owner_visible_vertical_slice_acceptance_v1.json
+    sha256: 394fdb8b767d0d172b5fe56cb6bf8e205fa4dcc27bec924494f3955ccf391a66
+    decision: CAPTURE_REQUIRED
+lanes:
+  PIT_MARKET:
+    may_establish: BOUNDED_MARKET_HISTORY_INPUT
+    cannot_establish:
+    - ROUTE_PERSISTENCE
+    - FILL
+    - SETTLEMENT
+    required_fields:
+    - pool_identity
+    - mint_identity
+    - dex_or_program_identity
+    - closed_interval
+    - ohlcv
+    - liquidity_state
+    - observed_at
+    - available_at
+    - ingested_at
+    - source_or_raw_sha256
+    - typed_gap_or_failure
+  ROUTE_FEASIBILITY:
+    may_establish: MULTI_NOTIONAL_ROUTE_AVAILABILITY
+    cannot_establish:
+    - FILL
+    - SETTLEMENT
+    required_fields:
+    - evaluated_at
+    - input_mint
+    - output_mint
+    - notional
+    - route_identifier_or_status
+    - quoted_amounts
+    - price_impact
+    - separate_fees
+    - observed_at
+    - available_at
+    - ingested_at
+    - source_or_raw_sha256
+    - typed_gap_or_failure
+  OWNED_EXECUTION:
+    may_establish: OWNER_ATTEMPT_INVENTORY_AND_SETTLEMENT
+    future_canary_only: true
+    available_in_this_atom: false
+    required_fields:
+    - stable_attempt_id
+    - retry_chain_id
+    - transaction_signature
+    - terminal_state
+    - terminal_at
+    - token_and_sol_deltas
+    - separate_fees
+    - inventory_before_after
+    - reconciliation_reference
+    - source_or_raw_hashes
+requirements:
+  pit_liquidity_retention_state:
+    lane: PIT_MARKET
+    state: MISSING_UNKNOWN
+    future_capture_capable: true
+  multi_notional_route_persistence:
+    lane: ROUTE_FEASIBILITY
+    state: MISSING_UNKNOWN
+    future_capture_capable: true
+  post_migration_continuation_context:
+    lane: PIT_MARKET
+    state: MISSING_UNKNOWN
+    required_context_fields:
+    - migration_or_program_context
+    - pool_identity
+    - pre_and_post_boundary_continuity
+    future_capture_capable: true
+  settled_execution_truth:
+    lane: OWNED_EXECUTION
+    state: UNSUPPORTED
+    future_capture_capable: false
+decision_policy:
+  allowed_terminal_decisions:
+  - PREPARE_PARTIAL_PIT_CAPTURE_CONTRACT
+  - REDESIGN_DATA
+  - CLOSE_ROUTE
+  current_decision: PREPARE_PARTIAL_PIT_CAPTURE_CONTRACT
+  trial_admissible: false
+  next_boundary: OWNER_GATE_FOR_NAMED_PARTIAL_PIT_OR_ROUTE_CAPTURE
+missingness_policy:
+  missing_to_zero: FORBIDDEN
+  quote_to_settlement: FORBIDDEN
+  price_to_trial: FORBIDDEN
+  continuity_imputation: FORBIDDEN
+capture_safety:
+  backup_or_waiver:
+    required: true
+    applies_before: DECISION_CRITICAL_IRRECOVERABLE_FUTURE_CAPTURE
+    registered_backup_or_restore_route: REQUIRED
+    tracked_waiver: ALLOWED_IF_EXPLICIT
+reuse_trigger:
+  required_before: FUTURE_CAPTURE_IMPLEMENTATION
+  orchestration_specific_line_threshold: 150
+  second_new_capture_consumer: true
+  required_assessment: ADOPT_WRAP_FORK_BUILD
+audit_assimilation:
+  input_sha256: 9ef775756f35199b073acfea0e52db228da9b4d08c30b1194e3d7b1b88886da1
+  accepted_now:
+  - PROSPECTIVE_CAPTURE_REUSE_TRIGGER
+  - BACKUP_OR_WAIVER_BEFORE_IRRECOVERABLE_CAPTURE
+  deferred_trigger: FAST_PATH_REPAIR_RECURRENCE_OR_MATERIAL_BASELINE_TOUCH
+authority:
+  provider_api_rpc_wss_calls: 0
+  credential_use: 0
+  raw_data_writes: 0
+  r2_r3_access: 0
+  scheduler_or_background_processes: 0
+  wallet_signer_transaction_actions: 0
+  cash_spend_usd_cents: 0
+  task30_trial_or_acceptance_actions: 0
+non_claims:
+  pit_capture_is_trial: false
+  price_only_is_route_persistence: false
+  quote_only_is_settlement: false
+  missing_is_zero_or_no_trade: false
+  provider_selected: false
+  forward_capture_started: false
+  execution_truth_available: false
+  alpha: false
+  strategy: false
+  pnl: false
+  numeric_netreturn: false
+  task30_acceptance: false
+side_effect_counters:
+  provider_api_rpc_wss_calls: 0
+  credential_use: 0
+  raw_data_writes: 0
+  r2_r3_access: 0
+  scheduler_or_background_processes: 0
+  dependency_changes: 0
+  wallet_signer_transaction_actions: 0
+  cash_spend_usd_cents: 0
+  task30_trial_or_acceptance_actions: 0
+  project_sources_changes: 0
+project_sources_disposition:
+  kind: NO_CHANGE
+  reason: T30-A8 is an offline data-contract decision and does not change canonical TASK-30 status.

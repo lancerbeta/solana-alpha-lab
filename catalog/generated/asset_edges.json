@@ -533,6 +533,11 @@
       "target_asset_id": "CONTRACT-T30-BIRDEYE-V3-HISTORY-PILOT-001"
     },
     {
+      "source_asset_id": "CONFIG-T30-H07-H01-DATA-CONTRACT-GATE-001",
+      "relation": "governed_by",
+      "target_asset_id": "CONTRACT-T30-H07-H01-DATA-CONTRACT-GATE-001"
+    },
+    {
       "source_asset_id": "CONFIG-T30-OHLCV-BOUNDARY-SEMANTICS-001",
       "relation": "governed_by",
       "target_asset_id": "CONTRACT-T30-OHLCV-BOUNDARY-SEMANTICS-001"
@@ -3063,6 +3068,21 @@
       "target_asset_id": "TEST-T30-BIRDEYE-ROUTE-HOLD-FORWARD-CAPTURE-001"
     },
     {
+      "source_asset_id": "EVIDENCE-T30-A8-H07-H01-DATA-CONTRACT-GATE-001",
+      "relation": "derived_from",
+      "target_asset_id": "CONTRACT-T30-H07-H01-DATA-CONTRACT-GATE-001"
+    },
+    {
+      "source_asset_id": "EVIDENCE-T30-A8-H07-H01-DATA-CONTRACT-GATE-001",
+      "relation": "derived_from",
+      "target_asset_id": "MODULE-T30-H07-H01-DATA-CONTRACT-GATE-001"
+    },
+    {
+      "source_asset_id": "EVIDENCE-T30-A8-H07-H01-DATA-CONTRACT-GATE-001",
+      "relation": "validated_by",
+      "target_asset_id": "TEST-T30-H07-H01-DATA-CONTRACT-GATE-001"
+    },
+    {
       "source_asset_id": "EVIDENCE-T34A-A3-ACCEPTANCE-001",
       "relation": "derived_from",
       "target_asset_id": "CONTRACT-T34A-DOCUMENTATION-FOUNDATION-001"
@@ -3636,6 +3656,11 @@
       "source_asset_id": "FIXTURE-T30-BIRDEYE-V3-HISTORY-PILOT-001",
       "relation": "derived_from",
       "target_asset_id": "CONFIG-T30-BIRDEYE-V3-HISTORY-PILOT-001"
+    },
+    {
+      "source_asset_id": "FIXTURE-T30-H07-H01-DATA-CONTRACT-GATE-001",
+      "relation": "derived_from",
+      "target_asset_id": "CONFIG-T30-H07-H01-DATA-CONTRACT-GATE-001"
     },
     {
       "source_asset_id": "FIXTURE-T30-OHLCV-BOUNDARY-SEMANTICS-001",
@@ -4453,6 +4478,16 @@
       "target_asset_id": "EVIDENCE-T30-A5-BIRDEYE-V3-HISTORY-PILOT-001"
     },
     {
+      "source_asset_id": "MODULE-T30-H07-H01-DATA-CONTRACT-GATE-001",
+      "relation": "governed_by",
+      "target_asset_id": "CONFIG-T30-H07-H01-DATA-CONTRACT-GATE-001"
+    },
+    {
+      "source_asset_id": "MODULE-T30-H07-H01-DATA-CONTRACT-GATE-001",
+      "relation": "produces",
+      "target_asset_id": "EVIDENCE-T30-A8-H07-H01-DATA-CONTRACT-GATE-001"
+    },
+    {
       "source_asset_id": "MODULE-T30-OHLCV-BOUNDARY-SEMANTICS-001",
       "relation": "governed_by",
       "target_asset_id": "CONFIG-T30-OHLCV-BOUNDARY-SEMANTICS-001"
@@ -4843,6 +4878,11 @@
       "target_asset_id": "EVIDENCE-T23-A4-BOUNDED-ANALYSIS-001"
     },
     {
+      "source_asset_id": "REPORT-T30-H07-H01-DATA-CONTRACT-GATE-001",
+      "relation": "derived_from",
+      "target_asset_id": "MODULE-T30-H07-H01-DATA-CONTRACT-GATE-001"
+    },
+    {
       "source_asset_id": "ROADMAP-PATCH-T21-PRODUCT-VISION-001",
       "relation": "advises",
       "target_asset_id": "ARCH-INTENT-T21-PRODUCT-VISION-001"
@@ -5218,6 +5258,11 @@
       "target_asset_id": "CONTRACT-T30-BIRDEYE-V3-HISTORY-PILOT-001"
     },
     {
+      "source_asset_id": "SCHEMA-T30-H07-H01-DATA-CONTRACT-GATE-001",
+      "relation": "governed_by",
+      "target_asset_id": "CONTRACT-T30-H07-H01-DATA-CONTRACT-GATE-001"
+    },
+    {
       "source_asset_id": "SCHEMA-T30-OHLCV-BOUNDARY-SEMANTICS-001",
       "relation": "governed_by",
       "target_asset_id": "CONTRACT-T30-OHLCV-BOUNDARY-SEMANTICS-001"
@@ -5591,6 +5636,11 @@
       "source_asset_id": "SCRIPT-T22-SPLIT-RESOLUTION-001",
       "relation": "depends_on",
       "target_asset_id": "MODULE-T22-SPLIT-RESOLUTION-001"
+    },
+    {
+      "source_asset_id": "SCRIPT-T30-H07-H01-DATA-CONTRACT-GATE-001",
+      "relation": "depends_on",
+      "target_asset_id": "MODULE-T30-H07-H01-DATA-CONTRACT-GATE-001"
     },
     {
       "source_asset_id": "SCRIPT-T34A-CONTEXT-001",
@@ -6931,6 +6981,26 @@
       "source_asset_id": "TEST-T30-BIRDEYE-V3-HISTORY-PILOT-001",
       "relation": "depends_on",
       "target_asset_id": "SCHEMA-T30-BIRDEYE-V3-HISTORY-PILOT-001"
+    },
+    {
+      "source_asset_id": "TEST-T30-H07-H01-DATA-CONTRACT-GATE-001",
+      "relation": "depends_on",
+      "target_asset_id": "EVIDENCE-T30-A8-H07-H01-DATA-CONTRACT-GATE-001"
+    },
+    {
+      "source_asset_id": "TEST-T30-H07-H01-DATA-CONTRACT-GATE-001",
+      "relation": "depends_on",
+      "target_asset_id": "FIXTURE-T30-H07-H01-DATA-CONTRACT-GATE-001"
+    },
+    {
+      "source_asset_id": "TEST-T30-H07-H01-DATA-CONTRACT-GATE-001",
+      "relation": "depends_on",
+      "target_asset_id": "MODULE-T30-H07-H01-DATA-CONTRACT-GATE-001"
+    },
+    {
+      "source_asset_id": "TEST-T30-H07-H01-DATA-CONTRACT-GATE-001",
+      "relation": "depends_on",
+      "target_asset_id": "SCHEMA-T30-H07-H01-DATA-CONTRACT-GATE-001"
     },
     {
       "source_asset_id": "TEST-T30-OHLCV-BOUNDARY-SEMANTICS-001",

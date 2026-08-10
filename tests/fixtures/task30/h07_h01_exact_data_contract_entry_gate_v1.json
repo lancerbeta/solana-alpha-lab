@@ -1,0 +1,17 @@
+{
+  "decision": "PREPARE_PARTIAL_PIT_CAPTURE_CONTRACT",
+  "trial_admissible": false,
+  "next_boundary": "OWNER_GATE_FOR_NAMED_PARTIAL_PIT_OR_ROUTE_CAPTURE",
+  "requirements": {
+    "pit_liquidity_retention_state": {"lane": "PIT_MARKET", "state": "MISSING_UNKNOWN"},
+    "multi_notional_route_persistence": {"lane": "ROUTE_FEASIBILITY", "state": "MISSING_UNKNOWN"},
+    "post_migration_continuation_context": {"lane": "PIT_MARKET", "state": "MISSING_UNKNOWN"},
+    "settled_execution_truth": {"lane": "OWNED_EXECUTION", "state": "UNSUPPORTED"}
+  },
+  "retained_blockers": ["MISSING_UNKNOWN", "UNSUPPORTED"],
+  "non_claims": [
+    "Partial PIT capture is not a trial.",
+    "Route feasibility is not settlement.",
+    "Owned execution truth remains future-canary-only."
+  ]
+}
