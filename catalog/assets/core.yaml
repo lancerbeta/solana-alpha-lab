@@ -1,6 +1,6 @@
 schema_version: '1.1'
 registry_id: CATALOG-ASSET-REGISTRY-CORE-001
-as_of: '2026-08-09'
+as_of: '2026-08-10'
 records:
 - asset_id: SCM-BASELINE-COMMIT-001
   record_version: '1.0'
@@ -16560,5 +16560,199 @@ records:
   - {relation_type: derived_from, target_asset_id: EVIDENCE-T34A-A3-ACCEPTANCE-001}
   - {relation_type: validated_by, target_asset_id: TEST-T34A-DOCUMENTATION-FOUNDATION-001}
   consumers: [TASK-34, FACTORY-001]
+  evidence: []
+  classification: *t25_internal
+
+- asset_id: CONTRACT-T30-GECKO-INTERVAL-SEMANTICS-001
+  record_version: '1.0'
+  asset_type: control_document
+  purpose: Exact two-read public GeckoTerminal contract for discriminating 15-minute OHLCV label semantics without starting a data route or trial.
+  status: VALIDATED_ACTIVE
+  origin: REPOSITORY
+  as_of: '2026-08-10'
+  truth_owner: TASK-30
+  location: {kind: git_path, logical_uri: 'repo://docs/contracts/task30_gecko_interval_semantics_contract_v1.md', repository_path: docs/contracts/task30_gecko_interval_semantics_contract_v1.md}
+  integrity: {kind: sha256, sha256: d8f0de5052eb72a96c876e87472ff230ab9a103eef2f4f527210ee41443e31a9}
+  access: *t25_read_file
+  relations: [{relation_type: derived_from, target_asset_id: EVIDENCE-T30-A1-BOUNDARY-SEMANTICS-001}]
+  consumers: [TASK-30, FACTORY-001]
+  evidence: []
+  classification: *t25_internal
+
+- asset_id: CONFIG-T30-GECKO-INTERVAL-SEMANTICS-001
+  record_version: '1.0'
+  asset_type: configuration
+  purpose: Machine-readable allowlist, two-call cap, exclusions, and raw-retention policy for the TASK-30 A10 interval-semantics discriminator.
+  status: VALIDATED_ACTIVE
+  origin: REPOSITORY
+  as_of: '2026-08-10'
+  truth_owner: TASK-30
+  location: {kind: git_path, logical_uri: 'repo://configs/task30_gecko_interval_semantics_v1.yaml', repository_path: configs/task30_gecko_interval_semantics_v1.yaml}
+  integrity: {kind: sha256, sha256: 930cf612adb4f5d728c8750816509c76238b2acc385861afe9d9aef4a6c754ad}
+  access: *t25_read_file
+  relations: [{relation_type: governed_by, target_asset_id: CONTRACT-T30-GECKO-INTERVAL-SEMANTICS-001}]
+  consumers: [TASK-30, FACTORY-001]
+  evidence: []
+  classification: *t25_internal
+
+- asset_id: SCHEMA-T30-GECKO-INTERVAL-SEMANTICS-001
+  record_version: '1.0'
+  asset_type: schema
+  purpose: JSON Schema binding the TASK-30 A10 public GeckoTerminal interval-semantics policy.
+  status: VALIDATED_ACTIVE
+  origin: REPOSITORY
+  as_of: '2026-08-10'
+  truth_owner: TASK-30
+  location: {kind: git_path, logical_uri: 'repo://catalog/schemas/task30_gecko_interval_semantics.schema.json', repository_path: catalog/schemas/task30_gecko_interval_semantics.schema.json}
+  integrity: {kind: sha256, sha256: 966f6f665944a53d8bc8612d9cc9be3dd400512fb5e934114030ba883a174c37}
+  access: *t25_read_file
+  relations: [{relation_type: governed_by, target_asset_id: CONTRACT-T30-GECKO-INTERVAL-SEMANTICS-001}]
+  consumers: [TASK-30, FACTORY-001]
+  evidence: []
+  classification: *t25_internal
+
+- asset_id: FIXTURE-T30-GECKO-INTERVAL-SEMANTICS-001
+  record_version: '1.0'
+  asset_type: evidence
+  purpose: Synthetic-only cases proving start label, end label, inconclusive, and malformed-payload handling for TASK-30 A10.
+  status: VALIDATED_ACTIVE
+  origin: REPOSITORY
+  as_of: '2026-08-10'
+  truth_owner: TASK-30
+  location: {kind: git_path, logical_uri: 'repo://tests/fixtures/task30/gecko_interval_semantics_v1.json', repository_path: tests/fixtures/task30/gecko_interval_semantics_v1.json}
+  integrity: {kind: sha256, sha256: 597a4d582dca13048e49dd77ba3d3e7563919278078abffff9d2fe008ac5e26c}
+  access: *t25_read_file
+  relations: [{relation_type: derived_from, target_asset_id: CONFIG-T30-GECKO-INTERVAL-SEMANTICS-001}]
+  consumers: [TASK-30, FACTORY-001]
+  evidence: []
+  classification: *t25_internal
+
+- asset_id: MODULE-T30-GECKO-INTERVAL-SEMANTICS-001
+  record_version: '1.0'
+  asset_type: script
+  purpose: Pure fail-closed evaluator that compares direct-trade USD prices with the two candidate 15-minute OHLCV timestamp mappings.
+  status: VALIDATED_ACTIVE
+  origin: REPOSITORY
+  as_of: '2026-08-10'
+  truth_owner: TASK-30
+  location: {kind: git_path, logical_uri: 'repo://src/solana_alpha_lab/task30_gecko_interval_semantics.py', repository_path: src/solana_alpha_lab/task30_gecko_interval_semantics.py}
+  integrity: {kind: sha256, sha256: 9c6ea8a834ef0008f54cfa4fd9eaf5ac7f4d2859a96e906503e6f0ef1af5f018}
+  access: *t25_read_file
+  relations:
+  - {relation_type: governed_by, target_asset_id: CONFIG-T30-GECKO-INTERVAL-SEMANTICS-001}
+  - {relation_type: produces, target_asset_id: EVIDENCE-T30-A10-GECKO-INTERVAL-SEMANTICS-RUNTIME-001}
+  consumers: [TASK-30, FACTORY-001]
+  evidence: []
+  classification: *t25_internal
+
+- asset_id: SCRIPT-T30-GECKO-INTERVAL-SEMANTICS-001
+  record_version: '1.0'
+  asset_type: script
+  purpose: One-shot zero-retry keyless transport that writes A10 raw bytes outside Git and never becomes a scheduler or collector.
+  status: VALIDATED_ACTIVE
+  origin: REPOSITORY
+  as_of: '2026-08-10'
+  truth_owner: TASK-30
+  location: {kind: git_path, logical_uri: 'repo://scripts/run_task30_gecko_interval_semantics.py', repository_path: scripts/run_task30_gecko_interval_semantics.py}
+  integrity: {kind: sha256, sha256: 9079f6f1accca0de6f58bbe565f0500f8e7897b68fae0beca50ed844544e6558}
+  access: *t25_read_file
+  relations:
+  - {relation_type: depends_on, target_asset_id: MODULE-T30-GECKO-INTERVAL-SEMANTICS-001}
+  - {relation_type: governed_by, target_asset_id: CONFIG-T30-GECKO-INTERVAL-SEMANTICS-001}
+  consumers: [TASK-30, FACTORY-001]
+  evidence: []
+  classification: *t25_internal
+
+- asset_id: TEST-T30-GECKO-INTERVAL-SEMANTICS-001
+  record_version: '1.0'
+  asset_type: script
+  purpose: Deterministic adversarial tests for request allowlisting and start/end/inconclusive interval semantics.
+  status: VALIDATED_ACTIVE
+  origin: REPOSITORY
+  as_of: '2026-08-10'
+  truth_owner: TASK-30
+  location: {kind: git_path, logical_uri: 'repo://tests/test_task30_gecko_interval_semantics.py', repository_path: tests/test_task30_gecko_interval_semantics.py}
+  integrity: {kind: sha256, sha256: 2b66022d8ea6330b3aeacc801767934c60379783cb56c2c617451fa50b57f9ad}
+  access: *t25_read_file
+  relations:
+  - {relation_type: depends_on, target_asset_id: MODULE-T30-GECKO-INTERVAL-SEMANTICS-001}
+  - {relation_type: depends_on, target_asset_id: SCHEMA-T30-GECKO-INTERVAL-SEMANTICS-001}
+  - {relation_type: depends_on, target_asset_id: FIXTURE-T30-GECKO-INTERVAL-SEMANTICS-001}
+  consumers: [TASK-30, FACTORY-001]
+  evidence: []
+  classification: *t25_internal
+
+- asset_id: TEST-T30-GECKO-INTERVAL-SEMANTICS-RUNNER-001
+  record_version: '1.0'
+  asset_type: script
+  purpose: Deterministic checks for zero-I/O dry run, exact two-GET transport, and pre-I/O call-cap rejection.
+  status: VALIDATED_ACTIVE
+  origin: REPOSITORY
+  as_of: '2026-08-10'
+  truth_owner: TASK-30
+  location: {kind: git_path, logical_uri: 'repo://tests/test_task30_gecko_interval_semantics_runner.py', repository_path: tests/test_task30_gecko_interval_semantics_runner.py}
+  integrity: {kind: sha256, sha256: 67bda61ec1a19cf37a4017959ae6225533e2bd5fc7f02af135ad0b1362badf17}
+  access: *t25_read_file
+  relations: [{relation_type: depends_on, target_asset_id: SCRIPT-T30-GECKO-INTERVAL-SEMANTICS-001}]
+  consumers: [TASK-30, FACTORY-001]
+  evidence: []
+  classification: *t25_internal
+
+- asset_id: EVIDENCE-T30-A10-GECKO-INTERVAL-SEMANTICS-RUNTIME-001
+  record_version: '1.0'
+  asset_type: evidence
+  purpose: Hash-bound observed result of exactly two public GeckoTerminal reads; records only the narrowed start-label semantics result and its non-claims.
+  status: VALIDATED_ACTIVE
+  origin: REPOSITORY
+  as_of: '2026-08-10'
+  truth_owner: TASK-30
+  location: {kind: git_path, logical_uri: 'repo://docs/evidence/task30/a10_gecko_interval_semantics_runtime_receipt_v1.json', repository_path: docs/evidence/task30/a10_gecko_interval_semantics_runtime_receipt_v1.json}
+  integrity: {kind: sha256, sha256: 5ba127597f448ebd8cdd3ea00d5d76722529e404084f59fea6bbbef6c598d904}
+  access: *t25_read_file
+  relations:
+  - {relation_type: derived_from, target_asset_id: CONTRACT-T30-GECKO-INTERVAL-SEMANTICS-001}
+  - {relation_type: derived_from, target_asset_id: MODULE-T30-GECKO-INTERVAL-SEMANTICS-001}
+  - {relation_type: validated_by, target_asset_id: TEST-T30-GECKO-INTERVAL-SEMANTICS-RUNTIME-001}
+  consumers: [TASK-30, FACTORY-001]
+  evidence:
+  - evidence_id: T30-A10-RAW-MANIFEST-HASH
+    kind: runtime_receipt
+    reference: local/task30_gecko_interval_semantics/run=t30a10-20260810T193420Z/raw_manifest_v1.json
+    result: PASS
+  classification: *t25_internal
+
+- asset_id: TEST-T30-GECKO-INTERVAL-SEMANTICS-RUNTIME-001
+  record_version: '1.0'
+  asset_type: script
+  purpose: Deterministic checks for the exact external-read receipt, non-claim boundary, Factory Fit, and Catalog discoverability.
+  status: VALIDATED_ACTIVE
+  origin: REPOSITORY
+  as_of: '2026-08-10'
+  truth_owner: TASK-30
+  location: {kind: git_path, logical_uri: 'repo://tests/test_task30_gecko_interval_semantics_runtime_receipt.py', repository_path: tests/test_task30_gecko_interval_semantics_runtime_receipt.py}
+  integrity: {kind: sha256, sha256: 082a9f003cb957e1dbbf9f37b5d71951da30197fa505686956e85fc2f98667a8}
+  access: *t25_read_file
+  relations:
+  - {relation_type: depends_on, target_asset_id: EVIDENCE-T30-A10-GECKO-INTERVAL-SEMANTICS-RUNTIME-001}
+  - {relation_type: depends_on, target_asset_id: EVIDENCE-T30-A10-GECKO-INTERVAL-SEMANTICS-FACTORY-FIT-001}
+  consumers: [TASK-30, FACTORY-001]
+  evidence: []
+  classification: *t25_internal
+
+- asset_id: EVIDENCE-T30-A10-GECKO-INTERVAL-SEMANTICS-FACTORY-FIT-001
+  record_version: '1.0'
+  asset_type: evidence
+  purpose: FULL Factory Fit receipt confirming a low-cost semantic result without promoting a data route, trial, execution, or cashflow claim.
+  status: VALIDATED_ACTIVE
+  origin: REPOSITORY
+  as_of: '2026-08-10'
+  truth_owner: TASK-30
+  location: {kind: git_path, logical_uri: 'repo://docs/evidence/task30/a10_gecko_interval_semantics_factory_fit_v1.json', repository_path: docs/evidence/task30/a10_gecko_interval_semantics_factory_fit_v1.json}
+  integrity: {kind: sha256, sha256: 22a9e53fad0e1537a0bfeaec37b3e7a8e76019ae6eae9d01665be5ed286cce56}
+  access: *t25_read_file
+  relations:
+  - {relation_type: derived_from, target_asset_id: EVIDENCE-T30-A10-GECKO-INTERVAL-SEMANTICS-RUNTIME-001}
+  - {relation_type: validated_by, target_asset_id: TEST-T30-GECKO-INTERVAL-SEMANTICS-RUNTIME-001}
+  consumers: [TASK-30, FACTORY-001]
   evidence: []
   classification: *t25_internal

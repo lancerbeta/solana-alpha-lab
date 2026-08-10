@@ -1,0 +1,16 @@
+{
+  "fixture_id": "FIXTURE-T30-GECKO-INTERVAL-SEMANTICS-001",
+  "purpose": "Synthetic only; proves that price-range contradictions discriminate one timestamp label model.",
+  "non_claims": {
+    "provider_response": false,
+    "historical_panel": false,
+    "trial": false,
+    "execution": false
+  },
+  "cases": [
+    "START_LABELED",
+    "END_LABELED",
+    "INCONCLUSIVE_NO_UNIQUE_MODEL",
+    "MALFORMED_PAYLOAD"
+  ]
+}

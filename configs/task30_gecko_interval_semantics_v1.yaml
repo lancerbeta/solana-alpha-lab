@@ -1,0 +1,41 @@
+schema: smial.task30.gecko-interval-semantics.policy
+schema_version: '1.0'
+task_id: TASK-30
+atom_id: T30-A10_GECKO_INTERVAL_SEMANTICS_DISCRIMINATOR_V1
+contract_id: CONTRACT-T30-GECKO-INTERVAL-SEMANTICS-001
+frozen_pool_address: URqx24yyYxtXXhTbBQnbtPLhtLWYoaDaRxuQuLpNS3S
+network: solana
+interval_seconds: 900
+external_read:
+  provider: GECKOTERMINAL_PUBLIC_KEYLESS
+  public_base_url: https://api.geckoterminal.com/api/v2
+  calls_max: 2
+  credentials: false
+  retry: false
+  fallback: false
+  scheduler: false
+  requests:
+  - request_id: OHLCV_15M
+    method: GET
+    path_template: /networks/solana/pools/{pool}/ohlcv/minute
+    query:
+      aggregate: '15'
+      currency: usd
+      token: base
+      limit: '96'
+      include_empty_intervals: 'false'
+      before_timestamp: DYNAMIC_CLOSED_BOUNDARY
+  - request_id: POOL_TRADES
+    method: GET
+    path_template: /networks/solana/pools/{pool}/trades
+    query:
+      token: base
+authority:
+  provider_api_rpc_wss_calls_max: 2
+  credential_use: false
+  r2_r3_access: false
+  scheduler_or_background_processes: false
+  wallet_signer_transaction_actions: false
+  cash_spend_usd_cents: 0
+  task30_trial_or_acceptance: false
+project_sources_disposition: NO_CHANGE
