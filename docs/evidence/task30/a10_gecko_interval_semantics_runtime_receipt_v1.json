@@ -1,0 +1,120 @@
+{
+  "schema": "smial.task30.gecko-interval-semantics.runtime-receipt",
+  "schema_version": "1.0",
+  "receipt_id": "T30-A10-GECKO-INTERVAL-SEMANTICS-RUNTIME-001",
+  "task_id": "TASK-30",
+  "atom_id": "T30-A10_GECKO_INTERVAL_SEMANTICS_DISCRIMINATOR_V1",
+  "status": "OBSERVED_EXTERNAL_READ_OUTCOME",
+  "authorization": "T30-A10_EXACT_TWO_PUBLIC_KEYLESS_GECKOTERMINAL_GETS",
+  "frozen_pool_address": "URqx24yyYxtXXhTbBQnbtPLhtLWYoaDaRxuQuLpNS3S",
+  "network": "solana",
+  "provider": "GECKOTERMINAL_PUBLIC_KEYLESS",
+  "credential_transport": "NONE",
+  "config_sha256": "930cf612adb4f5d728c8750816509c76238b2acc385861afe9d9aef4a6c754ad",
+  "contract_sha256": "d8f0de5052eb72a96c876e87472ff230ab9a103eef2f4f527210ee41443e31a9",
+  "run": {
+    "run_id": "t30a10-20260810T193420Z",
+    "before_timestamp": 1786390200,
+    "interval_seconds": 900,
+    "retention": "A4",
+    "raw_outside_git": true
+  },
+  "provider_calls_attempted": 2,
+  "reads": [
+    {
+      "request_id": "OHLCV_15M",
+      "method": "GET",
+      "host": "api.geckoterminal.com",
+      "endpoint_path": "/api/v2/networks/solana/pools/URqx24yyYxtXXhTbBQnbtPLhtLWYoaDaRxuQuLpNS3S/ohlcv/minute",
+      "query": {
+        "aggregate": "15",
+        "before_timestamp": "1786390200",
+        "currency": "usd",
+        "include_empty_intervals": "false",
+        "limit": "96",
+        "token": "base"
+      },
+      "http_status": 200,
+      "response_bytes": 11845,
+      "raw_sha256": "e7148b555b5e40b172d3746ac28ce450332654b8094330ead8f02d9cb1c50dbc",
+      "requested_at": "2026-08-10T19:34:20.748522Z",
+      "received_at": "2026-08-10T19:34:21.770216Z"
+    },
+    {
+      "request_id": "POOL_TRADES",
+      "method": "GET",
+      "host": "api.geckoterminal.com",
+      "endpoint_path": "/api/v2/networks/solana/pools/URqx24yyYxtXXhTbBQnbtPLhtLWYoaDaRxuQuLpNS3S/trades",
+      "query": {
+        "token": "base"
+      },
+      "http_status": 200,
+      "response_bytes": 34812,
+      "raw_sha256": "1be78a66c642300b5c7f798fa655e5f243b3c7fbeeb10db202ff661fade5a3ea",
+      "requested_at": "2026-08-10T19:34:21.770266Z",
+      "received_at": "2026-08-10T19:34:24.591884Z"
+    }
+  ],
+  "raw_manifest": {
+    "outside_git": true,
+    "relative_path": "local/task30_gecko_interval_semantics/run=t30a10-20260810T193420Z/raw_manifest_v1.json",
+    "sha256": "86e5483c5c1da610cc65e0de1b8aeb441f716a0c7553372769c3c5ae8e255899",
+    "bytes": 474
+  },
+  "decision": "START_LABELED",
+  "selected_model": "START_LABELED",
+  "runtime_result": {
+    "trade_records_received": 37,
+    "models": {
+      "START_LABELED": {
+        "usable_trades": 37,
+        "distinct_slots": 18,
+        "contradictions": 0,
+        "missing_mapped_bars": 0
+      },
+      "END_LABELED": {
+        "usable_trades": 16,
+        "distinct_slots": 7,
+        "contradictions": 6,
+        "missing_mapped_bars": 21
+      }
+    }
+  },
+  "stop_conditions_applied": {
+    "exact_call_cap": true,
+    "no_retry": true,
+    "no_fallback": true,
+    "no_credentials": true,
+    "no_scheduler": true,
+    "no_r2_r3": true,
+    "no_wallet_or_transaction": true,
+    "no_task30_trial_or_acceptance": true
+  },
+  "claims": {
+    "interval_label_semantics_only": true,
+    "continuous_panel": false,
+    "empty_interval_semantics": false,
+    "historical_panel": false,
+    "pit_admissible": false,
+    "h07_h01_evidence": false,
+    "provider_selected": false,
+    "task30_trial": false,
+    "execution": false,
+    "settlement": false,
+    "numeric_netreturn": false
+  },
+  "side_effects": {
+    "provider_api_calls": 2,
+    "credential_uses": 0,
+    "raw_artifacts_outside_git": 4,
+    "r2_r3_reads": 0,
+    "scheduler_or_background_processes": 0,
+    "wallet_signer_transaction_actions": 0,
+    "cash_spend_usd_cents": 0,
+    "task30_trial_or_acceptance_actions": 0,
+    "project_sources_changes": 0
+  },
+  "next_boundary": "OWNER_DECISION_AFTER_TECHNICAL_SEMANTICS_RESULT",
+  "project_sources_disposition": "NO_CHANGE",
+  "state_change": "NONE"
+}

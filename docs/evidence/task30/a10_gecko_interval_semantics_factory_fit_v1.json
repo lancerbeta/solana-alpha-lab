@@ -1,0 +1,36 @@
+{
+  "schema": "smial.task30.gecko-interval-semantics.factory-fit",
+  "schema_version": "1.0",
+  "receipt_id": "T30-A10-GECKO-INTERVAL-SEMANTICS-FACTORY-FIT-001",
+  "task_id": "TASK-30",
+  "atom_id": "T30-A10_GECKO_INTERVAL_SEMANTICS_DISCRIMINATOR_V1",
+  "review_scope": "FULL_REVIEW",
+  "verdict": "PASS_WITH_LIMITATIONS",
+  "decision": "START_LABEL_SEMANTICS_OBSERVED_NO_PANEL_PROMOTION",
+  "runtime_receipt": "docs/evidence/task30/a10_gecko_interval_semantics_runtime_receipt_v1.json",
+  "runtime_receipt_sha256": "5ba127597f448ebd8cdd3ea00d5d76722529e404084f59fea6bbbef6c598d904",
+  "factory_fit": {
+    "mission": "Removes a narrow timestamp ambiguity before the factory ever spends effort on a collection route; it does not claim alpha or data readiness.",
+    "estimand": "Only the label convention of this observed 15-minute OHLCV response is tested; NetReturn and research estimands remain untouched.",
+    "research_truth": "The selected start label needed 37 usable direct trades across 18 slots and zero range contradictions, while the end model had six contradictions. Missing mapped bars and every non-selected semantic remain explicit.",
+    "owner_operability": "The receipt says in one line what changed and what did not: bar-label ambiguity is reduced; a usable research panel still does not exist.",
+    "flexibility": "The runner is one bounded stdlib tool; it selects no provider and creates no collector, adapter, scheduler, schema migration, or platform dependency.",
+    "monitoring_and_recovery": "No process stays alive. Exact raw bytes and a manifest are retained outside Git; malformed or insufficient future evidence resolves fail-closed without retry or fallback.",
+    "economics": "Two keyless public reads, zero credential use and zero cash spend are below the cost of a 24-hour capture that could have inherited a one-bar error.",
+    "security": "Host, scheme, paths, request count, keyless mode, redirect handling, raw root, and zero wallet/signer boundary are code-tested.",
+    "build_vs_buy": "A small project-owned evaluator is justified only for the project's timestamp-truth boundary. It wraps no SDK and does not substitute for a market-data provider.",
+    "red_team": "A successful two-read result cannot become a continuous panel, empty/no-trade proof, H07/H01 result, trial, execution, settlement, or numeric-return claim; tests reject the promoted paths."
+  },
+  "product_horizon_radar": {
+    "now": "No collector is justified by A10 alone. The next owner decision is whether the reduced label uncertainty materially changes the need for a separately bounded data-route experiment.",
+    "watch_trigger": "If a future named route cannot emit every closed interval as an observation or typed gap with independently auditable availability time, stop before any hypothesis trial and return to reuse-first."
+  },
+  "limits": {
+    "provider_selected": false,
+    "historical_panel_ready": false,
+    "task30_trial_admissible": false,
+    "execution_or_cashflow_truth": false,
+    "project_sources_change": false
+  },
+  "state_change": "NONE"
+}

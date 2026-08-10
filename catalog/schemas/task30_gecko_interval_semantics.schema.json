@@ -1,0 +1,30 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "smial.task30.gecko-interval-semantics.policy.v1",
+  "type": "object",
+  "required": [
+    "schema",
+    "schema_version",
+    "task_id",
+    "atom_id",
+    "contract_id",
+    "frozen_pool_address",
+    "network",
+    "interval_seconds",
+    "external_read",
+    "authority",
+    "project_sources_disposition"
+  ],
+  "properties": {
+    "schema": {"const": "smial.task30.gecko-interval-semantics.policy"},
+    "schema_version": {"const": "1.0"},
+    "task_id": {"const": "TASK-30"},
+    "atom_id": {"const": "T30-A10_GECKO_INTERVAL_SEMANTICS_DISCRIMINATOR_V1"},
+    "contract_id": {"const": "CONTRACT-T30-GECKO-INTERVAL-SEMANTICS-001"},
+    "frozen_pool_address": {"const": "URqx24yyYxtXXhTbBQnbtPLhtLWYoaDaRxuQuLpNS3S"},
+    "network": {"const": "solana"},
+    "interval_seconds": {"const": 900},
+    "project_sources_disposition": {"const": "NO_CHANGE"}
+  },
+  "additionalProperties": true
+}
