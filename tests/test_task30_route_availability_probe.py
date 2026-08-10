@@ -16,10 +16,18 @@ try:
 except ModuleNotFoundError:
     validate_probe_policy = None
 
+try:
+    from solana_alpha_lab.task30_route_availability_probe import evaluate_probe
+except ImportError:
+    evaluate_probe = None
+
+from solana_alpha_lab.task30_route_availability_probe import RouteAvailabilityProbeError
+
 
 POLICY_PATH = ROOT / "configs" / "task30_route_availability_probe_v1.yaml"
 SCHEMA_PATH = ROOT / "catalog" / "schemas" / "task30_route_availability_probe.schema.json"
 FROZEN_PATH = ROOT / "configs" / "task28_rc001_registry_freeze_v1.yaml"
+FIXTURE_PATH = ROOT / "tests" / "fixtures" / "task30" / "route_availability_probe_v1.json"
 
 
 def load_yaml(path: Path) -> dict[str, object]:
@@ -39,6 +47,45 @@ def frozen_group() -> dict[str, object]:
     )
 
 
+def policy() -> dict[str, object]:
+    return load_yaml(POLICY_PATH)
+
+
+def stable_records(first_visible: list[int]) -> list[dict[str, object]]:
+    records: list[dict[str, object]] = []
+    for slot_start, first_offset in zip((1800, 2700, 3600), first_visible, strict=True):
+        for offset_seconds in (0, 15, 30, 60):
+            record: dict[str, object] = {
+                "slot_start": slot_start,
+                "offset_seconds": offset_seconds,
+                "capture_state": "TYPED_GAP" if offset_seconds < first_offset else "VALID_OBSERVATION",
+            }
+            if offset_seconds >= first_offset:
+                record.update(
+                    {
+                        "expected_interval_start": slot_start,
+                        "observed_interval_start": slot_start,
+                        "candle_fingerprint": f"synthetic-candle-{slot_start}",
+                    }
+                )
+            records.append(record)
+    return records
+
+
+def records_with(capture_state: str) -> list[dict[str, object]]:
+    records = stable_records([0, 0, 0])
+    records[0]["capture_state"] = capture_state
+    return records
+
+
+def assert_non_promoting(test_case: unittest.TestCase, result: dict[str, object]) -> None:
+    claims = result["claims"]
+    assert isinstance(claims, dict)
+    test_case.assertTrue(claims["technical_route_only"])
+    for name in ("pit_admissible", "h07_h01_evidence", "task30_trial", "execution", "numeric_netreturn"):
+        test_case.assertFalse(claims[name])
+
+
 class Task30RouteAvailabilityProbeTests(unittest.TestCase):
     def test_tracked_policy_binds_frozen_15m_group_a10_and_zero_authority(self) -> None:
         self.assertIsNotNone(validate_probe_policy, "policy validator is missing")
@@ -48,6 +95,93 @@ class Task30RouteAvailabilityProbeTests(unittest.TestCase):
         self.assertEqual(policy["probe_shape"]["boundaries"], 3)
         self.assertEqual(policy["probe_shape"]["offset_seconds"], [0, 15, 30, 60])
         self.assertEqual(policy["authority"]["provider_api_rpc_wss_calls"], 0)
+
+    def test_three_stable_boundaries_choose_latest_first_availability_as_fixed_delay(self) -> None:
+        self.assertIsNotNone(evaluate_probe, "probe evaluator is missing")
+        result = evaluate_probe(policy(), frozen_group(), stable_records([15, 30, 30]))
+        self.assertEqual(result["decision"], "READY_FOR_FIXED_DELAY_24H_TECHNICAL_CAPTURE")
+        self.assertEqual(result["recommended_fixed_delay_seconds"], 30)
+        self.assertEqual(result["execution_disposition"], "CONTINUE")
+
+    def test_process_or_monitoring_failure_stops_instead_of_becoming_a_gap(self) -> None:
+        self.assertIsNotNone(evaluate_probe, "probe evaluator is missing")
+        result = evaluate_probe(policy(), frozen_group(), records_with("MONITORING_LOST"))
+        self.assertEqual(result["decision"], "INCONCLUSIVE")
+        self.assertEqual(result["execution_disposition"], "STOP_RUN")
+
+    def test_stable_boundaries_can_require_a_sixty_second_delay(self) -> None:
+        result = evaluate_probe(policy(), frozen_group(), stable_records([60, 60, 60]))
+        self.assertEqual(result["decision"], "READY_FOR_FIXED_DELAY_24H_TECHNICAL_CAPTURE")
+        self.assertEqual(result["recommended_fixed_delay_seconds"], 60)
+        assert_non_promoting(self, result)
+
+    def test_later_candle_revision_rejects_fixed_delay_capture(self) -> None:
+        records = stable_records([0, 0, 0])
+        records[1]["candle_fingerprint"] = "synthetic-revision"
+        result = evaluate_probe(policy(), frozen_group(), records)
+        self.assertEqual(result["decision"], "ROUTE_NOT_READY_FOR_FIXED_DELAY_CAPTURE")
+        self.assertEqual(result["execution_disposition"], "CONTINUE")
+        assert_non_promoting(self, result)
+
+    def test_wrong_interval_start_rejects_fixed_delay_capture(self) -> None:
+        records = stable_records([0, 0, 0])
+        records[0]["observed_interval_start"] = 900
+        result = evaluate_probe(policy(), frozen_group(), records)
+        self.assertEqual(result["decision"], "ROUTE_NOT_READY_FOR_FIXED_DELAY_CAPTURE")
+        assert_non_promoting(self, result)
+
+    def test_typed_gap_after_publication_is_inconclusive(self) -> None:
+        records = stable_records([0, 0, 0])
+        records[1]["capture_state"] = "TYPED_GAP"
+        result = evaluate_probe(policy(), frozen_group(), records)
+        self.assertEqual(result["decision"], "INCONCLUSIVE")
+        self.assertEqual(result["execution_disposition"], "CONTINUE")
+        assert_non_promoting(self, result)
+
+    def test_duplicate_slot_offset_is_rejected_before_result(self) -> None:
+        records = stable_records([0, 0, 0])
+        records[-1]["slot_start"] = 1800
+        records[-1]["offset_seconds"] = 0
+        with self.assertRaisesRegex(RouteAvailabilityProbeError, "DUPLICATE_SLOT_OFFSET"):
+            evaluate_probe(policy(), frozen_group(), records)
+
+    def test_missing_offset_is_rejected_before_result(self) -> None:
+        records = stable_records([0, 0, 0])[:-1]
+        with self.assertRaisesRegex(RouteAvailabilityProbeError, "RECORD_COUNT_INVALID"):
+            evaluate_probe(policy(), frozen_group(), records)
+
+    def test_retry_and_fallback_are_rejected_before_result(self) -> None:
+        for field in ("retry", "fallback"):
+            with self.subTest(field=field):
+                records = stable_records([0, 0, 0])
+                records[0][field] = True
+                with self.assertRaisesRegex(RouteAvailabilityProbeError, field.upper() + "_FORBIDDEN"):
+                    evaluate_probe(policy(), frozen_group(), records)
+
+    def test_all_capture_health_failures_stop_the_run(self) -> None:
+        for state in (
+            "PROCESS_NOT_STARTED",
+            "RECEIPT_WRITE_FAILED",
+            "PRIOR_MANIFEST_UNREADABLE",
+            "MONITORING_LOST",
+        ):
+            with self.subTest(state=state):
+                result = evaluate_probe(policy(), frozen_group(), records_with(state))
+                self.assertEqual(result["decision"], "INCONCLUSIVE")
+                self.assertEqual(result["execution_disposition"], "STOP_RUN")
+                assert_non_promoting(self, result)
+
+    def test_unknown_capture_state_is_rejected_before_result(self) -> None:
+        records = stable_records([0, 0, 0])
+        records[0]["capture_state"] = "ZERO_IS_NOT_A_STATE"
+        with self.assertRaisesRegex(RouteAvailabilityProbeError, "CAPTURE_STATE_INVALID"):
+            evaluate_probe(policy(), frozen_group(), records)
+
+    def test_synthetic_fixture_reproduces_the_tracked_ready_decision(self) -> None:
+        self.assertTrue(FIXTURE_PATH.exists(), "synthetic availability fixture is missing")
+        fixture = json.loads(FIXTURE_PATH.read_text(encoding="utf-8"))
+        result = evaluate_probe(policy(), frozen_group(), fixture["records"])
+        self.assertEqual(result, fixture["expected_result"])
 
 
 if __name__ == "__main__":
