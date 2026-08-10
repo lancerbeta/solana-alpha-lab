@@ -9,6 +9,7 @@ source_asset_ids:
 - EVIDENCE-CANARY-SPECIFICATION-ONLY-A2-001
 - EVIDENCE-T27-A1S4-OWNER-ROUTE-CLOSE-001
 - EVIDENCE-T27-A2-TERMINAL-RECONCILIATION-001
+- EVIDENCE-T30-A9-NAMED-PARTIAL-CAPTURE-001
 records:
 - record_kind: negative_result
   record_id: NEGATIVE-T24-ENTITY-SIGNAL-V1-001
@@ -41,3 +42,10 @@ records:
   evidence_asset_ids:
   - EVIDENCE-T27-A2-TERMINAL-RECONCILIATION-001
   summary: "TASK-27 closed only the named authorized public 15-minute pool-history route: 33 of 96 required bars were observed, 63 remain MISSING_UNKNOWN, and no new provider read was authorized. This is not a claim about all public history, alpha, execution, PnL, NetReturn, or cashflow."
+- record_kind: decision
+  record_id: DECISION-T30-A9-NAMED-PARTIAL-CAPTURE-001
+  status: RECORDED
+  created_at: '2026-08-10T00:00:00Z'
+  evidence_asset_ids:
+  - EVIDENCE-T30-A9-NAMED-PARTIAL-CAPTURE-001
+  summary: "OWNER_PACKET_READY_EXTERNAL_AUTHORITY_REQUIRED: the offline A9 policy specifies a future 96-slot technical data-route pilot, but provider, identity, named notionals, caps, retention, recovery and monitoring remain owner inputs; no provider, raw capture, trial, execution, cash or H07/H01 evidence authority exists."

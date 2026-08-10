@@ -1,0 +1,83 @@
+{
+  "schema": "smial.task30.named-partial-pit-route-capture.acceptance",
+  "schema_version": "1.0",
+  "task_id": "TASK-30",
+  "atom_id": "T30-A9_NAMED_PARTIAL_PIT_AND_ROUTE_CAPTURE_CONTRACT_V1",
+  "contract_id": "CONTRACT-T30-NAMED-PARTIAL-CAPTURE-001",
+  "frozen_definition": {
+    "group_id": "RC001-H07-H01-LIQUIDITY-RETENTION",
+    "definition_sha256": "14a7387148d05773dedcb5ad6a8110a0dcab7e49da4dec77328903a5b7577df7"
+  },
+  "upstream_a8": {
+    "path": "docs/evidence/task30/a8_h07_h01_exact_data_contract_entry_gate_acceptance_v1.json",
+    "sha256": "7ab838e2bb6ddb887e2567ecd2c52d86ad82bbc5797e300e9dc86bff114c4eea",
+    "decision": "PREPARE_PARTIAL_PIT_CAPTURE_CONTRACT"
+  },
+  "decision": {
+    "value": "OWNER_PACKET_READY_EXTERNAL_AUTHORITY_REQUIRED",
+    "trial_admissible": false,
+    "state_change": "NONE",
+    "next_boundary": "OWNER_GATE_FOR_NAMED_EXTERNAL_READ_PACKET"
+  },
+  "factory_fit_review": "FULL_REVIEW",
+  "factory_fit": {
+    "mission": "Clarifies the lowest-cost future data-route decision without pretending that data collection, alpha, or execution has happened.",
+    "flexibility": "Provider, endpoint, credentials, and named notionals remain replaceable owner inputs.",
+    "research_truth": "Closed intervals require observation or typed gap; technical route evidence cannot promote H07/H01.",
+    "owner_operability": "The Russian readout shows the exact missing inputs and blocking conditions before a future external read.",
+    "recovery": "Backup or explicit tracked waiver remains a prerequisite for irrecoverable future capture.",
+    "build_vs_buy": "No collector or generic platform is built; the contract preserves later provider comparison.",
+    "red_team": "Provider preselection, fallback, unbound notionals, untyped missingness, and hidden authority are deterministically rejected."
+  },
+  "product_horizon_radar": {
+    "now": "One later owner gate can bind a concrete external-read route only after a provider and caps are intentionally chosen.",
+    "watch_trigger": "If a named external-read route cannot emit every closed slot as observation or typed gap, stop and revisit reuse-first before custom capture work."
+  },
+  "artifact_bindings": {
+    "task": {"path": "docs/tasks/TASK-30-named-partial-pit-route-capture-contract.md", "sha256": "f67e7041a13a3668eb23b75a82ff0ac5af93f8004b41c0f0edbe88eb68d242e4"},
+    "contract": {"path": "docs/contracts/task30_named_partial_pit_route_capture_contract_v1.md", "sha256": "889a1c8a25c0696a0546d57dac52ca953de34c8671c9df65d4fcd4bc87cae126"},
+    "configuration": {"path": "configs/task30_named_partial_pit_route_capture_contract_v1.yaml", "sha256": "571773b822e62f305800cc3c90857fbf30288c1d847d516771eeccb141c8cc8b"},
+    "schema": {"path": "catalog/schemas/task30_named_partial_pit_route_capture_contract.schema.json", "sha256": "95b7f09f906779126746e129f418701d1364f90aac6d2fd68f2ffee1ad311188"},
+    "fixture": {"path": "tests/fixtures/task30/named_partial_pit_route_capture_contract_v1.json", "sha256": "dc6e1dad048436ce7015ddff19cf6bae74d1d0c3fe1bf525b5421b9b22f7aeca"},
+    "module": {"path": "src/solana_alpha_lab/task30_named_partial_pit_route_capture_contract.py", "sha256": "d6f3df4caf91a71f65da92cd4cd2a3efb896aaf8fb96f53fc5b641e3bf490fcd"},
+    "script": {"path": "scripts/show_task30_named_partial_pit_route_capture_contract.py", "sha256": "9cd7ea0ac941a14396e22040a46ea02ea4d4aee8850ec7888f97af46a7535a39"},
+    "report": {"path": "docs/reports/task30/named_partial_pit_route_capture_contract_readout_v1.md", "sha256": "393a38178b24053854d5225bf08bba442f35cde0d4417c15dba4fbed02f410a9"},
+    "test": {"path": "tests/test_task30_named_partial_pit_route_capture_contract.py", "sha256": "dcc4d2e3884e9278b4b1ce3f0aead305427d127e60dae164869e1eca7b3c24c9"}
+  },
+  "authority": {
+    "provider_api_rpc_wss_calls": 0,
+    "credential_use": 0,
+    "raw_data_writes": 0,
+    "scheduler_or_background_processes": 0,
+    "provider_adapters_or_collectors": 0,
+    "wallet_signer_transaction_actions": 0,
+    "cash_spend_usd_cents": 0,
+    "task30_trial_or_acceptance_actions": 0
+  },
+  "side_effect_counters": {
+    "provider_api_rpc_wss_calls": 0,
+    "credential_use": 0,
+    "raw_data_writes": 0,
+    "r2_r3_access": 0,
+    "scheduler_or_background_processes": 0,
+    "dependency_changes": 0,
+    "wallet_signer_transaction_actions": 0,
+    "cash_spend_usd_cents": 0,
+    "task30_trial_or_acceptance_actions": 0,
+    "project_sources_changes": 0
+  },
+  "non_claims": {
+    "technical_pilot_is_h07_h01_evidence": false,
+    "technical_pilot_is_trial": false,
+    "technical_pilot_is_execution": false,
+    "technical_pilot_is_settlement": false,
+    "technical_pilot_is_pnl": false,
+    "external_capture_authorized": false,
+    "provider_selected": false,
+    "missing_is_zero_or_flat": false
+  },
+  "project_sources_disposition": {
+    "kind": "NO_CHANGE",
+    "reason": "A9 is an offline preparation contract and does not change canonical TASK-30 acceptance or active Project Sources."
+  }
+}

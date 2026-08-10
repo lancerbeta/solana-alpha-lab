@@ -1,0 +1,32 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://solana-alpha-lab.local/schemas/task30_named_partial_pit_route_capture_contract.schema.json",
+  "title": "TASK-30 named partial PIT and route-capture contract",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema", "schema_version", "task_id", "atom_id", "contract_id", "consumer",
+    "frozen_definition", "upstream_a8", "reference_subject", "pilot_window", "lanes",
+    "route_feasibility", "external_owner_packet", "authority", "non_claims",
+    "decision_policy", "project_sources_disposition"
+  ],
+  "properties": {
+    "schema": {"const": "smial.task30.named-partial-pit-route-capture.policy"},
+    "schema_version": {"const": "1.0"},
+    "task_id": {"const": "TASK-30"},
+    "atom_id": {"const": "T30-A9_NAMED_PARTIAL_PIT_AND_ROUTE_CAPTURE_CONTRACT_V1"},
+    "contract_id": {"const": "CONTRACT-T30-NAMED-PARTIAL-CAPTURE-001"},
+    "consumer": {"const": "OWNER_FUTURE_EXTERNAL_READ_REVIEW"},
+    "frozen_definition": {"type": "object"},
+    "upstream_a8": {"type": "object"},
+    "reference_subject": {"type": "object"},
+    "pilot_window": {"type": "object"},
+    "lanes": {"type": "object"},
+    "route_feasibility": {"type": "object"},
+    "external_owner_packet": {"type": "object"},
+    "authority": {"type": "object"},
+    "non_claims": {"type": "object"},
+    "decision_policy": {"type": "object"},
+    "project_sources_disposition": {"type": "object"}
+  }
+}

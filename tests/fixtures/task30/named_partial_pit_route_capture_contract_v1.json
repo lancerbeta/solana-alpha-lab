@@ -1,0 +1,39 @@
+{
+  "decision": "OWNER_PACKET_READY_EXTERNAL_AUTHORITY_REQUIRED",
+  "technical_pilot_only": true,
+  "external_capture_authorized": false,
+  "trial_admissible": false,
+  "reference_subject": {
+    "pool_address": "URqx24yyYxtXXhTbBQnbtPLhtLWYoaDaRxuQuLpNS3S",
+    "target_role": "TECHNICAL_DATA_ROUTE_PILOT",
+    "representativeness": "NOT_ESTABLISHED"
+  },
+  "pilot_window": {
+    "interval": "15m",
+    "expected_closed_intervals": 96,
+    "duration_seconds": 86400,
+    "slot_outcome_policy": "OBSERVATION_OR_TYPED_GAP_REQUIRED"
+  },
+  "lanes": {
+    "PIT_MARKET": "BOUNDED_MARKET_DATA_ROUTE_CAPABILITY",
+    "ROUTE_FEASIBILITY": "CONDITIONAL_OWNER_PACKET",
+    "OWNED_EXECUTION": "FUTURE_CANARY_ONLY"
+  },
+  "later_owner_inputs": [
+    "provider_selection", "endpoint", "verified_identity", "exact_utc_window",
+    "named_lanes_and_notionals", "request_cap", "quota_and_credential_cap",
+    "raw_retention_location_and_hash_plan", "backup_or_tracked_waiver",
+    "monitoring_owner", "recovery_path", "non_claims_acknowledged"
+  ],
+  "stop_conditions": [
+    "IDENTITY_UNVERIFIED", "UNNAMED_NOTIONALS", "RECOVERY_PROTECTION_REQUIRED",
+    "MONITORING_OWNER_REQUIRED", "FALLBACK_FORBIDDEN", "TYPED_GAP_REQUIRED"
+  ],
+  "non_claims": [
+    "Technical data-route pilot is not representative evidence.",
+    "Technical data-route pilot is not an H07/H01 trial.",
+    "PIT market data and route feasibility do not prove execution or settlement.",
+    "Missing data remains a typed gap."
+  ],
+  "next_boundary": "OWNER_GATE_FOR_NAMED_EXTERNAL_READ_PACKET"
+}
