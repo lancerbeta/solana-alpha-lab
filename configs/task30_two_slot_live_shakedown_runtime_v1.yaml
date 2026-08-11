@@ -1,0 +1,59 @@
+schema: smial.task30.two-slot-live-shakedown-runtime
+schema_version: '1.0'
+task_id: TASK-30
+atom_id: T30-A11C_TWO_SLOT_SHAKEDOWN_RUNTIME_HARNESS_V1
+contract_id: CONTRACT-T30-TWO-SLOT-LIVE-SHAKEDOWN-RUNTIME-001
+consumer: OWNER_TWO_SLOT_LIVE_SHAKEDOWN_EXECUTION_GATE
+frozen_candidate:
+  provider: GECKOTERMINAL_PUBLIC_KEYLESS
+  network: solana
+  pool_address: URqx24yyYxtXXhTbBQnbtPLhtLWYoaDaRxuQuLpNS3S
+  base_url: https://api.geckoterminal.com/api/v2
+  path_template: /networks/solana/pools/{pool}/ohlcv/minute
+request:
+  method: GET
+  aggregate: '15'
+  currency: usd
+  token: base
+  include_empty_intervals: 'false'
+  limit: '1'
+  request_timeout_seconds: 20
+  response_bytes_max: 4194304
+  retry: false
+  fallback: false
+  credentials: false
+shakedown_shape:
+  interval_seconds: 900
+  offset_seconds: [0, 15, 30, 60]
+  requests_per_slot_max: 4
+  requests_total_max: 8
+  late_offset_seconds_max: 15
+  scheduler: false
+retention:
+  policy: A4
+  raw_json_outside_git: true
+  raw_root_relative: local/task30_two_slot_live_shakedown
+  immediate_manifest_after_every_response: true
+  immediate_health_receipt_after_every_response: true
+authority:
+  provider_api_rpc_wss_calls: 0
+  credential_use: 0
+  raw_data_writes: 0
+  scheduler_or_background_processes: 0
+  r2_r3_access: 0
+  wallet_signer_transaction_actions: 0
+  cash_spend_usd_cents: 0
+  task30_trial_or_acceptance_actions: 0
+non_claims:
+  pit_admissible: false
+  h07_h01_evidence: false
+  task30_trial: false
+  execution: false
+  settlement: false
+  pnl: false
+  numeric_netreturn: false
+  provider_selected: false
+  external_capture_authorized: false
+  twenty_four_hour_capture_authorized: false
+  missing_is_zero_or_flat: false
+project_sources_disposition: NO_CHANGE
