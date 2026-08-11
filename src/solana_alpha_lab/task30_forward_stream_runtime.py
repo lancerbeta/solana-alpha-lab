@@ -17,15 +17,22 @@ POOL_ADDRESS = "URqx24yyYxtXXhTbBQnbtPLhtLWYoaDaRxuQuLpNS3S"
 BASE_MINT = "DMwbVy48dWVKGe9z1pcVnwF3HLMLrqWdDLfbvx8RchhK"
 HELIUS_WSS_BASE = "wss://mainnet.helius-rpc.com/"
 REQUEST_ID = "task30-a14-transaction-subscribe"
-OWNER_EXECUTION_PHRASE = (
-    "T30-A14P_FORWARD_STREAM_RUNTIME_V1; "
-    f"pool={POOL_ADDRESS}; "
-    "monitoring_owner=LOCAL_WORK_CODEX_FOREGROUND; "
-    "max_wss_connections=1; max_subscriptions=1; "
-    "max_open_seconds=1200; max_notifications=500; "
-    "max_stream_bytes=1000000; estimated_credit_cap=21; "
-    "retention=A4; retry=false; reconnect=false; fallback=false"
-)
+
+
+def _owner_execution_phrase(version: str) -> str:
+    return (
+        f"T30-A14P_FORWARD_STREAM_RUNTIME_{version}; "
+        f"pool={POOL_ADDRESS}; "
+        "monitoring_owner=LOCAL_WORK_CODEX_FOREGROUND; "
+        "max_wss_connections=1; max_subscriptions=1; "
+        "max_open_seconds=1200; max_notifications=500; "
+        "max_stream_bytes=1000000; estimated_credit_cap=21; "
+        "retention=A4; retry=false; reconnect=false; fallback=false"
+    )
+
+
+OWNER_EXECUTION_PHRASE = _owner_execution_phrase("V1")
+OWNER_EXECUTION_PHRASE_V2 = _owner_execution_phrase("V2")
 MAX_OPEN_SECONDS = 540
 MAX_NOTIFICATIONS = 500
 MAX_STREAM_BYTES = 1_000_000
@@ -108,6 +115,16 @@ _AUTHORITY_FIELDS = frozenset(
     }
 )
 _OWNER_FIELDS = frozenset({"future_pilot_authorized", "future_pilot_phrase"})
+_RUNTIME_PROFILES = {
+    "T30-A14_FORWARD_STREAM_PILOT_RUNTIME_HARNESS_V1": (
+        "TASK30-FORWARD-STREAM-RUNTIME-HARNESS-V1",
+        OWNER_EXECUTION_PHRASE,
+    ),
+    "T30-A14_FORWARD_STREAM_PILOT_RUNTIME_HARNESS_V2": (
+        "TASK30-FORWARD-STREAM-RUNTIME-HARNESS-V2",
+        OWNER_EXECUTION_PHRASE_V2,
+    ),
+}
 
 
 class ForwardStreamRuntimeError(ValueError):
@@ -133,21 +150,20 @@ def _exact(value: object, expected: object, code: str) -> None:
     _require(type(value) is type(expected) and value == expected, code)
 
 
+def _runtime_profile(config: Mapping[str, Any]) -> tuple[str, str]:
+    atom_id = config.get("atom_id")
+    profile = _RUNTIME_PROFILES.get(atom_id) if type(atom_id) is str else None
+    _require(profile is not None, "ATOM_ID_DRIFT")
+    return profile
+
+
 def _validate_policy_shape(config: Mapping[str, Any]) -> None:
     _exact_keys(config, _ROOT_FIELDS, "ROOT_FIELDS_DRIFT")
     _exact(config.get("schema"), "smial.task30.forward-stream-runtime.policy", "SCHEMA_DRIFT")
     _exact(config.get("schema_version"), "1.0", "SCHEMA_VERSION_DRIFT")
     _exact(config.get("task_id"), "TASK-30", "TASK_ID_DRIFT")
-    _exact(
-        config.get("atom_id"),
-        "T30-A14_FORWARD_STREAM_PILOT_RUNTIME_HARNESS_V1",
-        "ATOM_ID_DRIFT",
-    )
-    _exact(
-        config.get("contract_id"),
-        "TASK30-FORWARD-STREAM-RUNTIME-HARNESS-V1",
-        "CONTRACT_ID_DRIFT",
-    )
+    expected_contract_id, expected_phrase = _runtime_profile(config)
+    _exact(config.get("contract_id"), expected_contract_id, "CONTRACT_ID_DRIFT")
     _exact(config.get("consumer"), "FUTURE_EXACT_OWNER_EXTERNAL_READ_GATE", "CONSUMER_DRIFT")
 
     target = _mapping(config.get("target"), "TARGET_REQUIRED")
@@ -204,7 +220,7 @@ def _validate_policy_shape(config: Mapping[str, Any]) -> None:
     owner = _mapping(config.get("owner_authority"), "OWNER_AUTHORITY_REQUIRED")
     _exact_keys(owner, _OWNER_FIELDS, "OWNER_AUTHORITY_FIELDS_DRIFT")
     _exact(owner.get("future_pilot_authorized"), False, "OWNER_AUTHORITY_PROMOTION_FORBIDDEN")
-    _exact(owner.get("future_pilot_phrase"), OWNER_EXECUTION_PHRASE, "OWNER_PHRASE_DRIFT")
+    _exact(owner.get("future_pilot_phrase"), expected_phrase, "OWNER_PHRASE_DRIFT")
     _exact(config.get("decision"), "OFFLINE_RUNTIME_HARNESS_VALIDATED", "DECISION_DRIFT")
     _exact(config.get("project_sources_disposition"), "NO_CHANGE", "SOURCE_DISPOSITION_DRIFT")
 
@@ -434,7 +450,8 @@ def execute_forward_stream_capture(
     """
 
     evaluate_forward_stream_runtime(config)
-    _exact(authority_phrase, OWNER_EXECUTION_PHRASE, "EXTERNAL_OWNER_GATE_REQUIRED")
+    _, expected_phrase = _runtime_profile(config)
+    _exact(authority_phrase, expected_phrase, "EXTERNAL_OWNER_GATE_REQUIRED")
     request = bind_transaction_subscribe(api_key)
     capture = wss_exchange(
         request,

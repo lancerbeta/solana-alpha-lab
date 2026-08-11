@@ -24,10 +24,23 @@
     },
     "schema_version": {"const": "1.0"},
     "task_id": {"const": "TASK-30"},
-    "atom_id": {"const": "T30-A14P_FORWARD_STREAM_EXECUTION_ADAPTER_V1"},
-    "consumer": {"const": "EXACT_OWNER_FORWARD_STREAM_EXTERNAL_GATE"},
+    "atom_id": {
+      "enum": [
+        "T30-A14P_FORWARD_STREAM_EXECUTION_ADAPTER_V1",
+        "T30-A14P_FORWARD_STREAM_EXECUTION_ADAPTER_V2"
+      ]
+    },
+    "consumer": {
+      "enum": [
+        "EXACT_OWNER_FORWARD_STREAM_EXTERNAL_GATE",
+        "EXACT_OWNER_FORWARD_STREAM_EXTERNAL_GATE_RECOVERY"
+      ]
+    },
     "runtime_policy": {
-      "const": "configs/task30_forward_stream_runtime_harness_v1.yaml"
+      "enum": [
+        "configs/task30_forward_stream_runtime_harness_v1.yaml",
+        "configs/task30_forward_stream_runtime_harness_v2.yaml"
+      ]
     },
     "retention": {
       "type": "object",
@@ -42,7 +55,12 @@
       ],
       "properties": {
         "class": {"const": "A4"},
-        "logical_root": {"const": "local/task30_forward_stream"},
+        "logical_root": {
+          "enum": [
+            "local/task30_forward_stream",
+            "local/task30_forward_stream_v2"
+          ]
+        },
         "started_receipt": {"const": "attempt_started.json"},
         "manifest": {"const": "raw_manifest.json"},
         "terminal_receipt": {"const": "terminal_receipt.json"},
@@ -92,5 +110,27 @@
     },
     "decision": {"const": "OFFLINE_EXECUTION_ADAPTER_PENDING_IMPLEMENTATION"},
     "project_sources_disposition": {"const": "NO_CHANGE"}
-  }
+  },
+  "allOf": [
+    {
+      "if": {"properties": {"atom_id": {"const": "T30-A14P_FORWARD_STREAM_EXECUTION_ADAPTER_V1"}}},
+      "then": {
+        "properties": {
+          "consumer": {"const": "EXACT_OWNER_FORWARD_STREAM_EXTERNAL_GATE"},
+          "runtime_policy": {"const": "configs/task30_forward_stream_runtime_harness_v1.yaml"},
+          "retention": {"properties": {"logical_root": {"const": "local/task30_forward_stream"}}}
+        }
+      }
+    },
+    {
+      "if": {"properties": {"atom_id": {"const": "T30-A14P_FORWARD_STREAM_EXECUTION_ADAPTER_V2"}}},
+      "then": {
+        "properties": {
+          "consumer": {"const": "EXACT_OWNER_FORWARD_STREAM_EXTERNAL_GATE_RECOVERY"},
+          "runtime_policy": {"const": "configs/task30_forward_stream_runtime_harness_v2.yaml"},
+          "retention": {"properties": {"logical_root": {"const": "local/task30_forward_stream_v2"}}}
+        }
+      }
+    }
+  ]
 }

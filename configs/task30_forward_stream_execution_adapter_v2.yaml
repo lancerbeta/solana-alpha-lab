@@ -1,0 +1,28 @@
+schema: smial.task30.forward-stream-execution-adapter.policy
+schema_version: '1.0'
+task_id: TASK-30
+atom_id: T30-A14P_FORWARD_STREAM_EXECUTION_ADAPTER_V2
+consumer: EXACT_OWNER_FORWARD_STREAM_EXTERNAL_GATE_RECOVERY
+runtime_policy: configs/task30_forward_stream_runtime_harness_v2.yaml
+retention:
+  class: A4
+  logical_root: local/task30_forward_stream_v2
+  started_receipt: attempt_started.json
+  manifest: raw_manifest.json
+  terminal_receipt: terminal_receipt.json
+  create_only: true
+credential:
+  environment_variable: HELIUS_API_KEY
+  read_after_started_receipt: true
+execution:
+  max_attempts: 1
+  retry: false
+  reconnect: false
+  fallback: false
+  scheduler: false
+authority:
+  provider_api_rpc_wss_calls: 0
+  credential_read: false
+  raw_external_data_write: false
+decision: OFFLINE_EXECUTION_ADAPTER_PENDING_IMPLEMENTATION
+project_sources_disposition: NO_CHANGE

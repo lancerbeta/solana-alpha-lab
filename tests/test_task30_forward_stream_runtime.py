@@ -18,6 +18,7 @@ if str(SRC) not in sys.path:
 
 from solana_alpha_lab.task30_forward_stream_runtime import (  # noqa: E402
     OWNER_EXECUTION_PHRASE,
+    OWNER_EXECUTION_PHRASE_V2,
     ForwardStreamRuntimeError,
     RuntimeCapture,
     bind_transaction_subscribe,
@@ -31,6 +32,7 @@ from solana_alpha_lab.task30_forward_stream_runtime import (  # noqa: E402
 POOL = "URqx24yyYxtXXhTbBQnbtPLhtLWYoaDaRxuQuLpNS3S"
 BASE_MINT = "DMwbVy48dWVKGe9z1pcVnwF3HLMLrqWdDLfbvx8RchhK"
 CONFIG_PATH = ROOT / "configs/task30_forward_stream_runtime_harness_v1.yaml"
+CONFIG_V2_PATH = ROOT / "configs/task30_forward_stream_runtime_harness_v2.yaml"
 SCHEMA_PATH = ROOT / "catalog/schemas/task30_forward_stream_runtime_harness.schema.json"
 FIXTURE_PATH = ROOT / "tests/fixtures/task30/forward_stream_runtime_harness_v1.json"
 READOUT_PATH = ROOT / "docs/reports/task30/forward_stream_runtime_harness_readout_v1.md"
@@ -319,6 +321,33 @@ class Task30ForwardStreamRuntimeTests(unittest.TestCase):
         self.assertEqual(rendered, READOUT_PATH.read_text(encoding="utf-8"))
         self.assertNotIn("api-key", rendered.lower())
         self.assertNotIn("wss://", rendered.lower())
+
+    def test_v2_recovery_config_is_closed_and_uses_new_owner_phrase(self) -> None:
+        config = yaml.safe_load(CONFIG_V2_PATH.read_text(encoding="utf-8"))
+        schema = json.loads(SCHEMA_PATH.read_text(encoding="utf-8"))
+        errors = sorted(Draft202012Validator(schema).iter_errors(config), key=str)
+        self.assertEqual(errors, [])
+        self.assertEqual(
+            config["owner_authority"]["future_pilot_phrase"], OWNER_EXECUTION_PHRASE_V2
+        )
+        self.assertEqual(
+            evaluate_forward_stream_runtime(config),
+            {
+                "decision": "OFFLINE_RUNTIME_HARNESS_VALIDATED",
+                "external_action_authorized": False,
+                "project_sources_disposition": "NO_CHANGE",
+                "provider": "HELIUS",
+            },
+        )
+        wrong = copy.deepcopy(config)
+        wrong["owner_authority"]["future_pilot_phrase"] = OWNER_EXECUTION_PHRASE  # type: ignore[index]
+        with self.assertRaisesRegex(ForwardStreamRuntimeError, "OWNER_PHRASE_DRIFT"):
+            evaluate_forward_stream_runtime(wrong)
+
+        cross_profile = copy.deepcopy(config)
+        cross_profile["atom_id"] = "T30-A14_FORWARD_STREAM_PILOT_RUNTIME_HARNESS_V1"
+        with self.assertRaisesRegex(ForwardStreamRuntimeError, "CONTRACT_ID_DRIFT"):
+            evaluate_forward_stream_runtime(cross_profile)
 
     def test_acceptance_hashes_runtime_artifacts_and_keeps_zero_authority(self) -> None:
         acceptance = json.loads(ACCEPTANCE_PATH.read_text(encoding="utf-8"))

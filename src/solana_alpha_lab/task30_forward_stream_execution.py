@@ -21,6 +21,7 @@ from .task30_forward_stream_runtime import (
     MAX_OPEN_SECONDS,
     MAX_STREAM_BYTES,
     OWNER_EXECUTION_PHRASE,
+    OWNER_EXECUTION_PHRASE_V2,
     ForwardStreamRuntimeError,
     RuntimeCapture,
     bind_transaction_subscribe,
@@ -31,6 +32,7 @@ from .lifecycle_discovery_transport import WssCapture
 
 
 LOGICAL_ROOT = "local/task30_forward_stream"
+LOGICAL_ROOT_V2 = "local/task30_forward_stream_v2"
 _NONCE_RE = re.compile(r"^[0-9a-f]{8}$")
 _RUN_ID_RE = re.compile(r"^\d{8}T\d{6}Z-[0-9a-f]{8}$")
 _ERROR_CODE_RE = re.compile(r"^[A-Z][A-Z0-9_]{2,79}$")
@@ -70,40 +72,92 @@ _TERMINAL_RECEIPT_FIELDS = frozenset(
     }
 )
 
-_EXPECTED_EXECUTION_POLICY: dict[str, object] = {
-    "schema": "smial.task30.forward-stream-execution-adapter.policy",
-    "schema_version": "1.0",
-    "task_id": "TASK-30",
-    "atom_id": "T30-A14P_FORWARD_STREAM_EXECUTION_ADAPTER_V1",
-    "consumer": "EXACT_OWNER_FORWARD_STREAM_EXTERNAL_GATE",
-    "runtime_policy": "configs/task30_forward_stream_runtime_harness_v1.yaml",
-    "retention": {
-        "class": "A4",
-        "logical_root": LOGICAL_ROOT,
-        "started_receipt": "attempt_started.json",
-        "manifest": "raw_manifest.json",
-        "terminal_receipt": "terminal_receipt.json",
-        "create_only": True,
+def _execution_policy(
+    *,
+    version: str,
+    logical_root: str,
+    runtime_policy: str,
+    consumer: str,
+) -> dict[str, object]:
+    return {
+        "schema": "smial.task30.forward-stream-execution-adapter.policy",
+        "schema_version": "1.0",
+        "task_id": "TASK-30",
+        "atom_id": f"T30-A14P_FORWARD_STREAM_EXECUTION_ADAPTER_{version}",
+        "consumer": consumer,
+        "runtime_policy": runtime_policy,
+        "retention": {
+            "class": "A4",
+            "logical_root": logical_root,
+            "started_receipt": "attempt_started.json",
+            "manifest": "raw_manifest.json",
+            "terminal_receipt": "terminal_receipt.json",
+            "create_only": True,
+        },
+        "credential": {
+            "environment_variable": "HELIUS_API_KEY",
+            "read_after_started_receipt": True,
+        },
+        "execution": {
+            "max_attempts": 1,
+            "retry": False,
+            "reconnect": False,
+            "fallback": False,
+            "scheduler": False,
+        },
+        "authority": {
+            "provider_api_rpc_wss_calls": 0,
+            "credential_read": False,
+            "raw_external_data_write": False,
+        },
+        "decision": "OFFLINE_EXECUTION_ADAPTER_PENDING_IMPLEMENTATION",
+        "project_sources_disposition": "NO_CHANGE",
+    }
+
+
+_EXECUTION_PROFILES: dict[str, dict[str, object]] = {
+    "T30-A14P_FORWARD_STREAM_EXECUTION_ADAPTER_V1": {
+        "policy": _execution_policy(
+            version="V1",
+            logical_root=LOGICAL_ROOT,
+            runtime_policy="configs/task30_forward_stream_runtime_harness_v1.yaml",
+            consumer="EXACT_OWNER_FORWARD_STREAM_EXTERNAL_GATE",
+        ),
+        "runtime_atom": "T30-A14_FORWARD_STREAM_PILOT_RUNTIME_HARNESS_V1",
+        "phrase": OWNER_EXECUTION_PHRASE,
     },
-    "credential": {
-        "environment_variable": "HELIUS_API_KEY",
-        "read_after_started_receipt": True,
+    "T30-A14P_FORWARD_STREAM_EXECUTION_ADAPTER_V2": {
+        "policy": _execution_policy(
+            version="V2",
+            logical_root=LOGICAL_ROOT_V2,
+            runtime_policy="configs/task30_forward_stream_runtime_harness_v2.yaml",
+            consumer="EXACT_OWNER_FORWARD_STREAM_EXTERNAL_GATE_RECOVERY",
+        ),
+        "runtime_atom": "T30-A14_FORWARD_STREAM_PILOT_RUNTIME_HARNESS_V2",
+        "phrase": OWNER_EXECUTION_PHRASE_V2,
     },
-    "execution": {
-        "max_attempts": 1,
-        "retry": False,
-        "reconnect": False,
-        "fallback": False,
-        "scheduler": False,
-    },
-    "authority": {
-        "provider_api_rpc_wss_calls": 0,
-        "credential_read": False,
-        "raw_external_data_write": False,
-    },
-    "decision": "OFFLINE_EXECUTION_ADAPTER_PENDING_IMPLEMENTATION",
-    "project_sources_disposition": "NO_CHANGE",
 }
+
+_EXPECTED_EXECUTION_POLICY: dict[str, object] = _EXECUTION_PROFILES[
+    "T30-A14P_FORWARD_STREAM_EXECUTION_ADAPTER_V1"
+]["policy"]  # type: ignore[assignment]
+
+
+def _execution_profile(config: Mapping[str, Any]) -> Mapping[str, object]:
+    atom_id = config.get("atom_id")
+    profile = _EXECUTION_PROFILES.get(atom_id) if type(atom_id) is str else None
+    _require(profile is not None, "EXECUTION_PROFILE_UNKNOWN")
+    return profile
+
+
+def _profile_logical_root(profile: Mapping[str, object]) -> str:
+    policy = profile.get("policy")
+    _require(isinstance(policy, Mapping), "EXECUTION_PROFILE_INVALID")
+    retention = policy.get("retention")
+    _require(isinstance(retention, Mapping), "EXECUTION_PROFILE_INVALID")
+    logical_root = retention.get("logical_root")
+    _require(type(logical_root) is str, "EXECUTION_PROFILE_INVALID")
+    return logical_root
 
 
 class ForwardStreamExecutionError(RuntimeError):
@@ -236,6 +290,7 @@ def _raw_manifest_valid(
     run_id: str,
     reference: object,
     *,
+    logical_root: str = LOGICAL_ROOT,
     notifications: int,
     stream_bytes: int,
 ) -> bool:
@@ -279,7 +334,7 @@ def _raw_manifest_valid(
         or manifest.get("schema") != "smial.task30.forward-stream-raw-manifest"
         or manifest.get("schema_version") != "1.0"
         or manifest.get("run_id") != run_id
-        or manifest.get("logical_run_root") != f"{LOGICAL_ROOT}/run={run_id}"
+        or manifest.get("logical_run_root") != f"{logical_root}/run={run_id}"
         or manifest.get("retention_class") != "A4"
         or type(manifest.get("notifications")) is not int
         or manifest.get("notifications") != notifications
@@ -330,7 +385,9 @@ def _raw_manifest_valid(
     return retained_bytes == stream_bytes
 
 
-def _terminal_receipt_valid(run_root: Path, run_id: str) -> bool:
+def _terminal_receipt_valid(
+    run_root: Path, run_id: str, *, logical_root: str = LOGICAL_ROOT
+) -> bool:
     path = run_root / "terminal_receipt.json"
     if not path.is_file() or path.is_symlink():
         return False
@@ -352,7 +409,7 @@ def _terminal_receipt_valid(run_root: Path, run_id: str) -> bool:
         value.get("schema") == "smial.task30.forward-stream-terminal-receipt"
         and value.get("schema_version") == "1.0"
         and value.get("run_id") == run_id
-        and value.get("logical_run_root") == f"{LOGICAL_ROOT}/run={run_id}"
+        and value.get("logical_run_root") == f"{logical_root}/run={run_id}"
         and value.get("state") == "TERMINAL"
         and type(terminal_state) is str
         and terminal_state in _TERMINAL_STATES
@@ -385,6 +442,7 @@ def _terminal_receipt_valid(run_root: Path, run_id: str) -> bool:
             run_root,
             run_id,
             raw_manifest,
+            logical_root=logical_root,
             notifications=value["notifications"],
             stream_bytes=value["stream_bytes"],
         )
@@ -399,7 +457,9 @@ def _terminal_receipt_valid(run_root: Path, run_id: str) -> bool:
     return False
 
 
-def find_unresolved_attempts(raw_root: Path) -> tuple[str, ...]:
+def find_unresolved_attempts(
+    raw_root: Path, *, logical_root: str = LOGICAL_ROOT
+) -> tuple[str, ...]:
     """Return create-only runs whose durable terminal truth is absent or invalid."""
 
     _require(isinstance(raw_root, Path), "RAW_ROOT_PATH_REQUIRED")
@@ -411,7 +471,9 @@ def find_unresolved_attempts(raw_root: Path) -> tuple[str, ...]:
         _require(run_root.is_dir() and not run_root.is_symlink(), "RUN_ROOT_INVALID")
         run_id = run_root.name.removeprefix("run=")
         marker = run_root / "attempt_started.json"
-        if marker.exists() and not _terminal_receipt_valid(run_root, run_id):
+        if marker.exists() and not _terminal_receipt_valid(
+            run_root, run_id, logical_root=logical_root
+        ):
             unresolved.append(run_id)
     return tuple(unresolved)
 
@@ -437,8 +499,11 @@ def validate_forward_stream_preflight(
 ) -> dict[str, object]:
     """Validate all non-secret conditions without creating output or reading a key."""
 
+    profile = _execution_profile(execution_config)
+    expected_policy = profile.get("policy")
     _require(
-        _same_exact(execution_config, _EXPECTED_EXECUTION_POLICY),
+        isinstance(expected_policy, Mapping)
+        and _same_exact(execution_config, expected_policy),
         "EXECUTION_POLICY_DRIFT",
     )
     try:
@@ -446,7 +511,11 @@ def validate_forward_stream_preflight(
     except ForwardStreamRuntimeError as exc:
         raise ForwardStreamExecutionError(str(exc)) from exc
     _require(
-        type(authority_phrase) is str and authority_phrase == OWNER_EXECUTION_PHRASE,
+        runtime_config.get("atom_id") == profile.get("runtime_atom"),
+        "RUNTIME_PROFILE_DRIFT",
+    )
+    _require(
+        type(authority_phrase) is str and authority_phrase == profile.get("phrase"),
         "PILOT_NOT_AUTHORIZED",
     )
     _require(
@@ -461,7 +530,8 @@ def validate_forward_stream_preflight(
         isinstance(raw_root, Path) and raw_root.is_absolute(),
         "RAW_ROOT_ABSOLUTE_REQUIRED",
     )
-    expected_raw_root = repository_root / Path(LOGICAL_ROOT)
+    logical_root = _profile_logical_root(profile)
+    expected_raw_root = repository_root / Path(logical_root)
     _require(
         _normalized_path(raw_root) == _normalized_path(expected_raw_root),
         "RAW_ROOT_IDENTITY_DRIFT",
@@ -470,12 +540,15 @@ def validate_forward_stream_preflight(
         if component.exists() or component.is_symlink():
             _require(not component.is_symlink(), "RAW_ROOT_SYMLINK_FORBIDDEN")
     _require_ignored_local_root(repository_root)
-    _require(not find_unresolved_attempts(raw_root), "UNRESOLVED_PRIOR_ATTEMPT")
+    _require(
+        not find_unresolved_attempts(raw_root, logical_root=logical_root),
+        "UNRESOLVED_PRIOR_ATTEMPT",
+    )
     _require(not _prior_attempt_ids(raw_root), "PRIOR_ATTEMPT_REQUIRES_NEW_GATE")
     planned_request = bind_transaction_subscribe("offline-preflight-sentinel")
     return {
         "result": "PREFLIGHT_PASS",
-        "logical_root": LOGICAL_ROOT,
+        "logical_root": logical_root,
         "credential_read": False,
         "network_calls": 0,
         "output_created": False,
@@ -543,7 +616,8 @@ def prepare_forward_stream_attempt(
     started_text = _utc_text(now)
     _require(type(nonce) is str and _NONCE_RE.fullmatch(nonce) is not None, "NONCE_INVALID")
     run_id = f"{now.astimezone(UTC).strftime('%Y%m%dT%H%M%SZ')}-{nonce}"
-    logical_run_root = f"{LOGICAL_ROOT}/run={run_id}"
+    logical_root = str(preflight["logical_root"])
+    logical_run_root = f"{logical_root}/run={run_id}"
 
     try:
         raw_root.mkdir(parents=True, exist_ok=True)
@@ -796,7 +870,10 @@ def _publish_terminal_receipt(
         )
     except ForwardStreamExecutionError as exc:
         raise ForwardStreamExecutionError("UNRESOLVED_EXTERNAL_ATTEMPT") from exc
-    if not _terminal_receipt_valid(attempt.run_root, attempt.run_id):
+    logical_root = attempt.logical_run_root.rsplit("/run=", 1)[0]
+    if not _terminal_receipt_valid(
+        attempt.run_root, attempt.run_id, logical_root=logical_root
+    ):
         raise ForwardStreamExecutionError("UNRESOLVED_EXTERNAL_ATTEMPT")
     return receipt
 

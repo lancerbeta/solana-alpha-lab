@@ -518,6 +518,16 @@
       "target_asset_id": "CONTRACT-T28-RC001-REGISTRY-FREEZE-001"
     },
     {
+      "source_asset_id": "CONFIG-T30-A14P-R1-EXECUTION-001",
+      "relation": "governed_by",
+      "target_asset_id": "CONTRACT-T30-A14P-R1-AUTH-RECOVERY-001"
+    },
+    {
+      "source_asset_id": "CONFIG-T30-A14P-R1-RUNTIME-001",
+      "relation": "governed_by",
+      "target_asset_id": "CONTRACT-T30-A14P-R1-AUTH-RECOVERY-001"
+    },
+    {
       "source_asset_id": "CONFIG-T30-BIRDEYE-PILOT-READINESS-001",
       "relation": "governed_by",
       "target_asset_id": "CONTRACT-T30-BIRDEYE-PILOT-READINESS-001"
@@ -1126,6 +1136,16 @@
       "source_asset_id": "CONTRACT-T28-RC001-REGISTRY-FREEZE-001",
       "relation": "governed_by",
       "target_asset_id": "DOC-T28-RC001-REGISTRY-FREEZE-001"
+    },
+    {
+      "source_asset_id": "CONTRACT-T30-A14P-R1-AUTH-RECOVERY-001",
+      "relation": "depends_on",
+      "target_asset_id": "CONTRACT-T30-FORWARD-STREAM-EXECUTION-ADAPTER-001"
+    },
+    {
+      "source_asset_id": "CONTRACT-T30-A14P-R1-AUTH-RECOVERY-001",
+      "relation": "derived_from",
+      "target_asset_id": "EVIDENCE-T30-A14P-FORWARD-STREAM-EXECUTION-ADAPTER-001"
     },
     {
       "source_asset_id": "CONTRACT-T30-BIRDEYE-PILOT-READINESS-001",
@@ -3223,6 +3243,26 @@
       "target_asset_id": "TEST-T30-FORWARD-STREAM-EXECUTION-ADAPTER-001"
     },
     {
+      "source_asset_id": "EVIDENCE-T30-A14P-R1-AUTH-RECOVERY-001",
+      "relation": "derived_from",
+      "target_asset_id": "CONTRACT-T30-A14P-R1-AUTH-RECOVERY-001"
+    },
+    {
+      "source_asset_id": "EVIDENCE-T30-A14P-R1-AUTH-RECOVERY-001",
+      "relation": "validated_by",
+      "target_asset_id": "TEST-T30-FORWARD-STREAM-EXECUTION-ADAPTER-001"
+    },
+    {
+      "source_asset_id": "EVIDENCE-T30-A14P-R1-AUTH-RECOVERY-FACTORY-FIT-001",
+      "relation": "derived_from",
+      "target_asset_id": "EVIDENCE-T30-A14P-R1-AUTH-RECOVERY-001"
+    },
+    {
+      "source_asset_id": "EVIDENCE-T30-A14P-R1-AUTH-RECOVERY-FACTORY-FIT-001",
+      "relation": "validated_by",
+      "target_asset_id": "TEST-T30-FORWARD-STREAM-EXECUTION-ADAPTER-001"
+    },
+    {
       "source_asset_id": "EVIDENCE-T30-A2-CATALOG-FACTORY-FIT-001",
       "relation": "derived_from",
       "target_asset_id": "EVIDENCE-T30-A1-BOUNDARY-SEMANTICS-001"
@@ -3906,6 +3946,16 @@
       "source_asset_id": "FIXTURE-T28-RC001-REGISTRY-FREEZE-001",
       "relation": "derived_from",
       "target_asset_id": "CONFIG-T28-RC001-REGISTRY-FREEZE-001"
+    },
+    {
+      "source_asset_id": "FIXTURE-T30-A14P-R1-EXECUTION-001",
+      "relation": "derived_from",
+      "target_asset_id": "CONFIG-T30-A14P-R1-EXECUTION-001"
+    },
+    {
+      "source_asset_id": "FIXTURE-T30-A14P-R1-RUNTIME-001",
+      "relation": "derived_from",
+      "target_asset_id": "CONFIG-T30-A14P-R1-RUNTIME-001"
     },
     {
       "source_asset_id": "FIXTURE-T30-BIRDEYE-PILOT-READINESS-001",
@@ -6236,6 +6286,11 @@
       "source_asset_id": "SCRIPT-TASK-CLOSE-FAST-PATH-001",
       "relation": "governed_by",
       "target_asset_id": "POLICY-TASK-CLOSE-FAST-PATH-001"
+    },
+    {
+      "source_asset_id": "TASK-T30-A14P-R1-AUTH-RECOVERY-001",
+      "relation": "governed_by",
+      "target_asset_id": "CONTRACT-T30-A14P-R1-AUTH-RECOVERY-001"
     },
     {
       "source_asset_id": "TEMPLATE-BATON-ISSUE-FORM-001",

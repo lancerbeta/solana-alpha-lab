@@ -13,8 +13,18 @@
     "schema": {"const": "smial.task30.forward-stream-runtime.policy"},
     "schema_version": {"const": "1.0"},
     "task_id": {"const": "TASK-30"},
-    "atom_id": {"const": "T30-A14_FORWARD_STREAM_PILOT_RUNTIME_HARNESS_V1"},
-    "contract_id": {"const": "TASK30-FORWARD-STREAM-RUNTIME-HARNESS-V1"},
+    "atom_id": {
+      "enum": [
+        "T30-A14_FORWARD_STREAM_PILOT_RUNTIME_HARNESS_V1",
+        "T30-A14_FORWARD_STREAM_PILOT_RUNTIME_HARNESS_V2"
+      ]
+    },
+    "contract_id": {
+      "enum": [
+        "TASK30-FORWARD-STREAM-RUNTIME-HARNESS-V1",
+        "TASK30-FORWARD-STREAM-RUNTIME-HARNESS-V2"
+      ]
+    },
     "consumer": {"const": "FUTURE_EXACT_OWNER_EXTERNAL_READ_GATE"},
     "target": {
       "type": "object", "additionalProperties": false,
@@ -84,5 +94,19 @@
     },
     "decision": {"const": "OFFLINE_RUNTIME_HARNESS_VALIDATED"},
     "project_sources_disposition": {"const": "NO_CHANGE"}
-  }
+  },
+  "oneOf": [
+    {
+      "properties": {
+        "atom_id": {"const": "T30-A14_FORWARD_STREAM_PILOT_RUNTIME_HARNESS_V1"},
+        "contract_id": {"const": "TASK30-FORWARD-STREAM-RUNTIME-HARNESS-V1"}
+      }
+    },
+    {
+      "properties": {
+        "atom_id": {"const": "T30-A14_FORWARD_STREAM_PILOT_RUNTIME_HARNESS_V2"},
+        "contract_id": {"const": "TASK30-FORWARD-STREAM-RUNTIME-HARNESS-V2"}
+      }
+    }
+  ]
 }

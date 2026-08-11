@@ -34,8 +34,10 @@ from solana_alpha_lab.task30_forward_stream_execution import (  # noqa: E402
 from solana_alpha_lab.lifecycle_discovery_transport import WssCapture  # noqa: E402
 from solana_alpha_lab.task30_forward_stream_runtime import (  # noqa: E402
     OWNER_EXECUTION_PHRASE,
+    OWNER_EXECUTION_PHRASE_V2,
 )
 CONFIG_PATH = ROOT / "configs/task30_forward_stream_execution_adapter_v1.yaml"
+CONFIG_V2_PATH = ROOT / "configs/task30_forward_stream_execution_adapter_v2.yaml"
 SCHEMA_PATH = (
     ROOT / "catalog/schemas/task30_forward_stream_execution_adapter.schema.json"
 )
@@ -43,6 +45,7 @@ FIXTURE_PATH = (
     ROOT / "tests/fixtures/task30/forward_stream_execution_adapter_v1.json"
 )
 RUNTIME_CONFIG_PATH = ROOT / "configs/task30_forward_stream_runtime_harness_v1.yaml"
+RUNTIME_CONFIG_V2_PATH = ROOT / "configs/task30_forward_stream_runtime_harness_v2.yaml"
 CLI_PATH = ROOT / "scripts/run_task30_forward_stream_capture.py"
 TASK_PATH = ROOT / "docs/tasks/TASK-30-forward-stream-execution-adapter.md"
 CONTRACT_PATH = (
@@ -65,6 +68,8 @@ FACTORY_FIT_PATH = (
     ROOT
     / "docs/evidence/task30/a14p_forward_stream_execution_adapter_factory_fit_v1.json"
 )
+R1_ACCEPTANCE_PATH = ROOT / "docs/evidence/task30/a14p_r1_auth_recovery_gate_acceptance_v1.json"
+R1_FACTORY_FIT_PATH = ROOT / "docs/evidence/task30/a14p_r1_auth_recovery_gate_factory_fit_v1.json"
 CORE_CATALOG_PATH = ROOT / "catalog/assets/core.yaml"
 EXPECTED_A14P_ASSET_IDS = {
     "CONTRACT-T30-FORWARD-STREAM-EXECUTION-ADAPTER-001",
@@ -117,6 +122,15 @@ def expected_policy() -> dict[str, object]:
         "decision": "OFFLINE_EXECUTION_ADAPTER_PENDING_IMPLEMENTATION",
         "project_sources_disposition": "NO_CHANGE",
     }
+
+
+def expected_policy_v2() -> dict[str, object]:
+    value = expected_policy()
+    value["atom_id"] = "T30-A14P_FORWARD_STREAM_EXECUTION_ADAPTER_V2"
+    value["consumer"] = "EXACT_OWNER_FORWARD_STREAM_EXTERNAL_GATE_RECOVERY"
+    value["runtime_policy"] = "configs/task30_forward_stream_runtime_harness_v2.yaml"
+    value["retention"]["logical_root"] = "local/task30_forward_stream_v2"  # type: ignore[index]
+    return value
 
 
 def acknowledgement(
@@ -249,6 +263,10 @@ class Task30ForwardStreamExecutionPolicyTests(unittest.TestCase):
         alternate_environment = copy.deepcopy(self.policy)
         alternate_environment["credential"]["environment_variable"] = "OTHER_KEY"  # type: ignore[index]
         mutations.append(alternate_environment)
+
+        cross_profile = copy.deepcopy(self.policy)
+        cross_profile["atom_id"] = "T30-A14P_FORWARD_STREAM_EXECUTION_ADAPTER_V2"
+        mutations.append(cross_profile)
 
         for candidate in mutations:
             with self.subTest(candidate=candidate):
@@ -475,6 +493,77 @@ class Task30ForwardStreamExecutionPreflightTests(unittest.TestCase):
                     repository_root=self.root,
                     raw_root=self.raw_root,
                 )
+
+
+class Task30ForwardStreamExecutionRecoveryProfileTests(unittest.TestCase):
+    def setUp(self) -> None:
+        self.temporary = TemporaryDirectory()
+        self.addCleanup(self.temporary.cleanup)
+        self.root = Path(self.temporary.name).resolve()
+        (self.root / ".gitignore").write_text("local/\n", encoding="utf-8")
+        self.raw_root = self.root / "local/task30_forward_stream_v2"
+        self.execution_config = yaml.safe_load(
+            CONFIG_V2_PATH.read_text(encoding="utf-8")
+        )
+        self.runtime_config = yaml.safe_load(
+            RUNTIME_CONFIG_V2_PATH.read_text(encoding="utf-8")
+        )
+
+    def test_v2_contract_is_exact_and_uses_new_root_and_phrase(self) -> None:
+        self.assertEqual(self.execution_config, expected_policy_v2())
+        self.assertEqual(
+            self.runtime_config["owner_authority"]["future_pilot_phrase"],
+            OWNER_EXECUTION_PHRASE_V2,
+        )
+        receipt = validate_forward_stream_preflight(
+            self.execution_config,
+            self.runtime_config,
+            authority_phrase=OWNER_EXECUTION_PHRASE_V2,
+            repository_root=self.root,
+            raw_root=self.raw_root,
+        )
+        self.assertEqual(receipt["logical_root"], "local/task30_forward_stream_v2")
+        self.assertFalse(self.raw_root.exists())
+
+    def test_v1_phrase_cannot_authorize_v2_and_no_output_is_created(self) -> None:
+        with self.assertRaisesRegex(
+            ForwardStreamExecutionError, "PILOT_NOT_AUTHORIZED"
+        ):
+            validate_forward_stream_preflight(
+                self.execution_config,
+                self.runtime_config,
+                authority_phrase=OWNER_EXECUTION_PHRASE,
+                repository_root=self.root,
+                raw_root=self.raw_root,
+            )
+        self.assertFalse(self.raw_root.exists())
+
+    def test_v2_attempt_consumes_only_v2_root(self) -> None:
+        receipt = execute_forward_stream_attempt(
+            self.execution_config,
+            self.runtime_config,
+            authority_phrase=OWNER_EXECUTION_PHRASE_V2,
+            repository_root=self.root,
+            raw_root=self.raw_root,
+            credential_loader=lambda name: FAKE_CREDENTIAL,
+            wss_exchange=lambda request, **limits: bounded_capture(notification()),
+            clock=lambda: FROZEN_NOW,
+            nonce_factory=lambda: "b2c3d4e5",
+        )
+        self.assertEqual(
+            receipt["terminal_state"], "OBSERVATION_RETAINED_TECHNICAL_ONLY"
+        )
+        self.assertEqual(
+            receipt["logical_run_root"].split("/run=", 1)[0],
+            "local/task30_forward_stream_v2",
+        )
+        self.assertEqual(
+            find_unresolved_attempts(
+                self.raw_root, logical_root="local/task30_forward_stream_v2"
+            ),
+            (),
+        )
+        self.assertFalse((self.root / "local/task30_forward_stream").exists())
 
 
 class Task30ForwardStreamExecutionRetentionTests(unittest.TestCase):
@@ -843,6 +932,25 @@ class Task30ForwardStreamExecutionCliTests(unittest.TestCase):
         )
         self.assertFalse(self.raw_root.exists())
 
+    def test_v2_dry_run_selects_recovery_profile_and_separate_root(self) -> None:
+        result, stdout, stderr = self.invoke(
+            [
+                "--dry-run",
+                "--profile",
+                "v2",
+                "--authority",
+                OWNER_EXECUTION_PHRASE_V2,
+                "--raw-root",
+                str(self.root / "local/task30_forward_stream_v2"),
+            ],
+            environ=ExplodingMapping(),
+            exchange=lambda *args, **kwargs: None,
+        )
+        self.assertEqual(result, 0)
+        self.assertEqual(stderr, "")
+        self.assertEqual(json.loads(stdout)["result"], "DRY_RUN_PASS")
+        self.assertFalse((self.root / "local").exists())
+
     def test_execute_reads_only_named_key_after_started_marker(self) -> None:
         environment = RecordingMapping(
             FAKE_CREDENTIAL,
@@ -1022,6 +1130,39 @@ class Task30ForwardStreamExecutionAcceptanceTests(unittest.TestCase):
                     record["integrity"],
                     {"kind": "sha256", "sha256": hashlib.sha256(path.read_bytes()).hexdigest()},
                 )
+
+    def test_r1_acceptance_binds_recovery_artifacts_and_preserves_prior_failure(
+        self,
+    ) -> None:
+        acceptance = json.loads(R1_ACCEPTANCE_PATH.read_text(encoding="utf-8"))
+        self.assertEqual(acceptance["validation_status"], "PASS_WITH_LIMITATIONS")
+        self.assertEqual(acceptance["state_change"], "NONE")
+        self.assertEqual(
+            acceptance["prior_v1_evidence"],
+            {
+                "run_id": "20260811T221947Z-ec16b97f",
+                "terminal_state": "CONNECTION_OR_AUTH_REJECTED",
+                "notifications": 0,
+                "estimated_credits": 0,
+                "raw_manifest": None,
+                "immutable": True,
+            },
+        )
+        self.assertTrue(
+            all(
+                value == 0
+                for value in acceptance["authority"].values()
+            )
+        )
+        for binding in acceptance["artifact_bindings"].values():
+            path = ROOT / binding["path"]
+            self.assertTrue(path.is_file(), binding["path"])
+            self.assertEqual(
+                binding["sha256"], hashlib.sha256(path.read_bytes()).hexdigest()
+            )
+        factory_fit = json.loads(R1_FACTORY_FIT_PATH.read_text(encoding="utf-8"))
+        self.assertEqual(factory_fit["review_scope"], "FULL_REVIEW")
+        self.assertEqual(factory_fit["verdict"], "PASS_WITH_LIMITATIONS")
 
 if __name__ == "__main__":
     unittest.main()
