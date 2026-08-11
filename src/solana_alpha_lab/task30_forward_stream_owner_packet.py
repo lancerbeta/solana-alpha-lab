@@ -59,6 +59,28 @@ _FUTURE_PILOT_PHRASE = (
     "max_open_seconds=1200; max_notifications=500; "
     "retention=A4; retry=false; reconnect=false; fallback=false"
 )
+_ROOT_FIELDS = frozenset(
+    {
+        "atom_id",
+        "authority",
+        "candidate_subscription",
+        "consumer",
+        "contract_id",
+        "decision",
+        "execution_controls",
+        "frozen_group",
+        "non_claims",
+        "owner_authority",
+        "pilot_limits",
+        "project_sources_disposition",
+        "provider",
+        "schema",
+        "schema_version",
+        "target",
+        "task_id",
+        "terminal_truth",
+    }
+)
 
 
 class ForwardStreamOwnerPacketError(ValueError):
@@ -86,6 +108,32 @@ def _contains_forbidden_disclosure_key(value: object) -> bool:
     if isinstance(value, (list, tuple)):
         return any(_contains_forbidden_disclosure_key(item) for item in value)
     return False
+
+
+def _contains_forbidden_disclosure_value(value: object) -> bool:
+    if isinstance(value, Mapping):
+        return any(_contains_forbidden_disclosure_value(item) for item in value.values())
+    if isinstance(value, (list, tuple)):
+        return any(_contains_forbidden_disclosure_value(item) for item in value)
+    if not isinstance(value, str):
+        return False
+    lowered = value.casefold()
+    return any(
+        marker in lowered
+        for marker in (
+            "://",
+            "api_key=",
+            "api-key=",
+            "authorization:",
+            "bearer ",
+        )
+    )
+
+
+def _require_exact_keys(
+    value: Mapping[str, Any], expected: frozenset[str], code: str
+) -> None:
+    _require(frozenset(value) == expected, code)
 
 
 def _require_exact(
@@ -123,6 +171,11 @@ def _require_identity(config: Mapping[str, Any]) -> None:
         "FROZEN_GROUP_DRIFT",
     )
     target = _mapping(config.get("target"), "TARGET_REQUIRED")
+    _require_exact_keys(
+        target,
+        frozenset({"network", "pool_address", "base_mint", "dex_program_or_route"}),
+        "TARGET_FIELDS_DRIFT",
+    )
     _require_exact(target.get("network"), "solana", "TARGET_IDENTITY_DRIFT")
     _require_exact(
         target.get("pool_address"),
@@ -143,6 +196,13 @@ def _require_identity(config: Mapping[str, Any]) -> None:
 
 def _require_proposal_only(config: Mapping[str, Any]) -> None:
     provider = _mapping(config.get("provider"), "PROVIDER_REQUIRED")
+    _require_exact_keys(
+        provider,
+        frozenset(
+            {"provider_candidate", "provider_selection", "transport_candidate"}
+        ),
+        "PROVIDER_FIELDS_DRIFT",
+    )
     _require_exact(
         provider.get("provider_candidate"),
         "HELIUS_TRANSACTION_SUBSCRIBE",
@@ -161,8 +221,25 @@ def _require_proposal_only(config: Mapping[str, Any]) -> None:
     subscription = _mapping(
         config.get("candidate_subscription"), "CANDIDATE_SUBSCRIPTION_REQUIRED"
     )
+    _require_exact_keys(
+        subscription,
+        frozenset(
+            {
+                "account_include",
+                "commitment",
+                "encoding",
+                "failed",
+                "max_supported_transaction_version",
+                "method",
+                "transaction_details",
+                "vote",
+            }
+        ),
+        "CANDIDATE_SUBSCRIPTION_FIELDS_DRIFT",
+    )
     expected_subscription = {
         "method": "transactionSubscribe",
+        "account_include": ["URqx24yyYxtXXhTbBQnbtPLhtLWYoaDaRxuQuLpNS3S"],
         "commitment": "confirmed",
         "encoding": "jsonParsed",
         "transaction_details": "full",
@@ -171,13 +248,23 @@ def _require_proposal_only(config: Mapping[str, Any]) -> None:
         "vote": False,
     }
     for field, expected in expected_subscription.items():
-        _require_exact(
-            subscription.get(field), expected, "CANDIDATE_SUBSCRIPTION_DRIFT"
+        code = (
+            "SUBSCRIPTION_FILTER_DRIFT"
+            if field == "account_include"
+            else "CANDIDATE_SUBSCRIPTION_DRIFT"
         )
+        _require_exact(subscription.get(field), expected, code)
 
 
 def _require_limits_and_execution_controls(config: Mapping[str, Any]) -> None:
     limits = _mapping(config.get("pilot_limits"), "PILOT_LIMITS_REQUIRED")
+    _require_exact_keys(
+        limits,
+        frozenset(
+            {"connections", "subscriptions", "open_duration_seconds", "notifications"}
+        ),
+        "PILOT_LIMIT_FIELDS_DRIFT",
+    )
     for field, expected in {
         "connections": 1,
         "subscriptions": 1,
@@ -188,6 +275,21 @@ def _require_limits_and_execution_controls(config: Mapping[str, Any]) -> None:
 
     controls = _mapping(
         config.get("execution_controls"), "EXECUTION_CONTROLS_REQUIRED"
+    )
+    _require_exact_keys(
+        controls,
+        frozenset(
+            {
+                "absolute_raw_root",
+                "fallback",
+                "monitoring_owner",
+                "reconnect",
+                "retention_class",
+                "retry",
+                "scheduler",
+            }
+        ),
+        "EXECUTION_CONTROL_FIELDS_DRIFT",
     )
     for field in ("retry", "reconnect", "fallback"):
         _require_exact(
@@ -209,6 +311,23 @@ def _require_limits_and_execution_controls(config: Mapping[str, Any]) -> None:
 
 def _require_zero_authority(config: Mapping[str, Any]) -> None:
     authority = _mapping(config.get("authority"), "AUTHORITY_REQUIRED")
+    _require_exact_keys(
+        authority,
+        frozenset(
+            {
+                "cash_spend_usd",
+                "credential_read",
+                "dependency_changes",
+                "project_sources_changes",
+                "provider_api_rpc_wss_calls",
+                "r2_r3_access",
+                "raw_data_write",
+                "task30_trial_or_acceptance",
+                "wallet_signer_transaction_actions",
+            }
+        ),
+        "AUTHORITY_FIELDS_DRIFT",
+    )
     _require_exact(
         authority.get("provider_api_rpc_wss_calls"), 0, "ZERO_AUTHORITY_REQUIRED"
     )
@@ -219,6 +338,18 @@ def _require_zero_authority(config: Mapping[str, Any]) -> None:
 
 def _require_terminal_truth(config: Mapping[str, Any]) -> None:
     terminal_truth = _mapping(config.get("terminal_truth"), "TERMINAL_TRUTH_REQUIRED")
+    _require_exact_keys(
+        terminal_truth,
+        frozenset(
+            {
+                "allowed_terminal_states",
+                "no_observation_disposition",
+                "transport_loss_disposition",
+                "unknown_recovery",
+            }
+        ),
+        "TERMINAL_TRUTH_FIELDS_DRIFT",
+    )
     _require_exact(
         tuple(terminal_truth.get("allowed_terminal_states", ())),
         EXPECTED_TERMINALS,
@@ -237,6 +368,18 @@ def _require_terminal_truth(config: Mapping[str, Any]) -> None:
     recovery = _mapping(
         terminal_truth.get("unknown_recovery"), "UNKNOWN_RECOVERY_REQUIRED"
     )
+    _require_exact_keys(
+        recovery,
+        frozenset(
+            {
+                "automatic_reconciliation",
+                "interval_projection",
+                "reconciliation_reference",
+                "retry_before_reconciliation",
+            }
+        ),
+        "UNKNOWN_RECOVERY_FIELDS_DRIFT",
+    )
     for field, expected in {
         "reconciliation_reference": "OWNER_AUTHORITY_REQUIRED",
         "automatic_reconciliation": False,
@@ -249,6 +392,13 @@ def _require_terminal_truth(config: Mapping[str, Any]) -> None:
 def _require_owner_and_non_claims(config: Mapping[str, Any]) -> None:
     owner_authority = _mapping(
         config.get("owner_authority"), "OWNER_AUTHORITY_REQUIRED"
+    )
+    _require_exact_keys(
+        owner_authority,
+        frozenset(
+            {"future_pilot_authorized", "future_pilot_phrase", "stop_procedure"}
+        ),
+        "OWNER_AUTHORITY_FIELDS_DRIFT",
     )
     _require_exact(
         owner_authority.get("future_pilot_phrase"),
@@ -266,13 +416,19 @@ def _require_owner_and_non_claims(config: Mapping[str, Any]) -> None:
         "STOP_PROCEDURE_DRIFT",
     )
     non_claims = _mapping(config.get("non_claims"), "NON_CLAIMS_REQUIRED")
+    _require_exact_keys(non_claims, frozenset(_NON_CLAIM_FIELDS), "NON_CLAIM_FIELDS_DRIFT")
     for field in _NON_CLAIM_FIELDS:
         _require_exact(non_claims.get(field), False, "PROMOTION_CLAIM_FORBIDDEN")
 
 
 def evaluate_forward_stream_owner_packet(config: Mapping[str, Any]) -> dict[str, Any]:
     """Validate a no-I/O owner-gate packet and return its sole safe decision."""
-    _require(not _contains_forbidden_disclosure_key(config), "CREDENTIAL_OR_ENDPOINT_DISCLOSURE_FORBIDDEN")
+    _require(
+        not _contains_forbidden_disclosure_key(config)
+        and not _contains_forbidden_disclosure_value(config),
+        "CREDENTIAL_OR_ENDPOINT_DISCLOSURE_FORBIDDEN",
+    )
+    _require_exact_keys(config, _ROOT_FIELDS, "ROOT_FIELDS_DRIFT")
     _require_identity(config)
     _require_proposal_only(config)
     _require_limits_and_execution_controls(config)

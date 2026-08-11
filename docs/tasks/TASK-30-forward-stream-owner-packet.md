@@ -46,5 +46,7 @@ and receipt safety pattern in `lifecycle_discovery_transport.py`.  Its Pump
 
 The pure evaluator rejects every authority or truth promotion listed in the
 contract, the rendered packet remains non-technical and secret-free, all
-artifacts are hash-bound and Catalog-discoverable, and the delivery stops
-before a provider or owner-external-read action.
+artifacts are hash-bound, and all durable contract/runtime/report/evidence
+outputs are Catalog-discoverable.  The accepted design and implementation plan
+remain hash-bound process documents rather than Catalog product assets.  The
+delivery stops before a provider or owner-external-read action.

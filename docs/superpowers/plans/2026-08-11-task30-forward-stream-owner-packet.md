@@ -100,6 +100,7 @@ The contract and config must contain:
 - `provider_candidate=HELIUS_TRANSACTION_SUBSCRIBE`,
   `provider_selection=PROPOSED_NOT_SELECTED`, `transport_candidate=WSS_JSON_RPC`;
 - candidate request semantics, but no endpoint: `transactionSubscribe`,
+  `accountInclude=[URqx24yyYxtXXhTbBQnbtPLhtLWYoaDaRxuQuLpNS3S]`,
   `commitment=confirmed`, `encoding=jsonParsed`, `transactionDetails=full`,
   `maxSupportedTransactionVersion=0`, `failed=false`, `vote=false`;
 - caps `{connections: 1, subscriptions: 1, open_duration_seconds: 1200,

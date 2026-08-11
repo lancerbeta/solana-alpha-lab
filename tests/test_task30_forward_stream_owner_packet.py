@@ -211,6 +211,51 @@ class Task30ForwardStreamOwnerPacketTests(unittest.TestCase):
                 ):
                     evaluate_forward_stream_owner_packet(candidate)
 
+    def test_policy_rejects_unknown_fields_and_disclosure_values(self) -> None:
+        """Unknown authority/claim fields and secret-bearing strings fail closed."""
+        config = yaml.safe_load(CONFIG_PATH.read_text(encoding="utf-8"))
+        cases = (
+            (
+                lambda packet: packet.update(
+                    {"notes": "https://provider.invalid/path?api_key=not-a-key"}
+                ),
+                "CREDENTIAL_OR_ENDPOINT_DISCLOSURE_FORBIDDEN",
+            ),
+            (
+                lambda packet: packet["authority"].update({"external_calls": 1}),
+                "AUTHORITY_FIELDS_DRIFT",
+            ),
+            (
+                lambda packet: packet["non_claims"].update({"complete": True}),
+                "NON_CLAIM_FIELDS_DRIFT",
+            ),
+        )
+        for mutate, expected_error in cases:
+            with self.subTest(expected_error=expected_error):
+                candidate = copy.deepcopy(config)
+                mutate(candidate)
+                with self.assertRaisesRegex(
+                    ForwardStreamOwnerPacketError, expected_error
+                ):
+                    evaluate_forward_stream_owner_packet(candidate)
+
+    def test_candidate_subscription_filter_is_bound_to_the_frozen_pool(self) -> None:
+        """A later request cannot widen the subscription away from the target pool."""
+        config = yaml.safe_load(CONFIG_PATH.read_text(encoding="utf-8"))
+        pool = "URqx24yyYxtXXhTbBQnbtPLhtLWYoaDaRxuQuLpNS3S"
+        self.assertEqual(
+            config["candidate_subscription"]["account_include"], [pool]
+        )
+
+        candidate = copy.deepcopy(config)
+        candidate["candidate_subscription"]["account_include"] = [
+            "DMwbVy48dWVKGe9z1pcVnwF3HLMLrqWdDLfbvx8RchhK"
+        ]
+        with self.assertRaisesRegex(
+            ForwardStreamOwnerPacketError, "SUBSCRIPTION_FILTER_DRIFT"
+        ):
+            evaluate_forward_stream_owner_packet(candidate)
+
     def test_renderer_is_russian_and_never_grants_external_authority(self) -> None:
         """The human packet explains a future gate without leaking an execution path."""
         config = yaml.safe_load(CONFIG_PATH.read_text(encoding="utf-8"))

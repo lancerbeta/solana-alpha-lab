@@ -14,7 +14,7 @@ authority.
 | Provider candidate | `HELIUS_TRANSACTION_SUBSCRIBE` / `PROPOSED_NOT_SELECTED` |
 | Transport candidate | `WSS_JSON_RPC` |
 | Candidate method | `transactionSubscribe` |
-| Candidate wire options | `commitment=confirmed`, `encoding=jsonParsed`, `transactionDetails=full`, `maxSupportedTransactionVersion=0`, `failed=false`, `vote=false` |
+| Candidate wire options | `accountInclude=[URqx24yyYxtXXhTbBQnbtPLhtLWYoaDaRxuQuLpNS3S]`, `commitment=confirmed`, `encoding=jsonParsed`, `transactionDetails=full`, `maxSupportedTransactionVersion=0`, `failed=false`, `vote=false` |
 | Target | frozen Solana pool and base mint from TASK-30 A13 |
 | Connection/subscription cap | exactly `1` / exactly `1` |
 | Capture cap | maximum `1,200` seconds and `500` notifications |

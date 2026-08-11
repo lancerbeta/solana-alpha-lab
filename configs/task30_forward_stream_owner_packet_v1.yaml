@@ -16,6 +16,8 @@ provider:
   transport_candidate: WSS_JSON_RPC
 candidate_subscription:
   method: transactionSubscribe
+  account_include:
+    - URqx24yyYxtXXhTbBQnbtPLhtLWYoaDaRxuQuLpNS3S
   commitment: confirmed
   encoding: jsonParsed
   transaction_details: full

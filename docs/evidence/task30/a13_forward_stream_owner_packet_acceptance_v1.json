@@ -44,17 +44,17 @@
     }
   },
   "artifact_bindings": {
-    "task": {"path": "docs/tasks/TASK-30-forward-stream-owner-packet.md", "sha256": "0d1dcc68539db0aeb848176d7e0fa3036dd50cefea0a20bdb26b3e8e68e56a9d"},
-    "contract": {"path": "docs/contracts/task30_forward_stream_owner_packet_contract_v1.md", "sha256": "1ffee0c64a1ebff15d8f76788b81d9df15f61a47396806db3ed4d0ed22651bad"},
-    "configuration": {"path": "configs/task30_forward_stream_owner_packet_v1.yaml", "sha256": "62dafb8c4ae6faa08cf4fd50fb85b7a2d37278847c70deb51d2bf76b4dd4a0ce"},
-    "schema": {"path": "catalog/schemas/task30_forward_stream_owner_packet.schema.json", "sha256": "a0745221b374ee798c781aa202ba39e493a9dd3c1a340b2dc7170f73d08a45db"},
+    "task": {"path": "docs/tasks/TASK-30-forward-stream-owner-packet.md", "sha256": "fdfcfb59c13ae4176826a12dc7b192b9f778243a082c904c40afe20223cc14a1"},
+    "contract": {"path": "docs/contracts/task30_forward_stream_owner_packet_contract_v1.md", "sha256": "b9c26b6223f918dfe294cc02f2f28dd538559300dd23832238dc5b24ccdcc5aa"},
+    "configuration": {"path": "configs/task30_forward_stream_owner_packet_v1.yaml", "sha256": "2c69f5bc0a9e4544f735396dfe967386f4cd95a59c29a605c478ad6524a108fd"},
+    "schema": {"path": "catalog/schemas/task30_forward_stream_owner_packet.schema.json", "sha256": "844e2ea09b894121c037368de1bc2869ca8fe2dd41accbb8ce4ef5d4d59cd199"},
     "fixture": {"path": "tests/fixtures/task30/forward_stream_owner_packet_v1.json", "sha256": "8a9dfc1fc4fcb6772a8a227178cc0470ff0bf49b98277c2c4e8d7414fe030a10"},
-    "module": {"path": "src/solana_alpha_lab/task30_forward_stream_owner_packet.py", "sha256": "63a3fd5285dbc0058d697fc293aebeace1f4bde0c7099db57598dcf7c8f17b63"},
+    "module": {"path": "src/solana_alpha_lab/task30_forward_stream_owner_packet.py", "sha256": "2c51ddef7930d75011635bb7cf7fc543bf5e8bf160dbdc1c231c2f21ecb9936a"},
     "script": {"path": "scripts/show_task30_forward_stream_owner_packet.py", "sha256": "b6addccd5fb553f3a28c3c7e3a4d50daac868f4540d31797776d66b5824b2307"},
     "report": {"path": "docs/reports/task30/forward_stream_owner_packet_readout_v1.md", "sha256": "a429377ce7bd48aeaaac23381b0ecd063a5ca4d0a330fb828df6092100036da1"},
-    "test": {"path": "tests/test_task30_forward_stream_owner_packet.py", "sha256": "60647df52c45169bdae6f1026aaf519ffc6691f8d533fc10196a0fbc93be40e1"},
-    "design": {"path": "docs/superpowers/specs/2026-08-11-task30-forward-stream-owner-packet-design.md", "sha256": "7479f4cb6ff8e04c5eda1c0c2a142777f883f0a80274ce7b17a738d87a5e1ccd"},
-    "plan": {"path": "docs/superpowers/plans/2026-08-11-task30-forward-stream-owner-packet.md", "sha256": "22360af0a93566ca7ab2b2446d07e30dbf8c95795f7e330872a17fa9125dc784"},
+    "test": {"path": "tests/test_task30_forward_stream_owner_packet.py", "sha256": "eaddea6ce3b1484be3b6edee466c9873d47bbc11359a7f87f9bcc220ff3e095a"},
+    "design": {"path": "docs/superpowers/specs/2026-08-11-task30-forward-stream-owner-packet-design.md", "sha256": "666aa8aaedaf257ba7bc198143e6931d8d54281efca05d7315c8889813b7643c"},
+    "plan": {"path": "docs/superpowers/plans/2026-08-11-task30-forward-stream-owner-packet.md", "sha256": "e6a9525206ca3023ccd601d4dc1da5c5b37ea493aa136cad497229f7853eeef9"},
     "factory_fit": {"path": "docs/evidence/task30/a13_forward_stream_owner_packet_factory_fit_v1.json", "sha256": "a8dc8ecfdd0fdfcdefb1504faa4e50bef44e737d2736d4feb3f59b525fdf7f9b"}
   },
   "authority": {

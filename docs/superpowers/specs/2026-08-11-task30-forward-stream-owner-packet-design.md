@@ -51,7 +51,7 @@ The offline packet proposes, but does not authorize, this one future action:
 | Network | `solana` | Must be asserted again by the provider acknowledgement/route receipt. |
 | Target pool | `URqx24yyYxtXXhTbBQnbtPLhtLWYoaDaRxuQuLpNS3S` | Frozen identity binding. |
 | Base mint | `DMwbVy48dWVKGe9z1pcVnwF3HLMLrqWdDLfbvx8RchhK` | Frozen identity binding, not an instruction to trade. |
-| Candidate wire profile | `transactionSubscribe`, `commitment=confirmed`, `encoding=jsonParsed`, `transactionDetails=full`, `maxSupportedTransactionVersion=0`, `failed=false`, `vote=false` | Must be recorded as the exact sent body hash if the later pilot is authorised. |
+| Candidate wire profile | `transactionSubscribe`, `accountInclude=[URqx24yyYxtXXhTbBQnbtPLhtLWYoaDaRxuQuLpNS3S]`, `commitment=confirmed`, `encoding=jsonParsed`, `transactionDetails=full`, `maxSupportedTransactionVersion=0`, `failed=false`, `vote=false` | The proposed filter is exactly bound to the frozen pool and must be recorded as the sent body hash if the later pilot is authorised. |
 | Connection cap | `1` | A second connection is a separate owner decision. |
 | Subscription cap | `1` | No broad or additional filters. |
 | Open-duration cap | `1,200` seconds | A short technical evidence window, not a coverage promise. |

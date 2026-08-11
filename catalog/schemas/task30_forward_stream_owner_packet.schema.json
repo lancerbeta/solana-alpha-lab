@@ -55,9 +55,10 @@
     "candidate_subscription": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["method", "commitment", "encoding", "transaction_details", "max_supported_transaction_version", "failed", "vote"],
+      "required": ["method", "account_include", "commitment", "encoding", "transaction_details", "max_supported_transaction_version", "failed", "vote"],
       "properties": {
         "method": {"const": "transactionSubscribe"},
+        "account_include": {"const": ["URqx24yyYxtXXhTbBQnbtPLhtLWYoaDaRxuQuLpNS3S"]},
         "commitment": {"const": "confirmed"},
         "encoding": {"const": "jsonParsed"},
         "transaction_details": {"const": "full"},
