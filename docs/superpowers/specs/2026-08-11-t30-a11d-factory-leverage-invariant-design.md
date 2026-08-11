@@ -56,14 +56,18 @@ existing Factory Fit review must answer:
 - No claim that the current offline A11C harness is a hypothesis or that it
   should have avoided code; it is a safety capability for a future external
   read.
+- Historical TASK-15 receipt and TASK-20 frozen-input bytes remain untouched.
+  Their tests must preserve those historical hashes without treating a mutable
+  accepted architecture intent as if it could never evolve.
 
 ## Validation
 
 Inspect the exact policy and required Catalog-binding diff, run the existing
 owner-attention policy test that protects the active `AGENTS.md` contract, and
-run Catalog plus repository policy validation for the committed candidate. The
-completion review must confirm that this remains a guardrail rather than a
-second control plane.
+run the TASK-15/TASK-20 historical-binding tests that distinguish immutable
+snapshots from the current architecture. Run Catalog plus repository policy
+validation for the committed candidate. The completion review must confirm that
+this remains a guardrail rather than a second control plane.
 
 ## Rollback
 

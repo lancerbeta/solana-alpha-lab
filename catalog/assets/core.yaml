@@ -8092,14 +8092,14 @@ records:
   evidence: []
   classification: *t15_internal
 - asset_id: TEST-T15-HYPOTHESIS-DRIVEN-ACQUISITION-ACCEPTANCE-001
-  record_version: '1.1'
+  record_version: '1.2'
   asset_type: script
   purpose: Deterministic TASK-15 semantic acceptance tests binding the exact
     contract, fixture, operating-model intent, mandatory Factory Fit review,
     Catalog checkpoint, generated navigation and zero effects.
   status: IMPLEMENTED_UNVERIFIED
   origin: REPOSITORY
-  as_of: '2026-07-29'
+  as_of: '2026-08-11'
   truth_owner: TASK-15
   location:
     kind: git_path
@@ -8107,7 +8107,7 @@ records:
     repository_path: tests/test_task15_hypothesis_driven_acquisition_acceptance.py
   integrity:
     kind: sha256
-    sha256: 3e8ed0c207f1d0a0a9edbd2e10867c1c5926f93605c8b79512f95cded87192fa
+    sha256: c3ab5f5d9f1dcef6f4e2e164f3e7778e4b34044a4889897a4bd6102ceef5c80f
   access:
     mode: read_only
     method: file
@@ -11137,14 +11137,14 @@ records:
   classification: *t21_internal
 
 - asset_id: TEST-T20-COLLECTION-SPEC-CONTRACT-001
-  record_version: '1.0'
+  record_version: '1.1'
   asset_type: script
   purpose: Deterministic hash-bound tests for TASK-20 collection tiers,
     membership, PIT availability, physical caps, recovery handoff, non-claims
     and local-only authority.
   status: IMPLEMENTED_UNVERIFIED
   origin: REPOSITORY
-  as_of: '2026-07-30'
+  as_of: '2026-08-11'
   truth_owner: TASK-20
   location:
     kind: git_path
@@ -11152,7 +11152,7 @@ records:
     repository_path: tests/test_task20_collection_spec_contract.py
   integrity:
     kind: sha256
-    sha256: 21279e1aadbda01ee2a68c33799d4870ac8b6d144bada8ad4c04d84d18e91adb
+    sha256: 7bb2d63ff299166097c13f533a3691c666b47f993331e4bc5a7d47414953a36e
   access:
     mode: read_only
     method: file

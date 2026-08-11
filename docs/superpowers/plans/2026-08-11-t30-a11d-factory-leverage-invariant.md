@@ -34,6 +34,8 @@
 - Modify: `catalog/assets/lifecycle.yaml`
 - Generated: `docs/PROJECT_MAP.md`
 - Test: `tests/test_owner_attention_gate_policy.py`
+- Test repair: `tests/test_task15_hypothesis_driven_acquisition_acceptance.py`
+- Test repair: `tests/test_task20_collection_spec_contract.py`
 
 **Interfaces:**
 
@@ -79,8 +81,10 @@ not an automatic block.
 
 - [ ] **Step 4: Refresh existing Catalog integrity bindings and validate**
 
-Compute SHA-256 for each changed policy document and replace only the existing
-`CTRL-AGENTS-001` and `ARCH-INTENT-002` integrity values. Bump only those two
+Compute SHA-256 for each changed policy document and test, then replace only
+the existing `CTRL-AGENTS-001`, `ARCH-INTENT-002`,
+`TEST-T15-HYPOTHESIS-DRIVEN-ACQUISITION-ACCEPTANCE-001` and
+`TEST-T20-COLLECTION-SPEC-CONTRACT-001` integrity values. Bump only those
 record versions and `as_of` values so Catalog discovery remains honest. Then
 run the existing generator; do not edit its outputs manually. If it changes
 `docs/PROJECT_MAP.md`, bind its exact SHA-256 by updating only the existing
@@ -100,19 +104,27 @@ checks pass.
 
 - [ ] **Step 5: Validate the text and active policy compatibility**
 
+Preserve the byte-for-byte historical TASK-15 receipt and TASK-20 collection
+spec. Repair only their test interpretation: the frozen hash is a historical
+snapshot, while current `ARCH-INTENT-002` evolves through its versioned Catalog
+integrity binding. Add an explicit assertion that the current intent retains
+the Factory Leverage invariant.
+
 Run:
 
 ```text
 git diff --check
 uv run --locked --managed-python python -B -m unittest tests.test_owner_attention_gate_policy -v
+uv run --locked --managed-python python -B -m unittest tests.test_task15_hypothesis_driven_acquisition_acceptance tests.test_task20_collection_spec_contract -v
 uv run --locked --managed-python python -B scripts/validate_catalog.py
 uv run --locked --managed-python python -B scripts/generate_navigation.py --check
 ```
 
-Expected: clean whitespace, existing owner-attention rules still pass, and the
-affected Catalog and generated-navigation checks pass without new dependencies
-or external actions. The successful full gate is owned by the tracked-only
-delivery preflight below, per `VALIDATION_ECONOMY`.
+Expected: clean whitespace, existing owner-attention rules still pass,
+historical receipts/specs remain frozen while the current intent is verified,
+and the affected Catalog and generated-navigation checks pass without new
+dependencies or external actions. The successful full gate is owned by the
+tracked-only delivery preflight below, per `VALIDATION_ECONOMY`.
 
 - [ ] **Step 6: Inspect the exact scope and commit**
 
@@ -121,14 +133,15 @@ Run:
 ```text
 git diff --name-only origin/main...HEAD
 git status --short
-git add AGENTS.md docs/architecture/intents/ARCH-INTENT-002-hypothesis-factory-operating-model.md catalog/assets/core.yaml catalog/assets/architecture.yaml catalog/assets/lifecycle.yaml docs/PROJECT_MAP.md
+git add AGENTS.md docs/architecture/intents/ARCH-INTENT-002-hypothesis-factory-operating-model.md catalog/assets/core.yaml catalog/assets/architecture.yaml catalog/assets/lifecycle.yaml docs/PROJECT_MAP.md tests/test_task15_hypothesis_driven_acquisition_acceptance.py tests/test_task20_collection_spec_contract.py
 git commit -m "docs: add factory leverage invariant"
 ```
 
 Expected committed implementation inventory: the two policy files, their two
-existing Catalog bindings, the derived project map with its existing Catalog
-binding, and the already committed design and plan; no new Catalog asset or
-Project Sources change.
+existing Catalog bindings, the updated existing TASK-15/TASK-20 test bindings,
+the derived project map with its existing Catalog binding, two historical-
+binding test repairs, and the already committed design and plan; no new Catalog
+asset or Project Sources change.
 
 - [ ] **Step 7: Deliver through the ordinary repository route**
 
