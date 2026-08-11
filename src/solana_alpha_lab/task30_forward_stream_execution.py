@@ -1,0 +1,661 @@
+"""Create-only retention boundary for one future TASK-30 stream attempt."""
+
+from __future__ import annotations
+
+import hashlib
+import json
+import math
+import os
+import re
+from collections.abc import Callable, Mapping
+from dataclasses import dataclass, field
+from datetime import UTC, datetime
+from pathlib import Path
+from types import MappingProxyType
+from typing import Any
+
+from .task30_forward_stream_runtime import (
+    CONNECTION_CREDITS,
+    MAX_FRAME_BYTES,
+    MAX_NOTIFICATIONS,
+    MAX_OPEN_SECONDS,
+    MAX_STREAM_BYTES,
+    OWNER_EXECUTION_PHRASE,
+    ForwardStreamRuntimeError,
+    RuntimeCapture,
+    bind_transaction_subscribe,
+    classify_forward_stream_capture,
+    evaluate_forward_stream_runtime,
+)
+from .lifecycle_discovery_transport import WssCapture
+
+
+LOGICAL_ROOT = "local/task30_forward_stream"
+_NONCE_RE = re.compile(r"^[0-9a-f]{8}$")
+_ERROR_CODE_RE = re.compile(r"^[A-Z][A-Z0-9_]{2,79}$")
+_TERMINAL_STATES = frozenset(
+    {
+        "CONNECTION_OR_AUTH_REJECTED",
+        "NO_OBSERVED_TX_NO_EMPTY_CLAIM",
+        "OBSERVATION_RETAINED_TECHNICAL_ONLY",
+        "RETENTION_FAILED_STOP",
+        "SUBSCRIPTION_REJECTED",
+        "TRANSPORT_LOST_UNKNOWN",
+    }
+)
+
+_EXPECTED_EXECUTION_POLICY: dict[str, object] = {
+    "schema": "smial.task30.forward-stream-execution-adapter.policy",
+    "schema_version": "1.0",
+    "task_id": "TASK-30",
+    "atom_id": "T30-A14P_FORWARD_STREAM_EXECUTION_ADAPTER_V1",
+    "consumer": "EXACT_OWNER_FORWARD_STREAM_EXTERNAL_GATE",
+    "runtime_policy": "configs/task30_forward_stream_runtime_harness_v1.yaml",
+    "retention": {
+        "class": "A4",
+        "logical_root": LOGICAL_ROOT,
+        "started_receipt": "attempt_started.json",
+        "manifest": "raw_manifest.json",
+        "terminal_receipt": "terminal_receipt.json",
+        "create_only": True,
+    },
+    "credential": {
+        "environment_variable": "HELIUS_API_KEY",
+        "read_after_started_receipt": True,
+    },
+    "execution": {
+        "max_attempts": 1,
+        "retry": False,
+        "reconnect": False,
+        "fallback": False,
+        "scheduler": False,
+    },
+    "authority": {
+        "provider_api_rpc_wss_calls": 0,
+        "credential_read": False,
+        "raw_external_data_write": False,
+    },
+    "decision": "OFFLINE_EXECUTION_ADAPTER_PENDING_IMPLEMENTATION",
+    "project_sources_disposition": "NO_CHANGE",
+}
+
+
+class ForwardStreamExecutionError(RuntimeError):
+    """A sanitized, stable failure at the A14P execution boundary."""
+
+    def __init__(self, code: str) -> None:
+        if type(code) is not str or _ERROR_CODE_RE.fullmatch(code) is None:
+            code = "UNCLASSIFIED_LOCAL_FAILURE"
+        self.code = code
+        super().__init__(code)
+
+    def __repr__(self) -> str:
+        return f"ForwardStreamExecutionError(code={self.code!r})"
+
+
+def _require(condition: bool, code: str) -> None:
+    if not condition:
+        raise ForwardStreamExecutionError(code)
+
+
+def _same_exact(value: object, expected: object) -> bool:
+    if isinstance(expected, Mapping):
+        if not isinstance(value, Mapping):
+            return False
+        if set(value) != set(expected):
+            return False
+        return all(_same_exact(value[key], expected[key]) for key in expected)
+    return type(value) is type(expected) and value == expected
+
+
+def _canonical_json(value: object) -> bytes:
+    try:
+        return (
+            json.dumps(
+                value,
+                ensure_ascii=False,
+                sort_keys=True,
+                separators=(",", ":"),
+                allow_nan=False,
+            )
+            + "\n"
+        ).encode("utf-8")
+    except (TypeError, ValueError) as exc:
+        raise ForwardStreamExecutionError("RECEIPT_JSON_INVALID") from exc
+
+
+def _utc_text(value: datetime) -> str:
+    _require(
+        isinstance(value, datetime)
+        and value.tzinfo is not None
+        and value.utcoffset() is not None
+        and value.utcoffset().total_seconds() == 0,
+        "START_TIME_UTC_REQUIRED",
+    )
+    return value.astimezone(UTC).isoformat().replace("+00:00", "Z")
+
+
+def _normalized_path(value: Path) -> str:
+    return os.path.normcase(os.path.normpath(str(value)))
+
+
+def _existing_components(path: Path, stop: Path) -> tuple[Path, ...]:
+    components: list[Path] = []
+    current = path
+    while True:
+        components.append(current)
+        if _normalized_path(current) == _normalized_path(stop):
+            break
+        parent = current.parent
+        _require(parent != current, "RAW_ROOT_IDENTITY_DRIFT")
+        current = parent
+    return tuple(reversed(components))
+
+
+def _require_ignored_local_root(repository_root: Path) -> None:
+    ignore_path = repository_root / ".gitignore"
+    _require(ignore_path.is_file() and not ignore_path.is_symlink(), "RAW_ROOT_NOT_IGNORED")
+    entries = {
+        line.strip()
+        for line in ignore_path.read_text(encoding="utf-8").splitlines()
+        if line.strip() and not line.lstrip().startswith("#")
+    }
+    _require(bool(entries & {"local/", "/local/", "local/**"}), "RAW_ROOT_NOT_IGNORED")
+
+
+def _terminal_receipt_valid(run_root: Path, run_id: str) -> bool:
+    path = run_root / "terminal_receipt.json"
+    if not path.is_file() or path.is_symlink():
+        return False
+    try:
+        value = json.loads(path.read_text(encoding="utf-8"))
+    except (OSError, UnicodeError, ValueError):
+        return False
+    if not isinstance(value, Mapping):
+        return False
+    return (
+        value.get("schema") == "smial.task30.forward-stream-terminal-receipt"
+        and value.get("schema_version") == "1.0"
+        and value.get("run_id") == run_id
+        and value.get("logical_run_root") == f"{LOGICAL_ROOT}/run={run_id}"
+        and value.get("state") == "TERMINAL"
+        and value.get("terminal_state") in _TERMINAL_STATES
+    )
+
+
+def find_unresolved_attempts(raw_root: Path) -> tuple[str, ...]:
+    """Return create-only runs whose durable terminal truth is absent or invalid."""
+
+    _require(isinstance(raw_root, Path), "RAW_ROOT_PATH_REQUIRED")
+    if not raw_root.exists():
+        return ()
+    _require(raw_root.is_dir() and not raw_root.is_symlink(), "RAW_ROOT_SYMLINK_FORBIDDEN")
+    unresolved: list[str] = []
+    for run_root in sorted(raw_root.glob("run=*"), key=lambda item: item.name):
+        _require(run_root.is_dir() and not run_root.is_symlink(), "RUN_ROOT_INVALID")
+        run_id = run_root.name.removeprefix("run=")
+        marker = run_root / "attempt_started.json"
+        if marker.exists() and not _terminal_receipt_valid(run_root, run_id):
+            unresolved.append(run_id)
+    return tuple(unresolved)
+
+
+def validate_forward_stream_preflight(
+    execution_config: Mapping[str, Any],
+    runtime_config: Mapping[str, Any],
+    *,
+    authority_phrase: str,
+    repository_root: Path,
+    raw_root: Path,
+) -> dict[str, object]:
+    """Validate all non-secret conditions without creating output or reading a key."""
+
+    _require(
+        _same_exact(execution_config, _EXPECTED_EXECUTION_POLICY),
+        "EXECUTION_POLICY_DRIFT",
+    )
+    try:
+        evaluate_forward_stream_runtime(runtime_config)
+    except ForwardStreamRuntimeError as exc:
+        raise ForwardStreamExecutionError(str(exc)) from exc
+    _require(
+        type(authority_phrase) is str and authority_phrase == OWNER_EXECUTION_PHRASE,
+        "PILOT_NOT_AUTHORIZED",
+    )
+    _require(
+        isinstance(repository_root, Path) and repository_root.is_absolute(),
+        "REPOSITORY_ROOT_ABSOLUTE_REQUIRED",
+    )
+    _require(
+        repository_root.is_dir() and not repository_root.is_symlink(),
+        "REPOSITORY_ROOT_INVALID",
+    )
+    _require(
+        isinstance(raw_root, Path) and raw_root.is_absolute(),
+        "RAW_ROOT_ABSOLUTE_REQUIRED",
+    )
+    expected_raw_root = repository_root / Path(LOGICAL_ROOT)
+    _require(
+        _normalized_path(raw_root) == _normalized_path(expected_raw_root),
+        "RAW_ROOT_IDENTITY_DRIFT",
+    )
+    for component in _existing_components(raw_root, repository_root):
+        if component.exists() or component.is_symlink():
+            _require(not component.is_symlink(), "RAW_ROOT_SYMLINK_FORBIDDEN")
+    _require_ignored_local_root(repository_root)
+    _require(not find_unresolved_attempts(raw_root), "UNRESOLVED_PRIOR_ATTEMPT")
+    planned_request = bind_transaction_subscribe("offline-preflight-sentinel")
+    return {
+        "result": "PREFLIGHT_PASS",
+        "logical_root": LOGICAL_ROOT,
+        "credential_read": False,
+        "network_calls": 0,
+        "output_created": False,
+        "planned_request": planned_request.safe_receipt(),
+    }
+
+
+@dataclass(frozen=True, slots=True, repr=False)
+class StartedAttempt:
+    """Sanitized durable identity published before any credential lookup."""
+
+    run_id: str
+    run_root: Path = field(repr=False)
+    logical_run_root: str
+    started_at: datetime
+    planned_request_receipt: Mapping[str, object]
+
+    def __repr__(self) -> str:
+        return (
+            "StartedAttempt("
+            f"run_id={self.run_id!r}, "
+            f"logical_run_root={self.logical_run_root!r}, "
+            f"started_at={_utc_text(self.started_at)!r}, "
+            "planned_request_receipt=<sanitized>)"
+        )
+
+
+def _publish_new(path: Path, body: bytes) -> None:
+    _require(isinstance(body, bytes), "RECEIPT_BYTES_INVALID")
+    temporary = path.with_name(f".{path.name}.tmp")
+    try:
+        with temporary.open("xb") as handle:
+            handle.write(body)
+            handle.flush()
+            os.fsync(handle.fileno())
+        os.link(temporary, path)
+    except (FileExistsError, OSError) as exc:
+        raise ForwardStreamExecutionError("CREATE_ONLY_PUBLICATION_FAILED") from exc
+    finally:
+        try:
+            temporary.unlink(missing_ok=True)
+        except OSError:
+            pass
+
+
+def prepare_forward_stream_attempt(
+    execution_config: Mapping[str, Any],
+    runtime_config: Mapping[str, Any],
+    *,
+    authority_phrase: str,
+    repository_root: Path,
+    raw_root: Path,
+    now: datetime,
+    nonce: str,
+) -> StartedAttempt:
+    """Publish one unresolved marker before any credential or transport action."""
+
+    preflight = validate_forward_stream_preflight(
+        execution_config,
+        runtime_config,
+        authority_phrase=authority_phrase,
+        repository_root=repository_root,
+        raw_root=raw_root,
+    )
+    started_text = _utc_text(now)
+    _require(type(nonce) is str and _NONCE_RE.fullmatch(nonce) is not None, "NONCE_INVALID")
+    run_id = f"{now.astimezone(UTC).strftime('%Y%m%dT%H%M%SZ')}-{nonce}"
+    logical_run_root = f"{LOGICAL_ROOT}/run={run_id}"
+
+    try:
+        raw_root.mkdir(parents=True, exist_ok=True)
+    except OSError as exc:
+        raise ForwardStreamExecutionError("RAW_ROOT_CREATE_FAILED") from exc
+    for component in _existing_components(raw_root, repository_root):
+        _require(not component.is_symlink(), "RAW_ROOT_SYMLINK_FORBIDDEN")
+    run_root = raw_root / f"run={run_id}"
+    try:
+        run_root.mkdir()
+    except FileExistsError as exc:
+        raise ForwardStreamExecutionError("RUN_ID_COLLISION") from exc
+    except OSError as exc:
+        raise ForwardStreamExecutionError("RUN_ROOT_CREATE_FAILED") from exc
+
+    planned_request = preflight["planned_request"]
+    _require(isinstance(planned_request, Mapping), "PLANNED_REQUEST_INVALID")
+    marker = {
+        "schema": "smial.task30.forward-stream-attempt-started",
+        "schema_version": "1.0",
+        "run_id": run_id,
+        "logical_run_root": logical_run_root,
+        "started_at": started_text,
+        "state": "UNRESOLVED_EXTERNAL_ATTEMPT",
+        "target": dict(runtime_config["target"]),
+        "runtime_limits": dict(runtime_config["runtime_limits"]),
+        "planned_request": dict(planned_request),
+    }
+    _publish_new(run_root / "attempt_started.json", _canonical_json(marker))
+    return StartedAttempt(
+        run_id=run_id,
+        run_root=run_root,
+        logical_run_root=logical_run_root,
+        started_at=now,
+        planned_request_receipt=MappingProxyType(dict(planned_request)),
+    )
+
+
+def _capture_metrics(
+    runtime_config: Mapping[str, Any], capture: WssCapture
+) -> tuple[int, int]:
+    try:
+        evaluate_forward_stream_runtime(runtime_config)
+    except ForwardStreamRuntimeError as exc:
+        raise ForwardStreamExecutionError(str(exc)) from exc
+    _require(type(capture) is WssCapture, "WSS_CAPTURE_TYPE_INVALID")
+    limits = runtime_config["runtime_limits"]
+    _require(isinstance(limits, Mapping), "RUNTIME_LIMITS_REQUIRED")
+    stream_bytes = len(capture.acknowledgement) + sum(
+        len(item) for item in capture.notifications
+    )
+    _require(stream_bytes <= limits["max_stream_bytes"], "STREAM_BYTE_CAP_EXCEEDED")
+    _require(
+        len(capture.notifications) <= limits["max_notifications"],
+        "NOTIFICATION_CAP_EXCEEDED",
+    )
+    _require(
+        len(capture.acknowledgement) <= limits["max_frame_bytes"],
+        "ACK_FRAME_CAP_EXCEEDED",
+    )
+    _require(
+        all(len(item) <= limits["max_frame_bytes"] for item in capture.notifications),
+        "NOTIFICATION_FRAME_CAP_EXCEEDED",
+    )
+    estimated_credits = CONNECTION_CREDITS + math.ceil(
+        stream_bytes / limits["credit_bytes_per_unit"]
+    ) * limits["credits_per_unit"]
+    _require(
+        estimated_credits <= limits["estimated_credit_cap"],
+        "CREDIT_CAP_EXCEEDED",
+    )
+    return stream_bytes, estimated_credits
+
+
+def _closed_classification(
+    terminal_state: str,
+    *,
+    notifications: int,
+    stream_bytes: int,
+    estimated_credits: int,
+    unknown: bool,
+) -> dict[str, object]:
+    return {
+        "terminal_state": terminal_state,
+        "notifications": notifications,
+        "stream_bytes": stream_bytes,
+        "estimated_credits": estimated_credits,
+        "unknown": unknown,
+        "retry": False,
+        "reconnect": False,
+        "interval_projectable": False,
+        "zero_volume": False,
+        "empty_interval": False,
+        "task30_trial": False,
+    }
+
+
+def classify_task08_capture(
+    runtime_config: Mapping[str, Any], capture: WssCapture
+) -> dict[str, object]:
+    """Map TASK-08 transport truth into the accepted A14 terminal vocabulary."""
+
+    stream_bytes, estimated_credits = _capture_metrics(runtime_config, capture)
+    if capture.terminal_class != "BOUND_REACHED":
+        return _closed_classification(
+            "TRANSPORT_LOST_UNKNOWN",
+            notifications=len(capture.notifications),
+            stream_bytes=stream_bytes,
+            estimated_credits=estimated_credits,
+            unknown=True,
+        )
+    runtime_capture = RuntimeCapture(
+        acknowledgement=capture.acknowledgement,
+        notifications=capture.notifications,
+        terminal_class="BOUND_REACHED",
+        error_class=None,
+    )
+    try:
+        result = classify_forward_stream_capture(runtime_config, runtime_capture)
+    except ForwardStreamRuntimeError as exc:
+        if str(exc) == "SUBSCRIPTION_REJECTED":
+            return _closed_classification(
+                "SUBSCRIPTION_REJECTED",
+                notifications=len(capture.notifications),
+                stream_bytes=stream_bytes,
+                estimated_credits=estimated_credits,
+                unknown=False,
+            )
+        raise ForwardStreamExecutionError(str(exc)) from exc
+    return dict(result)
+
+
+def _raw_object(path: Path, *, relative_path: str, observed_at: datetime | None) -> dict[str, object]:
+    try:
+        body = path.read_bytes()
+    except OSError as exc:
+        raise ForwardStreamExecutionError("RAW_OBJECT_VERIFY_FAILED") from exc
+    return {
+        "path": relative_path,
+        "bytes": len(body),
+        "sha256": hashlib.sha256(body).hexdigest(),
+        "observed_at": None if observed_at is None else _utc_text(observed_at),
+    }
+
+
+def _retain_exact_capture(attempt: StartedAttempt, capture: WssCapture) -> dict[str, object]:
+    acknowledgement_path = attempt.run_root / "acknowledgement.json"
+    _publish_new(acknowledgement_path, capture.acknowledgement)
+    raw_objects = [
+        _raw_object(
+            acknowledgement_path,
+            relative_path="acknowledgement.json",
+            observed_at=capture.acknowledgement_observed_at,
+        )
+    ]
+
+    notification_root = attempt.run_root / "notifications"
+    try:
+        notification_root.mkdir()
+    except OSError as exc:
+        raise ForwardStreamExecutionError("NOTIFICATION_ROOT_CREATE_FAILED") from exc
+    for ordinal, (body, observed_at) in enumerate(
+        zip(capture.notifications, capture.notification_observed_at), start=1
+    ):
+        relative_path = f"notifications/{ordinal:06d}.json"
+        path = attempt.run_root / Path(relative_path)
+        _publish_new(path, body)
+        raw_objects.append(
+            _raw_object(path, relative_path=relative_path, observed_at=observed_at)
+        )
+
+    manifest = {
+        "schema": "smial.task30.forward-stream-raw-manifest",
+        "schema_version": "1.0",
+        "run_id": attempt.run_id,
+        "logical_run_root": attempt.logical_run_root,
+        "retention_class": "A4",
+        "raw_objects": raw_objects,
+        "notifications": len(capture.notifications),
+        "stream_bytes": len(capture.acknowledgement)
+        + sum(len(item) for item in capture.notifications),
+    }
+    manifest_body = _canonical_json(manifest)
+    manifest_path = attempt.run_root / "raw_manifest.json"
+    _publish_new(manifest_path, manifest_body)
+    try:
+        retained_manifest = manifest_path.read_bytes()
+    except OSError as exc:
+        raise ForwardStreamExecutionError("RAW_MANIFEST_VERIFY_FAILED") from exc
+    _require(retained_manifest == manifest_body, "RAW_MANIFEST_VERIFY_FAILED")
+    return {
+        "document": manifest,
+        "path": "raw_manifest.json",
+        "bytes": len(retained_manifest),
+        "sha256": hashlib.sha256(retained_manifest).hexdigest(),
+    }
+
+
+def _publish_terminal_receipt(
+    attempt: StartedAttempt,
+    classification: Mapping[str, object],
+    *,
+    terminal_at: datetime,
+    manifest: Mapping[str, object] | None,
+) -> dict[str, object]:
+    terminal_text = _utc_text(terminal_at)
+    terminal_state = classification.get("terminal_state")
+    _require(terminal_state in _TERMINAL_STATES, "TERMINAL_STATE_INVALID")
+    receipt: dict[str, object] = {
+        "schema": "smial.task30.forward-stream-terminal-receipt",
+        "schema_version": "1.0",
+        "run_id": attempt.run_id,
+        "logical_run_root": attempt.logical_run_root,
+        "started_at": _utc_text(attempt.started_at),
+        "terminal_at": terminal_text,
+        "state": "TERMINAL",
+        "terminal_state": terminal_state,
+        "notifications": classification.get("notifications", 0),
+        "stream_bytes": classification.get("stream_bytes", 0),
+        "estimated_credits": classification.get("estimated_credits", 0),
+        "unknown": classification.get("unknown", False),
+        "retry": False,
+        "reconnect": False,
+        "interval_projectable": False,
+        "zero_volume": False,
+        "empty_interval": False,
+        "task30_trial": False,
+        "raw_retention": (
+            "A4_EXACT_RETAINED"
+            if manifest is not None
+            else (
+                "FAILED"
+                if terminal_state == "RETENTION_FAILED_STOP"
+                else "NO_CAPTURE_RETURNED"
+            )
+        ),
+        "raw_manifest": (
+            None
+            if manifest is None
+            else {
+                "path": manifest["path"],
+                "bytes": manifest["bytes"],
+                "sha256": manifest["sha256"],
+            }
+        ),
+    }
+    try:
+        _publish_new(
+            attempt.run_root / "terminal_receipt.json", _canonical_json(receipt)
+        )
+    except ForwardStreamExecutionError as exc:
+        raise ForwardStreamExecutionError("UNRESOLVED_EXTERNAL_ATTEMPT") from exc
+    return receipt
+
+
+def execute_forward_stream_attempt(
+    execution_config: Mapping[str, Any],
+    runtime_config: Mapping[str, Any],
+    *,
+    authority_phrase: str,
+    repository_root: Path,
+    raw_root: Path,
+    credential_loader: Callable[[str], str],
+    wss_exchange: Callable[..., object],
+    clock: Callable[[], datetime],
+    nonce_factory: Callable[[], str],
+) -> dict[str, object]:
+    """Execute exactly one injected exchange after publishing durable intent."""
+
+    attempt = prepare_forward_stream_attempt(
+        execution_config,
+        runtime_config,
+        authority_phrase=authority_phrase,
+        repository_root=repository_root,
+        raw_root=raw_root,
+        now=clock(),
+        nonce=nonce_factory(),
+    )
+    try:
+        credential_value = credential_loader("HELIUS_API_KEY")
+        request = bind_transaction_subscribe(credential_value)
+    except Exception:
+        return _publish_terminal_receipt(
+            attempt,
+            _closed_classification(
+                "CONNECTION_OR_AUTH_REJECTED",
+                notifications=0,
+                stream_bytes=0,
+                estimated_credits=0,
+                unknown=False,
+            ),
+            terminal_at=clock(),
+            manifest=None,
+        )
+
+    _require(
+        request.safe_receipt() == dict(attempt.planned_request_receipt),
+        "REQUEST_RECEIPT_DRIFT",
+    )
+    try:
+        capture = wss_exchange(
+            request,
+            max_open_seconds=MAX_OPEN_SECONDS,
+            max_stream_bytes=MAX_STREAM_BYTES,
+            max_notifications=MAX_NOTIFICATIONS,
+        )
+    except Exception:
+        return _publish_terminal_receipt(
+            attempt,
+            _closed_classification(
+                "TRANSPORT_LOST_UNKNOWN",
+                notifications=0,
+                stream_bytes=0,
+                estimated_credits=CONNECTION_CREDITS,
+                unknown=True,
+            ),
+            terminal_at=clock(),
+            manifest=None,
+        )
+    _require(type(capture) is WssCapture, "WSS_CAPTURE_TYPE_INVALID")
+
+    try:
+        manifest = _retain_exact_capture(attempt, capture)
+    except Exception:
+        return _publish_terminal_receipt(
+            attempt,
+            _closed_classification(
+                "RETENTION_FAILED_STOP",
+                notifications=0,
+                stream_bytes=0,
+                estimated_credits=CONNECTION_CREDITS,
+                unknown=False,
+            ),
+            terminal_at=clock(),
+            manifest=None,
+        )
+    classification = classify_task08_capture(runtime_config, capture)
+    return _publish_terminal_receipt(
+        attempt,
+        classification,
+        terminal_at=clock(),
+        manifest=manifest,
+    )
