@@ -543,6 +543,11 @@
       "target_asset_id": "CONTRACT-T30-FORWARD-STREAM-OWNER-PACKET-001"
     },
     {
+      "source_asset_id": "CONFIG-T30-FORWARD-STREAM-RUNTIME-HARNESS-001",
+      "relation": "governed_by",
+      "target_asset_id": "CONTRACT-T30-FORWARD-STREAM-RUNTIME-HARNESS-001"
+    },
+    {
       "source_asset_id": "CONFIG-T30-GECKO-INTERVAL-SEMANTICS-001",
       "relation": "governed_by",
       "target_asset_id": "CONTRACT-T30-GECKO-INTERVAL-SEMANTICS-001"
@@ -1146,6 +1151,11 @@
       "source_asset_id": "CONTRACT-T30-FORWARD-STREAM-OWNER-PACKET-001",
       "relation": "depends_on",
       "target_asset_id": "EVIDENCE-T30-A12-FORWARD-RAW-TRADE-ROUTE-001"
+    },
+    {
+      "source_asset_id": "CONTRACT-T30-FORWARD-STREAM-RUNTIME-HARNESS-001",
+      "relation": "derived_from",
+      "target_asset_id": "CONTRACT-T30-FORWARD-STREAM-OWNER-PACKET-001"
     },
     {
       "source_asset_id": "CONTRACT-T30-GECKO-INTERVAL-SEMANTICS-001",
@@ -3163,6 +3173,26 @@
       "target_asset_id": "TEST-T30-FORWARD-STREAM-OWNER-PACKET-001"
     },
     {
+      "source_asset_id": "EVIDENCE-T30-A14-FORWARD-STREAM-RUNTIME-001",
+      "relation": "derived_from",
+      "target_asset_id": "CONTRACT-T30-FORWARD-STREAM-RUNTIME-HARNESS-001"
+    },
+    {
+      "source_asset_id": "EVIDENCE-T30-A14-FORWARD-STREAM-RUNTIME-001",
+      "relation": "validated_by",
+      "target_asset_id": "TEST-T30-FORWARD-STREAM-RUNTIME-HARNESS-001"
+    },
+    {
+      "source_asset_id": "EVIDENCE-T30-A14-FORWARD-STREAM-RUNTIME-FACTORY-FIT-001",
+      "relation": "derived_from",
+      "target_asset_id": "EVIDENCE-T30-A14-FORWARD-STREAM-RUNTIME-001"
+    },
+    {
+      "source_asset_id": "EVIDENCE-T30-A14-FORWARD-STREAM-RUNTIME-FACTORY-FIT-001",
+      "relation": "validated_by",
+      "target_asset_id": "TEST-T30-FORWARD-STREAM-RUNTIME-HARNESS-001"
+    },
+    {
       "source_asset_id": "EVIDENCE-T30-A2-CATALOG-FACTORY-FIT-001",
       "relation": "derived_from",
       "target_asset_id": "EVIDENCE-T30-A1-BOUNDARY-SEMANTICS-001"
@@ -3876,6 +3906,11 @@
       "source_asset_id": "FIXTURE-T30-FORWARD-STREAM-OWNER-PACKET-001",
       "relation": "derived_from",
       "target_asset_id": "CONFIG-T30-FORWARD-STREAM-OWNER-PACKET-001"
+    },
+    {
+      "source_asset_id": "FIXTURE-T30-FORWARD-STREAM-RUNTIME-HARNESS-001",
+      "relation": "derived_from",
+      "target_asset_id": "CONFIG-T30-FORWARD-STREAM-RUNTIME-HARNESS-001"
     },
     {
       "source_asset_id": "FIXTURE-T30-GECKO-INTERVAL-SEMANTICS-001",
@@ -4743,6 +4778,21 @@
       "target_asset_id": "CONFIG-T30-FORWARD-STREAM-OWNER-PACKET-001"
     },
     {
+      "source_asset_id": "MODULE-T30-FORWARD-STREAM-RUNTIME-HARNESS-001",
+      "relation": "depends_on",
+      "target_asset_id": "CONTRACT-T30-FORWARD-STREAM-RUNTIME-HARNESS-001"
+    },
+    {
+      "source_asset_id": "MODULE-T30-FORWARD-STREAM-RUNTIME-HARNESS-001",
+      "relation": "depends_on",
+      "target_asset_id": "MODULE-T08-LIFECYCLE-DISCOVERY-TRANSPORT-001"
+    },
+    {
+      "source_asset_id": "MODULE-T30-FORWARD-STREAM-RUNTIME-HARNESS-001",
+      "relation": "governed_by",
+      "target_asset_id": "CONFIG-T30-FORWARD-STREAM-RUNTIME-HARNESS-001"
+    },
+    {
       "source_asset_id": "MODULE-T30-GECKO-INTERVAL-SEMANTICS-001",
       "relation": "governed_by",
       "target_asset_id": "CONFIG-T30-GECKO-INTERVAL-SEMANTICS-001"
@@ -5213,6 +5263,11 @@
       "target_asset_id": "SCRIPT-T30-FORWARD-STREAM-OWNER-PACKET-001"
     },
     {
+      "source_asset_id": "REPORT-T30-FORWARD-STREAM-RUNTIME-HARNESS-001",
+      "relation": "derived_from",
+      "target_asset_id": "SCRIPT-T30-FORWARD-STREAM-RUNTIME-HARNESS-001"
+    },
+    {
       "source_asset_id": "REPORT-T30-H07-H01-DATA-CONTRACT-GATE-001",
       "relation": "derived_from",
       "target_asset_id": "MODULE-T30-H07-H01-DATA-CONTRACT-GATE-001"
@@ -5616,6 +5671,11 @@
       "source_asset_id": "SCHEMA-T30-FORWARD-STREAM-OWNER-PACKET-001",
       "relation": "governed_by",
       "target_asset_id": "CONTRACT-T30-FORWARD-STREAM-OWNER-PACKET-001"
+    },
+    {
+      "source_asset_id": "SCHEMA-T30-FORWARD-STREAM-RUNTIME-HARNESS-001",
+      "relation": "governed_by",
+      "target_asset_id": "CONTRACT-T30-FORWARD-STREAM-RUNTIME-HARNESS-001"
     },
     {
       "source_asset_id": "SCHEMA-T30-GECKO-INTERVAL-SEMANTICS-001",
@@ -6041,6 +6101,16 @@
       "source_asset_id": "SCRIPT-T30-FORWARD-STREAM-OWNER-PACKET-001",
       "relation": "governed_by",
       "target_asset_id": "CONFIG-T30-FORWARD-STREAM-OWNER-PACKET-001"
+    },
+    {
+      "source_asset_id": "SCRIPT-T30-FORWARD-STREAM-RUNTIME-HARNESS-001",
+      "relation": "depends_on",
+      "target_asset_id": "MODULE-T30-FORWARD-STREAM-RUNTIME-HARNESS-001"
+    },
+    {
+      "source_asset_id": "SCRIPT-T30-FORWARD-STREAM-RUNTIME-HARNESS-001",
+      "relation": "governed_by",
+      "target_asset_id": "CONFIG-T30-FORWARD-STREAM-RUNTIME-HARNESS-001"
     },
     {
       "source_asset_id": "SCRIPT-T30-GECKO-INTERVAL-SEMANTICS-001",
@@ -7466,6 +7536,21 @@
       "source_asset_id": "TEST-T30-FORWARD-STREAM-OWNER-PACKET-001",
       "relation": "depends_on",
       "target_asset_id": "SCHEMA-T30-FORWARD-STREAM-OWNER-PACKET-001"
+    },
+    {
+      "source_asset_id": "TEST-T30-FORWARD-STREAM-RUNTIME-HARNESS-001",
+      "relation": "depends_on",
+      "target_asset_id": "FIXTURE-T30-FORWARD-STREAM-RUNTIME-HARNESS-001"
+    },
+    {
+      "source_asset_id": "TEST-T30-FORWARD-STREAM-RUNTIME-HARNESS-001",
+      "relation": "depends_on",
+      "target_asset_id": "MODULE-T30-FORWARD-STREAM-RUNTIME-HARNESS-001"
+    },
+    {
+      "source_asset_id": "TEST-T30-FORWARD-STREAM-RUNTIME-HARNESS-001",
+      "relation": "depends_on",
+      "target_asset_id": "SCHEMA-T30-FORWARD-STREAM-RUNTIME-HARNESS-001"
     },
     {
       "source_asset_id": "TEST-T30-GECKO-INTERVAL-SEMANTICS-001",
