@@ -1,0 +1,128 @@
+{
+  "schema": "smial.task30.a14p-r2-forward-stream-external-capture.receipt",
+  "schema_version": "1.0",
+  "receipt_id": "T30-A14P-R2-FORWARD-STREAM-EXTERNAL-CAPTURE-001",
+  "task_id": "TASK-30",
+  "atom_id": "T30-A14P_R2_FORWARD_STREAM_EXTERNAL_CAPTURE_V1",
+  "as_of": "2026-08-12",
+  "repository": {
+    "main_commit": "530aeb0831c07215788dc46020110245da9e7a0a",
+    "tree": "a4f48190cd1849e5e9c85c197b78873a39f41b74",
+    "ci_run": "31544798266",
+    "ci_job": "93954870914"
+  },
+  "authorization": {
+    "profile": "T30-A14P_FORWARD_STREAM_RUNTIME_V2",
+    "owner_gate_consumed": true,
+    "one_shot": true,
+    "retry": false,
+    "reconnect": false,
+    "fallback": false,
+    "scheduler": false
+  },
+  "target": {
+    "network": "solana",
+    "pool_address": "URqx24yyYxtXXhTbBQnbtPLhtLWYoaDaRxuQuLpNS3S",
+    "base_mint": "DMwbVy48dWVKGe9z1pcVnwF3HLMLrqWdDLfbvx8RchhK",
+    "provider": "HELIUS",
+    "method": "transactionSubscribe",
+    "filter": "accountInclude=[pool], failed=false, vote=false"
+  },
+  "run": {
+    "run_id": "20260811T230539Z-98685481",
+    "logical_run_root": "local/task30_forward_stream_v2/run=20260811T230539Z-98685481",
+    "started_at": "2026-08-11T23:05:39.825765Z",
+    "terminal_at": "2026-08-11T23:11:15.587130Z",
+    "terminal_state": "TRANSPORT_LOST_UNKNOWN",
+    "unknown": true,
+    "notifications": 0,
+    "stream_bytes": 148,
+    "estimated_credits": 3,
+    "raw_retention": "A4_EXACT_RETAINED",
+    "interval_projectable": false,
+    "zero_volume": false,
+    "empty_interval": false,
+    "task30_trial": false
+  },
+  "provider_acknowledgement": {
+    "observed": true,
+    "kind": "ERROR",
+    "code": -32600,
+    "message": "transactionSubscribe is not available on the free plan",
+    "disposition": "EXPLICIT_FREE_PLAN_METHOD_REJECTION",
+    "runtime_terminal_preserved": "TRANSPORT_LOST_UNKNOWN"
+  },
+  "retained_evidence": {
+    "raw_git_status": "OUTSIDE_GIT_IGNORED_A4",
+    "raw_manifest": {"path": "raw_manifest.json", "bytes": 436, "sha256": "a729d57411c0f6390d98dc8f3d787dfbb3b0673b1817aa3b79c21ba748011c5a"},
+    "raw_objects": [{"path": "acknowledgement.json", "bytes": 148, "sha256": "cfdd29824510eb34ed48e1a8b22f1adb107c2d05bdf5564418c5065aee0f26b1", "observed_at": "2026-08-11T23:05:40.425886Z"}],
+    "attempt_started_sha256": "462e4f787344efd2b007a2fdb6b7c4dc914f76f73364ce0e7dcd49952cf14b43",
+    "terminal_receipt_sha256": "a2684c3df6fc616d0ec562940f5e12a862ab6880227c902ea7352471216a960e",
+    "manifest_object_count": 1
+  },
+  "authority_and_cost": {
+    "provider_api_rpc_wss_calls": 1,
+    "credential_reads": 1,
+    "raw_external_data_writes": 1,
+    "raw_data_tracked_in_git": false,
+    "cash_spend_usd": 0,
+    "wallet_signer_transaction_actions": 0,
+    "task30_trial_or_acceptance_actions": 0,
+    "credit_estimate_is_not_billing_claim": true
+  },
+  "decision": {
+    "value": "HELIUS_TRANSACTION_SUBSCRIBE_FREE_PLAN_NOT_AVAILABLE",
+    "evidence_strength": "EXPLICIT_PROVIDER_PLAN_RESPONSE",
+    "provider_suitability_for_this_route": false,
+    "alternate_provider_authorized": false,
+    "paid_plan_purchase_authorized": false,
+    "task30_acceptance": false
+  },
+  "non_claims": {
+    "pool_activity": false,
+    "interval_coverage": false,
+    "empty_interval": false,
+    "zero_volume": false,
+    "market_price": false,
+    "alpha": false,
+    "strategy": false,
+    "execution": false,
+    "settlement": false,
+    "pnl": false,
+    "numeric_netreturn": false,
+    "unknown_reconciled": false
+  },
+  "factory_fit_review": {
+    "scope": "FULL_REVIEW",
+    "verdict": "PASS_WITH_LIMITATIONS",
+    "mission": "PASS",
+    "research_truth": "PASS",
+    "owner_operability": "PASS_WITH_LIMITATIONS",
+    "monitoring_recovery": "PASS",
+    "reuse_first": "PASS",
+    "execution_to_cashflow": "NOT_APPLICABLE_YET",
+    "red_team": "PASS"
+  },
+  "product_horizon": {
+    "now": {
+      "candidate": "ONE_BOUNDED_ALTERNATE_PROVIDER_READ_ROUTE_DECISION",
+      "value": "Choose whether a free/credentialed alternative can answer the same technical question without paying for a Helius plan.",
+      "evidence": "Helius explicitly rejects transactionSubscribe on the current free plan; no market observation was obtained.",
+      "cost_risk": "One new provider-specific owner gate; no automatic fallback.",
+      "owner": "GOAL_OWNER",
+      "activation_trigger": "Owner selects an alternate provider route and issues an exact bounded gate.",
+      "why": "The current route is closed by a plan boundary, not by pool data scarcity."
+    },
+    "watch": {
+      "candidate": "PAID_HELIUS_PLAN",
+      "value": "Could unlock transactionSubscribe only if that surface is still strategically necessary.",
+      "evidence": "No measured product value beyond the rejected technical request.",
+      "cost_risk": "Recurring cash cost and provider lock-in.",
+      "owner": "GOAL_OWNER",
+      "activation_trigger": "A named consumer proves that an alternate route cannot provide the required evidence and paid access has positive expected value.",
+      "why": "Do not buy quota to rescue an unproven route."
+    }
+  },
+  "project_sources_disposition": {"kind": "NO_CHANGE"},
+  "state_change": "NONE"
+}
