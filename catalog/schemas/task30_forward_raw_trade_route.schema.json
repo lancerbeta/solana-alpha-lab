@@ -1,0 +1,25 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "TASK-30 forward raw trade route policy",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema", "schema_version", "task_id", "atom_id", "contract_id", "consumer", "frozen_definition", "reference_subject", "future_route", "coverage_states", "synthetic_envelope", "reconciliation", "reuse_research", "authority", "non_claims", "project_sources_disposition"],
+  "properties": {
+    "schema": {"const": "smial.task30.forward-raw-trade-route.policy"},
+    "schema_version": {"const": "1.0"},
+    "task_id": {"const": "TASK-30"},
+    "atom_id": {"const": "T30-A12_FORWARD_RAW_TRADE_ROUTE_OFFLINE_CONTRACT_V1"},
+    "contract_id": {"const": "CONTRACT-T30-FORWARD-RAW-TRADE-ROUTE-001"},
+    "consumer": {"const": "RC001-H07-H01-LIQUIDITY-RETENTION_FORWARD_DATA_ENTRY_GATE"},
+    "frozen_definition": {"type": "object", "additionalProperties": false, "required": ["group_id", "parameter_id", "interval_seconds"], "properties": {"group_id": {"const": "RC001-H07-H01-LIQUIDITY-RETENTION"}, "parameter_id": {"const": "OBSERVATION_WINDOW_15M"}, "interval_seconds": {"const": 900}}},
+    "reference_subject": {"type": "object", "additionalProperties": false, "required": ["pool_address", "representativeness"], "properties": {"pool_address": {"const": "URqx24yyYxtXXhTbBQnbtPLhtLWYoaDaRxuQuLpNS3S"}, "representativeness": {"const": "NOT_ESTABLISHED"}}},
+    "future_route": {"type": "object"},
+    "coverage_states": {"type": "array", "const": ["COMPLETE", "GAP_SUSPECTED", "UNKNOWN", "RECONCILED", "INVALID", "STOPPED"]},
+    "synthetic_envelope": {"type": "object"},
+    "reconciliation": {"type": "object"},
+    "reuse_research": {"type": "object"},
+    "authority": {"type": "object"},
+    "non_claims": {"type": "object"},
+    "project_sources_disposition": {"const": "NO_CHANGE"}
+  }
+}
