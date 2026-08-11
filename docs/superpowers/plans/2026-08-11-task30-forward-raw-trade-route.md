@@ -33,7 +33,7 @@
 - Consumes: `configs/task28_rc001_registry_freeze_v1.yaml` and the committed A12 design.
 - Produces: a schema-valid `ForwardRawTradeRoutePolicy` fixture and tests that call `validate_forward_raw_trade_route_policy()` and `evaluate_forward_coverage()` from Task 2.
 
-- [ ] **Step 1: Write the failing contract tests**
+- [x] **Step 1: Write the failing contract tests**
 
 ```python
 def test_policy_binds_frozen_consumer_and_every_external_authority_is_zero(self) -> None:
@@ -52,13 +52,13 @@ def test_duplicate_signature_reconnect_without_coverage_and_wrong_identity_fail_
                 evaluate_forward_coverage(policy(), frozen_group(), events)
 ```
 
-- [ ] **Step 2: Run the new test and confirm the missing module fails**
+- [x] **Step 2: Run the new test and confirm the missing module fails**
 
 Run: `uv run --locked --managed-python python -B -m unittest tests.test_task30_forward_raw_trade_route`
 
 Expected: FAIL because `solana_alpha_lab.task30_forward_raw_trade_route` does not exist.
 
-- [ ] **Step 3: Write the minimal policy, schema and synthetic fixture**
+- [x] **Step 3: Write the minimal policy, schema and synthetic fixture**
 
 ```yaml
 authority:
@@ -72,13 +72,13 @@ future_external_boundary: OWNER_PACKET_REQUIRED
 
 The fixture must contain one valid synthetic observation sequence and separate adversarial cases for duplicate signature, wrong identity, loss of transport, unreconciled reconnect, missing raw hash, zero/empty coercion, retry and fallback.
 
-- [ ] **Step 4: Run schema and fixture tests after each policy change**
+- [x] **Step 4: Run schema and fixture tests after each policy change**
 
 Run: `uv run --locked --managed-python python -B -m unittest tests.test_task30_forward_raw_trade_route`
 
 Expected: tests still fail only because the pure evaluator is absent; YAML and JSON schema loading must not be the failure cause.
 
-- [ ] **Step 5: Commit the contract surface**
+- [x] **Step 5: Commit the contract surface**
 
 ```bash
 git add docs/tasks/TASK-30-forward-raw-trade-route.md docs/contracts/task30_forward_raw_trade_route_contract_v1.md configs/task30_forward_raw_trade_route_contract_v1.yaml catalog/schemas/task30_forward_raw_trade_route.schema.json tests/fixtures/task30/forward_raw_trade_route_v1.json tests/test_task30_forward_raw_trade_route.py
@@ -97,7 +97,7 @@ git commit -m "test: define forward raw trade route contract"
 - Consumes: the Task 1 policy and synthetic fixtures.
 - Produces: `validate_forward_raw_trade_route_policy(policy, frozen_group)`, `evaluate_forward_coverage(policy, frozen_group, events)`, and `render_forward_raw_trade_route_readout(result)`.
 
-- [ ] **Step 1: Implement exact policy validation**
+- [x] **Step 1: Implement exact policy validation**
 
 ```python
 def validate_forward_raw_trade_route_policy(policy: Mapping[str, Any], frozen_group: Mapping[str, Any]) -> None:
@@ -107,7 +107,7 @@ def validate_forward_raw_trade_route_policy(policy: Mapping[str, Any], frozen_gr
         _require(value in (0, False), "AUTHORITY_PROMOTION")
 ```
 
-- [ ] **Step 2: Implement fail-closed synthetic coverage evaluation**
+- [x] **Step 2: Implement fail-closed synthetic coverage evaluation**
 
 ```python
 def evaluate_forward_coverage(policy, frozen_group, events):
@@ -121,17 +121,17 @@ def evaluate_forward_coverage(policy, frozen_group, events):
 
 The `COMPLETE` result means only that the synthetic coverage protocol is internally complete. It must not assert data completeness, a valid price, no-trade, PIT eligibility, H07/H01 evidence, a trial, execution, settlement, PnL or NetReturn.
 
-- [ ] **Step 3: Add the deterministic Russian readout**
+- [x] **Step 3: Add the deterministic Russian readout**
 
 The readout must show one of `OFFLINE_CONTRACT_VALIDATED`, `UNKNOWN` or `STOPPED`, list the reason external authority is still required, and state that no provider has been selected. It must contain no URL, credential-shaped text, raw payload, price, volume or numeric performance claim.
 
-- [ ] **Step 4: Run targeted behavior and readout tests**
+- [x] **Step 4: Run targeted behavior and readout tests**
 
 Run: `uv run --locked --managed-python python -B -m unittest tests.test_task30_forward_raw_trade_route`
 
 Expected: PASS, including every adversarial case and byte-for-byte CLI/report comparison.
 
-- [ ] **Step 5: Commit the pure evaluator**
+- [x] **Step 5: Commit the pure evaluator**
 
 ```bash
 git add src/solana_alpha_lab/task30_forward_raw_trade_route.py scripts/show_task30_forward_raw_trade_route.py docs/reports/task30/forward_raw_trade_route_readout_v1.md tests/test_task30_forward_raw_trade_route.py
@@ -152,7 +152,7 @@ git commit -m "feat: evaluate forward raw trade coverage offline"
 - Consumes: all Task 1–2 artifact hashes and the A12 design/plan paths.
 - Produces: a hash-bound `PASS_WITH_LIMITATIONS` receipt, complete Catalog registrations and generated navigation.
 
-- [ ] **Step 1: Extend the test with immutable acceptance checks**
+- [x] **Step 1: Extend the test with immutable acceptance checks**
 
 ```python
 def test_acceptance_binds_every_artifact_and_cannot_promote_authority(self) -> None:
@@ -164,17 +164,17 @@ def test_acceptance_binds_every_artifact_and_cannot_promote_authority(self) -> N
         assert_acceptance(candidate)
 ```
 
-- [ ] **Step 2: Create the acceptance receipt and register all durable assets**
+- [x] **Step 2: Create the acceptance receipt and register all durable assets**
 
 Bind task, contract, configuration, schema, fixture, module, script, report, test, design and plan by exact SHA-256. The receipt must declare `state_change=NONE`, `project_sources_disposition=NO_CHANGE`, full Factory Fit, the `REUSE_DECISION=WRAP_CANDIDATE` finding, and every authority/side-effect counter at zero.
 
-- [ ] **Step 3: Regenerate only the derived Catalog views**
+- [x] **Step 3: Regenerate only the derived Catalog views**
 
 Run: `uv run --locked --managed-python python -B scripts/generate_navigation.py --write`
 
 Expected: only `catalog/generated/asset_edges.json`, `docs/PROJECT_MAP.md` and `docs/OPERATOR_NAVIGATION.md` change as required by the Catalog.
 
-- [ ] **Step 4: Run targeted integrity validation**
+- [x] **Step 4: Run targeted integrity validation**
 
 Run:
 
@@ -187,7 +187,7 @@ git diff --check
 
 Expected: all PASS and no unregistered durable output or generated-view drift.
 
-- [ ] **Step 5: Commit the bound offline package**
+- [x] **Step 5: Commit the bound offline package**
 
 ```bash
 git add docs/evidence/task30/a12_forward_raw_trade_route_acceptance_v1.json catalog/assets/core.yaml catalog/generated/asset_edges.json docs/PROJECT_MAP.md docs/OPERATOR_NAVIGATION.md tests/test_task30_forward_raw_trade_route.py

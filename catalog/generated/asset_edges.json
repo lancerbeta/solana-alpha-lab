@@ -533,6 +533,11 @@
       "target_asset_id": "CONTRACT-T30-BIRDEYE-V3-HISTORY-PILOT-001"
     },
     {
+      "source_asset_id": "CONFIG-T30-FORWARD-RAW-TRADE-ROUTE-001",
+      "relation": "governed_by",
+      "target_asset_id": "CONTRACT-T30-FORWARD-RAW-TRADE-ROUTE-001"
+    },
+    {
       "source_asset_id": "CONFIG-T30-GECKO-INTERVAL-SEMANTICS-001",
       "relation": "governed_by",
       "target_asset_id": "CONTRACT-T30-GECKO-INTERVAL-SEMANTICS-001"
@@ -1126,6 +1131,11 @@
       "source_asset_id": "CONTRACT-T30-BIRDEYE-V3-HISTORY-PILOT-001",
       "relation": "derived_from",
       "target_asset_id": "EVIDENCE-T30-A4-REUSE-FIRST-HISTORY-ROUTE-001"
+    },
+    {
+      "source_asset_id": "CONTRACT-T30-FORWARD-RAW-TRADE-ROUTE-001",
+      "relation": "depends_on",
+      "target_asset_id": "EVIDENCE-T30-A11E-GECKO-LIVE-SHAKEDOWN-RUNTIME-001"
     },
     {
       "source_asset_id": "CONTRACT-T30-GECKO-INTERVAL-SEMANTICS-001",
@@ -3113,6 +3123,16 @@
       "target_asset_id": "TEST-T30-A11E-GECKO-LIVE-SHAKEDOWN-RUNTIME-001"
     },
     {
+      "source_asset_id": "EVIDENCE-T30-A12-FORWARD-RAW-TRADE-ROUTE-001",
+      "relation": "derived_from",
+      "target_asset_id": "CONTRACT-T30-FORWARD-RAW-TRADE-ROUTE-001"
+    },
+    {
+      "source_asset_id": "EVIDENCE-T30-A12-FORWARD-RAW-TRADE-ROUTE-001",
+      "relation": "validated_by",
+      "target_asset_id": "TEST-T30-FORWARD-RAW-TRADE-ROUTE-001"
+    },
+    {
       "source_asset_id": "EVIDENCE-T30-A2-CATALOG-FACTORY-FIT-001",
       "relation": "derived_from",
       "target_asset_id": "EVIDENCE-T30-A1-BOUNDARY-SEMANTICS-001"
@@ -3811,6 +3831,16 @@
       "source_asset_id": "FIXTURE-T30-BIRDEYE-V3-HISTORY-PILOT-001",
       "relation": "derived_from",
       "target_asset_id": "CONFIG-T30-BIRDEYE-V3-HISTORY-PILOT-001"
+    },
+    {
+      "source_asset_id": "FIXTURE-T30-FORWARD-RAW-TRADE-ROUTE-001",
+      "relation": "derived_from",
+      "target_asset_id": "CONFIG-T30-FORWARD-RAW-TRADE-ROUTE-001"
+    },
+    {
+      "source_asset_id": "FIXTURE-T30-FORWARD-RAW-TRADE-ROUTE-001",
+      "relation": "governed_by",
+      "target_asset_id": "CONTRACT-T30-FORWARD-RAW-TRADE-ROUTE-001"
     },
     {
       "source_asset_id": "FIXTURE-T30-GECKO-INTERVAL-SEMANTICS-001",
@@ -4658,6 +4688,16 @@
       "target_asset_id": "EVIDENCE-T30-A5-BIRDEYE-V3-HISTORY-PILOT-001"
     },
     {
+      "source_asset_id": "MODULE-T30-FORWARD-RAW-TRADE-ROUTE-001",
+      "relation": "derived_from",
+      "target_asset_id": "CONTRACT-T30-FORWARD-RAW-TRADE-ROUTE-001"
+    },
+    {
+      "source_asset_id": "MODULE-T30-FORWARD-RAW-TRADE-ROUTE-001",
+      "relation": "validated_by",
+      "target_asset_id": "TEST-T30-FORWARD-RAW-TRADE-ROUTE-001"
+    },
+    {
       "source_asset_id": "MODULE-T30-GECKO-INTERVAL-SEMANTICS-001",
       "relation": "governed_by",
       "target_asset_id": "CONFIG-T30-GECKO-INTERVAL-SEMANTICS-001"
@@ -5108,6 +5148,11 @@
       "target_asset_id": "EVIDENCE-T23-A4-BOUNDED-ANALYSIS-001"
     },
     {
+      "source_asset_id": "REPORT-T30-FORWARD-RAW-TRADE-ROUTE-001",
+      "relation": "derived_from",
+      "target_asset_id": "SCRIPT-T30-FORWARD-RAW-TRADE-ROUTE-001"
+    },
+    {
       "source_asset_id": "REPORT-T30-H07-H01-DATA-CONTRACT-GATE-001",
       "relation": "derived_from",
       "target_asset_id": "MODULE-T30-H07-H01-DATA-CONTRACT-GATE-001"
@@ -5501,6 +5546,11 @@
       "source_asset_id": "SCHEMA-T30-BIRDEYE-V3-HISTORY-PILOT-001",
       "relation": "governed_by",
       "target_asset_id": "CONTRACT-T30-BIRDEYE-V3-HISTORY-PILOT-001"
+    },
+    {
+      "source_asset_id": "SCHEMA-T30-FORWARD-RAW-TRADE-ROUTE-001",
+      "relation": "governed_by",
+      "target_asset_id": "CONTRACT-T30-FORWARD-RAW-TRADE-ROUTE-001"
     },
     {
       "source_asset_id": "SCHEMA-T30-GECKO-INTERVAL-SEMANTICS-001",
@@ -5906,6 +5956,16 @@
       "source_asset_id": "SCRIPT-T22-SPLIT-RESOLUTION-001",
       "relation": "depends_on",
       "target_asset_id": "MODULE-T22-SPLIT-RESOLUTION-001"
+    },
+    {
+      "source_asset_id": "SCRIPT-T30-FORWARD-RAW-TRADE-ROUTE-001",
+      "relation": "depends_on",
+      "target_asset_id": "MODULE-T30-FORWARD-RAW-TRADE-ROUTE-001"
+    },
+    {
+      "source_asset_id": "SCRIPT-T30-FORWARD-RAW-TRADE-ROUTE-001",
+      "relation": "governed_by",
+      "target_asset_id": "CONFIG-T30-FORWARD-RAW-TRADE-ROUTE-001"
     },
     {
       "source_asset_id": "SCRIPT-T30-GECKO-INTERVAL-SEMANTICS-001",
@@ -7306,6 +7366,16 @@
       "source_asset_id": "TEST-T30-BIRDEYE-V3-HISTORY-PILOT-001",
       "relation": "depends_on",
       "target_asset_id": "SCHEMA-T30-BIRDEYE-V3-HISTORY-PILOT-001"
+    },
+    {
+      "source_asset_id": "TEST-T30-FORWARD-RAW-TRADE-ROUTE-001",
+      "relation": "depends_on",
+      "target_asset_id": "CONFIG-T30-FORWARD-RAW-TRADE-ROUTE-001"
+    },
+    {
+      "source_asset_id": "TEST-T30-FORWARD-RAW-TRADE-ROUTE-001",
+      "relation": "depends_on",
+      "target_asset_id": "MODULE-T30-FORWARD-RAW-TRADE-ROUTE-001"
     },
     {
       "source_asset_id": "TEST-T30-GECKO-INTERVAL-SEMANTICS-001",

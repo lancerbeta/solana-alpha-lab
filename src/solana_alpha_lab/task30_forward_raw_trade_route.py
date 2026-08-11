@@ -256,6 +256,5 @@ def render_forward_raw_trade_route_readout(result: Mapping[str, Any]) -> str:
             "## Следующая граница",
             "",
             next_step,
-            "",
         ]
     )
