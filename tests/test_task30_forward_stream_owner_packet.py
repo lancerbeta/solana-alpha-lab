@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import json
 import copy
+import hashlib
 import subprocess
 import sys
 import unittest
@@ -28,6 +29,13 @@ SCHEMA_PATH = ROOT / "catalog/schemas/task30_forward_stream_owner_packet.schema.
 FIXTURE_PATH = ROOT / "tests/fixtures/task30/forward_stream_owner_packet_v1.json"
 SCRIPT_PATH = ROOT / "scripts/show_task30_forward_stream_owner_packet.py"
 READOUT_PATH = ROOT / "docs/reports/task30/forward_stream_owner_packet_readout_v1.md"
+ACCEPTANCE_PATH = (
+    ROOT / "docs/evidence/task30/a13_forward_stream_owner_packet_acceptance_v1.json"
+)
+FACTORY_FIT_PATH = (
+    ROOT / "docs/evidence/task30/a13_forward_stream_owner_packet_factory_fit_v1.json"
+)
+CATALOG_CORE_PATH = ROOT / "catalog/assets/core.yaml"
 
 
 def replace_pointer(
@@ -38,6 +46,27 @@ def replace_pointer(
     for part in parts[:-1]:
         target = target[part]  # type: ignore[assignment,index]
     target[parts[-1]] = replacement
+
+
+def sha256(path: Path) -> str:
+    return hashlib.sha256(path.read_bytes()).hexdigest()
+
+
+def assert_acceptance(receipt: dict[str, object]) -> None:
+    decision = receipt["decision"]  # type: ignore[index]
+    authority = receipt["authority"]  # type: ignore[index]
+    side_effects = receipt["side_effect_counters"]  # type: ignore[index]
+    non_claims = receipt["non_claims"]  # type: ignore[index]
+    assert isinstance(decision, dict)
+    assert isinstance(authority, dict)
+    assert isinstance(side_effects, dict)
+    assert isinstance(non_claims, dict)
+    assert decision["provider_selected"] is False
+    assert decision["external_capture_authorized"] is False
+    assert decision["trial_admissible"] is False
+    assert all(value == 0 for value in authority.values())
+    assert all(value == 0 for value in side_effects.values())
+    assert all(value is False for value in non_claims.values())
 
 
 class Task30ForwardStreamOwnerPacketTests(unittest.TestCase):
@@ -209,3 +238,65 @@ class Task30ForwardStreamOwnerPacketTests(unittest.TestCase):
             completed.stdout,
             READOUT_PATH.read_text(encoding="utf-8"),
         )
+
+    def test_acceptance_factory_fit_and_catalog_bind_the_offline_boundary(self) -> None:
+        """A13 cannot ship without hashes, FULL review, zero authority and discovery."""
+        self.assertTrue(
+            ACCEPTANCE_PATH.exists(),
+            "T30-A13 must include a hash-bound acceptance receipt",
+        )
+        self.assertTrue(
+            FACTORY_FIT_PATH.exists(),
+            "T30-A13 must include a FULL_REVIEW Factory Fit receipt",
+        )
+        if not ACCEPTANCE_PATH.exists() or not FACTORY_FIT_PATH.exists():
+            return
+
+        acceptance = json.loads(ACCEPTANCE_PATH.read_text(encoding="utf-8"))
+        factory_fit = json.loads(FACTORY_FIT_PATH.read_text(encoding="utf-8"))
+        catalog = yaml.safe_load(CATALOG_CORE_PATH.read_text(encoding="utf-8"))
+
+        for binding in acceptance["artifact_bindings"].values():
+            path = ROOT / binding["path"]
+            self.assertEqual(binding["sha256"], sha256(path))
+        assert_acceptance(acceptance)
+        self.assertEqual(
+            acceptance["decision"]["value"],
+            "OFFLINE_FORWARD_STREAM_OWNER_PACKET_VALIDATED",
+        )
+        self.assertEqual(
+            acceptance["project_sources_disposition"]["kind"], "NO_CHANGE"
+        )
+        self.assertEqual(
+            acceptance["reuse_research"]["decision"], "WRAP_CANDIDATE"
+        )
+        self.assertEqual(factory_fit["review_scope"], "FULL_REVIEW")
+        self.assertEqual(factory_fit["verdict"], "PASS_WITH_LIMITATIONS")
+        self.assertEqual(
+            factory_fit["reuse_first"]["outcome"], "WRAP_CANDIDATE"
+        )
+        self.assertEqual(
+            factory_fit["product_horizon"]["now"]["candidate"],
+            "ONE_EXACT_OWNER_EXTERNAL_READ_GATE",
+        )
+
+        assets = {asset["asset_id"] for asset in catalog["records"]}
+        self.assertTrue(
+            {
+                "CONTRACT-T30-FORWARD-STREAM-OWNER-PACKET-001",
+                "CONFIG-T30-FORWARD-STREAM-OWNER-PACKET-001",
+                "SCHEMA-T30-FORWARD-STREAM-OWNER-PACKET-001",
+                "FIXTURE-T30-FORWARD-STREAM-OWNER-PACKET-001",
+                "MODULE-T30-FORWARD-STREAM-OWNER-PACKET-001",
+                "SCRIPT-T30-FORWARD-STREAM-OWNER-PACKET-001",
+                "REPORT-T30-FORWARD-STREAM-OWNER-PACKET-001",
+                "TEST-T30-FORWARD-STREAM-OWNER-PACKET-001",
+                "EVIDENCE-T30-A13-FORWARD-STREAM-OWNER-PACKET-001",
+                "EVIDENCE-T30-A13-FORWARD-STREAM-OWNER-PACKET-FACTORY-FIT-001",
+            }.issubset(assets)
+        )
+
+        invalid = copy.deepcopy(acceptance)
+        invalid["side_effect_counters"]["provider_api_rpc_wss_calls"] = 1
+        with self.assertRaises(AssertionError):
+            assert_acceptance(invalid)
