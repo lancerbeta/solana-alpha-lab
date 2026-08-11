@@ -1,0 +1,80 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "TASK-30 two-slot live shakedown runtime policy",
+  "type": "object",
+  "required": ["schema", "schema_version", "task_id", "atom_id", "contract_id", "consumer", "frozen_candidate", "request", "shakedown_shape", "retention", "authority", "non_claims", "project_sources_disposition"],
+  "properties": {
+    "schema": {"const": "smial.task30.two-slot-live-shakedown-runtime"},
+    "schema_version": {"const": "1.0"},
+    "task_id": {"const": "TASK-30"},
+    "atom_id": {"const": "T30-A11C_TWO_SLOT_SHAKEDOWN_RUNTIME_HARNESS_V1"},
+    "contract_id": {"const": "CONTRACT-T30-TWO-SLOT-LIVE-SHAKEDOWN-RUNTIME-001"},
+    "consumer": {"const": "OWNER_TWO_SLOT_LIVE_SHAKEDOWN_EXECUTION_GATE"},
+    "frozen_candidate": {
+      "type": "object",
+      "required": ["provider", "network", "pool_address", "base_url", "path_template"],
+      "properties": {
+        "provider": {"const": "GECKOTERMINAL_PUBLIC_KEYLESS"},
+        "network": {"const": "solana"},
+        "pool_address": {"const": "URqx24yyYxtXXhTbBQnbtPLhtLWYoaDaRxuQuLpNS3S"},
+        "base_url": {"const": "https://api.geckoterminal.com/api/v2"},
+        "path_template": {"const": "/networks/solana/pools/{pool}/ohlcv/minute"}
+      },
+      "additionalProperties": false
+    },
+    "request": {
+      "type": "object",
+      "required": ["method", "aggregate", "currency", "token", "include_empty_intervals", "limit", "request_timeout_seconds", "response_bytes_max", "retry", "fallback", "credentials"],
+      "properties": {
+        "method": {"const": "GET"},
+        "aggregate": {"const": "15"},
+        "currency": {"const": "usd"},
+        "token": {"const": "base"},
+        "include_empty_intervals": {"const": "false"},
+        "limit": {"const": "1"},
+        "request_timeout_seconds": {"const": 20},
+        "response_bytes_max": {"const": 4194304},
+        "retry": {"const": false},
+        "fallback": {"const": false},
+        "credentials": {"const": false}
+      },
+      "additionalProperties": false
+    },
+    "shakedown_shape": {
+      "type": "object",
+      "required": ["interval_seconds", "offset_seconds", "requests_per_slot_max", "requests_total_max", "late_offset_seconds_max", "scheduler"],
+      "properties": {
+        "interval_seconds": {"const": 900},
+        "offset_seconds": {"const": [0, 15, 30, 60]},
+        "requests_per_slot_max": {"const": 4},
+        "requests_total_max": {"const": 8},
+        "late_offset_seconds_max": {"const": 15},
+        "scheduler": {"const": false}
+      },
+      "additionalProperties": false
+    },
+    "retention": {
+      "type": "object",
+      "required": ["policy", "raw_json_outside_git", "raw_root_relative", "immediate_manifest_after_every_response", "immediate_health_receipt_after_every_response"],
+      "properties": {
+        "policy": {"const": "A4"},
+        "raw_json_outside_git": {"const": true},
+        "raw_root_relative": {"const": "local/task30_two_slot_live_shakedown"},
+        "immediate_manifest_after_every_response": {"const": true},
+        "immediate_health_receipt_after_every_response": {"const": true}
+      },
+      "additionalProperties": false
+    },
+    "authority": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "provider_api_rpc_wss_calls": {"const": 0}, "credential_use": {"const": 0}, "raw_data_writes": {"const": 0}, "scheduler_or_background_processes": {"const": 0}, "r2_r3_access": {"const": 0}, "wallet_signer_transaction_actions": {"const": 0}, "cash_spend_usd_cents": {"const": 0}, "task30_trial_or_acceptance_actions": {"const": 0}
+      },
+      "required": ["provider_api_rpc_wss_calls", "credential_use", "raw_data_writes", "scheduler_or_background_processes", "r2_r3_access", "wallet_signer_transaction_actions", "cash_spend_usd_cents", "task30_trial_or_acceptance_actions"]
+    },
+    "non_claims": {"type": "object", "additionalProperties": false, "properties": {"pit_admissible": {"const": false}, "h07_h01_evidence": {"const": false}, "task30_trial": {"const": false}, "execution": {"const": false}, "settlement": {"const": false}, "pnl": {"const": false}, "numeric_netreturn": {"const": false}, "provider_selected": {"const": false}, "external_capture_authorized": {"const": false}, "twenty_four_hour_capture_authorized": {"const": false}, "missing_is_zero_or_flat": {"const": false}}, "required": ["pit_admissible", "h07_h01_evidence", "task30_trial", "execution", "settlement", "pnl", "numeric_netreturn", "provider_selected", "external_capture_authorized", "twenty_four_hour_capture_authorized", "missing_is_zero_or_flat"]},
+    "project_sources_disposition": {"const": "NO_CHANGE"}
+  },
+  "additionalProperties": false
+}

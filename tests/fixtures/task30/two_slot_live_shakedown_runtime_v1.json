@@ -1,0 +1,8 @@
+{
+  "fixture_id": "FIXTURE-T30-TWO-SLOT-LIVE-SHAKEDOWN-RUNTIME-001",
+  "purpose": "Synthetic-only inputs for the TASK-30 A11C offline runtime harness.",
+  "non_claims": {"provider_response": false, "historical_panel": false, "trial": false, "execution": false, "numeric_netreturn": false},
+  "healthy_response": {"data": {"attributes": {"ohlcv_list": [[1786528800, "1.00", "1.10", "0.90", "1.05", "100"]}}},
+  "wrong_interval_response": {"data": {"attributes": {"ohlcv_list": [[1786527900, "1.00", "1.10", "0.90", "1.05", "100"]}}},
+  "expected_technical_terminal_state": "SLOT_TECHNICAL_HEALTHY"
+}

@@ -1,0 +1,36 @@
+{
+  "schema": "smial.task30.two-slot-live-shakedown-runtime.acceptance",
+  "schema_version": "1.0",
+  "receipt_id": "T30-A11C-TWO-SLOT-LIVE-SHAKEDOWN-RUNTIME-OFFLINE-ACCEPTANCE-001",
+  "task_id": "TASK-30",
+  "atom_id": "T30-A11C_TWO_SLOT_SHAKEDOWN_RUNTIME_HARNESS_V1",
+  "validation_status": "PASS_WITH_LIMITATIONS",
+  "state_change": "NONE",
+  "decision": {"value": "OFFLINE_RUNTIME_HARNESS_VALIDATED", "future_external_authority_required": true, "next_boundary": "EXACT_OWNER_EXTERNAL_READ_AUTHORIZATION", "two_slot_live_shakedown_executed": false, "twenty_four_hour_capture_authorized": false},
+  "factory_fit_review": "FULL_REVIEW",
+  "factory_fit": {
+    "mission": "Removes a preventable human and runtime safety ambiguity before a bounded provider read.",
+    "flexibility": "Keeps the route, collector shape and retention boundary narrow; no scheduler, database, adapter platform or provider selection is introduced.",
+    "research_truth": "Synthetic responses and technical receipts cannot become PIT, H07/H01, trial, execution or cashflow evidence.",
+    "owner_operability": "One exact future phrase binds two UTC slots, one foreground monitoring owner and the eight-GET total cap.",
+    "recovery": "Late start, receipt-chain corruption, monitoring loss, unsafe transport and typed gaps fail closed without retry or fallback.",
+    "build_vs_buy": "The narrow standard-library harness wraps only the already observed public route; no dependency or generic platform was added.",
+    "red_team": "Tests reject malformed authority, a forged receipt chain, late offsets, invalid intervals, transport failure and unsafe CLI execution."
+  },
+  "product_horizon_radar": {"now": "A future owner gate can safely authorise one exact two-slot technical shakedown without expanding into a 24-hour collector.", "watch_trigger": "If the shakedown emits an inconclusive or unsafe receipt, close this route and revisit reuse-first before considering a recurring capture."},
+  "artifact_bindings": {
+    "contract": {"path": "docs/contracts/task30_two_slot_live_shakedown_runtime_contract_v1.md", "sha256": "b9873cf1a6f6d61408426d03724d77b01cadbd5444b1983a0d56802a2da57898"},
+    "configuration": {"path": "configs/task30_two_slot_live_shakedown_runtime_v1.yaml", "sha256": "019a4527be5969fdbd350041833bc1a02e9a058873d656a7832d4ec02b6442cf"},
+    "schema": {"path": "catalog/schemas/task30_two_slot_live_shakedown_runtime.schema.json", "sha256": "c12317f1c59966a823728aea5aca734b3e7028c8f42bcab1efc4d1961a6acc18"},
+    "fixture": {"path": "tests/fixtures/task30/two_slot_live_shakedown_runtime_v1.json", "sha256": "062342f3868ba69c5921046a88cd3503a5567ab2b9c440100017573427eb13c1"},
+    "module": {"path": "src/solana_alpha_lab/task30_two_slot_live_shakedown_runtime.py", "sha256": "4afdbd79783d6068363bd9838489a896b83858a20a1d6382a3198e5fa052a57f"},
+    "script": {"path": "scripts/run_task30_two_slot_live_shakedown.py", "sha256": "2d61d039595b2094b91abc5db2227c5d00aaa2d0783c7a588c74508b6efe54af"},
+    "test": {"path": "tests/test_task30_two_slot_live_shakedown_runtime.py", "sha256": "c67babf676d213860c61f5523b54b98efdbb3ddae7a191fa946784a7e4cd0fad"},
+    "design": {"path": "docs/superpowers/specs/2026-08-11-t30-a11c-two-slot-shakedown-runtime-harness-design.md", "sha256": "562e84c18e26eb7190320ba2be4825fdc8f460865bba551c1069a43e6b3fb4a8"},
+    "plan": {"path": "docs/superpowers/plans/2026-08-11-t30-a11c-two-slot-shakedown-runtime-harness.md", "sha256": "87ced1adc704b8a8ec72754bf9c8aba2418bb6db8b886c35ce3f37f2b997fdf4"}
+  },
+  "authority": {"provider_api_rpc_wss_calls": 0, "credential_use": 0, "raw_data_writes": 0, "scheduler_or_background_processes": 0, "dependency_changes": 0, "r2_r3_access": 0, "wallet_signer_transaction_actions": 0, "cash_spend_usd_cents": 0, "task30_trial_or_acceptance_actions": 0},
+  "side_effect_counters": {"provider_api_rpc_wss_calls": 0, "credential_use": 0, "raw_data_writes": 0, "scheduler_or_background_processes": 0, "dependency_changes": 0, "r2_r3_access": 0, "wallet_signer_transaction_actions": 0, "cash_spend_usd_cents": 0, "task30_trial_or_acceptance_actions": 0, "project_sources_changes": 0},
+  "non_claims": {"pit_admissible": false, "h07_h01_evidence": false, "task30_trial": false, "execution": false, "settlement": false, "pnl": false, "numeric_netreturn": false, "provider_selected": false, "external_capture_authorized": false, "two_slot_live_shakedown_executed": false, "twenty_four_hour_capture_authorized": false, "missing_is_zero_or_flat": false},
+  "project_sources_disposition": "NO_CHANGE"
+}
