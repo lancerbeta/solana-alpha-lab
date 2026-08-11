@@ -35,12 +35,12 @@
     "task": {"path": "docs/tasks/TASK-30-forward-stream-runtime-harness.md", "sha256": "45ba02b9b96698fb577a3f1086c79311078199545fbb62c0c6a69d512e2758f7"},
     "contract": {"path": "docs/contracts/task30_forward_stream_runtime_harness_contract_v1.md", "sha256": "494903025ad95ede92b9cdee62e04270ed37f185ab08f3db1bc4fa943d83445f"},
     "configuration": {"path": "configs/task30_forward_stream_runtime_harness_v1.yaml", "sha256": "57f86bb17b14d9d09680e098730265c1b13ea38a08af0c5f3838a77b6990aa73"},
-    "schema": {"path": "catalog/schemas/task30_forward_stream_runtime_harness.schema.json", "sha256": "739c2d59cb17916576f81a0f54f7b6408770c69d29b6c891e2398f3c066a3fde"},
+    "schema": {"path": "catalog/schemas/task30_forward_stream_runtime_harness.schema.json", "sha256": "7a6a461b25476637233e8dd4d11377114c410f6cb37aeb7a46a2d31feed55fd3"},
     "fixture": {"path": "tests/fixtures/task30/forward_stream_runtime_harness_v1.json", "sha256": "42fae2c2c0c2408bd161ece183c3f581cf4d43b214063fc538bfb3135c1882e0"},
-    "module": {"path": "src/solana_alpha_lab/task30_forward_stream_runtime.py", "sha256": "02e2cd93515e7e0162247c20f28685485cac0725d2bb1d0cf8555d0e87c1a54f"},
+    "module": {"path": "src/solana_alpha_lab/task30_forward_stream_runtime.py", "sha256": "537fd6c81ff7988044adafa2736f0ef69a7c5ded4ac377c8de86296e5e5a0ee9"},
     "script": {"path": "scripts/show_task30_forward_stream_runtime.py", "sha256": "77d3c52c8c7dcb8f7e03b080858e395ebd1c65ec0ec47d5c6c98daab2a547de2"},
     "report": {"path": "docs/reports/task30/forward_stream_runtime_harness_readout_v1.md", "sha256": "68941570515e0e50cf0b6e6ca24952e30bd5ca283c82e82327d7ee4cddb32b15"},
-    "test": {"path": "tests/test_task30_forward_stream_runtime.py", "sha256": "ac04014ce41b1e2a56ec4d4600e662df2596fff63020d377246c7c85376cbbd9"},
+    "test": {"path": "tests/test_task30_forward_stream_runtime.py", "sha256": "5e19706ad22a1aac0da88627225970e6aae006d8f5f909ae8fc4bf12f9b434a1"},
     "factory_fit": {"path": "docs/evidence/task30/a14_forward_stream_runtime_harness_factory_fit_v1.json", "sha256": "50dd844220f54031a74f961d7fa6227443c729dc2219ead9a74c24bc57504484"}
   },
   "authority": {

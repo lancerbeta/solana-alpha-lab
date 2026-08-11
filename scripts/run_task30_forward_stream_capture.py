@@ -33,14 +33,19 @@ from solana_alpha_lab.task30_forward_stream_runtime import (  # noqa: E402
 )
 
 
-EXECUTION_CONFIG_PATH = (
-    Path(__file__).resolve().parents[1]
-    / "configs/task30_forward_stream_execution_adapter_v1.yaml"
-)
-RUNTIME_CONFIG_PATH = (
-    Path(__file__).resolve().parents[1]
-    / "configs/task30_forward_stream_runtime_harness_v1.yaml"
-)
+CONFIG_ROOT = Path(__file__).resolve().parents[1] / "configs"
+PROFILE_PATHS = {
+    "v1": (
+        CONFIG_ROOT / "task30_forward_stream_execution_adapter_v1.yaml",
+        CONFIG_ROOT / "task30_forward_stream_runtime_harness_v1.yaml",
+    ),
+    "v2": (
+        CONFIG_ROOT / "task30_forward_stream_execution_adapter_v2.yaml",
+        CONFIG_ROOT / "task30_forward_stream_runtime_harness_v2.yaml",
+    ),
+}
+# Compatibility aliases retained for callers and existing offline tests.
+EXECUTION_CONFIG_PATH, RUNTIME_CONFIG_PATH = PROFILE_PATHS["v1"]
 
 
 def _parser() -> argparse.ArgumentParser:
@@ -50,6 +55,7 @@ def _parser() -> argparse.ArgumentParser:
     mode.add_argument("--execute", action="store_true")
     parser.add_argument("--authority", required=True)
     parser.add_argument("--raw-root", required=True, type=Path)
+    parser.add_argument("--profile", choices=tuple(PROFILE_PATHS), default="v1")
     return parser
 
 
@@ -78,8 +84,9 @@ def main(
 ) -> int:
     args = _parser().parse_args(argv)
     try:
-        execution_config = _load_mapping(EXECUTION_CONFIG_PATH)
-        runtime_config = _load_mapping(RUNTIME_CONFIG_PATH)
+        execution_path, runtime_path = PROFILE_PATHS[args.profile]
+        execution_config = _load_mapping(execution_path)
+        runtime_config = _load_mapping(runtime_path)
         if args.dry_run:
             validate_forward_stream_preflight(
                 execution_config,

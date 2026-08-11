@@ -1,0 +1,27 @@
+{
+  "schema": "smial.task30.a14p-r1-auth-recovery-gate.factory-fit",
+  "schema_version": "1.0",
+  "receipt_id": "T30-A14P-R1-AUTH-RECOVERY-GATE-FACTORY-FIT-001",
+  "task_id": "TASK-30",
+  "atom_id": "T30-A14P_R1_AUTH_RECOVERY_GATE_V1",
+  "as_of": "2026-08-12",
+  "review_scope": "FULL_REVIEW",
+  "verdict": "PASS_WITH_LIMITATIONS",
+  "state_change": "NONE",
+  "mission": {"result": "PASS", "finding": "The recovery package distinguishes the consumed V1 auth failure from a separately versioned V2 gate without changing the data estimand."},
+  "flexibility": {"result": "PASS", "finding": "V1 and V2 profiles share the adapter seam while retaining distinct owner phrases and ignored roots."},
+  "compatibility_history": {"result": "PASS", "finding": "The V1 run and negative evidence remain immutable; V2 cannot consume the V1 root."},
+  "efficiency": {"result": "PASS", "finding": "The patch wraps existing TASK-08 transport and adds no dependency, scheduler or generic service."},
+  "research_truth": {"result": "PASS", "finding": "Auth rejection, missing capture, UNKNOWN and technical observations remain distinct from empty/zero/settled claims."},
+  "secret_handling": {"result": "PASS", "finding": "No provider key or raw bytes are added to tracked artifacts; the future phrase grants no current authority."},
+  "owner_operability": {"result": "PASS_WITH_LIMITATIONS", "finding": "A later V2 external action still needs one exact owner phrase after exact-main CI; this package does not run it."},
+  "monitoring_recovery": {"result": "PASS", "finding": "Separate create-only roots and terminal validation prevent silent retry or cross-run reuse."},
+  "reuse_first": {"result": "PASS", "outcome": "WRAP", "candidate": "MODULE-T08-LIFECYCLE-DISCOVERY-TRANSPORT-001", "finding": "No second socket implementation is introduced."},
+  "execution_to_cashflow": {"result": "NOT_APPLICABLE_YET", "finding": "No execution, inventory, settlement, PnL or NetReturn authority exists."},
+  "red_team": {"result": "PASS", "falsifiers": ["V1 phrase authorizes V2", "V2 writes into V1 root", "schema accepts cross-profile binding", "prior V1 receipt is rewritten", "offline tests read credentials or call transport", "technical capture becomes trial or zero-volume claim"]},
+  "product_horizon": {
+    "now": {"candidate": "ONE_EXACT_OWNER_V2_FORWARD_STREAM_EXTERNAL_GATE", "value": "Resolve whether the first failure was only access state or a deeper stream feasibility problem.", "evidence": "V2 offline package and deterministic tests; no second provider action yet.", "cost_risk": "One separately authorised foreground attempt under frozen caps.", "owner": "GOAL_OWNER", "activation_trigger": "Exact-main CI pass and explicit V2 owner phrase.", "why": "It is the cheapest next discriminator after the closed V1 auth failure."},
+    "watch": {"candidate": "REPEAT_OR_SCHEDULED_CAPTURE", "value": "Only useful if a valid first capture shows coverage or cadence is the bottleneck.", "evidence": "No valid external capture exists.", "cost_risk": "Adds quota, monitoring and reconciliation burden.", "owner": "TECH_LEAD", "activation_trigger": "First valid capture proves repeatability/coverage gap.", "why": "Avoid infrastructure before evidence."}
+  },
+  "project_sources_disposition": "NO_CHANGE"
+}

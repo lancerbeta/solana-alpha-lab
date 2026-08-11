@@ -1,0 +1,52 @@
+schema: smial.task30.forward-stream-runtime.policy
+schema_version: '1.0'
+task_id: TASK-30
+atom_id: T30-A14_FORWARD_STREAM_PILOT_RUNTIME_HARNESS_V2
+contract_id: TASK30-FORWARD-STREAM-RUNTIME-HARNESS-V2
+consumer: FUTURE_EXACT_OWNER_EXTERNAL_READ_GATE
+target:
+  network: solana
+  pool_address: URqx24yyYxtXXhTbBQnbtPLhtLWYoaDaRxuQuLpNS3S
+  base_mint: DMwbVy48dWVKGe9z1pcVnwF3HLMLrqWdDLfbvx8RchhK
+wire:
+  provider: HELIUS
+  method: transactionSubscribe
+  commitment: confirmed
+  encoding: jsonParsed
+  transaction_details: full
+  max_supported_transaction_version: 0
+  failed: false
+  vote: false
+runtime_limits:
+  effective_open_seconds: 540
+  max_notifications: 500
+  max_stream_bytes: 1000000
+  max_frame_bytes: 100000
+  credit_bytes_per_unit: 100000
+  credits_per_unit: 2
+  connection_credits: 1
+  estimated_credit_cap: 21
+execution_controls:
+  retry: false
+  reconnect: false
+  fallback: false
+  scheduler: false
+  monitoring_owner: LOCAL_WORK_CODEX_FOREGROUND
+  retention_class: A4
+  raw_root: OWNER_INPUT_REQUIRED
+authority:
+  provider_api_rpc_wss_calls: 0
+  credential_read: false
+  raw_data_write: false
+  cash_spend_usd: 0
+  task30_trial_or_acceptance: false
+owner_authority:
+  future_pilot_authorized: false
+  future_pilot_phrase: >-
+    T30-A14P_FORWARD_STREAM_RUNTIME_V2; pool=URqx24yyYxtXXhTbBQnbtPLhtLWYoaDaRxuQuLpNS3S;
+    monitoring_owner=LOCAL_WORK_CODEX_FOREGROUND; max_wss_connections=1;
+    max_subscriptions=1; max_open_seconds=1200; max_notifications=500;
+    max_stream_bytes=1000000; estimated_credit_cap=21; retention=A4;
+    retry=false; reconnect=false; fallback=false
+decision: OFFLINE_RUNTIME_HARNESS_VALIDATED
+project_sources_disposition: NO_CHANGE
