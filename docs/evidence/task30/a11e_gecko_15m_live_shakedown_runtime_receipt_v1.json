@@ -1,0 +1,132 @@
+{
+  "schema": "smial.task30.gecko-15m-live-shakedown.runtime-receipt",
+  "schema_version": "1.0",
+  "receipt_id": "T30-A11E-GECKO-15M-LIVE-SHAKEDOWN-RUNTIME-001",
+  "task_id": "TASK-30",
+  "atom_id": "T30-A11E_GECKO_15M_LIVE_SHAKEDOWN_OUTCOME_AND_ROUTE_DECISION_V1",
+  "status": "OBSERVED_EXTERNAL_READ_OUTCOME",
+  "a11c_contract_path": "docs/contracts/task30_two_slot_live_shakedown_runtime_contract_v1.md",
+  "a11c_contract_sha256": "b9873cf1a6f6d61408426d03724d77b01cadbd5444b1983a0d56802a2da57898",
+  "provider": "GECKOTERMINAL_PUBLIC_KEYLESS",
+  "network": "solana",
+  "frozen_pool_address": "URqx24yyYxtXXhTbBQnbtPLhtLWYoaDaRxuQuLpNS3S",
+  "slot_index": 1,
+  "terminal_state": "SLOT_TECHNICAL_INCONCLUSIVE",
+  "request_shape": {
+    "method": "GET",
+    "path": "/networks/solana/pools/{pool}/ohlcv/minute",
+    "aggregate": "15",
+    "currency": "usd",
+    "token": "base",
+    "include_empty_intervals": "false",
+    "limit": "1",
+    "permitted_offsets_seconds": [0, 15, 30, 60]
+  },
+  "earlier_execution_context": {
+    "role": "NON_DECISION_ELIGIBLE_PROCEDURAL_CONTEXT",
+    "slot_start": 1786437900,
+    "slot_end": 1786438800,
+    "requests_completed": 4,
+    "terminal_state": "SLOT_TECHNICAL_HEALTHY",
+    "a4_slot_receipt_sha256": "2bd55e9ffe222c871a5bfbf5dfea230a65442a2da36c41b2932735ce106b8b30",
+    "a4_final_raw_manifest_sha256": "8b9c1a1af12b014de45c3810d5b446d78def6ba2dcd5abf876e266a847044515",
+    "second_slot_external_calls": 0,
+    "incomplete_reason": "RAW_ROOT_INITIALIZATION_FAILED_BEFORE_TRANSPORT",
+    "limited_conclusion": "DOES_NOT_ESTABLISH_TWO_SLOT_SHAKEDOWN"
+  },
+  "decision_basis_attempt": {
+    "authorization": "T30-A11C_TWO_SLOT_SHAKEDOWN_EXECUTION_V1",
+    "slot_index": 1,
+    "slot_start": 1786440600,
+    "slot_end": 1786441500,
+    "authority_fingerprint_sha256": "9977ca41036d6303e27ee719e88911d44fca99cf983ed0a2207ae4be0150a825",
+    "requests_completed": 4,
+    "requests_planned": 4,
+    "terminal_state": "SLOT_TECHNICAL_INCONCLUSIVE",
+    "stop_reason": null
+  },
+  "provider_calls_attempted": 4,
+  "expected_interval_start": 1786440600,
+  "observations": [
+    {
+      "ordinal": 1,
+      "offset_seconds": 0,
+      "http_status": 200,
+      "returned_candle_count": 1,
+      "returned_interval_start": 1786438800,
+      "classification": "TYPED_GAP",
+      "raw_sha256": "8bd1c5a6fea9ac77e49867ad21ba95fd5d5a47cb0acb72b4067223d76bde48e7"
+    },
+    {
+      "ordinal": 2,
+      "offset_seconds": 15,
+      "http_status": 200,
+      "returned_candle_count": 1,
+      "returned_interval_start": 1786438800,
+      "classification": "TYPED_GAP",
+      "raw_sha256": "8bd1c5a6fea9ac77e49867ad21ba95fd5d5a47cb0acb72b4067223d76bde48e7"
+    },
+    {
+      "ordinal": 3,
+      "offset_seconds": 30,
+      "http_status": 200,
+      "returned_candle_count": 1,
+      "returned_interval_start": 1786438800,
+      "classification": "TYPED_GAP",
+      "raw_sha256": "8bd1c5a6fea9ac77e49867ad21ba95fd5d5a47cb0acb72b4067223d76bde48e7"
+    },
+    {
+      "ordinal": 4,
+      "offset_seconds": 60,
+      "http_status": 200,
+      "returned_candle_count": 1,
+      "returned_interval_start": 1786438800,
+      "classification": "TYPED_GAP",
+      "raw_sha256": "6391524a0b1d6004eb41c3549ff7e234735c4caa42b0746470f07f32434ebb4d"
+    }
+  ],
+  "a4_slot_receipt": {
+    "outside_git": true,
+    "relative_path": "local/task30_two_slot_live_shakedown/retry_20260811_0930/slot_1/slot_receipt_v1.json",
+    "sha256": "88606d9ffa16830003b584916158c027678b82ca2287a3929e233aa8fae0fba9"
+  },
+  "a4_final_raw_manifest": {
+    "outside_git": true,
+    "relative_path": "local/task30_two_slot_live_shakedown/retry_20260811_0930/slot_1/raw_manifest_04.json",
+    "sha256": "9765ed20c655cf6d7176d2ac5211c2108975e59154025e88c265c31b59e5d131"
+  },
+  "route_disposition": "CLOSE_CURRENT_15M_FAST_FRESHNESS_ROUTE",
+  "route_scope": "GECKOTERMINAL_PUBLIC_KEYLESS_FROZEN_POOL_15M_BASE_USD_FIRST_VISIBLE_OFFSET_LE_60_SECONDS",
+  "stop_conditions_applied": {
+    "second_slot_not_started": true,
+    "no_retry": true,
+    "no_fallback": true,
+    "no_scheduler": true,
+    "no_new_provider_read": true
+  },
+  "claims": {
+    "pit_admissible": false,
+    "h07_h01_evidence": false,
+    "task30_trial": false,
+    "execution": false,
+    "settlement": false,
+    "pnl": false,
+    "numeric_netreturn": false,
+    "provider_selected": false,
+    "provider_globally_unusable": false,
+    "missing_is_zero_or_flat": false,
+    "twenty_four_hour_capture_authorized": false
+  },
+  "side_effects_of_this_atom": {
+    "provider_api_rpc_wss_calls": 0,
+    "credential_use": 0,
+    "raw_data_writes": 0,
+    "scheduler_or_background_processes": 0,
+    "dependency_changes": 0,
+    "r2_r3_access": 0,
+    "wallet_signer_transaction_actions": 0,
+    "cash_spend_usd_cents": 0,
+    "project_sources_changes": 0
+  },
+  "project_sources_disposition": "NO_CHANGE"
+}

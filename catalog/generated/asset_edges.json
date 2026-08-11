@@ -3088,6 +3088,31 @@
       "target_asset_id": "TEST-T30-TWO-SLOT-LIVE-SHAKEDOWN-RUNTIME-001"
     },
     {
+      "source_asset_id": "EVIDENCE-T30-A11E-GECKO-LIVE-SHAKEDOWN-FACTORY-FIT-001",
+      "relation": "derived_from",
+      "target_asset_id": "EVIDENCE-T30-A11E-GECKO-LIVE-SHAKEDOWN-RUNTIME-001"
+    },
+    {
+      "source_asset_id": "EVIDENCE-T30-A11E-GECKO-LIVE-SHAKEDOWN-FACTORY-FIT-001",
+      "relation": "validated_by",
+      "target_asset_id": "TEST-T30-A11E-GECKO-LIVE-SHAKEDOWN-RUNTIME-001"
+    },
+    {
+      "source_asset_id": "EVIDENCE-T30-A11E-GECKO-LIVE-SHAKEDOWN-RUNTIME-001",
+      "relation": "derived_from",
+      "target_asset_id": "CONTRACT-T30-TWO-SLOT-LIVE-SHAKEDOWN-RUNTIME-001"
+    },
+    {
+      "source_asset_id": "EVIDENCE-T30-A11E-GECKO-LIVE-SHAKEDOWN-RUNTIME-001",
+      "relation": "derived_from",
+      "target_asset_id": "EVIDENCE-T30-A11C-TWO-SLOT-LIVE-SHAKEDOWN-RUNTIME-001"
+    },
+    {
+      "source_asset_id": "EVIDENCE-T30-A11E-GECKO-LIVE-SHAKEDOWN-RUNTIME-001",
+      "relation": "validated_by",
+      "target_asset_id": "TEST-T30-A11E-GECKO-LIVE-SHAKEDOWN-RUNTIME-001"
+    },
+    {
       "source_asset_id": "EVIDENCE-T30-A2-CATALOG-FACTORY-FIT-001",
       "relation": "derived_from",
       "target_asset_id": "EVIDENCE-T30-A1-BOUNDARY-SEMANTICS-001"
@@ -7201,6 +7226,16 @@
       "source_asset_id": "TEST-T28-RC001-REGISTRY-FREEZE-001",
       "relation": "depends_on",
       "target_asset_id": "SCHEMA-T28-RC001-REGISTRY-FREEZE-001"
+    },
+    {
+      "source_asset_id": "TEST-T30-A11E-GECKO-LIVE-SHAKEDOWN-RUNTIME-001",
+      "relation": "depends_on",
+      "target_asset_id": "EVIDENCE-T30-A11E-GECKO-LIVE-SHAKEDOWN-FACTORY-FIT-001"
+    },
+    {
+      "source_asset_id": "TEST-T30-A11E-GECKO-LIVE-SHAKEDOWN-RUNTIME-001",
+      "relation": "depends_on",
+      "target_asset_id": "EVIDENCE-T30-A11E-GECKO-LIVE-SHAKEDOWN-RUNTIME-001"
     },
     {
       "source_asset_id": "TEST-T30-A5R1-BIRDEYE-EXTERNAL-READ-RUNTIME-001",
