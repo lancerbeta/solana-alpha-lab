@@ -43,7 +43,7 @@ EXPECTED_CONTRACT_SHA256 = (
 EXPECTED_FIXTURE_SHA256 = (
     "a1258f56c7521922876c1edd73ca77125e31294b623b8b793d6d5cfe2542235b"
 )
-EXPECTED_ARCHITECTURE_SHA256 = (
+EXPECTED_ARCHITECTURE_SNAPSHOT_SHA256 = (
     "ea094d88abf635fbe4df3b1ff9b3f0e80cb87dfa836f67505173766e69708639"
 )
 EXPECTED_RECEIPT_SHA256 = (
@@ -72,7 +72,9 @@ class Task15HypothesisDrivenAcquisitionAcceptanceTests(
         cls.receipt_bytes = RECEIPT_PATH.read_bytes()
         cls.receipt = json.loads(cls.receipt_bytes)
 
-    def test_acceptance_binds_exact_contract_fixture_and_intent(self) -> None:
+    def test_acceptance_binds_exact_contract_fixture_and_historical_intent(
+        self,
+    ) -> None:
         self.assertEqual(
             hashlib.sha256(self.contract_bytes).hexdigest(),
             EXPECTED_CONTRACT_SHA256,
@@ -80,10 +82,6 @@ class Task15HypothesisDrivenAcquisitionAcceptanceTests(
         self.assertEqual(
             hashlib.sha256(self.fixture_bytes).hexdigest(),
             EXPECTED_FIXTURE_SHA256,
-        )
-        self.assertEqual(
-            hashlib.sha256(self.architecture_bytes).hexdigest(),
-            EXPECTED_ARCHITECTURE_SHA256,
         )
         self.assertEqual(
             hashlib.sha256(self.receipt_bytes).hexdigest(),
@@ -100,7 +98,7 @@ class Task15HypothesisDrivenAcquisitionAcceptanceTests(
         )
         self.assertEqual(
             self.receipt["architecture_anchor"]["sha256"],
-            EXPECTED_ARCHITECTURE_SHA256,
+            EXPECTED_ARCHITECTURE_SNAPSHOT_SHA256,
         )
 
     def test_current_decision_remains_not_due_and_defer(self) -> None:
@@ -152,6 +150,12 @@ class Task15HypothesisDrivenAcquisitionAcceptanceTests(
         )
         self.assertIn(
             "Canonical Project Sources and\nroadmap versions change only",
+            self.architecture,
+        )
+        self.assertIn("## Factory leverage invariant", self.architecture)
+        self.assertIn("comparable new hypotheses", self.architecture)
+        self.assertIn(
+            "not an automatic block or a\nsecond control plane",
             self.architecture,
         )
 

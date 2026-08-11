@@ -271,6 +271,19 @@ cost, and owner gate remains in force.
 - Catalog, generated-view, security, and topology checks apply when their owner
   or consumer changed; read-only work does not trigger repository validation.
 
+## FACTORY_LEVERAGE_INVARIANT
+
+- The default path for a comparable hypothesis already covered by Factory
+  capabilities is configuration, data/query composition and a trial, without a
+  product-code modification.
+- A Git/code/deploy cycle is justified only by a named reusable capability gap,
+  defect, safety or reliability requirement, or measured scale bottleneck.
+- When comparable work repeatedly requires hypothesis-specific product code,
+  use the existing `FACTORY_FIT_REVIEW` before replicating that pattern. Name
+  the reusable gap and the next real consumer.
+- This is a review trigger, not an automatic blocker and not a new registry,
+  metric or recurring report.
+
 ## CHANGE_PROTOCOL
 
 Read this file and the task/handoff explicitly named by the current prompt,

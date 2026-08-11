@@ -575,15 +575,16 @@ records:
     contains_raw_data: false
     sensitivity: INTERNAL_NON_SECRET
 - asset_id: CTRL-AGENTS-001
-  record_version: '2.3'
+  record_version: '2.4'
   asset_type: control_document
   purpose: Repository-level agent contract for standing routine autonomy,
     OWNER_ATTENTION_GATE, route-specific merge authority, safety, JIT validation,
     fail-closed control-only task close, delivery preflight, status ownership, and
-    Project Sources release control with reuse-first recovery decisions.
+    Project Sources release control, reuse-first recovery decisions and the
+    Factory Leverage Invariant.
   status: IMPLEMENTED_UNVERIFIED
   origin: REPOSITORY
-  as_of: '2026-08-09'
+  as_of: '2026-08-11'
   truth_owner: CTRL-BATON-SETUP
   location:
     kind: git_path
@@ -591,7 +592,7 @@ records:
     repository_path: AGENTS.md
   integrity:
     kind: sha256
-    sha256: 1044f26aec5fe79889194b6d598f448fb173569ba26baf151c9d194d8d69a004
+    sha256: 39786138c660edead815a9c69e3a090e7517bf020533019380c1acce161db81a
   access:
     mode: read_only
     method: file
@@ -8091,14 +8092,14 @@ records:
   evidence: []
   classification: *t15_internal
 - asset_id: TEST-T15-HYPOTHESIS-DRIVEN-ACQUISITION-ACCEPTANCE-001
-  record_version: '1.1'
+  record_version: '1.2'
   asset_type: script
   purpose: Deterministic TASK-15 semantic acceptance tests binding the exact
     contract, fixture, operating-model intent, mandatory Factory Fit review,
     Catalog checkpoint, generated navigation and zero effects.
   status: IMPLEMENTED_UNVERIFIED
   origin: REPOSITORY
-  as_of: '2026-07-29'
+  as_of: '2026-08-11'
   truth_owner: TASK-15
   location:
     kind: git_path
@@ -8106,7 +8107,7 @@ records:
     repository_path: tests/test_task15_hypothesis_driven_acquisition_acceptance.py
   integrity:
     kind: sha256
-    sha256: 3e8ed0c207f1d0a0a9edbd2e10867c1c5926f93605c8b79512f95cded87192fa
+    sha256: c3ab5f5d9f1dcef6f4e2e164f3e7778e4b34044a4889897a4bd6102ceef5c80f
   access:
     mode: read_only
     method: file
@@ -11136,14 +11137,14 @@ records:
   classification: *t21_internal
 
 - asset_id: TEST-T20-COLLECTION-SPEC-CONTRACT-001
-  record_version: '1.0'
+  record_version: '1.1'
   asset_type: script
   purpose: Deterministic hash-bound tests for TASK-20 collection tiers,
     membership, PIT availability, physical caps, recovery handoff, non-claims
     and local-only authority.
   status: IMPLEMENTED_UNVERIFIED
   origin: REPOSITORY
-  as_of: '2026-07-30'
+  as_of: '2026-08-11'
   truth_owner: TASK-20
   location:
     kind: git_path
@@ -11151,7 +11152,7 @@ records:
     repository_path: tests/test_task20_collection_spec_contract.py
   integrity:
     kind: sha256
-    sha256: 21279e1aadbda01ee2a68c33799d4870ac8b6d144bada8ad4c04d84d18e91adb
+    sha256: 7bb2d63ff299166097c13f533a3691c666b47f993331e4bc5a7d47414953a36e
   access:
     mode: read_only
     method: file
@@ -11274,14 +11275,14 @@ records:
   evidence: []
   classification: *t20_internal
 - asset_id: TEST-T20-COVERAGE-RETENTION-RECOVERY-001
-  record_version: '1.0'
+  record_version: '1.1'
   asset_type: script
   purpose: Deterministic tests for exact TASK-20 field coverage, named
     consumers, retention, no-clobber backup, restore sampling, health states
     and local-only authority.
   status: IMPLEMENTED_UNVERIFIED
   origin: REPOSITORY
-  as_of: '2026-07-30'
+  as_of: '2026-08-11'
   truth_owner: TASK-20
   location:
     kind: git_path
@@ -11289,7 +11290,7 @@ records:
     repository_path: tests/test_task20_coverage_retention_recovery_policy.py
   integrity:
     kind: sha256
-    sha256: c16ff29fd1a9ebb22d9e8a29df93101846260654767beecd481177d62badfac8
+    sha256: f3ef50f1f8b03f65063798b54dd6642c826dc43c969e7f44b42440cdb5d0c716
   access:
     mode: read_only
     method: file
@@ -11342,14 +11343,14 @@ records:
   evidence: []
   classification: *t20_internal
 - asset_id: TEST-T20-ACCEPTANCE-CATALOG-FACTORY-FIT-001
-  record_version: '1.3'
+  record_version: '1.4'
   asset_type: script
   purpose: Exact hash-bound TASK-20 acceptance tests for eight adversarial
     vectors, Catalog consistency, Factory Fit, generated navigation, non-claims
     and zero external authority.
   status: IMPLEMENTED_UNVERIFIED
   origin: REPOSITORY
-  as_of: '2026-08-01'
+  as_of: '2026-08-11'
   truth_owner: TASK-20
   location:
     kind: git_path
@@ -11357,7 +11358,7 @@ records:
     repository_path: tests/test_task20_acceptance_catalog_factory_fit.py
   integrity:
     kind: sha256
-    sha256: c3a53a72560f10af982ac95919b9952434036e170aa1188d1c08ed8f02e38928
+    sha256: 36e36f6700f30a4537c495a70d3326aa103f38f79cf35c4c795f2d2833e037f6
   access:
     mode: read_only
     method: file
@@ -12989,12 +12990,12 @@ records:
   evidence: []
   classification: *t23_internal
 - asset_id: TEST-T23-A5-CATALOG-FACTORY-FIT-001
-  record_version: '1.2'
+  record_version: '1.3'
   asset_type: script
   purpose: Hash-bound A5 tests for exact assets append-only trials Catalog lineage generated navigation Factory Fit holdout governance and authority.
   status: IMPLEMENTED_UNVERIFIED
   origin: REPOSITORY
-  as_of: '2026-08-02'
+  as_of: '2026-08-11'
   truth_owner: TASK-23
   location:
     kind: git_path
@@ -13002,7 +13003,7 @@ records:
     repository_path: tests/test_task23_catalog_repository_factory_fit.py
   integrity:
     kind: sha256
-    sha256: 58232b162185c79fd2f83aff0c2c3b23b0a26352c1cd2830fe0f01c1a17d1858
+    sha256: 1470832ff2cf686eb6958a88bb9f2638d865b055f1f1a007b73cd20e6d95b5d3
   access: *t23_read_file
   relations:
   - relation_type: depends_on

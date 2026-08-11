@@ -54,16 +54,16 @@ records:
     availability_note: Current user-owned architecture direction; it is not attributed to TASK-01 or TASK-02 and does not
       claim implementation.
 - asset_id: ARCH-INTENT-002
-  record_version: '1.0'
+  record_version: '1.1'
   asset_type: architecture_intent
   purpose: Accepted operating model for hypothesis-owned data acquisition,
     append-only hypothesis provenance and derivation memory, research-tool
     routing, trigger-to-cashflow execution and position truth, lifecycle
-    monitoring, owner pulse and a mandatory Factory Fit review before every
-    future task completion bundle.
+    monitoring, owner pulse, a mandatory Factory Fit review before every
+    future task completion bundle and the Factory Leverage Invariant.
   status: ACCEPTED_DIRECTION_NOT_IMPLEMENTED
   origin: PROJECT_SOURCE
-  as_of: '2026-07-29'
+  as_of: '2026-08-11'
   truth_owner: USER_GOAL_OWNER
   location:
     kind: git_path
@@ -71,7 +71,7 @@ records:
     repository_path: docs/architecture/intents/ARCH-INTENT-002-hypothesis-factory-operating-model.md
   integrity:
     kind: sha256
-    sha256: ea094d88abf635fbe4df3b1ff9b3f0e80cb87dfa836f67505173766e69708639
+    sha256: cb4bc68ad8fab314ef45998f9c357002cad7637ddcccef10bb9c16c9affdbfd4
   access:
     mode: read_only
     method: file
