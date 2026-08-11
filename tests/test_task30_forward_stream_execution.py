@@ -44,6 +44,39 @@ FIXTURE_PATH = (
 )
 RUNTIME_CONFIG_PATH = ROOT / "configs/task30_forward_stream_runtime_harness_v1.yaml"
 CLI_PATH = ROOT / "scripts/run_task30_forward_stream_capture.py"
+TASK_PATH = ROOT / "docs/tasks/TASK-30-forward-stream-execution-adapter.md"
+CONTRACT_PATH = (
+    ROOT / "docs/contracts/task30_forward_stream_execution_adapter_contract_v1.md"
+)
+MODULE_PATH = ROOT / "src/solana_alpha_lab/task30_forward_stream_execution.py"
+DESIGN_PATH = (
+    ROOT
+    / "docs/superpowers/specs/2026-08-11-task30-forward-stream-execution-adapter-design.md"
+)
+PLAN_PATH = (
+    ROOT
+    / "docs/superpowers/plans/2026-08-11-task30-forward-stream-execution-adapter.md"
+)
+ACCEPTANCE_PATH = (
+    ROOT
+    / "docs/evidence/task30/a14p_forward_stream_execution_adapter_acceptance_v1.json"
+)
+FACTORY_FIT_PATH = (
+    ROOT
+    / "docs/evidence/task30/a14p_forward_stream_execution_adapter_factory_fit_v1.json"
+)
+CORE_CATALOG_PATH = ROOT / "catalog/assets/core.yaml"
+EXPECTED_A14P_ASSET_IDS = {
+    "CONTRACT-T30-FORWARD-STREAM-EXECUTION-ADAPTER-001",
+    "CONFIG-T30-FORWARD-STREAM-EXECUTION-ADAPTER-001",
+    "SCHEMA-T30-FORWARD-STREAM-EXECUTION-ADAPTER-001",
+    "FIXTURE-T30-FORWARD-STREAM-EXECUTION-ADAPTER-001",
+    "MODULE-T30-FORWARD-STREAM-EXECUTION-ADAPTER-001",
+    "SCRIPT-T30-FORWARD-STREAM-CAPTURE-001",
+    "TEST-T30-FORWARD-STREAM-EXECUTION-ADAPTER-001",
+    "EVIDENCE-T30-A14P-FORWARD-STREAM-EXECUTION-ADAPTER-001",
+    "EVIDENCE-T30-A14P-FORWARD-STREAM-EXECUTION-FACTORY-FIT-001",
+}
 FROZEN_NOW = datetime(2026, 8, 11, 12, 0, 0, tzinfo=UTC)
 SECOND_FRAME_AT = datetime(2026, 8, 11, 12, 0, 1, tzinfo=UTC)
 FAKE_CREDENTIAL = "synthetic-" + "credential-value"
@@ -790,6 +823,101 @@ class Task30ForwardStreamExecutionCliTests(unittest.TestCase):
                 self.assertEqual(stderr, "")
                 self.assertEqual(json.loads(stdout)["error"], code)
                 self.assertFalse(self.raw_root.exists())
+
+
+class Task30ForwardStreamExecutionAcceptanceTests(unittest.TestCase):
+    def test_acceptance_binds_exact_artifacts_and_zero_external_authority(self) -> None:
+        acceptance = json.loads(ACCEPTANCE_PATH.read_text(encoding="utf-8"))
+        self.assertEqual(acceptance["validation_status"], "PASS_WITH_LIMITATIONS")
+        self.assertEqual(acceptance["state_change"], "NONE")
+        self.assertEqual(
+            acceptance["decision"],
+            {
+                "value": "READY_FOR_EXACT_OWNER_EXTERNAL_GATE_WITH_LIMITATIONS",
+                "external_capture_authorized": False,
+                "raw_external_data_collected": False,
+                "task30_trial_admissible": False,
+            },
+        )
+        self.assertEqual(
+            acceptance["project_sources_disposition"], {"kind": "NO_CHANGE"}
+        )
+        self.assertTrue(
+            all(value == 0 for value in acceptance["authority"].values())
+        )
+        self.assertTrue(
+            all(value == 0 for value in acceptance["side_effect_counters"].values())
+        )
+
+        expected_paths = {
+            "task": TASK_PATH,
+            "contract": CONTRACT_PATH,
+            "configuration": CONFIG_PATH,
+            "schema": SCHEMA_PATH,
+            "fixture": FIXTURE_PATH,
+            "module": MODULE_PATH,
+            "runner": CLI_PATH,
+            "test": Path(__file__),
+            "design": DESIGN_PATH,
+            "plan": PLAN_PATH,
+            "factory_fit": FACTORY_FIT_PATH,
+        }
+        self.assertEqual(set(acceptance["artifact_bindings"]), set(expected_paths))
+        for role, path in expected_paths.items():
+            with self.subTest(role=role):
+                binding = acceptance["artifact_bindings"][role]
+                self.assertEqual(binding["path"], path.relative_to(ROOT).as_posix())
+                self.assertEqual(
+                    binding["sha256"], hashlib.sha256(path.read_bytes()).hexdigest()
+                )
+
+    def test_factory_fit_is_full_and_preserves_external_stop_boundary(self) -> None:
+        review = json.loads(FACTORY_FIT_PATH.read_text(encoding="utf-8"))
+        self.assertEqual(review["review_scope"], "FULL_REVIEW")
+        self.assertEqual(review["verdict"], "PASS_WITH_LIMITATIONS")
+        self.assertEqual(review["state_change"], "NONE")
+        for dimension in (
+            "mission",
+            "flexibility",
+            "compatibility_history",
+            "efficiency",
+            "research_truth",
+            "secret_handling",
+            "owner_operability",
+            "monitoring_recovery",
+            "reuse_first",
+            "red_team",
+        ):
+            with self.subTest(dimension=dimension):
+                self.assertIn(
+                    review[dimension]["result"], {"PASS", "PASS_WITH_LIMITATIONS"}
+                )
+        self.assertEqual(
+            review["execution_to_cashflow"]["result"], "NOT_APPLICABLE_YET"
+        )
+        self.assertEqual(
+            review["product_horizon"]["now"]["candidate"],
+            "ONE_EXACT_OWNER_FORWARD_STREAM_EXTERNAL_GATE",
+        )
+
+    def test_catalog_registers_only_nine_durable_a14p_assets_with_exact_hashes(
+        self,
+    ) -> None:
+        catalog = yaml.safe_load(CORE_CATALOG_PATH.read_text(encoding="utf-8"))
+        records = {
+            record["asset_id"]: record
+            for record in catalog["records"]
+            if record["asset_id"] in EXPECTED_A14P_ASSET_IDS
+        }
+        self.assertEqual(set(records), EXPECTED_A14P_ASSET_IDS)
+        for asset_id, record in records.items():
+            with self.subTest(asset_id=asset_id):
+                self.assertEqual(record["consumers"], ["TASK-30", "FACTORY-001"])
+                path = ROOT / record["location"]["repository_path"]
+                self.assertEqual(
+                    record["integrity"],
+                    {"kind": "sha256", "sha256": hashlib.sha256(path.read_bytes()).hexdigest()},
+                )
 
 if __name__ == "__main__":
     unittest.main()

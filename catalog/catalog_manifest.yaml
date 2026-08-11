@@ -1,12 +1,12 @@
 schema_version: '1.0'
 catalog_id: SMIAL-PROJECT-ASSET-CATALOG
-catalog_version: 0.57.0
-as_of: '2026-08-11'
+catalog_version: 0.58.0
+as_of: '2026-08-12'
 implementation_status: VALIDATED_ACTIVE
 current_checkpoint:
-  assets: 724
+  assets: 733
   asset_registries: 4
-  schemas: 29
+  schemas: 30
   queries: 8
   lifecycle_registries: 9
   lifecycle_records: 60
@@ -57,6 +57,7 @@ root_resolver:
   - catalog/schemas/task30_two_slot_live_shakedown_owner_packet.schema.json
   - catalog/schemas/task30_two_slot_live_shakedown_runtime.schema.json
   - catalog/schemas/task30_forward_stream_runtime_harness.schema.json
+  - catalog/schemas/task30_forward_stream_execution_adapter.schema.json
   - catalog/schemas/task34a_documentation_foundation.schema.json
   commands:
     validate:
