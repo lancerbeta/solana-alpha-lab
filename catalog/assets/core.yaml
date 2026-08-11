@@ -575,13 +575,14 @@ records:
     contains_raw_data: false
     sensitivity: INTERNAL_NON_SECRET
 - asset_id: CTRL-AGENTS-001
-  record_version: '2.5'
+  record_version: '2.6'
   asset_type: control_document
   purpose: Repository-level agent contract for standing routine autonomy,
     OWNER_ATTENTION_GATE, route-specific merge authority, safety, JIT validation,
     fail-closed control-only task close, tracked-only and CI-owned delivery
     preflights, status ownership, Project Sources release control, reuse-first
-    recovery decisions and the Factory Leverage Invariant.
+    recovery decisions, the Factory Leverage Invariant and deterministic
+    model-effort routing at task boundaries.
   status: IMPLEMENTED_UNVERIFIED
   origin: REPOSITORY
   as_of: '2026-08-11'
@@ -592,7 +593,7 @@ records:
     repository_path: AGENTS.md
   integrity:
     kind: sha256
-    sha256: 02529ec1406c6f424c69819b56f8608ca13481b527bff93a29eb3af5c37d6be5
+    sha256: 3664589e9f358744bf3810988df39fdf6c5b84aadc3a65adf222e667de8d6280
   access:
     mode: read_only
     method: file
@@ -15191,15 +15192,15 @@ records:
   classification: *t25_internal
 
 - asset_id: TEST-OWNER-ATTENTION-GATE-001
-  record_version: '1.0'
+  record_version: '1.1'
   asset_type: script
-  purpose: Adversarial decision matrix, active-policy recurrence and Project Instruction UI-limit tests.
+  purpose: Adversarial owner-attention matrix plus active-policy, Project Instruction UI-limit and model-effort boundary tests.
   status: IMPLEMENTED_UNVERIFIED
   origin: REPOSITORY
-  as_of: '2026-08-08'
+  as_of: '2026-08-11'
   truth_owner: CTRL-OWNER-ATTENTION-GATE
   location: {kind: git_path, logical_uri: 'repo://tests/test_owner_attention_gate_policy.py', repository_path: tests/test_owner_attention_gate_policy.py}
-  integrity: {kind: sha256, sha256: 254a274bc92399bb8d4871bd48c11a96b33cfc1010f0b4a7307ad73359885c62}
+  integrity: {kind: sha256, sha256: f93035eaee5d228a98019a21646c722da94af0a7af0b48029eab7095316b681b}
   access: *t25_read_file
   relations:
   - {relation_type: depends_on, target_asset_id: POLICY-OWNER-ATTENTION-GATE-001}
@@ -15209,15 +15210,33 @@ records:
   classification: *t25_internal
 
 - asset_id: PROJECT-INSTRUCTION-CANDIDATE-3-4-001
-  record_version: '1.0'
+  record_version: '1.1'
   asset_type: control_document
   purpose: Complete under-8000-character Project Instruction v3.4 candidate aligned to OWNER_ATTENTION_GATE.
-  status: PROPOSED
+  status: DEPRECATED
   origin: REPOSITORY
-  as_of: '2026-08-08'
+  as_of: '2026-08-11'
   truth_owner: CTRL-OWNER-ATTENTION-GATE
   location: {kind: git_path, logical_uri: 'repo://docs/agent/PROJECT_INSTRUCTION_V3_4.md', repository_path: docs/agent/PROJECT_INSTRUCTION_V3_4.md}
   integrity: {kind: sha256, sha256: dafd2b8e0d2063d2a8e964f97ded75f22d2c48582d772002623d4ae8ba626fbe}
+  access: *t25_read_file
+  relations:
+  - {relation_type: governed_by, target_asset_id: POLICY-OWNER-ATTENTION-GATE-001}
+  - {relation_type: superseded_by, target_asset_id: PROJECT-INSTRUCTION-CANDIDATE-3-5-001}
+  consumers: [CHATGPT-PROJECT-CONTROL-PLANE, GOAL-OWNER]
+  evidence: []
+  classification: *t25_internal
+
+- asset_id: PROJECT-INSTRUCTION-CANDIDATE-3-5-001
+  record_version: '1.0'
+  asset_type: control_document
+  purpose: Complete under-8000-character Project Instruction v3.5 candidate with deterministic model-effort routing and OWNER_ATTENTION_GATE.
+  status: PROPOSED
+  origin: REPOSITORY
+  as_of: '2026-08-11'
+  truth_owner: CTRL-OWNER-ATTENTION-GATE
+  location: {kind: git_path, logical_uri: 'repo://docs/agent/PROJECT_INSTRUCTION_V3_5.md', repository_path: docs/agent/PROJECT_INSTRUCTION_V3_5.md}
+  integrity: {kind: sha256, sha256: 755e24e5027e58dc89237e9b061f7ef9240d1941bbb8a6fb58e6e01345daef8d}
   access: *t25_read_file
   relations:
   - {relation_type: governed_by, target_asset_id: POLICY-OWNER-ATTENTION-GATE-001}

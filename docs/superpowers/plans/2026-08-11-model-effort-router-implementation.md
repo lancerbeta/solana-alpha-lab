@@ -27,6 +27,8 @@
 - Create: `docs/agent/PROJECT_INSTRUCTION_V3_5.md`
 - Modify: `tests/test_owner_attention_gate_policy.py`
 - Modify: `catalog/assets/core.yaml`
+- Modify: `catalog/assets/lifecycle.yaml`
+- Modify: `catalog/catalog_manifest.yaml`
 - Regenerate: `docs/PROJECT_MAP.md`
 - Regenerate: `catalog/generated/asset_edges.json`
 
@@ -57,10 +59,10 @@ Create `PROJECT_INSTRUCTION_V3_5.md` from v3.4, change only the version header a
 
 - [ ] **Step 3: Make Catalog ownership exact**
 
-Update `CTRL-AGENTS-001` and `TEST-OWNER-ATTENTION-GATE-001` record versions, purposes, dates, and SHA-256 values. Mark `PROJECT-INSTRUCTION-CANDIDATE-3-4-001` `DEPRECATED` with `superseded_by -> PROJECT-INSTRUCTION-CANDIDATE-3-5-001`; add the v3.5 `PROPOSED` asset with exact path/hash and existing control-plane consumers. Regenerate Catalog consumers with:
+Update `CTRL-AGENTS-001` and `TEST-OWNER-ATTENTION-GATE-001` record versions, purposes, dates, and SHA-256 values. Mark `PROJECT-INSTRUCTION-CANDIDATE-3-4-001` `DEPRECATED` with `superseded_by -> PROJECT-INSTRUCTION-CANDIDATE-3-5-001`; add the v3.5 `PROPOSED` asset with exact path/hash and existing control-plane consumers. Increment the manifest asset checkpoint from 713 to 714, then regenerate Catalog consumers with:
 
 ```powershell
-uv run --locked --managed-python python -B scripts/generate_navigation.py
+uv run --locked --managed-python python -B scripts/generate_navigation.py --write
 ```
 
 - [ ] **Step 4: Run targeted repository validation**
@@ -77,7 +79,7 @@ Expected: all commands PASS; no Project Sources, TASK-30 product code, provider,
 - [ ] **Step 5: Commit the repository implementation**
 
 ```powershell
-git add -- AGENTS.md docs/agent/PROJECT_INSTRUCTION_V3_5.md tests/test_owner_attention_gate_policy.py catalog/assets/core.yaml docs/PROJECT_MAP.md catalog/generated/asset_edges.json
+git add -- AGENTS.md docs/agent/PROJECT_INSTRUCTION_V3_5.md tests/test_owner_attention_gate_policy.py catalog/assets/core.yaml catalog/assets/lifecycle.yaml catalog/catalog_manifest.yaml docs/PROJECT_MAP.md catalog/generated/asset_edges.json docs/superpowers/plans/2026-08-11-model-effort-router-implementation.md
 git commit -m "feat: route model effort at task boundaries"
 ```
 

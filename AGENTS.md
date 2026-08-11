@@ -82,6 +82,39 @@ canonical form; explain exact English errors in Russian. This is a
 project-scoped reporting rule only—it grants no task authority or action
 permission.
 
+## MODEL_EFFORT_ROUTER
+
+At the Entry Gate for a complex task, atom, or uninterrupted autonomous chain,
+emit exactly one compact recommendation unless the immediately preceding
+finish checkpoint already carries the same tuple for the same scope:
+
+```text
+MODEL_EFFORT_RECOMMENDATION=<enum>; scope=<exact atom or chain>; reason=<one sentence>; escalation=<one trigger>
+```
+
+Use `LUNA_MAX` as the bounded implementation workhorse; use `SOL_XHIGH` for
+material architecture, public contract/schema, cross-system, difficult root
+cause, PIT/statistical/security, or invariant-reconciliation work; reserve
+`SOL_MAX` for irreversible/high-impact or still-unresolved adversarial work.
+`TERRA_XHIGH` is the bounded fallback when Luna is unavailable, not a mandatory
+escalation. Use `ROUTINE_NO_SWITCH` for deterministic smoke, exact read-back,
+ordinary merge, and other simple steps.
+
+For one uninterrupted autonomous chain, its `hardest material segment` sets the
+recommendation for the whole chain. After a material atom/task checkpoint and
+immediately before the next approval or handoff, emit:
+
+```text
+NEXT_MODEL_EFFORT=<enum or DEFERRED>; scope=<exact next atom or chain>; reason=<one sentence>; escalation=<one trigger>
+```
+
+Use `DEFERRED` only when canonical task selection has not identified the next
+scope. Do not stay silent when the default is sufficient, repeat an unchanged
+tuple for the same scope, or emit advice during routine microsteps. Recompute
+only after a material scope, architecture, data-contract, estimand, security,
+or safety-boundary change. Model advice grants no task, mutation, external,
+spend, wallet, signer, transaction, merge, or canonical-status authority.
+
 ## INPUT_ROUTING
 
 Default: `INPUT=DIRECT_PROMPT`.
