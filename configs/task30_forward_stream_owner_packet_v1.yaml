@@ -1,0 +1,80 @@
+schema: smial.task30.forward-stream-owner-packet.policy
+schema_version: '1.0'
+task_id: TASK-30
+atom_id: T30-A13_FORWARD_STREAM_OWNER_PACKET_READINESS_V1
+contract_id: TASK30-FORWARD-STREAM-OWNER-PACKET-V1
+consumer: FUTURE_EXACT_OWNER_EXTERNAL_READ_GATE
+frozen_group: RC001-H07-H01-LIQUIDITY-RETENTION
+target:
+  network: solana
+  pool_address: URqx24yyYxtXXhTbBQnbtPLhtLWYoaDaRxuQuLpNS3S
+  base_mint: DMwbVy48dWVKGe9z1pcVnwF3HLMLrqWdDLfbvx8RchhK
+  dex_program_or_route: OWNER_VERIFIED_ROUTE_REQUIRED
+provider:
+  provider_candidate: HELIUS_TRANSACTION_SUBSCRIBE
+  provider_selection: PROPOSED_NOT_SELECTED
+  transport_candidate: WSS_JSON_RPC
+candidate_subscription:
+  method: transactionSubscribe
+  commitment: confirmed
+  encoding: jsonParsed
+  transaction_details: full
+  max_supported_transaction_version: 0
+  failed: false
+  vote: false
+pilot_limits:
+  connections: 1
+  subscriptions: 1
+  open_duration_seconds: 1200
+  notifications: 500
+execution_controls:
+  retry: false
+  reconnect: false
+  fallback: false
+  monitoring_owner: LOCAL_WORK_CODEX_FOREGROUND
+  scheduler: false
+  retention_class: A4
+  absolute_raw_root: OWNER_INPUT_REQUIRED
+authority:
+  provider_api_rpc_wss_calls: 0
+  credential_read: false
+  raw_data_write: false
+  dependency_changes: false
+  r2_r3_access: false
+  wallet_signer_transaction_actions: false
+  cash_spend_usd: 0
+  task30_trial_or_acceptance: false
+  project_sources_changes: false
+terminal_truth:
+  allowed_terminal_states:
+    - PILOT_NOT_AUTHORIZED
+    - CONNECTION_OR_AUTH_REJECTED
+    - SUBSCRIPTION_REJECTED
+    - NO_OBSERVED_TX_NO_EMPTY_CLAIM
+    - OBSERVATION_RETAINED_TECHNICAL_ONLY
+    - TRANSPORT_LOST_UNKNOWN
+    - RETENTION_FAILED_STOP
+  no_observation_disposition: NO_OBSERVED_TX_NO_EMPTY_CLAIM
+  transport_loss_disposition: TRANSPORT_LOST_UNKNOWN
+  unknown_recovery:
+    reconciliation_reference: OWNER_AUTHORITY_REQUIRED
+    automatic_reconciliation: false
+    retry_before_reconciliation: false
+    interval_projection: false
+owner_authority:
+  future_pilot_phrase: T30-A13P_FORWARD_STREAM_PILOT_V1; pool=URqx24yyYxtXXhTbBQnbtPLhtLWYoaDaRxuQuLpNS3S; monitoring_owner=LOCAL_WORK_CODEX_FOREGROUND; max_wss_connections=1; max_subscriptions=1; max_open_seconds=1200; max_notifications=500; retention=A4; retry=false; reconnect=false; fallback=false
+  future_pilot_authorized: false
+  stop_procedure: STOP_AND_RETAIN_SAFE_RECEIPT
+non_claims:
+  empty_interval_claim: false
+  zero_volume_claim: false
+  complete_coverage_claim: false
+  pit_admissible_claim: false
+  h07_h01_evidence_claim: false
+  task30_trial_claim: false
+  execution_claim: false
+  settlement_claim: false
+  pnl_claim: false
+  numeric_netreturn_claim: false
+decision: READY_FOR_OWNER_EXTERNAL_READ_GATE_WITH_LIMITATIONS
+project_sources_disposition: NO_CHANGE
