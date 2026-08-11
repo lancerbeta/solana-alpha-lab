@@ -38,7 +38,7 @@ LOCAL_WORK_CODEX: Codex сам merge после exact-head tests/CI/full gate/Fa
 
 Sources: role→version→header→SHA-256→filename; UI suffix≠version. Manifest=roles/hashes/activation; roadmap=status/deps; state=stack/access; task=scope/DoD; OS=invariants; blueprint=research; Catalog=IDs; registries=lifecycle; ADR=why; repo/tests/runtime=implementation. Instruction=UI, не Source.
 
-Full Source smoke: account/project switch, activation-set change, missing receipt или identity/hash drift; иначе reuse receipt. Entry Gate: mission/estimand, consumer, deps/DoD, information gain, cash/time/risk, owner journey, cheapest falsifier, Product Horizon. Verdict: START_AS_WRITTEN | START_WITH_PATCH | SPLIT | REORDER | BLOCKED | SKIP/CLOSE.
+Full Source smoke: account/project switch, activation change, missing receipt или hash drift; иначе reuse receipt. Entry Gate: mission/estimand, consumer, deps/DoD, gain, cash/time/risk, owner journey, cheapest falsifier, Horizon. Verdict: START_AS_WRITTEN | START_WITH_PATCH | SPLIT | REORDER | BLOCKED | SKIP/CLOSE.
 
 Control debt inline только если блокирует DoD/evidence/safety или сработал durable trigger. Одна root cause=один repair. Не расширяй scope молча.
 
@@ -46,7 +46,7 @@ Control debt inline только если блокирует DoD/evidence/safety
 
 5. Alpha Factory, data и research truth
 
-Lifecycle: idea→mechanism/falsifier→data feasibility/cheap kill→freeze/OOS→paper/shadow→micro-live→champion/challenger→monitor/retire/reactivate. Hypothesis≠strategy≠bot. Selection-affecting run=trial; unlogged=RESEARCH_DEBT. Holdout opened=CONSUMED; redesign требует нового holdout.
+Lifecycle: idea→mechanism/falsifier→data feasibility/cheap kill→freeze/OOS→paper/shadow→micro-live→champion/challenger→monitor/retire/dormant/reactivate. Hypothesis≠strategy≠bot. Selection-affecting run=trial; unlogged=RESEARCH_DEBT. Holdout opened=CONSUMED; redesign требует нового holdout.
 
 До custom: ADOPT→WRAP→FORK→BUILD. Проверяй fit/PIT, source, license/security, maintenance, pin/SBOM, TCO/exit/replay. Project owns hypothesis/risk/position/cashflow truth; transport — replaceable adapter.
 
@@ -68,4 +68,4 @@ Secrets/seed/private keys запрещены в chat/repo/logs/URLs. Signer isol
 
 PLANNED→READY→IN_PROGRESS→IMPLEMENTED_UNVERIFIED→VALIDATED→DONE. DONE=DoD+evidence+tests+controls+Factory Fit+затронутые owners/registries/Catalog/consumers; иначе STATE_CHANGE=NONE. Permanent Sources: manifest, OS, blueprint, roadmap, state, archive, active task. Instruction=UI; Catalog/data/logs/secrets вне Sources.
 
-Пиши по-русски, answer-first; разделяй FACT/INFERENCE/RECOMMENDATION. Дай PASS/FAIL, evidence, limits, blocker, Product Horizon и next action без повтора. Critical: BLOCKED→REPAIR | REDESIGN_DATA | PIVOT_FAMILY | PAUSE | exact CLOSE_*.
+Пиши по-русски, answer-first; FACT/INFERENCE/RECOMMENDATION. Дай PASS/FAIL, evidence, limits, blocker, Horizon, next action. Critical: BLOCKED→REPAIR | REDESIGN_DATA | PIVOT_FAMILY | PAUSE | exact CLOSE_*.

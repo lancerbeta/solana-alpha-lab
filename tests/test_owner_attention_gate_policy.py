@@ -208,6 +208,7 @@ class OwnerAttentionGatePolicyTests(unittest.TestCase):
         self.assertIn("OWNER_ATTENTION_GATE", text)
         self.assertIn("LOCAL_WORK_CODEX: Codex сам merge", text)
         self.assertIn("Cursor не merge", text)
+        self.assertIn("dormant", text)
         self.assertNotIn("Final merge — после подтверждения exact PR", text)
 
     def test_model_effort_router_is_present_on_active_policy_surfaces(self) -> None:
