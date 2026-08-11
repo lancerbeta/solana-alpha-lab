@@ -1,0 +1,9 @@
+{
+  "expected_result": {
+    "decision": "READY_FOR_OWNER_EXTERNAL_READ_GATE_WITH_LIMITATIONS",
+    "external_action_authorized": false,
+    "next_action": "OWNER_EXTERNAL_READ_GATE_REQUIRED",
+    "project_sources_disposition": "NO_CHANGE",
+    "provider_selection": "PROPOSED_NOT_SELECTED"
+  }
+}

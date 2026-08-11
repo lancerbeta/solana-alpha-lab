@@ -1,0 +1,164 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "smial.task30.forward-stream-owner-packet.schema.v1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema",
+    "schema_version",
+    "task_id",
+    "atom_id",
+    "contract_id",
+    "consumer",
+    "frozen_group",
+    "target",
+    "provider",
+    "candidate_subscription",
+    "pilot_limits",
+    "execution_controls",
+    "authority",
+    "terminal_truth",
+    "owner_authority",
+    "non_claims",
+    "decision",
+    "project_sources_disposition"
+  ],
+  "properties": {
+    "schema": {"const": "smial.task30.forward-stream-owner-packet.policy"},
+    "schema_version": {"const": "1.0"},
+    "task_id": {"const": "TASK-30"},
+    "atom_id": {"const": "T30-A13_FORWARD_STREAM_OWNER_PACKET_READINESS_V1"},
+    "contract_id": {"const": "TASK30-FORWARD-STREAM-OWNER-PACKET-V1"},
+    "consumer": {"const": "FUTURE_EXACT_OWNER_EXTERNAL_READ_GATE"},
+    "frozen_group": {"const": "RC001-H07-H01-LIQUIDITY-RETENTION"},
+    "target": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["network", "pool_address", "base_mint", "dex_program_or_route"],
+      "properties": {
+        "network": {"const": "solana"},
+        "pool_address": {"const": "URqx24yyYxtXXhTbBQnbtPLhtLWYoaDaRxuQuLpNS3S"},
+        "base_mint": {"const": "DMwbVy48dWVKGe9z1pcVnwF3HLMLrqWdDLfbvx8RchhK"},
+        "dex_program_or_route": {"const": "OWNER_VERIFIED_ROUTE_REQUIRED"}
+      }
+    },
+    "provider": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["provider_candidate", "provider_selection", "transport_candidate"],
+      "properties": {
+        "provider_candidate": {"const": "HELIUS_TRANSACTION_SUBSCRIBE"},
+        "provider_selection": {"const": "PROPOSED_NOT_SELECTED"},
+        "transport_candidate": {"const": "WSS_JSON_RPC"}
+      }
+    },
+    "candidate_subscription": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["method", "account_include", "commitment", "encoding", "transaction_details", "max_supported_transaction_version", "failed", "vote"],
+      "properties": {
+        "method": {"const": "transactionSubscribe"},
+        "account_include": {"const": ["URqx24yyYxtXXhTbBQnbtPLhtLWYoaDaRxuQuLpNS3S"]},
+        "commitment": {"const": "confirmed"},
+        "encoding": {"const": "jsonParsed"},
+        "transaction_details": {"const": "full"},
+        "max_supported_transaction_version": {"const": 0},
+        "failed": {"const": false},
+        "vote": {"const": false}
+      }
+    },
+    "pilot_limits": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["connections", "subscriptions", "open_duration_seconds", "notifications"],
+      "properties": {
+        "connections": {"const": 1},
+        "subscriptions": {"const": 1},
+        "open_duration_seconds": {"const": 1200},
+        "notifications": {"const": 500}
+      }
+    },
+    "execution_controls": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["retry", "reconnect", "fallback", "monitoring_owner", "scheduler", "retention_class", "absolute_raw_root"],
+      "properties": {
+        "retry": {"const": false},
+        "reconnect": {"const": false},
+        "fallback": {"const": false},
+        "monitoring_owner": {"const": "LOCAL_WORK_CODEX_FOREGROUND"},
+        "scheduler": {"const": false},
+        "retention_class": {"const": "A4"},
+        "absolute_raw_root": {"const": "OWNER_INPUT_REQUIRED"}
+      }
+    },
+    "authority": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["provider_api_rpc_wss_calls", "credential_read", "raw_data_write", "dependency_changes", "r2_r3_access", "wallet_signer_transaction_actions", "cash_spend_usd", "task30_trial_or_acceptance", "project_sources_changes"],
+      "properties": {
+        "provider_api_rpc_wss_calls": {"const": 0},
+        "credential_read": {"const": false},
+        "raw_data_write": {"const": false},
+        "dependency_changes": {"const": false},
+        "r2_r3_access": {"const": false},
+        "wallet_signer_transaction_actions": {"const": false},
+        "cash_spend_usd": {"const": 0},
+        "task30_trial_or_acceptance": {"const": false},
+        "project_sources_changes": {"const": false}
+      }
+    },
+    "terminal_truth": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["allowed_terminal_states", "no_observation_disposition", "transport_loss_disposition", "unknown_recovery"],
+      "properties": {
+        "allowed_terminal_states": {
+          "const": ["PILOT_NOT_AUTHORIZED", "CONNECTION_OR_AUTH_REJECTED", "SUBSCRIPTION_REJECTED", "NO_OBSERVED_TX_NO_EMPTY_CLAIM", "OBSERVATION_RETAINED_TECHNICAL_ONLY", "TRANSPORT_LOST_UNKNOWN", "RETENTION_FAILED_STOP"]
+        },
+        "no_observation_disposition": {"const": "NO_OBSERVED_TX_NO_EMPTY_CLAIM"},
+        "transport_loss_disposition": {"const": "TRANSPORT_LOST_UNKNOWN"},
+        "unknown_recovery": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["reconciliation_reference", "automatic_reconciliation", "retry_before_reconciliation", "interval_projection"],
+          "properties": {
+            "reconciliation_reference": {"const": "OWNER_AUTHORITY_REQUIRED"},
+            "automatic_reconciliation": {"const": false},
+            "retry_before_reconciliation": {"const": false},
+            "interval_projection": {"const": false}
+          }
+        }
+      }
+    },
+    "owner_authority": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["future_pilot_phrase", "future_pilot_authorized", "stop_procedure"],
+      "properties": {
+        "future_pilot_phrase": {"type": "string", "minLength": 40},
+        "future_pilot_authorized": {"const": false},
+        "stop_procedure": {"const": "STOP_AND_RETAIN_SAFE_RECEIPT"}
+      }
+    },
+    "non_claims": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["empty_interval_claim", "zero_volume_claim", "complete_coverage_claim", "pit_admissible_claim", "h07_h01_evidence_claim", "task30_trial_claim", "execution_claim", "settlement_claim", "pnl_claim", "numeric_netreturn_claim"],
+      "properties": {
+        "empty_interval_claim": {"const": false},
+        "zero_volume_claim": {"const": false},
+        "complete_coverage_claim": {"const": false},
+        "pit_admissible_claim": {"const": false},
+        "h07_h01_evidence_claim": {"const": false},
+        "task30_trial_claim": {"const": false},
+        "execution_claim": {"const": false},
+        "settlement_claim": {"const": false},
+        "pnl_claim": {"const": false},
+        "numeric_netreturn_claim": {"const": false}
+      }
+    },
+    "decision": {"const": "READY_FOR_OWNER_EXTERNAL_READ_GATE_WITH_LIMITATIONS"},
+    "project_sources_disposition": {"const": "NO_CHANGE"}
+  }
+}
