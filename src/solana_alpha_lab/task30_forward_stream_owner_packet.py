@@ -139,7 +139,7 @@ def _require_exact_keys(
 def _require_exact(
     value: object, expected: object, code: str
 ) -> None:
-    _require(value == expected, code)
+    _require(type(value) is type(expected) and value == expected, code)
 
 
 def _require_identity(config: Mapping[str, Any]) -> None:

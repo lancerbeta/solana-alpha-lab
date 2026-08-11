@@ -17494,7 +17494,7 @@ records:
   as_of: '2026-08-11'
   truth_owner: TASK-30
   location: {kind: git_path, logical_uri: 'repo://src/solana_alpha_lab/task30_forward_stream_owner_packet.py', repository_path: src/solana_alpha_lab/task30_forward_stream_owner_packet.py}
-  integrity: {kind: sha256, sha256: 2c51ddef7930d75011635bb7cf7fc543bf5e8bf160dbdc1c231c2f21ecb9936a}
+  integrity: {kind: sha256, sha256: 1fd1ed9b715ef63a60c9d501056273745e8e904b343f2d5b593bfde99de0dcc7}
   access: *t25_read_file
   relations:
   - {relation_type: governed_by, target_asset_id: CONFIG-T30-FORWARD-STREAM-OWNER-PACKET-001}
@@ -17546,7 +17546,7 @@ records:
   as_of: '2026-08-11'
   truth_owner: TASK-30
   location: {kind: git_path, logical_uri: 'repo://tests/test_task30_forward_stream_owner_packet.py', repository_path: tests/test_task30_forward_stream_owner_packet.py}
-  integrity: {kind: sha256, sha256: eaddea6ce3b1484be3b6edee466c9873d47bbc11359a7f87f9bcc220ff3e095a}
+  integrity: {kind: sha256, sha256: 299c37487f7fc474ac1cce08c8e340a4e34123b8bf7e098469da855e8967d555}
   access: *t25_read_file
   relations:
   - {relation_type: depends_on, target_asset_id: MODULE-T30-FORWARD-STREAM-OWNER-PACKET-001}
@@ -17565,7 +17565,7 @@ records:
   as_of: '2026-08-11'
   truth_owner: TASK-30
   location: {kind: git_path, logical_uri: 'repo://docs/evidence/task30/a13_forward_stream_owner_packet_acceptance_v1.json', repository_path: docs/evidence/task30/a13_forward_stream_owner_packet_acceptance_v1.json}
-  integrity: {kind: sha256, sha256: 5b907f52396c78799bf00724a447c8a6d75820e55747118c6ded887d0d0fa9d0}
+  integrity: {kind: sha256, sha256: ff660fc8e5143aff5b5e108939545c7a0075bf738ddcd6cd2004c3d9b9cbc0dc}
   access: *t25_read_file
   relations:
   - {relation_type: derived_from, target_asset_id: CONTRACT-T30-FORWARD-STREAM-OWNER-PACKET-001}

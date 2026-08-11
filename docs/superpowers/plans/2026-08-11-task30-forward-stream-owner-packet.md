@@ -255,8 +255,10 @@ git commit -m "feat: evaluate forward stream owner packet offline"
 - Acceptance binds the exact SHA-256 of every A13 artifact—including accepted
   design and implementation plan—and declares `STATE_CHANGE=NONE`.
 - Factory Fit is `FULL_REVIEW`, expected verdict `PASS_WITH_LIMITATIONS`.
-- Catalog receives durable task/contract/config/schema/fixture/module/script/
-  report/test/evidence identifiers using current repository conventions.
+- Catalog receives durable contract/config/schema/fixture/module/script/
+  report/test/evidence identifiers using current repository conventions.  The
+  task note, design and implementation plan remain hash-bound process documents
+  and are not Catalog product assets.
 
 - [ ] **Step 1: Extend the test with acceptance and Factory Fit checks**
 

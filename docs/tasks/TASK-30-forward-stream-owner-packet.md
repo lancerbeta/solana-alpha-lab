@@ -48,5 +48,6 @@ The pure evaluator rejects every authority or truth promotion listed in the
 contract, the rendered packet remains non-technical and secret-free, all
 artifacts are hash-bound, and all durable contract/runtime/report/evidence
 outputs are Catalog-discoverable.  The accepted design and implementation plan
-remain hash-bound process documents rather than Catalog product assets.  The
-delivery stops before a provider or owner-external-read action.
+and this task note remain hash-bound process documents rather than Catalog
+product assets.  The delivery stops before a provider or owner-external-read
+action.

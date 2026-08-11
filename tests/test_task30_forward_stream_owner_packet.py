@@ -256,6 +256,41 @@ class Task30ForwardStreamOwnerPacketTests(unittest.TestCase):
         ):
             evaluate_forward_stream_owner_packet(candidate)
 
+    def test_exact_values_reject_bool_integer_and_float_conflation(self) -> None:
+        """Python equality cannot weaken the JSON/wire types frozen by the schema."""
+        config = yaml.safe_load(CONFIG_PATH.read_text(encoding="utf-8"))
+        cases = (
+            ("pilot_limits.connections", True, "PILOT_LIMIT_DRIFT"),
+            (
+                "pilot_limits.open_duration_seconds",
+                1200.0,
+                "PILOT_LIMIT_DRIFT",
+            ),
+            (
+                "candidate_subscription.max_supported_transaction_version",
+                False,
+                "CANDIDATE_SUBSCRIPTION_DRIFT",
+            ),
+            (
+                "candidate_subscription.failed",
+                0,
+                "CANDIDATE_SUBSCRIPTION_DRIFT",
+            ),
+            (
+                "authority.provider_api_rpc_wss_calls",
+                False,
+                "ZERO_AUTHORITY_REQUIRED",
+            ),
+        )
+        for pointer, replacement, expected_error in cases:
+            with self.subTest(pointer=pointer):
+                candidate = copy.deepcopy(config)
+                replace_pointer(candidate, pointer, replacement)
+                with self.assertRaisesRegex(
+                    ForwardStreamOwnerPacketError, expected_error
+                ):
+                    evaluate_forward_stream_owner_packet(candidate)
+
     def test_renderer_is_russian_and_never_grants_external_authority(self) -> None:
         """The human packet explains a future gate without leaking an execution path."""
         config = yaml.safe_load(CONFIG_PATH.read_text(encoding="utf-8"))
