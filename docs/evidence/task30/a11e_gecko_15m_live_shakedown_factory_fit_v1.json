@@ -1,0 +1,57 @@
+{
+  "schema": "smial.task30.gecko-15m-live-shakedown.factory-fit",
+  "schema_version": "1.0",
+  "receipt_id": "T30-A11E-GECKO-15M-LIVE-SHAKEDOWN-FACTORY-FIT-001",
+  "task_id": "TASK-30",
+  "atom_id": "T30-A11E_GECKO_15M_LIVE_SHAKEDOWN_OUTCOME_AND_ROUTE_DECISION_V1",
+  "review_scope": "FULL_REVIEW",
+  "verdict": "PASS_WITH_LIMITATIONS",
+  "runtime_receipt_path": "docs/evidence/task30/a11e_gecko_15m_live_shakedown_runtime_receipt_v1.json",
+  "runtime_receipt_sha256": "28d246c97a7e6866760683c6e63296f9d310a2cce35ac98be61e107af9f7bcdb",
+  "decision": "CLOSE_CURRENT_GECKO_15M_FAST_FRESHNESS_ROUTE",
+  "reuse_first_decision": "STOP_CURRENT_ROUTE_NO_NEW_PROVIDER_READ",
+  "mission_fit": "Stops a technically unfit capture route before it can create a misleading 15-minute research panel or consume more operator attention.",
+  "research_truth": {
+    "four_http_200_responses_observed": true,
+    "expected_closed_interval_observed_within_60_seconds": false,
+    "typed_gap_preserved": true,
+    "missing_coerced_to_zero_or_flat": false,
+    "pit_admissibility_proven": false,
+    "provider_globally_rejected": false
+  },
+  "owner_operability": {
+    "current_owner_action": "NONE",
+    "recovery": "Retain the A4 receipt chain and this bounded decision. Do not retry, delay-shift, fill, or substitute a provider implicitly.",
+    "future_external_boundary": "A new named consumer must supply a new provider-entry contract and exact owner external-read authority."
+  },
+  "flexibility": {
+    "new_collector_or_adapter": "NOT_BUILT",
+    "current_provider_route_selection": "NOT_MADE",
+    "future_provider_comparison": "DEFERRED_UNTIL_NAMED_CONSUMER"
+  },
+  "execution_to_cashflow": "NOT_IN_SCOPE_NO_EXECUTION_OR_CASHFLOW_CLAIM",
+  "monitoring_recovery": "PASS_FOREGROUND_RECEIPTS_STOPPED_BEFORE_SECOND_SLOT_AND_CREATED_NO_OPEN_STATE",
+  "product_horizon": {
+    "now": {
+      "candidate": "RETAIN_ROUTE_SPECIFIC_NEGATIVE_RESULT",
+      "value": "Prevents a stale candle from being presented as a current 15-minute observation.",
+      "activation_trigger": "ALWAYS_ACTIVE_FOR_THIS_FROZEN_ROUTE_AND_FRESHNESS_REQUIREMENT"
+    },
+    "watch": {
+      "candidate": "NEW_NAMED_PROVIDER_ENTRY_GATE",
+      "value": "May evaluate another source only when a named hypothesis consumer cannot proceed without a bounded fresh-candle contract.",
+      "activation_trigger": "NAMED_CONSUMER_PLUS_NEW_EXACT_OWNER_EXTERNAL_READ_AUTHORIZATION"
+    }
+  },
+  "next_provider_gate_required": true,
+  "non_claims": [
+    "NO_RETRY_AUTHORITY",
+    "NO_FALLBACK_PROVIDER_AUTHORITY",
+    "NO_CURRENT_15M_PIT_PANEL",
+    "NO_PROVIDER_GLOBAL_REJECTION",
+    "NO_TASK30_TRIAL_OR_ACCEPTANCE",
+    "NO_EXECUTION_OR_SETTLEMENT",
+    "NO_NUMERIC_NETRETURN"
+  ],
+  "project_sources_disposition": "NO_CHANGE"
+}
