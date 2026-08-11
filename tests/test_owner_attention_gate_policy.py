@@ -197,18 +197,35 @@ class OwnerAttentionGatePolicyTests(unittest.TestCase):
                 self.assertNotIn(phrase, text, relative)
 
     def test_project_instruction_candidate_is_ui_safe_and_policy_aligned(self) -> None:
-        path = ROOT / "docs" / "agent" / "PROJECT_INSTRUCTION_V3_4.md"
+        path = ROOT / "docs" / "agent" / "PROJECT_INSTRUCTION_V3_5.md"
         text = path.read_text(encoding="utf-8")
         self.assertTrue(
             text.startswith(
-                "PROJECT INSTRUCTION — SOLANA MEMECOIN INTRADAY ALPHA LAB v3.4"
+                "PROJECT INSTRUCTION — SOLANA MEMECOIN INTRADAY ALPHA LAB v3.5"
             )
         )
         self.assertLessEqual(len(text), 8000)
         self.assertIn("OWNER_ATTENTION_GATE", text)
         self.assertIn("LOCAL_WORK_CODEX: Codex сам merge", text)
         self.assertIn("Cursor не merge", text)
+        self.assertIn("dormant", text)
         self.assertNotIn("Final merge — после подтверждения exact PR", text)
+
+    def test_model_effort_router_is_present_on_active_policy_surfaces(self) -> None:
+        required = (
+            "MODEL_EFFORT_RECOMMENDATION",
+            "NEXT_MODEL_EFFORT",
+            "LUNA_MAX",
+            "SOL_XHIGH",
+            "SOL_MAX",
+            "TERRA_XHIGH",
+            "ROUTINE_NO_SWITCH",
+            "hardest material segment",
+        )
+        for relative in ("AGENTS.md", "docs/agent/PROJECT_INSTRUCTION_V3_5.md"):
+            text = (ROOT / relative).read_text(encoding="utf-8")
+            for marker in required:
+                self.assertIn(marker, text, f"{relative}: missing {marker}")
 
 
 if __name__ == "__main__":

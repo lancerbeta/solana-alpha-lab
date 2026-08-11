@@ -5073,6 +5073,16 @@
       "target_asset_id": "POLICY-OWNER-ATTENTION-GATE-001"
     },
     {
+      "source_asset_id": "PROJECT-INSTRUCTION-CANDIDATE-3-4-001",
+      "relation": "superseded_by",
+      "target_asset_id": "PROJECT-INSTRUCTION-CANDIDATE-3-5-001"
+    },
+    {
+      "source_asset_id": "PROJECT-INSTRUCTION-CANDIDATE-3-5-001",
+      "relation": "governed_by",
+      "target_asset_id": "POLICY-OWNER-ATTENTION-GATE-001"
+    },
+    {
       "source_asset_id": "PROTOCOL-EXECUTION-ROUTER-001",
       "relation": "governed_by",
       "target_asset_id": "CTRL-BATON-SETUP-001"
