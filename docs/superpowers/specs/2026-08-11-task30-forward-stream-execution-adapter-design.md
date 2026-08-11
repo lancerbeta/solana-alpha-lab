@@ -1,8 +1,10 @@
 # TASK-30 A14P — forward-stream execution adapter design
 
-Status: `DESIGN_APPROVED_PENDING_SPEC_REVIEW`
+Status: `SPEC_REVIEW_APPROVED`
 
 Owner design receipt: `A14P_ADAPTER_DESIGN_APPROVED`
+
+Owner spec-review receipt: `A14P_SPEC_REVIEW_APPROVED`
 
 Date: `2026-08-11`
 
