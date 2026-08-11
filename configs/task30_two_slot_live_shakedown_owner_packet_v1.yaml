@@ -1,0 +1,83 @@
+schema: smial.task30.two-slot-live-shakedown-owner-packet
+schema_version: '1.0'
+task_id: TASK-30
+atom_id: T30-A11B_TWO_SLOT_LIVE_SHAKEDOWN_OWNER_PACKET_V1
+contract_id: CONTRACT-T30-TWO-SLOT-LIVE-SHAKEDOWN-OWNER-PACKET-001
+status: OWNER_APPROVAL_REQUIRED
+frozen_binding:
+  group_id: RC001-H07-H01-LIQUIDITY-RETENTION
+  interval_seconds: 900
+  pool_address: URqx24yyYxtXXhTbBQnbtPLhtLWYoaDaRxuQuLpNS3S
+  network: solana
+  upstream_a10:
+    receipt_path: docs/evidence/task30/a10_gecko_interval_semantics_runtime_receipt_v1.json
+    receipt_sha256: 5ba127597f448ebd8cdd3ea00d5d76722529e404084f59fea6bbbef6c598d904
+    decision: START_LABELED
+  upstream_a11a:
+    receipt_path: docs/evidence/task30/a11_route_availability_probe_acceptance_v1.json
+    receipt_sha256: e5162217299518cdef4706c0ba973666c13c08d217c0f8a94c4914bffd3b7756
+    decision: OFFLINE_PROBE_POLICY_VALIDATED
+provider_candidate: GECKOTERMINAL_PUBLIC_KEYLESS
+provider_selected: false
+external_capture_authorized: false
+future_request_proposal:
+  method: GET
+  public_base_url: https://api.geckoterminal.com/api/v2
+  path_template: /networks/solana/pools/{pool}/ohlcv/minute
+  query:
+    aggregate: '15'
+    currency: usd
+    token: base
+    include_empty_intervals: 'false'
+    limit: '1'
+    before_timestamp: OWNER_BOUND_SLOT_END_UTC
+  credentials: false
+  retry: false
+  fallback: false
+shakedown_shape:
+  slot_count: 2
+  interval_seconds: 900
+  offset_seconds: [0, 15, 30, 60]
+  max_provider_gets: 8
+  separate_foreground_starts: true
+  second_slot_requires_prior_receipt: true
+  future_slot_starts_utc: OWNER_INPUT_REQUIRED
+retention:
+  policy: A4
+  raw_json_outside_git: true
+  raw_manifest_required_after_every_response: true
+  immediate_hash_required: true
+monitoring:
+  owner: OWNER_INPUT_REQUIRED
+  health_receipt_required: true
+  stop_on_monitoring_loss: true
+recovery:
+  stop_on_process_not_started: true
+  stop_on_receipt_write_failed: true
+  stop_on_prior_manifest_unreadable: true
+  stop_on_monitoring_lost: true
+  retry_allowed: false
+  fallback_allowed: false
+  silent_restart_allowed: false
+current_atom_authority:
+  provider_api_rpc_wss_calls: 0
+  credential_use: 0
+  raw_data_writes: 0
+  scheduler_or_background_processes: 0
+  r2_r3_access: 0
+  wallet_signer_transaction_actions: 0
+  cash_spend_usd_cents: 0
+  task30_trial_or_acceptance_actions: 0
+non_claims:
+  pit_admissible: false
+  h07_h01_evidence: false
+  task30_trial: false
+  execution: false
+  settlement: false
+  pnl: false
+  numeric_netreturn: false
+  provider_selected: false
+  external_capture_authorized: false
+  twenty_four_hour_capture_authorized: false
+  missing_is_zero_or_flat: false
+project_sources_disposition: NO_CHANGE

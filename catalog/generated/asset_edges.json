@@ -563,6 +563,11 @@
       "target_asset_id": "CONTRACT-T30-ROUTE-AVAILABILITY-PROBE-001"
     },
     {
+      "source_asset_id": "CONFIG-T30-TWO-SLOT-LIVE-SHAKEDOWN-OWNER-PACKET-001",
+      "relation": "governed_by",
+      "target_asset_id": "CONTRACT-T30-TWO-SLOT-LIVE-SHAKEDOWN-OWNER-PACKET-001"
+    },
+    {
       "source_asset_id": "CONFIG-T34A-DOCUMENTATION-FOUNDATION-001",
       "relation": "governed_by",
       "target_asset_id": "CONTRACT-T34A-DOCUMENTATION-FOUNDATION-001"
@@ -1141,6 +1146,11 @@
       "source_asset_id": "CONTRACT-T30-ROUTE-AVAILABILITY-PROBE-001",
       "relation": "depends_on",
       "target_asset_id": "EVIDENCE-T30-A10-GECKO-INTERVAL-SEMANTICS-RUNTIME-001"
+    },
+    {
+      "source_asset_id": "CONTRACT-T30-TWO-SLOT-LIVE-SHAKEDOWN-OWNER-PACKET-001",
+      "relation": "depends_on",
+      "target_asset_id": "EVIDENCE-T30-A11-ROUTE-AVAILABILITY-PROBE-001"
     },
     {
       "source_asset_id": "CONTROL-T21-ACTIVE-TIME-GATE-001",
@@ -3038,6 +3048,21 @@
       "target_asset_id": "TEST-T30-ROUTE-AVAILABILITY-PROBE-001"
     },
     {
+      "source_asset_id": "EVIDENCE-T30-A11B-TWO-SLOT-LIVE-SHAKEDOWN-OWNER-PACKET-001",
+      "relation": "derived_from",
+      "target_asset_id": "CONTRACT-T30-TWO-SLOT-LIVE-SHAKEDOWN-OWNER-PACKET-001"
+    },
+    {
+      "source_asset_id": "EVIDENCE-T30-A11B-TWO-SLOT-LIVE-SHAKEDOWN-OWNER-PACKET-001",
+      "relation": "derived_from",
+      "target_asset_id": "EVIDENCE-T30-A11-ROUTE-AVAILABILITY-PROBE-001"
+    },
+    {
+      "source_asset_id": "EVIDENCE-T30-A11B-TWO-SLOT-LIVE-SHAKEDOWN-OWNER-PACKET-001",
+      "relation": "validated_by",
+      "target_asset_id": "TEST-T30-TWO-SLOT-LIVE-SHAKEDOWN-OWNER-PACKET-001"
+    },
+    {
       "source_asset_id": "EVIDENCE-T30-A2-CATALOG-FACTORY-FIT-001",
       "relation": "derived_from",
       "target_asset_id": "EVIDENCE-T30-A1-BOUNDARY-SEMANTICS-001"
@@ -3766,6 +3791,11 @@
       "source_asset_id": "FIXTURE-T30-ROUTE-AVAILABILITY-PROBE-001",
       "relation": "derived_from",
       "target_asset_id": "CONFIG-T30-ROUTE-AVAILABILITY-PROBE-001"
+    },
+    {
+      "source_asset_id": "FIXTURE-T30-TWO-SLOT-LIVE-SHAKEDOWN-OWNER-PACKET-001",
+      "relation": "derived_from",
+      "target_asset_id": "CONFIG-T30-TWO-SLOT-LIVE-SHAKEDOWN-OWNER-PACKET-001"
     },
     {
       "source_asset_id": "FIXTURE-T34A-DOCUMENTATION-FOUNDATION-001",
@@ -4633,6 +4663,16 @@
       "target_asset_id": "CONFIG-T30-ROUTE-AVAILABILITY-PROBE-001"
     },
     {
+      "source_asset_id": "MODULE-T30-TWO-SLOT-LIVE-SHAKEDOWN-OWNER-PACKET-001",
+      "relation": "depends_on",
+      "target_asset_id": "EVIDENCE-T30-A11-ROUTE-AVAILABILITY-PROBE-001"
+    },
+    {
+      "source_asset_id": "MODULE-T30-TWO-SLOT-LIVE-SHAKEDOWN-OWNER-PACKET-001",
+      "relation": "governed_by",
+      "target_asset_id": "CONFIG-T30-TWO-SLOT-LIVE-SHAKEDOWN-OWNER-PACKET-001"
+    },
+    {
       "source_asset_id": "MODULE-T34A-DOCUMENTATION-FOUNDATION-001",
       "relation": "governed_by",
       "target_asset_id": "CONFIG-T34A-DOCUMENTATION-FOUNDATION-001"
@@ -5016,6 +5056,11 @@
       "source_asset_id": "REPORT-T30-ROUTE-AVAILABILITY-PROBE-001",
       "relation": "derived_from",
       "target_asset_id": "SCRIPT-T30-ROUTE-AVAILABILITY-PROBE-001"
+    },
+    {
+      "source_asset_id": "REPORT-T30-TWO-SLOT-LIVE-SHAKEDOWN-OWNER-PACKET-001",
+      "relation": "derived_from",
+      "target_asset_id": "SCRIPT-T30-TWO-SLOT-LIVE-SHAKEDOWN-OWNER-PACKET-001"
     },
     {
       "source_asset_id": "ROADMAP-PATCH-T21-PRODUCT-VISION-001",
@@ -5423,6 +5468,11 @@
       "target_asset_id": "CONTRACT-T30-ROUTE-AVAILABILITY-PROBE-001"
     },
     {
+      "source_asset_id": "SCHEMA-T30-TWO-SLOT-LIVE-SHAKEDOWN-OWNER-PACKET-001",
+      "relation": "governed_by",
+      "target_asset_id": "CONTRACT-T30-TWO-SLOT-LIVE-SHAKEDOWN-OWNER-PACKET-001"
+    },
+    {
       "source_asset_id": "SCHEMA-T34A-DOCUMENTATION-FOUNDATION-001",
       "relation": "governed_by",
       "target_asset_id": "CONTRACT-T34A-DOCUMENTATION-FOUNDATION-001"
@@ -5816,6 +5866,16 @@
       "source_asset_id": "SCRIPT-T30-ROUTE-AVAILABILITY-PROBE-001",
       "relation": "governed_by",
       "target_asset_id": "CONFIG-T30-ROUTE-AVAILABILITY-PROBE-001"
+    },
+    {
+      "source_asset_id": "SCRIPT-T30-TWO-SLOT-LIVE-SHAKEDOWN-OWNER-PACKET-001",
+      "relation": "depends_on",
+      "target_asset_id": "MODULE-T30-TWO-SLOT-LIVE-SHAKEDOWN-OWNER-PACKET-001"
+    },
+    {
+      "source_asset_id": "SCRIPT-T30-TWO-SLOT-LIVE-SHAKEDOWN-OWNER-PACKET-001",
+      "relation": "governed_by",
+      "target_asset_id": "CONFIG-T30-TWO-SLOT-LIVE-SHAKEDOWN-OWNER-PACKET-001"
     },
     {
       "source_asset_id": "SCRIPT-T34A-CONTEXT-001",
@@ -7281,6 +7341,21 @@
       "source_asset_id": "TEST-T30-ROUTE-AVAILABILITY-PROBE-001",
       "relation": "depends_on",
       "target_asset_id": "SCHEMA-T30-ROUTE-AVAILABILITY-PROBE-001"
+    },
+    {
+      "source_asset_id": "TEST-T30-TWO-SLOT-LIVE-SHAKEDOWN-OWNER-PACKET-001",
+      "relation": "depends_on",
+      "target_asset_id": "FIXTURE-T30-TWO-SLOT-LIVE-SHAKEDOWN-OWNER-PACKET-001"
+    },
+    {
+      "source_asset_id": "TEST-T30-TWO-SLOT-LIVE-SHAKEDOWN-OWNER-PACKET-001",
+      "relation": "depends_on",
+      "target_asset_id": "MODULE-T30-TWO-SLOT-LIVE-SHAKEDOWN-OWNER-PACKET-001"
+    },
+    {
+      "source_asset_id": "TEST-T30-TWO-SLOT-LIVE-SHAKEDOWN-OWNER-PACKET-001",
+      "relation": "depends_on",
+      "target_asset_id": "SCHEMA-T30-TWO-SLOT-LIVE-SHAKEDOWN-OWNER-PACKET-001"
     },
     {
       "source_asset_id": "TEST-T34A-DOCUMENTATION-FOUNDATION-001",

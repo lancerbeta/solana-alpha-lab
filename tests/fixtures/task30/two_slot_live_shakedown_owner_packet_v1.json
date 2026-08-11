@@ -1,0 +1,20 @@
+{
+  "schema": "smial.task30.two-slot-live-shakedown-owner-packet.fixture",
+  "schema_version": "1.0",
+  "fixture_id": "FIXTURE-T30-TWO-SLOT-LIVE-SHAKEDOWN-OWNER-PACKET-001",
+  "synthetic_only": true,
+  "expected_result": {
+    "status": "OWNER_APPROVAL_REQUIRED",
+    "external_capture_authorized": false,
+    "max_provider_gets": 8,
+    "provider_candidate": "GECKOTERMINAL_PUBLIC_KEYLESS",
+    "next_boundary": "EXACT_OWNER_EXTERNAL_READ_AUTHORIZATION"
+  },
+  "non_claims": {
+    "provider_call_performed": false,
+    "raw_data_retained": false,
+    "scheduler_started": false,
+    "task30_trial": false,
+    "numeric_netreturn": false
+  }
+}
