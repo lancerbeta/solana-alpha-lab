@@ -2,9 +2,13 @@ from __future__ import annotations
 
 import copy
 import hashlib
+import importlib.util
+import io
 import json
 import sys
 import unittest
+from collections.abc import Iterator, Mapping
+from contextlib import redirect_stderr, redirect_stdout
 from datetime import UTC, datetime
 from pathlib import Path
 from tempfile import TemporaryDirectory
@@ -39,6 +43,7 @@ FIXTURE_PATH = (
     ROOT / "tests/fixtures/task30/forward_stream_execution_adapter_v1.json"
 )
 RUNTIME_CONFIG_PATH = ROOT / "configs/task30_forward_stream_runtime_harness_v1.yaml"
+CLI_PATH = ROOT / "scripts/run_task30_forward_stream_capture.py"
 FROZEN_NOW = datetime(2026, 8, 11, 12, 0, 0, tzinfo=UTC)
 SECOND_FRAME_AT = datetime(2026, 8, 11, 12, 0, 1, tzinfo=UTC)
 FAKE_CREDENTIAL = "synthetic-" + "credential-value"
@@ -122,6 +127,49 @@ def bounded_capture(*notifications: bytes, ack: bytes | None = None) -> WssCaptu
         error_class=None,
         stop_reason="ELAPSED_CAP",
     )
+
+
+def load_cli():
+    spec = importlib.util.spec_from_file_location(
+        "run_task30_forward_stream_capture", CLI_PATH
+    )
+    if spec is None or spec.loader is None:
+        raise AssertionError("CLI module spec unavailable")
+    module = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(module)
+    return module
+
+
+class ExplodingMapping(Mapping[str, str]):
+    def __getitem__(self, key: str) -> str:
+        raise AssertionError("environment must not be read")
+
+    def __iter__(self) -> Iterator[str]:
+        raise AssertionError("environment must not be iterated")
+
+    def __len__(self) -> int:
+        raise AssertionError("environment length must not be read")
+
+
+class RecordingMapping(Mapping[str, str]):
+    def __init__(self, value: str, marker_exists) -> None:
+        self.value = value
+        self.marker_exists = marker_exists
+        self.read_keys: list[str] = []
+        self.marker_before_read = False
+
+    def __getitem__(self, key: str) -> str:
+        self.read_keys.append(key)
+        self.marker_before_read = self.marker_exists()
+        if key != "HELIUS_API_KEY":
+            raise KeyError(key)
+        return self.value
+
+    def __iter__(self) -> Iterator[str]:
+        yield "HELIUS_API_KEY"
+
+    def __len__(self) -> int:
+        return 1
 
 
 class Task30ForwardStreamExecutionPolicyTests(unittest.TestCase):
@@ -611,6 +659,137 @@ class Task30ForwardStreamExecutionRetentionTests(unittest.TestCase):
             FAKE_CREDENTIAL.encode(),
             (run_root / "terminal_receipt.json").read_bytes(),
         )
+
+
+class Task30ForwardStreamExecutionCliTests(unittest.TestCase):
+    def setUp(self) -> None:
+        self.temporary = TemporaryDirectory()
+        self.addCleanup(self.temporary.cleanup)
+        self.root = Path(self.temporary.name).resolve()
+        (self.root / ".gitignore").write_text("local/\n", encoding="utf-8")
+        self.raw_root = self.root / "local/task30_forward_stream"
+
+    def invoke(self, argv, *, environ, exchange, repository_root=None):
+        cli = load_cli()
+        cli.ROOT = self.root if repository_root is None else repository_root
+        stdout = io.StringIO()
+        stderr = io.StringIO()
+        with redirect_stdout(stdout), redirect_stderr(stderr):
+            result = cli.main(argv, environ=environ, wss_exchange=exchange)
+        return result, stdout.getvalue(), stderr.getvalue()
+
+    def test_dry_run_does_not_read_key_write_or_call_transport(self) -> None:
+        def fail_if_called(*args, **kwargs):
+            raise AssertionError("transport must not be called")
+
+        result, stdout, stderr = self.invoke(
+            [
+                "--dry-run",
+                "--authority",
+                OWNER_EXECUTION_PHRASE,
+                "--raw-root",
+                str(self.raw_root),
+            ],
+            environ=ExplodingMapping(),
+            exchange=fail_if_called,
+        )
+        self.assertEqual(result, 0)
+        self.assertEqual(stderr, "")
+        self.assertEqual(
+            json.loads(stdout),
+            {
+                "credential_read": False,
+                "network_calls": 0,
+                "output_created": False,
+                "result": "DRY_RUN_PASS",
+            },
+        )
+        self.assertFalse(self.raw_root.exists())
+
+    def test_execute_reads_only_named_key_after_started_marker(self) -> None:
+        environment = RecordingMapping(
+            FAKE_CREDENTIAL,
+            lambda: bool(tuple(self.raw_root.glob("run=*/attempt_started.json"))),
+        )
+        result, stdout, stderr = self.invoke(
+            [
+                "--execute",
+                "--authority",
+                OWNER_EXECUTION_PHRASE,
+                "--raw-root",
+                str(self.raw_root),
+            ],
+            environ=environment,
+            exchange=lambda request, **limits: bounded_capture(notification()),
+        )
+        self.assertEqual(result, 0)
+        self.assertEqual(stderr, "")
+        self.assertEqual(environment.read_keys, ["HELIUS_API_KEY"])
+        self.assertTrue(environment.marker_before_read)
+        output = json.loads(stdout)
+        self.assertEqual(
+            output["terminal_state"], "OBSERVATION_RETAINED_TECHNICAL_ONLY"
+        )
+        self.assertNotIn(FAKE_CREDENTIAL, stdout)
+        self.assertNotIn(notification().decode("utf-8"), stdout)
+
+    def test_cli_rejects_ambiguous_modes_and_unknown_clock_override(self) -> None:
+        cli = load_cli()
+        cases = (
+            [],
+            ["--dry-run", "--execute"],
+            ["--execute", "--clock", "2026-08-11T12:00:00Z"],
+        )
+        for argv in cases:
+            with self.subTest(argv=argv):
+                with redirect_stderr(io.StringIO()):
+                    with self.assertRaises(SystemExit) as context:
+                        cli.main(
+                            argv,
+                            environ=ExplodingMapping(),
+                            wss_exchange=lambda *args, **kwargs: None,
+                        )
+                self.assertEqual(context.exception.code, 2)
+
+    def test_cli_rejects_relative_root_or_wrong_authority_before_environment(self) -> None:
+        cases = (
+            (
+                [
+                    "--dry-run",
+                    "--authority",
+                    OWNER_EXECUTION_PHRASE,
+                    "--raw-root",
+                    "relative/local/task30_forward_stream",
+                ],
+                "REPOSITORY_ROOT_ABSOLUTE_REQUIRED",
+            ),
+            (
+                [
+                    "--execute",
+                    "--authority",
+                    "WRONG",
+                    "--raw-root",
+                    str(self.raw_root),
+                ],
+                "PILOT_NOT_AUTHORIZED",
+            ),
+        )
+        for argv, code in cases:
+            with self.subTest(code=code):
+                result, stdout, stderr = self.invoke(
+                    argv,
+                    environ=ExplodingMapping(),
+                    exchange=lambda *args, **kwargs: None,
+                    repository_root=(
+                        Path("relative")
+                        if code == "REPOSITORY_ROOT_ABSOLUTE_REQUIRED"
+                        else self.root
+                    ),
+                )
+                self.assertEqual(result, 2)
+                self.assertEqual(stderr, "")
+                self.assertEqual(json.loads(stdout)["error"], code)
+                self.assertFalse(self.raw_root.exists())
 
 if __name__ == "__main__":
     unittest.main()
