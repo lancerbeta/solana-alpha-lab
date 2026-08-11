@@ -56,9 +56,10 @@ existing Factory Fit review must answer:
 - No claim that the current offline A11C harness is a hypothesis or that it
   should have avoided code; it is a safety capability for a future external
   read.
-- Historical TASK-15 receipt and TASK-20 frozen-input bytes remain untouched.
-  Their tests must preserve those historical hashes without treating a mutable
-  accepted architecture intent as if it could never evolve.
+- Historical TASK-15/TASK-20/TASK-23 receipt and frozen-input bytes remain
+  untouched. Their tests must preserve those historical hashes without treating
+  a mutable accepted architecture intent or its evolving verification tests as
+  if they could never evolve.
 
 ## Validation
 

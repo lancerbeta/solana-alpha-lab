@@ -36,6 +36,9 @@
 - Test: `tests/test_owner_attention_gate_policy.py`
 - Test repair: `tests/test_task15_hypothesis_driven_acquisition_acceptance.py`
 - Test repair: `tests/test_task20_collection_spec_contract.py`
+- Test repair: `tests/test_task20_acceptance_catalog_factory_fit.py`
+- Test repair: `tests/test_task20_coverage_retention_recovery_policy.py`
+- Test repair: `tests/test_task23_catalog_repository_factory_fit.py`
 
 **Interfaces:**
 
@@ -108,14 +111,16 @@ Preserve the byte-for-byte historical TASK-15 receipt and TASK-20 collection
 spec. Repair only their test interpretation: the frozen hash is a historical
 snapshot, while current `ARCH-INTENT-002` evolves through its versioned Catalog
 integrity binding. Add an explicit assertion that the current intent retains
-the Factory Leverage invariant.
+the Factory Leverage invariant. Apply the same separation to the transitive
+TASK-20 and TASK-23 historical receipts: retain each old hash in its immutable
+receipt/policy, while continuing to byte-check every unaffected artifact.
 
 Run:
 
 ```text
 git diff --check
 uv run --locked --managed-python python -B -m unittest tests.test_owner_attention_gate_policy -v
-uv run --locked --managed-python python -B -m unittest tests.test_task15_hypothesis_driven_acquisition_acceptance tests.test_task20_collection_spec_contract -v
+uv run --locked --managed-python python -B -m unittest tests.test_task15_hypothesis_driven_acquisition_acceptance tests.test_task20_collection_spec_contract tests.test_task20_acceptance_catalog_factory_fit tests.test_task20_coverage_retention_recovery_policy tests.test_task23_catalog_repository_factory_fit -v
 uv run --locked --managed-python python -B scripts/validate_catalog.py
 uv run --locked --managed-python python -B scripts/generate_navigation.py --check
 ```
@@ -138,10 +143,10 @@ git commit -m "docs: add factory leverage invariant"
 ```
 
 Expected committed implementation inventory: the two policy files, their two
-existing Catalog bindings, the updated existing TASK-15/TASK-20 test bindings,
-the derived project map with its existing Catalog binding, two historical-
-binding test repairs, and the already committed design and plan; no new Catalog
-asset or Project Sources change.
+existing Catalog bindings, the updated existing historical-test bindings, the
+derived project map with its existing Catalog binding, five historical-binding
+test repairs, and the already committed design and plan; no new Catalog asset
+or Project Sources change.
 
 - [ ] **Step 7: Deliver through the ordinary repository route**
 

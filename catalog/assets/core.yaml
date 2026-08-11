@@ -11275,14 +11275,14 @@ records:
   evidence: []
   classification: *t20_internal
 - asset_id: TEST-T20-COVERAGE-RETENTION-RECOVERY-001
-  record_version: '1.0'
+  record_version: '1.1'
   asset_type: script
   purpose: Deterministic tests for exact TASK-20 field coverage, named
     consumers, retention, no-clobber backup, restore sampling, health states
     and local-only authority.
   status: IMPLEMENTED_UNVERIFIED
   origin: REPOSITORY
-  as_of: '2026-07-30'
+  as_of: '2026-08-11'
   truth_owner: TASK-20
   location:
     kind: git_path
@@ -11290,7 +11290,7 @@ records:
     repository_path: tests/test_task20_coverage_retention_recovery_policy.py
   integrity:
     kind: sha256
-    sha256: c16ff29fd1a9ebb22d9e8a29df93101846260654767beecd481177d62badfac8
+    sha256: f3ef50f1f8b03f65063798b54dd6642c826dc43c969e7f44b42440cdb5d0c716
   access:
     mode: read_only
     method: file
@@ -11343,14 +11343,14 @@ records:
   evidence: []
   classification: *t20_internal
 - asset_id: TEST-T20-ACCEPTANCE-CATALOG-FACTORY-FIT-001
-  record_version: '1.3'
+  record_version: '1.4'
   asset_type: script
   purpose: Exact hash-bound TASK-20 acceptance tests for eight adversarial
     vectors, Catalog consistency, Factory Fit, generated navigation, non-claims
     and zero external authority.
   status: IMPLEMENTED_UNVERIFIED
   origin: REPOSITORY
-  as_of: '2026-08-01'
+  as_of: '2026-08-11'
   truth_owner: TASK-20
   location:
     kind: git_path
@@ -11358,7 +11358,7 @@ records:
     repository_path: tests/test_task20_acceptance_catalog_factory_fit.py
   integrity:
     kind: sha256
-    sha256: c3a53a72560f10af982ac95919b9952434036e170aa1188d1c08ed8f02e38928
+    sha256: 36e36f6700f30a4537c495a70d3326aa103f38f79cf35c4c795f2d2833e037f6
   access:
     mode: read_only
     method: file
@@ -12990,12 +12990,12 @@ records:
   evidence: []
   classification: *t23_internal
 - asset_id: TEST-T23-A5-CATALOG-FACTORY-FIT-001
-  record_version: '1.2'
+  record_version: '1.3'
   asset_type: script
   purpose: Hash-bound A5 tests for exact assets append-only trials Catalog lineage generated navigation Factory Fit holdout governance and authority.
   status: IMPLEMENTED_UNVERIFIED
   origin: REPOSITORY
-  as_of: '2026-08-02'
+  as_of: '2026-08-11'
   truth_owner: TASK-23
   location:
     kind: git_path
@@ -13003,7 +13003,7 @@ records:
     repository_path: tests/test_task23_catalog_repository_factory_fit.py
   integrity:
     kind: sha256
-    sha256: 58232b162185c79fd2f83aff0c2c3b23b0a26352c1cd2830fe0f01c1a17d1858
+    sha256: 1470832ff2cf686eb6958a88bb9f2638d865b055f1f1a007b73cd20e6d95b5d3
   access: *t23_read_file
   relations:
   - relation_type: depends_on
