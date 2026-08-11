@@ -1,0 +1,90 @@
+{
+  "schema": "smial.task30.forward-stream-runtime-harness.acceptance",
+  "schema_version": "1.0",
+  "receipt_id": "T30-A14-FORWARD-STREAM-RUNTIME-HARNESS-ACCEPTANCE-001",
+  "task_id": "TASK-30",
+  "atom_id": "T30-A14_FORWARD_STREAM_PILOT_RUNTIME_HARNESS_V1",
+  "validation_status": "PASS_WITH_LIMITATIONS",
+  "state_change": "NONE",
+  "decision": {
+    "value": "OFFLINE_FORWARD_STREAM_RUNTIME_HARNESS_VALIDATED",
+    "future_external_owner_gate_required": true,
+    "provider_selected": false,
+    "external_capture_authorized": false,
+    "raw_retention_authorized": false,
+    "trial_admissible": false
+  },
+  "reuse_research": {
+    "decision": "WRAP_CANDIDATE",
+    "candidate": "TASK08_BOUNDED_WSS_CAPTURE_AND_RECEIPT_PATTERN",
+    "finding": "The existing bounded WSS safety boundary is the reuse seam; the Pump logsSubscribe binding is not copied as a transactionSubscribe parser."
+  },
+  "factory_fit_review": "FULL_REVIEW",
+  "factory_fit": {
+    "verdict": "PASS_WITH_LIMITATIONS",
+    "review_scope": "FULL_REVIEW",
+    "mission": "PASS",
+    "research_truth": "PASS",
+    "owner_operability": "PASS",
+    "execution_to_cashflow": "NOT_APPLICABLE_YET",
+    "monitoring_recovery": "PASS_WITH_LIMITATIONS",
+    "reuse_first": "WRAP_CANDIDATE",
+    "red_team": "PASS"
+  },
+  "artifact_bindings": {
+    "task": {"path": "docs/tasks/TASK-30-forward-stream-runtime-harness.md", "sha256": "45ba02b9b96698fb577a3f1086c79311078199545fbb62c0c6a69d512e2758f7"},
+    "contract": {"path": "docs/contracts/task30_forward_stream_runtime_harness_contract_v1.md", "sha256": "494903025ad95ede92b9cdee62e04270ed37f185ab08f3db1bc4fa943d83445f"},
+    "configuration": {"path": "configs/task30_forward_stream_runtime_harness_v1.yaml", "sha256": "57f86bb17b14d9d09680e098730265c1b13ea38a08af0c5f3838a77b6990aa73"},
+    "schema": {"path": "catalog/schemas/task30_forward_stream_runtime_harness.schema.json", "sha256": "739c2d59cb17916576f81a0f54f7b6408770c69d29b6c891e2398f3c066a3fde"},
+    "fixture": {"path": "tests/fixtures/task30/forward_stream_runtime_harness_v1.json", "sha256": "42fae2c2c0c2408bd161ece183c3f581cf4d43b214063fc538bfb3135c1882e0"},
+    "module": {"path": "src/solana_alpha_lab/task30_forward_stream_runtime.py", "sha256": "02e2cd93515e7e0162247c20f28685485cac0725d2bb1d0cf8555d0e87c1a54f"},
+    "script": {"path": "scripts/show_task30_forward_stream_runtime.py", "sha256": "77d3c52c8c7dcb8f7e03b080858e395ebd1c65ec0ec47d5c6c98daab2a547de2"},
+    "report": {"path": "docs/reports/task30/forward_stream_runtime_harness_readout_v1.md", "sha256": "68941570515e0e50cf0b6e6ca24952e30bd5ca283c82e82327d7ee4cddb32b15"},
+    "test": {"path": "tests/test_task30_forward_stream_runtime.py", "sha256": "ac04014ce41b1e2a56ec4d4600e662df2596fff63020d377246c7c85376cbbd9"},
+    "factory_fit": {"path": "docs/evidence/task30/a14_forward_stream_runtime_harness_factory_fit_v1.json", "sha256": "50dd844220f54031a74f961d7fa6227443c729dc2219ead9a74c24bc57504484"}
+  },
+  "authority": {
+    "provider_api_rpc_wss_calls": 0,
+    "credential_use": 0,
+    "raw_data_writes": 0,
+    "scheduler_or_background_processes": 0,
+    "dependency_changes": 0,
+    "r2_r3_access": 0,
+    "wallet_signer_transaction_actions": 0,
+    "cash_spend_usd_cents": 0,
+    "task30_trial_or_acceptance_actions": 0
+  },
+  "side_effect_counters": {
+    "provider_api_rpc_wss_calls": 0,
+    "credential_use": 0,
+    "raw_data_writes": 0,
+    "scheduler_or_background_processes": 0,
+    "dependency_changes": 0,
+    "r2_r3_access": 0,
+    "wallet_signer_transaction_actions": 0,
+    "cash_spend_usd_cents": 0,
+    "task30_trial_or_acceptance_actions": 0,
+    "project_sources_changes": 0
+  },
+  "non_claims": {
+    "provider_selected": false,
+    "external_capture_authorized": false,
+    "raw_retention_authorized": false,
+    "interval_projectable": false,
+    "empty_interval": false,
+    "zero_volume": false,
+    "pit_admissible": false,
+    "h07_h01_evidence": false,
+    "task30_trial": false,
+    "execution": false,
+    "settlement": false,
+    "pnl": false,
+    "numeric_netreturn": false,
+    "missing_is_zero_or_flat": false,
+    "unknown_reconciled": false
+  },
+  "project_sources_disposition": {
+    "kind": "NO_CHANGE",
+    "reason": "A14 is an offline runtime harness; it does not alter the canonical Project Sources release."
+  }
+}

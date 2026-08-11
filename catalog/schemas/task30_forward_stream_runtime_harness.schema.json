@@ -1,0 +1,88 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:smial:task30:forward-stream-runtime-harness:1.0",
+  "title": "TASK-30 A14 forward stream runtime harness policy",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema", "schema_version", "task_id", "atom_id", "contract_id",
+    "consumer", "target", "wire", "runtime_limits", "execution_controls",
+    "authority", "owner_authority", "decision", "project_sources_disposition"
+  ],
+  "properties": {
+    "schema": {"const": "smial.task30.forward-stream-runtime.policy"},
+    "schema_version": {"const": "1.0"},
+    "task_id": {"const": "TASK-30"},
+    "atom_id": {"const": "T30-A14_FORWARD_STREAM_PILOT_RUNTIME_HARNESS_V1"},
+    "contract_id": {"const": "TASK30-FORWARD-STREAM-RUNTIME-HARNESS-V1"},
+    "consumer": {"const": "FUTURE_EXACT_OWNER_EXTERNAL_READ_GATE"},
+    "target": {
+      "type": "object", "additionalProperties": false,
+      "required": ["network", "pool_address", "base_mint"],
+      "properties": {
+        "network": {"const": "solana"},
+        "pool_address": {"const": "URqx24yyYxtXXhTbBQnbtPLhtLWYoaDaRxuQuLpNS3S"},
+        "base_mint": {"const": "DMwbVy48dWVKGe9z1pcVnwF3HLMLrqWdDLfbvx8RchhK"}
+      }
+    },
+    "wire": {
+      "type": "object", "additionalProperties": false,
+      "required": ["provider", "method", "commitment", "encoding", "transaction_details", "max_supported_transaction_version", "failed", "vote"],
+      "properties": {
+        "provider": {"const": "HELIUS"},
+        "method": {"const": "transactionSubscribe"},
+        "commitment": {"const": "confirmed"},
+        "encoding": {"const": "jsonParsed"},
+        "transaction_details": {"const": "full"},
+        "max_supported_transaction_version": {"type": "integer", "const": 0},
+        "failed": {"const": false},
+        "vote": {"const": false}
+      }
+    },
+    "runtime_limits": {
+      "type": "object", "additionalProperties": false,
+      "required": ["effective_open_seconds", "max_notifications", "max_stream_bytes", "max_frame_bytes", "credit_bytes_per_unit", "credits_per_unit", "connection_credits", "estimated_credit_cap"],
+      "properties": {
+        "effective_open_seconds": {"type": "integer", "const": 540},
+        "max_notifications": {"type": "integer", "const": 500},
+        "max_stream_bytes": {"type": "integer", "const": 1000000},
+        "max_frame_bytes": {"type": "integer", "const": 100000},
+        "credit_bytes_per_unit": {"type": "integer", "const": 100000},
+        "credits_per_unit": {"type": "integer", "const": 2},
+        "connection_credits": {"type": "integer", "const": 1},
+        "estimated_credit_cap": {"type": "integer", "const": 21}
+      }
+    },
+    "execution_controls": {
+      "type": "object", "additionalProperties": false,
+      "required": ["retry", "reconnect", "fallback", "scheduler", "monitoring_owner", "retention_class", "raw_root"],
+      "properties": {
+        "retry": {"const": false}, "reconnect": {"const": false}, "fallback": {"const": false}, "scheduler": {"const": false},
+        "monitoring_owner": {"const": "LOCAL_WORK_CODEX_FOREGROUND"},
+        "retention_class": {"const": "A4"},
+        "raw_root": {"const": "OWNER_INPUT_REQUIRED"}
+      }
+    },
+    "authority": {
+      "type": "object", "additionalProperties": false,
+      "required": ["provider_api_rpc_wss_calls", "credential_read", "raw_data_write", "cash_spend_usd", "task30_trial_or_acceptance"],
+      "properties": {
+        "provider_api_rpc_wss_calls": {"type": "integer", "const": 0},
+        "credential_read": {"const": false},
+        "raw_data_write": {"const": false},
+        "cash_spend_usd": {"type": "integer", "const": 0},
+        "task30_trial_or_acceptance": {"const": false}
+      }
+    },
+    "owner_authority": {
+      "type": "object", "additionalProperties": false,
+      "required": ["future_pilot_authorized", "future_pilot_phrase"],
+      "properties": {
+        "future_pilot_authorized": {"const": false},
+        "future_pilot_phrase": {"type": "string", "minLength": 1}
+      }
+    },
+    "decision": {"const": "OFFLINE_RUNTIME_HARNESS_VALIDATED"},
+    "project_sources_disposition": {"const": "NO_CHANGE"}
+  }
+}

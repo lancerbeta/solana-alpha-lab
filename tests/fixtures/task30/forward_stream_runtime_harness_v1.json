@@ -1,0 +1,20 @@
+{
+  "schema": "smial.task30.forward-stream-runtime.fixture",
+  "schema_version": "1.0",
+  "expected_result": {
+    "decision": "OFFLINE_RUNTIME_HARNESS_VALIDATED",
+    "external_action_authorized": false,
+    "project_sources_disposition": "NO_CHANGE",
+    "provider": "HELIUS"
+  },
+  "non_claims": {
+    "interval_projectable": false,
+    "zero_volume": false,
+    "empty_interval": false,
+    "task30_trial": false,
+    "execution": false,
+    "settlement": false,
+    "pnl": false,
+    "numeric_netreturn": false
+  }
+}
