@@ -310,7 +310,10 @@ class Task30TwoSlotLiveShakedownRuntimeTests(unittest.TestCase):
         self.assertEqual(receipt["validation_status"], "PASS_WITH_LIMITATIONS")
         self.assertEqual(receipt["factory_fit_review"], "FULL_REVIEW")
         self.assertEqual(receipt["state_change"], "NONE")
-        self.assertEqual(receipt["project_sources_disposition"], "NO_CHANGE")
+        disposition = receipt["project_sources_disposition"]
+        self.assertIsInstance(disposition, dict)
+        self.assertEqual(disposition["kind"], "NO_CHANGE")
+        self.assertIn("does not change", disposition["reason"])
         self.assertEqual(receipt["side_effect_counters"]["provider_api_rpc_wss_calls"], 0)
         self.assertFalse(receipt["non_claims"]["twenty_four_hour_capture_authorized"])
         for name, path in ARTIFACT_PATHS.items():
