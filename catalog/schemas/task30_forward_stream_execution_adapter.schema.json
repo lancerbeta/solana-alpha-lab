@@ -1,0 +1,96 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:smial:task30:forward-stream-execution-adapter:1.0",
+  "title": "TASK-30 A14P forward stream execution adapter policy",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema",
+    "schema_version",
+    "task_id",
+    "atom_id",
+    "consumer",
+    "runtime_policy",
+    "retention",
+    "credential",
+    "execution",
+    "authority",
+    "decision",
+    "project_sources_disposition"
+  ],
+  "properties": {
+    "schema": {
+      "const": "smial.task30.forward-stream-execution-adapter.policy"
+    },
+    "schema_version": {"const": "1.0"},
+    "task_id": {"const": "TASK-30"},
+    "atom_id": {"const": "T30-A14P_FORWARD_STREAM_EXECUTION_ADAPTER_V1"},
+    "consumer": {"const": "EXACT_OWNER_FORWARD_STREAM_EXTERNAL_GATE"},
+    "runtime_policy": {
+      "const": "configs/task30_forward_stream_runtime_harness_v1.yaml"
+    },
+    "retention": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "class",
+        "logical_root",
+        "started_receipt",
+        "manifest",
+        "terminal_receipt",
+        "create_only"
+      ],
+      "properties": {
+        "class": {"const": "A4"},
+        "logical_root": {"const": "local/task30_forward_stream"},
+        "started_receipt": {"const": "attempt_started.json"},
+        "manifest": {"const": "raw_manifest.json"},
+        "terminal_receipt": {"const": "terminal_receipt.json"},
+        "create_only": {"const": true}
+      }
+    },
+    "credential": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["environment_variable", "read_after_started_receipt"],
+      "properties": {
+        "environment_variable": {"const": "HELIUS_API_KEY"},
+        "read_after_started_receipt": {"const": true}
+      }
+    },
+    "execution": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "max_attempts",
+        "retry",
+        "reconnect",
+        "fallback",
+        "scheduler"
+      ],
+      "properties": {
+        "max_attempts": {"type": "integer", "const": 1},
+        "retry": {"const": false},
+        "reconnect": {"const": false},
+        "fallback": {"const": false},
+        "scheduler": {"const": false}
+      }
+    },
+    "authority": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "provider_api_rpc_wss_calls",
+        "credential_read",
+        "raw_external_data_write"
+      ],
+      "properties": {
+        "provider_api_rpc_wss_calls": {"type": "integer", "const": 0},
+        "credential_read": {"const": false},
+        "raw_external_data_write": {"const": false}
+      }
+    },
+    "decision": {"const": "OFFLINE_EXECUTION_ADAPTER_PENDING_IMPLEMENTATION"},
+    "project_sources_disposition": {"const": "NO_CHANGE"}
+  }
+}

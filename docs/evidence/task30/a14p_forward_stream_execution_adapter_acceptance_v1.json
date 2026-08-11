@@ -1,0 +1,119 @@
+{
+  "schema": "smial.task30.forward-stream-execution-adapter.acceptance",
+  "schema_version": "1.0",
+  "receipt_id": "T30-A14P-FORWARD-STREAM-EXECUTION-ADAPTER-ACCEPTANCE-001",
+  "task_id": "TASK-30",
+  "atom_id": "T30-A14P_FORWARD_STREAM_EXECUTION_ADAPTER_V1",
+  "as_of": "2026-08-12",
+  "validation_status": "PASS_WITH_LIMITATIONS",
+  "state_change": "NONE",
+  "decision": {
+    "value": "READY_FOR_EXACT_OWNER_EXTERNAL_GATE_WITH_LIMITATIONS",
+    "external_capture_authorized": false,
+    "raw_external_data_collected": false,
+    "task30_trial_admissible": false
+  },
+  "reuse_decision": {
+    "value": "WRAP",
+    "candidate": "MODULE-T08-LIFECYCLE-DISCOVERY-TRANSPORT-001",
+    "finding": "A14P reuses the accepted TASK-08 bounded WebSocket exchange and keeps A14 as target and classification truth owner."
+  },
+  "factory_fit_review": "FULL_REVIEW",
+  "artifact_bindings": {
+    "task": {
+      "path": "docs/tasks/TASK-30-forward-stream-execution-adapter.md",
+      "sha256": "f531ea3ec8876cf14bbcdf5663e4ccc2106ca25f22617577c07c5d49a2a3f3a0"
+    },
+    "contract": {
+      "path": "docs/contracts/task30_forward_stream_execution_adapter_contract_v1.md",
+      "sha256": "eae751adbc71dd3484c103d0960c4b22d251014ebecbd5da17e23de6914cc422"
+    },
+    "configuration": {
+      "path": "configs/task30_forward_stream_execution_adapter_v1.yaml",
+      "sha256": "21d611503506b6c44a9ea4641a6d901719024923957761611e1d4a835b40a9c4"
+    },
+    "schema": {
+      "path": "catalog/schemas/task30_forward_stream_execution_adapter.schema.json",
+      "sha256": "0af7f7b491eaff905878d0a50e430eba7495265b2db54586ef5ad420fb0a4619"
+    },
+    "fixture": {
+      "path": "tests/fixtures/task30/forward_stream_execution_adapter_v1.json",
+      "sha256": "371cb65aef8a94846ef63e87b512cc4e39ec0d19691529dd15246ac1c5f6fcd4"
+    },
+    "module": {
+      "path": "src/solana_alpha_lab/task30_forward_stream_execution.py",
+      "sha256": "2c55b0490eed63757e20b9cbde77ed8088e54b2654285d894cb5b8b675476b54"
+    },
+    "runner": {
+      "path": "scripts/run_task30_forward_stream_capture.py",
+      "sha256": "314a4b3f5dd98ce25abb03a488ffc06682caa537fa3d4caca6ea19174bf41022"
+    },
+    "test": {
+      "path": "tests/test_task30_forward_stream_execution.py",
+      "sha256": "74185989a88883ba054021502d3866073ed6048a82e0a1ca2b19aa03b16e7d57"
+    },
+    "design": {
+      "path": "docs/superpowers/specs/2026-08-11-task30-forward-stream-execution-adapter-design.md",
+      "sha256": "3e545e96767ad857b38361bd0e7829be9ea54fead2d597548a1271be709f1335"
+    },
+    "plan": {
+      "path": "docs/superpowers/plans/2026-08-11-task30-forward-stream-execution-adapter.md",
+      "sha256": "bc5e0c66628c7a008556fdbae09d929e55e1ac0fd339c5910a14a0e9f481b1bd"
+    },
+    "factory_fit": {
+      "path": "docs/evidence/task30/a14p_forward_stream_execution_adapter_factory_fit_v1.json",
+      "sha256": "5bafbf4967b7c51cfa6c3b5844103d6a1771dfae763a463643278e122b56477d"
+    }
+  },
+  "validation_evidence": {
+    "policy_schema_fixture": "PASS",
+    "preflight_and_create_only_attempt": "PASS",
+    "raw_retention_and_terminal_truth": "PASS",
+    "guarded_cli_and_real_dry_run": "PASS",
+    "a14_and_task08_compatibility": "PASS",
+    "catalog_and_generated_views": "PASS"
+  },
+  "authority": {
+    "provider_api_rpc_wss_calls": 0,
+    "credential_reads": 0,
+    "raw_external_data_writes": 0,
+    "scheduler_or_background_processes": 0,
+    "dependency_changes": 0,
+    "r2_r3_access": 0,
+    "wallet_signer_transaction_actions": 0,
+    "cash_spend_usd_cents": 0,
+    "task30_trial_or_acceptance_actions": 0
+  },
+  "side_effect_counters": {
+    "provider_api_rpc_wss_calls": 0,
+    "credential_reads": 0,
+    "raw_external_data_writes": 0,
+    "scheduler_or_background_processes": 0,
+    "dependency_changes": 0,
+    "r2_r3_access": 0,
+    "wallet_signer_transaction_actions": 0,
+    "cash_spend_usd_cents": 0,
+    "task30_trial_or_acceptance_actions": 0,
+    "project_sources_changes": 0
+  },
+  "non_claims": {
+    "provider_selected_for_product": false,
+    "external_capture_authorized": false,
+    "raw_external_data_collected": false,
+    "interval_coverage": false,
+    "empty_interval": false,
+    "zero_volume": false,
+    "pit_admissible": false,
+    "h07_h01_evidence": false,
+    "task30_trial": false,
+    "alpha": false,
+    "execution": false,
+    "settlement": false,
+    "pnl": false,
+    "numeric_netreturn": false,
+    "unknown_reconciled": false
+  },
+  "project_sources_disposition": {
+    "kind": "NO_CHANGE"
+  }
+}
