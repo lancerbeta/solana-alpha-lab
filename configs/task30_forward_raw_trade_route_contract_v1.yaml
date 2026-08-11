@@ -1,0 +1,77 @@
+schema: smial.task30.forward-raw-trade-route.policy
+schema_version: '1.0'
+task_id: TASK-30
+atom_id: T30-A12_FORWARD_RAW_TRADE_ROUTE_OFFLINE_CONTRACT_V1
+contract_id: CONTRACT-T30-FORWARD-RAW-TRADE-ROUTE-001
+consumer: RC001-H07-H01-LIQUIDITY-RETENTION_FORWARD_DATA_ENTRY_GATE
+frozen_definition:
+  group_id: RC001-H07-H01-LIQUIDITY-RETENTION
+  parameter_id: OBSERVATION_WINDOW_15M
+  interval_seconds: 900
+reference_subject:
+  pool_address: URqx24yyYxtXXhTbBQnbtPLhtLWYoaDaRxuQuLpNS3S
+  representativeness: NOT_ESTABLISHED
+future_route:
+  selected_provider: null
+  selected_endpoint: null
+  selected_transport: null
+  provider_candidates:
+    HELIUS_TRANSACTION_SUBSCRIBE: WRAP_CANDIDATE
+    YELLOWSTONE_OR_MANAGED_REPLAY: WATCH_ONLY
+  external_owner_packet: REQUIRED
+coverage_states:
+- COMPLETE
+- GAP_SUSPECTED
+- UNKNOWN
+- RECONCILED
+- INVALID
+- STOPPED
+synthetic_envelope:
+  required_observed_fields:
+  - connection_epoch
+  - signature
+  - pool_address
+  - source_route
+  - observed_at
+  - available_at
+  - ingested_at
+  - slot
+  - interval_start
+  - raw_sha256
+  prohibited_fields:
+  - retry
+  - fallback
+reconciliation:
+  unresolved_transport_loss: UNKNOWN_STOP_RUN
+  reconnect_before_reconciliation: FORBIDDEN
+  projection_from_unknown: FORBIDDEN
+reuse_research:
+  decision: WRAP
+  required_before_future_build:
+  - CURRENT_OFFICIAL_DOCUMENTATION
+  - TWO_MAINTAINED_REFERENCES_WHEN_AVAILABLE
+  - LICENSE_MAINTENANCE_SECURITY_EXIT_REVIEW
+  - ADOPT_WRAP_FORK_BUILD_DECISION
+authority:
+  provider_api_rpc_wss_calls: 0
+  credential_use: 0
+  raw_data_writes: 0
+  scheduler_or_background_processes: 0
+  dependency_changes: 0
+  r2_r3_access: 0
+  wallet_signer_transaction_actions: 0
+  cash_spend_usd_cents: 0
+  task30_trial_or_acceptance_actions: 0
+non_claims:
+  provider_selected: false
+  external_capture_authorized: false
+  interval_projectable: false
+  pit_admissible: false
+  h07_h01_evidence: false
+  task30_trial: false
+  execution: false
+  settlement: false
+  pnl: false
+  numeric_netreturn: false
+  missing_is_zero_or_flat: false
+project_sources_disposition: NO_CHANGE

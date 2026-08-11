@@ -1,0 +1,35 @@
+{
+  "complete_events": [
+    {"state": "OBSERVED", "connection_epoch": "synthetic-epoch-1", "signature": "synthetic-signature-1", "pool_address": "URqx24yyYxtXXhTbBQnbtPLhtLWYoaDaRxuQuLpNS3S", "source_route": "SYNTHETIC_FORWARD_ROUTE", "observed_at": 1801, "available_at": 1802, "ingested_at": 1803, "slot": 100, "interval_start": 1800, "raw_sha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"},
+    {"state": "OBSERVED", "connection_epoch": "synthetic-epoch-1", "signature": "synthetic-signature-2", "pool_address": "URqx24yyYxtXXhTbBQnbtPLhtLWYoaDaRxuQuLpNS3S", "source_route": "SYNTHETIC_FORWARD_ROUTE", "observed_at": 1811, "available_at": 1812, "ingested_at": 1813, "slot": 101, "interval_start": 1800, "raw_sha256": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"}
+  ],
+  "transport_loss_events": [
+    {"state": "OBSERVED", "connection_epoch": "synthetic-epoch-1", "signature": "synthetic-signature-1", "pool_address": "URqx24yyYxtXXhTbBQnbtPLhtLWYoaDaRxuQuLpNS3S", "source_route": "SYNTHETIC_FORWARD_ROUTE", "observed_at": 1801, "available_at": 1802, "ingested_at": 1803, "slot": 100, "interval_start": 1800, "raw_sha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"},
+    {"state": "TRANSPORT_LOST", "connection_epoch": "synthetic-epoch-1", "lost_at": 1810, "last_observed_slot": 100}
+  ],
+  "rejected_cases": [
+    {"case_id": "duplicate_signature", "expected_error": "DUPLICATE_SIGNATURE", "events": [
+      {"state": "OBSERVED", "connection_epoch": "synthetic-epoch-1", "signature": "synthetic-signature-1", "pool_address": "URqx24yyYxtXXhTbBQnbtPLhtLWYoaDaRxuQuLpNS3S", "source_route": "SYNTHETIC_FORWARD_ROUTE", "observed_at": 1801, "available_at": 1802, "ingested_at": 1803, "slot": 100, "interval_start": 1800, "raw_sha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"},
+      {"state": "OBSERVED", "connection_epoch": "synthetic-epoch-1", "signature": "synthetic-signature-1", "pool_address": "URqx24yyYxtXXhTbBQnbtPLhtLWYoaDaRxuQuLpNS3S", "source_route": "SYNTHETIC_FORWARD_ROUTE", "observed_at": 1804, "available_at": 1805, "ingested_at": 1806, "slot": 101, "interval_start": 1800, "raw_sha256": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"}
+    ]},
+    {"case_id": "wrong_pool", "expected_error": "POOL_IDENTITY", "events": [
+      {"state": "OBSERVED", "connection_epoch": "synthetic-epoch-1", "signature": "synthetic-signature-1", "pool_address": "WRONG_POOL", "source_route": "SYNTHETIC_FORWARD_ROUTE", "observed_at": 1801, "available_at": 1802, "ingested_at": 1803, "slot": 100, "interval_start": 1800, "raw_sha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"}
+    ]},
+    {"case_id": "reconnect_before_reconciliation", "expected_error": "RECONNECT_BEFORE_RECONCILIATION", "events": [
+      {"state": "TRANSPORT_LOST", "connection_epoch": "synthetic-epoch-1", "lost_at": 1810, "last_observed_slot": 100},
+      {"state": "RECONNECTED", "connection_epoch": "synthetic-epoch-2", "reconnected_at": 1820}
+    ]},
+    {"case_id": "missing_raw_hash", "expected_error": "RAW_HASH", "events": [
+      {"state": "OBSERVED", "connection_epoch": "synthetic-epoch-1", "signature": "synthetic-signature-1", "pool_address": "URqx24yyYxtXXhTbBQnbtPLhtLWYoaDaRxuQuLpNS3S", "source_route": "SYNTHETIC_FORWARD_ROUTE", "observed_at": 1801, "available_at": 1802, "ingested_at": 1803, "slot": 100, "interval_start": 1800}
+    ]},
+    {"case_id": "empty_interval_coercion", "expected_error": "EMPTY_COERCION", "events": [
+      {"state": "EMPTY_INTERVAL", "interval_start": 1800}
+    ]},
+    {"case_id": "retry_forbidden", "expected_error": "RETRY_FORBIDDEN", "events": [
+      {"state": "OBSERVED", "connection_epoch": "synthetic-epoch-1", "signature": "synthetic-signature-1", "pool_address": "URqx24yyYxtXXhTbBQnbtPLhtLWYoaDaRxuQuLpNS3S", "source_route": "SYNTHETIC_FORWARD_ROUTE", "observed_at": 1801, "available_at": 1802, "ingested_at": 1803, "slot": 100, "interval_start": 1800, "raw_sha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa", "retry": true}
+    ]},
+    {"case_id": "fallback_forbidden", "expected_error": "FALLBACK_FORBIDDEN", "events": [
+      {"state": "OBSERVED", "connection_epoch": "synthetic-epoch-1", "signature": "synthetic-signature-1", "pool_address": "URqx24yyYxtXXhTbBQnbtPLhtLWYoaDaRxuQuLpNS3S", "source_route": "SYNTHETIC_FORWARD_ROUTE", "observed_at": 1801, "available_at": 1802, "ingested_at": 1803, "slot": 100, "interval_start": 1800, "raw_sha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa", "fallback": true}
+    ]}
+  ]
+}

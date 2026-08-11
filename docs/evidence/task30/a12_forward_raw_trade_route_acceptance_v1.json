@@ -1,0 +1,99 @@
+{
+  "schema": "smial.task30.forward-raw-trade-route.acceptance",
+  "schema_version": "1.0",
+  "receipt_id": "T30-A12-FORWARD-RAW-TRADE-ROUTE-ACCEPTANCE-001",
+  "task_id": "TASK-30",
+  "atom_id": "T30-A12_FORWARD_RAW_TRADE_ROUTE_OFFLINE_CONTRACT_V1",
+  "validation_status": "PASS_WITH_LIMITATIONS",
+  "state_change": "NONE",
+  "decision": {
+    "value": "OFFLINE_FORWARD_ROUTE_CONTRACT_VALIDATED",
+    "future_external_owner_gate_required": true,
+    "provider_selected": false,
+    "external_capture_authorized": false,
+    "trial_admissible": false
+  },
+  "reuse_research": {
+    "decision": "WRAP",
+    "candidate": "HELIUS_TRANSACTION_SUBSCRIBE",
+    "watch": "YELLOWSTONE_OR_MANAGED_REPLAY",
+    "finding": "An existing subscription surface can be wrapped later, but its documented disconnect/backfill limitation requires explicit coverage and reconciliation semantics before a pilot."
+  },
+  "factory_fit_review": "FULL_REVIEW",
+  "factory_fit": {
+    "mission": "Replaces repeated provider-candle probing with the smallest reusable proof boundary for future raw-observation capture.",
+    "flexibility": "No provider, endpoint, transport, parser, storage, scheduler or dependency is selected.",
+    "research_truth": "Synthetic coverage only distinguishes observation from unknown coverage; it cannot establish PIT data, H07/H01 evidence or a trial.",
+    "owner_operability": "The deterministic Russian readout states the current limit and the exact future owner boundary.",
+    "monitoring_recovery": "Unreconciled transport loss is UNKNOWN and STOP_RUN, never a hidden reconnect or empty interval.",
+    "reuse_build": "The policy wraps established stream semantics conceptually and keeps only the factory-specific coverage ledger local.",
+    "red_team": "Duplicate signatures, wrong identity, absent raw hash, retry, fallback, reconnect before reconciliation and empty-interval coercion fail closed."
+  },
+  "product_horizon_radar": {
+    "now": {
+      "candidate": "ONE_EXACT_FORWARD_STREAM_OWNER_PACKET",
+      "value": "A future external pilot can be reviewed as one bounded technical capture with a named recovery contract instead of a generic collector.",
+      "owner": "GOAL_OWNER",
+      "activation_trigger": "The owner wants to spend a measured provider quota on one named route."
+    },
+    "watch": {
+      "candidate": "REPLAY_CAPABLE_STREAMING_ROUTE",
+      "value": "Managed replay could reduce recovery uncertainty at larger scale.",
+      "owner": "TECH_LEAD",
+      "activation_trigger": "A named consumer proves that WebSocket gap recovery is the limiting cost or truth risk."
+    }
+  },
+  "artifact_bindings": {
+    "task": {"path": "docs/tasks/TASK-30-forward-raw-trade-route.md", "sha256": "6c01ac42bc73cdb16ac2e0cfc73f53bd0503d103403ff96949f796d0f6414cc2"},
+    "contract": {"path": "docs/contracts/task30_forward_raw_trade_route_contract_v1.md", "sha256": "d84c04f6daef235813fb0afe845400ee3f0af6ca73a04ed7362885671303e678"},
+    "configuration": {"path": "configs/task30_forward_raw_trade_route_contract_v1.yaml", "sha256": "78e10383bee906ebaab02fdffb61235b76a13d67ccd2ffa1bbc300127aaed461"},
+    "schema": {"path": "catalog/schemas/task30_forward_raw_trade_route.schema.json", "sha256": "72c711388cd6231cdbe25abe1c3dcbcd314ce1cd89d4f38f3dbdf510846f166b"},
+    "fixture": {"path": "tests/fixtures/task30/forward_raw_trade_route_v1.json", "sha256": "748f2111934dab6645ddf46afdf1f38fcfafbed510c0fb672aa69e538a41d520"},
+    "module": {"path": "src/solana_alpha_lab/task30_forward_raw_trade_route.py", "sha256": "498a76f21e0c9dd6e7c689d7f8610a5aa98a08bf1a017f0487cb99873e5d55c5"},
+    "script": {"path": "scripts/show_task30_forward_raw_trade_route.py", "sha256": "b7587de206714d4d0895a91ceb6125edf866b9c35998f9dc61ba59188e3a46f7"},
+    "report": {"path": "docs/reports/task30/forward_raw_trade_route_readout_v1.md", "sha256": "030010c5015c828fbf20768aea5bcd82e792e69050f46c4ece684a462ea295c2"},
+    "test": {"path": "tests/test_task30_forward_raw_trade_route.py", "sha256": "120aa0097cd508f115c46f5c79269189b90503b1997523d1d9f489a86aa2b1e0"},
+    "design": {"path": "docs/superpowers/specs/2026-08-11-task30-forward-raw-trade-route-design.md", "sha256": "bbe984739b7c6c48bb8b0020723ac8a2faf3243f7da3d086dd138828b4af3c7a"},
+    "plan": {"path": "docs/superpowers/plans/2026-08-11-task30-forward-raw-trade-route.md", "sha256": "cde621b13355b52aecbd1eb267c98d370859d348d691e963eda64b7735acf3be"}
+  },
+  "authority": {
+    "provider_api_rpc_wss_calls": 0,
+    "credential_use": 0,
+    "raw_data_writes": 0,
+    "scheduler_or_background_processes": 0,
+    "dependency_changes": 0,
+    "r2_r3_access": 0,
+    "wallet_signer_transaction_actions": 0,
+    "cash_spend_usd_cents": 0,
+    "task30_trial_or_acceptance_actions": 0
+  },
+  "side_effect_counters": {
+    "provider_api_rpc_wss_calls": 0,
+    "credential_use": 0,
+    "raw_data_writes": 0,
+    "scheduler_or_background_processes": 0,
+    "dependency_changes": 0,
+    "r2_r3_access": 0,
+    "wallet_signer_transaction_actions": 0,
+    "cash_spend_usd_cents": 0,
+    "task30_trial_or_acceptance_actions": 0,
+    "project_sources_changes": 0
+  },
+  "non_claims": {
+    "provider_selected": false,
+    "external_capture_authorized": false,
+    "interval_projectable": false,
+    "pit_admissible": false,
+    "h07_h01_evidence": false,
+    "task30_trial": false,
+    "execution": false,
+    "settlement": false,
+    "pnl": false,
+    "numeric_netreturn": false,
+    "missing_is_zero_or_flat": false
+  },
+  "project_sources_disposition": {
+    "kind": "NO_CHANGE",
+    "reason": "A12 is an offline contract and synthetic harness; canonical TASK-30 acceptance remains unchanged."
+  }
+}
