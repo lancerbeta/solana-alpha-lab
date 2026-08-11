@@ -23,7 +23,8 @@ missing.
 - one adapter joining A14 request/classification to TASK-08 `WssCapture`;
 - create-only `attempt_started.json`, exact raw objects, hash manifest and
   terminal receipt under ignored `local/task30_forward_stream`;
-- unresolved-attempt blocking and no-retry recovery semantics;
+- one-shot gate consumption, unresolved-attempt blocking and no-retry recovery
+  semantics;
 - one CLI with `--dry-run` and separately gated `--execute` modes;
 - adversarial offline tests, FULL Factory Fit and Catalog bindings.
 
@@ -42,12 +43,15 @@ NetReturn or TASK-30 acceptance.
 
 ## Recovery and stop rule
 
-`attempt_started.json` is published before reading `HELIUS_API_KEY`. A valid
-terminal receipt closes that attempt without rewriting the marker. Any started
-attempt without valid terminal truth is `UNRESOLVED_EXTERNAL_ATTEMPT` and
-blocks a second attempt. Transport loss remains `TRANSPORT_LOST_UNKNOWN`;
-retention failure becomes `RETENTION_FAILED_STOP` only when that terminal
-receipt can itself be durably published.
+`attempt_started.json` is published before reading `HELIUS_API_KEY`. A valid,
+closed and hash-verified terminal receipt closes that attempt without rewriting
+the marker. Any started attempt without valid terminal truth is
+`UNRESOLVED_EXTERNAL_ATTEMPT`. A valid terminal still consumes the exact
+one-shot owner gate, so every second attempt requires a new versioned gate.
+Transport loss remains `TRANSPORT_LOST_UNKNOWN`; retention failure becomes
+`RETENTION_FAILED_STOP` only when that terminal receipt can itself be durably
+published. Caps fail before raw publication, and unexpected local failures stay
+sanitised and unresolved instead of being mislabelled as provider rejection.
 
 After offline delivery and exact-main CI, stop before credential lookup or
 WebSocket execution. A later external action requires the exact A14P owner

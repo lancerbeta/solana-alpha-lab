@@ -33,7 +33,7 @@
   },
   "owner_operability": {
     "result": "PASS",
-    "finding": "Dry-run returns one compact safe receipt, execute mode requires the exact phrase and unresolved attempts block accidental repeats."
+    "finding": "Dry-run returns one compact safe receipt, execute mode requires the exact phrase, and every prior attempt consumes the one-shot gate while invalid terminal truth remains unresolved."
   },
   "execution_to_cashflow": {
     "result": "NOT_APPLICABLE_YET",
@@ -41,7 +41,7 @@
   },
   "monitoring_recovery": {
     "result": "PASS_WITH_LIMITATIONS",
-    "finding": "Foreground-only monitoring, create-only markers and terminal receipts expose unknown outcomes; automatic reconciliation remains intentionally absent."
+    "finding": "Foreground-only monitoring, create-only markers and closed hash-verified terminal receipts expose unknown outcomes; automatic reconciliation remains intentionally absent."
   },
   "reuse_first": {
     "result": "PASS",
@@ -60,7 +60,11 @@
       "type_confused_or_widened_cap",
       "raw_hash_or_timestamp_not_reproduced",
       "transport_loss_promoted_to_complete",
+      "partial_or_type_confused_terminal_receipt_clears_unresolved_state",
       "unresolved_attempt_allows_repeat",
+      "valid_terminal_allows_static_owner_phrase_reuse",
+      "capture_cap_checked_after_raw_publication",
+      "unexpected_local_failure_mislabelled_as_provider_rejection",
       "secret_or_raw_payload_in_safe_output",
       "technical_capture_promoted_to_trial_or_cashflow"
     ]

@@ -403,7 +403,7 @@ class Task30ForwardStreamExecutionPreflightTests(unittest.TestCase):
                         raw_root=raw_root,
                     )
 
-    def test_attempt_rejects_naive_time_unsafe_nonce_and_collision(self) -> None:
+    def test_attempt_rejects_naive_time_unsafe_nonce_and_forged_terminal(self) -> None:
         for now, nonce, code in (
             (datetime(2026, 8, 11, 12, 0, 0), "a1b2c3d4", "START_TIME_UTC_REQUIRED"),
             (FROZEN_NOW, "../unsafe", "NONCE_INVALID"),
@@ -441,7 +441,10 @@ class Task30ForwardStreamExecutionPreflightTests(unittest.TestCase):
         (first.run_root / "terminal_receipt.json").write_text(
             json.dumps(terminal), encoding="utf-8"
         )
-        with self.assertRaisesRegex(ForwardStreamExecutionError, "RUN_ID_COLLISION"):
+        self.assertEqual(find_unresolved_attempts(self.raw_root), (first.run_id,))
+        with self.assertRaisesRegex(
+            ForwardStreamExecutionError, "UNRESOLVED_PRIOR_ATTEMPT"
+        ):
             prepare_forward_stream_attempt(
                 self.execution_config,
                 self.runtime_config,
@@ -545,6 +548,60 @@ class Task30ForwardStreamExecutionRetentionTests(unittest.TestCase):
         self.assertNotIn(FAKE_CREDENTIAL, json.dumps(receipt))
         self.assertNotIn(FAKE_CREDENTIAL, repr(receipt))
 
+    def test_valid_terminal_consumes_gate_and_forged_variants_are_unresolved(
+        self,
+    ) -> None:
+        receipt = self.execute(
+            lambda request, **limits: bounded_capture(notification())
+        )
+        run_id = str(receipt["run_id"])
+        run_root = self.raw_root / f"run={run_id}"
+        terminal_path = run_root / "terminal_receipt.json"
+        original = json.loads(terminal_path.read_text(encoding="utf-8"))
+        self.assertEqual(find_unresolved_attempts(self.raw_root), ())
+
+        with self.assertRaisesRegex(
+            ForwardStreamExecutionError, "PRIOR_ATTEMPT_REQUIRES_NEW_GATE"
+        ):
+            prepare_forward_stream_attempt(
+                self.execution_config,
+                self.runtime_config,
+                authority_phrase=OWNER_EXECUTION_PHRASE,
+                repository_root=self.root,
+                raw_root=self.raw_root,
+                now=FROZEN_NOW,
+                nonce="deadbeef",
+            )
+
+        forged_variants = []
+        type_confused = copy.deepcopy(original)
+        type_confused["notifications"] = True
+        forged_variants.append(type_confused)
+        widened = copy.deepcopy(original)
+        widened["notes"] = "synthetic extra field"
+        forged_variants.append(widened)
+        reversed_time = copy.deepcopy(original)
+        reversed_time["terminal_at"] = "2026-08-11T11:59:59Z"
+        forged_variants.append(reversed_time)
+        malformed_manifest = copy.deepcopy(original)
+        malformed_manifest["raw_manifest"]["sha256"] = "not-a-sha256"
+        forged_variants.append(malformed_manifest)
+
+        for forged in forged_variants:
+            with self.subTest(forged=forged):
+                terminal_path.write_text(json.dumps(forged), encoding="utf-8")
+                self.assertEqual(find_unresolved_attempts(self.raw_root), (run_id,))
+
+        terminal_path.write_text(json.dumps(original), encoding="utf-8")
+        self.assertEqual(find_unresolved_attempts(self.raw_root), ())
+
+        raw_object_path = run_root / "notifications/000001.json"
+        raw_object = raw_object_path.read_bytes()
+        raw_object_path.write_bytes(b'{"synthetic":"tampered"}')
+        self.assertEqual(find_unresolved_attempts(self.raw_root), (run_id,))
+        raw_object_path.write_bytes(raw_object)
+        self.assertEqual(find_unresolved_attempts(self.raw_root), ())
+
     def test_credential_is_read_only_after_started_marker(self) -> None:
         observed = {"reads": 0, "marker_before_read": False}
 
@@ -578,6 +635,31 @@ class Task30ForwardStreamExecutionRetentionTests(unittest.TestCase):
         self.assertEqual(receipt["terminal_state"], "CONNECTION_OR_AUTH_REJECTED")
         self.assertEqual(transport_calls, 0)
         self.assertEqual(find_unresolved_attempts(self.raw_root), ())
+
+    def test_unexpected_credential_loader_failure_stays_unresolved_and_sanitized(
+        self,
+    ) -> None:
+        transport_calls = 0
+
+        def unexpected(name: str) -> str:
+            raise RuntimeError(f"synthetic loader bug {FAKE_CREDENTIAL}")
+
+        def exchange(*args, **kwargs):
+            nonlocal transport_calls
+            transport_calls += 1
+            raise AssertionError("transport must not run")
+
+        with self.assertRaisesRegex(
+            ForwardStreamExecutionError, "UNCLASSIFIED_LOCAL_FAILURE"
+        ) as caught:
+            self.execute(exchange, credential_loader=unexpected)
+        self.assertEqual(transport_calls, 0)
+        self.assertNotIn(FAKE_CREDENTIAL, str(caught.exception))
+        self.assertNotIn(FAKE_CREDENTIAL, repr(caught.exception))
+        self.assertEqual(len(find_unresolved_attempts(self.raw_root)), 1)
+        run_root = next(self.raw_root.glob("run=*"))
+        self.assertTrue((run_root / "attempt_started.json").is_file())
+        self.assertFalse((run_root / "terminal_receipt.json").exists())
 
     def test_nonbounded_transport_is_unknown_after_cap_enforcement(self) -> None:
         capture = WssCapture(
@@ -614,6 +696,28 @@ class Task30ForwardStreamExecutionRetentionTests(unittest.TestCase):
             ForwardStreamExecutionError, "ACK_FRAME_CAP_EXCEEDED"
         ):
             classify_task08_capture(self.runtime_config, oversized)
+
+    def test_execute_rejects_oversized_capture_before_raw_publication(self) -> None:
+        oversized = WssCapture(
+            acknowledgement=b"x" * 100_001,
+            notifications=(),
+            acknowledgement_observed_at=FROZEN_NOW,
+            notification_observed_at=(),
+            terminal_class="RESPONSE_TOO_LARGE",
+            error_class="wss_frame_too_large",
+            stop_reason="FRAME_LIMIT",
+        )
+        with self.assertRaisesRegex(
+            ForwardStreamExecutionError, "ACK_FRAME_CAP_EXCEEDED"
+        ):
+            self.execute(lambda request, **limits: oversized)
+
+        run_root = next(self.raw_root.glob("run=*"))
+        self.assertTrue((run_root / "attempt_started.json").is_file())
+        self.assertFalse((run_root / "acknowledgement.json").exists())
+        self.assertFalse((run_root / "raw_manifest.json").exists())
+        self.assertFalse((run_root / "terminal_receipt.json").exists())
+        self.assertEqual(len(find_unresolved_attempts(self.raw_root)), 1)
 
     def test_subscription_error_is_closed_but_identity_drift_stays_unresolved(self) -> None:
         rejected = self.execute(

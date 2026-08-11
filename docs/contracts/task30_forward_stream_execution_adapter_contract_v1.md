@@ -33,7 +33,8 @@ Before any credential lookup or transport call, the adapter must validate:
 2. the exact owner phrase;
 3. an absolute repository root and exact ignored logical raw root
    `local/task30_forward_stream` with no symlink component;
-4. absence of any prior unresolved attempt;
+4. absence of any prior attempt under this gate; an invalid terminal remains
+   unresolved, while a valid terminal consumes the one-shot authority;
 5. UTC start time, safe nonce and create-only run identity.
 
 It then publishes `attempt_started.json`. Only afterward may execute mode read
@@ -57,7 +58,11 @@ sanitised terminal truth.
 - missing or invalid terminal receipt: `UNRESOLVED_EXTERNAL_ATTEMPT`.
 
 UNKNOWN or unresolved truth forbids another attempt until separately
-reconciled. No automatic reconciliation or retry is part of this contract.
+reconciled. Every valid terminal outcome also consumes this exact gate: any
+second attempt requires a new versioned owner gate rather than reuse of the
+static phrase. Terminal receipts are closed, type-strict and verified against
+the retained manifest and raw object hashes before they can clear unresolved
+state. No automatic reconciliation or retry is part of this contract.
 
 ## Caps and secret safety
 
@@ -67,7 +72,9 @@ bytes and 100,000 bytes per frame. The conservative estimated ceiling remains
 
 Credentials stay in memory and never enter tracked files, raw receipts, safe
 output, full URLs, exception text or object representations. Unexpected local
-exceptions collapse to a fixed sanitised error class.
+exceptions collapse to a fixed sanitised error class and leave the started
+attempt unresolved. Capture caps are checked before any external raw bytes are
+published.
 
 ## Non-claims and acceptance boundary
 

@@ -32,7 +32,9 @@ from .lifecycle_discovery_transport import WssCapture
 
 LOGICAL_ROOT = "local/task30_forward_stream"
 _NONCE_RE = re.compile(r"^[0-9a-f]{8}$")
+_RUN_ID_RE = re.compile(r"^\d{8}T\d{6}Z-[0-9a-f]{8}$")
 _ERROR_CODE_RE = re.compile(r"^[A-Z][A-Z0-9_]{2,79}$")
+_SHA256_RE = re.compile(r"^[0-9a-f]{64}$")
 _TERMINAL_STATES = frozenset(
     {
         "CONNECTION_OR_AUTH_REJECTED",
@@ -41,6 +43,30 @@ _TERMINAL_STATES = frozenset(
         "RETENTION_FAILED_STOP",
         "SUBSCRIPTION_REJECTED",
         "TRANSPORT_LOST_UNKNOWN",
+    }
+)
+_TERMINAL_RECEIPT_FIELDS = frozenset(
+    {
+        "schema",
+        "schema_version",
+        "run_id",
+        "logical_run_root",
+        "started_at",
+        "terminal_at",
+        "state",
+        "terminal_state",
+        "notifications",
+        "stream_bytes",
+        "estimated_credits",
+        "unknown",
+        "retry",
+        "reconnect",
+        "interval_projectable",
+        "zero_volume",
+        "empty_interval",
+        "task30_trial",
+        "raw_retention",
+        "raw_manifest",
     }
 )
 
@@ -124,6 +150,26 @@ def _canonical_json(value: object) -> bytes:
         raise ForwardStreamExecutionError("RECEIPT_JSON_INVALID") from exc
 
 
+def _closed_json_object(pairs: list[tuple[str, object]]) -> dict[str, object]:
+    value: dict[str, object] = {}
+    for key, item in pairs:
+        if key in value:
+            raise ValueError("duplicate JSON key")
+        value[key] = item
+    return value
+
+
+def _closed_json_loads(body: str) -> object:
+    def reject_constant(value: str) -> object:
+        raise ValueError(f"non-finite JSON constant: {value}")
+
+    return json.loads(
+        body,
+        object_pairs_hook=_closed_json_object,
+        parse_constant=reject_constant,
+    )
+
+
 def _utc_text(value: datetime) -> str:
     _require(
         isinstance(value, datetime)
@@ -133,6 +179,28 @@ def _utc_text(value: datetime) -> str:
         "START_TIME_UTC_REQUIRED",
     )
     return value.astimezone(UTC).isoformat().replace("+00:00", "Z")
+
+
+def _receipt_utc(value: object) -> datetime | None:
+    if type(value) is not str or not value.endswith("Z"):
+        return None
+    try:
+        parsed = datetime.fromisoformat(f"{value[:-1]}+00:00")
+    except ValueError:
+        return None
+    if (
+        parsed.tzinfo is None
+        or parsed.utcoffset() is None
+        or parsed.utcoffset().total_seconds() != 0
+    ):
+        return None
+    if parsed.astimezone(UTC).isoformat().replace("+00:00", "Z") != value:
+        return None
+    return parsed
+
+
+def _nonnegative_int(value: object) -> bool:
+    return type(value) is int and value >= 0
 
 
 def _normalized_path(value: Path) -> str:
@@ -163,24 +231,172 @@ def _require_ignored_local_root(repository_root: Path) -> None:
     _require(bool(entries & {"local/", "/local/", "local/**"}), "RAW_ROOT_NOT_IGNORED")
 
 
+def _raw_manifest_valid(
+    run_root: Path,
+    run_id: str,
+    reference: object,
+    *,
+    notifications: int,
+    stream_bytes: int,
+) -> bool:
+    if not isinstance(reference, Mapping) or set(reference) != {
+        "path",
+        "bytes",
+        "sha256",
+    }:
+        return False
+    if (
+        type(reference.get("path")) is not str
+        or reference.get("path") != "raw_manifest.json"
+        or not _nonnegative_int(reference.get("bytes"))
+        or type(reference.get("sha256")) is not str
+        or _SHA256_RE.fullmatch(reference["sha256"]) is None
+    ):
+        return False
+    manifest_path = run_root / "raw_manifest.json"
+    if not manifest_path.is_file() or manifest_path.is_symlink():
+        return False
+    try:
+        manifest_body = manifest_path.read_bytes()
+        manifest = _closed_json_loads(manifest_body.decode("utf-8"))
+    except (OSError, UnicodeError, ValueError):
+        return False
+    if (
+        len(manifest_body) != reference["bytes"]
+        or hashlib.sha256(manifest_body).hexdigest() != reference["sha256"]
+        or not isinstance(manifest, Mapping)
+        or set(manifest)
+        != {
+            "schema",
+            "schema_version",
+            "run_id",
+            "logical_run_root",
+            "retention_class",
+            "raw_objects",
+            "notifications",
+            "stream_bytes",
+        }
+        or manifest.get("schema") != "smial.task30.forward-stream-raw-manifest"
+        or manifest.get("schema_version") != "1.0"
+        or manifest.get("run_id") != run_id
+        or manifest.get("logical_run_root") != f"{LOGICAL_ROOT}/run={run_id}"
+        or manifest.get("retention_class") != "A4"
+        or type(manifest.get("notifications")) is not int
+        or manifest.get("notifications") != notifications
+        or type(manifest.get("stream_bytes")) is not int
+        or manifest.get("stream_bytes") != stream_bytes
+    ):
+        return False
+    raw_objects = manifest.get("raw_objects")
+    if type(raw_objects) is not list or len(raw_objects) != notifications + 1:
+        return False
+    expected_paths = ["acknowledgement.json"] + [
+        f"notifications/{ordinal:06d}.json"
+        for ordinal in range(1, notifications + 1)
+    ]
+    retained_bytes = 0
+    for item, expected_path in zip(raw_objects, expected_paths):
+        if (
+            not isinstance(item, Mapping)
+            or set(item) != {"path", "bytes", "sha256", "observed_at"}
+            or type(item.get("path")) is not str
+            or item.get("path") != expected_path
+            or not _nonnegative_int(item.get("bytes"))
+            or type(item.get("sha256")) is not str
+            or _SHA256_RE.fullmatch(item["sha256"]) is None
+        ):
+            return False
+        observed_at = item.get("observed_at")
+        if observed_at is None:
+            if item["bytes"] != 0:
+                return False
+        else:
+            observed = _receipt_utc(observed_at)
+            if observed is None:
+                return False
+        object_path = run_root / Path(expected_path)
+        if not object_path.is_file() or object_path.is_symlink():
+            return False
+        try:
+            body = object_path.read_bytes()
+        except OSError:
+            return False
+        if (
+            len(body) != item["bytes"]
+            or hashlib.sha256(body).hexdigest() != item["sha256"]
+        ):
+            return False
+        retained_bytes += len(body)
+    return retained_bytes == stream_bytes
+
+
 def _terminal_receipt_valid(run_root: Path, run_id: str) -> bool:
     path = run_root / "terminal_receipt.json"
     if not path.is_file() or path.is_symlink():
         return False
     try:
-        value = json.loads(path.read_text(encoding="utf-8"))
+        value = _closed_json_loads(path.read_text(encoding="utf-8"))
     except (OSError, UnicodeError, ValueError):
         return False
-    if not isinstance(value, Mapping):
+    if (
+        not isinstance(value, Mapping)
+        or set(value) != _TERMINAL_RECEIPT_FIELDS
+        or type(run_id) is not str
+        or _RUN_ID_RE.fullmatch(run_id) is None
+    ):
         return False
-    return (
+    started_at = _receipt_utc(value.get("started_at"))
+    terminal_at = _receipt_utc(value.get("terminal_at"))
+    terminal_state = value.get("terminal_state")
+    if not (
         value.get("schema") == "smial.task30.forward-stream-terminal-receipt"
         and value.get("schema_version") == "1.0"
         and value.get("run_id") == run_id
         and value.get("logical_run_root") == f"{LOGICAL_ROOT}/run={run_id}"
         and value.get("state") == "TERMINAL"
-        and value.get("terminal_state") in _TERMINAL_STATES
-    )
+        and type(terminal_state) is str
+        and terminal_state in _TERMINAL_STATES
+        and started_at is not None
+        and terminal_at is not None
+        and terminal_at >= started_at
+        and _nonnegative_int(value.get("notifications"))
+        and _nonnegative_int(value.get("stream_bytes"))
+        and _nonnegative_int(value.get("estimated_credits"))
+        and type(value.get("unknown")) is bool
+        and value.get("unknown") == (terminal_state == "TRANSPORT_LOST_UNKNOWN")
+        and type(value.get("retry")) is bool
+        and value.get("retry") is False
+        and type(value.get("reconnect")) is bool
+        and value.get("reconnect") is False
+        and type(value.get("interval_projectable")) is bool
+        and value.get("interval_projectable") is False
+        and type(value.get("zero_volume")) is bool
+        and value.get("zero_volume") is False
+        and type(value.get("empty_interval")) is bool
+        and value.get("empty_interval") is False
+        and type(value.get("task30_trial")) is bool
+        and value.get("task30_trial") is False
+    ):
+        return False
+    raw_retention = value.get("raw_retention")
+    raw_manifest = value.get("raw_manifest")
+    if raw_retention == "A4_EXACT_RETAINED":
+        return _raw_manifest_valid(
+            run_root,
+            run_id,
+            raw_manifest,
+            notifications=value["notifications"],
+            stream_bytes=value["stream_bytes"],
+        )
+    if raw_retention == "FAILED":
+        return terminal_state == "RETENTION_FAILED_STOP" and raw_manifest is None
+    if raw_retention == "NO_CAPTURE_RETURNED":
+        return (
+            terminal_state
+            in {"CONNECTION_OR_AUTH_REJECTED", "TRANSPORT_LOST_UNKNOWN"}
+            and raw_manifest is None
+        )
+    return False
 
 
 def find_unresolved_attempts(raw_root: Path) -> tuple[str, ...]:
@@ -198,6 +414,17 @@ def find_unresolved_attempts(raw_root: Path) -> tuple[str, ...]:
         if marker.exists() and not _terminal_receipt_valid(run_root, run_id):
             unresolved.append(run_id)
     return tuple(unresolved)
+
+
+def _prior_attempt_ids(raw_root: Path) -> tuple[str, ...]:
+    if not raw_root.exists():
+        return ()
+    _require(raw_root.is_dir() and not raw_root.is_symlink(), "RAW_ROOT_SYMLINK_FORBIDDEN")
+    attempts: list[str] = []
+    for run_root in sorted(raw_root.glob("run=*"), key=lambda item: item.name):
+        _require(run_root.is_dir() and not run_root.is_symlink(), "RUN_ROOT_INVALID")
+        attempts.append(run_root.name.removeprefix("run="))
+    return tuple(attempts)
 
 
 def validate_forward_stream_preflight(
@@ -244,6 +471,7 @@ def validate_forward_stream_preflight(
             _require(not component.is_symlink(), "RAW_ROOT_SYMLINK_FORBIDDEN")
     _require_ignored_local_root(repository_root)
     _require(not find_unresolved_attempts(raw_root), "UNRESOLVED_PRIOR_ATTEMPT")
+    _require(not _prior_attempt_ids(raw_root), "PRIOR_ATTEMPT_REQUIRES_NEW_GATE")
     planned_request = bind_transaction_subscribe("offline-preflight-sentinel")
     return {
         "result": "PREFLIGHT_PASS",
@@ -568,6 +796,8 @@ def _publish_terminal_receipt(
         )
     except ForwardStreamExecutionError as exc:
         raise ForwardStreamExecutionError("UNRESOLVED_EXTERNAL_ATTEMPT") from exc
+    if not _terminal_receipt_valid(attempt.run_root, attempt.run_id):
+        raise ForwardStreamExecutionError("UNRESOLVED_EXTERNAL_ATTEMPT")
     return receipt
 
 
@@ -597,7 +827,7 @@ def execute_forward_stream_attempt(
     try:
         credential_value = credential_loader("HELIUS_API_KEY")
         request = bind_transaction_subscribe(credential_value)
-    except Exception:
+    except (KeyError, ForwardStreamRuntimeError):
         return _publish_terminal_receipt(
             attempt,
             _closed_classification(
@@ -610,6 +840,8 @@ def execute_forward_stream_attempt(
             terminal_at=clock(),
             manifest=None,
         )
+    except Exception:
+        raise ForwardStreamExecutionError("UNCLASSIFIED_LOCAL_FAILURE") from None
 
     _require(
         request.safe_receipt() == dict(attempt.planned_request_receipt),
@@ -636,10 +868,11 @@ def execute_forward_stream_attempt(
             manifest=None,
         )
     _require(type(capture) is WssCapture, "WSS_CAPTURE_TYPE_INVALID")
+    _capture_metrics(runtime_config, capture)
 
     try:
         manifest = _retain_exact_capture(attempt, capture)
-    except Exception:
+    except ForwardStreamExecutionError:
         return _publish_terminal_receipt(
             attempt,
             _closed_classification(
@@ -652,6 +885,8 @@ def execute_forward_stream_attempt(
             terminal_at=clock(),
             manifest=None,
         )
+    except Exception:
+        raise ForwardStreamExecutionError("UNCLASSIFIED_LOCAL_FAILURE") from None
     classification = classify_task08_capture(runtime_config, capture)
     return _publish_terminal_receipt(
         attempt,

@@ -22,11 +22,11 @@
   "artifact_bindings": {
     "task": {
       "path": "docs/tasks/TASK-30-forward-stream-execution-adapter.md",
-      "sha256": "40e6881025c365126c8cc7fc04e49001ea4341af5456ec4267c669686a18df48"
+      "sha256": "f531ea3ec8876cf14bbcdf5663e4ccc2106ca25f22617577c07c5d49a2a3f3a0"
     },
     "contract": {
       "path": "docs/contracts/task30_forward_stream_execution_adapter_contract_v1.md",
-      "sha256": "15d4ebf6086ae08369b7d80c050cdfacf6b0cadbd041d4314a9ee0499d6de007"
+      "sha256": "eae751adbc71dd3484c103d0960c4b22d251014ebecbd5da17e23de6914cc422"
     },
     "configuration": {
       "path": "configs/task30_forward_stream_execution_adapter_v1.yaml",
@@ -42,7 +42,7 @@
     },
     "module": {
       "path": "src/solana_alpha_lab/task30_forward_stream_execution.py",
-      "sha256": "fd04b4956679063915b73e4a3ccaa63578432820c5dc5e235877ea08abe99232"
+      "sha256": "2c55b0490eed63757e20b9cbde77ed8088e54b2654285d894cb5b8b675476b54"
     },
     "runner": {
       "path": "scripts/run_task30_forward_stream_capture.py",
@@ -50,7 +50,7 @@
     },
     "test": {
       "path": "tests/test_task30_forward_stream_execution.py",
-      "sha256": "05eb8adf587846ff2e807b99ff30b4b0b45042de08642ca89fad3f7745f2b614"
+      "sha256": "74185989a88883ba054021502d3866073ed6048a82e0a1ca2b19aa03b16e7d57"
     },
     "design": {
       "path": "docs/superpowers/specs/2026-08-11-task30-forward-stream-execution-adapter-design.md",
@@ -62,7 +62,7 @@
     },
     "factory_fit": {
       "path": "docs/evidence/task30/a14p_forward_stream_execution_adapter_factory_fit_v1.json",
-      "sha256": "cd2bd4ad6f4505bc70e0438fb545de4d305890ab8c51bf0675040053bea7380d"
+      "sha256": "5bafbf4967b7c51cfa6c3b5844103d6a1771dfae763a463643278e122b56477d"
     }
   },
   "validation_evidence": {

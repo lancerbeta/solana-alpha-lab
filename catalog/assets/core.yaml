@@ -13234,7 +13234,7 @@ records:
   as_of: '2026-08-12'
   truth_owner: TASK-30
   location: {kind: git_path, logical_uri: 'repo://docs/contracts/task30_forward_stream_execution_adapter_contract_v1.md', repository_path: docs/contracts/task30_forward_stream_execution_adapter_contract_v1.md}
-  integrity: {kind: sha256, sha256: 15d4ebf6086ae08369b7d80c050cdfacf6b0cadbd041d4314a9ee0499d6de007}
+  integrity: {kind: sha256, sha256: eae751adbc71dd3484c103d0960c4b22d251014ebecbd5da17e23de6914cc422}
   access: *t25_read_file
   relations:
   - {relation_type: depends_on, target_asset_id: CONTRACT-T30-FORWARD-STREAM-RUNTIME-HARNESS-001}
@@ -13299,7 +13299,7 @@ records:
   as_of: '2026-08-12'
   truth_owner: TASK-30
   location: {kind: git_path, logical_uri: 'repo://src/solana_alpha_lab/task30_forward_stream_execution.py', repository_path: src/solana_alpha_lab/task30_forward_stream_execution.py}
-  integrity: {kind: sha256, sha256: fd04b4956679063915b73e4a3ccaa63578432820c5dc5e235877ea08abe99232}
+  integrity: {kind: sha256, sha256: 2c55b0490eed63757e20b9cbde77ed8088e54b2654285d894cb5b8b675476b54}
   access: *t25_read_file
   relations:
   - {relation_type: governed_by, target_asset_id: CONFIG-T30-FORWARD-STREAM-EXECUTION-ADAPTER-001}
@@ -13336,7 +13336,7 @@ records:
   as_of: '2026-08-12'
   truth_owner: TASK-30
   location: {kind: git_path, logical_uri: 'repo://tests/test_task30_forward_stream_execution.py', repository_path: tests/test_task30_forward_stream_execution.py}
-  integrity: {kind: sha256, sha256: 05eb8adf587846ff2e807b99ff30b4b0b45042de08642ca89fad3f7745f2b614}
+  integrity: {kind: sha256, sha256: 74185989a88883ba054021502d3866073ed6048a82e0a1ca2b19aa03b16e7d57}
   access: *t25_read_file
   relations:
   - {relation_type: depends_on, target_asset_id: MODULE-T30-FORWARD-STREAM-EXECUTION-ADAPTER-001}
@@ -13356,7 +13356,7 @@ records:
   as_of: '2026-08-12'
   truth_owner: TASK-30
   location: {kind: git_path, logical_uri: 'repo://docs/evidence/task30/a14p_forward_stream_execution_adapter_acceptance_v1.json', repository_path: docs/evidence/task30/a14p_forward_stream_execution_adapter_acceptance_v1.json}
-  integrity: {kind: sha256, sha256: deeaac485a0e67655da7848f5ac581b9e8474b0683e76e49dddc1d410d9f0837}
+  integrity: {kind: sha256, sha256: 0bbd21433495ede59161fba0b6e3793f0239767ad46bb54fed33e77e96c25424}
   access: *t25_read_file
   relations:
   - {relation_type: derived_from, target_asset_id: CONTRACT-T30-FORWARD-STREAM-EXECUTION-ADAPTER-001}
@@ -13374,7 +13374,7 @@ records:
   as_of: '2026-08-12'
   truth_owner: TASK-30
   location: {kind: git_path, logical_uri: 'repo://docs/evidence/task30/a14p_forward_stream_execution_adapter_factory_fit_v1.json', repository_path: docs/evidence/task30/a14p_forward_stream_execution_adapter_factory_fit_v1.json}
-  integrity: {kind: sha256, sha256: cd2bd4ad6f4505bc70e0438fb545de4d305890ab8c51bf0675040053bea7380d}
+  integrity: {kind: sha256, sha256: 5bafbf4967b7c51cfa6c3b5844103d6a1771dfae763a463643278e122b56477d}
   access: *t25_read_file
   relations:
   - {relation_type: derived_from, target_asset_id: EVIDENCE-T30-A14P-FORWARD-STREAM-EXECUTION-ADAPTER-001}
