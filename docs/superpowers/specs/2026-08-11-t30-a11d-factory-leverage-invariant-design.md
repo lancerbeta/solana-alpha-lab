@@ -49,18 +49,21 @@ existing Factory Fit review must answer:
 ## Non-goals
 
 - No automatic blocker, quota, score, registry, schema or recurring report.
-- No change to canonical Project Sources, Catalog, data contracts, providers,
-  credentials, scheduler, wallet, transaction, spend or deployment.
+- No change to canonical Project Sources, Catalog asset IDs, schemas, data
+  contracts, providers, credentials, scheduler, wallet, transaction, spend or
+  deployment. Existing Catalog integrity bindings, record metadata and generated
+  views may be refreshed only when the changed policy documents require it.
 - No claim that the current offline A11C harness is a hypothesis or that it
   should have avoided code; it is a safety capability for a future external
   read.
 
 ## Validation
 
-Inspect the exact two-file diff, run the existing owner-attention policy test
-that protects the active `AGENTS.md` contract, and run the repository policy
-validation required for the committed candidate.  The completion review must
-confirm that this remains a guardrail rather than a second control plane.
+Inspect the exact policy and required Catalog-binding diff, run the existing
+owner-attention policy test that protects the active `AGENTS.md` contract, and
+run Catalog plus repository policy validation for the committed candidate. The
+completion review must confirm that this remains a guardrail rather than a
+second control plane.
 
 ## Rollback
 

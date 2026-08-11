@@ -11,8 +11,13 @@
 ## Global Constraints
 
 - Base: `origin/main` at `55e9984d189f41d3b54c9d5515d6e50bfa600048`.
-- Modify only `AGENTS.md` and `docs/architecture/intents/ARCH-INTENT-002-hypothesis-factory-operating-model.md`; the design and this plan are already versioned planning artifacts.
-- No Catalog, Project Sources, schema, dependency, provider/API/RPC/WSS, credential, scheduler, wallet, signer, transaction, cash, deploy or UI action.
+- Modify the two policy owners and their existing Catalog SHA-256 bindings:
+  `AGENTS.md`, `docs/architecture/intents/ARCH-INTENT-002-hypothesis-factory-operating-model.md`,
+  `catalog/assets/core.yaml`, `catalog/assets/architecture.yaml` and the
+  existing generated-project-map binding in `catalog/assets/lifecycle.yaml`;
+  the design and this plan are already versioned planning artifacts.
+- No new Catalog asset ID, Project Sources, schema, dependency, provider/API/RPC/WSS,
+  credential, scheduler, wallet, signer, transaction, cash, deploy or UI action.
 - A repeated hypothesis-specific code need triggers the existing Factory Fit review; it never automatically blocks work.
 - Use the existing `VALIDATION_ECONOMY` and tracked-only delivery preflight for the final committed candidate.
 
@@ -24,6 +29,10 @@
 
 - Modify: `AGENTS.md`
 - Modify: `docs/architecture/intents/ARCH-INTENT-002-hypothesis-factory-operating-model.md`
+- Modify: `catalog/assets/core.yaml`
+- Modify: `catalog/assets/architecture.yaml`
+- Modify: `catalog/assets/lifecycle.yaml`
+- Generated: `docs/PROJECT_MAP.md`
 - Test: `tests/test_owner_attention_gate_policy.py`
 
 **Interfaces:**
@@ -68,37 +77,68 @@ State that a repeated unaccounted need for hypothesis-specific code is an
 architecture warning requiring that existing review before copying the pattern,
 not an automatic block.
 
-- [ ] **Step 4: Validate the text and active policy compatibility**
+- [ ] **Step 4: Refresh existing Catalog integrity bindings and validate**
+
+Compute SHA-256 for each changed policy document and replace only the existing
+`CTRL-AGENTS-001` and `ARCH-INTENT-002` integrity values. Bump only those two
+record versions and `as_of` values so Catalog discovery remains honest. Then
+run the existing generator; do not edit its outputs manually. If it changes
+`docs/PROJECT_MAP.md`, bind its exact SHA-256 by updating only the existing
+`GENERATED-PROJECT-MAP-001` version and integrity value in
+`catalog/assets/lifecycle.yaml`.
+
+Run:
+
+```text
+uv run --locked --managed-python python -B scripts/generate_navigation.py --write
+uv run --locked --managed-python python -B scripts/validate_catalog.py
+uv run --locked --managed-python python -B scripts/generate_navigation.py --check
+```
+
+Expected: no new asset ID or schema; Catalog integrity and generated-navigation
+checks pass.
+
+- [ ] **Step 5: Validate the text and active policy compatibility**
 
 Run:
 
 ```text
 git diff --check
 uv run --locked --managed-python python -B -m unittest tests.test_owner_attention_gate_policy -v
-uv run --locked --managed-python python -B scripts/validate_ci.py
+uv run --locked --managed-python python -B scripts/validate_catalog.py
+uv run --locked --managed-python python -B scripts/generate_navigation.py --check
 ```
 
 Expected: clean whitespace, existing owner-attention rules still pass, and the
-repository gate passes without new dependencies or external actions.
+affected Catalog and generated-navigation checks pass without new dependencies
+or external actions. The successful full gate is owned by the tracked-only
+delivery preflight below, per `VALIDATION_ECONOMY`.
 
-- [ ] **Step 5: Inspect the exact scope and commit**
+- [ ] **Step 6: Inspect the exact scope and commit**
 
 Run:
 
 ```text
 git diff --name-only origin/main...HEAD
 git status --short
-git add AGENTS.md docs/architecture/intents/ARCH-INTENT-002-hypothesis-factory-operating-model.md
+git add AGENTS.md docs/architecture/intents/ARCH-INTENT-002-hypothesis-factory-operating-model.md catalog/assets/core.yaml catalog/assets/architecture.yaml catalog/assets/lifecycle.yaml docs/PROJECT_MAP.md
 git commit -m "docs: add factory leverage invariant"
 ```
 
-Expected committed implementation inventory: the two target policy files plus
-the already committed design and plan; no Catalog or Project Sources change.
+Expected committed implementation inventory: the two policy files, their two
+existing Catalog bindings, the derived project map with its existing Catalog
+binding, and the already committed design and plan; no new Catalog asset or
+Project Sources change.
 
-- [ ] **Step 6: Deliver through the ordinary repository route**
+- [ ] **Step 7: Deliver through the ordinary repository route**
 
-Run the tracked-only delivery preflight once for the exact committed candidate,
-then use the standing GitHub transport authority for non-force push, one Draft
+Run once:
+
+```text
+uv run --locked --managed-python python -B scripts/validate_ci.py --tracked-only-delivery
+```
+
+Then use the standing GitHub transport authority for non-force push, one Draft
 PR, exact-head CI read-back and the repository `OWNER_ATTENTION_GATE` before
 any ordinary merge. Preserve the branch and do not claim canonical TASK-30
 completion: its separate next boundary remains owner-authorized external read.

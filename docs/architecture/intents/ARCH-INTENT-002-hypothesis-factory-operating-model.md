@@ -305,6 +305,22 @@ surface actions. It cannot silently change a hypothesis definition, consume a
 holdout twice, activate a strategy, widen capital, buy infrastructure or send
 a transaction without the applicable accepted gate.
 
+## Factory leverage invariant
+
+The factory earns its name only when comparable new hypotheses become cheaper
+to evaluate as reusable capabilities accumulate. The default path for a
+hypothesis already covered by existing Factory capabilities is a versioned
+definition, configuration, data/query composition and trial; it does not need
+a product-code modification.
+
+A Git/code/deploy cycle is justified only by a named reusable capability gap,
+a defect, a safety or reliability requirement, or a measured scale bottleneck.
+When comparable work repeatedly requires hypothesis-specific product code, that
+is an architecture warning. Before replicating the pattern, the existing
+Factory Fit review must name the reusable gap and the next real consumer. The
+review is a trigger for reasoning and correction, not an automatic block or a
+second control plane.
+
 ## Factory Fit Gate before completion
 
 A green test suite proves implementation consistency, not product direction.
@@ -316,8 +332,11 @@ The review binds to the exact candidate inventory and asks:
 
 1. **Mission and consumer:** does the result shorten or protect a named
    hypothesis-to-cashflow decision, or is it infrastructure without demand?
-2. **Flexibility and change amplification:** can a new hypothesis, field,
-   provider, cadence or regime be added without editing unrelated components?
+2. **Flexibility, reuse and leverage:** can a new hypothesis, field, provider,
+   cadence or regime be added without editing unrelated components? Could the
+   next comparable hypothesis run through existing Factory capabilities without
+   product-code modification? If not, which reusable capability gap is closed
+   and who is the next real consumer?
 3. **Compatibility and history:** are migrations, PIT, lineage, cache reuse,
    old evidence and forward-only evolution preserved?
 4. **Efficiency:** was the cheapest falsifier used; are storage, calls,
