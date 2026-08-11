@@ -61,15 +61,22 @@ CI_OWNED_INELIGIBLE_EXACT_PATHS = frozenset(
         "scripts/validate_ci.py",
         "tests/test_baseline.py",
         "tests/test_baton_repository_policy.py",
+        "tests/test_catalog.py",
         "tests/test_ci.py",
         "tests/test_control_only_task_close_fast_path.py",
+        "tests/test_generate_navigation.py",
         "tests/test_owner_attention_gate_policy.py",
+        "tests/test_pre_git_import.py",
+        "tests/test_project_sources_release_registry.py",
+        "tests/test_secret_scan.py",
+        "tests/test_task04_core_stack.py",
     }
 )
 CI_OWNED_INELIGIBLE_PREFIXES = (
     ".cursor/",
     ".github/",
     ".githooks/",
+    "catalog/schemas/",
     "control/",
     "docs/agent/",
     "docs/tasks/CTRL-",
@@ -77,6 +84,10 @@ CI_OWNED_INELIGIBLE_PREFIXES = (
     "scripts/baton_",
     "scripts/validate_",
     "schemas/",
+    "src/solana_alpha_lab/contracts/migration_",
+    "src/solana_alpha_lab/contracts/schema_",
+    "tests/test_baton_",
+    "tests/test_validate_",
 )
 DELIVERY_SKIP_CALL = re.compile(
     r"(?:\.skipTest\s*\(|@(?:unittest\.)?skip(?:If|Unless)?\s*\("
