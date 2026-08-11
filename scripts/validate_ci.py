@@ -35,6 +35,60 @@ DELIVERY_PREFLIGHT_SCHEMA = (
 )
 DELIVERY_PREFLIGHT_TIMEOUT_SECONDS = 900
 DELIVERY_PREFLIGHT_RECEIPT_DIR = ROOT / "local/delivery_preflight"
+CI_OWNED_DELIVERY_COMMAND = VALIDATION_COMMAND + " --ci-owned-delivery"
+CI_OWNED_DELIVERY_SCHEMA = "solana-alpha-lab.ci-owned-delivery-preflight.v1"
+CI_OWNED_DELIVERY_PILOT_ID = "CTRL-CI-OWNED-DELIVERY-PILOT-V1"
+CI_OWNED_DELIVERY_TIMEOUT_SECONDS = 120
+CI_OWNED_FULL_VALIDATION_OWNER = "GITHUB_PR_EXACT_HEAD_CI"
+CI_OWNED_INELIGIBLE_EXACT_PATHS = frozenset(
+    {
+        ".cursorignore",
+        ".github/pull_request_template.md",
+        ".python-version",
+        "AGENTS.md",
+        "docs/agent/EXECUTION_ROUTER_PROTOCOL.md",
+        "docs/agent/GITHUB_BATON_PROTOCOL.md",
+        "pyproject.toml",
+        "uv.lock",
+        "scripts/control_only_task_close_fast_path.py",
+        "scripts/catalog_cli.py",
+        "scripts/generate_navigation.py",
+        "scripts/owner_attention_gate.py",
+        "scripts/secret_scan.py",
+        "scripts/validate.ps1",
+        "scripts/validate_baseline.py",
+        "scripts/validate_baton.py",
+        "scripts/validate_ci.py",
+        "tests/test_baseline.py",
+        "tests/test_baton_repository_policy.py",
+        "tests/test_catalog.py",
+        "tests/test_ci.py",
+        "tests/test_control_only_task_close_fast_path.py",
+        "tests/test_generate_navigation.py",
+        "tests/test_owner_attention_gate_policy.py",
+        "tests/test_pre_git_import.py",
+        "tests/test_project_sources_release_registry.py",
+        "tests/test_secret_scan.py",
+        "tests/test_task04_core_stack.py",
+    }
+)
+CI_OWNED_INELIGIBLE_PREFIXES = (
+    ".cursor/",
+    ".github/",
+    ".githooks/",
+    "catalog/schemas/",
+    "control/",
+    "docs/agent/",
+    "docs/tasks/CTRL-",
+    "migrations/",
+    "scripts/baton_",
+    "scripts/validate_",
+    "schemas/",
+    "src/solana_alpha_lab/contracts/migration_",
+    "src/solana_alpha_lab/contracts/schema_",
+    "tests/test_baton_",
+    "tests/test_validate_",
+)
 DELIVERY_SKIP_CALL = re.compile(
     r"(?:\.skipTest\s*\(|@(?:unittest\.)?skip(?:If|Unless)?\s*\("
     r"|pytest\.(?:skip|importorskip)\s*\()"
@@ -189,15 +243,54 @@ def parse_validation_summary(output: str) -> dict[str, Any]:
     }
 
 
-def write_delivery_receipt(payload: dict[str, Any], candidate: str) -> Path:
+def write_delivery_receipt(
+    payload: dict[str, Any],
+    candidate: str,
+    *,
+    suffix: str = "",
+) -> Path:
     DELIVERY_PREFLIGHT_RECEIPT_DIR.mkdir(parents=True, exist_ok=True)
-    path = DELIVERY_PREFLIGHT_RECEIPT_DIR / f"{candidate}.json"
+    path = DELIVERY_PREFLIGHT_RECEIPT_DIR / f"{candidate}{suffix}.json"
     path.write_text(
         json.dumps(payload, indent=2, sort_keys=True) + "\n",
         encoding="utf-8",
         newline="\n",
     )
     return path
+
+
+def validate_ci_owned_delivery_eligibility(
+    changed_paths: list[str],
+) -> list[str]:
+    """Admit only objectively bounded candidates; ambiguity uses the legacy gate."""
+
+    normalized: list[str] = []
+    violations: list[str] = []
+    for raw_path in changed_paths:
+        path = raw_path.replace("\\", "/")
+        parts = Path(path).parts
+        if (
+            not path
+            or path.startswith("/")
+            or path.startswith("../")
+            or Path(path).is_absolute()
+            or re.match(r"^[A-Za-z]:/", path) is not None
+            or ".." in parts
+        ):
+            violations.append(f"unsafe:{raw_path}")
+            continue
+        normalized.append(path)
+        if path in CI_OWNED_INELIGIBLE_EXACT_PATHS or path.startswith(
+            CI_OWNED_INELIGIBLE_PREFIXES
+        ):
+            violations.append(path)
+    if not normalized:
+        violations.append("no_changed_paths")
+    if violations:
+        raise CiValidationError(
+            "ci_owned_delivery_ineligible_paths:" + ",".join(sorted(violations))
+        )
+    return normalized
 
 
 def run_tracked_only_delivery_preflight(*, base_ref: str = "origin/main") -> None:
@@ -506,26 +599,49 @@ def child_commands() -> list[tuple[str, list[str]]]:
     ]
 
 
+def ci_owned_child_commands() -> list[tuple[str, list[str]]]:
+    """Focused local controls; GitHub PR CI owns full repository discovery."""
+
+    focused: list[tuple[str, list[str]]] = []
+    for label, command in child_commands():
+        if label == "REPOSITORY_POLICY":
+            continue
+        if label == "BATON_VALIDATION":
+            command = [*command, "--focused"]
+        focused.append((label, command))
+    return focused
+
+
 def run_checked(
     label: str,
     command: list[str],
     *,
     runner: Callable[..., subprocess.CompletedProcess[str]] | None = None,
+    timeout_seconds: float | None = None,
+    offline: bool = False,
 ) -> subprocess.CompletedProcess[str]:
     execute = runner or subprocess.run
     environment = os.environ.copy()
     environment["PYTHONDONTWRITEBYTECODE"] = "1"
     environment["UV_MANAGED_PYTHON"] = "1"
-    completed = execute(
-        command,
-        cwd=ROOT,
-        env=environment,
-        text=True,
-        stdout=subprocess.PIPE,
-        stderr=subprocess.PIPE,
-        check=False,
-        shell=False,
-    )
+    if offline:
+        environment["UV_OFFLINE"] = "1"
+        environment["UV_NO_ENV_FILE"] = "1"
+    arguments: dict[str, Any] = {
+        "cwd": ROOT,
+        "env": environment,
+        "text": True,
+        "stdout": subprocess.PIPE,
+        "stderr": subprocess.PIPE,
+        "check": False,
+        "shell": False,
+    }
+    if timeout_seconds is not None:
+        arguments["timeout"] = max(0.001, timeout_seconds)
+    try:
+        completed = execute(command, **arguments)
+    except subprocess.TimeoutExpired as exc:
+        raise CiValidationError(f"{label.lower()}_timeout") from exc
     if completed.stdout.strip():
         print(completed.stdout.strip())
     if completed.stderr.strip():
@@ -534,6 +650,185 @@ def run_checked(
         raise CiValidationError(f"{label.lower()}_failed:{completed.returncode}")
     print(f"{label}: PASS")
     return completed
+
+
+def ci_owned_remaining_seconds(deadline: float) -> float:
+    remaining = deadline - time.monotonic()
+    if remaining <= 0:
+        raise CiValidationError("ci_owned_delivery_focused_gate_timeout")
+    return remaining
+
+
+def run_ci_owned_focused_gate(*, deadline: float) -> list[str]:
+    validate_python_version(sys.version_info[:3])
+    print("PYTHON_RUNTIME: PASS")
+
+    uv = run_checked(
+        "UV_RUNTIME",
+        ["uv", "--version"],
+        timeout_seconds=ci_owned_remaining_seconds(deadline),
+        offline=True,
+    )
+    validate_uv_version(uv.stdout + uv.stderr)
+
+    with (ROOT / "pyproject.toml").open("rb") as handle:
+        validate_project_contract(tomllib.load(handle))
+    print("EXECUTABLE_CONTRACT: PASS")
+
+    validate_workflow_text(WORKFLOW_PATH.read_text(encoding="utf-8"))
+    print("WORKFLOW_STATIC_VALIDATION: PASS")
+
+    before = LOCK_PATH.read_bytes()
+    run_checked(
+        "PYTHON_LOCK",
+        ["uv", "lock", "--check", "--managed-python"],
+        timeout_seconds=ci_owned_remaining_seconds(deadline),
+        offline=True,
+    )
+    assert_lock_unchanged(before, LOCK_PATH.read_bytes())
+    print("UV_LOCK_IMMUTABLE: PASS")
+
+    passed: list[str] = []
+    for label, command in ci_owned_child_commands():
+        completed = run_checked(
+            label,
+            command,
+            timeout_seconds=ci_owned_remaining_seconds(deadline),
+            offline=True,
+        )
+        if (
+            label == "CATALOG_RESOLUTION"
+            and '"asset_id": "CATALOG-ROOT-001"' not in completed.stdout
+        ):
+            raise CiValidationError("catalog_resolution_contract_mismatch")
+        if label == "PRE_COMMIT_HOOK" and completed.stdout.strip() != ".githooks":
+            raise CiValidationError("pre_commit_hook_config_mismatch")
+        passed.append(label)
+
+    assert_lock_unchanged(before, LOCK_PATH.read_bytes())
+    ci_owned_remaining_seconds(deadline)
+    print("CI_OWNED_FOCUSED_RESULT: PASS")
+    return passed
+
+
+def run_ci_owned_delivery_preflight(*, base_ref: str = "origin/main") -> None:
+    started = time.monotonic()
+    deadline = started + CI_OWNED_DELIVERY_TIMEOUT_SECONDS
+    candidate = git_text(["rev-parse", "HEAD"])
+    tree = git_text(["show", "-s", "--format=%T", candidate])
+    branch = git_text(["symbolic-ref", "--quiet", "--short", "HEAD"])
+    base_commit: str | None = None
+    tracked_count: int | None = None
+    tracked_clean = False
+    changed_paths: list[str] = []
+    waivers: list[dict[str, str]] = []
+    focused_passes: list[str] = []
+    status = "FAIL"
+    eligibility_status = "NOT_RUN"
+    skip_policy_status = "NOT_RUN"
+    error: str | None = None
+    try:
+        tracked_dirty = git_text(
+            ["status", "--porcelain=v1", "--untracked-files=no"]
+        )
+        if tracked_dirty:
+            raise CiValidationError("ci_owned_delivery_candidate_has_tracked_changes")
+        tracked_clean = True
+        base_commit = git_text(["merge-base", base_ref, candidate])
+        tracked_count = len(
+            git_text(["ls-tree", "-r", "--name-only", candidate]).splitlines()
+        )
+        changed_paths = git_text(
+            ["diff", "--name-only", f"{base_commit}..{candidate}"]
+        ).splitlines()
+        eligibility_status = "FAIL"
+        changed_paths = validate_ci_owned_delivery_eligibility(changed_paths)
+        eligibility_status = "PASS"
+
+        diff_text = git_text(
+            ["diff", "--unified=3", f"{base_commit}..{candidate}", "--", "tests"]
+        )
+
+        def proof_exists(path: str) -> bool:
+            completed = subprocess.run(
+                ["git", "cat-file", "-e", f"{candidate}:{path}"],
+                cwd=ROOT,
+                stdout=subprocess.DEVNULL,
+                stderr=subprocess.DEVNULL,
+                check=False,
+                shell=False,
+            )
+            return completed.returncode == 0
+
+        skip_policy_status = "FAIL"
+        waivers = validate_new_test_skip_policy(
+            diff_text,
+            proof_exists=proof_exists,
+        )
+        skip_policy_status = "PASS"
+        focused_passes = run_ci_owned_focused_gate(deadline=deadline)
+        status = "PASS"
+    except Exception as exc:
+        error = f"{type(exc).__name__}:{exc}"
+        raise
+    finally:
+        elapsed = round(time.monotonic() - started, 3)
+        payload = {
+            "schema": CI_OWNED_DELIVERY_SCHEMA,
+            "pilot_id": CI_OWNED_DELIVERY_PILOT_ID,
+            "status": status,
+            "observed_at": utc_now(),
+            "candidate": {
+                "branch": branch,
+                "commit": candidate,
+                "tree": tree,
+                "base_ref": base_ref,
+                "base_commit": base_commit,
+                "tracked_file_count": tracked_count,
+                "tracked_worktree_clean": tracked_clean,
+                "changed_paths": changed_paths,
+            },
+            "eligibility": {
+                "status": eligibility_status,
+                "asserted_class": "BOUNDED_OFFLINE_ROUTINE",
+                "ambiguous_or_ineligible_fallback": DELIVERY_PREFLIGHT_COMMAND,
+            },
+            "focused_gate": {
+                "command": CI_OWNED_DELIVERY_COMMAND,
+                "timeout_seconds": CI_OWNED_DELIVERY_TIMEOUT_SECONDS,
+                "wall_seconds": elapsed,
+                "pass_labels": focused_passes,
+                "full_repository_policy_executed": False,
+            },
+            "new_skip_policy": {
+                "status": skip_policy_status,
+                "tracked_noncritical_waivers": waivers,
+            },
+            "full_validation": {
+                "owner": CI_OWNED_FULL_VALIDATION_OWNER,
+                "state": "DELEGATED_PENDING",
+                "clean_checkout": "REQUIRED_IN_PULL_REQUEST_CI",
+                "required_before_merge": True,
+            },
+            "pilot": {
+                "required_eligible_observations": 3,
+                "success_first_head_ci": "3/3",
+                "minimum_time_saved_minutes": 7,
+                "rollback_on_missed_clean_checkout_or_local_data_defect": True,
+            },
+            "network": {"performed": False},
+            "error": error,
+        }
+        receipt = write_delivery_receipt(
+            payload,
+            candidate,
+            suffix=".ci-owned",
+        )
+        print(
+            "CI_OWNED_DELIVERY_RECEIPT: "
+            + receipt.relative_to(ROOT).as_posix()
+        )
+    print("CI_OWNED_DELIVERY_PREFLIGHT: PASS")
 
 
 def validate() -> None:
@@ -579,6 +874,11 @@ def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
         action="store_true",
         help="run the fail-closed focused gate for an eligible combined task close",
     )
+    delivery_mode.add_argument(
+        "--ci-owned-delivery",
+        action="store_true",
+        help="run focused local controls and delegate the full clean-checkout suite to PR CI",
+    )
     parser.add_argument(
         "--base-ref",
         default="origin/main",
@@ -596,6 +896,8 @@ def main(argv: list[str] | None = None) -> int:
             from control_only_task_close_fast_path import run_fast_path
 
             run_fast_path(base_ref=args.base_ref)
+        elif args.ci_owned_delivery:
+            run_ci_owned_delivery_preflight(base_ref=args.base_ref)
         else:
             validate()
     except Exception as exc:

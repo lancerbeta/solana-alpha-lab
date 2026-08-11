@@ -157,6 +157,28 @@ the same pushed head, Cursor may report targeted evidence and
 `FULL_VALIDATION=DELEGATED_TO_CI`; do not duplicate the full gate merely because
 the same bytes were staged, committed, pushed, or placed in a PR.
 
+### CI_OWNED_DELIVERY_PILOT
+
+For the next three eligible bounded offline/routine candidates, run
+`uv run --locked --managed-python python -B scripts/validate_ci.py --ci-owned-delivery`
+on the exact committed tracked-clean bytes. The focused local gate retains
+security, baton, Catalog, generated-view, architecture, lock, workflow, skip
+and hook checks and must finish within 120 seconds. Workflow, dependency/lock,
+validation/security/control-policy, schema/migration or validation-test changes,
+plus any ambiguous candidate, fall back to `--tracked-only-delivery`.
+
+`GITHUB_PR_EXACT_HEAD_CI` is the sole clean-checkout/full-suite owner: require
+the first pushed exact head before merge and exact-main CI after merge. Keep the
+route only after 3/3 first-head passes without repair and at least seven minutes
+saved per eligible delivery. A false admission, missed clean-checkout or
+local-data defect, omitted-local-coverage failure, or focused gate above
+120 seconds disables the route and restores `--tracked-only-delivery`.
+
+Read prior merged PR validation evidence before admission and record
+`CTRL-CI-OWNED-DELIVERY-PILOT-V1 observation N/3` plus the focused receipt
+summary in the current PR. After observation 3/3, do not admit a fourth
+candidate until the pilot keep/repair/rollback review.
+
 ## Route switching rules
 
 - Route changes require an explicit control-plane decision in the active prompt

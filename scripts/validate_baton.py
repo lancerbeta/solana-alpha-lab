@@ -3,6 +3,7 @@
 
 from __future__ import annotations
 
+import argparse
 import hashlib
 import json
 import re
@@ -950,20 +951,35 @@ def validate_offline_commands_have_no_hidden_network() -> None:
         )
 
 
-def validate() -> None:
+def validate(*, focused: bool = False) -> None:
     validate_schemas()
     validate_fixtures()
-    validate_canonical_catalog_integrity()
+    if not focused:
+        validate_canonical_catalog_integrity()
     validate_cursor_and_templates()
     validate_owner_attention_gate()
     validate_protocol_links()
     validate_offline_commands_have_no_hidden_network()
-    print("BATON_VALIDATION: PASS")
+    if focused:
+        print("BATON_FOCUSED_VALIDATION: PASS")
+    else:
+        print("BATON_VALIDATION: PASS")
 
 
-def main() -> int:
+def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument(
+        "--focused",
+        action="store_true",
+        help="skip the duplicate canonical Catalog hash sweep owned by Catalog validation",
+    )
+    return parser.parse_args(argv)
+
+
+def main(argv: list[str] | None = None) -> int:
+    args = parse_args(argv)
     try:
-        validate()
+        validate(focused=args.focused)
     except BatonValidationError as exc:
         print("BATON_VALIDATION: FAIL")
         print(f"ERROR_TYPE: {type(exc).__name__}")

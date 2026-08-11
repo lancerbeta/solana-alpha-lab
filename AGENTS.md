@@ -174,6 +174,12 @@ Tracked-only delivery preflight:
 uv run --locked --managed-python python -B scripts/validate_ci.py --tracked-only-delivery
 ```
 
+CI-owned delivery pilot preflight:
+
+```text
+uv run --locked --managed-python python -B scripts/validate_ci.py --ci-owned-delivery
+```
+
 Control-only task-close fast path:
 
 ```text
@@ -200,14 +206,39 @@ uv run --locked --managed-python python -B scripts/validate_ci.py --control-only
   control/clean-checkout repair and each local focused gate finishes within
   120 seconds. A false classification or missed drift disables the path.
 
+## CI_OWNED_DELIVERY_PILOT
+
+- Prospectively admit the next three eligible bounded offline/routine delivery
+  candidates through `--ci-owned-delivery`. The exact candidate must be
+  committed and tracked-clean; the mode preserves the new-test skip policy and
+  runs focused security, baton, Catalog, generated-view, architecture, lock,
+  workflow and hook checks within 120 seconds.
+- Workflow, hook, dependency/lock, validation/security/control-policy,
+  schema/migration and validation-test changes are ineligible. Semantic
+  ambiguity, any machine classification failure, or a focused-check failure
+  falls back to `--tracked-only-delivery`; owner attention cannot waive it.
+- `GITHUB_PR_EXACT_HEAD_CI` is the sole clean-checkout/full-suite owner for an
+  admitted candidate. Its first pushed exact head must pass before merge, and
+  exact-main post-merge CI remains mandatory. Do not repeat the local full
+  suite for unchanged admitted bytes.
+- Before admission, read prior merged PR validation evidence for this pilot.
+  Record `CTRL-CI-OWNED-DELIVERY-PILOT-V1 observation N/3` plus the focused
+  receipt summary in the existing PR Validation section. After observation 3/3,
+  do not admit a fourth candidate until the pilot keep/repair/rollback review.
+- Keep the route only after 3/3 first-head PR CI passes with no repair and at
+  least seven minutes saved per eligible delivery. Immediately disable it and
+  fall back to `--tracked-only-delivery` after a false admission, a missed
+  clean-checkout or local-data defect, a first-head failure caused by omitted
+  local coverage, or a focused gate above 120 seconds.
+
 ## TRACKED_ONLY_DELIVERY_PREFLIGHT
 
-- Unless `CONTROL_ONLY_TASK_CLOSE_FAST_PATH` admits the exact candidate, run
-  the tracked-only delivery preflight once for the exact committed
-  candidate before its first push. It creates an isolated local clone from Git
-  objects, copies no untracked or ignored inputs, runs the full locked gate
-  offline, removes the temporary checkout, and writes a compact ignored receipt
-  under `local/delivery_preflight/`.
+- Unless `CONTROL_ONLY_TASK_CLOSE_FAST_PATH` or `CI_OWNED_DELIVERY_PILOT`
+  admits the exact candidate, run the tracked-only delivery preflight once for
+  the exact committed candidate before its first push. It creates an isolated
+  local clone from Git objects, copies no untracked or ignored inputs, runs the
+  full locked gate offline, removes the temporary checkout, and writes a
+  compact ignored receipt under `local/delivery_preflight/`.
 - The candidate must have no staged or unstaged tracked changes. Untracked and
   ignored local evidence may remain in the source workspace because it is not
   copied into the isolated checkout.
@@ -260,11 +291,12 @@ cost, and owner gate remains in force.
 - When the route guarantees full validation on the same pushed head, Cursor may
   return targeted evidence plus `FULL_VALIDATION=DELEGATED_TO_CI`, then read
   back CI when transport is available. Delegation is not a blocker.
-- For an ordinary delivery candidate, the tracked-only preflight is the local
-  full-gate owner. For an admitted control-only close,
-  `GITHUB_PR_EXACT_HEAD_CI` is the sole full-gate owner after the focused local
-  gate. In both cases GitHub remains the independent remote read-back; do not
-  add another local full-gate run for unchanged bytes.
+- For an ordinary candidate outside an active fast path or pilot, the
+  tracked-only preflight is the local full-gate owner. For an admitted
+  control-only close or CI-owned pilot delivery, `GITHUB_PR_EXACT_HEAD_CI` is
+  the sole full-gate owner after the focused local gate. GitHub is independent
+  remote read-back for the legacy route and the actual full owner for admitted
+  focused routes; do not add another local full-gate run for unchanged bytes.
 - Re-run a failed check only after its root cause changed; re-run a passed full
   gate only when the candidate fingerprint, dependencies, relevant runtime, or
   validation policy changed.
