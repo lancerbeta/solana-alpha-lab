@@ -255,7 +255,9 @@ FAILED (failures=1)
         )
         self.assertFalse(ordinary.tracked_only_delivery)
         self.assertFalse(ordinary.control_only_task_close)
+        self.assertFalse(ordinary.ci_owned_delivery)
         self.assertTrue(delivery.tracked_only_delivery)
+        self.assertFalse(delivery.ci_owned_delivery)
         self.assertEqual(delivery.base_ref, "origin/main")
 
     def test_control_only_close_mode_is_exclusive_and_explicit(self) -> None:
@@ -264,6 +266,7 @@ FAILED (failures=1)
         )
         self.assertTrue(fast_path.control_only_task_close)
         self.assertFalse(fast_path.tracked_only_delivery)
+        self.assertFalse(fast_path.ci_owned_delivery)
         with contextlib.redirect_stderr(io.StringIO()):
             with self.assertRaises(SystemExit):
                 ci.parse_args(
@@ -318,6 +321,127 @@ FAILED (failures=1)
                 ],
             ],
         )
+
+
+class CiOwnedDeliveryPilotTests(unittest.TestCase):
+    def test_mode_is_explicit_and_exclusive(self) -> None:
+        candidate = ci.parse_args(
+            ["--ci-owned-delivery", "--base-ref", "origin/main"]
+        )
+        self.assertTrue(candidate.ci_owned_delivery)
+        self.assertFalse(candidate.tracked_only_delivery)
+        self.assertFalse(candidate.control_only_task_close)
+        self.assertEqual(candidate.base_ref, "origin/main")
+        with contextlib.redirect_stderr(io.StringIO()):
+            with self.assertRaises(SystemExit):
+                ci.parse_args(
+                    ["--ci-owned-delivery", "--tracked-only-delivery"]
+                )
+
+    def test_ordinary_offline_candidate_paths_are_eligible(self) -> None:
+        changed_paths = [
+            "src/solana_alpha_lab/task30_example.py",
+            "tests/test_task30_example.py",
+            "configs/task30_example_v1.yaml",
+            "docs/contracts/task30_example_v1.md",
+            "catalog/assets/core.yaml",
+            "catalog/generated/asset_edges.json",
+            "docs/PROJECT_MAP.md",
+        ]
+        self.assertEqual(
+            ci.validate_ci_owned_delivery_eligibility(changed_paths),
+            changed_paths,
+        )
+
+    def test_validation_dependency_schema_and_control_changes_fail_closed(self) -> None:
+        forbidden = (
+            ".github/workflows/ci.yml",
+            ".github/pull_request_template.md",
+            ".githooks/pre-commit",
+            ".cursor/rules/20-validation.mdc",
+            ".python-version",
+            "pyproject.toml",
+            "uv.lock",
+            "AGENTS.md",
+            "docs/agent/EXECUTION_ROUTER_PROTOCOL.md",
+            "docs/agent/GITHUB_BATON_PROTOCOL.md",
+            "scripts/validate_ci.py",
+            "scripts/validate_baseline.py",
+            "scripts/validate_baton.py",
+            "scripts/validate_catalog.py",
+            "scripts/secret_scan.py",
+            "scripts/baton_contract.py",
+            "control/owner_attention_gate_v1.yaml",
+            "schemas/schema_v1.sql",
+            "migrations/0001_canonical_schema_v1.sql",
+            "tests/test_ci.py",
+            "tests/test_baton_repository_policy.py",
+            "C:/outside/repository.py",
+        )
+        for path in forbidden:
+            with self.subTest(path=path):
+                with self.assertRaisesRegex(
+                    ci.CiValidationError,
+                    "ci_owned_delivery_ineligible_paths",
+                ):
+                    ci.validate_ci_owned_delivery_eligibility([path])
+
+    def test_focused_gate_retains_controls_without_full_repository_suite(self) -> None:
+        commands = {label: command for label, command in ci.ci_owned_child_commands()}
+        self.assertEqual(
+            set(commands),
+            {
+                "SECRET_REJECTION",
+                "BATON_VALIDATION",
+                "CATALOG_VALIDATION",
+                "CATALOG_RESOLUTION",
+                "GENERATED_NAVIGATION",
+                "PRE_GIT_IMPORT_VALIDATION",
+                "TASK04_ARCHITECTURE",
+                "PRE_COMMIT_HOOK",
+            },
+        )
+        flattened = " ".join(
+            part for command in commands.values() for part in command
+        )
+        self.assertNotIn("scripts/validate_baseline.py", flattened)
+        self.assertIn("--focused", commands["BATON_VALIDATION"])
+
+    def test_focused_child_execution_is_forced_offline(self) -> None:
+        observed: dict[str, str] = {}
+
+        def runner(*_args, **kwargs):
+            observed.update(kwargs["env"])
+            return subprocess.CompletedProcess([], 0, "", "")
+
+        ci.run_checked(
+            "SYNTHETIC",
+            ["synthetic"],
+            runner=runner,
+            offline=True,
+        )
+        self.assertEqual(observed["UV_OFFLINE"], "1")
+        self.assertEqual(observed["UV_NO_ENV_FILE"], "1")
+
+    def test_policy_names_owner_pilot_success_and_rollback(self) -> None:
+        agents = (ROOT / "AGENTS.md").read_text(encoding="utf-8")
+        router = (ROOT / "docs/agent/EXECUTION_ROUTER_PROTOCOL.md").read_text(
+            encoding="utf-8"
+        )
+        for text in (agents, router):
+            normalized = " ".join(text.split())
+            with self.subTest(owner="policy"):
+                self.assertIn("CI_OWNED_DELIVERY_PILOT", normalized)
+                self.assertIn(ci.CI_OWNED_DELIVERY_COMMAND, normalized)
+                self.assertIn("GITHUB_PR_EXACT_HEAD_CI", normalized)
+                self.assertIn("next three eligible", normalized)
+                self.assertIn("120 seconds", normalized)
+                self.assertIn("3/3", normalized)
+                self.assertIn("seven minutes", normalized)
+                self.assertIn("--tracked-only-delivery", normalized)
+                self.assertIn("missed clean-checkout", normalized)
+                self.assertIn("observation N/3", normalized)
+                self.assertIn("do not admit a fourth", normalized)
 
 
 class PlatformGateContractTests(unittest.TestCase):

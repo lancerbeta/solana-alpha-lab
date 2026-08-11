@@ -575,13 +575,13 @@ records:
     contains_raw_data: false
     sensitivity: INTERNAL_NON_SECRET
 - asset_id: CTRL-AGENTS-001
-  record_version: '2.4'
+  record_version: '2.5'
   asset_type: control_document
   purpose: Repository-level agent contract for standing routine autonomy,
     OWNER_ATTENTION_GATE, route-specific merge authority, safety, JIT validation,
-    fail-closed control-only task close, delivery preflight, status ownership, and
-    Project Sources release control, reuse-first recovery decisions and the
-    Factory Leverage Invariant.
+    fail-closed control-only task close, tracked-only and CI-owned delivery
+    preflights, status ownership, Project Sources release control, reuse-first
+    recovery decisions and the Factory Leverage Invariant.
   status: IMPLEMENTED_UNVERIFIED
   origin: REPOSITORY
   as_of: '2026-08-11'
@@ -592,7 +592,7 @@ records:
     repository_path: AGENTS.md
   integrity:
     kind: sha256
-    sha256: 39786138c660edead815a9c69e3a090e7517bf020533019380c1acce161db81a
+    sha256: 02529ec1406c6f424c69819b56f8608ca13481b527bff93a29eb3af5c37d6be5
   access:
     mode: read_only
     method: file
@@ -781,11 +781,12 @@ records:
     contains_raw_data: false
     sensitivity: INTERNAL_NON_SECRET
 - asset_id: CI-VALIDATOR-001
-  record_version: '2.0'
+  record_version: '2.1'
   asset_type: script
   purpose: Single platform-neutral gate for runtime, lock, secrets, Catalog, generated
     views, repository policy, baton machine-layer checks, tests, one isolated
-    tracked-only delivery preflight, and one fail-closed control-only task-close mode.
+    tracked-only delivery preflight, one fail-closed control-only task-close mode,
+    and one fail-closed CI-owned delivery pilot preflight.
   status: IMPLEMENTED_UNVERIFIED
   origin: REPOSITORY
   as_of: '2026-08-09'
@@ -796,7 +797,7 @@ records:
     repository_path: scripts/validate_ci.py
   integrity:
     kind: sha256
-    sha256: 212fb7ff45d5c27fd728f2198c403e95f135bec2838c41e8974139e4eaad444d
+    sha256: 536530b4ef05b59c875c5b39dec232705ac1f637a0055f57b586ece3d2aa5522
   access:
     mode: read_only
     method: command
@@ -4001,11 +4002,12 @@ records:
     contains_raw_data: false
     sensitivity: INTERNAL_NON_SECRET
 - asset_id: PROTOCOL-EXECUTION-ROUTER-001
-  record_version: '1.4'
+  record_version: '1.5'
   asset_type: control_document
   purpose: Execution router combining GPT control ownership with standing routine
     autonomy and OWNER_ATTENTION_GATE across local and GitHub baton routes,
-    including Project Sources release disposition.
+    including Project Sources release disposition and CI-owned delivery pilot
+    routing.
   status: IMPLEMENTED_UNVERIFIED
   origin: REPOSITORY
   as_of: '2026-08-08'
@@ -4016,7 +4018,7 @@ records:
     repository_path: docs/agent/EXECUTION_ROUTER_PROTOCOL.md
   integrity:
     kind: sha256
-    sha256: 94e6e914b2f415992bd66e6186900b27e921a19e32b583788e106ecafdeca38d
+    sha256: 578e7570159dd19f0669fcd16a71777c077892d09b237a26f8d937e9465079fd
   access:
     mode: read_only
     method: file
@@ -4646,10 +4648,11 @@ records:
     contains_raw_data: false
     sensitivity: INTERNAL_NON_SECRET
 - asset_id: SCRIPT-BATON-VALIDATE-001
-  record_version: '1.11'
+  record_version: '1.12'
   asset_type: script
   purpose: Deterministic offline validator for baton schemas, fixtures, route
-    ownership, OWNER_ATTENTION_GATE, JIT validation, Catalog, templates and rules.
+    ownership, OWNER_ATTENTION_GATE, JIT validation, Catalog, templates and rules,
+    with a focused mode that delegates the duplicate canonical hash sweep.
   status: IMPLEMENTED_UNVERIFIED
   origin: REPOSITORY
   as_of: '2026-08-08'
@@ -4660,7 +4663,7 @@ records:
     repository_path: scripts/validate_baton.py
   integrity:
     kind: sha256
-    sha256: 2e6f7e730f2ac2dfce24e74bdd377baf98cd2592cfcf50a4ac437d7d3251acd8
+    sha256: 69a2b8a5f87d69014a53aed95d353e4bb68fe3f2efd505de133aefe29f98d450
   access:
     mode: read_only
     method: file
