@@ -1,0 +1,47 @@
+schema: smial.task30.standard-pool-logs-route.policy
+schema_version: '1.0'
+task_id: TASK-30
+atom_id: T30-A15_STANDARD_WSS_POOL_TRADE_ROUTE_V1
+contract_id: TASK30-STANDARD-POOL-LOGS-ROUTE-V1
+consumer: RC001-H07-H01-LIQUIDITY-RETENTION
+target:
+  network: solana
+  pool_address: URqx24yyYxtXXhTbBQnbtPLhtLWYoaDaRxuQuLpNS3S
+  base_mint: DMwbVy48dWVKGe9z1pcVnwF3HLMLrqWdDLfbvx8RchhK
+  quote_mint: So11111111111111111111111111111111111111112
+  dex_id: pumpswap
+wire:
+  provider: HELIUS_STANDARD_WSS
+  method: logsSubscribe
+  mentions: [URqx24yyYxtXXhTbBQnbtPLhtLWYoaDaRxuQuLpNS3S]
+  commitment: confirmed
+runtime_limits:
+  effective_open_seconds: 600
+  max_notifications: 128
+  max_stream_bytes: 1000000
+  max_frame_bytes: 100000
+  estimated_credit_cap: 21
+  credit_bytes_per_unit: 100000
+  credits_per_unit: 2
+  connection_credits: 1
+execution_controls:
+  monitoring_owner: LOCAL_WORK_CODEX_FOREGROUND
+  retention_class: A4
+  wss_connections: 1
+  subscriptions: 1
+  rpc_followups: 0
+  retry: false
+  reconnect: false
+  fallback: false
+  scheduler: false
+authority:
+  provider_api_rpc_wss_calls: 0
+  credential_read: false
+  raw_data_write: false
+  cash_spend_usd: 0
+  task30_trial_or_acceptance: false
+owner_authority:
+  future_pilot_authorized: false
+  future_pilot_phrase: 'T30-A15P_STANDARD_POOL_LOGS_RUNTIME_V1; pool=URqx24yyYxtXXhTbBQnbtPLhtLWYoaDaRxuQuLpNS3S; provider=HELIUS_STANDARD_WSS; monitoring_owner=LOCAL_WORK_CODEX_FOREGROUND; max_wss_connections=1; max_subscriptions=1; max_open_seconds=600; max_notifications=128; max_stream_bytes=1000000; estimated_credit_cap=21; retention=A4; rpc_followups=0; retry=false; reconnect=false; fallback=false'
+decision: OFFLINE_ROUTE_READY_FOR_OWNER_GATE
+project_sources_disposition: NO_CHANGE

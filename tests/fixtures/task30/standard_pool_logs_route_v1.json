@@ -1,0 +1,24 @@
+{
+  "schema": "smial.task30.standard-pool-logs-route.fixture",
+  "schema_version": "1.0",
+  "terminal_states": [
+    "ROUTE_READY_OFFLINE",
+    "SUBSCRIPTION_REJECTED",
+    "TRANSPORT_LOST_UNKNOWN",
+    "NO_OBSERVATION_UNKNOWN",
+    "OBSERVED_POOL_TRADE",
+    "OBSERVED_NON_TRADE_OR_UNSUPPORTED",
+    "TRUNCATED_OR_SCHEMA_DRIFT_UNKNOWN"
+  ],
+  "mutations": [
+    {"case_id": "second_mention", "pointer": "wire.mentions", "value": ["URqx24yyYxtXXhTbBQnbtPLhtLWYoaDaRxuQuLpNS3S", "DMwbVy48dWVKGe9z1pcVnwF3HLMLrqWdDLfbvx8RchhK"]},
+    {"case_id": "wrong_method", "pointer": "wire.method", "value": "transactionSubscribe"},
+    {"case_id": "cap_widening", "pointer": "runtime_limits.effective_open_seconds", "value": 601},
+    {"case_id": "type_confusion", "pointer": "runtime_limits.max_notifications", "value": true},
+    {"case_id": "rpc_followup", "pointer": "execution_controls.rpc_followups", "value": 1},
+    {"case_id": "retry", "pointer": "execution_controls.retry", "value": true},
+    {"case_id": "reconnect", "pointer": "execution_controls.reconnect", "value": true},
+    {"case_id": "fallback", "pointer": "execution_controls.fallback", "value": true},
+    {"case_id": "scheduler", "pointer": "execution_controls.scheduler", "value": true}
+  ]
+}
