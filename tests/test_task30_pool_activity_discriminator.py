@@ -169,7 +169,7 @@ class Task30PoolActivityDiscriminatorTests(unittest.TestCase):
 
     def test_boundary_null_short_unbracketed_and_truncated_pages_remain_typed_unknown(self) -> None:
         records = self.records()
-        boundary = self.classify([records["after_terminal"], records["start_boundary"], records["before_start"]])
+        start_bracket = self.classify([records["after_terminal"], records["start_boundary"]])
         ack_boundary = copy.deepcopy(records["start_boundary"])
         ack_boundary["signature"] = "sig-ack-boundary"
         ack_boundary["blockTime"] = 1786526873
@@ -182,14 +182,14 @@ class Task30PoolActivityDiscriminatorTests(unittest.TestCase):
         truncated = self.classify(
             [synthetic_record(index, 1786529000 - index) for index in range(1000)]
         )
-        self.assertEqual(boundary["terminal_state"], "BOUNDARY_TIME_AMBIGUOUS_UNKNOWN")
+        self.assertEqual(start_bracket["terminal_state"], "NO_DIRECT_POOL_ACTIVITY_SUPPORTED")
         self.assertEqual(self.classify([records["after_terminal"], ack_boundary])["terminal_state"], "BOUNDARY_TIME_AMBIGUOUS_UNKNOWN")
         self.assertEqual(self.classify([records["after_terminal"], terminal_boundary])["terminal_state"], "BOUNDARY_TIME_AMBIGUOUS_UNKNOWN")
         self.assertEqual(null_time["terminal_state"], "NULL_BLOCK_TIME_UNKNOWN")
         self.assertEqual(short_unbracketed["terminal_state"], "HISTORY_COVERAGE_UNKNOWN")
         self.assertEqual(empty["terminal_state"], "HISTORY_COVERAGE_UNKNOWN")
         self.assertEqual(truncated["terminal_state"], "PAGE_TRUNCATED_UNKNOWN")
-        self.assertTrue(all(item["unknown"] for item in (boundary, null_time, short_unbracketed, empty, truncated)))
+        self.assertTrue(all(item["unknown"] for item in (null_time, short_unbracketed, empty, truncated)))
 
     def test_rpc_error_malformed_schema_ordering_and_duplicate_fail_closed(self) -> None:
         records = self.records()
@@ -200,6 +200,8 @@ class Task30PoolActivityDiscriminatorTests(unittest.TestCase):
             (response([records["before_start"], records["after_terminal"]]), "ORDERING_OR_SCHEMA_DRIFT_UNKNOWN"),
             (response([records["after_terminal"], records["after_terminal"]]), "ORDERING_OR_SCHEMA_DRIFT_UNKNOWN"),
             (response([{**records["inside"], "err": True}]), "ORDERING_OR_SCHEMA_DRIFT_UNKNOWN"),
+            (response([{**records["inside"], "err": "not-a-transaction-error"}]), "ORDERING_OR_SCHEMA_DRIFT_UNKNOWN"),
+            (response([{**records["inside"], "err": {"NotATransactionError": True}}]), "ORDERING_OR_SCHEMA_DRIFT_UNKNOWN"),
         )
         for payload, expected in cases:
             with self.subTest(expected=expected):
@@ -209,11 +211,11 @@ class Task30PoolActivityDiscriminatorTests(unittest.TestCase):
 
     def test_slot_order_ties_and_transaction_error_union_are_explicit(self) -> None:
         records = self.records()
+        first = copy.deepcopy(records["inside"])
         tied = copy.deepcopy(records["inside"])
         tied["signature"] = "sig-tied"
-        tied["slot"] = records["after_terminal"]["slot"]
-        tied["err"] = {"InstructionError": [0, "Custom"]}
-        accepted = self.classify([records["after_terminal"], tied])
+        tied["err"] = {"InstructionError": [0, {"Custom": 6001}]}
+        accepted = self.classify([first, tied])
         self.assertEqual(
             accepted["terminal_state"],
             "POOL_ADDRESS_ACTIVITY_OBSERVED_ROUTE_REVIEW_REQUIRED",
@@ -222,6 +224,10 @@ class Task30PoolActivityDiscriminatorTests(unittest.TestCase):
         inverted["slot"] = records["after_terminal"]["slot"] + 1
         rejected = self.classify([records["after_terminal"], inverted])
         self.assertEqual(rejected["terminal_state"], "ORDERING_OR_SCHEMA_DRIFT_UNKNOWN")
+        inconsistent_tie = copy.deepcopy(tied)
+        inconsistent_tie["blockTime"] = tied["blockTime"] + 1
+        rejected_tie = self.classify([first, inconsistent_tie])
+        self.assertEqual(rejected_tie["terminal_state"], "ORDERING_OR_SCHEMA_DRIFT_UNKNOWN")
 
     def test_every_result_preserves_market_and_task_nonclaims(self) -> None:
         results = (

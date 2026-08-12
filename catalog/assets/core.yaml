@@ -18293,7 +18293,7 @@ records:
   as_of: '2026-08-12'
   truth_owner: TASK-30
   location: {kind: git_path, logical_uri: 'repo://docs/contracts/task30_pool_activity_discriminator_contract_v1.md', repository_path: docs/contracts/task30_pool_activity_discriminator_contract_v1.md}
-  integrity: {kind: sha256, sha256: 90067dea42385308eddcc463a6714fef0738019549f757121d745891844faf5a}
+  integrity: {kind: sha256, sha256: ac2f0285ec6e0adc6e4d2c27ddc2356ab244dfc1fc6831aa3e703aa85138794f}
   access: *t25_read_file
   relations: [{relation_type: derived_from, target_asset_id: EVIDENCE-T30-A15P-STANDARD-POOL-LOGS-RUNTIME-001}]
   consumers: [TASK-30, FACTORY-001]
@@ -18357,7 +18357,7 @@ records:
   as_of: '2026-08-12'
   truth_owner: TASK-30
   location: {kind: git_path, logical_uri: 'repo://src/solana_alpha_lab/task30_pool_activity_discriminator.py', repository_path: src/solana_alpha_lab/task30_pool_activity_discriminator.py}
-  integrity: {kind: sha256, sha256: 4780657308cf1716f17cffd9b0a18875a06dab0cd4dd54c5e9a850376a540cd2}
+  integrity: {kind: sha256, sha256: 818af62f7a32a34457a41794b796102662df5201aeac6f47c9540ed602617092}
   access: *t25_read_file
   relations: [{relation_type: governed_by, target_asset_id: CONFIG-T30-POOL-ACTIVITY-DISCRIMINATOR-001}]
   consumers: [TASK-30, FACTORY-001]
@@ -18373,7 +18373,7 @@ records:
   as_of: '2026-08-12'
   truth_owner: TASK-30
   location: {kind: git_path, logical_uri: 'repo://tests/test_task30_pool_activity_discriminator.py', repository_path: tests/test_task30_pool_activity_discriminator.py}
-  integrity: {kind: sha256, sha256: cd725aab1f1c37bea2dda7530bab6ff9d04efe10dbb1bdd565926dbd622fdb4f}
+  integrity: {kind: sha256, sha256: 8170c2d98515154ce7889e4292d0e083e079414e7f601b7e501ae657f49ea0c0}
   access: *t25_read_file
   relations:
   - {relation_type: depends_on, target_asset_id: MODULE-T30-POOL-ACTIVITY-DISCRIMINATOR-001}
@@ -18392,7 +18392,7 @@ records:
   as_of: '2026-08-12'
   truth_owner: TASK-30
   location: {kind: git_path, logical_uri: 'repo://docs/evidence/task30/a16_pool_activity_discriminator_acceptance_v1.json', repository_path: docs/evidence/task30/a16_pool_activity_discriminator_acceptance_v1.json}
-  integrity: {kind: sha256, sha256: b0711929440ee267e3734878f1bb8d8a41f7859812cfacb64a38f97ddaa268c5}
+  integrity: {kind: sha256, sha256: 1ce7b87524801f08c20b37dc9c3ffbdfe8cdc5f155c8eda023dcdd430d90acd9}
   access: *t25_read_file
   relations:
   - {relation_type: derived_from, target_asset_id: CONTRACT-T30-POOL-ACTIVITY-DISCRIMINATOR-001}
@@ -18410,7 +18410,7 @@ records:
   as_of: '2026-08-12'
   truth_owner: TASK-30
   location: {kind: git_path, logical_uri: 'repo://docs/evidence/task30/a16_pool_activity_discriminator_factory_fit_v1.json', repository_path: docs/evidence/task30/a16_pool_activity_discriminator_factory_fit_v1.json}
-  integrity: {kind: sha256, sha256: 2a6b912918c5a49a65b1ddc2edf317d47fd04250eebcfaf9a1d9a30eb6a7bdce}
+  integrity: {kind: sha256, sha256: e7277af6afcdff1df24fe0896f3aaf2f26b965a6a634d8369bd41d80149f3344}
   access: *t25_read_file
   relations:
   - {relation_type: derived_from, target_asset_id: EVIDENCE-T30-A16-POOL-ACTIVITY-DISCRIMINATOR-001}

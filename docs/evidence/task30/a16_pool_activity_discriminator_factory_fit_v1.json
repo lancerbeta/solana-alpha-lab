@@ -60,7 +60,7 @@
   "product_horizon": {
     "now": {
       "candidate": "ONE_BOUNDED_POOL_ACTIVITY_DISCRIMINATOR_RUNTIME",
-      "value": "Choose between WSS route repair and target inactivity without another blind waiting window.",
+      "value": "Choose whether the WSS route warrants review or direct post-ack pool-address activity remains unsupported in this one window.",
       "evidence": "A15P accepted the subscription but observed zero notifications in 600 seconds.",
       "cost_risk": "One separately authorized Helius read, one estimated credit and one A4 raw object.",
       "owner": "LOCAL_WORK_CODEX_AFTER_EXACT_GATE",

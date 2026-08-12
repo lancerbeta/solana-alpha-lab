@@ -13,6 +13,102 @@ ACKNOWLEDGEMENT_FLOOR = 1786526873
 TERMINAL_FLOOR = 1786527473
 PAGE_LIMIT = 1000
 
+_TRANSACTION_ERROR_UNIT_VARIANTS = frozenset(
+    {
+        "AccountBorrowOutstanding",
+        "AccountInUse",
+        "AccountLoadedTwice",
+        "AccountNotFound",
+        "AddressLookupTableNotFound",
+        "AlreadyProcessed",
+        "BlockhashNotFound",
+        "CallChainTooDeep",
+        "ClusterMaintenance",
+        "CommitCancelled",
+        "InsufficientFundsForFee",
+        "InvalidAccountForFee",
+        "InvalidAccountIndex",
+        "InvalidAddressLookupTableData",
+        "InvalidAddressLookupTableIndex",
+        "InvalidAddressLookupTableOwner",
+        "InvalidLoadedAccountsDataSizeLimit",
+        "InvalidProgramForExecution",
+        "InvalidRentPayingAccount",
+        "InvalidWritableAccount",
+        "MaxLoadedAccountsDataSizeExceeded",
+        "MissingSignatureForFee",
+        "ProgramAccountNotFound",
+        "ResanitizationNeeded",
+        "SanitizeFailure",
+        "SignatureFailure",
+        "TooManyAccountLocks",
+        "UnbalancedTransaction",
+        "UnsupportedVersion",
+        "WouldExceedAccountDataBlockLimit",
+        "WouldExceedAccountDataTotalLimit",
+        "WouldExceedMaxAccountCostLimit",
+        "WouldExceedMaxBlockCostLimit",
+        "WouldExceedMaxVoteCostLimit",
+    }
+)
+
+_INSTRUCTION_ERROR_UNIT_VARIANTS = frozenset(
+    {
+        "AccountAlreadyInitialized",
+        "AccountBorrowFailed",
+        "AccountBorrowOutstanding",
+        "AccountDataSizeChanged",
+        "AccountDataTooSmall",
+        "AccountNotExecutable",
+        "AccountNotRentExempt",
+        "ArithmeticOverflow",
+        "BuiltinProgramsMustConsumeComputeUnits",
+        "CallDepth",
+        "ComputationalBudgetExceeded",
+        "DuplicateAccountIndex",
+        "DuplicateAccountOutOfSync",
+        "ExecutableAccountNotRentExempt",
+        "ExecutableDataModified",
+        "ExecutableLamportChange",
+        "ExecutableModified",
+        "ExternalAccountDataModified",
+        "ExternalAccountLamportSpend",
+        "GenericError",
+        "IllegalOwner",
+        "Immutable",
+        "IncorrectAuthority",
+        "IncorrectProgramId",
+        "InsufficientFunds",
+        "InvalidAccountData",
+        "InvalidAccountOwner",
+        "InvalidArgument",
+        "InvalidError",
+        "InvalidInstructionData",
+        "InvalidRealloc",
+        "InvalidSeeds",
+        "MaxAccountsDataAllocationsExceeded",
+        "MaxAccountsExceeded",
+        "MaxInstructionTraceLengthExceeded",
+        "MaxSeedLengthExceeded",
+        "MissingAccount",
+        "MissingRequiredSignature",
+        "ModifiedProgramId",
+        "NotEnoughAccountKeys",
+        "PrivilegeEscalation",
+        "ProgramEnvironmentSetupFailure",
+        "ProgramFailedToCompile",
+        "ProgramFailedToComplete",
+        "ReadonlyDataModified",
+        "ReadonlyLamportChange",
+        "ReentrancyNotAllowed",
+        "RentEpochModified",
+        "UnbalancedInstruction",
+        "UninitializedAccount",
+        "UnsupportedProgramId",
+        "UnsupportedSysvar",
+    }
+)
+
 
 class PoolActivityDiscriminatorError(ValueError):
     """Raised when the offline policy widens or drifts."""
@@ -250,26 +346,48 @@ def _result(state: str, *, count: int = 0) -> dict[str, object]:
     }
 
 
-def _valid_json(value: object) -> bool:
-    if value is None or type(value) in {bool, int, float, str}:
-        return True
-    if isinstance(value, list):
-        return all(_valid_json(item) for item in value)
-    if isinstance(value, Mapping):
-        return all(
-            type(key) is str and _valid_json(nested)
-            for key, nested in value.items()
-        )
+def _valid_instruction_error(value: object) -> bool:
+    if type(value) is str:
+        return value in _INSTRUCTION_ERROR_UNIT_VARIANTS
+    if not isinstance(value, Mapping) or len(value) != 1:
+        return False
+    key, payload = next(iter(value.items()))
+    if key == "Custom":
+        return type(payload) is int and 0 <= payload <= 0xFFFFFFFF
+    if key == "BorshIoError":
+        return type(payload) is str
     return False
+
+
+def _valid_account_index_payload(value: object) -> bool:
+    return (
+        isinstance(value, Mapping)
+        and frozenset(value) == frozenset({"account_index"})
+        and type(value.get("account_index")) is int
+        and value["account_index"] >= 0
+    )
 
 
 def _valid_transaction_error(value: object) -> bool:
     if value is None:
         return True
     if type(value) is str:
-        return bool(value)
-    if isinstance(value, Mapping):
-        return bool(value) and _valid_json(value)
+        return value in _TRANSACTION_ERROR_UNIT_VARIANTS
+    if not isinstance(value, Mapping) or len(value) != 1:
+        return False
+    key, payload = next(iter(value.items()))
+    if key == "InstructionError":
+        return (
+            type(payload) is list
+            and len(payload) == 2
+            and type(payload[0]) is int
+            and payload[0] >= 0
+            and _valid_instruction_error(payload[1])
+        )
+    if key in {"InsufficientFundsForRent", "ProgramExecutionTemporarilyRestricted"}:
+        return _valid_account_index_payload(payload)
+    if key == "DuplicateInstruction":
+        return type(payload) is int and payload >= 0
     return False
 
 
@@ -343,6 +461,13 @@ def classify_pool_activity_response(
         for newer, older in zip(slots, slots[1:])
     ):
         return _result("ORDERING_OR_SCHEMA_DRIFT_UNKNOWN")
+    slot_times: dict[int, int | None] = {}
+    for item in records:
+        slot = item["slot"]
+        block_time = item["blockTime"]
+        if slot in slot_times and slot_times[slot] != block_time:
+            return _result("ORDERING_OR_SCHEMA_DRIFT_UNKNOWN")
+        slot_times[slot] = block_time
 
     interior = [
         item
@@ -359,7 +484,7 @@ def classify_pool_activity_response(
         return _result("NULL_BLOCK_TIME_UNKNOWN")
     if any(
         item["blockTime"]
-        in {START_FLOOR, ACKNOWLEDGEMENT_FLOOR, TERMINAL_FLOOR}
+        in {ACKNOWLEDGEMENT_FLOOR, TERMINAL_FLOOR}
         for item in records
     ):
         return _result("BOUNDARY_TIME_AMBIGUOUS_UNKNOWN")

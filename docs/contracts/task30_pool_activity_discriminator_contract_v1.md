@@ -42,11 +42,12 @@ drift and RPC error stay typed UNKNOWN.
 
 ## Truth precedence
 
-All records must have the frozen shape, a valid opaque
-`TransactionError|null`, unique signatures and non-increasing slots. After
-structural validity is established, one strict post-ack record is sufficient
-positive evidence even if other valid records have null or boundary time.
-Positive evidence does not prove a trade or a WSS delivery failure.
+All records must have the frozen shape, a recognized frozen Solana
+`TransactionError|null` variant, unique signatures and non-increasing slots;
+records sharing a slot must agree on `blockTime`. After structural validity is
+established, one strict post-ack record is sufficient positive evidence even if
+other valid records have null or boundary time. Positive evidence does not prove
+a trade or a WSS delivery failure.
 
 ## Authority
 
