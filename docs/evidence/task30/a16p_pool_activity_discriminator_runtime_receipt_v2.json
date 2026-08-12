@@ -1,0 +1,152 @@
+{
+  "schema": "smial.task30.a16p-pool-activity-discriminator-runtime.receipt",
+  "schema_version": "1.0",
+  "receipt_id": "T30-A16P-POOL-ACTIVITY-DISCRIMINATOR-RUNTIME-002",
+  "task_id": "TASK-30",
+  "atom_id": "T30-A16P_POOL_ACTIVITY_DISCRIMINATOR_RUNTIME_V2",
+  "as_of": "2026-08-12",
+  "repository_base": {
+    "main_commit": "2000a0844604489c1878e2983ae4b147f8c94398",
+    "tree": "2b2e576d3cfccb26fecf8462a48039aa14578d78"
+  },
+  "authorization": {
+    "owner_gate_consumed": true,
+    "basis": "Owner explicitly requested an immediate on-the-spot repeat after reporting the transient internet outage.",
+    "max_requests": 1,
+    "limit": 1000,
+    "commitment": "confirmed",
+    "estimated_credit_cap": 1,
+    "retry": false,
+    "fallback": false,
+    "transaction_followups": 0
+  },
+  "target": {
+    "network": "solana",
+    "pool_address": "URqx24yyYxtXXhTbBQnbtPLhtLWYoaDaRxuQuLpNS3S",
+    "provider": "HELIUS_STANDARD_RPC",
+    "method": "getSignaturesForAddress",
+    "capture_started_at": "2026-08-12T09:27:52.749910Z",
+    "subscription_acknowledged_at": "2026-08-12T09:27:53.436278Z",
+    "capture_terminal_at": "2026-08-12T09:37:53.059095Z"
+  },
+  "route_preflight": {
+    "required_before_credential_read": true,
+    "dns_resolved": true,
+    "tcp_443": true,
+    "credential_read_on_preflight_failure": false,
+    "attempt_consumed_on_preflight_failure": false
+  },
+  "run": {
+    "run_id": "20260812T205647Z-586cca70",
+    "logical_run_root": "local/task30_pool_activity_discriminator_v2/run=20260812T205647Z-586cca70",
+    "terminal_at": "2026-08-12T20:56:50.121049Z",
+    "request_count": 1,
+    "estimated_credits": 1,
+    "http_status": 200,
+    "transport_terminal_class": "SUCCESS",
+    "transport_error_class": null,
+    "terminal_state": "NO_DIRECT_POOL_ACTIVITY_SUPPORTED",
+    "unknown": false,
+    "raw_retention": "A4_EXACT_RETAINED"
+  },
+  "coverage": {
+    "result_count": 1000,
+    "newest_block_time": 1786564286,
+    "oldest_block_time": 1786308635,
+    "newest_slot": 438875040,
+    "oldest_slot": 438268450,
+    "acknowledgement_floor": 1786526873,
+    "terminal_floor": 1786527473,
+    "page_brackets_acknowledgement_floor": true,
+    "interior_signature_count": 0
+  },
+  "retained_evidence": {
+    "raw_git_status": "OUTSIDE_GIT_IGNORED_A4",
+    "raw_manifest_sha256": "04dee83940b6d745391e76164e77e4d63090dcedf000daf5b99b6818d07e857a",
+    "terminal_receipt_sha256": "e12a8544be8132e5c2eced645bca1400554bba7f8f5f8f7380254645093f4b3f",
+    "raw_response_bytes": 214229,
+    "raw_response_sha256": "2ee288b77ce1a7e594531f33e9e992cdaf13c587a7601b303d2fdbc9299ef7fa",
+    "secret_retention_check": "PASS"
+  },
+  "decision": {
+    "value": "NO_DIRECT_POOL_ACTIVITY_SUPPORTED",
+    "evidence_strength": "ONE_VALID_NEWEST_FIRST_PAGE_BRACKETING_ACKNOWLEDGEMENT_WITH_ZERO_INTERIOR_SIGNATURES",
+    "a15p_no_notification_explained": true,
+    "wss_defect_supported": false,
+    "same_gate_retry_authorized": false,
+    "task30_trial": false,
+    "task30_acceptance": false,
+    "route_closed": false,
+    "next_boundary": "Do not repeat this inactive-pool stream. Select a currently active target or activity-first route only if it remains the cheapest path to the named panel consumer."
+  },
+  "artifact_bindings": {
+    "module": {
+      "path": "src/solana_alpha_lab/task30_pool_activity_discriminator_runtime.py",
+      "sha256": "0022b678ce9a02a619d51803c5737dd2340fe4f55ecf8b9cf9eb455eb388f520"
+    },
+    "script": {
+      "path": "scripts/run_task30_pool_activity_discriminator.py",
+      "sha256": "8b43b4b9f95d8c095a336842b0df67a16a757034d829ec0adb66c842d553f37b"
+    },
+    "test": {
+      "path": "tests/test_task30_pool_activity_discriminator_runtime.py",
+      "sha256": "76f4ddccbe2d16e650217cfdcd2c63d175238803141163b1b7f31a0564fa58c7"
+    }
+  },
+  "authority_and_cost": {
+    "provider_api_rpc_wss_calls": 1,
+    "credential_reads": 1,
+    "cash_spend_usd": 0,
+    "wallet_signer_transaction_actions": 0,
+    "task30_trial_or_acceptance_actions": 0,
+    "credit_estimate_is_not_billing_claim": true
+  },
+  "non_claims": {
+    "pool_inactive": false,
+    "no_trades": false,
+    "pumpswap_trade": false,
+    "price": false,
+    "volume": false,
+    "empty_interval": false,
+    "interval_complete": false,
+    "pit_panel": false,
+    "provider_reliability": false,
+    "alpha": false,
+    "strategy": false,
+    "execution": false,
+    "pnl": false,
+    "numeric_netreturn": false
+  },
+  "factory_fit_review": {
+    "scope": "FULL_REVIEW",
+    "verdict": "PASS_WITH_LIMITATIONS",
+    "mission": "PASS_WITH_LIMITATIONS",
+    "research_truth": "PASS",
+    "flexibility": "PASS",
+    "compatibility_history": "PASS",
+    "efficiency": "PASS_WITH_PATCH",
+    "owner_operability": "PASS_WITH_PATCH",
+    "monitoring_recovery": "PASS_WITH_PATCH",
+    "reuse_first": "PASS",
+    "execution_to_cashflow": "NOT_APPLICABLE_YET",
+    "red_team": "PASS",
+    "finding": "The selected pool had no direct address activity in the A15P window, so repeating the same stream cannot improve the named evidence. Keyless preflight now prevents local network outages from consuming future one-shot attempts."
+  },
+  "product_horizon": {
+    "now": {
+      "candidate": "ACTIVE_TARGET_FIRST_SELECTION",
+      "value": "Choose evidence of current target activity before opening another bounded stream.",
+      "activation_trigger": "TASK-30 still requires a forward non-reconstructable observation after this route-level negative result."
+    },
+    "watch": {
+      "candidate": "SHARED_EXTERNAL_ROUTE_PREFLIGHT",
+      "value": "Reuse the same cheap health gate for other credentialed provider adapters.",
+      "activation_trigger": "A second adapter needs the same preflight or another attempt is lost to local network health."
+    }
+  },
+  "project_sources_disposition": {
+    "kind": "NO_CHANGE",
+    "reason": "A16P explains one inactive capture window but does not accept TASK-30 or change canonical task status."
+  },
+  "state_change": "NONE"
+}

@@ -1,0 +1,153 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "SMIAL provider route capability registry",
+  "type": "object",
+  "required": ["schema", "schema_version", "registry_id", "as_of", "update_policy", "routes", "non_claims"],
+  "properties": {
+    "schema": {"const": "smial.provider-route-capability-registry"},
+    "schema_version": {"const": "1.0"},
+    "registry_id": {"const": "PROVIDER-ROUTE-CAPABILITY-REGISTRY-001"},
+    "as_of": {"type": "string", "format": "date"},
+    "update_policy": {
+      "type": "object",
+      "required": ["observed_receipt_required", "preserve_receipt_history", "separate_last_success", "registry_gap_is_unavailability", "automatic_routing", "authority_granted"],
+      "properties": {
+        "observed_receipt_required": {"const": true},
+        "preserve_receipt_history": {"const": true},
+        "separate_last_success": {"const": true},
+        "registry_gap_is_unavailability": {"const": false},
+        "automatic_routing": {"const": false},
+        "authority_granted": {"const": false}
+      },
+      "additionalProperties": false
+    },
+    "routes": {
+      "type": "array",
+      "minItems": 1,
+      "items": {"$ref": "#/$defs/route"}
+    },
+    "non_claims": {"$ref": "#/$defs/nonClaims"}
+  },
+  "additionalProperties": false,
+  "$defs": {
+    "nonClaims": {
+      "type": "object",
+      "required": ["provider_reliability", "data_completeness", "market_activity", "task30_trial", "alpha", "numeric_netreturn"],
+      "properties": {
+        "provider_reliability": {"const": false},
+        "data_completeness": {"const": false},
+        "market_activity": {"const": false},
+        "task30_trial": {"const": false},
+        "alpha": {"const": false},
+        "numeric_netreturn": {"const": false}
+      },
+      "additionalProperties": false
+    },
+    "runtime": {
+      "type": "object",
+      "required": ["client", "version_source", "tls_engine", "observed_result"],
+      "properties": {
+        "client": {"type": "string", "minLength": 1},
+        "version_source": {"type": "string", "minLength": 1},
+        "tls_engine": {"type": "string", "minLength": 1},
+        "observed_result": {"type": "string", "minLength": 1}
+      },
+      "additionalProperties": false
+    },
+    "preflight": {
+      "type": "object",
+      "required": ["kind", "steps", "consumes_credential", "consumes_attempt"],
+      "properties": {
+        "kind": {"type": "string", "minLength": 1},
+        "steps": {"type": "array", "minItems": 1, "items": {"type": "string", "minLength": 1}},
+        "consumes_credential": {"const": false},
+        "consumes_attempt": {"const": false}
+      },
+      "additionalProperties": false
+    },
+    "success": {
+      "type": "object",
+      "required": ["observed_at", "http_status", "response_bytes", "response_sha256", "evidence_id"],
+      "properties": {
+        "observed_at": {"type": "string", "format": "date-time"},
+        "http_status": {"type": "integer", "minimum": 100, "maximum": 599},
+        "response_bytes": {"type": "integer", "minimum": 1},
+        "response_sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+        "evidence_id": {"type": "string", "minLength": 1}
+      },
+      "additionalProperties": false
+    },
+    "observation": {
+      "type": "object",
+      "required": ["observed_at", "terminal_class", "layer", "http_status", "response_bytes", "response_sha256", "error_fingerprint", "evidence_id"],
+      "properties": {
+        "observed_at": {"type": "string", "format": "date-time"},
+        "terminal_class": {"type": "string", "minLength": 1},
+        "layer": {"enum": ["LOCAL_TLS", "TRANSPORT", "HTTP", "RPC", "DATA"]},
+        "http_status": {"type": ["integer", "null"], "minimum": 100, "maximum": 599},
+        "response_bytes": {"type": "integer", "minimum": 0},
+        "response_sha256": {"type": ["string", "null"], "pattern": "^[0-9a-f]{64}$"},
+        "error_fingerprint": {"type": ["string", "null"], "minLength": 1},
+        "evidence_id": {"type": "string", "minLength": 1}
+      },
+      "allOf": [
+        {
+          "if": {"properties": {"response_bytes": {"const": 0}}, "required": ["response_bytes"]},
+          "then": {"properties": {"response_sha256": {"type": "null"}}},
+          "else": {"properties": {"response_sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"}}}
+        }
+      ],
+      "additionalProperties": false
+    },
+    "failure": {
+      "type": "object",
+      "required": ["fingerprint", "layer", "interpretation"],
+      "properties": {
+        "fingerprint": {"type": "string", "minLength": 1},
+        "layer": {"enum": ["LOCAL_TLS", "TRANSPORT", "HTTP", "RPC", "DATA"]},
+        "interpretation": {"type": "string", "minLength": 1}
+      },
+      "additionalProperties": false
+    },
+    "route": {
+      "type": "object",
+      "required": ["route_id", "provider", "endpoint_family", "network", "access_class", "operation", "protocol", "runtime", "preflight", "last_success", "last_observation", "known_failures", "execution_policy", "evidence", "non_claims"],
+      "properties": {
+        "route_id": {"type": "string", "pattern": "^[A-Z0-9-]+$"},
+        "provider": {"type": "string", "pattern": "^[A-Z0-9_]+$"},
+        "endpoint_family": {"type": "string", "minLength": 1},
+        "network": {"const": "solana"},
+        "access_class": {"enum": ["KEYLESS", "LOCAL_ENV_CREDENTIAL"]},
+        "operation": {"type": "string", "minLength": 1},
+        "protocol": {"type": "string", "minLength": 1},
+        "runtime": {"$ref": "#/$defs/runtime"},
+        "preflight": {"$ref": "#/$defs/preflight"},
+        "last_success": {"$ref": "#/$defs/success"},
+        "last_observation": {"$ref": "#/$defs/observation"},
+        "known_failures": {"type": "array", "items": {"$ref": "#/$defs/failure"}},
+        "execution_policy": {
+          "type": "object",
+          "required": ["retry", "fallback", "automatic_selection", "authority_granted"],
+          "properties": {
+            "retry": {"const": false},
+            "fallback": {"const": false},
+            "automatic_selection": {"const": false},
+            "authority_granted": {"const": false}
+          },
+          "additionalProperties": false
+        },
+        "evidence": {
+          "type": "object",
+          "required": ["last_observation_receipt", "raw_retention"],
+          "properties": {
+            "last_observation_receipt": {"type": "string", "pattern": "^a4://[A-Za-z0-9_./=-]+$"},
+            "raw_retention": {"type": "string", "pattern": "^A4_[A-Z0-9_]+$"}
+          },
+          "additionalProperties": false
+        },
+        "non_claims": {"$ref": "#/$defs/nonClaims"}
+      },
+      "additionalProperties": false
+    }
+  }
+}

@@ -1,0 +1,103 @@
+{
+  "schema": "smial.task30.provider-route-capability-registry.acceptance",
+  "schema_version": "1.0",
+  "receipt_id": "T30-A16R1-PROVIDER-ROUTE-CAPABILITY-REGISTRY-001",
+  "task_id": "TASK-30",
+  "atom_id": "T30-A16R1_PROVIDER_ROUTE_CAPABILITY_REGISTRY_V1",
+  "as_of": "2026-08-13",
+  "decision": "REGISTRY_VALIDATED_NO_RUNTIME_AUTHORITY",
+  "purpose": "Retain observed provider-route transport knowledge so later bounded reads do not rediscover the same local client and failure boundary.",
+  "runtime_observation": {
+    "authorization": "POPCAT_ACTIVE_POOL_PILOT_V2_APPROVED",
+    "provider_calls": {
+      "dexscreener_keyless_get": 1,
+      "helius_rpc": 1,
+      "helius_wss": 0
+    },
+    "dexscreener": {
+      "terminal_class": "HTTP_SUCCESS",
+      "http_status": 200,
+      "response_bytes": 42510,
+      "response_sha256": "34ee46d235f6525c0c09cadf372a8577be61b9534afe35946438be76a24619f4",
+      "matched_popcat_pairs": 30,
+      "selected_pool": "AHTTzwf3GmVMJdxWM8v2MSxyjZj8rQR6hyAC3g9477Yj",
+      "selected_dex": "orca",
+      "selected_pair": "POPCAT/SOL",
+      "observed_txns_m5": 5,
+      "observed_txns_h1": 28,
+      "raw_retention": "A4_OUTSIDE_GIT",
+      "logical_evidence": "a4://task30_popcat_active_pool_pilot/run=20260812T211748172Z-v2"
+    },
+    "helius": {
+      "terminal_class": "CONNECTION_RESET",
+      "error_fingerprint": "NODE_ECONNRESET_SOCKET_HANG_UP",
+      "http_status": null,
+      "response_bytes": 0,
+      "raw_retention": "A4_OUTSIDE_GIT_NO_RESPONSE_BODY",
+      "logical_evidence": "a4://task30_popcat_active_pool_pilot/activity=20260812T211932164Z-v2"
+    },
+    "stream_disposition": "NOT_OPENED_ACTIVITY_GATE_FAILED",
+    "retry": false,
+    "fallback": false,
+    "cash_spend_usd": 0,
+    "wallet_signer_transaction_actions": 0
+  },
+  "artifact_bindings": {
+    "registry": {
+      "path": "configs/provider_route_capability_registry_v1.yaml",
+      "sha256": "ea44843f7ee7e8116a5599e7e38a8802e416f963ed6e0020448e33db898b7598"
+    },
+    "schema": {
+      "path": "catalog/schemas/provider_route_capability_registry.schema.json",
+      "sha256": "67eb1ff58755324b07969c5a2225e47d165aca68ddc491b7c881610b7acdf0e8"
+    },
+    "module": {
+      "path": "src/solana_alpha_lab/provider_route_capability_registry.py",
+      "sha256": "9f51572946f51f155e85f3afa4a8467e48ebc68aed51490555f8b9bc76b324a7"
+    },
+    "test": {
+      "path": "tests/test_provider_route_capability_registry.py",
+      "sha256": "1b8af05d35f9888ff802f2741d001ab758cf26ece41af8fccf8a0a828e4174b9"
+    }
+  },
+  "non_claims": {
+    "provider_reliability": false,
+    "helius_unavailable": false,
+    "selected_pool_active_at_wss_time": false,
+    "price_or_volume_panel": false,
+    "pit_admissible": false,
+    "task30_trial": false,
+    "task30_acceptance": false,
+    "alpha": false,
+    "strategy": false,
+    "execution": false,
+    "pnl": false,
+    "numeric_netreturn": false,
+    "owner_cashflow": false
+  },
+  "factory_fit_review": {
+    "scope": "FULL_REVIEW",
+    "verdict": "PASS_WITH_LIMITATIONS",
+    "mission": "PASS_WITH_LIMITATIONS",
+    "research_truth": "PASS",
+    "flexibility": "PASS",
+    "compatibility_history": "PASS",
+    "efficiency": "PASS",
+    "owner_operability": "PASS",
+    "monitoring_recovery": "PASS_WITH_LIMITATIONS",
+    "reuse_first": "PASS_WRAP_EXISTING_TRANSPORT",
+    "execution_to_cashflow": "NOT_APPLICABLE_YET",
+    "red_team": "PASS",
+    "finding": "The registry removes repeated local transport discovery cost but does not repair or authorize the failed Helius route."
+  },
+  "product_horizon": {
+    "now": "CONSULT_REGISTRY_BEFORE_NEXT_EXTERNAL_ROUTE",
+    "watch": "AUTOMATIC_PROVIDER_ROUTING_ONLY_AFTER_TWO_CONSUMERS_AND_MEASURED_MANUAL_COST"
+  },
+  "rollback": "Delete the new registry assets and Catalog transaction before downstream adoption; no external state must be undone.",
+  "project_sources_disposition": {
+    "kind": "NO_CHANGE",
+    "reason": "A16R1 retains provider-route observations and does not change the canonical Project Sources release or TASK-30 status."
+  },
+  "state_change": "NONE"
+}
