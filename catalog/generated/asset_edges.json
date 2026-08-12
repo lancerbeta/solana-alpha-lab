@@ -593,6 +593,11 @@
       "target_asset_id": "CONTRACT-T30-ROUTE-AVAILABILITY-PROBE-001"
     },
     {
+      "source_asset_id": "CONFIG-T30-STANDARD-POOL-LOGS-ROUTE-001",
+      "relation": "governed_by",
+      "target_asset_id": "CONTRACT-T30-STANDARD-POOL-LOGS-ROUTE-001"
+    },
+    {
       "source_asset_id": "CONFIG-T30-TWO-SLOT-LIVE-SHAKEDOWN-OWNER-PACKET-001",
       "relation": "governed_by",
       "target_asset_id": "CONTRACT-T30-TWO-SLOT-LIVE-SHAKEDOWN-OWNER-PACKET-001"
@@ -1211,6 +1216,11 @@
       "source_asset_id": "CONTRACT-T30-ROUTE-AVAILABILITY-PROBE-001",
       "relation": "depends_on",
       "target_asset_id": "EVIDENCE-T30-A10-GECKO-INTERVAL-SEMANTICS-RUNTIME-001"
+    },
+    {
+      "source_asset_id": "CONTRACT-T30-STANDARD-POOL-LOGS-ROUTE-001",
+      "relation": "derived_from",
+      "target_asset_id": "EVIDENCE-T30-A14P-R2-FORWARD-STREAM-EXTERNAL-CAPTURE-001"
     },
     {
       "source_asset_id": "CONTRACT-T30-TWO-SLOT-LIVE-SHAKEDOWN-OWNER-PACKET-001",
@@ -3273,6 +3283,26 @@
       "target_asset_id": "MODULE-T30-FORWARD-STREAM-EXECUTION-ADAPTER-001"
     },
     {
+      "source_asset_id": "EVIDENCE-T30-A15-STANDARD-POOL-LOGS-ROUTE-001",
+      "relation": "derived_from",
+      "target_asset_id": "CONTRACT-T30-STANDARD-POOL-LOGS-ROUTE-001"
+    },
+    {
+      "source_asset_id": "EVIDENCE-T30-A15-STANDARD-POOL-LOGS-ROUTE-001",
+      "relation": "validated_by",
+      "target_asset_id": "TEST-T30-STANDARD-POOL-LOGS-ROUTE-001"
+    },
+    {
+      "source_asset_id": "EVIDENCE-T30-A15-STANDARD-POOL-LOGS-ROUTE-FACTORY-FIT-001",
+      "relation": "derived_from",
+      "target_asset_id": "EVIDENCE-T30-A15-STANDARD-POOL-LOGS-ROUTE-001"
+    },
+    {
+      "source_asset_id": "EVIDENCE-T30-A15-STANDARD-POOL-LOGS-ROUTE-FACTORY-FIT-001",
+      "relation": "validated_by",
+      "target_asset_id": "TEST-T30-STANDARD-POOL-LOGS-ROUTE-001"
+    },
+    {
       "source_asset_id": "EVIDENCE-T30-A2-CATALOG-FACTORY-FIT-001",
       "relation": "derived_from",
       "target_asset_id": "EVIDENCE-T30-A1-BOUNDARY-SEMANTICS-001"
@@ -4036,6 +4066,11 @@
       "source_asset_id": "FIXTURE-T30-ROUTE-AVAILABILITY-PROBE-001",
       "relation": "derived_from",
       "target_asset_id": "CONFIG-T30-ROUTE-AVAILABILITY-PROBE-001"
+    },
+    {
+      "source_asset_id": "FIXTURE-T30-STANDARD-POOL-LOGS-ROUTE-001",
+      "relation": "derived_from",
+      "target_asset_id": "CONFIG-T30-STANDARD-POOL-LOGS-ROUTE-001"
     },
     {
       "source_asset_id": "FIXTURE-T30-TWO-SLOT-LIVE-SHAKEDOWN-OWNER-PACKET-001",
@@ -4963,6 +4998,21 @@
       "target_asset_id": "CONFIG-T30-ROUTE-AVAILABILITY-PROBE-001"
     },
     {
+      "source_asset_id": "MODULE-T30-STANDARD-POOL-LOGS-ROUTE-001",
+      "relation": "depends_on",
+      "target_asset_id": "MODULE-T08-LIFECYCLE-DISCOVERY-TRANSPORT-001"
+    },
+    {
+      "source_asset_id": "MODULE-T30-STANDARD-POOL-LOGS-ROUTE-001",
+      "relation": "depends_on",
+      "target_asset_id": "MODULE-T09-PUMPSWAP-TOUCH-DECODER-001"
+    },
+    {
+      "source_asset_id": "MODULE-T30-STANDARD-POOL-LOGS-ROUTE-001",
+      "relation": "governed_by",
+      "target_asset_id": "CONFIG-T30-STANDARD-POOL-LOGS-ROUTE-001"
+    },
+    {
       "source_asset_id": "MODULE-T30-TWO-SLOT-LIVE-SHAKEDOWN-OWNER-PACKET-001",
       "relation": "depends_on",
       "target_asset_id": "EVIDENCE-T30-A11-ROUTE-AVAILABILITY-PROBE-001"
@@ -5393,6 +5443,11 @@
       "target_asset_id": "SCRIPT-T30-ROUTE-AVAILABILITY-PROBE-001"
     },
     {
+      "source_asset_id": "REPORT-T30-STANDARD-POOL-LOGS-ROUTE-001",
+      "relation": "derived_from",
+      "target_asset_id": "SCRIPT-T30-STANDARD-POOL-LOGS-ROUTE-001"
+    },
+    {
       "source_asset_id": "REPORT-T30-TWO-SLOT-LIVE-SHAKEDOWN-OWNER-PACKET-001",
       "relation": "derived_from",
       "target_asset_id": "SCRIPT-T30-TWO-SLOT-LIVE-SHAKEDOWN-OWNER-PACKET-001"
@@ -5821,6 +5876,11 @@
       "source_asset_id": "SCHEMA-T30-ROUTE-AVAILABILITY-PROBE-001",
       "relation": "governed_by",
       "target_asset_id": "CONTRACT-T30-ROUTE-AVAILABILITY-PROBE-001"
+    },
+    {
+      "source_asset_id": "SCHEMA-T30-STANDARD-POOL-LOGS-ROUTE-001",
+      "relation": "governed_by",
+      "target_asset_id": "CONTRACT-T30-STANDARD-POOL-LOGS-ROUTE-001"
     },
     {
       "source_asset_id": "SCHEMA-T30-TWO-SLOT-LIVE-SHAKEDOWN-OWNER-PACKET-001",
@@ -6266,6 +6326,16 @@
       "source_asset_id": "SCRIPT-T30-ROUTE-AVAILABILITY-PROBE-001",
       "relation": "governed_by",
       "target_asset_id": "CONFIG-T30-ROUTE-AVAILABILITY-PROBE-001"
+    },
+    {
+      "source_asset_id": "SCRIPT-T30-STANDARD-POOL-LOGS-ROUTE-001",
+      "relation": "depends_on",
+      "target_asset_id": "MODULE-T30-STANDARD-POOL-LOGS-ROUTE-001"
+    },
+    {
+      "source_asset_id": "SCRIPT-T30-STANDARD-POOL-LOGS-ROUTE-001",
+      "relation": "governed_by",
+      "target_asset_id": "CONFIG-T30-STANDARD-POOL-LOGS-ROUTE-001"
     },
     {
       "source_asset_id": "SCRIPT-T30-TWO-SLOT-LIVE-SHAKEDOWN-OWNER-PACKET-001",
@@ -7826,6 +7896,21 @@
       "source_asset_id": "TEST-T30-ROUTE-AVAILABILITY-PROBE-001",
       "relation": "depends_on",
       "target_asset_id": "SCHEMA-T30-ROUTE-AVAILABILITY-PROBE-001"
+    },
+    {
+      "source_asset_id": "TEST-T30-STANDARD-POOL-LOGS-ROUTE-001",
+      "relation": "depends_on",
+      "target_asset_id": "FIXTURE-T30-STANDARD-POOL-LOGS-ROUTE-001"
+    },
+    {
+      "source_asset_id": "TEST-T30-STANDARD-POOL-LOGS-ROUTE-001",
+      "relation": "depends_on",
+      "target_asset_id": "MODULE-T30-STANDARD-POOL-LOGS-ROUTE-001"
+    },
+    {
+      "source_asset_id": "TEST-T30-STANDARD-POOL-LOGS-ROUTE-001",
+      "relation": "depends_on",
+      "target_asset_id": "SCHEMA-T30-STANDARD-POOL-LOGS-ROUTE-001"
     },
     {
       "source_asset_id": "TEST-T30-TWO-SLOT-LIVE-SHAKEDOWN-OWNER-PACKET-001",
