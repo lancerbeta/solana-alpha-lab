@@ -13517,6 +13517,24 @@ records:
   evidence: []
   classification: *t25_internal
 
+- asset_id: EVIDENCE-T30-A14P-R2-FORWARD-STREAM-EXTERNAL-CAPTURE-001
+  record_version: '1.0'
+  asset_type: evidence
+  purpose: Sanitized durable receipt for the one owner-authorized V2 Helius stream attempt and explicit free-plan rejection.
+  status: VALIDATED_ACTIVE
+  origin: REPOSITORY
+  as_of: '2026-08-12'
+  truth_owner: TASK-30
+  location: {kind: git_path, logical_uri: 'repo://docs/evidence/task30/a14p_r2_forward_stream_external_capture_receipt_v1.json', repository_path: docs/evidence/task30/a14p_r2_forward_stream_external_capture_receipt_v1.json}
+  integrity: {kind: sha256, sha256: 179c2b26c6a6d325388ec04c388fae8efa4adc8ba01639c85c70e5626e405604}
+  access: *t25_read_file
+  relations:
+  - {relation_type: derived_from, target_asset_id: EVIDENCE-T30-A14P-R1-AUTH-RECOVERY-001}
+  - {relation_type: validated_by, target_asset_id: MODULE-T30-FORWARD-STREAM-EXECUTION-ADAPTER-001}
+  consumers: [TASK-30, FACTORY-001]
+  evidence: []
+  classification: *t25_internal
+
 - asset_id: CONTRACT-T30-FORWARD-RAW-TRADE-ROUTE-001
   record_version: '1.0'
   asset_type: control_document

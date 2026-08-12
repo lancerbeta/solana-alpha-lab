@@ -3263,6 +3263,16 @@
       "target_asset_id": "TEST-T30-FORWARD-STREAM-EXECUTION-ADAPTER-001"
     },
     {
+      "source_asset_id": "EVIDENCE-T30-A14P-R2-FORWARD-STREAM-EXTERNAL-CAPTURE-001",
+      "relation": "derived_from",
+      "target_asset_id": "EVIDENCE-T30-A14P-R1-AUTH-RECOVERY-001"
+    },
+    {
+      "source_asset_id": "EVIDENCE-T30-A14P-R2-FORWARD-STREAM-EXTERNAL-CAPTURE-001",
+      "relation": "validated_by",
+      "target_asset_id": "MODULE-T30-FORWARD-STREAM-EXECUTION-ADAPTER-001"
+    },
+    {
       "source_asset_id": "EVIDENCE-T30-A2-CATALOG-FACTORY-FIT-001",
       "relation": "derived_from",
       "target_asset_id": "EVIDENCE-T30-A1-BOUNDARY-SEMANTICS-001"
