@@ -1,0 +1,21 @@
+{
+  "schema": "smial.task30.pool-activity-discriminator.fixture",
+  "schema_version": "1.0",
+  "records": {
+    "after_terminal": {"signature": "sig-after", "slot": 105, "err": null, "memo": null, "blockTime": 1786527500, "confirmationStatus": "confirmed"},
+    "inside": {"signature": "sig-inside", "slot": 104, "err": null, "memo": null, "blockTime": 1786527000, "confirmationStatus": "confirmed"},
+    "start_boundary": {"signature": "sig-start-boundary", "slot": 103, "err": null, "memo": null, "blockTime": 1786526872, "confirmationStatus": "finalized"},
+    "before_start": {"signature": "sig-before", "slot": 102, "err": null, "memo": null, "blockTime": 1786526800, "confirmationStatus": "finalized"},
+    "null_time": {"signature": "sig-null", "slot": 101, "err": null, "memo": null, "blockTime": null, "confirmationStatus": "finalized"}
+  },
+  "expected_states": [
+    "POOL_ADDRESS_ACTIVITY_OBSERVED_ROUTE_REVIEW_REQUIRED",
+    "NO_DIRECT_POOL_ACTIVITY_SUPPORTED",
+    "BOUNDARY_TIME_AMBIGUOUS_UNKNOWN",
+    "NULL_BLOCK_TIME_UNKNOWN",
+    "PAGE_TRUNCATED_UNKNOWN",
+    "HISTORY_COVERAGE_UNKNOWN",
+    "ORDERING_OR_SCHEMA_DRIFT_UNKNOWN",
+    "MALFORMED_OR_RPC_ERROR_UNKNOWN"
+  ]
+}

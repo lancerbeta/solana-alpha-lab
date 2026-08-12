@@ -1,0 +1,109 @@
+{
+  "schema": "smial.task30.a16-pool-activity-discriminator.acceptance",
+  "schema_version": "1.0",
+  "evidence_id": "T30-A16-POOL-ACTIVITY-DISCRIMINATOR-001",
+  "task_id": "TASK-30",
+  "atom_id": "T30-A16_ONE_BOUNDED_POOL_ACTIVITY_DISCRIMINATOR_V1",
+  "as_of": "2026-08-12",
+  "upstream_evidence": {
+    "evidence_id": "T30-A15P-STANDARD-POOL-LOGS-RUNTIME-001",
+    "capture_started_at": "2026-08-12T09:27:52.749910Z",
+    "subscription_acknowledged_at": "2026-08-12T09:27:53.436278Z",
+    "capture_terminal_at": "2026-08-12T09:37:53.059095Z",
+    "terminal_state": "NO_OBSERVATION_UNKNOWN",
+    "pool_activity_in_capture_window": "UNKNOWN"
+  },
+  "artifact_bindings": {
+    "contract": {
+      "path": "docs/contracts/task30_pool_activity_discriminator_contract_v1.md",
+      "sha256": "79a2a407d77b6d32ed468dc0565595158937771acdd1b6b281f3e26494d9c944"
+    },
+    "config": {
+      "path": "configs/task30_pool_activity_discriminator_v1.yaml",
+      "sha256": "96912631c6b1cd62df124f39a789987b35a32cedf3f3e8adfda68218572d0743"
+    },
+    "schema": {
+      "path": "catalog/schemas/task30_pool_activity_discriminator.schema.json",
+      "sha256": "4c7557e2b8ceec6df084bbbffe34e131ffc3cc1031ed9117b1a073b593c38afe"
+    },
+    "fixture": {
+      "path": "tests/fixtures/task30/pool_activity_discriminator_v1.json",
+      "sha256": "a03f3aea75a55953b31c365590c719b13043e2451d39227659acc092c5677d21"
+    },
+    "module": {
+      "path": "src/solana_alpha_lab/task30_pool_activity_discriminator.py",
+      "sha256": "ef2ae4017e716cee6c10e2bf2f69d09f47e7021bb2a008cfeecd4b64d1fe1a39"
+    },
+    "test": {
+      "path": "tests/test_task30_pool_activity_discriminator.py",
+      "sha256": "833cc263f4e677f7485331c88fe21b34bc9159fa63e06b168839ad3525145c2a"
+    },
+    "design": {
+      "path": "docs/superpowers/specs/2026-08-12-task30-pool-activity-discriminator-design.md",
+      "sha256": "891c7b645673f77bef514c9c24eb417b6653fcad276bc90b827de5a8757e4aac"
+    },
+    "plan": {
+      "path": "docs/superpowers/plans/2026-08-12-task30-pool-activity-discriminator.md",
+      "sha256": "817fe535d6c172e8f5f59f0a29b4f66654ec9963040e5d5458cdc2f792e9fcf0"
+    }
+  },
+  "implemented_truth": {
+    "exact_pool_bound": true,
+    "exact_a15p_window_bound": true,
+    "exact_subscription_acknowledgement_bound": true,
+    "secret_free_request_body": true,
+    "type_strict_policy": true,
+    "closed_response_classifier": true,
+    "transaction_error_validated_by_pinned_solders": true,
+    "same_slot_block_time_consistency_required": true,
+    "boundary_second_is_unknown": true,
+    "null_block_time_is_unknown": true,
+    "truncated_page_is_unknown": true,
+    "short_unbracketed_history_is_unknown": true,
+    "provider_completeness_is_not_assumed": true,
+    "missing_is_not_zero": true,
+    "positive_signature_is_not_trade": true
+  },
+  "validation_status": "PASS_WITH_LIMITATIONS",
+  "decision": "OFFLINE_DISCRIMINATOR_READY_FOR_OWNER_GATE",
+  "authority": {
+    "provider_api_rpc_wss_calls": 0,
+    "credential_reads": 0,
+    "raw_external_data_writes": 0,
+    "cash_spend_usd": 0,
+    "wallet_signer_transaction_actions": 0,
+    "task30_trial_or_acceptance_actions": 0
+  },
+  "non_claims": {
+    "pool_inactive": false,
+    "pumpswap_trade": false,
+    "buy_or_sell": false,
+    "price": false,
+    "volume": false,
+    "empty_interval": false,
+    "interval_complete": false,
+    "pit_panel": false,
+    "provider_reliability": false,
+    "wss_delivery_failure": false,
+    "h07_h01_evidence": false,
+    "alpha": false,
+    "strategy": false,
+    "execution": false,
+    "pnl": false,
+    "numeric_netreturn": false
+  },
+  "next_external_boundary": {
+    "authorized": false,
+    "exact_phrase": "T30-A16P_POOL_ACTIVITY_DISCRIMINATOR_RUNTIME_V1; pool=URqx24yyYxtXXhTbBQnbtPLhtLWYoaDaRxuQuLpNS3S; provider=HELIUS_STANDARD_RPC; method=getSignaturesForAddress; capture_started_at=2026-08-12T09:27:52.749910Z; capture_terminal_at=2026-08-12T09:37:53.059095Z; max_requests=1; limit=1000; commitment=confirmed; estimated_credit_cap=1; retention=A4; retry=false; fallback=false; transaction_followups=0",
+    "stop_before": [
+      "HELIUS_CREDENTIAL_READ",
+      "HELIUS_RPC_CALL",
+      "RAW_EXTERNAL_DATA_WRITE"
+    ]
+  },
+  "project_sources_disposition": {
+    "kind": "NO_CHANGE",
+    "reason": "A16 prepares one offline discriminator but does not accept TASK-30 or change canonical task status."
+  },
+  "state_change": "NONE"
+}
