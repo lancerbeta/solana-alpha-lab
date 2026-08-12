@@ -10,14 +10,16 @@ The A15P Helius Standard WSS `logsSubscribe` route was accepted but produced no
 notifications during the frozen interval
 `[2026-08-12T09:27:52.749910Z, 2026-08-12T09:37:53.059095Z]`. That result is
 `NO_OBSERVATION_UNKNOWN`: it does not distinguish an inactive pool from a WSS
-delivery gap.
+route that needs review. The subscription acknowledgement was observed at
+`2026-08-12T09:27:53.436278Z`; activity before or within that whole second
+cannot test post-ack delivery.
 
 ## Decision to improve
 
 Decide whether the next useful work is:
 
-- repair or replace the WSS observation route because direct pool-address
-  activity existed in the capture window; or
+- review the WSS observation route because direct pool-address activity existed
+  after the acknowledgement second; or
 - stop blaming WSS for this window because no direct pool-address activity is
   supported by a complete/bracketing signature page.
 
@@ -37,6 +39,10 @@ Official method facts frozen as of 2026-08-12:
 - `limit` is bounded to 1–1000;
 - `blockTime` may be null;
 - `confirmed` or `finalized` commitment is supported.
+
+Neither source is treated as a guarantee that a short or empty provider page is
+a complete historical record. Negative evidence requires observed bracketing,
+not an inferred retention policy.
 
 Sources:
 
@@ -64,34 +70,39 @@ follow-up. It requires a separate exact owner gate.
 ## Frozen interval and conservative time rule
 
 - exact start: `2026-08-12T09:27:52.749910Z`
+- subscription acknowledged: `2026-08-12T09:27:53.436278Z`
 - exact terminal: `2026-08-12T09:37:53.059095Z`
 - integer start floor: `1786526872`
+- integer acknowledgement floor: `1786526873`
 - integer terminal floor: `1786527473`
 
 Because provider `blockTime` has only whole-second precision, a record proves
-interior activity only when `blockTime > 1786526872` and
+post-ack activity only when `blockTime > 1786526873` and
 `blockTime < 1786527473`. A record on either boundary second is ambiguous.
 
 ## Closed decision states
 
-- `POOL_ACTIVITY_OBSERVED_WSS_DELIVERY_GAP`: at least one valid signature record
-  is strictly inside the frozen interval.
-- `NO_DIRECT_POOL_ACTIVITY_SUPPORTED`: no interior record exists and the result
-  page either exhausts history or reaches strictly before the interval start.
+- `POOL_ADDRESS_ACTIVITY_OBSERVED_ROUTE_REVIEW_REQUIRED`: at least one valid
+  signature is strictly after the acknowledgement second and before the
+  terminal second. This selects WSS review but does not prove a delivery defect.
+- `NO_DIRECT_POOL_ACTIVITY_SUPPORTED`: no post-ack record exists and the oldest
+  returned signature reaches strictly before the acknowledgement second.
 - `BOUNDARY_TIME_AMBIGUOUS_UNKNOWN`: only relevant evidence is on a boundary
   second.
 - `NULL_BLOCK_TIME_UNKNOWN`: no interior proof exists and a relevant record has
   null time.
 - `PAGE_TRUNCATED_UNKNOWN`: a full 1000-record page does not reach before the
-  interval start.
+  acknowledgement second.
+- `HISTORY_COVERAGE_UNKNOWN`: an empty or short page does not bracket the
+  acknowledgement second, so provider completeness remains unknown.
 - `ORDERING_OR_SCHEMA_DRIFT_UNKNOWN`: ordering, duplicates or record shape
   violate the frozen contract.
 - `MALFORMED_OR_RPC_ERROR_UNKNOWN`: JSON-RPC error or malformed envelope.
 
-Positive proof wins over unrelated null or boundary records because one valid
-interior signature is sufficient to falsify pool inactivity. Every negative
-decision remains explicitly scoped to direct address activity in this one
-window.
+All records must have the frozen shape, a valid opaque `TransactionError|null`,
+unique signatures and non-increasing slots. One valid strict post-ack signature
+wins over unrelated null or boundary records. It proves address activity, not a
+trade or WSS fault. Every negative decision remains scoped to this one window.
 
 ## Non-claims
 

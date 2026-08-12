@@ -11,9 +11,10 @@
 
 ## Estimand
 
-Did at least one direct pool-address signature occur strictly inside the exact
-A15P WSS capture interval? This is a route diagnostic, not a market-data or
-strategy trial.
+Did at least one direct pool-address signature occur strictly after the A15P
+subscription acknowledgement second and before the capture terminal second?
+This is a route diagnostic, not proof of a WSS defect, market-data observation
+or strategy trial.
 
 ## Frozen request proposal
 
@@ -24,27 +25,28 @@ the exact phrase stored in the policy.
 
 ## Time and page semantics
 
-The exact interval is
-`[2026-08-12T09:27:52.749910Z, 2026-08-12T09:37:53.059095Z]`.
-Whole-second `blockTime` proves interior activity only for
-`1786526872 < blockTime < 1786527473`.
+The exact capture is
+`[2026-08-12T09:27:52.749910Z, 2026-08-12T09:37:53.059095Z]`, and the
+subscription acknowledgement is `2026-08-12T09:27:53.436278Z`.
+Whole-second `blockTime` proves post-ack activity only for
+`1786526873 < blockTime < 1786527473`.
 
-No interior activity is supported only when a valid newest-first page either:
+No post-ack activity is supported only when the oldest record of a valid
+newest-first page is strictly earlier than the acknowledgement-floor second.
+An empty or short non-bracketing page does not prove provider completeness and
+stays `HISTORY_COVERAGE_UNKNOWN`.
 
-1. contains fewer than 1000 records and therefore exhausts the available
-   address history; or
-2. contains 1000 records and its oldest record is strictly earlier than the
-   start-floor second.
-
-Boundary seconds, null time, a full page that does not reach the start, schema
-drift, ordering drift and RPC error stay typed UNKNOWN.
+Boundary seconds, null time, a full page that does not reach the
+acknowledgement, short or empty non-bracketing history, schema drift, ordering
+drift and RPC error stay typed UNKNOWN.
 
 ## Truth precedence
 
-All records must have the frozen shape and unique signatures. Non-null times
-must be newest-first. After structural validity is established, one strictly
-interior record is sufficient positive evidence even if other valid records
-have null or boundary time. Positive evidence does not prove a trade.
+All records must have the frozen shape, a valid opaque
+`TransactionError|null`, unique signatures and non-increasing slots. After
+structural validity is established, one strict post-ack record is sufficient
+positive evidence even if other valid records have null or boundary time.
+Positive evidence does not prove a trade or a WSS delivery failure.
 
 ## Authority
 

@@ -9,11 +9,12 @@
     "null_time": {"signature": "sig-null", "slot": 101, "err": null, "memo": null, "blockTime": null, "confirmationStatus": "finalized"}
   },
   "expected_states": [
-    "POOL_ACTIVITY_OBSERVED_WSS_DELIVERY_GAP",
+    "POOL_ADDRESS_ACTIVITY_OBSERVED_ROUTE_REVIEW_REQUIRED",
     "NO_DIRECT_POOL_ACTIVITY_SUPPORTED",
     "BOUNDARY_TIME_AMBIGUOUS_UNKNOWN",
     "NULL_BLOCK_TIME_UNKNOWN",
     "PAGE_TRUNCATED_UNKNOWN",
+    "HISTORY_COVERAGE_UNKNOWN",
     "ORDERING_OR_SCHEMA_DRIFT_UNKNOWN",
     "MALFORMED_OR_RPC_ERROR_UNKNOWN"
   ]

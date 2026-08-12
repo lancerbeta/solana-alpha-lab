@@ -26,7 +26,7 @@
     },
     "research_truth": {
       "result": "PASS",
-      "evidence": "Boundary, null, truncation, malformed and ordering cases stay typed UNKNOWN; absence is never converted into volume zero or pool inactivity."
+      "evidence": "Acknowledgement/boundary, null, short non-bracketing history, truncation, malformed and ordering cases stay typed UNKNOWN; provider completeness is not assumed and absence is never converted into volume zero or pool inactivity."
     },
     "owner_operability_and_ux": {
       "result": "PASS",
@@ -46,12 +46,14 @@
     },
     "red_team": {
       "result": "PASS",
-      "evidence": "Tests attack type confusion, extra fields, wrong identity, duplicates, newest-first ordering, ambiguous times, truncation and RPC errors."
+      "evidence": "Tests attack type confusion, extra fields, wrong identity, TransactionError shape, duplicates, slot ordering/ties, acknowledgement and terminal boundary seconds, short history, truncation and RPC errors."
     }
   },
   "limitations": [
     "No external response has been captured under this contract.",
     "A matching signature proves address activity, not a PumpSwap trade or market observation.",
+    "Post-ack address activity selects route review but does not alone prove a WSS delivery defect.",
+    "A short or empty non-bracketing page cannot support a negative conclusion.",
     "A full 1000-record page may require redesign; pagination is outside A16 authority.",
     "TASK-30 remains unaccepted."
   ],
@@ -71,7 +73,7 @@
       "evidence": "Only needed if A16 observes interior address activity and that distinction changes the experiment.",
       "cost_risk": "Additional RPC, decoding and research-truth scope; may still not yield a panel.",
       "owner": "GOAL_OWNER",
-      "activation_trigger": "A16 runtime returns POOL_ACTIVITY_OBSERVED_WSS_DELIVERY_GAP.",
+      "activation_trigger": "A16 runtime returns POOL_ADDRESS_ACTIVITY_OBSERVED_ROUTE_REVIEW_REQUIRED.",
       "why": "Do not decode transactions before activity exists."
     }
   },

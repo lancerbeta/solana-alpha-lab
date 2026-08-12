@@ -13,8 +13,10 @@ target:
   dex_id: pumpswap
 capture_window:
   started_at: '2026-08-12T09:27:52.749910Z'
+  subscription_acknowledged_at: '2026-08-12T09:27:53.436278Z'
   terminal_at: '2026-08-12T09:37:53.059095Z'
   start_floor_unix: 1786526872
+  acknowledgement_floor_unix: 1786526873
   terminal_floor_unix: 1786527473
 request:
   provider: HELIUS_STANDARD_RPC

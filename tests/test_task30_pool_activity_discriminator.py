@@ -147,13 +147,13 @@ class Task30PoolActivityDiscriminatorTests(unittest.TestCase):
         result = self.classify(
             [records["after_terminal"], records["inside"], records["start_boundary"], records["null_time"]]
         )
-        self.assertEqual(result["terminal_state"], "POOL_ACTIVITY_OBSERVED_WSS_DELIVERY_GAP")
+        self.assertEqual(result["terminal_state"], "POOL_ADDRESS_ACTIVITY_OBSERVED_ROUTE_REVIEW_REQUIRED")
         self.assertEqual(result["interior_signature_count"], 1)
         self.assertIs(result["pool_address_activity_observed"], True)
 
-    def test_exhausted_or_bracketing_page_supports_no_direct_activity(self) -> None:
+    def test_only_a_page_reaching_before_ack_supports_no_direct_activity(self) -> None:
         records = self.records()
-        exhausted = self.classify([records["after_terminal"], records["before_start"]])
+        short_bracketed = self.classify([records["after_terminal"], records["before_start"]])
         bracketed_records = [
             synthetic_record(index, 1786527600 - index)
             for index in range(10)
@@ -162,22 +162,34 @@ class Task30PoolActivityDiscriminatorTests(unittest.TestCase):
             for index in range(990)
         ]
         bracketed = self.classify(bracketed_records)
-        for result in (exhausted, bracketed):
+        for result in (short_bracketed, bracketed):
             self.assertEqual(result["terminal_state"], "NO_DIRECT_POOL_ACTIVITY_SUPPORTED")
             self.assertIs(result["pool_inactive"], False)
             self.assertIs(result["zero_volume"], False)
 
-    def test_boundary_null_and_truncated_pages_remain_typed_unknown(self) -> None:
+    def test_boundary_null_short_unbracketed_and_truncated_pages_remain_typed_unknown(self) -> None:
         records = self.records()
         boundary = self.classify([records["after_terminal"], records["start_boundary"], records["before_start"]])
-        null_time = self.classify([records["after_terminal"], records["null_time"], records["before_start"]])
+        ack_boundary = copy.deepcopy(records["start_boundary"])
+        ack_boundary["signature"] = "sig-ack-boundary"
+        ack_boundary["blockTime"] = 1786526873
+        terminal_boundary = copy.deepcopy(records["start_boundary"])
+        terminal_boundary["signature"] = "sig-terminal-boundary"
+        terminal_boundary["blockTime"] = 1786527473
+        null_time = self.classify([records["after_terminal"], records["before_start"], records["null_time"]])
+        short_unbracketed = self.classify([records["after_terminal"]])
+        empty = self.classify([])
         truncated = self.classify(
             [synthetic_record(index, 1786529000 - index) for index in range(1000)]
         )
         self.assertEqual(boundary["terminal_state"], "BOUNDARY_TIME_AMBIGUOUS_UNKNOWN")
+        self.assertEqual(self.classify([records["after_terminal"], ack_boundary])["terminal_state"], "BOUNDARY_TIME_AMBIGUOUS_UNKNOWN")
+        self.assertEqual(self.classify([records["after_terminal"], terminal_boundary])["terminal_state"], "BOUNDARY_TIME_AMBIGUOUS_UNKNOWN")
         self.assertEqual(null_time["terminal_state"], "NULL_BLOCK_TIME_UNKNOWN")
+        self.assertEqual(short_unbracketed["terminal_state"], "HISTORY_COVERAGE_UNKNOWN")
+        self.assertEqual(empty["terminal_state"], "HISTORY_COVERAGE_UNKNOWN")
         self.assertEqual(truncated["terminal_state"], "PAGE_TRUNCATED_UNKNOWN")
-        self.assertTrue(all(item["unknown"] for item in (boundary, null_time, truncated)))
+        self.assertTrue(all(item["unknown"] for item in (boundary, null_time, short_unbracketed, empty, truncated)))
 
     def test_rpc_error_malformed_schema_ordering_and_duplicate_fail_closed(self) -> None:
         records = self.records()
@@ -187,12 +199,29 @@ class Task30PoolActivityDiscriminatorTests(unittest.TestCase):
             (response([{**records["before_start"], "extra": 1}]), "ORDERING_OR_SCHEMA_DRIFT_UNKNOWN"),
             (response([records["before_start"], records["after_terminal"]]), "ORDERING_OR_SCHEMA_DRIFT_UNKNOWN"),
             (response([records["after_terminal"], records["after_terminal"]]), "ORDERING_OR_SCHEMA_DRIFT_UNKNOWN"),
+            (response([{**records["inside"], "err": True}]), "ORDERING_OR_SCHEMA_DRIFT_UNKNOWN"),
         )
         for payload, expected in cases:
             with self.subTest(expected=expected):
                 result = classify_pool_activity_response(policy(), payload)
                 self.assertEqual(result["terminal_state"], expected)
                 self.assertIs(result["unknown"], True)
+
+    def test_slot_order_ties_and_transaction_error_union_are_explicit(self) -> None:
+        records = self.records()
+        tied = copy.deepcopy(records["inside"])
+        tied["signature"] = "sig-tied"
+        tied["slot"] = records["after_terminal"]["slot"]
+        tied["err"] = {"InstructionError": [0, "Custom"]}
+        accepted = self.classify([records["after_terminal"], tied])
+        self.assertEqual(
+            accepted["terminal_state"],
+            "POOL_ADDRESS_ACTIVITY_OBSERVED_ROUTE_REVIEW_REQUIRED",
+        )
+        inverted = copy.deepcopy(records["inside"])
+        inverted["slot"] = records["after_terminal"]["slot"] + 1
+        rejected = self.classify([records["after_terminal"], inverted])
+        self.assertEqual(rejected["terminal_state"], "ORDERING_OR_SCHEMA_DRIFT_UNKNOWN")
 
     def test_every_result_preserves_market_and_task_nonclaims(self) -> None:
         results = (

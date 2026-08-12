@@ -9,6 +9,7 @@ from typing import Any
 POOL = "URqx24yyYxtXXhTbBQnbtPLhtLWYoaDaRxuQuLpNS3S"
 REQUEST_ID = "task30-a16-pool-activity-discriminator"
 START_FLOOR = 1786526872
+ACKNOWLEDGEMENT_FLOOR = 1786526873
 TERMINAL_FLOOR = 1786527473
 PAGE_LIMIT = 1000
 
@@ -127,8 +128,10 @@ def evaluate_pool_activity_policy(config: Mapping[str, Any]) -> dict[str, object
         config.get("capture_window"),
         {
             "started_at": "2026-08-12T09:27:52.749910Z",
+            "subscription_acknowledged_at": "2026-08-12T09:27:53.436278Z",
             "terminal_at": "2026-08-12T09:37:53.059095Z",
             "start_floor_unix": START_FLOOR,
+            "acknowledgement_floor_unix": ACKNOWLEDGEMENT_FLOOR,
             "terminal_floor_unix": TERMINAL_FLOOR,
         },
         "CAPTURE_WINDOW_DRIFT",
@@ -227,7 +230,7 @@ def build_pool_activity_request(config: Mapping[str, Any]) -> dict[str, object]:
 
 def _result(state: str, *, count: int = 0) -> dict[str, object]:
     unknown = state.endswith("_UNKNOWN")
-    observed = state == "POOL_ACTIVITY_OBSERVED_WSS_DELIVERY_GAP"
+    observed = state == "POOL_ADDRESS_ACTIVITY_OBSERVED_ROUTE_REVIEW_REQUIRED"
     return {
         "terminal_state": state,
         "unknown": unknown,
@@ -245,6 +248,29 @@ def _result(state: str, *, count: int = 0) -> dict[str, object]:
         "task30_acceptance": False,
         "numeric_netreturn": False,
     }
+
+
+def _valid_json(value: object) -> bool:
+    if value is None or type(value) in {bool, int, float, str}:
+        return True
+    if isinstance(value, list):
+        return all(_valid_json(item) for item in value)
+    if isinstance(value, Mapping):
+        return all(
+            type(key) is str and _valid_json(nested)
+            for key, nested in value.items()
+        )
+    return False
+
+
+def _valid_transaction_error(value: object) -> bool:
+    if value is None:
+        return True
+    if type(value) is str:
+        return bool(value)
+    if isinstance(value, Mapping):
+        return bool(value) and _valid_json(value)
+    return False
 
 
 def _valid_record(record: object) -> bool:
@@ -266,6 +292,8 @@ def _valid_record(record: object) -> bool:
     if memo is not None and type(memo) is not str:
         return False
     if block_time is not None and (type(block_time) is not int or block_time < 0):
+        return False
+    if not _valid_transaction_error(record.get("err")):
         return False
     if type(status) is not str or status not in {"confirmed", "finalized"}:
         return False
@@ -309,10 +337,10 @@ def classify_pool_activity_response(
     signatures = [item["signature"] for item in records]
     if len(signatures) != len(set(signatures)):
         return _result("ORDERING_OR_SCHEMA_DRIFT_UNKNOWN")
-    non_null_times = [item["blockTime"] for item in records if item["blockTime"] is not None]
+    slots = [item["slot"] for item in records]
     if any(
         newer < older
-        for newer, older in zip(non_null_times, non_null_times[1:])
+        for newer, older in zip(slots, slots[1:])
     ):
         return _result("ORDERING_OR_SCHEMA_DRIFT_UNKNOWN")
 
@@ -320,21 +348,23 @@ def classify_pool_activity_response(
         item
         for item in records
         if item["blockTime"] is not None
-        and START_FLOOR < item["blockTime"] < TERMINAL_FLOOR
+        and ACKNOWLEDGEMENT_FLOOR < item["blockTime"] < TERMINAL_FLOOR
     ]
     if interior:
         return _result(
-            "POOL_ACTIVITY_OBSERVED_WSS_DELIVERY_GAP", count=len(interior)
+            "POOL_ADDRESS_ACTIVITY_OBSERVED_ROUTE_REVIEW_REQUIRED",
+            count=len(interior),
         )
     if any(item["blockTime"] is None for item in records):
         return _result("NULL_BLOCK_TIME_UNKNOWN")
     if any(
-        item["blockTime"] in {START_FLOOR, TERMINAL_FLOOR} for item in records
+        item["blockTime"]
+        in {START_FLOOR, ACKNOWLEDGEMENT_FLOOR, TERMINAL_FLOOR}
+        for item in records
     ):
         return _result("BOUNDARY_TIME_AMBIGUOUS_UNKNOWN")
-    if len(records) < PAGE_LIMIT:
+    if records and records[-1]["blockTime"] < ACKNOWLEDGEMENT_FLOOR:
         return _result("NO_DIRECT_POOL_ACTIVITY_SUPPORTED")
-    oldest_time = records[-1]["blockTime"]
-    if oldest_time < START_FLOOR:
-        return _result("NO_DIRECT_POOL_ACTIVITY_SUPPORTED")
-    return _result("PAGE_TRUNCATED_UNKNOWN")
+    if len(records) == PAGE_LIMIT:
+        return _result("PAGE_TRUNCATED_UNKNOWN")
+    return _result("HISTORY_COVERAGE_UNKNOWN")

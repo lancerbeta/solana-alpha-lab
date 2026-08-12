@@ -32,11 +32,13 @@
     "capture_window": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["started_at", "terminal_at", "start_floor_unix", "terminal_floor_unix"],
+      "required": ["started_at", "subscription_acknowledged_at", "terminal_at", "start_floor_unix", "acknowledgement_floor_unix", "terminal_floor_unix"],
       "properties": {
         "started_at": {"const": "2026-08-12T09:27:52.749910Z"},
+        "subscription_acknowledged_at": {"const": "2026-08-12T09:27:53.436278Z"},
         "terminal_at": {"const": "2026-08-12T09:37:53.059095Z"},
         "start_floor_unix": {"const": 1786526872},
+        "acknowledgement_floor_unix": {"const": 1786526873},
         "terminal_floor_unix": {"const": 1786527473}
       }
     },
