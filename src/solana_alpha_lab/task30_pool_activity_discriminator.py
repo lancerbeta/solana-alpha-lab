@@ -271,14 +271,16 @@ def _pinned_transaction_error_is_valid(encoded_error: str) -> bool:
         ],
     }
     try:
-        GetSignaturesForAddressResp.from_json(
+        parsed = GetSignaturesForAddressResp.from_json(
             json.dumps(payload, sort_keys=True, separators=(",", ":"))
         )
+        canonical = json.loads(parsed.to_json())
+        canonical_error = canonical["result"][0]["err"]
     except Exception:
         # solders exposes its Rust serde failure as a non-exported exception;
         # any parser failure is conservatively schema drift for this classifier.
         return False
-    return True
+    return canonical_error == json.loads(encoded_error)
 
 
 def _valid_transaction_error(value: object) -> bool:

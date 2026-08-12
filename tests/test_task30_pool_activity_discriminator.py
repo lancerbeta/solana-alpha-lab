@@ -203,6 +203,8 @@ class Task30PoolActivityDiscriminatorTests(unittest.TestCase):
             (response([{**records["inside"], "err": "not-a-transaction-error"}]), "ORDERING_OR_SCHEMA_DRIFT_UNKNOWN"),
             (response([{**records["inside"], "err": {"NotATransactionError": True}}]), "ORDERING_OR_SCHEMA_DRIFT_UNKNOWN"),
             (response([{**records["inside"], "err": {"InstructionError": [256, "BorshIoError"]}}]), "ORDERING_OR_SCHEMA_DRIFT_UNKNOWN"),
+            (response([{**records["inside"], "err": {"InstructionError": [256, "BorshIoError"], "extra": 1}}]), "ORDERING_OR_SCHEMA_DRIFT_UNKNOWN"),
+            (response([{**records["inside"], "err": {"InstructionError": [0, {"Custom": 1, "extra": 2}]}}]), "ORDERING_OR_SCHEMA_DRIFT_UNKNOWN"),
             (response([{**records["inside"], "err": {"DuplicateInstruction": 256}}]), "ORDERING_OR_SCHEMA_DRIFT_UNKNOWN"),
             (response([{**records["inside"], "err": {"InsufficientFundsForRent": {"account_index": 256}}}]), "ORDERING_OR_SCHEMA_DRIFT_UNKNOWN"),
         )

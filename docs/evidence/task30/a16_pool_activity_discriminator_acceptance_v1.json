@@ -32,11 +32,11 @@
     },
     "module": {
       "path": "src/solana_alpha_lab/task30_pool_activity_discriminator.py",
-      "sha256": "995362efe4cb0c27193ccd050baad05127a0d39abfa81d752b94f57cb26be113"
+      "sha256": "ef2ae4017e716cee6c10e2bf2f69d09f47e7021bb2a008cfeecd4b64d1fe1a39"
     },
     "test": {
       "path": "tests/test_task30_pool_activity_discriminator.py",
-      "sha256": "eca96ce49b1b1a9812d7a8483fa05321e6d526c245dd8748ce7a22d55db46539"
+      "sha256": "833cc263f4e677f7485331c88fe21b34bc9159fa63e06b168839ad3525145c2a"
     },
     "design": {
       "path": "docs/superpowers/specs/2026-08-12-task30-pool-activity-discriminator-design.md",
