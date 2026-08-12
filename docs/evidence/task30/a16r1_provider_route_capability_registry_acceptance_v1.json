@@ -95,6 +95,9 @@
     "watch": "AUTOMATIC_PROVIDER_ROUTING_ONLY_AFTER_TWO_CONSUMERS_AND_MEASURED_MANUAL_COST"
   },
   "rollback": "Delete the new registry assets and Catalog transaction before downstream adoption; no external state must be undone.",
-  "project_sources_disposition": "NO_CHANGE",
+  "project_sources_disposition": {
+    "kind": "NO_CHANGE",
+    "reason": "A16R1 retains provider-route observations and does not change the canonical Project Sources release or TASK-30 status."
+  },
   "state_change": "NONE"
 }
