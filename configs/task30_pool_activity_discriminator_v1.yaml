@@ -1,0 +1,47 @@
+schema: smial.task30.pool-activity-discriminator.policy
+schema_version: '1.0'
+task_id: TASK-30
+atom_id: T30-A16_ONE_BOUNDED_POOL_ACTIVITY_DISCRIMINATOR_V1
+contract_id: TASK30-POOL-ACTIVITY-DISCRIMINATOR-V1
+consumer: RC001-H07-H01-LIQUIDITY-RETENTION
+upstream_evidence_id: T30-A15P-STANDARD-POOL-LOGS-RUNTIME-001
+target:
+  network: solana
+  pool_address: URqx24yyYxtXXhTbBQnbtPLhtLWYoaDaRxuQuLpNS3S
+  base_mint: DMwbVy48dWVKGe9z1pcVnwF3HLMLrqWdDLfbvx8RchhK
+  quote_mint: So11111111111111111111111111111111111111112
+  dex_id: pumpswap
+capture_window:
+  started_at: '2026-08-12T09:27:52.749910Z'
+  terminal_at: '2026-08-12T09:37:53.059095Z'
+  start_floor_unix: 1786526872
+  terminal_floor_unix: 1786527473
+request:
+  provider: HELIUS_STANDARD_RPC
+  jsonrpc: '2.0'
+  id: task30-a16-pool-activity-discriminator
+  method: getSignaturesForAddress
+  commitment: confirmed
+  limit: 1000
+runtime_limits:
+  max_requests: 1
+  estimated_credit_cap: 1
+  transaction_followups: 0
+execution_controls:
+  monitoring_owner: LOCAL_WORK_CODEX_FOREGROUND
+  retention_class: A4
+  retry: false
+  fallback: false
+  scheduler: false
+authority:
+  provider_api_rpc_wss_calls: 0
+  credential_read: false
+  raw_external_data_write: false
+  cash_spend_usd: 0
+  wallet_signer_transaction_actions: 0
+  task30_trial_or_acceptance: false
+owner_authority:
+  future_runtime_authorized: false
+  future_runtime_phrase: 'T30-A16P_POOL_ACTIVITY_DISCRIMINATOR_RUNTIME_V1; pool=URqx24yyYxtXXhTbBQnbtPLhtLWYoaDaRxuQuLpNS3S; provider=HELIUS_STANDARD_RPC; method=getSignaturesForAddress; capture_started_at=2026-08-12T09:27:52.749910Z; capture_terminal_at=2026-08-12T09:37:53.059095Z; max_requests=1; limit=1000; commitment=confirmed; estimated_credit_cap=1; retention=A4; retry=false; fallback=false; transaction_followups=0'
+decision: OFFLINE_DISCRIMINATOR_READY_FOR_OWNER_GATE
+project_sources_disposition: NO_CHANGE

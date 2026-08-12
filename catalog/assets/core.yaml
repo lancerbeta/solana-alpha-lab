@@ -18283,3 +18283,138 @@ records:
   consumers: [TASK-30, FACTORY-001]
   evidence: []
   classification: *t25_internal
+
+- asset_id: CONTRACT-T30-POOL-ACTIVITY-DISCRIMINATOR-001
+  record_version: '1.0'
+  asset_type: control_document
+  purpose: Versioned zero-authority contract for one exact-pool A15P activity discriminator.
+  status: VALIDATED_ACTIVE
+  origin: REPOSITORY
+  as_of: '2026-08-12'
+  truth_owner: TASK-30
+  location: {kind: git_path, logical_uri: 'repo://docs/contracts/task30_pool_activity_discriminator_contract_v1.md', repository_path: docs/contracts/task30_pool_activity_discriminator_contract_v1.md}
+  integrity: {kind: sha256, sha256: c2ab9a071837eafb671b1295ce361f9ad167ec456873002b4d06295369b272a7}
+  access: *t25_read_file
+  relations: [{relation_type: derived_from, target_asset_id: EVIDENCE-T30-A15P-STANDARD-POOL-LOGS-RUNTIME-001}]
+  consumers: [TASK-30, FACTORY-001]
+  evidence: []
+  classification: *t25_internal
+
+- asset_id: CONFIG-T30-POOL-ACTIVITY-DISCRIMINATOR-001
+  record_version: '1.0'
+  asset_type: configuration
+  purpose: Closed exact-target policy and external authority boundary for the A16 discriminator.
+  status: VALIDATED_ACTIVE
+  origin: REPOSITORY
+  as_of: '2026-08-12'
+  truth_owner: TASK-30
+  location: {kind: git_path, logical_uri: 'repo://configs/task30_pool_activity_discriminator_v1.yaml', repository_path: configs/task30_pool_activity_discriminator_v1.yaml}
+  integrity: {kind: sha256, sha256: 10397852055c2910a2ee92b8f2b2439e755cea58411a917787e79bb1febf4963}
+  access: *t25_read_file
+  relations: [{relation_type: governed_by, target_asset_id: CONTRACT-T30-POOL-ACTIVITY-DISCRIMINATOR-001}]
+  consumers: [TASK-30, FACTORY-001]
+  evidence: []
+  classification: *t25_internal
+
+- asset_id: SCHEMA-T30-POOL-ACTIVITY-DISCRIMINATOR-001
+  record_version: '1.0'
+  asset_type: schema
+  purpose: Closed JSON Schema for the A16 exact-pool discriminator policy.
+  status: VALIDATED_ACTIVE
+  origin: REPOSITORY
+  as_of: '2026-08-12'
+  truth_owner: TASK-30
+  location: {kind: git_path, logical_uri: 'repo://catalog/schemas/task30_pool_activity_discriminator.schema.json', repository_path: catalog/schemas/task30_pool_activity_discriminator.schema.json}
+  integrity: {kind: sha256, sha256: 2af8f5d54e8d1ca8c71cd3a7578b3b22abdc0e329b6ac548cca4524a364089a3}
+  access: *t25_read_file
+  relations: [{relation_type: governed_by, target_asset_id: CONTRACT-T30-POOL-ACTIVITY-DISCRIMINATOR-001}]
+  consumers: [TASK-30, FACTORY-001]
+  evidence: []
+  classification: *t25_internal
+
+- asset_id: FIXTURE-T30-POOL-ACTIVITY-DISCRIMINATOR-001
+  record_version: '1.0'
+  asset_type: evidence
+  purpose: Synthetic response atoms and expected truth states for the A16 discriminator.
+  status: VALIDATED_ACTIVE
+  origin: REPOSITORY
+  as_of: '2026-08-12'
+  truth_owner: TASK-30
+  location: {kind: git_path, logical_uri: 'repo://tests/fixtures/task30/pool_activity_discriminator_v1.json', repository_path: tests/fixtures/task30/pool_activity_discriminator_v1.json}
+  integrity: {kind: sha256, sha256: 20293236e01b5e6828401fe38f401bfa3c30bd5e32b39e669595f85432cd61e1}
+  access: *t25_read_file
+  relations: [{relation_type: derived_from, target_asset_id: CONFIG-T30-POOL-ACTIVITY-DISCRIMINATOR-001}]
+  consumers: [TASK-30, FACTORY-001]
+  evidence: []
+  classification: *t25_internal
+
+- asset_id: MODULE-T30-POOL-ACTIVITY-DISCRIMINATOR-001
+  record_version: '1.0'
+  asset_type: script
+  purpose: Pure secret-free request binder and conservative A15P-window response classifier.
+  status: VALIDATED_ACTIVE
+  origin: REPOSITORY
+  as_of: '2026-08-12'
+  truth_owner: TASK-30
+  location: {kind: git_path, logical_uri: 'repo://src/solana_alpha_lab/task30_pool_activity_discriminator.py', repository_path: src/solana_alpha_lab/task30_pool_activity_discriminator.py}
+  integrity: {kind: sha256, sha256: 1b600a37d3b1c55ff4101b7534ddab0a706b1fe965541e00ffa9672bb373fe1f}
+  access: *t25_read_file
+  relations: [{relation_type: governed_by, target_asset_id: CONFIG-T30-POOL-ACTIVITY-DISCRIMINATOR-001}]
+  consumers: [TASK-30, FACTORY-001]
+  evidence: []
+  classification: *t25_internal
+
+- asset_id: TEST-T30-POOL-ACTIVITY-DISCRIMINATOR-001
+  record_version: '1.0'
+  asset_type: script
+  purpose: Deterministic policy, classifier, adversarial, non-claim and binding tests for A16.
+  status: VALIDATED_ACTIVE
+  origin: REPOSITORY
+  as_of: '2026-08-12'
+  truth_owner: TASK-30
+  location: {kind: git_path, logical_uri: 'repo://tests/test_task30_pool_activity_discriminator.py', repository_path: tests/test_task30_pool_activity_discriminator.py}
+  integrity: {kind: sha256, sha256: 06d6783c41109bcb251833007084c83ae24c5a9e398ab91bacb8875babf8f60b}
+  access: *t25_read_file
+  relations:
+  - {relation_type: depends_on, target_asset_id: MODULE-T30-POOL-ACTIVITY-DISCRIMINATOR-001}
+  - {relation_type: depends_on, target_asset_id: SCHEMA-T30-POOL-ACTIVITY-DISCRIMINATOR-001}
+  - {relation_type: depends_on, target_asset_id: FIXTURE-T30-POOL-ACTIVITY-DISCRIMINATOR-001}
+  consumers: [TASK-30, FACTORY-001]
+  evidence: []
+  classification: *t25_internal
+
+- asset_id: EVIDENCE-T30-A16-POOL-ACTIVITY-DISCRIMINATOR-001
+  record_version: '1.0'
+  asset_type: evidence
+  purpose: Hash-bound offline acceptance for the A16 one-request activity discriminator.
+  status: VALIDATED_ACTIVE
+  origin: REPOSITORY
+  as_of: '2026-08-12'
+  truth_owner: TASK-30
+  location: {kind: git_path, logical_uri: 'repo://docs/evidence/task30/a16_pool_activity_discriminator_acceptance_v1.json', repository_path: docs/evidence/task30/a16_pool_activity_discriminator_acceptance_v1.json}
+  integrity: {kind: sha256, sha256: 780c552e2ceac9455d72ebab2b0723ac8e46cddce0cd73f5d4671dfefa0b617d}
+  access: *t25_read_file
+  relations:
+  - {relation_type: derived_from, target_asset_id: CONTRACT-T30-POOL-ACTIVITY-DISCRIMINATOR-001}
+  - {relation_type: validated_by, target_asset_id: TEST-T30-POOL-ACTIVITY-DISCRIMINATOR-001}
+  consumers: [TASK-30, FACTORY-001]
+  evidence: []
+  classification: *t25_internal
+
+- asset_id: EVIDENCE-T30-A16-POOL-ACTIVITY-DISCRIMINATOR-FACTORY-FIT-001
+  record_version: '1.0'
+  asset_type: evidence
+  purpose: FULL Factory Fit review for the A16 exact-pool activity discriminator.
+  status: VALIDATED_ACTIVE
+  origin: REPOSITORY
+  as_of: '2026-08-12'
+  truth_owner: TASK-30
+  location: {kind: git_path, logical_uri: 'repo://docs/evidence/task30/a16_pool_activity_discriminator_factory_fit_v1.json', repository_path: docs/evidence/task30/a16_pool_activity_discriminator_factory_fit_v1.json}
+  integrity: {kind: sha256, sha256: 9908696c5c38f905faeca482d767da884819f8c88eff7033587e0db6c685ac0b}
+  access: *t25_read_file
+  relations:
+  - {relation_type: derived_from, target_asset_id: EVIDENCE-T30-A16-POOL-ACTIVITY-DISCRIMINATOR-001}
+  - {relation_type: validated_by, target_asset_id: TEST-T30-POOL-ACTIVITY-DISCRIMINATOR-001}
+  consumers: [TASK-30, FACTORY-001]
+  evidence: []
+  classification: *t25_internal

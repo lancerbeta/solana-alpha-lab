@@ -1,0 +1,103 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "smial.task30.pool-activity-discriminator.schema.v1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema", "schema_version", "task_id", "atom_id", "contract_id",
+    "consumer", "upstream_evidence_id", "target", "capture_window",
+    "request", "runtime_limits", "execution_controls", "authority",
+    "owner_authority", "decision", "project_sources_disposition"
+  ],
+  "properties": {
+    "schema": {"const": "smial.task30.pool-activity-discriminator.policy"},
+    "schema_version": {"const": "1.0"},
+    "task_id": {"const": "TASK-30"},
+    "atom_id": {"const": "T30-A16_ONE_BOUNDED_POOL_ACTIVITY_DISCRIMINATOR_V1"},
+    "contract_id": {"const": "TASK30-POOL-ACTIVITY-DISCRIMINATOR-V1"},
+    "consumer": {"const": "RC001-H07-H01-LIQUIDITY-RETENTION"},
+    "upstream_evidence_id": {"const": "T30-A15P-STANDARD-POOL-LOGS-RUNTIME-001"},
+    "target": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["network", "pool_address", "base_mint", "quote_mint", "dex_id"],
+      "properties": {
+        "network": {"const": "solana"},
+        "pool_address": {"const": "URqx24yyYxtXXhTbBQnbtPLhtLWYoaDaRxuQuLpNS3S"},
+        "base_mint": {"const": "DMwbVy48dWVKGe9z1pcVnwF3HLMLrqWdDLfbvx8RchhK"},
+        "quote_mint": {"const": "So11111111111111111111111111111111111111112"},
+        "dex_id": {"const": "pumpswap"}
+      }
+    },
+    "capture_window": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["started_at", "terminal_at", "start_floor_unix", "terminal_floor_unix"],
+      "properties": {
+        "started_at": {"const": "2026-08-12T09:27:52.749910Z"},
+        "terminal_at": {"const": "2026-08-12T09:37:53.059095Z"},
+        "start_floor_unix": {"const": 1786526872},
+        "terminal_floor_unix": {"const": 1786527473}
+      }
+    },
+    "request": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["provider", "jsonrpc", "id", "method", "commitment", "limit"],
+      "properties": {
+        "provider": {"const": "HELIUS_STANDARD_RPC"},
+        "jsonrpc": {"const": "2.0"},
+        "id": {"const": "task30-a16-pool-activity-discriminator"},
+        "method": {"const": "getSignaturesForAddress"},
+        "commitment": {"const": "confirmed"},
+        "limit": {"const": 1000}
+      }
+    },
+    "runtime_limits": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["max_requests", "estimated_credit_cap", "transaction_followups"],
+      "properties": {
+        "max_requests": {"const": 1},
+        "estimated_credit_cap": {"const": 1},
+        "transaction_followups": {"const": 0}
+      }
+    },
+    "execution_controls": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["monitoring_owner", "retention_class", "retry", "fallback", "scheduler"],
+      "properties": {
+        "monitoring_owner": {"const": "LOCAL_WORK_CODEX_FOREGROUND"},
+        "retention_class": {"const": "A4"},
+        "retry": {"const": false},
+        "fallback": {"const": false},
+        "scheduler": {"const": false}
+      }
+    },
+    "authority": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["provider_api_rpc_wss_calls", "credential_read", "raw_external_data_write", "cash_spend_usd", "wallet_signer_transaction_actions", "task30_trial_or_acceptance"],
+      "properties": {
+        "provider_api_rpc_wss_calls": {"const": 0},
+        "credential_read": {"const": false},
+        "raw_external_data_write": {"const": false},
+        "cash_spend_usd": {"const": 0},
+        "wallet_signer_transaction_actions": {"const": 0},
+        "task30_trial_or_acceptance": {"const": false}
+      }
+    },
+    "owner_authority": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["future_runtime_authorized", "future_runtime_phrase"],
+      "properties": {
+        "future_runtime_authorized": {"const": false},
+        "future_runtime_phrase": {"const": "T30-A16P_POOL_ACTIVITY_DISCRIMINATOR_RUNTIME_V1; pool=URqx24yyYxtXXhTbBQnbtPLhtLWYoaDaRxuQuLpNS3S; provider=HELIUS_STANDARD_RPC; method=getSignaturesForAddress; capture_started_at=2026-08-12T09:27:52.749910Z; capture_terminal_at=2026-08-12T09:37:53.059095Z; max_requests=1; limit=1000; commitment=confirmed; estimated_credit_cap=1; retention=A4; retry=false; fallback=false; transaction_followups=0"}
+      }
+    },
+    "decision": {"const": "OFFLINE_DISCRIMINATOR_READY_FOR_OWNER_GATE"},
+    "project_sources_disposition": {"const": "NO_CHANGE"}
+  }
+}
