@@ -2,8 +2,12 @@
 
 from __future__ import annotations
 
+import json
 from collections.abc import Mapping
+from functools import lru_cache
 from typing import Any
+
+from solders.rpc.responses import GetSignaturesForAddressResp
 
 
 POOL = "URqx24yyYxtXXhTbBQnbtPLhtLWYoaDaRxuQuLpNS3S"
@@ -12,102 +16,6 @@ START_FLOOR = 1786526872
 ACKNOWLEDGEMENT_FLOOR = 1786526873
 TERMINAL_FLOOR = 1786527473
 PAGE_LIMIT = 1000
-
-_TRANSACTION_ERROR_UNIT_VARIANTS = frozenset(
-    {
-        "AccountBorrowOutstanding",
-        "AccountInUse",
-        "AccountLoadedTwice",
-        "AccountNotFound",
-        "AddressLookupTableNotFound",
-        "AlreadyProcessed",
-        "BlockhashNotFound",
-        "CallChainTooDeep",
-        "ClusterMaintenance",
-        "CommitCancelled",
-        "InsufficientFundsForFee",
-        "InvalidAccountForFee",
-        "InvalidAccountIndex",
-        "InvalidAddressLookupTableData",
-        "InvalidAddressLookupTableIndex",
-        "InvalidAddressLookupTableOwner",
-        "InvalidLoadedAccountsDataSizeLimit",
-        "InvalidProgramForExecution",
-        "InvalidRentPayingAccount",
-        "InvalidWritableAccount",
-        "MaxLoadedAccountsDataSizeExceeded",
-        "MissingSignatureForFee",
-        "ProgramAccountNotFound",
-        "ResanitizationNeeded",
-        "SanitizeFailure",
-        "SignatureFailure",
-        "TooManyAccountLocks",
-        "UnbalancedTransaction",
-        "UnsupportedVersion",
-        "WouldExceedAccountDataBlockLimit",
-        "WouldExceedAccountDataTotalLimit",
-        "WouldExceedMaxAccountCostLimit",
-        "WouldExceedMaxBlockCostLimit",
-        "WouldExceedMaxVoteCostLimit",
-    }
-)
-
-_INSTRUCTION_ERROR_UNIT_VARIANTS = frozenset(
-    {
-        "AccountAlreadyInitialized",
-        "AccountBorrowFailed",
-        "AccountBorrowOutstanding",
-        "AccountDataSizeChanged",
-        "AccountDataTooSmall",
-        "AccountNotExecutable",
-        "AccountNotRentExempt",
-        "ArithmeticOverflow",
-        "BuiltinProgramsMustConsumeComputeUnits",
-        "CallDepth",
-        "ComputationalBudgetExceeded",
-        "DuplicateAccountIndex",
-        "DuplicateAccountOutOfSync",
-        "ExecutableAccountNotRentExempt",
-        "ExecutableDataModified",
-        "ExecutableLamportChange",
-        "ExecutableModified",
-        "ExternalAccountDataModified",
-        "ExternalAccountLamportSpend",
-        "GenericError",
-        "IllegalOwner",
-        "Immutable",
-        "IncorrectAuthority",
-        "IncorrectProgramId",
-        "InsufficientFunds",
-        "InvalidAccountData",
-        "InvalidAccountOwner",
-        "InvalidArgument",
-        "InvalidError",
-        "InvalidInstructionData",
-        "InvalidRealloc",
-        "InvalidSeeds",
-        "MaxAccountsDataAllocationsExceeded",
-        "MaxAccountsExceeded",
-        "MaxInstructionTraceLengthExceeded",
-        "MaxSeedLengthExceeded",
-        "MissingAccount",
-        "MissingRequiredSignature",
-        "ModifiedProgramId",
-        "NotEnoughAccountKeys",
-        "PrivilegeEscalation",
-        "ProgramEnvironmentSetupFailure",
-        "ProgramFailedToCompile",
-        "ProgramFailedToComplete",
-        "ReadonlyDataModified",
-        "ReadonlyLamportChange",
-        "ReentrancyNotAllowed",
-        "RentEpochModified",
-        "UnbalancedInstruction",
-        "UninitializedAccount",
-        "UnsupportedProgramId",
-        "UnsupportedSysvar",
-    }
-)
 
 
 class PoolActivityDiscriminatorError(ValueError):
@@ -346,49 +254,53 @@ def _result(state: str, *, count: int = 0) -> dict[str, object]:
     }
 
 
-def _valid_instruction_error(value: object) -> bool:
-    if type(value) is str:
-        return value in _INSTRUCTION_ERROR_UNIT_VARIANTS
-    if not isinstance(value, Mapping) or len(value) != 1:
+@lru_cache(maxsize=256)
+def _pinned_transaction_error_is_valid(encoded_error: str) -> bool:
+    payload = {
+        "jsonrpc": "2.0",
+        "id": 1,
+        "result": [
+            {
+                "signature": "1" * 64,
+                "slot": 1,
+                "err": json.loads(encoded_error),
+                "memo": None,
+                "blockTime": 1,
+                "confirmationStatus": "confirmed",
+            }
+        ],
+    }
+    try:
+        GetSignaturesForAddressResp.from_json(
+            json.dumps(payload, sort_keys=True, separators=(",", ":"))
+        )
+    except Exception:
+        # solders exposes its Rust serde failure as a non-exported exception;
+        # any parser failure is conservatively schema drift for this classifier.
         return False
-    key, payload = next(iter(value.items()))
-    if key == "Custom":
-        return type(payload) is int and 0 <= payload <= 0xFFFFFFFF
-    if key == "BorshIoError":
-        return type(payload) is str
-    return False
-
-
-def _valid_account_index_payload(value: object) -> bool:
-    return (
-        isinstance(value, Mapping)
-        and frozenset(value) == frozenset({"account_index"})
-        and type(value.get("account_index")) is int
-        and value["account_index"] >= 0
-    )
+    return True
 
 
 def _valid_transaction_error(value: object) -> bool:
-    if value is None:
-        return True
-    if type(value) is str:
-        return value in _TRANSACTION_ERROR_UNIT_VARIANTS
-    if not isinstance(value, Mapping) or len(value) != 1:
-        return False
-    key, payload = next(iter(value.items()))
-    if key == "InstructionError":
-        return (
-            type(payload) is list
-            and len(payload) == 2
-            and type(payload[0]) is int
-            and payload[0] >= 0
-            and _valid_instruction_error(payload[1])
+    if isinstance(value, Mapping) and frozenset(value) == frozenset({"InstructionError"}):
+        instruction_error = value["InstructionError"]
+        if (
+            type(instruction_error) is not list
+            or len(instruction_error) != 2
+            or type(instruction_error[0]) is not int
+            or not 0 <= instruction_error[0] <= 0xFF
+        ):
+            return False
+    try:
+        encoded = json.dumps(
+            value,
+            sort_keys=True,
+            separators=(",", ":"),
+            allow_nan=False,
         )
-    if key in {"InsufficientFundsForRent", "ProgramExecutionTemporarilyRestricted"}:
-        return _valid_account_index_payload(payload)
-    if key == "DuplicateInstruction":
-        return type(payload) is int and payload >= 0
-    return False
+    except (TypeError, ValueError):
+        return False
+    return _pinned_transaction_error_is_valid(encoded)
 
 
 def _valid_record(record: object) -> bool:

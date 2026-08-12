@@ -100,11 +100,11 @@ post-ack activity only when `blockTime > 1786526873` and
 - `MALFORMED_OR_RPC_ERROR_UNKNOWN`: JSON-RPC error or malformed envelope.
 
 All records must have the frozen shape, a recognized frozen Solana
-`TransactionError|null` variant, unique signatures and non-increasing slots;
-records sharing a slot must agree on `blockTime`. One valid strict post-ack
-signature wins over unrelated null or boundary records. It proves address
-activity, not a trade or WSS fault. Every negative decision remains scoped to
-this one window.
+`TransactionError|null` variant accepted by the repository-pinned `solders`
+parser, unique signatures and non-increasing slots; records sharing a slot must
+agree on `blockTime`. One valid strict post-ack signature wins over unrelated
+null or boundary records. It proves address activity, not a trade or WSS fault.
+Every negative decision remains scoped to this one window.
 
 ## Non-claims
 

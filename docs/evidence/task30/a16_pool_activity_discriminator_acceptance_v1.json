@@ -16,7 +16,7 @@
   "artifact_bindings": {
     "contract": {
       "path": "docs/contracts/task30_pool_activity_discriminator_contract_v1.md",
-      "sha256": "ac2f0285ec6e0adc6e4d2c27ddc2356ab244dfc1fc6831aa3e703aa85138794f"
+      "sha256": "79a2a407d77b6d32ed468dc0565595158937771acdd1b6b281f3e26494d9c944"
     },
     "config": {
       "path": "configs/task30_pool_activity_discriminator_v1.yaml",
@@ -32,15 +32,15 @@
     },
     "module": {
       "path": "src/solana_alpha_lab/task30_pool_activity_discriminator.py",
-      "sha256": "818af62f7a32a34457a41794b796102662df5201aeac6f47c9540ed602617092"
+      "sha256": "995362efe4cb0c27193ccd050baad05127a0d39abfa81d752b94f57cb26be113"
     },
     "test": {
       "path": "tests/test_task30_pool_activity_discriminator.py",
-      "sha256": "8170c2d98515154ce7889e4292d0e083e079414e7f601b7e501ae657f49ea0c0"
+      "sha256": "eca96ce49b1b1a9812d7a8483fa05321e6d526c245dd8748ce7a22d55db46539"
     },
     "design": {
       "path": "docs/superpowers/specs/2026-08-12-task30-pool-activity-discriminator-design.md",
-      "sha256": "54db2d3baa747d3ecfc7275784938bf3d2027b50311d28d1d87328bdf0f369d9"
+      "sha256": "891c7b645673f77bef514c9c24eb417b6653fcad276bc90b827de5a8757e4aac"
     },
     "plan": {
       "path": "docs/superpowers/plans/2026-08-12-task30-pool-activity-discriminator.md",
@@ -54,7 +54,7 @@
     "secret_free_request_body": true,
     "type_strict_policy": true,
     "closed_response_classifier": true,
-    "transaction_error_variants_closed": true,
+    "transaction_error_validated_by_pinned_solders": true,
     "same_slot_block_time_consistency_required": true,
     "boundary_second_is_unknown": true,
     "null_block_time_is_unknown": true,

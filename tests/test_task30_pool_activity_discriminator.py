@@ -202,6 +202,9 @@ class Task30PoolActivityDiscriminatorTests(unittest.TestCase):
             (response([{**records["inside"], "err": True}]), "ORDERING_OR_SCHEMA_DRIFT_UNKNOWN"),
             (response([{**records["inside"], "err": "not-a-transaction-error"}]), "ORDERING_OR_SCHEMA_DRIFT_UNKNOWN"),
             (response([{**records["inside"], "err": {"NotATransactionError": True}}]), "ORDERING_OR_SCHEMA_DRIFT_UNKNOWN"),
+            (response([{**records["inside"], "err": {"InstructionError": [256, "BorshIoError"]}}]), "ORDERING_OR_SCHEMA_DRIFT_UNKNOWN"),
+            (response([{**records["inside"], "err": {"DuplicateInstruction": 256}}]), "ORDERING_OR_SCHEMA_DRIFT_UNKNOWN"),
+            (response([{**records["inside"], "err": {"InsufficientFundsForRent": {"account_index": 256}}}]), "ORDERING_OR_SCHEMA_DRIFT_UNKNOWN"),
         )
         for payload, expected in cases:
             with self.subTest(expected=expected):
@@ -228,6 +231,17 @@ class Task30PoolActivityDiscriminatorTests(unittest.TestCase):
         inconsistent_tie["blockTime"] = tied["blockTime"] + 1
         rejected_tie = self.classify([first, inconsistent_tie])
         self.assertEqual(rejected_tie["terminal_state"], "ORDERING_OR_SCHEMA_DRIFT_UNKNOWN")
+        for valid_error in (
+            "ProgramCacheHitMaxLimit",
+            {"InstructionError": [255, "BorshIoError"]},
+        ):
+            candidate = copy.deepcopy(first)
+            candidate["err"] = valid_error
+            with self.subTest(valid_error=valid_error):
+                self.assertEqual(
+                    self.classify([candidate])["terminal_state"],
+                    "POOL_ADDRESS_ACTIVITY_OBSERVED_ROUTE_REVIEW_REQUIRED",
+                )
 
     def test_every_result_preserves_market_and_task_nonclaims(self) -> None:
         results = (

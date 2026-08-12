@@ -42,7 +42,7 @@
     },
     "build_vs_buy": {
       "result": "PASS",
-      "evidence": "WRAP uses standard Solana getSignaturesForAddress and existing Helius conventions; no collector, scheduler or new dependency was built."
+      "evidence": "WRAP uses standard Solana getSignaturesForAddress, existing Helius conventions and the already-pinned solders parser for TransactionError compatibility; no collector, scheduler or new dependency was built."
     },
     "red_team": {
       "result": "PASS",
