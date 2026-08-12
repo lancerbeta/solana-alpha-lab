@@ -432,3 +432,27 @@ def classify_standard_pool_logs_capture(
         decoded_events=decoded_events,
         signature_hashes=tuple(signature_hashes),
     )
+
+
+def render_standard_pool_logs_route(config: Mapping[str, Any]) -> str:
+    """Render stable owner-facing Russian text without an external surface."""
+
+    evaluate_standard_pool_logs_route(config)
+    limits = _mapping(config["runtime_limits"], "LIMITS_REQUIRED")
+    stream_bytes = f"{limits['max_stream_bytes']:,}".replace(",", " ")
+    return "\n".join(
+        (
+            "# Стандартный WSS-маршрут одного PumpSwap-пула",
+            "",
+            "Стандартный бесплатный WSS-маршрут подготовлен офлайн.",
+            "Он слушает только зафиксированный пул и использует уже проверенный PumpSwap-декодер.",
+            "Но реальный запуск пока не разрешён: соединение не открывалось и ключ не читался.",
+            f"Будущий предел: {limits['effective_open_seconds']} секунд, {limits['max_notifications']} уведомлений и {stream_bytes} байт.",
+            "Повтор, переподключение, fallback, scheduler и дополнительные RPC-запросы запрещены.",
+            "Важно: отсутствие уведомлений не означает нулевой объём, пустой интервал или полное покрытие.",
+            "Обрыв соединения или усечённые логи остаются UNKNOWN и останавливают выводы.",
+            "Даже найденная сделка пока является техническим наблюдением, а не TASK-30 trial или alpha evidence.",
+            "",
+            "Следующая граница — отдельное точное разрешение владельца на один foreground-пилот.",
+        )
+    ) + "\n"

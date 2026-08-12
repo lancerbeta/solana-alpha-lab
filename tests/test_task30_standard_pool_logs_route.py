@@ -21,6 +21,7 @@ from solana_alpha_lab.task30_standard_pool_logs_route import (
     bind_pool_logs_subscribe,
     classify_standard_pool_logs_capture,
     evaluate_standard_pool_logs_route,
+    render_standard_pool_logs_route,
 )
 from solana_alpha_lab.pumpswap_touch_decoder import (
     PROGRAM_DATA_PREFIX,
@@ -35,6 +36,7 @@ CONFIG = ROOT / "configs" / "task30_standard_pool_logs_route_v1.yaml"
 SCHEMA = ROOT / "catalog" / "schemas" / "task30_standard_pool_logs_route.schema.json"
 FIXTURE = ROOT / "tests" / "fixtures" / "task30" / "standard_pool_logs_route_v1.json"
 PUMPSWAP_FIXTURE = ROOT / "tests" / "fixtures" / "task09" / "pumpswap_idl_subset_v1.json"
+READOUT = ROOT / "docs" / "reports" / "task30" / "standard_pool_logs_route_readout_v1.md"
 
 
 def _sample_value(field: FieldSpec, seed: int, *, pool: bytes) -> object:
@@ -289,6 +291,14 @@ class Task30StandardPoolLogsRouteTests(unittest.TestCase):
                     classify_standard_pool_logs_capture(
                         policy(), capture, self.plan
                     )
+
+    def test_owner_readout_is_exact_and_nontechnical(self) -> None:
+        rendered = render_standard_pool_logs_route(policy())
+        self.assertIn("Стандартный бесплатный WSS-маршрут подготовлен офлайн", rendered)
+        self.assertIn("реальный запуск пока не разрешён", rendered)
+        self.assertIn("отсутствие уведомлений не означает нулевой объём", rendered)
+        self.assertNotIn("api-key", rendered.casefold())
+        self.assertEqual(READOUT.read_text(encoding="utf-8"), rendered)
 
 
 if __name__ == "__main__":
