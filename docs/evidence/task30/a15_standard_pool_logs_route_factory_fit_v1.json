@@ -1,0 +1,52 @@
+{
+  "schema": "smial.task30.standard-pool-logs-route.factory-fit",
+  "schema_version": "1.0",
+  "receipt_id": "T30-A15-STANDARD-POOL-LOGS-ROUTE-FACTORY-FIT-001",
+  "task_id": "TASK-30",
+  "atom_id": "T30-A15_STANDARD_WSS_POOL_TRADE_ROUTE_V1",
+  "review_scope": "FULL_REVIEW",
+  "verdict": "PASS_WITH_LIMITATIONS",
+  "mission": "PASS",
+  "research_truth": "PASS",
+  "flexibility": "PASS",
+  "compatibility_history": "PASS",
+  "efficiency": "PASS",
+  "owner_operability": "PASS",
+  "monitoring_recovery": "PASS_WITH_LIMITATIONS",
+  "reuse_first": "PASS",
+  "execution_to_cashflow": "NOT_APPLICABLE_YET",
+  "red_team": "PASS",
+  "findings": {
+    "mission": "The route tests the next non-reconstructable data boundary for RC001 without promoting a technical capture into alpha evidence.",
+    "research_truth": "No notification, transport loss and truncation remain UNKNOWN; missing is never zero, flat, empty or complete.",
+    "flexibility": "The provider binder is narrow and replaceable while the pinned PumpSwap decoder and truth classification remain reusable.",
+    "compatibility_history": "The route extends TASK-09 decoding and TASK-30 bounded-capture controls without rewriting prior receipts or negative evidence.",
+    "efficiency": "Standard Helius WSS and the existing decoder are wrapped before any new provider, dependency, generic platform or RPC enrichment.",
+    "owner_operability": "A deterministic Russian readout exposes the limits and exact future gate without endpoint or credential disclosure.",
+    "monitoring_recovery": "Foreground-only monitoring and fail-closed UNKNOWN are specified; live recovery and reconciliation are untested and remain outside A15.",
+    "reuse_first": "Existing BoundProbeRequest, the pinned PumpSwap IDL and parse_logs_notification are reused directly.",
+    "execution_to_cashflow": "A15 is read-only data-route preparation and makes no execution, settlement, PnL or NetReturn claim.",
+    "red_team": "Adversarial tests cover target widening, cap/type drift, subscription drift, duplicate signatures, pool mismatch, unknown keys, truncation and transport loss."
+  },
+  "limitation": "No real pool observation, interval coverage or PIT-admissible panel exists yet.",
+  "product_horizon": {
+    "now": {
+      "candidate": "ONE_EXACT_FOREGROUND_STANDARD_WSS_PILOT",
+      "value": "Determine whether exact-pool PumpSwap trade logs are observable through the free standard route.",
+      "evidence": "Offline wire binding and decoder classification pass deterministically.",
+      "cost_risk": "One bounded foreground connection; possible no-observation or transport UNKNOWN.",
+      "owner": "GOAL_OWNER",
+      "activation_trigger": "Exact owner phrase is approved after A15 delivery."
+    },
+    "watch": {
+      "candidate": "RPC_ENRICHMENT_OR_REPLAY_ROUTE",
+      "value": "Fill only a named field or recovery gap proven by retained successful logs.",
+      "evidence": "No such gap is observed yet.",
+      "cost_risk": "Adds credits, complexity and a second truth surface.",
+      "owner": "TECH_LEAD",
+      "activation_trigger": "An exact retained pool trade leaves the named consumer blocked on a specific missing field or recoverability gap."
+    }
+  },
+  "project_sources_disposition": "NO_CHANGE",
+  "state_change": "NONE"
+}

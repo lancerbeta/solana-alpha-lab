@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import copy
 import base64
+import hashlib
 import json
 import struct
 import sys
@@ -37,6 +38,36 @@ SCHEMA = ROOT / "catalog" / "schemas" / "task30_standard_pool_logs_route.schema.
 FIXTURE = ROOT / "tests" / "fixtures" / "task30" / "standard_pool_logs_route_v1.json"
 PUMPSWAP_FIXTURE = ROOT / "tests" / "fixtures" / "task09" / "pumpswap_idl_subset_v1.json"
 READOUT = ROOT / "docs" / "reports" / "task30" / "standard_pool_logs_route_readout_v1.md"
+TASK = ROOT / "docs" / "tasks" / "TASK-30-standard-pool-logs-route.md"
+CONTRACT = ROOT / "docs" / "contracts" / "task30_standard_pool_logs_route_contract_v1.md"
+MODULE = ROOT / "src" / "solana_alpha_lab" / "task30_standard_pool_logs_route.py"
+SCRIPT = ROOT / "scripts" / "show_task30_standard_pool_logs_route.py"
+ACCEPTANCE = ROOT / "docs" / "evidence" / "task30" / "a15_standard_pool_logs_route_acceptance_v1.json"
+FACTORY_FIT = ROOT / "docs" / "evidence" / "task30" / "a15_standard_pool_logs_route_factory_fit_v1.json"
+CATALOG = ROOT / "catalog" / "assets" / "core.yaml"
+
+ARTIFACTS = {
+    "contract": CONTRACT,
+    "configuration": CONFIG,
+    "schema": SCHEMA,
+    "module": MODULE,
+    "fixture": FIXTURE,
+    "test": Path(__file__),
+    "script": SCRIPT,
+    "report": READOUT,
+}
+CATALOG_IDS = {
+    "CONTRACT-T30-STANDARD-POOL-LOGS-ROUTE-001": CONTRACT,
+    "CONFIG-T30-STANDARD-POOL-LOGS-ROUTE-001": CONFIG,
+    "SCHEMA-T30-STANDARD-POOL-LOGS-ROUTE-001": SCHEMA,
+    "MODULE-T30-STANDARD-POOL-LOGS-ROUTE-001": MODULE,
+    "FIXTURE-T30-STANDARD-POOL-LOGS-ROUTE-001": FIXTURE,
+    "TEST-T30-STANDARD-POOL-LOGS-ROUTE-001": Path(__file__),
+    "SCRIPT-T30-STANDARD-POOL-LOGS-ROUTE-001": SCRIPT,
+    "REPORT-T30-STANDARD-POOL-LOGS-ROUTE-001": READOUT,
+    "EVIDENCE-T30-A15-STANDARD-POOL-LOGS-ROUTE-001": ACCEPTANCE,
+    "EVIDENCE-T30-A15-STANDARD-POOL-LOGS-ROUTE-FACTORY-FIT-001": FACTORY_FIT,
+}
 
 
 def _sample_value(field: FieldSpec, seed: int, *, pool: bytes) -> object:
@@ -125,6 +156,10 @@ def policy() -> dict[str, object]:
     loaded = yaml.safe_load(CONFIG.read_text(encoding="utf-8"))
     assert isinstance(loaded, dict)
     return loaded
+
+
+def sha256(path: Path) -> str:
+    return hashlib.sha256(path.read_bytes()).hexdigest()
 
 
 class Task30StandardPoolLogsRouteTests(unittest.TestCase):
@@ -264,6 +299,29 @@ class Task30StandardPoolLogsRouteTests(unittest.TestCase):
             ):
                 self.assertIs(result[key], False)
 
+    def test_typed_subscription_rejection_is_terminal_without_retry(self) -> None:
+        acknowledgement = json.dumps(
+            {
+                "error": {"code": -32602, "message": "synthetic rejection"},
+                "id": "task30-a15-pool-logs-subscribe",
+                "jsonrpc": "2.0",
+            },
+            sort_keys=True,
+            separators=(",", ":"),
+        ).encode()
+        result = classify_standard_pool_logs_capture(
+            policy(),
+            StandardPoolLogsCapture(
+                acknowledgement=acknowledgement,
+                notifications=(),
+                terminal_class="BOUND_REACHED",
+            ),
+            self.plan,
+        )
+        self.assertEqual(result["terminal_state"], "SUBSCRIPTION_REJECTED")
+        self.assertIs(result["retry"], False)
+        self.assertIs(result["reconnect"], False)
+
     def test_classifier_fails_closed_on_identity_or_schema_drift(self) -> None:
         wrong_request = json.dumps(
             {"id": "wrong", "jsonrpc": "2.0", "result": 77},
@@ -299,6 +357,36 @@ class Task30StandardPoolLogsRouteTests(unittest.TestCase):
         self.assertIn("отсутствие уведомлений не означает нулевой объём", rendered)
         self.assertNotIn("api-key", rendered.casefold())
         self.assertEqual(READOUT.read_text(encoding="utf-8"), rendered)
+
+    def test_acceptance_is_hash_bound_and_catalogued_without_promotion(self) -> None:
+        receipt = json.loads(ACCEPTANCE.read_text(encoding="utf-8"))
+        self.assertEqual(
+            receipt["decision"],
+            "OFFLINE_STANDARD_POOL_LOGS_ROUTE_READY_FOR_OWNER_GATE",
+        )
+        self.assertEqual(receipt["validation_status"], "PASS_WITH_LIMITATIONS")
+        self.assertEqual(receipt["state_change"], "NONE")
+        self.assertEqual(receipt["project_sources_disposition"]["kind"], "NO_CHANGE")
+        self.assertEqual(set(receipt["artifact_bindings"]), set(ARTIFACTS))
+        for artifact_id, path in ARTIFACTS.items():
+            binding = receipt["artifact_bindings"][artifact_id]
+            self.assertEqual(binding["path"], path.relative_to(ROOT).as_posix())
+            self.assertEqual(binding["sha256"], sha256(path))
+        self.assertTrue(all(value in (0, False) for value in receipt["authority"].values()))
+        self.assertTrue(all(value is False for value in receipt["non_claims"].values()))
+
+        factory_fit = json.loads(FACTORY_FIT.read_text(encoding="utf-8"))
+        self.assertEqual(factory_fit["review_scope"], "FULL_REVIEW")
+        self.assertEqual(factory_fit["verdict"], "PASS_WITH_LIMITATIONS")
+        self.assertEqual(factory_fit["state_change"], "NONE")
+
+        catalog = yaml.safe_load(CATALOG.read_text(encoding="utf-8"))
+        records = {record["asset_id"]: record for record in catalog["records"]}
+        for asset_id, path in CATALOG_IDS.items():
+            self.assertEqual(
+                records[asset_id]["location"]["repository_path"],
+                path.relative_to(ROOT).as_posix(),
+            )
 
 
 if __name__ == "__main__":

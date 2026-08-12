@@ -1,0 +1,59 @@
+{
+  "schema": "smial.task30.standard-pool-logs-route.acceptance",
+  "schema_version": "1.0",
+  "receipt_id": "T30-A15-STANDARD-POOL-LOGS-ROUTE-ACCEPTANCE-001",
+  "task_id": "TASK-30",
+  "atom_id": "T30-A15_STANDARD_WSS_POOL_TRADE_ROUTE_V1",
+  "validation_status": "PASS_WITH_LIMITATIONS",
+  "state_change": "NONE",
+  "decision": "OFFLINE_STANDARD_POOL_LOGS_ROUTE_READY_FOR_OWNER_GATE",
+  "consumer": "RC001-H07-H01-LIQUIDITY-RETENTION",
+  "artifact_bindings": {
+    "contract": {"path": "docs/contracts/task30_standard_pool_logs_route_contract_v1.md", "sha256": "a40187c37aa7f50ff60d971ed9385158fca0473f0f29298136d85f873e084bc1"},
+    "configuration": {"path": "configs/task30_standard_pool_logs_route_v1.yaml", "sha256": "9a8295c90a67106d4294af4f94b0519271e8dfcfd0f7169fae48ab5ed8d347c4"},
+    "schema": {"path": "catalog/schemas/task30_standard_pool_logs_route.schema.json", "sha256": "b4a732947e66360b96335c8ab656e8a64844cc476db154c29a04de519866a5df"},
+    "module": {"path": "src/solana_alpha_lab/task30_standard_pool_logs_route.py", "sha256": "c7509e646cb0f37b430ba951b7f478e3f01d9df503272f81895f41566bfdc63d"},
+    "fixture": {"path": "tests/fixtures/task30/standard_pool_logs_route_v1.json", "sha256": "2c7487a3d95d64fa8a65625874bfe215630dda2419ec62795ed80b507387850a"},
+    "test": {"path": "tests/test_task30_standard_pool_logs_route.py", "sha256": "53a97de2bfa6a20bfe49e4c3b96377d60df0c10a60d946003023b9a4ee8e6471"},
+    "script": {"path": "scripts/show_task30_standard_pool_logs_route.py", "sha256": "4c4968c5cc1b03821984eba8f89ee1a34a13b8d4d0d043d621148ba6c4a62123"},
+    "report": {"path": "docs/reports/task30/standard_pool_logs_route_readout_v1.md", "sha256": "a704b330c85cfeb763b60e171ed164930036395eec292c994be0c3ea0f0f50c7"}
+  },
+  "authority": {
+    "provider_api_rpc_wss_calls": 0,
+    "credential_reads": 0,
+    "raw_external_writes": 0,
+    "scheduler_or_background_processes": 0,
+    "dependency_changes": 0,
+    "r2_r3_access": 0,
+    "wallet_signer_transaction_actions": 0,
+    "cash_spend_usd_cents": 0,
+    "task30_trial_or_acceptance_actions": 0
+  },
+  "non_claims": {
+    "external_capture_authorized": false,
+    "provider_observation_present": false,
+    "interval_complete": false,
+    "empty_interval": false,
+    "zero_volume": false,
+    "pit_admissible": false,
+    "h07_h01_evidence": false,
+    "task30_trial": false,
+    "execution": false,
+    "settlement": false,
+    "pnl": false,
+    "numeric_netreturn": false,
+    "unknown_reconciled": false
+  },
+  "next_boundary": {
+    "kind": "ONE_SEPARATELY_AUTHORIZED_FOREGROUND_EXTERNAL_PILOT",
+    "owner_input_required": true,
+    "rpc_followups": 0,
+    "retry": false,
+    "reconnect": false,
+    "fallback": false
+  },
+  "project_sources_disposition": {
+    "kind": "NO_CHANGE",
+    "reason": "A15 prepares an offline route and does not change the canonical Project Sources release."
+  }
+}
