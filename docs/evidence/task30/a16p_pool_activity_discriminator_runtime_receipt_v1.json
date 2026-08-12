@@ -1,0 +1,157 @@
+{
+  "schema": "smial.task30.a16p-pool-activity-discriminator-runtime.receipt",
+  "schema_version": "1.0",
+  "receipt_id": "T30-A16P-POOL-ACTIVITY-DISCRIMINATOR-RUNTIME-001",
+  "task_id": "TASK-30",
+  "atom_id": "T30-A16P_POOL_ACTIVITY_DISCRIMINATOR_RUNTIME_V1",
+  "as_of": "2026-08-12",
+  "repository_base": {
+    "main_commit": "2000a0844604489c1878e2983ae4b147f8c94398",
+    "tree": "2b2e576d3cfccb26fecf8462a48039aa14578d78"
+  },
+  "authorization": {
+    "owner_gate_consumed": true,
+    "max_requests": 1,
+    "limit": 1000,
+    "commitment": "confirmed",
+    "estimated_credit_cap": 1,
+    "retry": false,
+    "fallback": false,
+    "transaction_followups": 0
+  },
+  "target": {
+    "network": "solana",
+    "pool_address": "URqx24yyYxtXXhTbBQnbtPLhtLWYoaDaRxuQuLpNS3S",
+    "provider": "HELIUS_STANDARD_RPC",
+    "method": "getSignaturesForAddress"
+  },
+  "run": {
+    "run_id": "20260812T202913Z-b1156d2f",
+    "logical_run_root": "local/task30_pool_activity_discriminator/run=20260812T202913Z-b1156d2f",
+    "terminal_at": "2026-08-12T20:29:15.738414Z",
+    "request_count": 1,
+    "estimated_credits_conservative": 1,
+    "http_status": null,
+    "transport_terminal_class": "DNS_OR_TLS",
+    "transport_error_class": "http_connection_failed",
+    "terminal_state": "MALFORMED_OR_RPC_ERROR_UNKNOWN",
+    "unknown": true,
+    "raw_retention": "A4_EXACT_RETAINED"
+  },
+  "retained_evidence": {
+    "raw_git_status": "OUTSIDE_GIT_IGNORED_A4",
+    "raw_manifest_sha256": "51fe7f6b97f46adf72a3dfc78ffcc3d68d25315f4360b4dccd511006ac9cfb90",
+    "terminal_receipt_sha256": "c62e6120bb6206cdb811a4a6884e36902823de9bc4bce2421ac85ca154411850",
+    "raw_response_bytes": 0,
+    "raw_response_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "secret_retention_check": "PASS"
+  },
+  "root_cause": {
+    "classification": "TRANSIENT_LOCAL_NETWORK_FAILURE_SUPPORTED",
+    "owner_context": "The owner reported an internet outage during the attempt.",
+    "evidence": "The authorized call ended before HTTP response with DNS_OR_TLS; a later keyless probe from the same local environment resolved DNS and opened TCP 443.",
+    "helius_endpoint_defect_supported": false,
+    "helius_rpc_method_defect_supported": false,
+    "pool_activity_in_window": "UNKNOWN"
+  },
+  "post_failure_route_preflight": {
+    "credential_read": false,
+    "provider_rpc_calls": 0,
+    "raw_market_evidence_written": false,
+    "dns_resolved": true,
+    "resolved_address_count": 2,
+    "tcp_443": true,
+    "observed_after_failed_attempt": true,
+    "purpose": "NETWORK_DIAGNOSTIC_ONLY_NOT_MARKET_EVIDENCE"
+  },
+  "official_documentation_check": {
+    "as_of": "2026-08-12",
+    "endpoint_matches": true,
+    "method_matches": true,
+    "limit_1000_supported": true,
+    "newest_first_documented": true,
+    "credit_cost_documented": 1,
+    "source_classes": ["HELIUS_OFFICIAL_RPC_GUIDE", "HELIUS_OFFICIAL_CREDITS"]
+  },
+  "decision": {
+    "value": "ATTEMPT_NOT_DECISION_USABLE_NETWORK_FAILURE",
+    "same_gate_retry_authorized": false,
+    "task30_trial": false,
+    "task30_acceptance": false,
+    "route_closed": false,
+    "reuse_first_outcome": "WRAP",
+    "recovery": "Future credentialed runtime must pass a keyless DNS plus TCP-443 preflight before credential read, intent publication or request-budget consumption."
+  },
+  "artifact_bindings": {
+    "module": {
+      "path": "src/solana_alpha_lab/task30_pool_activity_discriminator_runtime.py",
+      "sha256": "0022b678ce9a02a619d51803c5737dd2340fe4f55ecf8b9cf9eb455eb388f520"
+    },
+    "script": {
+      "path": "scripts/run_task30_pool_activity_discriminator.py",
+      "sha256": "8b43b4b9f95d8c095a336842b0df67a16a757034d829ec0adb66c842d553f37b"
+    },
+    "test": {
+      "path": "tests/test_task30_pool_activity_discriminator_runtime.py",
+      "sha256": "76f4ddccbe2d16e650217cfdcd2c63d175238803141163b1b7f31a0564fa58c7"
+    }
+  },
+  "authority_and_cost": {
+    "provider_api_rpc_wss_calls": 1,
+    "credential_reads": 1,
+    "post_failure_provider_calls": 0,
+    "cash_spend_usd": 0,
+    "wallet_signer_transaction_actions": 0,
+    "task30_trial_or_acceptance_actions": 0,
+    "credit_estimate_is_not_billing_claim": true
+  },
+  "non_claims": {
+    "pool_inactive": false,
+    "pool_activity": false,
+    "pumpswap_trade": false,
+    "price": false,
+    "volume": false,
+    "empty_interval": false,
+    "interval_complete": false,
+    "pit_panel": false,
+    "provider_reliability": false,
+    "h07_h01_evidence": false,
+    "alpha": false,
+    "strategy": false,
+    "execution": false,
+    "pnl": false,
+    "numeric_netreturn": false
+  },
+  "factory_fit_review": {
+    "scope": "FULL_REVIEW",
+    "verdict": "PASS_WITH_LIMITATIONS",
+    "mission": "PASS_WITH_LIMITATIONS",
+    "research_truth": "PASS",
+    "flexibility": "PASS",
+    "compatibility_history": "PASS",
+    "efficiency": "PASS_WITH_PATCH",
+    "owner_operability": "PASS_WITH_PATCH",
+    "monitoring_recovery": "PASS_WITH_PATCH",
+    "reuse_first": "PASS",
+    "execution_to_cashflow": "NOT_APPLICABLE_YET",
+    "red_team": "PASS",
+    "finding": "The failed network attempt is retained as UNKNOWN; the reusable runtime now gates all credentialed execution behind a zero-credit DNS and TCP preflight."
+  },
+  "product_horizon": {
+    "now": {
+      "candidate": "NO_REPEAT_UNDER_CONSUMED_GATE",
+      "value": "Avoid spending attention on a second identical request without new authority.",
+      "activation_trigger": "A separately selected next atom establishes whether another external observation still has decision value."
+    },
+    "watch": {
+      "candidate": "SHARED_EXTERNAL_ROUTE_PREFLIGHT",
+      "value": "Reuse DNS, TCP, credential-presence and endpoint-shape checks across later provider adapters.",
+      "activation_trigger": "A second credentialed adapter needs the same preflight or another external attempt is lost to local network health."
+    }
+  },
+  "project_sources_disposition": {
+    "kind": "NO_CHANGE",
+    "reason": "A16P produced a network-failure UNKNOWN and does not change canonical TASK-30 status."
+  },
+  "state_change": "NONE"
+}

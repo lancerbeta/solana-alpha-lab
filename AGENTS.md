@@ -163,6 +163,24 @@ permission changes, VPS actions, package adoption, deployment,
 wallet/signer/transaction actions, and any other external side effect remain
 separately gated.
 
+Before building or invoking an external provider route, resolve its stable ID
+through `PROVIDER_ROUTE_CAPABILITY_REGISTRY_V1` at
+`configs/provider_route_capability_registry_v1.yaml`. Reuse only an observed
+transport boundary that fits the exact consumer and current authority. A
+missing record is `REGISTRY_GAP`, not provider unavailability; a stale or
+failed record requires the declared preflight and a new bounded authority gate.
+The registry grants no call, credential, retry, fallback or provider-selection
+authority.
+
+When a credentialed provider attempt is bounded by a one-shot/request cap and
+current local network health is uncertain, run a credential-free route
+preflight first: DNS resolution, TCP reachability to the already allowlisted
+host/port, and current official endpoint/method confirmation. A failed
+preflight reads no credential, writes no market evidence and does not consume
+the external attempt. It stops before the provider call. This is an ordering
+rule, not provider authority, retry authority or a substitute for exact raw
+retention after a real attempt.
+
 ## PRE_GIT_PROVENANCE
 
 - Exact imported bytes live under `docs/evidence/pre_git/`.

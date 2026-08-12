@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import copy
+import hashlib
 import json
 import sys
 import unittest
@@ -23,6 +24,25 @@ from solana_alpha_lab.provider_route_capability_registry import (
 
 REGISTRY = ROOT / "configs/provider_route_capability_registry_v1.yaml"
 SCHEMA = ROOT / "catalog/schemas/provider_route_capability_registry.schema.json"
+MODULE = ROOT / "src/solana_alpha_lab/provider_route_capability_registry.py"
+TEST = ROOT / "tests/test_provider_route_capability_registry.py"
+AGENTS = ROOT / "AGENTS.md"
+ACCEPTANCE = (
+    ROOT
+    / "docs/evidence/task30/a16r1_provider_route_capability_registry_acceptance_v1.json"
+)
+CATALOG_CORE = ROOT / "catalog/assets/core.yaml"
+REQUIRED_CATALOG_ASSETS = {
+    "CONFIG-PROVIDER-ROUTE-CAPABILITY-REGISTRY-001": REGISTRY,
+    "SCHEMA-PROVIDER-ROUTE-CAPABILITY-REGISTRY-001": SCHEMA,
+    "MODULE-PROVIDER-ROUTE-CAPABILITY-REGISTRY-001": MODULE,
+    "TEST-PROVIDER-ROUTE-CAPABILITY-REGISTRY-001": TEST,
+    "EVIDENCE-T30-A16R1-PROVIDER-ROUTE-CAPABILITY-REGISTRY-001": ACCEPTANCE,
+    "EVIDENCE-T30-A16P-POOL-ACTIVITY-DISCRIMINATOR-RUNTIME-002": (
+        ROOT
+        / "docs/evidence/task30/a16p_pool_activity_discriminator_runtime_receipt_v2.json"
+    ),
+}
 
 
 def registry() -> dict[str, object]:
@@ -37,6 +57,10 @@ def schema() -> dict[str, object]:
     if not isinstance(value, dict):
         raise AssertionError("schema fixture must be a mapping")
     return value
+
+
+def sha256(path: Path) -> str:
+    return hashlib.sha256(path.read_bytes()).hexdigest()
 
 
 class ProviderRouteCapabilityRegistryTests(unittest.TestCase):
@@ -156,6 +180,39 @@ class ProviderRouteCapabilityRegistryTests(unittest.TestCase):
     def test_unknown_route_is_registry_gap_not_unavailability(self) -> None:
         with self.assertRaisesRegex(ProviderRouteRegistryError, "REGISTRY_GAP"):
             resolve_provider_route(registry(), "UNKNOWN-ROUTE")
+
+    def test_external_route_policy_points_to_registry_before_transport(self) -> None:
+        agents = AGENTS.read_text(encoding="utf-8")
+        self.assertIn("PROVIDER_ROUTE_CAPABILITY_REGISTRY_V1", agents)
+        self.assertIn("configs/provider_route_capability_registry_v1.yaml", agents)
+        self.assertIn("REGISTRY_GAP", agents)
+
+    def test_acceptance_binds_registry_schema_module_and_test(self) -> None:
+        receipt = json.loads(ACCEPTANCE.read_text(encoding="utf-8"))
+        self.assertEqual(
+            receipt["decision"], "REGISTRY_VALIDATED_NO_RUNTIME_AUTHORITY"
+        )
+        self.assertEqual(
+            receipt["runtime_observation"]["provider_calls"],
+            {"dexscreener_keyless_get": 1, "helius_rpc": 1, "helius_wss": 0},
+        )
+        for binding in receipt["artifact_bindings"].values():
+            artifact = ROOT / binding["path"]
+            self.assertTrue(artifact.is_file(), binding["path"])
+            self.assertEqual(binding["sha256"], sha256(artifact))
+
+    def test_catalog_resolves_registry_and_a16p_v2_assets_by_stable_id(self) -> None:
+        catalog = yaml.safe_load(CATALOG_CORE.read_text(encoding="utf-8"))
+        self.assertIsInstance(catalog, dict)
+        catalog_records = catalog["records"]
+        self.assertIsInstance(catalog_records, list)
+        records = {record["asset_id"]: record for record in catalog_records}
+        for asset_id, path in REQUIRED_CATALOG_ASSETS.items():
+            with self.subTest(asset_id=asset_id):
+                self.assertIn(asset_id, records)
+                self.assertEqual(
+                    records[asset_id]["integrity"]["sha256"], sha256(path)
+                )
 
 
 if __name__ == "__main__":

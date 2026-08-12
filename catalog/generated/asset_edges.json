@@ -388,6 +388,11 @@
       "target_asset_id": "CONTRACT-OWNER-AUTHORITY-PACKET-001"
     },
     {
+      "source_asset_id": "CONFIG-PROVIDER-ROUTE-CAPABILITY-REGISTRY-001",
+      "relation": "validated_by",
+      "target_asset_id": "TEST-PROVIDER-ROUTE-CAPABILITY-REGISTRY-001"
+    },
+    {
       "source_asset_id": "CONFIG-T20-COLLECTION-SPEC-001",
       "relation": "governed_by",
       "target_asset_id": "CONTRACT-T20-COLLECTION-SPEC-001"
@@ -3343,6 +3348,36 @@
       "target_asset_id": "TEST-T30-POOL-ACTIVITY-DISCRIMINATOR-001"
     },
     {
+      "source_asset_id": "EVIDENCE-T30-A16P-POOL-ACTIVITY-DISCRIMINATOR-RUNTIME-001",
+      "relation": "derived_from",
+      "target_asset_id": "EVIDENCE-T30-A16-POOL-ACTIVITY-DISCRIMINATOR-001"
+    },
+    {
+      "source_asset_id": "EVIDENCE-T30-A16P-POOL-ACTIVITY-DISCRIMINATOR-RUNTIME-001",
+      "relation": "validated_by",
+      "target_asset_id": "TEST-T30-POOL-ACTIVITY-DISCRIMINATOR-RUNTIME-001"
+    },
+    {
+      "source_asset_id": "EVIDENCE-T30-A16P-POOL-ACTIVITY-DISCRIMINATOR-RUNTIME-002",
+      "relation": "derived_from",
+      "target_asset_id": "EVIDENCE-T30-A16P-POOL-ACTIVITY-DISCRIMINATOR-RUNTIME-001"
+    },
+    {
+      "source_asset_id": "EVIDENCE-T30-A16P-POOL-ACTIVITY-DISCRIMINATOR-RUNTIME-002",
+      "relation": "validated_by",
+      "target_asset_id": "TEST-T30-POOL-ACTIVITY-DISCRIMINATOR-RUNTIME-001"
+    },
+    {
+      "source_asset_id": "EVIDENCE-T30-A16R1-PROVIDER-ROUTE-CAPABILITY-REGISTRY-001",
+      "relation": "derived_from",
+      "target_asset_id": "CONFIG-PROVIDER-ROUTE-CAPABILITY-REGISTRY-001"
+    },
+    {
+      "source_asset_id": "EVIDENCE-T30-A16R1-PROVIDER-ROUTE-CAPABILITY-REGISTRY-001",
+      "relation": "validated_by",
+      "target_asset_id": "TEST-PROVIDER-ROUTE-CAPABILITY-REGISTRY-001"
+    },
+    {
       "source_asset_id": "EVIDENCE-T30-A2-CATALOG-FACTORY-FIT-001",
       "relation": "derived_from",
       "target_asset_id": "EVIDENCE-T30-A1-BOUNDARY-SEMANTICS-001"
@@ -4228,6 +4263,11 @@
       "target_asset_id": "EVIDENCE-OWNER-AUTHORITY-PACKET-A1-001"
     },
     {
+      "source_asset_id": "MODULE-PROVIDER-ROUTE-CAPABILITY-REGISTRY-001",
+      "relation": "governed_by",
+      "target_asset_id": "CONFIG-PROVIDER-ROUTE-CAPABILITY-REGISTRY-001"
+    },
+    {
       "source_asset_id": "MODULE-T06-STORAGE-API-001",
       "relation": "contains",
       "target_asset_id": "SCRIPT-T06-MANIFESTS-001"
@@ -5028,6 +5068,16 @@
       "target_asset_id": "CONFIG-T30-POOL-ACTIVITY-DISCRIMINATOR-001"
     },
     {
+      "source_asset_id": "MODULE-T30-POOL-ACTIVITY-DISCRIMINATOR-RUNTIME-001",
+      "relation": "depends_on",
+      "target_asset_id": "MODULE-T08-LIFECYCLE-DISCOVERY-TRANSPORT-001"
+    },
+    {
+      "source_asset_id": "MODULE-T30-POOL-ACTIVITY-DISCRIMINATOR-RUNTIME-001",
+      "relation": "depends_on",
+      "target_asset_id": "MODULE-T30-POOL-ACTIVITY-DISCRIMINATOR-001"
+    },
+    {
       "source_asset_id": "MODULE-T30-REUSE-FIRST-HISTORY-ROUTE-001",
       "relation": "governed_by",
       "target_asset_id": "CONFIG-T30-REUSE-FIRST-HISTORY-ROUTE-001"
@@ -5541,6 +5591,11 @@
       "source_asset_id": "SCHEMA-OWNER-AUTHORITY-PACKET-001",
       "relation": "governed_by",
       "target_asset_id": "CONTRACT-OWNER-AUTHORITY-PACKET-001"
+    },
+    {
+      "source_asset_id": "SCHEMA-PROVIDER-ROUTE-CAPABILITY-REGISTRY-001",
+      "relation": "governed_by",
+      "target_asset_id": "CONFIG-PROVIDER-ROUTE-CAPABILITY-REGISTRY-001"
     },
     {
       "source_asset_id": "SCHEMA-T05-CANONICAL-DDL-001",
@@ -6373,6 +6428,11 @@
       "target_asset_id": "MODULE-T30-NAMED-PARTIAL-CAPTURE-001"
     },
     {
+      "source_asset_id": "SCRIPT-T30-POOL-ACTIVITY-DISCRIMINATOR-RUNTIME-001",
+      "relation": "depends_on",
+      "target_asset_id": "MODULE-T30-POOL-ACTIVITY-DISCRIMINATOR-RUNTIME-001"
+    },
+    {
       "source_asset_id": "SCRIPT-T30-ROUTE-AVAILABILITY-PROBE-001",
       "relation": "depends_on",
       "target_asset_id": "MODULE-T30-ROUTE-AVAILABILITY-PROBE-001"
@@ -6521,6 +6581,16 @@
       "source_asset_id": "TEST-OWNER-AUTHORITY-PACKET-A2-001",
       "relation": "depends_on",
       "target_asset_id": "EVIDENCE-OWNER-AUTHORITY-PACKET-A2-001"
+    },
+    {
+      "source_asset_id": "TEST-PROVIDER-ROUTE-CAPABILITY-REGISTRY-001",
+      "relation": "depends_on",
+      "target_asset_id": "MODULE-PROVIDER-ROUTE-CAPABILITY-REGISTRY-001"
+    },
+    {
+      "source_asset_id": "TEST-PROVIDER-ROUTE-CAPABILITY-REGISTRY-001",
+      "relation": "depends_on",
+      "target_asset_id": "SCHEMA-PROVIDER-ROUTE-CAPABILITY-REGISTRY-001"
     },
     {
       "source_asset_id": "TEST-T04-CORE-STACK-001",
@@ -7931,6 +8001,11 @@
       "source_asset_id": "TEST-T30-POOL-ACTIVITY-DISCRIMINATOR-001",
       "relation": "depends_on",
       "target_asset_id": "SCHEMA-T30-POOL-ACTIVITY-DISCRIMINATOR-001"
+    },
+    {
+      "source_asset_id": "TEST-T30-POOL-ACTIVITY-DISCRIMINATOR-RUNTIME-001",
+      "relation": "depends_on",
+      "target_asset_id": "MODULE-T30-POOL-ACTIVITY-DISCRIMINATOR-RUNTIME-001"
     },
     {
       "source_asset_id": "TEST-T30-REUSE-FIRST-HISTORY-ROUTE-001",
