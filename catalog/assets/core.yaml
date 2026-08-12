@@ -18265,3 +18265,21 @@ records:
   consumers: [TASK-30, FACTORY-001]
   evidence: []
   classification: *t25_internal
+
+- asset_id: EVIDENCE-T30-A15P-STANDARD-POOL-LOGS-RUNTIME-001
+  record_version: '1.0'
+  asset_type: evidence
+  purpose: Sanitized durable receipt for the one owner-authorized Helius Standard WSS exact-pool capture and bounded no-observation result.
+  status: VALIDATED_ACTIVE
+  origin: REPOSITORY
+  as_of: '2026-08-12'
+  truth_owner: TASK-30
+  location: {kind: git_path, logical_uri: 'repo://docs/evidence/task30/a15p_standard_pool_logs_runtime_receipt_v1.json', repository_path: docs/evidence/task30/a15p_standard_pool_logs_runtime_receipt_v1.json}
+  integrity: {kind: sha256, sha256: ee40a42a49bb470b4cde81d5d7b59bbb3209ecfa8aecd9e73b92f01a0beffbf7}
+  access: *t25_read_file
+  relations:
+  - {relation_type: derived_from, target_asset_id: EVIDENCE-T30-A15-STANDARD-POOL-LOGS-ROUTE-001}
+  - {relation_type: validated_by, target_asset_id: TEST-T30-STANDARD-POOL-LOGS-ROUTE-001}
+  consumers: [TASK-30, FACTORY-001]
+  evidence: []
+  classification: *t25_internal

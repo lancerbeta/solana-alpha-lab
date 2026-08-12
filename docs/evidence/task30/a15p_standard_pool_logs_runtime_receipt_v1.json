@@ -1,0 +1,162 @@
+{
+  "schema": "smial.task30.a15p-standard-pool-logs-runtime.receipt",
+  "schema_version": "1.0",
+  "receipt_id": "T30-A15P-STANDARD-POOL-LOGS-RUNTIME-001",
+  "task_id": "TASK-30",
+  "atom_id": "T30-A15P_STANDARD_POOL_LOGS_RUNTIME_V1",
+  "as_of": "2026-08-12",
+  "repository": {
+    "main_commit": "38dde5ceb67415d5cc90cdef405387e6e1d154e3",
+    "tree": "2fced119fcf93d1e298526e2962a60213af202b2",
+    "ci_run": "31575088566",
+    "ci_job": "94045312077"
+  },
+  "authorization": {
+    "owner_gate_consumed": true,
+    "one_shot": true,
+    "foreground_only": true,
+    "max_open_seconds": 600,
+    "max_notifications": 128,
+    "max_stream_bytes": 1000000,
+    "estimated_credit_cap": 21,
+    "retry": false,
+    "reconnect": false,
+    "fallback": false,
+    "scheduler": false,
+    "rpc_followups": 0
+  },
+  "target": {
+    "network": "solana",
+    "pool_address": "URqx24yyYxtXXhTbBQnbtPLhtLWYoaDaRxuQuLpNS3S",
+    "base_mint": "DMwbVy48dWVKGe9z1pcVnwF3HLMLrqWdDLfbvx8RchhK",
+    "quote_mint": "So11111111111111111111111111111111111111112",
+    "dex_id": "pumpswap",
+    "provider": "HELIUS_STANDARD_WSS",
+    "method": "logsSubscribe",
+    "filter": "mentions=[pool]",
+    "commitment": "confirmed"
+  },
+  "run": {
+    "run_id": "20260812T092752Z-f96d593f",
+    "logical_run_root": "local/task30_standard_pool_logs/run=20260812T092752Z-f96d593f",
+    "started_at": "2026-08-12T09:27:52.749910Z",
+    "terminal_at": "2026-08-12T09:37:53.059095Z",
+    "elapsed_seconds": 600,
+    "transport_terminal_class": "BOUND_REACHED",
+    "transport_stop_reason": "ELAPSED_CAP",
+    "terminal_state": "NO_OBSERVATION_UNKNOWN",
+    "unknown": true,
+    "notifications": 0,
+    "decoded_events": 0,
+    "stream_bytes": 71,
+    "estimated_credits": 3,
+    "raw_retention": "A4_EXACT_RETAINED",
+    "interval_complete": false,
+    "zero_volume": false,
+    "empty_interval": false,
+    "pit_admissible": false,
+    "task30_trial": false
+  },
+  "provider_acknowledgement": {
+    "observed": true,
+    "kind": "SUBSCRIPTION_ACCEPTED",
+    "request_id_matched": true,
+    "subscription_id_present": true,
+    "disposition": "STANDARD_WSS_ROUTE_TECHNICALLY_AVAILABLE",
+    "pool_activity_in_capture_window": "UNKNOWN"
+  },
+  "retained_evidence": {
+    "raw_git_status": "OUTSIDE_GIT_IGNORED_A4",
+    "raw_hash_check": "PASS",
+    "secret_retention_check": "PASS",
+    "raw_manifest": {
+      "path": "raw_manifest.json",
+      "bytes": 439,
+      "sha256": "94d4644e5f1989d66d4b7ba71eed065c069f2a08af01adb8d15e32179cc4efa3"
+    },
+    "raw_objects": [
+      {
+        "path": "acknowledgement.json",
+        "bytes": 71,
+        "sha256": "3403dc7c4f2b3728b19e08f41522c4471fe2ebd0f007e931d07b13cd84529172",
+        "observed_at": "2026-08-12T09:27:53.436278Z"
+      }
+    ],
+    "attempt_started_sha256": "c77fd9baa7233cd0d13901d0416196977c76a0df06ce19a82a1ff33b128cbfe1",
+    "terminal_receipt_sha256": "0907aef6c9c84c8b7bca8532112f8b9a970230ecc1dccc8fe04205779e12a73e",
+    "execution_harness_sha256": "fcda19c73f684cf6228de415c454114cb3088ec450f68a8f5fc96a4e8e673ba7",
+    "synthetic_test_sha256": "bcc0ad3d8533cc14f4dc58f85331d3fe4ed6adb3c3065f70b88e9ab0002e8920",
+    "synthetic_tests": "2_PASS",
+    "manifest_object_count": 1
+  },
+  "authority_and_cost": {
+    "provider_api_rpc_wss_calls": 1,
+    "credential_reads": 1,
+    "raw_external_data_writes": 1,
+    "raw_data_tracked_in_git": false,
+    "cash_spend_usd": 0,
+    "wallet_signer_transaction_actions": 0,
+    "task30_trial_or_acceptance_actions": 0,
+    "credit_estimate_is_not_billing_claim": true
+  },
+  "decision": {
+    "value": "HELIUS_STANDARD_WSS_AVAILABLE_CAPTURE_YIELD_UNRESOLVED",
+    "evidence_strength": "ACCEPTED_SUBSCRIPTION_PLUS_BOUNDED_NO_NOTIFICATION_WINDOW",
+    "provider_suitability_for_standard_wss": true,
+    "provider_suitability_for_REQUIRED_PANEL": "UNKNOWN",
+    "same_route_retry_authorized": false,
+    "task30_acceptance": false
+  },
+  "non_claims": {
+    "pool_inactive": false,
+    "pool_activity": false,
+    "interval_coverage": false,
+    "empty_interval": false,
+    "zero_volume": false,
+    "market_price": false,
+    "h07_h01_evidence": false,
+    "alpha": false,
+    "strategy": false,
+    "execution": false,
+    "settlement": false,
+    "pnl": false,
+    "numeric_netreturn": false,
+    "unknown_reconciled": false
+  },
+  "factory_fit_review": {
+    "scope": "FULL_REVIEW",
+    "verdict": "PASS_WITH_LIMITATIONS",
+    "mission": "PASS_WITH_LIMITATIONS",
+    "research_truth": "PASS",
+    "owner_operability": "PASS",
+    "monitoring_recovery": "PASS",
+    "reuse_first": "PASS",
+    "execution_to_cashflow": "NOT_APPLICABLE_YET",
+    "red_team": "PASS"
+  },
+  "product_horizon": {
+    "now": {
+      "candidate": "ONE_BOUNDED_POOL_ACTIVITY_DISCRIMINATOR",
+      "value": "Distinguish an inactive ten-minute pool window from a Standard WSS delivery gap before repeating any long capture.",
+      "evidence": "The subscription was accepted, but no notification arrived in 600 seconds.",
+      "cost_risk": "At most one separately authorized read-only pool activity query; no repeat stream and no panel claim.",
+      "owner": "LOCAL_WORK_CODEX_AFTER_EXACT_GATE",
+      "activation_trigger": "A new exact owner gate authorizes one bounded activity discriminator.",
+      "why": "It is cheaper and more decision-changing than another blind ten-minute wait."
+    },
+    "watch": {
+      "candidate": "STANDARD_WSS_SHADOW_COLLECTOR",
+      "value": "Could accumulate forward trade observations only after the route proves useful on an active target.",
+      "evidence": "One accepted subscription is not enough to justify a scheduler or always-on collector.",
+      "cost_risk": "New monitoring, retention, recovery and quota burden.",
+      "owner": "GOAL_OWNER",
+      "activation_trigger": "A bounded activity check proves target activity and a named experiment requires non-reconstructable forward observations.",
+      "why": "Do not build collection infrastructure before demonstrating data yield."
+    }
+  },
+  "project_sources_disposition": {
+    "kind": "NO_CHANGE",
+    "reason": "A15P resolves one technical route but does not accept TASK-30 or change canonical task status."
+  },
+  "state_change": "NONE"
+}
