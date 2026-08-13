@@ -1,0 +1,56 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://lancerbeta.github.io/solana-alpha-lab/schemas/task30_terminal_route_decision.schema.json",
+  "title": "TASK-30 A19 terminal route decision policy",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema", "schema_version", "task_id", "atom_id", "contract_id", "spec_route", "consumer", "route_scope", "decision", "route_closed", "hypothesis_closed", "provider_globally_unavailable", "h07_h01_state", "trial_admissible", "next_owner_gate", "reopen_trigger", "evidence", "authority", "claims", "project_sources_disposition", "state_change"],
+  "properties": {
+    "schema": {"const": "smial.task30.terminal-route-decision.policy"},
+    "schema_version": {"const": "1.0"},
+    "task_id": {"const": "TASK-30"},
+    "atom_id": {"const": "T30-A19_TERMINAL_ROUTE_DECISION_V1"},
+    "contract_id": {"const": "TASK30-A19-TERMINAL-ROUTE-DECISION-V1"},
+    "spec_route": {"const": "PRD_LITE"},
+    "consumer": {"const": "RC001-H07-H01-LIQUIDITY-RETENTION"},
+    "route_scope": {"const": "TASK30_CURRENT_NAMED_PUBLIC_FREE_DATA_ROUTE"},
+    "decision": {"const": "CLOSE_CURRENT_DATA_ROUTE_LIMITED_NEGATIVE_RESULT"},
+    "route_closed": {"const": true},
+    "hypothesis_closed": {"const": false},
+    "provider_globally_unavailable": {"const": false},
+    "h07_h01_state": {"const": "BLOCKED_DATA"},
+    "trial_admissible": {"const": false},
+    "next_owner_gate": {"const": "NONE_UNTIL_NAMED_REOPEN_TRIGGER"},
+    "reopen_trigger": {"const": "NAMED_CONSUMER_PLUS_REPRODUCIBLE_PIT_ROUTE_AND_EXECUTION_TRUTH"},
+    "evidence": {
+      "type": "object", "additionalProperties": false,
+      "required": ["task30_a5r1_birdeye", "task30_a11e_gecko", "task30_a14p_r2", "task30_a15p", "task30_a16p", "task30_a17", "task30_a18_readiness", "task30_a18_runtime"],
+      "properties": {
+        "task30_a5r1_birdeye": {"$ref": "#/$defs/evidence_binding"},
+        "task30_a11e_gecko": {"$ref": "#/$defs/evidence_binding"},
+        "task30_a14p_r2": {"$ref": "#/$defs/evidence_binding"},
+        "task30_a15p": {"$ref": "#/$defs/evidence_binding"},
+        "task30_a16p": {"$ref": "#/$defs/evidence_binding"},
+        "task30_a17": {"$ref": "#/$defs/evidence_binding"},
+        "task30_a18_readiness": {"$ref": "#/$defs/evidence_binding"},
+        "task30_a18_runtime": {"$ref": "#/$defs/evidence_binding"}
+      }
+    },
+    "authority": {"type": "object", "additionalProperties": false, "required": ["provider_api_rpc_wss_calls", "credential_reads", "raw_external_data_writes", "scheduler_or_background_processes", "r2_r3_access", "wallet_signer_transaction_actions", "cash_spend_usd_cents", "task30_trial_or_acceptance_actions"], "properties": {"provider_api_rpc_wss_calls": {"const": 0}, "credential_reads": {"const": 0}, "raw_external_data_writes": {"const": 0}, "scheduler_or_background_processes": {"const": 0}, "r2_r3_access": {"const": 0}, "wallet_signer_transaction_actions": {"const": 0}, "cash_spend_usd_cents": {"const": 0}, "task30_trial_or_acceptance_actions": {"const": 0}}},
+    "claims": {"type": "object", "additionalProperties": false, "required": ["pit_admissible", "h07_h01_evidence", "task30_trial", "price", "volume", "alpha", "strategy", "execution", "settlement", "pnl", "numeric_netreturn", "owner_cashflow", "missing_is_zero_or_flat"], "properties": {"pit_admissible": {"const": false}, "h07_h01_evidence": {"const": false}, "task30_trial": {"const": false}, "price": {"const": false}, "volume": {"const": false}, "alpha": {"const": false}, "strategy": {"const": false}, "execution": {"const": false}, "settlement": {"const": false}, "pnl": {"const": false}, "numeric_netreturn": {"const": false}, "owner_cashflow": {"const": false}, "missing_is_zero_or_flat": {"const": false}}},
+    "project_sources_disposition": {"const": "NO_CHANGE"},
+    "state_change": {"const": "NONE"}
+  },
+  "$defs": {
+    "evidence_binding": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["path", "sha256", "observed_decision"],
+      "properties": {
+        "path": {"type": "string"},
+        "sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+        "observed_decision": {"type": "string"}
+      }
+    }
+  }
+}

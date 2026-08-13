@@ -1,0 +1,11 @@
+{
+  "expected": {
+    "decision": "CLOSE_CURRENT_DATA_ROUTE_LIMITED_NEGATIVE_RESULT",
+    "route_scope": "TASK30_CURRENT_NAMED_PUBLIC_FREE_DATA_ROUTE",
+    "h07_h01_state": "BLOCKED_DATA",
+    "hypothesis_closed": false,
+    "provider_globally_unavailable": false,
+    "next_owner_gate": "NONE_UNTIL_NAMED_REOPEN_TRIGGER",
+    "reopen_trigger": "NAMED_CONSUMER_PLUS_REPRODUCIBLE_PIT_ROUTE_AND_EXECUTION_TRUTH"
+  }
+}

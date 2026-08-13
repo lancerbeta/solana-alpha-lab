@@ -1,0 +1,47 @@
+{
+  "schema": "smial.task30.terminal-route-decision.acceptance",
+  "schema_version": "1.0",
+  "receipt_id": "EVIDENCE-T30-A19-TERMINAL-ROUTE-DECISION-001",
+  "task_id": "TASK-30",
+  "atom_id": "T30-A19_TERMINAL_ROUTE_DECISION_V1",
+  "as_of": "2026-08-13",
+  "entry_gate": "START_WITH_PATCH",
+  "spec_route": "PRD_LITE",
+  "decision": "CLOSE_CURRENT_DATA_ROUTE_LIMITED_NEGATIVE_RESULT",
+  "task_outcome": {
+    "owner_decision": "Stop the current named public/free data-route without confusing route closure with hypothesis closure.",
+    "product_outcome": "Remove the repeated route-pivot loop and leave H07/H01 explicitly BLOCKED_DATA until a reproducible PIT and execution route exists.",
+    "named_consumer": "RC001-H07-H01-LIQUIDITY-RETENTION",
+    "cheapest_falsifier": "A retained or newly named route demonstrably provides PIT-safe history and execution truth under a fresh owner gate.",
+    "user_visible_result": "One searchable terminal readout stating what is closed, what remains unknown and what would reopen it."
+  },
+  "evidence_bindings": {
+    "task30_a5r1_birdeye": {"path": "docs/evidence/task30/a5r1_birdeye_v3_external_read_runtime_receipt_v1.json", "sha256": "a4f69df4dcff2afe88c06828884ec9155af8bfe91b659080cfed74ab1acbcdf1"},
+    "task30_a11e_gecko": {"path": "docs/evidence/task30/a11e_gecko_15m_live_shakedown_runtime_receipt_v1.json", "sha256": "28d246c97a7e6866760683c6e63296f9d310a2cce35ac98be61e107af9f7bcdb"},
+    "task30_a14p_r2": {"path": "docs/evidence/task30/a14p_r2_forward_stream_external_capture_receipt_v1.json", "sha256": "179c2b26c6a6d325388ec04c388fae8efa4adc8ba01639c85c70e5626e405604"},
+    "task30_a15p": {"path": "docs/evidence/task30/a15p_standard_pool_logs_runtime_receipt_v1.json", "sha256": "ee40a42a49bb470b4cde81d5d7b59bbb3209ecfa8aecd9e73b92f01a0beffbf7"},
+    "task30_a16p": {"path": "docs/evidence/task30/a16p_pool_activity_discriminator_runtime_receipt_v2.json", "sha256": "32868bff924719ba364ec0ed07e63436764a4c86032b6624f1e6439656edfe52"},
+    "task30_a17": {"path": "docs/evidence/task30/a17_active_pool_route_yield_acceptance_v1.json", "sha256": "3647b41e13ed4e16da9927de196c39c4feac17bc062f8d17df22d61a2c1bc48e"},
+    "task30_a18_readiness": {"path": "docs/evidence/task30/a18_single_signature_transaction_readiness_acceptance_v1.json", "sha256": "fdad06e5e88f06334c31899416010980e3a2961820640f8e3af65f248a8e6c46"},
+    "task30_a18_runtime": {"path": "docs/evidence/task30/a18_single_signature_transaction_readiness_runtime_receipt_v1.json", "sha256": "eea7b1e1a45aa862bd2a8fb65ba32e430ceeb525c8f8870169986930c6b67448"}
+  },
+  "authority": {"provider_api_rpc_wss_calls": 0, "credential_reads": 0, "raw_external_data_writes": 0, "scheduler_or_background_processes": 0, "r2_r3_access": 0, "wallet_signer_transaction_actions": 0, "cash_spend_usd_cents": 0, "task30_trial_or_acceptance_actions": 0},
+  "non_claims": {"route_close_is_hypothesis_close": false, "provider_globally_unavailable": false, "pit_admissible": false, "h07_h01_evidence": false, "task30_trial": false, "price": false, "volume": false, "execution": false, "settlement": false, "pnl": false, "numeric_netreturn": false, "owner_cashflow": false, "missing_is_zero_or_flat": false},
+  "reopen_trigger": "NAMED_CONSUMER_PLUS_REPRODUCIBLE_PIT_ROUTE_AND_EXECUTION_TRUTH",
+  "factory_fit_review": "FULL_REVIEW",
+  "factory_fit": {"verdict": "PASS_WITH_FOLLOWUP", "follow_up": "Do not reopen the route without a fresh named consumer, exact PIT/execution falsifier and owner gate."},
+  "project_sources_disposition": {"kind": "NO_CHANGE", "reason": "Repository receipt only; no Project Sources activation or canonical TASK-30 acceptance."},
+  "artifact_bindings": {
+    "task": {"path": "docs/tasks/TASK-30-terminal-route-decision.md", "sha256": "4eedb4eb7ae5ccae739ab9c01c02cde5dc1ee51c7a054abfba556023eb0108df"},
+    "contract": {"path": "docs/contracts/task30_terminal_route_decision_contract_v1.md", "sha256": "8c82b58932e98671f7381dac61b5fa27bcd21c8da848338993a2c6a5ee738329"},
+    "configuration": {"path": "configs/task30_terminal_route_decision_v1.yaml", "sha256": "25b5dc077257d27c51903058b2b0dee6cccc1cdff3a3cd0b2f1a10dd67559932"},
+    "schema": {"path": "catalog/schemas/task30_terminal_route_decision.schema.json", "sha256": "01d3fa8013f9146bb1cabf09bca8f879e0408f109b41bfe7686f15930fd64f8e"},
+    "fixture": {"path": "tests/fixtures/task30/terminal_route_decision_v1.json", "sha256": "52a5ae204f21762ffe3d6bc30f626ca0d6a02338588cc5c2bab1d7ed387f84c3"},
+    "module": {"path": "src/solana_alpha_lab/task30_terminal_route_decision.py", "sha256": "fc01424bdf5184dfffc3d608bce642e40d32133603dff3b03554867a4a8e4b73"},
+    "script": {"path": "scripts/show_task30_terminal_route_decision.py", "sha256": "bee3db8c1dbb9ddd6b0ac4becdc6306df9a33f85409c002a9b962fa0d9008fa0"},
+    "report": {"path": "docs/reports/task30/terminal_route_decision_readout_v1.md", "sha256": "c72ae148e69e52237e2cf9563e7897afcb9c4a9b9818456aabd8db47f07c5a00"},
+    "test": {"path": "tests/test_task30_terminal_route_decision.py", "sha256": "5e9ab83a9baad6dd1e4bcbb69ff6f71100fe1e81fbbdee18f1af943d6e403592"}
+  },
+  "state_change": "NONE",
+  "rollback": "Remove only A19 tracked files, registry record and Catalog records; no external state exists."
+}

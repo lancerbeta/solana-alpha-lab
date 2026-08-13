@@ -37,6 +37,152 @@ records:
     contains_secrets: false
     contains_raw_data: false
     sensitivity: INTERNAL_NON_SECRET
+
+- asset_id: CONTRACT-T30-TERMINAL-ROUTE-DECISION-001
+  record_version: '1.0'
+  asset_type: control_document
+  purpose: Versioned offline contract for the bounded terminal decision closing the current TASK-30 public/free data route without closing H07/H01.
+  status: VALIDATED_ACTIVE
+  origin: REPOSITORY
+  as_of: '2026-08-13'
+  truth_owner: TASK-30
+  location: {kind: git_path, logical_uri: 'repo://docs/contracts/task30_terminal_route_decision_contract_v1.md', repository_path: docs/contracts/task30_terminal_route_decision_contract_v1.md}
+  integrity: {kind: sha256, sha256: 8c82b58932e98671f7381dac61b5fa27bcd21c8da848338993a2c6a5ee738329}
+  access: {mode: read_only, method: file, network_required: false, secrets_required: false}
+  relations: [{relation_type: depends_on, target_asset_id: EVIDENCE-T30-A18-SINGLE-SIGNATURE-TRANSACTION-RUNTIME-001}]
+  consumers: [TASK-30, RC001-H07-H01-LIQUIDITY-RETENTION, FACTORY-001]
+  evidence: []
+  search_terms: [A19, TERMINAL_ROUTE_DECISION, CLOSE_CURRENT_DATA_ROUTE_LIMITED_NEGATIVE_RESULT, H07, H01, BLOCKED_DATA]
+  classification: {contains_secrets: false, contains_raw_data: false, sensitivity: INTERNAL_NON_SECRET}
+- asset_id: CONFIG-T30-TERMINAL-ROUTE-DECISION-001
+  record_version: '1.0'
+  asset_type: configuration
+  purpose: Closed decision policy binding all eight prior TASK-30 route receipts and the limited reopen trigger.
+  status: VALIDATED_ACTIVE
+  origin: REPOSITORY
+  as_of: '2026-08-13'
+  truth_owner: TASK-30
+  location: {kind: git_path, logical_uri: 'repo://configs/task30_terminal_route_decision_v1.yaml', repository_path: configs/task30_terminal_route_decision_v1.yaml}
+  integrity: {kind: sha256, sha256: 25b5dc077257d27c51903058b2b0dee6cccc1cdff3a3cd0b2f1a10dd67559932}
+  access: {mode: read_only, method: file, network_required: false, secrets_required: false}
+  relations: [{relation_type: governed_by, target_asset_id: CONTRACT-T30-TERMINAL-ROUTE-DECISION-001}]
+  consumers: [TASK-30, RC001-H07-H01-LIQUIDITY-RETENTION, FACTORY-001]
+  evidence: []
+  search_terms: [A19, TERMINAL_ROUTE_DECISION, BIRDEYE, GECKO, HELIUS, A18, REOPEN_TRIGGER]
+  classification: {contains_secrets: false, contains_raw_data: false, sensitivity: INTERNAL_NON_SECRET}
+- asset_id: SCHEMA-T30-TERMINAL-ROUTE-DECISION-001
+  record_version: '1.0'
+  asset_type: schema
+  purpose: Closed JSON Schema for the A19 terminal route decision policy and non-claims.
+  status: VALIDATED_ACTIVE
+  origin: REPOSITORY
+  as_of: '2026-08-13'
+  truth_owner: TASK-30
+  location: {kind: git_path, logical_uri: 'repo://catalog/schemas/task30_terminal_route_decision.schema.json', repository_path: catalog/schemas/task30_terminal_route_decision.schema.json}
+  integrity: {kind: sha256, sha256: 01d3fa8013f9146bb1cabf09bca8f879e0408f109b41bfe7686f15930fd64f8e}
+  access: {mode: read_only, method: file, network_required: false, secrets_required: false}
+  relations: [{relation_type: governed_by, target_asset_id: CONTRACT-T30-TERMINAL-ROUTE-DECISION-001}]
+  consumers: [TASK-30, FACTORY-001]
+  evidence: []
+  search_terms: [A19, CLOSED_SCHEMA, NON_CLAIMS, BLOCKED_DATA]
+  classification: {contains_secrets: false, contains_raw_data: false, sensitivity: INTERNAL_NON_SECRET}
+- asset_id: FIXTURE-T30-TERMINAL-ROUTE-DECISION-001
+  record_version: '1.0'
+  asset_type: evidence
+  purpose: Deterministic golden owner result for the A19 terminal route decision.
+  status: VALIDATED_ACTIVE
+  origin: REPOSITORY
+  as_of: '2026-08-13'
+  truth_owner: TASK-30
+  location: {kind: git_path, logical_uri: 'repo://tests/fixtures/task30/terminal_route_decision_v1.json', repository_path: tests/fixtures/task30/terminal_route_decision_v1.json}
+  integrity: {kind: sha256, sha256: 52a5ae204f21762ffe3d6bc30f626ca0d6a02338588cc5c2bab1d7ed387f84c3}
+  access: {mode: read_only, method: file, network_required: false, secrets_required: false}
+  relations: [{relation_type: derived_from, target_asset_id: CONFIG-T30-TERMINAL-ROUTE-DECISION-001}]
+  consumers: [TASK-30, FACTORY-001]
+  evidence: []
+  search_terms: [A19, GOLDEN, TERMINAL_DECISION, BLOCKED_DATA]
+  classification: {contains_secrets: false, contains_raw_data: false, sensitivity: INTERNAL_NON_SECRET}
+- asset_id: MODULE-T30-TERMINAL-ROUTE-DECISION-001
+  record_version: '1.0'
+  asset_type: script
+  purpose: Pure fail-closed evaluator and Russian owner readout for the A19 route decision.
+  status: VALIDATED_ACTIVE
+  origin: REPOSITORY
+  as_of: '2026-08-13'
+  truth_owner: TASK-30
+  location: {kind: git_path, logical_uri: 'repo://src/solana_alpha_lab/task30_terminal_route_decision.py', repository_path: src/solana_alpha_lab/task30_terminal_route_decision.py}
+  integrity: {kind: sha256, sha256: fc01424bdf5184dfffc3d608bce642e40d32133603dff3b03554867a4a8e4b73}
+  access: {mode: read_only, method: file, network_required: false, secrets_required: false}
+  relations: [{relation_type: governed_by, target_asset_id: CONFIG-T30-TERMINAL-ROUTE-DECISION-001}, {relation_type: depends_on, target_asset_id: EVIDENCE-T30-A18-SINGLE-SIGNATURE-TRANSACTION-RUNTIME-001}]
+  consumers: [TASK-30, RC001-H07-H01-LIQUIDITY-RETENTION, FACTORY-001]
+  evidence: []
+  search_terms: [A19, EVALUATOR, TERMINAL_ROUTE_DECISION, BLOCKED_DATA]
+  classification: {contains_secrets: false, contains_raw_data: false, sensitivity: INTERNAL_NON_SECRET}
+- asset_id: SCRIPT-T30-TERMINAL-ROUTE-DECISION-001
+  record_version: '1.0'
+  asset_type: script
+  purpose: Read-only CLI rendering the A19 terminal decision in JSON or Russian markdown.
+  status: VALIDATED_ACTIVE
+  origin: REPOSITORY
+  as_of: '2026-08-13'
+  truth_owner: TASK-30
+  location: {kind: git_path, logical_uri: 'repo://scripts/show_task30_terminal_route_decision.py', repository_path: scripts/show_task30_terminal_route_decision.py}
+  integrity: {kind: sha256, sha256: bee3db8c1dbb9ddd6b0ac4becdc6306df9a33f85409c002a9b962fa0d9008fa0}
+  access: {mode: read_only, method: file, network_required: false, secrets_required: false}
+  relations: [{relation_type: depends_on, target_asset_id: MODULE-T30-TERMINAL-ROUTE-DECISION-001}]
+  consumers: [TASK-30, FACTORY-001]
+  evidence: []
+  search_terms: [A19, CLI, OWNER_READOUT, TERMINAL_ROUTE_DECISION]
+  classification: {contains_secrets: false, contains_raw_data: false, sensitivity: INTERNAL_NON_SECRET}
+- asset_id: REPORT-T30-TERMINAL-ROUTE-DECISION-001
+  record_version: '1.0'
+  asset_type: control_document
+  purpose: Checked-in Russian owner report explaining the limited route closure and reopen trigger.
+  status: VALIDATED_ACTIVE
+  origin: REPOSITORY
+  as_of: '2026-08-13'
+  truth_owner: TASK-30
+  location: {kind: git_path, logical_uri: 'repo://docs/reports/task30/terminal_route_decision_readout_v1.md', repository_path: docs/reports/task30/terminal_route_decision_readout_v1.md}
+  integrity: {kind: sha256, sha256: c72ae148e69e52237e2cf9563e7897afcb9c4a9b9818456aabd8db47f07c5a00}
+  access: {mode: read_only, method: file, network_required: false, secrets_required: false}
+  relations: [{relation_type: derived_from, target_asset_id: MODULE-T30-TERMINAL-ROUTE-DECISION-001}]
+  consumers: [TASK-30, RC001-H07-H01-LIQUIDITY-RETENTION, FACTORY-001]
+  evidence: []
+  search_terms: [A19, OWNER_REPORT, LIMITED_NEGATIVE_RESULT, BLOCKED_DATA]
+  classification: {contains_secrets: false, contains_raw_data: false, sensitivity: INTERNAL_NON_SECRET}
+- asset_id: TEST-T30-TERMINAL-ROUTE-DECISION-001
+  record_version: '1.0'
+  asset_type: script
+  purpose: Deterministic schema, hash-binding, adversarial non-claim and Catalog tests for A19.
+  status: VALIDATED_ACTIVE
+  origin: REPOSITORY
+  as_of: '2026-08-13'
+  truth_owner: TASK-30
+  location: {kind: git_path, logical_uri: 'repo://tests/test_task30_terminal_route_decision.py', repository_path: tests/test_task30_terminal_route_decision.py}
+  integrity: {kind: sha256, sha256: 5e9ab83a9baad6dd1e4bcbb69ff6f71100fe1e81fbbdee18f1af943d6e403592}
+  access: {mode: read_only, method: file, network_required: false, secrets_required: false}
+  relations: [{relation_type: depends_on, target_asset_id: MODULE-T30-TERMINAL-ROUTE-DECISION-001}, {relation_type: depends_on, target_asset_id: SCHEMA-T30-TERMINAL-ROUTE-DECISION-001}, {relation_type: depends_on, target_asset_id: FIXTURE-T30-TERMINAL-ROUTE-DECISION-001}]
+  consumers: [TASK-30, FACTORY-001]
+  evidence: []
+  search_terms: [A19, TEST, ADVERSARIAL, TERMINAL_ROUTE_DECISION]
+  classification: {contains_secrets: false, contains_raw_data: false, sensitivity: INTERNAL_NON_SECRET}
+- asset_id: EVIDENCE-T30-A19-TERMINAL-ROUTE-DECISION-001
+  record_version: '1.0'
+  asset_type: evidence
+  purpose: Hash-bound FULL_REVIEW acceptance for the terminal TASK-30 route decision and limited negative result.
+  status: VALIDATED_ACTIVE
+  origin: REPOSITORY
+  as_of: '2026-08-13'
+  truth_owner: TASK-30
+  location: {kind: git_path, logical_uri: 'repo://docs/evidence/task30/a19_terminal_route_decision_acceptance_v1.json', repository_path: docs/evidence/task30/a19_terminal_route_decision_acceptance_v1.json}
+  integrity: {kind: sha256, sha256: 862745e377424e100c053abd8abf69293696bf197681873f5793997cf7539803}
+  access: {mode: read_only, method: file, network_required: false, secrets_required: false}
+  relations: [{relation_type: derived_from, target_asset_id: CONTRACT-T30-TERMINAL-ROUTE-DECISION-001}, {relation_type: validated_by, target_asset_id: TEST-T30-TERMINAL-ROUTE-DECISION-001}, {relation_type: depends_on, target_asset_id: CATALOG-CLI-001}]
+  consumers: [TASK-30, RC001-H07-H01-LIQUIDITY-RETENTION, FACTORY-001]
+  evidence: []
+  search_terms: [A19, TERMINAL_ROUTE_DECISION, LIMITED_NEGATIVE_RESULT, CLOSE_CURRENT_DATA_ROUTE_LIMITED_NEGATIVE_RESULT, BLOCKED_DATA, H07, H01]
+  classification: {contains_secrets: false, contains_raw_data: false, sensitivity: INTERNAL_NON_SECRET}
+
 - asset_id: CTRL-TASK-06-001
   record_version: '1.1'
   asset_type: control_document
