@@ -375,6 +375,55 @@ def write_context_receipt(root: Path, receipt: dict[str, Any]) -> Path:
     return path
 
 
+def validate_route_continuity(
+    prior_receipt: dict[str, Any], requested_route: str
+) -> list[str]:
+    if not isinstance(prior_receipt, dict):
+        return ["PRIOR_CONTEXT_RECEIPT_INVALID"]
+    prior_route = prior_receipt.get("route")
+    if not isinstance(prior_route, str):
+        return ["PRIOR_CONTEXT_RECEIPT_INVALID"]
+    if prior_route != requested_route:
+        return ["ACTIVE_ROUTE_CHANGED"]
+    return []
+
+
+def detect_multi_root_context_duplication(roots: list[Path]) -> list[str]:
+    resolved: list[Path] = []
+    for root in roots:
+        if not isinstance(root, Path):
+            return ["WORKSPACE_ROOTS_INVALID"]
+        resolved.append(root.resolve())
+    for index, left in enumerate(resolved):
+        for right in resolved[index + 1 :]:
+            if left in right.parents or right in left.parents:
+                return ["MULTI_ROOT_CONTEXT_DUPLICATION_WARNING"]
+    return []
+
+
+def cursor_rule_frontmatter(path: Path) -> dict[str, Any]:
+    text = path.read_text(encoding="utf-8")
+    match = re.match(r"\A---\r?\n(.*?)\r?\n---\r?\n", text, re.DOTALL)
+    if match is None:
+        raise ValueError("CURSOR_RULE_FRONTMATTER_INVALID")
+    value = yaml.safe_load(match.group(1))
+    if not isinstance(value, dict) or set(value) != {
+        "description",
+        "globs",
+        "alwaysApply",
+    }:
+        raise ValueError("CURSOR_RULE_FRONTMATTER_INVALID")
+    if not isinstance(value["description"], str):
+        raise ValueError("CURSOR_RULE_FRONTMATTER_INVALID")
+    if not isinstance(value["globs"], list) or any(
+        not isinstance(item, str) for item in value["globs"]
+    ):
+        raise ValueError("CURSOR_RULE_FRONTMATTER_INVALID")
+    if type(value["alwaysApply"]) is not bool:
+        raise ValueError("CURSOR_RULE_FRONTMATTER_INVALID")
+    return value
+
+
 def check_harness(root: Path) -> dict[str, Any]:
     errors: list[str] = []
     documents = (
@@ -394,6 +443,37 @@ def check_harness(root: Path) -> dict[str, Any]:
     ]
     if any((root / path).exists() for path in active_baton_paths):
         errors.append("ACTIVE_ADAPTER_MIGRATION_PENDING")
+    required_active_paths = [
+        "AGENTS.md",
+        ".agents/skills/delivery-harness/SKILL.md",
+        ".cursor/commands/delivery-start.md",
+        ".cursor/commands/delivery-status.md",
+        ".cursor/commands/delivery-review.md",
+        ".cursor/commands/delivery-finish.md",
+    ]
+    if any(not (root / path).is_file() for path in required_active_paths):
+        errors.append("ACTIVE_ADAPTER_MISSING")
+    historical_paths = [
+        "scripts/baton_preflight.py",
+        "scripts/baton_receipt.py",
+        "tests/test_baton_contract.py",
+        "docs/agent/GITHUB_BATON_PROTOCOL.md",
+    ]
+    if any(not (root / path).is_file() for path in historical_paths):
+        errors.append("HISTORICAL_BATON_MISSING")
+    try:
+        agents_bytes = (root / "AGENTS.md").stat().st_size
+        if agents_bytes > 12 * 1024:
+            errors.append("AGENTS_CONTEXT_BUDGET_EXCEEDED")
+        always_bytes = 0
+        for path in sorted((root / ".cursor/rules").glob("*.mdc")):
+            metadata = cursor_rule_frontmatter(path)
+            if metadata["alwaysApply"] is True:
+                always_bytes += path.stat().st_size
+        if always_bytes > 6 * 1024:
+            errors.append("CURSOR_ALWAYS_CONTEXT_BUDGET_EXCEEDED")
+    except (OSError, ValueError, yaml.YAMLError):
+        errors.append("ACTIVE_ADAPTER_INVALID")
     return {
         "schema": "smial.delivery-harness-check",
         "schema_version": "1.0",

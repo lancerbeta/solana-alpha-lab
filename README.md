@@ -11,6 +11,22 @@ only the task and handoff explicitly named by the Work-approved prompt. The
 repository may contain an uncommitted or staged candidate without changing the
 canonical task state.
 
+## Delivery Harness bootstrap
+
+The repository-owned entrypoint for Cursor and Codex is `AGENTS.md` plus
+`DELIVERY_HARNESS_V1`. Cursor bootstrap uses the exact copy-paste prompt at
+`delivery-harness/templates/bootstrap-prompt.md`; the protocol is
+`docs/agent/DELIVERY_HARNESS_BOOTSTRAP.md`.
+
+Open one repository/worktree root, require an exact Git task contract and run:
+
+```text
+uv run --locked --managed-python python -B scripts/delivery_harness.py check --root . --format json
+```
+
+Cloud Project Sources/Project Instruction are optional owner-managed exports.
+The harness neither requires nor requests their update or smoke.
+
 Catalog counts, lifecycle counts, exact dependency pins, and candidate state
 are checked by the repository validation gate and recorded in the explicitly
 named task/handoff.

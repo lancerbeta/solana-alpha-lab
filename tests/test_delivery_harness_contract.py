@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import copy
+import hashlib
 import json
 import re
 import unittest
@@ -16,6 +17,10 @@ HARNESS = ROOT / "delivery-harness" / "harness.yaml"
 PROFILE = ROOT / "delivery-harness" / "project-profile.yaml"
 CONTEXT_MAP = ROOT / "delivery-harness" / "context-map.yaml"
 RADAR = ROOT / "delivery-harness" / "capability-radar.yaml"
+ACCEPTANCE = ROOT / "docs/evidence/control/delivery_harness_acceptance_v1.json"
+FACTORY_FIT = ROOT / "docs/evidence/control/delivery_harness_factory_fit_v1.json"
+CORE_CATALOG = ROOT / "catalog/assets/core.yaml"
+MANIFEST = ROOT / "catalog/catalog_manifest.yaml"
 SCHEMAS = {
     HARNESS: ROOT / "catalog/schemas/delivery_harness.schema.json",
     PROFILE: ROOT / "catalog/schemas/delivery_harness_project_profile.schema.json",
@@ -59,6 +64,24 @@ EXPECTED_RADAR_CANDIDATES = {
     "CLICKHOUSE_OR_REMOTE_ANALYTICS",
     "CONTEXT7_OR_DOCS_MCP",
 }
+REQUIRED_CATALOG_ASSETS = {
+    "CTRL-DELIVERY-HARNESS-001",
+    "CONFIG-DELIVERY-HARNESS-001",
+    "CONFIG-DELIVERY-PROJECT-PROFILE-001",
+    "CONFIG-DELIVERY-CONTEXT-MAP-001",
+    "CONFIG-DELIVERY-CAPABILITY-RADAR-001",
+    "SCRIPT-DELIVERY-HARNESS-001",
+    "SKILL-DELIVERY-HARNESS-001",
+    "POLICY-OWNER-ATTENTION-GATE-002",
+    "ADR-DIRECT-DELIVERY-HARNESS-005",
+    "PROTOCOL-DELIVERY-HARNESS-001",
+    "PROTOCOL-DELIVERY-CONTEXT-001",
+    "EVIDENCE-DELIVERY-HARNESS-ACCEPTANCE-001",
+}
+
+
+def sha256(path: Path) -> str:
+    return hashlib.sha256(path.read_bytes()).hexdigest()
 
 
 def load_yaml(path: Path) -> dict[str, Any]:
@@ -217,6 +240,63 @@ class DeliveryHarnessContractTests(unittest.TestCase):
     def test_local_runtime_receipts_are_ignored(self) -> None:
         lines = (ROOT / ".gitignore").read_text(encoding="utf-8").splitlines()
         self.assertIn("local/delivery_harness/", lines)
+
+    def test_acceptance_binds_final_implementation_and_non_claims(self) -> None:
+        receipt = json.loads(ACCEPTANCE.read_text(encoding="utf-8"))
+        self.assertEqual(receipt["state_change"], "IMPLEMENTED_UNVERIFIED")
+        self.assertEqual(receipt["cloud_bundle_mode"], "OWNER_MANAGED_OPTIONAL_EXPORT")
+        self.assertFalse(receipt["cloud_bundle_required_by_harness"])
+        self.assertFalse(receipt["cloud_bundle_smoke_required"])
+        self.assertEqual(receipt["capability_radar_now"], "NONE")
+        self.assertEqual(receipt["side_effects"], {
+            "provider_calls": 0,
+            "wallet_signer_transaction_actions": 0,
+            "cash_spend_usd": 0,
+        })
+        bound = receipt["implementation_bindings"]
+        required_paths = {
+            "docs/superpowers/specs/2026-08-13-delivery-harness-design.md",
+            "docs/superpowers/plans/2026-08-13-delivery-harness-v1.md",
+            "delivery-harness/harness.yaml",
+            "delivery-harness/project-profile.yaml",
+            "delivery-harness/context-map.yaml",
+            "delivery-harness/capability-radar.yaml",
+            "scripts/delivery_harness.py",
+            "control/owner_attention_gate_v2.yaml",
+            "AGENTS.md",
+            ".agents/skills/delivery-harness/SKILL.md",
+            "docs/agent/DELIVERY_HARNESS_PROTOCOL.md",
+            "docs/agent/DELIVERY_CONTEXT_PROTOCOL.md",
+            "tests/test_delivery_harness_contract.py",
+            "tests/test_delivery_harness_adapters.py",
+        }
+        self.assertTrue(required_paths.issubset(bound))
+        for relative, observed in bound.items():
+            self.assertEqual(observed, sha256(ROOT / relative), relative)
+        self.assertEqual(receipt["factory_fit"]["sha256"], sha256(FACTORY_FIT))
+
+    def test_catalog_registers_harness_and_schemas(self) -> None:
+        catalog = load_yaml(CORE_CATALOG)
+        records = {item["asset_id"]: item for item in catalog["records"]}
+        self.assertTrue(REQUIRED_CATALOG_ASSETS.issubset(records))
+        for asset_id in REQUIRED_CATALOG_ASSETS:
+            record = records[asset_id]
+            if record["location"]["kind"] == "git_path":
+                self.assertEqual(
+                    record["integrity"]["sha256"],
+                    sha256(ROOT / record["location"]["repository_path"]),
+                    asset_id,
+                )
+        manifest = load_yaml(MANIFEST)
+        for relative in (
+            "catalog/schemas/delivery_harness.schema.json",
+            "catalog/schemas/delivery_harness_project_profile.schema.json",
+            "catalog/schemas/delivery_harness_context_map.schema.json",
+            "catalog/schemas/delivery_harness_context_receipt.schema.json",
+            "catalog/schemas/delivery_harness_capability_radar.schema.json",
+            "catalog/schemas/owner_attention_gate_v2.schema.json",
+        ):
+            self.assertIn(relative, manifest["root_resolver"]["schemas"])
 
 
 if __name__ == "__main__":

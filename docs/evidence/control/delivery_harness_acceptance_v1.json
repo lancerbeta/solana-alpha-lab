@@ -1,0 +1,58 @@
+{
+  "schema": "smial.delivery-harness-acceptance",
+  "schema_version": "1.0",
+  "acceptance_id": "DELIVERY-HARNESS-ACCEPTANCE-V1",
+  "as_of": "2026-08-14",
+  "task_id": "CTRL-DELIVERY-HARNESS-V1",
+  "base_main": "e78a08ec7ce5687c89b39fa19d8503ca206c6d9e",
+  "owner_approvals": [
+    "DELIVERY_HARNESS_SPEC_REVIEW_APPROVED",
+    "DELIVERY_HARNESS_PLAN_APPROVED; INLINE_EXECUTION_APPROVED",
+    "CURSOR_GUARDED_MERGE_V2_APPROVED"
+  ],
+  "state_change": "IMPLEMENTED_UNVERIFIED",
+  "cloud_bundle_mode": "OWNER_MANAGED_OPTIONAL_EXPORT",
+  "cloud_bundle_required_by_harness": false,
+  "cloud_bundle_smoke_required": false,
+  "capability_radar_now": "NONE",
+  "implementation_bindings": {
+    ".agents/skills/delivery-harness/SKILL.md": "d65ed1a9859ad6d7ae9a5a1b0cd98a22195f79261278d96dc23d4db56a5e930a",
+    "AGENTS.md": "25e9bbb6c8113686448fcb664ff9a037ae8a4585db28547a6c5fae3d4d93db24",
+    "control/owner_attention_gate_v2.yaml": "8d2760f8165e2d2c843bf05c59f8d1e2b683d5535101f1158af86031f076b3fe",
+    "delivery-harness/capability-radar.yaml": "c1d05dcdefa600f99b5c7d7cfcf0fbb153b764034fa2f794239feb59e8d817eb",
+    "delivery-harness/context-map.yaml": "ca881df9da3884deb480327f2fd070e249572aa50f1d8eef30e877b5dfbbcf4d",
+    "delivery-harness/harness.yaml": "1f1b18953985069a35b7f933d9a2eec16d704d10161b2e95176974ce9d6e9d65",
+    "delivery-harness/project-profile.yaml": "71169afdec04aa7c14b363bf4f9febbb1d720245995e53176ed43f2c633c1949",
+    "docs/agent/DELIVERY_CONTEXT_PROTOCOL.md": "c4c9ea00621df32c953a63641c49ec622bd4b156e80c2b2195e2bc654dbd738b",
+    "docs/agent/DELIVERY_HARNESS_PROTOCOL.md": "89ac74e3a2865d634433747e19057ac8a3408e99a51dd733b41c3ac74ef8b44c",
+    "docs/superpowers/plans/2026-08-13-delivery-harness-v1.md": "45d09616dcab6ad6c7d3583a61bea3e96c76a9d9d9d8bfdd230ebaed36850aa5",
+    "docs/superpowers/specs/2026-08-13-delivery-harness-design.md": "d17d1575e6fc89cae74e277877a18f25ffce338e3c2270b273261a0a84b9d58d",
+    "scripts/delivery_harness.py": "1d5ee983b9e7e470041c5c676abedb13131fe16163cd0e6019559a65348043a6",
+    "tests/test_delivery_harness_adapters.py": "53a7ed1794a075bf73793fe72fad122795fa541b35b3ca3d521f5809941f704e",
+    "tests/test_delivery_harness_contract.py": "7dad499f5a332e8906e3d4aa877d5c4547ebe1b1ed2673fb0ad94c57e24c7fe3"
+  },
+  "factory_fit": {
+    "path": "docs/evidence/control/delivery_harness_factory_fit_v1.json",
+    "sha256": "cb5acb3a68f89c1f867d199d9d6e1c4336ae628152c15343a7025eda51d024b2",
+    "verdict": "PASS"
+  },
+  "validation": {
+    "targeted": "PENDING_FINAL_HASH_AND_CATALOG_PASS",
+    "catalog": "PENDING_FINAL_HASH_AND_GENERATION_PASS",
+    "independent_review": "PENDING_EXACT_DIFF",
+    "tracked_only_full_gate": "PENDING_EXACT_COMMITTED_CANDIDATE",
+    "github_ci": "PENDING_EXACT_PR_HEAD"
+  },
+  "non_claims": [
+    "NO_PRODUCT_TASK_ACCEPTANCE_OR_NEXT_TASK_SELECTION",
+    "NO_ALPHA_STRATEGY_PNL_NETRETURN_OR_OWNER_CASHFLOW_CLAIM",
+    "NO_PROVIDER_CREDENTIAL_DEPENDENCY_WALLET_TRANSACTION_OR_CASH_AUTHORITY",
+    "NO_CLOUD_BUNDLE_ACTIVATION_REPLACEMENT_OR_SMOKE_REQUIRED",
+    "PR_CI_OR_MERGE_DOES_NOT_ESTABLISH_CANONICAL_DONE"
+  ],
+  "side_effects": {
+    "provider_calls": 0,
+    "wallet_signer_transaction_actions": 0,
+    "cash_spend_usd": 0
+  }
+}

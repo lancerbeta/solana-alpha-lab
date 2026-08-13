@@ -180,10 +180,8 @@ class OwnerAttentionGatePolicyTests(unittest.TestCase):
         active_paths = (
             "AGENTS.md",
             ".cursor/rules/00-authority.mdc",
-            ".cursor/rules/50-github-baton.mdc",
             ".github/pull_request_template.md",
             "docs/agent/EXECUTION_ROUTER_PROTOCOL.md",
-            "docs/agent/GITHUB_BATON_PROTOCOL.md",
         )
         forbidden = (
             "exact per-PR confirmation",
@@ -222,7 +220,10 @@ class OwnerAttentionGatePolicyTests(unittest.TestCase):
             "ROUTINE_NO_SWITCH",
             "hardest material segment",
         )
-        for relative in ("AGENTS.md", "docs/agent/PROJECT_INSTRUCTION_V3_5.md"):
+        for relative in (
+            "delivery-harness/policies/solana-alpha-lab.md",
+            "docs/agent/PROJECT_INSTRUCTION_V3_5.md",
+        ):
             text = (ROOT / relative).read_text(encoding="utf-8")
             for marker in required:
                 self.assertIn(marker, text, f"{relative}: missing {marker}")

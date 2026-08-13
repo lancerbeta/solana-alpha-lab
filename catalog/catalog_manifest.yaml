@@ -1,12 +1,12 @@
 schema_version: '1.0'
 catalog_id: SMIAL-PROJECT-ASSET-CATALOG
-catalog_version: 0.65.2
-as_of: '2026-08-13'
+catalog_version: 0.66.0
+as_of: '2026-08-14'
 implementation_status: VALIDATED_ACTIVE
 current_checkpoint:
-  assets: 805
+  assets: 820
   asset_registries: 4
-  schemas: 36
+  schemas: 42
   queries: 9
   lifecycle_registries: 9
   lifecycle_records: 61
@@ -65,6 +65,12 @@ root_resolver:
   - catalog/schemas/provider_route_capability_registry_v3.schema.json
   - catalog/schemas/task30_a18_single_signature_transaction_readiness.schema.json
   - catalog/schemas/task30_terminal_route_decision.schema.json
+  - catalog/schemas/delivery_harness.schema.json
+  - catalog/schemas/delivery_harness_project_profile.schema.json
+  - catalog/schemas/delivery_harness_context_map.schema.json
+  - catalog/schemas/delivery_harness_context_receipt.schema.json
+  - catalog/schemas/delivery_harness_capability_radar.schema.json
+  - catalog/schemas/owner_attention_gate_v2.schema.json
   commands:
     validate:
     - uv

@@ -65,7 +65,6 @@ REQUIRED_PATHS = [
     ROOT / "docs/tasks/CTRL-OWNER-ATTENTION-GATE.md",
     ROOT / "control/owner_attention_gate_v1.yaml",
     ROOT / "docs/tasks/CTRL-BATON-SETUP.md",
-    ROOT / ".cursor/commands/baton-preflight.md",
     ROOT / ".cursorignore",
     ROOT / ".github/ISSUE_TEMPLATE/control-atom.yml",
     ROOT / ".github/pull_request_template.md",
@@ -88,7 +87,6 @@ CURSOR_RULES = [
     ROOT / ".cursor/rules/20-validation.mdc",
     ROOT / ".cursor/rules/30-security-and-secrets.mdc",
     ROOT / ".cursor/rules/40-catalog-and-evidence.mdc",
-    ROOT / ".cursor/rules/50-github-baton.mdc",
 ]
 ACCEPTED_BASE_HEAD = "bd152b3199a9ba5c75374bd798b1e81756cd4d9b"
 ACCEPTED_BASE_TREE = "a068018e57ad53340ad94321539ed7d1b411bc10"
@@ -594,9 +592,6 @@ def validate_cursor_and_templates() -> None:
     catalog_rule = (
         ROOT / ".cursor/rules/40-catalog-and-evidence.mdc"
     ).read_text(encoding="utf-8")
-    baton_rule = (
-        ROOT / ".cursor/rules/50-github-baton.mdc"
-    ).read_text(encoding="utf-8")
     router = (
         ROOT / "docs/agent/EXECUTION_ROUTER_PROTOCOL.md"
     ).read_text(encoding="utf-8")
@@ -604,97 +599,72 @@ def validate_cursor_and_templates() -> None:
         ROOT / "docs/agent/GITHUB_BATON_PROTOCOL.md"
     ).read_text(encoding="utf-8")
     handoff = (ROOT / "docs/agent/HANDOFF_PROTOCOL.md").read_text(encoding="utf-8")
-    for needle in [
-        (
-            "The user skills `start-solana-task` and `finish-solana-task` "
-            "are non-executable in Cursor."
-        ),
-        (
-            "Cursor must not use those skills to run an Entry Gate, Finish Gate, "
-            "emit `DONE_CONFIRMED`, select a current or next canonical task, "
-            "perform a skill auto-chain, or invoke `refactor-solana-lab`."
-        ),
-        (
-            "Conversational cues such as `продолжай`, `что дальше`, or a task "
-            "appearing complete grant no lifecycle-skill authority."
-        ),
-        (
-            "Cursor must not claim semantic acceptance, canonical status "
-            "changes, or `DONE`."
-        ),
-        (
-            "This isolation does not disable third-party skill import or "
-            "unrelated skills."
-        ),
-    ]:
-        assert_check(f"authority_lifecycle_isolation:{needle}", needle in authority)
+    assert_check(
+        "active_baton_rule_removed",
+        not (ROOT / ".cursor/rules/50-github-baton.mdc").exists(),
+    )
+    assert_check(
+        "active_baton_command_removed",
+        not (ROOT / ".cursor/commands/baton-preflight.md").exists(),
+    )
     policy_needles = {
         "agents": (
             agents,
             (
-                "Codex and Cursor may proceed",
-                "one full-gate owner per exact candidate fingerprint",
-                "exact Atom Contract Issue creation/update/read-back",
-                "OWNER_ATTENTION_GATE",
+                "Cursor and Codex are equal direct delivery agents",
+                "Git is the working project-memory owner",
+                "OWNER_ATTENTION_GATE_V2",
+                "exact owner phrase",
             ),
         ),
         "authority": (
             authority,
             (
-                "STANDING_PROJECT_AUTONOMY",
-                "Proceed through those routine steps without asking",
-                "OWNER_ATTENTION_GATE",
-                "Cursor never merges",
+                "Routine bounded engineering",
+                "OWNER_ATTENTION_GATE_V2",
+                "same guarded merge right",
+                "OWNER_MANAGED_OPTIONAL_EXPORT",
             ),
         ),
         "validation": (
             validation,
             (
                 "one full-gate owner per exact candidate fingerprint",
-                "FULL_VALIDATION=DELEGATED_TO_CI",
-                "Never run the full gate merely because",
+                "Do not repeat a passing full gate",
+                "Never weaken validators",
             ),
         ),
         "security": (
             security,
             (
-                "Routine GitHub transport",
+                "Routine bounded GitHub delivery transport",
                 "Provider/API/RPC/WSS",
-                "exact named-Issue receipt comments",
+                "Exception text and raw sensitive values",
             ),
         ),
         "catalog": (
             catalog_rule,
             (
-                "routine propagation",
-                "Never manually edit generated Catalog navigation",
-            ),
-        ),
-        "baton": (
-            baton_rule,
-            (
-                "standing project autonomy",
-                "Cursor never merges",
-                "exact receipt comment",
-                "OWNER_ATTENTION_GATE",
+                "Catalog is discovery metadata over Git truth",
+                "Do not hand-edit generated projections",
             ),
         ),
         "router": (
             router,
             (
-                "STANDING_PROJECT_AUTONOMY",
-                "FULL_VALIDATION=DELEGATED_TO_CI",
-                "exact Atom Contract Issue creation/update/read-back",
-                "OWNER_ATTENTION_GATE",
+                "DIRECT_CODEX_DELIVERY",
+                "DIRECT_CURSOR_DELIVERY",
+                "LEGACY_GITHUB_BATON_DORMANT",
+                "OWNER_ATTENTION_GATE_V2",
             ),
         ),
         "protocol": (
             protocol,
             (
-                "standing routine authority",
-                "FULL_VALIDATION=DELEGATED_TO_CI",
-                "exact named-Issue receipt comments",
-                "OWNER_ATTENTION_GATE",
+                "DORMANT_HISTORICAL",
+                "NO ACTIVE AUTHORITY",
+                "scripts/baton_preflight.py",
+                "cannot select work",
             ),
         ),
         "handoff": (
@@ -711,21 +681,6 @@ def validate_cursor_and_templates() -> None:
                 f"cursor_jit_policy:{policy_name}:{needle}",
                 needle.lower() in text.lower(),
             )
-    cmd = (ROOT / ".cursor/commands/baton-preflight.md").read_text(encoding="utf-8")
-    for needle in [
-        "expected_contract_sha256",
-        "scripts/baton_preflight.py",
-        "BLOCKED_AUTHORITY",
-        "github_reads",
-        "github_writes",
-        "--allow-github-read",
-        "standing grant",
-    ]:
-        assert_check(f"preflight_cmd:{needle}", needle in cmd)
-    assert_check(
-        "preflight_no_blanket_api_ban",
-        "do not call GitHub APIs" not in cmd.lower(),
-    )
     ignore = (ROOT / ".cursorignore").read_text(encoding="utf-8")
     for needle in [".env", "!.env.example", ".smial-handoff/**", "wallet/**"]:
         assert_check(f"cursorignore:{needle}", needle in ignore)
@@ -754,12 +709,12 @@ def validate_cursor_and_templates() -> None:
     pr = (ROOT / ".github/pull_request_template.md").read_text(encoding="utf-8")
     for needle in [
         "Draft PR is candidate evidence",
-        "Cursor never merges",
-        "do not establish DONE",
-        "expected SHA-256",
+        "Cursor and Codex merge only after",
+        "do not establish canonical DONE",
+        "Context receipt SHA-256",
         "Single full-gate owner",
         "FULL_VALIDATION=DELEGATED_TO_CI",
-        "OWNER_ATTENTION_GATE",
+        "OWNER_ATTENTION_GATE_V2",
     ]:
         assert_check(f"pr_template:{needle}", needle.lower() in pr.lower())
     stale_active_policy = (
@@ -776,10 +731,7 @@ def validate_cursor_and_templates() -> None:
         ".cursor/rules/20-validation.mdc": validation,
         ".cursor/rules/30-security-and-secrets.mdc": security,
         ".cursor/rules/40-catalog-and-evidence.mdc": catalog_rule,
-        ".cursor/rules/50-github-baton.mdc": baton_rule,
-        ".cursor/commands/baton-preflight.md": cmd,
         "docs/agent/EXECUTION_ROUTER_PROTOCOL.md": router,
-        "docs/agent/GITHUB_BATON_PROTOCOL.md": protocol,
         "docs/agent/HANDOFF_PROTOCOL.md": handoff,
         ".github/pull_request_template.md": pr,
     }
@@ -793,26 +745,29 @@ def validate_cursor_and_templates() -> None:
 
 def validate_owner_attention_gate() -> None:
     policy = yaml.safe_load(
-        (ROOT / "control/owner_attention_gate_v1.yaml").read_text(
+        (ROOT / "control/owner_attention_gate_v2.yaml").read_text(
             encoding="utf-8"
         )
     )
     assert_check(
         "owner_attention_policy_schema",
         policy.get("schema") == "smial.owner-attention-gate"
-        and str(policy.get("schema_version")) == "1.0",
+        and str(policy.get("schema_version")) == "2.0",
     )
     routes = policy.get("route_authority", {})
     assert_check(
-        "owner_attention_local_codex_auto_merge",
-        routes.get("LOCAL_WORK_CODEX", {}).get("ordinary_merge")
-        == "AUTONOMOUS_AFTER_MACHINE_GATE",
+        "owner_attention_direct_codex_guarded_merge",
+        routes.get("DIRECT_CODEX_DELIVERY", {}).get("ordinary_merge")
+        == "EXACT_OWNER_APPROVAL_AND_MACHINE_GATE",
     )
     assert_check(
-        "owner_attention_cursor_merge_forbidden",
-        routes.get("PROJECT_CHAT_PRO_GITHUB_BATON_CURSOR", {}).get(
-            "cursor_merge"
-        )
+        "owner_attention_direct_cursor_guarded_merge",
+        routes.get("DIRECT_CURSOR_DELIVERY", {}).get("ordinary_merge")
+        == "EXACT_OWNER_APPROVAL_AND_MACHINE_GATE",
+    )
+    assert_check(
+        "owner_attention_dormant_baton_merge_forbidden",
+        routes.get("LEGACY_GITHUB_BATON_DORMANT", {}).get("ordinary_merge")
         == "FORBIDDEN",
     )
     required_checks = set(policy.get("merge_preconditions", []))
@@ -838,12 +793,8 @@ LIVE_ROUTE_CONTROL_PATHS = (
     "AGENTS.md",
     ".cursor/rules/00-authority.mdc",
     ".cursor/rules/10-input-routing.mdc",
-    ".cursor/rules/50-github-baton.mdc",
     "docs/agent/EXECUTION_ROUTER_PROTOCOL.md",
-    "docs/agent/GITHUB_BATON_PROTOCOL.md",
-    "docs/decisions/ADR-003-gpt-executor-routing.md",
-    "docs/tasks/CTRL-BATON-SETUP.md",
-    "docs/tasks/CTRL-CURSOR-WORKPLACE-RECONCILIATION.md",
+    "docs/decisions/ADR-005-direct-delivery-harness.md",
 )
 
 STALE_ROUTE_PHRASES = (
@@ -867,60 +818,25 @@ STALE_ROUTE_PHRASES = (
 
 def validate_protocol_links() -> None:
     agents = (ROOT / "AGENTS.md").read_text(encoding="utf-8")
-    assert_check("agents_github_baton", "GITHUB_BATON" in agents)
-    assert_check("agents_execution_only", "EXECUTION_ONLY" in agents)
-    assert_check("agents_gpt_control_plane", "GPT control plane" in agents or "control plane" in agents.lower())
-    assert_check("agents_live_accepted_route", "live accepted" in agents.lower())
+    assert_check("agents_delivery_harness", "DELIVERY_HARNESS_V1" in agents)
+    assert_check("agents_direct_cursor", "DIRECT_CURSOR_DELIVERY" in agents)
+    assert_check("agents_baton_dormant", "LEGACY_GITHUB_BATON_DORMANT" in agents)
+    assert_check("agents_no_live_baton_trigger", "GITHUB_BATON:" not in agents)
     protocol = (ROOT / "docs/agent/GITHUB_BATON_PROTOCOL.md").read_text(encoding="utf-8")
-    assert_check(
-        "protocol_oob_hash",
-        "expected" in protocol.lower() and "sha-256" in protocol.lower(),
-    )
-    assert_check("protocol_mutable_transport", "mutable" in protocol.lower())
-    assert_check("protocol_live_execution_flow", "Live execution flow" in protocol)
-    assert_check("protocol_project_chat_primary", "PROJECT_CHAT_PRIMARY" in protocol)
-    assert_check("protocol_transport_and_audit", "TRANSPORT_AND_AUDIT" in protocol)
+    assert_check("protocol_dormant", "status: DORMANT_HISTORICAL" in protocol)
+    assert_check("protocol_no_active_authority", "NO ACTIVE AUTHORITY" in protocol)
+    assert_check("protocol_historical_machine_layer", "scripts/baton_preflight.py" in protocol)
     router = (ROOT / "docs/agent/EXECUTION_ROUTER_PROTOCOL.md").read_text(encoding="utf-8")
-    assert_check("router_live_accepted_route", "Live accepted input route" in router)
-    assert_check(
-        "router_not_future_only_candidate",
-        "not a future-only, local-dirty, pre-merge, or uncommitted candidate" in router,
-    )
+    assert_check("router_direct_codex", "DIRECT_CODEX_DELIVERY" in router)
+    assert_check("router_direct_cursor", "DIRECT_CURSOR_DELIVERY" in router)
+    assert_check("router_baton_dormant", "LEGACY_GITHUB_BATON_DORMANT" in router)
     authority = (ROOT / ".cursor/rules/00-authority.mdc").read_text(encoding="utf-8")
-    assert_check("authority_project_chat_primary", "PROJECT_CHAT_PRIMARY" in authority)
-    assert_check("authority_transport_and_audit", "TRANSPORT_AND_AUDIT" in authority)
-    baton_rule = (ROOT / ".cursor/rules/50-github-baton.mdc").read_text(encoding="utf-8")
-    assert_check("baton_rule_live_accepted", "live accepted input route" in baton_rule.lower())
-    adr = (ROOT / "docs/decisions/ADR-003-gpt-executor-routing.md").read_text(encoding="utf-8")
-    assert_check("adr_accepted_repository_mirror", "ACCEPTED_REPOSITORY_MIRROR" in adr)
-    assert_check("adr_live_accepted_route", "live accepted input route" in adr.lower())
-    setup = (ROOT / "docs/tasks/CTRL-BATON-SETUP.md").read_text(encoding="utf-8")
-    assert_check("setup_live_route_posture", "Live route posture" in setup)
-    assert_check("setup_not_future_only", "future-only, local-dirty" in setup)
-    reconciliation = (
-        ROOT / "docs/tasks/CTRL-CURSOR-WORKPLACE-RECONCILIATION.md"
-    ).read_text(encoding="utf-8")
-    assert_check(
-        "reconciliation_mirror_exists",
-        "CWR-A1_LIVE_ROUTE_CONTRACT_REPAIR" in reconciliation,
-    )
-    assert_check(
-        "reconciliation_current_owner",
-        re.search(
-            r"^current_owning_surface: LOCAL_WORK_PRIMARY$",
-            reconciliation,
-            re.MULTILINE,
-        )
-        is not None,
-    )
-    assert_check(
-        "reconciliation_local_work_control_plane",
-        "`LOCAL_WORK_PRIMARY`" in reconciliation,
-    )
-    assert_check(
-        "reconciliation_generic_baton_control_plane",
-        "`CONTROL_PLANE` = `PROJECT_CHAT_PRIMARY`" in reconciliation,
-    )
+    assert_check("authority_direct_merge", "same guarded merge right" in authority)
+    assert_check("baton_rule_absent", not (ROOT / ".cursor/rules/50-github-baton.mdc").exists())
+    assert_check("baton_command_absent", not (ROOT / ".cursor/commands/baton-preflight.md").exists())
+    adr = (ROOT / "docs/decisions/ADR-005-direct-delivery-harness.md").read_text(encoding="utf-8")
+    assert_check("adr005_active_routes", "DIRECT_CURSOR_DELIVERY" in adr)
+    assert_check("adr005_optional_cloud", "OWNER_MANAGED_OPTIONAL_EXPORT" in adr)
     for relative in LIVE_ROUTE_CONTROL_PATHS:
         text = (ROOT / relative).read_text(encoding="utf-8")
         for phrase in STALE_ROUTE_PHRASES:

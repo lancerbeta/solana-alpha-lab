@@ -149,7 +149,9 @@ class CleanCloneDocumentationTests(unittest.TestCase):
 
 class TrackedOnlyDeliveryPreflightTests(unittest.TestCase):
     def test_agents_contract_selects_one_delivery_only_gate(self) -> None:
-        text = (ROOT / "AGENTS.md").read_text(encoding="utf-8")
+        agents = (ROOT / "AGENTS.md").read_text(encoding="utf-8")
+        self.assertIn("delivery-harness/policies/solana-alpha-lab.md", agents)
+        text = (ROOT / "delivery-harness/policies/solana-alpha-lab.md").read_text(encoding="utf-8")
         self.assertIn("## TRACKED_ONLY_DELIVERY_PREFLIGHT", text)
         self.assertIn(ci.DELIVERY_PREFLIGHT_COMMAND, text)
         self.assertIn("wall-time cap is 15 minutes", text)
@@ -457,10 +459,14 @@ class CiOwnedDeliveryPilotTests(unittest.TestCase):
 
     def test_policy_names_owner_pilot_success_and_rollback(self) -> None:
         agents = (ROOT / "AGENTS.md").read_text(encoding="utf-8")
+        self.assertIn("delivery-harness/policies/solana-alpha-lab.md", agents)
+        domain = (ROOT / "delivery-harness/policies/solana-alpha-lab.md").read_text(
+            encoding="utf-8"
+        )
         router = (ROOT / "docs/agent/EXECUTION_ROUTER_PROTOCOL.md").read_text(
             encoding="utf-8"
         )
-        for text in (agents, router):
+        for text in (domain, router):
             normalized = " ".join(text.split())
             with self.subTest(owner="policy"):
                 self.assertIn("CI_OWNED_DELIVERY_PILOT", normalized)
@@ -523,7 +529,11 @@ class PlatformGateContractTests(unittest.TestCase):
 
 class ReuseFirstRecoveryTriggerTests(unittest.TestCase):
     def test_agents_contract_requires_reuse_first_after_material_blocker(self) -> None:
-        text = (ROOT / "AGENTS.md").read_text(encoding="utf-8")
+        agents = (ROOT / "AGENTS.md").read_text(encoding="utf-8")
+        self.assertIn("delivery-harness/policies/solana-alpha-lab.md", agents)
+        text = (ROOT / "delivery-harness/policies/solana-alpha-lab.md").read_text(
+            encoding="utf-8"
+        )
         normalized_text = " ".join(text.split())
         required_fragments = (
             "## REUSE_FIRST_RECOVERY_TRIGGER",
@@ -550,7 +560,11 @@ class ReuseFirstRecoveryTriggerTests(unittest.TestCase):
 
 class ControlOnlyTaskCloseDocumentationTests(unittest.TestCase):
     def test_agents_makes_fast_path_and_fallback_unavoidable(self) -> None:
-        text = (ROOT / "AGENTS.md").read_text(encoding="utf-8")
+        agents = (ROOT / "AGENTS.md").read_text(encoding="utf-8")
+        self.assertIn("delivery-harness/policies/solana-alpha-lab.md", agents)
+        text = (ROOT / "delivery-harness/policies/solana-alpha-lab.md").read_text(
+            encoding="utf-8"
+        )
         self.assertIn("## CONTROL_ONLY_TASK_CLOSE_FAST_PATH", text)
         self.assertIn("--control-only-task-close", text)
         self.assertIn("GITHUB_PR_EXACT_HEAD_CI", text)

@@ -51,6 +51,7 @@ AGENTS.md
 README.md
 catalog/assets/architecture.yaml
 catalog/assets/core.yaml
+catalog/assets/lifecycle.yaml                           # direct owner of generated project-map and edge hashes
 catalog/catalog_manifest.yaml
 catalog/generated/asset_edges.json                         # generated
 catalog/schemas/delivery_harness.schema.json
@@ -86,6 +87,8 @@ docs/superpowers/specs/2026-08-13-delivery-harness-design.md
 docs/tasks/CTRL-DELIVERY-HARNESS-V1.md
 scripts/delivery_harness.py
 scripts/owner_attention_gate.py
+scripts/validate_baton.py                                  # retire active adapter checks; preserve historical machine layer
+scripts/validate_catalog.py                                # direct consumer: admit evidenced implementation of architecture intent
 tests/fixtures/delivery_harness/current_repo_events.yaml
 tests/fixtures/delivery_harness/dummy_project/AGENTS.md
 tests/fixtures/delivery_harness/dummy_project/README.md
@@ -104,12 +107,21 @@ tests/test_delivery_harness_context.py
 tests/test_delivery_harness_contract.py
 tests/test_delivery_harness_skill.py
 tests/test_owner_attention_gate_policy.py
+tests/test_catalog.py
 tests/test_provider_route_capability_registry.py
 tests/test_task21_durable_resume_router_binding.py
 tests/test_task21_owner_pulse.py
 ```
 
 `uv.lock`, `.github/workflows/**`, `docs/project_sources/**`, provider registries and all historical baton receipts are explicitly outside the write set.
+
+**Write-set amendment (2026-08-14):** Catalog validation exposed a direct
+consumer that hard-coded every architecture intent as unimplemented. The
+validator and its test are admitted only for a backward-compatible repair that
+keeps unevidenced implementation claims fail-closed. Navigation regeneration
+also exposed `catalog/assets/lifecycle.yaml` as the direct hash owner of the two
+generated projections, so that one shard is admitted only for their version and
+integrity propagation.
 
 ## Task 1: Freeze the core contracts and negative invariants
 
@@ -812,7 +824,7 @@ uv run --locked --managed-python python -B scripts/delivery_harness.py check --r
 uv run --locked --managed-python python -B scripts/delivery_harness.py radar --root . --events tests/fixtures/delivery_harness/current_repo_events.yaml --format json
 uv run --locked --managed-python python -B scripts/validate_catalog.py
 uv run --locked --managed-python python -B scripts/generate_navigation.py --check
-uv run --locked --managed-python python -B scripts/secret_scan.py
+uv run --locked --managed-python python -B scripts/secret_scan.py --self-test --scan-repository
 git diff --check origin/main...HEAD
 ```
 

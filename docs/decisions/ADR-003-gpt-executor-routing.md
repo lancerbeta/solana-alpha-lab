@@ -1,13 +1,17 @@
 ---
 adr_id: ADR-003
 title: GPT control plane and executor routing
-status: PARTIALLY_SUPERSEDED_BY_ADR-004
+status: SUPERSEDED_FOR_ACTIVE_ROUTING_BY_ADR-005
 as_of: 2026-07-28
 owner_task: CTRL-BATON-SETUP
 contains_secrets: false
 ---
 
 # ADR-003 — GPT control plane and executor routing
+
+> Historical predecessor. Active routing is owned by `ADR-005` and
+> `DELIVERY_HARNESS_V1`. The baton-specific decisions below are preserved as
+> historical context and grant no current authority.
 
 > Accepted repository control mirror for the live GitHub Baton and Cursor
 > workplace. Canonical Project Sources reconciliation and roadmap `DONE`

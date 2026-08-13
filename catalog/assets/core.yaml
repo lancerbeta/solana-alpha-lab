@@ -721,23 +721,21 @@ records:
     contains_raw_data: false
     sensitivity: INTERNAL_NON_SECRET
 - asset_id: CTRL-AGENTS-001
-  record_version: '2.8'
+  record_version: '3.0'
   asset_type: control_document
-  purpose: Repository agent contract for routine autonomy, owner-attention and
-    merge gates, safety, delivery preflights, Sources release control, reuse-first
-    recovery, observed provider-route lookup, credential-free preflight, Factory
-    Leverage and model-effort routing.
+  purpose: Lean Delivery Harness front door for exact context, bounded autonomy,
+    safety, validation ownership, optional cloud export and guarded merge.
   status: IMPLEMENTED_UNVERIFIED
   origin: REPOSITORY
-  as_of: '2026-08-13'
-  truth_owner: CTRL-BATON-SETUP
+  as_of: '2026-08-14'
+  truth_owner: CTRL-DELIVERY-HARNESS-001
   location:
     kind: git_path
     logical_uri: repo://AGENTS.md
     repository_path: AGENTS.md
   integrity:
     kind: sha256
-    sha256: 86b82b087c1eb560bbf4460b215658eb93de9a98630013a939c317e0a39444b2
+    sha256: 25e9bbb6c8113686448fcb664ff9a037ae8a4585db28547a6c5fae3d4d93db24
   access:
     mode: read_only
     method: file
@@ -746,15 +744,11 @@ records:
     secrets_required: false
   relations:
   - relation_type: governed_by
-    target_asset_id: CTRL-TASK-04-001
-  - relation_type: governed_by
-    target_asset_id: CTRL-OWNER-ATTENTION-GATE-001
-  - relation_type: governed_by
-    target_asset_id: POLICY-TASK-CLOSE-FAST-PATH-001
+    target_asset_id: CTRL-DELIVERY-HARNESS-001
   consumers:
   - TASK-03
   - TASK-04
-  - CTRL-BATON-SETUP
+  - CTRL-DELIVERY-HARNESS-001
   evidence: []
   classification:
     contains_secrets: false
@@ -1176,12 +1170,12 @@ records:
     contains_raw_data: false
     sensitivity: INTERNAL_NON_SECRET
 - asset_id: CATALOG-VALIDATOR-001
-  record_version: '1.3'
+  record_version: '1.4'
   asset_type: script
   purpose: Deterministic schema and semantic validator for Catalog policy, integrity and the current physical-count checkpoint.
   status: IMPLEMENTED_UNVERIFIED
   origin: REPOSITORY
-  as_of: '2026-07-22'
+  as_of: '2026-08-14'
   truth_owner: TASK-04
   location:
     kind: git_path
@@ -1189,7 +1183,7 @@ records:
     repository_path: scripts/validate_catalog.py
   integrity:
     kind: sha256
-    sha256: 7dca6a4f0857117c082c4b13ea60d4d517eaad6ed5f44cb00ecac399d65656df
+    sha256: df1e711c1b5f8b2f735ef9550347bc650b263066b3419c5457732e5ee53bfc7e
   access:
     mode: read_only
     method: command
@@ -1501,21 +1495,21 @@ records:
     contains_raw_data: false
     sensitivity: INTERNAL_NON_SECRET
 - asset_id: CTRL-README-001
-  record_version: '1.0'
+  record_version: '1.1'
   asset_type: control_document
-  purpose: Repository bootstrap instructions with an explicit non-canonical status
-    boundary.
+  purpose: Repository bootstrap instructions for the Git-native Delivery Harness
+    with an explicit non-canonical status boundary.
   status: IMPLEMENTED_UNVERIFIED
   origin: REPOSITORY
-  as_of: '2026-07-22'
-  truth_owner: TASK-04
+  as_of: '2026-08-14'
+  truth_owner: CTRL-DELIVERY-HARNESS-001
   location:
     kind: git_path
     logical_uri: repo://README.md
     repository_path: README.md
   integrity:
     kind: sha256
-    sha256: e93c78b023f0db04f859dd721d43b30c9eeafb6f03d7dc5bb0cbafabff68dee5
+    sha256: 75fe53fb5cbb1144672bd21d988366eb2f09d0b697933eff1741037ed73f4850
   access:
     mode: read_only
     method: file
@@ -1523,9 +1517,10 @@ records:
     secrets_required: false
   relations:
   - relation_type: governed_by
-    target_asset_id: CTRL-TASK-04-001
+    target_asset_id: CTRL-DELIVERY-HARNESS-001
   consumers:
   - TASK-04
+  - CTRL-DELIVERY-HARNESS-001
   evidence: []
   classification:
     contains_secrets: false
@@ -4147,23 +4142,21 @@ records:
     contains_raw_data: false
     sensitivity: INTERNAL_NON_SECRET
 - asset_id: PROTOCOL-EXECUTION-ROUTER-001
-  record_version: '1.5'
+  record_version: '2.0'
   asset_type: control_document
-  purpose: Execution router combining GPT control ownership with standing routine
-    autonomy and OWNER_ATTENTION_GATE across local and GitHub baton routes,
-    including Project Sources release disposition and CI-owned delivery pilot
-    routing.
+  purpose: Active direct execution router for Cursor and Codex over one Git-native
+    Delivery Harness, with dormant baton history and proportional validation.
   status: IMPLEMENTED_UNVERIFIED
   origin: REPOSITORY
-  as_of: '2026-08-08'
-  truth_owner: ChatGPT_Project_GPT_Control_Plane
+  as_of: '2026-08-14'
+  truth_owner: CTRL-DELIVERY-HARNESS-001
   location:
     kind: git_path
     logical_uri: repo://docs/agent/EXECUTION_ROUTER_PROTOCOL.md
     repository_path: docs/agent/EXECUTION_ROUTER_PROTOCOL.md
   integrity:
     kind: sha256
-    sha256: 578e7570159dd19f0669fcd16a71777c077892d09b237a26f8d937e9465079fd
+    sha256: e69520b70b7dae30a16fe248ecd28fcd1686f4736c8ff1509a7952ff6f5e3308
   access:
     mode: read_only
     method: file
@@ -4171,53 +4164,53 @@ records:
     secrets_required: false
   relations:
   - relation_type: governed_by
-    target_asset_id: CTRL-BATON-SETUP-001
+    target_asset_id: CTRL-DELIVERY-HARNESS-001
   consumers:
-  - CTRL-BATON-SETUP
+  - CTRL-DELIVERY-HARNESS-001
   evidence: []
   classification:
     contains_secrets: false
     contains_raw_data: false
     sensitivity: INTERNAL_NON_SECRET
 - asset_id: PROTOCOL-GITHUB-BATON-001
-  record_version: '1.3'
+  record_version: '2.0'
   asset_type: control_document
-  purpose: GitHub Baton protocol for revision-locked contracts, standing routine
-    delivery, OWNER_ATTENTION_GATE, JIT validation, and out-of-band hash trust.
-  status: IMPLEMENTED_UNVERIFIED
+  purpose: Dormant historical GitHub Baton protocol retained for audit, rollback
+    analysis and exact legacy receipt validation with no active authority.
+  status: DEPRECATED
   origin: REPOSITORY
-  as_of: '2026-08-08'
-  truth_owner: ChatGPT_Project_GPT_Control_Plane
+  as_of: '2026-08-14'
+  truth_owner: CTRL-DELIVERY-HARNESS-001
   location:
     kind: git_path
     logical_uri: repo://docs/agent/GITHUB_BATON_PROTOCOL.md
     repository_path: docs/agent/GITHUB_BATON_PROTOCOL.md
   integrity:
     kind: sha256
-    sha256: 531869eff5eb2561467714dac6e14b96955abe3411f9c809cb0a8c024d92167d
+    sha256: 3761176f5e7631cadce4532e1c90780ac411ccaf956426f421c2218c38e8d2e0
   access:
     mode: read_only
     method: file
     network_required: false
     secrets_required: false
   relations:
-  - relation_type: governed_by
-    target_asset_id: CTRL-BATON-SETUP-001
+  - relation_type: superseded_by
+    target_asset_id: ADR-DIRECT-DELIVERY-HARNESS-005
   consumers:
-  - CTRL-BATON-SETUP
+  - CTRL-DELIVERY-HARNESS-001
   evidence: []
   classification:
     contains_secrets: false
     contains_raw_data: false
     sensitivity: INTERNAL_NON_SECRET
 - asset_id: ADR-GPT-EXECUTOR-ROUTING-003
-  record_version: '1.3'
+  record_version: '1.4'
   asset_type: decision
-  purpose: Accepted route and status-ownership decision, partially superseded by
-    ADR-004 for merge authority only.
-  status: VALIDATED_ACTIVE
+  purpose: Historical GPT/executor routing predecessor superseded for active
+    routing by ADR-005 while preserving its original context.
+  status: DEPRECATED
   origin: REPOSITORY
-  as_of: '2026-08-08'
+  as_of: '2026-08-14'
   truth_owner: ChatGPT_Project_GPT_Control_Plane
   location:
     kind: git_path
@@ -4225,40 +4218,38 @@ records:
     repository_path: docs/decisions/ADR-003-gpt-executor-routing.md
   integrity:
     kind: sha256
-    sha256: 4daa5b37c2c9d965c076aa3db9d97951f81d72cd78c66e34590aef0cd8b5e2f6
+    sha256: f72b2e67418d7acae22af24bf292894cdb2a49a7ac1667d43aba50e66a6d56d9
   access:
     mode: read_only
     method: file
     network_required: false
     secrets_required: false
   relations:
-  - relation_type: governed_by
-    target_asset_id: CTRL-BATON-SETUP-001
   - relation_type: superseded_by
-    target_asset_id: ADR-OWNER-ATTENTION-GATE-004
+    target_asset_id: ADR-DIRECT-DELIVERY-HARNESS-005
   consumers:
-  - CTRL-BATON-SETUP
+  - CTRL-DELIVERY-HARNESS-001
   evidence: []
   classification:
     contains_secrets: false
     contains_raw_data: false
     sensitivity: INTERNAL_NON_SECRET
 - asset_id: CURSOR-RULE-AUTHORITY-001
-  record_version: '1.3'
+  record_version: '2.0'
   asset_type: configuration
-  purpose: Always-on Cursor rule combining EXECUTION_ONLY, standing routine
-    autonomy, OWNER_ATTENTION_GATE and the no-merge boundary.
+  purpose: Always-on Cursor rule for direct bounded authority, exact owner attention
+    and guarded merge parity with Codex.
   status: IMPLEMENTED_UNVERIFIED
   origin: REPOSITORY
-  as_of: '2026-08-08'
-  truth_owner: CTRL-BATON-SETUP
+  as_of: '2026-08-14'
+  truth_owner: CTRL-DELIVERY-HARNESS-001
   location:
     kind: git_path
     logical_uri: repo://.cursor/rules/00-authority.mdc
     repository_path: .cursor/rules/00-authority.mdc
   integrity:
     kind: sha256
-    sha256: c23d88b508aaaaaef547ae8b86d77ddd519559ab93988ca6577dd01839509f89
+    sha256: 107afba0dcd6e0358a1c6bff14ea22795345ef2d4aa0f2f30021a2783fd7d028
   access:
     mode: read_only
     method: file
@@ -4266,30 +4257,30 @@ records:
     secrets_required: false
   relations:
   - relation_type: governed_by
-    target_asset_id: CTRL-BATON-SETUP-001
+    target_asset_id: CTRL-DELIVERY-HARNESS-001
   consumers:
-  - CTRL-BATON-SETUP
+  - CTRL-DELIVERY-HARNESS-001
   evidence: []
   classification:
     contains_secrets: false
     contains_raw_data: false
     sensitivity: INTERNAL_NON_SECRET
 - asset_id: CURSOR-RULE-INPUT-ROUTING-001
-  record_version: '1.1'
+  record_version: '2.0'
   asset_type: configuration
-  purpose: Always-on Cursor rule for explicit input routes including the live accepted
-    GITHUB_BATON route.
+  purpose: Scoped Cursor rule for direct route election from an exact task contract
+    with dormant legacy baton excluded.
   status: IMPLEMENTED_UNVERIFIED
   origin: REPOSITORY
-  as_of: '2026-07-27'
-  truth_owner: CTRL-BATON-SETUP
+  as_of: '2026-08-14'
+  truth_owner: CTRL-DELIVERY-HARNESS-001
   location:
     kind: git_path
     logical_uri: repo://.cursor/rules/10-input-routing.mdc
     repository_path: .cursor/rules/10-input-routing.mdc
   integrity:
     kind: sha256
-    sha256: 83642d604932a080aebf72e511df23287ab384820dd4a0671d2a2b84fee2be92
+    sha256: 4b6df7a71cb321fda7d98a1420d12778ccda63bbce1ed5aa924a04b8ac80951d
   access:
     mode: read_only
     method: file
@@ -4297,30 +4288,30 @@ records:
     secrets_required: false
   relations:
   - relation_type: governed_by
-    target_asset_id: CTRL-BATON-SETUP-001
+    target_asset_id: CTRL-DELIVERY-HARNESS-001
   consumers:
-  - CTRL-BATON-SETUP
+  - CTRL-DELIVERY-HARNESS-001
   evidence: []
   classification:
     contains_secrets: false
     contains_raw_data: false
     sensitivity: INTERNAL_NON_SECRET
 - asset_id: CURSOR-RULE-VALIDATION-001
-  record_version: '1.1'
+  record_version: '2.0'
   asset_type: configuration
-  purpose: Always-on Cursor rule for targeted iteration and one full-gate owner
-    per candidate fingerprint.
+  purpose: Scoped Cursor rule for targeted iteration, risk-routed review and one
+    full-gate owner per candidate fingerprint.
   status: IMPLEMENTED_UNVERIFIED
   origin: REPOSITORY
-  as_of: '2026-07-28'
-  truth_owner: CTRL-BATON-SETUP
+  as_of: '2026-08-14'
+  truth_owner: CTRL-DELIVERY-HARNESS-001
   location:
     kind: git_path
     logical_uri: repo://.cursor/rules/20-validation.mdc
     repository_path: .cursor/rules/20-validation.mdc
   integrity:
     kind: sha256
-    sha256: 14787689e01c2ab3514c7a0d724ba65a3092fe55e96986a30de7893691bb1e31
+    sha256: 7c7af2b3d04a9a80bd339ebc9cc8676e79a91d313be875ca807a9df3186ea90b
   access:
     mode: read_only
     method: file
@@ -4328,30 +4319,30 @@ records:
     secrets_required: false
   relations:
   - relation_type: governed_by
-    target_asset_id: CTRL-BATON-SETUP-001
+    target_asset_id: CTRL-DELIVERY-HARNESS-001
   consumers:
-  - CTRL-BATON-SETUP
+  - CTRL-DELIVERY-HARNESS-001
   evidence: []
   classification:
     contains_secrets: false
     contains_raw_data: false
     sensitivity: INTERNAL_NON_SECRET
 - asset_id: CURSOR-RULE-SECURITY-001
-  record_version: '1.2'
+  record_version: '2.0'
   asset_type: configuration
-  purpose: Always-on Cursor rule for secrets, wallets, bounded GitHub transport,
-    and separately gated external actions.
+  purpose: Always-on Cursor rule for secrets, wallets, external authority and
+    fail-closed safety boundaries.
   status: IMPLEMENTED_UNVERIFIED
   origin: REPOSITORY
-  as_of: '2026-07-28'
-  truth_owner: CTRL-BATON-SETUP
+  as_of: '2026-08-14'
+  truth_owner: CTRL-DELIVERY-HARNESS-001
   location:
     kind: git_path
     logical_uri: repo://.cursor/rules/30-security-and-secrets.mdc
     repository_path: .cursor/rules/30-security-and-secrets.mdc
   integrity:
     kind: sha256
-    sha256: 1680688889bad4f68c6603a903a428e31f0c8edff4810da1ff31298b1214771d
+    sha256: 6e25723a6f7fe4c8e56cb245abd09f13a9fe08ac15f05fe157a3ffeb9e56ec5b
   access:
     mode: read_only
     method: file
@@ -4359,30 +4350,30 @@ records:
     secrets_required: false
   relations:
   - relation_type: governed_by
-    target_asset_id: CTRL-BATON-SETUP-001
+    target_asset_id: CTRL-DELIVERY-HARNESS-001
   consumers:
-  - CTRL-BATON-SETUP
+  - CTRL-DELIVERY-HARNESS-001
   evidence: []
   classification:
     contains_secrets: false
     contains_raw_data: false
     sensitivity: INTERNAL_NON_SECRET
 - asset_id: CURSOR-RULE-CATALOG-001
-  record_version: '1.1'
+  record_version: '2.0'
   asset_type: configuration
-  purpose: Always-on Cursor rule for routine Catalog propagation and evidence boundaries
+  purpose: Scoped Cursor rule for routine Catalog propagation and evidence boundaries
     without dual truth owners.
   status: IMPLEMENTED_UNVERIFIED
   origin: REPOSITORY
-  as_of: '2026-07-28'
-  truth_owner: CTRL-BATON-SETUP
+  as_of: '2026-08-14'
+  truth_owner: CTRL-DELIVERY-HARNESS-001
   location:
     kind: git_path
     logical_uri: repo://.cursor/rules/40-catalog-and-evidence.mdc
     repository_path: .cursor/rules/40-catalog-and-evidence.mdc
   integrity:
     kind: sha256
-    sha256: eea67fb5f1c51baf3d2b74ab90ca7363c21f05072ecfaa6315199a475b74cd89
+    sha256: 95036dfe14ecf68974389e1d744b7294601d6377330d7f1db5153fd7661ef918
   access:
     mode: read_only
     method: file
@@ -4390,60 +4381,58 @@ records:
     secrets_required: false
   relations:
   - relation_type: governed_by
-    target_asset_id: CTRL-BATON-SETUP-001
+    target_asset_id: CTRL-DELIVERY-HARNESS-001
   consumers:
-  - CTRL-BATON-SETUP
+  - CTRL-DELIVERY-HARNESS-001
   evidence: []
   classification:
     contains_secrets: false
     contains_raw_data: false
     sensitivity: INTERNAL_NON_SECRET
 - asset_id: CURSOR-RULE-GITHUB-BATON-001
-  record_version: '1.3'
+  record_version: '2.0'
   asset_type: configuration
-  purpose: Always-on Cursor rule for exact baton trust, routine GitHub delivery,
-    OWNER_ATTENTION_GATE, and the absolute Cursor no-merge boundary.
-  status: IMPLEMENTED_UNVERIFIED
+  purpose: Historical record of the removed active Cursor baton rule; content is
+    retained in Git history and grants no current authority.
+  status: DEPRECATED
   origin: REPOSITORY
-  as_of: '2026-08-08'
-  truth_owner: CTRL-BATON-SETUP
+  as_of: '2026-08-14'
+  truth_owner: CTRL-DELIVERY-HARNESS-001
   location:
-    kind: git_path
-    logical_uri: repo://.cursor/rules/50-github-baton.mdc
-    repository_path: .cursor/rules/50-github-baton.mdc
+    kind: logical_only
+    logical_uri: git-history://.cursor/rules/50-github-baton.mdc
   integrity:
-    kind: sha256
-    sha256: b9be68ecac0a5a1f331b3bdb781d50f17bb5517dc5a2c9e95573b8b5d1888803
+    kind: none
   access:
     mode: read_only
     method: file
     network_required: false
     secrets_required: false
   relations:
-  - relation_type: governed_by
-    target_asset_id: CTRL-BATON-SETUP-001
+  - relation_type: superseded_by
+    target_asset_id: ADR-DIRECT-DELIVERY-HARNESS-005
   consumers:
-  - CTRL-BATON-SETUP
+  - CTRL-DELIVERY-HARNESS-001
   evidence: []
   classification:
     contains_secrets: false
     contains_raw_data: false
     sensitivity: INTERNAL_NON_SECRET
 - asset_id: CURSOR-RULE-LANGUAGE-001
-  record_version: '1.0'
+  record_version: '2.0'
   asset_type: configuration
-  purpose: Always-on Cursor rule for Russian user-facing reporting with canonical technical tokens.
+  purpose: Scoped Cursor rule for Russian user-facing reporting with canonical technical tokens.
   status: IMPLEMENTED_UNVERIFIED
   origin: REPOSITORY
-  as_of: '2026-07-25'
-  truth_owner: CTRL-BATON-SETUP
+  as_of: '2026-08-14'
+  truth_owner: CTRL-DELIVERY-HARNESS-001
   location:
     kind: git_path
     logical_uri: repo://.cursor/rules/05-language-and-reporting.mdc
     repository_path: .cursor/rules/05-language-and-reporting.mdc
   integrity:
     kind: sha256
-    sha256: f4d5e653169efc740bb2bdb95f9da605aa663c81e4c117a7457e794dae991f19
+    sha256: e093161658d1439802bd919d9d3df0ed3d42b04d935d9b8e81b9607ecd25da60
   access:
     mode: read_only
     method: file
@@ -4451,40 +4440,38 @@ records:
     secrets_required: false
   relations:
   - relation_type: governed_by
-    target_asset_id: CTRL-BATON-SETUP-001
+    target_asset_id: CTRL-DELIVERY-HARNESS-001
   consumers:
-  - CTRL-BATON-SETUP
+  - CTRL-DELIVERY-HARNESS-001
   evidence: []
   classification:
     contains_secrets: false
     contains_raw_data: false
     sensitivity: INTERNAL_NON_SECRET
 - asset_id: CURSOR-CMD-BATON-PREFLIGHT-001
-  record_version: '1.1'
+  record_version: '2.0'
   asset_type: configuration
-  purpose: Read-only Cursor command for exact baton preflight under the standing
-    GitHub-read grant.
-  status: IMPLEMENTED_UNVERIFIED
+  purpose: Historical record of the removed active baton-preflight command;
+    legacy behavior remains in Git history and machine fixtures only.
+  status: DEPRECATED
   origin: REPOSITORY
-  as_of: '2026-07-28'
-  truth_owner: CTRL-BATON-SETUP
+  as_of: '2026-08-14'
+  truth_owner: CTRL-DELIVERY-HARNESS-001
   location:
-    kind: git_path
-    logical_uri: repo://.cursor/commands/baton-preflight.md
-    repository_path: .cursor/commands/baton-preflight.md
+    kind: logical_only
+    logical_uri: git-history://.cursor/commands/baton-preflight.md
   integrity:
-    kind: sha256
-    sha256: f0888336ac38f389ae81933fdd9715d383a77b47574a456cb76599460cd9a2cc
+    kind: none
   access:
     mode: read_only
     method: file
     network_required: false
     secrets_required: false
   relations:
-  - relation_type: governed_by
-    target_asset_id: CTRL-BATON-SETUP-001
+  - relation_type: superseded_by
+    target_asset_id: ADR-DIRECT-DELIVERY-HARNESS-005
   consumers:
-  - CTRL-BATON-SETUP
+  - CTRL-DELIVERY-HARNESS-001
   evidence: []
   classification:
     contains_secrets: false
@@ -4641,21 +4628,21 @@ records:
     contains_raw_data: false
     sensitivity: INTERNAL_NON_SECRET
 - asset_id: TEMPLATE-BATON-PULL-REQUEST-001
-  record_version: '1.2'
+  record_version: '2.0'
   asset_type: configuration
-  purpose: Pull request template for candidate evidence, single full-gate
-    ownership, OWNER_ATTENTION_GATE, and route-specific merge read-back.
+  purpose: Delivery Harness pull request template for exact context, candidate
+    evidence, owner-attention v2 and guarded merge read-back.
   status: IMPLEMENTED_UNVERIFIED
   origin: REPOSITORY
-  as_of: '2026-08-08'
-  truth_owner: CTRL-BATON-SETUP
+  as_of: '2026-08-14'
+  truth_owner: CTRL-DELIVERY-HARNESS-001
   location:
     kind: git_path
     logical_uri: repo://.github/pull_request_template.md
     repository_path: .github/pull_request_template.md
   integrity:
     kind: sha256
-    sha256: 132ff62ab8e76d8ffe2afb4361b196528a5cb14d1e569850d2403a2bf6983754
+    sha256: ff8dcedd7804ffc8811cc76f2aa4cdbfe2b6a6cb09f433e13b2b89cae4a10876
   access:
     mode: read_only
     method: file
@@ -4663,9 +4650,9 @@ records:
     secrets_required: false
   relations:
   - relation_type: governed_by
-    target_asset_id: CTRL-BATON-SETUP-001
+    target_asset_id: CTRL-DELIVERY-HARNESS-001
   consumers:
-  - CTRL-BATON-SETUP
+  - CTRL-DELIVERY-HARNESS-001
   evidence: []
   classification:
     contains_secrets: false
@@ -4793,22 +4780,21 @@ records:
     contains_raw_data: false
     sensitivity: INTERNAL_NON_SECRET
 - asset_id: SCRIPT-BATON-VALIDATE-001
-  record_version: '1.12'
+  record_version: '2.0'
   asset_type: script
-  purpose: Deterministic offline validator for baton schemas, fixtures, route
-    ownership, OWNER_ATTENTION_GATE, JIT validation, Catalog, templates and rules,
-    with a focused mode that delegates the duplicate canonical hash sweep.
+  purpose: Deterministic offline validator preserving historical baton schemas and
+    fixtures while enforcing dormant routing and direct Delivery Harness ownership.
   status: IMPLEMENTED_UNVERIFIED
   origin: REPOSITORY
-  as_of: '2026-08-08'
-  truth_owner: CTRL-BATON-SETUP
+  as_of: '2026-08-14'
+  truth_owner: CTRL-DELIVERY-HARNESS-001
   location:
     kind: git_path
     logical_uri: repo://scripts/validate_baton.py
     repository_path: scripts/validate_baton.py
   integrity:
     kind: sha256
-    sha256: 69a2b8a5f87d69014a53aed95d353e4bb68fe3f2efd505de133aefe29f98d450
+    sha256: 00c05cd231997f7c3ad532b6ed6e907211a8f642a732923778f5c5cd4901e465
   access:
     mode: read_only
     method: file
@@ -4816,9 +4802,9 @@ records:
     secrets_required: false
   relations:
   - relation_type: governed_by
-    target_asset_id: CTRL-BATON-SETUP-001
+    target_asset_id: CTRL-DELIVERY-HARNESS-001
   consumers:
-  - CTRL-BATON-SETUP
+  - CTRL-DELIVERY-HARNESS-001
   evidence: []
   classification:
     contains_secrets: false
@@ -4885,21 +4871,21 @@ records:
     contains_raw_data: false
     sensitivity: INTERNAL_NON_SECRET
 - asset_id: TEST-BATON-CONTRACT-001
-  record_version: '1.1'
+  record_version: '2.0'
   asset_type: script
-  purpose: Unit tests for marker extraction, hashing, managed-write fail-closed rules,
-    and current versus generic route ownership.
+  purpose: Unit tests for historical baton byte safety plus direct-route ownership,
+    dormant-adapter exclusion and guarded merge invariants.
   status: IMPLEMENTED_UNVERIFIED
   origin: REPOSITORY
-  as_of: '2026-07-27'
-  truth_owner: CTRL-BATON-SETUP
+  as_of: '2026-08-14'
+  truth_owner: CTRL-DELIVERY-HARNESS-001
   location:
     kind: git_path
     logical_uri: repo://tests/test_baton_contract.py
     repository_path: tests/test_baton_contract.py
   integrity:
     kind: sha256
-    sha256: e9e9291d70c876294e8cacdeeefa2572dc6370f46af9155405cf805eb1aa048e
+    sha256: 2b9981e634697874fd8fc3f414b0627044b605ce93efb408b9163402219509b8
   access:
     mode: read_only
     method: file
@@ -4907,9 +4893,9 @@ records:
     secrets_required: false
   relations:
   - relation_type: governed_by
-    target_asset_id: CTRL-BATON-SETUP-001
+    target_asset_id: CTRL-DELIVERY-HARNESS-001
   consumers:
-  - CTRL-BATON-SETUP
+  - CTRL-DELIVERY-HARNESS-001
   evidence: []
   classification:
     contains_secrets: false
@@ -15784,53 +15770,58 @@ records:
   classification: *t25_internal
 
 - asset_id: ADR-OWNER-ATTENTION-GATE-004
-  record_version: '1.0'
+  record_version: '1.1'
   asset_type: decision
-  purpose: Accepted design for owner attention and route-specific Codex/Cursor merge authority.
-  status: IMPLEMENTED_UNVERIFIED
+  purpose: Historical owner-attention v1 predecessor superseded for direct-route
+    merge authority by ADR-005 and the v2 machine policy.
+  status: DEPRECATED
   origin: REPOSITORY
-  as_of: '2026-08-08'
+  as_of: '2026-08-14'
   truth_owner: CTRL-OWNER-ATTENTION-GATE
   location: {kind: git_path, logical_uri: 'repo://docs/decisions/ADR-004-owner-attention-and-route-specific-merge-authority.md', repository_path: docs/decisions/ADR-004-owner-attention-and-route-specific-merge-authority.md}
-  integrity: {kind: sha256, sha256: 64eec120ac934b147960604e79416a4a291a991333d42b0b64a62c9407bfe11f}
+  integrity: {kind: sha256, sha256: 1f90f1ee484fd75fb6ed59556b65b05a5fc4318d6d7862ad4f9ed61f4408510e}
   access: *t25_read_file
   relations:
   - {relation_type: governed_by, target_asset_id: CTRL-OWNER-ATTENTION-GATE-001}
   - {relation_type: depends_on, target_asset_id: ADR-GPT-EXECUTOR-ROUTING-003}
+  - {relation_type: superseded_by, target_asset_id: ADR-DIRECT-DELIVERY-HARNESS-005}
   consumers: [FACTORY-001, LOCAL-WORK-CODEX, PROJECT-CHAT-BATON-CURSOR]
   evidence: []
   classification: *t25_internal
 
 - asset_id: SCRIPT-OWNER-ATTENTION-GATE-001
-  record_version: '1.0'
+  record_version: '2.0'
   asset_type: script
-  purpose: Deterministic fail-closed evaluator for routine, material and merge decisions.
+  purpose: Deterministic fail-closed evaluator for v1 compatibility and v2 direct
+    route routine, material and guarded merge decisions.
   status: IMPLEMENTED_UNVERIFIED
   origin: REPOSITORY
-  as_of: '2026-08-08'
-  truth_owner: CTRL-OWNER-ATTENTION-GATE
+  as_of: '2026-08-14'
+  truth_owner: CTRL-DELIVERY-HARNESS-001
   location: {kind: git_path, logical_uri: 'repo://scripts/owner_attention_gate.py', repository_path: scripts/owner_attention_gate.py}
-  integrity: {kind: sha256, sha256: f047fcb0186db68533211f0a3c4d5cb770204592856b11ec9cc6d44152131820}
+  integrity: {kind: sha256, sha256: 1e1537ab252ea2aab7b43c8f73981cdc5ece6052c877e7e9bb389bf2a3c100b1}
   access: *t25_read_file
   relations:
-  - {relation_type: governed_by, target_asset_id: POLICY-OWNER-ATTENTION-GATE-001}
+  - {relation_type: governed_by, target_asset_id: POLICY-OWNER-ATTENTION-GATE-002}
   consumers: [FACTORY-001, LOCAL-WORK-CODEX]
   evidence: []
   classification: *t25_internal
 
 - asset_id: TEST-OWNER-ATTENTION-GATE-001
-  record_version: '1.2'
+  record_version: '2.0'
   asset_type: script
-  purpose: Adversarial owner-attention matrix plus active-policy, Project Instruction UI-limit and model-effort boundary tests.
+  purpose: Adversarial v1/v2 owner-attention matrix plus active direct-policy,
+    optional Project Instruction and model-effort boundary tests.
   status: IMPLEMENTED_UNVERIFIED
   origin: REPOSITORY
-  as_of: '2026-08-11'
-  truth_owner: CTRL-OWNER-ATTENTION-GATE
+  as_of: '2026-08-14'
+  truth_owner: CTRL-DELIVERY-HARNESS-001
   location: {kind: git_path, logical_uri: 'repo://tests/test_owner_attention_gate_policy.py', repository_path: tests/test_owner_attention_gate_policy.py}
-  integrity: {kind: sha256, sha256: bb88701478da8e9074958c9d3953e85ef0daa5f7747f2ed2090a5b82681ddc0d}
+  integrity: {kind: sha256, sha256: 1aa4bc944f1b8ca896ecf0752c795043ca054718fca6c8e4b0a64b6dcc90a9e9}
   access: *t25_read_file
   relations:
   - {relation_type: depends_on, target_asset_id: POLICY-OWNER-ATTENTION-GATE-001}
+  - {relation_type: depends_on, target_asset_id: POLICY-OWNER-ATTENTION-GATE-002}
   - {relation_type: depends_on, target_asset_id: SCRIPT-OWNER-ATTENTION-GATE-001}
   consumers: [FACTORY-001, LOCAL-WORK-CODEX]
   evidence: []
@@ -15858,7 +15849,7 @@ records:
   record_version: '1.1'
   asset_type: control_document
   purpose: Complete under-8000-character Project Instruction v3.5 candidate with deterministic model-effort routing and OWNER_ATTENTION_GATE.
-  status: PROPOSED
+  status: DEPRECATED
   origin: REPOSITORY
   as_of: '2026-08-11'
   truth_owner: CTRL-OWNER-ATTENTION-GATE
@@ -15867,6 +15858,7 @@ records:
   access: *t25_read_file
   relations:
   - {relation_type: governed_by, target_asset_id: POLICY-OWNER-ATTENTION-GATE-001}
+  - {relation_type: superseded_by, target_asset_id: PROJECT-INSTRUCTION-OPTIONAL-3-6-001}
   consumers: [CHATGPT-PROJECT-CONTROL-PLANE, GOAL-OWNER]
   evidence: []
   classification: *t25_internal
@@ -19191,3 +19183,280 @@ records:
     contains_secrets: false
     contains_raw_data: false
     sensitivity: INTERNAL_NON_SECRET
+
+- asset_id: CTRL-DELIVERY-HARNESS-001
+  record_version: '1.0'
+  asset_type: control_document
+  purpose: Portable Git-native direct delivery task and Definition of Done for equal Cursor and Codex bounded engineering routes.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-08-14'
+  truth_owner: CTRL-DELIVERY-HARNESS-001
+  location: {kind: git_path, logical_uri: 'repo://docs/tasks/CTRL-DELIVERY-HARNESS-V1.md', repository_path: docs/tasks/CTRL-DELIVERY-HARNESS-V1.md}
+  integrity: {kind: sha256, sha256: 383c5ad771dc8a003e0a0fed10d3d65330bb68b3e4eb6971d45c7033329980f5}
+  access: *t25_read_file
+  relations:
+  - {relation_type: contains, target_asset_id: CONFIG-DELIVERY-HARNESS-001}
+  - {relation_type: contains, target_asset_id: CONFIG-DELIVERY-PROJECT-PROFILE-001}
+  - {relation_type: contains, target_asset_id: CONFIG-DELIVERY-CONTEXT-MAP-001}
+  - {relation_type: contains, target_asset_id: CONFIG-DELIVERY-CAPABILITY-RADAR-001}
+  - {relation_type: contains, target_asset_id: SKILL-DELIVERY-HARNESS-001}
+  - {relation_type: validated_by, target_asset_id: TEST-DELIVERY-HARNESS-001}
+  - {relation_type: evidenced_by, target_asset_id: EVIDENCE-DELIVERY-HARNESS-ACCEPTANCE-001}
+  consumers: [FACTORY-001, LOCAL-WORK-CODEX, DIRECT-CURSOR-DELIVERY]
+  evidence: []
+  classification: *t25_internal
+
+- asset_id: CONFIG-DELIVERY-HARNESS-001
+  record_version: '1.0'
+  asset_type: configuration
+  purpose: Closed route-neutral Delivery Harness contract with routes, context budgets, cloud export mode and external authority exclusions.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-08-14'
+  truth_owner: CTRL-DELIVERY-HARNESS-001
+  location: {kind: git_path, logical_uri: 'repo://delivery-harness/harness.yaml', repository_path: delivery-harness/harness.yaml}
+  integrity: {kind: sha256, sha256: 1f1b18953985069a35b7f933d9a2eec16d704d10161b2e95176974ce9d6e9d65}
+  access: *t25_read_file
+  relations:
+  - {relation_type: governed_by, target_asset_id: CTRL-DELIVERY-HARNESS-001}
+  - {relation_type: validated_by, target_asset_id: TEST-DELIVERY-HARNESS-001}
+  consumers: [LOCAL-WORK-CODEX, DIRECT-CURSOR-DELIVERY, FACTORY-001]
+  evidence: []
+  classification: *t25_internal
+
+- asset_id: CONFIG-DELIVERY-PROJECT-PROFILE-001
+  record_version: '1.0'
+  asset_type: configuration
+  purpose: Solana Alpha Lab binding profile for repository, truth owners, context caps and optional cloud export.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-08-14'
+  truth_owner: CTRL-DELIVERY-HARNESS-001
+  location: {kind: git_path, logical_uri: 'repo://delivery-harness/project-profile.yaml', repository_path: delivery-harness/project-profile.yaml}
+  integrity: {kind: sha256, sha256: 71169afdec04aa7c14b363bf4f9febbb1d720245995e53176ed43f2c633c1949}
+  access: *t25_read_file
+  relations:
+  - {relation_type: governed_by, target_asset_id: CTRL-DELIVERY-HARNESS-001}
+  - {relation_type: depends_on, target_asset_id: CONFIG-DELIVERY-HARNESS-001}
+  consumers: [LOCAL-WORK-CODEX, DIRECT-CURSOR-DELIVERY]
+  evidence: []
+  classification: *t25_internal
+
+- asset_id: CONFIG-DELIVERY-CONTEXT-MAP-001
+  record_version: '1.0'
+  asset_type: configuration
+  purpose: Deterministic L0 through L3 context projection map over Git, Catalog, lifecycle and historical evidence owners.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-08-14'
+  truth_owner: CTRL-DELIVERY-HARNESS-001
+  location: {kind: git_path, logical_uri: 'repo://delivery-harness/context-map.yaml', repository_path: delivery-harness/context-map.yaml}
+  integrity: {kind: sha256, sha256: ca881df9da3884deb480327f2fd070e249572aa50f1d8eef30e877b5dfbbcf4d}
+  access: *t25_read_file
+  relations:
+  - {relation_type: governed_by, target_asset_id: CTRL-DELIVERY-HARNESS-001}
+  - {relation_type: advises, target_asset_id: ARCH-INTENT-004}
+  consumers: [LOCAL-WORK-CODEX, DIRECT-CURSOR-DELIVERY, FACTORY-001]
+  evidence: []
+  classification: *t25_internal
+
+- asset_id: CONFIG-DELIVERY-CAPABILITY-RADAR-001
+  record_version: '1.0'
+  asset_type: configuration
+  purpose: Fail-closed one-candidate radar for plugin or tool adoption only after measured capability triggers.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-08-14'
+  truth_owner: CTRL-DELIVERY-HARNESS-001
+  location: {kind: git_path, logical_uri: 'repo://delivery-harness/capability-radar.yaml', repository_path: delivery-harness/capability-radar.yaml}
+  integrity: {kind: sha256, sha256: c1d05dcdefa600f99b5c7d7cfcf0fbb153b764034fa2f794239feb59e8d817eb}
+  access: *t25_read_file
+  relations:
+  - {relation_type: governed_by, target_asset_id: CTRL-DELIVERY-HARNESS-001}
+  - {relation_type: validated_by, target_asset_id: TEST-DELIVERY-HARNESS-001}
+  consumers: [FACTORY-001, GOAL-OWNER]
+  evidence: []
+  classification: *t25_internal
+
+- asset_id: SCRIPT-DELIVERY-HARNESS-001
+  record_version: '1.0'
+  asset_type: script
+  purpose: Deterministic CLI for harness checks, bounded context receipts, portable bootstrap, capability radar and route continuity.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-08-14'
+  truth_owner: CTRL-DELIVERY-HARNESS-001
+  location: {kind: git_path, logical_uri: 'repo://scripts/delivery_harness.py', repository_path: scripts/delivery_harness.py}
+  integrity: {kind: sha256, sha256: 1d5ee983b9e7e470041c5c676abedb13131fe16163cd0e6019559a65348043a6}
+  access: *t25_read_file
+  relations:
+  - {relation_type: governed_by, target_asset_id: CONFIG-DELIVERY-HARNESS-001}
+  - {relation_type: validated_by, target_asset_id: TEST-DELIVERY-HARNESS-001}
+  consumers: [LOCAL-WORK-CODEX, DIRECT-CURSOR-DELIVERY]
+  evidence: []
+  classification: *t25_internal
+
+- asset_id: SKILL-DELIVERY-HARNESS-001
+  record_version: '1.0'
+  asset_type: control_document
+  purpose: Canonical repository Agent Skill for exact bounded delivery from context through guarded merge and read-back.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-08-14'
+  truth_owner: CTRL-DELIVERY-HARNESS-001
+  location: {kind: git_path, logical_uri: 'repo://.agents/skills/delivery-harness/SKILL.md', repository_path: .agents/skills/delivery-harness/SKILL.md}
+  integrity: {kind: sha256, sha256: d65ed1a9859ad6d7ae9a5a1b0cd98a22195f79261278d96dc23d4db56a5e930a}
+  access: *t25_read_file
+  relations:
+  - {relation_type: governed_by, target_asset_id: CTRL-DELIVERY-HARNESS-001}
+  - {relation_type: depends_on, target_asset_id: PROTOCOL-DELIVERY-HARNESS-001}
+  consumers: [LOCAL-WORK-CODEX, DIRECT-CURSOR-DELIVERY]
+  evidence: []
+  classification: *t25_internal
+
+- asset_id: POLICY-OWNER-ATTENTION-GATE-002
+  record_version: '1.0'
+  asset_type: configuration
+  purpose: Machine-readable v2 owner-attention policy giving Cursor and Codex equal bounded routine and guarded merge authority.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-08-14'
+  truth_owner: CTRL-DELIVERY-HARNESS-001
+  location: {kind: git_path, logical_uri: 'repo://control/owner_attention_gate_v2.yaml', repository_path: control/owner_attention_gate_v2.yaml}
+  integrity: {kind: sha256, sha256: 8d2760f8165e2d2c843bf05c59f8d1e2b683d5535101f1158af86031f076b3fe}
+  access: *t25_read_file
+  relations:
+  - {relation_type: governed_by, target_asset_id: ADR-DIRECT-DELIVERY-HARNESS-005}
+  - {relation_type: validated_by, target_asset_id: TEST-OWNER-ATTENTION-GATE-001}
+  consumers: [LOCAL-WORK-CODEX, DIRECT-CURSOR-DELIVERY, GOAL-OWNER]
+  evidence: []
+  classification: *t25_internal
+
+- asset_id: ADR-DIRECT-DELIVERY-HARNESS-005
+  record_version: '1.0'
+  asset_type: decision
+  purpose: Accepted successor decision for one Git-native direct Delivery Harness and dormant historical baton.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-08-14'
+  truth_owner: CTRL-DELIVERY-HARNESS-001
+  location: {kind: git_path, logical_uri: 'repo://docs/decisions/ADR-005-direct-delivery-harness.md', repository_path: docs/decisions/ADR-005-direct-delivery-harness.md}
+  integrity: {kind: sha256, sha256: 5dfad1947049489f62b89ad0d9b0992fc10966bbca87f552e6d6cbdd9b725b2b}
+  access: *t25_read_file
+  relations:
+  - {relation_type: derived_from, target_asset_id: ADR-GPT-EXECUTOR-ROUTING-003}
+  - {relation_type: derived_from, target_asset_id: ADR-OWNER-ATTENTION-GATE-004}
+  consumers: [FACTORY-001, LOCAL-WORK-CODEX, DIRECT-CURSOR-DELIVERY]
+  evidence: []
+  classification: *t25_internal
+
+- asset_id: PROTOCOL-DELIVERY-HARNESS-001
+  record_version: '1.0'
+  asset_type: control_document
+  purpose: Exact direct delivery workflow with decision-oriented atoms, risk-routed review, one full gate and guarded merge read-back.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-08-14'
+  truth_owner: CTRL-DELIVERY-HARNESS-001
+  location: {kind: git_path, logical_uri: 'repo://docs/agent/DELIVERY_HARNESS_PROTOCOL.md', repository_path: docs/agent/DELIVERY_HARNESS_PROTOCOL.md}
+  integrity: {kind: sha256, sha256: 89ac74e3a2865d634433747e19057ac8a3408e99a51dd733b41c3ac74ef8b44c}
+  access: *t25_read_file
+  relations:
+  - {relation_type: governed_by, target_asset_id: ADR-DIRECT-DELIVERY-HARNESS-005}
+  - {relation_type: depends_on, target_asset_id: PROTOCOL-DELIVERY-CONTEXT-001}
+  consumers: [LOCAL-WORK-CODEX, DIRECT-CURSOR-DELIVERY]
+  evidence: []
+  classification: *t25_internal
+
+- asset_id: PROTOCOL-DELIVERY-CONTEXT-001
+  record_version: '1.0'
+  asset_type: control_document
+  purpose: Bounded deterministic context projection protocol over exact repository truth owners with explicit missingness.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-08-14'
+  truth_owner: CTRL-DELIVERY-HARNESS-001
+  location: {kind: git_path, logical_uri: 'repo://docs/agent/DELIVERY_CONTEXT_PROTOCOL.md', repository_path: docs/agent/DELIVERY_CONTEXT_PROTOCOL.md}
+  integrity: {kind: sha256, sha256: c4c9ea00621df32c953a63641c49ec622bd4b156e80c2b2195e2bc654dbd738b}
+  access: *t25_read_file
+  relations:
+  - {relation_type: governed_by, target_asset_id: CONFIG-DELIVERY-CONTEXT-MAP-001}
+  - {relation_type: advises, target_asset_id: ARCH-INTENT-004}
+  consumers: [LOCAL-WORK-CODEX, DIRECT-CURSOR-DELIVERY, FACTORY-001]
+  evidence: []
+  classification: *t25_internal
+
+- asset_id: TEST-DELIVERY-HARNESS-001
+  record_version: '1.0'
+  asset_type: script
+  purpose: Deterministic contract, context, authority, bootstrap, adapter, skill, capability-radar and cloud-export boundary tests.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-08-14'
+  truth_owner: CTRL-DELIVERY-HARNESS-001
+  location: {kind: git_path, logical_uri: 'repo://tests/test_delivery_harness_contract.py', repository_path: tests/test_delivery_harness_contract.py}
+  integrity: {kind: sha256, sha256: 7dad499f5a332e8906e3d4aa877d5c4547ebe1b1ed2673fb0ad94c57e24c7fe3}
+  access: *t25_read_file
+  relations:
+  - {relation_type: depends_on, target_asset_id: CONFIG-DELIVERY-HARNESS-001}
+  - {relation_type: depends_on, target_asset_id: CONFIG-DELIVERY-CONTEXT-MAP-001}
+  - {relation_type: depends_on, target_asset_id: POLICY-OWNER-ATTENTION-GATE-002}
+  consumers: [CTRL-DELIVERY-HARNESS-001, FACTORY-001]
+  evidence: []
+  classification: *t25_internal
+
+- asset_id: PROJECT-INSTRUCTION-OPTIONAL-3-6-001
+  record_version: '1.0'
+  asset_type: control_document
+  purpose: Optional owner-managed under-8000-character cloud Project Instruction export derived from the Git-native harness.
+  status: PROPOSED
+  origin: REPOSITORY
+  as_of: '2026-08-14'
+  truth_owner: GOAL-OWNER
+  location: {kind: git_path, logical_uri: 'repo://docs/agent/PROJECT_INSTRUCTION_V3_6.md', repository_path: docs/agent/PROJECT_INSTRUCTION_V3_6.md}
+  integrity: {kind: sha256, sha256: f2957caf0abb3aca8d6aa831debdb84d5a5cc217628ea3f74fda61b4035460ab}
+  access: *t25_read_file
+  relations:
+  - {relation_type: governed_by, target_asset_id: CTRL-DELIVERY-HARNESS-001}
+  consumers: [GOAL-OWNER]
+  evidence: []
+  classification: *t25_internal
+
+- asset_id: EVIDENCE-DELIVERY-HARNESS-ACCEPTANCE-001
+  record_version: '1.0'
+  asset_type: evidence
+  purpose: Hash-bound implementation acceptance candidate with optional cloud export, non-claims and zero external side effects.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-08-14'
+  truth_owner: CTRL-DELIVERY-HARNESS-001
+  location: {kind: git_path, logical_uri: 'repo://docs/evidence/control/delivery_harness_acceptance_v1.json', repository_path: docs/evidence/control/delivery_harness_acceptance_v1.json}
+  integrity: {kind: sha256, sha256: 00b4e28095e11f27f67f3a45a3e5757e447aa93b20681021c4dda0b5fa93e4fe}
+  access: *t25_read_file
+  relations:
+  - {relation_type: derived_from, target_asset_id: CTRL-DELIVERY-HARNESS-001}
+  - {relation_type: validated_by, target_asset_id: TEST-DELIVERY-HARNESS-001}
+  - {relation_type: depends_on, target_asset_id: EVIDENCE-DELIVERY-HARNESS-FACTORY-FIT-001}
+  consumers: [CTRL-DELIVERY-HARNESS-001, FACTORY-001, GOAL-OWNER]
+  evidence: []
+  search_terms: [DELIVERY_HARNESS_V1, DIRECT_CODEX_DELIVERY, DIRECT_CURSOR_DELIVERY, OWNER_MANAGED_OPTIONAL_EXPORT, LEGACY_GITHUB_BATON_DORMANT]
+  classification: *t25_internal
+
+- asset_id: EVIDENCE-DELIVERY-HARNESS-FACTORY-FIT-001
+  record_version: '1.0'
+  asset_type: evidence
+  purpose: FULL Factory Fit review for context efficiency, authority parity, history, operability, recovery, build versus buy and red team.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-08-14'
+  truth_owner: CTRL-DELIVERY-HARNESS-001
+  location: {kind: git_path, logical_uri: 'repo://docs/evidence/control/delivery_harness_factory_fit_v1.json', repository_path: docs/evidence/control/delivery_harness_factory_fit_v1.json}
+  integrity: {kind: sha256, sha256: cb5acb3a68f89c1f867d199d9d6e1c4336ae628152c15343a7025eda51d024b2}
+  access: *t25_read_file
+  relations:
+  - {relation_type: derived_from, target_asset_id: CTRL-DELIVERY-HARNESS-001}
+  - {relation_type: validated_by, target_asset_id: TEST-DELIVERY-HARNESS-001}
+  consumers: [CTRL-DELIVERY-HARNESS-001, FACTORY-001, GOAL-OWNER]
+  evidence: []
+  classification: *t25_internal

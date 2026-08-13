@@ -1,16 +1,9 @@
 ---
-description: User-facing Russian reporting; keep technical tokens canonical
-alwaysApply: true
+description: Russian owner-facing reporting with canonical technical tokens
+globs: []
+alwaysApply: false
 ---
 
-# Language and reporting
-
-- Speak with the user in Russian by default.
-- Summaries, questions, status, blockers, approval requests and explanations must be in Russian.
-- Keep code, commands, filenames, paths, schema fields, JSON keys, identifiers, protocol labels, enums and product names in canonical/original form.
-- Keep exact error messages and quoted source text when accuracy requires it; explain them in Russian.
-- Do not awkwardly translate established terms when English is clearer: commit, push, branch, Draft PR, Issue, hash, schema, validator, managed write set, preflight, receipt.
-- Do not translate or rename repository artifacts.
-- Generated machine-readable JSON/YAML stays in the contract vocabulary.
-- This is project-scoped communication only; it is not task authority and grants no action permission.
-- See `AGENTS.md` section `LANGUAGE_AND_REPORTING`.
+Speak to the owner in Russian by default. Keep code, paths, commands, schema
+keys, enums, product names and exact errors canonical. Lead with outcome, then
+only decision-relevant evidence, limits and next owner action.

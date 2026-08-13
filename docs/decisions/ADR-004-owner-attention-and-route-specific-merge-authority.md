@@ -1,7 +1,7 @@
 ---
 adr_id: ADR-004
 title: Owner attention gate and route-specific merge authority
-status: OWNER_DESIGN_APPROVED_IMPLEMENTATION_CANDIDATE
+status: SUPERSEDED_FOR_DIRECT_ROUTE_MERGE_BY_ADR-005
 as_of: 2026-08-08
 owner_task: CTRL-OWNER-ATTENTION-GATE
 supersedes:
@@ -10,6 +10,10 @@ contains_secrets: false
 ---
 
 # ADR-004 — Owner attention gate and route-specific merge authority
+
+> Historical v1 predecessor. `ADR-005` and
+> `control/owner_attention_gate_v2.yaml` supersede active direct-route merge
+> authority. The v1 policy remains immutable compatibility evidence.
 
 ## Context
 

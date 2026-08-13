@@ -1,17 +1,10 @@
 ---
-description: Catalog and evidence boundaries without dual truth owners
-alwaysApply: true
+description: Catalog, evidence and generated-view integrity
+globs: ["catalog/**", "docs/evidence/**", "registries/**", "configs/**"]
+alwaysApply: false
 ---
 
-# Catalog and evidence
-
-- Git bytes are repository truth for tracked files; Catalog is discovery metadata.
-- Do not copy the seven ChatGPT Project Sources into Git as a second permanent-memory owner.
-- Do not invent past `first_reliable_available_at` availability.
-- Exact imported pre-Git bytes stay under `docs/evidence/pre_git/`.
-- Catalog/hash maintenance and direct generated consumers required by an
-  in-scope change are routine propagation under standing project autonomy.
-- Never manually edit generated Catalog navigation or `docs/PROJECT_MAP.md`;
-  update its owner and run the deterministic generator.
-- Machine-specific absolute paths must not enter Catalog metadata.
-- See `AGENTS.md` and existing Catalog/ADR docs for integrity rules.
+Catalog is discovery metadata over Git truth. Query stable IDs; do not load it
+wholesale. Preserve exact raw/imported bytes, availability, lineage and
+negative evidence. Do not hand-edit generated projections. Cloud export is
+historical/optional, not working memory or an acceptance gate.

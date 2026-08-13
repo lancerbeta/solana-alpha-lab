@@ -164,9 +164,24 @@ def validate_provenance(asset_id: str, asset: dict[str, Any], assets: dict[str, 
         return
 
     if asset_type == "architecture_intent":
+        status = asset["status"]
+        implementation_statuses = {"IMPLEMENTED_UNVERIFIED", "VALIDATED_ACTIVE"}
+        status_rank = {"IMPLEMENTED_UNVERIFIED": 1, "VALIDATED_ACTIVE": 2}
+        evidence_targets = [
+            assets[relation["target_asset_id"]]
+            for relation in asset["relations"]
+            if relation["relation_type"] == "evidenced_by"
+            and relation["target_asset_id"] in assets
+            and assets[relation["target_asset_id"]]["asset_type"] == "evidence"
+        ]
+        implementation_evidenced = status not in implementation_statuses or any(
+            status_rank.get(evidence["status"], 0) >= status_rank[status]
+            for evidence in evidence_targets
+        )
         required = (
             asset["origin"] == "PROJECT_SOURCE"
-            and asset["status"] == "ACCEPTED_DIRECTION_NOT_IMPLEMENTED"
+            and status in {"ACCEPTED_DIRECTION_NOT_IMPLEMENTED", *implementation_statuses}
+            and implementation_evidenced
             and provenance["import_mode"] == "REGISTERED_CURRENT_INTENT"
             and provenance["canonicality"] == "CURRENT_INTENT"
             and provenance["past_availability_claim"] == "NO_PAST_AVAILABILITY_CLAIM"

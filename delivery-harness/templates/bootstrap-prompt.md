@@ -13,7 +13,9 @@ its child worktree together.
    contract. Never infer work from recency, branch names or chat history.
 5. Generate the L0/L1 context receipt and report its hash and explicit gaps.
 6. Confirm that no active Cursor rule or command elects the historical baton.
-7. Do not change global Cursor/Codex settings and do not connect external
+7. Treat cloud Project Sources/Project Instruction as
+   `OWNER_MANAGED_OPTIONAL_EXPORT`. Do not request replacement or smoke.
+8. Do not change global Cursor/Codex settings and do not connect external
    systems during bootstrap.
 
 Finish with exactly one terminal:
