@@ -1,0 +1,15 @@
+schema: delivery-harness.portable-project-profile
+schema_version: '1.0'
+profile_id: PORTABLE_PROJECT_PROFILE_V1
+repository:
+  name: OWNER_AND_REPOSITORY_REQUIRED
+  default_branch: main
+bindings:
+  agent_front_door: AGENTS.md
+  task_contract: EXACT_TASK_CONTRACT_REQUIRED
+  catalog_manifest: OPTIONAL_EXACT_PATH
+authority:
+  routine_engineering: bounded_only
+  external_material_action: owner_gate
+  destructive_action: owner_gate
+  merge: exact_pr_and_head_owner_gate

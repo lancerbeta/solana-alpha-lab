@@ -6,11 +6,15 @@ repository:
   name: lancerbeta/solana-alpha-lab
   default_branch: main
 bindings:
-  project_sources_release_registry: docs/project_sources/release_registry_v1.yaml
   catalog_manifest: catalog/catalog_manifest.yaml
   owner_attention_policy: control/owner_attention_gate_v2.yaml
   context_map: delivery-harness/context-map.yaml
   domain_policy: delivery-harness/policies/solana-alpha-lab.md
+  historical_cloud_bundle_registry: docs/project_sources/release_registry_v1.yaml
+working_memory:
+  truth_owner: GIT
+  task_resolution: EXACT_TASK_CONTRACT
+  cloud_bundle: OWNER_MANAGED_OPTIONAL_EXPORT
 context_budgets:
   agents_max_bytes: 12288
   cursor_always_apply_max_bytes: 6144

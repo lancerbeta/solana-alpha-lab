@@ -1,0 +1,38 @@
+fixtures:
+  sentry:
+    schema: smial.delivery-harness-capability-events
+    schema_version: '1.0'
+    events:
+      first_unattended_runtime: true
+      named_incident_consumer: true
+  posthog:
+    schema: smial.delivery-harness-capability-events
+    schema_version: '1.0'
+    events:
+      owner_cockpit_workflow: true
+      named_behavior_question: true
+  clickhouse:
+    schema: smial.delivery-harness-capability-events
+    schema_version: '1.0'
+    events:
+      measured_duckdb_boundary: true
+      second_analytics_consumer: true
+  context7:
+    schema: smial.delivery-harness-capability-events
+    schema_version: '1.0'
+    events:
+      material_version_documentation_delays: 2
+  partial_unattended_runtime:
+    schema: smial.delivery-harness-capability-events
+    schema_version: '1.0'
+    events:
+      first_unattended_runtime: true
+      named_incident_consumer: false
+  multiple:
+    schema: smial.delivery-harness-capability-events
+    schema_version: '1.0'
+    events:
+      first_unattended_runtime: true
+      named_incident_consumer: true
+      owner_cockpit_workflow: true
+      named_behavior_question: true

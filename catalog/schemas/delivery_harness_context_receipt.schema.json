@@ -3,12 +3,13 @@
   "$id": "https://smial.local/schemas/delivery_harness_context_receipt.schema.json",
   "type": "object",
   "additionalProperties": false,
-  "required": ["schema", "schema_version", "harness_id", "route", "repository", "task", "selected", "gaps", "budgets", "receipt_sha256"],
+  "required": ["schema", "schema_version", "harness_id", "route", "cloud_bundle_mode", "repository", "task", "selected", "gaps", "budgets", "receipt_sha256"],
   "properties": {
     "schema": {"const": "smial.delivery-context-receipt"},
     "schema_version": {"const": "1.0"},
     "harness_id": {"const": "DELIVERY_HARNESS_V1"},
     "route": {"enum": ["DIRECT_CODEX_DELIVERY", "DIRECT_CURSOR_DELIVERY", "DESIGN_ONLY"]},
+    "cloud_bundle_mode": {"const": "OWNER_MANAGED_OPTIONAL_EXPORT"},
     "repository": {
       "type": "object", "additionalProperties": false,
       "required": ["name", "head", "tree", "branch", "dirty"],

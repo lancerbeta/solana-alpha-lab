@@ -3,7 +3,7 @@
   "$id": "https://smial.local/schemas/delivery_harness.schema.json",
   "type": "object",
   "additionalProperties": false,
-  "required": ["schema", "schema_version", "harness_id", "active_routes", "forbidden_active_input_routes", "routes", "context_lanes", "context_budgets", "portable_templates", "external_authority"],
+  "required": ["schema", "schema_version", "harness_id", "active_routes", "forbidden_active_input_routes", "routes", "context_lanes", "context_budgets", "portable_templates", "cloud_bundle", "external_authority"],
   "properties": {
     "schema": {"const": "smial.delivery-harness"},
     "schema_version": {"const": "1.0"},
@@ -26,6 +26,7 @@
     },
     "context_budgets": {"$ref": "#/$defs/budgets"},
     "portable_templates": {"type": "array", "minItems": 2, "uniqueItems": true, "items": {"type": "string", "pattern": "^[^\\\\:/]+(?:/[^\\\\:/]+)+$"}},
+    "cloud_bundle": {"type": "object", "additionalProperties": false, "required": ["mode", "execution_gate", "done_gate", "smoke_required_by_harness", "reminders", "working_context_truth_owner", "historical_registry_preserved"], "properties": {"mode": {"const": "OWNER_MANAGED_OPTIONAL_EXPORT"}, "execution_gate": {"const": false}, "done_gate": {"const": false}, "smoke_required_by_harness": {"const": false}, "reminders": {"const": false}, "working_context_truth_owner": {"const": false}, "historical_registry_preserved": {"const": true}}},
     "external_authority": {"$ref": "#/$defs/allFalseAuthority"}
   },
   "$defs": {

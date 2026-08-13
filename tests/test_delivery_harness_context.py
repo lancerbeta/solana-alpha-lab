@@ -64,18 +64,19 @@ class DeliveryHarnessContextTests(unittest.TestCase):
             value.pop("route")
         self.assertEqual(codex, cursor)
 
-    def test_active_source_release_comes_from_registry_not_recency(self) -> None:
+    def test_cloud_bundle_is_not_selected_as_working_context(self) -> None:
         receipt = self.receipt()
-        selected = receipt["selected"]
-        roadmap = next(
-            item for item in selected if item["semantic_role"] == "PRODUCT_ROADMAP"
+        self.assertFalse(
+            any(
+                item["path"].startswith("docs/project_sources/")
+                for item in receipt["selected"]
+            )
         )
-        self.assertEqual(roadmap["stable_id"], "PSR-0003-T28-RC001-FREEZE")
-        self.assertEqual(
-            roadmap["path"],
-            "docs/project_sources/releases/PSR-0003-T28-RC001-FREEZE/roadmap.md",
+        roadmap_gap = next(
+            gap for gap in receipt["gaps"] if gap["semantic_role"] == "PRODUCT_ROADMAP"
         )
-        self.assertEqual(roadmap["state"], "RESOLVED")
+        self.assertEqual(roadmap_gap["reason_code"], "NO_EXACT_GIT_ROADMAP_BOUND")
+        self.assertEqual(receipt["cloud_bundle_mode"], "OWNER_MANAGED_OPTIONAL_EXPORT")
 
     def test_selected_entries_are_stable_bounded_references(self) -> None:
         receipt = self.receipt()

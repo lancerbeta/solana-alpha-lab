@@ -41,6 +41,14 @@ context_budgets:
 portable_templates:
   - delivery-harness/templates/portable-project-profile.yaml
   - delivery-harness/templates/bootstrap-prompt.md
+cloud_bundle:
+  mode: OWNER_MANAGED_OPTIONAL_EXPORT
+  execution_gate: false
+  done_gate: false
+  smoke_required_by_harness: false
+  reminders: false
+  working_context_truth_owner: false
+  historical_registry_preserved: true
 external_authority:
   provider_api_rpc_wss: false
   wallet_signer_transaction: false

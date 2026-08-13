@@ -12,11 +12,11 @@ roles:
       paths: [AGENTS.md, delivery-harness/project-profile.yaml]
   - semantic_role: PRODUCT_ROADMAP
     lane: L1
-    truth_owner: ACTIVE_PROJECT_SOURCES_RELEASE
-    missingness: ERROR
+    truth_owner: EXACT_GIT_ROADMAP_BINDING
+    missingness: EXPLICIT_GAP
     resolver:
-      kind: SOURCE_RELEASE_REGISTRY
-      paths: [docs/project_sources/release_registry_v1.yaml]
+      kind: EXACT_INPUT
+      paths: []
   - semantic_role: ACTIVE_BOUNDED_WORK
     lane: L1
     truth_owner: EXACT_TASK_CONTRACT

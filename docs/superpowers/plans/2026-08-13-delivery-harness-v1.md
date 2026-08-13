@@ -13,7 +13,9 @@
 **Global constraints:**
 
 - no provider/API/RPC/WSS calls, credentials, wallet, signer, transaction, cash, deployment, repository settings or dependency changes;
-- do not mutate Project Sources, their release registry or cloud activation state;
+- preserve the historical Project Sources release registry byte-for-audit; treat
+  any future cloud bundle/Project Instruction as `OWNER_MANAGED_OPTIONAL_EXPORT`,
+  never an execution/DONE gate, reminder or required smoke;
 - do not delete historical baton scripts, tests, fixtures, protocols, ADRs or receipts;
 - generated Catalog files are changed only by `scripts/generate_navigation.py`;
 - `AGENTS.md` at most 12 KiB; combined Cursor `alwaysApply` rule bytes at most 6 KiB; ordinary context receipt at most 48 KiB; files above 100 KiB are reference-only;
@@ -150,7 +152,9 @@ Also assert:
 - active routes are exactly the two direct routes plus `DESIGN_ONLY`;
 - `LEGACY_GITHUB_BATON_DORMANT` has `active: false`, `task_selection: false`, `merge: FORBIDDEN`;
 - `GITHUB_BATON` is in `forbidden_active_input_routes`;
-- the project profile binds repository `lancerbeta/solana-alpha-lab`, active Source registry path, Catalog manifest path, owner-attention v2 path and the four context budgets;
+- the project profile binds repository `lancerbeta/solana-alpha-lab`, Git as the
+  working-memory owner, the historical cloud-export registry path, Catalog
+  manifest path, owner-attention v2 path and the four context budgets;
 - the Context Map has exactly the ten semantic roles from the design and each role declares truth owner, resolver, lane and missingness policy;
 - capability radar has `max_candidates: 1`, `default_decision: NONE`, no install action, no credentials and the four accepted WATCH triggers;
 - no configuration contains an absolute Windows path, a secret-like value, provider authority or wallet/cash authority;
@@ -254,7 +258,10 @@ Tests must prove:
 
 - identical committed bytes produce identical ordered `selected` entries and receipt hash for Cursor and Codex routes after normalizing only the `route` field;
 - every selected item carries semantic role, lane, truth owner, repository-relative path, stable ID where available, SHA-256 and missingness state;
-- active Project Sources resolve through `docs/project_sources/release_registry_v1.yaml`, never directory recency;
+- no path under `docs/project_sources/` is selected as working context; the
+  historical registry remains discoverable only as audit/rollback evidence;
+- a missing exact Git roadmap binding is an explicit
+  `NO_EXACT_GIT_ROADMAP_BOUND` gap, never a fallback to cloud-bundle recency;
 - Catalog is queried by exact task/asset text rather than loaded into the receipt wholesale;
 - exact task contract is required; newest/latest discovery, absolute paths and `..` fail before any read;
 - dirty Git state is reported, not hidden;
@@ -571,7 +578,8 @@ Generate L0/L1 context from an exact task contract; never discover newest work.
 Routine bounded engineering is autonomous.
 Material, external, user-only, destructive and truth-conflict actions use OWNER_ATTENTION_GATE_V2.
 Both direct agents stop for exact PR/head owner approval; dormant baton never merges.
-Tests/PR/CI do not establish canonical DONE or Project Source activation.
+Tests/PR/CI do not establish canonical DONE; optional cloud export is outside the
+delivery lifecycle and is never requested by the harness.
 ```
 
 Rewrite the six remaining Cursor rules so only authority and security are always-on. Give validation, Catalog and language rules path/description scoping where Cursor supports it. Unsupported rule metadata must fail the self-check rather than silently disappearing.
@@ -643,8 +651,12 @@ Extend existing tests to require:
 - `GITHUB_BATON_PROTOCOL.md` frontmatter/status `DORMANT_HISTORICAL`, a prominent no-active-authority warning and unchanged historical tooling references;
 - active execution router lists exactly `DIRECT_CODEX_DELIVERY`, `DIRECT_CURSOR_DELIVERY`, `DESIGN_ONLY`, with dormant baton only in a historical section;
 - ARCH-INTENT-004 advances to version `1.1`, status `IMPLEMENTED_BOUNDED_READ_ONLY_PROJECTION`, binds `DELIVERY_CONTEXT_MAP_V1` and keeps vector DB/remote RAG/UI excluded;
-- Project Instruction v3.6 is at most 8,000 characters, route-neutral, points to the Git core and v2 owner gate, requires exact merge approval for both direct agents, and explicitly says UI activation is separate;
-- PR template records harness ID, route, exact task contract, context receipt hash, owner gate, review fallback, candidate fingerprint and Project Sources disposition;
+- Project Instruction v3.6 is at most 8,000 characters, route-neutral, points to
+  the Git core and v2 owner gate, requires exact merge approval for both direct
+  agents, and is explicitly an optional owner-managed export with no activation
+  or smoke gate;
+- PR template records harness ID, route, exact task contract, context receipt
+  hash, owner gate, review fallback, candidate fingerprint and cloud-bundle mode;
 - README gives one current-repo bootstrap entry point and links the portable initializer without embedding machine-specific paths.
 
 Run RED:
@@ -666,16 +678,19 @@ Keep the active protocol concise and executable:
 - exact owner PR/head gate, merge read-back and canonical-status separation;
 - capability radar at Entry/Finish, deep only on trigger.
 
-The task contract freezes `project_sources_disposition: NO_CHANGE` and all external/wallet/cash authorities false.
+The task contract freezes `cloud_bundle_mode: OWNER_MANAGED_OPTIONAL_EXPORT`,
+`cloud_bundle_required_by_harness: false` and all external/wallet/cash
+authorities false. Historical Project Sources bytes remain unchanged.
 
 ### Step 3: Update owner-facing surfaces
 
-`PROJECT_INSTRUCTION_V3_6.md` is a candidate for later manual UI replacement. Repository delivery must not claim it active. `DELIVERY_HARNESS_BOOTSTRAP.md` gives the owner one short sequence after merge:
+`PROJECT_INSTRUCTION_V3_6.md` is an optional owner-managed export artifact.
+Repository delivery must not request its activation or smoke.
+`DELIVERY_HARNESS_BOOTSTRAP.md` gives one short sequence after merge:
 
 1. open only the repository root in Cursor;
 2. paste the checked-in bootstrap prompt;
-3. if requested, replace Project Instruction v3.5 with v3.6 and return its smoke;
-4. no plugin installation is required.
+3. no plugin installation or cloud bundle update is required.
 
 ### Step 4: Run GREEN
 
@@ -730,16 +745,18 @@ Update existing records rather than duplicate:
 - old Cursor baton rule/command records become `DORMANT_HISTORICAL`/`REMOVED_FROM_ACTIVE_DISCOVERY` with preserved historical relations;
 - ADR-003/ADR-004/protocol baton records point by `superseded_by` or `historical_evidence_for` to ADR-005;
 - ARCH-INTENT-004 status and hash match version 1.1;
-- Project Instruction v3.5 becomes superseded candidate; v3.6 is registered as `PROPOSED_UI_ACTIVATION_REQUIRED`.
+- Project Instruction v3.5 remains historical; v3.6 is registered as
+  `OWNER_MANAGED_OPTIONAL_EXPORT` and grants no active-route authority.
 
 Acceptance evidence must bind exact SHA-256 for design, plan, contracts, schemas, runtime, policy, active protocols, root AGENTS, skill and targeted tests. It records:
 
 ```json
 {
   "state_change": "IMPLEMENTED_UNVERIFIED",
-  "project_sources_disposition": "NO_CHANGE",
+  "cloud_bundle_mode": "OWNER_MANAGED_OPTIONAL_EXPORT",
   "capability_radar_now": "NONE",
-  "project_instruction_ui_activation": false,
+  "cloud_bundle_required_by_harness": false,
+  "cloud_bundle_smoke_required": false,
   "provider_calls": 0,
   "wallet_signer_transaction_actions": 0,
   "cash_spend_usd": 0
@@ -867,7 +884,11 @@ git push -u origin ctrl-delivery-harness-v1
 gh pr create --draft --base main --head ctrl-delivery-harness-v1 --title "feat: add portable delivery harness" --body-file local/delivery_harness/pr_body.md
 ```
 
-The PR body reports exact head/tree, targeted/full validation, independent review, Context/authority invariants, deleted active baton adapters, preserved historical baton assets, capability radar `NONE`, Project Sources `NO_CHANGE`, Project Instruction v3.6 activation pending and rollback.
+The PR body reports exact head/tree, targeted/full validation, independent
+review, Context/authority invariants, deleted active baton adapters, preserved
+historical baton assets, capability radar `NONE`, cloud bundle mode
+`OWNER_MANAGED_OPTIONAL_EXPORT` and rollback. It requests no bundle activation or
+smoke.
 
 ### Step 3: Wait for exact-head CI and review read-back
 
@@ -897,7 +918,8 @@ Return:
 
 - merge/main/CI evidence;
 - the exact copy-paste text from `delivery-harness/templates/bootstrap-prompt.md`;
-- one manual Project Instruction v3.6 replacement/smoke only if still required;
+- no Project Sources/Project Instruction replacement or smoke request; the owner
+  may export them voluntarily outside the harness;
 - no plugin installation instruction because `CAPABILITY_RADAR_NOW=NONE`;
 - `STATE_CHANGE` limited to the control task. Do not claim TASK-30, roadmap or Project Sources state changed.
 

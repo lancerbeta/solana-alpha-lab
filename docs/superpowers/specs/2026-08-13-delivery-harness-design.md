@@ -1,6 +1,6 @@
 # Delivery Harness v1 — Design
 
-Status: `OWNER_DESIGN_APPROVED_SPEC_REVIEW_PENDING`
+Status: `OWNER_DESIGN_AND_SPEC_REVIEW_APPROVED`
 Task: `CTRL-DELIVERY-HARNESS-V1`
 Date: `2026-08-13`
 Repository: `lancerbeta/solana-alpha-lab`
@@ -17,11 +17,18 @@ surface; their adapters may differ, but they must not create competing project
 truth.
 
 The owner remains responsible for product meaning, material risk/cost/access
-decisions, Project Sources activation and the exact merge gate. The elected
+decisions, optional cloud-export maintenance and the exact merge gate. The elected
 direct-delivery agent owns bounded task orchestration, Entry/Finish checks,
 routine engineering, repository reconciliation and technical/semantic evidence
 inside the approved objective and safety boundary. It cannot turn its own
 recommendation into new material authority.
+
+Git is the working project-memory owner for both direct routes. The historical
+cloud Project Sources registry remains preserved only as audit/rollback evidence.
+A future cloud bundle or Project Instruction export is owner-managed and optional:
+the harness never selects it as working context, never blocks execution or DONE on
+its activation, never reminds the owner to replace it and never requests a
+`SMOKE=PASS` receipt.
 
 The harness is also a portable seed for future repositories. Reuse must require
 changing a small project profile, not copying Solana-specific policy into every
@@ -179,8 +186,9 @@ The portable core defines universal concepts: authority, objective, bounded
 write set, evidence, context, validation, review, merge and recovery. A project
 profile binds those concepts to local files and commands.
 
-The Solana profile may reference Project Sources, Catalog, Factory Fit and
-provider/wallet boundaries. The portable core must not. A dummy-project fixture
+The Solana profile may reference the historical cloud-export registry, Catalog,
+Factory Fit and provider/wallet boundaries. The registry is not a working-context
+truth owner. The portable core must not contain Solana-specific bindings. A dummy-project fixture
 must prove that the core initializes and validates without Solana-specific
 paths or vocabulary.
 
@@ -309,8 +317,8 @@ safety gate, but distinguishes direct delivery from dormant baton execution:
 - after the owner names the exact PR and unchanged head SHA, the elected direct
   agent may perform only a standard guarded merge and read back `main`/CI;
 - dormant baton Cursor retains its historical `merge=FORBIDDEN` semantics;
-- merge never grants Project Sources activation or canonical product truth
-  unsupported by the task's Finish Gate.
+- merge neither requires nor certifies a cloud bundle export and never grants
+  canonical product truth unsupported by the exact Git task's Finish Gate.
 
 The merge guard rechecks repository, PR, head SHA, mergeability, required
 checks, unresolved reviews, write set and forbidden side effects immediately
@@ -403,7 +411,8 @@ route remains forbidden from merging. A stale head, failed check, unresolved
 review or route mismatch requires a new exact approval.
 
 Merge/CI still do not make a canonical task `DONE`. Canonical reconciliation
-and any Project Sources replacement follow their existing truth owners.
+follows exact Git task/evidence owners. Optional cloud export is entirely outside
+the delivery gate and remains an owner-managed convenience.
 
 ## 7. Baton retirement
 
@@ -579,7 +588,7 @@ This task does not:
 - change wallet, signer, transaction, cash, strategy, trial, PIT, PnL or
   NetReturn authority;
 - accept/close `TASK-30` or select the next product task;
-- activate cloud Project Sources or Project Instruction;
+- mutate or require a cloud Project Sources/Project Instruction export;
 - authorize merge before the exact PR/head gate.
 
 ## 13. Factory Fit and Product Horizon

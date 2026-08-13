@@ -119,6 +119,16 @@ class DeliveryHarnessContractTests(unittest.TestCase):
         self.assertFalse(harness["external_authority"]["wallet_signer_transaction"])
         self.assertFalse(harness["external_authority"]["cash_spend"])
         self.assertFalse(harness["external_authority"]["project_sources_activation"])
+        self.assertEqual(
+            harness["cloud_bundle"]["mode"],
+            "OWNER_MANAGED_OPTIONAL_EXPORT",
+        )
+        self.assertFalse(harness["cloud_bundle"]["execution_gate"])
+        self.assertFalse(harness["cloud_bundle"]["done_gate"])
+        self.assertFalse(harness["cloud_bundle"]["smoke_required_by_harness"])
+        self.assertFalse(harness["cloud_bundle"]["reminders"])
+        self.assertFalse(harness["cloud_bundle"]["working_context_truth_owner"])
+        self.assertTrue(harness["cloud_bundle"]["historical_registry_preserved"])
 
     def test_project_profile_binds_current_truth_owners(self) -> None:
         profile = self.documents[PROFILE]
@@ -128,11 +138,11 @@ class DeliveryHarnessContractTests(unittest.TestCase):
         self.assertEqual(
             profile["bindings"],
             {
-                "project_sources_release_registry": "docs/project_sources/release_registry_v1.yaml",
                 "catalog_manifest": "catalog/catalog_manifest.yaml",
                 "owner_attention_policy": "control/owner_attention_gate_v2.yaml",
                 "context_map": "delivery-harness/context-map.yaml",
                 "domain_policy": "delivery-harness/policies/solana-alpha-lab.md",
+                "historical_cloud_bundle_registry": "docs/project_sources/release_registry_v1.yaml",
             },
         )
         self.assertEqual(profile["context_budgets"], EXPECTED_BUDGETS)
@@ -140,6 +150,15 @@ class DeliveryHarnessContractTests(unittest.TestCase):
         self.assertFalse(profile["authority"]["wallet_signer_transaction"])
         self.assertFalse(profile["authority"]["cash_spend"])
         self.assertFalse(profile["authority"]["project_sources_mutation"])
+        self.assertEqual(profile["working_memory"]["truth_owner"], "GIT")
+        self.assertEqual(
+            profile["working_memory"]["task_resolution"],
+            "EXACT_TASK_CONTRACT",
+        )
+        self.assertEqual(
+            profile["working_memory"]["cloud_bundle"],
+            "OWNER_MANAGED_OPTIONAL_EXPORT",
+        )
 
     def test_context_map_has_exact_roles_and_explicit_missingness(self) -> None:
         context = self.documents[CONTEXT_MAP]
