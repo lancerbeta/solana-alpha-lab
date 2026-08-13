@@ -18969,6 +18969,29 @@ records:
   search_terms: [AHTTzwf3GmVMJdxWM8v2MSxyjZj8rQR6hyAC3g9477Yj, 65G9eRh9UpW5FcJqJpMmXvZ1Jtyi8SWCpj95JdDndn6w6KqUMVrU3GhtTgiQBoRRYZCvmNg9mEQexo6LWfw88B6v, 7GCihgDB8fe6KNjn2MYtkzZcRjQy3t9GHdC8uHYmW2hr, So11111111111111111111111111111111111111112, SOLANA-STANDARD-GET-TRANSACTION-001, SOLANA_STANDARD_RPC, GET_TRANSACTION, A18]
   classification: *t25_internal
 
+- asset_id: EVIDENCE-T30-A18-SINGLE-SIGNATURE-TRANSACTION-RUNTIME-001
+  record_version: '1.0'
+  asset_type: evidence
+  purpose: Sanitized one-shot A18 standard-RPC runtime receipt preserving a timeout as TRANSPORT_OR_COVERAGE_UNKNOWN without a transaction or economic claim.
+  status: VALIDATED_ACTIVE
+  origin: REPOSITORY
+  as_of: '2026-08-13'
+  truth_owner: TASK-30
+  location: {kind: git_path, logical_uri: 'repo://docs/evidence/task30/a18_single_signature_transaction_readiness_runtime_receipt_v1.json', repository_path: docs/evidence/task30/a18_single_signature_transaction_readiness_runtime_receipt_v1.json}
+  integrity: {kind: sha256, sha256: eea7b1e1a45aa862bd2a8fb65ba32e430ceeb525c8f8870169986930c6b67448}
+  access: *t25_read_file
+  relations:
+  - {relation_type: derived_from, target_asset_id: EVIDENCE-T30-A18-SINGLE-SIGNATURE-TRANSACTION-001}
+  - {relation_type: validated_by, target_asset_id: TEST-T30-A18-SINGLE-SIGNATURE-TRANSACTION-001}
+  consumers: [TASK-30, RC001-H07-H01-LIQUIDITY-RETENTION, FACTORY-001]
+  evidence:
+  - evidence_id: T30-A18-RUNTIME-RAW-MANIFEST-HASH
+    kind: runtime_receipt
+    reference: local/task30_a18_single_signature_transaction_readiness/run=20260813T141902Z-a18/receipt.json
+    result: PENDING
+  search_terms: [AHTTzwf3GmVMJdxWM8v2MSxyjZj8rQR6hyAC3g9477Yj, 65G9eRh9UpW5FcJqJpMmXvZ1Jtyi8SWCpj95JdDndn6w6KqUMVrU3GhtTgiQBoRRYZCvmNg9mEQexo6LWfw88B6v, TRANSPORT_OR_COVERAGE_UNKNOWN, SOLANA-STANDARD-GET-TRANSACTION-001, SOLANA_STANDARD_RPC, A18]
+  classification: *t25_internal
+
 - asset_id: TEST-CATALOG-SEARCH-001
   record_version: '1.0'
   asset_type: script
