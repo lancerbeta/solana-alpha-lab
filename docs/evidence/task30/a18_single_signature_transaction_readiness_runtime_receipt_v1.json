@@ -1,0 +1,93 @@
+{
+  "schema": "smial.task30.a18.single-signature-transaction-readiness.runtime-receipt",
+  "schema_version": "1.0",
+  "receipt_id": "RUNTIME-T30-A18-SINGLE-SIGNATURE-TRANSACTION-20260813T141902Z-A18",
+  "task_id": "TASK-30",
+  "atom_id": "T30-A18_SINGLE_SIGNATURE_TRANSACTION_READINESS_V1",
+  "as_of": "2026-08-13",
+  "repository": {
+    "main_commit": "24712572043c354193168b6e01a67a27995a38a8",
+    "route_registry_id": "PROVIDER-ROUTE-CAPABILITY-REGISTRY-003",
+    "route_id": "SOLANA-STANDARD-GET-TRANSACTION-001"
+  },
+  "authorization": {
+    "owner_gate_consumed": true,
+    "max_requests": 1,
+    "request_count": 1,
+    "retry": false,
+    "fallback": false,
+    "reconnect": false
+  },
+  "target": {
+    "network": "solana",
+    "pool_address": "AHTTzwf3GmVMJdxWM8v2MSxyjZj8rQR6hyAC3g9477Yj",
+    "signature": "65G9eRh9UpW5FcJqJpMmXvZ1Jtyi8SWCpj95JdDndn6w6KqUMVrU3GhtTgiQBoRRYZCvmNg9mEQexo6LWfw88B6v",
+    "provider": "SOLANA_STANDARD_RPC",
+    "method": "getTransaction"
+  },
+  "run": {
+    "logical_run_root": "local/task30_a18_single_signature_transaction_readiness/run=20260813T141902Z-a18",
+    "terminal_at": "2026-08-13T14:19:02Z",
+    "http_status": null,
+    "transport_terminal_class": "TIMEOUT",
+    "transport_error_class": "http_timeout",
+    "received_bytes": 0,
+    "terminal_state": "TRANSPORT_OR_COVERAGE_UNKNOWN",
+    "unknown": true,
+    "raw_retention": "A4_EXACT_RETAINED_OUTSIDE_GIT",
+    "raw_response_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  "decision": {
+    "value": "TRANSPORT_OR_COVERAGE_UNKNOWN",
+    "evidence_strength": "ONE_BOUNDED_TIMEOUT_WITHOUT_RESPONSE",
+    "same_route_retry_authorized": false,
+    "task30_trial": false,
+    "task30_acceptance": false,
+    "next_owner_decision": "PIVOT | ACCEPT_UNKNOWN | DEFER | CLOSE"
+  },
+  "authority_and_cost": {
+    "provider_api_rpc_wss_calls": 1,
+    "credential_reads": 0,
+    "raw_external_data_writes": 1,
+    "raw_data_tracked_in_git": false,
+    "cash_spend_usd": 0,
+    "wallet_signer_transaction_actions": 0,
+    "task30_trial_or_acceptance_actions": 0
+  },
+  "non_claims": {
+    "transaction_present": false,
+    "trade_decoded": false,
+    "price": false,
+    "volume": false,
+    "fill": false,
+    "realized_pnl": false,
+    "numeric_netreturn": false,
+    "alpha": false,
+    "provider_unavailable": false,
+    "task30_trial": false,
+    "task30_acceptance": false
+  },
+  "factory_fit_review": {
+    "scope": "FULL_REVIEW",
+    "verdict": "PASS_WITH_FOLLOWUP",
+    "mission": "PASS_WITH_LIMITATIONS",
+    "research_truth": "PASS: timeout remains UNKNOWN and never becomes null, zero or no-trade.",
+    "efficiency": "PASS: one short bounded read was attempted; no retry ritual was introduced.",
+    "owner_operability": "PASS: stable Catalog entry records the exact route and negative result.",
+    "monitoring_recovery": "PASS_WITH_LIMITATIONS: this was a foreground one-shot; no scheduler or retry is justified.",
+    "reuse_first": "PASS_WRAP: existing standard JSON-RPC binder and bounded transport were reused.",
+    "execution_to_cashflow": "NOT_APPLICABLE_YET",
+    "red_team": "PASS: no response, no target binding, no price/volume or economic projection.",
+    "follow_up": {
+      "owner": "TASK-30",
+      "reason": "The standard endpoint did not provide decision-changing transaction evidence within the bounded read.",
+      "activation_trigger": "A separate owner gate only if another named consumer still needs this exact signature.",
+      "destination": "TASK-30 route decision: PIVOT, ACCEPT_UNKNOWN, DEFER or CLOSE"
+    }
+  },
+  "project_sources_disposition": {
+    "kind": "NO_CHANGE",
+    "reason": "This runtime receipt does not accept TASK-30 or activate Project Sources."
+  },
+  "state_change": "TASK30_A18_RUNTIME_UNKNOWN_RECORDED"
+}
