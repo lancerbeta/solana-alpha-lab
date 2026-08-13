@@ -403,6 +403,16 @@
       "target_asset_id": "TEST-T30-ACTIVE-POOL-ROUTE-YIELD-001"
     },
     {
+      "source_asset_id": "CONFIG-PROVIDER-ROUTE-CAPABILITY-REGISTRY-003",
+      "relation": "derived_from",
+      "target_asset_id": "CONFIG-PROVIDER-ROUTE-CAPABILITY-REGISTRY-002"
+    },
+    {
+      "source_asset_id": "CONFIG-PROVIDER-ROUTE-CAPABILITY-REGISTRY-003",
+      "relation": "validated_by",
+      "target_asset_id": "TEST-T30-A18-SINGLE-SIGNATURE-TRANSACTION-001"
+    },
+    {
       "source_asset_id": "CONFIG-T20-COLLECTION-SPEC-001",
       "relation": "governed_by",
       "target_asset_id": "CONTRACT-T20-COLLECTION-SPEC-001"
@@ -541,6 +551,11 @@
       "source_asset_id": "CONFIG-T30-A14P-R1-RUNTIME-001",
       "relation": "governed_by",
       "target_asset_id": "CONTRACT-T30-A14P-R1-AUTH-RECOVERY-001"
+    },
+    {
+      "source_asset_id": "CONFIG-T30-A18-SINGLE-SIGNATURE-TRANSACTION-001",
+      "relation": "governed_by",
+      "target_asset_id": "CONTRACT-T30-A18-SINGLE-SIGNATURE-TRANSACTION-001"
     },
     {
       "source_asset_id": "CONFIG-T30-ACTIVE-POOL-ROUTE-YIELD-001",
@@ -1176,6 +1191,16 @@
       "source_asset_id": "CONTRACT-T30-A14P-R1-AUTH-RECOVERY-001",
       "relation": "derived_from",
       "target_asset_id": "EVIDENCE-T30-A14P-FORWARD-STREAM-EXECUTION-ADAPTER-001"
+    },
+    {
+      "source_asset_id": "CONTRACT-T30-A18-SINGLE-SIGNATURE-TRANSACTION-001",
+      "relation": "depends_on",
+      "target_asset_id": "CONFIG-PROVIDER-ROUTE-CAPABILITY-REGISTRY-003"
+    },
+    {
+      "source_asset_id": "CONTRACT-T30-A18-SINGLE-SIGNATURE-TRANSACTION-001",
+      "relation": "derived_from",
+      "target_asset_id": "EVIDENCE-T30-A17-ACTIVE-POOL-ROUTE-YIELD-001"
     },
     {
       "source_asset_id": "CONTRACT-T30-ACTIVE-POOL-ROUTE-YIELD-001",
@@ -3413,6 +3438,21 @@
       "target_asset_id": "TEST-T30-ACTIVE-POOL-ROUTE-YIELD-001"
     },
     {
+      "source_asset_id": "EVIDENCE-T30-A18-SINGLE-SIGNATURE-TRANSACTION-001",
+      "relation": "depends_on",
+      "target_asset_id": "CATALOG-CLI-001"
+    },
+    {
+      "source_asset_id": "EVIDENCE-T30-A18-SINGLE-SIGNATURE-TRANSACTION-001",
+      "relation": "derived_from",
+      "target_asset_id": "CONTRACT-T30-A18-SINGLE-SIGNATURE-TRANSACTION-001"
+    },
+    {
+      "source_asset_id": "EVIDENCE-T30-A18-SINGLE-SIGNATURE-TRANSACTION-001",
+      "relation": "validated_by",
+      "target_asset_id": "TEST-T30-A18-SINGLE-SIGNATURE-TRANSACTION-001"
+    },
+    {
       "source_asset_id": "EVIDENCE-T30-A2-CATALOG-FACTORY-FIT-001",
       "relation": "derived_from",
       "target_asset_id": "EVIDENCE-T30-A1-BOUNDARY-SEMANTICS-001"
@@ -4108,6 +4148,11 @@
       "target_asset_id": "CONFIG-T30-A14P-R1-RUNTIME-001"
     },
     {
+      "source_asset_id": "FIXTURE-T30-A18-SINGLE-SIGNATURE-TRANSACTION-001",
+      "relation": "derived_from",
+      "target_asset_id": "CONFIG-T30-A18-SINGLE-SIGNATURE-TRANSACTION-001"
+    },
+    {
       "source_asset_id": "FIXTURE-T30-ACTIVE-POOL-ROUTE-YIELD-001",
       "relation": "derived_from",
       "target_asset_id": "CONFIG-T30-ACTIVE-POOL-ROUTE-YIELD-001"
@@ -4316,6 +4361,16 @@
       "source_asset_id": "MODULE-PROVIDER-ROUTE-CAPABILITY-REGISTRY-002",
       "relation": "governed_by",
       "target_asset_id": "CONFIG-PROVIDER-ROUTE-CAPABILITY-REGISTRY-002"
+    },
+    {
+      "source_asset_id": "MODULE-PROVIDER-ROUTE-CAPABILITY-REGISTRY-003",
+      "relation": "depends_on",
+      "target_asset_id": "MODULE-PROVIDER-ROUTE-CAPABILITY-REGISTRY-002"
+    },
+    {
+      "source_asset_id": "MODULE-PROVIDER-ROUTE-CAPABILITY-REGISTRY-003",
+      "relation": "governed_by",
+      "target_asset_id": "CONFIG-PROVIDER-ROUTE-CAPABILITY-REGISTRY-003"
     },
     {
       "source_asset_id": "MODULE-T06-STORAGE-API-001",
@@ -4993,6 +5048,16 @@
       "target_asset_id": "EVIDENCE-T28-A1-RC001-REGISTRY-FREEZE-001"
     },
     {
+      "source_asset_id": "MODULE-T30-A18-SINGLE-SIGNATURE-TRANSACTION-001",
+      "relation": "depends_on",
+      "target_asset_id": "MODULE-T08-LIFECYCLE-DISCOVERY-TRANSPORT-001"
+    },
+    {
+      "source_asset_id": "MODULE-T30-A18-SINGLE-SIGNATURE-TRANSACTION-001",
+      "relation": "governed_by",
+      "target_asset_id": "CONFIG-T30-A18-SINGLE-SIGNATURE-TRANSACTION-001"
+    },
+    {
       "source_asset_id": "MODULE-T30-ACTIVE-POOL-ROUTE-YIELD-001",
       "relation": "depends_on",
       "target_asset_id": "MODULE-PROVIDER-ROUTE-CAPABILITY-REGISTRY-002"
@@ -5623,6 +5688,16 @@
       "target_asset_id": "ARCH-INTENT-T21-PRODUCT-VISION-001"
     },
     {
+      "source_asset_id": "RUNTIME-T30-A17-ACTIVE-POOL-ROUTE-YIELD-001",
+      "relation": "derived_from",
+      "target_asset_id": "EVIDENCE-T30-A17-ACTIVE-POOL-ROUTE-YIELD-001"
+    },
+    {
+      "source_asset_id": "RUNTIME-T30-A17-ACTIVE-POOL-ROUTE-YIELD-001",
+      "relation": "governed_by",
+      "target_asset_id": "CONFIG-T30-ACTIVE-POOL-ROUTE-YIELD-001"
+    },
+    {
       "source_asset_id": "SBOM-T04-CORE-STACK-001",
       "relation": "derived_from",
       "target_asset_id": "CTRL-UVLOCK-001"
@@ -5666,6 +5741,11 @@
       "source_asset_id": "SCHEMA-PROVIDER-ROUTE-CAPABILITY-REGISTRY-002",
       "relation": "governed_by",
       "target_asset_id": "CONFIG-PROVIDER-ROUTE-CAPABILITY-REGISTRY-002"
+    },
+    {
+      "source_asset_id": "SCHEMA-PROVIDER-ROUTE-CAPABILITY-REGISTRY-003",
+      "relation": "governed_by",
+      "target_asset_id": "CONFIG-PROVIDER-ROUTE-CAPABILITY-REGISTRY-003"
     },
     {
       "source_asset_id": "SCHEMA-T05-CANONICAL-DDL-001",
@@ -5986,6 +6066,11 @@
       "source_asset_id": "SCHEMA-T28-RC001-REGISTRY-FREEZE-001",
       "relation": "governed_by",
       "target_asset_id": "CONTRACT-T28-RC001-REGISTRY-FREEZE-001"
+    },
+    {
+      "source_asset_id": "SCHEMA-T30-A18-SINGLE-SIGNATURE-TRANSACTION-001",
+      "relation": "governed_by",
+      "target_asset_id": "CONTRACT-T30-A18-SINGLE-SIGNATURE-TRANSACTION-001"
     },
     {
       "source_asset_id": "SCHEMA-T30-ACTIVE-POOL-ROUTE-YIELD-001",
@@ -6626,6 +6711,21 @@
       "source_asset_id": "TEST-CANARY-SPECIFICATION-ONLY-A2-001",
       "relation": "depends_on",
       "target_asset_id": "EVIDENCE-CANARY-SPECIFICATION-ONLY-A2-001"
+    },
+    {
+      "source_asset_id": "TEST-CATALOG-SEARCH-001",
+      "relation": "depends_on",
+      "target_asset_id": "CATALOG-CLI-001"
+    },
+    {
+      "source_asset_id": "TEST-CATALOG-SEARCH-001",
+      "relation": "depends_on",
+      "target_asset_id": "CATALOG-SCHEMA-ASSET-001"
+    },
+    {
+      "source_asset_id": "TEST-CATALOG-SEARCH-001",
+      "relation": "validated_by",
+      "target_asset_id": "CATALOG-VALIDATOR-001"
     },
     {
       "source_asset_id": "TEST-OWNER-ATTENTION-GATE-001",
@@ -7846,6 +7946,21 @@
       "source_asset_id": "TEST-T30-A11E-GECKO-LIVE-SHAKEDOWN-RUNTIME-001",
       "relation": "depends_on",
       "target_asset_id": "EVIDENCE-T30-A11E-GECKO-LIVE-SHAKEDOWN-RUNTIME-001"
+    },
+    {
+      "source_asset_id": "TEST-T30-A18-SINGLE-SIGNATURE-TRANSACTION-001",
+      "relation": "depends_on",
+      "target_asset_id": "FIXTURE-T30-A18-SINGLE-SIGNATURE-TRANSACTION-001"
+    },
+    {
+      "source_asset_id": "TEST-T30-A18-SINGLE-SIGNATURE-TRANSACTION-001",
+      "relation": "depends_on",
+      "target_asset_id": "MODULE-T30-A18-SINGLE-SIGNATURE-TRANSACTION-001"
+    },
+    {
+      "source_asset_id": "TEST-T30-A18-SINGLE-SIGNATURE-TRANSACTION-001",
+      "relation": "depends_on",
+      "target_asset_id": "SCHEMA-T30-A18-SINGLE-SIGNATURE-TRANSACTION-001"
     },
     {
       "source_asset_id": "TEST-T30-A5R1-BIRDEYE-EXTERNAL-READ-RUNTIME-001",

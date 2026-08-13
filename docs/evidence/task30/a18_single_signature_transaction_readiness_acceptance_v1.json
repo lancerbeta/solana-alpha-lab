@@ -1,0 +1,108 @@
+{
+  "schema": "smial.task30.a18.single-signature-transaction-readiness.acceptance",
+  "schema_version": "1.0",
+  "receipt_id": "EVIDENCE-T30-A18-SINGLE-SIGNATURE-TRANSACTION-001",
+  "task_id": "TASK-30",
+  "atom_id": "T30-A18_SINGLE_SIGNATURE_TRANSACTION_READINESS_V1",
+  "as_of": "2026-08-13",
+  "entry_gate": "START_WITH_PATCH",
+  "spec_route": "PRD_LITE",
+  "decision": "OFFLINE_CLASSIFIER_READY_FOR_OWNER_EXTERNAL_GATE",
+  "task_outcome": {
+    "owner_decision": "After one exact read, choose whether this signature yields usable balance evidence or whether TASK-30 must PIVOT, ACCEPT_UNKNOWN, DEFER or CLOSE.",
+    "product_outcome": "Make one selected active-pool signature searchable and conservatively classifiable without promoting it to price, volume or alpha.",
+    "named_consumer": "RC001-H07-H01-LIQUIDITY-RETENTION",
+    "cheapest_falsifier": "One exact getTransaction response that is null, schema-drifted, target-mismatched or balance-ambiguous.",
+    "user_visible_result": "A stable Catalog search result linking pool, signature, route, classifier and terminal evidence."
+  },
+  "authority": {
+    "provider_api_rpc_wss_calls": 0,
+    "credential_reads": 0,
+    "raw_external_data_writes": 0,
+    "cash_spend_usd": 0,
+    "wallet_signer_transaction_actions": 0,
+    "task30_trial_or_acceptance_actions": 0
+  },
+  "future_runtime_caps": {
+    "standard_rpc_get_transaction_requests": 1,
+    "max_response_bytes": 2000000,
+    "retry": false,
+    "fallback": false,
+    "reconnect": false,
+    "raw_retention": "A4_OUTSIDE_GIT"
+  },
+  "owner_gate_phrase": "T30-A18_SINGLE_SIGNATURE_TRANSACTION_READINESS_V1; pool=AHTTzwf3GmVMJdxWM8v2MSxyjZj8rQR6hyAC3g9477Yj; signature=65G9eRh9UpW5FcJqJpMmXvZ1Jtyi8SWCpj95JdDndn6w6KqUMVrU3GhtTgiQBoRRYZCvmNg9mEQexo6LWfw88B6v; provider=SOLANA_STANDARD_RPC; method=getTransaction; max_requests=1; max_response_bytes=2000000; retention=A4; retry=false; fallback=false; reconnect=false; task30_trial=false",
+  "route_registry": {
+    "registry_id": "PROVIDER-ROUTE-CAPABILITY-REGISTRY-003",
+    "predecessor_sha256": "2fbe49382fcfe5edc438e03378f7eaad173ede4940161fcc5f02d39735d5a7f1",
+    "preserved_routes": 3,
+    "added_route": "SOLANA-STANDARD-GET-TRANSACTION-001",
+    "registry_gap_is_not_provider_unavailability": true,
+    "authority_granted": false
+  },
+  "terminal_outcomes": [
+    "TRADE_DATA_CANDIDATE",
+    "TRANSACTION_PRESENT_NO_TRADE_PROJECTION",
+    "TRANSACTION_NULL_OR_UNAVAILABLE",
+    "PROVIDER_TYPED_FAILURE",
+    "TRANSPORT_OR_COVERAGE_UNKNOWN"
+  ],
+  "artifact_bindings": {
+    "route_registry": {"path": "configs/provider_route_capability_registry_v3.yaml", "sha256": "dfab094593c061fc2dcbe344b2e7977942927f833c2d2a83e50aa5a3e27cd95e"},
+    "route_registry_schema": {"path": "catalog/schemas/provider_route_capability_registry_v3.schema.json", "sha256": "2e674c0d8b4a7710db24a885be1e1537ffbdfdb81b6ec2fbf9806aba3eca56f7"},
+    "route_registry_module": {"path": "src/solana_alpha_lab/provider_route_capability_registry_v3.py", "sha256": "880220c5aea2a975035a9ccc6e9909360fecc612ca73d13c1616966c32a017e0"},
+    "contract": {"path": "docs/contracts/task30_a18_single_signature_transaction_readiness_contract_v1.md", "sha256": "747562860d77ddb925f71f409c29e30b0b00f481dcba1c814054fe50585306cf"},
+    "config": {"path": "configs/task30_a18_single_signature_transaction_readiness_v1.yaml", "sha256": "450fa869d9a813eede698dada10acfe577394f0d6bae55a464c4592ffc5295c7"},
+    "schema": {"path": "catalog/schemas/task30_a18_single_signature_transaction_readiness.schema.json", "sha256": "3614d8886cfe404dd616f991db15d8e8400bc8c6bab0a9de7145eac728913526"},
+    "fixture": {"path": "tests/fixtures/task30/single_signature_transaction_readiness_v1.json", "sha256": "676a7c35afcd46aa82fd3b9b07474c8a8a18f513c43845a8be7dc9b1fd731711"},
+    "module": {"path": "src/solana_alpha_lab/task30_a18_single_signature_transaction_readiness.py", "sha256": "4228d334062c662df81edb4440e869b88f6ee3f3eb37a16f62f5ffcb47da1e2c"},
+    "test": {"path": "tests/test_task30_a18_single_signature_transaction_readiness.py", "sha256": "11ed7f6941ba3b00f3f946a08087ae08aae62af0d873eecbfc3cb6a24455567e"}
+  },
+  "factory_fit_review": {
+    "scope": "FULL_REVIEW",
+    "verdict": "PASS_WITH_LIMITATIONS",
+    "mission": "PASS_WITH_LIMITATIONS: reduces one evidence-route uncertainty but does not establish a tradable hypothesis or cashflow.",
+    "flexibility": "PASS: pool, signature and mints are frozen; classifier is Orca-neutral and route-bound.",
+    "compatibility_history": "PASS: v3 is append-only, preserves v2 route semantics and retains the older TASK-09 schema-drift evidence.",
+    "efficiency": "PASS: one bounded read is the cheapest discriminator after A17 route yield.",
+    "research_truth": "PASS: null, missing, malformed, failed and ambiguous values remain explicit and never become zero.",
+    "owner_operability": "PASS: stable IDs and read-only Catalog search remove guesswork when locating evidence.",
+    "monitoring_recovery": "PASS_WITH_LIMITATIONS: this is a one-shot foreground read; no scheduler or retry is introduced.",
+    "reuse_first": "PASS_WRAP: existing standard request shape, capture and A4 retention are reused; only the narrow delta classifier is new.",
+    "execution_to_cashflow": "NOT_APPLICABLE_YET",
+    "red_team": "PASS: target/signature mismatch, duplicate balances, missing balances, provider errors, schema drift, retry and secret disclosure are rejected."
+  },
+  "product_horizon": {
+    "now": "RUN_ONLY_AFTER_EXACT_OWNER_EXTERNAL_GATE",
+    "watch": "ORCA_DECODER_ONLY_IF_TARGET_BOUND_DELTA_CANDIDATE_AND_NAMED_CONSUMER_STILL_NEEDS_IT"
+  },
+  "non_claims": {
+    "external_runtime_executed": false,
+    "transaction_present": false,
+    "trade_decoded": false,
+    "price": false,
+    "volume": false,
+    "fill": false,
+    "pit_admissible": false,
+    "task30_trial": false,
+    "task30_acceptance": false,
+    "alpha": false,
+    "strategy": false,
+    "execution": false,
+    "pnl": false,
+    "numeric_netreturn": false
+  },
+  "catalog_search": {
+    "stable_lookup": "scripts/catalog_cli.py search-assets --text <term> --json",
+    "supported_filters": ["asset_type", "consumer", "status"],
+    "read_only": true,
+    "network_required": false,
+    "max_records": 1000
+  },
+  "project_sources_disposition": {
+    "kind": "NO_CHANGE",
+    "reason": "This offline readiness atom changes repository truth and Catalog search only; it does not accept TASK-30 or activate Project Sources."
+  },
+  "rollback": "Remove only the A18 tracked files, Catalog records and query recipe before downstream adoption; no external state exists.",
+  "state_change": "NONE"
+}
