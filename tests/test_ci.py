@@ -260,6 +260,16 @@ FAILED (failures=1)
         self.assertEqual(summary["pass_labels"], 1)
         self.assertEqual(summary["failure_diagnostics"], [])
 
+    def test_delivery_output_emitter_is_safe_for_cp1251_console(self) -> None:
+        buffer = io.BytesIO()
+        stream = io.TextIOWrapper(buffer, encoding="cp1251", errors="strict")
+        decoded = ci.decode_delivery_output(b"RESULT: PASS\ndiagnostic:\xefinvalid\n")
+        ci.emit_delivery_output(decoded, stream=stream)
+        stream.flush()
+        rendered = buffer.getvalue().decode("cp1251")
+        self.assertIn("RESULT: PASS", rendered)
+        self.assertIn("\\ufffd", rendered)
+
     def test_delivery_mode_is_opt_in_and_base_ref_is_explicit(self) -> None:
         ordinary = ci.parse_args([])
         delivery = ci.parse_args(
