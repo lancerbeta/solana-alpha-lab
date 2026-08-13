@@ -1,7 +1,7 @@
 schema_version: '1.0'
 registry_id: SMIAL-REGISTRY-DECISIONS-NEGATIVE-RESULTS
 registry_type: decisions_negative_results
-as_of: '2026-08-08'
+as_of: '2026-08-13'
 truth_owner: TASK-27
 source_asset_ids:
 - EVIDENCE-T24-A6-STOP-DECISION-001
@@ -10,6 +10,7 @@ source_asset_ids:
 - EVIDENCE-T27-A1S4-OWNER-ROUTE-CLOSE-001
 - EVIDENCE-T27-A2-TERMINAL-RECONCILIATION-001
 - EVIDENCE-T30-A9-NAMED-PARTIAL-CAPTURE-001
+- EVIDENCE-T30-A19-TERMINAL-ROUTE-DECISION-001
 records:
 - record_kind: negative_result
   record_id: NEGATIVE-T24-ENTITY-SIGNAL-V1-001
@@ -49,3 +50,10 @@ records:
   evidence_asset_ids:
   - EVIDENCE-T30-A9-NAMED-PARTIAL-CAPTURE-001
   summary: "OWNER_PACKET_READY_EXTERNAL_AUTHORITY_REQUIRED: the offline A9 policy specifies a future 96-slot technical data-route pilot, but provider, identity, named notionals, caps, retention, recovery and monitoring remain owner inputs; no provider, raw capture, trial, execution, cash or H07/H01 evidence authority exists."
+- record_kind: negative_result
+  record_id: NEGATIVE-T30-CURRENT-DATA-ROUTE-001
+  status: RECORDED
+  created_at: '2026-08-13T00:00:00Z'
+  evidence_asset_ids:
+  - EVIDENCE-T30-A19-TERMINAL-ROUTE-DECISION-001
+  summary: "TASK-30 current named public/free data-route closed with a limited negative result after retained Birdeye, Gecko, Helius WSS/activity and A18 evidence; H07/H01 remain BLOCKED_DATA. This is not a claim about all providers, route universes, alpha, execution, PnL, NetReturn or cashflow. UNKNOWN is not inactive, zero, flat or no-trade."

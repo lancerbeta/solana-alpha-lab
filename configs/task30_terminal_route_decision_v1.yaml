@@ -1,0 +1,74 @@
+schema: smial.task30.terminal-route-decision.policy
+schema_version: '1.0'
+task_id: TASK-30
+atom_id: T30-A19_TERMINAL_ROUTE_DECISION_V1
+contract_id: TASK30-A19-TERMINAL-ROUTE-DECISION-V1
+spec_route: PRD_LITE
+consumer: RC001-H07-H01-LIQUIDITY-RETENTION
+route_scope: TASK30_CURRENT_NAMED_PUBLIC_FREE_DATA_ROUTE
+decision: CLOSE_CURRENT_DATA_ROUTE_LIMITED_NEGATIVE_RESULT
+route_closed: true
+hypothesis_closed: false
+provider_globally_unavailable: false
+h07_h01_state: BLOCKED_DATA
+trial_admissible: false
+next_owner_gate: NONE_UNTIL_NAMED_REOPEN_TRIGGER
+reopen_trigger: NAMED_CONSUMER_PLUS_REPRODUCIBLE_PIT_ROUTE_AND_EXECUTION_TRUTH
+evidence:
+  task30_a5r1_birdeye:
+    path: docs/evidence/task30/a5r1_birdeye_v3_external_read_runtime_receipt_v1.json
+    sha256: a4f69df4dcff2afe88c06828884ec9155af8bfe91b659080cfed74ab1acbcdf1
+    observed_decision: PAIR_IDENTITY_ACCEPTED_OHLCV_RATE_OR_QUOTA_LIMITED
+  task30_a11e_gecko:
+    path: docs/evidence/task30/a11e_gecko_15m_live_shakedown_runtime_receipt_v1.json
+    sha256: 28d246c97a7e6866760683c6e63296f9d310a2cce35ac98be61e107af9f7bcdb
+    observed_decision: CLOSE_CURRENT_15M_FAST_FRESHNESS_ROUTE
+  task30_a14p_r2:
+    path: docs/evidence/task30/a14p_r2_forward_stream_external_capture_receipt_v1.json
+    sha256: 179c2b26c6a6d325388ec04c388fae8efa4adc8ba01639c85c70e5626e405604
+    observed_decision: HELIUS_TRANSACTION_SUBSCRIBE_FREE_PLAN_NOT_AVAILABLE
+  task30_a15p:
+    path: docs/evidence/task30/a15p_standard_pool_logs_runtime_receipt_v1.json
+    sha256: ee40a42a49bb470b4cde81d5d7b59bbb3209ecfa8aecd9e73b92f01a0beffbf7
+    observed_decision: HELIUS_STANDARD_WSS_AVAILABLE_CAPTURE_YIELD_UNRESOLVED
+  task30_a16p:
+    path: docs/evidence/task30/a16p_pool_activity_discriminator_runtime_receipt_v2.json
+    sha256: 32868bff924719ba364ec0ed07e63436764a4c86032b6624f1e6439656edfe52
+    observed_decision: NO_DIRECT_POOL_ACTIVITY_SUPPORTED
+  task30_a17:
+    path: docs/evidence/task30/a17_active_pool_route_yield_acceptance_v1.json
+    sha256: 3647b41e13ed4e16da9927de196c39c4feac17bc062f8d17df22d61a2c1bc48e
+    observed_decision: OFFLINE_ACTIVE_POOL_ROUTE_YIELD_READY_FOR_OWNER_GATE
+  task30_a18_readiness:
+    path: docs/evidence/task30/a18_single_signature_transaction_readiness_acceptance_v1.json
+    sha256: fdad06e5e88f06334c31899416010980e3a2961820640f8e3af65f248a8e6c46
+    observed_decision: OFFLINE_CLASSIFIER_READY_FOR_OWNER_EXTERNAL_GATE
+  task30_a18_runtime:
+    path: docs/evidence/task30/a18_single_signature_transaction_readiness_runtime_receipt_v1.json
+    sha256: eea7b1e1a45aa862bd2a8fb65ba32e430ceeb525c8f8870169986930c6b67448
+    observed_decision: TRANSPORT_OR_COVERAGE_UNKNOWN
+authority:
+  provider_api_rpc_wss_calls: 0
+  credential_reads: 0
+  raw_external_data_writes: 0
+  scheduler_or_background_processes: 0
+  r2_r3_access: 0
+  wallet_signer_transaction_actions: 0
+  cash_spend_usd_cents: 0
+  task30_trial_or_acceptance_actions: 0
+claims:
+  pit_admissible: false
+  h07_h01_evidence: false
+  task30_trial: false
+  price: false
+  volume: false
+  alpha: false
+  strategy: false
+  execution: false
+  settlement: false
+  pnl: false
+  numeric_netreturn: false
+  owner_cashflow: false
+  missing_is_zero_or_flat: false
+project_sources_disposition: NO_CHANGE
+state_change: NONE
