@@ -253,7 +253,7 @@ class Task17AExecutionCapacityAuditTests(unittest.TestCase):
         self.assertGreaterEqual(checkpoint["assets"], 321)
         self.assertEqual(checkpoint["asset_registries"], 4)
         self.assertGreaterEqual(checkpoint["schemas"], 4)
-        self.assertEqual(checkpoint["queries"], 8)
+        self.assertGreaterEqual(checkpoint["queries"], 8)
         expected = {
             "CONTRACT-T17A-TIMING-REPAIR-001":
                 "docs/contracts/task17a_one_window_timing_repair_contract_v1.md",

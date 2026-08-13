@@ -5,6 +5,7 @@ from __future__ import annotations
 
 import argparse
 import json
+from typing import Any
 
 from validate_catalog import load_and_validate
 
@@ -18,6 +19,61 @@ def emit(value: object, as_json: bool) -> None:
                 print(f"{key}: {item}")
         else:
             print(value)
+
+
+def search_assets(
+    assets: dict[str, dict[str, Any]],
+    text: str,
+    *,
+    asset_type: str | None = None,
+    consumer: str | None = None,
+    status: str | None = None,
+) -> list[dict[str, Any]]:
+    """Return deterministic, bounded metadata matches from the validated Catalog."""
+
+    needle = text.strip().casefold()
+    if not needle:
+        raise ValueError("SEARCH_TEXT_REQUIRED")
+    values: list[dict[str, Any]] = []
+    for asset_id, record in assets.items():
+        location = record.get("location", {})
+        relation_ids = [item.get("target_asset_id", "") for item in record.get("relations", [])]
+        evidence_ids = [item.get("evidence_id", "") for item in record.get("evidence", [])]
+        searchable = " ".join(
+            [
+                asset_id,
+                str(record.get("purpose", "")),
+                str(location.get("logical_uri", "")),
+                str(location.get("repository_path", "")),
+                " ".join(str(item) for item in record.get("consumers", [])),
+                " ".join(str(item) for item in relation_ids),
+                " ".join(str(item) for item in evidence_ids),
+                " ".join(str(item) for item in record.get("search_terms", [])),
+            ]
+        ).casefold()
+        searchable = f"{searchable} {searchable.replace('-', ' ')}"
+        if needle not in searchable:
+            continue
+        if asset_type is not None and record.get("asset_type") != asset_type:
+            continue
+        if consumer is not None and consumer not in record.get("consumers", []):
+            continue
+        if status is not None and record.get("status") != status:
+            continue
+        values.append(
+            {
+                "asset_id": asset_id,
+                "asset_type": record.get("asset_type"),
+                "status": record.get("status"),
+                "purpose": record.get("purpose"),
+                "location": location,
+                "consumers": record.get("consumers", []),
+                "relations": record.get("relations", []),
+                "evidence": record.get("evidence", []),
+                "search_terms": record.get("search_terms", []),
+            }
+        )
+    return sorted(values, key=lambda item: item["asset_id"])
 
 
 def main() -> int:
@@ -35,6 +91,13 @@ def main() -> int:
     resolve_query.add_argument("recipe_id")
     resolve_query.add_argument("--json", action="store_true")
 
+    search = sub.add_parser("search-assets")
+    search.add_argument("--text", required=True)
+    search.add_argument("--asset-type")
+    search.add_argument("--consumer")
+    search.add_argument("--status")
+    search.add_argument("--json", action="store_true")
+
     args = parser.parse_args()
     snapshot = load_and_validate()
 
@@ -49,6 +112,21 @@ def main() -> int:
             print(f"ASSET_NOT_FOUND: {args.asset_id}")
             return 2
         emit(record, args.json)
+        return 0
+
+    if args.command == "search-assets":
+        try:
+            matches = search_assets(
+                snapshot.assets,
+                args.text,
+                asset_type=args.asset_type,
+                consumer=args.consumer,
+                status=args.status,
+            )
+        except ValueError as exc:
+            print(str(exc))
+            return 2
+        emit(matches, args.json)
         return 0
 
     record = snapshot.queries.get(args.recipe_id)

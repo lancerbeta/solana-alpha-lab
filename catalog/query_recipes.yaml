@@ -288,3 +288,34 @@ recipes:
   output_contract:
     format: json
     max_records: 50
+- recipe_id: QUERY-CATALOG-SEARCH-ASSETS-001
+  record_version: '1.0'
+  purpose: Search validated Catalog metadata for prior measurements, tests, routes and evidence by stable text terms and optional consumer/status/type filters.
+  kind: local_command
+  read_only: true
+  bounded: true
+  network_required: false
+  write_effects: NONE
+  timeout_seconds: 30
+  command:
+  - uv
+  - run
+  - --locked
+  - --managed-python
+  - python
+  - -B
+  - scripts/catalog_cli.py
+  - search-assets
+  - --text
+  - '{text}'
+  - --json
+  parameters:
+  - name: text
+    required: true
+    pattern: '^[A-Za-z0-9][A-Za-z0-9 _:.{}()/-]{0,199}$'
+  target_asset_ids:
+  - CATALOG-ROOT-001
+  - CATALOG-CLI-001
+  output_contract:
+    format: json
+    max_records: 1000

@@ -1,0 +1,61 @@
+schema: smial.task30.a18.single-signature-transaction-readiness.policy
+schema_version: '1.0'
+task_id: TASK-30
+atom_id: T30-A18_SINGLE_SIGNATURE_TRANSACTION_READINESS_V1
+contract_id: TASK30-A18-SINGLE-SIGNATURE-TRANSACTION-V1
+consumer: RC001-H07-H01-LIQUIDITY-RETENTION
+spec_route: PRD_LITE
+route_registry:
+  registry_id: PROVIDER-ROUTE-CAPABILITY-REGISTRY-003
+  schema_version: '3.0'
+  path: configs/provider_route_capability_registry_v3.yaml
+transaction_route:
+  route_id: SOLANA-STANDARD-GET-TRANSACTION-001
+  provider: SOLANA_STANDARD_RPC
+  method: getTransaction
+  encoding: json
+  commitment: confirmed
+  max_supported_transaction_version: 0
+owner_gate_phrase: 'T30-A18_SINGLE_SIGNATURE_TRANSACTION_READINESS_V1; pool=AHTTzwf3GmVMJdxWM8v2MSxyjZj8rQR6hyAC3g9477Yj; signature=65G9eRh9UpW5FcJqJpMmXvZ1Jtyi8SWCpj95JdDndn6w6KqUMVrU3GhtTgiQBoRRYZCvmNg9mEQexo6LWfw88B6v; provider=SOLANA_STANDARD_RPC; method=getTransaction; max_requests=1; max_response_bytes=2000000; retention=A4; retry=false; fallback=false; reconnect=false; task30_trial=false'
+target:
+  pool_address: AHTTzwf3GmVMJdxWM8v2MSxyjZj8rQR6hyAC3g9477Yj
+  signature: 65G9eRh9UpW5FcJqJpMmXvZ1Jtyi8SWCpj95JdDndn6w6KqUMVrU3GhtTgiQBoRRYZCvmNg9mEQexo6LWfw88B6v
+  base_mint: 7GCihgDB8fe6KNjn2MYtkzZcRjQy3t9GHdC8uHYmW2hr
+  quote_mint: So11111111111111111111111111111111111111112
+runtime_limits:
+  max_requests: 1
+  max_response_bytes: 2000000
+execution_controls:
+  monitoring_owner: LOCAL_WORK_CODEX_FOREGROUND
+  retention_class: A4
+  retry: false
+  fallback: false
+  reconnect: false
+  scheduler: false
+  cash_spend_usd: 0
+  wallet_signer_transaction_actions: 0
+authority:
+  provider_api_rpc_wss_calls: 0
+  credential_reads: 0
+  raw_external_data_write: 0
+  task30_trial_or_acceptance: false
+terminal_outcomes:
+- TRADE_DATA_CANDIDATE
+- TRANSACTION_PRESENT_NO_TRADE_PROJECTION
+- TRANSACTION_NULL_OR_UNAVAILABLE
+- PROVIDER_TYPED_FAILURE
+- TRANSPORT_OR_COVERAGE_UNKNOWN
+projection:
+  token_balance_deltas_only: true
+  price: false
+  volume: false
+  numeric_netreturn: false
+  alpha: false
+  missing_is_zero: false
+  ambiguous_is_unknown: true
+replan:
+  terminal_atom: true
+  automatic_suffix_atom: false
+  allowed_next_decisions: [PIVOT, ACCEPT_UNKNOWN, DEFER, CLOSE]
+decision: OFFLINE_CLASSIFIER_READY_FOR_OWNER_EXTERNAL_GATE
+project_sources_disposition: NO_CHANGE

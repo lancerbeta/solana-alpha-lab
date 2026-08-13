@@ -127,7 +127,7 @@ class Task24CatalogFactoryFitTests(unittest.TestCase):
         self.assertGreaterEqual(checkpoint["assets"], transaction["after_assets"])
         self.assertEqual(checkpoint["asset_registries"], transaction["asset_registries"])
         self.assertGreaterEqual(checkpoint["schemas"], transaction["schemas"])
-        self.assertEqual(checkpoint["queries"], transaction["queries"])
+        self.assertGreaterEqual(checkpoint["queries"], transaction["queries"])
         self.assertEqual(
             checkpoint["lifecycle_registries"],
             transaction["lifecycle_registries"],

@@ -591,7 +591,7 @@ records:
     repository_path: AGENTS.md
   integrity:
     kind: sha256
-    sha256: 1499eb534c8f7c6d7d2b2d76cbaeed578f61e41025f7f5da5d0fb0fcb76d3122
+    sha256: 86b82b087c1eb560bbf4460b215658eb93de9a98630013a939c317e0a39444b2
   access:
     mode: read_only
     method: file
@@ -983,7 +983,7 @@ records:
     repository_path: catalog/schemas/asset_catalog.schema.json
   integrity:
     kind: sha256
-    sha256: f2ab657dbbe9457eca357c001478500f0d1b8e536d81a80be4644770a204daec
+    sha256: 4b3e9af7f7e39f60ba8bc0a36a8e280e17e8dcbd4ef250784f1f6e673d74a5c0
   access:
     mode: read_only
     method: file
@@ -1064,7 +1064,7 @@ records:
 - asset_id: CATALOG-CLI-001
   record_version: '1.0'
   asset_type: script
-  purpose: Read-only stable-ID CLI for listing and resolving asset and query records.
+  purpose: Read-only stable-ID CLI for listing, resolving and searching asset and query records.
   status: VALIDATED_ACTIVE
   origin: REPOSITORY
   as_of: '2026-07-22'
@@ -1075,7 +1075,7 @@ records:
     repository_path: scripts/catalog_cli.py
   integrity:
     kind: sha256
-    sha256: 995175d69d1b95cb6e7694c67550c94ba63c8548082f18cb781bb21ecb63344e
+    sha256: 11114abff162e190933baeb60607cba87921174fa946c23b37fa0eb68551f804
   access:
     mode: read_only
     method: command
@@ -8918,7 +8918,7 @@ records:
     repository_path: tests/test_task17a_execution_capacity_audit.py
   integrity:
     kind: sha256
-    sha256: 26db813bea589de2e352f3cad6996b6e8ae24875989bfc8ebe63bfe2a82d8879
+    sha256: 4eded36cdd32b269d4b8da9d15ba1a8b129c214b65a2b88a3bc0c47ee892e63c
   access:
     mode: read_only
     method: file
@@ -11360,7 +11360,7 @@ records:
     repository_path: tests/test_task20_acceptance_catalog_factory_fit.py
   integrity:
     kind: sha256
-    sha256: 36e36f6700f30a4537c495a70d3326aa103f38f79cf35c4c795f2d2833e037f6
+    sha256: 2053e9c1c270f25cfd651eef05ed40c1b608eb83b436a88b709f7d7c55d9f88c
   access:
     mode: read_only
     method: file
@@ -12532,7 +12532,7 @@ records:
     repository_path: tests/test_task24_catalog_factory_fit.py
   integrity:
     kind: sha256
-    sha256: 928ca368dd49468368b1a69d4cabfaffebb0a2031ab914d57f5cfe961ab8869d
+    sha256: d5c30cdefff7ef3b47108d0f2b934c1f9f4a889d3944d02f3bb8bdef5ed217cc
   access: *t24_read_file
   relations:
   - relation_type: depends_on
@@ -13005,7 +13005,7 @@ records:
     repository_path: tests/test_task23_catalog_repository_factory_fit.py
   integrity:
     kind: sha256
-    sha256: 1470832ff2cf686eb6958a88bb9f2638d865b055f1f1a007b73cd20e6d95b5d3
+    sha256: 5631d84bebdcfdd2b8764ee99508b6f7b38d8402a02b40f09df7a3e1c5dea941
   access: *t23_read_file
   relations:
   - relation_type: depends_on
@@ -18791,4 +18791,234 @@ records:
   - {relation_type: validated_by, target_asset_id: TEST-T30-ACTIVE-POOL-ROUTE-YIELD-001}
   consumers: [TASK-30, RC001-H07-H01-LIQUIDITY-RETENTION]
   evidence: []
+  search_terms: [AHTTzwf3GmVMJdxWM8v2MSxyjZj8rQR6hyAC3g9477Yj, 65G9eRh9UpW5FcJqJpMmXvZ1Jtyi8SWCpj95JdDndn6w6KqUMVrU3GhtTgiQBoRRYZCvmNg9mEQexo6LWfw88B6v, 7GCihgDB8fe6KNjn2MYtkzZcRjQy3t9GHdC8uHYmW2hr, So11111111111111111111111111111111111111112, SOLANA-STANDARD-GET-TRANSACTION-001, ORCA, POPCAT]
   classification: *t25_internal
+
+- asset_id: CONFIG-PROVIDER-ROUTE-CAPABILITY-REGISTRY-003
+  record_version: '1.0'
+  asset_type: configuration
+  purpose: Append-only provider-route registry successor preserving all v2 route semantics and adding the observed standard-RPC getTransaction route.
+  status: VALIDATED_ACTIVE
+  origin: REPOSITORY
+  as_of: '2026-08-13'
+  truth_owner: TASK-30
+  location: {kind: git_path, logical_uri: 'repo://configs/provider_route_capability_registry_v3.yaml', repository_path: configs/provider_route_capability_registry_v3.yaml}
+  integrity: {kind: sha256, sha256: dfab094593c061fc2dcbe344b2e7977942927f833c2d2a83e50aa5a3e27cd95e}
+  access: *t25_read_file
+  relations:
+  - {relation_type: derived_from, target_asset_id: CONFIG-PROVIDER-ROUTE-CAPABILITY-REGISTRY-002}
+  - {relation_type: validated_by, target_asset_id: TEST-T30-A18-SINGLE-SIGNATURE-TRANSACTION-001}
+  consumers: [TASK-30, FACTORY-001]
+  evidence: []
+  classification: *t25_internal
+
+- asset_id: SCHEMA-PROVIDER-ROUTE-CAPABILITY-REGISTRY-003
+  record_version: '1.0'
+  asset_type: schema
+  purpose: Closed schema for the v3 append-only route registry identity, predecessor binding and four-route cardinality.
+  status: VALIDATED_ACTIVE
+  origin: REPOSITORY
+  as_of: '2026-08-13'
+  truth_owner: TASK-30
+  location: {kind: git_path, logical_uri: 'repo://catalog/schemas/provider_route_capability_registry_v3.schema.json', repository_path: catalog/schemas/provider_route_capability_registry_v3.schema.json}
+  integrity: {kind: sha256, sha256: 2e674c0d8b4a7710db24a885be1e1537ffbdfdb81b6ec2fbf9806aba3eca56f7}
+  access: *t25_read_file
+  relations: [{relation_type: governed_by, target_asset_id: CONFIG-PROVIDER-ROUTE-CAPABILITY-REGISTRY-003}]
+  consumers: [TASK-30, FACTORY-001]
+  evidence: []
+  classification: *t25_internal
+
+- asset_id: MODULE-PROVIDER-ROUTE-CAPABILITY-REGISTRY-003
+  record_version: '1.0'
+  asset_type: script
+  purpose: Fail-closed v3 route resolver proving exact v2 semantic carry-forward and explicit standard-RPC getTransaction registry binding.
+  status: VALIDATED_ACTIVE
+  origin: REPOSITORY
+  as_of: '2026-08-13'
+  truth_owner: TASK-30
+  location: {kind: git_path, logical_uri: 'repo://src/solana_alpha_lab/provider_route_capability_registry_v3.py', repository_path: src/solana_alpha_lab/provider_route_capability_registry_v3.py}
+  integrity: {kind: sha256, sha256: 880220c5aea2a975035a9ccc6e9909360fecc612ca73d13c1616966c32a017e0}
+  access: *t25_read_file
+  relations:
+  - {relation_type: governed_by, target_asset_id: CONFIG-PROVIDER-ROUTE-CAPABILITY-REGISTRY-003}
+  - {relation_type: depends_on, target_asset_id: MODULE-PROVIDER-ROUTE-CAPABILITY-REGISTRY-002}
+  consumers: [TASK-30, FACTORY-001]
+  evidence: []
+  classification: *t25_internal
+
+- asset_id: CONTRACT-T30-A18-SINGLE-SIGNATURE-TRANSACTION-001
+  record_version: '1.0'
+  asset_type: control_document
+  purpose: Versioned zero-authority contract for one exact getTransaction read and conservative pool-bound token balance projection.
+  status: VALIDATED_ACTIVE
+  origin: REPOSITORY
+  as_of: '2026-08-13'
+  truth_owner: TASK-30
+  location: {kind: git_path, logical_uri: 'repo://docs/contracts/task30_a18_single_signature_transaction_readiness_contract_v1.md', repository_path: docs/contracts/task30_a18_single_signature_transaction_readiness_contract_v1.md}
+  integrity: {kind: sha256, sha256: 747562860d77ddb925f71f409c29e30b0b00f481dcba1c814054fe50585306cf}
+  access: *t25_read_file
+  relations:
+  - {relation_type: derived_from, target_asset_id: EVIDENCE-T30-A17-ACTIVE-POOL-ROUTE-YIELD-001}
+  - {relation_type: depends_on, target_asset_id: CONFIG-PROVIDER-ROUTE-CAPABILITY-REGISTRY-003}
+  consumers: [TASK-30, RC001-H07-H01-LIQUIDITY-RETENTION]
+  evidence: []
+  classification: *t25_internal
+
+- asset_id: CONFIG-T30-A18-SINGLE-SIGNATURE-TRANSACTION-001
+  record_version: '1.0'
+  asset_type: configuration
+  purpose: Closed target, standard-RPC route, one-request cap, terminal outcomes and zero-authority policy for A18.
+  status: VALIDATED_ACTIVE
+  origin: REPOSITORY
+  as_of: '2026-08-13'
+  truth_owner: TASK-30
+  location: {kind: git_path, logical_uri: 'repo://configs/task30_a18_single_signature_transaction_readiness_v1.yaml', repository_path: configs/task30_a18_single_signature_transaction_readiness_v1.yaml}
+  integrity: {kind: sha256, sha256: 450fa869d9a813eede698dada10acfe577394f0d6bae55a464c4592ffc5295c7}
+  access: *t25_read_file
+  relations: [{relation_type: governed_by, target_asset_id: CONTRACT-T30-A18-SINGLE-SIGNATURE-TRANSACTION-001}]
+  consumers: [TASK-30, RC001-H07-H01-LIQUIDITY-RETENTION]
+  evidence: []
+  classification: *t25_internal
+
+- asset_id: SCHEMA-T30-A18-SINGLE-SIGNATURE-TRANSACTION-001
+  record_version: '1.0'
+  asset_type: schema
+  purpose: Closed JSON Schema for A18 target, request limits, terminal outcomes and explicit non-claims.
+  status: VALIDATED_ACTIVE
+  origin: REPOSITORY
+  as_of: '2026-08-13'
+  truth_owner: TASK-30
+  location: {kind: git_path, logical_uri: 'repo://catalog/schemas/task30_a18_single_signature_transaction_readiness.schema.json', repository_path: catalog/schemas/task30_a18_single_signature_transaction_readiness.schema.json}
+  integrity: {kind: sha256, sha256: 3614d8886cfe404dd616f991db15d8e8400bc8c6bab0a9de7145eac728913526}
+  access: *t25_read_file
+  relations: [{relation_type: governed_by, target_asset_id: CONTRACT-T30-A18-SINGLE-SIGNATURE-TRANSACTION-001}]
+  consumers: [TASK-30, FACTORY-001]
+  evidence: []
+  classification: *t25_internal
+
+- asset_id: FIXTURE-T30-A18-SINGLE-SIGNATURE-TRANSACTION-001
+  record_version: '1.0'
+  asset_type: evidence
+  purpose: Synthetic target, terminal and non-claim fixture for A18 offline readiness.
+  status: VALIDATED_ACTIVE
+  origin: REPOSITORY
+  as_of: '2026-08-13'
+  truth_owner: TASK-30
+  location: {kind: git_path, logical_uri: 'repo://tests/fixtures/task30/single_signature_transaction_readiness_v1.json', repository_path: tests/fixtures/task30/single_signature_transaction_readiness_v1.json}
+  integrity: {kind: sha256, sha256: 676a7c35afcd46aa82fd3b9b07474c8a8a18f513c43845a8be7dc9b1fd731711}
+  access: *t25_read_file
+  relations: [{relation_type: derived_from, target_asset_id: CONFIG-T30-A18-SINGLE-SIGNATURE-TRANSACTION-001}]
+  consumers: [TASK-30, FACTORY-001]
+  evidence: []
+  classification: *t25_internal
+
+- asset_id: MODULE-T30-A18-SINGLE-SIGNATURE-TRANSACTION-001
+  record_version: '1.0'
+  asset_type: script
+  purpose: Conservative signature-bound transaction classifier returning token deltas only when pool and opposite-direction balances are unambiguous.
+  status: VALIDATED_ACTIVE
+  origin: REPOSITORY
+  as_of: '2026-08-13'
+  truth_owner: TASK-30
+  location: {kind: git_path, logical_uri: 'repo://src/solana_alpha_lab/task30_a18_single_signature_transaction_readiness.py', repository_path: src/solana_alpha_lab/task30_a18_single_signature_transaction_readiness.py}
+  integrity: {kind: sha256, sha256: 4228d334062c662df81edb4440e869b88f6ee3f3eb37a16f62f5ffcb47da1e2c}
+  access: *t25_read_file
+  relations:
+  - {relation_type: governed_by, target_asset_id: CONFIG-T30-A18-SINGLE-SIGNATURE-TRANSACTION-001}
+  - {relation_type: depends_on, target_asset_id: MODULE-T08-LIFECYCLE-DISCOVERY-TRANSPORT-001}
+  consumers: [TASK-30, RC001-H07-H01-LIQUIDITY-RETENTION]
+  evidence: []
+  classification: *t25_internal
+
+- asset_id: TEST-T30-A18-SINGLE-SIGNATURE-TRANSACTION-001
+  record_version: '1.0'
+  asset_type: script
+  purpose: Deterministic request, registry, schema, target-binding, ambiguity, non-claim and acceptance tests for A18.
+  status: VALIDATED_ACTIVE
+  origin: REPOSITORY
+  as_of: '2026-08-13'
+  truth_owner: TASK-30
+  location: {kind: git_path, logical_uri: 'repo://tests/test_task30_a18_single_signature_transaction_readiness.py', repository_path: tests/test_task30_a18_single_signature_transaction_readiness.py}
+  integrity: {kind: sha256, sha256: 11ed7f6941ba3b00f3f946a08087ae08aae62af0d873eecbfc3cb6a24455567e}
+  access: *t25_read_file
+  relations:
+  - {relation_type: depends_on, target_asset_id: MODULE-T30-A18-SINGLE-SIGNATURE-TRANSACTION-001}
+  - {relation_type: depends_on, target_asset_id: SCHEMA-T30-A18-SINGLE-SIGNATURE-TRANSACTION-001}
+  - {relation_type: depends_on, target_asset_id: FIXTURE-T30-A18-SINGLE-SIGNATURE-TRANSACTION-001}
+  consumers: [TASK-30, FACTORY-001]
+  evidence: []
+  classification: *t25_internal
+
+- asset_id: EVIDENCE-T30-A18-SINGLE-SIGNATURE-TRANSACTION-001
+  record_version: '1.0'
+  asset_type: evidence
+  purpose: Hash-bound offline acceptance, route-gap handling, Catalog searchability and FULL Factory Fit review for A18.
+  status: VALIDATED_ACTIVE
+  origin: REPOSITORY
+  as_of: '2026-08-13'
+  truth_owner: TASK-30
+  location: {kind: git_path, logical_uri: 'repo://docs/evidence/task30/a18_single_signature_transaction_readiness_acceptance_v1.json', repository_path: docs/evidence/task30/a18_single_signature_transaction_readiness_acceptance_v1.json}
+  integrity: {kind: sha256, sha256: fdad06e5e88f06334c31899416010980e3a2961820640f8e3af65f248a8e6c46}
+  access: *t25_read_file
+  relations:
+  - {relation_type: derived_from, target_asset_id: CONTRACT-T30-A18-SINGLE-SIGNATURE-TRANSACTION-001}
+  - {relation_type: validated_by, target_asset_id: TEST-T30-A18-SINGLE-SIGNATURE-TRANSACTION-001}
+  - {relation_type: depends_on, target_asset_id: CATALOG-CLI-001}
+  consumers: [TASK-30, RC001-H07-H01-LIQUIDITY-RETENTION, FACTORY-001]
+  evidence: []
+  search_terms: [AHTTzwf3GmVMJdxWM8v2MSxyjZj8rQR6hyAC3g9477Yj, 65G9eRh9UpW5FcJqJpMmXvZ1Jtyi8SWCpj95JdDndn6w6KqUMVrU3GhtTgiQBoRRYZCvmNg9mEQexo6LWfw88B6v, 7GCihgDB8fe6KNjn2MYtkzZcRjQy3t9GHdC8uHYmW2hr, So11111111111111111111111111111111111111112, SOLANA-STANDARD-GET-TRANSACTION-001, SOLANA_STANDARD_RPC, GET_TRANSACTION, A18]
+  classification: *t25_internal
+
+- asset_id: TEST-CATALOG-SEARCH-001
+  record_version: '1.0'
+  asset_type: script
+  purpose: Deterministic tests proving read-only Catalog search finds measurements and runtime evidence by explicit pool, signature and route terms.
+  status: VALIDATED_ACTIVE
+  origin: REPOSITORY
+  as_of: '2026-08-13'
+  truth_owner: TASK-03
+  location: {kind: git_path, logical_uri: 'repo://tests/test_catalog_search.py', repository_path: tests/test_catalog_search.py}
+  integrity: {kind: sha256, sha256: 28da9e3edf6dcd340d3e34deb5b27a6813bcc62bdb87e64e0111962da43067fa}
+  access: *t25_read_file
+  relations:
+  - {relation_type: depends_on, target_asset_id: CATALOG-CLI-001}
+  - {relation_type: depends_on, target_asset_id: CATALOG-SCHEMA-ASSET-001}
+  - {relation_type: validated_by, target_asset_id: CATALOG-VALIDATOR-001}
+  consumers: [TASK-03, TASK-30, FACTORY-001]
+  evidence: []
+  search_terms: [CATALOG_SEARCH, A17, A18, pool, signature, runtime_receipt]
+  classification: *t25_internal
+
+- asset_id: RUNTIME-T30-A17-ACTIVE-POOL-ROUTE-YIELD-001
+  record_version: '1.0'
+  asset_type: evidence
+  purpose: Searchable metadata receipt for the one owner-gated A17 external route-yield run; raw response bytes remain outside Git under A4.
+  status: VALIDATED_ACTIVE
+  origin: RUNTIME
+  as_of: '2026-08-13'
+  truth_owner: TASK-30
+  location:
+    kind: runtime
+    logical_uri: runtime://task30/active_pool_route_yield/run=20260813T090418Z-863357bb
+  integrity:
+    kind: runtime_receipt
+    reference: a4://task30_active_pool_route_yield/run=20260813T090418Z-863357bb/terminal_receipt.json
+  access:
+    mode: read_only
+    method: runtime_attestation
+    network_required: false
+    secrets_required: false
+  relations:
+  - {relation_type: derived_from, target_asset_id: EVIDENCE-T30-A17-ACTIVE-POOL-ROUTE-YIELD-001}
+  - {relation_type: governed_by, target_asset_id: CONFIG-T30-ACTIVE-POOL-ROUTE-YIELD-001}
+  consumers: [TASK-30, RC001-H07-H01-LIQUIDITY-RETENTION, FACTORY-001]
+  evidence:
+  - evidence_id: EVIDENCE-T30-A17-ACTIVE-POOL-ROUTE-YIELD-001
+    kind: runtime_receipt
+    reference: a4://task30_active_pool_route_yield/run=20260813T090418Z-863357bb/terminal_receipt.json
+    result: PASS
+  search_terms: [AHTTzwf3GmVMJdxWM8v2MSxyjZj8rQR6hyAC3g9477Yj, 65G9eRh9UpW5FcJqJpMmXvZ1Jtyi8SWCpj95JdDndn6w6KqUMVrU3GhtTgiQBoRRYZCvmNg9mEQexo6LWfw88B6v, 7GCihgDB8fe6KNjn2MYtkzZcRjQy3t9GHdC8uHYmW2hr, ROUTE_YIELD_OBSERVED_TECHNICAL_ONLY, DEXSCREENER, HELIUS, ORCA, POPCAT]
+  classification:
+    contains_secrets: false
+    contains_raw_data: false
+    sensitivity: INTERNAL_NON_SECRET

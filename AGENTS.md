@@ -165,8 +165,8 @@ separately gated.
 
 Before building or invoking an external provider route, resolve its stable ID
 through the current append-only provider route registry. The current successor
-is `PROVIDER-ROUTE-CAPABILITY-REGISTRY-002` at
-`configs/provider_route_capability_registry_v2.yaml`; it must preserve the
+is `PROVIDER-ROUTE-CAPABILITY-REGISTRY-003` at
+`configs/provider_route_capability_registry_v3.yaml`; it must preserve the
 semantic hashes and exact SHA of immutable predecessor
 `PROVIDER_ROUTE_CAPABILITY_REGISTRY_V1` at
 `configs/provider_route_capability_registry_v1.yaml`. Reuse only an observed

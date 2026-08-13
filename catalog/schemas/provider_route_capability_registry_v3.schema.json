@@ -1,0 +1,28 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://lancerbeta.github.io/solana-alpha-lab/schemas/provider_route_capability_registry_v3.schema.json",
+  "title": "SMIAL provider route capability registry v3",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema", "schema_version", "registry_id", "as_of", "supersedes", "update_policy", "routes", "non_claims"],
+  "properties": {
+    "schema": {"const": "smial.provider-route-capability-registry"},
+    "schema_version": {"const": "3.0"},
+    "registry_id": {"const": "PROVIDER-ROUTE-CAPABILITY-REGISTRY-003"},
+    "as_of": {"const": "2026-08-13"},
+    "supersedes": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["registry_id", "path", "sha256", "preserved_route_semantic_sha256"],
+      "properties": {
+        "registry_id": {"const": "PROVIDER-ROUTE-CAPABILITY-REGISTRY-002"},
+        "path": {"const": "configs/provider_route_capability_registry_v2.yaml"},
+        "sha256": {"const": "2fbe49382fcfe5edc438e03378f7eaad173ede4940161fcc5f02d39735d5a7f1"},
+        "preserved_route_semantic_sha256": {"type": "object", "additionalProperties": {"type": "string", "pattern": "^[0-9a-f]{64}$"}, "minProperties": 3}
+      }
+    },
+    "update_policy": {"type": "object", "additionalProperties": false, "required": ["observed_receipt_required", "preserve_receipt_history", "separate_last_success", "registry_gap_is_unavailability", "automatic_routing", "authority_granted"], "properties": {"observed_receipt_required": {"const": true}, "preserve_receipt_history": {"const": true}, "separate_last_success": {"const": true}, "registry_gap_is_unavailability": {"const": false}, "automatic_routing": {"const": false}, "authority_granted": {"const": false}}},
+    "routes": {"type": "array", "minItems": 4, "maxItems": 4, "items": {"type": "object", "required": ["route_id", "provider", "endpoint_family", "network", "access_class", "operation", "protocol", "runtime", "preflight", "execution_policy", "evidence", "non_claims"], "additionalProperties": true}},
+    "non_claims": {"type": "object", "additionalProperties": false, "required": ["provider_reliability", "data_completeness", "market_activity", "task30_trial", "alpha", "numeric_netreturn"], "properties": {"provider_reliability": {"const": false}, "data_completeness": {"const": false}, "market_activity": {"const": false}, "task30_trial": {"const": false}, "alpha": {"const": false}, "numeric_netreturn": {"const": false}}}
+  }
+}

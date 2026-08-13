@@ -149,6 +149,16 @@
             "$ref": "#/$defs/evidence"
           }
         },
+        "search_terms": {
+          "type": "array",
+          "uniqueItems": true,
+          "maxItems": 32,
+          "items": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 200
+          }
+        },
         "classification": {
           "type": "object",
           "additionalProperties": false,

@@ -151,7 +151,7 @@ class Task23CatalogRepositoryFactoryFitTests(unittest.TestCase):
         self.assertGreaterEqual(
             checkpoint["schemas"], self.receipt["catalog"]["schemas"]
         )
-        self.assertEqual(checkpoint["queries"], 8)
+        self.assertGreaterEqual(checkpoint["queries"], 8)
         self.assertEqual(checkpoint["lifecycle_registries"], 9)
         self.assertGreaterEqual(checkpoint["lifecycle_records"], 55)
         self.assertEqual(len(records), checkpoint["assets"])
