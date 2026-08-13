@@ -1,0 +1,10 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://smial.local/schemas/delivery_harness_context_map.schema.json",
+  "type": "object", "additionalProperties": false,
+  "required": ["schema", "schema_version", "context_map_id", "harness_id", "roles"],
+  "properties": {
+    "schema": {"const": "smial.delivery-harness-context-map"}, "schema_version": {"const": "1.0"}, "context_map_id": {"const": "DELIVERY_CONTEXT_MAP_V1"}, "harness_id": {"const": "DELIVERY_HARNESS_V1"},
+    "roles": {"type": "array", "minItems": 10, "maxItems": 10, "items": {"type": "object", "additionalProperties": false, "required": ["semantic_role", "lane", "truth_owner", "missingness", "resolver"], "properties": {"semantic_role": {"type": "string"}, "lane": {"enum": ["L0", "L1", "L2", "L3"]}, "truth_owner": {"type": "string", "minLength": 1}, "missingness": {"enum": ["ERROR", "EXPLICIT_GAP"]}, "resolver": {"type": "object", "additionalProperties": false, "required": ["kind", "paths"], "properties": {"kind": {"enum": ["EXACT_PATHS", "EXACT_INPUT", "GIT_IDENTITY", "CATALOG_QUERY", "SOURCE_RELEASE_REGISTRY"]}, "paths": {"type": "array", "items": {"type": "string"}}}}}}}
+  }
+}

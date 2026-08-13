@@ -1,0 +1,23 @@
+schema: smial.delivery-harness-project-profile
+schema_version: '1.0'
+profile_id: SOLANA_ALPHA_LAB_V1
+harness_id: DELIVERY_HARNESS_V1
+repository:
+  name: lancerbeta/solana-alpha-lab
+  default_branch: main
+bindings:
+  project_sources_release_registry: docs/project_sources/release_registry_v1.yaml
+  catalog_manifest: catalog/catalog_manifest.yaml
+  owner_attention_policy: control/owner_attention_gate_v2.yaml
+  context_map: delivery-harness/context-map.yaml
+  domain_policy: delivery-harness/policies/solana-alpha-lab.md
+context_budgets:
+  agents_max_bytes: 12288
+  cursor_always_apply_max_bytes: 6144
+  ordinary_receipt_max_bytes: 49152
+  auto_inline_file_max_bytes: 102400
+authority:
+  provider_read: false
+  wallet_signer_transaction: false
+  cash_spend: false
+  project_sources_mutation: false

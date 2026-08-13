@@ -1,0 +1,48 @@
+schema: smial.delivery-harness
+schema_version: '1.0'
+harness_id: DELIVERY_HARNESS_V1
+active_routes:
+  - DIRECT_CODEX_DELIVERY
+  - DIRECT_CURSOR_DELIVERY
+  - DESIGN_ONLY
+forbidden_active_input_routes:
+  - GITHUB_BATON
+routes:
+  DIRECT_CODEX_DELIVERY:
+    active: true
+    actor: CODEX
+    task_selection: explicit_owner_or_canonical_ready_contract_only
+    merge: EXACT_OWNER_APPROVAL_AND_MACHINE_GATE
+  DIRECT_CURSOR_DELIVERY:
+    active: true
+    actor: CURSOR
+    task_selection: explicit_owner_or_canonical_ready_contract_only
+    merge: EXACT_OWNER_APPROVAL_AND_MACHINE_GATE
+  DESIGN_ONLY:
+    active: true
+    actor: ANY
+    task_selection: explicit_input_only
+    merge: FORBIDDEN
+  LEGACY_GITHUB_BATON_DORMANT:
+    active: false
+    actor: CURSOR
+    task_selection: false
+    merge: FORBIDDEN
+context_lanes:
+  L0: always_loaded_front_door
+  L1: exact_task_capsule
+  L2: dynamic_capability_context
+  L3: deep_evidence_on_demand
+context_budgets:
+  agents_max_bytes: 12288
+  cursor_always_apply_max_bytes: 6144
+  ordinary_receipt_max_bytes: 49152
+  auto_inline_file_max_bytes: 102400
+portable_templates:
+  - delivery-harness/templates/portable-project-profile.yaml
+  - delivery-harness/templates/bootstrap-prompt.md
+external_authority:
+  provider_api_rpc_wss: false
+  wallet_signer_transaction: false
+  cash_spend: false
+  project_sources_activation: false

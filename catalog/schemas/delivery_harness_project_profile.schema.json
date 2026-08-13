@@ -1,0 +1,13 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://smial.local/schemas/delivery_harness_project_profile.schema.json",
+  "type": "object", "additionalProperties": false,
+  "required": ["schema", "schema_version", "profile_id", "harness_id", "repository", "bindings", "context_budgets", "authority"],
+  "properties": {
+    "schema": {"const": "smial.delivery-harness-project-profile"}, "schema_version": {"const": "1.0"}, "profile_id": {"const": "SOLANA_ALPHA_LAB_V1"}, "harness_id": {"const": "DELIVERY_HARNESS_V1"},
+    "repository": {"type": "object", "additionalProperties": false, "required": ["name", "default_branch"], "properties": {"name": {"const": "lancerbeta/solana-alpha-lab"}, "default_branch": {"const": "main"}}},
+    "bindings": {"type": "object", "additionalProperties": false, "required": ["project_sources_release_registry", "catalog_manifest", "owner_attention_policy", "context_map", "domain_policy"], "properties": {"project_sources_release_registry": {"type": "string"}, "catalog_manifest": {"type": "string"}, "owner_attention_policy": {"type": "string"}, "context_map": {"type": "string"}, "domain_policy": {"type": "string"}}},
+    "context_budgets": {"type": "object", "additionalProperties": false, "required": ["agents_max_bytes", "cursor_always_apply_max_bytes", "ordinary_receipt_max_bytes", "auto_inline_file_max_bytes"], "properties": {"agents_max_bytes": {"const": 12288}, "cursor_always_apply_max_bytes": {"const": 6144}, "ordinary_receipt_max_bytes": {"const": 49152}, "auto_inline_file_max_bytes": {"const": 102400}}},
+    "authority": {"type": "object", "additionalProperties": false, "required": ["provider_read", "wallet_signer_transaction", "cash_spend", "project_sources_mutation"], "properties": {"provider_read": {"const": false}, "wallet_signer_transaction": {"const": false}, "cash_spend": {"const": false}, "project_sources_mutation": {"const": false}}}
+  }
+}

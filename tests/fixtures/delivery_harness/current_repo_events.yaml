@@ -1,0 +1,10 @@
+schema: smial.delivery-harness-capability-events
+schema_version: '1.0'
+events:
+  first_unattended_runtime: false
+  named_incident_consumer: false
+  owner_cockpit_workflow: false
+  named_behavior_question: false
+  measured_duckdb_boundary: false
+  second_analytics_consumer: false
+  material_version_documentation_delays: 0
