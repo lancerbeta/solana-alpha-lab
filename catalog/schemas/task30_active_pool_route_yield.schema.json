@@ -1,0 +1,68 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://lancerbeta.github.io/solana-alpha-lab/schemas/task30_active_pool_route_yield.schema.json",
+  "title": "TASK-30 A17 active-pool route-yield policy",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema", "schema_version", "task_id", "atom_id", "contract_id", "consumer", "spec_route", "upstream_evidence_ids", "route_registry", "discovery", "stream", "reconciliation", "runtime_limits", "execution_controls", "authority", "owner_authority", "terminal_outcomes", "replan", "decision", "project_sources_disposition"],
+  "properties": {
+    "schema": {"const": "smial.task30.active-pool-route-yield.policy"},
+    "schema_version": {"const": "1.0"},
+    "task_id": {"const": "TASK-30"},
+    "atom_id": {"const": "T30-A17_ACTIVE_POOL_ROUTE_YIELD_DISCRIMINATOR_V1"},
+    "contract_id": {"const": "TASK30-ACTIVE-POOL-ROUTE-YIELD-V1"},
+    "consumer": {"const": "RC001-H07-H01-LIQUIDITY-RETENTION"},
+    "spec_route": {"const": "DESIGN_SPEC"},
+    "upstream_evidence_ids": {"const": ["T30-A15P-STANDARD-POOL-LOGS-RUNTIME-001", "T30-A16P-POOL-ACTIVITY-DISCRIMINATOR-RUNTIME-002", "T30-A16R1-PROVIDER-ROUTE-CAPABILITY-REGISTRY-001"]},
+    "route_registry": {
+      "const": {"registry_id": "PROVIDER-ROUTE-CAPABILITY-REGISTRY-002", "schema_version": "2.0", "path": "configs/provider_route_capability_registry_v2.yaml"}
+    },
+    "discovery": {
+      "type": "object", "additionalProperties": false,
+      "required": ["route_id", "provider", "network", "operation", "token_mint", "dex_id", "quote_mint", "minimum_m5_transactions", "max_requests"],
+      "properties": {
+        "route_id": {"const": "DEXSCREENER-SOLANA-TOKEN-PAIRS-KEYLESS-001"},
+        "provider": {"const": "DEXSCREENER"}, "network": {"const": "solana"},
+        "operation": {"const": "PUBLIC_TOKEN_PAIR_DISCOVERY"},
+        "token_mint": {"const": "7GCihgDB8fe6KNjn2MYtkzZcRjQy3t9GHdC8uHYmW2hr"},
+        "dex_id": {"const": "orca"},
+        "quote_mint": {"const": "So11111111111111111111111111111111111111112"},
+        "minimum_m5_transactions": {"const": 1}, "max_requests": {"const": 1}
+      }
+    },
+    "stream": {
+      "type": "object", "additionalProperties": false,
+      "required": ["provider_route_id", "provider", "method", "commitment", "stop_after_first_notification"],
+      "properties": {"provider_route_id": {"const": "HELIUS-SOLANA-LOGS-SUBSCRIBE-001"}, "provider": {"const": "HELIUS_STANDARD_WSS"}, "method": {"const": "logsSubscribe"}, "commitment": {"const": "confirmed"}, "stop_after_first_notification": {"const": true}}
+    },
+    "reconciliation": {
+      "type": "object", "additionalProperties": false,
+      "required": ["provider_route_id", "provider", "method", "commitment", "limit", "only_after_acknowledged_zero_notification_window"],
+      "properties": {"provider_route_id": {"const": "HELIUS-SOLANA-GET-SIGNATURES-001"}, "provider": {"const": "HELIUS_STANDARD_RPC"}, "method": {"const": "getSignaturesForAddress"}, "commitment": {"const": "confirmed"}, "limit": {"const": 1000}, "only_after_acknowledged_zero_notification_window": {"const": true}}
+    },
+    "runtime_limits": {
+      "type": "object", "additionalProperties": false,
+      "required": ["max_discovery_requests", "max_wss_connections", "max_subscriptions", "max_wss_seconds", "max_notifications", "max_stream_bytes", "max_frame_bytes", "max_rpc_requests", "max_rpc_response_bytes", "estimated_helius_credit_cap"],
+      "properties": {"max_discovery_requests": {"const": 1}, "max_wss_connections": {"const": 1}, "max_subscriptions": {"const": 1}, "max_wss_seconds": {"const": 180}, "max_notifications": {"const": 1}, "max_stream_bytes": {"const": 300000}, "max_frame_bytes": {"const": 100000}, "max_rpc_requests": {"const": 1}, "max_rpc_response_bytes": {"const": 2000000}, "estimated_helius_credit_cap": {"const": 8}}
+    },
+    "execution_controls": {
+      "type": "object", "additionalProperties": false,
+      "required": ["monitoring_owner", "retention_class", "raw_root", "retry", "reconnect", "fallback", "scheduler", "transaction_followups"],
+      "properties": {"monitoring_owner": {"const": "LOCAL_WORK_CODEX_FOREGROUND"}, "retention_class": {"const": "A4"}, "raw_root": {"const": "local/task30_active_pool_route_yield"}, "retry": {"const": false}, "reconnect": {"const": false}, "fallback": {"const": false}, "scheduler": {"const": false}, "transaction_followups": {"const": 0}}
+    },
+    "authority": {
+      "type": "object", "additionalProperties": false,
+      "required": ["provider_api_rpc_wss_calls", "credential_read", "raw_external_data_write", "cash_spend_usd", "wallet_signer_transaction_actions", "task30_trial_or_acceptance"],
+      "properties": {"provider_api_rpc_wss_calls": {"const": 0}, "credential_read": {"const": false}, "raw_external_data_write": {"const": false}, "cash_spend_usd": {"const": 0}, "wallet_signer_transaction_actions": {"const": 0}, "task30_trial_or_acceptance": {"const": false}}
+    },
+    "owner_authority": {
+      "type": "object", "additionalProperties": false,
+      "required": ["future_runtime_authorized", "future_runtime_phrase"],
+      "properties": {"future_runtime_authorized": {"const": false}, "future_runtime_phrase": {"const": "T30-A17P_ACTIVE_POOL_ROUTE_YIELD_RUNTIME_V1; token=7GCihgDB8fe6KNjn2MYtkzZcRjQy3t9GHdC8uHYmW2hr; dex=orca; quote=So11111111111111111111111111111111111111112; monitoring_owner=LOCAL_WORK_CODEX_FOREGROUND; max_dexscreener_gets=1; max_wss_connections=1; max_subscriptions=1; max_open_seconds=180; max_notifications=1; max_stream_bytes=300000; conditional_rpc_requests=1; rpc_limit=1000; estimated_helius_credit_cap=8; retention=A4; retry=false; reconnect=false; fallback=false; transaction_followups=0"}}
+    },
+    "terminal_outcomes": {"const": ["ROUTE_YIELD_OBSERVED_TECHNICAL_ONLY", "ACTIVE_BUT_NO_WSS_YIELD", "NO_ACTIVITY_DURING_WINDOW", "NO_ACTIVE_TARGET_STOP", "TRANSPORT_OR_COVERAGE_UNKNOWN"]},
+    "replan": {"type": "object", "additionalProperties": false, "required": ["terminal_atom", "automatic_suffix_atom", "allowed_next_decisions"], "properties": {"terminal_atom": {"const": true}, "automatic_suffix_atom": {"const": false}, "allowed_next_decisions": {"const": ["PIVOT", "ACCEPT_UNKNOWN", "DEFER", "CLOSE"]}}},
+    "decision": {"const": "OFFLINE_ACTIVE_POOL_ROUTE_YIELD_READY_FOR_OWNER_GATE"},
+    "project_sources_disposition": {"const": "NO_CHANGE"}
+  }
+}

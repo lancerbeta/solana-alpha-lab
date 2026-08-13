@@ -1,0 +1,80 @@
+schema: smial.task30.active-pool-route-yield.policy
+schema_version: '1.0'
+task_id: TASK-30
+atom_id: T30-A17_ACTIVE_POOL_ROUTE_YIELD_DISCRIMINATOR_V1
+contract_id: TASK30-ACTIVE-POOL-ROUTE-YIELD-V1
+consumer: RC001-H07-H01-LIQUIDITY-RETENTION
+spec_route: DESIGN_SPEC
+upstream_evidence_ids:
+- T30-A15P-STANDARD-POOL-LOGS-RUNTIME-001
+- T30-A16P-POOL-ACTIVITY-DISCRIMINATOR-RUNTIME-002
+- T30-A16R1-PROVIDER-ROUTE-CAPABILITY-REGISTRY-001
+route_registry:
+  registry_id: PROVIDER-ROUTE-CAPABILITY-REGISTRY-002
+  schema_version: '2.0'
+  path: configs/provider_route_capability_registry_v2.yaml
+discovery:
+  route_id: DEXSCREENER-SOLANA-TOKEN-PAIRS-KEYLESS-001
+  provider: DEXSCREENER
+  network: solana
+  operation: PUBLIC_TOKEN_PAIR_DISCOVERY
+  token_mint: 7GCihgDB8fe6KNjn2MYtkzZcRjQy3t9GHdC8uHYmW2hr
+  dex_id: orca
+  quote_mint: So11111111111111111111111111111111111111112
+  minimum_m5_transactions: 1
+  max_requests: 1
+stream:
+  provider_route_id: HELIUS-SOLANA-LOGS-SUBSCRIBE-001
+  provider: HELIUS_STANDARD_WSS
+  method: logsSubscribe
+  commitment: confirmed
+  stop_after_first_notification: true
+reconciliation:
+  provider_route_id: HELIUS-SOLANA-GET-SIGNATURES-001
+  provider: HELIUS_STANDARD_RPC
+  method: getSignaturesForAddress
+  commitment: confirmed
+  limit: 1000
+  only_after_acknowledged_zero_notification_window: true
+runtime_limits:
+  max_discovery_requests: 1
+  max_wss_connections: 1
+  max_subscriptions: 1
+  max_wss_seconds: 180
+  max_notifications: 1
+  max_stream_bytes: 300000
+  max_frame_bytes: 100000
+  max_rpc_requests: 1
+  max_rpc_response_bytes: 2000000
+  estimated_helius_credit_cap: 8
+execution_controls:
+  monitoring_owner: LOCAL_WORK_CODEX_FOREGROUND
+  retention_class: A4
+  raw_root: local/task30_active_pool_route_yield
+  retry: false
+  reconnect: false
+  fallback: false
+  scheduler: false
+  transaction_followups: 0
+authority:
+  provider_api_rpc_wss_calls: 0
+  credential_read: false
+  raw_external_data_write: false
+  cash_spend_usd: 0
+  wallet_signer_transaction_actions: 0
+  task30_trial_or_acceptance: false
+owner_authority:
+  future_runtime_authorized: false
+  future_runtime_phrase: 'T30-A17P_ACTIVE_POOL_ROUTE_YIELD_RUNTIME_V1; token=7GCihgDB8fe6KNjn2MYtkzZcRjQy3t9GHdC8uHYmW2hr; dex=orca; quote=So11111111111111111111111111111111111111112; monitoring_owner=LOCAL_WORK_CODEX_FOREGROUND; max_dexscreener_gets=1; max_wss_connections=1; max_subscriptions=1; max_open_seconds=180; max_notifications=1; max_stream_bytes=300000; conditional_rpc_requests=1; rpc_limit=1000; estimated_helius_credit_cap=8; retention=A4; retry=false; reconnect=false; fallback=false; transaction_followups=0'
+terminal_outcomes:
+- ROUTE_YIELD_OBSERVED_TECHNICAL_ONLY
+- ACTIVE_BUT_NO_WSS_YIELD
+- NO_ACTIVITY_DURING_WINDOW
+- NO_ACTIVE_TARGET_STOP
+- TRANSPORT_OR_COVERAGE_UNKNOWN
+replan:
+  terminal_atom: true
+  automatic_suffix_atom: false
+  allowed_next_decisions: [PIVOT, ACCEPT_UNKNOWN, DEFER, CLOSE]
+decision: OFFLINE_ACTIVE_POOL_ROUTE_YIELD_READY_FOR_OWNER_GATE
+project_sources_disposition: NO_CHANGE

@@ -164,7 +164,11 @@ wallet/signer/transaction actions, and any other external side effect remain
 separately gated.
 
 Before building or invoking an external provider route, resolve its stable ID
-through `PROVIDER_ROUTE_CAPABILITY_REGISTRY_V1` at
+through the current append-only provider route registry. The current successor
+is `PROVIDER-ROUTE-CAPABILITY-REGISTRY-002` at
+`configs/provider_route_capability_registry_v2.yaml`; it must preserve the
+semantic hashes and exact SHA of immutable predecessor
+`PROVIDER_ROUTE_CAPABILITY_REGISTRY_V1` at
 `configs/provider_route_capability_registry_v1.yaml`. Reuse only an observed
 transport boundary that fits the exact consumer and current authority. A
 missing record is `REGISTRY_GAP`, not provider unavailability; a stale or

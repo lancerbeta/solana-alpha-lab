@@ -1,12 +1,12 @@
 schema_version: '1.0'
 catalog_id: SMIAL-PROJECT-ASSET-CATALOG
-catalog_version: 0.64.0
+catalog_version: 0.65.0
 as_of: '2026-08-13'
 implementation_status: VALIDATED_ACTIVE
 current_checkpoint:
-  assets: 771
+  assets: 783
   asset_registries: 4
-  schemas: 31
+  schemas: 33
   queries: 8
   lifecycle_registries: 9
   lifecycle_records: 60
@@ -60,6 +60,8 @@ root_resolver:
   - catalog/schemas/task30_forward_stream_execution_adapter.schema.json
   - catalog/schemas/task34a_documentation_foundation.schema.json
   - catalog/schemas/provider_route_capability_registry.schema.json
+  - catalog/schemas/provider_route_capability_registry_v2.schema.json
+  - catalog/schemas/task30_active_pool_route_yield.schema.json
   commands:
     validate:
     - uv
@@ -713,5 +715,17 @@ mandatory_asset_ids:
 - TEST-T30-POOL-ACTIVITY-DISCRIMINATOR-001
 - EVIDENCE-T30-A16-POOL-ACTIVITY-DISCRIMINATOR-001
 - EVIDENCE-T30-A16-POOL-ACTIVITY-DISCRIMINATOR-FACTORY-FIT-001
+- CONFIG-PROVIDER-ROUTE-CAPABILITY-REGISTRY-002
+- SCHEMA-PROVIDER-ROUTE-CAPABILITY-REGISTRY-002
+- MODULE-PROVIDER-ROUTE-CAPABILITY-REGISTRY-002
+- CONTRACT-T30-ACTIVE-POOL-ROUTE-YIELD-001
+- CONFIG-T30-ACTIVE-POOL-ROUTE-YIELD-001
+- SCHEMA-T30-ACTIVE-POOL-ROUTE-YIELD-001
+- FIXTURE-T30-ACTIVE-POOL-ROUTE-YIELD-001
+- MODULE-T30-ACTIVE-POOL-ROUTE-YIELD-001
+- MODULE-T30-ACTIVE-POOL-ROUTE-YIELD-RUNTIME-001
+- SCRIPT-T30-ACTIVE-POOL-ROUTE-YIELD-001
+- TEST-T30-ACTIVE-POOL-ROUTE-YIELD-001
+- EVIDENCE-T30-A17-ACTIVE-POOL-ROUTE-YIELD-001
 deferred_capabilities:
 - GRAPH_DATABASE

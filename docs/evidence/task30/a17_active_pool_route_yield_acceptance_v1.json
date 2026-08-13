@@ -1,0 +1,116 @@
+{
+  "schema": "smial.task30.active-pool-route-yield.acceptance",
+  "schema_version": "1.0",
+  "receipt_id": "T30-A17-ACTIVE-POOL-ROUTE-YIELD-001",
+  "task_id": "TASK-30",
+  "atom_id": "T30-A17_ACTIVE_POOL_ROUTE_YIELD_DISCRIMINATOR_V1",
+  "as_of": "2026-08-13",
+  "entry_gate": "START_WITH_PATCH",
+  "spec_route": "DESIGN_SPEC",
+  "decision": "OFFLINE_ACTIVE_POOL_ROUTE_YIELD_READY_FOR_OWNER_GATE",
+  "task_outcome": {
+    "owner_decision": "Extend only after technical route yield; otherwise choose PIVOT, ACCEPT_UNKNOWN, DEFER or CLOSE at TASK-30 level.",
+    "product_outcome": "Remove one route-yield uncertainty for RC001-H07-H01-LIQUIDITY-RETENTION.",
+    "named_consumer": "RC001-H07-H01-LIQUIDITY-RETENTION",
+    "cheapest_falsifier": "One active-pool selection, one first-notification standard stream and one conditional same-window signature page.",
+    "user_visible_result": "One terminal route-yield explanation without price, volume or trial promotion."
+  },
+  "authority": {
+    "provider_api_rpc_wss_calls": 0,
+    "credential_reads": 0,
+    "raw_external_data_writes": 0,
+    "cash_spend_usd": 0,
+    "wallet_signer_transaction_actions": 0,
+    "task30_trial_or_acceptance_actions": 0
+  },
+  "future_runtime_caps": {
+    "dexscreener_gets": 1,
+    "helius_wss_connections": 1,
+    "helius_subscriptions": 1,
+    "max_open_seconds": 180,
+    "max_notifications": 1,
+    "max_stream_bytes": 300000,
+    "conditional_rpc_requests": 1,
+    "rpc_limit": 1000,
+    "estimated_helius_credit_cap": 8,
+    "retry": false,
+    "reconnect": false,
+    "fallback": false,
+    "transaction_followups": 0,
+    "raw_retention": "A4_OUTSIDE_GIT"
+  },
+  "route_registry": {
+    "registry_id": "PROVIDER-ROUTE-CAPABILITY-REGISTRY-002",
+    "predecessor_sha256": "ea44843f7ee7e8116a5599e7e38a8802e416f963ed6e0020448e33db898b7598",
+    "preserved_legacy_routes": 2,
+    "added_observed_route": "HELIUS-SOLANA-LOGS-SUBSCRIBE-001",
+    "authority_granted": false
+  },
+  "terminal_outcomes": [
+    "ROUTE_YIELD_OBSERVED_TECHNICAL_ONLY",
+    "ACTIVE_BUT_NO_WSS_YIELD",
+    "NO_ACTIVITY_DURING_WINDOW",
+    "NO_ACTIVE_TARGET_STOP",
+    "TRANSPORT_OR_COVERAGE_UNKNOWN"
+  ],
+  "replan": {
+    "terminal_atom": true,
+    "automatic_suffix_atom": false,
+    "allowed_next_decisions": ["PIVOT", "ACCEPT_UNKNOWN", "DEFER", "CLOSE"],
+    "trigger": "Any repeated blocker, second post-A17 route/provider pivot, inability to bracket the same window or widened evidence budget."
+  },
+  "artifact_bindings": {
+    "route_registry": {"path": "configs/provider_route_capability_registry_v2.yaml", "sha256": "2fbe49382fcfe5edc438e03378f7eaad173ede4940161fcc5f02d39735d5a7f1"},
+    "route_registry_schema": {"path": "catalog/schemas/provider_route_capability_registry_v2.schema.json", "sha256": "2ab8c265c0ddecb4cd321c8280b0bfd4c8d4b8d710792de8bb930f36811b7985"},
+    "route_registry_module": {"path": "src/solana_alpha_lab/provider_route_capability_registry_v2.py", "sha256": "86c9d5026cd2e56bb8d404647ff3da71dac3834edb92f0e0bbab75a7855a6325"},
+    "contract": {"path": "docs/contracts/task30_active_pool_route_yield_contract_v1.md", "sha256": "1dcde3492725d1db3f0d111cea578a8700d43b931a8ab463a2928070c8cf5f2a"},
+    "config": {"path": "configs/task30_active_pool_route_yield_v1.yaml", "sha256": "10b11ca951eebd349849eb26716177f2aaf30ea5c6f99bb92a51237b7df8f3e4"},
+    "schema": {"path": "catalog/schemas/task30_active_pool_route_yield.schema.json", "sha256": "799731344bff5a62f483760e9c84f2606dbe227d3e43d46776d716957739167f"},
+    "fixture": {"path": "tests/fixtures/task30/active_pool_route_yield_v1.json", "sha256": "8a1615b473120162a5a0e409819c196e531a84ae6d2d1913e602234ec723b406"},
+    "module": {"path": "src/solana_alpha_lab/task30_active_pool_route_yield.py", "sha256": "1071f431d66d7eba18e05d4b6f248b6019a0f035367dbba890855b4d3c535b35"},
+    "runtime": {"path": "src/solana_alpha_lab/task30_active_pool_route_yield_runtime.py", "sha256": "5e1a5305461c350d37f9f149b4165359e249777156f0b1585b937edf4b5d9952"},
+    "script": {"path": "scripts/run_task30_active_pool_route_yield.py", "sha256": "8218704e62b04781481bbf1bfe9d790db37d3f964199a18221acc51050752bd4"},
+    "test": {"path": "tests/test_task30_active_pool_route_yield.py", "sha256": "34bb44e90c3183c4b0f5287d4386ba3c545584a240b0bd7b686b48e02239f0a5"}
+  },
+  "factory_fit_review": {
+    "scope": "FULL_REVIEW",
+    "verdict": "PASS_WITH_LIMITATIONS",
+    "mission": "PASS_WITH_LIMITATIONS: resolves route yield only and cannot promote alpha evidence.",
+    "flexibility": "PASS: selected pool is runtime-bound while token, DEX, quote, route and caps stay frozen.",
+    "compatibility_history": "PASS: immutable v1 and A15P/A16P evidence remain unchanged; v2 proves semantic carry-forward before adding the observed WSS route.",
+    "efficiency": "PASS: same-window early stop replaces blind sequential waits; RPC is conditional.",
+    "research_truth": "PASS: missing, malformed and unbracketed evidence stay UNKNOWN and never become zero.",
+    "owner_operability": "PASS: one five-state result and one exact future phrase.",
+    "monitoring_recovery": "PASS_WITH_LIMITATIONS: foreground only; no scheduler or reconnect is justified yet.",
+    "reuse_first": "PASS_WRAP: append-only route-registry successor and existing capture boundaries are reused without a new dependency.",
+    "execution_to_cashflow": "NOT_APPLICABLE_YET",
+    "red_team": "PASS: type confusion, invalid ack, target drift, transport failure, unbracketed history, duplicate RPC and premature secret read are rejected."
+  },
+  "product_horizon": {
+    "now": "RUN_ONLY_AFTER_EXACT_OWNER_EXTERNAL_GATE",
+    "watch": "ORCA_DECODER_OR_FORWARD_COLLECTOR_ONLY_AFTER_ROUTE_YIELD_AND_NAMED_CONSUMER"
+  },
+  "non_claims": {
+    "external_runtime_executed": false,
+    "provider_selected": false,
+    "orca_swap_decoded": false,
+    "price": false,
+    "volume": false,
+    "empty_interval": false,
+    "interval_complete": false,
+    "pit_admissible": false,
+    "task30_trial": false,
+    "task30_acceptance": false,
+    "alpha": false,
+    "strategy": false,
+    "execution": false,
+    "pnl": false,
+    "numeric_netreturn": false
+  },
+  "project_sources_disposition": {
+    "kind": "NO_CHANGE",
+    "reason": "A17 is an offline route-yield contract and harness; it does not accept TASK-30 or change the active Project Sources release."
+  },
+  "rollback": "Delete only the A17 tracked assets and Catalog transaction before any downstream adoption; no external state exists.",
+  "state_change": "NONE"
+}

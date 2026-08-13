@@ -1,0 +1,9 @@
+{
+  "expected_result": {
+    "decision": "OFFLINE_ACTIVE_POOL_ROUTE_YIELD_READY_FOR_OWNER_GATE",
+    "external_action_authorized": false,
+    "project_sources_disposition": "NO_CHANGE",
+    "spec_route": "DESIGN_SPEC",
+    "terminal_atom": true
+  }
+}
