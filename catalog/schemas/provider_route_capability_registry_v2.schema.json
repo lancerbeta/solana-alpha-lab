@@ -1,0 +1,51 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://lancerbeta.github.io/solana-alpha-lab/schemas/provider_route_capability_registry_v2.schema.json",
+  "title": "SMIAL provider route capability registry successor",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema", "schema_version", "registry_id", "as_of", "supersedes", "update_policy", "routes", "non_claims"],
+  "properties": {
+    "schema": {"const": "smial.provider-route-capability-registry"},
+    "schema_version": {"const": "2.0"},
+    "registry_id": {"const": "PROVIDER-ROUTE-CAPABILITY-REGISTRY-002"},
+    "as_of": {"const": "2026-08-13"},
+    "supersedes": {
+      "const": {
+        "registry_id": "PROVIDER-ROUTE-CAPABILITY-REGISTRY-001",
+        "path": "configs/provider_route_capability_registry_v1.yaml",
+        "sha256": "ea44843f7ee7e8116a5599e7e38a8802e416f963ed6e0020448e33db898b7598",
+        "preserved_route_semantic_sha256": {
+          "DEXSCREENER-SOLANA-TOKEN-PAIRS-KEYLESS-001": "c5d7861a4f3074784d1ecfa5614e1617be37dde2fb3e7c28f03ec5d3dd8e0055",
+          "HELIUS-SOLANA-GET-SIGNATURES-001": "8852673f88c310d9e9c098a03fdcb2360150a2cfc242cf346637ac5fdd44f46d"
+        }
+      }
+    },
+    "update_policy": {
+      "const": {
+        "observed_receipt_required": true,
+        "preserve_receipt_history": true,
+        "separate_last_success": true,
+        "registry_gap_is_unavailability": false,
+        "automatic_routing": false,
+        "authority_granted": false
+      }
+    },
+    "routes": {
+      "type": "array",
+      "minItems": 3,
+      "maxItems": 3,
+      "items": {"type": "object"}
+    },
+    "non_claims": {
+      "const": {
+        "provider_reliability": false,
+        "data_completeness": false,
+        "market_activity": false,
+        "task30_trial": false,
+        "alpha": false,
+        "numeric_netreturn": false
+      }
+    }
+  }
+}

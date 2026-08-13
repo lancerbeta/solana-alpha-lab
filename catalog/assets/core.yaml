@@ -591,7 +591,7 @@ records:
     repository_path: AGENTS.md
   integrity:
     kind: sha256
-    sha256: 5fdbedf1089fa80b06ce54dea27a0dfd240538cebff62362a0cd528d1f1a5169
+    sha256: 1499eb534c8f7c6d7d2b2d76cbaeed578f61e41025f7f5da5d0fb0fcb76d3122
   access:
     mode: read_only
     method: file
@@ -796,7 +796,7 @@ records:
     repository_path: scripts/validate_ci.py
   integrity:
     kind: sha256
-    sha256: 43122f2ac5216ef2603733212dce72f87139e9ceb5446a71a4faba6e081b523c
+    sha256: 56e761de2c3fe089bb3a21a0c266eb0b9e828ec10efef174ef18c97aa162faa6
   access:
     mode: read_only
     method: command
@@ -18569,6 +18569,58 @@ records:
   evidence: []
   classification: *t25_internal
 
+- asset_id: CONFIG-PROVIDER-ROUTE-CAPABILITY-REGISTRY-002
+  record_version: '1.0'
+  asset_type: configuration
+  purpose: Append-only provider-route registry successor preserving v1 route semantics and adding the A15P-observed Helius logsSubscribe route.
+  status: VALIDATED_ACTIVE
+  origin: REPOSITORY
+  as_of: '2026-08-13'
+  truth_owner: TASK-30
+  location: {kind: git_path, logical_uri: 'repo://configs/provider_route_capability_registry_v2.yaml', repository_path: configs/provider_route_capability_registry_v2.yaml}
+  integrity: {kind: sha256, sha256: 2fbe49382fcfe5edc438e03378f7eaad173ede4940161fcc5f02d39735d5a7f1}
+  access: *t25_read_file
+  relations:
+  - {relation_type: derived_from, target_asset_id: CONFIG-PROVIDER-ROUTE-CAPABILITY-REGISTRY-001}
+  - {relation_type: validated_by, target_asset_id: TEST-T30-ACTIVE-POOL-ROUTE-YIELD-001}
+  consumers: [TASK-30, FACTORY-001]
+  evidence: []
+  classification: *t25_internal
+
+- asset_id: SCHEMA-PROVIDER-ROUTE-CAPABILITY-REGISTRY-002
+  record_version: '1.0'
+  asset_type: schema
+  purpose: Schema for successor identity, predecessor binding, route cardinality and global non-claims; the resolver closes route semantics.
+  status: VALIDATED_ACTIVE
+  origin: REPOSITORY
+  as_of: '2026-08-13'
+  truth_owner: TASK-30
+  location: {kind: git_path, logical_uri: 'repo://catalog/schemas/provider_route_capability_registry_v2.schema.json', repository_path: catalog/schemas/provider_route_capability_registry_v2.schema.json}
+  integrity: {kind: sha256, sha256: 2ab8c265c0ddecb4cd321c8280b0bfd4c8d4b8d710792de8bb930f36811b7985}
+  access: *t25_read_file
+  relations: [{relation_type: governed_by, target_asset_id: CONFIG-PROVIDER-ROUTE-CAPABILITY-REGISTRY-002}]
+  consumers: [TASK-30, FACTORY-001]
+  evidence: []
+  classification: *t25_internal
+
+- asset_id: MODULE-PROVIDER-ROUTE-CAPABILITY-REGISTRY-002
+  record_version: '1.0'
+  asset_type: script
+  purpose: Fail-closed resolver proving immutable v1 carry-forward and the single observed WSS route addition.
+  status: VALIDATED_ACTIVE
+  origin: REPOSITORY
+  as_of: '2026-08-13'
+  truth_owner: TASK-30
+  location: {kind: git_path, logical_uri: 'repo://src/solana_alpha_lab/provider_route_capability_registry_v2.py', repository_path: src/solana_alpha_lab/provider_route_capability_registry_v2.py}
+  integrity: {kind: sha256, sha256: 86c9d5026cd2e56bb8d404647ff3da71dac3834edb92f0e0bbab75a7855a6325}
+  access: *t25_read_file
+  relations:
+  - {relation_type: governed_by, target_asset_id: CONFIG-PROVIDER-ROUTE-CAPABILITY-REGISTRY-002}
+  - {relation_type: depends_on, target_asset_id: MODULE-PROVIDER-ROUTE-CAPABILITY-REGISTRY-001}
+  consumers: [TASK-30, FACTORY-001]
+  evidence: []
+  classification: *t25_internal
+
 - asset_id: EVIDENCE-T30-A16P-POOL-ACTIVITY-DISCRIMINATOR-RUNTIME-002
   record_version: '1.0'
   asset_type: evidence
@@ -18584,5 +18636,159 @@ records:
   - {relation_type: derived_from, target_asset_id: EVIDENCE-T30-A16P-POOL-ACTIVITY-DISCRIMINATOR-RUNTIME-001}
   - {relation_type: validated_by, target_asset_id: TEST-T30-POOL-ACTIVITY-DISCRIMINATOR-RUNTIME-001}
   consumers: [TASK-30, FACTORY-001]
+  evidence: []
+  classification: *t25_internal
+
+- asset_id: CONTRACT-T30-ACTIVE-POOL-ROUTE-YIELD-001
+  record_version: '1.0'
+  asset_type: control_document
+  purpose: Versioned zero-authority contract for one same-window active-pool route-yield discriminator.
+  status: VALIDATED_ACTIVE
+  origin: REPOSITORY
+  as_of: '2026-08-13'
+  truth_owner: TASK-30
+  location: {kind: git_path, logical_uri: 'repo://docs/contracts/task30_active_pool_route_yield_contract_v1.md', repository_path: docs/contracts/task30_active_pool_route_yield_contract_v1.md}
+  integrity: {kind: sha256, sha256: 1dcde3492725d1db3f0d111cea578a8700d43b931a8ab463a2928070c8cf5f2a}
+  access: *t25_read_file
+  relations:
+  - {relation_type: derived_from, target_asset_id: EVIDENCE-T30-A16P-POOL-ACTIVITY-DISCRIMINATOR-RUNTIME-002}
+  - {relation_type: depends_on, target_asset_id: CONFIG-PROVIDER-ROUTE-CAPABILITY-REGISTRY-002}
+  consumers: [TASK-30, RC001-H07-H01-LIQUIDITY-RETENTION]
+  evidence: []
+  classification: *t25_internal
+
+- asset_id: CONFIG-T30-ACTIVE-POOL-ROUTE-YIELD-001
+  record_version: '1.0'
+  asset_type: configuration
+  purpose: Closed target, same-window sequence, limits, owner gate and terminal replan policy for A17.
+  status: VALIDATED_ACTIVE
+  origin: REPOSITORY
+  as_of: '2026-08-13'
+  truth_owner: TASK-30
+  location: {kind: git_path, logical_uri: 'repo://configs/task30_active_pool_route_yield_v1.yaml', repository_path: configs/task30_active_pool_route_yield_v1.yaml}
+  integrity: {kind: sha256, sha256: 10b11ca951eebd349849eb26716177f2aaf30ea5c6f99bb92a51237b7df8f3e4}
+  access: *t25_read_file
+  relations: [{relation_type: governed_by, target_asset_id: CONTRACT-T30-ACTIVE-POOL-ROUTE-YIELD-001}]
+  consumers: [TASK-30, RC001-H07-H01-LIQUIDITY-RETENTION]
+  evidence: []
+  classification: *t25_internal
+
+- asset_id: SCHEMA-T30-ACTIVE-POOL-ROUTE-YIELD-001
+  record_version: '1.0'
+  asset_type: schema
+  purpose: Closed JSON Schema for the A17 active-pool route-yield policy and zero-authority boundary.
+  status: VALIDATED_ACTIVE
+  origin: REPOSITORY
+  as_of: '2026-08-13'
+  truth_owner: TASK-30
+  location: {kind: git_path, logical_uri: 'repo://catalog/schemas/task30_active_pool_route_yield.schema.json', repository_path: catalog/schemas/task30_active_pool_route_yield.schema.json}
+  integrity: {kind: sha256, sha256: 799731344bff5a62f483760e9c84f2606dbe227d3e43d46776d716957739167f}
+  access: *t25_read_file
+  relations: [{relation_type: governed_by, target_asset_id: CONTRACT-T30-ACTIVE-POOL-ROUTE-YIELD-001}]
+  consumers: [TASK-30, FACTORY-001]
+  evidence: []
+  classification: *t25_internal
+
+- asset_id: FIXTURE-T30-ACTIVE-POOL-ROUTE-YIELD-001
+  record_version: '1.0'
+  asset_type: evidence
+  purpose: Synthetic expected offline decision for the A17 closed policy and terminal route branch.
+  status: VALIDATED_ACTIVE
+  origin: REPOSITORY
+  as_of: '2026-08-13'
+  truth_owner: TASK-30
+  location: {kind: git_path, logical_uri: 'repo://tests/fixtures/task30/active_pool_route_yield_v1.json', repository_path: tests/fixtures/task30/active_pool_route_yield_v1.json}
+  integrity: {kind: sha256, sha256: 8a1615b473120162a5a0e409819c196e531a84ae6d2d1913e602234ec723b406}
+  access: *t25_read_file
+  relations: [{relation_type: derived_from, target_asset_id: CONFIG-T30-ACTIVE-POOL-ROUTE-YIELD-001}]
+  consumers: [TASK-30, FACTORY-001]
+  evidence: []
+  classification: *t25_internal
+
+- asset_id: MODULE-T30-ACTIVE-POOL-ROUTE-YIELD-001
+  record_version: '1.0'
+  asset_type: script
+  purpose: Pure target selector, request binder and conservative same-window route-yield classifier.
+  status: VALIDATED_ACTIVE
+  origin: REPOSITORY
+  as_of: '2026-08-13'
+  truth_owner: TASK-30
+  location: {kind: git_path, logical_uri: 'repo://src/solana_alpha_lab/task30_active_pool_route_yield.py', repository_path: src/solana_alpha_lab/task30_active_pool_route_yield.py}
+  integrity: {kind: sha256, sha256: 1071f431d66d7eba18e05d4b6f248b6019a0f035367dbba890855b4d3c535b35}
+  access: *t25_read_file
+  relations:
+  - {relation_type: governed_by, target_asset_id: CONFIG-T30-ACTIVE-POOL-ROUTE-YIELD-001}
+  - {relation_type: depends_on, target_asset_id: MODULE-PROVIDER-ROUTE-CAPABILITY-REGISTRY-002}
+  consumers: [TASK-30, RC001-H07-H01-LIQUIDITY-RETENTION]
+  evidence: []
+  classification: *t25_internal
+
+- asset_id: MODULE-T30-ACTIVE-POOL-ROUTE-YIELD-RUNTIME-001
+  record_version: '1.0'
+  asset_type: script
+  purpose: Guarded one-shot A17 sequencer and immutable A4 retention boundary with injected transports.
+  status: VALIDATED_ACTIVE
+  origin: REPOSITORY
+  as_of: '2026-08-13'
+  truth_owner: TASK-30
+  location: {kind: git_path, logical_uri: 'repo://src/solana_alpha_lab/task30_active_pool_route_yield_runtime.py', repository_path: src/solana_alpha_lab/task30_active_pool_route_yield_runtime.py}
+  integrity: {kind: sha256, sha256: 5e1a5305461c350d37f9f149b4165359e249777156f0b1585b937edf4b5d9952}
+  access: *t25_read_file
+  relations: [{relation_type: depends_on, target_asset_id: MODULE-T30-ACTIVE-POOL-ROUTE-YIELD-001}]
+  consumers: [TASK-30, FACTORY-001]
+  evidence: []
+  classification: *t25_internal
+
+- asset_id: SCRIPT-T30-ACTIVE-POOL-ROUTE-YIELD-001
+  record_version: '1.0'
+  asset_type: script
+  purpose: Exact owner-gated foreground runner for the future A17 Node-HTTPS, WSS and conditional RPC sequence.
+  status: VALIDATED_ACTIVE
+  origin: REPOSITORY
+  as_of: '2026-08-13'
+  truth_owner: TASK-30
+  location: {kind: git_path, logical_uri: 'repo://scripts/run_task30_active_pool_route_yield.py', repository_path: scripts/run_task30_active_pool_route_yield.py}
+  integrity: {kind: sha256, sha256: 8218704e62b04781481bbf1bfe9d790db37d3f964199a18221acc51050752bd4}
+  access: *t25_read_file
+  relations: [{relation_type: depends_on, target_asset_id: MODULE-T30-ACTIVE-POOL-ROUTE-YIELD-RUNTIME-001}]
+  consumers: [TASK-30, FACTORY-001]
+  evidence: []
+  classification: *t25_internal
+
+- asset_id: TEST-T30-ACTIVE-POOL-ROUTE-YIELD-001
+  record_version: '1.0'
+  asset_type: script
+  purpose: Deterministic policy, sequencing, retention, adversarial, non-claim and Catalog tests for A17.
+  status: VALIDATED_ACTIVE
+  origin: REPOSITORY
+  as_of: '2026-08-13'
+  truth_owner: TASK-30
+  location: {kind: git_path, logical_uri: 'repo://tests/test_task30_active_pool_route_yield.py', repository_path: tests/test_task30_active_pool_route_yield.py}
+  integrity: {kind: sha256, sha256: 34bb44e90c3183c4b0f5287d4386ba3c545584a240b0bd7b686b48e02239f0a5}
+  access: *t25_read_file
+  relations:
+  - {relation_type: depends_on, target_asset_id: MODULE-T30-ACTIVE-POOL-ROUTE-YIELD-001}
+  - {relation_type: depends_on, target_asset_id: MODULE-T30-ACTIVE-POOL-ROUTE-YIELD-RUNTIME-001}
+  - {relation_type: depends_on, target_asset_id: SCHEMA-T30-ACTIVE-POOL-ROUTE-YIELD-001}
+  - {relation_type: depends_on, target_asset_id: FIXTURE-T30-ACTIVE-POOL-ROUTE-YIELD-001}
+  consumers: [TASK-30, FACTORY-001]
+  evidence: []
+  classification: *t25_internal
+
+- asset_id: EVIDENCE-T30-A17-ACTIVE-POOL-ROUTE-YIELD-001
+  record_version: '1.0'
+  asset_type: evidence
+  purpose: Hash-bound offline acceptance and FULL Factory Fit review for the terminal A17 route discriminator.
+  status: VALIDATED_ACTIVE
+  origin: REPOSITORY
+  as_of: '2026-08-13'
+  truth_owner: TASK-30
+  location: {kind: git_path, logical_uri: 'repo://docs/evidence/task30/a17_active_pool_route_yield_acceptance_v1.json', repository_path: docs/evidence/task30/a17_active_pool_route_yield_acceptance_v1.json}
+  integrity: {kind: sha256, sha256: 3647b41e13ed4e16da9927de196c39c4feac17bc062f8d17df22d61a2c1bc48e}
+  access: *t25_read_file
+  relations:
+  - {relation_type: derived_from, target_asset_id: CONTRACT-T30-ACTIVE-POOL-ROUTE-YIELD-001}
+  - {relation_type: validated_by, target_asset_id: TEST-T30-ACTIVE-POOL-ROUTE-YIELD-001}
+  consumers: [TASK-30, RC001-H07-H01-LIQUIDITY-RETENTION]
   evidence: []
   classification: *t25_internal

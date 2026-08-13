@@ -201,6 +201,25 @@ def validate_new_test_skip_policy(
     return waivers
 
 
+def decode_delivery_output(output: bytes | None) -> str:
+    """Decode child-process output without losing a successful full-gate result."""
+
+    if output is None:
+        return ""
+    return output.decode("utf-8", errors="replace")
+
+
+def emit_delivery_output(output: str, *, stream: Any = sys.stdout) -> None:
+    """Emit diagnostics without letting a narrow Windows console break the gate."""
+
+    text = output.strip()
+    if not text:
+        return
+    encoding = getattr(stream, "encoding", None) or "utf-8"
+    safe = text.encode(encoding, errors="backslashreplace").decode(encoding)
+    stream.write(safe + "\n")
+
+
 def parse_validation_summary(output: str) -> dict[str, Any]:
     test_counts = [int(value) for value in re.findall(r"Ran (\d+) tests?", output)]
     skip_counts = [
@@ -387,7 +406,6 @@ def run_tracked_only_delivery_preflight(*, base_ref: str = "origin/main") -> Non
                     VALIDATION_COMMAND.split(),
                     cwd=checkout,
                     env=environment,
-                    text=True,
                     stdout=subprocess.PIPE,
                     stderr=subprocess.PIPE,
                     check=False,
@@ -397,9 +415,12 @@ def run_tracked_only_delivery_preflight(*, base_ref: str = "origin/main") -> Non
             except subprocess.TimeoutExpired as exc:
                 raise CiValidationError("delivery_full_gate_timeout") from exc
             exit_code = completed.returncode
-            output = completed.stdout + "\n" + completed.stderr
-            if output.strip():
-                print(output.strip())
+            output = (
+                decode_delivery_output(completed.stdout)
+                + "\n"
+                + decode_delivery_output(completed.stderr)
+            )
+            emit_delivery_output(output)
             summary = parse_validation_summary(output)
             if completed.returncode != 0:
                 raise CiValidationError(
