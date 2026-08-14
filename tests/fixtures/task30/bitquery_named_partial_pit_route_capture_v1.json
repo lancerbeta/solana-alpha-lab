@@ -1,0 +1,46 @@
+{
+  "response": {
+    "data": {
+      "Solana": {
+        "bars": [
+          {
+            "Block": {"Timefield": "2026-08-12T00:00:00Z"},
+            "Trade": {
+              "open": 1.0,
+              "high": 1.2,
+              "low": 0.9,
+              "close": 1.1,
+              "Market": {"MarketAddress": "URqx24yyYxtXXhTbBQnbtPLhtLWYoaDaRxuQuLpNS3S"},
+              "Dex": {"ProtocolName": "pumpswap", "ProgramAddress": "pAMMBay6oceH9fJKBRHGP5D4bD4sWpmSwMn52FMfXEA"},
+              "Currency": {"MintAddress": "DMwbVy48dWVKGe9z1pcVnwF3HLMLrqWdDLfbvx8RchhK", "Symbol": "TEST"},
+              "Side": {"Currency": {"MintAddress": "So11111111111111111111111111111111111111112", "Symbol": "WSOL"}}
+            },
+            "volume_usd": 25.5,
+            "trade_count": 3
+          },
+          {
+            "Block": {"Timefield": "2026-08-12T00:30:00Z"},
+            "Trade": {
+              "open": 2.0,
+              "high": 2.2,
+              "low": 1.8,
+              "close": 2.1,
+              "Market": {"MarketAddress": "URqx24yyYxtXXhTbBQnbtPLhtLWYoaDaRxuQuLpNS3S"},
+              "Dex": {"ProtocolName": "pumpswap", "ProgramAddress": "pAMMBay6oceH9fJKBRHGP5D4bD4sWpmSwMn52FMfXEA"},
+              "Currency": {"MintAddress": "DMwbVy48dWVKGe9z1pcVnwF3HLMLrqWdDLfbvx8RchhK", "Symbol": "TEST"},
+              "Side": {"Currency": {"MintAddress": "So11111111111111111111111111111111111111112", "Symbol": "WSOL"}}
+            },
+            "volume_usd": 40.0,
+            "trade_count": 4
+          }
+        ]
+      }
+    }
+  },
+  "expected": {
+    "slots": 96,
+    "observed": 2,
+    "typed_gaps": 94,
+    "terminal_outcome": "PARTIAL_TYPED_GAP_PANEL"
+  }
+}
