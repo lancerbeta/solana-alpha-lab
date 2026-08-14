@@ -23,7 +23,7 @@
     ".agents/skills/delivery-harness/SKILL.md": "e47abf8526e127cecc76a42bcc2f98149f8b8207d0cfe14409829c5111c54663",
     ".cursor/commands/delivery-finish.md": "fb234b0a1faac1b5ee20961ae5be3516bd628608d29cda367e5861dfe7b6083f",
     ".github/ISSUE_TEMPLATE/control-atom.yml": "29cb96ec1b0058f38ea6e9669017bf01ef66552ab1288d68c17d39baa2f29fba",
-    "AGENTS.md": "f0289f1746924e6bd2cf3c215b60e9e6b23b79111fe1908585090a98a1a466b4",
+    "AGENTS.md": "6905419d8bc5d2ab8d883036608cedd4954dd5022a06fef10a94d29a920c5d33",
     "README.md": "539c48304858f0f7a0b54299b785fabef515d0fb39710dcc98c97b9c92000971",
     "catalog/schemas/delivery_harness.schema.json": "5a09c7a0a24b5ced3a2af6ae196b876b8efd11272d65597394007c020b977f05",
     "catalog/schemas/delivery_harness_capability_radar.schema.json": "90253c97e1b9cabc80a48ef2b3ec2b23da5d6a499124184e3a571f8c2ec01734",
@@ -38,9 +38,9 @@
     "control/active_time_gates.json": "d66c73a25515a2be16d0923e604634c3d1243230b1e050533445c65953679522",
     "control/owner_attention_gate_v2.yaml": "6c4cb1ec1d709510e36b0b3d10f2e17272a28ff902e432847d27a8edf2be372d",
     "delivery-harness/capability-radar.yaml": "6f68bfa257f5e227a96552f785c8f9eede7126c9e1f84eb2a5ed4bdf64d0d0e8",
-    "delivery-harness/context-map.yaml": "8bdf75a1c6e600fb43368872c8e77c34b4d96552a494820ac54474a7594a895c",
+    "delivery-harness/context-map.yaml": "ca881df9da3884deb480327f2fd070e249572aa50f1d8eef30e877b5dfbbcf4d",
     "delivery-harness/harness.yaml": "03df4e3223f9b28a7bb31b877a698deecabdf4b6dc6e800865f8c27f03b0c916",
-    "delivery-harness/policies/solana-alpha-lab.md": "b7e7d19c208daedb2024b245ace9817934ea4361dba9ff06e42d72f8c2e27ae9",
+    "delivery-harness/policies/solana-alpha-lab.md": "ff8667d46d2e8aa00e5fc1d5409cebd04f49cbf313e486f5b014e5777ba4328f",
     "delivery-harness/project-profile.yaml": "5aff7be56febd2ebadab76ae6f86e7023dd1f5a6facf9bed58f07747779d3df1",
     "delivery-harness/templates/bootstrap-prompt.md": "0af2660e84b4f37d917832db88e5a03069fc85c3a331bc9476e24eddee171aef",
     "delivery-harness/templates/portable-bundle-manifest.json": "5e2d34b2276c6b4e30a528a7ed029f97f283afe5ec5ee83c5bb6c3387f345aee",
@@ -99,7 +99,7 @@
     "full_gate": "ENFORCED_BY_PROJECT_BOUND_VALIDATION",
     "github_ci": "ENFORCED_LIVE_AT_GUARDED_MERGE",
     "project_checks": [
-      "PASS_839_ASSETS_AND_GENERATED_PROJECTIONS"
+      "PASS_824_ASSETS_AND_GENERATED_PROJECTIONS"
     ]
   },
   "non_claims": [

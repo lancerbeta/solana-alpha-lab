@@ -3698,6 +3698,46 @@
       "target_asset_id": "TEST-T30-A20-BITQUERY-PIT-CAPTURE-001"
     },
     {
+      "source_asset_id": "EVIDENCE-T30-A20-DELIVERY-COMPLETION-001",
+      "relation": "depends_on",
+      "target_asset_id": "EVIDENCE-T30-A20-DELIVERY-FACTORY-FIT-001"
+    },
+    {
+      "source_asset_id": "EVIDENCE-T30-A20-DELIVERY-COMPLETION-001",
+      "relation": "depends_on",
+      "target_asset_id": "EVIDENCE-T30-A20-DELIVERY-INDEPENDENT-REVIEW-001"
+    },
+    {
+      "source_asset_id": "EVIDENCE-T30-A20-DELIVERY-COMPLETION-001",
+      "relation": "depends_on",
+      "target_asset_id": "SCHEMA-DELIVERY-COMPLETION-EVIDENCE-001"
+    },
+    {
+      "source_asset_id": "EVIDENCE-T30-A20-DELIVERY-COMPLETION-001",
+      "relation": "derived_from",
+      "target_asset_id": "EVIDENCE-T30-A20-BITQUERY-PIT-CAPTURE-001"
+    },
+    {
+      "source_asset_id": "EVIDENCE-T30-A20-DELIVERY-FACTORY-FIT-001",
+      "relation": "depends_on",
+      "target_asset_id": "EVIDENCE-T30-A20-DELIVERY-INDEPENDENT-REVIEW-001"
+    },
+    {
+      "source_asset_id": "EVIDENCE-T30-A20-DELIVERY-FACTORY-FIT-001",
+      "relation": "derived_from",
+      "target_asset_id": "EVIDENCE-T30-A20-BITQUERY-PIT-CAPTURE-001"
+    },
+    {
+      "source_asset_id": "EVIDENCE-T30-A20-DELIVERY-INDEPENDENT-REVIEW-001",
+      "relation": "depends_on",
+      "target_asset_id": "SCHEMA-DELIVERY-INDEPENDENT-REVIEW-EVIDENCE-001"
+    },
+    {
+      "source_asset_id": "EVIDENCE-T30-A20-DELIVERY-INDEPENDENT-REVIEW-001",
+      "relation": "derived_from",
+      "target_asset_id": "EVIDENCE-T30-A20-BITQUERY-PIT-CAPTURE-001"
+    },
+    {
       "source_asset_id": "EVIDENCE-T30-A20P-BITQUERY-PIT-CAPTURE-001",
       "relation": "derived_from",
       "target_asset_id": "CONFIG-T30-A20-BITQUERY-PIT-CAPTURE-001"

@@ -735,7 +735,7 @@ records:
     repository_path: AGENTS.md
   integrity:
     kind: sha256
-    sha256: f0289f1746924e6bd2cf3c215b60e9e6b23b79111fe1908585090a98a1a466b4
+    sha256: 6905419d8bc5d2ab8d883036608cedd4954dd5022a06fef10a94d29a920c5d33
   access:
     mode: read_only
     method: file
@@ -13352,7 +13352,7 @@ records:
   as_of: '2026-08-14'
   truth_owner: TASK-30
   location: {kind: git_path, logical_uri: 'repo://docs/evidence/task30/a20_bitquery_named_partial_pit_route_capture_acceptance_v1.json', repository_path: docs/evidence/task30/a20_bitquery_named_partial_pit_route_capture_acceptance_v1.json}
-  integrity: {kind: sha256, sha256: ed8bbf3e0b4e49978806336aef7221442097f6f65200daab9e181404590f7ccc}
+  integrity: {kind: sha256, sha256: fb228c064a9d39aa13ec41cc2e545d129b1de2e236f4f3e3bf44bbc3ad486699}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: derived_from, target_asset_id: CONTRACT-T30-A20-BITQUERY-PIT-CAPTURE-001}
@@ -13448,7 +13448,7 @@ records:
   as_of: '2026-08-14'
   truth_owner: TASK-30
   location: {kind: git_path, logical_uri: 'repo://docs/evidence/task30/a20r1_provider_route_capability_registry_acceptance_v1.json', repository_path: docs/evidence/task30/a20r1_provider_route_capability_registry_acceptance_v1.json}
-  integrity: {kind: sha256, sha256: 8ec6689a3b4b994cd3dfc8b75b0973045f1f93e7bf26f3eedd9210172b73bd7e}
+  integrity: {kind: sha256, sha256: c01c7e0f65ff45ed3dee418b6f9870cd3b4ae9335ac8ab638f2196934253a416}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: derived_from, target_asset_id: CONFIG-PROVIDER-ROUTE-CAPABILITY-REGISTRY-004}
@@ -13457,6 +13457,65 @@ records:
   consumers: [TASK-30, FACTORY-001]
   evidence: []
   search_terms: [A20R1, REGISTRY_V4, ACCEPTANCE, BITQUERY, ROUTE_UNKNOWN_STOP]
+  classification: {contains_secrets: false, contains_raw_data: false, sensitivity: INTERNAL_NON_SECRET}
+
+- asset_id: EVIDENCE-T30-A20-DELIVERY-COMPLETION-001
+  record_version: '1.0'
+  asset_type: evidence
+  purpose: Guard-consumable completion evidence binding the exact A20 product inventory without promoting TASK-30.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-08-14'
+  truth_owner: TASK-30
+  location: {kind: git_path, logical_uri: 'repo://docs/evidence/task30/a20_delivery_completion_evidence_v1.json', repository_path: docs/evidence/task30/a20_delivery_completion_evidence_v1.json}
+  integrity: {kind: none, note: 'Content integrity is owned by the live completion-review-fit hash chain; embedding its SHA here would create an indirect self-reference through the reviewed inventory.'}
+  access: {mode: read_only, method: file, network_required: false, secrets_required: false}
+  relations:
+  - {relation_type: derived_from, target_asset_id: EVIDENCE-T30-A20-BITQUERY-PIT-CAPTURE-001}
+  - {relation_type: depends_on, target_asset_id: EVIDENCE-T30-A20-DELIVERY-INDEPENDENT-REVIEW-001}
+  - {relation_type: depends_on, target_asset_id: EVIDENCE-T30-A20-DELIVERY-FACTORY-FIT-001}
+  - {relation_type: depends_on, target_asset_id: SCHEMA-DELIVERY-COMPLETION-EVIDENCE-001}
+  consumers: [TASK-30, FACTORY-001, GOAL-OWNER]
+  evidence: []
+  search_terms: [A20, DELIVERY_COMPLETION, GUARDED_MERGE, BLOCKED_DATA, NO_TASK30_PROMOTION]
+  classification: {contains_secrets: false, contains_raw_data: false, sensitivity: INTERNAL_NON_SECRET}
+
+- asset_id: EVIDENCE-T30-A20-DELIVERY-INDEPENDENT-REVIEW-001
+  record_version: '1.0'
+  asset_type: evidence
+  purpose: Required-role review evidence bound to the exact non-self-referential A20 inventory.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-08-14'
+  truth_owner: TASK-30
+  location: {kind: git_path, logical_uri: 'repo://docs/evidence/task30/a20_delivery_independent_review_v1.json', repository_path: docs/evidence/task30/a20_delivery_independent_review_v1.json}
+  integrity: {kind: none, note: 'Content integrity is owned by the live completion-review-fit hash chain; embedding its SHA here would create an indirect self-reference through the reviewed inventory.'}
+  access: {mode: read_only, method: file, network_required: false, secrets_required: false}
+  relations:
+  - {relation_type: derived_from, target_asset_id: EVIDENCE-T30-A20-BITQUERY-PIT-CAPTURE-001}
+  - {relation_type: depends_on, target_asset_id: SCHEMA-DELIVERY-INDEPENDENT-REVIEW-EVIDENCE-001}
+  consumers: [TASK-30, FACTORY-001, GOAL-OWNER]
+  evidence: []
+  search_terms: [A20, INDEPENDENT_REVIEW, CODE_REVIEWER, GOAL_DOD_CRITIC, ARCHITECTURE_CRITIC]
+  classification: {contains_secrets: false, contains_raw_data: false, sensitivity: INTERNAL_NON_SECRET}
+
+- asset_id: EVIDENCE-T30-A20-DELIVERY-FACTORY-FIT-001
+  record_version: '1.0'
+  asset_type: evidence
+  purpose: FULL Factory Fit evidence preserving unknown data truth, no-switch outcome and bounded recovery.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-08-14'
+  truth_owner: TASK-30
+  location: {kind: git_path, logical_uri: 'repo://docs/evidence/task30/a20_delivery_factory_fit_v1.json', repository_path: docs/evidence/task30/a20_delivery_factory_fit_v1.json}
+  integrity: {kind: none, note: 'Content integrity is owned by the live completion-review-fit hash chain; embedding its SHA here would create an indirect self-reference through the reviewed inventory.'}
+  access: {mode: read_only, method: file, network_required: false, secrets_required: false}
+  relations:
+  - {relation_type: derived_from, target_asset_id: EVIDENCE-T30-A20-BITQUERY-PIT-CAPTURE-001}
+  - {relation_type: depends_on, target_asset_id: EVIDENCE-T30-A20-DELIVERY-INDEPENDENT-REVIEW-001}
+  consumers: [TASK-30, FACTORY-001, GOAL-OWNER]
+  evidence: []
+  search_terms: [A20, FACTORY_FIT, FULL_REVIEW, BLOCKED_DATA, NO_SWITCH]
   classification: {contains_secrets: false, contains_raw_data: false, sensitivity: INTERNAL_NON_SECRET}
 
 - asset_id: CONTRACT-T30-FORWARD-STREAM-RUNTIME-HARNESS-001
@@ -19533,7 +19592,7 @@ records:
   as_of: '2026-08-14'
   truth_owner: CTRL-DELIVERY-HARNESS-001
   location: {kind: git_path, logical_uri: 'repo://delivery-harness/context-map.yaml', repository_path: delivery-harness/context-map.yaml}
-  integrity: {kind: sha256, sha256: 8bdf75a1c6e600fb43368872c8e77c34b4d96552a494820ac54474a7594a895c}
+  integrity: {kind: sha256, sha256: ca881df9da3884deb480327f2fd070e249572aa50f1d8eef30e877b5dfbbcf4d}
   access: *t25_read_file
   relations:
   - {relation_type: governed_by, target_asset_id: CTRL-DELIVERY-HARNESS-001}

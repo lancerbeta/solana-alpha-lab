@@ -29,6 +29,9 @@ managed_write_set:
   - docs/evidence/task30/a20_bitquery_named_partial_pit_route_capture_acceptance_v1.json
   - docs/evidence/task30/a20p_bitquery_named_partial_pit_route_capture_runtime_receipt_v1.json
   - docs/evidence/task30/a20r1_provider_route_capability_registry_acceptance_v1.json
+  - docs/evidence/task30/a20_delivery_completion_evidence_v1.json
+  - docs/evidence/task30/a20_delivery_independent_review_v1.json
+  - docs/evidence/task30/a20_delivery_factory_fit_v1.json
   - docs/evidence/control/delivery_harness_acceptance_v1.json
   - docs/reports/task30/bitquery_named_partial_pit_route_capture_readout_v1.md
   - configs/provider_route_capability_registry_v4.yaml
@@ -78,6 +81,7 @@ context_requirements:
     ARCHITECTURE_DECISIONS:
       - docs/decisions/ADR-002-mvp-stack.md
     DELIVERY_EVIDENCE:
+      - docs/evidence/task30/a20_delivery_completion_evidence_v1.json
       - docs/evidence/task30/a9_named_partial_pit_route_capture_contract_acceptance_v1.json
       - docs/evidence/task30/a19_terminal_route_decision_acceptance_v1.json
       - docs/evidence/task27/a1_stage_a_public_pair_identity_runtime_receipt_v1.json

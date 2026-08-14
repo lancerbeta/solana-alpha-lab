@@ -51,7 +51,7 @@ roles:
     missingness: EXPLICIT_GAP
     resolver:
       kind: EXACT_PATHS
-      paths: [configs/provider_route_capability_registry_v4.yaml]
+      paths: [configs/provider_route_capability_registry_v3.yaml]
   - semantic_role: ARCHITECTURE_DECISIONS
     lane: L2
     truth_owner: ADR_AND_INTENT_REGISTRIES

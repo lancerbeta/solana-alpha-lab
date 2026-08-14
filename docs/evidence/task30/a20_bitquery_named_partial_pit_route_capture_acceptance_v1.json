@@ -104,7 +104,7 @@
     "missing_is_zero_or_flat": false
   },
   "artifact_bindings": {
-    "task": {"path": "docs/tasks/TASK-30-bitquery-named-partial-pit-route-capture.md", "sha256": "475a25858d26e32f7d9997de4ddd2323e0d944820ef7766e29805c5ba99172f4"},
+    "task": {"path": "docs/tasks/TASK-30-bitquery-named-partial-pit-route-capture.md", "sha256": "587b2751e218df843ca045902336e77d20f8883602fdc1ce4946d7c9797c18fb"},
     "contract": {"path": "docs/contracts/task30_bitquery_named_partial_pit_route_capture_contract_v1.md", "sha256": "3090a9d1d4adba52f66b8795e28b45045152363c9514bccc2c3ea035af6a169d"},
     "configuration": {"path": "configs/task30_bitquery_named_partial_pit_route_capture_v1.yaml", "sha256": "932aac773a1ba333687830ed8ca33ea3e1e54a774e9f726e7ea179510453d694"},
     "schema": {"path": "catalog/schemas/task30_bitquery_named_partial_pit_route_capture.schema.json", "sha256": "083af72ff5a1dff8e5fae96e7a25f2aff3e2df34491d8a304d5608872a21f7b1"},
