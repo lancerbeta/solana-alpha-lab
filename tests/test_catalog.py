@@ -64,6 +64,7 @@ class CatalogImportTests(unittest.TestCase):
                 "NEGATIVE-T27-PUBLIC-HISTORY-ROUTE-V1-001",
                 "DECISION-T30-A9-NAMED-PARTIAL-CAPTURE-001",
                 "NEGATIVE-T30-CURRENT-DATA-ROUTE-001",
+                "NEGATIVE-T30-BITQUERY-PIT-ROUTE-001",
             ],
         )
         self.assertTrue(

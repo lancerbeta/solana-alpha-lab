@@ -1,0 +1,69 @@
+{
+  "schema": "smial.delivery-completion-evidence",
+  "schema_version": "1.0",
+  "acceptance_id": "T30-A20-DELIVERY-COMPLETION-001",
+  "as_of": "2026-08-14",
+  "task_id": "TASK-30",
+  "base_main": "828a29af68807809fecb58d1a3b5b8b2dfcd9946",
+  "state_change": "ROUTE_OBSERVATION_RECORDED_NO_TASK30_PROMOTION",
+  "cloud_bundle_mode": "OWNER_MANAGED_OPTIONAL_EXPORT",
+  "cloud_bundle_required_by_harness": false,
+  "cloud_bundle_smoke_required": false,
+  "project_sources_disposition": {"kind": "NO_CHANGE"},
+  "capability_radar_now": "NONE",
+  "implementation_bindings": {
+    "docs/tasks/TASK-30-bitquery-named-partial-pit-route-capture.md": "587b2751e218df843ca045902336e77d20f8883602fdc1ce4946d7c9797c18fb",
+    "docs/contracts/task30_bitquery_named_partial_pit_route_capture_contract_v1.md": "3090a9d1d4adba52f66b8795e28b45045152363c9514bccc2c3ea035af6a169d",
+    "src/solana_alpha_lab/task30_bitquery_named_partial_pit_route_capture.py": "b700d43c231fe97c8dbc40a4ef2941c33a1a2d2d3c38ef6a809b6e4f426fcf33",
+    "scripts/run_task30_bitquery_named_partial_pit_route_capture.py": "f3acbbe9a68d979b850f0e88c7cc545047bb09e04c8372e265e939ac6f64a9b3",
+    "tests/test_task30_bitquery_named_partial_pit_route_capture.py": "05be84a86aa195e26f10ae830ae65b47cb30ca8de73a03ab90504f92c67f3dcf",
+    "docs/evidence/task30/a20p_bitquery_named_partial_pit_route_capture_runtime_receipt_v1.json": "fd7a52e6952e12fc48b9a88ed13b6dcfb28dbc9324cb767642fb28806897a185",
+    "docs/evidence/task30/a20_bitquery_named_partial_pit_route_capture_acceptance_v1.json": "fb228c064a9d39aa13ec41cc2e545d129b1de2e236f4f3e3bf44bbc3ad486699",
+    "configs/provider_route_capability_registry_v4.yaml": "329d2590ff799688dfbe674ce34f5fa6cd2aa85230dfa6d8dcc22fa4980594e4",
+    "docs/evidence/task30/a20r1_provider_route_capability_registry_acceptance_v1.json": "c01c7e0f65ff45ed3dee418b6f9870cd3b4ae9335ac8ab638f2196934253a416",
+    "catalog/assets/core.yaml": "aed3341355712f05dc8619552b1e16d6870fedc3d3f990e6a488498aab271dda",
+    "catalog/assets/lifecycle.yaml": "293a53cf09eeb2ae46b03694a41014d8b38185532298cfa531401abe37776b9e",
+    "catalog/generated/asset_edges.json": "a0030e4cac8c34eb845d816baa0d84cc86bab73977afc56b1d8ce9a17cfbf592",
+    "docs/PROJECT_MAP.md": "7de24cc672dee56823bb1582436e05afeec52782497029c61c59a562ae71da7c"
+  },
+  "active_stop_conditions": [],
+  "owner_attention_triggers": {
+    "auth_or_access_recovery": false,
+    "material_owner_decision": false,
+    "user_only_activation": false,
+    "external_material_action": false,
+    "unresolved_safety_or_truth_conflict": false
+  },
+  "factory_fit": {
+    "path": "docs/evidence/task30/a20_delivery_factory_fit_v1.json",
+    "sha256": "c7760311a7554566183c8bd17df7fb005cd233ba072473a11288b0fc4764f89b",
+    "verdict": "PASS"
+  },
+  "validation": {
+    "targeted": "PASS_65_DIRECT_CONSUMER_TESTS",
+    "independent_review": {
+      "path": "docs/evidence/task30/a20_delivery_independent_review_v1.json",
+      "sha256": "217deb7ac2c7e3426b98eacacdaf5a2dd403d4355d01aa94c46adcf66529f983",
+      "verdict": "PASS"
+    },
+    "full_gate": "ENFORCED_BY_PROJECT_BOUND_VALIDATION",
+    "github_ci": "ENFORCED_LIVE_AT_GUARDED_MERGE",
+    "project_checks": ["PASS_CATALOG_GENERATED_NAVIGATION_AND_SECRET_SCAN"]
+  },
+  "non_claims": [
+    "NO_TASK30_ACCEPTANCE_OR_DONE",
+    "NO_PROVIDER_FAILURE_OR_UNAVAILABILITY",
+    "NO_PIT_ADMISSIBILITY_H07_H01_ALPHA_EXECUTION_PNL_OR_NETRETURN",
+    "NO_RETRY_FALLBACK_SECOND_PROVIDER_OR_CASH_AUTHORITY",
+    "NO_GLOBAL_V4_CONTROL_ACTIVATION"
+  ],
+  "side_effects": {
+    "credential_free_preflights": 1,
+    "credential_reads": 1,
+    "provider_requests": 1,
+    "retries": 0,
+    "fallbacks": 0,
+    "wallet_signer_transaction_actions": 0,
+    "cash_spend_usd_cents": 0
+  }
+}

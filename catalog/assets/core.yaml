@@ -13183,6 +13183,341 @@ records:
   evidence: []
   classification: *t25_internal
 
+- asset_id: CONTRACT-T30-A20-BITQUERY-PIT-CAPTURE-001
+  record_version: '1.0'
+  asset_type: control_document
+  purpose: Exact one-request Bitquery PumpSwap archive capture contract with frozen identity, 96-slot panel shape, retention and non-claims.
+  status: VALIDATED_ACTIVE
+  origin: REPOSITORY
+  as_of: '2026-08-14'
+  truth_owner: TASK-30
+  location: {kind: git_path, logical_uri: 'repo://docs/contracts/task30_bitquery_named_partial_pit_route_capture_contract_v1.md', repository_path: docs/contracts/task30_bitquery_named_partial_pit_route_capture_contract_v1.md}
+  integrity: {kind: sha256, sha256: 3090a9d1d4adba52f66b8795e28b45045152363c9514bccc2c3ea035af6a169d}
+  access: {mode: read_only, method: file, network_required: false, secrets_required: false}
+  relations:
+  - {relation_type: derived_from, target_asset_id: EVIDENCE-T30-A9-NAMED-PARTIAL-CAPTURE-001}
+  - {relation_type: derived_from, target_asset_id: EVIDENCE-T30-A19-TERMINAL-ROUTE-DECISION-001}
+  consumers: [TASK-30, RC001-H07-H01-LIQUIDITY-RETENTION, FACTORY-001]
+  evidence: []
+  search_terms: [A20, BITQUERY, PUMPSWAP, PIT, GRAPHQL, TYPED_GAP, ROUTE_UNKNOWN_STOP]
+  classification: {contains_secrets: false, contains_raw_data: false, sensitivity: INTERNAL_NON_SECRET}
+
+- asset_id: CONFIG-T30-A20-BITQUERY-PIT-CAPTURE-001
+  record_version: '1.0'
+  asset_type: configuration
+  purpose: Closed Bitquery route, pool identity, UTC window, request cap, byte cap and zero-retry policy for A20.
+  status: VALIDATED_ACTIVE
+  origin: REPOSITORY
+  as_of: '2026-08-14'
+  truth_owner: TASK-30
+  location: {kind: git_path, logical_uri: 'repo://configs/task30_bitquery_named_partial_pit_route_capture_v1.yaml', repository_path: configs/task30_bitquery_named_partial_pit_route_capture_v1.yaml}
+  integrity: {kind: sha256, sha256: 932aac773a1ba333687830ed8ca33ea3e1e54a774e9f726e7ea179510453d694}
+  access: {mode: read_only, method: file, network_required: false, secrets_required: false}
+  relations: [{relation_type: governed_by, target_asset_id: CONTRACT-T30-A20-BITQUERY-PIT-CAPTURE-001}]
+  consumers: [TASK-30, RC001-H07-H01-LIQUIDITY-RETENTION, FACTORY-001]
+  evidence: []
+  search_terms: [A20, BITQUERY, ARCHIVE, DEXTRADEBYTOKENS, REQUEST_CAP, NO_RETRY]
+  classification: {contains_secrets: false, contains_raw_data: false, sensitivity: INTERNAL_NON_SECRET}
+
+- asset_id: SCHEMA-T30-A20-BITQUERY-PIT-CAPTURE-001
+  record_version: '1.0'
+  asset_type: schema
+  purpose: Closed JSON Schema for the A20 Bitquery route, panel shape, authority and non-claims.
+  status: VALIDATED_ACTIVE
+  origin: REPOSITORY
+  as_of: '2026-08-14'
+  truth_owner: TASK-30
+  location: {kind: git_path, logical_uri: 'repo://catalog/schemas/task30_bitquery_named_partial_pit_route_capture.schema.json', repository_path: catalog/schemas/task30_bitquery_named_partial_pit_route_capture.schema.json}
+  integrity: {kind: sha256, sha256: 083af72ff5a1dff8e5fae96e7a25f2aff3e2df34491d8a304d5608872a21f7b1}
+  access: {mode: read_only, method: file, network_required: false, secrets_required: false}
+  relations: [{relation_type: governed_by, target_asset_id: CONTRACT-T30-A20-BITQUERY-PIT-CAPTURE-001}]
+  consumers: [TASK-30, FACTORY-001]
+  evidence: []
+  search_terms: [A20, BITQUERY, CLOSED_SCHEMA, AUTHORITY, NON_CLAIMS]
+  classification: {contains_secrets: false, contains_raw_data: false, sensitivity: INTERNAL_NON_SECRET}
+
+- asset_id: FIXTURE-T30-A20-BITQUERY-PIT-CAPTURE-001
+  record_version: '1.0'
+  asset_type: evidence
+  purpose: Synthetic two-observation Bitquery response proving 94 typed gaps without imputation.
+  status: VALIDATED_ACTIVE
+  origin: REPOSITORY
+  as_of: '2026-08-14'
+  truth_owner: TASK-30
+  location: {kind: git_path, logical_uri: 'repo://tests/fixtures/task30/bitquery_named_partial_pit_route_capture_v1.json', repository_path: tests/fixtures/task30/bitquery_named_partial_pit_route_capture_v1.json}
+  integrity: {kind: sha256, sha256: 1887b88840e678b70719444a92c6cf2c4231d2aa45d6ffce01f106b471622508}
+  access: {mode: read_only, method: file, network_required: false, secrets_required: false}
+  relations: [{relation_type: derived_from, target_asset_id: CONFIG-T30-A20-BITQUERY-PIT-CAPTURE-001}]
+  consumers: [TASK-30, FACTORY-001]
+  evidence: []
+  search_terms: [A20, FIXTURE, OBSERVATION, MISSING_UNKNOWN, TYPED_GAP]
+  classification: {contains_secrets: false, contains_raw_data: false, sensitivity: INTERNAL_NON_SECRET}
+
+- asset_id: MODULE-T30-A20-BITQUERY-PIT-CAPTURE-001
+  record_version: '1.0'
+  asset_type: script
+  purpose: Fail-closed query builder, one-shot HTTP boundary, raw retention and deterministic 96-slot projection for A20.
+  status: VALIDATED_ACTIVE
+  origin: REPOSITORY
+  as_of: '2026-08-14'
+  truth_owner: TASK-30
+  location: {kind: git_path, logical_uri: 'repo://src/solana_alpha_lab/task30_bitquery_named_partial_pit_route_capture.py', repository_path: src/solana_alpha_lab/task30_bitquery_named_partial_pit_route_capture.py}
+  integrity: {kind: sha256, sha256: b700d43c231fe97c8dbc40a4ef2941c33a1a2d2d3c38ef6a809b6e4f426fcf33}
+  access: {mode: read_only, method: file, network_required: false, secrets_required: false}
+  relations: [{relation_type: governed_by, target_asset_id: CONFIG-T30-A20-BITQUERY-PIT-CAPTURE-001}]
+  consumers: [TASK-30, RC001-H07-H01-LIQUIDITY-RETENTION, FACTORY-001]
+  evidence: []
+  search_terms: [A20, BITQUERY, GRAPHQL, ONE_SHOT, RAW_RETENTION, SLOT_PROJECTION]
+  classification: {contains_secrets: false, contains_raw_data: false, sensitivity: INTERNAL_NON_SECRET}
+
+- asset_id: SCRIPT-T30-A20-BITQUERY-PIT-CAPTURE-001
+  record_version: '1.0'
+  asset_type: script
+  purpose: Separate credential-free preflight and one-shot capture CLI that never accepts a token argument.
+  status: VALIDATED_ACTIVE
+  origin: REPOSITORY
+  as_of: '2026-08-14'
+  truth_owner: TASK-30
+  location: {kind: git_path, logical_uri: 'repo://scripts/run_task30_bitquery_named_partial_pit_route_capture.py', repository_path: scripts/run_task30_bitquery_named_partial_pit_route_capture.py}
+  integrity: {kind: sha256, sha256: f3acbbe9a68d979b850f0e88c7cc545047bb09e04c8372e265e939ac6f64a9b3}
+  access: {mode: read_only, method: file, network_required: false, secrets_required: false}
+  relations: [{relation_type: depends_on, target_asset_id: MODULE-T30-A20-BITQUERY-PIT-CAPTURE-001}]
+  consumers: [TASK-30, FACTORY-001]
+  evidence: []
+  search_terms: [A20, BITQUERY, PREFLIGHT, CAPTURE, BITQUERY_ACCESS_TOKEN]
+  classification: {contains_secrets: false, contains_raw_data: false, sensitivity: INTERNAL_NON_SECRET}
+
+- asset_id: TEST-T30-A20-BITQUERY-PIT-CAPTURE-001
+  record_version: '1.0'
+  asset_type: script
+  purpose: Deterministic contract, identity, typed-gap, transport, secret, redirect and terminal-receipt regressions for A20.
+  status: VALIDATED_ACTIVE
+  origin: REPOSITORY
+  as_of: '2026-08-14'
+  truth_owner: TASK-30
+  location: {kind: git_path, logical_uri: 'repo://tests/test_task30_bitquery_named_partial_pit_route_capture.py', repository_path: tests/test_task30_bitquery_named_partial_pit_route_capture.py}
+  integrity: {kind: sha256, sha256: 05be84a86aa195e26f10ae830ae65b47cb30ca8de73a03ab90504f92c67f3dcf}
+  access: {mode: read_only, method: file, network_required: false, secrets_required: false}
+  relations:
+  - {relation_type: depends_on, target_asset_id: MODULE-T30-A20-BITQUERY-PIT-CAPTURE-001}
+  - {relation_type: depends_on, target_asset_id: SCHEMA-T30-A20-BITQUERY-PIT-CAPTURE-001}
+  - {relation_type: depends_on, target_asset_id: FIXTURE-T30-A20-BITQUERY-PIT-CAPTURE-001}
+  consumers: [TASK-30, FACTORY-001]
+  evidence: []
+  search_terms: [A20, TEST, HTTPERROR, REDIRECT, SECRET, TYPED_GAP]
+  classification: {contains_secrets: false, contains_raw_data: false, sensitivity: INTERNAL_NON_SECRET}
+
+- asset_id: EVIDENCE-T30-A20P-BITQUERY-PIT-CAPTURE-001
+  record_version: '1.0'
+  asset_type: evidence
+  purpose: Tracked runtime receipt for one passed preflight and one terminal Bitquery request with unknown response status and no retry.
+  status: VALIDATED_ACTIVE
+  origin: REPOSITORY
+  as_of: '2026-08-14'
+  truth_owner: TASK-30
+  location: {kind: git_path, logical_uri: 'repo://docs/evidence/task30/a20p_bitquery_named_partial_pit_route_capture_runtime_receipt_v1.json', repository_path: docs/evidence/task30/a20p_bitquery_named_partial_pit_route_capture_runtime_receipt_v1.json}
+  integrity: {kind: sha256, sha256: fd7a52e6952e12fc48b9a88ed13b6dcfb28dbc9324cb767642fb28806897a185}
+  access: {mode: read_only, method: file, network_required: false, secrets_required: false}
+  relations:
+  - {relation_type: derived_from, target_asset_id: CONFIG-T30-A20-BITQUERY-PIT-CAPTURE-001}
+  - {relation_type: validated_by, target_asset_id: TEST-T30-A20-BITQUERY-PIT-CAPTURE-001}
+  consumers: [TASK-30, RC001-H07-H01-LIQUIDITY-RETENTION, FACTORY-001]
+  evidence: []
+  search_terms: [A20P, BITQUERY, ROUTE_UNKNOWN_STOP, TRANSPORT_ERROR, NO_RETRY, BLOCKED_DATA]
+  classification: {contains_secrets: false, contains_raw_data: false, sensitivity: INTERNAL_NON_SECRET}
+
+- asset_id: REPORT-T30-A20-BITQUERY-PIT-CAPTURE-001
+  record_version: '1.0'
+  asset_type: control_document
+  purpose: Russian owner readout separating confirmed reachability, unknown provider cause and the no-retry decision.
+  status: VALIDATED_ACTIVE
+  origin: REPOSITORY
+  as_of: '2026-08-14'
+  truth_owner: TASK-30
+  location: {kind: git_path, logical_uri: 'repo://docs/reports/task30/bitquery_named_partial_pit_route_capture_readout_v1.md', repository_path: docs/reports/task30/bitquery_named_partial_pit_route_capture_readout_v1.md}
+  integrity: {kind: sha256, sha256: cad5aab2faa64e8a887db813e822811d4342aca6ac707cf7f872fbe9d8258095}
+  access: {mode: read_only, method: file, network_required: false, secrets_required: false}
+  relations: [{relation_type: derived_from, target_asset_id: EVIDENCE-T30-A20P-BITQUERY-PIT-CAPTURE-001}]
+  consumers: [TASK-30, RC001-H07-H01-LIQUIDITY-RETENTION, FACTORY-001]
+  evidence: []
+  search_terms: [A20, OWNER_REPORT, BITQUERY, UNKNOWN, BLOCKED_DATA]
+  classification: {contains_secrets: false, contains_raw_data: false, sensitivity: INTERNAL_NON_SECRET}
+
+- asset_id: EVIDENCE-T30-A20-BITQUERY-PIT-CAPTURE-001
+  record_version: '1.0'
+  asset_type: evidence
+  purpose: Hash-bound FULL_REVIEW acceptance for the one-request Bitquery route stop without TASK-30 promotion.
+  status: VALIDATED_ACTIVE
+  origin: REPOSITORY
+  as_of: '2026-08-14'
+  truth_owner: TASK-30
+  location: {kind: git_path, logical_uri: 'repo://docs/evidence/task30/a20_bitquery_named_partial_pit_route_capture_acceptance_v1.json', repository_path: docs/evidence/task30/a20_bitquery_named_partial_pit_route_capture_acceptance_v1.json}
+  integrity: {kind: sha256, sha256: fb228c064a9d39aa13ec41cc2e545d129b1de2e236f4f3e3bf44bbc3ad486699}
+  access: {mode: read_only, method: file, network_required: false, secrets_required: false}
+  relations:
+  - {relation_type: derived_from, target_asset_id: CONTRACT-T30-A20-BITQUERY-PIT-CAPTURE-001}
+  - {relation_type: depends_on, target_asset_id: EVIDENCE-T30-A20P-BITQUERY-PIT-CAPTURE-001}
+  - {relation_type: validated_by, target_asset_id: TEST-T30-A20-BITQUERY-PIT-CAPTURE-001}
+  consumers: [TASK-30, RC001-H07-H01-LIQUIDITY-RETENTION, FACTORY-001]
+  evidence: []
+  search_terms: [A20, ACCEPTANCE, FULL_REVIEW, ROUTE_UNKNOWN_STOP, NO_TASK30_PROMOTION]
+  classification: {contains_secrets: false, contains_raw_data: false, sensitivity: INTERNAL_NON_SECRET}
+
+- asset_id: CONFIG-PROVIDER-ROUTE-CAPABILITY-REGISTRY-004
+  record_version: '1.0'
+  asset_type: configuration
+  purpose: Append-only provider-route registry successor preserving all v3 semantics and adding the observed Bitquery unknown stop.
+  status: VALIDATED_ACTIVE
+  origin: REPOSITORY
+  as_of: '2026-08-14'
+  truth_owner: TASK-30
+  location: {kind: git_path, logical_uri: 'repo://configs/provider_route_capability_registry_v4.yaml', repository_path: configs/provider_route_capability_registry_v4.yaml}
+  integrity: {kind: sha256, sha256: 329d2590ff799688dfbe674ce34f5fa6cd2aa85230dfa6d8dcc22fa4980594e4}
+  access: {mode: read_only, method: file, network_required: false, secrets_required: false}
+  relations:
+  - {relation_type: derived_from, target_asset_id: CONFIG-PROVIDER-ROUTE-CAPABILITY-REGISTRY-003}
+  - {relation_type: validated_by, target_asset_id: TEST-PROVIDER-ROUTE-CAPABILITY-REGISTRY-004}
+  consumers: [TASK-30, FACTORY-001]
+  evidence: []
+  search_terms: [PROVIDER_ROUTE, REGISTRY_V4, BITQUERY, ROUTE_UNKNOWN_STOP, APPEND_ONLY]
+  classification: {contains_secrets: false, contains_raw_data: false, sensitivity: INTERNAL_NON_SECRET}
+
+- asset_id: SCHEMA-PROVIDER-ROUTE-CAPABILITY-REGISTRY-004
+  record_version: '1.0'
+  asset_type: schema
+  purpose: Closed root schema for v4 predecessor binding, policy and five-route cardinality.
+  status: VALIDATED_ACTIVE
+  origin: REPOSITORY
+  as_of: '2026-08-14'
+  truth_owner: TASK-30
+  location: {kind: git_path, logical_uri: 'repo://catalog/schemas/provider_route_capability_registry_v4.schema.json', repository_path: catalog/schemas/provider_route_capability_registry_v4.schema.json}
+  integrity: {kind: sha256, sha256: d0fe7b42895709eed6ddd1ec0efa13605a2932e63302e3eeab50fcae6aadfff5}
+  access: {mode: read_only, method: file, network_required: false, secrets_required: false}
+  relations: [{relation_type: governed_by, target_asset_id: CONFIG-PROVIDER-ROUTE-CAPABILITY-REGISTRY-004}]
+  consumers: [TASK-30, FACTORY-001]
+  evidence: []
+  search_terms: [PROVIDER_ROUTE, REGISTRY_V4, CLOSED_SCHEMA, FIVE_ROUTES]
+  classification: {contains_secrets: false, contains_raw_data: false, sensitivity: INTERNAL_NON_SECRET}
+
+- asset_id: MODULE-PROVIDER-ROUTE-CAPABILITY-REGISTRY-004
+  record_version: '1.0'
+  asset_type: script
+  purpose: Fail-closed v4 resolver proving exact v3 semantic carry-forward and a non-promoted Bitquery stop.
+  status: VALIDATED_ACTIVE
+  origin: REPOSITORY
+  as_of: '2026-08-14'
+  truth_owner: TASK-30
+  location: {kind: git_path, logical_uri: 'repo://src/solana_alpha_lab/provider_route_capability_registry_v4.py', repository_path: src/solana_alpha_lab/provider_route_capability_registry_v4.py}
+  integrity: {kind: sha256, sha256: 3067f79a3950b8735810192fec0d399c9947acc5e17bf2a5e02239fc5b0adad6}
+  access: {mode: read_only, method: file, network_required: false, secrets_required: false}
+  relations:
+  - {relation_type: governed_by, target_asset_id: CONFIG-PROVIDER-ROUTE-CAPABILITY-REGISTRY-004}
+  - {relation_type: depends_on, target_asset_id: MODULE-PROVIDER-ROUTE-CAPABILITY-REGISTRY-003}
+  consumers: [TASK-30, FACTORY-001]
+  evidence: []
+  search_terms: [PROVIDER_ROUTE, REGISTRY_V4, RESOLVER, SEMANTIC_HASH, REGISTRY_GAP]
+  classification: {contains_secrets: false, contains_raw_data: false, sensitivity: INTERNAL_NON_SECRET}
+
+- asset_id: TEST-PROVIDER-ROUTE-CAPABILITY-REGISTRY-004
+  record_version: '1.0'
+  asset_type: script
+  purpose: Deterministic schema, carry-forward, mutation, acceptance and registry-gap tests for v4.
+  status: VALIDATED_ACTIVE
+  origin: REPOSITORY
+  as_of: '2026-08-14'
+  truth_owner: TASK-30
+  location: {kind: git_path, logical_uri: 'repo://tests/test_provider_route_capability_registry_v4.py', repository_path: tests/test_provider_route_capability_registry_v4.py}
+  integrity: {kind: sha256, sha256: 674a83de8b9fb60d76d188c5d649d28b38c62daeb21a72187773553f30612c99}
+  access: {mode: read_only, method: file, network_required: false, secrets_required: false}
+  relations:
+  - {relation_type: depends_on, target_asset_id: CONFIG-PROVIDER-ROUTE-CAPABILITY-REGISTRY-004}
+  - {relation_type: depends_on, target_asset_id: SCHEMA-PROVIDER-ROUTE-CAPABILITY-REGISTRY-004}
+  - {relation_type: depends_on, target_asset_id: MODULE-PROVIDER-ROUTE-CAPABILITY-REGISTRY-004}
+  - {relation_type: depends_on, target_asset_id: EVIDENCE-T30-A20P-BITQUERY-PIT-CAPTURE-001}
+  consumers: [TASK-30, FACTORY-001]
+  evidence: []
+  search_terms: [PROVIDER_ROUTE, REGISTRY_V4, TEST, LEGACY_SEMANTICS, AUTHORITY_PROMOTION]
+  classification: {contains_secrets: false, contains_raw_data: false, sensitivity: INTERNAL_NON_SECRET}
+
+- asset_id: EVIDENCE-T30-A20R1-PROVIDER-ROUTE-REGISTRY-001
+  record_version: '1.0'
+  asset_type: evidence
+  purpose: Hash-bound acceptance for registry v4 semantic carry-forward and the observed Bitquery route stop.
+  status: VALIDATED_ACTIVE
+  origin: REPOSITORY
+  as_of: '2026-08-14'
+  truth_owner: TASK-30
+  location: {kind: git_path, logical_uri: 'repo://docs/evidence/task30/a20r1_provider_route_capability_registry_acceptance_v1.json', repository_path: docs/evidence/task30/a20r1_provider_route_capability_registry_acceptance_v1.json}
+  integrity: {kind: sha256, sha256: c01c7e0f65ff45ed3dee418b6f9870cd3b4ae9335ac8ab638f2196934253a416}
+  access: {mode: read_only, method: file, network_required: false, secrets_required: false}
+  relations:
+  - {relation_type: derived_from, target_asset_id: CONFIG-PROVIDER-ROUTE-CAPABILITY-REGISTRY-004}
+  - {relation_type: depends_on, target_asset_id: EVIDENCE-T30-A20P-BITQUERY-PIT-CAPTURE-001}
+  - {relation_type: validated_by, target_asset_id: TEST-PROVIDER-ROUTE-CAPABILITY-REGISTRY-004}
+  consumers: [TASK-30, FACTORY-001]
+  evidence: []
+  search_terms: [A20R1, REGISTRY_V4, ACCEPTANCE, BITQUERY, ROUTE_UNKNOWN_STOP]
+  classification: {contains_secrets: false, contains_raw_data: false, sensitivity: INTERNAL_NON_SECRET}
+
+- asset_id: EVIDENCE-T30-A20-DELIVERY-COMPLETION-001
+  record_version: '1.0'
+  asset_type: evidence
+  purpose: Guard-consumable completion evidence binding the exact A20 product inventory without promoting TASK-30.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-08-14'
+  truth_owner: TASK-30
+  location: {kind: git_path, logical_uri: 'repo://docs/evidence/task30/a20_delivery_completion_evidence_v1.json', repository_path: docs/evidence/task30/a20_delivery_completion_evidence_v1.json}
+  integrity: {kind: none, note: 'Content integrity is owned by the live completion-review-fit hash chain; embedding its SHA here would create an indirect self-reference through the reviewed inventory.'}
+  access: {mode: read_only, method: file, network_required: false, secrets_required: false}
+  relations:
+  - {relation_type: derived_from, target_asset_id: EVIDENCE-T30-A20-BITQUERY-PIT-CAPTURE-001}
+  - {relation_type: depends_on, target_asset_id: EVIDENCE-T30-A20-DELIVERY-INDEPENDENT-REVIEW-001}
+  - {relation_type: depends_on, target_asset_id: EVIDENCE-T30-A20-DELIVERY-FACTORY-FIT-001}
+  - {relation_type: depends_on, target_asset_id: SCHEMA-DELIVERY-COMPLETION-EVIDENCE-001}
+  consumers: [TASK-30, FACTORY-001, GOAL-OWNER]
+  evidence: []
+  search_terms: [A20, DELIVERY_COMPLETION, GUARDED_MERGE, BLOCKED_DATA, NO_TASK30_PROMOTION]
+  classification: {contains_secrets: false, contains_raw_data: false, sensitivity: INTERNAL_NON_SECRET}
+
+- asset_id: EVIDENCE-T30-A20-DELIVERY-INDEPENDENT-REVIEW-001
+  record_version: '1.0'
+  asset_type: evidence
+  purpose: Required-role review evidence bound to the exact non-self-referential A20 inventory.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-08-14'
+  truth_owner: TASK-30
+  location: {kind: git_path, logical_uri: 'repo://docs/evidence/task30/a20_delivery_independent_review_v1.json', repository_path: docs/evidence/task30/a20_delivery_independent_review_v1.json}
+  integrity: {kind: none, note: 'Content integrity is owned by the live completion-review-fit hash chain; embedding its SHA here would create an indirect self-reference through the reviewed inventory.'}
+  access: {mode: read_only, method: file, network_required: false, secrets_required: false}
+  relations:
+  - {relation_type: derived_from, target_asset_id: EVIDENCE-T30-A20-BITQUERY-PIT-CAPTURE-001}
+  - {relation_type: depends_on, target_asset_id: SCHEMA-DELIVERY-INDEPENDENT-REVIEW-EVIDENCE-001}
+  consumers: [TASK-30, FACTORY-001, GOAL-OWNER]
+  evidence: []
+  search_terms: [A20, INDEPENDENT_REVIEW, CODE_REVIEWER, GOAL_DOD_CRITIC, ARCHITECTURE_CRITIC]
+  classification: {contains_secrets: false, contains_raw_data: false, sensitivity: INTERNAL_NON_SECRET}
+
+- asset_id: EVIDENCE-T30-A20-DELIVERY-FACTORY-FIT-001
+  record_version: '1.0'
+  asset_type: evidence
+  purpose: FULL Factory Fit evidence preserving unknown data truth, no-switch outcome and bounded recovery.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-08-14'
+  truth_owner: TASK-30
+  location: {kind: git_path, logical_uri: 'repo://docs/evidence/task30/a20_delivery_factory_fit_v1.json', repository_path: docs/evidence/task30/a20_delivery_factory_fit_v1.json}
+  integrity: {kind: none, note: 'Content integrity is owned by the live completion-review-fit hash chain; embedding its SHA here would create an indirect self-reference through the reviewed inventory.'}
+  access: {mode: read_only, method: file, network_required: false, secrets_required: false}
+  relations:
+  - {relation_type: derived_from, target_asset_id: EVIDENCE-T30-A20-BITQUERY-PIT-CAPTURE-001}
+  - {relation_type: depends_on, target_asset_id: EVIDENCE-T30-A20-DELIVERY-INDEPENDENT-REVIEW-001}
+  consumers: [TASK-30, FACTORY-001, GOAL-OWNER]
+  evidence: []
+  search_terms: [A20, FACTORY_FIT, FULL_REVIEW, BLOCKED_DATA, NO_SWITCH]
+  classification: {contains_secrets: false, contains_raw_data: false, sensitivity: INTERNAL_NON_SECRET}
+
 - asset_id: CONTRACT-T30-FORWARD-STREAM-RUNTIME-HARNESS-001
   record_version: '1.0'
   asset_type: control_document

@@ -1,7 +1,7 @@
 schema_version: '1.0'
 registry_id: SMIAL-REGISTRY-DECISIONS-NEGATIVE-RESULTS
 registry_type: decisions_negative_results
-as_of: '2026-08-13'
+as_of: '2026-08-14'
 truth_owner: TASK-27
 source_asset_ids:
 - EVIDENCE-T24-A6-STOP-DECISION-001
@@ -11,6 +11,7 @@ source_asset_ids:
 - EVIDENCE-T27-A2-TERMINAL-RECONCILIATION-001
 - EVIDENCE-T30-A9-NAMED-PARTIAL-CAPTURE-001
 - EVIDENCE-T30-A19-TERMINAL-ROUTE-DECISION-001
+- EVIDENCE-T30-A20-BITQUERY-PIT-CAPTURE-001
 records:
 - record_kind: negative_result
   record_id: NEGATIVE-T24-ENTITY-SIGNAL-V1-001
@@ -57,3 +58,10 @@ records:
   evidence_asset_ids:
   - EVIDENCE-T30-A19-TERMINAL-ROUTE-DECISION-001
   summary: "TASK-30 current named public/free data-route closed with a limited negative result after retained Birdeye, Gecko, Helius WSS/activity and A18 evidence; H07/H01 remain BLOCKED_DATA. This is not a claim about all providers, route universes, alpha, execution, PnL, NetReturn or cashflow. UNKNOWN is not inactive, zero, flat or no-trade."
+- record_kind: negative_result
+  record_id: NEGATIVE-T30-BITQUERY-PIT-ROUTE-001
+  status: RECORDED
+  created_at: '2026-08-14T00:00:00Z'
+  evidence_asset_ids:
+  - EVIDENCE-T30-A20-BITQUERY-PIT-CAPTURE-001
+  summary: "One authorized Bitquery PumpSwap archive request ended ROUTE_UNKNOWN_STOP after DNS/TCP/TLS PASS. The pre-patch client did not retain HTTP status or response bytes, so provider, auth, schema and data causes remain unknown; no retry occurred and TASK-30 remains BLOCKED_DATA. UNKNOWN is not zero, flat, no-trade, provider failure or provider unavailability."
