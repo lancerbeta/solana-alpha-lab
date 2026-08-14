@@ -4,8 +4,8 @@
   "review_id": "T30-A20-DELIVERY-FACTORY-FIT-001",
   "as_of": "2026-08-14",
   "task_id": "TASK-30",
-  "reviewed_bindings_sha256": "0000000000000000000000000000000000000000000000000000000000000000",
-  "reviewed_inventory_sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+  "reviewed_bindings_sha256": "e07b19fb4ed18aeee535501b96703caa465e7d42d4ecacd41d784173395052ae",
+  "reviewed_inventory_sha256": "20c9c9b884c1c5f94d5e964ba654d9b9a41a72121475b6b6014423ba26ae4ae4",
   "mode": "FULL_REVIEW",
   "verdict": "PASS",
   "dimensions": {
