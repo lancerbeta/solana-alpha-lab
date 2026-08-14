@@ -1,0 +1,114 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://solana-alpha-lab.local/schemas/task30_a23_helius_bounded_pagination_complete_batch.schema.json",
+  "title": "TASK-30 A23 Helius bounded pagination policy",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema", "schema_version", "task_id", "atom_id", "contract_id",
+    "spec_route", "adoption_route", "consumer", "first_page_binding",
+    "reference_subject", "provider_route", "request", "pilot_window",
+    "external_authority", "runtime_limits", "execution_controls", "retention",
+    "terminal_outcomes", "claims", "project_sources_disposition"
+  ],
+  "properties": {
+    "schema": {"const": "smial.task30.helius-bounded-pagination-complete-batch.policy"},
+    "schema_version": {"const": "1.0"},
+    "task_id": {"const": "TASK-30"},
+    "atom_id": {"const": "T30-A23_HELIUS_BOUNDED_PAGINATION_COMPLETE_BATCH_V1"},
+    "contract_id": {"const": "CONTRACT-T30-A23-HELIUS-BOUNDED-PAGINATION-001"},
+    "spec_route": {"const": "DESIGN_SPEC"},
+    "adoption_route": {"const": "WRAP_A22_TESTED_REQUEST_AND_PREFLIGHT"},
+    "consumer": {"const": "RC001-H07-H01-LIQUIDITY-RETENTION"},
+    "first_page_binding": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["source_atom_id", "raw_path", "request_id", "raw_sha256", "response_bytes", "transaction_count", "cursor_sha256", "reuse_without_refetch"],
+      "properties": {
+        "source_atom_id": {"const": "T30-A22_HELIUS_GET_TRANSACTIONS_FOR_ADDRESS_ONE_SHOT_V1"},
+        "raw_path": {"const": "local/task30_a22_helius_get_transactions_for_address/run=20260814T184209Z-7572a5c2/raw_response.json"},
+        "request_id": {"const": "task30-a22-helius-get-transactions-for-address"},
+        "raw_sha256": {"const": "7244a4c049c7ebe5f77d6136513d402c9af568dd0ccabb3a842160ab61a72bcc"},
+        "response_bytes": {"const": 9012030},
+        "transaction_count": {"const": 520},
+        "cursor_sha256": {"const": "8ef7a4d174cf6846b11c5e57d1127edea0575fb66ce06fefc68997ebe55ab2ec"},
+        "reuse_without_refetch": {"const": true}
+      }
+    },
+    "reference_subject": {"type": "object"},
+    "provider_route": {
+      "type": "object",
+      "required": ["route_id", "provider", "endpoint", "protocol", "method", "credential_reference", "credential_transport"],
+      "properties": {
+        "route_id": {"const": "HELIUS-SOLANA-GET-TRANSACTIONS-FOR-ADDRESS-001"},
+        "provider": {"const": "HELIUS"},
+        "endpoint": {"const": "https://mainnet.helius-rpc.com/"},
+        "method": {"const": "getTransactionsForAddress"}
+      }
+    },
+    "request": {
+      "const": {
+        "transaction_details": "full",
+        "sort_order": "asc",
+        "limit": 1000,
+        "commitment": "finalized",
+        "encoding": "json",
+        "max_supported_transaction_version": 0,
+        "status": "succeeded",
+        "token_accounts": "none"
+      }
+    },
+    "pilot_window": {"type": "object"},
+    "external_authority": {
+      "type": "object",
+      "required": ["basis", "owner_phrase", "capture_authorized", "credential_value_local_only", "provider_api_rpc_calls_authorized", "credential_reads_authorized", "purchase_authorized", "plan_or_autoscaling_change_authorized"],
+      "properties": {
+        "owner_phrase": {"const": "OK T30-A23 HELIUS_BOUNDED_PAGINATION_COMPLETE_BATCH"},
+        "capture_authorized": {"const": true},
+        "provider_api_rpc_calls_authorized": {"const": 2},
+        "credential_reads_authorized": {"const": 1},
+        "purchase_authorized": {"const": false},
+        "plan_or_autoscaling_change_authorized": {"const": false}
+      }
+    },
+    "runtime_limits": {
+      "const": {
+        "max_credential_free_preflights": 1,
+        "max_continuation_requests": 2,
+        "max_response_bytes_per_page": 25000000,
+        "max_new_response_bytes_total": 50000000,
+        "timeout_seconds": 30,
+        "max_full_transactions_per_page": 1000,
+        "max_helius_credits_per_page": 100,
+        "max_helius_credits_total": 200
+      }
+    },
+    "execution_controls": {
+      "const": {"retry": false, "fallback": false, "redirect": false, "pagination": true, "scheduler": false, "background_process": false}
+    },
+    "retention": {"type": "object"},
+    "terminal_outcomes": {"const": ["COMPLETE_RAW_BATCH_CANDIDATE", "BOUNDED_PAGINATION_INCOMPLETE_STOP", "A22_BINDING_DRIFT", "PROVIDER_TYPED_FAILURE", "TRANSPORT_OR_VALIDATION_STOP"]},
+    "claims": {
+      "type": "object",
+      "required": ["technical_raw_transaction_route_only", "complete_raw_batch_candidate_only", "complete_market_panel", "pit_admissible", "h07_h01_evidence", "fillability", "route_feasibility", "execution", "settlement", "pnl", "numeric_netreturn", "alpha", "strategy", "task30_acceptance", "missing_is_zero_or_flat"],
+      "properties": {
+        "technical_raw_transaction_route_only": {"const": true},
+        "complete_raw_batch_candidate_only": {"const": true},
+        "complete_market_panel": {"const": false},
+        "pit_admissible": {"const": false},
+        "h07_h01_evidence": {"const": false},
+        "fillability": {"const": false},
+        "route_feasibility": {"const": false},
+        "execution": {"const": false},
+        "settlement": {"const": false},
+        "pnl": {"const": false},
+        "numeric_netreturn": {"const": false},
+        "alpha": {"const": false},
+        "strategy": {"const": false},
+        "task30_acceptance": {"const": false},
+        "missing_is_zero_or_flat": {"const": false}
+      }
+    },
+    "project_sources_disposition": {"const": "NO_CHANGE"}
+  }
+}

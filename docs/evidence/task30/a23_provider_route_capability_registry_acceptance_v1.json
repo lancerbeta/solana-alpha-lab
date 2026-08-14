@@ -1,0 +1,66 @@
+{
+  "schema": "smial.provider-route-capability-registry-v6.acceptance",
+  "schema_version": "1.0",
+  "receipt_id": "EVIDENCE-T30-A23R1-PROVIDER-ROUTE-REGISTRY-001",
+  "task_id": "TASK-30",
+  "atom_id": "T30-A23R1_PROVIDER_ROUTE_CAPABILITY_REGISTRY_V6",
+  "as_of": "2026-08-15",
+  "decision": "REGISTER_COMPLETE_RAW_BATCH_CANDIDATE_NO_PIT_PROMOTION",
+  "supersedes": {
+    "registry_id": "PROVIDER-ROUTE-CAPABILITY-REGISTRY-005",
+    "path": "configs/provider_route_capability_registry_v5.yaml",
+    "sha256": "8875fcc28ae763360f183cf644c1048ba4ec3950fb31406c0f0b1e3ee22231d0",
+    "preserved_route_semantic_sha256": {
+      "DEXSCREENER-SOLANA-TOKEN-PAIRS-KEYLESS-001": "c5d7861a4f3074784d1ecfa5614e1617be37dde2fb3e7c28f03ec5d3dd8e0055",
+      "HELIUS-SOLANA-GET-SIGNATURES-001": "8852673f88c310d9e9c098a03fdcb2360150a2cfc242cf346637ac5fdd44f46d",
+      "HELIUS-SOLANA-LOGS-SUBSCRIBE-001": "97cef2d76835cf484ddd24a378db3a7cb47a91eac6d5d6f179a8090c4c9514cb",
+      "SOLANA-STANDARD-GET-TRANSACTION-001": "b00b7c58edebd331e6908ff19b1a4b066678b9b371362d55157c599633db4ae7",
+      "BITQUERY-SOLANA-PUMPSWAP-OHLCV-001": "07140d5c257b00b9769be6d908f8e69f31739b7dfabeca1b69e0176dc410915a"
+    },
+    "updated_route_prior_semantic_sha256": {"HELIUS-SOLANA-GET-TRANSACTIONS-FOR-ADDRESS-001": "05279d47cde9e0447f845a7324106dab8edc90abf08b52b60aebd177f5c7a440"}
+  },
+  "updated_route": {
+    "route_id": "HELIUS-SOLANA-GET-TRANSACTIONS-FOR-ADDRESS-001",
+    "observed_result": "HTTP_200_COMPLETE_RAW_BATCH_CANDIDATE",
+    "last_success_http_status": 200,
+    "continuation_requests": 1,
+    "continuation_transaction_count": 0,
+    "total_transaction_count": 520,
+    "final_pagination_token_present": false,
+    "complete_raw_batch_candidate": true,
+    "pit_admissible": false,
+    "automatic_selection": false,
+    "authority_granted": false,
+    "runtime_receipt": "docs/evidence/task30/a23_helius_bounded_pagination_runtime_receipt_v1.json",
+    "runtime_receipt_sha256": "7aa03c53222f64a462270994304fe512a4b5d91e5fc3781e31ce50e26a5dbeca"
+  },
+  "review": {
+    "mode": "SINGLE_AGENT_REVIEW_FALLBACK",
+    "verdict": "PASS_WITH_FOLLOWUP",
+    "history_preserved": true,
+    "raw_batch_candidate_not_promoted_to_pit_or_market_panel": true,
+    "authority_not_promoted": true,
+    "follow_up": "Registry presence records the observed exact route only; raw-to-PIT admissibility remains a fresh owner gate."
+  },
+  "artifact_bindings": {
+    "registry": {"path": "configs/provider_route_capability_registry_v6.yaml", "sha256": "b9642b77c300c81aedebc4aa464284fe244a7553bb3a37bdbb344d68594df580"},
+    "schema": {"path": "catalog/schemas/provider_route_capability_registry_v6.schema.json", "sha256": "ee3ed96e1fea92e1e7dc7a157fc3cf74af8547fb402f184bf93ade5c46050563"},
+    "module": {"path": "src/solana_alpha_lab/provider_route_capability_registry_v6.py", "sha256": "59434388b9b9989a5c665690570c30df58efc2f53f5a46bd9f3b081b7217eef5"},
+    "test": {"path": "tests/test_provider_route_capability_registry_v6.py", "sha256": "f23b8b3892063cfe319ae9cf86bc806e7d4c80df334546899eea11e355d769bf"},
+    "runtime": {"path": "docs/evidence/task30/a23_helius_bounded_pagination_runtime_receipt_v1.json", "sha256": "7aa03c53222f64a462270994304fe512a4b5d91e5fc3781e31ce50e26a5dbeca"}
+  },
+  "non_claims": {
+    "provider_failure": false,
+    "provider_unavailable": false,
+    "provider_reliability": false,
+    "complete_market_panel": false,
+    "pit_admissible": false,
+    "market_activity": false,
+    "task30_trial": false,
+    "alpha": false,
+    "numeric_netreturn": false,
+    "authority_granted": false
+  },
+  "state_change": "EXTERNAL_ROUTE_KNOWLEDGE_SUCCESSOR_ONLY",
+  "project_sources_disposition": {"kind": "NO_CHANGE"}
+}

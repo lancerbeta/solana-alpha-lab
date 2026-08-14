@@ -1,0 +1,138 @@
+{
+  "schema": "smial.task30.a23-helius-bounded-pagination.acceptance",
+  "schema_version": "1.0",
+  "receipt_id": "EVIDENCE-T30-A23-HELIUS-BOUNDED-PAGINATION-001",
+  "task_id": "TASK-30",
+  "atom_id": "T30-A23_HELIUS_BOUNDED_PAGINATION_COMPLETE_BATCH_V1",
+  "as_of": "2026-08-15",
+  "entry_gate": "START_WITH_PATCH",
+  "spec_route": "DESIGN_SPEC",
+  "adoption_route": "WRAP_A22_TESTED_REQUEST_AND_PREFLIGHT",
+  "decision": "COMPLETE_RAW_BATCH_CANDIDATE",
+  "task_state": "BLOCKED_DATA",
+  "named_consumer": "RC001-H07-H01-LIQUIDITY-RETENTION",
+  "route_observation": {
+    "route_id": "HELIUS-SOLANA-GET-TRANSACTIONS-FOR-ADDRESS-001",
+    "preflight": "DNS_TCP_TLS_PASS",
+    "a22_first_page_reused": true,
+    "a22_first_page_refetched": false,
+    "provider_requests": 1,
+    "authorized_provider_requests": 2,
+    "terminal_outcome": "COMPLETE_RAW_BATCH_CANDIDATE",
+    "terminal_error": null,
+    "http_status": 200,
+    "continuation_response_bytes": 93,
+    "continuation_raw_sha256": "6770f134e61d334451780ded411fe5dd79e0577f2c532a5d3a8a694b8c58ae81",
+    "continuation_transaction_count": 0,
+    "final_pagination_token_present": false,
+    "total_transaction_count": 520,
+    "complete_raw_batch_candidate": true,
+    "credits_upper_bound": 10,
+    "retry": false,
+    "redirect": false,
+    "fallback": false,
+    "second_provider": false
+  },
+  "decision_delta": "The immutable 520-transaction A22 page plus one empty terminal continuation with a null cursor establish a complete raw-batch candidate for the exact frozen pool/day.",
+  "uncertainty_removed": "The current bottleneck is no longer historical raw-transaction coverage for the exact sample; it is raw-to-panel transformation and PIT data admissibility for the named estimand.",
+  "capability_or_evidence": "One hash-bound A22 page, one retained 93-byte terminal continuation, global key/signature validation, a bounded no-retry runner and append-only provider registry v6.",
+  "stop": "The live invocation stopped after the first continuation. No second request, retry, fallback, second provider, purchase or plan/autoscaling change is allowed in A23.",
+  "next": "After delivery, the owner decides whether RC001 still merits a separately authorized raw-to-PIT data-admissibility atom; do not create A24 automatically.",
+  "reuse_first": {
+    "decision": "ADOPT",
+    "candidate": "EXISTING_HELIUS_GET_TRANSACTIONS_FOR_ADDRESS_ROUTE",
+    "why": "The existing route completed the exact pool/day raw batch without another provider, package or purchase.",
+    "boundary": "Adoption covers only the exact technical raw route and grants no broader quota, reliability, PIT or provider authority claim."
+  },
+  "reviews": {
+    "review_mode": "SINGLE_AGENT_REVIEW_FALLBACK",
+    "code_review": {
+      "verdict": "PASS_WITH_DELIVERY_PENDING",
+      "closed_findings": [
+        "Historical A22 module remains byte-identical; A23 composes its sealed request/preflight behavior.",
+        "A22 page binding now occurs before the only credential read.",
+        "Tracked runtime evidence now binds the exact create-only raw run id."
+      ],
+      "open_findings": []
+    },
+    "goal_and_dod_review": {"verdict": "PASS_WITH_DELIVERY_PENDING", "business_terminal_reached": true, "pr_and_exact_head_ci_pending": true},
+    "architecture_review": {
+      "verdict": "PASS",
+      "boundary": "One immutable prior page, at most two sequential continuations, hashed opaque cursors, create-only raw retention and no automatic provider pivot.",
+      "follow_up": "A future atom must prove raw-to-PIT transformation rather than reopen provider discovery without a concrete field or coverage gap."
+    }
+  },
+  "factory_fit_review": "FULL_REVIEW",
+  "factory_fit": {
+    "verdict": "PASS_WITH_FOLLOWUP",
+    "mission": "The atom closed the concrete complete-batch question with one observed continuation, not another adapter-only suffix.",
+    "research_truth": "Complete raw-batch candidate is separated from complete market panel, PIT admissibility and H07/H01 evidence.",
+    "owner_operability": "No provider purchase is recommended for this exact sample; the next owner decision is whether the named hypothesis merits transformation/admissibility work.",
+    "recovery": "Raw bytes remain outside Git, exact hashes and run id are tracked, and no replay or retry is needed.",
+    "build_vs_buy": "ADOPT the existing Helius route for this exact batch; buy research resumes only after a demonstrated field, scale, quota or universe gap.",
+    "follow_up": "TASK-30 remains BLOCKED_DATA until raw-to-panel and PIT admissibility are separately proven."
+  },
+  "product_horizon": {
+    "now": "NONE",
+    "watch": {
+      "candidate": "RAW_TO_PIT_DATA_ADMISSIBILITY_IF_RC001_REMAINS_PRIORITY",
+      "value": "Determines whether the 520 retained full transactions can support the named 15-minute H07/H01 estimand.",
+      "evidence_required": "Deterministic event decoding, price/volume semantics, 96-slot coverage accounting, missingness semantics and PIT timestamps from the retained batch.",
+      "cost_risk": "May reveal missing fields or transform complexity; that is the concrete trigger for provider research, not a reason to buy pre-emptively.",
+      "owner": "GOAL_OWNER",
+      "activation_trigger": "Explicit priority decision after this PR is merged."
+    }
+  },
+  "capability_radar": {"decision": "NONE", "candidate": null, "install_authority": false},
+  "authority": {
+    "credential_free_preflights": 1,
+    "credential_reads": 1,
+    "provider_requests": 1,
+    "provider_requests_authorized": 2,
+    "retries": 0,
+    "redirects": 0,
+    "fallbacks": 0,
+    "second_provider_requests": 0,
+    "purchase_or_plan_changes": 0,
+    "scheduler_or_background_processes": 0,
+    "wallet_signer_transaction_actions": 0,
+    "cash_spend_usd_cents": 0,
+    "task30_acceptance_actions": 0
+  },
+  "non_claims": {
+    "provider_failure": false,
+    "provider_unavailable": false,
+    "provider_reliability": false,
+    "complete_market_panel": false,
+    "pit_admissible": false,
+    "h07_h01_evidence": false,
+    "route_feasibility": false,
+    "fillability": false,
+    "execution": false,
+    "settlement": false,
+    "pnl": false,
+    "numeric_netreturn": false,
+    "alpha": false,
+    "strategy": false,
+    "task30_acceptance": false,
+    "missing_is_zero_or_flat": false,
+    "provider_reliability_or_scale_verified": false,
+    "account_plan_or_free_quota_verified": false
+  },
+  "artifact_bindings": {
+    "task": {"path": "docs/tasks/TASK-30-a23-helius-bounded-pagination-complete-batch.md", "sha256": "41bc6689565654c28cef602c739ea807b7c7e96bbca63adbce9a73d968099702"},
+    "contract": {"path": "docs/contracts/task30_a23_helius_bounded_pagination_complete_batch_contract_v1.md", "sha256": "a03a5dfa7cb720783de19088fb685a60ed4a8767727ccb98c9fa88bd86649ad3"},
+    "configuration": {"path": "configs/task30_a23_helius_bounded_pagination_complete_batch_v1.yaml", "sha256": "b786f05ce6dead10c5aa8f1bce6f1d3254d5261d5d3bbfa89d3a77737a1d0821"},
+    "schema": {"path": "catalog/schemas/task30_a23_helius_bounded_pagination_complete_batch.schema.json", "sha256": "0fe5f50abc1d711b9adff5e31416f96f59f5116cf4eeab74bd8c0ed79074705a"},
+    "fixture": {"path": "tests/fixtures/task30/helius_bounded_pagination_v1.json", "sha256": "3dafdbec8e66c11d92267987c03b5159ab734f0c383f31924a78143ec321bdeb"},
+    "module": {"path": "src/solana_alpha_lab/task30_helius_bounded_pagination.py", "sha256": "255e7b5ad5d9f3b9abe4c58f2aa07432f66ee8211c11bdbea9c2757a93977584"},
+    "script": {"path": "scripts/run_task30_a23_helius_bounded_pagination.py", "sha256": "7572203c8c4aaf4d9689b4bb12318bfda0584b73ca50069ddfcec3e4f1bd023e"},
+    "test": {"path": "tests/test_task30_a23_helius_bounded_pagination.py", "sha256": "8107701c69ccce90e1a40a419a94f8b8d561769476a4d5a9b4eb482d12ecb2a8"},
+    "runtime": {"path": "docs/evidence/task30/a23_helius_bounded_pagination_runtime_receipt_v1.json", "sha256": "7aa03c53222f64a462270994304fe512a4b5d91e5fc3781e31ce50e26a5dbeca"},
+    "report": {"path": "docs/reports/task30/a23_helius_bounded_pagination_readout_v1.md", "sha256": "c429d73287bd6330cab84119a05b9fddbf0e326328731ae5fe31d4568cc01335"},
+    "provider_registry": {"path": "configs/provider_route_capability_registry_v6.yaml", "sha256": "b9642b77c300c81aedebc4aa464284fe244a7553bb3a37bdbb344d68594df580"}
+  },
+  "project_sources_disposition": {"kind": "NO_CHANGE"},
+  "state_change": "COMPLETE_RAW_BATCH_CANDIDATE_NO_TASK30_PROMOTION",
+  "rollback": "Remove only A23 tracked files and Catalog records. The consumed external read is never retried by rollback; retained raw bytes are not deleted."
+}
