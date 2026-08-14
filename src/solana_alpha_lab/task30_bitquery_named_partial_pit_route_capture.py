@@ -269,8 +269,10 @@ def project_slots(
 
 
 class _NoRedirectHandler(urllib.request.HTTPRedirectHandler):
-    def redirect_request(self, *_args: object, **_kwargs: object) -> urllib.request.Request:
-        raise CaptureContractError("REDIRECT_FORBIDDEN")
+    def redirect_request(
+        self, *_args: object, **_kwargs: object
+    ) -> urllib.request.Request | None:
+        return None
 
 
 def _canonical_json_bytes(value: Mapping[str, Any]) -> bytes:

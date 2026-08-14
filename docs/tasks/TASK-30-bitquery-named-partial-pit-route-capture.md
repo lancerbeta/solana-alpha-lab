@@ -1,7 +1,7 @@
 ---
 task_id: TASK-30
 task_version: '20.0'
-status: READY
+status: IMPLEMENTED_UNVERIFIED
 as_of: '2026-08-14'
 owner: GOAL_OWNER
 allowed_routes: [DIRECT_CODEX_DELIVERY]
@@ -63,14 +63,14 @@ context_requirements:
     - CONTRACT-T30-NAMED-PARTIAL-CAPTURE-001
     - EVIDENCE-T30-A9-NAMED-PARTIAL-CAPTURE-001
     - EVIDENCE-T30-A19-TERMINAL-ROUTE-DECISION-001
-    - CONFIG-PROVIDER-ROUTE-CAPABILITY-REGISTRY-003
+    - CONFIG-PROVIDER-ROUTE-CAPABILITY-REGISTRY-004
   l2_roles: [EXTERNAL_ROUTE_KNOWLEDGE, DELIVERY_EVIDENCE, ARCHITECTURE_DECISIONS]
   l3_roles: []
   roadmap_path: null
   exact_role_paths:
     LIFECYCLE: []
     EXTERNAL_ROUTE_KNOWLEDGE:
-      - configs/provider_route_capability_registry_v3.yaml
+      - configs/provider_route_capability_registry_v4.yaml
     ARCHITECTURE_DECISIONS:
       - docs/decisions/ADR-002-mvp-stack.md
     DELIVERY_EVIDENCE:
@@ -142,3 +142,20 @@ never enter chat, Git, command arguments, URLs, raw manifests, receipts or logs.
 
 No wallet, signer, transaction, deployment, repository setting, destructive
 action, cash spend, retry, fallback or second provider is authorised.
+
+## Implementation checkpoint
+
+- **DECISION_DELTA:** `BITQUERY-SOLANA-PUMPSWAP-OHLCV-001` is observed as
+  `ROUTE_UNKNOWN_STOP`; TASK-30 remains `BLOCKED_DATA` and does not switch to
+  Bitquery.
+- **UNCERTAINTY_REMOVED:** DNS/TCP/TLS reachability and the exact one-request
+  authority path passed; provider HTTP/GraphQL cause remains unknown because
+  the pre-patch client collapsed `HTTPError` and transport failure.
+- **CAPABILITY_OR_EVIDENCE:** one no-retry runtime receipt, a corrected
+  evidence-preserving client with regression tests, and append-only provider
+  registry v4 preserving all v3 route semantics.
+- **STOP:** the one authorized provider request is consumed; no retry,
+  fallback or second provider is allowed in this task.
+- **NEXT:** deliver the exact candidate through PR and exact-head CI, then stop
+  for the repository merge phrase. A new external read requires a fresh owner
+  gate and is outside this task.

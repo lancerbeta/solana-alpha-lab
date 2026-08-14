@@ -92,9 +92,11 @@ unresolved marker routes to its exact `required_next_atom`. Legacy
 replacement or user smoke is historical compatibility metadata and MUST NOT
 route work or interrupt the owner under `OWNER_MANAGED_OPTIONAL_EXPORT`.
 Provider work must
-also preserve the immutable `PROVIDER_ROUTE_CAPABILITY_REGISTRY_V1` binding at
+resolve current observations through `configs/provider_route_capability_registry_v4.yaml`
+and preserve the immutable `PROVIDER_ROUTE_CAPABILITY_REGISTRY_V1` binding at
 `configs/provider_route_capability_registry_v1.yaml`; an absent route is
-`REGISTRY_GAP`, not provider failure or implied authority.
+`REGISTRY_GAP`, not provider failure or implied authority. An observed
+`ROUTE_UNKNOWN_STOP` grants no retry, fallback or provider-selection authority.
 
 ## VALIDATION_AND_REVIEW
 

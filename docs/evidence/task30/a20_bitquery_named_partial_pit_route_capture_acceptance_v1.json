@@ -1,0 +1,121 @@
+{
+  "schema": "smial.task30.bitquery-named-partial-pit-route-capture.acceptance",
+  "schema_version": "1.0",
+  "receipt_id": "EVIDENCE-T30-A20-BITQUERY-PIT-CAPTURE-001",
+  "task_id": "TASK-30",
+  "atom_id": "T30-A20_BITQUERY_NAMED_PARTIAL_PIT_ROUTE_CAPTURE_V1",
+  "as_of": "2026-08-14",
+  "entry_gate": "START_WITH_PATCH",
+  "spec_route": "DESIGN_SPEC",
+  "decision": "ROUTE_UNKNOWN_STOP_NO_RETRY",
+  "task_state": "BLOCKED_DATA",
+  "named_consumer": "RC001-H07-H01-LIQUIDITY-RETENTION",
+  "route_observation": {
+    "route_id": "BITQUERY-SOLANA-PUMPSWAP-OHLCV-001",
+    "preflight": "DNS_TCP_TLS_PASS",
+    "provider_requests": 1,
+    "terminal_outcome": "ROUTE_UNKNOWN_STOP",
+    "terminal_error": "TRANSPORT_ERROR",
+    "http_or_graphql_cause": "UNKNOWN_DUE_PREPATCH_EXCEPTION_COLLAPSE",
+    "response_bytes": null,
+    "panel_state": "NOT_ESTABLISHED",
+    "slots_observed": null,
+    "typed_gaps": null,
+    "retry": false,
+    "fallback": false
+  },
+  "decision_delta": "The fresh named Bitquery route was tested once and cannot currently replace the blocked TASK-30 data route.",
+  "uncertainty_removed": "Endpoint DNS, TCP and verified TLS reachability passed; the exact provider HTTP or GraphQL cause remains unknown because the pre-patch runner did not retain terminal response evidence.",
+  "capability_or_evidence": "A hash-bound no-retry runtime receipt plus a corrected evidence-preserving one-shot client and deterministic regression suite.",
+  "stop": "The only authorized provider request is consumed; no retry, fallback or second provider is allowed in this task.",
+  "next": "Deliver the candidate through PR and exact-head CI. Any new external read requires a fresh owner gate outside this task.",
+  "reviews": {
+    "review_mode": "SINGLE_AGENT_REVIEW_FALLBACK",
+    "code_review": {
+      "verdict": "PASS",
+      "closed_findings": [
+        "HTTPError was previously collapsed into TRANSPORT_ERROR and lost safe response evidence.",
+        "A consumed redirect or terminal request previously could bypass the tracked stop receipt."
+      ],
+      "open_findings": []
+    },
+    "goal_and_dod_review": {
+      "verdict": "PASS_WITH_DELIVERY_PENDING",
+      "business_terminal_reached": true,
+      "pr_and_exact_head_ci_pending": true
+    },
+    "architecture_review": {
+      "verdict": "PASS_WITH_FOLLOWUP",
+      "boundary": "One credential read, one provider request, no retry/fallback, raw bytes only outside Git, tracked unknown state without imputation.",
+      "follow_up": "Do not infer provider failure or data absence from the collapsed pre-patch terminal class."
+    }
+  },
+  "factory_fit_review": "FULL_REVIEW",
+  "factory_fit": {
+    "verdict": "PASS_WITH_FOLLOWUP",
+    "mission": "The atom stops an unproductive route-preparation loop with retained evidence instead of promoting candles into product progress.",
+    "research_truth": "Unknown status, response bytes and slot counts remain null; missingness is not zero, flat or no-trade.",
+    "owner_operability": "No manual action is required until an explicit future external-read gate or the exact merge phrase.",
+    "recovery": "The client now retains HTTP terminal evidence, but this consumed request is not retried.",
+    "build_vs_buy": "Bitquery official GraphQL plus Python standard library remained the narrow WRAP route; no dependency or plugin was added.",
+    "follow_up": "TASK-30 remains BLOCKED_DATA until a separately authorized reproducible PIT route yields an admissible panel."
+  },
+  "product_horizon": {
+    "now": "NONE",
+    "watch": {
+      "candidate": "One corrected Bitquery read only if RC001-H07-H01 remains the owner priority.",
+      "value": "Could distinguish provider/schema/auth failure from a usable 96-slot panel.",
+      "evidence_required": "Fresh exact owner gate with a new request cap and the patched evidence-retention code on main.",
+      "cost_risk": "One credentialed provider request; risk of another non-data terminal result.",
+      "owner": "GOAL_OWNER",
+      "activation_trigger": "Explicit new external-read authority after this PR is merged."
+    }
+  },
+  "capability_radar": {
+    "decision": "NONE",
+    "candidate": null,
+    "install_authority": false
+  },
+  "authority": {
+    "credential_free_preflights": 1,
+    "credential_reads": 1,
+    "provider_requests": 1,
+    "retries": 0,
+    "fallbacks": 0,
+    "scheduler_or_background_processes": 0,
+    "wallet_signer_transaction_actions": 0,
+    "cash_spend_usd_cents": 0,
+    "task30_acceptance_actions": 0
+  },
+  "non_claims": {
+    "provider_failure": false,
+    "provider_unavailable": false,
+    "pit_admissible": false,
+    "h07_h01_evidence": false,
+    "route_feasibility": false,
+    "fillability": false,
+    "execution": false,
+    "settlement": false,
+    "pnl": false,
+    "numeric_netreturn": false,
+    "alpha": false,
+    "strategy": false,
+    "task30_acceptance": false,
+    "missing_is_zero_or_flat": false
+  },
+  "artifact_bindings": {
+    "task": {"path": "docs/tasks/TASK-30-bitquery-named-partial-pit-route-capture.md", "sha256": "a6e0ca6e79d56831768d41acb25655e4030cc590ee28ead6843953bef65ba304"},
+    "contract": {"path": "docs/contracts/task30_bitquery_named_partial_pit_route_capture_contract_v1.md", "sha256": "3090a9d1d4adba52f66b8795e28b45045152363c9514bccc2c3ea035af6a169d"},
+    "configuration": {"path": "configs/task30_bitquery_named_partial_pit_route_capture_v1.yaml", "sha256": "932aac773a1ba333687830ed8ca33ea3e1e54a774e9f726e7ea179510453d694"},
+    "schema": {"path": "catalog/schemas/task30_bitquery_named_partial_pit_route_capture.schema.json", "sha256": "083af72ff5a1dff8e5fae96e7a25f2aff3e2df34491d8a304d5608872a21f7b1"},
+    "fixture": {"path": "tests/fixtures/task30/bitquery_named_partial_pit_route_capture_v1.json", "sha256": "1887b88840e678b70719444a92c6cf2c4231d2aa45d6ffce01f106b471622508"},
+    "module": {"path": "src/solana_alpha_lab/task30_bitquery_named_partial_pit_route_capture.py", "sha256": "b700d43c231fe97c8dbc40a4ef2941c33a1a2d2d3c38ef6a809b6e4f426fcf33"},
+    "script": {"path": "scripts/run_task30_bitquery_named_partial_pit_route_capture.py", "sha256": "f3acbbe9a68d979b850f0e88c7cc545047bb09e04c8372e265e939ac6f64a9b3"},
+    "test": {"path": "tests/test_task30_bitquery_named_partial_pit_route_capture.py", "sha256": "05be84a86aa195e26f10ae830ae65b47cb30ca8de73a03ab90504f92c67f3dcf"},
+    "runtime": {"path": "docs/evidence/task30/a20p_bitquery_named_partial_pit_route_capture_runtime_receipt_v1.json", "sha256": "fd7a52e6952e12fc48b9a88ed13b6dcfb28dbc9324cb767642fb28806897a185"},
+    "report": {"path": "docs/reports/task30/bitquery_named_partial_pit_route_capture_readout_v1.md", "sha256": "cad5aab2faa64e8a887db813e822811d4342aca6ac707cf7f872fbe9d8258095"}
+  },
+  "project_sources_disposition": {"kind": "NO_CHANGE"},
+  "state_change": "ROUTE_OBSERVATION_RECORDED_NO_TASK30_PROMOTION",
+  "rollback": "Remove only A20 tracked files, the v4 successor and Catalog records. The external read is already consumed and is never retried by rollback."
+}

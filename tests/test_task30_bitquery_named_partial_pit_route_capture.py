@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import copy
+import hashlib
 import importlib
 import importlib.util
 import io
@@ -26,6 +27,8 @@ SCHEMA_PATH = ROOT / "catalog/schemas/task30_bitquery_named_partial_pit_route_ca
 FIXTURE_PATH = ROOT / "tests/fixtures/task30/bitquery_named_partial_pit_route_capture_v1.json"
 CONTRACT_PATH = ROOT / "docs/contracts/task30_bitquery_named_partial_pit_route_capture_contract_v1.md"
 SCRIPT_PATH = ROOT / "scripts/run_task30_bitquery_named_partial_pit_route_capture.py"
+ACCEPTANCE_PATH = ROOT / "docs/evidence/task30/a20_bitquery_named_partial_pit_route_capture_acceptance_v1.json"
+CATALOG_PATH = ROOT / "catalog/assets/core.yaml"
 MODULE_NAME = "solana_alpha_lab.task30_bitquery_named_partial_pit_route_capture"
 
 POOL = "URqx24yyYxtXXhTbBQnbtPLhtLWYoaDaRxuQuLpNS3S"
@@ -166,6 +169,28 @@ class Task30BitqueryNamedPartialPitRouteCaptureTests(unittest.TestCase):
         help_text = completed.stdout + completed.stderr
         self.assertIn("{preflight,capture}", help_text)
         self.assertNotIn("--token", help_text)
+
+    def test_acceptance_bindings_and_catalog_ids_are_closed(self) -> None:
+        acceptance = json.loads(ACCEPTANCE_PATH.read_text(encoding="utf-8"))
+        for binding in acceptance["artifact_bindings"].values():
+            path = ROOT / binding["path"]
+            self.assertEqual(hashlib.sha256(path.read_bytes()).hexdigest(), binding["sha256"])
+        catalog = yaml.safe_load(CATALOG_PATH.read_text(encoding="utf-8"))
+        ids = {record["asset_id"] for record in catalog["records"]}
+        self.assertTrue(
+            {
+                "CONTRACT-T30-A20-BITQUERY-PIT-CAPTURE-001",
+                "CONFIG-T30-A20-BITQUERY-PIT-CAPTURE-001",
+                "SCHEMA-T30-A20-BITQUERY-PIT-CAPTURE-001",
+                "FIXTURE-T30-A20-BITQUERY-PIT-CAPTURE-001",
+                "MODULE-T30-A20-BITQUERY-PIT-CAPTURE-001",
+                "SCRIPT-T30-A20-BITQUERY-PIT-CAPTURE-001",
+                "TEST-T30-A20-BITQUERY-PIT-CAPTURE-001",
+                "EVIDENCE-T30-A20P-BITQUERY-PIT-CAPTURE-001",
+                "REPORT-T30-A20-BITQUERY-PIT-CAPTURE-001",
+                "EVIDENCE-T30-A20-BITQUERY-PIT-CAPTURE-001",
+            }.issubset(ids)
+        )
 
     def test_graphql_payload_uses_exact_archive_pool_and_closed_window_filters(self) -> None:
         module = self._module()
@@ -317,6 +342,20 @@ class Task30BitqueryNamedPartialPitRouteCaptureTests(unittest.TestCase):
         self.assertEqual(result["http_status"], 401)
         self.assertEqual(result["body"], error_body)
         self.assertEqual(result["request_count"], 1)
+
+    def test_redirect_handler_refuses_follow_without_bypassing_http_evidence(self) -> None:
+        module = self._module()
+        handler = module._NoRedirectHandler()
+        self.assertIsNone(
+            handler.redirect_request(
+                object(),
+                object(),
+                302,
+                "Found",
+                {},
+                "https://other.example/graphql",
+            )
+        )
 
     def test_http_terminal_error_retains_raw_and_sanitized_evidence(self) -> None:
         module = self._module()
