@@ -20165,7 +20165,7 @@ records:
   as_of: '2026-08-14'
   truth_owner: TASK-30
   location: {kind: git_path, logical_uri: 'repo://tests/test_task30_a22_helius_get_transactions_for_address.py', repository_path: tests/test_task30_a22_helius_get_transactions_for_address.py}
-  integrity: {kind: sha256, sha256: fa31a33a46be8f82657154a6ac11f844872f5047750ae9c4f75d1cfaca7e00d3}
+  integrity: {kind: sha256, sha256: ef8cc1ebfa3180428a9cdd8549209d95489e0df1856af3ffd3b914844e25db00}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: depends_on, target_asset_id: CONFIG-T30-A22-HELIUS-GTA-001}
@@ -20222,7 +20222,7 @@ records:
   as_of: '2026-08-14'
   truth_owner: TASK-30
   location: {kind: git_path, logical_uri: 'repo://docs/evidence/task30/a22_helius_get_transactions_for_address_acceptance_v1.json', repository_path: docs/evidence/task30/a22_helius_get_transactions_for_address_acceptance_v1.json}
-  integrity: {kind: sha256, sha256: 140e516cad4b3160d09b5ecceed89e62dbe4ca3186553da6e73cccdef2faff33}
+  integrity: {kind: sha256, sha256: 434d07afcffc86f1787b41ac0f9f6dcf6ebdc49b2f6fe786491aa65ccc618c3a}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: derived_from, target_asset_id: CONTRACT-T30-A22-HELIUS-GTA-001}
@@ -20242,7 +20242,7 @@ records:
   as_of: '2026-08-14'
   truth_owner: TASK-30
   location: {kind: git_path, logical_uri: 'repo://docs/tasks/TASK-30-a22-helius-get-transactions-for-address-one-shot.md', repository_path: docs/tasks/TASK-30-a22-helius-get-transactions-for-address-one-shot.md}
-  integrity: {kind: sha256, sha256: 0170c1abf5bf5d736ff48b2581e1eb2f2242a97de7e0708e330f2a89eb8da314}
+  integrity: {kind: sha256, sha256: f2dbf2bc5727a8a33041f37107d8256bd05babb8e0f65e0d9312dd825350956f}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: contains, target_asset_id: CONTRACT-T30-A22-HELIUS-GTA-001}

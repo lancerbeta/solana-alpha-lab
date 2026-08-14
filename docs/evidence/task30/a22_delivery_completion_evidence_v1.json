@@ -12,7 +12,7 @@
   "project_sources_disposition": {"kind": "NO_CHANGE"},
   "capability_radar_now": "NONE",
   "implementation_bindings": {
-    "catalog/assets/core.yaml": "4a7ef6e85e025fade381df7500ade17eabe06883e598b09f761361b3fe045795",
+    "catalog/assets/core.yaml": "b73fffbf3167419a3db8d37fde781a08d60feb38f400a235953888c3864fbc43",
     "catalog/assets/lifecycle.yaml": "4716529817c0a84fa479e6baabcd56b5abb13462efb6bba815685ccf170e70ff",
     "catalog/catalog_manifest.yaml": "01c1c9eddca487045f5dd2dd8c1df393765eb0e691a766a2378734f5322c18ab",
     "catalog/generated/asset_edges.json": "655fac0d7cb6a0eafbd6847a0518425839e45280d6690f0791213f0b2b916a48",
@@ -22,11 +22,11 @@
     "configs/task30_a22_helius_get_transactions_for_address_one_shot_v1.yaml": "8e193d1ac7fa4652cbaae9ac7cedc15c0d075b93a67258b5bfe0973fb109b989",
     "docs/PROJECT_MAP.md": "100a6159b4e3588853886f35b6a85b6a98d58d9f558745148c27c5e37d528c84",
     "docs/contracts/task30_a22_helius_get_transactions_for_address_one_shot_contract_v1.md": "c304b51799ba7929006e664fc1b42a04a32ec7ac3a7d61d5986f5e5e2af0e91d",
-    "docs/evidence/task30/a22_helius_get_transactions_for_address_acceptance_v1.json": "140e516cad4b3160d09b5ecceed89e62dbe4ca3186553da6e73cccdef2faff33",
+    "docs/evidence/task30/a22_helius_get_transactions_for_address_acceptance_v1.json": "434d07afcffc86f1787b41ac0f9f6dcf6ebdc49b2f6fe786491aa65ccc618c3a",
     "docs/evidence/task30/a22_helius_get_transactions_for_address_runtime_receipt_v1.json": "bbb29e932ff2c2d68703f2f1693e8fe07a57b7ef24ffabea71c1a95436f97b15",
     "docs/evidence/task30/a22_provider_route_capability_registry_acceptance_v1.json": "ed156ae1437972e4c93c12c678ba01a5043fb0cb58c851fe62744a346ca05a23",
     "docs/reports/task30/a22_helius_get_transactions_for_address_readout_v1.md": "79693964f03f0d18de2e2f06a2e08143e53a12f92fa69a5ec2e343106c02e1b7",
-    "docs/tasks/TASK-30-a22-helius-get-transactions-for-address-one-shot.md": "0170c1abf5bf5d736ff48b2581e1eb2f2242a97de7e0708e330f2a89eb8da314",
+    "docs/tasks/TASK-30-a22-helius-get-transactions-for-address-one-shot.md": "f2dbf2bc5727a8a33041f37107d8256bd05babb8e0f65e0d9312dd825350956f",
     "registries/decisions_negative_results.yaml": "ad045ebdf9f7e36c581a7bd1858411dc927034938f79050017b6fc133752064d",
     "scripts/run_task30_a22_helius_get_transactions_for_address.py": "26662214c7311dafc33da9f7990c5b2ccff551d0d3edefceab47e4766f95e5b0",
     "src/solana_alpha_lab/provider_route_capability_registry_v5.py": "57bbae3384115fa6c2eadde18eecf650293b4255af57eb47305f62f56582922e",
@@ -35,7 +35,7 @@
     "tests/test_catalog.py": "e65a100f99b92d7a6d8e95a8ec5d298c54cd102e36a2aa3a8e4221ae04063486",
     "tests/test_lifecycle_registries.py": "5ff9c5fd7d2576fb1fa3bcf05a8de218a71d41c872d8927fbfe82f38ef33cf95",
     "tests/test_provider_route_capability_registry_v5.py": "0c3bd0aa5b75058086e2b6759bbf80846343ad87956eee4d6d31ca8febf25c84",
-    "tests/test_task30_a22_helius_get_transactions_for_address.py": "fa31a33a46be8f82657154a6ac11f844872f5047750ae9c4f75d1cfaca7e00d3"
+    "tests/test_task30_a22_helius_get_transactions_for_address.py": "ef8cc1ebfa3180428a9cdd8549209d95489e0df1856af3ffd3b914844e25db00"
   },
   "active_stop_conditions": [],
   "owner_attention_triggers": {
@@ -47,14 +47,14 @@
   },
   "factory_fit": {
     "path": "docs/evidence/task30/a22_delivery_factory_fit_v1.json",
-    "sha256": "f38fc34ae38932cbf8398b01e23b8495b3a821a7a9e54f8c8e9455b89a20c6e1",
+    "sha256": "a48822996786dcae9a439e0cb52641a23ef701653b6e9fe094b56ccc69c174c1",
     "verdict": "PASS"
   },
   "validation": {
     "targeted": "PASS_69_DIRECT_CONSUMER_REGISTRY_AND_CATALOG_TESTS",
     "independent_review": {
       "path": "docs/evidence/task30/a22_delivery_independent_review_v1.json",
-      "sha256": "06d3de5e4be77a6840bc7fe464814255383018dc7d51fcb7c95ee28a27c158a5",
+      "sha256": "766fef645b0d679e068228e41a9ac05340bb4e1989aa26a8bb3e89b3282748e7",
       "verdict": "PASS"
     },
     "full_gate": "ENFORCED_BY_PROJECT_BOUND_VALIDATION",

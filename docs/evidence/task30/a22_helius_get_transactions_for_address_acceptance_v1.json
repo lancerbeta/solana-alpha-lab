@@ -119,14 +119,14 @@
     "account_plan_or_free_quota_verified": false
   },
   "artifact_bindings": {
-    "task": {"path": "docs/tasks/TASK-30-a22-helius-get-transactions-for-address-one-shot.md", "sha256": "0170c1abf5bf5d736ff48b2581e1eb2f2242a97de7e0708e330f2a89eb8da314"},
+    "task": {"path": "docs/tasks/TASK-30-a22-helius-get-transactions-for-address-one-shot.md", "sha256": "f2dbf2bc5727a8a33041f37107d8256bd05babb8e0f65e0d9312dd825350956f"},
     "contract": {"path": "docs/contracts/task30_a22_helius_get_transactions_for_address_one_shot_contract_v1.md", "sha256": "c304b51799ba7929006e664fc1b42a04a32ec7ac3a7d61d5986f5e5e2af0e91d"},
     "configuration": {"path": "configs/task30_a22_helius_get_transactions_for_address_one_shot_v1.yaml", "sha256": "8e193d1ac7fa4652cbaae9ac7cedc15c0d075b93a67258b5bfe0973fb109b989"},
     "schema": {"path": "catalog/schemas/task30_a22_helius_get_transactions_for_address_one_shot.schema.json", "sha256": "42a2393e5ef907093ac854f1c5af6c287a88d1b406c960c2e76c3958769072dc"},
     "fixture": {"path": "tests/fixtures/task30/helius_get_transactions_for_address_v1.json", "sha256": "0557ff4a9ff60023ab020874fd8616f3bad022492f0be09555d785af0162491c"},
     "module": {"path": "src/solana_alpha_lab/task30_helius_get_transactions_for_address.py", "sha256": "2cfd648838fc6a510e4e7d076ca4f833b30102449d6c0b888dbfbd4984b9b66f"},
     "script": {"path": "scripts/run_task30_a22_helius_get_transactions_for_address.py", "sha256": "26662214c7311dafc33da9f7990c5b2ccff551d0d3edefceab47e4766f95e5b0"},
-    "test": {"path": "tests/test_task30_a22_helius_get_transactions_for_address.py", "sha256": "fa31a33a46be8f82657154a6ac11f844872f5047750ae9c4f75d1cfaca7e00d3"},
+    "test": {"path": "tests/test_task30_a22_helius_get_transactions_for_address.py", "sha256": "ef8cc1ebfa3180428a9cdd8549209d95489e0df1856af3ffd3b914844e25db00"},
     "runtime": {"path": "docs/evidence/task30/a22_helius_get_transactions_for_address_runtime_receipt_v1.json", "sha256": "bbb29e932ff2c2d68703f2f1693e8fe07a57b7ef24ffabea71c1a95436f97b15"},
     "report": {"path": "docs/reports/task30/a22_helius_get_transactions_for_address_readout_v1.md", "sha256": "79693964f03f0d18de2e2f06a2e08143e53a12f92fa69a5ec2e343106c02e1b7"},
     "provider_registry": {"path": "configs/provider_route_capability_registry_v5.yaml", "sha256": "8875fcc28ae763360f183cf644c1048ba4ec3950fb31406c0f0b1e3ee22231d0"}

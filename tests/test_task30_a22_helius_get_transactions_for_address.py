@@ -5,6 +5,7 @@ import hashlib
 import importlib.util
 import io
 import json
+import re
 import sys
 import tempfile
 import unittest
@@ -163,6 +164,21 @@ class Task30A22HeliusGetTransactionsForAddressTests(unittest.TestCase):
         self.assertFalse(self.config["execution_controls"]["redirect"])
         self.assertFalse(self.config["claims"]["pit_admissible"])
         self.assertFalse(self.config["claims"]["task30_acceptance"])
+
+    def test_task_context_projects_exactly_one_current_completion_evidence(self) -> None:
+        task_text = TASK_PATH.read_text(encoding="utf-8")
+        frontmatter = re.match(r"\A---\s*\n(.*?)\n---\s*\n", task_text, re.DOTALL)
+        self.assertIsNotNone(frontmatter)
+        assert frontmatter is not None
+        metadata = yaml.safe_load(frontmatter.group(1))
+        delivery_evidence = metadata["context_requirements"]["exact_role_paths"]["DELIVERY_EVIDENCE"]
+        completion_evidence = [
+            path for path in delivery_evidence if path.endswith("_delivery_completion_evidence_v1.json")
+        ]
+        self.assertEqual(
+            completion_evidence,
+            ["docs/evidence/task30/a22_delivery_completion_evidence_v1.json"],
+        )
 
     def test_request_payload_is_exact_and_secret_free(self) -> None:
         payload = build_json_rpc_payload(self.config)

@@ -82,7 +82,7 @@ context_requirements:
     ARCHITECTURE_DECISIONS:
       - docs/decisions/ADR-002-mvp-stack.md
     DELIVERY_EVIDENCE:
-      - docs/evidence/task30/a21_delivery_completion_evidence_v1.json
+      - docs/evidence/task30/a22_delivery_completion_evidence_v1.json
       - docs/evidence/task30/a21_patched_bitquery_one_shot_acceptance_v1.json
       - docs/evidence/task30/a20_bitquery_named_partial_pit_route_capture_acceptance_v1.json
       - docs/evidence/task30/a20p_bitquery_named_partial_pit_route_capture_runtime_receipt_v1.json
