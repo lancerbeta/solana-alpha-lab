@@ -1,0 +1,126 @@
+schema: smial.task30.helius-get-transactions-for-address-one-shot.policy
+schema_version: '1.0'
+task_id: TASK-30
+atom_id: T30-A22_HELIUS_GET_TRANSACTIONS_FOR_ADDRESS_ONE_SHOT_V1
+contract_id: CONTRACT-T30-A22-HELIUS-GET-TRANSACTIONS-FOR-ADDRESS-001
+spec_route: DESIGN_SPEC
+consumer: RC001-H07-H01-LIQUIDITY-RETENTION
+reopen_basis:
+  a21_acceptance: docs/evidence/task30/a21_patched_bitquery_one_shot_acceptance_v1.json
+  a20_contract: docs/contracts/task30_bitquery_named_partial_pit_route_capture_contract_v1.md
+  provider_registry: configs/provider_route_capability_registry_v4.yaml
+  decision: EXISTING_HELIUS_ACCESS_ONE_SHOT_OWNER_GATE
+reference_subject:
+  network: solana
+  pool_address: URqx24yyYxtXXhTbBQnbtPLhtLWYoaDaRxuQuLpNS3S
+  base_mint: DMwbVy48dWVKGe9z1pcVnwF3HLMLrqWdDLfbvx8RchhK
+  quote_mint: So11111111111111111111111111111111111111112
+  dex_id: pumpswap
+  program_address: pAMMBay6oceH9fJKBRHGP5D4bD4sWpmSwMn52FMfXEA
+  target_role: TECHNICAL_RAW_TRANSACTION_ROUTE_PILOT
+  representativeness: NOT_ESTABLISHED
+provider_route:
+  route_id: HELIUS-SOLANA-GET-TRANSACTIONS-FOR-ADDRESS-001
+  provider: HELIUS
+  endpoint: https://mainnet.helius-rpc.com/
+  protocol: HTTPS_POST_JSON_RPC_2_0
+  method: getTransactionsForAddress
+  credential_reference: HELIUS_API_KEY
+  credential_transport: URL_QUERY_API_KEY
+request:
+  transaction_details: full
+  sort_order: asc
+  limit: 1000
+  commitment: finalized
+  encoding: json
+  max_supported_transaction_version: 0
+  status: succeeded
+  token_accounts: none
+pilot_window:
+  since_inclusive: '2026-08-12T00:00:00Z'
+  till_exclusive: '2026-08-13T00:00:00Z'
+  block_time_gte: 1786492800
+  block_time_lt: 1786579200
+  interval_seconds: 900
+  expected_slots: 96
+lanes:
+  RAW_TRANSACTIONS:
+    state: AUTHORIZED_BOUNDED_CAPTURE
+    may_establish: BOUNDED_RAW_TRANSACTION_ROUTE_CAPABILITY
+  PIT_MARKET:
+    state: NOT_ESTABLISHED_FROM_RAW_BATCH
+  ROUTE_FEASIBILITY:
+    state: NOT_ESTABLISHED_FROM_RAW_BATCH
+  OWNED_EXECUTION:
+    state: OUT_OF_SCOPE
+external_authority:
+  basis: EXPLICIT_OWNER_PHRASE
+  owner_phrase: OK T30-A22 HELIUS_GET_TRANSACTIONS_FOR_ADDRESS_ONE_SHOT
+  capture_authorized: true
+  credential_value_local_only: true
+  provider_api_rpc_calls_authorized: 1
+  credential_reads_authorized: 1
+runtime_limits:
+  max_credential_free_preflights: 1
+  max_provider_requests: 1
+  max_response_bytes: 25000000
+  timeout_seconds: 30
+  max_full_transactions: 1000
+  max_helius_credits: 100
+execution_controls:
+  monitoring_owner: DIRECT_CODEX_FOREGROUND
+  retry: false
+  fallback: false
+  redirect: false
+  pagination: false
+  scheduler: false
+  background_process: false
+retention:
+  class: A4_OUTSIDE_GIT
+  raw_root: local/task30_a22_helius_get_transactions_for_address
+  raw_filename: raw_response.json
+  manifest_filename: raw_manifest_v1.json
+  hash: SHA256_EXACT_BYTES
+  tracked_projection: docs/evidence/task30/a22_helius_get_transactions_for_address_runtime_receipt_v1.json
+monitoring:
+  health: DNS_TCP_TLS_HTTP_JSON_RPC_SCHEMA_IDENTITY_ORDER_WINDOW_RETENTION
+  request_count_terminal: 1
+  secret_exposure_allowed: false
+recovery:
+  retry: FORBIDDEN
+  fallback: FORBIDDEN
+  pagination: FORBIDDEN
+  second_provider: FORBIDDEN
+  on_transport_or_provider_error: TERMINAL_TYPED_STOP
+terminal_outcomes:
+- BATCH_OBSERVED_LT_1000
+- ZERO_RESULT_TYPED_GAP
+- TRUNCATED_AT_1000_STOP
+- PAGINATION_REQUIRED_STOP
+- PROVIDER_TYPED_FAILURE
+- TRANSPORT_OR_COVERAGE_UNKNOWN
+authority:
+  credential_free_preflight_calls: 1
+  provider_api_rpc_wss_calls: 1
+  credential_reads: 1
+  raw_external_data_writes: 2
+  scheduler_or_background_processes: 0
+  wallet_signer_transaction_actions: 0
+  cash_spend_usd_cents: 0
+  task30_acceptance_actions: 0
+claims:
+  technical_raw_transaction_route_only: true
+  complete_market_panel: false
+  pit_admissible: false
+  h07_h01_evidence: false
+  fillability: false
+  route_feasibility: false
+  execution: false
+  settlement: false
+  pnl: false
+  numeric_netreturn: false
+  alpha: false
+  strategy: false
+  task30_acceptance: false
+  missing_is_zero_or_flat: false
+project_sources_disposition: NO_CHANGE

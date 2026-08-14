@@ -20047,3 +20047,363 @@ records:
   evidence: []
   search_terms: [DELIVERY_HARNESS_V1, INDEPENDENT_REVIEW, REVIEWED_INVENTORY, CODE_REVIEWER, GOAL_DOD_CRITIC, ARCHITECTURE_CRITIC]
   classification: *t25_internal
+
+- asset_id: CONTRACT-T30-A22-HELIUS-GTA-001
+  record_version: '1.0'
+  asset_type: control_document
+  purpose: Exact one-shot Helius full-transaction capture, completeness, retention and non-claim contract.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-08-14'
+  truth_owner: TASK-30
+  location: {kind: git_path, logical_uri: 'repo://docs/contracts/task30_a22_helius_get_transactions_for_address_one_shot_contract_v1.md', repository_path: docs/contracts/task30_a22_helius_get_transactions_for_address_one_shot_contract_v1.md}
+  integrity: {kind: sha256, sha256: c304b51799ba7929006e664fc1b42a04a32ec7ac3a7d61d5986f5e5e2af0e91d}
+  access: {mode: read_only, method: file, network_required: false, secrets_required: false}
+  relations:
+  - {relation_type: derived_from, target_asset_id: EVIDENCE-T30-A21-PATCHED-BITQUERY-ONE-SHOT-001}
+  - {relation_type: depends_on, target_asset_id: CONTRACT-T30-A20-BITQUERY-PIT-CAPTURE-001}
+  consumers: [TASK-30, RC001-H07-H01-LIQUIDITY-RETENTION, FACTORY-001]
+  evidence: []
+  search_terms: [A22, HELIUS, GET_TRANSACTIONS_FOR_ADDRESS, ONE_SHOT, PAGINATION]
+  classification: {contains_secrets: false, contains_raw_data: false, sensitivity: INTERNAL_NON_SECRET}
+
+- asset_id: CONFIG-T30-A22-HELIUS-GTA-001
+  record_version: '1.0'
+  asset_type: configuration
+  purpose: Closed A22 policy freezing pool, window, official method, single request and zero-pagination authority.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-08-14'
+  truth_owner: TASK-30
+  location: {kind: git_path, logical_uri: 'repo://configs/task30_a22_helius_get_transactions_for_address_one_shot_v1.yaml', repository_path: configs/task30_a22_helius_get_transactions_for_address_one_shot_v1.yaml}
+  integrity: {kind: sha256, sha256: 8e193d1ac7fa4652cbaae9ac7cedc15c0d075b93a67258b5bfe0973fb109b989}
+  access: {mode: read_only, method: file, network_required: false, secrets_required: false}
+  relations: [{relation_type: governed_by, target_asset_id: CONTRACT-T30-A22-HELIUS-GTA-001}]
+  consumers: [TASK-30, RC001-H07-H01-LIQUIDITY-RETENTION, FACTORY-001]
+  evidence: []
+  search_terms: [A22, HELIUS, FULL_TRANSACTIONS, NO_RETRY, NO_PAGINATION]
+  classification: {contains_secrets: false, contains_raw_data: false, sensitivity: INTERNAL_NON_SECRET}
+
+- asset_id: SCHEMA-T30-A22-HELIUS-GTA-001
+  record_version: '1.0'
+  asset_type: schema
+  purpose: Closed JSON Schema for A22 route identity, exact request, caps, authority and claims.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-08-14'
+  truth_owner: TASK-30
+  location: {kind: git_path, logical_uri: 'repo://catalog/schemas/task30_a22_helius_get_transactions_for_address_one_shot.schema.json', repository_path: catalog/schemas/task30_a22_helius_get_transactions_for_address_one_shot.schema.json}
+  integrity: {kind: sha256, sha256: 42a2393e5ef907093ac854f1c5af6c287a88d1b406c960c2e76c3958769072dc}
+  access: {mode: read_only, method: file, network_required: false, secrets_required: false}
+  relations: [{relation_type: governed_by, target_asset_id: CONTRACT-T30-A22-HELIUS-GTA-001}]
+  consumers: [TASK-30, FACTORY-001]
+  evidence: []
+  search_terms: [A22, HELIUS, CLOSED_SCHEMA, PAGINATION_FORBIDDEN]
+  classification: {contains_secrets: false, contains_raw_data: false, sensitivity: INTERNAL_NON_SECRET}
+
+- asset_id: FIXTURE-T30-A22-HELIUS-GTA-001
+  record_version: '1.0'
+  asset_type: evidence
+  purpose: Secret-free A22 expected route, window, terminal state and claim boundary fixture.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-08-14'
+  truth_owner: TASK-30
+  location: {kind: git_path, logical_uri: 'repo://tests/fixtures/task30/helius_get_transactions_for_address_v1.json', repository_path: tests/fixtures/task30/helius_get_transactions_for_address_v1.json}
+  integrity: {kind: sha256, sha256: 0557ff4a9ff60023ab020874fd8616f3bad022492f0be09555d785af0162491c}
+  access: {mode: read_only, method: file, network_required: false, secrets_required: false}
+  relations: [{relation_type: governed_by, target_asset_id: CONTRACT-T30-A22-HELIUS-GTA-001}]
+  consumers: [TASK-30, FACTORY-001]
+  evidence: []
+  search_terms: [A22, HELIUS, FIXTURE, FULL_TRANSACTION_BATCH]
+  classification: {contains_secrets: false, contains_raw_data: false, sensitivity: INTERNAL_NON_SECRET}
+
+- asset_id: MODULE-T30-A22-HELIUS-GTA-001
+  record_version: '1.0'
+  asset_type: script
+  purpose: Fail-closed request, transport, exact-byte retention and full-transaction batch classifier for A22.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-08-14'
+  truth_owner: TASK-30
+  location: {kind: git_path, logical_uri: 'repo://src/solana_alpha_lab/task30_helius_get_transactions_for_address.py', repository_path: src/solana_alpha_lab/task30_helius_get_transactions_for_address.py}
+  integrity: {kind: sha256, sha256: 2cfd648838fc6a510e4e7d076ca4f833b30102449d6c0b888dbfbd4984b9b66f}
+  access: {mode: read_only, method: file, network_required: false, secrets_required: false}
+  relations:
+  - {relation_type: governed_by, target_asset_id: CONTRACT-T30-A22-HELIUS-GTA-001}
+  - {relation_type: validated_by, target_asset_id: TEST-T30-A22-HELIUS-GTA-001}
+  consumers: [TASK-30, FACTORY-001]
+  evidence: []
+  search_terms: [A22, HELIUS, JSON_RPC, RAW_RETENTION, FAIL_CLOSED]
+  classification: {contains_secrets: false, contains_raw_data: false, sensitivity: INTERNAL_NON_SECRET}
+
+- asset_id: SCRIPT-T30-A22-HELIUS-GTA-001
+  record_version: '1.0'
+  asset_type: script
+  purpose: Foreground runner proving preflight before local key read and one provider POST with safe receipt output.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-08-14'
+  truth_owner: TASK-30
+  location: {kind: git_path, logical_uri: 'repo://scripts/run_task30_a22_helius_get_transactions_for_address.py', repository_path: scripts/run_task30_a22_helius_get_transactions_for_address.py}
+  integrity: {kind: sha256, sha256: 26662214c7311dafc33da9f7990c5b2ccff551d0d3edefceab47e4766f95e5b0}
+  access: {mode: read_only, method: file, network_required: false, secrets_required: false}
+  relations:
+  - {relation_type: depends_on, target_asset_id: MODULE-T30-A22-HELIUS-GTA-001}
+  - {relation_type: governed_by, target_asset_id: CONTRACT-T30-A22-HELIUS-GTA-001}
+  consumers: [TASK-30, FACTORY-001]
+  evidence: []
+  search_terms: [A22, HELIUS, PREFLIGHT, SINGLE_POST, SECRET_SAFE]
+  classification: {contains_secrets: false, contains_raw_data: false, sensitivity: INTERNAL_NON_SECRET}
+
+- asset_id: TEST-T30-A22-HELIUS-GTA-001
+  record_version: '1.0'
+  asset_type: script
+  purpose: Deterministic A22 policy, request, parser, transport, runner, live receipt and hash-binding tests.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-08-14'
+  truth_owner: TASK-30
+  location: {kind: git_path, logical_uri: 'repo://tests/test_task30_a22_helius_get_transactions_for_address.py', repository_path: tests/test_task30_a22_helius_get_transactions_for_address.py}
+  integrity: {kind: sha256, sha256: fa31a33a46be8f82657154a6ac11f844872f5047750ae9c4f75d1cfaca7e00d3}
+  access: {mode: read_only, method: file, network_required: false, secrets_required: false}
+  relations:
+  - {relation_type: depends_on, target_asset_id: CONFIG-T30-A22-HELIUS-GTA-001}
+  - {relation_type: depends_on, target_asset_id: SCHEMA-T30-A22-HELIUS-GTA-001}
+  - {relation_type: depends_on, target_asset_id: MODULE-T30-A22-HELIUS-GTA-001}
+  - {relation_type: depends_on, target_asset_id: SCRIPT-T30-A22-HELIUS-GTA-001}
+  consumers: [TASK-30, FACTORY-001]
+  evidence: []
+  search_terms: [A22, HELIUS, TEST, PAGINATION_STOP, ONE_REQUEST]
+  classification: {contains_secrets: false, contains_raw_data: false, sensitivity: INTERNAL_NON_SECRET}
+
+- asset_id: EVIDENCE-T30-A22P-HELIUS-GTA-001
+  record_version: '1.0'
+  asset_type: evidence
+  purpose: Runtime receipt for HTTP 200, 520 full transactions, pagination-required stop and zero retry.
+  status: VALIDATED_ACTIVE
+  origin: REPOSITORY
+  as_of: '2026-08-14'
+  truth_owner: TASK-30
+  location: {kind: git_path, logical_uri: 'repo://docs/evidence/task30/a22_helius_get_transactions_for_address_runtime_receipt_v1.json', repository_path: docs/evidence/task30/a22_helius_get_transactions_for_address_runtime_receipt_v1.json}
+  integrity: {kind: sha256, sha256: bbb29e932ff2c2d68703f2f1693e8fe07a57b7ef24ffabea71c1a95436f97b15}
+  access: {mode: read_only, method: file, network_required: false, secrets_required: false}
+  relations:
+  - {relation_type: derived_from, target_asset_id: CONFIG-T30-A22-HELIUS-GTA-001}
+  - {relation_type: validated_by, target_asset_id: TEST-T30-A22-HELIUS-GTA-001}
+  consumers: [TASK-30, RC001-H07-H01-LIQUIDITY-RETENTION, FACTORY-001]
+  evidence: []
+  search_terms: [A22P, HELIUS, HTTP_200, TRANSACTIONS_520, PAGINATION_REQUIRED_STOP]
+  classification: {contains_secrets: false, contains_raw_data: false, sensitivity: INTERNAL_NON_SECRET}
+
+- asset_id: REPORT-T30-A22-HELIUS-GTA-001
+  record_version: '1.0'
+  asset_type: control_document
+  purpose: Russian owner readout separating technical route success from incomplete one-shot coverage and purchase decisions.
+  status: VALIDATED_ACTIVE
+  origin: REPOSITORY
+  as_of: '2026-08-14'
+  truth_owner: TASK-30
+  location: {kind: git_path, logical_uri: 'repo://docs/reports/task30/a22_helius_get_transactions_for_address_readout_v1.md', repository_path: docs/reports/task30/a22_helius_get_transactions_for_address_readout_v1.md}
+  integrity: {kind: sha256, sha256: 79693964f03f0d18de2e2f06a2e08143e53a12f92fa69a5ec2e343106c02e1b7}
+  access: {mode: read_only, method: file, network_required: false, secrets_required: false}
+  relations: [{relation_type: derived_from, target_asset_id: EVIDENCE-T30-A22P-HELIUS-GTA-001}]
+  consumers: [TASK-30, RC001-H07-H01-LIQUIDITY-RETENTION, FACTORY-001, GOAL-OWNER]
+  evidence: []
+  search_terms: [A22, OWNER_REPORT, HELIUS, BUY_VS_EXISTING, BLOCKED_DATA]
+  classification: {contains_secrets: false, contains_raw_data: false, sensitivity: INTERNAL_NON_SECRET}
+
+- asset_id: EVIDENCE-T30-A22-HELIUS-GTA-001
+  record_version: '1.0'
+  asset_type: evidence
+  purpose: Hash-bound FULL_REVIEW acceptance for the partial raw batch without TASK-30 promotion.
+  status: VALIDATED_ACTIVE
+  origin: REPOSITORY
+  as_of: '2026-08-14'
+  truth_owner: TASK-30
+  location: {kind: git_path, logical_uri: 'repo://docs/evidence/task30/a22_helius_get_transactions_for_address_acceptance_v1.json', repository_path: docs/evidence/task30/a22_helius_get_transactions_for_address_acceptance_v1.json}
+  integrity: {kind: sha256, sha256: 140e516cad4b3160d09b5ecceed89e62dbe4ca3186553da6e73cccdef2faff33}
+  access: {mode: read_only, method: file, network_required: false, secrets_required: false}
+  relations:
+  - {relation_type: derived_from, target_asset_id: CONTRACT-T30-A22-HELIUS-GTA-001}
+  - {relation_type: depends_on, target_asset_id: EVIDENCE-T30-A22P-HELIUS-GTA-001}
+  - {relation_type: validated_by, target_asset_id: TEST-T30-A22-HELIUS-GTA-001}
+  consumers: [TASK-30, RC001-H07-H01-LIQUIDITY-RETENTION, FACTORY-001, GOAL-OWNER]
+  evidence: []
+  search_terms: [A22, ACCEPTANCE, FULL_REVIEW, PAGINATION_REQUIRED_STOP, ADOPT]
+  classification: {contains_secrets: false, contains_raw_data: false, sensitivity: INTERNAL_NON_SECRET}
+
+- asset_id: CTRL-TASK-30-A22-001
+  record_version: '1.0'
+  asset_type: control_document
+  purpose: Harness-valid A22 task contract binding exact authority, branch, write set, stop and checkpoint.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-08-14'
+  truth_owner: TASK-30
+  location: {kind: git_path, logical_uri: 'repo://docs/tasks/TASK-30-a22-helius-get-transactions-for-address-one-shot.md', repository_path: docs/tasks/TASK-30-a22-helius-get-transactions-for-address-one-shot.md}
+  integrity: {kind: sha256, sha256: 0170c1abf5bf5d736ff48b2581e1eb2f2242a97de7e0708e330f2a89eb8da314}
+  access: {mode: read_only, method: file, network_required: false, secrets_required: false}
+  relations:
+  - {relation_type: contains, target_asset_id: CONTRACT-T30-A22-HELIUS-GTA-001}
+  - {relation_type: contains, target_asset_id: SCRIPT-T30-A22-HELIUS-GTA-001}
+  - {relation_type: depends_on, target_asset_id: EVIDENCE-T30-A21-PATCHED-BITQUERY-ONE-SHOT-001}
+  consumers: [TASK-30, FACTORY-001]
+  evidence: []
+  search_terms: [A22, TASK_CONTRACT, HELIUS, ONE_SHOT, IMPLEMENTED_UNVERIFIED]
+  classification: {contains_secrets: false, contains_raw_data: false, sensitivity: INTERNAL_NON_SECRET}
+
+- asset_id: CONFIG-PROVIDER-ROUTE-CAPABILITY-REGISTRY-005
+  record_version: '1.0'
+  asset_type: configuration
+  purpose: Append-only provider registry preserving v4 semantics and adding Helius HTTP success plus pagination stop.
+  status: VALIDATED_ACTIVE
+  origin: REPOSITORY
+  as_of: '2026-08-14'
+  truth_owner: TASK-30
+  location: {kind: git_path, logical_uri: 'repo://configs/provider_route_capability_registry_v5.yaml', repository_path: configs/provider_route_capability_registry_v5.yaml}
+  integrity: {kind: sha256, sha256: 8875fcc28ae763360f183cf644c1048ba4ec3950fb31406c0f0b1e3ee22231d0}
+  access: {mode: read_only, method: file, network_required: false, secrets_required: false}
+  relations:
+  - {relation_type: derived_from, target_asset_id: CONFIG-PROVIDER-ROUTE-CAPABILITY-REGISTRY-004}
+  - {relation_type: validated_by, target_asset_id: TEST-PROVIDER-ROUTE-CAPABILITY-REGISTRY-005}
+  consumers: [TASK-30, FACTORY-001]
+  evidence: []
+  search_terms: [PROVIDER_ROUTE, REGISTRY_V5, HELIUS, PAGINATION_REQUIRED_STOP, APPEND_ONLY]
+  classification: {contains_secrets: false, contains_raw_data: false, sensitivity: INTERNAL_NON_SECRET}
+
+- asset_id: SCHEMA-PROVIDER-ROUTE-CAPABILITY-REGISTRY-005
+  record_version: '1.0'
+  asset_type: schema
+  purpose: Closed root schema for v5 predecessor binding, immutable policy and six-route cardinality.
+  status: VALIDATED_ACTIVE
+  origin: REPOSITORY
+  as_of: '2026-08-14'
+  truth_owner: TASK-30
+  location: {kind: git_path, logical_uri: 'repo://catalog/schemas/provider_route_capability_registry_v5.schema.json', repository_path: catalog/schemas/provider_route_capability_registry_v5.schema.json}
+  integrity: {kind: sha256, sha256: cc37370e7d3344db463b079008c265dede709f95e6d09a8ce03ca7f751747ef4}
+  access: {mode: read_only, method: file, network_required: false, secrets_required: false}
+  relations: [{relation_type: governed_by, target_asset_id: CONFIG-PROVIDER-ROUTE-CAPABILITY-REGISTRY-005}]
+  consumers: [TASK-30, FACTORY-001]
+  evidence: []
+  search_terms: [PROVIDER_ROUTE, REGISTRY_V5, CLOSED_SCHEMA, SIX_ROUTES]
+  classification: {contains_secrets: false, contains_raw_data: false, sensitivity: INTERNAL_NON_SECRET}
+
+- asset_id: MODULE-PROVIDER-ROUTE-CAPABILITY-REGISTRY-005
+  record_version: '1.0'
+  asset_type: script
+  purpose: Fail-closed v5 resolver proving exact v4 semantic carry-forward and non-promoted Helius observation.
+  status: VALIDATED_ACTIVE
+  origin: REPOSITORY
+  as_of: '2026-08-14'
+  truth_owner: TASK-30
+  location: {kind: git_path, logical_uri: 'repo://src/solana_alpha_lab/provider_route_capability_registry_v5.py', repository_path: src/solana_alpha_lab/provider_route_capability_registry_v5.py}
+  integrity: {kind: sha256, sha256: 57bbae3384115fa6c2eadde18eecf650293b4255af57eb47305f62f56582922e}
+  access: {mode: read_only, method: file, network_required: false, secrets_required: false}
+  relations:
+  - {relation_type: governed_by, target_asset_id: CONFIG-PROVIDER-ROUTE-CAPABILITY-REGISTRY-005}
+  - {relation_type: depends_on, target_asset_id: MODULE-PROVIDER-ROUTE-CAPABILITY-REGISTRY-004}
+  consumers: [TASK-30, FACTORY-001]
+  evidence: []
+  search_terms: [PROVIDER_ROUTE, REGISTRY_V5, RESOLVER, SEMANTIC_HASH, REGISTRY_GAP]
+  classification: {contains_secrets: false, contains_raw_data: false, sensitivity: INTERNAL_NON_SECRET}
+
+- asset_id: TEST-PROVIDER-ROUTE-CAPABILITY-REGISTRY-005
+  record_version: '1.0'
+  asset_type: script
+  purpose: Deterministic v5 schema, carry-forward, mutation, observation and registry-gap tests.
+  status: VALIDATED_ACTIVE
+  origin: REPOSITORY
+  as_of: '2026-08-14'
+  truth_owner: TASK-30
+  location: {kind: git_path, logical_uri: 'repo://tests/test_provider_route_capability_registry_v5.py', repository_path: tests/test_provider_route_capability_registry_v5.py}
+  integrity: {kind: sha256, sha256: 0c3bd0aa5b75058086e2b6759bbf80846343ad87956eee4d6d31ca8febf25c84}
+  access: {mode: read_only, method: file, network_required: false, secrets_required: false}
+  relations:
+  - {relation_type: depends_on, target_asset_id: CONFIG-PROVIDER-ROUTE-CAPABILITY-REGISTRY-005}
+  - {relation_type: depends_on, target_asset_id: SCHEMA-PROVIDER-ROUTE-CAPABILITY-REGISTRY-005}
+  - {relation_type: depends_on, target_asset_id: MODULE-PROVIDER-ROUTE-CAPABILITY-REGISTRY-005}
+  - {relation_type: depends_on, target_asset_id: EVIDENCE-T30-A22P-HELIUS-GTA-001}
+  consumers: [TASK-30, FACTORY-001]
+  evidence: []
+  search_terms: [PROVIDER_ROUTE, REGISTRY_V5, TEST, LEGACY_SEMANTICS, HTTP_SUCCESS_NOT_COMPLETENESS]
+  classification: {contains_secrets: false, contains_raw_data: false, sensitivity: INTERNAL_NON_SECRET}
+
+- asset_id: EVIDENCE-T30-A22R1-PROVIDER-ROUTE-REGISTRY-001
+  record_version: '1.0'
+  asset_type: evidence
+  purpose: Hash-bound registry v5 acceptance separating Helius HTTP success from incomplete one-shot coverage.
+  status: VALIDATED_ACTIVE
+  origin: REPOSITORY
+  as_of: '2026-08-14'
+  truth_owner: TASK-30
+  location: {kind: git_path, logical_uri: 'repo://docs/evidence/task30/a22_provider_route_capability_registry_acceptance_v1.json', repository_path: docs/evidence/task30/a22_provider_route_capability_registry_acceptance_v1.json}
+  integrity: {kind: sha256, sha256: ed156ae1437972e4c93c12c678ba01a5043fb0cb58c851fe62744a346ca05a23}
+  access: {mode: read_only, method: file, network_required: false, secrets_required: false}
+  relations:
+  - {relation_type: derived_from, target_asset_id: CONFIG-PROVIDER-ROUTE-CAPABILITY-REGISTRY-005}
+  - {relation_type: depends_on, target_asset_id: EVIDENCE-T30-A22P-HELIUS-GTA-001}
+  - {relation_type: validated_by, target_asset_id: TEST-PROVIDER-ROUTE-CAPABILITY-REGISTRY-005}
+  consumers: [TASK-30, FACTORY-001]
+  evidence: []
+  search_terms: [A22R1, REGISTRY_V5, ACCEPTANCE, HELIUS, PAGINATION_REQUIRED_STOP]
+  classification: {contains_secrets: false, contains_raw_data: false, sensitivity: INTERNAL_NON_SECRET}
+
+- asset_id: EVIDENCE-T30-A22-DELIVERY-COMPLETION-001
+  record_version: '1.0'
+  asset_type: evidence
+  purpose: Guard-consumable completion evidence binding the exact A22 delivery inventory without TASK-30 promotion.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-08-14'
+  truth_owner: TASK-30
+  location: {kind: git_path, logical_uri: 'repo://docs/evidence/task30/a22_delivery_completion_evidence_v1.json', repository_path: docs/evidence/task30/a22_delivery_completion_evidence_v1.json}
+  integrity: {kind: none, note: 'Content integrity is owned by the live completion-review-fit hash chain; embedding its SHA here would create an indirect self-reference through the reviewed inventory.'}
+  access: {mode: read_only, method: file, network_required: false, secrets_required: false}
+  relations:
+  - {relation_type: derived_from, target_asset_id: EVIDENCE-T30-A22-HELIUS-GTA-001}
+  - {relation_type: depends_on, target_asset_id: EVIDENCE-T30-A22-DELIVERY-INDEPENDENT-REVIEW-001}
+  - {relation_type: depends_on, target_asset_id: EVIDENCE-T30-A22-DELIVERY-FACTORY-FIT-001}
+  - {relation_type: depends_on, target_asset_id: SCHEMA-DELIVERY-COMPLETION-EVIDENCE-001}
+  consumers: [TASK-30, FACTORY-001, GOAL-OWNER]
+  evidence: []
+  search_terms: [A22, DELIVERY_COMPLETION, GUARDED_MERGE, PAGINATION_REQUIRED_STOP, BLOCKED_DATA]
+  classification: {contains_secrets: false, contains_raw_data: false, sensitivity: INTERNAL_NON_SECRET}
+
+- asset_id: EVIDENCE-T30-A22-DELIVERY-INDEPENDENT-REVIEW-001
+  record_version: '1.0'
+  asset_type: evidence
+  purpose: Required-role review evidence bound to the exact non-self-referential A22 inventory.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-08-14'
+  truth_owner: TASK-30
+  location: {kind: git_path, logical_uri: 'repo://docs/evidence/task30/a22_delivery_independent_review_v1.json', repository_path: docs/evidence/task30/a22_delivery_independent_review_v1.json}
+  integrity: {kind: none, note: 'Content integrity is owned by the live completion-review-fit hash chain; embedding its SHA here would create an indirect self-reference through the reviewed inventory.'}
+  access: {mode: read_only, method: file, network_required: false, secrets_required: false}
+  relations:
+  - {relation_type: derived_from, target_asset_id: EVIDENCE-T30-A22-HELIUS-GTA-001}
+  - {relation_type: depends_on, target_asset_id: SCHEMA-DELIVERY-INDEPENDENT-REVIEW-EVIDENCE-001}
+  consumers: [TASK-30, FACTORY-001, GOAL-OWNER]
+  evidence: []
+  search_terms: [A22, INDEPENDENT_REVIEW, SINGLE_AGENT_REVIEW_FALLBACK, ARCHITECTURE]
+  classification: {contains_secrets: false, contains_raw_data: false, sensitivity: INTERNAL_NON_SECRET}
+
+- asset_id: EVIDENCE-T30-A22-DELIVERY-FACTORY-FIT-001
+  record_version: '1.0'
+  asset_type: evidence
+  purpose: FULL Factory Fit review for A22 mission, data truth, owner operability, build versus buy, security and red team.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-08-14'
+  truth_owner: TASK-30
+  location: {kind: git_path, logical_uri: 'repo://docs/evidence/task30/a22_delivery_factory_fit_v1.json', repository_path: docs/evidence/task30/a22_delivery_factory_fit_v1.json}
+  integrity: {kind: none, note: 'Content integrity is owned by the live completion-review-fit hash chain; embedding its SHA here would create an indirect self-reference through the reviewed inventory.'}
+  access: {mode: read_only, method: file, network_required: false, secrets_required: false}
+  relations:
+  - {relation_type: derived_from, target_asset_id: EVIDENCE-T30-A22-HELIUS-GTA-001}
+  - {relation_type: depends_on, target_asset_id: EVIDENCE-T30-A22-DELIVERY-INDEPENDENT-REVIEW-001}
+  consumers: [TASK-30, FACTORY-001, GOAL-OWNER]
+  evidence: []
+  search_terms: [A22, FACTORY_FIT, FULL_REVIEW, ADOPT, NO_PURCHASE_NOW]
+  classification: {contains_secrets: false, contains_raw_data: false, sensitivity: INTERNAL_NON_SECRET}

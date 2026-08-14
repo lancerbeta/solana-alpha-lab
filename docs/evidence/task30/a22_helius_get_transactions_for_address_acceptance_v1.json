@@ -1,0 +1,137 @@
+{
+  "schema": "smial.task30.a22-helius-get-transactions-for-address.acceptance",
+  "schema_version": "1.0",
+  "receipt_id": "EVIDENCE-T30-A22-HELIUS-GET-TRANSACTIONS-FOR-ADDRESS-001",
+  "task_id": "TASK-30",
+  "atom_id": "T30-A22_HELIUS_GET_TRANSACTIONS_FOR_ADDRESS_ONE_SHOT_V1",
+  "as_of": "2026-08-14",
+  "entry_gate": "START_AS_WRITTEN",
+  "spec_route": "DESIGN_SPEC",
+  "decision": "ONE_SHOT_INCOMPLETE_PAGINATION_REQUIRED_NO_SECOND_REQUEST",
+  "task_state": "BLOCKED_DATA",
+  "named_consumer": "RC001-H07-H01-LIQUIDITY-RETENTION",
+  "route_observation": {
+    "route_id": "HELIUS-SOLANA-GET-TRANSACTIONS-FOR-ADDRESS-001",
+    "preflight": "DNS_TCP_TLS_PASS",
+    "provider_requests": 1,
+    "terminal_outcome": "PAGINATION_REQUIRED_STOP",
+    "terminal_error": null,
+    "http_status": 200,
+    "response_bytes": 9012030,
+    "raw_sha256": "7244a4c049c7ebe5f77d6136513d402c9af568dd0ccabb3a842160ab61a72bcc",
+    "transaction_count": 520,
+    "pagination_token_present": true,
+    "complete_one_shot_batch": false,
+    "route_fit_for_raw_batch": false,
+    "retry": false,
+    "fallback": false,
+    "pagination_requests": 0
+  },
+  "decision_delta": "Existing Helius access returned 520 full successful pool transactions in one HTTP 200 response, proving technical data access but falsifying one-shot completeness because a pagination token remained.",
+  "uncertainty_removed": "The bottleneck is no longer whether any maintained provider can return full historical transactions for the pool; it is bounded pagination plus later data-admissibility, not immediate provider purchase.",
+  "capability_or_evidence": "One exact retained 9,012,030-byte response, a tracked SHA-256 receipt, a fail-closed no-retry client, and append-only provider registry v5.",
+  "stop": "The only authorized provider request is consumed. No pagination, retry, fallback, second provider or cash action is allowed in A22.",
+  "next": "After delivery, the owner decides whether RC001-H07-H01 still merits a separately authorized bounded paginated Helius capture; do not start A23 automatically.",
+  "reuse_first": {
+    "decision": "ADOPT",
+    "candidate": "EXISTING_HELIUS_GET_TRANSACTIONS_FOR_ADDRESS_ROUTE",
+    "why": "The existing maintained provider returned full transaction bytes without a new package or purchase.",
+    "cheapest_falsifier_result": "ONE_POST_RETURNED_520_FULL_TRANSACTIONS_AND_PAGINATION_TOKEN",
+    "boundary": "Adoption is a route recommendation only and grants no pagination or external authority."
+  },
+  "reviews": {
+    "review_mode": "SINGLE_AGENT_REVIEW_FALLBACK",
+    "code_review": {
+      "verdict": "PASS",
+      "closed_findings": [
+        "Ambiguous JSON-RPC error plus result now fails closed.",
+        "Malformed loaded-address metadata now fails closed instead of being ignored.",
+        "The runner proves preflight precedes the only credential read and provider request."
+      ],
+      "open_findings": []
+    },
+    "goal_and_dod_review": {
+      "verdict": "PASS_WITH_DELIVERY_PENDING",
+      "business_terminal_reached": true,
+      "pr_and_exact_head_ci_pending": true
+    },
+    "architecture_review": {
+      "verdict": "PASS",
+      "boundary": "One official Helius method, one key read, one POST, create-only raw retention, no pagination/retry/fallback and no authority promotion.",
+      "follow_up": "A future pagination atom must cap pages, credits, raw bytes and completeness before any PIT projection."
+    }
+  },
+  "factory_fit_review": "FULL_REVIEW",
+  "factory_fit": {
+    "verdict": "PASS_WITH_FOLLOWUP",
+    "mission": "The atom answered a concrete buy-versus-existing-provider gap with observed bytes rather than more provider scaffolding.",
+    "research_truth": "HTTP success is separated from one-shot completeness; 520 rows remain a partial page, not total market activity.",
+    "owner_operability": "No purchase is recommended now; owner chooses whether the named hypothesis justifies a new pagination gate.",
+    "recovery": "Raw bytes remain outside Git and the tracked receipt prevents accidental replay.",
+    "build_vs_buy": "ADOPT the existing Helius route for consideration before buying; no dependency or provider purchase was added.",
+    "follow_up": "TASK-30 remains BLOCKED_DATA until complete capture and data-admissibility are separately proven."
+  },
+  "product_horizon": {
+    "now": "NONE",
+    "watch": {
+      "candidate": "BOUNDED_HELIUS_PAGINATED_CAPTURE_IF_RC001_REMAINS_PRIORITY",
+      "value": "Could complete the exact pool/day raw batch without changing provider.",
+      "evidence_required": "Fresh exact owner gate with page, credit, byte and completeness caps, followed by PIT data-admissibility review.",
+      "cost_risk": "Consumes additional quota and can still expose a transformation or PIT gap; current account plan was not verified.",
+      "owner": "GOAL_OWNER",
+      "activation_trigger": "Explicit product-priority decision after this PR is merged."
+    }
+  },
+  "capability_radar": {
+    "decision": "NONE",
+    "candidate": null,
+    "install_authority": false
+  },
+  "authority": {
+    "credential_free_preflights": 1,
+    "credential_reads": 1,
+    "provider_requests": 1,
+    "retries": 0,
+    "fallbacks": 0,
+    "pagination_requests": 0,
+    "scheduler_or_background_processes": 0,
+    "wallet_signer_transaction_actions": 0,
+    "cash_spend_usd_cents": 0,
+    "task30_acceptance_actions": 0
+  },
+  "non_claims": {
+    "provider_failure": false,
+    "provider_unavailable": false,
+    "complete_batch": false,
+    "complete_market_panel": false,
+    "pit_admissible": false,
+    "h07_h01_evidence": false,
+    "route_feasibility": false,
+    "fillability": false,
+    "execution": false,
+    "settlement": false,
+    "pnl": false,
+    "numeric_netreturn": false,
+    "alpha": false,
+    "strategy": false,
+    "task30_acceptance": false,
+    "missing_is_zero_or_flat": false,
+    "account_plan_or_free_quota_verified": false
+  },
+  "artifact_bindings": {
+    "task": {"path": "docs/tasks/TASK-30-a22-helius-get-transactions-for-address-one-shot.md", "sha256": "0170c1abf5bf5d736ff48b2581e1eb2f2242a97de7e0708e330f2a89eb8da314"},
+    "contract": {"path": "docs/contracts/task30_a22_helius_get_transactions_for_address_one_shot_contract_v1.md", "sha256": "c304b51799ba7929006e664fc1b42a04a32ec7ac3a7d61d5986f5e5e2af0e91d"},
+    "configuration": {"path": "configs/task30_a22_helius_get_transactions_for_address_one_shot_v1.yaml", "sha256": "8e193d1ac7fa4652cbaae9ac7cedc15c0d075b93a67258b5bfe0973fb109b989"},
+    "schema": {"path": "catalog/schemas/task30_a22_helius_get_transactions_for_address_one_shot.schema.json", "sha256": "42a2393e5ef907093ac854f1c5af6c287a88d1b406c960c2e76c3958769072dc"},
+    "fixture": {"path": "tests/fixtures/task30/helius_get_transactions_for_address_v1.json", "sha256": "0557ff4a9ff60023ab020874fd8616f3bad022492f0be09555d785af0162491c"},
+    "module": {"path": "src/solana_alpha_lab/task30_helius_get_transactions_for_address.py", "sha256": "2cfd648838fc6a510e4e7d076ca4f833b30102449d6c0b888dbfbd4984b9b66f"},
+    "script": {"path": "scripts/run_task30_a22_helius_get_transactions_for_address.py", "sha256": "26662214c7311dafc33da9f7990c5b2ccff551d0d3edefceab47e4766f95e5b0"},
+    "test": {"path": "tests/test_task30_a22_helius_get_transactions_for_address.py", "sha256": "fa31a33a46be8f82657154a6ac11f844872f5047750ae9c4f75d1cfaca7e00d3"},
+    "runtime": {"path": "docs/evidence/task30/a22_helius_get_transactions_for_address_runtime_receipt_v1.json", "sha256": "bbb29e932ff2c2d68703f2f1693e8fe07a57b7ef24ffabea71c1a95436f97b15"},
+    "report": {"path": "docs/reports/task30/a22_helius_get_transactions_for_address_readout_v1.md", "sha256": "79693964f03f0d18de2e2f06a2e08143e53a12f92fa69a5ec2e343106c02e1b7"},
+    "provider_registry": {"path": "configs/provider_route_capability_registry_v5.yaml", "sha256": "8875fcc28ae763360f183cf644c1048ba4ec3950fb31406c0f0b1e3ee22231d0"}
+  },
+  "project_sources_disposition": {"kind": "NO_CHANGE"},
+  "state_change": "PARTIAL_RAW_BATCH_OBSERVED_NO_TASK30_PROMOTION",
+  "rollback": "Remove only A22 tracked files and Catalog records. The consumed external read is never retried by rollback; retained raw bytes may be quarantined separately but are not deleted by this task."
+}

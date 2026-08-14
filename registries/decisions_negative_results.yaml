@@ -12,6 +12,7 @@ source_asset_ids:
 - EVIDENCE-T30-A9-NAMED-PARTIAL-CAPTURE-001
 - EVIDENCE-T30-A19-TERMINAL-ROUTE-DECISION-001
 - EVIDENCE-T30-A20-BITQUERY-PIT-CAPTURE-001
+- EVIDENCE-T30-A22-HELIUS-GTA-001
 records:
 - record_kind: negative_result
   record_id: NEGATIVE-T24-ENTITY-SIGNAL-V1-001
@@ -65,3 +66,10 @@ records:
   evidence_asset_ids:
   - EVIDENCE-T30-A20-BITQUERY-PIT-CAPTURE-001
   summary: "One authorized Bitquery PumpSwap archive request ended ROUTE_UNKNOWN_STOP after DNS/TCP/TLS PASS. The pre-patch client did not retain HTTP status or response bytes, so provider, auth, schema and data causes remain unknown; no retry occurred and TASK-30 remains BLOCKED_DATA. UNKNOWN is not zero, flat, no-trade, provider failure or provider unavailability."
+- record_kind: negative_result
+  record_id: NEGATIVE-T30-HELIUS-GTA-ONE-SHOT-001
+  status: RECORDED
+  created_at: '2026-08-14T18:42:09Z'
+  evidence_asset_ids:
+  - EVIDENCE-T30-A22-HELIUS-GTA-001
+  summary: "One authorized Helius getTransactionsForAddress request returned HTTP 200 with 520 full successful transactions for the exact pool/day and a pagination token. The route is technically live but the bounded one-shot did not establish a complete batch; no pagination, retry or fallback occurred and TASK-30 remains BLOCKED_DATA. This is not provider failure, provider unavailability, complete market activity, PIT admissibility, H07/H01 evidence, alpha, execution, PnL or NetReturn."

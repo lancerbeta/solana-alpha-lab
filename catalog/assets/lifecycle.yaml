@@ -189,12 +189,12 @@ records:
   evidence: []
   classification: *id004
 - asset_id: REGISTRY-DECISIONS-NEGATIVE-RESULTS-001
-  record_version: '1.5'
+  record_version: '1.6'
   asset_type: lifecycle_registry
   purpose: Active registry for decisions and durable negative research results.
   status: VALIDATED_ACTIVE
   origin: REPOSITORY
-  as_of: '2026-08-13'
+  as_of: '2026-08-14'
   truth_owner: TASK-03
   location:
     kind: git_path
@@ -202,14 +202,14 @@ records:
     repository_path: registries/decisions_negative_results.yaml
   integrity:
     kind: sha256
-    sha256: 3166a40c64d45ae8fa66f831994c5e9f94bc969ff17cdbb77bf1ad9d75774e4b
+    sha256: ad045ebdf9f7e36c581a7bd1858411dc927034938f79050017b6fc133752064d
   access: *id001
   relations: *id002
   consumers: *id003
   evidence: []
   classification: *id004
 - asset_id: GENERATED-PROJECT-MAP-001
-  record_version: '1.96'
+  record_version: '1.97'
   asset_type: generated_view
   purpose: Deterministic human-readable navigation projected only from the Catalog.
   status: IMPLEMENTED_UNVERIFIED
@@ -222,7 +222,7 @@ records:
     repository_path: docs/PROJECT_MAP.md
   integrity:
     kind: sha256
-    sha256: 4ae0ec47b786e5abe0550af4f7fa61c1490c872a8ba107359b315b5cebb7f6b9
+    sha256: 100a6159b4e3588853886f35b6a85b6a98d58d9f558745148c27c5e37d528c84
   access:
     mode: read_only
     method: file
@@ -269,7 +269,7 @@ records:
   evidence: []
   classification: *id004
 - asset_id: GENERATED-EDGE-PROJECTION-001
-  record_version: '1.75'
+  record_version: '1.76'
   asset_type: generated_view
   purpose: Deterministic machine-readable projection of Catalog asset relations.
   status: IMPLEMENTED_UNVERIFIED
@@ -282,7 +282,7 @@ records:
     repository_path: catalog/generated/asset_edges.json
   integrity:
     kind: sha256
-    sha256: 589aea5d5347fb0e029b440af51538a8f1fab591b5b60be291cb62ee621bad60
+    sha256: 655fac0d7cb6a0eafbd6847a0518425839e45280d6690f0791213f0b2b916a48
   access:
     mode: read_only
     method: file

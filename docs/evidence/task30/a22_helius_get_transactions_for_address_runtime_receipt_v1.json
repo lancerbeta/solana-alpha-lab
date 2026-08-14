@@ -1,0 +1,102 @@
+{
+  "atom_id": "T30-A22_HELIUS_GET_TRANSACTIONS_FOR_ADDRESS_ONE_SHOT_V1",
+  "authority": {
+    "basis": "EXACT_OWNER_PHRASE",
+    "cash_spend_usd_cents": 0,
+    "credential_free_preflights": 1,
+    "credential_reads": 1,
+    "fallbacks": 0,
+    "pagination_requests": 0,
+    "provider_requests": 1,
+    "retries": 0,
+    "second_provider_requests": 0
+  },
+  "claims": {
+    "alpha": false,
+    "complete_market_panel": false,
+    "execution": false,
+    "fillability": false,
+    "h07_h01_evidence": false,
+    "missing_is_zero_or_flat": false,
+    "numeric_netreturn": false,
+    "pit_admissible": false,
+    "pnl": false,
+    "route_feasibility": false,
+    "settlement": false,
+    "strategy": false,
+    "task30_acceptance": false,
+    "technical_raw_transaction_route_only": true
+  },
+  "observed_at": "2026-08-14T18:42:09Z",
+  "pagination_token_present": true,
+  "preflight": {
+    "credential_reads": 0,
+    "dns_resolved": true,
+    "host": "mainnet.helius-rpc.com",
+    "observed_at": "2026-08-14T18:42:09Z",
+    "port": 443,
+    "provider_requests": 0,
+    "schema": "smial.task30.helius-get-transactions-for-address.credential-free-preflight",
+    "schema_version": "1.0",
+    "tcp_443": true,
+    "tls_verified": true,
+    "tls_version": "TLSv1.3"
+  },
+  "projection": {
+    "atom_id": "T30-A22_HELIUS_GET_TRANSACTIONS_FOR_ADDRESS_ONE_SHOT_V1",
+    "first_block_time": 1786494563,
+    "h07_h01_evidence": false,
+    "last_block_time": 1786575893,
+    "observed_at": "2026-08-14T18:42:09Z",
+    "pagination_token_present": true,
+    "pit_admissible": false,
+    "pool_address": "URqx24yyYxtXXhTbBQnbtPLhtLWYoaDaRxuQuLpNS3S",
+    "provider_error_code": null,
+    "raw_sha256": "7244a4c049c7ebe5f77d6136513d402c9af568dd0ccabb3a842160ab61a72bcc",
+    "response_bytes": 9012030,
+    "route_fit_for_raw_batch": false,
+    "route_id": "HELIUS-SOLANA-GET-TRANSACTIONS-FOR-ADDRESS-001",
+    "schema": "smial.task30.helius-get-transactions-for-address.runtime-projection",
+    "schema_version": "1.0",
+    "task30_acceptance": false,
+    "task_id": "TASK-30",
+    "terminal_outcome": "PAGINATION_REQUIRED_STOP",
+    "transaction_count": 520,
+    "window": {
+      "block_time_gte": 1786492800,
+      "block_time_lt": 1786579200
+    },
+    "zero_activity_claim": false
+  },
+  "raw_retention": {
+    "manifest": {
+      "observed_at": "2026-08-14T18:42:09Z",
+      "raw_filename": "raw_response.json",
+      "raw_sha256": "7244a4c049c7ebe5f77d6136513d402c9af568dd0ccabb3a842160ab61a72bcc",
+      "request_body_sha256": "d2957848c6474f1b101d52aa6c9f50b2ee9ce13743b3b5e455130982f65feb71",
+      "response_bytes": 9012030,
+      "retention_class": "A4_OUTSIDE_GIT",
+      "run_id": "20260814T184209Z-7572a5c2",
+      "schema": "smial.task30.helius-get-transactions-for-address.raw-manifest",
+      "schema_version": "1.0"
+    },
+    "raw_retained": true
+  },
+  "receipt_id": "EVIDENCE-T30-A22P-HELIUS-GET-TRANSACTIONS-FOR-ADDRESS-001",
+  "route_fit_for_raw_batch": false,
+  "route_id": "HELIUS-SOLANA-GET-TRANSACTIONS-FOR-ADDRESS-001",
+  "schema": "smial.task30.helius-get-transactions-for-address.runtime-receipt",
+  "schema_version": "1.0",
+  "task30_state": "BLOCKED_DATA",
+  "task_id": "TASK-30",
+  "terminal_error": null,
+  "terminal_outcome": "PAGINATION_REQUIRED_STOP",
+  "transaction_count": 520,
+  "transport": {
+    "content_type": "application/json",
+    "http_status": 200,
+    "request_body_sha256": "d2957848c6474f1b101d52aa6c9f50b2ee9ce13743b3b5e455130982f65feb71",
+    "request_count": 1,
+    "response_bytes": 9012030
+  }
+}
