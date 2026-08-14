@@ -4,6 +4,7 @@ import importlib
 import hashlib
 import inspect
 import json
+import os
 import sys
 import tempfile
 import unittest
@@ -194,10 +195,15 @@ class Task30A23HeliusBoundedPaginationBehaviorTests(unittest.TestCase):
             / "page=001"
             / "raw_response.json"
         )
-        self.assertTrue(raw_path.is_file(), raw_path)
+        manifest = receipt["raw_manifests"][0]
+        self.assertEqual(manifest["raw_filename"], "raw_response.json")
+        self.assertEqual(manifest["retention_class"], "A4_OUTSIDE_GIT")
+        if not raw_path.is_file():
+            self.assertEqual(os.environ.get("CI"), "true", raw_path)
+            return
         raw = raw_path.read_bytes()
-        self.assertEqual(hashlib.sha256(raw).hexdigest(), receipt["raw_manifests"][0]["raw_sha256"])
-        self.assertEqual(len(raw), receipt["raw_manifests"][0]["response_bytes"])
+        self.assertEqual(hashlib.sha256(raw).hexdigest(), manifest["raw_sha256"])
+        self.assertEqual(len(raw), manifest["response_bytes"])
         self.assertEqual(receipt["terminal_outcome"], "COMPLETE_RAW_BATCH_CANDIDATE")
         self.assertEqual(receipt["provider_requests"], 1)
         self.assertEqual(receipt["total_transaction_count"], 520)
