@@ -156,6 +156,15 @@ class DeliveryHarnessContractTests(unittest.TestCase):
         self.assertFalse(harness["cloud_bundle"]["reminders"])
         self.assertFalse(harness["cloud_bundle"]["working_context_truth_owner"])
         self.assertTrue(harness["cloud_bundle"]["historical_registry_preserved"])
+        merge_policy = harness["merge_policy"]
+        self.assertEqual(merge_policy["executor"], "DIRECT_AGENT")
+        self.assertEqual(merge_policy["owner_role"], "EXACT_PHRASE_AFTER_CI")
+        self.assertEqual(merge_policy["owner_github_merge_click"], "FORBIDDEN")
+        self.assertEqual(
+            merge_policy["identity_modes"],
+            ["TASK_CONTEXT_RECEIPT", "LIVE_PR_HEAD"],
+        )
+        self.assertIn("delivery-harness/**", merge_policy["harness_control_write_prefixes"])
 
     def test_project_profile_binds_current_truth_owners(self) -> None:
         profile = self.documents[PROFILE]

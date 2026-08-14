@@ -16,8 +16,9 @@ alwaysApply: true
   task contract. Do not ask for micro-approvals.
 - Evaluate `OWNER_ATTENTION_GATE_V2` for material/external/user-only/destructive
   boundaries and merge. Failed machine checks are `DENY`.
-- Cursor and Codex have the same guarded merge right: only after the exact
-  owner phrase for the unchanged PR/head and immediate machine re-read.
+- Cursor and Codex have the same guarded merge right: only after exact-head CI
+  and the exact owner phrase for the unchanged PR/head. The owner never clicks
+  GitHub Merge; the elected direct agent merges.
 - Git is working project memory. Cloud bundle/Project Instruction is
   `OWNER_MANAGED_OPTIONAL_EXPORT`; never request replacement or smoke.
 - Tests, PR, CI or merge do not by themselves establish semantic acceptance,

@@ -4,9 +4,12 @@ For the exact task contract and candidate fingerprint under
 `DELIVERY_HARNESS_V1`, run
 `scripts/delivery_harness.py check`, proportional Factory Fit, Product Horizon,
 capability radar, exact inventory and targeted checks. Prepare the PR/read-back.
-Stop once for exact PR/head owner approval; only then let the guarded merge
-execute the elected project-bound gate once via
-`scripts/owner_attention_gate.py --guarded-merge`. It reads live PR/check/review
+Stop once after exact-head CI for exact PR/head owner approval; the owner never
+clicks GitHub Merge. Only then let the guarded merge execute the elected
+project-bound gate once via
+`scripts/owner_attention_gate.py --guarded-merge`. Harness or control PRs bind
+a local `LIVE_PR_HEAD` receipt; product work still uses an exact task contract.
+It reads live PR/check/review
 state and bound Factory-Fit evidence itself; never pass hand-asserted green
 booleans. Verify the profile's exact default branch plus post-merge CI afterward.
 Require `delivery_gate_ready=true`; the guard executes the project-profile

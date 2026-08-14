@@ -41,10 +41,12 @@ and the same deterministic validation.
 
 Run Factory Fit, Product Horizon and capability radar. Record exact inventory,
 head/tree, tests, limitations, non-claims and rollback. Capability candidates
-grant no installation/credential/network/spend authority. Require exact-head CI
-and then the exact owner PR/head phrase. Re-read machine state, evaluate v2,
-merge once only on `AUTONOMOUS`, then verify the base-bound profile default
-branch and its post-merge CI.
+grant no installation/credential/network/spend authority. Require exact-head CI and then the exact owner PR/head phrase. The owner never
+clicks GitHub Merge. Re-read machine state, evaluate v2, merge once only on
+`AUTONOMOUS`, then verify the base-bound profile default branch and its
+post-merge CI. Harness or control PRs use a local `LIVE_PR_HEAD` context
+receipt from `scripts/delivery_harness.py context --pr` instead of a product
+`TASK-XX` contract. Product work still requires an exact task contract.
 The guarded submission's `merge_commit` becomes the expected default-branch
 head. The self-hashed submission is a mandatory input to
 `--post-merge-readback --submission-receipt <GUARDED_SUBMISSION_JSON>`; the

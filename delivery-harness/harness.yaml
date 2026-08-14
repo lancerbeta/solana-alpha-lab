@@ -28,6 +28,37 @@ routes:
     actor: CURSOR
     task_selection: false
     merge: FORBIDDEN
+merge_policy:
+  executor: DIRECT_AGENT
+  owner_role: EXACT_PHRASE_AFTER_CI
+  owner_github_merge_click: FORBIDDEN
+  identity_modes:
+    - TASK_CONTEXT_RECEIPT
+    - LIVE_PR_HEAD
+  harness_control_write_prefixes:
+    - AGENTS.md
+    - .agents/**
+    - .cursor/**
+    - .github/**
+    - catalog/schemas/**
+    - catalog/assets/core.yaml
+    - catalog/catalog_manifest.yaml
+    - control/owner_attention_gate_v2.yaml
+    - delivery-harness/**
+    - docs/agent/DELIVERY_HARNESS_PROTOCOL.md
+    - docs/agent/DELIVERY_CONTEXT_PROTOCOL.md
+    - docs/agent/DELIVERY_HARNESS_BOOTSTRAP.md
+    - docs/agent/EXECUTION_ROUTER_PROTOCOL.md
+    - docs/evidence/control/**
+    - docs/tasks/CTRL-DELIVERY-HARNESS-V1.md
+    - scripts/delivery_harness.py
+    - scripts/owner_attention_gate.py
+    - tests/test_delivery_harness_adapters.py
+    - tests/test_delivery_harness_authority.py
+    - tests/test_delivery_harness_bootstrap.py
+    - tests/test_delivery_harness_context.py
+    - tests/test_delivery_harness_contract.py
+    - tests/test_delivery_harness_merge_guard.py
 context_lanes:
   L0: always_loaded_front_door
   L1: exact_task_capsule

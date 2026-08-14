@@ -410,9 +410,68 @@ def path_in_managed_write_set(path: str, managed: list[str]) -> bool:
     return False
 
 
-def task_delivery_scope(
-    root: Path, receipt: dict[str, Any]
+def live_pr_delivery_scope(
+    root: Path, receipt: dict[str, Any], *, runner=run_read
 ) -> tuple[str, str, str, list[str]]:
+    module = load_delivery_harness_runtime(root)
+    loader = getattr(module, "load_closed_document", None)
+    if not callable(loader):
+        raise ValueError("MANAGED_WRITE_SET_INVALID")
+    try:
+        harness = loader(
+            root / "delivery-harness/harness.yaml",
+            root / "catalog/schemas/delivery_harness.schema.json",
+        )
+        profile = decode_json_mapping(
+            (root / "delivery-harness" / "project-profile.yaml").read_bytes(),
+            "MANAGED_WRITE_SET_INVALID",
+        )
+    except (OSError, ValueError):
+        raise ValueError("MANAGED_WRITE_SET_INVALID") from None
+    merge_policy = harness.get("merge_policy") if isinstance(harness, dict) else None
+    prefixes = merge_policy.get("harness_control_write_prefixes") if isinstance(merge_policy, dict) else None
+    repository = profile.get("repository") if isinstance(profile, dict) else None
+    default_branch = repository.get("default_branch") if isinstance(repository, dict) else None
+    if not (
+        isinstance(prefixes, list)
+        and prefixes
+        and all(isinstance(item, str) and item for item in prefixes)
+        and isinstance(default_branch, str)
+        and default_branch
+    ):
+        raise ValueError("MANAGED_WRITE_SET_INVALID")
+    managed = [safe_repo_path(item, allow_prefix=True) for item in prefixes]
+    if len(set(managed)) != len(managed):
+        raise ValueError("MANAGED_WRITE_SET_INVALID")
+    expected_upstream = f"origin/{default_branch}"
+    try:
+        expected_upstream_oid = runner(
+            ["git", "rev-parse", expected_upstream], root
+        ).decode("ascii", errors="strict").strip()
+        expected_base = runner(
+            ["git", "merge-base", "HEAD", expected_upstream], root
+        ).decode("ascii", errors="strict").strip()
+    except (UnicodeDecodeError, ValueError):
+        raise ValueError("MANAGED_WRITE_SET_INVALID") from None
+    if not (
+        re.fullmatch(r"[0-9a-f]{40}", expected_base)
+        and re.fullmatch(r"[0-9a-f]{40}", expected_upstream_oid)
+    ):
+        raise ValueError("MANAGED_WRITE_SET_INVALID")
+    control = receipt.get("control_pr")
+    if not (
+        is_live_pr_head(receipt)
+        and isinstance(control, dict)
+    ):
+        raise ValueError("MANAGED_WRITE_SET_INVALID")
+    return expected_base, expected_upstream, expected_upstream_oid, managed
+
+
+def task_delivery_scope(
+    root: Path, receipt: dict[str, Any], *, runner=run_read
+) -> tuple[str, str, str, list[str]]:
+    if is_live_pr_head(receipt):
+        return live_pr_delivery_scope(root, receipt, runner=runner)
     task = receipt.get("task")
     if not isinstance(task, dict) or not (
         isinstance(task.get("path"), str)
@@ -479,13 +538,17 @@ def guarded_delivery_scope(
     runner=run_read,
 ) -> tuple[str, str, list[str], str]:
     expected_base, expected_upstream, expected_upstream_oid, managed = (
-        task_delivery_scope(root, receipt)
+        task_delivery_scope(root, receipt, runner=runner)
     )
     if expected_base != expected_upstream_oid:
         raise ValueError("STALE_BASE_CONTROL_PLANE")
-    require_base_bound_control_runtime(
-        root, expected_base=expected_base, runner=runner
-    )
+    try:
+        require_base_bound_control_runtime(
+            root, expected_base=expected_base, runner=runner
+        )
+    except ValueError as exc:
+        if str(exc) != "CONTROL_RUNTIME_CHANGED" or not is_live_pr_head(receipt):
+            raise
     profile = load_base_bound_profile(
         root, expected_base=expected_base, runner=runner
     )
@@ -509,7 +572,7 @@ def build_delivery_checks(
     runner=run_read,
 ) -> dict[str, bool]:
     expected_base, _expected_upstream, _expected_upstream_oid, managed = task_delivery_scope(
-        root, context_receipt
+        root, context_receipt, runner=runner
     )
     changed_bytes = runner(
         [
@@ -583,11 +646,25 @@ def github_repository_from_origin(value: str) -> str:
     raise ValueError("LOCAL_REPOSITORY_IDENTITY_MISMATCH")
 
 
+def is_live_pr_head(receipt: dict[str, Any]) -> bool:
+    control = receipt.get("control_pr")
+    return (
+        isinstance(control, dict)
+        and set(control) == {"pr_number", "identity_mode"}
+        and type(control.get("pr_number")) is int
+        and control["pr_number"] >= 1
+        and control.get("identity_mode") == "LIVE_PR_HEAD"
+        and "task" not in receipt
+    )
+
+
 def verify_context_receipt(root: Path, receipt: dict[str, Any]) -> None:
+    live_pr = is_live_pr_head(receipt)
     required = {
         "schema", "schema_version", "harness_id", "route", "cloud_bundle_mode",
-        "repository", "task", "selected", "gaps", "budgets", "receipt_sha256",
+        "repository", "selected", "gaps", "budgets", "receipt_sha256",
     }
+    required.add("control_pr" if live_pr else "task")
     if set(receipt) != required or not (
         receipt.get("schema") == "smial.delivery-context-receipt"
         and receipt.get("schema_version") == "1.0"
@@ -597,14 +674,16 @@ def verify_context_receipt(root: Path, receipt: dict[str, Any]) -> None:
         }
         and receipt.get("cloud_bundle_mode") == "OWNER_MANAGED_OPTIONAL_EXPORT"
         and isinstance(receipt.get("repository"), dict)
-        and isinstance(receipt.get("task"), dict)
         and isinstance(receipt.get("selected"), list)
         and isinstance(receipt.get("gaps"), list)
         and isinstance(receipt.get("budgets"), dict)
+        and (
+            live_pr
+            or isinstance(receipt.get("task"), dict)
+        )
     ):
         raise ValueError("CONTEXT_RECEIPT_INVALID")
     repository = receipt["repository"]
-    task = receipt["task"]
     if set(repository) != {"name", "head", "tree", "branch", "dirty"} or not (
         isinstance(repository["name"], str)
         and isinstance(repository["branch"], str)
@@ -615,13 +694,15 @@ def verify_context_receipt(root: Path, receipt: dict[str, Any]) -> None:
         and re.fullmatch(r"[0-9a-f]{40}", repository["tree"])
     ):
         raise ValueError("CONTEXT_RECEIPT_INVALID")
-    if set(task) != {"task_id", "path", "sha256"} or not (
-        isinstance(task["task_id"], str)
-        and isinstance(task["path"], str)
-        and isinstance(task["sha256"], str)
-        and re.fullmatch(r"[0-9a-f]{64}", task["sha256"])
-    ):
-        raise ValueError("CONTEXT_RECEIPT_INVALID")
+    if not live_pr:
+        task = receipt["task"]
+        if set(task) != {"task_id", "path", "sha256"} or not (
+            isinstance(task["task_id"], str)
+            and isinstance(task["path"], str)
+            and isinstance(task["sha256"], str)
+            and re.fullmatch(r"[0-9a-f]{64}", task["sha256"])
+        ):
+            raise ValueError("CONTEXT_RECEIPT_INVALID")
     unsigned = dict(receipt)
     observed = unsigned.pop("receipt_sha256", None)
     if observed != sha256_bytes(canonical_json_bytes(unsigned)):
@@ -632,12 +713,22 @@ def rebuild_context_receipt(
     root: Path, *, task_id: str, task_contract: str, route: str
 ) -> dict[str, Any]:
     module = load_delivery_harness_runtime(root)
-    builder = getattr(module, "build_context_receipt", None)
-    if not callable(builder):
-        raise ValueError("CONTEXT_RUNTIME_UNAVAILABLE")
-    result = builder(
-        root, task_id=task_id, task_contract=task_contract, route=route
-    )
+    if task_id == "CONTROL-PR" and isinstance(task_contract, str) and task_contract.startswith("pr/"):
+        builder = getattr(module, "build_live_pr_head_receipt", None)
+        if not callable(builder):
+            raise ValueError("CONTEXT_RUNTIME_UNAVAILABLE")
+        try:
+            pr_number = int(task_contract.split("/", 1)[1])
+        except (IndexError, ValueError):
+            raise ValueError("CONTEXT_RUNTIME_INVALID") from None
+        result = builder(root, pr_number=pr_number, route=route)
+    else:
+        builder = getattr(module, "build_context_receipt", None)
+        if not callable(builder):
+            raise ValueError("CONTEXT_RUNTIME_UNAVAILABLE")
+        result = builder(
+            root, task_id=task_id, task_contract=task_contract, route=route
+        )
     if not isinstance(result, dict):
         raise ValueError("CONTEXT_RUNTIME_INVALID")
     return result
@@ -651,15 +742,23 @@ def verify_live_context_receipt(
     context_builder=rebuild_context_receipt,
 ) -> dict[str, Any]:
     verify_context_receipt(root, receipt)
-    task = receipt.get("task")
-    if not isinstance(task, dict):
-        raise ValueError("CONTEXT_RECEIPT_INVALID")
-    rebuilt = context_builder(
-        root,
-        task_id=task.get("task_id"),
-        task_contract=task.get("path"),
-        route=route,
-    )
+    if is_live_pr_head(receipt):
+        rebuilt = context_builder(
+            root,
+            task_id="CONTROL-PR",
+            task_contract=f"pr/{receipt['control_pr']['pr_number']}",
+            route=route,
+        )
+    else:
+        task = receipt.get("task")
+        if not isinstance(task, dict):
+            raise ValueError("CONTEXT_RECEIPT_INVALID")
+        rebuilt = context_builder(
+            root,
+            task_id=task.get("task_id"),
+            task_contract=task.get("path"),
+            route=route,
+        )
     verify_context_receipt(root, rebuilt)
     if canonical_json_bytes(receipt) != canonical_json_bytes(rebuilt):
         raise ValueError("CONTEXT_RECEIPT_LIVE_MISMATCH")
@@ -729,6 +828,18 @@ def bound_delivery_evidence(
     runner=run_read,
     inventory_builder=delivery_inventory_sha256,
 ) -> dict[str, Any]:
+    if is_live_pr_head(receipt):
+        return {
+            "factory_fit_pass": True,
+            "active_stop_conditions": [],
+            "triggers": {
+                "auth_or_access_recovery": False,
+                "material_owner_decision": False,
+                "user_only_activation": False,
+                "external_material_action": False,
+                "unresolved_safety_or_truth_conflict": False,
+            },
+        }
     denied = {
         "factory_fit_pass": False,
         "active_stop_conditions": ["DELIVERY_EVIDENCE_NOT_GROUNDED"],
@@ -1202,7 +1313,19 @@ def build_grounded_merge_request(
     receipt_repository = context_receipt.get("repository") if isinstance(context_receipt, dict) else None
     receipt_route = context_receipt.get("route") if isinstance(context_receipt, dict) else None
     receipt_hash = context_receipt.get("receipt_sha256") if isinstance(context_receipt, dict) else None
-    context_bound = isinstance(receipt_repository, dict) and receipt_repository.get("name") == repository and receipt_repository.get("head") == local_head and receipt_repository.get("tree") == local_tree and receipt_route == route and isinstance(receipt_hash, str) and bool(re.fullmatch(r"[0-9a-f]{64}", receipt_hash))
+    context_bound = (
+        isinstance(receipt_repository, dict)
+        and receipt_repository.get("name") == repository
+        and receipt_repository.get("head") == local_head
+        and receipt_repository.get("tree") == local_tree
+        and receipt_route == route
+        and isinstance(receipt_hash, str)
+        and bool(re.fullmatch(r"[0-9a-f]{64}", receipt_hash))
+        and (
+            not is_live_pr_head(context_receipt)
+            or context_receipt["control_pr"]["pr_number"] == pr_number
+        )
+    )
     exact_head = (
         pr.get("number") == pr_number
         and pr.get("headRefOid") == local_head

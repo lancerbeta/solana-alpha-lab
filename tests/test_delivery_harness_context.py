@@ -337,6 +337,26 @@ class DeliveryHarnessContextTests(unittest.TestCase):
                 except OSError:
                     pass
 
+    def test_live_pr_head_receipt_does_not_require_a_task_contract(self) -> None:
+        _metadata, git_text = self.frozen_task_git_text()
+        with mock.patch.object(self.module, "git_text", side_effect=git_text):
+            receipt = self.module.build_live_pr_head_receipt(
+                ROOT, pr_number=104, route="DIRECT_CURSOR_DELIVERY"
+            )
+        jsonschema.validate(receipt, self.schema)
+        self.assertEqual(self.module.validate_context_receipt(receipt), [])
+        self.assertEqual(receipt["control_pr"]["identity_mode"], "LIVE_PR_HEAD")
+        self.assertEqual(receipt["control_pr"]["pr_number"], 104)
+        self.assertNotIn("task", receipt)
+        self.assertFalse(
+            any(item["semantic_role"] == "DELIVERY_EVIDENCE" for item in receipt["selected"])
+        )
+        path = self.module.write_context_receipt(ROOT, receipt)
+        try:
+            self.assertTrue(path.name.startswith("control-pr-104-"))
+        finally:
+            path.unlink(missing_ok=True)
+
     def test_large_file_is_never_inlined(self) -> None:
         with tempfile.TemporaryDirectory() as directory:
             path = Path(directory) / "large.bin"

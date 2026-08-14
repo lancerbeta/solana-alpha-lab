@@ -707,6 +707,118 @@ def build_context_receipt(
     return receipt
 
 
+def build_live_pr_head_receipt(
+    root: Path,
+    *,
+    pr_number: int,
+    route: str,
+    profile_path: str = PROFILE_PATH,
+) -> dict[str, Any]:
+    root = root.resolve()
+    if type(pr_number) is not int or pr_number < 1:
+        raise ValueError("PR_NUMBER_INVALID")
+    harness = load_closed_document(
+        root / HARNESS_PATH,
+        root / "catalog/schemas/delivery_harness.schema.json",
+    )
+    if route not in harness["active_routes"]:
+        raise ValueError("ACTIVE_ROUTE_UNKNOWN")
+    merge_policy = harness["merge_policy"]
+    if "LIVE_PR_HEAD" not in merge_policy["identity_modes"]:
+        raise ValueError("LIVE_PR_HEAD_NOT_ENABLED")
+    profile_relative = safe_relative_path(profile_path)
+    profile = load_closed_document(
+        root / profile_relative,
+        root / "catalog/schemas/delivery_harness_project_profile.schema.json",
+    )
+    validate_repository_origin(root, profile["repository"]["name"])
+    context_map = load_closed_document(
+        root / profile["bindings"]["context_map"],
+        root / "catalog/schemas/delivery_harness_context_map.schema.json",
+    )
+    validate_context_role_set(context_map)
+    budgets = profile["context_budgets"]
+    max_inline = budgets["auto_inline_file_max_bytes"]
+    identity = git_identity(root)
+    role_by_id = {role["semantic_role"]: role for role in context_map["roles"]}
+    selected: list[dict[str, Any]] = []
+    gaps: list[dict[str, Any]] = []
+    for relative in ("AGENTS.md", profile_relative):
+        selected.append(
+            reference_for_path(
+                root,
+                relative,
+                semantic_role="MISSION_AND_INVARIANTS",
+                lane="L0",
+                truth_owner="REPOSITORY_POLICY",
+                stable_id=("CTRL-AGENTS-001" if relative == "AGENTS.md" else "SOLANA_ALPHA_LAB_V1"),
+                max_inline_bytes=max_inline,
+            )
+        )
+    gaps.append(explicit_gap(role_by_id["PRODUCT_ROADMAP"], "NO_EXACT_GIT_ROADMAP_BOUND"))
+    control_payload = {
+        "pr_number": pr_number,
+        "identity_mode": "LIVE_PR_HEAD",
+        "head": identity["head"],
+    }
+    selected.append(
+        metadata_reference(
+            semantic_role="ACTIVE_BOUNDED_WORK",
+            lane="L1",
+            truth_owner="LIVE_PR_HEAD",
+            path=f"github/pull/{pr_number}",
+            stable_id="CONTROL-PR",
+            payload=control_payload,
+        )
+    )
+    selected.append(
+        metadata_reference(
+            semantic_role="IMPLEMENTATION_STATE",
+            lane="L1",
+            truth_owner="GIT",
+            path="git/HEAD",
+            stable_id=identity["head"],
+            payload=identity,
+        )
+    )
+    for role_id in (
+        "LIFECYCLE",
+        "EXTERNAL_ROUTE_KNOWLEDGE",
+        "ARCHITECTURE_DECISIONS",
+        "DELIVERY_EVIDENCE",
+        "HISTORICAL_CONTEXT",
+    ):
+        gaps.append(explicit_gap(role_by_id[role_id], "DEFERRED_ON_DEMAND"))
+    selected.sort(
+        key=lambda item: (
+            item["lane"],
+            item["semantic_role"],
+            item["stable_id"] or "",
+            item["path"],
+        )
+    )
+    gaps.sort(key=lambda item: (item["lane"], item["semantic_role"]))
+    receipt: dict[str, Any] = {
+        "schema": "smial.delivery-context-receipt",
+        "schema_version": "1.0",
+        "harness_id": harness["harness_id"],
+        "route": route,
+        "cloud_bundle_mode": harness["cloud_bundle"]["mode"],
+        "repository": {"name": profile["repository"]["name"], **identity},
+        "control_pr": {"pr_number": pr_number, "identity_mode": "LIVE_PR_HEAD"},
+        "selected": selected,
+        "gaps": gaps,
+        "budgets": budgets,
+    }
+    receipt["receipt_sha256"] = sha256_bytes(canonical_json_bytes(receipt))
+    errors = validate_context_receipt(receipt, root=root)
+    if errors:
+        raise ValueError(errors[0])
+    if len(canonical_json_bytes(receipt)) > budgets["ordinary_receipt_max_bytes"]:
+        raise ValueError("CONTEXT_RECEIPT_BUDGET_EXCEEDED")
+    return receipt
+
+
 def validate_context_receipt(
     receipt: dict[str, Any], *, root: Path = ROOT
 ) -> list[str]:
@@ -726,12 +838,17 @@ def write_context_receipt(root: Path, receipt: dict[str, Any]) -> Path:
     errors = validate_context_receipt(receipt, root=root)
     if errors:
         raise ValueError(errors[0])
-    task_id = receipt["task"]["task_id"]
-    if not SAFE_TASK_ID.fullmatch(task_id):
-        raise ValueError("TASK_ID_INVALID")
+    control_pr = receipt.get("control_pr")
+    if isinstance(control_pr, dict) and control_pr.get("identity_mode") == "LIVE_PR_HEAD":
+        label = f"control-pr-{control_pr['pr_number']}"
+    else:
+        task_id = receipt["task"]["task_id"]
+        if not SAFE_TASK_ID.fullmatch(task_id):
+            raise ValueError("TASK_ID_INVALID")
+        label = task_id.lower()
     directory = root.resolve() / "local/delivery_harness/context"
     directory.mkdir(parents=True, exist_ok=True)
-    path = directory / f"{task_id.lower()}-{receipt['receipt_sha256'][:12]}.json"
+    path = directory / f"{label}-{receipt['receipt_sha256'][:12]}.json"
     path.write_bytes(json.dumps(receipt, indent=2, ensure_ascii=False, sort_keys=True).encode("utf-8") + b"\n")
     return path
 
@@ -1264,8 +1381,9 @@ def parse_args() -> argparse.Namespace:
     check.add_argument("--format", choices=("json",), default="json")
     context = sub.add_parser("context")
     context.add_argument("--root", type=Path, default=ROOT)
-    context.add_argument("--task-id", required=True)
-    context.add_argument("--contract", required=True)
+    context.add_argument("--task-id")
+    context.add_argument("--contract")
+    context.add_argument("--pr", type=int)
     context.add_argument("--route", required=True)
     context.add_argument("--write-receipt", action="store_true")
     context.add_argument("--format", choices=("json",), default="json")
@@ -1317,12 +1435,21 @@ def main() -> int:
             result = apply_initialization(args.target, plan)
         print(json.dumps(result, indent=2, ensure_ascii=False, sort_keys=True))
         return 0 if result.get("decision") not in {"CONFLICT_REFUSAL"} else 2
-    receipt = build_context_receipt(
-        args.root,
-        task_id=args.task_id,
-        task_contract=args.contract,
-        route=args.route,
-    )
+    if args.pr is not None:
+        if args.task_id is not None or args.contract is not None:
+            raise ValueError("CONTEXT_IDENTITY_MODE_CONFLICT")
+        receipt = build_live_pr_head_receipt(
+            args.root, pr_number=args.pr, route=args.route
+        )
+    else:
+        if not args.task_id or not args.contract:
+            raise ValueError("TASK_CONTRACT_EXACT_PATH_REQUIRED")
+        receipt = build_context_receipt(
+            args.root,
+            task_id=args.task_id,
+            task_contract=args.contract,
+            route=args.route,
+        )
     if args.write_receipt:
         path = write_context_receipt(args.root, receipt)
         receipt = {**receipt, "local_receipt": path.relative_to(args.root.resolve()).as_posix()}

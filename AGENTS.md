@@ -56,12 +56,15 @@ change, real money/wallet/signer/transaction, unresolved truth/safety conflict,
 or a stricter task stop. Failed machine evidence is `DENY`; reassurance cannot
 override it.
 
-Both direct agents stop once for the exact owner phrase bound to the current PR
-and unchanged 40-hex head. After re-reading repository, PR, head, mergeability,
-checks, unresolved reviews, write set and exclusions, either direct agent may
-perform one ordinary guarded merge only when the v2 gate returns `AUTONOMOUS`.
-Then read back exact `main` and post-merge CI. No force push, history rewrite,
-branch deletion or settings change.
+Both direct agents stop once after exact-head CI for the exact owner phrase bound
+to the current PR and unchanged 40-hex head. The owner never clicks GitHub Merge.
+After re-reading repository, PR, head, mergeability, checks, unresolved reviews,
+write set and exclusions, the elected direct agent performs one ordinary guarded
+merge only when the v2 gate returns `AUTONOMOUS`. Harness or control PRs bind a
+local `LIVE_PR_HEAD` receipt via `scripts/delivery_harness.py context --pr`;
+product work still uses an exact task contract. Then read back exact `main` and
+post-merge CI. No force push, history rewrite, branch deletion or settings
+change.
 
 ## DELIVERY_WORKFLOW
 
