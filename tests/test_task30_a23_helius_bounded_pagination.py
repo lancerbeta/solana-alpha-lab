@@ -42,6 +42,7 @@ CONTRACT_PATH = ROOT / "docs/contracts/task30_a23_helius_bounded_pagination_comp
 SCRIPT_PATH = ROOT / "scripts/run_task30_a23_helius_bounded_pagination.py"
 RUNTIME_PATH = ROOT / "docs/evidence/task30/a23_helius_bounded_pagination_runtime_receipt_v1.json"
 ACCEPTANCE_PATH = ROOT / "docs/evidence/task30/a23_helius_bounded_pagination_acceptance_v1.json"
+TASK_PATH = ROOT / "docs/tasks/TASK-30-a23-helius-bounded-pagination-complete-batch.md"
 RAW_ROOT = ROOT / "local/task30_a23_helius_bounded_pagination"
 
 
@@ -168,6 +169,25 @@ class Task30A23HeliusBoundedPaginationApiTests(unittest.TestCase):
 
 
 class Task30A23HeliusBoundedPaginationBehaviorTests(unittest.TestCase):
+    def test_task_context_projects_terminal_delivery_evidence(self) -> None:
+        """Catches a task receipt that cannot ground Factory Fit at merge."""
+
+        task_text = TASK_PATH.read_text(encoding="utf-8")
+        task_meta = yaml.safe_load(task_text.split("---", 2)[1])
+        delivery_paths = task_meta["context_requirements"]["exact_role_paths"][
+            "DELIVERY_EVIDENCE"
+        ]
+        self.assertEqual(
+            delivery_paths,
+            [
+                "docs/evidence/task30/a22_helius_get_transactions_for_address_runtime_receipt_v1.json",
+                "docs/evidence/task30/a22_helius_get_transactions_for_address_acceptance_v1.json",
+                "docs/evidence/task30/a23_delivery_completion_evidence_v1.json",
+                "docs/evidence/task30/a23_delivery_independent_review_v1.json",
+                "docs/evidence/task30/a23_delivery_factory_fit_v1.json",
+            ],
+        )
+
     def test_acceptance_binds_complete_batch_without_task30_promotion(self) -> None:
         """Catches an acceptance that overclaims or points at stale artifacts."""
 

@@ -87,6 +87,9 @@ context_requirements:
     DELIVERY_EVIDENCE:
       - docs/evidence/task30/a22_helius_get_transactions_for_address_runtime_receipt_v1.json
       - docs/evidence/task30/a22_helius_get_transactions_for_address_acceptance_v1.json
+      - docs/evidence/task30/a23_delivery_completion_evidence_v1.json
+      - docs/evidence/task30/a23_delivery_independent_review_v1.json
+      - docs/evidence/task30/a23_delivery_factory_fit_v1.json
     HISTORICAL_CONTEXT: []
 ---
 

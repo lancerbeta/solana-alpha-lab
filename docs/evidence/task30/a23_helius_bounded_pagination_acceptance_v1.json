@@ -120,14 +120,14 @@
     "account_plan_or_free_quota_verified": false
   },
   "artifact_bindings": {
-    "task": {"path": "docs/tasks/TASK-30-a23-helius-bounded-pagination-complete-batch.md", "sha256": "41bc6689565654c28cef602c739ea807b7c7e96bbca63adbce9a73d968099702"},
+    "task": {"path": "docs/tasks/TASK-30-a23-helius-bounded-pagination-complete-batch.md", "sha256": "822ef362c3c4132fc2bf68957ccc84154ea739be5a5f1c875c26d5e15db0446a"},
     "contract": {"path": "docs/contracts/task30_a23_helius_bounded_pagination_complete_batch_contract_v1.md", "sha256": "a03a5dfa7cb720783de19088fb685a60ed4a8767727ccb98c9fa88bd86649ad3"},
     "configuration": {"path": "configs/task30_a23_helius_bounded_pagination_complete_batch_v1.yaml", "sha256": "b786f05ce6dead10c5aa8f1bce6f1d3254d5261d5d3bbfa89d3a77737a1d0821"},
     "schema": {"path": "catalog/schemas/task30_a23_helius_bounded_pagination_complete_batch.schema.json", "sha256": "0fe5f50abc1d711b9adff5e31416f96f59f5116cf4eeab74bd8c0ed79074705a"},
     "fixture": {"path": "tests/fixtures/task30/helius_bounded_pagination_v1.json", "sha256": "3dafdbec8e66c11d92267987c03b5159ab734f0c383f31924a78143ec321bdeb"},
     "module": {"path": "src/solana_alpha_lab/task30_helius_bounded_pagination.py", "sha256": "255e7b5ad5d9f3b9abe4c58f2aa07432f66ee8211c11bdbea9c2757a93977584"},
     "script": {"path": "scripts/run_task30_a23_helius_bounded_pagination.py", "sha256": "7572203c8c4aaf4d9689b4bb12318bfda0584b73ca50069ddfcec3e4f1bd023e"},
-    "test": {"path": "tests/test_task30_a23_helius_bounded_pagination.py", "sha256": "4267806e06b8a2e946854c2fb1d188c7b3b9cc6aa2c66b141263a54b1ab0bc12"},
+    "test": {"path": "tests/test_task30_a23_helius_bounded_pagination.py", "sha256": "9b573c253a2c35d9b3b979b0fa657b4fa4c0e7dbb7a7ea811a552a267910fc5d"},
     "runtime": {"path": "docs/evidence/task30/a23_helius_bounded_pagination_runtime_receipt_v1.json", "sha256": "7aa03c53222f64a462270994304fe512a4b5d91e5fc3781e31ce50e26a5dbeca"},
     "report": {"path": "docs/reports/task30/a23_helius_bounded_pagination_readout_v1.md", "sha256": "c429d73287bd6330cab84119a05b9fddbf0e326328731ae5fe31d4568cc01335"},
     "provider_registry": {"path": "configs/provider_route_capability_registry_v6.yaml", "sha256": "b9642b77c300c81aedebc4aa464284fe244a7553bb3a37bdbb344d68594df580"}
