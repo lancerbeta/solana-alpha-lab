@@ -4,8 +4,8 @@
   "review_id": "T30-A22-DELIVERY-INDEPENDENT-REVIEW-001",
   "as_of": "2026-08-14",
   "task_id": "TASK-30",
-  "reviewed_bindings_sha256": "338ed0c936cf8850551453c7fe475c9851d30b046b0e1ff39aae6a33d6e62b9a",
-  "reviewed_inventory_sha256": "ee0e11bb5bb812234f6a9e3a87e0db9a1919cab54470cac40ce3a86f03896cfa",
+  "reviewed_bindings_sha256": "d864124a7052da8006ded0cf4e3ed1ffa07e609746c767d72b81982b0cd34bbb",
+  "reviewed_inventory_sha256": "22c0fa326ca88fc6627b69959b1cbf6a115c08a86516a7e686a0ae356aaa1f60",
   "required_roles": ["CODE_REVIEWER", "GOAL_DOD_CRITIC", "ARCHITECTURE_CRITIC"],
   "reviews": [
     {"role": "CODE_REVIEWER", "verdict": "PASS", "findings": []},
