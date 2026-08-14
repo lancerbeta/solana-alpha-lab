@@ -220,7 +220,7 @@ class LiveRouteContractTests(unittest.TestCase):
                 with self.subTest(path=relative, phrase=phrase):
                     self.assertNotIn(phrase, text)
 
-    def test_live_route_role_invariants_are_present(self) -> None:
+    def test_direct_route_and_dormant_baton_invariants_are_present(self) -> None:
         authority = (ROOT / ".cursor/rules/00-authority.mdc").read_text(encoding="utf-8")
         protocol = (ROOT / "docs/agent/GITHUB_BATON_PROTOCOL.md").read_text(
             encoding="utf-8"
@@ -229,24 +229,24 @@ class LiveRouteContractTests(unittest.TestCase):
             ROOT / "docs/tasks/CTRL-CURSOR-WORKPLACE-RECONCILIATION.md"
         ).read_text(encoding="utf-8")
         agents = (ROOT / "AGENTS.md").read_text(encoding="utf-8")
-        self.assertIn("PROJECT_CHAT_PRIMARY", authority)
-        self.assertIn("TRANSPORT_AND_AUDIT", authority)
-        self.assertIn("EXECUTION_ONLY", authority)
-        self.assertIn("PROJECT_CHAT_PRIMARY", protocol)
+        self.assertIn("DIRECT_CURSOR_DELIVERY", authority)
+        self.assertIn("same guarded merge right", authority)
+        self.assertNotIn("PROJECT_CHAT_PRIMARY", authority)
+        self.assertIn("status: DORMANT_HISTORICAL", protocol)
+        self.assertIn("NO ACTIVE AUTHORITY", protocol)
+        self.assertIn("scripts/baton_contract.py", protocol)
         self.assertIn(
             "current_owning_surface: LOCAL_WORK_PRIMARY",
             reconciliation,
         )
         self.assertIn("`LOCAL_WORK_PRIMARY`", reconciliation)
         self.assertIn(
-            "`CONTROL_PLANE` = `PROJECT_CHAT_PRIMARY`",
-            reconciliation,
-        )
-        self.assertIn(
             "CWR-A4_WORK_REELECTION_FAIL_CLOSED_REPAIR",
             reconciliation,
         )
-        self.assertIn("live accepted", agents.lower())
+        self.assertIn("DIRECT_CODEX_DELIVERY", agents)
+        self.assertIn("DIRECT_CURSOR_DELIVERY", agents)
+        self.assertIn("LEGACY_GITHUB_BATON_DORMANT", agents)
 
 
 if __name__ == "__main__":

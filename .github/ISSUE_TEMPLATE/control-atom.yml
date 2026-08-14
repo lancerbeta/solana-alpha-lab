@@ -1,12 +1,16 @@
-name: Control Atom Contract
-description: Manual fallback form for a revision-locked GitHub Baton Atom Contract.
+name: Historical Control Atom (inactive)
+description: Archived Baton transport example; not an active task or authority route.
 title: "[CTRL-ATOM] "
 body:
   - type: markdown
     attributes:
       value: |
-        Project Chat GPT control plane owns the Atom Contract, routing, semantic
-        acceptance, canonical status and DONE.
+        **DORMANT HISTORICAL ARTIFACT — DO NOT USE TO START OR ROUTE WORK.**
+
+        The active entrypoint is the repository Delivery Harness through
+        `AGENTS.md` and an exact Git task contract. This form remains only so
+        old audit references keep resolving; it grants no task-selection,
+        execution, merge or status authority.
 
         This Issue body is **mutable transport infrastructure**, not the trust
         anchor. Cursor must compare extracted contract bytes to an

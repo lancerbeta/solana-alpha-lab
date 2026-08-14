@@ -1,69 +1,51 @@
-## Contract
+## Delivery Harness contract
 
-- Contract ID:
-- Contract revision:
-- Out-of-band expected SHA-256:
-- Linked control Issue:
+- Harness ID: `DELIVERY_HARNESS_V1`
+- Route (`DIRECT_CODEX_DELIVERY` / `DIRECT_CURSOR_DELIVERY` / `DESIGN_ONLY`):
+- Exact task ID and contract path:
+- Context receipt SHA-256:
+- Candidate commit/tree:
+- Managed write set and exact changed files:
 
-## Objective and scope
+## Outcome and evidence
 
-- Objective:
-- Managed write set:
-- Authority class:
+- Owner decision / decision delta:
+- Named consumer:
+- Cheapest falsifier:
+- Targeted checks:
+- Single full-gate owner:
+- Full-gate receipt/reuse/`FULL_VALIDATION=DELEGATED_TO_CI`:
+- Review routes and `SINGLE_AGENT_REVIEW_FALLBACK` if used:
+- Factory Fit / Product Horizon:
+- Capability radar:
 
-## Exact changed files
+## Safety and side effects
 
--
-
-## Files outside managed write set
-
-- None / list:
-
-## Validation
-
-- Candidate commit/tree or staged fingerprint:
-- Targeted commands:
-- Single full-gate owner (`Cursor` / `Codex` / `GitHub CI`):
-- Full-gate receipt, reuse, or `FULL_VALIDATION=DELEGATED_TO_CI`:
-- Catalog delta:
-
-## Side effects
-
-- GitHub reads:
-- GitHub writes:
-- Provider calls:
-- Cash spend USD:
+- Secrets or absolute user paths: none
+- Provider/API/RPC/WSS calls:
+- Credentials:
 - Wallet/signer/transaction actions:
+- Cash spend:
+- Dependency/deploy/settings/destructive changes:
+- Cloud bundle mode: `OWNER_MANAGED_OPTIONAL_EXPORT`
+- Cloud bundle replacement/smoke requested by harness: no
 
-## Security
+## Limitations and rollback
 
-- Secrets exposed: no
-- Absolute user paths: no
+- Non-claims:
+- Known gaps:
+- Rollback:
 
-## Limitations / blockers
+## OWNER_ATTENTION_GATE_V2
 
--
-
-## Rollback
-
--
-
-## GPT acceptance status
-
-- Not accepted / accepted by GPT control plane:
-
-## OWNER_ATTENTION_GATE and merge status
-
-- Execution route:
-- Exact PR head:
+- Exact PR/head:
+- Machine preconditions:
+- Owner approval phrase present and bound:
 - Gate decision (`AUTONOMOUS` / `OWNER_ATTENTION_REQUIRED` / `DENY`):
-- Merge preconditions all PASS:
-- Post-merge exact main read-back / main CI:
+- Post-merge exact main / main CI:
 
 ---
 
-Draft PR is candidate evidence, not canonical acceptance.
-Cursor never merges. Local Codex merges only after `OWNER_ATTENTION_GATE`
-returns `AUTONOMOUS` for the exact head; baton-route merge returns to the
-Project Chat/owner boundary.
-Commit/tests/CI do not establish DONE.
+Draft PR is candidate evidence, not semantic acceptance. Tests, PR, CI and
+merge do not establish canonical DONE. Cursor and Codex merge only after the
+same exact PR/head owner gate and immediate machine re-read.

@@ -1,0 +1,72 @@
+{
+  "schema": "smial.delivery-harness-capability-radar",
+  "schema_version": "1.0",
+  "radar_id": "DELIVERY_CAPABILITY_RADAR_V1",
+  "harness_id": "DELIVERY_HARNESS_V1",
+  "default_decision": "NONE",
+  "max_candidates": 1,
+  "authority": {
+    "install": false,
+    "credentials": false,
+    "network": false,
+    "paid_plan": false
+  },
+  "candidates": [
+    {
+      "candidate_id": "INCIDENT_TOOL_OR_EQUIVALENT",
+      "conditions_all": ["first_unattended_runtime", "named_incident_consumer"],
+      "named_consumer_required": true,
+      "owner_decision": "Adopt an incident tool only after unattended runtime creates a named response need.",
+      "measurable_value_test": "Reduce incident detection or recovery time against repository-native receipts.",
+      "minimum_permissions": "Read-only incident ingestion until a separate owner gate.",
+      "data_exposure": "Only minimized operational events approved by the project owner.",
+      "security_license_maintenance_cost_check": "required_before_install",
+      "why_now": "Only when a real unattended-runtime consumer exists.",
+      "adoption_order": ["ADOPT", "WRAP", "FORK", "BUILD"],
+      "fallback_without_tool": "repository_native_runtime_receipts",
+      "exit_path": "remove_adapter_and_preserve_receipts"
+    },
+    {
+      "candidate_id": "PRODUCT_ANALYTICS_OR_EQUIVALENT",
+      "conditions_all": ["owner_cockpit_workflow", "named_behavior_question"],
+      "named_consumer_required": true,
+      "owner_decision": "Adopt product analytics only for a named cockpit behavior decision.",
+      "measurable_value_test": "Answer the named behavior question faster than repository-native events.",
+      "minimum_permissions": "Write only explicitly approved product events.",
+      "data_exposure": "Minimized non-secret product events with documented retention.",
+      "security_license_maintenance_cost_check": "required_before_install",
+      "why_now": "Only after an owner-facing workflow and question both exist.",
+      "adoption_order": ["ADOPT", "WRAP", "FORK", "BUILD"],
+      "fallback_without_tool": "repository_native_event_log",
+      "exit_path": "export_events_and_remove_adapter"
+    },
+    {
+      "candidate_id": "REMOTE_ANALYTICS_OR_EQUIVALENT",
+      "conditions_all": ["measured_duckdb_boundary", "second_analytics_consumer"],
+      "named_consumer_required": true,
+      "owner_decision": "Adopt remote analytics only after a measured local boundary affects two consumers.",
+      "measurable_value_test": "Remove the measured bottleneck within an explicit cost and latency budget.",
+      "minimum_permissions": "Dataset-scoped access without administrative credentials.",
+      "data_exposure": "Only approved analytical tables with explicit retention.",
+      "security_license_maintenance_cost_check": "required_before_install",
+      "why_now": "Only after local analytics is measurably insufficient.",
+      "adoption_order": ["ADOPT", "WRAP", "FORK", "BUILD"],
+      "fallback_without_tool": "bounded_local_analytics",
+      "exit_path": "retain_open_files_and_remove_adapter"
+    },
+    {
+      "candidate_id": "VERSIONED_DOCS_CONNECTOR",
+      "conditions_all": ["two_material_version_documentation_delays"],
+      "named_consumer_required": true,
+      "owner_decision": "Add a documentation connector only after repeated version drift costs a decision.",
+      "measurable_value_test": "Prevent the next documented version-delay without widening write authority.",
+      "minimum_permissions": "Read-only access to named official documentation.",
+      "data_exposure": "Public documentation references and bounded query metadata only.",
+      "security_license_maintenance_cost_check": "required_before_install",
+      "why_now": "Only after two material delays prove ordinary search insufficient.",
+      "adoption_order": ["ADOPT", "WRAP", "FORK", "BUILD"],
+      "fallback_without_tool": "official_documentation_search",
+      "exit_path": "remove_connector_and_keep_source_links"
+    }
+  ]
+}

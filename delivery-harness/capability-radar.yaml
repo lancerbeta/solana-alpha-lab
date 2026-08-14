@@ -1,0 +1,60 @@
+schema: smial.delivery-harness-capability-radar
+schema_version: '1.0'
+radar_id: DELIVERY_CAPABILITY_RADAR_V1
+harness_id: DELIVERY_HARNESS_V1
+default_decision: NONE
+max_candidates: 1
+authority:
+  install: false
+  credentials: false
+  network: false
+  paid_plan: false
+candidates:
+  - candidate_id: SENTRY_OR_EQUIVALENT
+    conditions_all: [first_unattended_runtime, named_incident_consumer]
+    named_consumer_required: true
+    owner_decision: adopt_incident_monitoring_for_named_unattended_runtime
+    measurable_value_test: catches_one_named_runtime_failure_within_owner_response_slo
+    minimum_permissions: read_runtime_events_write_incident_events_only
+    data_exposure: redacted_operational_metadata_only
+    security_license_maintenance_cost_check: required_before_install
+    why_now: first_unattended_runtime_has_named_incident_consumer
+    adoption_order: [ADOPT, WRAP, FORK, BUILD]
+    fallback_without_tool: repository_native_runtime_receipts
+    exit_path: remove_adapter_and_preserve_receipts
+  - candidate_id: POSTHOG_OR_EQUIVALENT
+    conditions_all: [owner_cockpit_workflow, named_behavior_question]
+    named_consumer_required: true
+    owner_decision: adopt_product_analytics_for_named_owner_workflow_question
+    measurable_value_test: answers_one_repeated_owner_behavior_question_without_manual_log_join
+    minimum_permissions: write_pseudonymous_product_events_read_aggregate_only
+    data_exposure: no_secrets_wallets_or_raw_market_payloads
+    security_license_maintenance_cost_check: required_before_install
+    why_now: owner_cockpit_has_named_behavior_question
+    adoption_order: [ADOPT, WRAP, FORK, BUILD]
+    fallback_without_tool: repository_native_owner_event_log
+    exit_path: export_events_and_remove_adapter
+  - candidate_id: CLICKHOUSE_OR_REMOTE_ANALYTICS
+    conditions_all: [measured_duckdb_boundary, second_analytics_consumer]
+    named_consumer_required: true
+    owner_decision: adopt_remote_analytics_after_measured_local_boundary
+    measurable_value_test: bounded_query_meets_named_consumer_slo_beyond_local_engine
+    minimum_permissions: isolated_dataset_read_write_only
+    data_exposure: minimized_replayable_analytical_rows
+    security_license_maintenance_cost_check: required_before_install
+    why_now: measured_local_boundary_and_second_real_consumer
+    adoption_order: [ADOPT, WRAP, FORK, BUILD]
+    fallback_without_tool: bounded_duckdb_parquet_workflow
+    exit_path: retain_parquet_and_drop_remote_adapter
+  - candidate_id: CONTEXT7_OR_DOCS_MCP
+    conditions_all: [two_material_version_documentation_delays]
+    named_consumer_required: true
+    owner_decision: adopt_versioned_docs_connector_after_repeated_material_delay
+    measurable_value_test: resolves_next_version_specific_blocker_faster_than_official_web_search
+    minimum_permissions: public_documentation_read_only
+    data_exposure: public_documentation_queries_only
+    security_license_maintenance_cost_check: required_before_install
+    why_now: two_material_version_documentation_delays
+    adoption_order: [ADOPT, WRAP, FORK, BUILD]
+    fallback_without_tool: official_web_documentation_search
+    exit_path: remove_connector_and_keep_source_links

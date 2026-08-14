@@ -41,6 +41,7 @@ temp/
 # Local private/import staging
 private/
 local/
+local/delivery_harness/
 staging/
 
 # Isolated local development worktrees

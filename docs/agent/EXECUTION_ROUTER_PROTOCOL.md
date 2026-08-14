@@ -1,219 +1,94 @@
+---
+protocol_id: DELIVERY_EXECUTION_ROUTER_V1
+status: ACTIVE
+as_of: '2026-08-14'
+truth_owner: DELIVERY_HARNESS_V1
+---
+
 # Execution Router Protocol
 
-Beginner-safe routing among three execution routes. Canonical control remains
-with the GPT control plane. Skills are helper procedures, not control owners.
+This protocol elects one route for an exact bounded Git task. The route stays
+fixed for the candidate fingerprint and context receipt.
 
-## GPT control plane
+## Active routes
 
-The GPT control plane is the elected owning ChatGPT Project surface:
+| Route | Actor | Use | Merge |
+|---|---|---|---|
+| `DIRECT_CODEX_DELIVERY` | Codex | bounded repository delivery | exact owner PR/head approval plus machine gate |
+| `DIRECT_CURSOR_DELIVERY` | Cursor | bounded repository delivery | exact owner PR/head approval plus machine gate |
+| `DESIGN_ONLY` | either | read-only design/review with no delivery mutation | forbidden |
 
-- Project Work when `LOCAL_WORK_CODEX` is selected;
-- Project Chat Pro when `PROJECT_CHAT_PRO_GITHUB_BATON_CURSOR` is selected.
+`LEGACY_GITHUB_BATON_DORMANT` is historical and inactive. It cannot select a
+task, receive a new atom, grant execution authority or merge. Historical bytes
+remain under `docs/agent/GITHUB_BATON_PROTOCOL.md`, scripts, fixtures and tests.
 
-For `GPT_ONLY`, the active Project surface that authored the iteration remains
-the control plane. Cursor is always `EXECUTION_ONLY`.
+## Route election
 
-Related:
+Use `DESIGN_ONLY` when no repository mutation or delivery evidence is needed.
+Use the direct route matching the active agent when an exact task contract and
+bounded objective exist. Never route from recency, a branch name, Issue, PR,
+commit, tests or a historical baton receipt.
 
-- `AGENTS.md` — repository contract and input routes
-- `docs/agent/HANDOFF_PROTOCOL.md` — local Work↔Codex handoff
-- `docs/agent/GITHUB_BATON_PROTOCOL.md` — live GitHub Atom Contract baton
-- `docs/decisions/ADR-003-gpt-executor-routing.md` — accepted repository routing ADR
+The elected route receives routine autonomy from `AGENTS.md` and
+`control/owner_attention_gate_v2.yaml`. A stricter task contract wins. A route
+change is `ACTIVE_ROUTE_CHANGED`: stop, replan and issue a new context receipt.
 
-## Control-plane ownership
+## Context and status
 
-The GPT control plane owns:
+Git is working project memory. Generate bounded context through
+`scripts/delivery_harness.py context` from an exact task contract. Cloud Project
+Sources or Project Instruction are `OWNER_MANAGED_OPTIONAL_EXPORT`; never read
+them as active context, request replacement/smoke or block execution/DONE on
+them.
 
-- task selection and roadmap order;
-- research, analysis, architecture, and strategy design;
-- route selection among the three routes below;
-- semantic acceptance and repair decisions;
-- canonical status and `DONE`.
-
-Cursor, when used, is always `EXECUTION_ONLY`. It executes only an explicitly
-scoped bounded objective. `AGENTS.md` standing project autonomy supplies routine
-execution classes, including an exact named-Issue receipt comment; the active
-prompt, handoff, or baton supplies scope and any stricter stops. Cursor never
-selects the current or next canonical task, never declares `DONE`, never
-creates or discovers unrelated Issues, and never infers scope from an Issue,
-PR, commit, tests, or files alone.
-
-## Three routes
-
-### 1. `GPT_ONLY`
-
-GPT performs research, analysis, architecture, strategy, and validation.
-No execution agent is created when repository mutation is unnecessary.
-
-Use when the iteration is design/review only, or when the answer does not
-require local file changes, Git evidence, or executor tooling.
-
-### 2. `LOCAL_WORK_CODEX`
-
-Project Work with the local repository remains the control plane.
-Work may execute directly or use the existing bounded Work↔Codex handoff under
-`docs/agent/HANDOFF_PROTOCOL.md`.
-
-Preserved input routes:
-
-- `DIRECT_PROMPT`
-- `LOCAL_HANDOFF`
-- `ACCEPT_LOCAL_HANDOFF`
-
-### 3. `PROJECT_CHAT_PRO_GITHUB_BATON_CURSOR`
-
-Project Chat Pro remains the primary control plane
-(`CONTROL_PLANE=PROJECT_CHAT_PRIMARY`). GitHub is `TRANSPORT_AND_AUDIT` for a
-revision-locked, content-addressed Atom Contract. Cursor is `EXECUTION_ONLY`
-and executes only that exact atom, returning evidence through an Issue comment
-or PR under standing routine authority unless the contract is stricter. The GPT
-control plane may create/update/read back the exact Atom Contract Issue under
-the same standing grant.
-
-Live accepted input route:
-
-- `GITHUB_BATON`
-
-`GITHUB_BATON` is a live accepted route for this repository control contract. It
-is not a future-only, local-dirty, pre-merge, or uncommitted candidate description.
-The baton machine layer is committed on `main` and used through exact Issue
-transport with out-of-band hash trust. Canonical Project Sources reconciliation
-and roadmap `DONE` remain GPT-owned and may still be pending. MCP and Cursor
-Automations remain deferred.
-
-## Routing criteria
-
-| Situation | Route |
-|---|---|
-| No repository mutation needed | `GPT_ONLY` |
-| Local Work/Codex can complete a bounded atom safely | `LOCAL_WORK_CODEX` |
-| Revision-locked GitHub-transported atom + Cursor execution needed | `PROJECT_CHAT_PRO_GITHUB_BATON_CURSOR` |
-
-Prefer `GPT_ONLY` whenever an executor adds no evidence value. Not every
-project iteration creates an executor.
-
-## When no executor is created
-
-Do not create Cursor, Codex, Cloud Agent, Automation, or MCP executor when:
-
-- the work is research/design/acceptance only;
-- the managed write set would be empty;
-- authority class is read-only and no local evidence package is required;
-- route switching has not been explicitly authorized by the control plane.
-
-## Authority boundaries
-
-Every authorized atom must state:
-
-- exact repository identity;
-- bounded objective and initial managed write set;
-- expected base revision when mutation is allowed;
-- network/cost/dependency caps and stop-before boundaries.
-
-The prompt, handoff, or baton scopes the objective. `STANDING_PROJECT_AUTONOMY`
-supplies routine local write, direct propagation, test, stage, commit,
-exact Atom Contract Issue creation/update/read-back by the GPT control plane,
-exact named-Issue receipt comments by the executor, fetch/read-back, non-force
-task-branch push, PR/review, and CI classes. A stricter contract wins. Cursor
-may add only direct tests, Catalog/hash records, and generated consumers
-necessary to keep the scoped change valid, and must report the final exact
-inventory.
-
-Provider/API/RPC/WSS, credentials, spend, package adoption, deploy, wallet,
-signer, transaction, real money, settings, force/history rewrite, destructive
-cleanup, branch deletion, material product/architecture scope, and user-only
-actions remain owner-attention gates. Evaluate `OWNER_ATTENTION_GATE` from
-`control/owner_attention_gate_v1.yaml` before asking the user or merging.
-`LOCAL_WORK_CODEX` allows Codex ordinary merge only after all exact-head
-machine preconditions pass. Cursor never merges; the
-`PROJECT_CHAT_PRO_GITHUB_BATON_CURSOR` route has no Codex auto-merge grant.
-
-Cursor never:
-
-- chooses TASK-XX or CTRL-XX as “next”;
-- activates canonical Project Sources in the cloud UI or represents a
-  repository candidate as activated truth;
-- widens product semantics or adds unrelated truth owners;
-- performs network/provider/RPC calls without an explicit
-  GPT-control-plane-approved atom.
-
-## Project Sources release control
-
-At Entry Gate, read `docs/project_sources/release_registry_v1.yaml` before
-relying on a repository-authored Source release. At Finish Gate, a changed
-acceptance receipt must declare exactly one project-Sources disposition:
-`NO_CHANGE`, `RELEASE_CANDIDATE` or `ACTIVATION_RECEIPT`.
-
-Only a registered candidate under `docs/project_sources/releases/` may be
-prepared by the repository route. The owner separately replaces cloud UI
-roles and returns the manifest-first seven-role smoke. A PR, merge or CI run
-does not activate cloud Project Sources.
+Repository bytes, tests, PR, CI and merge establish technical evidence only.
+The exact Git task's Finish Gate owns semantic acceptance and canonical DONE.
 
 ## Validation ownership
 
-Use targeted checks while iterating. Elect one full-gate owner for the exact
-candidate fingerprint: Cursor, Codex, or GitHub CI. When CI is guaranteed on
-the same pushed head, Cursor may report targeted evidence and
-`FULL_VALIDATION=DELEGATED_TO_CI`; do not duplicate the full gate merely because
-the same bytes were staged, committed, pushed, or placed in a PR.
+During implementation run targeted checks only. After bootstrap, the guarded
+merge owns the one project-bound gate execution for the unchanged candidate:
+it runs the base-bound focused command and consumes existing exact-head PR CI,
+or machine-selects `--tracked-only-delivery` when that primary route is
+ineligible. Never run the same local full gate once before PR and again at
+merge. `CI_OWNED_DELIVERY_PILOT` remains an observation policy inside this
+route: focused work is capped at 120 seconds and the three-observation
+keep/repair/rollback rule remains unchanged. The first harness installation is
+the sole exception: because v2 does not exist on its frozen base, the
+predecessor exact-owner route requires one pre-PR tracked-only gate.
 
-### CI_OWNED_DELIVERY_PILOT
+The exact pilot command retained for policy verification is
+`uv run --locked --managed-python python -B scripts/validate_ci.py --ci-owned-delivery`.
+`GITHUB_PR_EXACT_HEAD_CI` admits the next three eligible observations; record
+`observation N/3`, require 3/3 and seven minutes saved, and do not admit a
+fourth before keep/repair/rollback. A missed clean-checkout defect falls back
+to `--tracked-only-delivery`.
 
-For the next three eligible bounded offline/routine candidates, run
-`uv run --locked --managed-python python -B scripts/validate_ci.py --ci-owned-delivery`
-on the exact committed tracked-clean bytes. The focused local gate retains
-security, baton, Catalog, generated-view, architecture, lock, workflow, skip
-and hook checks and must finish within 120 seconds. Workflow, dependency/lock,
-validation/security/control-policy, schema/migration or validation-test changes,
-plus any ambiguous candidate, fall back to `--tracked-only-delivery`.
+## Owner attention and guarded merge
 
-`GITHUB_PR_EXACT_HEAD_CI` is the sole clean-checkout/full-suite owner: require
-the first pushed exact head before merge and exact-main CI after merge. Keep the
-route only after 3/3 first-head passes without repair and at least seven minutes
-saved per eligible delivery. A false admission, missed clean-checkout or
-local-data defect, omitted-local-coverage failure, or focused gate above
-120 seconds disables the route and restores `--tracked-only-delivery`.
+Routine bounded local/GitHub delivery continues without micro-approval. Stop
+for the material/external/user-only/destructive/safety gates in
+`OWNER_ATTENTION_GATE_V2`.
 
-Read prior merged PR validation evidence before admission and record
-`CTRL-CI-OWNED-DELIVERY-PILOT-V1 observation N/3` plus the focused receipt
-summary in the current PR. After observation 3/3, do not admit a fourth
-candidate until the pilot keep/repair/rollback review.
+Both direct routes stop for exactly:
 
-## Route switching rules
+`PR #<number>, head <40 lowercase hex> проверен; ready + merge разрешаю.`
 
-- Route changes require an explicit control-plane decision in the active prompt
-  or named handoff/baton.
-- Silent mid-task ownership transfer is forbidden.
-- Switching from `GPT_ONLY` to an executor requires a bounded objective and
-  scope; routine classes come from standing project autonomy.
-- Switching into `GITHUB_BATON` requires a new Atom Contract revision and hash
-  when material terms change.
-- Skills such as start/finish helpers may advise; they do not own routing or
-  canonical status.
+Immediately before mutation re-read repository, PR, head, mergeability,
+required tests/CI/full gate/Factory Fit, write set, secret scan, unresolved
+reviews, standard-merge mode, branch preservation and settings. A stale head or
+failed check is `DENY`, not a human override prompt. On `AUTONOMOUS`, perform
+one ordinary merge, preserve the feature branch/settings and read back exact
+the profile's exact default branch plus its post-merge CI.
 
-## Beginner-safe startup model
+## Startup
 
-1. Read `AGENTS.md`.
-2. Identify the active input route from the current prompt only.
-3. Confirm the route, objective, scope, caps, and stricter stops.
-4. If `GPT_ONLY`, stop after analysis; create no executor.
-5. If local handoff, follow `HANDOFF_PROTOCOL.md` path rules exactly.
-6. If GitHub baton, follow `GITHUB_BATON_PROTOCOL.md` preflight before any write.
-7. Execute the named atom through routine delivery; stop only at a stated or
-   excluded boundary.
+1. Read `AGENTS.md`, harness and elected profile.
+2. Run `scripts/delivery_harness.py check`.
+3. Require exact task ID and exact Git task-contract path.
+4. Generate the context receipt and report explicit gaps.
+5. Freeze Task Outcome Brief, evidence budget, write set and route.
+6. Execute the Delivery Harness skill through the first real boundary.
 
-## Failure and stop conditions
-
-Stop without mutation when:
-
-- repository identity, branch, HEAD/tree, or upstream mismatch expected base;
-- worktree is dirty before a mutation atom that requires clean state;
-- contract hash, revision, objective, caps, or scope is missing/invalid;
-- managed write set is absent or would be exceeded;
-- secrets, absolute machine paths, or out-of-workspace paths appear;
-- GitHub action is outside standing routine transport or violates a stricter
-  contract; provider/credentialed network action lacks an exact gate;
-- acceptance or `DONE` is requested from an execution-only agent.
-
-On stop, return `BLOCKED` with exact observed versus expected facts. Do not
-guess the next task.
+If any identity, contract, scope, route, write-set, safety or authority fact is
+missing/conflicting, stop with a stable reason. Do not guess the next task.

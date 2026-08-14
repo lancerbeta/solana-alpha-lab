@@ -1,14 +1,16 @@
 {
   "schema": "smial.active-time-gates",
-  "schema_version": "1.0",
-  "as_of": "2026-08-01T18:13:07.833538Z",
+  "schema_version": "1.1",
+  "as_of": "2026-08-14",
+  "historical_gate_state_as_of": "2026-08-01T18:13:07.833538Z",
+  "policy_reconciled_on": "2026-08-14",
   "contains_secrets": false,
   "resume_router": {
     "router_id": "TASK21-DURABLE-RESUME-ROUTER-001",
-    "router_version": "1.0",
+    "router_version": "1.1",
     "task_id": "TASK-21",
-    "status": "A8_MERGED_PENDING_TASK21_FINISH_SOURCE_ACTIVATION",
-    "entry_rule": "READ_MARKER_THEN_RUN_FINISH_GATE_PULSE_BEFORE_TASK21_OR_TASK22_CONTINUATION",
+    "status": "TERMINAL_DORMANT_OWNER_EXPORT_OPTIONAL",
+    "entry_rule": "HISTORICAL_COMPATIBILITY_ONLY_NO_ACTIVE_RESUME_ACTION",
     "read_only_command": [
       "uv",
       "run",
@@ -22,13 +24,12 @@
     "required_sequence": [
       "READ_REPOSITORY_AGENTS",
       "READ_ACTIVE_TIME_GATE_MARKER",
-      "RUN_FINISH_GATE_PULSE_READ_ONLY",
       "CONFIRM_A7_ACCEPTANCE_AND_FINAL_RECOVERY_IDENTITY",
       "CONFIRM_PR28_A8_MERGE_TREE_AND_MAIN_CI",
-      "COMPLETE_TASK21_FINISH_SOURCE_ACTIVATION_AND_USER_SMOKE",
-      "DO_NOT_START_TASK22_BEFORE_TASK21_DONE_CONFIRMED"
+      "TREAT_CLOUD_EXPORT_AS_OWNER_MANAGED_OPTIONAL",
+      "CONTINUE_FROM_CURRENT_CANONICAL_TASK"
     ],
-    "due_gate_precedence": "AT_OR_AFTER_EARLIEST_AT_ROUTE_REQUIRED_NEXT_ATOM_BEFORE_NEW_MUTATION",
+    "due_gate_precedence": "NONE_TERMINAL_DORMANT",
     "active_gate_id": null,
     "fallback_read_set": [
       "control/active_time_gates.json",
@@ -40,7 +41,7 @@
     "binding": {
       "config": {
           "path": "configs/t21_finish_gate_read_model_v1.yaml",
-          "sha256": "d7ebb3ab547717f6fc33fcd6b2249ec43db2dc0ba9facc40d133f3150a7efbdf"
+          "sha256": "8d6ab301b7120296d801aa17d872c57971a583d1e9f22b4171ca022f98237181"
       },
       "contract": {
           "path": "docs/contracts/task21_dataset_freeze_acceptance_contract_v1.md",
@@ -91,7 +92,7 @@
           "path": "docs/roadmap_patches/task21_product_vision_followups_v1.md",
           "sha256": "925b6398056b81c7baa71b5a7217dd50aaf2408a4bf199aac55cdd52302542a5"
         },
-        "project_source_activation": "PENDING_TASK21_FINISH_BUNDLE_AND_USER_SMOKE"
+        "project_source_activation": "OWNER_MANAGED_OPTIONAL_EXPORT"
       },
       "next_atom": "T21-A8_REPOSITORY_DELIVERY_V1",
       "next_atom_authorized": false,
@@ -112,7 +113,7 @@
       "main_ci_run": 30711629023,
       "branch_preserved": true,
       "task22_started": false,
-      "next_boundary": "TASK21_FINISH_SOURCE_ACTIVATION_AND_SMOKE"
+      "next_boundary": "TERMINAL_NO_OWNER_ACTION"
     }
   },
   "gates": [

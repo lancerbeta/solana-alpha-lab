@@ -1,44 +1,24 @@
 ---
-description: Cursor is EXECUTION_ONLY; GPT owns status and DONE
+description: Always-on direct delivery authority and exact owner boundary
+globs: []
 alwaysApply: true
 ---
 
-# Authority
+# Direct delivery authority
 
-- The GPT control plane owns task selection, acceptance, canonical status, and `DONE`.
-- Elected surface: Project Work for `LOCAL_WORK_CODEX`; Project Chat Pro for `PROJECT_CHAT_PRO_GITHUB_BATON_CURSOR`.
-- On the live baton route, `CONTROL_PLANE` equals `PROJECT_CHAT_PRIMARY`; GitHub
-  is `TRANSPORT_AND_AUDIT`; Cursor is `EXECUTION_ONLY`.
-- Project Chat owns task selection, Entry Gate, architecture, Atom Contract,
-  semantic acceptance, canonical status, reconciliation, and `DONE`.
-- GitHub stores mutable transport and evidence only; it never selects tasks or
-  changes canonical status.
-- Cursor is always `EXECUTION_ONLY`.
-- Never select the current or next canonical task.
-- Never infer authority from an Issue, PR, commit, tests, or files alone.
-- The active prompt, handoff, or baton supplies the bounded objective and
-  scope. `AGENTS.md` `STANDING_PROJECT_AUTONOMY` supplies routine execution
-  authority for local writes, direct propagation consumers, tests, exact
-  staging, exact named-Issue receipt comments, ordinary commits,
-  fetch/read-back, non-force task-branch push, PR/review, and CI interaction
-  unless the active contract is stricter. Cursor does not create or discover
-  unrelated Issues.
-- Proceed through those routine steps without asking the user for another
-  approval. Report the final exact inventory and side effects.
-- Stop for material scope/estimand/data-contract/safety changes and the
-  excluded provider, credential, spend, wallet, destructive, settings, and
-  user-only boundaries listed in `AGENTS.md`.
-- Apply repository `OWNER_ATTENTION_GATE` before any owner prompt. Cursor never merges.
-  The local Codex auto-merge grant does not transfer to the
-  `PROJECT_CHAT_PRO_GITHUB_BATON_CURSOR` route.
-- Local validation and GPT semantic acceptance are gates, not authority grants.
-- Follow `AGENTS.md` and `docs/agent/EXECUTION_ROUTER_PROTOCOL.md`.
-- Skills advise; they do not own control-plane status.
-
-## Imported lifecycle skill isolation
-
-- The user skills `start-solana-task` and `finish-solana-task` are non-executable in Cursor. They may be read only to report conflicts with `AGENTS.md` or project rules.
-- Cursor must not use those skills to run an Entry Gate, Finish Gate, emit `DONE_CONFIRMED`, select a current or next canonical task, perform a skill auto-chain, or invoke `refactor-solana-lab`.
-- Conversational cues such as `продолжай`, `что дальше`, or a task appearing complete grant no lifecycle-skill authority. Cursor acts only on an explicit GPT-control-plane-approved route and exact atom.
-- Cursor must not claim semantic acceptance, canonical status changes, or `DONE`.
-- This isolation does not disable third-party skill import or unrelated skills.
+- Read `AGENTS.md`, `delivery-harness/harness.yaml` and the elected project
+  profile. Use only `DIRECT_CURSOR_DELIVERY`, `DIRECT_CODEX_DELIVERY` or
+  `DESIGN_ONLY`; historical transport artifacts grant no active authority.
+- Work only from an exact task contract. Do not infer the current/next task from
+  recency, branch names, Issues, PRs, commits, tests or chat history.
+- Routine bounded engineering, tests, Catalog/generated propagation, ordinary
+  commits, non-force push, PR/review and CI are autonomous inside the stricter
+  task contract. Do not ask for micro-approvals.
+- Evaluate `OWNER_ATTENTION_GATE_V2` for material/external/user-only/destructive
+  boundaries and merge. Failed machine checks are `DENY`.
+- Cursor and Codex have the same guarded merge right: only after the exact
+  owner phrase for the unchanged PR/head and immediate machine re-read.
+- Git is working project memory. Cloud bundle/Project Instruction is
+  `OWNER_MANAGED_OPTIONAL_EXPORT`; never request replacement or smoke.
+- Tests, PR, CI or merge do not by themselves establish semantic acceptance,
+  canonical `DONE`, alpha or cashflow.

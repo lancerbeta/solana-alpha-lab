@@ -1,11 +1,13 @@
 schema: smial.t21_finish_gate_read_model
-schema_version: '1.0'
+schema_version: '1.1'
 read_model_id: OWNER-PULSE-T21-FINISH-001
-read_model_version: '1.0'
+read_model_version: '1.1'
 task_id: TASK-21
 atom_id: TASK21_FINISH_GATE_RECONCILIATION_V1
-status: FORWARD_ONLY_POST_A8_READ_MODEL
-as_of: '2026-08-01'
+status: TERMINAL_DORMANT_COMPATIBILITY_READ_MODEL
+as_of: '2026-08-14'
+historical_delivery_as_of: '2026-08-01T18:02:15Z'
+policy_reconciled_on: '2026-08-14'
 contains_secrets: false
 
 truth_sources:
@@ -25,8 +27,8 @@ required_repository_delivery:
   branch_preserved: true
 
 required_projection:
-  task21_state: A8_MERGED_PENDING_FINISH_SOURCE_ACTIVATION
-  next_owner_action: ACTIVATE_TASK21_FINISH_SOURCE_BUNDLE_AND_RUN_SMOKE
+  task21_state: A8_MERGED_TERMINAL_OWNER_EXPORT_OPTIONAL
+  next_owner_action: NONE_OWNER_EXPORT_OPTIONAL
   task22_started: false
   active_time_gates: 0
   product_vision_terminal_result: CANONICALIZED_WITH_PATCH

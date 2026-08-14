@@ -8,14 +8,19 @@
       "target_asset_id": "CTRL-TASK-03-001"
     },
     {
-      "source_asset_id": "ADR-GPT-EXECUTOR-ROUTING-003",
-      "relation": "governed_by",
-      "target_asset_id": "CTRL-BATON-SETUP-001"
+      "source_asset_id": "ADR-DIRECT-DELIVERY-HARNESS-005",
+      "relation": "derived_from",
+      "target_asset_id": "ADR-GPT-EXECUTOR-ROUTING-003"
+    },
+    {
+      "source_asset_id": "ADR-DIRECT-DELIVERY-HARNESS-005",
+      "relation": "derived_from",
+      "target_asset_id": "ADR-OWNER-ATTENTION-GATE-004"
     },
     {
       "source_asset_id": "ADR-GPT-EXECUTOR-ROUTING-003",
       "relation": "superseded_by",
-      "target_asset_id": "ADR-OWNER-ATTENTION-GATE-004"
+      "target_asset_id": "ADR-DIRECT-DELIVERY-HARNESS-005"
     },
     {
       "source_asset_id": "ADR-MVP-STACK-002",
@@ -46,6 +51,11 @@
       "source_asset_id": "ADR-OWNER-ATTENTION-GATE-004",
       "relation": "governed_by",
       "target_asset_id": "CTRL-OWNER-ATTENTION-GATE-001"
+    },
+    {
+      "source_asset_id": "ADR-OWNER-ATTENTION-GATE-004",
+      "relation": "superseded_by",
+      "target_asset_id": "ADR-DIRECT-DELIVERY-HARNESS-005"
     },
     {
       "source_asset_id": "ARCH-INTENT-001",
@@ -86,6 +96,11 @@
       "source_asset_id": "ARCH-INTENT-004",
       "relation": "derived_from",
       "target_asset_id": "ARCH-INTENT-T21-PRODUCT-VISION-001"
+    },
+    {
+      "source_asset_id": "ARCH-INTENT-004",
+      "relation": "evidenced_by",
+      "target_asset_id": "EVIDENCE-DELIVERY-HARNESS-ACCEPTANCE-001"
     },
     {
       "source_asset_id": "ARCH-INTENT-T21-PRODUCT-VISION-001",
@@ -381,6 +396,56 @@
       "source_asset_id": "CONFIG-CANARY-SPECIFICATION-ONLY-001",
       "relation": "governed_by",
       "target_asset_id": "CONTRACT-CANARY-SPECIFICATION-ONLY-001"
+    },
+    {
+      "source_asset_id": "CONFIG-DELIVERY-CAPABILITY-RADAR-001",
+      "relation": "governed_by",
+      "target_asset_id": "CTRL-DELIVERY-HARNESS-001"
+    },
+    {
+      "source_asset_id": "CONFIG-DELIVERY-CAPABILITY-RADAR-001",
+      "relation": "validated_by",
+      "target_asset_id": "TEST-DELIVERY-HARNESS-001"
+    },
+    {
+      "source_asset_id": "CONFIG-DELIVERY-CONTEXT-MAP-001",
+      "relation": "advises",
+      "target_asset_id": "ARCH-INTENT-004"
+    },
+    {
+      "source_asset_id": "CONFIG-DELIVERY-CONTEXT-MAP-001",
+      "relation": "governed_by",
+      "target_asset_id": "CTRL-DELIVERY-HARNESS-001"
+    },
+    {
+      "source_asset_id": "CONFIG-DELIVERY-HARNESS-001",
+      "relation": "governed_by",
+      "target_asset_id": "CTRL-DELIVERY-HARNESS-001"
+    },
+    {
+      "source_asset_id": "CONFIG-DELIVERY-HARNESS-001",
+      "relation": "validated_by",
+      "target_asset_id": "TEST-DELIVERY-HARNESS-001"
+    },
+    {
+      "source_asset_id": "CONFIG-DELIVERY-PORTABLE-BUNDLE-MANIFEST-001",
+      "relation": "governed_by",
+      "target_asset_id": "CTRL-DELIVERY-HARNESS-001"
+    },
+    {
+      "source_asset_id": "CONFIG-DELIVERY-PORTABLE-BUNDLE-MANIFEST-001",
+      "relation": "validated_by",
+      "target_asset_id": "TEST-DELIVERY-HARNESS-001"
+    },
+    {
+      "source_asset_id": "CONFIG-DELIVERY-PROJECT-PROFILE-001",
+      "relation": "depends_on",
+      "target_asset_id": "CONFIG-DELIVERY-HARNESS-001"
+    },
+    {
+      "source_asset_id": "CONFIG-DELIVERY-PROJECT-PROFILE-001",
+      "relation": "governed_by",
+      "target_asset_id": "CTRL-DELIVERY-HARNESS-001"
     },
     {
       "source_asset_id": "CONFIG-OWNER-AUTHORITY-PACKET-001",
@@ -1315,32 +1380,72 @@
     {
       "source_asset_id": "CTRL-AGENTS-001",
       "relation": "governed_by",
-      "target_asset_id": "CTRL-OWNER-ATTENTION-GATE-001"
-    },
-    {
-      "source_asset_id": "CTRL-AGENTS-001",
-      "relation": "governed_by",
-      "target_asset_id": "CTRL-TASK-04-001"
-    },
-    {
-      "source_asset_id": "CTRL-AGENTS-001",
-      "relation": "governed_by",
-      "target_asset_id": "POLICY-TASK-CLOSE-FAST-PATH-001"
+      "target_asset_id": "CTRL-DELIVERY-HARNESS-001"
     },
     {
       "source_asset_id": "CTRL-BATON-SETUP-001",
-      "relation": "governed_by",
-      "target_asset_id": "CTRL-AGENTS-001"
+      "relation": "superseded_by",
+      "target_asset_id": "CTRL-DELIVERY-HARNESS-001"
     },
     {
       "source_asset_id": "CTRL-CURSOR-WORKPLACE-RECONCILIATION-001",
-      "relation": "governed_by",
-      "target_asset_id": "CTRL-BATON-SETUP-001"
+      "relation": "superseded_by",
+      "target_asset_id": "CTRL-DELIVERY-HARNESS-001"
     },
     {
       "source_asset_id": "CTRL-CURSOR-WORKPLACE-RECONCILIATION-001",
       "relation": "validated_by",
       "target_asset_id": "SCRIPT-BATON-VALIDATE-001"
+    },
+    {
+      "source_asset_id": "CTRL-DELIVERY-HARNESS-001",
+      "relation": "contains",
+      "target_asset_id": "CONFIG-DELIVERY-CAPABILITY-RADAR-001"
+    },
+    {
+      "source_asset_id": "CTRL-DELIVERY-HARNESS-001",
+      "relation": "contains",
+      "target_asset_id": "CONFIG-DELIVERY-CONTEXT-MAP-001"
+    },
+    {
+      "source_asset_id": "CTRL-DELIVERY-HARNESS-001",
+      "relation": "contains",
+      "target_asset_id": "CONFIG-DELIVERY-HARNESS-001"
+    },
+    {
+      "source_asset_id": "CTRL-DELIVERY-HARNESS-001",
+      "relation": "contains",
+      "target_asset_id": "CONFIG-DELIVERY-PORTABLE-BUNDLE-MANIFEST-001"
+    },
+    {
+      "source_asset_id": "CTRL-DELIVERY-HARNESS-001",
+      "relation": "contains",
+      "target_asset_id": "CONFIG-DELIVERY-PROJECT-PROFILE-001"
+    },
+    {
+      "source_asset_id": "CTRL-DELIVERY-HARNESS-001",
+      "relation": "contains",
+      "target_asset_id": "SCHEMA-DELIVERY-COMPLETION-EVIDENCE-001"
+    },
+    {
+      "source_asset_id": "CTRL-DELIVERY-HARNESS-001",
+      "relation": "contains",
+      "target_asset_id": "SCHEMA-DELIVERY-INDEPENDENT-REVIEW-EVIDENCE-001"
+    },
+    {
+      "source_asset_id": "CTRL-DELIVERY-HARNESS-001",
+      "relation": "contains",
+      "target_asset_id": "SKILL-DELIVERY-HARNESS-001"
+    },
+    {
+      "source_asset_id": "CTRL-DELIVERY-HARNESS-001",
+      "relation": "evidenced_by",
+      "target_asset_id": "EVIDENCE-DELIVERY-HARNESS-ACCEPTANCE-001"
+    },
+    {
+      "source_asset_id": "CTRL-DELIVERY-HARNESS-001",
+      "relation": "validated_by",
+      "target_asset_id": "TEST-DELIVERY-HARNESS-001"
     },
     {
       "source_asset_id": "CTRL-HANDOFF-PROTOCOL-001",
@@ -1394,6 +1499,11 @@
     },
     {
       "source_asset_id": "CTRL-OWNER-ATTENTION-GATE-001",
+      "relation": "superseded_by",
+      "target_asset_id": "CTRL-DELIVERY-HARNESS-001"
+    },
+    {
+      "source_asset_id": "CTRL-OWNER-ATTENTION-GATE-001",
       "relation": "validated_by",
       "target_asset_id": "TEST-OWNER-ATTENTION-GATE-001"
     },
@@ -1415,7 +1525,7 @@
     {
       "source_asset_id": "CTRL-README-001",
       "relation": "governed_by",
-      "target_asset_id": "CTRL-TASK-04-001"
+      "target_asset_id": "CTRL-DELIVERY-HARNESS-001"
     },
     {
       "source_asset_id": "CTRL-TASK-03-001",
@@ -1499,8 +1609,8 @@
     },
     {
       "source_asset_id": "CURSOR-CMD-BATON-PREFLIGHT-001",
-      "relation": "governed_by",
-      "target_asset_id": "CTRL-BATON-SETUP-001"
+      "relation": "superseded_by",
+      "target_asset_id": "ADR-DIRECT-DELIVERY-HARNESS-005"
     },
     {
       "source_asset_id": "CURSOR-IGNORE-001",
@@ -1510,37 +1620,37 @@
     {
       "source_asset_id": "CURSOR-RULE-AUTHORITY-001",
       "relation": "governed_by",
-      "target_asset_id": "CTRL-BATON-SETUP-001"
+      "target_asset_id": "CTRL-DELIVERY-HARNESS-001"
     },
     {
       "source_asset_id": "CURSOR-RULE-CATALOG-001",
       "relation": "governed_by",
-      "target_asset_id": "CTRL-BATON-SETUP-001"
+      "target_asset_id": "CTRL-DELIVERY-HARNESS-001"
     },
     {
       "source_asset_id": "CURSOR-RULE-GITHUB-BATON-001",
-      "relation": "governed_by",
-      "target_asset_id": "CTRL-BATON-SETUP-001"
+      "relation": "superseded_by",
+      "target_asset_id": "ADR-DIRECT-DELIVERY-HARNESS-005"
     },
     {
       "source_asset_id": "CURSOR-RULE-INPUT-ROUTING-001",
       "relation": "governed_by",
-      "target_asset_id": "CTRL-BATON-SETUP-001"
+      "target_asset_id": "CTRL-DELIVERY-HARNESS-001"
     },
     {
       "source_asset_id": "CURSOR-RULE-LANGUAGE-001",
       "relation": "governed_by",
-      "target_asset_id": "CTRL-BATON-SETUP-001"
+      "target_asset_id": "CTRL-DELIVERY-HARNESS-001"
     },
     {
       "source_asset_id": "CURSOR-RULE-SECURITY-001",
       "relation": "governed_by",
-      "target_asset_id": "CTRL-BATON-SETUP-001"
+      "target_asset_id": "CTRL-DELIVERY-HARNESS-001"
     },
     {
       "source_asset_id": "CURSOR-RULE-VALIDATION-001",
       "relation": "governed_by",
-      "target_asset_id": "CTRL-BATON-SETUP-001"
+      "target_asset_id": "CTRL-DELIVERY-HARNESS-001"
     },
     {
       "source_asset_id": "DATA-REQUIREMENT-T17-EXECUTION-CAPACITY-001",
@@ -2011,6 +2121,56 @@
       "source_asset_id": "EVIDENCE-CANARY-SPECIFICATION-ONLY-A2-001",
       "relation": "validated_by",
       "target_asset_id": "TEST-CANARY-SPECIFICATION-ONLY-A2-001"
+    },
+    {
+      "source_asset_id": "EVIDENCE-DELIVERY-HARNESS-ACCEPTANCE-001",
+      "relation": "depends_on",
+      "target_asset_id": "EVIDENCE-DELIVERY-HARNESS-FACTORY-FIT-001"
+    },
+    {
+      "source_asset_id": "EVIDENCE-DELIVERY-HARNESS-ACCEPTANCE-001",
+      "relation": "depends_on",
+      "target_asset_id": "EVIDENCE-DELIVERY-HARNESS-INDEPENDENT-REVIEW-001"
+    },
+    {
+      "source_asset_id": "EVIDENCE-DELIVERY-HARNESS-ACCEPTANCE-001",
+      "relation": "derived_from",
+      "target_asset_id": "CTRL-DELIVERY-HARNESS-001"
+    },
+    {
+      "source_asset_id": "EVIDENCE-DELIVERY-HARNESS-ACCEPTANCE-001",
+      "relation": "validated_by",
+      "target_asset_id": "TEST-DELIVERY-HARNESS-001"
+    },
+    {
+      "source_asset_id": "EVIDENCE-DELIVERY-HARNESS-FACTORY-FIT-001",
+      "relation": "depends_on",
+      "target_asset_id": "EVIDENCE-DELIVERY-HARNESS-INDEPENDENT-REVIEW-001"
+    },
+    {
+      "source_asset_id": "EVIDENCE-DELIVERY-HARNESS-FACTORY-FIT-001",
+      "relation": "derived_from",
+      "target_asset_id": "CTRL-DELIVERY-HARNESS-001"
+    },
+    {
+      "source_asset_id": "EVIDENCE-DELIVERY-HARNESS-FACTORY-FIT-001",
+      "relation": "validated_by",
+      "target_asset_id": "TEST-DELIVERY-HARNESS-001"
+    },
+    {
+      "source_asset_id": "EVIDENCE-DELIVERY-HARNESS-INDEPENDENT-REVIEW-001",
+      "relation": "depends_on",
+      "target_asset_id": "SCHEMA-DELIVERY-INDEPENDENT-REVIEW-EVIDENCE-001"
+    },
+    {
+      "source_asset_id": "EVIDENCE-DELIVERY-HARNESS-INDEPENDENT-REVIEW-001",
+      "relation": "derived_from",
+      "target_asset_id": "CTRL-DELIVERY-HARNESS-001"
+    },
+    {
+      "source_asset_id": "EVIDENCE-DELIVERY-HARNESS-INDEPENDENT-REVIEW-001",
+      "relation": "validated_by",
+      "target_asset_id": "TEST-DELIVERY-HARNESS-001"
     },
     {
       "source_asset_id": "EVIDENCE-OWNER-ATTENTION-GATE-001",
@@ -5329,6 +5489,21 @@
     },
     {
       "source_asset_id": "POLICY-OWNER-ATTENTION-GATE-001",
+      "relation": "superseded_by",
+      "target_asset_id": "POLICY-OWNER-ATTENTION-GATE-002"
+    },
+    {
+      "source_asset_id": "POLICY-OWNER-ATTENTION-GATE-001",
+      "relation": "validated_by",
+      "target_asset_id": "TEST-OWNER-ATTENTION-GATE-001"
+    },
+    {
+      "source_asset_id": "POLICY-OWNER-ATTENTION-GATE-002",
+      "relation": "governed_by",
+      "target_asset_id": "ADR-DIRECT-DELIVERY-HARNESS-005"
+    },
+    {
+      "source_asset_id": "POLICY-OWNER-ATTENTION-GATE-002",
       "relation": "validated_by",
       "target_asset_id": "TEST-OWNER-ATTENTION-GATE-001"
     },
@@ -5573,14 +5748,44 @@
       "target_asset_id": "POLICY-OWNER-ATTENTION-GATE-001"
     },
     {
+      "source_asset_id": "PROJECT-INSTRUCTION-CANDIDATE-3-5-001",
+      "relation": "superseded_by",
+      "target_asset_id": "PROJECT-INSTRUCTION-OPTIONAL-3-6-001"
+    },
+    {
+      "source_asset_id": "PROJECT-INSTRUCTION-OPTIONAL-3-6-001",
+      "relation": "governed_by",
+      "target_asset_id": "CTRL-DELIVERY-HARNESS-001"
+    },
+    {
+      "source_asset_id": "PROTOCOL-DELIVERY-CONTEXT-001",
+      "relation": "advises",
+      "target_asset_id": "ARCH-INTENT-004"
+    },
+    {
+      "source_asset_id": "PROTOCOL-DELIVERY-CONTEXT-001",
+      "relation": "governed_by",
+      "target_asset_id": "CONFIG-DELIVERY-CONTEXT-MAP-001"
+    },
+    {
+      "source_asset_id": "PROTOCOL-DELIVERY-HARNESS-001",
+      "relation": "depends_on",
+      "target_asset_id": "PROTOCOL-DELIVERY-CONTEXT-001"
+    },
+    {
+      "source_asset_id": "PROTOCOL-DELIVERY-HARNESS-001",
+      "relation": "governed_by",
+      "target_asset_id": "ADR-DIRECT-DELIVERY-HARNESS-005"
+    },
+    {
       "source_asset_id": "PROTOCOL-EXECUTION-ROUTER-001",
       "relation": "governed_by",
-      "target_asset_id": "CTRL-BATON-SETUP-001"
+      "target_asset_id": "CTRL-DELIVERY-HARNESS-001"
     },
     {
       "source_asset_id": "PROTOCOL-GITHUB-BATON-001",
-      "relation": "governed_by",
-      "target_asset_id": "CTRL-BATON-SETUP-001"
+      "relation": "superseded_by",
+      "target_asset_id": "ADR-DIRECT-DELIVERY-HARNESS-005"
     },
     {
       "source_asset_id": "PROTOTYPE-T04-CORE-NATIVE-STACK-001",
@@ -5781,6 +5986,26 @@
       "source_asset_id": "SCHEMA-CANARY-SPECIFICATION-ONLY-001",
       "relation": "governed_by",
       "target_asset_id": "CONTRACT-CANARY-SPECIFICATION-ONLY-001"
+    },
+    {
+      "source_asset_id": "SCHEMA-DELIVERY-COMPLETION-EVIDENCE-001",
+      "relation": "governed_by",
+      "target_asset_id": "CTRL-DELIVERY-HARNESS-001"
+    },
+    {
+      "source_asset_id": "SCHEMA-DELIVERY-COMPLETION-EVIDENCE-001",
+      "relation": "validated_by",
+      "target_asset_id": "TEST-DELIVERY-HARNESS-001"
+    },
+    {
+      "source_asset_id": "SCHEMA-DELIVERY-INDEPENDENT-REVIEW-EVIDENCE-001",
+      "relation": "governed_by",
+      "target_asset_id": "CTRL-DELIVERY-HARNESS-001"
+    },
+    {
+      "source_asset_id": "SCHEMA-DELIVERY-INDEPENDENT-REVIEW-EVIDENCE-001",
+      "relation": "validated_by",
+      "target_asset_id": "TEST-DELIVERY-HARNESS-001"
     },
     {
       "source_asset_id": "SCHEMA-OWNER-AUTHORITY-PACKET-001",
@@ -6255,12 +6480,22 @@
     {
       "source_asset_id": "SCRIPT-BATON-VALIDATE-001",
       "relation": "governed_by",
-      "target_asset_id": "CTRL-BATON-SETUP-001"
+      "target_asset_id": "CTRL-DELIVERY-HARNESS-001"
+    },
+    {
+      "source_asset_id": "SCRIPT-DELIVERY-HARNESS-001",
+      "relation": "governed_by",
+      "target_asset_id": "CONFIG-DELIVERY-HARNESS-001"
+    },
+    {
+      "source_asset_id": "SCRIPT-DELIVERY-HARNESS-001",
+      "relation": "validated_by",
+      "target_asset_id": "TEST-DELIVERY-HARNESS-001"
     },
     {
       "source_asset_id": "SCRIPT-OWNER-ATTENTION-GATE-001",
       "relation": "governed_by",
-      "target_asset_id": "POLICY-OWNER-ATTENTION-GATE-001"
+      "target_asset_id": "POLICY-OWNER-ATTENTION-GATE-002"
     },
     {
       "source_asset_id": "SCRIPT-T05-MIGRATION-LEDGER-001",
@@ -6713,6 +6948,16 @@
       "target_asset_id": "POLICY-TASK-CLOSE-FAST-PATH-001"
     },
     {
+      "source_asset_id": "SKILL-DELIVERY-HARNESS-001",
+      "relation": "depends_on",
+      "target_asset_id": "PROTOCOL-DELIVERY-HARNESS-001"
+    },
+    {
+      "source_asset_id": "SKILL-DELIVERY-HARNESS-001",
+      "relation": "governed_by",
+      "target_asset_id": "CTRL-DELIVERY-HARNESS-001"
+    },
+    {
       "source_asset_id": "TASK-T30-A14P-R1-AUTH-RECOVERY-001",
       "relation": "governed_by",
       "target_asset_id": "CONTRACT-T30-A14P-R1-AUTH-RECOVERY-001"
@@ -6725,12 +6970,12 @@
     {
       "source_asset_id": "TEMPLATE-BATON-PULL-REQUEST-001",
       "relation": "governed_by",
-      "target_asset_id": "CTRL-BATON-SETUP-001"
+      "target_asset_id": "CTRL-DELIVERY-HARNESS-001"
     },
     {
       "source_asset_id": "TEST-BATON-CONTRACT-001",
       "relation": "governed_by",
-      "target_asset_id": "CTRL-BATON-SETUP-001"
+      "target_asset_id": "CTRL-DELIVERY-HARNESS-001"
     },
     {
       "source_asset_id": "TEST-BATON-CURSORIGNORE-001",
@@ -6793,9 +7038,29 @@
       "target_asset_id": "CATALOG-VALIDATOR-001"
     },
     {
+      "source_asset_id": "TEST-DELIVERY-HARNESS-001",
+      "relation": "depends_on",
+      "target_asset_id": "CONFIG-DELIVERY-CONTEXT-MAP-001"
+    },
+    {
+      "source_asset_id": "TEST-DELIVERY-HARNESS-001",
+      "relation": "depends_on",
+      "target_asset_id": "CONFIG-DELIVERY-HARNESS-001"
+    },
+    {
+      "source_asset_id": "TEST-DELIVERY-HARNESS-001",
+      "relation": "depends_on",
+      "target_asset_id": "POLICY-OWNER-ATTENTION-GATE-002"
+    },
+    {
       "source_asset_id": "TEST-OWNER-ATTENTION-GATE-001",
       "relation": "depends_on",
       "target_asset_id": "POLICY-OWNER-ATTENTION-GATE-001"
+    },
+    {
+      "source_asset_id": "TEST-OWNER-ATTENTION-GATE-001",
+      "relation": "depends_on",
+      "target_asset_id": "POLICY-OWNER-ATTENTION-GATE-002"
     },
     {
       "source_asset_id": "TEST-OWNER-ATTENTION-GATE-001",

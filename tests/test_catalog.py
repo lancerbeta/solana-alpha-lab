@@ -209,6 +209,17 @@ class CatalogImportTests(unittest.TestCase):
         with self.assertRaisesRegex(catalog.CatalogValidationError, "architecture_intent_provenance_invalid"):
             catalog.validate_semantics(manifest, assets, queries, lifecycle)
 
+    def test_architecture_intent_implementation_requires_catalog_evidence(self) -> None:
+        manifest, assets, queries, lifecycle = self.documents()
+        target = next(r for d in assets for r in d["records"] if r["asset_id"] == "ARCH-INTENT-004")
+        target["relations"] = [
+            relation
+            for relation in target["relations"]
+            if relation["relation_type"] != "evidenced_by"
+        ]
+        with self.assertRaisesRegex(catalog.CatalogValidationError, "architecture_intent_provenance_invalid"):
+            catalog.validate_semantics(manifest, assets, queries, lifecycle)
+
     def test_external_bundle_requires_external_retention(self) -> None:
         manifest, assets, queries, lifecycle = self.documents()
         target = next(r for d in assets for r in d["records"] if r["asset_id"] == "BUNDLE-TASK01-COMPLETION-001")

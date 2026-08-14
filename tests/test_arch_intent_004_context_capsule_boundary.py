@@ -28,13 +28,14 @@ def frontmatter(path: Path) -> dict:
 
 
 class ArchIntent004ContextCapsuleBoundaryTests(unittest.TestCase):
-    def test_intent_is_content_bound_catalog_discoverable_and_not_implemented(self) -> None:
+    def test_intent_is_content_bound_catalog_discoverable_and_bounded_implemented(self) -> None:
         self.assertTrue(INTENT_PATH.is_file(), INTENT_PATH)
         document = frontmatter(INTENT_PATH)
         self.assertEqual(document["intent_id"], INTENT_ID)
-        self.assertEqual(document["intent_version"], "1.0")
-        self.assertEqual(document["status"], "ACCEPTED_DIRECTION_NOT_IMPLEMENTED")
+        self.assertEqual(document["intent_version"], "1.1")
+        self.assertEqual(document["status"], "IMPLEMENTED_BOUNDED_READ_ONLY_PROJECTION")
         self.assertEqual(document["projection_kind"], "DERIVED_READ_ONLY_PROJECTION")
+        self.assertEqual(document["context_map_id"], "DELIVERY_CONTEXT_MAP_V1")
         self.assertEqual(document["truth_owners"], {
             "bytes": "GIT",
             "discovery_and_relations": "CATALOG",
@@ -44,18 +45,23 @@ class ArchIntent004ContextCapsuleBoundaryTests(unittest.TestCase):
         self.assertFalse(document["authority"]["wallet_signer_transaction"])
         self.assertFalse(document["authority"]["cash_spend"])
         self.assertFalse(document["authority"]["project_source_mutation"])
-        self.assertEqual(document["implementation"], "DEFERRED_UNTIL_TRIGGER")
-        self.assertEqual(len(document["activation_triggers_any"]), 3)
+        self.assertEqual(document["implementation"], "DELIVERY_HARNESS_V1")
+        self.assertEqual(len(document["activation_evidence"]), 2)
 
         catalog = yaml.safe_load(ARCHITECTURE_CATALOG_PATH.read_text(encoding="utf-8"))
         record = next(item for item in catalog["records"] if item["asset_id"] == INTENT_ID)
-        self.assertEqual(record["status"], "ACCEPTED_DIRECTION_NOT_IMPLEMENTED")
+        self.assertEqual(record["record_version"], "1.1")
+        self.assertEqual(record["status"], "IMPLEMENTED_UNVERIFIED")
         self.assertEqual(record["integrity"]["sha256"], sha256(INTENT_PATH))
         self.assertEqual(
             {item["target_asset_id"] for item in record["relations"]},
-            {"ARCH-INTENT-002", "ARCH-INTENT-T21-PRODUCT-VISION-001"},
+            {
+                "ARCH-INTENT-002",
+                "ARCH-INTENT-T21-PRODUCT-VISION-001",
+                "EVIDENCE-DELIVERY-HARNESS-ACCEPTANCE-001",
+            },
         )
-        self.assertEqual(record["consumers"], ["FACTORY-001", "REG-RESEARCH-001", "TASK-28"])
+        self.assertIn("CTRL-DELIVERY-HARNESS-001", record["consumers"])
 
         manifest = yaml.safe_load(MANIFEST_PATH.read_text(encoding="utf-8"))
         self.assertIn(

@@ -1,0 +1,49 @@
+{
+  "schema": "smial.delivery-harness-project-profile",
+  "schema_version": "1.0",
+  "profile_id": "SOLANA_ALPHA_LAB_V1",
+  "harness_id": "DELIVERY_HARNESS_V1",
+  "mode": "BOUND_PROJECT",
+  "repository": {"name": "lancerbeta/solana-alpha-lab", "default_branch": "main"},
+  "bindings": {
+    "catalog_manifest": "catalog/catalog_manifest.yaml",
+    "owner_attention_policy": "control/owner_attention_gate_v2.yaml",
+    "context_map": "delivery-harness/context-map.yaml",
+    "domain_policy": "delivery-harness/policies/solana-alpha-lab.md",
+    "historical_cloud_bundle_registry": "docs/project_sources/release_registry_v1.yaml"
+  },
+  "working_memory": {
+    "truth_owner": "GIT",
+    "task_resolution": "EXACT_TASK_CONTRACT",
+    "cloud_bundle": "OWNER_MANAGED_OPTIONAL_EXPORT"
+  },
+  "context_budgets": {
+    "agents_max_bytes": 12288,
+    "cursor_always_apply_max_bytes": 6144,
+    "ordinary_receipt_max_bytes": 49152,
+    "auto_inline_file_max_bytes": 102400
+  },
+  "validation": {
+    "github_ci_bound": true,
+    "primary": {
+      "argv": ["uv", "run", "--locked", "--managed-python", "python", "-B", "scripts/validate_ci.py", "--ci-owned-delivery", "--base-ref", "{expected_base}"],
+      "result_owner": "FOCUSED_PLUS_EXACT_PR_CI",
+      "trusted_paths": ["scripts/validate_ci.py", "pyproject.toml", "uv.lock", ".github/workflows/ci.yml"]
+    },
+    "fallback": {
+      "argv": ["uv", "run", "--locked", "--managed-python", "python", "-B", "scripts/validate_ci.py", "--tracked-only-delivery", "--base-ref", "{expected_base}"],
+      "result_owner": "FULL_EXACT_HEAD",
+      "trusted_paths": ["scripts/validate_ci.py", "pyproject.toml", "uv.lock"]
+    },
+    "credential_scan": {
+      "argv": ["uv", "run", "--locked", "--managed-python", "python", "-B", "scripts/secret_scan.py", "--self-test", "--scan-repository"],
+      "trusted_paths": ["scripts/secret_scan.py", "pyproject.toml", "uv.lock"]
+    }
+  },
+  "authority": {
+    "external_system": false,
+    "signing_or_financial_action": false,
+    "cash_spend": false,
+    "cloud_export_mutation": false
+  }
+}

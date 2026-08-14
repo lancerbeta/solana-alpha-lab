@@ -1,0 +1,11 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://smial.local/schemas/delivery_harness_capability_radar.schema.json",
+  "type": "object", "additionalProperties": false,
+  "required": ["schema", "schema_version", "radar_id", "harness_id", "default_decision", "max_candidates", "authority", "candidates"],
+  "properties": {
+    "schema": {"const": "smial.delivery-harness-capability-radar"}, "schema_version": {"const": "1.0"}, "radar_id": {"const": "DELIVERY_CAPABILITY_RADAR_V1"}, "harness_id": {"const": "DELIVERY_HARNESS_V1"}, "default_decision": {"const": "NONE"}, "max_candidates": {"const": 1},
+    "authority": {"type": "object", "additionalProperties": false, "required": ["install", "credentials", "network", "paid_plan"], "properties": {"install": {"const": false}, "credentials": {"const": false}, "network": {"const": false}, "paid_plan": {"const": false}}},
+    "candidates": {"type": "array", "minItems": 4, "maxItems": 4, "items": {"type": "object", "additionalProperties": false, "required": ["candidate_id", "conditions_all", "named_consumer_required", "owner_decision", "measurable_value_test", "minimum_permissions", "data_exposure", "security_license_maintenance_cost_check", "why_now", "adoption_order", "fallback_without_tool", "exit_path"], "properties": {"candidate_id": {"type": "string"}, "conditions_all": {"type": "array", "minItems": 1, "uniqueItems": true, "items": {"type": "string"}}, "named_consumer_required": {"const": true}, "owner_decision": {"type": "string", "minLength": 12}, "measurable_value_test": {"type": "string", "minLength": 12}, "minimum_permissions": {"type": "string", "minLength": 8}, "data_exposure": {"type": "string", "minLength": 8}, "security_license_maintenance_cost_check": {"const": "required_before_install"}, "why_now": {"type": "string", "minLength": 8}, "adoption_order": {"type": "array", "prefixItems": [{"const": "ADOPT"}, {"const": "WRAP"}, {"const": "FORK"}, {"const": "BUILD"}], "items": false}, "fallback_without_tool": {"type": "string", "minLength": 1}, "exit_path": {"type": "string", "minLength": 1}}}}
+  }
+}

@@ -102,7 +102,12 @@ class TestTask21OwnerPulse(unittest.TestCase):
         cls.marker = json.loads(MARKER_PATH.read_text(encoding="utf-8"))
 
     def test_marker_is_exact_and_source_receipt_is_pinned(self) -> None:
-        self.assertEqual(self.marker["schema_version"], "1.0")
+        self.assertEqual(self.marker["schema_version"], "1.1")
+        self.assertEqual(self.marker["resume_router"]["router_version"], "1.1")
+        self.assertEqual(
+            self.marker["resume_router"]["status"],
+            "TERMINAL_DORMANT_OWNER_EXPORT_OPTIONAL",
+        )
         self.assertEqual(len(self.marker["gates"]), 4)
         historical, h1_gate, h6_gate, gate = self.marker["gates"]
         self.assertEqual(historical["gate_id"], EXPECTED_GATE_ID)

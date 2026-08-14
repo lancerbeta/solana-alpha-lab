@@ -1,35 +1,10 @@
 ---
-description: Required local validation gate before claiming technical completion
-alwaysApply: true
+description: Validation economy and exact-candidate delivery gates
+globs: ["scripts/**", "tests/**", ".github/**", "pyproject.toml", "uv.lock"]
+alwaysApply: false
 ---
 
-# Validation
-
-Platform-neutral gate:
-
-```text
-uv run --locked --managed-python python -B scripts/validate_ci.py
-```
-
-Rules:
-
-- During iteration run only targeted checks for changed behavior and direct
-  consumers. Do not run validation for read-only work.
-- There is one full-gate owner per exact candidate fingerprint: Cursor, Codex,
-  or GitHub CI. Never run the full gate merely because the same bytes moved
-  from worktree to stage, commit, push, or PR.
-- If Codex or CI is guaranteed to validate the same pushed head, return
-  targeted evidence, the commit/tree identity, and
-  `FULL_VALIDATION=DELEGATED_TO_CI`; this is a valid handoff, not a blocker.
-- Run the full gate locally only when Cursor is the elected full-gate owner or
-  downstream validation is unavailable.
-- Re-run a failed check only after its root cause changed. Re-run a passed full
-  gate only after candidate fingerprint, dependencies, relevant runtime, or
-  validation policy changed.
-- Apply Catalog/generator, security, topology, and cross-platform checks only
-  when their owners or direct consumers changed.
-- Do not weaken or patch validators merely to pass.
-- Catalog and generated-consumer repair inside the active objective is covered
-  by standing project autonomy; report unrelated Catalog drift honestly.
-- Technical validation is not semantic acceptance or `DONE`.
-- See `AGENTS.md` section `VALIDATION_COMMAND`.
+Run targeted checks while implementing and one full-gate owner per exact
+candidate fingerprint. Do not repeat a passing full gate for stage/commit/push.
+Never weaken validators to pass. Generated artifacts change only through their
+generator. Technical PASS is not semantic acceptance or `DONE`.

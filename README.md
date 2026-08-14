@@ -6,10 +6,39 @@ on a 15-minute to 4-hour horizon.
 ## Repository status boundary
 
 This README is bootstrap documentation, not a live task-status source.
-Work/control plane owns canonical status and acceptance. For current work, use
-only the task and handoff explicitly named by the Work-approved prompt. The
-repository may contain an uncommitted or staged candidate without changing the
-canonical task state.
+The exact Git task contract owns bounded delivery state; the goal owner owns
+product meaning and semantic acceptance. Use only a task contract named by the
+owner or an exact canonical READY Git contract. A branch, chat, PR, CI result or
+merge cannot silently select work or establish product `DONE`.
+
+## Delivery Harness bootstrap
+
+The repository-owned entrypoint for Cursor and Codex is `AGENTS.md` plus
+`DELIVERY_HARNESS_V1`. Cursor bootstrap uses the exact copy-paste prompt at
+`delivery-harness/templates/bootstrap-prompt.md`; the protocol is
+`docs/agent/DELIVERY_HARNESS_BOOTSTRAP.md`.
+
+To seed a different existing Git repository from a trusted exact checkout of
+this repository, preview the complete zero-write plan first, inspect its
+`plan_sha256`, then apply that unchanged plan:
+
+```text
+python -B scripts/delivery_harness.py init --target <NEW_REPOSITORY_ROOT> --repository <OWNER/REPOSITORY> --default-branch <DEFAULT_BRANCH> --preview --format json
+python -B scripts/delivery_harness.py init --target <NEW_REPOSITORY_ROOT> --repository <OWNER/REPOSITORY> --default-branch <DEFAULT_BRANCH> --apply --plan-sha256 <PLAN_SHA256> --format json
+```
+
+The initializer uses only the Python standard library. The target must already
+be the exact Git root whose live `origin` matches `<OWNER/REPOSITORY>`; it never
+writes user-global Cursor, Codex or home-directory configuration.
+
+Open one repository/worktree root, require an exact Git task contract and run:
+
+```text
+uv run --locked --managed-python python -B scripts/delivery_harness.py check --root . --format json
+```
+
+Cloud Project Sources/Project Instruction are optional owner-managed exports.
+The harness neither requires nor requests their update or smoke.
 
 Catalog counts, lifecycle counts, exact dependency pins, and candidate state
 are checked by the repository validation gate and recorded in the explicitly

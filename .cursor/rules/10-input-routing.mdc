@@ -1,24 +1,10 @@
 ---
-description: Explicit input routes only; no handoff discovery
-alwaysApply: true
+description: Exact task and context routing for Delivery Harness work
+globs: []
+alwaysApply: false
 ---
 
-# Input routing
-
-Default input is `DIRECT_PROMPT`.
-
-Allowed explicit routes:
-
-- `DIRECT_PROMPT`
-- `LOCAL_HANDOFF: <repository-relative path>`
-- `ACCEPT_LOCAL_HANDOFF: <repository-relative path>`
-- `GITHUB_BATON: <exact contract locator>` (live accepted route)
-
-Rules:
-
-- Read local handoffs only when the named trigger is present.
-- Follow `docs/agent/HANDOFF_PROTOCOL.md` path and manifest rules.
-- Follow `docs/agent/GITHUB_BATON_PROTOCOL.md` for baton contracts.
-- Never search for newest/latest/last-modified handoffs or Issues.
-- Reject absolute paths, parent traversal, and workspace escapes.
-- Route selection lives in `docs/agent/EXECUTION_ROUTER_PROTOCOL.md`.
+Use `.agents/skills/delivery-harness/SKILL.md`. Resolve an exact task contract;
+never search latest/newest/current work. Generate bounded context with
+`scripts/delivery_harness.py context`. Preserve explicit gaps and route
+continuity. Open one repository/worktree root only.
