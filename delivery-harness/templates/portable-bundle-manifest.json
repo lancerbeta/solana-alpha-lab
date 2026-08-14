@@ -86,7 +86,7 @@
     {
       "source": "delivery-harness/templates/portable-core/scripts/delivery_harness.py",
       "destination": "scripts/delivery_harness.py",
-      "sha256": "51d6df1ec7255858c4e50593a2b267c91fd5c88b12a2804c3b1c5cc6bcd6da38"
+      "sha256": "243611c703040a8036ea9c78de33c3f6d93bd3f83717f4e0ffdd823b4910d2e7"
     },
     {
       "source": "scripts/owner_attention_gate.py",

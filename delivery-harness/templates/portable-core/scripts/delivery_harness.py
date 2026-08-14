@@ -6,6 +6,7 @@ from __future__ import annotations
 import argparse
 import hashlib
 import json
+import os
 import re
 import subprocess
 from pathlib import Path, PurePosixPath, PureWindowsPath
@@ -609,7 +610,13 @@ def build_context_receipt(
         raise ValueError("TASK_REPOSITORY_ORIGIN_MISMATCH")
     head = git(root, "rev-parse", "HEAD")
     tree = git(root, "rev-parse", "HEAD^{tree}")
-    branch = git(root, "branch", "--show-current") or "DETACHED"
+    branch = git(root, "branch", "--show-current")
+    github_head_ref = os.environ.get("GITHUB_HEAD_REF", "")
+    if not branch and os.environ.get("GITHUB_ACTIONS") == "true" and re.fullmatch(
+        r"[A-Za-z0-9][A-Za-z0-9._/-]{0,254}", github_head_ref
+    ):
+        branch = github_head_ref
+    branch = branch or "DETACHED"
     dirty = bool(git(root, "status", "--porcelain=v1"))
     binding = metadata["git_binding"]
     if git(root, "merge-base", "HEAD", binding["expected_upstream"]) != binding["expected_base"]:

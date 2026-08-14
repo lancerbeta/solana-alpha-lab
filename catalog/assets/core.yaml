@@ -19293,7 +19293,7 @@ records:
   as_of: '2026-08-14'
   truth_owner: CTRL-DELIVERY-HARNESS-001
   location: {kind: git_path, logical_uri: 'repo://delivery-harness/templates/portable-bundle-manifest.json', repository_path: delivery-harness/templates/portable-bundle-manifest.json}
-  integrity: {kind: sha256, sha256: 9130ff9c310b0309348240720c591867b6508b948acbe4f6c93118dd23dfc936}
+  integrity: {kind: sha256, sha256: 8d0c33a7d3c034503c83c04fbf4ad4f201702e110601ce82bddfb0c7e3bb6353}
   access: *t25_read_file
   relations:
   - {relation_type: governed_by, target_asset_id: CTRL-DELIVERY-HARNESS-001}
@@ -19312,7 +19312,7 @@ records:
   as_of: '2026-08-14'
   truth_owner: CTRL-DELIVERY-HARNESS-001
   location: {kind: git_path, logical_uri: 'repo://scripts/delivery_harness.py', repository_path: scripts/delivery_harness.py}
-  integrity: {kind: sha256, sha256: cf09fa151e8483511d8be75662d7db27bd4011b2620bdfb3d4486c2bb96ad110}
+  integrity: {kind: sha256, sha256: 5150f27d0813969d6b16ff2029c15a4b462c5d922b27dcc28c8e6d3eade516d4}
   access: *t25_read_file
   relations:
   - {relation_type: governed_by, target_asset_id: CONFIG-DELIVERY-HARNESS-001}

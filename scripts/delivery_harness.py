@@ -348,7 +348,13 @@ def git_text(root: Path, *args: str) -> str:
 def git_identity(root: Path) -> dict[str, Any]:
     head = git_text(root, "rev-parse", "HEAD")
     tree = git_text(root, "rev-parse", "HEAD^{tree}")
-    branch = git_text(root, "branch", "--show-current") or "DETACHED"
+    branch = git_text(root, "branch", "--show-current")
+    github_head_ref = os.environ.get("GITHUB_HEAD_REF", "")
+    if not branch and os.environ.get("GITHUB_ACTIONS") == "true" and re.fullmatch(
+        r"[A-Za-z0-9][A-Za-z0-9._/-]{0,254}", github_head_ref
+    ):
+        branch = github_head_ref
+    branch = branch or "DETACHED"
     dirty = bool(git_text(root, "status", "--porcelain=v1"))
     if not re.fullmatch(r"[0-9a-f]{40}", head) or not re.fullmatch(
         r"[0-9a-f]{40}", tree

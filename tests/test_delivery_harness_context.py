@@ -44,6 +44,31 @@ class DeliveryHarnessContextTests(unittest.TestCase):
             route=route,
         )
 
+    def test_github_pr_detached_checkout_uses_exact_head_ref(self) -> None:
+        values = {
+            ("rev-parse", "HEAD"): "a" * 40,
+            ("rev-parse", "HEAD^{tree}"): "b" * 40,
+            ("branch", "--show-current"): "",
+            ("status", "--porcelain=v1"): "",
+        }
+        with (
+            mock.patch.object(
+                self.module,
+                "git_text",
+                side_effect=lambda _root, *args: values[args],
+            ),
+            mock.patch.dict(
+                os.environ,
+                {
+                    "GITHUB_ACTIONS": "true",
+                    "GITHUB_HEAD_REF": "ctrl-delivery-harness-v1",
+                },
+                clear=False,
+            ),
+        ):
+            identity = self.module.git_identity(ROOT)
+        self.assertEqual(identity["branch"], "ctrl-delivery-harness-v1")
+
     def test_receipt_is_closed_valid_and_self_hashing(self) -> None:
         receipt = self.receipt()
         jsonschema.validate(receipt, self.schema)
