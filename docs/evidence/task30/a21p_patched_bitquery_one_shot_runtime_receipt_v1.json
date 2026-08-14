@@ -1,0 +1,83 @@
+{
+  "atom_id": "T30-A21_PATCHED_BITQUERY_ONE_SHOT_V1",
+  "authority": {
+    "cash_spend_usd_cents": 0,
+    "credential_free_preflights": 1,
+    "credential_reads": 1,
+    "fallbacks": 0,
+    "provider_requests": 1,
+    "raw_external_data_writes": 2,
+    "retries": 0
+  },
+  "non_claims": {
+    "alpha": false,
+    "execution": false,
+    "fillability": false,
+    "h07_h01_evidence": false,
+    "missing_is_zero_or_flat": false,
+    "numeric_netreturn": false,
+    "pit_admissible": false,
+    "pnl": false,
+    "route_feasibility": false,
+    "settlement": false,
+    "strategy": false,
+    "task30_acceptance": false
+  },
+  "observed_at": "2026-08-14T16:04:39Z",
+  "panel_counts": {
+    "slots_expected": 96,
+    "slots_observed": null,
+    "typed_gaps": null
+  },
+  "panel_state": "NOT_ESTABLISHED",
+  "panel_window": {
+    "interval_seconds": 900,
+    "since_inclusive": "2026-08-12T00:00:00Z",
+    "till_exclusive": "2026-08-13T00:00:00Z"
+  },
+  "preflight": {
+    "credential_reads": 0,
+    "dns_resolved": true,
+    "host": "streaming.bitquery.io",
+    "observed_at": "2026-08-14T16:04:32Z",
+    "port": 443,
+    "provider_requests": 0,
+    "schema": "smial.task30.bitquery-credential-free-preflight",
+    "schema_version": "1.0",
+    "tcp_443": true,
+    "tls_verified": true,
+    "tls_version": "TLSv1.3"
+  },
+  "project_sources_disposition": {
+    "kind": "NO_CHANGE"
+  },
+  "raw_manifest": {
+    "observed_at": "2026-08-14T16:04:39Z",
+    "raw_filename": "raw_response.json",
+    "raw_sha256": "ba69c8d20f8976c9a915f578088e43a65c9b7d79855f6fb683a8dc675fc484c6",
+    "request_body_sha256": "59352e27cbb4ea4b8fc20a60d5031ad3ef25861718e5a6731b3fce65ff5f2a6b",
+    "response_bytes": 138,
+    "retention_class": "A4_OUTSIDE_GIT",
+    "run_id": "20260814T160439136244Z",
+    "schema": "smial.task30.bitquery-raw-manifest",
+    "schema_version": "1.0"
+  },
+  "raw_retention": {
+    "loss_reason": null,
+    "raw_retained": true
+  },
+  "receipt_id": "EVIDENCE-T30-A21P-PATCHED-BITQUERY-ONE-SHOT-001",
+  "route_id": "BITQUERY-SOLANA-PUMPSWAP-OHLCV-001",
+  "schema": "smial.task30.bitquery-named-partial-pit-route-capture.runtime-receipt",
+  "schema_version": "1.0",
+  "task_id": "TASK-30",
+  "terminal_error": "HTTP_STATUS_ERROR",
+  "terminal_outcome": "ROUTE_UNKNOWN_STOP",
+  "transport": {
+    "content_type": "application/json",
+    "http_status": 403,
+    "request_body_sha256": "59352e27cbb4ea4b8fc20a60d5031ad3ef25861718e5a6731b3fce65ff5f2a6b",
+    "request_count": 1,
+    "response_bytes": 138
+  }
+}

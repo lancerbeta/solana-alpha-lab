@@ -1,0 +1,119 @@
+schema: smial.task30.a21-patched-bitquery-one-shot.policy
+schema_version: '1.0'
+task_id: TASK-30
+atom_id: T30-A21_PATCHED_BITQUERY_ONE_SHOT_V1
+contract_id: CONTRACT-T30-A21-PATCHED-BITQUERY-ONE-SHOT-001
+spec_route: NONE
+consumer: RC001-H07-H01-LIQUIDITY-RETENTION
+reopen_basis:
+  a9_contract: docs/evidence/task30/a9_named_partial_pit_route_capture_contract_acceptance_v1.json
+  a19_terminal: docs/evidence/task30/a19_terminal_route_decision_acceptance_v1.json
+  a20_acceptance: docs/evidence/task30/a20_bitquery_named_partial_pit_route_capture_acceptance_v1.json
+  a20p_runtime: docs/evidence/task30/a20p_bitquery_named_partial_pit_route_capture_runtime_receipt_v1.json
+  patched_client_head: 3b532d6ad4a875837bee061ff2e7832e86344fdb
+  decision: PATCHED_CLIENT_SAME_ROUTE_ONE_SHOT_OWNER_GATE
+reference_subject:
+  network: solana
+  pool_address: URqx24yyYxtXXhTbBQnbtPLhtLWYoaDaRxuQuLpNS3S
+  base_mint: DMwbVy48dWVKGe9z1pcVnwF3HLMLrqWdDLfbvx8RchhK
+  quote_mint: So11111111111111111111111111111111111111112
+  dex_id: pumpswap
+  program_address: pAMMBay6oceH9fJKBRHGP5D4bD4sWpmSwMn52FMfXEA
+  target_role: TECHNICAL_DATA_ROUTE_PILOT
+  representativeness: NOT_ESTABLISHED
+provider_route:
+  route_id: BITQUERY-SOLANA-PUMPSWAP-OHLCV-001
+  provider: BITQUERY
+  endpoint: https://streaming.bitquery.io/graphql
+  protocol: HTTPS_POST_GRAPHQL_V2
+  dataset: archive
+  cube: DEXTradeByTokens
+  credential_reference: BITQUERY_ACCESS_TOKEN
+  credential_transport: AUTHORIZATION_BEARER_HEADER
+pilot_window:
+  since_inclusive: '2026-08-12T00:00:00Z'
+  till_exclusive: '2026-08-13T00:00:00Z'
+  interval_seconds: 900
+  expected_slots: 96
+  slot_outcome_policy: OBSERVATION_OR_TYPED_GAP_REQUIRED
+lanes:
+  PIT_MARKET:
+    state: AUTHORIZED_BOUNDED_CAPTURE
+    may_establish: BOUNDED_MARKET_DATA_ROUTE_CAPABILITY
+  ROUTE_FEASIBILITY:
+    state: NOT_ESTABLISHED_FROM_HISTORICAL_OHLCV
+  OWNED_EXECUTION:
+    state: OUT_OF_SCOPE
+route_feasibility:
+  state: NOT_ESTABLISHED_FROM_HISTORICAL_OHLCV
+  notional_currency: USD
+  notional_usd: [10, 25, 50, 100]
+external_authority:
+  basis: OWNER_PHRASE_ONE_PATCHED_POST_AUTHORIZED
+  credential_value_local_only: true
+  capture_authorized: true
+  provider_api_graphql_calls_authorized: 1
+  credential_reads_authorized: 1
+runtime_limits:
+  max_credential_free_preflights: 1
+  max_provider_requests: 1
+  max_response_bytes: 2000000
+  timeout_seconds: 30
+  max_bitquery_points: 100
+execution_controls:
+  monitoring_owner: DIRECT_CURSOR_FOREGROUND
+  retry: false
+  fallback: false
+  redirect: false
+  scheduler: false
+  background_process: false
+retention:
+  class: A4_OUTSIDE_GIT
+  raw_root: local/task30_a21_bitquery_one_shot
+  raw_filename: raw_response.json
+  manifest_filename: raw_manifest_v1.json
+  hash: SHA256_EXACT_BYTES
+  tracked_projection: docs/evidence/task30/a21p_patched_bitquery_one_shot_runtime_receipt_v1.json
+  raw_loss_waiver: HISTORICAL_REQUERY_PLUS_TRACKED_96_SLOT_PROJECTION
+  a20_receipts_immutable: true
+evidence_retention:
+  http_error_status_required: true
+  http_error_body_retained_when_present: true
+  collapse_http_into_transport_forbidden: true
+monitoring:
+  health: DNS_TCP_TLS_HTTP_GRAPHQL_SCHEMA_IDENTITY_RETENTION
+  request_count_terminal: 1
+  secret_exposure_allowed: false
+recovery:
+  retry: FORBIDDEN
+  fallback: FORBIDDEN
+  on_transport_or_provider_error: ROUTE_UNKNOWN_STOP
+  on_partial_data: RETAIN_TYPED_GAPS_NO_IMPUTATION
+terminal_outcomes:
+- COMPLETE_96_SLOT_MARKET_PANEL
+- PARTIAL_TYPED_GAP_PANEL
+- ROUTE_UNKNOWN_STOP
+authority:
+  credential_free_preflight_calls: 1
+  provider_api_rpc_wss_calls: 1
+  credential_reads: 1
+  raw_external_data_writes: 2
+  scheduler_or_background_processes: 0
+  wallet_signer_transaction_actions: 0
+  cash_spend_usd_cents: 0
+  task30_acceptance_actions: 0
+claims:
+  technical_market_route_only: true
+  pit_admissible: false
+  h07_h01_evidence: false
+  fillability: false
+  route_feasibility: false
+  execution: false
+  settlement: false
+  pnl: false
+  numeric_netreturn: false
+  alpha: false
+  strategy: false
+  task30_acceptance: false
+  missing_is_zero_or_flat: false
+project_sources_disposition: NO_CHANGE

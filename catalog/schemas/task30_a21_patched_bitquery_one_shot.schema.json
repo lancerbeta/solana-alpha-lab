@@ -1,0 +1,178 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://solana-alpha-lab.local/schemas/task30_a21_patched_bitquery_one_shot.schema.json",
+  "title": "TASK-30 A21 patched Bitquery one-shot policy",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema", "schema_version", "task_id", "atom_id", "contract_id", "spec_route",
+    "consumer", "reopen_basis", "reference_subject", "provider_route", "pilot_window",
+    "lanes", "route_feasibility", "external_authority", "runtime_limits",
+    "execution_controls", "retention", "evidence_retention", "monitoring", "recovery",
+    "terminal_outcomes", "authority", "claims", "project_sources_disposition"
+  ],
+  "properties": {
+    "schema": {"const": "smial.task30.a21-patched-bitquery-one-shot.policy"},
+    "schema_version": {"const": "1.0"},
+    "task_id": {"const": "TASK-30"},
+    "atom_id": {"const": "T30-A21_PATCHED_BITQUERY_ONE_SHOT_V1"},
+    "contract_id": {"const": "CONTRACT-T30-A21-PATCHED-BITQUERY-ONE-SHOT-001"},
+    "spec_route": {"const": "NONE"},
+    "consumer": {"const": "RC001-H07-H01-LIQUIDITY-RETENTION"},
+    "reopen_basis": {
+      "type": "object", "additionalProperties": false,
+      "required": ["a9_contract", "a19_terminal", "a20_acceptance", "a20p_runtime", "patched_client_head", "decision"],
+      "properties": {
+        "a9_contract": {"const": "docs/evidence/task30/a9_named_partial_pit_route_capture_contract_acceptance_v1.json"},
+        "a19_terminal": {"const": "docs/evidence/task30/a19_terminal_route_decision_acceptance_v1.json"},
+        "a20_acceptance": {"const": "docs/evidence/task30/a20_bitquery_named_partial_pit_route_capture_acceptance_v1.json"},
+        "a20p_runtime": {"const": "docs/evidence/task30/a20p_bitquery_named_partial_pit_route_capture_runtime_receipt_v1.json"},
+        "patched_client_head": {"const": "3b532d6ad4a875837bee061ff2e7832e86344fdb"},
+        "decision": {"const": "PATCHED_CLIENT_SAME_ROUTE_ONE_SHOT_OWNER_GATE"}
+      }
+    },
+    "reference_subject": {
+      "type": "object", "additionalProperties": false,
+      "required": ["network", "pool_address", "base_mint", "quote_mint", "dex_id", "program_address", "target_role", "representativeness"],
+      "properties": {
+        "network": {"const": "solana"},
+        "pool_address": {"const": "URqx24yyYxtXXhTbBQnbtPLhtLWYoaDaRxuQuLpNS3S"},
+        "base_mint": {"const": "DMwbVy48dWVKGe9z1pcVnwF3HLMLrqWdDLfbvx8RchhK"},
+        "quote_mint": {"const": "So11111111111111111111111111111111111111112"},
+        "dex_id": {"const": "pumpswap"},
+        "program_address": {"const": "pAMMBay6oceH9fJKBRHGP5D4bD4sWpmSwMn52FMfXEA"},
+        "target_role": {"const": "TECHNICAL_DATA_ROUTE_PILOT"},
+        "representativeness": {"const": "NOT_ESTABLISHED"}
+      }
+    },
+    "provider_route": {
+      "type": "object", "additionalProperties": false,
+      "required": ["route_id", "provider", "endpoint", "protocol", "dataset", "cube", "credential_reference", "credential_transport"],
+      "properties": {
+        "route_id": {"const": "BITQUERY-SOLANA-PUMPSWAP-OHLCV-001"},
+        "provider": {"const": "BITQUERY"},
+        "endpoint": {"const": "https://streaming.bitquery.io/graphql"},
+        "protocol": {"const": "HTTPS_POST_GRAPHQL_V2"},
+        "dataset": {"const": "archive"},
+        "cube": {"const": "DEXTradeByTokens"},
+        "credential_reference": {"const": "BITQUERY_ACCESS_TOKEN"},
+        "credential_transport": {"const": "AUTHORIZATION_BEARER_HEADER"}
+      }
+    },
+    "pilot_window": {
+      "type": "object", "additionalProperties": false,
+      "required": ["since_inclusive", "till_exclusive", "interval_seconds", "expected_slots", "slot_outcome_policy"],
+      "properties": {
+        "since_inclusive": {"const": "2026-08-12T00:00:00Z"},
+        "till_exclusive": {"const": "2026-08-13T00:00:00Z"},
+        "interval_seconds": {"const": 900},
+        "expected_slots": {"const": 96},
+        "slot_outcome_policy": {"const": "OBSERVATION_OR_TYPED_GAP_REQUIRED"}
+      }
+    },
+    "lanes": {"type": "object"},
+    "route_feasibility": {
+      "type": "object", "additionalProperties": false,
+      "required": ["state", "notional_currency", "notional_usd"],
+      "properties": {
+        "state": {"const": "NOT_ESTABLISHED_FROM_HISTORICAL_OHLCV"},
+        "notional_currency": {"const": "USD"},
+        "notional_usd": {"const": [10, 25, 50, 100]}
+      }
+    },
+    "external_authority": {
+      "type": "object", "additionalProperties": false,
+      "required": ["basis", "credential_value_local_only", "capture_authorized", "provider_api_graphql_calls_authorized", "credential_reads_authorized"],
+      "properties": {
+        "basis": {"const": "OWNER_PHRASE_ONE_PATCHED_POST_AUTHORIZED"},
+        "credential_value_local_only": {"const": true},
+        "capture_authorized": {"const": true},
+        "provider_api_graphql_calls_authorized": {"const": 1},
+        "credential_reads_authorized": {"const": 1}
+      }
+    },
+    "runtime_limits": {
+      "type": "object", "additionalProperties": false,
+      "required": ["max_credential_free_preflights", "max_provider_requests", "max_response_bytes", "timeout_seconds", "max_bitquery_points"],
+      "properties": {
+        "max_credential_free_preflights": {"const": 1},
+        "max_provider_requests": {"const": 1},
+        "max_response_bytes": {"const": 2000000},
+        "timeout_seconds": {"const": 30},
+        "max_bitquery_points": {"const": 100}
+      }
+    },
+    "execution_controls": {
+      "type": "object", "additionalProperties": false,
+      "required": ["monitoring_owner", "retry", "fallback", "redirect", "scheduler", "background_process"],
+      "properties": {
+        "monitoring_owner": {"const": "DIRECT_CURSOR_FOREGROUND"},
+        "retry": {"const": false},
+        "fallback": {"const": false},
+        "redirect": {"const": false},
+        "scheduler": {"const": false},
+        "background_process": {"const": false}
+      }
+    },
+    "retention": {
+      "type": "object", "additionalProperties": false,
+      "required": ["class", "raw_root", "raw_filename", "manifest_filename", "hash", "tracked_projection", "raw_loss_waiver", "a20_receipts_immutable"],
+      "properties": {
+        "class": {"const": "A4_OUTSIDE_GIT"},
+        "raw_root": {"const": "local/task30_a21_bitquery_one_shot"},
+        "raw_filename": {"const": "raw_response.json"},
+        "manifest_filename": {"const": "raw_manifest_v1.json"},
+        "hash": {"const": "SHA256_EXACT_BYTES"},
+        "tracked_projection": {"const": "docs/evidence/task30/a21p_patched_bitquery_one_shot_runtime_receipt_v1.json"},
+        "raw_loss_waiver": {"const": "HISTORICAL_REQUERY_PLUS_TRACKED_96_SLOT_PROJECTION"},
+        "a20_receipts_immutable": {"const": true}
+      }
+    },
+    "evidence_retention": {
+      "type": "object", "additionalProperties": false,
+      "required": ["http_error_status_required", "http_error_body_retained_when_present", "collapse_http_into_transport_forbidden"],
+      "properties": {
+        "http_error_status_required": {"const": true},
+        "http_error_body_retained_when_present": {"const": true},
+        "collapse_http_into_transport_forbidden": {"const": true}
+      }
+    },
+    "monitoring": {"type": "object"},
+    "recovery": {"type": "object"},
+    "terminal_outcomes": {"const": ["COMPLETE_96_SLOT_MARKET_PANEL", "PARTIAL_TYPED_GAP_PANEL", "ROUTE_UNKNOWN_STOP"]},
+    "authority": {
+      "type": "object", "additionalProperties": false,
+      "required": ["credential_free_preflight_calls", "provider_api_rpc_wss_calls", "credential_reads", "raw_external_data_writes", "scheduler_or_background_processes", "wallet_signer_transaction_actions", "cash_spend_usd_cents", "task30_acceptance_actions"],
+      "properties": {
+        "credential_free_preflight_calls": {"const": 1},
+        "provider_api_rpc_wss_calls": {"const": 1},
+        "credential_reads": {"const": 1},
+        "raw_external_data_writes": {"const": 2},
+        "scheduler_or_background_processes": {"const": 0},
+        "wallet_signer_transaction_actions": {"const": 0},
+        "cash_spend_usd_cents": {"const": 0},
+        "task30_acceptance_actions": {"const": 0}
+      }
+    },
+    "claims": {
+      "type": "object", "additionalProperties": false,
+      "required": ["technical_market_route_only", "pit_admissible", "h07_h01_evidence", "fillability", "route_feasibility", "execution", "settlement", "pnl", "numeric_netreturn", "alpha", "strategy", "task30_acceptance", "missing_is_zero_or_flat"],
+      "properties": {
+        "technical_market_route_only": {"const": true},
+        "pit_admissible": {"const": false},
+        "h07_h01_evidence": {"const": false},
+        "fillability": {"const": false},
+        "route_feasibility": {"const": false},
+        "execution": {"const": false},
+        "settlement": {"const": false},
+        "pnl": {"const": false},
+        "numeric_netreturn": {"const": false},
+        "alpha": {"const": false},
+        "strategy": {"const": false},
+        "task30_acceptance": {"const": false},
+        "missing_is_zero_or_flat": {"const": false}
+      }
+    },
+    "project_sources_disposition": {"const": "NO_CHANGE"}
+  }
+}
