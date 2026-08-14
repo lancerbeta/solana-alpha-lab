@@ -234,8 +234,14 @@ class Task21DatasetFreezeAcceptanceTests(unittest.TestCase):
         router = marker["resume_router"]
         self.assertEqual(
             router["status"],
-            "A8_MERGED_PENDING_TASK21_FINISH_SOURCE_ACTIVATION",
+            "TERMINAL_DORMANT_OWNER_EXPORT_OPTIONAL",
         )
+        self.assertEqual(
+            router["entry_rule"],
+            "HISTORICAL_COMPATIBILITY_ONLY_NO_ACTIVE_RESUME_ACTION",
+        )
+        self.assertEqual(router["due_gate_precedence"], "NONE_TERMINAL_DORMANT")
+        self.assertIsNone(router["active_gate_id"])
         self.assertEqual(
             router["read_only_command"][-2:],
             ["scripts/show_t21_finish_gate.py", "--json"],
@@ -245,6 +251,10 @@ class Task21DatasetFreezeAcceptanceTests(unittest.TestCase):
         self.assertEqual(resolution["next_atom"], "T21-A8_REPOSITORY_DELIVERY_V1")
         self.assertFalse(resolution["next_atom_authorized"])
         self.assertFalse(resolution["task22_started"])
+        self.assertEqual(
+            router["a8_resolution"]["next_boundary"],
+            "TERMINAL_NO_OWNER_ACTION",
+        )
         self.assertEqual(
             self.receipt["next_boundary"]["status"], "NOT_AUTHORIZED"
         )

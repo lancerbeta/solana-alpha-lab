@@ -795,7 +795,7 @@ def bound_delivery_evidence(
         optional_evidence = {
             "base_main", "owner_approvals", "cloud_bundle_mode",
             "cloud_bundle_required_by_harness", "cloud_bundle_smoke_required",
-            "capability_radar_now",
+            "project_sources_disposition", "capability_radar_now",
         }
         if not (
             required_evidence <= set(evidence) <= required_evidence | optional_evidence
@@ -827,6 +827,21 @@ def bound_delivery_evidence(
             or ("cloud_bundle_mode" in evidence and evidence["cloud_bundle_mode"] != "OWNER_MANAGED_OPTIONAL_EXPORT")
             or ("cloud_bundle_required_by_harness" in evidence and evidence["cloud_bundle_required_by_harness"] is not False)
             or ("cloud_bundle_smoke_required" in evidence and evidence["cloud_bundle_smoke_required"] is not False)
+            or ("project_sources_disposition" in evidence and not (
+                isinstance(evidence["project_sources_disposition"], dict)
+                and set(evidence["project_sources_disposition"]) in (
+                    {"kind"}, {"kind", "reason"}
+                )
+                and evidence["project_sources_disposition"].get("kind")
+                in {"NO_CHANGE", "RELEASE_CANDIDATE", "ACTIVATION_RECEIPT"}
+                and (
+                    "reason" not in evidence["project_sources_disposition"]
+                    or (
+                        isinstance(evidence["project_sources_disposition"]["reason"], str)
+                        and bool(evidence["project_sources_disposition"]["reason"])
+                    )
+                )
+            ))
             or ("capability_radar_now" in evidence and not (
                 isinstance(evidence["capability_radar_now"], str)
                 and bool(evidence["capability_radar_now"])

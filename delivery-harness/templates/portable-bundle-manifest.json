@@ -66,7 +66,7 @@
     {
       "source": "catalog/schemas/delivery_harness_completion_evidence.schema.json",
       "destination": "catalog/schemas/delivery_harness_completion_evidence.schema.json",
-      "sha256": "42f650a83ffda753f0cb1a54944a8529e1019f782db4c51220e1852275e632b9"
+      "sha256": "fa6af92585341f34e4314552f71ae1688c82ffdfc4e6b44f347c6efac786d353"
     },
     {
       "source": "catalog/schemas/delivery_harness_independent_review_evidence.schema.json",

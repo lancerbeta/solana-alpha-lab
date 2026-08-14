@@ -120,6 +120,7 @@ tests/test_delivery_harness_merge_guard.py
 tests/test_owner_attention_gate_policy.py
 tests/test_catalog.py
 tests/test_provider_route_capability_registry.py
+tests/test_task21_dataset_freeze_acceptance.py
 tests/test_task21_durable_resume_router_binding.py
 tests/test_t21_finish_gate.py
 tests/test_task21_owner_pulse.py

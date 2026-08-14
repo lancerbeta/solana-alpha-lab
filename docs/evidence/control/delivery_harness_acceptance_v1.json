@@ -14,6 +14,10 @@
   "cloud_bundle_mode": "OWNER_MANAGED_OPTIONAL_EXPORT",
   "cloud_bundle_required_by_harness": false,
   "cloud_bundle_smoke_required": false,
+  "project_sources_disposition": {
+    "kind": "NO_CHANGE",
+    "reason": "The Git-native Delivery Harness changes repository control and portability assets only; no permanent Project Sources release payload or activation set changes."
+  },
   "capability_radar_now": "NONE",
   "implementation_bindings": {
     ".agents/skills/delivery-harness/SKILL.md": "e3c654f84fcfc7cc6f9182dcc4e49aa7b958f717e424310b6f87547397e6e8c1",
@@ -25,7 +29,7 @@
     "catalog/schemas/delivery_harness_capability_radar.schema.json": "90253c97e1b9cabc80a48ef2b3ec2b23da5d6a499124184e3a571f8c2ec01734",
     "catalog/schemas/delivery_harness_context_map.schema.json": "19cb254e9cacdb7a9d20e202c9ad9468378eb96b1285dd130077d325199c3d8b",
     "catalog/schemas/delivery_harness_context_receipt.schema.json": "ec93dc76b8f478f1550df61bdec9f93f442fbd9f6e629703adb07de6464bcf18",
-    "catalog/schemas/delivery_harness_completion_evidence.schema.json": "42f650a83ffda753f0cb1a54944a8529e1019f782db4c51220e1852275e632b9",
+    "catalog/schemas/delivery_harness_completion_evidence.schema.json": "fa6af92585341f34e4314552f71ae1688c82ffdfc4e6b44f347c6efac786d353",
     "catalog/schemas/delivery_harness_independent_review_evidence.schema.json": "f5ecbb2ead0255e98ed03a026181190651d97c1f9214234a44ea197d39c0d40f",
     "catalog/schemas/delivery_harness_project_profile.schema.json": "66bf134c4de09a4ed94d55c75c1fe2a955f6040acbd11eab9421b05959413677",
     "catalog/schemas/delivery_harness_task_contract.schema.json": "1f8f878befa55ffbdf5b670d1b5cdc083ccd3dae4efed3f793e3d2191452fe85",
@@ -39,7 +43,7 @@
     "delivery-harness/policies/solana-alpha-lab.md": "a2659a7b16b52c4ef26f87a412abc99f32313f93b7a82a633023dcdca18abdb5",
     "delivery-harness/project-profile.yaml": "5aff7be56febd2ebadab76ae6f86e7023dd1f5a6facf9bed58f07747779d3df1",
     "delivery-harness/templates/bootstrap-prompt.md": "0af2660e84b4f37d917832db88e5a03069fc85c3a331bc9476e24eddee171aef",
-    "delivery-harness/templates/portable-bundle-manifest.json": "9979aa65a0b77d92e1fefc99b4f28e42d95d1abe3d13f10c588a734a3b70d288",
+    "delivery-harness/templates/portable-bundle-manifest.json": "6f25fa0903143cd2fae93c9e13af95557a56e632ebc7d82f14b1104f34923878",
     "delivery-harness/templates/portable-core/.cursor/commands/delivery-finish.md": "d4007af65c3fcad8be54269e4b341e53d9ebf64e04edc09013afdfff5b186ca3",
     "delivery-harness/templates/portable-core/.cursor/commands/delivery-start.md": "c28a2c63fc7826463a26e75927968935802193bec4adcc470f9b4fc4cd095f4b",
     "delivery-harness/templates/portable-core/AGENTS.md": "452ebadb254c594afa45df5ac978b1f54da0a1640214afba5ec9a48b3f3871af",
@@ -53,11 +57,11 @@
     "docs/agent/DELIVERY_HARNESS_BOOTSTRAP.md": "d223d2d52cde600ae9cf265cb0e4145b46e365780d1de2d9965cbe440504a6d8",
     "docs/agent/DELIVERY_HARNESS_PROTOCOL.md": "e85ba3f1de833417c4c63de0f8e746be706a917306172fe1b8ec31a2b0ffc9cc",
     "docs/decisions/ADR-005-direct-delivery-harness.md": "11b40a38077c57127f224a63c3c4cf5c0bca7c6d910b7da83c5128adb4ebe59f",
-    "docs/superpowers/plans/2026-08-13-delivery-harness-v1.md": "1f411653f6281698042e195bb92d82a16e69462504a022a58313f84afae49ede",
+    "docs/superpowers/plans/2026-08-13-delivery-harness-v1.md": "a0525254db20214bdf3834512a8ab92962f4164e2f98d47b139ff26a1b8827e8",
     "docs/superpowers/specs/2026-08-13-delivery-harness-design.md": "e8d053e95a0f9a42a668e769ef80ad95d45269af9a7ed63a14603ce39d536540",
     "docs/tasks/CTRL-DELIVERY-HARNESS-V1.md": "e6b14b15982d305d5a7a7567dd15b8de7b1c61c51020abc76d01ce6567ccea28",
     "scripts/delivery_harness.py": "cf09fa151e8483511d8be75662d7db27bd4011b2620bdfb3d4486c2bb96ad110",
-    "scripts/owner_attention_gate.py": "33006f17fde77d5ac4e74bacad421a8716f33b6ff84d93ef74072e30257ffab2",
+    "scripts/owner_attention_gate.py": "2f4f4d388583b03894fd32fffd29266c0a772d9f6d590cd5a2ce26748c29f6b9",
     "scripts/validate_baton.py": "dce0138ce90b64c04abad2bf9ca959b1ee0d9529f8871082400d3061237339c1",
     "src/solana_alpha_lab/t21_finish_gate.py": "4e9cf571cbfdfa3a106bc8e4015c6c9d8a5e0c44ece80241e196f5bf36ae368b",
     "tests/test_delivery_harness_adapters.py": "d17116e75c25ce81168cefa53e532477d2a2e0f9c575fd5b6c58fc807d630c14",
@@ -67,7 +71,9 @@
     "tests/test_delivery_harness_contract.py": "9448648858d686e1bfeba5add29cf2330a8ae5ec2d03ae536eeddf1d00138397",
     "tests/test_delivery_harness_merge_guard.py": "c245cf45a21d334896f5aa0cad43c24b94a4947531975cf95a099230b4ea8861",
     "tests/test_t21_finish_gate.py": "6986160663e6960303429c990e7ec105d70b18bba1afeb03d8acc6ffe1a0b458",
-    "tests/test_task21_durable_resume_router_binding.py": "948246dde3dd4e70b7af591b5c8fcedc5ed0b8e6e43f53efedcb197ea07ad1b3"
+    "tests/test_task21_dataset_freeze_acceptance.py": "f8f57a7d964bc499e301d613a5a1d2952bf133106b48e174c3002f373c8b6967",
+    "tests/test_task21_durable_resume_router_binding.py": "948246dde3dd4e70b7af591b5c8fcedc5ed0b8e6e43f53efedcb197ea07ad1b3",
+    "tests/test_task21_owner_pulse.py": "4efe09496a5a37d744ab412fedb3a12581dcff93807c92b39d351230a9ffcd7c"
   },
   "active_stop_conditions": [],
   "owner_attention_triggers": {
@@ -79,14 +85,14 @@
   },
   "factory_fit": {
     "path": "docs/evidence/control/delivery_harness_factory_fit_v1.json",
-    "sha256": "903ed03dc4052b80bcba6f21ea53b088a7391d6fc124b4cdc2970a120d27a37c",
+    "sha256": "d0b39298497724f8b229f347e3c4953670435be32b793624cb367108e7fcd842",
     "verdict": "PASS"
   },
   "validation": {
     "targeted": "PASS_128_TARGETED_TESTS",
     "independent_review": {
       "path": "docs/evidence/control/delivery_harness_independent_review_v1.json",
-      "sha256": "7aad78823135c8b696202f315e8a85a3b19794492bb3a35e3d0ae5274f88bd84",
+      "sha256": "302b6f1cf8092e6a9ff1cdc5b1b27616443a417c52c6700dda98b6cb490107ee",
       "verdict": "PASS"
     },
     "full_gate": "ENFORCED_BY_PROJECT_BOUND_VALIDATION",

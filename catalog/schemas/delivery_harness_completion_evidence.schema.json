@@ -23,6 +23,15 @@
     "cloud_bundle_mode": {"const": "OWNER_MANAGED_OPTIONAL_EXPORT"},
     "cloud_bundle_required_by_harness": {"const": false},
     "cloud_bundle_smoke_required": {"const": false},
+    "project_sources_disposition": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["kind"],
+      "properties": {
+        "kind": {"enum": ["NO_CHANGE", "RELEASE_CANDIDATE", "ACTIVATION_RECEIPT"]},
+        "reason": {"type": "string", "minLength": 1}
+      }
+    },
     "capability_radar_now": {"type": "string", "minLength": 1},
     "implementation_bindings": {
       "type": "object",

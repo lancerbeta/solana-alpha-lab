@@ -11088,7 +11088,7 @@ records:
     repository_path: tests/test_task21_dataset_freeze_acceptance.py
   integrity:
     kind: sha256
-    sha256: 18a5e6f146ff03b470eaf5ebb98c0ffcd607f647bb066472fcf9a0ac0c3f90e5
+    sha256: f8f57a7d964bc499e301d613a5a1d2952bf133106b48e174c3002f373c8b6967
   access: *t21_read_file
   relations:
   - relation_type: depends_on
@@ -15801,7 +15801,7 @@ records:
   as_of: '2026-08-14'
   truth_owner: CTRL-DELIVERY-HARNESS-001
   location: {kind: git_path, logical_uri: 'repo://scripts/owner_attention_gate.py', repository_path: scripts/owner_attention_gate.py}
-  integrity: {kind: sha256, sha256: 33006f17fde77d5ac4e74bacad421a8716f33b6ff84d93ef74072e30257ffab2}
+  integrity: {kind: sha256, sha256: 2f4f4d388583b03894fd32fffd29266c0a772d9f6d590cd5a2ce26748c29f6b9}
   access: *t25_read_file
   relations:
   - {relation_type: governed_by, target_asset_id: POLICY-OWNER-ATTENTION-GATE-002}
@@ -19293,7 +19293,7 @@ records:
   as_of: '2026-08-14'
   truth_owner: CTRL-DELIVERY-HARNESS-001
   location: {kind: git_path, logical_uri: 'repo://delivery-harness/templates/portable-bundle-manifest.json', repository_path: delivery-harness/templates/portable-bundle-manifest.json}
-  integrity: {kind: sha256, sha256: 9979aa65a0b77d92e1fefc99b4f28e42d95d1abe3d13f10c588a734a3b70d288}
+  integrity: {kind: sha256, sha256: 6f25fa0903143cd2fae93c9e13af95557a56e632ebc7d82f14b1104f34923878}
   access: *t25_read_file
   relations:
   - {relation_type: governed_by, target_asset_id: CTRL-DELIVERY-HARNESS-001}
@@ -19330,7 +19330,7 @@ records:
   as_of: '2026-08-14'
   truth_owner: CTRL-DELIVERY-HARNESS-001
   location: {kind: git_path, logical_uri: 'repo://catalog/schemas/delivery_harness_completion_evidence.schema.json', repository_path: catalog/schemas/delivery_harness_completion_evidence.schema.json}
-  integrity: {kind: sha256, sha256: 42f650a83ffda753f0cb1a54944a8529e1019f782db4c51220e1852275e632b9}
+  integrity: {kind: sha256, sha256: fa6af92585341f34e4314552f71ae1688c82ffdfc4e6b44f347c6efac786d353}
   access: *t25_read_file
   relations:
   - {relation_type: governed_by, target_asset_id: CTRL-DELIVERY-HARNESS-001}
