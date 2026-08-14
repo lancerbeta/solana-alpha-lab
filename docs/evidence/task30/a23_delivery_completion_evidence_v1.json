@@ -12,7 +12,7 @@
   "project_sources_disposition": {"kind": "NO_CHANGE"},
   "capability_radar_now": "NONE",
   "implementation_bindings": {
-    "catalog/assets/core.yaml": "47b58deccd3cdc6b3f5da57c89f1dd0f58d266b34ae1b4728c704158258b752b",
+    "catalog/assets/core.yaml": "1e0ad72ab762a9eb4ad9e0eedaf58ceed492cca56152e59769a8ffda22d250c3",
     "catalog/assets/lifecycle.yaml": "0dd6b430c4a3451213c9ff03c9ed011342cf8376a4adc3f4784a04686ddddbca",
     "catalog/catalog_manifest.yaml": "d5f2132b26e84024fc24391781105779932922f4a7182957e239780692fa0f48",
     "catalog/generated/asset_edges.json": "e6edb7b87fb122ef79daf6b01ecc19106b29b277ce8bbf522ea07b2756562032",
@@ -22,7 +22,7 @@
     "configs/task30_a23_helius_bounded_pagination_complete_batch_v1.yaml": "b786f05ce6dead10c5aa8f1bce6f1d3254d5261d5d3bbfa89d3a77737a1d0821",
     "docs/PROJECT_MAP.md": "e5f6704712e97591b6b20c9d32df61321ba2e07af1792700f6c66f523e47fa85",
     "docs/contracts/task30_a23_helius_bounded_pagination_complete_batch_contract_v1.md": "a03a5dfa7cb720783de19088fb685a60ed4a8767727ccb98c9fa88bd86649ad3",
-    "docs/evidence/task30/a23_helius_bounded_pagination_acceptance_v1.json": "d274046709768977a5941a21446d833a4514aa4bb5b9bd90ddf7d618d8539887",
+    "docs/evidence/task30/a23_helius_bounded_pagination_acceptance_v1.json": "e0de7570eb7995d1f90a8fb4df4cbb336f57c48b977111ebc07b1392989bbd1b",
     "docs/evidence/task30/a23_helius_bounded_pagination_runtime_receipt_v1.json": "7aa03c53222f64a462270994304fe512a4b5d91e5fc3781e31ce50e26a5dbeca",
     "docs/evidence/task30/a23_provider_route_capability_registry_acceptance_v1.json": "f4cc37047c68e9c1b1cd88e460c128fcfe3ba2d0c5774805f7ab491bd784a0e8",
     "docs/reports/task30/a23_helius_bounded_pagination_readout_v1.md": "c429d73287bd6330cab84119a05b9fddbf0e326328731ae5fe31d4568cc01335",
@@ -36,14 +36,14 @@
     "tests/test_catalog.py": "1ad87c5d33e3671fa6e56fc3bdc06bb14ee5255ccb302bcd559c37e4b53901fb",
     "tests/test_lifecycle_registries.py": "f94db83dbd05e9ccff810712bb56465cdcdcea2c09ea0724fc93b9827f72d430",
     "tests/test_provider_route_capability_registry_v6.py": "f23b8b3892063cfe319ae9cf86bc806e7d4c80df334546899eea11e355d769bf",
-    "tests/test_task30_a23_helius_bounded_pagination.py": "e2f79d2db32a39b1dbdaa63efb3ed693938e4ba61d86d071012d7675893a52db"
+    "tests/test_task30_a23_helius_bounded_pagination.py": "4267806e06b8a2e946854c2fb1d188c7b3b9cc6aa2c66b141263a54b1ab0bc12"
   },
   "active_stop_conditions": [],
   "owner_attention_triggers": {"auth_or_access_recovery": false, "material_owner_decision": false, "user_only_activation": false, "external_material_action": false, "unresolved_safety_or_truth_conflict": false},
-  "factory_fit": {"path": "docs/evidence/task30/a23_delivery_factory_fit_v1.json", "sha256": "3a397d5578bade3cb265803584619a31cdbff8e2ed1e1261796772c0019df70e", "verdict": "PASS"},
+  "factory_fit": {"path": "docs/evidence/task30/a23_delivery_factory_fit_v1.json", "sha256": "65cb73ca38752ee636965bed4592fb6986281a26ff989c0eb661eafdd12d6649", "verdict": "PASS"},
   "validation": {
     "targeted": "PASS_59_DIRECT_CONSUMER_REGISTRY_AND_CATALOG_TESTS",
-    "independent_review": {"path": "docs/evidence/task30/a23_delivery_independent_review_v1.json", "sha256": "623a5d52a054087b3837d654a7dc2b639d1208e7e01a36427e0cf66b5025a3a0", "verdict": "PASS"},
+    "independent_review": {"path": "docs/evidence/task30/a23_delivery_independent_review_v1.json", "sha256": "56c60fe9d9ba77150a8f2773103ba88532a211c26b543bffcf434af574dcbbee", "verdict": "PASS"},
     "full_gate": "ENFORCED_BY_PROJECT_BOUND_VALIDATION",
     "github_ci": "ENFORCED_LIVE_AT_GUARDED_MERGE",
     "project_checks": ["PASS_GENERATED_NAVIGATION_SECRET_CURSOR_ABSOLUTE_PATH_AST_AND_DIFF_CHECKS"]

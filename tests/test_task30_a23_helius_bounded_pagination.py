@@ -4,7 +4,7 @@ import importlib
 import hashlib
 import inspect
 import json
-import os
+import subprocess
 import sys
 import tempfile
 import unittest
@@ -198,12 +198,25 @@ class Task30A23HeliusBoundedPaginationBehaviorTests(unittest.TestCase):
         manifest = receipt["raw_manifests"][0]
         self.assertEqual(manifest["raw_filename"], "raw_response.json")
         self.assertEqual(manifest["retention_class"], "A4_OUTSIDE_GIT")
-        if not raw_path.is_file():
-            self.assertEqual(os.environ.get("CI"), "true", raw_path)
-            return
-        raw = raw_path.read_bytes()
-        self.assertEqual(hashlib.sha256(raw).hexdigest(), manifest["raw_sha256"])
-        self.assertEqual(len(raw), manifest["response_bytes"])
+        page_summary = receipt["page_summaries"][1]
+        self.assertEqual(manifest["raw_sha256"], page_summary["raw_sha256"])
+        self.assertEqual(manifest["response_bytes"], page_summary["response_bytes"])
+        self.assertEqual(receipt["new_response_bytes"], manifest["response_bytes"])
+        relative_raw_path = (
+            raw_path.relative_to(ROOT) if raw_path.is_absolute() else raw_path
+        )
+        ignored = subprocess.run(
+            ["git", "check-ignore", "--quiet", "--no-index", relative_raw_path.as_posix()],
+            cwd=ROOT,
+            check=False,
+            stdout=subprocess.DEVNULL,
+            stderr=subprocess.DEVNULL,
+        )
+        self.assertEqual(ignored.returncode, 0, relative_raw_path)
+        if raw_path.is_file():
+            raw = raw_path.read_bytes()
+            self.assertEqual(hashlib.sha256(raw).hexdigest(), manifest["raw_sha256"])
+            self.assertEqual(len(raw), manifest["response_bytes"])
         self.assertEqual(receipt["terminal_outcome"], "COMPLETE_RAW_BATCH_CANDIDATE")
         self.assertEqual(receipt["provider_requests"], 1)
         self.assertEqual(receipt["total_transaction_count"], 520)
