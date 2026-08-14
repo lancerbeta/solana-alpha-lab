@@ -1,0 +1,123 @@
+{
+  "schema": "smial.task30.a21-patched-bitquery-one-shot.acceptance",
+  "schema_version": "1.0",
+  "receipt_id": "EVIDENCE-T30-A21-PATCHED-BITQUERY-ONE-SHOT-001",
+  "task_id": "TASK-30",
+  "atom_id": "T30-A21_PATCHED_BITQUERY_ONE_SHOT_V1",
+  "as_of": "2026-08-14",
+  "entry_gate": "START_AS_WRITTEN",
+  "spec_route": "NONE",
+  "decision": "ROUTE_UNKNOWN_STOP_NO_RETRY",
+  "task_state": "BLOCKED_DATA",
+  "named_consumer": "RC001-H07-H01-LIQUIDITY-RETENTION",
+  "route_observation": {
+    "route_id": "BITQUERY-SOLANA-PUMPSWAP-OHLCV-001",
+    "preflight": "DNS_TCP_TLS_PASS",
+    "provider_requests": 1,
+    "terminal_outcome": "ROUTE_UNKNOWN_STOP",
+    "terminal_error": "HTTP_STATUS_ERROR",
+    "http_status": 403,
+    "http_or_graphql_cause": "BITQUERY_PLAN_ALLOWS_REALTIME_ONLY_ARCHIVE_CUBE_FORBIDDEN",
+    "response_bytes": 138,
+    "panel_state": "NOT_ESTABLISHED",
+    "slots_observed": null,
+    "typed_gaps": null,
+    "retry": false,
+    "fallback": false,
+    "a20_bytes_unchanged": true
+  },
+  "decision_delta": "The patched same-route one-shot retained HTTP 403 and classified the stop as a Bitquery plan restriction against archive DEXTradeByTokens, without retrying A20.",
+  "uncertainty_removed": "A20's collapsed TRANSPORT_ERROR is replaced by retained HTTP 403: the current plan allows realtime only, so the frozen archive cube cannot yield a 96-slot panel.",
+  "capability_or_evidence": "A21 runtime receipt with http_status 403, raw bytes retained outside Git, and unchanged A20 receipts.",
+  "stop": "The only authorized patched provider request is consumed; no retry, fallback, second provider, realtime pivot or TASK-30 promotion is allowed in this atom.",
+  "next": "Do not repeat the archive POST. Any Bitquery plan change, dataset change or other provider requires a fresh owner gate after this PR.",
+  "reviews": {
+    "review_mode": "SINGLE_AGENT_REVIEW_FALLBACK",
+    "code_review": {
+      "verdict": "PASS",
+      "closed_findings": [
+        "A21 CLI refuses unauthorized policy and never writes A20 receipt paths.",
+        "HTTPError status is retained on the tracked A21 receipt."
+      ],
+      "open_findings": []
+    },
+    "goal_and_dod_review": {
+      "verdict": "PASS_WITH_DELIVERY_PENDING",
+      "business_terminal_reached": true,
+      "pr_and_exact_head_ci_pending": true
+    },
+    "architecture_review": {
+      "verdict": "PASS",
+      "boundary": "One credential-free preflight, one credential read, one provider POST, A21 paths only, A20 immutable, no retry/fallback.",
+      "follow_up": "Realtime dataset is not a PIT substitute for the frozen historical window."
+    }
+  },
+  "factory_fit_review": "FULL_REVIEW",
+  "factory_fit": {
+    "verdict": "PASS_WITH_FOLLOWUP",
+    "mission": "The atom converted an uninformative transport class into a retained HTTP cause without promoting candles into product progress.",
+    "research_truth": "HTTP 403 plan restriction is not missingness-as-zero; slot counts remain null.",
+    "owner_operability": "No archive retry. Next external action needs a new owner phrase.",
+    "recovery": "Raw bytes are outside Git; tracked receipt is sufficient to stop the same-route loop.",
+    "build_vs_buy": "Reused the merged patched client and Bitquery official GraphQL; no new dependency.",
+    "follow_up": "TASK-30 remains BLOCKED_DATA. Archive Bitquery is not currently entitled on this plan."
+  },
+  "product_horizon": {
+    "now": "NONE",
+    "watch": {
+      "candidate": "A different PIT-admissible route or an explicitly paid Bitquery archive entitlement, only if RC001-H07-H01 remains the owner priority.",
+      "value": "Could unblock a 15m historical panel for liquidity-retention.",
+      "evidence_required": "Fresh exact owner gate; not another A21 archive POST.",
+      "cost_risk": "Plan upgrade is cash; another provider is a route pivot.",
+      "owner": "GOAL_OWNER",
+      "activation_trigger": "Explicit new external-read or spend authority after this PR is merged."
+    }
+  },
+  "capability_radar": {
+    "decision": "NONE",
+    "candidate": null,
+    "install_authority": false
+  },
+  "authority": {
+    "credential_free_preflights": 1,
+    "credential_reads": 1,
+    "provider_requests": 1,
+    "retries": 0,
+    "fallbacks": 0,
+    "scheduler_or_background_processes": 0,
+    "wallet_signer_transaction_actions": 0,
+    "cash_spend_usd_cents": 0,
+    "task30_acceptance_actions": 0
+  },
+  "non_claims": {
+    "provider_failure": false,
+    "provider_unavailable": false,
+    "pit_admissible": false,
+    "h07_h01_evidence": false,
+    "route_feasibility": false,
+    "fillability": false,
+    "execution": false,
+    "settlement": false,
+    "pnl": false,
+    "numeric_netreturn": false,
+    "alpha": false,
+    "strategy": false,
+    "task30_acceptance": false,
+    "missing_is_zero_or_flat": false,
+    "realtime_is_historical_pit": false
+  },
+  "artifact_bindings": {
+    "task": {"path": "docs/tasks/TASK-30-a21-patched-bitquery-one-shot.md", "sha256": "15a381d63056bd8236c5f3f3bf9186aec33fc885a2249a6e1e03213138782bfb"},
+    "contract": {"path": "docs/contracts/task30_a21_patched_bitquery_one_shot_contract_v1.md", "sha256": "e602917fb7f50cde5c09a58203be9fbe3c94fda2737bc9f895c526f07aa5e05a"},
+    "configuration": {"path": "configs/task30_a21_patched_bitquery_one_shot_v1.yaml", "sha256": "5ff1f7ee9989b6cd41a6ea07b56e27a94c61d8e1c49afe3ea97f0e82a743ac79"},
+    "schema": {"path": "catalog/schemas/task30_a21_patched_bitquery_one_shot.schema.json", "sha256": "3bdbdc2449c6b2c4db9a414b1f331597bc13f81c9ded1f3d256df6bbf604d17d"},
+    "script": {"path": "scripts/run_task30_a21_patched_bitquery_one_shot.py", "sha256": "79b8ec68df5e5bcd5eb117e3dd5af7f5201a3aa3f96eb64aa9d889aabc92fec0"},
+    "test": {"path": "tests/test_task30_a21_patched_bitquery_one_shot.py", "sha256": "9139c8c37a1e94c79de2fe91e0f08a4bdd04e1087ae1e2e64acbc5eb3ebc3d87"},
+    "runtime": {"path": "docs/evidence/task30/a21p_patched_bitquery_one_shot_runtime_receipt_v1.json", "sha256": "fbe73bcf4ca6755e8bfc09a4a4a60a8bec9d75b86224abf2bf47646fbf5d529b"},
+    "report": {"path": "docs/reports/task30/a21_patched_bitquery_one_shot_readout_v1.md", "sha256": "5761c5044ab1ce8ce9cfe4854a0ee87e6bd889191250babeed88b51dc5281914"},
+    "a20_runtime": {"path": "docs/evidence/task30/a20p_bitquery_named_partial_pit_route_capture_runtime_receipt_v1.json", "sha256": "fd7a52e6952e12fc48b9a88ed13b6dcfb28dbc9324cb767642fb28806897a185"}
+  },
+  "project_sources_disposition": {"kind": "NO_CHANGE"},
+  "state_change": "ROUTE_OBSERVATION_RECORDED_NO_TASK30_PROMOTION",
+  "rollback": "Remove only A21 tracked files and Catalog records. The external read is already consumed and is never retried by rollback. A20 bytes stay."
+}

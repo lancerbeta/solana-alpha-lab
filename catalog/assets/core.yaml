@@ -13363,6 +13363,176 @@ records:
   search_terms: [A20, ACCEPTANCE, FULL_REVIEW, ROUTE_UNKNOWN_STOP, NO_TASK30_PROMOTION]
   classification: {contains_secrets: false, contains_raw_data: false, sensitivity: INTERNAL_NON_SECRET}
 
+- asset_id: CONTRACT-T30-A21-PATCHED-BITQUERY-ONE-SHOT-001
+  record_version: '1.0'
+  asset_type: control_document
+  purpose: Exact same-route patched Bitquery one-shot contract with one authorized POST and HTTP-evidence retention.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-08-14'
+  truth_owner: TASK-30
+  location: {kind: git_path, logical_uri: 'repo://docs/contracts/task30_a21_patched_bitquery_one_shot_contract_v1.md', repository_path: docs/contracts/task30_a21_patched_bitquery_one_shot_contract_v1.md}
+  integrity: {kind: sha256, sha256: e602917fb7f50cde5c09a58203be9fbe3c94fda2737bc9f895c526f07aa5e05a}
+  access: {mode: read_only, method: file, network_required: false, secrets_required: false}
+  relations:
+  - {relation_type: derived_from, target_asset_id: EVIDENCE-T30-A20-BITQUERY-PIT-CAPTURE-001}
+  - {relation_type: derived_from, target_asset_id: EVIDENCE-T30-A20P-BITQUERY-PIT-CAPTURE-001}
+  - {relation_type: derived_from, target_asset_id: EVIDENCE-T30-A19-TERMINAL-ROUTE-DECISION-001}
+  consumers: [TASK-30, RC001-H07-H01-LIQUIDITY-RETENTION, FACTORY-001]
+  evidence: []
+  search_terms: [A21, BITQUERY, PATCHED_CLIENT, ONE_SHOT, CAPTURE_AUTHORIZED, HTTPError]
+  classification: {contains_secrets: false, contains_raw_data: false, sensitivity: INTERNAL_NON_SECRET}
+
+- asset_id: CONFIG-T30-A21-PATCHED-BITQUERY-ONE-SHOT-001
+  record_version: '1.0'
+  asset_type: configuration
+  purpose: Closed A21 policy freezing the A20 route identity and authorizing one patched POST.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-08-14'
+  truth_owner: TASK-30
+  location: {kind: git_path, logical_uri: 'repo://configs/task30_a21_patched_bitquery_one_shot_v1.yaml', repository_path: configs/task30_a21_patched_bitquery_one_shot_v1.yaml}
+  integrity: {kind: sha256, sha256: 5ff1f7ee9989b6cd41a6ea07b56e27a94c61d8e1c49afe3ea97f0e82a743ac79}
+  access: {mode: read_only, method: file, network_required: false, secrets_required: false}
+  relations: [{relation_type: governed_by, target_asset_id: CONTRACT-T30-A21-PATCHED-BITQUERY-ONE-SHOT-001}]
+  consumers: [TASK-30, RC001-H07-H01-LIQUIDITY-RETENTION, FACTORY-001]
+  evidence: []
+  search_terms: [A21, BITQUERY, CAPTURE_AUTHORIZED, NO_RETRY, SAME_WINDOW]
+  classification: {contains_secrets: false, contains_raw_data: false, sensitivity: INTERNAL_NON_SECRET}
+
+- asset_id: SCHEMA-T30-A21-PATCHED-BITQUERY-ONE-SHOT-001
+  record_version: '1.0'
+  asset_type: schema
+  purpose: Closed JSON Schema for the A21 patched one-shot policy, authorized capture and HTTP-evidence obligation.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-08-14'
+  truth_owner: TASK-30
+  location: {kind: git_path, logical_uri: 'repo://catalog/schemas/task30_a21_patched_bitquery_one_shot.schema.json', repository_path: catalog/schemas/task30_a21_patched_bitquery_one_shot.schema.json}
+  integrity: {kind: sha256, sha256: 3bdbdc2449c6b2c4db9a414b1f331597bc13f81c9ded1f3d256df6bbf604d17d}
+  access: {mode: read_only, method: file, network_required: false, secrets_required: false}
+  relations: [{relation_type: governed_by, target_asset_id: CONTRACT-T30-A21-PATCHED-BITQUERY-ONE-SHOT-001}]
+  consumers: [TASK-30, FACTORY-001]
+  evidence: []
+  search_terms: [A21, BITQUERY, CLOSED_SCHEMA, HTTP_ERROR_STATUS_REQUIRED]
+  classification: {contains_secrets: false, contains_raw_data: false, sensitivity: INTERNAL_NON_SECRET}
+
+- asset_id: TEST-T30-A21-PATCHED-BITQUERY-ONE-SHOT-001
+  record_version: '1.0'
+  asset_type: script
+  purpose: Deterministic tests that A21 reuses the A20 route, authorizes one shot and leaves A20 receipts immutable.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-08-14'
+  truth_owner: TASK-30
+  location: {kind: git_path, logical_uri: 'repo://tests/test_task30_a21_patched_bitquery_one_shot.py', repository_path: tests/test_task30_a21_patched_bitquery_one_shot.py}
+  integrity: {kind: sha256, sha256: 9139c8c37a1e94c79de2fe91e0f08a4bdd04e1087ae1e2e64acbc5eb3ebc3d87}
+  access: {mode: read_only, method: file, network_required: false, secrets_required: false}
+  relations:
+  - {relation_type: depends_on, target_asset_id: CONFIG-T30-A21-PATCHED-BITQUERY-ONE-SHOT-001}
+  - {relation_type: depends_on, target_asset_id: SCHEMA-T30-A21-PATCHED-BITQUERY-ONE-SHOT-001}
+  - {relation_type: depends_on, target_asset_id: CONTRACT-T30-A21-PATCHED-BITQUERY-ONE-SHOT-001}
+  - {relation_type: depends_on, target_asset_id: SCRIPT-T30-A21-PATCHED-BITQUERY-ONE-SHOT-001}
+  consumers: [TASK-30, FACTORY-001]
+  evidence: []
+  search_terms: [A21, BITQUERY, TEST, CAPTURE_AUTHORIZED, A20_IMMUTABLE]
+  classification: {contains_secrets: false, contains_raw_data: false, sensitivity: INTERNAL_NON_SECRET}
+
+- asset_id: SCRIPT-T30-A21-PATCHED-BITQUERY-ONE-SHOT-001
+  record_version: '1.0'
+  asset_type: script
+  purpose: Separate credential-free preflight and one patched capture CLI that never accepts a token argument and never writes A20 paths.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-08-14'
+  truth_owner: TASK-30
+  location: {kind: git_path, logical_uri: 'repo://scripts/run_task30_a21_patched_bitquery_one_shot.py', repository_path: scripts/run_task30_a21_patched_bitquery_one_shot.py}
+  integrity: {kind: sha256, sha256: 79b8ec68df5e5bcd5eb117e3dd5af7f5201a3aa3f96eb64aa9d889aabc92fec0}
+  access: {mode: read_only, method: file, network_required: false, secrets_required: false}
+  relations:
+  - {relation_type: depends_on, target_asset_id: MODULE-T30-A20-BITQUERY-PIT-CAPTURE-001}
+  - {relation_type: governed_by, target_asset_id: CONTRACT-T30-A21-PATCHED-BITQUERY-ONE-SHOT-001}
+  consumers: [TASK-30, FACTORY-001]
+  evidence: []
+  search_terms: [A21, BITQUERY, PREFLIGHT, CAPTURE, PATCHED_CLIENT]
+  classification: {contains_secrets: false, contains_raw_data: false, sensitivity: INTERNAL_NON_SECRET}
+
+- asset_id: EVIDENCE-T30-A21P-PATCHED-BITQUERY-ONE-SHOT-001
+  record_version: '1.0'
+  asset_type: evidence
+  purpose: Tracked runtime receipt for one patched Bitquery POST with retained HTTP 403 and no retry.
+  status: VALIDATED_ACTIVE
+  origin: REPOSITORY
+  as_of: '2026-08-14'
+  truth_owner: TASK-30
+  location: {kind: git_path, logical_uri: 'repo://docs/evidence/task30/a21p_patched_bitquery_one_shot_runtime_receipt_v1.json', repository_path: docs/evidence/task30/a21p_patched_bitquery_one_shot_runtime_receipt_v1.json}
+  integrity: {kind: sha256, sha256: fbe73bcf4ca6755e8bfc09a4a4a60a8bec9d75b86224abf2bf47646fbf5d529b}
+  access: {mode: read_only, method: file, network_required: false, secrets_required: false}
+  relations:
+  - {relation_type: derived_from, target_asset_id: CONFIG-T30-A21-PATCHED-BITQUERY-ONE-SHOT-001}
+  - {relation_type: validated_by, target_asset_id: TEST-T30-A21-PATCHED-BITQUERY-ONE-SHOT-001}
+  consumers: [TASK-30, RC001-H07-H01-LIQUIDITY-RETENTION, FACTORY-001]
+  evidence: []
+  search_terms: [A21P, BITQUERY, HTTP_403, ROUTE_UNKNOWN_STOP, NO_RETRY, BLOCKED_DATA]
+  classification: {contains_secrets: false, contains_raw_data: false, sensitivity: INTERNAL_NON_SECRET}
+
+- asset_id: REPORT-T30-A21-PATCHED-BITQUERY-ONE-SHOT-001
+  record_version: '1.0'
+  asset_type: control_document
+  purpose: Russian owner readout separating retained HTTP 403 plan restriction from A20 unknown transport.
+  status: VALIDATED_ACTIVE
+  origin: REPOSITORY
+  as_of: '2026-08-14'
+  truth_owner: TASK-30
+  location: {kind: git_path, logical_uri: 'repo://docs/reports/task30/a21_patched_bitquery_one_shot_readout_v1.md', repository_path: docs/reports/task30/a21_patched_bitquery_one_shot_readout_v1.md}
+  integrity: {kind: sha256, sha256: 5761c5044ab1ce8ce9cfe4854a0ee87e6bd889191250babeed88b51dc5281914}
+  access: {mode: read_only, method: file, network_required: false, secrets_required: false}
+  relations: [{relation_type: derived_from, target_asset_id: EVIDENCE-T30-A21P-PATCHED-BITQUERY-ONE-SHOT-001}]
+  consumers: [TASK-30, RC001-H07-H01-LIQUIDITY-RETENTION, FACTORY-001]
+  evidence: []
+  search_terms: [A21, OWNER_REPORT, BITQUERY, HTTP_403, PLAN_REALTIME_ONLY, BLOCKED_DATA]
+  classification: {contains_secrets: false, contains_raw_data: false, sensitivity: INTERNAL_NON_SECRET}
+
+- asset_id: EVIDENCE-T30-A21-PATCHED-BITQUERY-ONE-SHOT-001
+  record_version: '1.0'
+  asset_type: evidence
+  purpose: Hash-bound FULL_REVIEW acceptance for the patched one-shot stop without TASK-30 promotion.
+  status: VALIDATED_ACTIVE
+  origin: REPOSITORY
+  as_of: '2026-08-14'
+  truth_owner: TASK-30
+  location: {kind: git_path, logical_uri: 'repo://docs/evidence/task30/a21_patched_bitquery_one_shot_acceptance_v1.json', repository_path: docs/evidence/task30/a21_patched_bitquery_one_shot_acceptance_v1.json}
+  integrity: {kind: sha256, sha256: 67f0c96babb31e18a8da69c5359a470089f504c1d70d9eaeadee38324ace94d2}
+  access: {mode: read_only, method: file, network_required: false, secrets_required: false}
+  relations:
+  - {relation_type: derived_from, target_asset_id: CONTRACT-T30-A21-PATCHED-BITQUERY-ONE-SHOT-001}
+  - {relation_type: depends_on, target_asset_id: EVIDENCE-T30-A21P-PATCHED-BITQUERY-ONE-SHOT-001}
+  - {relation_type: validated_by, target_asset_id: TEST-T30-A21-PATCHED-BITQUERY-ONE-SHOT-001}
+  consumers: [TASK-30, RC001-H07-H01-LIQUIDITY-RETENTION, FACTORY-001]
+  evidence: []
+  search_terms: [A21, ACCEPTANCE, FULL_REVIEW, HTTP_403, NO_TASK30_PROMOTION]
+  classification: {contains_secrets: false, contains_raw_data: false, sensitivity: INTERNAL_NON_SECRET}
+
+- asset_id: CTRL-TASK-30-A21-001
+  record_version: '1.0'
+  asset_type: control_document
+  purpose: Harness-valid TASK-30 A21 contract for one patched Bitquery POST on A21 paths only.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-08-14'
+  truth_owner: TASK-30
+  location: {kind: git_path, logical_uri: 'repo://docs/tasks/TASK-30-a21-patched-bitquery-one-shot.md', repository_path: docs/tasks/TASK-30-a21-patched-bitquery-one-shot.md}
+  integrity: {kind: sha256, sha256: 37fd4b10d4d18d49d4862c7bf95daceb7f4859a6a111a17a73405af7a1a68b17}
+  access: {mode: read_only, method: file, network_required: false, secrets_required: false}
+  relations:
+  - {relation_type: contains, target_asset_id: CONTRACT-T30-A21-PATCHED-BITQUERY-ONE-SHOT-001}
+  - {relation_type: contains, target_asset_id: SCRIPT-T30-A21-PATCHED-BITQUERY-ONE-SHOT-001}
+  - {relation_type: depends_on, target_asset_id: EVIDENCE-T30-A20-BITQUERY-PIT-CAPTURE-001}
+  consumers: [TASK-30, FACTORY-001]
+  evidence: []
+  search_terms: [A21, TASK_CONTRACT, CAPTURE_AUTHORIZED, IN_PROGRESS]
+  classification: {contains_secrets: false, contains_raw_data: false, sensitivity: INTERNAL_NON_SECRET}
+
 - asset_id: CONFIG-PROVIDER-ROUTE-CAPABILITY-REGISTRY-004
   record_version: '1.0'
   asset_type: configuration
