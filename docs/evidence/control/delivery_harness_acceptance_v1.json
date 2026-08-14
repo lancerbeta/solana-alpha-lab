@@ -19,7 +19,7 @@
     ".agents/skills/delivery-harness/SKILL.md": "e3c654f84fcfc7cc6f9182dcc4e49aa7b958f717e424310b6f87547397e6e8c1",
     ".cursor/commands/delivery-finish.md": "909e5e340b879e7fb9157c62382da0fec353804e5057af99eae42ba89690773e",
     ".github/ISSUE_TEMPLATE/control-atom.yml": "29cb96ec1b0058f38ea6e9669017bf01ef66552ab1288d68c17d39baa2f29fba",
-    "AGENTS.md": "a068acc285e27ad16f132973a19db771ea7e6bb5cae646bb2f8d0da2ff409d17",
+    "AGENTS.md": "65323139cf22c7c45dc400c3df33adb6ce3f69ddbbf5df111057693c6b1cec6c",
     "README.md": "539c48304858f0f7a0b54299b785fabef515d0fb39710dcc98c97b9c92000971",
     "catalog/schemas/delivery_harness.schema.json": "09884f977e7a9bf6791e8d1669ac0a8814ca5102317a7f61a3ef2696f59bc682",
     "catalog/schemas/delivery_harness_capability_radar.schema.json": "90253c97e1b9cabc80a48ef2b3ec2b23da5d6a499124184e3a571f8c2ec01734",
@@ -79,14 +79,14 @@
   },
   "factory_fit": {
     "path": "docs/evidence/control/delivery_harness_factory_fit_v1.json",
-    "sha256": "d02e6faa3c967d3261b8dc2d40654f2b3adfc05db4b390d42ec6be39c55679db",
+    "sha256": "903ed03dc4052b80bcba6f21ea53b088a7391d6fc124b4cdc2970a120d27a37c",
     "verdict": "PASS"
   },
   "validation": {
     "targeted": "PASS_128_TARGETED_TESTS",
     "independent_review": {
       "path": "docs/evidence/control/delivery_harness_independent_review_v1.json",
-      "sha256": "119a41a7049ec5a89190075d5329af58a7d6142cc18dba6acb58fbc50bb5c039",
+      "sha256": "7aad78823135c8b696202f315e8a85a3b19794492bb3a35e3d0ae5274f88bd84",
       "verdict": "PASS"
     },
     "full_gate": "ENFORCED_BY_PROJECT_BOUND_VALIDATION",

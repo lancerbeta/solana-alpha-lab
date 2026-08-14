@@ -735,7 +735,7 @@ records:
     repository_path: AGENTS.md
   integrity:
     kind: sha256
-    sha256: a068acc285e27ad16f132973a19db771ea7e6bb5cae646bb2f8d0da2ff409d17
+    sha256: 65323139cf22c7c45dc400c3df33adb6ce3f69ddbbf5df111057693c6b1cec6c
   access:
     mode: read_only
     method: file

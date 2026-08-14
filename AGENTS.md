@@ -116,6 +116,15 @@ Before task closure run the proportional `FACTORY_FIT_REVIEW` and
 hand-edited. Exception text, secrets, absolute machine paths and raw sensitive
 values never enter receipts.
 
+## LEGACY_LOCAL_HANDOFF_COMPATIBILITY
+
+`INPUT=DIRECT_PROMPT` remains the default. `LOCAL_HANDOFF:` and
+`ACCEPT_LOCAL_HANDOFF:` are dormant read-only compatibility triggers governed
+by `docs/agent/HANDOFF_PROTOCOL.md`; they cannot select work or widen authority.
+Never search for the newest handoff. The historical marker `GPT control plane owns canonical`
+describes legacy acceptance ownership only and does not
+reactivate GitHub Baton or override the Delivery Harness.
+
 ## SECURITY_AND_EXTERNAL_BOUNDARY
 
 Operate inside the elected repository/worktree. Never create, request, display,
