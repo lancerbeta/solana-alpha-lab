@@ -40,10 +40,10 @@
   },
   "active_stop_conditions": [],
   "owner_attention_triggers": {"auth_or_access_recovery": false, "material_owner_decision": false, "user_only_activation": false, "external_material_action": false, "unresolved_safety_or_truth_conflict": false},
-  "factory_fit": {"path": "docs/evidence/task30/a23_delivery_factory_fit_v1.json", "sha256": "f3bf0fb3730005b12ff2884ca0c3e2a6fc630a40c3961046ca424c3a427f6c12", "verdict": "PASS"},
+  "factory_fit": {"path": "docs/evidence/task30/a23_delivery_factory_fit_v1.json", "sha256": "6a3b5ed7b23560ad0efc366a81a3c413dab9153367101dd870853f07098ee6dc", "verdict": "PASS"},
   "validation": {
     "targeted": "PASS_60_DIRECT_CONSUMER_REGISTRY_AND_CATALOG_TESTS",
-    "independent_review": {"path": "docs/evidence/task30/a23_delivery_independent_review_v1.json", "sha256": "2471a54f281fdc307f6b68115a75b80b3e01bb34d0790e7d24a586cc42f595e7", "verdict": "PASS"},
+    "independent_review": {"path": "docs/evidence/task30/a23_delivery_independent_review_v1.json", "sha256": "1d3030cc8b9a2f7681b1a62e619fb8dc770027862b12f9b6f579cd05222070a3", "verdict": "PASS"},
     "full_gate": "ENFORCED_BY_PROJECT_BOUND_VALIDATION",
     "github_ci": "ENFORCED_LIVE_AT_GUARDED_MERGE",
     "project_checks": ["PASS_GENERATED_NAVIGATION_SECRET_CURSOR_ABSOLUTE_PATH_AST_AND_DIFF_CHECKS"]
