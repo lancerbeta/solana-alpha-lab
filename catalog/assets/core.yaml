@@ -13522,7 +13522,7 @@ records:
   as_of: '2026-08-14'
   truth_owner: TASK-30
   location: {kind: git_path, logical_uri: 'repo://docs/tasks/TASK-30-a21-patched-bitquery-one-shot.md', repository_path: docs/tasks/TASK-30-a21-patched-bitquery-one-shot.md}
-  integrity: {kind: sha256, sha256: 15a381d63056bd8236c5f3f3bf9186aec33fc885a2249a6e1e03213138782bfb}
+  integrity: {kind: sha256, sha256: 37fd4b10d4d18d49d4862c7bf95daceb7f4859a6a111a17a73405af7a1a68b17}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: contains, target_asset_id: CONTRACT-T30-A21-PATCHED-BITQUERY-ONE-SHOT-001}

@@ -28,6 +28,10 @@ managed_write_set:
   - catalog/assets/core.yaml
   - catalog/generated/asset_edges.json
   - docs/PROJECT_MAP.md
+  - catalog/assets/lifecycle.yaml
+  - docs/evidence/task30/a21_delivery_completion_evidence_v1.json
+  - docs/evidence/task30/a21_delivery_independent_review_v1.json
+  - docs/evidence/task30/a21_delivery_factory_fit_v1.json
   - local/task30_a21_bitquery_one_shot/**
 external_caps:
   network: true
@@ -63,6 +67,7 @@ context_requirements:
     ARCHITECTURE_DECISIONS:
       - docs/decisions/ADR-002-mvp-stack.md
     DELIVERY_EVIDENCE:
+      - docs/evidence/task30/a21_delivery_completion_evidence_v1.json
       - docs/evidence/task30/a20_bitquery_named_partial_pit_route_capture_acceptance_v1.json
       - docs/evidence/task30/a20p_bitquery_named_partial_pit_route_capture_runtime_receipt_v1.json
       - docs/evidence/task30/a19_terminal_route_decision_acceptance_v1.json
