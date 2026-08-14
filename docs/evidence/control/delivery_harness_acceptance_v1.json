@@ -68,7 +68,7 @@
     "tests/test_delivery_harness_adapters.py": "d17116e75c25ce81168cefa53e532477d2a2e0f9c575fd5b6c58fc807d630c14",
     "tests/test_delivery_harness_authority.py": "c277f12a1ee8b8d1edf77ab4d334ca7c35c046312731361d31416be445a676cc",
     "tests/test_delivery_harness_bootstrap.py": "15a503b2201d0449cf1605aa0cfd8e6a12f4802725417634e99d62ef51156c04",
-    "tests/test_delivery_harness_context.py": "bb4343533c68023ff34885687401bcc07d3487b4a7a0c0260dac869eee17188a",
+    "tests/test_delivery_harness_context.py": "8c6764f024532e3c9e0cb16990367c6dd4826e4b6472927d7231e17c61bf625a",
     "tests/test_delivery_harness_contract.py": "9448648858d686e1bfeba5add29cf2330a8ae5ec2d03ae536eeddf1d00138397",
     "tests/test_delivery_harness_merge_guard.py": "c245cf45a21d334896f5aa0cad43c24b94a4947531975cf95a099230b4ea8861",
     "tests/test_t21_finish_gate.py": "6986160663e6960303429c990e7ec105d70b18bba1afeb03d8acc6ffe1a0b458",
