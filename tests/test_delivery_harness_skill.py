@@ -9,8 +9,8 @@ import yaml
 
 ROOT = Path(__file__).resolve().parents[1]
 SKILL = ROOT / ".agents/skills/delivery-harness/SKILL.md"
-PORTABLE_SKILL = ROOT / "delivery-harness/templates/portable-core/.agents/skills/delivery-harness/SKILL.md"
-PORTABLE_CURSOR_FINISH = ROOT / "delivery-harness/templates/portable-core/.cursor/commands/delivery-finish.md"
+PORTABLE_SKILL = ROOT / "delivery-harness/templates/portable-core/dot-agents/skills/delivery-harness/SKILL.md"
+PORTABLE_CURSOR_FINISH = ROOT / "delivery-harness/templates/portable-core/dot-cursor/commands/delivery-finish.md"
 PRESSURE = ROOT / "tests/fixtures/delivery_harness/pressure_cases.yaml"
 
 

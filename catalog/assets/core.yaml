@@ -19293,7 +19293,7 @@ records:
   as_of: '2026-08-14'
   truth_owner: CTRL-DELIVERY-HARNESS-001
   location: {kind: git_path, logical_uri: 'repo://delivery-harness/templates/portable-bundle-manifest.json', repository_path: delivery-harness/templates/portable-bundle-manifest.json}
-  integrity: {kind: sha256, sha256: 8d0c33a7d3c034503c83c04fbf4ad4f201702e110601ce82bddfb0c7e3bb6353}
+  integrity: {kind: sha256, sha256: df71a22e0ed777ec0b4e86fb6f10f24b22a07596689a06338505010b39026407}
   access: *t25_read_file
   relations:
   - {relation_type: governed_by, target_asset_id: CTRL-DELIVERY-HARNESS-001}
