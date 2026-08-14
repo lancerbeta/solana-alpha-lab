@@ -5,7 +5,7 @@
   "as_of": "2026-08-15",
   "task_id": "TASK-30",
   "reviewed_bindings_sha256": "2ffae2dddfc88bb41f135f7d5c4f9866128874d3ea041837c9536cfd23328c53",
-  "reviewed_inventory_sha256": "04a34d9412aca078136a1c2fa78aa5e5f499cf287a229bd5ff8ddc93d42cdda8",
+  "reviewed_inventory_sha256": "3dc28a89ca843dab07b0b60360e6769ba8329ae6ce4392a3a21988df512246af",
   "required_roles": ["CODE_REVIEWER", "GOAL_DOD_CRITIC", "ARCHITECTURE_CRITIC"],
   "reviews": [
     {"role": "CODE_REVIEWER", "verdict": "PASS", "findings": []},

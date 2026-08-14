@@ -40,10 +40,10 @@
   },
   "active_stop_conditions": [],
   "owner_attention_triggers": {"auth_or_access_recovery": false, "material_owner_decision": false, "user_only_activation": false, "external_material_action": false, "unresolved_safety_or_truth_conflict": false},
-  "factory_fit": {"path": "docs/evidence/task30/a23_delivery_factory_fit_v1.json", "sha256": "65cb73ca38752ee636965bed4592fb6986281a26ff989c0eb661eafdd12d6649", "verdict": "PASS"},
+  "factory_fit": {"path": "docs/evidence/task30/a23_delivery_factory_fit_v1.json", "sha256": "81e6ad79233ddf153da53e32c3019183c9ce052abd3103f2fe69b160f0cb27b7", "verdict": "PASS"},
   "validation": {
     "targeted": "PASS_59_DIRECT_CONSUMER_REGISTRY_AND_CATALOG_TESTS",
-    "independent_review": {"path": "docs/evidence/task30/a23_delivery_independent_review_v1.json", "sha256": "56c60fe9d9ba77150a8f2773103ba88532a211c26b543bffcf434af574dcbbee", "verdict": "PASS"},
+    "independent_review": {"path": "docs/evidence/task30/a23_delivery_independent_review_v1.json", "sha256": "1d1980d3159a1f9b639e988339c3efba13e35f0c1a535c5e65a011545325c96d", "verdict": "PASS"},
     "full_gate": "ENFORCED_BY_PROJECT_BOUND_VALIDATION",
     "github_ci": "ENFORCED_LIVE_AT_GUARDED_MERGE",
     "project_checks": ["PASS_GENERATED_NAVIGATION_SECRET_CURSOR_ABSOLUTE_PATH_AST_AND_DIFF_CHECKS"]
