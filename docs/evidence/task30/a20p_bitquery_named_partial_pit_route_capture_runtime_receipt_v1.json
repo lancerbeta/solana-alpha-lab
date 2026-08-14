@@ -1,0 +1,98 @@
+{
+  "schema": "smial.task30.bitquery-named-partial-pit-route-capture.runtime-receipt",
+  "schema_version": "1.0",
+  "receipt_id": "EVIDENCE-T30-A20P-BITQUERY-PIT-CAPTURE-001",
+  "task_id": "TASK-30",
+  "atom_id": "T30-A20_BITQUERY_NAMED_PARTIAL_PIT_ROUTE_CAPTURE_V1",
+  "recorded_at": "2026-08-14T12:26:53Z",
+  "route_id": "BITQUERY-SOLANA-PUMPSWAP-OHLCV-001",
+  "terminal_outcome": "ROUTE_UNKNOWN_STOP",
+  "terminal_error": "TRANSPORT_ERROR",
+  "attempt_time": {
+    "exact": null,
+    "lower_bound_inclusive": "2026-08-14T12:21:00Z",
+    "upper_bound_inclusive": "2026-08-14T12:26:53Z",
+    "precision": "BOUNDED_NOT_EXACT_PREPATCH",
+    "reason": "The pre-patch runner emitted only the terminal class and did not retain an attempt timestamp."
+  },
+  "preflight": {
+    "schema": "smial.task30.bitquery-credential-free-preflight",
+    "schema_version": "1.0",
+    "observed_at": "2026-08-14T12:21:00Z",
+    "host": "streaming.bitquery.io",
+    "port": 443,
+    "dns_resolved": true,
+    "tcp_443": true,
+    "tls_verified": true,
+    "tls_version": "TLSv1.3",
+    "credential_reads": 0,
+    "provider_requests": 0,
+    "sha256": "895dc06456bedd1fd0e74af9d72c3ba97aceba5bd45527b02375c811b72e5095"
+  },
+  "transport": {
+    "http_status": null,
+    "content_type": null,
+    "response_bytes": null,
+    "request_body_sha256": "59352e27cbb4ea4b8fc20a60d5031ad3ef25861718e5a6731b3fce65ff5f2a6b",
+    "request_body_bytes": 1500,
+    "request_count": 1,
+    "retry_count": 0,
+    "fallback_count": 0,
+    "safe_error_class": "TRANSPORT_ERROR",
+    "external_terminal_cause": "UNKNOWN_DUE_PREPATCH_EXCEPTION_COLLAPSE"
+  },
+  "raw_manifest": null,
+  "raw_retention": {
+    "raw_retained": false,
+    "loss_reason": "NO_RESPONSE_BYTES_AVAILABLE",
+    "waiver_state": "NOT_APPLICABLE_WITHOUT_RESPONSE_BYTES"
+  },
+  "panel_state": "NOT_ESTABLISHED",
+  "panel_window": {
+    "since_inclusive": "2026-08-12T00:00:00Z",
+    "till_exclusive": "2026-08-13T00:00:00Z",
+    "interval_seconds": 900
+  },
+  "panel_counts": {
+    "slots_expected": 96,
+    "slots_observed": null,
+    "typed_gaps": null
+  },
+  "authority": {
+    "credential_free_preflights": 1,
+    "credential_reads": 1,
+    "provider_requests": 1,
+    "raw_external_data_writes": 0,
+    "retries": 0,
+    "fallbacks": 0,
+    "scheduler_or_background_processes": 0,
+    "wallet_signer_transaction_actions": 0,
+    "cash_spend_usd_cents": 0,
+    "task30_acceptance_actions": 0
+  },
+  "diagnostic": {
+    "dns_tcp_tls_route": "PASS",
+    "provider_http_or_graphql_result": "UNKNOWN",
+    "local_evidence_capture_defect": "CONFIRMED_HTTPERROR_SUBCLASS_COLLAPSE_AND_SUCCESS_ONLY_RECEIPT",
+    "offline_regression_fix": "IMPLEMENTED_AND_16_TESTS_PASS",
+    "provider_retry": "FORBIDDEN_AND_NOT_PERFORMED"
+  },
+  "decision": "KEEP_TASK30_BLOCKED_DATA_AND_REGISTER_ROUTE_UNKNOWN_STOP",
+  "non_claims": {
+    "pit_admissible": false,
+    "h07_h01_evidence": false,
+    "route_feasibility": false,
+    "fillability": false,
+    "execution": false,
+    "settlement": false,
+    "pnl": false,
+    "numeric_netreturn": false,
+    "alpha": false,
+    "strategy": false,
+    "task30_acceptance": false,
+    "missing_is_zero_or_flat": false
+  },
+  "project_sources_disposition": {
+    "kind": "NO_CHANGE"
+  }
+}

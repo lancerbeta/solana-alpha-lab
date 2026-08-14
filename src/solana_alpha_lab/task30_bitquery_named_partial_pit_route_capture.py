@@ -14,13 +14,23 @@ import ssl
 import urllib.error
 import urllib.request
 from collections.abc import Mapping
+from collections.abc import Callable
 from datetime import UTC, datetime, timedelta
 from pathlib import Path
 from typing import Any
+from urllib.parse import urlsplit
 
 
 class CaptureContractError(ValueError):
     """Raised when the bounded capture contract cannot be satisfied."""
+
+
+class CaptureTerminalError(CaptureContractError):
+    """A one-request terminal result with sanitized retained evidence."""
+
+    def __init__(self, code: str, *, evidence: Mapping[str, object]) -> None:
+        super().__init__(code)
+        self.evidence = dict(evidence)
 
 
 EXPECTED_ENDPOINT = "https://streaming.bitquery.io/graphql"
@@ -288,23 +298,52 @@ def perform_http_post_once(
     )
     selected_opener = opener or urllib.request.build_opener(_NoRedirectHandler())
     max_bytes = int(limits["max_response_bytes"])
+    request_body_sha256 = hashlib.sha256(request_body).hexdigest()
     try:
         with selected_opener.open(outgoing, timeout=float(limits["timeout_seconds"])) as response:  # type: ignore[union-attr]
             status = int(response.getcode())
             body = response.read(max_bytes + 1)
             content_type = str(response.headers.get("Content-Type", ""))
+    except urllib.error.HTTPError as exc:
+        status = int(exc.code)
+        body = exc.read(max_bytes + 1)
+        content_type = str(exc.headers.get("Content-Type", "")) if exc.headers is not None else ""
     except CaptureContractError:
         raise
     except (urllib.error.URLError, ssl.SSLError, socket.gaierror, socket.timeout, TimeoutError, OSError) as exc:
-        raise CaptureContractError("TRANSPORT_ERROR") from exc
-    _require(len(body) <= max_bytes, "RESPONSE_BYTES_EXCEEDED")
-    _require(status == 200, "HTTP_STATUS_ERROR")
+        raise CaptureTerminalError(
+            "TRANSPORT_ERROR",
+            evidence={
+                "transport": {
+                    "http_status": None,
+                    "content_type": None,
+                    "response_bytes": None,
+                    "request_body_sha256": request_body_sha256,
+                    "request_count": 1,
+                },
+                "raw_manifest": None,
+            },
+        ) from exc
+    if len(body) > max_bytes:
+        raise CaptureTerminalError(
+            "RESPONSE_BYTES_EXCEEDED",
+            evidence={
+                "transport": {
+                    "http_status": status,
+                    "content_type": content_type,
+                    "response_bytes": len(body),
+                    "request_body_sha256": request_body_sha256,
+                    "request_count": 1,
+                },
+                "raw_manifest": None,
+            },
+        )
     return {
         "body": body,
         "http_status": status,
         "content_type": content_type,
         "response_bytes": len(body),
-        "request_body_sha256": hashlib.sha256(request_body).hexdigest(),
+        "request_body_sha256": request_body_sha256,
         "request_count": 1,
     }
 
@@ -347,3 +386,248 @@ def write_raw_artifacts(
         encoding="utf-8",
     )
     return manifest
+
+
+def credential_free_preflight(
+    policy: Mapping[str, Any],
+    *,
+    observed_at: str,
+    resolver: Callable[..., object] = socket.getaddrinfo,
+    connector: Callable[..., object] = socket.create_connection,
+    context_factory: Callable[[], object] = ssl.create_default_context,
+) -> dict[str, object]:
+    """Verify the frozen endpoint's DNS, TCP and hostname-checked TLS route."""
+
+    route, _subject, _window, _limits, _controls = _policy_sections(policy)
+    _parse_utc(observed_at, "OBSERVED_AT_INVALID")
+    endpoint = urlsplit(str(route["endpoint"]))
+    _require(
+        endpoint.scheme == "https"
+        and endpoint.hostname == "streaming.bitquery.io"
+        and endpoint.port is None
+        and endpoint.path == "/graphql",
+        "ENDPOINT_INVALID",
+    )
+    host = endpoint.hostname
+    port = 443
+    try:
+        addresses = resolver(host, port, type=socket.SOCK_STREAM)
+    except (socket.gaierror, OSError) as exc:
+        raise CaptureContractError("DNS_PREFLIGHT_FAILED") from exc
+    _require(bool(addresses), "DNS_PREFLIGHT_FAILED")
+    raw_socket: object | None = None
+    try:
+        raw_socket = connector((host, port), timeout=5.0)
+    except (socket.timeout, TimeoutError, OSError) as exc:
+        raise CaptureContractError("TCP_PREFLIGHT_FAILED") from exc
+    try:
+        context = context_factory()
+        with context.wrap_socket(raw_socket, server_hostname=host) as tls_socket:  # type: ignore[union-attr]
+            tls_version = str(tls_socket.version())
+    except (ssl.SSLError, socket.timeout, TimeoutError, OSError) as exc:
+        raise CaptureContractError("TLS_PREFLIGHT_FAILED") from exc
+    finally:
+        close = getattr(raw_socket, "close", None)
+        if callable(close):
+            close()
+    _require(bool(tls_version), "TLS_PREFLIGHT_FAILED")
+    return {
+        "schema": "smial.task30.bitquery-credential-free-preflight",
+        "schema_version": "1.0",
+        "observed_at": observed_at,
+        "host": host,
+        "port": port,
+        "dns_resolved": True,
+        "tcp_443": True,
+        "tls_verified": True,
+        "tls_version": tls_version,
+        "credential_reads": 0,
+        "provider_requests": 0,
+    }
+
+
+def execute_once(
+    policy: Mapping[str, Any],
+    token: str,
+    raw_root: Path,
+    *,
+    run_id: str,
+    observed_at: str,
+    opener: object | None = None,
+) -> dict[str, object]:
+    """Make one provider request, retain exact bytes and project all slots."""
+
+    payload = build_graphql_payload(policy)
+    transport = perform_http_post_once(policy, payload, token, opener=opener)
+    body = transport["body"]
+    _require(isinstance(body, bytes), "RESPONSE_BODY_INVALID")
+    manifest = write_raw_artifacts(
+        raw_root,
+        run_id=run_id,
+        response_body=body,
+        request_body_sha256=str(transport["request_body_sha256"]),
+        observed_at=observed_at,
+    )
+    sanitized_transport = {key: value for key, value in transport.items() if key != "body"}
+    terminal_evidence = {"transport": sanitized_transport, "raw_manifest": manifest}
+    if transport["http_status"] != 200:
+        raise CaptureTerminalError("HTTP_STATUS_ERROR", evidence=terminal_evidence)
+    try:
+        response = json.loads(body.decode("utf-8"))
+    except (UnicodeDecodeError, json.JSONDecodeError) as exc:
+        raise CaptureTerminalError("RESPONSE_JSON_INVALID", evidence=terminal_evidence) from exc
+    try:
+        _require(isinstance(response, Mapping), "RESPONSE_SHAPE_INVALID")
+        projection = project_slots(
+            policy,
+            response,
+            raw_sha256=str(manifest["raw_sha256"]),
+            response_bytes=int(manifest["response_bytes"]),
+            observed_at=observed_at,
+        )
+    except CaptureContractError as exc:
+        raise CaptureTerminalError(str(exc), evidence=terminal_evidence) from exc
+    return {
+        "transport": sanitized_transport,
+        "raw_manifest": manifest,
+        "projection": projection,
+    }
+
+
+def _validate_passed_preflight(
+    policy: Mapping[str, Any], preflight: Mapping[str, Any], *, capture_at: str
+) -> None:
+    route, _subject, _window, _limits, _controls = _policy_sections(policy)
+    endpoint = urlsplit(str(route["endpoint"]))
+    _require(preflight.get("schema") == "smial.task30.bitquery-credential-free-preflight", "PREFLIGHT_INVALID")
+    _require(preflight.get("schema_version") == "1.0", "PREFLIGHT_INVALID")
+    _require(preflight.get("host") == endpoint.hostname and preflight.get("port") == 443, "PREFLIGHT_ROUTE_DRIFT")
+    _require(
+        preflight.get("dns_resolved") is True
+        and preflight.get("tcp_443") is True
+        and preflight.get("tls_verified") is True
+        and bool(preflight.get("tls_version")),
+        "PREFLIGHT_NOT_PASS",
+    )
+    _require(preflight.get("credential_reads") == 0 and preflight.get("provider_requests") == 0, "PREFLIGHT_AUTHORITY_DRIFT")
+    preflight_at = _parse_utc(preflight.get("observed_at"), "PREFLIGHT_TIMESTAMP_INVALID")
+    captured_at = _parse_utc(capture_at, "OBSERVED_AT_INVALID")
+    age_seconds = (captured_at - preflight_at).total_seconds()
+    _require(0 <= age_seconds <= 900, "PREFLIGHT_STALE_OR_FUTURE")
+
+
+def execute_after_preflight(
+    policy: Mapping[str, Any],
+    preflight: Mapping[str, Any],
+    credential_loader: Callable[[str], str],
+    raw_root: Path,
+    *,
+    run_id: str,
+    observed_at: str,
+    opener: object | None = None,
+) -> dict[str, object]:
+    """Read one credential only after a fresh passed preflight, then capture once."""
+
+    _validate_passed_preflight(policy, preflight, capture_at=observed_at)
+    try:
+        token = credential_loader("BITQUERY_ACCESS_TOKEN")
+    except (KeyError, OSError) as exc:
+        raise CaptureContractError("CREDENTIAL_REQUIRED") from exc
+    execution = execute_once(
+        policy,
+        token,
+        raw_root,
+        run_id=run_id,
+        observed_at=observed_at,
+        opener=opener,
+    )
+    return {
+        "schema": "smial.task30.bitquery-named-partial-pit-route-capture.execution",
+        "schema_version": "1.0",
+        "preflight": dict(preflight),
+        "transport": execution["transport"],
+        "raw_manifest": execution["raw_manifest"],
+        "projection": execution["projection"],
+        "authority": {
+            "credential_free_preflights": 1,
+            "credential_reads": 1,
+            "provider_requests": 1,
+            "raw_external_data_writes": 2,
+            "retries": 0,
+            "fallbacks": 0,
+            "cash_spend_usd_cents": 0,
+        },
+    }
+
+
+def build_unknown_stop_receipt(
+    policy: Mapping[str, Any],
+    preflight: Mapping[str, Any],
+    *,
+    observed_at: str,
+    terminal_error: CaptureTerminalError,
+) -> dict[str, object]:
+    """Build a tracked receipt for a consumed request that yielded no panel."""
+
+    route, _subject, window, _limits, _controls = _policy_sections(policy)
+    _validate_passed_preflight(policy, preflight, capture_at=observed_at)
+    evidence = _mapping(terminal_error.evidence, "TERMINAL_EVIDENCE_INVALID")
+    transport = dict(_mapping(evidence.get("transport"), "TERMINAL_TRANSPORT_INVALID"))
+    _require(transport.get("request_count") == 1, "TERMINAL_REQUEST_COUNT_INVALID")
+    raw_manifest_value = evidence.get("raw_manifest")
+    _require(raw_manifest_value is None or isinstance(raw_manifest_value, Mapping), "TERMINAL_RAW_MANIFEST_INVALID")
+    raw_manifest = dict(raw_manifest_value) if isinstance(raw_manifest_value, Mapping) else None
+    raw_retained = raw_manifest is not None
+    return {
+        "schema": "smial.task30.bitquery-named-partial-pit-route-capture.runtime-receipt",
+        "schema_version": "1.0",
+        "receipt_id": "EVIDENCE-T30-A20P-BITQUERY-PIT-CAPTURE-001",
+        "task_id": "TASK-30",
+        "atom_id": policy.get("atom_id"),
+        "observed_at": observed_at,
+        "route_id": route.get("route_id"),
+        "terminal_outcome": "ROUTE_UNKNOWN_STOP",
+        "terminal_error": str(terminal_error),
+        "preflight": dict(preflight),
+        "transport": transport,
+        "raw_manifest": raw_manifest,
+        "raw_retention": {
+            "raw_retained": raw_retained,
+            "loss_reason": None if raw_retained else "NO_RESPONSE_BYTES_AVAILABLE",
+        },
+        "panel_state": "NOT_ESTABLISHED",
+        "panel_window": {
+            "since_inclusive": window.get("since_inclusive"),
+            "till_exclusive": window.get("till_exclusive"),
+            "interval_seconds": window.get("interval_seconds"),
+        },
+        "panel_counts": {
+            "slots_expected": EXPECTED_SLOTS,
+            "slots_observed": None,
+            "typed_gaps": None,
+        },
+        "authority": {
+            "credential_free_preflights": 1,
+            "credential_reads": 1,
+            "provider_requests": 1,
+            "raw_external_data_writes": 2 if raw_retained else 0,
+            "retries": 0,
+            "fallbacks": 0,
+            "cash_spend_usd_cents": 0,
+        },
+        "non_claims": {
+            "pit_admissible": False,
+            "h07_h01_evidence": False,
+            "route_feasibility": False,
+            "fillability": False,
+            "execution": False,
+            "settlement": False,
+            "pnl": False,
+            "numeric_netreturn": False,
+            "alpha": False,
+            "strategy": False,
+            "task30_acceptance": False,
+            "missing_is_zero_or_flat": False,
+        },
+        "project_sources_disposition": {"kind": "NO_CHANGE"},
+    }
