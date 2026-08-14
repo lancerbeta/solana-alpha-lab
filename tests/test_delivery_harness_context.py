@@ -36,13 +36,41 @@ class DeliveryHarnessContextTests(unittest.TestCase):
         cls.module = load_module()
         cls.schema = json.loads(RECEIPT_SCHEMA.read_text(encoding="utf-8"))
 
+    def frozen_task_git_text(self, *, dirty: bool = False):
+        metadata = self.module.parse_task_contract(ROOT, TASK_CONTRACT, TASK_ID)
+        binding = metadata["git_binding"]
+        values = {
+            ("rev-parse", "HEAD"): "a" * 40,
+            ("rev-parse", "HEAD^{tree}"): "b" * 40,
+            ("branch", "--show-current"): binding["expected_branch"],
+            ("status", "--porcelain=v1"): " M fixture" if dirty else "",
+            ("remote", "get-url", "origin"): (
+                f"git@github.com:{metadata['expected_repository']}.git"
+            ),
+            ("merge-base", "HEAD", binding["expected_upstream"]): binding[
+                "expected_base"
+            ],
+            ("rev-parse", binding["expected_upstream"]): binding[
+                "expected_upstream_oid"
+            ],
+        }
+
+        def respond(_root: Path, *args: str) -> str:
+            if args not in values:
+                raise AssertionError(f"unexpected git fixture call: {args!r}")
+            return values[args]
+
+        return metadata, respond
+
     def receipt(self, route: str = "DIRECT_CODEX_DELIVERY") -> dict:
-        return self.module.build_context_receipt(
-            ROOT,
-            task_id=TASK_ID,
-            task_contract=TASK_CONTRACT,
-            route=route,
-        )
+        _metadata, git_text = self.frozen_task_git_text()
+        with mock.patch.object(self.module, "git_text", side_effect=git_text):
+            return self.module.build_context_receipt(
+                ROOT,
+                task_id=TASK_ID,
+                task_contract=TASK_CONTRACT,
+                route=route,
+            )
 
     def test_github_pr_detached_checkout_uses_exact_head_ref(self) -> None:
         values = {
@@ -123,24 +151,23 @@ class DeliveryHarnessContextTests(unittest.TestCase):
             )
 
     def test_task_git_binding_is_checked_fail_closed(self) -> None:
-        metadata = self.module.parse_task_contract(ROOT, TASK_CONTRACT, TASK_ID)
-        identity = self.module.git_identity(ROOT)
-        self.module.validate_task_git_binding(ROOT, metadata, identity)
-        changed = copy.deepcopy(metadata)
-        changed["git_binding"]["expected_upstream_oid"] = "0" * 40
-        with self.assertRaisesRegex(ValueError, "TASK_UPSTREAM_OID_MISMATCH"):
-            self.module.validate_task_git_binding(ROOT, changed, identity)
-        changed = copy.deepcopy(metadata)
-        changed["git_binding"]["expected_branch"] = "wrong-branch"
-        with self.assertRaisesRegex(ValueError, "TASK_BRANCH_MISMATCH"):
-            self.module.validate_task_git_binding(ROOT, changed, identity)
-
-        original = self.module.git_text
+        metadata, git_text = self.frozen_task_git_text()
+        with mock.patch.object(self.module, "git_text", side_effect=git_text):
+            identity = self.module.git_identity(ROOT)
+            self.module.validate_task_git_binding(ROOT, metadata, identity)
+            changed = copy.deepcopy(metadata)
+            changed["git_binding"]["expected_upstream_oid"] = "0" * 40
+            with self.assertRaisesRegex(ValueError, "TASK_UPSTREAM_OID_MISMATCH"):
+                self.module.validate_task_git_binding(ROOT, changed, identity)
+            changed = copy.deepcopy(metadata)
+            changed["git_binding"]["expected_branch"] = "wrong-branch"
+            with self.assertRaisesRegex(ValueError, "TASK_BRANCH_MISMATCH"):
+                self.module.validate_task_git_binding(ROOT, changed, identity)
 
         def wrong_fork_base(root: Path, *args: str) -> str:
             if args[:3] == ("merge-base", "HEAD", metadata["git_binding"]["expected_upstream"]):
                 return "0" * 40
-            return original(root, *args)
+            return git_text(root, *args)
 
         with mock.patch.object(self.module, "git_text", side_effect=wrong_fork_base):
             with self.assertRaisesRegex(ValueError, "TASK_EXPECTED_BASE_MISMATCH"):
