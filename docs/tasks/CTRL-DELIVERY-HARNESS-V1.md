@@ -32,9 +32,14 @@ context_requirements:
   l2_roles: [ARCHITECTURE_DECISIONS, DELIVERY_EVIDENCE]
   l3_roles: []
   roadmap_path: null
-  exact_evidence_paths:
-    - docs/evidence/control/delivery_harness_acceptance_v1.json
-  exact_registry_paths: []
+  exact_role_paths:
+    LIFECYCLE: []
+    EXTERNAL_ROUTE_KNOWLEDGE: []
+    ARCHITECTURE_DECISIONS:
+      - docs/decisions/ADR-005-direct-delivery-harness.md
+    DELIVERY_EVIDENCE:
+      - docs/evidence/control/delivery_harness_acceptance_v1.json
+    HISTORICAL_CONTEXT: []
 ---
 
 # CTRL-DELIVERY-HARNESS-V1 — Portable direct delivery harness
@@ -80,6 +85,13 @@ Both require the exact owner phrase bound to the unchanged PR/head plus every
 machine precondition before one ordinary merge. Passing code, PR, CI or merge
 does not establish semantic acceptance, canonical DONE, alpha or cashflow.
 
+This exact task is the one-time bootstrap migration. Its frozen base does not
+contain the v2 policy/profile, so the candidate v2 guard must deny self-merge.
+The bootstrap PR uses the predecessor repository route with the same exact
+PR/head owner approval, tracked-only validation and exact-head CI. After those
+bytes land on `main`, all later tasks use the base-bound v2 guard; there is no
+candidate-authored bootstrap bypass.
+
 ## Definition of Done
 
 1. Core YAML and receipt contracts validate closed-shape and type-strict.
@@ -94,7 +106,8 @@ does not establish semantic acceptance, canonical DONE, alpha or cashflow.
 8. Targeted checks, Catalog, generated projections, secret scan, independent
    risk-routed review, tracked-only full gate and exact-head CI pass.
 9. Final merge occurs only after exact owner approval for the unchanged PR/head;
-   exact main and post-merge CI are read back.
+   exact base-bound default branch and post-merge CI are read back from the
+   same frozen task/context receipt.
 
 ## Factory Fit and Product Horizon
 

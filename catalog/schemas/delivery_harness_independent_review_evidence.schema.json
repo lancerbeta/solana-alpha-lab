@@ -1,0 +1,42 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://delivery-harness.local/schemas/delivery_harness_independent_review_evidence.schema.json",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema", "schema_version", "review_id", "as_of", "task_id",
+    "reviewed_bindings_sha256", "reviewed_inventory_sha256",
+    "required_roles", "reviews", "verdict",
+    "non_claims"
+  ],
+  "properties": {
+    "schema": {"const": "smial.delivery-independent-review-evidence"},
+    "schema_version": {"const": "1.0"},
+    "review_id": {"type": "string", "minLength": 1},
+    "as_of": {"type": "string", "pattern": "^20[0-9]{2}-[0-9]{2}-[0-9]{2}$"},
+    "task_id": {"type": "string", "pattern": "^[A-Z0-9][A-Z0-9_-]{2,127}$"},
+    "reviewed_bindings_sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+    "reviewed_inventory_sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+    "required_roles": {
+      "type": "array", "minItems": 1, "uniqueItems": true,
+      "items": {"enum": ["CODE_REVIEWER", "GOAL_DOD_CRITIC", "ARCHITECTURE_CRITIC", "REFACTOR_CRITIC"]}
+    },
+    "reviews": {
+      "type": "array", "minItems": 1,
+      "items": {
+        "type": "object", "additionalProperties": false,
+        "required": ["role", "verdict", "findings"],
+        "properties": {
+          "role": {"enum": ["CODE_REVIEWER", "GOAL_DOD_CRITIC", "ARCHITECTURE_CRITIC", "REFACTOR_CRITIC"]},
+          "verdict": {"enum": ["PASS", "NOT_READY"]},
+          "findings": {"type": "array", "uniqueItems": true, "items": {"type": "string", "minLength": 1}}
+        }
+      }
+    },
+    "verdict": {"enum": ["PENDING", "PASS"]},
+    "non_claims": {
+      "type": "array", "minItems": 1, "uniqueItems": true,
+      "items": {"type": "string", "minLength": 1}
+    }
+  }
+}

@@ -8,8 +8,10 @@ import tempfile
 import unittest
 from pathlib import Path
 from types import ModuleType
+from unittest import mock
 
 import jsonschema
+import yaml
 
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -87,6 +89,14 @@ class DeliveryHarnessContextTests(unittest.TestCase):
                 route="DIRECT_CODEX_DELIVERY",
             )
 
+    def test_duplicate_yaml_keys_in_task_contract_fail_closed(self) -> None:
+        with self.assertRaisesRegex(yaml.YAMLError, "duplicate key 'git_binding'"):
+            self.module.load_yaml_unique(
+                "task_id: TEST-TASK\n"
+                "git_binding: {expected_base: '" + ("a" * 40) + "'}\n"
+                "git_binding: {expected_base: '" + ("b" * 40) + "'}\n"
+            )
+
     def test_task_git_binding_is_checked_fail_closed(self) -> None:
         metadata = self.module.parse_task_contract(ROOT, TASK_CONTRACT, TASK_ID)
         identity = self.module.git_identity(ROOT)
@@ -99,6 +109,35 @@ class DeliveryHarnessContextTests(unittest.TestCase):
         changed["git_binding"]["expected_branch"] = "wrong-branch"
         with self.assertRaisesRegex(ValueError, "TASK_BRANCH_MISMATCH"):
             self.module.validate_task_git_binding(ROOT, changed, identity)
+
+        original = self.module.git_text
+
+        def wrong_fork_base(root: Path, *args: str) -> str:
+            if args[:3] == ("merge-base", "HEAD", metadata["git_binding"]["expected_upstream"]):
+                return "0" * 40
+            return original(root, *args)
+
+        with mock.patch.object(self.module, "git_text", side_effect=wrong_fork_base):
+            with self.assertRaisesRegex(ValueError, "TASK_EXPECTED_BASE_MISMATCH"):
+                self.module.validate_task_git_binding(ROOT, metadata, identity)
+
+    def test_repository_identity_is_bound_to_live_origin(self) -> None:
+        self.module.validate_repository_origin(ROOT, "lancerbeta/solana-alpha-lab")
+        self.assertEqual(
+            self.module.github_repository_from_origin(
+                "ssh://git@github.com/lancerbeta/solana-alpha-lab.git"
+            ),
+            "lancerbeta/solana-alpha-lab",
+        )
+        with mock.patch.object(
+            self.module,
+            "git_text",
+            return_value="git@github.com:someone/other.git",
+        ):
+            with self.assertRaisesRegex(ValueError, "TASK_REPOSITORY_ORIGIN_MISMATCH"):
+                self.module.validate_repository_origin(
+                    ROOT, "lancerbeta/solana-alpha-lab"
+                )
 
     def test_non_task_document_cannot_be_used_as_task_contract(self) -> None:
         with self.assertRaisesRegex(ValueError, "TASK_CONTRACT_SCHEMA_INVALID"):
@@ -175,8 +214,47 @@ class DeliveryHarnessContextTests(unittest.TestCase):
         deferred = {gap["semantic_role"] for gap in receipt["gaps"]}
         self.assertIn("HISTORICAL_CONTEXT", deferred)
         selected_roles = {item["semantic_role"] for item in receipt["selected"]}
+        self.assertIn("ARCHITECTURE_DECISIONS", selected_roles)
         self.assertIn("DELIVERY_EVIDENCE", selected_roles)
+        required = {"ARCHITECTURE_DECISIONS", "DELIVERY_EVIDENCE"}
+        self.assertFalse(
+            any(gap["semantic_role"] in required for gap in receipt["gaps"])
+        )
         self.assertTrue(all(gap["state"] == "EXPLICIT_GAP" for gap in receipt["gaps"]))
+
+    def test_required_role_without_exact_path_fails_closed(self) -> None:
+        metadata = self.module.parse_task_contract(ROOT, TASK_CONTRACT, TASK_ID)
+        metadata["context_requirements"]["exact_role_paths"][
+            "ARCHITECTURE_DECISIONS"
+        ] = []
+        with self.assertRaisesRegex(
+            ValueError, "REQUIRED_CONTEXT_REFERENCE_NOT_BOUND:ARCHITECTURE_DECISIONS"
+        ):
+            self.module.resolve_required_context(
+                ROOT,
+                metadata,
+                self.module.load_closed_document(
+                    ROOT / "delivery-harness/context-map.yaml",
+                    ROOT / "catalog/schemas/delivery_harness_context_map.schema.json",
+                ),
+                max_inline_bytes=102400,
+            )
+
+    def test_cloud_source_history_cannot_be_relabelled_as_delivery_evidence(self) -> None:
+        metadata = self.module.parse_task_contract(ROOT, TASK_CONTRACT, TASK_ID)
+        metadata["context_requirements"]["exact_role_paths"][
+            "DELIVERY_EVIDENCE"
+        ] = ["docs/project_sources/release_registry_v1.yaml"]
+        with self.assertRaisesRegex(ValueError, "SOURCE_HISTORY_ROLE_MISMATCH"):
+            self.module.resolve_required_context(
+                ROOT,
+                metadata,
+                self.module.load_closed_document(
+                    ROOT / "delivery-harness/context-map.yaml",
+                    ROOT / "catalog/schemas/delivery_harness_context_map.schema.json",
+                ),
+                max_inline_bytes=102400,
+            )
 
     def test_dirty_state_is_reported_and_local_root_is_not_serialized(self) -> None:
         receipt = self.receipt()

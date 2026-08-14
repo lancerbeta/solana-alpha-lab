@@ -96,10 +96,13 @@ also preserve the immutable `PROVIDER_ROUTE_CAPABILITY_REGISTRY_V1` binding at
 ## VALIDATION_AND_REVIEW
 
 During implementation run the smallest tests for changed behavior and direct
-consumers. Elect one full-gate owner per exact candidate fingerprint; do not
-repeat a passing full gate because bytes moved through stage, commit, push or
-PR. Use the project profile's eligible focused route, otherwise the tracked-only
-delivery preflight. A changed fingerprint invalidates reused evidence.
+consumers. After the first-install bootstrap, do not run a local full gate
+before PR: the guarded merge is the sole executor of the project-bound primary
+or tracked-only fallback for that exact candidate fingerprint. It consumes
+already-completed exact-head CI and never repeats a passing local full gate
+because bytes moved through stage, commit, push or PR. The first harness
+installation alone uses the predecessor route and one pre-PR tracked-only
+gate. A changed fingerprint invalidates evidence.
 
 Risk-route review: code review for every delivery; goal/DoD review for new or
 changed outcomes; architecture review for contracts, schemas, boundaries,

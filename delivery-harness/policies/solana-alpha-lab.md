@@ -74,6 +74,21 @@ Estimand is `NetReturn` after PIT data, executable buy/sell route, latency,
 fees, retries, exit and notional. Separate `Touch | Fillable | RealizedVWAP |
 Net | PathRisk`. Trigger is not order, fill or profit.
 
+## IMPORTED_BYTES_AND_ADVISORY_CONTEXT
+
+Every imported record preserves exact source bytes, origin task/path, legacy
+ID when available, creation time, `first_reliable_available_at`, retention and
+named consumers. Import or backfill never creates retroactive availability.
+Content-addressed imported evidence is not style-normalized, and bundle-only
+or superseded code never becomes active product code merely because it exists
+in Git history.
+
+External analytical context such as AOT/ALBS is advisory only. It must carry
+as-of, first reliable availability, TTL, revision, hash, confidence or
+calibration, lineage, evidence and allowed-consumer fields. It cannot command
+a bot or bypass holdout, risk, execution, inventory, reconciliation or
+economics gates.
+
 ## EXECUTION_RISK_AND_MONITORING
 
 Trace hypothesis/version through watchlist, trigger, decision/risk, intent,
@@ -126,12 +141,14 @@ consumer changes.
 
 ## TRACKED_ONLY_DELIVERY_PREFLIGHT
 
-Default full local owner for a non-fast-path delivery:
+Fail-closed local full owner selected inside guarded merge only when the
+base-bound focused-plus-exact-PR-CI route is ineligible:
 
 `uv run --locked --managed-python python -B scripts/validate_ci.py --tracked-only-delivery`
 
 It copies no untracked or ignored inputs and runs once on a clean exact commit
-in an isolated checkout. Its wall-time cap is 15 minutes. It is not an implementation-loop or per-atom hook.
+in an isolated checkout. Its wall-time cap is 15 minutes. It is not a pre-PR,
+implementation-loop or per-atom hook after bootstrap.
 New tests cannot skip missing local/raw evidence in place of a
 tracked fixture or exact non-critical proof.
 
@@ -139,8 +156,9 @@ tracked fixture or exact non-critical proof.
 
 Only a machine-eligible bounded offline/routine candidate may use
 `uv run --locked --managed-python python -B scripts/validate_ci.py --ci-owned-delivery`.
-`GITHUB_PR_EXACT_HEAD_CI` owns the full suite; the local
-focused cap is 120 seconds. The pilot admits the next three eligible
+`GITHUB_PR_EXACT_HEAD_CI` owns the full suite when the base-bound primary route
+is eligible; guarded merge executes the local focused command once and reads
+that existing exact-head run. The local focused cap is 120 seconds. The pilot admits the next three eligible
 observations, records `observation N/3`, requires 3/3 first-head CI and at least
 seven minutes saved. After 3/3, do not admit a fourth before keep/repair/rollback.
 A false admission, missed clean-checkout/local-data defect or focused overrun

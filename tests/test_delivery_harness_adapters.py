@@ -72,10 +72,16 @@ class DeliveryHarnessAdapterTests(unittest.TestCase):
             "## FACTORY_LEVERAGE_INVARIANT",
             "## MODEL_EFFORT_ROUTER",
             "## FACTORY_FIT_REVIEW",
+            "## IMPORTED_BYTES_AND_ADVISORY_CONTEXT",
         )
         for marker in required:
             self.assertIn(marker, policy)
         self.assertIn("HISTORICAL_OPTIONAL_EXPORT_NON_TRIGGERING", policy)
+        self.assertIn("first_reliable_available_at", policy)
+        self.assertIn("Import or backfill never creates retroactive availability", policy)
+        self.assertIn("External analytical context such as AOT/ALBS is advisory only", policy)
+        self.assertIn("cannot command", policy)
+        self.assertIn("bypass holdout, risk, execution, inventory", policy)
         self.assertIn("MUST NOT", AGENTS.read_text(encoding="utf-8"))
 
     def test_cursor_rules_are_native_scoped_and_within_always_context_budget(self) -> None:
@@ -137,11 +143,11 @@ class DeliveryHarnessAdapterTests(unittest.TestCase):
             injected = target / ".cursor/commands/delivery-start.md"
             injected.write_text(
                 injected.read_text(encoding="utf-8")
-                + "\nRoute this task through GITHUB_BATON as an active transport.\n",
+                + "\nRun python -m scripts.baton_preflight as an active transport.\n",
                 encoding="utf-8",
             )
             result = module.check_harness(target)
-            self.assertIn("ACTIVE_BATON_TOKEN_REACTIVATED", result["errors"])
+            self.assertIn("ACTIVE_BATON_REFERENCE", result["errors"])
 
     def test_commands_are_thin_exact_task_adapters(self) -> None:
         names = {"delivery-start.md", "delivery-status.md", "delivery-review.md", "delivery-finish.md"}

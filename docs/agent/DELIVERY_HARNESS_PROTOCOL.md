@@ -31,8 +31,9 @@ evidence/time budget breach.
 
 ### Execute and review
 
-Routine bounded delivery is autonomous. Use targeted tests and one full-gate
-owner. Code review is mandatory. Goal/DoD, architecture and refactor critics
+Routine bounded delivery is autonomous. Use targeted tests; after bootstrap
+the guarded merge is the sole project-bound gate executor for the unchanged
+fingerprint. Code review is mandatory. Goal/DoD, architecture and refactor critics
 are trigger-routed; unavailable subagents yield `SINGLE_AGENT_REVIEW_FALLBACK`
 and the same deterministic validation.
 
@@ -42,7 +43,28 @@ Run Factory Fit, Product Horizon and capability radar. Record exact inventory,
 head/tree, tests, limitations, non-claims and rollback. Capability candidates
 grant no installation/credential/network/spend authority. Require exact-head CI
 and then the exact owner PR/head phrase. Re-read machine state, evaluate v2,
-merge once only on `AUTONOMOUS`, then verify exact main and post-merge CI.
+merge once only on `AUTONOMOUS`, then verify the base-bound profile default
+branch and its post-merge CI.
+The guarded submission's `merge_commit` becomes the expected default-branch
+head. The self-hashed submission is a mandatory input to
+`--post-merge-readback --submission-receipt <GUARDED_SUBMISSION_JSON>`; the
+separate hash-bound terminal receipt must prove the
+ordered parents are exactly the frozen base then approved head, plus exact push
+CI success. Read-only polling needs no
+second owner approval; merge submission alone is never a completed delivery.
+
+Validation commands are project-profile bindings, not portable-core guesses.
+The guard executes them with `shell=false`; it never trusts a pre-existing local
+receipt. A portable seed with null bindings may CHECK and build CONTEXT, but it
+must report `delivery_gate_ready=false` and cannot merge until bootstrap binds
+the repository's actual commands and exact PR-CI identity. In the normal path,
+the guard runs the local focused primary once and consumes existing exact PR
+CI as its full-suite evidence. The tracked-only fallback is exceptional and is
+executed by that same guard only when the primary route is ineligible; it is
+never a second pre-PR plus merge-time local run. The first harness installation
+is delivered by the predecessor owner-approved route after one pre-PR
+tracked-only gate; the new guard activates only after its policy/profile exist
+on the default branch.
 
 ## Context and cloud export
 

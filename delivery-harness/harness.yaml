@@ -38,9 +38,12 @@ context_budgets:
   cursor_always_apply_max_bytes: 6144
   ordinary_receipt_max_bytes: 49152
   auto_inline_file_max_bytes: 102400
-portable_templates:
-  - delivery-harness/templates/portable-project-profile.yaml
-  - delivery-harness/templates/bootstrap-prompt.md
+portable_bundle:
+  execution_inventory_owner: PORTABLE_BUNDLE_MANIFEST
+  manifest_path: delivery-harness/templates/portable-bundle-manifest.json
+  entry_artifacts:
+    - delivery-harness/templates/portable-project-profile.yaml
+    - delivery-harness/templates/bootstrap-prompt.md
 cloud_bundle:
   mode: OWNER_MANAGED_OPTIONAL_EXPORT
   execution_gate: false

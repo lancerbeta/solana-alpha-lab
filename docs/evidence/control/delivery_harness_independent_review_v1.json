@@ -1,0 +1,17 @@
+{
+  "schema": "smial.delivery-independent-review-evidence",
+  "schema_version": "1.0",
+  "review_id": "DELIVERY-HARNESS-INDEPENDENT-REVIEW-V1",
+  "as_of": "2026-08-14",
+  "task_id": "CTRL-DELIVERY-HARNESS-V1",
+  "reviewed_bindings_sha256": "5bc94fae759009af322ff56f91e2a4be2f00308f00b24f57740afac05277f8b0",
+  "reviewed_inventory_sha256": "b41439fcc70344377549ce3f73140c24fe95358303663e4db48bde62f2df9171",
+  "required_roles": ["CODE_REVIEWER", "GOAL_DOD_CRITIC", "ARCHITECTURE_CRITIC"],
+  "reviews": [
+    {"role": "CODE_REVIEWER", "verdict": "PASS", "findings": []},
+    {"role": "GOAL_DOD_CRITIC", "verdict": "PASS", "findings": []},
+    {"role": "ARCHITECTURE_CRITIC", "verdict": "PASS", "findings": []}
+  ],
+  "verdict": "PASS",
+  "non_claims": ["NO_CRYPTOGRAPHIC_REVIEWER_IDENTITY"]
+}

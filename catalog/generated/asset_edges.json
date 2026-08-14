@@ -428,6 +428,16 @@
       "target_asset_id": "TEST-DELIVERY-HARNESS-001"
     },
     {
+      "source_asset_id": "CONFIG-DELIVERY-PORTABLE-BUNDLE-MANIFEST-001",
+      "relation": "governed_by",
+      "target_asset_id": "CTRL-DELIVERY-HARNESS-001"
+    },
+    {
+      "source_asset_id": "CONFIG-DELIVERY-PORTABLE-BUNDLE-MANIFEST-001",
+      "relation": "validated_by",
+      "target_asset_id": "TEST-DELIVERY-HARNESS-001"
+    },
+    {
       "source_asset_id": "CONFIG-DELIVERY-PROJECT-PROFILE-001",
       "relation": "depends_on",
       "target_asset_id": "CONFIG-DELIVERY-HARNESS-001"
@@ -1374,13 +1384,13 @@
     },
     {
       "source_asset_id": "CTRL-BATON-SETUP-001",
-      "relation": "governed_by",
-      "target_asset_id": "CTRL-AGENTS-001"
+      "relation": "superseded_by",
+      "target_asset_id": "CTRL-DELIVERY-HARNESS-001"
     },
     {
       "source_asset_id": "CTRL-CURSOR-WORKPLACE-RECONCILIATION-001",
-      "relation": "governed_by",
-      "target_asset_id": "CTRL-BATON-SETUP-001"
+      "relation": "superseded_by",
+      "target_asset_id": "CTRL-DELIVERY-HARNESS-001"
     },
     {
       "source_asset_id": "CTRL-CURSOR-WORKPLACE-RECONCILIATION-001",
@@ -1405,7 +1415,22 @@
     {
       "source_asset_id": "CTRL-DELIVERY-HARNESS-001",
       "relation": "contains",
+      "target_asset_id": "CONFIG-DELIVERY-PORTABLE-BUNDLE-MANIFEST-001"
+    },
+    {
+      "source_asset_id": "CTRL-DELIVERY-HARNESS-001",
+      "relation": "contains",
       "target_asset_id": "CONFIG-DELIVERY-PROJECT-PROFILE-001"
+    },
+    {
+      "source_asset_id": "CTRL-DELIVERY-HARNESS-001",
+      "relation": "contains",
+      "target_asset_id": "SCHEMA-DELIVERY-COMPLETION-EVIDENCE-001"
+    },
+    {
+      "source_asset_id": "CTRL-DELIVERY-HARNESS-001",
+      "relation": "contains",
+      "target_asset_id": "SCHEMA-DELIVERY-INDEPENDENT-REVIEW-EVIDENCE-001"
     },
     {
       "source_asset_id": "CTRL-DELIVERY-HARNESS-001",
@@ -2104,6 +2129,11 @@
     },
     {
       "source_asset_id": "EVIDENCE-DELIVERY-HARNESS-ACCEPTANCE-001",
+      "relation": "depends_on",
+      "target_asset_id": "EVIDENCE-DELIVERY-HARNESS-INDEPENDENT-REVIEW-001"
+    },
+    {
+      "source_asset_id": "EVIDENCE-DELIVERY-HARNESS-ACCEPTANCE-001",
       "relation": "derived_from",
       "target_asset_id": "CTRL-DELIVERY-HARNESS-001"
     },
@@ -2114,11 +2144,31 @@
     },
     {
       "source_asset_id": "EVIDENCE-DELIVERY-HARNESS-FACTORY-FIT-001",
+      "relation": "depends_on",
+      "target_asset_id": "EVIDENCE-DELIVERY-HARNESS-INDEPENDENT-REVIEW-001"
+    },
+    {
+      "source_asset_id": "EVIDENCE-DELIVERY-HARNESS-FACTORY-FIT-001",
       "relation": "derived_from",
       "target_asset_id": "CTRL-DELIVERY-HARNESS-001"
     },
     {
       "source_asset_id": "EVIDENCE-DELIVERY-HARNESS-FACTORY-FIT-001",
+      "relation": "validated_by",
+      "target_asset_id": "TEST-DELIVERY-HARNESS-001"
+    },
+    {
+      "source_asset_id": "EVIDENCE-DELIVERY-HARNESS-INDEPENDENT-REVIEW-001",
+      "relation": "depends_on",
+      "target_asset_id": "SCHEMA-DELIVERY-INDEPENDENT-REVIEW-EVIDENCE-001"
+    },
+    {
+      "source_asset_id": "EVIDENCE-DELIVERY-HARNESS-INDEPENDENT-REVIEW-001",
+      "relation": "derived_from",
+      "target_asset_id": "CTRL-DELIVERY-HARNESS-001"
+    },
+    {
+      "source_asset_id": "EVIDENCE-DELIVERY-HARNESS-INDEPENDENT-REVIEW-001",
       "relation": "validated_by",
       "target_asset_id": "TEST-DELIVERY-HARNESS-001"
     },
@@ -5936,6 +5986,26 @@
       "source_asset_id": "SCHEMA-CANARY-SPECIFICATION-ONLY-001",
       "relation": "governed_by",
       "target_asset_id": "CONTRACT-CANARY-SPECIFICATION-ONLY-001"
+    },
+    {
+      "source_asset_id": "SCHEMA-DELIVERY-COMPLETION-EVIDENCE-001",
+      "relation": "governed_by",
+      "target_asset_id": "CTRL-DELIVERY-HARNESS-001"
+    },
+    {
+      "source_asset_id": "SCHEMA-DELIVERY-COMPLETION-EVIDENCE-001",
+      "relation": "validated_by",
+      "target_asset_id": "TEST-DELIVERY-HARNESS-001"
+    },
+    {
+      "source_asset_id": "SCHEMA-DELIVERY-INDEPENDENT-REVIEW-EVIDENCE-001",
+      "relation": "governed_by",
+      "target_asset_id": "CTRL-DELIVERY-HARNESS-001"
+    },
+    {
+      "source_asset_id": "SCHEMA-DELIVERY-INDEPENDENT-REVIEW-EVIDENCE-001",
+      "relation": "validated_by",
+      "target_asset_id": "TEST-DELIVERY-HARNESS-001"
     },
     {
       "source_asset_id": "SCHEMA-OWNER-AUTHORITY-PACKET-001",

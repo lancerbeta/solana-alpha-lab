@@ -1,0 +1,137 @@
+{
+  "schema": "delivery-harness.portable-bundle-manifest",
+  "schema_version": "1.0",
+  "harness_id": "DELIVERY_HARNESS_V1",
+  "files": [
+    {
+      "source": "delivery-harness/templates/portable-project-profile.yaml",
+      "destination": "delivery-harness/project-profile.yaml",
+      "sha256": "180544c43b48b94cf51f79ddd523f6e49d4a7f26728655aaff45f79e4c66d236"
+    },
+    {
+      "source": "delivery-harness/templates/bootstrap-prompt.md",
+      "destination": "delivery-harness/bootstrap-prompt.md",
+      "sha256": "0af2660e84b4f37d917832db88e5a03069fc85c3a331bc9476e24eddee171aef"
+    },
+    {
+      "source": "delivery-harness/templates/portable-core/delivery-harness/harness.yaml",
+      "destination": "delivery-harness/harness.yaml",
+      "sha256": "929c53012a1b12f167bfb8a1040759ee1521e0558e76af8b4cbe64dd7acc116d"
+    },
+    {
+      "source": "delivery-harness/templates/portable-core/delivery-harness/context-map.yaml",
+      "destination": "delivery-harness/context-map.yaml",
+      "sha256": "e5671719d67e439487c6fdaec8b195e9e5cfa6ce121597f19b5d00d4d0e341fd"
+    },
+    {
+      "source": "delivery-harness/templates/portable-core/delivery-harness/capability-radar.yaml",
+      "destination": "delivery-harness/capability-radar.yaml",
+      "sha256": "d4c4b7c7080001c492830aa50b571af3fe4274387e5265cc21e2c85c652c0bd8"
+    },
+    {
+      "source": "delivery-harness/templates/portable-core/delivery-harness/runtime-requirements.txt",
+      "destination": "delivery-harness/runtime-requirements.txt",
+      "sha256": "58a54419c9987667f007e7e0d9e0211515402d0731b93d88c2f88e5ff613629c"
+    },
+    {
+      "source": "delivery-harness/templates/portable-core/catalog/schemas/delivery_harness.schema.json",
+      "destination": "catalog/schemas/delivery_harness.schema.json",
+      "sha256": "e0d161272866be6ea85f50edbe62e5966aafe9f9848001726353cc10969260eb"
+    },
+    {
+      "source": "catalog/schemas/delivery_harness_project_profile.schema.json",
+      "destination": "catalog/schemas/delivery_harness_project_profile.schema.json",
+      "sha256": "66bf134c4de09a4ed94d55c75c1fe2a955f6040acbd11eab9421b05959413677"
+    },
+    {
+      "source": "catalog/schemas/delivery_harness_context_map.schema.json",
+      "destination": "catalog/schemas/delivery_harness_context_map.schema.json",
+      "sha256": "19cb254e9cacdb7a9d20e202c9ad9468378eb96b1285dd130077d325199c3d8b"
+    },
+    {
+      "source": "catalog/schemas/delivery_harness_context_receipt.schema.json",
+      "destination": "catalog/schemas/delivery_harness_context_receipt.schema.json",
+      "sha256": "ec93dc76b8f478f1550df61bdec9f93f442fbd9f6e629703adb07de6464bcf18"
+    },
+    {
+      "source": "catalog/schemas/delivery_harness_capability_radar.schema.json",
+      "destination": "catalog/schemas/delivery_harness_capability_radar.schema.json",
+      "sha256": "90253c97e1b9cabc80a48ef2b3ec2b23da5d6a499124184e3a571f8c2ec01734"
+    },
+    {
+      "source": "catalog/schemas/delivery_harness_task_contract.schema.json",
+      "destination": "catalog/schemas/delivery_harness_task_contract.schema.json",
+      "sha256": "1f8f878befa55ffbdf5b670d1b5cdc083ccd3dae4efed3f793e3d2191452fe85"
+    },
+    {
+      "source": "catalog/schemas/delivery_harness_completion_evidence.schema.json",
+      "destination": "catalog/schemas/delivery_harness_completion_evidence.schema.json",
+      "sha256": "42f650a83ffda753f0cb1a54944a8529e1019f782db4c51220e1852275e632b9"
+    },
+    {
+      "source": "catalog/schemas/delivery_harness_independent_review_evidence.schema.json",
+      "destination": "catalog/schemas/delivery_harness_independent_review_evidence.schema.json",
+      "sha256": "f5ecbb2ead0255e98ed03a026181190651d97c1f9214234a44ea197d39c0d40f"
+    },
+    {
+      "source": "catalog/schemas/owner_attention_gate_v2.schema.json",
+      "destination": "catalog/schemas/owner_attention_gate_v2.schema.json",
+      "sha256": "dd25d1e30b1e248f984506b0d594a20deb91fcc952ca55c43fb749bc16516425"
+    },
+    {
+      "source": "delivery-harness/templates/portable-core/control/owner_attention_gate_v2.yaml",
+      "destination": "control/owner_attention_gate_v2.yaml",
+      "sha256": "6b915495cd20cf9bd20a4d8c7f838d1ecfb5d0e26e08e3551b1d0097d3903006"
+    },
+    {
+      "source": "delivery-harness/templates/portable-core/scripts/delivery_harness.py",
+      "destination": "scripts/delivery_harness.py",
+      "sha256": "51d6df1ec7255858c4e50593a2b267c91fd5c88b12a2804c3b1c5cc6bcd6da38"
+    },
+    {
+      "source": "scripts/owner_attention_gate.py",
+      "destination": "scripts/owner_attention_gate.py",
+      "sha256": "33006f17fde77d5ac4e74bacad421a8716f33b6ff84d93ef74072e30257ffab2"
+    },
+    {
+      "source": "delivery-harness/templates/portable-core/AGENTS.md",
+      "destination": "AGENTS.md",
+      "sha256": "452ebadb254c594afa45df5ac978b1f54da0a1640214afba5ec9a48b3f3871af"
+    },
+    {
+      "source": "delivery-harness/templates/portable-core/.agents/skills/delivery-harness/SKILL.md",
+      "destination": ".agents/skills/delivery-harness/SKILL.md",
+      "sha256": "334dbe37c05542f8f5c5beeaf198642c154a36ce009b8ed18addd4f7ad0aeddf"
+    },
+    {
+      "source": "delivery-harness/templates/portable-core/.cursor/rules/00-authority.mdc",
+      "destination": ".cursor/rules/00-authority.mdc",
+      "sha256": "a3c4b72067794db5705740edd331fa63444c9ffac93eb3f3a3f3e6c98f1aa8da"
+    },
+    {
+      "source": "delivery-harness/templates/portable-core/.cursor/rules/30-security-and-secrets.mdc",
+      "destination": ".cursor/rules/30-security-and-secrets.mdc",
+      "sha256": "faaddbe033a1df8f289e9a18dab181a54e3e9d3106af568792629ea20249aa3b"
+    },
+    {
+      "source": "delivery-harness/templates/portable-core/.cursor/commands/delivery-start.md",
+      "destination": ".cursor/commands/delivery-start.md",
+      "sha256": "c28a2c63fc7826463a26e75927968935802193bec4adcc470f9b4fc4cd095f4b"
+    },
+    {
+      "source": "delivery-harness/templates/portable-core/.cursor/commands/delivery-status.md",
+      "destination": ".cursor/commands/delivery-status.md",
+      "sha256": "7d71899c3a7207c9b7f38b192b579d051595068df610c2505ed1cbe1ae4b6eb8"
+    },
+    {
+      "source": "delivery-harness/templates/portable-core/.cursor/commands/delivery-review.md",
+      "destination": ".cursor/commands/delivery-review.md",
+      "sha256": "0d00ad57f6a2e9d4179f323bfbf71d0c5ec8bc768bceb2a20ecb01379dd63776"
+    },
+    {
+      "source": "delivery-harness/templates/portable-core/.cursor/commands/delivery-finish.md",
+      "destination": ".cursor/commands/delivery-finish.md",
+      "sha256": "d4007af65c3fcad8be54269e4b341e53d9ebf64e04edc09013afdfff5b186ca3"
+    }
+  ]
+}

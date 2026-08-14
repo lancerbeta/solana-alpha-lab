@@ -9,6 +9,8 @@ import yaml
 
 ROOT = Path(__file__).resolve().parents[1]
 SKILL = ROOT / ".agents/skills/delivery-harness/SKILL.md"
+PORTABLE_SKILL = ROOT / "delivery-harness/templates/portable-core/.agents/skills/delivery-harness/SKILL.md"
+PORTABLE_CURSOR_FINISH = ROOT / "delivery-harness/templates/portable-core/.cursor/commands/delivery-finish.md"
 PRESSURE = ROOT / "tests/fixtures/delivery_harness/pressure_cases.yaml"
 
 
@@ -50,6 +52,15 @@ class DeliveryHarnessSkillTests(unittest.TestCase):
         self.assertIn("never request a bundle replacement or smoke", text)
         self.assertIn("CAPABILITY_RADAR_NOW=NONE", text)
         self.assertIn("does not grant install authority", text)
+
+    def test_portable_codex_and_cursor_share_submission_bound_readback(self) -> None:
+        codex = PORTABLE_SKILL.read_text(encoding="utf-8")
+        cursor = PORTABLE_CURSOR_FINISH.read_text(encoding="utf-8")
+        for text in (codex, cursor):
+            self.assertIn("self-hashed submission", text)
+            self.assertIn("--post-merge-readback", text)
+            self.assertIn("--submission-receipt", text)
+            self.assertIn("hash-bound receipt", text)
 
     def test_pressure_cases_have_stable_non_authorizing_outcomes(self) -> None:
         value = yaml.safe_load(PRESSURE.read_text(encoding="utf-8"))

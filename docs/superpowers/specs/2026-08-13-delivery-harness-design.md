@@ -38,6 +38,21 @@ This is a control-plane task. It does not advance or accept `TASK-30`, select a
 new canonical product task, gather market data, run a provider route, trade or
 claim alpha.
 
+### Final adversarial hardening
+
+The delivery candidate must additionally satisfy four fail-closed properties:
+
+- context and delivery evidence are rebuilt from the clean exact Git candidate;
+  a caller-provided self-hash is never authority;
+- repository identity is one live origin plus the exact frozen merge-base, not
+  a profile label or bootstrap placeholder;
+- merge is compare-and-swap against the approved PR head and accepts only the
+  named workflow/job in exact successful state;
+- merge submission is itself self-hashed and is followed by a mandatory
+  submission-bound exact-default-branch/ancestry/
+  push-CI receipt. The portable seed is standard-library-only and every copied
+  source byte is covered by a deterministic bundle manifest.
+
 ## 2. Why this task exists now
 
 Three measured conditions make the work timely:
@@ -188,7 +203,9 @@ profile binds those concepts to local files and commands.
 
 The Solana profile may reference the historical cloud-export registry, Catalog,
 Factory Fit and provider/wallet boundaries. The registry is not a working-context
-truth owner. The portable core must not contain Solana-specific bindings. A dummy-project fixture
+truth owner. Its configured registry path defines the entire historical-cloud
+boundary: those bytes may resolve only as L3 historical context, never be
+relabelled as L2 delivery evidence. The portable core must not contain Solana-specific bindings. A dummy-project fixture
 must prove that the core initializes and validates without Solana-specific
 paths or vocabulary.
 
@@ -216,6 +233,11 @@ docs/agent/
 scripts/
   delivery_harness.py          # context/status/check/init preview/apply
 ```
+
+`portable-bundle-manifest.json` is the single source/destination/SHA-256
+inventory for initialization. The standard-library-only `init --preview` path
+validates every source hash before any target write; apply requires the exact
+unchanged plan fingerprint.
 
 Final filenames may change during implementation planning to match existing
 repository conventions, but ownership and separation above must not.
@@ -315,14 +337,20 @@ safety gate, but distinguishes direct delivery from dormant baton execution:
 - direct Cursor or Codex may perform routine delivery autonomously;
 - both stop at an exact owner merge gate;
 - after the owner names the exact PR and unchanged head SHA, the elected direct
-  agent may perform only a standard guarded merge and read back `main`/CI;
+  agent may perform only a standard guarded merge and read back the base-bound
+  profile default branch/CI;
 - dormant baton Cursor retains its historical `merge=FORBIDDEN` semantics;
 - merge neither requires nor certifies a cloud bundle export and never grants
   canonical product truth unsupported by the exact Git task's Finish Gate.
 
-The merge guard rechecks repository, PR, head SHA, mergeability, required
+The merge guard rechecks repository, default branch, PR, head SHA, mergeability, required
 checks, unresolved reviews, write set and forbidden side effects immediately
-before mutation. Any drift invalidates the approval and stops.
+before mutation. Policy, profile, guard/context runtime and their core schemas
+must be byte-identical to the frozen base; any control-plane change uses the
+predecessor exact-owner route and cannot self-authorize. Post-merge readback
+rebuilds the same context receipt and derives the frozen first parent from its
+task contract, never from a caller assertion. Any drift invalidates the
+approval and stops.
 
 ### 5.8 Model/effort router
 
@@ -396,7 +424,8 @@ The agent:
 
 1. runs proportional Factory Fit and Product Horizon review;
 2. runs the Capability Radar;
-3. elects one full-gate owner for the unchanged candidate fingerprint;
+3. runs targeted checks; after bootstrap the guarded merge executes the elected
+   project-bound gate once and consumes existing exact-head CI;
 4. produces exact changed-file, tests, head/tree, limitations and rollback
    receipts;
 5. pushes and opens/updates one PR;
@@ -439,7 +468,7 @@ repository URL and a deterministic bootstrap route.
 
 For this repository it tells Cursor to:
 
-1. fetch and verify the expected `main` identity;
+1. discover or accept one exact default branch, then fetch and verify that identity;
 2. read only the compact harness front door;
 3. run `delivery_harness.py check` and a dry-run migration preview;
 4. remove/replace only the exact project-scoped active baton adapters;
@@ -447,7 +476,8 @@ For this repository it tells Cursor to:
 6. generate the first context receipt;
 7. stop for the owner only if a user-only setup step remains.
 
-For a new repository it uses `init --preview` then `init --apply` to install the
+For a new repository it uses the standard-library-only `init --preview` then
+`init --apply --plan-sha256 <PLAN_SHA256>` route to install the
 portable core and a project profile. The initializer refuses non-empty/conflicting
 targets unless every overwrite is explicit. It never edits global Cursor/Codex
 configuration or installs plugins automatically.
@@ -533,7 +563,9 @@ At minimum:
    baton merge denied;
 8. capability radar returns `NONE` for the current repository and exactly one
    candidate for synthetic trigger fixtures;
-9. portable dummy-project initialization contains no Solana-specific leakage;
+9. portable dummy-project initialization contains no Solana-specific leakage,
+   honors an arbitrary configured historical-cloud path and supports a
+   non-`main` default branch;
 10. initializer preview/apply idempotence, conflict refusal and rollback;
 11. Cursor missing-skill/subagent fallback remains safe;
 12. Catalog/generated consumers and repository validation remain consistent.
@@ -562,6 +594,20 @@ The Cursor route must then demonstrate:
 - non-force push and Draft PR;
 - exact-head CI;
 - stop at owner merge gate.
+
+The completion, independent-review and Factory Fit files are Catalog-discoverable
+by stable IDs, but their Catalog records deliberately use `integrity.kind=none`.
+Their exact content integrity is owned by the live completion-review-fit hash
+chain and the reviewed full-diff digest; embedding the same hashes in a Catalog
+file covered by that digest would create an indirect self-reference. Catalog
+validation and generated projections remain required independently.
+
+Bootstrap exception: the frozen base of `CTRL-DELIVERY-HARNESS-V1` predates the
+v2 policy/profile, therefore the new guard cannot and must not authorize its
+own installation. This one candidate is merged only through the predecessor
+exact PR/head owner route after the tracked-only gate and exact-head CI. The v2
+guard becomes the sole direct merge route only after its reviewed bytes exist
+on the exact default branch; no missing-base, candidate-self-trust or reduced-check bypass exists.
 
 ## 11. Risks and mitigations
 

@@ -1,28 +1,38 @@
-schema: smial.delivery-harness-project-profile
-schema_version: '1.0'
-profile_id: PORTABLE_PROJECT_PROFILE_V1
-harness_id: DELIVERY_HARNESS_V1
-mode: PORTABLE_PROJECT
-repository:
-  name: example/project
-  default_branch: main
-bindings:
-  catalog_manifest: null
-  owner_attention_policy: control/owner_attention_gate_v2.yaml
-  context_map: delivery-harness/context-map.yaml
-  domain_policy: null
-  historical_cloud_bundle_registry: null
-working_memory:
-  truth_owner: GIT
-  task_resolution: EXACT_TASK_CONTRACT
-  cloud_bundle: OWNER_MANAGED_OPTIONAL_EXPORT
-context_budgets:
-  agents_max_bytes: 12288
-  cursor_always_apply_max_bytes: 6144
-  ordinary_receipt_max_bytes: 49152
-  auto_inline_file_max_bytes: 102400
-authority:
-  external_system: false
-  signing_or_financial_action: false
-  cash_spend: false
-  cloud_export_mutation: false
+{
+  "schema": "smial.delivery-harness-project-profile",
+  "schema_version": "1.0",
+  "profile_id": "PORTABLE_PROJECT_PROFILE_V1",
+  "harness_id": "DELIVERY_HARNESS_V1",
+  "mode": "PORTABLE_PROJECT",
+  "repository": {"name": "example/project", "default_branch": "main"},
+  "bindings": {
+    "catalog_manifest": null,
+    "owner_attention_policy": "control/owner_attention_gate_v2.yaml",
+    "context_map": "delivery-harness/context-map.yaml",
+    "domain_policy": null,
+    "historical_cloud_bundle_registry": null
+  },
+  "working_memory": {
+    "truth_owner": "GIT",
+    "task_resolution": "EXACT_TASK_CONTRACT",
+    "cloud_bundle": "OWNER_MANAGED_OPTIONAL_EXPORT"
+  },
+  "context_budgets": {
+    "agents_max_bytes": 12288,
+    "cursor_always_apply_max_bytes": 6144,
+    "ordinary_receipt_max_bytes": 49152,
+    "auto_inline_file_max_bytes": 102400
+  },
+  "validation": {
+    "github_ci_bound": false,
+    "primary": null,
+    "fallback": null,
+    "credential_scan": null
+  },
+  "authority": {
+    "external_system": false,
+    "signing_or_financial_action": false,
+    "cash_spend": false,
+    "cloud_export_mutation": false
+  }
+}

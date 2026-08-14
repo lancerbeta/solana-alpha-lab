@@ -53,14 +53,19 @@ class Task21DurableResumeRouterBindingTests(unittest.TestCase):
         self.assertIn("## ACTIVE_TIME_GATE_CHECK", agents)
         self.assertIn("control/active_time_gates.json", agents)
         self.assertEqual(self.router["router_id"], self.config["router_id"])
-        self.assertEqual(self.router["router_version"], "1.0")
+        self.assertEqual(self.router["router_version"], "1.1")
+        self.assertEqual(self.marker["policy_reconciled_on"], "2026-08-14")
+        self.assertEqual(
+            self.marker["historical_gate_state_as_of"],
+            "2026-08-01T18:13:07.833538Z",
+        )
         self.assertEqual(
             self.router["status"],
-            "A8_MERGED_PENDING_TASK21_FINISH_SOURCE_ACTIVATION",
+            "TERMINAL_DORMANT_OWNER_EXPORT_OPTIONAL",
         )
         self.assertEqual(
             self.router["entry_rule"],
-            "READ_MARKER_THEN_RUN_FINISH_GATE_PULSE_BEFORE_TASK21_OR_TASK22_CONTINUATION",
+            "HISTORICAL_COMPATIBILITY_ONLY_NO_ACTIVE_RESUME_ACTION",
         )
 
     def test_router_binds_exact_config_and_owner_pulse_entrypoint(self) -> None:
@@ -98,7 +103,7 @@ class Task21DurableResumeRouterBindingTests(unittest.TestCase):
     def test_due_gate_precedence_is_clear_after_h24_resolution(self) -> None:
         self.assertEqual(
             self.router["due_gate_precedence"],
-            "AT_OR_AFTER_EARLIEST_AT_ROUTE_REQUIRED_NEXT_ATOM_BEFORE_NEW_MUTATION",
+            "NONE_TERMINAL_DORMANT",
         )
         active = [
             gate for gate in self.marker["gates"] if gate["status"] == "ACTIVE_WAITING"

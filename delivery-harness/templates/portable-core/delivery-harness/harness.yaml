@@ -1,15 +1,18 @@
-schema: smial.delivery-harness
-schema_version: '1.0'
-harness_id: DELIVERY_HARNESS_V1
-active_routes: [DIRECT_CODEX_DELIVERY, DIRECT_CURSOR_DELIVERY, DESIGN_ONLY]
-forbidden_active_input_routes: [GITHUB_BATON]
-routes:
-  DIRECT_CODEX_DELIVERY: {active: true, actor: CODEX, task_selection: exact_task_contract_only, merge: EXACT_OWNER_APPROVAL_AND_MACHINE_GATE}
-  DIRECT_CURSOR_DELIVERY: {active: true, actor: CURSOR, task_selection: exact_task_contract_only, merge: EXACT_OWNER_APPROVAL_AND_MACHINE_GATE}
-  DESIGN_ONLY: {active: true, actor: ANY, task_selection: explicit_input_only, merge: FORBIDDEN}
-  LEGACY_GITHUB_BATON_DORMANT: {active: false, actor: CURSOR, task_selection: false, merge: FORBIDDEN}
-context_lanes: {L0: always_loaded_front_door, L1: exact_task_capsule, L2: dynamic_capability_context, L3: deep_evidence_on_demand}
-context_budgets: {agents_max_bytes: 12288, cursor_always_apply_max_bytes: 6144, ordinary_receipt_max_bytes: 49152, auto_inline_file_max_bytes: 102400}
-portable_templates: [delivery-harness/templates/portable-project-profile.yaml, delivery-harness/templates/bootstrap-prompt.md]
-cloud_bundle: {mode: OWNER_MANAGED_OPTIONAL_EXPORT, execution_gate: false, done_gate: false, smoke_required_by_harness: false, reminders: false, working_context_truth_owner: false, historical_registry_preserved: true}
-external_authority: {external_system: false, signing_or_financial_action: false, cash_spend: false, cloud_activation: false}
+{
+  "schema": "smial.delivery-harness",
+  "schema_version": "1.0",
+  "harness_id": "DELIVERY_HARNESS_V1",
+  "active_routes": ["DIRECT_CODEX_DELIVERY", "DIRECT_CURSOR_DELIVERY", "DESIGN_ONLY"],
+  "forbidden_active_input_routes": ["GITHUB_BATON"],
+  "routes": {
+    "DIRECT_CODEX_DELIVERY": {"active": true, "actor": "CODEX", "task_selection": "exact_task_contract_only", "merge": "EXACT_OWNER_APPROVAL_AND_MACHINE_GATE"},
+    "DIRECT_CURSOR_DELIVERY": {"active": true, "actor": "CURSOR", "task_selection": "exact_task_contract_only", "merge": "EXACT_OWNER_APPROVAL_AND_MACHINE_GATE"},
+    "DESIGN_ONLY": {"active": true, "actor": "ANY", "task_selection": "explicit_input_only", "merge": "FORBIDDEN"},
+    "LEGACY_GITHUB_BATON_DORMANT": {"active": false, "actor": "CURSOR", "task_selection": false, "merge": "FORBIDDEN"}
+  },
+  "context_lanes": {"L0": "always_loaded_front_door", "L1": "exact_task_capsule", "L2": "dynamic_capability_context", "L3": "deep_evidence_on_demand"},
+  "context_budgets": {"agents_max_bytes": 12288, "cursor_always_apply_max_bytes": 6144, "ordinary_receipt_max_bytes": 49152, "auto_inline_file_max_bytes": 102400},
+  "portable_bundle": {"execution_inventory_owner": "PORTABLE_BUNDLE_MANIFEST", "manifest_path": "delivery-harness/templates/portable-bundle-manifest.json", "entry_artifacts": ["delivery-harness/templates/portable-project-profile.yaml", "delivery-harness/templates/bootstrap-prompt.md"]},
+  "cloud_bundle": {"mode": "OWNER_MANAGED_OPTIONAL_EXPORT", "execution_gate": false, "done_gate": false, "smoke_required_by_harness": false, "reminders": false, "working_context_truth_owner": false, "historical_registry_preserved": true},
+  "external_authority": {"external_system": false, "signing_or_financial_action": false, "cash_spend": false, "cloud_activation": false}
+}

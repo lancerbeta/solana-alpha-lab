@@ -39,8 +39,9 @@ implementation, tests and review are phases, not automatic owner gates.
 ## Execute and validate
 
 Use bounded routine autonomy without micro-approval. Apply test-first behavior
-for changed behavior, smallest targeted checks during implementation and one
-full-gate owner for an unchanged fingerprint. Generated consumers are routine
+for changed behavior and the smallest targeted checks during implementation.
+After bootstrap the guarded merge is the sole project-bound gate executor for
+an unchanged fingerprint. Generated consumers are routine
 propagation; unrelated changes stay untouched.
 
 After the first material blocker, inspect exact reusable candidates and current
@@ -59,16 +60,34 @@ checks remain mandatory.
 
 Run Factory Fit, Product Horizon and capability radar. A default result is
 `CAPABILITY_RADAR_NOW=NONE`; any candidate does not grant install authority.
+Require `delivery_gate_ready=true`. Validation and credential-scan commands are
+closed, shell-free project-profile bindings; execute them and never infer PASS
+from a local receipt. Null bindings deny merge until project bootstrap fixes
+them. `github_ci_bound=true` is valid only after the live PR workflow file,
+event and required jobs match the base-bound owner policy. Use focused local
+validation plus existing exact PR CI as the normal route; the same guard runs
+tracked-only fallback once for an explicitly ineligible control/validation
+change. Do not run that local full gate both before PR and at merge. First
+installation alone uses the predecessor route and one pre-PR tracked-only gate.
 Bind exact inventory, tests, head/tree, limitations and rollback. Push/open PR
 inside routine authority, require exact-head CI and stop for one exact owner
 approval bound to PR/head. Re-read every machine precondition, evaluate
 `OWNER_ATTENTION_GATE_V2`, then perform at most one ordinary guarded merge and
-read back exact main/post-merge CI. Use the repository-owned
+read back the profile's exact default branch/post-merge CI. Use the repository-owned
 `scripts/owner_attention_gate.py --guarded-merge` entrypoint so the agent cannot
 supply pre-asserted test/CI/Factory-Fit booleans: it verifies the self-hashed
 context receipt, exact local head/tree, required live GitHub check, unresolved
 review threads and hash-bound FULL_REVIEW evidence before invoking one standard
 merge without branch deletion.
+
+The merge submission is not the terminal receipt. Persist its self-hashed JSON,
+bind its `merge_commit` as the expected default-branch head and require
+`scripts/owner_attention_gate.py --post-merge-readback --submission-receipt
+<GUARDED_SUBMISSION_JSON>` to verify the ordered parents
+`[frozen default-branch head, approved head]`, the exact merge commit and
+successful push CI. Polling this
+read-only state requires no new owner gate;
+do not claim delivery complete before the hash-bound receipt exists.
 
 Recommend `MODEL_EFFORT_RECOMMENDATION` once before a substantial chain and
 `NEXT_MODEL_EFFORT` only at its material checkpoint, never on microsteps.

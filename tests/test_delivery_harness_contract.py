@@ -70,6 +70,7 @@ REQUIRED_CATALOG_ASSETS = {
     "CONFIG-DELIVERY-PROJECT-PROFILE-001",
     "CONFIG-DELIVERY-CONTEXT-MAP-001",
     "CONFIG-DELIVERY-CAPABILITY-RADAR-001",
+    "CONFIG-DELIVERY-PORTABLE-BUNDLE-MANIFEST-001",
     "SCRIPT-DELIVERY-HARNESS-001",
     "SKILL-DELIVERY-HARNESS-001",
     "POLICY-OWNER-ATTENTION-GATE-002",
@@ -77,6 +78,9 @@ REQUIRED_CATALOG_ASSETS = {
     "PROTOCOL-DELIVERY-HARNESS-001",
     "PROTOCOL-DELIVERY-CONTEXT-001",
     "EVIDENCE-DELIVERY-HARNESS-ACCEPTANCE-001",
+    "EVIDENCE-DELIVERY-HARNESS-INDEPENDENT-REVIEW-001",
+    "SCHEMA-DELIVERY-COMPLETION-EVIDENCE-001",
+    "SCHEMA-DELIVERY-INDEPENDENT-REVIEW-EVIDENCE-001",
 }
 
 
@@ -170,6 +174,7 @@ class DeliveryHarnessContractTests(unittest.TestCase):
             },
         )
         self.assertEqual(profile["context_budgets"], EXPECTED_BUDGETS)
+        self.assertTrue(profile["validation"]["github_ci_bound"])
         self.assertFalse(profile["authority"]["external_system"])
         self.assertFalse(profile["authority"]["signing_or_financial_action"])
         self.assertFalse(profile["authority"]["cash_spend"])
@@ -247,6 +252,12 @@ class DeliveryHarnessContractTests(unittest.TestCase):
 
     def test_acceptance_binds_final_implementation_and_non_claims(self) -> None:
         receipt = json.loads(ACCEPTANCE.read_text(encoding="utf-8"))
+        schema = json.loads(
+            (ROOT / "catalog/schemas/delivery_harness_completion_evidence.schema.json").read_text(
+                encoding="utf-8"
+            )
+        )
+        jsonschema.validate(receipt, schema)
         self.assertEqual(receipt["state_change"], "IMPLEMENTED_UNVERIFIED")
         self.assertEqual(receipt["cloud_bundle_mode"], "OWNER_MANAGED_OPTIONAL_EXPORT")
         self.assertFalse(receipt["cloud_bundle_required_by_harness"])
@@ -265,6 +276,7 @@ class DeliveryHarnessContractTests(unittest.TestCase):
             "delivery-harness/project-profile.yaml",
             "delivery-harness/context-map.yaml",
             "delivery-harness/capability-radar.yaml",
+            "delivery-harness/templates/portable-bundle-manifest.json",
             "scripts/delivery_harness.py",
             "control/owner_attention_gate_v2.yaml",
             "AGENTS.md",
@@ -286,11 +298,19 @@ class DeliveryHarnessContractTests(unittest.TestCase):
         for asset_id in REQUIRED_CATALOG_ASSETS:
             record = records[asset_id]
             if record["location"]["kind"] == "git_path":
-                self.assertEqual(
-                    record["integrity"]["sha256"],
-                    sha256(ROOT / record["location"]["repository_path"]),
-                    asset_id,
-                )
+                if asset_id in {
+                    "EVIDENCE-DELIVERY-HARNESS-ACCEPTANCE-001",
+                    "EVIDENCE-DELIVERY-HARNESS-FACTORY-FIT-001",
+                    "EVIDENCE-DELIVERY-HARNESS-INDEPENDENT-REVIEW-001",
+                }:
+                    self.assertEqual(record["integrity"]["kind"], "none", asset_id)
+                    self.assertIn("self-reference", record["integrity"]["note"])
+                else:
+                    self.assertEqual(
+                        record["integrity"]["sha256"],
+                        sha256(ROOT / record["location"]["repository_path"]),
+                        asset_id,
+                    )
         manifest = load_yaml(MANIFEST)
         for relative in (
             "catalog/schemas/delivery_harness.schema.json",
@@ -299,6 +319,8 @@ class DeliveryHarnessContractTests(unittest.TestCase):
             "catalog/schemas/delivery_harness_context_receipt.schema.json",
             "catalog/schemas/delivery_harness_capability_radar.schema.json",
             "catalog/schemas/owner_attention_gate_v2.schema.json",
+            "catalog/schemas/delivery_harness_completion_evidence.schema.json",
+            "catalog/schemas/delivery_harness_independent_review_evidence.schema.json",
         ):
             self.assertIn(relative, manifest["root_resolver"]["schemas"])
 

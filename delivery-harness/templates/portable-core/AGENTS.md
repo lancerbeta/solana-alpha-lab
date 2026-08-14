@@ -2,15 +2,26 @@
 
 This repository uses `DELIVERY_HARNESS_V1`. Git is working project memory.
 Read the exact task contract and `delivery-harness/project-profile.yaml`; never
-infer work from recency. Run `scripts/delivery_harness.py check`, then build the
-bounded context receipt. Cloud exports are `OWNER_MANAGED_OPTIONAL_EXPORT` and
+infer work from recency. With Python 3.11 or newer, run the standard-library-only
+runtime as `python -B scripts/delivery_harness.py check`; do not install packages.
+Then build the bounded context receipt. Cloud exports are `OWNER_MANAGED_OPTIONAL_EXPORT` and
 must never become an update, replacement or smoke request.
+
+Before the first delivery, require `delivery_gate_ready=true`. If validation
+bindings are null, bind the repository's existing shell-free test/full-gate and
+credential-scan argv in the project profile. Do not invent a toolchain; null or
+invalid bindings keep guarded merge denied.
 
 Cursor and Codex are equal direct delivery agents. Routine bounded engineering,
 tests, ordinary commits, non-force push, PR/review and CI are autonomous inside
 the exact task contract. Stop for material/external/destructive/user-only
 boundaries and for the exact PR/head merge approval. Failed machine evidence is
 `DENY`; merge does not establish product acceptance or `DONE`.
+
+During implementation run targeted checks only. Once bootstrap validation is
+bound, guarded merge executes the repository-owned gate once and consumes the
+existing exact-head PR CI; do not run the same local full gate before PR and at
+merge. First installation uses the predecessor route and one pre-PR gate.
 
 Use `.agents/skills/delivery-harness/SKILL.md` and the workflow
 `CHECK -> CONTEXT -> EXECUTE -> REVIEW -> FINISH -> MERGE GATE -> READ-BACK`.

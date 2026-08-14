@@ -48,7 +48,37 @@ remain discoverable and cannot reactivate themselves.
   correctness dependency;
 - capability radar may recommend one plugin/tool only after a measured trigger
   and never grants installation or credentials;
+- the portable seed is a hash-inventoried, standard-library-only bundle bound
+  to one live Git origin; no hidden Solana virtualenv or placeholder repository
+  is needed;
+- guarded merge uses an atomic expected-head comparison and is incomplete until
+  the self-hashed guarded submission is a mandatory input to a separate
+  hash-bound receipt proving exact default-branch ancestry and successful push
+  CI;
+- first installation is a one-time predecessor-route migration because the
+  frozen base cannot trust policy/profile bytes that do not yet exist there;
+  the new guard deliberately denies self-merge and activates only from the
+  first default-branch commit that contains the reviewed owners;
 - technical delivery remains distinct from semantic acceptance and DONE.
+
+## Official platform fit
+
+The context split follows current OpenAI product mechanics rather than a local
+prompt convention. Codex discovers layered `AGENTS.md` files once per run and
+has a default combined project-instruction ceiling of 32 KiB, so the repository
+root stays deliberately lean and stable:
+<https://learn.chatgpt.com/docs/agent-configuration/agents-md>.
+
+Repeatable workflow detail lives in the repository skill because Codex skills
+use progressive disclosure: only name/description occupy the initial context,
+then full `SKILL.md` is loaded on demand. Repository skills under
+`.agents/skills` are a supported discovery scope:
+<https://learn.chatgpt.com/docs/build-skills>.
+
+Task and evidence bytes therefore remain Git-addressed and selected by the
+context receipt rather than copied into always-on instructions. No plugin, MCP
+or separate memory service is justified until the capability radar observes a
+named external consumer or repeated measured retrieval failure.
 
 ## Rollback
 

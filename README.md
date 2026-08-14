@@ -18,6 +18,19 @@ The repository-owned entrypoint for Cursor and Codex is `AGENTS.md` plus
 `delivery-harness/templates/bootstrap-prompt.md`; the protocol is
 `docs/agent/DELIVERY_HARNESS_BOOTSTRAP.md`.
 
+To seed a different existing Git repository from a trusted exact checkout of
+this repository, preview the complete zero-write plan first, inspect its
+`plan_sha256`, then apply that unchanged plan:
+
+```text
+python -B scripts/delivery_harness.py init --target <NEW_REPOSITORY_ROOT> --repository <OWNER/REPOSITORY> --default-branch <DEFAULT_BRANCH> --preview --format json
+python -B scripts/delivery_harness.py init --target <NEW_REPOSITORY_ROOT> --repository <OWNER/REPOSITORY> --default-branch <DEFAULT_BRANCH> --apply --plan-sha256 <PLAN_SHA256> --format json
+```
+
+The initializer uses only the Python standard library. The target must already
+be the exact Git root whose live `origin` matches `<OWNER/REPOSITORY>`; it never
+writes user-global Cursor, Codex or home-directory configuration.
+
 Open one repository/worktree root, require an exact Git task contract and run:
 
 ```text

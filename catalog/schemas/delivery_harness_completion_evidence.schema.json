@@ -1,0 +1,76 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://delivery-harness.local/schemas/delivery_harness_completion_evidence.schema.json",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema", "schema_version", "acceptance_id", "as_of", "task_id",
+    "state_change", "base_main", "cloud_bundle_mode",
+    "cloud_bundle_required_by_harness", "cloud_bundle_smoke_required",
+    "implementation_bindings", "active_stop_conditions",
+    "owner_attention_triggers", "factory_fit", "validation", "non_claims",
+    "side_effects"
+  ],
+  "properties": {
+    "schema": {"const": "smial.delivery-completion-evidence"},
+    "schema_version": {"const": "1.0"},
+    "acceptance_id": {"type": "string", "minLength": 1},
+    "as_of": {"type": "string", "pattern": "^20[0-9]{2}-[0-9]{2}-[0-9]{2}$"},
+    "task_id": {"type": "string", "pattern": "^[A-Z0-9][A-Z0-9_-]{2,127}$"},
+    "state_change": {"type": "string", "minLength": 1},
+    "base_main": {"type": "string", "pattern": "^[0-9a-f]{40}$"},
+    "owner_approvals": {"type": "array", "uniqueItems": true, "items": {"type": "string", "minLength": 1}},
+    "cloud_bundle_mode": {"const": "OWNER_MANAGED_OPTIONAL_EXPORT"},
+    "cloud_bundle_required_by_harness": {"const": false},
+    "cloud_bundle_smoke_required": {"const": false},
+    "capability_radar_now": {"type": "string", "minLength": 1},
+    "implementation_bindings": {
+      "type": "object",
+      "minProperties": 1,
+      "propertyNames": {"type": "string", "minLength": 1},
+      "additionalProperties": {"type": "string", "pattern": "^[0-9a-f]{64}$"}
+    },
+    "active_stop_conditions": {"type": "array", "uniqueItems": true, "items": {"type": "string", "minLength": 1}},
+    "owner_attention_triggers": {
+      "type": "object", "additionalProperties": false,
+      "required": ["auth_or_access_recovery", "material_owner_decision", "user_only_activation", "external_material_action", "unresolved_safety_or_truth_conflict"],
+      "properties": {
+        "auth_or_access_recovery": {"type": "boolean"},
+        "material_owner_decision": {"type": "boolean"},
+        "user_only_activation": {"type": "boolean"},
+        "external_material_action": {"type": "boolean"},
+        "unresolved_safety_or_truth_conflict": {"type": "boolean"}
+      }
+    },
+    "factory_fit": {
+      "type": "object", "additionalProperties": false,
+      "required": ["path", "sha256", "verdict"],
+      "properties": {
+        "path": {"type": "string", "minLength": 1},
+        "sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+        "verdict": {"const": "PASS"}
+      }
+    },
+    "validation": {
+      "type": "object", "additionalProperties": false,
+      "required": ["targeted", "independent_review", "full_gate", "github_ci", "project_checks"],
+      "properties": {
+        "targeted": {"type": "string", "pattern": "^PASS_"},
+        "independent_review": {
+          "type": "object", "additionalProperties": false,
+          "required": ["path", "sha256", "verdict"],
+          "properties": {
+            "path": {"type": "string", "minLength": 1},
+            "sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+            "verdict": {"enum": ["PENDING", "PASS"]}
+          }
+        },
+        "full_gate": {"const": "ENFORCED_BY_PROJECT_BOUND_VALIDATION"},
+        "github_ci": {"const": "ENFORCED_LIVE_AT_GUARDED_MERGE"},
+        "project_checks": {"type": "array", "uniqueItems": true, "items": {"type": "string", "pattern": "^PASS_"}}
+      }
+    },
+    "non_claims": {"type": "array", "minItems": 1, "uniqueItems": true, "items": {"type": "string", "minLength": 1}},
+    "side_effects": {"type": "object"}
+  }
+}

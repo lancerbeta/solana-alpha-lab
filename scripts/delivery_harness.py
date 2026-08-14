@@ -6,14 +6,91 @@ from __future__ import annotations
 import argparse
 import hashlib
 import json
+import os
 import re
+import stat
 import subprocess
 import sys
 from pathlib import Path, PurePosixPath, PureWindowsPath
 from typing import Any
 
-import jsonschema
-import yaml
+try:  # init must remain stdlib-only in a clean target environment.
+    import jsonschema  # type: ignore[import-not-found]
+except ModuleNotFoundError:  # pragma: no cover - exercised by isolated subprocess.
+    jsonschema = None  # type: ignore[assignment]
+
+try:  # init consumes JSON-compatible templates and does not need PyYAML.
+    import yaml  # type: ignore[import-not-found]
+except ModuleNotFoundError:  # pragma: no cover - exercised by isolated subprocess.
+    yaml = None  # type: ignore[assignment]
+
+
+class _DependencyValidationError(Exception):
+    """Stable exception type when optional project dependencies are absent."""
+
+
+JSONSCHEMA_VALIDATION_ERROR = (
+    jsonschema.ValidationError if jsonschema is not None else _DependencyValidationError
+)
+YAML_ERROR = yaml.YAMLError if yaml is not None else _DependencyValidationError
+
+
+def load_json_unique(text: str, *, code: str = "JSON_MAPPING_INVALID") -> Any:
+    def reject_duplicates(pairs: list[tuple[str, Any]]) -> dict[str, Any]:
+        result: dict[str, Any] = {}
+        for key, value in pairs:
+            if key in result:
+                raise ValueError(code)
+            result[key] = value
+        return result
+
+    try:
+        return json.loads(
+            text,
+            object_pairs_hook=reject_duplicates,
+            parse_constant=lambda _value: (_ for _ in ()).throw(ValueError(code)),
+        )
+    except (json.JSONDecodeError, ValueError):
+        raise ValueError(code) from None
+
+
+if yaml is not None:
+    class UniqueKeySafeLoader(yaml.SafeLoader):
+        pass
+
+
+    def _construct_unique_mapping(
+        loader: Any, node: Any, deep: bool = False
+    ) -> dict[Any, Any]:
+        mapping: dict[Any, Any] = {}
+        for key_node, value_node in node.value:
+            key = loader.construct_object(key_node, deep=deep)
+            try:
+                duplicate = key in mapping
+            except TypeError as exc:
+                raise yaml.constructor.ConstructorError(
+                    "while constructing a mapping", node.start_mark,
+                    "found an unhashable key", key_node.start_mark,
+                ) from exc
+            if duplicate:
+                raise yaml.constructor.ConstructorError(
+                    "while constructing a mapping", node.start_mark,
+                    f"found duplicate key {key!r}", key_node.start_mark,
+                )
+            mapping[key] = loader.construct_object(value_node, deep=deep)
+        return mapping
+
+
+    UniqueKeySafeLoader.add_constructor(
+        yaml.resolver.BaseResolver.DEFAULT_MAPPING_TAG,
+        _construct_unique_mapping,
+    )
+
+
+def load_yaml_unique(text: str) -> Any:
+    if yaml is None:
+        return load_json_unique(text, code="PROJECT_RUNTIME_DEPENDENCY_MISSING")
+    return yaml.load(text, Loader=UniqueKeySafeLoader)
 
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -34,31 +111,19 @@ CAPABILITY_EVENT_TYPES = {
     "second_analytics_consumer": bool,
     "material_version_documentation_delays": int,
 }
-PORTABLE_TEMPLATE_MAP = {
-    "delivery-harness/templates/portable-project-profile.yaml": "delivery-harness/project-profile.yaml",
-    "delivery-harness/templates/bootstrap-prompt.md": "delivery-harness/bootstrap-prompt.md",
-    "delivery-harness/templates/portable-core/delivery-harness/harness.yaml": "delivery-harness/harness.yaml",
-    "delivery-harness/templates/portable-core/delivery-harness/context-map.yaml": "delivery-harness/context-map.yaml",
-    "delivery-harness/templates/portable-core/delivery-harness/capability-radar.yaml": "delivery-harness/capability-radar.yaml",
-    "delivery-harness/templates/portable-core/catalog/schemas/delivery_harness.schema.json": "catalog/schemas/delivery_harness.schema.json",
-    "catalog/schemas/delivery_harness_project_profile.schema.json": "catalog/schemas/delivery_harness_project_profile.schema.json",
-    "catalog/schemas/delivery_harness_context_map.schema.json": "catalog/schemas/delivery_harness_context_map.schema.json",
-    "catalog/schemas/delivery_harness_context_receipt.schema.json": "catalog/schemas/delivery_harness_context_receipt.schema.json",
-    "catalog/schemas/delivery_harness_capability_radar.schema.json": "catalog/schemas/delivery_harness_capability_radar.schema.json",
-    "catalog/schemas/delivery_harness_task_contract.schema.json": "catalog/schemas/delivery_harness_task_contract.schema.json",
-    "catalog/schemas/owner_attention_gate_v2.schema.json": "catalog/schemas/owner_attention_gate_v2.schema.json",
-    "delivery-harness/templates/portable-core/control/owner_attention_gate_v2.yaml": "control/owner_attention_gate_v2.yaml",
-    "delivery-harness/templates/portable-core/scripts/delivery_harness.py": "scripts/delivery_harness.py",
-    "scripts/owner_attention_gate.py": "scripts/owner_attention_gate.py",
-    "delivery-harness/templates/portable-core/AGENTS.md": "AGENTS.md",
-    "delivery-harness/templates/portable-core/.agents/skills/delivery-harness/SKILL.md": ".agents/skills/delivery-harness/SKILL.md",
-    "delivery-harness/templates/portable-core/.cursor/rules/00-authority.mdc": ".cursor/rules/00-authority.mdc",
-    "delivery-harness/templates/portable-core/.cursor/rules/30-security-and-secrets.mdc": ".cursor/rules/30-security-and-secrets.mdc",
-    "delivery-harness/templates/portable-core/.cursor/commands/delivery-start.md": ".cursor/commands/delivery-start.md",
-    "delivery-harness/templates/portable-core/.cursor/commands/delivery-status.md": ".cursor/commands/delivery-status.md",
-    "delivery-harness/templates/portable-core/.cursor/commands/delivery-review.md": ".cursor/commands/delivery-review.md",
-    "delivery-harness/templates/portable-core/.cursor/commands/delivery-finish.md": ".cursor/commands/delivery-finish.md",
-}
+CONTEXT_ROLE_ORDER = (
+    "MISSION_AND_INVARIANTS",
+    "PRODUCT_ROADMAP",
+    "ACTIVE_BOUNDED_WORK",
+    "IMPLEMENTATION_STATE",
+    "STABLE_ASSETS_AND_RELATIONS",
+    "LIFECYCLE",
+    "EXTERNAL_ROUTE_KNOWLEDGE",
+    "ARCHITECTURE_DECISIONS",
+    "DELIVERY_EVIDENCE",
+    "HISTORICAL_CONTEXT",
+)
+PORTABLE_MANIFEST_PATH = "delivery-harness/templates/portable-bundle-manifest.json"
 def canonical_json_bytes(value: Any) -> bytes:
     return (
         json.dumps(
@@ -77,6 +142,18 @@ def sha256_bytes(value: bytes) -> str:
 
 def sha256_file(path: Path) -> str:
     return sha256_bytes(path.read_bytes())
+
+
+def validate_context_role_set(context_map: dict[str, Any]) -> None:
+    roles = context_map.get("roles")
+    if not isinstance(roles, list) or len(roles) != len(CONTEXT_ROLE_ORDER):
+        raise ValueError("CONTEXT_ROLE_SET_INVALID")
+    role_ids = [
+        role.get("semantic_role") if isinstance(role, dict) else None
+        for role in roles
+    ]
+    if len(set(role_ids)) != len(role_ids) or set(role_ids) != set(CONTEXT_ROLE_ORDER):
+        raise ValueError("CONTEXT_ROLE_SET_INVALID")
 
 
 def safe_relative_path(value: str, *, code: str = "UNSAFE_RELATIVE_PATH") -> str:
@@ -101,13 +178,15 @@ def resolve_bounded(root: Path, relative: str, *, code: str) -> Path:
 
 
 def load_mapping(path: Path) -> dict[str, Any]:
-    value = yaml.safe_load(path.read_text(encoding="utf-8"))
+    value = load_yaml_unique(path.read_text(encoding="utf-8"))
     if not isinstance(value, dict):
         raise ValueError("MAPPING_REQUIRED")
     return value
 
 
 def load_closed_document(path: Path, schema_path: Path) -> dict[str, Any]:
+    if jsonschema is None:
+        raise ValueError("PROJECT_RUNTIME_DEPENDENCY_MISSING")
     document = load_mapping(path)
     schema = json.loads(schema_path.read_text(encoding="utf-8"))
     if not isinstance(schema, dict):
@@ -115,6 +194,141 @@ def load_closed_document(path: Path, schema_path: Path) -> dict[str, Any]:
     jsonschema.Draft202012Validator.check_schema(schema)
     jsonschema.validate(document, schema)
     return document
+
+
+def validate_portable_profile_for_init(document: Any) -> dict[str, Any]:
+    if not isinstance(document, dict) or set(document) != {
+        "schema", "schema_version", "profile_id", "harness_id", "mode",
+        "repository", "bindings", "working_memory", "context_budgets",
+        "validation", "authority",
+    }:
+        raise ValueError("PORTABLE_PROFILE_INVALID")
+    if not (
+        document["schema"] == "smial.delivery-harness-project-profile"
+        and document["schema_version"] == "1.0"
+        and document["harness_id"] == "DELIVERY_HARNESS_V1"
+        and document["mode"] in {"BOUND_PROJECT", "PORTABLE_PROJECT"}
+        and isinstance(document["profile_id"], str)
+        and re.fullmatch(r"[A-Z0-9][A-Z0-9_-]{2,127}", document["profile_id"])
+    ):
+        raise ValueError("PORTABLE_PROFILE_INVALID")
+    repository = document["repository"]
+    if not isinstance(repository, dict) or set(repository) != {"name", "default_branch"}:
+        raise ValueError("PORTABLE_PROFILE_INVALID")
+    if not (
+        isinstance(repository["name"], str)
+        and re.fullmatch(r"[A-Za-z0-9_.-]+/[A-Za-z0-9_.-]+", repository["name"])
+        and isinstance(repository["default_branch"], str)
+        and re.fullmatch(r"[A-Za-z0-9._/-]+", repository["default_branch"])
+    ):
+        raise ValueError("PORTABLE_PROFILE_INVALID")
+    bindings = document["bindings"]
+    if not isinstance(bindings, dict) or set(bindings) != {
+        "catalog_manifest", "owner_attention_policy", "context_map",
+        "domain_policy", "historical_cloud_bundle_registry",
+    }:
+        raise ValueError("PORTABLE_PROFILE_INVALID")
+    if not all(
+        bindings[key] is None or isinstance(bindings[key], str)
+        for key in {"catalog_manifest", "domain_policy", "historical_cloud_bundle_registry"}
+    ) or not all(
+        isinstance(bindings[key], str) and bool(bindings[key])
+        for key in {"owner_attention_policy", "context_map"}
+    ):
+        raise ValueError("PORTABLE_PROFILE_INVALID")
+    if document["working_memory"] != {
+        "truth_owner": "GIT",
+        "task_resolution": "EXACT_TASK_CONTRACT",
+        "cloud_bundle": "OWNER_MANAGED_OPTIONAL_EXPORT",
+    } or document["context_budgets"] != {
+        "agents_max_bytes": 12288,
+        "cursor_always_apply_max_bytes": 6144,
+        "ordinary_receipt_max_bytes": 49152,
+        "auto_inline_file_max_bytes": 102400,
+    }:
+        raise ValueError("PORTABLE_PROFILE_INVALID")
+    validation = document["validation"]
+    if not isinstance(validation, dict) or set(validation) != {
+        "github_ci_bound", "primary", "fallback", "credential_scan"
+    } or type(validation["github_ci_bound"]) is not bool:
+        raise ValueError("PORTABLE_PROFILE_INVALID")
+
+    def command_ok(value: Any, *, result_owner: bool) -> bool:
+        if value is None:
+            return True
+        keys = {"argv", "trusted_paths"} | ({"result_owner"} if result_owner else set())
+        return (
+            isinstance(value, dict)
+            and set(value) == keys
+            and isinstance(value.get("argv"), list)
+            and bool(value["argv"])
+            and all(isinstance(item, str) and bool(item) for item in value["argv"])
+            and isinstance(value.get("trusted_paths"), list)
+            and bool(value["trusted_paths"])
+            and all(isinstance(item, str) and bool(item) for item in value["trusted_paths"])
+            and (
+                not result_owner
+                or value.get("result_owner") in {"FOCUSED_PLUS_EXACT_PR_CI", "FULL_EXACT_HEAD"}
+            )
+        )
+
+    if not (
+        command_ok(validation["primary"], result_owner=True)
+        and command_ok(validation["fallback"], result_owner=True)
+        and command_ok(validation["credential_scan"], result_owner=False)
+    ):
+        raise ValueError("PORTABLE_PROFILE_INVALID")
+    authority = document["authority"]
+    if not isinstance(authority, dict) or set(authority) != {
+        "external_system", "signing_or_financial_action", "cash_spend",
+        "cloud_export_mutation",
+    } or any(value is not False for value in authority.values()):
+        raise ValueError("PORTABLE_PROFILE_INVALID")
+    return document
+
+
+def load_portable_bundle_manifest(template_root: Path) -> list[dict[str, str]]:
+    manifest_path = resolve_bounded(
+        template_root, PORTABLE_MANIFEST_PATH, code="PORTABLE_MANIFEST_PATH_INVALID"
+    )
+    try:
+        manifest = load_json_unique(
+            manifest_path.read_text(encoding="utf-8"), code="PORTABLE_MANIFEST_INVALID"
+        )
+    except (OSError, UnicodeDecodeError):
+        raise ValueError("PORTABLE_MANIFEST_INVALID") from None
+    if not isinstance(manifest, dict) or set(manifest) != {
+        "schema", "schema_version", "harness_id", "files"
+    } or not (
+        manifest["schema"] == "delivery-harness.portable-bundle-manifest"
+        and manifest["schema_version"] == "1.0"
+        and manifest["harness_id"] == "DELIVERY_HARNESS_V1"
+        and isinstance(manifest["files"], list)
+        and bool(manifest["files"])
+    ):
+        raise ValueError("PORTABLE_MANIFEST_INVALID")
+    records: list[dict[str, str]] = []
+    sources: set[str] = set()
+    destinations: set[str] = set()
+    for item in manifest["files"]:
+        if not isinstance(item, dict) or set(item) != {"source", "destination", "sha256"}:
+            raise ValueError("PORTABLE_MANIFEST_INVALID")
+        source = safe_relative_path(item["source"], code="PORTABLE_MANIFEST_INVALID")
+        destination = safe_relative_path(item["destination"], code="PORTABLE_MANIFEST_INVALID")
+        digest = item["sha256"]
+        if not isinstance(digest, str) or re.fullmatch(r"[0-9a-f]{64}", digest) is None:
+            raise ValueError("PORTABLE_MANIFEST_INVALID")
+        if source in sources or destination in destinations:
+            raise ValueError("PORTABLE_MANIFEST_INVALID")
+        source_path = resolve_bounded(
+            template_root, source, code="PORTABLE_MANIFEST_INVALID"
+        )
+        if not source_path.is_file() or sha256_file(source_path) != digest:
+            raise ValueError("PORTABLE_TEMPLATE_HASH_MISMATCH")
+        sources.add(source)
+        destinations.add(destination)
+        records.append({"source": source, "destination": destination, "sha256": digest})
+    return records
 
 
 def git_text(root: Path, *args: str) -> str:
@@ -143,11 +357,30 @@ def git_identity(root: Path) -> dict[str, Any]:
     return {"head": head, "tree": tree, "branch": branch, "dirty": dirty}
 
 
+def github_repository_from_origin(value: str) -> str:
+    patterns = (
+        r"git@github\.com:([A-Za-z0-9_.-]+/[A-Za-z0-9_.-]+?)(?:\.git)?$",
+        r"ssh://git@github\.com/([A-Za-z0-9_.-]+/[A-Za-z0-9_.-]+?)(?:\.git)?/?$",
+        r"https://github\.com/([A-Za-z0-9_.-]+/[A-Za-z0-9_.-]+?)(?:\.git)?/?$",
+    )
+    for pattern in patterns:
+        match = re.fullmatch(pattern, value)
+        if match is not None:
+            return match.group(1)
+    raise ValueError("TASK_REPOSITORY_ORIGIN_MISMATCH")
+
+
+def validate_repository_origin(root: Path, expected_repository: str) -> None:
+    origin = git_text(root, "remote", "get-url", "origin")
+    if github_repository_from_origin(origin) != expected_repository:
+        raise ValueError("TASK_REPOSITORY_ORIGIN_MISMATCH")
+
+
 def validate_task_git_binding(root: Path, metadata: dict[str, Any], identity: dict[str, Any]) -> None:
     binding = metadata["git_binding"]
     expected_base = binding["expected_base"]
     expected_upstream = binding["expected_upstream"]
-    if git_text(root, "merge-base", "HEAD", expected_base) != expected_base:
+    if git_text(root, "merge-base", "HEAD", expected_upstream) != expected_base:
         raise ValueError("TASK_EXPECTED_BASE_MISMATCH")
     if git_text(root, "rev-parse", expected_upstream) != binding["expected_upstream_oid"]:
         raise ValueError("TASK_UPSTREAM_OID_MISMATCH")
@@ -168,6 +401,10 @@ def reference_for_path(
     max_inline_bytes: int,
 ) -> dict[str, Any]:
     normalized = safe_relative_path(relative)
+    if normalized.startswith("docs/project_sources/") and not (
+        semantic_role == "HISTORICAL_CONTEXT" and lane == "L3"
+    ):
+        raise ValueError("SOURCE_HISTORY_ROLE_MISMATCH")
     path = resolve_bounded(root, normalized, code="UNSAFE_RELATIVE_PATH")
     if not path.is_file():
         raise FileNotFoundError(normalized)
@@ -240,10 +477,10 @@ def parse_task_contract(root: Path, relative: str, task_id: str) -> dict[str, An
     if match is None:
         raise ValueError("TASK_CONTRACT_SCHEMA_INVALID")
     try:
-        metadata = yaml.safe_load(match.group(1))
+        metadata = load_yaml_unique(match.group(1))
         schema = json.loads((root / TASK_CONTRACT_SCHEMA).read_text(encoding="utf-8"))
         jsonschema.validate(metadata, schema)
-    except (OSError, json.JSONDecodeError, yaml.YAMLError, jsonschema.ValidationError):
+    except (OSError, json.JSONDecodeError, YAML_ERROR, JSONSCHEMA_VALIDATION_ERROR):
         raise ValueError("TASK_CONTRACT_SCHEMA_INVALID") from None
     if not isinstance(metadata, dict):
         raise ValueError("TASK_CONTRACT_SCHEMA_INVALID")
@@ -290,6 +527,48 @@ def catalog_relation_references(
     return selected, gaps
 
 
+def resolve_required_context(
+    root: Path,
+    task_metadata: dict[str, Any],
+    context_map: dict[str, Any],
+    *,
+    max_inline_bytes: int,
+) -> tuple[list[dict[str, Any]], list[dict[str, Any]]]:
+    selected: list[dict[str, Any]] = []
+    gaps: list[dict[str, Any]] = []
+    role_by_id = {role["semantic_role"]: role for role in context_map["roles"]}
+    requirements = task_metadata["context_requirements"]
+    required = set(requirements["l2_roles"]) | set(requirements["l3_roles"])
+    paths_by_role = requirements["exact_role_paths"]
+    for role_id in (
+        "LIFECYCLE",
+        "EXTERNAL_ROUTE_KNOWLEDGE",
+        "ARCHITECTURE_DECISIONS",
+        "DELIVERY_EVIDENCE",
+        "HISTORICAL_CONTEXT",
+    ):
+        role = role_by_id[role_id]
+        if role_id not in required:
+            gaps.append(explicit_gap(role, "DEFERRED_ON_DEMAND"))
+            continue
+        paths = paths_by_role[role_id]
+        if not paths:
+            raise ValueError(f"REQUIRED_CONTEXT_REFERENCE_NOT_BOUND:{role_id}")
+        for relative in paths:
+            selected.append(
+                reference_for_path(
+                    root,
+                    relative,
+                    semantic_role=role_id,
+                    lane=role["lane"],
+                    truth_owner=role["truth_owner"],
+                    stable_id=None,
+                    max_inline_bytes=max_inline_bytes,
+                )
+            )
+    return selected, gaps
+
+
 def build_context_receipt(
     root: Path,
     *,
@@ -322,12 +601,14 @@ def build_context_receipt(
     )
     if profile["repository"]["name"] != task_metadata["expected_repository"]:
         raise ValueError("TASK_REPOSITORY_MISMATCH")
+    validate_repository_origin(root, task_metadata["expected_repository"])
     if route not in task_metadata["allowed_routes"]:
         raise ValueError("TASK_ROUTE_NOT_ALLOWED")
     context_map = load_closed_document(
         root / profile["bindings"]["context_map"],
         root / "catalog/schemas/delivery_harness_context_map.schema.json",
     )
+    validate_context_role_set(context_map)
     budgets = profile["context_budgets"]
     max_inline = budgets["auto_inline_file_max_bytes"]
     identity = git_identity(root)
@@ -377,23 +658,14 @@ def build_context_receipt(
     )
     records = load_catalog_records(root, profile["bindings"]["catalog_manifest"])
     catalog_selected, catalog_gaps = catalog_relation_references(root, records, task_metadata["context_requirements"]["catalog_asset_ids"], max_inline_bytes=max_inline)
+    if catalog_gaps:
+        raise ValueError("REQUIRED_CATALOG_ASSET_NOT_RESOLVED")
     selected.extend(catalog_selected)
-    gaps.extend(catalog_gaps)
-
-    required_l2 = set(task_metadata["context_requirements"]["l2_roles"])
-    exact_evidence = task_metadata["context_requirements"]["exact_evidence_paths"]
-    exact_registries = task_metadata["context_requirements"]["exact_registry_paths"]
-    for role_id in ("LIFECYCLE", "EXTERNAL_ROUTE_KNOWLEDGE", "ARCHITECTURE_DECISIONS", "DELIVERY_EVIDENCE"):
-        if role_id not in required_l2:
-            gaps.append(explicit_gap(role_by_id[role_id], "DEFERRED_ON_DEMAND"))
-            continue
-        paths = exact_evidence if role_id == "DELIVERY_EVIDENCE" else exact_registries
-        if not paths:
-            gaps.append(explicit_gap(role_by_id[role_id], "REQUIRED_EXACT_REFERENCE_NOT_BOUND"))
-            continue
-        for relative in paths:
-            selected.append(reference_for_path(root, relative, semantic_role=role_id, lane="L2", truth_owner=role_by_id[role_id]["truth_owner"], stable_id=None, max_inline_bytes=max_inline))
-    gaps.append(explicit_gap(role_by_id["HISTORICAL_CONTEXT"], "DEFERRED_ON_DEMAND"))
+    required_selected, required_gaps = resolve_required_context(
+        root, task_metadata, context_map, max_inline_bytes=max_inline
+    )
+    selected.extend(required_selected)
+    gaps.extend(required_gaps)
 
     selected.sort(
         key=lambda item: (
@@ -435,7 +707,7 @@ def validate_context_receipt(
     try:
         schema = json.loads((root / CONTEXT_RECEIPT_SCHEMA).read_text(encoding="utf-8"))
         jsonschema.validate(receipt, schema)
-    except (OSError, json.JSONDecodeError, jsonschema.ValidationError):
+    except (OSError, json.JSONDecodeError, JSONSCHEMA_VALIDATION_ERROR):
         return ["CONTEXT_RECEIPT_SCHEMA_INVALID"]
     unsigned = dict(receipt)
     observed = unsigned.pop("receipt_sha256", None)
@@ -489,7 +761,7 @@ def cursor_rule_frontmatter(path: Path) -> dict[str, Any]:
     match = re.match(r"\A---\r?\n(.*?)\r?\n---\r?\n", text, re.DOTALL)
     if match is None:
         raise ValueError("CURSOR_RULE_FRONTMATTER_INVALID")
-    value = yaml.safe_load(match.group(1))
+    value = load_yaml_unique(match.group(1))
     if not isinstance(value, dict) or set(value) != {
         "description",
         "globs",
@@ -510,19 +782,38 @@ def cursor_rule_frontmatter(path: Path) -> dict[str, Any]:
 def check_harness(root: Path) -> dict[str, Any]:
     errors: list[str] = []
     profile: dict[str, Any] | None = None
+    delivery_gate_ready = False
     documents = (
         (HARNESS_PATH, "catalog/schemas/delivery_harness.schema.json"),
         (PROFILE_PATH, "catalog/schemas/delivery_harness_project_profile.schema.json"),
         (CONTEXT_MAP_PATH, "catalog/schemas/delivery_harness_context_map.schema.json"),
         (RADAR_PATH, "catalog/schemas/delivery_harness_capability_radar.schema.json"),
+        (
+            "control/owner_attention_gate_v2.yaml",
+            "catalog/schemas/owner_attention_gate_v2.schema.json",
+        ),
     )
     for document, schema in documents:
         try:
             loaded = load_closed_document(root / document, root / schema)
             if document == PROFILE_PATH:
                 profile = loaded
-        except (OSError, ValueError, jsonschema.ValidationError):
+            elif document == CONTEXT_MAP_PATH:
+                validate_context_role_set(loaded)
+        except (OSError, ValueError, JSONSCHEMA_VALIDATION_ERROR):
             errors.append(f"CONTRACT_INVALID:{document}")
+    if profile is not None:
+        validation = profile["validation"]
+        delivery_gate_ready = (
+            validation["github_ci_bound"] is True
+            and
+            (validation["primary"] is not None or validation["fallback"] is not None)
+            and validation["credential_scan"] is not None
+        )
+        try:
+            validate_repository_origin(root, profile["repository"]["name"])
+        except ValueError:
+            errors.append("REPOSITORY_IDENTITY_DIVERGENCE")
     active_baton_paths = [
         ".cursor/rules/50-github-baton.mdc",
         ".cursor/commands/baton-preflight.md",
@@ -548,24 +839,36 @@ def check_harness(root: Path) -> dict[str, Any]:
         ]
         if any(not (root / path).is_file() for path in historical_paths):
             errors.append("HISTORICAL_BATON_MISSING")
-    active_adapter_roots = (root / ".cursor/rules", root / ".cursor/commands")
+    active_adapter_roots = (
+        root / ".cursor/rules",
+        root / ".cursor/commands",
+        root / ".cursor/agents",
+        root / ".agents/skills/delivery-harness",
+    )
     active_baton_patterns = (
         re.compile(r"GITHUB_BATON\s+as\s+an\s+active", re.IGNORECASE),
         re.compile(r"route\s*[:=]\s*GITHUB_BATON", re.IGNORECASE),
         re.compile(r"use\s+GITHUB_BATON", re.IGNORECASE),
+        re.compile(
+            r"\bbaton[_-](?:preflight|receipt|contract|scope)\b",
+            re.IGNORECASE,
+        ),
     )
+    active_adapter_files = [root / "AGENTS.md"]
     for adapter_root in active_adapter_roots:
         if not adapter_root.is_dir():
             continue
-        for path in adapter_root.rglob("*"):
-            if path.is_file():
-                try:
-                    text = path.read_text(encoding="utf-8")
-                except (OSError, UnicodeDecodeError):
-                    errors.append("ACTIVE_ADAPTER_INVALID")
-                    continue
-                if any(pattern.search(text) for pattern in active_baton_patterns):
-                    errors.append("ACTIVE_BATON_TOKEN_REACTIVATED")
+        active_adapter_files.extend(
+            path for path in adapter_root.rglob("*") if path.is_file()
+        )
+    for path in active_adapter_files:
+        try:
+            text = path.read_text(encoding="utf-8")
+        except (OSError, UnicodeDecodeError):
+            errors.append("ACTIVE_ADAPTER_INVALID")
+            continue
+        if any(pattern.search(text) for pattern in active_baton_patterns):
+            errors.append("ACTIVE_BATON_REFERENCE")
     try:
         agents_bytes = (root / "AGENTS.md").stat().st_size
         if agents_bytes > 12 * 1024:
@@ -577,13 +880,14 @@ def check_harness(root: Path) -> dict[str, Any]:
                 always_bytes += path.stat().st_size
         if always_bytes > 6 * 1024:
             errors.append("CURSOR_ALWAYS_CONTEXT_BUDGET_EXCEEDED")
-    except (OSError, ValueError, yaml.YAMLError):
+    except (OSError, ValueError, YAML_ERROR):
         errors.append("ACTIVE_ADAPTER_INVALID")
     return {
         "schema": "smial.delivery-harness-check",
         "schema_version": "1.0",
         "harness_id": "DELIVERY_HARNESS_V1",
         "status": "PASS" if not errors else "PENDING",
+        "delivery_gate_ready": delivery_gate_ready,
         "errors": sorted(errors),
         "side_effects": {"local_writes": 0, "network_calls": 0},
     }
@@ -643,21 +947,90 @@ def evaluate_capability_radar(
     return {"decision": "CANDIDATE", "candidate": matches[0], **base}
 
 
-def portable_template_bytes(source_relative: str, template_root: Path) -> bytes:
+def portable_template_bytes(
+    source_relative: str,
+    destination: str,
+    template_root: Path,
+    *,
+    repository: str,
+    default_branch: str,
+) -> bytes:
     source = resolve_bounded(
         template_root, source_relative, code="PORTABLE_TEMPLATE_PATH_INVALID"
     )
     value = source.read_bytes()
-    if source_relative.endswith("bootstrap-prompt.md"):
+    if destination == "delivery-harness/project-profile.yaml":
+        document = load_json_unique(
+            value.decode("utf-8", errors="strict"), code="PORTABLE_PROFILE_INVALID"
+        )
+        if not isinstance(document, dict) or not isinstance(
+            document.get("repository"), dict
+        ):
+            raise ValueError("PORTABLE_PROFILE_INVALID")
+        document["repository"]["name"] = repository
+        document["repository"]["default_branch"] = default_branch
+        value = (json.dumps(document, indent=2, ensure_ascii=False) + "\n").encode(
+            "utf-8"
+        )
+    elif destination == "control/owner_attention_gate_v2.yaml":
+        document = load_json_unique(
+            value.decode("utf-8", errors="strict"), code="PORTABLE_POLICY_INVALID"
+        )
+        if not isinstance(document, dict):
+            raise ValueError("PORTABLE_POLICY_INVALID")
+        document["repository"] = repository
+        value = (json.dumps(document, indent=2, ensure_ascii=False) + "\n").encode(
+            "utf-8"
+        )
+    elif destination == RADAR_PATH:
+        document = load_json_unique(
+            value.decode("utf-8", errors="strict"), code="PORTABLE_RADAR_INVALID"
+        )
+        if not isinstance(document, dict):
+            raise ValueError("PORTABLE_RADAR_INVALID")
+        value = (json.dumps(document, indent=2, ensure_ascii=False) + "\n").encode(
+            "utf-8"
+        )
+    elif destination == "delivery-harness/bootstrap-prompt.md":
         value = re.sub(
             rb"(?m)^Repository: .+$",
-            b"Repository: REPOSITORY_URL_REQUIRED",
+            f"Repository: https://github.com/{repository}".encode("utf-8"),
             value,
+        )
+        value = value.replace(
+            b"`main`", f"`{default_branch}`".encode("utf-8")
         )
     return value
 
 
+def is_reparse_point(path: Path) -> bool:
+    try:
+        attributes = getattr(os.lstat(path), "st_file_attributes", 0)
+    except OSError:
+        return False
+    marker = getattr(stat, "FILE_ATTRIBUTE_REPARSE_POINT", 0x400)
+    return bool(attributes & marker)
+
+
+def destination_ancestor_conflict(target: Path, destination: str) -> bool:
+    normalized = safe_relative_path(destination, code="INITIALIZATION_PATH_INVALID")
+    current = target.resolve()
+    for part in PurePosixPath(normalized).parts[:-1]:
+        current = current / part
+        if current.is_symlink() or is_reparse_point(current):
+            return True
+        if current.exists() and not current.is_dir():
+            return True
+    return False
+
+
 def target_state(target: Path, destination: str) -> dict[str, Any]:
+    normalized = safe_relative_path(destination, code="INITIALIZATION_PATH_INVALID")
+    lexical = target.resolve() / normalized
+    if destination_ancestor_conflict(target, destination):
+        return {"state": "CONFLICT", "sha256": None}
+    if lexical.is_symlink() or is_reparse_point(lexical):
+        return {"state": "CONFLICT", "sha256": None}
     path = resolve_bounded(target, destination, code="INITIALIZATION_PATH_INVALID")
     if not path.exists():
         return {"state": "MISSING", "sha256": None}
@@ -666,21 +1039,78 @@ def target_state(target: Path, destination: str) -> dict[str, Any]:
     return {"state": "FILE", "sha256": sha256_file(path)}
 
 
+def has_reparse_boundary(target: Path) -> bool:
+    lexical = target.absolute()
+    for candidate in (lexical, *lexical.parents):
+        if candidate.is_symlink() or is_reparse_point(candidate):
+            return True
+    return False
+
+
 def validate_initialization_target(target: Path) -> Path:
     forbidden = {".cursor", ".codex", ".agents"}
     if any(part.casefold() in forbidden for part in target.parts):
         raise ValueError("GLOBAL_CONFIG_TARGET_FORBIDDEN")
-    if target.is_symlink():
-        raise ValueError("INITIALIZATION_SYMLINK_TARGET_FORBIDDEN")
+    if has_reparse_boundary(target):
+        raise ValueError("INITIALIZATION_REPARSE_TARGET_FORBIDDEN")
     resolved = target.resolve()
+    if resolved == Path.home().resolve():
+        raise ValueError("GLOBAL_CONFIG_TARGET_FORBIDDEN")
     if not resolved.is_dir():
         raise ValueError("INITIALIZATION_TARGET_DIRECTORY_REQUIRED")
     if not (resolved / ".git").exists():
         raise ValueError("INITIALIZATION_REPOSITORY_ROOT_REQUIRED")
-    for parent in (resolved, *resolved.parents):
-        if parent.is_symlink() or (hasattr(parent, "is_junction") and parent.is_junction()):
-            raise ValueError("INITIALIZATION_REPARSE_TARGET_FORBIDDEN")
+    try:
+        toplevel = Path(
+            git_text(resolved, "rev-parse", "--show-toplevel")
+        ).resolve()
+    except (OSError, ValueError):
+        raise ValueError("INITIALIZATION_REPOSITORY_ROOT_REQUIRED") from None
+    if toplevel != resolved:
+        raise ValueError("INITIALIZATION_REPOSITORY_ROOT_REQUIRED")
     return resolved
+
+
+def validate_initialization_repository(
+    target: Path, repository: str | None
+) -> str:
+    try:
+        origin = git_text(target, "remote", "get-url", "origin")
+        origin_repository = github_repository_from_origin(origin)
+    except ValueError:
+        raise ValueError("INITIALIZATION_REPOSITORY_REQUIRED") from None
+    if repository is None:
+        repository = origin_repository
+    if re.fullmatch(r"[A-Za-z0-9_.-]+/[A-Za-z0-9_.-]+", repository) is None:
+        raise ValueError("INITIALIZATION_REPOSITORY_INVALID")
+    if origin_repository != repository:
+        raise ValueError("INITIALIZATION_REPOSITORY_MISMATCH")
+    return repository
+
+
+def validate_initialization_default_branch(
+    target: Path, default_branch: str | None
+) -> str:
+    discovered: str | None = None
+    try:
+        remote_head = git_text(
+            target, "symbolic-ref", "--quiet", "--short", "refs/remotes/origin/HEAD"
+        )
+        if remote_head.startswith("origin/"):
+            discovered = remote_head.removeprefix("origin/")
+    except ValueError:
+        pass
+    branch = default_branch if default_branch is not None else discovered
+    if not isinstance(branch, str) or not (
+        re.fullmatch(r"[A-Za-z0-9][A-Za-z0-9._/-]{0,127}", branch)
+        and ".." not in branch
+        and "//" not in branch
+        and not branch.endswith(("/", "."))
+    ):
+        raise ValueError("INITIALIZATION_DEFAULT_BRANCH_REQUIRED")
+    if discovered is not None and branch != discovered:
+        raise ValueError("INITIALIZATION_DEFAULT_BRANCH_MISMATCH")
+    return branch
 
 
 def initialization_plan_hash(value: dict[str, Any]) -> str:
@@ -697,29 +1127,45 @@ def plan_initialization(
     target: Path,
     template_root: Path,
     *,
+    repository: str | None = None,
+    default_branch: str | None = None,
     profile_path: str = "delivery-harness/templates/portable-project-profile.yaml",
 ) -> dict[str, Any]:
     target = validate_initialization_target(target)
+    repository = validate_initialization_repository(target, repository)
+    default_branch = validate_initialization_default_branch(target, default_branch)
     template_root = template_root.resolve()
     profile_relative = safe_relative_path(profile_path, code="PORTABLE_PROFILE_PATH_INVALID")
     profile_source = resolve_bounded(template_root, profile_relative, code="PORTABLE_PROFILE_PATH_INVALID")
     if not profile_source.is_file():
         raise ValueError("PORTABLE_PROFILE_NOT_FOUND")
     try:
-        load_closed_document(
-            profile_source,
-            template_root / "catalog/schemas/delivery_harness_project_profile.schema.json",
+        profile_document = load_json_unique(
+            profile_source.read_text(encoding="utf-8"), code="PORTABLE_PROFILE_INVALID"
         )
-    except (OSError, ValueError, jsonschema.ValidationError) as exc:
+        validate_portable_profile_for_init(profile_document)
+    except (OSError, UnicodeDecodeError, ValueError) as exc:
         raise ValueError("PORTABLE_PROFILE_INVALID") from exc
-    template_map = dict(PORTABLE_TEMPLATE_MAP)
-    template_map.pop("delivery-harness/templates/portable-project-profile.yaml", None)
-    template_map[profile_relative] = "delivery-harness/project-profile.yaml"
+    manifest_records = load_portable_bundle_manifest(template_root)
+    profile_records = [
+        item for item in manifest_records
+        if item["destination"] == "delivery-harness/project-profile.yaml"
+    ]
+    if len(profile_records) != 1 or profile_records[0]["source"] != profile_relative:
+        raise ValueError("PORTABLE_PROFILE_NOT_IN_MANIFEST")
     files: list[dict[str, Any]] = []
     creates: list[str] = []
     conflicts: list[str] = []
-    for source, destination in sorted(template_map.items()):
-        payload = portable_template_bytes(source, template_root)
+    for record in sorted(manifest_records, key=lambda item: item["destination"]):
+        source = record["source"]
+        destination = record["destination"]
+        payload = portable_template_bytes(
+            source,
+            destination,
+            template_root,
+            repository=repository,
+            default_branch=default_branch,
+        )
         payload_hash = sha256_bytes(payload)
         preimage = target_state(target, destination)
         if preimage["state"] == "MISSING":
@@ -746,6 +1192,8 @@ def plan_initialization(
         "removes": [],
         "conflicts": conflicts,
         "target_fingerprint": target_fingerprint(target),
+        "repository": repository,
+        "default_branch": default_branch,
         "profile_sha256": sha256_file(profile_source),
         "files": files,
     }
@@ -755,6 +1203,8 @@ def plan_initialization(
 
 def apply_initialization(target: Path, plan: dict[str, Any]) -> dict[str, Any]:
     target = validate_initialization_target(target)
+    validate_initialization_repository(target, plan.get("repository"))
+    validate_initialization_default_branch(target, plan.get("default_branch"))
     if plan.get("target_fingerprint") != target_fingerprint(target):
         raise ValueError("INITIALIZATION_TARGET_MISMATCH")
     if plan.get("decision") != "APPLY_ALLOWED":
@@ -819,6 +1269,8 @@ def parse_args() -> argparse.Namespace:
     radar.add_argument("--format", choices=("json",), default="json")
     init = sub.add_parser("init")
     init.add_argument("--target", type=Path, required=True)
+    init.add_argument("--repository")
+    init.add_argument("--default-branch")
     init.add_argument("--profile", default="delivery-harness/templates/portable-project-profile.yaml")
     mode = init.add_mutually_exclusive_group(required=True)
     mode.add_argument("--preview", action="store_true")
@@ -844,7 +1296,13 @@ def main() -> int:
         print(json.dumps(result, indent=2, ensure_ascii=False, sort_keys=True))
         return 0 if result["decision"] != "RADAR_REPLAN_REQUIRED" else 2
     if args.command == "init":
-        plan = plan_initialization(args.target, ROOT, profile_path=args.profile)
+        plan = plan_initialization(
+            args.target,
+            ROOT,
+            repository=args.repository,
+            default_branch=args.default_branch,
+            profile_path=args.profile,
+        )
         if args.preview:
             result = plan
         else:

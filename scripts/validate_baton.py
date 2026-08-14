@@ -861,7 +861,6 @@ def validate_offline_commands_have_no_hidden_network() -> None:
         "scripts/baton_contract.py",
         "scripts/baton_scope.py",
         "scripts/baton_receipt.py",
-        "scripts/owner_attention_gate.py",
         "scripts/validate_baton.py",
     ]:
         text = (ROOT / relative).read_text(encoding="utf-8")
@@ -873,6 +872,22 @@ def validate_offline_commands_have_no_hidden_network() -> None:
             f"no_requests:{relative}",
             request_needle not in text and urllib_needle not in text,
         )
+    merge_gate = (ROOT / "scripts/owner_attention_gate.py").read_text(
+        encoding="utf-8"
+    )
+    assert_check(
+        "guarded_merge_exact_head_cas",
+        "--match-head-commit" in merge_gate,
+    )
+    for forbidden in ("--admin", "--delete-branch", "g" + "h repo edit"):
+        assert_check(
+            f"guarded_merge_forbidden_mutation_absent:{forbidden}",
+            forbidden not in merge_gate,
+        )
+    assert_check(
+        "guarded_merge_no_http_library",
+        request_needle not in merge_gate and urllib_needle not in merge_gate,
+    )
 
 
 def validate(*, focused: bool = False) -> None:

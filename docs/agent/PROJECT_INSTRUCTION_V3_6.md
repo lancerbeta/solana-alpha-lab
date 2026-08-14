@@ -22,7 +22,7 @@ merge. Failed machine check = DENY.
 
 Для merge владелец один раз подтверждает exact PR/head фразой из policy. После
 повторной машинной проверки Cursor или Codex выполняет только ordinary guarded
-merge, сохраняет branch/settings и проверяет exact main + post-merge CI.
+merge, сохраняет branch/settings и проверяет точную default branch профиля + post-merge CI.
 PR/tests/CI/merge сами по себе не доказывают DONE, alpha или cashflow.
 
 Workflow: CHECK → CONTEXT → ENTRY/OUTCOME → EXECUTE → RISK-ROUTED REVIEW →

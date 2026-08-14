@@ -52,8 +52,15 @@ def build_t21_finish_gate_pulse(
     router = marker.get("resume_router")
     if not isinstance(router, dict):
         raise T21FinishGateError("resume_router_missing")
-    if router.get("status") != "A8_MERGED_PENDING_TASK21_FINISH_SOURCE_ACTIVATION":
-        raise T21FinishGateError("post_a8_router_status_missing")
+    if (
+        marker.get("policy_reconciled_on") != "2026-08-14"
+        or marker.get("historical_gate_state_as_of")
+        != "2026-08-01T18:13:07.833538Z"
+        or router.get("router_version") != "1.1"
+    ):
+        raise T21FinishGateError("forward_policy_reconciliation_missing")
+    if router.get("status") != "TERMINAL_DORMANT_OWNER_EXPORT_OPTIONAL":
+        raise T21FinishGateError("terminal_router_status_missing")
     delivery = router.get("a8_resolution")
     if not isinstance(delivery, dict) or delivery.get("status") != "MERGED_MAIN_CI_PASS":
         raise T21FinishGateError("a8_delivery_not_accepted")
@@ -69,23 +76,20 @@ def build_t21_finish_gate_pulse(
     pulse.update(
         {
             "schema": "smial.task21.finish-gate-owner-pulse",
-            "schema_version": "1.0",
+            "schema_version": "1.1",
             "read_model_id": "OWNER-PULSE-T21-FINISH-001",
+            "read_model_version": "1.1",
             "atom_id": "TASK21_FINISH_GATE_RECONCILIATION_V1",
             "as_of": observed_at.isoformat().replace("+00:00", "Z"),
+            "historical_delivery_as_of": delivery["resolved_at"],
+            "policy_reconciled_on": marker["policy_reconciled_on"],
             "active_time_gates": [],
-            "attention": [
-                {
-                    "severity": "INFO",
-                    "code": "A8_MERGED_PENDING_FINISH_SOURCE_ACTIVATION",
-                    "action": "ACTIVATE_TASK21_FINISH_SOURCE_BUNDLE_AND_RUN_SMOKE",
-                }
-            ],
+            "attention": [],
         }
     )
     pulse["task21_forward_state"].update(
         {
-            "state": "A8_MERGED_PENDING_FINISH_SOURCE_ACTIVATION",
+            "state": "A8_MERGED_TERMINAL_OWNER_EXPORT_OPTIONAL",
             "task22_started": False,
         }
     )
@@ -93,23 +97,21 @@ def build_t21_finish_gate_pulse(
     pulse["recovery_and_storage"].update(
         {
             "dataset_freeze_state": "A7_ACCEPTED_AND_A8_MERGED",
-            "analysis_promotion_blocker": (
-                "TASK21_FINISH_SOURCE_ACTIVATION_THEN_TASK22_ENTRY_GATE"
-            ),
+            "analysis_promotion_blocker": "NONE_FROM_TASK21_CLOUD_EXPORT",
         }
     )
     pulse["a7_acceptance"].update(
         {
-            "next_atom": "TASK21_FINISH_SOURCE_ACTIVATION_AND_SMOKE",
+            "next_atom": "NONE_OWNER_EXPORT_OPTIONAL",
             "next_atom_authorized": False,
             "task22_eligible_after_finish": True,
         }
     )
     pulse["finish_gate"] = {
-        "status": "FINALIZATION_REQUIRED_PENDING_PROJECT_SOURCE_ACTIVATION",
+        "status": "TERMINAL_DORMANT_COMPATIBILITY",
         "factory_fit": "PASS_WITH_DURABLE_FOLLOWUPS",
         "product_vision_terminal_result": "CANONICALIZED_WITH_PATCH",
-        "source_activation": "PENDING_REPLACEMENT_BUNDLE_AND_USER_SMOKE",
+        "source_activation": "OWNER_MANAGED_OPTIONAL_EXPORT",
         "task22_started": False,
         "evidence_sources": [
             {"path": marker_path.relative_to(root).as_posix(), "sha256": _sha256(marker_path)},
@@ -140,7 +142,7 @@ def render_t21_finish_gate_text(pulse: JsonObject) -> str:
                 f"{delivery['merge_commit']} / tree {delivery['merge_tree']}."
             ),
             f"Dataset: {state['owner_verdict']}.",
-            "Следующий шаг: активировать replacement bundle постоянной памяти и получить SMOKE=PASS.",
-            "TASK-22 не запущен; read model не выдаёт внешнюю authority.",
+            "Cloud bundle — добровольный экспорт владельца и не требует действий владельца.",
+            "Этот исторический read model не блокирует текущую canonical работу и не выдаёт внешнюю authority.",
         ]
     ) + "\n"

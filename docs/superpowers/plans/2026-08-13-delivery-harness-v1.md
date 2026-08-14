@@ -59,16 +59,21 @@ catalog/schemas/delivery_harness.schema.json
 catalog/schemas/delivery_harness_capability_radar.schema.json
 catalog/schemas/delivery_harness_context_map.schema.json
 catalog/schemas/delivery_harness_context_receipt.schema.json
+catalog/schemas/delivery_harness_completion_evidence.schema.json
+catalog/schemas/delivery_harness_independent_review_evidence.schema.json
 catalog/schemas/delivery_harness_project_profile.schema.json
 catalog/schemas/delivery_harness_task_contract.schema.json
 catalog/schemas/owner_attention_gate_v2.schema.json
 control/owner_attention_gate_v2.yaml
+control/active_time_gates.json                          # terminalize obsolete cloud-smoke resume route only
+configs/t21_finish_gate_read_model_v1.yaml              # matching dormant compatibility projection
 delivery-harness/capability-radar.yaml
 delivery-harness/context-map.yaml
 delivery-harness/harness.yaml
 delivery-harness/policies/solana-alpha-lab.md
 delivery-harness/project-profile.yaml
 delivery-harness/templates/bootstrap-prompt.md
+delivery-harness/templates/portable-bundle-manifest.json
 delivery-harness/templates/portable-project-profile.yaml
 delivery-harness/templates/portable-core/**
 docs/OPERATOR_NAVIGATION.md                               # generated
@@ -85,6 +90,7 @@ docs/decisions/ADR-004-owner-attention-and-route-specific-merge-authority.md
 docs/decisions/ADR-005-direct-delivery-harness.md
 docs/evidence/control/delivery_harness_acceptance_v1.json
 docs/evidence/control/delivery_harness_factory_fit_v1.json
+docs/evidence/control/delivery_harness_independent_review_v1.json
 docs/superpowers/plans/2026-08-13-delivery-harness-v1.md
 docs/superpowers/specs/2026-08-13-delivery-harness-design.md
 docs/tasks/CTRL-DELIVERY-HARNESS-V1.md
@@ -92,6 +98,7 @@ scripts/delivery_harness.py
 scripts/owner_attention_gate.py
 scripts/validate_baton.py                                  # retire active adapter checks; preserve historical machine layer
 scripts/validate_catalog.py                                # direct consumer: admit evidenced implementation of architecture intent
+src/solana_alpha_lab/t21_finish_gate.py                    # remove obsolete owner cloud-smoke action
 tests/fixtures/delivery_harness/current_repo_events.yaml
 tests/fixtures/delivery_harness/dummy_project/AGENTS.md
 tests/fixtures/delivery_harness/dummy_project/README.md
@@ -114,6 +121,7 @@ tests/test_owner_attention_gate_policy.py
 tests/test_catalog.py
 tests/test_provider_route_capability_registry.py
 tests/test_task21_durable_resume_router_binding.py
+tests/test_t21_finish_gate.py
 tests/test_task21_owner_pulse.py
 ```
 
@@ -132,10 +140,19 @@ architecture reviews proved that the portable initializer was not yet runnable,
 the active Issue form still advertised dormant Baton, exact task identity and
 L2 gating were under-bound, and the merge evaluator did not own live GitHub
 read-back. The paths above are admitted only for those fail-closed repairs and
-their direct schemas/tests/Catalog hashes. Historical Source releases, Baton
-receipts and `control/active_time_gates.json` remain immutable; the active
-harness instead classifies obsolete cloud-activation resume text as historical
-and non-triggering under `OWNER_MANAGED_OPTIONAL_EXPORT`.
+their direct schemas/tests/Catalog hashes. Historical Source releases and Baton
+receipts remain immutable; the active harness classifies obsolete
+cloud-activation resume text as historical and non-triggering under
+`OWNER_MANAGED_OPTIONAL_EXPORT`.
+
+**Write-set amendment (2026-08-14, grounded-merge re-review):** Exact code,
+goal/DoD and architecture reviews reproduced a forged self-hash context pass,
+a PR-head race, skipped-CI acceptance, an unusable portable dependency/runtime
+contract and a still-active TASK-21 cloud-smoke owner action. The four TASK-21
+control/read-model paths above are admitted only to terminalize that obsolete
+owner action without rewriting historical evidence. Portable runtime metadata,
+the deterministic bundle manifest and all fail-closed tests remain inside the
+explicit managed paths above.
 
 ## Task 1: Freeze the core contracts and negative invariants
 
@@ -480,7 +497,7 @@ Tests prove:
 - parent traversal, symlink escape and global Cursor/Codex directories are rejected;
 - dummy project output contains no Solana repository name, task number, provider or wallet semantics;
 - rollback inventory contains preimage hashes and newly created paths, but no automatic destructive rollback;
-- bootstrap prompt names `https://github.com/lancerbeta/solana-alpha-lab`, checks exact main after fetch, opens one repository/worktree root, runs `check`, generates context from an exact task contract and never asks Cursor to search latest task;
+- bootstrap prompt names `https://github.com/lancerbeta/solana-alpha-lab`, renders the exact bound default branch, checks that branch after fetch, opens one repository/worktree root, runs `check`, generates context from an exact task contract and never asks Cursor to search latest task;
 - on the current merged repository, Git has already removed old active baton adapters; bootstrap only verifies this and never edits user-global settings.
 
 Run RED:
@@ -491,7 +508,7 @@ uv run --locked --managed-python python -B -m unittest tests.test_delivery_harne
 
 ### Step 3: Implement the bounded radar and initializer
 
-The initializer copies only the portable template set declared in `harness.yaml`. `--apply` requires the exact preview fingerprint, so a filesystem drift between preview and apply returns `PLAN_DRIFT`. It does not invoke Git, a package manager, a marketplace, Cursor UI or Codex global configuration.
+`delivery-harness/templates/portable-bundle-manifest.json` is the single closed execution inventory for the initializer. `harness.yaml.portable_bundle.entry_artifacts` is only the short human-discovery front door and never a second copy list. `--apply` requires the exact preview fingerprint, so a filesystem drift between preview and apply returns `PLAN_DRIFT`. It does not invoke a package manager, a marketplace, Cursor UI or Codex global configuration; Git is read only for target identity and default-branch binding.
 
 The checked-in bootstrap prompt is a finished copy-paste artifact, not pseudocode. It tells Cursor to finish with one of:
 
@@ -791,6 +808,12 @@ Acceptance evidence must bind exact SHA-256 for design, plan, contracts, schemas
 
 Factory Fit evidence uses `FULL_REVIEW` and covers mission, flexibility/history, context efficiency, research truth, owner operability, cashflow contribution, monitoring/recovery, build-vs-buy, security and red-team outcomes. A failed dimension blocks delivery.
 
+The three mutually bound delivery evidence records remain Catalog-discoverable
+with `integrity.kind=none`; exact content hashes live in the completion-review-fit
+chain and the reviewed full-diff digest. This avoids an impossible fixed point
+where `catalog/assets/core.yaml` would contain hashes of evidence that itself
+hashes the Catalog inventory.
+
 ### Step 2: Update Catalog source records and manifest checkpoint
 
 Compute hashes from final bytes. Increment Catalog semantic version once.
@@ -936,7 +959,20 @@ Return one short owner action:
 PR #<number>, head <exact 40-hex SHA> проверен; ready + merge разрешаю.
 ```
 
-Do not merge before that exact phrase. After it arrives, re-read PR/head/checks, evaluate `OWNER_ATTENTION_GATE_V2`, perform one standard merge only if the result is `AUTONOMOUS`, read back exact `main` and post-merge CI, and keep the feature branch.
+Do not merge before that exact phrase. In the normal post-bootstrap lifecycle,
+after it arrives re-read PR/head/checks, evaluate `OWNER_ATTENTION_GATE_V2`,
+perform one standard merge only if the result is `AUTONOMOUS`, rebuild the
+same context receipt, derive the frozen first parent from the task contract,
+read back the profile's exact default branch and post-merge CI, and keep the
+feature branch. This initial migration
+uses the explicit exception below.
+
+For this first installation only, `OWNER_ATTENTION_GATE_V2` is expected to
+deny because its policy/profile are absent from frozen base `e78a08ec...`.
+Use the predecessor repository merge route after the same exact PR/head owner
+phrase, tracked-only receipt, exact-head CI and clean read-back. Do not add a
+bootstrap trust bypass. From the next task onward, policy/profile exist on
+`main` and the base-bound v2 guard is mandatory.
 
 ### Step 5: Post-merge handoff
 

@@ -46,20 +46,16 @@ The exact Git task's Finish Gate owns semantic acceptance and canonical DONE.
 
 ## Validation ownership
 
-During implementation run targeted checks. Elect one full-gate owner per exact
-candidate fingerprint. Use an eligible focused gate only when machine
-classification admits it; otherwise use:
-
-`uv run --locked --managed-python python -B scripts/validate_ci.py --tracked-only-delivery`
-
-`CI_OWNED_DELIVERY_PILOT`, when eligible, uses
-`uv run --locked --managed-python python -B scripts/validate_ci.py --ci-owned-delivery`.
-`GITHUB_PR_EXACT_HEAD_CI` owns the full clean-checkout suite. The next three
-eligible observations must each finish focused checks within 120 seconds, pass
-first-head CI without repair and save at least seven minutes. Record
-`observation N/3`; after 3/3 do not admit a fourth before keep/repair/rollback.
-A false admission, missed clean-checkout/local-data defect or focused overrun
-falls back to `--tracked-only-delivery`.
+During implementation run targeted checks only. After bootstrap, the guarded
+merge owns the one project-bound gate execution for the unchanged candidate:
+it runs the base-bound focused command and consumes existing exact-head PR CI,
+or machine-selects `--tracked-only-delivery` when that primary route is
+ineligible. Never run the same local full gate once before PR and again at
+merge. `CI_OWNED_DELIVERY_PILOT` remains an observation policy inside this
+route: focused work is capped at 120 seconds and the three-observation
+keep/repair/rollback rule remains unchanged. The first harness installation is
+the sole exception: because v2 does not exist on its frozen base, the
+predecessor exact-owner route requires one pre-PR tracked-only gate.
 
 ## Owner attention and guarded merge
 
@@ -76,7 +72,7 @@ required tests/CI/full gate/Factory Fit, write set, secret scan, unresolved
 reviews, standard-merge mode, branch preservation and settings. A stale head or
 failed check is `DENY`, not a human override prompt. On `AUTONOMOUS`, perform
 one ordinary merge, preserve the feature branch/settings and read back exact
-main plus post-merge main CI.
+the profile's exact default branch plus its post-merge CI.
 
 ## Startup
 
