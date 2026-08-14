@@ -1,0 +1,15 @@
+{
+  "fixture_id": "FIXTURE-T30-A22-HELIUS-GET-TRANSACTIONS-FOR-ADDRESS-001",
+  "route_id": "HELIUS-SOLANA-GET-TRANSACTIONS-FOR-ADDRESS-001",
+  "pool_address": "URqx24yyYxtXXhTbBQnbtPLhtLWYoaDaRxuQuLpNS3S",
+  "window": {
+    "block_time_gte": 1786492800,
+    "block_time_lt": 1786579200
+  },
+  "expected_terminal_outcome": "BATCH_OBSERVED_LT_1000",
+  "claims": {
+    "pit_admissible": false,
+    "h07_h01_evidence": false,
+    "task30_acceptance": false
+  }
+}

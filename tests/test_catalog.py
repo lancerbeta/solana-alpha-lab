@@ -65,6 +65,7 @@ class CatalogImportTests(unittest.TestCase):
                 "DECISION-T30-A9-NAMED-PARTIAL-CAPTURE-001",
                 "NEGATIVE-T30-CURRENT-DATA-ROUTE-001",
                 "NEGATIVE-T30-BITQUERY-PIT-ROUTE-001",
+                "NEGATIVE-T30-HELIUS-GTA-ONE-SHOT-001",
             ],
         )
         self.assertTrue(
