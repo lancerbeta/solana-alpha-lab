@@ -47,14 +47,14 @@
   },
   "factory_fit": {
     "path": "docs/evidence/task30/a22_delivery_factory_fit_v1.json",
-    "sha256": "a48822996786dcae9a439e0cb52641a23ef701653b6e9fe094b56ccc69c174c1",
+    "sha256": "3747133f1018570b0eadb4e256dd3aa0afcb937bc6418d2a7b196092b92c5a26",
     "verdict": "PASS"
   },
   "validation": {
     "targeted": "PASS_69_DIRECT_CONSUMER_REGISTRY_AND_CATALOG_TESTS",
     "independent_review": {
       "path": "docs/evidence/task30/a22_delivery_independent_review_v1.json",
-      "sha256": "766fef645b0d679e068228e41a9ac05340bb4e1989aa26a8bb3e89b3282748e7",
+      "sha256": "85e48671f98b361c8fcfd4b3b9d05979808bc52951eff3174a94be497f5d5a6b",
       "verdict": "PASS"
     },
     "full_gate": "ENFORCED_BY_PROJECT_BOUND_VALIDATION",

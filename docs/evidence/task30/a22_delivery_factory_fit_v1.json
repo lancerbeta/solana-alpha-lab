@@ -5,7 +5,7 @@
   "as_of": "2026-08-14",
   "task_id": "TASK-30",
   "reviewed_bindings_sha256": "8319f38064c11b00f99794cb4e3407e4613eb2d23e8e74a781abcff120b0bcc7",
-  "reviewed_inventory_sha256": "22c0fa326ca88fc6627b69959b1cbf6a115c08a86516a7e686a0ae356aaa1f60",
+  "reviewed_inventory_sha256": "ba1be54e8fa097a617652dc90a4d2f8ecdd00dc8c8631f8c509741dfaad0ee95",
   "mode": "FULL_REVIEW",
   "verdict": "PASS",
   "dimensions": {
