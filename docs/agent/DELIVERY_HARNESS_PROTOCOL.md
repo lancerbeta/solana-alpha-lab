@@ -41,10 +41,12 @@ and the same deterministic validation.
 
 Run Factory Fit, Product Horizon and capability radar. Record exact inventory,
 head/tree, tests, limitations, non-claims and rollback. Capability candidates
-grant no installation/credential/network/spend authority. Require exact-head CI
-and then the exact owner PR/head phrase. Re-read machine state, evaluate v2,
-merge once only on `AUTONOMOUS`, then verify the base-bound profile default
-branch and its post-merge CI.
+grant no installation/credential/network/spend authority. Require exact-head CI and then the exact owner PR/head phrase. The owner never
+clicks GitHub Merge. Re-read machine state, evaluate v2, merge once only on
+`AUTONOMOUS`, then verify the base-bound profile default branch and its
+post-merge CI. Harness or control PRs use a local `LIVE_PR_HEAD` context
+receipt from `scripts/delivery_harness.py context --pr` instead of a product
+`TASK-XX` contract. Product work still requires an exact task contract.
 The guarded submission's `merge_commit` becomes the expected default-branch
 head. The self-hashed submission is a mandatory input to
 `--post-merge-readback --submission-receipt <GUARDED_SUBMISSION_JSON>`; the
@@ -61,7 +63,9 @@ the repository's actual commands and exact PR-CI identity. In the normal path,
 the guard runs the local focused primary once and consumes existing exact PR
 CI as its full-suite evidence. The tracked-only fallback is exceptional and is
 executed by that same guard only when the primary route is ineligible; it is
-never a second pre-PR plus merge-time local run. The first harness installation
+never a second pre-PR plus merge-time local run. A `LIVE_PR_HEAD` control PR
+whose focused primary is ineligible consumes already-green exact-head GitHub CI
+instead of repeating a local full suite. The first harness installation
 is delivered by the predecessor owner-approved route after one pre-PR
 tracked-only gate; the new guard activates only after its policy/profile exist
 on the default branch.

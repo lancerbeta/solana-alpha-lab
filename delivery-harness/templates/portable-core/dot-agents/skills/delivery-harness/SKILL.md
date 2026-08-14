@@ -17,6 +17,9 @@ bindings or an unbound PR-CI identity deny merge; bootstrap must bind existing
 project-owned commands and the live workflow/job identity first.
 After the exact PR/head owner phrase, use the repository-owned grounded merge
 entrypoint; never replace its live checks with caller-supplied booleans.
+The owner never clicks GitHub Merge. Harness or control PRs use
+`scripts/delivery_harness.py context --pr` (`LIVE_PR_HEAD`) instead of a
+product task contract.
 Persist the self-hashed submission returned by guarded merge. FINISH is terminal
 only after `scripts/owner_attention_gate.py --post-merge-readback
 --submission-receipt <GUARDED_SUBMISSION_JSON>` emits a hash-bound receipt for

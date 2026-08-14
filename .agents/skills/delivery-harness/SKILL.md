@@ -71,9 +71,13 @@ change. Do not run that local full gate both before PR and at merge. First
 installation alone uses the predecessor route and one pre-PR tracked-only gate.
 Bind exact inventory, tests, head/tree, limitations and rollback. Push/open PR
 inside routine authority, require exact-head CI and stop for one exact owner
-approval bound to PR/head. Re-read every machine precondition, evaluate
-`OWNER_ATTENTION_GATE_V2`, then perform at most one ordinary guarded merge and
-read back the profile's exact default branch/post-merge CI. Use the repository-owned
+approval bound to PR/head. The owner never clicks GitHub Merge. Re-read every
+machine precondition, evaluate `OWNER_ATTENTION_GATE_V2`, then perform at most
+one ordinary guarded merge and read back the profile's exact default
+branch/post-merge CI. Harness or control PRs use
+`scripts/delivery_harness.py context --pr <N> --route <ROUTE> --write-receipt`
+for a local `LIVE_PR_HEAD` receipt instead of inventing a product `TASK-XX`.
+Use the repository-owned
 `scripts/owner_attention_gate.py --guarded-merge` entrypoint so the agent cannot
 supply pre-asserted test/CI/Factory-Fit booleans: it verifies the self-hashed
 context receipt, exact local head/tree, required live GitHub check, unresolved

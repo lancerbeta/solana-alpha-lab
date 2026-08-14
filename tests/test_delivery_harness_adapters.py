@@ -53,6 +53,7 @@ class DeliveryHarnessAdapterTests(unittest.TestCase):
         self.assertIn("Git is the working project-memory owner", text)
         self.assertIn("OWNER_MANAGED_OPTIONAL_EXPORT", text)
         self.assertIn("never request its replacement or smoke", text)
+        self.assertIn("never clicks GitHub Merge", text)
         self.assertNotIn("PROJECT_CHAT_PRO_GITHUB_BATON_CURSOR", text)
         self.assertNotIn("GITHUB_BATON:", text)
 

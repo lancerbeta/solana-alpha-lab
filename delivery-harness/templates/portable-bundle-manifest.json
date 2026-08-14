@@ -16,7 +16,7 @@
     {
       "source": "delivery-harness/templates/portable-core/delivery-harness/harness.yaml",
       "destination": "delivery-harness/harness.yaml",
-      "sha256": "929c53012a1b12f167bfb8a1040759ee1521e0558e76af8b4cbe64dd7acc116d"
+      "sha256": "823dc8023a815381d1de026237d122a3c9b79209e9cf0344fd9c82b504ad6186"
     },
     {
       "source": "delivery-harness/templates/portable-core/delivery-harness/context-map.yaml",
@@ -36,7 +36,7 @@
     {
       "source": "delivery-harness/templates/portable-core/catalog/schemas/delivery_harness.schema.json",
       "destination": "catalog/schemas/delivery_harness.schema.json",
-      "sha256": "e0d161272866be6ea85f50edbe62e5966aafe9f9848001726353cc10969260eb"
+      "sha256": "c3279ff66ee98f292cc404148409711105d3eb4b35f1b7501e400c9037304829"
     },
     {
       "source": "catalog/schemas/delivery_harness_project_profile.schema.json",
@@ -51,7 +51,7 @@
     {
       "source": "catalog/schemas/delivery_harness_context_receipt.schema.json",
       "destination": "catalog/schemas/delivery_harness_context_receipt.schema.json",
-      "sha256": "ec93dc76b8f478f1550df61bdec9f93f442fbd9f6e629703adb07de6464bcf18"
+      "sha256": "632f0a9238ef7b8cc70c3afe0ed9b022ed46311fac045d25a7799555ef186b6f"
     },
     {
       "source": "catalog/schemas/delivery_harness_capability_radar.schema.json",
@@ -86,52 +86,52 @@
     {
       "source": "delivery-harness/templates/portable-core/scripts/delivery_harness.py",
       "destination": "scripts/delivery_harness.py",
-      "sha256": "243611c703040a8036ea9c78de33c3f6d93bd3f83717f4e0ffdd823b4910d2e7"
+      "sha256": "f08ee046937ad8d74b73eacef87fe8287d5880bcd97120b33eed7bd26f84da5d"
     },
     {
       "source": "scripts/owner_attention_gate.py",
       "destination": "scripts/owner_attention_gate.py",
-      "sha256": "2f4f4d388583b03894fd32fffd29266c0a772d9f6d590cd5a2ce26748c29f6b9"
+      "sha256": "da7dd742eb5ba4709bf1c8753de18b36b2de870171ca0daef388cc5ff67a937c"
     },
     {
-      "source": "delivery-harness/templates/portable-core/AGENTS.md",
+      "source": "delivery-harness/templates/portable-core/AGENTS.md.tmpl",
       "destination": "AGENTS.md",
-      "sha256": "452ebadb254c594afa45df5ac978b1f54da0a1640214afba5ec9a48b3f3871af"
+      "sha256": "c99c7e32c5cfbce0e30cd13e40306449aee1d2a2531461a1eaee5f7bf1e3d114"
     },
     {
-      "source": "delivery-harness/templates/portable-core/.agents/skills/delivery-harness/SKILL.md",
+      "source": "delivery-harness/templates/portable-core/dot-agents/skills/delivery-harness/SKILL.md",
       "destination": ".agents/skills/delivery-harness/SKILL.md",
-      "sha256": "334dbe37c05542f8f5c5beeaf198642c154a36ce009b8ed18addd4f7ad0aeddf"
+      "sha256": "54cae6c53f270daab01711e589547bcc6fa77a5b49c6ba3ccbe7886613eeab8d"
     },
     {
-      "source": "delivery-harness/templates/portable-core/.cursor/rules/00-authority.mdc",
+      "source": "delivery-harness/templates/portable-core/dot-cursor/rules/00-authority.mdc",
       "destination": ".cursor/rules/00-authority.mdc",
-      "sha256": "a3c4b72067794db5705740edd331fa63444c9ffac93eb3f3a3f3e6c98f1aa8da"
+      "sha256": "b55573d325b96507528f26d6d9a0288e0e231be70d72b395f0cad7ef156de07b"
     },
     {
-      "source": "delivery-harness/templates/portable-core/.cursor/rules/30-security-and-secrets.mdc",
+      "source": "delivery-harness/templates/portable-core/dot-cursor/rules/30-security-and-secrets.mdc",
       "destination": ".cursor/rules/30-security-and-secrets.mdc",
       "sha256": "faaddbe033a1df8f289e9a18dab181a54e3e9d3106af568792629ea20249aa3b"
     },
     {
-      "source": "delivery-harness/templates/portable-core/.cursor/commands/delivery-start.md",
+      "source": "delivery-harness/templates/portable-core/dot-cursor/commands/delivery-start.md",
       "destination": ".cursor/commands/delivery-start.md",
       "sha256": "c28a2c63fc7826463a26e75927968935802193bec4adcc470f9b4fc4cd095f4b"
     },
     {
-      "source": "delivery-harness/templates/portable-core/.cursor/commands/delivery-status.md",
+      "source": "delivery-harness/templates/portable-core/dot-cursor/commands/delivery-status.md",
       "destination": ".cursor/commands/delivery-status.md",
       "sha256": "7d71899c3a7207c9b7f38b192b579d051595068df610c2505ed1cbe1ae4b6eb8"
     },
     {
-      "source": "delivery-harness/templates/portable-core/.cursor/commands/delivery-review.md",
+      "source": "delivery-harness/templates/portable-core/dot-cursor/commands/delivery-review.md",
       "destination": ".cursor/commands/delivery-review.md",
       "sha256": "0d00ad57f6a2e9d4179f323bfbf71d0c5ec8bc768bceb2a20ecb01379dd63776"
     },
     {
-      "source": "delivery-harness/templates/portable-core/.cursor/commands/delivery-finish.md",
+      "source": "delivery-harness/templates/portable-core/dot-cursor/commands/delivery-finish.md",
       "destination": ".cursor/commands/delivery-finish.md",
-      "sha256": "d4007af65c3fcad8be54269e4b341e53d9ebf64e04edc09013afdfff5b186ca3"
+      "sha256": "361625e9c14444ec9aed5957c521185cb27570dc1ec7d95938e66ec42e4aca3b"
     }
   ]
 }

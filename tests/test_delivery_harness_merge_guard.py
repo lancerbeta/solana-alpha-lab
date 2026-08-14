@@ -80,6 +80,10 @@ class FakeRunner:
             return (self.origin + "\n").encode()
         if command[:3] == ("git", "rev-parse", "HEAD"):
             return (self.head + "\n").encode()
+        if command[:3] == ("git", "rev-parse", f"origin/{self.default_branch}"):
+            return (self.upstream_oid + "\n").encode()
+        if command[:4] == ("git", "merge-base", "HEAD", f"origin/{self.default_branch}"):
+            return (self.upstream_oid + "\n").encode()
         if command[:3] == ("git", "rev-parse", "HEAD^{tree}"):
             return (TREE + "\n").encode()
         if command[:3] == ("git", "status", "--porcelain=v1"):
@@ -231,6 +235,53 @@ def context_receipt(module: ModuleType, route: str = "DIRECT_CURSOR_DELIVERY") -
     }
     receipt["receipt_sha256"] = module.sha256_bytes(module.canonical_json_bytes(receipt))
     return receipt
+
+
+def live_pr_head_receipt(
+    module: ModuleType,
+    route: str = "DIRECT_CURSOR_DELIVERY",
+    *,
+    pr_number: int = PR,
+) -> dict[str, object]:
+    receipt: dict[str, object] = {
+        "schema": "smial.delivery-context-receipt",
+        "schema_version": "1.0",
+        "harness_id": "DELIVERY_HARNESS_V1",
+        "route": route,
+        "cloud_bundle_mode": "OWNER_MANAGED_OPTIONAL_EXPORT",
+        "repository": {
+            "name": "lancerbeta/solana-alpha-lab",
+            "head": HEAD,
+            "tree": TREE,
+            "branch": "candidate",
+            "dirty": False,
+        },
+        "control_pr": {"pr_number": pr_number, "identity_mode": "LIVE_PR_HEAD"},
+        "selected": [],
+        "gaps": [],
+        "budgets": {
+            "agents_max_bytes": 12288,
+            "cursor_always_apply_max_bytes": 6144,
+            "ordinary_receipt_max_bytes": 49152,
+            "auto_inline_file_max_bytes": 102400,
+        },
+    }
+    receipt["receipt_sha256"] = module.sha256_bytes(module.canonical_json_bytes(receipt))
+    return receipt
+
+
+def exact_live_pr_builder(module: ModuleType, receipt: dict[str, object]):
+    def build(root: Path, *, task_id: str, task_contract: str, route: str) -> dict[str, object]:
+        assert task_id == "CONTROL-PR"
+        assert task_contract == f"pr/{receipt['control_pr']['pr_number']}"
+        self = dict(receipt)
+        self["route"] = route
+        unsigned = dict(self)
+        unsigned.pop("receipt_sha256", None)
+        self["receipt_sha256"] = module.sha256_bytes(module.canonical_json_bytes(unsigned))
+        return self
+
+    return build
 
 
 def guarded_submission_receipt(
@@ -971,6 +1022,85 @@ class DeliveryHarnessMergeGuardTests(unittest.TestCase):
                 evidence_builder=grounded_evidence,
                 delivery_checks_builder=grounded_delivery_checks,
             )
+
+    def test_live_pr_head_merge_submits_after_exact_phrase_and_ci(self) -> None:
+        receipt = live_pr_head_receipt(self.module)
+        runner = FakeRunner()
+        result = self.module.execute_guarded_merge(
+            ROOT, repository="lancerbeta/solana-alpha-lab", pr_number=PR,
+            route="DIRECT_CURSOR_DELIVERY", actor="CURSOR", approval_phrase=PHRASE,
+            context_receipt=receipt, runner=runner,
+            context_builder=exact_live_pr_builder(self.module, receipt),
+            evidence_builder=grounded_evidence,
+            delivery_checks_builder=grounded_delivery_checks,
+        )
+        self.assertTrue(result["merge_submitted"])
+        merge_calls = [call for call in runner.calls if call[:3] == ("gh", "pr", "merge")]
+        self.assertEqual(merge_calls, [(
+            "gh", "pr", "merge", str(PR), "--repo", "lancerbeta/solana-alpha-lab",
+            "--merge", "--match-head-commit", HEAD,
+        )])
+        self.assertNotIn("--delete-branch", merge_calls[0])
+
+    def test_live_pr_head_control_runtime_landing_is_allowed(self) -> None:
+        receipt = live_pr_head_receipt(self.module)
+        result = self.module.build_grounded_merge_request(
+            ROOT, repository="lancerbeta/solana-alpha-lab", pr_number=PR,
+            route="DIRECT_CURSOR_DELIVERY", actor="CURSOR", approval_phrase=PHRASE,
+            context_receipt=receipt,
+            runner=FakeRunner(base_mismatch_path="scripts/owner_attention_gate.py"),
+            context_builder=exact_live_pr_builder(self.module, receipt),
+            evidence_builder=grounded_evidence,
+            delivery_checks_builder=grounded_delivery_checks,
+        )
+        self.assertTrue(result["merge_checks"]["context_receipt_bound"])
+        self.assertEqual(
+            self.module.evaluate(result, POLICY)["decision"], "AUTONOMOUS"
+        )
+
+    def test_live_pr_head_write_set_rejects_product_paths(self) -> None:
+        receipt = live_pr_head_receipt(self.module)
+        runner = FakeRunner()
+
+        def product_diff(args: list[str], cwd: Path) -> bytes:
+            if tuple(args[:3]) == ("git", "diff", "--name-only"):
+                return b"src/solana_alpha_lab/alpha.py\0"
+            if args and args[0] == "uv":
+                return b""
+            return runner(args, cwd)
+
+        checks = self.module.build_delivery_checks(
+            ROOT,
+            context_receipt=receipt,
+            local_head=HEAD,
+            local_tree=TREE,
+            ci_pass=True,
+            runner=product_diff,
+        )
+        self.assertFalse(checks["write_set_pass"])
+
+    def test_live_pr_head_consumes_exact_head_ci_when_local_gates_fail(self) -> None:
+        receipt = live_pr_head_receipt(self.module)
+        runner = FakeRunner()
+
+        def failing_local_gates(args: list[str], cwd: Path) -> bytes:
+            if tuple(args[:3]) == ("git", "diff", "--name-only"):
+                return b"delivery-harness/harness.yaml\0"
+            if args and args[0] == "uv":
+                raise ValueError("LIVE_READBACK_FAILED")
+            return runner(args, cwd)
+
+        checks = self.module.build_delivery_checks(
+            ROOT,
+            context_receipt=receipt,
+            local_head=HEAD,
+            local_tree=TREE,
+            ci_pass=True,
+            runner=failing_local_gates,
+        )
+        self.assertTrue(checks["required_tests_pass"])
+        self.assertTrue(checks["full_gate_pass"])
+        self.assertTrue(checks["write_set_pass"])
 
     def test_guarded_scope_rejects_stale_merge_base_before_control_import(self) -> None:
         runner = FakeRunner()

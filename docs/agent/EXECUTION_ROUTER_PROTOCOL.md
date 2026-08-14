@@ -74,6 +74,11 @@ Both direct routes stop for exactly:
 
 `PR #<number>, head <40 lowercase hex> проверен; ready + merge разрешаю.`
 
+The owner never clicks GitHub Merge. After that phrase, the elected direct
+agent runs `scripts/owner_attention_gate.py --guarded-merge`. Harness or
+control PRs bind a local `LIVE_PR_HEAD` receipt; product tasks still bind an
+exact task contract.
+
 Immediately before mutation re-read repository, PR, head, mergeability,
 required tests/CI/full gate/Factory Fit, write set, secret scan, unresolved
 reviews, standard-merge mode, branch preservation and settings. A stale head or

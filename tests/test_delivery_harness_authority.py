@@ -241,6 +241,14 @@ class DeliveryHarnessAuthorityTests(unittest.TestCase):
         self.assertTrue(self.policy["post_merge"]["exact_main_readback_required"])
         self.assertTrue(self.policy["post_merge"]["main_ci_required"])
 
+    def test_harness_merge_policy_forbids_owner_github_merge_click(self) -> None:
+        harness = yaml.safe_load(
+            (ROOT / "delivery-harness/harness.yaml").read_text(encoding="utf-8")
+        )
+        self.assertEqual(harness["merge_policy"]["executor"], "DIRECT_AGENT")
+        self.assertEqual(harness["merge_policy"]["owner_github_merge_click"], "FORBIDDEN")
+        self.assertEqual(harness["merge_policy"]["owner_role"], "EXACT_PHRASE_AFTER_CI")
+
 
 if __name__ == "__main__":
     unittest.main()

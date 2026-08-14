@@ -3,7 +3,7 @@
   "$id": "https://smial.local/schemas/delivery_harness.schema.json",
   "type": "object",
   "additionalProperties": false,
-  "required": ["schema", "schema_version", "harness_id", "active_routes", "forbidden_active_input_routes", "routes", "context_lanes", "context_budgets", "portable_bundle", "cloud_bundle", "external_authority"],
+  "required": ["schema", "schema_version", "harness_id", "active_routes", "forbidden_active_input_routes", "routes", "merge_policy", "context_lanes", "context_budgets", "portable_bundle", "cloud_bundle", "external_authority"],
   "properties": {
     "schema": {"const": "smial.delivery-harness"},
     "schema_version": {"const": "1.0"},
@@ -20,6 +20,7 @@
         "LEGACY_GITHUB_BATON_DORMANT": {"$ref": "#/$defs/dormantRoute"}
       }
     },
+    "merge_policy": {"$ref": "#/$defs/mergePolicy"},
     "context_lanes": {
       "type": "object", "additionalProperties": false, "required": ["L0", "L1", "L2", "L3"],
       "properties": {"L0": {"type": "string"}, "L1": {"type": "string"}, "L2": {"type": "string"}, "L3": {"type": "string"}}
@@ -39,6 +40,28 @@
     "external_authority": {"$ref": "#/$defs/allFalseAuthority"}
   },
   "$defs": {
+    "mergePolicy": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["executor", "owner_role", "owner_github_merge_click", "identity_modes", "harness_control_write_prefixes"],
+      "properties": {
+        "executor": {"const": "DIRECT_AGENT"},
+        "owner_role": {"const": "EXACT_PHRASE_AFTER_CI"},
+        "owner_github_merge_click": {"const": "FORBIDDEN"},
+        "identity_modes": {
+          "type": "array",
+          "minItems": 2,
+          "prefixItems": [{"const": "TASK_CONTEXT_RECEIPT"}, {"const": "LIVE_PR_HEAD"}],
+          "items": false
+        },
+        "harness_control_write_prefixes": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": {"type": "string", "minLength": 1}
+        }
+      }
+    },
     "activeRoute": {"type": "object", "additionalProperties": false, "required": ["active", "actor", "task_selection", "merge"], "properties": {"active": {"const": true}, "actor": {"enum": ["CODEX", "CURSOR", "ANY"]}, "task_selection": {"type": "string"}, "merge": {"enum": ["EXACT_OWNER_APPROVAL_AND_MACHINE_GATE", "FORBIDDEN"]}}},
     "dormantRoute": {"type": "object", "additionalProperties": false, "required": ["active", "actor", "task_selection", "merge"], "properties": {"active": {"const": false}, "actor": {"const": "CURSOR"}, "task_selection": {"const": false}, "merge": {"const": "FORBIDDEN"}}},
     "budgets": {"type": "object", "additionalProperties": false, "required": ["agents_max_bytes", "cursor_always_apply_max_bytes", "ordinary_receipt_max_bytes", "auto_inline_file_max_bytes"], "properties": {"agents_max_bytes": {"const": 12288}, "cursor_always_apply_max_bytes": {"const": 6144}, "ordinary_receipt_max_bytes": {"const": 49152}, "auto_inline_file_max_bytes": {"const": 102400}}},

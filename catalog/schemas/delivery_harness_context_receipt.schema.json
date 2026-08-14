@@ -1,55 +1,6 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://smial.local/schemas/delivery_harness_context_receipt.schema.json",
-  "type": "object",
-  "additionalProperties": false,
-  "required": ["schema", "schema_version", "harness_id", "route", "cloud_bundle_mode", "repository", "task", "selected", "gaps", "budgets", "receipt_sha256"],
-  "properties": {
-    "schema": {"const": "smial.delivery-context-receipt"},
-    "schema_version": {"const": "1.0"},
-    "harness_id": {"const": "DELIVERY_HARNESS_V1"},
-    "route": {"enum": ["DIRECT_CODEX_DELIVERY", "DIRECT_CURSOR_DELIVERY", "DESIGN_ONLY"]},
-    "cloud_bundle_mode": {"const": "OWNER_MANAGED_OPTIONAL_EXPORT"},
-    "repository": {
-      "type": "object", "additionalProperties": false,
-      "required": ["name", "head", "tree", "branch", "dirty"],
-      "properties": {
-        "name": {"type": "string", "minLength": 3},
-        "head": {"type": "string", "pattern": "^[0-9a-f]{40}$"},
-        "tree": {"type": "string", "pattern": "^[0-9a-f]{40}$"},
-        "branch": {"type": "string", "minLength": 1},
-        "dirty": {"type": "boolean"}
-      }
-    },
-    "task": {
-      "type": "object", "additionalProperties": false,
-      "required": ["task_id", "path", "sha256"],
-      "properties": {
-        "task_id": {"type": "string", "pattern": "^[A-Z0-9][A-Z0-9_-]{2,127}$"},
-        "path": {"type": "string", "minLength": 1},
-        "sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"}
-      }
-    },
-    "selected": {
-      "type": "array",
-      "items": {"$ref": "#/$defs/selected"}
-    },
-    "gaps": {
-      "type": "array",
-      "items": {"$ref": "#/$defs/gap"}
-    },
-    "budgets": {
-      "type": "object", "additionalProperties": false,
-      "required": ["agents_max_bytes", "cursor_always_apply_max_bytes", "ordinary_receipt_max_bytes", "auto_inline_file_max_bytes"],
-      "properties": {
-        "agents_max_bytes": {"type": "integer", "minimum": 1},
-        "cursor_always_apply_max_bytes": {"type": "integer", "minimum": 1},
-        "ordinary_receipt_max_bytes": {"type": "integer", "minimum": 1},
-        "auto_inline_file_max_bytes": {"type": "integer", "minimum": 1}
-      }
-    },
-    "receipt_sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"}
-  },
   "$defs": {
     "selected": {
       "type": "object", "additionalProperties": false,
@@ -75,6 +26,80 @@
         "state": {"const": "EXPLICIT_GAP"},
         "reason_code": {"type": "string", "pattern": "^[A-Z][A-Z0-9_]+$"}
       }
+    },
+    "repository": {
+      "type": "object", "additionalProperties": false,
+      "required": ["name", "head", "tree", "branch", "dirty"],
+      "properties": {
+        "name": {"type": "string", "minLength": 3},
+        "head": {"type": "string", "pattern": "^[0-9a-f]{40}$"},
+        "tree": {"type": "string", "pattern": "^[0-9a-f]{40}$"},
+        "branch": {"type": "string", "minLength": 1},
+        "dirty": {"type": "boolean"}
+      }
+    },
+    "budgets": {
+      "type": "object", "additionalProperties": false,
+      "required": ["agents_max_bytes", "cursor_always_apply_max_bytes", "ordinary_receipt_max_bytes", "auto_inline_file_max_bytes"],
+      "properties": {
+        "agents_max_bytes": {"type": "integer", "minimum": 1},
+        "cursor_always_apply_max_bytes": {"type": "integer", "minimum": 1},
+        "ordinary_receipt_max_bytes": {"type": "integer", "minimum": 1},
+        "auto_inline_file_max_bytes": {"type": "integer", "minimum": 1}
+      }
     }
-  }
+  },
+  "oneOf": [
+    {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["schema", "schema_version", "harness_id", "route", "cloud_bundle_mode", "repository", "task", "selected", "gaps", "budgets", "receipt_sha256"],
+      "properties": {
+        "schema": {"const": "smial.delivery-context-receipt"},
+        "schema_version": {"const": "1.0"},
+        "harness_id": {"const": "DELIVERY_HARNESS_V1"},
+        "route": {"enum": ["DIRECT_CODEX_DELIVERY", "DIRECT_CURSOR_DELIVERY", "DESIGN_ONLY"]},
+        "cloud_bundle_mode": {"const": "OWNER_MANAGED_OPTIONAL_EXPORT"},
+        "repository": {"$ref": "#/$defs/repository"},
+        "task": {
+          "type": "object", "additionalProperties": false,
+          "required": ["task_id", "path", "sha256"],
+          "properties": {
+            "task_id": {"type": "string", "pattern": "^[A-Z0-9][A-Z0-9_-]{2,127}$"},
+            "path": {"type": "string", "minLength": 1},
+            "sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"}
+          }
+        },
+        "selected": {"type": "array", "items": {"$ref": "#/$defs/selected"}},
+        "gaps": {"type": "array", "items": {"$ref": "#/$defs/gap"}},
+        "budgets": {"$ref": "#/$defs/budgets"},
+        "receipt_sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"}
+      }
+    },
+    {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["schema", "schema_version", "harness_id", "route", "cloud_bundle_mode", "repository", "control_pr", "selected", "gaps", "budgets", "receipt_sha256"],
+      "properties": {
+        "schema": {"const": "smial.delivery-context-receipt"},
+        "schema_version": {"const": "1.0"},
+        "harness_id": {"const": "DELIVERY_HARNESS_V1"},
+        "route": {"enum": ["DIRECT_CODEX_DELIVERY", "DIRECT_CURSOR_DELIVERY", "DESIGN_ONLY"]},
+        "cloud_bundle_mode": {"const": "OWNER_MANAGED_OPTIONAL_EXPORT"},
+        "repository": {"$ref": "#/$defs/repository"},
+        "control_pr": {
+          "type": "object", "additionalProperties": false,
+          "required": ["pr_number", "identity_mode"],
+          "properties": {
+            "pr_number": {"type": "integer", "minimum": 1},
+            "identity_mode": {"const": "LIVE_PR_HEAD"}
+          }
+        },
+        "selected": {"type": "array", "items": {"$ref": "#/$defs/selected"}},
+        "gaps": {"type": "array", "items": {"$ref": "#/$defs/gap"}},
+        "budgets": {"$ref": "#/$defs/budgets"},
+        "receipt_sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"}
+      }
+    }
+  ]
 }

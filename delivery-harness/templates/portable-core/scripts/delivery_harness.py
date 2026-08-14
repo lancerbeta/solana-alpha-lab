@@ -684,6 +684,74 @@ def build_context_receipt(
     return receipt
 
 
+def build_live_pr_head_receipt(
+    root: Path, *, pr_number: int, route: str
+) -> dict[str, Any]:
+    root = root.resolve()
+    if type(pr_number) is not int or pr_number < 1:
+        raise ValueError("PR_NUMBER_INVALID")
+    if route not in ROUTES:
+        raise ValueError("ACTIVE_ROUTE_UNKNOWN")
+    harness, profile, context_map = load_core(root)
+    merge_policy = harness.get("merge_policy")
+    if not isinstance(merge_policy, dict) or "LIVE_PR_HEAD" not in merge_policy.get("identity_modes", []):
+        raise ValueError("LIVE_PR_HEAD_NOT_ENABLED")
+    if route not in harness["active_routes"]:
+        raise ValueError("TASK_ROUTE_NOT_ALLOWED")
+    repository = profile["repository"]["name"]
+    cloud_boundaries = historical_cloud_boundaries(profile)
+    if github_repository_from_origin(git(root, "remote", "get-url", "origin")) != repository:
+        raise ValueError("TASK_REPOSITORY_ORIGIN_MISMATCH")
+    head = git(root, "rev-parse", "HEAD")
+    tree = git(root, "rev-parse", "HEAD^{tree}")
+    branch = git(root, "branch", "--show-current") or "DETACHED"
+    dirty = bool(git(root, "status", "--porcelain=v1"))
+    identity = {"head": head, "tree": tree, "branch": branch, "dirty": dirty}
+    roles = {item["semantic_role"]: item for item in context_map["roles"]}
+    refs = [
+        selected(root, "AGENTS.md", role="MISSION_AND_INVARIANTS", lane="L0", owner="REPOSITORY_POLICY", historical_boundaries=cloud_boundaries),
+        selected(root, "delivery-harness/project-profile.yaml", role="MISSION_AND_INVARIANTS", lane="L0", owner="REPOSITORY_POLICY", historical_boundaries=cloud_boundaries),
+        metadata_selected(
+            role="ACTIVE_BOUNDED_WORK", lane="L1", owner="LIVE_PR_HEAD",
+            path=f"github/pull/{pr_number}", stable_id="CONTROL-PR",
+            payload={"pr_number": pr_number, "identity_mode": "LIVE_PR_HEAD", "head": head},
+        ),
+        metadata_selected(
+            role="IMPLEMENTATION_STATE", lane="L1", owner="GIT", path="git/HEAD",
+            stable_id=head, payload=identity,
+        ),
+    ]
+    gaps: list[dict[str, Any]] = []
+    role = roles["PRODUCT_ROADMAP"]
+    gaps.append({"semantic_role": "PRODUCT_ROADMAP", "lane": role["lane"], "truth_owner": role["truth_owner"], "state": "EXPLICIT_GAP", "reason_code": "NO_EXACT_GIT_ROADMAP_BOUND"})
+    for role_id in ON_DEMAND_ROLE_ORDER:
+        role = roles[role_id]
+        gaps.append({"semantic_role": role_id, "lane": role["lane"], "truth_owner": role["truth_owner"], "state": "EXPLICIT_GAP", "reason_code": "DEFERRED_ON_DEMAND"})
+    refs.sort(key=lambda item: (item["lane"], item["semantic_role"], item["stable_id"] or "", item["path"]))
+    gaps.sort(key=lambda item: (item["lane"], item["semantic_role"]))
+    receipt: dict[str, Any] = {
+        "schema": "smial.delivery-context-receipt",
+        "schema_version": "1.0",
+        "harness_id": "DELIVERY_HARNESS_V1",
+        "route": route,
+        "cloud_bundle_mode": "OWNER_MANAGED_OPTIONAL_EXPORT",
+        "repository": {"name": repository, **identity},
+        "control_pr": {"pr_number": pr_number, "identity_mode": "LIVE_PR_HEAD"},
+        "selected": refs,
+        "gaps": gaps,
+        "budgets": profile["context_budgets"],
+    }
+    receipt["receipt_sha256"] = hashlib.sha256(canonical_json(receipt)).hexdigest()
+    if len(canonical_json(receipt)) > profile["context_budgets"]["ordinary_receipt_max_bytes"]:
+        raise ValueError("CONTEXT_RECEIPT_BUDGET_EXCEEDED")
+    receipt_schema = load_json_mapping(
+        bounded(root, "catalog/schemas/delivery_harness_context_receipt.schema.json"),
+        "CONTEXT_RECEIPT_SCHEMA_INVALID",
+    )
+    validate_schema_subset(receipt, receipt_schema)
+    return receipt
+
+
 def context(root: Path, task_id: str, contract: str, route: str) -> dict[str, Any]:
     return build_context_receipt(
         root, task_id=task_id, task_contract=contract, route=route
@@ -697,16 +765,24 @@ def main() -> int:
     check_parser.add_argument("--root", type=Path, default=Path.cwd())
     context_parser = sub.add_parser("context")
     context_parser.add_argument("--root", type=Path, default=Path.cwd())
-    context_parser.add_argument("--task-id", required=True)
-    context_parser.add_argument("--contract", required=True)
+    context_parser.add_argument("--task-id")
+    context_parser.add_argument("--contract")
+    context_parser.add_argument("--pr", type=int)
     context_parser.add_argument("--route", required=True)
     args = parser.parse_args()
     try:
-        result = (
-            check(args.root)
-            if args.command == "check"
-            else context(args.root, args.task_id, args.contract, args.route)
-        )
+        if args.command == "check":
+            result = check(args.root)
+        elif args.pr is not None:
+            if args.task_id is not None or args.contract is not None:
+                raise ValueError("CONTEXT_IDENTITY_MODE_CONFLICT")
+            result = build_live_pr_head_receipt(
+                args.root, pr_number=args.pr, route=args.route
+            )
+        else:
+            if not args.task_id or not args.contract:
+                raise ValueError("TASK_CONTRACT_EXACT_PATH_REQUIRED")
+            result = context(args.root, args.task_id, args.contract, args.route)
     except Exception as exc:
         result = {
             "schema": "delivery-harness.error",

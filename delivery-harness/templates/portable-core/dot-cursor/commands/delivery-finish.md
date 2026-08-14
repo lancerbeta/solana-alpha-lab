@@ -1,6 +1,9 @@
 # Delivery finish
 
-Bind targeted evidence and stop for exact PR/head approval. Then let
+Bind targeted evidence and stop for exact PR/head approval after CI. The owner
+never clicks GitHub Merge. Harness or control PRs bind `LIVE_PR_HEAD` via
+`scripts/delivery_harness.py context --pr`; product work still uses an exact
+task contract. Then let
 `scripts/owner_attention_gate.py --guarded-merge` execute the elected
 project-bound gate once, consume existing exact-head PR CI and re-read live
 merge facts before one standard merge; do not supply
