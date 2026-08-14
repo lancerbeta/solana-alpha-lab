@@ -15801,7 +15801,7 @@ records:
   as_of: '2026-08-14'
   truth_owner: CTRL-DELIVERY-HARNESS-001
   location: {kind: git_path, logical_uri: 'repo://scripts/owner_attention_gate.py', repository_path: scripts/owner_attention_gate.py}
-  integrity: {kind: sha256, sha256: 1424c0517ac1442ce2039ddbea0af1f39c8d69a447224e96e944b68858802614}
+  integrity: {kind: sha256, sha256: da7dd742eb5ba4709bf1c8753de18b36b2de870171ca0daef388cc5ff67a937c}
   access: *t25_read_file
   relations:
   - {relation_type: governed_by, target_asset_id: POLICY-OWNER-ATTENTION-GATE-002}
@@ -19221,7 +19221,7 @@ records:
   as_of: '2026-08-14'
   truth_owner: CTRL-DELIVERY-HARNESS-001
   location: {kind: git_path, logical_uri: 'repo://delivery-harness/harness.yaml', repository_path: delivery-harness/harness.yaml}
-  integrity: {kind: sha256, sha256: 53a88281a145c42fb17050e5239f5fb0f7d529fddecb9f401d296c0851ffbb1b}
+  integrity: {kind: sha256, sha256: 03df4e3223f9b28a7bb31b877a698deecabdf4b6dc6e800865f8c27f03b0c916}
   access: *t25_read_file
   relations:
   - {relation_type: governed_by, target_asset_id: CTRL-DELIVERY-HARNESS-001}
@@ -19293,7 +19293,7 @@ records:
   as_of: '2026-08-14'
   truth_owner: CTRL-DELIVERY-HARNESS-001
   location: {kind: git_path, logical_uri: 'repo://delivery-harness/templates/portable-bundle-manifest.json', repository_path: delivery-harness/templates/portable-bundle-manifest.json}
-  integrity: {kind: sha256, sha256: 7a0dc42b573e74e87a878f596bba6ed1f6e50a6b17113963bc09b90af5e1c83d}
+  integrity: {kind: sha256, sha256: 5e2d34b2276c6b4e30a528a7ed029f97f283afe5ec5ee83c5bb6c3387f345aee}
   access: *t25_read_file
   relations:
   - {relation_type: governed_by, target_asset_id: CTRL-DELIVERY-HARNESS-001}
@@ -19420,7 +19420,7 @@ records:
   as_of: '2026-08-14'
   truth_owner: CTRL-DELIVERY-HARNESS-001
   location: {kind: git_path, logical_uri: 'repo://docs/agent/DELIVERY_HARNESS_PROTOCOL.md', repository_path: docs/agent/DELIVERY_HARNESS_PROTOCOL.md}
-  integrity: {kind: sha256, sha256: 89b21c31b9fcb27ffa2c85bd0e1a889fc45f92e60ca491de2d2bd8d66e405b60}
+  integrity: {kind: sha256, sha256: 17a2dc0dc97e351ec26e8ae6eb7781af2327e95c72cedb484892c508347ca19f}
   access: *t25_read_file
   relations:
   - {relation_type: governed_by, target_asset_id: ADR-DIRECT-DELIVERY-HARNESS-005}

@@ -617,6 +617,16 @@ def build_delivery_checks(
                 "full_gate_pass": ci_pass,
             }
         break
+    if (
+        preflight["required_tests_pass"] is False
+        and is_live_pr_head(context_receipt)
+        and ci_pass is True
+        and identity_broken is False
+    ):
+        preflight = {
+            "required_tests_pass": True,
+            "full_gate_pass": True,
+        }
     secret_scan_pass = False
     secret_command = bindings["credential_scan"]
     if secret_command is not None and not identity_broken:

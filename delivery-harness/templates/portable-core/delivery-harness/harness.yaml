@@ -25,7 +25,8 @@
       "scripts/delivery_harness.py", "scripts/owner_attention_gate.py",
       "tests/test_delivery_harness_adapters.py", "tests/test_delivery_harness_authority.py",
       "tests/test_delivery_harness_bootstrap.py", "tests/test_delivery_harness_context.py",
-      "tests/test_delivery_harness_contract.py", "tests/test_delivery_harness_merge_guard.py"
+      "tests/test_delivery_harness_contract.py", "tests/test_delivery_harness_merge_guard.py",
+      "tests/test_delivery_harness_skill.py"
     ]
   },
   "context_lanes": {"L0": "always_loaded_front_door", "L1": "exact_task_capsule", "L2": "dynamic_capability_context", "L3": "deep_evidence_on_demand"},

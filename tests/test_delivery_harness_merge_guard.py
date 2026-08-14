@@ -1079,6 +1079,29 @@ class DeliveryHarnessMergeGuardTests(unittest.TestCase):
         )
         self.assertFalse(checks["write_set_pass"])
 
+    def test_live_pr_head_consumes_exact_head_ci_when_local_gates_fail(self) -> None:
+        receipt = live_pr_head_receipt(self.module)
+        runner = FakeRunner()
+
+        def failing_local_gates(args: list[str], cwd: Path) -> bytes:
+            if tuple(args[:3]) == ("git", "diff", "--name-only"):
+                return b"delivery-harness/harness.yaml\0"
+            if args and args[0] == "uv":
+                raise ValueError("LIVE_READBACK_FAILED")
+            return runner(args, cwd)
+
+        checks = self.module.build_delivery_checks(
+            ROOT,
+            context_receipt=receipt,
+            local_head=HEAD,
+            local_tree=TREE,
+            ci_pass=True,
+            runner=failing_local_gates,
+        )
+        self.assertTrue(checks["required_tests_pass"])
+        self.assertTrue(checks["full_gate_pass"])
+        self.assertTrue(checks["write_set_pass"])
+
     def test_guarded_scope_rejects_stale_merge_base_before_control_import(self) -> None:
         runner = FakeRunner()
         with mock.patch.object(

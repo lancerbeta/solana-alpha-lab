@@ -16,7 +16,7 @@
     {
       "source": "delivery-harness/templates/portable-core/delivery-harness/harness.yaml",
       "destination": "delivery-harness/harness.yaml",
-      "sha256": "d6db295f2819e7307b6bf92d25f534fad2fa95bb8cab231ac335e593f8df93d7"
+      "sha256": "823dc8023a815381d1de026237d122a3c9b79209e9cf0344fd9c82b504ad6186"
     },
     {
       "source": "delivery-harness/templates/portable-core/delivery-harness/context-map.yaml",
@@ -91,7 +91,7 @@
     {
       "source": "scripts/owner_attention_gate.py",
       "destination": "scripts/owner_attention_gate.py",
-      "sha256": "1424c0517ac1442ce2039ddbea0af1f39c8d69a447224e96e944b68858802614"
+      "sha256": "da7dd742eb5ba4709bf1c8753de18b36b2de870171ca0daef388cc5ff67a937c"
     },
     {
       "source": "delivery-harness/templates/portable-core/AGENTS.md.tmpl",
