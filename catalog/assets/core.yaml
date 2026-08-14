@@ -13352,7 +13352,7 @@ records:
   as_of: '2026-08-14'
   truth_owner: TASK-30
   location: {kind: git_path, logical_uri: 'repo://docs/evidence/task30/a20_bitquery_named_partial_pit_route_capture_acceptance_v1.json', repository_path: docs/evidence/task30/a20_bitquery_named_partial_pit_route_capture_acceptance_v1.json}
-  integrity: {kind: sha256, sha256: 80487cb9ee27781b4122616456a4dedd24f080c990dafc7943030c026d0f4d48}
+  integrity: {kind: sha256, sha256: ed8bbf3e0b4e49978806336aef7221442097f6f65200daab9e181404590f7ccc}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: derived_from, target_asset_id: CONTRACT-T30-A20-BITQUERY-PIT-CAPTURE-001}
@@ -13448,7 +13448,7 @@ records:
   as_of: '2026-08-14'
   truth_owner: TASK-30
   location: {kind: git_path, logical_uri: 'repo://docs/evidence/task30/a20r1_provider_route_capability_registry_acceptance_v1.json', repository_path: docs/evidence/task30/a20r1_provider_route_capability_registry_acceptance_v1.json}
-  integrity: {kind: sha256, sha256: 6ab48c2df9e2824150ab932a52660a8d17916367905c5c0bc77ffa34c634d0a1}
+  integrity: {kind: sha256, sha256: 8ec6689a3b4b994cd3dfc8b75b0973045f1f93e7bf26f3eedd9210172b73bd7e}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: derived_from, target_asset_id: CONFIG-PROVIDER-ROUTE-CAPABILITY-REGISTRY-004}

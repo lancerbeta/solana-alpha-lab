@@ -29,6 +29,7 @@ managed_write_set:
   - docs/evidence/task30/a20_bitquery_named_partial_pit_route_capture_acceptance_v1.json
   - docs/evidence/task30/a20p_bitquery_named_partial_pit_route_capture_runtime_receipt_v1.json
   - docs/evidence/task30/a20r1_provider_route_capability_registry_acceptance_v1.json
+  - docs/evidence/control/delivery_harness_acceptance_v1.json
   - docs/reports/task30/bitquery_named_partial_pit_route_capture_readout_v1.md
   - configs/provider_route_capability_registry_v4.yaml
   - catalog/schemas/provider_route_capability_registry_v4.schema.json
@@ -36,9 +37,12 @@ managed_write_set:
   - tests/test_provider_route_capability_registry_v4.py
   - catalog/catalog_manifest.yaml
   - catalog/assets/core.yaml
+  - catalog/assets/lifecycle.yaml
   - catalog/generated/asset_edges.json
   - docs/PROJECT_MAP.md
   - registries/decisions_negative_results.yaml
+  - tests/test_catalog.py
+  - tests/test_lifecycle_registries.py
   - local/task30_bitquery_pit_capture/**
 external_caps:
   network: true

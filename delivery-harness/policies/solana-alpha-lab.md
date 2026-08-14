@@ -105,6 +105,9 @@ unhealthy. Before OOS+paper+shadow, Kelly is zero.
 
 Before building or invoking a provider route, resolve its stable ID through
 `configs/provider_route_capability_registry_v4.yaml` (`PROVIDER-ROUTE-CAPABILITY-REGISTRY-004`).
+This successor preserves `configs/provider_route_capability_registry_v3.yaml`
+as its exact append-only predecessor rather than rewriting historical route
+observations.
 It preserves immutable predecessor `PROVIDER_ROUTE_CAPABILITY_REGISTRY_V1` at
 `configs/provider_route_capability_registry_v1.yaml`. A missing record is
 `REGISTRY_GAP`, not provider failure. A record grants no call, credential,
