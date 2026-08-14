@@ -6,10 +6,10 @@ on a 15-minute to 4-hour horizon.
 ## Repository status boundary
 
 This README is bootstrap documentation, not a live task-status source.
-Work/control plane owns canonical status and acceptance. For current work, use
-only the task and handoff explicitly named by the Work-approved prompt. The
-repository may contain an uncommitted or staged candidate without changing the
-canonical task state.
+The exact Git task contract owns bounded delivery state; the goal owner owns
+product meaning and semantic acceptance. Use only a task contract named by the
+owner or an exact canonical READY Git contract. A branch, chat, PR, CI result or
+merge cannot silently select work or establish product `DONE`.
 
 ## Delivery Harness bootstrap
 

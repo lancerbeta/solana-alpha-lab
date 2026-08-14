@@ -63,7 +63,12 @@ Bind exact inventory, tests, head/tree, limitations and rollback. Push/open PR
 inside routine authority, require exact-head CI and stop for one exact owner
 approval bound to PR/head. Re-read every machine precondition, evaluate
 `OWNER_ATTENTION_GATE_V2`, then perform at most one ordinary guarded merge and
-read back exact main/post-merge CI.
+read back exact main/post-merge CI. Use the repository-owned
+`scripts/owner_attention_gate.py --guarded-merge` entrypoint so the agent cannot
+supply pre-asserted test/CI/Factory-Fit booleans: it verifies the self-hashed
+context receipt, exact local head/tree, required live GitHub check, unresolved
+review threads and hash-bound FULL_REVIEW evidence before invoking one standard
+merge without branch deletion.
 
 Recommend `MODEL_EFFORT_RECOMMENDATION` once before a substantial chain and
 `NEXT_MODEL_EFFORT` only at its material checkpoint, never on microsteps.

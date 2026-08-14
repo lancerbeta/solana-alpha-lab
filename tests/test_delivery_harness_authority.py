@@ -73,11 +73,25 @@ def passing_merge_request(
         "phrase": APPROVAL,
         "pr_number": PR,
         "head_sha": HEAD,
+        "context_receipt_sha256": "a" * 64,
+        "context_route": (
+            route
+            if route in {"DIRECT_CODEX_DELIVERY", "DIRECT_CURSOR_DELIVERY"}
+            else "DIRECT_CURSOR_DELIVERY"
+        ),
     }
     value["merge_checks"] = {
         "pr_number": PR,
         "observed_head_sha": HEAD,
+        "observed_tree_sha": "fedcba9876543210fedcba9876543210fedcba98",
+        "context_receipt_sha256": "a" * 64,
+        "context_route": (
+            route
+            if route in {"DIRECT_CODEX_DELIVERY", "DIRECT_CURSOR_DELIVERY"}
+            else "DIRECT_CURSOR_DELIVERY"
+        ),
         "exact_pr_head_bound": True,
+        "context_receipt_bound": True,
         "required_tests_pass": True,
         "ci_exact_head_pass": True,
         "full_gate_pass": True,
@@ -156,6 +170,8 @@ class DeliveryHarnessAuthorityTests(unittest.TestCase):
             lambda value: value["merge_checks"].__setitem__("observed_head_sha", OTHER_HEAD),
             lambda value: value["owner_approval"].__setitem__("head_sha", OTHER_HEAD),
             lambda value: value["owner_approval"].__setitem__("pr_number", PR + 1),
+            lambda value: value["owner_approval"].__setitem__("context_receipt_sha256", "b" * 64),
+            lambda value: value["owner_approval"].__setitem__("context_route", "DIRECT_CURSOR_DELIVERY"),
             lambda value: value["owner_approval"].__setitem__("phrase", APPROVAL.replace(str(PR), str(PR + 1))),
             lambda value: value.__setitem__("repository", "other/repository"),
         )
@@ -172,10 +188,27 @@ class DeliveryHarnessAuthorityTests(unittest.TestCase):
         self.assertEqual(result["decision"], "DENY")
         self.assertEqual(result["reasons"], ["MERGE_CHECK_FAILED:ci_exact_head_pass"])
 
+    def test_failed_machine_check_beats_owner_attention_trigger(self) -> None:
+        request = passing_merge_request()
+        request["merge_checks"]["ci_exact_head_pass"] = False
+        request["triggers"]["material_owner_decision"] = True
+        result = self.evaluate(request)
+        self.assertEqual(result["decision"], "DENY")
+        self.assertEqual(result["reasons"], ["MERGE_CHECK_FAILED:ci_exact_head_pass"])
+
     def test_dormant_baton_cursor_merge_remains_forbidden(self) -> None:
         request = passing_merge_request(
             route="LEGACY_GITHUB_BATON_DORMANT", actor="CURSOR"
         )
+        result = self.evaluate(request)
+        self.assertEqual(result["decision"], "DENY")
+        self.assertEqual(result["reasons"], ["ROUTE_MERGE_FORBIDDEN"])
+
+    def test_dormant_route_denial_beats_owner_attention_trigger(self) -> None:
+        request = passing_merge_request(
+            route="LEGACY_GITHUB_BATON_DORMANT", actor="CURSOR"
+        )
+        request["triggers"]["material_owner_decision"] = True
         result = self.evaluate(request)
         self.assertEqual(result["decision"], "DENY")
         self.assertEqual(result["reasons"], ["ROUTE_MERGE_FORBIDDEN"])

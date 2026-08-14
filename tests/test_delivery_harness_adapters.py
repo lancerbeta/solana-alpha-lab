@@ -2,6 +2,8 @@ from __future__ import annotations
 
 import importlib.util
 import re
+import shutil
+import tempfile
 import unittest
 from pathlib import Path
 
@@ -73,6 +75,8 @@ class DeliveryHarnessAdapterTests(unittest.TestCase):
         )
         for marker in required:
             self.assertIn(marker, policy)
+        self.assertIn("HISTORICAL_OPTIONAL_EXPORT_NON_TRIGGERING", policy)
+        self.assertIn("MUST NOT", AGENTS.read_text(encoding="utf-8"))
 
     def test_cursor_rules_are_native_scoped_and_within_always_context_budget(self) -> None:
         rules = sorted((CURSOR / "rules").glob("*.mdc"))
@@ -120,6 +124,24 @@ class DeliveryHarnessAdapterTests(unittest.TestCase):
             "docs/agent/GITHUB_BATON_PROTOCOL.md",
         ):
             self.assertTrue((ROOT / historical).is_file(), historical)
+
+    def test_machine_check_rejects_baton_reactivation_in_any_active_adapter(self) -> None:
+        module = load_module()
+        with tempfile.TemporaryDirectory() as directory:
+            target = Path(directory)
+            shutil.copytree(ROOT / ".cursor", target / ".cursor")
+            shutil.copytree(ROOT / ".agents", target / ".agents")
+            shutil.copytree(ROOT / "delivery-harness", target / "delivery-harness")
+            shutil.copytree(ROOT / "catalog/schemas", target / "catalog/schemas")
+            (target / "AGENTS.md").write_bytes(AGENTS.read_bytes())
+            injected = target / ".cursor/commands/delivery-start.md"
+            injected.write_text(
+                injected.read_text(encoding="utf-8")
+                + "\nRoute this task through GITHUB_BATON as an active transport.\n",
+                encoding="utf-8",
+            )
+            result = module.check_harness(target)
+            self.assertIn("ACTIVE_BATON_TOKEN_REACTIVATED", result["errors"])
 
     def test_commands_are_thin_exact_task_adapters(self) -> None:
         names = {"delivery-start.md", "delivery-status.md", "delivery-review.md", "delivery-finish.md"}

@@ -15,7 +15,7 @@ import jsonschema
 ROOT = Path(__file__).resolve().parents[1]
 SCRIPT = ROOT / "scripts/delivery_harness.py"
 RECEIPT_SCHEMA = ROOT / "catalog/schemas/delivery_harness_context_receipt.schema.json"
-TASK_CONTRACT = "docs/superpowers/specs/2026-08-13-delivery-harness-design.md"
+TASK_CONTRACT = "docs/tasks/CTRL-DELIVERY-HARNESS-V1.md"
 TASK_ID = "CTRL-DELIVERY-HARNESS-V1"
 
 
@@ -78,6 +78,65 @@ class DeliveryHarnessContextTests(unittest.TestCase):
         self.assertEqual(roadmap_gap["reason_code"], "NO_EXACT_GIT_ROADMAP_BOUND")
         self.assertEqual(receipt["cloud_bundle_mode"], "OWNER_MANAGED_OPTIONAL_EXPORT")
 
+    def test_task_id_must_match_exact_contract_frontmatter(self) -> None:
+        with self.assertRaisesRegex(ValueError, "TASK_ID_CONTRACT_MISMATCH"):
+            self.module.build_context_receipt(
+                ROOT,
+                task_id="FAKE-TASK-ID",
+                task_contract=TASK_CONTRACT,
+                route="DIRECT_CODEX_DELIVERY",
+            )
+
+    def test_task_git_binding_is_checked_fail_closed(self) -> None:
+        metadata = self.module.parse_task_contract(ROOT, TASK_CONTRACT, TASK_ID)
+        identity = self.module.git_identity(ROOT)
+        self.module.validate_task_git_binding(ROOT, metadata, identity)
+        changed = copy.deepcopy(metadata)
+        changed["git_binding"]["expected_upstream_oid"] = "0" * 40
+        with self.assertRaisesRegex(ValueError, "TASK_UPSTREAM_OID_MISMATCH"):
+            self.module.validate_task_git_binding(ROOT, changed, identity)
+        changed = copy.deepcopy(metadata)
+        changed["git_binding"]["expected_branch"] = "wrong-branch"
+        with self.assertRaisesRegex(ValueError, "TASK_BRANCH_MISMATCH"):
+            self.module.validate_task_git_binding(ROOT, changed, identity)
+
+    def test_non_task_document_cannot_be_used_as_task_contract(self) -> None:
+        with self.assertRaisesRegex(ValueError, "TASK_CONTRACT_SCHEMA_INVALID"):
+            self.module.build_context_receipt(
+                ROOT,
+                task_id=TASK_ID,
+                task_contract="README.md",
+                route="DIRECT_CODEX_DELIVERY",
+            )
+
+    def test_default_context_does_not_load_l2_provider_registry(self) -> None:
+        receipt = self.receipt()
+        self.assertFalse(
+            any(
+                item["semantic_role"] == "EXTERNAL_ROUTE_KNOWLEDGE"
+                for item in receipt["selected"]
+            )
+        )
+        gap = next(
+            item
+            for item in receipt["gaps"]
+            if item["semantic_role"] == "EXTERNAL_ROUTE_KNOWLEDGE"
+        )
+        self.assertEqual(gap["reason_code"], "DEFERRED_ON_DEMAND")
+
+    def test_task_catalog_relations_are_bounded_to_exact_task_asset(self) -> None:
+        receipt = self.receipt()
+        catalog_items = [
+            item
+            for item in receipt["selected"]
+            if item["semantic_role"] == "STABLE_ASSETS_AND_RELATIONS"
+        ]
+        self.assertTrue(catalog_items)
+        self.assertTrue(
+            all(item["stable_id"] != "SMIAL-PROJECT-ASSET-CATALOG" for item in catalog_items)
+        )
+        self.assertIn("CTRL-DELIVERY-HARNESS-001", {item["stable_id"] for item in catalog_items})
+
     def test_selected_entries_are_stable_bounded_references(self) -> None:
         receipt = self.receipt()
         keys = [
@@ -115,7 +174,8 @@ class DeliveryHarnessContextTests(unittest.TestCase):
         receipt = self.receipt()
         deferred = {gap["semantic_role"] for gap in receipt["gaps"]}
         self.assertIn("HISTORICAL_CONTEXT", deferred)
-        self.assertIn("DELIVERY_EVIDENCE", deferred)
+        selected_roles = {item["semantic_role"] for item in receipt["selected"]}
+        self.assertIn("DELIVERY_EVIDENCE", selected_roles)
         self.assertTrue(all(gap["state"] == "EXPLICIT_GAP" for gap in receipt["gaps"]))
 
     def test_dirty_state_is_reported_and_local_root_is_not_serialized(self) -> None:

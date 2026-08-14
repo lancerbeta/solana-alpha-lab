@@ -165,6 +165,13 @@ platform or refactor by taste.
 
 ## ACTIVE_TIME_GATE_CHECK
 
+`control/active_time_gates.json` is interpreted by gate records, not by stale
+cloud-export prose in its legacy `resume_router`. Any resume terminal whose
+only remaining action is bundle/Project Sources activation or owner smoke is
+`HISTORICAL_OPTIONAL_EXPORT_NON_TRIGGERING`; it cannot select work, block DONE,
+or create an owner request. This overlay preserves the old bytes for audit and
+prevents their obsolete UI workflow from regaining authority.
+
 Before selecting or starting new work, read `control/active_time_gates.json`
 when present. A due unresolved marker routes to its exact
 `required_next_atom`; an `ACTIVE_WAITING` marker does not block non-interfering

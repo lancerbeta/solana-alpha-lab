@@ -1474,6 +1474,11 @@
     },
     {
       "source_asset_id": "CTRL-OWNER-ATTENTION-GATE-001",
+      "relation": "superseded_by",
+      "target_asset_id": "CTRL-DELIVERY-HARNESS-001"
+    },
+    {
+      "source_asset_id": "CTRL-OWNER-ATTENTION-GATE-001",
       "relation": "validated_by",
       "target_asset_id": "TEST-OWNER-ATTENTION-GATE-001"
     },
@@ -5431,6 +5436,11 @@
       "source_asset_id": "POLICY-OWNER-ATTENTION-GATE-001",
       "relation": "contains",
       "target_asset_id": "SCRIPT-OWNER-ATTENTION-GATE-001"
+    },
+    {
+      "source_asset_id": "POLICY-OWNER-ATTENTION-GATE-001",
+      "relation": "superseded_by",
+      "target_asset_id": "POLICY-OWNER-ATTENTION-GATE-002"
     },
     {
       "source_asset_id": "POLICY-OWNER-ATTENTION-GATE-001",

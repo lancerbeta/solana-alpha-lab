@@ -50,7 +50,7 @@ cloud_bundle:
   working_context_truth_owner: false
   historical_registry_preserved: true
 external_authority:
-  provider_api_rpc_wss: false
-  wallet_signer_transaction: false
+  external_system: false
+  signing_or_financial_action: false
   cash_spend: false
-  project_sources_activation: false
+  cloud_activation: false

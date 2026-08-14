@@ -45,6 +45,7 @@ The implementation may add, modify or delete only the following paths. A newly d
 .cursor/rules/30-security-and-secrets.mdc
 .cursor/rules/40-catalog-and-evidence.mdc
 .cursor/rules/50-github-baton.mdc                          # delete active adapter only
+.github/ISSUE_TEMPLATE/control-atom.yml                   # mark historical; remove active fallback discovery
 .github/pull_request_template.md
 .gitignore
 AGENTS.md
@@ -59,6 +60,7 @@ catalog/schemas/delivery_harness_capability_radar.schema.json
 catalog/schemas/delivery_harness_context_map.schema.json
 catalog/schemas/delivery_harness_context_receipt.schema.json
 catalog/schemas/delivery_harness_project_profile.schema.json
+catalog/schemas/delivery_harness_task_contract.schema.json
 catalog/schemas/owner_attention_gate_v2.schema.json
 control/owner_attention_gate_v2.yaml
 delivery-harness/capability-radar.yaml
@@ -68,6 +70,7 @@ delivery-harness/policies/solana-alpha-lab.md
 delivery-harness/project-profile.yaml
 delivery-harness/templates/bootstrap-prompt.md
 delivery-harness/templates/portable-project-profile.yaml
+delivery-harness/templates/portable-core/**
 docs/OPERATOR_NAVIGATION.md                               # generated
 docs/PROJECT_MAP.md                                       # generated
 docs/agent/DELIVERY_CONTEXT_PROTOCOL.md
@@ -106,6 +109,7 @@ tests/test_delivery_harness_capability_radar.py
 tests/test_delivery_harness_context.py
 tests/test_delivery_harness_contract.py
 tests/test_delivery_harness_skill.py
+tests/test_delivery_harness_merge_guard.py
 tests/test_owner_attention_gate_policy.py
 tests/test_catalog.py
 tests/test_provider_route_capability_registry.py
@@ -122,6 +126,16 @@ keeps unevidenced implementation claims fail-closed. Navigation regeneration
 also exposed `catalog/assets/lifecycle.yaml` as the direct hash owner of the two
 generated projections, so that one shard is admitted only for their version and
 integrity propagation.
+
+**Write-set amendment (2026-08-14, independent-review repair):** Goal, code and
+architecture reviews proved that the portable initializer was not yet runnable,
+the active Issue form still advertised dormant Baton, exact task identity and
+L2 gating were under-bound, and the merge evaluator did not own live GitHub
+read-back. The paths above are admitted only for those fail-closed repairs and
+their direct schemas/tests/Catalog hashes. Historical Source releases, Baton
+receipts and `control/active_time_gates.json` remain immutable; the active
+harness instead classifies obsolete cloud-activation resume text as historical
+and non-triggering under `OWNER_MANAGED_OPTIONAL_EXPORT`.
 
 ## Task 1: Freeze the core contracts and negative invariants
 

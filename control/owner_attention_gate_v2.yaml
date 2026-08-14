@@ -35,8 +35,11 @@ merge_approval:
   bind_repository: true
   bind_pr_number: true
   bind_head_sha: true
+github_checks:
+  required: [Repository validation]
 merge_preconditions:
   - exact_pr_head_bound
+  - context_receipt_bound
   - required_tests_pass
   - ci_exact_head_pass
   - full_gate_pass

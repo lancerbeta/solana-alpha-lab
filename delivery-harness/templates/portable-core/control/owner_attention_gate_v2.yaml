@@ -1,0 +1,21 @@
+schema: smial.owner-attention-gate
+schema_version: '2.0'
+policy_id: OWNER_ATTENTION_GATE_V2
+as_of: '2026-08-14'
+status: PORTABLE_TEMPLATE
+owner: GOAL_OWNER
+repository: example/project
+purpose: Route owner attention only to material boundaries and exact guarded merge approval.
+decisions: [AUTONOMOUS, OWNER_ATTENTION_REQUIRED, DENY]
+owner_attention_triggers: {auth_or_access_recovery: AUTH_OR_ACCESS_RECOVERY, material_owner_decision: MATERIAL_OWNER_DECISION, user_only_activation: USER_ONLY_ACTIVATION, external_material_action: EXTERNAL_MATERIAL_ACTION, unresolved_safety_or_truth_conflict: UNRESOLVED_SAFETY_OR_TRUTH_CONFLICT}
+route_authority:
+  DIRECT_CODEX_DELIVERY: {allowed_actors: [CODEX], autonomous_action_classes: [READ_ONLY, ROUTINE_ENGINEERING, GITHUB_TRANSPORT], ordinary_merge: EXACT_OWNER_APPROVAL_AND_MACHINE_GATE}
+  DIRECT_CURSOR_DELIVERY: {allowed_actors: [CURSOR], autonomous_action_classes: [READ_ONLY, ROUTINE_ENGINEERING, GITHUB_TRANSPORT], ordinary_merge: EXACT_OWNER_APPROVAL_AND_MACHINE_GATE}
+  DESIGN_ONLY: {allowed_actors: [GPT, CODEX, CURSOR], autonomous_action_classes: [READ_ONLY], ordinary_merge: FORBIDDEN}
+  LEGACY_GITHUB_BATON_DORMANT: {allowed_actors: [CURSOR], autonomous_action_classes: [READ_ONLY], ordinary_merge: FORBIDDEN}
+merge_approval: {exact_phrase_pattern: '^PR #([1-9][0-9]*), head ([0-9a-f]{40}) проверен; ready \+ merge разрешаю\.$', bind_repository: true, bind_pr_number: true, bind_head_sha: true}
+github_checks: {required: [Repository validation]}
+merge_preconditions: [exact_pr_head_bound, context_receipt_bound, required_tests_pass, ci_exact_head_pass, full_gate_pass, factory_fit_pass, write_set_pass, secret_scan_pass, mergeable, no_unresolved_reviews, standard_merge, branch_preserved, settings_unchanged]
+post_merge: {exact_main_readback_required: true, main_ci_required: true, branch_deletion_forbidden: true, settings_change_forbidden: true}
+invariants: {scope_must_be_bound: true, stricter_task_stop_wins: true, passing_tests_do_not_grant_canonical_done: true, owner_attention_is_not_a_failed_machine_check_override: true, historical_receipts_are_append_only: true, project_sources_activation_is_separate: true}
+non_claims: [NO_EXTERNAL_AUTHORITY, MERGE_IS_NOT_PRODUCT_ACCEPTANCE, CLOUD_EXPORT_IS_OPTIONAL_AND_NEVER_A_REQUIRED_SMOKE]

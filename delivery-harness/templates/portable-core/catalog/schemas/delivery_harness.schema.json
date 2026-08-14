@@ -1,0 +1,21 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object", "additionalProperties": false,
+  "required": ["schema", "schema_version", "harness_id", "active_routes", "forbidden_active_input_routes", "routes", "context_lanes", "context_budgets", "portable_templates", "cloud_bundle", "external_authority"],
+  "properties": {
+    "schema": {"const": "smial.delivery-harness"}, "schema_version": {"const": "1.0"}, "harness_id": {"const": "DELIVERY_HARNESS_V1"},
+    "active_routes": {"type": "array", "prefixItems": [{"const": "DIRECT_CODEX_DELIVERY"}, {"const": "DIRECT_CURSOR_DELIVERY"}, {"const": "DESIGN_ONLY"}], "items": false},
+    "forbidden_active_input_routes": {"type": "array", "prefixItems": [{"const": "GITHUB_BATON"}], "items": false},
+    "routes": {"type": "object", "additionalProperties": false, "required": ["DIRECT_CODEX_DELIVERY", "DIRECT_CURSOR_DELIVERY", "DESIGN_ONLY", "LEGACY_GITHUB_BATON_DORMANT"], "properties": {"DIRECT_CODEX_DELIVERY": {"$ref": "#/$defs/active"}, "DIRECT_CURSOR_DELIVERY": {"$ref": "#/$defs/active"}, "DESIGN_ONLY": {"$ref": "#/$defs/active"}, "LEGACY_GITHUB_BATON_DORMANT": {"$ref": "#/$defs/dormant"}}},
+    "context_lanes": {"type": "object", "additionalProperties": false, "required": ["L0", "L1", "L2", "L3"], "properties": {"L0": {"type": "string"}, "L1": {"type": "string"}, "L2": {"type": "string"}, "L3": {"type": "string"}}},
+    "context_budgets": {"$ref": "#/$defs/budgets"},
+    "portable_templates": {"type": "array", "minItems": 2, "items": {"type": "string"}},
+    "cloud_bundle": {"type": "object", "additionalProperties": false, "required": ["mode", "execution_gate", "done_gate", "smoke_required_by_harness", "reminders", "working_context_truth_owner", "historical_registry_preserved"], "properties": {"mode": {"const": "OWNER_MANAGED_OPTIONAL_EXPORT"}, "execution_gate": {"const": false}, "done_gate": {"const": false}, "smoke_required_by_harness": {"const": false}, "reminders": {"const": false}, "working_context_truth_owner": {"const": false}, "historical_registry_preserved": {"const": true}}},
+    "external_authority": {"type": "object", "additionalProperties": false, "required": ["external_system", "signing_or_financial_action", "cash_spend", "cloud_activation"], "properties": {"external_system": {"const": false}, "signing_or_financial_action": {"const": false}, "cash_spend": {"const": false}, "cloud_activation": {"const": false}}}
+  },
+  "$defs": {
+    "active": {"type": "object", "additionalProperties": false, "required": ["active", "actor", "task_selection", "merge"], "properties": {"active": {"const": true}, "actor": {"enum": ["CODEX", "CURSOR", "ANY"]}, "task_selection": {"type": "string"}, "merge": {"enum": ["EXACT_OWNER_APPROVAL_AND_MACHINE_GATE", "FORBIDDEN"]}}},
+    "dormant": {"type": "object", "additionalProperties": false, "required": ["active", "actor", "task_selection", "merge"], "properties": {"active": {"const": false}, "actor": {"const": "CURSOR"}, "task_selection": {"const": false}, "merge": {"const": "FORBIDDEN"}}},
+    "budgets": {"type": "object", "additionalProperties": false, "required": ["agents_max_bytes", "cursor_always_apply_max_bytes", "ordinary_receipt_max_bytes", "auto_inline_file_max_bytes"], "properties": {"agents_max_bytes": {"const": 12288}, "cursor_always_apply_max_bytes": {"const": 6144}, "ordinary_receipt_max_bytes": {"const": 49152}, "auto_inline_file_max_bytes": {"const": 102400}}}
+  }
+}

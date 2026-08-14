@@ -4,9 +4,37 @@ task_version: '1.0'
 status: IMPLEMENTED_UNVERIFIED
 as_of: '2026-08-14'
 owner: GOAL_OWNER
-delivery_route: DIRECT_CODEX_DELIVERY
-cloud_bundle_mode: OWNER_MANAGED_OPTIONAL_EXPORT
-contains_secrets: false
+allowed_routes: [DIRECT_CODEX_DELIVERY, DIRECT_CURSOR_DELIVERY]
+expected_repository: lancerbeta/solana-alpha-lab
+git_binding:
+  expected_base: e78a08ec7ce5687c89b39fa19d8503ca206c6d9e
+  expected_upstream: origin/main
+  expected_upstream_oid: e78a08ec7ce5687c89b39fa19d8503ca206c6d9e
+  expected_branch: ctrl-delivery-harness-v1
+  dirty_mode: ALLOW_REPORTED
+objective: Replace active baton routing with one portable Git-native direct Delivery Harness.
+managed_write_set:
+  path: docs/superpowers/plans/2026-08-13-delivery-harness-v1.md
+  heading: Managed write set
+external_caps:
+  network: false
+  credentials: false
+  external_system: false
+  signing_or_financial_action: false
+  cash_spend: false
+  deployment: false
+stop_conditions:
+  - AUTHORITY_WIDENING
+  - CONTEXT_DIVERGENCE
+  - SECOND_TRUTH_OWNER
+context_requirements:
+  catalog_asset_ids: [CTRL-DELIVERY-HARNESS-001]
+  l2_roles: [ARCHITECTURE_DECISIONS, DELIVERY_EVIDENCE]
+  l3_roles: []
+  roadmap_path: null
+  exact_evidence_paths:
+    - docs/evidence/control/delivery_harness_acceptance_v1.json
+  exact_registry_paths: []
 ---
 
 # CTRL-DELIVERY-HARNESS-V1 — Portable direct delivery harness

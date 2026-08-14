@@ -84,7 +84,11 @@ research grants no dependency, provider, cost or external authority.
 ## ACTIVE_TIME_GATE_CHECK
 
 Before selecting new work, read `control/active_time_gates.json`; a due
-unresolved marker routes to its exact `required_next_atom`. Provider work must
+unresolved marker routes to its exact `required_next_atom`. Legacy
+`resume_router` text that only requests Project Sources activation, bundle
+replacement or user smoke is historical compatibility metadata and MUST NOT
+route work or interrupt the owner under `OWNER_MANAGED_OPTIONAL_EXPORT`.
+Provider work must
 also preserve the immutable `PROVIDER_ROUTE_CAPABILITY_REGISTRY_V1` binding at
 `configs/provider_route_capability_registry_v1.yaml`; an absent route is
 `REGISTRY_GAP`, not provider failure or implied authority.

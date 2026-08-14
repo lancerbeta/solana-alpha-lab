@@ -2,6 +2,7 @@ schema: smial.delivery-harness-project-profile
 schema_version: '1.0'
 profile_id: SOLANA_ALPHA_LAB_V1
 harness_id: DELIVERY_HARNESS_V1
+mode: BOUND_PROJECT
 repository:
   name: lancerbeta/solana-alpha-lab
   default_branch: main
@@ -21,7 +22,7 @@ context_budgets:
   ordinary_receipt_max_bytes: 49152
   auto_inline_file_max_bytes: 102400
 authority:
-  provider_read: false
-  wallet_signer_transaction: false
+  external_system: false
+  signing_or_financial_action: false
   cash_spend: false
-  project_sources_mutation: false
+  cloud_export_mutation: false

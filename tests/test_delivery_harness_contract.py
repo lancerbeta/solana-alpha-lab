@@ -138,10 +138,10 @@ class DeliveryHarnessContractTests(unittest.TestCase):
         self.assertFalse(dormant["task_selection"])
         self.assertEqual(dormant["merge"], "FORBIDDEN")
         self.assertEqual(harness["forbidden_active_input_routes"], ["GITHUB_BATON"])
-        self.assertFalse(harness["external_authority"]["provider_api_rpc_wss"])
-        self.assertFalse(harness["external_authority"]["wallet_signer_transaction"])
+        self.assertFalse(harness["external_authority"]["external_system"])
+        self.assertFalse(harness["external_authority"]["signing_or_financial_action"])
         self.assertFalse(harness["external_authority"]["cash_spend"])
-        self.assertFalse(harness["external_authority"]["project_sources_activation"])
+        self.assertFalse(harness["external_authority"]["cloud_activation"])
         self.assertEqual(
             harness["cloud_bundle"]["mode"],
             "OWNER_MANAGED_OPTIONAL_EXPORT",
@@ -156,6 +156,7 @@ class DeliveryHarnessContractTests(unittest.TestCase):
     def test_project_profile_binds_current_truth_owners(self) -> None:
         profile = self.documents[PROFILE]
         self.assertEqual(profile["profile_id"], "SOLANA_ALPHA_LAB_V1")
+        self.assertEqual(profile["mode"], "BOUND_PROJECT")
         self.assertEqual(profile["repository"]["name"], "lancerbeta/solana-alpha-lab")
         self.assertEqual(profile["repository"]["default_branch"], "main")
         self.assertEqual(
@@ -169,10 +170,10 @@ class DeliveryHarnessContractTests(unittest.TestCase):
             },
         )
         self.assertEqual(profile["context_budgets"], EXPECTED_BUDGETS)
-        self.assertFalse(profile["authority"]["provider_read"])
-        self.assertFalse(profile["authority"]["wallet_signer_transaction"])
+        self.assertFalse(profile["authority"]["external_system"])
+        self.assertFalse(profile["authority"]["signing_or_financial_action"])
         self.assertFalse(profile["authority"]["cash_spend"])
-        self.assertFalse(profile["authority"]["project_sources_mutation"])
+        self.assertFalse(profile["authority"]["cloud_export_mutation"])
         self.assertEqual(profile["working_memory"]["truth_owner"], "GIT")
         self.assertEqual(
             profile["working_memory"]["task_resolution"],
@@ -222,6 +223,9 @@ class DeliveryHarnessContractTests(unittest.TestCase):
             with self.subTest(candidate=candidate["candidate_id"]):
                 self.assertTrue(candidate["conditions_all"])
                 self.assertTrue(candidate["named_consumer_required"])
+                for field in ("owner_decision", "measurable_value_test", "minimum_permissions", "data_exposure", "why_now"):
+                    self.assertTrue(candidate[field])
+                self.assertEqual(candidate["security_license_maintenance_cost_check"], "required_before_install")
                 self.assertEqual(candidate["adoption_order"], ["ADOPT", "WRAP", "FORK", "BUILD"])
                 self.assertTrue(candidate["fallback_without_tool"])
                 self.assertTrue(candidate["exit_path"])

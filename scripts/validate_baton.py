@@ -675,11 +675,14 @@ def validate_cursor_and_templates() -> None:
             ),
         ),
     }
+    def normalized_policy_text(value: str) -> str:
+        return " ".join(value.casefold().split())
+
     for policy_name, (text, needles) in policy_needles.items():
         for needle in needles:
             assert_check(
                 f"cursor_jit_policy:{policy_name}:{needle}",
-                needle.lower() in text.lower(),
+                normalized_policy_text(needle) in normalized_policy_text(text),
             )
     ignore = (ROOT / ".cursorignore").read_text(encoding="utf-8")
     for needle in [".env", "!.env.example", ".smial-handoff/**", "wallet/**"]:
@@ -700,6 +703,11 @@ def validate_cursor_and_templates() -> None:
         (ROOT / ".github/ISSUE_TEMPLATE/control-atom.yml").read_text(encoding="utf-8")
     )
     assert_check("issue_form_name", "name" in issue and "body" in issue)
+    assert_check(
+        "issue_form_dormant_historical",
+        "historical" in str(issue.get("name", "")).lower()
+        and "not an active" in str(issue.get("description", "")).lower(),
+    )
     body_text = (ROOT / ".github/ISSUE_TEMPLATE/control-atom.yml").read_text(encoding="utf-8")
     assert_check("issue_form_transport_warning", "mutable transport" in body_text.lower())
     assert_check(
