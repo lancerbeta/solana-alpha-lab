@@ -4,8 +4,8 @@
   "review_id": "DELIVERY-HARNESS-INDEPENDENT-REVIEW-V1",
   "as_of": "2026-08-14",
   "task_id": "CTRL-DELIVERY-HARNESS-V1",
-  "reviewed_bindings_sha256": "eb5327b4529e23196ddd73fd203a145b996f1b5155e46b53ffea4ddd14e71c0d",
-  "reviewed_inventory_sha256": "a975e4236e413462fd4095d5fea6fb1217a6af937e54289796769aa3b55e56a1",
+  "reviewed_bindings_sha256": "89e05622afa621753b8dd725d445253431ed876954c5f3f3301f61c3e72b0721",
+  "reviewed_inventory_sha256": "f4f6404877eb87c76d5bd5891f9c158e21e48c239e16613d56b12147b6d2e909",
   "required_roles": ["CODE_REVIEWER", "GOAL_DOD_CRITIC", "ARCHITECTURE_CRITIC"],
   "reviews": [
     {"role": "CODE_REVIEWER", "verdict": "PASS", "findings": []},

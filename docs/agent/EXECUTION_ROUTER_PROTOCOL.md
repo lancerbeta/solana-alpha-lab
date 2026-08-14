@@ -57,6 +57,13 @@ keep/repair/rollback rule remains unchanged. The first harness installation is
 the sole exception: because v2 does not exist on its frozen base, the
 predecessor exact-owner route requires one pre-PR tracked-only gate.
 
+The exact pilot command retained for policy verification is
+`uv run --locked --managed-python python -B scripts/validate_ci.py --ci-owned-delivery`.
+`GITHUB_PR_EXACT_HEAD_CI` admits the next three eligible observations; record
+`observation N/3`, require 3/3 and seven minutes saved, and do not admit a
+fourth before keep/repair/rollback. A missed clean-checkout defect falls back
+to `--tracked-only-delivery`.
+
 ## Owner attention and guarded merge
 
 Routine bounded local/GitHub delivery continues without micro-approval. Stop

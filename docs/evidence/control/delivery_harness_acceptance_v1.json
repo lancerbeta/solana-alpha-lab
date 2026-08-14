@@ -40,10 +40,10 @@
     "delivery-harness/capability-radar.yaml": "6f68bfa257f5e227a96552f785c8f9eede7126c9e1f84eb2a5ed4bdf64d0d0e8",
     "delivery-harness/context-map.yaml": "ca881df9da3884deb480327f2fd070e249572aa50f1d8eef30e877b5dfbbcf4d",
     "delivery-harness/harness.yaml": "78b3c871860eb8a0fccf8b9782d678220489e4a4f87260ee16714e4a5bb1e62e",
-    "delivery-harness/policies/solana-alpha-lab.md": "a2659a7b16b52c4ef26f87a412abc99f32313f93b7a82a633023dcdca18abdb5",
+    "delivery-harness/policies/solana-alpha-lab.md": "ff8667d46d2e8aa00e5fc1d5409cebd04f49cbf313e486f5b014e5777ba4328f",
     "delivery-harness/project-profile.yaml": "5aff7be56febd2ebadab76ae6f86e7023dd1f5a6facf9bed58f07747779d3df1",
     "delivery-harness/templates/bootstrap-prompt.md": "0af2660e84b4f37d917832db88e5a03069fc85c3a331bc9476e24eddee171aef",
-    "delivery-harness/templates/portable-bundle-manifest.json": "6f25fa0903143cd2fae93c9e13af95557a56e632ebc7d82f14b1104f34923878",
+    "delivery-harness/templates/portable-bundle-manifest.json": "9130ff9c310b0309348240720c591867b6508b948acbe4f6c93118dd23dfc936",
     "delivery-harness/templates/portable-core/.cursor/commands/delivery-finish.md": "d4007af65c3fcad8be54269e4b341e53d9ebf64e04edc09013afdfff5b186ca3",
     "delivery-harness/templates/portable-core/.cursor/commands/delivery-start.md": "c28a2c63fc7826463a26e75927968935802193bec4adcc470f9b4fc4cd095f4b",
     "delivery-harness/templates/portable-core/AGENTS.md": "452ebadb254c594afa45df5ac978b1f54da0a1640214afba5ec9a48b3f3871af",
@@ -56,6 +56,7 @@
     "docs/agent/DELIVERY_CONTEXT_PROTOCOL.md": "c4c9ea00621df32c953a63641c49ec622bd4b156e80c2b2195e2bc654dbd738b",
     "docs/agent/DELIVERY_HARNESS_BOOTSTRAP.md": "d223d2d52cde600ae9cf265cb0e4145b46e365780d1de2d9965cbe440504a6d8",
     "docs/agent/DELIVERY_HARNESS_PROTOCOL.md": "e85ba3f1de833417c4c63de0f8e746be706a917306172fe1b8ec31a2b0ffc9cc",
+    "docs/agent/EXECUTION_ROUTER_PROTOCOL.md": "30ace6ee8e85e40149848650559eb5eb11b46e5a9bce10f2ee08002c5d1978dd",
     "docs/decisions/ADR-005-direct-delivery-harness.md": "11b40a38077c57127f224a63c3c4cf5c0bca7c6d910b7da83c5128adb4ebe59f",
     "docs/superpowers/plans/2026-08-13-delivery-harness-v1.md": "a0525254db20214bdf3834512a8ab92962f4164e2f98d47b139ff26a1b8827e8",
     "docs/superpowers/specs/2026-08-13-delivery-harness-design.md": "e8d053e95a0f9a42a668e769ef80ad95d45269af9a7ed63a14603ce39d536540",
@@ -85,14 +86,14 @@
   },
   "factory_fit": {
     "path": "docs/evidence/control/delivery_harness_factory_fit_v1.json",
-    "sha256": "d0b39298497724f8b229f347e3c4953670435be32b793624cb367108e7fcd842",
+    "sha256": "682c161ce3a2560406150caad618c7fce627b7873a5632dc761f90e2c0efd517",
     "verdict": "PASS"
   },
   "validation": {
     "targeted": "PASS_128_TARGETED_TESTS",
     "independent_review": {
       "path": "docs/evidence/control/delivery_harness_independent_review_v1.json",
-      "sha256": "302b6f1cf8092e6a9ff1cdc5b1b27616443a417c52c6700dda98b6cb490107ee",
+      "sha256": "ae574c0048f063ee707a18f9b888b4d561270644f23a488133559d75fefcfdb1",
       "verdict": "PASS"
     },
     "full_gate": "ENFORCED_BY_PROJECT_BOUND_VALIDATION",

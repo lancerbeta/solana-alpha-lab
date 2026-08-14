@@ -4156,7 +4156,7 @@ records:
     repository_path: docs/agent/EXECUTION_ROUTER_PROTOCOL.md
   integrity:
     kind: sha256
-    sha256: 80eb1d9118ec77a384c8424a36ee2876065fa22e2d2670e7b59deaeae0029dd2
+    sha256: 30ace6ee8e85e40149848650559eb5eb11b46e5a9bce10f2ee08002c5d1978dd
   access:
     mode: read_only
     method: file
@@ -19293,7 +19293,7 @@ records:
   as_of: '2026-08-14'
   truth_owner: CTRL-DELIVERY-HARNESS-001
   location: {kind: git_path, logical_uri: 'repo://delivery-harness/templates/portable-bundle-manifest.json', repository_path: delivery-harness/templates/portable-bundle-manifest.json}
-  integrity: {kind: sha256, sha256: 6f25fa0903143cd2fae93c9e13af95557a56e632ebc7d82f14b1104f34923878}
+  integrity: {kind: sha256, sha256: 9130ff9c310b0309348240720c591867b6508b948acbe4f6c93118dd23dfc936}
   access: *t25_read_file
   relations:
   - {relation_type: governed_by, target_asset_id: CTRL-DELIVERY-HARNESS-001}
