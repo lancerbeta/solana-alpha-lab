@@ -399,10 +399,16 @@ class CiOwnedDeliveryPilotTests(unittest.TestCase):
             "schemas/schema_v1.sql",
             "migrations/0001_canonical_schema_v1.sql",
             "catalog/schemas/asset_catalog.schema.json",
+            "catalog/schemas/catalog_manifest.schema.json",
+            "catalog/schemas/lifecycle_registry.schema.json",
+            "catalog/schemas/delivery_harness.schema.json",
+            "catalog/schemas/delivery_harness_task_contract.schema.json",
+            "catalog/schemas/owner_attention_gate_v2.schema.json",
+            "catalog/schemas/project_sources_release_registry.schema.json",
+            "catalog/schemas/query_recipe.schema.json",
             "src/solana_alpha_lab/contracts/schema_v1.py",
             "src/solana_alpha_lab/contracts/migration_ledger.py",
             "tests/test_ci.py",
-            "tests/test_catalog.py",
             "tests/test_generate_navigation.py",
             "tests/test_pre_git_import.py",
             "tests/test_project_sources_release_registry.py",
@@ -419,6 +425,49 @@ class CiOwnedDeliveryPilotTests(unittest.TestCase):
                     "ci_owned_delivery_ineligible_paths",
                 ):
                     ci.validate_ci_owned_delivery_eligibility([path])
+
+    def test_product_task_schema_and_catalog_inventory_are_eligible(self) -> None:
+        changed_paths = [
+            "src/solana_alpha_lab/task30_example.py",
+            "tests/test_task30_example.py",
+            "tests/test_catalog.py",
+            "catalog/schemas/task30_a25_h07_h01_limited_diagnostic.schema.json",
+            "catalog/schemas/provider_route_capability_registry_v6.schema.json",
+            "configs/task30_example_v1.yaml",
+            "docs/contracts/task30_example_v1.md",
+            "catalog/assets/core.yaml",
+            "catalog/generated/asset_edges.json",
+            "docs/PROJECT_MAP.md",
+        ]
+        self.assertEqual(
+            ci.validate_ci_owned_delivery_eligibility(changed_paths),
+            changed_paths,
+        )
+
+    def test_tracked_only_clone_env_uses_hardlink_and_drops_sandbox_cache(
+        self,
+    ) -> None:
+        source = {
+            "PATH": "/bin",
+            "UV_CACHE_DIR": (
+                r"C:\Users\someone\AppData\Local\Temp\cursor-sandbox-cache\uv"
+            ),
+            "VIRTUAL_ENV": r"C:\venv",
+            "UV_LINK_MODE": "symlink",
+        }
+        environment = ci.tracked_only_clone_environment(source)
+        self.assertEqual(environment["UV_LINK_MODE"], "hardlink")
+        self.assertNotIn("UV_CACHE_DIR", environment)
+        self.assertNotIn("VIRTUAL_ENV", environment)
+        self.assertEqual(environment["UV_OFFLINE"], "1")
+        self.assertEqual(environment["UV_NO_ENV_FILE"], "1")
+        self.assertEqual(environment["SMIAL_TRACKED_ONLY_DELIVERY"], "1")
+
+    def test_tracked_only_clone_env_keeps_non_sandbox_cache(self) -> None:
+        cache = r"C:\Users\someone\AppData\Local\uv\cache"
+        environment = ci.tracked_only_clone_environment({"UV_CACHE_DIR": cache})
+        self.assertEqual(environment["UV_CACHE_DIR"], cache)
+        self.assertEqual(environment["UV_LINK_MODE"], "hardlink")
 
     def test_focused_gate_retains_controls_without_full_repository_suite(self) -> None:
         commands = {label: command for label, command in ci.ci_owned_child_commands()}

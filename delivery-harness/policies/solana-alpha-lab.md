@@ -163,6 +163,16 @@ observations, records `observation N/3`, requires 3/3 first-head CI and at least
 seven minutes saved. After 3/3, do not admit a fourth before keep/repair/rollback.
 A false admission, missed clean-checkout/local-data defect or focused overrun
 falls back to `--tracked-only-delivery`.
+Product `catalog/schemas/task*_*.schema.json`,
+`provider_route_capability_registry*.schema.json`, and mechanical
+`tests/test_catalog.py` inventory updates are eligible for the focused
+primary. Meta/harness catalog schemas (`asset_catalog.schema.json`,
+`catalog_manifest.schema.json`, `lifecycle_registry.schema.json`,
+`delivery_harness*.schema.json`, `owner_attention_gate_v2.schema.json`,
+`project_sources_release_registry.schema.json`, and other
+catalog/harness/validator schemas), `tests/test_ci.py`,
+`scripts/validate_*`, `.github/`, `control/`, and `docs/agent/` remain
+ineligible and keep `--tracked-only-delivery`.
 
 ## CONTROL_ONLY_TASK_CLOSE_FAST_PATH
 
