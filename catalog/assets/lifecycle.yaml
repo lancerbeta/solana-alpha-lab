@@ -66,7 +66,7 @@ records:
     repository_path: registries/global_trial_ledger.yaml
   integrity:
     kind: sha256
-    sha256: a1f6d586f3e8ee1997bef581191f3e6badf937fc65e743826b10c46d467da020
+    sha256: e3b2415f0efbf8fdeedebad17fee0b105dda835a66cd24759863c5c8f0bc5e73
   access: *id001
   relations: *id002
   consumers:
@@ -189,7 +189,7 @@ records:
   evidence: []
   classification: *id004
 - asset_id: REGISTRY-DECISIONS-NEGATIVE-RESULTS-001
-  record_version: '1.11'
+  record_version: '1.12'
   asset_type: lifecycle_registry
   purpose: Active registry for decisions and durable negative research results.
   status: VALIDATED_ACTIVE
@@ -202,7 +202,7 @@ records:
     repository_path: registries/decisions_negative_results.yaml
   integrity:
     kind: sha256
-    sha256: 165b523571542c19e25edf3a88c7e770d23906512b4ad5fdde8cf192f03d4e7f
+    sha256: 9d98f898fad8449b7c51bb074c732b5a3a601beb3f6e4dad9b64856579d06afb
   access: *id001
   relations: *id002
   consumers: *id003
@@ -214,7 +214,7 @@ records:
   purpose: Deterministic human-readable navigation projected only from the Catalog.
   status: IMPLEMENTED_UNVERIFIED
   origin: REPOSITORY
-  as_of: '2026-08-15'
+  as_of: '2026-08-16'
   truth_owner: TASK-04
   location:
     kind: git_path
@@ -222,7 +222,7 @@ records:
     repository_path: docs/PROJECT_MAP.md
   integrity:
     kind: sha256
-    sha256: 47ad40daaa64903dc04c349d1ff605edfee80678be09f4db75c384b76aa29c1f
+    sha256: 9138be37dffc2f12d309245f9b9cda4bf70ade928ae18c27b23196a7e559cd18
   access:
     mode: read_only
     method: file
@@ -269,12 +269,12 @@ records:
   evidence: []
   classification: *id004
 - asset_id: GENERATED-EDGE-PROJECTION-001
-  record_version: '1.80'
+  record_version: '1.81'
   asset_type: generated_view
   purpose: Deterministic machine-readable projection of Catalog asset relations.
   status: IMPLEMENTED_UNVERIFIED
   origin: REPOSITORY
-  as_of: '2026-08-15'
+  as_of: '2026-08-16'
   truth_owner: TASK-04
   location:
     kind: git_path
@@ -282,7 +282,7 @@ records:
     repository_path: catalog/generated/asset_edges.json
   integrity:
     kind: sha256
-    sha256: 3f01aeb28d33195c86e9c3290532f01657aec3c69459851812f9b8e4eeea9ccc
+    sha256: ad92fd8d1a1c73567811920928a068c85d2b17db7dd95dbfd7ffd0c4ccea2ae8
   access:
     mode: read_only
     method: file

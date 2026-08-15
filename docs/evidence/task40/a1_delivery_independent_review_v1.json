@@ -1,0 +1,53 @@
+{
+  "as_of": "2026-08-16",
+  "non_claims": [
+    "NO_CRYPTOGRAPHIC_REVIEWER_IDENTITY",
+    "SINGLE_AGENT_REVIEW_FALLBACK",
+    "REVIEW_IS_NOT_TASK40_SEMANTIC_DONE"
+  ],
+  "required_roles": [
+    "CODE_REVIEWER",
+    "GOAL_DOD_CRITIC",
+    "ARCHITECTURE_CRITIC"
+  ],
+  "review_id": "T40-A1-DELIVERY-INDEPENDENT-REVIEW-001",
+  "reviewed_bindings_sha256": "b22adef6adfa2f310ffd563e4872f36fcbba44b5425fec1425f428e922147cef",
+  "reviewed_inventory_sha256": "434d2fa9bae129a298506d746a64ec6b9c7680a20719f6894520d315d4d3ed2b",
+  "reviews": [
+    {
+      "findings": [
+        "CHECKED_PDA_SEEDS_PINNED_AND_DERIVED_ADDRESS_FROZEN",
+        "CHECKED_PAYLOAD_IS_SEALED_A22_SHAPE_WITH_BONDING_CURVE_AND_NO_DAY_WINDOW",
+        "CHECKED_PUMP_PROGRAM_POOL_AND_MINT_ARE_NEVER_GTA_TARGETS",
+        "CHECKED_TRIAL_REGISTERS_PENDING_BEFORE_OUTCOME",
+        "CHECKED_LIVE_THREE_PAGE_BOUND_AND_PINNED_PUMP_DECODE",
+        "CHECKED_NO_SECRET_IN_TRACKED_RECEIPTS"
+      ],
+      "role": "CODE_REVIEWER",
+      "verdict": "PASS"
+    },
+    {
+      "findings": [
+        "CHECKED_OUTCOME_IS_HISTORICAL_ROUTE_WRONG_ADDRESS_OR_EVENT_NOT_INFRASTRUCTURE_ONLY",
+        "CHECKED_CREATE_AND_MIGRATION_REMAIN_ZERO_ON_OLDEST_2393_CURVE_TXS",
+        "CHECKED_H13_H02_UNBOUNDED_PROGRAM_GTA_AND_RC001_MUTATION_REMAIN_FORBIDDEN",
+        "CHECKED_NO_ALPHA_PIT_EXECUTION_OR_CASHFLOW_CLAIM"
+      ],
+      "role": "GOAL_DOD_CRITIC",
+      "verdict": "PASS"
+    },
+    {
+      "findings": [
+        "CHECKED_ONE_HELIUS_ROUTE_ADOPTED_NOT_A_NEW_PROVIDER",
+        "CHECKED_PDA_SUBSET_WRAPS_OFFICIAL_IDL_SEEDS_NO_NEW_DEPENDENCY",
+        "SINGLE_AGENT_REVIEW_FALLBACK_WITHOUT_ISOLATED_CONTEXT_CRITICS"
+      ],
+      "role": "ARCHITECTURE_CRITIC",
+      "verdict": "PASS"
+    }
+  ],
+  "schema": "smial.delivery-independent-review-evidence",
+  "schema_version": "1.0",
+  "task_id": "TASK-40",
+  "verdict": "PASS"
+}

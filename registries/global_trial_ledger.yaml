@@ -62,3 +62,11 @@ records:
   - EVIDENCE-T39-RC002-H11-NAMED-MINT-GTA-001
   hypothesis_id: HYP-RC002-H11-LIFECYCLE-CLOCK-V1
   outcome: INCONCLUSIVE
+- record_kind: trial
+  record_id: TRIAL-RC002-H11-BONDING-CURVE-PDA-GTA-001
+  status: RECORDED
+  created_at: '2026-08-15T23:03:21Z'
+  evidence_asset_ids:
+  - EVIDENCE-T40-RC002-H11-BONDING-CURVE-PDA-GTA-001
+  hypothesis_id: HYP-RC002-H11-LIFECYCLE-CLOCK-V1
+  outcome: INCONCLUSIVE

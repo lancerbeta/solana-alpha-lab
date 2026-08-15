@@ -828,6 +828,11 @@
       "target_asset_id": "CONTRACT-T39-RC002-H11-NAMED-MINT-GTA-001"
     },
     {
+      "source_asset_id": "CONFIG-T40-RC002-H11-BONDING-CURVE-PDA-GTA-001",
+      "relation": "governed_by",
+      "target_asset_id": "CONTRACT-T40-RC002-H11-BONDING-CURVE-PDA-GTA-001"
+    },
+    {
       "source_asset_id": "CONTRACT-CANARY-SPECIFICATION-ONLY-001",
       "relation": "derived_from",
       "target_asset_id": "CONTRACT-OWNER-AUTHORITY-PACKET-001"
@@ -1603,6 +1608,16 @@
       "target_asset_id": "EVIDENCE-T37-RC002-H11-CLOCK-CAPTURE-001"
     },
     {
+      "source_asset_id": "CONTRACT-T40-RC002-H11-BONDING-CURVE-PDA-GTA-001",
+      "relation": "depends_on",
+      "target_asset_id": "EVIDENCE-T38-RC002-H11-NEXT-GTA-001"
+    },
+    {
+      "source_asset_id": "CONTRACT-T40-RC002-H11-BONDING-CURVE-PDA-GTA-001",
+      "relation": "depends_on",
+      "target_asset_id": "EVIDENCE-T39-RC002-H11-NAMED-MINT-GTA-001"
+    },
+    {
       "source_asset_id": "CONTROL-T21-ACTIVE-TIME-GATE-001",
       "relation": "governed_by",
       "target_asset_id": "CONTRACT-T21-A7-ACCEPTANCE-001"
@@ -1991,6 +2006,21 @@
       "source_asset_id": "CTRL-TASK-39-001",
       "relation": "depends_on",
       "target_asset_id": "EVIDENCE-T37-RC002-H11-CLOCK-CAPTURE-001"
+    },
+    {
+      "source_asset_id": "CTRL-TASK-40-001",
+      "relation": "contains",
+      "target_asset_id": "CONTRACT-T40-RC002-H11-BONDING-CURVE-PDA-GTA-001"
+    },
+    {
+      "source_asset_id": "CTRL-TASK-40-001",
+      "relation": "contains",
+      "target_asset_id": "SCRIPT-T40-RC002-H11-BONDING-CURVE-PDA-GTA-001"
+    },
+    {
+      "source_asset_id": "CTRL-TASK-40-001",
+      "relation": "depends_on",
+      "target_asset_id": "EVIDENCE-T39-RC002-H11-NAMED-MINT-GTA-001"
     },
     {
       "source_asset_id": "CTRL-UVLOCK-001",
@@ -4988,6 +5018,71 @@
       "target_asset_id": "TEST-T39-RC002-H11-NAMED-MINT-GTA-001"
     },
     {
+      "source_asset_id": "EVIDENCE-T40-A1-DELIVERY-COMPLETION-001",
+      "relation": "depends_on",
+      "target_asset_id": "EVIDENCE-T40-A1-DELIVERY-FACTORY-FIT-001"
+    },
+    {
+      "source_asset_id": "EVIDENCE-T40-A1-DELIVERY-COMPLETION-001",
+      "relation": "depends_on",
+      "target_asset_id": "EVIDENCE-T40-A1-DELIVERY-INDEPENDENT-REVIEW-001"
+    },
+    {
+      "source_asset_id": "EVIDENCE-T40-A1-DELIVERY-COMPLETION-001",
+      "relation": "depends_on",
+      "target_asset_id": "SCHEMA-DELIVERY-COMPLETION-EVIDENCE-001"
+    },
+    {
+      "source_asset_id": "EVIDENCE-T40-A1-DELIVERY-COMPLETION-001",
+      "relation": "derived_from",
+      "target_asset_id": "EVIDENCE-T40-RC002-H11-BONDING-CURVE-PDA-GTA-001"
+    },
+    {
+      "source_asset_id": "EVIDENCE-T40-A1-DELIVERY-FACTORY-FIT-001",
+      "relation": "depends_on",
+      "target_asset_id": "EVIDENCE-T40-A1-DELIVERY-INDEPENDENT-REVIEW-001"
+    },
+    {
+      "source_asset_id": "EVIDENCE-T40-A1-DELIVERY-FACTORY-FIT-001",
+      "relation": "derived_from",
+      "target_asset_id": "EVIDENCE-T40-RC002-H11-BONDING-CURVE-PDA-GTA-001"
+    },
+    {
+      "source_asset_id": "EVIDENCE-T40-A1-DELIVERY-INDEPENDENT-REVIEW-001",
+      "relation": "depends_on",
+      "target_asset_id": "SCHEMA-DELIVERY-INDEPENDENT-REVIEW-EVIDENCE-001"
+    },
+    {
+      "source_asset_id": "EVIDENCE-T40-A1-DELIVERY-INDEPENDENT-REVIEW-001",
+      "relation": "derived_from",
+      "target_asset_id": "EVIDENCE-T40-RC002-H11-BONDING-CURVE-PDA-GTA-001"
+    },
+    {
+      "source_asset_id": "EVIDENCE-T40-RC002-H11-BONDING-CURVE-PDA-GTA-001",
+      "relation": "depends_on",
+      "target_asset_id": "EVIDENCE-T40-RC002-H11P-BONDING-CURVE-PDA-GTA-001"
+    },
+    {
+      "source_asset_id": "EVIDENCE-T40-RC002-H11-BONDING-CURVE-PDA-GTA-001",
+      "relation": "derived_from",
+      "target_asset_id": "CONTRACT-T40-RC002-H11-BONDING-CURVE-PDA-GTA-001"
+    },
+    {
+      "source_asset_id": "EVIDENCE-T40-RC002-H11-BONDING-CURVE-PDA-GTA-001",
+      "relation": "validated_by",
+      "target_asset_id": "TEST-T40-RC002-H11-BONDING-CURVE-PDA-GTA-001"
+    },
+    {
+      "source_asset_id": "EVIDENCE-T40-RC002-H11P-BONDING-CURVE-PDA-GTA-001",
+      "relation": "derived_from",
+      "target_asset_id": "CONFIG-T40-RC002-H11-BONDING-CURVE-PDA-GTA-001"
+    },
+    {
+      "source_asset_id": "EVIDENCE-T40-RC002-H11P-BONDING-CURVE-PDA-GTA-001",
+      "relation": "validated_by",
+      "target_asset_id": "TEST-T40-RC002-H11-BONDING-CURVE-PDA-GTA-001"
+    },
+    {
       "source_asset_id": "FIXTURE-BATON-SUITE-001",
       "relation": "governed_by",
       "target_asset_id": "CTRL-BATON-SETUP-001"
@@ -5701,6 +5796,16 @@
       "source_asset_id": "FIXTURE-T39-RC002-H11-NAMED-MINT-GTA-001",
       "relation": "governed_by",
       "target_asset_id": "CONTRACT-T39-RC002-H11-NAMED-MINT-GTA-001"
+    },
+    {
+      "source_asset_id": "FIXTURE-T40-RC002-H11-BONDING-CURVE-PDA-GTA-001",
+      "relation": "governed_by",
+      "target_asset_id": "CONTRACT-T40-RC002-H11-BONDING-CURVE-PDA-GTA-001"
+    },
+    {
+      "source_asset_id": "FIXTURE-T40-RC002-H11-BONDING-CURVE-PDA-SUBSET-001",
+      "relation": "governed_by",
+      "target_asset_id": "CONTRACT-T40-RC002-H11-BONDING-CURVE-PDA-GTA-001"
     },
     {
       "source_asset_id": "GENERATED-EDGE-PROJECTION-001",
@@ -6918,6 +7023,21 @@
       "target_asset_id": "TEST-T39-RC002-H11-NAMED-MINT-GTA-001"
     },
     {
+      "source_asset_id": "MODULE-T40-RC002-H11-BONDING-CURVE-PDA-GTA-001",
+      "relation": "depends_on",
+      "target_asset_id": "CONFIG-T40-RC002-H11-BONDING-CURVE-PDA-GTA-001"
+    },
+    {
+      "source_asset_id": "MODULE-T40-RC002-H11-BONDING-CURVE-PDA-GTA-001",
+      "relation": "governed_by",
+      "target_asset_id": "CONTRACT-T40-RC002-H11-BONDING-CURVE-PDA-GTA-001"
+    },
+    {
+      "source_asset_id": "MODULE-T40-RC002-H11-BONDING-CURVE-PDA-GTA-001",
+      "relation": "validated_by",
+      "target_asset_id": "TEST-T40-RC002-H11-BONDING-CURVE-PDA-GTA-001"
+    },
+    {
       "source_asset_id": "POLICY-OWNER-ATTENTION-GATE-001",
       "relation": "contains",
       "target_asset_id": "SCRIPT-OWNER-ATTENTION-GATE-001"
@@ -7436,6 +7556,11 @@
       "source_asset_id": "REPORT-T39-RC002-H11-NAMED-MINT-GTA-001",
       "relation": "derived_from",
       "target_asset_id": "EVIDENCE-T39-RC002-H11P-NAMED-MINT-GTA-001"
+    },
+    {
+      "source_asset_id": "REPORT-T40-RC002-H11-BONDING-CURVE-PDA-GTA-001",
+      "relation": "derived_from",
+      "target_asset_id": "EVIDENCE-T40-RC002-H11P-BONDING-CURVE-PDA-GTA-001"
     },
     {
       "source_asset_id": "ROADMAP-PATCH-T21-PRODUCT-VISION-001",
@@ -8021,6 +8146,11 @@
       "source_asset_id": "SCHEMA-T39-RC002-H11-NAMED-MINT-GTA-001",
       "relation": "governed_by",
       "target_asset_id": "CONTRACT-T39-RC002-H11-NAMED-MINT-GTA-001"
+    },
+    {
+      "source_asset_id": "SCHEMA-T40-RC002-H11-BONDING-CURVE-PDA-GTA-001",
+      "relation": "governed_by",
+      "target_asset_id": "CONTRACT-T40-RC002-H11-BONDING-CURVE-PDA-GTA-001"
     },
     {
       "source_asset_id": "SCM-BASELINE-COMMIT-001",
@@ -8626,6 +8756,16 @@
       "source_asset_id": "SCRIPT-T39-RC002-H11-NAMED-MINT-GTA-001",
       "relation": "governed_by",
       "target_asset_id": "CONTRACT-T39-RC002-H11-NAMED-MINT-GTA-001"
+    },
+    {
+      "source_asset_id": "SCRIPT-T40-RC002-H11-BONDING-CURVE-PDA-GTA-001",
+      "relation": "depends_on",
+      "target_asset_id": "MODULE-T40-RC002-H11-BONDING-CURVE-PDA-GTA-001"
+    },
+    {
+      "source_asset_id": "SCRIPT-T40-RC002-H11-BONDING-CURVE-PDA-GTA-001",
+      "relation": "governed_by",
+      "target_asset_id": "CONTRACT-T40-RC002-H11-BONDING-CURVE-PDA-GTA-001"
     },
     {
       "source_asset_id": "SCRIPT-TASK-CLOSE-FAST-PATH-001",
@@ -10646,6 +10786,26 @@
       "source_asset_id": "TEST-T39-RC002-H11-NAMED-MINT-GTA-001",
       "relation": "depends_on",
       "target_asset_id": "SCHEMA-T39-RC002-H11-NAMED-MINT-GTA-001"
+    },
+    {
+      "source_asset_id": "TEST-T40-RC002-H11-BONDING-CURVE-PDA-GTA-001",
+      "relation": "depends_on",
+      "target_asset_id": "CONFIG-T40-RC002-H11-BONDING-CURVE-PDA-GTA-001"
+    },
+    {
+      "source_asset_id": "TEST-T40-RC002-H11-BONDING-CURVE-PDA-GTA-001",
+      "relation": "depends_on",
+      "target_asset_id": "FIXTURE-T40-RC002-H11-BONDING-CURVE-PDA-GTA-001"
+    },
+    {
+      "source_asset_id": "TEST-T40-RC002-H11-BONDING-CURVE-PDA-GTA-001",
+      "relation": "depends_on",
+      "target_asset_id": "MODULE-T40-RC002-H11-BONDING-CURVE-PDA-GTA-001"
+    },
+    {
+      "source_asset_id": "TEST-T40-RC002-H11-BONDING-CURVE-PDA-GTA-001",
+      "relation": "depends_on",
+      "target_asset_id": "SCHEMA-T40-RC002-H11-BONDING-CURVE-PDA-GTA-001"
     },
     {
       "source_asset_id": "TEST-TASK-CLOSE-FAST-PATH-001",

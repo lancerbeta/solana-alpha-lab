@@ -54,6 +54,7 @@ class CatalogImportTests(unittest.TestCase):
                 "TRIAL-RC002-H11-MIGRATION-CLOCK-CAPTURE-001",
                 "TRIAL-RC002-H11-NEXT-GTA-TARGET-001",
                 "TRIAL-RC002-H11-NAMED-MINT-GTA-001",
+                "TRIAL-RC002-H11-BONDING-CURVE-PDA-GTA-001",
             ],
         )
         self.assertEqual(
@@ -80,6 +81,7 @@ class CatalogImportTests(unittest.TestCase):
                 "DECISION-T37-RC002-H11-CLOCK-CAPTURE-001",
                 "DECISION-T38-RC002-H11-NEXT-GTA-001",
                 "DECISION-T39-RC002-H11-NAMED-MINT-GTA-001",
+                "DECISION-T40-RC002-H11-BONDING-CURVE-PDA-GTA-001",
             ],
         )
         self.assertTrue(
