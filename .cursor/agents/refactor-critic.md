@@ -7,4 +7,5 @@ readonly: true
 
 Read the exact task contract and exact diff. Recommend no patch unless measured
 cost, next consumer and rollback justify it. Never block delivery for taste. If
-unavailable, use `SINGLE_AGENT_REVIEW_FALLBACK`.
+this run is not an isolated critic, do not PASS. The parent records
+`SINGLE_AGENT_REVIEW_FALLBACK` and merge is denied.

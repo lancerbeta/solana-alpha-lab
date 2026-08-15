@@ -1,0 +1,34 @@
+{
+  "as_of": "2026-08-16",
+  "capability_radar": {
+    "now": "NONE",
+    "watch": "FIRST_UNATTENDED_RUNTIME_WITH_NAMED_INCIDENT_CONSUMER"
+  },
+  "dimensions": {
+    "build_vs_buy": "PASS_ADOPT_TASK30_XB_AND_EXISTING_CRITIC_AGENTS",
+    "context_efficiency": "PASS_ONE_TASK_CONTRACT_NO_NEW_REVIEW_SCHEMA",
+    "execution_to_cashflow": "NOT_APPLICABLE",
+    "flexibility_and_history": "PASS_HISTORICAL_RECEIPTS_UNCHANGED",
+    "mission": "PASS_OWNER_NEED_NOT_REMEMBER_TO_REJECT_SELF_REVIEW",
+    "monitoring_and_recovery": "PASS_NO_BACKGROUND_PROCESS",
+    "owner_operability": "PASS_MERGE_DENIES_RECORDED_AUTHOR_AS_REVIEWER",
+    "red_team": "PASS_ADMISSION_STRING_DENY_NOT_IDENTITY_PROOF",
+    "research_truth": "PASS_RAW_PAGE_NOCLOBBER_DUCKDB_UNCHANGED",
+    "security": "PASS_SECRET_FREE_OFFLINE_ATOM"
+  },
+  "limits": [
+    "NO_CRYPTOGRAPHIC_REVIEWER_IDENTITY",
+    "OMITTED_ADMISSION_STILL_GROUNDS_MERGE",
+    "XB_TRUNCATION_CAN_STICK_ON_PATH",
+    "NO_PRODUCT_ACCEPTANCE_OR_CASHFLOW"
+  ],
+  "mode": "FULL_REVIEW",
+  "recovery": "REVERT_TASK41_TRACKED_OUTPUTS; PRESERVE_TASK39_SCIENCE_AND_A4_RAW",
+  "review_id": "T41-A1-DELIVERY-FACTORY-FIT-001",
+  "reviewed_bindings_sha256": "f33c1d2bb859c9912b92185bc6d8ea923fd64dd9f764ababcd58e2f6f56f66c3",
+  "reviewed_inventory_sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+  "schema": "smial.delivery-harness-factory-fit",
+  "schema_version": "1.0",
+  "task_id": "TASK-41",
+  "verdict": "PASS"
+}

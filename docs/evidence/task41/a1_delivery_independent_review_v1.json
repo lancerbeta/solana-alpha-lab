@@ -1,0 +1,58 @@
+{
+  "as_of": "2026-08-16",
+  "non_claims": [
+    "NO_CRYPTOGRAPHIC_REVIEWER_IDENTITY",
+    "REVIEW_IS_NOT_TASK41_SEMANTIC_DONE",
+    "ISOLATION_IS_ADMISSION_DENY_NOT_IDENTITY_PROOF"
+  ],
+  "required_roles": [
+    "CODE_REVIEWER",
+    "GOAL_DOD_CRITIC",
+    "ARCHITECTURE_CRITIC"
+  ],
+  "review_id": "T41-A1-DELIVERY-INDEPENDENT-REVIEW-001",
+  "reviewed_bindings_sha256": "f33c1d2bb859c9912b92185bc6d8ea923fd64dd9f764ababcd58e2f6f56f66c3",
+  "reviewed_inventory_sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+  "reviews": [
+    {
+      "findings": [
+        "CHECKED_EXCLUSIVE_OPEN_XB",
+        "CHECKED_EXCLUSIVE_REPLAY_IDENTICAL",
+        "CHECKED_EXCLUSIVE_CONFLICT_UNCHANGED",
+        "CHECKED_WRITE_RAW_PAGE_BODY_AND_MANIFEST_EXCLUSIVE",
+        "CHECKED_BOUND_EVIDENCE_DENIES_FALLBACK_BEFORE_FIT_PASS",
+        "CHECKED_TEST_FALSIFIERS_FOR_CLOBBER_AND_FALLBACK"
+      ],
+      "role": "CODE_REVIEWER",
+      "verdict": "PASS"
+    },
+    {
+      "findings": [
+        "CHECKED_ISOLATED_CRITIC",
+        "CHECKED_DOD_MERGE_DENY_AND_EXCLUSIVE_WRITE",
+        "CHECKED_PROMPTS_REQUIRE_ISOLATED_LAUNCH",
+        "CHECKED_NON_GOALS_NO_RUFF_NO_DOMAIN_EXTRACTION",
+        "CHECKED_CHEAPEST_FALSIFIER_ENCODED_IN_TESTS"
+      ],
+      "role": "GOAL_DOD_CRITIC",
+      "verdict": "PASS"
+    },
+    {
+      "findings": [
+        "CHECKED_ISOLATED_CRITIC_RUN",
+        "CHECKED_MERGE_DENY_IS_RECEIPT_TIGHTENING",
+        "CHECKED_FAIL_CLOSED_ON_RECORDED_ADMISSION_STRING",
+        "CHECKED_H11_TRUTH_IS_A4_RAW_PLUS_MANIFEST",
+        "CHECKED_TASK37_PRIVATE_IMPORT_OUT_OF_SCOPE",
+        "CHECKED_NO_NEW_PIT_CLAIM",
+        "CHECKED_OMITTED_ADMISSION_STILL_GROUNDS_AND_IS_NAMED_NON_CLAIM"
+      ],
+      "role": "ARCHITECTURE_CRITIC",
+      "verdict": "PASS"
+    }
+  ],
+  "schema": "smial.delivery-independent-review-evidence",
+  "schema_version": "1.0",
+  "task_id": "TASK-41",
+  "verdict": "PASS"
+}

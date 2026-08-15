@@ -24,6 +24,10 @@ from solana_alpha_lab.pump_event_decoder import (
     PUMP_PROGRAM_ID,
     load_pinned_pump_event_plan,
 )
+from solana_alpha_lab.storage.exclusive import (
+    write_exclusive_bytes,
+    write_exclusive_text,
+)
 from solana_alpha_lab.task30_helius_get_transactions_for_address import (
     EXPECTED_ENDPOINT,
     EXPECTED_METHOD,
@@ -298,8 +302,7 @@ def write_raw_page(raw_root: Path, *, run_id: str, page_number: int, body: bytes
     page_root = raw_root / f"run={run_id}" / f"page={page_number:03d}"
     page_root.mkdir(parents=True, exist_ok=True)
     path = page_root / "raw_response.json"
-    path.write_bytes(body)
-    digest = sha256_bytes(body)
+    digest, _outcome = write_exclusive_bytes(path, body)
     manifest = {
         "schema": "smial.task39.named-mint-gta.raw-manifest",
         "schema_version": "1.0",
@@ -309,10 +312,9 @@ def write_raw_page(raw_root: Path, *, run_id: str, page_number: int, body: bytes
         "raw_sha256": digest,
         "retention_class": "A4_OUTSIDE_GIT",
     }
-    (page_root / "raw_manifest_v1.json").write_text(
+    write_exclusive_text(
+        page_root / "raw_manifest_v1.json",
         json.dumps(manifest, indent=2, sort_keys=True) + "\n",
-        encoding="utf-8",
-        newline="\n",
     )
     return manifest
 

@@ -735,7 +735,7 @@ records:
     repository_path: AGENTS.md
   integrity:
     kind: sha256
-    sha256: 39d2db33970b886021ffea887cd051a995e05f1cb2c8c1ccce366d7f382212ab
+    sha256: 808f38cad4954d49faf933328943ac49625d14d694bb17555f9d2f732b65f142
   access:
     mode: read_only
     method: file
@@ -4642,7 +4642,7 @@ records:
     repository_path: .github/pull_request_template.md
   integrity:
     kind: sha256
-    sha256: ff8dcedd7804ffc8811cc76f2aa4cdbfe2b6a6cb09f433e13b2b89cae4a10876
+    sha256: d6d025436652d44d250571a5772585dcfac6c0662e5df4c88779bdc457634aff
   access:
     mode: read_only
     method: file
@@ -16307,7 +16307,7 @@ records:
   as_of: '2026-08-14'
   truth_owner: CTRL-DELIVERY-HARNESS-001
   location: {kind: git_path, logical_uri: 'repo://scripts/owner_attention_gate.py', repository_path: scripts/owner_attention_gate.py}
-  integrity: {kind: sha256, sha256: 11e2a2d8a7b3a9a17b3f2c2258f62b332227ff410e5fc788919fdaf904ec96ac}
+  integrity: {kind: sha256, sha256: cb4c65cbebcb0f5cb2c53679f0d62bda53596ce1272325d5b123a1f6b8c5c3ab}
   access: *t25_read_file
   relations:
   - {relation_type: governed_by, target_asset_id: POLICY-OWNER-ATTENTION-GATE-002}
@@ -19872,7 +19872,7 @@ records:
   as_of: '2026-08-14'
   truth_owner: CTRL-DELIVERY-HARNESS-001
   location: {kind: git_path, logical_uri: 'repo://.agents/skills/delivery-harness/SKILL.md', repository_path: .agents/skills/delivery-harness/SKILL.md}
-  integrity: {kind: sha256, sha256: 6364595e1de363f81ff3ebf1372ed650a613ce483daed0d05a7a4d677873bf74}
+  integrity: {kind: sha256, sha256: 20fb89acf4c171c7202b4925b231f5736b767a58fd1acb2256c74ab4a265bfea}
   access: *t25_read_file
   relations:
   - {relation_type: governed_by, target_asset_id: CTRL-DELIVERY-HARNESS-001}
@@ -19926,7 +19926,7 @@ records:
   as_of: '2026-08-14'
   truth_owner: CTRL-DELIVERY-HARNESS-001
   location: {kind: git_path, logical_uri: 'repo://docs/agent/DELIVERY_HARNESS_PROTOCOL.md', repository_path: docs/agent/DELIVERY_HARNESS_PROTOCOL.md}
-  integrity: {kind: sha256, sha256: 2ba3f67901f887cb6fe36076611d28055e96ecf98c00294dcb92757bd0ea1f7a}
+  integrity: {kind: sha256, sha256: ad0a43b9c3ad2dc66abc8fa7bf60ddd0571037acc84a9a416d2e259118b3e422}
   access: *t25_read_file
   relations:
   - {relation_type: governed_by, target_asset_id: ADR-DIRECT-DELIVERY-HARNESS-005}
@@ -22711,7 +22711,7 @@ records:
   as_of: '2026-08-15'
   truth_owner: TASK-39
   location: {kind: git_path, logical_uri: 'repo://src/solana_alpha_lab/task39_h11_named_mint_gta_clock_capture.py', repository_path: src/solana_alpha_lab/task39_h11_named_mint_gta_clock_capture.py}
-  integrity: {kind: sha256, sha256: 8e057dd831c7a9003e0ccf07bc1f4c0ae62d46ecbfef416749dc58ab3376bfd8}
+  integrity: {kind: sha256, sha256: 8a78a2b16f50c8c928c23452eb6eb55813a9aa97a6623a5b39486bd95b5a0935}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: governed_by, target_asset_id: CONTRACT-T39-RC002-H11-NAMED-MINT-GTA-001}
@@ -22750,7 +22750,7 @@ records:
   as_of: '2026-08-15'
   truth_owner: TASK-39
   location: {kind: git_path, logical_uri: 'repo://tests/test_task39_rc002_h11_named_mint_gta_clock_capture.py', repository_path: tests/test_task39_rc002_h11_named_mint_gta_clock_capture.py}
-  integrity: {kind: sha256, sha256: a86e798850ccce1897fc88e17368684fef7c5bff4cb5efbe75b990ec3fe7cf04}
+  integrity: {kind: sha256, sha256: 7769c088c188d3614dcca6a04e13cce2d5e1e9bd14772ec5d80dc18e21d8dbb3}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: depends_on, target_asset_id: CONFIG-T39-RC002-H11-NAMED-MINT-GTA-001}

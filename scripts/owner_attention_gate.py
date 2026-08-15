@@ -25,6 +25,25 @@ REQUIRED_REVIEW_ROLES = {
     "GOAL_DOD_CRITIC",
     "ARCHITECTURE_CRITIC",
 }
+SINGLE_AGENT_REVIEW_FALLBACK = "SINGLE_AGENT_REVIEW_FALLBACK"
+
+
+def review_records_single_agent_fallback(review: dict[str, Any]) -> bool:
+    """True when the receipt admits author-as-reviewer. Merge must deny."""
+
+    claims = review.get("non_claims")
+    if isinstance(claims, list) and SINGLE_AGENT_REVIEW_FALLBACK in claims:
+        return True
+    for item in review.get("reviews") or []:
+        if not isinstance(item, dict):
+            continue
+        findings = item.get("findings")
+        if not isinstance(findings, list):
+            continue
+        for finding in findings:
+            if isinstance(finding, str) and SINGLE_AGENT_REVIEW_FALLBACK in finding:
+                return True
+    return False
 CONTROL_RUNTIME_PATHS = (
     "scripts/owner_attention_gate.py",
     "scripts/delivery_harness.py",
@@ -1113,6 +1132,7 @@ def bound_delivery_evidence(
                 and reviews_by_role[role][0]["verdict"] == "PASS"
                 for role in REQUIRED_REVIEW_ROLES
             )
+            and not review_records_single_agent_fallback(review)
         ):
             continue
         fit_path = (root / fit_relative).resolve()

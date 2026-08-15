@@ -200,8 +200,12 @@ class DeliveryHarnessAdapterTests(unittest.TestCase):
             self.assertIn("exact task contract", text.casefold())
             self.assertIn("exact diff", text.casefold())
             self.assertIn("SINGLE_AGENT_REVIEW_FALLBACK", text)
+            self.assertIn("merge is denied", text.casefold())
 
-    def test_route_continuity_and_multi_root_warning_are_machine_checked(self) -> None:
+    def test_agents_front_door_denies_fallback_at_merge(self) -> None:
+        text = (ROOT / "AGENTS.md").read_text(encoding="utf-8")
+        self.assertIn("SINGLE_AGENT_REVIEW_FALLBACK", text)
+        self.assertIn("`NOT_READY` for merge", text)
         module = load_module()
         self.assertEqual(
             module.detect_multi_root_context_duplication(
