@@ -50,6 +50,7 @@ merge_policy:
     - docs/agent/DELIVERY_HARNESS_BOOTSTRAP.md
     - docs/agent/EXECUTION_ROUTER_PROTOCOL.md
     - docs/evidence/control/**
+    - docs/evidence/task30/a20r1_provider_route_capability_registry_acceptance_v1.json
     - docs/tasks/CTRL-DELIVERY-HARNESS-V1.md
     - docs/tasks/CTRL-CI-OWNED-PRODUCT-SCHEMA-ELIGIBILITY-V1.md
     - docs/tasks/CTRL-AUTONOMOUS-DELIVERY-SKILL-V1.md
