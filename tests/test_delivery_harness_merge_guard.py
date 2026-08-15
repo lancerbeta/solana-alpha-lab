@@ -945,12 +945,109 @@ class DeliveryHarnessMergeGuardTests(unittest.TestCase):
                     return (root / relative).read_bytes()
                 raise AssertionError(args)
 
-            with self.assertRaisesRegex(
-                ValueError, "PROJECT_VALIDATION_BINDING_INVALID"
+            bindings = self.module.load_validation_bindings(
+                root, expected_base=MAIN, runner=runner
+            )
+            self.assertIsNone(bindings["primary"])
+            self.assertIsNone(bindings["fallback"])
+            self.assertIsNotNone(bindings["credential_scan"])
+
+    def test_credential_scan_survives_primary_trusted_path_drift(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            write_validation_profile(
+                root,
+                primary={
+                    "argv": ["project-primary", "{expected_base}"],
+                    "result_owner": "FOCUSED_PLUS_EXACT_PR_CI",
+                    "trusted_paths": ["validator.txt"],
+                },
+                fallback={
+                    "argv": ["project-fallback", "{expected_base}"],
+                    "result_owner": "FULL_EXACT_HEAD",
+                    "trusted_paths": ["validator.txt"],
+                },
+                credential_scan={
+                    "argv": ["project-secret-scan"],
+                    "trusted_paths": ["scanner.txt"],
+                },
+            )
+            calls: list[tuple[str, ...]] = []
+
+            def runner(args: list[str], cwd: Path) -> bytes:
+                calls.append(tuple(args))
+                if args[:5] == ["git", "diff", "--name-only", "--no-renames", "-z"]:
+                    return b"delivery-harness/harness.yaml\0"
+                if args[:2] == ["git", "show"]:
+                    relative = args[2].split(":", 1)[1]
+                    if relative == "validator.txt":
+                        return b"base validator bytes\n"
+                    return (root / relative).read_bytes()
+                git_result = validation_git_read(args, root)
+                if git_result is not None:
+                    return git_result
+                if args[0] == "project-secret-scan":
+                    return b"PASS\n"
+                raise AssertionError(args)
+
+            bindings = self.module.load_validation_bindings(
+                root, expected_base=MAIN, runner=runner
+            )
+            self.assertIsNone(bindings["primary"])
+            self.assertIsNone(bindings["fallback"])
+            self.assertIsNotNone(bindings["credential_scan"])
+
+            receipt = live_pr_head_receipt(self.module)
+            with mock.patch.object(
+                self.module,
+                "task_delivery_scope",
+                return_value=(MAIN, "origin/main", MAIN, ["delivery-harness/**"]),
             ):
-                self.module.load_validation_bindings(
-                    root, expected_base=MAIN, runner=runner
+                checks = self.module.build_delivery_checks(
+                    root,
+                    context_receipt=receipt,
+                    local_head=HEAD,
+                    local_tree=TREE,
+                    ci_pass=True,
+                    runner=runner,
                 )
+            self.assertTrue(checks["required_tests_pass"])
+            self.assertTrue(checks["full_gate_pass"])
+            self.assertTrue(checks["secret_scan_pass"])
+            self.assertTrue(any(call[0] == "project-secret-scan" for call in calls))
+            self.assertFalse(any(call[0] == "project-primary" for call in calls))
+            self.assertFalse(any(call[0] == "project-fallback" for call in calls))
+
+    def test_credential_scan_is_null_when_its_trusted_paths_drift(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            write_validation_profile(
+                root,
+                primary={
+                    "argv": ["project-primary", "{expected_base}"],
+                    "result_owner": "FOCUSED_PLUS_EXACT_PR_CI",
+                    "trusted_paths": ["validator.txt"],
+                },
+                fallback=None,
+                credential_scan={
+                    "argv": ["project-secret-scan"],
+                    "trusted_paths": ["scanner.txt"],
+                },
+            )
+
+            def runner(args: list[str], cwd: Path) -> bytes:
+                if args[:2] == ["git", "show"]:
+                    relative = args[2].split(":", 1)[1]
+                    if relative == "scanner.txt":
+                        return b"base scanner bytes\n"
+                    return (root / relative).read_bytes()
+                raise AssertionError(args)
+
+            bindings = self.module.load_validation_bindings(
+                root, expected_base=MAIN, runner=runner
+            )
+            self.assertIsNotNone(bindings["primary"])
+            self.assertIsNone(bindings["credential_scan"])
 
     def test_managed_write_set_parser_preserves_exact_paths_and_prefixes(self) -> None:
         plan = """\n## Managed write set\n\n```text\nAGENTS.md\ndelivery-harness/templates/portable-core/** # portable subtree\n```\n\n## Next\n"""

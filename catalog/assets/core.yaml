@@ -16307,7 +16307,7 @@ records:
   as_of: '2026-08-14'
   truth_owner: CTRL-DELIVERY-HARNESS-001
   location: {kind: git_path, logical_uri: 'repo://scripts/owner_attention_gate.py', repository_path: scripts/owner_attention_gate.py}
-  integrity: {kind: sha256, sha256: da7dd742eb5ba4709bf1c8753de18b36b2de870171ca0daef388cc5ff67a937c}
+  integrity: {kind: sha256, sha256: 11e2a2d8a7b3a9a17b3f2c2258f62b332227ff410e5fc788919fdaf904ec96ac}
   access: *t25_read_file
   relations:
   - {relation_type: governed_by, target_asset_id: POLICY-OWNER-ATTENTION-GATE-002}

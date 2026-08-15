@@ -259,6 +259,33 @@ def require_base_bound_control_runtime(
             raise ValueError("CONTROL_RUNTIME_CHANGED")
 
 
+def _trusted_path_matches_base(
+    root: Path,
+    relative: str,
+    *,
+    expected_base: str,
+    runner,
+    cache: dict[str, bool],
+) -> bool:
+    normalized = safe_repo_path(relative)
+    cached = cache.get(normalized)
+    if cached is not None:
+        return cached
+    candidate = root.resolve() / normalized
+    matched = False
+    if candidate.is_file():
+        try:
+            base_bytes = runner(
+                ["git", "show", f"{expected_base}:{normalized}"], root
+            )
+        except ValueError:
+            matched = False
+        else:
+            matched = candidate.read_bytes() == base_bytes
+    cache[normalized] = matched
+    return matched
+
+
 def load_validation_bindings(
     root: Path, *, expected_base: str, runner=run_read
 ) -> dict[str, dict[str, Any] | None]:
@@ -276,26 +303,21 @@ def load_validation_bindings(
             validation["credential_scan"], result_owner=False
         ),
     }
-    checked_paths: set[str] = set()
-    for command in bindings.values():
+    cache: dict[str, bool] = {}
+    for name, command in bindings.items():
         if command is None:
             continue
-        for relative in command["trusted_paths"]:
-            normalized = safe_repo_path(relative)
-            if normalized in checked_paths:
-                continue
-            candidate = root.resolve() / normalized
-            if not candidate.is_file():
-                raise ValueError("PROJECT_VALIDATION_BINDING_INVALID")
-            try:
-                base_bytes = runner(
-                    ["git", "show", f"{expected_base}:{normalized}"], root
-                )
-            except ValueError:
-                raise ValueError("PROJECT_VALIDATION_BINDING_INVALID") from None
-            if candidate.read_bytes() != base_bytes:
-                raise ValueError("PROJECT_VALIDATION_BINDING_INVALID")
-            checked_paths.add(normalized)
+        if not all(
+            _trusted_path_matches_base(
+                root,
+                relative,
+                expected_base=expected_base,
+                runner=runner,
+                cache=cache,
+            )
+            for relative in command["trusted_paths"]
+        ):
+            bindings[name] = None
     return bindings
 
 
