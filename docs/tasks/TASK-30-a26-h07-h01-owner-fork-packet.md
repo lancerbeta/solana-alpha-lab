@@ -31,6 +31,7 @@ managed_write_set:
   - registries/decisions_negative_results.yaml
   - catalog/catalog_manifest.yaml
   - catalog/assets/core.yaml
+  - catalog/assets/lifecycle.yaml
   - catalog/generated/asset_edges.json
   - docs/PROJECT_MAP.md
   - tests/test_lifecycle_registries.py

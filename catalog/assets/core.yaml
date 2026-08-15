@@ -21501,7 +21501,7 @@ records:
   as_of: '2026-08-15'
   truth_owner: TASK-30
   location: {kind: git_path, logical_uri: 'repo://docs/tasks/TASK-30-a26-h07-h01-owner-fork-packet.md', repository_path: docs/tasks/TASK-30-a26-h07-h01-owner-fork-packet.md}
-  integrity: {kind: sha256, sha256: 11ae2e712f9e33612d56d02b9cff0467f84a666886177a520e297b07ff431673}
+  integrity: {kind: sha256, sha256: 7d84d2a9d7368326904f7033a938c61491613d6a33d86016c73a68ae7342a67f}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: contains, target_asset_id: CONTRACT-T30-A26-H07-H01-OWNER-FORK-PACKET-001}

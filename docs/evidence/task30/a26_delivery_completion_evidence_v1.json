@@ -14,7 +14,7 @@
   },
   "capability_radar_now": "NONE",
   "implementation_bindings": {
-    "catalog/assets/core.yaml": "9f0a734c99f94d714949e1f57e95aa24312d2c473567780ff905a2fcefbefc09",
+    "catalog/assets/core.yaml": "068bae2fd816e54371279677d4301e6bae71a772b2ec349a21503bba4573fef1",
     "catalog/assets/lifecycle.yaml": "9605fcaf03743363b9ed066df35aa5eb50a16fcff92cededa9a3003fe420da03",
     "catalog/catalog_manifest.yaml": "f2f0a255e03ca4e1bc6c1231e3b12a7ff7276933d1a36427e80e099c38bbc4d9",
     "catalog/generated/asset_edges.json": "22a0c85799da19d3d665eb9120300bc91b20e47c0cdf940df8583b2165d608e7",
@@ -25,7 +25,7 @@
     "docs/evidence/task30/a26_h07_h01_owner_fork_packet_acceptance_v1.json": "8d4755643c4f64f325e3d2986d928a93f9c1bf64e7694c47230440b8271aecd7",
     "docs/evidence/task30/a26_h07_h01_owner_fork_packet_runtime_receipt_v1.json": "e8b5425023716c53ec3a37cf985b113a2a49d2a88b2e54f534a33ae99b34b4fb",
     "docs/reports/task30/a26_h07_h01_owner_fork_packet_owner_readout_v1.md": "8536d0df8457a846fde3278e0fe8495d448ab4d8e0e2369ed9180ef71bed98e8",
-    "docs/tasks/TASK-30-a26-h07-h01-owner-fork-packet.md": "11ae2e712f9e33612d56d02b9cff0467f84a666886177a520e297b07ff431673",
+    "docs/tasks/TASK-30-a26-h07-h01-owner-fork-packet.md": "7d84d2a9d7368326904f7033a938c61491613d6a33d86016c73a68ae7342a67f",
     "registries/decisions_negative_results.yaml": "ce9b7cb1067ad491da6f2e929fc403c849fc24cc51cf2986b0b9b03463c8a109",
     "scripts/run_task30_a26_h07_h01_owner_fork_packet.py": "75105e8b66206edef949b7078e800d6b96d07c5e3c07f755ed24d378efea2745",
     "src/solana_alpha_lab/task30_h07_h01_owner_fork_packet.py": "f372db7e8806ae521f901285550284d605e118601f3b1fdc9c53e71a1b634ef0",
@@ -44,14 +44,14 @@
   },
   "factory_fit": {
     "path": "docs/evidence/task30/a26_delivery_factory_fit_v1.json",
-    "sha256": "05194774810dea52a317933518acfe553078fb8bd1d5f6edb6c942fe25105346",
+    "sha256": "866ae0c3488e49e9843be3cb51618b8c9e62d27d3d6740ad544aedeedb3544cc",
     "verdict": "PASS"
   },
   "validation": {
     "targeted": "PASS_A26_A25_CATALOG_AND_LIFECYCLE_TESTS",
     "independent_review": {
       "path": "docs/evidence/task30/a26_delivery_independent_review_v1.json",
-      "sha256": "d3b6d7dd3af5fbd2ae9679bf03cba1917f8bc687b385e18330330cc6cfa1d285",
+      "sha256": "c911f1a0114e24b782ba06817bef90b2b2fa75f01ee77ee4238985ae22e06e96",
       "verdict": "PASS"
     },
     "full_gate": "ENFORCED_BY_PROJECT_BOUND_VALIDATION",
