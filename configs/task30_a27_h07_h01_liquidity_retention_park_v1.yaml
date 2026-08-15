@@ -1,0 +1,80 @@
+schema: smial.task30.h07-h01-liquidity-retention-park.policy
+schema_version: '1.0'
+task_id: TASK-30
+atom_id: T30-A27_RETIRE_RC001_H07_H01_LIQUIDITY_RETENTION_V1
+contract_id: CONTRACT-T30-A27-H07-H01-LIQUIDITY-RETENTION-PARK-001
+spec_route: BOTH
+adoption_route: WRAP_FROZEN_A26_OWNER_FORK
+consumer: RC001-H07-H01-LIQUIDITY-RETENTION
+selected_fork: RETIRE_RC001_H07_H01_LIQUIDITY_RETENTION
+priority_disposition: PARKED_FROM_PRIORITY
+science_disposition: RETAINED
+deletion: false
+frozen_a26:
+  path: docs/evidence/task30/a26_h07_h01_owner_fork_packet_acceptance_v1.json
+  sha256: 8d4755643c4f64f325e3d2986d928a93f9c1bf64e7694c47230440b8271aecd7
+  required_terminal: FIVE_DOLLAR_HELIUS_CANNOT_FALSIFY_OWNER_FORK_READY
+  required_task_state: BLOCKED_DATA
+  required_selected_fork_option: RETIRE_RC001_H07_H01_LIQUIDITY_RETENTION
+retained_evidence:
+  - asset_id: EVIDENCE-T30-A24-RAW-TO-PIT-001
+    path: docs/evidence/task30/a24_raw_to_pit_admissibility_acceptance_v1.json
+    sha256: 257e81801afbfa3ba6bf64e8c25b41009e560bb168e9a01d92c606ca4bcdb183
+  - asset_id: EVIDENCE-T30-A25-H07-H01-MEASURABILITY-001
+    path: docs/evidence/task30/a25_h07_h01_limited_diagnostic_acceptance_v1.json
+    sha256: c29ecd424e4c2276259ffc05aec6fb8058b53469a30c763db972c0581f84ceca
+  - asset_id: EVIDENCE-T30-A26-H07-H01-OWNER-FORK-001
+    path: docs/evidence/task30/a26_h07_h01_owner_fork_packet_acceptance_v1.json
+    sha256: 8d4755643c4f64f325e3d2986d928a93f9c1bf64e7694c47230440b8271aecd7
+rc001_freeze:
+  path: configs/task28_rc001_registry_freeze_v1.yaml
+  group_id: RC001-H07-H01-LIQUIDITY-RETENTION
+  required_definition_sha256: 14a7387148d05773dedcb5ad6a8110a0dcab7e49da4dec77328903a5b7577df7
+  mutation_authorized: false
+forbidden_follow_ons:
+  - FREEZE_NOTIONAL_BUCKET_SET_V1
+  - AUTHORIZE_VARIANCE_CALIBRATION_CAPTURE
+  - ROUTE_FEASIBILITY_CAPTURE
+  - H13_TRIAL
+  - H02_H10_H14_TRIAL
+  - PROVIDER_PURCHASE
+terminal_outcomes:
+  - RC001_H07_H01_PARKED_FROM_PRIORITY_SCIENCE_RETAINED
+  - STOP_INTEGRITY_CONFLICT
+claims:
+  parked_from_priority_only: true
+  science_retained: true
+  science_deleted: false
+  effect_estimate: false
+  hypothesis_supported_or_refuted: false
+  h07_h01_trial: false
+  h13_trial: false
+  h02_trial: false
+  route_feasibility: false
+  execution: false
+  settlement: false
+  pnl: false
+  numeric_netreturn: false
+  alpha: false
+  task30_acceptance: false
+  task30_canonical_done: false
+  rc001_definition_changed: false
+  notional_buckets_frozen: false
+external_authority:
+  basis: EXPLICIT_OWNER_PHRASE
+  owner_phrase: OK T30-A26 RETIRE_RC001_H07_H01_LIQUIDITY_RETENTION
+  provider_api_rpc_calls_authorized: 0
+  credential_reads_authorized: 0
+  purchase_authorized: false
+execution_controls:
+  retry: false
+  fallback: false
+  redirect: false
+  pagination: false
+  scheduler: false
+  background_process: false
+  network: false
+  credentials: false
+  cash_spend: false
+project_sources_disposition:
+  kind: NO_CHANGE

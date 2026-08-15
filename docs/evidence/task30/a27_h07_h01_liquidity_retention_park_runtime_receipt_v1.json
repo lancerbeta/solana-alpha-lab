@@ -1,0 +1,97 @@
+{
+  "atom_id": "T30-A27_RETIRE_RC001_H07_H01_LIQUIDITY_RETENTION_V1",
+  "claims": {
+    "alpha": false,
+    "effect_estimate": false,
+    "execution": false,
+    "h02_trial": false,
+    "h07_h01_trial": false,
+    "h13_trial": false,
+    "hypothesis_supported_or_refuted": false,
+    "notional_buckets_frozen": false,
+    "numeric_netreturn": false,
+    "parked_from_priority_only": true,
+    "pnl": false,
+    "rc001_definition_changed": false,
+    "route_feasibility": false,
+    "science_deleted": false,
+    "science_retained": true,
+    "settlement": false,
+    "task30_acceptance": false,
+    "task30_canonical_done": false
+  },
+  "deletion": false,
+  "family_status": "PARKED_FROM_PRIORITY_NOT_CANONICAL_DONE",
+  "forbidden_follow_ons": [
+    "FREEZE_NOTIONAL_BUCKET_SET_V1",
+    "AUTHORIZE_VARIANCE_CALIBRATION_CAPTURE",
+    "ROUTE_FEASIBILITY_CAPTURE",
+    "H13_TRIAL",
+    "H02_H10_H14_TRIAL",
+    "PROVIDER_PURCHASE"
+  ],
+  "frozen_a26": {
+    "decision": "FIVE_DOLLAR_HELIUS_CANNOT_FALSIFY_OWNER_FORK_READY",
+    "encoded_selected": "NONE_THIS_ATOM_ONLY_ENCODES_THE_FORK",
+    "path": "docs/evidence/task30/a26_h07_h01_owner_fork_packet_acceptance_v1.json",
+    "retire_option_present": true,
+    "sha256": "8d4755643c4f64f325e3d2986d928a93f9c1bf64e7694c47230440b8271aecd7",
+    "task_state": "BLOCKED_DATA"
+  },
+  "non_claims": [
+    "NO_TASK30_ACCEPTANCE_OR_DONE",
+    "NO_RC001_PROMOTION_OR_DEFINITION_CHANGE",
+    "NO_SCIENCE_DELETION",
+    "NO_H07_H01_TRIAL",
+    "NO_H13_OR_H02_TRIAL",
+    "NO_NOTIONAL_BUCKET_FREEZE",
+    "NO_ROUTE_FEASIBILITY_CAPTURE",
+    "NO_PROVIDER_CALL_OR_PURCHASE",
+    "NO_ALPHA_EXECUTION_PNL_OR_NETRETURN"
+  ],
+  "observed_at": "2026-08-15T16:21:25Z",
+  "priority_disposition": "PARKED_FROM_PRIORITY",
+  "project_sources_disposition": {
+    "kind": "NO_CHANGE"
+  },
+  "rc001_freeze": {
+    "admissibility_state": "BLOCKED_DATA",
+    "definition_sha256": "14a7387148d05773dedcb5ad6a8110a0dcab7e49da4dec77328903a5b7577df7",
+    "group_id": "RC001-H07-H01-LIQUIDITY-RETENTION",
+    "mutation_authorized": false,
+    "path": "configs/task28_rc001_registry_freeze_v1.yaml"
+  },
+  "retained_evidence": [
+    {
+      "asset_id": "EVIDENCE-T30-A24-RAW-TO-PIT-001",
+      "disposition": "RETAINED",
+      "path": "docs/evidence/task30/a24_raw_to_pit_admissibility_acceptance_v1.json",
+      "sha256": "257e81801afbfa3ba6bf64e8c25b41009e560bb168e9a01d92c606ca4bcdb183"
+    },
+    {
+      "asset_id": "EVIDENCE-T30-A25-H07-H01-MEASURABILITY-001",
+      "disposition": "RETAINED",
+      "path": "docs/evidence/task30/a25_h07_h01_limited_diagnostic_acceptance_v1.json",
+      "sha256": "c29ecd424e4c2276259ffc05aec6fb8058b53469a30c763db972c0581f84ceca"
+    },
+    {
+      "asset_id": "EVIDENCE-T30-A26-H07-H01-OWNER-FORK-001",
+      "disposition": "RETAINED",
+      "path": "docs/evidence/task30/a26_h07_h01_owner_fork_packet_acceptance_v1.json",
+      "sha256": "8d4755643c4f64f325e3d2986d928a93f9c1bf64e7694c47230440b8271aecd7"
+    }
+  ],
+  "schema": "smial.task30.a27-h07-h01-liquidity-retention-park.runtime",
+  "schema_version": "1.0",
+  "science_disposition": "RETAINED",
+  "selected_fork": "RETIRE_RC001_H07_H01_LIQUIDITY_RETENTION",
+  "side_effects": {
+    "cash_spend_usd_cents": 0,
+    "credential_reads": 0,
+    "fallbacks": 0,
+    "provider_requests": 0,
+    "retries": 0
+  },
+  "task_state": "BLOCKED_DATA",
+  "terminal_decision": "RC001_H07_H01_PARKED_FROM_PRIORITY_SCIENCE_RETAINED"
+}

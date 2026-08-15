@@ -71,6 +71,7 @@ class CatalogImportTests(unittest.TestCase):
                 "DECISION-T30-A25-H07-H01-MEASURABILITY-001",
                 "DECISION-DELIVERY-PREFLIGHT-SKIP-PROOF-001",
                 "DECISION-T30-A26-FIVE-DOLLAR-CANNOT-FALSIFY-001",
+                "DECISION-T30-A27-H07-H01-PARK-001",
             ],
         )
         self.assertTrue(
