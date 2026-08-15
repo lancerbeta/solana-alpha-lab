@@ -26,7 +26,7 @@
   "recovery": "REVERT_TASK41_TRACKED_OUTPUTS; PRESERVE_TASK39_SCIENCE_AND_A4_RAW",
   "review_id": "T41-A1-DELIVERY-FACTORY-FIT-001",
   "reviewed_bindings_sha256": "f33c1d2bb859c9912b92185bc6d8ea923fd64dd9f764ababcd58e2f6f56f66c3",
-  "reviewed_inventory_sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+  "reviewed_inventory_sha256": "3f869ae7568cedbed9c82eb7286e5f52f6c7994acbefc4f35d5e43377c5d43d4",
   "schema": "smial.delivery-harness-factory-fit",
   "schema_version": "1.0",
   "task_id": "TASK-41",

@@ -12,7 +12,7 @@
   ],
   "review_id": "T41-A1-DELIVERY-INDEPENDENT-REVIEW-001",
   "reviewed_bindings_sha256": "f33c1d2bb859c9912b92185bc6d8ea923fd64dd9f764ababcd58e2f6f56f66c3",
-  "reviewed_inventory_sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+  "reviewed_inventory_sha256": "3f869ae7568cedbed9c82eb7286e5f52f6c7994acbefc4f35d5e43377c5d43d4",
   "reviews": [
     {
       "findings": [
