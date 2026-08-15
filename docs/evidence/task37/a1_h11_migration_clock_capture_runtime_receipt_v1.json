@@ -1,0 +1,95 @@
+{
+  "alpha_claim": false,
+  "atom_id": "T37-A1_RC002_H11_MIGRATION_CLOCK_CAPTURE_V1",
+  "clock_sha256": "d857f78c64426f8dda9e81632cd1e6d20a8107d9923debca090b1751cd018b6c",
+  "cohort": {
+    "days": [],
+    "deployers": [],
+    "fingerprint": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+    "n": 0,
+    "pools": [],
+    "row_ids": []
+  },
+  "execution_claim": false,
+  "holdout": {
+    "path": "registries/holdout_consumption.yaml",
+    "records": 0,
+    "sha256": "863d68e53861c4aa30f6afa1a512ec5ab84c8966273cee6d42ca1519ef5fa07a"
+  },
+  "live_PIT_claim": false,
+  "live_universe": true,
+  "non_claims": [
+    "NO_LIVE_PIT_CLAIM",
+    "NO_EXECUTION_CLAIM",
+    "NO_ALPHA",
+    "NO_NETRETURN",
+    "NO_RC001_MUTATION",
+    "NO_HOLDOUT_CONSUMPTION",
+    "NO_H11_EFFECT_SCREEN",
+    "NO_AVAILABLE_TO_STRATEGY_AT_CONVERSION"
+  ],
+  "observed_at": "2026-08-15T18:35:57Z",
+  "project_sources_disposition": {
+    "kind": "NO_CHANGE"
+  },
+  "rc001_freeze": {
+    "definition_sha256": {
+      "RC001-H02-H10-H14-PULLBACK-RECLAIM": "fc225417541570aa73814a4cb992f6f801a84bea1baf15696d754c706e0aa9f8",
+      "RC001-H07-H01-LIQUIDITY-RETENTION": "14a7387148d05773dedcb5ad6a8110a0dcab7e49da4dec77328903a5b7577df7",
+      "RC001-H13-COMPOSITE-VETO": "f1f020f4fa79acd2f2de667d71b8002d5821f45e9070a0f259c63210b23a16d0"
+    },
+    "holdout_consumed": false,
+    "mutation_authorized": false,
+    "path": "configs/task28_rc001_registry_freeze_v1.yaml",
+    "remaining_families_deprioritized": true,
+    "sha256": "c4fbb7157a13d1dee0f2b1f163e8f8fc1a38da4bc850275fba25bc0d70a785a7",
+    "trial_record_created": false
+  },
+  "research_cycle_id": "RESEARCH-CYCLE-RC002-001",
+  "scan": {
+    "attribution_errors": {
+      "program_data_base64_invalid": 2,
+      "program_data_discriminator_missing": 1
+    },
+    "complete_events": 0,
+    "create_events": 0,
+    "exact_gap": "CreateEvent and CompletePumpAmmMigrationEvent are not present in getTransactionsForAddress(pool); Pump program is not in account keys",
+    "migration_events": 0,
+    "missingness": [
+      "CREATE_EVENT_NOT_IN_ADDRESSED_HISTORY",
+      "MIGRATION_EVENT_NOT_IN_ADDRESSED_HISTORY",
+      "PUMP_PROGRAM_NOT_IN_ACCOUNT_KEYS"
+    ],
+    "pool_address": "URqx24yyYxtXXhTbBQnbtPLhtLWYoaDaRxuQuLpNS3S",
+    "pump_program_in_account_keys": 0,
+    "route_id": "HELIUS-SOLANA-GET-TRANSACTIONS-FOR-ADDRESS-001",
+    "target_kind": "PUMPSWAP_POOL_ADDRESS",
+    "transaction_count": 520
+  },
+  "schema": "smial.task37.rc002-h11-migration-clock-capture.runtime",
+  "schema_version": "1.0",
+  "side_effects": {
+    "cash_spend_usd_cents": 0,
+    "credential_reads": 0,
+    "fallbacks": 0,
+    "provider_requests": 0,
+    "retries": 0,
+    "wallet_signer_transaction_actions": 0
+  },
+  "terminal_decision": "HISTORICAL_ROUTE_WRONG_ADDRESS_OR_EVENT",
+  "trial": {
+    "clock_sha256": "d857f78c64426f8dda9e81632cd1e6d20a8107d9923debca090b1751cd018b6c",
+    "created_at": "2026-08-15T21:00:00Z",
+    "evidence_asset_ids": [
+      "EVIDENCE-T37-RC002-H11-CLOCK-CAPTURE-001"
+    ],
+    "execution_claim": false,
+    "hypothesis_id": "HYP-RC002-H11-LIFECYCLE-CLOCK-V1",
+    "live_PIT_claim": false,
+    "outcome": "INCONCLUSIVE",
+    "record_id": "TRIAL-RC002-H11-MIGRATION-CLOCK-CAPTURE-001",
+    "record_kind": "trial",
+    "research_cycle_id": "RESEARCH-CYCLE-RC002-001",
+    "status": "RECORDED"
+  }
+}

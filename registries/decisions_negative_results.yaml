@@ -128,3 +128,10 @@ records:
   evidence_asset_ids:
   - EVIDENCE-T36-RC002-H11-LIFECYCLE-CLOCK-001
   summary: "HISTORICAL_ROUTE_INADEQUATE_REPLAN: the frozen H11 lifecycle-clock screen cannot reconstruct time_since_migration or a decision-time running peak for a contiguous outcome-independent post-migration universe from adopted TASK-08/09/21/30 receipts. Remaining RC001 H13/H02 stay deprioritized. Not alpha, PIT, execution or RC001 mutation."
+- record_kind: decision
+  record_id: DECISION-T37-RC002-H11-CLOCK-CAPTURE-001
+  status: RECORDED
+  created_at: '2026-08-15T21:00:00Z'
+  evidence_asset_ids:
+  - EVIDENCE-T37-RC002-H11-CLOCK-CAPTURE-001
+  summary: "HISTORICAL_ROUTE_WRONG_ADDRESS_OR_EVENT: adopted Helius getTransactionsForAddress on the PumpSwap pool does not contain CreateEvent or CompletePumpAmmMigrationEvent; Pump program is absent from account keys. Migration clocks cannot be reconstructed from this pool-history route. Not alpha, PIT, execution, paid capture or RC001 mutation."

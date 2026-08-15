@@ -1,0 +1,184 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://solana-alpha-lab.local/schemas/task37_rc002_h11_migration_clock_capture.schema.json",
+  "title": "TASK-37 RC002 H11 migration-clock capture policy",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema", "schema_version", "task_id", "atom_id", "contract_id",
+    "spec_route", "adoption_route", "consumer", "research_cycle",
+    "clock_definitions", "capture_protocol", "rc001_freeze",
+    "holdout_guard", "adopted_route", "terminal_outcomes", "claims",
+    "external_authority", "project_sources_disposition"
+  ],
+  "properties": {
+    "schema": {"const": "smial.task37.rc002-h11-migration-clock-capture.policy"},
+    "schema_version": {"const": "1.0"},
+    "task_id": {"const": "TASK-37"},
+    "atom_id": {"const": "T37-A1_RC002_H11_MIGRATION_CLOCK_CAPTURE_V1"},
+    "contract_id": {"const": "CONTRACT-T37-RC002-H11-CLOCK-CAPTURE-001"},
+    "spec_route": {"const": "BOTH"},
+    "adoption_route": {"const": "ADOPT_EXISTING_HELIUS_GTA_AND_PUMP_EVENT_DECODER"},
+    "consumer": {"const": "RC002-H11-LIFECYCLE-CLOCK"},
+    "research_cycle": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "research_cycle_id", "task_owned_register_id", "register_kind",
+        "title", "status", "definition_owner", "retrofit_into_rc001"
+      ],
+      "properties": {
+        "research_cycle_id": {"const": "RESEARCH-CYCLE-RC002-001"},
+        "task_owned_register_id": {"const": "TASK36-RC002-REGISTER-001"},
+        "register_kind": {"const": "TASK_OWNED_CONFIG_EVIDENCE"},
+        "title": {"type": "string", "minLength": 8},
+        "status": {"const": "CLOCK_CAPTURE"},
+        "definition_owner": {"const": "TASK-37"},
+        "retrofit_into_rc001": {"const": false}
+      }
+    },
+    "clock_definitions": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "freeze_before_event_inspection", "create_at", "migration_at",
+        "running_peak_at", "typed_missingness"
+      ],
+      "properties": {
+        "freeze_before_event_inspection": {"const": true},
+        "create_at": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["source_event", "field", "time_basis"],
+          "properties": {
+            "source_event": {"const": "CreateEvent"},
+            "field": {"const": "timestamp"},
+            "time_basis": {"const": "chain_event_i64"}
+          }
+        },
+        "migration_at": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "source_event", "field", "time_basis",
+            "complete_event_is_not_migration", "forbidden_sources"
+          ],
+          "properties": {
+            "source_event": {"const": "CompletePumpAmmMigrationEvent"},
+            "field": {"const": "timestamp"},
+            "time_basis": {"const": "chain_event_i64"},
+            "complete_event_is_not_migration": {"const": true},
+            "forbidden_sources": {
+              "type": "array",
+              "minItems": 4,
+              "maxItems": 4,
+              "items": {
+                "enum": [
+                  "later_price",
+                  "first_pumpswap_trade",
+                  "block_time_heuristic",
+                  "first_reliable_availability"
+                ]
+              }
+            }
+          }
+        },
+        "running_peak_at": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["rule", "future_events"],
+          "properties": {
+            "rule": {"const": "max_price_among_events_with_event_at_lte_decision_time"},
+            "future_events": {"const": "IGNORE"}
+          }
+        },
+        "typed_missingness": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "absent_create", "absent_migration", "pump_program_absent",
+            "complete_event_only"
+          ],
+          "properties": {
+            "absent_create": {"const": "CREATE_EVENT_NOT_IN_ADDRESSED_HISTORY"},
+            "absent_migration": {"const": "MIGRATION_EVENT_NOT_IN_ADDRESSED_HISTORY"},
+            "pump_program_absent": {"const": "PUMP_PROGRAM_NOT_IN_ACCOUNT_KEYS"},
+            "complete_event_only": {"const": "MIGRATION_STARTED_NOT_MIGRATED"}
+          }
+        }
+      }
+    },
+    "capture_protocol": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "family", "stage", "data_semantics", "live_PIT_claim",
+        "execution_claim", "universe", "include_fast_deaths",
+        "include_inactive_paths", "missing_as_typed_gaps",
+        "h11_effect_screen", "minimum_independent_units"
+      ],
+      "properties": {
+        "family": {"const": "H11_LIFECYCLE_CLOCK"},
+        "stage": {"const": "HISTORICAL_CLOCK_RECONSTRUCTION"},
+        "data_semantics": {"const": "RETROSPECTIVE_EVENT_TIME_RECONSTRUCTION"},
+        "live_PIT_claim": {"const": false},
+        "execution_claim": {"const": false},
+        "universe": {"const": "CONFIRMED_POST_MIGRATION_POOLS_OUTCOME_INDEPENDENT_CONTIGUOUS_WINDOW"},
+        "include_fast_deaths": {"const": true},
+        "include_inactive_paths": {"const": true},
+        "missing_as_typed_gaps": {"const": true},
+        "h11_effect_screen": {"const": false},
+        "minimum_independent_units": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["pools", "days", "deployers"],
+          "properties": {
+            "pools": {"const": 8},
+            "days": {"const": 2},
+            "deployers": {"const": 2}
+          }
+        }
+      }
+    },
+    "rc001_freeze": {"type": "object"},
+    "holdout_guard": {"type": "object"},
+    "adopted_route": {"type": "object"},
+    "terminal_outcomes": {
+      "type": "array",
+      "minItems": 4,
+      "maxItems": 4,
+      "items": {
+        "enum": [
+          "CLOCKS_RECONSTRUCTED_COHORT_READY",
+          "HISTORICAL_ROUTE_WRONG_ADDRESS_OR_EVENT",
+          "INSUFFICIENT_SCALE_WITHOUT_PAID_CAPTURE",
+          "STOP_INTEGRITY_CONFLICT"
+        ]
+      }
+    },
+    "claims": {"type": "object"},
+    "external_authority": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "network", "credentials", "cash_spend", "paid_plan",
+        "provider_routes_max", "wallet_signer_transaction", "deployment"
+      ],
+      "properties": {
+        "network": {"const": false},
+        "credentials": {"const": false},
+        "cash_spend": {"const": false},
+        "paid_plan": {"const": false},
+        "provider_routes_max": {"const": 1},
+        "wallet_signer_transaction": {"const": false},
+        "deployment": {"const": false}
+      }
+    },
+    "project_sources_disposition": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["kind"],
+      "properties": {"kind": {"const": "NO_CHANGE"}}
+    }
+  }
+}

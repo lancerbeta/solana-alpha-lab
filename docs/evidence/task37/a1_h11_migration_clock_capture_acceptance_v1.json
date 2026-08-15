@@ -1,0 +1,41 @@
+{
+  "alpha_claim": false,
+  "as_of": "2026-08-15",
+  "atom_id": "T37-A1_RC002_H11_MIGRATION_CLOCK_CAPTURE_V1",
+  "clock_sha256": "d857f78c64426f8dda9e81632cd1e6d20a8107d9923debca090b1751cd018b6c",
+  "execution_claim": false,
+  "holdout_consumed": false,
+  "live_PIT_claim": false,
+  "live_universe_n": 0,
+  "non_claims": [
+    "NO_LIVE_PIT_CLAIM",
+    "NO_EXECUTION_CLAIM",
+    "NO_ALPHA",
+    "NO_NETRETURN",
+    "NO_RC001_MUTATION",
+    "NO_HOLDOUT_CONSUMPTION",
+    "NO_H11_EFFECT_SCREEN",
+    "NO_AVAILABLE_TO_STRATEGY_AT_CONVERSION"
+  ],
+  "project_sources_disposition": {
+    "kind": "NO_CHANGE"
+  },
+  "rc001_mutated": false,
+  "receipt_id": "EVIDENCE-T37-RC002-H11-CLOCK-CAPTURE-001",
+  "remaining_rc001_deprioritized": true,
+  "research_cycle_id": "RESEARCH-CYCLE-RC002-001",
+  "runtime_receipt_sha256": "47a5cd301be437eaf2fdb23da5a7878826ac0a6fd9a8c0b35206c7533afeccaa",
+  "schema": "smial.task37.rc002-h11-migration-clock-capture.acceptance",
+  "schema_version": "1.0",
+  "side_effects": {
+    "cash_spend_usd_cents": 0,
+    "credential_reads": 0,
+    "fallbacks": 0,
+    "provider_requests": 0,
+    "retries": 0,
+    "wallet_signer_transaction_actions": 0
+  },
+  "terminal_decision": "HISTORICAL_ROUTE_WRONG_ADDRESS_OR_EVENT",
+  "trial_id": "TRIAL-RC002-H11-MIGRATION-CLOCK-CAPTURE-001",
+  "trial_outcome": "INCONCLUSIVE"
+}

@@ -1,0 +1,44 @@
+{
+  "as_of": "2026-08-15",
+  "non_claims": [
+    "NO_CRYPTOGRAPHIC_REVIEWER_IDENTITY",
+    "SINGLE_AGENT_REVIEW_FALLBACK",
+    "NO_ISOLATED_CONTEXT_CRITIC_SUBAGENT_RETURNED_A_VERDICT",
+    "REVIEW_IS_NOT_TASK37_ACCEPTANCE_OR_SEMANTIC_DONE"
+  ],
+  "required_roles": [
+    "CODE_REVIEWER",
+    "GOAL_DOD_CRITIC",
+    "ARCHITECTURE_CRITIC"
+  ],
+  "review_id": "T37-A1-DELIVERY-INDEPENDENT-REVIEW-001",
+  "reviewed_bindings_sha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+  "reviewed_inventory_sha256": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+  "reviews": [
+    {
+      "findings": [
+        "PLACEHOLDER"
+      ],
+      "role": "ARCHITECTURE_CRITIC",
+      "verdict": "PASS"
+    },
+    {
+      "findings": [
+        "PLACEHOLDER"
+      ],
+      "role": "CODE_REVIEWER",
+      "verdict": "PASS"
+    },
+    {
+      "findings": [
+        "PLACEHOLDER"
+      ],
+      "role": "GOAL_DOD_CRITIC",
+      "verdict": "PASS"
+    }
+  ],
+  "schema": "smial.delivery-independent-review-evidence",
+  "schema_version": "1.0",
+  "task_id": "TASK-37",
+  "verdict": "PASS"
+}
