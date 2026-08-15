@@ -1,0 +1,14 @@
+{
+  "expected_live_terminal": "HISTORICAL_ROUTE_WRONG_ADDRESS_OR_EVENT",
+  "a22_sha256": "7244a4c049c7ebe5f77d6136513d402c9af568dd0ccabb3a842160ab61a72bcc",
+  "a23_sha256": "6770f134e61d334451780ded411fe5dd79e0577f2c532a5d3a8a694b8c58ae81",
+  "transaction_count": 520,
+  "pump_program_in_account_keys": 0,
+  "create_events": 0,
+  "complete_events": 0,
+  "migration_events": 0,
+  "pool_address": "URqx24yyYxtXXhTbBQnbtPLhtLWYoaDaRxuQuLpNS3S",
+  "route_id": "HELIUS-SOLANA-GET-TRANSACTIONS-FOR-ADDRESS-001",
+  "target_kind": "PUMPSWAP_POOL_ADDRESS",
+  "exact_gap": "CreateEvent and CompletePumpAmmMigrationEvent are not present in getTransactionsForAddress(pool); Pump program is not in account keys"
+}
