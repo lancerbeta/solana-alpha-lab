@@ -17,11 +17,10 @@ managed_write_set:
   - docs/tasks/CTRL-CI-OWNED-PRODUCT-SCHEMA-ELIGIBILITY-V1.md
   - scripts/validate_ci.py
   - tests/test_ci.py
-  - delivery-harness/policies/solana-alpha-lab.md
+  - delivery-harness/harness.yaml
   - docs/agent/EXECUTION_ROUTER_PROTOCOL.md
   - catalog/assets/core.yaml
   - docs/evidence/control/delivery_harness_acceptance_v1.json
-  - docs/evidence/task30/a20r1_provider_route_capability_registry_acceptance_v1.json
 external_caps:
   network: false
   credentials: false

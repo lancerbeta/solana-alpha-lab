@@ -13619,7 +13619,7 @@ records:
   as_of: '2026-08-14'
   truth_owner: TASK-30
   location: {kind: git_path, logical_uri: 'repo://docs/evidence/task30/a20r1_provider_route_capability_registry_acceptance_v1.json', repository_path: docs/evidence/task30/a20r1_provider_route_capability_registry_acceptance_v1.json}
-  integrity: {kind: sha256, sha256: a5296c80a6c780a04c4e5226248ec76dd162197e46cfd665310dcbff25ccacf4}
+  integrity: {kind: sha256, sha256: c01c7e0f65ff45ed3dee418b6f9870cd3b4ae9335ac8ab638f2196934253a416}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: derived_from, target_asset_id: CONFIG-PROVIDER-ROUTE-CAPABILITY-REGISTRY-004}
@@ -19724,10 +19724,10 @@ records:
   purpose: Closed route-neutral Delivery Harness contract with routes, context budgets, cloud export mode and external authority exclusions.
   status: IMPLEMENTED_UNVERIFIED
   origin: REPOSITORY
-  as_of: '2026-08-14'
+  as_of: '2026-08-15'
   truth_owner: CTRL-DELIVERY-HARNESS-001
   location: {kind: git_path, logical_uri: 'repo://delivery-harness/harness.yaml', repository_path: delivery-harness/harness.yaml}
-  integrity: {kind: sha256, sha256: 03df4e3223f9b28a7bb31b877a698deecabdf4b6dc6e800865f8c27f03b0c916}
+  integrity: {kind: sha256, sha256: 6391270fe77fedf6ffa5bd4bf1a644df1904caf59b6c76b3d9c1773512a0d6b8}
   access: *t25_read_file
   relations:
   - {relation_type: governed_by, target_asset_id: CTRL-DELIVERY-HARNESS-001}
