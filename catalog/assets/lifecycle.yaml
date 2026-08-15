@@ -66,7 +66,7 @@ records:
     repository_path: registries/global_trial_ledger.yaml
   integrity:
     kind: sha256
-    sha256: b71eb9c6293899e6053d27b1151430c92d509c14404e1d46258bbce9ce78709f
+    sha256: 1c88c10a47eae27acd320e158611c4937061e29aed4ffaf74187ed5ad56f1ed0
   access: *id001
   relations: *id002
   consumers:
@@ -202,7 +202,7 @@ records:
     repository_path: registries/decisions_negative_results.yaml
   integrity:
     kind: sha256
-    sha256: 798b6ce5030f2e3bf936dddeea2f599fc0fe9405298cffa181594eeed81c9b15
+    sha256: ccd30ab20ee3f867d19bcd88d644a729ae067589f7e66eabba47dd64063aa0e9
   access: *id001
   relations: *id002
   consumers: *id003
@@ -222,7 +222,7 @@ records:
     repository_path: docs/PROJECT_MAP.md
   integrity:
     kind: sha256
-    sha256: ca11ed6c90ef7c8f224075a6b033228f084b4be6c27e48fffe8dd58c2fef762e
+    sha256: 6523dfb47df182d57d5993e1241d3009e3c91958a892dd337d17b8b351f00407
   access:
     mode: read_only
     method: file
@@ -282,7 +282,7 @@ records:
     repository_path: catalog/generated/asset_edges.json
   integrity:
     kind: sha256
-    sha256: 5f58b6f4c17793f382bbdb941c7e1c92800af8361df400014b4b99914d27bcbf
+    sha256: 0daa3894223d47855990faf6dd8e10e80596bd6628cb0dd1cd3b8d8e8acac329
   access:
     mode: read_only
     method: file

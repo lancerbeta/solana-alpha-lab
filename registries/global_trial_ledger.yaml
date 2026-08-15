@@ -46,3 +46,11 @@ records:
   - EVIDENCE-T37-RC002-H11-CLOCK-CAPTURE-001
   hypothesis_id: HYP-RC002-H11-LIFECYCLE-CLOCK-V1
   outcome: INCONCLUSIVE
+- record_kind: trial
+  record_id: TRIAL-RC002-H11-NEXT-GTA-TARGET-001
+  status: RECORDED
+  created_at: '2026-08-15T22:00:00Z'
+  evidence_asset_ids:
+  - EVIDENCE-T38-RC002-H11-NEXT-GTA-001
+  hypothesis_id: HYP-RC002-H11-LIFECYCLE-CLOCK-V1
+  outcome: PASS

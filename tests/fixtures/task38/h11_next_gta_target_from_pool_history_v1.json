@@ -1,0 +1,18 @@
+{
+  "expected_live_terminal": "NEXT_BOUNDED_GTA_TARGET_NAMED",
+  "expected_target_kind": "TOKEN_MINT",
+  "expected_target_address": "DMwbVy48dWVKGe9z1pcVnwF3HLMLrqWdDLfbvx8RchhK",
+  "a22_sha256": "7244a4c049c7ebe5f77d6136513d402c9af568dd0ccabb3a842160ab61a72bcc",
+  "a23_sha256": "6770f134e61d334451780ded411fe5dd79e0577f2c532a5d3a8a694b8c58ae81",
+  "transaction_count": 520,
+  "pump_program_in_account_keys": 0,
+  "create_events": 0,
+  "pool_owned_mints": ["DMwbVy48dWVKGe9z1pcVnwF3HLMLrqWdDLfbvx8RchhK"],
+  "create_mints": [],
+  "bonding_curves": [],
+  "pool_address": "URqx24yyYxtXXhTbBQnbtPLhtLWYoaDaRxuQuLpNS3S",
+  "route_id": "HELIUS-SOLANA-GET-TRANSACTIONS-FOR-ADDRESS-001",
+  "scanned_target_kind": "PUMPSWAP_POOL_ADDRESS",
+  "network_authorized": false,
+  "exact_gap": "named target is not a network authorization; getTransactionsForAddress remains forbidden in this atom"
+}

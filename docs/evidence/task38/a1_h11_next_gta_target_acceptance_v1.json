@@ -1,0 +1,46 @@
+{
+  "alpha_claim": false,
+  "as_of": "2026-08-15",
+  "atom_id": "T38-A1_RC002_H11_NEXT_GTA_TARGET_FROM_POOL_HISTORY_V1",
+  "execution_claim": false,
+  "holdout_consumed": false,
+  "live_PIT_claim": false,
+  "live_universe_txs": 520,
+  "named_target_address": "DMwbVy48dWVKGe9z1pcVnwF3HLMLrqWdDLfbvx8RchhK",
+  "named_target_kind": "TOKEN_MINT",
+  "network_authorized": false,
+  "non_claims": [
+    "NO_LIVE_PIT_CLAIM",
+    "NO_EXECUTION_CLAIM",
+    "NO_ALPHA",
+    "NO_NETRETURN",
+    "NO_RC001_MUTATION",
+    "NO_HOLDOUT_CONSUMPTION",
+    "NO_H11_EFFECT_SCREEN",
+    "NO_NETWORK_OR_NEW_HELIUS_CALL",
+    "NO_UNBOUNDED_PUMP_PROGRAM_GTA",
+    "NAMING_IS_NOT_GTA_AUTHORIZATION"
+  ],
+  "project_sources_disposition": {
+    "kind": "NO_CHANGE"
+  },
+  "rc001_mutated": false,
+  "receipt_id": "EVIDENCE-T38-RC002-H11-NEXT-GTA-001",
+  "remaining_rc001_deprioritized": true,
+  "research_cycle_id": "RESEARCH-CYCLE-RC002-001",
+  "resolver_sha256": "202010698e66fab87dc7fb8d4a553fd98bed43e39ff0fdfe36bdd8cf7a6d9e95",
+  "runtime_receipt_sha256": "90da6f1fb302f9130a85e9a44f749b0ed4adbac18799aa1a427ba37e1c5147cb",
+  "schema": "smial.task38.rc002-h11-next-gta-target.acceptance",
+  "schema_version": "1.0",
+  "side_effects": {
+    "cash_spend_usd_cents": 0,
+    "credential_reads": 0,
+    "fallbacks": 0,
+    "provider_requests": 0,
+    "retries": 0,
+    "wallet_signer_transaction_actions": 0
+  },
+  "terminal_decision": "NEXT_BOUNDED_GTA_TARGET_NAMED",
+  "trial_id": "TRIAL-RC002-H11-NEXT-GTA-TARGET-001",
+  "trial_outcome": "PASS"
+}
