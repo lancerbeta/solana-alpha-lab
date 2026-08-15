@@ -84,15 +84,6 @@ first material blocker, consult the exact reuse registry and a smallest useful
 set of official/maintained solutions before inventing infrastructure. This
 research grants no dependency, provider, cost or external authority.
 
-## AUTONOMOUS_DELIVERY_CONTINUE
-
-For owner intents such as "го дальше", "что дальше", "продолжай",
-"следующий шаг" or a strategic continuation request, use
-`.agents/skills/autonomous-delivery/SKILL.md`. The skill may challenge the
-current roadmap when new evidence warrants `KEEP`/`PATCH`/`REORDER`/`REBASE`.
-It never overrides Delivery Harness authority, safety/material gates, or
-exact merge policy.
-
 ## ACTIVE_TIME_GATE_CHECK
 
 Before selecting new work, read `control/active_time_gates.json`; a due

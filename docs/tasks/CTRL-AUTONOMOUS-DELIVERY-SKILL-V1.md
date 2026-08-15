@@ -18,8 +18,6 @@ managed_write_set:
   - .agents/skills/autonomous-delivery/SKILL.md
   - .agents/skills/autonomous-delivery/references/product-system-contract.md
   - .agents/skills/autonomous-delivery/references/roadmap-challenge.md
-  - AGENTS.md
-  - catalog/assets/core.yaml
   - tests/test_autonomous_delivery_skill.py
 external_caps:
   network: false
@@ -66,8 +64,11 @@ context_requirements:
   next `TASK-XX` by number.
 - **Terminal outcome:** `PROCEED` only if targeted skill tests pass, write set
   is exact, exact-head CI is green, and merge waits for the owner phrase.
-- **User-visible result:** `/autonomous-delivery` plus automatic relevance;
-  a few-line `AGENTS.md` pointer; no plugin/MCP/automation.
+- **User-visible result:** `/autonomous-delivery` plus automatic relevance
+  from the skill description. No `AGENTS.md` pointer: that file is
+  hash-bound across Catalog and historical acceptance receipts, and a
+  nine-line pointer would force an unrelated inventory cascade. No
+  plugin/MCP/automation.
 - **Non-goals:** no replacement of Delivery Harness; no Catalog registration;
   no `validate_ci.py` / `test_ci.py` / domain-policy / execution-router edits;
   no provider/network/cash; no merge in this atom.

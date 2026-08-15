@@ -95,15 +95,12 @@ class AutonomousDeliverySkillTests(unittest.TestCase):
         self.assertIn("Silent divergence is forbidden", roadmap)
         self.assertIn("do not REBASE because", roadmap)
 
-    def test_agents_pointer_is_tiny_and_non_authorizing(self) -> None:
+    def test_agents_front_door_stays_harness_owned_without_skill_body(self) -> None:
         text = AGENTS.read_text(encoding="utf-8")
-        self.assertIn("## AUTONOMOUS_DELIVERY_CONTINUE", text)
-        self.assertIn(".agents/skills/autonomous-delivery/SKILL.md", text)
-        self.assertIn("never overrides Delivery Harness authority", text)
+        self.assertIn(".agents/skills/delivery-harness/SKILL.md", text)
+        self.assertNotIn("## AUTONOMOUS_DELIVERY_CONTINUE", text)
+        self.assertNotIn("Never take the next `TASK-XX` by number", text)
         self.assertLessEqual(len(AGENTS.read_bytes()), 12 * 1024)
-        block = text.split("## AUTONOMOUS_DELIVERY_CONTINUE", 1)[1]
-        block = block.split("\n## ", 1)[0]
-        self.assertLessEqual(len(block.encode("utf-8")), 900)
 
     def test_control_contract_is_schema_valid_and_write_set_closed(self) -> None:
         metadata = frontmatter(CTRL)
@@ -116,8 +113,6 @@ class AutonomousDeliverySkillTests(unittest.TestCase):
             ".agents/skills/autonomous-delivery/SKILL.md",
             ".agents/skills/autonomous-delivery/references/product-system-contract.md",
             ".agents/skills/autonomous-delivery/references/roadmap-challenge.md",
-            "AGENTS.md",
-            "catalog/assets/core.yaml",
             "tests/test_autonomous_delivery_skill.py",
         }
         self.assertEqual(write_set, expected)
