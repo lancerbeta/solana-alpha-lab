@@ -42,7 +42,7 @@
     "runtime": {"path": "docs/evidence/task30/a20p_bitquery_named_partial_pit_route_capture_runtime_receipt_v1.json", "sha256": "fd7a52e6952e12fc48b9a88ed13b6dcfb28dbc9324cb767642fb28806897a185"},
     "agents_policy": {"path": "AGENTS.md", "sha256": "6905419d8bc5d2ab8d883036608cedd4954dd5022a06fef10a94d29a920c5d33"},
     "context_map": {"path": "delivery-harness/context-map.yaml", "sha256": "ca881df9da3884deb480327f2fd070e249572aa50f1d8eef30e877b5dfbbcf4d"},
-    "domain_policy": {"path": "delivery-harness/policies/solana-alpha-lab.md", "sha256": "ff8667d46d2e8aa00e5fc1d5409cebd04f49cbf313e486f5b014e5777ba4328f"}
+    "domain_policy": {"path": "delivery-harness/policies/solana-alpha-lab.md", "sha256": "10a279c275e4eb91f6768e58db9f301f103bbf89c085f98e2cffbe5d7c8a047e"}
   },
   "non_claims": {
     "provider_failure": false,

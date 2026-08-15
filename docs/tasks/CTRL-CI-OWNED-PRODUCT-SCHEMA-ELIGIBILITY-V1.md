@@ -20,6 +20,8 @@ managed_write_set:
   - delivery-harness/policies/solana-alpha-lab.md
   - docs/agent/EXECUTION_ROUTER_PROTOCOL.md
   - catalog/assets/core.yaml
+  - docs/evidence/control/delivery_harness_acceptance_v1.json
+  - docs/evidence/task30/a20r1_provider_route_capability_registry_acceptance_v1.json
 external_caps:
   network: false
   credentials: false

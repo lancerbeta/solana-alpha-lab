@@ -13619,7 +13619,7 @@ records:
   as_of: '2026-08-14'
   truth_owner: TASK-30
   location: {kind: git_path, logical_uri: 'repo://docs/evidence/task30/a20r1_provider_route_capability_registry_acceptance_v1.json', repository_path: docs/evidence/task30/a20r1_provider_route_capability_registry_acceptance_v1.json}
-  integrity: {kind: sha256, sha256: c01c7e0f65ff45ed3dee418b6f9870cd3b4ae9335ac8ab638f2196934253a416}
+  integrity: {kind: sha256, sha256: a5296c80a6c780a04c4e5226248ec76dd162197e46cfd665310dcbff25ccacf4}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: derived_from, target_asset_id: CONFIG-PROVIDER-ROUTE-CAPABILITY-REGISTRY-004}
