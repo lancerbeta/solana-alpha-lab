@@ -75,10 +75,11 @@ context_requirements:
     EXTERNAL_ROUTE_KNOWLEDGE: []
     ARCHITECTURE_DECISIONS: []
     DELIVERY_EVIDENCE:
-      - docs/evidence/task08/lifecycle_discovery_probe_execution_receipt_v1.json
-      - docs/evidence/task09/pumpswap_touch_probe_execution_receipt_v1.json
-      - docs/evidence/task21/effective_sample_summary_v1.json
-      - docs/evidence/task30/a24_raw_to_pit_admissibility_acceptance_v1.json
+      - docs/evidence/task36/a1_h11_lifecycle_clock_screen_runtime_receipt_v1.json
+      - docs/evidence/task36/a1_h11_lifecycle_clock_screen_acceptance_v1.json
+      - docs/evidence/task36/a1_delivery_completion_evidence_v1.json
+      - docs/evidence/task36/a1_delivery_independent_review_v1.json
+      - docs/evidence/task36/a1_delivery_factory_fit_v1.json
     HISTORICAL_CONTEXT: []
 ---
 

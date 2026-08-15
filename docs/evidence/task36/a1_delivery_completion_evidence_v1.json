@@ -26,7 +26,7 @@
     "docs/evidence/task36/a1_h11_lifecycle_clock_screen_acceptance_v1.json": "bdad6edb129c2ae626c52e4f135c93953941eef32c12ec6917060d0bf6b3c7de",
     "docs/evidence/task36/a1_h11_lifecycle_clock_screen_runtime_receipt_v1.json": "7cd6952156682bba773855097c39be67b584969a44624ae25bd5e9da2dbf9971",
     "docs/reports/task36/a1_h11_lifecycle_clock_screen_owner_readout_v1.md": "0b0e88098a6154ab54ea985aefd7c3756f734db0eebf5537f3cbd39167c589b2",
-    "docs/tasks/TASK-36-rc002-h11-lifecycle-clock-mechanism-screen.md": "2124b621b5774086c96ad2971a2143f01848e0e6d5fdcfbe23dafc931e4dc58e",
+    "docs/tasks/TASK-36-rc002-h11-lifecycle-clock-mechanism-screen.md": "39175c5eb07fdec3f1fe01218707cfe02db9e9673f38174f06839a1a411f9dc6",
     "registries/decisions_negative_results.yaml": "c2f72fed03730959c5d101f5e3d0606c2cf324a43982e15a589ae6bf93ac738c",
     "registries/global_trial_ledger.yaml": "bae08185c59b62792a2f30db8839132316e60ecd3f2eb831d753a9b178b7478a",
     "scripts/run_task36_rc002_h11_lifecycle_clock_screen.py": "ca4382173f5f525ae7b876f8c556fa9a520cdbfae0dab4014732452348c6bbde",
@@ -48,14 +48,14 @@
   },
   "factory_fit": {
     "path": "docs/evidence/task36/a1_delivery_factory_fit_v1.json",
-    "sha256": "231f4c3cdd88a18327f26a4be0c4d9353deb74323a77df122051a9daf5394088",
+    "sha256": "27ed0665c57def700b0aff025d07f63e60ed1b7323598d04ade16bf1bf7a4cea",
     "verdict": "PASS"
   },
   "validation": {
     "targeted": "PASS_H11_PROTOCOL_CATALOG_AND_LIFECYCLE_TESTS",
     "independent_review": {
       "path": "docs/evidence/task36/a1_delivery_independent_review_v1.json",
-      "sha256": "bc82aa2e37692a448f4fc1865cd4922d33686e4d3c7cd483f0e96e775259bc98",
+      "sha256": "8d06cc9c485af96c1a861edd4cd30647f911c6eb8ca047dc4ea73905b55ffded",
       "verdict": "PASS"
     },
     "full_gate": "ENFORCED_BY_PROJECT_BOUND_VALIDATION",
