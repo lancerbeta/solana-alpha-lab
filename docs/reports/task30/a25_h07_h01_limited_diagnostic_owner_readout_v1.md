@@ -47,7 +47,7 @@
 - Слотов на кластер: `96` × `900` с
 - Покрытие слотов: `TYPED_GAP_REQUIRED_NO_IMPUTATION`
 - Оценок маршрута на кластер: `SLOTS_PER_CLUSTER_TIMES_NOTIONAL_BUCKET_COUNT`
-- Размер набора нотионалов: `None` (параметр `NOTIONAL_BUCKET_SET_V1`)
+- Размер набора нотионалов: не определён — `FROZEN_PARAMETER_DEFINITION_ABSENT` (параметр `NOTIONAL_BUCKET_SET_V1`)
 - Решающий масштаб выводим из этой панели: `False` — `BETWEEN_CLUSTER_VARIANCE_UNIDENTIFIED_AT_ONE_CLUSTER`
 - Цель следующего измерения: `VARIANCE_CALIBRATION_PILOT_NOT_HYPOTHESIS_TEST`
 
@@ -85,6 +85,10 @@
 
 ## Что дальше
 
-Decide whether to fund a variance-calibration capture that adds the named route-feasibility lane over at least the minimum cluster count, or to retire RC001-H07-H01. This is not a trial, alpha or acceptance.
+Решение владельца: либо профинансировать захват, добавляющий недостающие полосы данных (`POST_MIGRATION_CONTEXT`, `ROUTE_FEASIBILITY`), либо снять `RC001-H07-H01-LIQUIDITY-RETENTION` с приоритета.
+
+Минимальный масштаб такого захвата: кластеров вида `POOL_DAY` — не менее `4`.
+
+Цель такого захвата — `VARIANCE_CALIBRATION_PILOT_NOT_HYPOTHESIS_TEST`: сначала измерить межкластерную дисперсию, и только потом планировать проверку гипотезы. Это не испытание, не альфа и не приёмка.
 
 `TASK-30` остаётся `BLOCKED_DATA`. RC001 не продвигается.

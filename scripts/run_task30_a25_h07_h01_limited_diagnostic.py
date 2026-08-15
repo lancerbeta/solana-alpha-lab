@@ -210,7 +210,7 @@ def _readout(runtime: dict[str, object]) -> str:
             ),
             (
                 "- Размер набора нотионалов: "
-                f"`{specification.get('notional_bucket_count')}` "
+                f"{_bucket_count(specification, parameters)} "
                 f"(параметр `{specification.get('notional_bucket_parameter')}`)"
             ),
             (
@@ -236,18 +236,50 @@ def _readout(runtime: dict[str, object]) -> str:
     limitations = verdict.get("limitations") or []
     if isinstance(limitations, list):
         lines.extend(f"- `{item}`" for item in limitations)
-    lines.extend(
-        [
-            "",
-            "## Что дальше",
-            "",
-            str(verdict.get("next_owner_decision", "")),
-            "",
-            "`TASK-30` остаётся `BLOCKED_DATA`. RC001 не продвигается.",
-            "",
-        ]
-    )
+    lines.extend(["", "## Что дальше", "", *_next_steps(verdict, specification), ""])
     return "\n".join(lines)
+
+
+def _bucket_count(
+    specification: dict[str, object], parameters: dict[str, object]
+) -> str:
+    """Never print a bare Python None to the owner."""
+    count = specification.get("notional_bucket_count")
+    if count is not None:
+        return f"`{count}`"
+    name = str(specification.get("notional_bucket_parameter"))
+    entry = dict(parameters.get(name) or {})  # type: ignore[arg-type]
+    return f"не определён — `{entry.get('unresolved_code')}`"
+
+
+def _next_steps(
+    verdict: dict[str, object], specification: dict[str, object]
+) -> list[str]:
+    """Render the owner's next decision in Russian from the machine fields."""
+    lanes = verdict.get("missing_capability_lanes") or []
+    named = ", ".join(f"`{lane}`" for lane in lanes) if isinstance(lanes, list) else ""
+    return [
+        (
+            "Решение владельца: либо профинансировать захват, добавляющий "
+            f"недостающие полосы данных ({named}), либо снять "
+            "`RC001-H07-H01-LIQUIDITY-RETENTION` с приоритета."
+        ),
+        "",
+        (
+            "Минимальный масштаб такого захвата: кластеров вида "
+            f"`{specification.get('cluster_unit')}` — не менее "
+            f"`{specification.get('minimum_clusters_for_two_group_cluster_level_test')}`."
+        ),
+        "",
+        (
+            "Цель такого захвата — "
+            f"`{specification.get('next_measurement_purpose')}`: сначала измерить "
+            "межкластерную дисперсию, и только потом планировать проверку "
+            "гипотезы. Это не испытание, не альфа и не приёмка."
+        ),
+        "",
+        "`TASK-30` остаётся `BLOCKED_DATA`. RC001 не продвигается.",
+    ]
 
 
 if __name__ == "__main__":
