@@ -1,0 +1,118 @@
+schema: smial.task30.raw-to-pit-admissibility-owner-panel.policy
+schema_version: '1.0'
+task_id: TASK-30
+atom_id: T30-A24_RAW_TO_PIT_ADMISSIBILITY_OWNER_PANEL_V1
+contract_id: CONTRACT-T30-A24-RAW-TO-PIT-001
+spec_route: BOTH
+adoption_route: WRAP_EXISTING_DECODER_AND_DATA_CONTRACTS
+consumer: RC001-H07-H01-LIQUIDITY-RETENTION
+frozen_definition:
+  path: configs/task28_rc001_registry_freeze_v1.yaml
+  group_id: RC001-H07-H01-LIQUIDITY-RETENTION
+  definition_sha256: 14a7387148d05773dedcb5ad6a8110a0dcab7e49da4dec77328903a5b7577df7
+input_bindings:
+  a22_raw:
+    path: local/task30_a22_helius_get_transactions_for_address/run=20260814T184209Z-7572a5c2/raw_response.json
+    sha256: 7244a4c049c7ebe5f77d6136513d402c9af568dd0ccabb3a842160ab61a72bcc
+    bytes: 9012030
+    ingested_at: '2026-08-14T18:42:09Z'
+    mode: READ_ONLY
+  a23_terminal_page:
+    path: local/task30_a23_helius_bounded_pagination/run=20260814T220124Z-e494b5aa/page=001/raw_response.json
+    sha256: 6770f134e61d334451780ded411fe5dd79e0577f2c532a5d3a8a694b8c58ae81
+    bytes: 93
+    expected_rows: 0
+    expected_cursor: null
+    completeness_available_at: '2026-08-14T22:01:24Z'
+    mode: READ_ONLY
+reference_subject:
+  network: solana
+  pool_address: URqx24yyYxtXXhTbBQnbtPLhtLWYoaDaRxuQuLpNS3S
+  base_mint: DMwbVy48dWVKGe9z1pcVnwF3HLMLrqWdDLfbvx8RchhK
+  quote_mint: So11111111111111111111111111111111111111112
+  base_decimals: 6
+  quote_decimals: 9
+  dex_id: pumpswap
+  program_address: pAMMBay6oceH9fJKBRHGP5D4bD4sWpmSwMn52FMfXEA
+  target_role: RAW_TO_PIT_ADMISSIBILITY_PANEL
+  representativeness: NOT_ESTABLISHED
+pilot_window:
+  since_inclusive: '2026-08-12T00:00:00Z'
+  till_exclusive: '2026-08-13T00:00:00Z'
+  block_time_gte: 1786492800
+  block_time_lt: 1786579200
+  interval_seconds: 900
+  expected_slots: 96
+decoder_binding:
+  idl_subset_path: tests/fixtures/task09/pumpswap_idl_subset_v1.json
+  idl_commit: 9c82f61cb711b044a17f770ab8ce9f9bdf78f333
+  program_id: pAMMBay6oceH9fJKBRHGP5D4bD4sWpmSwMn52FMfXEA
+instruction_discriminators:
+  buy: 66063d1201daebea
+  buy_exact_quote_in: c62e1552b4d9e870
+  sell: 33e685a4017f83ad
+  close_user_volume_accumulator: f945a4da9667548a
+  anchor_self_cpi_event: e445a52e51cb9a1d
+non_market_events:
+  CloseUserVolumeAccumulatorEvent:
+    discriminator_hex: 929fbdac925838f4
+    anchor_event_name: CloseUserVolumeAccumulatorEvent
+    matching_instruction: close_user_volume_accumulator
+slot_states:
+  - OBSERVED_TARGET_TRADES
+  - PROVEN_NO_TARGET_TRADE
+  - STATE_PERSISTENCE_PROVEN
+  - UNKNOWN_COVERAGE
+pit_policy:
+  required_timestamps:
+    - event_at
+    - observed_at
+    - first_reliable_available_at
+    - available_to_strategy_at
+    - ingested_at
+    - measured_as_of
+  backdate_retrieval_to_block_time: false
+  separate_retrospective_and_prospective: true
+  derived_availability_is_max_input: true
+terminal_outcomes:
+  - LIMITED_DIAGNOSTIC_PANEL_READY
+  - TARGETED_PROVIDER_CAPABILITY_GAP_PROVEN
+  - REDESIGN_DATA
+  - STOP_INTEGRITY_CONFLICT
+claims:
+  technical_admissibility_decision_only: true
+  complete_market_panel: false
+  continuous_price: false
+  missing_is_zero_or_flat: false
+  forward_fill: false
+  pit_prospective_route: false
+  h07_h01_trial: false
+  fillability: false
+  route_feasibility: false
+  execution: false
+  settlement: false
+  pnl: false
+  numeric_netreturn: false
+  alpha: false
+  strategy: false
+  task30_acceptance: false
+  rc001_definition_changed: false
+external_authority:
+  basis: EXPLICIT_OWNER_PHRASE
+  owner_phrase: OK T30-A24 RAW_TO_PIT_ADMISSIBILITY_OWNER_PANEL
+  provider_api_rpc_calls_authorized: 0
+  credential_reads_authorized: 0
+  purchase_authorized: false
+execution_controls:
+  retry: false
+  fallback: false
+  redirect: false
+  pagination: false
+  scheduler: false
+  background_process: false
+  network: false
+retention:
+  class: A4_OUTSIDE_GIT
+  raw_root: local/task30_a24_raw_to_pit_admissibility
+  create_only: true
+project_sources_disposition: NO_CHANGE

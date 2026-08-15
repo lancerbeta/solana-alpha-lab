@@ -1,0 +1,116 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://solana-alpha-lab.local/schemas/task30_a24_raw_to_pit_admissibility_owner_panel.schema.json",
+  "title": "TASK-30 A24 raw-to-PIT admissibility owner-panel policy",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema", "schema_version", "task_id", "atom_id", "contract_id",
+    "spec_route", "adoption_route", "consumer", "frozen_definition",
+    "input_bindings", "reference_subject", "pilot_window", "decoder_binding",
+    "instruction_discriminators", "non_market_events", "slot_states",
+    "pit_policy", "terminal_outcomes", "claims", "external_authority",
+    "execution_controls", "retention", "project_sources_disposition"
+  ],
+  "properties": {
+    "schema": {"const": "smial.task30.raw-to-pit-admissibility-owner-panel.policy"},
+    "schema_version": {"const": "1.0"},
+    "task_id": {"const": "TASK-30"},
+    "atom_id": {"const": "T30-A24_RAW_TO_PIT_ADMISSIBILITY_OWNER_PANEL_V1"},
+    "contract_id": {"const": "CONTRACT-T30-A24-RAW-TO-PIT-001"},
+    "spec_route": {"const": "BOTH"},
+    "adoption_route": {"const": "WRAP_EXISTING_DECODER_AND_DATA_CONTRACTS"},
+    "consumer": {"const": "RC001-H07-H01-LIQUIDITY-RETENTION"},
+    "frozen_definition": {"type": "object"},
+    "input_bindings": {"type": "object"},
+    "reference_subject": {"type": "object"},
+    "pilot_window": {"type": "object"},
+    "decoder_binding": {"type": "object"},
+    "instruction_discriminators": {"type": "object"},
+    "non_market_events": {"type": "object"},
+    "slot_states": {
+      "const": [
+        "OBSERVED_TARGET_TRADES",
+        "PROVEN_NO_TARGET_TRADE",
+        "STATE_PERSISTENCE_PROVEN",
+        "UNKNOWN_COVERAGE"
+      ]
+    },
+    "pit_policy": {"type": "object"},
+    "terminal_outcomes": {
+      "const": [
+        "LIMITED_DIAGNOSTIC_PANEL_READY",
+        "TARGETED_PROVIDER_CAPABILITY_GAP_PROVEN",
+        "REDESIGN_DATA",
+        "STOP_INTEGRITY_CONFLICT"
+      ]
+    },
+    "claims": {
+      "type": "object",
+      "required": [
+        "technical_admissibility_decision_only",
+        "complete_market_panel",
+        "continuous_price",
+        "missing_is_zero_or_flat",
+        "forward_fill",
+        "pit_prospective_route",
+        "h07_h01_trial",
+        "fillability",
+        "route_feasibility",
+        "execution",
+        "settlement",
+        "pnl",
+        "numeric_netreturn",
+        "alpha",
+        "strategy",
+        "task30_acceptance",
+        "rc001_definition_changed"
+      ],
+      "properties": {
+        "technical_admissibility_decision_only": {"const": true},
+        "complete_market_panel": {"const": false},
+        "continuous_price": {"const": false},
+        "missing_is_zero_or_flat": {"const": false},
+        "forward_fill": {"const": false},
+        "pit_prospective_route": {"const": false},
+        "h07_h01_trial": {"const": false},
+        "fillability": {"const": false},
+        "route_feasibility": {"const": false},
+        "execution": {"const": false},
+        "settlement": {"const": false},
+        "pnl": {"const": false},
+        "numeric_netreturn": {"const": false},
+        "alpha": {"const": false},
+        "strategy": {"const": false},
+        "task30_acceptance": {"const": false},
+        "rc001_definition_changed": {"const": false}
+      }
+    },
+    "external_authority": {
+      "type": "object",
+      "required": [
+        "basis", "owner_phrase", "provider_api_rpc_calls_authorized",
+        "credential_reads_authorized", "purchase_authorized"
+      ],
+      "properties": {
+        "owner_phrase": {"const": "OK T30-A24 RAW_TO_PIT_ADMISSIBILITY_OWNER_PANEL"},
+        "provider_api_rpc_calls_authorized": {"const": 0},
+        "credential_reads_authorized": {"const": 0},
+        "purchase_authorized": {"const": false}
+      }
+    },
+    "execution_controls": {
+      "const": {
+        "retry": false,
+        "fallback": false,
+        "redirect": false,
+        "pagination": false,
+        "scheduler": false,
+        "background_process": false,
+        "network": false
+      }
+    },
+    "retention": {"type": "object"},
+    "project_sources_disposition": {"const": "NO_CHANGE"}
+  }
+}

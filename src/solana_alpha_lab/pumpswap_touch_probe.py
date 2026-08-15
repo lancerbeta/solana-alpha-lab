@@ -619,17 +619,44 @@ def _event_discriminator(line: str) -> bytes | None:
     return payload[:8]
 
 
-def _decode_attributed_events(
+@dataclass(frozen=True, slots=True)
+class AttributedPumpSwapLogs:
+    decoded_events: tuple[DecodedTradeEvent, ...]
+    unsupported_pumpswap_program_data: int
+    unsupported_discriminators_hex: tuple[str, ...]
+    logs_truncated: bool
+    invocation_unclosed: bool
+
+
+def attribute_pumpswap_program_data_logs(
     plan: PumpSwapIdlPlan,
     *,
     logs: Sequence[str],
     transaction_succeeded: bool,
     allow_unclosed_stack: bool,
-) -> tuple[tuple[DecodedTradeEvent, ...], int]:
+) -> AttributedPumpSwapLogs:
+    """Attribute PumpSwap Program data using the actual invocation stack.
+
+    Program data emitted by any other program is ignored without parsing.
+    Truncation is recorded; decoded events emitted before the marker are kept.
+    """
+
+    if (
+        isinstance(logs, (str, bytes))
+        or not isinstance(logs, Sequence)
+        or not all(isinstance(line, str) for line in logs)
+    ):
+        raise TouchProtocolDriftError("program_logs_invalid")
+    truncation_indexes = [
+        index for index, line in enumerate(logs) if line == _LOG_TRUNCATED_MARKER
+    ]
+    logs_truncated = bool(truncation_indexes)
     stack: list[str] = []
     decoded: list[DecodedTradeEvent] = []
-    unsupported = 0
+    unsupported_hex: list[str] = []
     for line in logs:
+        if line == _LOG_TRUNCATED_MARKER:
+            continue
         invoke = _INVOKE_RE.fullmatch(line)
         if invoke:
             if int(invoke.group(2)) != len(stack) + 1:
@@ -644,15 +671,17 @@ def _decode_attributed_events(
                 )
             stack.pop()
             continue
-        discriminator = _event_discriminator(line)
-        if discriminator is None:
+        if not line.startswith(PROGRAM_DATA_PREFIX):
             continue
         if not stack:
             raise TouchProtocolDriftError("program_data_without_invocation")
         if stack[-1] != plan.program_id or not transaction_succeeded:
             continue
+        discriminator = _event_discriminator(line)
+        if discriminator is None:
+            raise TouchProtocolDriftError("program_data_discriminator_missing")
         if discriminator not in plan.event_by_discriminator:
-            unsupported += 1
+            unsupported_hex.append(discriminator.hex())
             continue
         try:
             event = decode_pumpswap_program_data(
@@ -668,9 +697,31 @@ def _decode_attributed_events(
         if event is None:
             raise TouchProtocolDriftError("successful_event_not_decoded")
         decoded.append(event)
-    if stack and not allow_unclosed_stack:
+    if stack and not allow_unclosed_stack and not logs_truncated:
         raise TouchProtocolDriftError("program_invocation_unclosed")
-    return tuple(decoded), unsupported
+    return AttributedPumpSwapLogs(
+        decoded_events=tuple(decoded),
+        unsupported_pumpswap_program_data=len(unsupported_hex),
+        unsupported_discriminators_hex=tuple(unsupported_hex),
+        logs_truncated=logs_truncated,
+        invocation_unclosed=bool(stack),
+    )
+
+
+def _decode_attributed_events(
+    plan: PumpSwapIdlPlan,
+    *,
+    logs: Sequence[str],
+    transaction_succeeded: bool,
+    allow_unclosed_stack: bool,
+) -> tuple[tuple[DecodedTradeEvent, ...], int]:
+    attributed = attribute_pumpswap_program_data_logs(
+        plan,
+        logs=logs,
+        transaction_succeeded=transaction_succeeded,
+        allow_unclosed_stack=allow_unclosed_stack,
+    )
+    return attributed.decoded_events, attributed.unsupported_pumpswap_program_data
 
 
 def parse_logs_notification(

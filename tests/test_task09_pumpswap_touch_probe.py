@@ -37,8 +37,10 @@ from solana_alpha_lab.pumpswap_touch_probe import (  # noqa: E402
     ExternalExecutionGate,
     HttpCapture,
     TouchNotificationError,
+    TouchProtocolDriftError,
     TouchProbeRunner,
     WssCapture,
+    attribute_pumpswap_program_data_logs,
     bind_get_transaction,
     bind_logs_subscribe,
     parse_logs_notification,
@@ -222,6 +224,40 @@ class Task09PumpSwapTouchProbeTests(unittest.TestCase):
                 plan=self.plan,
             ).decoded_events
         )
+
+    def test_attribution_ignores_other_program_program_data_without_parsing(self) -> None:
+        event_line = PROGRAM_DATA_PREFIX + base64.b64encode(
+            _payload(self.plan.events[0])
+        ).decode()
+        other_program = "AQU1FRd7otherProgram11111111111111111111111"
+        logs = [
+            f"Program {PUMPSWAP_PROGRAM_ID} invoke [1]",
+            event_line,
+            f"Program {PUMPSWAP_PROGRAM_ID} success",
+            f"Program {other_program} invoke [1]",
+            PROGRAM_DATA_PREFIX + "Synopsis not-valid-base64-payload",
+            f"Program {other_program} success",
+        ]
+        attributed = attribute_pumpswap_program_data_logs(
+            self.plan,
+            logs=logs,
+            transaction_succeeded=True,
+            allow_unclosed_stack=False,
+        )
+        self.assertEqual(len(attributed.decoded_events), 1)
+        self.assertEqual(attributed.decoded_events[0].event_name, "BuyEvent")
+        self.assertFalse(attributed.logs_truncated)
+        with self.assertRaises(TouchProtocolDriftError):
+            attribute_pumpswap_program_data_logs(
+                self.plan,
+                logs=[
+                    f"Program {PUMPSWAP_PROGRAM_ID} invoke [1]",
+                    PROGRAM_DATA_PREFIX + "Synopsis not-valid-base64-payload",
+                    f"Program {PUMPSWAP_PROGRAM_ID} success",
+                ],
+                transaction_succeeded=True,
+                allow_unclosed_stack=False,
+            )
 
     def test_get_transaction_result_preserves_gap_and_provider_failure(self) -> None:
         present = json.dumps(

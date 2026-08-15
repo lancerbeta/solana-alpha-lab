@@ -162,6 +162,7 @@ class LifecycleRegistryTests(unittest.TestCase):
                             "NEGATIVE-T30-BITQUERY-PIT-ROUTE-001",
                             "NEGATIVE-T30-HELIUS-GTA-ONE-SHOT-001",
                             "DECISION-T30-HELIUS-COMPLETE-RAW-BATCH-001",
+                            "DECISION-T30-A24-RAW-TO-PIT-001",
                         ],
                     )
                     self.assertEqual(
@@ -175,6 +176,7 @@ class LifecycleRegistryTests(unittest.TestCase):
                             "negative_result",
                             "negative_result",
                             "negative_result",
+                            "decision",
                             "decision",
                         ],
                     )

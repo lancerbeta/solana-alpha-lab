@@ -1,0 +1,80 @@
+{
+  "schema": "smial.delivery-completion-evidence",
+  "schema_version": "1.0",
+  "acceptance_id": "T30-A24-DELIVERY-COMPLETION-001",
+  "as_of": "2026-08-15",
+  "task_id": "TASK-30",
+  "state_change": "LIMITED_DIAGNOSTIC_PANEL_READY_NO_TASK30_PROMOTION",
+  "base_main": "ef6da7f95ed797f1106b1a176eb139006727a9c3",
+  "cloud_bundle_mode": "OWNER_MANAGED_OPTIONAL_EXPORT",
+  "cloud_bundle_required_by_harness": false,
+  "cloud_bundle_smoke_required": false,
+  "project_sources_disposition": {
+    "kind": "NO_CHANGE"
+  },
+  "capability_radar_now": "NONE",
+  "implementation_bindings": {
+    "catalog/assets/core.yaml": "3cc195a67a2a56f266abd4be51f4506a4158a39f2a53f9b257da73a8c1220359",
+    "catalog/assets/lifecycle.yaml": "e18d29c53b7ae741acad765c2eb7a4da52e7832f6a207c989321cd7c386ded8d",
+    "catalog/catalog_manifest.yaml": "cc622ae5ea6fbfc2b64e8018e3d493fc43ad1917fa32e0111032f5199889833b",
+    "catalog/generated/asset_edges.json": "516c2fc0f8fa44c744d9d86c017ddbad673dee98438bee37aee1bea8865a92ce",
+    "catalog/schemas/task30_a24_raw_to_pit_admissibility_owner_panel.schema.json": "cb87f713bcb71340424a409079ef465fa5dee285c185d5dc02eada9f1a368ff6",
+    "configs/task30_a24_raw_to_pit_admissibility_owner_panel_v1.yaml": "96593c1448c0cfc8735b8bd94841de8e15245f06f22388a79bf12da99b58f47e",
+    "docs/PROJECT_MAP.md": "ee1a634bf872fb76d3d69b6f751cc52707b83a968d6c8e3d7e40d37b77975617",
+    "docs/contracts/task30_a24_raw_to_pit_admissibility_owner_panel_contract_v1.md": "a1a34fdd88fdd67b4d40fd31a1e4e0820d3fe55053fd17badd083f7972d09ff8",
+    "docs/evidence/task30/a24_raw_to_pit_admissibility_acceptance_v1.json": "257e81801afbfa3ba6bf64e8c25b41009e560bb168e9a01d92c606ca4bcdb183",
+    "docs/evidence/task30/a24_raw_to_pit_admissibility_runtime_receipt_v1.json": "6b0f16d80ec72e46507755c09c79e434b6a8de0cf5f50d6f7e18e63fcdac75c4",
+    "docs/reports/task30/a24_raw_to_pit_admissibility_owner_readout_v1.md": "c621d1340cbe30f485a313cf509320d46baf3a8a159d62975a78741cb0b75601",
+    "docs/tasks/TASK-30-a24-raw-to-pit-admissibility-owner-panel.md": "ef5dad3ec02535cb70f1b6f24e1f89cc1dbd5cd21d40200f8ed77c8ea1a03494",
+    "registries/decisions_negative_results.yaml": "26dee58246cdd3b7f086244774b527350848dcda4a8e2aeca9b3f41c990a6d9e",
+    "scripts/run_task30_a24_raw_to_pit_admissibility.py": "4175cce79df3b5e9815113075ff4deed8816a9fece4832a451d6044777b70235",
+    "src/solana_alpha_lab/pumpswap_touch_probe.py": "756ce5ae47c3df04154ef8628bbb100af29a861d13811cfdbde70af239178bf6",
+    "src/solana_alpha_lab/task30_raw_to_pit_admissibility.py": "9df5773f70e8107824a990794b6b35df8fb9c64b94dc318c1dc1eb9f42de020b",
+    "tests/fixtures/task30/raw_to_pit_admissibility_v1.json": "425c9007243750abe3692a6bce54b3ff1875bb56e697be5bd4d6af943c7559d7",
+    "tests/test_catalog.py": "3b587b8672b841a9cdef41a02282331b818d55020187e53e66fbabe97cf6d33c",
+    "tests/test_lifecycle_registries.py": "8237f24e38630b70fa82920c4912e032ee89bb9667f3ec52e19cb29102247397",
+    "tests/test_task09_pumpswap_touch_probe.py": "0c52d94ff656e5045d5b0ebec7c87b153d29bc9d64675376e9d35c5c6b189477",
+    "tests/test_task30_a24_raw_to_pit_admissibility.py": "1957dde4b302ca8687aa45b89c2754abb95ce2a453df41b61fe4cd306109bcf1"
+  },
+  "active_stop_conditions": [],
+  "owner_attention_triggers": {
+    "auth_or_access_recovery": false,
+    "material_owner_decision": false,
+    "user_only_activation": false,
+    "external_material_action": false,
+    "unresolved_safety_or_truth_conflict": false
+  },
+  "factory_fit": {
+    "path": "docs/evidence/task30/a24_delivery_factory_fit_v1.json",
+    "sha256": "039ef2564668a3b37a7227f1ebd059de3f2a790db10767ec68f01c29ca8bf75c",
+    "verdict": "PASS"
+  },
+  "validation": {
+    "targeted": "PASS_55_A24_PROBE_CATALOG_LIFECYCLE_AND_DECODER_TESTS",
+    "independent_review": {
+      "path": "docs/evidence/task30/a24_delivery_independent_review_v1.json",
+      "sha256": "9e61b9084f5b71675db86ade7aa177b4c94494fadb99f99bc4c111f29fb7239c",
+      "verdict": "PASS"
+    },
+    "full_gate": "ENFORCED_BY_PROJECT_BOUND_VALIDATION",
+    "github_ci": "ENFORCED_LIVE_AT_GUARDED_MERGE",
+    "project_checks": [
+      "PASS_GENERATED_NAVIGATION_SECRET_AND_CATALOG_CHECKS"
+    ]
+  },
+  "non_claims": [
+    "NO_TASK30_ACCEPTANCE_OR_DONE",
+    "NO_PROSPECTIVE_PIT_ROUTE_OR_CONTINUOUS_PRICE",
+    "NO_H07_H01_TRIAL_ALPHA_EXECUTION_PNL_OR_NETRETURN",
+    "NO_PROVIDER_PURCHASE_RETRY_FALLBACK_OR_SECOND_PROVIDER",
+    "NO_RC001_DEFINITION_CHANGE"
+  ],
+  "side_effects": {
+    "credential_reads": 0,
+    "provider_requests": 0,
+    "retries": 0,
+    "fallbacks": 0,
+    "cash_spend_usd_cents": 0,
+    "wallet_signer_transaction_actions": 0
+  }
+}

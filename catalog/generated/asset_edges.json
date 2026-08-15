@@ -673,6 +673,11 @@
       "target_asset_id": "CONTRACT-T30-A23-HELIUS-PAGINATION-001"
     },
     {
+      "source_asset_id": "CONFIG-T30-A24-RAW-TO-PIT-001",
+      "relation": "governed_by",
+      "target_asset_id": "CONTRACT-T30-A24-RAW-TO-PIT-001"
+    },
+    {
       "source_asset_id": "CONFIG-T30-ACTIVE-POOL-ROUTE-YIELD-001",
       "relation": "governed_by",
       "target_asset_id": "CONTRACT-T30-ACTIVE-POOL-ROUTE-YIELD-001"
@@ -1363,6 +1368,11 @@
       "target_asset_id": "EVIDENCE-T30-A22-HELIUS-GTA-001"
     },
     {
+      "source_asset_id": "CONTRACT-T30-A24-RAW-TO-PIT-001",
+      "relation": "derived_from",
+      "target_asset_id": "EVIDENCE-T30-A23-HELIUS-PAGINATION-001"
+    },
+    {
       "source_asset_id": "CONTRACT-T30-ACTIVE-POOL-ROUTE-YIELD-001",
       "relation": "depends_on",
       "target_asset_id": "CONFIG-PROVIDER-ROUTE-CAPABILITY-REGISTRY-002"
@@ -1731,6 +1741,21 @@
       "source_asset_id": "CTRL-TASK-30-A23-001",
       "relation": "depends_on",
       "target_asset_id": "EVIDENCE-T30-A22-HELIUS-GTA-001"
+    },
+    {
+      "source_asset_id": "CTRL-TASK-30-A24-001",
+      "relation": "contains",
+      "target_asset_id": "CONTRACT-T30-A24-RAW-TO-PIT-001"
+    },
+    {
+      "source_asset_id": "CTRL-TASK-30-A24-001",
+      "relation": "contains",
+      "target_asset_id": "SCRIPT-T30-A24-RAW-TO-PIT-001"
+    },
+    {
+      "source_asset_id": "CTRL-TASK-30-A24-001",
+      "relation": "depends_on",
+      "target_asset_id": "EVIDENCE-T30-A23-HELIUS-PAGINATION-001"
     },
     {
       "source_asset_id": "CTRL-UVLOCK-001",
@@ -4063,6 +4088,76 @@
       "target_asset_id": "TEST-PROVIDER-ROUTE-CAPABILITY-REGISTRY-006"
     },
     {
+      "source_asset_id": "EVIDENCE-T30-A24-DELIVERY-COMPLETION-001",
+      "relation": "depends_on",
+      "target_asset_id": "EVIDENCE-T30-A24-DELIVERY-FACTORY-FIT-001"
+    },
+    {
+      "source_asset_id": "EVIDENCE-T30-A24-DELIVERY-COMPLETION-001",
+      "relation": "depends_on",
+      "target_asset_id": "EVIDENCE-T30-A24-DELIVERY-INDEPENDENT-REVIEW-001"
+    },
+    {
+      "source_asset_id": "EVIDENCE-T30-A24-DELIVERY-COMPLETION-001",
+      "relation": "depends_on",
+      "target_asset_id": "SCHEMA-DELIVERY-COMPLETION-EVIDENCE-001"
+    },
+    {
+      "source_asset_id": "EVIDENCE-T30-A24-DELIVERY-COMPLETION-001",
+      "relation": "derived_from",
+      "target_asset_id": "EVIDENCE-T30-A24-RAW-TO-PIT-001"
+    },
+    {
+      "source_asset_id": "EVIDENCE-T30-A24-DELIVERY-FACTORY-FIT-001",
+      "relation": "depends_on",
+      "target_asset_id": "EVIDENCE-T30-A24-DELIVERY-INDEPENDENT-REVIEW-001"
+    },
+    {
+      "source_asset_id": "EVIDENCE-T30-A24-DELIVERY-FACTORY-FIT-001",
+      "relation": "derived_from",
+      "target_asset_id": "EVIDENCE-T30-A24-RAW-TO-PIT-001"
+    },
+    {
+      "source_asset_id": "EVIDENCE-T30-A24-DELIVERY-INDEPENDENT-REVIEW-001",
+      "relation": "depends_on",
+      "target_asset_id": "SCHEMA-DELIVERY-INDEPENDENT-REVIEW-EVIDENCE-001"
+    },
+    {
+      "source_asset_id": "EVIDENCE-T30-A24-DELIVERY-INDEPENDENT-REVIEW-001",
+      "relation": "derived_from",
+      "target_asset_id": "EVIDENCE-T30-A24-RAW-TO-PIT-001"
+    },
+    {
+      "source_asset_id": "EVIDENCE-T30-A24-RAW-TO-PIT-001",
+      "relation": "depends_on",
+      "target_asset_id": "EVIDENCE-T30-A24P-RAW-TO-PIT-001"
+    },
+    {
+      "source_asset_id": "EVIDENCE-T30-A24-RAW-TO-PIT-001",
+      "relation": "derived_from",
+      "target_asset_id": "CONTRACT-T30-A24-RAW-TO-PIT-001"
+    },
+    {
+      "source_asset_id": "EVIDENCE-T30-A24-RAW-TO-PIT-001",
+      "relation": "validated_by",
+      "target_asset_id": "TEST-T30-A24-RAW-TO-PIT-001"
+    },
+    {
+      "source_asset_id": "EVIDENCE-T30-A24P-RAW-TO-PIT-001",
+      "relation": "depends_on",
+      "target_asset_id": "EVIDENCE-T30-A23-HELIUS-PAGINATION-001"
+    },
+    {
+      "source_asset_id": "EVIDENCE-T30-A24P-RAW-TO-PIT-001",
+      "relation": "derived_from",
+      "target_asset_id": "CONFIG-T30-A24-RAW-TO-PIT-001"
+    },
+    {
+      "source_asset_id": "EVIDENCE-T30-A24P-RAW-TO-PIT-001",
+      "relation": "validated_by",
+      "target_asset_id": "TEST-T30-A24-RAW-TO-PIT-001"
+    },
+    {
       "source_asset_id": "EVIDENCE-T30-A3-BIRDEYE-PILOT-READINESS-001",
       "relation": "derived_from",
       "target_asset_id": "MODULE-T30-BIRDEYE-PILOT-READINESS-001"
@@ -4766,6 +4861,11 @@
       "source_asset_id": "FIXTURE-T30-A23-HELIUS-PAGINATION-001",
       "relation": "governed_by",
       "target_asset_id": "CONTRACT-T30-A23-HELIUS-PAGINATION-001"
+    },
+    {
+      "source_asset_id": "FIXTURE-T30-A24-RAW-TO-PIT-001",
+      "relation": "governed_by",
+      "target_asset_id": "CONTRACT-T30-A24-RAW-TO-PIT-001"
     },
     {
       "source_asset_id": "FIXTURE-T30-ACTIVE-POOL-ROUTE-YIELD-001",
@@ -5733,6 +5833,26 @@
       "target_asset_id": "TEST-T30-A23-HELIUS-PAGINATION-001"
     },
     {
+      "source_asset_id": "MODULE-T30-A24-RAW-TO-PIT-001",
+      "relation": "depends_on",
+      "target_asset_id": "MODULE-T09-PUMPSWAP-TOUCH-DECODER-001"
+    },
+    {
+      "source_asset_id": "MODULE-T30-A24-RAW-TO-PIT-001",
+      "relation": "depends_on",
+      "target_asset_id": "MODULE-T09-PUMPSWAP-TOUCH-PROBE-001"
+    },
+    {
+      "source_asset_id": "MODULE-T30-A24-RAW-TO-PIT-001",
+      "relation": "governed_by",
+      "target_asset_id": "CONTRACT-T30-A24-RAW-TO-PIT-001"
+    },
+    {
+      "source_asset_id": "MODULE-T30-A24-RAW-TO-PIT-001",
+      "relation": "validated_by",
+      "target_asset_id": "TEST-T30-A24-RAW-TO-PIT-001"
+    },
+    {
       "source_asset_id": "MODULE-T30-ACTIVE-POOL-ROUTE-YIELD-001",
       "relation": "depends_on",
       "target_asset_id": "MODULE-PROVIDER-ROUTE-CAPABILITY-REGISTRY-002"
@@ -6393,6 +6513,11 @@
       "target_asset_id": "EVIDENCE-T30-A23P-HELIUS-PAGINATION-001"
     },
     {
+      "source_asset_id": "REPORT-T30-A24-RAW-TO-PIT-001",
+      "relation": "derived_from",
+      "target_asset_id": "EVIDENCE-T30-A24P-RAW-TO-PIT-001"
+    },
+    {
       "source_asset_id": "REPORT-T30-FORWARD-RAW-TRADE-ROUTE-001",
       "relation": "derived_from",
       "target_asset_id": "SCRIPT-T30-FORWARD-RAW-TRADE-ROUTE-001"
@@ -6881,6 +7006,11 @@
       "source_asset_id": "SCHEMA-T30-A23-HELIUS-PAGINATION-001",
       "relation": "governed_by",
       "target_asset_id": "CONTRACT-T30-A23-HELIUS-PAGINATION-001"
+    },
+    {
+      "source_asset_id": "SCHEMA-T30-A24-RAW-TO-PIT-001",
+      "relation": "governed_by",
+      "target_asset_id": "CONTRACT-T30-A24-RAW-TO-PIT-001"
     },
     {
       "source_asset_id": "SCHEMA-T30-ACTIVE-POOL-ROUTE-YIELD-001",
@@ -7386,6 +7516,16 @@
       "source_asset_id": "SCRIPT-T30-A23-HELIUS-PAGINATION-001",
       "relation": "governed_by",
       "target_asset_id": "CONTRACT-T30-A23-HELIUS-PAGINATION-001"
+    },
+    {
+      "source_asset_id": "SCRIPT-T30-A24-RAW-TO-PIT-001",
+      "relation": "depends_on",
+      "target_asset_id": "MODULE-T30-A24-RAW-TO-PIT-001"
+    },
+    {
+      "source_asset_id": "SCRIPT-T30-A24-RAW-TO-PIT-001",
+      "relation": "governed_by",
+      "target_asset_id": "CONTRACT-T30-A24-RAW-TO-PIT-001"
     },
     {
       "source_asset_id": "SCRIPT-T30-ACTIVE-POOL-ROUTE-YIELD-001",
@@ -8991,6 +9131,26 @@
       "source_asset_id": "TEST-T30-A23-HELIUS-PAGINATION-001",
       "relation": "depends_on",
       "target_asset_id": "SCRIPT-T30-A23-HELIUS-PAGINATION-001"
+    },
+    {
+      "source_asset_id": "TEST-T30-A24-RAW-TO-PIT-001",
+      "relation": "depends_on",
+      "target_asset_id": "CONFIG-T30-A24-RAW-TO-PIT-001"
+    },
+    {
+      "source_asset_id": "TEST-T30-A24-RAW-TO-PIT-001",
+      "relation": "depends_on",
+      "target_asset_id": "MODULE-T30-A24-RAW-TO-PIT-001"
+    },
+    {
+      "source_asset_id": "TEST-T30-A24-RAW-TO-PIT-001",
+      "relation": "depends_on",
+      "target_asset_id": "SCHEMA-T30-A24-RAW-TO-PIT-001"
+    },
+    {
+      "source_asset_id": "TEST-T30-A24-RAW-TO-PIT-001",
+      "relation": "depends_on",
+      "target_asset_id": "SCRIPT-T30-A24-RAW-TO-PIT-001"
     },
     {
       "source_asset_id": "TEST-T30-A5R1-BIRDEYE-EXTERNAL-READ-RUNTIME-001",
