@@ -1,0 +1,346 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://solana-alpha-lab.local/schemas/task30_a25_h07_h01_limited_diagnostic.schema.json",
+  "title": "TASK-30 A25 frozen H07/H01 limited diagnostic and measurability policy",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema", "schema_version", "task_id", "atom_id", "contract_id",
+    "spec_route", "adoption_route", "consumer", "frozen_definition",
+    "upstream_panel", "orientation_constants", "definition_input_lanes",
+    "derived_lanes", "structurally_unsupported_requirements",
+    "lane_field_supply", "target_metric_requirements",
+    "frozen_parameter_resolution", "cluster_design",
+    "statistic_slot_consumption", "required_data_specification",
+    "terminal_outcomes", "claims", "external_authority",
+    "execution_controls", "retention", "project_sources_disposition"
+  ],
+  "properties": {
+    "schema": {"const": "smial.task30.h07-h01-limited-diagnostic.policy"},
+    "schema_version": {"const": "1.0"},
+    "task_id": {"const": "TASK-30"},
+    "atom_id": {"const": "T30-A25_H07_H01_FROZEN_LIMITED_DIAGNOSTIC_AND_MEASURABILITY_VERDICT_V1"},
+    "contract_id": {"const": "CONTRACT-T30-A25-H07-H01-LIMITED-DIAGNOSTIC-001"},
+    "spec_route": {"const": "BOTH"},
+    "adoption_route": {"const": "WRAP_EXISTING_A24_PANEL_AND_FROZEN_ESTIMAND"},
+    "consumer": {"const": "RC001-H07-H01-LIQUIDITY-RETENTION"},
+    "frozen_definition": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "path", "group_id", "definition_sha256", "entry_gate_policy_path",
+        "entry_gate_atom_id"
+      ],
+      "properties": {
+        "path": {"const": "configs/task28_rc001_registry_freeze_v1.yaml"},
+        "group_id": {"const": "RC001-H07-H01-LIQUIDITY-RETENTION"},
+        "definition_sha256": {"const": "14a7387148d05773dedcb5ad6a8110a0dcab7e49da4dec77328903a5b7577df7"},
+        "entry_gate_policy_path": {"const": "configs/task30_h07_h01_exact_data_contract_entry_gate_v1.yaml"},
+        "entry_gate_atom_id": {"const": "T30-A8_H07_H01_EXACT_DATA_CONTRACT_ENTRY_GATE_V1"}
+      }
+    },
+    "upstream_panel": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["policy_path", "atom_id", "required_terminal_decision", "panel_row_count"],
+      "properties": {
+        "policy_path": {"const": "configs/task30_a24_raw_to_pit_admissibility_owner_panel_v1.yaml"},
+        "atom_id": {"const": "T30-A24_RAW_TO_PIT_ADMISSIBILITY_OWNER_PANEL_V1"},
+        "required_terminal_decision": {"const": "LIMITED_DIAGNOSTIC_PANEL_READY"},
+        "panel_row_count": {"const": 96}
+      }
+    },
+    "orientation_constants": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "successful_transactions", "attributed_pumpswap_events",
+        "decoded_buy_sell_events", "target_pool_trade_events",
+        "target_buy_events", "target_sell_events", "other_pool_trade_events",
+        "close_user_volume_accumulator_events", "log_truncated_transactions",
+        "slot_state_counts"
+      ],
+      "properties": {
+        "successful_transactions": {"const": 520},
+        "attributed_pumpswap_events": {"const": 163},
+        "decoded_buy_sell_events": {"const": 153},
+        "target_pool_trade_events": {"const": 149},
+        "target_buy_events": {"const": 96},
+        "target_sell_events": {"const": 53},
+        "other_pool_trade_events": {"const": 4},
+        "close_user_volume_accumulator_events": {"const": 10},
+        "log_truncated_transactions": {"const": 14},
+        "slot_state_counts": {
+          "const": {
+            "OBSERVED_TARGET_TRADES": 35,
+            "PROVEN_NO_TARGET_TRADE": 1,
+            "STATE_PERSISTENCE_PROVEN": 60,
+            "UNKNOWN_COVERAGE": 0
+          }
+        }
+      }
+    },
+    "definition_input_lanes": {
+      "type": "object",
+      "additionalProperties": {"enum": ["PIT_MARKET", "ROUTE_FEASIBILITY", "POST_MIGRATION_CONTEXT"]},
+      "minProperties": 3
+    },
+    "derived_lanes": {
+      "type": "object",
+      "additionalProperties": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["entry_gate_requirement", "field_source_key"],
+        "properties": {
+          "entry_gate_requirement": {"type": "string", "minLength": 1},
+          "field_source_key": {"type": "string", "minLength": 1}
+        }
+      }
+    },
+    "structurally_unsupported_requirements": {
+      "type": "object",
+      "additionalProperties": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["expected_state", "expected_future_capture_capable"],
+        "properties": {
+          "expected_state": {"type": "string", "minLength": 1},
+          "expected_future_capture_capable": {"const": false}
+        }
+      }
+    },
+    "lane_field_supply": {
+      "type": "object",
+      "minProperties": 3,
+      "additionalProperties": {
+        "type": "object",
+        "minProperties": 1,
+        "additionalProperties": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["kind"],
+          "properties": {
+            "kind": {
+              "enum": [
+                "PANEL_CONSTANT", "PIT_FIELD", "ROW_FIELD",
+                "ROW_FIELD_FRESH_ONLY", "IDENTIFIER_ONLY_NOT_AN_OBSERVATION",
+                "ABSENT"
+              ]
+            },
+            "source": {"type": "string", "minLength": 1},
+            "staleness_flag": {"type": "string", "minLength": 1},
+            "reason": {"type": "string", "minLength": 1},
+            "equivalent_leaf_names": {
+              "type": "array",
+              "minItems": 1,
+              "uniqueItems": true,
+              "items": {"type": "string", "minLength": 1}
+            }
+          },
+          "allOf": [
+            {
+              "if": {"properties": {"kind": {"const": "ABSENT"}}, "required": ["kind"]},
+              "then": {"required": ["reason", "equivalent_leaf_names"]}
+            },
+            {
+              "if": {
+                "properties": {
+                  "kind": {"enum": ["PANEL_CONSTANT", "PIT_FIELD", "ROW_FIELD", "ROW_FIELD_FRESH_ONLY", "IDENTIFIER_ONLY_NOT_AN_OBSERVATION"]}
+                },
+                "required": ["kind"]
+              },
+              "then": {"required": ["source"]}
+            },
+            {
+              "if": {"properties": {"kind": {"const": "ROW_FIELD_FRESH_ONLY"}}, "required": ["kind"]},
+              "then": {"required": ["staleness_flag"]}
+            }
+          ]
+        }
+      }
+    },
+    "target_metric_requirements": {
+      "type": "object",
+      "minProperties": 3,
+      "additionalProperties": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["required_lanes", "frozen_justification"],
+        "properties": {
+          "required_lanes": {
+            "type": "array",
+            "minItems": 1,
+            "uniqueItems": true,
+            "items": {"enum": ["PIT_MARKET", "ROUTE_FEASIBILITY", "POST_MIGRATION_CONTEXT"]}
+          },
+          "frozen_justification": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["path"],
+            "properties": {
+              "path": {"type": "string", "minLength": 1},
+              "must_equal": {"type": "string", "minLength": 1},
+              "must_contain": {"type": "string", "minLength": 1}
+            },
+            "anyOf": [{"required": ["must_equal"]}, {"required": ["must_contain"]}]
+          }
+        }
+      }
+    },
+    "frozen_parameter_resolution": {
+      "type": "object",
+      "minProperties": 2,
+      "additionalProperties": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["resolved"],
+        "properties": {
+          "resolved": {"type": "boolean"},
+          "resolved_as_seconds": {"type": "integer", "minimum": 1},
+          "resolved_bucket_count": {"type": ["integer", "null"], "minimum": 1},
+          "binding": {"type": "string", "minLength": 1},
+          "unresolved_code": {"type": "string", "minLength": 1},
+          "owner_document": {"type": "string", "minLength": 1},
+          "non_adopted_observed_convention": {"type": "string", "minLength": 1}
+        }
+      }
+    },
+    "cluster_design": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "cluster_unit", "pools", "days", "independent_clusters",
+        "slots_per_cluster", "slot_interval_seconds",
+        "slots_are_independent_replicates", "slot_dependence_reason"
+      ],
+      "properties": {
+        "cluster_unit": {"const": "POOL_DAY"},
+        "pools": {"type": "integer", "minimum": 1},
+        "days": {"type": "integer", "minimum": 1},
+        "independent_clusters": {"type": "integer", "minimum": 1},
+        "slots_per_cluster": {"const": 96},
+        "slot_interval_seconds": {"const": 900},
+        "slots_are_independent_replicates": {"const": false},
+        "slot_dependence_reason": {"type": "string", "minLength": 1}
+      }
+    },
+    "statistic_slot_consumption": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "observed_states", "typed_gap_states", "unknown_states",
+        "state_persistence_counts_as_observed_trade",
+        "carry_forward_counts_as_fresh_liquidity_observation"
+      ],
+      "properties": {
+        "observed_states": {"const": ["OBSERVED_TARGET_TRADES"]},
+        "typed_gap_states": {"const": ["PROVEN_NO_TARGET_TRADE", "STATE_PERSISTENCE_PROVEN"]},
+        "unknown_states": {"const": ["UNKNOWN_COVERAGE"]},
+        "state_persistence_counts_as_observed_trade": {"const": false},
+        "carry_forward_counts_as_fresh_liquidity_observation": {"const": false}
+      }
+    },
+    "required_data_specification": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "cluster_unit", "minimum_clusters_for_defined_between_cluster_variance",
+        "minimum_clusters_for_two_group_cluster_level_test", "slots_per_cluster",
+        "slot_interval_seconds", "route_evaluations_per_cluster_formula",
+        "notional_bucket_parameter", "slot_coverage_policy",
+        "decisive_scale_derivable_from_this_panel", "decisive_scale_blocker",
+        "next_measurement_purpose"
+      ],
+      "properties": {
+        "cluster_unit": {"const": "POOL_DAY"},
+        "minimum_clusters_for_defined_between_cluster_variance": {"const": 2},
+        "minimum_clusters_for_two_group_cluster_level_test": {"const": 4},
+        "slots_per_cluster": {"const": 96},
+        "slot_interval_seconds": {"const": 900},
+        "route_evaluations_per_cluster_formula": {"const": "SLOTS_PER_CLUSTER_TIMES_NOTIONAL_BUCKET_COUNT"},
+        "notional_bucket_parameter": {"const": "NOTIONAL_BUCKET_SET_V1"},
+        "slot_coverage_policy": {"const": "TYPED_GAP_REQUIRED_NO_IMPUTATION"},
+        "decisive_scale_derivable_from_this_panel": {"const": false},
+        "decisive_scale_blocker": {"type": "string", "minLength": 1},
+        "next_measurement_purpose": {"type": "string", "minLength": 1}
+      }
+    },
+    "terminal_outcomes": {
+      "const": [
+        "ESTIMAND_MEASURABLE_AND_DECISIVE_ON_FROZEN_PANEL",
+        "ESTIMAND_MEASURABLE_UNDERPOWERED_WITH_EXACT_DATA_SPEC",
+        "ESTIMAND_NOT_COMPUTABLE_TARGETED_CAPABILITY_GAP_PROVEN",
+        "STOP_INTEGRITY_CONFLICT"
+      ]
+    },
+    "claims": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "measurability_diagnostic_only", "effect_estimate",
+        "hypothesis_supported_or_refuted", "continuous_price",
+        "missing_is_zero_or_flat", "forward_fill", "pit_prospective_route",
+        "h07_h01_trial", "fillability", "route_feasibility", "execution",
+        "settlement", "pnl", "numeric_netreturn", "alpha", "strategy",
+        "task30_acceptance", "rc001_definition_changed"
+      ],
+      "properties": {
+        "measurability_diagnostic_only": {"const": true},
+        "effect_estimate": {"const": false},
+        "hypothesis_supported_or_refuted": {"const": false},
+        "continuous_price": {"const": false},
+        "missing_is_zero_or_flat": {"const": false},
+        "forward_fill": {"const": false},
+        "pit_prospective_route": {"const": false},
+        "h07_h01_trial": {"const": false},
+        "fillability": {"const": false},
+        "route_feasibility": {"const": false},
+        "execution": {"const": false},
+        "settlement": {"const": false},
+        "pnl": {"const": false},
+        "numeric_netreturn": {"const": false},
+        "alpha": {"const": false},
+        "strategy": {"const": false},
+        "task30_acceptance": {"const": false},
+        "rc001_definition_changed": {"const": false}
+      }
+    },
+    "external_authority": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "basis", "owner_phrase", "provider_api_rpc_calls_authorized",
+        "credential_reads_authorized", "purchase_authorized"
+      ],
+      "properties": {
+        "basis": {"const": "EXPLICIT_OWNER_PHRASE"},
+        "owner_phrase": {"const": "OK T30-A25 H07_H01_FROZEN_LIMITED_DIAGNOSTIC_AND_MEASURABILITY_VERDICT"},
+        "provider_api_rpc_calls_authorized": {"const": 0},
+        "credential_reads_authorized": {"const": 0},
+        "purchase_authorized": {"const": false}
+      }
+    },
+    "execution_controls": {
+      "const": {
+        "retry": false,
+        "fallback": false,
+        "redirect": false,
+        "pagination": false,
+        "scheduler": false,
+        "background_process": false,
+        "network": false
+      }
+    },
+    "retention": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["class", "raw_root", "create_only"],
+      "properties": {
+        "class": {"const": "A4_OUTSIDE_GIT"},
+        "raw_root": {"const": "local/task30_a25_h07_h01_limited_diagnostic"},
+        "create_only": {"const": true}
+      }
+    },
+    "project_sources_disposition": {"const": "NO_CHANGE"}
+  }
+}

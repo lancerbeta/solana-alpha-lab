@@ -21032,3 +21032,273 @@ records:
   evidence: []
   search_terms: [A24, FACTORY_FIT, FULL_REVIEW, WRAP, LIMITED_DIAGNOSTIC]
   classification: {contains_secrets: false, contains_raw_data: false, sensitivity: INTERNAL_NON_SECRET}
+
+- asset_id: CONTRACT-T30-A25-H07-H01-LIMITED-DIAGNOSTIC-001
+  record_version: '1.0'
+  asset_type: control_document
+  purpose: Exact A25 offline contract for the frozen H07/H01 measurability verdict over the A24 panel.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-08-15'
+  truth_owner: TASK-30
+  location: {kind: git_path, logical_uri: 'repo://docs/contracts/task30_a25_h07_h01_limited_diagnostic_contract_v1.md', repository_path: docs/contracts/task30_a25_h07_h01_limited_diagnostic_contract_v1.md}
+  integrity: {kind: sha256, sha256: 07935b4baa7224ebff2b76ead84d609a302debe511bd4d8c7826cd881b80efdd}
+  access: {mode: read_only, method: file, network_required: false, secrets_required: false}
+  relations:
+  - {relation_type: derived_from, target_asset_id: EVIDENCE-T30-A24-RAW-TO-PIT-001}
+  - {relation_type: depends_on, target_asset_id: CONTRACT-T30-H07-H01-DATA-CONTRACT-GATE-001}
+  - {relation_type: depends_on, target_asset_id: CONFIG-T28-RC001-REGISTRY-FREEZE-001}
+  consumers: [TASK-30, FACTORY-001]
+  evidence: []
+  search_terms: [A25, MEASURABILITY, FROZEN_ESTIMAND, CLUSTER_PRECISION, CAPABILITY_GAP]
+  classification: {contains_secrets: false, contains_raw_data: false, sensitivity: INTERNAL_NON_SECRET}
+
+- asset_id: CONFIG-T30-A25-H07-H01-LIMITED-DIAGNOSTIC-001
+  record_version: '1.0'
+  asset_type: configuration
+  purpose: Closed A25 policy binding frozen lane fields, metric justifications, cluster design and terminal outcomes.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-08-15'
+  truth_owner: TASK-30
+  location: {kind: git_path, logical_uri: 'repo://configs/task30_a25_h07_h01_limited_diagnostic_v1.yaml', repository_path: configs/task30_a25_h07_h01_limited_diagnostic_v1.yaml}
+  integrity: {kind: sha256, sha256: 3cb8c0f391f17d1acef06db9ec36c3ac10f5956569f968ddef746e9034b92e2a}
+  access: {mode: read_only, method: file, network_required: false, secrets_required: false}
+  relations:
+  - {relation_type: governed_by, target_asset_id: CONTRACT-T30-A25-H07-H01-LIMITED-DIAGNOSTIC-001}
+  - {relation_type: depends_on, target_asset_id: CONFIG-T30-A24-RAW-TO-PIT-001}
+  consumers: [TASK-30, FACTORY-001]
+  evidence: []
+  search_terms: [A25, POLICY, LANE_FIELD_SUPPLY, POOL_DAY_CLUSTER, ZERO_PROVIDER]
+  classification: {contains_secrets: false, contains_raw_data: false, sensitivity: INTERNAL_NON_SECRET}
+
+- asset_id: SCHEMA-T30-A25-H07-H01-LIMITED-DIAGNOSTIC-001
+  record_version: '1.0'
+  asset_type: schema
+  purpose: Closed JSON Schema for A25 frozen bindings, lane supply kinds, cluster design and claims.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-08-15'
+  truth_owner: TASK-30
+  location: {kind: git_path, logical_uri: 'repo://catalog/schemas/task30_a25_h07_h01_limited_diagnostic.schema.json', repository_path: catalog/schemas/task30_a25_h07_h01_limited_diagnostic.schema.json}
+  integrity: {kind: sha256, sha256: a6a07755ce7e8599d5e10c2f700fb0613aa55a598612dbe30807c3928a4b0da8}
+  access: {mode: read_only, method: file, network_required: false, secrets_required: false}
+  relations: [{relation_type: governed_by, target_asset_id: CONTRACT-T30-A25-H07-H01-LIMITED-DIAGNOSTIC-001}]
+  consumers: [TASK-30, FACTORY-001]
+  evidence: []
+  search_terms: [A25, CLOSED_SCHEMA, SUPPLY_KINDS, TERMINAL_OUTCOMES]
+  classification: {contains_secrets: false, contains_raw_data: false, sensitivity: INTERNAL_NON_SECRET}
+
+- asset_id: FIXTURE-T30-A25-H07-H01-LIMITED-DIAGNOSTIC-001
+  record_version: '1.0'
+  asset_type: evidence
+  purpose: Secret-free A25 expectation fixture for the frozen estimand and the measurability verdict.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-08-15'
+  truth_owner: TASK-30
+  location: {kind: git_path, logical_uri: 'repo://tests/fixtures/task30/h07_h01_limited_diagnostic_v1.json', repository_path: tests/fixtures/task30/h07_h01_limited_diagnostic_v1.json}
+  integrity: {kind: sha256, sha256: 595f3588faa21a4f92d540b358788325c75a99079671710a018b6c49d93a28bb}
+  access: {mode: read_only, method: file, network_required: false, secrets_required: false}
+  relations: [{relation_type: governed_by, target_asset_id: CONTRACT-T30-A25-H07-H01-LIMITED-DIAGNOSTIC-001}]
+  consumers: [TASK-30, FACTORY-001]
+  evidence: []
+  search_terms: [A25, FIXTURE, NOT_COMPUTABLE, SINGLE_CLUSTER, FORBIDDEN_COERCIONS]
+  classification: {contains_secrets: false, contains_raw_data: false, sensitivity: INTERNAL_NON_SECRET}
+
+- asset_id: MODULE-T30-A25-H07-H01-LIMITED-DIAGNOSTIC-001
+  record_version: '1.0'
+  asset_type: script
+  purpose: Fail-closed frozen-owner binding, proved field absence, metric computability and single-cluster precision.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-08-15'
+  truth_owner: TASK-30
+  location: {kind: git_path, logical_uri: 'repo://src/solana_alpha_lab/task30_h07_h01_limited_diagnostic.py', repository_path: src/solana_alpha_lab/task30_h07_h01_limited_diagnostic.py}
+  integrity: {kind: sha256, sha256: 0980f1710810ffd120d860d8706f303cce25ad7f3ff4940b2892c14986a957bb}
+  access: {mode: read_only, method: file, network_required: false, secrets_required: false}
+  relations:
+  - {relation_type: governed_by, target_asset_id: CONTRACT-T30-A25-H07-H01-LIMITED-DIAGNOSTIC-001}
+  - {relation_type: depends_on, target_asset_id: MODULE-T30-A24-RAW-TO-PIT-001}
+  - {relation_type: depends_on, target_asset_id: CONFIG-T28-RC001-REGISTRY-FREEZE-001}
+  - {relation_type: validated_by, target_asset_id: TEST-T30-A25-H07-H01-LIMITED-DIAGNOSTIC-001}
+  consumers: [TASK-30, FACTORY-001]
+  evidence: []
+  search_terms: [A25, WRAP_A24, ABSENCE_PROOF, NO_NAIVE_STANDARD_ERROR, FAIL_CLOSED]
+  classification: {contains_secrets: false, contains_raw_data: false, sensitivity: INTERNAL_NON_SECRET}
+
+- asset_id: SCRIPT-T30-A25-H07-H01-LIMITED-DIAGNOSTIC-001
+  record_version: '1.0'
+  asset_type: script
+  purpose: Offline create-only runner that emits the A25 receipts and the Russian owner readout without provider access.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-08-15'
+  truth_owner: TASK-30
+  location: {kind: git_path, logical_uri: 'repo://scripts/run_task30_a25_h07_h01_limited_diagnostic.py', repository_path: scripts/run_task30_a25_h07_h01_limited_diagnostic.py}
+  integrity: {kind: sha256, sha256: 1f02857455374165ba55ac84e5c639e3c9c7b33bf41fd535936696630cb96f64}
+  access: {mode: read_only, method: file, network_required: false, secrets_required: false}
+  relations:
+  - {relation_type: depends_on, target_asset_id: MODULE-T30-A25-H07-H01-LIMITED-DIAGNOSTIC-001}
+  - {relation_type: governed_by, target_asset_id: CONTRACT-T30-A25-H07-H01-LIMITED-DIAGNOSTIC-001}
+  consumers: [TASK-30, FACTORY-001]
+  evidence: []
+  search_terms: [A25, RUNNER, CREATE_ONLY, ZERO_PROVIDER, OWNER_READOUT]
+  classification: {contains_secrets: false, contains_raw_data: false, sensitivity: INTERNAL_NON_SECRET}
+
+- asset_id: TEST-T30-A25-H07-H01-LIMITED-DIAGNOSTIC-001
+  record_version: '1.0'
+  asset_type: script
+  purpose: Deterministic A25 frozen-binding, absence-proof, slot-consumption, precision and terminal-outcome tests.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-08-15'
+  truth_owner: TASK-30
+  location: {kind: git_path, logical_uri: 'repo://tests/test_task30_a25_h07_h01_limited_diagnostic.py', repository_path: tests/test_task30_a25_h07_h01_limited_diagnostic.py}
+  integrity: {kind: sha256, sha256: b66eaf5093cd9e3f58dcc2056a2083cf8fc6bfdb077228d46f311b9bca36b93a}
+  access: {mode: read_only, method: file, network_required: false, secrets_required: false}
+  relations:
+  - {relation_type: depends_on, target_asset_id: CONFIG-T30-A25-H07-H01-LIMITED-DIAGNOSTIC-001}
+  - {relation_type: depends_on, target_asset_id: SCHEMA-T30-A25-H07-H01-LIMITED-DIAGNOSTIC-001}
+  - {relation_type: depends_on, target_asset_id: MODULE-T30-A25-H07-H01-LIMITED-DIAGNOSTIC-001}
+  - {relation_type: depends_on, target_asset_id: FIXTURE-T30-A25-H07-H01-LIMITED-DIAGNOSTIC-001}
+  consumers: [TASK-30, FACTORY-001]
+  evidence: []
+  search_terms: [A25, TEST, ABSENCE_PROOF, NO_OBSERVED_TRADE_INFLATION, IDEMPOTENT]
+  classification: {contains_secrets: false, contains_raw_data: false, sensitivity: INTERNAL_NON_SECRET}
+
+- asset_id: EVIDENCE-T30-A25P-H07-H01-MEASURABILITY-001
+  record_version: '1.0'
+  asset_type: evidence
+  purpose: Runtime receipt for the offline measurability diagnostic and the ESTIMAND_NOT_COMPUTABLE terminal decision.
+  status: VALIDATED_ACTIVE
+  origin: REPOSITORY
+  as_of: '2026-08-15'
+  truth_owner: TASK-30
+  location: {kind: git_path, logical_uri: 'repo://docs/evidence/task30/a25_h07_h01_limited_diagnostic_runtime_receipt_v1.json', repository_path: docs/evidence/task30/a25_h07_h01_limited_diagnostic_runtime_receipt_v1.json}
+  integrity: {kind: sha256, sha256: 019680a841e69bb0b76b195ad1b739e09143bb6b6d9bb8e7db85d92cf23da81e}
+  access: {mode: read_only, method: file, network_required: false, secrets_required: false}
+  relations:
+  - {relation_type: derived_from, target_asset_id: CONFIG-T30-A25-H07-H01-LIMITED-DIAGNOSTIC-001}
+  - {relation_type: depends_on, target_asset_id: EVIDENCE-T30-A24P-RAW-TO-PIT-001}
+  - {relation_type: validated_by, target_asset_id: TEST-T30-A25-H07-H01-LIMITED-DIAGNOSTIC-001}
+  consumers: [TASK-30, RC001-H07-H01-LIQUIDITY-RETENTION, FACTORY-001]
+  evidence: []
+  search_terms: [A25P, RUNTIME, NOT_COMPUTABLE, ROUTE_FEASIBILITY_ABSENT, ONE_CLUSTER]
+  classification: {contains_secrets: false, contains_raw_data: false, sensitivity: INTERNAL_NON_SECRET}
+
+- asset_id: REPORT-T30-A25-H07-H01-MEASURABILITY-001
+  record_version: '1.0'
+  asset_type: control_document
+  purpose: Russian owner readout of the A25 measurability verdict, precision limits and required data specification.
+  status: VALIDATED_ACTIVE
+  origin: REPOSITORY
+  as_of: '2026-08-15'
+  truth_owner: TASK-30
+  location: {kind: git_path, logical_uri: 'repo://docs/reports/task30/a25_h07_h01_limited_diagnostic_owner_readout_v1.md', repository_path: docs/reports/task30/a25_h07_h01_limited_diagnostic_owner_readout_v1.md}
+  integrity: {kind: sha256, sha256: 09552f5435807a9e5f421d15d3331c8eef7b4436570e88c62c591c999b950ddd}
+  access: {mode: read_only, method: file, network_required: false, secrets_required: false}
+  relations: [{relation_type: derived_from, target_asset_id: EVIDENCE-T30-A25P-H07-H01-MEASURABILITY-001}]
+  consumers: [TASK-30, RC001-H07-H01-LIQUIDITY-RETENTION, FACTORY-001, GOAL-OWNER]
+  evidence: []
+  search_terms: [A25, OWNER_REPORT, MEASURABILITY, DATA_SPECIFICATION, BLOCKED_DATA]
+  classification: {contains_secrets: false, contains_raw_data: false, sensitivity: INTERNAL_NON_SECRET}
+
+- asset_id: EVIDENCE-T30-A25-H07-H01-MEASURABILITY-001
+  record_version: '1.0'
+  asset_type: evidence
+  purpose: Hash-bound acceptance for the A25 measurability verdict without TASK-30 or RC001 promotion.
+  status: VALIDATED_ACTIVE
+  origin: REPOSITORY
+  as_of: '2026-08-15'
+  truth_owner: TASK-30
+  location: {kind: git_path, logical_uri: 'repo://docs/evidence/task30/a25_h07_h01_limited_diagnostic_acceptance_v1.json', repository_path: docs/evidence/task30/a25_h07_h01_limited_diagnostic_acceptance_v1.json}
+  integrity: {kind: sha256, sha256: c29ecd424e4c2276259ffc05aec6fb8058b53469a30c763db972c0581f84ceca}
+  access: {mode: read_only, method: file, network_required: false, secrets_required: false}
+  relations:
+  - {relation_type: derived_from, target_asset_id: CONTRACT-T30-A25-H07-H01-LIMITED-DIAGNOSTIC-001}
+  - {relation_type: depends_on, target_asset_id: EVIDENCE-T30-A25P-H07-H01-MEASURABILITY-001}
+  - {relation_type: validated_by, target_asset_id: TEST-T30-A25-H07-H01-LIMITED-DIAGNOSTIC-001}
+  consumers: [TASK-30, RC001-H07-H01-LIQUIDITY-RETENTION, FACTORY-001, GOAL-OWNER]
+  evidence: []
+  search_terms: [A25, ACCEPTANCE, CAPABILITY_GAP_PROVEN, NO_EFFECT_ESTIMATE, BLOCKED_DATA]
+  classification: {contains_secrets: false, contains_raw_data: false, sensitivity: INTERNAL_NON_SECRET}
+
+- asset_id: CTRL-TASK-30-A25-001
+  record_version: '1.0'
+  asset_type: control_document
+  purpose: Harness-valid A25 task contract binding exact authority, branch, write set, stop conditions and DoD.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-08-15'
+  truth_owner: TASK-30
+  location: {kind: git_path, logical_uri: 'repo://docs/tasks/TASK-30-a25-h07-h01-limited-diagnostic.md', repository_path: docs/tasks/TASK-30-a25-h07-h01-limited-diagnostic.md}
+  integrity: {kind: sha256, sha256: 992d21d9c5873f723cf8820fcf346229a52428b6a641a031f905808827750489}
+  access: {mode: read_only, method: file, network_required: false, secrets_required: false}
+  relations:
+  - {relation_type: contains, target_asset_id: CONTRACT-T30-A25-H07-H01-LIMITED-DIAGNOSTIC-001}
+  - {relation_type: contains, target_asset_id: SCRIPT-T30-A25-H07-H01-LIMITED-DIAGNOSTIC-001}
+  - {relation_type: depends_on, target_asset_id: EVIDENCE-T30-A24-RAW-TO-PIT-001}
+  consumers: [TASK-30, FACTORY-001]
+  evidence: []
+  search_terms: [A25, TASK_CONTRACT, MEASURABILITY, IMPLEMENTED_UNVERIFIED]
+  classification: {contains_secrets: false, contains_raw_data: false, sensitivity: INTERNAL_NON_SECRET}
+
+- asset_id: EVIDENCE-T30-A25-DELIVERY-COMPLETION-001
+  record_version: '1.0'
+  asset_type: evidence
+  purpose: Guard-consumable completion evidence binding the exact A25 delivery inventory without TASK-30 promotion.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-08-15'
+  truth_owner: TASK-30
+  location: {kind: git_path, logical_uri: 'repo://docs/evidence/task30/a25_delivery_completion_evidence_v1.json', repository_path: docs/evidence/task30/a25_delivery_completion_evidence_v1.json}
+  integrity: {kind: none, note: 'Content integrity is owned by the live completion-review-fit hash chain; embedding its SHA here would create an indirect self-reference through the reviewed inventory.'}
+  access: {mode: read_only, method: file, network_required: false, secrets_required: false}
+  relations:
+  - {relation_type: derived_from, target_asset_id: EVIDENCE-T30-A25-H07-H01-MEASURABILITY-001}
+  - {relation_type: depends_on, target_asset_id: EVIDENCE-T30-A25-DELIVERY-INDEPENDENT-REVIEW-001}
+  - {relation_type: depends_on, target_asset_id: EVIDENCE-T30-A25-DELIVERY-FACTORY-FIT-001}
+  - {relation_type: depends_on, target_asset_id: SCHEMA-DELIVERY-COMPLETION-EVIDENCE-001}
+  consumers: [TASK-30, FACTORY-001, GOAL-OWNER]
+  evidence: []
+  search_terms: [A25, DELIVERY_COMPLETION, GUARDED_MERGE, MEASURABILITY, BLOCKED_DATA]
+  classification: {contains_secrets: false, contains_raw_data: false, sensitivity: INTERNAL_NON_SECRET}
+
+- asset_id: EVIDENCE-T30-A25-DELIVERY-INDEPENDENT-REVIEW-001
+  record_version: '1.0'
+  asset_type: evidence
+  purpose: Required-role review evidence bound to the exact non-self-referential A25 inventory.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-08-15'
+  truth_owner: TASK-30
+  location: {kind: git_path, logical_uri: 'repo://docs/evidence/task30/a25_delivery_independent_review_v1.json', repository_path: docs/evidence/task30/a25_delivery_independent_review_v1.json}
+  integrity: {kind: none, note: 'Content integrity is owned by the live completion-review-fit hash chain; embedding its SHA here would create an indirect self-reference through the reviewed inventory.'}
+  access: {mode: read_only, method: file, network_required: false, secrets_required: false}
+  relations:
+  - {relation_type: derived_from, target_asset_id: EVIDENCE-T30-A25-H07-H01-MEASURABILITY-001}
+  - {relation_type: depends_on, target_asset_id: SCHEMA-DELIVERY-INDEPENDENT-REVIEW-EVIDENCE-001}
+  consumers: [TASK-30, FACTORY-001, GOAL-OWNER]
+  evidence: []
+  search_terms: [A25, INDEPENDENT_REVIEW, SINGLE_AGENT_REVIEW_FALLBACK, ESTIMAND_TRUTH]
+  classification: {contains_secrets: false, contains_raw_data: false, sensitivity: INTERNAL_NON_SECRET}
+
+- asset_id: EVIDENCE-T30-A25-DELIVERY-FACTORY-FIT-001
+  record_version: '1.0'
+  asset_type: evidence
+  purpose: FULL Factory Fit review for A25 mission, research truth, owner operability, wrap-versus-buy, security and red team.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-08-15'
+  truth_owner: TASK-30
+  location: {kind: git_path, logical_uri: 'repo://docs/evidence/task30/a25_delivery_factory_fit_v1.json', repository_path: docs/evidence/task30/a25_delivery_factory_fit_v1.json}
+  integrity: {kind: none, note: 'Content integrity is owned by the live completion-review-fit hash chain; embedding its SHA here would create an indirect self-reference through the reviewed inventory.'}
+  access: {mode: read_only, method: file, network_required: false, secrets_required: false}
+  relations:
+  - {relation_type: derived_from, target_asset_id: EVIDENCE-T30-A25-H07-H01-MEASURABILITY-001}
+  - {relation_type: depends_on, target_asset_id: EVIDENCE-T30-A25-DELIVERY-INDEPENDENT-REVIEW-001}
+  consumers: [TASK-30, FACTORY-001, GOAL-OWNER]
+  evidence: []
+  search_terms: [A25, FACTORY_FIT, FULL_REVIEW, MEASURABILITY, DATA_SPECIFICATION]
+  classification: {contains_secrets: false, contains_raw_data: false, sensitivity: INTERNAL_NON_SECRET}

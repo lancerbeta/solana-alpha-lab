@@ -1,0 +1,244 @@
+schema: smial.task30.h07-h01-limited-diagnostic.policy
+schema_version: '1.0'
+task_id: TASK-30
+atom_id: T30-A25_H07_H01_FROZEN_LIMITED_DIAGNOSTIC_AND_MEASURABILITY_VERDICT_V1
+contract_id: CONTRACT-T30-A25-H07-H01-LIMITED-DIAGNOSTIC-001
+spec_route: BOTH
+adoption_route: WRAP_EXISTING_A24_PANEL_AND_FROZEN_ESTIMAND
+consumer: RC001-H07-H01-LIQUIDITY-RETENTION
+frozen_definition:
+  path: configs/task28_rc001_registry_freeze_v1.yaml
+  group_id: RC001-H07-H01-LIQUIDITY-RETENTION
+  definition_sha256: 14a7387148d05773dedcb5ad6a8110a0dcab7e49da4dec77328903a5b7577df7
+  entry_gate_policy_path: configs/task30_h07_h01_exact_data_contract_entry_gate_v1.yaml
+  entry_gate_atom_id: T30-A8_H07_H01_EXACT_DATA_CONTRACT_ENTRY_GATE_V1
+upstream_panel:
+  policy_path: configs/task30_a24_raw_to_pit_admissibility_owner_panel_v1.yaml
+  atom_id: T30-A24_RAW_TO_PIT_ADMISSIBILITY_OWNER_PANEL_V1
+  required_terminal_decision: LIMITED_DIAGNOSTIC_PANEL_READY
+  panel_row_count: 96
+orientation_constants:
+  successful_transactions: 520
+  attributed_pumpswap_events: 163
+  decoded_buy_sell_events: 153
+  target_pool_trade_events: 149
+  target_buy_events: 96
+  target_sell_events: 53
+  other_pool_trade_events: 4
+  close_user_volume_accumulator_events: 10
+  log_truncated_transactions: 14
+  slot_state_counts:
+    OBSERVED_TARGET_TRADES: 35
+    PROVEN_NO_TARGET_TRADE: 1
+    STATE_PERSISTENCE_PROVEN: 60
+    UNKNOWN_COVERAGE: 0
+definition_input_lanes:
+  PIT liquidity-retention state: PIT_MARKET
+  multi-notional route persistence: ROUTE_FEASIBILITY
+  post-migration continuation context: POST_MIGRATION_CONTEXT
+derived_lanes:
+  POST_MIGRATION_CONTEXT:
+    entry_gate_requirement: post_migration_continuation_context
+    field_source_key: required_context_fields
+structurally_unsupported_requirements:
+  settled_execution_truth:
+    expected_state: UNSUPPORTED
+    expected_future_capture_capable: false
+lane_field_supply:
+  PIT_MARKET:
+    pool_identity:
+      kind: PANEL_CONSTANT
+      source: pool_address
+    mint_identity:
+      kind: PANEL_CONSTANT
+      source: base_mint
+    dex_or_program_identity:
+      kind: PANEL_CONSTANT
+      source: program_address
+    closed_interval:
+      kind: ROW_FIELD
+      source: end_at
+    ohlcv:
+      kind: ROW_FIELD
+      source: ohlc.close
+    liquidity_state:
+      kind: ROW_FIELD_FRESH_ONLY
+      source: reserves.raw_quote_reserve_atomic
+      staleness_flag: reserves.carry_forward
+    observed_at:
+      kind: PIT_FIELD
+      source: observed_at
+    available_at:
+      kind: PIT_FIELD
+      source: available_to_strategy_at
+    ingested_at:
+      kind: PIT_FIELD
+      source: ingested_at
+    source_or_raw_sha256:
+      kind: ROW_FIELD
+      source: source_hashes.a22_raw_sha256
+    typed_gap_or_failure:
+      kind: ROW_FIELD
+      source: state
+  ROUTE_FEASIBILITY:
+    evaluated_at:
+      kind: ABSENT
+      reason: NO_QUOTE_EVALUATION_EVENT_IN_EXECUTED_TRADE_PANEL
+      equivalent_leaf_names: [evaluated_at, quote_at, quoted_at]
+    input_mint:
+      kind: IDENTIFIER_ONLY_NOT_AN_OBSERVATION
+      source: quote_mint
+      reason: SUBJECT_IDENTIFIER_IS_NOT_A_ROUTE_OBSERVATION
+    output_mint:
+      kind: IDENTIFIER_ONLY_NOT_AN_OBSERVATION
+      source: base_mint
+      reason: SUBJECT_IDENTIFIER_IS_NOT_A_ROUTE_OBSERVATION
+    notional:
+      kind: ABSENT
+      reason: NO_NOTIONAL_BUCKET_DIMENSION_IN_PANEL
+      equivalent_leaf_names: [notional, notional_usd, notional_bucket, notionals_usd]
+    route_identifier_or_status:
+      kind: ABSENT
+      reason: NO_ROUTE_IDENTIFIER_OR_STATUS_IN_PANEL
+      equivalent_leaf_names: [route, route_id, route_identifier, route_status]
+    quoted_amounts:
+      kind: ABSENT
+      reason: EXECUTED_TRADE_AMOUNTS_ARE_NOT_COUNTERFACTUAL_QUOTES
+      equivalent_leaf_names: [quoted_amounts, quoted_amount, in_amount, out_amount]
+    price_impact:
+      kind: ABSENT
+      reason: NO_PER_NOTIONAL_PRICE_IMPACT_IN_PANEL
+      equivalent_leaf_names: [price_impact, impact_bps]
+    separate_fees:
+      kind: ABSENT
+      reason: NO_SEPARATED_FEE_COMPONENTS_IN_PANEL
+      equivalent_leaf_names: [fees, separate_fees, fee_lamports, lp_fee, protocol_fee, platform_fee]
+    observed_at:
+      kind: ABSENT
+      reason: TRADE_CAPTURE_PIT_STAMPS_ARE_NOT_QUOTE_OBSERVATION_STAMPS
+      equivalent_leaf_names: [quote_observed_at, route_observed_at]
+    available_at:
+      kind: ABSENT
+      reason: TRADE_CAPTURE_PIT_STAMPS_ARE_NOT_QUOTE_OBSERVATION_STAMPS
+      equivalent_leaf_names: [quote_available_at, route_available_at]
+    ingested_at:
+      kind: ABSENT
+      reason: TRADE_CAPTURE_PIT_STAMPS_ARE_NOT_QUOTE_OBSERVATION_STAMPS
+      equivalent_leaf_names: [quote_ingested_at, route_ingested_at]
+    source_or_raw_sha256:
+      kind: ABSENT
+      reason: NO_ROUTE_RAW_RESPONSE_RETAINED
+      equivalent_leaf_names: [route_raw_sha256, quote_raw_sha256]
+    typed_gap_or_failure:
+      kind: ABSENT
+      reason: NO_ROUTE_LANE_STATE_ENUM_IN_PANEL
+      equivalent_leaf_names: [route_state, quote_state]
+  POST_MIGRATION_CONTEXT:
+    migration_or_program_context:
+      kind: IDENTIFIER_ONLY_NOT_AN_OBSERVATION
+      source: program_address
+      reason: PROGRAM_IDENTITY_IS_NOT_A_MIGRATION_BOUNDARY_OBSERVATION
+    pool_identity:
+      kind: PANEL_CONSTANT
+      source: pool_address
+    pre_and_post_boundary_continuity:
+      kind: ABSENT
+      reason: SINGLE_POOL_SINGLE_DAY_WINDOW_CONTAINS_NO_MIGRATION_BOUNDARY
+      equivalent_leaf_names: [pre_and_post_boundary_continuity, boundary_continuity, migration_boundary, pre_migration, post_migration]
+target_metric_requirements:
+  PIT_ROUTE_SURVIVAL:
+    required_lanes: [PIT_MARKET, ROUTE_FEASIBILITY]
+    frozen_justification:
+      path: lanes.PIT_MARKET.cannot_establish
+      must_contain: ROUTE_PERSISTENCE
+  QUOTE_AVAILABILITY:
+    required_lanes: [ROUTE_FEASIBILITY]
+    frozen_justification:
+      path: lanes.ROUTE_FEASIBILITY.may_establish
+      must_equal: MULTI_NOTIONAL_ROUTE_AVAILABILITY
+  MISSINGNESS_RATE:
+    required_lanes: [PIT_MARKET]
+    frozen_justification:
+      path: requirements.pit_liquidity_retention_state.lane
+      must_equal: PIT_MARKET
+frozen_parameter_resolution:
+  OBSERVATION_WINDOW_15M:
+    resolved: true
+    resolved_as_seconds: 900
+    binding: upstream_panel_pilot_window_interval_seconds
+  NOTIONAL_BUCKET_SET_V1:
+    resolved: false
+    resolved_bucket_count: null
+    unresolved_code: FROZEN_PARAMETER_DEFINITION_ABSENT
+    owner_document: configs/task28_rc001_registry_freeze_v1.yaml
+    non_adopted_observed_convention: TASK21_NOTIONALS_USD_10_25_50_100_IS_A_DIFFERENT_TASK_PARAMETER
+cluster_design:
+  cluster_unit: POOL_DAY
+  pools: 1
+  days: 1
+  independent_clusters: 1
+  slots_per_cluster: 96
+  slot_interval_seconds: 900
+  slots_are_independent_replicates: false
+  slot_dependence_reason: SERIALLY_DEPENDENT_SLOTS_INSIDE_ONE_POOL_DAY_CLUSTER
+statistic_slot_consumption:
+  observed_states: [OBSERVED_TARGET_TRADES]
+  typed_gap_states: [PROVEN_NO_TARGET_TRADE, STATE_PERSISTENCE_PROVEN]
+  unknown_states: [UNKNOWN_COVERAGE]
+  state_persistence_counts_as_observed_trade: false
+  carry_forward_counts_as_fresh_liquidity_observation: false
+required_data_specification:
+  cluster_unit: POOL_DAY
+  minimum_clusters_for_defined_between_cluster_variance: 2
+  minimum_clusters_for_two_group_cluster_level_test: 4
+  slots_per_cluster: 96
+  slot_interval_seconds: 900
+  route_evaluations_per_cluster_formula: SLOTS_PER_CLUSTER_TIMES_NOTIONAL_BUCKET_COUNT
+  notional_bucket_parameter: NOTIONAL_BUCKET_SET_V1
+  slot_coverage_policy: TYPED_GAP_REQUIRED_NO_IMPUTATION
+  decisive_scale_derivable_from_this_panel: false
+  decisive_scale_blocker: BETWEEN_CLUSTER_VARIANCE_UNIDENTIFIED_AT_ONE_CLUSTER
+  next_measurement_purpose: VARIANCE_CALIBRATION_PILOT_NOT_HYPOTHESIS_TEST
+terminal_outcomes:
+  - ESTIMAND_MEASURABLE_AND_DECISIVE_ON_FROZEN_PANEL
+  - ESTIMAND_MEASURABLE_UNDERPOWERED_WITH_EXACT_DATA_SPEC
+  - ESTIMAND_NOT_COMPUTABLE_TARGETED_CAPABILITY_GAP_PROVEN
+  - STOP_INTEGRITY_CONFLICT
+claims:
+  measurability_diagnostic_only: true
+  effect_estimate: false
+  hypothesis_supported_or_refuted: false
+  continuous_price: false
+  missing_is_zero_or_flat: false
+  forward_fill: false
+  pit_prospective_route: false
+  h07_h01_trial: false
+  fillability: false
+  route_feasibility: false
+  execution: false
+  settlement: false
+  pnl: false
+  numeric_netreturn: false
+  alpha: false
+  strategy: false
+  task30_acceptance: false
+  rc001_definition_changed: false
+external_authority:
+  basis: EXPLICIT_OWNER_PHRASE
+  owner_phrase: OK T30-A25 H07_H01_FROZEN_LIMITED_DIAGNOSTIC_AND_MEASURABILITY_VERDICT
+  provider_api_rpc_calls_authorized: 0
+  credential_reads_authorized: 0
+  purchase_authorized: false
+execution_controls:
+  retry: false
+  fallback: false
+  redirect: false
+  pagination: false
+  scheduler: false
+  background_process: false
+  network: false
+retention:
+  class: A4_OUTSIDE_GIT
+  raw_root: local/task30_a25_h07_h01_limited_diagnostic
+  create_only: true
+project_sources_disposition: NO_CHANGE
