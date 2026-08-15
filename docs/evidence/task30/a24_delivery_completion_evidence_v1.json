@@ -44,14 +44,14 @@
   },
   "factory_fit": {
     "path": "docs/evidence/task30/a24_delivery_factory_fit_v1.json",
-    "sha256": "38b4bf738c34c4238fde88b0a24f4d15492e7822841ca77e4e21dc716167f297",
+    "sha256": "bbb429a55308942e6f322934117a728f88e779f2fb59155e0fd5a878892636c1",
     "verdict": "PASS"
   },
   "validation": {
     "targeted": "PASS_55_A24_PROBE_CATALOG_LIFECYCLE_AND_DECODER_TESTS",
     "independent_review": {
       "path": "docs/evidence/task30/a24_delivery_independent_review_v1.json",
-      "sha256": "6adeccf3e23d1a81ba0c6e507c6fe640ed84e9dfe56620ea473deaacf45943e6",
+      "sha256": "257929e8f49d1e94cd43f7bc9f7b948dc21937811dfeea350507605bf41a8d85",
       "verdict": "PASS"
     },
     "full_gate": "ENFORCED_BY_PROJECT_BOUND_VALIDATION",
