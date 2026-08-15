@@ -1,28 +1,20 @@
 {
-  "schema": "smial.delivery-harness-factory-fit",
-  "schema_version": "1.0",
-  "task_id": "TASK-39",
   "as_of": "2026-08-15",
-  "review_id": "T39-A1-DELIVERY-FACTORY-FIT-001",
-  "mode": "FULL_REVIEW",
-  "verdict": "PASS",
-  "reviewed_bindings_sha256": "PENDING",
-  "reviewed_inventory_sha256": "PENDING",
   "capability_radar": {
     "now": "NONE",
     "watch": "H11_CLOCKS_ON_THIS_MINT_GTA_PATH_EXHAUSTED_PARK_OR_SEPARATE_BONDING_CURVE_ATOM"
   },
   "dimensions": {
-    "mission": "PASS_BOUNDED_NAMED_MINT_GTA_FALSIFIED_CREATE_MIGRATION_ON_EARLIEST_PAGES",
     "build_vs_buy": "PASS_ADOPT_A22_GTA_AND_PINNED_PUMP_DECODE",
     "context_efficiency": "PASS_ONE_TASK_CONTRACT",
     "execution_to_cashflow": "NOT_APPLICABLE",
     "flexibility_and_history": "PASS_RC001_UNCHANGED",
+    "mission": "PASS_BOUNDED_NAMED_MINT_GTA_FALSIFIED_CREATE_MIGRATION_ON_EARLIEST_PAGES",
+    "monitoring_and_recovery": "PASS_NO_BACKGROUND_PROCESS",
     "owner_operability": "PASS_RUSSIAN_READOUT_STATES_WRONG_ADDRESS_OR_EVENT",
     "red_team": "PASS_UNBOUNDED_PROGRAM_GTA_FORBIDDEN",
     "research_truth": "PASS_ZERO_CREATE_MIGRATION_IS_A_DATA_DECISION",
-    "security": "PASS_SECRET_FREE_TRACKED_EVIDENCE",
-    "monitoring_and_recovery": "PASS_NO_BACKGROUND_PROCESS"
+    "security": "PASS_SECRET_FREE_TRACKED_EVIDENCE"
   },
   "limits": [
     "HISTORICAL_ROUTE_WRONG_ADDRESS_OR_EVENT",
@@ -30,5 +22,13 @@
     "RETROSPECTIVE_ONLY_NO_LIVE_PIT",
     "SINGLE_AGENT_REVIEW_FALLBACK_WITHOUT_ISOLATED_CONTEXT_CRITICS"
   ],
-  "recovery": "REVERT_ONLY_TASK39_TRACKED_OUTPUTS; PRESERVE_RC001_AND_TASK38_SCIENCE"
+  "mode": "FULL_REVIEW",
+  "recovery": "REVERT_ONLY_TASK39_TRACKED_OUTPUTS; PRESERVE_RC001_AND_TASK38_SCIENCE",
+  "review_id": "T39-A1-DELIVERY-FACTORY-FIT-001",
+  "reviewed_bindings_sha256": "a19197c89e3f5edd023cd2da80fa3d31941b5eefa4607a0b8e74f13c5b24d3b4",
+  "reviewed_inventory_sha256": "4c9708eb95443e4d3f9f0021b9ae011b51a696a8a0c7149b98b2955f3fe7fbcb",
+  "schema": "smial.delivery-harness-factory-fit",
+  "schema_version": "1.0",
+  "task_id": "TASK-39",
+  "verdict": "PASS"
 }

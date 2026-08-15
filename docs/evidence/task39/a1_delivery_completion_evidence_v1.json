@@ -1,22 +1,42 @@
 {
-  "schema": "smial.delivery-completion-evidence",
-  "schema_version": "1.0",
-  "task_id": "TASK-39",
-  "as_of": "2026-08-15",
   "acceptance_id": "T39-A1-DELIVERY-COMPLETION-001",
+  "active_stop_conditions": [],
+  "as_of": "2026-08-15",
   "base_main": "55479f7f6e23d81c0692f011fa10ed7b98d0614e",
-  "state_change": "H11_NAMED_MINT_GTA_WRONG_ADDRESS_OR_EVENT_NO_RC001_MUTATION",
   "capability_radar_now": "NONE",
   "cloud_bundle_mode": "OWNER_MANAGED_OPTIONAL_EXPORT",
   "cloud_bundle_required_by_harness": false,
   "cloud_bundle_smoke_required": false,
-  "active_stop_conditions": [],
   "factory_fit": {
     "path": "docs/evidence/task39/a1_delivery_factory_fit_v1.json",
-    "sha256": "PENDING",
+    "sha256": "5256716075bb04de58ea85be0d052b5736d2a7386239be43c0b583a26e1c33ac",
     "verdict": "PASS"
   },
-  "implementation_bindings": {},
+  "implementation_bindings": {
+    "catalog/assets/core.yaml": "c05d4cd9060406d4dc1d6ca66b6fec2a0d1622a5b99d6568a337dab48839dc15",
+    "catalog/assets/lifecycle.yaml": "c1c487d6dc107899b4fa6488d602514db7e8310c2f803e03b2b22351251f1504",
+    "catalog/catalog_manifest.yaml": "6b1a050c2b99c759046055f9a0086e71d26f4ead88bf8c8e3adf022f906287ab",
+    "catalog/generated/asset_edges.json": "3f01aeb28d33195c86e9c3290532f01657aec3c69459851812f9b8e4eeea9ccc",
+    "catalog/schemas/task39_rc002_h11_named_mint_gta_clock_capture.schema.json": "f7e98f4d4cd3280290a84c4d6b39907725d231f5306901ac45ce4e411eaa58d5",
+    "configs/task39_rc002_h11_named_mint_gta_clock_capture_v1.yaml": "4f78b54d800dda71373e18bb1ceadafa3d10f4306739e5182edf43d2b3a20239",
+    "docs/PROJECT_MAP.md": "47ad40daaa64903dc04c349d1ff605edfee80678be09f4db75c384b76aa29c1f",
+    "docs/contracts/task39_rc002_h11_named_mint_gta_clock_capture_contract_v1.md": "22c4bcda93f2e24a0798ccf6cd823ab78e9620d34e70023dc8105d0a9090eee9",
+    "docs/evidence/task28/a1_rc001_registry_freeze_acceptance_v1.json": "a23c643b2b2d5a9ed92cb4d212c5d4552e674b38c6a026d7eeae58a1e93fd617",
+    "docs/evidence/task39/a1_h11_named_mint_gta_acceptance_v1.json": "58eef7dec9e0d702f9e0a39558255942787c285e02e412bea528e6eca525deda",
+    "docs/evidence/task39/a1_h11_named_mint_gta_runtime_receipt_v1.json": "f33d8a1054b19f3f30702e362bf5d6b476d1b6258ad1e0efac76b36c28fc7a25",
+    "docs/reports/task39/a1_h11_named_mint_gta_owner_readout_v1.md": "f290ec5bcb9f33f057f11ab6cbe01a9d8930d9ac46d80d1845309e53e8834437",
+    "docs/tasks/TASK-39-rc002-h11-named-mint-gta-clock-capture.md": "eed05329ef6d2b87ada4f169f243bd7b6252be58e57e1606845eb3fade6452ac",
+    "registries/decisions_negative_results.yaml": "165b523571542c19e25edf3a88c7e770d23906512b4ad5fdde8cf192f03d4e7f",
+    "registries/global_trial_ledger.yaml": "a1f6d586f3e8ee1997bef581191f3e6badf937fc65e743826b10c46d467da020",
+    "scripts/run_task39_rc002_h11_named_mint_gta_clock_capture.py": "842b557a553a57e578069c40fb03e288f8b84bb153c2b993f5904c67f07a21ca",
+    "src/solana_alpha_lab/task39_h11_named_mint_gta_clock_capture.py": "8e057dd831c7a9003e0ccf07bc1f4c0ae62d46ecbfef416749dc58ab3376bfd8",
+    "tests/fixtures/task28/rc001_registry_freeze_v1.json": "d3565a484a2085498bb326610de5a3f12f3cbefffa7ea3af8bee4e6ac7a341e4",
+    "tests/fixtures/task39/h11_named_mint_gta_clock_capture_v1.json": "f7e60b4dd66b985bba7f31be2e9bca3805bcdc43b61914a55c6bec5a1cf42a11",
+    "tests/test_catalog.py": "a05a017ee359de030fda5ffe3c73243e4876f0b720b38b2f5651d5a36a831bf7",
+    "tests/test_lifecycle_registries.py": "ac151584b3e389c0138d6a3dcb8576b5c88509339734a0e51f6f16807e48c2f2",
+    "tests/test_task23_catalog_repository_factory_fit.py": "68f6aaf9607020cfedafd12da2c43632212dd9b766b5a5887acd7a40653fe5e1",
+    "tests/test_task39_rc002_h11_named_mint_gta_clock_capture.py": "a86e798850ccce1897fc88e17368684fef7c5bff4cb5efbe75b990ec3fe7cf04"
+  },
   "non_claims": [
     "NO_TASK39_CANONICAL_DONE",
     "NO_RC001_PROMOTION_OR_DEFINITION_CHANGE",
@@ -32,7 +52,11 @@
     "unresolved_safety_or_truth_conflict": false,
     "user_only_activation": false
   },
-  "project_sources_disposition": {"kind": "NO_CHANGE"},
+  "project_sources_disposition": {
+    "kind": "NO_CHANGE"
+  },
+  "schema": "smial.delivery-completion-evidence",
+  "schema_version": "1.0",
   "side_effects": {
     "cash_spend_usd_cents": 0,
     "credential_reads": 1,
@@ -41,14 +65,19 @@
     "retries": 0,
     "wallet_signer_transaction_actions": 0
   },
+  "state_change": "H11_NAMED_MINT_GTA_WRONG_ADDRESS_OR_EVENT_NO_RC001_MUTATION",
+  "task_id": "TASK-39",
   "validation": {
     "full_gate": "ENFORCED_BY_PROJECT_BOUND_VALIDATION",
     "github_ci": "ENFORCED_LIVE_AT_GUARDED_MERGE",
     "independent_review": {
       "path": "docs/evidence/task39/a1_delivery_independent_review_v1.json",
-      "sha256": "PENDING",
+      "sha256": "63d8be316c145322ddfc166ac8e0d7f8e982d19b32dc11fb216a3a02f2970e99",
       "verdict": "PASS"
     },
-    "project_checks": ["catalog", "lifecycle", "task39"]
+    "project_checks": [
+      "PASS_GENERATED_NAVIGATION_SECRET_AND_CATALOG_CHECKS"
+    ],
+    "targeted": "PASS_H11_NAMED_MINT_GTA_CATALOG_AND_LIFECYCLE_TESTS"
   }
 }
