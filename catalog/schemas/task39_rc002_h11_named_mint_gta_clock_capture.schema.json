@@ -1,0 +1,75 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://solana-alpha-lab.local/schemas/task39_rc002_h11_named_mint_gta_clock_capture.schema.json",
+  "title": "TASK-39 RC002 H11 named-mint GTA clock capture policy",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema", "schema_version", "task_id", "atom_id", "contract_id",
+    "spec_route", "adoption_route", "consumer", "research_cycle",
+    "clock_definitions", "capture_protocol", "rc001_freeze", "holdout_guard",
+    "adopted_route", "request", "runtime_limits", "execution_controls",
+    "retention", "terminal_outcomes", "claims", "external_authority",
+    "project_sources_disposition"
+  ],
+  "properties": {
+    "schema": {"const": "smial.task39.rc002-h11-named-mint-gta.policy"},
+    "schema_version": {"const": "1.0"},
+    "task_id": {"const": "TASK-39"},
+    "atom_id": {"const": "T39-A1_RC002_H11_NAMED_MINT_GTA_CLOCK_CAPTURE_V1"},
+    "contract_id": {"const": "CONTRACT-T39-RC002-H11-NAMED-MINT-GTA-001"},
+    "spec_route": {"const": "BOTH"},
+    "adoption_route": {"const": "ADOPT_EXISTING_HELIUS_GTA_AND_PUMP_EVENT_DECODER"},
+    "consumer": {"const": "RC002-H11-LIFECYCLE-CLOCK"},
+    "research_cycle": {"type": "object"},
+    "clock_definitions": {"type": "object"},
+    "capture_protocol": {"type": "object"},
+    "rc001_freeze": {"type": "object"},
+    "holdout_guard": {"type": "object"},
+    "adopted_route": {"type": "object"},
+    "request": {"type": "object"},
+    "runtime_limits": {"type": "object"},
+    "execution_controls": {"type": "object"},
+    "retention": {"type": "object"},
+    "terminal_outcomes": {
+      "type": "array",
+      "minItems": 4,
+      "maxItems": 4,
+      "items": {
+        "enum": [
+          "CLOCKS_RECONSTRUCTED_COHORT_READY",
+          "HISTORICAL_ROUTE_WRONG_ADDRESS_OR_EVENT",
+          "INSUFFICIENT_SCALE_WITHOUT_PAID_CAPTURE",
+          "STOP_INTEGRITY_CONFLICT"
+        ]
+      }
+    },
+    "claims": {"type": "object"},
+    "external_authority": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "network", "credentials", "cash_spend", "paid_plan",
+        "provider_routes_max", "wallet_signer_transaction", "deployment",
+        "owner_phrase", "credential_reference"
+      ],
+      "properties": {
+        "network": {"const": true},
+        "credentials": {"const": true},
+        "cash_spend": {"const": false},
+        "paid_plan": {"const": false},
+        "provider_routes_max": {"const": 1},
+        "wallet_signer_transaction": {"const": false},
+        "deployment": {"const": false},
+        "owner_phrase": {"const": "OK T39-RC002 H11_NAMED_MINT_GTA_ONE_SHOT"},
+        "credential_reference": {"const": "HELIUS_API_KEY"}
+      }
+    },
+    "project_sources_disposition": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["kind"],
+      "properties": {"kind": {"const": "NO_CHANGE"}}
+    }
+  }
+}
