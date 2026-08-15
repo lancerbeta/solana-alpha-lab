@@ -1,0 +1,59 @@
+{
+  "schema": "smial.delivery-completion-evidence",
+  "schema_version": "1.0",
+  "acceptance_id": "T30-A25-DELIVERY-COMPLETION-001",
+  "as_of": "2026-08-15",
+  "task_id": "TASK-30",
+  "state_change": "ESTIMAND_NOT_COMPUTABLE_TARGETED_CAPABILITY_GAP_PROVEN_NO_TASK30_PROMOTION",
+  "base_main": "d982cdf802243558ff9609ddafe8785663e22a9b",
+  "cloud_bundle_mode": "OWNER_MANAGED_OPTIONAL_EXPORT",
+  "cloud_bundle_required_by_harness": false,
+  "cloud_bundle_smoke_required": false,
+  "project_sources_disposition": {
+    "kind": "NO_CHANGE"
+  },
+  "capability_radar_now": "NONE",
+  "implementation_bindings": {},
+  "active_stop_conditions": [],
+  "owner_attention_triggers": {
+    "auth_or_access_recovery": false,
+    "material_owner_decision": false,
+    "user_only_activation": false,
+    "external_material_action": false,
+    "unresolved_safety_or_truth_conflict": false
+  },
+  "factory_fit": {
+    "path": "docs/evidence/task30/a25_delivery_factory_fit_v1.json",
+    "sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+    "verdict": "PASS"
+  },
+  "validation": {
+    "targeted": "PASS_51_A25_A24_PROBE_AND_RC001_FREEZE_TESTS",
+    "independent_review": {
+      "path": "docs/evidence/task30/a25_delivery_independent_review_v1.json",
+      "sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+      "verdict": "PASS"
+    },
+    "full_gate": "ENFORCED_BY_PROJECT_BOUND_VALIDATION",
+    "github_ci": "ENFORCED_LIVE_AT_GUARDED_MERGE",
+    "project_checks": [
+      "PASS_GENERATED_NAVIGATION_SECRET_AND_CATALOG_CHECKS"
+    ]
+  },
+  "non_claims": [
+    "NO_TASK30_ACCEPTANCE_OR_DONE",
+    "NO_RC001_PROMOTION_OR_DEFINITION_CHANGE",
+    "NO_EFFECT_ESTIMATE_OR_HYPOTHESIS_VERDICT",
+    "NO_VALID_STANDARD_ERROR_OR_CONFIDENCE_INTERVAL_AT_ONE_CLUSTER",
+    "NO_H07_H01_TRIAL_ALPHA_EXECUTION_PNL_OR_NETRETURN",
+    "NO_PROVIDER_PURCHASE_RETRY_FALLBACK_OR_SECOND_PROVIDER"
+  ],
+  "side_effects": {
+    "credential_reads": 0,
+    "provider_requests": 0,
+    "retries": 0,
+    "fallbacks": 0,
+    "cash_spend_usd_cents": 0,
+    "wallet_signer_transaction_actions": 0
+  }
+}

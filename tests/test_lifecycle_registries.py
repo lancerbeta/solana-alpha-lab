@@ -163,6 +163,8 @@ class LifecycleRegistryTests(unittest.TestCase):
                             "NEGATIVE-T30-HELIUS-GTA-ONE-SHOT-001",
                             "DECISION-T30-HELIUS-COMPLETE-RAW-BATCH-001",
                             "DECISION-T30-A24-RAW-TO-PIT-001",
+                            "DECISION-T30-A25-H07-H01-MEASURABILITY-001",
+                            "DECISION-DELIVERY-PREFLIGHT-SKIP-PROOF-001",
                         ],
                     )
                     self.assertEqual(
@@ -176,6 +178,8 @@ class LifecycleRegistryTests(unittest.TestCase):
                             "negative_result",
                             "negative_result",
                             "negative_result",
+                            "decision",
+                            "decision",
                             "decision",
                             "decision",
                         ],

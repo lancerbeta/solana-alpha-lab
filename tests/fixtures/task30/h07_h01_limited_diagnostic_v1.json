@@ -1,0 +1,41 @@
+{
+  "schema": "smial.task30.h07-h01-limited-diagnostic.fixture",
+  "schema_version": "1.0",
+  "atom_id": "T30-A25_H07_H01_FROZEN_LIMITED_DIAGNOSTIC_AND_MEASURABILITY_VERDICT_V1",
+  "frozen_estimand": {
+    "group_id": "RC001-H07-H01-LIQUIDITY-RETENTION",
+    "definition_sha256": "14a7387148d05773dedcb5ad6a8110a0dcab7e49da4dec77328903a5b7577df7",
+    "target_metrics": ["PIT_ROUTE_SURVIVAL", "QUOTE_AVAILABILITY", "MISSINGNESS_RATE"],
+    "definition_inputs": [
+      "PIT liquidity-retention state",
+      "multi-notional route persistence",
+      "post-migration continuation context"
+    ]
+  },
+  "expected_if_live_bytes_present": {
+    "terminal_decision": "ESTIMAND_NOT_COMPUTABLE_TARGETED_CAPABILITY_GAP_PROVEN",
+    "not_computable_metrics": ["PIT_ROUTE_SURVIVAL", "QUOTE_AVAILABILITY"],
+    "computable_metrics": ["MISSINGNESS_RATE"],
+    "missing_capability_lanes": ["POST_MIGRATION_CONTEXT", "ROUTE_FEASIBILITY"],
+    "slots_total": 96,
+    "slots_consumed_as_observed": 35,
+    "slots_consumed_as_typed_gap": 61,
+    "slots_consumed_as_unknown": 0,
+    "ohlc_missingness_rate": "0.635417",
+    "fresh_liquidity_observation_slots": 35,
+    "carried_forward_liquidity_slots": 60,
+    "independent_clusters": 1,
+    "between_cluster_degrees_of_freedom": 0,
+    "standard_error_status": "UNDEFINED_SINGLE_CLUSTER_ZERO_BETWEEN_CLUSTER_DF",
+    "unresolved_frozen_parameters": ["NOTIONAL_BUCKET_SET_V1"]
+  },
+  "forbidden": [
+    "state_persistence_counted_as_observed_trade",
+    "carry_forward_counted_as_fresh_liquidity_observation",
+    "naive_standard_error_reported_as_precision",
+    "missing_to_zero",
+    "forward_fill_as_price",
+    "restated_or_drifted_estimand",
+    "provider_call"
+  ]
+}
