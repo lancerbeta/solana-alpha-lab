@@ -1,0 +1,26 @@
+{
+  "schema": "smial.task30.h07-h01-owner-fork-packet.fixture",
+  "schema_version": "1.0",
+  "atom_id": "T30-A26_H07_H01_FIVE_DOLLAR_CANNOT_FALSIFY_OWNER_FORK_PACKET_V1",
+  "expected": {
+    "terminal_decision": "FIVE_DOLLAR_HELIUS_CANNOT_FALSIFY_OWNER_FORK_READY",
+    "task_state": "BLOCKED_DATA",
+    "a25_terminal": "ESTIMAND_NOT_COMPUTABLE_TARGETED_CAPABILITY_GAP_PROVEN",
+    "independent_clusters": 1,
+    "minimum_clusters_for_variance_calibration": 4,
+    "route_feasibility_registry_status": "REGISTRY_GAP",
+    "falsifies_estimand": false,
+    "quote_evaluations_lower_bound": null,
+    "illustrative_n1_evaluations": 384,
+    "illustrative_n1_usage": "ILLUSTRATIVE_N1_NOT_A_FROZEN_PARAMETER",
+    "owner_fork_selected": "NONE_THIS_ATOM_ONLY_ENCODES_THE_FORK"
+  },
+  "forbidden": [
+    "five_dollar_treated_as_falsifier",
+    "notional_buckets_guessed",
+    "jupiter_route_invented",
+    "provider_call",
+    "cash_spend",
+    "hypothesis_retired_without_owner_phrase"
+  ]
+}

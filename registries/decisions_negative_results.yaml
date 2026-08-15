@@ -16,6 +16,7 @@ source_asset_ids:
 - EVIDENCE-T30-A23-HELIUS-PAGINATION-001
 - EVIDENCE-T30-A24-RAW-TO-PIT-001
 - EVIDENCE-T30-A25-H07-H01-MEASURABILITY-001
+- EVIDENCE-T30-A26-H07-H01-OWNER-FORK-001
 records:
 - record_kind: negative_result
   record_id: NEGATIVE-T24-ENTITY-SIGNAL-V1-001
@@ -104,3 +105,10 @@ records:
   evidence_asset_ids:
   - EVIDENCE-T30-A25-H07-H01-MEASURABILITY-001
   summary: "DELIVERY_PREFLIGHT_SKIP_PROOF_REQUIRED: a newly added local-only test skip must carry an adjacent DELIVERY_PREFLIGHT_NONCRITICAL_SKIP comment naming a tracked docs/decisions or docs/evidence proof. GitHub PR CI does not run that check, so only the merge-gate tracked-only fallback catches a missing proof, which is where T30-A24 failed."
+- record_kind: decision
+  record_id: DECISION-T30-A26-FIVE-DOLLAR-CANNOT-FALSIFY-001
+  status: RECORDED
+  created_at: '2026-08-15T13:40:00Z'
+  evidence_asset_ids:
+  - EVIDENCE-T30-A26-H07-H01-OWNER-FORK-001
+  summary: "FIVE_DOLLAR_HELIUS_CANNOT_FALSIFY_OWNER_FORK_READY: A25 still cannot compute PIT_ROUTE_SURVIVAL or QUOTE_AVAILABILITY; Helius is trade/log history, not ROUTE_FEASIBILITY; Jupiter/quote is REGISTRY_GAP; NOTIONAL_BUCKET_SET_V1 is undefined; 1 POOL_DAY cluster cannot meet the 4-cluster floor. TASK-30 stays BLOCKED_DATA. Owner fork is encoded, not selected."

@@ -165,6 +165,7 @@ class LifecycleRegistryTests(unittest.TestCase):
                             "DECISION-T30-A24-RAW-TO-PIT-001",
                             "DECISION-T30-A25-H07-H01-MEASURABILITY-001",
                             "DECISION-DELIVERY-PREFLIGHT-SKIP-PROOF-001",
+                            "DECISION-T30-A26-FIVE-DOLLAR-CANNOT-FALSIFY-001",
                         ],
                     )
                     self.assertEqual(
@@ -178,6 +179,7 @@ class LifecycleRegistryTests(unittest.TestCase):
                             "negative_result",
                             "negative_result",
                             "negative_result",
+                            "decision",
                             "decision",
                             "decision",
                             "decision",

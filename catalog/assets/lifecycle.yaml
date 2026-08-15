@@ -202,7 +202,7 @@ records:
     repository_path: registries/decisions_negative_results.yaml
   integrity:
     kind: sha256
-    sha256: 874084d61becf0c01ebdc43bbcb54f78f0bbb454bf29f81e49ad80a7e6b0601c
+    sha256: ce9b7cb1067ad491da6f2e929fc403c849fc24cc51cf2986b0b9b03463c8a109
   access: *id001
   relations: *id002
   consumers: *id003
@@ -222,7 +222,7 @@ records:
     repository_path: docs/PROJECT_MAP.md
   integrity:
     kind: sha256
-    sha256: 6dba7f79673325b4224ee98a59880a6e47109866b92647377183770bfd5beec5
+    sha256: c95c49b72a428897f00371e5635caacf1528ba087bbf5ba4eaa47d3188008325
   access:
     mode: read_only
     method: file
@@ -282,7 +282,7 @@ records:
     repository_path: catalog/generated/asset_edges.json
   integrity:
     kind: sha256
-    sha256: acb2d3a9d8a78f86bef5f8092c7c8e630b7c7f63200cfec3665fb5cf6e288916
+    sha256: 22a0c85799da19d3d665eb9120300bc91b20e47c0cdf940df8583b2165d608e7
   access:
     mode: read_only
     method: file
