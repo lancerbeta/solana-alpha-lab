@@ -377,6 +377,7 @@ class Task30A24RawToPitAdmissibilityTests(unittest.TestCase):
         self.assertEqual(expected["slots_with_target_trades"], 35)
         self.assertEqual(expected["log_truncated_transactions"], 14)
 
+    # DELIVERY_PREFLIGHT_NONCRITICAL_SKIP: docs/evidence/task30/a24_raw_to_pit_admissibility_runtime_receipt_v1.json
     @unittest.skipUnless(A22_RAW.is_file() and A23_RAW.is_file(), "retained raw is local-only")
     def test_live_retained_batch_reproduces_orientation(self) -> None:
         a22 = A22_RAW.read_bytes()

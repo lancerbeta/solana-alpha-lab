@@ -14,7 +14,7 @@
   },
   "capability_radar_now": "NONE",
   "implementation_bindings": {
-    "catalog/assets/core.yaml": "8c68b2612c8569b1214fbaa3b9bbc0f85c17f532f7e79c2eeceda76e1637c52a",
+    "catalog/assets/core.yaml": "3cc195a67a2a56f266abd4be51f4506a4158a39f2a53f9b257da73a8c1220359",
     "catalog/assets/lifecycle.yaml": "e18d29c53b7ae741acad765c2eb7a4da52e7832f6a207c989321cd7c386ded8d",
     "catalog/catalog_manifest.yaml": "cc622ae5ea6fbfc2b64e8018e3d493fc43ad1917fa32e0111032f5199889833b",
     "catalog/generated/asset_edges.json": "516c2fc0f8fa44c744d9d86c017ddbad673dee98438bee37aee1bea8865a92ce",
@@ -34,7 +34,7 @@
     "tests/test_catalog.py": "3b587b8672b841a9cdef41a02282331b818d55020187e53e66fbabe97cf6d33c",
     "tests/test_lifecycle_registries.py": "8237f24e38630b70fa82920c4912e032ee89bb9667f3ec52e19cb29102247397",
     "tests/test_task09_pumpswap_touch_probe.py": "0c52d94ff656e5045d5b0ebec7c87b153d29bc9d64675376e9d35c5c6b189477",
-    "tests/test_task30_a24_raw_to_pit_admissibility.py": "b48ea6bef4469d274ad5a7673c2afc3983b430968e55c0235a07b8bf2a6337f9"
+    "tests/test_task30_a24_raw_to_pit_admissibility.py": "1957dde4b302ca8687aa45b89c2754abb95ce2a453df41b61fe4cd306109bcf1"
   },
   "active_stop_conditions": [],
   "owner_attention_triggers": {
@@ -46,14 +46,14 @@
   },
   "factory_fit": {
     "path": "docs/evidence/task30/a24_delivery_factory_fit_v1.json",
-    "sha256": "c72f7cbec8b53e1a73dc521942c2d879326da19e14241aef0e06bc824133bbd0",
+    "sha256": "039ef2564668a3b37a7227f1ebd059de3f2a790db10767ec68f01c29ca8bf75c",
     "verdict": "PASS"
   },
   "validation": {
     "targeted": "PASS_55_A24_PROBE_CATALOG_LIFECYCLE_AND_DECODER_TESTS",
     "independent_review": {
       "path": "docs/evidence/task30/a24_delivery_independent_review_v1.json",
-      "sha256": "c3e9db67e5586dca73ecf08a1d7d028e05325cdd04dba898db276cc5f52651c2",
+      "sha256": "9e61b9084f5b71675db86ade7aa177b4c94494fadb99f99bc4c111f29fb7239c",
       "verdict": "PASS"
     },
     "full_gate": "ENFORCED_BY_PROJECT_BOUND_VALIDATION",

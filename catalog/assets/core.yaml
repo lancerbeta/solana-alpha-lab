@@ -20885,7 +20885,7 @@ records:
   as_of: '2026-08-15'
   truth_owner: TASK-30
   location: {kind: git_path, logical_uri: 'repo://tests/test_task30_a24_raw_to_pit_admissibility.py', repository_path: tests/test_task30_a24_raw_to_pit_admissibility.py}
-  integrity: {kind: sha256, sha256: b48ea6bef4469d274ad5a7673c2afc3983b430968e55c0235a07b8bf2a6337f9}
+  integrity: {kind: sha256, sha256: 1957dde4b302ca8687aa45b89c2754abb95ce2a453df41b61fe4cd306109bcf1}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: depends_on, target_asset_id: CONFIG-T30-A24-RAW-TO-PIT-001}
