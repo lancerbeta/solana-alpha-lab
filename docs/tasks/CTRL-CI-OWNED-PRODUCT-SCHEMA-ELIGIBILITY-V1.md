@@ -19,6 +19,7 @@ managed_write_set:
   - tests/test_ci.py
   - delivery-harness/policies/solana-alpha-lab.md
   - docs/agent/EXECUTION_ROUTER_PROTOCOL.md
+  - catalog/assets/core.yaml
 external_caps:
   network: false
   credentials: false

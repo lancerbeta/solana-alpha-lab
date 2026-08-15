@@ -928,7 +928,7 @@ records:
     and one fail-closed CI-owned delivery pilot preflight.
   status: IMPLEMENTED_UNVERIFIED
   origin: REPOSITORY
-  as_of: '2026-08-09'
+  as_of: '2026-08-15'
   truth_owner: TASK-04
   location:
     kind: git_path
@@ -936,7 +936,7 @@ records:
     repository_path: scripts/validate_ci.py
   integrity:
     kind: sha256
-    sha256: 56e761de2c3fe089bb3a21a0c266eb0b9e828ec10efef174ef18c97aa162faa6
+    sha256: 848817360dba1648241f73ab898108858b624f04184da362f965edc4bb56e635
   access:
     mode: read_only
     method: command
@@ -4148,7 +4148,7 @@ records:
     Delivery Harness, with dormant baton history and proportional validation.
   status: IMPLEMENTED_UNVERIFIED
   origin: REPOSITORY
-  as_of: '2026-08-14'
+  as_of: '2026-08-15'
   truth_owner: CTRL-DELIVERY-HARNESS-001
   location:
     kind: git_path
@@ -4156,7 +4156,7 @@ records:
     repository_path: docs/agent/EXECUTION_ROUTER_PROTOCOL.md
   integrity:
     kind: sha256
-    sha256: 7ef43868666559927e9295acb057417057aaad5b80f7184c66ef70f04ec8e76c
+    sha256: 72df429789819e74cfe5d0aff0729e96692104802046382a00ccc76f85b82e56
   access:
     mode: read_only
     method: file
