@@ -735,7 +735,7 @@ records:
     repository_path: AGENTS.md
   integrity:
     kind: sha256
-    sha256: 6905419d8bc5d2ab8d883036608cedd4954dd5022a06fef10a94d29a920c5d33
+    sha256: 39d2db33970b886021ffea887cd051a995e05f1cb2c8c1ccce366d7f382212ab
   access:
     mode: read_only
     method: file
@@ -4249,7 +4249,7 @@ records:
     repository_path: .cursor/rules/00-authority.mdc
   integrity:
     kind: sha256
-    sha256: 50a55302658ae28867e97e7470dc1695bdc6b3240b410cf77f6b6b88248a6634
+    sha256: f042ec3268ebf614aaa794ad1e9bce446b9932a7872be53aec365b02ec6b3759
   access:
     mode: read_only
     method: file
@@ -4280,7 +4280,7 @@ records:
     repository_path: .cursor/rules/10-input-routing.mdc
   integrity:
     kind: sha256
-    sha256: 4b6df7a71cb321fda7d98a1420d12778ccda63bbce1ed5aa924a04b8ac80951d
+    sha256: 766fbb91be37c49b15b2fece0f282da375bf6158f40ec8c1ac19b88d1e651c64
   access:
     mode: read_only
     method: file
@@ -19872,7 +19872,7 @@ records:
   as_of: '2026-08-14'
   truth_owner: CTRL-DELIVERY-HARNESS-001
   location: {kind: git_path, logical_uri: 'repo://.agents/skills/delivery-harness/SKILL.md', repository_path: .agents/skills/delivery-harness/SKILL.md}
-  integrity: {kind: sha256, sha256: e47abf8526e127cecc76a42bcc2f98149f8b8207d0cfe14409829c5111c54663}
+  integrity: {kind: sha256, sha256: 6364595e1de363f81ff3ebf1372ed650a613ce483daed0d05a7a4d677873bf74}
   access: *t25_read_file
   relations:
   - {relation_type: governed_by, target_asset_id: CTRL-DELIVERY-HARNESS-001}
@@ -19926,7 +19926,7 @@ records:
   as_of: '2026-08-14'
   truth_owner: CTRL-DELIVERY-HARNESS-001
   location: {kind: git_path, logical_uri: 'repo://docs/agent/DELIVERY_HARNESS_PROTOCOL.md', repository_path: docs/agent/DELIVERY_HARNESS_PROTOCOL.md}
-  integrity: {kind: sha256, sha256: 17a2dc0dc97e351ec26e8ae6eb7781af2327e95c72cedb484892c508347ca19f}
+  integrity: {kind: sha256, sha256: 2ba3f67901f887cb6fe36076611d28055e96ecf98c00294dcb92757bd0ea1f7a}
   access: *t25_read_file
   relations:
   - {relation_type: governed_by, target_asset_id: ADR-DIRECT-DELIVERY-HARNESS-005}

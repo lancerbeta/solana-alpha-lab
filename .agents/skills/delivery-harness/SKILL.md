@@ -1,6 +1,6 @@
 ---
 name: delivery-harness
-description: Use when starting, resuming, implementing, reviewing or finishing bounded repository work through the Git-native Delivery Harness, including exact context projection, owner-attention routing and guarded delivery.
+description: Use when starting, resuming, implementing, reviewing or finishing bounded repository work through the Git-native Delivery Harness, including exact context projection, owner-attention routing and guarded delivery. Do not use for orientation phrases such as го дальше, что дальше, or поднимем голову; those stay read-only until EXECUTE.
 ---
 
 # Delivery Harness
@@ -10,6 +10,9 @@ Run one workflow:
 `CHECK -> CONTEXT -> ENTRY/OUTCOME -> EXECUTE -> RISK-ROUTED REVIEW -> FINISH -> EXACT MERGE GATE -> READ-BACK`
 
 ## Check and context
+
+If `.cursor/rules/10-input-routing.mdc` classifies the turn as `ORIENTATION`
+or `NEITHER`, do not start this workflow.
 
 Read `AGENTS.md`, `delivery-harness/harness.yaml` and the elected profile. Run
 the deterministic check. Require one exact task contract; never discover work

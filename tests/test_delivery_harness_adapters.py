@@ -51,6 +51,7 @@ class DeliveryHarnessAdapterTests(unittest.TestCase):
         ):
             self.assertIn(path, text)
         self.assertIn("Git is the working project-memory owner", text)
+        self.assertIn(".cursor/rules/10-input-routing.mdc", text)
         self.assertIn("OWNER_MANAGED_OPTIONAL_EXPORT", text)
         self.assertIn("never request its replacement or smoke", text)
         self.assertIn("never clicks GitHub Merge", text)
@@ -107,8 +108,34 @@ class DeliveryHarnessAdapterTests(unittest.TestCase):
                 always.append(path)
             else:
                 self.assertTrue(metadata["description"])
-        self.assertEqual({path.name for path in always}, {"00-authority.mdc", "30-security-and-secrets.mdc"})
+        self.assertEqual(
+            {path.name for path in always},
+            {
+                "00-authority.mdc",
+                "10-input-routing.mdc",
+                "30-security-and-secrets.mdc",
+            },
+        )
         self.assertLessEqual(sum(path.stat().st_size for path in always), 6 * 1024)
+
+    def test_input_routing_discriminates_orientation_from_execute(self) -> None:
+        authority = (CURSOR / "rules/00-authority.mdc").read_text(encoding="utf-8")
+        routing = (CURSOR / "rules/10-input-routing.mdc").read_text(encoding="utf-8")
+        agents = AGENTS.read_text(encoding="utf-8")
+        self.assertIn("Mutate, deliver and merge only from an exact task contract", authority)
+        self.assertIn("Orientation may inspect Git truth without a new contract", authority)
+        self.assertIn("## ORIENTATION", routing)
+        self.assertIn("## EXECUTE", routing)
+        self.assertIn("## NEITHER", routing)
+        self.assertIn("OWNER_DECISION", routing)
+        self.assertIn(".agents/skills/delivery-harness/SKILL.md", routing)
+        self.assertIn("scripts/delivery_harness.py check", routing)
+        self.assertIn("`ORIENTATION` versus `EXECUTE`", agents)
+        self.assertIn("On `ORIENTATION`, do not start that workflow.", agents)
+        self.assertNotRegex(
+            routing,
+            r"\A---\n.*\n---\nUse `.agents/skills/delivery-harness/SKILL.md`",
+        )
 
     def test_no_active_cursor_adapter_can_reactivate_baton(self) -> None:
         self.assertFalse((CURSOR / "rules/50-github-baton.mdc").exists())

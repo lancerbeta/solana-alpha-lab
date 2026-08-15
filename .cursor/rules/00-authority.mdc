@@ -9,8 +9,10 @@ alwaysApply: true
 - Read `AGENTS.md`, `delivery-harness/harness.yaml` and the elected project
   profile. Use only `DIRECT_CURSOR_DELIVERY`, `DIRECT_CODEX_DELIVERY` or
   `DESIGN_ONLY`; historical transport artifacts grant no active authority.
-- Work only from an exact task contract. Do not infer the current/next task from
-  recency, branch names, Issues, PRs, commits, tests or chat history.
+- Mutate, deliver and merge only from an exact task contract. Do not infer the
+  current/next task from recency, branch names, Issues, PRs, commits, tests or
+  chat history. Orientation may inspect Git truth without a new contract and
+  must not create one or mutate; see `10-input-routing.mdc`.
 - Routine bounded engineering, tests, Catalog/generated propagation, ordinary
   commits, non-force push, PR/review and CI are autonomous inside the stricter
   task contract. Do not ask for micro-approvals.

@@ -11,6 +11,11 @@ harness_id: DELIVERY_HARNESS_V1
 
 `CHECK -> CONTEXT -> ENTRY/OUTCOME -> EXECUTE -> RISK-ROUTED REVIEW -> FINISH -> EXACT MERGE GATE -> READ-BACK`
 
+Owner navigation phrases inspect Git truth without a new contract and must not
+mutate. Discriminate `ORIENTATION` versus `EXECUTE` with
+`.cursor/rules/10-input-routing.mdc`. The workflow below starts only on
+`EXECUTE`.
+
 ### Check and context
 
 Run the deterministic harness check and require an exact Git task contract.
