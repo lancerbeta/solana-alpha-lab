@@ -409,6 +409,18 @@ class Task30A24RawToPitAdmissibilityTests(unittest.TestCase):
         self.assertFalse(result["pit"]["prospective_pit_route_usable"])
         self.assertEqual(result["side_effects"]["provider_requests"], 0)
 
+    def test_tracked_acceptance_declares_no_source_change(self) -> None:
+        receipt = json.loads(
+            (
+                ROOT
+                / "docs/evidence/task30/a24_raw_to_pit_admissibility_acceptance_v1.json"
+            ).read_text(encoding="utf-8")
+        )
+        self.assertEqual(
+            receipt["project_sources_disposition"],
+            {"kind": "NO_CHANGE"},
+        )
+
 
 def _row_from_live(row: object) -> dict[str, object]:
     if not isinstance(row, dict):

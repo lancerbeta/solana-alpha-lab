@@ -20866,7 +20866,7 @@ records:
   as_of: '2026-08-15'
   truth_owner: TASK-30
   location: {kind: git_path, logical_uri: 'repo://scripts/run_task30_a24_raw_to_pit_admissibility.py', repository_path: scripts/run_task30_a24_raw_to_pit_admissibility.py}
-  integrity: {kind: sha256, sha256: 0df83cb5037bf0adb928586f43eae264657b6c156cdf7f84a64ce0b968fd2462}
+  integrity: {kind: sha256, sha256: 4175cce79df3b5e9815113075ff4deed8816a9fece4832a451d6044777b70235}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: depends_on, target_asset_id: MODULE-T30-A24-RAW-TO-PIT-001}
@@ -20885,7 +20885,7 @@ records:
   as_of: '2026-08-15'
   truth_owner: TASK-30
   location: {kind: git_path, logical_uri: 'repo://tests/test_task30_a24_raw_to_pit_admissibility.py', repository_path: tests/test_task30_a24_raw_to_pit_admissibility.py}
-  integrity: {kind: sha256, sha256: f49db8fbbe95495e302352d2b1d5fc896dedca744f9a9029d8344c74adaa9750}
+  integrity: {kind: sha256, sha256: b48ea6bef4469d274ad5a7673c2afc3983b430968e55c0235a07b8bf2a6337f9}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: depends_on, target_asset_id: CONFIG-T30-A24-RAW-TO-PIT-001}
@@ -20943,7 +20943,7 @@ records:
   as_of: '2026-08-15'
   truth_owner: TASK-30
   location: {kind: git_path, logical_uri: 'repo://docs/evidence/task30/a24_raw_to_pit_admissibility_acceptance_v1.json', repository_path: docs/evidence/task30/a24_raw_to_pit_admissibility_acceptance_v1.json}
-  integrity: {kind: sha256, sha256: dee6af0d956a74993053bfa370767632b167d051f326ca8494bd084a7d23eab4}
+  integrity: {kind: sha256, sha256: 257e81801afbfa3ba6bf64e8c25b41009e560bb168e9a01d92c606ca4bcdb183}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: derived_from, target_asset_id: CONTRACT-T30-A24-RAW-TO-PIT-001}

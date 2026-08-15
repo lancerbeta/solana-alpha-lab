@@ -98,6 +98,7 @@ def main() -> int:
         "slot_state_counts": runtime["slot_state_counts"],
         "limitations": result["decision"].get("limitations"),
         "provider_gap": result["decision"].get("provider_gap"),
+        "project_sources_disposition": {"kind": "NO_CHANGE"},
         "claims": result["claims"],
         "side_effects": result["side_effects"],
         "non_claims": [
