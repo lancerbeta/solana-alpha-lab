@@ -1,0 +1,120 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://solana-alpha-lab.local/schemas/task38_rc002_h11_next_gta_target_from_pool_history.schema.json",
+  "title": "TASK-38 RC002 H11 next GTA target from pool-history policy",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema", "schema_version", "task_id", "atom_id", "contract_id",
+    "spec_route", "adoption_route", "consumer", "research_cycle",
+    "target_resolver", "rc001_freeze", "holdout_guard", "adopted_route",
+    "terminal_outcomes", "claims", "external_authority",
+    "project_sources_disposition"
+  ],
+  "properties": {
+    "schema": {"const": "smial.task38.rc002-h11-next-gta-target.policy"},
+    "schema_version": {"const": "1.0"},
+    "task_id": {"const": "TASK-38"},
+    "atom_id": {"const": "T38-A1_RC002_H11_NEXT_GTA_TARGET_FROM_POOL_HISTORY_V1"},
+    "contract_id": {"const": "CONTRACT-T38-RC002-H11-NEXT-GTA-001"},
+    "spec_route": {"const": "BOTH"},
+    "adoption_route": {"const": "ADOPT_EXISTING_HELIUS_GTA_AND_PUMP_EVENT_DECODER"},
+    "consumer": {"const": "RC002-H11-LIFECYCLE-CLOCK"},
+    "research_cycle": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "research_cycle_id", "task_owned_register_id", "register_kind",
+        "title", "status", "definition_owner", "retrofit_into_rc001"
+      ],
+      "properties": {
+        "research_cycle_id": {"const": "RESEARCH-CYCLE-RC002-001"},
+        "task_owned_register_id": {"const": "TASK36-RC002-REGISTER-001"},
+        "register_kind": {"const": "TASK_OWNED_CONFIG_EVIDENCE"},
+        "title": {"type": "string", "minLength": 8},
+        "status": {"const": "NEXT_GTA_TARGET"},
+        "definition_owner": {"const": "TASK-38"},
+        "retrofit_into_rc001": {"const": false}
+      }
+    },
+    "target_resolver": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "freeze_before_candidate_inspection", "allowed_kinds", "prefer_kind",
+        "token_balance_owner_scope", "exclude", "wrapped_sol_mint",
+        "pump_program_id", "create_event_fields", "unbounded_gta_forbidden",
+        "naming_does_not_authorize_network"
+      ],
+      "properties": {
+        "freeze_before_candidate_inspection": {"const": true},
+        "allowed_kinds": {
+          "type": "array",
+          "minItems": 2,
+          "maxItems": 2,
+          "items": {"enum": ["TOKEN_MINT", "BONDING_CURVE"]}
+        },
+        "prefer_kind": {"const": "TOKEN_MINT"},
+        "token_balance_owner_scope": {"const": "SCANNED_POOL_ONLY"},
+        "exclude": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["pump_program", "scanned_pool", "wrapped_sol_quote"],
+          "properties": {
+            "pump_program": {"const": true},
+            "scanned_pool": {"const": true},
+            "wrapped_sol_quote": {"const": true}
+          }
+        },
+        "wrapped_sol_mint": {"const": "So11111111111111111111111111111111111111112"},
+        "pump_program_id": {"const": "6EF8rrecthR5Dkzon8Nwu78hRvfCKubJ14M5uBEwF6P"},
+        "create_event_fields": {
+          "type": "array",
+          "minItems": 2,
+          "maxItems": 2,
+          "items": {"enum": ["mint", "bonding_curve"]}
+        },
+        "unbounded_gta_forbidden": {"const": true},
+        "naming_does_not_authorize_network": {"const": true}
+      }
+    },
+    "rc001_freeze": {"type": "object"},
+    "holdout_guard": {"type": "object"},
+    "adopted_route": {"type": "object"},
+    "terminal_outcomes": {
+      "type": "array",
+      "minItems": 2,
+      "maxItems": 2,
+      "items": {
+        "enum": [
+          "NEXT_BOUNDED_GTA_TARGET_NAMED",
+          "CANNOT_RESOLVE_BOUNDED_TARGET_FROM_POOL_HISTORY"
+        ]
+      }
+    },
+    "claims": {"type": "object"},
+    "external_authority": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "network", "credentials", "cash_spend", "paid_plan",
+        "provider_routes_max", "wallet_signer_transaction", "deployment"
+      ],
+      "properties": {
+        "network": {"const": false},
+        "credentials": {"const": false},
+        "cash_spend": {"const": false},
+        "paid_plan": {"const": false},
+        "provider_routes_max": {"const": 1},
+        "wallet_signer_transaction": {"const": false},
+        "deployment": {"const": false}
+      }
+    },
+    "project_sources_disposition": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["kind"],
+      "properties": {"kind": {"const": "NO_CHANGE"}}
+    }
+  }
+}

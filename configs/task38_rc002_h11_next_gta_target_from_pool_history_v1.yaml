@@ -1,0 +1,85 @@
+schema: smial.task38.rc002-h11-next-gta-target.policy
+schema_version: '1.0'
+task_id: TASK-38
+atom_id: T38-A1_RC002_H11_NEXT_GTA_TARGET_FROM_POOL_HISTORY_V1
+contract_id: CONTRACT-T38-RC002-H11-NEXT-GTA-001
+spec_route: BOTH
+adoption_route: ADOPT_EXISTING_HELIUS_GTA_AND_PUMP_EVENT_DECODER
+consumer: RC002-H11-LIFECYCLE-CLOCK
+research_cycle:
+  research_cycle_id: RESEARCH-CYCLE-RC002-001
+  task_owned_register_id: TASK36-RC002-REGISTER-001
+  register_kind: TASK_OWNED_CONFIG_EVIDENCE
+  title: RC-002 H11 next bounded GTA target from adopted pool-history bytes
+  status: NEXT_GTA_TARGET
+  definition_owner: TASK-38
+  retrofit_into_rc001: false
+target_resolver:
+  freeze_before_candidate_inspection: true
+  allowed_kinds:
+    - TOKEN_MINT
+    - BONDING_CURVE
+  prefer_kind: TOKEN_MINT
+  token_balance_owner_scope: SCANNED_POOL_ONLY
+  exclude:
+    pump_program: true
+    scanned_pool: true
+    wrapped_sol_quote: true
+  wrapped_sol_mint: So11111111111111111111111111111111111111112
+  pump_program_id: 6EF8rrecthR5Dkzon8Nwu78hRvfCKubJ14M5uBEwF6P
+  create_event_fields:
+    - mint
+    - bonding_curve
+  unbounded_gta_forbidden: true
+  naming_does_not_authorize_network: true
+rc001_freeze:
+  path: configs/task28_rc001_registry_freeze_v1.yaml
+  sha256: c4fbb7157a13d1dee0f2b1f163e8f8fc1a38da4bc850275fba25bc0d70a785a7
+  mutation_authorized: false
+  remaining_families_deprioritized: true
+  required_definition_sha256:
+    RC001-H13-COMPOSITE-VETO: f1f020f4fa79acd2f2de667d71b8002d5821f45e9070a0f259c63210b23a16d0
+    RC001-H07-H01-LIQUIDITY-RETENTION: 14a7387148d05773dedcb5ad6a8110a0dcab7e49da4dec77328903a5b7577df7
+    RC001-H02-H10-H14-PULLBACK-RECLAIM: fc225417541570aa73814a4cb992f6f801a84bea1baf15696d754c706e0aa9f8
+holdout_guard:
+  path: registries/holdout_consumption.yaml
+  sha256: 863d68e53861c4aa30f6afa1a512ec5ab84c8966273cee6d42ca1519ef5fa07a
+adopted_route:
+  route_id: HELIUS-SOLANA-GET-TRANSACTIONS-FOR-ADDRESS-001
+  provider_routes_max: 1
+  target_kind: PUMPSWAP_POOL_ADDRESS
+  pool_address: URqx24yyYxtXXhTbBQnbtPLhtLWYoaDaRxuQuLpNS3S
+  decoder_idl_path: tests/fixtures/task08/pump_event_idl_subset_v1.json
+  a22_raw:
+    path: local/task30_a22_helius_get_transactions_for_address/run=20260814T184209Z-7572a5c2/raw_response.json
+    sha256: 7244a4c049c7ebe5f77d6136513d402c9af568dd0ccabb3a842160ab61a72bcc
+    bytes: 9012030
+  a23_terminal_page:
+    path: local/task30_a23_helius_bounded_pagination/run=20260814T220124Z-e494b5aa/page=001/raw_response.json
+    sha256: 6770f134e61d334451780ded411fe5dd79e0577f2c532a5d3a8a694b8c58ae81
+    bytes: 93
+terminal_outcomes:
+  - NEXT_BOUNDED_GTA_TARGET_NAMED
+  - CANNOT_RESOLVE_BOUNDED_TARGET_FROM_POOL_HISTORY
+claims:
+  next_gta_target_naming_only: true
+  network_call_authorized: false
+  live_pit: false
+  execution: false
+  alpha: false
+  numeric_netreturn: false
+  rc001_definition_changed: false
+  holdout_consumed: false
+  h11_effect_screen: false
+  h13_trial: false
+  h02_trial: false
+external_authority:
+  network: false
+  credentials: false
+  cash_spend: false
+  paid_plan: false
+  provider_routes_max: 1
+  wallet_signer_transaction: false
+  deployment: false
+project_sources_disposition:
+  kind: NO_CHANGE

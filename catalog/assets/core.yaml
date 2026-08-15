@@ -13138,7 +13138,7 @@ records:
     repository_path: tests/test_task23_catalog_repository_factory_fit.py
   integrity:
     kind: sha256
-    sha256: 70a43d8ab8727c58e0742bdaf80fd29d7e0527053cf1036bb3fd5557e2a57575
+    sha256: fd1a4967432debd83f134061b193685f8168282c223a0029683fb3db0a3b581b
   access: *t23_read_file
   relations:
   - relation_type: depends_on
@@ -16602,7 +16602,7 @@ records:
   as_of: '2026-08-09'
   truth_owner: TASK-28
   location: {kind: git_path, logical_uri: 'repo://tests/fixtures/task28/rc001_registry_freeze_v1.json', repository_path: tests/fixtures/task28/rc001_registry_freeze_v1.json}
-  integrity: {kind: sha256, sha256: a6440a8e964319bcf27384de156774bf374b03816096f053625a555c52638de9}
+  integrity: {kind: sha256, sha256: 7056d3b6975ba573e1d7fa0c3a0544d287d718dcf4e82ecfbb22514adbfa912e}
   access: *t25_read_file
   relations: [{relation_type: derived_from, target_asset_id: CONFIG-T28-RC001-REGISTRY-FREEZE-001}]
   consumers: [TASK-28, FACTORY-001]
@@ -16656,7 +16656,7 @@ records:
   as_of: '2026-08-09'
   truth_owner: TASK-28
   location: {kind: git_path, logical_uri: 'repo://docs/evidence/task28/a1_rc001_registry_freeze_acceptance_v1.json', repository_path: docs/evidence/task28/a1_rc001_registry_freeze_acceptance_v1.json}
-  integrity: {kind: sha256, sha256: 6e6cc0df579576bfda278747c97ce372b1d55d3ce85d7f4f3e7f241364b61978}
+  integrity: {kind: sha256, sha256: 46df7e54c39e70689a8fbd4c7f9de20df7ada47e93498cd80d751ab86d23e3da}
   access: *t25_read_file
   relations:
   - {relation_type: derived_from, target_asset_id: MODULE-T28-RC001-REGISTRY-FREEZE-001}
@@ -22366,4 +22366,269 @@ records:
   consumers: [TASK-37, FACTORY-001, GOAL-OWNER]
   evidence: []
   search_terms: [H11, FACTORY_FIT, FULL_REVIEW, CLOCK_CAPTURE]
+  classification: {contains_secrets: false, contains_raw_data: false, sensitivity: INTERNAL_NON_SECRET}
+
+- asset_id: CONTRACT-T38-RC002-H11-NEXT-GTA-001
+  record_version: '1.0'
+  asset_type: control_document
+  purpose: Exact TASK-38 contract for naming a bounded next GTA target from pool-history bytes.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-08-15'
+  truth_owner: TASK-38
+  location: {kind: git_path, logical_uri: 'repo://docs/contracts/task38_rc002_h11_next_gta_target_from_pool_history_contract_v1.md', repository_path: docs/contracts/task38_rc002_h11_next_gta_target_from_pool_history_contract_v1.md}
+  integrity: {kind: sha256, sha256: 88911231aafdc96725f2e4f0794942abc2b2240010d5c392da704efdb5505701}
+  access: {mode: read_only, method: file, network_required: false, secrets_required: false}
+  relations:
+  - {relation_type: depends_on, target_asset_id: EVIDENCE-T37-RC002-H11-CLOCK-CAPTURE-001}
+  - {relation_type: depends_on, target_asset_id: EVIDENCE-T30-A24-RAW-TO-PIT-001}
+  consumers: [TASK-38, FACTORY-001]
+  evidence: []
+  search_terms: [H11, RC002, NEXT_GTA, BOUNDED_TARGET]
+  classification: {contains_secrets: false, contains_raw_data: false, sensitivity: INTERNAL_NON_SECRET}
+
+- asset_id: CONFIG-T38-RC002-H11-NEXT-GTA-001
+  record_version: '1.0'
+  asset_type: configuration
+  purpose: Frozen unique resolver, adopted Helius pool-history route and RC001 non-mutation guard.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-08-15'
+  truth_owner: TASK-38
+  location: {kind: git_path, logical_uri: 'repo://configs/task38_rc002_h11_next_gta_target_from_pool_history_v1.yaml', repository_path: configs/task38_rc002_h11_next_gta_target_from_pool_history_v1.yaml}
+  integrity: {kind: sha256, sha256: 25dd8c09a6c4a9a9fc93e24a63f511142de95defd33c3c0bcbdb7bb09528d551}
+  access: {mode: read_only, method: file, network_required: false, secrets_required: false}
+  relations: [{relation_type: governed_by, target_asset_id: CONTRACT-T38-RC002-H11-NEXT-GTA-001}]
+  consumers: [TASK-38, FACTORY-001]
+  evidence: []
+  search_terms: [H11, UNIQUE_RESOLVER, HELIUS_GTA, ZERO_PROVIDER]
+  classification: {contains_secrets: false, contains_raw_data: false, sensitivity: INTERNAL_NON_SECRET}
+
+- asset_id: SCHEMA-T38-RC002-H11-NEXT-GTA-001
+  record_version: '1.0'
+  asset_type: schema
+  purpose: Closed JSON Schema for the TASK-38 next bounded GTA target policy.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-08-15'
+  truth_owner: TASK-38
+  location: {kind: git_path, logical_uri: 'repo://catalog/schemas/task38_rc002_h11_next_gta_target_from_pool_history.schema.json', repository_path: catalog/schemas/task38_rc002_h11_next_gta_target_from_pool_history.schema.json}
+  integrity: {kind: sha256, sha256: 72ae7b9ed455c71d54c2fd35f84acd487eea57f5832a204dd602fc7e252f79f7}
+  access: {mode: read_only, method: file, network_required: false, secrets_required: false}
+  relations: [{relation_type: governed_by, target_asset_id: CONTRACT-T38-RC002-H11-NEXT-GTA-001}]
+  consumers: [TASK-38, FACTORY-001]
+  evidence: []
+  search_terms: [H11, CLOSED_SCHEMA, NEXT_GTA]
+  classification: {contains_secrets: false, contains_raw_data: false, sensitivity: INTERNAL_NON_SECRET}
+
+- asset_id: FIXTURE-T38-RC002-H11-NEXT-GTA-001
+  record_version: '1.0'
+  asset_type: evidence
+  purpose: Secret-free expected live terminal for the unique pool-owned vault mint.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-08-15'
+  truth_owner: TASK-38
+  location: {kind: git_path, logical_uri: 'repo://tests/fixtures/task38/h11_next_gta_target_from_pool_history_v1.json', repository_path: tests/fixtures/task38/h11_next_gta_target_from_pool_history_v1.json}
+  integrity: {kind: sha256, sha256: 0c824925b422c948efb36f358f6748712bf73888c9ca5ab707276da98aa52b82}
+  access: {mode: read_only, method: file, network_required: false, secrets_required: false}
+  relations: [{relation_type: governed_by, target_asset_id: CONTRACT-T38-RC002-H11-NEXT-GTA-001}]
+  consumers: [TASK-38, FACTORY-001]
+  evidence: []
+  search_terms: [H11, FIXTURE, NEXT_BOUNDED_GTA_TARGET_NAMED]
+  classification: {contains_secrets: false, contains_raw_data: false, sensitivity: INTERNAL_NON_SECRET}
+
+- asset_id: MODULE-T38-RC002-H11-NEXT-GTA-001
+  record_version: '1.0'
+  asset_type: script
+  purpose: Thin next-GTA target scan over adopted A22/A23 pool history with pinned Pump decode.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-08-15'
+  truth_owner: TASK-38
+  location: {kind: git_path, logical_uri: 'repo://src/solana_alpha_lab/task38_h11_next_gta_target_from_pool_history.py', repository_path: src/solana_alpha_lab/task38_h11_next_gta_target_from_pool_history.py}
+  integrity: {kind: sha256, sha256: 69e92e16a57752e6a9f95c104297af8e9957896eecf5cfb494b0c7205d1030f4}
+  access: {mode: read_only, method: file, network_required: false, secrets_required: false}
+  relations:
+  - {relation_type: governed_by, target_asset_id: CONTRACT-T38-RC002-H11-NEXT-GTA-001}
+  - {relation_type: depends_on, target_asset_id: CONFIG-T38-RC002-H11-NEXT-GTA-001}
+  - {relation_type: validated_by, target_asset_id: TEST-T38-RC002-H11-NEXT-GTA-001}
+  consumers: [TASK-38, FACTORY-001]
+  evidence: []
+  search_terms: [H11, MODULE, NEXT_GTA, PUMP_DECODE]
+  classification: {contains_secrets: false, contains_raw_data: false, sensitivity: INTERNAL_NON_SECRET}
+
+- asset_id: SCRIPT-T38-RC002-H11-NEXT-GTA-001
+  record_version: '1.0'
+  asset_type: script
+  purpose: Offline runner that scans adopted A22/A23 bytes and emits next-GTA naming receipts.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-08-15'
+  truth_owner: TASK-38
+  location: {kind: git_path, logical_uri: 'repo://scripts/run_task38_rc002_h11_next_gta_target_from_pool_history.py', repository_path: scripts/run_task38_rc002_h11_next_gta_target_from_pool_history.py}
+  integrity: {kind: sha256, sha256: 53c7f23fc50ac647d81e1ab67ed6e588d3a6c5a74d865f4194207177a2eb4744}
+  access: {mode: read_only, method: file, network_required: false, secrets_required: false}
+  relations:
+  - {relation_type: depends_on, target_asset_id: MODULE-T38-RC002-H11-NEXT-GTA-001}
+  - {relation_type: governed_by, target_asset_id: CONTRACT-T38-RC002-H11-NEXT-GTA-001}
+  consumers: [TASK-38, FACTORY-001]
+  evidence: []
+  search_terms: [H11, RUNNER, NEXT_GTA, OWNER_READOUT]
+  classification: {contains_secrets: false, contains_raw_data: false, sensitivity: INTERNAL_NON_SECRET}
+
+- asset_id: TEST-T38-RC002-H11-NEXT-GTA-001
+  record_version: '1.0'
+  asset_type: script
+  purpose: Targeted tests for unique mint, cannot-resolve, incidental-mint non-ambiguity and RC001 non-mutation.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-08-15'
+  truth_owner: TASK-38
+  location: {kind: git_path, logical_uri: 'repo://tests/test_task38_rc002_h11_next_gta_target_from_pool_history.py', repository_path: tests/test_task38_rc002_h11_next_gta_target_from_pool_history.py}
+  integrity: {kind: sha256, sha256: ab333393f255424584a6d263b37e28bf2f1d7dd697d0442a4acbd2c916e5caa8}
+  access: {mode: read_only, method: file, network_required: false, secrets_required: false}
+  relations:
+  - {relation_type: depends_on, target_asset_id: CONFIG-T38-RC002-H11-NEXT-GTA-001}
+  - {relation_type: depends_on, target_asset_id: SCHEMA-T38-RC002-H11-NEXT-GTA-001}
+  - {relation_type: depends_on, target_asset_id: MODULE-T38-RC002-H11-NEXT-GTA-001}
+  - {relation_type: depends_on, target_asset_id: FIXTURE-T38-RC002-H11-NEXT-GTA-001}
+  consumers: [TASK-38, FACTORY-001]
+  evidence: []
+  search_terms: [H11, TEST, NEXT_GTA, FAIL_CLOSED]
+  classification: {contains_secrets: false, contains_raw_data: false, sensitivity: INTERNAL_NON_SECRET}
+
+- asset_id: EVIDENCE-T38-RC002-H11P-NEXT-GTA-001
+  record_version: '1.0'
+  asset_type: evidence
+  purpose: Runtime receipt for the H11 next bounded GTA target scan over pool-history bytes.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-08-15'
+  truth_owner: TASK-38
+  location: {kind: git_path, logical_uri: 'repo://docs/evidence/task38/a1_h11_next_gta_target_runtime_receipt_v1.json', repository_path: docs/evidence/task38/a1_h11_next_gta_target_runtime_receipt_v1.json}
+  integrity: {kind: sha256, sha256: 90da6f1fb302f9130a85e9a44f749b0ed4adbac18799aa1a427ba37e1c5147cb}
+  access: {mode: read_only, method: file, network_required: false, secrets_required: false}
+  relations:
+  - {relation_type: derived_from, target_asset_id: CONFIG-T38-RC002-H11-NEXT-GTA-001}
+  - {relation_type: validated_by, target_asset_id: TEST-T38-RC002-H11-NEXT-GTA-001}
+  consumers: [TASK-38, FACTORY-001, GOAL-OWNER]
+  evidence: []
+  search_terms: [H11, RUNTIME, NEXT_BOUNDED_GTA_TARGET_NAMED]
+  classification: {contains_secrets: false, contains_raw_data: false, sensitivity: INTERNAL_NON_SECRET}
+
+- asset_id: REPORT-T38-RC002-H11-NEXT-GTA-001
+  record_version: '1.0'
+  asset_type: control_document
+  purpose: Russian owner readout of the named bounded next GTA mint and no-network limit.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-08-15'
+  truth_owner: TASK-38
+  location: {kind: git_path, logical_uri: 'repo://docs/reports/task38/a1_h11_next_gta_target_owner_readout_v1.md', repository_path: docs/reports/task38/a1_h11_next_gta_target_owner_readout_v1.md}
+  integrity: {kind: sha256, sha256: 16908883ce48287d7467d3a38da98121bccc65cb9299c9660de302afdc8d7ce4}
+  access: {mode: read_only, method: file, network_required: false, secrets_required: false}
+  relations: [{relation_type: derived_from, target_asset_id: EVIDENCE-T38-RC002-H11P-NEXT-GTA-001}]
+  consumers: [TASK-38, FACTORY-001, GOAL-OWNER]
+  evidence: []
+  search_terms: [H11, READOUT, NEXT_BOUNDED_GTA_TARGET_NAMED]
+  classification: {contains_secrets: false, contains_raw_data: false, sensitivity: INTERNAL_NON_SECRET}
+
+- asset_id: EVIDENCE-T38-RC002-H11-NEXT-GTA-001
+  record_version: '1.0'
+  asset_type: evidence
+  purpose: Acceptance that frozen pool-history bytes name unique TOKEN_MINT without authorizing a new Helius call.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-08-15'
+  truth_owner: TASK-38
+  location: {kind: git_path, logical_uri: 'repo://docs/evidence/task38/a1_h11_next_gta_target_acceptance_v1.json', repository_path: docs/evidence/task38/a1_h11_next_gta_target_acceptance_v1.json}
+  integrity: {kind: sha256, sha256: 5e603c3ed34ad4a697ce496b440661aac04275f8b0cd1878dd41de887da3f9c1}
+  access: {mode: read_only, method: file, network_required: false, secrets_required: false}
+  relations:
+  - {relation_type: derived_from, target_asset_id: CONTRACT-T38-RC002-H11-NEXT-GTA-001}
+  - {relation_type: depends_on, target_asset_id: EVIDENCE-T38-RC002-H11P-NEXT-GTA-001}
+  - {relation_type: validated_by, target_asset_id: TEST-T38-RC002-H11-NEXT-GTA-001}
+  consumers: [TASK-38, RC002-H11-LIFECYCLE-CLOCK, FACTORY-001, GOAL-OWNER]
+  evidence: []
+  search_terms: [H11, ACCEPTANCE, NEXT_BOUNDED_GTA_TARGET_NAMED]
+  classification: {contains_secrets: false, contains_raw_data: false, sensitivity: INTERNAL_NON_SECRET}
+
+- asset_id: CTRL-TASK-38-001
+  record_version: '1.0'
+  asset_type: control_document
+  purpose: Harness-valid TASK-38 contract binding RC002 next-GTA naming authority, write set and DoD.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-08-15'
+  truth_owner: TASK-38
+  location: {kind: git_path, logical_uri: 'repo://docs/tasks/TASK-38-rc002-h11-next-gta-target-from-pool-history.md', repository_path: docs/tasks/TASK-38-rc002-h11-next-gta-target-from-pool-history.md}
+  integrity: {kind: sha256, sha256: 07fb553ee2d92c3b236826dda0451cc8dc86b2306a61e938b10f6d29b5c18afe}
+  access: {mode: read_only, method: file, network_required: false, secrets_required: false}
+  relations:
+  - {relation_type: contains, target_asset_id: CONTRACT-T38-RC002-H11-NEXT-GTA-001}
+  - {relation_type: contains, target_asset_id: SCRIPT-T38-RC002-H11-NEXT-GTA-001}
+  - {relation_type: depends_on, target_asset_id: EVIDENCE-T37-RC002-H11-CLOCK-CAPTURE-001}
+  consumers: [TASK-38, FACTORY-001]
+  evidence: []
+  search_terms: [H11, TASK_CONTRACT, NEXT_GTA, IMPLEMENTED_UNVERIFIED]
+  classification: {contains_secrets: false, contains_raw_data: false, sensitivity: INTERNAL_NON_SECRET}
+
+- asset_id: EVIDENCE-T38-A1-DELIVERY-COMPLETION-001
+  record_version: '1.0'
+  asset_type: evidence
+  purpose: Guard-consumable completion evidence binding the exact TASK-38 next-GTA inventory without product DONE.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-08-15'
+  truth_owner: TASK-38
+  location: {kind: git_path, logical_uri: 'repo://docs/evidence/task38/a1_delivery_completion_evidence_v1.json', repository_path: docs/evidence/task38/a1_delivery_completion_evidence_v1.json}
+  integrity: {kind: none, note: 'Content integrity is owned by the live completion-review-fit hash chain; embedding its SHA here would create an indirect self-reference through the reviewed inventory.'}
+  access: {mode: read_only, method: file, network_required: false, secrets_required: false}
+  relations:
+  - {relation_type: derived_from, target_asset_id: EVIDENCE-T38-RC002-H11-NEXT-GTA-001}
+  - {relation_type: depends_on, target_asset_id: EVIDENCE-T38-A1-DELIVERY-INDEPENDENT-REVIEW-001}
+  - {relation_type: depends_on, target_asset_id: EVIDENCE-T38-A1-DELIVERY-FACTORY-FIT-001}
+  - {relation_type: depends_on, target_asset_id: SCHEMA-DELIVERY-COMPLETION-EVIDENCE-001}
+  consumers: [TASK-38, FACTORY-001, GOAL-OWNER]
+  evidence: []
+  search_terms: [H11, DELIVERY_COMPLETION, NEXT_BOUNDED_GTA_TARGET_NAMED]
+  classification: {contains_secrets: false, contains_raw_data: false, sensitivity: INTERNAL_NON_SECRET}
+
+- asset_id: EVIDENCE-T38-A1-DELIVERY-INDEPENDENT-REVIEW-001
+  record_version: '1.0'
+  asset_type: evidence
+  purpose: Required-role review evidence bound to the exact non-self-referential TASK-38 next-GTA inventory.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-08-15'
+  truth_owner: TASK-38
+  location: {kind: git_path, logical_uri: 'repo://docs/evidence/task38/a1_delivery_independent_review_v1.json', repository_path: docs/evidence/task38/a1_delivery_independent_review_v1.json}
+  integrity: {kind: none, note: 'Content integrity is owned by the live completion-review-fit hash chain; embedding its SHA here would create an indirect self-reference through the reviewed inventory.'}
+  access: {mode: read_only, method: file, network_required: false, secrets_required: false}
+  relations:
+  - {relation_type: derived_from, target_asset_id: EVIDENCE-T38-RC002-H11-NEXT-GTA-001}
+  - {relation_type: depends_on, target_asset_id: SCHEMA-DELIVERY-INDEPENDENT-REVIEW-EVIDENCE-001}
+  consumers: [TASK-38, FACTORY-001, GOAL-OWNER]
+  evidence: []
+  search_terms: [H11, INDEPENDENT_REVIEW, SINGLE_AGENT_REVIEW_FALLBACK]
+  classification: {contains_secrets: false, contains_raw_data: false, sensitivity: INTERNAL_NON_SECRET}
+
+- asset_id: EVIDENCE-T38-A1-DELIVERY-FACTORY-FIT-001
+  record_version: '1.0'
+  asset_type: evidence
+  purpose: FULL Factory Fit review for TASK-38 next-GTA naming mission, research truth, owner operability, wrap-versus-buy, security and red team.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-08-15'
+  truth_owner: TASK-38
+  location: {kind: git_path, logical_uri: 'repo://docs/evidence/task38/a1_delivery_factory_fit_v1.json', repository_path: docs/evidence/task38/a1_delivery_factory_fit_v1.json}
+  integrity: {kind: none, note: 'Content integrity is owned by the live completion-review-fit hash chain; embedding its SHA here would create an indirect self-reference through the reviewed inventory.'}
+  access: {mode: read_only, method: file, network_required: false, secrets_required: false}
+  relations:
+  - {relation_type: derived_from, target_asset_id: EVIDENCE-T38-RC002-H11-NEXT-GTA-001}
+  - {relation_type: depends_on, target_asset_id: EVIDENCE-T38-A1-DELIVERY-INDEPENDENT-REVIEW-001}
+  consumers: [TASK-38, FACTORY-001, GOAL-OWNER]
+  evidence: []
+  search_terms: [H11, FACTORY_FIT, FULL_REVIEW, NEXT_GTA]
   classification: {contains_secrets: false, contains_raw_data: false, sensitivity: INTERNAL_NON_SECRET}

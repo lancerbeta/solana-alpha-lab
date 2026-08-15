@@ -1,0 +1,50 @@
+{
+  "schema": "smial.delivery-completion-evidence",
+  "schema_version": "1.0",
+  "acceptance_id": "T38-A1-DELIVERY-COMPLETION-001",
+  "as_of": "2026-08-15",
+  "task_id": "TASK-38",
+  "state_change": "PLACEHOLDER",
+  "base_main": "d438037a8ff63951c4cb4250e73149a37db1b050",
+  "cloud_bundle_mode": "OWNER_MANAGED_OPTIONAL_EXPORT",
+  "cloud_bundle_required_by_harness": false,
+  "cloud_bundle_smoke_required": false,
+  "project_sources_disposition": {"kind": "NO_CHANGE"},
+  "capability_radar_now": "NONE",
+  "implementation_bindings": {
+    "docs/tasks/TASK-38-rc002-h11-next-gta-target-from-pool-history.md": "07fb553ee2d92c3b236826dda0451cc8dc86b2306a61e938b10f6d29b5c18afe"
+  },
+  "active_stop_conditions": [],
+  "owner_attention_triggers": {
+    "auth_or_access_recovery": false,
+    "material_owner_decision": false,
+    "user_only_activation": false,
+    "external_material_action": false,
+    "unresolved_safety_or_truth_conflict": false
+  },
+  "factory_fit": {
+    "path": "docs/evidence/task38/a1_delivery_factory_fit_v1.json",
+    "sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+    "verdict": "PASS"
+  },
+  "validation": {
+    "targeted": "PASS_PLACEHOLDER",
+    "independent_review": {
+      "path": "docs/evidence/task38/a1_delivery_independent_review_v1.json",
+      "sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+      "verdict": "PASS"
+    },
+    "full_gate": "ENFORCED_BY_PROJECT_BOUND_VALIDATION",
+    "github_ci": "ENFORCED_LIVE_AT_GUARDED_MERGE",
+    "project_checks": ["PASS_GENERATED_NAVIGATION_SECRET_AND_CATALOG_CHECKS"]
+  },
+  "non_claims": ["NO_TASK38_CANONICAL_DONE"],
+  "side_effects": {
+    "credential_reads": 0,
+    "provider_requests": 0,
+    "retries": 0,
+    "fallbacks": 0,
+    "cash_spend_usd_cents": 0,
+    "wallet_signer_transaction_actions": 0
+  }
+}
