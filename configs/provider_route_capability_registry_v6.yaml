@@ -1,0 +1,163 @@
+schema: smial.provider-route-capability-registry
+schema_version: '6.0'
+registry_id: PROVIDER-ROUTE-CAPABILITY-REGISTRY-006
+as_of: '2026-08-15'
+supersedes:
+  registry_id: PROVIDER-ROUTE-CAPABILITY-REGISTRY-005
+  path: configs/provider_route_capability_registry_v5.yaml
+  sha256: 8875fcc28ae763360f183cf644c1048ba4ec3950fb31406c0f0b1e3ee22231d0
+  preserved_route_semantic_sha256:
+    DEXSCREENER-SOLANA-TOKEN-PAIRS-KEYLESS-001: c5d7861a4f3074784d1ecfa5614e1617be37dde2fb3e7c28f03ec5d3dd8e0055
+    HELIUS-SOLANA-GET-SIGNATURES-001: 8852673f88c310d9e9c098a03fdcb2360150a2cfc242cf346637ac5fdd44f46d
+    HELIUS-SOLANA-LOGS-SUBSCRIBE-001: 97cef2d76835cf484ddd24a378db3a7cb47a91eac6d5d6f179a8090c4c9514cb
+    SOLANA-STANDARD-GET-TRANSACTION-001: b00b7c58edebd331e6908ff19b1a4b066678b9b371362d55157c599633db4ae7
+    BITQUERY-SOLANA-PUMPSWAP-OHLCV-001: 07140d5c257b00b9769be6d908f8e69f31739b7dfabeca1b69e0176dc410915a
+  updated_route_prior_semantic_sha256:
+    HELIUS-SOLANA-GET-TRANSACTIONS-FOR-ADDRESS-001: 05279d47cde9e0447f845a7324106dab8edc90abf08b52b60aebd177f5c7a440
+update_policy:
+  observed_receipt_required: true
+  preserve_receipt_history: true
+  separate_last_success: true
+  registry_gap_is_unavailability: false
+  automatic_routing: false
+  authority_granted: false
+routes:
+- route_id: DEXSCREENER-SOLANA-TOKEN-PAIRS-KEYLESS-001
+  provider: DEXSCREENER
+  endpoint_family: token-pairs/v1/solana/{tokenAddress}
+  network: solana
+  access_class: KEYLESS
+  operation: PUBLIC_TOKEN_PAIR_DISCOVERY
+  protocol: HTTPS_GET
+  runtime: {client: BUNDLED_NODE_HTTPS, version_source: CODEX_WORKSPACE_DEPENDENCY, tls_engine: OPENSSL, observed_result: HTTP_200}
+  preflight: {kind: DNS_TCP_TLS, steps: [DNS, TCP_443, TLS_HANDSHAKE], consumes_credential: false, consumes_attempt: false}
+  last_success: {observed_at: '2026-08-12T21:17:48.620Z', http_status: 200, response_bytes: 42510, response_sha256: 34ee46d235f6525c0c09cadf372a8577be61b9534afe35946438be76a24619f4, evidence_id: T30-POPCAT-ACTIVE-POOL-PILOT-V2-DEXSCREENER-001}
+  last_observation: {observed_at: '2026-08-12T21:17:48.620Z', terminal_class: HTTP_SUCCESS, layer: TRANSPORT, http_status: 200, response_bytes: 42510, response_sha256: 34ee46d235f6525c0c09cadf372a8577be61b9534afe35946438be76a24619f4, error_fingerprint: null, evidence_id: T30-POPCAT-ACTIVE-POOL-PILOT-V2-DEXSCREENER-001}
+  known_failures:
+  - {fingerprint: DOTNET_SSL_CONNECTION_FAILED, layer: LOCAL_TLS, interpretation: Windows HttpClient failed before an HTTP response; provider failure is unsupported.}
+  - {fingerprint: SCHANNEL_SEC_E_NO_CREDENTIALS, layer: LOCAL_TLS, interpretation: Windows curl failed before an HTTP response; provider failure is unsupported.}
+  execution_policy: {retry: false, fallback: false, automatic_selection: false, authority_granted: false}
+  evidence: {last_observation_receipt: a4://task30_popcat_active_pool_pilot/run=20260812T211748172Z-v2, raw_retention: A4_OUTSIDE_GIT}
+  non_claims: &route_non_claims {provider_reliability: false, data_completeness: false, market_activity: false, task30_trial: false, alpha: false, numeric_netreturn: false}
+- route_id: HELIUS-SOLANA-GET-SIGNATURES-001
+  provider: HELIUS
+  endpoint_family: standard-rpc/getSignaturesForAddress
+  network: solana
+  access_class: LOCAL_ENV_CREDENTIAL
+  operation: GET_SIGNATURES_FOR_ADDRESS
+  protocol: HTTPS_POST_JSON_RPC
+  runtime: {client: BUNDLED_NODE_HTTPS, version_source: CODEX_WORKSPACE_DEPENDENCY, tls_engine: OPENSSL, observed_result: CONNECTION_RESET_BEFORE_HTTP}
+  preflight: {kind: DNS_TCP, steps: [DNS, TCP_443], consumes_credential: false, consumes_attempt: false}
+  last_success: {observed_at: '2026-08-12T20:56:50.121049Z', http_status: 200, response_bytes: 214229, response_sha256: 2ee288b77ce1a7e594531f33e9e992cdaf13c587a7601b303d2fdbc9299ef7fa, evidence_id: T30-A16P-POOL-ACTIVITY-DISCRIMINATOR-RUNTIME-002}
+  last_observation: {observed_at: '2026-08-12T21:19:32.164Z', terminal_class: CONNECTION_RESET, layer: TRANSPORT, http_status: null, response_bytes: 0, response_sha256: null, error_fingerprint: NODE_ECONNRESET_SOCKET_HANG_UP, evidence_id: T30-POPCAT-ACTIVE-POOL-PILOT-V2-HELIUS-001}
+  known_failures:
+  - fingerprint: NODE_ECONNRESET_SOCKET_HANG_UP
+    layer: TRANSPORT
+    interpretation: Connection ended before HTTP or RPC result; provider, method and target defects remain unknown.
+  execution_policy: {retry: false, fallback: false, automatic_selection: false, authority_granted: false}
+  evidence: {last_observation_receipt: a4://task30_popcat_active_pool_pilot/activity=20260812T211932164Z-v2, raw_retention: A4_OUTSIDE_GIT_NO_RESPONSE_BODY}
+  non_claims: *route_non_claims
+- route_id: HELIUS-SOLANA-LOGS-SUBSCRIBE-001
+  provider: HELIUS
+  endpoint_family: standard-wss/logsSubscribe
+  network: solana
+  access_class: LOCAL_ENV_CREDENTIAL
+  operation: LOGS_SUBSCRIBE_MENTIONS
+  protocol: WSS_JSON_RPC
+  runtime: {client: PYTHON_WEBSOCKETS, version_source: CODEX_WORKSPACE_DEPENDENCY, tls_engine: OPENSSL, observed_result: SUBSCRIPTION_ACCEPTED}
+  preflight: {kind: DNS_TCP, steps: [DNS, TCP_443], consumes_credential: false, consumes_attempt: false}
+  last_success: {observed_at: '2026-08-12T09:27:53.436278Z', transport_status: SUBSCRIPTION_ACCEPTED, response_bytes: 71, response_sha256: 3403dc7c4f2b3728b19e08f41522c4471fe2ebd0f007e931d07b13cd84529172, evidence_id: T30-A15P-STANDARD-POOL-LOGS-RUNTIME-001}
+  last_observation: {observed_at: '2026-08-12T09:37:53.059095Z', terminal_class: BOUND_REACHED, layer: DATA, transport_status: ELAPSED_CAP, response_bytes: 71, response_sha256: 3403dc7c4f2b3728b19e08f41522c4471fe2ebd0f007e931d07b13cd84529172, error_fingerprint: null, evidence_id: T30-A15P-STANDARD-POOL-LOGS-RUNTIME-001}
+  known_failures: []
+  execution_policy: {retry: false, fallback: false, automatic_selection: false, authority_granted: false}
+  evidence: {last_observation_receipt: a4://task30_standard_pool_logs/run=20260812T092752Z-f96d593f, raw_retention: A4_OUTSIDE_GIT}
+  non_claims: *route_non_claims
+- route_id: SOLANA-STANDARD-GET-TRANSACTION-001
+  provider: SOLANA_STANDARD_RPC
+  endpoint_family: standard-rpc/getTransaction
+  network: solana
+  access_class: KEYLESS
+  operation: GET_TRANSACTION
+  protocol: HTTPS_POST_JSON_RPC
+  runtime: {client: PYTHON_STDLIB_URLOPEN, version_source: CODEX_WORKSPACE_DEPENDENCY, tls_engine: OPENSSL, observed_result: HTTP_200_SCHEMA_DRIFT}
+  preflight: {kind: DNS_TCP, steps: [DNS, TCP_443], consumes_credential: false, consumes_attempt: false}
+  last_success: {observed_at: '2026-07-27T18:47:43.597028Z', http_status: 200, response_bytes: 11460, response_sha256: fdcb075a854b3471d0d4de0afdae29297e1359a095d5d9b745934f60a907ad6b, evidence_id: T09-A4-PUMPSWAP-GET-TRANSACTION-001}
+  last_observation: {observed_at: '2026-07-27T18:47:43.597028Z', terminal_class: HTTP_SUCCESS, layer: HTTP, http_status: 200, response_bytes: 11460, response_sha256: fdcb075a854b3471d0d4de0afdae29297e1359a095d5d9b745934f60a907ad6b, error_fingerprint: null, evidence_id: T09-A4-PUMPSWAP-GET-TRANSACTION-001}
+  known_failures: [{fingerprint: GET_TRANSACTION_RESULT_KEYS_DRIFT, layer: RPC, interpretation: Historical HTTP success contained an additive transactionIndex field; preserve raw bytes and classify protocol drift rather than silently widening the parser.}]
+  execution_policy: {retry: false, fallback: false, automatic_selection: false, authority_granted: false}
+  evidence: {last_observation_receipt: a4://task09_pumpswap_touch_probe_v1/run=t09a4-20260727T184740Z, raw_retention: A4_OUTSIDE_GIT}
+  non_claims: *route_non_claims
+- route_id: BITQUERY-SOLANA-PUMPSWAP-OHLCV-001
+  provider: BITQUERY
+  endpoint_family: streaming.bitquery.io/graphql
+  network: solana
+  access_class: LOCAL_ENV_CREDENTIAL
+  operation: PUMPSWAP_ARCHIVE_15M_OHLCV
+  protocol: HTTPS_POST_GRAPHQL_V2
+  runtime: {client: PYTHON_STDLIB_URLLIB, version_source: CODEX_WORKSPACE_DEPENDENCY, tls_engine: OPENSSL, observed_result: ROUTE_UNKNOWN_STOP}
+  preflight: {kind: DNS_TCP_TLS, steps: [DNS, TCP_443, TLS_HANDSHAKE], consumes_credential: false, consumes_attempt: false}
+  last_success: null
+  last_observation:
+    observed_at: '2026-08-14T12:26:53Z'
+    observed_at_semantics: RECEIPT_RECORDED_AT
+    attempt_time_precision: BOUNDED_NOT_EXACT_PREPATCH
+    terminal_class: ROUTE_UNKNOWN_STOP
+    layer: TRANSPORT
+    http_status: null
+    response_bytes: null
+    response_sha256: null
+    error_fingerprint: PREPATCH_HTTPERROR_OR_TRANSPORT_COLLAPSE
+    evidence_id: EVIDENCE-T30-A20P-BITQUERY-PIT-CAPTURE-001
+  known_failures:
+  - fingerprint: PREPATCH_HTTPERROR_OR_TRANSPORT_COLLAPSE
+    layer: LOCAL_CLIENT
+    interpretation: The one authorized request stopped after a passed TLS preflight; the pre-patch client collapsed HTTPError and transport failure, so provider cause and response bytes remain unknown and no retry is allowed.
+  execution_policy: {retry: false, fallback: false, automatic_selection: false, authority_granted: false}
+  evidence:
+    last_observation_receipt: docs/evidence/task30/a20p_bitquery_named_partial_pit_route_capture_runtime_receipt_v1.json
+    last_observation_receipt_sha256: fd7a52e6952e12fc48b9a88ed13b6dcfb28dbc9324cb767642fb28806897a185
+    raw_retention: NO_RESPONSE_BYTES_AVAILABLE
+  non_claims: *route_non_claims
+- route_id: HELIUS-SOLANA-GET-TRANSACTIONS-FOR-ADDRESS-001
+  provider: HELIUS
+  endpoint_family: helius-rpc/getTransactionsForAddress
+  network: solana
+  access_class: LOCAL_ENV_CREDENTIAL
+  operation: GET_TRANSACTIONS_FOR_ADDRESS_FULL
+  protocol: HTTPS_POST_JSON_RPC_2_0
+  runtime: {client: PYTHON_STDLIB_URLLIB, version_source: CODEX_WORKSPACE_DEPENDENCY, tls_engine: OPENSSL, observed_result: HTTP_200_COMPLETE_RAW_BATCH_CANDIDATE}
+  preflight: {kind: DNS_TCP_TLS, steps: [DNS, TCP_443, TLS_HANDSHAKE], consumes_credential: false, consumes_attempt: false}
+  last_success:
+    observed_at: '2026-08-14T22:01:24Z'
+    http_status: 200
+    response_bytes: 93
+    response_sha256: 6770f134e61d334451780ded411fe5dd79e0577f2c532a5d3a8a694b8c58ae81
+    evidence_id: EVIDENCE-T30-A23P-HELIUS-BOUNDED-PAGINATION-001
+  last_observation:
+    observed_at: '2026-08-14T22:01:24Z'
+    terminal_class: COMPLETE_RAW_BATCH_CANDIDATE
+    layer: DATA_COVERAGE
+    http_status: 200
+    continuation_requests: 1
+    continuation_response_bytes: 93
+    continuation_response_sha256: 6770f134e61d334451780ded411fe5dd79e0577f2c532a5d3a8a694b8c58ae81
+    retained_batch_response_bytes: 9012123
+    total_transaction_count: 520
+    final_pagination_token_present: false
+    complete_raw_batch_candidate: true
+    credits_upper_bound: 10
+    error_fingerprint: null
+    evidence_id: EVIDENCE-T30-A23P-HELIUS-BOUNDED-PAGINATION-001
+  known_failures:
+  - fingerprint: PAGINATION_TOKEN_PRESENT_AFTER_520_FULL_TRANSACTIONS
+    layer: DATA_COVERAGE
+    interpretation: A22 established that one response was incomplete; A23 followed that cursor once and retained an empty terminal page, so the one-shot limitation remains historical rather than a current batch-completeness blocker.
+  execution_policy: {retry: false, fallback: false, automatic_selection: false, authority_granted: false}
+  evidence:
+    last_observation_receipt: docs/evidence/task30/a23_helius_bounded_pagination_runtime_receipt_v1.json
+    last_observation_receipt_sha256: 7aa03c53222f64a462270994304fe512a4b5d91e5fc3781e31ce50e26a5dbeca
+    prior_observation_receipt: docs/evidence/task30/a22_helius_get_transactions_for_address_runtime_receipt_v1.json
+    prior_observation_receipt_sha256: bbb29e932ff2c2d68703f2f1693e8fe07a57b7ef24ffabea71c1a95436f97b15
+    raw_retention: A4_OUTSIDE_GIT
+  non_claims: *route_non_claims
+non_claims: *route_non_claims

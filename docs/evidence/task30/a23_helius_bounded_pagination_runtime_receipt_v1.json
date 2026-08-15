@@ -1,0 +1,109 @@
+{
+  "a22_first_page_refetched": false,
+  "a22_first_page_reused": true,
+  "atom_id": "T30-A23_HELIUS_BOUNDED_PAGINATION_COMPLETE_BATCH_V1",
+  "authority": {
+    "basis": "EXACT_OWNER_PHRASE",
+    "cash_spend_usd_cents": 0,
+    "credential_free_preflights": 1,
+    "credential_reads": 1,
+    "fallbacks": 0,
+    "provider_requests": 1,
+    "purchase_or_plan_changes": 0,
+    "redirects": 0,
+    "retries": 0,
+    "second_provider_requests": 0
+  },
+  "claims": {
+    "alpha": false,
+    "complete_market_panel": false,
+    "complete_raw_batch_candidate_only": true,
+    "execution": false,
+    "fillability": false,
+    "h07_h01_evidence": false,
+    "missing_is_zero_or_flat": false,
+    "numeric_netreturn": false,
+    "pit_admissible": false,
+    "pnl": false,
+    "route_feasibility": false,
+    "settlement": false,
+    "strategy": false,
+    "task30_acceptance": false,
+    "technical_raw_transaction_route_only": true
+  },
+  "complete_raw_batch_candidate": true,
+  "credits_upper_bound": 10,
+  "new_response_bytes": 93,
+  "observed_at": "2026-08-14T22:01:24Z",
+  "page_summaries": [
+    {
+      "credits_upper_bound": 60,
+      "cursor_present": true,
+      "cursor_sha256": "8ef7a4d174cf6846b11c5e57d1127edea0575fb66ce06fefc68997ebe55ab2ec",
+      "first_block_time": 1786494563,
+      "first_transaction_key": [
+        438709109,
+        26
+      ],
+      "last_block_time": 1786575893,
+      "last_transaction_key": [
+        438902738,
+        82
+      ],
+      "page_number": 0,
+      "raw_sha256": "7244a4c049c7ebe5f77d6136513d402c9af568dd0ccabb3a842160ab61a72bcc",
+      "response_bytes": 9012030,
+      "transaction_count": 520
+    },
+    {
+      "credits_upper_bound": 10,
+      "cursor_present": false,
+      "cursor_sha256": null,
+      "first_block_time": null,
+      "first_transaction_key": null,
+      "last_block_time": null,
+      "last_transaction_key": null,
+      "page_number": 1,
+      "raw_sha256": "6770f134e61d334451780ded411fe5dd79e0577f2c532a5d3a8a694b8c58ae81",
+      "response_bytes": 93,
+      "transaction_count": 0
+    }
+  ],
+  "preflight": {
+    "credential_reads": 0,
+    "dns_resolved": true,
+    "host": "mainnet.helius-rpc.com",
+    "observed_at": "2026-08-14T22:01:24Z",
+    "port": 443,
+    "provider_requests": 0,
+    "schema": "smial.task30.helius-get-transactions-for-address.credential-free-preflight",
+    "schema_version": "1.0",
+    "tcp_443": true,
+    "tls_verified": true,
+    "tls_version": "TLSv1.3"
+  },
+  "provider_requests": 1,
+  "raw_manifests": [
+    {
+      "observed_at": "2026-08-14T22:01:24Z",
+      "page_number": 1,
+      "raw_filename": "raw_response.json",
+      "raw_sha256": "6770f134e61d334451780ded411fe5dd79e0577f2c532a5d3a8a694b8c58ae81",
+      "request_body_sha256": "3c2fb1800fd35efc7edcc6f4538afcec1dfa14b8dc6e4c536ab4d34b8b427d54",
+      "response_bytes": 93,
+      "retention_class": "A4_OUTSIDE_GIT",
+      "schema": "smial.task30.helius-bounded-pagination.raw-page-manifest",
+      "schema_version": "1.0"
+    }
+  ],
+  "receipt_id": "EVIDENCE-T30-A23P-HELIUS-BOUNDED-PAGINATION-001",
+  "route_id": "HELIUS-SOLANA-GET-TRANSACTIONS-FOR-ADDRESS-001",
+  "run_id": "20260814T220124Z-e494b5aa",
+  "schema": "smial.task30.helius-bounded-pagination.runtime-receipt",
+  "schema_version": "1.0",
+  "task30_state": "BLOCKED_DATA",
+  "task_id": "TASK-30",
+  "terminal_error": null,
+  "terminal_outcome": "COMPLETE_RAW_BATCH_CANDIDATE",
+  "total_transaction_count": 520
+}

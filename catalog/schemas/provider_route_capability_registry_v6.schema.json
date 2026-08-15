@@ -1,0 +1,46 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://lancerbeta.github.io/solana-alpha-lab/schemas/provider_route_capability_registry_v6.schema.json",
+  "title": "SMIAL provider route capability registry v6",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema", "schema_version", "registry_id", "as_of", "supersedes", "update_policy", "routes", "non_claims"],
+  "properties": {
+    "schema": {"const": "smial.provider-route-capability-registry"},
+    "schema_version": {"const": "6.0"},
+    "registry_id": {"const": "PROVIDER-ROUTE-CAPABILITY-REGISTRY-006"},
+    "as_of": {"const": "2026-08-15"},
+    "supersedes": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["registry_id", "path", "sha256", "preserved_route_semantic_sha256", "updated_route_prior_semantic_sha256"],
+      "properties": {
+        "registry_id": {"const": "PROVIDER-ROUTE-CAPABILITY-REGISTRY-005"},
+        "path": {"const": "configs/provider_route_capability_registry_v5.yaml"},
+        "sha256": {"const": "8875fcc28ae763360f183cf644c1048ba4ec3950fb31406c0f0b1e3ee22231d0"},
+        "preserved_route_semantic_sha256": {"type": "object", "minProperties": 5, "maxProperties": 5, "additionalProperties": {"type": "string", "pattern": "^[0-9a-f]{64}$"}},
+        "updated_route_prior_semantic_sha256": {
+          "const": {"HELIUS-SOLANA-GET-TRANSACTIONS-FOR-ADDRESS-001": "05279d47cde9e0447f845a7324106dab8edc90abf08b52b60aebd177f5c7a440"}
+        }
+      }
+    },
+    "update_policy": {"type": "object"},
+    "routes": {
+      "type": "array", "minItems": 6, "maxItems": 6,
+      "items": {
+        "type": "object",
+        "required": ["route_id", "provider", "endpoint_family", "network", "access_class", "operation", "protocol", "runtime", "preflight", "last_success", "last_observation", "known_failures", "execution_policy", "evidence", "non_claims"],
+        "additionalProperties": true
+      }
+    },
+    "non_claims": {
+      "type": "object", "additionalProperties": false,
+      "required": ["provider_reliability", "data_completeness", "market_activity", "task30_trial", "alpha", "numeric_netreturn"],
+      "properties": {
+        "provider_reliability": {"const": false}, "data_completeness": {"const": false},
+        "market_activity": {"const": false}, "task30_trial": {"const": false},
+        "alpha": {"const": false}, "numeric_netreturn": {"const": false}
+      }
+    }
+  }
+}

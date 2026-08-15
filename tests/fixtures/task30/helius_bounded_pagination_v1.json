@@ -1,0 +1,17 @@
+{
+  "fixture_id": "FIXTURE-T30-A23-HELIUS-BOUNDED-PAGINATION-001",
+  "route_id": "HELIUS-SOLANA-GET-TRANSACTIONS-FOR-ADDRESS-001",
+  "synthetic_cursor": "300000000:1",
+  "a22_page": {
+    "transaction_count": 520,
+    "raw_sha256": "7244a4c049c7ebe5f77d6136513d402c9af568dd0ccabb3a842160ab61a72bcc",
+    "cursor_sha256": "8ef7a4d174cf6846b11c5e57d1127edea0575fb66ce06fefc68997ebe55ab2ec"
+  },
+  "caps": {
+    "continuation_requests": 2,
+    "credits_total": 200,
+    "new_response_bytes_total": 50000000
+  },
+  "complete_when": "PAGINATION_TOKEN_NULL_WITHIN_TWO_CONTINUATIONS",
+  "claims": {"pit_admissible": false, "h07_h01_evidence": false, "task30_acceptance": false}
+}

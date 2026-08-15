@@ -1,0 +1,105 @@
+schema: smial.task30.helius-bounded-pagination-complete-batch.policy
+schema_version: '1.0'
+task_id: TASK-30
+atom_id: T30-A23_HELIUS_BOUNDED_PAGINATION_COMPLETE_BATCH_V1
+contract_id: CONTRACT-T30-A23-HELIUS-BOUNDED-PAGINATION-001
+spec_route: DESIGN_SPEC
+adoption_route: WRAP_A22_TESTED_REQUEST_AND_PREFLIGHT
+consumer: RC001-H07-H01-LIQUIDITY-RETENTION
+first_page_binding:
+  source_atom_id: T30-A22_HELIUS_GET_TRANSACTIONS_FOR_ADDRESS_ONE_SHOT_V1
+  raw_path: local/task30_a22_helius_get_transactions_for_address/run=20260814T184209Z-7572a5c2/raw_response.json
+  request_id: task30-a22-helius-get-transactions-for-address
+  raw_sha256: 7244a4c049c7ebe5f77d6136513d402c9af568dd0ccabb3a842160ab61a72bcc
+  response_bytes: 9012030
+  transaction_count: 520
+  cursor_sha256: 8ef7a4d174cf6846b11c5e57d1127edea0575fb66ce06fefc68997ebe55ab2ec
+  reuse_without_refetch: true
+reference_subject:
+  network: solana
+  pool_address: URqx24yyYxtXXhTbBQnbtPLhtLWYoaDaRxuQuLpNS3S
+  base_mint: DMwbVy48dWVKGe9z1pcVnwF3HLMLrqWdDLfbvx8RchhK
+  quote_mint: So11111111111111111111111111111111111111112
+  dex_id: pumpswap
+  program_address: pAMMBay6oceH9fJKBRHGP5D4bD4sWpmSwMn52FMfXEA
+  target_role: COMPLETE_RAW_TRANSACTION_BATCH_CANDIDATE
+  representativeness: NOT_ESTABLISHED
+provider_route:
+  route_id: HELIUS-SOLANA-GET-TRANSACTIONS-FOR-ADDRESS-001
+  provider: HELIUS
+  endpoint: https://mainnet.helius-rpc.com/
+  protocol: HTTPS_POST_JSON_RPC_2_0
+  method: getTransactionsForAddress
+  credential_reference: HELIUS_API_KEY
+  credential_transport: URL_QUERY_API_KEY
+request:
+  transaction_details: full
+  sort_order: asc
+  limit: 1000
+  commitment: finalized
+  encoding: json
+  max_supported_transaction_version: 0
+  status: succeeded
+  token_accounts: none
+pilot_window:
+  since_inclusive: '2026-08-12T00:00:00Z'
+  till_exclusive: '2026-08-13T00:00:00Z'
+  block_time_gte: 1786492800
+  block_time_lt: 1786579200
+  interval_seconds: 900
+  expected_slots: 96
+external_authority:
+  basis: EXPLICIT_OWNER_PHRASE
+  owner_phrase: OK T30-A23 HELIUS_BOUNDED_PAGINATION_COMPLETE_BATCH
+  capture_authorized: true
+  credential_value_local_only: true
+  provider_api_rpc_calls_authorized: 2
+  credential_reads_authorized: 1
+  purchase_authorized: false
+  plan_or_autoscaling_change_authorized: false
+runtime_limits:
+  max_credential_free_preflights: 1
+  max_continuation_requests: 2
+  max_response_bytes_per_page: 25000000
+  max_new_response_bytes_total: 50000000
+  timeout_seconds: 30
+  max_full_transactions_per_page: 1000
+  max_helius_credits_per_page: 100
+  max_helius_credits_total: 200
+execution_controls:
+  retry: false
+  fallback: false
+  redirect: false
+  pagination: true
+  scheduler: false
+  background_process: false
+retention:
+  class: A4_OUTSIDE_GIT
+  raw_root: local/task30_a23_helius_bounded_pagination
+  raw_filename: raw_response.json
+  manifest_filename: raw_manifest_v1.json
+  hash: SHA256_EXACT_BYTES
+  tracked_projection: docs/evidence/task30/a23_helius_bounded_pagination_runtime_receipt_v1.json
+terminal_outcomes:
+- COMPLETE_RAW_BATCH_CANDIDATE
+- BOUNDED_PAGINATION_INCOMPLETE_STOP
+- A22_BINDING_DRIFT
+- PROVIDER_TYPED_FAILURE
+- TRANSPORT_OR_VALIDATION_STOP
+claims:
+  technical_raw_transaction_route_only: true
+  complete_raw_batch_candidate_only: true
+  complete_market_panel: false
+  pit_admissible: false
+  h07_h01_evidence: false
+  fillability: false
+  route_feasibility: false
+  execution: false
+  settlement: false
+  pnl: false
+  numeric_netreturn: false
+  alpha: false
+  strategy: false
+  task30_acceptance: false
+  missing_is_zero_or_flat: false
+project_sources_disposition: NO_CHANGE

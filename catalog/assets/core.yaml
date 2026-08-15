@@ -20407,3 +20407,362 @@ records:
   evidence: []
   search_terms: [A22, FACTORY_FIT, FULL_REVIEW, ADOPT, NO_PURCHASE_NOW]
   classification: {contains_secrets: false, contains_raw_data: false, sensitivity: INTERNAL_NON_SECRET}
+
+- asset_id: CONTRACT-T30-A23-HELIUS-PAGINATION-001
+  record_version: '1.0'
+  asset_type: control_document
+  purpose: Exact A23 immutable-page, continuation, budget, completeness and non-claim contract.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-08-15'
+  truth_owner: TASK-30
+  location: {kind: git_path, logical_uri: 'repo://docs/contracts/task30_a23_helius_bounded_pagination_complete_batch_contract_v1.md', repository_path: docs/contracts/task30_a23_helius_bounded_pagination_complete_batch_contract_v1.md}
+  integrity: {kind: sha256, sha256: a03a5dfa7cb720783de19088fb685a60ed4a8767727ccb98c9fa88bd86649ad3}
+  access: {mode: read_only, method: file, network_required: false, secrets_required: false}
+  relations: [{relation_type: derived_from, target_asset_id: EVIDENCE-T30-A22-HELIUS-GTA-001}]
+  consumers: [TASK-30, RC001-H07-H01-LIQUIDITY-RETENTION, FACTORY-001]
+  evidence: []
+  search_terms: [A23, HELIUS, PAGINATION, COMPLETE_RAW_BATCH, BOUNDED_CREDITS]
+  classification: {contains_secrets: false, contains_raw_data: false, sensitivity: INTERNAL_NON_SECRET}
+
+- asset_id: CONFIG-T30-A23-HELIUS-PAGINATION-001
+  record_version: '1.0'
+  asset_type: configuration
+  purpose: Closed A23 policy binding A22 page zero, two continuations, 200 credits and 50 MB new data.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-08-15'
+  truth_owner: TASK-30
+  location: {kind: git_path, logical_uri: 'repo://configs/task30_a23_helius_bounded_pagination_complete_batch_v1.yaml', repository_path: configs/task30_a23_helius_bounded_pagination_complete_batch_v1.yaml}
+  integrity: {kind: sha256, sha256: b786f05ce6dead10c5aa8f1bce6f1d3254d5261d5d3bbfa89d3a77737a1d0821}
+  access: {mode: read_only, method: file, network_required: false, secrets_required: false}
+  relations: [{relation_type: governed_by, target_asset_id: CONTRACT-T30-A23-HELIUS-PAGINATION-001}]
+  consumers: [TASK-30, RC001-H07-H01-LIQUIDITY-RETENTION, FACTORY-001]
+  evidence: []
+  search_terms: [A23, HELIUS, TWO_PAGES, CREDITS_200, BYTES_50000000]
+  classification: {contains_secrets: false, contains_raw_data: false, sensitivity: INTERNAL_NON_SECRET}
+
+- asset_id: SCHEMA-T30-A23-HELIUS-PAGINATION-001
+  record_version: '1.0'
+  asset_type: schema
+  purpose: Closed JSON Schema for A23 identity, A22 binding, budgets, authority and claims.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-08-15'
+  truth_owner: TASK-30
+  location: {kind: git_path, logical_uri: 'repo://catalog/schemas/task30_a23_helius_bounded_pagination_complete_batch.schema.json', repository_path: catalog/schemas/task30_a23_helius_bounded_pagination_complete_batch.schema.json}
+  integrity: {kind: sha256, sha256: 0fe5f50abc1d711b9adff5e31416f96f59f5116cf4eeab74bd8c0ed79074705a}
+  access: {mode: read_only, method: file, network_required: false, secrets_required: false}
+  relations: [{relation_type: governed_by, target_asset_id: CONTRACT-T30-A23-HELIUS-PAGINATION-001}]
+  consumers: [TASK-30, FACTORY-001]
+  evidence: []
+  search_terms: [A23, HELIUS, CLOSED_SCHEMA, PAGINATION_CAPS]
+  classification: {contains_secrets: false, contains_raw_data: false, sensitivity: INTERNAL_NON_SECRET}
+
+- asset_id: FIXTURE-T30-A23-HELIUS-PAGINATION-001
+  record_version: '1.0'
+  asset_type: evidence
+  purpose: Secret-free A23 cursor, immutable-page, budget and completion-boundary fixture.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-08-15'
+  truth_owner: TASK-30
+  location: {kind: git_path, logical_uri: 'repo://tests/fixtures/task30/helius_bounded_pagination_v1.json', repository_path: tests/fixtures/task30/helius_bounded_pagination_v1.json}
+  integrity: {kind: sha256, sha256: 3dafdbec8e66c11d92267987c03b5159ab734f0c383f31924a78143ec321bdeb}
+  access: {mode: read_only, method: file, network_required: false, secrets_required: false}
+  relations: [{relation_type: governed_by, target_asset_id: CONTRACT-T30-A23-HELIUS-PAGINATION-001}]
+  consumers: [TASK-30, FACTORY-001]
+  evidence: []
+  search_terms: [A23, HELIUS, FIXTURE, CURSOR_HASH, COMPLETE_RAW_BATCH]
+  classification: {contains_secrets: false, contains_raw_data: false, sensitivity: INTERNAL_NON_SECRET}
+
+- asset_id: MODULE-T30-A23-HELIUS-PAGINATION-001
+  record_version: '1.0'
+  asset_type: script
+  purpose: Fail-closed cursor, page, global-order, budget, retention and bounded-continuation state machine.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-08-15'
+  truth_owner: TASK-30
+  location: {kind: git_path, logical_uri: 'repo://src/solana_alpha_lab/task30_helius_bounded_pagination.py', repository_path: src/solana_alpha_lab/task30_helius_bounded_pagination.py}
+  integrity: {kind: sha256, sha256: 255e7b5ad5d9f3b9abe4c58f2aa07432f66ee8211c11bdbea9c2757a93977584}
+  access: {mode: read_only, method: file, network_required: false, secrets_required: false}
+  relations:
+  - {relation_type: governed_by, target_asset_id: CONTRACT-T30-A23-HELIUS-PAGINATION-001}
+  - {relation_type: validated_by, target_asset_id: TEST-T30-A23-HELIUS-PAGINATION-001}
+  consumers: [TASK-30, FACTORY-001]
+  evidence: []
+  search_terms: [A23, HELIUS, CURSOR, GLOBAL_ORDER, RAW_RETENTION, FAIL_CLOSED]
+  classification: {contains_secrets: false, contains_raw_data: false, sensitivity: INTERNAL_NON_SECRET}
+
+- asset_id: SCRIPT-T30-A23-HELIUS-PAGINATION-001
+  record_version: '1.0'
+  asset_type: script
+  purpose: Foreground runner proving preflight and A22 binding before one credential read and at most two POSTs.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-08-15'
+  truth_owner: TASK-30
+  location: {kind: git_path, logical_uri: 'repo://scripts/run_task30_a23_helius_bounded_pagination.py', repository_path: scripts/run_task30_a23_helius_bounded_pagination.py}
+  integrity: {kind: sha256, sha256: 7572203c8c4aaf4d9689b4bb12318bfda0584b73ca50069ddfcec3e4f1bd023e}
+  access: {mode: read_only, method: file, network_required: false, secrets_required: false}
+  relations:
+  - {relation_type: depends_on, target_asset_id: MODULE-T30-A23-HELIUS-PAGINATION-001}
+  - {relation_type: governed_by, target_asset_id: CONTRACT-T30-A23-HELIUS-PAGINATION-001}
+  consumers: [TASK-30, FACTORY-001]
+  evidence: []
+  search_terms: [A23, HELIUS, PREFLIGHT, FIRST_PAGE_BINDING, SECRET_SAFE]
+  classification: {contains_secrets: false, contains_raw_data: false, sensitivity: INTERNAL_NON_SECRET}
+
+- asset_id: TEST-T30-A23-HELIUS-PAGINATION-001
+  record_version: '1.0'
+  asset_type: script
+  purpose: Deterministic A23 policy, cursor, page, global loop, runner, runtime and acceptance binding tests.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-08-15'
+  truth_owner: TASK-30
+  location: {kind: git_path, logical_uri: 'repo://tests/test_task30_a23_helius_bounded_pagination.py', repository_path: tests/test_task30_a23_helius_bounded_pagination.py}
+  integrity: {kind: sha256, sha256: 9b573c253a2c35d9b3b979b0fa657b4fa4c0e7dbb7a7ea811a552a267910fc5d}
+  access: {mode: read_only, method: file, network_required: false, secrets_required: false}
+  relations:
+  - {relation_type: depends_on, target_asset_id: CONFIG-T30-A23-HELIUS-PAGINATION-001}
+  - {relation_type: depends_on, target_asset_id: SCHEMA-T30-A23-HELIUS-PAGINATION-001}
+  - {relation_type: depends_on, target_asset_id: MODULE-T30-A23-HELIUS-PAGINATION-001}
+  - {relation_type: depends_on, target_asset_id: SCRIPT-T30-A23-HELIUS-PAGINATION-001}
+  consumers: [TASK-30, FACTORY-001]
+  evidence: []
+  search_terms: [A23, HELIUS, TEST, TWO_REQUEST_CAP, COMPLETE_RAW_BATCH]
+  classification: {contains_secrets: false, contains_raw_data: false, sensitivity: INTERNAL_NON_SECRET}
+
+- asset_id: EVIDENCE-T30-A23P-HELIUS-PAGINATION-001
+  record_version: '1.0'
+  asset_type: evidence
+  purpose: Runtime receipt for one empty terminal continuation and the complete 520-transaction raw-batch candidate.
+  status: VALIDATED_ACTIVE
+  origin: REPOSITORY
+  as_of: '2026-08-15'
+  truth_owner: TASK-30
+  location: {kind: git_path, logical_uri: 'repo://docs/evidence/task30/a23_helius_bounded_pagination_runtime_receipt_v1.json', repository_path: docs/evidence/task30/a23_helius_bounded_pagination_runtime_receipt_v1.json}
+  integrity: {kind: sha256, sha256: 7aa03c53222f64a462270994304fe512a4b5d91e5fc3781e31ce50e26a5dbeca}
+  access: {mode: read_only, method: file, network_required: false, secrets_required: false}
+  relations:
+  - {relation_type: derived_from, target_asset_id: CONFIG-T30-A23-HELIUS-PAGINATION-001}
+  - {relation_type: depends_on, target_asset_id: EVIDENCE-T30-A22P-HELIUS-GTA-001}
+  - {relation_type: validated_by, target_asset_id: TEST-T30-A23-HELIUS-PAGINATION-001}
+  consumers: [TASK-30, RC001-H07-H01-LIQUIDITY-RETENTION, FACTORY-001]
+  evidence: []
+  search_terms: [A23P, HELIUS, HTTP_200, ZERO_CONTINUATION_ROWS, COMPLETE_RAW_BATCH_CANDIDATE]
+  classification: {contains_secrets: false, contains_raw_data: false, sensitivity: INTERNAL_NON_SECRET}
+
+- asset_id: REPORT-T30-A23-HELIUS-PAGINATION-001
+  record_version: '1.0'
+  asset_type: control_document
+  purpose: Russian owner readout routing from provider coverage to raw-to-PIT admissibility without recommending a purchase.
+  status: VALIDATED_ACTIVE
+  origin: REPOSITORY
+  as_of: '2026-08-15'
+  truth_owner: TASK-30
+  location: {kind: git_path, logical_uri: 'repo://docs/reports/task30/a23_helius_bounded_pagination_readout_v1.md', repository_path: docs/reports/task30/a23_helius_bounded_pagination_readout_v1.md}
+  integrity: {kind: sha256, sha256: c429d73287bd6330cab84119a05b9fddbf0e326328731ae5fe31d4568cc01335}
+  access: {mode: read_only, method: file, network_required: false, secrets_required: false}
+  relations: [{relation_type: derived_from, target_asset_id: EVIDENCE-T30-A23P-HELIUS-PAGINATION-001}]
+  consumers: [TASK-30, RC001-H07-H01-LIQUIDITY-RETENTION, FACTORY-001, GOAL-OWNER]
+  evidence: []
+  search_terms: [A23, OWNER_REPORT, HELIUS, NO_PURCHASE_NOW, RAW_TO_PIT]
+  classification: {contains_secrets: false, contains_raw_data: false, sensitivity: INTERNAL_NON_SECRET}
+
+- asset_id: EVIDENCE-T30-A23-HELIUS-PAGINATION-001
+  record_version: '1.0'
+  asset_type: evidence
+  purpose: Hash-bound FULL_REVIEW acceptance for the complete raw-batch candidate without TASK-30 promotion.
+  status: VALIDATED_ACTIVE
+  origin: REPOSITORY
+  as_of: '2026-08-15'
+  truth_owner: TASK-30
+  location: {kind: git_path, logical_uri: 'repo://docs/evidence/task30/a23_helius_bounded_pagination_acceptance_v1.json', repository_path: docs/evidence/task30/a23_helius_bounded_pagination_acceptance_v1.json}
+  integrity: {kind: sha256, sha256: 7322ba9315b14d75856329a57b4260eb4fddce3d8e40c2e1aa5f9cf60f42ad96}
+  access: {mode: read_only, method: file, network_required: false, secrets_required: false}
+  relations:
+  - {relation_type: derived_from, target_asset_id: CONTRACT-T30-A23-HELIUS-PAGINATION-001}
+  - {relation_type: depends_on, target_asset_id: EVIDENCE-T30-A23P-HELIUS-PAGINATION-001}
+  - {relation_type: validated_by, target_asset_id: TEST-T30-A23-HELIUS-PAGINATION-001}
+  consumers: [TASK-30, RC001-H07-H01-LIQUIDITY-RETENTION, FACTORY-001, GOAL-OWNER]
+  evidence: []
+  search_terms: [A23, ACCEPTANCE, FULL_REVIEW, COMPLETE_RAW_BATCH_CANDIDATE, RAW_TO_PIT]
+  classification: {contains_secrets: false, contains_raw_data: false, sensitivity: INTERNAL_NON_SECRET}
+
+- asset_id: CTRL-TASK-30-A23-001
+  record_version: '1.0'
+  asset_type: control_document
+  purpose: Harness-valid A23 task contract binding exact authority, branch, budgets, stop and checkpoint.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-08-15'
+  truth_owner: TASK-30
+  location: {kind: git_path, logical_uri: 'repo://docs/tasks/TASK-30-a23-helius-bounded-pagination-complete-batch.md', repository_path: docs/tasks/TASK-30-a23-helius-bounded-pagination-complete-batch.md}
+  integrity: {kind: sha256, sha256: 822ef362c3c4132fc2bf68957ccc84154ea739be5a5f1c875c26d5e15db0446a}
+  access: {mode: read_only, method: file, network_required: false, secrets_required: false}
+  relations:
+  - {relation_type: contains, target_asset_id: CONTRACT-T30-A23-HELIUS-PAGINATION-001}
+  - {relation_type: contains, target_asset_id: SCRIPT-T30-A23-HELIUS-PAGINATION-001}
+  - {relation_type: depends_on, target_asset_id: EVIDENCE-T30-A22-HELIUS-GTA-001}
+  consumers: [TASK-30, FACTORY-001]
+  evidence: []
+  search_terms: [A23, TASK_CONTRACT, HELIUS, BOUNDED_PAGINATION, IMPLEMENTED_UNVERIFIED]
+  classification: {contains_secrets: false, contains_raw_data: false, sensitivity: INTERNAL_NON_SECRET}
+
+- asset_id: CONFIG-PROVIDER-ROUTE-CAPABILITY-REGISTRY-006
+  record_version: '1.0'
+  asset_type: configuration
+  purpose: Append-only provider registry preserving five v5 routes and updating Helius to complete raw-batch candidate.
+  status: VALIDATED_ACTIVE
+  origin: REPOSITORY
+  as_of: '2026-08-15'
+  truth_owner: TASK-30
+  location: {kind: git_path, logical_uri: 'repo://configs/provider_route_capability_registry_v6.yaml', repository_path: configs/provider_route_capability_registry_v6.yaml}
+  integrity: {kind: sha256, sha256: b9642b77c300c81aedebc4aa464284fe244a7553bb3a37bdbb344d68594df580}
+  access: {mode: read_only, method: file, network_required: false, secrets_required: false}
+  relations:
+  - {relation_type: derived_from, target_asset_id: CONFIG-PROVIDER-ROUTE-CAPABILITY-REGISTRY-005}
+  - {relation_type: validated_by, target_asset_id: TEST-PROVIDER-ROUTE-CAPABILITY-REGISTRY-006}
+  consumers: [TASK-30, FACTORY-001]
+  evidence: []
+  search_terms: [PROVIDER_ROUTE, REGISTRY_V6, HELIUS, COMPLETE_RAW_BATCH_CANDIDATE, APPEND_ONLY]
+  classification: {contains_secrets: false, contains_raw_data: false, sensitivity: INTERNAL_NON_SECRET}
+
+- asset_id: SCHEMA-PROVIDER-ROUTE-CAPABILITY-REGISTRY-006
+  record_version: '1.0'
+  asset_type: schema
+  purpose: Closed root schema for v5 predecessor binding, five preserved routes and one updated route.
+  status: VALIDATED_ACTIVE
+  origin: REPOSITORY
+  as_of: '2026-08-15'
+  truth_owner: TASK-30
+  location: {kind: git_path, logical_uri: 'repo://catalog/schemas/provider_route_capability_registry_v6.schema.json', repository_path: catalog/schemas/provider_route_capability_registry_v6.schema.json}
+  integrity: {kind: sha256, sha256: ee3ed96e1fea92e1e7dc7a157fc3cf74af8547fb402f184bf93ade5c46050563}
+  access: {mode: read_only, method: file, network_required: false, secrets_required: false}
+  relations: [{relation_type: governed_by, target_asset_id: CONFIG-PROVIDER-ROUTE-CAPABILITY-REGISTRY-006}]
+  consumers: [TASK-30, FACTORY-001]
+  evidence: []
+  search_terms: [PROVIDER_ROUTE, REGISTRY_V6, CLOSED_SCHEMA, UPDATED_ROUTE_PRIOR_HASH]
+  classification: {contains_secrets: false, contains_raw_data: false, sensitivity: INTERNAL_NON_SECRET}
+
+- asset_id: MODULE-PROVIDER-ROUTE-CAPABILITY-REGISTRY-006
+  record_version: '1.0'
+  asset_type: script
+  purpose: Fail-closed v6 resolver proving exact v5 lineage and non-promoted Helius complete-batch observation.
+  status: VALIDATED_ACTIVE
+  origin: REPOSITORY
+  as_of: '2026-08-15'
+  truth_owner: TASK-30
+  location: {kind: git_path, logical_uri: 'repo://src/solana_alpha_lab/provider_route_capability_registry_v6.py', repository_path: src/solana_alpha_lab/provider_route_capability_registry_v6.py}
+  integrity: {kind: sha256, sha256: 59434388b9b9989a5c665690570c30df58efc2f53f5a46bd9f3b081b7217eef5}
+  access: {mode: read_only, method: file, network_required: false, secrets_required: false}
+  relations:
+  - {relation_type: governed_by, target_asset_id: CONFIG-PROVIDER-ROUTE-CAPABILITY-REGISTRY-006}
+  - {relation_type: depends_on, target_asset_id: MODULE-PROVIDER-ROUTE-CAPABILITY-REGISTRY-005}
+  consumers: [TASK-30, FACTORY-001]
+  evidence: []
+  search_terms: [PROVIDER_ROUTE, REGISTRY_V6, RESOLVER, SEMANTIC_HASH, REGISTRY_GAP]
+  classification: {contains_secrets: false, contains_raw_data: false, sensitivity: INTERNAL_NON_SECRET}
+
+- asset_id: TEST-PROVIDER-ROUTE-CAPABILITY-REGISTRY-006
+  record_version: '1.0'
+  asset_type: script
+  purpose: Deterministic v6 schema, lineage, mutation, complete-batch and registry-gap tests.
+  status: VALIDATED_ACTIVE
+  origin: REPOSITORY
+  as_of: '2026-08-15'
+  truth_owner: TASK-30
+  location: {kind: git_path, logical_uri: 'repo://tests/test_provider_route_capability_registry_v6.py', repository_path: tests/test_provider_route_capability_registry_v6.py}
+  integrity: {kind: sha256, sha256: f23b8b3892063cfe319ae9cf86bc806e7d4c80df334546899eea11e355d769bf}
+  access: {mode: read_only, method: file, network_required: false, secrets_required: false}
+  relations:
+  - {relation_type: depends_on, target_asset_id: CONFIG-PROVIDER-ROUTE-CAPABILITY-REGISTRY-006}
+  - {relation_type: depends_on, target_asset_id: SCHEMA-PROVIDER-ROUTE-CAPABILITY-REGISTRY-006}
+  - {relation_type: depends_on, target_asset_id: MODULE-PROVIDER-ROUTE-CAPABILITY-REGISTRY-006}
+  - {relation_type: depends_on, target_asset_id: EVIDENCE-T30-A23P-HELIUS-PAGINATION-001}
+  consumers: [TASK-30, FACTORY-001]
+  evidence: []
+  search_terms: [PROVIDER_ROUTE, REGISTRY_V6, TEST, PRIOR_ROUTE_HASH, NO_PIT_PROMOTION]
+  classification: {contains_secrets: false, contains_raw_data: false, sensitivity: INTERNAL_NON_SECRET}
+
+- asset_id: EVIDENCE-T30-A23R1-PROVIDER-ROUTE-REGISTRY-001
+  record_version: '1.0'
+  asset_type: evidence
+  purpose: Hash-bound registry v6 acceptance separating complete raw batch from PIT and market-panel completeness.
+  status: VALIDATED_ACTIVE
+  origin: REPOSITORY
+  as_of: '2026-08-15'
+  truth_owner: TASK-30
+  location: {kind: git_path, logical_uri: 'repo://docs/evidence/task30/a23_provider_route_capability_registry_acceptance_v1.json', repository_path: docs/evidence/task30/a23_provider_route_capability_registry_acceptance_v1.json}
+  integrity: {kind: sha256, sha256: f4cc37047c68e9c1b1cd88e460c128fcfe3ba2d0c5774805f7ab491bd784a0e8}
+  access: {mode: read_only, method: file, network_required: false, secrets_required: false}
+  relations:
+  - {relation_type: derived_from, target_asset_id: CONFIG-PROVIDER-ROUTE-CAPABILITY-REGISTRY-006}
+  - {relation_type: depends_on, target_asset_id: EVIDENCE-T30-A23P-HELIUS-PAGINATION-001}
+  - {relation_type: validated_by, target_asset_id: TEST-PROVIDER-ROUTE-CAPABILITY-REGISTRY-006}
+  consumers: [TASK-30, FACTORY-001]
+  evidence: []
+  search_terms: [A23R1, REGISTRY_V6, ACCEPTANCE, HELIUS, COMPLETE_RAW_BATCH_CANDIDATE]
+  classification: {contains_secrets: false, contains_raw_data: false, sensitivity: INTERNAL_NON_SECRET}
+
+- asset_id: EVIDENCE-T30-A23-DELIVERY-COMPLETION-001
+  record_version: '1.0'
+  asset_type: evidence
+  purpose: Guard-consumable completion evidence binding the exact A23 delivery inventory without TASK-30 promotion.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-08-15'
+  truth_owner: TASK-30
+  location: {kind: git_path, logical_uri: 'repo://docs/evidence/task30/a23_delivery_completion_evidence_v1.json', repository_path: docs/evidence/task30/a23_delivery_completion_evidence_v1.json}
+  integrity: {kind: none, note: 'Content integrity is owned by the live completion-review-fit hash chain; embedding its SHA here would create an indirect self-reference through the reviewed inventory.'}
+  access: {mode: read_only, method: file, network_required: false, secrets_required: false}
+  relations:
+  - {relation_type: derived_from, target_asset_id: EVIDENCE-T30-A23-HELIUS-PAGINATION-001}
+  - {relation_type: depends_on, target_asset_id: EVIDENCE-T30-A23-DELIVERY-INDEPENDENT-REVIEW-001}
+  - {relation_type: depends_on, target_asset_id: EVIDENCE-T30-A23-DELIVERY-FACTORY-FIT-001}
+  - {relation_type: depends_on, target_asset_id: SCHEMA-DELIVERY-COMPLETION-EVIDENCE-001}
+  consumers: [TASK-30, FACTORY-001, GOAL-OWNER]
+  evidence: []
+  search_terms: [A23, DELIVERY_COMPLETION, GUARDED_MERGE, COMPLETE_RAW_BATCH_CANDIDATE, BLOCKED_DATA]
+  classification: {contains_secrets: false, contains_raw_data: false, sensitivity: INTERNAL_NON_SECRET}
+
+- asset_id: EVIDENCE-T30-A23-DELIVERY-INDEPENDENT-REVIEW-001
+  record_version: '1.0'
+  asset_type: evidence
+  purpose: Required-role review evidence bound to the exact non-self-referential A23 inventory.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-08-15'
+  truth_owner: TASK-30
+  location: {kind: git_path, logical_uri: 'repo://docs/evidence/task30/a23_delivery_independent_review_v1.json', repository_path: docs/evidence/task30/a23_delivery_independent_review_v1.json}
+  integrity: {kind: none, note: 'Content integrity is owned by the live completion-review-fit hash chain; embedding its SHA here would create an indirect self-reference through the reviewed inventory.'}
+  access: {mode: read_only, method: file, network_required: false, secrets_required: false}
+  relations:
+  - {relation_type: derived_from, target_asset_id: EVIDENCE-T30-A23-HELIUS-PAGINATION-001}
+  - {relation_type: depends_on, target_asset_id: SCHEMA-DELIVERY-INDEPENDENT-REVIEW-EVIDENCE-001}
+  consumers: [TASK-30, FACTORY-001, GOAL-OWNER]
+  evidence: []
+  search_terms: [A23, INDEPENDENT_REVIEW, SINGLE_AGENT_REVIEW_FALLBACK, ARCHITECTURE]
+  classification: {contains_secrets: false, contains_raw_data: false, sensitivity: INTERNAL_NON_SECRET}
+
+- asset_id: EVIDENCE-T30-A23-DELIVERY-FACTORY-FIT-001
+  record_version: '1.0'
+  asset_type: evidence
+  purpose: FULL Factory Fit review for A23 mission, data truth, owner operability, build versus buy, security and red team.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-08-15'
+  truth_owner: TASK-30
+  location: {kind: git_path, logical_uri: 'repo://docs/evidence/task30/a23_delivery_factory_fit_v1.json', repository_path: docs/evidence/task30/a23_delivery_factory_fit_v1.json}
+  integrity: {kind: none, note: 'Content integrity is owned by the live completion-review-fit hash chain; embedding its SHA here would create an indirect self-reference through the reviewed inventory.'}
+  access: {mode: read_only, method: file, network_required: false, secrets_required: false}
+  relations:
+  - {relation_type: derived_from, target_asset_id: EVIDENCE-T30-A23-HELIUS-PAGINATION-001}
+  - {relation_type: depends_on, target_asset_id: EVIDENCE-T30-A23-DELIVERY-INDEPENDENT-REVIEW-001}
+  consumers: [TASK-30, FACTORY-001, GOAL-OWNER]
+  evidence: []
+  search_terms: [A23, FACTORY_FIT, FULL_REVIEW, ADOPT, RAW_TO_PIT]
+  classification: {contains_secrets: false, contains_raw_data: false, sensitivity: INTERNAL_NON_SECRET}

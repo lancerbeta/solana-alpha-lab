@@ -498,6 +498,16 @@
       "target_asset_id": "TEST-PROVIDER-ROUTE-CAPABILITY-REGISTRY-005"
     },
     {
+      "source_asset_id": "CONFIG-PROVIDER-ROUTE-CAPABILITY-REGISTRY-006",
+      "relation": "derived_from",
+      "target_asset_id": "CONFIG-PROVIDER-ROUTE-CAPABILITY-REGISTRY-005"
+    },
+    {
+      "source_asset_id": "CONFIG-PROVIDER-ROUTE-CAPABILITY-REGISTRY-006",
+      "relation": "validated_by",
+      "target_asset_id": "TEST-PROVIDER-ROUTE-CAPABILITY-REGISTRY-006"
+    },
+    {
       "source_asset_id": "CONFIG-T20-COLLECTION-SPEC-001",
       "relation": "governed_by",
       "target_asset_id": "CONTRACT-T20-COLLECTION-SPEC-001"
@@ -656,6 +666,11 @@
       "source_asset_id": "CONFIG-T30-A22-HELIUS-GTA-001",
       "relation": "governed_by",
       "target_asset_id": "CONTRACT-T30-A22-HELIUS-GTA-001"
+    },
+    {
+      "source_asset_id": "CONFIG-T30-A23-HELIUS-PAGINATION-001",
+      "relation": "governed_by",
+      "target_asset_id": "CONTRACT-T30-A23-HELIUS-PAGINATION-001"
     },
     {
       "source_asset_id": "CONFIG-T30-ACTIVE-POOL-ROUTE-YIELD-001",
@@ -1343,6 +1358,11 @@
       "target_asset_id": "EVIDENCE-T30-A21-PATCHED-BITQUERY-ONE-SHOT-001"
     },
     {
+      "source_asset_id": "CONTRACT-T30-A23-HELIUS-PAGINATION-001",
+      "relation": "derived_from",
+      "target_asset_id": "EVIDENCE-T30-A22-HELIUS-GTA-001"
+    },
+    {
       "source_asset_id": "CONTRACT-T30-ACTIVE-POOL-ROUTE-YIELD-001",
       "relation": "depends_on",
       "target_asset_id": "CONFIG-PROVIDER-ROUTE-CAPABILITY-REGISTRY-002"
@@ -1696,6 +1716,21 @@
       "source_asset_id": "CTRL-TASK-30-A22-001",
       "relation": "depends_on",
       "target_asset_id": "EVIDENCE-T30-A21-PATCHED-BITQUERY-ONE-SHOT-001"
+    },
+    {
+      "source_asset_id": "CTRL-TASK-30-A23-001",
+      "relation": "contains",
+      "target_asset_id": "CONTRACT-T30-A23-HELIUS-PAGINATION-001"
+    },
+    {
+      "source_asset_id": "CTRL-TASK-30-A23-001",
+      "relation": "contains",
+      "target_asset_id": "SCRIPT-T30-A23-HELIUS-PAGINATION-001"
+    },
+    {
+      "source_asset_id": "CTRL-TASK-30-A23-001",
+      "relation": "depends_on",
+      "target_asset_id": "EVIDENCE-T30-A22-HELIUS-GTA-001"
     },
     {
       "source_asset_id": "CTRL-UVLOCK-001",
@@ -3943,6 +3978,91 @@
       "target_asset_id": "TEST-PROVIDER-ROUTE-CAPABILITY-REGISTRY-005"
     },
     {
+      "source_asset_id": "EVIDENCE-T30-A23-DELIVERY-COMPLETION-001",
+      "relation": "depends_on",
+      "target_asset_id": "EVIDENCE-T30-A23-DELIVERY-FACTORY-FIT-001"
+    },
+    {
+      "source_asset_id": "EVIDENCE-T30-A23-DELIVERY-COMPLETION-001",
+      "relation": "depends_on",
+      "target_asset_id": "EVIDENCE-T30-A23-DELIVERY-INDEPENDENT-REVIEW-001"
+    },
+    {
+      "source_asset_id": "EVIDENCE-T30-A23-DELIVERY-COMPLETION-001",
+      "relation": "depends_on",
+      "target_asset_id": "SCHEMA-DELIVERY-COMPLETION-EVIDENCE-001"
+    },
+    {
+      "source_asset_id": "EVIDENCE-T30-A23-DELIVERY-COMPLETION-001",
+      "relation": "derived_from",
+      "target_asset_id": "EVIDENCE-T30-A23-HELIUS-PAGINATION-001"
+    },
+    {
+      "source_asset_id": "EVIDENCE-T30-A23-DELIVERY-FACTORY-FIT-001",
+      "relation": "depends_on",
+      "target_asset_id": "EVIDENCE-T30-A23-DELIVERY-INDEPENDENT-REVIEW-001"
+    },
+    {
+      "source_asset_id": "EVIDENCE-T30-A23-DELIVERY-FACTORY-FIT-001",
+      "relation": "derived_from",
+      "target_asset_id": "EVIDENCE-T30-A23-HELIUS-PAGINATION-001"
+    },
+    {
+      "source_asset_id": "EVIDENCE-T30-A23-DELIVERY-INDEPENDENT-REVIEW-001",
+      "relation": "depends_on",
+      "target_asset_id": "SCHEMA-DELIVERY-INDEPENDENT-REVIEW-EVIDENCE-001"
+    },
+    {
+      "source_asset_id": "EVIDENCE-T30-A23-DELIVERY-INDEPENDENT-REVIEW-001",
+      "relation": "derived_from",
+      "target_asset_id": "EVIDENCE-T30-A23-HELIUS-PAGINATION-001"
+    },
+    {
+      "source_asset_id": "EVIDENCE-T30-A23-HELIUS-PAGINATION-001",
+      "relation": "depends_on",
+      "target_asset_id": "EVIDENCE-T30-A23P-HELIUS-PAGINATION-001"
+    },
+    {
+      "source_asset_id": "EVIDENCE-T30-A23-HELIUS-PAGINATION-001",
+      "relation": "derived_from",
+      "target_asset_id": "CONTRACT-T30-A23-HELIUS-PAGINATION-001"
+    },
+    {
+      "source_asset_id": "EVIDENCE-T30-A23-HELIUS-PAGINATION-001",
+      "relation": "validated_by",
+      "target_asset_id": "TEST-T30-A23-HELIUS-PAGINATION-001"
+    },
+    {
+      "source_asset_id": "EVIDENCE-T30-A23P-HELIUS-PAGINATION-001",
+      "relation": "depends_on",
+      "target_asset_id": "EVIDENCE-T30-A22P-HELIUS-GTA-001"
+    },
+    {
+      "source_asset_id": "EVIDENCE-T30-A23P-HELIUS-PAGINATION-001",
+      "relation": "derived_from",
+      "target_asset_id": "CONFIG-T30-A23-HELIUS-PAGINATION-001"
+    },
+    {
+      "source_asset_id": "EVIDENCE-T30-A23P-HELIUS-PAGINATION-001",
+      "relation": "validated_by",
+      "target_asset_id": "TEST-T30-A23-HELIUS-PAGINATION-001"
+    },
+    {
+      "source_asset_id": "EVIDENCE-T30-A23R1-PROVIDER-ROUTE-REGISTRY-001",
+      "relation": "depends_on",
+      "target_asset_id": "EVIDENCE-T30-A23P-HELIUS-PAGINATION-001"
+    },
+    {
+      "source_asset_id": "EVIDENCE-T30-A23R1-PROVIDER-ROUTE-REGISTRY-001",
+      "relation": "derived_from",
+      "target_asset_id": "CONFIG-PROVIDER-ROUTE-CAPABILITY-REGISTRY-006"
+    },
+    {
+      "source_asset_id": "EVIDENCE-T30-A23R1-PROVIDER-ROUTE-REGISTRY-001",
+      "relation": "validated_by",
+      "target_asset_id": "TEST-PROVIDER-ROUTE-CAPABILITY-REGISTRY-006"
+    },
+    {
       "source_asset_id": "EVIDENCE-T30-A3-BIRDEYE-PILOT-READINESS-001",
       "relation": "derived_from",
       "target_asset_id": "MODULE-T30-BIRDEYE-PILOT-READINESS-001"
@@ -4643,6 +4763,11 @@
       "target_asset_id": "CONTRACT-T30-A22-HELIUS-GTA-001"
     },
     {
+      "source_asset_id": "FIXTURE-T30-A23-HELIUS-PAGINATION-001",
+      "relation": "governed_by",
+      "target_asset_id": "CONTRACT-T30-A23-HELIUS-PAGINATION-001"
+    },
+    {
       "source_asset_id": "FIXTURE-T30-ACTIVE-POOL-ROUTE-YIELD-001",
       "relation": "derived_from",
       "target_asset_id": "CONFIG-T30-ACTIVE-POOL-ROUTE-YIELD-001"
@@ -4886,6 +5011,16 @@
       "source_asset_id": "MODULE-PROVIDER-ROUTE-CAPABILITY-REGISTRY-005",
       "relation": "governed_by",
       "target_asset_id": "CONFIG-PROVIDER-ROUTE-CAPABILITY-REGISTRY-005"
+    },
+    {
+      "source_asset_id": "MODULE-PROVIDER-ROUTE-CAPABILITY-REGISTRY-006",
+      "relation": "depends_on",
+      "target_asset_id": "MODULE-PROVIDER-ROUTE-CAPABILITY-REGISTRY-005"
+    },
+    {
+      "source_asset_id": "MODULE-PROVIDER-ROUTE-CAPABILITY-REGISTRY-006",
+      "relation": "governed_by",
+      "target_asset_id": "CONFIG-PROVIDER-ROUTE-CAPABILITY-REGISTRY-006"
     },
     {
       "source_asset_id": "MODULE-T06-STORAGE-API-001",
@@ -5588,6 +5723,16 @@
       "target_asset_id": "TEST-T30-A22-HELIUS-GTA-001"
     },
     {
+      "source_asset_id": "MODULE-T30-A23-HELIUS-PAGINATION-001",
+      "relation": "governed_by",
+      "target_asset_id": "CONTRACT-T30-A23-HELIUS-PAGINATION-001"
+    },
+    {
+      "source_asset_id": "MODULE-T30-A23-HELIUS-PAGINATION-001",
+      "relation": "validated_by",
+      "target_asset_id": "TEST-T30-A23-HELIUS-PAGINATION-001"
+    },
+    {
       "source_asset_id": "MODULE-T30-ACTIVE-POOL-ROUTE-YIELD-001",
       "relation": "depends_on",
       "target_asset_id": "MODULE-PROVIDER-ROUTE-CAPABILITY-REGISTRY-002"
@@ -6243,6 +6388,11 @@
       "target_asset_id": "EVIDENCE-T30-A22P-HELIUS-GTA-001"
     },
     {
+      "source_asset_id": "REPORT-T30-A23-HELIUS-PAGINATION-001",
+      "relation": "derived_from",
+      "target_asset_id": "EVIDENCE-T30-A23P-HELIUS-PAGINATION-001"
+    },
+    {
       "source_asset_id": "REPORT-T30-FORWARD-RAW-TRADE-ROUTE-001",
       "relation": "derived_from",
       "target_asset_id": "SCRIPT-T30-FORWARD-RAW-TRADE-ROUTE-001"
@@ -6381,6 +6531,11 @@
       "source_asset_id": "SCHEMA-PROVIDER-ROUTE-CAPABILITY-REGISTRY-005",
       "relation": "governed_by",
       "target_asset_id": "CONFIG-PROVIDER-ROUTE-CAPABILITY-REGISTRY-005"
+    },
+    {
+      "source_asset_id": "SCHEMA-PROVIDER-ROUTE-CAPABILITY-REGISTRY-006",
+      "relation": "governed_by",
+      "target_asset_id": "CONFIG-PROVIDER-ROUTE-CAPABILITY-REGISTRY-006"
     },
     {
       "source_asset_id": "SCHEMA-T05-CANONICAL-DDL-001",
@@ -6721,6 +6876,11 @@
       "source_asset_id": "SCHEMA-T30-A22-HELIUS-GTA-001",
       "relation": "governed_by",
       "target_asset_id": "CONTRACT-T30-A22-HELIUS-GTA-001"
+    },
+    {
+      "source_asset_id": "SCHEMA-T30-A23-HELIUS-PAGINATION-001",
+      "relation": "governed_by",
+      "target_asset_id": "CONTRACT-T30-A23-HELIUS-PAGINATION-001"
     },
     {
       "source_asset_id": "SCHEMA-T30-ACTIVE-POOL-ROUTE-YIELD-001",
@@ -7218,6 +7378,16 @@
       "target_asset_id": "CONTRACT-T30-A22-HELIUS-GTA-001"
     },
     {
+      "source_asset_id": "SCRIPT-T30-A23-HELIUS-PAGINATION-001",
+      "relation": "depends_on",
+      "target_asset_id": "MODULE-T30-A23-HELIUS-PAGINATION-001"
+    },
+    {
+      "source_asset_id": "SCRIPT-T30-A23-HELIUS-PAGINATION-001",
+      "relation": "governed_by",
+      "target_asset_id": "CONTRACT-T30-A23-HELIUS-PAGINATION-001"
+    },
+    {
       "source_asset_id": "SCRIPT-T30-ACTIVE-POOL-ROUTE-YIELD-001",
       "relation": "depends_on",
       "target_asset_id": "MODULE-T30-ACTIVE-POOL-ROUTE-YIELD-RUNTIME-001"
@@ -7536,6 +7706,26 @@
       "source_asset_id": "TEST-PROVIDER-ROUTE-CAPABILITY-REGISTRY-005",
       "relation": "depends_on",
       "target_asset_id": "SCHEMA-PROVIDER-ROUTE-CAPABILITY-REGISTRY-005"
+    },
+    {
+      "source_asset_id": "TEST-PROVIDER-ROUTE-CAPABILITY-REGISTRY-006",
+      "relation": "depends_on",
+      "target_asset_id": "CONFIG-PROVIDER-ROUTE-CAPABILITY-REGISTRY-006"
+    },
+    {
+      "source_asset_id": "TEST-PROVIDER-ROUTE-CAPABILITY-REGISTRY-006",
+      "relation": "depends_on",
+      "target_asset_id": "EVIDENCE-T30-A23P-HELIUS-PAGINATION-001"
+    },
+    {
+      "source_asset_id": "TEST-PROVIDER-ROUTE-CAPABILITY-REGISTRY-006",
+      "relation": "depends_on",
+      "target_asset_id": "MODULE-PROVIDER-ROUTE-CAPABILITY-REGISTRY-006"
+    },
+    {
+      "source_asset_id": "TEST-PROVIDER-ROUTE-CAPABILITY-REGISTRY-006",
+      "relation": "depends_on",
+      "target_asset_id": "SCHEMA-PROVIDER-ROUTE-CAPABILITY-REGISTRY-006"
     },
     {
       "source_asset_id": "TEST-T04-CORE-STACK-001",
@@ -8781,6 +8971,26 @@
       "source_asset_id": "TEST-T30-A22-HELIUS-GTA-001",
       "relation": "depends_on",
       "target_asset_id": "SCRIPT-T30-A22-HELIUS-GTA-001"
+    },
+    {
+      "source_asset_id": "TEST-T30-A23-HELIUS-PAGINATION-001",
+      "relation": "depends_on",
+      "target_asset_id": "CONFIG-T30-A23-HELIUS-PAGINATION-001"
+    },
+    {
+      "source_asset_id": "TEST-T30-A23-HELIUS-PAGINATION-001",
+      "relation": "depends_on",
+      "target_asset_id": "MODULE-T30-A23-HELIUS-PAGINATION-001"
+    },
+    {
+      "source_asset_id": "TEST-T30-A23-HELIUS-PAGINATION-001",
+      "relation": "depends_on",
+      "target_asset_id": "SCHEMA-T30-A23-HELIUS-PAGINATION-001"
+    },
+    {
+      "source_asset_id": "TEST-T30-A23-HELIUS-PAGINATION-001",
+      "relation": "depends_on",
+      "target_asset_id": "SCRIPT-T30-A23-HELIUS-PAGINATION-001"
     },
     {
       "source_asset_id": "TEST-T30-A5R1-BIRDEYE-EXTERNAL-READ-RUNTIME-001",
