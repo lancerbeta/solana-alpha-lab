@@ -1,0 +1,13 @@
+{
+  "schema": "smial.task36.rc002-h11-lifecycle-clock-screen.fixture",
+  "schema_version": "1.0",
+  "expected_live_terminal": "HISTORICAL_ROUTE_INADEQUATE_REPLAN",
+  "expected_trial_id": "TRIAL-RC002-H11-LIFECYCLE-CLOCK-SCREEN-001",
+  "expected_hypothesis_id": "HYP-RC002-H11-LIFECYCLE-CLOCK-V1",
+  "expected_research_cycle_id": "RESEARCH-CYCLE-RC002-001",
+  "rc001_groups": [
+    "RC001-H13-COMPOSITE-VETO",
+    "RC001-H07-H01-LIQUIDITY-RETENTION",
+    "RC001-H02-H10-H14-PULLBACK-RECLAIM"
+  ]
+}

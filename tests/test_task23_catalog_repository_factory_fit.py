@@ -168,10 +168,10 @@ class Task23CatalogRepositoryFactoryFitTests(unittest.TestCase):
         ledger = yaml.safe_load(
             (ROOT / "registries/global_trial_ledger.yaml").read_text(encoding="utf-8")
         )
-        self.assertEqual(len(ledger["records"]), 3)
+        self.assertEqual(len(ledger["records"]), 4)
         self.assertEqual(
             [record["outcome"] for record in ledger["records"]],
-            ["FAIL", "INCONCLUSIVE", "INCONCLUSIVE"],
+            ["FAIL", "INCONCLUSIVE", "INCONCLUSIVE", "INCONCLUSIVE"],
         )
         for record in ledger["records"]:
             for evidence_asset_id in record["evidence_asset_ids"]:

@@ -1,7 +1,7 @@
 schema_version: '1.0'
 registry_id: SMIAL-REGISTRY-GLOBAL-TRIAL-LEDGER
 registry_type: global_trial_ledger
-as_of: '2026-08-02'
+as_of: '2026-08-15'
 truth_owner: TASK-03
 source_asset_ids: []
 records:
@@ -29,4 +29,12 @@ records:
   - EVIDENCE-T23-A4-BOUNDED-ANALYSIS-001
   - EVIDENCE-T23-A4-ADVERSARIAL-ACCEPTANCE-001
   hypothesis_id: HYP-VERSION-EXECUTION-CAPACITY-CURVATURE-V1
+  outcome: INCONCLUSIVE
+- record_kind: trial
+  record_id: TRIAL-RC002-H11-LIFECYCLE-CLOCK-SCREEN-001
+  status: RECORDED
+  created_at: '2026-08-15T17:30:00Z'
+  evidence_asset_ids:
+  - EVIDENCE-T36-RC002-H11-LIFECYCLE-CLOCK-001
+  hypothesis_id: HYP-RC002-H11-LIFECYCLE-CLOCK-V1
   outcome: INCONCLUSIVE

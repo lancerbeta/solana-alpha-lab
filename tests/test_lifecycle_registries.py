@@ -143,11 +143,12 @@ class LifecycleRegistryTests(unittest.TestCase):
                             "TRIAL-T23-R2-DIAGNOSTIC-PROJECTION-ATTEMPT-01",
                             "TRIAL-T23-R2-DIAGNOSTIC-PROJECTION-ATTEMPT-02",
                             "TRIAL-T23-BOUNDED-ANALYSIS-ADVERSARIAL-ACCEPTANCE-001",
+                            "TRIAL-RC002-H11-LIFECYCLE-CLOCK-SCREEN-001",
                         ],
                     )
                     self.assertEqual(
                         [record["outcome"] for record in document["records"]],
-                        ["FAIL", "INCONCLUSIVE", "INCONCLUSIVE"],
+                        ["FAIL", "INCONCLUSIVE", "INCONCLUSIVE", "INCONCLUSIVE"],
                     )
                 elif registry_type == "decisions_negative_results":
                     self.assertEqual(
@@ -167,6 +168,7 @@ class LifecycleRegistryTests(unittest.TestCase):
                             "DECISION-DELIVERY-PREFLIGHT-SKIP-PROOF-001",
                             "DECISION-T30-A26-FIVE-DOLLAR-CANNOT-FALSIFY-001",
                             "DECISION-T30-A27-H07-H01-PARK-001",
+                            "DECISION-T36-RC002-H11-LIFECYCLE-CLOCK-001",
                         ],
                     )
                     self.assertEqual(
@@ -180,6 +182,7 @@ class LifecycleRegistryTests(unittest.TestCase):
                             "negative_result",
                             "negative_result",
                             "negative_result",
+                            "decision",
                             "decision",
                             "decision",
                             "decision",

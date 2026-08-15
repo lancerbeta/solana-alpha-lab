@@ -1,0 +1,217 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://solana-alpha-lab.local/schemas/task36_rc002_h11_lifecycle_clock_screen.schema.json",
+  "title": "TASK-36 RC002 H11 lifecycle-clock exploratory mechanism screen policy",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema", "schema_version", "task_id", "atom_id", "contract_id",
+    "spec_route", "adoption_route", "consumer", "research_cycle",
+    "screen_protocol", "rc001_freeze", "holdout_guard",
+    "historical_sources", "terminal_outcomes", "claims",
+    "external_authority", "project_sources_disposition"
+  ],
+  "properties": {
+    "schema": {"const": "smial.task36.rc002-h11-lifecycle-clock-screen.policy"},
+    "schema_version": {"const": "1.0"},
+    "task_id": {"const": "TASK-36"},
+    "atom_id": {"const": "T36-A1_RC002_H11_LIFECYCLE_CLOCK_MECHANISM_SCREEN_V1"},
+    "contract_id": {"const": "CONTRACT-T36-RC002-H11-LIFECYCLE-CLOCK-001"},
+    "spec_route": {"const": "BOTH"},
+    "adoption_route": {"const": "ADOPT_EXISTING_LIFECYCLE_HELIUS_PUMPSWAP_HISTORY"},
+    "consumer": {"const": "RC002-H11-LIFECYCLE-CLOCK"},
+    "research_cycle": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "research_cycle_id", "task_owned_register_id", "register_kind",
+        "title", "status", "definition_owner", "retrofit_into_rc001"
+      ],
+      "properties": {
+        "research_cycle_id": {"const": "RESEARCH-CYCLE-RC002-001"},
+        "task_owned_register_id": {"const": "TASK36-RC002-REGISTER-001"},
+        "register_kind": {"const": "TASK_OWNED_CONFIG_EVIDENCE"},
+        "title": {"type": "string", "minLength": 8},
+        "status": {"const": "EXPLORATORY_SCREEN"},
+        "definition_owner": {"const": "TASK-36"},
+        "retrofit_into_rc001": {"const": false}
+      }
+    },
+    "screen_protocol": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "family", "stage", "data_semantics", "live_PIT_claim",
+        "execution_claim", "universe", "include_fast_deaths",
+        "include_inactive_paths", "missing_as_typed_gaps",
+        "primary_features", "baseline", "primary_question",
+        "parameter_search", "ml_search", "missing_to_zero_or_flat",
+        "random_row_split", "convert_event_time_to_available_to_strategy_at",
+        "time_since_migration_bin_edges_seconds", "peak_age_bin_edges_seconds",
+        "outcome_horizon_seconds", "outcome_classes",
+        "chronological_group_aware_split", "minimum_raw_n",
+        "minimum_independent_units", "incremental_g_threshold",
+        "max_single_unit_share"
+      ],
+      "properties": {
+        "family": {"const": "H11_LIFECYCLE_CLOCK"},
+        "stage": {"const": "EXPLORATORY_MECHANISM_SCREEN"},
+        "data_semantics": {"const": "RETROSPECTIVE_EVENT_TIME_RECONSTRUCTION"},
+        "live_PIT_claim": {"const": false},
+        "execution_claim": {"const": false},
+        "universe": {"const": "CONFIRMED_POST_MIGRATION_POOLS_OUTCOME_INDEPENDENT_CONTIGUOUS_WINDOW"},
+        "include_fast_deaths": {"const": true},
+        "include_inactive_paths": {"const": true},
+        "missing_as_typed_gaps": {"const": true},
+        "primary_features": {
+          "type": "array",
+          "minItems": 2,
+          "maxItems": 2,
+          "items": {"enum": ["time_since_migration", "time_since_decision_time_running_peak"]}
+        },
+        "baseline": {"const": "COARSE_UTC_AND_SESSION"},
+        "primary_question": {"type": "string", "minLength": 20},
+        "parameter_search": {"const": false},
+        "ml_search": {"const": false},
+        "missing_to_zero_or_flat": {"const": false},
+        "random_row_split": {"const": false},
+        "convert_event_time_to_available_to_strategy_at": {"const": false},
+        "time_since_migration_bin_edges_seconds": {
+          "type": "array", "minItems": 3, "maxItems": 3,
+          "items": {"type": "integer", "minimum": 1}
+        },
+        "peak_age_bin_edges_seconds": {
+          "type": "array", "minItems": 2, "maxItems": 2,
+          "items": {"type": "integer", "minimum": 1}
+        },
+        "outcome_horizon_seconds": {"const": 900},
+        "outcome_classes": {
+          "type": "array", "minItems": 3, "maxItems": 3,
+          "items": {"enum": ["FAST_DEATH", "INACTIVE_TYPED_GAP", "CONTINUATION"]}
+        },
+        "chronological_group_aware_split": {"const": true},
+        "minimum_raw_n": {"const": 24},
+        "minimum_independent_units": {
+          "type": "object", "additionalProperties": false,
+          "required": ["pools", "days", "deployers"],
+          "properties": {
+            "pools": {"const": 8},
+            "days": {"const": 2},
+            "deployers": {"const": 2}
+          }
+        },
+        "incremental_g_threshold": {"const": 5.99},
+        "max_single_unit_share": {"const": 0.5}
+      }
+    },
+    "rc001_freeze": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["path", "sha256", "mutation_authorized", "remaining_families_deprioritized", "required_definition_sha256"],
+      "properties": {
+        "path": {"const": "configs/task28_rc001_registry_freeze_v1.yaml"},
+        "sha256": {"const": "c4fbb7157a13d1dee0f2b1f163e8f8fc1a38da4bc850275fba25bc0d70a785a7"},
+        "mutation_authorized": {"const": false},
+        "remaining_families_deprioritized": {"const": true},
+        "required_definition_sha256": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "RC001-H13-COMPOSITE-VETO",
+            "RC001-H07-H01-LIQUIDITY-RETENTION",
+            "RC001-H02-H10-H14-PULLBACK-RECLAIM"
+          ],
+          "properties": {
+            "RC001-H13-COMPOSITE-VETO": {"const": "f1f020f4fa79acd2f2de667d71b8002d5821f45e9070a0f259c63210b23a16d0"},
+            "RC001-H07-H01-LIQUIDITY-RETENTION": {"const": "14a7387148d05773dedcb5ad6a8110a0dcab7e49da4dec77328903a5b7577df7"},
+            "RC001-H02-H10-H14-PULLBACK-RECLAIM": {"const": "fc225417541570aa73814a4cb992f6f801a84bea1baf15696d754c706e0aa9f8"}
+          }
+        }
+      }
+    },
+    "holdout_guard": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["path", "sha256"],
+      "properties": {
+        "path": {"const": "registries/holdout_consumption.yaml"},
+        "sha256": {"const": "863d68e53861c4aa30f6afa1a512ec5ab84c8966273cee6d42ca1519ef5fa07a"}
+      }
+    },
+    "historical_sources": {
+      "type": "array",
+      "minItems": 4,
+      "maxItems": 4,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["source_id", "path", "sha256"],
+        "properties": {
+          "source_id": {
+            "enum": ["TASK08_LIFECYCLE", "TASK09_PUMPSWAP", "TASK21_SAMPLE", "TASK30_A24"]
+          },
+          "path": {"type": "string", "minLength": 8},
+          "sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"}
+        }
+      }
+    },
+    "terminal_outcomes": {
+      "type": "array",
+      "minItems": 5,
+      "maxItems": 5,
+      "items": {
+        "enum": [
+          "H11_SCREEN_NEGATIVE_DEPRIORITIZE_OR_CLOSE",
+          "H11_SCREEN_POSITIVE_EARNS_PROSPECTIVE_CONFIRMATION",
+          "H11_SCREEN_INCONCLUSIVE_DATA_SCALE",
+          "HISTORICAL_ROUTE_INADEQUATE_REPLAN",
+          "STOP_INTEGRITY_CONFLICT"
+        ]
+      }
+    },
+    "claims": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "exploratory_mechanism_screen_only", "live_pit", "execution",
+        "alpha", "numeric_netreturn", "rc001_definition_changed",
+        "holdout_consumed", "prospective_collector", "h13_trial", "h02_trial"
+      ],
+      "properties": {
+        "exploratory_mechanism_screen_only": {"const": true},
+        "live_pit": {"const": false},
+        "execution": {"const": false},
+        "alpha": {"const": false},
+        "numeric_netreturn": {"const": false},
+        "rc001_definition_changed": {"const": false},
+        "holdout_consumed": {"const": false},
+        "prospective_collector": {"const": false},
+        "h13_trial": {"const": false},
+        "h02_trial": {"const": false}
+      }
+    },
+    "external_authority": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "network", "credentials", "cash_spend", "paid_plan",
+        "provider_routes_max", "wallet_signer_transaction", "deployment"
+      ],
+      "properties": {
+        "network": {"const": false},
+        "credentials": {"const": false},
+        "cash_spend": {"const": false},
+        "paid_plan": {"const": false},
+        "provider_routes_max": {"const": 1},
+        "wallet_signer_transaction": {"const": false},
+        "deployment": {"const": false}
+      }
+    },
+    "project_sources_disposition": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["kind"],
+      "properties": {"kind": {"const": "NO_CHANGE"}}
+    }
+  }
+}
