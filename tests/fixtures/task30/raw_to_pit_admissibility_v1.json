@@ -1,0 +1,28 @@
+{
+  "schema": "smial.task30.raw-to-pit-admissibility.fixture",
+  "schema_version": "1.0",
+  "atom_id": "T30-A24_RAW_TO_PIT_ADMISSIBILITY_OWNER_PANEL_V1",
+  "orientation_if_live_bytes_present": {
+    "raw_transactions": 520,
+    "successful_transactions": 520,
+    "target_buy_events": 96,
+    "target_sell_events": 53,
+    "other_pool_trade_events": 4,
+    "close_user_volume_accumulator_events": 10,
+    "log_truncated_transactions": 14,
+    "slots_with_target_trades": 35,
+    "slots_without_decoded_target_trades": 61
+  },
+  "non_market_event": {
+    "name": "CloseUserVolumeAccumulatorEvent",
+    "discriminator_hex": "929fbdac925838f4",
+    "binding": "sha256(event:CloseUserVolumeAccumulatorEvent)[:8]"
+  },
+  "forbidden": [
+    "missing_to_zero",
+    "missing_to_flat",
+    "forward_fill_as_price",
+    "backdate_retrieval_to_blockTime",
+    "provider_call"
+  ]
+}

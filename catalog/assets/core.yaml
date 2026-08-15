@@ -5325,7 +5325,7 @@ records:
     contains_raw_data: false
     sensitivity: INTERNAL_NON_SECRET
 - asset_id: MODULE-T09-PUMPSWAP-TOUCH-PROBE-001
-  record_version: '1.1'
+  record_version: '1.2'
   asset_type: script
   purpose: Offline-first bounded standard Solana logsSubscribe and getTransaction Touch probe with typed optional transactionIndex extension handling.
   status: IMPLEMENTED_UNVERIFIED
@@ -5338,7 +5338,7 @@ records:
     repository_path: src/solana_alpha_lab/pumpswap_touch_probe.py
   integrity:
     kind: sha256
-    sha256: 7c68f09ef67147a6ebd4cebcf6f0286915210240dad8a9b713077204ce957a69
+    sha256: 756ce5ae47c3df04154ef8628bbb100af29a861d13811cfdbde70af239178bf6
   access:
     mode: read_only
     method: file
@@ -5356,6 +5356,7 @@ records:
   consumers:
   - TASK-09
   - TASK-10
+  - TASK-30
   evidence:
   - evidence_id: EVIDENCE-T09-PUMPSWAP-TOUCH-RECEIPT-001
     kind: runtime_receipt
@@ -5398,7 +5399,7 @@ records:
     contains_raw_data: false
     sensitivity: INTERNAL_NON_SECRET
 - asset_id: TEST-T09-PUMPSWAP-TOUCH-PROBE-001
-  record_version: '1.1'
+  record_version: '1.2'
   asset_type: script
   purpose: Offline transport and replay tests for exact request binding, caps, raw persistence, typed failures and bounded transactionIndex extension handling.
   status: IMPLEMENTED_UNVERIFIED
@@ -5411,7 +5412,7 @@ records:
     repository_path: tests/test_task09_pumpswap_touch_probe.py
   integrity:
     kind: sha256
-    sha256: 2adbe645c22ca426ed50b9638da3a48a672cf0026ffa2d2c28eb3bbef0f552e8
+    sha256: 0c52d94ff656e5045d5b0ebec7c87b153d29bc9d64675376e9d35c5c6b189477
   access:
     mode: read_only
     method: file
@@ -20765,4 +20766,269 @@ records:
   consumers: [TASK-30, FACTORY-001, GOAL-OWNER]
   evidence: []
   search_terms: [A23, FACTORY_FIT, FULL_REVIEW, ADOPT, RAW_TO_PIT]
+  classification: {contains_secrets: false, contains_raw_data: false, sensitivity: INTERNAL_NON_SECRET}
+
+- asset_id: CONTRACT-T30-A24-RAW-TO-PIT-001
+  record_version: '1.0'
+  asset_type: control_document
+  purpose: Exact A24 offline raw-to-PIT admissibility contract for the retained A22+A23 batch.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-08-15'
+  truth_owner: TASK-30
+  location: {kind: git_path, logical_uri: 'repo://docs/contracts/task30_a24_raw_to_pit_admissibility_owner_panel_contract_v1.md', repository_path: docs/contracts/task30_a24_raw_to_pit_admissibility_owner_panel_contract_v1.md}
+  integrity: {kind: sha256, sha256: a1a34fdd88fdd67b4d40fd31a1e4e0820d3fe55053fd17badd083f7972d09ff8}
+  access: {mode: read_only, method: file, network_required: false, secrets_required: false}
+  relations: [{relation_type: derived_from, target_asset_id: EVIDENCE-T30-A23-HELIUS-PAGINATION-001}]
+  consumers: [TASK-30, RC001-H07-H01-LIQUIDITY-RETENTION, FACTORY-001]
+  evidence: []
+  search_terms: [A24, RAW_TO_PIT, ADMISSIBILITY, OWNER_PANEL, WRAP_DECODER]
+  classification: {contains_secrets: false, contains_raw_data: false, sensitivity: INTERNAL_NON_SECRET}
+
+- asset_id: CONFIG-T30-A24-RAW-TO-PIT-001
+  record_version: '1.0'
+  asset_type: configuration
+  purpose: Closed A24 policy binding retained hashes, frozen pool/day, PIT rules and terminal decisions.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-08-15'
+  truth_owner: TASK-30
+  location: {kind: git_path, logical_uri: 'repo://configs/task30_a24_raw_to_pit_admissibility_owner_panel_v1.yaml', repository_path: configs/task30_a24_raw_to_pit_admissibility_owner_panel_v1.yaml}
+  integrity: {kind: sha256, sha256: 96593c1448c0cfc8735b8bd94841de8e15245f06f22388a79bf12da99b58f47e}
+  access: {mode: read_only, method: file, network_required: false, secrets_required: false}
+  relations: [{relation_type: governed_by, target_asset_id: CONTRACT-T30-A24-RAW-TO-PIT-001}]
+  consumers: [TASK-30, RC001-H07-H01-LIQUIDITY-RETENTION, FACTORY-001]
+  evidence: []
+  search_terms: [A24, POLICY, NINETY_SIX_SLOTS, ZERO_PROVIDER, PIT]
+  classification: {contains_secrets: false, contains_raw_data: false, sensitivity: INTERNAL_NON_SECRET}
+
+- asset_id: SCHEMA-T30-A24-RAW-TO-PIT-001
+  record_version: '1.0'
+  asset_type: schema
+  purpose: Closed JSON Schema for A24 identity, reconciliation, slot states, PIT and claims.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-08-15'
+  truth_owner: TASK-30
+  location: {kind: git_path, logical_uri: 'repo://catalog/schemas/task30_a24_raw_to_pit_admissibility_owner_panel.schema.json', repository_path: catalog/schemas/task30_a24_raw_to_pit_admissibility_owner_panel.schema.json}
+  integrity: {kind: sha256, sha256: cb87f713bcb71340424a409079ef465fa5dee285c185d5dc02eada9f1a368ff6}
+  access: {mode: read_only, method: file, network_required: false, secrets_required: false}
+  relations: [{relation_type: governed_by, target_asset_id: CONTRACT-T30-A24-RAW-TO-PIT-001}]
+  consumers: [TASK-30, FACTORY-001]
+  evidence: []
+  search_terms: [A24, CLOSED_SCHEMA, SLOT_STATES, TERMINAL_DECISION]
+  classification: {contains_secrets: false, contains_raw_data: false, sensitivity: INTERNAL_NON_SECRET}
+
+- asset_id: FIXTURE-T30-A24-RAW-TO-PIT-001
+  record_version: '1.0'
+  asset_type: evidence
+  purpose: Secret-free A24 synthetic coverage, truncation and non-market discriminator fixture.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-08-15'
+  truth_owner: TASK-30
+  location: {kind: git_path, logical_uri: 'repo://tests/fixtures/task30/raw_to_pit_admissibility_v1.json', repository_path: tests/fixtures/task30/raw_to_pit_admissibility_v1.json}
+  integrity: {kind: sha256, sha256: 425c9007243750abe3692a6bce54b3ff1875bb56e697be5bd4d6af943c7559d7}
+  access: {mode: read_only, method: file, network_required: false, secrets_required: false}
+  relations: [{relation_type: governed_by, target_asset_id: CONTRACT-T30-A24-RAW-TO-PIT-001}]
+  consumers: [TASK-30, FACTORY-001]
+  evidence: []
+  search_terms: [A24, FIXTURE, TRUNCATION, CLOSE_ACCUMULATOR, OTHER_POOL]
+  classification: {contains_secrets: false, contains_raw_data: false, sensitivity: INTERNAL_NON_SECRET}
+
+- asset_id: MODULE-T30-A24-RAW-TO-PIT-001
+  record_version: '1.0'
+  asset_type: script
+  purpose: Fail-closed attribution, instruction/event reconciliation, 96-slot panel and terminal decision.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-08-15'
+  truth_owner: TASK-30
+  location: {kind: git_path, logical_uri: 'repo://src/solana_alpha_lab/task30_raw_to_pit_admissibility.py', repository_path: src/solana_alpha_lab/task30_raw_to_pit_admissibility.py}
+  integrity: {kind: sha256, sha256: 9df5773f70e8107824a990794b6b35df8fb9c64b94dc318c1dc1eb9f42de020b}
+  access: {mode: read_only, method: file, network_required: false, secrets_required: false}
+  relations:
+  - {relation_type: governed_by, target_asset_id: CONTRACT-T30-A24-RAW-TO-PIT-001}
+  - {relation_type: depends_on, target_asset_id: MODULE-T09-PUMPSWAP-TOUCH-DECODER-001}
+  - {relation_type: depends_on, target_asset_id: MODULE-T09-PUMPSWAP-TOUCH-PROBE-001}
+  - {relation_type: validated_by, target_asset_id: TEST-T30-A24-RAW-TO-PIT-001}
+  consumers: [TASK-30, FACTORY-001]
+  evidence: []
+  search_terms: [A24, RECONCILE, NINETY_SIX_SLOT, NO_FORWARD_FILL, WRAP]
+  classification: {contains_secrets: false, contains_raw_data: false, sensitivity: INTERNAL_NON_SECRET}
+
+- asset_id: SCRIPT-T30-A24-RAW-TO-PIT-001
+  record_version: '1.0'
+  asset_type: script
+  purpose: Offline runner that projects local 96-slot evidence and tracked receipts without provider access.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-08-15'
+  truth_owner: TASK-30
+  location: {kind: git_path, logical_uri: 'repo://scripts/run_task30_a24_raw_to_pit_admissibility.py', repository_path: scripts/run_task30_a24_raw_to_pit_admissibility.py}
+  integrity: {kind: sha256, sha256: 0df83cb5037bf0adb928586f43eae264657b6c156cdf7f84a64ce0b968fd2462}
+  access: {mode: read_only, method: file, network_required: false, secrets_required: false}
+  relations:
+  - {relation_type: depends_on, target_asset_id: MODULE-T30-A24-RAW-TO-PIT-001}
+  - {relation_type: governed_by, target_asset_id: CONTRACT-T30-A24-RAW-TO-PIT-001}
+  consumers: [TASK-30, FACTORY-001]
+  evidence: []
+  search_terms: [A24, RUNNER, CREATE_ONLY, ZERO_PROVIDER, OWNER_PHRASE]
+  classification: {contains_secrets: false, contains_raw_data: false, sensitivity: INTERNAL_NON_SECRET}
+
+- asset_id: TEST-T30-A24-RAW-TO-PIT-001
+  record_version: '1.0'
+  asset_type: script
+  purpose: Deterministic A24 identity, attribution, truncation, slot-state, PIT and live-byte tests.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-08-15'
+  truth_owner: TASK-30
+  location: {kind: git_path, logical_uri: 'repo://tests/test_task30_a24_raw_to_pit_admissibility.py', repository_path: tests/test_task30_a24_raw_to_pit_admissibility.py}
+  integrity: {kind: sha256, sha256: f49db8fbbe95495e302352d2b1d5fc896dedca744f9a9029d8344c74adaa9750}
+  access: {mode: read_only, method: file, network_required: false, secrets_required: false}
+  relations:
+  - {relation_type: depends_on, target_asset_id: CONFIG-T30-A24-RAW-TO-PIT-001}
+  - {relation_type: depends_on, target_asset_id: SCHEMA-T30-A24-RAW-TO-PIT-001}
+  - {relation_type: depends_on, target_asset_id: MODULE-T30-A24-RAW-TO-PIT-001}
+  - {relation_type: depends_on, target_asset_id: SCRIPT-T30-A24-RAW-TO-PIT-001}
+  consumers: [TASK-30, FACTORY-001]
+  evidence: []
+  search_terms: [A24, TEST, ORIENTATION_DRIFT, NO_MISSING_TO_ZERO, PIT]
+  classification: {contains_secrets: false, contains_raw_data: false, sensitivity: INTERNAL_NON_SECRET}
+
+- asset_id: EVIDENCE-T30-A24P-RAW-TO-PIT-001
+  record_version: '1.0'
+  asset_type: evidence
+  purpose: Runtime receipt for the offline 96-slot admissibility projection and LIMITED_DIAGNOSTIC_PANEL_READY decision.
+  status: VALIDATED_ACTIVE
+  origin: REPOSITORY
+  as_of: '2026-08-15'
+  truth_owner: TASK-30
+  location: {kind: git_path, logical_uri: 'repo://docs/evidence/task30/a24_raw_to_pit_admissibility_runtime_receipt_v1.json', repository_path: docs/evidence/task30/a24_raw_to_pit_admissibility_runtime_receipt_v1.json}
+  integrity: {kind: sha256, sha256: 6b0f16d80ec72e46507755c09c79e434b6a8de0cf5f50d6f7e18e63fcdac75c4}
+  access: {mode: read_only, method: file, network_required: false, secrets_required: false}
+  relations:
+  - {relation_type: derived_from, target_asset_id: CONFIG-T30-A24-RAW-TO-PIT-001}
+  - {relation_type: depends_on, target_asset_id: EVIDENCE-T30-A23-HELIUS-PAGINATION-001}
+  - {relation_type: validated_by, target_asset_id: TEST-T30-A24-RAW-TO-PIT-001}
+  consumers: [TASK-30, RC001-H07-H01-LIQUIDITY-RETENTION, FACTORY-001]
+  evidence: []
+  search_terms: [A24P, RUNTIME, LIMITED_DIAGNOSTIC_PANEL_READY, ZERO_UNKNOWN]
+  classification: {contains_secrets: false, contains_raw_data: false, sensitivity: INTERNAL_NON_SECRET}
+
+- asset_id: REPORT-T30-A24-RAW-TO-PIT-001
+  record_version: '1.0'
+  asset_type: control_document
+  purpose: Russian owner readout for the A24 terminal decision without TASK-30 or alpha promotion.
+  status: VALIDATED_ACTIVE
+  origin: REPOSITORY
+  as_of: '2026-08-15'
+  truth_owner: TASK-30
+  location: {kind: git_path, logical_uri: 'repo://docs/reports/task30/a24_raw_to_pit_admissibility_owner_readout_v1.md', repository_path: docs/reports/task30/a24_raw_to_pit_admissibility_owner_readout_v1.md}
+  integrity: {kind: sha256, sha256: c621d1340cbe30f485a313cf509320d46baf3a8a159d62975a78741cb0b75601}
+  access: {mode: read_only, method: file, network_required: false, secrets_required: false}
+  relations: [{relation_type: derived_from, target_asset_id: EVIDENCE-T30-A24P-RAW-TO-PIT-001}]
+  consumers: [TASK-30, RC001-H07-H01-LIQUIDITY-RETENTION, FACTORY-001, GOAL-OWNER]
+  evidence: []
+  search_terms: [A24, OWNER_REPORT, LIMITED_DIAGNOSTIC, RETROSPECTIVE_ONLY]
+  classification: {contains_secrets: false, contains_raw_data: false, sensitivity: INTERNAL_NON_SECRET}
+
+- asset_id: EVIDENCE-T30-A24-RAW-TO-PIT-001
+  record_version: '1.0'
+  asset_type: evidence
+  purpose: Hash-bound FULL_REVIEW acceptance for LIMITED_DIAGNOSTIC_PANEL_READY without TASK-30 promotion.
+  status: VALIDATED_ACTIVE
+  origin: REPOSITORY
+  as_of: '2026-08-15'
+  truth_owner: TASK-30
+  location: {kind: git_path, logical_uri: 'repo://docs/evidence/task30/a24_raw_to_pit_admissibility_acceptance_v1.json', repository_path: docs/evidence/task30/a24_raw_to_pit_admissibility_acceptance_v1.json}
+  integrity: {kind: sha256, sha256: dee6af0d956a74993053bfa370767632b167d051f326ca8494bd084a7d23eab4}
+  access: {mode: read_only, method: file, network_required: false, secrets_required: false}
+  relations:
+  - {relation_type: derived_from, target_asset_id: CONTRACT-T30-A24-RAW-TO-PIT-001}
+  - {relation_type: depends_on, target_asset_id: EVIDENCE-T30-A24P-RAW-TO-PIT-001}
+  - {relation_type: validated_by, target_asset_id: TEST-T30-A24-RAW-TO-PIT-001}
+  consumers: [TASK-30, RC001-H07-H01-LIQUIDITY-RETENTION, FACTORY-001, GOAL-OWNER]
+  evidence: []
+  search_terms: [A24, ACCEPTANCE, FULL_REVIEW, LIMITED_DIAGNOSTIC_PANEL_READY, BLOCKED_DATA]
+  classification: {contains_secrets: false, contains_raw_data: false, sensitivity: INTERNAL_NON_SECRET}
+
+- asset_id: CTRL-TASK-30-A24-001
+  record_version: '1.0'
+  asset_type: control_document
+  purpose: Harness-valid A24 task contract binding exact authority, branch, budgets, stop and checkpoint.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-08-15'
+  truth_owner: TASK-30
+  location: {kind: git_path, logical_uri: 'repo://docs/tasks/TASK-30-a24-raw-to-pit-admissibility-owner-panel.md', repository_path: docs/tasks/TASK-30-a24-raw-to-pit-admissibility-owner-panel.md}
+  integrity: {kind: sha256, sha256: ef5dad3ec02535cb70f1b6f24e1f89cc1dbd5cd21d40200f8ed77c8ea1a03494}
+  access: {mode: read_only, method: file, network_required: false, secrets_required: false}
+  relations:
+  - {relation_type: contains, target_asset_id: CONTRACT-T30-A24-RAW-TO-PIT-001}
+  - {relation_type: contains, target_asset_id: SCRIPT-T30-A24-RAW-TO-PIT-001}
+  - {relation_type: depends_on, target_asset_id: EVIDENCE-T30-A23-HELIUS-PAGINATION-001}
+  consumers: [TASK-30, FACTORY-001]
+  evidence: []
+  search_terms: [A24, TASK_CONTRACT, RAW_TO_PIT, IMPLEMENTED_UNVERIFIED]
+  classification: {contains_secrets: false, contains_raw_data: false, sensitivity: INTERNAL_NON_SECRET}
+
+- asset_id: EVIDENCE-T30-A24-DELIVERY-COMPLETION-001
+  record_version: '1.0'
+  asset_type: evidence
+  purpose: Guard-consumable completion evidence binding the exact A24 delivery inventory without TASK-30 promotion.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-08-15'
+  truth_owner: TASK-30
+  location: {kind: git_path, logical_uri: 'repo://docs/evidence/task30/a24_delivery_completion_evidence_v1.json', repository_path: docs/evidence/task30/a24_delivery_completion_evidence_v1.json}
+  integrity: {kind: none, note: 'Content integrity is owned by the live completion-review-fit hash chain; embedding its SHA here would create an indirect self-reference through the reviewed inventory.'}
+  access: {mode: read_only, method: file, network_required: false, secrets_required: false}
+  relations:
+  - {relation_type: derived_from, target_asset_id: EVIDENCE-T30-A24-RAW-TO-PIT-001}
+  - {relation_type: depends_on, target_asset_id: EVIDENCE-T30-A24-DELIVERY-INDEPENDENT-REVIEW-001}
+  - {relation_type: depends_on, target_asset_id: EVIDENCE-T30-A24-DELIVERY-FACTORY-FIT-001}
+  - {relation_type: depends_on, target_asset_id: SCHEMA-DELIVERY-COMPLETION-EVIDENCE-001}
+  consumers: [TASK-30, FACTORY-001, GOAL-OWNER]
+  evidence: []
+  search_terms: [A24, DELIVERY_COMPLETION, GUARDED_MERGE, LIMITED_DIAGNOSTIC, BLOCKED_DATA]
+  classification: {contains_secrets: false, contains_raw_data: false, sensitivity: INTERNAL_NON_SECRET}
+
+- asset_id: EVIDENCE-T30-A24-DELIVERY-INDEPENDENT-REVIEW-001
+  record_version: '1.0'
+  asset_type: evidence
+  purpose: Required-role review evidence bound to the exact non-self-referential A24 inventory.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-08-15'
+  truth_owner: TASK-30
+  location: {kind: git_path, logical_uri: 'repo://docs/evidence/task30/a24_delivery_independent_review_v1.json', repository_path: docs/evidence/task30/a24_delivery_independent_review_v1.json}
+  integrity: {kind: none, note: 'Content integrity is owned by the live completion-review-fit hash chain; embedding its SHA here would create an indirect self-reference through the reviewed inventory.'}
+  access: {mode: read_only, method: file, network_required: false, secrets_required: false}
+  relations:
+  - {relation_type: derived_from, target_asset_id: EVIDENCE-T30-A24-RAW-TO-PIT-001}
+  - {relation_type: depends_on, target_asset_id: SCHEMA-DELIVERY-INDEPENDENT-REVIEW-EVIDENCE-001}
+  consumers: [TASK-30, FACTORY-001, GOAL-OWNER]
+  evidence: []
+  search_terms: [A24, INDEPENDENT_REVIEW, SINGLE_AGENT_REVIEW_FALLBACK, ARCHITECTURE]
+  classification: {contains_secrets: false, contains_raw_data: false, sensitivity: INTERNAL_NON_SECRET}
+
+- asset_id: EVIDENCE-T30-A24-DELIVERY-FACTORY-FIT-001
+  record_version: '1.0'
+  asset_type: evidence
+  purpose: FULL Factory Fit review for A24 mission, data truth, owner operability, wrap-versus-buy, security and red team.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-08-15'
+  truth_owner: TASK-30
+  location: {kind: git_path, logical_uri: 'repo://docs/evidence/task30/a24_delivery_factory_fit_v1.json', repository_path: docs/evidence/task30/a24_delivery_factory_fit_v1.json}
+  integrity: {kind: none, note: 'Content integrity is owned by the live completion-review-fit hash chain; embedding its SHA here would create an indirect self-reference through the reviewed inventory.'}
+  access: {mode: read_only, method: file, network_required: false, secrets_required: false}
+  relations:
+  - {relation_type: derived_from, target_asset_id: EVIDENCE-T30-A24-RAW-TO-PIT-001}
+  - {relation_type: depends_on, target_asset_id: EVIDENCE-T30-A24-DELIVERY-INDEPENDENT-REVIEW-001}
+  consumers: [TASK-30, FACTORY-001, GOAL-OWNER]
+  evidence: []
+  search_terms: [A24, FACTORY_FIT, FULL_REVIEW, WRAP, LIMITED_DIAGNOSTIC]
   classification: {contains_secrets: false, contains_raw_data: false, sensitivity: INTERNAL_NON_SECRET}
