@@ -1,0 +1,107 @@
+schema: smial.task30.h07-h01-owner-fork-packet.policy
+schema_version: '1.0'
+task_id: TASK-30
+atom_id: T30-A26_H07_H01_FIVE_DOLLAR_CANNOT_FALSIFY_OWNER_FORK_PACKET_V1
+contract_id: CONTRACT-T30-A26-H07-H01-OWNER-FORK-PACKET-001
+spec_route: BOTH
+adoption_route: WRAP_FROZEN_A25_AND_CURRENT_REGISTRY
+consumer: RC001-H07-H01-LIQUIDITY-RETENTION
+frozen_a25:
+  path: docs/evidence/task30/a25_h07_h01_limited_diagnostic_acceptance_v1.json
+  sha256: c29ecd424e4c2276259ffc05aec6fb8058b53469a30c763db972c0581f84ceca
+  required_terminal: ESTIMAND_NOT_COMPUTABLE_TARGETED_CAPABILITY_GAP_PROVEN
+  required_task_state: BLOCKED_DATA
+current_registry:
+  path: configs/provider_route_capability_registry_v6.yaml
+  registry_id: PROVIDER-ROUTE-CAPABILITY-REGISTRY-006
+  schema_version: '6.0'
+  route_count: 6
+predecessor_registry:
+  path: configs/provider_route_capability_registry_v1.yaml
+  registry_id: PROVIDER-ROUTE-CAPABILITY-REGISTRY-001
+reuse_candidate:
+  record_id: REUSE-T04-JUPITER-V2-001
+  verdict: WRAP
+  decision_status: ACCEPT_CONTRACT_RUNTIME_DEFERRED
+  grants_quote_route: false
+required_route_feasibility_fields:
+  - ROUTE_FEASIBILITY.available_at
+  - ROUTE_FEASIBILITY.evaluated_at
+  - ROUTE_FEASIBILITY.ingested_at
+  - ROUTE_FEASIBILITY.input_mint
+  - ROUTE_FEASIBILITY.notional
+  - ROUTE_FEASIBILITY.observed_at
+  - ROUTE_FEASIBILITY.output_mint
+  - ROUTE_FEASIBILITY.price_impact
+  - ROUTE_FEASIBILITY.quoted_amounts
+  - ROUTE_FEASIBILITY.route_identifier_or_status
+  - ROUTE_FEASIBILITY.separate_fees
+  - ROUTE_FEASIBILITY.source_or_raw_sha256
+  - ROUTE_FEASIBILITY.typed_gap_or_failure
+cluster_requirement:
+  cluster_unit: POOL_DAY
+  frozen_independent_clusters: 1
+  minimum_clusters_for_variance_calibration: 4
+  next_measurement_purpose: VARIANCE_CALIBRATION_PILOT_NOT_HYPOTHESIS_TEST
+notional_parameter:
+  parameter_id: NOTIONAL_BUCKET_SET_V1
+  unresolved_code: FROZEN_PARAMETER_DEFINITION_ABSENT
+  non_adopted_observed_convention: TASK21_NOTIONALS_USD_10_25_50_100_IS_A_DIFFERENT_TASK_PARAMETER
+proposed_spend:
+  usd_cents: 500
+  provider: HELIUS
+  payment_kind: OWNER_CRYPTO_ONE_SHOT_NOT_CARD_NOT_SUBSCRIPTION
+  subscription: false
+  wallet_or_signer_handling_by_agent: false
+helius_operations:
+  - GET_SIGNATURES_FOR_ADDRESS
+  - LOGS_SUBSCRIBE_MENTIONS
+  - GET_TRANSACTIONS_FOR_ADDRESS_FULL
+quote_operations: []
+owner_forks:
+  selected: NONE_THIS_ATOM_ONLY_ENCODES_THE_FORK
+  options:
+    - option_id: RETIRE_RC001_H07_H01_LIQUIDITY_RETENTION
+      owner_phrase: OK T30-A26 RETIRE_RC001_H07_H01_LIQUIDITY_RETENTION
+      eligibility: ELIGIBLE_AFTER_MERGE
+    - option_id: FREEZE_NOTIONAL_BUCKET_SET_V1
+      owner_phrase: OK T30-A26 FREEZE_NOTIONAL_BUCKET_SET_V1
+      eligibility: ELIGIBLE_AFTER_MERGE
+    - option_id: AUTHORIZE_VARIANCE_CALIBRATION_CAPTURE
+      owner_phrase: OK T30-A26 AUTHORIZE_VARIANCE_CALIBRATION_CAPTURE
+      eligibility: INELIGIBLE_UNTIL_PRECONDITIONS
+terminal_outcomes:
+  - FIVE_DOLLAR_HELIUS_CANNOT_FALSIFY_OWNER_FORK_READY
+  - STOP_INTEGRITY_CONFLICT
+claims:
+  five_dollar_cannot_falsify_only: true
+  effect_estimate: false
+  hypothesis_supported_or_refuted: false
+  h07_h01_trial: false
+  route_feasibility: false
+  execution: false
+  settlement: false
+  pnl: false
+  numeric_netreturn: false
+  alpha: false
+  task30_acceptance: false
+  rc001_definition_changed: false
+  notional_buckets_frozen: false
+external_authority:
+  basis: EXPLICIT_OWNER_PHRASE
+  owner_phrase: OK T30-A26 H07_H01_FIVE_DOLLAR_CANNOT_FALSIFY_OWNER_FORK_PACKET
+  provider_api_rpc_calls_authorized: 0
+  credential_reads_authorized: 0
+  purchase_authorized: false
+execution_controls:
+  retry: false
+  fallback: false
+  redirect: false
+  pagination: false
+  scheduler: false
+  background_process: false
+  network: false
+  credentials: false
+  cash_spend: false
+project_sources_disposition:
+  kind: NO_CHANGE

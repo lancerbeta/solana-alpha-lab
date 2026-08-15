@@ -1,0 +1,160 @@
+{
+  "as_of": "2026-08-15",
+  "atom_id": "T30-A26_H07_H01_FIVE_DOLLAR_CANNOT_FALSIFY_OWNER_FORK_PACKET_V1",
+  "claims": {
+    "alpha": false,
+    "effect_estimate": false,
+    "execution": false,
+    "five_dollar_cannot_falsify_only": true,
+    "h07_h01_trial": false,
+    "hypothesis_supported_or_refuted": false,
+    "notional_buckets_frozen": false,
+    "numeric_netreturn": false,
+    "pnl": false,
+    "rc001_definition_changed": false,
+    "route_feasibility": false,
+    "settlement": false,
+    "task30_acceptance": false
+  },
+  "decision": "FIVE_DOLLAR_HELIUS_CANNOT_FALSIFY_OWNER_FORK_READY",
+  "frozen_a25": {
+    "decision": "ESTIMAND_NOT_COMPUTABLE_TARGETED_CAPABILITY_GAP_PROVEN",
+    "independent_clusters": 1,
+    "minimum_clusters_for_variance_calibration": 4,
+    "missing_route_feasibility_fields": [
+      "ROUTE_FEASIBILITY.available_at",
+      "ROUTE_FEASIBILITY.evaluated_at",
+      "ROUTE_FEASIBILITY.ingested_at",
+      "ROUTE_FEASIBILITY.input_mint",
+      "ROUTE_FEASIBILITY.notional",
+      "ROUTE_FEASIBILITY.observed_at",
+      "ROUTE_FEASIBILITY.output_mint",
+      "ROUTE_FEASIBILITY.price_impact",
+      "ROUTE_FEASIBILITY.quoted_amounts",
+      "ROUTE_FEASIBILITY.route_identifier_or_status",
+      "ROUTE_FEASIBILITY.separate_fees",
+      "ROUTE_FEASIBILITY.source_or_raw_sha256",
+      "ROUTE_FEASIBILITY.typed_gap_or_failure"
+    ],
+    "notional_bucket_count": null,
+    "path": "docs/evidence/task30/a25_h07_h01_limited_diagnostic_acceptance_v1.json",
+    "sha256": "c29ecd424e4c2276259ffc05aec6fb8058b53469a30c763db972c0581f84ceca",
+    "task_state": "BLOCKED_DATA",
+    "unresolved_frozen_parameters": [
+      "NOTIONAL_BUCKET_SET_V1"
+    ]
+  },
+  "named_consumer": "RC001-H07-H01-LIQUIDITY-RETENTION",
+  "non_claims": [
+    "NO_TASK30_ACCEPTANCE",
+    "NO_RC001_PROMOTION",
+    "NO_H07_H01_TRIAL",
+    "NO_EFFECT_ESTIMATE",
+    "NO_ALPHA",
+    "NO_NOTIONAL_BUCKET_GUESS",
+    "NO_PROVIDER_CALL",
+    "NO_FIVE_DOLLAR_PURCHASE"
+  ],
+  "owner_forks": {
+    "options": [
+      {
+        "eligibility": "ELIGIBLE_AFTER_MERGE",
+        "option_id": "RETIRE_RC001_H07_H01_LIQUIDITY_RETENTION",
+        "owner_phrase": "OK T30-A26 RETIRE_RC001_H07_H01_LIQUIDITY_RETENTION"
+      },
+      {
+        "eligibility": "ELIGIBLE_AFTER_MERGE",
+        "option_id": "FREEZE_NOTIONAL_BUCKET_SET_V1",
+        "owner_phrase": "OK T30-A26 FREEZE_NOTIONAL_BUCKET_SET_V1"
+      },
+      {
+        "eligibility": "INELIGIBLE_UNTIL_PRECONDITIONS",
+        "option_id": "AUTHORIZE_VARIANCE_CALIBRATION_CAPTURE",
+        "owner_phrase": "OK T30-A26 AUTHORIZE_VARIANCE_CALIBRATION_CAPTURE"
+      }
+    ],
+    "selected": "NONE_THIS_ATOM_ONLY_ENCODES_THE_FORK"
+  },
+  "project_sources_disposition": {
+    "kind": "NO_CHANGE"
+  },
+  "proposed_spend": {
+    "can_create_four_pool_day_clusters": false,
+    "can_supply_route_feasibility_fields": false,
+    "falsifies_estimand": false,
+    "payment_kind": "OWNER_CRYPTO_ONE_SHOT_NOT_CARD_NOT_SUBSCRIPTION",
+    "provider": "HELIUS",
+    "quote_call_budget": {
+      "clusters_required": 4,
+      "formula": "SLOTS_PER_CLUSTER_TIMES_NOTIONAL_BUCKET_COUNT_TIMES_CLUSTERS",
+      "illustrative_n1_evaluations": 384,
+      "illustrative_n1_usage": "ILLUSTRATIVE_N1_NOT_A_FROZEN_PARAMETER",
+      "lower_bound_status": "UNDEFINED_NOTIONAL_BUCKET_SET_ABSENT",
+      "notional_bucket_count": null,
+      "quote_evaluations_lower_bound": null,
+      "slots_per_cluster": 96
+    },
+    "reasons": [
+      "WRONG_LANE_HELIUS_IS_TRADE_HISTORY_NOT_ROUTE_FEASIBILITY",
+      "FOUR_POOL_DAY_CLUSTERS_NOT_PURCHASABLE_WITH_FIVE_DOLLARS_ON_THIS_ROUTE",
+      "NOTIONAL_BUCKET_SET_V1_ABSENT_SO_QUOTE_CALL_BUDGET_UNDEFINED",
+      "REGISTRY_GAP_FOR_ROUTE_FEASIBILITY_PROVIDER"
+    ],
+    "subscription": false,
+    "usd_cents": 500,
+    "wallet_or_signer_handling_by_agent": false
+  },
+  "receipt_id": "EVIDENCE-T30-A26-H07-H01-OWNER-FORK-001",
+  "registries": {
+    "authority_granted": false,
+    "current_registry_id": "PROVIDER-ROUTE-CAPABILITY-REGISTRY-006",
+    "helius_operations": [
+      "GET_SIGNATURES_FOR_ADDRESS",
+      "GET_TRANSACTIONS_FOR_ADDRESS_FULL",
+      "LOGS_SUBSCRIBE_MENTIONS"
+    ],
+    "jupiter_or_quote_route_present": false,
+    "operations": [
+      "GET_SIGNATURES_FOR_ADDRESS",
+      "GET_TRANSACTION",
+      "GET_TRANSACTIONS_FOR_ADDRESS_FULL",
+      "LOGS_SUBSCRIBE_MENTIONS",
+      "PUBLIC_TOKEN_PAIR_DISCOVERY",
+      "PUMPSWAP_ARCHIVE_15M_OHLCV"
+    ],
+    "predecessor_registry_id": "PROVIDER-ROUTE-CAPABILITY-REGISTRY-001",
+    "providers": [
+      "BITQUERY",
+      "DEXSCREENER",
+      "HELIUS",
+      "SOLANA_STANDARD_RPC"
+    ],
+    "route_feasibility_registry_status": "REGISTRY_GAP",
+    "route_ids": [
+      "BITQUERY-SOLANA-PUMPSWAP-OHLCV-001",
+      "DEXSCREENER-SOLANA-TOKEN-PAIRS-KEYLESS-001",
+      "HELIUS-SOLANA-GET-SIGNATURES-001",
+      "HELIUS-SOLANA-GET-TRANSACTIONS-FOR-ADDRESS-001",
+      "HELIUS-SOLANA-LOGS-SUBSCRIBE-001",
+      "SOLANA-STANDARD-GET-TRANSACTION-001"
+    ]
+  },
+  "reuse_candidate": {
+    "decision_status": "ACCEPT_CONTRACT_RUNTIME_DEFERRED",
+    "grants_quote_route": false,
+    "record_id": "REUSE-T04-JUPITER-V2-001",
+    "verdict": "WRAP"
+  },
+  "runtime_receipt_sha256": "e8b5425023716c53ec3a37cf985b113a2a49d2a88b2e54f534a33ae99b34b4fb",
+  "schema": "smial.task30.a26-h07-h01-owner-fork-packet.acceptance",
+  "schema_version": "1.0",
+  "side_effects": {
+    "cash_spend_usd_cents": 0,
+    "credential_reads": 0,
+    "fallbacks": 0,
+    "provider_requests": 0,
+    "retries": 0
+  },
+  "task_id": "TASK-30",
+  "task_state": "BLOCKED_DATA"
+}

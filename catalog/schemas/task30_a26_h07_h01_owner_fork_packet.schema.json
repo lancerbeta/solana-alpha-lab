@@ -1,0 +1,238 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://solana-alpha-lab.local/schemas/task30_a26_h07_h01_owner_fork_packet.schema.json",
+  "title": "TASK-30 A26 H07/H01 five-dollar cannot-falsify owner-fork packet policy",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema", "schema_version", "task_id", "atom_id", "contract_id",
+    "spec_route", "adoption_route", "consumer", "frozen_a25",
+    "current_registry", "predecessor_registry", "reuse_candidate",
+    "required_route_feasibility_fields", "cluster_requirement",
+    "notional_parameter", "proposed_spend", "helius_operations",
+    "quote_operations", "owner_forks", "terminal_outcomes", "claims",
+    "external_authority", "execution_controls", "project_sources_disposition"
+  ],
+  "properties": {
+    "schema": {"const": "smial.task30.h07-h01-owner-fork-packet.policy"},
+    "schema_version": {"const": "1.0"},
+    "task_id": {"const": "TASK-30"},
+    "atom_id": {"const": "T30-A26_H07_H01_FIVE_DOLLAR_CANNOT_FALSIFY_OWNER_FORK_PACKET_V1"},
+    "contract_id": {"const": "CONTRACT-T30-A26-H07-H01-OWNER-FORK-PACKET-001"},
+    "spec_route": {"const": "BOTH"},
+    "adoption_route": {"const": "WRAP_FROZEN_A25_AND_CURRENT_REGISTRY"},
+    "consumer": {"const": "RC001-H07-H01-LIQUIDITY-RETENTION"},
+    "frozen_a25": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["path", "sha256", "required_terminal", "required_task_state"],
+      "properties": {
+        "path": {"const": "docs/evidence/task30/a25_h07_h01_limited_diagnostic_acceptance_v1.json"},
+        "sha256": {"const": "c29ecd424e4c2276259ffc05aec6fb8058b53469a30c763db972c0581f84ceca"},
+        "required_terminal": {"const": "ESTIMAND_NOT_COMPUTABLE_TARGETED_CAPABILITY_GAP_PROVEN"},
+        "required_task_state": {"const": "BLOCKED_DATA"}
+      }
+    },
+    "current_registry": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["path", "registry_id", "schema_version", "route_count"],
+      "properties": {
+        "path": {"const": "configs/provider_route_capability_registry_v6.yaml"},
+        "registry_id": {"const": "PROVIDER-ROUTE-CAPABILITY-REGISTRY-006"},
+        "schema_version": {"const": "6.0"},
+        "route_count": {"const": 6}
+      }
+    },
+    "predecessor_registry": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["path", "registry_id"],
+      "properties": {
+        "path": {"const": "configs/provider_route_capability_registry_v1.yaml"},
+        "registry_id": {"const": "PROVIDER-ROUTE-CAPABILITY-REGISTRY-001"}
+      }
+    },
+    "reuse_candidate": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["record_id", "verdict", "decision_status", "grants_quote_route"],
+      "properties": {
+        "record_id": {"const": "REUSE-T04-JUPITER-V2-001"},
+        "verdict": {"const": "WRAP"},
+        "decision_status": {"const": "ACCEPT_CONTRACT_RUNTIME_DEFERRED"},
+        "grants_quote_route": {"const": false}
+      }
+    },
+    "required_route_feasibility_fields": {
+      "type": "array",
+      "minItems": 13,
+      "maxItems": 13,
+      "uniqueItems": true,
+      "items": {"type": "string", "pattern": "^ROUTE_FEASIBILITY\\.[a-z0-9_]+$"}
+    },
+    "cluster_requirement": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "cluster_unit", "frozen_independent_clusters",
+        "minimum_clusters_for_variance_calibration", "next_measurement_purpose"
+      ],
+      "properties": {
+        "cluster_unit": {"const": "POOL_DAY"},
+        "frozen_independent_clusters": {"const": 1},
+        "minimum_clusters_for_variance_calibration": {"const": 4},
+        "next_measurement_purpose": {"const": "VARIANCE_CALIBRATION_PILOT_NOT_HYPOTHESIS_TEST"}
+      }
+    },
+    "notional_parameter": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["parameter_id", "unresolved_code", "non_adopted_observed_convention"],
+      "properties": {
+        "parameter_id": {"const": "NOTIONAL_BUCKET_SET_V1"},
+        "unresolved_code": {"const": "FROZEN_PARAMETER_DEFINITION_ABSENT"},
+        "non_adopted_observed_convention": {"const": "TASK21_NOTIONALS_USD_10_25_50_100_IS_A_DIFFERENT_TASK_PARAMETER"}
+      }
+    },
+    "proposed_spend": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "usd_cents", "provider", "payment_kind", "subscription",
+        "wallet_or_signer_handling_by_agent"
+      ],
+      "properties": {
+        "usd_cents": {"const": 500},
+        "provider": {"const": "HELIUS"},
+        "payment_kind": {"const": "OWNER_CRYPTO_ONE_SHOT_NOT_CARD_NOT_SUBSCRIPTION"},
+        "subscription": {"const": false},
+        "wallet_or_signer_handling_by_agent": {"const": false}
+      }
+    },
+    "helius_operations": {
+      "type": "array",
+      "minItems": 3,
+      "maxItems": 3,
+      "uniqueItems": true,
+      "items": {
+        "enum": [
+          "GET_SIGNATURES_FOR_ADDRESS",
+          "LOGS_SUBSCRIBE_MENTIONS",
+          "GET_TRANSACTIONS_FOR_ADDRESS_FULL"
+        ]
+      }
+    },
+    "quote_operations": {
+      "type": "array",
+      "maxItems": 0,
+      "items": {"type": "string"}
+    },
+    "owner_forks": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["selected", "options"],
+      "properties": {
+        "selected": {"const": "NONE_THIS_ATOM_ONLY_ENCODES_THE_FORK"},
+        "options": {
+          "type": "array",
+          "minItems": 3,
+          "maxItems": 3,
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["option_id", "owner_phrase", "eligibility"],
+            "properties": {
+              "option_id": {
+                "enum": [
+                  "RETIRE_RC001_H07_H01_LIQUIDITY_RETENTION",
+                  "FREEZE_NOTIONAL_BUCKET_SET_V1",
+                  "AUTHORIZE_VARIANCE_CALIBRATION_CAPTURE"
+                ]
+              },
+              "owner_phrase": {"type": "string", "minLength": 20},
+              "eligibility": {"enum": ["ELIGIBLE_AFTER_MERGE", "INELIGIBLE_UNTIL_PRECONDITIONS"]}
+            }
+          }
+        }
+      }
+    },
+    "terminal_outcomes": {
+      "type": "array",
+      "minItems": 2,
+      "maxItems": 2,
+      "items": {
+        "enum": [
+          "FIVE_DOLLAR_HELIUS_CANNOT_FALSIFY_OWNER_FORK_READY",
+          "STOP_INTEGRITY_CONFLICT"
+        ]
+      }
+    },
+    "claims": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "five_dollar_cannot_falsify_only", "effect_estimate",
+        "hypothesis_supported_or_refuted", "h07_h01_trial",
+        "route_feasibility", "execution", "settlement", "pnl",
+        "numeric_netreturn", "alpha", "task30_acceptance",
+        "rc001_definition_changed", "notional_buckets_frozen"
+      ],
+      "properties": {
+        "five_dollar_cannot_falsify_only": {"const": true},
+        "effect_estimate": {"const": false},
+        "hypothesis_supported_or_refuted": {"const": false},
+        "h07_h01_trial": {"const": false},
+        "route_feasibility": {"const": false},
+        "execution": {"const": false},
+        "settlement": {"const": false},
+        "pnl": {"const": false},
+        "numeric_netreturn": {"const": false},
+        "alpha": {"const": false},
+        "task30_acceptance": {"const": false},
+        "rc001_definition_changed": {"const": false},
+        "notional_buckets_frozen": {"const": false}
+      }
+    },
+    "external_authority": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "basis", "owner_phrase", "provider_api_rpc_calls_authorized",
+        "credential_reads_authorized", "purchase_authorized"
+      ],
+      "properties": {
+        "basis": {"const": "EXPLICIT_OWNER_PHRASE"},
+        "owner_phrase": {"const": "OK T30-A26 H07_H01_FIVE_DOLLAR_CANNOT_FALSIFY_OWNER_FORK_PACKET"},
+        "provider_api_rpc_calls_authorized": {"const": 0},
+        "credential_reads_authorized": {"const": 0},
+        "purchase_authorized": {"const": false}
+      }
+    },
+    "execution_controls": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "retry", "fallback", "redirect", "pagination", "scheduler",
+        "background_process", "network", "credentials", "cash_spend"
+      ],
+      "properties": {
+        "retry": {"const": false},
+        "fallback": {"const": false},
+        "redirect": {"const": false},
+        "pagination": {"const": false},
+        "scheduler": {"const": false},
+        "background_process": {"const": false},
+        "network": {"const": false},
+        "credentials": {"const": false},
+        "cash_spend": {"const": false}
+      }
+    },
+    "project_sources_disposition": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["kind"],
+      "properties": {"kind": {"const": "NO_CHANGE"}}
+    }
+  }
+}

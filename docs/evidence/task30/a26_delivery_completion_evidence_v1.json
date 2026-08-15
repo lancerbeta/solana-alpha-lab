@@ -1,0 +1,79 @@
+{
+  "schema": "smial.delivery-completion-evidence",
+  "schema_version": "1.0",
+  "acceptance_id": "T30-A26-DELIVERY-COMPLETION-001",
+  "as_of": "2026-08-15",
+  "task_id": "TASK-30",
+  "state_change": "FIVE_DOLLAR_HELIUS_CANNOT_FALSIFY_OWNER_FORK_READY_NO_TASK30_PROMOTION",
+  "base_main": "0b89358b2f060a6d89c69dfed6563c2f6c966a67",
+  "cloud_bundle_mode": "OWNER_MANAGED_OPTIONAL_EXPORT",
+  "cloud_bundle_required_by_harness": false,
+  "cloud_bundle_smoke_required": false,
+  "project_sources_disposition": {
+    "kind": "NO_CHANGE"
+  },
+  "capability_radar_now": "NONE",
+  "implementation_bindings": {
+    "catalog/assets/core.yaml": "068bae2fd816e54371279677d4301e6bae71a772b2ec349a21503bba4573fef1",
+    "catalog/assets/lifecycle.yaml": "9605fcaf03743363b9ed066df35aa5eb50a16fcff92cededa9a3003fe420da03",
+    "catalog/catalog_manifest.yaml": "f2f0a255e03ca4e1bc6c1231e3b12a7ff7276933d1a36427e80e099c38bbc4d9",
+    "catalog/generated/asset_edges.json": "22a0c85799da19d3d665eb9120300bc91b20e47c0cdf940df8583b2165d608e7",
+    "catalog/schemas/task30_a26_h07_h01_owner_fork_packet.schema.json": "f826fb49e02c7b16969f66da669f49aba76f23f50c21edd91f64830ee3e55adf",
+    "configs/task30_a26_h07_h01_owner_fork_packet_v1.yaml": "08b80dad14afbc47567d1dccf72403683907c80c4bc2332d62260089a65bb527",
+    "docs/PROJECT_MAP.md": "c95c49b72a428897f00371e5635caacf1528ba087bbf5ba4eaa47d3188008325",
+    "docs/contracts/task30_a26_h07_h01_owner_fork_packet_contract_v1.md": "77aefd93e03d1d374bd7afc24bf80c68aaa099bd85755ee2d8eb02b1364f4c78",
+    "docs/evidence/task30/a26_h07_h01_owner_fork_packet_acceptance_v1.json": "8d4755643c4f64f325e3d2986d928a93f9c1bf64e7694c47230440b8271aecd7",
+    "docs/evidence/task30/a26_h07_h01_owner_fork_packet_runtime_receipt_v1.json": "e8b5425023716c53ec3a37cf985b113a2a49d2a88b2e54f534a33ae99b34b4fb",
+    "docs/reports/task30/a26_h07_h01_owner_fork_packet_owner_readout_v1.md": "8536d0df8457a846fde3278e0fe8495d448ab4d8e0e2369ed9180ef71bed98e8",
+    "docs/tasks/TASK-30-a26-h07-h01-owner-fork-packet.md": "7d84d2a9d7368326904f7033a938c61491613d6a33d86016c73a68ae7342a67f",
+    "registries/decisions_negative_results.yaml": "ce9b7cb1067ad491da6f2e929fc403c849fc24cc51cf2986b0b9b03463c8a109",
+    "scripts/run_task30_a26_h07_h01_owner_fork_packet.py": "75105e8b66206edef949b7078e800d6b96d07c5e3c07f755ed24d378efea2745",
+    "src/solana_alpha_lab/task30_h07_h01_owner_fork_packet.py": "f372db7e8806ae521f901285550284d605e118601f3b1fdc9c53e71a1b634ef0",
+    "tests/fixtures/task30/h07_h01_owner_fork_packet_v1.json": "d30620c1f07f37f49d8e61b9f8f9bcf245a026f1896e2b7c04762522854f78ab",
+    "tests/test_catalog.py": "eb0c20f48d9a26d80ba2cc9e49b7c2f5eca851af503ac73ebabd59ea597ec567",
+    "tests/test_lifecycle_registries.py": "7af8bbeb6ac0839e5aaa56c487621de1d417f2e6b73d131a3e6148023c8006e1",
+    "tests/test_task30_a26_h07_h01_owner_fork_packet.py": "e54179392242acdfeea23844f4ceef23beb4c2f823114fe930e6689cbcf6f517"
+  },
+  "active_stop_conditions": [],
+  "owner_attention_triggers": {
+    "auth_or_access_recovery": false,
+    "material_owner_decision": false,
+    "user_only_activation": false,
+    "external_material_action": false,
+    "unresolved_safety_or_truth_conflict": false
+  },
+  "factory_fit": {
+    "path": "docs/evidence/task30/a26_delivery_factory_fit_v1.json",
+    "sha256": "866ae0c3488e49e9843be3cb51618b8c9e62d27d3d6740ad544aedeedb3544cc",
+    "verdict": "PASS"
+  },
+  "validation": {
+    "targeted": "PASS_A26_A25_CATALOG_AND_LIFECYCLE_TESTS",
+    "independent_review": {
+      "path": "docs/evidence/task30/a26_delivery_independent_review_v1.json",
+      "sha256": "c911f1a0114e24b782ba06817bef90b2b2fa75f01ee77ee4238985ae22e06e96",
+      "verdict": "PASS"
+    },
+    "full_gate": "ENFORCED_BY_PROJECT_BOUND_VALIDATION",
+    "github_ci": "ENFORCED_LIVE_AT_GUARDED_MERGE",
+    "project_checks": [
+      "PASS_GENERATED_NAVIGATION_SECRET_AND_CATALOG_CHECKS"
+    ]
+  },
+  "non_claims": [
+    "NO_TASK30_ACCEPTANCE_OR_DONE",
+    "NO_RC001_PROMOTION_OR_DEFINITION_CHANGE",
+    "NO_EFFECT_ESTIMATE_OR_HYPOTHESIS_VERDICT",
+    "NO_FIVE_DOLLAR_PURCHASE_OR_PROVIDER_CALL",
+    "NO_H07_H01_TRIAL_ALPHA_EXECUTION_PNL_OR_NETRETURN",
+    "NO_NOTIONAL_BUCKET_GUESS_OR_ROUTE_FEASIBILITY_REGISTRY_INSERT"
+  ],
+  "side_effects": {
+    "credential_reads": 0,
+    "provider_requests": 0,
+    "retries": 0,
+    "fallbacks": 0,
+    "cash_spend_usd_cents": 0,
+    "wallet_signer_transaction_actions": 0
+  }
+}
