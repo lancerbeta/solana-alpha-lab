@@ -33,6 +33,8 @@ managed_write_set:
   - tests/test_catalog.py
   - tests/test_lifecycle_registries.py
   - tests/test_task23_catalog_repository_factory_fit.py
+  - tests/fixtures/task28/rc001_registry_freeze_v1.json
+  - docs/evidence/task28/a1_rc001_registry_freeze_acceptance_v1.json
   - catalog/catalog_manifest.yaml
   - catalog/assets/core.yaml
   - catalog/assets/lifecycle.yaml

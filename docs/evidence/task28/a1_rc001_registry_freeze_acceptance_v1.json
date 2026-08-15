@@ -20,7 +20,7 @@
     },
     "fixture": {
       "path": "tests/fixtures/task28/rc001_registry_freeze_v1.json",
-      "sha256": "2e23fb6dd02e3c6938a063ffc2f2e27bb3bb977c00f60614382d99f133a92df4"
+      "sha256": "a6440a8e964319bcf27384de156774bf374b03816096f053625a555c52638de9"
     },
     "validator": {
       "path": "src/solana_alpha_lab/task28_rc001_registry_freeze.py",
@@ -40,7 +40,7 @@
     },
     "registry:global_trial_ledger": {
       "path": "registries/global_trial_ledger.yaml",
-      "sha256": "bae08185c59b62792a2f30db8839132316e60ecd3f2eb831d753a9b178b7478a"
+      "sha256": "b71eb9c6293899e6053d27b1151430c92d509c14404e1d46258bbce9ce78709f"
     },
     "known_evidence:task24_stop": {
       "path": "docs/evidence/task24/a6_bounded_data_redesign_or_stop_decision_v1.json",

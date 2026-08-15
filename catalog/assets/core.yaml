@@ -16602,7 +16602,7 @@ records:
   as_of: '2026-08-09'
   truth_owner: TASK-28
   location: {kind: git_path, logical_uri: 'repo://tests/fixtures/task28/rc001_registry_freeze_v1.json', repository_path: tests/fixtures/task28/rc001_registry_freeze_v1.json}
-  integrity: {kind: sha256, sha256: 2e23fb6dd02e3c6938a063ffc2f2e27bb3bb977c00f60614382d99f133a92df4}
+  integrity: {kind: sha256, sha256: a6440a8e964319bcf27384de156774bf374b03816096f053625a555c52638de9}
   access: *t25_read_file
   relations: [{relation_type: derived_from, target_asset_id: CONFIG-T28-RC001-REGISTRY-FREEZE-001}]
   consumers: [TASK-28, FACTORY-001]
@@ -16656,7 +16656,7 @@ records:
   as_of: '2026-08-09'
   truth_owner: TASK-28
   location: {kind: git_path, logical_uri: 'repo://docs/evidence/task28/a1_rc001_registry_freeze_acceptance_v1.json', repository_path: docs/evidence/task28/a1_rc001_registry_freeze_acceptance_v1.json}
-  integrity: {kind: sha256, sha256: cb786b8f2a2424a836feff1e6c80a3f463d674d829d287de9ca4151fa4c433d5}
+  integrity: {kind: sha256, sha256: 6e6cc0df579576bfda278747c97ce372b1d55d3ce85d7f4f3e7f241364b61978}
   access: *t25_read_file
   relations:
   - {relation_type: derived_from, target_asset_id: MODULE-T28-RC001-REGISTRY-FREEZE-001}
@@ -22298,7 +22298,7 @@ records:
   as_of: '2026-08-15'
   truth_owner: TASK-37
   location: {kind: git_path, logical_uri: 'repo://docs/tasks/TASK-37-rc002-h11-migration-clock-capture.md', repository_path: docs/tasks/TASK-37-rc002-h11-migration-clock-capture.md}
-  integrity: {kind: sha256, sha256: 09b40fe7e3bfb017b25baf9488be2f1d958083995b09b5f187eddda9ab727e7c}
+  integrity: {kind: sha256, sha256: 484161b6eea75e556ce271d47b7a2c9a96b02ee22f004ffcb77218209c0dd5cf}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: contains, target_asset_id: CONTRACT-T37-RC002-H11-CLOCK-CAPTURE-001}
