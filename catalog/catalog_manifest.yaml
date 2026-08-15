@@ -1,15 +1,15 @@
 schema_version: '1.0'
 catalog_id: SMIAL-PROJECT-ASSET-CATALOG
-catalog_version: 0.76.0
+catalog_version: 0.77.0
 as_of: '2026-08-15'
 implementation_status: VALIDATED_ACTIVE
 current_checkpoint:
-  assets: 931
+  assets: 945
   asset_registries: 4
   schemas: 50
   queries: 9
   lifecycle_registries: 9
-  lifecycle_records: 68
+  lifecycle_records: 69
 root_resolver:
   asset_registries:
   - catalog/assets/core.yaml

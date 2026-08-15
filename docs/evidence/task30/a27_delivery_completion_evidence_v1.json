@@ -1,0 +1,80 @@
+{
+  "schema": "smial.delivery-completion-evidence",
+  "schema_version": "1.0",
+  "acceptance_id": "T30-A27-DELIVERY-COMPLETION-001",
+  "as_of": "2026-08-15",
+  "task_id": "TASK-30",
+  "state_change": "RC001_H07_H01_PARKED_FROM_PRIORITY_SCIENCE_RETAINED_NO_TASK30_PROMOTION",
+  "base_main": "87283799319c1fc073b162dd36027ae80cb402da",
+  "cloud_bundle_mode": "OWNER_MANAGED_OPTIONAL_EXPORT",
+  "cloud_bundle_required_by_harness": false,
+  "cloud_bundle_smoke_required": false,
+  "project_sources_disposition": {
+    "kind": "NO_CHANGE"
+  },
+  "capability_radar_now": "NONE",
+  "implementation_bindings": {
+    "catalog/assets/core.yaml": "04695fbec770de802a6f9c884e7fae4472565dc953fa9de56c74979acf421854",
+    "catalog/assets/lifecycle.yaml": "5ab9cdf69769083c9a7d61023738387c85ed404e9c8eb6ca9121be27f2bfecd2",
+    "catalog/catalog_manifest.yaml": "0016967c33e6f0cc85f759519310f3452574df65b50dbf8e9a34cccad47e5e4a",
+    "catalog/generated/asset_edges.json": "d9ddaab42f671c36ebd42bbc83b0c79b300683dcb21c89876c1ebfc08e6850fb",
+    "catalog/schemas/task30_a27_h07_h01_liquidity_retention_park.schema.json": "2c3b2da21008085a4e87050c36d108edf95b5bb85919214087c7f476019a4579",
+    "configs/task30_a27_h07_h01_liquidity_retention_park_v1.yaml": "e8cb2d25675542662b55c61d707f902622c49fe1d4b0ac3c6f03af1851359cd0",
+    "docs/PROJECT_MAP.md": "e37473438e69e00336f1c7adf30381ce210b2ad52e54d478819b515457a1ec17",
+    "docs/contracts/task30_a27_h07_h01_liquidity_retention_park_contract_v1.md": "f5272b4c3c45b09b4b4d5548579c035e467f8a55247e13f75590b70cfc713ff1",
+    "docs/evidence/task30/a27_h07_h01_liquidity_retention_park_acceptance_v1.json": "b85ee3ff0a7553014977613c624f2295fee3082f7f6c9f5ddf4fa3d6fb64aa42",
+    "docs/evidence/task30/a27_h07_h01_liquidity_retention_park_runtime_receipt_v1.json": "5c171144980f38c2d29e8e6651fa6effda1a2e187668fd1586d18712273d14d2",
+    "docs/reports/task30/a27_h07_h01_liquidity_retention_park_owner_readout_v1.md": "aac5d5b321f99f5ffaf13de35263feff367c9fe5200d4fedb2b66a392dc2358c",
+    "docs/tasks/TASK-30-a27-h07-h01-liquidity-retention-park.md": "591647cde19e2811aaba8d12d3b7d86e7f2ae3421e6e489af504fd343fea99d9",
+    "registries/decisions_negative_results.yaml": "933962bda2a5e856334d2673733cfe0d0598cdcce948d0ad3ea34a9c330fcff8",
+    "scripts/run_task30_a27_h07_h01_liquidity_retention_park.py": "31a62673c73f3b9dde4c35fd443fdc78d1da33d0c2ce94400844cd94a96e9adc",
+    "src/solana_alpha_lab/task30_h07_h01_liquidity_retention_park.py": "993d2906c01b416ebe15a9bf63ddd30e8cbf8f353316f7c85e32bda0fb4a5a35",
+    "tests/fixtures/task30/h07_h01_liquidity_retention_park_v1.json": "6e124d1ce7f445ef0b78a2b357ac0dfd90dd2236134833c5c0cf0bcf896f6d3b",
+    "tests/test_catalog.py": "7b28c6dca9d68d688f1e14dd8771be9ceb4ba9258555536ff48250d2fa212526",
+    "tests/test_lifecycle_registries.py": "0b3ecad74780c2de00de9ed2cb35b2c157b36ed6b4c1f9f3c4c7fb1c08d3040e",
+    "tests/test_task30_a27_h07_h01_liquidity_retention_park.py": "b62266b6f9337904f833b2ed2c991f08ea0859a8f5b868061cfdf427b0348341"
+  },
+  "active_stop_conditions": [],
+  "owner_attention_triggers": {
+    "auth_or_access_recovery": false,
+    "material_owner_decision": false,
+    "user_only_activation": false,
+    "external_material_action": false,
+    "unresolved_safety_or_truth_conflict": false
+  },
+  "factory_fit": {
+    "path": "docs/evidence/task30/a27_delivery_factory_fit_v1.json",
+    "sha256": "300c0795979c5dac73aa51a2fb5e56be35b45641a9ed6b11406afee12da74de2",
+    "verdict": "PASS"
+  },
+  "validation": {
+    "targeted": "PASS_A27_A26_CATALOG_AND_LIFECYCLE_TESTS",
+    "independent_review": {
+      "path": "docs/evidence/task30/a27_delivery_independent_review_v1.json",
+      "sha256": "30520891efc83282115e3a4caf55f367583a3dc4658f6571ce7e6f0860b5c272",
+      "verdict": "PASS"
+    },
+    "full_gate": "ENFORCED_BY_PROJECT_BOUND_VALIDATION",
+    "github_ci": "ENFORCED_LIVE_AT_GUARDED_MERGE",
+    "project_checks": [
+      "PASS_GENERATED_NAVIGATION_SECRET_AND_CATALOG_CHECKS"
+    ]
+  },
+  "non_claims": [
+    "NO_TASK30_ACCEPTANCE_OR_DONE",
+    "NO_RC001_PROMOTION_OR_DEFINITION_CHANGE",
+    "NO_SCIENCE_DELETION",
+    "NO_EFFECT_ESTIMATE_OR_HYPOTHESIS_VERDICT",
+    "NO_H07_H01_H13_OR_H02_TRIAL",
+    "NO_NOTIONAL_BUCKET_FREEZE_OR_ROUTE_FEASIBILITY_CAPTURE",
+    "NO_PROVIDER_CALL_OR_PURCHASE"
+  ],
+  "side_effects": {
+    "credential_reads": 0,
+    "provider_requests": 0,
+    "retries": 0,
+    "fallbacks": 0,
+    "cash_spend_usd_cents": 0,
+    "wallet_signer_transaction_actions": 0
+  }
+}

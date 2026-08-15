@@ -1,0 +1,26 @@
+{
+  "schema": "smial.task30.h07-h01-liquidity-retention-park.fixture",
+  "schema_version": "1.0",
+  "atom_id": "T30-A27_RETIRE_RC001_H07_H01_LIQUIDITY_RETENTION_V1",
+  "expected": {
+    "terminal_decision": "RC001_H07_H01_PARKED_FROM_PRIORITY_SCIENCE_RETAINED",
+    "task_state": "BLOCKED_DATA",
+    "family_status": "PARKED_FROM_PRIORITY_NOT_CANONICAL_DONE",
+    "selected_fork": "RETIRE_RC001_H07_H01_LIQUIDITY_RETENTION",
+    "priority_disposition": "PARKED_FROM_PRIORITY",
+    "science_disposition": "RETAINED",
+    "deletion": false,
+    "a26_terminal": "FIVE_DOLLAR_HELIUS_CANNOT_FALSIFY_OWNER_FORK_READY",
+    "rc001_group_id": "RC001-H07-H01-LIQUIDITY-RETENTION",
+    "rc001_definition_sha256": "14a7387148d05773dedcb5ad6a8110a0dcab7e49da4dec77328903a5b7577df7"
+  },
+  "forbidden": [
+    "science_deleted",
+    "notional_buckets_frozen",
+    "route_feasibility_capture",
+    "h13_or_h02_trial",
+    "provider_call",
+    "cash_spend",
+    "task30_canonical_done"
+  ]
+}

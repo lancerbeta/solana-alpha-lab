@@ -1,0 +1,175 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://solana-alpha-lab.local/schemas/task30_a27_h07_h01_liquidity_retention_park.schema.json",
+  "title": "TASK-30 A27 H07/H01 liquidity-retention park-from-priority policy",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema", "schema_version", "task_id", "atom_id", "contract_id",
+    "spec_route", "adoption_route", "consumer", "selected_fork",
+    "priority_disposition", "science_disposition", "deletion",
+    "frozen_a26", "retained_evidence", "rc001_freeze",
+    "forbidden_follow_ons", "terminal_outcomes", "claims",
+    "external_authority", "execution_controls", "project_sources_disposition"
+  ],
+  "properties": {
+    "schema": {"const": "smial.task30.h07-h01-liquidity-retention-park.policy"},
+    "schema_version": {"const": "1.0"},
+    "task_id": {"const": "TASK-30"},
+    "atom_id": {"const": "T30-A27_RETIRE_RC001_H07_H01_LIQUIDITY_RETENTION_V1"},
+    "contract_id": {"const": "CONTRACT-T30-A27-H07-H01-LIQUIDITY-RETENTION-PARK-001"},
+    "spec_route": {"const": "BOTH"},
+    "adoption_route": {"const": "WRAP_FROZEN_A26_OWNER_FORK"},
+    "consumer": {"const": "RC001-H07-H01-LIQUIDITY-RETENTION"},
+    "selected_fork": {"const": "RETIRE_RC001_H07_H01_LIQUIDITY_RETENTION"},
+    "priority_disposition": {"const": "PARKED_FROM_PRIORITY"},
+    "science_disposition": {"const": "RETAINED"},
+    "deletion": {"const": false},
+    "frozen_a26": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "path", "sha256", "required_terminal", "required_task_state",
+        "required_selected_fork_option"
+      ],
+      "properties": {
+        "path": {"const": "docs/evidence/task30/a26_h07_h01_owner_fork_packet_acceptance_v1.json"},
+        "sha256": {"const": "8d4755643c4f64f325e3d2986d928a93f9c1bf64e7694c47230440b8271aecd7"},
+        "required_terminal": {"const": "FIVE_DOLLAR_HELIUS_CANNOT_FALSIFY_OWNER_FORK_READY"},
+        "required_task_state": {"const": "BLOCKED_DATA"},
+        "required_selected_fork_option": {"const": "RETIRE_RC001_H07_H01_LIQUIDITY_RETENTION"}
+      }
+    },
+    "retained_evidence": {
+      "type": "array",
+      "minItems": 3,
+      "maxItems": 3,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["asset_id", "path", "sha256"],
+        "properties": {
+          "asset_id": {
+            "enum": [
+              "EVIDENCE-T30-A24-RAW-TO-PIT-001",
+              "EVIDENCE-T30-A25-H07-H01-MEASURABILITY-001",
+              "EVIDENCE-T30-A26-H07-H01-OWNER-FORK-001"
+            ]
+          },
+          "path": {"type": "string", "minLength": 20},
+          "sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"}
+        }
+      }
+    },
+    "rc001_freeze": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["path", "group_id", "required_definition_sha256", "mutation_authorized"],
+      "properties": {
+        "path": {"const": "configs/task28_rc001_registry_freeze_v1.yaml"},
+        "group_id": {"const": "RC001-H07-H01-LIQUIDITY-RETENTION"},
+        "required_definition_sha256": {"const": "14a7387148d05773dedcb5ad6a8110a0dcab7e49da4dec77328903a5b7577df7"},
+        "mutation_authorized": {"const": false}
+      }
+    },
+    "forbidden_follow_ons": {
+      "type": "array",
+      "minItems": 6,
+      "maxItems": 6,
+      "uniqueItems": true,
+      "items": {
+        "enum": [
+          "FREEZE_NOTIONAL_BUCKET_SET_V1",
+          "AUTHORIZE_VARIANCE_CALIBRATION_CAPTURE",
+          "ROUTE_FEASIBILITY_CAPTURE",
+          "H13_TRIAL",
+          "H02_H10_H14_TRIAL",
+          "PROVIDER_PURCHASE"
+        ]
+      }
+    },
+    "terminal_outcomes": {
+      "type": "array",
+      "minItems": 2,
+      "maxItems": 2,
+      "items": {
+        "enum": [
+          "RC001_H07_H01_PARKED_FROM_PRIORITY_SCIENCE_RETAINED",
+          "STOP_INTEGRITY_CONFLICT"
+        ]
+      }
+    },
+    "claims": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "parked_from_priority_only", "science_retained", "science_deleted",
+        "effect_estimate", "hypothesis_supported_or_refuted", "h07_h01_trial",
+        "h13_trial", "h02_trial", "route_feasibility", "execution",
+        "settlement", "pnl", "numeric_netreturn", "alpha",
+        "task30_acceptance", "task30_canonical_done",
+        "rc001_definition_changed", "notional_buckets_frozen"
+      ],
+      "properties": {
+        "parked_from_priority_only": {"const": true},
+        "science_retained": {"const": true},
+        "science_deleted": {"const": false},
+        "effect_estimate": {"const": false},
+        "hypothesis_supported_or_refuted": {"const": false},
+        "h07_h01_trial": {"const": false},
+        "h13_trial": {"const": false},
+        "h02_trial": {"const": false},
+        "route_feasibility": {"const": false},
+        "execution": {"const": false},
+        "settlement": {"const": false},
+        "pnl": {"const": false},
+        "numeric_netreturn": {"const": false},
+        "alpha": {"const": false},
+        "task30_acceptance": {"const": false},
+        "task30_canonical_done": {"const": false},
+        "rc001_definition_changed": {"const": false},
+        "notional_buckets_frozen": {"const": false}
+      }
+    },
+    "external_authority": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "basis", "owner_phrase", "provider_api_rpc_calls_authorized",
+        "credential_reads_authorized", "purchase_authorized"
+      ],
+      "properties": {
+        "basis": {"const": "EXPLICIT_OWNER_PHRASE"},
+        "owner_phrase": {"const": "OK T30-A26 RETIRE_RC001_H07_H01_LIQUIDITY_RETENTION"},
+        "provider_api_rpc_calls_authorized": {"const": 0},
+        "credential_reads_authorized": {"const": 0},
+        "purchase_authorized": {"const": false}
+      }
+    },
+    "execution_controls": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "retry", "fallback", "redirect", "pagination", "scheduler",
+        "background_process", "network", "credentials", "cash_spend"
+      ],
+      "properties": {
+        "retry": {"const": false},
+        "fallback": {"const": false},
+        "redirect": {"const": false},
+        "pagination": {"const": false},
+        "scheduler": {"const": false},
+        "background_process": {"const": false},
+        "network": {"const": false},
+        "credentials": {"const": false},
+        "cash_spend": {"const": false}
+      }
+    },
+    "project_sources_disposition": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["kind"],
+      "properties": {"kind": {"const": "NO_CHANGE"}}
+    }
+  }
+}

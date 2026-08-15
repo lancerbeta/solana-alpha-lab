@@ -21570,3 +21570,270 @@ records:
   evidence: []
   search_terms: [A26, FACTORY_FIT, FULL_REVIEW, WRAP, FIVE_DOLLAR]
   classification: {contains_secrets: false, contains_raw_data: false, sensitivity: INTERNAL_NON_SECRET}
+
+- asset_id: CONTRACT-T30-A27-H07-H01-LIQUIDITY-RETENTION-PARK-001
+  record_version: '1.0'
+  asset_type: control_document
+  purpose: Exact A27 contract parking RC001-H07-H01 from priority while retaining A24/A25/A26 science.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-08-15'
+  truth_owner: TASK-30
+  location: {kind: git_path, logical_uri: 'repo://docs/contracts/task30_a27_h07_h01_liquidity_retention_park_contract_v1.md', repository_path: docs/contracts/task30_a27_h07_h01_liquidity_retention_park_contract_v1.md}
+  integrity: {kind: sha256, sha256: f5272b4c3c45b09b4b4d5548579c035e467f8a55247e13f75590b70cfc713ff1}
+  access: {mode: read_only, method: file, network_required: false, secrets_required: false}
+  relations:
+  - {relation_type: derived_from, target_asset_id: EVIDENCE-T30-A26-H07-H01-OWNER-FORK-001}
+  - {relation_type: depends_on, target_asset_id: CONFIG-T28-RC001-REGISTRY-FREEZE-001}
+  consumers: [TASK-30, FACTORY-001]
+  evidence: []
+  search_terms: [A27, PARK, RETIRE, SCIENCE_RETAINED, BLOCKED_DATA]
+  classification: {contains_secrets: false, contains_raw_data: false, sensitivity: INTERNAL_NON_SECRET}
+
+- asset_id: CONFIG-T30-A27-H07-H01-LIQUIDITY-RETENTION-PARK-001
+  record_version: '1.0'
+  asset_type: configuration
+  purpose: Closed A27 policy binding the exact retire phrase, retained evidence hashes and forbidden follow-ons.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-08-15'
+  truth_owner: TASK-30
+  location: {kind: git_path, logical_uri: 'repo://configs/task30_a27_h07_h01_liquidity_retention_park_v1.yaml', repository_path: configs/task30_a27_h07_h01_liquidity_retention_park_v1.yaml}
+  integrity: {kind: sha256, sha256: e8cb2d25675542662b55c61d707f902622c49fe1d4b0ac3c6f03af1851359cd0}
+  access: {mode: read_only, method: file, network_required: false, secrets_required: false}
+  relations:
+  - {relation_type: governed_by, target_asset_id: CONTRACT-T30-A27-H07-H01-LIQUIDITY-RETENTION-PARK-001}
+  - {relation_type: depends_on, target_asset_id: EVIDENCE-T30-A26-H07-H01-OWNER-FORK-001}
+  consumers: [TASK-30, FACTORY-001]
+  evidence: []
+  search_terms: [A27, POLICY, PARKED_FROM_PRIORITY, ZERO_PROVIDER]
+  classification: {contains_secrets: false, contains_raw_data: false, sensitivity: INTERNAL_NON_SECRET}
+
+- asset_id: SCHEMA-T30-A27-H07-H01-LIQUIDITY-RETENTION-PARK-001
+  record_version: '1.0'
+  asset_type: schema
+  purpose: Closed JSON Schema for the A27 park-from-priority policy.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-08-15'
+  truth_owner: TASK-30
+  location: {kind: git_path, logical_uri: 'repo://catalog/schemas/task30_a27_h07_h01_liquidity_retention_park.schema.json', repository_path: catalog/schemas/task30_a27_h07_h01_liquidity_retention_park.schema.json}
+  integrity: {kind: sha256, sha256: 2c3b2da21008085a4e87050c36d108edf95b5bb85919214087c7f476019a4579}
+  access: {mode: read_only, method: file, network_required: false, secrets_required: false}
+  relations: [{relation_type: governed_by, target_asset_id: CONTRACT-T30-A27-H07-H01-LIQUIDITY-RETENTION-PARK-001}]
+  consumers: [TASK-30, FACTORY-001]
+  evidence: []
+  search_terms: [A27, CLOSED_SCHEMA, PARK, RETAINED]
+  classification: {contains_secrets: false, contains_raw_data: false, sensitivity: INTERNAL_NON_SECRET}
+
+- asset_id: FIXTURE-T30-A27-H07-H01-LIQUIDITY-RETENTION-PARK-001
+  record_version: '1.0'
+  asset_type: evidence
+  purpose: Secret-free A27 expectation fixture for the park-from-priority verdict.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-08-15'
+  truth_owner: TASK-30
+  location: {kind: git_path, logical_uri: 'repo://tests/fixtures/task30/h07_h01_liquidity_retention_park_v1.json', repository_path: tests/fixtures/task30/h07_h01_liquidity_retention_park_v1.json}
+  integrity: {kind: sha256, sha256: 6e124d1ce7f445ef0b78a2b357ac0dfd90dd2236134833c5c0cf0bcf896f6d3b}
+  access: {mode: read_only, method: file, network_required: false, secrets_required: false}
+  relations: [{relation_type: governed_by, target_asset_id: CONTRACT-T30-A27-H07-H01-LIQUIDITY-RETENTION-PARK-001}]
+  consumers: [TASK-30, FACTORY-001]
+  evidence: []
+  search_terms: [A27, FIXTURE, PARKED_FROM_PRIORITY, BLOCKED_DATA]
+  classification: {contains_secrets: false, contains_raw_data: false, sensitivity: INTERNAL_NON_SECRET}
+
+- asset_id: MODULE-T30-A27-H07-H01-LIQUIDITY-RETENTION-PARK-001
+  record_version: '1.0'
+  asset_type: script
+  purpose: Fail-closed wrap of frozen A26 that parks H07/H01 without deleting science.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-08-15'
+  truth_owner: TASK-30
+  location: {kind: git_path, logical_uri: 'repo://src/solana_alpha_lab/task30_h07_h01_liquidity_retention_park.py', repository_path: src/solana_alpha_lab/task30_h07_h01_liquidity_retention_park.py}
+  integrity: {kind: sha256, sha256: 993d2906c01b416ebe15a9bf63ddd30e8cbf8f353316f7c85e32bda0fb4a5a35}
+  access: {mode: read_only, method: file, network_required: false, secrets_required: false}
+  relations:
+  - {relation_type: governed_by, target_asset_id: CONTRACT-T30-A27-H07-H01-LIQUIDITY-RETENTION-PARK-001}
+  - {relation_type: depends_on, target_asset_id: CONFIG-T30-A27-H07-H01-LIQUIDITY-RETENTION-PARK-001}
+  - {relation_type: validated_by, target_asset_id: TEST-T30-A27-H07-H01-LIQUIDITY-RETENTION-PARK-001}
+  consumers: [TASK-30, FACTORY-001]
+  evidence: []
+  search_terms: [A27, MODULE, PARK, SCIENCE_RETAINED, ZERO_PROVIDER]
+  classification: {contains_secrets: false, contains_raw_data: false, sensitivity: INTERNAL_NON_SECRET}
+
+- asset_id: SCRIPT-T30-A27-H07-H01-LIQUIDITY-RETENTION-PARK-001
+  record_version: '1.0'
+  asset_type: script
+  purpose: Offline runner that emits the A27 runtime receipt, acceptance and Russian owner readout.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-08-15'
+  truth_owner: TASK-30
+  location: {kind: git_path, logical_uri: 'repo://scripts/run_task30_a27_h07_h01_liquidity_retention_park.py', repository_path: scripts/run_task30_a27_h07_h01_liquidity_retention_park.py}
+  integrity: {kind: sha256, sha256: 31a62673c73f3b9dde4c35fd443fdc78d1da33d0c2ce94400844cd94a96e9adc}
+  access: {mode: read_only, method: file, network_required: false, secrets_required: false}
+  relations:
+  - {relation_type: depends_on, target_asset_id: MODULE-T30-A27-H07-H01-LIQUIDITY-RETENTION-PARK-001}
+  - {relation_type: governed_by, target_asset_id: CONTRACT-T30-A27-H07-H01-LIQUIDITY-RETENTION-PARK-001}
+  consumers: [TASK-30, FACTORY-001]
+  evidence: []
+  search_terms: [A27, RUNNER, OFFLINE, OWNER_READOUT]
+  classification: {contains_secrets: false, contains_raw_data: false, sensitivity: INTERNAL_NON_SECRET}
+
+- asset_id: TEST-T30-A27-H07-H01-LIQUIDITY-RETENTION-PARK-001
+  record_version: '1.0'
+  asset_type: script
+  purpose: Targeted tests that H07/H01 is parked from priority and A24/A25/A26 science is retained.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-08-15'
+  truth_owner: TASK-30
+  location: {kind: git_path, logical_uri: 'repo://tests/test_task30_a27_h07_h01_liquidity_retention_park.py', repository_path: tests/test_task30_a27_h07_h01_liquidity_retention_park.py}
+  integrity: {kind: sha256, sha256: b62266b6f9337904f833b2ed2c991f08ea0859a8f5b868061cfdf427b0348341}
+  access: {mode: read_only, method: file, network_required: false, secrets_required: false}
+  relations:
+  - {relation_type: depends_on, target_asset_id: CONFIG-T30-A27-H07-H01-LIQUIDITY-RETENTION-PARK-001}
+  - {relation_type: depends_on, target_asset_id: SCHEMA-T30-A27-H07-H01-LIQUIDITY-RETENTION-PARK-001}
+  - {relation_type: depends_on, target_asset_id: MODULE-T30-A27-H07-H01-LIQUIDITY-RETENTION-PARK-001}
+  - {relation_type: depends_on, target_asset_id: FIXTURE-T30-A27-H07-H01-LIQUIDITY-RETENTION-PARK-001}
+  consumers: [TASK-30, FACTORY-001]
+  evidence: []
+  search_terms: [A27, TEST, PARK, FAIL_CLOSED]
+  classification: {contains_secrets: false, contains_raw_data: false, sensitivity: INTERNAL_NON_SECRET}
+
+- asset_id: EVIDENCE-T30-A27P-H07-H01-LIQUIDITY-RETENTION-PARK-001
+  record_version: '1.0'
+  asset_type: evidence
+  purpose: Runtime receipt for the A27 park-from-priority decision.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-08-15'
+  truth_owner: TASK-30
+  location: {kind: git_path, logical_uri: 'repo://docs/evidence/task30/a27_h07_h01_liquidity_retention_park_runtime_receipt_v1.json', repository_path: docs/evidence/task30/a27_h07_h01_liquidity_retention_park_runtime_receipt_v1.json}
+  integrity: {kind: sha256, sha256: 5c171144980f38c2d29e8e6651fa6effda1a2e187668fd1586d18712273d14d2}
+  access: {mode: read_only, method: file, network_required: false, secrets_required: false}
+  relations:
+  - {relation_type: derived_from, target_asset_id: CONFIG-T30-A27-H07-H01-LIQUIDITY-RETENTION-PARK-001}
+  - {relation_type: validated_by, target_asset_id: TEST-T30-A27-H07-H01-LIQUIDITY-RETENTION-PARK-001}
+  consumers: [TASK-30, FACTORY-001, GOAL-OWNER]
+  evidence: []
+  search_terms: [A27, RUNTIME, PARKED_FROM_PRIORITY, SCIENCE_RETAINED]
+  classification: {contains_secrets: false, contains_raw_data: false, sensitivity: INTERNAL_NON_SECRET}
+
+- asset_id: REPORT-T30-A27-H07-H01-LIQUIDITY-RETENTION-PARK-001
+  record_version: '1.0'
+  asset_type: control_document
+  purpose: Russian owner readout that H07/H01 is parked from priority and science is retained.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-08-15'
+  truth_owner: TASK-30
+  location: {kind: git_path, logical_uri: 'repo://docs/reports/task30/a27_h07_h01_liquidity_retention_park_owner_readout_v1.md', repository_path: docs/reports/task30/a27_h07_h01_liquidity_retention_park_owner_readout_v1.md}
+  integrity: {kind: sha256, sha256: aac5d5b321f99f5ffaf13de35263feff367c9fe5200d4fedb2b66a392dc2358c}
+  access: {mode: read_only, method: file, network_required: false, secrets_required: false}
+  relations: [{relation_type: derived_from, target_asset_id: EVIDENCE-T30-A27P-H07-H01-LIQUIDITY-RETENTION-PARK-001}]
+  consumers: [TASK-30, FACTORY-001, GOAL-OWNER]
+  evidence: []
+  search_terms: [A27, READOUT, PARK, BLOCKED_DATA]
+  classification: {contains_secrets: false, contains_raw_data: false, sensitivity: INTERNAL_NON_SECRET}
+
+- asset_id: EVIDENCE-T30-A27-H07-H01-LIQUIDITY-RETENTION-PARK-001
+  record_version: '1.0'
+  asset_type: evidence
+  purpose: Acceptance that RC001-H07-H01 is parked from priority; TASK-30 stays BLOCKED_DATA.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-08-15'
+  truth_owner: TASK-30
+  location: {kind: git_path, logical_uri: 'repo://docs/evidence/task30/a27_h07_h01_liquidity_retention_park_acceptance_v1.json', repository_path: docs/evidence/task30/a27_h07_h01_liquidity_retention_park_acceptance_v1.json}
+  integrity: {kind: sha256, sha256: b85ee3ff0a7553014977613c624f2295fee3082f7f6c9f5ddf4fa3d6fb64aa42}
+  access: {mode: read_only, method: file, network_required: false, secrets_required: false}
+  relations:
+  - {relation_type: derived_from, target_asset_id: CONTRACT-T30-A27-H07-H01-LIQUIDITY-RETENTION-PARK-001}
+  - {relation_type: depends_on, target_asset_id: EVIDENCE-T30-A27P-H07-H01-LIQUIDITY-RETENTION-PARK-001}
+  - {relation_type: validated_by, target_asset_id: TEST-T30-A27-H07-H01-LIQUIDITY-RETENTION-PARK-001}
+  consumers: [TASK-30, RC001-H07-H01-LIQUIDITY-RETENTION, FACTORY-001, GOAL-OWNER]
+  evidence: []
+  search_terms: [A27, ACCEPTANCE, PARKED_FROM_PRIORITY, BLOCKED_DATA]
+  classification: {contains_secrets: false, contains_raw_data: false, sensitivity: INTERNAL_NON_SECRET}
+
+- asset_id: CTRL-TASK-30-A27-001
+  record_version: '1.0'
+  asset_type: control_document
+  purpose: Harness-valid A27 task contract binding exact authority, branch, write set, stop conditions and DoD.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-08-15'
+  truth_owner: TASK-30
+  location: {kind: git_path, logical_uri: 'repo://docs/tasks/TASK-30-a27-h07-h01-liquidity-retention-park.md', repository_path: docs/tasks/TASK-30-a27-h07-h01-liquidity-retention-park.md}
+  integrity: {kind: sha256, sha256: 591647cde19e2811aaba8d12d3b7d86e7f2ae3421e6e489af504fd343fea99d9}
+  access: {mode: read_only, method: file, network_required: false, secrets_required: false}
+  relations:
+  - {relation_type: contains, target_asset_id: CONTRACT-T30-A27-H07-H01-LIQUIDITY-RETENTION-PARK-001}
+  - {relation_type: contains, target_asset_id: SCRIPT-T30-A27-H07-H01-LIQUIDITY-RETENTION-PARK-001}
+  - {relation_type: depends_on, target_asset_id: EVIDENCE-T30-A26-H07-H01-OWNER-FORK-001}
+  consumers: [TASK-30, FACTORY-001]
+  evidence: []
+  search_terms: [A27, TASK_CONTRACT, PARK, IMPLEMENTED_UNVERIFIED]
+  classification: {contains_secrets: false, contains_raw_data: false, sensitivity: INTERNAL_NON_SECRET}
+
+- asset_id: EVIDENCE-T30-A27-DELIVERY-COMPLETION-001
+  record_version: '1.0'
+  asset_type: evidence
+  purpose: Guard-consumable completion evidence binding the exact A27 delivery inventory without TASK-30 promotion.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-08-15'
+  truth_owner: TASK-30
+  location: {kind: git_path, logical_uri: 'repo://docs/evidence/task30/a27_delivery_completion_evidence_v1.json', repository_path: docs/evidence/task30/a27_delivery_completion_evidence_v1.json}
+  integrity: {kind: none, note: 'Content integrity is owned by the live completion-review-fit hash chain; embedding its SHA here would create an indirect self-reference through the reviewed inventory.'}
+  access: {mode: read_only, method: file, network_required: false, secrets_required: false}
+  relations:
+  - {relation_type: derived_from, target_asset_id: EVIDENCE-T30-A27-H07-H01-LIQUIDITY-RETENTION-PARK-001}
+  - {relation_type: depends_on, target_asset_id: EVIDENCE-T30-A27-DELIVERY-INDEPENDENT-REVIEW-001}
+  - {relation_type: depends_on, target_asset_id: EVIDENCE-T30-A27-DELIVERY-FACTORY-FIT-001}
+  - {relation_type: depends_on, target_asset_id: SCHEMA-DELIVERY-COMPLETION-EVIDENCE-001}
+  consumers: [TASK-30, FACTORY-001, GOAL-OWNER]
+  evidence: []
+  search_terms: [A27, DELIVERY_COMPLETION, PARK, BLOCKED_DATA]
+  classification: {contains_secrets: false, contains_raw_data: false, sensitivity: INTERNAL_NON_SECRET}
+
+- asset_id: EVIDENCE-T30-A27-DELIVERY-INDEPENDENT-REVIEW-001
+  record_version: '1.0'
+  asset_type: evidence
+  purpose: Required-role review evidence bound to the exact non-self-referential A27 inventory.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-08-15'
+  truth_owner: TASK-30
+  location: {kind: git_path, logical_uri: 'repo://docs/evidence/task30/a27_delivery_independent_review_v1.json', repository_path: docs/evidence/task30/a27_delivery_independent_review_v1.json}
+  integrity: {kind: none, note: 'Content integrity is owned by the live completion-review-fit hash chain; embedding its SHA here would create an indirect self-reference through the reviewed inventory.'}
+  access: {mode: read_only, method: file, network_required: false, secrets_required: false}
+  relations:
+  - {relation_type: derived_from, target_asset_id: EVIDENCE-T30-A27-H07-H01-LIQUIDITY-RETENTION-PARK-001}
+  - {relation_type: depends_on, target_asset_id: SCHEMA-DELIVERY-INDEPENDENT-REVIEW-EVIDENCE-001}
+  consumers: [TASK-30, FACTORY-001, GOAL-OWNER]
+  evidence: []
+  search_terms: [A27, INDEPENDENT_REVIEW, SINGLE_AGENT_REVIEW_FALLBACK, PARK]
+  classification: {contains_secrets: false, contains_raw_data: false, sensitivity: INTERNAL_NON_SECRET}
+
+- asset_id: EVIDENCE-T30-A27-DELIVERY-FACTORY-FIT-001
+  record_version: '1.0'
+  asset_type: evidence
+  purpose: FULL Factory Fit review for A27 mission, research truth, owner operability, wrap-versus-buy, security and red team.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-08-15'
+  truth_owner: TASK-30
+  location: {kind: git_path, logical_uri: 'repo://docs/evidence/task30/a27_delivery_factory_fit_v1.json', repository_path: docs/evidence/task30/a27_delivery_factory_fit_v1.json}
+  integrity: {kind: none, note: 'Content integrity is owned by the live completion-review-fit hash chain; embedding its SHA here would create an indirect self-reference through the reviewed inventory.'}
+  access: {mode: read_only, method: file, network_required: false, secrets_required: false}
+  relations:
+  - {relation_type: derived_from, target_asset_id: EVIDENCE-T30-A27-H07-H01-LIQUIDITY-RETENTION-PARK-001}
+  - {relation_type: depends_on, target_asset_id: EVIDENCE-T30-A27-DELIVERY-INDEPENDENT-REVIEW-001}
+  consumers: [TASK-30, FACTORY-001, GOAL-OWNER]
+  evidence: []
+  search_terms: [A27, FACTORY_FIT, FULL_REVIEW, PARK, SCIENCE_RETAINED]
+  classification: {contains_secrets: false, contains_raw_data: false, sensitivity: INTERNAL_NON_SECRET}
