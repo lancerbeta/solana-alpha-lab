@@ -1,0 +1,100 @@
+schema: smial.task36.rc002-h11-lifecycle-clock-screen.policy
+schema_version: '1.0'
+task_id: TASK-36
+atom_id: T36-A1_RC002_H11_LIFECYCLE_CLOCK_MECHANISM_SCREEN_V1
+contract_id: CONTRACT-T36-RC002-H11-LIFECYCLE-CLOCK-001
+spec_route: BOTH
+adoption_route: ADOPT_EXISTING_LIFECYCLE_HELIUS_PUMPSWAP_HISTORY
+consumer: RC002-H11-LIFECYCLE-CLOCK
+research_cycle:
+  research_cycle_id: RESEARCH-CYCLE-RC002-001
+  task_owned_register_id: TASK36-RC002-REGISTER-001
+  register_kind: TASK_OWNED_CONFIG_EVIDENCE
+  title: RC-002 H11 lifecycle-clock exploratory mechanism screen
+  status: EXPLORATORY_SCREEN
+  definition_owner: TASK-36
+  retrofit_into_rc001: false
+screen_protocol:
+  family: H11_LIFECYCLE_CLOCK
+  stage: EXPLORATORY_MECHANISM_SCREEN
+  data_semantics: RETROSPECTIVE_EVENT_TIME_RECONSTRUCTION
+  live_PIT_claim: false
+  execution_claim: false
+  universe: CONFIRMED_POST_MIGRATION_POOLS_OUTCOME_INDEPENDENT_CONTIGUOUS_WINDOW
+  include_fast_deaths: true
+  include_inactive_paths: true
+  missing_as_typed_gaps: true
+  primary_features:
+    - time_since_migration
+    - time_since_decision_time_running_peak
+  baseline: COARSE_UTC_AND_SESSION
+  primary_question: Do lifecycle-relative clocks add stable OOS information beyond wall-clock/session alone?
+  parameter_search: false
+  ml_search: false
+  missing_to_zero_or_flat: false
+  random_row_split: false
+  convert_event_time_to_available_to_strategy_at: false
+  time_since_migration_bin_edges_seconds: [300, 900, 3600]
+  peak_age_bin_edges_seconds: [120, 600]
+  outcome_horizon_seconds: 900
+  outcome_classes: [FAST_DEATH, INACTIVE_TYPED_GAP, CONTINUATION]
+  chronological_group_aware_split: true
+  minimum_raw_n: 24
+  minimum_independent_units:
+    pools: 8
+    days: 2
+    deployers: 2
+  incremental_g_threshold: 5.99
+  max_single_unit_share: 0.5
+rc001_freeze:
+  path: configs/task28_rc001_registry_freeze_v1.yaml
+  sha256: c4fbb7157a13d1dee0f2b1f163e8f8fc1a38da4bc850275fba25bc0d70a785a7
+  mutation_authorized: false
+  remaining_families_deprioritized: true
+  required_definition_sha256:
+    RC001-H13-COMPOSITE-VETO: f1f020f4fa79acd2f2de667d71b8002d5821f45e9070a0f259c63210b23a16d0
+    RC001-H07-H01-LIQUIDITY-RETENTION: 14a7387148d05773dedcb5ad6a8110a0dcab7e49da4dec77328903a5b7577df7
+    RC001-H02-H10-H14-PULLBACK-RECLAIM: fc225417541570aa73814a4cb992f6f801a84bea1baf15696d754c706e0aa9f8
+holdout_guard:
+  path: registries/holdout_consumption.yaml
+  sha256: 863d68e53861c4aa30f6afa1a512ec5ab84c8966273cee6d42ca1519ef5fa07a
+historical_sources:
+  - source_id: TASK08_LIFECYCLE
+    path: docs/evidence/task08/lifecycle_discovery_probe_execution_receipt_v1.json
+    sha256: 33a3f0b90de36c1543ee605eccc07685798f1b2e08ee6a5f494345d5cb19df40
+  - source_id: TASK09_PUMPSWAP
+    path: docs/evidence/task09/pumpswap_touch_probe_execution_receipt_v1.json
+    sha256: 8e9c066671ec8a0334d7cf41cf2cb5a725a836ad0c7c3f473b0e35902a16f0ee
+  - source_id: TASK21_SAMPLE
+    path: docs/evidence/task21/effective_sample_summary_v1.json
+    sha256: 63ddb790dcd54191ac342aa8add5889c8647d2cf09d91c4d9ca14c67ca8b51fb
+  - source_id: TASK30_A24
+    path: docs/evidence/task30/a24_raw_to_pit_admissibility_acceptance_v1.json
+    sha256: 257e81801afbfa3ba6bf64e8c25b41009e560bb168e9a01d92c606ca4bcdb183
+terminal_outcomes:
+  - H11_SCREEN_NEGATIVE_DEPRIORITIZE_OR_CLOSE
+  - H11_SCREEN_POSITIVE_EARNS_PROSPECTIVE_CONFIRMATION
+  - H11_SCREEN_INCONCLUSIVE_DATA_SCALE
+  - HISTORICAL_ROUTE_INADEQUATE_REPLAN
+  - STOP_INTEGRITY_CONFLICT
+claims:
+  exploratory_mechanism_screen_only: true
+  live_pit: false
+  execution: false
+  alpha: false
+  numeric_netreturn: false
+  rc001_definition_changed: false
+  holdout_consumed: false
+  prospective_collector: false
+  h13_trial: false
+  h02_trial: false
+external_authority:
+  network: false
+  credentials: false
+  cash_spend: false
+  paid_plan: false
+  provider_routes_max: 1
+  wallet_signer_transaction: false
+  deployment: false
+project_sources_disposition:
+  kind: NO_CHANGE

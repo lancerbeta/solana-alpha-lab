@@ -1,0 +1,83 @@
+{
+  "schema": "smial.delivery-completion-evidence",
+  "schema_version": "1.0",
+  "acceptance_id": "T36-A1-DELIVERY-COMPLETION-001",
+  "as_of": "2026-08-15",
+  "task_id": "TASK-36",
+  "state_change": "H11_SCREEN_HISTORICAL_ROUTE_INADEQUATE_REPLAN_RC002_OPENED_NO_RC001_MUTATION",
+  "base_main": "ea90d5152d06719224cbf971116584452494a0ef",
+  "cloud_bundle_mode": "OWNER_MANAGED_OPTIONAL_EXPORT",
+  "cloud_bundle_required_by_harness": false,
+  "cloud_bundle_smoke_required": false,
+  "project_sources_disposition": {
+    "kind": "NO_CHANGE"
+  },
+  "capability_radar_now": "NONE",
+  "implementation_bindings": {
+    "catalog/assets/core.yaml": "f96ef5c9305d453fd5ce0a91ad1285d211bbe20966589fbfe27054053194e57f",
+    "docs/evidence/task28/a1_rc001_registry_freeze_acceptance_v1.json": "cb786b8f2a2424a836feff1e6c80a3f463d674d829d287de9ca4151fa4c433d5",
+    "catalog/assets/lifecycle.yaml": "6fc8b74a37caa01ab1b07e0a7516fbd64ad1535c55bbcbff11b4f04de572b80f",
+    "catalog/catalog_manifest.yaml": "a1bbb9ac446191463e2231de4810fb3c4a4762b800dd96ec4e209148680e32e6",
+    "catalog/generated/asset_edges.json": "6dcbc4778903a379d77e744884cb9484d52089166e553f3ff259af2400728be9",
+    "catalog/schemas/task36_rc002_h11_lifecycle_clock_screen.schema.json": "5e846f0b044ae52faeb50d3ee2af676f81de3c4e443e106a3bb9fbc63f84f966",
+    "configs/task36_rc002_h11_lifecycle_clock_screen_v1.yaml": "bd2ce1e016e8f8d48265c6651ea1f287a4868d22f195c85524db75952e5014f0",
+    "docs/PROJECT_MAP.md": "922cc4d9fa4be3739d3d48aef49dbd759ce57984773bf9c22a32a11e5ade3794",
+    "docs/contracts/task36_rc002_h11_lifecycle_clock_screen_contract_v1.md": "495c70ff346d2da727a92106bcd18657d8d489cceca68008e088f59fbaa28e90",
+    "docs/evidence/task36/a1_h11_lifecycle_clock_screen_acceptance_v1.json": "bdad6edb129c2ae626c52e4f135c93953941eef32c12ec6917060d0bf6b3c7de",
+    "docs/evidence/task36/a1_h11_lifecycle_clock_screen_runtime_receipt_v1.json": "7cd6952156682bba773855097c39be67b584969a44624ae25bd5e9da2dbf9971",
+    "docs/reports/task36/a1_h11_lifecycle_clock_screen_owner_readout_v1.md": "0b0e88098a6154ab54ea985aefd7c3756f734db0eebf5537f3cbd39167c589b2",
+    "docs/tasks/TASK-36-rc002-h11-lifecycle-clock-mechanism-screen.md": "39175c5eb07fdec3f1fe01218707cfe02db9e9673f38174f06839a1a411f9dc6",
+    "registries/decisions_negative_results.yaml": "c2f72fed03730959c5d101f5e3d0606c2cf324a43982e15a589ae6bf93ac738c",
+    "registries/global_trial_ledger.yaml": "bae08185c59b62792a2f30db8839132316e60ecd3f2eb831d753a9b178b7478a",
+    "scripts/run_task36_rc002_h11_lifecycle_clock_screen.py": "ca4382173f5f525ae7b876f8c556fa9a520cdbfae0dab4014732452348c6bbde",
+    "src/solana_alpha_lab/task36_h11_lifecycle_clock_screen.py": "6667d35a09c125400b091ddc3c1ef3af39de70b0c7f9dc3d8ab03cfc46080313",
+    "tests/fixtures/task28/rc001_registry_freeze_v1.json": "2e23fb6dd02e3c6938a063ffc2f2e27bb3bb977c00f60614382d99f133a92df4",
+    "tests/fixtures/task36/h11_lifecycle_clock_screen_v1.json": "c2733fbed0bda82f0080220893cc25c9bd7dd434e3ea4a78e0f7daeddf5c13e3",
+    "tests/test_catalog.py": "fac299ef101bfae180cab4500e660007770cc58a8ef2d83063a649f8b60d2c17",
+    "tests/test_lifecycle_registries.py": "a1e5cc748ea43ab59c1c5a5e5fb59578397f4a04d419de86d5f3cf46b785b08d",
+    "tests/test_task23_catalog_repository_factory_fit.py": "b385ed54b0ac919e3cbe549f2b3d9d4fc6764137beaa739899e3906439d7adbb",
+    "tests/test_task36_rc002_h11_lifecycle_clock_screen.py": "8b3bfeeba6834df72b39c2dd9f3d588aa6e821eb276a8b55408a0983d13190e7"
+  },
+  "active_stop_conditions": [],
+  "owner_attention_triggers": {
+    "auth_or_access_recovery": false,
+    "material_owner_decision": false,
+    "user_only_activation": false,
+    "external_material_action": false,
+    "unresolved_safety_or_truth_conflict": false
+  },
+  "factory_fit": {
+    "path": "docs/evidence/task36/a1_delivery_factory_fit_v1.json",
+    "sha256": "612fb5acbe00d84e03047e80b304e484085f3829564fce91538f50cec2632128",
+    "verdict": "PASS"
+  },
+  "validation": {
+    "targeted": "PASS_H11_PROTOCOL_CATALOG_AND_LIFECYCLE_TESTS",
+    "independent_review": {
+      "path": "docs/evidence/task36/a1_delivery_independent_review_v1.json",
+      "sha256": "bdf4e2e653b927d969946df4e4c67aaa1a5ddafde21bbb337e034ba9271a016b",
+      "verdict": "PASS"
+    },
+    "full_gate": "ENFORCED_BY_PROJECT_BOUND_VALIDATION",
+    "github_ci": "ENFORCED_LIVE_AT_GUARDED_MERGE",
+    "project_checks": [
+      "PASS_GENERATED_NAVIGATION_SECRET_AND_CATALOG_CHECKS"
+    ]
+  },
+  "non_claims": [
+    "NO_TASK36_CANONICAL_DONE",
+    "NO_RC001_PROMOTION_OR_DEFINITION_CHANGE",
+    "NO_LIVE_PIT_OR_EXECUTION_CLAIM",
+    "NO_ALPHA_PNL_OR_NETRETURN",
+    "NO_H13_OR_H02_TRIAL",
+    "NO_PROVIDER_CALL_OR_PURCHASE"
+  ],
+  "side_effects": {
+    "credential_reads": 0,
+    "provider_requests": 0,
+    "retries": 0,
+    "fallbacks": 0,
+    "cash_spend_usd_cents": 0,
+    "wallet_signer_transaction_actions": 0
+  }
+}
