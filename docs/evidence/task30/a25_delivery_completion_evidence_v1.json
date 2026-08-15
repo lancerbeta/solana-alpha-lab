@@ -13,7 +13,27 @@
     "kind": "NO_CHANGE"
   },
   "capability_radar_now": "NONE",
-  "implementation_bindings": {},
+  "implementation_bindings": {
+    "catalog/assets/core.yaml": "44df47f3beeabaffe395999d557136244560c892c83a86f25988d24219b35943",
+    "catalog/assets/lifecycle.yaml": "55fde2d830e55fa7bf4f848ee71155ee575f8346f883787aaf14c6e0aa9c33ce",
+    "catalog/catalog_manifest.yaml": "734f51e7e954a3f69c1f3a306498757cdc202c48bbe89876111433df0cf72aa7",
+    "catalog/generated/asset_edges.json": "acb2d3a9d8a78f86bef5f8092c7c8e630b7c7f63200cfec3665fb5cf6e288916",
+    "catalog/schemas/task30_a25_h07_h01_limited_diagnostic.schema.json": "a6a07755ce7e8599d5e10c2f700fb0613aa55a598612dbe30807c3928a4b0da8",
+    "configs/task30_a25_h07_h01_limited_diagnostic_v1.yaml": "3cb8c0f391f17d1acef06db9ec36c3ac10f5956569f968ddef746e9034b92e2a",
+    "docs/PROJECT_MAP.md": "6dba7f79673325b4224ee98a59880a6e47109866b92647377183770bfd5beec5",
+    "docs/contracts/task30_a25_h07_h01_limited_diagnostic_contract_v1.md": "07935b4baa7224ebff2b76ead84d609a302debe511bd4d8c7826cd881b80efdd",
+    "docs/evidence/task30/a25_h07_h01_limited_diagnostic_acceptance_v1.json": "c29ecd424e4c2276259ffc05aec6fb8058b53469a30c763db972c0581f84ceca",
+    "docs/evidence/task30/a25_h07_h01_limited_diagnostic_runtime_receipt_v1.json": "019680a841e69bb0b76b195ad1b739e09143bb6b6d9bb8e7db85d92cf23da81e",
+    "docs/reports/task30/a25_h07_h01_limited_diagnostic_owner_readout_v1.md": "09552f5435807a9e5f421d15d3331c8eef7b4436570e88c62c591c999b950ddd",
+    "docs/tasks/TASK-30-a25-h07-h01-limited-diagnostic.md": "992d21d9c5873f723cf8820fcf346229a52428b6a641a031f905808827750489",
+    "registries/decisions_negative_results.yaml": "874084d61becf0c01ebdc43bbcb54f78f0bbb454bf29f81e49ad80a7e6b0601c",
+    "scripts/run_task30_a25_h07_h01_limited_diagnostic.py": "1f02857455374165ba55ac84e5c639e3c9c7b33bf41fd535936696630cb96f64",
+    "src/solana_alpha_lab/task30_h07_h01_limited_diagnostic.py": "0980f1710810ffd120d860d8706f303cce25ad7f3ff4940b2892c14986a957bb",
+    "tests/fixtures/task30/h07_h01_limited_diagnostic_v1.json": "595f3588faa21a4f92d540b358788325c75a99079671710a018b6c49d93a28bb",
+    "tests/test_catalog.py": "ae7a96fddf4d3e258664414e03c3ef9546ac30641ebfa608de4c353d75761f43",
+    "tests/test_lifecycle_registries.py": "eb725885c669be38bbc039c7e6d3936aee17a8af336ccffbb8e9fbb2c2925c39",
+    "tests/test_task30_a25_h07_h01_limited_diagnostic.py": "b66eaf5093cd9e3f58dcc2056a2083cf8fc6bfdb077228d46f311b9bca36b93a"
+  },
   "active_stop_conditions": [],
   "owner_attention_triggers": {
     "auth_or_access_recovery": false,
@@ -24,14 +44,14 @@
   },
   "factory_fit": {
     "path": "docs/evidence/task30/a25_delivery_factory_fit_v1.json",
-    "sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+    "sha256": "6119c18e516e4550f0e3630a9031f6ca7ce50613bf4115396f091db0816500cd",
     "verdict": "PASS"
   },
   "validation": {
-    "targeted": "PASS_51_A25_A24_PROBE_AND_RC001_FREEZE_TESTS",
+    "targeted": "PASS_75_A25_A24_PROBE_RC001_CATALOG_AND_LIFECYCLE_TESTS",
     "independent_review": {
       "path": "docs/evidence/task30/a25_delivery_independent_review_v1.json",
-      "sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+      "sha256": "545f31ccfbdf253113553352d58d5fa0beb0022f23433b1877493f5db6b40fe2",
       "verdict": "PASS"
     },
     "full_gate": "ENFORCED_BY_PROJECT_BOUND_VALIDATION",
