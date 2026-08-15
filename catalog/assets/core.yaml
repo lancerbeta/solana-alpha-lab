@@ -13138,7 +13138,7 @@ records:
     repository_path: tests/test_task23_catalog_repository_factory_fit.py
   integrity:
     kind: sha256
-    sha256: fd1a4967432debd83f134061b193685f8168282c223a0029683fb3db0a3b581b
+    sha256: 68f6aaf9607020cfedafd12da2c43632212dd9b766b5a5887acd7a40653fe5e1
   access: *t23_read_file
   relations:
   - relation_type: depends_on
@@ -16602,7 +16602,7 @@ records:
   as_of: '2026-08-09'
   truth_owner: TASK-28
   location: {kind: git_path, logical_uri: 'repo://tests/fixtures/task28/rc001_registry_freeze_v1.json', repository_path: tests/fixtures/task28/rc001_registry_freeze_v1.json}
-  integrity: {kind: sha256, sha256: 7056d3b6975ba573e1d7fa0c3a0544d287d718dcf4e82ecfbb22514adbfa912e}
+  integrity: {kind: sha256, sha256: d3565a484a2085498bb326610de5a3f12f3cbefffa7ea3af8bee4e6ac7a341e4}
   access: *t25_read_file
   relations: [{relation_type: derived_from, target_asset_id: CONFIG-T28-RC001-REGISTRY-FREEZE-001}]
   consumers: [TASK-28, FACTORY-001]
@@ -16656,7 +16656,7 @@ records:
   as_of: '2026-08-09'
   truth_owner: TASK-28
   location: {kind: git_path, logical_uri: 'repo://docs/evidence/task28/a1_rc001_registry_freeze_acceptance_v1.json', repository_path: docs/evidence/task28/a1_rc001_registry_freeze_acceptance_v1.json}
-  integrity: {kind: sha256, sha256: 46df7e54c39e70689a8fbd4c7f9de20df7ada47e93498cd80d751ab86d23e3da}
+  integrity: {kind: sha256, sha256: a23c643b2b2d5a9ed92cb4d212c5d4552e674b38c6a026d7eeae58a1e93fd617}
   access: *t25_read_file
   relations:
   - {relation_type: derived_from, target_asset_id: MODULE-T28-RC001-REGISTRY-FREEZE-001}
@@ -22631,4 +22631,268 @@ records:
   consumers: [TASK-38, FACTORY-001, GOAL-OWNER]
   evidence: []
   search_terms: [H11, FACTORY_FIT, FULL_REVIEW, NEXT_GTA]
+  classification: {contains_secrets: false, contains_raw_data: false, sensitivity: INTERNAL_NON_SECRET}
+- asset_id: CONTRACT-T39-RC002-H11-NAMED-MINT-GTA-001
+  record_version: '1.0'
+  asset_type: control_document
+  purpose: Exact TASK-39 contract for naming a bounded next GTA target from named-mint Helius GTA.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-08-15'
+  truth_owner: TASK-39
+  location: {kind: git_path, logical_uri: 'repo://docs/contracts/task39_rc002_h11_named_mint_gta_clock_capture_contract_v1.md', repository_path: docs/contracts/task39_rc002_h11_named_mint_gta_clock_capture_contract_v1.md}
+  integrity: {kind: sha256, sha256: 22c4bcda93f2e24a0798ccf6cd823ab78e9620d34e70023dc8105d0a9090eee9}
+  access: {mode: read_only, method: file, network_required: false, secrets_required: false}
+  relations:
+  - {relation_type: depends_on, target_asset_id: EVIDENCE-T37-RC002-H11-CLOCK-CAPTURE-001}
+  - {relation_type: depends_on, target_asset_id: EVIDENCE-T30-A24-RAW-TO-PIT-001}
+  consumers: [TASK-39, FACTORY-001]
+  evidence: []
+  search_terms: [H11, RC002, NAMED_MINT_GTA, BOUNDED_TARGET]
+  classification: {contains_secrets: false, contains_raw_data: false, sensitivity: INTERNAL_NON_SECRET}
+
+- asset_id: CONFIG-T39-RC002-H11-NAMED-MINT-GTA-001
+  record_version: '1.0'
+  asset_type: configuration
+  purpose: Frozen unique resolver, adopted Helius pool-history route and RC001 non-mutation guard.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-08-15'
+  truth_owner: TASK-39
+  location: {kind: git_path, logical_uri: 'repo://configs/task39_rc002_h11_named_mint_gta_clock_capture_v1.yaml', repository_path: configs/task39_rc002_h11_named_mint_gta_clock_capture_v1.yaml}
+  integrity: {kind: sha256, sha256: 4f78b54d800dda71373e18bb1ceadafa3d10f4306739e5182edf43d2b3a20239}
+  access: {mode: read_only, method: file, network_required: false, secrets_required: false}
+  relations: [{relation_type: governed_by, target_asset_id: CONTRACT-T39-RC002-H11-NAMED-MINT-GTA-001}]
+  consumers: [TASK-39, FACTORY-001]
+  evidence: []
+  search_terms: [H11, UNIQUE_RESOLVER, HELIUS_GTA, ZERO_PROVIDER]
+  classification: {contains_secrets: false, contains_raw_data: false, sensitivity: INTERNAL_NON_SECRET}
+
+- asset_id: SCHEMA-T39-RC002-H11-NAMED-MINT-GTA-001
+  record_version: '1.0'
+  asset_type: schema
+  purpose: Closed JSON Schema for the TASK-39 named-mint GTA clock capture target policy.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-08-15'
+  truth_owner: TASK-39
+  location: {kind: git_path, logical_uri: 'repo://catalog/schemas/task39_rc002_h11_named_mint_gta_clock_capture.schema.json', repository_path: catalog/schemas/task39_rc002_h11_named_mint_gta_clock_capture.schema.json}
+  integrity: {kind: sha256, sha256: f7e98f4d4cd3280290a84c4d6b39907725d231f5306901ac45ce4e411eaa58d5}
+  access: {mode: read_only, method: file, network_required: false, secrets_required: false}
+  relations: [{relation_type: governed_by, target_asset_id: CONTRACT-T39-RC002-H11-NAMED-MINT-GTA-001}]
+  consumers: [TASK-39, FACTORY-001]
+  evidence: []
+  search_terms: [H11, CLOSED_SCHEMA, NAMED_MINT_GTA]
+  classification: {contains_secrets: false, contains_raw_data: false, sensitivity: INTERNAL_NON_SECRET}
+
+- asset_id: FIXTURE-T39-RC002-H11-NAMED-MINT-GTA-001
+  record_version: '1.0'
+  asset_type: evidence
+  purpose: Secret-free expected live terminal for the unique pool-owned vault mint.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-08-15'
+  truth_owner: TASK-39
+  location: {kind: git_path, logical_uri: 'repo://tests/fixtures/task39/h11_named_mint_gta_clock_capture_v1.json', repository_path: tests/fixtures/task39/h11_named_mint_gta_clock_capture_v1.json}
+  integrity: {kind: sha256, sha256: f7e60b4dd66b985bba7f31be2e9bca3805bcdc43b61914a55c6bec5a1cf42a11}
+  access: {mode: read_only, method: file, network_required: false, secrets_required: false}
+  relations: [{relation_type: governed_by, target_asset_id: CONTRACT-T39-RC002-H11-NAMED-MINT-GTA-001}]
+  consumers: [TASK-39, FACTORY-001]
+  evidence: []
+  search_terms: [H11, FIXTURE, HISTORICAL_ROUTE_WRONG_ADDRESS_OR_EVENT]
+  classification: {contains_secrets: false, contains_raw_data: false, sensitivity: INTERNAL_NON_SECRET}
+
+- asset_id: MODULE-T39-RC002-H11-NAMED-MINT-GTA-001
+  record_version: '1.0'
+  asset_type: script
+  purpose: Thin named-mint GTA target scan over adopted A22/A23 pool history with pinned Pump decode.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-08-15'
+  truth_owner: TASK-39
+  location: {kind: git_path, logical_uri: 'repo://src/solana_alpha_lab/task39_h11_named_mint_gta_clock_capture.py', repository_path: src/solana_alpha_lab/task39_h11_named_mint_gta_clock_capture.py}
+  integrity: {kind: sha256, sha256: 8e057dd831c7a9003e0ccf07bc1f4c0ae62d46ecbfef416749dc58ab3376bfd8}
+  access: {mode: read_only, method: file, network_required: false, secrets_required: false}
+  relations:
+  - {relation_type: governed_by, target_asset_id: CONTRACT-T39-RC002-H11-NAMED-MINT-GTA-001}
+  - {relation_type: depends_on, target_asset_id: CONFIG-T39-RC002-H11-NAMED-MINT-GTA-001}
+  - {relation_type: validated_by, target_asset_id: TEST-T39-RC002-H11-NAMED-MINT-GTA-001}
+  consumers: [TASK-39, FACTORY-001]
+  evidence: []
+  search_terms: [H11, MODULE, NAMED_MINT_GTA, PUMP_DECODE]
+  classification: {contains_secrets: false, contains_raw_data: false, sensitivity: INTERNAL_NON_SECRET}
+
+- asset_id: SCRIPT-T39-RC002-H11-NAMED-MINT-GTA-001
+  record_version: '1.0'
+  asset_type: script
+  purpose: Offline runner that scans adopted A22/A23 bytes and emits named-mint GTA naming receipts.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-08-15'
+  truth_owner: TASK-39
+  location: {kind: git_path, logical_uri: 'repo://scripts/run_task39_rc002_h11_named_mint_gta_clock_capture.py', repository_path: scripts/run_task39_rc002_h11_named_mint_gta_clock_capture.py}
+  integrity: {kind: sha256, sha256: 842b557a553a57e578069c40fb03e288f8b84bb153c2b993f5904c67f07a21ca}
+  access: {mode: read_only, method: file, network_required: false, secrets_required: false}
+  relations:
+  - {relation_type: depends_on, target_asset_id: MODULE-T39-RC002-H11-NAMED-MINT-GTA-001}
+  - {relation_type: governed_by, target_asset_id: CONTRACT-T39-RC002-H11-NAMED-MINT-GTA-001}
+  consumers: [TASK-39, FACTORY-001]
+  evidence: []
+  search_terms: [H11, RUNNER, NAMED_MINT_GTA, OWNER_READOUT]
+  classification: {contains_secrets: false, contains_raw_data: false, sensitivity: INTERNAL_NON_SECRET}
+
+- asset_id: TEST-T39-RC002-H11-NAMED-MINT-GTA-001
+  record_version: '1.0'
+  asset_type: script
+  purpose: Targeted tests for unique mint, cannot-resolve, incidental-mint non-ambiguity and RC001 non-mutation.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-08-15'
+  truth_owner: TASK-39
+  location: {kind: git_path, logical_uri: 'repo://tests/test_task39_rc002_h11_named_mint_gta_clock_capture.py', repository_path: tests/test_task39_rc002_h11_named_mint_gta_clock_capture.py}
+  integrity: {kind: sha256, sha256: a86e798850ccce1897fc88e17368684fef7c5bff4cb5efbe75b990ec3fe7cf04}
+  access: {mode: read_only, method: file, network_required: false, secrets_required: false}
+  relations:
+  - {relation_type: depends_on, target_asset_id: CONFIG-T39-RC002-H11-NAMED-MINT-GTA-001}
+  - {relation_type: depends_on, target_asset_id: SCHEMA-T39-RC002-H11-NAMED-MINT-GTA-001}
+  - {relation_type: depends_on, target_asset_id: MODULE-T39-RC002-H11-NAMED-MINT-GTA-001}
+  - {relation_type: depends_on, target_asset_id: FIXTURE-T39-RC002-H11-NAMED-MINT-GTA-001}
+  consumers: [TASK-39, FACTORY-001]
+  evidence: []
+  search_terms: [H11, TEST, NAMED_MINT_GTA, FAIL_CLOSED]
+  classification: {contains_secrets: false, contains_raw_data: false, sensitivity: INTERNAL_NON_SECRET}
+
+- asset_id: EVIDENCE-T39-RC002-H11P-NAMED-MINT-GTA-001
+  record_version: '1.0'
+  asset_type: evidence
+  purpose: Runtime receipt for the H11 named-mint GTA clock capture target scan over named-mint Helius GTA.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-08-15'
+  truth_owner: TASK-39
+  location: {kind: git_path, logical_uri: 'repo://docs/evidence/task39/a1_h11_named_mint_gta_runtime_receipt_v1.json', repository_path: docs/evidence/task39/a1_h11_named_mint_gta_runtime_receipt_v1.json}
+  integrity: {kind: sha256, sha256: f33d8a1054b19f3f30702e362bf5d6b476d1b6258ad1e0efac76b36c28fc7a25}
+  access: {mode: read_only, method: file, network_required: false, secrets_required: false}
+  relations:
+  - {relation_type: derived_from, target_asset_id: CONFIG-T39-RC002-H11-NAMED-MINT-GTA-001}
+  - {relation_type: validated_by, target_asset_id: TEST-T39-RC002-H11-NAMED-MINT-GTA-001}
+  consumers: [TASK-39, FACTORY-001, GOAL-OWNER]
+  evidence: []
+  search_terms: [H11, RUNTIME, HISTORICAL_ROUTE_WRONG_ADDRESS_OR_EVENT]
+  classification: {contains_secrets: false, contains_raw_data: false, sensitivity: INTERNAL_NON_SECRET}
+
+- asset_id: REPORT-T39-RC002-H11-NAMED-MINT-GTA-001
+  record_version: '1.0'
+  asset_type: control_document
+  purpose: Russian owner readout of the named bounded next GTA mint and no-network limit.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-08-15'
+  truth_owner: TASK-39
+  location: {kind: git_path, logical_uri: 'repo://docs/reports/task39/a1_h11_named_mint_gta_owner_readout_v1.md', repository_path: docs/reports/task39/a1_h11_named_mint_gta_owner_readout_v1.md}
+  integrity: {kind: sha256, sha256: f290ec5bcb9f33f057f11ab6cbe01a9d8930d9ac46d80d1845309e53e8834437}
+  access: {mode: read_only, method: file, network_required: false, secrets_required: false}
+  relations: [{relation_type: derived_from, target_asset_id: EVIDENCE-T39-RC002-H11P-NAMED-MINT-GTA-001}]
+  consumers: [TASK-39, FACTORY-001, GOAL-OWNER]
+  evidence: []
+  search_terms: [H11, READOUT, HISTORICAL_ROUTE_WRONG_ADDRESS_OR_EVENT]
+  classification: {contains_secrets: false, contains_raw_data: false, sensitivity: INTERNAL_NON_SECRET}
+
+- asset_id: EVIDENCE-T39-RC002-H11-NAMED-MINT-GTA-001
+  record_version: '1.0'
+  asset_type: evidence
+  purpose: Acceptance that frozen named-mint Helius GTA name unique TOKEN_MINT without authorizing a new Helius call.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-08-15'
+  truth_owner: TASK-39
+  location: {kind: git_path, logical_uri: 'repo://docs/evidence/task39/a1_h11_named_mint_gta_acceptance_v1.json', repository_path: docs/evidence/task39/a1_h11_named_mint_gta_acceptance_v1.json}
+  integrity: {kind: sha256, sha256: 58eef7dec9e0d702f9e0a39558255942787c285e02e412bea528e6eca525deda}
+  access: {mode: read_only, method: file, network_required: false, secrets_required: false}
+  relations:
+  - {relation_type: derived_from, target_asset_id: CONTRACT-T39-RC002-H11-NAMED-MINT-GTA-001}
+  - {relation_type: depends_on, target_asset_id: EVIDENCE-T39-RC002-H11P-NAMED-MINT-GTA-001}
+  - {relation_type: validated_by, target_asset_id: TEST-T39-RC002-H11-NAMED-MINT-GTA-001}
+  consumers: [TASK-39, RC002-H11-LIFECYCLE-CLOCK, FACTORY-001, GOAL-OWNER]
+  evidence: []
+  search_terms: [H11, ACCEPTANCE, HISTORICAL_ROUTE_WRONG_ADDRESS_OR_EVENT]
+  classification: {contains_secrets: false, contains_raw_data: false, sensitivity: INTERNAL_NON_SECRET}
+
+- asset_id: CTRL-TASK-39-001
+  record_version: '1.0'
+  asset_type: control_document
+  purpose: Harness-valid TASK-39 contract binding RC002 named-mint GTA naming authority, write set and DoD.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-08-15'
+  truth_owner: TASK-39
+  location: {kind: git_path, logical_uri: 'repo://docs/tasks/TASK-39-rc002-h11-named-mint-gta-clock-capture.md', repository_path: docs/tasks/TASK-39-rc002-h11-named-mint-gta-clock-capture.md}
+  integrity: {kind: sha256, sha256: eed05329ef6d2b87ada4f169f243bd7b6252be58e57e1606845eb3fade6452ac}
+  access: {mode: read_only, method: file, network_required: false, secrets_required: false}
+  relations:
+  - {relation_type: contains, target_asset_id: CONTRACT-T39-RC002-H11-NAMED-MINT-GTA-001}
+  - {relation_type: contains, target_asset_id: SCRIPT-T39-RC002-H11-NAMED-MINT-GTA-001}
+  - {relation_type: depends_on, target_asset_id: EVIDENCE-T37-RC002-H11-CLOCK-CAPTURE-001}
+  consumers: [TASK-39, FACTORY-001]
+  evidence: []
+  search_terms: [H11, TASK_CONTRACT, NAMED_MINT_GTA, IMPLEMENTED_UNVERIFIED]
+  classification: {contains_secrets: false, contains_raw_data: false, sensitivity: INTERNAL_NON_SECRET}
+
+- asset_id: EVIDENCE-T39-A1-DELIVERY-COMPLETION-001
+  record_version: '1.0'
+  asset_type: evidence
+  purpose: Guard-consumable completion evidence binding the exact TASK-39 named-mint GTA inventory without product DONE.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-08-15'
+  truth_owner: TASK-39
+  location: {kind: git_path, logical_uri: 'repo://docs/evidence/task39/a1_delivery_completion_evidence_v1.json', repository_path: docs/evidence/task39/a1_delivery_completion_evidence_v1.json}
+  integrity: {kind: none, note: 'Content integrity is owned by the live completion-review-fit hash chain; embedding its SHA here would create an indirect self-reference through the reviewed inventory.'}
+  access: {mode: read_only, method: file, network_required: false, secrets_required: false}
+  relations:
+  - {relation_type: derived_from, target_asset_id: EVIDENCE-T39-RC002-H11-NAMED-MINT-GTA-001}
+  - {relation_type: depends_on, target_asset_id: EVIDENCE-T39-A1-DELIVERY-INDEPENDENT-REVIEW-001}
+  - {relation_type: depends_on, target_asset_id: EVIDENCE-T39-A1-DELIVERY-FACTORY-FIT-001}
+  - {relation_type: depends_on, target_asset_id: SCHEMA-DELIVERY-COMPLETION-EVIDENCE-001}
+  consumers: [TASK-39, FACTORY-001, GOAL-OWNER]
+  evidence: []
+  search_terms: [H11, DELIVERY_COMPLETION, HISTORICAL_ROUTE_WRONG_ADDRESS_OR_EVENT]
+  classification: {contains_secrets: false, contains_raw_data: false, sensitivity: INTERNAL_NON_SECRET}
+
+- asset_id: EVIDENCE-T39-A1-DELIVERY-INDEPENDENT-REVIEW-001
+  record_version: '1.0'
+  asset_type: evidence
+  purpose: Required-role review evidence bound to the exact non-self-referential TASK-39 named-mint GTA inventory.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-08-15'
+  truth_owner: TASK-39
+  location: {kind: git_path, logical_uri: 'repo://docs/evidence/task39/a1_delivery_independent_review_v1.json', repository_path: docs/evidence/task39/a1_delivery_independent_review_v1.json}
+  integrity: {kind: none, note: 'Content integrity is owned by the live completion-review-fit hash chain; embedding its SHA here would create an indirect self-reference through the reviewed inventory.'}
+  access: {mode: read_only, method: file, network_required: false, secrets_required: false}
+  relations:
+  - {relation_type: derived_from, target_asset_id: EVIDENCE-T39-RC002-H11-NAMED-MINT-GTA-001}
+  - {relation_type: depends_on, target_asset_id: SCHEMA-DELIVERY-INDEPENDENT-REVIEW-EVIDENCE-001}
+  consumers: [TASK-39, FACTORY-001, GOAL-OWNER]
+  evidence: []
+  search_terms: [H11, INDEPENDENT_REVIEW, SINGLE_AGENT_REVIEW_FALLBACK]
+  classification: {contains_secrets: false, contains_raw_data: false, sensitivity: INTERNAL_NON_SECRET}
+
+- asset_id: EVIDENCE-T39-A1-DELIVERY-FACTORY-FIT-001
+  record_version: '1.0'
+  asset_type: evidence
+  purpose: FULL Factory Fit review for TASK-39 named-mint GTA naming mission, research truth, owner operability, wrap-versus-buy, security and red team.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-08-15'
+  truth_owner: TASK-39
+  location: {kind: git_path, logical_uri: 'repo://docs/evidence/task39/a1_delivery_factory_fit_v1.json', repository_path: docs/evidence/task39/a1_delivery_factory_fit_v1.json}
+  integrity: {kind: none, note: 'Content integrity is owned by the live completion-review-fit hash chain; embedding its SHA here would create an indirect self-reference through the reviewed inventory.'}
+  access: {mode: read_only, method: file, network_required: false, secrets_required: false}
+  relations:
+  - {relation_type: derived_from, target_asset_id: EVIDENCE-T39-RC002-H11-NAMED-MINT-GTA-001}
+  - {relation_type: depends_on, target_asset_id: EVIDENCE-T39-A1-DELIVERY-INDEPENDENT-REVIEW-001}
+  consumers: [TASK-39, FACTORY-001, GOAL-OWNER]
+  evidence: []
+  search_terms: [H11, FACTORY_FIT, FULL_REVIEW, NAMED_MINT_GTA]
   classification: {contains_secrets: false, contains_raw_data: false, sensitivity: INTERNAL_NON_SECRET}

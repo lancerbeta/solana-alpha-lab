@@ -1,0 +1,134 @@
+schema: smial.task39.rc002-h11-named-mint-gta.policy
+schema_version: '1.0'
+task_id: TASK-39
+atom_id: T39-A1_RC002_H11_NAMED_MINT_GTA_CLOCK_CAPTURE_V1
+contract_id: CONTRACT-T39-RC002-H11-NAMED-MINT-GTA-001
+spec_route: BOTH
+adoption_route: ADOPT_EXISTING_HELIUS_GTA_AND_PUMP_EVENT_DECODER
+consumer: RC002-H11-LIFECYCLE-CLOCK
+research_cycle:
+  research_cycle_id: RESEARCH-CYCLE-RC002-001
+  task_owned_register_id: TASK36-RC002-REGISTER-001
+  register_kind: TASK_OWNED_CONFIG_EVIDENCE
+  title: RC-002 H11 named-mint GTA clock capture
+  status: NAMED_MINT_GTA
+  definition_owner: TASK-39
+  retrofit_into_rc001: false
+clock_definitions:
+  freeze_before_event_inspection: true
+  create_at:
+    source_event: CreateEvent
+    field: timestamp
+    time_basis: chain_event_i64
+  migration_at:
+    source_event: CompletePumpAmmMigrationEvent
+    field: timestamp
+    time_basis: chain_event_i64
+    complete_event_is_not_migration: true
+    forbidden_sources:
+      - later_price
+      - first_pumpswap_trade
+      - block_time_heuristic
+      - first_reliable_availability
+  running_peak_at:
+    rule: max_price_among_events_with_event_at_lte_decision_time
+    future_events: IGNORE
+  typed_missingness:
+    absent_create: CREATE_EVENT_NOT_IN_ADDRESSED_HISTORY
+    absent_migration: MIGRATION_EVENT_NOT_IN_ADDRESSED_HISTORY
+    pump_program_absent: PUMP_PROGRAM_NOT_IN_ACCOUNT_KEYS
+    complete_event_only: MIGRATION_STARTED_NOT_MIGRATED
+capture_protocol:
+  family: H11_LIFECYCLE_CLOCK
+  stage: NAMED_MINT_HISTORICAL_CLOCK_RECONSTRUCTION
+  data_semantics: RETROSPECTIVE_EVENT_TIME_RECONSTRUCTION
+  live_PIT_claim: false
+  execution_claim: false
+  universe: CONFIRMED_POST_MIGRATION_POOLS_OUTCOME_INDEPENDENT_CONTIGUOUS_WINDOW
+  include_fast_deaths: true
+  include_inactive_paths: true
+  missing_as_typed_gaps: true
+  h11_effect_screen: false
+  minimum_independent_units:
+    pools: 8
+    days: 2
+    deployers: 2
+rc001_freeze:
+  path: configs/task28_rc001_registry_freeze_v1.yaml
+  sha256: c4fbb7157a13d1dee0f2b1f163e8f8fc1a38da4bc850275fba25bc0d70a785a7
+  mutation_authorized: false
+  remaining_families_deprioritized: true
+  required_definition_sha256:
+    RC001-H13-COMPOSITE-VETO: f1f020f4fa79acd2f2de667d71b8002d5821f45e9070a0f259c63210b23a16d0
+    RC001-H07-H01-LIQUIDITY-RETENTION: 14a7387148d05773dedcb5ad6a8110a0dcab7e49da4dec77328903a5b7577df7
+    RC001-H02-H10-H14-PULLBACK-RECLAIM: fc225417541570aa73814a4cb992f6f801a84bea1baf15696d754c706e0aa9f8
+holdout_guard:
+  path: registries/holdout_consumption.yaml
+  sha256: 863d68e53861c4aa30f6afa1a512ec5ab84c8966273cee6d42ca1519ef5fa07a
+adopted_route:
+  route_id: HELIUS-SOLANA-GET-TRANSACTIONS-FOR-ADDRESS-001
+  provider: HELIUS
+  endpoint: https://mainnet.helius-rpc.com/
+  method: getTransactionsForAddress
+  provider_routes_max: 1
+  target_kind: TOKEN_MINT
+  mint_address: DMwbVy48dWVKGe9z1pcVnwF3HLMLrqWdDLfbvx8RchhK
+  pool_address: URqx24yyYxtXXhTbBQnbtPLhtLWYoaDaRxuQuLpNS3S
+  decoder_idl_path: tests/fixtures/task08/pump_event_idl_subset_v1.json
+  named_by: EVIDENCE-T38-RC002-H11-NEXT-GTA-001
+request:
+  transaction_details: full
+  sort_order: asc
+  limit: 1000
+  commitment: finalized
+  encoding: json
+  max_supported_transaction_version: 0
+  status: succeeded
+  token_accounts: none
+  omit_block_time_filter: true
+runtime_limits:
+  max_credential_free_preflights: 1
+  max_provider_requests: 3
+  max_response_bytes_per_page: 25000000
+  timeout_seconds: 60
+  max_full_transactions_per_page: 1000
+  max_helius_credits_total: 300
+execution_controls:
+  retry: false
+  fallback: false
+  redirect: false
+  pagination: true
+  scheduler: false
+  background_process: false
+  payload_repair_before_science_receipt: true
+retention:
+  class: A4_OUTSIDE_GIT
+  raw_root: local/task39_rc002_h11_named_mint_gta
+terminal_outcomes:
+  - CLOCKS_RECONSTRUCTED_COHORT_READY
+  - HISTORICAL_ROUTE_WRONG_ADDRESS_OR_EVENT
+  - INSUFFICIENT_SCALE_WITHOUT_PAID_CAPTURE
+  - STOP_INTEGRITY_CONFLICT
+claims:
+  named_mint_gta_clock_capture_only: true
+  live_pit: false
+  execution: false
+  alpha: false
+  numeric_netreturn: false
+  rc001_definition_changed: false
+  holdout_consumed: false
+  h11_effect_screen: false
+  h13_trial: false
+  h02_trial: false
+external_authority:
+  network: true
+  credentials: true
+  cash_spend: false
+  paid_plan: false
+  provider_routes_max: 1
+  wallet_signer_transaction: false
+  deployment: false
+  owner_phrase: OK T39-RC002 H11_NAMED_MINT_GTA_ONE_SHOT
+  credential_reference: HELIUS_API_KEY
+project_sources_disposition:
+  kind: NO_CHANGE

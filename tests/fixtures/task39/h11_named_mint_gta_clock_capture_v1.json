@@ -1,0 +1,11 @@
+{
+  "schema": "smial.task39.rc002-h11-named-mint-gta.fixture",
+  "schema_version": "1.0",
+  "named_mint": "DMwbVy48dWVKGe9z1pcVnwF3HLMLrqWdDLfbvx8RchhK",
+  "forbidden_gta_targets": [
+    "6EF8rrecthR5Dkzon8Nwu78hRvfCKubJ14M5uBEwF6P",
+    "URqx24yyYxtXXhTbBQnbtPLhtLWYoaDaRxuQuLpNS3S"
+  ],
+  "omit_block_time_filter": true,
+  "owner_phrase": "OK T39-RC002 H11_NAMED_MINT_GTA_ONE_SHOT"
+}
