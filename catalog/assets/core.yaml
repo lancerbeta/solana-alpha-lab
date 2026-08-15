@@ -928,7 +928,7 @@ records:
     and one fail-closed CI-owned delivery pilot preflight.
   status: IMPLEMENTED_UNVERIFIED
   origin: REPOSITORY
-  as_of: '2026-08-09'
+  as_of: '2026-08-15'
   truth_owner: TASK-04
   location:
     kind: git_path
@@ -936,7 +936,7 @@ records:
     repository_path: scripts/validate_ci.py
   integrity:
     kind: sha256
-    sha256: 56e761de2c3fe089bb3a21a0c266eb0b9e828ec10efef174ef18c97aa162faa6
+    sha256: 848817360dba1648241f73ab898108858b624f04184da362f965edc4bb56e635
   access:
     mode: read_only
     method: command
@@ -4148,7 +4148,7 @@ records:
     Delivery Harness, with dormant baton history and proportional validation.
   status: IMPLEMENTED_UNVERIFIED
   origin: REPOSITORY
-  as_of: '2026-08-14'
+  as_of: '2026-08-15'
   truth_owner: CTRL-DELIVERY-HARNESS-001
   location:
     kind: git_path
@@ -4156,7 +4156,7 @@ records:
     repository_path: docs/agent/EXECUTION_ROUTER_PROTOCOL.md
   integrity:
     kind: sha256
-    sha256: 7ef43868666559927e9295acb057417057aaad5b80f7184c66ef70f04ec8e76c
+    sha256: 72df429789819e74cfe5d0aff0729e96692104802046382a00ccc76f85b82e56
   access:
     mode: read_only
     method: file
@@ -16307,7 +16307,7 @@ records:
   as_of: '2026-08-14'
   truth_owner: CTRL-DELIVERY-HARNESS-001
   location: {kind: git_path, logical_uri: 'repo://scripts/owner_attention_gate.py', repository_path: scripts/owner_attention_gate.py}
-  integrity: {kind: sha256, sha256: da7dd742eb5ba4709bf1c8753de18b36b2de870171ca0daef388cc5ff67a937c}
+  integrity: {kind: sha256, sha256: 11e2a2d8a7b3a9a17b3f2c2258f62b332227ff410e5fc788919fdaf904ec96ac}
   access: *t25_read_file
   relations:
   - {relation_type: governed_by, target_asset_id: POLICY-OWNER-ATTENTION-GATE-002}
@@ -19724,10 +19724,10 @@ records:
   purpose: Closed route-neutral Delivery Harness contract with routes, context budgets, cloud export mode and external authority exclusions.
   status: IMPLEMENTED_UNVERIFIED
   origin: REPOSITORY
-  as_of: '2026-08-14'
+  as_of: '2026-08-15'
   truth_owner: CTRL-DELIVERY-HARNESS-001
   location: {kind: git_path, logical_uri: 'repo://delivery-harness/harness.yaml', repository_path: delivery-harness/harness.yaml}
-  integrity: {kind: sha256, sha256: 6320b9e023f30f3b14ad769123a425aca3aaee6ed61890daf6de065b6fd0f851}
+  integrity: {kind: sha256, sha256: 5dc785bc1f69af024fd078ab73fa522f2ffb1bde047ade4734ddfd85d4ab4872}
   access: *t25_read_file
   relations:
   - {relation_type: governed_by, target_asset_id: CTRL-DELIVERY-HARNESS-001}
@@ -19799,7 +19799,7 @@ records:
   as_of: '2026-08-14'
   truth_owner: CTRL-DELIVERY-HARNESS-001
   location: {kind: git_path, logical_uri: 'repo://delivery-harness/templates/portable-bundle-manifest.json', repository_path: delivery-harness/templates/portable-bundle-manifest.json}
-  integrity: {kind: sha256, sha256: 5e2d34b2276c6b4e30a528a7ed029f97f283afe5ec5ee83c5bb6c3387f345aee}
+  integrity: {kind: sha256, sha256: eabb6e6954a1503b1c098c300f1089deaea7f24fc81915b9e534377e553a3597}
   access: *t25_read_file
   relations:
   - {relation_type: governed_by, target_asset_id: CTRL-DELIVERY-HARNESS-001}

@@ -51,9 +51,12 @@ merge_policy:
     - docs/agent/EXECUTION_ROUTER_PROTOCOL.md
     - docs/evidence/control/**
     - docs/tasks/CTRL-DELIVERY-HARNESS-V1.md
+    - docs/tasks/CTRL-CI-OWNED-PRODUCT-SCHEMA-ELIGIBILITY-V1.md
     - docs/tasks/CTRL-AUTONOMOUS-DELIVERY-SKILL-V1.md
     - scripts/delivery_harness.py
     - scripts/owner_attention_gate.py
+    - scripts/validate_ci.py
+    - tests/test_ci.py
     - tests/test_delivery_harness_adapters.py
     - tests/test_delivery_harness_authority.py
     - tests/test_delivery_harness_bootstrap.py

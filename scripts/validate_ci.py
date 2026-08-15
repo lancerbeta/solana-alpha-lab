@@ -61,7 +61,6 @@ CI_OWNED_INELIGIBLE_EXACT_PATHS = frozenset(
         "scripts/validate_ci.py",
         "tests/test_baseline.py",
         "tests/test_baton_repository_policy.py",
-        "tests/test_catalog.py",
         "tests/test_ci.py",
         "tests/test_control_only_task_close_fast_path.py",
         "tests/test_generate_navigation.py",
@@ -76,7 +75,6 @@ CI_OWNED_INELIGIBLE_PREFIXES = (
     ".cursor/",
     ".github/",
     ".githooks/",
-    "catalog/schemas/",
     "control/",
     "docs/agent/",
     "docs/tasks/CTRL-",
@@ -89,6 +87,18 @@ CI_OWNED_INELIGIBLE_PREFIXES = (
     "tests/test_baton_",
     "tests/test_validate_",
 )
+CI_OWNED_INELIGIBLE_CATALOG_SCHEMA_NAMES = frozenset(
+    {
+        "asset_catalog.schema.json",
+        "catalog_manifest.schema.json",
+        "lifecycle_registry.schema.json",
+        "owner_attention_gate_v2.schema.json",
+        "project_sources_release_registry.schema.json",
+        "query_recipe.schema.json",
+    }
+)
+CI_OWNED_CATALOG_SCHEMAS_PREFIX = "catalog/schemas/"
+SANDBOX_UV_CACHE_MARKER = "cursor-sandbox-cache"
 DELIVERY_SKIP_CALL = re.compile(
     r"(?:\.skipTest\s*\(|@(?:unittest\.)?skip(?:If|Unless)?\s*\("
     r"|pytest\.(?:skip|importorskip)\s*\()"
@@ -101,6 +111,39 @@ DELIVERY_SKIP_PROOF_PREFIXES = ("docs/decisions/", "docs/evidence/")
 
 class CiValidationError(RuntimeError):
     """Fail-closed CI or repository contract violation."""
+
+
+def tracked_only_clone_environment(
+    source: dict[str, str] | None = None,
+) -> dict[str, str]:
+    """Isolate tracked-only uv from Cursor sandbox caches; copy if hardlink cannot work."""
+
+    environment = dict(os.environ if source is None else source)
+    environment["PYTHONDONTWRITEBYTECODE"] = "1"
+    environment["UV_MANAGED_PYTHON"] = "1"
+    environment["UV_NO_ENV_FILE"] = "1"
+    environment["UV_OFFLINE"] = "1"
+    environment["SMIAL_TRACKED_ONLY_DELIVERY"] = "1"
+    # uv falls back from hardlink to copy on cross-device/sandbox failure; do not skip the gate.
+    environment["UV_LINK_MODE"] = "hardlink"
+    environment.pop("VIRTUAL_ENV", None)
+    cache_dir = environment.get("UV_CACHE_DIR", "")
+    if SANDBOX_UV_CACHE_MARKER in cache_dir.replace("\\", "/").casefold():
+        environment.pop("UV_CACHE_DIR", None)
+    return environment
+
+
+def ci_owned_ineligible_catalog_schema(path: str) -> bool:
+    """Keep catalog/harness/validator schemas ineligible; product/task schemas pass."""
+
+    if not path.startswith(CI_OWNED_CATALOG_SCHEMAS_PREFIX):
+        return False
+    name = path[len(CI_OWNED_CATALOG_SCHEMAS_PREFIX) :]
+    if not name or "/" in name:
+        return True
+    if name in CI_OWNED_INELIGIBLE_CATALOG_SCHEMA_NAMES:
+        return True
+    return name.startswith("delivery_harness") and name.endswith(".schema.json")
 
 
 def utc_now() -> str:
@@ -299,8 +342,10 @@ def validate_ci_owned_delivery_eligibility(
             violations.append(f"unsafe:{raw_path}")
             continue
         normalized.append(path)
-        if path in CI_OWNED_INELIGIBLE_EXACT_PATHS or path.startswith(
-            CI_OWNED_INELIGIBLE_PREFIXES
+        if (
+            path in CI_OWNED_INELIGIBLE_EXACT_PATHS
+            or path.startswith(CI_OWNED_INELIGIBLE_PREFIXES)
+            or ci_owned_ineligible_catalog_schema(path)
         ):
             violations.append(path)
     if not normalized:
@@ -394,13 +439,7 @@ def run_tracked_only_delivery_preflight(*, base_ref: str = "origin/main") -> Non
             observed_tree = git_text(["show", "-s", "--format=%T", "HEAD"], cwd=checkout)
             if observed_commit != candidate or observed_tree != tree:
                 raise CiValidationError("delivery_tracked_clone_identity_mismatch")
-            environment = os.environ.copy()
-            environment["PYTHONDONTWRITEBYTECODE"] = "1"
-            environment["UV_MANAGED_PYTHON"] = "1"
-            environment["UV_NO_ENV_FILE"] = "1"
-            environment["UV_OFFLINE"] = "1"
-            environment["SMIAL_TRACKED_ONLY_DELIVERY"] = "1"
-            environment.pop("VIRTUAL_ENV", None)
+            environment = tracked_only_clone_environment()
             try:
                 completed = subprocess.run(
                     VALIDATION_COMMAND.split(),
