@@ -1,0 +1,30 @@
+{
+  "schema": "solana_alpha_lab.pump_bonding_curve_pda_subset",
+  "schema_version": "1.0",
+  "as_of": "2026-08-16",
+  "status": "PINNED_OFFICIAL_SUBSET",
+  "source": {
+    "repository": "pump-fun/pump-public-docs",
+    "ref": "main",
+    "path": "idl/pump.json",
+    "instruction": "create",
+    "account": "bonding_curve",
+    "retrieval_mode": "GITHUB_CONTENTS_READ_ONLY",
+    "observed_main_as_of": "2026-08-16"
+  },
+  "program_id": "6EF8rrecthR5Dkzon8Nwu78hRvfCKubJ14M5uBEwF6P",
+  "seeds": [
+    {
+      "kind": "const",
+      "value": [98, 111, 110, 100, 105, 110, 103, 45, 99, 117, 114, 118, 101],
+      "utf8": "bonding-curve"
+    },
+    {
+      "kind": "account",
+      "path": "mint"
+    }
+  ],
+  "named_mint": "DMwbVy48dWVKGe9z1pcVnwF3HLMLrqWdDLfbvx8RchhK",
+  "expected_address": "ENz3D4ZoarzHZCsGeFTfswAKrSo5sHX9UUut1FLS6WgC",
+  "expected_bump": 255
+}
