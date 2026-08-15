@@ -117,6 +117,7 @@ class AutonomousDeliverySkillTests(unittest.TestCase):
             ".agents/skills/autonomous-delivery/references/product-system-contract.md",
             ".agents/skills/autonomous-delivery/references/roadmap-challenge.md",
             "AGENTS.md",
+            "catalog/assets/core.yaml",
             "tests/test_autonomous_delivery_skill.py",
         }
         self.assertEqual(write_set, expected)
