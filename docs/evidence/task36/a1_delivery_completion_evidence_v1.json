@@ -14,7 +14,7 @@
   },
   "capability_radar_now": "NONE",
   "implementation_bindings": {
-    "catalog/assets/core.yaml": "4b93c91ba998b535aa7165fec33675f2c0bc73428e6837f0dee70ed1d650974b",
+    "catalog/assets/core.yaml": "f96ef5c9305d453fd5ce0a91ad1285d211bbe20966589fbfe27054053194e57f",
     "docs/evidence/task28/a1_rc001_registry_freeze_acceptance_v1.json": "cb786b8f2a2424a836feff1e6c80a3f463d674d829d287de9ca4151fa4c433d5",
     "catalog/assets/lifecycle.yaml": "6fc8b74a37caa01ab1b07e0a7516fbd64ad1535c55bbcbff11b4f04de572b80f",
     "catalog/catalog_manifest.yaml": "a1bbb9ac446191463e2231de4810fb3c4a4762b800dd96ec4e209148680e32e6",
@@ -48,14 +48,14 @@
   },
   "factory_fit": {
     "path": "docs/evidence/task36/a1_delivery_factory_fit_v1.json",
-    "sha256": "27ed0665c57def700b0aff025d07f63e60ed1b7323598d04ade16bf1bf7a4cea",
+    "sha256": "612fb5acbe00d84e03047e80b304e484085f3829564fce91538f50cec2632128",
     "verdict": "PASS"
   },
   "validation": {
     "targeted": "PASS_H11_PROTOCOL_CATALOG_AND_LIFECYCLE_TESTS",
     "independent_review": {
       "path": "docs/evidence/task36/a1_delivery_independent_review_v1.json",
-      "sha256": "8d06cc9c485af96c1a861edd4cd30647f911c6eb8ca047dc4ea73905b55ffded",
+      "sha256": "bdf4e2e653b927d969946df4e4c67aaa1a5ddafde21bbb337e034ba9271a016b",
       "verdict": "PASS"
     },
     "full_gate": "ENFORCED_BY_PROJECT_BOUND_VALIDATION",

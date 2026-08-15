@@ -22033,7 +22033,7 @@ records:
   as_of: '2026-08-15'
   truth_owner: TASK-36
   location: {kind: git_path, logical_uri: 'repo://docs/tasks/TASK-36-rc002-h11-lifecycle-clock-mechanism-screen.md', repository_path: docs/tasks/TASK-36-rc002-h11-lifecycle-clock-mechanism-screen.md}
-  integrity: {kind: sha256, sha256: 2124b621b5774086c96ad2971a2143f01848e0e6d5fdcfbe23dafc931e4dc58e}
+  integrity: {kind: sha256, sha256: 39175c5eb07fdec3f1fe01218707cfe02db9e9673f38174f06839a1a411f9dc6}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: contains, target_asset_id: CONTRACT-T36-RC002-H11-LIFECYCLE-CLOCK-001}
