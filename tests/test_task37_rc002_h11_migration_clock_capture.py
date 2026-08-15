@@ -388,9 +388,7 @@ class Task37ClockCaptureTests(unittest.TestCase):
     def test_live_a22_scan_matches_committed_gap_when_a4_present(self) -> None:
         a22 = ROOT / self.policy["adopted_route"]["a22_raw"]["path"]
         if not a22.is_file():
-            # DELIVERY_PREFLIGHT_NONCRITICAL_SKIP: tracked proof is
-            # docs/evidence/task30/a22_helius_get_transactions_for_address_runtime_receipt_v1.json
-            # plus tests/fixtures/task37/h11_migration_clock_capture_v1.json.
+            # DELIVERY_PREFLIGHT_NONCRITICAL_SKIP: docs/evidence/task37/a1_h11_migration_clock_capture_runtime_receipt_v1.json
             self.skipTest("A4 local A22 bytes absent")
         result = execute_capture(repo_root=ROOT, policy=self.policy)
         self.assertTrue(result["live_universe"])

@@ -22221,7 +22221,7 @@ records:
   as_of: '2026-08-15'
   truth_owner: TASK-37
   location: {kind: git_path, logical_uri: 'repo://tests/test_task37_rc002_h11_migration_clock_capture.py', repository_path: tests/test_task37_rc002_h11_migration_clock_capture.py}
-  integrity: {kind: sha256, sha256: eac5884b64bc2610bff8d31249ed2ea247cb89bb0c7ffc8fa0cdeb2aacc3e0db}
+  integrity: {kind: sha256, sha256: c62a38ef6286cca658146d77485dedb3d9434dd4823d933f661b4cbd3a9a2a59}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: depends_on, target_asset_id: CONFIG-T37-RC002-H11-CLOCK-CAPTURE-001}

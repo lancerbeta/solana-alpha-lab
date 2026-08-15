@@ -14,7 +14,7 @@
   },
   "capability_radar_now": "NONE",
   "implementation_bindings": {
-    "catalog/assets/core.yaml": "27b1bb8ccd7bf044a09c9a16858781cc19882f08fb9c95f824d6184292a8a790",
+    "catalog/assets/core.yaml": "eed584c15de9e32bf844267244a313a77f5a1afc96f9d4be325bca242ab4e022",
     "catalog/assets/lifecycle.yaml": "c9d459580dce4f8587203c281bc445ded482091ac4615f6142c62e0ef91b5ef2",
     "catalog/catalog_manifest.yaml": "d19163951a337f0aa4cd2095265b2dc003a43c91c2f465fca1d85602ae64f2a6",
     "catalog/generated/asset_edges.json": "5f58b6f4c17793f382bbdb941c7e1c92800af8361df400014b4b99914d27bcbf",
@@ -36,7 +36,7 @@
     "tests/test_catalog.py": "e8002413412bd14e173bdb2cc3015630b6b88ed930f6b97ba5b386e9473eaf93",
     "tests/test_lifecycle_registries.py": "1e4d0a5f8a15d317aa767b7470bd0a01af02320740bf2700acbf6675857e7b17",
     "tests/test_task23_catalog_repository_factory_fit.py": "70a43d8ab8727c58e0742bdaf80fd29d7e0527053cf1036bb3fd5557e2a57575",
-    "tests/test_task37_rc002_h11_migration_clock_capture.py": "eac5884b64bc2610bff8d31249ed2ea247cb89bb0c7ffc8fa0cdeb2aacc3e0db"
+    "tests/test_task37_rc002_h11_migration_clock_capture.py": "c62a38ef6286cca658146d77485dedb3d9434dd4823d933f661b4cbd3a9a2a59"
   },
   "active_stop_conditions": [],
   "owner_attention_triggers": {
@@ -48,14 +48,14 @@
   },
   "factory_fit": {
     "path": "docs/evidence/task37/a1_delivery_factory_fit_v1.json",
-    "sha256": "a7cd16dea165f409762aea2544e07ff3f86ea860ea27d1bdde9c9c5228bbb7f7",
+    "sha256": "3aaf0e1f5c07631ddd3297b391383087e692d36d70f9f45dbc75134c5114d147",
     "verdict": "PASS"
   },
   "validation": {
     "targeted": "PASS_H11_CLOCK_CAPTURE_CATALOG_AND_LIFECYCLE_TESTS",
     "independent_review": {
       "path": "docs/evidence/task37/a1_delivery_independent_review_v1.json",
-      "sha256": "2327face3d431cd1690fbe8478bab00659b228bb22fbdb255428ca4e45b9d407",
+      "sha256": "6ece176550b60b853404719b4a4bce52af198ca1950491a8fb6eda147ef6af95",
       "verdict": "PASS"
     },
     "full_gate": "ENFORCED_BY_PROJECT_BOUND_VALIDATION",

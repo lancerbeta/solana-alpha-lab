@@ -12,8 +12,8 @@
     "ARCHITECTURE_CRITIC"
   ],
   "review_id": "T37-A1-DELIVERY-INDEPENDENT-REVIEW-001",
-  "reviewed_bindings_sha256": "1b7777b4da3c30f4a1e4621c5900c9c6cc18d42ca3060d0aad369113651e58d4",
-  "reviewed_inventory_sha256": "e59bdddc16b19ea2feb4117637b9e9d880359cd1c8f508d102e95c4b57fecabf",
+  "reviewed_bindings_sha256": "0b41da33bd94942b531bf1dd2be2941fcfddaa996c1697240fb818c116933846",
+  "reviewed_inventory_sha256": "59513d129b02a347be319edb2b68fc2218d8e9540f4975b5333cc8062e6a28ac",
   "reviews": [
     {
       "findings": [
