@@ -12,9 +12,12 @@ delivery agents over one Git-native control core. Read this file first, then:
 
 ## WORKING_MEMORY_AND_CONTEXT
 
-Git is the working project-memory owner. Resolve work only from an exact task
-contract named by the owner or an exact canonical READY Git contract. Never
-search for the newest/latest/current task, handoff, Issue, branch or file.
+Git is the working project-memory owner. Mutation, delivery and merge require
+an exact task contract named by the owner or an exact canonical READY Git
+contract. Owner navigation phrases such as го дальше inspect Git truth without
+a new contract and must not mutate or invent a task. Discriminate
+`ORIENTATION` versus `EXECUTE` with `.cursor/rules/10-input-routing.mdc`.
+Never search for the newest/latest/current task, handoff, Issue, branch or file.
 
 Build L0/L1 context with `scripts/delivery_harness.py context`. Load L2 only for
 a named capability gap and L3 only for a concrete evidence dispute. Missing
@@ -68,9 +71,12 @@ change.
 
 ## DELIVERY_WORKFLOW
 
-Use the repository skill at `.agents/skills/delivery-harness/SKILL.md`:
+On `EXECUTE`, use the repository skill at
+`.agents/skills/delivery-harness/SKILL.md`:
 
 `CHECK -> CONTEXT -> ENTRY/OUTCOME -> EXECUTE -> RISK-ROUTED REVIEW -> FINISH -> EXACT MERGE GATE -> READ-BACK`
+
+On `ORIENTATION`, do not start that workflow.
 
 Keep design/spec/plan/implementation/tests/review as phases of one bounded atom,
 not automatic owner approvals. Each substantial atom names decision delta,

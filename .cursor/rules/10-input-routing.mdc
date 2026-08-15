@@ -1,10 +1,42 @@
 ---
-description: Exact task and context routing for Delivery Harness work
+description: Discriminate orientation vs exact-contract delivery; never mix the two
 globs: []
-alwaysApply: false
+alwaysApply: true
 ---
 
-Use `.agents/skills/delivery-harness/SKILL.md`. Resolve an exact task contract;
-never search latest/newest/current work. Generate bounded context with
-`scripts/delivery_harness.py context`. Preserve explicit gaps and route
-continuity. Open one repository/worktree root only.
+# Input routing
+
+Pick exactly one entry per turn. Do not mix them.
+
+## ORIENTATION
+
+Triggers: го дальше, что дальше, продолжай, поднимем голову, go next,
+continue, what next, next best step — when the ask is project direction or
+the next meaningful step.
+
+Read-only Git truth only: last verified result, due time gates, any still-live
+exact contract, the named product/evidence gap. Challenge the current route
+when evidence warrants it. Never search latest/newest/current work. No
+mutation, provider/API/RPC/WSS, credentials or new write set.
+
+Return one verdict and one next atom:
+`CONTINUE | REPLAN | SELECT | STRATEGY | BOTTLENECK | RESEARCH | OWNER_DECISION`.
+
+If an unfinished exact contract has a safe in-scope next step, return
+`CONTINUE` and follow EXECUTE. Otherwise stop before mutation. A new write
+set needs an exact task contract plus one owner OK. Do not invent a task to
+dodge `OWNER_DECISION`.
+
+## EXECUTE
+
+Triggers: a named TASK/CTRL contract, `/delivery-start`, or resume of that
+already-bound contract.
+
+Use `.agents/skills/delivery-harness/SKILL.md`. Run
+`scripts/delivery_harness.py check` then `context`. Preserve explicit gaps
+and route continuity. Open one repository/worktree root only.
+
+## NEITHER
+
+Isolated explanation, Plan/Ask, one-file debug or translation: answer in
+place. Do not open the skill or run orientation.

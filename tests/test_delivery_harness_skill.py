@@ -27,6 +27,8 @@ class DeliveryHarnessSkillTests(unittest.TestCase):
             "CHECK -> CONTEXT -> ENTRY/OUTCOME -> EXECUTE -> RISK-ROUTED REVIEW -> FINISH -> EXACT MERGE GATE -> READ-BACK",
             text,
         )
+        self.assertIn("Do not use for orientation phrases", metadata["description"])
+        self.assertIn("classifies the turn as `ORIENTATION`", text)
         self.assertFalse((ROOT / ".cursor/skills").exists())
 
     def test_skill_preserves_decision_atoms_replan_and_single_effort_advice(self) -> None:
