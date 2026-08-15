@@ -1,0 +1,43 @@
+{
+  "alpha_claim": false,
+  "as_of": "2026-08-15",
+  "atom_id": "T39-A1_RC002_H11_NAMED_MINT_GTA_CLOCK_CAPTURE_V1",
+  "clock_sha256": "d857f78c64426f8dda9e81632cd1e6d20a8107d9923debca090b1751cd018b6c",
+  "execution_claim": false,
+  "holdout_consumed": false,
+  "live_PIT_claim": false,
+  "live_universe_txs": 3000,
+  "named_mint": "DMwbVy48dWVKGe9z1pcVnwF3HLMLrqWdDLfbvx8RchhK",
+  "non_claims": [
+    "NO_LIVE_PIT_CLAIM",
+    "NO_EXECUTION_CLAIM",
+    "NO_ALPHA",
+    "NO_NETRETURN",
+    "NO_RC001_MUTATION",
+    "NO_HOLDOUT_CONSUMPTION",
+    "NO_H11_EFFECT_SCREEN",
+    "NO_UNBOUNDED_PUMP_PROGRAM_GTA",
+    "NO_H13_OR_H02_TRIAL"
+  ],
+  "project_sources_disposition": {
+    "kind": "NO_CHANGE"
+  },
+  "rc001_mutated": false,
+  "receipt_id": "EVIDENCE-T39-RC002-H11-NAMED-MINT-GTA-001",
+  "remaining_rc001_deprioritized": true,
+  "research_cycle_id": "RESEARCH-CYCLE-RC002-001",
+  "runtime_receipt_sha256": "f33d8a1054b19f3f30702e362bf5d6b476d1b6258ad1e0efac76b36c28fc7a25",
+  "schema": "smial.task39.rc002-h11-named-mint-gta.acceptance",
+  "schema_version": "1.0",
+  "side_effects": {
+    "cash_spend_usd_cents": 0,
+    "credential_reads": 1,
+    "fallbacks": 0,
+    "provider_requests": 3,
+    "retries": 0,
+    "wallet_signer_transaction_actions": 0
+  },
+  "terminal_decision": "HISTORICAL_ROUTE_WRONG_ADDRESS_OR_EVENT",
+  "trial_id": "TRIAL-RC002-H11-NAMED-MINT-GTA-001",
+  "trial_outcome": "INCONCLUSIVE"
+}

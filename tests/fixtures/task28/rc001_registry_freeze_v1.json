@@ -11,7 +11,7 @@
     "RC001-H07-H01-LIQUIDITY-RETENTION": "BLOCKED_DATA",
     "RC001-H02-H10-H14-PULLBACK-RECLAIM": "BLOCKED_DATA"
   },
-  "initial_global_trial_record_count": 6,
+  "initial_global_trial_record_count": 7,
   "adversarial_cases": [
     {
       "case_id": "numeric-netreturn-promotion",
