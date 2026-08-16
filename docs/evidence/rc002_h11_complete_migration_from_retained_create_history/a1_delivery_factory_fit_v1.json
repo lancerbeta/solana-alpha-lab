@@ -4,8 +4,8 @@
   "review_id": "RC002-H11-COMPLETE-MIGRATION-FROM-RETAINED-CREATE-HISTORY-FACTORY-FIT-001",
   "as_of": "2026-08-17",
   "task_id": "RC002-H11-COMPLETE-MIGRATION-FROM-RETAINED-CREATE-HISTORY-OFFLINE-V1",
-  "reviewed_bindings_sha256": "4e7199d67a72de778d8102fb299d6aa94c58893ab2de007c530f80d0d3843fd0",
-  "reviewed_inventory_sha256": "5d98b2e8900a6348390d63216fa7d8aa1babdb2a11c807d3aef0ac02ade47330",
+  "reviewed_bindings_sha256": "54470c26c4be9914c780c29e8bcafcf66b3e8863f772628015e0a210a1af58a2",
+  "reviewed_inventory_sha256": "b779cb08b1cb448a5d4c6aa88f88b78a4876afb39b2fde5b0ec8e67106d45dc3",
   "mode": "FULL_REVIEW",
   "verdict": "PASS",
   "dimensions": {
