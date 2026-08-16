@@ -1,0 +1,73 @@
+{
+  "schema": "smial.delivery-completion-evidence",
+  "schema_version": "1.0",
+  "acceptance_id": "RC002-H11-TASK40-CLOSE-CREATE-AT-GAP-MIGRATION-AT-BOUND-DELIVERY-COMPLETION-001",
+  "as_of": "2026-08-17",
+  "task_id": "RC002-H11-TASK40-CLOSE-CREATE-AT-GAP-MIGRATION-AT-BOUND-V1",
+  "state_change": "TASK40_CLOSED_CREATE_AT_GAP_MIGRATION_AT_BOUND",
+  "base_main": "5800e2c7183df335fcddd10253e1e11bd3aa8089",
+  "cloud_bundle_mode": "OWNER_MANAGED_OPTIONAL_EXPORT",
+  "cloud_bundle_required_by_harness": false,
+  "cloud_bundle_smoke_required": false,
+  "capability_radar_now": "NONE",
+  "implementation_bindings": {
+    "docs/evidence/rc002_h11_task40_close_create_at_gap_migration_at_bound/a1_task40_close_create_at_gap_migration_at_bound_acceptance_v1.json": "a3270ec48a70ab500fa692b855b8ffa7454e8a84baebde28fd339b68188319e0",
+    "docs/reports/rc002_h11_task40_close_create_at_gap_migration_at_bound/a1_owner_readout_v1.md": "54ec6a677cd97ee6342a20e6558889850130b2e10a886ed7958bc09612fad679",
+    "docs/tasks/RC002-H11-TASK40-CLOSE-CREATE-AT-GAP-MIGRATION-AT-BOUND-V1.md": "408c0a1f57803d2b80f174a7480bbebd530422573f39455957d2473b3e49c58d",
+    "scripts/run_rc002_h11_task40_close_create_at_gap_migration_at_bound.py": "7f650413330e18261c1defcbc94e52a1deee35e5ea3aab3e9664757e205e2146",
+    "src/solana_alpha_lab/rc002_h11_task40_close_create_at_gap_migration_at_bound.py": "4dddc5145104dc00b89f3f0a3ea92027a62b5f588899fec1cd7f9815297fcb96",
+    "tests/test_rc002_h11_task40_close_create_at_gap_migration_at_bound.py": "d704fffa56c3e31c6e0191d118d894157ec4e9f8d8e6aa47d4b7e7c81a8f9e66"
+  },
+  "active_stop_conditions": [],
+  "owner_attention_triggers": {
+    "auth_or_access_recovery": false,
+    "material_owner_decision": false,
+    "user_only_activation": false,
+    "external_material_action": false,
+    "unresolved_safety_or_truth_conflict": false
+  },
+  "factory_fit": {
+    "path": "docs/evidence/rc002_h11_task40_close_create_at_gap_migration_at_bound/a1_delivery_factory_fit_v1.json",
+    "sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+    "verdict": "PASS"
+  },
+  "validation": {
+    "targeted": "PASS_TASK40_CLOSE_CREATE_AT_GAP_MIGRATION_AT_BOUND_TESTS",
+    "independent_review": {
+      "path": "docs/evidence/rc002_h11_task40_close_create_at_gap_migration_at_bound/a1_delivery_independent_review_v1.json",
+      "sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+      "verdict": "PASS"
+    },
+    "full_gate": "ENFORCED_BY_PROJECT_BOUND_VALIDATION",
+    "github_ci": "ENFORCED_LIVE_AT_GUARDED_MERGE",
+    "project_checks": [
+      "PASS_TARGETED_TASK40_CLOSE_CREATE_AT_GAP_MIGRATION_AT_BOUND_TESTS"
+    ]
+  },
+  "non_claims": [
+    "NO_CANONICAL_DONE",
+    "NO_LIVE_PIT_OR_EXECUTION_CLAIM",
+    "NO_ALPHA_PNL_OR_NETRETURN",
+    "NO_EXCLUSIVE_XB_RPC_CUT_CLAIM",
+    "NO_CREATE_LAYOUT_AS_CURRENT_IDL_CLAIM",
+    "NO_CREATE_AT_FROM_BLOCKTIME",
+    "NO_MIGRATION_AT_FROM_BLOCKTIME",
+    "NO_COMPLETE_EVENT_AS_MIGRATION_AT",
+    "NO_TASK37_CLOCK_DEFINITION_REWRITE",
+    "NO_TASK40_RECEIPT_REWRITE",
+    "NO_TRIAL_LEDGER_REWRITE",
+    "NO_H11_EFFECT_SCREEN",
+    "NO_PINNED_DECODER_MUTATION"
+  ],
+  "side_effects": {
+    "cash_spend_usd_cents": 0,
+    "credential_reads": 0,
+    "fallbacks": 0,
+    "provider_requests": 0,
+    "retries": 0,
+    "wallet_signer_transaction_actions": 0
+  },
+  "project_sources_disposition": {
+    "kind": "NO_CHANGE"
+  }
+}
