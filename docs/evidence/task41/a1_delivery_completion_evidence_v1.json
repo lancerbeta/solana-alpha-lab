@@ -2,19 +2,19 @@
   "acceptance_id": "T41-A1-DELIVERY-COMPLETION-001",
   "active_stop_conditions": [],
   "as_of": "2026-08-16",
-  "base_main": "f6cf9b422d7fa8ff03e0a295ad750cb8b02066f3",
+  "base_main": "6ad2e5545330fd655c1508da4a49661f9e268cf9",
   "capability_radar_now": "NONE",
   "cloud_bundle_mode": "OWNER_MANAGED_OPTIONAL_EXPORT",
   "cloud_bundle_required_by_harness": false,
   "cloud_bundle_smoke_required": false,
   "factory_fit": {
     "path": "docs/evidence/task41/a1_delivery_factory_fit_v1.json",
-    "sha256": "7cee70bcfaa7ef52976507ef2f04c9c50f87a7f9955d48db9e10f388819e4586",
+    "sha256": "0000000000000000000000000000000000000000000000000000000000000000",
     "verdict": "PASS"
   },
   "implementation_bindings": {
-    "catalog/assets/core.yaml": "79aa0a8d40f0d690130a1716c0158f8f89d29d19f453d219d851a9dd95115ae8",
-    "docs/tasks/TASK-41-isolated-review-and-raw-noclobber.md": "564d4a359edc3d70d41a656575c253e4bb90a2eddf92a946fe8aec5a16345fc3",
+    "catalog/assets/core.yaml": "4b379761e617f1b25697dccc6e7c62e0128d0c8d39e262187c4e43bc88d30390",
+    "docs/tasks/TASK-41-isolated-review-and-raw-noclobber.md": "2066b6c782b5b276cae7826eb17005d362d2d3e6086bb85c5f85550c93a6710a",
     "src/solana_alpha_lab/storage/exclusive.py": "5cb37fbdec0acb6214777aef7699568f2626a6a7a93e8005a921f939b4eb2dcf",
     "src/solana_alpha_lab/task39_h11_named_mint_gta_clock_capture.py": "8a78a2b16f50c8c928c23452eb6eb55813a9aa97a6623a5b39486bd95b5a0935",
     "tests/test_storage_exclusive_write.py": "6b657840675b0cae81cde572beddd79016376ad39828dfbd8a2a188681aabc12",
@@ -54,7 +54,7 @@
     "github_ci": "ENFORCED_LIVE_AT_GUARDED_MERGE",
     "independent_review": {
       "path": "docs/evidence/task41/a1_delivery_independent_review_v1.json",
-      "sha256": "23db1ed7034dd1c52f4de18058081871a715ba813442efe3abfdd0ace7c12dfe",
+      "sha256": "0000000000000000000000000000000000000000000000000000000000000000",
       "verdict": "PASS"
     },
     "project_checks": [

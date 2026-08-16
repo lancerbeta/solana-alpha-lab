@@ -7,9 +7,9 @@ owner: GOAL_OWNER
 allowed_routes: [DIRECT_CURSOR_DELIVERY]
 expected_repository: lancerbeta/solana-alpha-lab
 git_binding:
-  expected_base: f6cf9b422d7fa8ff03e0a295ad750cb8b02066f3
+  expected_base: 6ad2e5545330fd655c1508da4a49661f9e268cf9
   expected_upstream: origin/main
-  expected_upstream_oid: f6cf9b422d7fa8ff03e0a295ad750cb8b02066f3
+  expected_upstream_oid: 6ad2e5545330fd655c1508da4a49661f9e268cf9
   expected_branch: cursor/task41-exclusive-raw-noclobber
   dirty_mode: ALLOW_REPORTED
 objective: Persist H11 live raw pages with exclusive no-clobber writes.
