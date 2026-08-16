@@ -1,0 +1,67 @@
+{
+  "schema": "smial.delivery-completion-evidence",
+  "schema_version": "1.0",
+  "acceptance_id": "RC002-H11-CREATE-WITHOUT-VIRTUAL-QUOTE-DELIVERY-COMPLETION-001",
+  "as_of": "2026-08-16",
+  "task_id": "RC002-H11-CREATE-WITHOUT-VIRTUAL-QUOTE-OFFLINE-V1",
+  "state_change": "CREATE_STILL_TRUNCATED_NEED_GETTRANSACTION",
+  "base_main": "c35a69f6473f10973cb5a94f8c32dc21e8809d9b",
+  "cloud_bundle_mode": "OWNER_MANAGED_OPTIONAL_EXPORT",
+  "cloud_bundle_required_by_harness": false,
+  "cloud_bundle_smoke_required": false,
+  "capability_radar_now": "NONE",
+  "implementation_bindings": {
+    "docs/evidence/rc002_h11_create_without_virtual_quote/a1_create_without_virtual_quote_acceptance_v1.json": "79dd09c1d88b0e5893fd512612089e03b6df42b30b8c53e6b3e8a432bed96df2",
+    "docs/reports/rc002_h11_create_without_virtual_quote/a1_owner_readout_v1.md": "8e9b12bba8461f48993903b6060832a98c8fa0e47fe55bfe60ec4d72cca644d6",
+    "docs/tasks/RC002-H11-CREATE-WITHOUT-VIRTUAL-QUOTE-OFFLINE-V1.md": "bc5577c3af09ff20c2ad69308e9cec0f3a6f4207f74871e72e48872bc62145d5",
+    "scripts/run_rc002_h11_create_without_virtual_quote.py": "eedc8104671d329829c8b14d4912abb6677cbbc9eceba2ccab42d639f5942ff0",
+    "src/solana_alpha_lab/rc002_h11_create_without_virtual_quote.py": "a7ec1bf49a31655f8b12ef55511a9a72af844635b160f78c1f0dc49eb55dbe62",
+    "tests/test_rc002_h11_create_without_virtual_quote.py": "641fa02aa6295d2e6333bb7b3bd6ece5ce0a7a773278dcc1fbc4eeaeddb4eade"
+  },
+  "active_stop_conditions": [],
+  "owner_attention_triggers": {
+    "auth_or_access_recovery": false,
+    "material_owner_decision": false,
+    "user_only_activation": false,
+    "external_material_action": false,
+    "unresolved_safety_or_truth_conflict": false
+  },
+  "factory_fit": {
+    "path": "docs/evidence/rc002_h11_create_without_virtual_quote/a1_delivery_factory_fit_v1.json",
+    "sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+    "verdict": "PASS"
+  },
+  "validation": {
+    "targeted": "PASS_CREATE_WITHOUT_VIRTUAL_QUOTE_TESTS",
+    "independent_review": {
+      "path": "docs/evidence/rc002_h11_create_without_virtual_quote/a1_delivery_independent_review_v1.json",
+      "sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+      "verdict": "PASS"
+    },
+    "full_gate": "ENFORCED_BY_PROJECT_BOUND_VALIDATION",
+    "github_ci": "ENFORCED_LIVE_AT_GUARDED_MERGE",
+    "project_checks": [
+      "PASS_TARGETED_CREATE_WITHOUT_VIRTUAL_QUOTE_TESTS"
+    ]
+  },
+  "non_claims": [
+    "NO_CANONICAL_DONE",
+    "NO_LIVE_PIT_OR_EXECUTION_CLAIM",
+    "NO_ALPHA_PNL_OR_NETRETURN",
+    "NO_EXCLUSIVE_XB_RPC_CUT_CLAIM",
+    "NO_CREATE_LAYOUT_CLAIM",
+    "NO_TASK40_RECEIPT_REWRITE",
+    "NO_PINNED_DECODER_MUTATION"
+  ],
+  "side_effects": {
+    "cash_spend_usd_cents": 0,
+    "credential_reads": 0,
+    "fallbacks": 0,
+    "provider_requests": 0,
+    "retries": 0,
+    "wallet_signer_transaction_actions": 0
+  },
+  "project_sources_disposition": {
+    "kind": "NO_CHANGE"
+  }
+}

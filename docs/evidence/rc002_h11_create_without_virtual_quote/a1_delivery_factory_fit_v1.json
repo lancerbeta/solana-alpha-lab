@@ -1,0 +1,34 @@
+{
+  "schema": "smial.delivery-harness-factory-fit",
+  "schema_version": "1.0",
+  "review_id": "RC002-H11-CREATE-WITHOUT-VIRTUAL-QUOTE-FACTORY-FIT-001",
+  "as_of": "2026-08-16",
+  "task_id": "RC002-H11-CREATE-WITHOUT-VIRTUAL-QUOTE-OFFLINE-V1",
+  "reviewed_bindings_sha256": "fb8a1f8870ea4bf9d1501dd1a47c3490a9f428816f9ba3cf070cb955aaea546d",
+  "reviewed_inventory_sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+  "mode": "FULL_REVIEW",
+  "verdict": "PASS",
+  "dimensions": {
+    "mission": "PASS_CREATE_STILL_TRUNCATED_WITHOUT_XB_OVERCLAIM",
+    "flexibility_and_history": "PASS_TASK40_AND_OLDER_IDL_RECEIPTS_IMMUTABLE_PINNED_DECODER_UNCHANGED",
+    "context_efficiency": "PASS_ONE_TASK_CONTRACT_NO_CATALOG_CASCADE",
+    "research_truth": "PASS_CREATE_195_STILL_BORSH_PAYLOAD_TRUNCATED_AFTER_TWO_FIELD_DROP",
+    "owner_operability": "PASS_RUSSIAN_READOUT_AND_OFFLINE_SCRIPT",
+    "execution_to_cashflow": "NOT_APPLICABLE",
+    "monitoring_and_recovery": "PASS_NO_BACKGROUND_PROCESS",
+    "build_vs_buy": "PASS_ADOPT_PINNED_PUMP_DECODER_PUBLIC_DECODE",
+    "security": "PASS_SECRET_FREE_COUNTS_AND_PAGE_HASHES_ONLY",
+    "red_team": "PASS_NO_PROGRAM_GTA_NO_PROVIDER_CALL"
+  },
+  "capability_radar": {
+    "now": "NONE",
+    "watch": "BOUNDED_GETTRANSACTION_IF_CREATE_STILL_TRUNCATED"
+  },
+  "recovery": "REVERT_ONLY_THIS_ATOM_TRACKED_OUTPUTS; PRESERVE_TASK40_A4_AND_SCIENCE_RECEIPTS; PRESERVE_OLDER_IDL_RECEIPTS; PRESERVE_PINNED_DECODER",
+  "limits": [
+    "NO_CREATE_LAYOUT_CLAIM",
+    "NO_EXCLUSIVE_XB_RPC_CUT_CLAIM",
+    "CI_DOES_NOT_REHASH_LOCAL_A4",
+    "NO_LIVE_PIT_OR_CASHFLOW"
+  ]
+}
