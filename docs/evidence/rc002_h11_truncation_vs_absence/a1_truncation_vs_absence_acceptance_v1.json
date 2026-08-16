@@ -1,0 +1,80 @@
+{
+  "schema": "smial.rc002.h11-truncation-vs-absence.acceptance",
+  "schema_version": "1.0",
+  "acceptance_id": "EVIDENCE-RC002-H11-TRUNCATION-VS-ABSENCE-001",
+  "atom_id": "RC002-H11-TRUNCATION-VS-ABSENCE-OFFLINE-V1",
+  "as_of": "2026-08-16",
+  "consumer": "RC002-H11-LIFECYCLE-CLOCK",
+  "research_cycle_id": "RESEARCH-CYCLE-RC002-001",
+  "hypothesis_id": "HYP-RC002-H11-LIFECYCLE-CLOCK-V1",
+  "live_PIT_claim": false,
+  "execution_claim": false,
+  "alpha_claim": false,
+  "provider_requests": 0,
+  "credential_reads": 0,
+  "cash_spend_usd_cents": 0,
+  "historical_receipts_rewritten": false,
+  "fixture_terminal_create_truncated": "CLOCK_DISCRIMINATORS_PRESENT_BODY_NOT_PINNED_LAYOUT",
+  "fixture_terminal_trade_truncated": "CLOCK_EVENTS_ABSENT_TRUNCATION_IS_NON_CLOCK",
+  "fixture_terminal_create_after_truncated_trade": "CLOCK_EVENTS_PRESENT_AFTER_NON_CLOCK_TRUNCATION",
+  "retained_a4": {
+    "raw_root": "local/task40_rc002_h11_bonding_curve_pda_gta",
+    "pages_status": "SCANNED",
+    "page_count": 3,
+    "task40_runtime_receipt": "docs/evidence/task40/a1_h11_bonding_curve_pda_gta_runtime_receipt_v1.json",
+    "pages": [
+      {
+        "page_number": 0,
+        "response_bytes": 6478360,
+        "raw_sha256": "720705bf74fb052122236bf976afec405dfa749a99b676a90c6f95d1eca9710e"
+      },
+      {
+        "page_number": 1,
+        "response_bytes": 8166555,
+        "raw_sha256": "3db601e6b24e1adae952b0672b6469272902654fc373511f60c049f3d680e79d"
+      },
+      {
+        "page_number": 2,
+        "response_bytes": 3070312,
+        "raw_sha256": "70fb3accfa83fe8e002134f76f6cfea5850834dc12c87ee38a361e2406f63df2"
+      }
+    ],
+    "transaction_count": 2393,
+    "pump_program_in_account_keys": 2061,
+    "terminal": "CLOCK_DISCRIMINATORS_PRESENT_BODY_NOT_PINNED_LAYOUT",
+    "layout_claim": "PINNED_DISCRIMINATOR_PRESENT_BODY_NOT_CONSUMED",
+    "truncated_by_event": {
+      "CreateEvent": 1,
+      "CompleteEvent": 1,
+      "CompletePumpAmmMigrationEvent": 1,
+      "TradeEvent": 1258
+    },
+    "decoded_by_event": {},
+    "other_decode_by_event": {},
+    "attribution_errors": {
+      "log_truncated_marker": 2
+    },
+    "unknown_discriminator": 1094,
+    "clock_after_non_clock_truncation": 0,
+    "truncated_clock": 3,
+    "undecodable_clock": 3,
+    "truncated_non_clock": 1258,
+    "clock_undecodable_payload_bytes": [195, 112, 168]
+  },
+  "task40_terminal_patch": "HISTORICAL_ROUTE_WRONG_ADDRESS_OR_EVENT_NOT_CLOSED_CLOCK_DISCRIMINATORS_PRESENT_BODY_NOT_PINNED_LAYOUT",
+  "non_claims": [
+    "NO_LIVE_PIT_CLAIM",
+    "NO_EXECUTION_CLAIM",
+    "NO_ALPHA",
+    "NO_NETRETURN",
+    "NO_RC001_MUTATION",
+    "NO_HOLDOUT_CONSUMPTION",
+    "NO_UNBOUNDED_PUMP_PROGRAM_GTA",
+    "NO_TASK40_RECEIPT_REWRITE",
+    "NO_FULL_CLOCK_DECODE",
+    "NO_EXCLUSIVE_XB_RPC_CUT_CLAIM"
+  ],
+  "project_sources_disposition": {
+    "kind": "NO_CHANGE"
+  }
+}

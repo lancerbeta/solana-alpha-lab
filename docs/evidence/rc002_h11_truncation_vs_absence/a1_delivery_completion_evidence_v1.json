@@ -1,0 +1,65 @@
+{
+  "schema": "smial.delivery-completion-evidence",
+  "schema_version": "1.0",
+  "acceptance_id": "RC002-H11-TRUNCATION-VS-ABSENCE-DELIVERY-COMPLETION-001",
+  "as_of": "2026-08-16",
+  "task_id": "RC002-H11-TRUNCATION-VS-ABSENCE-OFFLINE-V1",
+  "state_change": "CLOCK_DISCRIMINATORS_PRESENT_BODY_NOT_PINNED_LAYOUT",
+  "base_main": "edfe3a9c51de106277793b8e5ca8e2ee820f1343",
+  "cloud_bundle_mode": "OWNER_MANAGED_OPTIONAL_EXPORT",
+  "cloud_bundle_required_by_harness": false,
+  "cloud_bundle_smoke_required": false,
+  "capability_radar_now": "NONE",
+  "implementation_bindings": {
+    "docs/evidence/rc002_h11_truncation_vs_absence/a1_truncation_vs_absence_acceptance_v1.json": "992d26052df1f3efef260672ac479bda2649edad4b77ddcc085a86491d9b0589",
+    "docs/reports/rc002_h11_truncation_vs_absence/a1_owner_readout_v1.md": "9825840342e9a79a557e88951f90586beaf22425248548878f70c9dc0f0dc98f",
+    "docs/tasks/RC002-H11-TRUNCATION-VS-ABSENCE-OFFLINE-V1.md": "f31211de6e8047982f31cc70414accea76c714b5121e4eae22f20670ce0da839",
+    "scripts/run_rc002_h11_truncation_vs_absence.py": "fb98f74bb632c36ef9f2c0f41d1ad63b350c1b53d1092c48715ba4694014cfa7",
+    "src/solana_alpha_lab/rc002_h11_truncation_vs_absence.py": "75c590bed1a4aa4d6d2059ad2dbbc83028d3d65ebbeaeee115571ac678107300",
+    "tests/test_rc002_h11_truncation_vs_absence.py": "e1d4fbd66711b8699770eb0960444d39aa0012594a7eee240ff5bd44a814334b"
+  },
+  "active_stop_conditions": [],
+  "owner_attention_triggers": {
+    "auth_or_access_recovery": false,
+    "material_owner_decision": false,
+    "user_only_activation": false,
+    "external_material_action": false,
+    "unresolved_safety_or_truth_conflict": false
+  },
+  "factory_fit": {
+    "path": "docs/evidence/rc002_h11_truncation_vs_absence/a1_delivery_factory_fit_v1.json",
+    "sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+    "verdict": "PASS"
+  },
+  "validation": {
+    "targeted": "PASS_TRUNCATION_VS_ABSENCE_TESTS",
+    "independent_review": {
+      "path": "docs/evidence/rc002_h11_truncation_vs_absence/a1_delivery_independent_review_v1.json",
+      "sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+      "verdict": "PASS"
+    },
+    "full_gate": "ENFORCED_BY_PROJECT_BOUND_VALIDATION",
+    "github_ci": "ENFORCED_LIVE_AT_GUARDED_MERGE",
+    "project_checks": [
+      "PASS_TARGETED_TRUNCATION_TESTS"
+    ]
+  },
+  "non_claims": [
+    "NO_CANONICAL_DONE",
+    "NO_LIVE_PIT_OR_EXECUTION_CLAIM",
+    "NO_ALPHA_PNL_OR_NETRETURN",
+    "NO_EXCLUSIVE_XB_RPC_CUT_CLAIM",
+    "NO_TASK40_RECEIPT_REWRITE"
+  ],
+  "side_effects": {
+    "cash_spend_usd_cents": 0,
+    "credential_reads": 0,
+    "fallbacks": 0,
+    "provider_requests": 0,
+    "retries": 0,
+    "wallet_signer_transaction_actions": 0
+  },
+  "project_sources_disposition": {
+    "kind": "NO_CHANGE"
+  }
+}
