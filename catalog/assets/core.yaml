@@ -735,7 +735,7 @@ records:
     repository_path: AGENTS.md
   integrity:
     kind: sha256
-    sha256: 39d2db33970b886021ffea887cd051a995e05f1cb2c8c1ccce366d7f382212ab
+    sha256: 808f38cad4954d49faf933328943ac49625d14d694bb17555f9d2f732b65f142
   access:
     mode: read_only
     method: file
@@ -4642,7 +4642,7 @@ records:
     repository_path: .github/pull_request_template.md
   integrity:
     kind: sha256
-    sha256: ff8dcedd7804ffc8811cc76f2aa4cdbfe2b6a6cb09f433e13b2b89cae4a10876
+    sha256: d6d025436652d44d250571a5772585dcfac6c0662e5df4c88779bdc457634aff
   access:
     mode: read_only
     method: file
@@ -13619,7 +13619,7 @@ records:
   as_of: '2026-08-14'
   truth_owner: TASK-30
   location: {kind: git_path, logical_uri: 'repo://docs/evidence/task30/a20r1_provider_route_capability_registry_acceptance_v1.json', repository_path: docs/evidence/task30/a20r1_provider_route_capability_registry_acceptance_v1.json}
-  integrity: {kind: sha256, sha256: 1673d7c85c67b12af433a3635bae7475280b094f3c5740f8febde81eb4270fd6}
+  integrity: {kind: sha256, sha256: 5dbaffbf7579ecfa851bb4ef527ed31af740952f1d61dd6a27df46e88280775b}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: derived_from, target_asset_id: CONFIG-PROVIDER-ROUTE-CAPABILITY-REGISTRY-004}
@@ -16307,7 +16307,7 @@ records:
   as_of: '2026-08-14'
   truth_owner: CTRL-DELIVERY-HARNESS-001
   location: {kind: git_path, logical_uri: 'repo://scripts/owner_attention_gate.py', repository_path: scripts/owner_attention_gate.py}
-  integrity: {kind: sha256, sha256: 11e2a2d8a7b3a9a17b3f2c2258f62b332227ff410e5fc788919fdaf904ec96ac}
+  integrity: {kind: sha256, sha256: cb4c65cbebcb0f5cb2c53679f0d62bda53596ce1272325d5b123a1f6b8c5c3ab}
   access: *t25_read_file
   relations:
   - {relation_type: governed_by, target_asset_id: POLICY-OWNER-ATTENTION-GATE-002}
@@ -19799,7 +19799,7 @@ records:
   as_of: '2026-08-14'
   truth_owner: CTRL-DELIVERY-HARNESS-001
   location: {kind: git_path, logical_uri: 'repo://delivery-harness/templates/portable-bundle-manifest.json', repository_path: delivery-harness/templates/portable-bundle-manifest.json}
-  integrity: {kind: sha256, sha256: eabb6e6954a1503b1c098c300f1089deaea7f24fc81915b9e534377e553a3597}
+  integrity: {kind: sha256, sha256: 112f2bd814299fb82471821a36b58fefe1112a606aee714daf886c7fe4cd9d20}
   access: *t25_read_file
   relations:
   - {relation_type: governed_by, target_asset_id: CTRL-DELIVERY-HARNESS-001}
@@ -19872,7 +19872,7 @@ records:
   as_of: '2026-08-14'
   truth_owner: CTRL-DELIVERY-HARNESS-001
   location: {kind: git_path, logical_uri: 'repo://.agents/skills/delivery-harness/SKILL.md', repository_path: .agents/skills/delivery-harness/SKILL.md}
-  integrity: {kind: sha256, sha256: 6364595e1de363f81ff3ebf1372ed650a613ce483daed0d05a7a4d677873bf74}
+  integrity: {kind: sha256, sha256: 20fb89acf4c171c7202b4925b231f5736b767a58fd1acb2256c74ab4a265bfea}
   access: *t25_read_file
   relations:
   - {relation_type: governed_by, target_asset_id: CTRL-DELIVERY-HARNESS-001}
@@ -19926,7 +19926,7 @@ records:
   as_of: '2026-08-14'
   truth_owner: CTRL-DELIVERY-HARNESS-001
   location: {kind: git_path, logical_uri: 'repo://docs/agent/DELIVERY_HARNESS_PROTOCOL.md', repository_path: docs/agent/DELIVERY_HARNESS_PROTOCOL.md}
-  integrity: {kind: sha256, sha256: 2ba3f67901f887cb6fe36076611d28055e96ecf98c00294dcb92757bd0ea1f7a}
+  integrity: {kind: sha256, sha256: ad0a43b9c3ad2dc66abc8fa7bf60ddd0571037acc84a9a416d2e259118b3e422}
   access: *t25_read_file
   relations:
   - {relation_type: governed_by, target_asset_id: ADR-DIRECT-DELIVERY-HARNESS-005}

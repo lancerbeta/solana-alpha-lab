@@ -39,8 +39,8 @@ evidence/time budget breach.
 Routine bounded delivery is autonomous. Use targeted tests; after bootstrap
 the guarded merge is the sole project-bound gate executor for the unchanged
 fingerprint. Code review is mandatory. Goal/DoD, architecture and refactor critics
-are trigger-routed; unavailable subagents yield `SINGLE_AGENT_REVIEW_FALLBACK`
-and the same deterministic validation.
+are trigger-routed and must run in isolated context. `SINGLE_AGENT_REVIEW_FALLBACK`
+is `NOT_READY` for merge; deterministic validation still runs.
 
 ### Finish and merge
 

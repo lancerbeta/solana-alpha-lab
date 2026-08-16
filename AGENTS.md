@@ -113,12 +113,11 @@ because bytes moved through stage, commit, push or PR. The first harness
 installation alone uses the predecessor route and one pre-PR tracked-only
 gate. A changed fingerprint invalidates evidence.
 
-Risk-route review: code review for every delivery; goal/DoD review for new or
-changed outcomes; architecture review for contracts, schemas, boundaries,
-security or multiple components; refactor review only after correctness and a
-measured complexity/duplication signal. Custom critics are optional read-only
-context isolation. If unavailable, record `SINGLE_AGENT_REVIEW_FALLBACK` and
-run the same deterministic checks.
+Risk-route review: launch isolated read-only critics for the exact contract
+and diff (code always; goal/DoD and architecture on their triggers).
+Architecture review must name what can pass tests and still break research
+validity. `SINGLE_AGENT_REVIEW_FALLBACK` is `NOT_READY` for merge; the
+owner-attention gate denies PASS evidence that records it.
 
 Before task closure run the proportional `FACTORY_FIT_REVIEW` and
 `PRODUCT_HORIZON_RADAR` from the domain policy. Generated files are never

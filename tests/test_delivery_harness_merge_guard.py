@@ -677,6 +677,16 @@ class DeliveryHarnessMergeGuardTests(unittest.TestCase):
                 })
             },
             {
+                "mutate_review": lambda value: value["non_claims"].append(
+                    "SINGLE_AGENT_REVIEW_FALLBACK"
+                )
+            },
+            {
+                "mutate_review": lambda value: value["reviews"][2]["findings"].append(
+                    "SINGLE_AGENT_REVIEW_FALLBACK_WITHOUT_ISOLATED_CONTEXT_CRITICS"
+                )
+            },
+            {
                 "mutate_fit": lambda value: value.__setitem__(
                     "reviewed_bindings_sha256", "0" * 64
                 )
