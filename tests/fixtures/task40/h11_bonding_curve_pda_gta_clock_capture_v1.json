@@ -1,0 +1,14 @@
+{
+  "schema": "smial.task40.rc002-h11-bonding-curve-pda-gta.fixture",
+  "schema_version": "1.0",
+  "named_mint": "DMwbVy48dWVKGe9z1pcVnwF3HLMLrqWdDLfbvx8RchhK",
+  "bonding_curve": "ENz3D4ZoarzHZCsGeFTfswAKrSo5sHX9UUut1FLS6WgC",
+  "expected_bump": 255,
+  "forbidden_gta_targets": [
+    "6EF8rrecthR5Dkzon8Nwu78hRvfCKubJ14M5uBEwF6P",
+    "URqx24yyYxtXXhTbBQnbtPLhtLWYoaDaRxuQuLpNS3S",
+    "DMwbVy48dWVKGe9z1pcVnwF3HLMLrqWdDLfbvx8RchhK"
+  ],
+  "omit_block_time_filter": true,
+  "owner_phrase": "OK T40-RC002 H11_BONDING_CURVE_PDA_GTA_ONE_SHOT"
+}

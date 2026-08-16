@@ -13138,7 +13138,7 @@ records:
     repository_path: tests/test_task23_catalog_repository_factory_fit.py
   integrity:
     kind: sha256
-    sha256: 68f6aaf9607020cfedafd12da2c43632212dd9b766b5a5887acd7a40653fe5e1
+    sha256: 484aeb7a9febe6e0425c935bb49368d70a72acd75f0378749cb6321353b6083b
   access: *t23_read_file
   relations:
   - relation_type: depends_on
@@ -16602,7 +16602,7 @@ records:
   as_of: '2026-08-09'
   truth_owner: TASK-28
   location: {kind: git_path, logical_uri: 'repo://tests/fixtures/task28/rc001_registry_freeze_v1.json', repository_path: tests/fixtures/task28/rc001_registry_freeze_v1.json}
-  integrity: {kind: sha256, sha256: d3565a484a2085498bb326610de5a3f12f3cbefffa7ea3af8bee4e6ac7a341e4}
+  integrity: {kind: sha256, sha256: 35213fedf42b47ad35614131e730dc8bc45ce35acd54d45ffa02bf3f0be82773}
   access: *t25_read_file
   relations: [{relation_type: derived_from, target_asset_id: CONFIG-T28-RC001-REGISTRY-FREEZE-001}]
   consumers: [TASK-28, FACTORY-001]
@@ -16656,7 +16656,7 @@ records:
   as_of: '2026-08-09'
   truth_owner: TASK-28
   location: {kind: git_path, logical_uri: 'repo://docs/evidence/task28/a1_rc001_registry_freeze_acceptance_v1.json', repository_path: docs/evidence/task28/a1_rc001_registry_freeze_acceptance_v1.json}
-  integrity: {kind: sha256, sha256: a23c643b2b2d5a9ed92cb4d212c5d4552e674b38c6a026d7eeae58a1e93fd617}
+  integrity: {kind: sha256, sha256: 4292df639605f3a6e10c6c02c1b5d1fc63ca3883269d904db323bc42916594f4}
   access: *t25_read_file
   relations:
   - {relation_type: derived_from, target_asset_id: MODULE-T28-RC001-REGISTRY-FREEZE-001}
@@ -22895,4 +22895,285 @@ records:
   consumers: [TASK-39, FACTORY-001, GOAL-OWNER]
   evidence: []
   search_terms: [H11, FACTORY_FIT, FULL_REVIEW, NAMED_MINT_GTA]
+  classification: {contains_secrets: false, contains_raw_data: false, sensitivity: INTERNAL_NON_SECRET}
+- asset_id: CONTRACT-T40-RC002-H11-BONDING-CURVE-PDA-GTA-001
+  record_version: '1.0'
+  asset_type: control_document
+  purpose: Exact TASK-40 contract for bonding_curve PDA derivation plus bounded Helius GTA clock capture.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-08-16'
+  truth_owner: TASK-40
+  location: {kind: git_path, logical_uri: 'repo://docs/contracts/task40_rc002_h11_bonding_curve_pda_gta_clock_capture_contract_v1.md', repository_path: docs/contracts/task40_rc002_h11_bonding_curve_pda_gta_clock_capture_contract_v1.md}
+  integrity: {kind: sha256, sha256: 796bb1ec7f9de8beca30175a4c408d33a3c6ed8f859dcda47abf872dd75fdb95}
+  access: {mode: read_only, method: file, network_required: false, secrets_required: false}
+  relations:
+  - {relation_type: depends_on, target_asset_id: EVIDENCE-T39-RC002-H11-NAMED-MINT-GTA-001}
+  - {relation_type: depends_on, target_asset_id: EVIDENCE-T38-RC002-H11-NEXT-GTA-001}
+  consumers: [TASK-40, FACTORY-001]
+  evidence: []
+  search_terms: [H11, RC002, BONDING_CURVE_PDA, BOUNDED_GTA]
+  classification: {contains_secrets: false, contains_raw_data: false, sensitivity: INTERNAL_NON_SECRET}
+
+- asset_id: CONFIG-T40-RC002-H11-BONDING-CURVE-PDA-GTA-001
+  record_version: '1.0'
+  asset_type: configuration
+  purpose: Frozen PDA address, adopted Helius GTA route and RC001 non-mutation guard.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-08-16'
+  truth_owner: TASK-40
+  location: {kind: git_path, logical_uri: 'repo://configs/task40_rc002_h11_bonding_curve_pda_gta_clock_capture_v1.yaml', repository_path: configs/task40_rc002_h11_bonding_curve_pda_gta_clock_capture_v1.yaml}
+  integrity: {kind: sha256, sha256: d86ef4f4c0495b0a6be74d9dc716e8acde563d1fce8364516b04a82211585f60}
+  access: {mode: read_only, method: file, network_required: false, secrets_required: false}
+  relations: [{relation_type: governed_by, target_asset_id: CONTRACT-T40-RC002-H11-BONDING-CURVE-PDA-GTA-001}]
+  consumers: [TASK-40, FACTORY-001]
+  evidence: []
+  search_terms: [H11, PDA, HELIUS_GTA, BONDING_CURVE]
+  classification: {contains_secrets: false, contains_raw_data: false, sensitivity: INTERNAL_NON_SECRET}
+
+- asset_id: SCHEMA-T40-RC002-H11-BONDING-CURVE-PDA-GTA-001
+  record_version: '1.0'
+  asset_type: schema
+  purpose: Closed JSON Schema for the TASK-40 bonding_curve PDA GTA clock capture policy.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-08-16'
+  truth_owner: TASK-40
+  location: {kind: git_path, logical_uri: 'repo://catalog/schemas/task40_rc002_h11_bonding_curve_pda_gta_clock_capture.schema.json', repository_path: catalog/schemas/task40_rc002_h11_bonding_curve_pda_gta_clock_capture.schema.json}
+  integrity: {kind: sha256, sha256: ea029e94611a7ee7cc9a29f5cb561dd9fd4177497233fb6e46058c45d46b2e71}
+  access: {mode: read_only, method: file, network_required: false, secrets_required: false}
+  relations: [{relation_type: governed_by, target_asset_id: CONTRACT-T40-RC002-H11-BONDING-CURVE-PDA-GTA-001}]
+  consumers: [TASK-40, FACTORY-001]
+  evidence: []
+  search_terms: [H11, CLOSED_SCHEMA, BONDING_CURVE_PDA]
+  classification: {contains_secrets: false, contains_raw_data: false, sensitivity: INTERNAL_NON_SECRET}
+
+- asset_id: FIXTURE-T40-RC002-H11-BONDING-CURVE-PDA-SUBSET-001
+  record_version: '1.0'
+  asset_type: evidence
+  purpose: Pinned official Pump bonding_curve PDA seeds and frozen derived address for the TASK-38 mint.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-08-16'
+  truth_owner: TASK-40
+  location: {kind: git_path, logical_uri: 'repo://tests/fixtures/task08/pump_bonding_curve_pda_subset_v1.json', repository_path: tests/fixtures/task08/pump_bonding_curve_pda_subset_v1.json}
+  integrity: {kind: sha256, sha256: 5ab78aa7f6b86812c8dbea23ea575ac520bd4a6bbcd2d8623656cc5dcf56f4a6}
+  access: {mode: read_only, method: file, network_required: false, secrets_required: false}
+  relations: [{relation_type: governed_by, target_asset_id: CONTRACT-T40-RC002-H11-BONDING-CURVE-PDA-GTA-001}]
+  consumers: [TASK-40, FACTORY-001]
+  evidence: []
+  search_terms: [H11, PDA, BONDING_CURVE, PINNED_IDL]
+  classification: {contains_secrets: false, contains_raw_data: false, sensitivity: INTERNAL_NON_SECRET}
+
+- asset_id: FIXTURE-T40-RC002-H11-BONDING-CURVE-PDA-GTA-001
+  record_version: '1.0'
+  asset_type: evidence
+  purpose: Secret-free expected live terminal identity for the frozen bonding_curve PDA GTA.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-08-16'
+  truth_owner: TASK-40
+  location: {kind: git_path, logical_uri: 'repo://tests/fixtures/task40/h11_bonding_curve_pda_gta_clock_capture_v1.json', repository_path: tests/fixtures/task40/h11_bonding_curve_pda_gta_clock_capture_v1.json}
+  integrity: {kind: sha256, sha256: de8e045d04b543566737884b02839ad172c6899fed7052211607df846e0fa6b3}
+  access: {mode: read_only, method: file, network_required: false, secrets_required: false}
+  relations: [{relation_type: governed_by, target_asset_id: CONTRACT-T40-RC002-H11-BONDING-CURVE-PDA-GTA-001}]
+  consumers: [TASK-40, FACTORY-001]
+  evidence: []
+  search_terms: [H11, FIXTURE, HISTORICAL_ROUTE_WRONG_ADDRESS_OR_EVENT]
+  classification: {contains_secrets: false, contains_raw_data: false, sensitivity: INTERNAL_NON_SECRET}
+
+- asset_id: MODULE-T40-RC002-H11-BONDING-CURVE-PDA-GTA-001
+  record_version: '1.0'
+  asset_type: script
+  purpose: Thin bonding_curve PDA derivation plus bounded Helius GTA clock scan with pinned Pump decode.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-08-16'
+  truth_owner: TASK-40
+  location: {kind: git_path, logical_uri: 'repo://src/solana_alpha_lab/task40_h11_bonding_curve_pda_gta_clock_capture.py', repository_path: src/solana_alpha_lab/task40_h11_bonding_curve_pda_gta_clock_capture.py}
+  integrity: {kind: sha256, sha256: 30315bb3dfd02b6ba7da4d9f8b0d8cbbd64f13abd547a505a9590ce45b2abe83}
+  access: {mode: read_only, method: file, network_required: false, secrets_required: false}
+  relations:
+  - {relation_type: governed_by, target_asset_id: CONTRACT-T40-RC002-H11-BONDING-CURVE-PDA-GTA-001}
+  - {relation_type: depends_on, target_asset_id: CONFIG-T40-RC002-H11-BONDING-CURVE-PDA-GTA-001}
+  - {relation_type: validated_by, target_asset_id: TEST-T40-RC002-H11-BONDING-CURVE-PDA-GTA-001}
+  consumers: [TASK-40, FACTORY-001]
+  evidence: []
+  search_terms: [H11, MODULE, BONDING_CURVE_PDA, PUMP_DECODE]
+  classification: {contains_secrets: false, contains_raw_data: false, sensitivity: INTERNAL_NON_SECRET}
+
+- asset_id: SCRIPT-T40-RC002-H11-BONDING-CURVE-PDA-GTA-001
+  record_version: '1.0'
+  asset_type: script
+  purpose: Owner-authorized runner that derives the PDA, runs bounded GTA and emits clock receipts.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-08-16'
+  truth_owner: TASK-40
+  location: {kind: git_path, logical_uri: 'repo://scripts/run_task40_rc002_h11_bonding_curve_pda_gta_clock_capture.py', repository_path: scripts/run_task40_rc002_h11_bonding_curve_pda_gta_clock_capture.py}
+  integrity: {kind: sha256, sha256: 584f895ed8833251a24ae09a2953cb516c79be41ddb4603111050a0f4826a9de}
+  access: {mode: read_only, method: file, network_required: false, secrets_required: false}
+  relations:
+  - {relation_type: depends_on, target_asset_id: MODULE-T40-RC002-H11-BONDING-CURVE-PDA-GTA-001}
+  - {relation_type: governed_by, target_asset_id: CONTRACT-T40-RC002-H11-BONDING-CURVE-PDA-GTA-001}
+  consumers: [TASK-40, FACTORY-001]
+  evidence: []
+  search_terms: [H11, RUNNER, BONDING_CURVE_PDA, OWNER_READOUT]
+  classification: {contains_secrets: false, contains_raw_data: false, sensitivity: INTERNAL_NON_SECRET}
+
+- asset_id: TEST-T40-RC002-H11-BONDING-CURVE-PDA-GTA-001
+  record_version: '1.0'
+  asset_type: script
+  purpose: Targeted tests for frozen PDA identity, A22 payload deltas, trial-before-outcome and RC001 non-mutation.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-08-16'
+  truth_owner: TASK-40
+  location: {kind: git_path, logical_uri: 'repo://tests/test_task40_rc002_h11_bonding_curve_pda_gta_clock_capture.py', repository_path: tests/test_task40_rc002_h11_bonding_curve_pda_gta_clock_capture.py}
+  integrity: {kind: sha256, sha256: 0fbee5f42efb974e58db4a2511686a77b656f6153e33d1af9e95cb99631876c6}
+  access: {mode: read_only, method: file, network_required: false, secrets_required: false}
+  relations:
+  - {relation_type: depends_on, target_asset_id: CONFIG-T40-RC002-H11-BONDING-CURVE-PDA-GTA-001}
+  - {relation_type: depends_on, target_asset_id: SCHEMA-T40-RC002-H11-BONDING-CURVE-PDA-GTA-001}
+  - {relation_type: depends_on, target_asset_id: MODULE-T40-RC002-H11-BONDING-CURVE-PDA-GTA-001}
+  - {relation_type: depends_on, target_asset_id: FIXTURE-T40-RC002-H11-BONDING-CURVE-PDA-GTA-001}
+  consumers: [TASK-40, FACTORY-001]
+  evidence: []
+  search_terms: [H11, TEST, BONDING_CURVE_PDA, FAIL_CLOSED]
+  classification: {contains_secrets: false, contains_raw_data: false, sensitivity: INTERNAL_NON_SECRET}
+
+- asset_id: EVIDENCE-T40-RC002-H11P-BONDING-CURVE-PDA-GTA-001
+  record_version: '1.0'
+  asset_type: evidence
+  purpose: Runtime receipt for the H11 bonding_curve PDA GTA clock capture over named-mint-derived curve history.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-08-16'
+  truth_owner: TASK-40
+  location: {kind: git_path, logical_uri: 'repo://docs/evidence/task40/a1_h11_bonding_curve_pda_gta_runtime_receipt_v1.json', repository_path: docs/evidence/task40/a1_h11_bonding_curve_pda_gta_runtime_receipt_v1.json}
+  integrity: {kind: sha256, sha256: d34ea4a7d08266dcf1421b84ed0fbb9223b139d18d1d9b3f03a406cc6be72311}
+  access: {mode: read_only, method: file, network_required: false, secrets_required: false}
+  relations:
+  - {relation_type: derived_from, target_asset_id: CONFIG-T40-RC002-H11-BONDING-CURVE-PDA-GTA-001}
+  - {relation_type: validated_by, target_asset_id: TEST-T40-RC002-H11-BONDING-CURVE-PDA-GTA-001}
+  consumers: [TASK-40, FACTORY-001, GOAL-OWNER]
+  evidence: []
+  search_terms: [H11, RUNTIME, HISTORICAL_ROUTE_WRONG_ADDRESS_OR_EVENT]
+  classification: {contains_secrets: false, contains_raw_data: false, sensitivity: INTERNAL_NON_SECRET}
+
+- asset_id: REPORT-T40-RC002-H11-BONDING-CURVE-PDA-GTA-001
+  record_version: '1.0'
+  asset_type: control_document
+  purpose: Russian owner readout of the bonding_curve PDA GTA clock decision and non-claims.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-08-16'
+  truth_owner: TASK-40
+  location: {kind: git_path, logical_uri: 'repo://docs/reports/task40/a1_h11_bonding_curve_pda_gta_owner_readout_v1.md', repository_path: docs/reports/task40/a1_h11_bonding_curve_pda_gta_owner_readout_v1.md}
+  integrity: {kind: sha256, sha256: 7562a5e9722491b0de9e9d41a180829e1b4ec7e6b94df7f0833edde7644f8705}
+  access: {mode: read_only, method: file, network_required: false, secrets_required: false}
+  relations: [{relation_type: derived_from, target_asset_id: EVIDENCE-T40-RC002-H11P-BONDING-CURVE-PDA-GTA-001}]
+  consumers: [TASK-40, FACTORY-001, GOAL-OWNER]
+  evidence: []
+  search_terms: [H11, READOUT, HISTORICAL_ROUTE_WRONG_ADDRESS_OR_EVENT]
+  classification: {contains_secrets: false, contains_raw_data: false, sensitivity: INTERNAL_NON_SECRET}
+
+- asset_id: EVIDENCE-T40-RC002-H11-BONDING-CURVE-PDA-GTA-001
+  record_version: '1.0'
+  asset_type: evidence
+  purpose: Acceptance that frozen bonding_curve PDA GTA did not reconstruct Create or migration clocks.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-08-16'
+  truth_owner: TASK-40
+  location: {kind: git_path, logical_uri: 'repo://docs/evidence/task40/a1_h11_bonding_curve_pda_gta_acceptance_v1.json', repository_path: docs/evidence/task40/a1_h11_bonding_curve_pda_gta_acceptance_v1.json}
+  integrity: {kind: sha256, sha256: ce13526f883f0b25cc709d7afaf307c63d1c60d652c2ac0f54e5d6fcb753a895}
+  access: {mode: read_only, method: file, network_required: false, secrets_required: false}
+  relations:
+  - {relation_type: derived_from, target_asset_id: CONTRACT-T40-RC002-H11-BONDING-CURVE-PDA-GTA-001}
+  - {relation_type: depends_on, target_asset_id: EVIDENCE-T40-RC002-H11P-BONDING-CURVE-PDA-GTA-001}
+  - {relation_type: validated_by, target_asset_id: TEST-T40-RC002-H11-BONDING-CURVE-PDA-GTA-001}
+  consumers: [TASK-40, RC002-H11-LIFECYCLE-CLOCK, FACTORY-001, GOAL-OWNER]
+  evidence: []
+  search_terms: [H11, ACCEPTANCE, HISTORICAL_ROUTE_WRONG_ADDRESS_OR_EVENT]
+  classification: {contains_secrets: false, contains_raw_data: false, sensitivity: INTERNAL_NON_SECRET}
+
+- asset_id: CTRL-TASK-40-001
+  record_version: '1.0'
+  asset_type: control_document
+  purpose: Harness-valid TASK-40 contract binding RC002 bonding_curve PDA GTA authority, write set and DoD.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-08-16'
+  truth_owner: TASK-40
+  location: {kind: git_path, logical_uri: 'repo://docs/tasks/TASK-40-rc002-h11-bonding-curve-pda-gta-clock-capture.md', repository_path: docs/tasks/TASK-40-rc002-h11-bonding-curve-pda-gta-clock-capture.md}
+  integrity: {kind: sha256, sha256: a226ff107d554f3e75c9e5a495cb9156a297a085e0e969767464195fddb0f805}
+  access: {mode: read_only, method: file, network_required: false, secrets_required: false}
+  relations:
+  - {relation_type: contains, target_asset_id: CONTRACT-T40-RC002-H11-BONDING-CURVE-PDA-GTA-001}
+  - {relation_type: contains, target_asset_id: SCRIPT-T40-RC002-H11-BONDING-CURVE-PDA-GTA-001}
+  - {relation_type: depends_on, target_asset_id: EVIDENCE-T39-RC002-H11-NAMED-MINT-GTA-001}
+  consumers: [TASK-40, FACTORY-001]
+  evidence: []
+  search_terms: [H11, TASK_CONTRACT, BONDING_CURVE_PDA, IMPLEMENTED_UNVERIFIED]
+  classification: {contains_secrets: false, contains_raw_data: false, sensitivity: INTERNAL_NON_SECRET}
+
+- asset_id: EVIDENCE-T40-A1-DELIVERY-COMPLETION-001
+  record_version: '1.0'
+  asset_type: evidence
+  purpose: Guard-consumable completion evidence binding the exact TASK-40 bonding_curve PDA GTA inventory without product DONE.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-08-16'
+  truth_owner: TASK-40
+  location: {kind: git_path, logical_uri: 'repo://docs/evidence/task40/a1_delivery_completion_evidence_v1.json', repository_path: docs/evidence/task40/a1_delivery_completion_evidence_v1.json}
+  integrity: {kind: none, note: 'Content integrity is owned by the live completion-review-fit hash chain; embedding its SHA here would create an indirect self-reference through the reviewed inventory.'}
+  access: {mode: read_only, method: file, network_required: false, secrets_required: false}
+  relations:
+  - {relation_type: derived_from, target_asset_id: EVIDENCE-T40-RC002-H11-BONDING-CURVE-PDA-GTA-001}
+  - {relation_type: depends_on, target_asset_id: EVIDENCE-T40-A1-DELIVERY-INDEPENDENT-REVIEW-001}
+  - {relation_type: depends_on, target_asset_id: EVIDENCE-T40-A1-DELIVERY-FACTORY-FIT-001}
+  - {relation_type: depends_on, target_asset_id: SCHEMA-DELIVERY-COMPLETION-EVIDENCE-001}
+  consumers: [TASK-40, FACTORY-001, GOAL-OWNER]
+  evidence: []
+  search_terms: [H11, DELIVERY_COMPLETION, HISTORICAL_ROUTE_WRONG_ADDRESS_OR_EVENT]
+  classification: {contains_secrets: false, contains_raw_data: false, sensitivity: INTERNAL_NON_SECRET}
+
+- asset_id: EVIDENCE-T40-A1-DELIVERY-INDEPENDENT-REVIEW-001
+  record_version: '1.0'
+  asset_type: evidence
+  purpose: Required-role review evidence bound to the exact non-self-referential TASK-40 bonding_curve PDA GTA inventory.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-08-16'
+  truth_owner: TASK-40
+  location: {kind: git_path, logical_uri: 'repo://docs/evidence/task40/a1_delivery_independent_review_v1.json', repository_path: docs/evidence/task40/a1_delivery_independent_review_v1.json}
+  integrity: {kind: none, note: 'Content integrity is owned by the live completion-review-fit hash chain; embedding its SHA here would create an indirect self-reference through the reviewed inventory.'}
+  access: {mode: read_only, method: file, network_required: false, secrets_required: false}
+  relations:
+  - {relation_type: derived_from, target_asset_id: EVIDENCE-T40-RC002-H11-BONDING-CURVE-PDA-GTA-001}
+  - {relation_type: depends_on, target_asset_id: SCHEMA-DELIVERY-INDEPENDENT-REVIEW-EVIDENCE-001}
+  consumers: [TASK-40, FACTORY-001, GOAL-OWNER]
+  evidence: []
+  search_terms: [H11, INDEPENDENT_REVIEW, SINGLE_AGENT_REVIEW_FALLBACK]
+  classification: {contains_secrets: false, contains_raw_data: false, sensitivity: INTERNAL_NON_SECRET}
+
+- asset_id: EVIDENCE-T40-A1-DELIVERY-FACTORY-FIT-001
+  record_version: '1.0'
+  asset_type: evidence
+  purpose: FULL Factory Fit review for TASK-40 bonding_curve PDA GTA mission, research truth, owner operability, wrap-versus-buy, security and red team.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-08-16'
+  truth_owner: TASK-40
+  location: {kind: git_path, logical_uri: 'repo://docs/evidence/task40/a1_delivery_factory_fit_v1.json', repository_path: docs/evidence/task40/a1_delivery_factory_fit_v1.json}
+  integrity: {kind: none, note: 'Content integrity is owned by the live completion-review-fit hash chain; embedding its SHA here would create an indirect self-reference through the reviewed inventory.'}
+  access: {mode: read_only, method: file, network_required: false, secrets_required: false}
+  relations:
+  - {relation_type: derived_from, target_asset_id: EVIDENCE-T40-RC002-H11-BONDING-CURVE-PDA-GTA-001}
+  - {relation_type: depends_on, target_asset_id: EVIDENCE-T40-A1-DELIVERY-INDEPENDENT-REVIEW-001}
+  consumers: [TASK-40, FACTORY-001, GOAL-OWNER]
+  evidence: []
+  search_terms: [H11, FACTORY_FIT, FULL_REVIEW, BONDING_CURVE_PDA]
   classification: {contains_secrets: false, contains_raw_data: false, sensitivity: INTERNAL_NON_SECRET}

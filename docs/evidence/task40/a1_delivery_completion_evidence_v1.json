@@ -1,0 +1,84 @@
+{
+  "acceptance_id": "T40-A1-DELIVERY-COMPLETION-001",
+  "active_stop_conditions": [],
+  "as_of": "2026-08-16",
+  "base_main": "6089e1d011562de43068a26a8f5feb17c4c2abcf",
+  "capability_radar_now": "NONE",
+  "cloud_bundle_mode": "OWNER_MANAGED_OPTIONAL_EXPORT",
+  "cloud_bundle_required_by_harness": false,
+  "cloud_bundle_smoke_required": false,
+  "factory_fit": {
+    "path": "docs/evidence/task40/a1_delivery_factory_fit_v1.json",
+    "sha256": "9fa2cd2c80e676c539d8dc9c641aee516bca96657bca10b2861bf46a59c84319",
+    "verdict": "PASS"
+  },
+  "implementation_bindings": {
+    "catalog/assets/core.yaml": "3c299591e6f952584566309866cf4317c9715761fd7e5b946aed1d7d0914719c",
+    "catalog/assets/lifecycle.yaml": "7827fab4715a402fb4fafd7567276079afb3b4e116e357399d453bbcd21d7fc8",
+    "catalog/catalog_manifest.yaml": "2e36f07d3a023c3fc837d59e8e768b80cfe7166af2913a2a88e199e754762857",
+    "catalog/generated/asset_edges.json": "ad92fd8d1a1c73567811920928a068c85d2b17db7dd95dbfd7ffd0c4ccea2ae8",
+    "catalog/schemas/task40_rc002_h11_bonding_curve_pda_gta_clock_capture.schema.json": "ea029e94611a7ee7cc9a29f5cb561dd9fd4177497233fb6e46058c45d46b2e71",
+    "configs/task40_rc002_h11_bonding_curve_pda_gta_clock_capture_v1.yaml": "d86ef4f4c0495b0a6be74d9dc716e8acde563d1fce8364516b04a82211585f60",
+    "docs/PROJECT_MAP.md": "9138be37dffc2f12d309245f9b9cda4bf70ade928ae18c27b23196a7e559cd18",
+    "docs/contracts/task40_rc002_h11_bonding_curve_pda_gta_clock_capture_contract_v1.md": "796bb1ec7f9de8beca30175a4c408d33a3c6ed8f859dcda47abf872dd75fdb95",
+    "docs/evidence/task28/a1_rc001_registry_freeze_acceptance_v1.json": "4292df639605f3a6e10c6c02c1b5d1fc63ca3883269d904db323bc42916594f4",
+    "docs/evidence/task40/a1_h11_bonding_curve_pda_gta_acceptance_v1.json": "ce13526f883f0b25cc709d7afaf307c63d1c60d652c2ac0f54e5d6fcb753a895",
+    "docs/evidence/task40/a1_h11_bonding_curve_pda_gta_runtime_receipt_v1.json": "d34ea4a7d08266dcf1421b84ed0fbb9223b139d18d1d9b3f03a406cc6be72311",
+    "docs/reports/task40/a1_h11_bonding_curve_pda_gta_owner_readout_v1.md": "7562a5e9722491b0de9e9d41a180829e1b4ec7e6b94df7f0833edde7644f8705",
+    "docs/tasks/TASK-40-rc002-h11-bonding-curve-pda-gta-clock-capture.md": "a226ff107d554f3e75c9e5a495cb9156a297a085e0e969767464195fddb0f805",
+    "registries/decisions_negative_results.yaml": "9d98f898fad8449b7c51bb074c732b5a3a601beb3f6e4dad9b64856579d06afb",
+    "registries/global_trial_ledger.yaml": "e3b2415f0efbf8fdeedebad17fee0b105dda835a66cd24759863c5c8f0bc5e73",
+    "scripts/run_task40_rc002_h11_bonding_curve_pda_gta_clock_capture.py": "584f895ed8833251a24ae09a2953cb516c79be41ddb4603111050a0f4826a9de",
+    "src/solana_alpha_lab/task40_h11_bonding_curve_pda_gta_clock_capture.py": "30315bb3dfd02b6ba7da4d9f8b0d8cbbd64f13abd547a505a9590ce45b2abe83",
+    "tests/fixtures/task08/pump_bonding_curve_pda_subset_v1.json": "5ab78aa7f6b86812c8dbea23ea575ac520bd4a6bbcd2d8623656cc5dcf56f4a6",
+    "tests/fixtures/task28/rc001_registry_freeze_v1.json": "35213fedf42b47ad35614131e730dc8bc45ce35acd54d45ffa02bf3f0be82773",
+    "tests/fixtures/task40/h11_bonding_curve_pda_gta_clock_capture_v1.json": "de8e045d04b543566737884b02839ad172c6899fed7052211607df846e0fa6b3",
+    "tests/test_catalog.py": "c4a5f4bd53648b0e62aaed301b3e7d4465b1e87b0baf5ebbda9beb3d7f22e2ee",
+    "tests/test_lifecycle_registries.py": "582d3cff0ebd126e5457fd8f89bb9486e36ea210f63a78d5abab0df9c101e53c",
+    "tests/test_task23_catalog_repository_factory_fit.py": "484aeb7a9febe6e0425c935bb49368d70a72acd75f0378749cb6321353b6083b",
+    "tests/test_task40_rc002_h11_bonding_curve_pda_gta_clock_capture.py": "0fbee5f42efb974e58db4a2511686a77b656f6153e33d1af9e95cb99631876c6"
+  },
+  "non_claims": [
+    "NO_TASK40_CANONICAL_DONE",
+    "NO_RC001_PROMOTION_OR_DEFINITION_CHANGE",
+    "NO_LIVE_PIT_OR_EXECUTION_CLAIM",
+    "NO_ALPHA_PNL_OR_NETRETURN",
+    "NO_H13_OR_H02_TRIAL",
+    "NO_UNBOUNDED_PUMP_PROGRAM_GTA"
+  ],
+  "owner_attention_triggers": {
+    "auth_or_access_recovery": false,
+    "external_material_action": false,
+    "material_owner_decision": false,
+    "unresolved_safety_or_truth_conflict": false,
+    "user_only_activation": false
+  },
+  "project_sources_disposition": {
+    "kind": "NO_CHANGE"
+  },
+  "schema": "smial.delivery-completion-evidence",
+  "schema_version": "1.0",
+  "side_effects": {
+    "cash_spend_usd_cents": 0,
+    "credential_reads": 1,
+    "fallbacks": 0,
+    "provider_requests": 3,
+    "retries": 0,
+    "wallet_signer_transaction_actions": 0
+  },
+  "state_change": "H11_BONDING_CURVE_PDA_GTA_WRONG_ADDRESS_OR_EVENT_NO_RC001_MUTATION",
+  "task_id": "TASK-40",
+  "validation": {
+    "full_gate": "ENFORCED_BY_PROJECT_BOUND_VALIDATION",
+    "github_ci": "ENFORCED_LIVE_AT_GUARDED_MERGE",
+    "independent_review": {
+      "path": "docs/evidence/task40/a1_delivery_independent_review_v1.json",
+      "sha256": "66140362f3c1e51cddc14bc0beefff653161c6e02e7b3ca48b47a47dfbaf3dbc",
+      "verdict": "PASS"
+    },
+    "project_checks": [
+      "PASS_GENERATED_NAVIGATION_SECRET_AND_CATALOG_CHECKS"
+    ],
+    "targeted": "PASS_H11_BONDING_CURVE_PDA_GTA_CATALOG_AND_LIFECYCLE_TESTS"
+  }
+}

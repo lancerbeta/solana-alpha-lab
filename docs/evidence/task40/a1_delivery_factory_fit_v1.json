@@ -1,0 +1,34 @@
+{
+  "as_of": "2026-08-16",
+  "capability_radar": {
+    "now": "NONE",
+    "watch": "H11_CLOCKS_ON_BOUNDED_HELIUS_GTA_ADDRESSES_EXHAUSTED_DECODER_OR_PROGRAM_GTA_REMAIN_FORBIDDEN"
+  },
+  "dimensions": {
+    "build_vs_buy": "PASS_ADOPT_A22_GTA_PINNED_PUMP_DECODE_AND_OFFICIAL_PDA_SEEDS",
+    "context_efficiency": "PASS_ONE_TASK_CONTRACT",
+    "execution_to_cashflow": "NOT_APPLICABLE",
+    "flexibility_and_history": "PASS_RC001_UNCHANGED",
+    "mission": "PASS_BOUNDED_BONDING_CURVE_PDA_GTA_FALSIFIED_CREATE_MIGRATION_ON_EARLIEST_PAGES",
+    "monitoring_and_recovery": "PASS_NO_BACKGROUND_PROCESS",
+    "owner_operability": "PASS_RUSSIAN_READOUT_STATES_WRONG_ADDRESS_OR_EVENT",
+    "red_team": "PASS_UNBOUNDED_PROGRAM_GTA_FORBIDDEN",
+    "research_truth": "PASS_ZERO_CREATE_MIGRATION_IS_A_DATA_DECISION",
+    "security": "PASS_SECRET_FREE_TRACKED_EVIDENCE"
+  },
+  "limits": [
+    "HISTORICAL_ROUTE_WRONG_ADDRESS_OR_EVENT",
+    "NO_UNBOUNDED_PUMP_PROGRAM_GTA",
+    "RETROSPECTIVE_ONLY_NO_LIVE_PIT",
+    "SINGLE_AGENT_REVIEW_FALLBACK_WITHOUT_ISOLATED_CONTEXT_CRITICS"
+  ],
+  "mode": "FULL_REVIEW",
+  "recovery": "REVERT_ONLY_TASK40_TRACKED_OUTPUTS; PRESERVE_RC001_AND_TASK39_SCIENCE",
+  "review_id": "T40-A1-DELIVERY-FACTORY-FIT-001",
+  "reviewed_bindings_sha256": "b22adef6adfa2f310ffd563e4872f36fcbba44b5425fec1425f428e922147cef",
+  "reviewed_inventory_sha256": "434d2fa9bae129a298506d746a64ec6b9c7680a20719f6894520d315d4d3ed2b",
+  "schema": "smial.delivery-harness-factory-fit",
+  "schema_version": "1.0",
+  "task_id": "TASK-40",
+  "verdict": "PASS"
+}
