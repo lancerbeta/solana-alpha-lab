@@ -13619,7 +13619,7 @@ records:
   as_of: '2026-08-14'
   truth_owner: TASK-30
   location: {kind: git_path, logical_uri: 'repo://docs/evidence/task30/a20r1_provider_route_capability_registry_acceptance_v1.json', repository_path: docs/evidence/task30/a20r1_provider_route_capability_registry_acceptance_v1.json}
-  integrity: {kind: sha256, sha256: 1673d7c85c67b12af433a3635bae7475280b094f3c5740f8febde81eb4270fd6}
+  integrity: {kind: sha256, sha256: 5dbaffbf7579ecfa851bb4ef527ed31af740952f1d61dd6a27df46e88280775b}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: derived_from, target_asset_id: CONFIG-PROVIDER-ROUTE-CAPABILITY-REGISTRY-004}
@@ -19799,7 +19799,7 @@ records:
   as_of: '2026-08-14'
   truth_owner: CTRL-DELIVERY-HARNESS-001
   location: {kind: git_path, logical_uri: 'repo://delivery-harness/templates/portable-bundle-manifest.json', repository_path: delivery-harness/templates/portable-bundle-manifest.json}
-  integrity: {kind: sha256, sha256: eabb6e6954a1503b1c098c300f1089deaea7f24fc81915b9e534377e553a3597}
+  integrity: {kind: sha256, sha256: 112f2bd814299fb82471821a36b58fefe1112a606aee714daf886c7fe4cd9d20}
   access: *t25_read_file
   relations:
   - {relation_type: governed_by, target_asset_id: CTRL-DELIVERY-HARNESS-001}
