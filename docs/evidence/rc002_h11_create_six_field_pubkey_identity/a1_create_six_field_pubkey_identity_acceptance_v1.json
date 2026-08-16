@@ -1,0 +1,71 @@
+{
+  "schema": "smial.rc002.h11-create-six-field-pubkey-identity.acceptance",
+  "schema_version": "1.0",
+  "acceptance_id": "EVIDENCE-RC002-H11-CREATE-SIX-FIELD-PUBKEY-IDENTITY-001",
+  "atom_id": "RC002-H11-CREATE-SIX-FIELD-PUBKEY-IDENTITY-OFFLINE-V1",
+  "as_of": "2026-08-16",
+  "consumer": "RC002-H11-LIFECYCLE-CLOCK",
+  "research_cycle_id": "RESEARCH-CYCLE-RC002-001",
+  "hypothesis_id": "HYP-RC002-H11-LIFECYCLE-CLOCK-V1",
+  "live_PIT_claim": false,
+  "execution_claim": false,
+  "alpha_claim": false,
+  "provider_requests": 0,
+  "credential_reads": 0,
+  "cash_spend_usd_cents": 0,
+  "historical_receipts_rewritten": false,
+  "pinned_decoder_mutated": false,
+  "create_at": null,
+  "named_mint": "DMwbVy48dWVKGe9z1pcVnwF3HLMLrqWdDLfbvx8RchhK",
+  "bonding_curve": "ENz3D4ZoarzHZCsGeFTfswAKrSo5sHX9UUut1FLS6WgC",
+  "gettransaction_fixture": {
+    "path": "tests/fixtures/rc002_h11/gettransaction_create_same_195_v1.json",
+    "payload_len": [195],
+    "parse_status": ["OK"],
+    "terminal": "CREATE_PUBKEYS_MATCH_NAMED_MINT_AND_BONDING_CURVE",
+    "observed": {
+      "name": "Cope",
+      "symbol": "Cope",
+      "uri": "https://cf-ipfs.com/ipfs/QmdnBymuNUqWtCfvxqtitCXntkxKndcbeZnnLN279ywCtJ",
+      "mint": "DMwbVy48dWVKGe9z1pcVnwF3HLMLrqWdDLfbvx8RchhK",
+      "bonding_curve": "ENz3D4ZoarzHZCsGeFTfswAKrSo5sHX9UUut1FLS6WgC",
+      "user": "BFx6LQHkgcvdQ3ySxZBDBigii4fDQvn7yw5pfWRdVAgm"
+    }
+  },
+  "retained_a4": {
+    "raw_root": "local/task40_rc002_h11_bonding_curve_pda_gta",
+    "pages_status": "SCANNED",
+    "page_count": 3,
+    "payload_len": [195],
+    "parse_status": ["OK"],
+    "terminal": "CREATE_PUBKEYS_MATCH_NAMED_MINT_AND_BONDING_CURVE",
+    "observed": {
+      "name": "Cope",
+      "symbol": "Cope",
+      "uri": "https://cf-ipfs.com/ipfs/QmdnBymuNUqWtCfvxqtitCXntkxKndcbeZnnLN279ywCtJ",
+      "mint": "DMwbVy48dWVKGe9z1pcVnwF3HLMLrqWdDLfbvx8RchhK",
+      "bonding_curve": "ENz3D4ZoarzHZCsGeFTfswAKrSo5sHX9UUut1FLS6WgC",
+      "user": "BFx6LQHkgcvdQ3ySxZBDBigii4fDQvn7yw5pfWRdVAgm"
+    }
+  },
+  "task40_terminal_patch": "HISTORICAL_ROUTE_WRONG_ADDRESS_OR_EVENT_STILL_NOT_CLOSED_CREATE_PUBKEYS_MATCH_NO_CREATE_AT",
+  "non_claims": [
+    "NO_LIVE_PIT_CLAIM",
+    "NO_EXECUTION_CLAIM",
+    "NO_ALPHA",
+    "NO_NETRETURN",
+    "NO_RC001_MUTATION",
+    "NO_HOLDOUT_CONSUMPTION",
+    "NO_UNBOUNDED_PUMP_PROGRAM_GTA",
+    "NO_TASK40_RECEIPT_REWRITE",
+    "NO_PINNED_DECODER_MUTATION",
+    "NO_EXCLUSIVE_XB_RPC_CUT_CLAIM",
+    "NO_CREATE_LAYOUT_AS_CURRENT_IDL_CLAIM",
+    "NO_CREATE_AT_FROM_BLOCKTIME",
+    "NO_CREATE_AT_FROM_EVENT_TIMESTAMP",
+    "NO_USER_PUBKEY_REQUIRED_IDENTITY"
+  ],
+  "project_sources_disposition": {
+    "kind": "NO_CHANGE"
+  }
+}
