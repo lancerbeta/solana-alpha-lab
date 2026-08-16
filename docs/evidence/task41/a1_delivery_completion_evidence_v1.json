@@ -54,7 +54,7 @@
     "github_ci": "ENFORCED_LIVE_AT_GUARDED_MERGE",
     "independent_review": {
       "path": "docs/evidence/task41/a1_delivery_independent_review_v1.json",
-      "sha256": "beb817ef186e767a5753238ecfc677ea22550414216f579b15e673ad3e45f2ce",
+      "sha256": "28d0c64d5161997bc282280e39ca1035fd6ccef1c9874480f88bced24e09f480",
       "verdict": "PASS"
     },
     "project_checks": [
