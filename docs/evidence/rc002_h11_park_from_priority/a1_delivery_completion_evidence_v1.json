@@ -1,0 +1,72 @@
+{
+  "schema": "smial.delivery-completion-evidence",
+  "schema_version": "1.0",
+  "acceptance_id": "RC002-H11-PARK-FROM-PRIORITY-DELIVERY-COMPLETION-001",
+  "as_of": "2026-08-17",
+  "task_id": "RC002-H11-PARK-FROM-PRIORITY-OFFLINE-V1",
+  "state_change": "H11_PARKED_FROM_PRIORITY_SCIENCE_RETAINED",
+  "base_main": "f551066c0350d7b0a58c0bb12d12c7090ebfe9c9",
+  "cloud_bundle_mode": "OWNER_MANAGED_OPTIONAL_EXPORT",
+  "cloud_bundle_required_by_harness": false,
+  "cloud_bundle_smoke_required": false,
+  "capability_radar_now": "NONE",
+  "implementation_bindings": {
+    "docs/evidence/rc002_h11_park_from_priority/a1_h11_park_from_priority_acceptance_v1.json": "2d09bc144ea0b12d0abcad09c5f3f5ccc81cd7ee200d4821502538c8de55c725",
+    "docs/reports/rc002_h11_park_from_priority/a1_owner_readout_v1.md": "5d9684695bbf42133918788fef94d6f73d622a1e1f2fcc75588f1aef37e45d69",
+    "docs/tasks/RC002-H11-PARK-FROM-PRIORITY-OFFLINE-V1.md": "b3e69dc81ee98bcc9155f6e6d4ff0064dc8a8d999a4be3fe0fd544e610dac6af",
+    "registries/decisions_negative_results.yaml": "dd815799ed64037af79692a8adaec0e83fc01fc59f5d10fb1c0334afcde190e5",
+    "scripts/run_rc002_h11_park_from_priority.py": "7bc6ea750e19d572a07a28bddaec041e7fce95e581f260c907b45db56d8ace28",
+    "src/solana_alpha_lab/rc002_h11_park_from_priority.py": "47d20b69ff39e5dd7f1ded2ac689531b66963b15715107c245c732c57b907505",
+    "tests/test_lifecycle_registries.py": "cf62114da30cf189310c74a299329f0571415b268d1d0b6de6fbb72afdd50770",
+    "tests/test_rc002_h11_park_from_priority.py": "d0606d644646d2ff4daacc19058cd5f86670b5b0f7a7935d1c9c593cfde68cb6"
+  },
+  "active_stop_conditions": [],
+  "owner_attention_triggers": {
+    "auth_or_access_recovery": false,
+    "material_owner_decision": false,
+    "user_only_activation": false,
+    "external_material_action": false,
+    "unresolved_safety_or_truth_conflict": false
+  },
+  "factory_fit": {
+    "path": "docs/evidence/rc002_h11_park_from_priority/a1_delivery_factory_fit_v1.json",
+    "sha256": "PENDING_FACTORY_FIT_FILE",
+    "verdict": "PASS"
+  },
+  "validation": {
+    "targeted": "PASS_H11_PARK_FROM_PRIORITY_TESTS",
+    "independent_review": {
+      "path": "docs/evidence/rc002_h11_park_from_priority/a1_delivery_independent_review_v1.json",
+      "sha256": "PENDING_INDEPENDENT_REVIEW_FILE",
+      "verdict": "PASS"
+    },
+    "full_gate": "ENFORCED_BY_PROJECT_BOUND_VALIDATION",
+    "github_ci": "ENFORCED_LIVE_AT_GUARDED_MERGE",
+    "project_checks": [
+      "PASS_TARGETED_H11_PARK_FROM_PRIORITY_TESTS"
+    ]
+  },
+  "non_claims": [
+    "NO_CANONICAL_DONE",
+    "NO_LIVE_PIT_OR_EXECUTION_CLAIM",
+    "NO_ALPHA_PNL_OR_NETRETURN",
+    "NO_H11_EFFECT_SCREEN",
+    "NO_H11_SCREEN_NEGATIVE_OR_POSITIVE",
+    "NO_PAID_CAPTURE",
+    "NO_H13_OR_H02_TRIAL",
+    "NO_TASK36_37_40_RECEIPT_REWRITE",
+    "NO_PINNED_DECODER_MUTATION",
+    "NO_TRIAL_LEDGER_REWRITE"
+  ],
+  "side_effects": {
+    "cash_spend_usd_cents": 0,
+    "credential_reads": 0,
+    "fallbacks": 0,
+    "provider_requests": 0,
+    "retries": 0,
+    "wallet_signer_transaction_actions": 0
+  },
+  "project_sources_disposition": {
+    "kind": "NO_CHANGE"
+  }
+}

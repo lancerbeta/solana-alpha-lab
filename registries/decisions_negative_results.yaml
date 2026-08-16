@@ -156,3 +156,10 @@ records:
   evidence_asset_ids:
   - EVIDENCE-T40-RC002-H11-BONDING-CURVE-PDA-GTA-001
   summary: "HISTORICAL_ROUTE_WRONG_ADDRESS_OR_EVENT: pinned Pump bonding_curve PDA ENz3D4ZoarzHZCsGeFTfswAKrSo5sHX9UUut1FLS6WgC from mint DMwbVy48dWVKGe9z1pcVnwF3HLMLrqWdDLfbvx8RchhK; bounded Helius GTA returned 2393 oldest txs across 3 pages; CreateEvent and CompletePumpAmmMigrationEvent remain 0 after pinned Pump decode (2061 txs had Pump in keys; 1245 borsh_payload_truncated). Pump-program GTA remains forbidden. Not alpha, PIT, execution, paid capture or RC001 mutation."
+- record_kind: decision
+  record_id: DECISION-RC002-H11-PARK-FROM-PRIORITY-001
+  status: RECORDED
+  created_at: '2026-08-17T00:00:00Z'
+  evidence_asset_ids:
+  - EVIDENCE-RC002-H11-PARK-FROM-PRIORITY-001
+  summary: "H11_PARKED_FROM_PRIORITY_SCIENCE_RETAINED: owner phrase H11 паркуем parks HYP-RC002-H11-LIFECYCLE-CLOCK-V1 from priority; science retained; hypothesis NOT_REFUTED_NOT_SUPPORTED; screen never ran (n=0). Return only via a new sample-campaign brief. Calendar, one-mint decode, falsified GTA, effect screen, n=1 cohort-ready and H13/H02 auto-start are not triggers. Not alpha, PIT, DONE or paid capture."
