@@ -16,7 +16,7 @@
     "docs/tasks/RC002-H11-TRUNCATION-VS-ABSENCE-OFFLINE-V1.md": "f31211de6e8047982f31cc70414accea76c714b5121e4eae22f20670ce0da839",
     "scripts/run_rc002_h11_truncation_vs_absence.py": "fb98f74bb632c36ef9f2c0f41d1ad63b350c1b53d1092c48715ba4694014cfa7",
     "src/solana_alpha_lab/rc002_h11_truncation_vs_absence.py": "75c590bed1a4aa4d6d2059ad2dbbc83028d3d65ebbeaeee115571ac678107300",
-    "tests/test_rc002_h11_truncation_vs_absence.py": "e1d4fbd66711b8699770eb0960444d39aa0012594a7eee240ff5bd44a814334b"
+    "tests/test_rc002_h11_truncation_vs_absence.py": "52b80d8826e070e37a3fefe960bfe087cc6b1a629c6a5b977e005d3b97e52592"
   },
   "active_stop_conditions": [],
   "owner_attention_triggers": {
@@ -28,14 +28,14 @@
   },
   "factory_fit": {
     "path": "docs/evidence/rc002_h11_truncation_vs_absence/a1_delivery_factory_fit_v1.json",
-    "sha256": "4009cd5581934c15bf361e729ac9e5fca35c928eefa45350a30a2eac683035d5",
+    "sha256": "34077038067e424bc785686f0ea745fc64210bd476cbe54e418c026ff28e94e5",
     "verdict": "PASS"
   },
   "validation": {
     "targeted": "PASS_TRUNCATION_VS_ABSENCE_TESTS",
     "independent_review": {
       "path": "docs/evidence/rc002_h11_truncation_vs_absence/a1_delivery_independent_review_v1.json",
-      "sha256": "7ff426f4214d472ee627cdc14bfc15026fd9f8c90d53459f8d46d35a51b89fdd",
+      "sha256": "4a10b96daf34cb4c11aa1172064d1b8694fe2e1cd85b44f998c5591dcadddb9a",
       "verdict": "PASS"
     },
     "full_gate": "ENFORCED_BY_PROJECT_BOUND_VALIDATION",
