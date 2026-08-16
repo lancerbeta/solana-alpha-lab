@@ -1,0 +1,56 @@
+{
+  "as_of": "2026-08-16",
+  "non_claims": [
+    "NO_MERGE_GATE_CHANGE",
+    "REVIEW_IS_NOT_TASK41_SEMANTIC_DONE",
+    "NO_TASK06_STORAGE_API_EXPORT"
+  ],
+  "required_roles": [
+    "CODE_REVIEWER",
+    "GOAL_DOD_CRITIC",
+    "ARCHITECTURE_CRITIC"
+  ],
+  "review_id": "T41-A1-DELIVERY-INDEPENDENT-REVIEW-001",
+  "reviewed_bindings_sha256": "4e60310bf0e1fb8d33dbbe333d41e024d39ad5877c9cbbcf49711b0fad0e0e12",
+  "reviewed_inventory_sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+  "reviews": [
+    {
+      "findings": [
+        "CHECKED_EXCLUSIVE_OPEN_XB",
+        "CHECKED_EXCLUSIVE_REPLAY_IDENTICAL",
+        "CHECKED_EXCLUSIVE_CONFLICT_UNCHANGED",
+        "CHECKED_WRITE_RAW_PAGE_BODY_AND_MANIFEST_EXCLUSIVE",
+        "CHECKED_NOT_EXPORTED_FROM_STORAGE_INIT",
+        "CHECKED_TEST_FALSIFIER_FOR_CLOBBER"
+      ],
+      "role": "CODE_REVIEWER",
+      "verdict": "PASS"
+    },
+    {
+      "findings": [
+        "CHECKED_ISOLATED_CRITIC",
+        "CHECKED_DOD_EXCLUSIVE_WRITE_ONLY",
+        "CHECKED_CHEAPEST_FALSIFIER_CLOBBER_IN_TESTS",
+        "CHECKED_NON_GOALS_NO_CONTROL_RUNTIME_NO_RUFF"
+      ],
+      "role": "GOAL_DOD_CRITIC",
+      "verdict": "PASS"
+    },
+    {
+      "findings": [
+        "CHECKED_ISOLATED_CRITIC_RUN",
+        "CHECKED_HELPER_NOT_PUBLIC_STORAGE_API",
+        "CHECKED_TASK06_CATALOG_API_HASH_STABLE",
+        "CHECKED_H11_TRUTH_IS_A4_RAW_PLUS_MANIFEST",
+        "CHECKED_NO_MERGE_GATE_IN_WRITE_SET",
+        "CHECKED_NO_NEW_PIT_CLAIM"
+      ],
+      "role": "ARCHITECTURE_CRITIC",
+      "verdict": "PASS"
+    }
+  ],
+  "schema": "smial.delivery-independent-review-evidence",
+  "schema_version": "1.0",
+  "task_id": "TASK-41",
+  "verdict": "PASS"
+}

@@ -1,0 +1,34 @@
+{
+  "as_of": "2026-08-16",
+  "capability_radar": {
+    "now": "NONE",
+    "watch": "FIRST_UNATTENDED_RUNTIME_WITH_NAMED_INCIDENT_CONSUMER"
+  },
+  "dimensions": {
+    "build_vs_buy": "PASS_ADOPT_TASK30_XB",
+    "context_efficiency": "PASS_ONE_TASK_CONTRACT_PRODUCT_ONLY",
+    "execution_to_cashflow": "NOT_APPLICABLE",
+    "flexibility_and_history": "PASS_HISTORICAL_RECEIPTS_UNCHANGED",
+    "mission": "PASS_RAW_PAGE_NOCLOBBER",
+    "monitoring_and_recovery": "PASS_NO_BACKGROUND_PROCESS",
+    "owner_operability": "PASS_RETRY_LEAVES_IDENTICAL_BYTES",
+    "red_team": "PASS_DIFFERENT_BYTES_LEAVE_OLD_FILE",
+    "research_truth": "PASS_RAW_PAGE_NOCLOBBER_DUCKDB_UNCHANGED",
+    "security": "PASS_SECRET_FREE_OFFLINE_ATOM"
+  },
+  "limits": [
+    "NO_MERGE_GATE_CHANGE",
+    "XB_TRUNCATION_CAN_STICK_ON_PATH",
+    "NO_PRODUCT_ACCEPTANCE_OR_CASHFLOW",
+    "TASK40_STILL_CLOBBERS_OUT_OF_SCOPE"
+  ],
+  "mode": "FULL_REVIEW",
+  "recovery": "REVERT_TASK41_TRACKED_OUTPUTS; PRESERVE_TASK39_SCIENCE_AND_A4_RAW",
+  "review_id": "T41-A1-DELIVERY-FACTORY-FIT-001",
+  "reviewed_bindings_sha256": "4e60310bf0e1fb8d33dbbe333d41e024d39ad5877c9cbbcf49711b0fad0e0e12",
+  "reviewed_inventory_sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+  "schema": "smial.delivery-harness-factory-fit",
+  "schema_version": "1.0",
+  "task_id": "TASK-41",
+  "verdict": "PASS"
+}
