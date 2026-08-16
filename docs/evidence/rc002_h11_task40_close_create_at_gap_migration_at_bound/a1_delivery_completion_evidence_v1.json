@@ -28,14 +28,14 @@
   },
   "factory_fit": {
     "path": "docs/evidence/rc002_h11_task40_close_create_at_gap_migration_at_bound/a1_delivery_factory_fit_v1.json",
-    "sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+    "sha256": "d334c981f9dc09f03f909d8c60f478e51ee4c49caa14f0481844a15b6457752a",
     "verdict": "PASS"
   },
   "validation": {
     "targeted": "PASS_TASK40_CLOSE_CREATE_AT_GAP_MIGRATION_AT_BOUND_TESTS",
     "independent_review": {
       "path": "docs/evidence/rc002_h11_task40_close_create_at_gap_migration_at_bound/a1_delivery_independent_review_v1.json",
-      "sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+      "sha256": "532294d41a5d7ba87ba8ca2ddf802ca50de2cb21ede9d9ccfb72dce015f3f3a2",
       "verdict": "PASS"
     },
     "full_gate": "ENFORCED_BY_PROJECT_BOUND_VALIDATION",
