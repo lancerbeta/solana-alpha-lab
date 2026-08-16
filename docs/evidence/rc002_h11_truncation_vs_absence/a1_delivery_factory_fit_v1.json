@@ -1,0 +1,34 @@
+{
+  "schema": "smial.delivery-harness-factory-fit",
+  "schema_version": "1.0",
+  "review_id": "RC002-H11-TRUNCATION-VS-ABSENCE-FACTORY-FIT-001",
+  "as_of": "2026-08-16",
+  "task_id": "RC002-H11-TRUNCATION-VS-ABSENCE-OFFLINE-V1",
+  "reviewed_bindings_sha256": "fa14763bba639265084a94987f814019ccdbe8fddc9ef00fd8def789698c4903",
+  "reviewed_inventory_sha256": "b602c26a5f248fecf266dfe9fa885f0fdc0429de5a923191e34aa4d63b99e3eb",
+  "mode": "FULL_REVIEW",
+  "verdict": "PASS",
+  "dimensions": {
+    "mission": "PASS_UNCLOSES_TASK40_WRONG_ADDRESS_WITHOUT_XB_OVERCLAIM",
+    "flexibility_and_history": "PASS_TASK40_RECEIPTS_IMMUTABLE_OVERLAY_ONLY",
+    "context_efficiency": "PASS_ONE_TASK_CONTRACT_NO_CATALOG_CASCADE",
+    "research_truth": "PASS_DISCRIMINATOR_PRESENT_BODY_NOT_PINNED_LAYOUT",
+    "owner_operability": "PASS_RUSSIAN_READOUT_AND_OFFLINE_SCRIPT",
+    "execution_to_cashflow": "NOT_APPLICABLE",
+    "monitoring_and_recovery": "PASS_NO_BACKGROUND_PROCESS",
+    "build_vs_buy": "PASS_ADOPT_PINNED_PUMP_DECODER",
+    "security": "PASS_SECRET_FREE_COUNTS_AND_PAGE_HASHES_ONLY",
+    "red_team": "PASS_NO_PROGRAM_GTA_NO_PROVIDER_CALL"
+  },
+  "capability_radar": {
+    "now": "NONE",
+    "watch": "BOUNDED_GETTRANSACTION_OR_OLDER_IDL_FOR_THREE_CLOCK_LINES"
+  },
+  "recovery": "REVERT_ONLY_THIS_ATOM_TRACKED_OUTPUTS; PRESERVE_TASK40_A4_AND_SCIENCE_RECEIPTS",
+  "limits": [
+    "NO_FULL_CLOCK_DECODE",
+    "NO_EXCLUSIVE_XB_RPC_CUT_CLAIM",
+    "CI_DOES_NOT_REHASH_LOCAL_A4",
+    "NO_LIVE_PIT_OR_CASHFLOW"
+  ]
+}
