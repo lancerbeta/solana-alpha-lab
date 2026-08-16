@@ -5,7 +5,7 @@
   "as_of": "2026-08-16",
   "task_id": "RC002-H11-CREATE-AT-MISSING-UNKNOWN-OFFLINE-V1",
   "reviewed_bindings_sha256": "be524d5487712e469fd80013189537e5aca7aa63bf0d73d13b785968207e1a70",
-  "reviewed_inventory_sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+  "reviewed_inventory_sha256": "19f17cb399ca028ab36f08e5b6be8d8f7f1b1f15b805a6c7b7136969f349d64b",
   "required_roles": [
     "CODE_REVIEWER",
     "GOAL_DOD_CRITIC",
