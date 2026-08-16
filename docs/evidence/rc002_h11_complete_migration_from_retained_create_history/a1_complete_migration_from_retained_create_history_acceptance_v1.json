@@ -1,0 +1,88 @@
+{
+  "schema": "smial.rc002.h11-complete-migration-from-retained-create-history.acceptance",
+  "schema_version": "1.0",
+  "acceptance_id": "EVIDENCE-RC002-H11-COMPLETE-MIGRATION-FROM-RETAINED-CREATE-HISTORY-001",
+  "atom_id": "RC002-H11-COMPLETE-MIGRATION-FROM-RETAINED-CREATE-HISTORY-OFFLINE-V1",
+  "as_of": "2026-08-17",
+  "consumer": "RC002-H11-LIFECYCLE-CLOCK",
+  "research_cycle_id": "RESEARCH-CYCLE-RC002-001",
+  "hypothesis_id": "HYP-RC002-H11-LIFECYCLE-CLOCK-V1",
+  "live_PIT_claim": false,
+  "execution_claim": false,
+  "alpha_claim": false,
+  "provider_requests": 0,
+  "credential_reads": 0,
+  "cash_spend_usd_cents": 0,
+  "historical_receipts_rewritten": false,
+  "pinned_decoder_mutated": false,
+  "owner_decision": "SCAN_COMPLETE_MIGRATION_IN_RETAINED_CREATE_HISTORY",
+  "named_mint": "DMwbVy48dWVKGe9z1pcVnwF3HLMLrqWdDLfbvx8RchhK",
+  "bonding_curve": "ENz3D4ZoarzHZCsGeFTfswAKrSo5sHX9UUut1FLS6WgC",
+  "candidate_id": "DROP_TRAILING_QUOTE_MINT",
+  "create_at": null,
+  "create_at_status": "MISSING_UNKNOWN",
+  "create_at_terminal": "CREATE_AT_MISSING_UNKNOWN",
+  "complete_event_timestamp": 1756321521,
+  "complete_event_status": "MIGRATION_STARTED",
+  "migration_at": 1756321522,
+  "migration_at_status": "BOUND_FROM_EVENT_TIMESTAMP",
+  "destination_pool": "URqx24yyYxtXXhTbBQnbtPLhtLWYoaDaRxuQuLpNS3S",
+  "terminal": "COMPLETE_MIGRATION_IDENTITY_MATCH",
+  "gettransaction_fixture": {
+    "path": "tests/fixtures/rc002_h11/gettransaction_create_same_195_v1.json",
+    "consumed_by_event": {},
+    "failed_by_event": {},
+    "observed": [],
+    "terminal": "COMPLETE_MIGRATION_ABSENT_FROM_CREATE_GETTX",
+    "migration_at": null,
+    "migration_at_status": "NOT_IN_CREATE_GETTX"
+  },
+  "retained_a4": {
+    "raw_root": "local/task40_rc002_h11_bonding_curve_pda_gta",
+    "pages_status": "SCANNED",
+    "page_count": 3,
+    "terminal": "COMPLETE_MIGRATION_IDENTITY_MATCH",
+    "consumed_by_event": {
+      "CompleteEvent": 1,
+      "CompletePumpAmmMigrationEvent": 1
+    },
+    "observed": [
+      {
+        "event_name": "CompleteEvent",
+        "mint": "DMwbVy48dWVKGe9z1pcVnwF3HLMLrqWdDLfbvx8RchhK",
+        "bonding_curve": "ENz3D4ZoarzHZCsGeFTfswAKrSo5sHX9UUut1FLS6WgC",
+        "payload_len": 112,
+        "timestamp": 1756321521
+      },
+      {
+        "event_name": "CompletePumpAmmMigrationEvent",
+        "mint": "DMwbVy48dWVKGe9z1pcVnwF3HLMLrqWdDLfbvx8RchhK",
+        "bonding_curve": "ENz3D4ZoarzHZCsGeFTfswAKrSo5sHX9UUut1FLS6WgC",
+        "payload_len": 168,
+        "pool": "URqx24yyYxtXXhTbBQnbtPLhtLWYoaDaRxuQuLpNS3S",
+        "timestamp": 1756321522
+      }
+    ]
+  },
+  "task40_terminal_patch": "HISTORICAL_ROUTE_WRONG_ADDRESS_OR_EVENT_STILL_NOT_CLOSED_COMPLETE_MIGRATION_IDENTITY_MATCH_ON_A4",
+  "non_claims": [
+    "NO_LIVE_PIT_CLAIM",
+    "NO_EXECUTION_CLAIM",
+    "NO_ALPHA",
+    "NO_NETRETURN",
+    "NO_RC001_MUTATION",
+    "NO_HOLDOUT_CONSUMPTION",
+    "NO_UNBOUNDED_PUMP_PROGRAM_GTA",
+    "NO_TASK40_RECEIPT_REWRITE",
+    "NO_TASK37_CLOCK_DEFINITION_REWRITE",
+    "NO_PINNED_DECODER_MUTATION",
+    "NO_EXCLUSIVE_XB_RPC_CUT_CLAIM",
+    "NO_CREATE_LAYOUT_AS_CURRENT_IDL_CLAIM",
+    "NO_CREATE_AT_FROM_BLOCKTIME",
+    "NO_MIGRATION_AT_FROM_BLOCKTIME",
+    "NO_COMPLETE_EVENT_AS_MIGRATION_AT"
+  ],
+  "project_sources_disposition": {
+    "kind": "NO_CHANGE"
+  }
+}
