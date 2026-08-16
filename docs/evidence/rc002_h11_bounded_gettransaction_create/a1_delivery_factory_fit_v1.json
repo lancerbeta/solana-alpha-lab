@@ -1,0 +1,35 @@
+{
+  "schema": "smial.delivery-harness-factory-fit",
+  "schema_version": "1.0",
+  "review_id": "RC002-H11-BOUNDED-GETTRANSACTION-CREATE-FACTORY-FIT-001",
+  "as_of": "2026-08-16",
+  "task_id": "RC002-H11-BOUNDED-GETTRANSACTION-CREATE-V1",
+  "reviewed_bindings_sha256": "f46449882ecbe238da60e0bd84df21fe48b9c1632d4be8d28c88e76fae3a88ef",
+  "reviewed_inventory_sha256": "bd0d453fb233465e9fe0680346a8d39683943da33fef8b6415d6615c1c26507d",
+  "mode": "FULL_REVIEW",
+  "verdict": "PASS",
+  "dimensions": {
+    "mission": "PASS_GETTX_SAME_195_WITHOUT_XB_OVERCLAIM",
+    "flexibility_and_history": "PASS_TASK40_AND_H11_RECEIPTS_IMMUTABLE_PINNED_DECODER_UNCHANGED",
+    "context_efficiency": "PASS_ONE_TASK_CONTRACT_NO_CATALOG_CASCADE",
+    "research_truth": "PASS_PUBLIC_GETTX_CREATE_PAYLOAD_LEN_STILL_195",
+    "owner_operability": "PASS_RUSSIAN_READOUT_AND_OFFLINE_PLUS_LIVE_SCRIPT",
+    "execution_to_cashflow": "NOT_APPLICABLE",
+    "monitoring_and_recovery": "PASS_NO_BACKGROUND_PROCESS_ONE_SHOT",
+    "build_vs_buy": "PASS_ADOPT_SOLANA_STANDARD_GET_TRANSACTION_001",
+    "security": "PASS_KEYLESS_NO_CREDENTIAL_SECRET_FREE_HASHES",
+    "red_team": "PASS_NO_HELIUS_NO_GTA_NO_RETRY"
+  },
+  "capability_radar": {
+    "now": "NONE",
+    "watch": "HELIUS_GETTRANSACTION_ONLY_IF_PUBLIC_RPC_NULL"
+  },
+  "recovery": "REVERT_ONLY_THIS_ATOM_TRACKED_OUTPUTS; PRESERVE_TASK40_A4_AND_SCIENCE_RECEIPTS; PRESERVE_PINNED_DECODER; PRESERVE_LIVE_A4_OUTSIDE_GIT",
+  "limits": [
+    "NO_CREATE_LAYOUT_CLAIM",
+    "NO_EXCLUSIVE_XB_RPC_CUT_CLAIM",
+    "CI_DOES_NOT_RECALL_RPC_OR_REHASH_LOCAL_A4",
+    "SAME_195_IS_LOG_LENGTH_NOT_BYTE_IDENTITY",
+    "NO_LIVE_PIT_OR_CASHFLOW"
+  ]
+}

@@ -1,0 +1,70 @@
+{
+  "schema": "smial.delivery-completion-evidence",
+  "schema_version": "1.0",
+  "acceptance_id": "RC002-H11-BOUNDED-GETTRANSACTION-CREATE-DELIVERY-COMPLETION-001",
+  "as_of": "2026-08-16",
+  "task_id": "RC002-H11-BOUNDED-GETTRANSACTION-CREATE-V1",
+  "state_change": "CREATE_GETTX_SAME_195_STILL_TRUNCATED",
+  "base_main": "a81568ea17d9615e4e2cde6d57852bde6b8bb8c0",
+  "cloud_bundle_mode": "OWNER_MANAGED_OPTIONAL_EXPORT",
+  "cloud_bundle_required_by_harness": false,
+  "cloud_bundle_smoke_required": false,
+  "capability_radar_now": "NONE",
+  "implementation_bindings": {
+    "docs/evidence/rc002_h11_bounded_gettransaction_create/a1_bounded_gettransaction_create_acceptance_v1.json": "d713f1f3b6c4ea4bfb79a4deb188e8f74c2bdcbf503bb8b5bc529cdfcc7ad0b3",
+    "docs/reports/rc002_h11_bounded_gettransaction_create/a1_owner_readout_v1.md": "da12438ce48681727f03efbe4f808c96606d2b6bb159c4b4b0ec5ce8478e97b6",
+    "docs/tasks/RC002-H11-BOUNDED-GETTRANSACTION-CREATE-V1.md": "5e509b2f642b4bc22b0ada00148b9b1b6ada27e9d91fd4d458443497413ac8a4",
+    "scripts/run_rc002_h11_bounded_gettransaction_create.py": "bfcd1f84de8f2a847fedbb714be0705afd6acd28a72af948a8a15d1cf49d4919",
+    "src/solana_alpha_lab/rc002_h11_bounded_gettransaction_create.py": "f1832c690081409381cec58229c8405b1c3bd8bb687fbbcd09366f27f5d24cd2",
+    "tests/fixtures/rc002_h11/gettransaction_create_null_v1.json": "b3599c055622a73977a12e72578ce8b336994621d6c3af8573b26794f5cc45a0",
+    "tests/fixtures/rc002_h11/gettransaction_create_same_195_v1.json": "b72c54696a4b950ca5314779221fac2798f77d6fa001ca3f0b57d4a35ffc265c",
+    "tests/test_rc002_h11_bounded_gettransaction_create.py": "af4f9a4877f3253c2076daf8fc3cd29c0ff805f7fc3b43c99c478ffad132be24"
+  },
+  "active_stop_conditions": [],
+  "owner_attention_triggers": {
+    "auth_or_access_recovery": false,
+    "material_owner_decision": false,
+    "user_only_activation": false,
+    "external_material_action": false,
+    "unresolved_safety_or_truth_conflict": false
+  },
+  "factory_fit": {
+    "path": "docs/evidence/rc002_h11_bounded_gettransaction_create/a1_delivery_factory_fit_v1.json",
+    "sha256": "21f7099ca11951a68094271da17a0069f288b264c4d29ed9d1850881c8809a91",
+    "verdict": "PASS"
+  },
+  "validation": {
+    "targeted": "PASS_BOUNDED_GETTRANSACTION_CREATE_TESTS",
+    "independent_review": {
+      "path": "docs/evidence/rc002_h11_bounded_gettransaction_create/a1_delivery_independent_review_v1.json",
+      "sha256": "96c2dd4bb6c472dbfab450c3b83b358035e2ca2db943402f95bdab9aac39c4f1",
+      "verdict": "PASS"
+    },
+    "full_gate": "ENFORCED_BY_PROJECT_BOUND_VALIDATION",
+    "github_ci": "ENFORCED_LIVE_AT_GUARDED_MERGE",
+    "project_checks": [
+      "PASS_TARGETED_BOUNDED_GETTRANSACTION_CREATE_TESTS"
+    ]
+  },
+  "non_claims": [
+    "NO_CANONICAL_DONE",
+    "NO_LIVE_PIT_OR_EXECUTION_CLAIM",
+    "NO_ALPHA_PNL_OR_NETRETURN",
+    "NO_EXCLUSIVE_XB_RPC_CUT_CLAIM",
+    "NO_CREATE_LAYOUT_CLAIM",
+    "NO_TASK40_RECEIPT_REWRITE",
+    "NO_PINNED_DECODER_MUTATION",
+    "NO_HELIUS_CALL"
+  ],
+  "side_effects": {
+    "cash_spend_usd_cents": 0,
+    "credential_reads": 0,
+    "fallbacks": 0,
+    "provider_requests": 1,
+    "retries": 0,
+    "wallet_signer_transaction_actions": 0
+  },
+  "project_sources_disposition": {
+    "kind": "NO_CHANGE"
+  }
+}

@@ -1,0 +1,27 @@
+{
+  "jsonrpc": "2.0",
+  "id": "rc002-h11-bounded-gettransaction-create",
+  "result": {
+    "slot": 258275546,
+    "blockTime": 1712218394,
+    "transaction": {
+      "signatures": [
+        "4fi62bv2A67i6rFh6naBrLyVoteXT4EnXaQzK7K2rboujxRy2AxEu5epesgG7hRcT3xhpZx15EKGG4BxxspX61EH"
+      ],
+      "message": {
+        "accountKeys": [
+          "6EF8rrecthR5Dkzon8Nwu78hRvfCKubJ14M5uBEwF6P",
+          "11111111111111111111111111111111"
+        ]
+      }
+    },
+    "meta": {
+      "err": null,
+      "logMessages": [
+        "Program 6EF8rrecthR5Dkzon8Nwu78hRvfCKubJ14M5uBEwF6P invoke [1]",
+        "Program data: G3KpTd7rY3YEAAAAQ29wZQQAAABDb3BlRwAAAGh0dHBzOi8vY2YtaXBmcy5jb20vaXBmcy9RbWRuQnltdU5VcVd0Q2Z2eHF0aXRDWG50a3hLbmRjYmVabm5MTjI3OXl3Q3RKt6mXALl0NfbDSHoLQRSrIpPLAjo9gpq2wzUHEqLr6VrGyZ7ER62hM9tBXHtjABZ68GYZdl7irpfGPzWEj1UArZhpSxSxdbvJ2GdPql87BVS7S7Zs0IdFTLecU5Miq+wm",
+        "Program 6EF8rrecthR5Dkzon8Nwu78hRvfCKubJ14M5uBEwF6P success"
+      ]
+    }
+  }
+}

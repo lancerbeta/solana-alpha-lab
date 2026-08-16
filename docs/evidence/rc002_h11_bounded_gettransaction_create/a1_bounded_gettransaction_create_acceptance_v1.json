@@ -1,0 +1,54 @@
+{
+  "schema": "smial.rc002.h11-bounded-gettransaction-create.acceptance",
+  "schema_version": "1.0",
+  "acceptance_id": "EVIDENCE-RC002-H11-BOUNDED-GETTRANSACTION-CREATE-001",
+  "atom_id": "RC002-H11-BOUNDED-GETTRANSACTION-CREATE-V1",
+  "as_of": "2026-08-16",
+  "consumer": "RC002-H11-LIFECYCLE-CLOCK",
+  "research_cycle_id": "RESEARCH-CYCLE-RC002-001",
+  "hypothesis_id": "HYP-RC002-H11-LIFECYCLE-CLOCK-V1",
+  "live_PIT_claim": false,
+  "execution_claim": false,
+  "alpha_claim": false,
+  "provider_requests": 1,
+  "credential_reads": 0,
+  "cash_spend_usd_cents": 0,
+  "historical_receipts_rewritten": false,
+  "pinned_decoder_mutated": false,
+  "route_id": "SOLANA-STANDARD-GET-TRANSACTION-001",
+  "signature": "4fi62bv2A67i6rFh6naBrLyVoteXT4EnXaQzK7K2rboujxRy2AxEu5epesgG7hRcT3xhpZx15EKGG4BxxspX61EH",
+  "gta_payload_len": 195,
+  "live_payload_len": 195,
+  "terminal": "CREATE_GETTX_SAME_195_STILL_TRUNCATED",
+  "create_fail_code": "borsh_payload_truncated",
+  "live_status": "LIVE_ONE_SHOT",
+  "transport": {
+    "http_status": 200,
+    "response_bytes": 11246,
+    "response_sha256": "7c7e6c0536c788b9753c7f08490b085a1e329938882caf38c16c206ba8a87d31",
+    "request_count": 1
+  },
+  "raw_retention": {
+    "kind": "A4_OUTSIDE_GIT",
+    "path": "local/rc002_h11_bounded_gettransaction_create/raw_response.json",
+    "sha256": "7c7e6c0536c788b9753c7f08490b085a1e329938882caf38c16c206ba8a87d31",
+    "response_bytes": 11246
+  },
+  "non_claims": [
+    "NO_LIVE_PIT_CLAIM",
+    "NO_EXECUTION_CLAIM",
+    "NO_ALPHA",
+    "NO_NETRETURN",
+    "NO_RC001_MUTATION",
+    "NO_HOLDOUT_CONSUMPTION",
+    "NO_UNBOUNDED_PUMP_PROGRAM_GTA",
+    "NO_TASK40_RECEIPT_REWRITE",
+    "NO_PINNED_DECODER_MUTATION",
+    "NO_EXCLUSIVE_XB_RPC_CUT_CLAIM",
+    "NO_CREATE_LAYOUT_CLAIM",
+    "NO_HELIUS_CALL"
+  ],
+  "project_sources_disposition": {
+    "kind": "NO_CHANGE"
+  }
+}
