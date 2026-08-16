@@ -28,14 +28,14 @@
   },
   "factory_fit": {
     "path": "docs/evidence/rc002_h11_truncation_vs_absence/a1_delivery_factory_fit_v1.json",
-    "sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+    "sha256": "4009cd5581934c15bf361e729ac9e5fca35c928eefa45350a30a2eac683035d5",
     "verdict": "PASS"
   },
   "validation": {
     "targeted": "PASS_TRUNCATION_VS_ABSENCE_TESTS",
     "independent_review": {
       "path": "docs/evidence/rc002_h11_truncation_vs_absence/a1_delivery_independent_review_v1.json",
-      "sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+      "sha256": "7ff426f4214d472ee627cdc14bfc15026fd9f8c90d53459f8d46d35a51b89fdd",
       "verdict": "PASS"
     },
     "full_gate": "ENFORCED_BY_PROJECT_BOUND_VALIDATION",

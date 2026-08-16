@@ -5,7 +5,7 @@
   "as_of": "2026-08-16",
   "task_id": "RC002-H11-TRUNCATION-VS-ABSENCE-OFFLINE-V1",
   "reviewed_bindings_sha256": "87a9262891d6a507e71af2c77c7509c16e1a3326986a9fd1c8c000075dd78a33",
-  "reviewed_inventory_sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+  "reviewed_inventory_sha256": "97be54638063677330ccf7d7f60ef271647bc22273749f6fd111b6a9741cfdc4",
   "required_roles": [
     "CODE_REVIEWER",
     "GOAL_DOD_CRITIC",
