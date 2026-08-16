@@ -1,0 +1,71 @@
+{
+  "schema": "smial.delivery-completion-evidence",
+  "schema_version": "1.0",
+  "acceptance_id": "RC002-H11-COMPLETE-MIGRATION-FROM-RETAINED-CREATE-HISTORY-DELIVERY-COMPLETION-001",
+  "as_of": "2026-08-17",
+  "task_id": "RC002-H11-COMPLETE-MIGRATION-FROM-RETAINED-CREATE-HISTORY-OFFLINE-V1",
+  "state_change": "COMPLETE_MIGRATION_IDENTITY_MATCH",
+  "base_main": "d6b88812c14fd787e9a7bed756fa5b70a2566b10",
+  "cloud_bundle_mode": "OWNER_MANAGED_OPTIONAL_EXPORT",
+  "cloud_bundle_required_by_harness": false,
+  "cloud_bundle_smoke_required": false,
+  "capability_radar_now": "NONE",
+  "implementation_bindings": {
+    "docs/evidence/rc002_h11_complete_migration_from_retained_create_history/a1_complete_migration_from_retained_create_history_acceptance_v1.json": "e1d5a5c71fc03ce3b7963951fe9a5a0079baa7ea670f6150633360badce83022",
+    "docs/reports/rc002_h11_complete_migration_from_retained_create_history/a1_owner_readout_v1.md": "5925411e99d246dfd24ab34efb146394d0f99420c9d2769da474d7539c594837",
+    "docs/tasks/RC002-H11-COMPLETE-MIGRATION-FROM-RETAINED-CREATE-HISTORY-OFFLINE-V1.md": "1721c10c475cda6dd5a35ba198e3ee68211b685966f04e1da476f58162fce796",
+    "scripts/run_rc002_h11_complete_migration_from_retained_create_history.py": "3c7cded205f82d5ccd9cdace575ff2f491b6143c0453f6722d50e1bd14bbde19",
+    "src/solana_alpha_lab/rc002_h11_complete_migration_from_retained_create_history.py": "45586dd3a940ab40c7db94b86c7e38f210318d3c3195ae3fde5dc2b73f6aa49a",
+    "tests/test_rc002_h11_complete_migration_from_retained_create_history.py": "9ee921767230e36039fb23cb09dc0ecc06fe9ad12341da40e5c4e39495a21477"
+  },
+  "active_stop_conditions": [],
+  "owner_attention_triggers": {
+    "auth_or_access_recovery": false,
+    "material_owner_decision": false,
+    "user_only_activation": false,
+    "external_material_action": false,
+    "unresolved_safety_or_truth_conflict": false
+  },
+  "factory_fit": {
+    "path": "docs/evidence/rc002_h11_complete_migration_from_retained_create_history/a1_delivery_factory_fit_v1.json",
+    "sha256": "eb7c77171c84ae3a08986f13591d8c36002d0e9837bf576b82c80fd84cc074d1",
+    "verdict": "PASS"
+  },
+  "validation": {
+    "targeted": "PASS_COMPLETE_MIGRATION_FROM_RETAINED_CREATE_HISTORY_TESTS",
+    "independent_review": {
+      "path": "docs/evidence/rc002_h11_complete_migration_from_retained_create_history/a1_delivery_independent_review_v1.json",
+      "sha256": "3cd60de526e7af414a02157a5b9db499382595f9a3765788d3c32ec141d38f68",
+      "verdict": "PASS"
+    },
+    "full_gate": "ENFORCED_BY_PROJECT_BOUND_VALIDATION",
+    "github_ci": "ENFORCED_LIVE_AT_GUARDED_MERGE",
+    "project_checks": [
+      "PASS_TARGETED_COMPLETE_MIGRATION_FROM_RETAINED_CREATE_HISTORY_TESTS"
+    ]
+  },
+  "non_claims": [
+    "NO_CANONICAL_DONE",
+    "NO_LIVE_PIT_OR_EXECUTION_CLAIM",
+    "NO_ALPHA_PNL_OR_NETRETURN",
+    "NO_EXCLUSIVE_XB_RPC_CUT_CLAIM",
+    "NO_CREATE_LAYOUT_AS_CURRENT_IDL_CLAIM",
+    "NO_CREATE_AT_FROM_BLOCKTIME",
+    "NO_MIGRATION_AT_FROM_BLOCKTIME",
+    "NO_COMPLETE_EVENT_AS_MIGRATION_AT",
+    "NO_TASK37_CLOCK_DEFINITION_REWRITE",
+    "NO_TASK40_RECEIPT_REWRITE",
+    "NO_PINNED_DECODER_MUTATION"
+  ],
+  "side_effects": {
+    "cash_spend_usd_cents": 0,
+    "credential_reads": 0,
+    "fallbacks": 0,
+    "provider_requests": 0,
+    "retries": 0,
+    "wallet_signer_transaction_actions": 0
+  },
+  "project_sources_disposition": {
+    "kind": "NO_CHANGE"
+  }
+}

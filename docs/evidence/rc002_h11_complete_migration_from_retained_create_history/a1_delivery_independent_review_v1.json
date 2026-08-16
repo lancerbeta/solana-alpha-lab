@@ -1,0 +1,75 @@
+{
+  "schema": "smial.delivery-independent-review-evidence",
+  "schema_version": "1.0",
+  "review_id": "RC002-H11-COMPLETE-MIGRATION-FROM-RETAINED-CREATE-HISTORY-INDEPENDENT-REVIEW-001",
+  "as_of": "2026-08-17",
+  "task_id": "RC002-H11-COMPLETE-MIGRATION-FROM-RETAINED-CREATE-HISTORY-OFFLINE-V1",
+  "reviewed_bindings_sha256": "54470c26c4be9914c780c29e8bcafcf66b3e8863f772628015e0a210a1af58a2",
+  "reviewed_inventory_sha256": "b779cb08b1cb448a5d4c6aa88f88b78a4876afb39b2fde5b0ec8e67106d45dc3",
+  "required_roles": [
+    "CODE_REVIEWER",
+    "GOAL_DOD_CRITIC",
+    "ARCHITECTURE_CRITIC"
+  ],
+  "reviews": [
+    {
+      "role": "CODE_REVIEWER",
+      "verdict": "PASS",
+      "findings": [
+        "CHECKED_WRITE_SET_BOUNDED",
+        "CHECKED_PINNED_DECODER_UNMUTATED",
+        "CHECKED_NO_PROVIDER_NETWORK_CREDENTIAL",
+        "CHECKED_DECODE_CANDIDATE_ONLY",
+        "CHECKED_CREATE_GETTX_ABSENT",
+        "CHECKED_A4_OPTIONAL_IDENTITY_MIGRATION_AT",
+        "CHECKED_COMPLETE_EVENT_MIGRATION_STARTED_NOT_MIGRATION_AT",
+        "CHECKED_NO_BLOCKTIME_CLOCK",
+        "CHECKED_HISTORICAL_RECEIPTS_UNMUTATED",
+        "CHECKED_NO_SKIPTEST",
+        "CHECKED_NO_SECRETS"
+      ]
+    },
+    {
+      "role": "GOAL_DOD_CRITIC",
+      "verdict": "PASS",
+      "findings": [
+        "CHECKED_DECISION_DELTA",
+        "CHECKED_NAMED_CONSUMER",
+        "CHECKED_CHEAPEST_FALSIFIER",
+        "CHECKED_NON_CLAIMS",
+        "CHECKED_USER_VISIBLE",
+        "CHECKED_EVIDENCE_BUDGET",
+        "CHECKED_DOD"
+      ]
+    },
+    {
+      "role": "ARCHITECTURE_CRITIC",
+      "verdict": "PASS",
+      "findings": [
+        "CHECKED_WRITE_SET",
+        "CHECKED_TRUTH_OWNERSHIP",
+        "CHECKED_PRIVATE_API",
+        "CHECKED_LOG_WALKER_DUPLICATED_NOT_PRIVATE_IMPORT",
+        "CHECKED_RESEARCH_VALIDITY_MATCH_REQUIRES_MIGRATION",
+        "CHECKED_TASK37_CLOCK_FREEZE",
+        "CHECKED_PINNED_DECODER",
+        "CHECKED_PIT_NONCLAIM",
+        "CHECKED_CREATE_AT_NULL_VS_BOUND",
+        "CHECKED_MIGRATION_AT_NULL_VS_BOUND",
+        "CHECKED_ACCEPTANCE_EQUALS_BINDER_WHEN_A4_PRESENT",
+        "CHECKED_COMPATIBILITY",
+        "CHECKED_BLAST_RADIUS",
+        "CHECKED_RECOVERY",
+        "CHECKED_DUCKDB",
+        "CHECKED_NO_GENERIC_PLATFORM"
+      ]
+    }
+  ],
+  "verdict": "PASS",
+  "non_claims": [
+    "NO_CRYPTOGRAPHIC_REVIEWER_IDENTITY",
+    "REVIEW_IS_NOT_SEMANTIC_DONE",
+    "NO_LIVE_PIT_OR_EXECUTION_CLAIM",
+    "NO_TASK40_RECEIPT_REWRITE"
+  ]
+}
