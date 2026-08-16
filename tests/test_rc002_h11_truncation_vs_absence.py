@@ -259,8 +259,6 @@ class TruncationVsAbsenceTests(unittest.TestCase):
 
     def test_acceptance_receipt_is_json_object(self) -> None:
         path = ROOT / "docs/evidence/rc002_h11_truncation_vs_absence/a1_truncation_vs_absence_acceptance_v1.json"
-        if not path.is_file():
-            self.skipTest("acceptance_receipt_not_written_yet")
         receipt = json.loads(path.read_text(encoding="utf-8"))
         self.assertEqual(receipt["atom_id"], ATOM_ID)
         self.assertEqual(
