@@ -1,0 +1,81 @@
+{
+  "schema": "smial.rc002.h11-create-early-six-field-layout.acceptance",
+  "schema_version": "1.0",
+  "acceptance_id": "EVIDENCE-RC002-H11-CREATE-EARLY-SIX-FIELD-LAYOUT-001",
+  "atom_id": "RC002-H11-CREATE-EARLY-SIX-FIELD-LAYOUT-OFFLINE-V1",
+  "as_of": "2026-08-16",
+  "consumer": "RC002-H11-LIFECYCLE-CLOCK",
+  "research_cycle_id": "RESEARCH-CYCLE-RC002-001",
+  "hypothesis_id": "HYP-RC002-H11-LIFECYCLE-CLOCK-V1",
+  "live_PIT_claim": false,
+  "execution_claim": false,
+  "alpha_claim": false,
+  "provider_requests": 0,
+  "credential_reads": 0,
+  "cash_spend_usd_cents": 0,
+  "historical_receipts_rewritten": false,
+  "pinned_decoder_mutated": false,
+  "candidate_id": "DROP_CREATE_FIELDS_AFTER_USER",
+  "create_keep_fields": [
+    "name",
+    "symbol",
+    "uri",
+    "mint",
+    "bonding_curve",
+    "user"
+  ],
+  "gettransaction_fixture": {
+    "path": "tests/fixtures/rc002_h11/gettransaction_create_same_195_v1.json",
+    "payload_len_by_event": {
+      "CreateEvent": [195]
+    },
+    "consumed_by_event": {},
+    "failed_by_event": {
+      "CreateEvent": 1
+    },
+    "create_fail_code": "decoded_event_missing_timestamp",
+    "terminal": "CREATE_EARLY_LAYOUT_BORSH_CONSUMED_TIMESTAMP_INVARIANT"
+  },
+  "retained_a4": {
+    "raw_root": "local/task40_rc002_h11_bonding_curve_pda_gta",
+    "pages_status": "SCANNED",
+    "page_count": 3,
+    "terminal": "CREATE_EARLY_LAYOUT_BORSH_CONSUMED_TIMESTAMP_INVARIANT",
+    "payload_len_by_event": {
+      "CreateEvent": [195]
+    },
+    "consumed_by_event": {},
+    "failed_by_event": {
+      "CreateEvent": 1
+    },
+    "create_fail_code": "decoded_event_missing_timestamp",
+    "quote_mint_only_regression": {
+      "candidate_id": "DROP_TRAILING_QUOTE_MINT",
+      "consumed_by_event": {
+        "CompleteEvent": 1,
+        "CompletePumpAmmMigrationEvent": 1
+      },
+      "failed_by_event": {
+        "CreateEvent": 1
+      }
+    }
+  },
+  "task40_terminal_patch": "HISTORICAL_ROUTE_WRONG_ADDRESS_OR_EVENT_STILL_NOT_CLOSED_CREATE_EARLY_SIX_FIELD_BORSH_NO_TIMESTAMP",
+  "non_claims": [
+    "NO_LIVE_PIT_CLAIM",
+    "NO_EXECUTION_CLAIM",
+    "NO_ALPHA",
+    "NO_NETRETURN",
+    "NO_RC001_MUTATION",
+    "NO_HOLDOUT_CONSUMPTION",
+    "NO_UNBOUNDED_PUMP_PROGRAM_GTA",
+    "NO_TASK40_RECEIPT_REWRITE",
+    "NO_PINNED_DECODER_MUTATION",
+    "NO_EXCLUSIVE_XB_RPC_CUT_CLAIM",
+    "NO_CREATE_LAYOUT_AS_CURRENT_IDL_CLAIM",
+    "NO_CREATE_AT_FROM_EVENT_TIMESTAMP"
+  ],
+  "project_sources_disposition": {
+    "kind": "NO_CHANGE"
+  }
+}
