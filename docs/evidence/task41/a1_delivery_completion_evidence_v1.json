@@ -9,7 +9,7 @@
   "cloud_bundle_smoke_required": false,
   "factory_fit": {
     "path": "docs/evidence/task41/a1_delivery_factory_fit_v1.json",
-    "sha256": "794419767d875921e4a1095ecb1091549b8322db3dce61448842142fce3b2995",
+    "sha256": "7b43e21af6185af0844b836d40c6757e1d106d5e05bed50c5a6922fe7b79c4f4",
     "verdict": "PASS"
   },
   "implementation_bindings": {
@@ -28,7 +28,7 @@
     "docs/agent/DELIVERY_HARNESS_PROTOCOL.md": "ad0a43b9c3ad2dc66abc8fa7bf60ddd0571037acc84a9a416d2e259118b3e422",
     "docs/evidence/control/delivery_harness_acceptance_v1.json": "d48a279db24189a68bb94dd4e6391923f1370dbd48deae44b7034976420fefe4",
     "docs/evidence/task30/a20r1_provider_route_capability_registry_acceptance_v1.json": "5dbaffbf7579ecfa851bb4ef527ed31af740952f1d61dd6a27df46e88280775b",
-    "docs/tasks/TASK-41-isolated-review-and-raw-noclobber.md": "a9bf01981f81645d6ef46ee84f927a51c4c9058cabab03c3dbfcb4d35629da6a",
+    "docs/tasks/TASK-41-isolated-review-and-raw-noclobber.md": "f6ce9a366191ee8c4bd118618af1609d1ebe171f6077bc7fcab9f6a0b5c0634a",
     "scripts/owner_attention_gate.py": "cb4c65cbebcb0f5cb2c53679f0d62bda53596ce1272325d5b123a1f6b8c5c3ab",
     "src/solana_alpha_lab/storage/exclusive.py": "5cb37fbdec0acb6214777aef7699568f2626a6a7a93e8005a921f939b4eb2dcf",
     "src/solana_alpha_lab/task39_h11_named_mint_gta_clock_capture.py": "8a78a2b16f50c8c928c23452eb6eb55813a9aa97a6623a5b39486bd95b5a0935",
@@ -72,7 +72,7 @@
     "github_ci": "ENFORCED_LIVE_AT_GUARDED_MERGE",
     "independent_review": {
       "path": "docs/evidence/task41/a1_delivery_independent_review_v1.json",
-      "sha256": "bc0ecf045a48a3d7caf0fba66ba557785bb04b90205075f97598be494eba0575",
+      "sha256": "14aa2c22691d555fc780655b5bc17b477a1692ae1dd502cd036b2bfcfd52632e",
       "verdict": "PASS"
     },
     "project_checks": [
