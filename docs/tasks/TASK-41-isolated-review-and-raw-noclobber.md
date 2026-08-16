@@ -7,9 +7,9 @@ owner: GOAL_OWNER
 allowed_routes: [DIRECT_CURSOR_DELIVERY]
 expected_repository: lancerbeta/solana-alpha-lab
 git_binding:
-  expected_base: 6089e1d011562de43068a26a8f5feb17c4c2abcf
+  expected_base: f6cf9b422d7fa8ff03e0a295ad750cb8b02066f3
   expected_upstream: origin/main
-  expected_upstream_oid: 6089e1d011562de43068a26a8f5feb17c4c2abcf
+  expected_upstream_oid: f6cf9b422d7fa8ff03e0a295ad750cb8b02066f3
   expected_branch: cursor/task41-isolated-review-and-raw-noclobber
   dirty_mode: ALLOW_REPORTED
 objective: Make guarded merge deny SINGLE_AGENT_REVIEW_FALLBACK and persist H11 live raw pages with exclusive no-clobber writes.
