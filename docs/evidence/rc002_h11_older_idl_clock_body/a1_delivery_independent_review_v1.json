@@ -1,0 +1,57 @@
+{
+  "schema": "smial.delivery-independent-review-evidence",
+  "schema_version": "1.0",
+  "review_id": "RC002-H11-OLDER-IDL-CLOCK-BODY-INDEPENDENT-REVIEW-001",
+  "as_of": "2026-08-16",
+  "task_id": "RC002-H11-OLDER-IDL-CLOCK-BODY-OFFLINE-V1",
+  "reviewed_bindings_sha256": "cf1499fcd5d51250a44ef765728dfba746e1a99f7c3de8bb348f3aedd563d10c",
+  "reviewed_inventory_sha256": "38e5f0a5c18ab46d0adaecebcc62b3e6aa91c6ba60e265b761c2d14c66a37ce1",
+  "required_roles": [
+    "CODE_REVIEWER",
+    "GOAL_DOD_CRITIC",
+    "ARCHITECTURE_CRITIC"
+  ],
+  "reviews": [
+    {
+      "role": "CODE_REVIEWER",
+      "verdict": "PASS",
+      "findings": [
+        "CHECKED_CANDIDATE_DROPS_QUOTE_MINT_ONLY_ON_CLOCK_EVENTS",
+        "CHECKED_TRADEEVENT_FIELD_LIST_UNCHANGED",
+        "CHECKED_CPI_COMPLETE_WALKED_VIA_INVOKE_STACK_NOT_ACCOUNT_KEYS",
+        "CHECKED_CREATE_FAIL_CODE_BORSH_PAYLOAD_TRUNCATED",
+        "CHECKED_NO_PRIVATE_TASK_API_IMPORT",
+        "CHECKED_NO_UNPROVEN_SKIPTEST"
+      ]
+    },
+    {
+      "role": "GOAL_DOD_CRITIC",
+      "verdict": "PASS",
+      "findings": [
+        "CHECKED_DOD_DROP_TRAILING_QUOTE_MINT",
+        "CHECKED_CHEAPEST_FALSIFIER_CREATE_FAILS_WHILE_COMPLETE_MIGRATION_CONSUME",
+        "CHECKED_LIVE_A4_PAYLOADS_195_112_168",
+        "CHECKED_MIXED_IS_ALLOWED_TERMINAL",
+        "CHECKED_NON_CLAIMS_NO_EXCLUSIVE_CUT_NO_CREATE_LAYOUT_NO_TASK40_REWRITE"
+      ]
+    },
+    {
+      "role": "ARCHITECTURE_CRITIC",
+      "verdict": "PASS",
+      "findings": [
+        "CHECKED_PINNED_DECODER_NOT_MUTATED",
+        "CHECKED_CANDIDATE_PLAN_IS_DERIVED_NOT_PINNED_TRUTH",
+        "CHECKED_DECIDE_TERMINAL_REQUIRES_ALL_THREE_CLOCK_EVENTS_FOR_CONSUME",
+        "CHECKED_COMPLETE_MIGRATION_CONSUME_NOT_EXCLUSIVE_OF_EXACT_32_CUT",
+        "CHECKED_LIVE_PIT_FALSE"
+      ]
+    }
+  ],
+  "verdict": "PASS",
+  "non_claims": [
+    "NO_CRYPTOGRAPHIC_REVIEWER_IDENTITY",
+    "REVIEW_IS_NOT_SEMANTIC_DONE",
+    "NO_LIVE_PIT_OR_EXECUTION_CLAIM",
+    "NO_TASK40_RECEIPT_REWRITE"
+  ]
+}

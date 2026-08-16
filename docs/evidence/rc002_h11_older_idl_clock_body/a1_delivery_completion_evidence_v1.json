@@ -1,0 +1,67 @@
+{
+  "schema": "smial.delivery-completion-evidence",
+  "schema_version": "1.0",
+  "acceptance_id": "RC002-H11-OLDER-IDL-CLOCK-BODY-DELIVERY-COMPLETION-001",
+  "as_of": "2026-08-16",
+  "task_id": "RC002-H11-OLDER-IDL-CLOCK-BODY-OFFLINE-V1",
+  "state_change": "MIXED_CLOCK_BODIES_NOT_UNIFORM",
+  "base_main": "4a2f4a90bbddf5f0f349590eb76b097a51e8080b",
+  "cloud_bundle_mode": "OWNER_MANAGED_OPTIONAL_EXPORT",
+  "cloud_bundle_required_by_harness": false,
+  "cloud_bundle_smoke_required": false,
+  "capability_radar_now": "NONE",
+  "implementation_bindings": {
+    "docs/evidence/rc002_h11_older_idl_clock_body/a1_older_idl_clock_body_acceptance_v1.json": "780d447d116acb9448121f5061bf5d0be7fb908c4664320cf010fca01d86384d",
+    "docs/reports/rc002_h11_older_idl_clock_body/a1_owner_readout_v1.md": "5eae1b906907523af501dec5808db009e3fee54f483c808db669e5e8724684d2",
+    "docs/tasks/RC002-H11-OLDER-IDL-CLOCK-BODY-OFFLINE-V1.md": "62f19a4486890b6b46b23cf042aee676cbd3a866393b3f096eed9725c141fd39",
+    "scripts/run_rc002_h11_older_idl_clock_body.py": "ebf3decd38b3fe26b212dffb2b2d0f86cb11666ea43c3a386aa01954ddbc9707",
+    "src/solana_alpha_lab/rc002_h11_older_idl_clock_body.py": "c933fcdc48b4d86e8735c53d79d0151a0beeb405ebc11aa42cc9704b7ee77a89",
+    "tests/test_rc002_h11_older_idl_clock_body.py": "7912821cc91640a1f7eb8ebf82b7c9f4def370c538775e060a8f4845dba91545"
+  },
+  "active_stop_conditions": [],
+  "owner_attention_triggers": {
+    "auth_or_access_recovery": false,
+    "material_owner_decision": false,
+    "user_only_activation": false,
+    "external_material_action": false,
+    "unresolved_safety_or_truth_conflict": false
+  },
+  "factory_fit": {
+    "path": "docs/evidence/rc002_h11_older_idl_clock_body/a1_delivery_factory_fit_v1.json",
+    "sha256": "cff78b35a9c65aa28331336fcc517d63400cf3a4df0536332583b3832f624eb3",
+    "verdict": "PASS"
+  },
+  "validation": {
+    "targeted": "PASS_OLDER_IDL_CLOCK_BODY_TESTS",
+    "independent_review": {
+      "path": "docs/evidence/rc002_h11_older_idl_clock_body/a1_delivery_independent_review_v1.json",
+      "sha256": "d2e261ec9d33d05adfdeb8e03029b40f16ffd29fb36c44dbd5ee1332b7c1df90",
+      "verdict": "PASS"
+    },
+    "full_gate": "ENFORCED_BY_PROJECT_BOUND_VALIDATION",
+    "github_ci": "ENFORCED_LIVE_AT_GUARDED_MERGE",
+    "project_checks": [
+      "PASS_TARGETED_OLDER_IDL_TESTS"
+    ]
+  },
+  "non_claims": [
+    "NO_CANONICAL_DONE",
+    "NO_LIVE_PIT_OR_EXECUTION_CLAIM",
+    "NO_ALPHA_PNL_OR_NETRETURN",
+    "NO_EXCLUSIVE_XB_RPC_CUT_CLAIM",
+    "NO_CREATE_LAYOUT_CLAIM",
+    "NO_TASK40_RECEIPT_REWRITE",
+    "NO_PINNED_DECODER_MUTATION"
+  ],
+  "side_effects": {
+    "cash_spend_usd_cents": 0,
+    "credential_reads": 0,
+    "fallbacks": 0,
+    "provider_requests": 0,
+    "retries": 0,
+    "wallet_signer_transaction_actions": 0
+  },
+  "project_sources_disposition": {
+    "kind": "NO_CHANGE"
+  }
+}
