@@ -1,0 +1,70 @@
+{
+  "schema": "smial.delivery-completion-evidence",
+  "schema_version": "1.0",
+  "acceptance_id": "RC002-H11-CREATE-AT-MISSING-UNKNOWN-DELIVERY-COMPLETION-001",
+  "as_of": "2026-08-16",
+  "task_id": "RC002-H11-CREATE-AT-MISSING-UNKNOWN-OFFLINE-V1",
+  "state_change": "CREATE_AT_MISSING_UNKNOWN",
+  "base_main": "38df23922b31733bdaa5e4c425b70cfb15757c63",
+  "cloud_bundle_mode": "OWNER_MANAGED_OPTIONAL_EXPORT",
+  "cloud_bundle_required_by_harness": false,
+  "cloud_bundle_smoke_required": false,
+  "capability_radar_now": "NONE",
+  "implementation_bindings": {
+    "docs/evidence/rc002_h11_create_at_missing_unknown/a1_create_at_missing_unknown_acceptance_v1.json": "e78c16ff1329e32bf66d778a3bf0152fd949c08e49a639db3c5370effe2e7c14",
+    "docs/reports/rc002_h11_create_at_missing_unknown/a1_owner_readout_v1.md": "0049f4bb5c6e7c6a1bfc304c9a9aa3993725b65cfac0f0836536fb65c321ab31",
+    "docs/tasks/RC002-H11-CREATE-AT-MISSING-UNKNOWN-OFFLINE-V1.md": "bf85fa54d00e876c92b7f9ef38f0180209e122f240e84ce1bcb82f3532240912",
+    "scripts/run_rc002_h11_create_at_missing_unknown.py": "68ed1fec53c7be15fd7543d692040e324526d508c64e7496d527620fb64b138a",
+    "src/solana_alpha_lab/rc002_h11_create_at_missing_unknown.py": "7c84e35db262f49d360736932b00c6ec926b70d50753ee0e721ad76c0e0f976d",
+    "tests/test_rc002_h11_create_at_missing_unknown.py": "7728581e9bfd67bd72d5be3255c99d34b1a681468ed7f7b477f07288e2d0418f"
+  },
+  "active_stop_conditions": [],
+  "owner_attention_triggers": {
+    "auth_or_access_recovery": false,
+    "material_owner_decision": false,
+    "user_only_activation": false,
+    "external_material_action": false,
+    "unresolved_safety_or_truth_conflict": false
+  },
+  "factory_fit": {
+    "path": "docs/evidence/rc002_h11_create_at_missing_unknown/a1_delivery_factory_fit_v1.json",
+    "sha256": "65c11f427a8dcf06bb04d08cbcf30f5475e9103f9f7c9616ecf54f1954640484",
+    "verdict": "PASS"
+  },
+  "validation": {
+    "targeted": "PASS_CREATE_AT_MISSING_UNKNOWN_TESTS",
+    "independent_review": {
+      "path": "docs/evidence/rc002_h11_create_at_missing_unknown/a1_delivery_independent_review_v1.json",
+      "sha256": "4a64649b3345b555a5a77c6af7d822e6791afa6f8248ba91668f08ae512a2381",
+      "verdict": "PASS"
+    },
+    "full_gate": "ENFORCED_BY_PROJECT_BOUND_VALIDATION",
+    "github_ci": "ENFORCED_LIVE_AT_GUARDED_MERGE",
+    "project_checks": [
+      "PASS_TARGETED_CREATE_AT_MISSING_UNKNOWN_TESTS"
+    ]
+  },
+  "non_claims": [
+    "NO_CANONICAL_DONE",
+    "NO_LIVE_PIT_OR_EXECUTION_CLAIM",
+    "NO_ALPHA_PNL_OR_NETRETURN",
+    "NO_EXCLUSIVE_XB_RPC_CUT_CLAIM",
+    "NO_CREATE_LAYOUT_AS_CURRENT_IDL_CLAIM",
+    "NO_CREATE_AT_FROM_BLOCKTIME",
+    "NO_CREATE_AT_FROM_EVENT_TIMESTAMP",
+    "NO_TASK37_CLOCK_DEFINITION_REWRITE",
+    "NO_TASK40_RECEIPT_REWRITE",
+    "NO_PINNED_DECODER_MUTATION"
+  ],
+  "side_effects": {
+    "cash_spend_usd_cents": 0,
+    "credential_reads": 0,
+    "fallbacks": 0,
+    "provider_requests": 0,
+    "retries": 0,
+    "wallet_signer_transaction_actions": 0
+  },
+  "project_sources_disposition": {
+    "kind": "NO_CHANGE"
+  }
+}
