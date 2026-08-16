@@ -28,14 +28,14 @@
   },
   "factory_fit": {
     "path": "docs/evidence/rc002_h11_cohort_eligibility_after_task40_close/a1_delivery_factory_fit_v1.json",
-    "sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+    "sha256": "c25b74392c74cfa3d4ad95cc7171353babdfdefa5629c12d39255ace30f65225",
     "verdict": "PASS"
   },
   "validation": {
     "targeted": "PASS_COHORT_ELIGIBILITY_AFTER_TASK40_CLOSE_TESTS",
     "independent_review": {
       "path": "docs/evidence/rc002_h11_cohort_eligibility_after_task40_close/a1_delivery_independent_review_v1.json",
-      "sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+      "sha256": "7b5225891d64f052400086c6e410250cfb7b3593ac3d47216a61a90d760d552c",
       "verdict": "PASS"
     },
     "full_gate": "ENFORCED_BY_PROJECT_BOUND_VALIDATION",
