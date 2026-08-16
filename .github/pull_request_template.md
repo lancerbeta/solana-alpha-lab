@@ -15,7 +15,7 @@
 - Targeted checks:
 - Single full-gate owner:
 - Full-gate receipt/reuse/`FULL_VALIDATION=DELEGATED_TO_CI`:
-- Review routes and `SINGLE_AGENT_REVIEW_FALLBACK` if used:
+- Review routes; `SINGLE_AGENT_REVIEW_FALLBACK` must be absent for merge PASS:
 - Factory Fit / Product Horizon:
 - Capability radar:
 
