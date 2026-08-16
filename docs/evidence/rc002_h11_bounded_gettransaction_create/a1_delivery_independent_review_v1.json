@@ -5,7 +5,7 @@
   "as_of": "2026-08-16",
   "task_id": "RC002-H11-BOUNDED-GETTRANSACTION-CREATE-V1",
   "reviewed_bindings_sha256": "f46449882ecbe238da60e0bd84df21fe48b9c1632d4be8d28c88e76fae3a88ef",
-  "reviewed_inventory_sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+  "reviewed_inventory_sha256": "bd0d453fb233465e9fe0680346a8d39683943da33fef8b6415d6615c1c26507d",
   "required_roles": [
     "CODE_REVIEWER",
     "GOAL_DOD_CRITIC",
