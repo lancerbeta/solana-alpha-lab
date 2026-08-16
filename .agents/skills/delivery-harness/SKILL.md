@@ -56,8 +56,8 @@ widens provider, dependency, credential, spend or install authority.
 Run code review for every delivery. Add goal/DoD review for a new/changed
 outcome, architecture review for boundaries/contracts/schemas/security or
 multiple components, and refactor review only after correctness with measured
-cost. Optional subagent failure is `SINGLE_AGENT_REVIEW_FALLBACK`; deterministic
-checks remain mandatory.
+cost. Launch critics in isolated context. `SINGLE_AGENT_REVIEW_FALLBACK` is
+`NOT_READY` for merge; deterministic checks remain mandatory.
 
 ## Finish and merge
 

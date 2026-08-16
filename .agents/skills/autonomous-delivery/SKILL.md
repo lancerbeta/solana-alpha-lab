@@ -155,13 +155,13 @@ authority.
 Passing tests are required and do not prove product outcome. Risk-route as
 the harness: code review always; goal/DoD for new/changed outcomes;
 architecture for contracts/schemas/boundaries/security/multi-component;
-refactor only after correctness plus a measured signal. Unavailable
-subagents → `SINGLE_AGENT_REVIEW_FALLBACK` plus the same deterministic
-checks.
+refactor only after correctness plus a measured signal. Launch isolated
+critics. `SINGLE_AGENT_REVIEW_FALLBACK` is `NOT_READY` for merge.
 
 Critics hunt: false DONE, wrong outcome, hidden regression, invalid
 assumption, architecture drift, weak oracle, scope creep, new
-operational/security burden. No multi-agent ceremony for routine change.
+operational/security burden. Ask what can pass tests and still break
+research validity.
 
 ## 11. Context budget
 
