@@ -5,7 +5,7 @@
   "as_of": "2026-08-16",
   "task_id": "RC002-H11-CREATE-SIX-FIELD-PUBKEY-IDENTITY-OFFLINE-V1",
   "reviewed_bindings_sha256": "e96f636bd05c7f75a591d466acdee60076a91ca897b7478ec23418e8d84bb6af",
-  "reviewed_inventory_sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+  "reviewed_inventory_sha256": "877ecc608412978afb678792b39766eb5799f5c032779d81a54942a65a2dc282",
   "mode": "FULL_REVIEW",
   "verdict": "PASS",
   "dimensions": {

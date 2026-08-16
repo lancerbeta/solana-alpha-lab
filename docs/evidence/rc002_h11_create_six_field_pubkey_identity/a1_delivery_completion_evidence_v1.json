@@ -28,14 +28,14 @@
   },
   "factory_fit": {
     "path": "docs/evidence/rc002_h11_create_six_field_pubkey_identity/a1_delivery_factory_fit_v1.json",
-    "sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+    "sha256": "570b2cc36d285ad15d1a67d1cdd7ce519fa7b28c5f47150de263893d75dec41a",
     "verdict": "PASS"
   },
   "validation": {
     "targeted": "PASS_CREATE_SIX_FIELD_PUBKEY_IDENTITY_TESTS",
     "independent_review": {
       "path": "docs/evidence/rc002_h11_create_six_field_pubkey_identity/a1_delivery_independent_review_v1.json",
-      "sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+      "sha256": "546930cab5ae3deba03ff240be846308a8abfbedc492b811cb4017113482f0e1",
       "verdict": "PASS"
     },
     "full_gate": "ENFORCED_BY_PROJECT_BOUND_VALIDATION",
