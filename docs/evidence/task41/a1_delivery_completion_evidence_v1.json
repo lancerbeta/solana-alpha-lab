@@ -2,14 +2,14 @@
   "acceptance_id": "T41-A1-DELIVERY-COMPLETION-001",
   "active_stop_conditions": [],
   "as_of": "2026-08-16",
-  "base_main": "6089e1d011562de43068a26a8f5feb17c4c2abcf",
+  "base_main": "f6cf9b422d7fa8ff03e0a295ad750cb8b02066f3",
   "capability_radar_now": "NONE",
   "cloud_bundle_mode": "OWNER_MANAGED_OPTIONAL_EXPORT",
   "cloud_bundle_required_by_harness": false,
   "cloud_bundle_smoke_required": false,
   "factory_fit": {
     "path": "docs/evidence/task41/a1_delivery_factory_fit_v1.json",
-    "sha256": "14e1950bf42857bb241a2a73a8b92d9b441101a3ddfccddd8270f1b04e524534",
+    "sha256": "794419767d875921e4a1095ecb1091549b8322db3dce61448842142fce3b2995",
     "verdict": "PASS"
   },
   "implementation_bindings": {
@@ -22,13 +22,13 @@
     ".cursor/commands/delivery-review.md": "4610588b5f725e61735625c7046afa1086dd00c4df82c8f27617c8d3d7481caf",
     ".github/pull_request_template.md": "d6d025436652d44d250571a5772585dcfac6c0662e5df4c88779bdc457634aff",
     "AGENTS.md": "808f38cad4954d49faf933328943ac49625d14d694bb17555f9d2f732b65f142",
-    "catalog/assets/core.yaml": "b2a151bf043b97207e478815d24664a24f5b7d82eb285013139ad06f0ca32d38",
+    "catalog/assets/core.yaml": "4b379761e617f1b25697dccc6e7c62e0128d0c8d39e262187c4e43bc88d30390",
     "delivery-harness/templates/portable-bundle-manifest.json": "112f2bd814299fb82471821a36b58fefe1112a606aee714daf886c7fe4cd9d20",
     "delivery-harness/templates/portable-core/dot-cursor/commands/delivery-review.md": "152c0a264f9fc0c5d138ef965cbdf51dce9ebdab60d9b3f7e21875a58f6429f4",
     "docs/agent/DELIVERY_HARNESS_PROTOCOL.md": "ad0a43b9c3ad2dc66abc8fa7bf60ddd0571037acc84a9a416d2e259118b3e422",
     "docs/evidence/control/delivery_harness_acceptance_v1.json": "d48a279db24189a68bb94dd4e6391923f1370dbd48deae44b7034976420fefe4",
     "docs/evidence/task30/a20r1_provider_route_capability_registry_acceptance_v1.json": "5dbaffbf7579ecfa851bb4ef527ed31af740952f1d61dd6a27df46e88280775b",
-    "docs/tasks/TASK-41-isolated-review-and-raw-noclobber.md": "f426a0903710ce6b52934edf5de3695b64ba28711b3bb54e52945a4a9ffef8ad",
+    "docs/tasks/TASK-41-isolated-review-and-raw-noclobber.md": "a9bf01981f81645d6ef46ee84f927a51c4c9058cabab03c3dbfcb4d35629da6a",
     "scripts/owner_attention_gate.py": "cb4c65cbebcb0f5cb2c53679f0d62bda53596ce1272325d5b123a1f6b8c5c3ab",
     "src/solana_alpha_lab/storage/exclusive.py": "5cb37fbdec0acb6214777aef7699568f2626a6a7a93e8005a921f939b4eb2dcf",
     "src/solana_alpha_lab/task39_h11_named_mint_gta_clock_capture.py": "8a78a2b16f50c8c928c23452eb6eb55813a9aa97a6623a5b39486bd95b5a0935",
@@ -72,7 +72,7 @@
     "github_ci": "ENFORCED_LIVE_AT_GUARDED_MERGE",
     "independent_review": {
       "path": "docs/evidence/task41/a1_delivery_independent_review_v1.json",
-      "sha256": "30ae02434906c205bf7ccd707c5b3696ecafadefe2b5b12971ffd11f51161ae4",
+      "sha256": "bc0ecf045a48a3d7caf0fba66ba557785bb04b90205075f97598be494eba0575",
       "verdict": "PASS"
     },
     "project_checks": [
