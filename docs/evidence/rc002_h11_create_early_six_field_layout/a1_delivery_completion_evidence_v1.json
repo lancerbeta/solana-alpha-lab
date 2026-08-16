@@ -1,0 +1,68 @@
+{
+  "schema": "smial.delivery-completion-evidence",
+  "schema_version": "1.0",
+  "acceptance_id": "RC002-H11-CREATE-EARLY-SIX-FIELD-LAYOUT-DELIVERY-COMPLETION-001",
+  "as_of": "2026-08-16",
+  "task_id": "RC002-H11-CREATE-EARLY-SIX-FIELD-LAYOUT-OFFLINE-V1",
+  "state_change": "CREATE_EARLY_LAYOUT_BORSH_CONSUMED_TIMESTAMP_INVARIANT",
+  "base_main": "656d0698852661f44c5812919dde9f12f6b78f45",
+  "cloud_bundle_mode": "OWNER_MANAGED_OPTIONAL_EXPORT",
+  "cloud_bundle_required_by_harness": false,
+  "cloud_bundle_smoke_required": false,
+  "capability_radar_now": "NONE",
+  "implementation_bindings": {
+    "docs/evidence/rc002_h11_create_early_six_field_layout/a1_create_early_six_field_layout_acceptance_v1.json": "3dfc9099f02ba1278286bb9f9bd4e2b312be41b466a874080dccbd40d5aac75e",
+    "docs/reports/rc002_h11_create_early_six_field_layout/a1_owner_readout_v1.md": "c314933d3bd790371f9006c2baaa876e02d9d238a28c2283bea66e781367f974",
+    "docs/tasks/RC002-H11-CREATE-EARLY-SIX-FIELD-LAYOUT-OFFLINE-V1.md": "ee723969a18961bbee17b668b387cf06da9398e1bf0686f418347c5cd1ec27fe",
+    "scripts/run_rc002_h11_create_early_six_field_layout.py": "fc0a2abed3eb8f4418928c177d3e6616b9d4ac4671296ca59dd18701af69814c",
+    "src/solana_alpha_lab/rc002_h11_create_early_six_field_layout.py": "e03b21afb61396726bdc7cf9f23bc5a9e5328fe40ba8dbc390913c36aafa7720",
+    "tests/test_rc002_h11_create_early_six_field_layout.py": "2e3e195919739baf593443107c262624ead9ae37d1329f211290442f4daf50cb"
+  },
+  "active_stop_conditions": [],
+  "owner_attention_triggers": {
+    "auth_or_access_recovery": false,
+    "material_owner_decision": false,
+    "user_only_activation": false,
+    "external_material_action": false,
+    "unresolved_safety_or_truth_conflict": false
+  },
+  "factory_fit": {
+    "path": "docs/evidence/rc002_h11_create_early_six_field_layout/a1_delivery_factory_fit_v1.json",
+    "sha256": "0a2fb53444aeac5130fb7b389488167d9b031d468d784e323f2dfd7fb70bdb2d",
+    "verdict": "PASS"
+  },
+  "validation": {
+    "targeted": "PASS_CREATE_EARLY_SIX_FIELD_LAYOUT_TESTS",
+    "independent_review": {
+      "path": "docs/evidence/rc002_h11_create_early_six_field_layout/a1_delivery_independent_review_v1.json",
+      "sha256": "2ed7c1f097036645ecda314e0b8bd46503e2ec286a91abba153f32d079376a6b",
+      "verdict": "PASS"
+    },
+    "full_gate": "ENFORCED_BY_PROJECT_BOUND_VALIDATION",
+    "github_ci": "ENFORCED_LIVE_AT_GUARDED_MERGE",
+    "project_checks": [
+      "PASS_TARGETED_CREATE_EARLY_SIX_FIELD_LAYOUT_TESTS"
+    ]
+  },
+  "non_claims": [
+    "NO_CANONICAL_DONE",
+    "NO_LIVE_PIT_OR_EXECUTION_CLAIM",
+    "NO_ALPHA_PNL_OR_NETRETURN",
+    "NO_EXCLUSIVE_XB_RPC_CUT_CLAIM",
+    "NO_CREATE_LAYOUT_AS_CURRENT_IDL_CLAIM",
+    "NO_CREATE_AT_FROM_EVENT_TIMESTAMP",
+    "NO_TASK40_RECEIPT_REWRITE",
+    "NO_PINNED_DECODER_MUTATION"
+  ],
+  "side_effects": {
+    "cash_spend_usd_cents": 0,
+    "credential_reads": 0,
+    "fallbacks": 0,
+    "provider_requests": 0,
+    "retries": 0,
+    "wallet_signer_transaction_actions": 0
+  },
+  "project_sources_disposition": {
+    "kind": "NO_CHANGE"
+  }
+}

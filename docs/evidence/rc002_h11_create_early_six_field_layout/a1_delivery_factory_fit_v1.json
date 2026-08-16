@@ -1,0 +1,35 @@
+{
+  "schema": "smial.delivery-harness-factory-fit",
+  "schema_version": "1.0",
+  "review_id": "RC002-H11-CREATE-EARLY-SIX-FIELD-LAYOUT-FACTORY-FIT-001",
+  "as_of": "2026-08-16",
+  "task_id": "RC002-H11-CREATE-EARLY-SIX-FIELD-LAYOUT-OFFLINE-V1",
+  "reviewed_bindings_sha256": "24b14f872318727f4cd55ab26c700c7b2c06330047da8224fed67a0d16d3ce7f",
+  "reviewed_inventory_sha256": "fdd8c9b0c852d48723fe4e366054ac510702bd7b01c4212861fb58abc6bf05e2",
+  "mode": "FULL_REVIEW",
+  "verdict": "PASS",
+  "dimensions": {
+    "mission": "PASS_CREATE_195_SIX_FIELD_BORSH_WITHOUT_TIMESTAMP_OVERCLAIM",
+    "flexibility_and_history": "PASS_TASK40_AND_H11_RECEIPTS_IMMUTABLE_PINNED_DECODER_UNCHANGED",
+    "context_efficiency": "PASS_ONE_TASK_CONTRACT_NO_CATALOG_CASCADE",
+    "research_truth": "PASS_PUBLIC_DECODE_MISSING_TIMESTAMP_AFTER_EXACT_SIX_FIELD_BORSH",
+    "owner_operability": "PASS_RUSSIAN_READOUT_AND_OFFLINE_SCRIPT",
+    "execution_to_cashflow": "NOT_APPLICABLE",
+    "monitoring_and_recovery": "PASS_NO_BACKGROUND_PROCESS_OFFLINE",
+    "build_vs_buy": "PASS_ADOPT_PINNED_PUBLIC_DECODE_WITH_CREATE_ONLY_CANDIDATE",
+    "security": "PASS_NO_NETWORK_NO_CREDENTIAL_SECRET_FREE_HASHES",
+    "red_team": "PASS_NO_HELIUS_NO_GTA_NO_DECODER_FORK"
+  },
+  "capability_radar": {
+    "now": "NONE",
+    "watch": "PINNED_DECODER_FORK_ONLY_AFTER_MULTI_CREATE_CONFIRM"
+  },
+  "recovery": "REVERT_ONLY_THIS_ATOM_TRACKED_OUTPUTS; PRESERVE_TASK40_A4_AND_SCIENCE_RECEIPTS; PRESERVE_PINNED_DECODER",
+  "limits": [
+    "NO_CREATE_LAYOUT_AS_CURRENT_IDL_CLAIM",
+    "NO_EXCLUSIVE_XB_RPC_CUT_CLAIM",
+    "NO_CREATE_AT_FROM_EVENT_TIMESTAMP",
+    "CI_DOES_NOT_REHASH_LOCAL_A4",
+    "NO_LIVE_PIT_OR_CASHFLOW"
+  ]
+}
