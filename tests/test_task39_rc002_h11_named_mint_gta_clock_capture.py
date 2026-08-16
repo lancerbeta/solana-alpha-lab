@@ -4,6 +4,7 @@ import base64
 import json
 import struct
 import sys
+import tempfile
 import unittest
 from pathlib import Path
 
@@ -26,6 +27,7 @@ from solana_alpha_lab.task30_helius_get_transactions_for_address import (  # noq
     EXPECTED_POOL,
     build_json_rpc_payload,
 )
+from solana_alpha_lab.storage.exclusive import ExclusiveWriteConflict  # noqa: E402
 from solana_alpha_lab.task39_h11_named_mint_gta_clock_capture import (  # noqa: E402
     ATOM_ID,
     NAMED_MINT,
@@ -35,6 +37,7 @@ from solana_alpha_lab.task39_h11_named_mint_gta_clock_capture import (  # noqa: 
     build_mint_gta_payload,
     execute_capture,
     load_policy,
+    write_raw_page,
 )
 
 CONFIG_PATH = ROOT / "configs/task39_rc002_h11_named_mint_gta_clock_capture_v1.yaml"
@@ -186,6 +189,19 @@ class Task39NamedMintGtaTests(unittest.TestCase):
         self.assertGreaterEqual(result["scan"]["migration_events"], 1)
         self.assertEqual(result["terminal_decision"], "INSUFFICIENT_SCALE_WITHOUT_PAID_CAPTURE")
         self.assertFalse(result["live_PIT_claim"])
+
+    def test_raw_page_replays_identical_bytes_and_rejects_clobber(self) -> None:
+        body = b'{"jsonrpc":"2.0","id":"page-0","result":{"data":[]}}'
+        with tempfile.TemporaryDirectory() as directory:
+            raw_root = Path(directory)
+            first = write_raw_page(raw_root, run_id="run-a", page_number=0, body=body)
+            replay = write_raw_page(raw_root, run_id="run-a", page_number=0, body=body)
+            self.assertEqual(first["raw_sha256"], replay["raw_sha256"])
+            raw_path = raw_root / "run=run-a" / "page=000" / "raw_response.json"
+            self.assertEqual(raw_path.read_bytes(), body)
+            with self.assertRaisesRegex(ExclusiveWriteConflict, "EXCLUSIVE_WRITE_CONFLICT"):
+                write_raw_page(raw_root, run_id="run-a", page_number=0, body=b'{"other":true}')
+            self.assertEqual(raw_path.read_bytes(), body)
 
 
 if __name__ == "__main__":
