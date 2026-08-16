@@ -1,0 +1,68 @@
+{
+  "schema": "smial.delivery-completion-evidence",
+  "schema_version": "1.0",
+  "acceptance_id": "RC002-H11-COHORT-ELIGIBILITY-AFTER-TASK40-CLOSE-DELIVERY-COMPLETION-001",
+  "as_of": "2026-08-17",
+  "task_id": "RC002-H11-COHORT-ELIGIBILITY-AFTER-TASK40-CLOSE-OFFLINE-V1",
+  "state_change": "H11_COHORT_NOT_READY_SCREEN_FORBIDDEN",
+  "base_main": "17df0e57cc0db29dc34b0f6c68d5fb3b179ea598",
+  "cloud_bundle_mode": "OWNER_MANAGED_OPTIONAL_EXPORT",
+  "cloud_bundle_required_by_harness": false,
+  "cloud_bundle_smoke_required": false,
+  "capability_radar_now": "NONE",
+  "implementation_bindings": {
+    "docs/evidence/rc002_h11_cohort_eligibility_after_task40_close/a1_cohort_eligibility_after_task40_close_acceptance_v1.json": "c9658b93697f26678cb3d53db3fecfade895163ff8205c71beddfa8b0809957a",
+    "docs/reports/rc002_h11_cohort_eligibility_after_task40_close/a1_owner_readout_v1.md": "f493a84fd19fe7939a6e1b62e63c240814f33715135071d51c93b88a27e35cea",
+    "docs/tasks/RC002-H11-COHORT-ELIGIBILITY-AFTER-TASK40-CLOSE-OFFLINE-V1.md": "d106c8b6500caac718ceac8a04a530b7cdb9b1b76f85444c1c01fc285a07bcb4",
+    "scripts/run_rc002_h11_cohort_eligibility_after_task40_close.py": "6365435cc300a45af48ff0307a3b8269031558586186e7fb91f0d3a02b6ecae5",
+    "src/solana_alpha_lab/rc002_h11_cohort_eligibility_after_task40_close.py": "ebd5819306d7ff7608bdd0e928b1be5074df25cf6b773d613dd5bff720bf68a9",
+    "tests/test_rc002_h11_cohort_eligibility_after_task40_close.py": "30a695a4a9463a9b6721d9ba686a67a5de4f271634ad3985a02b8bdcec6454f4"
+  },
+  "active_stop_conditions": [],
+  "owner_attention_triggers": {
+    "auth_or_access_recovery": false,
+    "material_owner_decision": false,
+    "user_only_activation": false,
+    "external_material_action": false,
+    "unresolved_safety_or_truth_conflict": false
+  },
+  "factory_fit": {
+    "path": "docs/evidence/rc002_h11_cohort_eligibility_after_task40_close/a1_delivery_factory_fit_v1.json",
+    "sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+    "verdict": "PASS"
+  },
+  "validation": {
+    "targeted": "PASS_COHORT_ELIGIBILITY_AFTER_TASK40_CLOSE_TESTS",
+    "independent_review": {
+      "path": "docs/evidence/rc002_h11_cohort_eligibility_after_task40_close/a1_delivery_independent_review_v1.json",
+      "sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+      "verdict": "PASS"
+    },
+    "full_gate": "ENFORCED_BY_PROJECT_BOUND_VALIDATION",
+    "github_ci": "ENFORCED_LIVE_AT_GUARDED_MERGE",
+    "project_checks": [
+      "PASS_TARGETED_COHORT_ELIGIBILITY_AFTER_TASK40_CLOSE_TESTS"
+    ]
+  },
+  "non_claims": [
+    "NO_CANONICAL_DONE",
+    "NO_LIVE_PIT_OR_EXECUTION_CLAIM",
+    "NO_ALPHA_PNL_OR_NETRETURN",
+    "NO_H11_EFFECT_SCREEN",
+    "NO_COHORT_READY_FROM_N1",
+    "NO_TASK37_CLOCK_DEFINITION_REWRITE",
+    "NO_TASK40_RECEIPT_REWRITE",
+    "NO_PINNED_DECODER_MUTATION"
+  ],
+  "side_effects": {
+    "cash_spend_usd_cents": 0,
+    "credential_reads": 0,
+    "fallbacks": 0,
+    "provider_requests": 0,
+    "retries": 0,
+    "wallet_signer_transaction_actions": 0
+  },
+  "project_sources_disposition": {
+    "kind": "NO_CHANGE"
+  }
+}
