@@ -9,7 +9,7 @@
   "cloud_bundle_smoke_required": false,
   "factory_fit": {
     "path": "docs/evidence/task41/a1_delivery_factory_fit_v1.json",
-    "sha256": "ea4d92f18fcfa9bf17224256f88b9c359d9a63fd71ebec5e4beb3caa3ff3f323",
+    "sha256": "14e1950bf42857bb241a2a73a8b92d9b441101a3ddfccddd8270f1b04e524534",
     "verdict": "PASS"
   },
   "implementation_bindings": {
@@ -22,11 +22,13 @@
     ".cursor/commands/delivery-review.md": "4610588b5f725e61735625c7046afa1086dd00c4df82c8f27617c8d3d7481caf",
     ".github/pull_request_template.md": "d6d025436652d44d250571a5772585dcfac6c0662e5df4c88779bdc457634aff",
     "AGENTS.md": "808f38cad4954d49faf933328943ac49625d14d694bb17555f9d2f732b65f142",
-    "catalog/assets/core.yaml": "ba3893c45504d9c3da2ff2c1ef51b1af792a392a2710480ee4c073c8b4612bfc",
+    "catalog/assets/core.yaml": "b2a151bf043b97207e478815d24664a24f5b7d82eb285013139ad06f0ca32d38",
+    "delivery-harness/templates/portable-bundle-manifest.json": "112f2bd814299fb82471821a36b58fefe1112a606aee714daf886c7fe4cd9d20",
     "delivery-harness/templates/portable-core/dot-cursor/commands/delivery-review.md": "152c0a264f9fc0c5d138ef965cbdf51dce9ebdab60d9b3f7e21875a58f6429f4",
     "docs/agent/DELIVERY_HARNESS_PROTOCOL.md": "ad0a43b9c3ad2dc66abc8fa7bf60ddd0571037acc84a9a416d2e259118b3e422",
-    "docs/evidence/control/delivery_harness_acceptance_v1.json": "cdba800db4a57641d404e2ee6ef75e706746e93cba61169559e711ad320b9193",
-    "docs/tasks/TASK-41-isolated-review-and-raw-noclobber.md": "77d8b1fb0d571b2e99ae617e84b54f977031c7f51d87ed769ee31915f336f4b1",
+    "docs/evidence/control/delivery_harness_acceptance_v1.json": "d48a279db24189a68bb94dd4e6391923f1370dbd48deae44b7034976420fefe4",
+    "docs/evidence/task30/a20r1_provider_route_capability_registry_acceptance_v1.json": "5dbaffbf7579ecfa851bb4ef527ed31af740952f1d61dd6a27df46e88280775b",
+    "docs/tasks/TASK-41-isolated-review-and-raw-noclobber.md": "f426a0903710ce6b52934edf5de3695b64ba28711b3bb54e52945a4a9ffef8ad",
     "scripts/owner_attention_gate.py": "cb4c65cbebcb0f5cb2c53679f0d62bda53596ce1272325d5b123a1f6b8c5c3ab",
     "src/solana_alpha_lab/storage/exclusive.py": "5cb37fbdec0acb6214777aef7699568f2626a6a7a93e8005a921f939b4eb2dcf",
     "src/solana_alpha_lab/task39_h11_named_mint_gta_clock_capture.py": "8a78a2b16f50c8c928c23452eb6eb55813a9aa97a6623a5b39486bd95b5a0935",
@@ -70,7 +72,7 @@
     "github_ci": "ENFORCED_LIVE_AT_GUARDED_MERGE",
     "independent_review": {
       "path": "docs/evidence/task41/a1_delivery_independent_review_v1.json",
-      "sha256": "e344804a85f637050bf51f7d094cbad7344f6e02e08c4cb83d655171b8edc81c",
+      "sha256": "30ae02434906c205bf7ccd707c5b3696ecafadefe2b5b12971ffd11f51161ae4",
       "verdict": "PASS"
     },
     "project_checks": [
