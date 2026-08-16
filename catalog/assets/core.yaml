@@ -22711,7 +22711,7 @@ records:
   as_of: '2026-08-15'
   truth_owner: TASK-39
   location: {kind: git_path, logical_uri: 'repo://src/solana_alpha_lab/task39_h11_named_mint_gta_clock_capture.py', repository_path: src/solana_alpha_lab/task39_h11_named_mint_gta_clock_capture.py}
-  integrity: {kind: sha256, sha256: 8e057dd831c7a9003e0ccf07bc1f4c0ae62d46ecbfef416749dc58ab3376bfd8}
+  integrity: {kind: sha256, sha256: 8a78a2b16f50c8c928c23452eb6eb55813a9aa97a6623a5b39486bd95b5a0935}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: governed_by, target_asset_id: CONTRACT-T39-RC002-H11-NAMED-MINT-GTA-001}
@@ -22750,7 +22750,7 @@ records:
   as_of: '2026-08-15'
   truth_owner: TASK-39
   location: {kind: git_path, logical_uri: 'repo://tests/test_task39_rc002_h11_named_mint_gta_clock_capture.py', repository_path: tests/test_task39_rc002_h11_named_mint_gta_clock_capture.py}
-  integrity: {kind: sha256, sha256: a86e798850ccce1897fc88e17368684fef7c5bff4cb5efbe75b990ec3fe7cf04}
+  integrity: {kind: sha256, sha256: 7769c088c188d3614dcca6a04e13cce2d5e1e9bd14772ec5d80dc18e21d8dbb3}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: depends_on, target_asset_id: CONFIG-T39-RC002-H11-NAMED-MINT-GTA-001}
