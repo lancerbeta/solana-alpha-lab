@@ -1,0 +1,69 @@
+{
+  "schema": "smial.delivery-completion-evidence",
+  "schema_version": "1.0",
+  "acceptance_id": "RC002-H11-CREATE-SIX-FIELD-PUBKEY-IDENTITY-DELIVERY-COMPLETION-001",
+  "as_of": "2026-08-16",
+  "task_id": "RC002-H11-CREATE-SIX-FIELD-PUBKEY-IDENTITY-OFFLINE-V1",
+  "state_change": "CREATE_PUBKEYS_MATCH_NAMED_MINT_AND_BONDING_CURVE",
+  "base_main": "124d2335096d8ae62d3d5417ce7cf057a52f3afa",
+  "cloud_bundle_mode": "OWNER_MANAGED_OPTIONAL_EXPORT",
+  "cloud_bundle_required_by_harness": false,
+  "cloud_bundle_smoke_required": false,
+  "capability_radar_now": "NONE",
+  "implementation_bindings": {
+    "docs/evidence/rc002_h11_create_six_field_pubkey_identity/a1_create_six_field_pubkey_identity_acceptance_v1.json": "f1a786c33200216b365238a8e0b6b6dced0ebf15869fb28c47cc92b7b9ffe178",
+    "docs/reports/rc002_h11_create_six_field_pubkey_identity/a1_owner_readout_v1.md": "d42454eba89fb63d25a52f80ba177d2f77452e1697c6d05e0a52855e22abfa47",
+    "docs/tasks/RC002-H11-CREATE-SIX-FIELD-PUBKEY-IDENTITY-OFFLINE-V1.md": "a2cf3d82bcf4f84db6f66e20482f531dbfdfd02603884e265e142c871d000900",
+    "scripts/run_rc002_h11_create_six_field_pubkey_identity.py": "9d6c7601491a049b0b632abb7393dce43f41e28c3c2818da1ac1e4f16292f418",
+    "src/solana_alpha_lab/rc002_h11_create_six_field_pubkey_identity.py": "8127ccbc8bfcf567eedcf4197556abcc043cb353e14e6ec3310e8fc4bc170e5a",
+    "tests/test_rc002_h11_create_six_field_pubkey_identity.py": "e4b4d0cb138a44cb7111cf11c4fabe2092f40435916d08d3a2eebbe7e03bdd62"
+  },
+  "active_stop_conditions": [],
+  "owner_attention_triggers": {
+    "auth_or_access_recovery": false,
+    "material_owner_decision": false,
+    "user_only_activation": false,
+    "external_material_action": false,
+    "unresolved_safety_or_truth_conflict": false
+  },
+  "factory_fit": {
+    "path": "docs/evidence/rc002_h11_create_six_field_pubkey_identity/a1_delivery_factory_fit_v1.json",
+    "sha256": "570b2cc36d285ad15d1a67d1cdd7ce519fa7b28c5f47150de263893d75dec41a",
+    "verdict": "PASS"
+  },
+  "validation": {
+    "targeted": "PASS_CREATE_SIX_FIELD_PUBKEY_IDENTITY_TESTS",
+    "independent_review": {
+      "path": "docs/evidence/rc002_h11_create_six_field_pubkey_identity/a1_delivery_independent_review_v1.json",
+      "sha256": "546930cab5ae3deba03ff240be846308a8abfbedc492b811cb4017113482f0e1",
+      "verdict": "PASS"
+    },
+    "full_gate": "ENFORCED_BY_PROJECT_BOUND_VALIDATION",
+    "github_ci": "ENFORCED_LIVE_AT_GUARDED_MERGE",
+    "project_checks": [
+      "PASS_TARGETED_CREATE_SIX_FIELD_PUBKEY_IDENTITY_TESTS"
+    ]
+  },
+  "non_claims": [
+    "NO_CANONICAL_DONE",
+    "NO_LIVE_PIT_OR_EXECUTION_CLAIM",
+    "NO_ALPHA_PNL_OR_NETRETURN",
+    "NO_EXCLUSIVE_XB_RPC_CUT_CLAIM",
+    "NO_CREATE_LAYOUT_AS_CURRENT_IDL_CLAIM",
+    "NO_CREATE_AT_FROM_BLOCKTIME",
+    "NO_CREATE_AT_FROM_EVENT_TIMESTAMP",
+    "NO_TASK40_RECEIPT_REWRITE",
+    "NO_PINNED_DECODER_MUTATION"
+  ],
+  "side_effects": {
+    "cash_spend_usd_cents": 0,
+    "credential_reads": 0,
+    "fallbacks": 0,
+    "provider_requests": 0,
+    "retries": 0,
+    "wallet_signer_transaction_actions": 0
+  },
+  "project_sources_disposition": {
+    "kind": "NO_CHANGE"
+  }
+}
