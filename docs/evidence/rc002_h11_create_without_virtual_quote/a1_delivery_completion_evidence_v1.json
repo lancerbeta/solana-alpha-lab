@@ -28,14 +28,14 @@
   },
   "factory_fit": {
     "path": "docs/evidence/rc002_h11_create_without_virtual_quote/a1_delivery_factory_fit_v1.json",
-    "sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+    "sha256": "6e6f08eef6c868bfc95a263e25f7324b0620b979b251a3389791d91dfb2d831c",
     "verdict": "PASS"
   },
   "validation": {
     "targeted": "PASS_CREATE_WITHOUT_VIRTUAL_QUOTE_TESTS",
     "independent_review": {
       "path": "docs/evidence/rc002_h11_create_without_virtual_quote/a1_delivery_independent_review_v1.json",
-      "sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+      "sha256": "7a1c5c5421005f0abf5d8ee481865466b3d0cf46fa34dd016d744b31347a9a40",
       "verdict": "PASS"
     },
     "full_gate": "ENFORCED_BY_PROJECT_BOUND_VALIDATION",
