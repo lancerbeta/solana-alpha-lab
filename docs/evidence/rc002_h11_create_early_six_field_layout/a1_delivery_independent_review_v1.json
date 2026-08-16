@@ -5,7 +5,7 @@
   "as_of": "2026-08-16",
   "task_id": "RC002-H11-CREATE-EARLY-SIX-FIELD-LAYOUT-OFFLINE-V1",
   "reviewed_bindings_sha256": "24b14f872318727f4cd55ab26c700c7b2c06330047da8224fed67a0d16d3ce7f",
-  "reviewed_inventory_sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+  "reviewed_inventory_sha256": "fdd8c9b0c852d48723fe4e366054ac510702bd7b01c4212861fb58abc6bf05e2",
   "required_roles": [
     "CODE_REVIEWER",
     "GOAL_DOD_CRITIC",
