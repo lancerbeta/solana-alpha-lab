@@ -1,0 +1,106 @@
+{
+  "acceptance_id": "EVIDENCE-PMF-QUOTE-OWNER-FORK-001",
+  "adoption_route": "WRAP_A26_FORK_PATTERN_OVER_OVERLAY_RECEIPT_AND_TASK26",
+  "alpha_claim": false,
+  "as_of": "2026-08-17",
+  "atom_id": "PMF-QUOTE-OWNER-FORK-V1",
+  "build": "FORBIDDEN",
+  "cash_spend_usd_cents": 0,
+  "credential_reads": 0,
+  "execute": "FORBIDDEN",
+  "execute_phrase_status": "INELIGIBLE",
+  "execution_claim": false,
+  "forbidden_follow_ons": [
+    "JUPITER_EXECUTE_OR_BUILD",
+    "TAKER_OR_SIGNER_SUPPLIED",
+    "PROMOTE_QUOTE_TO_TOUCH_OR_FILLABLE",
+    "MISSING_FEE_TREATED_AS_ZERO",
+    "NETRETURN_OR_CASHFLOW_CLAIM",
+    "LOCAL_RAW_USED_AS_GIT_TRUTH",
+    "H11_UNPARK_OR_SAMPLE_CAMPAIGN",
+    "H13_TRIAL",
+    "H02_H10_H14_TRIAL",
+    "LIVE_PIT_OR_CASHFLOW_CLAIM",
+    "EXECUTE_PHRASE_OFFERED_AS_AUTHORIZED"
+  ],
+  "h11_unparked": false,
+  "h13_or_h02_started": false,
+  "historical_receipts_rewritten": false,
+  "input_mint": "So11111111111111111111111111111111111111112",
+  "live_PIT_claim": false,
+  "local_raw_used_as_git_truth": false,
+  "missing_facts": {
+    "fees": {
+      "does_not_prove": [
+        "NETRETURN"
+      ],
+      "missing_fact": "TYPED_FEE_COMPONENTS_WITH_SOURCE_AND_CONFIDENCE_ABSENCE_IS_NOT_ZERO",
+      "missing_is_not_zero": true,
+      "observed_reason": "SANITIZED_RECEIPT_HAS_NO_FEE_COMPONENTS",
+      "state": "NOT_COMPUTABLE",
+      "task26_layer": "FEES"
+    },
+    "fillable": {
+      "does_not_prove": [
+        "FILL",
+        "FEES",
+        "NETRETURN"
+      ],
+      "missing_fact": "TYPED_ATTEMPT_OR_SIMULATE_WITH_TAKER_NOT_AUTHORIZED_HERE",
+      "observed_reason": "NO_TAKER_NO_TRANSACTION_NO_SIMULATE",
+      "state": "NOT_EVIDENCED",
+      "task26_layer": "ATTEMPT"
+    },
+    "touch": {
+      "does_not_prove": [
+        "FILLABLE",
+        "FEES",
+        "NETRETURN"
+      ],
+      "missing_fact": "PIT_SAFE_TOUCH_OBSERVATION_NOT_ANOTHER_ORDER_QUOTE_AND_NOT_EXECUTE",
+      "observed_reason": "QUOTE_IS_NOT_TOUCH",
+      "state": "NOT_EVIDENCED",
+      "task26_layer": "QUOTE"
+    }
+  },
+  "non_claims": [
+    "NO_LIVE_PIT_CLAIM",
+    "NO_EXECUTION_CLAIM",
+    "NO_ALPHA",
+    "NO_NETRETURN",
+    "NO_TOUCH_OR_FILLABLE",
+    "NO_FEE_ZERO_FROM_ABSENCE",
+    "NO_RC001_MUTATION",
+    "NO_H11_UNPARK",
+    "NO_H13_OR_H02_TRIAL",
+    "NO_PROVIDER_CALL",
+    "NO_CREDENTIAL_READ",
+    "NO_CANONICAL_DONE",
+    "NO_EXECUTE_PHRASE_AUTHORIZED"
+  ],
+  "notional_atomic": "10000000",
+  "observed_at": "2026-08-17T02:38:46Z",
+  "observed_out_amount": "9010943976",
+  "output_mint": "DMwbVy48dWVKGe9z1pcVnwF3HLMLrqWdDLfbvx8RchhK",
+  "overlay_acceptance_sha256": "ecbe30d4ba9f14eed6d6dbde1b2424ad594edab7a8e1e6d828d5879d4834d49b",
+  "overlay_config_sha256": "bfe6d8e7d5fea2b00d7c35fde0d52594045332514b0150ca7b649be1ce94d9ea",
+  "overlay_runtime_sha256": "2b9240d3d29f46365f3b3e594cd55067ccd53fa17dede1d45e06deb59fe44397",
+  "overlay_terminal": "QUOTE_COST_OVERLAY_BOUND_FILLABLE_NOT_EVIDENCED",
+  "owner_decision": "NAME_MISSING_TOUCH_FILLABLE_FEE_FACTS_NO_EXECUTE",
+  "owner_phrase": "OK PMF-QUOTE-OWNER-FORK: overlay receipt only, name missing Touch/Fillable/fee facts, no execute",
+  "project_sources_disposition": {
+    "kind": "NO_CHANGE"
+  },
+  "provider_requests": 0,
+  "route_id": "JUPITER-SOLANA-SWAP-V2-ORDER-001",
+  "schema": "smial.pmf-quote-owner-fork.acceptance",
+  "schema_version": "1.0",
+  "taker": "OMITTED_QUOTE_ONLY",
+  "task26_contract_sha256": "aac003cf7ba2742d310893c81af3ae4a032a52b719f2f56d80171a6486351efd",
+  "terminal": "QUOTE_OWNER_FORK_MISSING_FACTS_NAMED",
+  "unpaid_owner_phrases": [
+    "OK PMF-QUOTE-STAY-OVERLAY: accept Touch/Fillable/fees not evidenced",
+    "OK PMF-QUOTE-TOUCH-FACT: authorize a non-execute Touch observation",
+    "OK PMF-QUOTE-FEE-FACT: authorize a quote-layer fee-field observation, no execute"
+  ]
+}

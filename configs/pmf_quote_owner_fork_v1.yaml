@@ -1,0 +1,46 @@
+schema: smial.pmf-quote-owner-fork
+schema_version: '1.0'
+atom_id: PMF-QUOTE-OWNER-FORK-V1
+as_of: '2026-08-17'
+owner_phrase: 'OK PMF-QUOTE-OWNER-FORK: overlay receipt only, name missing Touch/Fillable/fee facts, no execute'
+adoption_route: WRAP_A26_FORK_PATTERN_OVER_OVERLAY_RECEIPT_AND_TASK26
+overlay:
+  runtime_receipt: docs/evidence/pmf_quote_slice/a1_pmf_quote_cost_overlay_runtime_receipt_v1.json
+  runtime_receipt_sha256: 2b9240d3d29f46365f3b3e594cd55067ccd53fa17dede1d45e06deb59fe44397
+  acceptance: docs/evidence/pmf_quote_slice/a1_pmf_quote_cost_overlay_acceptance_v1.json
+  acceptance_sha256: ecbe30d4ba9f14eed6d6dbde1b2424ad594edab7a8e1e6d828d5879d4834d49b
+  config: configs/pmf_quote_cost_overlay_v1.yaml
+  config_sha256: bfe6d8e7d5fea2b00d7c35fde0d52594045332514b0150ca7b649be1ce94d9ea
+task26_vocabulary:
+  contract: docs/contracts/task26_execution_cost_and_netreturn_contract_v1.md
+  contract_sha256: aac003cf7ba2742d310893c81af3ae4a032a52b719f2f56d80171a6486351efd
+  wrap: true
+  invoke_synthetic_engine: false
+identity:
+  output_mint: DMwbVy48dWVKGe9z1pcVnwF3HLMLrqWdDLfbvx8RchhK
+  input_mint: So11111111111111111111111111111111111111112
+  notional_atomic: '10000000'
+  route_id: JUPITER-SOLANA-SWAP-V2-ORDER-001
+execute: FORBIDDEN
+build: FORBIDDEN
+taker: OMITTED_QUOTE_ONLY
+execute_phrase_status: INELIGIBLE
+provider_requests_max: 0
+credential_reads_max: 0
+local_raw_as_git_truth: false
+unpaid_owner_phrases:
+  - 'OK PMF-QUOTE-STAY-OVERLAY: accept Touch/Fillable/fees not evidenced'
+  - 'OK PMF-QUOTE-TOUCH-FACT: authorize a non-execute Touch observation'
+  - 'OK PMF-QUOTE-FEE-FACT: authorize a quote-layer fee-field observation, no execute'
+forbidden_follow_ons:
+  - JUPITER_EXECUTE_OR_BUILD
+  - TAKER_OR_SIGNER_SUPPLIED
+  - PROMOTE_QUOTE_TO_TOUCH_OR_FILLABLE
+  - MISSING_FEE_TREATED_AS_ZERO
+  - NETRETURN_OR_CASHFLOW_CLAIM
+  - LOCAL_RAW_USED_AS_GIT_TRUTH
+  - H11_UNPARK_OR_SAMPLE_CAMPAIGN
+  - H13_TRIAL
+  - H02_H10_H14_TRIAL
+  - LIVE_PIT_OR_CASHFLOW_CLAIM
+  - EXECUTE_PHRASE_OFFERED_AS_AUTHORIZED
