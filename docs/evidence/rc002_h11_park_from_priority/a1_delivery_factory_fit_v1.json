@@ -4,8 +4,8 @@
   "review_id": "RC002-H11-PARK-FROM-PRIORITY-FACTORY-FIT-001",
   "as_of": "2026-08-17",
   "task_id": "RC002-H11-PARK-FROM-PRIORITY-OFFLINE-V1",
-  "reviewed_bindings_sha256": "ab8e4921bb648692fdb79fdcca3e9830427246989949896691d90f8e3b4b2b63",
-  "reviewed_inventory_sha256": "PENDING_EXACT_HEAD_INVENTORY",
+  "reviewed_bindings_sha256": "f1c50edee2e58b0d47cc231b128bdc9174d1fd1ec92a71a4853e185f92269f1d",
+  "reviewed_inventory_sha256": "a15445cd69d35471fb7ffd922784a1cbfe86205a48ab212b28c378108b3830c2",
   "mode": "FULL_REVIEW",
   "verdict": "PASS",
   "dimensions": {
