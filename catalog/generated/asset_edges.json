@@ -458,6 +458,11 @@
       "target_asset_id": "CTRL-PMF-QUOTE-SLICE-001"
     },
     {
+      "source_asset_id": "CONFIG-PMF-QUOTE-SLICE-ONE-SHOT-001",
+      "relation": "governed_by",
+      "target_asset_id": "CTRL-PMF-QUOTE-SLICE-ONE-SHOT-001"
+    },
+    {
       "source_asset_id": "CONFIG-PROVIDER-ROUTE-CAPABILITY-REGISTRY-001",
       "relation": "validated_by",
       "target_asset_id": "TEST-PROVIDER-ROUTE-CAPABILITY-REGISTRY-001"
@@ -511,6 +516,16 @@
       "source_asset_id": "CONFIG-PROVIDER-ROUTE-CAPABILITY-REGISTRY-006",
       "relation": "validated_by",
       "target_asset_id": "TEST-PROVIDER-ROUTE-CAPABILITY-REGISTRY-006"
+    },
+    {
+      "source_asset_id": "CONFIG-PROVIDER-ROUTE-CAPABILITY-REGISTRY-007",
+      "relation": "derived_from",
+      "target_asset_id": "CONFIG-PROVIDER-ROUTE-CAPABILITY-REGISTRY-006"
+    },
+    {
+      "source_asset_id": "CONFIG-PROVIDER-ROUTE-CAPABILITY-REGISTRY-007",
+      "relation": "validated_by",
+      "target_asset_id": "TEST-PROVIDER-ROUTE-CAPABILITY-REGISTRY-007"
     },
     {
       "source_asset_id": "CONFIG-T20-COLLECTION-SPEC-001",
@@ -1773,6 +1788,21 @@
       "target_asset_id": "CONFIG-PROVIDER-ROUTE-CAPABILITY-REGISTRY-006"
     },
     {
+      "source_asset_id": "CTRL-PMF-QUOTE-SLICE-ONE-SHOT-001",
+      "relation": "contains",
+      "target_asset_id": "MODULE-PMF-QUOTE-SLICE-ONE-SHOT-001"
+    },
+    {
+      "source_asset_id": "CTRL-PMF-QUOTE-SLICE-ONE-SHOT-001",
+      "relation": "contains",
+      "target_asset_id": "SCRIPT-PMF-QUOTE-SLICE-ONE-SHOT-001"
+    },
+    {
+      "source_asset_id": "CTRL-PMF-QUOTE-SLICE-ONE-SHOT-001",
+      "relation": "depends_on",
+      "target_asset_id": "CONFIG-PROVIDER-ROUTE-CAPABILITY-REGISTRY-007"
+    },
+    {
       "source_asset_id": "CTRL-PYPROJECT-001",
       "relation": "depends_on",
       "target_asset_id": "ENV-WORKSTATION-001"
@@ -2681,6 +2711,26 @@
       "source_asset_id": "EVIDENCE-PMF-QUOTE-SLICE-001",
       "relation": "validated_by",
       "target_asset_id": "TEST-PMF-QUOTE-SLICE-001"
+    },
+    {
+      "source_asset_id": "EVIDENCE-PMF-QUOTE-SLICE-ONE-SHOT-001",
+      "relation": "depends_on",
+      "target_asset_id": "CONFIG-PROVIDER-ROUTE-CAPABILITY-REGISTRY-007"
+    },
+    {
+      "source_asset_id": "EVIDENCE-PMF-QUOTE-SLICE-ONE-SHOT-001",
+      "relation": "derived_from",
+      "target_asset_id": "CTRL-PMF-QUOTE-SLICE-ONE-SHOT-001"
+    },
+    {
+      "source_asset_id": "EVIDENCE-PMF-QUOTE-SLICE-ONE-SHOT-001",
+      "relation": "validated_by",
+      "target_asset_id": "TEST-PMF-QUOTE-SLICE-ONE-SHOT-001"
+    },
+    {
+      "source_asset_id": "EVIDENCE-PMF-QUOTE-SLICE-ONE-SHOT-ACCEPTANCE-001",
+      "relation": "derived_from",
+      "target_asset_id": "EVIDENCE-PMF-QUOTE-SLICE-ONE-SHOT-001"
     },
     {
       "source_asset_id": "EVIDENCE-RC002-H11-PARK-FROM-PRIORITY-001",
@@ -5983,6 +6033,11 @@
       "target_asset_id": "TEST-PMF-QUOTE-SLICE-001"
     },
     {
+      "source_asset_id": "MODULE-PMF-QUOTE-SLICE-ONE-SHOT-001",
+      "relation": "depends_on",
+      "target_asset_id": "CONFIG-PMF-QUOTE-SLICE-ONE-SHOT-001"
+    },
+    {
       "source_asset_id": "MODULE-PROVIDER-ROUTE-CAPABILITY-REGISTRY-001",
       "relation": "governed_by",
       "target_asset_id": "CONFIG-PROVIDER-ROUTE-CAPABILITY-REGISTRY-001"
@@ -6036,6 +6091,16 @@
       "source_asset_id": "MODULE-PROVIDER-ROUTE-CAPABILITY-REGISTRY-006",
       "relation": "governed_by",
       "target_asset_id": "CONFIG-PROVIDER-ROUTE-CAPABILITY-REGISTRY-006"
+    },
+    {
+      "source_asset_id": "MODULE-PROVIDER-ROUTE-CAPABILITY-REGISTRY-007",
+      "relation": "depends_on",
+      "target_asset_id": "CONFIG-PROVIDER-ROUTE-CAPABILITY-REGISTRY-007"
+    },
+    {
+      "source_asset_id": "MODULE-PROVIDER-ROUTE-CAPABILITY-REGISTRY-007",
+      "relation": "depends_on",
+      "target_asset_id": "SCHEMA-PROVIDER-ROUTE-CAPABILITY-REGISTRY-007"
     },
     {
       "source_asset_id": "MODULE-RC002-H11-PARK-FROM-PRIORITY-001",
@@ -7543,6 +7608,11 @@
       "target_asset_id": "EVIDENCE-PMF-QUOTE-SLICE-001"
     },
     {
+      "source_asset_id": "REPORT-PMF-QUOTE-SLICE-ONE-SHOT-001",
+      "relation": "derived_from",
+      "target_asset_id": "EVIDENCE-PMF-QUOTE-SLICE-ONE-SHOT-ACCEPTANCE-001"
+    },
+    {
       "source_asset_id": "REPORT-RC002-H11-PARK-FROM-PRIORITY-001",
       "relation": "derived_from",
       "target_asset_id": "EVIDENCE-RC002-H11-PARK-FROM-PRIORITY-001"
@@ -7761,6 +7831,11 @@
       "source_asset_id": "SCHEMA-PROVIDER-ROUTE-CAPABILITY-REGISTRY-006",
       "relation": "governed_by",
       "target_asset_id": "CONFIG-PROVIDER-ROUTE-CAPABILITY-REGISTRY-006"
+    },
+    {
+      "source_asset_id": "SCHEMA-PROVIDER-ROUTE-CAPABILITY-REGISTRY-007",
+      "relation": "governed_by",
+      "target_asset_id": "CONFIG-PROVIDER-ROUTE-CAPABILITY-REGISTRY-007"
     },
     {
       "source_asset_id": "SCHEMA-T05-CANONICAL-DDL-001",
@@ -8301,6 +8376,11 @@
       "source_asset_id": "SCRIPT-PMF-QUOTE-SLICE-001",
       "relation": "depends_on",
       "target_asset_id": "MODULE-PMF-QUOTE-SLICE-001"
+    },
+    {
+      "source_asset_id": "SCRIPT-PMF-QUOTE-SLICE-ONE-SHOT-001",
+      "relation": "depends_on",
+      "target_asset_id": "MODULE-PMF-QUOTE-SLICE-ONE-SHOT-001"
     },
     {
       "source_asset_id": "SCRIPT-RC002-H11-PARK-FROM-PRIORITY-001",
@@ -9038,6 +9118,16 @@
       "target_asset_id": "MODULE-PMF-QUOTE-SLICE-001"
     },
     {
+      "source_asset_id": "TEST-PMF-QUOTE-SLICE-ONE-SHOT-001",
+      "relation": "depends_on",
+      "target_asset_id": "EVIDENCE-PMF-QUOTE-SLICE-ONE-SHOT-001"
+    },
+    {
+      "source_asset_id": "TEST-PMF-QUOTE-SLICE-ONE-SHOT-001",
+      "relation": "depends_on",
+      "target_asset_id": "MODULE-PMF-QUOTE-SLICE-ONE-SHOT-001"
+    },
+    {
       "source_asset_id": "TEST-PROVIDER-ROUTE-CAPABILITY-REGISTRY-001",
       "relation": "depends_on",
       "target_asset_id": "MODULE-PROVIDER-ROUTE-CAPABILITY-REGISTRY-001"
@@ -9106,6 +9196,16 @@
       "source_asset_id": "TEST-PROVIDER-ROUTE-CAPABILITY-REGISTRY-006",
       "relation": "depends_on",
       "target_asset_id": "SCHEMA-PROVIDER-ROUTE-CAPABILITY-REGISTRY-006"
+    },
+    {
+      "source_asset_id": "TEST-PROVIDER-ROUTE-CAPABILITY-REGISTRY-007",
+      "relation": "depends_on",
+      "target_asset_id": "EVIDENCE-PMF-QUOTE-SLICE-ONE-SHOT-001"
+    },
+    {
+      "source_asset_id": "TEST-PROVIDER-ROUTE-CAPABILITY-REGISTRY-007",
+      "relation": "depends_on",
+      "target_asset_id": "MODULE-PROVIDER-ROUTE-CAPABILITY-REGISTRY-007"
     },
     {
       "source_asset_id": "TEST-RC002-H11-PARK-FROM-PRIORITY-001",

@@ -1,0 +1,39 @@
+{
+  "schema": "smial.delivery-harness-factory-fit",
+  "schema_version": "1.0",
+  "review_id": "PMF-QUOTE-SLICE-ONE-SHOT-FACTORY-FIT-001",
+  "as_of": "2026-08-17",
+  "task_id": "PMF-QUOTE-SLICE-ONE-SHOT-V1",
+  "reviewed_bindings_sha256": "aa8b38566349da16dda4a85d086a54964c49afb422a6869130c48309942ab40f",
+  "reviewed_inventory_sha256": "8d05759571f3771689b6740e1bfac4dc3e33ad5fa97516c3cbef3b861bbccee8",
+  "mode": "FULL_REVIEW",
+  "verdict": "PASS",
+  "dimensions": {
+    "mission": "PASS_ONE_OBSERVED_QUOTE_SLICE_WITHOUT_EXECUTE",
+    "flexibility_and_history": "PASS_V6_RC001_H11_H07_LEDGER_IMMUTABLE",
+    "context_efficiency": "PASS_ONE_TASK_CONTRACT_ADOPT_OFFICIAL_ORDER_WITHOUT_TAKER",
+    "research_truth": "PASS_QUOTE_OBSERVED_NOT_PIT_RECEIPT_BINDS_A24_MINTS",
+    "owner_operability": "PASS_RUSSIAN_READOUT_PRICE_ROUTER_EXECUTE_FORBIDDEN",
+    "execution_to_cashflow": "NOT_APPLICABLE",
+    "monitoring_and_recovery": "PASS_NO_BACKGROUND_PROCESS_REVERT_NEW_EVIDENCE_ONLY",
+    "build_vs_buy": "PASS_ADOPT_JUPITER_V2_ORDER_REJECT_METIS_LOGGER",
+    "security": "PASS_KEYLESS_OPTIONAL_PORTAL_KEY_SECRET_FREE_HASHES",
+    "red_team": "PASS_NO_EXECUTE_NO_TAKER_NO_H13_AUTO_NO_H11_UNPARK"
+  },
+  "capability_radar": {
+    "now": "NONE",
+    "watch": "EXECUTE_STILL_FORBIDDEN"
+  },
+  "recovery": "REVERT_ONLY_THIS_ATOM_TRACKED_OUTPUTS; PRESERVE_V6_REGISTRY; PRESERVE_A24_A26_A27_H11_PARK; PRESERVE_RC001_FREEZE; PRESERVE_TRIAL_LEDGER",
+  "limits": [
+    "NO_EXECUTE_OR_BUILD",
+    "NO_TAKER_OR_SIGNER",
+    "NO_TRANSACTION_BYTES_IN_GIT",
+    "NO_H11_UNPARK",
+    "NO_H13_OR_H02_AUTO_START",
+    "NO_NOTIONAL_BUCKET_SET_V1",
+    "NO_LIVE_PIT_OR_CASHFLOW",
+    "NO_CANONICAL_DONE",
+    "QUOTE_IS_NOT_A24_PUMPSWAP_POOL_FILL"
+  ]
+}

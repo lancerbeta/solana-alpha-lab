@@ -1,0 +1,81 @@
+{
+  "schema": "smial.delivery-completion-evidence",
+  "schema_version": "1.0",
+  "acceptance_id": "PMF-QUOTE-SLICE-ONE-SHOT-DELIVERY-COMPLETION-001",
+  "as_of": "2026-08-17",
+  "task_id": "PMF-QUOTE-SLICE-ONE-SHOT-V1",
+  "state_change": "QUOTE_OBSERVED",
+  "base_main": "6e47c092d09f2851f3cf3425b363b2d4eb03d42b",
+  "cloud_bundle_mode": "OWNER_MANAGED_OPTIONAL_EXPORT",
+  "cloud_bundle_required_by_harness": false,
+  "cloud_bundle_smoke_required": false,
+  "capability_radar_now": "NONE",
+  "implementation_bindings": {
+    "catalog/assets/core.yaml": "8524933d43d4ce282c4ec5cc92ddec53183d5e21789df7995861896dc86b2a7e",
+    "catalog/assets/lifecycle.yaml": "1b97a1fca7fefed38fdd73efbaa71bf5de3d2be021c6cbcdaa5432b49aafa2a1",
+    "catalog/catalog_manifest.yaml": "c5e91daf28f963a802a6a159dbec2eada1c5ff2a3fa8ca434124cd77b929ed7e",
+    "catalog/generated/asset_edges.json": "3301b004a2a8ea16e047a77ba9af26b10a10935b8d004bacf2b4f687b44ba072",
+    "catalog/schemas/provider_route_capability_registry_v7.schema.json": "2e527bfc891ef4c0ae7fe5f2dac0bc3e2ebf6704f303a31dbfd005dd3b8d2747",
+    "configs/pmf_quote_slice_one_shot_v1.yaml": "4cbae0cb6ba69a1e3fc30912a72915d3e65e1d9f1f4d8e470c0e90a2b1a28830",
+    "configs/provider_route_capability_registry_v7.yaml": "cfbd2b34fdecd387d14b89b81ec8d6b814f819ec2b5c7e032ccb54734ff7be6a",
+    "docs/PROJECT_MAP.md": "4e48fa7c8fb0059cbcda82a5da4330aea8309fc4f62b7c8a7bcbb41be4da6a14",
+    "docs/evidence/pmf_quote_slice/a1_pmf_quote_slice_one_shot_acceptance_v1.json": "76346f1d47ffc08afd1d5534c4b0a55820104c52c3e096fa41e5b382d77aa4a8",
+    "docs/evidence/pmf_quote_slice/a1_pmf_quote_slice_one_shot_runtime_receipt_v1.json": "2ee2b71115b67b5129e44d08f7c29becefefd8979ad130c3174614ba7f64ba2c",
+    "docs/reports/pmf_quote_slice/a1_one_shot_owner_readout_v1.md": "7663105190b2ae3a204f3cf8f647d2594b7c267e3a8f22e130bac437f019d574",
+    "docs/tasks/PMF-QUOTE-SLICE-ONE-SHOT-V1.md": "43769ea9f133290b8184a8f020d54f149e2c88c4de242da051a5ef896844a101",
+    "scripts/run_pmf_quote_slice_one_shot.py": "ff9feedb54608b4290a8a739d025b9c2a5814bdcdb962e639b2d9739850414d8",
+    "src/solana_alpha_lab/pmf_quote_slice_one_shot.py": "2ef95803d17a0f076dd5042d6d64c783541f6c351fdb5c2fb65550b613b52ac7",
+    "src/solana_alpha_lab/provider_route_capability_registry_v7.py": "3befb5809e6d7074b9d14bedadf54cb919608c132132cad084d392351f168299",
+    "tests/test_pmf_quote_slice_one_shot.py": "9d77577c7d07fb63be444eaa55bb2063e50abdbaa02e724632901dc3530762ef",
+    "tests/test_provider_route_capability_registry_v7.py": "6f75b73de9327f4fc3c9dfd4de867e43617dcd9453bed00cdac799583030c6cf"
+  },
+  "active_stop_conditions": [],
+  "owner_attention_triggers": {
+    "auth_or_access_recovery": false,
+    "material_owner_decision": false,
+    "user_only_activation": false,
+    "external_material_action": false,
+    "unresolved_safety_or_truth_conflict": false
+  },
+  "factory_fit": {
+    "path": "docs/evidence/pmf_quote_slice/a1_one_shot_delivery_factory_fit_v1.json",
+    "sha256": "19b376585e55726cc5cc4e46de3211f97b1db4ab0125c03d741045950fead6d7",
+    "verdict": "PASS"
+  },
+  "validation": {
+    "targeted": "PASS_PMF_QUOTE_SLICE_ONE_SHOT_TESTS",
+    "independent_review": {
+      "path": "docs/evidence/pmf_quote_slice/a1_one_shot_delivery_independent_review_v1.json",
+      "sha256": "c5e94087a4284f1fd3d49f1b6ea2fa96bf0067f056a1c037e276ee29bee4c5dd",
+      "verdict": "PASS"
+    },
+    "full_gate": "ENFORCED_BY_PROJECT_BOUND_VALIDATION",
+    "github_ci": "ENFORCED_LIVE_AT_GUARDED_MERGE",
+    "project_checks": [
+      "PASS_TARGETED_PMF_QUOTE_SLICE_ONE_SHOT_TESTS"
+    ]
+  },
+  "non_claims": [
+    "NO_CANONICAL_DONE",
+    "NO_LIVE_PIT_OR_EXECUTION_CLAIM",
+    "NO_ALPHA_PNL_OR_NETRETURN",
+    "NO_EXECUTE_OR_BUILD",
+    "NO_TAKER_OR_SIGNER",
+    "NO_TRANSACTION_BYTES_IN_GIT",
+    "NO_H11_UNPARK",
+    "NO_H13_OR_H02_TRIAL",
+    "NO_NOTIONAL_BUCKET_SET_V1",
+    "NO_RC001_FREEZE_MUTATION"
+  ],
+  "side_effects": {
+    "cash_spend_usd_cents": 0,
+    "credential_reads": 0,
+    "fallbacks": 0,
+    "provider_requests": 1,
+    "retries": 0,
+    "wallet_signer_transaction_actions": 0
+  },
+  "project_sources_disposition": {
+    "kind": "NO_CHANGE"
+  }
+}

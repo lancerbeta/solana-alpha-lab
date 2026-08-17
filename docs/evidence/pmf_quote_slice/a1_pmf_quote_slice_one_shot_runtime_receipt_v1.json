@@ -1,0 +1,79 @@
+{
+  "atom_id": "PMF-QUOTE-SLICE-ONE-SHOT-V1",
+  "authority": {
+    "access_class": "KEYLESS",
+    "basis": "EXACT_OWNER_PHRASE",
+    "build_calls": 0,
+    "credential_free_preflights": 1,
+    "credential_reads": 0,
+    "execute_calls": 0,
+    "fallbacks": 0,
+    "provider_requests": 1,
+    "retries": 0,
+    "taker_supplied": false
+  },
+  "non_claims": [
+    "NO_EXECUTE",
+    "NO_BUILD",
+    "NO_TAKER_OR_SIGNER",
+    "NO_TRANSACTION_BYTES_IN_GIT",
+    "NO_ALPHA",
+    "NO_LIVE_PIT",
+    "NO_CASHFLOW",
+    "NO_CANONICAL_DONE"
+  ],
+  "observed_at": "2026-08-17T02:38:46Z",
+  "preflight": {
+    "credential_reads": 0,
+    "dns_resolved": true,
+    "host": "api.jup.ag",
+    "observed_at": "2026-08-17T02:38:46Z",
+    "port": 443,
+    "provider_requests": 0,
+    "schema": "smial.pmf-quote-slice-one-shot.credential-free-preflight",
+    "schema_version": "1.0",
+    "tcp_443": true,
+    "tls_verified": true,
+    "tls_version": "TLSv1.3"
+  },
+  "quote": {
+    "error_code": null,
+    "in_amount": "10000000",
+    "mode": "manual",
+    "out_amount": "9010943976",
+    "request_id_present": true,
+    "router": "dflow",
+    "transaction_present": false
+  },
+  "raw_retention": {
+    "manifest": {
+      "bytes": 1871,
+      "path": "local/pmf_quote_slice_one_shot/run=20260817T023846Z-d1481585/order_response.json",
+      "retention": "A4_OUTSIDE_GIT",
+      "sha256": "c213b957e2da3f2cee9beebba5e8ee7f518cbe10d41601f77c813c172f216042"
+    },
+    "raw_retained": true
+  },
+  "receipt_id": "EVIDENCE-PMF-QUOTE-SLICE-ONE-SHOT-001",
+  "request": {
+    "amount": "10000000",
+    "input_mint": "So11111111111111111111111111111111111111112",
+    "output_mint": "DMwbVy48dWVKGe9z1pcVnwF3HLMLrqWdDLfbvx8RchhK",
+    "slippage_bps": 100,
+    "taker": "OMITTED_QUOTE_ONLY"
+  },
+  "route_id": "JUPITER-SOLANA-SWAP-V2-ORDER-001",
+  "schema": "smial.pmf-quote-slice-one-shot.runtime-receipt",
+  "schema_version": "1.0",
+  "terminal_error": null,
+  "terminal_outcome": "QUOTE_OBSERVED",
+  "transport": {
+    "content_type": "application/json",
+    "http_status": 200,
+    "request_count": 1,
+    "response_bytes": 1871,
+    "response_sha256": "c213b957e2da3f2cee9beebba5e8ee7f518cbe10d41601f77c813c172f216042",
+    "url_has_api_key": false,
+    "url_has_taker": false
+  }
+}
