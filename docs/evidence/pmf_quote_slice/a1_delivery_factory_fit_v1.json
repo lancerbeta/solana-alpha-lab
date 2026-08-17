@@ -4,8 +4,8 @@
   "review_id": "PMF-QUOTE-SLICE-FACTORY-FIT-001",
   "as_of": "2026-08-17",
   "task_id": "PMF-QUOTE-SLICE-OFFLINE-V1",
-  "reviewed_bindings_sha256": "43ac7a979371ac51324f5f51f9dc7c8dbc2294b3ab449f6e048358cc21d4c74e",
-  "reviewed_inventory_sha256": "43ac7a979371ac51324f5f51f9dc7c8dbc2294b3ab449f6e048358cc21d4c74e",
+  "reviewed_bindings_sha256": "0e95d60a598c987a3f7aec8b46ffcd06c7b31a23f80a746c8c42848066ec5ca9",
+  "reviewed_inventory_sha256": "954355f1965ae6891621b9fd1c84a870acd65b7f2a1eefeeea42931e1326dcd4",
   "mode": "FULL_REVIEW",
   "verdict": "PASS",
   "dimensions": {

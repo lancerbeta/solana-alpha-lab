@@ -34,14 +34,14 @@
   },
   "factory_fit": {
     "path": "docs/evidence/pmf_quote_slice/a1_delivery_factory_fit_v1.json",
-    "sha256": "a27dcc7ae809476e306413080a4cad77596114c3efaa7523ec331e73b4bd5948",
+    "sha256": "89887a7ff91a94ebff1a264c8665f0b2d5bbe6c6d2321be8f442a399039971b6",
     "verdict": "PASS"
   },
   "validation": {
     "targeted": "PASS_PMF_QUOTE_SLICE_TESTS",
     "independent_review": {
       "path": "docs/evidence/pmf_quote_slice/a1_delivery_independent_review_v1.json",
-      "sha256": "eb8c0effa5561bd769061697dc95722ed6581e38af694cd09549795e931e361c",
+      "sha256": "45e13e12a99b68f14ea5181221814393f702d4d7d2792c78a28c8ce765e68432",
       "verdict": "PASS"
     },
     "full_gate": "ENFORCED_BY_PROJECT_BOUND_VALIDATION",
