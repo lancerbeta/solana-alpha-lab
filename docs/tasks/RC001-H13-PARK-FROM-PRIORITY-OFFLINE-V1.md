@@ -7,9 +7,9 @@ owner: GOAL_OWNER
 allowed_routes: [DIRECT_CURSOR_DELIVERY]
 expected_repository: lancerbeta/solana-alpha-lab
 git_binding:
-  expected_base: 9e00d9543224d34a2aa935196694f5afd614f37c
+  expected_base: f74201d5b5bc7100ea095220ca81b293e38ea107
   expected_upstream: origin/main
-  expected_upstream_oid: 9e00d9543224d34a2aa935196694f5afd614f37c
+  expected_upstream_oid: f74201d5b5bc7100ea095220ca81b293e38ea107
   expected_branch: cursor/rc001-h13-park-from-priority
   dirty_mode: ALLOW_REPORTED
 objective: Offline-bind the explicit owner selection to park RC001-H13-COMPOSITE-VETO from factory priority, retain TASK-24/TASK-28 science, and state that no RC001 family is eligible to start without a new exact contract.

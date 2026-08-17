@@ -23978,7 +23978,7 @@ records:
   as_of: '2026-08-18'
   truth_owner: RC001-H13-PARK-FROM-PRIORITY-OFFLINE-V1
   location: {kind: git_path, logical_uri: 'repo://docs/tasks/RC001-H13-PARK-FROM-PRIORITY-OFFLINE-V1.md', repository_path: docs/tasks/RC001-H13-PARK-FROM-PRIORITY-OFFLINE-V1.md}
-  integrity: {kind: sha256, sha256: b5fa218b79cbb1ae5376e43279ab95a6bb7fbdb741edf5104f7ad2c76243a3fb}
+  integrity: {kind: sha256, sha256: 4f1d8e04097bffee91828779f371e49e309a3cb3f12223a86d20d6536efb7569}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: contains, target_asset_id: MODULE-RC001-H13-PARK-FROM-PRIORITY-001}
