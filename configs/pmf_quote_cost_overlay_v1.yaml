@@ -1,0 +1,40 @@
+schema: smial.pmf-quote-cost-overlay
+schema_version: '1.0'
+atom_id: PMF-QUOTE-COST-OVERLAY-V1
+as_of: '2026-08-17'
+owner_phrase: 'OK PMF-QUOTE-COST-OVERLAY: consume one-shot receipt only, no execute'
+adoption_route: WRAP_TASK26_LAYER_VOCABULARY_OVER_ONE_SHOT_RECEIPT
+one_shot:
+  runtime_receipt: docs/evidence/pmf_quote_slice/a1_pmf_quote_slice_one_shot_runtime_receipt_v1.json
+  runtime_receipt_sha256: 2ee2b71115b67b5129e44d08f7c29becefefd8979ad130c3174614ba7f64ba2c
+  acceptance: docs/evidence/pmf_quote_slice/a1_pmf_quote_slice_one_shot_acceptance_v1.json
+  acceptance_sha256: 76346f1d47ffc08afd1d5534c4b0a55820104c52c3e096fa41e5b382d77aa4a8
+  config: configs/pmf_quote_slice_one_shot_v1.yaml
+  config_sha256: 4cbae0cb6ba69a1e3fc30912a72915d3e65e1d9f1f4d8e470c0e90a2b1a28830
+task26_vocabulary:
+  contract: docs/contracts/task26_execution_cost_and_netreturn_contract_v1.md
+  contract_sha256: aac003cf7ba2742d310893c81af3ae4a032a52b719f2f56d80171a6486351efd
+  wrap: true
+  invoke_synthetic_engine: false
+identity:
+  output_mint: DMwbVy48dWVKGe9z1pcVnwF3HLMLrqWdDLfbvx8RchhK
+  input_mint: So11111111111111111111111111111111111111112
+  notional_atomic: '10000000'
+  route_id: JUPITER-SOLANA-SWAP-V2-ORDER-001
+execute: FORBIDDEN
+build: FORBIDDEN
+taker: OMITTED_QUOTE_ONLY
+provider_requests_max: 0
+credential_reads_max: 0
+local_raw_as_git_truth: false
+forbidden_follow_ons:
+  - JUPITER_EXECUTE_OR_BUILD
+  - SUPPLY_TAKER_OR_SIGNER
+  - PROMOTE_QUOTE_TO_TOUCH_OR_FILLABLE
+  - MISSING_FEE_TREATED_AS_ZERO
+  - NETRETURN_OR_CASHFLOW_CLAIM
+  - LOCAL_RAW_USED_AS_GIT_TRUTH
+  - H11_UNPARK_OR_SAMPLE_CAMPAIGN
+  - H13_TRIAL
+  - H02_H10_H14_TRIAL
+  - LIVE_PIT_OR_CASHFLOW_CLAIM
