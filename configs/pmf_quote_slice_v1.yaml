@@ -1,0 +1,57 @@
+schema: smial.pmf-quote-slice
+schema_version: '1.0'
+slice_id: PMF-QUOTE-SLICE-001
+as_of: '2026-08-17'
+owner_phrase: OK PMF-QUOTE-SLICE
+adoption_route: ADOPT_JUPITER_SWAP_V2_ORDER_QUOTE_ONLY
+rejected_client: TASK10_JUPITER_METIS_V1_QUOTE_LOGGER
+live_registry:
+  path: configs/provider_route_capability_registry_v6.yaml
+  registry_id: PROVIDER-ROUTE-CAPABILITY-REGISTRY-006
+  sha256: b9642b77c300c81aedebc4aa464284fe244a7553bb3a37bdbb344d68594df580
+  intended_route_status: REGISTRY_GAP
+a26_gap_binder:
+  path: docs/evidence/task30/a26_h07_h01_owner_fork_packet_acceptance_v1.json
+  sha256: 8d4755643c4f64f325e3d2986d928a93f9c1bf64e7694c47230440b8271aecd7
+intended_route:
+  route_id: JUPITER-SOLANA-SWAP-V2-ORDER-001
+  provider: JUPITER
+  endpoint_family: swap/v2/order
+  endpoint: https://api.jup.ag/swap/v2/order
+  method: GET
+  official_docs: https://developers.jup.ag/docs/swap/order-and-execute
+  access_class: LOCAL_ENV_CREDENTIAL
+  credential: JUPITER_PORTAL_API_KEY
+  taker: OMITTED_QUOTE_ONLY
+  execute: FORBIDDEN
+  build: FORBIDDEN
+  persist_transaction_bytes: false
+  authority_granted: false
+identity:
+  provenance: TASK30_A24_PUMPSWAP_POOL
+  a24_config: configs/task30_a24_raw_to_pit_admissibility_owner_panel_v1.yaml
+  a24_config_sha256: 96593c1448c0cfc8735b8bd94841de8e15245f06f22388a79bf12da99b58f47e
+  pool_address: URqx24yyYxtXXhTbBQnbtPLhtLWYoaDaRxuQuLpNS3S
+  output_mint: DMwbVy48dWVKGe9z1pcVnwF3HLMLrqWdDLfbvx8RchhK
+  input_mint: So11111111111111111111111111111111111111112
+  pair: SOL_TO_A24_BASE_MINT
+notional:
+  parameter_id: PMF_QUOTE_SLICE_NOTIONAL_V1
+  amount_atomic: '10000000'
+  amount_unit: LAMPORTS
+  input_symbol: SOL
+  not_notional_bucket_set_v1: true
+slippage_bps: 100
+task26_layer: QUOTE
+call_authorized: false
+next_owner_phrase: 'OK PMF-QUOTE-SLICE-ONE-SHOT: Jupiter Swap V2 /order without taker, SOL to A24 base mint 0.01 SOL, quote layer only, portal key allowed, no execute'
+forbidden_follow_ons:
+  - WRAP_TASK10_METIS_LOGGER
+  - JUPITER_EXECUTE_OR_BUILD
+  - SUPPLY_TAKER_OR_SIGNER
+  - FAKE_V7_WITHOUT_OBSERVED_RECEIPT
+  - H11_UNPARK_OR_SAMPLE_CAMPAIGN
+  - H13_TRIAL
+  - H02_H10_H14_TRIAL
+  - NOTIONAL_BUCKET_SET_V1_FREEZE
+  - LIVE_PIT_OR_CASHFLOW_CLAIM

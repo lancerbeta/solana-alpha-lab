@@ -453,6 +453,11 @@
       "target_asset_id": "CONTRACT-OWNER-AUTHORITY-PACKET-001"
     },
     {
+      "source_asset_id": "CONFIG-PMF-QUOTE-SLICE-001",
+      "relation": "governed_by",
+      "target_asset_id": "CTRL-PMF-QUOTE-SLICE-001"
+    },
+    {
       "source_asset_id": "CONFIG-PROVIDER-ROUTE-CAPABILITY-REGISTRY-001",
       "relation": "validated_by",
       "target_asset_id": "TEST-PROVIDER-ROUTE-CAPABILITY-REGISTRY-001"
@@ -1753,6 +1758,21 @@
       "target_asset_id": "TEST-OWNER-ATTENTION-GATE-001"
     },
     {
+      "source_asset_id": "CTRL-PMF-QUOTE-SLICE-001",
+      "relation": "contains",
+      "target_asset_id": "MODULE-PMF-QUOTE-SLICE-001"
+    },
+    {
+      "source_asset_id": "CTRL-PMF-QUOTE-SLICE-001",
+      "relation": "contains",
+      "target_asset_id": "SCRIPT-PMF-QUOTE-SLICE-001"
+    },
+    {
+      "source_asset_id": "CTRL-PMF-QUOTE-SLICE-001",
+      "relation": "depends_on",
+      "target_asset_id": "CONFIG-PROVIDER-ROUTE-CAPABILITY-REGISTRY-006"
+    },
+    {
       "source_asset_id": "CTRL-PYPROJECT-001",
       "relation": "depends_on",
       "target_asset_id": "ENV-WORKSTATION-001"
@@ -2641,6 +2661,26 @@
       "source_asset_id": "EVIDENCE-OWNER-AUTHORITY-PACKET-A2-001",
       "relation": "validated_by",
       "target_asset_id": "TEST-OWNER-AUTHORITY-PACKET-A2-001"
+    },
+    {
+      "source_asset_id": "EVIDENCE-PMF-QUOTE-SLICE-001",
+      "relation": "depends_on",
+      "target_asset_id": "CONFIG-PROVIDER-ROUTE-CAPABILITY-REGISTRY-006"
+    },
+    {
+      "source_asset_id": "EVIDENCE-PMF-QUOTE-SLICE-001",
+      "relation": "depends_on",
+      "target_asset_id": "EVIDENCE-T30-A26-H07-H01-OWNER-FORK-001"
+    },
+    {
+      "source_asset_id": "EVIDENCE-PMF-QUOTE-SLICE-001",
+      "relation": "derived_from",
+      "target_asset_id": "CTRL-PMF-QUOTE-SLICE-001"
+    },
+    {
+      "source_asset_id": "EVIDENCE-PMF-QUOTE-SLICE-001",
+      "relation": "validated_by",
+      "target_asset_id": "TEST-PMF-QUOTE-SLICE-001"
     },
     {
       "source_asset_id": "EVIDENCE-RC002-H11-PARK-FROM-PRIORITY-001",
@@ -5933,6 +5973,16 @@
       "target_asset_id": "EVIDENCE-OWNER-AUTHORITY-PACKET-A1-001"
     },
     {
+      "source_asset_id": "MODULE-PMF-QUOTE-SLICE-001",
+      "relation": "governed_by",
+      "target_asset_id": "CTRL-PMF-QUOTE-SLICE-001"
+    },
+    {
+      "source_asset_id": "MODULE-PMF-QUOTE-SLICE-001",
+      "relation": "validated_by",
+      "target_asset_id": "TEST-PMF-QUOTE-SLICE-001"
+    },
+    {
       "source_asset_id": "MODULE-PROVIDER-ROUTE-CAPABILITY-REGISTRY-001",
       "relation": "governed_by",
       "target_asset_id": "CONFIG-PROVIDER-ROUTE-CAPABILITY-REGISTRY-001"
@@ -7488,6 +7538,11 @@
       "target_asset_id": "CATALOG-SCHEMA-LIFECYCLE-001"
     },
     {
+      "source_asset_id": "REPORT-PMF-QUOTE-SLICE-001",
+      "relation": "derived_from",
+      "target_asset_id": "EVIDENCE-PMF-QUOTE-SLICE-001"
+    },
+    {
       "source_asset_id": "REPORT-RC002-H11-PARK-FROM-PRIORITY-001",
       "relation": "derived_from",
       "target_asset_id": "EVIDENCE-RC002-H11-PARK-FROM-PRIORITY-001"
@@ -8243,6 +8298,11 @@
       "target_asset_id": "POLICY-OWNER-ATTENTION-GATE-002"
     },
     {
+      "source_asset_id": "SCRIPT-PMF-QUOTE-SLICE-001",
+      "relation": "depends_on",
+      "target_asset_id": "MODULE-PMF-QUOTE-SLICE-001"
+    },
+    {
       "source_asset_id": "SCRIPT-RC002-H11-PARK-FROM-PRIORITY-001",
       "relation": "depends_on",
       "target_asset_id": "MODULE-RC002-H11-PARK-FROM-PRIORITY-001"
@@ -8966,6 +9026,16 @@
       "source_asset_id": "TEST-OWNER-AUTHORITY-PACKET-A2-001",
       "relation": "depends_on",
       "target_asset_id": "EVIDENCE-OWNER-AUTHORITY-PACKET-A2-001"
+    },
+    {
+      "source_asset_id": "TEST-PMF-QUOTE-SLICE-001",
+      "relation": "depends_on",
+      "target_asset_id": "EVIDENCE-PMF-QUOTE-SLICE-001"
+    },
+    {
+      "source_asset_id": "TEST-PMF-QUOTE-SLICE-001",
+      "relation": "depends_on",
+      "target_asset_id": "MODULE-PMF-QUOTE-SLICE-001"
     },
     {
       "source_asset_id": "TEST-PROVIDER-ROUTE-CAPABILITY-REGISTRY-001",

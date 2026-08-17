@@ -1,0 +1,39 @@
+{
+  "schema": "smial.delivery-harness-factory-fit",
+  "schema_version": "1.0",
+  "review_id": "PMF-QUOTE-SLICE-FACTORY-FIT-001",
+  "as_of": "2026-08-17",
+  "task_id": "PMF-QUOTE-SLICE-OFFLINE-V1",
+  "reviewed_bindings_sha256": "43ac7a979371ac51324f5f51f9dc7c8dbc2294b3ab449f6e048358cc21d4c74e",
+  "reviewed_inventory_sha256": "43ac7a979371ac51324f5f51f9dc7c8dbc2294b3ab449f6e048358cc21d4c74e",
+  "mode": "FULL_REVIEW",
+  "verdict": "PASS",
+  "dimensions": {
+    "mission": "PASS_REBASE_LIVE_OBJECT_TO_QUOTE_ONLY_PMF_SLICE",
+    "flexibility_and_history": "PASS_V6_RC001_H11_H07_LEDGER_IMMUTABLE",
+    "context_efficiency": "PASS_ONE_TASK_CONTRACT_ADOPT_OFFICIAL_ORDER_WITHOUT_TAKER",
+    "research_truth": "PASS_REGISTRY_GAP_RETAINED_A24_MINT_JOINED",
+    "owner_operability": "PASS_RUSSIAN_READOUT_NAMES_BOUND_GAP_NEXT_PHRASE_FORBIDDEN",
+    "execution_to_cashflow": "NOT_APPLICABLE",
+    "monitoring_and_recovery": "PASS_NO_BACKGROUND_PROCESS_REVERT_NEW_EVIDENCE_ONLY",
+    "build_vs_buy": "PASS_ADOPT_JUPITER_V2_ORDER_REJECT_METIS_LOGGER",
+    "security": "PASS_NO_NETWORK_NO_CREDENTIAL_SECRET_FREE_HASHES",
+    "red_team": "PASS_NO_FAKE_V7_NO_EXECUTE_NO_H13_AUTO_NO_H11_UNPARK"
+  },
+  "capability_radar": {
+    "now": "NONE",
+    "watch": "PMF_QUOTE_ONE_SHOT_AFTER_SEPARATE_PHRASE"
+  },
+  "recovery": "REVERT_ONLY_THIS_ATOM_TRACKED_OUTPUTS; PRESERVE_V6_REGISTRY; PRESERVE_A24_A26_A27_H11_PARK; PRESERVE_RC001_FREEZE; PRESERVE_TRIAL_LEDGER",
+  "limits": [
+    "NO_JUPITER_CALL_OR_CREDENTIAL_READ",
+    "NO_FAKE_OBSERVED_REGISTRY_ROW",
+    "NO_EXECUTE_OR_BUILD",
+    "NO_H11_UNPARK",
+    "NO_H13_OR_H02_AUTO_START",
+    "NO_NOTIONAL_BUCKET_SET_V1",
+    "NO_LIVE_PIT_OR_CASHFLOW",
+    "NO_CANONICAL_DONE",
+    "ACCESS_CLASS_RECHECK_AT_ONE_SHOT"
+  ]
+}
