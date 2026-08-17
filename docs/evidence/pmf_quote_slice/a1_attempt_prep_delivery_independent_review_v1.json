@@ -15,7 +15,7 @@
   ],
   "review_id": "PMF-QUOTE-ATTEMPT-PREP-INDEPENDENT-REVIEW-001",
   "reviewed_bindings_sha256": "7e05253107ac768adc1dca43a715d6732d58a282a7ac07f9e586ecf039e177cf",
-  "reviewed_inventory_sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+  "reviewed_inventory_sha256": "6a6407be0dfa9689f0d192a7e8f53bb1709b892e658c72162195597b60af9f67",
   "reviews": [
     {
       "findings": [
