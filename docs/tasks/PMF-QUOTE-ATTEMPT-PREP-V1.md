@@ -7,9 +7,9 @@ owner: GOAL_OWNER
 allowed_routes: [DIRECT_CURSOR_DELIVERY]
 expected_repository: lancerbeta/solana-alpha-lab
 git_binding:
-  expected_base: 5bc273b1fb0f4285a92924b09e77925d8f404573
+  expected_base: 9e00d9543224d34a2aa935196694f5afd614f37c
   expected_upstream: origin/main
-  expected_upstream_oid: 5bc273b1fb0f4285a92924b09e77925d8f404573
+  expected_upstream_oid: 9e00d9543224d34a2aa935196694f5afd614f37c
   expected_branch: cursor/pmf-quote-attempt-prep
   dirty_mode: ALLOW_REPORTED
 objective: Freeze an offline TASK-26 ATTEMPT contract over the merged owner-fork packet so a later keyed /order with taker pubkey is named, while this atom supplies no wallet, no provider call, no /execute and no seed.

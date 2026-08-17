@@ -23937,7 +23937,7 @@ records:
   as_of: '2026-08-17'
   truth_owner: PMF-QUOTE-ATTEMPT-PREP-V1
   location: {kind: git_path, logical_uri: 'repo://docs/tasks/PMF-QUOTE-ATTEMPT-PREP-V1.md', repository_path: docs/tasks/PMF-QUOTE-ATTEMPT-PREP-V1.md}
-  integrity: {kind: sha256, sha256: 9a705aad68045d19c77dceece8130a1e36ffdc96e6887795dd6943f0299ae577}
+  integrity: {kind: sha256, sha256: 276cf19f5e75ffb834b7ecfdf106902a5bda403677d576fcbe53e9078822d5eb}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: contains, target_asset_id: MODULE-PMF-QUOTE-ATTEMPT-PREP-001}

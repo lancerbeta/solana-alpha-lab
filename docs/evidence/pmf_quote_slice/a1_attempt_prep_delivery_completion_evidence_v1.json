@@ -2,18 +2,18 @@
   "acceptance_id": "PMF-QUOTE-ATTEMPT-PREP-DELIVERY-COMPLETION-001",
   "active_stop_conditions": [],
   "as_of": "2026-08-17",
-  "base_main": "5bc273b1fb0f4285a92924b09e77925d8f404573",
+  "base_main": "9e00d9543224d34a2aa935196694f5afd614f37c",
   "capability_radar_now": "NONE",
   "cloud_bundle_mode": "OWNER_MANAGED_OPTIONAL_EXPORT",
   "cloud_bundle_required_by_harness": false,
   "cloud_bundle_smoke_required": false,
   "factory_fit": {
     "path": "docs/evidence/pmf_quote_slice/a1_attempt_prep_delivery_factory_fit_v1.json",
-    "sha256": "25078a1e1c5220aeae6cbd8b02c3e2c853ef2ce4896295c27edb3c84069dd62d",
+    "sha256": "264bc27abb9cc6b6221526375e6295737a617e697c2d739d495f45c35039e013",
     "verdict": "PASS"
   },
   "implementation_bindings": {
-    "catalog/assets/core.yaml": "e553efbb705286563b59bfb95a146f48e8b921e33807bfe6bf3b1c94581f28ab",
+    "catalog/assets/core.yaml": "47e5cafdfe99bcc6d68bf1ac914e351478b05078be1e1eab81fea402d88eb08b",
     "catalog/assets/lifecycle.yaml": "9577912175c2ef252d49e5570c6d1d89d0089e9b1aa2b1734a990077698659c0",
     "catalog/catalog_manifest.yaml": "25a6ddb5b74520b6a5f68560553013df3966d15d825219e638a724230fc92ddb",
     "catalog/generated/asset_edges.json": "b544b895b7d0532771fcd6d0eafcbc79d0fd58dd468c331db229c4cf8190a520",
@@ -22,7 +22,7 @@
     "docs/evidence/pmf_quote_slice/a1_pmf_quote_attempt_prep_acceptance_v1.json": "5aae4490839f83585cb48ce88a1e1681afda50c6a8290f27a4633effa0fabf6b",
     "docs/evidence/pmf_quote_slice/a1_pmf_quote_attempt_prep_runtime_receipt_v1.json": "e4f3eb43b03a73cb825f5dbc5de7c775c5005e6cacbe357185b8fda7c50c23c2",
     "docs/reports/pmf_quote_slice/a1_attempt_prep_owner_readout_v1.md": "70378163c18fc0c866911aab8c19a258ac4b538daad65ac6a0c942415a30537e",
-    "docs/tasks/PMF-QUOTE-ATTEMPT-PREP-V1.md": "9a705aad68045d19c77dceece8130a1e36ffdc96e6887795dd6943f0299ae577",
+    "docs/tasks/PMF-QUOTE-ATTEMPT-PREP-V1.md": "276cf19f5e75ffb834b7ecfdf106902a5bda403677d576fcbe53e9078822d5eb",
     "scripts/run_pmf_quote_attempt_prep.py": "6709d7543ccb77045cc32267e4792349f0cd57414464458c78fe32addb51aa39",
     "src/solana_alpha_lab/pmf_quote_attempt_prep.py": "afe07fccb3b8ea45d17db81dd12e297bf4ca1b1fd6b55f02b8830332bbca223c",
     "tests/test_pmf_quote_attempt_prep.py": "06da128048133e3bece87ed0db7e9233a32c21920855c3609211595f72cf9484"
@@ -70,7 +70,7 @@
     "github_ci": "ENFORCED_LIVE_AT_GUARDED_MERGE",
     "independent_review": {
       "path": "docs/evidence/pmf_quote_slice/a1_attempt_prep_delivery_independent_review_v1.json",
-      "sha256": "7acfc016fe085b9441052f2b05a6a33745dd75cffa61fbed2b973f6881c38a47",
+      "sha256": "76b66611cdc455fc6b6fa43b31a170fa387b7dea03b57c0371cdf6d00d7c817f",
       "verdict": "PASS"
     },
     "project_checks": [

@@ -14,8 +14,8 @@
     "ARCHITECTURE_CRITIC"
   ],
   "review_id": "PMF-QUOTE-ATTEMPT-PREP-INDEPENDENT-REVIEW-001",
-  "reviewed_bindings_sha256": "7e05253107ac768adc1dca43a715d6732d58a282a7ac07f9e586ecf039e177cf",
-  "reviewed_inventory_sha256": "6a6407be0dfa9689f0d192a7e8f53bb1709b892e658c72162195597b60af9f67",
+  "reviewed_bindings_sha256": "685a9fc63701145916099f2b38f2040e30d413dfbfdcd9ed37b324bc9b37e1de",
+  "reviewed_inventory_sha256": "686b5bf5858fdce80aacbd0d68c6f74706eedfcb4d17ecc73d9ad9ca89aee479",
   "reviews": [
     {
       "findings": [
