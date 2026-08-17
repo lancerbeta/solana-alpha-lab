@@ -71,6 +71,9 @@ context_requirements:
       - docs/evidence/pmf_quote_slice/a1_pmf_quote_slice_one_shot_runtime_receipt_v1.json
       - docs/evidence/pmf_quote_slice/a1_pmf_quote_slice_one_shot_acceptance_v1.json
       - docs/evidence/pmf_quote_slice/a1_pmf_quote_cost_overlay_acceptance_v1.json
+      - docs/evidence/pmf_quote_slice/a1_cost_overlay_delivery_completion_evidence_v1.json
+      - docs/evidence/pmf_quote_slice/a1_cost_overlay_delivery_independent_review_v1.json
+      - docs/evidence/pmf_quote_slice/a1_cost_overlay_delivery_factory_fit_v1.json
     HISTORICAL_CONTEXT: []
 ---
 

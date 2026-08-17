@@ -85,6 +85,17 @@ class PmfQuoteCostOverlayTests(unittest.TestCase):
             parsed["context_requirements"]["catalog_asset_ids"],
             ["EVIDENCE-PMF-QUOTE-SLICE-ONE-SHOT-001"],
         )
+        self.assertEqual(
+            parsed["context_requirements"]["exact_role_paths"]["DELIVERY_EVIDENCE"],
+            [
+                "docs/evidence/pmf_quote_slice/a1_pmf_quote_slice_one_shot_runtime_receipt_v1.json",
+                "docs/evidence/pmf_quote_slice/a1_pmf_quote_slice_one_shot_acceptance_v1.json",
+                "docs/evidence/pmf_quote_slice/a1_pmf_quote_cost_overlay_acceptance_v1.json",
+                "docs/evidence/pmf_quote_slice/a1_cost_overlay_delivery_completion_evidence_v1.json",
+                "docs/evidence/pmf_quote_slice/a1_cost_overlay_delivery_independent_review_v1.json",
+                "docs/evidence/pmf_quote_slice/a1_cost_overlay_delivery_factory_fit_v1.json",
+            ],
+        )
 
     def test_module_does_not_open_network_or_execute(self) -> None:
         source = MODULE_PATH.read_text(encoding="utf-8")

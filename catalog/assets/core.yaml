@@ -23647,7 +23647,7 @@ records:
   as_of: '2026-08-17'
   truth_owner: PMF-QUOTE-COST-OVERLAY-V1
   location: {kind: git_path, logical_uri: 'repo://docs/tasks/PMF-QUOTE-COST-OVERLAY-V1.md', repository_path: docs/tasks/PMF-QUOTE-COST-OVERLAY-V1.md}
-  integrity: {kind: sha256, sha256: dfcd59a740ae0a098ad33a9e2e3fb80ddc8fa112e92e662ba7875b72fed0f839}
+  integrity: {kind: sha256, sha256: 79d7ad235c80f1faf0dc12fef9e53448bbffca12cd79ab6a76eefd6efd78bba2}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: contains, target_asset_id: MODULE-PMF-QUOTE-COST-OVERLAY-001}
@@ -23719,7 +23719,7 @@ records:
   as_of: '2026-08-17'
   truth_owner: PMF-QUOTE-COST-OVERLAY-V1
   location: {kind: git_path, logical_uri: 'repo://tests/test_pmf_quote_cost_overlay.py', repository_path: tests/test_pmf_quote_cost_overlay.py}
-  integrity: {kind: sha256, sha256: 1fac05f9c89f38e43a84d3177e6637360daa3897a8d661212356409498693cef}
+  integrity: {kind: sha256, sha256: fac1086582cd6ff64303734bd45dfa428875691cc127fcc7c35070c4b7b565dc}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: depends_on, target_asset_id: MODULE-PMF-QUOTE-COST-OVERLAY-001}

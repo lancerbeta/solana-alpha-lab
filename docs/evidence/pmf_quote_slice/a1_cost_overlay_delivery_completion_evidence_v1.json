@@ -11,7 +11,7 @@
   "cloud_bundle_smoke_required": false,
   "capability_radar_now": "NONE",
   "implementation_bindings": {
-    "catalog/assets/core.yaml": "eb8c553e64cf795a9e4194aaa10c0db5923d8096cd9438f998d69c5e4f553eec",
+    "catalog/assets/core.yaml": "b373ea61fef8a560444a0697cc4afcd0977db45b3bc4f4b53c8085622e1cbfb5",
     "catalog/assets/lifecycle.yaml": "a0426b9188b2056113488c3241d29dfdd660d5235aa606a4a21c4757d75a55a3",
     "catalog/catalog_manifest.yaml": "d3665d5344ee98167d521ee2d9cd08fc946849cfef43424cbab5dcaafd52da63",
     "catalog/generated/asset_edges.json": "28db6c1cd4b30f143e2d1464f84fca3f1cc5c77252cf6456b7ffb73a5cec3f76",
@@ -20,10 +20,10 @@
     "docs/evidence/pmf_quote_slice/a1_pmf_quote_cost_overlay_acceptance_v1.json": "ecbe30d4ba9f14eed6d6dbde1b2424ad594edab7a8e1e6d828d5879d4834d49b",
     "docs/evidence/pmf_quote_slice/a1_pmf_quote_cost_overlay_runtime_receipt_v1.json": "2b9240d3d29f46365f3b3e594cd55067ccd53fa17dede1d45e06deb59fe44397",
     "docs/reports/pmf_quote_slice/a1_cost_overlay_owner_readout_v1.md": "1aefcf3d483dfe6d321e628ae52c11560d2ba6d58f484948336b1cdcc22b5360",
-    "docs/tasks/PMF-QUOTE-COST-OVERLAY-V1.md": "dfcd59a740ae0a098ad33a9e2e3fb80ddc8fa112e92e662ba7875b72fed0f839",
+    "docs/tasks/PMF-QUOTE-COST-OVERLAY-V1.md": "79d7ad235c80f1faf0dc12fef9e53448bbffca12cd79ab6a76eefd6efd78bba2",
     "scripts/run_pmf_quote_cost_overlay.py": "be7d1e7652f9a85345d7a3707b0c192fb45b902d711b9399fa3ca4e1e4b13378",
     "src/solana_alpha_lab/pmf_quote_cost_overlay.py": "a38843f0d23d187cbc0f5e7ba6a36164c313cc092add7b261f53bd07864cbf07",
-    "tests/test_pmf_quote_cost_overlay.py": "1fac05f9c89f38e43a84d3177e6637360daa3897a8d661212356409498693cef"
+    "tests/test_pmf_quote_cost_overlay.py": "fac1086582cd6ff64303734bd45dfa428875691cc127fcc7c35070c4b7b565dc"
   },
   "active_stop_conditions": [],
   "owner_attention_triggers": {
@@ -35,14 +35,14 @@
   },
   "factory_fit": {
     "path": "docs/evidence/pmf_quote_slice/a1_cost_overlay_delivery_factory_fit_v1.json",
-    "sha256": "4889e03cd0e0d80ff3655c1fb745ac718c999aa3770c4cfb012376226992ece7",
+    "sha256": "23837d457fcdfd68e3e3ef852c1d73d1b728828870cd42728bcff32dd3890b93",
     "verdict": "PASS"
   },
   "validation": {
     "targeted": "PASS_PMF_QUOTE_COST_OVERLAY_TESTS",
     "independent_review": {
       "path": "docs/evidence/pmf_quote_slice/a1_cost_overlay_delivery_independent_review_v1.json",
-      "sha256": "7e53d7e0a4d0b2980ef37978a0af26c1ec78d15c2f8b86542f90dbaf8fe2d2ba",
+      "sha256": "13c0600a20a11eaa2c269e4e089347b087a8d2b58ba927da79fd1a76e5a9b300",
       "verdict": "PASS"
     },
     "full_gate": "ENFORCED_BY_PROJECT_BOUND_VALIDATION",
