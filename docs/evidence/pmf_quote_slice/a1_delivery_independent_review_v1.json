@@ -1,0 +1,68 @@
+{
+  "schema": "smial.delivery-independent-review-evidence",
+  "schema_version": "1.0",
+  "review_id": "PMF-QUOTE-SLICE-INDEPENDENT-REVIEW-001",
+  "as_of": "2026-08-17",
+  "task_id": "PMF-QUOTE-SLICE-OFFLINE-V1",
+  "reviewed_bindings_sha256": "0e95d60a598c987a3f7aec8b46ffcd06c7b31a23f80a746c8c42848066ec5ca9",
+  "reviewed_inventory_sha256": "954355f1965ae6891621b9fd1c84a870acd65b7f2a1eefeeea42931e1326dcd4",
+  "required_roles": [
+    "CODE_REVIEWER",
+    "GOAL_DOD_CRITIC",
+    "ARCHITECTURE_CRITIC"
+  ],
+  "reviews": [
+    {
+      "role": "CODE_REVIEWER",
+      "verdict": "PASS",
+      "findings": [
+        "CHECKED_WRITE_SET_BOUNDED",
+        "CHECKED_NO_PROVIDER_NETWORK_CREDENTIAL",
+        "CHECKED_V6_AND_RC001_AND_LEDGER_NOT_IN_WRITE_SET",
+        "CHECKED_TERMINAL_FAIL_CLOSED_ON_ENDPOINT_METHOD_BUILD_TX_BYTES",
+        "CHECKED_A24_BASE_MINT_NOT_A18_ORCA",
+        "CHECKED_NO_SKIPTEST",
+        "CHECKED_NO_SECRETS",
+        "REPAIRED_DOD5_TERMINAL_GAPS_BEFORE_EVIDENCE"
+      ]
+    },
+    {
+      "role": "GOAL_DOD_CRITIC",
+      "verdict": "PASS",
+      "findings": [
+        "CHECKED_DECISION_DELTA_REBASE_TO_QUOTE_SLICE",
+        "CHECKED_NAMED_CONSUMER",
+        "CHECKED_CHEAPEST_FALSIFIER",
+        "CHECKED_NON_CLAIMS",
+        "CHECKED_NOTIONAL_IS_NOT_BUCKET_SET_V1",
+        "CHECKED_H11_AND_H07_PARK_HASH_BOUND",
+        "CHECKED_RUSSIAN_READOUT_WHAT_WHY_CALL_NEXT_FORBIDDEN",
+        "CHECKED_DRIFT_HEADING_NOT_BOUND",
+        "REPAIRED_FALSE_A24_POPCAT_IDENTITY_BEFORE_EVIDENCE"
+      ]
+    },
+    {
+      "role": "ARCHITECTURE_CRITIC",
+      "verdict": "PASS",
+      "findings": [
+        "CHECKED_V6_LEFT_AS_REGISTRY_GAP_NO_FAKE_V7",
+        "CHECKED_ADOPT_V2_ORDER_WITHOUT_TAKER_NOT_WRAP_METIS",
+        "CHECKED_QUOTE_LAYER_NOT_EXECUTE",
+        "CHECKED_A24_IDENTITY_JOIN_TO_BASE_MINT",
+        "CHECKED_OBSERVED_RECEIPT_REQUIRED_PRESERVED",
+        "CHECKED_RESEARCH_VALIDITY",
+        "CHECKED_BLAST_RADIUS",
+        "CHECKED_RECOVERY"
+      ]
+    }
+  ],
+  "verdict": "PASS",
+  "non_claims": [
+    "NO_CRYPTOGRAPHIC_REVIEWER_IDENTITY",
+    "REVIEW_IS_NOT_SEMANTIC_DONE",
+    "NO_LIVE_PIT_OR_EXECUTION_CLAIM",
+    "NO_JUPITER_CALL",
+    "NO_FAKE_OBSERVED_REGISTRY_ROW",
+    "NO_SINGLE_AGENT_REVIEW_FALLBACK"
+  ]
+}
