@@ -11,14 +11,14 @@
   "cloud_bundle_smoke_required": false,
   "capability_radar_now": "NONE",
   "implementation_bindings": {
-    "catalog/assets/core.yaml": "a2997913d31206f2c70e519f5413f20f51600594bd8aece69145fd3225fad3d0",
+    "catalog/assets/core.yaml": "779c92ae7294204b22e864be2f2dc53dc7445edcb34016698c7181e6222e4a31",
     "catalog/assets/lifecycle.yaml": "c59596d2793857bc0db56faf732914f75654f7e02b7fab1ebfa020ee0f31aa80",
     "catalog/catalog_manifest.yaml": "871ab0d7b7ad7f17b8976f4f57e40bb32562ee26beaed5f47632550207df03a5",
     "catalog/generated/asset_edges.json": "ac19246ab7f87ddc1017049687e53024ec290b9910c9d5f7ff907ac4e0bd49a8",
     "docs/PROJECT_MAP.md": "0f4f29d1fe79e6ed373d1e64b057db85ff6405f98c2634e251e36e55532644fa",
     "docs/evidence/rc001_h13_park_from_priority/a1_h13_park_from_priority_acceptance_v1.json": "94b620bd3a9317c2b2f0dba6567780d62777b415ccf738b73dba40d22e12ebfd",
     "docs/reports/rc001_h13_park_from_priority/a1_owner_readout_v1.md": "ee18a68d448a48e887e51a0bd1e790c7c0e3a02eaae5ab536fa59c046d0afe29",
-    "docs/tasks/RC001-H13-PARK-FROM-PRIORITY-OFFLINE-V1.md": "4f1d8e04097bffee91828779f371e49e309a3cb3f12223a86d20d6536efb7569",
+    "docs/tasks/RC001-H13-PARK-FROM-PRIORITY-OFFLINE-V1.md": "9b549d0be2ac89740deaf30d7ed6793f8a1bd87b7cee50cc4ca61e555b601e6c",
     "registries/decisions_negative_results.yaml": "05b781fed0d5d2f2a6d337dc3ce748268599abf26ac8333b7a72d373977c5b34",
     "scripts/run_rc001_h13_park_from_priority.py": "f435da64e8da4bbb49b6524e075a4a5419be85c4fbceea50787c0fca683b3190",
     "src/solana_alpha_lab/rc001_h13_park_from_priority.py": "a7c01d28526e3e7c0dbceaeef0995eac7ec34070588820e4b9ce297b469776ed",
@@ -36,14 +36,14 @@
   },
   "factory_fit": {
     "path": "docs/evidence/rc001_h13_park_from_priority/a1_delivery_factory_fit_v1.json",
-    "sha256": "08241d4431a4f194e74d3ad966b22d3499d37e571187c164f1283de83c03f7bf",
+    "sha256": "2bebbeba781d26f73837ee74225ab087c78501011ee452b1ca2af1e38fcc4174",
     "verdict": "PASS"
   },
   "validation": {
     "targeted": "PASS_H13_PARK_FROM_PRIORITY_TESTS",
     "independent_review": {
       "path": "docs/evidence/rc001_h13_park_from_priority/a1_delivery_independent_review_v1.json",
-      "sha256": "1b18597a36fa497e3ccdb2025b8670196ca4104416cebb545921d19cfaccf2c9",
+      "sha256": "a8b368741ecf5e447a2e83cd21c627c1e41ebc8c9aecf11f3dfc3585b169e6ea",
       "verdict": "PASS"
     },
     "full_gate": "ENFORCED_BY_PROJECT_BOUND_VALIDATION",
