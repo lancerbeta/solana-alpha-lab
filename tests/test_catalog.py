@@ -83,6 +83,7 @@ class CatalogImportTests(unittest.TestCase):
                 "DECISION-T39-RC002-H11-NAMED-MINT-GTA-001",
                 "DECISION-T40-RC002-H11-BONDING-CURVE-PDA-GTA-001",
                 "DECISION-RC002-H11-PARK-FROM-PRIORITY-001",
+                "DECISION-RC001-H13-PARK-FROM-PRIORITY-001",
             ],
         )
         self.assertTrue(
