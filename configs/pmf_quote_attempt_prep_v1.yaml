@@ -1,0 +1,56 @@
+schema: smial.pmf-quote-attempt-prep
+schema_version: '1.0'
+atom_id: PMF-QUOTE-ATTEMPT-PREP-V1
+as_of: '2026-08-17'
+owner_phrase: 'OK PMF-QUOTE-ATTEMPT-PREP: offline attempt contract only, no wallet, no execute, no provider'
+adoption_route: WRAP_TASK26_ATTEMPT_AND_JUPITER_ORDER_EXECUTE_SPLIT
+owner_fork:
+  runtime_receipt: docs/evidence/pmf_quote_slice/a1_pmf_quote_owner_fork_runtime_receipt_v1.json
+  runtime_receipt_sha256: e76e25aab611b77ab11e97ad4e6849a1f15dbd5f0f4fcc48d77bc8aa9395b1be
+  acceptance: docs/evidence/pmf_quote_slice/a1_pmf_quote_owner_fork_acceptance_v1.json
+  acceptance_sha256: 2b2bac38eb87fe36d32a40d5817b6c4e37a9f23b4a3c4fe28c1db3e15ec9a2c4
+task26_vocabulary:
+  contract: docs/contracts/task26_execution_cost_and_netreturn_contract_v1.md
+  contract_sha256: aac003cf7ba2742d310893c81af3ae4a032a52b719f2f56d80171a6486351efd
+  wrap: true
+  invoke_synthetic_engine: false
+identity:
+  output_mint: DMwbVy48dWVKGe9z1pcVnwF3HLMLrqWdDLfbvx8RchhK
+  input_mint: So11111111111111111111111111111111111111112
+  notional_atomic: '10000000'
+  route_id: JUPITER-SOLANA-SWAP-V2-ORDER-001
+execute: FORBIDDEN
+build: FORBIDDEN
+taker: OMITTED_QUOTE_ONLY
+taker_later_shape: PUBLIC_KEY_ONLY
+execute_phrase_status: INELIGIBLE
+attempt_status: NOT_ATTEMPTED
+attempt_id: RESERVED_NOT_ISSUED
+intent_id: RESERVED_NOT_ISSUED
+phase: ENTRY
+frozen_quote_is_attempt_quote: false
+later_call: KEYED_JUPITER_V2_ORDER_WITH_TAKER_PUBKEY
+later_credential_named: JUPITER_API_KEY
+later_credential_read: false
+transaction_bytes_in_git: FORBIDDEN
+seed_in_git: FORBIDDEN
+provider_requests_max: 0
+credential_reads_max: 0
+local_raw_as_git_truth: false
+unpaid_owner_phrases:
+  - 'OK PMF-QUOTE-ATTEMPT: keyed /order with taker pubkey only, no /execute, no seed in git'
+forbidden_follow_ons:
+  - JUPITER_EXECUTE_OR_BUILD
+  - TAKER_OR_SIGNER_SUPPLIED
+  - SEED_OR_PRIVATE_KEY_IN_GIT
+  - TRANSACTION_BYTES_IN_GIT
+  - FROZEN_QUOTE_USED_AS_ATTEMPT_QUOTE
+  - PROMOTE_QUOTE_TO_TOUCH_OR_FILLABLE
+  - MISSING_FEE_TREATED_AS_ZERO
+  - NETRETURN_OR_CASHFLOW_CLAIM
+  - LOCAL_RAW_USED_AS_GIT_TRUTH
+  - H11_UNPARK_OR_SAMPLE_CAMPAIGN
+  - H13_TRIAL
+  - H02_H10_H14_TRIAL
+  - LIVE_PIT_OR_CASHFLOW_CLAIM
+  - EXECUTE_PHRASE_OFFERED_AS_AUTHORIZED

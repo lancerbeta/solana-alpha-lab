@@ -1,0 +1,75 @@
+{
+  "as_of": "2026-08-17",
+  "non_claims": [
+    "NO_CRYPTOGRAPHIC_REVIEWER_IDENTITY",
+    "REVIEW_IS_NOT_SEMANTIC_DONE",
+    "NO_LIVE_PIT_OR_EXECUTION_CLAIM",
+    "NO_ALPHA_PNL_OR_NETRETURN",
+    "NO_CANONICAL_DONE",
+    "NO_SINGLE_AGENT_REVIEW_FALLBACK"
+  ],
+  "required_roles": [
+    "CODE_REVIEWER",
+    "GOAL_DOD_CRITIC",
+    "ARCHITECTURE_CRITIC"
+  ],
+  "review_id": "PMF-QUOTE-ATTEMPT-PREP-INDEPENDENT-REVIEW-001",
+  "reviewed_bindings_sha256": "685a9fc63701145916099f2b38f2040e30d413dfbfdcd9ed37b324bc9b37e1de",
+  "reviewed_inventory_sha256": "686b5bf5858fdce80aacbd0d68c6f74706eedfcb4d17ecc73d9ad9ca89aee479",
+  "reviews": [
+    {
+      "findings": [
+        "CHECKED_WRITE_SET_SUBSET",
+        "CHECKED_OFFLINE_CAPS",
+        "CHECKED_NO_ATTEMPT_TAKER_EXECUTE",
+        "CHECKED_FROZEN_QUOTE_NOT_ATTEMPT",
+        "CHECKED_FEE_ABSENCE_NOT_ZERO",
+        "CHECKED_PHRASE_STRIP",
+        "CHECKED_TASK26_WRAP",
+        "CHECKED_CATALOG_EIGHT_UNIQUE",
+        "CHECKED_TERMINAL_AND_READOUT",
+        "CHECKED_RESIDUAL_FAIL_CLOSED"
+      ],
+      "role": "CODE_REVIEWER",
+      "verdict": "PASS"
+    },
+    {
+      "findings": [
+        "CHECKED_DECISION_DELTA",
+        "CHECKED_NAMED_CONSUMER",
+        "CHECKED_CHEAPEST_FALSIFIER",
+        "CHECKED_DOD_1_OFFLINE_INPUTS",
+        "CHECKED_DOD_2_OWNER_FORK_IDENTITY",
+        "CHECKED_DOD_3_NOT_ATTEMPTED",
+        "CHECKED_DOD_4_RUSSIAN_READOUT",
+        "CHECKED_DOD_5_WRITE_SET",
+        "CHECKED_NON_CLAIMS",
+        "CHECKED_UNPAID_NEXT_NOT_EXECUTED",
+        "CHECKED_EVIDENCE_BUDGET"
+      ],
+      "role": "GOAL_DOD_CRITIC",
+      "verdict": "PASS"
+    },
+    {
+      "findings": [
+        "CHECKED_TRUTH_OWNERSHIP",
+        "CHECKED_CATALOG_UNIQUENESS",
+        "CHECKED_WRAP_NOT_SYNTHETIC_ENGINE",
+        "CHECKED_QUOTE_NOT_PROMOTED_TO_ATTEMPT",
+        "CHECKED_LATER_CALL_AND_EXECUTE_SPLIT",
+        "CHECKED_BLAST_RADIUS_AND_RECOVERY",
+        "CHECKED_NO_CROSS_TASK_PRIVATE_API",
+        "CHECKED_DUCKDB_TRUTH",
+        "CHECKED_RESIDUAL_QUOTE_AMOUNT_CAN_BE_MISREAD_AS_ATTEMPT",
+        "CHECKED_EXECUTE_PHRASE_INELIGIBLE_IN_PACKET",
+        "CHECKED_V6_V7_RC001_H11_TRIAL_LEDGER_OUTSIDE_WRITE_SET"
+      ],
+      "role": "ARCHITECTURE_CRITIC",
+      "verdict": "PASS"
+    }
+  ],
+  "schema": "smial.delivery-independent-review-evidence",
+  "schema_version": "1.0",
+  "task_id": "PMF-QUOTE-ATTEMPT-PREP-V1",
+  "verdict": "PASS"
+}
