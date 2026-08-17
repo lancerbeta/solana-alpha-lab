@@ -391,19 +391,27 @@ def candidate_identity_unchanged(
 def live_default_branch_oid(
     root: Path, *, repository: str, branch: str, runner=run_read
 ) -> str:
+    if not isinstance(repository, str) or repository.count("/") != 1:
+        raise ValueError("DEFAULT_BRANCH_READBACK_INVALID")
+    if not isinstance(branch, str) or re.fullmatch(
+        r"[A-Za-z0-9][A-Za-z0-9._/-]{0,254}", branch
+    ) is None:
+        raise ValueError("DEFAULT_BRANCH_READBACK_INVALID")
     try:
-        value = runner(
-            [
-                "gh", "api", f"repos/{repository}/git/ref/heads/{branch}",
-                "--jq", ".object.sha",
-            ],
+        remote = runner(
+            ["git", "ls-remote", "--heads", "origin", f"refs/heads/{branch}"],
             root,
         ).decode("ascii", errors="strict").strip()
     except (UnicodeDecodeError, ValueError):
         raise ValueError("DEFAULT_BRANCH_READBACK_INVALID") from None
-    if re.fullmatch(r"[0-9a-f]{40}", value) is None:
+    parts = remote.split()
+    if (
+        len(parts) != 2
+        or parts[1] != f"refs/heads/{branch}"
+        or re.fullmatch(r"[0-9a-f]{40}", parts[0]) is None
+    ):
         raise ValueError("DEFAULT_BRANCH_READBACK_INVALID")
-    return value
+    return parts[0]
 
 
 def parse_managed_write_set(plan_text: str, heading: str) -> list[str]:
@@ -1537,7 +1545,11 @@ def build_post_merge_receipt(
         ["git", "ls-remote", "origin", f"refs/heads/{default_branch}"], root
     ).decode("ascii", errors="strict").strip()
     parts = remote.split()
-    if len(parts) != 2 or parts[1] != f"refs/heads/{default_branch}":
+    if (
+        len(parts) != 2
+        or parts[1] != f"refs/heads/{default_branch}"
+        or re.fullmatch(r"[0-9a-f]{40}", parts[0]) is None
+    ):
         raise ValueError("POST_MERGE_READBACK_FAILED")
     default_head = parts[0]
     head_remote = runner(
@@ -1549,14 +1561,27 @@ def build_post_merge_receipt(
         or head_remote[1] != f"refs/heads/{head_branch}"
     ):
         raise ValueError("POST_MERGE_READBACK_FAILED")
-    commit = decode_json_mapping(
-        runner(["gh", "api", f"repos/{repository}/commits/{default_head}"], root),
-        "POST_MERGE_COMMIT_READBACK_INVALID",
-    )
-    parents = commit.get("parents")
-    parent_oids = [
-        item.get("sha") for item in parents if isinstance(item, dict)
-    ] if isinstance(parents, list) else []
+    try:
+        runner(
+            ["git", "fetch", "--no-tags", "origin", "--", default_head],
+            root,
+        )
+        lineage = runner(
+            [
+                "git", "--no-replace-objects", "rev-list",
+                "--parents", "-n", "1", default_head,
+            ],
+            root,
+        ).decode("ascii", errors="strict").strip().split()
+    except (UnicodeDecodeError, ValueError):
+        raise ValueError("POST_MERGE_COMMIT_READBACK_INVALID") from None
+    if (
+        not lineage
+        or lineage[0] != default_head
+        or any(re.fullmatch(r"[0-9a-f]{40}", token) is None for token in lineage)
+    ):
+        raise ValueError("POST_MERGE_COMMIT_READBACK_INVALID")
+    parent_oids = lineage[1:]
     try:
         policy = load_base_bound_policy(
             root, expected_base=expected_base, runner=runner

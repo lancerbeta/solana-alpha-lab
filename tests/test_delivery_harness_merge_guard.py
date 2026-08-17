@@ -53,6 +53,7 @@ class FakeRunner:
         flip_head_after_policy_reads: int | None = None,
         default_branch: str = "main",
         base_mismatch_path: str | None = None,
+        postmerge_default_oid: str | None = None,
     ) -> None:
         self.head = head
         self.check_state = check_state
@@ -70,6 +71,7 @@ class FakeRunner:
         self.flip_head_after_policy_reads = flip_head_after_policy_reads
         self.default_branch = default_branch
         self.base_mismatch_path = base_mismatch_path
+        self.postmerge_default_oid = MAIN if postmerge_default_oid is None else postmerge_default_oid
         self.policy_reads = 0
         self.calls: list[tuple[str, ...]] = []
 
@@ -121,23 +123,25 @@ class FakeRunner:
             }]).encode()
         if command[:3] == ("gh", "api", "graphql"):
             return json.dumps({"data": {"repository": {"pullRequest": {"reviewThreads": {"nodes": [{"isResolved": not self.unresolved_review}], "pageInfo": {"hasNextPage": False}}}}}}).encode()
-        if command[:2] == ("gh", "api") and command[2] == f"repos/lancerbeta/solana-alpha-lab/git/ref/heads/{self.default_branch}":
-            return (self.upstream_oid + "\n").encode()
         if command[:2] == ("gh", "api") and command[2] == "repos/lancerbeta/solana-alpha-lab":
             return json.dumps({"delete_branch_on_merge": self.delete_branch_on_merge}).encode()
-        if command[:2] == ("gh", "api") and command[2] == f"repos/lancerbeta/solana-alpha-lab/commits/{MAIN}":
-            return json.dumps({
-                "sha": MAIN,
-                "parents": [{"sha": self.upstream_oid}, {"sha": HEAD}],
-            }).encode()
         if command[:3] == ("gh", "pr", "merge"):
             return b""
+        if command[:3] == ("git", "ls-remote", "--heads"):
+            return f"{self.upstream_oid}\trefs/heads/{self.default_branch}\n".encode()
         if command[:2] == ("git", "ls-remote"):
             if command[-1] == f"refs/heads/{self.default_branch}":
-                return f"{MAIN}\trefs/heads/{self.default_branch}\n".encode()
+                return (
+                    f"{self.postmerge_default_oid}\t"
+                    f"refs/heads/{self.default_branch}\n"
+                ).encode()
             if command[-1] == "refs/heads/candidate" and self.head_branch_preserved:
                 return f"{HEAD}\trefs/heads/candidate\n".encode()
             return b""
+        if command[:2] == ("git", "fetch"):
+            return b""
+        if command[:5] == ("git", "--no-replace-objects", "rev-list", "--parents", "-n"):
+            return f"{MAIN} {self.upstream_oid} {HEAD}\n".encode()
         if command[:3] == ("gh", "run", "list"):
             if self.head in command:
                 runs = [{
@@ -1242,8 +1246,11 @@ class DeliveryHarnessMergeGuardTests(unittest.TestCase):
             )
         self.assertTrue(request["merge_checks"]["exact_pr_head_bound"])
         self.assertIn(
-            ("gh", "api", "repos/lancerbeta/solana-alpha-lab/git/ref/heads/trunk", "--jq", ".object.sha"),
+            ("git", "ls-remote", "--heads", "origin", "refs/heads/trunk"),
             runner.calls,
+        )
+        self.assertFalse(
+            any("git/ref/heads/" in item for call in runner.calls for item in call)
         )
         with mock.patch.object(
             self.module,
@@ -1294,6 +1301,55 @@ class DeliveryHarnessMergeGuardTests(unittest.TestCase):
         self.assertEqual(receipt["base_branch"], "main")
         self.assertEqual(receipt["base_head"], BASE)
         self.assertEqual(receipt["head_branch"], "candidate")
+        self.assertIn(
+            ("git", "fetch", "--no-tags", "origin", "--", MAIN),
+            runner.calls,
+        )
+        self.assertIn(
+            (
+                "git", "--no-replace-objects", "rev-list",
+                "--parents", "-n", "1", MAIN,
+            ),
+            runner.calls,
+        )
+
+    def test_live_default_branch_oid_rejects_malformed_ls_remote(self) -> None:
+        class Runner:
+            def __init__(self) -> None:
+                self.calls: list[tuple[str, ...]] = []
+
+            def __call__(self, args: list[str], cwd: Path) -> bytes:
+                self.calls.append(tuple(args))
+                return b"+refs/heads/main:refs/remotes/origin/main\trefs/heads/main\n"
+
+        runner = Runner()
+        with self.assertRaisesRegex(ValueError, "DEFAULT_BRANCH_READBACK_INVALID"):
+            self.module.live_default_branch_oid(
+                ROOT,
+                repository="lancerbeta/solana-alpha-lab",
+                branch="main",
+                runner=runner,
+            )
+        self.assertEqual(
+            runner.calls,
+            [("git", "ls-remote", "--heads", "origin", "refs/heads/main")],
+        )
+
+    def test_post_merge_rejects_non_oid_default_head_before_fetch(self) -> None:
+        runner = FakeRunner(
+            postmerge_default_oid="+refs/heads/main:refs/remotes/origin/main",
+        )
+        with self.assertRaisesRegex(ValueError, "POST_MERGE_READBACK_FAILED"):
+            self.module.build_post_merge_receipt(
+                ROOT, repository="lancerbeta/solana-alpha-lab", pr_number=PR,
+                route="DIRECT_CURSOR_DELIVERY",
+                context_receipt=context_receipt(self.module),
+                submission_receipt=guarded_submission_receipt(self.module),
+                runner=runner,
+                context_builder=exact_context_builder(self.module),
+            )
+        self.assertFalse(any(call[:2] == ("git", "fetch") for call in runner.calls))
+        self.assertFalse(any("rev-list" in call for call in runner.calls))
 
     def test_post_merge_receipt_rejects_wrong_pr_or_deleted_head_branch(self) -> None:
         for runner in (
