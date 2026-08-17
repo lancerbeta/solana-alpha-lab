@@ -122,6 +122,62 @@ class FakeRunner:
                 "state": self.check_state, "bucket": bucket,
             }]).encode()
         if command[:3] == ("gh", "api", "graphql"):
+            blob = " ".join(command)
+            if "checkRuns" in blob:
+                oid = next(
+                    (item[4:] for item in command if item.startswith("oid=")),
+                    "",
+                )
+                conclusion = "SUCCESS" if self.check_state == "SUCCESS" else "FAILURE"
+                suites: list[dict[str, object]] = []
+                if oid in {self.head, self.ci_head, HEAD}:
+                    suites.append({
+                        "workflowRun": {"databaseId": 76},
+                        "checkRuns": {
+                            "pageInfo": {"hasNextPage": False},
+                            "nodes": [{
+                                "name": "validate",
+                                "status": "COMPLETED",
+                                "conclusion": conclusion,
+                            }],
+                        },
+                    })
+                if oid == MAIN:
+                    if self.postmerge_latest_failure:
+                        suites.append({
+                            "workflowRun": {"databaseId": 78},
+                            "checkRuns": {
+                                "pageInfo": {"hasNextPage": False},
+                                "nodes": [{
+                                    "name": "validate",
+                                    "status": "COMPLETED",
+                                    "conclusion": "FAILURE",
+                                }],
+                            },
+                        })
+                    suites.append({
+                        "workflowRun": {"databaseId": 77},
+                        "checkRuns": {
+                            "pageInfo": {"hasNextPage": False},
+                            "nodes": [{
+                                "name": "validate",
+                                "status": "COMPLETED",
+                                "conclusion": "SUCCESS",
+                            }],
+                        },
+                    })
+                return json.dumps({
+                    "data": {
+                        "repository": {
+                            "object": {
+                                "checkSuites": {
+                                    "pageInfo": {"hasNextPage": False},
+                                    "nodes": suites,
+                                }
+                            }
+                        }
+                    }
+                }).encode()
             return json.dumps({"data": {"repository": {"pullRequest": {"reviewThreads": {"nodes": [{"isResolved": not self.unresolved_review}], "pageInfo": {"hasNextPage": False}}}}}}).encode()
         if command[:2] == ("gh", "api") and command[2] == "repos/lancerbeta/solana-alpha-lab":
             return json.dumps({"delete_branch_on_merge": self.delete_branch_on_merge}).encode()
@@ -1252,6 +1308,20 @@ class DeliveryHarnessMergeGuardTests(unittest.TestCase):
         self.assertFalse(
             any("git/ref/heads/" in item for call in runner.calls for item in call)
         )
+        self.assertFalse(
+            any(
+                call[:3] == ("gh", "run", "view")
+                and any("jobs" in item for item in call)
+                for call in runner.calls
+            )
+        )
+        self.assertTrue(
+            any(
+                call[:3] == ("gh", "api", "graphql")
+                and any("checkRuns" in item for item in call)
+                for call in runner.calls
+            )
+        )
         with mock.patch.object(
             self.module,
             "guarded_delivery_scope",
@@ -1312,6 +1382,55 @@ class DeliveryHarnessMergeGuardTests(unittest.TestCase):
             ),
             runner.calls,
         )
+
+    def test_github_workflow_jobs_accepts_null_conclusion_and_rejects_unmatched_run(self) -> None:
+        payload = json.dumps({
+            "data": {
+                "repository": {
+                    "object": {
+                        "checkSuites": {
+                            "pageInfo": {"hasNextPage": False},
+                            "nodes": [{
+                                "workflowRun": {"databaseId": 76},
+                                "checkRuns": {
+                                    "pageInfo": {"hasNextPage": False},
+                                    "nodes": [{
+                                        "name": "validate",
+                                        "status": "IN_PROGRESS",
+                                        "conclusion": None,
+                                    }],
+                                },
+                            }],
+                        }
+                    }
+                }
+            }
+        }).encode()
+
+        def runner(args: list[str], cwd: Path) -> bytes:
+            return payload
+
+        jobs = self.module.github_workflow_jobs(
+            "lancerbeta/solana-alpha-lab",
+            commit_oid=HEAD,
+            run_id=76,
+            root=ROOT,
+            runner=runner,
+            invalid_code="PR_CI_READBACK_INVALID",
+        )
+        self.assertEqual(
+            jobs,
+            [{"name": "validate", "status": "in_progress", "conclusion": None}],
+        )
+        with self.assertRaisesRegex(ValueError, "PR_CI_READBACK_INVALID"):
+            self.module.github_workflow_jobs(
+                "lancerbeta/solana-alpha-lab",
+                commit_oid=HEAD,
+                run_id=99,
+                root=ROOT,
+                runner=runner,
+                invalid_code="PR_CI_READBACK_INVALID",
+            )
 
     def test_live_default_branch_oid_rejects_malformed_ls_remote(self) -> None:
         class Runner:
