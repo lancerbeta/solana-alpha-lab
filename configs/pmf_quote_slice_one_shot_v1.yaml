@@ -1,0 +1,33 @@
+schema: smial.pmf-quote-slice-one-shot
+schema_version: '1.0'
+atom_id: PMF-QUOTE-SLICE-ONE-SHOT-V1
+as_of: '2026-08-17'
+slice_config: configs/pmf_quote_slice_v1.yaml
+external_authority:
+  capture_authorized: true
+  owner_phrase: 'OK PMF-QUOTE-SLICE-ONE-SHOT: Jupiter Swap V2 /order without taker, SOL to A24 base mint 0.01 SOL, quote layer only, portal key allowed, no execute'
+  credential: JUPITER_API_KEY
+  credential_alias: JUPITER_PORTAL_API_KEY
+  header_name: x-api-key
+  execute: false
+  build: false
+  taker: OMITTED_QUOTE_ONLY
+provider_route:
+  route_id: JUPITER-SOLANA-SWAP-V2-ORDER-001
+  endpoint: https://api.jup.ag/swap/v2/order
+  method: GET
+  host: api.jup.ag
+  official_docs: https://developers.jup.ag/docs/swap/order-and-execute
+request:
+  inputMint: So11111111111111111111111111111111111111112
+  outputMint: DMwbVy48dWVKGe9z1pcVnwF3HLMLrqWdDLfbvx8RchhK
+  amount: '10000000'
+  slippageBps: '100'
+runtime_limits:
+  timeout_seconds: 20.0
+  max_response_bytes: 500000
+execution_controls:
+  retries: 0
+  fallback: false
+  persist_transaction_bytes: false
+  provider_requests_max: 1
