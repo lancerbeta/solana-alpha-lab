@@ -1,0 +1,107 @@
+{
+  "acceptance_id": "EVIDENCE-RC001-H13-PARK-FROM-PRIORITY-001",
+  "as_of": "2026-08-18",
+  "atom_id": "RC001-H13-PARK-FROM-PRIORITY-OFFLINE-V1",
+  "deletion": false,
+  "family_status": "PARKED_FROM_PRIORITY_NOT_CANONICAL_DONE",
+  "forbidden_follow_ons": [
+    "H13_TRIAL",
+    "H02_H10_H14_TRIAL",
+    "ENTITY_ROUTE_REDESIGN_OR_CAPTURE",
+    "CONTINUOUS_PIT_OR_EXECUTION_CAPTURE",
+    "H07_H01_UNPARK",
+    "PROVIDER_OR_CREDENTIAL_CALL"
+  ],
+  "h02_started": false,
+  "h02_state": "BLOCKED_DATA",
+  "h07_h01_park": {
+    "decision": "RC001_H07_H01_PARKED_FROM_PRIORITY_SCIENCE_RETAINED",
+    "path": "docs/evidence/task30/a27_h07_h01_liquidity_retention_park_acceptance_v1.json",
+    "priority_disposition": "PARKED_FROM_PRIORITY",
+    "science_disposition": "RETAINED",
+    "sha256": "b85ee3ff0a7553014977613c624f2295fee3082f7f6c9f5ddf4fa3d6fb64aa42"
+  },
+  "h07_h01_park_decision": "RC001_H07_H01_PARKED_FROM_PRIORITY_SCIENCE_RETAINED",
+  "h13_blocker_codes": [
+    "ENTITY_ROUTE_NOT_ADMISSIBLE",
+    "CONTINUOUS_PIT_PRICE_HISTORY_UNAVAILABLE",
+    "SETTLED_EXECUTION_TRUTH_UNAVAILABLE"
+  ],
+  "h13_state": "BLOCKED_DATA",
+  "hypothesis_verdict": "NOT_REFUTED_NOT_SUPPORTED",
+  "next_family_selection": "NONE_THIS_ATOM",
+  "non_claims": [
+    "NO_RC001_FREEZE_MUTATION",
+    "NO_H13_OR_H02_TRIAL",
+    "NO_ENTITY_ROUTE_REDESIGN_OR_CAPTURE",
+    "NO_CONTINUOUS_PIT_OR_EXECUTION_CAPTURE",
+    "NO_H07_H01_UNPARK",
+    "NO_HYPOTHESIS_NEGATIVE_OR_POSITIVE_INFERENCE",
+    "NO_ALPHA_NETRETURN_OR_CASHFLOW",
+    "NO_CANONICAL_DONE"
+  ],
+  "owner_decision": "PARK_H13_FROM_PRIORITY",
+  "priority_disposition": "PARKED_FROM_PRIORITY",
+  "project_sources_disposition": {
+    "kind": "NO_CHANGE"
+  },
+  "return_prerequisites": {
+    "definition_sha256": "f1f020f4fa79acd2f2de667d71b8002d5821f45e9070a0f259c63210b23a16d0",
+    "group_id": "RC001-H13-COMPOSITE-VETO",
+    "required_authority": "NEW_EXACT_CONTRACT_WITH_EXPLICIT_OWNER_DECISION",
+    "unresolved_blocker_codes": [
+      "ENTITY_ROUTE_NOT_ADMISSIBLE",
+      "CONTINUOUS_PIT_PRICE_HISTORY_UNAVAILABLE",
+      "SETTLED_EXECUTION_TRUTH_UNAVAILABLE"
+    ]
+  },
+  "return_trigger": "NEW_EXACT_CONTRACT_WITH_EXPLICIT_OWNER_DECISION_AND_SEPARATE_ADMISSIBLE_ENTITY_PIT_AND_SETTLED_EXECUTION_EVIDENCE",
+  "schema": "smial.rc001.h13-park-from-priority.acceptance",
+  "schema_version": "1.0",
+  "science_disposition": "RETAINED",
+  "side_effects": {
+    "cash_spend_usd_cents": 0,
+    "credential_reads": 0,
+    "execution_attempts": 0,
+    "network_requests": 0,
+    "provider_requests": 0,
+    "wallet_signer_transaction_actions": 0
+  },
+  "task24_stop": {
+    "entity_route_status": "NOT_ADMISSIBLE",
+    "owner_decision": "STOP_NO_RELIABLE_ENTITY_SIGNAL",
+    "path": "docs/evidence/task24/a6_bounded_data_redesign_or_stop_decision_v1.json",
+    "sha256": "442350624eef0625da3415692c48d2544c4d46c8edd21c5b7051098f7501d455"
+  },
+  "task28_freeze": {
+    "acceptance_path": "docs/evidence/task28/a1_rc001_registry_freeze_acceptance_v1.json",
+    "acceptance_sha256": "4292df639605f3a6e10c6c02c1b5d1fc63ca3883269d904db323bc42916594f4",
+    "freeze_path": "configs/task28_rc001_registry_freeze_v1.yaml",
+    "freeze_sha256": "c4fbb7157a13d1dee0f2b1f163e8f8fc1a38da4bc850275fba25bc0d70a785a7",
+    "h02_blocker_codes": [
+      "CONTINUOUS_PIT_PRICE_HISTORY_UNAVAILABLE",
+      "SETTLED_EXECUTION_TRUTH_UNAVAILABLE"
+    ],
+    "h02_definition_sha256": "fc225417541570aa73814a4cb992f6f801a84bea1baf15696d754c706e0aa9f8",
+    "h02_order": 3,
+    "h02_state": "BLOCKED_DATA",
+    "h13_blocker_codes": [
+      "ENTITY_ROUTE_NOT_ADMISSIBLE",
+      "CONTINUOUS_PIT_PRICE_HISTORY_UNAVAILABLE",
+      "SETTLED_EXECUTION_TRUTH_UNAVAILABLE"
+    ],
+    "h13_definition_sha256": "f1f020f4fa79acd2f2de667d71b8002d5821f45e9070a0f259c63210b23a16d0",
+    "h13_order": 1,
+    "h13_state": "BLOCKED_DATA",
+    "holdout_consumed": false,
+    "trial_record_count_created_by_task28": 0
+  },
+  "task_id": "RC001-H13-PARK-FROM-PRIORITY-OFFLINE-V1",
+  "terminal": "H13_PARKED_FROM_PRIORITY_SCIENCE_RETAINED",
+  "trial_ledger": {
+    "as_of": "2026-08-15",
+    "path": "registries/global_trial_ledger.yaml",
+    "rc001_trial_record_ids": [],
+    "sha256": "e3b2415f0efbf8fdeedebad17fee0b105dda835a66cd24759863c5c8f0bc5e73"
+  }
+}

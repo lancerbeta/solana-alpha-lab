@@ -189,12 +189,12 @@ records:
   evidence: []
   classification: *id004
 - asset_id: REGISTRY-DECISIONS-NEGATIVE-RESULTS-001
-  record_version: '1.13'
+  record_version: '1.15'
   asset_type: lifecycle_registry
   purpose: Active registry for decisions and durable negative research results.
   status: VALIDATED_ACTIVE
   origin: REPOSITORY
-  as_of: '2026-08-17'
+  as_of: '2026-08-18'
   truth_owner: TASK-03
   location:
     kind: git_path
@@ -202,19 +202,19 @@ records:
     repository_path: registries/decisions_negative_results.yaml
   integrity:
     kind: sha256
-    sha256: a89a5166e66a8ec25c477d4253c8bc071dd59242b4eb526d6ce50051331e5e67
+    sha256: 05b781fed0d5d2f2a6d337dc3ce748268599abf26ac8333b7a72d373977c5b34
   access: *id001
   relations: *id002
   consumers: *id003
   evidence: []
   classification: *id004
 - asset_id: GENERATED-PROJECT-MAP-001
-  record_version: '2.0'
+  record_version: '2.6'
   asset_type: generated_view
   purpose: Deterministic human-readable navigation projected only from the Catalog.
   status: IMPLEMENTED_UNVERIFIED
   origin: REPOSITORY
-  as_of: '2026-08-17'
+  as_of: '2026-08-18'
   truth_owner: TASK-04
   location:
     kind: git_path
@@ -222,7 +222,7 @@ records:
     repository_path: docs/PROJECT_MAP.md
   integrity:
     kind: sha256
-    sha256: 81848639627d5a8c2761d4ddb23a55888a20ed4582b2737ccd4ab8ea0503a52c
+    sha256: 0f4f29d1fe79e6ed373d1e64b057db85ff6405f98c2634e251e36e55532644fa
   access:
     mode: read_only
     method: file
@@ -269,12 +269,12 @@ records:
   evidence: []
   classification: *id004
 - asset_id: GENERATED-EDGE-PROJECTION-001
-  record_version: '1.82'
+  record_version: '1.87'
   asset_type: generated_view
   purpose: Deterministic machine-readable projection of Catalog asset relations.
   status: IMPLEMENTED_UNVERIFIED
   origin: REPOSITORY
-  as_of: '2026-08-17'
+  as_of: '2026-08-18'
   truth_owner: TASK-04
   location:
     kind: git_path
@@ -282,7 +282,7 @@ records:
     repository_path: catalog/generated/asset_edges.json
   integrity:
     kind: sha256
-    sha256: b544b895b7d0532771fcd6d0eafcbc79d0fd58dd468c331db229c4cf8190a520
+    sha256: ac19246ab7f87ddc1017049687e53024ec290b9910c9d5f7ff907ac4e0bd49a8
   access:
     mode: read_only
     method: file

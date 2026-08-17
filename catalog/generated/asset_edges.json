@@ -1893,6 +1893,36 @@
       "target_asset_id": "CI-VALIDATOR-001"
     },
     {
+      "source_asset_id": "CTRL-RC001-H13-PARK-FROM-PRIORITY-001",
+      "relation": "contains",
+      "target_asset_id": "MODULE-RC001-H13-PARK-FROM-PRIORITY-001"
+    },
+    {
+      "source_asset_id": "CTRL-RC001-H13-PARK-FROM-PRIORITY-001",
+      "relation": "contains",
+      "target_asset_id": "SCRIPT-RC001-H13-PARK-FROM-PRIORITY-001"
+    },
+    {
+      "source_asset_id": "CTRL-RC001-H13-PARK-FROM-PRIORITY-001",
+      "relation": "depends_on",
+      "target_asset_id": "CONFIG-T28-RC001-REGISTRY-FREEZE-001"
+    },
+    {
+      "source_asset_id": "CTRL-RC001-H13-PARK-FROM-PRIORITY-001",
+      "relation": "depends_on",
+      "target_asset_id": "EVIDENCE-T24-A6-STOP-DECISION-001"
+    },
+    {
+      "source_asset_id": "CTRL-RC001-H13-PARK-FROM-PRIORITY-001",
+      "relation": "depends_on",
+      "target_asset_id": "EVIDENCE-T28-A1-RC001-REGISTRY-FREEZE-001"
+    },
+    {
+      "source_asset_id": "CTRL-RC001-H13-PARK-FROM-PRIORITY-001",
+      "relation": "depends_on",
+      "target_asset_id": "EVIDENCE-T30-A27-H07-H01-LIQUIDITY-RETENTION-PARK-001"
+    },
+    {
       "source_asset_id": "CTRL-RC002-H11-PARK-FROM-PRIORITY-001",
       "relation": "contains",
       "target_asset_id": "MODULE-RC002-H11-PARK-FROM-PRIORITY-001"
@@ -2866,6 +2896,41 @@
       "source_asset_id": "EVIDENCE-PMF-QUOTE-SLICE-ONE-SHOT-ACCEPTANCE-001",
       "relation": "derived_from",
       "target_asset_id": "EVIDENCE-PMF-QUOTE-SLICE-ONE-SHOT-001"
+    },
+    {
+      "source_asset_id": "EVIDENCE-RC001-H13-PARK-FROM-PRIORITY-001",
+      "relation": "depends_on",
+      "target_asset_id": "CONFIG-T28-RC001-REGISTRY-FREEZE-001"
+    },
+    {
+      "source_asset_id": "EVIDENCE-RC001-H13-PARK-FROM-PRIORITY-001",
+      "relation": "depends_on",
+      "target_asset_id": "EVIDENCE-T24-A6-STOP-DECISION-001"
+    },
+    {
+      "source_asset_id": "EVIDENCE-RC001-H13-PARK-FROM-PRIORITY-001",
+      "relation": "depends_on",
+      "target_asset_id": "EVIDENCE-T28-A1-RC001-REGISTRY-FREEZE-001"
+    },
+    {
+      "source_asset_id": "EVIDENCE-RC001-H13-PARK-FROM-PRIORITY-001",
+      "relation": "depends_on",
+      "target_asset_id": "EVIDENCE-T30-A27-H07-H01-LIQUIDITY-RETENTION-PARK-001"
+    },
+    {
+      "source_asset_id": "EVIDENCE-RC001-H13-PARK-FROM-PRIORITY-001",
+      "relation": "depends_on",
+      "target_asset_id": "REGISTRY-GLOBAL-TRIAL-LEDGER-001"
+    },
+    {
+      "source_asset_id": "EVIDENCE-RC001-H13-PARK-FROM-PRIORITY-001",
+      "relation": "derived_from",
+      "target_asset_id": "CTRL-RC001-H13-PARK-FROM-PRIORITY-001"
+    },
+    {
+      "source_asset_id": "EVIDENCE-RC001-H13-PARK-FROM-PRIORITY-001",
+      "relation": "validated_by",
+      "target_asset_id": "TEST-RC001-H13-PARK-FROM-PRIORITY-001"
     },
     {
       "source_asset_id": "EVIDENCE-RC002-H11-PARK-FROM-PRIORITY-001",
@@ -6253,6 +6318,16 @@
       "target_asset_id": "SCHEMA-PROVIDER-ROUTE-CAPABILITY-REGISTRY-007"
     },
     {
+      "source_asset_id": "MODULE-RC001-H13-PARK-FROM-PRIORITY-001",
+      "relation": "governed_by",
+      "target_asset_id": "CTRL-RC001-H13-PARK-FROM-PRIORITY-001"
+    },
+    {
+      "source_asset_id": "MODULE-RC001-H13-PARK-FROM-PRIORITY-001",
+      "relation": "validated_by",
+      "target_asset_id": "TEST-RC001-H13-PARK-FROM-PRIORITY-001"
+    },
+    {
       "source_asset_id": "MODULE-RC002-H11-PARK-FROM-PRIORITY-001",
       "relation": "governed_by",
       "target_asset_id": "CTRL-RC002-H11-PARK-FROM-PRIORITY-001"
@@ -7778,6 +7853,11 @@
       "target_asset_id": "EVIDENCE-PMF-QUOTE-SLICE-ONE-SHOT-ACCEPTANCE-001"
     },
     {
+      "source_asset_id": "REPORT-RC001-H13-PARK-FROM-PRIORITY-001",
+      "relation": "derived_from",
+      "target_asset_id": "EVIDENCE-RC001-H13-PARK-FROM-PRIORITY-001"
+    },
+    {
       "source_asset_id": "REPORT-RC002-H11-PARK-FROM-PRIORITY-001",
       "relation": "derived_from",
       "target_asset_id": "EVIDENCE-RC002-H11-PARK-FROM-PRIORITY-001"
@@ -8561,6 +8641,11 @@
       "source_asset_id": "SCRIPT-PMF-QUOTE-SLICE-ONE-SHOT-001",
       "relation": "depends_on",
       "target_asset_id": "MODULE-PMF-QUOTE-SLICE-ONE-SHOT-001"
+    },
+    {
+      "source_asset_id": "SCRIPT-RC001-H13-PARK-FROM-PRIORITY-001",
+      "relation": "depends_on",
+      "target_asset_id": "MODULE-RC001-H13-PARK-FROM-PRIORITY-001"
     },
     {
       "source_asset_id": "SCRIPT-RC002-H11-PARK-FROM-PRIORITY-001",
@@ -9416,6 +9501,16 @@
       "source_asset_id": "TEST-PROVIDER-ROUTE-CAPABILITY-REGISTRY-007",
       "relation": "depends_on",
       "target_asset_id": "MODULE-PROVIDER-ROUTE-CAPABILITY-REGISTRY-007"
+    },
+    {
+      "source_asset_id": "TEST-RC001-H13-PARK-FROM-PRIORITY-001",
+      "relation": "depends_on",
+      "target_asset_id": "EVIDENCE-RC001-H13-PARK-FROM-PRIORITY-001"
+    },
+    {
+      "source_asset_id": "TEST-RC001-H13-PARK-FROM-PRIORITY-001",
+      "relation": "depends_on",
+      "target_asset_id": "MODULE-RC001-H13-PARK-FROM-PRIORITY-001"
     },
     {
       "source_asset_id": "TEST-RC002-H11-PARK-FROM-PRIORITY-001",
