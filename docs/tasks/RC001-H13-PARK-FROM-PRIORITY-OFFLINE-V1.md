@@ -72,6 +72,10 @@ context_requirements:
       - docs/evidence/task24/a6_bounded_data_redesign_or_stop_decision_v1.json
       - docs/evidence/task28/a1_rc001_registry_freeze_acceptance_v1.json
       - docs/evidence/task30/a27_h07_h01_liquidity_retention_park_acceptance_v1.json
+      - docs/evidence/rc001_h13_park_from_priority/a1_h13_park_from_priority_acceptance_v1.json
+      - docs/evidence/rc001_h13_park_from_priority/a1_delivery_completion_evidence_v1.json
+      - docs/evidence/rc001_h13_park_from_priority/a1_delivery_independent_review_v1.json
+      - docs/evidence/rc001_h13_park_from_priority/a1_delivery_factory_fit_v1.json
     HISTORICAL_CONTEXT: []
 ---
 
