@@ -1,0 +1,67 @@
+{
+  "as_of": "2026-08-17",
+  "non_claims": [
+    "NO_CRYPTOGRAPHIC_REVIEWER_IDENTITY",
+    "REVIEW_IS_NOT_SEMANTIC_DONE",
+    "NO_LIVE_PIT_OR_EXECUTION_CLAIM",
+    "NO_ALPHA_PNL_OR_NETRETURN",
+    "NO_CANONICAL_DONE",
+    "NO_SINGLE_AGENT_REVIEW_FALLBACK"
+  ],
+  "required_roles": [
+    "CODE_REVIEWER",
+    "GOAL_DOD_CRITIC",
+    "ARCHITECTURE_CRITIC"
+  ],
+  "review_id": "PMF-QUOTE-OWNER-FORK-INDEPENDENT-REVIEW-001",
+  "reviewed_bindings_sha256": "7f21e800ca37d403936ce714f06200fbf09cce5dbfea292578554f1b1c470c82",
+  "reviewed_inventory_sha256": "32b175805ad978cc8102489bdb76677c8cbe169e992524a6628d654fbc4be967",
+  "reviews": [
+    {
+      "findings": [
+        "CHECKED_WRITE_SET",
+        "CHECKED_FROZEN_OVERLAY_ONLY",
+        "CHECKED_IDENTITY",
+        "CHECKED_LAYERS_FAIL_CLOSED",
+        "CHECKED_PHRASES_NO_EXECUTE_FALSE_POSITIVE",
+        "CHECKED_CATALOG_AND_SECRETS",
+        "CHECKED_NO_NETWORK_CREDENTIAL_OR_EXECUTE",
+        "CHECKED_COMPLETION_EVIDENCE_BOUND_IN_CONTEXT"
+      ],
+      "role": "CODE_REVIEWER",
+      "verdict": "PASS"
+    },
+    {
+      "findings": [
+        "CHECKED_OVERLAY_BOUND",
+        "CHECKED_MISSING_FACTS",
+        "CHECKED_RUSSIAN_READOUT",
+        "CHECKED_UNPAID_PHRASES",
+        "CHECKED_NO_EXECUTE_PHRASE",
+        "CHECKED_ZERO_PROVIDER_NON_GOALS",
+        "CHECKED_FALSIFIABLE_USEFUL",
+        "CHECKED_TERMINAL_NOT_DONE"
+      ],
+      "role": "GOAL_DOD_CRITIC",
+      "verdict": "PASS"
+    },
+    {
+      "findings": [
+        "CHECKED_WRAP_A26_AND_TASK26_NOT_SYNTHETIC_ENGINE",
+        "CHECKED_QUOTE_IS_NOT_PIT_OR_PUMPSWAP_POOL_FILL",
+        "CHECKED_NO_DUCKDB_TRUTH_RECOVERY_IS_REVERT_OF_THIS_ATOM",
+        "CHECKED_BLAST_RADIUS_CATALOG_APPEND_LIFECYCLE_GENERATED_HASHES",
+        "CHECKED_RESIDUAL_QUOTE_AMOUNT_CAN_BE_MISREAD_AS_FILLABLE",
+        "CHECKED_INVENTORY_ABSENCE_NOT_TYPED_AS_FLAT_OR_FILLABLE",
+        "CHECKED_EXECUTE_PHRASE_INELIGIBLE_IN_PACKET",
+        "CHECKED_V6_V7_RC001_H11_TRIAL_LEDGER_OUTSIDE_WRITE_SET"
+      ],
+      "role": "ARCHITECTURE_CRITIC",
+      "verdict": "PASS"
+    }
+  ],
+  "schema": "smial.delivery-independent-review-evidence",
+  "schema_version": "1.0",
+  "task_id": "PMF-QUOTE-OWNER-FORK-V1",
+  "verdict": "PASS"
+}
