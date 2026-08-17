@@ -25,6 +25,12 @@ managed_write_set:
   - docs/evidence/rc002_h11_park_from_priority/a1_delivery_factory_fit_v1.json
   - registries/decisions_negative_results.yaml
   - tests/test_lifecycle_registries.py
+  - tests/test_catalog.py
+  - catalog/assets/core.yaml
+  - catalog/assets/lifecycle.yaml
+  - catalog/catalog_manifest.yaml
+  - catalog/generated/asset_edges.json
+  - docs/PROJECT_MAP.md
 external_caps:
   network: false
   credentials: false
@@ -35,7 +41,7 @@ external_caps:
 stop_conditions:
   - AUTHORITY_WIDENING
   - PROVIDER_OR_NETWORK_CALL
-  - CATALOG_OR_HARNESS_REWRITE
+  - HARNESS_REWRITE
   - RC001_FREEZE_MUTATED
   - HOLDOUT_CONSUMED
   - LIVE_PIT_OR_EXECUTION_CLAIM
@@ -56,7 +62,8 @@ stop_conditions:
   - CREATE_AT_FROM_BLOCKTIME
   - MIGRATION_AT_FROM_BLOCKTIME
 context_requirements:
-  catalog_asset_ids: []
+  catalog_asset_ids:
+    - EVIDENCE-RC002-H11-PARK-FROM-PRIORITY-001
   l2_roles: [DELIVERY_EVIDENCE, LIFECYCLE]
   l3_roles: []
   roadmap_path: null

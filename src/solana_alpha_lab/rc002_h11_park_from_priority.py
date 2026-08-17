@@ -93,6 +93,7 @@ def decide_park_terminal(result: Mapping[str, Any]) -> str:
         or result.get("task36_n") != 0
         or result.get("task37_capture_terminal") != TASK37_TERMINAL
         or result.get("effect_screen_eligible") is not False
+        or result.get("migration_at_status") != "BOUND_FROM_EVENT_TIMESTAMP"
         or result.get("cohort_acceptance_sha256") != EXPECTED_COHORT_ACCEPTANCE_SHA256
         or result.get("return_trigger") != RETURN_TRIGGER
         or list(result.get("forbidden_follow_ons") or []) != list(FORBIDDEN_FOLLOW_ONS)
@@ -132,6 +133,7 @@ def bind_h11_park_from_priority(repo_root: Path) -> dict[str, Any]:
         "effect_screen_eligible": cohort["effect_screen_eligible"],
         "create_at_status": cohort["create_at_status"],
         "migration_at": cohort["migration_at"],
+        "migration_at_status": cohort["migration_at_status"],
         "reconstructed_units": cohort["reconstructed_units"],
         "required_units": cohort["required_units"],
         "priority_disposition": "PARKED_FROM_PRIORITY",
@@ -153,6 +155,7 @@ def bind_h11_park_from_priority(repo_root: Path) -> dict[str, Any]:
     result["terminal"] = decide_park_terminal(result)
     if result["terminal"] != "H11_PARKED_FROM_PRIORITY_SCIENCE_RETAINED":
         result["migration_at"] = None
+        result["migration_at_status"] = None
         result["create_at_status"] = None
         result["reconstructed_units"] = None
         result["required_units"] = None
@@ -220,7 +223,8 @@ def format_owner_readout(result: Mapping[str, Any]) -> str:
         f"- cohort after TASK-40 close: `{result.get('cohort_terminal')}`\n"
         f"- mint: `{result.get('named_mint')}`\n"
         f"- bonding_curve: `{result.get('bonding_curve')}`\n"
-        f"- migration_at bound: `{result.get('migration_at')}`\n"
+        f"- migration_at bound: `{result.get('migration_at')}` "
+        f"(`{result.get('migration_at_status')}`)\n"
         "- TASK-39/40 science receipts и pinned decoder не менялись\n"
         "- trial ledger не менялся\n"
         "\n"

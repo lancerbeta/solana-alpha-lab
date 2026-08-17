@@ -32,7 +32,7 @@
 - cohort after TASK-40 close: `H11_COHORT_NOT_READY_SCREEN_FORBIDDEN`
 - mint: `DMwbVy48dWVKGe9z1pcVnwF3HLMLrqWdDLfbvx8RchhK`
 - bonding_curve: `ENz3D4ZoarzHZCsGeFTfswAKrSo5sHX9UUut1FLS6WgC`
-- migration_at bound: `1756321522`
+- migration_at bound: `1756321522` (`BOUND_FROM_EVENT_TIMESTAMP`)
 - TASK-39/40 science receipts и pinned decoder не менялись
 - trial ledger не менялся
 

@@ -1768,6 +1768,21 @@
       "target_asset_id": "CI-VALIDATOR-001"
     },
     {
+      "source_asset_id": "CTRL-RC002-H11-PARK-FROM-PRIORITY-001",
+      "relation": "contains",
+      "target_asset_id": "MODULE-RC002-H11-PARK-FROM-PRIORITY-001"
+    },
+    {
+      "source_asset_id": "CTRL-RC002-H11-PARK-FROM-PRIORITY-001",
+      "relation": "contains",
+      "target_asset_id": "SCRIPT-RC002-H11-PARK-FROM-PRIORITY-001"
+    },
+    {
+      "source_asset_id": "CTRL-RC002-H11-PARK-FROM-PRIORITY-001",
+      "relation": "depends_on",
+      "target_asset_id": "EVIDENCE-T36-RC002-H11-LIFECYCLE-CLOCK-001"
+    },
+    {
       "source_asset_id": "CTRL-README-001",
       "relation": "governed_by",
       "target_asset_id": "CTRL-DELIVERY-HARNESS-001"
@@ -2626,6 +2641,21 @@
       "source_asset_id": "EVIDENCE-OWNER-AUTHORITY-PACKET-A2-001",
       "relation": "validated_by",
       "target_asset_id": "TEST-OWNER-AUTHORITY-PACKET-A2-001"
+    },
+    {
+      "source_asset_id": "EVIDENCE-RC002-H11-PARK-FROM-PRIORITY-001",
+      "relation": "depends_on",
+      "target_asset_id": "EVIDENCE-T36-RC002-H11-LIFECYCLE-CLOCK-001"
+    },
+    {
+      "source_asset_id": "EVIDENCE-RC002-H11-PARK-FROM-PRIORITY-001",
+      "relation": "derived_from",
+      "target_asset_id": "CTRL-RC002-H11-PARK-FROM-PRIORITY-001"
+    },
+    {
+      "source_asset_id": "EVIDENCE-RC002-H11-PARK-FROM-PRIORITY-001",
+      "relation": "validated_by",
+      "target_asset_id": "TEST-RC002-H11-PARK-FROM-PRIORITY-001"
     },
     {
       "source_asset_id": "EVIDENCE-T04-A4R-SBOM-001",
@@ -5958,6 +5988,16 @@
       "target_asset_id": "CONFIG-PROVIDER-ROUTE-CAPABILITY-REGISTRY-006"
     },
     {
+      "source_asset_id": "MODULE-RC002-H11-PARK-FROM-PRIORITY-001",
+      "relation": "governed_by",
+      "target_asset_id": "CTRL-RC002-H11-PARK-FROM-PRIORITY-001"
+    },
+    {
+      "source_asset_id": "MODULE-RC002-H11-PARK-FROM-PRIORITY-001",
+      "relation": "validated_by",
+      "target_asset_id": "TEST-RC002-H11-PARK-FROM-PRIORITY-001"
+    },
+    {
       "source_asset_id": "MODULE-T06-STORAGE-API-001",
       "relation": "contains",
       "target_asset_id": "SCRIPT-T06-MANIFESTS-001"
@@ -7448,6 +7488,11 @@
       "target_asset_id": "CATALOG-SCHEMA-LIFECYCLE-001"
     },
     {
+      "source_asset_id": "REPORT-RC002-H11-PARK-FROM-PRIORITY-001",
+      "relation": "derived_from",
+      "target_asset_id": "EVIDENCE-RC002-H11-PARK-FROM-PRIORITY-001"
+    },
+    {
       "source_asset_id": "REPORT-T23-COHORT-DIAGNOSTICS-001",
       "relation": "derived_from",
       "target_asset_id": "EVIDENCE-T23-A4-BOUNDED-ANALYSIS-001"
@@ -8196,6 +8241,11 @@
       "source_asset_id": "SCRIPT-OWNER-ATTENTION-GATE-001",
       "relation": "governed_by",
       "target_asset_id": "POLICY-OWNER-ATTENTION-GATE-002"
+    },
+    {
+      "source_asset_id": "SCRIPT-RC002-H11-PARK-FROM-PRIORITY-001",
+      "relation": "depends_on",
+      "target_asset_id": "MODULE-RC002-H11-PARK-FROM-PRIORITY-001"
     },
     {
       "source_asset_id": "SCRIPT-T05-MIGRATION-LEDGER-001",
@@ -8986,6 +9036,16 @@
       "source_asset_id": "TEST-PROVIDER-ROUTE-CAPABILITY-REGISTRY-006",
       "relation": "depends_on",
       "target_asset_id": "SCHEMA-PROVIDER-ROUTE-CAPABILITY-REGISTRY-006"
+    },
+    {
+      "source_asset_id": "TEST-RC002-H11-PARK-FROM-PRIORITY-001",
+      "relation": "depends_on",
+      "target_asset_id": "EVIDENCE-RC002-H11-PARK-FROM-PRIORITY-001"
+    },
+    {
+      "source_asset_id": "TEST-RC002-H11-PARK-FROM-PRIORITY-001",
+      "relation": "depends_on",
+      "target_asset_id": "MODULE-RC002-H11-PARK-FROM-PRIORITY-001"
     },
     {
       "source_asset_id": "TEST-T04-CORE-STACK-001",

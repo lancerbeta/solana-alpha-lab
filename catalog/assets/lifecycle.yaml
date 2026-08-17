@@ -189,12 +189,12 @@ records:
   evidence: []
   classification: *id004
 - asset_id: REGISTRY-DECISIONS-NEGATIVE-RESULTS-001
-  record_version: '1.12'
+  record_version: '1.13'
   asset_type: lifecycle_registry
   purpose: Active registry for decisions and durable negative research results.
   status: VALIDATED_ACTIVE
   origin: REPOSITORY
-  as_of: '2026-08-15'
+  as_of: '2026-08-17'
   truth_owner: TASK-03
   location:
     kind: git_path
@@ -202,7 +202,7 @@ records:
     repository_path: registries/decisions_negative_results.yaml
   integrity:
     kind: sha256
-    sha256: 9d98f898fad8449b7c51bb074c732b5a3a601beb3f6e4dad9b64856579d06afb
+    sha256: a89a5166e66a8ec25c477d4253c8bc071dd59242b4eb526d6ce50051331e5e67
   access: *id001
   relations: *id002
   consumers: *id003
@@ -214,7 +214,7 @@ records:
   purpose: Deterministic human-readable navigation projected only from the Catalog.
   status: IMPLEMENTED_UNVERIFIED
   origin: REPOSITORY
-  as_of: '2026-08-16'
+  as_of: '2026-08-17'
   truth_owner: TASK-04
   location:
     kind: git_path
@@ -222,7 +222,7 @@ records:
     repository_path: docs/PROJECT_MAP.md
   integrity:
     kind: sha256
-    sha256: 9138be37dffc2f12d309245f9b9cda4bf70ade928ae18c27b23196a7e559cd18
+    sha256: d385fafa19551bdea7d131bf8870f32f6de8785bbf40f50b31f62088704cdded
   access:
     mode: read_only
     method: file
@@ -269,12 +269,12 @@ records:
   evidence: []
   classification: *id004
 - asset_id: GENERATED-EDGE-PROJECTION-001
-  record_version: '1.81'
+  record_version: '1.82'
   asset_type: generated_view
   purpose: Deterministic machine-readable projection of Catalog asset relations.
   status: IMPLEMENTED_UNVERIFIED
   origin: REPOSITORY
-  as_of: '2026-08-16'
+  as_of: '2026-08-17'
   truth_owner: TASK-04
   location:
     kind: git_path
@@ -282,7 +282,7 @@ records:
     repository_path: catalog/generated/asset_edges.json
   integrity:
     kind: sha256
-    sha256: ad92fd8d1a1c73567811920928a068c85d2b17db7dd95dbfd7ffd0c4ccea2ae8
+    sha256: 05a4d21db526cdc956a30ab88c786cdca51605f646cf9c2dcb9d96e0b5ed244e
   access:
     mode: read_only
     method: file

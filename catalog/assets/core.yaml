@@ -23177,3 +23177,115 @@ records:
   evidence: []
   search_terms: [H11, FACTORY_FIT, FULL_REVIEW, BONDING_CURVE_PDA]
   classification: {contains_secrets: false, contains_raw_data: false, sensitivity: INTERNAL_NON_SECRET}
+
+- asset_id: EVIDENCE-RC002-H11-PARK-FROM-PRIORITY-001
+  record_version: '1.0'
+  asset_type: evidence
+  purpose: Acceptance that RC002-H11 is parked from priority; science retained; not a screen verdict.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-08-17'
+  truth_owner: RC002-H11-PARK-FROM-PRIORITY-OFFLINE-V1
+  location: {kind: git_path, logical_uri: 'repo://docs/evidence/rc002_h11_park_from_priority/a1_h11_park_from_priority_acceptance_v1.json', repository_path: docs/evidence/rc002_h11_park_from_priority/a1_h11_park_from_priority_acceptance_v1.json}
+  integrity: {kind: sha256, sha256: de2fe1c1abf8bbe2f27b46ee8c23c6b1e1496d5355591a7274df2582ab4332e5}
+  access: {mode: read_only, method: file, network_required: false, secrets_required: false}
+  relations:
+  - {relation_type: derived_from, target_asset_id: CTRL-RC002-H11-PARK-FROM-PRIORITY-001}
+  - {relation_type: depends_on, target_asset_id: EVIDENCE-T36-RC002-H11-LIFECYCLE-CLOCK-001}
+  - {relation_type: validated_by, target_asset_id: TEST-RC002-H11-PARK-FROM-PRIORITY-001}
+  consumers: [RC002-H11-LIFECYCLE-CLOCK, FACTORY-001, GOAL-OWNER]
+  evidence: []
+  search_terms: [H11, PARKED_FROM_PRIORITY, NOT_REFUTED_NOT_SUPPORTED]
+  classification: {contains_secrets: false, contains_raw_data: false, sensitivity: INTERNAL_NON_SECRET}
+
+- asset_id: REPORT-RC002-H11-PARK-FROM-PRIORITY-001
+  record_version: '1.0'
+  asset_type: control_document
+  purpose: Russian owner readout naming why H11 is parked, when to return, and forbidden follow-ons.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-08-17'
+  truth_owner: RC002-H11-PARK-FROM-PRIORITY-OFFLINE-V1
+  location: {kind: git_path, logical_uri: 'repo://docs/reports/rc002_h11_park_from_priority/a1_owner_readout_v1.md', repository_path: docs/reports/rc002_h11_park_from_priority/a1_owner_readout_v1.md}
+  integrity: {kind: sha256, sha256: 8c875de774f145b4a3f9cd4eda53ec3759e0e4708d51ff7186e9ca9f7c66c15b}
+  access: {mode: read_only, method: file, network_required: false, secrets_required: false}
+  relations: [{relation_type: derived_from, target_asset_id: EVIDENCE-RC002-H11-PARK-FROM-PRIORITY-001}]
+  consumers: [RC002-H11-LIFECYCLE-CLOCK, FACTORY-001, GOAL-OWNER]
+  evidence: []
+  search_terms: [H11, PARK, OWNER_READOUT, RETURN_TRIGGER]
+  classification: {contains_secrets: false, contains_raw_data: false, sensitivity: INTERNAL_NON_SECRET}
+
+- asset_id: CTRL-RC002-H11-PARK-FROM-PRIORITY-001
+  record_version: '1.0'
+  asset_type: control_document
+  purpose: Harness-valid park contract binding H11 park-from-priority authority, write set and DoD.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-08-17'
+  truth_owner: RC002-H11-PARK-FROM-PRIORITY-OFFLINE-V1
+  location: {kind: git_path, logical_uri: 'repo://docs/tasks/RC002-H11-PARK-FROM-PRIORITY-OFFLINE-V1.md', repository_path: docs/tasks/RC002-H11-PARK-FROM-PRIORITY-OFFLINE-V1.md}
+  integrity: {kind: sha256, sha256: bc45f6c97fce79705b0f2cd09dc14b4944b6b1258e1618cffce421df59e7f373}
+  access: {mode: read_only, method: file, network_required: false, secrets_required: false}
+  relations:
+  - {relation_type: contains, target_asset_id: MODULE-RC002-H11-PARK-FROM-PRIORITY-001}
+  - {relation_type: contains, target_asset_id: SCRIPT-RC002-H11-PARK-FROM-PRIORITY-001}
+  - {relation_type: depends_on, target_asset_id: EVIDENCE-T36-RC002-H11-LIFECYCLE-CLOCK-001}
+  consumers: [FACTORY-001, GOAL-OWNER]
+  evidence: []
+  search_terms: [H11, TASK_CONTRACT, PARK_FROM_PRIORITY]
+  classification: {contains_secrets: false, contains_raw_data: false, sensitivity: INTERNAL_NON_SECRET}
+
+- asset_id: MODULE-RC002-H11-PARK-FROM-PRIORITY-001
+  record_version: '1.0'
+  asset_type: script
+  purpose: Fail-closed wrap of the public cohort binder that parks H11 without deleting science.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-08-17'
+  truth_owner: RC002-H11-PARK-FROM-PRIORITY-OFFLINE-V1
+  location: {kind: git_path, logical_uri: 'repo://src/solana_alpha_lab/rc002_h11_park_from_priority.py', repository_path: src/solana_alpha_lab/rc002_h11_park_from_priority.py}
+  integrity: {kind: sha256, sha256: a2fa4a7b1ddb48b25269830f85ca960480590b020ed1bfc5c686a9b9024d1db8}
+  access: {mode: read_only, method: file, network_required: false, secrets_required: false}
+  relations:
+  - {relation_type: governed_by, target_asset_id: CTRL-RC002-H11-PARK-FROM-PRIORITY-001}
+  - {relation_type: validated_by, target_asset_id: TEST-RC002-H11-PARK-FROM-PRIORITY-001}
+  consumers: [FACTORY-001]
+  evidence: []
+  search_terms: [H11, PARK, BINDER]
+  classification: {contains_secrets: false, contains_raw_data: false, sensitivity: INTERNAL_NON_SECRET}
+
+- asset_id: SCRIPT-RC002-H11-PARK-FROM-PRIORITY-001
+  record_version: '1.0'
+  asset_type: script
+  purpose: Offline runner that emits the H11 park acceptance and Russian owner readout.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-08-17'
+  truth_owner: RC002-H11-PARK-FROM-PRIORITY-OFFLINE-V1
+  location: {kind: git_path, logical_uri: 'repo://scripts/run_rc002_h11_park_from_priority.py', repository_path: scripts/run_rc002_h11_park_from_priority.py}
+  integrity: {kind: sha256, sha256: 7bc6ea750e19d572a07a28bddaec041e7fce95e581f260c907b45db56d8ace28}
+  access: {mode: read_only, method: file, network_required: false, secrets_required: false}
+  relations: [{relation_type: depends_on, target_asset_id: MODULE-RC002-H11-PARK-FROM-PRIORITY-001}]
+  consumers: [FACTORY-001]
+  evidence: []
+  search_terms: [H11, PARK, RUNNER]
+  classification: {contains_secrets: false, contains_raw_data: false, sensitivity: INTERNAL_NON_SECRET}
+
+- asset_id: TEST-RC002-H11-PARK-FROM-PRIORITY-001
+  record_version: '1.0'
+  asset_type: script
+  purpose: Targeted tests that H11 is parked from priority and science receipts stay immutable.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-08-17'
+  truth_owner: RC002-H11-PARK-FROM-PRIORITY-OFFLINE-V1
+  location: {kind: git_path, logical_uri: 'repo://tests/test_rc002_h11_park_from_priority.py', repository_path: tests/test_rc002_h11_park_from_priority.py}
+  integrity: {kind: sha256, sha256: 2f3c52928253b128fe5e1b95a1a68bc071fccfdbd4a272b89cbe8287a1fc7f28}
+  access: {mode: read_only, method: file, network_required: false, secrets_required: false}
+  relations:
+  - {relation_type: depends_on, target_asset_id: MODULE-RC002-H11-PARK-FROM-PRIORITY-001}
+  - {relation_type: depends_on, target_asset_id: EVIDENCE-RC002-H11-PARK-FROM-PRIORITY-001}
+  consumers: [FACTORY-001]
+  evidence: []
+  search_terms: [H11, PARK, TESTS]
+  classification: {contains_secrets: false, contains_raw_data: false, sensitivity: INTERNAL_NON_SECRET}

@@ -43,6 +43,7 @@
   "effect_screen_eligible": false,
   "create_at_status": "MISSING_UNKNOWN",
   "migration_at": 1756321522,
+  "migration_at_status": "BOUND_FROM_EVENT_TIMESTAMP",
   "reconstructed_units": {
     "pools": 1,
     "days": 0,

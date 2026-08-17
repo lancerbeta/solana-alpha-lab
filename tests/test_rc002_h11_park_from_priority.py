@@ -5,6 +5,8 @@ import sys
 import unittest
 from pathlib import Path
 
+import yaml
+
 ROOT = Path(__file__).resolve().parents[1]
 SRC = ROOT / "src"
 if str(SRC) not in sys.path:
@@ -23,6 +25,7 @@ from solana_alpha_lab.rc002_h11_park_from_priority import (  # noqa: E402
     RETURN_TRIGGER,
     TERMINAL_OUTCOMES,
     bind_h11_park_from_priority,
+    decide_park_terminal,
     format_owner_readout,
 )
 
@@ -73,6 +76,13 @@ class H11ParkFromPriorityTests(unittest.TestCase):
         self.assertTrue(TASK36_YAML.is_file())
         self.assertTrue(TASK37_YAML.is_file())
         self.assertTrue(TRIAL_LEDGER.is_file())
+        front_matter = text.split("---", 2)[1]
+        parsed = yaml.safe_load(front_matter)
+        self.assertEqual(parsed["task_id"], ATOM_ID)
+        self.assertEqual(
+            parsed["context_requirements"]["catalog_asset_ids"],
+            ["EVIDENCE-RC002-H11-PARK-FROM-PRIORITY-001"],
+        )
 
     def test_module_does_not_name_transaction_wall_clock_field(self) -> None:
         source = MODULE_PATH.read_text(encoding="utf-8")
@@ -104,7 +114,8 @@ class H11ParkFromPriorityTests(unittest.TestCase):
             result["task37_capture_terminal"],
             "HISTORICAL_ROUTE_WRONG_ADDRESS_OR_EVENT",
         )
-        self.assertFalse(result["effect_screen_eligible"])
+        self.assertEqual(result["migration_at"], 1756321522)
+        self.assertEqual(result["migration_at_status"], "BOUND_FROM_EVENT_TIMESTAMP")
         self.assertEqual(
             result["cohort_acceptance_sha256"], EXPECTED_COHORT_ACCEPTANCE_SHA256
         )
@@ -124,7 +135,7 @@ class H11ParkFromPriorityTests(unittest.TestCase):
         )
         self.assertEqual(acceptance["return_trigger"], RETURN_TRIGGER)
         self.assertEqual(acceptance["forbidden_follow_ons"], list(FORBIDDEN_FOLLOW_ONS))
-        self.assertFalse(acceptance["calendar_elapsed_is_return_trigger"])
+        self.assertEqual(acceptance["migration_at_status"], "BOUND_FROM_EVENT_TIMESTAMP")
         self.assertEqual(
             acceptance["cohort_acceptance"], COHORT_ACCEPTANCE_RELATIVE
         )
@@ -144,6 +155,17 @@ class H11ParkFromPriorityTests(unittest.TestCase):
         self.assertIn("H11_PARKED_FROM_PRIORITY_SCIENCE_RETAINED", text)
         self.assertIn("H11 паркуем", text)
         self.assertIn("EVIDENCE-RC002-H11-PARK-FROM-PRIORITY-001", text)
+        catalog = (ROOT / "catalog/assets/core.yaml").read_text(encoding="utf-8")
+        self.assertIn("asset_id: EVIDENCE-RC002-H11-PARK-FROM-PRIORITY-001", catalog)
+        self.assertIn("asset_id: CTRL-RC002-H11-PARK-FROM-PRIORITY-001", catalog)
+
+    def test_decide_park_terminal_names_prerequisite_drift(self) -> None:
+        result = dict(bind_h11_park_from_priority(ROOT))
+        result["owner_phrase"] = "wrong"
+        self.assertEqual(
+            decide_park_terminal(result),
+            "H11_PARK_PREREQUISITES_DRIFT",
+        )
 
 
 if __name__ == "__main__":
