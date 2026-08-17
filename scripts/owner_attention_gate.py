@@ -391,19 +391,27 @@ def candidate_identity_unchanged(
 def live_default_branch_oid(
     root: Path, *, repository: str, branch: str, runner=run_read
 ) -> str:
+    if not isinstance(repository, str) or repository.count("/") != 1:
+        raise ValueError("DEFAULT_BRANCH_READBACK_INVALID")
+    if not isinstance(branch, str) or re.fullmatch(
+        r"[A-Za-z0-9][A-Za-z0-9._/-]{0,254}", branch
+    ) is None:
+        raise ValueError("DEFAULT_BRANCH_READBACK_INVALID")
     try:
-        value = runner(
-            [
-                "gh", "api", f"repos/{repository}/git/ref/heads/{branch}",
-                "--jq", ".object.sha",
-            ],
+        remote = runner(
+            ["git", "ls-remote", "--heads", "origin", f"refs/heads/{branch}"],
             root,
         ).decode("ascii", errors="strict").strip()
     except (UnicodeDecodeError, ValueError):
         raise ValueError("DEFAULT_BRANCH_READBACK_INVALID") from None
-    if re.fullmatch(r"[0-9a-f]{40}", value) is None:
+    parts = remote.split()
+    if (
+        len(parts) != 2
+        or parts[1] != f"refs/heads/{branch}"
+        or re.fullmatch(r"[0-9a-f]{40}", parts[0]) is None
+    ):
         raise ValueError("DEFAULT_BRANCH_READBACK_INVALID")
-    return value
+    return parts[0]
 
 
 def parse_managed_write_set(plan_text: str, heading: str) -> list[str]:
@@ -1252,6 +1260,92 @@ def github_review_threads_resolved(
     )
 
 
+def github_workflow_jobs(
+    repository: str,
+    *,
+    commit_oid: str,
+    run_id: int,
+    root: Path,
+    runner=run_read,
+    invalid_code: str,
+) -> list[dict[str, Any]]:
+    if (
+        not isinstance(repository, str)
+        or repository.count("/") != 1
+        or not isinstance(commit_oid, str)
+        or re.fullmatch(r"[0-9a-f]{40}", commit_oid) is None
+        or type(run_id) is not int
+    ):
+        raise ValueError(invalid_code)
+    owner, name = repository.split("/", 1)
+    query = (
+        "query($owner:String!,$name:String!,$oid:GitObjectID!){"
+        "repository(owner:$owner,name:$name){object(oid:$oid){... on Commit{"
+        "checkSuites(first:20){pageInfo{hasNextPage}nodes{workflowRun{databaseId}"
+        "checkRuns(first:20){pageInfo{hasNextPage}nodes{name status conclusion}}}}}}}}"
+    )
+    value = decode_json_mapping(
+        runner(
+            [
+                "gh", "api", "graphql", "-f", f"query={query}",
+                "-F", f"owner={owner}", "-F", f"name={name}",
+                "-F", f"oid={commit_oid}",
+            ],
+            root,
+        ),
+        invalid_code,
+    )
+    try:
+        suites = value["data"]["repository"]["object"]["checkSuites"]
+        suite_nodes = suites["nodes"]
+        suites_next = suites["pageInfo"]["hasNextPage"]
+    except (KeyError, TypeError):
+        raise ValueError(invalid_code) from None
+    if suites_next is not False or not isinstance(suite_nodes, list):
+        raise ValueError(invalid_code)
+    selected = next(
+        (
+            item for item in suite_nodes
+            if isinstance(item, dict)
+            and isinstance(item.get("workflowRun"), dict)
+            and item["workflowRun"].get("databaseId") == run_id
+        ),
+        None,
+    )
+    if not isinstance(selected, dict):
+        raise ValueError(invalid_code)
+    try:
+        checks = selected["checkRuns"]
+        check_nodes = checks["nodes"]
+        checks_next = checks["pageInfo"]["hasNextPage"]
+    except (KeyError, TypeError):
+        raise ValueError(invalid_code) from None
+    if checks_next is not False or not isinstance(check_nodes, list):
+        raise ValueError(invalid_code)
+    jobs: list[dict[str, Any]] = []
+    for item in check_nodes:
+        if not isinstance(item, dict) or not isinstance(item.get("name"), str):
+            raise ValueError(invalid_code)
+        status = item.get("status")
+        conclusion = item.get("conclusion")
+        if not isinstance(status, str):
+            raise ValueError(invalid_code)
+        if conclusion is None:
+            mapped_conclusion = None
+        elif isinstance(conclusion, str):
+            mapped_conclusion = conclusion.lower()
+        else:
+            raise ValueError(invalid_code)
+        jobs.append(
+            {
+                "name": item["name"],
+                "status": status.lower(),
+                "conclusion": mapped_conclusion,
+            }
+        )
+    return jobs
+
+
 def build_grounded_merge_request(
     root: Path,
     *,
@@ -1329,18 +1423,23 @@ def build_grounded_merge_request(
         runner(
             [
                 "gh", "run", "view", str(run_id), "--repo", repository,
-                "--json", "headSha,status,conclusion,event,workflowName,jobs",
+                "--json", "headSha,status,conclusion,event,workflowName",
             ],
             root,
         ),
         "PR_CI_READBACK_INVALID",
     ) if type(run_id) is int else {}
-    jobs = run.get("jobs")
+    jobs = github_workflow_jobs(
+        repository,
+        commit_oid=local_head,
+        run_id=run_id,
+        root=root,
+        runner=runner,
+        invalid_code="PR_CI_READBACK_INVALID",
+    ) if type(run_id) is int else []
     jobs_by_name: dict[str, list[dict[str, Any]]] = {}
-    if isinstance(jobs, list):
-        for job in jobs:
-            if isinstance(job, dict) and isinstance(job.get("name"), str):
-                jobs_by_name.setdefault(job["name"], []).append(job)
+    for job in jobs:
+        jobs_by_name.setdefault(job["name"], []).append(job)
     ci_pass = (
         isinstance(latest_run, dict)
         and latest_run.get("status") == "completed"
@@ -1537,7 +1636,11 @@ def build_post_merge_receipt(
         ["git", "ls-remote", "origin", f"refs/heads/{default_branch}"], root
     ).decode("ascii", errors="strict").strip()
     parts = remote.split()
-    if len(parts) != 2 or parts[1] != f"refs/heads/{default_branch}":
+    if (
+        len(parts) != 2
+        or parts[1] != f"refs/heads/{default_branch}"
+        or re.fullmatch(r"[0-9a-f]{40}", parts[0]) is None
+    ):
         raise ValueError("POST_MERGE_READBACK_FAILED")
     default_head = parts[0]
     head_remote = runner(
@@ -1549,14 +1652,27 @@ def build_post_merge_receipt(
         or head_remote[1] != f"refs/heads/{head_branch}"
     ):
         raise ValueError("POST_MERGE_READBACK_FAILED")
-    commit = decode_json_mapping(
-        runner(["gh", "api", f"repos/{repository}/commits/{default_head}"], root),
-        "POST_MERGE_COMMIT_READBACK_INVALID",
-    )
-    parents = commit.get("parents")
-    parent_oids = [
-        item.get("sha") for item in parents if isinstance(item, dict)
-    ] if isinstance(parents, list) else []
+    try:
+        runner(
+            ["git", "fetch", "--no-tags", "origin", "--", default_head],
+            root,
+        )
+        lineage = runner(
+            [
+                "git", "--no-replace-objects", "rev-list",
+                "--parents", "-n", "1", default_head,
+            ],
+            root,
+        ).decode("ascii", errors="strict").strip().split()
+    except (UnicodeDecodeError, ValueError):
+        raise ValueError("POST_MERGE_COMMIT_READBACK_INVALID") from None
+    if (
+        not lineage
+        or lineage[0] != default_head
+        or any(re.fullmatch(r"[0-9a-f]{40}", token) is None for token in lineage)
+    ):
+        raise ValueError("POST_MERGE_COMMIT_READBACK_INVALID")
+    parent_oids = lineage[1:]
     try:
         policy = load_base_bound_policy(
             root, expected_base=expected_base, runner=runner
@@ -1590,18 +1706,23 @@ def build_post_merge_receipt(
         runner(
             [
                 "gh", "run", "view", str(run_id), "--repo", repository,
-                "--json", "headSha,status,conclusion,event,workflowName,jobs",
+                "--json", "headSha,status,conclusion,event,workflowName",
             ],
             root,
         ),
         "MAIN_CI_READBACK_INVALID",
     ) if type(run_id) is int else {}
-    jobs = run.get("jobs")
+    jobs = github_workflow_jobs(
+        repository,
+        commit_oid=default_head,
+        run_id=run_id,
+        root=root,
+        runner=runner,
+        invalid_code="MAIN_CI_READBACK_INVALID",
+    ) if type(run_id) is int else []
     jobs_by_name: dict[str, list[dict[str, Any]]] = {}
-    if isinstance(jobs, list):
-        for job in jobs:
-            if isinstance(job, dict) and isinstance(job.get("name"), str):
-                jobs_by_name.setdefault(job["name"], []).append(job)
+    for job in jobs:
+        jobs_by_name.setdefault(job["name"], []).append(job)
     ci_pass = (
         isinstance(latest, dict)
         and latest.get("status") == "completed"
