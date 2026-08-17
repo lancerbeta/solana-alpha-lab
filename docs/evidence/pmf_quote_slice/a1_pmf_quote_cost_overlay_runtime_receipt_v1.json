@@ -1,0 +1,70 @@
+{
+  "adoption_route": "WRAP_TASK26_LAYER_VOCABULARY_OVER_ONE_SHOT_RECEIPT",
+  "atom_id": "PMF-QUOTE-COST-OVERLAY-V1",
+  "build": "FORBIDDEN",
+  "credential_reads": 0,
+  "execute": "FORBIDDEN",
+  "forbidden_follow_ons": [
+    "JUPITER_EXECUTE_OR_BUILD",
+    "SUPPLY_TAKER_OR_SIGNER",
+    "PROMOTE_QUOTE_TO_TOUCH_OR_FILLABLE",
+    "MISSING_FEE_TREATED_AS_ZERO",
+    "NETRETURN_OR_CASHFLOW_CLAIM",
+    "LOCAL_RAW_USED_AS_GIT_TRUTH",
+    "H11_UNPARK_OR_SAMPLE_CAMPAIGN",
+    "H13_TRIAL",
+    "H02_H10_H14_TRIAL",
+    "LIVE_PIT_OR_CASHFLOW_CLAIM"
+  ],
+  "h11_unparked": false,
+  "h13_or_h02_started": false,
+  "input_mint": "So11111111111111111111111111111111111111112",
+  "layers": {
+    "fees": {
+      "missing_is_not_zero": true,
+      "reason": "SANITIZED_RECEIPT_HAS_NO_FEE_COMPONENTS",
+      "state": "NOT_COMPUTABLE"
+    },
+    "fillable": {
+      "reason": "NO_TAKER_NO_TRANSACTION_NO_SIMULATE",
+      "state": "NOT_EVIDENCED"
+    },
+    "netreturn": {
+      "reason": "NO_FILL_NO_FEES_NO_INVENTORY",
+      "state": "NOT_COMPUTABLE"
+    },
+    "quote": {
+      "reason": "ONE_SHOT_RECEIPT_QUOTE_OBSERVED",
+      "state": "OBSERVED"
+    },
+    "realized_vwap": {
+      "reason": "NO_FILL",
+      "state": "NOT_EVIDENCED"
+    },
+    "touch": {
+      "reason": "QUOTE_IS_NOT_TOUCH",
+      "state": "NOT_EVIDENCED"
+    }
+  },
+  "local_raw_used_as_git_truth": false,
+  "notional_atomic": "10000000",
+  "observed_at": "2026-08-17T02:38:46Z",
+  "observed_in_amount": "10000000",
+  "observed_mode": "manual",
+  "observed_out_amount": "9010943976",
+  "observed_router": "dflow",
+  "one_shot_acceptance_sha256": "76346f1d47ffc08afd1d5534c4b0a55820104c52c3e096fa41e5b382d77aa4a8",
+  "one_shot_receipt_sha256": "2ee2b71115b67b5129e44d08f7c29becefefd8979ad130c3174614ba7f64ba2c",
+  "output_mint": "DMwbVy48dWVKGe9z1pcVnwF3HLMLrqWdDLfbvx8RchhK",
+  "owner_phrase": "OK PMF-QUOTE-COST-OVERLAY: consume one-shot receipt only, no execute",
+  "provider_requests": 0,
+  "receipt_id": "EVIDENCE-PMF-QUOTE-COST-OVERLAY-001",
+  "route_id": "JUPITER-SOLANA-SWAP-V2-ORDER-001",
+  "schema": "smial.pmf-quote-cost-overlay.runtime-receipt",
+  "schema_version": "1.0",
+  "slippage_bps": 100,
+  "taker": "OMITTED_QUOTE_ONLY",
+  "task26_contract_sha256": "aac003cf7ba2742d310893c81af3ae4a032a52b719f2f56d80171a6486351efd",
+  "terminal": "QUOTE_COST_OVERLAY_BOUND_FILLABLE_NOT_EVIDENCED",
+  "transaction_present": false
+}

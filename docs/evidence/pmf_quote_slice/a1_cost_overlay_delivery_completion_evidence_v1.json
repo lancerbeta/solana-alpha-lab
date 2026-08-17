@@ -1,0 +1,78 @@
+{
+  "schema": "smial.delivery-completion-evidence",
+  "schema_version": "1.0",
+  "acceptance_id": "PMF-QUOTE-COST-OVERLAY-DELIVERY-COMPLETION-001",
+  "as_of": "2026-08-17",
+  "task_id": "PMF-QUOTE-COST-OVERLAY-V1",
+  "state_change": "QUOTE_COST_OVERLAY_BOUND_FILLABLE_NOT_EVIDENCED",
+  "base_main": "feee8007462afb83c12e32a41c886c3d82cbd898",
+  "cloud_bundle_mode": "OWNER_MANAGED_OPTIONAL_EXPORT",
+  "cloud_bundle_required_by_harness": false,
+  "cloud_bundle_smoke_required": false,
+  "capability_radar_now": "NONE",
+  "implementation_bindings": {
+    "catalog/assets/core.yaml": "b373ea61fef8a560444a0697cc4afcd0977db45b3bc4f4b53c8085622e1cbfb5",
+    "catalog/assets/lifecycle.yaml": "a0426b9188b2056113488c3241d29dfdd660d5235aa606a4a21c4757d75a55a3",
+    "catalog/catalog_manifest.yaml": "d3665d5344ee98167d521ee2d9cd08fc946849cfef43424cbab5dcaafd52da63",
+    "catalog/generated/asset_edges.json": "28db6c1cd4b30f143e2d1464f84fca3f1cc5c77252cf6456b7ffb73a5cec3f76",
+    "configs/pmf_quote_cost_overlay_v1.yaml": "bfe6d8e7d5fea2b00d7c35fde0d52594045332514b0150ca7b649be1ce94d9ea",
+    "docs/PROJECT_MAP.md": "72c413c2387f244486cadfbf3379b9df3aed62d1ba147a4bf9fce8a833c494db",
+    "docs/evidence/pmf_quote_slice/a1_pmf_quote_cost_overlay_acceptance_v1.json": "ecbe30d4ba9f14eed6d6dbde1b2424ad594edab7a8e1e6d828d5879d4834d49b",
+    "docs/evidence/pmf_quote_slice/a1_pmf_quote_cost_overlay_runtime_receipt_v1.json": "2b9240d3d29f46365f3b3e594cd55067ccd53fa17dede1d45e06deb59fe44397",
+    "docs/reports/pmf_quote_slice/a1_cost_overlay_owner_readout_v1.md": "1aefcf3d483dfe6d321e628ae52c11560d2ba6d58f484948336b1cdcc22b5360",
+    "docs/tasks/PMF-QUOTE-COST-OVERLAY-V1.md": "79d7ad235c80f1faf0dc12fef9e53448bbffca12cd79ab6a76eefd6efd78bba2",
+    "scripts/run_pmf_quote_cost_overlay.py": "be7d1e7652f9a85345d7a3707b0c192fb45b902d711b9399fa3ca4e1e4b13378",
+    "src/solana_alpha_lab/pmf_quote_cost_overlay.py": "a38843f0d23d187cbc0f5e7ba6a36164c313cc092add7b261f53bd07864cbf07",
+    "tests/test_pmf_quote_cost_overlay.py": "fac1086582cd6ff64303734bd45dfa428875691cc127fcc7c35070c4b7b565dc"
+  },
+  "active_stop_conditions": [],
+  "owner_attention_triggers": {
+    "auth_or_access_recovery": false,
+    "material_owner_decision": false,
+    "user_only_activation": false,
+    "external_material_action": false,
+    "unresolved_safety_or_truth_conflict": false
+  },
+  "factory_fit": {
+    "path": "docs/evidence/pmf_quote_slice/a1_cost_overlay_delivery_factory_fit_v1.json",
+    "sha256": "23837d457fcdfd68e3e3ef852c1d73d1b728828870cd42728bcff32dd3890b93",
+    "verdict": "PASS"
+  },
+  "validation": {
+    "targeted": "PASS_PMF_QUOTE_COST_OVERLAY_TESTS",
+    "independent_review": {
+      "path": "docs/evidence/pmf_quote_slice/a1_cost_overlay_delivery_independent_review_v1.json",
+      "sha256": "13c0600a20a11eaa2c269e4e089347b087a8d2b58ba927da79fd1a76e5a9b300",
+      "verdict": "PASS"
+    },
+    "full_gate": "ENFORCED_BY_PROJECT_BOUND_VALIDATION",
+    "github_ci": "ENFORCED_LIVE_AT_GUARDED_MERGE",
+    "project_checks": [
+      "PASS_TARGETED_PMF_QUOTE_COST_OVERLAY_TESTS"
+    ]
+  },
+  "non_claims": [
+    "NO_CANONICAL_DONE",
+    "NO_LIVE_PIT_OR_EXECUTION_CLAIM",
+    "NO_ALPHA_PNL_OR_NETRETURN",
+    "NO_EXECUTE_OR_BUILD",
+    "NO_TAKER_OR_SIGNER",
+    "NO_TOUCH_OR_FILLABLE_FROM_QUOTE",
+    "NO_FEE_ZERO_FROM_ABSENCE",
+    "NO_H11_UNPARK",
+    "NO_H13_OR_H02_TRIAL",
+    "NO_PROVIDER_OR_CREDENTIAL",
+    "NO_RC001_FREEZE_MUTATION"
+  ],
+  "side_effects": {
+    "cash_spend_usd_cents": 0,
+    "credential_reads": 0,
+    "fallbacks": 0,
+    "provider_requests": 0,
+    "retries": 0,
+    "wallet_signer_transaction_actions": 0
+  },
+  "project_sources_disposition": {
+    "kind": "NO_CHANGE"
+  }
+}

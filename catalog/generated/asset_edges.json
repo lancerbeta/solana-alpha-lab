@@ -453,6 +453,11 @@
       "target_asset_id": "CONTRACT-OWNER-AUTHORITY-PACKET-001"
     },
     {
+      "source_asset_id": "CONFIG-PMF-QUOTE-COST-OVERLAY-001",
+      "relation": "governed_by",
+      "target_asset_id": "CTRL-PMF-QUOTE-COST-OVERLAY-001"
+    },
+    {
       "source_asset_id": "CONFIG-PMF-QUOTE-SLICE-001",
       "relation": "governed_by",
       "target_asset_id": "CTRL-PMF-QUOTE-SLICE-001"
@@ -1773,6 +1778,26 @@
       "target_asset_id": "TEST-OWNER-ATTENTION-GATE-001"
     },
     {
+      "source_asset_id": "CTRL-PMF-QUOTE-COST-OVERLAY-001",
+      "relation": "contains",
+      "target_asset_id": "MODULE-PMF-QUOTE-COST-OVERLAY-001"
+    },
+    {
+      "source_asset_id": "CTRL-PMF-QUOTE-COST-OVERLAY-001",
+      "relation": "contains",
+      "target_asset_id": "SCRIPT-PMF-QUOTE-COST-OVERLAY-001"
+    },
+    {
+      "source_asset_id": "CTRL-PMF-QUOTE-COST-OVERLAY-001",
+      "relation": "depends_on",
+      "target_asset_id": "CONTRACT-T26-EXECUTION-COST-NETRETURN-001"
+    },
+    {
+      "source_asset_id": "CTRL-PMF-QUOTE-COST-OVERLAY-001",
+      "relation": "depends_on",
+      "target_asset_id": "EVIDENCE-PMF-QUOTE-SLICE-ONE-SHOT-001"
+    },
+    {
       "source_asset_id": "CTRL-PMF-QUOTE-SLICE-001",
       "relation": "contains",
       "target_asset_id": "MODULE-PMF-QUOTE-SLICE-001"
@@ -2691,6 +2716,26 @@
       "source_asset_id": "EVIDENCE-OWNER-AUTHORITY-PACKET-A2-001",
       "relation": "validated_by",
       "target_asset_id": "TEST-OWNER-AUTHORITY-PACKET-A2-001"
+    },
+    {
+      "source_asset_id": "EVIDENCE-PMF-QUOTE-COST-OVERLAY-001",
+      "relation": "depends_on",
+      "target_asset_id": "EVIDENCE-PMF-QUOTE-SLICE-ONE-SHOT-001"
+    },
+    {
+      "source_asset_id": "EVIDENCE-PMF-QUOTE-COST-OVERLAY-001",
+      "relation": "derived_from",
+      "target_asset_id": "CTRL-PMF-QUOTE-COST-OVERLAY-001"
+    },
+    {
+      "source_asset_id": "EVIDENCE-PMF-QUOTE-COST-OVERLAY-001",
+      "relation": "validated_by",
+      "target_asset_id": "TEST-PMF-QUOTE-COST-OVERLAY-001"
+    },
+    {
+      "source_asset_id": "EVIDENCE-PMF-QUOTE-COST-OVERLAY-ACCEPTANCE-001",
+      "relation": "derived_from",
+      "target_asset_id": "EVIDENCE-PMF-QUOTE-COST-OVERLAY-001"
     },
     {
       "source_asset_id": "EVIDENCE-PMF-QUOTE-SLICE-001",
@@ -6023,6 +6068,11 @@
       "target_asset_id": "EVIDENCE-OWNER-AUTHORITY-PACKET-A1-001"
     },
     {
+      "source_asset_id": "MODULE-PMF-QUOTE-COST-OVERLAY-001",
+      "relation": "depends_on",
+      "target_asset_id": "CONFIG-PMF-QUOTE-COST-OVERLAY-001"
+    },
+    {
       "source_asset_id": "MODULE-PMF-QUOTE-SLICE-001",
       "relation": "governed_by",
       "target_asset_id": "CTRL-PMF-QUOTE-SLICE-001"
@@ -7603,6 +7653,11 @@
       "target_asset_id": "CATALOG-SCHEMA-LIFECYCLE-001"
     },
     {
+      "source_asset_id": "REPORT-PMF-QUOTE-COST-OVERLAY-001",
+      "relation": "derived_from",
+      "target_asset_id": "EVIDENCE-PMF-QUOTE-COST-OVERLAY-ACCEPTANCE-001"
+    },
+    {
       "source_asset_id": "REPORT-PMF-QUOTE-SLICE-001",
       "relation": "derived_from",
       "target_asset_id": "EVIDENCE-PMF-QUOTE-SLICE-001"
@@ -8373,6 +8428,11 @@
       "target_asset_id": "POLICY-OWNER-ATTENTION-GATE-002"
     },
     {
+      "source_asset_id": "SCRIPT-PMF-QUOTE-COST-OVERLAY-001",
+      "relation": "depends_on",
+      "target_asset_id": "MODULE-PMF-QUOTE-COST-OVERLAY-001"
+    },
+    {
       "source_asset_id": "SCRIPT-PMF-QUOTE-SLICE-001",
       "relation": "depends_on",
       "target_asset_id": "MODULE-PMF-QUOTE-SLICE-001"
@@ -9106,6 +9166,16 @@
       "source_asset_id": "TEST-OWNER-AUTHORITY-PACKET-A2-001",
       "relation": "depends_on",
       "target_asset_id": "EVIDENCE-OWNER-AUTHORITY-PACKET-A2-001"
+    },
+    {
+      "source_asset_id": "TEST-PMF-QUOTE-COST-OVERLAY-001",
+      "relation": "depends_on",
+      "target_asset_id": "EVIDENCE-PMF-QUOTE-COST-OVERLAY-001"
+    },
+    {
+      "source_asset_id": "TEST-PMF-QUOTE-COST-OVERLAY-001",
+      "relation": "depends_on",
+      "target_asset_id": "MODULE-PMF-QUOTE-COST-OVERLAY-001"
     },
     {
       "source_asset_id": "TEST-PMF-QUOTE-SLICE-001",

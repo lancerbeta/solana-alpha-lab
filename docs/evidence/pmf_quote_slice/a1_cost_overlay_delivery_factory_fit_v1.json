@@ -1,0 +1,41 @@
+{
+  "schema": "smial.delivery-harness-factory-fit",
+  "schema_version": "1.0",
+  "review_id": "PMF-QUOTE-COST-OVERLAY-FACTORY-FIT-001",
+  "as_of": "2026-08-17",
+  "task_id": "PMF-QUOTE-COST-OVERLAY-V1",
+  "reviewed_bindings_sha256": "1e7be5b84bb2d3ad299398afb5120b33177cd9723e9ba29540123e5968305535",
+  "reviewed_inventory_sha256": "72b085d91f5ff5ed8aedb7098a13f49ab4b606548c48d0c4036d415e128df531",
+  "mode": "FULL_REVIEW",
+  "verdict": "PASS",
+  "dimensions": {
+    "mission": "PASS_QUOTE_OVERLAY_WITHOUT_FILL_OR_EXECUTE",
+    "flexibility_and_history": "PASS_V6_V7_RC001_H11_LEDGER_IMMUTABLE",
+    "context_efficiency": "PASS_ONE_CONTRACT_WRAP_TASK26_VOCABULARY",
+    "research_truth": "PASS_QUOTE_OBSERVED_TOUCH_FILLABLE_NOT_EVIDENCED",
+    "owner_operability": "PASS_RUSSIAN_READOUT_LAYERS_EXECUTE_FORBIDDEN",
+    "execution_to_cashflow": "PASS_NETRETURN_NOT_COMPUTABLE_MISSING_FEE_NOT_ZERO",
+    "monitoring_and_recovery": "PASS_NO_BACKGROUND_PROCESS_REVERT_NEW_EVIDENCE_ONLY",
+    "build_vs_buy": "PASS_WRAP_TASK26_REJECT_METIS_AND_REQUOTE",
+    "security": "PASS_ZERO_PROVIDER_ZERO_CREDENTIAL_SECRET_FREE_HASHES",
+    "red_team": "PASS_NO_QUOTE_PROMOTION_NO_EXECUTE_NO_H11_UNPARK"
+  },
+  "capability_radar": {
+    "now": "NONE",
+    "watch": "EXECUTE_STILL_FORBIDDEN"
+  },
+  "recovery": "REVERT_ONLY_THIS_ATOM_TRACKED_OUTPUTS; PRESERVE_V6_V7_REGISTRY; PRESERVE_A24_A26_A27_H11_PARK; PRESERVE_RC001_FREEZE; PRESERVE_TRIAL_LEDGER; PRESERVE_ONE_SHOT_RECEIPT",
+  "limits": [
+    "NO_EXECUTE_OR_BUILD",
+    "NO_TAKER_OR_SIGNER",
+    "NO_PROVIDER_OR_CREDENTIAL",
+    "NO_TOUCH_OR_FILLABLE_FROM_QUOTE",
+    "NO_FEE_ZERO_FROM_ABSENCE",
+    "NO_NETRETURN_OR_CASHFLOW",
+    "NO_H11_UNPARK",
+    "NO_H13_OR_H02_AUTO_START",
+    "NO_LIVE_PIT_CLAIM",
+    "NO_CANONICAL_DONE",
+    "QUOTE_IS_NOT_A24_PUMPSWAP_POOL_FILL"
+  ]
+}
