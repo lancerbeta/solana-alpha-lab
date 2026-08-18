@@ -1,7 +1,7 @@
 ---
 task_id: QUOTE_NATIVE_LIVE_VARIATION_CAMPAIGN_V1
-task_version: '1.0'
-status: IN_PROGRESS
+task_version: '1.1'
+status: DONE
 as_of: '2026-08-18'
 owner: GOAL_OWNER
 allowed_routes: [DIRECT_CURSOR_DELIVERY]
@@ -142,3 +142,12 @@ H3600 is a secondary observable, not the kill criterion. H14400 is an explicit g
 6. Missing is never zero. `Y=X` is not a directional hint. Family is not closed on `SAMPLE_INVALID_*`.
 7. Registry v8 is append-only after the first Tokens V2 observation and preserves v7 route semantics.
 8. Russian readout names strata, variation, and limitations.
+
+## Canonical closure
+
+`FINISH_GATE=DONE_CONFIRMED`: the owner accepted
+`SAMPLE_INVALID_INSUFFICIENT_COMPLETE_XY` as the terminal result of this
+keyless campaign. The result is neither alpha nor MOVE 2, and it does not close
+the quote-native family by itself. Historical A1 receipt bytes remain bound to
+task version 1.0; the owner-approved replan is recorded separately in
+`docs/evidence/quote_native_live_variation_campaign/a2_replan_closure_v1.json`.

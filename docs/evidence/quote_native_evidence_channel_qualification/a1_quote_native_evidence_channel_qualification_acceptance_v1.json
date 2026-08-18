@@ -1,0 +1,128 @@
+{
+  "schema": "smial.quote-native-evidence-channel-qualification.acceptance",
+  "schema_version": "1.0",
+  "acceptance_id": "EVIDENCE-QUOTE-NATIVE-EVIDENCE-CHANNEL-QUALIFICATION-001",
+  "as_of": "2026-08-18",
+  "atom_id": "QUOTE_NATIVE_EVIDENCE_CHANNEL_QUALIFICATION_V1",
+  "terminal": "PAUSE_CLOSE_QUOTE_NATIVE_CURRENT_ALPHA_ROUTE",
+  "capture_contract": "INVALID_CAPTURE_CONTRACT",
+  "numeric_floors": "PASSED",
+  "owner_decision": "QUALIFY_OR_PAUSE_CURRENT_QUOTE_NATIVE_EVIDENCE_CHANNEL",
+  "evidence_fit": "NOT_ACCEPTED",
+  "source_runtime_receipt": "docs/evidence/quote_native_evidence_channel_qualification/a1_quote_native_evidence_channel_qualification_runtime_receipt_v1.json",
+  "source_runtime_receipt_sha256": "d10e0d74de9d175dfcf5e3fd2408e3736d0fa8b94f52d804a34dce590a89e56f",
+  "source_runtime_candidate_sha256": "f20152859ca186e4c7fe186434f2cb60b4fe23a7473efbae0948adbf92e71908",
+  "timing_recovery_receipt": "docs/evidence/quote_native_evidence_channel_qualification/a1_quote_native_evidence_channel_qualification_timing_recovery_v1.json",
+  "timing_recovery_receipt_sha256": "b7a5c5cd11730d8d5faf3e4f998729bb9edf37e6342343c1d73f441ea73891f5",
+  "portal_reconciliation_receipt": "docs/evidence/quote_native_evidence_channel_qualification/a1_quote_native_evidence_channel_qualification_portal_reconciliation_v1.json",
+  "portal_reconciliation_receipt_sha256": "6493f4bd101f40500647be87039e67d649abdc558edfec0db95857c34fdc69fe",
+  "runtime_scorer_terminal": "QUOTE_NATIVE_EVIDENCE_FIT_PASS",
+  "runtime_scorer_semantics": "NUMERIC_FLOORS_ONLY_NOT_EVIDENCE_FIT_ACCEPTANCE",
+  "timing_evidence": {
+    "verdict": "RECOVERED_RAW_WRITE_UPPER_BOUND_WITHIN_SLACK",
+    "timestamp_semantics": "LOCAL_RAW_WRITE_COMPLETE_UPPER_BOUND_NOT_REMOTE_OBSERVED_AT",
+    "portal_corroboration": "PORTAL_LOG_TIME_COHORT_CORROBORATED",
+    "portal_row_identity": false,
+    "attempt_reservation_in_canonical_receipt": false,
+    "horizon_counts": {
+      "900": 12,
+      "3600": 12
+    }
+  },
+  "registry": {
+    "path": "configs/provider_route_capability_registry_v9.yaml",
+    "sha256": "dc5cdd4c78a8a907f4bb6de16629c4ee2ef7535c437b33ae9bd8b18eb1847aa1",
+    "route_ids": [
+      "JUPITER-SOLANA-TOKENS-V2-RECENT-FREE-API-KEY-001",
+      "JUPITER-SOLANA-TOKENS-V2-TOPTRADED-FREE-API-KEY-001",
+      "JUPITER-SOLANA-SWAP-V2-ORDER-FREE-API-KEY-001"
+    ]
+  },
+  "cohort": {
+    "frozen_cell_count": 12,
+    "recent_cell_count": 6,
+    "traded_cell_count": 6,
+    "sample_class": "LIVE_OUTCOME_BLIND_TOKENS_V2_FREE_KEY"
+  },
+  "provider_observations": {
+    "provider_requests": 50,
+    "credential_reads": 1,
+    "retries": 0,
+    "fallbacks": 0,
+    "all_http_status_counts": {
+      "200": 44,
+      "400": 6
+    },
+    "token_http_status_counts": {
+      "200": 2
+    },
+    "swap_http_status_counts": {
+      "200": 42,
+      "400": 6
+    },
+    "provider_typed_failure_count": 6,
+    "rate_limited_count": 0,
+    "raw_manifest_count": 50,
+    "safe_response_header_names": [
+      "x-api-gateway-request-id"
+    ]
+  },
+  "criteria": {
+    "success_min_complete_xy": 10,
+    "success_min_time_separated": 6,
+    "observed_complete_xy": 10,
+    "observed_time_separated": 8,
+    "both_strata_represented": true,
+    "success_passed": true,
+    "acceptance_allowed": false,
+    "control_min_complete_xy": 6,
+    "control_min_time_separated_share": "0.5",
+    "traded_complete_xy": 6,
+    "traded_time_separated": 6,
+    "traded_time_separated_share": "1",
+    "control_kill_triggered": false,
+    "h3600_moved_count": 8,
+    "h3600_y_equals_x_count": 2
+  },
+  "side_effects": {
+    "cash_spend_usd_cents": 0,
+    "execute_calls": 0,
+    "build_calls": 0,
+    "taker_supplied": false,
+    "wallet_signer_transaction_actions": 0,
+    "paid_plan": false,
+    "second_provider": false
+  },
+  "review_blockers": [
+    "CAPTURE_TIME_NOT_HASH_BOUND_AT_WRITE",
+    "ATTEMPT_RESERVATION_MISSING_BEFORE_CREDENTIAL_READ",
+    "PORTAL_CORROBORATES_BATCH_NOT_ROW_IDENTITY"
+  ],
+  "resolved_review_blockers": [
+    "UNSAFE_RESPONSE_HEADER_RETAINED"
+  ],
+  "limitations": [
+    "UNIQUE_CAMPAIGN_BUDGET_CONSUMED",
+    "NO_AUTOMATIC_REPLACEMENT_CAMPAIGN",
+    "H14400_EXPLICIT_GAP",
+    "SIX_HTTP_400_TYPED_MISSING_ORDER_CELLS",
+    "GIT_RECEIPT_SANITIZED_CANDIDATE_CONTENT_TYPE_REMOVED",
+    "FORWARD_RUNNER_HARDENING_DOES_NOT_REPAIR_THIS_CAPTURE"
+  ],
+  "non_claims": [
+    "NO_ALPHA",
+    "NO_NETRETURN",
+    "NO_CAUSAL_MECHANISM_RESULT",
+    "NO_MOVE_2_EXECUTED",
+    "NO_EXECUTE_OR_BUILD",
+    "NO_TAKER_OR_SIGNER",
+    "NO_PAID_PLAN",
+    "NO_SECOND_PROVIDER",
+    "NO_RAW_BODY_IN_GIT",
+    "NO_REMOTE_OBSERVED_AT_CLAIM",
+    "NO_CANONICAL_DONE_AS_ALPHA",
+    "NO_EVIDENCE_FIT_ACCEPTANCE",
+    "NO_MECHANISM_AUDITION_NOMINATED"
+  ],
+  "next_boundary": "OWNER_DECISION_NEW_RECAPTURE_CONTRACT_OR_LEAVE_QUOTE_NATIVE_PAUSED"
+}

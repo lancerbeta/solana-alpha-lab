@@ -1,0 +1,57 @@
+schema: smial.quote-native-evidence-channel-qualification
+schema_version: '1.0'
+atom_id: QUOTE_NATIVE_EVIDENCE_CHANNEL_QUALIFICATION_V1
+as_of: '2026-08-18'
+external_authority:
+  owner_phrase: 'OK QUOTE_NATIVE_EVIDENCE_CHANNEL_QUALIFICATION_V1: one fresh Jupiter Free-key quote-native evidence campaign using a local process-environment key only; Tokens V2 /recent and /toptraded/1h plus quote-only /swap/v2/order; x-api-key header only; no .env read, no key in URL/log/receipt/Git, no taker, /build, /execute, wallet, signer, transaction, paid plan, second provider, retry or fallback; cash cap $0; call cap 60; global provider pace >=3s; preserve the existing 6 RECENT + 6 TRADED cohort and success/control-kill thresholds; any 429 or insufficient Free-key sample closes or pauses the current quote-native alpha route.'
+  credential_name: JUPITER_API_KEY
+  credential_reads: 1
+  dotenv_reads: false
+  execute: false
+  build: false
+  taker: OMITTED_QUOTE_ONLY
+  cash_cap_usd_cents: 0
+  call_cap: 60
+registry: configs/provider_route_capability_registry_v9.yaml
+quote_route:
+  route_id: JUPITER-SOLANA-SWAP-V2-ORDER-FREE-API-KEY-001
+  endpoint: https://api.jup.ag/swap/v2/order
+  host: api.jup.ag
+  method: GET
+discovery_routes:
+  recent:
+    route_id: JUPITER-SOLANA-TOKENS-V2-RECENT-FREE-API-KEY-001
+    endpoint: https://api.jup.ag/tokens/v2/recent
+  traded:
+    route_id: JUPITER-SOLANA-TOKENS-V2-TOPTRADED-FREE-API-KEY-001
+    endpoint: https://api.jup.ag/tokens/v2/toptraded/1h
+wrapped_sol_mint: So11111111111111111111111111111111111111112
+slippage_bps: '100'
+notional_atomic: '10000000'
+recent_cell_count: 6
+traded_cell_count: 6
+liquidity_floor_usd: 1000
+min_interval_seconds: 3
+observable_horizon_seconds: [900, 3600]
+gap_horizon_seconds: [14400]
+lateness_slack_seconds: 120
+control_kill:
+  min_complete_cells: 6
+  min_time_separated_share: '0.5'
+success:
+  min_complete_xy: 10
+  min_time_separated: 6
+runtime_limits:
+  timeout_seconds: 20.0
+  max_response_bytes: 2000000
+execution_controls:
+  retries: 0
+  fallback: false
+  persist_transaction_bytes: false
+  provider_requests_max: 60
+  background_scheduler: false
+  second_provider: false
+  paid_plan: false
+raw_retention:
+  body: A4_OUTSIDE_GIT
+  response_headers: SAFE_ALLOWLIST_ONLY
