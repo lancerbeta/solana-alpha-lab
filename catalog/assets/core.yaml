@@ -25238,7 +25238,7 @@ records:
   as_of: '2026-08-18'
   truth_owner: QUOTE_NATIVE_ADMISSIBLE_FRICTION_AUDITION_V1
   location: {kind: git_path, logical_uri: 'repo://docs/tasks/QUOTE_NATIVE_ADMISSIBLE_FRICTION_AUDITION_V1.md', repository_path: docs/tasks/QUOTE_NATIVE_ADMISSIBLE_FRICTION_AUDITION_V1.md}
-  integrity: {kind: sha256, sha256: dd754887fa0fab7ce6fdc82783ce8176fbcdbaecc4d44adbae00374e0f5fa72d}
+  integrity: {kind: sha256, sha256: 6d26ec83e69ccdd93a5f6f2bf2fbd2200f2e5aa2ca540a73185fbfe6f17eb64a}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: contains, target_asset_id: CONFIG-QUOTE-NATIVE-ADMISSIBLE-FRICTION-AUDITION-001}

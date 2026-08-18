@@ -1,6 +1,6 @@
 ---
 task_id: QUOTE_NATIVE_ADMISSIBLE_FRICTION_AUDITION_V1
-task_version: '1.0'
+task_version: '1.1'
 status: DONE
 as_of: '2026-08-18'
 owner: GOAL_OWNER
@@ -77,6 +77,11 @@ context_requirements:
     DELIVERY_EVIDENCE:
       - docs/evidence/quote_native_evidence_channel_qualification/a1_quote_native_evidence_channel_qualification_acceptance_v1.json
       - docs/evidence/quote_native_friction_h900_falsifier/a1_quote_native_friction_h900_falsifier_acceptance_v1.json
+      - docs/evidence/quote_native_admissible_friction_audition/a1_quote_native_admissible_friction_audition_runtime_receipt_v1.json
+      - docs/evidence/quote_native_admissible_friction_audition/a1_quote_native_admissible_friction_audition_acceptance_v1.json
+      - docs/evidence/quote_native_admissible_friction_audition/a1_delivery_completion_evidence_v1.json
+      - docs/evidence/quote_native_admissible_friction_audition/a1_delivery_independent_review_v1.json
+      - docs/evidence/quote_native_admissible_friction_audition/a1_delivery_factory_fit_v1.json
     HISTORICAL_CONTEXT: []
 ---
 
