@@ -1,0 +1,102 @@
+{
+  "a1_runtime_receipt_sha256": "75f60a155b7db6ddb8c801c9ff5060ce5e4e7fe641b836ff35edeb91534c308e",
+  "acceptance_id": "EVIDENCE-QUOTE-NATIVE-FRICTION-H900-MOVE2-OOS-ACCEPTANCE-001",
+  "as_of": "2026-08-19",
+  "atom_id": "QUOTE_NATIVE_FRICTION_H900_MOVE2_OOS_V1",
+  "capture": {
+    "accepted": true,
+    "attempt_reservation_before_credential_read": true,
+    "blockers": [],
+    "consumed_count": 34,
+    "hash_bound_row_observed_at": true,
+    "searchable_y_kind": "SELL_H900"
+  },
+  "capture_contract": "VALID_CAPTURE_CONTRACT",
+  "cohort": {
+    "frozen_cell_count": 12,
+    "recent_cell_count": 6,
+    "sample_class": "LIVE_OUTCOME_BLIND_TOKENS_V2_FREE_KEY_EXCLUDING_A1",
+    "traded_cell_count": 6
+  },
+  "criteria": {
+    "both_strata_represented": true,
+    "concordance_rate": "0.5833333333333333333333333333",
+    "concordance_rule": "ORDINAL_SIGN_TEST_NO_RATE_FLOOR",
+    "concordant_pairs": 21,
+    "control_kill_triggered": false,
+    "discordant_pairs": 15,
+    "h3600_moved_count": 0,
+    "h3600_role": "PREDECLARED_ROBUSTNESS_NOT_SEARCHABLE_Y",
+    "h3600_y_equals_x_count": 0,
+    "mechanism_scored": true,
+    "observed_complete_xy": 10,
+    "observed_time_separated": 9,
+    "success_passed": true,
+    "tied_pairs": 0,
+    "traded_complete_xy": 6,
+    "traded_time_separated": 6,
+    "traded_time_separated_share": "1"
+  },
+  "exclusion": {
+    "a1_intersection_empty": true,
+    "a1_mint_count": 12,
+    "frozen_cell_count": 12
+  },
+  "family_close": false,
+  "limitations": [
+    "H3600_NOT_OBSERVED_ROBUSTNESS_ONLY",
+    "NO_RECAPTURE_ONLY_RETRY",
+    "H14400_EXPLICIT_GAP",
+    "NO_NETRETURN",
+    "NO_ALPHA",
+    "NO_MOVE_3"
+  ],
+  "move_3_executed": false,
+  "next_boundary": "OWNER_DECISION_LEAVE_REPLICATED_SIGN_UNEXTENDED_NOT_MOVE_3",
+  "non_claims": [
+    "NO_ALPHA",
+    "NO_NETRETURN",
+    "NO_MOVE_3",
+    "NO_EXECUTE_OR_BUILD",
+    "NO_TAKER_OR_SIGNER",
+    "NO_PAID_PLAN",
+    "NO_SECOND_PROVIDER",
+    "NO_RAW_BODY_IN_GIT",
+    "NO_H3600_SEARCHABLE_Y",
+    "NO_RECAPTURE_ONLY_SUFFIX",
+    "NO_FAMILY_CLOSE",
+    "NO_H13_H11_H07_H02_UNPARK",
+    "NO_CANONICAL_DONE_AS_ALPHA",
+    "NO_THRESHOLD_FIT",
+    "NO_A1_MINT_REUSE"
+  ],
+  "numeric_floors": "PASSED",
+  "owner_decision": "UNIQUE_ATTEMPT_REPLICATED_SIGN_NOT_ALPHA",
+  "project_sources_disposition": {
+    "kind": "NO_CHANGE"
+  },
+  "provider_observations": {
+    "credential_reads": 1,
+    "fallbacks": 0,
+    "foreground_run_incomplete": true,
+    "h3600_observed": false,
+    "h900_observed": true,
+    "provider_requests": 34,
+    "retries": 0
+  },
+  "review_blockers": [],
+  "schema": "smial.quote-native-friction-h900-move2-oos.acceptance",
+  "schema_version": "1.0",
+  "side_effects": {
+    "build_calls": 0,
+    "cash_spend_usd_cents": 0,
+    "execute_calls": 0,
+    "paid_plan": false,
+    "second_provider": false,
+    "taker_supplied": false,
+    "wallet_signer_transaction_actions": 0
+  },
+  "source_runtime_receipt": "docs/evidence/quote_native_friction_h900_move2_oos/a1_quote_native_friction_h900_move2_oos_runtime_receipt_v1.json",
+  "source_runtime_receipt_sha256": "a860888cd6c528c03cffb27146d07da6ed60770d0f1e13d47651b0d63f51b926",
+  "terminal": "REPLICATED_SIGN_NOT_ALPHA"
+}

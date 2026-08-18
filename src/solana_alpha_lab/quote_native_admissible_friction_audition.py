@@ -417,6 +417,7 @@ def run_campaign(
     sleeper: Callable[[float], None] | None = None,
     monotonic_clock: Callable[[], float] | None = None,
     raw_sink: Callable[[str, bytes, str, str], None] | None = None,
+    select_cohort_fn: Callable[[list[Mapping[str, Any]], list[Mapping[str, Any]]], dict[str, object]] | None = None,
 ) -> dict[str, object]:
     _validate_policy_shape(policy)
     _require(reservation.get("credential_reads") == 0, "CREDENTIAL_READ_BEFORE_ATTEMPT_RESERVATION")
@@ -575,7 +576,8 @@ def run_campaign(
             reservation=reservation,
             capture=capture,
         )
-    cohort = select_cohort(recent_payload or [], traded_payload or [])
+    choose_cohort = select_cohort if select_cohort_fn is None else select_cohort_fn
+    cohort = choose_cohort(recent_payload or [], traded_payload or [])
     cells = cohort["cells"]
     if not cohort["sufficient"] or not isinstance(cells, list):
         attached = _attach_envelopes(discovery_rows, envelopes)
