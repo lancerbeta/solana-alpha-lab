@@ -9,7 +9,7 @@
   "cloud_bundle_smoke_required": false,
   "factory_fit": {
     "path": "docs/evidence/quote_native_friction_h900_falsifier/a1_delivery_factory_fit_v1.json",
-    "sha256": "64d848b9b865b62f3b35d57fa29fa167d20b0426742b8122235d90c6fc2c3be6",
+    "sha256": "b629b9f88ded2d904794f2327c3237946e0a14cf5dc14ef9893d105c108b5249",
     "verdict": "PASS"
   },
   "implementation_bindings": {
@@ -67,7 +67,7 @@
     "github_ci": "ENFORCED_LIVE_AT_GUARDED_MERGE",
     "independent_review": {
       "path": "docs/evidence/quote_native_friction_h900_falsifier/a1_delivery_independent_review_v1.json",
-      "sha256": "5bbd4f7055d35063bdb135c985efa43e2e331e95e38db54e2e4887d0bd5b8d7e",
+      "sha256": "fe14b852e3d7dc39f701a679067435c6d3e01afe43a93182a1675633b2f59f5e",
       "verdict": "PASS"
     },
     "project_checks": [
