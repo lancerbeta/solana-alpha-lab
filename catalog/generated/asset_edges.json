@@ -583,6 +583,11 @@
       "target_asset_id": "CTRL-QUOTE-NATIVE-EVIDENCE-FIT-PANEL-001"
     },
     {
+      "source_asset_id": "CONFIG-QUOTE-NATIVE-FRICTION-H900-FALSIFIER-001",
+      "relation": "governed_by",
+      "target_asset_id": "CTRL-QUOTE-NATIVE-FRICTION-H900-FALSIFIER-001"
+    },
+    {
       "source_asset_id": "CONFIG-QUOTE-NATIVE-QUOTED-BUY-H900-CLOCK-001",
       "relation": "governed_by",
       "target_asset_id": "CTRL-QUOTE-NATIVE-QUOTED-BUY-H900-CLOCK-001"
@@ -1968,6 +1973,21 @@
       "target_asset_id": "CONFIG-PROVIDER-ROUTE-CAPABILITY-REGISTRY-007"
     },
     {
+      "source_asset_id": "CTRL-QUOTE-NATIVE-FRICTION-H900-FALSIFIER-001",
+      "relation": "contains",
+      "target_asset_id": "MODULE-QUOTE-NATIVE-FRICTION-H900-FALSIFIER-001"
+    },
+    {
+      "source_asset_id": "CTRL-QUOTE-NATIVE-FRICTION-H900-FALSIFIER-001",
+      "relation": "contains",
+      "target_asset_id": "SCRIPT-QUOTE-NATIVE-FRICTION-H900-FALSIFIER-001"
+    },
+    {
+      "source_asset_id": "CTRL-QUOTE-NATIVE-FRICTION-H900-FALSIFIER-001",
+      "relation": "depends_on",
+      "target_asset_id": "CONFIG-PROVIDER-ROUTE-CAPABILITY-REGISTRY-007"
+    },
+    {
       "source_asset_id": "CTRL-QUOTE-NATIVE-QUOTED-BUY-H900-CLOCK-001",
       "relation": "contains",
       "target_asset_id": "MODULE-QUOTE-NATIVE-QUOTED-BUY-H900-CLOCK-001"
@@ -3006,6 +3026,26 @@
       "source_asset_id": "EVIDENCE-QUOTE-NATIVE-EVIDENCE-FIT-PANEL-ACCEPTANCE-001",
       "relation": "derived_from",
       "target_asset_id": "EVIDENCE-QUOTE-NATIVE-EVIDENCE-FIT-PANEL-001"
+    },
+    {
+      "source_asset_id": "EVIDENCE-QUOTE-NATIVE-FRICTION-H900-FALSIFIER-001",
+      "relation": "depends_on",
+      "target_asset_id": "CONFIG-PROVIDER-ROUTE-CAPABILITY-REGISTRY-007"
+    },
+    {
+      "source_asset_id": "EVIDENCE-QUOTE-NATIVE-FRICTION-H900-FALSIFIER-001",
+      "relation": "derived_from",
+      "target_asset_id": "CTRL-QUOTE-NATIVE-FRICTION-H900-FALSIFIER-001"
+    },
+    {
+      "source_asset_id": "EVIDENCE-QUOTE-NATIVE-FRICTION-H900-FALSIFIER-001",
+      "relation": "validated_by",
+      "target_asset_id": "TEST-QUOTE-NATIVE-FRICTION-H900-FALSIFIER-001"
+    },
+    {
+      "source_asset_id": "EVIDENCE-QUOTE-NATIVE-FRICTION-H900-FALSIFIER-ACCEPTANCE-001",
+      "relation": "derived_from",
+      "target_asset_id": "EVIDENCE-QUOTE-NATIVE-FRICTION-H900-FALSIFIER-001"
     },
     {
       "source_asset_id": "EVIDENCE-QUOTE-NATIVE-QUOTED-BUY-H900-CLOCK-001",
@@ -6458,6 +6498,16 @@
       "target_asset_id": "MODULE-PMF-QUOTE-SLICE-ONE-SHOT-001"
     },
     {
+      "source_asset_id": "MODULE-QUOTE-NATIVE-FRICTION-H900-FALSIFIER-001",
+      "relation": "depends_on",
+      "target_asset_id": "CONFIG-QUOTE-NATIVE-FRICTION-H900-FALSIFIER-001"
+    },
+    {
+      "source_asset_id": "MODULE-QUOTE-NATIVE-FRICTION-H900-FALSIFIER-001",
+      "relation": "depends_on",
+      "target_asset_id": "MODULE-QUOTE-NATIVE-EVIDENCE-FIT-PANEL-001"
+    },
+    {
       "source_asset_id": "MODULE-QUOTE-NATIVE-QUOTED-BUY-H900-CLOCK-001",
       "relation": "depends_on",
       "target_asset_id": "CONFIG-QUOTE-NATIVE-QUOTED-BUY-H900-CLOCK-001"
@@ -8008,6 +8058,11 @@
       "target_asset_id": "EVIDENCE-QUOTE-NATIVE-EVIDENCE-FIT-PANEL-ACCEPTANCE-001"
     },
     {
+      "source_asset_id": "REPORT-QUOTE-NATIVE-FRICTION-H900-FALSIFIER-001",
+      "relation": "derived_from",
+      "target_asset_id": "EVIDENCE-QUOTE-NATIVE-FRICTION-H900-FALSIFIER-ACCEPTANCE-001"
+    },
+    {
       "source_asset_id": "REPORT-QUOTE-NATIVE-QUOTED-BUY-H900-CLOCK-001",
       "relation": "derived_from",
       "target_asset_id": "EVIDENCE-QUOTE-NATIVE-QUOTED-BUY-H900-CLOCK-ACCEPTANCE-001"
@@ -8806,6 +8861,11 @@
       "source_asset_id": "SCRIPT-QUOTE-NATIVE-EVIDENCE-FIT-PANEL-001",
       "relation": "depends_on",
       "target_asset_id": "MODULE-QUOTE-NATIVE-EVIDENCE-FIT-PANEL-001"
+    },
+    {
+      "source_asset_id": "SCRIPT-QUOTE-NATIVE-FRICTION-H900-FALSIFIER-001",
+      "relation": "depends_on",
+      "target_asset_id": "MODULE-QUOTE-NATIVE-FRICTION-H900-FALSIFIER-001"
     },
     {
       "source_asset_id": "SCRIPT-QUOTE-NATIVE-QUOTED-BUY-H900-CLOCK-001",
@@ -9696,6 +9756,11 @@
       "source_asset_id": "TEST-QUOTE-NATIVE-EVIDENCE-FIT-PANEL-001",
       "relation": "depends_on",
       "target_asset_id": "MODULE-QUOTE-NATIVE-EVIDENCE-FIT-PANEL-001"
+    },
+    {
+      "source_asset_id": "TEST-QUOTE-NATIVE-FRICTION-H900-FALSIFIER-001",
+      "relation": "depends_on",
+      "target_asset_id": "MODULE-QUOTE-NATIVE-FRICTION-H900-FALSIFIER-001"
     },
     {
       "source_asset_id": "TEST-QUOTE-NATIVE-QUOTED-BUY-H900-CLOCK-001",

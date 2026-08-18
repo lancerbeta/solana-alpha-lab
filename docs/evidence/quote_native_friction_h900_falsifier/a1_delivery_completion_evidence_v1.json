@@ -1,0 +1,81 @@
+{
+  "acceptance_id": "QUOTE-NATIVE-FRICTION-H900-FALSIFIER-DELIVERY-COMPLETION-001",
+  "active_stop_conditions": [],
+  "as_of": "2026-08-18",
+  "base_main": "497a3056d79bb0328c3dfc56f68e4dbb2694d0cb",
+  "capability_radar_now": "NONE",
+  "cloud_bundle_mode": "OWNER_MANAGED_OPTIONAL_EXPORT",
+  "cloud_bundle_required_by_harness": false,
+  "cloud_bundle_smoke_required": false,
+  "factory_fit": {
+    "path": "docs/evidence/quote_native_friction_h900_falsifier/a1_delivery_factory_fit_v1.json",
+    "sha256": "9198a893b3571e59bf782d702c9dbfe540d435b73a9f963eb93d5b618c6f1b4e",
+    "verdict": "PASS"
+  },
+  "implementation_bindings": {
+    "catalog/assets/core.yaml": "7c0c992c6a94363ece0d1a585c6e420f09fcdf227f395dfaa4f6af8631cb5333",
+    "catalog/assets/lifecycle.yaml": "13fe584438e5990db4b54be878c498353565ad3669397d72082d01923289bb3e",
+    "catalog/catalog_manifest.yaml": "aee33a56609bbe0de99588fdafa1ab007a52ad5e92c1d8c18a37a7a6303febcd",
+    "catalog/generated/asset_edges.json": "c6900c5693308267e0cfdef72dc5e7b0e6773c16723007060d35f127fecf5266",
+    "configs/quote_native_friction_h900_falsifier_v1.yaml": "a22c3c2355defee97d5ac0b91415fb82631f159762ae0f7ef005211193de9af1",
+    "docs/PROJECT_MAP.md": "901421a97fdf22fe530391dc8e7195acb9926e5449576741d4df45e38de1b27e",
+    "docs/evidence/quote_native_friction_h900_falsifier/a1_quote_native_friction_h900_falsifier_acceptance_v1.json": "9e201f0d55c46f24669386e9e3584f8b877d490037e7495ca305a477b5f20074",
+    "docs/evidence/quote_native_friction_h900_falsifier/a1_quote_native_friction_h900_falsifier_runtime_receipt_v1.json": "19536c8a574b01c6127682454a4fc4c064af11b7a066b1306fd9bcab42ae5de9",
+    "docs/reports/quote_native_friction_h900_falsifier/a1_owner_readout_v1.md": "481fe2dd06225034ec60554882fb10d0658f9475ff9cd8e1dd54d9e0394c1590",
+    "docs/tasks/QUOTE_NATIVE_FRICTION_H900_FALSIFIER_V1.md": "0751400e9b1a5aa82434a12909dc2de19ed498e960e53db6edbb67954cb9a9de",
+    "scripts/run_quote_native_friction_h900_falsifier.py": "c9562c83d6be7548d960707e1f016d3299dfc7a0810630a51b5cdb43f438522d",
+    "src/solana_alpha_lab/quote_native_friction_h900_falsifier.py": "ea9cc34c3280a6beb1d0230508dc628b9e9d0e76b81e876aa6d530c80ab706ce",
+    "tests/test_quote_native_friction_h900_falsifier.py": "f727a282684cf635cf2bc496b75689d8b895c3b72dc25d83ff5004932bd6408f"
+  },
+  "non_claims": [
+    "NO_CANONICAL_DONE",
+    "NO_LIVE_PIT_OR_EXECUTION_CLAIM",
+    "NO_ALPHA_PNL_OR_NETRETURN",
+    "NO_H13_OR_H02_TRIAL",
+    "NO_MOVE_2_EARNED",
+    "NO_TAKER_OR_EXECUTE",
+    "NO_H3600_OR_H14400_OBSERVATION",
+    "NO_LIVE_UNIVERSE",
+    "NO_TIME_SEPARATED_MECHANISM_ON_Y_EQUALS_X",
+    "NO_RC001_FREEZE_MUTATION",
+    "NO_TRIAL_LEDGER_REWRITE"
+  ],
+  "owner_attention_triggers": {
+    "auth_or_access_recovery": false,
+    "external_material_action": false,
+    "material_owner_decision": false,
+    "unresolved_safety_or_truth_conflict": false,
+    "user_only_activation": false
+  },
+  "project_sources_disposition": {
+    "kind": "NO_CHANGE"
+  },
+  "schema": "smial.delivery-completion-evidence",
+  "schema_version": "1.0",
+  "side_effects": {
+    "cash_spend_usd_cents": 0,
+    "credential_reads": 0,
+    "fallbacks": 0,
+    "provider_requests": 9,
+    "retries": 0,
+    "wallet_signer_transaction_actions": 0
+  },
+  "state_change": "SAMPLE_INVALID_Y_EQUALS_X_STALE_COHORT",
+  "task_id": "QUOTE_NATIVE_FRICTION_H900_FALSIFIER_V1",
+  "validation": {
+    "full_gate": "ENFORCED_BY_PROJECT_BOUND_VALIDATION",
+    "github_ci": "ENFORCED_LIVE_AT_GUARDED_MERGE",
+    "independent_review": {
+      "path": "docs/evidence/quote_native_friction_h900_falsifier/a1_delivery_independent_review_v1.json",
+      "sha256": "7c5a645ade1ee2ef955aacf8a909f202068166f2215d2660ca574440ae94b6fb",
+      "verdict": "PASS"
+    },
+    "project_checks": [
+      "PASS_QUOTE_NATIVE_FRICTION_H900_FALSIFIER_TESTS",
+      "PASS_CATALOG_VALIDATION",
+      "PASS_NAVIGATION_CHECK",
+      "PASS_SECRET_SCAN"
+    ],
+    "targeted": "PASS_QUOTE_NATIVE_FRICTION_H900_FALSIFIER_TESTS"
+  }
+}
