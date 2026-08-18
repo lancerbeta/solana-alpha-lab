@@ -240,6 +240,16 @@ class CatalogImportTests(unittest.TestCase):
         with self.assertRaisesRegex(catalog.CatalogValidationError, "architecture_intent_provenance_invalid"):
             catalog.validate_semantics(manifest, assets, queries, lifecycle)
 
+    def test_repository_origin_accepted_direction_intent_validates(self) -> None:
+        manifest, assets, queries, lifecycle = self.documents()
+        target = next(r for d in assets for r in d["records"] if r["asset_id"] == "ARCH-INTENT-005")
+        self.assertEqual(target["origin"], "REPOSITORY")
+        self.assertEqual(target["status"], "ACCEPTED_DIRECTION_NOT_IMPLEMENTED")
+        catalog.validate_semantics(manifest, assets, queries, lifecycle)
+        target["origin"] = "PRE_GIT"
+        with self.assertRaisesRegex(catalog.CatalogValidationError, "architecture_intent_provenance_invalid"):
+            catalog.validate_semantics(manifest, assets, queries, lifecycle)
+
     def test_external_bundle_requires_external_retention(self) -> None:
         manifest, assets, queries, lifecycle = self.documents()
         target = next(r for d in assets for r in d["records"] if r["asset_id"] == "BUNDLE-TASK01-COMPLETION-001")

@@ -165,3 +165,53 @@ records:
     retention: TRACKED_REFERENCE
     canonicality: CURRENT_INTENT
     availability_note: The deterministic read-only Context Capsule projection is implemented by DELIVERY_HARNESS_V1; vector DB, remote RAG and Workbench UI remain excluded.
+- asset_id: ARCH-INTENT-005
+  record_version: '1.0'
+  asset_type: architecture_intent
+  purpose: Accepted Factory v1 operational-readiness milestone and owner-experience direction; productization remains NOT_TRIGGERED and unimplemented.
+  status: ACCEPTED_DIRECTION_NOT_IMPLEMENTED
+  origin: REPOSITORY
+  as_of: '2026-08-18'
+  truth_owner: USER_GOAL_OWNER
+  location:
+    kind: git_path
+    logical_uri: repo://docs/architecture/intents/ARCH-INTENT-005-factory-v1-operational-readiness-and-owner-experience.md
+    repository_path: docs/architecture/intents/ARCH-INTENT-005-factory-v1-operational-readiness-and-owner-experience.md
+  integrity:
+    kind: sha256
+    sha256: 3ce4780376a710fa5731e76e629c2d42aa351730a404abe88541c0ae9f8ce0bb
+  access:
+    mode: read_only
+    method: file
+    recipe_id: QUERY-CATALOG-RESOLVE-ASSET-001
+    network_required: false
+    secrets_required: false
+  relations:
+  - relation_type: derived_from
+    target_asset_id: ARCH-INTENT-002
+  - relation_type: derived_from
+    target_asset_id: ARCH-INTENT-004
+  - relation_type: derived_from
+    target_asset_id: ARCH-INTENT-T21-PRODUCT-VISION-001
+  - relation_type: advises
+    target_asset_id: CONFIG-FACTORY-V1-OPERATIONAL-READINESS-001
+  - relation_type: advises
+    target_asset_id: ROADMAP-PATCH-T21-PRODUCT-VISION-001
+  consumers:
+  - FACTORY-001
+  - REG-RESEARCH-001
+  - GOAL-OWNER
+  evidence: []
+  classification:
+    contains_secrets: false
+    contains_raw_data: false
+    sensitivity: INTERNAL_NON_SECRET
+  provenance:
+    created_at: '2026-08-18'
+    first_reliable_available_at: '2026-08-18'
+    imported_by_task: FACTORY-V1-OPERATIONAL-READINESS-V1
+    import_mode: REGISTERED_CURRENT_INTENT
+    past_availability_claim: NO_PAST_AVAILABILITY_CLAIM
+    retention: TRACKED_REFERENCE
+    canonicality: CURRENT_INTENT
+    availability_note: Git-native registration by FACTORY-V1-OPERATIONAL-READINESS-V1; not a TASK-21 import and not implementation evidence.

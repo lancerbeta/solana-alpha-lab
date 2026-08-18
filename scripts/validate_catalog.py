@@ -179,7 +179,7 @@ def validate_provenance(asset_id: str, asset: dict[str, Any], assets: dict[str, 
             for evidence in evidence_targets
         )
         required = (
-            asset["origin"] == "PROJECT_SOURCE"
+            asset["origin"] in {"PROJECT_SOURCE", "REPOSITORY"}
             and status in {"ACCEPTED_DIRECTION_NOT_IMPLEMENTED", *implementation_statuses}
             and implementation_evidenced
             and provenance["import_mode"] == "REGISTERED_CURRENT_INTENT"
