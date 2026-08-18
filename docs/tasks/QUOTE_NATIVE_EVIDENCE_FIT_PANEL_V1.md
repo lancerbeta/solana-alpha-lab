@@ -26,6 +26,7 @@ managed_write_set:
   - docs/evidence/quote_native_evidence_fit_panel/a1_delivery_independent_review_v1.json
   - docs/evidence/quote_native_evidence_fit_panel/a1_delivery_factory_fit_v1.json
   - catalog/assets/core.yaml
+  - catalog/assets/lifecycle.yaml
   - catalog/catalog_manifest.yaml
   - catalog/generated/asset_edges.json
   - docs/PROJECT_MAP.md
