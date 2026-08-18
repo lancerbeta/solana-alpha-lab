@@ -1,0 +1,62 @@
+schema: smial.quote-native-quoted-buy-h900-clock
+schema_version: '1.0'
+atom_id: QUOTE_NATIVE_QUOTED_BUY_H900_CLOCK_V1
+as_of: '2026-08-18'
+external_authority:
+  capture_authorized: true
+  owner_phrase: 'OK QUOTE_NATIVE_QUOTED_BUY_H900_CLOCK_V1: Jupiter /swap/v2/order quote-only, taker omitted, execute forbidden, wallet/signer/transaction forbidden, cash cap $0, no retry/fallback, call cap 16, bind registry v7 route JUPITER-SOLANA-SWAP-V2-ORDER-001, new clock A24 both notionals plus T21_R2_MINT_A 0.01 SOL only, t0 plus +15m only in this session, +60m and +240m explicit gap no backfill, leftover B/C and 0.001 forbidden, old due_at not rebuilt'
+  credential_reads: false
+  dotenv_reads: false
+  execute: false
+  build: false
+  taker: OMITTED_QUOTE_ONLY
+  cash_cap_usd_cents: 0
+  call_cap: 16
+provider_route:
+  route_id: JUPITER-SOLANA-SWAP-V2-ORDER-001
+  registry: configs/provider_route_capability_registry_v7.yaml
+  endpoint: https://api.jup.ag/swap/v2/order
+  method: GET
+  host: api.jup.ag
+  official_docs: https://developers.jup.ag/docs/swap/order-and-execute
+wrapped_sol_mint: So11111111111111111111111111111111111111112
+slippage_bps: '100'
+observable_horizon_seconds: 900
+gap_horizon_seconds:
+- 3600
+- 14400
+lateness_slack_seconds: 120
+cells:
+- identity_id: A24_POST_MIGRATION
+  mint: DMwbVy48dWVKGe9z1pcVnwF3HLMLrqWdDLfbvx8RchhK
+  notional_atomic: '10000000'
+  source_kind: GIT_FROZEN
+  source_path: configs/pmf_quote_slice_v1.yaml
+  post_migration_status: GIT_NAMED_POST_MIGRATION
+- identity_id: A24_POST_MIGRATION
+  mint: DMwbVy48dWVKGe9z1pcVnwF3HLMLrqWdDLfbvx8RchhK
+  notional_atomic: '1000000'
+  source_kind: GIT_FROZEN
+  source_path: configs/pmf_quote_slice_v1.yaml
+  post_migration_status: GIT_NAMED_POST_MIGRATION
+- identity_id: T21_R2_MINT_A
+  mint: 2Ezm4w3gFdymRAyhx9KEsbJV9NA79Y7UoiNWeXNFpump
+  notional_atomic: '10000000'
+  source_kind: GIT_FROZEN
+  source_path: configs/task21_final_cohort_freeze_v1.yaml
+  post_migration_status: GIT_NAMED_INDEPENDENT_NOT_PROVEN_POST_MIGRATION
+forbidden_identity_ids:
+- T21_R2_MINT_B
+- T21_R2_MINT_C
+runtime_limits:
+  timeout_seconds: 20.0
+  max_response_bytes: 500000
+execution_controls:
+  retries: 0
+  fallback: false
+  persist_transaction_bytes: false
+  provider_requests_max: 16
+  t0_provider_requests_max: 6
+  live_market_discovery: false
+  background_scheduler: false
+prior_panel_runtime_receipt: docs/evidence/quote_native_evidence_fit_panel/a1_quote_native_evidence_fit_panel_runtime_receipt_v1.json

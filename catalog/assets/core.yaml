@@ -24396,3 +24396,149 @@ records:
   evidence: []
   search_terms: [FACTORY_V1, TESTS, DESIGN_ONLY]
   classification: {contains_secrets: false, contains_raw_data: false, sensitivity: INTERNAL_NON_SECRET}
+
+- asset_id: EVIDENCE-QUOTE-NATIVE-QUOTED-BUY-H900-CLOCK-001
+  record_version: '1.0'
+  asset_type: evidence
+  purpose: Observed new-clock quote-native t0 plus honest +15m sells; H3600/H14400 explicit gap.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-08-18'
+  truth_owner: QUOTE_NATIVE_QUOTED_BUY_H900_CLOCK_V1
+  location: {kind: git_path, logical_uri: 'repo://docs/evidence/quote_native_quoted_buy_h900_clock/a1_quote_native_quoted_buy_h900_clock_runtime_receipt_v1.json', repository_path: docs/evidence/quote_native_quoted_buy_h900_clock/a1_quote_native_quoted_buy_h900_clock_runtime_receipt_v1.json}
+  integrity: {kind: sha256, sha256: c472a1b975eecd16f9f1d9e3622abdbda3dada3b231003a698a39ba4d9baee02}
+  access: {mode: read_only, method: file, network_required: false, secrets_required: false}
+  relations:
+  - {relation_type: derived_from, target_asset_id: CTRL-QUOTE-NATIVE-QUOTED-BUY-H900-CLOCK-001}
+  - {relation_type: depends_on, target_asset_id: CONFIG-PROVIDER-ROUTE-CAPABILITY-REGISTRY-007}
+  - {relation_type: validated_by, target_asset_id: TEST-QUOTE-NATIVE-QUOTED-BUY-H900-CLOCK-001}
+  consumers: [FACTORY-001, GOAL-OWNER]
+  evidence: []
+  search_terms: [QUOTE_NATIVE, H900, JUPITER_SWAP_V2, H900_PANEL_OBSERVED]
+  classification: {contains_secrets: false, contains_raw_data: false, sensitivity: INTERNAL_NON_SECRET}
+
+- asset_id: EVIDENCE-QUOTE-NATIVE-QUOTED-BUY-H900-CLOCK-ACCEPTANCE-001
+  record_version: '1.0'
+  asset_type: evidence
+  purpose: Acceptance that three quoted buys produced comparable +15m sells on a new clock.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-08-18'
+  truth_owner: QUOTE_NATIVE_QUOTED_BUY_H900_CLOCK_V1
+  location: {kind: git_path, logical_uri: 'repo://docs/evidence/quote_native_quoted_buy_h900_clock/a1_quote_native_quoted_buy_h900_clock_acceptance_v1.json', repository_path: docs/evidence/quote_native_quoted_buy_h900_clock/a1_quote_native_quoted_buy_h900_clock_acceptance_v1.json}
+  integrity: {kind: sha256, sha256: 41e30bfd2cdf2ebea54535371d5f1fe49e132f95d3ef2216f4c37c20f8feb7f8}
+  access: {mode: read_only, method: file, network_required: false, secrets_required: false}
+  relations: [{relation_type: derived_from, target_asset_id: EVIDENCE-QUOTE-NATIVE-QUOTED-BUY-H900-CLOCK-001}]
+  consumers: [FACTORY-001, GOAL-OWNER]
+  evidence: []
+  search_terms: [QUOTE_NATIVE, ACCEPTANCE, H900]
+  classification: {contains_secrets: false, contains_raw_data: false, sensitivity: INTERNAL_NON_SECRET}
+
+- asset_id: REPORT-QUOTE-NATIVE-QUOTED-BUY-H900-CLOCK-001
+  record_version: '1.0'
+  asset_type: control_document
+  purpose: Russian owner readout for the new-clock +15m panel and explicit +60m/+240m gaps.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-08-18'
+  truth_owner: QUOTE_NATIVE_QUOTED_BUY_H900_CLOCK_V1
+  location: {kind: git_path, logical_uri: 'repo://docs/reports/quote_native_quoted_buy_h900_clock/a1_owner_readout_v1.md', repository_path: docs/reports/quote_native_quoted_buy_h900_clock/a1_owner_readout_v1.md}
+  integrity: {kind: sha256, sha256: 8912d7ff2c5daf262924826ff63d31419d26ce444c53d7aba376144359bea918}
+  access: {mode: read_only, method: file, network_required: false, secrets_required: false}
+  relations: [{relation_type: derived_from, target_asset_id: EVIDENCE-QUOTE-NATIVE-QUOTED-BUY-H900-CLOCK-ACCEPTANCE-001}]
+  consumers: [FACTORY-001, GOAL-OWNER]
+  evidence: []
+  search_terms: [QUOTE_NATIVE, OWNER_READOUT, H900]
+  classification: {contains_secrets: false, contains_raw_data: false, sensitivity: INTERNAL_NON_SECRET}
+
+- asset_id: CTRL-QUOTE-NATIVE-QUOTED-BUY-H900-CLOCK-001
+  record_version: '1.0'
+  asset_type: control_document
+  purpose: Harness-valid contract for the authorized new-clock quoted-buy +15m panel.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-08-18'
+  truth_owner: QUOTE_NATIVE_QUOTED_BUY_H900_CLOCK_V1
+  location: {kind: git_path, logical_uri: 'repo://docs/tasks/QUOTE_NATIVE_QUOTED_BUY_H900_CLOCK_V1.md', repository_path: docs/tasks/QUOTE_NATIVE_QUOTED_BUY_H900_CLOCK_V1.md}
+  integrity: {kind: sha256, sha256: 1c4325df2ae3c583067693fdc6d0ca9f2d44dc677ec6221d91cb92fb4055d878}
+  access: {mode: read_only, method: file, network_required: false, secrets_required: false}
+  relations:
+  - {relation_type: contains, target_asset_id: MODULE-QUOTE-NATIVE-QUOTED-BUY-H900-CLOCK-001}
+  - {relation_type: contains, target_asset_id: SCRIPT-QUOTE-NATIVE-QUOTED-BUY-H900-CLOCK-001}
+  - {relation_type: depends_on, target_asset_id: CONFIG-PROVIDER-ROUTE-CAPABILITY-REGISTRY-007}
+  consumers: [FACTORY-001, GOAL-OWNER]
+  evidence: []
+  search_terms: [QUOTE_NATIVE, TASK_CONTRACT, H900]
+  classification: {contains_secrets: false, contains_raw_data: false, sensitivity: INTERNAL_NON_SECRET}
+
+- asset_id: CONFIG-QUOTE-NATIVE-QUOTED-BUY-H900-CLOCK-001
+  record_version: '1.0'
+  asset_type: configuration
+  purpose: Frozen quoted-buy cells, +15m observable horizon, and explicit +60m/+240m gaps.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-08-18'
+  truth_owner: QUOTE_NATIVE_QUOTED_BUY_H900_CLOCK_V1
+  location: {kind: git_path, logical_uri: 'repo://configs/quote_native_quoted_buy_h900_clock_v1.yaml', repository_path: configs/quote_native_quoted_buy_h900_clock_v1.yaml}
+  integrity: {kind: sha256, sha256: f5d83e1821f44f04b354584f65785d996516897382fd025073d53d5741f3055b}
+  access: {mode: read_only, method: file, network_required: false, secrets_required: false}
+  relations: [{relation_type: governed_by, target_asset_id: CTRL-QUOTE-NATIVE-QUOTED-BUY-H900-CLOCK-001}]
+  consumers: [FACTORY-001]
+  evidence: []
+  search_terms: [QUOTE_NATIVE, H900, CONFIG]
+  classification: {contains_secrets: false, contains_raw_data: false, sensitivity: INTERNAL_NON_SECRET}
+
+- asset_id: MODULE-QUOTE-NATIVE-QUOTED-BUY-H900-CLOCK-001
+  record_version: '1.0'
+  asset_type: script
+  purpose: Fail-closed new-clock panel; due-wave fires only in-window H900 sells.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-08-18'
+  truth_owner: QUOTE_NATIVE_QUOTED_BUY_H900_CLOCK_V1
+  location: {kind: git_path, logical_uri: 'repo://src/solana_alpha_lab/quote_native_quoted_buy_h900_clock.py', repository_path: src/solana_alpha_lab/quote_native_quoted_buy_h900_clock.py}
+  integrity: {kind: sha256, sha256: 35f081b6c144e955dced5697228cbe5903b0306a69609e2e5a26a1f068d80752}
+  access: {mode: read_only, method: file, network_required: false, secrets_required: false}
+  relations:
+  - {relation_type: depends_on, target_asset_id: CONFIG-QUOTE-NATIVE-QUOTED-BUY-H900-CLOCK-001}
+  - {relation_type: depends_on, target_asset_id: MODULE-QUOTE-NATIVE-EVIDENCE-FIT-PANEL-001}
+  consumers: [FACTORY-001]
+  evidence: []
+  search_terms: [QUOTE_NATIVE, MODULE, H900]
+  classification: {contains_secrets: false, contains_raw_data: false, sensitivity: INTERNAL_NON_SECRET}
+
+- asset_id: SCRIPT-QUOTE-NATIVE-QUOTED-BUY-H900-CLOCK-001
+  record_version: '1.0'
+  asset_type: script
+  purpose: Runner for the authorized new-clock t0 and in-session H900 waves with A4 raw retention.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-08-18'
+  truth_owner: QUOTE_NATIVE_QUOTED_BUY_H900_CLOCK_V1
+  location: {kind: git_path, logical_uri: 'repo://scripts/run_quote_native_quoted_buy_h900_clock.py', repository_path: scripts/run_quote_native_quoted_buy_h900_clock.py}
+  integrity: {kind: sha256, sha256: 647655409d72fd9a1873fac5e6ee82f5042e44b95890634c52d488a8c77bfffe}
+  access: {mode: read_only, method: file, network_required: false, secrets_required: false}
+  relations: [{relation_type: depends_on, target_asset_id: MODULE-QUOTE-NATIVE-QUOTED-BUY-H900-CLOCK-001}]
+  consumers: [FACTORY-001]
+  evidence: []
+  search_terms: [QUOTE_NATIVE, RUNNER, H900]
+  classification: {contains_secrets: false, contains_raw_data: false, sensitivity: INTERNAL_NON_SECRET}
+
+- asset_id: TEST-QUOTE-NATIVE-QUOTED-BUY-H900-CLOCK-001
+  record_version: '1.0'
+  asset_type: script
+  purpose: Targeted tests that leftover cells are forbidden, gaps stay EXPLICIT_GAP, and late H900 is MISSED_OFFSET.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-08-18'
+  truth_owner: QUOTE_NATIVE_QUOTED_BUY_H900_CLOCK_V1
+  location: {kind: git_path, logical_uri: 'repo://tests/test_quote_native_quoted_buy_h900_clock.py', repository_path: tests/test_quote_native_quoted_buy_h900_clock.py}
+  integrity: {kind: sha256, sha256: e9ed5658d295399c65e458d0fbefccabc1faacc22cf0df9851c7a78ba355b020}
+  access: {mode: read_only, method: file, network_required: false, secrets_required: false}
+  relations:
+  - {relation_type: depends_on, target_asset_id: MODULE-QUOTE-NATIVE-QUOTED-BUY-H900-CLOCK-001}
+  - {relation_type: depends_on, target_asset_id: EVIDENCE-QUOTE-NATIVE-QUOTED-BUY-H900-CLOCK-001}
+  consumers: [FACTORY-001]
+  evidence: []
+  search_terms: [QUOTE_NATIVE, TESTS, H900]
+  classification: {contains_secrets: false, contains_raw_data: false, sensitivity: INTERNAL_NON_SECRET}

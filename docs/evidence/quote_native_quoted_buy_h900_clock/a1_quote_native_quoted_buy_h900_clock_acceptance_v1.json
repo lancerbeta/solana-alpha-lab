@@ -1,0 +1,72 @@
+{
+  "acceptance_id": "EVIDENCE-QUOTE-NATIVE-QUOTED-BUY-H900-CLOCK-001",
+  "alpha_claim": false,
+  "as_of": "2026-08-18",
+  "atom_id": "QUOTE_NATIVE_QUOTED_BUY_H900_CLOCK_V1",
+  "call_cap": 16,
+  "cash_spend_usd_cents": 0,
+  "cheapest_falsifier": "QUOTED_BUY_FAILS_COMPARABLE_H900_SELL",
+  "cheapest_falsifier_result": "NOT_TRIGGERED",
+  "credential_reads": 0,
+  "execute": "FORBIDDEN",
+  "execution_claim": false,
+  "gap_horizons": ["SELL_H3600", "SELL_H14400"],
+  "gap_status": "EXPLICIT_GAP_NO_BACKFILL",
+  "historical_receipts_rewritten": false,
+  "h900_due_at": "2026-08-18T01:51:24Z",
+  "h900_observed_at": "2026-08-18T01:52:14Z",
+  "h900_quote_observed_count": 3,
+  "identities_quoted": [
+    "A24_POST_MIGRATION",
+    "T21_R2_MINT_A"
+  ],
+  "identity_source": "GIT_FROZEN_NO_LIVE_DISCOVERY",
+  "leftover_b_c_or_t21a_001": "FORBIDDEN_NOT_SELECTED",
+  "limitations": [
+    "RATE_LIMIT_STOPPED_REMAINING_CELLS",
+    "H3600_H14400_EXPLICIT_GAP_NO_BACKFILL",
+    "T21_R2_MINT_A_REVERSE_T0_HTTP_429"
+  ],
+  "live_PIT_claim": false,
+  "live_registry_id": "PROVIDER-ROUTE-CAPABILITY-REGISTRY-007",
+  "new_clock": true,
+  "non_claims": [
+    "NO_LIVE_PIT_CLAIM",
+    "NO_EXECUTION_CLAIM",
+    "NO_ALPHA",
+    "NO_NETRETURN",
+    "NO_RC001_MUTATION",
+    "NO_H11_UNPARK",
+    "NO_H13_OR_H02_TRIAL",
+    "NO_TRANSACTION_BYTES_IN_GIT",
+    "NO_CANONICAL_DONE",
+    "NOT_A_HYPOTHESIS_TRIAL",
+    "NO_MOVE_1_COMPLETE",
+    "NO_H3600_OR_H14400_OBSERVATION",
+    "NO_OLD_CLOCK_DUE_REBUILD",
+    "NO_POST_MIGRATION_INFERENCE_FOR_UNPROVEN_T21"
+  ],
+  "observable_horizon_seconds": 900,
+  "old_panel_receipt_mutated": false,
+  "owner_decision": "AUTHORIZE_QUOTE_NATIVE_QUOTED_BUY_H900_CLOCK",
+  "owner_phrase": "OK QUOTE_NATIVE_QUOTED_BUY_H900_CLOCK_V1: Jupiter /swap/v2/order quote-only, taker omitted, execute forbidden, wallet/signer/transaction forbidden, cash cap $0, no retry/fallback, call cap 16, bind registry v7 route JUPITER-SOLANA-SWAP-V2-ORDER-001, new clock A24 both notionals plus T21_R2_MINT_A 0.01 SOL only, t0 plus +15m only in this session, +60m and +240m explicit gap no backfill, leftover B/C and 0.001 forbidden, old due_at not rebuilt",
+  "panel_started_at": "2026-08-18T01:36:24Z",
+  "project_sources_disposition": {
+    "kind": "NO_CHANGE"
+  },
+  "provider_requests": 9,
+  "quoted_buy_ids": [
+    "A24_POST_MIGRATION:10000000:BUY_T0",
+    "A24_POST_MIGRATION:1000000:BUY_T0",
+    "T21_R2_MINT_A:10000000:BUY_T0"
+  ],
+  "retries": 0,
+  "route_id": "JUPITER-SOLANA-SWAP-V2-ORDER-001",
+  "runtime_receipt": "docs/evidence/quote_native_quoted_buy_h900_clock/a1_quote_native_quoted_buy_h900_clock_runtime_receipt_v1.json",
+  "runtime_receipt_sha256": "c472a1b975eecd16f9f1d9e3622abdbda3dada3b231003a698a39ba4d9baee02",
+  "schema": "smial.quote-native-quoted-buy-h900-clock.acceptance",
+  "schema_version": "1.0",
+  "t0_quote_observed_count": 5,
+  "taker": "OMITTED_QUOTE_ONLY",
+  "terminal": "H900_PANEL_OBSERVED"
+}

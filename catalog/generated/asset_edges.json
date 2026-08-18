@@ -583,6 +583,11 @@
       "target_asset_id": "CTRL-QUOTE-NATIVE-EVIDENCE-FIT-PANEL-001"
     },
     {
+      "source_asset_id": "CONFIG-QUOTE-NATIVE-QUOTED-BUY-H900-CLOCK-001",
+      "relation": "governed_by",
+      "target_asset_id": "CTRL-QUOTE-NATIVE-QUOTED-BUY-H900-CLOCK-001"
+    },
+    {
       "source_asset_id": "CONFIG-T20-COLLECTION-SPEC-001",
       "relation": "governed_by",
       "target_asset_id": "CONTRACT-T20-COLLECTION-SPEC-001"
@@ -1963,6 +1968,21 @@
       "target_asset_id": "CONFIG-PROVIDER-ROUTE-CAPABILITY-REGISTRY-007"
     },
     {
+      "source_asset_id": "CTRL-QUOTE-NATIVE-QUOTED-BUY-H900-CLOCK-001",
+      "relation": "contains",
+      "target_asset_id": "MODULE-QUOTE-NATIVE-QUOTED-BUY-H900-CLOCK-001"
+    },
+    {
+      "source_asset_id": "CTRL-QUOTE-NATIVE-QUOTED-BUY-H900-CLOCK-001",
+      "relation": "contains",
+      "target_asset_id": "SCRIPT-QUOTE-NATIVE-QUOTED-BUY-H900-CLOCK-001"
+    },
+    {
+      "source_asset_id": "CTRL-QUOTE-NATIVE-QUOTED-BUY-H900-CLOCK-001",
+      "relation": "depends_on",
+      "target_asset_id": "CONFIG-PROVIDER-ROUTE-CAPABILITY-REGISTRY-007"
+    },
+    {
       "source_asset_id": "CTRL-RC001-H13-PARK-FROM-PRIORITY-001",
       "relation": "contains",
       "target_asset_id": "MODULE-RC001-H13-PARK-FROM-PRIORITY-001"
@@ -2986,6 +3006,26 @@
       "source_asset_id": "EVIDENCE-QUOTE-NATIVE-EVIDENCE-FIT-PANEL-ACCEPTANCE-001",
       "relation": "derived_from",
       "target_asset_id": "EVIDENCE-QUOTE-NATIVE-EVIDENCE-FIT-PANEL-001"
+    },
+    {
+      "source_asset_id": "EVIDENCE-QUOTE-NATIVE-QUOTED-BUY-H900-CLOCK-001",
+      "relation": "depends_on",
+      "target_asset_id": "CONFIG-PROVIDER-ROUTE-CAPABILITY-REGISTRY-007"
+    },
+    {
+      "source_asset_id": "EVIDENCE-QUOTE-NATIVE-QUOTED-BUY-H900-CLOCK-001",
+      "relation": "derived_from",
+      "target_asset_id": "CTRL-QUOTE-NATIVE-QUOTED-BUY-H900-CLOCK-001"
+    },
+    {
+      "source_asset_id": "EVIDENCE-QUOTE-NATIVE-QUOTED-BUY-H900-CLOCK-001",
+      "relation": "validated_by",
+      "target_asset_id": "TEST-QUOTE-NATIVE-QUOTED-BUY-H900-CLOCK-001"
+    },
+    {
+      "source_asset_id": "EVIDENCE-QUOTE-NATIVE-QUOTED-BUY-H900-CLOCK-ACCEPTANCE-001",
+      "relation": "derived_from",
+      "target_asset_id": "EVIDENCE-QUOTE-NATIVE-QUOTED-BUY-H900-CLOCK-001"
     },
     {
       "source_asset_id": "EVIDENCE-RC001-H13-PARK-FROM-PRIORITY-001",
@@ -6418,6 +6458,16 @@
       "target_asset_id": "MODULE-PMF-QUOTE-SLICE-ONE-SHOT-001"
     },
     {
+      "source_asset_id": "MODULE-QUOTE-NATIVE-QUOTED-BUY-H900-CLOCK-001",
+      "relation": "depends_on",
+      "target_asset_id": "CONFIG-QUOTE-NATIVE-QUOTED-BUY-H900-CLOCK-001"
+    },
+    {
+      "source_asset_id": "MODULE-QUOTE-NATIVE-QUOTED-BUY-H900-CLOCK-001",
+      "relation": "depends_on",
+      "target_asset_id": "MODULE-QUOTE-NATIVE-EVIDENCE-FIT-PANEL-001"
+    },
+    {
       "source_asset_id": "MODULE-RC001-H13-PARK-FROM-PRIORITY-001",
       "relation": "governed_by",
       "target_asset_id": "CTRL-RC001-H13-PARK-FROM-PRIORITY-001"
@@ -7958,6 +8008,11 @@
       "target_asset_id": "EVIDENCE-QUOTE-NATIVE-EVIDENCE-FIT-PANEL-ACCEPTANCE-001"
     },
     {
+      "source_asset_id": "REPORT-QUOTE-NATIVE-QUOTED-BUY-H900-CLOCK-001",
+      "relation": "derived_from",
+      "target_asset_id": "EVIDENCE-QUOTE-NATIVE-QUOTED-BUY-H900-CLOCK-ACCEPTANCE-001"
+    },
+    {
       "source_asset_id": "REPORT-RC001-H13-PARK-FROM-PRIORITY-001",
       "relation": "derived_from",
       "target_asset_id": "EVIDENCE-RC001-H13-PARK-FROM-PRIORITY-001"
@@ -8751,6 +8806,11 @@
       "source_asset_id": "SCRIPT-QUOTE-NATIVE-EVIDENCE-FIT-PANEL-001",
       "relation": "depends_on",
       "target_asset_id": "MODULE-QUOTE-NATIVE-EVIDENCE-FIT-PANEL-001"
+    },
+    {
+      "source_asset_id": "SCRIPT-QUOTE-NATIVE-QUOTED-BUY-H900-CLOCK-001",
+      "relation": "depends_on",
+      "target_asset_id": "MODULE-QUOTE-NATIVE-QUOTED-BUY-H900-CLOCK-001"
     },
     {
       "source_asset_id": "SCRIPT-RC001-H13-PARK-FROM-PRIORITY-001",
@@ -9636,6 +9696,16 @@
       "source_asset_id": "TEST-QUOTE-NATIVE-EVIDENCE-FIT-PANEL-001",
       "relation": "depends_on",
       "target_asset_id": "MODULE-QUOTE-NATIVE-EVIDENCE-FIT-PANEL-001"
+    },
+    {
+      "source_asset_id": "TEST-QUOTE-NATIVE-QUOTED-BUY-H900-CLOCK-001",
+      "relation": "depends_on",
+      "target_asset_id": "EVIDENCE-QUOTE-NATIVE-QUOTED-BUY-H900-CLOCK-001"
+    },
+    {
+      "source_asset_id": "TEST-QUOTE-NATIVE-QUOTED-BUY-H900-CLOCK-001",
+      "relation": "depends_on",
+      "target_asset_id": "MODULE-QUOTE-NATIVE-QUOTED-BUY-H900-CLOCK-001"
     },
     {
       "source_asset_id": "TEST-RC001-H13-PARK-FROM-PRIORITY-001",

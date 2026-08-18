@@ -1,0 +1,75 @@
+{
+  "as_of": "2026-08-18",
+  "non_claims": [
+    "NO_CRYPTOGRAPHIC_REVIEWER_IDENTITY",
+    "NO_SINGLE_AGENT_REVIEW_FALLBACK",
+    "REVIEW_IS_NOT_SEMANTIC_DONE",
+    "NO_LIVE_PIT_OR_EXECUTION_CLAIM",
+    "NO_ALPHA_NETRETURN_OR_CASHFLOW",
+    "NO_H13_OR_H02_TRIAL",
+    "NO_MOVE_1_COMPLETE",
+    "NO_H3600_OR_H14400_OBSERVATION"
+  ],
+  "required_roles": [
+    "ARCHITECTURE_CRITIC",
+    "CODE_REVIEWER",
+    "GOAL_DOD_CRITIC"
+  ],
+  "review_id": "QUOTE-NATIVE-QUOTED-BUY-H900-CLOCK-INDEPENDENT-REVIEW-001",
+  "reviewed_bindings_sha256": "61e04411cc4c773cd1323ddab8cd32e01072a7635ea376d3ccd52c4fbbe24b86",
+  "reviewed_inventory_sha256": "c36f6249aa706fe776abf8816f456217b98f113c121be63d476e11ee63a72024",
+  "reviews": [
+    {
+      "findings": [
+        "CHECKED_WRAP_PUBLIC_ORDER_HELPERS",
+        "CHECKED_OLD_CLOCK_NOT_REBUILT",
+        "CHECKED_OLD_PANEL_RECEIPT_IMMUTABLE_PATH",
+        "CHECKED_GAP_HORIZONS_NEVER_SELECTED",
+        "CHECKED_KEYLESS_NO_TAKER_EXECUTE_ENV",
+        "CHECKED_NO_RETRY_FALLBACK",
+        "CHECKED_T21_POST_MIGRATION_LABELED_NOT_PROVEN",
+        "CHECKED_REVERSIBLE_ADDITIVE_ATOM"
+      ],
+      "role": "ARCHITECTURE_CRITIC",
+      "verdict": "PASS"
+    },
+    {
+      "findings": [
+        "CHECKED_THREE_CELLS_ONLY",
+        "CHECKED_NO_LEFTOVER_B_C_OR_T21A_001",
+        "CHECKED_NO_TAKER_EXECUTE_DOTENV",
+        "CHECKED_DUE_WAVE_H900_WINDOW_AND_PARENT",
+        "CHECKED_EARLY_STAYS_SCHEDULED_ZERO_CALLS",
+        "CHECKED_LATE_MISSED_OFFSET_ZERO_CALLS",
+        "CHECKED_H3600_H14400_EXPLICIT_GAP_NEVER_SELECTED",
+        "CHECKED_REJECT_FOREIGN_ATOM_ID",
+        "CHECKED_T0_CAP_6_TOTAL_CAP_16",
+        "CHECKED_NO_SKIPTEST",
+        "CHECKED_LIFECYCLE_REMAINS_IN_WRITE_SET",
+        "CHECKED_LIVE_H900_PANEL_OBSERVED"
+      ],
+      "role": "CODE_REVIEWER",
+      "verdict": "PASS"
+    },
+    {
+      "findings": [
+        "CHECKED_DECISION_DELTA",
+        "CHECKED_FALSIFIABLE",
+        "CHECKED_RATE_LIMIT_NOT_CHEAPEST_FALSIFIER",
+        "CHECKED_CELLS",
+        "CHECKED_NEW_CLOCK",
+        "CHECKED_H900_WINDOW",
+        "CHECKED_EXPLICIT_GAPS",
+        "CHECKED_READOUT_NEW_CLOCK",
+        "CHECKED_NON_CLAIMS_NOT_DONE",
+        "CHECKED_NEXT_OWNER_DECISION"
+      ],
+      "role": "GOAL_DOD_CRITIC",
+      "verdict": "PASS"
+    }
+  ],
+  "schema": "smial.delivery-independent-review-evidence",
+  "schema_version": "1.0",
+  "task_id": "QUOTE_NATIVE_QUOTED_BUY_H900_CLOCK_V1",
+  "verdict": "PASS"
+}
