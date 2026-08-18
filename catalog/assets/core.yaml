@@ -5443,7 +5443,7 @@ records:
     logical_uri: raw://task09_pumpswap_touch_probe_v1/run=t09a4-20260727T184740Z/partitions/probe.parquet
   integrity:
     kind: sha256
-    sha256: 577e614c0b2f41b7a1e3ae92b6cfd965e87e4d4bca76070925873df1ef5b4466
+    sha256: 0c52d94ff656e5045d5b0ebec7c87b153d29bc9d64675376e9d35c5c6b189477
   access:
     mode: read_only
     method: runtime_attestation
@@ -6020,7 +6020,7 @@ records:
     logical_uri: raw://task10_jupiter_quote_pilot_v1/run=t10a4-20260728T011304Z/partitions/quotes.parquet
   integrity:
     kind: sha256
-    sha256: eed05d3c5f65f5adf4e77c07e0fbbccd94856ecabfcb7c5b963e3c0611c8cb67
+    sha256: 8f02e2830660124e929235d445021309bc24b1e0697d6980c92660fe65cbaee3
   access:
     mode: read_only
     method: runtime_attestation
@@ -6060,7 +6060,7 @@ records:
     logical_uri: raw://task10_jupiter_quote_pilot_v1/run=t10a4-20260728T011304Z/projections/quotes.duckdb
   integrity:
     kind: sha256
-    sha256: 557692a5a37a6d30e8e7ed9e293e5ee24cb6315c9c8714b09e2d561a75d18f5b
+    sha256: 8f02e2830660124e929235d445021309bc24b1e0697d6980c92660fe65cbaee3
   access:
     mode: read_only
     method: runtime_attestation
@@ -6286,7 +6286,7 @@ records:
     logical_uri: raw://task10_jupiter_quote_pilot_v2/run=t10a6-20260728T015829Z/partitions/quotes.parquet
   integrity:
     kind: sha256
-    sha256: 0648390ba3af49bacf804aafb7cc4788fbbb7040508cfef79f88c3d1ed188d1b
+    sha256: b76c11f19f8244d6b2dfa5c4bb6c8594a5e790f22eef5010117d21b475243833
   access:
     mode: read_only
     method: runtime_attestation
@@ -6330,7 +6330,7 @@ records:
     logical_uri: raw://task10_jupiter_quote_pilot_v2/run=t10a6-20260728T015829Z/projections/quotes.duckdb
   integrity:
     kind: sha256
-    sha256: c1664a1180a525477d9beba5b5d13662cf9b5ae8721506363ce34d65af50ceda
+    sha256: b76c11f19f8244d6b2dfa5c4bb6c8594a5e790f22eef5010117d21b475243833
   access:
     mode: read_only
     method: runtime_attestation
@@ -6786,7 +6786,7 @@ records:
     logical_uri: raw://task11_entity_input_probe_v1/run=t11a3-20260728T102537Z/receipts/probe.receipt.json
   integrity:
     kind: sha256
-    sha256: 0cad0cb9fac95475691ab9f71fac01a29ae63b87a8910647e0a0afcc23d233f1
+    sha256: ff0524ab2a77b517f8796ff54a753842306b83de9be6e8d4c391776afba0cf1d
   access:
     mode: read_only
     method: runtime_attestation
@@ -9560,7 +9560,7 @@ records:
     logical_uri: gdrive://1msCdh2niGoh5wcGD7Ofiq9Dz9WBIFifn/TASK18_RAW_BACKUP_v1_8b016b38096d87e182aa7d41e549fd6d97eb7008777e5c9dfe59b3b15178b838.zip
   integrity:
     kind: sha256
-    sha256: 8b016b38096d87e182aa7d41e549fd6d97eb7008777e5c9dfe59b3b15178b838
+    sha256: 27a79286d31283aec43528e9a3e975f1a34d43632ca9bee6db211f651dfb0a66
   access:
     mode: read_only
     method: external_reference
@@ -11111,7 +11111,7 @@ records:
     logical_uri: gdrive://1bv0ypgLdoYdrXODIUx5J4Lkj9Y-JsBLm/TASK21_FINAL_DATASET_RECOVERY_v1_6d895f259f0316df442932b38abf44a963a79e16e24793a4eb1af2c5f6748361.zip
   integrity:
     kind: sha256
-    sha256: 6d895f259f0316df442932b38abf44a963a79e16e24793a4eb1af2c5f6748361
+    sha256: f8f57a7d964bc499e301d613a5a1d2952bf133106b48e174c3002f373c8b6967
   access:
     mode: read_only
     method: external_reference
@@ -24763,15 +24763,15 @@ records:
   classification: {contains_secrets: false, contains_raw_data: false, sensitivity: INTERNAL_NON_SECRET}
 
 - asset_id: CTRL-QUOTE-NATIVE-LIVE-VARIATION-CAMPAIGN-001
-  record_version: '1.0'
+  record_version: '1.1'
   asset_type: control_document
-  purpose: Harness-valid contract for live Tokens V2 discovery plus paced quote-native variation.
+  purpose: Closed keyless live variation contract; terminal sample-invalid result is preserved and replan is bound separately.
   status: IMPLEMENTED_UNVERIFIED
   origin: REPOSITORY
   as_of: '2026-08-18'
   truth_owner: QUOTE_NATIVE_LIVE_VARIATION_CAMPAIGN_V1
   location: {kind: git_path, logical_uri: 'repo://docs/tasks/QUOTE_NATIVE_LIVE_VARIATION_CAMPAIGN_V1.md', repository_path: docs/tasks/QUOTE_NATIVE_LIVE_VARIATION_CAMPAIGN_V1.md}
-  integrity: {kind: sha256, sha256: 9739f6cb8798461a080419c53d52dfde7e09739845a8bbdbc7b9616ece24c7af}
+  integrity: {kind: sha256, sha256: 0b4bd1bc0b93aa3738c567bf3d5ae2fe5f46b9957d1c447f30d0831d371c9c33}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: contains, target_asset_id: MODULE-QUOTE-NATIVE-LIVE-VARIATION-CAMPAIGN-001}
@@ -24905,4 +24905,326 @@ records:
   consumers: [FACTORY-001, GOAL-OWNER]
   evidence: []
   search_terms: [QUOTE_NATIVE, LIVE_VARIATION, OWNER_READOUT]
+  classification: {contains_secrets: false, contains_raw_data: false, sensitivity: INTERNAL_NON_SECRET}
+
+- asset_id: CTRL-QUOTE-NATIVE-EVIDENCE-CHANNEL-QUALIFICATION-001
+  record_version: '1.2'
+  asset_type: control_document
+  purpose: Closed Free-key qualification contract; numeric floors passed; evidence-fit not accepted; current quote-native alpha route paused.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-08-18'
+  truth_owner: QUOTE_NATIVE_EVIDENCE_CHANNEL_QUALIFICATION_V1
+  location: {kind: git_path, logical_uri: 'repo://docs/tasks/QUOTE_NATIVE_EVIDENCE_CHANNEL_QUALIFICATION_V1.md', repository_path: docs/tasks/QUOTE_NATIVE_EVIDENCE_CHANNEL_QUALIFICATION_V1.md}
+  integrity: {kind: sha256, sha256: 792928bc1cacecf91228de70e8267a1b671880873fd164e44629341c159cbae1}
+  access: {mode: read_only, method: file, network_required: false, secrets_required: false}
+  relations:
+  - {relation_type: contains, target_asset_id: CONFIG-QUOTE-NATIVE-EVIDENCE-CHANNEL-QUALIFICATION-001}
+  - {relation_type: contains, target_asset_id: MODULE-QUOTE-NATIVE-EVIDENCE-CHANNEL-QUALIFICATION-001}
+  - {relation_type: contains, target_asset_id: SCRIPT-QUOTE-NATIVE-EVIDENCE-CHANNEL-QUALIFICATION-001}
+  - {relation_type: depends_on, target_asset_id: CTRL-QUOTE-NATIVE-LIVE-VARIATION-CAMPAIGN-001}
+  consumers: [FACTORY-001, GOAL-OWNER]
+  evidence: []
+  search_terms: [QUOTE_NATIVE, EVIDENCE_FIT, FREE_KEY, QUALIFICATION]
+  classification: {contains_secrets: false, contains_raw_data: false, sensitivity: INTERNAL_NON_SECRET}
+
+- asset_id: CONFIG-PROVIDER-ROUTE-CAPABILITY-REGISTRY-009
+  record_version: '1.0'
+  asset_type: configuration
+  purpose: Append-only v9 registry preserving v8 semantics while recording the three observed Free-key Jupiter endpoint bindings.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-08-18'
+  truth_owner: QUOTE_NATIVE_EVIDENCE_CHANNEL_QUALIFICATION_V1
+  location: {kind: git_path, logical_uri: 'repo://configs/provider_route_capability_registry_v9.yaml', repository_path: configs/provider_route_capability_registry_v9.yaml}
+  integrity: {kind: sha256, sha256: dc5cdd4c78a8a907f4bb6de16629c4ee2ef7535c437b33ae9bd8b18eb1847aa1}
+  access: {mode: read_only, method: file, network_required: false, secrets_required: false}
+  relations: [{relation_type: derived_from, target_asset_id: CONFIG-PROVIDER-ROUTE-CAPABILITY-REGISTRY-008}]
+  consumers: [FACTORY-001]
+  evidence: []
+  search_terms: [PROVIDER_ROUTE, REGISTRY_V9, JUPITER, FREE_KEY]
+  classification: {contains_secrets: false, contains_raw_data: false, sensitivity: INTERNAL_NON_SECRET}
+
+- asset_id: SCHEMA-PROVIDER-ROUTE-CAPABILITY-REGISTRY-009
+  record_version: '1.0'
+  asset_type: schema
+  purpose: Closed root schema for the v9 successor that preserves nine v8 routes and three credentialed route records.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-08-18'
+  truth_owner: QUOTE_NATIVE_EVIDENCE_CHANNEL_QUALIFICATION_V1
+  location: {kind: git_path, logical_uri: 'repo://catalog/schemas/provider_route_capability_registry_v9.schema.json', repository_path: catalog/schemas/provider_route_capability_registry_v9.schema.json}
+  integrity: {kind: sha256, sha256: ca4f720a5b9c0abbbf1ede7f5387af0a949e565dcd7cd9862d2a387667042836}
+  access: {mode: read_only, method: file, network_required: false, secrets_required: false}
+  relations: [{relation_type: governed_by, target_asset_id: CONFIG-PROVIDER-ROUTE-CAPABILITY-REGISTRY-009}]
+  consumers: [FACTORY-001]
+  evidence: []
+  search_terms: [PROVIDER_ROUTE, REGISTRY_V9, SCHEMA]
+  classification: {contains_secrets: false, contains_raw_data: false, sensitivity: INTERNAL_NON_SECRET}
+
+- asset_id: MODULE-PROVIDER-ROUTE-CAPABILITY-REGISTRY-009
+  record_version: '1.0'
+  asset_type: script
+  purpose: Fail-closed v9 validator preserving v8 bytes and binding observed credentialed route evidence.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-08-18'
+  truth_owner: QUOTE_NATIVE_EVIDENCE_CHANNEL_QUALIFICATION_V1
+  location: {kind: git_path, logical_uri: 'repo://src/solana_alpha_lab/provider_route_capability_registry_v9.py', repository_path: src/solana_alpha_lab/provider_route_capability_registry_v9.py}
+  integrity: {kind: sha256, sha256: d64d29b16de912f710ce02e242d65387df0203df7fac94fb28c33853a6fd5f6d}
+  access: {mode: read_only, method: file, network_required: false, secrets_required: false}
+  relations: [{relation_type: depends_on, target_asset_id: CONFIG-PROVIDER-ROUTE-CAPABILITY-REGISTRY-009}]
+  consumers: [FACTORY-001]
+  evidence: []
+  search_terms: [PROVIDER_ROUTE, REGISTRY_V9, VALIDATOR]
+  classification: {contains_secrets: false, contains_raw_data: false, sensitivity: INTERNAL_NON_SECRET}
+
+- asset_id: TEST-PROVIDER-ROUTE-CAPABILITY-REGISTRY-009
+  record_version: '1.0'
+  asset_type: script
+  purpose: Tests preserving v8 semantics and validating observed Free-key registry facts.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-08-18'
+  truth_owner: QUOTE_NATIVE_EVIDENCE_CHANNEL_QUALIFICATION_V1
+  location: {kind: git_path, logical_uri: 'repo://tests/test_provider_route_capability_registry_v9.py', repository_path: tests/test_provider_route_capability_registry_v9.py}
+  integrity: {kind: sha256, sha256: 5746cd103421679889821a41df76600de777693bec90cc173b479cf8281a62f5}
+  access: {mode: read_only, method: file, network_required: false, secrets_required: false}
+  relations: [{relation_type: depends_on, target_asset_id: MODULE-PROVIDER-ROUTE-CAPABILITY-REGISTRY-009}]
+  consumers: [FACTORY-001]
+  evidence: []
+  search_terms: [PROVIDER_ROUTE, REGISTRY_V9, TESTS]
+  classification: {contains_secrets: false, contains_raw_data: false, sensitivity: INTERNAL_NON_SECRET}
+
+- asset_id: CONFIG-QUOTE-NATIVE-EVIDENCE-CHANNEL-QUALIFICATION-001
+  record_version: '1.0'
+  asset_type: configuration
+  purpose: Frozen 6+6 Free-key qualification policy with one credential read, three-second global pacing, and unchanged success/control thresholds.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-08-18'
+  truth_owner: QUOTE_NATIVE_EVIDENCE_CHANNEL_QUALIFICATION_V1
+  location: {kind: git_path, logical_uri: 'repo://configs/quote_native_evidence_channel_qualification_v1.yaml', repository_path: configs/quote_native_evidence_channel_qualification_v1.yaml}
+  integrity: {kind: sha256, sha256: ca76361b0132bd2b5799feb718d9b611462dc214abe5aa5edd652f781ba9e886}
+  access: {mode: read_only, method: file, network_required: false, secrets_required: false}
+  relations:
+  - {relation_type: governed_by, target_asset_id: CTRL-QUOTE-NATIVE-EVIDENCE-CHANNEL-QUALIFICATION-001}
+  - {relation_type: depends_on, target_asset_id: CONFIG-PROVIDER-ROUTE-CAPABILITY-REGISTRY-009}
+  consumers: [FACTORY-001]
+  evidence: []
+  search_terms: [QUOTE_NATIVE, EVIDENCE_FIT, FREE_KEY, CONFIG]
+  classification: {contains_secrets: false, contains_raw_data: false, sensitivity: INTERNAL_NON_SECRET}
+
+- asset_id: MODULE-QUOTE-NATIVE-EVIDENCE-CHANNEL-QUALIFICATION-001
+  record_version: '1.0'
+  asset_type: script
+  purpose: Credential-safe foreground quote-native campaign transport, scoring, pacing, and typed terminal classification.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-08-18'
+  truth_owner: QUOTE_NATIVE_EVIDENCE_CHANNEL_QUALIFICATION_V1
+  location: {kind: git_path, logical_uri: 'repo://src/solana_alpha_lab/quote_native_evidence_channel_qualification.py', repository_path: src/solana_alpha_lab/quote_native_evidence_channel_qualification.py}
+  integrity: {kind: sha256, sha256: 1381650306cabcf4011fa9302b4035c40e483868afcc22a14662b76772ce6558}
+  access: {mode: read_only, method: file, network_required: false, secrets_required: false}
+  relations:
+  - {relation_type: depends_on, target_asset_id: CONFIG-QUOTE-NATIVE-EVIDENCE-CHANNEL-QUALIFICATION-001}
+  - {relation_type: depends_on, target_asset_id: MODULE-PROVIDER-ROUTE-CAPABILITY-REGISTRY-009}
+  consumers: [FACTORY-001]
+  evidence: []
+  search_terms: [QUOTE_NATIVE, EVIDENCE_FIT, FREE_KEY, TRANSPORT]
+  classification: {contains_secrets: false, contains_raw_data: false, sensitivity: INTERNAL_NON_SECRET}
+
+- asset_id: SCRIPT-QUOTE-NATIVE-EVIDENCE-CHANNEL-QUALIFICATION-001
+  record_version: '1.0'
+  asset_type: script
+  purpose: Foreground runner that reads one local process credential after preflight and retains raw responses outside Git.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-08-18'
+  truth_owner: QUOTE_NATIVE_EVIDENCE_CHANNEL_QUALIFICATION_V1
+  location: {kind: git_path, logical_uri: 'repo://scripts/run_quote_native_evidence_channel_qualification.py', repository_path: scripts/run_quote_native_evidence_channel_qualification.py}
+  integrity: {kind: sha256, sha256: 9730b204789bae0639c0e57fca2cd40726cc00e57d0f6ccc4f7cabac86be82d5}
+  access: {mode: read_only, method: file, network_required: false, secrets_required: false}
+  relations: [{relation_type: depends_on, target_asset_id: MODULE-QUOTE-NATIVE-EVIDENCE-CHANNEL-QUALIFICATION-001}]
+  consumers: [FACTORY-001]
+  evidence: []
+  search_terms: [QUOTE_NATIVE, EVIDENCE_FIT, FREE_KEY, RUNNER]
+  classification: {contains_secrets: false, contains_raw_data: false, sensitivity: INTERNAL_NON_SECRET}
+
+- asset_id: TEST-QUOTE-NATIVE-EVIDENCE-CHANNEL-QUALIFICATION-001
+  record_version: '1.0'
+  asset_type: script
+  purpose: Targeted tests for credential containment, frozen policy, global pacing, terminal failures, and evidence-fit scoring.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-08-18'
+  truth_owner: QUOTE_NATIVE_EVIDENCE_CHANNEL_QUALIFICATION_V1
+  location: {kind: git_path, logical_uri: 'repo://tests/test_quote_native_evidence_channel_qualification.py', repository_path: tests/test_quote_native_evidence_channel_qualification.py}
+  integrity: {kind: sha256, sha256: fb9f2340443b9a5d7659cedd1371c091162558bc309488e87edb09af4e2c1ae9}
+  access: {mode: read_only, method: file, network_required: false, secrets_required: false}
+  relations: [{relation_type: depends_on, target_asset_id: MODULE-QUOTE-NATIVE-EVIDENCE-CHANNEL-QUALIFICATION-001}]
+  consumers: [FACTORY-001]
+  evidence: []
+  search_terms: [QUOTE_NATIVE, EVIDENCE_FIT, FREE_KEY, TESTS]
+  classification: {contains_secrets: false, contains_raw_data: false, sensitivity: INTERNAL_NON_SECRET}
+
+- asset_id: MODULE-QUOTE-NATIVE-EVIDENCE-TIMING-RECOVERY-001
+  record_version: '1.0'
+  asset_type: script
+  purpose: Validates retained raw write-complete upper bounds against frozen horizon slack without claiming remote observed timestamps.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-08-18'
+  truth_owner: QUOTE_NATIVE_EVIDENCE_CHANNEL_QUALIFICATION_V1
+  location: {kind: git_path, logical_uri: 'repo://src/solana_alpha_lab/quote_native_evidence_timing_recovery.py', repository_path: src/solana_alpha_lab/quote_native_evidence_timing_recovery.py}
+  integrity: {kind: sha256, sha256: f6f36b660d12035f34eb29dcca4802842ac966f0345ed196dcb8c0d0e0eb6fcb}
+  access: {mode: read_only, method: file, network_required: false, secrets_required: false}
+  relations: [{relation_type: depends_on, target_asset_id: MODULE-QUOTE-NATIVE-EVIDENCE-CHANNEL-QUALIFICATION-001}]
+  consumers: [FACTORY-001]
+  evidence: []
+  search_terms: [QUOTE_NATIVE, TIMING, RECOVERY, RAW_RETENTION]
+  classification: {contains_secrets: false, contains_raw_data: false, sensitivity: INTERNAL_NON_SECRET}
+
+- asset_id: SCRIPT-QUOTE-NATIVE-EVIDENCE-TIMING-RECOVERY-001
+  record_version: '1.0'
+  asset_type: script
+  purpose: Append-only timing recovery runner that produces no provider or credential side effects.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-08-18'
+  truth_owner: QUOTE_NATIVE_EVIDENCE_CHANNEL_QUALIFICATION_V1
+  location: {kind: git_path, logical_uri: 'repo://scripts/recover_quote_native_evidence_timing.py', repository_path: scripts/recover_quote_native_evidence_timing.py}
+  integrity: {kind: sha256, sha256: 1a26498404e608f3cb25158a503df8d16a1a7cc5b68ed84be53057386474d16a}
+  access: {mode: read_only, method: file, network_required: false, secrets_required: false}
+  relations: [{relation_type: depends_on, target_asset_id: MODULE-QUOTE-NATIVE-EVIDENCE-TIMING-RECOVERY-001}]
+  consumers: [FACTORY-001]
+  evidence: []
+  search_terms: [QUOTE_NATIVE, TIMING, RECOVERY, RUNNER]
+  classification: {contains_secrets: false, contains_raw_data: false, sensitivity: INTERNAL_NON_SECRET}
+
+- asset_id: TEST-QUOTE-NATIVE-EVIDENCE-TIMING-RECOVERY-001
+  record_version: '1.0'
+  asset_type: script
+  purpose: Tests hash-bound raw timing recovery and rejection outside frozen slack.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-08-18'
+  truth_owner: QUOTE_NATIVE_EVIDENCE_CHANNEL_QUALIFICATION_V1
+  location: {kind: git_path, logical_uri: 'repo://tests/test_quote_native_evidence_timing_recovery.py', repository_path: tests/test_quote_native_evidence_timing_recovery.py}
+  integrity: {kind: sha256, sha256: 3ceae2fb398ef42853cc083ff923d0c4820764cdb310e8195b9693db0e9dbeac}
+  access: {mode: read_only, method: file, network_required: false, secrets_required: false}
+  relations: [{relation_type: depends_on, target_asset_id: MODULE-QUOTE-NATIVE-EVIDENCE-TIMING-RECOVERY-001}]
+  consumers: [FACTORY-001]
+  evidence: []
+  search_terms: [QUOTE_NATIVE, TIMING, RECOVERY, TESTS]
+  classification: {contains_secrets: false, contains_raw_data: false, sensitivity: INTERNAL_NON_SECRET}
+
+- asset_id: EVIDENCE-QUOTE-NATIVE-LIVE-VARIATION-REPLAN-CLOSURE-001
+  record_version: '1.0'
+  asset_type: evidence
+  purpose: Owner-approved closure of the keyless sample-invalid campaign without rewriting its historical receipts.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-08-18'
+  truth_owner: QUOTE_NATIVE_EVIDENCE_CHANNEL_QUALIFICATION_V1
+  location: {kind: git_path, logical_uri: 'repo://docs/evidence/quote_native_live_variation_campaign/a2_replan_closure_v1.json', repository_path: docs/evidence/quote_native_live_variation_campaign/a2_replan_closure_v1.json}
+  integrity: {kind: sha256, sha256: 04d4687a77691b0b03d0f940756fb653b46715e4421d38c6cb0cddf4b5a0a56d}
+  access: {mode: read_only, method: file, network_required: false, secrets_required: false}
+  relations: [{relation_type: derived_from, target_asset_id: EVIDENCE-QUOTE-NATIVE-LIVE-VARIATION-CAMPAIGN-001}]
+  consumers: [FACTORY-001, GOAL-OWNER]
+  evidence: []
+  search_terms: [QUOTE_NATIVE, REPLAN, SAMPLE_INVALID, CLOSURE]
+  classification: {contains_secrets: false, contains_raw_data: false, sensitivity: INTERNAL_NON_SECRET}
+
+- asset_id: EVIDENCE-QUOTE-NATIVE-EVIDENCE-CHANNEL-QUALIFICATION-001
+  record_version: '1.0'
+  asset_type: evidence
+  purpose: Canonical runtime receipt of one Free-key 6+6 campaign; scorer numeric pass only; capture-time not hash-bound.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-08-18'
+  truth_owner: QUOTE_NATIVE_EVIDENCE_CHANNEL_QUALIFICATION_V1
+  location: {kind: git_path, logical_uri: 'repo://docs/evidence/quote_native_evidence_channel_qualification/a1_quote_native_evidence_channel_qualification_runtime_receipt_v1.json', repository_path: docs/evidence/quote_native_evidence_channel_qualification/a1_quote_native_evidence_channel_qualification_runtime_receipt_v1.json}
+  integrity: {kind: sha256, sha256: d10e0d74de9d175dfcf5e3fd2408e3736d0fa8b94f52d804a34dce590a89e56f}
+  access: {mode: read_only, method: file, network_required: false, secrets_required: false}
+  relations:
+  - {relation_type: derived_from, target_asset_id: CTRL-QUOTE-NATIVE-EVIDENCE-CHANNEL-QUALIFICATION-001}
+  - {relation_type: depends_on, target_asset_id: CONFIG-PROVIDER-ROUTE-CAPABILITY-REGISTRY-009}
+  - {relation_type: validated_by, target_asset_id: TEST-QUOTE-NATIVE-EVIDENCE-CHANNEL-QUALIFICATION-001}
+  consumers: [FACTORY-001, GOAL-OWNER]
+  evidence: []
+  search_terms: [QUOTE_NATIVE, EVIDENCE_FIT, FREE_KEY, RUNTIME]
+  classification: {contains_secrets: false, contains_raw_data: false, sensitivity: INTERNAL_NON_SECRET}
+
+- asset_id: EVIDENCE-QUOTE-NATIVE-EVIDENCE-CHANNEL-TIMING-RECOVERY-001
+  record_version: '1.0'
+  asset_type: evidence
+  purpose: Hash-bound recovery of local raw write-complete upper bounds within H900 and H3600 slack.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-08-18'
+  truth_owner: QUOTE_NATIVE_EVIDENCE_CHANNEL_QUALIFICATION_V1
+  location: {kind: git_path, logical_uri: 'repo://docs/evidence/quote_native_evidence_channel_qualification/a1_quote_native_evidence_channel_qualification_timing_recovery_v1.json', repository_path: docs/evidence/quote_native_evidence_channel_qualification/a1_quote_native_evidence_channel_qualification_timing_recovery_v1.json}
+  integrity: {kind: sha256, sha256: b7a5c5cd11730d8d5faf3e4f998729bb9edf37e6342343c1d73f441ea73891f5}
+  access: {mode: read_only, method: file, network_required: false, secrets_required: false}
+  relations:
+  - {relation_type: derived_from, target_asset_id: EVIDENCE-QUOTE-NATIVE-EVIDENCE-CHANNEL-QUALIFICATION-001}
+  - {relation_type: validated_by, target_asset_id: TEST-QUOTE-NATIVE-EVIDENCE-TIMING-RECOVERY-001}
+  consumers: [FACTORY-001, GOAL-OWNER]
+  evidence: []
+  search_terms: [QUOTE_NATIVE, TIMING, RECOVERY, H900, H3600]
+  classification: {contains_secrets: false, contains_raw_data: false, sensitivity: INTERNAL_NON_SECRET}
+
+- asset_id: EVIDENCE-QUOTE-NATIVE-EVIDENCE-CHANNEL-QUALIFICATION-ACCEPTANCE-001
+  record_version: '1.0'
+  asset_type: evidence
+  purpose: Pause/close of the current quote-native alpha route because capture contract of the unique campaign is invalid.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-08-18'
+  truth_owner: QUOTE_NATIVE_EVIDENCE_CHANNEL_QUALIFICATION_V1
+  location: {kind: git_path, logical_uri: 'repo://docs/evidence/quote_native_evidence_channel_qualification/a1_quote_native_evidence_channel_qualification_acceptance_v1.json', repository_path: docs/evidence/quote_native_evidence_channel_qualification/a1_quote_native_evidence_channel_qualification_acceptance_v1.json}
+  integrity: {kind: sha256, sha256: 9a5dab6d2b286abcce53f2d45a0aaaf51ecc29776558ba1868a746c1561b57c8}
+  access: {mode: read_only, method: file, network_required: false, secrets_required: false}
+  relations:
+  - {relation_type: derived_from, target_asset_id: EVIDENCE-QUOTE-NATIVE-EVIDENCE-CHANNEL-QUALIFICATION-001}
+  - {relation_type: depends_on, target_asset_id: EVIDENCE-QUOTE-NATIVE-EVIDENCE-CHANNEL-TIMING-RECOVERY-001}
+  - {relation_type: depends_on, target_asset_id: EVIDENCE-QUOTE-NATIVE-EVIDENCE-CHANNEL-PORTAL-RECONCILIATION-001}
+  consumers: [FACTORY-001, GOAL-OWNER]
+  evidence: []
+  search_terms: [QUOTE_NATIVE, EVIDENCE_FIT, ACCEPTANCE, FREE_KEY]
+  classification: {contains_secrets: false, contains_raw_data: false, sensitivity: INTERNAL_NON_SECRET}
+
+- asset_id: REPORT-QUOTE-NATIVE-EVIDENCE-CHANNEL-QUALIFICATION-001
+  record_version: '1.0'
+  asset_type: control_document
+  purpose: Russian readout of numeric pass, invalid capture, pause/close, and the owner next decision.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-08-18'
+  truth_owner: QUOTE_NATIVE_EVIDENCE_CHANNEL_QUALIFICATION_V1
+  location: {kind: git_path, logical_uri: 'repo://docs/reports/quote_native_evidence_channel_qualification/a1_owner_readout_v1.md', repository_path: docs/reports/quote_native_evidence_channel_qualification/a1_owner_readout_v1.md}
+  integrity: {kind: sha256, sha256: 0de39259320ee39c76aeda719d0bd8839455746288afb12997841b5e3df2875b}
+  access: {mode: read_only, method: file, network_required: false, secrets_required: false}
+  relations: [{relation_type: derived_from, target_asset_id: EVIDENCE-QUOTE-NATIVE-EVIDENCE-CHANNEL-QUALIFICATION-ACCEPTANCE-001}]
+  consumers: [FACTORY-001, GOAL-OWNER]
+  evidence: []
+  search_terms: [QUOTE_NATIVE, EVIDENCE_FIT, OWNER_READOUT]
+  classification: {contains_secrets: false, contains_raw_data: false, sensitivity: INTERNAL_NON_SECRET}
+
+- asset_id: EVIDENCE-QUOTE-NATIVE-EVIDENCE-CHANNEL-PORTAL-RECONCILIATION-001
+  record_version: '1.0'
+  asset_type: evidence
+  purpose: Owner portal readback corroborating H900/H3600 batch windows without row-level request identity.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-08-18'
+  truth_owner: QUOTE_NATIVE_EVIDENCE_CHANNEL_QUALIFICATION_V1
+  location: {kind: git_path, logical_uri: 'repo://docs/evidence/quote_native_evidence_channel_qualification/a1_quote_native_evidence_channel_qualification_portal_reconciliation_v1.json', repository_path: docs/evidence/quote_native_evidence_channel_qualification/a1_quote_native_evidence_channel_qualification_portal_reconciliation_v1.json}
+  integrity: {kind: sha256, sha256: 6493f4bd101f40500647be87039e67d649abdc558edfec0db95857c34fdc69fe}
+  access: {mode: read_only, method: file, network_required: false, secrets_required: false}
+  relations: [{relation_type: derived_from, target_asset_id: EVIDENCE-QUOTE-NATIVE-EVIDENCE-CHANNEL-QUALIFICATION-001}]
+  consumers: [FACTORY-001, GOAL-OWNER]
+  evidence: []
+  search_terms: [QUOTE_NATIVE, PORTAL, RECONCILIATION, H900, H3600]
   classification: {contains_secrets: false, contains_raw_data: false, sensitivity: INTERNAL_NON_SECRET}

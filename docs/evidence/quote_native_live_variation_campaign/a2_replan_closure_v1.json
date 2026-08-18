@@ -1,0 +1,37 @@
+{
+  "schema": "smial.quote-native-live-variation-campaign.replan-closure",
+  "schema_version": "1.0",
+  "closure_id": "QUOTE-NATIVE-LIVE-VARIATION-CAMPAIGN-REPLAN-CLOSURE-001",
+  "as_of": "2026-08-18",
+  "prior_task_id": "QUOTE_NATIVE_LIVE_VARIATION_CAMPAIGN_V1",
+  "prior_task_contract_sha256": "9739f6cb8798461a080419c53d52dfde7e09739845a8bbdbc7b9616ece24c7af",
+  "prior_task_status_before": "IN_PROGRESS",
+  "prior_terminal": "SAMPLE_INVALID_INSUFFICIENT_COMPLETE_XY",
+  "prior_runtime_path": "docs/evidence/quote_native_live_variation_campaign/a1_quote_native_live_variation_campaign_runtime_receipt_v1.json",
+  "prior_runtime_sha256": "d672ddfe764278468cf2e38dc07cf8076dc81abd5e3e5d40450942b20a0497c6",
+  "prior_acceptance_path": "docs/evidence/quote_native_live_variation_campaign/a1_quote_native_live_variation_campaign_acceptance_v1.json",
+  "prior_acceptance_sha256": "0d9759495fc9b625c1f7a6e4dd961c312ad35c2bb17802c79cb301a08a856ead",
+  "owner_decision": "CLOSE_KEYLESS_CAMPAIGN_AND_REPLAN_FREE_KEY_QUALIFICATION",
+  "replan_task_id": "QUOTE_NATIVE_EVIDENCE_CHANNEL_QUALIFICATION_V1",
+  "historical_receipts_rewritten": false,
+  "alpha_claim": false,
+  "move_2_earned": false,
+  "family_close": false,
+  "side_effects": {
+    "provider_requests": 0,
+    "credential_reads": 0,
+    "retries": 0,
+    "fallbacks": 0,
+    "cash_spend_usd_cents": 0,
+    "wallet_signer_transaction_actions": 0
+  },
+  "non_claims": [
+    "NO_ALPHA",
+    "NO_NETRETURN",
+    "NO_MOVE_2",
+    "NO_NEW_PROVIDER",
+    "NO_PAID_PLAN",
+    "NO_CREDENTIAL_READ",
+    "NO_HISTORICAL_RECEIPT_REWRITE"
+  ]
+}

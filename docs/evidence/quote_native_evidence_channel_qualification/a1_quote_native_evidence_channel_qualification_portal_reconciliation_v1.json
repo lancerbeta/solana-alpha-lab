@@ -1,0 +1,107 @@
+{
+  "schema": "smial.quote-native-evidence-channel-qualification.portal-reconciliation",
+  "schema_version": "1.0",
+  "reconciliation_id": "QUOTE-NATIVE-EVIDENCE-CHANNEL-QUALIFICATION-PORTAL-RECONCILIATION-001",
+  "as_of": "2026-08-18",
+  "atom_id": "QUOTE_NATIVE_EVIDENCE_CHANNEL_QUALIFICATION_V1",
+  "source_runtime_receipt": "docs/evidence/quote_native_evidence_channel_qualification/a1_quote_native_evidence_channel_qualification_runtime_receipt_v1.json",
+  "source_runtime_receipt_sha256": "d10e0d74de9d175dfcf5e3fd2408e3736d0fa8b94f52d804a34dce590a89e56f",
+  "source_runtime_candidate_sha256": "f20152859ca186e4c7fe186434f2cb60b4fe23a7473efbae0948adbf92e71908",
+  "source": {
+    "kind": "OWNER_PORTAL_READBACK",
+    "provider": "JUPITER",
+    "fields_retained": [
+      "timestamp",
+      "time_taken_ms",
+      "method",
+      "uri_stem",
+      "status",
+      "user_agent"
+    ],
+    "fields_excluded": [
+      "team_id",
+      "request_id",
+      "api_key_hash",
+      "client_ip",
+      "asn",
+      "country_code",
+      "request_headers",
+      "response_body"
+    ]
+  },
+  "discovery_anchor": {
+    "recent": {
+      "timestamp_utc": "2026-08-18T12:43:03.264Z",
+      "time_taken_ms": 28,
+      "status": 200,
+      "uri_stem": "/tokens/v2/recent"
+    },
+    "toptraded": {
+      "timestamp_utc": "2026-08-18T12:43:06.520Z",
+      "time_taken_ms": 48,
+      "status": 200,
+      "uri_stem": "/tokens/v2/toptraded/1h",
+      "response_complete_not_before_utc": "2026-08-18T12:43:06.568Z"
+    }
+  },
+  "horizon_batches": {
+    "H900": {
+      "uri_stem": "/swap/v2/order",
+      "request_count": 12,
+      "first_timestamp_utc": "2026-08-18T12:58:06.785Z",
+      "last_timestamp_utc": "2026-08-18T12:58:43.534Z",
+      "status_counts": {
+        "200": 10,
+        "400": 2
+      },
+      "first_after_discovery_completion_ms": 900217,
+      "batch_span_ms": 36749
+    },
+    "H3600": {
+      "uri_stem": "/swap/v2/order",
+      "request_count": 12,
+      "first_timestamp_utc": "2026-08-18T13:43:06.712Z",
+      "last_timestamp_utc": "2026-08-18T13:43:43.502Z",
+      "status_counts": {
+        "200": 10,
+        "400": 2
+      },
+      "first_after_discovery_completion_ms": 3600144,
+      "batch_span_ms": 36790
+    }
+  },
+  "corroboration": {
+    "global_pace_seconds_min": 3,
+    "horizon_slack_seconds": 120,
+    "portal_batch_time_consistent_with_foreground_schedule": true,
+    "all_portal_batch_spans_within_slack": true,
+    "verdict": "PORTAL_LOG_TIME_COHORT_CORROBORATED"
+  },
+  "local_payload_audit": {
+    "raw_manifest_count": 50,
+    "json_object_count": 48,
+    "non_object_or_unparseable_count": 2,
+    "transaction_non_null_count": 0,
+    "semantics": "LOCAL_A4_AUDIT_NO_RAW_BODY_RETAINED_IN_GIT"
+  },
+  "limitations": [
+    "PORTAL_READBACK_CORROBORATES_THE_BATCH_BUT_DOES_NOT_REWRITE_THE_CAPTURE_RECEIPT",
+    "ORIGINAL_RUNTIME_RECEIPT_LACKS_CAPTURE_TIME_HASH_BOUND_ROW_TIMESTAMPS",
+    "NO_REQUEST_ID_OR_ACCOUNT_IDENTIFIER_IS_RETAINED_IN_THIS_GIT_RECEIPT"
+  ],
+  "side_effects": {
+    "provider_requests": 0,
+    "credential_reads": 0,
+    "retries": 0,
+    "fallbacks": 0,
+    "cash_spend_usd_cents": 0,
+    "wallet_signer_transaction_actions": 0
+  },
+  "non_claims": [
+    "NO_NEW_MARKET_CALL",
+    "NO_API_KEY",
+    "NO_RAW_BODY",
+    "NO_EXACT_CAPTURE_TIME_REWRITE",
+    "NO_EVIDENCE_FIT_ACCEPTANCE"
+  ]
+}
