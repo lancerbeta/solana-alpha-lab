@@ -14,8 +14,8 @@
     "ARCHITECTURE_CRITIC"
   ],
   "review_id": "FACTORY-V1-OPERATIONAL-READINESS-INDEPENDENT-REVIEW-001",
-  "reviewed_bindings_sha256": "4b0900005024da2f51741e3d4e648a86ae747a70a0268d86d5c553eaefa081b9",
-  "reviewed_inventory_sha256": "6a4133414862667f7ccaf79c7d91796e73414a8bd026b663946eb42f3d0efefa",
+  "reviewed_bindings_sha256": "946fad100342a303de6c4debda90d28b4d68ce2089ca084f7b5729ddd22e97a1",
+  "reviewed_inventory_sha256": "3e6da7337e4b7a267b305c6dfabbd27792165591cbe796b5afdb3ad2417e5803",
   "reviews": [
     {
       "findings": [

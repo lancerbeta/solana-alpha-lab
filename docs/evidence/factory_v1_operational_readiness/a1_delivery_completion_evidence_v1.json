@@ -9,12 +9,12 @@
   "cloud_bundle_smoke_required": false,
   "factory_fit": {
     "path": "docs/evidence/factory_v1_operational_readiness/a1_delivery_factory_fit_v1.json",
-    "sha256": "18c8794892923d391cee409ffb953019457f74554f918d436ac70621c175ebb4",
+    "sha256": "1640a4336c3f6c357f1099e43bc4a08d5a33540d5cd63facddd7f4c1cd64048a",
     "verdict": "PASS"
   },
   "implementation_bindings": {
     "catalog/assets/architecture.yaml": "ef7d767f0162c5575f637dd6e7de9ef194973b459c96c9376093d3eaa6a656a2",
-    "catalog/assets/core.yaml": "6bbd28fc48d5a64f4116815b042b7089410a1c7c55bff7b5081e0a9576582c74",
+    "catalog/assets/core.yaml": "11af8b6799cfee6e55e8d342a75c7a46c674b2dee9e1bbb12d9f3376f2e75669",
     "catalog/assets/lifecycle.yaml": "9eed17473cf67d51b6ed7f6aab4ba828e389ca4f859d28efb63111477b40131a",
     "catalog/catalog_manifest.yaml": "1de47a5b1d06b13ad6b2b5832fec22193613ac3a177a8e5afd47ba5be4b99b21",
     "catalog/generated/asset_edges.json": "b9d8588fb8109d3eae612d0ea9fe6e31dd394052f2ab0499ccb11b6f99480fa2",
@@ -63,7 +63,7 @@
     "github_ci": "ENFORCED_LIVE_AT_GUARDED_MERGE",
     "independent_review": {
       "path": "docs/evidence/factory_v1_operational_readiness/a1_delivery_independent_review_v1.json",
-      "sha256": "2e52f25bd5864a7905c35dbb68fd78f1e9f49866dedfba1d3d40fc6ddec3cec6",
+      "sha256": "cf4bda54cf0c4818b497c63e79dcdbb8c835e7adbc6b01b6d5ff187f90398e36",
       "verdict": "PASS"
     },
     "project_checks": [
