@@ -124,8 +124,6 @@ class QuoteNativePanelTests(unittest.TestCase):
         self.assertNotIn("jupiter_quote_logger", source)
 
     def test_runner_source_does_not_read_credentials(self) -> None:
-        if not SCRIPT.is_file():
-            self.skipTest("runner not written yet")
         source = SCRIPT.read_text(encoding="utf-8").lower()
         self.assertNotIn(".env", source)
         self.assertNotIn("jupiter_api_key", source)

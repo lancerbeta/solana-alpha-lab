@@ -24328,7 +24328,7 @@ records:
   as_of: '2026-08-18'
   truth_owner: QUOTE_NATIVE_EVIDENCE_FIT_PANEL_V1
   location: {kind: git_path, logical_uri: 'repo://tests/test_quote_native_evidence_fit_panel.py', repository_path: tests/test_quote_native_evidence_fit_panel.py}
-  integrity: {kind: sha256, sha256: 0634d8bcfcba77477b711512f1d011eb406ee98a5ac604bbf7e6fb93ee5e4815}
+  integrity: {kind: sha256, sha256: 3e23918fa9809dd179348982e11d00c5a84977b7ffd37ab891c0eee2842d524e}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: depends_on, target_asset_id: MODULE-QUOTE-NATIVE-EVIDENCE-FIT-PANEL-001}
