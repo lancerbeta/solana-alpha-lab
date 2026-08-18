@@ -9,11 +9,11 @@
   "cloud_bundle_smoke_required": false,
   "factory_fit": {
     "path": "docs/evidence/quote_native_evidence_fit_panel/a1_delivery_factory_fit_v1.json",
-    "sha256": "8788c57aa3d7b27a6b15e182a9827a9c42333b4a2a06e0c5ed4625756424945c",
+    "sha256": "ee6558e65b3e10f91d98e4cb4eb524e5e4c23dcf560f97f5c410694ceb5e715e",
     "verdict": "PASS"
   },
   "implementation_bindings": {
-    "catalog/assets/core.yaml": "b3ae3a5fcc864ae549638c36f80be16a9ee18ae20cbd3ab9789bbbbd9e880736",
+    "catalog/assets/core.yaml": "4afa03254f2967a6c64fe6a0e8d571371f52f7f2a433eab7fc7ec79e3bab150a",
     "catalog/assets/lifecycle.yaml": "bd008230ae704b2fb0f10d8fbec6cb6101a4665563bc4fed0890c80d0f58195c",
     "catalog/catalog_manifest.yaml": "6a6b9b717b89116f6c68eabc07158b1f1916855718ced4f981dc80b10ecb6ec7",
     "catalog/generated/asset_edges.json": "76fb4f87e30b90ea995448fa7984fe835f2de28b6f2b460107c23148fe03a93b",
@@ -25,7 +25,7 @@
     "docs/tasks/QUOTE_NATIVE_EVIDENCE_FIT_PANEL_V1.md": "502f483d12bd7a47c9bf81fd55df4fb465b6b6245548cb567eeb94e96945c635",
     "scripts/run_quote_native_evidence_fit_panel.py": "631d7830c0d07cb450c5565527cb5e60e1b72862b85679ef5c7b9355912beb5a",
     "src/solana_alpha_lab/quote_native_evidence_fit_panel.py": "25bd0a6165f5525c2c277854cd0c0df18bd20c1fd9e7c1ff8529d7a0164ab02b",
-    "tests/test_quote_native_evidence_fit_panel.py": "0634d8bcfcba77477b711512f1d011eb406ee98a5ac604bbf7e6fb93ee5e4815"
+    "tests/test_quote_native_evidence_fit_panel.py": "3e23918fa9809dd179348982e11d00c5a84977b7ffd37ab891c0eee2842d524e"
   },
   "non_claims": [
     "NO_CANONICAL_DONE",
@@ -65,7 +65,7 @@
     "github_ci": "ENFORCED_LIVE_AT_GUARDED_MERGE",
     "independent_review": {
       "path": "docs/evidence/quote_native_evidence_fit_panel/a1_delivery_independent_review_v1.json",
-      "sha256": "771ff893293e845a0a1d20df7f5b0040991294c9c95a62004f8befb14cbab8bc",
+      "sha256": "e976cac5e588d3425c83cae53014162fc5abc58898e6621719607b9794d49ac0",
       "verdict": "PASS"
     },
     "project_checks": [
