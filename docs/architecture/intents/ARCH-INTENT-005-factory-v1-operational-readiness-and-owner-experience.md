@@ -137,6 +137,13 @@ names executed this journey.
 
 ## 6. Required Factory v1 product surfaces
 
+Sections 6.1–6.7 and 8 are an accepted owner-experience map. They are not
+the `FACTORY_V1_OPERATIONAL_READY` PASS checklist. That checklist is only
+`milestone.requires` plus `gate` in
+`configs/factory_v1_operational_readiness_v1.yaml`. Substituting a methods
+or cockpit-screen inventory for the commissioning run is a Factory
+readiness FAIL or REPLAN.
+
 These surfaces are accepted direction. They are not implemented by this
 intent.
 
@@ -181,15 +188,15 @@ The Factory should provide reusable experiment composition rather than
 one-off task code. A comparable new hypothesis should usually change
 `ExperimentSpec`, not the runner.
 
-Required analysis capabilities: descriptive distributions, cohort
-comparison, event study, path MAE/MFE, route liquidity surface,
-missingness and selection audit, chronological walk-forward, cluster-block
-bootstrap, sensitivity analysis, concentration analysis, negative
-controls/placebos, multiple-testing accounting. Sequential decision
-boundary is supported when justified.
+Owner-experience map (WATCH, not Factory v1 PASS inventory): descriptive
+distributions, cohort comparison, event study, path MAE/MFE, route
+liquidity surface, missingness and selection audit, chronological
+walk-forward, cluster-block bootstrap, sensitivity analysis,
+concentration analysis, negative controls/placebos, multiple-testing
+accounting. Sequential decision boundary is supported when justified.
 
-Discovery capabilities are hypothesis-generating, not confirmatory.
-Unsupervised clustering and AI-assisted pattern generation are
+Discovery output is hypothesis-generating evidence, not confirmatory
+evidence. Unsupervised clustering and AI-assisted pattern generation are
 exploration-only. Any value-inspecting search that affects selection must
 be recorded in trial/search history.
 
@@ -257,6 +264,12 @@ WATCHED
 
 No position is silently removed because quote/route disappears.
 
+This lifecycle is the same conceptual chain as ARCH-INTENT-002. Mapping
+before any implementation atom: `WATCHED` is not `watchlist_membership`;
+`SIGNALLED` is not the trigger object; `strategy_version` and
+`activation_epoch` remain separately versioned. Do not spawn a second
+incompatible position model.
+
 ## 8. Owner Cockpit navigation
 
 ```text
@@ -300,7 +313,8 @@ SYSTEM
 ```
 
 Unavailable lifecycle stages should remain hidden or clearly disabled
-instead of showing empty enterprise screens.
+instead of showing empty enterprise screens. This information architecture
+is part of the owner-experience map, not the commissioning PASS checklist.
 
 ## 9. UX invariants
 
@@ -415,11 +429,13 @@ owner_cockpit:
 
 ## 15. Application service
 
-Add only when implementation is triggered. It may resolve context,
-create/freeze product objects through existing contracts, submit experiment
-jobs, read status, stop bounded jobs, assemble owner read models, emit
-decision requests and serve evidence links. It must not contain
-alpha-specific business rules. Hypothesis logic lives in versioned
+Add only when implementation is triggered, consistent with ARCH-INTENT-004
+excluding a service today. If started, it is a command gateway over
+existing contracts: resolve context, create/freeze product objects through
+those contracts, submit experiment jobs, read status, stop bounded jobs,
+assemble owner read models, emit decision requests and serve evidence
+links. It must not become a second lifecycle truth owner and must not
+contain alpha-specific business rules. Hypothesis logic lives in versioned
 experiment definitions/modules.
 
 ## 16. Generic experiment runner
@@ -451,9 +467,12 @@ paths.
 
 Keep the analytical spine: immutable Parquet + DuckDB. Do not migrate
 research truth merely to support a UI. For Factory v1, prefer a single
-well-defined runtime writer boundary. A transactional/remote OLTP database
-is considered only when a measured requirement appears. The new operational
-store, if later introduced, does not replace Git/Catalog/evidence truth.
+well-defined runtime writer boundary. That writer must not mutate raw
+Parquet or lifecycle registries except through existing contracts. A
+transactional/remote OLTP database is considered only when a measured
+requirement appears. The new operational store, if later introduced, does
+not replace Git/Catalog/evidence truth. Job state and attention-queue
+bytes may not live only in DuckDB.
 
 ## 18. Research Workbench implementation boundary
 
@@ -537,7 +556,9 @@ Must not preempt the current cheapest decision-bearing market falsifier.
 The live Git binding is
 `configs/factory_v1_operational_readiness_v1.yaml`, resolved by this
 task's harness `roadmap_path`. Historical Project Sources roadmaps are not
-modified.
+modified. Numbered `TASK-35A` in `ROADMAP-PATCH-T21-PRODUCT-VISION-001`
+is a historical cockpit candidate, not a parallel activation chain.
+Do not start TASK-35A beside this milestone.
 
 ## 27. Domain-policy integration
 

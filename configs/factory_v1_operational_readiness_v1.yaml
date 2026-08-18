@@ -36,7 +36,8 @@ live_roadmap_binding:
   numbered_task_chain_inserted: false
 domain_policy_integration:
   patch_status: NOT_APPLIED_HASH_BOUND_HISTORICAL_RECEIPTS
-  live_invariant_owner: configs/factory_v1_operational_readiness_v1.yaml
+  deferred_invariant_record: configs/factory_v1_operational_readiness_v1.yaml
+  entry_gate_resolves_this_file: false
   existing_overlap: FACTORY_LEVERAGE_INVARIANT
   invariant: >-
     When FACTORY_V1_OPERATIONAL_READY is triggered, Entry Gate and Factory Fit
@@ -65,6 +66,16 @@ milestone:
   terminal:
     PASS: FACTORY_V1_OPERATIONAL_READY
     FAIL: FACTORY_PRODUCTIZATION_REPLAN
+  historical_numbered_cockpit_candidate: ROADMAP-PATCH-T21-PRODUCT-VISION-001
+  start_task35a_as_parallel_chain: false
+owner_experience_map:
+  not_factory_v1_pass_inventory: true
+  sections:
+    - '6'
+    - '8'
+commissioning_pass_checklist:
+  owner: gate
+  forbids_methods_inventory_substitution: true
 current_product_stage:
   research_truth_substrate: ADVANCED
   hypothesis_lifecycle: FUNCTIONAL

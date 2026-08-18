@@ -109,6 +109,11 @@
     },
     {
       "source_asset_id": "ARCH-INTENT-005",
+      "relation": "advises",
+      "target_asset_id": "ROADMAP-PATCH-T21-PRODUCT-VISION-001"
+    },
+    {
+      "source_asset_id": "ARCH-INTENT-005",
       "relation": "derived_from",
       "target_asset_id": "ARCH-INTENT-002"
     },

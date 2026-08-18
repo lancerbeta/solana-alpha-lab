@@ -18,6 +18,9 @@ managed_write_set:
   - docs/architecture/intents/ARCH-INTENT-005-factory-v1-operational-readiness-and-owner-experience.md
   - configs/factory_v1_operational_readiness_v1.yaml
   - tests/test_factory_v1_operational_readiness.py
+  - tests/test_catalog.py
+  - catalog/schemas/asset_catalog.schema.json
+  - scripts/validate_catalog.py
   - catalog/assets/architecture.yaml
   - catalog/assets/core.yaml
   - catalog/catalog_manifest.yaml

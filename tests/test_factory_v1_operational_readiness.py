@@ -71,6 +71,9 @@ class FactoryV1OperationalReadinessTests(unittest.TestCase):
         self.assertIn("ExperimentSpec", text)
         self.assertIn("derived read model", text)
         self.assertIn("must not preempt", text.lower())
+        self.assertIn("WATCH, not Factory v1 PASS inventory", text)
+        self.assertIn("`FACTORY_V1_OPERATIONAL_READY` PASS checklist", text)
+        self.assertIn("TASK-35A", text)
         self.assertNotIn("Kubernetes is required", text)
 
     def test_yaml_contract_is_triggered_milestone_not_task_chain(self) -> None:
@@ -95,6 +98,19 @@ class FactoryV1OperationalReadinessTests(unittest.TestCase):
             contract["domain_policy_integration"]["patch_status"],
             "NOT_APPLIED_HASH_BOUND_HISTORICAL_RECEIPTS",
         )
+        self.assertFalse(contract["domain_policy_integration"]["entry_gate_resolves_this_file"])
+        self.assertEqual(
+            contract["domain_policy_integration"]["deferred_invariant_record"],
+            "configs/factory_v1_operational_readiness_v1.yaml",
+        )
+        self.assertNotIn("live_invariant_owner", contract["domain_policy_integration"])
+        self.assertFalse(contract["milestone"]["start_task35a_as_parallel_chain"])
+        self.assertEqual(
+            contract["milestone"]["historical_numbered_cockpit_candidate"],
+            "ROADMAP-PATCH-T21-PRODUCT-VISION-001",
+        )
+        self.assertTrue(contract["owner_experience_map"]["not_factory_v1_pass_inventory"])
+        self.assertTrue(contract["commissioning_pass_checklist"]["forbids_methods_inventory_substitution"])
         self.assertIn(
             "commissioning run",
             contract["domain_policy_integration"]["invariant"],
@@ -128,6 +144,12 @@ class FactoryV1OperationalReadinessTests(unittest.TestCase):
         intent = architecture[INTENT_ID]
         self.assertEqual(intent["status"], "ACCEPTED_DIRECTION_NOT_IMPLEMENTED")
         self.assertEqual(intent["integrity"]["sha256"], sha256(INTENT_PATH))
+        self.assertEqual(intent["origin"], "REPOSITORY")
+        self.assertEqual(
+            intent["provenance"]["imported_by_task"],
+            "FACTORY-V1-OPERATIONAL-READINESS-V1",
+        )
+        self.assertEqual(intent["evidence"], [])
         self.assertEqual(
             {item["target_asset_id"] for item in intent["relations"]},
             {
@@ -135,6 +157,7 @@ class FactoryV1OperationalReadinessTests(unittest.TestCase):
                 "ARCH-INTENT-004",
                 "ARCH-INTENT-T21-PRODUCT-VISION-001",
                 CONFIG_ID,
+                "ROADMAP-PATCH-T21-PRODUCT-VISION-001",
             },
         )
         config = core[CONFIG_ID]
