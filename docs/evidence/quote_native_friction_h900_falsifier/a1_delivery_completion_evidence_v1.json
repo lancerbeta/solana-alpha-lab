@@ -9,23 +9,23 @@
   "cloud_bundle_smoke_required": false,
   "factory_fit": {
     "path": "docs/evidence/quote_native_friction_h900_falsifier/a1_delivery_factory_fit_v1.json",
-    "sha256": "b629b9f88ded2d904794f2327c3237946e0a14cf5dc14ef9893d105c108b5249",
+    "sha256": "02d7fab9f5cac710b69edff1e5ea2858f9b42f2ca11e28b472c90d3e327c8dfa",
     "verdict": "PASS"
   },
   "implementation_bindings": {
-    "catalog/assets/core.yaml": "ff3eb425b8907eb23ac80b77dcc0f84e98d4d4517663a9e601558e7d5de1c469",
-    "catalog/assets/lifecycle.yaml": "8041df76de1bce9b3684038e2b1b04b7dbc716516e3f3767f394476a025377c6",
+    "catalog/assets/core.yaml": "5684c3ee5fdbd221d3f07f6565570c5f3c1e99c0245c1741c139e0cab06d157f",
+    "catalog/assets/lifecycle.yaml": "13fe584438e5990db4b54be878c498353565ad3669397d72082d01923289bb3e",
     "catalog/catalog_manifest.yaml": "aee33a56609bbe0de99588fdafa1ab007a52ad5e92c1d8c18a37a7a6303febcd",
     "catalog/generated/asset_edges.json": "c6900c5693308267e0cfdef72dc5e7b0e6773c16723007060d35f127fecf5266",
     "configs/quote_native_friction_h900_falsifier_v1.yaml": "a22c3c2355defee97d5ac0b91415fb82631f159762ae0f7ef005211193de9af1",
-    "docs/PROJECT_MAP.md": "f50cba4403921034b609681984f2b1f4c7904578a54417149eaa8eaab4f7df9a",
-    "docs/evidence/quote_native_friction_h900_falsifier/a1_quote_native_friction_h900_falsifier_acceptance_v1.json": "a3aee9c0ce2526b295f36039d6d6d83dac1004fb269cd0c533128ca540489078",
-    "docs/evidence/quote_native_friction_h900_falsifier/a1_quote_native_friction_h900_falsifier_runtime_receipt_v1.json": "201b26f0a85a85460faf3a3ed58a7d1f002068f44e2db79bdc3dd9a68a4d7fe2",
-    "docs/reports/quote_native_friction_h900_falsifier/a1_owner_readout_v1.md": "4925b457adb66fd570537a81206843c2886fa405b76352723ec5bb63a6c5636c",
-    "docs/tasks/QUOTE_NATIVE_FRICTION_H900_FALSIFIER_V1.md": "18442c1e58cd68eb0db7d317d3ed513850400c5dfc8b0a9cd4bf54087f0c2685",
+    "docs/PROJECT_MAP.md": "901421a97fdf22fe530391dc8e7195acb9926e5449576741d4df45e38de1b27e",
+    "docs/evidence/quote_native_friction_h900_falsifier/a1_quote_native_friction_h900_falsifier_acceptance_v1.json": "9e201f0d55c46f24669386e9e3584f8b877d490037e7495ca305a477b5f20074",
+    "docs/evidence/quote_native_friction_h900_falsifier/a1_quote_native_friction_h900_falsifier_runtime_receipt_v1.json": "19536c8a574b01c6127682454a4fc4c064af11b7a066b1306fd9bcab42ae5de9",
+    "docs/reports/quote_native_friction_h900_falsifier/a1_owner_readout_v1.md": "481fe2dd06225034ec60554882fb10d0658f9475ff9cd8e1dd54d9e0394c1590",
+    "docs/tasks/QUOTE_NATIVE_FRICTION_H900_FALSIFIER_V1.md": "d3b195a5991fcf776b418522a5a0e37fe7bed51913d79d412b6611a13779fb91",
     "scripts/run_quote_native_friction_h900_falsifier.py": "c9562c83d6be7548d960707e1f016d3299dfc7a0810630a51b5cdb43f438522d",
-    "src/solana_alpha_lab/quote_native_friction_h900_falsifier.py": "0ee7d346847be1482335b7485b22cc5e2ddc177c7371cabf5306ca3aa8402434",
-    "tests/test_quote_native_friction_h900_falsifier.py": "fa31bc1e2044f31e8f16eb9789cfc61c36f00ec8e7e092f734817bae2392f357"
+    "src/solana_alpha_lab/quote_native_friction_h900_falsifier.py": "82822609498b70cd1538dad939e5cef1579b2649287e444e111e039f65808cf8",
+    "tests/test_quote_native_friction_h900_falsifier.py": "bb5d4aad8bcecbf6ab4729165956e2ba0765cdb7a6bd94be76de80b70590b7e7"
   },
   "non_claims": [
     "NO_CANONICAL_DONE",
@@ -60,14 +60,14 @@
     "retries": 0,
     "wallet_signer_transaction_actions": 0
   },
-  "state_change": "DIRECTIONAL_HINT_Y_EQUALS_X_STALE_COHORT",
+  "state_change": "SAMPLE_INVALID_Y_EQUALS_X_STALE_COHORT",
   "task_id": "QUOTE_NATIVE_FRICTION_H900_FALSIFIER_V1",
   "validation": {
     "full_gate": "ENFORCED_BY_PROJECT_BOUND_VALIDATION",
     "github_ci": "ENFORCED_LIVE_AT_GUARDED_MERGE",
     "independent_review": {
       "path": "docs/evidence/quote_native_friction_h900_falsifier/a1_delivery_independent_review_v1.json",
-      "sha256": "fe14b852e3d7dc39f701a679067435c6d3e01afe43a93182a1675633b2f59f5e",
+      "sha256": "d46dfba6356fcec75987652e7610a37371030e6a8d6856c81b0e1b4f13f4e996",
       "verdict": "PASS"
     },
     "project_checks": [
