@@ -1,0 +1,72 @@
+schema: smial.quote-native-friction-h900-falsifier
+schema_version: '1.0'
+atom_id: QUOTE_NATIVE_FRICTION_H900_FALSIFIER_V1
+as_of: '2026-08-18'
+hypothesis_id: HYP-RC003-QUOTE-FRICTION-H900-V1
+sample_class: STALE_OUTCOME_BLIND_T21_UNUSED_NOT_LIVE_UNIVERSE
+expected_direction: more_negative_t0_roundtrip_friction_ranks_more_negative_h900_quoted_recovery
+external_authority:
+  capture_authorized: true
+  owner_phrase: 'OK QUOTE_NATIVE_FRICTION_H900_FALSIFIER_V1: Jupiter /swap/v2/order quote-only, taker omitted, execute forbidden, wallet/signer/transaction forbidden, cash cap $0, no retry/fallback, call cap 16, bind registry v7 route JUPITER-SOLANA-SWAP-V2-ORDER-001, unused T21 B/C plus R3 two mints only, one notional 0.01 SOL, t0 buy/reverse plus +15m sell, A24 and T21 A forbidden, +60m/+240m explicit gap no backfill, no live discovery'
+  credential_reads: false
+  dotenv_reads: false
+  execute: false
+  build: false
+  taker: OMITTED_QUOTE_ONLY
+  cash_cap_usd_cents: 0
+  call_cap: 16
+provider_route:
+  route_id: JUPITER-SOLANA-SWAP-V2-ORDER-001
+  registry: configs/provider_route_capability_registry_v7.yaml
+  endpoint: https://api.jup.ag/swap/v2/order
+  method: GET
+  host: api.jup.ag
+  official_docs: https://developers.jup.ag/docs/swap/order-and-execute
+wrapped_sol_mint: So11111111111111111111111111111111111111112
+slippage_bps: '100'
+observable_horizon_seconds: 900
+gap_horizon_seconds:
+- 3600
+- 14400
+lateness_slack_seconds: 120
+cells:
+- identity_id: T21_R2_MINT_B
+  mint: 2HU2VftbJ7Fp9P5pEbneNsRhax8boHhTVS1KLnYrpump
+  notional_atomic: '10000000'
+  source_kind: GIT_FROZEN
+  source_path: configs/task21_final_cohort_freeze_v1.yaml
+  post_migration_status: GIT_NAMED_INDEPENDENT_NOT_PROVEN_POST_MIGRATION
+- identity_id: T21_R2_MINT_C
+  mint: 2JdM5MHiXjsQz5QgnSQfbidZDTVXCLki74jMYgJapump
+  notional_atomic: '10000000'
+  source_kind: GIT_FROZEN
+  source_path: configs/task21_final_cohort_freeze_v1.yaml
+  post_migration_status: GIT_NAMED_INDEPENDENT_NOT_PROVEN_POST_MIGRATION
+- identity_id: T21_R3_MINT_1
+  mint: CWfuB1HDEp9W3xT3prBX8EPa1TQWKh1PmWFot3Gkpump
+  notional_atomic: '10000000'
+  source_kind: GIT_FROZEN
+  source_path: configs/task21_final_cohort_freeze_v1.yaml
+  post_migration_status: GIT_NAMED_INDEPENDENT_NOT_PROVEN_POST_MIGRATION
+- identity_id: T21_R3_MINT_2
+  mint: 8LRXPgAdhFktQzXjRVWgqWBWnMZTexjxsMrtQTQ6pump
+  notional_atomic: '10000000'
+  source_kind: GIT_FROZEN
+  source_path: configs/task21_final_cohort_freeze_v1.yaml
+  post_migration_status: GIT_NAMED_INDEPENDENT_NOT_PROVEN_POST_MIGRATION
+forbidden_identity_ids:
+- A24_POST_MIGRATION
+- T21_R2_MINT_A
+runtime_limits:
+  timeout_seconds: 20.0
+  max_response_bytes: 500000
+execution_controls:
+  retries: 0
+  fallback: false
+  persist_transaction_bytes: false
+  provider_requests_max: 16
+  t0_provider_requests_max: 8
+  live_market_discovery: false
+  background_scheduler: false
+  second_provider: false
+consumed_outcome_receipt: docs/evidence/quote_native_quoted_buy_h900_clock/a1_quote_native_quoted_buy_h900_clock_runtime_receipt_v1.json
