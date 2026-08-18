@@ -1,0 +1,81 @@
+{
+  "acceptance_id": "QUOTE-NATIVE-QUOTED-BUY-H900-CLOCK-DELIVERY-COMPLETION-001",
+  "active_stop_conditions": [],
+  "as_of": "2026-08-18",
+  "base_main": "67c58dec8ce274c102f65ad7dbb82a5e801d4db9",
+  "capability_radar_now": "NONE",
+  "cloud_bundle_mode": "OWNER_MANAGED_OPTIONAL_EXPORT",
+  "cloud_bundle_required_by_harness": false,
+  "cloud_bundle_smoke_required": false,
+  "factory_fit": {
+    "path": "docs/evidence/quote_native_quoted_buy_h900_clock/a1_delivery_factory_fit_v1.json",
+    "sha256": "3311d0ef0d1b13769f265e82b8d63f0f0ee4198ea4c45f0b2973b4c6a8c7fb4f",
+    "verdict": "PASS"
+  },
+  "implementation_bindings": {
+    "catalog/assets/core.yaml": "5a982e53d8820849609112ae0e3b219afd069296a894015f0b0a2096be037c81",
+    "catalog/assets/lifecycle.yaml": "a5124623c18959414639fc0267893c175baef58e3aafda4e9102e9d6f7149cd4",
+    "catalog/catalog_manifest.yaml": "403b191208136dd12117c7d44c37ce4d18881a4dc590694a95fb8e3be9a668e1",
+    "catalog/generated/asset_edges.json": "0688c9c7a2d9f3a466a71f9b334724e867190daacde35902f1a97b702e2db0fb",
+    "configs/quote_native_quoted_buy_h900_clock_v1.yaml": "f5d83e1821f44f04b354584f65785d996516897382fd025073d53d5741f3055b",
+    "docs/PROJECT_MAP.md": "70bd2e5843c7b9457d553f68ae632da489a47dc5956051690864a2193dfe5377",
+    "docs/evidence/quote_native_quoted_buy_h900_clock/a1_quote_native_quoted_buy_h900_clock_acceptance_v1.json": "41e30bfd2cdf2ebea54535371d5f1fe49e132f95d3ef2216f4c37c20f8feb7f8",
+    "docs/evidence/quote_native_quoted_buy_h900_clock/a1_quote_native_quoted_buy_h900_clock_runtime_receipt_v1.json": "c472a1b975eecd16f9f1d9e3622abdbda3dada3b231003a698a39ba4d9baee02",
+    "docs/reports/quote_native_quoted_buy_h900_clock/a1_owner_readout_v1.md": "8912d7ff2c5daf262924826ff63d31419d26ce444c53d7aba376144359bea918",
+    "docs/tasks/QUOTE_NATIVE_QUOTED_BUY_H900_CLOCK_V1.md": "1c4325df2ae3c583067693fdc6d0ca9f2d44dc677ec6221d91cb92fb4055d878",
+    "scripts/run_quote_native_quoted_buy_h900_clock.py": "647655409d72fd9a1873fac5e6ee82f5042e44b95890634c52d488a8c77bfffe",
+    "src/solana_alpha_lab/quote_native_quoted_buy_h900_clock.py": "35f081b6c144e955dced5697228cbe5903b0306a69609e2e5a26a1f068d80752",
+    "tests/test_quote_native_quoted_buy_h900_clock.py": "e9ed5658d295399c65e458d0fbefccabc1faacc22cf0df9851c7a78ba355b020"
+  },
+  "non_claims": [
+    "NO_CANONICAL_DONE",
+    "NO_LIVE_PIT_OR_EXECUTION_CLAIM",
+    "NO_ALPHA_PNL_OR_NETRETURN",
+    "NO_H13_OR_H02_TRIAL",
+    "NO_MOVE_1_COMPLETE",
+    "NO_TAKER_OR_EXECUTE",
+    "NO_H3600_OR_H14400_OBSERVATION",
+    "NO_OLD_CLOCK_DUE_REBUILD",
+    "NO_POST_MIGRATION_INFERENCE_FOR_UNPROVEN_T21",
+    "NO_RC001_FREEZE_MUTATION",
+    "NO_TRIAL_LEDGER_REWRITE"
+  ],
+  "owner_attention_triggers": {
+    "auth_or_access_recovery": false,
+    "external_material_action": false,
+    "material_owner_decision": false,
+    "unresolved_safety_or_truth_conflict": false,
+    "user_only_activation": false
+  },
+  "project_sources_disposition": {
+    "kind": "NO_CHANGE"
+  },
+  "schema": "smial.delivery-completion-evidence",
+  "schema_version": "1.0",
+  "side_effects": {
+    "cash_spend_usd_cents": 0,
+    "credential_reads": 0,
+    "fallbacks": 0,
+    "provider_requests": 9,
+    "retries": 0,
+    "wallet_signer_transaction_actions": 0
+  },
+  "state_change": "H900_QUOTED_BUY_CLOCK_OBSERVED_GAPS_EXPLICIT",
+  "task_id": "QUOTE_NATIVE_QUOTED_BUY_H900_CLOCK_V1",
+  "validation": {
+    "full_gate": "ENFORCED_BY_PROJECT_BOUND_VALIDATION",
+    "github_ci": "ENFORCED_LIVE_AT_GUARDED_MERGE",
+    "independent_review": {
+      "path": "docs/evidence/quote_native_quoted_buy_h900_clock/a1_delivery_independent_review_v1.json",
+      "sha256": "250da085ade7f7c625dfa0618b5262d645894ec23dcbe10baa6b19971b69e90e",
+      "verdict": "PASS"
+    },
+    "project_checks": [
+      "PASS_QUOTE_NATIVE_QUOTED_BUY_H900_CLOCK_TESTS",
+      "PASS_CATALOG_VALIDATION",
+      "PASS_NAVIGATION_CHECK",
+      "PASS_SECRET_SCAN"
+    ],
+    "targeted": "PASS_QUOTE_NATIVE_QUOTED_BUY_H900_CLOCK_TESTS"
+  }
+}

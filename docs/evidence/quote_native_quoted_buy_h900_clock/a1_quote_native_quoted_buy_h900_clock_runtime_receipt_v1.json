@@ -1,0 +1,725 @@
+{
+  "atom_id": "QUOTE_NATIVE_QUOTED_BUY_H900_CLOCK_V1",
+  "comparable_identities": [
+    "A24_POST_MIGRATION",
+    "T21_R2_MINT_A"
+  ],
+  "credential_reads": 0,
+  "execute_calls": 0,
+  "fallbacks": 0,
+  "identity_bindings": {
+    "provider_route_registry_v7_sha256": "cfbd2b34fdecd387d14b89b81ec8d6b814f819ec2b5c7e032ccb54734ff7be6a",
+    "task21_final_cohort_freeze_sha256": "d644c3432241a8ebbe74373038cfe0c15b87872e7afc6e96b6fade49e82d6fde",
+    "v7_access_class": "KEYLESS"
+  },
+  "limitations": [
+    "RATE_LIMIT_STOPPED_REMAINING_CELLS",
+    "H3600_H14400_EXPLICIT_GAP_NO_BACKFILL"
+  ],
+  "new_provider_requests": 3,
+  "non_claims": [
+    "NO_EXECUTE",
+    "NO_TAKER_OR_SIGNER",
+    "NO_TRANSACTION_BYTES_IN_GIT",
+    "NO_ALPHA",
+    "NO_NETRETURN",
+    "NO_CANONICAL_DONE",
+    "NO_H13_OR_H02_TRIAL",
+    "NOT_A_HYPOTHESIS_TRIAL",
+    "NO_LEFTOVER_B_C_OR_T21A_001",
+    "NO_H3600_OR_H14400_OBSERVATION",
+    "NO_OLD_CLOCK_DUE_REBUILD",
+    "NO_POST_MIGRATION_INFERENCE_FOR_UNPROVEN_T21"
+  ],
+  "observations": [
+    {
+      "amount": "10000000",
+      "consumed_call": true,
+      "due_at": "2026-08-18T01:36:24Z",
+      "horizon_seconds": 0,
+      "identity_id": "A24_POST_MIGRATION",
+      "input_mint": "So11111111111111111111111111111111111111112",
+      "kind": "BUY_T0",
+      "mint": "DMwbVy48dWVKGe9z1pcVnwF3HLMLrqWdDLfbvx8RchhK",
+      "observation_id": "A24_POST_MIGRATION:10000000:BUY_T0",
+      "observed_at": "2026-08-18T01:36:24Z",
+      "output_mint": "DMwbVy48dWVKGe9z1pcVnwF3HLMLrqWdDLfbvx8RchhK",
+      "parent_id": null,
+      "post_migration_status": "GIT_NAMED_POST_MIGRATION",
+      "quote": {
+        "error_code": null,
+        "fee_bps": {
+          "status": "OBSERVED",
+          "value": 10
+        },
+        "in_amount": "10000000",
+        "mode": "manual",
+        "out_amount": "10333269704",
+        "platform_fee": {
+          "status": "OBSERVED",
+          "value": {
+            "feeBps": 10,
+            "feeMint": "So11111111111111111111111111111111111111112"
+          }
+        },
+        "price_impact_pct": {
+          "status": "OBSERVED",
+          "value": "-0.01122797864858935"
+        },
+        "request_id_present": true,
+        "route_plan": {
+          "fee_amounts_present": false,
+          "hop_count": 1,
+          "status": "OBSERVED"
+        },
+        "router": "metis",
+        "surface": "QUOTE_OBSERVED",
+        "transaction_present": false
+      },
+      "raw_sha256": "82d709ac7d03d59cb277203e1fc089b14fe22f23e3c55d066ed41d4e6e1b68fb",
+      "terminal": "QUOTE_OBSERVED",
+      "terminal_error": null,
+      "transport": {
+        "content_type": "application/json",
+        "http_status": 200,
+        "request_count": 1,
+        "response_bytes": 1263,
+        "response_sha256": "82d709ac7d03d59cb277203e1fc089b14fe22f23e3c55d066ed41d4e6e1b68fb",
+        "url_has_api_key": false,
+        "url_has_taker": false
+      },
+      "wave": "t0"
+    },
+    {
+      "amount": "10333269704",
+      "consumed_call": true,
+      "due_at": "2026-08-18T01:36:24Z",
+      "horizon_seconds": 0,
+      "identity_id": "A24_POST_MIGRATION",
+      "input_mint": "DMwbVy48dWVKGe9z1pcVnwF3HLMLrqWdDLfbvx8RchhK",
+      "kind": "REVERSE_T0",
+      "mint": "DMwbVy48dWVKGe9z1pcVnwF3HLMLrqWdDLfbvx8RchhK",
+      "observation_id": "A24_POST_MIGRATION:10000000:REVERSE_T0",
+      "observed_at": "2026-08-18T01:36:24Z",
+      "output_mint": "So11111111111111111111111111111111111111112",
+      "parent_id": "A24_POST_MIGRATION:10000000:BUY_T0",
+      "post_migration_status": "GIT_NAMED_POST_MIGRATION",
+      "quote": {
+        "error_code": null,
+        "fee_bps": {
+          "status": "OBSERVED",
+          "value": 10
+        },
+        "in_amount": "10333269704",
+        "mode": "manual",
+        "out_amount": "9933549",
+        "platform_fee": {
+          "status": "OBSERVED",
+          "value": {
+            "feeBps": 10,
+            "feeMint": "So11111111111111111111111111111111111111112"
+          }
+        },
+        "price_impact_pct": {
+          "status": "OBSERVED",
+          "value": "0.004634919424930397"
+        },
+        "request_id_present": true,
+        "route_plan": {
+          "fee_amounts_present": false,
+          "hop_count": 2,
+          "status": "OBSERVED"
+        },
+        "router": "dflow",
+        "surface": "QUOTE_OBSERVED",
+        "transaction_present": false
+      },
+      "raw_sha256": "2b90d6320bebf117733dc82d8ad9e0961cf620c78b07d71cf371e42eac80cde6",
+      "terminal": "QUOTE_OBSERVED",
+      "terminal_error": null,
+      "transport": {
+        "content_type": "application/json",
+        "http_status": 200,
+        "request_count": 1,
+        "response_bytes": 1562,
+        "response_sha256": "2b90d6320bebf117733dc82d8ad9e0961cf620c78b07d71cf371e42eac80cde6",
+        "url_has_api_key": false,
+        "url_has_taker": false
+      },
+      "wave": "t0"
+    },
+    {
+      "amount": "10333269704",
+      "consumed_call": true,
+      "due_at": "2026-08-18T01:51:24Z",
+      "horizon_seconds": 900,
+      "identity_id": "A24_POST_MIGRATION",
+      "input_mint": "DMwbVy48dWVKGe9z1pcVnwF3HLMLrqWdDLfbvx8RchhK",
+      "kind": "SELL_H900",
+      "lateness_slack_seconds": 120,
+      "mint": "DMwbVy48dWVKGe9z1pcVnwF3HLMLrqWdDLfbvx8RchhK",
+      "observation_id": "A24_POST_MIGRATION:10000000:SELL_H900",
+      "observed_at": "2026-08-18T01:52:14Z",
+      "output_mint": "So11111111111111111111111111111111111111112",
+      "parent_id": "A24_POST_MIGRATION:10000000:BUY_T0",
+      "post_migration_status": "GIT_NAMED_POST_MIGRATION",
+      "quote": {
+        "error_code": null,
+        "fee_bps": {
+          "status": "OBSERVED",
+          "value": 10
+        },
+        "in_amount": "10333269704",
+        "mode": "manual",
+        "out_amount": "9959269",
+        "platform_fee": {
+          "status": "OBSERVED",
+          "value": {
+            "feeBps": 10,
+            "feeMint": "So11111111111111111111111111111111111111112"
+          }
+        },
+        "price_impact_pct": {
+          "status": "OBSERVED",
+          "value": "0.004267041628732244"
+        },
+        "request_id_present": true,
+        "route_plan": {
+          "fee_amounts_present": false,
+          "hop_count": 3,
+          "status": "OBSERVED"
+        },
+        "router": "dflow",
+        "surface": "QUOTE_OBSERVED",
+        "transaction_present": false
+      },
+      "raw_sha256": "a5a00435083cbd7328eaaef1c2c970021de2fd354e23cf23f0d075168c62dd48",
+      "terminal": "QUOTE_OBSERVED",
+      "terminal_error": null,
+      "transport": {
+        "content_type": "application/json",
+        "http_status": 200,
+        "request_count": 1,
+        "response_bytes": 1870,
+        "response_sha256": "a5a00435083cbd7328eaaef1c2c970021de2fd354e23cf23f0d075168c62dd48",
+        "url_has_api_key": false,
+        "url_has_taker": false
+      },
+      "wave": "horizon"
+    },
+    {
+      "amount": null,
+      "consumed_call": false,
+      "due_at": "2026-08-18T02:36:24Z",
+      "horizon_seconds": 3600,
+      "identity_id": "A24_POST_MIGRATION",
+      "input_mint": "DMwbVy48dWVKGe9z1pcVnwF3HLMLrqWdDLfbvx8RchhK",
+      "kind": "SELL_H3600",
+      "mint": "DMwbVy48dWVKGe9z1pcVnwF3HLMLrqWdDLfbvx8RchhK",
+      "observation_id": "A24_POST_MIGRATION:10000000:SELL_H3600",
+      "output_mint": "So11111111111111111111111111111111111111112",
+      "parent_id": "A24_POST_MIGRATION:10000000:BUY_T0",
+      "post_migration_status": "GIT_NAMED_POST_MIGRATION",
+      "terminal": "EXPLICIT_GAP",
+      "wave": "gap"
+    },
+    {
+      "amount": null,
+      "consumed_call": false,
+      "due_at": "2026-08-18T05:36:24Z",
+      "horizon_seconds": 14400,
+      "identity_id": "A24_POST_MIGRATION",
+      "input_mint": "DMwbVy48dWVKGe9z1pcVnwF3HLMLrqWdDLfbvx8RchhK",
+      "kind": "SELL_H14400",
+      "mint": "DMwbVy48dWVKGe9z1pcVnwF3HLMLrqWdDLfbvx8RchhK",
+      "observation_id": "A24_POST_MIGRATION:10000000:SELL_H14400",
+      "output_mint": "So11111111111111111111111111111111111111112",
+      "parent_id": "A24_POST_MIGRATION:10000000:BUY_T0",
+      "post_migration_status": "GIT_NAMED_POST_MIGRATION",
+      "terminal": "EXPLICIT_GAP",
+      "wave": "gap"
+    },
+    {
+      "amount": "1000000",
+      "consumed_call": true,
+      "due_at": "2026-08-18T01:36:24Z",
+      "horizon_seconds": 0,
+      "identity_id": "A24_POST_MIGRATION",
+      "input_mint": "So11111111111111111111111111111111111111112",
+      "kind": "BUY_T0",
+      "mint": "DMwbVy48dWVKGe9z1pcVnwF3HLMLrqWdDLfbvx8RchhK",
+      "observation_id": "A24_POST_MIGRATION:1000000:BUY_T0",
+      "observed_at": "2026-08-18T01:36:25Z",
+      "output_mint": "DMwbVy48dWVKGe9z1pcVnwF3HLMLrqWdDLfbvx8RchhK",
+      "parent_id": null,
+      "post_migration_status": "GIT_NAMED_POST_MIGRATION",
+      "quote": {
+        "error_code": null,
+        "fee_bps": {
+          "status": "OBSERVED",
+          "value": 10
+        },
+        "in_amount": "1000000",
+        "mode": "manual",
+        "out_amount": "1033357612",
+        "platform_fee": {
+          "status": "OBSERVED",
+          "value": {
+            "feeBps": 10,
+            "feeMint": "So11111111111111111111111111111111111111112"
+          }
+        },
+        "price_impact_pct": {
+          "status": "OBSERVED",
+          "value": "-0.011198658251815234"
+        },
+        "request_id_present": true,
+        "route_plan": {
+          "fee_amounts_present": false,
+          "hop_count": 1,
+          "status": "OBSERVED"
+        },
+        "router": "metis",
+        "surface": "QUOTE_OBSERVED",
+        "transaction_present": false
+      },
+      "raw_sha256": "76ca2735c2a923edb0ef37eff9123b937a8c43f2b0997346882ca55159411650",
+      "terminal": "QUOTE_OBSERVED",
+      "terminal_error": null,
+      "transport": {
+        "content_type": "application/json",
+        "http_status": 200,
+        "request_count": 1,
+        "response_bytes": 1263,
+        "response_sha256": "76ca2735c2a923edb0ef37eff9123b937a8c43f2b0997346882ca55159411650",
+        "url_has_api_key": false,
+        "url_has_taker": false
+      },
+      "wave": "t0"
+    },
+    {
+      "amount": "1033357612",
+      "consumed_call": true,
+      "due_at": "2026-08-18T01:36:24Z",
+      "horizon_seconds": 0,
+      "identity_id": "A24_POST_MIGRATION",
+      "input_mint": "DMwbVy48dWVKGe9z1pcVnwF3HLMLrqWdDLfbvx8RchhK",
+      "kind": "REVERSE_T0",
+      "mint": "DMwbVy48dWVKGe9z1pcVnwF3HLMLrqWdDLfbvx8RchhK",
+      "observation_id": "A24_POST_MIGRATION:1000000:REVERSE_T0",
+      "observed_at": "2026-08-18T01:36:25Z",
+      "output_mint": "So11111111111111111111111111111111111111112",
+      "parent_id": "A24_POST_MIGRATION:1000000:BUY_T0",
+      "post_migration_status": "GIT_NAMED_POST_MIGRATION",
+      "quote": {
+        "error_code": null,
+        "fee_bps": {
+          "status": "OBSERVED",
+          "value": 10
+        },
+        "in_amount": "1033357612",
+        "mode": "manual",
+        "out_amount": "994641",
+        "platform_fee": {
+          "status": "OBSERVED",
+          "value": {
+            "feeBps": 10,
+            "feeMint": "So11111111111111111111111111111111111111112"
+          }
+        },
+        "price_impact_pct": {
+          "status": "OBSERVED",
+          "value": "0.005905795234349879"
+        },
+        "request_id_present": true,
+        "route_plan": {
+          "fee_amounts_present": false,
+          "hop_count": 2,
+          "status": "OBSERVED"
+        },
+        "router": "dflow",
+        "surface": "QUOTE_OBSERVED",
+        "transaction_present": false
+      },
+      "raw_sha256": "6e56f8e697172a1bbf1b320888b89a02785e505fe3984513d1bffc1c3b028279",
+      "terminal": "QUOTE_OBSERVED",
+      "terminal_error": null,
+      "transport": {
+        "content_type": "application/json",
+        "http_status": 200,
+        "request_count": 1,
+        "response_bytes": 1561,
+        "response_sha256": "6e56f8e697172a1bbf1b320888b89a02785e505fe3984513d1bffc1c3b028279",
+        "url_has_api_key": false,
+        "url_has_taker": false
+      },
+      "wave": "t0"
+    },
+    {
+      "amount": "1033357612",
+      "consumed_call": true,
+      "due_at": "2026-08-18T01:51:24Z",
+      "horizon_seconds": 900,
+      "identity_id": "A24_POST_MIGRATION",
+      "input_mint": "DMwbVy48dWVKGe9z1pcVnwF3HLMLrqWdDLfbvx8RchhK",
+      "kind": "SELL_H900",
+      "lateness_slack_seconds": 120,
+      "mint": "DMwbVy48dWVKGe9z1pcVnwF3HLMLrqWdDLfbvx8RchhK",
+      "observation_id": "A24_POST_MIGRATION:1000000:SELL_H900",
+      "observed_at": "2026-08-18T01:52:14Z",
+      "output_mint": "So11111111111111111111111111111111111111112",
+      "parent_id": "A24_POST_MIGRATION:1000000:BUY_T0",
+      "post_migration_status": "GIT_NAMED_POST_MIGRATION",
+      "quote": {
+        "error_code": null,
+        "fee_bps": {
+          "status": "OBSERVED",
+          "value": 10
+        },
+        "in_amount": "1033357612",
+        "mode": "manual",
+        "out_amount": "997270",
+        "platform_fee": {
+          "status": "OBSERVED",
+          "value": {
+            "feeBps": 10,
+            "feeMint": "So11111111111111111111111111111111111111112"
+          }
+        },
+        "price_impact_pct": {
+          "status": "OBSERVED",
+          "value": "0.005591569932335803"
+        },
+        "request_id_present": true,
+        "route_plan": {
+          "fee_amounts_present": false,
+          "hop_count": 2,
+          "status": "OBSERVED"
+        },
+        "router": "dflow",
+        "surface": "QUOTE_OBSERVED",
+        "transaction_present": false
+      },
+      "raw_sha256": "6223a379bdf6c24a06fa5df96dacbd8aa5f3df146112f946ea8699cfae5bef14",
+      "terminal": "QUOTE_OBSERVED",
+      "terminal_error": null,
+      "transport": {
+        "content_type": "application/json",
+        "http_status": 200,
+        "request_count": 1,
+        "response_bytes": 1564,
+        "response_sha256": "6223a379bdf6c24a06fa5df96dacbd8aa5f3df146112f946ea8699cfae5bef14",
+        "url_has_api_key": false,
+        "url_has_taker": false
+      },
+      "wave": "horizon"
+    },
+    {
+      "amount": null,
+      "consumed_call": false,
+      "due_at": "2026-08-18T02:36:24Z",
+      "horizon_seconds": 3600,
+      "identity_id": "A24_POST_MIGRATION",
+      "input_mint": "DMwbVy48dWVKGe9z1pcVnwF3HLMLrqWdDLfbvx8RchhK",
+      "kind": "SELL_H3600",
+      "mint": "DMwbVy48dWVKGe9z1pcVnwF3HLMLrqWdDLfbvx8RchhK",
+      "observation_id": "A24_POST_MIGRATION:1000000:SELL_H3600",
+      "output_mint": "So11111111111111111111111111111111111111112",
+      "parent_id": "A24_POST_MIGRATION:1000000:BUY_T0",
+      "post_migration_status": "GIT_NAMED_POST_MIGRATION",
+      "terminal": "EXPLICIT_GAP",
+      "wave": "gap"
+    },
+    {
+      "amount": null,
+      "consumed_call": false,
+      "due_at": "2026-08-18T05:36:24Z",
+      "horizon_seconds": 14400,
+      "identity_id": "A24_POST_MIGRATION",
+      "input_mint": "DMwbVy48dWVKGe9z1pcVnwF3HLMLrqWdDLfbvx8RchhK",
+      "kind": "SELL_H14400",
+      "mint": "DMwbVy48dWVKGe9z1pcVnwF3HLMLrqWdDLfbvx8RchhK",
+      "observation_id": "A24_POST_MIGRATION:1000000:SELL_H14400",
+      "output_mint": "So11111111111111111111111111111111111111112",
+      "parent_id": "A24_POST_MIGRATION:1000000:BUY_T0",
+      "post_migration_status": "GIT_NAMED_POST_MIGRATION",
+      "terminal": "EXPLICIT_GAP",
+      "wave": "gap"
+    },
+    {
+      "amount": "10000000",
+      "consumed_call": true,
+      "due_at": "2026-08-18T01:36:24Z",
+      "horizon_seconds": 0,
+      "identity_id": "T21_R2_MINT_A",
+      "input_mint": "So11111111111111111111111111111111111111112",
+      "kind": "BUY_T0",
+      "mint": "2Ezm4w3gFdymRAyhx9KEsbJV9NA79Y7UoiNWeXNFpump",
+      "observation_id": "T21_R2_MINT_A:10000000:BUY_T0",
+      "observed_at": "2026-08-18T01:36:25Z",
+      "output_mint": "2Ezm4w3gFdymRAyhx9KEsbJV9NA79Y7UoiNWeXNFpump",
+      "parent_id": null,
+      "post_migration_status": "GIT_NAMED_INDEPENDENT_NOT_PROVEN_POST_MIGRATION",
+      "quote": {
+        "error_code": null,
+        "fee_bps": {
+          "status": "OBSERVED",
+          "value": 10
+        },
+        "in_amount": "10000000",
+        "mode": "manual",
+        "out_amount": "299378607512",
+        "platform_fee": {
+          "status": "OBSERVED",
+          "value": {
+            "feeBps": 10,
+            "feeMint": "So11111111111111111111111111111111111111112"
+          }
+        },
+        "price_impact_pct": {
+          "status": "OBSERVED",
+          "value": "-0.0019624160287417688"
+        },
+        "request_id_present": true,
+        "route_plan": {
+          "fee_amounts_present": false,
+          "hop_count": 1,
+          "status": "OBSERVED"
+        },
+        "router": "metis",
+        "surface": "QUOTE_OBSERVED",
+        "transaction_present": false
+      },
+      "raw_sha256": "879f8d26c281c9f45b26ab429d22c82c4035c692f7f444c08a2c6f5eafaf2b4a",
+      "terminal": "QUOTE_OBSERVED",
+      "terminal_error": null,
+      "transport": {
+        "content_type": "application/json",
+        "http_status": 200,
+        "request_count": 1,
+        "response_bytes": 1270,
+        "response_sha256": "879f8d26c281c9f45b26ab429d22c82c4035c692f7f444c08a2c6f5eafaf2b4a",
+        "url_has_api_key": false,
+        "url_has_taker": false
+      },
+      "wave": "t0"
+    },
+    {
+      "amount": "299378607512",
+      "consumed_call": true,
+      "due_at": "2026-08-18T01:36:24Z",
+      "horizon_seconds": 0,
+      "identity_id": "T21_R2_MINT_A",
+      "input_mint": "2Ezm4w3gFdymRAyhx9KEsbJV9NA79Y7UoiNWeXNFpump",
+      "kind": "REVERSE_T0",
+      "mint": "2Ezm4w3gFdymRAyhx9KEsbJV9NA79Y7UoiNWeXNFpump",
+      "observation_id": "T21_R2_MINT_A:10000000:REVERSE_T0",
+      "observed_at": "2026-08-18T01:36:26Z",
+      "output_mint": "So11111111111111111111111111111111111111112",
+      "parent_id": "T21_R2_MINT_A:10000000:BUY_T0",
+      "post_migration_status": "GIT_NAMED_INDEPENDENT_NOT_PROVEN_POST_MIGRATION",
+      "quote": null,
+      "raw_sha256": "b490277b048ca69e3accf0940b3ea5fb8ef2036cce3bb841c327166c6aad34a1",
+      "terminal": "RATE_LIMITED",
+      "terminal_error": "HTTP_429",
+      "transport": {
+        "content_type": "application/json",
+        "http_status": 429,
+        "request_count": 1,
+        "response_bytes": 56,
+        "response_sha256": "b490277b048ca69e3accf0940b3ea5fb8ef2036cce3bb841c327166c6aad34a1",
+        "url_has_api_key": false,
+        "url_has_taker": false
+      },
+      "wave": "t0"
+    },
+    {
+      "amount": "299378607512",
+      "consumed_call": true,
+      "due_at": "2026-08-18T01:51:24Z",
+      "horizon_seconds": 900,
+      "identity_id": "T21_R2_MINT_A",
+      "input_mint": "2Ezm4w3gFdymRAyhx9KEsbJV9NA79Y7UoiNWeXNFpump",
+      "kind": "SELL_H900",
+      "lateness_slack_seconds": 120,
+      "mint": "2Ezm4w3gFdymRAyhx9KEsbJV9NA79Y7UoiNWeXNFpump",
+      "observation_id": "T21_R2_MINT_A:10000000:SELL_H900",
+      "observed_at": "2026-08-18T01:52:15Z",
+      "output_mint": "So11111111111111111111111111111111111111112",
+      "parent_id": "T21_R2_MINT_A:10000000:BUY_T0",
+      "post_migration_status": "GIT_NAMED_INDEPENDENT_NOT_PROVEN_POST_MIGRATION",
+      "quote": {
+        "error_code": null,
+        "fee_bps": {
+          "status": "OBSERVED",
+          "value": 10
+        },
+        "in_amount": "299378607512",
+        "mode": "manual",
+        "out_amount": "9755194",
+        "platform_fee": {
+          "status": "OBSERVED",
+          "value": {
+            "feeBps": 10,
+            "feeMint": "So11111111111111111111111111111111111111112"
+          }
+        },
+        "price_impact_pct": {
+          "status": "OBSERVED",
+          "value": "-0.025143386971946676"
+        },
+        "request_id_present": true,
+        "route_plan": {
+          "fee_amounts_present": false,
+          "hop_count": 1,
+          "status": "OBSERVED"
+        },
+        "router": "dflow",
+        "surface": "QUOTE_OBSERVED",
+        "transaction_present": false
+      },
+      "raw_sha256": "1282d6603c1e31827e96cb9e82a0bc30d266e320979cb1136facc4e697756f9b",
+      "terminal": "QUOTE_OBSERVED",
+      "terminal_error": null,
+      "transport": {
+        "content_type": "application/json",
+        "http_status": 200,
+        "request_count": 1,
+        "response_bytes": 1261,
+        "response_sha256": "1282d6603c1e31827e96cb9e82a0bc30d266e320979cb1136facc4e697756f9b",
+        "url_has_api_key": false,
+        "url_has_taker": false
+      },
+      "wave": "horizon"
+    },
+    {
+      "amount": null,
+      "consumed_call": false,
+      "due_at": "2026-08-18T02:36:24Z",
+      "horizon_seconds": 3600,
+      "identity_id": "T21_R2_MINT_A",
+      "input_mint": "2Ezm4w3gFdymRAyhx9KEsbJV9NA79Y7UoiNWeXNFpump",
+      "kind": "SELL_H3600",
+      "mint": "2Ezm4w3gFdymRAyhx9KEsbJV9NA79Y7UoiNWeXNFpump",
+      "observation_id": "T21_R2_MINT_A:10000000:SELL_H3600",
+      "output_mint": "So11111111111111111111111111111111111111112",
+      "parent_id": "T21_R2_MINT_A:10000000:BUY_T0",
+      "post_migration_status": "GIT_NAMED_INDEPENDENT_NOT_PROVEN_POST_MIGRATION",
+      "terminal": "EXPLICIT_GAP",
+      "wave": "gap"
+    },
+    {
+      "amount": null,
+      "consumed_call": false,
+      "due_at": "2026-08-18T05:36:24Z",
+      "horizon_seconds": 14400,
+      "identity_id": "T21_R2_MINT_A",
+      "input_mint": "2Ezm4w3gFdymRAyhx9KEsbJV9NA79Y7UoiNWeXNFpump",
+      "kind": "SELL_H14400",
+      "mint": "2Ezm4w3gFdymRAyhx9KEsbJV9NA79Y7UoiNWeXNFpump",
+      "observation_id": "T21_R2_MINT_A:10000000:SELL_H14400",
+      "output_mint": "So11111111111111111111111111111111111111112",
+      "parent_id": "T21_R2_MINT_A:10000000:BUY_T0",
+      "post_migration_status": "GIT_NAMED_INDEPENDENT_NOT_PROVEN_POST_MIGRATION",
+      "terminal": "EXPLICIT_GAP",
+      "wave": "gap"
+    }
+  ],
+  "owner_phrase": "OK QUOTE_NATIVE_QUOTED_BUY_H900_CLOCK_V1: Jupiter /swap/v2/order quote-only, taker omitted, execute forbidden, wallet/signer/transaction forbidden, cash cap $0, no retry/fallback, call cap 16, bind registry v7 route JUPITER-SOLANA-SWAP-V2-ORDER-001, new clock A24 both notionals plus T21_R2_MINT_A 0.01 SOL only, t0 plus +15m only in this session, +60m and +240m explicit gap no backfill, leftover B/C and 0.001 forbidden, old due_at not rebuilt",
+  "panel_started_at": "2026-08-18T01:36:24Z",
+  "preflight": {
+    "credential_reads": 0,
+    "dns_resolved": true,
+    "host": "api.jup.ag",
+    "observed_at": "2026-08-18T01:52:14Z",
+    "port": 443,
+    "provider_requests": 0,
+    "schema": "smial.pmf-quote-slice-one-shot.credential-free-preflight",
+    "schema_version": "1.0",
+    "tcp_443": true,
+    "tls_verified": true,
+    "tls_version": "TLSv1.3"
+  },
+  "provider_requests": 9,
+  "quoted_buy_ids": [
+    "A24_POST_MIGRATION:10000000:BUY_T0",
+    "A24_POST_MIGRATION:1000000:BUY_T0",
+    "T21_R2_MINT_A:10000000:BUY_T0"
+  ],
+  "raw_retention": {
+    "manifests": [
+      {
+        "bytes": 1263,
+        "observation_id": "A24_POST_MIGRATION:10000000:BUY_T0",
+        "path": "local/quote_native_quoted_buy_h900_clock/run=20260818T013624Z-t0/A24_POST_MIGRATION_10000000_BUY_T0.json",
+        "retention": "A4_OUTSIDE_GIT",
+        "sha256": "82d709ac7d03d59cb277203e1fc089b14fe22f23e3c55d066ed41d4e6e1b68fb"
+      },
+      {
+        "bytes": 1562,
+        "observation_id": "A24_POST_MIGRATION:10000000:REVERSE_T0",
+        "path": "local/quote_native_quoted_buy_h900_clock/run=20260818T013624Z-t0/A24_POST_MIGRATION_10000000_REVERSE_T0.json",
+        "retention": "A4_OUTSIDE_GIT",
+        "sha256": "2b90d6320bebf117733dc82d8ad9e0961cf620c78b07d71cf371e42eac80cde6"
+      },
+      {
+        "bytes": 1263,
+        "observation_id": "A24_POST_MIGRATION:1000000:BUY_T0",
+        "path": "local/quote_native_quoted_buy_h900_clock/run=20260818T013624Z-t0/A24_POST_MIGRATION_1000000_BUY_T0.json",
+        "retention": "A4_OUTSIDE_GIT",
+        "sha256": "76ca2735c2a923edb0ef37eff9123b937a8c43f2b0997346882ca55159411650"
+      },
+      {
+        "bytes": 1561,
+        "observation_id": "A24_POST_MIGRATION:1000000:REVERSE_T0",
+        "path": "local/quote_native_quoted_buy_h900_clock/run=20260818T013624Z-t0/A24_POST_MIGRATION_1000000_REVERSE_T0.json",
+        "retention": "A4_OUTSIDE_GIT",
+        "sha256": "6e56f8e697172a1bbf1b320888b89a02785e505fe3984513d1bffc1c3b028279"
+      },
+      {
+        "bytes": 1270,
+        "observation_id": "T21_R2_MINT_A:10000000:BUY_T0",
+        "path": "local/quote_native_quoted_buy_h900_clock/run=20260818T013624Z-t0/T21_R2_MINT_A_10000000_BUY_T0.json",
+        "retention": "A4_OUTSIDE_GIT",
+        "sha256": "879f8d26c281c9f45b26ab429d22c82c4035c692f7f444c08a2c6f5eafaf2b4a"
+      },
+      {
+        "bytes": 56,
+        "observation_id": "T21_R2_MINT_A:10000000:REVERSE_T0",
+        "path": "local/quote_native_quoted_buy_h900_clock/run=20260818T013624Z-t0/T21_R2_MINT_A_10000000_REVERSE_T0.json",
+        "retention": "A4_OUTSIDE_GIT",
+        "sha256": "b490277b048ca69e3accf0940b3ea5fb8ef2036cce3bb841c327166c6aad34a1"
+      },
+      {
+        "bytes": 1870,
+        "observation_id": "A24_POST_MIGRATION:10000000:SELL_H900",
+        "path": "local/quote_native_quoted_buy_h900_clock/run=20260818T015214Z-due/A24_POST_MIGRATION_10000000_SELL_H900.json",
+        "retention": "A4_OUTSIDE_GIT",
+        "sha256": "a5a00435083cbd7328eaaef1c2c970021de2fd354e23cf23f0d075168c62dd48"
+      },
+      {
+        "bytes": 1564,
+        "observation_id": "A24_POST_MIGRATION:1000000:SELL_H900",
+        "path": "local/quote_native_quoted_buy_h900_clock/run=20260818T015214Z-due/A24_POST_MIGRATION_1000000_SELL_H900.json",
+        "retention": "A4_OUTSIDE_GIT",
+        "sha256": "6223a379bdf6c24a06fa5df96dacbd8aa5f3df146112f946ea8699cfae5bef14"
+      },
+      {
+        "bytes": 1261,
+        "observation_id": "T21_R2_MINT_A:10000000:SELL_H900",
+        "path": "local/quote_native_quoted_buy_h900_clock/run=20260818T015214Z-due/T21_R2_MINT_A_10000000_SELL_H900.json",
+        "retention": "A4_OUTSIDE_GIT",
+        "sha256": "1282d6603c1e31827e96cb9e82a0bc30d266e320979cb1136facc4e697756f9b"
+      }
+    ],
+    "raw_retained": true
+  },
+  "receipt_id": "EVIDENCE-QUOTE-NATIVE-QUOTED-BUY-H900-CLOCK-001",
+  "retries": 0,
+  "route_id": "JUPITER-SOLANA-SWAP-V2-ORDER-001",
+  "schema": "smial.quote-native-quoted-buy-h900-clock.runtime-receipt",
+  "schema_version": "1.0",
+  "started_at": "2026-08-18T01:52:14Z",
+  "terminal_outcome": "H900_PANEL_OBSERVED",
+  "wave": "due"
+}
