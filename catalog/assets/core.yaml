@@ -24347,7 +24347,7 @@ records:
   as_of: '2026-08-18'
   truth_owner: FACTORY-V1-OPERATIONAL-READINESS-V1
   location: {kind: git_path, logical_uri: 'repo://docs/tasks/FACTORY-V1-OPERATIONAL-READINESS-V1.md', repository_path: docs/tasks/FACTORY-V1-OPERATIONAL-READINESS-V1.md}
-  integrity: {kind: sha256, sha256: d63e458bfec43d4af56a9f8105e81fc933c1529bf93e269403411c127228e401}
+  integrity: {kind: sha256, sha256: aaf9d0ad99edccbb3f84d1d3656c15b80df3b39426f2521da8b2e0f14c4c329a}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: governed_by, target_asset_id: ARCH-INTENT-005}

@@ -1,0 +1,58 @@
+{
+  "as_of": "2026-08-18",
+  "non_claims": [
+    "NO_CRYPTOGRAPHIC_REVIEWER_IDENTITY",
+    "REVIEW_IS_NOT_SEMANTIC_DONE",
+    "NO_PRODUCT_IMPLEMENTATION",
+    "NO_FACTORY_V1_OPERATIONAL_READY_TRIGGER",
+    "NO_ALPHA_OR_CASHFLOW",
+    "NO_CANONICAL_DONE"
+  ],
+  "required_roles": [
+    "CODE_REVIEWER",
+    "GOAL_DOD_CRITIC",
+    "ARCHITECTURE_CRITIC"
+  ],
+  "review_id": "FACTORY-V1-OPERATIONAL-READINESS-INDEPENDENT-REVIEW-001",
+  "reviewed_bindings_sha256": "4b0900005024da2f51741e3d4e648a86ae747a70a0268d86d5c553eaefa081b9",
+  "reviewed_inventory_sha256": "6a4133414862667f7ccaf79c7d91796e73414a8bd026b663946eb42f3d0efefa",
+  "reviews": [
+    {
+      "findings": [
+        "CHECKED_WRITE_SET_EXACT",
+        "CHECKED_NO_SECRETS",
+        "CHECKED_NO_PRODUCT_IMPLEMENTATION",
+        "CHECKED_HASHES_MATCH_FILES",
+        "CHECKED_CATALOG_AND_NAVIGATION_PASS",
+        "CHECKED_REPOSITORY_ORIGIN_AND_GIT_NATIVE_REGISTRAR"
+      ],
+      "role": "CODE_REVIEWER",
+      "verdict": "PASS"
+    },
+    {
+      "findings": [
+        "CHECKED_MILESTONE_NOT_TRIGGERED",
+        "CHECKED_NO_COCKPIT_RUNNER_OR_NUMBERED_CHAIN",
+        "CHECKED_CHEAPEST_FALSIFIER_NOT_PREEMPTED",
+        "CHECKED_DOD_IS_DIRECTION_NOT_PROFIT"
+      ],
+      "role": "GOAL_DOD_CRITIC",
+      "verdict": "PASS"
+    },
+    {
+      "findings": [
+        "CHECKED_A1_REPOSITORY_ORIGIN_EMPTY_EVIDENCE",
+        "CHECKED_A2_ADVISES_ROADMAP_PATCH_T21_NO_TASK35A_PARALLEL",
+        "CHECKED_A3_WATCH_MAP_NOT_PASS_INVENTORY",
+        "CHECKED_APPLICATION_SERVICE_COMMAND_GATEWAY",
+        "CHECKED_NO_SRC_COCKPIT_RUNTIME"
+      ],
+      "role": "ARCHITECTURE_CRITIC",
+      "verdict": "PASS"
+    }
+  ],
+  "schema": "smial.delivery-independent-review-evidence",
+  "schema_version": "1.0",
+  "task_id": "FACTORY-V1-OPERATIONAL-READINESS-V1",
+  "verdict": "PASS"
+}

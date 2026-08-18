@@ -27,6 +27,9 @@ managed_write_set:
   - catalog/assets/lifecycle.yaml
   - catalog/generated/asset_edges.json
   - docs/PROJECT_MAP.md
+  - docs/evidence/factory_v1_operational_readiness/a1_delivery_completion_evidence_v1.json
+  - docs/evidence/factory_v1_operational_readiness/a1_delivery_independent_review_v1.json
+  - docs/evidence/factory_v1_operational_readiness/a1_delivery_factory_fit_v1.json
 external_caps:
   network: false
   credentials: false
@@ -49,7 +52,7 @@ context_requirements:
     - ARCH-INTENT-004
     - ARCH-INTENT-005
     - ARCH-INTENT-T21-PRODUCT-VISION-001
-  l2_roles: [ARCHITECTURE_DECISIONS]
+  l2_roles: [ARCHITECTURE_DECISIONS, DELIVERY_EVIDENCE]
   l3_roles: []
   roadmap_path: configs/factory_v1_operational_readiness_v1.yaml
   exact_role_paths:
@@ -60,7 +63,10 @@ context_requirements:
       - docs/architecture/intents/ARCH-INTENT-003-product-owner-operating-topology.md
       - docs/architecture/intents/ARCH-INTENT-004-factory-context-capsule-and-workbench-boundary.md
       - docs/architecture/intents/ARCH-INTENT-005-factory-v1-operational-readiness-and-owner-experience.md
-    DELIVERY_EVIDENCE: []
+    DELIVERY_EVIDENCE:
+      - docs/evidence/factory_v1_operational_readiness/a1_delivery_completion_evidence_v1.json
+      - docs/evidence/factory_v1_operational_readiness/a1_delivery_independent_review_v1.json
+      - docs/evidence/factory_v1_operational_readiness/a1_delivery_factory_fit_v1.json
     HISTORICAL_CONTEXT: []
 ---
 
