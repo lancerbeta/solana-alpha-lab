@@ -103,6 +103,26 @@
       "target_asset_id": "EVIDENCE-DELIVERY-HARNESS-ACCEPTANCE-001"
     },
     {
+      "source_asset_id": "ARCH-INTENT-005",
+      "relation": "advises",
+      "target_asset_id": "CONFIG-FACTORY-V1-OPERATIONAL-READINESS-001"
+    },
+    {
+      "source_asset_id": "ARCH-INTENT-005",
+      "relation": "derived_from",
+      "target_asset_id": "ARCH-INTENT-002"
+    },
+    {
+      "source_asset_id": "ARCH-INTENT-005",
+      "relation": "derived_from",
+      "target_asset_id": "ARCH-INTENT-004"
+    },
+    {
+      "source_asset_id": "ARCH-INTENT-005",
+      "relation": "derived_from",
+      "target_asset_id": "ARCH-INTENT-T21-PRODUCT-VISION-001"
+    },
+    {
       "source_asset_id": "ARCH-INTENT-T21-PRODUCT-VISION-001",
       "relation": "derived_from",
       "target_asset_id": "ARCH-INTENT-002"
@@ -446,6 +466,16 @@
       "source_asset_id": "CONFIG-DELIVERY-PROJECT-PROFILE-001",
       "relation": "governed_by",
       "target_asset_id": "CTRL-DELIVERY-HARNESS-001"
+    },
+    {
+      "source_asset_id": "CONFIG-FACTORY-V1-OPERATIONAL-READINESS-001",
+      "relation": "derived_from",
+      "target_asset_id": "CTRL-FACTORY-V1-OPERATIONAL-READINESS-001"
+    },
+    {
+      "source_asset_id": "CONFIG-FACTORY-V1-OPERATIONAL-READINESS-001",
+      "relation": "governed_by",
+      "target_asset_id": "ARCH-INTENT-005"
     },
     {
       "source_asset_id": "CONFIG-OWNER-AUTHORITY-PACKET-001",
@@ -1726,6 +1756,21 @@
       "source_asset_id": "CTRL-DELIVERY-HARNESS-001",
       "relation": "validated_by",
       "target_asset_id": "TEST-DELIVERY-HARNESS-001"
+    },
+    {
+      "source_asset_id": "CTRL-FACTORY-V1-OPERATIONAL-READINESS-001",
+      "relation": "contains",
+      "target_asset_id": "CONFIG-FACTORY-V1-OPERATIONAL-READINESS-001"
+    },
+    {
+      "source_asset_id": "CTRL-FACTORY-V1-OPERATIONAL-READINESS-001",
+      "relation": "governed_by",
+      "target_asset_id": "ARCH-INTENT-005"
+    },
+    {
+      "source_asset_id": "CTRL-FACTORY-V1-OPERATIONAL-READINESS-001",
+      "relation": "validated_by",
+      "target_asset_id": "TEST-FACTORY-V1-OPERATIONAL-READINESS-001"
     },
     {
       "source_asset_id": "CTRL-HANDOFF-PROTOCOL-001",
@@ -9331,6 +9376,21 @@
       "source_asset_id": "TEST-DELIVERY-HARNESS-001",
       "relation": "depends_on",
       "target_asset_id": "POLICY-OWNER-ATTENTION-GATE-002"
+    },
+    {
+      "source_asset_id": "TEST-FACTORY-V1-OPERATIONAL-READINESS-001",
+      "relation": "depends_on",
+      "target_asset_id": "ARCH-INTENT-005"
+    },
+    {
+      "source_asset_id": "TEST-FACTORY-V1-OPERATIONAL-READINESS-001",
+      "relation": "depends_on",
+      "target_asset_id": "CONFIG-FACTORY-V1-OPERATIONAL-READINESS-001"
+    },
+    {
+      "source_asset_id": "TEST-FACTORY-V1-OPERATIONAL-READINESS-001",
+      "relation": "depends_on",
+      "target_asset_id": "CTRL-FACTORY-V1-OPERATIONAL-READINESS-001"
     },
     {
       "source_asset_id": "TEST-OWNER-ATTENTION-GATE-001",

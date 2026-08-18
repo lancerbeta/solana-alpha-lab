@@ -1,0 +1,200 @@
+schema: smial.factory-v1-operational-readiness
+schema_version: '1.0'
+contract_id: FACTORY-V1-OPERATIONAL-READINESS-001
+artifact_kind: PRODUCT_VISION_PRD_SSD
+artifact_id: FACTORY-V1-OPERATIONAL-READINESS-V1
+intent_id: ARCH-INTENT-005
+as_of: '2026-08-18'
+status: ACCEPTED_DIRECTION_NOT_IMPLEMENTED
+mode: DESIGN_ONLY
+implementation: NOT_IMPLEMENTED
+authority:
+  repository_product_mutation: false
+  provider_calls: false
+  dependency_install: false
+  deployment: false
+  cash_spend: false
+  wallet_signer_transaction: false
+  ui_framework_selection: false
+mission:
+  shortest_path: idea -> decision-bearing evidence -> falsification/promotion -> owner-operable product -> realized owner cashflow
+  product_target: owner-operated hypothesis factory, not a collection of research tasks
+extends:
+  - ARCH-INTENT-002
+  - ARCH-INTENT-003
+  - ARCH-INTENT-004
+  - DELIVERY_HARNESS_V1
+must_not_replace:
+  - Git as byte truth owner
+  - Catalog as discovery/relations owner
+  - lifecycle registries as lifecycle truth
+  - existing PIT/missingness/holdout/execution boundaries
+live_roadmap_binding:
+  harness_resolution: PER_TASK_ROADMAP_PATH
+  this_contract_path: configs/factory_v1_operational_readiness_v1.yaml
+  historical_project_sources_roadmaps: DO_NOT_MODIFY
+  numbered_task_chain_inserted: false
+domain_policy_integration:
+  patch_status: NOT_APPLIED_HASH_BOUND_HISTORICAL_RECEIPTS
+  live_invariant_owner: configs/factory_v1_operational_readiness_v1.yaml
+  existing_overlap: FACTORY_LEVERAGE_INVARIANT
+  invariant: >-
+    When FACTORY_V1_OPERATIONAL_READY is triggered, Entry Gate and Factory Fit
+    must resolve this readiness contract and prohibit substituting a list of
+    completed infrastructure components for the commissioning run.
+    Productization must not preempt a cheaper active market falsifier.
+    After readiness, comparable hypothesis work defaults to
+    configuration/data/query composition; repeated hypothesis-specific core
+    code is a Factory Fit architecture warning.
+milestone:
+  milestone_id: FACTORY_V1_OPERATIONAL_READY
+  status: NOT_TRIGGERED
+  activation_when_any:
+    - OWNER_EXPLICITLY_SELECTS_FACTORY_PRODUCTIZATION
+    - FIRST_UNATTENDED_REMOTE_RUNTIME_IS_NEXT
+    - LONG_RUNNING_PAPER_SHADOW_OBSERVATION_IS_NEXT
+  must_not_preempt: current cheapest decision-bearing market falsifier
+  requires:
+    - stable hypothesis/trial/evidence contracts
+    - stable Context Capsule/read contract
+    - one generic experiment-runner objective
+    - owner read-model objective
+    - production-lite runtime objective
+    - monitoring/recovery objective
+    - commissioning hypothesis
+  terminal:
+    PASS: FACTORY_V1_OPERATIONAL_READY
+    FAIL: FACTORY_PRODUCTIZATION_REPLAN
+current_product_stage:
+  research_truth_substrate: ADVANCED
+  hypothesis_lifecycle: FUNCTIONAL
+  research_memory: FUNCTIONAL
+  data_evidence_spine: FUNCTIONAL_WITH_GAPS
+  provider_routes: PARTIAL
+  generic_hypothesis_runner: NOT_OPERATIONAL_AS_PRODUCT
+  owner_cockpit: NOT_IMPLEMENTED
+  production_lite_runtime: NOT_IMPLEMENTED
+  unattended_monitoring: NOT_IMPLEMENTED
+  paper_shadow_position_operations: NOT_OPERATIONAL
+  micro_live: OUT_OF_SCOPE_FOR_FACTORY_V1
+gate:
+  commissioning:
+    real_new_hypothesis_completed_end_to_end: required
+    second_existing_hypothesis_or_golden_cycle_replayed_through_same_runner: required
+  factory_leverage:
+    commissioning_hypothesis_core_product_code_changes: 0
+    task_specific_pipeline_required: false
+    existing_capability_composition_used: true
+  owner_operability:
+    normal_cycle_requires_git_file_archaeology: false
+    normal_cycle_requires_manual_database_join: false
+    hypothesis_state_visible: true
+    experiment_state_visible: true
+    blockers_visible: true
+    evidence_and_decision_visible: true
+    next_safe_action_visible: true
+  time_to_evidence:
+    first_market_byte_requires_at_most_one_preparatory_only_substantial_step: true
+    second_consecutive_preparatory_only_step_triggers_replan: true
+  runtime:
+    reproducible_remote_runtime: true
+    restart_recovery_tested: true
+    deploy_version_visible: true
+    rollback_tested: true
+  data:
+    PIT_and_lineage_preserved: true
+    explicit_missingness: true
+    provider_health_visible: true
+    backup_readback_pass: true
+    isolated_restore_pass: true
+  monitoring:
+    health_view_available: true
+    stale_data_detection_tested: true
+    provider_failure_alert_tested: true
+    experiment_stall_alert_tested: true
+    deduplication_tested: true
+  security:
+    secrets_outside_repo: true
+    read_ui_has_no_implicit_trading_authority: true
+    destructive_and_financial_actions_separately_gated: true
+  truth:
+    Git_remains_byte_truth: true
+    Catalog_remains_discovery_truth: true
+    registries_remain_lifecycle_truth: true
+    UI_is_projection_only: true
+commissioning_hypothesis_selection:
+  must_use_claimed_reusable_capabilities: true
+  must_not_be_selected_to_justify_large_new_component: true
+  hypothesis_scientific_failure_may_still_pass_factory: true
+  bespoke_pipeline_required: FAIL_OR_REPLAN
+foundation_freeze_after_readiness:
+  default_change_class:
+    - HYPOTHESIS_CONFIG
+    - FEATURE_OR_QUERY
+    - DATA_REQUIREMENT
+    - EXPERIMENT_METHOD_COMPOSITION
+    - PROVIDER_ADAPTER_FOR_NAMED_GAP
+  core_product_change_requires_one_of:
+    - reusable_capability_gap
+    - second_named_consumer
+    - correctness_defect
+    - research_truth_defect
+    - safety_or_reliability_requirement
+    - measured_scale_bottleneck
+    - material_owner_operability_problem
+  forbidden_justifications:
+    - cleaner_architecture
+    - future_flexibility_without_consumer
+    - generic_platform_aspiration
+    - hypothesis_specific_convenience_only
+truth_owners:
+  git: immutable repository bytes and contracts
+  catalog: discovery, location and relations
+  lifecycle_registries: hypotheses, trials, decisions, strategies and bots
+  raw_parquet: immutable market/provider observations
+  duckdb: reproducible analytical projections and queries
+  owner_cockpit: NOTHING
+owner_cockpit_role: derived read model + bounded command surface
+runtime_objectives:
+  first_operational_deployment_target: one ordinary supported Linux VPS
+  RPO_max: 24h
+  RTO_max: 12h
+  clean_rehost_proof: REQUIRED
+  rollback_proof: REQUIRED
+  actual_vps_provider_purchase: LATER_EXTERNAL_AUTHORITY
+non_goals:
+  - Kubernetes
+  - microservices
+  - graph database
+  - vector database
+  - generic RAG
+  - ClickHouse
+  - PostgreSQL migration without measured transactional/concurrency need
+  - polished mobile application
+  - multi-user RBAC beyond actual operator/security need
+  - real-money execution
+  - portfolio optimizer
+  - autonomous AI trading
+  - broad all-Solana data warehouse
+  - advanced ML before simple methods fail
+  - generic plugin marketplace
+capability_radar:
+  now: NONE
+  watch:
+    - trigger: repeated notebook_state_or_owner_interactive_analysis_friction
+      candidate_class: git_friendly_reactive_python_workbench
+      route: ADOPT_OR_WRAP
+    - trigger: first_unattended_runtime_and_named_incident_consumer
+      existing_capability_radar_candidate: SENTRY_OR_EQUIVALENT
+    - trigger: native_health_and_alerting_becomes_materially_insufficient
+      candidate_class: metrics_logs_dashboard_alerting
+    - trigger: repeated_named_owner_workflow_question
+      existing_capability_radar_candidate: POSTHOG_OR_EQUIVALENT
+    - trigger: measured_DuckDB_boundary_and_second_analytics_consumer
+      existing_capability_radar_candidate: CLICKHOUSE_OR_REMOTE_ANALYTICS
+  grants_install_credential_network_deploy_or_spend: false
+explicitly_do_not_modify:
+  - historical Project Sources roadmaps
+  - frozen hypothesis definitions
+  - consumed holdouts
+  - historical evidence
