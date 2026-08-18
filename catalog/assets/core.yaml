@@ -24552,7 +24552,7 @@ records:
   as_of: '2026-08-18'
   truth_owner: QUOTE_NATIVE_FRICTION_H900_FALSIFIER_V1
   location: {kind: git_path, logical_uri: 'repo://docs/tasks/QUOTE_NATIVE_FRICTION_H900_FALSIFIER_V1.md', repository_path: docs/tasks/QUOTE_NATIVE_FRICTION_H900_FALSIFIER_V1.md}
-  integrity: {kind: sha256, sha256: d3b195a5991fcf776b418522a5a0e37fe7bed51913d79d412b6611a13779fb91}
+  integrity: {kind: sha256, sha256: 0751400e9b1a5aa82434a12909dc2de19ed498e960e53db6edbb67954cb9a9de}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: contains, target_asset_id: MODULE-QUOTE-NATIVE-FRICTION-H900-FALSIFIER-001}

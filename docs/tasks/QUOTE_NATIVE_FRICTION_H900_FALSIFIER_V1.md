@@ -77,6 +77,9 @@ context_requirements:
     DELIVERY_EVIDENCE:
       - docs/evidence/quote_native_quoted_buy_h900_clock/a1_quote_native_quoted_buy_h900_clock_acceptance_v1.json
       - docs/evidence/quote_native_friction_h900_falsifier/a1_quote_native_friction_h900_falsifier_acceptance_v1.json
+      - docs/evidence/quote_native_friction_h900_falsifier/a1_delivery_completion_evidence_v1.json
+      - docs/evidence/quote_native_friction_h900_falsifier/a1_delivery_independent_review_v1.json
+      - docs/evidence/quote_native_friction_h900_falsifier/a1_delivery_factory_fit_v1.json
     HISTORICAL_CONTEXT: []
 ---
 
