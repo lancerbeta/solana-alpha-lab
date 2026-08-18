@@ -618,6 +618,11 @@
       "target_asset_id": "CTRL-QUOTE-NATIVE-FRICTION-H900-FALSIFIER-001"
     },
     {
+      "source_asset_id": "CONFIG-QUOTE-NATIVE-FRICTION-H900-MOVE2-OOS-001",
+      "relation": "governed_by",
+      "target_asset_id": "CTRL-QUOTE-NATIVE-FRICTION-H900-MOVE2-OOS-001"
+    },
+    {
       "source_asset_id": "CONFIG-QUOTE-NATIVE-LIVE-VARIATION-CAMPAIGN-001",
       "relation": "governed_by",
       "target_asset_id": "CTRL-QUOTE-NATIVE-LIVE-VARIATION-CAMPAIGN-001"
@@ -2068,6 +2073,26 @@
       "target_asset_id": "CONFIG-PROVIDER-ROUTE-CAPABILITY-REGISTRY-007"
     },
     {
+      "source_asset_id": "CTRL-QUOTE-NATIVE-FRICTION-H900-MOVE2-OOS-001",
+      "relation": "contains",
+      "target_asset_id": "CONFIG-QUOTE-NATIVE-FRICTION-H900-MOVE2-OOS-001"
+    },
+    {
+      "source_asset_id": "CTRL-QUOTE-NATIVE-FRICTION-H900-MOVE2-OOS-001",
+      "relation": "contains",
+      "target_asset_id": "MODULE-QUOTE-NATIVE-FRICTION-H900-MOVE2-OOS-001"
+    },
+    {
+      "source_asset_id": "CTRL-QUOTE-NATIVE-FRICTION-H900-MOVE2-OOS-001",
+      "relation": "contains",
+      "target_asset_id": "SCRIPT-QUOTE-NATIVE-FRICTION-H900-MOVE2-OOS-001"
+    },
+    {
+      "source_asset_id": "CTRL-QUOTE-NATIVE-FRICTION-H900-MOVE2-OOS-001",
+      "relation": "depends_on",
+      "target_asset_id": "CTRL-QUOTE-NATIVE-ADMISSIBLE-FRICTION-AUDITION-001"
+    },
+    {
       "source_asset_id": "CTRL-QUOTE-NATIVE-LIVE-VARIATION-CAMPAIGN-001",
       "relation": "contains",
       "target_asset_id": "MODULE-QUOTE-NATIVE-LIVE-VARIATION-CAMPAIGN-001"
@@ -3206,6 +3231,26 @@
       "source_asset_id": "EVIDENCE-QUOTE-NATIVE-FRICTION-H900-FALSIFIER-ACCEPTANCE-001",
       "relation": "derived_from",
       "target_asset_id": "EVIDENCE-QUOTE-NATIVE-FRICTION-H900-FALSIFIER-001"
+    },
+    {
+      "source_asset_id": "EVIDENCE-QUOTE-NATIVE-FRICTION-H900-MOVE2-OOS-001",
+      "relation": "depends_on",
+      "target_asset_id": "CONFIG-PROVIDER-ROUTE-CAPABILITY-REGISTRY-009"
+    },
+    {
+      "source_asset_id": "EVIDENCE-QUOTE-NATIVE-FRICTION-H900-MOVE2-OOS-001",
+      "relation": "derived_from",
+      "target_asset_id": "CTRL-QUOTE-NATIVE-FRICTION-H900-MOVE2-OOS-001"
+    },
+    {
+      "source_asset_id": "EVIDENCE-QUOTE-NATIVE-FRICTION-H900-MOVE2-OOS-001",
+      "relation": "validated_by",
+      "target_asset_id": "TEST-QUOTE-NATIVE-FRICTION-H900-MOVE2-OOS-001"
+    },
+    {
+      "source_asset_id": "EVIDENCE-QUOTE-NATIVE-FRICTION-H900-MOVE2-OOS-ACCEPTANCE-001",
+      "relation": "derived_from",
+      "target_asset_id": "EVIDENCE-QUOTE-NATIVE-FRICTION-H900-MOVE2-OOS-001"
     },
     {
       "source_asset_id": "EVIDENCE-QUOTE-NATIVE-LIVE-VARIATION-CAMPAIGN-001",
@@ -6738,6 +6783,16 @@
       "target_asset_id": "MODULE-QUOTE-NATIVE-EVIDENCE-FIT-PANEL-001"
     },
     {
+      "source_asset_id": "MODULE-QUOTE-NATIVE-FRICTION-H900-MOVE2-OOS-001",
+      "relation": "depends_on",
+      "target_asset_id": "CONFIG-QUOTE-NATIVE-FRICTION-H900-MOVE2-OOS-001"
+    },
+    {
+      "source_asset_id": "MODULE-QUOTE-NATIVE-FRICTION-H900-MOVE2-OOS-001",
+      "relation": "depends_on",
+      "target_asset_id": "MODULE-QUOTE-NATIVE-ADMISSIBLE-FRICTION-AUDITION-001"
+    },
+    {
       "source_asset_id": "MODULE-QUOTE-NATIVE-LIVE-VARIATION-CAMPAIGN-001",
       "relation": "depends_on",
       "target_asset_id": "CONFIG-QUOTE-NATIVE-LIVE-VARIATION-CAMPAIGN-001"
@@ -8313,6 +8368,11 @@
       "target_asset_id": "EVIDENCE-QUOTE-NATIVE-FRICTION-H900-FALSIFIER-ACCEPTANCE-001"
     },
     {
+      "source_asset_id": "REPORT-QUOTE-NATIVE-FRICTION-H900-MOVE2-OOS-001",
+      "relation": "derived_from",
+      "target_asset_id": "EVIDENCE-QUOTE-NATIVE-FRICTION-H900-MOVE2-OOS-ACCEPTANCE-001"
+    },
+    {
       "source_asset_id": "REPORT-QUOTE-NATIVE-LIVE-VARIATION-CAMPAIGN-001",
       "relation": "derived_from",
       "target_asset_id": "EVIDENCE-QUOTE-NATIVE-LIVE-VARIATION-CAMPAIGN-ACCEPTANCE-001"
@@ -9146,6 +9206,11 @@
       "source_asset_id": "SCRIPT-QUOTE-NATIVE-FRICTION-H900-FALSIFIER-001",
       "relation": "depends_on",
       "target_asset_id": "MODULE-QUOTE-NATIVE-FRICTION-H900-FALSIFIER-001"
+    },
+    {
+      "source_asset_id": "SCRIPT-QUOTE-NATIVE-FRICTION-H900-MOVE2-OOS-001",
+      "relation": "depends_on",
+      "target_asset_id": "MODULE-QUOTE-NATIVE-FRICTION-H900-MOVE2-OOS-001"
     },
     {
       "source_asset_id": "SCRIPT-QUOTE-NATIVE-LIVE-VARIATION-CAMPAIGN-001",
@@ -10076,6 +10141,11 @@
       "source_asset_id": "TEST-QUOTE-NATIVE-FRICTION-H900-FALSIFIER-001",
       "relation": "depends_on",
       "target_asset_id": "MODULE-QUOTE-NATIVE-FRICTION-H900-FALSIFIER-001"
+    },
+    {
+      "source_asset_id": "TEST-QUOTE-NATIVE-FRICTION-H900-MOVE2-OOS-001",
+      "relation": "depends_on",
+      "target_asset_id": "MODULE-QUOTE-NATIVE-FRICTION-H900-MOVE2-OOS-001"
     },
     {
       "source_asset_id": "TEST-QUOTE-NATIVE-LIVE-VARIATION-CAMPAIGN-001",
