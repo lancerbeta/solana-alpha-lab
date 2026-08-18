@@ -1,0 +1,87 @@
+{
+  "acceptance_id": "QUOTE-NATIVE-LIVE-VARIATION-CAMPAIGN-DELIVERY-COMPLETION-001",
+  "active_stop_conditions": [],
+  "as_of": "2026-08-18",
+  "base_main": "91b7e7144e9a94b47e626178d521cc2f89c817dc",
+  "capability_radar_now": "NONE",
+  "cloud_bundle_mode": "OWNER_MANAGED_OPTIONAL_EXPORT",
+  "cloud_bundle_required_by_harness": false,
+  "cloud_bundle_smoke_required": false,
+  "factory_fit": {
+    "path": "docs/evidence/quote_native_live_variation_campaign/a1_delivery_factory_fit_v1.json",
+    "sha256": "f8674d0c27cff5ae9ed1df18d6db4b4a741014a2a516fe53cc2c1818a953154d",
+    "verdict": "PASS"
+  },
+  "implementation_bindings": {
+    "catalog/assets/core.yaml": "9e9fa95643190f98bf59ef963dafde8cb2b6d18e1520fb93966b05a35195a6bb",
+    "catalog/assets/lifecycle.yaml": "01f55f8eb1c353a175c1c5ecdd919499dcb69cef0bfec4f633e5e6a7ebb4b354",
+    "catalog/catalog_manifest.yaml": "a49ef1f8f996ebf89e6e95ede5693519a9ea18c768cbf66b2662e1a5c0570ded",
+    "catalog/generated/asset_edges.json": "da7980ae213496f2d5aa0c8d07f8194f6519afb126ba954daa5f5a1ba0e9248b",
+    "catalog/schemas/provider_route_capability_registry_v8.schema.json": "9ac91a64200c586bfdb69de904b9ea804bc49d74cf38245d76e4e12bc154c456",
+    "configs/provider_route_capability_registry_v8.yaml": "2a4483ee2ab3c7b657644044b35317fe9f60cd66c7287ac7303170e78ae67609",
+    "configs/quote_native_live_variation_campaign_v1.yaml": "605025f5586bcb72c7bead234f5933d40c8149895e72035dfcb2bfe99816309d",
+    "docs/PROJECT_MAP.md": "513254fa5e787525d45b7ad49a6d796e0a1f4aad33b9bfe4f6ce0c8440cb9ae1",
+    "docs/evidence/quote_native_live_variation_campaign/a1_quote_native_live_variation_campaign_acceptance_v1.json": "0d9759495fc9b625c1f7a6e4dd961c312ad35c2bb17802c79cb301a08a856ead",
+    "docs/evidence/quote_native_live_variation_campaign/a1_quote_native_live_variation_campaign_runtime_receipt_v1.json": "d672ddfe764278468cf2e38dc07cf8076dc81abd5e3e5d40450942b20a0497c6",
+    "docs/reports/quote_native_live_variation_campaign/a1_owner_readout_v1.md": "2d12a95273ca1555b770c681c6ee512630356ccc3462e471c884b1c6d86d53db",
+    "docs/tasks/QUOTE_NATIVE_LIVE_VARIATION_CAMPAIGN_V1.md": "9739f6cb8798461a080419c53d52dfde7e09739845a8bbdbc7b9616ece24c7af",
+    "scripts/run_quote_native_live_variation_campaign.py": "03fa8efb63c60ea0fee02b88a47d804bbd9411300dc298cb674bc17962063843",
+    "src/solana_alpha_lab/provider_route_capability_registry_v8.py": "5eb7165c959f0e6bfdc9ed53d6f8152307f01e0e79589aa0d9004292fef98464",
+    "src/solana_alpha_lab/quote_native_live_variation_campaign.py": "93a9088a8d15f64f1868084937d510ea17c229f329a5456c2583c33e1403ed4d",
+    "tests/test_provider_route_capability_registry_v8.py": "ca09c9624d0bca670d155306818ab9a3753251a6dd0f79a9978b732fa7d43904",
+    "tests/test_quote_native_live_variation_campaign.py": "858ef3291cc56ff02371c10ef1f7f3890fc3ba05aa2f54c071e6e8376d47bf0b"
+  },
+  "non_claims": [
+    "NO_CANONICAL_DONE",
+    "NO_LIVE_PIT_OR_EXECUTION_CLAIM",
+    "NO_ALPHA_PNL_OR_NETRETURN",
+    "NO_H13_OR_H02_TRIAL",
+    "NO_MOVE_2_EARNED",
+    "NO_TAKER_OR_EXECUTE",
+    "NO_H14400_OBSERVATION",
+    "NO_DIRECTIONAL_HINT_FROM_THIS_ATOM",
+    "NO_FAMILY_CLOSE",
+    "NO_T21_FREEZE_REUSE",
+    "NO_RC001_FREEZE_MUTATION",
+    "NO_TRIAL_LEDGER_REWRITE"
+  ],
+  "owner_attention_triggers": {
+    "auth_or_access_recovery": false,
+    "external_material_action": false,
+    "material_owner_decision": false,
+    "unresolved_safety_or_truth_conflict": false,
+    "user_only_activation": false
+  },
+  "project_sources_disposition": {
+    "kind": "NO_CHANGE"
+  },
+  "schema": "smial.delivery-completion-evidence",
+  "schema_version": "1.0",
+  "side_effects": {
+    "cash_spend_usd_cents": 0,
+    "credential_reads": 0,
+    "fallbacks": 0,
+    "provider_requests": 14,
+    "retries": 0,
+    "wallet_signer_transaction_actions": 0
+  },
+  "state_change": "SAMPLE_INVALID_LIVE_COHORT_INSUFFICIENT_COMPLETE_XY",
+  "task_id": "QUOTE_NATIVE_LIVE_VARIATION_CAMPAIGN_V1",
+  "validation": {
+    "full_gate": "ENFORCED_BY_PROJECT_BOUND_VALIDATION",
+    "github_ci": "ENFORCED_LIVE_AT_GUARDED_MERGE",
+    "independent_review": {
+      "path": "docs/evidence/quote_native_live_variation_campaign/a1_delivery_independent_review_v1.json",
+      "sha256": "9af7c40ed7591f5b74b7b1203b02227a8c6b954abc7682c1e60597252a80c3d6",
+      "verdict": "PASS"
+    },
+    "project_checks": [
+      "PASS_QUOTE_NATIVE_LIVE_VARIATION_CAMPAIGN_TESTS",
+      "PASS_PROVIDER_ROUTE_REGISTRY_V8_TESTS",
+      "PASS_CATALOG_VALIDATION",
+      "PASS_NAVIGATION_CHECK",
+      "PASS_SECRET_SCAN"
+    ],
+    "targeted": "PASS_QUOTE_NATIVE_LIVE_VARIATION_CAMPAIGN_TESTS"
+  }
+}
