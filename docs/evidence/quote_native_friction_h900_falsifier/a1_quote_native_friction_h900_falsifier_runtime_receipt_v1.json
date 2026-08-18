@@ -1,0 +1,900 @@
+{
+  "atom_id": "QUOTE_NATIVE_FRICTION_H900_FALSIFIER_V1",
+  "comparable_identities": [
+    "T21_R2_MINT_B",
+    "T21_R2_MINT_C",
+    "T21_R3_MINT_1"
+  ],
+  "credential_reads": 0,
+  "execute_calls": 0,
+  "fallbacks": 0,
+  "hypothesis_id": "HYP-RC003-QUOTE-FRICTION-H900-V1",
+  "identity_bindings": {
+    "provider_route_registry_v7_sha256": "cfbd2b34fdecd387d14b89b81ec8d6b814f819ec2b5c7e032ccb54734ff7be6a",
+    "task21_final_cohort_freeze_sha256": "d644c3432241a8ebbe74373038cfe0c15b87872e7afc6e96b6fade49e82d6fde",
+    "v7_access_class": "KEYLESS"
+  },
+  "limitations": [
+    "RATE_LIMIT_STOPPED_REMAINING_CELLS",
+    "STALE_OUTCOME_BLIND_T21_UNUSED_NOT_LIVE_UNIVERSE",
+    "H3600_H14400_EXPLICIT_GAP_NO_BACKFILL"
+  ],
+  "mechanism": {
+    "cells": [
+      {
+        "buy_terminal": "QUOTE_OBSERVED",
+        "fee_bps": {
+          "status": "OBSERVED",
+          "value": 10
+        },
+        "h900_terminal": "QUOTE_OBSERVED",
+        "identity_id": "T21_R2_MINT_B",
+        "price_impact_pct": {
+          "status": "OBSERVED",
+          "value": "-0.023990921501344752"
+        },
+        "reverse_terminal": "QUOTE_OBSERVED",
+        "router": "metis",
+        "x_quoted_roundtrip_friction": "-0.0244625",
+        "x_status": "OBSERVED",
+        "y_quoted_liquidation_recovery": "-0.0244625",
+        "y_status": "OBSERVED"
+      },
+      {
+        "buy_terminal": "QUOTE_OBSERVED",
+        "fee_bps": {
+          "status": "OBSERVED",
+          "value": 10
+        },
+        "h900_terminal": "QUOTE_OBSERVED",
+        "identity_id": "T21_R2_MINT_C",
+        "price_impact_pct": {
+          "status": "OBSERVED",
+          "value": "-0.04237134629381816"
+        },
+        "reverse_terminal": "QUOTE_OBSERVED",
+        "router": "metis",
+        "x_quoted_roundtrip_friction": "-0.0272801",
+        "x_status": "OBSERVED",
+        "y_quoted_liquidation_recovery": "-0.0272801",
+        "y_status": "OBSERVED"
+      },
+      {
+        "buy_terminal": "QUOTE_OBSERVED",
+        "fee_bps": {
+          "status": "OBSERVED",
+          "value": 10
+        },
+        "h900_terminal": "QUOTE_OBSERVED",
+        "identity_id": "T21_R3_MINT_1",
+        "price_impact_pct": {
+          "status": "OBSERVED",
+          "value": "-0.03143014411271845"
+        },
+        "reverse_terminal": "RATE_LIMITED",
+        "router": "metis",
+        "x_quoted_roundtrip_friction": null,
+        "x_status": "MISSING",
+        "y_quoted_liquidation_recovery": "-0.0247072",
+        "y_status": "OBSERVED"
+      },
+      {
+        "buy_terminal": "NOT_REACHED",
+        "fee_bps": null,
+        "h900_terminal": "SCHEDULED",
+        "identity_id": "T21_R3_MINT_2",
+        "price_impact_pct": null,
+        "reverse_terminal": "NOT_REACHED",
+        "router": null,
+        "x_quoted_roundtrip_friction": null,
+        "x_status": "MISSING",
+        "y_quoted_liquidation_recovery": null,
+        "y_status": "MISSING"
+      }
+    ],
+    "complete_xy_count": 2,
+    "concordance_rate": "1",
+    "concordant_pairs": 1,
+    "discordant_pairs": 0,
+    "expected_direction": "more_negative_t0_roundtrip_friction_ranks_more_negative_h900_quoted_recovery",
+    "family_close": false,
+    "h900_no_route_count": 0,
+    "h900_quote_observed_count": 3,
+    "non_claims": [
+      "NOT_NETRETURN",
+      "NOT_ALPHA",
+      "NOT_LIVE_UNIVERSE",
+      "NO_THRESHOLD_FIT",
+      "NO_FAMILY_CLOSE_ON_SAMPLE_INVALID"
+    ],
+    "tied_pairs": 0,
+    "verdict": "DIRECTIONAL_HINT_NOT_CONFIRMATION"
+  },
+  "new_provider_requests": 3,
+  "non_claims": [
+    "NO_EXECUTE",
+    "NO_TAKER_OR_SIGNER",
+    "NO_TRANSACTION_BYTES_IN_GIT",
+    "NO_ALPHA",
+    "NO_NETRETURN",
+    "NO_CANONICAL_DONE",
+    "NO_H13_OR_H02_TRIAL",
+    "NO_LIVE_UNIVERSE",
+    "NO_THRESHOLD_FIT",
+    "NO_A24_OR_T21A_SAMPLE",
+    "NO_H3600_OR_H14400_OBSERVATION",
+    "NO_FAMILY_CLOSE_ON_SAMPLE_INVALID"
+  ],
+  "observations": [
+    {
+      "amount": "10000000",
+      "consumed_call": true,
+      "due_at": "2026-08-18T07:56:21Z",
+      "horizon_seconds": 0,
+      "identity_id": "T21_R2_MINT_B",
+      "input_mint": "So11111111111111111111111111111111111111112",
+      "kind": "BUY_T0",
+      "mint": "2HU2VftbJ7Fp9P5pEbneNsRhax8boHhTVS1KLnYrpump",
+      "observation_id": "T21_R2_MINT_B:10000000:BUY_T0",
+      "observed_at": "2026-08-18T07:56:21Z",
+      "output_mint": "2HU2VftbJ7Fp9P5pEbneNsRhax8boHhTVS1KLnYrpump",
+      "parent_id": null,
+      "post_migration_status": "GIT_NAMED_INDEPENDENT_NOT_PROVEN_POST_MIGRATION",
+      "quote": {
+        "error_code": null,
+        "fee_bps": {
+          "status": "OBSERVED",
+          "value": 10
+        },
+        "in_amount": "10000000",
+        "mode": "manual",
+        "out_amount": "315729343615",
+        "platform_fee": {
+          "status": "OBSERVED",
+          "value": {
+            "feeBps": 10,
+            "feeMint": "So11111111111111111111111111111111111111112"
+          }
+        },
+        "price_impact_pct": {
+          "status": "OBSERVED",
+          "value": "-0.023990921501344752"
+        },
+        "request_id_present": true,
+        "route_plan": {
+          "fee_amounts_present": false,
+          "hop_count": 1,
+          "status": "OBSERVED"
+        },
+        "router": "metis",
+        "surface": "QUOTE_OBSERVED",
+        "transaction_present": false
+      },
+      "raw_sha256": "47811b7b000c58ab9085ed9a4e70861e0c533f121e951722aa4f0ec044c746c1",
+      "terminal": "QUOTE_OBSERVED",
+      "terminal_error": null,
+      "transport": {
+        "content_type": "application/json",
+        "http_status": 200,
+        "request_count": 1,
+        "response_bytes": 1267,
+        "response_sha256": "47811b7b000c58ab9085ed9a4e70861e0c533f121e951722aa4f0ec044c746c1",
+        "url_has_api_key": false,
+        "url_has_taker": false
+      },
+      "wave": "t0"
+    },
+    {
+      "amount": "315729343615",
+      "consumed_call": true,
+      "due_at": "2026-08-18T07:56:21Z",
+      "horizon_seconds": 0,
+      "identity_id": "T21_R2_MINT_B",
+      "input_mint": "2HU2VftbJ7Fp9P5pEbneNsRhax8boHhTVS1KLnYrpump",
+      "kind": "REVERSE_T0",
+      "mint": "2HU2VftbJ7Fp9P5pEbneNsRhax8boHhTVS1KLnYrpump",
+      "observation_id": "T21_R2_MINT_B:10000000:REVERSE_T0",
+      "observed_at": "2026-08-18T07:56:22Z",
+      "output_mint": "So11111111111111111111111111111111111111112",
+      "parent_id": "T21_R2_MINT_B:10000000:BUY_T0",
+      "post_migration_status": "GIT_NAMED_INDEPENDENT_NOT_PROVEN_POST_MIGRATION",
+      "quote": {
+        "error_code": null,
+        "fee_bps": {
+          "status": "OBSERVED",
+          "value": 10
+        },
+        "in_amount": "315729343615",
+        "mode": "manual",
+        "out_amount": "9755375",
+        "platform_fee": {
+          "status": "OBSERVED",
+          "value": {
+            "feeBps": 10,
+            "feeMint": "So11111111111111111111111111111111111111112"
+          }
+        },
+        "price_impact_pct": {
+          "status": "OBSERVED",
+          "value": "-0.00048317019692146877"
+        },
+        "request_id_present": true,
+        "route_plan": {
+          "fee_amounts_present": false,
+          "hop_count": 1,
+          "status": "OBSERVED"
+        },
+        "router": "dflow",
+        "surface": "QUOTE_OBSERVED",
+        "transaction_present": false
+      },
+      "raw_sha256": "8ba069046928be982b5da47ca6cfeef30f4b548cd243c33b9f32c8f29ef78126",
+      "terminal": "QUOTE_OBSERVED",
+      "terminal_error": null,
+      "transport": {
+        "content_type": "application/json",
+        "http_status": 200,
+        "request_count": 1,
+        "response_bytes": 1264,
+        "response_sha256": "8ba069046928be982b5da47ca6cfeef30f4b548cd243c33b9f32c8f29ef78126",
+        "url_has_api_key": false,
+        "url_has_taker": false
+      },
+      "wave": "t0"
+    },
+    {
+      "amount": "315729343615",
+      "consumed_call": true,
+      "due_at": "2026-08-18T08:11:21Z",
+      "horizon_seconds": 900,
+      "identity_id": "T21_R2_MINT_B",
+      "input_mint": "2HU2VftbJ7Fp9P5pEbneNsRhax8boHhTVS1KLnYrpump",
+      "kind": "SELL_H900",
+      "lateness_slack_seconds": 120,
+      "mint": "2HU2VftbJ7Fp9P5pEbneNsRhax8boHhTVS1KLnYrpump",
+      "observation_id": "T21_R2_MINT_B:10000000:SELL_H900",
+      "observed_at": "2026-08-18T08:11:39Z",
+      "output_mint": "So11111111111111111111111111111111111111112",
+      "parent_id": "T21_R2_MINT_B:10000000:BUY_T0",
+      "post_migration_status": "GIT_NAMED_INDEPENDENT_NOT_PROVEN_POST_MIGRATION",
+      "quote": {
+        "error_code": null,
+        "fee_bps": {
+          "status": "OBSERVED",
+          "value": 10
+        },
+        "in_amount": "315729343615",
+        "mode": "manual",
+        "out_amount": "9755375",
+        "platform_fee": {
+          "status": "OBSERVED",
+          "value": {
+            "feeBps": 10,
+            "feeMint": "So11111111111111111111111111111111111111112"
+          }
+        },
+        "price_impact_pct": {
+          "status": "OBSERVED",
+          "value": "-0.0020123049909138552"
+        },
+        "request_id_present": true,
+        "route_plan": {
+          "fee_amounts_present": false,
+          "hop_count": 1,
+          "status": "OBSERVED"
+        },
+        "router": "dflow",
+        "surface": "QUOTE_OBSERVED",
+        "transaction_present": false
+      },
+      "raw_sha256": "87d60b7ba7c29389e5d5da46821451e25c7751fe937c9fa22422a711905d338a",
+      "terminal": "QUOTE_OBSERVED",
+      "terminal_error": null,
+      "transport": {
+        "content_type": "application/json",
+        "http_status": 200,
+        "request_count": 1,
+        "response_bytes": 1263,
+        "response_sha256": "87d60b7ba7c29389e5d5da46821451e25c7751fe937c9fa22422a711905d338a",
+        "url_has_api_key": false,
+        "url_has_taker": false
+      },
+      "wave": "horizon"
+    },
+    {
+      "amount": null,
+      "consumed_call": false,
+      "due_at": "2026-08-18T08:56:21Z",
+      "horizon_seconds": 3600,
+      "identity_id": "T21_R2_MINT_B",
+      "input_mint": "2HU2VftbJ7Fp9P5pEbneNsRhax8boHhTVS1KLnYrpump",
+      "kind": "SELL_H3600",
+      "mint": "2HU2VftbJ7Fp9P5pEbneNsRhax8boHhTVS1KLnYrpump",
+      "observation_id": "T21_R2_MINT_B:10000000:SELL_H3600",
+      "output_mint": "So11111111111111111111111111111111111111112",
+      "parent_id": "T21_R2_MINT_B:10000000:BUY_T0",
+      "post_migration_status": "GIT_NAMED_INDEPENDENT_NOT_PROVEN_POST_MIGRATION",
+      "terminal": "EXPLICIT_GAP",
+      "wave": "gap"
+    },
+    {
+      "amount": null,
+      "consumed_call": false,
+      "due_at": "2026-08-18T11:56:21Z",
+      "horizon_seconds": 14400,
+      "identity_id": "T21_R2_MINT_B",
+      "input_mint": "2HU2VftbJ7Fp9P5pEbneNsRhax8boHhTVS1KLnYrpump",
+      "kind": "SELL_H14400",
+      "mint": "2HU2VftbJ7Fp9P5pEbneNsRhax8boHhTVS1KLnYrpump",
+      "observation_id": "T21_R2_MINT_B:10000000:SELL_H14400",
+      "output_mint": "So11111111111111111111111111111111111111112",
+      "parent_id": "T21_R2_MINT_B:10000000:BUY_T0",
+      "post_migration_status": "GIT_NAMED_INDEPENDENT_NOT_PROVEN_POST_MIGRATION",
+      "terminal": "EXPLICIT_GAP",
+      "wave": "gap"
+    },
+    {
+      "amount": "10000000",
+      "consumed_call": true,
+      "due_at": "2026-08-18T07:56:21Z",
+      "horizon_seconds": 0,
+      "identity_id": "T21_R2_MINT_C",
+      "input_mint": "So11111111111111111111111111111111111111112",
+      "kind": "BUY_T0",
+      "mint": "2JdM5MHiXjsQz5QgnSQfbidZDTVXCLki74jMYgJapump",
+      "observation_id": "T21_R2_MINT_C:10000000:BUY_T0",
+      "observed_at": "2026-08-18T07:56:22Z",
+      "output_mint": "2JdM5MHiXjsQz5QgnSQfbidZDTVXCLki74jMYgJapump",
+      "parent_id": null,
+      "post_migration_status": "GIT_NAMED_INDEPENDENT_NOT_PROVEN_POST_MIGRATION",
+      "quote": {
+        "error_code": null,
+        "fee_bps": {
+          "status": "OBSERVED",
+          "value": 10
+        },
+        "in_amount": "10000000",
+        "mode": "manual",
+        "out_amount": "351377346548",
+        "platform_fee": {
+          "status": "OBSERVED",
+          "value": {
+            "feeBps": 10,
+            "feeMint": "So11111111111111111111111111111111111111112"
+          }
+        },
+        "price_impact_pct": {
+          "status": "OBSERVED",
+          "value": "-0.04237134629381816"
+        },
+        "request_id_present": true,
+        "route_plan": {
+          "fee_amounts_present": false,
+          "hop_count": 1,
+          "status": "OBSERVED"
+        },
+        "router": "metis",
+        "surface": "QUOTE_OBSERVED",
+        "transaction_present": false
+      },
+      "raw_sha256": "433e5c0130aacc4a8ff573a30e21a4e2d4a58a847d3ad28fa93bd9f084014a78",
+      "terminal": "QUOTE_OBSERVED",
+      "terminal_error": null,
+      "transport": {
+        "content_type": "application/json",
+        "http_status": 200,
+        "request_count": 1,
+        "response_bytes": 1262,
+        "response_sha256": "433e5c0130aacc4a8ff573a30e21a4e2d4a58a847d3ad28fa93bd9f084014a78",
+        "url_has_api_key": false,
+        "url_has_taker": false
+      },
+      "wave": "t0"
+    },
+    {
+      "amount": "351377346548",
+      "consumed_call": true,
+      "due_at": "2026-08-18T07:56:21Z",
+      "horizon_seconds": 0,
+      "identity_id": "T21_R2_MINT_C",
+      "input_mint": "2JdM5MHiXjsQz5QgnSQfbidZDTVXCLki74jMYgJapump",
+      "kind": "REVERSE_T0",
+      "mint": "2JdM5MHiXjsQz5QgnSQfbidZDTVXCLki74jMYgJapump",
+      "observation_id": "T21_R2_MINT_C:10000000:REVERSE_T0",
+      "observed_at": "2026-08-18T07:56:22Z",
+      "output_mint": "So11111111111111111111111111111111111111112",
+      "parent_id": "T21_R2_MINT_C:10000000:BUY_T0",
+      "post_migration_status": "GIT_NAMED_INDEPENDENT_NOT_PROVEN_POST_MIGRATION",
+      "quote": {
+        "error_code": null,
+        "fee_bps": {
+          "status": "OBSERVED",
+          "value": 10
+        },
+        "in_amount": "351377346548",
+        "mode": "manual",
+        "out_amount": "9727199",
+        "platform_fee": {
+          "status": "OBSERVED",
+          "value": {
+            "feeBps": 10,
+            "feeMint": "So11111111111111111111111111111111111111112"
+          }
+        },
+        "price_impact_pct": {
+          "status": "OBSERVED",
+          "value": "0.015758975293202096"
+        },
+        "request_id_present": true,
+        "route_plan": {
+          "fee_amounts_present": false,
+          "hop_count": 1,
+          "status": "OBSERVED"
+        },
+        "router": "metis",
+        "surface": "QUOTE_OBSERVED",
+        "transaction_present": false
+      },
+      "raw_sha256": "4a3d7b267b912034cdc6ccdd4c6465bf5fd324719404657e6e920afc9ec890c7",
+      "terminal": "QUOTE_OBSERVED",
+      "terminal_error": null,
+      "transport": {
+        "content_type": "application/json",
+        "http_status": 200,
+        "request_count": 1,
+        "response_bytes": 1255,
+        "response_sha256": "4a3d7b267b912034cdc6ccdd4c6465bf5fd324719404657e6e920afc9ec890c7",
+        "url_has_api_key": false,
+        "url_has_taker": false
+      },
+      "wave": "t0"
+    },
+    {
+      "amount": "351377346548",
+      "consumed_call": true,
+      "due_at": "2026-08-18T08:11:21Z",
+      "horizon_seconds": 900,
+      "identity_id": "T21_R2_MINT_C",
+      "input_mint": "2JdM5MHiXjsQz5QgnSQfbidZDTVXCLki74jMYgJapump",
+      "kind": "SELL_H900",
+      "lateness_slack_seconds": 120,
+      "mint": "2JdM5MHiXjsQz5QgnSQfbidZDTVXCLki74jMYgJapump",
+      "observation_id": "T21_R2_MINT_C:10000000:SELL_H900",
+      "observed_at": "2026-08-18T08:11:39Z",
+      "output_mint": "So11111111111111111111111111111111111111112",
+      "parent_id": "T21_R2_MINT_C:10000000:BUY_T0",
+      "post_migration_status": "GIT_NAMED_INDEPENDENT_NOT_PROVEN_POST_MIGRATION",
+      "quote": {
+        "error_code": null,
+        "fee_bps": {
+          "status": "OBSERVED",
+          "value": 10
+        },
+        "in_amount": "351377346548",
+        "mode": "manual",
+        "out_amount": "9727199",
+        "platform_fee": {
+          "status": "OBSERVED",
+          "value": {
+            "feeBps": 10,
+            "feeMint": "So11111111111111111111111111111111111111112"
+          }
+        },
+        "price_impact_pct": {
+          "status": "OBSERVED",
+          "value": "0.014131320032871049"
+        },
+        "request_id_present": true,
+        "route_plan": {
+          "fee_amounts_present": false,
+          "hop_count": 1,
+          "status": "OBSERVED"
+        },
+        "router": "metis",
+        "surface": "QUOTE_OBSERVED",
+        "transaction_present": false
+      },
+      "raw_sha256": "c09be79b80154c617a0576ee57953a5a1fa97f7823fc089f599e80ebcfe21f56",
+      "terminal": "QUOTE_OBSERVED",
+      "terminal_error": null,
+      "transport": {
+        "content_type": "application/json",
+        "http_status": 200,
+        "request_count": 1,
+        "response_bytes": 1255,
+        "response_sha256": "c09be79b80154c617a0576ee57953a5a1fa97f7823fc089f599e80ebcfe21f56",
+        "url_has_api_key": false,
+        "url_has_taker": false
+      },
+      "wave": "horizon"
+    },
+    {
+      "amount": null,
+      "consumed_call": false,
+      "due_at": "2026-08-18T08:56:21Z",
+      "horizon_seconds": 3600,
+      "identity_id": "T21_R2_MINT_C",
+      "input_mint": "2JdM5MHiXjsQz5QgnSQfbidZDTVXCLki74jMYgJapump",
+      "kind": "SELL_H3600",
+      "mint": "2JdM5MHiXjsQz5QgnSQfbidZDTVXCLki74jMYgJapump",
+      "observation_id": "T21_R2_MINT_C:10000000:SELL_H3600",
+      "output_mint": "So11111111111111111111111111111111111111112",
+      "parent_id": "T21_R2_MINT_C:10000000:BUY_T0",
+      "post_migration_status": "GIT_NAMED_INDEPENDENT_NOT_PROVEN_POST_MIGRATION",
+      "terminal": "EXPLICIT_GAP",
+      "wave": "gap"
+    },
+    {
+      "amount": null,
+      "consumed_call": false,
+      "due_at": "2026-08-18T11:56:21Z",
+      "horizon_seconds": 14400,
+      "identity_id": "T21_R2_MINT_C",
+      "input_mint": "2JdM5MHiXjsQz5QgnSQfbidZDTVXCLki74jMYgJapump",
+      "kind": "SELL_H14400",
+      "mint": "2JdM5MHiXjsQz5QgnSQfbidZDTVXCLki74jMYgJapump",
+      "observation_id": "T21_R2_MINT_C:10000000:SELL_H14400",
+      "output_mint": "So11111111111111111111111111111111111111112",
+      "parent_id": "T21_R2_MINT_C:10000000:BUY_T0",
+      "post_migration_status": "GIT_NAMED_INDEPENDENT_NOT_PROVEN_POST_MIGRATION",
+      "terminal": "EXPLICIT_GAP",
+      "wave": "gap"
+    },
+    {
+      "amount": "10000000",
+      "consumed_call": true,
+      "due_at": "2026-08-18T07:56:21Z",
+      "horizon_seconds": 0,
+      "identity_id": "T21_R3_MINT_1",
+      "input_mint": "So11111111111111111111111111111111111111112",
+      "kind": "BUY_T0",
+      "mint": "CWfuB1HDEp9W3xT3prBX8EPa1TQWKh1PmWFot3Gkpump",
+      "observation_id": "T21_R3_MINT_1:10000000:BUY_T0",
+      "observed_at": "2026-08-18T07:56:23Z",
+      "output_mint": "CWfuB1HDEp9W3xT3prBX8EPa1TQWKh1PmWFot3Gkpump",
+      "parent_id": null,
+      "post_migration_status": "GIT_NAMED_INDEPENDENT_NOT_PROVEN_POST_MIGRATION",
+      "quote": {
+        "error_code": null,
+        "fee_bps": {
+          "status": "OBSERVED",
+          "value": 10
+        },
+        "in_amount": "10000000",
+        "mode": "manual",
+        "out_amount": "491271165486",
+        "platform_fee": {
+          "status": "OBSERVED",
+          "value": {
+            "feeBps": 10,
+            "feeMint": "So11111111111111111111111111111111111111112"
+          }
+        },
+        "price_impact_pct": {
+          "status": "OBSERVED",
+          "value": "-0.03143014411271845"
+        },
+        "request_id_present": true,
+        "route_plan": {
+          "fee_amounts_present": false,
+          "hop_count": 1,
+          "status": "OBSERVED"
+        },
+        "router": "metis",
+        "surface": "QUOTE_OBSERVED",
+        "transaction_present": false
+      },
+      "raw_sha256": "be18ac085e58c583a8ca9461dd0ceea85e2ea0c1abf1c2b13ef6eab2b37ae944",
+      "terminal": "QUOTE_OBSERVED",
+      "terminal_error": null,
+      "transport": {
+        "content_type": "application/json",
+        "http_status": 200,
+        "request_count": 1,
+        "response_bytes": 1268,
+        "response_sha256": "be18ac085e58c583a8ca9461dd0ceea85e2ea0c1abf1c2b13ef6eab2b37ae944",
+        "url_has_api_key": false,
+        "url_has_taker": false
+      },
+      "wave": "t0"
+    },
+    {
+      "amount": "491271165486",
+      "consumed_call": true,
+      "due_at": "2026-08-18T07:56:21Z",
+      "horizon_seconds": 0,
+      "identity_id": "T21_R3_MINT_1",
+      "input_mint": "CWfuB1HDEp9W3xT3prBX8EPa1TQWKh1PmWFot3Gkpump",
+      "kind": "REVERSE_T0",
+      "mint": "CWfuB1HDEp9W3xT3prBX8EPa1TQWKh1PmWFot3Gkpump",
+      "observation_id": "T21_R3_MINT_1:10000000:REVERSE_T0",
+      "observed_at": "2026-08-18T07:56:23Z",
+      "output_mint": "So11111111111111111111111111111111111111112",
+      "parent_id": "T21_R3_MINT_1:10000000:BUY_T0",
+      "post_migration_status": "GIT_NAMED_INDEPENDENT_NOT_PROVEN_POST_MIGRATION",
+      "quote": null,
+      "raw_sha256": "b490277b048ca69e3accf0940b3ea5fb8ef2036cce3bb841c327166c6aad34a1",
+      "terminal": "RATE_LIMITED",
+      "terminal_error": "HTTP_429",
+      "transport": {
+        "content_type": "application/json",
+        "http_status": 429,
+        "request_count": 1,
+        "response_bytes": 56,
+        "response_sha256": "b490277b048ca69e3accf0940b3ea5fb8ef2036cce3bb841c327166c6aad34a1",
+        "url_has_api_key": false,
+        "url_has_taker": false
+      },
+      "wave": "t0"
+    },
+    {
+      "amount": "491271165486",
+      "consumed_call": true,
+      "due_at": "2026-08-18T08:11:21Z",
+      "horizon_seconds": 900,
+      "identity_id": "T21_R3_MINT_1",
+      "input_mint": "CWfuB1HDEp9W3xT3prBX8EPa1TQWKh1PmWFot3Gkpump",
+      "kind": "SELL_H900",
+      "lateness_slack_seconds": 120,
+      "mint": "CWfuB1HDEp9W3xT3prBX8EPa1TQWKh1PmWFot3Gkpump",
+      "observation_id": "T21_R3_MINT_1:10000000:SELL_H900",
+      "observed_at": "2026-08-18T08:11:39Z",
+      "output_mint": "So11111111111111111111111111111111111111112",
+      "parent_id": "T21_R3_MINT_1:10000000:BUY_T0",
+      "post_migration_status": "GIT_NAMED_INDEPENDENT_NOT_PROVEN_POST_MIGRATION",
+      "quote": {
+        "error_code": null,
+        "fee_bps": {
+          "status": "OBSERVED",
+          "value": 10
+        },
+        "in_amount": "491271165486",
+        "mode": "manual",
+        "out_amount": "9752928",
+        "platform_fee": {
+          "status": "OBSERVED",
+          "value": {
+            "feeBps": 10,
+            "feeMint": "So11111111111111111111111111111111111111112"
+          }
+        },
+        "price_impact_pct": {
+          "status": "OBSERVED",
+          "value": "0.005419105372176883"
+        },
+        "request_id_present": true,
+        "route_plan": {
+          "fee_amounts_present": false,
+          "hop_count": 1,
+          "status": "OBSERVED"
+        },
+        "router": "dflow",
+        "surface": "QUOTE_OBSERVED",
+        "transaction_present": false
+      },
+      "raw_sha256": "f5eb97c23bb0ed674e0fa2e6014d3ab5fcbaf6dc6a9eefdf208ac1134b38f39e",
+      "terminal": "QUOTE_OBSERVED",
+      "terminal_error": null,
+      "transport": {
+        "content_type": "application/json",
+        "http_status": 200,
+        "request_count": 1,
+        "response_bytes": 1259,
+        "response_sha256": "f5eb97c23bb0ed674e0fa2e6014d3ab5fcbaf6dc6a9eefdf208ac1134b38f39e",
+        "url_has_api_key": false,
+        "url_has_taker": false
+      },
+      "wave": "horizon"
+    },
+    {
+      "amount": null,
+      "consumed_call": false,
+      "due_at": "2026-08-18T08:56:21Z",
+      "horizon_seconds": 3600,
+      "identity_id": "T21_R3_MINT_1",
+      "input_mint": "CWfuB1HDEp9W3xT3prBX8EPa1TQWKh1PmWFot3Gkpump",
+      "kind": "SELL_H3600",
+      "mint": "CWfuB1HDEp9W3xT3prBX8EPa1TQWKh1PmWFot3Gkpump",
+      "observation_id": "T21_R3_MINT_1:10000000:SELL_H3600",
+      "output_mint": "So11111111111111111111111111111111111111112",
+      "parent_id": "T21_R3_MINT_1:10000000:BUY_T0",
+      "post_migration_status": "GIT_NAMED_INDEPENDENT_NOT_PROVEN_POST_MIGRATION",
+      "terminal": "EXPLICIT_GAP",
+      "wave": "gap"
+    },
+    {
+      "amount": null,
+      "consumed_call": false,
+      "due_at": "2026-08-18T11:56:21Z",
+      "horizon_seconds": 14400,
+      "identity_id": "T21_R3_MINT_1",
+      "input_mint": "CWfuB1HDEp9W3xT3prBX8EPa1TQWKh1PmWFot3Gkpump",
+      "kind": "SELL_H14400",
+      "mint": "CWfuB1HDEp9W3xT3prBX8EPa1TQWKh1PmWFot3Gkpump",
+      "observation_id": "T21_R3_MINT_1:10000000:SELL_H14400",
+      "output_mint": "So11111111111111111111111111111111111111112",
+      "parent_id": "T21_R3_MINT_1:10000000:BUY_T0",
+      "post_migration_status": "GIT_NAMED_INDEPENDENT_NOT_PROVEN_POST_MIGRATION",
+      "terminal": "EXPLICIT_GAP",
+      "wave": "gap"
+    },
+    {
+      "amount": "10000000",
+      "consumed_call": false,
+      "due_at": "2026-08-18T07:56:21Z",
+      "horizon_seconds": 0,
+      "identity_id": "T21_R3_MINT_2",
+      "input_mint": "So11111111111111111111111111111111111111112",
+      "kind": "BUY_T0",
+      "mint": "8LRXPgAdhFktQzXjRVWgqWBWnMZTexjxsMrtQTQ6pump",
+      "observation_id": "T21_R3_MINT_2:10000000:BUY_T0",
+      "output_mint": "8LRXPgAdhFktQzXjRVWgqWBWnMZTexjxsMrtQTQ6pump",
+      "parent_id": null,
+      "post_migration_status": "GIT_NAMED_INDEPENDENT_NOT_PROVEN_POST_MIGRATION",
+      "terminal": "NOT_REACHED",
+      "wave": "t0"
+    },
+    {
+      "amount": null,
+      "consumed_call": false,
+      "due_at": "2026-08-18T07:56:21Z",
+      "horizon_seconds": 0,
+      "identity_id": "T21_R3_MINT_2",
+      "input_mint": "8LRXPgAdhFktQzXjRVWgqWBWnMZTexjxsMrtQTQ6pump",
+      "kind": "REVERSE_T0",
+      "mint": "8LRXPgAdhFktQzXjRVWgqWBWnMZTexjxsMrtQTQ6pump",
+      "observation_id": "T21_R3_MINT_2:10000000:REVERSE_T0",
+      "output_mint": "So11111111111111111111111111111111111111112",
+      "parent_id": "T21_R3_MINT_2:10000000:BUY_T0",
+      "post_migration_status": "GIT_NAMED_INDEPENDENT_NOT_PROVEN_POST_MIGRATION",
+      "terminal": "NOT_REACHED",
+      "wave": "t0"
+    },
+    {
+      "amount": null,
+      "consumed_call": false,
+      "due_at": "2026-08-18T08:11:21Z",
+      "horizon_seconds": 900,
+      "identity_id": "T21_R3_MINT_2",
+      "input_mint": "8LRXPgAdhFktQzXjRVWgqWBWnMZTexjxsMrtQTQ6pump",
+      "kind": "SELL_H900",
+      "lateness_slack_seconds": 120,
+      "mint": "8LRXPgAdhFktQzXjRVWgqWBWnMZTexjxsMrtQTQ6pump",
+      "observation_id": "T21_R3_MINT_2:10000000:SELL_H900",
+      "output_mint": "So11111111111111111111111111111111111111112",
+      "parent_id": "T21_R3_MINT_2:10000000:BUY_T0",
+      "post_migration_status": "GIT_NAMED_INDEPENDENT_NOT_PROVEN_POST_MIGRATION",
+      "terminal": "SCHEDULED",
+      "wave": "horizon"
+    },
+    {
+      "amount": null,
+      "consumed_call": false,
+      "due_at": "2026-08-18T08:56:21Z",
+      "horizon_seconds": 3600,
+      "identity_id": "T21_R3_MINT_2",
+      "input_mint": "8LRXPgAdhFktQzXjRVWgqWBWnMZTexjxsMrtQTQ6pump",
+      "kind": "SELL_H3600",
+      "mint": "8LRXPgAdhFktQzXjRVWgqWBWnMZTexjxsMrtQTQ6pump",
+      "observation_id": "T21_R3_MINT_2:10000000:SELL_H3600",
+      "output_mint": "So11111111111111111111111111111111111111112",
+      "parent_id": "T21_R3_MINT_2:10000000:BUY_T0",
+      "post_migration_status": "GIT_NAMED_INDEPENDENT_NOT_PROVEN_POST_MIGRATION",
+      "terminal": "EXPLICIT_GAP",
+      "wave": "gap"
+    },
+    {
+      "amount": null,
+      "consumed_call": false,
+      "due_at": "2026-08-18T11:56:21Z",
+      "horizon_seconds": 14400,
+      "identity_id": "T21_R3_MINT_2",
+      "input_mint": "8LRXPgAdhFktQzXjRVWgqWBWnMZTexjxsMrtQTQ6pump",
+      "kind": "SELL_H14400",
+      "mint": "8LRXPgAdhFktQzXjRVWgqWBWnMZTexjxsMrtQTQ6pump",
+      "observation_id": "T21_R3_MINT_2:10000000:SELL_H14400",
+      "output_mint": "So11111111111111111111111111111111111111112",
+      "parent_id": "T21_R3_MINT_2:10000000:BUY_T0",
+      "post_migration_status": "GIT_NAMED_INDEPENDENT_NOT_PROVEN_POST_MIGRATION",
+      "terminal": "EXPLICIT_GAP",
+      "wave": "gap"
+    }
+  ],
+  "owner_phrase": "OK QUOTE_NATIVE_FRICTION_H900_FALSIFIER_V1: Jupiter /swap/v2/order quote-only, taker omitted, execute forbidden, wallet/signer/transaction forbidden, cash cap $0, no retry/fallback, call cap 16, bind registry v7 route JUPITER-SOLANA-SWAP-V2-ORDER-001, unused T21 B/C plus R3 two mints only, one notional 0.01 SOL, t0 buy/reverse plus +15m sell, A24 and T21 A forbidden, +60m/+240m explicit gap no backfill, no live discovery",
+  "panel_started_at": "2026-08-18T07:56:21Z",
+  "preflight": {
+    "credential_reads": 0,
+    "dns_resolved": true,
+    "host": "api.jup.ag",
+    "observed_at": "2026-08-18T08:11:39Z",
+    "port": 443,
+    "provider_requests": 0,
+    "schema": "smial.pmf-quote-slice-one-shot.credential-free-preflight",
+    "schema_version": "1.0",
+    "tcp_443": true,
+    "tls_verified": true,
+    "tls_version": "TLSv1.3"
+  },
+  "provider_requests": 9,
+  "quoted_buy_ids": [
+    "T21_R2_MINT_B:10000000:BUY_T0",
+    "T21_R2_MINT_C:10000000:BUY_T0",
+    "T21_R3_MINT_1:10000000:BUY_T0"
+  ],
+  "raw_retention": {
+    "manifests": [
+      {
+        "bytes": 1267,
+        "observation_id": "T21_R2_MINT_B:10000000:BUY_T0",
+        "path": "local/quote_native_friction_h900_falsifier/run=20260818T075621Z-t0/T21_R2_MINT_B_10000000_BUY_T0.json",
+        "retention": "A4_OUTSIDE_GIT",
+        "sha256": "47811b7b000c58ab9085ed9a4e70861e0c533f121e951722aa4f0ec044c746c1"
+      },
+      {
+        "bytes": 1264,
+        "observation_id": "T21_R2_MINT_B:10000000:REVERSE_T0",
+        "path": "local/quote_native_friction_h900_falsifier/run=20260818T075621Z-t0/T21_R2_MINT_B_10000000_REVERSE_T0.json",
+        "retention": "A4_OUTSIDE_GIT",
+        "sha256": "8ba069046928be982b5da47ca6cfeef30f4b548cd243c33b9f32c8f29ef78126"
+      },
+      {
+        "bytes": 1262,
+        "observation_id": "T21_R2_MINT_C:10000000:BUY_T0",
+        "path": "local/quote_native_friction_h900_falsifier/run=20260818T075621Z-t0/T21_R2_MINT_C_10000000_BUY_T0.json",
+        "retention": "A4_OUTSIDE_GIT",
+        "sha256": "433e5c0130aacc4a8ff573a30e21a4e2d4a58a847d3ad28fa93bd9f084014a78"
+      },
+      {
+        "bytes": 1255,
+        "observation_id": "T21_R2_MINT_C:10000000:REVERSE_T0",
+        "path": "local/quote_native_friction_h900_falsifier/run=20260818T075621Z-t0/T21_R2_MINT_C_10000000_REVERSE_T0.json",
+        "retention": "A4_OUTSIDE_GIT",
+        "sha256": "4a3d7b267b912034cdc6ccdd4c6465bf5fd324719404657e6e920afc9ec890c7"
+      },
+      {
+        "bytes": 1268,
+        "observation_id": "T21_R3_MINT_1:10000000:BUY_T0",
+        "path": "local/quote_native_friction_h900_falsifier/run=20260818T075621Z-t0/T21_R3_MINT_1_10000000_BUY_T0.json",
+        "retention": "A4_OUTSIDE_GIT",
+        "sha256": "be18ac085e58c583a8ca9461dd0ceea85e2ea0c1abf1c2b13ef6eab2b37ae944"
+      },
+      {
+        "bytes": 56,
+        "observation_id": "T21_R3_MINT_1:10000000:REVERSE_T0",
+        "path": "local/quote_native_friction_h900_falsifier/run=20260818T075621Z-t0/T21_R3_MINT_1_10000000_REVERSE_T0.json",
+        "retention": "A4_OUTSIDE_GIT",
+        "sha256": "b490277b048ca69e3accf0940b3ea5fb8ef2036cce3bb841c327166c6aad34a1"
+      },
+      {
+        "bytes": 1263,
+        "observation_id": "T21_R2_MINT_B:10000000:SELL_H900",
+        "path": "local/quote_native_friction_h900_falsifier/run=20260818T081139Z-due/T21_R2_MINT_B_10000000_SELL_H900.json",
+        "retention": "A4_OUTSIDE_GIT",
+        "sha256": "87d60b7ba7c29389e5d5da46821451e25c7751fe937c9fa22422a711905d338a"
+      },
+      {
+        "bytes": 1255,
+        "observation_id": "T21_R2_MINT_C:10000000:SELL_H900",
+        "path": "local/quote_native_friction_h900_falsifier/run=20260818T081139Z-due/T21_R2_MINT_C_10000000_SELL_H900.json",
+        "retention": "A4_OUTSIDE_GIT",
+        "sha256": "c09be79b80154c617a0576ee57953a5a1fa97f7823fc089f599e80ebcfe21f56"
+      },
+      {
+        "bytes": 1259,
+        "observation_id": "T21_R3_MINT_1:10000000:SELL_H900",
+        "path": "local/quote_native_friction_h900_falsifier/run=20260818T081139Z-due/T21_R3_MINT_1_10000000_SELL_H900.json",
+        "retention": "A4_OUTSIDE_GIT",
+        "sha256": "f5eb97c23bb0ed674e0fa2e6014d3ab5fcbaf6dc6a9eefdf208ac1134b38f39e"
+      }
+    ],
+    "raw_retained": true
+  },
+  "receipt_id": "EVIDENCE-QUOTE-NATIVE-FRICTION-H900-FALSIFIER-001",
+  "retries": 0,
+  "route_id": "JUPITER-SOLANA-SWAP-V2-ORDER-001",
+  "schema": "smial.quote-native-friction-h900-falsifier.runtime-receipt",
+  "schema_version": "1.0",
+  "started_at": "2026-08-18T08:11:39Z",
+  "terminal_outcome": "DIRECTIONAL_HINT_NOT_CONFIRMATION",
+  "wave": "due"
+}

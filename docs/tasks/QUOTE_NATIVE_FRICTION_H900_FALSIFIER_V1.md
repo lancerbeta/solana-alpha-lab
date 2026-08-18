@@ -61,6 +61,7 @@ stop_conditions:
 context_requirements:
   catalog_asset_ids:
     - EVIDENCE-QUOTE-NATIVE-QUOTED-BUY-H900-CLOCK-001
+    - EVIDENCE-QUOTE-NATIVE-FRICTION-H900-FALSIFIER-001
     - CONFIG-PROVIDER-ROUTE-CAPABILITY-REGISTRY-007
   l2_roles: [DELIVERY_EVIDENCE, EXTERNAL_ROUTE_KNOWLEDGE]
   l3_roles: []
@@ -75,6 +76,7 @@ context_requirements:
     ARCHITECTURE_DECISIONS: []
     DELIVERY_EVIDENCE:
       - docs/evidence/quote_native_quoted_buy_h900_clock/a1_quote_native_quoted_buy_h900_clock_acceptance_v1.json
+      - docs/evidence/quote_native_friction_h900_falsifier/a1_quote_native_friction_h900_falsifier_acceptance_v1.json
     HISTORICAL_CONTEXT: []
 ---
 
