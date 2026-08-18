@@ -15,8 +15,8 @@
     "GOAL_DOD_CRITIC"
   ],
   "review_id": "QUOTE-NATIVE-EVIDENCE-FIT-PANEL-INDEPENDENT-REVIEW-001",
-  "reviewed_bindings_sha256": "279e7cc77dc9ca0d5105f7e002d4f2a093ee9fe4870fe4997b07f2ccb99a3690",
-  "reviewed_inventory_sha256": "f7ffa7c50e63d61d43bed79fd3e123111fbc196e3e1ad0d95319b07709dec6da",
+  "reviewed_bindings_sha256": "8f44b2b9f27cb5f9544c760206a69ddc9f38133fad967c1af1369808478f9c71",
+  "reviewed_inventory_sha256": "80ec1af3046a9655bfdac3a2d3e5e06a030a42f68028b3ceb6baefb2bcce4918",
   "reviews": [
     {
       "findings": [
@@ -38,7 +38,8 @@
         "CHECKED_NO_TAKER_EXECUTE_ENV_OR_ZERO_FILLED_FEES",
         "CHECKED_429_IS_RATE_LIMITED_REVERSE_USES_OUTAMOUNT",
         "CHECKED_T0_CREATE_ONLY_DUE_OVERWRITE_REMAINING_CAP_40_MINUS_PRIOR",
-        "CHECKED_REMOVED_SKIPTEST_WITHOUT_PROOF"
+        "CHECKED_REMOVED_SKIPTEST_WITHOUT_PROOF",
+        "CHECKED_LIFECYCLE_YAML_IN_MANAGED_WRITE_SET"
       ],
       "role": "CODE_REVIEWER",
       "verdict": "PASS"
