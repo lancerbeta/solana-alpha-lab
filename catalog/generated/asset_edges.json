@@ -593,6 +593,11 @@
       "target_asset_id": "CONFIG-PROVIDER-ROUTE-CAPABILITY-REGISTRY-008"
     },
     {
+      "source_asset_id": "CONFIG-QUOTE-NATIVE-ADMISSIBLE-FRICTION-AUDITION-001",
+      "relation": "governed_by",
+      "target_asset_id": "CTRL-QUOTE-NATIVE-ADMISSIBLE-FRICTION-AUDITION-001"
+    },
+    {
       "source_asset_id": "CONFIG-QUOTE-NATIVE-EVIDENCE-CHANNEL-QUALIFICATION-001",
       "relation": "depends_on",
       "target_asset_id": "CONFIG-PROVIDER-ROUTE-CAPABILITY-REGISTRY-009"
@@ -1988,6 +1993,31 @@
       "target_asset_id": "CI-VALIDATOR-001"
     },
     {
+      "source_asset_id": "CTRL-QUOTE-NATIVE-ADMISSIBLE-FRICTION-AUDITION-001",
+      "relation": "contains",
+      "target_asset_id": "CONFIG-QUOTE-NATIVE-ADMISSIBLE-FRICTION-AUDITION-001"
+    },
+    {
+      "source_asset_id": "CTRL-QUOTE-NATIVE-ADMISSIBLE-FRICTION-AUDITION-001",
+      "relation": "contains",
+      "target_asset_id": "MODULE-QUOTE-NATIVE-ADMISSIBLE-FRICTION-AUDITION-001"
+    },
+    {
+      "source_asset_id": "CTRL-QUOTE-NATIVE-ADMISSIBLE-FRICTION-AUDITION-001",
+      "relation": "contains",
+      "target_asset_id": "SCRIPT-QUOTE-NATIVE-ADMISSIBLE-FRICTION-AUDITION-001"
+    },
+    {
+      "source_asset_id": "CTRL-QUOTE-NATIVE-ADMISSIBLE-FRICTION-AUDITION-001",
+      "relation": "depends_on",
+      "target_asset_id": "CTRL-QUOTE-NATIVE-EVIDENCE-CHANNEL-QUALIFICATION-001"
+    },
+    {
+      "source_asset_id": "CTRL-QUOTE-NATIVE-ADMISSIBLE-FRICTION-AUDITION-001",
+      "relation": "depends_on",
+      "target_asset_id": "CTRL-QUOTE-NATIVE-FRICTION-H900-FALSIFIER-001"
+    },
+    {
       "source_asset_id": "CTRL-QUOTE-NATIVE-EVIDENCE-CHANNEL-QUALIFICATION-001",
       "relation": "contains",
       "target_asset_id": "CONFIG-QUOTE-NATIVE-EVIDENCE-CHANNEL-QUALIFICATION-001"
@@ -3071,6 +3101,26 @@
       "source_asset_id": "EVIDENCE-PMF-QUOTE-SLICE-ONE-SHOT-ACCEPTANCE-001",
       "relation": "derived_from",
       "target_asset_id": "EVIDENCE-PMF-QUOTE-SLICE-ONE-SHOT-001"
+    },
+    {
+      "source_asset_id": "EVIDENCE-QUOTE-NATIVE-ADMISSIBLE-FRICTION-AUDITION-001",
+      "relation": "depends_on",
+      "target_asset_id": "CONFIG-PROVIDER-ROUTE-CAPABILITY-REGISTRY-009"
+    },
+    {
+      "source_asset_id": "EVIDENCE-QUOTE-NATIVE-ADMISSIBLE-FRICTION-AUDITION-001",
+      "relation": "derived_from",
+      "target_asset_id": "CTRL-QUOTE-NATIVE-ADMISSIBLE-FRICTION-AUDITION-001"
+    },
+    {
+      "source_asset_id": "EVIDENCE-QUOTE-NATIVE-ADMISSIBLE-FRICTION-AUDITION-001",
+      "relation": "validated_by",
+      "target_asset_id": "TEST-QUOTE-NATIVE-ADMISSIBLE-FRICTION-AUDITION-001"
+    },
+    {
+      "source_asset_id": "EVIDENCE-QUOTE-NATIVE-ADMISSIBLE-FRICTION-AUDITION-ACCEPTANCE-001",
+      "relation": "derived_from",
+      "target_asset_id": "EVIDENCE-QUOTE-NATIVE-ADMISSIBLE-FRICTION-AUDITION-001"
     },
     {
       "source_asset_id": "EVIDENCE-QUOTE-NATIVE-EVIDENCE-CHANNEL-PORTAL-RECONCILIATION-001",
@@ -6638,6 +6688,21 @@
       "target_asset_id": "CONFIG-PROVIDER-ROUTE-CAPABILITY-REGISTRY-009"
     },
     {
+      "source_asset_id": "MODULE-QUOTE-NATIVE-ADMISSIBLE-FRICTION-AUDITION-001",
+      "relation": "depends_on",
+      "target_asset_id": "CONFIG-QUOTE-NATIVE-ADMISSIBLE-FRICTION-AUDITION-001"
+    },
+    {
+      "source_asset_id": "MODULE-QUOTE-NATIVE-ADMISSIBLE-FRICTION-AUDITION-001",
+      "relation": "depends_on",
+      "target_asset_id": "MODULE-QUOTE-NATIVE-EVIDENCE-CHANNEL-QUALIFICATION-001"
+    },
+    {
+      "source_asset_id": "MODULE-QUOTE-NATIVE-ADMISSIBLE-FRICTION-AUDITION-001",
+      "relation": "depends_on",
+      "target_asset_id": "MODULE-QUOTE-NATIVE-FRICTION-H900-FALSIFIER-001"
+    },
+    {
       "source_asset_id": "MODULE-QUOTE-NATIVE-EVIDENCE-CHANNEL-QUALIFICATION-001",
       "relation": "depends_on",
       "target_asset_id": "CONFIG-QUOTE-NATIVE-EVIDENCE-CHANNEL-QUALIFICATION-001"
@@ -8228,6 +8293,11 @@
       "target_asset_id": "EVIDENCE-PMF-QUOTE-SLICE-ONE-SHOT-ACCEPTANCE-001"
     },
     {
+      "source_asset_id": "REPORT-QUOTE-NATIVE-ADMISSIBLE-FRICTION-AUDITION-001",
+      "relation": "derived_from",
+      "target_asset_id": "EVIDENCE-QUOTE-NATIVE-ADMISSIBLE-FRICTION-AUDITION-ACCEPTANCE-001"
+    },
+    {
       "source_asset_id": "REPORT-QUOTE-NATIVE-EVIDENCE-CHANNEL-QUALIFICATION-001",
       "relation": "derived_from",
       "target_asset_id": "EVIDENCE-QUOTE-NATIVE-EVIDENCE-CHANNEL-QUALIFICATION-ACCEPTANCE-001"
@@ -9051,6 +9121,11 @@
       "source_asset_id": "SCRIPT-PMF-QUOTE-SLICE-ONE-SHOT-001",
       "relation": "depends_on",
       "target_asset_id": "MODULE-PMF-QUOTE-SLICE-ONE-SHOT-001"
+    },
+    {
+      "source_asset_id": "SCRIPT-QUOTE-NATIVE-ADMISSIBLE-FRICTION-AUDITION-001",
+      "relation": "depends_on",
+      "target_asset_id": "MODULE-QUOTE-NATIVE-ADMISSIBLE-FRICTION-AUDITION-001"
     },
     {
       "source_asset_id": "SCRIPT-QUOTE-NATIVE-EVIDENCE-CHANNEL-QUALIFICATION-001",
@@ -9971,6 +10046,11 @@
       "source_asset_id": "TEST-PROVIDER-ROUTE-CAPABILITY-REGISTRY-009",
       "relation": "depends_on",
       "target_asset_id": "MODULE-PROVIDER-ROUTE-CAPABILITY-REGISTRY-009"
+    },
+    {
+      "source_asset_id": "TEST-QUOTE-NATIVE-ADMISSIBLE-FRICTION-AUDITION-001",
+      "relation": "depends_on",
+      "target_asset_id": "MODULE-QUOTE-NATIVE-ADMISSIBLE-FRICTION-AUDITION-001"
     },
     {
       "source_asset_id": "TEST-QUOTE-NATIVE-EVIDENCE-CHANNEL-QUALIFICATION-001",
