@@ -17,8 +17,8 @@
     "GOAL_DOD_CRITIC"
   ],
   "review_id": "QUOTE-NATIVE-FRICTION-H900-FALSIFIER-INDEPENDENT-REVIEW-001",
-  "reviewed_bindings_sha256": "3377abed0dbf64a7d28946388bd9620b69a13f4c2d4711086c959685b0bfb1ab",
-  "reviewed_inventory_sha256": "61e7c82f2d4370f0255d8b77fab18ca4284677c4c8ce18780857e8eb02094836",
+  "reviewed_bindings_sha256": "af07821d45f5b229363ead3f32423e862a9e8cccf80f7c7b2a8de4c44081e9f3",
+  "reviewed_inventory_sha256": "9cdd6ce48bfbd34f0486357d228046cfb8e7f0008c20850973f64ec7d0f7e6fa",
   "reviews": [
     {
       "findings": [
