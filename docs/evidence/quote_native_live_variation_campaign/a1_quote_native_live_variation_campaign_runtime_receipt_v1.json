@@ -1,0 +1,1991 @@
+{
+  "atom_id": "QUOTE_NATIVE_LIVE_VARIATION_CAMPAIGN_V1",
+  "campaign": {
+    "campaign_verdict": "SAMPLE_INVALID_INSUFFICIENT_COMPLETE_XY",
+    "cells": [
+      {
+        "buy_terminal": "QUOTE_OBSERVED",
+        "fee_bps": {
+          "status": "OBSERVED",
+          "value": 10
+        },
+        "h900_terminal": "QUOTE_OBSERVED",
+        "identity_id": "RECENT_1",
+        "price_impact_pct": {
+          "status": "OBSERVED",
+          "value": "-0.029151373859257985"
+        },
+        "reverse_terminal": "QUOTE_OBSERVED",
+        "router": "metis",
+        "x_quoted_roundtrip_friction": "-0.0272581",
+        "x_status": "OBSERVED",
+        "y_equals_x": false,
+        "y_quoted_liquidation_recovery": "-0.097137",
+        "y_status": "OBSERVED"
+      },
+      {
+        "buy_terminal": "QUOTE_OBSERVED",
+        "fee_bps": {
+          "status": "OBSERVED",
+          "value": 10
+        },
+        "h900_terminal": "QUOTE_OBSERVED",
+        "identity_id": "RECENT_2",
+        "price_impact_pct": {
+          "status": "OBSERVED",
+          "value": "-0.03732803838736409"
+        },
+        "reverse_terminal": "QUOTE_OBSERVED",
+        "router": "metis",
+        "x_quoted_roundtrip_friction": "-0.0243109",
+        "x_status": "OBSERVED",
+        "y_equals_x": false,
+        "y_quoted_liquidation_recovery": "-0.0736254",
+        "y_status": "OBSERVED"
+      },
+      {
+        "buy_terminal": "QUOTE_OBSERVED",
+        "fee_bps": {
+          "status": "OBSERVED",
+          "value": 10
+        },
+        "h900_terminal": "QUOTE_OBSERVED",
+        "identity_id": "RECENT_3",
+        "price_impact_pct": {
+          "status": "OBSERVED",
+          "value": "0.006207729093120517"
+        },
+        "reverse_terminal": "RATE_LIMITED",
+        "router": "metis",
+        "x_quoted_roundtrip_friction": null,
+        "x_status": "MISSING",
+        "y_equals_x": null,
+        "y_quoted_liquidation_recovery": "-0.1636148",
+        "y_status": "OBSERVED"
+      },
+      {
+        "buy_terminal": "NOT_REACHED",
+        "fee_bps": null,
+        "h900_terminal": "SCHEDULED",
+        "identity_id": "RECENT_4",
+        "price_impact_pct": null,
+        "reverse_terminal": "NOT_REACHED",
+        "router": null,
+        "x_quoted_roundtrip_friction": null,
+        "x_status": "MISSING",
+        "y_equals_x": null,
+        "y_quoted_liquidation_recovery": null,
+        "y_status": "MISSING"
+      },
+      {
+        "buy_terminal": "NOT_REACHED",
+        "fee_bps": null,
+        "h900_terminal": "SCHEDULED",
+        "identity_id": "RECENT_5",
+        "price_impact_pct": null,
+        "reverse_terminal": "NOT_REACHED",
+        "router": null,
+        "x_quoted_roundtrip_friction": null,
+        "x_status": "MISSING",
+        "y_equals_x": null,
+        "y_quoted_liquidation_recovery": null,
+        "y_status": "MISSING"
+      },
+      {
+        "buy_terminal": "NOT_REACHED",
+        "fee_bps": null,
+        "h900_terminal": "SCHEDULED",
+        "identity_id": "RECENT_6",
+        "price_impact_pct": null,
+        "reverse_terminal": "NOT_REACHED",
+        "router": null,
+        "x_quoted_roundtrip_friction": null,
+        "x_status": "MISSING",
+        "y_equals_x": null,
+        "y_quoted_liquidation_recovery": null,
+        "y_status": "MISSING"
+      },
+      {
+        "buy_terminal": "NOT_REACHED",
+        "fee_bps": null,
+        "h900_terminal": "SCHEDULED",
+        "identity_id": "TRADED_1",
+        "price_impact_pct": null,
+        "reverse_terminal": "NOT_REACHED",
+        "router": null,
+        "x_quoted_roundtrip_friction": null,
+        "x_status": "MISSING",
+        "y_equals_x": null,
+        "y_quoted_liquidation_recovery": null,
+        "y_status": "MISSING"
+      },
+      {
+        "buy_terminal": "NOT_REACHED",
+        "fee_bps": null,
+        "h900_terminal": "SCHEDULED",
+        "identity_id": "TRADED_2",
+        "price_impact_pct": null,
+        "reverse_terminal": "NOT_REACHED",
+        "router": null,
+        "x_quoted_roundtrip_friction": null,
+        "x_status": "MISSING",
+        "y_equals_x": null,
+        "y_quoted_liquidation_recovery": null,
+        "y_status": "MISSING"
+      },
+      {
+        "buy_terminal": "NOT_REACHED",
+        "fee_bps": null,
+        "h900_terminal": "SCHEDULED",
+        "identity_id": "TRADED_3",
+        "price_impact_pct": null,
+        "reverse_terminal": "NOT_REACHED",
+        "router": null,
+        "x_quoted_roundtrip_friction": null,
+        "x_status": "MISSING",
+        "y_equals_x": null,
+        "y_quoted_liquidation_recovery": null,
+        "y_status": "MISSING"
+      },
+      {
+        "buy_terminal": "NOT_REACHED",
+        "fee_bps": null,
+        "h900_terminal": "SCHEDULED",
+        "identity_id": "TRADED_4",
+        "price_impact_pct": null,
+        "reverse_terminal": "NOT_REACHED",
+        "router": null,
+        "x_quoted_roundtrip_friction": null,
+        "x_status": "MISSING",
+        "y_equals_x": null,
+        "y_quoted_liquidation_recovery": null,
+        "y_status": "MISSING"
+      },
+      {
+        "buy_terminal": "NOT_REACHED",
+        "fee_bps": null,
+        "h900_terminal": "SCHEDULED",
+        "identity_id": "TRADED_5",
+        "price_impact_pct": null,
+        "reverse_terminal": "NOT_REACHED",
+        "router": null,
+        "x_quoted_roundtrip_friction": null,
+        "x_status": "MISSING",
+        "y_equals_x": null,
+        "y_quoted_liquidation_recovery": null,
+        "y_status": "MISSING"
+      },
+      {
+        "buy_terminal": "NOT_REACHED",
+        "fee_bps": null,
+        "h900_terminal": "SCHEDULED",
+        "identity_id": "TRADED_6",
+        "price_impact_pct": null,
+        "reverse_terminal": "NOT_REACHED",
+        "router": null,
+        "x_quoted_roundtrip_friction": null,
+        "x_status": "MISSING",
+        "y_equals_x": null,
+        "y_quoted_liquidation_recovery": null,
+        "y_status": "MISSING"
+      }
+    ],
+    "complete_xy_count": 2,
+    "family_close": false,
+    "h3600_moved_count": 2,
+    "h3600_y_equals_x_count": 0,
+    "h900_no_route_count": 0,
+    "h900_quote_observed_count": 3,
+    "non_claims": [
+      "NOT_NETRETURN",
+      "NOT_ALPHA",
+      "NO_THRESHOLD_FIT",
+      "NO_FAMILY_CLOSE_ON_SAMPLE_INVALID",
+      "NO_DIRECTIONAL_HINT_FROM_THIS_ATOM",
+      "NO_MOVE_2_EARNED"
+    ],
+    "recent_complete_xy_count": 2,
+    "recent_time_separated_count": 2,
+    "time_separated_complete_xy_count": 2,
+    "traded_complete_xy_count": 0,
+    "traded_time_separated_count": 0,
+    "traded_time_separated_share": null,
+    "verdict": "SAMPLE_INVALID_INSUFFICIENT_COMPLETE_XY",
+    "y_equals_x_count": 0
+  },
+  "credential_reads": 0,
+  "discovery_observations": [
+    {
+      "consumed_call": true,
+      "kind": "DISCOVERY_RECENT",
+      "observation_id": "DISCOVERY:RECENT",
+      "observed_at": "2026-08-18T09:35:50Z",
+      "payload_count": 30,
+      "terminal": "TOKEN_LIST_OBSERVED",
+      "terminal_error": null,
+      "transport": {
+        "content_type": "application/json",
+        "http_status": 200,
+        "request_count": 1,
+        "response_bytes": 46234,
+        "response_sha256": "f0d611d0ba4be83dbf4d6f4e17d6a50361722b1b5953c661efd5f21a6e1812aa",
+        "url_has_api_key": false,
+        "url_has_taker": false
+      },
+      "url": "https://api.jup.ag/tokens/v2/recent",
+      "wave": "discovery"
+    },
+    {
+      "consumed_call": true,
+      "kind": "DISCOVERY_TRADED",
+      "observation_id": "DISCOVERY:TRADED",
+      "observed_at": "2026-08-18T09:35:52Z",
+      "payload_count": 50,
+      "terminal": "TOKEN_LIST_OBSERVED",
+      "terminal_error": null,
+      "transport": {
+        "content_type": "application/json",
+        "http_status": 200,
+        "request_count": 1,
+        "response_bytes": 125056,
+        "response_sha256": "b0aac757015eb1dbedc3fbb2caa491bd13653c2164f77960c7c52d991799f007",
+        "url_has_api_key": false,
+        "url_has_taker": false
+      },
+      "url": "https://api.jup.ag/tokens/v2/toptraded/1h",
+      "wave": "discovery"
+    }
+  ],
+  "execute_calls": 0,
+  "fallbacks": 0,
+  "frozen_cells": [
+    {
+      "first_pool_created_at": "2026-08-18T09:35:40Z",
+      "identity_id": "RECENT_1",
+      "liquidity": 2550.7906760187916,
+      "mint": "G9MprCR5QYSpmSDTgp2UMWPW4rB1tDjCjy7Jb1o9pump",
+      "notional_atomic": "10000000",
+      "source_kind": "LIVE_TOKENS_V2_RECENT",
+      "stratum": "RECENT"
+    },
+    {
+      "first_pool_created_at": "2026-08-18T09:35:40Z",
+      "identity_id": "RECENT_2",
+      "liquidity": 2527.0474331210808,
+      "mint": "EhJkE9e6YvE2Zrz5NWfKkttMZs1gQPdb5j9J15hFpump",
+      "notional_atomic": "10000000",
+      "source_kind": "LIVE_TOKENS_V2_RECENT",
+      "stratum": "RECENT"
+    },
+    {
+      "first_pool_created_at": "2026-08-18T09:35:34Z",
+      "identity_id": "RECENT_3",
+      "liquidity": 2454.943702142852,
+      "mint": "9wtvwqvCRN4yyqHsacx1fCrYZFSerDDzkFS4RLk2pump",
+      "notional_atomic": "10000000",
+      "source_kind": "LIVE_TOKENS_V2_RECENT",
+      "stratum": "RECENT"
+    },
+    {
+      "first_pool_created_at": "2026-08-18T09:35:33Z",
+      "identity_id": "RECENT_4",
+      "liquidity": 2811.237663082141,
+      "mint": "9fxWQd8RuXmpBcJYtfGhDzjKrq25iRoLCyo11qdDpump",
+      "notional_atomic": "10000000",
+      "source_kind": "LIVE_TOKENS_V2_RECENT",
+      "stratum": "RECENT"
+    },
+    {
+      "first_pool_created_at": "2026-08-18T09:35:32Z",
+      "identity_id": "RECENT_5",
+      "liquidity": 6420.672981359758,
+      "mint": "ACD6Bj4FgwVMq9A687inEB6jmkdn5unvxqZdWx95jACp",
+      "notional_atomic": "10000000",
+      "source_kind": "LIVE_TOKENS_V2_RECENT",
+      "stratum": "RECENT"
+    },
+    {
+      "first_pool_created_at": "2026-08-18T09:35:31Z",
+      "identity_id": "RECENT_6",
+      "liquidity": 2280.17765478856,
+      "mint": "DU4jnhEv6Zhbg6BwzBeGh9KCGxeF3Cos8YgGHQ8kpump",
+      "notional_atomic": "10000000",
+      "source_kind": "LIVE_TOKENS_V2_RECENT",
+      "stratum": "RECENT"
+    },
+    {
+      "first_pool_created_at": "2024-11-07T14:34:00Z",
+      "identity_id": "TRADED_1",
+      "liquidity": 21819567.18614926,
+      "mint": "cbbtcf3aa214zXHbiAZQwf4122FBYbraNdFqgw4iMij",
+      "notional_atomic": "10000000",
+      "source_kind": "LIVE_TOKENS_V2_TOPTRADED",
+      "stratum": "TRADED"
+    },
+    {
+      "first_pool_created_at": "2025-07-12T15:11:26Z",
+      "identity_id": "TRADED_2",
+      "liquidity": 26018729.705763686,
+      "mint": "pumpCmXqMfrsAkQ5r49WcJnRayYRqmXz6ae8H7H9Dfn",
+      "notional_atomic": "10000000",
+      "source_kind": "LIVE_TOKENS_V2_TOPTRADED",
+      "stratum": "TRADED"
+    },
+    {
+      "first_pool_created_at": "2026-06-16T21:05:48Z",
+      "identity_id": "TRADED_3",
+      "liquidity": 3184338.4248101837,
+      "mint": "9cRCn9rGT8V2imeM2BaKs13yhMEais3ruM3rPvTGpump",
+      "notional_atomic": "10000000",
+      "source_kind": "LIVE_TOKENS_V2_TOPTRADED",
+      "stratum": "TRADED"
+    },
+    {
+      "first_pool_created_at": "2026-05-02T03:31:54Z",
+      "identity_id": "TRADED_4",
+      "liquidity": 7688266.448331742,
+      "mint": "CWZ6BsdnjkDVTGkmL6bGbJXXig6ceef12KvyGQW14cMt",
+      "notional_atomic": "10000000",
+      "source_kind": "LIVE_TOKENS_V2_TOPTRADED",
+      "stratum": "TRADED"
+    },
+    {
+      "first_pool_created_at": "2025-10-10T17:50:23Z",
+      "identity_id": "TRADED_5",
+      "liquidity": 3235426.4216577066,
+      "mint": "98sMhvDwXj1RQi5c5Mndm3vPe9cBqPrbLaufMXFNMh5g",
+      "notional_atomic": "10000000",
+      "source_kind": "LIVE_TOKENS_V2_TOPTRADED",
+      "stratum": "TRADED"
+    },
+    {
+      "first_pool_created_at": "2026-06-11T17:17:20Z",
+      "identity_id": "TRADED_6",
+      "liquidity": 803311.7653144703,
+      "mint": "SPCXxcqXj6e5dJDVNovHN8744zkbhM2bYudU45BimGb",
+      "notional_atomic": "10000000",
+      "source_kind": "LIVE_TOKENS_V2_TOPTRADED",
+      "stratum": "TRADED"
+    }
+  ],
+  "last_provider_call_at": "2026-08-18T10:36:49Z",
+  "limitations": [
+    "LIVE_SAMPLE_NOT_A_CONFIRMATORY_TRIAL",
+    "H14400_EXPLICIT_GAP_NO_BACKFILL"
+  ],
+  "new_provider_requests": 3,
+  "non_claims": [
+    "NO_EXECUTE",
+    "NO_TAKER_OR_SIGNER",
+    "NO_TRANSACTION_BYTES_IN_GIT",
+    "NO_ALPHA",
+    "NO_NETRETURN",
+    "NO_CANONICAL_DONE",
+    "NO_H13_OR_H02_TRIAL",
+    "NO_DIRECTIONAL_HINT_FROM_THIS_ATOM",
+    "NO_T21_FREEZE_REUSE",
+    "NO_H14400_OBSERVATION",
+    "NO_FAMILY_CLOSE_ON_SAMPLE_INVALID",
+    "NO_MOVE_2_EARNED"
+  ],
+  "observations": [
+    {
+      "amount": "10000000",
+      "consumed_call": true,
+      "due_at": "2026-08-18T09:36:11Z",
+      "horizon_seconds": 0,
+      "identity_id": "RECENT_1",
+      "input_mint": "So11111111111111111111111111111111111111112",
+      "kind": "BUY_T0",
+      "mint": "G9MprCR5QYSpmSDTgp2UMWPW4rB1tDjCjy7Jb1o9pump",
+      "observation_id": "RECENT_1:10000000:BUY_T0",
+      "observed_at": "2026-08-18T09:36:11Z",
+      "output_mint": "G9MprCR5QYSpmSDTgp2UMWPW4rB1tDjCjy7Jb1o9pump",
+      "parent_id": null,
+      "quote": {
+        "error_code": null,
+        "fee_bps": {
+          "status": "OBSERVED",
+          "value": 10
+        },
+        "in_amount": "10000000",
+        "mode": "manual",
+        "out_amount": "327438907623",
+        "platform_fee": {
+          "status": "OBSERVED",
+          "value": {
+            "feeBps": 10,
+            "feeMint": "So11111111111111111111111111111111111111112"
+          }
+        },
+        "price_impact_pct": {
+          "status": "OBSERVED",
+          "value": "-0.029151373859257985"
+        },
+        "request_id_present": true,
+        "route_plan": {
+          "fee_amounts_present": false,
+          "hop_count": 1,
+          "status": "OBSERVED"
+        },
+        "router": "metis",
+        "surface": "QUOTE_OBSERVED",
+        "transaction_present": false
+      },
+      "raw_sha256": "521262b1eaa7014e451d4d204b88fa6645ca659fe93d0039810c06777d63bd34",
+      "stratum": "RECENT",
+      "terminal": "QUOTE_OBSERVED",
+      "terminal_error": null,
+      "transport": {
+        "content_type": "application/json",
+        "http_status": 200,
+        "request_count": 1,
+        "response_bytes": 1263,
+        "response_sha256": "521262b1eaa7014e451d4d204b88fa6645ca659fe93d0039810c06777d63bd34",
+        "url_has_api_key": false,
+        "url_has_taker": false
+      },
+      "wave": "t0"
+    },
+    {
+      "amount": "327438907623",
+      "consumed_call": true,
+      "due_at": "2026-08-18T09:36:11Z",
+      "horizon_seconds": 0,
+      "identity_id": "RECENT_1",
+      "input_mint": "G9MprCR5QYSpmSDTgp2UMWPW4rB1tDjCjy7Jb1o9pump",
+      "kind": "REVERSE_T0",
+      "mint": "G9MprCR5QYSpmSDTgp2UMWPW4rB1tDjCjy7Jb1o9pump",
+      "observation_id": "RECENT_1:10000000:REVERSE_T0",
+      "observed_at": "2026-08-18T09:36:13Z",
+      "output_mint": "So11111111111111111111111111111111111111112",
+      "parent_id": "RECENT_1:10000000:BUY_T0",
+      "quote": {
+        "error_code": null,
+        "fee_bps": {
+          "status": "OBSERVED",
+          "value": 10
+        },
+        "in_amount": "327438907623",
+        "mode": "manual",
+        "out_amount": "9727419",
+        "platform_fee": {
+          "status": "OBSERVED",
+          "value": {
+            "feeBps": 10,
+            "feeMint": "So11111111111111111111111111111111111111112"
+          }
+        },
+        "price_impact_pct": {
+          "status": "OBSERVED",
+          "value": "0.0019501226126094283"
+        },
+        "request_id_present": true,
+        "route_plan": {
+          "fee_amounts_present": false,
+          "hop_count": 1,
+          "status": "OBSERVED"
+        },
+        "router": "metis",
+        "surface": "QUOTE_OBSERVED",
+        "transaction_present": false
+      },
+      "raw_sha256": "c1cf9c6c69f557d847133f1c3ed307ae51e123abfcb10c757943809c4b944580",
+      "stratum": "RECENT",
+      "terminal": "QUOTE_OBSERVED",
+      "terminal_error": null,
+      "transport": {
+        "content_type": "application/json",
+        "http_status": 200,
+        "request_count": 1,
+        "response_bytes": 1253,
+        "response_sha256": "c1cf9c6c69f557d847133f1c3ed307ae51e123abfcb10c757943809c4b944580",
+        "url_has_api_key": false,
+        "url_has_taker": false
+      },
+      "wave": "t0"
+    },
+    {
+      "amount": "327438907623",
+      "consumed_call": true,
+      "due_at": "2026-08-18T09:51:11Z",
+      "horizon_seconds": 900,
+      "identity_id": "RECENT_1",
+      "input_mint": "G9MprCR5QYSpmSDTgp2UMWPW4rB1tDjCjy7Jb1o9pump",
+      "kind": "SELL_H900",
+      "lateness_slack_seconds": 120,
+      "mint": "G9MprCR5QYSpmSDTgp2UMWPW4rB1tDjCjy7Jb1o9pump",
+      "observation_id": "RECENT_1:10000000:SELL_H900",
+      "observed_at": "2026-08-18T09:52:29Z",
+      "output_mint": "So11111111111111111111111111111111111111112",
+      "parent_id": "RECENT_1:10000000:BUY_T0",
+      "quote": {
+        "error_code": null,
+        "fee_bps": {
+          "status": "OBSERVED",
+          "value": 10
+        },
+        "in_amount": "327438907623",
+        "mode": "manual",
+        "out_amount": "9028630",
+        "platform_fee": {
+          "status": "OBSERVED",
+          "value": {
+            "feeBps": 10,
+            "feeMint": "So11111111111111111111111111111111111111112"
+          }
+        },
+        "price_impact_pct": {
+          "status": "OBSERVED",
+          "value": "-0.022161746527776863"
+        },
+        "request_id_present": true,
+        "route_plan": {
+          "fee_amounts_present": false,
+          "hop_count": 1,
+          "status": "OBSERVED"
+        },
+        "router": "metis",
+        "surface": "QUOTE_OBSERVED",
+        "transaction_present": false
+      },
+      "raw_sha256": "57e34579ffd6183d9e8b50be86ef2e87442746b17f46176b2d8681cff07a349b",
+      "stratum": "RECENT",
+      "terminal": "QUOTE_OBSERVED",
+      "terminal_error": null,
+      "transport": {
+        "content_type": "application/json",
+        "http_status": 200,
+        "request_count": 1,
+        "response_bytes": 1256,
+        "response_sha256": "57e34579ffd6183d9e8b50be86ef2e87442746b17f46176b2d8681cff07a349b",
+        "url_has_api_key": false,
+        "url_has_taker": false
+      },
+      "wave": "horizon"
+    },
+    {
+      "amount": "327438907623",
+      "consumed_call": true,
+      "due_at": "2026-08-18T10:36:11Z",
+      "horizon_seconds": 3600,
+      "identity_id": "RECENT_1",
+      "input_mint": "G9MprCR5QYSpmSDTgp2UMWPW4rB1tDjCjy7Jb1o9pump",
+      "kind": "SELL_H3600",
+      "lateness_slack_seconds": 120,
+      "mint": "G9MprCR5QYSpmSDTgp2UMWPW4rB1tDjCjy7Jb1o9pump",
+      "observation_id": "RECENT_1:10000000:SELL_H3600",
+      "observed_at": "2026-08-18T10:36:43Z",
+      "output_mint": "So11111111111111111111111111111111111111112",
+      "parent_id": "RECENT_1:10000000:BUY_T0",
+      "quote": {
+        "error_code": null,
+        "fee_bps": {
+          "status": "OBSERVED",
+          "value": 10
+        },
+        "in_amount": "327438907623",
+        "mode": "manual",
+        "out_amount": "9028630",
+        "platform_fee": {
+          "status": "OBSERVED",
+          "value": {
+            "feeBps": 10,
+            "feeMint": "So11111111111111111111111111111111111111112"
+          }
+        },
+        "price_impact_pct": {
+          "status": "OBSERVED",
+          "value": "-0.023047178197304487"
+        },
+        "request_id_present": true,
+        "route_plan": {
+          "fee_amounts_present": false,
+          "hop_count": 1,
+          "status": "OBSERVED"
+        },
+        "router": "metis",
+        "surface": "QUOTE_OBSERVED",
+        "transaction_present": false
+      },
+      "raw_sha256": "e641ae477c499d277b99252d5aa3188a0dfbe9437641ddef507816b9e1ce1dc6",
+      "stratum": "RECENT",
+      "terminal": "QUOTE_OBSERVED",
+      "terminal_error": null,
+      "transport": {
+        "content_type": "application/json",
+        "http_status": 200,
+        "request_count": 1,
+        "response_bytes": 1257,
+        "response_sha256": "e641ae477c499d277b99252d5aa3188a0dfbe9437641ddef507816b9e1ce1dc6",
+        "url_has_api_key": false,
+        "url_has_taker": false
+      },
+      "wave": "horizon"
+    },
+    {
+      "amount": null,
+      "consumed_call": false,
+      "due_at": "2026-08-18T13:36:11Z",
+      "horizon_seconds": 14400,
+      "identity_id": "RECENT_1",
+      "input_mint": "G9MprCR5QYSpmSDTgp2UMWPW4rB1tDjCjy7Jb1o9pump",
+      "kind": "SELL_H14400",
+      "lateness_slack_seconds": 120,
+      "mint": "G9MprCR5QYSpmSDTgp2UMWPW4rB1tDjCjy7Jb1o9pump",
+      "observation_id": "RECENT_1:10000000:SELL_H14400",
+      "output_mint": "So11111111111111111111111111111111111111112",
+      "parent_id": "RECENT_1:10000000:BUY_T0",
+      "stratum": "RECENT",
+      "terminal": "EXPLICIT_GAP",
+      "wave": "gap"
+    },
+    {
+      "amount": "10000000",
+      "consumed_call": true,
+      "due_at": "2026-08-18T09:36:11Z",
+      "horizon_seconds": 0,
+      "identity_id": "RECENT_2",
+      "input_mint": "So11111111111111111111111111111111111111112",
+      "kind": "BUY_T0",
+      "mint": "EhJkE9e6YvE2Zrz5NWfKkttMZs1gQPdb5j9J15hFpump",
+      "observation_id": "RECENT_2:10000000:BUY_T0",
+      "observed_at": "2026-08-18T09:36:15Z",
+      "output_mint": "EhJkE9e6YvE2Zrz5NWfKkttMZs1gQPdb5j9J15hFpump",
+      "parent_id": null,
+      "quote": {
+        "error_code": null,
+        "fee_bps": {
+          "status": "OBSERVED",
+          "value": 10
+        },
+        "in_amount": "10000000",
+        "mode": "manual",
+        "out_amount": "335968482318",
+        "platform_fee": {
+          "status": "OBSERVED",
+          "value": {
+            "feeBps": 10,
+            "feeMint": "So11111111111111111111111111111111111111112"
+          }
+        },
+        "price_impact_pct": {
+          "status": "OBSERVED",
+          "value": "-0.03732803838736409"
+        },
+        "request_id_present": true,
+        "route_plan": {
+          "fee_amounts_present": false,
+          "hop_count": 1,
+          "status": "OBSERVED"
+        },
+        "router": "metis",
+        "surface": "QUOTE_OBSERVED",
+        "transaction_present": false
+      },
+      "raw_sha256": "d4ff9c7b1a009946d8044ce9541fe5e16b3daedf6f06eb2d8ddae47914bd2fe9",
+      "stratum": "RECENT",
+      "terminal": "QUOTE_OBSERVED",
+      "terminal_error": null,
+      "transport": {
+        "content_type": "application/json",
+        "http_status": 200,
+        "request_count": 1,
+        "response_bytes": 1262,
+        "response_sha256": "d4ff9c7b1a009946d8044ce9541fe5e16b3daedf6f06eb2d8ddae47914bd2fe9",
+        "url_has_api_key": false,
+        "url_has_taker": false
+      },
+      "wave": "t0"
+    },
+    {
+      "amount": "335968482318",
+      "consumed_call": true,
+      "due_at": "2026-08-18T09:36:11Z",
+      "horizon_seconds": 0,
+      "identity_id": "RECENT_2",
+      "input_mint": "EhJkE9e6YvE2Zrz5NWfKkttMZs1gQPdb5j9J15hFpump",
+      "kind": "REVERSE_T0",
+      "mint": "EhJkE9e6YvE2Zrz5NWfKkttMZs1gQPdb5j9J15hFpump",
+      "observation_id": "RECENT_2:10000000:REVERSE_T0",
+      "observed_at": "2026-08-18T09:36:17Z",
+      "output_mint": "So11111111111111111111111111111111111111112",
+      "parent_id": "RECENT_2:10000000:BUY_T0",
+      "quote": {
+        "error_code": null,
+        "fee_bps": {
+          "status": "OBSERVED",
+          "value": 10
+        },
+        "in_amount": "335968482318",
+        "mode": "manual",
+        "out_amount": "9756891",
+        "platform_fee": {
+          "status": "OBSERVED",
+          "value": {
+            "feeBps": 10,
+            "feeMint": "So11111111111111111111111111111111111111112"
+          }
+        },
+        "price_impact_pct": {
+          "status": "OBSERVED",
+          "value": "0.013521883784335284"
+        },
+        "request_id_present": true,
+        "route_plan": {
+          "fee_amounts_present": false,
+          "hop_count": 1,
+          "status": "OBSERVED"
+        },
+        "router": "dflow",
+        "surface": "QUOTE_OBSERVED",
+        "transaction_present": false
+      },
+      "raw_sha256": "b1b34ce76ff8bd242c86fdbeb7f4b91a8b173f24d70020c512975aedbd448036",
+      "stratum": "RECENT",
+      "terminal": "QUOTE_OBSERVED",
+      "terminal_error": null,
+      "transport": {
+        "content_type": "application/json",
+        "http_status": 200,
+        "request_count": 1,
+        "response_bytes": 1255,
+        "response_sha256": "b1b34ce76ff8bd242c86fdbeb7f4b91a8b173f24d70020c512975aedbd448036",
+        "url_has_api_key": false,
+        "url_has_taker": false
+      },
+      "wave": "t0"
+    },
+    {
+      "amount": "335968482318",
+      "consumed_call": true,
+      "due_at": "2026-08-18T09:51:11Z",
+      "horizon_seconds": 900,
+      "identity_id": "RECENT_2",
+      "input_mint": "EhJkE9e6YvE2Zrz5NWfKkttMZs1gQPdb5j9J15hFpump",
+      "kind": "SELL_H900",
+      "lateness_slack_seconds": 120,
+      "mint": "EhJkE9e6YvE2Zrz5NWfKkttMZs1gQPdb5j9J15hFpump",
+      "observation_id": "RECENT_2:10000000:SELL_H900",
+      "observed_at": "2026-08-18T09:52:32Z",
+      "output_mint": "So11111111111111111111111111111111111111112",
+      "parent_id": "RECENT_2:10000000:BUY_T0",
+      "quote": {
+        "error_code": null,
+        "fee_bps": {
+          "status": "OBSERVED",
+          "value": 10
+        },
+        "in_amount": "335968482318",
+        "mode": "manual",
+        "out_amount": "9263746",
+        "platform_fee": {
+          "status": "OBSERVED",
+          "value": {
+            "feeBps": 10,
+            "feeMint": "So11111111111111111111111111111111111111112"
+          }
+        },
+        "price_impact_pct": {
+          "status": "OBSERVED",
+          "value": "-0.03813413408151164"
+        },
+        "request_id_present": true,
+        "route_plan": {
+          "fee_amounts_present": false,
+          "hop_count": 1,
+          "status": "OBSERVED"
+        },
+        "router": "metis",
+        "surface": "QUOTE_OBSERVED",
+        "transaction_present": false
+      },
+      "raw_sha256": "bb7722ecaa59766b123c8f5ce603ad8f3f81c0455c3d6733f5be9fec23373673",
+      "stratum": "RECENT",
+      "terminal": "QUOTE_OBSERVED",
+      "terminal_error": null,
+      "transport": {
+        "content_type": "application/json",
+        "http_status": 200,
+        "request_count": 1,
+        "response_bytes": 1255,
+        "response_sha256": "bb7722ecaa59766b123c8f5ce603ad8f3f81c0455c3d6733f5be9fec23373673",
+        "url_has_api_key": false,
+        "url_has_taker": false
+      },
+      "wave": "horizon"
+    },
+    {
+      "amount": "335968482318",
+      "consumed_call": true,
+      "due_at": "2026-08-18T10:36:11Z",
+      "horizon_seconds": 3600,
+      "identity_id": "RECENT_2",
+      "input_mint": "EhJkE9e6YvE2Zrz5NWfKkttMZs1gQPdb5j9J15hFpump",
+      "kind": "SELL_H3600",
+      "lateness_slack_seconds": 120,
+      "mint": "EhJkE9e6YvE2Zrz5NWfKkttMZs1gQPdb5j9J15hFpump",
+      "observation_id": "RECENT_2:10000000:SELL_H3600",
+      "observed_at": "2026-08-18T10:36:46Z",
+      "output_mint": "So11111111111111111111111111111111111111112",
+      "parent_id": "RECENT_2:10000000:BUY_T0",
+      "quote": {
+        "error_code": null,
+        "fee_bps": {
+          "status": "OBSERVED",
+          "value": 10
+        },
+        "in_amount": "335968482318",
+        "mode": "manual",
+        "out_amount": "9263746",
+        "platform_fee": {
+          "status": "OBSERVED",
+          "value": {
+            "feeBps": 10,
+            "feeMint": "So11111111111111111111111111111111111111112"
+          }
+        },
+        "price_impact_pct": {
+          "status": "OBSERVED",
+          "value": "-0.039026373419988485"
+        },
+        "request_id_present": true,
+        "route_plan": {
+          "fee_amounts_present": false,
+          "hop_count": 1,
+          "status": "OBSERVED"
+        },
+        "router": "metis",
+        "surface": "QUOTE_OBSERVED",
+        "transaction_present": false
+      },
+      "raw_sha256": "fe9a6308c526f8a1c54edd8869f5c99990a123d6905f5428798d3f8c5ecbf13a",
+      "stratum": "RECENT",
+      "terminal": "QUOTE_OBSERVED",
+      "terminal_error": null,
+      "transport": {
+        "content_type": "application/json",
+        "http_status": 200,
+        "request_count": 1,
+        "response_bytes": 1256,
+        "response_sha256": "fe9a6308c526f8a1c54edd8869f5c99990a123d6905f5428798d3f8c5ecbf13a",
+        "url_has_api_key": false,
+        "url_has_taker": false
+      },
+      "wave": "horizon"
+    },
+    {
+      "amount": null,
+      "consumed_call": false,
+      "due_at": "2026-08-18T13:36:11Z",
+      "horizon_seconds": 14400,
+      "identity_id": "RECENT_2",
+      "input_mint": "EhJkE9e6YvE2Zrz5NWfKkttMZs1gQPdb5j9J15hFpump",
+      "kind": "SELL_H14400",
+      "lateness_slack_seconds": 120,
+      "mint": "EhJkE9e6YvE2Zrz5NWfKkttMZs1gQPdb5j9J15hFpump",
+      "observation_id": "RECENT_2:10000000:SELL_H14400",
+      "output_mint": "So11111111111111111111111111111111111111112",
+      "parent_id": "RECENT_2:10000000:BUY_T0",
+      "stratum": "RECENT",
+      "terminal": "EXPLICIT_GAP",
+      "wave": "gap"
+    },
+    {
+      "amount": "10000000",
+      "consumed_call": true,
+      "due_at": "2026-08-18T09:36:11Z",
+      "horizon_seconds": 0,
+      "identity_id": "RECENT_3",
+      "input_mint": "So11111111111111111111111111111111111111112",
+      "kind": "BUY_T0",
+      "mint": "9wtvwqvCRN4yyqHsacx1fCrYZFSerDDzkFS4RLk2pump",
+      "observation_id": "RECENT_3:10000000:BUY_T0",
+      "observed_at": "2026-08-18T09:36:19Z",
+      "output_mint": "9wtvwqvCRN4yyqHsacx1fCrYZFSerDDzkFS4RLk2pump",
+      "parent_id": null,
+      "quote": {
+        "error_code": null,
+        "fee_bps": {
+          "status": "OBSERVED",
+          "value": 10
+        },
+        "in_amount": "10000000",
+        "mode": "manual",
+        "out_amount": "303322756717",
+        "platform_fee": {
+          "status": "OBSERVED",
+          "value": {
+            "feeBps": 10,
+            "feeMint": "So11111111111111111111111111111111111111112"
+          }
+        },
+        "price_impact_pct": {
+          "status": "OBSERVED",
+          "value": "0.006207729093120517"
+        },
+        "request_id_present": true,
+        "route_plan": {
+          "fee_amounts_present": false,
+          "hop_count": 1,
+          "status": "OBSERVED"
+        },
+        "router": "metis",
+        "surface": "QUOTE_OBSERVED",
+        "transaction_present": false
+      },
+      "raw_sha256": "6b17094498742315bc87f713f26d4e46e9865b61177aa8340f1e8631f807d4da",
+      "stratum": "RECENT",
+      "terminal": "QUOTE_OBSERVED",
+      "terminal_error": null,
+      "transport": {
+        "content_type": "application/json",
+        "http_status": 200,
+        "request_count": 1,
+        "response_bytes": 1262,
+        "response_sha256": "6b17094498742315bc87f713f26d4e46e9865b61177aa8340f1e8631f807d4da",
+        "url_has_api_key": false,
+        "url_has_taker": false
+      },
+      "wave": "t0"
+    },
+    {
+      "amount": "303322756717",
+      "consumed_call": true,
+      "due_at": "2026-08-18T09:36:11Z",
+      "horizon_seconds": 0,
+      "identity_id": "RECENT_3",
+      "input_mint": "9wtvwqvCRN4yyqHsacx1fCrYZFSerDDzkFS4RLk2pump",
+      "kind": "REVERSE_T0",
+      "mint": "9wtvwqvCRN4yyqHsacx1fCrYZFSerDDzkFS4RLk2pump",
+      "observation_id": "RECENT_3:10000000:REVERSE_T0",
+      "observed_at": "2026-08-18T09:36:21Z",
+      "output_mint": "So11111111111111111111111111111111111111112",
+      "parent_id": "RECENT_3:10000000:BUY_T0",
+      "quote": null,
+      "raw_sha256": "b490277b048ca69e3accf0940b3ea5fb8ef2036cce3bb841c327166c6aad34a1",
+      "stratum": "RECENT",
+      "terminal": "RATE_LIMITED",
+      "terminal_error": "HTTP_429",
+      "transport": {
+        "content_type": "application/json",
+        "http_status": 429,
+        "request_count": 1,
+        "response_bytes": 56,
+        "response_sha256": "b490277b048ca69e3accf0940b3ea5fb8ef2036cce3bb841c327166c6aad34a1",
+        "url_has_api_key": false,
+        "url_has_taker": false
+      },
+      "wave": "t0"
+    },
+    {
+      "amount": "303322756717",
+      "consumed_call": true,
+      "due_at": "2026-08-18T09:51:11Z",
+      "horizon_seconds": 900,
+      "identity_id": "RECENT_3",
+      "input_mint": "9wtvwqvCRN4yyqHsacx1fCrYZFSerDDzkFS4RLk2pump",
+      "kind": "SELL_H900",
+      "lateness_slack_seconds": 120,
+      "mint": "9wtvwqvCRN4yyqHsacx1fCrYZFSerDDzkFS4RLk2pump",
+      "observation_id": "RECENT_3:10000000:SELL_H900",
+      "observed_at": "2026-08-18T09:52:35Z",
+      "output_mint": "So11111111111111111111111111111111111111112",
+      "parent_id": "RECENT_3:10000000:BUY_T0",
+      "quote": {
+        "error_code": null,
+        "fee_bps": {
+          "status": "OBSERVED",
+          "value": 10
+        },
+        "in_amount": "303322756717",
+        "mode": "manual",
+        "out_amount": "8363852",
+        "platform_fee": {
+          "status": "OBSERVED",
+          "value": {
+            "feeBps": 10,
+            "feeMint": "So11111111111111111111111111111111111111112"
+          }
+        },
+        "price_impact_pct": {
+          "status": "OBSERVED",
+          "value": "-0.07158287541759621"
+        },
+        "request_id_present": true,
+        "route_plan": {
+          "fee_amounts_present": false,
+          "hop_count": 1,
+          "status": "OBSERVED"
+        },
+        "router": "metis",
+        "surface": "QUOTE_OBSERVED",
+        "transaction_present": false
+      },
+      "raw_sha256": "bccc32841e1be0c563d5e2d0ea61d3ded050fc1b2efcc7ee29aedeaeec833a4f",
+      "stratum": "RECENT",
+      "terminal": "QUOTE_OBSERVED",
+      "terminal_error": null,
+      "transport": {
+        "content_type": "application/json",
+        "http_status": 200,
+        "request_count": 1,
+        "response_bytes": 1256,
+        "response_sha256": "bccc32841e1be0c563d5e2d0ea61d3ded050fc1b2efcc7ee29aedeaeec833a4f",
+        "url_has_api_key": false,
+        "url_has_taker": false
+      },
+      "wave": "horizon"
+    },
+    {
+      "amount": "303322756717",
+      "consumed_call": true,
+      "due_at": "2026-08-18T10:36:11Z",
+      "horizon_seconds": 3600,
+      "identity_id": "RECENT_3",
+      "input_mint": "9wtvwqvCRN4yyqHsacx1fCrYZFSerDDzkFS4RLk2pump",
+      "kind": "SELL_H3600",
+      "lateness_slack_seconds": 120,
+      "mint": "9wtvwqvCRN4yyqHsacx1fCrYZFSerDDzkFS4RLk2pump",
+      "observation_id": "RECENT_3:10000000:SELL_H3600",
+      "observed_at": "2026-08-18T10:36:49Z",
+      "output_mint": "So11111111111111111111111111111111111111112",
+      "parent_id": "RECENT_3:10000000:BUY_T0",
+      "quote": {
+        "error_code": null,
+        "fee_bps": {
+          "status": "OBSERVED",
+          "value": 10
+        },
+        "in_amount": "303322756717",
+        "mode": "manual",
+        "out_amount": "8363852",
+        "platform_fee": {
+          "status": "OBSERVED",
+          "value": {
+            "feeBps": 10,
+            "feeMint": "So11111111111111111111111111111111111111112"
+          }
+        },
+        "price_impact_pct": {
+          "status": "OBSERVED",
+          "value": "-0.038838261114773336"
+        },
+        "request_id_present": true,
+        "route_plan": {
+          "fee_amounts_present": false,
+          "hop_count": 1,
+          "status": "OBSERVED"
+        },
+        "router": "metis",
+        "surface": "QUOTE_OBSERVED",
+        "transaction_present": false
+      },
+      "raw_sha256": "fcc94663e9e591acb80bb107ee5a6ad718fcf3c175315557a038822c9961c605",
+      "stratum": "RECENT",
+      "terminal": "QUOTE_OBSERVED",
+      "terminal_error": null,
+      "transport": {
+        "content_type": "application/json",
+        "http_status": 200,
+        "request_count": 1,
+        "response_bytes": 1257,
+        "response_sha256": "fcc94663e9e591acb80bb107ee5a6ad718fcf3c175315557a038822c9961c605",
+        "url_has_api_key": false,
+        "url_has_taker": false
+      },
+      "wave": "horizon"
+    },
+    {
+      "amount": null,
+      "consumed_call": false,
+      "due_at": "2026-08-18T13:36:11Z",
+      "horizon_seconds": 14400,
+      "identity_id": "RECENT_3",
+      "input_mint": "9wtvwqvCRN4yyqHsacx1fCrYZFSerDDzkFS4RLk2pump",
+      "kind": "SELL_H14400",
+      "lateness_slack_seconds": 120,
+      "mint": "9wtvwqvCRN4yyqHsacx1fCrYZFSerDDzkFS4RLk2pump",
+      "observation_id": "RECENT_3:10000000:SELL_H14400",
+      "output_mint": "So11111111111111111111111111111111111111112",
+      "parent_id": "RECENT_3:10000000:BUY_T0",
+      "stratum": "RECENT",
+      "terminal": "EXPLICIT_GAP",
+      "wave": "gap"
+    },
+    {
+      "amount": "10000000",
+      "consumed_call": false,
+      "due_at": "2026-08-18T09:36:11Z",
+      "horizon_seconds": 0,
+      "identity_id": "RECENT_4",
+      "input_mint": "So11111111111111111111111111111111111111112",
+      "kind": "BUY_T0",
+      "mint": "9fxWQd8RuXmpBcJYtfGhDzjKrq25iRoLCyo11qdDpump",
+      "observation_id": "RECENT_4:10000000:BUY_T0",
+      "output_mint": "9fxWQd8RuXmpBcJYtfGhDzjKrq25iRoLCyo11qdDpump",
+      "parent_id": null,
+      "stratum": "RECENT",
+      "terminal": "NOT_REACHED",
+      "wave": "t0"
+    },
+    {
+      "amount": null,
+      "consumed_call": false,
+      "due_at": "2026-08-18T09:36:11Z",
+      "horizon_seconds": 0,
+      "identity_id": "RECENT_4",
+      "input_mint": "9fxWQd8RuXmpBcJYtfGhDzjKrq25iRoLCyo11qdDpump",
+      "kind": "REVERSE_T0",
+      "mint": "9fxWQd8RuXmpBcJYtfGhDzjKrq25iRoLCyo11qdDpump",
+      "observation_id": "RECENT_4:10000000:REVERSE_T0",
+      "output_mint": "So11111111111111111111111111111111111111112",
+      "parent_id": "RECENT_4:10000000:BUY_T0",
+      "stratum": "RECENT",
+      "terminal": "NOT_REACHED",
+      "wave": "t0"
+    },
+    {
+      "amount": null,
+      "consumed_call": false,
+      "due_at": "2026-08-18T09:51:11Z",
+      "horizon_seconds": 900,
+      "identity_id": "RECENT_4",
+      "input_mint": "9fxWQd8RuXmpBcJYtfGhDzjKrq25iRoLCyo11qdDpump",
+      "kind": "SELL_H900",
+      "lateness_slack_seconds": 120,
+      "mint": "9fxWQd8RuXmpBcJYtfGhDzjKrq25iRoLCyo11qdDpump",
+      "observation_id": "RECENT_4:10000000:SELL_H900",
+      "output_mint": "So11111111111111111111111111111111111111112",
+      "parent_id": "RECENT_4:10000000:BUY_T0",
+      "stratum": "RECENT",
+      "terminal": "SCHEDULED",
+      "wave": "horizon"
+    },
+    {
+      "amount": null,
+      "consumed_call": false,
+      "due_at": "2026-08-18T10:36:11Z",
+      "horizon_seconds": 3600,
+      "identity_id": "RECENT_4",
+      "input_mint": "9fxWQd8RuXmpBcJYtfGhDzjKrq25iRoLCyo11qdDpump",
+      "kind": "SELL_H3600",
+      "lateness_slack_seconds": 120,
+      "mint": "9fxWQd8RuXmpBcJYtfGhDzjKrq25iRoLCyo11qdDpump",
+      "observation_id": "RECENT_4:10000000:SELL_H3600",
+      "output_mint": "So11111111111111111111111111111111111111112",
+      "parent_id": "RECENT_4:10000000:BUY_T0",
+      "stratum": "RECENT",
+      "terminal": "SCHEDULED",
+      "wave": "horizon"
+    },
+    {
+      "amount": null,
+      "consumed_call": false,
+      "due_at": "2026-08-18T13:36:11Z",
+      "horizon_seconds": 14400,
+      "identity_id": "RECENT_4",
+      "input_mint": "9fxWQd8RuXmpBcJYtfGhDzjKrq25iRoLCyo11qdDpump",
+      "kind": "SELL_H14400",
+      "lateness_slack_seconds": 120,
+      "mint": "9fxWQd8RuXmpBcJYtfGhDzjKrq25iRoLCyo11qdDpump",
+      "observation_id": "RECENT_4:10000000:SELL_H14400",
+      "output_mint": "So11111111111111111111111111111111111111112",
+      "parent_id": "RECENT_4:10000000:BUY_T0",
+      "stratum": "RECENT",
+      "terminal": "EXPLICIT_GAP",
+      "wave": "gap"
+    },
+    {
+      "amount": "10000000",
+      "consumed_call": false,
+      "due_at": "2026-08-18T09:36:11Z",
+      "horizon_seconds": 0,
+      "identity_id": "RECENT_5",
+      "input_mint": "So11111111111111111111111111111111111111112",
+      "kind": "BUY_T0",
+      "mint": "ACD6Bj4FgwVMq9A687inEB6jmkdn5unvxqZdWx95jACp",
+      "observation_id": "RECENT_5:10000000:BUY_T0",
+      "output_mint": "ACD6Bj4FgwVMq9A687inEB6jmkdn5unvxqZdWx95jACp",
+      "parent_id": null,
+      "stratum": "RECENT",
+      "terminal": "NOT_REACHED",
+      "wave": "t0"
+    },
+    {
+      "amount": null,
+      "consumed_call": false,
+      "due_at": "2026-08-18T09:36:11Z",
+      "horizon_seconds": 0,
+      "identity_id": "RECENT_5",
+      "input_mint": "ACD6Bj4FgwVMq9A687inEB6jmkdn5unvxqZdWx95jACp",
+      "kind": "REVERSE_T0",
+      "mint": "ACD6Bj4FgwVMq9A687inEB6jmkdn5unvxqZdWx95jACp",
+      "observation_id": "RECENT_5:10000000:REVERSE_T0",
+      "output_mint": "So11111111111111111111111111111111111111112",
+      "parent_id": "RECENT_5:10000000:BUY_T0",
+      "stratum": "RECENT",
+      "terminal": "NOT_REACHED",
+      "wave": "t0"
+    },
+    {
+      "amount": null,
+      "consumed_call": false,
+      "due_at": "2026-08-18T09:51:11Z",
+      "horizon_seconds": 900,
+      "identity_id": "RECENT_5",
+      "input_mint": "ACD6Bj4FgwVMq9A687inEB6jmkdn5unvxqZdWx95jACp",
+      "kind": "SELL_H900",
+      "lateness_slack_seconds": 120,
+      "mint": "ACD6Bj4FgwVMq9A687inEB6jmkdn5unvxqZdWx95jACp",
+      "observation_id": "RECENT_5:10000000:SELL_H900",
+      "output_mint": "So11111111111111111111111111111111111111112",
+      "parent_id": "RECENT_5:10000000:BUY_T0",
+      "stratum": "RECENT",
+      "terminal": "SCHEDULED",
+      "wave": "horizon"
+    },
+    {
+      "amount": null,
+      "consumed_call": false,
+      "due_at": "2026-08-18T10:36:11Z",
+      "horizon_seconds": 3600,
+      "identity_id": "RECENT_5",
+      "input_mint": "ACD6Bj4FgwVMq9A687inEB6jmkdn5unvxqZdWx95jACp",
+      "kind": "SELL_H3600",
+      "lateness_slack_seconds": 120,
+      "mint": "ACD6Bj4FgwVMq9A687inEB6jmkdn5unvxqZdWx95jACp",
+      "observation_id": "RECENT_5:10000000:SELL_H3600",
+      "output_mint": "So11111111111111111111111111111111111111112",
+      "parent_id": "RECENT_5:10000000:BUY_T0",
+      "stratum": "RECENT",
+      "terminal": "SCHEDULED",
+      "wave": "horizon"
+    },
+    {
+      "amount": null,
+      "consumed_call": false,
+      "due_at": "2026-08-18T13:36:11Z",
+      "horizon_seconds": 14400,
+      "identity_id": "RECENT_5",
+      "input_mint": "ACD6Bj4FgwVMq9A687inEB6jmkdn5unvxqZdWx95jACp",
+      "kind": "SELL_H14400",
+      "lateness_slack_seconds": 120,
+      "mint": "ACD6Bj4FgwVMq9A687inEB6jmkdn5unvxqZdWx95jACp",
+      "observation_id": "RECENT_5:10000000:SELL_H14400",
+      "output_mint": "So11111111111111111111111111111111111111112",
+      "parent_id": "RECENT_5:10000000:BUY_T0",
+      "stratum": "RECENT",
+      "terminal": "EXPLICIT_GAP",
+      "wave": "gap"
+    },
+    {
+      "amount": "10000000",
+      "consumed_call": false,
+      "due_at": "2026-08-18T09:36:11Z",
+      "horizon_seconds": 0,
+      "identity_id": "RECENT_6",
+      "input_mint": "So11111111111111111111111111111111111111112",
+      "kind": "BUY_T0",
+      "mint": "DU4jnhEv6Zhbg6BwzBeGh9KCGxeF3Cos8YgGHQ8kpump",
+      "observation_id": "RECENT_6:10000000:BUY_T0",
+      "output_mint": "DU4jnhEv6Zhbg6BwzBeGh9KCGxeF3Cos8YgGHQ8kpump",
+      "parent_id": null,
+      "stratum": "RECENT",
+      "terminal": "NOT_REACHED",
+      "wave": "t0"
+    },
+    {
+      "amount": null,
+      "consumed_call": false,
+      "due_at": "2026-08-18T09:36:11Z",
+      "horizon_seconds": 0,
+      "identity_id": "RECENT_6",
+      "input_mint": "DU4jnhEv6Zhbg6BwzBeGh9KCGxeF3Cos8YgGHQ8kpump",
+      "kind": "REVERSE_T0",
+      "mint": "DU4jnhEv6Zhbg6BwzBeGh9KCGxeF3Cos8YgGHQ8kpump",
+      "observation_id": "RECENT_6:10000000:REVERSE_T0",
+      "output_mint": "So11111111111111111111111111111111111111112",
+      "parent_id": "RECENT_6:10000000:BUY_T0",
+      "stratum": "RECENT",
+      "terminal": "NOT_REACHED",
+      "wave": "t0"
+    },
+    {
+      "amount": null,
+      "consumed_call": false,
+      "due_at": "2026-08-18T09:51:11Z",
+      "horizon_seconds": 900,
+      "identity_id": "RECENT_6",
+      "input_mint": "DU4jnhEv6Zhbg6BwzBeGh9KCGxeF3Cos8YgGHQ8kpump",
+      "kind": "SELL_H900",
+      "lateness_slack_seconds": 120,
+      "mint": "DU4jnhEv6Zhbg6BwzBeGh9KCGxeF3Cos8YgGHQ8kpump",
+      "observation_id": "RECENT_6:10000000:SELL_H900",
+      "output_mint": "So11111111111111111111111111111111111111112",
+      "parent_id": "RECENT_6:10000000:BUY_T0",
+      "stratum": "RECENT",
+      "terminal": "SCHEDULED",
+      "wave": "horizon"
+    },
+    {
+      "amount": null,
+      "consumed_call": false,
+      "due_at": "2026-08-18T10:36:11Z",
+      "horizon_seconds": 3600,
+      "identity_id": "RECENT_6",
+      "input_mint": "DU4jnhEv6Zhbg6BwzBeGh9KCGxeF3Cos8YgGHQ8kpump",
+      "kind": "SELL_H3600",
+      "lateness_slack_seconds": 120,
+      "mint": "DU4jnhEv6Zhbg6BwzBeGh9KCGxeF3Cos8YgGHQ8kpump",
+      "observation_id": "RECENT_6:10000000:SELL_H3600",
+      "output_mint": "So11111111111111111111111111111111111111112",
+      "parent_id": "RECENT_6:10000000:BUY_T0",
+      "stratum": "RECENT",
+      "terminal": "SCHEDULED",
+      "wave": "horizon"
+    },
+    {
+      "amount": null,
+      "consumed_call": false,
+      "due_at": "2026-08-18T13:36:11Z",
+      "horizon_seconds": 14400,
+      "identity_id": "RECENT_6",
+      "input_mint": "DU4jnhEv6Zhbg6BwzBeGh9KCGxeF3Cos8YgGHQ8kpump",
+      "kind": "SELL_H14400",
+      "lateness_slack_seconds": 120,
+      "mint": "DU4jnhEv6Zhbg6BwzBeGh9KCGxeF3Cos8YgGHQ8kpump",
+      "observation_id": "RECENT_6:10000000:SELL_H14400",
+      "output_mint": "So11111111111111111111111111111111111111112",
+      "parent_id": "RECENT_6:10000000:BUY_T0",
+      "stratum": "RECENT",
+      "terminal": "EXPLICIT_GAP",
+      "wave": "gap"
+    },
+    {
+      "amount": "10000000",
+      "consumed_call": false,
+      "due_at": "2026-08-18T09:36:11Z",
+      "horizon_seconds": 0,
+      "identity_id": "TRADED_1",
+      "input_mint": "So11111111111111111111111111111111111111112",
+      "kind": "BUY_T0",
+      "mint": "cbbtcf3aa214zXHbiAZQwf4122FBYbraNdFqgw4iMij",
+      "observation_id": "TRADED_1:10000000:BUY_T0",
+      "output_mint": "cbbtcf3aa214zXHbiAZQwf4122FBYbraNdFqgw4iMij",
+      "parent_id": null,
+      "stratum": "TRADED",
+      "terminal": "NOT_REACHED",
+      "wave": "t0"
+    },
+    {
+      "amount": null,
+      "consumed_call": false,
+      "due_at": "2026-08-18T09:36:11Z",
+      "horizon_seconds": 0,
+      "identity_id": "TRADED_1",
+      "input_mint": "cbbtcf3aa214zXHbiAZQwf4122FBYbraNdFqgw4iMij",
+      "kind": "REVERSE_T0",
+      "mint": "cbbtcf3aa214zXHbiAZQwf4122FBYbraNdFqgw4iMij",
+      "observation_id": "TRADED_1:10000000:REVERSE_T0",
+      "output_mint": "So11111111111111111111111111111111111111112",
+      "parent_id": "TRADED_1:10000000:BUY_T0",
+      "stratum": "TRADED",
+      "terminal": "NOT_REACHED",
+      "wave": "t0"
+    },
+    {
+      "amount": null,
+      "consumed_call": false,
+      "due_at": "2026-08-18T09:51:11Z",
+      "horizon_seconds": 900,
+      "identity_id": "TRADED_1",
+      "input_mint": "cbbtcf3aa214zXHbiAZQwf4122FBYbraNdFqgw4iMij",
+      "kind": "SELL_H900",
+      "lateness_slack_seconds": 120,
+      "mint": "cbbtcf3aa214zXHbiAZQwf4122FBYbraNdFqgw4iMij",
+      "observation_id": "TRADED_1:10000000:SELL_H900",
+      "output_mint": "So11111111111111111111111111111111111111112",
+      "parent_id": "TRADED_1:10000000:BUY_T0",
+      "stratum": "TRADED",
+      "terminal": "SCHEDULED",
+      "wave": "horizon"
+    },
+    {
+      "amount": null,
+      "consumed_call": false,
+      "due_at": "2026-08-18T10:36:11Z",
+      "horizon_seconds": 3600,
+      "identity_id": "TRADED_1",
+      "input_mint": "cbbtcf3aa214zXHbiAZQwf4122FBYbraNdFqgw4iMij",
+      "kind": "SELL_H3600",
+      "lateness_slack_seconds": 120,
+      "mint": "cbbtcf3aa214zXHbiAZQwf4122FBYbraNdFqgw4iMij",
+      "observation_id": "TRADED_1:10000000:SELL_H3600",
+      "output_mint": "So11111111111111111111111111111111111111112",
+      "parent_id": "TRADED_1:10000000:BUY_T0",
+      "stratum": "TRADED",
+      "terminal": "SCHEDULED",
+      "wave": "horizon"
+    },
+    {
+      "amount": null,
+      "consumed_call": false,
+      "due_at": "2026-08-18T13:36:11Z",
+      "horizon_seconds": 14400,
+      "identity_id": "TRADED_1",
+      "input_mint": "cbbtcf3aa214zXHbiAZQwf4122FBYbraNdFqgw4iMij",
+      "kind": "SELL_H14400",
+      "lateness_slack_seconds": 120,
+      "mint": "cbbtcf3aa214zXHbiAZQwf4122FBYbraNdFqgw4iMij",
+      "observation_id": "TRADED_1:10000000:SELL_H14400",
+      "output_mint": "So11111111111111111111111111111111111111112",
+      "parent_id": "TRADED_1:10000000:BUY_T0",
+      "stratum": "TRADED",
+      "terminal": "EXPLICIT_GAP",
+      "wave": "gap"
+    },
+    {
+      "amount": "10000000",
+      "consumed_call": false,
+      "due_at": "2026-08-18T09:36:11Z",
+      "horizon_seconds": 0,
+      "identity_id": "TRADED_2",
+      "input_mint": "So11111111111111111111111111111111111111112",
+      "kind": "BUY_T0",
+      "mint": "pumpCmXqMfrsAkQ5r49WcJnRayYRqmXz6ae8H7H9Dfn",
+      "observation_id": "TRADED_2:10000000:BUY_T0",
+      "output_mint": "pumpCmXqMfrsAkQ5r49WcJnRayYRqmXz6ae8H7H9Dfn",
+      "parent_id": null,
+      "stratum": "TRADED",
+      "terminal": "NOT_REACHED",
+      "wave": "t0"
+    },
+    {
+      "amount": null,
+      "consumed_call": false,
+      "due_at": "2026-08-18T09:36:11Z",
+      "horizon_seconds": 0,
+      "identity_id": "TRADED_2",
+      "input_mint": "pumpCmXqMfrsAkQ5r49WcJnRayYRqmXz6ae8H7H9Dfn",
+      "kind": "REVERSE_T0",
+      "mint": "pumpCmXqMfrsAkQ5r49WcJnRayYRqmXz6ae8H7H9Dfn",
+      "observation_id": "TRADED_2:10000000:REVERSE_T0",
+      "output_mint": "So11111111111111111111111111111111111111112",
+      "parent_id": "TRADED_2:10000000:BUY_T0",
+      "stratum": "TRADED",
+      "terminal": "NOT_REACHED",
+      "wave": "t0"
+    },
+    {
+      "amount": null,
+      "consumed_call": false,
+      "due_at": "2026-08-18T09:51:11Z",
+      "horizon_seconds": 900,
+      "identity_id": "TRADED_2",
+      "input_mint": "pumpCmXqMfrsAkQ5r49WcJnRayYRqmXz6ae8H7H9Dfn",
+      "kind": "SELL_H900",
+      "lateness_slack_seconds": 120,
+      "mint": "pumpCmXqMfrsAkQ5r49WcJnRayYRqmXz6ae8H7H9Dfn",
+      "observation_id": "TRADED_2:10000000:SELL_H900",
+      "output_mint": "So11111111111111111111111111111111111111112",
+      "parent_id": "TRADED_2:10000000:BUY_T0",
+      "stratum": "TRADED",
+      "terminal": "SCHEDULED",
+      "wave": "horizon"
+    },
+    {
+      "amount": null,
+      "consumed_call": false,
+      "due_at": "2026-08-18T10:36:11Z",
+      "horizon_seconds": 3600,
+      "identity_id": "TRADED_2",
+      "input_mint": "pumpCmXqMfrsAkQ5r49WcJnRayYRqmXz6ae8H7H9Dfn",
+      "kind": "SELL_H3600",
+      "lateness_slack_seconds": 120,
+      "mint": "pumpCmXqMfrsAkQ5r49WcJnRayYRqmXz6ae8H7H9Dfn",
+      "observation_id": "TRADED_2:10000000:SELL_H3600",
+      "output_mint": "So11111111111111111111111111111111111111112",
+      "parent_id": "TRADED_2:10000000:BUY_T0",
+      "stratum": "TRADED",
+      "terminal": "SCHEDULED",
+      "wave": "horizon"
+    },
+    {
+      "amount": null,
+      "consumed_call": false,
+      "due_at": "2026-08-18T13:36:11Z",
+      "horizon_seconds": 14400,
+      "identity_id": "TRADED_2",
+      "input_mint": "pumpCmXqMfrsAkQ5r49WcJnRayYRqmXz6ae8H7H9Dfn",
+      "kind": "SELL_H14400",
+      "lateness_slack_seconds": 120,
+      "mint": "pumpCmXqMfrsAkQ5r49WcJnRayYRqmXz6ae8H7H9Dfn",
+      "observation_id": "TRADED_2:10000000:SELL_H14400",
+      "output_mint": "So11111111111111111111111111111111111111112",
+      "parent_id": "TRADED_2:10000000:BUY_T0",
+      "stratum": "TRADED",
+      "terminal": "EXPLICIT_GAP",
+      "wave": "gap"
+    },
+    {
+      "amount": "10000000",
+      "consumed_call": false,
+      "due_at": "2026-08-18T09:36:11Z",
+      "horizon_seconds": 0,
+      "identity_id": "TRADED_3",
+      "input_mint": "So11111111111111111111111111111111111111112",
+      "kind": "BUY_T0",
+      "mint": "9cRCn9rGT8V2imeM2BaKs13yhMEais3ruM3rPvTGpump",
+      "observation_id": "TRADED_3:10000000:BUY_T0",
+      "output_mint": "9cRCn9rGT8V2imeM2BaKs13yhMEais3ruM3rPvTGpump",
+      "parent_id": null,
+      "stratum": "TRADED",
+      "terminal": "NOT_REACHED",
+      "wave": "t0"
+    },
+    {
+      "amount": null,
+      "consumed_call": false,
+      "due_at": "2026-08-18T09:36:11Z",
+      "horizon_seconds": 0,
+      "identity_id": "TRADED_3",
+      "input_mint": "9cRCn9rGT8V2imeM2BaKs13yhMEais3ruM3rPvTGpump",
+      "kind": "REVERSE_T0",
+      "mint": "9cRCn9rGT8V2imeM2BaKs13yhMEais3ruM3rPvTGpump",
+      "observation_id": "TRADED_3:10000000:REVERSE_T0",
+      "output_mint": "So11111111111111111111111111111111111111112",
+      "parent_id": "TRADED_3:10000000:BUY_T0",
+      "stratum": "TRADED",
+      "terminal": "NOT_REACHED",
+      "wave": "t0"
+    },
+    {
+      "amount": null,
+      "consumed_call": false,
+      "due_at": "2026-08-18T09:51:11Z",
+      "horizon_seconds": 900,
+      "identity_id": "TRADED_3",
+      "input_mint": "9cRCn9rGT8V2imeM2BaKs13yhMEais3ruM3rPvTGpump",
+      "kind": "SELL_H900",
+      "lateness_slack_seconds": 120,
+      "mint": "9cRCn9rGT8V2imeM2BaKs13yhMEais3ruM3rPvTGpump",
+      "observation_id": "TRADED_3:10000000:SELL_H900",
+      "output_mint": "So11111111111111111111111111111111111111112",
+      "parent_id": "TRADED_3:10000000:BUY_T0",
+      "stratum": "TRADED",
+      "terminal": "SCHEDULED",
+      "wave": "horizon"
+    },
+    {
+      "amount": null,
+      "consumed_call": false,
+      "due_at": "2026-08-18T10:36:11Z",
+      "horizon_seconds": 3600,
+      "identity_id": "TRADED_3",
+      "input_mint": "9cRCn9rGT8V2imeM2BaKs13yhMEais3ruM3rPvTGpump",
+      "kind": "SELL_H3600",
+      "lateness_slack_seconds": 120,
+      "mint": "9cRCn9rGT8V2imeM2BaKs13yhMEais3ruM3rPvTGpump",
+      "observation_id": "TRADED_3:10000000:SELL_H3600",
+      "output_mint": "So11111111111111111111111111111111111111112",
+      "parent_id": "TRADED_3:10000000:BUY_T0",
+      "stratum": "TRADED",
+      "terminal": "SCHEDULED",
+      "wave": "horizon"
+    },
+    {
+      "amount": null,
+      "consumed_call": false,
+      "due_at": "2026-08-18T13:36:11Z",
+      "horizon_seconds": 14400,
+      "identity_id": "TRADED_3",
+      "input_mint": "9cRCn9rGT8V2imeM2BaKs13yhMEais3ruM3rPvTGpump",
+      "kind": "SELL_H14400",
+      "lateness_slack_seconds": 120,
+      "mint": "9cRCn9rGT8V2imeM2BaKs13yhMEais3ruM3rPvTGpump",
+      "observation_id": "TRADED_3:10000000:SELL_H14400",
+      "output_mint": "So11111111111111111111111111111111111111112",
+      "parent_id": "TRADED_3:10000000:BUY_T0",
+      "stratum": "TRADED",
+      "terminal": "EXPLICIT_GAP",
+      "wave": "gap"
+    },
+    {
+      "amount": "10000000",
+      "consumed_call": false,
+      "due_at": "2026-08-18T09:36:11Z",
+      "horizon_seconds": 0,
+      "identity_id": "TRADED_4",
+      "input_mint": "So11111111111111111111111111111111111111112",
+      "kind": "BUY_T0",
+      "mint": "CWZ6BsdnjkDVTGkmL6bGbJXXig6ceef12KvyGQW14cMt",
+      "observation_id": "TRADED_4:10000000:BUY_T0",
+      "output_mint": "CWZ6BsdnjkDVTGkmL6bGbJXXig6ceef12KvyGQW14cMt",
+      "parent_id": null,
+      "stratum": "TRADED",
+      "terminal": "NOT_REACHED",
+      "wave": "t0"
+    },
+    {
+      "amount": null,
+      "consumed_call": false,
+      "due_at": "2026-08-18T09:36:11Z",
+      "horizon_seconds": 0,
+      "identity_id": "TRADED_4",
+      "input_mint": "CWZ6BsdnjkDVTGkmL6bGbJXXig6ceef12KvyGQW14cMt",
+      "kind": "REVERSE_T0",
+      "mint": "CWZ6BsdnjkDVTGkmL6bGbJXXig6ceef12KvyGQW14cMt",
+      "observation_id": "TRADED_4:10000000:REVERSE_T0",
+      "output_mint": "So11111111111111111111111111111111111111112",
+      "parent_id": "TRADED_4:10000000:BUY_T0",
+      "stratum": "TRADED",
+      "terminal": "NOT_REACHED",
+      "wave": "t0"
+    },
+    {
+      "amount": null,
+      "consumed_call": false,
+      "due_at": "2026-08-18T09:51:11Z",
+      "horizon_seconds": 900,
+      "identity_id": "TRADED_4",
+      "input_mint": "CWZ6BsdnjkDVTGkmL6bGbJXXig6ceef12KvyGQW14cMt",
+      "kind": "SELL_H900",
+      "lateness_slack_seconds": 120,
+      "mint": "CWZ6BsdnjkDVTGkmL6bGbJXXig6ceef12KvyGQW14cMt",
+      "observation_id": "TRADED_4:10000000:SELL_H900",
+      "output_mint": "So11111111111111111111111111111111111111112",
+      "parent_id": "TRADED_4:10000000:BUY_T0",
+      "stratum": "TRADED",
+      "terminal": "SCHEDULED",
+      "wave": "horizon"
+    },
+    {
+      "amount": null,
+      "consumed_call": false,
+      "due_at": "2026-08-18T10:36:11Z",
+      "horizon_seconds": 3600,
+      "identity_id": "TRADED_4",
+      "input_mint": "CWZ6BsdnjkDVTGkmL6bGbJXXig6ceef12KvyGQW14cMt",
+      "kind": "SELL_H3600",
+      "lateness_slack_seconds": 120,
+      "mint": "CWZ6BsdnjkDVTGkmL6bGbJXXig6ceef12KvyGQW14cMt",
+      "observation_id": "TRADED_4:10000000:SELL_H3600",
+      "output_mint": "So11111111111111111111111111111111111111112",
+      "parent_id": "TRADED_4:10000000:BUY_T0",
+      "stratum": "TRADED",
+      "terminal": "SCHEDULED",
+      "wave": "horizon"
+    },
+    {
+      "amount": null,
+      "consumed_call": false,
+      "due_at": "2026-08-18T13:36:11Z",
+      "horizon_seconds": 14400,
+      "identity_id": "TRADED_4",
+      "input_mint": "CWZ6BsdnjkDVTGkmL6bGbJXXig6ceef12KvyGQW14cMt",
+      "kind": "SELL_H14400",
+      "lateness_slack_seconds": 120,
+      "mint": "CWZ6BsdnjkDVTGkmL6bGbJXXig6ceef12KvyGQW14cMt",
+      "observation_id": "TRADED_4:10000000:SELL_H14400",
+      "output_mint": "So11111111111111111111111111111111111111112",
+      "parent_id": "TRADED_4:10000000:BUY_T0",
+      "stratum": "TRADED",
+      "terminal": "EXPLICIT_GAP",
+      "wave": "gap"
+    },
+    {
+      "amount": "10000000",
+      "consumed_call": false,
+      "due_at": "2026-08-18T09:36:11Z",
+      "horizon_seconds": 0,
+      "identity_id": "TRADED_5",
+      "input_mint": "So11111111111111111111111111111111111111112",
+      "kind": "BUY_T0",
+      "mint": "98sMhvDwXj1RQi5c5Mndm3vPe9cBqPrbLaufMXFNMh5g",
+      "observation_id": "TRADED_5:10000000:BUY_T0",
+      "output_mint": "98sMhvDwXj1RQi5c5Mndm3vPe9cBqPrbLaufMXFNMh5g",
+      "parent_id": null,
+      "stratum": "TRADED",
+      "terminal": "NOT_REACHED",
+      "wave": "t0"
+    },
+    {
+      "amount": null,
+      "consumed_call": false,
+      "due_at": "2026-08-18T09:36:11Z",
+      "horizon_seconds": 0,
+      "identity_id": "TRADED_5",
+      "input_mint": "98sMhvDwXj1RQi5c5Mndm3vPe9cBqPrbLaufMXFNMh5g",
+      "kind": "REVERSE_T0",
+      "mint": "98sMhvDwXj1RQi5c5Mndm3vPe9cBqPrbLaufMXFNMh5g",
+      "observation_id": "TRADED_5:10000000:REVERSE_T0",
+      "output_mint": "So11111111111111111111111111111111111111112",
+      "parent_id": "TRADED_5:10000000:BUY_T0",
+      "stratum": "TRADED",
+      "terminal": "NOT_REACHED",
+      "wave": "t0"
+    },
+    {
+      "amount": null,
+      "consumed_call": false,
+      "due_at": "2026-08-18T09:51:11Z",
+      "horizon_seconds": 900,
+      "identity_id": "TRADED_5",
+      "input_mint": "98sMhvDwXj1RQi5c5Mndm3vPe9cBqPrbLaufMXFNMh5g",
+      "kind": "SELL_H900",
+      "lateness_slack_seconds": 120,
+      "mint": "98sMhvDwXj1RQi5c5Mndm3vPe9cBqPrbLaufMXFNMh5g",
+      "observation_id": "TRADED_5:10000000:SELL_H900",
+      "output_mint": "So11111111111111111111111111111111111111112",
+      "parent_id": "TRADED_5:10000000:BUY_T0",
+      "stratum": "TRADED",
+      "terminal": "SCHEDULED",
+      "wave": "horizon"
+    },
+    {
+      "amount": null,
+      "consumed_call": false,
+      "due_at": "2026-08-18T10:36:11Z",
+      "horizon_seconds": 3600,
+      "identity_id": "TRADED_5",
+      "input_mint": "98sMhvDwXj1RQi5c5Mndm3vPe9cBqPrbLaufMXFNMh5g",
+      "kind": "SELL_H3600",
+      "lateness_slack_seconds": 120,
+      "mint": "98sMhvDwXj1RQi5c5Mndm3vPe9cBqPrbLaufMXFNMh5g",
+      "observation_id": "TRADED_5:10000000:SELL_H3600",
+      "output_mint": "So11111111111111111111111111111111111111112",
+      "parent_id": "TRADED_5:10000000:BUY_T0",
+      "stratum": "TRADED",
+      "terminal": "SCHEDULED",
+      "wave": "horizon"
+    },
+    {
+      "amount": null,
+      "consumed_call": false,
+      "due_at": "2026-08-18T13:36:11Z",
+      "horizon_seconds": 14400,
+      "identity_id": "TRADED_5",
+      "input_mint": "98sMhvDwXj1RQi5c5Mndm3vPe9cBqPrbLaufMXFNMh5g",
+      "kind": "SELL_H14400",
+      "lateness_slack_seconds": 120,
+      "mint": "98sMhvDwXj1RQi5c5Mndm3vPe9cBqPrbLaufMXFNMh5g",
+      "observation_id": "TRADED_5:10000000:SELL_H14400",
+      "output_mint": "So11111111111111111111111111111111111111112",
+      "parent_id": "TRADED_5:10000000:BUY_T0",
+      "stratum": "TRADED",
+      "terminal": "EXPLICIT_GAP",
+      "wave": "gap"
+    },
+    {
+      "amount": "10000000",
+      "consumed_call": false,
+      "due_at": "2026-08-18T09:36:11Z",
+      "horizon_seconds": 0,
+      "identity_id": "TRADED_6",
+      "input_mint": "So11111111111111111111111111111111111111112",
+      "kind": "BUY_T0",
+      "mint": "SPCXxcqXj6e5dJDVNovHN8744zkbhM2bYudU45BimGb",
+      "observation_id": "TRADED_6:10000000:BUY_T0",
+      "output_mint": "SPCXxcqXj6e5dJDVNovHN8744zkbhM2bYudU45BimGb",
+      "parent_id": null,
+      "stratum": "TRADED",
+      "terminal": "NOT_REACHED",
+      "wave": "t0"
+    },
+    {
+      "amount": null,
+      "consumed_call": false,
+      "due_at": "2026-08-18T09:36:11Z",
+      "horizon_seconds": 0,
+      "identity_id": "TRADED_6",
+      "input_mint": "SPCXxcqXj6e5dJDVNovHN8744zkbhM2bYudU45BimGb",
+      "kind": "REVERSE_T0",
+      "mint": "SPCXxcqXj6e5dJDVNovHN8744zkbhM2bYudU45BimGb",
+      "observation_id": "TRADED_6:10000000:REVERSE_T0",
+      "output_mint": "So11111111111111111111111111111111111111112",
+      "parent_id": "TRADED_6:10000000:BUY_T0",
+      "stratum": "TRADED",
+      "terminal": "NOT_REACHED",
+      "wave": "t0"
+    },
+    {
+      "amount": null,
+      "consumed_call": false,
+      "due_at": "2026-08-18T09:51:11Z",
+      "horizon_seconds": 900,
+      "identity_id": "TRADED_6",
+      "input_mint": "SPCXxcqXj6e5dJDVNovHN8744zkbhM2bYudU45BimGb",
+      "kind": "SELL_H900",
+      "lateness_slack_seconds": 120,
+      "mint": "SPCXxcqXj6e5dJDVNovHN8744zkbhM2bYudU45BimGb",
+      "observation_id": "TRADED_6:10000000:SELL_H900",
+      "output_mint": "So11111111111111111111111111111111111111112",
+      "parent_id": "TRADED_6:10000000:BUY_T0",
+      "stratum": "TRADED",
+      "terminal": "SCHEDULED",
+      "wave": "horizon"
+    },
+    {
+      "amount": null,
+      "consumed_call": false,
+      "due_at": "2026-08-18T10:36:11Z",
+      "horizon_seconds": 3600,
+      "identity_id": "TRADED_6",
+      "input_mint": "SPCXxcqXj6e5dJDVNovHN8744zkbhM2bYudU45BimGb",
+      "kind": "SELL_H3600",
+      "lateness_slack_seconds": 120,
+      "mint": "SPCXxcqXj6e5dJDVNovHN8744zkbhM2bYudU45BimGb",
+      "observation_id": "TRADED_6:10000000:SELL_H3600",
+      "output_mint": "So11111111111111111111111111111111111111112",
+      "parent_id": "TRADED_6:10000000:BUY_T0",
+      "stratum": "TRADED",
+      "terminal": "SCHEDULED",
+      "wave": "horizon"
+    },
+    {
+      "amount": null,
+      "consumed_call": false,
+      "due_at": "2026-08-18T13:36:11Z",
+      "horizon_seconds": 14400,
+      "identity_id": "TRADED_6",
+      "input_mint": "SPCXxcqXj6e5dJDVNovHN8744zkbhM2bYudU45BimGb",
+      "kind": "SELL_H14400",
+      "lateness_slack_seconds": 120,
+      "mint": "SPCXxcqXj6e5dJDVNovHN8744zkbhM2bYudU45BimGb",
+      "observation_id": "TRADED_6:10000000:SELL_H14400",
+      "output_mint": "So11111111111111111111111111111111111111112",
+      "parent_id": "TRADED_6:10000000:BUY_T0",
+      "stratum": "TRADED",
+      "terminal": "EXPLICIT_GAP",
+      "wave": "gap"
+    }
+  ],
+  "owner_phrase": "OK QUOTE_NATIVE_LIVE_VARIATION_CAMPAIGN_V1: Jupiter Tokens V2 /recent plus /toptraded/1h control keyless, quote-only /swap/v2/order, taker omitted, execute forbidden, wallet/signer/transaction forbidden, cash cap $0, no retry/fallback, pace >=2s, call cap 60, bind order route JUPITER-SOLANA-SWAP-V2-ORDER-001, registry v8 additive after first observation, live outcome-blind sample, no T21 freeze reuse, no A24, +15m and +60m sells, +240m explicit gap",
+  "panel_started_at": "2026-08-18T09:36:11Z",
+  "preflight": {
+    "credential_reads": 0,
+    "dns_resolved": true,
+    "host": "api.jup.ag",
+    "observed_at": "2026-08-18T10:36:43Z",
+    "port": 443,
+    "provider_requests": 0,
+    "schema": "smial.pmf-quote-slice-one-shot.credential-free-preflight",
+    "schema_version": "1.0",
+    "tcp_443": true,
+    "tls_verified": true,
+    "tls_version": "TLSv1.3"
+  },
+  "provider_requests": 14,
+  "raw_retention": {
+    "manifests": [
+      {
+        "bytes": 46234,
+        "observation_id": "DISCOVERY:RECENT",
+        "path": "local/quote_native_live_variation_campaign/run=20260818T093550Z-discovery/DISCOVERY_RECENT.json",
+        "retention": "A4_OUTSIDE_GIT",
+        "sha256": "f0d611d0ba4be83dbf4d6f4e17d6a50361722b1b5953c661efd5f21a6e1812aa"
+      },
+      {
+        "bytes": 125056,
+        "observation_id": "DISCOVERY:TRADED",
+        "path": "local/quote_native_live_variation_campaign/run=20260818T093550Z-discovery/DISCOVERY_TRADED.json",
+        "retention": "A4_OUTSIDE_GIT",
+        "sha256": "b0aac757015eb1dbedc3fbb2caa491bd13653c2164f77960c7c52d991799f007"
+      },
+      {
+        "bytes": 1263,
+        "observation_id": "RECENT_1:10000000:BUY_T0",
+        "path": "local/quote_native_live_variation_campaign/run=20260818T093611Z-t0/RECENT_1_10000000_BUY_T0.json",
+        "retention": "A4_OUTSIDE_GIT",
+        "sha256": "521262b1eaa7014e451d4d204b88fa6645ca659fe93d0039810c06777d63bd34"
+      },
+      {
+        "bytes": 1253,
+        "observation_id": "RECENT_1:10000000:REVERSE_T0",
+        "path": "local/quote_native_live_variation_campaign/run=20260818T093611Z-t0/RECENT_1_10000000_REVERSE_T0.json",
+        "retention": "A4_OUTSIDE_GIT",
+        "sha256": "c1cf9c6c69f557d847133f1c3ed307ae51e123abfcb10c757943809c4b944580"
+      },
+      {
+        "bytes": 1262,
+        "observation_id": "RECENT_2:10000000:BUY_T0",
+        "path": "local/quote_native_live_variation_campaign/run=20260818T093611Z-t0/RECENT_2_10000000_BUY_T0.json",
+        "retention": "A4_OUTSIDE_GIT",
+        "sha256": "d4ff9c7b1a009946d8044ce9541fe5e16b3daedf6f06eb2d8ddae47914bd2fe9"
+      },
+      {
+        "bytes": 1255,
+        "observation_id": "RECENT_2:10000000:REVERSE_T0",
+        "path": "local/quote_native_live_variation_campaign/run=20260818T093611Z-t0/RECENT_2_10000000_REVERSE_T0.json",
+        "retention": "A4_OUTSIDE_GIT",
+        "sha256": "b1b34ce76ff8bd242c86fdbeb7f4b91a8b173f24d70020c512975aedbd448036"
+      },
+      {
+        "bytes": 1262,
+        "observation_id": "RECENT_3:10000000:BUY_T0",
+        "path": "local/quote_native_live_variation_campaign/run=20260818T093611Z-t0/RECENT_3_10000000_BUY_T0.json",
+        "retention": "A4_OUTSIDE_GIT",
+        "sha256": "6b17094498742315bc87f713f26d4e46e9865b61177aa8340f1e8631f807d4da"
+      },
+      {
+        "bytes": 56,
+        "observation_id": "RECENT_3:10000000:REVERSE_T0",
+        "path": "local/quote_native_live_variation_campaign/run=20260818T093611Z-t0/RECENT_3_10000000_REVERSE_T0.json",
+        "retention": "A4_OUTSIDE_GIT",
+        "sha256": "b490277b048ca69e3accf0940b3ea5fb8ef2036cce3bb841c327166c6aad34a1"
+      },
+      {
+        "bytes": 1256,
+        "observation_id": "RECENT_1:10000000:SELL_H900",
+        "path": "local/quote_native_live_variation_campaign/run=20260818T095229Z-due/RECENT_1_10000000_SELL_H900.json",
+        "retention": "A4_OUTSIDE_GIT",
+        "sha256": "57e34579ffd6183d9e8b50be86ef2e87442746b17f46176b2d8681cff07a349b"
+      },
+      {
+        "bytes": 1255,
+        "observation_id": "RECENT_2:10000000:SELL_H900",
+        "path": "local/quote_native_live_variation_campaign/run=20260818T095229Z-due/RECENT_2_10000000_SELL_H900.json",
+        "retention": "A4_OUTSIDE_GIT",
+        "sha256": "bb7722ecaa59766b123c8f5ce603ad8f3f81c0455c3d6733f5be9fec23373673"
+      },
+      {
+        "bytes": 1256,
+        "observation_id": "RECENT_3:10000000:SELL_H900",
+        "path": "local/quote_native_live_variation_campaign/run=20260818T095229Z-due/RECENT_3_10000000_SELL_H900.json",
+        "retention": "A4_OUTSIDE_GIT",
+        "sha256": "bccc32841e1be0c563d5e2d0ea61d3ded050fc1b2efcc7ee29aedeaeec833a4f"
+      },
+      {
+        "bytes": 1257,
+        "observation_id": "RECENT_1:10000000:SELL_H3600",
+        "path": "local/quote_native_live_variation_campaign/run=20260818T103643Z-due/RECENT_1_10000000_SELL_H3600.json",
+        "retention": "A4_OUTSIDE_GIT",
+        "sha256": "e641ae477c499d277b99252d5aa3188a0dfbe9437641ddef507816b9e1ce1dc6"
+      },
+      {
+        "bytes": 1256,
+        "observation_id": "RECENT_2:10000000:SELL_H3600",
+        "path": "local/quote_native_live_variation_campaign/run=20260818T103643Z-due/RECENT_2_10000000_SELL_H3600.json",
+        "retention": "A4_OUTSIDE_GIT",
+        "sha256": "fe9a6308c526f8a1c54edd8869f5c99990a123d6905f5428798d3f8c5ecbf13a"
+      },
+      {
+        "bytes": 1257,
+        "observation_id": "RECENT_3:10000000:SELL_H3600",
+        "path": "local/quote_native_live_variation_campaign/run=20260818T103643Z-due/RECENT_3_10000000_SELL_H3600.json",
+        "retention": "A4_OUTSIDE_GIT",
+        "sha256": "fcc94663e9e591acb80bb107ee5a6ad718fcf3c175315557a038822c9961c605"
+      }
+    ],
+    "raw_retained": true
+  },
+  "receipt_id": "EVIDENCE-QUOTE-NATIVE-LIVE-VARIATION-CAMPAIGN-001",
+  "retries": 0,
+  "route_id": "JUPITER-SOLANA-SWAP-V2-ORDER-001",
+  "schema": "smial.quote-native-live-variation-campaign.runtime-receipt",
+  "schema_version": "1.0",
+  "started_at": "2026-08-18T10:36:43Z",
+  "terminal_outcome": "SAMPLE_INVALID_INSUFFICIENT_COMPLETE_XY",
+  "wave": "due"
+}
