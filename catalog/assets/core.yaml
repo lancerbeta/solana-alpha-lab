@@ -24908,7 +24908,7 @@ records:
   classification: {contains_secrets: false, contains_raw_data: false, sensitivity: INTERNAL_NON_SECRET}
 
 - asset_id: CTRL-QUOTE-NATIVE-EVIDENCE-CHANNEL-QUALIFICATION-001
-  record_version: '1.1'
+  record_version: '1.2'
   asset_type: control_document
   purpose: Closed Free-key qualification contract; numeric floors passed; evidence-fit not accepted; current quote-native alpha route paused.
   status: IMPLEMENTED_UNVERIFIED
@@ -24916,7 +24916,7 @@ records:
   as_of: '2026-08-18'
   truth_owner: QUOTE_NATIVE_EVIDENCE_CHANNEL_QUALIFICATION_V1
   location: {kind: git_path, logical_uri: 'repo://docs/tasks/QUOTE_NATIVE_EVIDENCE_CHANNEL_QUALIFICATION_V1.md', repository_path: docs/tasks/QUOTE_NATIVE_EVIDENCE_CHANNEL_QUALIFICATION_V1.md}
-  integrity: {kind: sha256, sha256: caa25775ed088c4db1ced874c0ffc2738bc6f88be965390bd6f3ee6e62ff5912}
+  integrity: {kind: sha256, sha256: 792928bc1cacecf91228de70e8267a1b671880873fd164e44629341c159cbae1}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: contains, target_asset_id: CONFIG-QUOTE-NATIVE-EVIDENCE-CHANNEL-QUALIFICATION-001}

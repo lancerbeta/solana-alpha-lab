@@ -83,7 +83,10 @@ context_requirements:
     DELIVERY_EVIDENCE:
       - docs/evidence/quote_native_live_variation_campaign/a1_quote_native_live_variation_campaign_runtime_receipt_v1.json
       - docs/evidence/quote_native_live_variation_campaign/a1_quote_native_live_variation_campaign_acceptance_v1.json
-      - docs/evidence/quote_native_live_variation_campaign/a1_delivery_completion_evidence_v1.json
+      - docs/evidence/quote_native_evidence_channel_qualification/a1_quote_native_evidence_channel_qualification_acceptance_v1.json
+      - docs/evidence/quote_native_evidence_channel_qualification/a1_delivery_completion_evidence_v1.json
+      - docs/evidence/quote_native_evidence_channel_qualification/a1_delivery_independent_review_v1.json
+      - docs/evidence/quote_native_evidence_channel_qualification/a1_delivery_factory_fit_v1.json
     HISTORICAL_CONTEXT: []
 ---
 

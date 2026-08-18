@@ -20,8 +20,8 @@
     "GOAL_DOD_CRITIC"
   ],
   "review_id": "QUOTE-NATIVE-EVIDENCE-CHANNEL-QUALIFICATION-INDEPENDENT-REVIEW-001",
-  "reviewed_bindings_sha256": "76e1b9361bb9c1965d2c66bb1e6ac4b53ac206722f053edb8b946591657561c7",
-  "reviewed_inventory_sha256": "f08477733470a98b099bf7905f8ee049b09f02d2caa21a0a4b09cd44fb6ee342",
+  "reviewed_bindings_sha256": "3a1bb02b3e9103fb00a96c2e988c751e885872116306dc3939cbb43e3b8e4bd6",
+  "reviewed_inventory_sha256": "408cfd82e93ecbeb21c236cf95e36d5c1e5d2c737975d4a8cd4bd07a568ef8ab",
   "reviews": [
     {
       "findings": [
@@ -42,7 +42,8 @@
         "CHECKED_PROVIDER_REQUESTS_COUNTED_ON_TYPED_STOP",
         "CHECKED_A1_RUNTIME_RECEIPT_IMMUTABLE_CAMPAIGN_BYTES",
         "CHECKED_NO_KEY_IN_RECEIPT_OR_GIT",
-        "CHECKED_NO_RETRY_NO_FALLBACK_NO_DOTENV"
+        "CHECKED_NO_RETRY_NO_FALLBACK_NO_DOTENV",
+        "CHECKED_DELIVERY_EVIDENCE_BINDS_THIS_ATOM_COMPLETION"
       ],
       "role": "CODE_REVIEWER",
       "verdict": "PASS"
