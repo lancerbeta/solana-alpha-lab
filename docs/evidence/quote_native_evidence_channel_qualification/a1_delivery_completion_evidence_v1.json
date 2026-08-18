@@ -9,11 +9,11 @@
   "cloud_bundle_smoke_required": false,
   "factory_fit": {
     "path": "docs/evidence/quote_native_evidence_channel_qualification/a1_delivery_factory_fit_v1.json",
-    "sha256": "1453cc9b1f9cfae9975914c382eb42db34fa2dcf86f222ecfb44f29464c45f69",
+    "sha256": "dc5c0464b9744e12f67424d895c821dc37159446cc731756150a3f3ece223765",
     "verdict": "PASS"
   },
   "implementation_bindings": {
-    "catalog/assets/core.yaml": "5b37918cef8f97ce745c54d4e4088f77f4b62728a35311e4079da72e24cc3c72",
+    "catalog/assets/core.yaml": "c35d8872417b1bde7a8392f4b42836d1d49daf751569ef6127599b3bac3c5bba",
     "catalog/assets/lifecycle.yaml": "44b580cca2de53f0aca169dceb76fbb6ac8fc223b4d02b7d5328c1947af907af",
     "catalog/catalog_manifest.yaml": "c63d10a470e48254ba3a4c65027be96b41c102b620191f39c5481e7ddb544d8b",
     "catalog/generated/asset_edges.json": "e3e4f4ff1eba7becb3caf21266dc1529702889ed8528ddde43992bcf723ebca2",
@@ -21,14 +21,14 @@
     "configs/provider_route_capability_registry_v9.yaml": "dc5cdd4c78a8a907f4bb6de16629c4ee2ef7535c437b33ae9bd8b18eb1847aa1",
     "configs/quote_native_evidence_channel_qualification_v1.yaml": "ca76361b0132bd2b5799feb718d9b611462dc214abe5aa5edd652f781ba9e886",
     "docs/PROJECT_MAP.md": "fceea9627348d560a8a3507757b24b31ad0266cffc259ad63327237b69974653",
-    "docs/evidence/quote_native_evidence_channel_qualification/a1_quote_native_evidence_channel_qualification_acceptance_v1.json": "528784edababf1e11c697e506e5a5761180fe742f72eab0286b2b42931141f21",
+    "docs/evidence/quote_native_evidence_channel_qualification/a1_quote_native_evidence_channel_qualification_acceptance_v1.json": "9a5dab6d2b286abcce53f2d45a0aaaf51ecc29776558ba1868a746c1561b57c8",
     "docs/evidence/quote_native_evidence_channel_qualification/a1_quote_native_evidence_channel_qualification_portal_reconciliation_v1.json": "6493f4bd101f40500647be87039e67d649abdc558edfec0db95857c34fdc69fe",
     "docs/evidence/quote_native_evidence_channel_qualification/a1_quote_native_evidence_channel_qualification_runtime_receipt_v1.json": "d10e0d74de9d175dfcf5e3fd2408e3736d0fa8b94f52d804a34dce590a89e56f",
     "docs/evidence/quote_native_evidence_channel_qualification/a1_quote_native_evidence_channel_qualification_timing_recovery_v1.json": "b7a5c5cd11730d8d5faf3e4f998729bb9edf37e6342343c1d73f441ea73891f5",
     "docs/evidence/quote_native_live_variation_campaign/a2_replan_closure_v1.json": "04d4687a77691b0b03d0f940756fb653b46715e4421d38c6cb0cddf4b5a0a56d",
     "docs/reports/quote_native_evidence_channel_qualification/a1_owner_readout_v1.md": "0de39259320ee39c76aeda719d0bd8839455746288afb12997841b5e3df2875b",
     "docs/superpowers/plans/2026-08-18-quote-native-evidence-channel-qualification.md": "4699703029e1a61ad2bc9bb920b2991c583d380674f6429ffb32c5dac60a5b92",
-    "docs/tasks/QUOTE_NATIVE_EVIDENCE_CHANNEL_QUALIFICATION_V1.md": "ff6c8b1437632662c0707cc9675d9a1406c9ffe2a142cca1fcb3a046c0397e40",
+    "docs/tasks/QUOTE_NATIVE_EVIDENCE_CHANNEL_QUALIFICATION_V1.md": "caa25775ed088c4db1ced874c0ffc2738bc6f88be965390bd6f3ee6e62ff5912",
     "docs/tasks/QUOTE_NATIVE_LIVE_VARIATION_CAMPAIGN_V1.md": "0b4bd1bc0b93aa3738c567bf3d5ae2fe5f46b9957d1c447f30d0831d371c9c33",
     "registries/decisions_negative_results.yaml": "c75cd249d6e8f1563f9b4c62e18f356ad58998e9fd10d000d633f104661dcb92",
     "scripts/recover_quote_native_evidence_timing.py": "1a26498404e608f3cb25158a503df8d16a1a7cc5b68ed84be53057386474d16a",
@@ -36,6 +36,8 @@
     "src/solana_alpha_lab/provider_route_capability_registry_v9.py": "d64d29b16de912f710ce02e242d65387df0203df7fac94fb28c33853a6fd5f6d",
     "src/solana_alpha_lab/quote_native_evidence_channel_qualification.py": "1381650306cabcf4011fa9302b4035c40e483868afcc22a14662b76772ce6558",
     "src/solana_alpha_lab/quote_native_evidence_timing_recovery.py": "f6f36b660d12035f34eb29dcca4802842ac966f0345ed196dcb8c0d0e0eb6fcb",
+    "tests/test_catalog.py": "ed220568810a05c6b7d71171598eaac5e986fd690a7b95e5bafb3c1d80a3659e",
+    "tests/test_lifecycle_registries.py": "bc53576b8a1e9ea29b64d326c61ba057f16ea1b158bc1542c65ce1ea055566b2",
     "tests/test_provider_route_capability_registry_v9.py": "5746cd103421679889821a41df76600de777693bec90cc173b479cf8281a62f5",
     "tests/test_quote_native_evidence_channel_qualification.py": "fb9f2340443b9a5d7659cedd1371c091162558bc309488e87edb09af4e2c1ae9",
     "tests/test_quote_native_evidence_timing_recovery.py": "3ceae2fb398ef42853cc083ff923d0c4820764cdb310e8195b9693db0e9dbeac"
@@ -79,7 +81,7 @@
     "github_ci": "ENFORCED_LIVE_AT_GUARDED_MERGE",
     "independent_review": {
       "path": "docs/evidence/quote_native_evidence_channel_qualification/a1_delivery_independent_review_v1.json",
-      "sha256": "629d10e0d3ba0d74a9704a95122bc6096ffbae2ec5c5679162aa70739cee2ccd",
+      "sha256": "c36a7f2900bddb75d595e721b99aac808abc4e5d0f1d9323b8b016df0a74bf71",
       "verdict": "PASS"
     },
     "project_checks": [

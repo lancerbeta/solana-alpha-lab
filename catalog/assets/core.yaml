@@ -3842,7 +3842,7 @@ records:
     logical_uri: raw://task08_lifecycle_discovery_probe_v1/run=t08a5-20260725T084127Z/partitions/probe.parquet
   integrity:
     kind: sha256
-    sha256: a81246032718a61fdc0e4cd3e3628bcbf8c7a07ec59de4e528f0acb6e5e9eba7
+    sha256: 079dc1401b4da3cf0e1d63d2b20210e017252f26d93c4dd2afd8af7d950fcb6a
   access:
     mode: read_only
     method: runtime_attestation
@@ -8945,7 +8945,7 @@ records:
     logical_uri: raw://task17a_execution_capacity_quote_panel_v1+repair_01
   integrity:
     kind: sha256
-    sha256: 4df0a121e7b7b234d31e5e77b5865c4a307601d4214a8c55fbe979706bad7d8b
+    sha256: 15c9ba7641c15c5511b308485cc230d3bff977f6529c6b86019673e91ee8a0a2
   access:
     mode: read_only
     method: runtime_attestation
@@ -24916,7 +24916,7 @@ records:
   as_of: '2026-08-18'
   truth_owner: QUOTE_NATIVE_EVIDENCE_CHANNEL_QUALIFICATION_V1
   location: {kind: git_path, logical_uri: 'repo://docs/tasks/QUOTE_NATIVE_EVIDENCE_CHANNEL_QUALIFICATION_V1.md', repository_path: docs/tasks/QUOTE_NATIVE_EVIDENCE_CHANNEL_QUALIFICATION_V1.md}
-  integrity: {kind: sha256, sha256: ff6c8b1437632662c0707cc9675d9a1406c9ffe2a142cca1fcb3a046c0397e40}
+  integrity: {kind: sha256, sha256: caa25775ed088c4db1ced874c0ffc2738bc6f88be965390bd6f3ee6e62ff5912}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: contains, target_asset_id: CONFIG-QUOTE-NATIVE-EVIDENCE-CHANNEL-QUALIFICATION-001}
@@ -25184,7 +25184,7 @@ records:
   as_of: '2026-08-18'
   truth_owner: QUOTE_NATIVE_EVIDENCE_CHANNEL_QUALIFICATION_V1
   location: {kind: git_path, logical_uri: 'repo://docs/evidence/quote_native_evidence_channel_qualification/a1_quote_native_evidence_channel_qualification_acceptance_v1.json', repository_path: docs/evidence/quote_native_evidence_channel_qualification/a1_quote_native_evidence_channel_qualification_acceptance_v1.json}
-  integrity: {kind: sha256, sha256: 528784edababf1e11c697e506e5a5761180fe742f72eab0286b2b42931141f21}
+  integrity: {kind: sha256, sha256: 9a5dab6d2b286abcce53f2d45a0aaaf51ecc29776558ba1868a746c1561b57c8}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: derived_from, target_asset_id: EVIDENCE-QUOTE-NATIVE-EVIDENCE-CHANNEL-QUALIFICATION-001}

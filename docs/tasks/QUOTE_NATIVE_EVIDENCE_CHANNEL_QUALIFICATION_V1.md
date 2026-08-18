@@ -21,6 +21,8 @@ managed_write_set:
   - src/solana_alpha_lab/quote_native_evidence_channel_qualification.py
   - scripts/run_quote_native_evidence_channel_qualification.py
   - tests/test_quote_native_evidence_channel_qualification.py
+  - tests/test_catalog.py
+  - tests/test_lifecycle_registries.py
   - src/solana_alpha_lab/quote_native_evidence_timing_recovery.py
   - scripts/recover_quote_native_evidence_timing.py
   - tests/test_quote_native_evidence_timing_recovery.py
