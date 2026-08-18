@@ -1,0 +1,61 @@
+schema: smial.quote-native-evidence-fit-panel
+schema_version: '1.0'
+atom_id: QUOTE_NATIVE_EVIDENCE_FIT_PANEL_V1
+as_of: '2026-08-18'
+external_authority:
+  capture_authorized: true
+  owner_phrase: 'OK QUOTE_NATIVE_EVIDENCE_FIT_PANEL_V1: Jupiter /swap/v2/order quote-only, taker omitted, execute forbidden, wallet/signer/transaction forbidden, cash cap $0, no retry/fallback, call cap 40, bind registry v7 route JUPITER-SOLANA-SWAP-V2-ORDER-001'
+  credential_reads: false
+  dotenv_reads: false
+  execute: false
+  build: false
+  taker: OMITTED_QUOTE_ONLY
+  cash_cap_usd_cents: 0
+  call_cap: 40
+provider_route:
+  route_id: JUPITER-SOLANA-SWAP-V2-ORDER-001
+  registry: configs/provider_route_capability_registry_v7.yaml
+  endpoint: https://api.jup.ag/swap/v2/order
+  method: GET
+  host: api.jup.ag
+  official_docs: https://developers.jup.ag/docs/swap/order-and-execute
+wrapped_sol_mint: So11111111111111111111111111111111111111112
+slippage_bps: '100'
+notionals_atomic:
+- '10000000'
+- '1000000'
+horizon_seconds:
+- 900
+- 3600
+- 14400
+identities:
+- identity_id: A24_POST_MIGRATION
+  mint: DMwbVy48dWVKGe9z1pcVnwF3HLMLrqWdDLfbvx8RchhK
+  source_kind: GIT_FROZEN
+  source_path: configs/pmf_quote_slice_v1.yaml
+  post_migration_status: GIT_NAMED_POST_MIGRATION
+- identity_id: T21_R2_MINT_A
+  mint: 2Ezm4w3gFdymRAyhx9KEsbJV9NA79Y7UoiNWeXNFpump
+  source_kind: GIT_FROZEN
+  source_path: configs/task21_final_cohort_freeze_v1.yaml
+  post_migration_status: GIT_NAMED_INDEPENDENT_NOT_PROVEN_POST_MIGRATION
+- identity_id: T21_R2_MINT_B
+  mint: 2HU2VftbJ7Fp9P5pEbneNsRhax8boHhTVS1KLnYrpump
+  source_kind: GIT_FROZEN
+  source_path: configs/task21_final_cohort_freeze_v1.yaml
+  post_migration_status: GIT_NAMED_INDEPENDENT_NOT_PROVEN_POST_MIGRATION
+- identity_id: T21_R2_MINT_C
+  mint: 2JdM5MHiXjsQz5QgnSQfbidZDTVXCLki74jMYgJapump
+  source_kind: GIT_FROZEN
+  source_path: configs/task21_final_cohort_freeze_v1.yaml
+  post_migration_status: GIT_NAMED_INDEPENDENT_NOT_PROVEN_POST_MIGRATION
+runtime_limits:
+  timeout_seconds: 20.0
+  max_response_bytes: 500000
+execution_controls:
+  retries: 0
+  fallback: false
+  persist_transaction_bytes: false
+  provider_requests_max: 40
+  t0_provider_requests_max: 16
+  live_market_discovery: false

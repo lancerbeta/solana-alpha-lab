@@ -24192,6 +24192,152 @@ records:
   search_terms: [PMF, ATTEMPT, PREP, OWNER_READOUT]
   classification: {contains_secrets: false, contains_raw_data: false, sensitivity: INTERNAL_NON_SECRET}
 
+- asset_id: EVIDENCE-QUOTE-NATIVE-EVIDENCE-FIT-PANEL-001
+  record_version: '1.0'
+  asset_type: evidence
+  purpose: Observed t0 quote-native Jupiter V2 /order panel; A24 and T21_R2_MINT_A quoted, B/C not reached after rate limit.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-08-18'
+  truth_owner: QUOTE_NATIVE_EVIDENCE_FIT_PANEL_V1
+  location: {kind: git_path, logical_uri: 'repo://docs/evidence/quote_native_evidence_fit_panel/a1_quote_native_evidence_fit_panel_runtime_receipt_v1.json', repository_path: docs/evidence/quote_native_evidence_fit_panel/a1_quote_native_evidence_fit_panel_runtime_receipt_v1.json}
+  integrity: {kind: sha256, sha256: cf65b918280a61fe395d9e7a7974a8af4c17f5fa7cd6bcf30d4a597e59e70ba1}
+  access: {mode: read_only, method: file, network_required: false, secrets_required: false}
+  relations:
+  - {relation_type: derived_from, target_asset_id: CTRL-QUOTE-NATIVE-EVIDENCE-FIT-PANEL-001}
+  - {relation_type: depends_on, target_asset_id: CONFIG-PROVIDER-ROUTE-CAPABILITY-REGISTRY-007}
+  - {relation_type: validated_by, target_asset_id: TEST-QUOTE-NATIVE-EVIDENCE-FIT-PANEL-001}
+  consumers: [FACTORY-001, GOAL-OWNER]
+  evidence: []
+  search_terms: [QUOTE_NATIVE, EVIDENCE_FIT, JUPITER_SWAP_V2, T0_PANEL_OBSERVED]
+  classification: {contains_secrets: false, contains_raw_data: false, sensitivity: INTERNAL_NON_SECRET}
+
+- asset_id: EVIDENCE-QUOTE-NATIVE-EVIDENCE-FIT-PANEL-ACCEPTANCE-001
+  record_version: '1.0'
+  asset_type: evidence
+  purpose: Acceptance that the quote-native t0 panel quoted a second independent identity without taker or execute.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-08-18'
+  truth_owner: QUOTE_NATIVE_EVIDENCE_FIT_PANEL_V1
+  location: {kind: git_path, logical_uri: 'repo://docs/evidence/quote_native_evidence_fit_panel/a1_quote_native_evidence_fit_panel_acceptance_v1.json', repository_path: docs/evidence/quote_native_evidence_fit_panel/a1_quote_native_evidence_fit_panel_acceptance_v1.json}
+  integrity: {kind: sha256, sha256: 61338c99e84a0452c5b7974972b2e6f8299406611cfc504c4b05cfb34ce1e9f0}
+  access: {mode: read_only, method: file, network_required: false, secrets_required: false}
+  relations: [{relation_type: derived_from, target_asset_id: EVIDENCE-QUOTE-NATIVE-EVIDENCE-FIT-PANEL-001}]
+  consumers: [FACTORY-001, GOAL-OWNER]
+  evidence: []
+  search_terms: [QUOTE_NATIVE, ACCEPTANCE, T0_PANEL]
+  classification: {contains_secrets: false, contains_raw_data: false, sensitivity: INTERNAL_NON_SECRET}
+
+- asset_id: REPORT-QUOTE-NATIVE-EVIDENCE-FIT-PANEL-001
+  record_version: '1.0'
+  asset_type: control_document
+  purpose: Russian owner readout for the quote-native t0 panel, rate-limit stop, and remaining scheduled sells.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-08-18'
+  truth_owner: QUOTE_NATIVE_EVIDENCE_FIT_PANEL_V1
+  location: {kind: git_path, logical_uri: 'repo://docs/reports/quote_native_evidence_fit_panel/a1_owner_readout_v1.md', repository_path: docs/reports/quote_native_evidence_fit_panel/a1_owner_readout_v1.md}
+  integrity: {kind: sha256, sha256: d2feacf3edf49b22eba245a4b762886feaaa7835ec1b7bcee0f0a3271ea772cd}
+  access: {mode: read_only, method: file, network_required: false, secrets_required: false}
+  relations: [{relation_type: derived_from, target_asset_id: EVIDENCE-QUOTE-NATIVE-EVIDENCE-FIT-PANEL-ACCEPTANCE-001}]
+  consumers: [FACTORY-001, GOAL-OWNER]
+  evidence: []
+  search_terms: [QUOTE_NATIVE, OWNER_READOUT, RATE_LIMIT]
+  classification: {contains_secrets: false, contains_raw_data: false, sensitivity: INTERNAL_NON_SECRET}
+
+- asset_id: CTRL-QUOTE-NATIVE-EVIDENCE-FIT-PANEL-001
+  record_version: '1.0'
+  asset_type: control_document
+  purpose: Harness-valid contract for the authorized quote-native Jupiter V2 /order measurement panel.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-08-18'
+  truth_owner: QUOTE_NATIVE_EVIDENCE_FIT_PANEL_V1
+  location: {kind: git_path, logical_uri: 'repo://docs/tasks/QUOTE_NATIVE_EVIDENCE_FIT_PANEL_V1.md', repository_path: docs/tasks/QUOTE_NATIVE_EVIDENCE_FIT_PANEL_V1.md}
+  integrity: {kind: sha256, sha256: b904c10f968108c3e734dc3634a7d613141e2982f88345b95e6b4f583d4933a6}
+  access: {mode: read_only, method: file, network_required: false, secrets_required: false}
+  relations:
+  - {relation_type: contains, target_asset_id: MODULE-QUOTE-NATIVE-EVIDENCE-FIT-PANEL-001}
+  - {relation_type: contains, target_asset_id: SCRIPT-QUOTE-NATIVE-EVIDENCE-FIT-PANEL-001}
+  - {relation_type: depends_on, target_asset_id: CONFIG-PROVIDER-ROUTE-CAPABILITY-REGISTRY-007}
+  consumers: [FACTORY-001, GOAL-OWNER]
+  evidence: []
+  search_terms: [QUOTE_NATIVE, TASK_CONTRACT, PANEL]
+  classification: {contains_secrets: false, contains_raw_data: false, sensitivity: INTERNAL_NON_SECRET}
+
+- asset_id: CONFIG-QUOTE-NATIVE-EVIDENCE-FIT-PANEL-001
+  record_version: '1.0'
+  asset_type: configuration
+  purpose: Frozen Git identities, notionals, horizons, and keyless quote-only policy for the panel.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-08-18'
+  truth_owner: QUOTE_NATIVE_EVIDENCE_FIT_PANEL_V1
+  location: {kind: git_path, logical_uri: 'repo://configs/quote_native_evidence_fit_panel_v1.yaml', repository_path: configs/quote_native_evidence_fit_panel_v1.yaml}
+  integrity: {kind: sha256, sha256: bc049b6037610f292feb5c79f10a20684604424c3c4125886955c4758b8905b7}
+  access: {mode: read_only, method: file, network_required: false, secrets_required: false}
+  relations: [{relation_type: governed_by, target_asset_id: CTRL-QUOTE-NATIVE-EVIDENCE-FIT-PANEL-001}]
+  consumers: [FACTORY-001]
+  evidence: []
+  search_terms: [QUOTE_NATIVE, PANEL, CONFIG]
+  classification: {contains_secrets: false, contains_raw_data: false, sensitivity: INTERNAL_NON_SECRET}
+
+- asset_id: MODULE-QUOTE-NATIVE-EVIDENCE-FIT-PANEL-001
+  record_version: '1.0'
+  asset_type: script
+  purpose: Fail-closed keyless Jupiter V2 quote panel; due-wave consumes the frozen t0 schedule only.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-08-18'
+  truth_owner: QUOTE_NATIVE_EVIDENCE_FIT_PANEL_V1
+  location: {kind: git_path, logical_uri: 'repo://src/solana_alpha_lab/quote_native_evidence_fit_panel.py', repository_path: src/solana_alpha_lab/quote_native_evidence_fit_panel.py}
+  integrity: {kind: sha256, sha256: 25bd0a6165f5525c2c277854cd0c0df18bd20c1fd9e7c1ff8529d7a0164ab02b}
+  access: {mode: read_only, method: file, network_required: false, secrets_required: false}
+  relations:
+  - {relation_type: depends_on, target_asset_id: CONFIG-QUOTE-NATIVE-EVIDENCE-FIT-PANEL-001}
+  - {relation_type: depends_on, target_asset_id: MODULE-PMF-QUOTE-SLICE-ONE-SHOT-001}
+  consumers: [FACTORY-001]
+  evidence: []
+  search_terms: [QUOTE_NATIVE, MODULE, JUPITER]
+  classification: {contains_secrets: false, contains_raw_data: false, sensitivity: INTERNAL_NON_SECRET}
+
+- asset_id: SCRIPT-QUOTE-NATIVE-EVIDENCE-FIT-PANEL-001
+  record_version: '1.0'
+  asset_type: script
+  purpose: Runner for the authorized t0 quote-native panel, due-wave prior receipt, and A4 raw retention.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-08-18'
+  truth_owner: QUOTE_NATIVE_EVIDENCE_FIT_PANEL_V1
+  location: {kind: git_path, logical_uri: 'repo://scripts/run_quote_native_evidence_fit_panel.py', repository_path: scripts/run_quote_native_evidence_fit_panel.py}
+  integrity: {kind: sha256, sha256: 631d7830c0d07cb450c5565527cb5e60e1b72862b85679ef5c7b9355912beb5a}
+  access: {mode: read_only, method: file, network_required: false, secrets_required: false}
+  relations: [{relation_type: depends_on, target_asset_id: MODULE-QUOTE-NATIVE-EVIDENCE-FIT-PANEL-001}]
+  consumers: [FACTORY-001]
+  evidence: []
+  search_terms: [QUOTE_NATIVE, RUNNER]
+  classification: {contains_secrets: false, contains_raw_data: false, sensitivity: INTERNAL_NON_SECRET}
+
+- asset_id: TEST-QUOTE-NATIVE-EVIDENCE-FIT-PANEL-001
+  record_version: '1.0'
+  asset_type: script
+  purpose: Targeted tests that due-wave keeps frozen dues, transport is not T0_PANEL_OBSERVED, and 429 is not protocol fail.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-08-18'
+  truth_owner: QUOTE_NATIVE_EVIDENCE_FIT_PANEL_V1
+  location: {kind: git_path, logical_uri: 'repo://tests/test_quote_native_evidence_fit_panel.py', repository_path: tests/test_quote_native_evidence_fit_panel.py}
+  integrity: {kind: sha256, sha256: 3e23918fa9809dd179348982e11d00c5a84977b7ffd37ab891c0eee2842d524e}
+  access: {mode: read_only, method: file, network_required: false, secrets_required: false}
+  relations:
+  - {relation_type: depends_on, target_asset_id: MODULE-QUOTE-NATIVE-EVIDENCE-FIT-PANEL-001}
+  - {relation_type: depends_on, target_asset_id: EVIDENCE-QUOTE-NATIVE-EVIDENCE-FIT-PANEL-001}
+  consumers: [FACTORY-001]
+  evidence: []
+  search_terms: [QUOTE_NATIVE, TESTS]
+  classification: {contains_secrets: false, contains_raw_data: false, sensitivity: INTERNAL_NON_SECRET}
+
 - asset_id: CTRL-FACTORY-V1-OPERATIONAL-READINESS-001
   record_version: '1.0'
   asset_type: control_document
@@ -24201,7 +24347,7 @@ records:
   as_of: '2026-08-18'
   truth_owner: FACTORY-V1-OPERATIONAL-READINESS-V1
   location: {kind: git_path, logical_uri: 'repo://docs/tasks/FACTORY-V1-OPERATIONAL-READINESS-V1.md', repository_path: docs/tasks/FACTORY-V1-OPERATIONAL-READINESS-V1.md}
-  integrity: {kind: sha256, sha256: 40aceaa25462e0e63dce54467c762d044180bb2e79d2d4385bf5499da9e43f4e}
+  integrity: {kind: sha256, sha256: d63e458bfec43d4af56a9f8105e81fc933c1529bf93e269403411c127228e401}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: governed_by, target_asset_id: ARCH-INTENT-005}

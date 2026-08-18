@@ -7,9 +7,9 @@ owner: GOAL_OWNER
 allowed_routes: [DESIGN_ONLY, DIRECT_CURSOR_DELIVERY]
 expected_repository: lancerbeta/solana-alpha-lab
 git_binding:
-  expected_base: 57fd8b4c915d0149825a5d64f8f9942999cf5bfa
+  expected_base: 084d311596b35bea3cf156360b81e65b47c62b92
   expected_upstream: origin/main
-  expected_upstream_oid: 57fd8b4c915d0149825a5d64f8f9942999cf5bfa
+  expected_upstream_oid: 084d311596b35bea3cf156360b81e65b47c62b92
   expected_branch: cursor/factory-v1-operational-readiness
   dirty_mode: ALLOW_REPORTED
 objective: Canonize Factory v1 operational readiness as an accepted Git-native product direction without implementing cockpit, runner, runtime, or a numbered task chain.
