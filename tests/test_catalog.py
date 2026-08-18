@@ -85,6 +85,7 @@ class CatalogImportTests(unittest.TestCase):
                 "DECISION-RC002-H11-PARK-FROM-PRIORITY-001",
                 "DECISION-RC001-H13-PARK-FROM-PRIORITY-001",
                 "DECISION-QUOTE-NATIVE-EVIDENCE-CHANNEL-INVALID-CAPTURE-001",
+                "DECISION-QUOTE-NATIVE-ADMISSIBLE-FRICTION-AUDITION-001",
             ],
         )
         self.assertTrue(

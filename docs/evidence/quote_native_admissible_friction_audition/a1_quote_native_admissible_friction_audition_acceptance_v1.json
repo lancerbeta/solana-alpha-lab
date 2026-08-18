@@ -1,0 +1,121 @@
+{
+  "schema": "smial.quote-native-admissible-friction-audition.acceptance",
+  "schema_version": "1.0",
+  "acceptance_id": "EVIDENCE-QUOTE-NATIVE-ADMISSIBLE-FRICTION-AUDITION-ACCEPTANCE-001",
+  "as_of": "2026-08-18",
+  "atom_id": "QUOTE_NATIVE_ADMISSIBLE_FRICTION_AUDITION_V1",
+  "terminal": "DIRECTIONAL_HINT_NOT_CONFIRMATION",
+  "capture_contract": "VALID_CAPTURE_CONTRACT",
+  "numeric_floors": "PASSED",
+  "owner_decision": "FRESH_ADMISSIBLE_FRICTION_AUDITION",
+  "family_close": false,
+  "move_2_executed": false,
+  "source_runtime_receipt": "docs/evidence/quote_native_admissible_friction_audition/a1_quote_native_admissible_friction_audition_runtime_receipt_v1.json",
+  "source_runtime_receipt_sha256": "75f60a155b7db6ddb8c801c9ff5060ce5e4e7fe641b836ff35edeb91534c308e",
+  "capture": {
+    "accepted": true,
+    "blockers": [],
+    "consumed_count": 50,
+    "attempt_reservation_before_credential_read": true,
+    "hash_bound_row_observed_at": true,
+    "searchable_y_kind": "SELL_H900"
+  },
+  "registry": {
+    "path": "configs/provider_route_capability_registry_v9.yaml",
+    "sha256": "dc5cdd4c78a8a907f4bb6de16629c4ee2ef7535c437b33ae9bd8b18eb1847aa1",
+    "route_ids": [
+      "JUPITER-SOLANA-TOKENS-V2-RECENT-FREE-API-KEY-001",
+      "JUPITER-SOLANA-TOKENS-V2-TOPTRADED-FREE-API-KEY-001",
+      "JUPITER-SOLANA-SWAP-V2-ORDER-FREE-API-KEY-001"
+    ]
+  },
+  "cohort": {
+    "frozen_cell_count": 12,
+    "recent_cell_count": 6,
+    "traded_cell_count": 6,
+    "sample_class": "LIVE_OUTCOME_BLIND_TOKENS_V2_FREE_KEY"
+  },
+  "provider_observations": {
+    "provider_requests": 50,
+    "credential_reads": 1,
+    "retries": 0,
+    "fallbacks": 0,
+    "all_http_status_counts": {
+      "200": 49,
+      "400": 1
+    },
+    "token_http_status_counts": {
+      "200": 2
+    },
+    "swap_http_status_counts": {
+      "200": 47,
+      "400": 1
+    },
+    "provider_typed_failure_count": 1,
+    "rate_limited_count": 0,
+    "raw_manifest_count": 50,
+    "safe_response_header_names": [
+      "x-api-gateway-request-id"
+    ]
+  },
+  "criteria": {
+    "success_min_complete_xy": 10,
+    "success_min_time_separated": 6,
+    "observed_complete_xy": 12,
+    "observed_time_separated": 10,
+    "both_strata_represented": true,
+    "success_passed": true,
+    "control_min_complete_xy": 6,
+    "control_min_time_separated_share": "0.5",
+    "traded_complete_xy": 6,
+    "traded_time_separated": 6,
+    "traded_time_separated_share": "1",
+    "control_kill_triggered": false,
+    "h3600_moved_count": 9,
+    "h3600_y_equals_x_count": 2,
+    "h3600_role": "PREDECLARED_ROBUSTNESS_NOT_SEARCHABLE_Y",
+    "concordant_pairs": 31,
+    "discordant_pairs": 14,
+    "tied_pairs": 0,
+    "concordance_rate": "0.6888888888888888888888888889"
+  },
+  "side_effects": {
+    "cash_spend_usd_cents": 0,
+    "execute_calls": 0,
+    "build_calls": 0,
+    "taker_supplied": false,
+    "wallet_signer_transaction_actions": 0,
+    "paid_plan": false,
+    "second_provider": false
+  },
+  "review_blockers": [],
+  "limitations": [
+    "SCREENING_HINT_NOT_OOS_CONFIRMATION",
+    "H14400_EXPLICIT_GAP",
+    "ONE_HTTP_400_TYPED_MISSING_H3600_CELL",
+    "TWO_H900_Y_EQUALS_X_CELLS_EXCLUDED_FROM_DIRECTION",
+    "WRAPPED_SCORER_NESTED_NON_CLAIMS_NOT_CANONICAL",
+    "NO_NETRETURN",
+    "NO_ALPHA"
+  ],
+  "non_claims": [
+    "NO_ALPHA",
+    "NO_NETRETURN",
+    "NO_MOVE_2_EXECUTED",
+    "NO_EXECUTE_OR_BUILD",
+    "NO_TAKER_OR_SIGNER",
+    "NO_PAID_PLAN",
+    "NO_SECOND_PROVIDER",
+    "NO_RAW_BODY_IN_GIT",
+    "NO_H3600_SEARCHABLE_Y",
+    "NO_RECAPTURE_ONLY_SUFFIX",
+    "NO_FAMILY_CLOSE",
+    "NO_H13_H11_H07_H02_UNPARK",
+    "NO_CANONICAL_DONE_AS_ALPHA",
+    "NO_THRESHOLD_FIT"
+  ],
+  "next_boundary": "OWNER_DECISION_MOVE_2_FRESH_OOS_CONTRACT_OR_LEAVE_HINT_UNEXTENDED",
+  "project_sources_disposition": {
+    "kind": "NO_CHANGE"
+  }
+}
