@@ -17,8 +17,8 @@
     "GOAL_DOD_CRITIC"
   ],
   "review_id": "QUOTE-NATIVE-FRICTION-H900-FALSIFIER-INDEPENDENT-REVIEW-001",
-  "reviewed_bindings_sha256": "51e091c3332c36f176c93a11c258337a3edd0e8ef429fcc60e7ea31b5c5c79ae",
-  "reviewed_inventory_sha256": "f3f120bbf64e1b50aedeb51a7d2ae884980d5cc1dcbf88139b6d313820ee9445",
+  "reviewed_bindings_sha256": "3377abed0dbf64a7d28946388bd9620b69a13f4c2d4711086c959685b0bfb1ab",
+  "reviewed_inventory_sha256": "61e7c82f2d4370f0255d8b77fab18ca4284677c4c8ce18780857e8eb02094836",
   "reviews": [
     {
       "findings": [
@@ -42,7 +42,10 @@
         "CHECKED_H3600_H14400_EXPLICIT_GAP",
         "CHECKED_CONSUMED_H900_RECEIPT_REJECTED",
         "CHECKED_T0_CAP_8_TOTAL_CAP_16",
-        "CHECKED_Y_EQUALS_X_IS_SAMPLE_INVALID_NOT_HINT"
+        "CHECKED_Y_EQUALS_X_IS_SAMPLE_INVALID_NOT_HINT",
+        "CHECKED_CONSUMED_ATOM_STOP_BEFORE_OWN_ATOM_ID",
+        "CHECKED_DUE_SCHEDULE_REBINDS_CELLS",
+        "CHECKED_FOUR_FREEZE_MINT_LITERALS"
       ],
       "role": "CODE_REVIEWER",
       "verdict": "PASS"
