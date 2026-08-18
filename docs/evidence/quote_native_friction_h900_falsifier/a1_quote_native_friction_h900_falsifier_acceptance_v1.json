@@ -6,23 +6,29 @@
   "call_cap": 16,
   "cash_spend_usd_cents": 0,
   "cheapest_falsifier": "WORSE_T0_FRICTION_DOES_NOT_RANK_WORSE_H900_RECOVERY",
-  "cheapest_falsifier_result": "NOT_TRIGGERED_ON_TWO_COMPLETE_CELLS_WITH_Y_EQUALS_X",
+  "cheapest_falsifier_result": "NOT_TRIGGERED_NO_TIME_SEPARATED_COMPLETE_XY_Y_EQUALS_X",
   "complete_xy_count": 2,
-  "concordance_rate": "1",
-  "concordant_pairs": 1,
+  "concordance_rate": null,
+  "concordant_pairs": 0,
   "credential_reads": 0,
   "discordant_pairs": 0,
   "execute": "FORBIDDEN",
   "execution_claim": false,
   "family_close": false,
-  "gap_horizons": ["SELL_H3600", "SELL_H14400"],
+  "gap_horizons": [
+    "SELL_H3600",
+    "SELL_H14400"
+  ],
   "gap_status": "EXPLICIT_GAP_NO_BACKFILL",
   "h900_due_at": "2026-08-18T08:11:21Z",
   "h900_observed_at": "2026-08-18T08:11:39Z",
   "h900_quote_observed_count": 3,
   "historical_receipts_rewritten": false,
   "hypothesis_id": "HYP-RC003-QUOTE-FRICTION-H900-V1",
-  "identities_complete_xy": ["T21_R2_MINT_B", "T21_R2_MINT_C"],
+  "identities_complete_xy": [
+    "T21_R2_MINT_B",
+    "T21_R2_MINT_C"
+  ],
   "identity_source": "GIT_FROZEN_T21_UNUSED_NO_LIVE_DISCOVERY",
   "limitations": [
     "RATE_LIMIT_STOPPED_REMAINING_CELLS",
@@ -35,7 +41,7 @@
   "live_PIT_claim": false,
   "live_registry_id": "PROVIDER-ROUTE-CAPABILITY-REGISTRY-007",
   "live_universe_claim": false,
-  "mechanism_verdict": "DIRECTIONAL_HINT_NOT_CONFIRMATION",
+  "mechanism_verdict": "SAMPLE_INVALID_INSUFFICIENT_COMPLETE_XY",
   "non_claims": [
     "NO_LIVE_PIT_CLAIM",
     "NO_EXECUTION_CLAIM",
@@ -68,10 +74,12 @@
   "retries": 0,
   "route_id": "JUPITER-SOLANA-SWAP-V2-ORDER-001",
   "runtime_receipt": "docs/evidence/quote_native_friction_h900_falsifier/a1_quote_native_friction_h900_falsifier_runtime_receipt_v1.json",
-  "runtime_receipt_sha256": "201b26f0a85a85460faf3a3ed58a7d1f002068f44e2db79bdc3dd9a68a4d7fe2",
+  "runtime_receipt_sha256": "19536c8a574b01c6127682454a4fc4c064af11b7a066b1306fd9bcab42ae5de9",
   "sample_class": "STALE_OUTCOME_BLIND_T21_UNUSED_NOT_LIVE_UNIVERSE",
   "schema": "smial.quote-native-friction-h900-falsifier.acceptance",
   "schema_version": "1.0",
   "taker": "OMITTED_QUOTE_ONLY",
-  "terminal": "DIRECTIONAL_HINT_NOT_CONFIRMATION"
+  "terminal": "SAMPLE_INVALID_INSUFFICIENT_COMPLETE_XY",
+  "time_separated_complete_xy_count": 0,
+  "y_equals_x_count": 2
 }

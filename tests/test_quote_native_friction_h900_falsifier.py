@@ -193,15 +193,17 @@ class FrictionH900Tests(unittest.TestCase):
             prior_receipt=t0,
             opener=_ScriptedOpener(
                 [
-                    (_quote_body("10900000"), 200),
                     (_quote_body("10800000"), 200),
                     (_quote_body("10700000"), 200),
                     (_quote_body("10600000"), 200),
+                    (_quote_body("10500000"), 200),
                 ]
             ),
         )
         self.assertEqual(due["terminal_outcome"], "DIRECTIONAL_HINT_NOT_CONFIRMATION")
         self.assertEqual(due["mechanism"]["complete_xy_count"], 4)
+        self.assertEqual(due["mechanism"]["time_separated_complete_xy_count"], 4)
+        self.assertEqual(due["mechanism"]["y_equals_x_count"], 0)
         self.assertGreater(due["mechanism"]["concordant_pairs"], due["mechanism"]["discordant_pairs"])
         self.assertIs(due["mechanism"]["family_close"], False)
 
@@ -233,6 +235,58 @@ class FrictionH900Tests(unittest.TestCase):
         self.assertEqual(scored["cells"][0]["y_status"], "MISSING")
         self.assertEqual(scored["verdict"], "SAMPLE_INVALID_ROUTE_DOMINATED")
         self.assertIs(scored["family_close"], False)
+
+    def test_y_equals_x_is_sample_invalid_not_directional_hint(self) -> None:
+        scored = score_mechanism(
+            [
+                {
+                    "identity_id": "T21_R2_MINT_B",
+                    "kind": "BUY_T0",
+                    "terminal": "QUOTE_OBSERVED",
+                    "amount": "10000000",
+                    "quote": {"out_amount": "315000000000"},
+                },
+                {
+                    "identity_id": "T21_R2_MINT_B",
+                    "kind": "REVERSE_T0",
+                    "terminal": "QUOTE_OBSERVED",
+                    "quote": {"out_amount": "9755375"},
+                },
+                {
+                    "identity_id": "T21_R2_MINT_B",
+                    "kind": "SELL_H900",
+                    "terminal": "QUOTE_OBSERVED",
+                    "quote": {"out_amount": "9755375"},
+                },
+                {
+                    "identity_id": "T21_R2_MINT_C",
+                    "kind": "BUY_T0",
+                    "terminal": "QUOTE_OBSERVED",
+                    "amount": "10000000",
+                    "quote": {"out_amount": "351000000000"},
+                },
+                {
+                    "identity_id": "T21_R2_MINT_C",
+                    "kind": "REVERSE_T0",
+                    "terminal": "QUOTE_OBSERVED",
+                    "quote": {"out_amount": "9727199"},
+                },
+                {
+                    "identity_id": "T21_R2_MINT_C",
+                    "kind": "SELL_H900",
+                    "terminal": "QUOTE_OBSERVED",
+                    "quote": {"out_amount": "9727199"},
+                },
+            ]
+        )
+        self.assertEqual(scored["complete_xy_count"], 2)
+        self.assertEqual(scored["time_separated_complete_xy_count"], 0)
+        self.assertEqual(scored["y_equals_x_count"], 2)
+        self.assertIs(scored["concordance_rate"], None)
+        self.assertEqual(scored["verdict"], "SAMPLE_INVALID_INSUFFICIENT_COMPLETE_XY")
+        self.assertIs(scored["family_close"], False)
+        self.assertIn("NO_TIME_SEPARATED_MECHANISM_ON_Y_EQUALS_X", scored["non_claims"])
+        self.assertIn("NO_MOVE_2_EARNED", scored["non_claims"])
 
     def test_late_h900_is_missed_offset_without_call(self) -> None:
         quoted = _quote_body()

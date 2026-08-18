@@ -17,7 +17,8 @@
   "limitations": [
     "RATE_LIMIT_STOPPED_REMAINING_CELLS",
     "STALE_OUTCOME_BLIND_T21_UNUSED_NOT_LIVE_UNIVERSE",
-    "H3600_H14400_EXPLICIT_GAP_NO_BACKFILL"
+    "H3600_H14400_EXPLICIT_GAP_NO_BACKFILL",
+    "Y_EQUALS_X_ON_COMPLETE_CELLS_QUOTE_UNCHANGED_OVER_900S"
   ],
   "mechanism": {
     "cells": [
@@ -37,6 +38,7 @@
         "router": "metis",
         "x_quoted_roundtrip_friction": "-0.0244625",
         "x_status": "OBSERVED",
+        "y_equals_x": true,
         "y_quoted_liquidation_recovery": "-0.0244625",
         "y_status": "OBSERVED"
       },
@@ -56,6 +58,7 @@
         "router": "metis",
         "x_quoted_roundtrip_friction": "-0.0272801",
         "x_status": "OBSERVED",
+        "y_equals_x": true,
         "y_quoted_liquidation_recovery": "-0.0272801",
         "y_status": "OBSERVED"
       },
@@ -75,6 +78,7 @@
         "router": "metis",
         "x_quoted_roundtrip_friction": null,
         "x_status": "MISSING",
+        "y_equals_x": null,
         "y_quoted_liquidation_recovery": "-0.0247072",
         "y_status": "OBSERVED"
       },
@@ -88,13 +92,14 @@
         "router": null,
         "x_quoted_roundtrip_friction": null,
         "x_status": "MISSING",
+        "y_equals_x": null,
         "y_quoted_liquidation_recovery": null,
         "y_status": "MISSING"
       }
     ],
     "complete_xy_count": 2,
-    "concordance_rate": "1",
-    "concordant_pairs": 1,
+    "concordance_rate": null,
+    "concordant_pairs": 0,
     "discordant_pairs": 0,
     "expected_direction": "more_negative_t0_roundtrip_friction_ranks_more_negative_h900_quoted_recovery",
     "family_close": false,
@@ -105,10 +110,14 @@
       "NOT_ALPHA",
       "NOT_LIVE_UNIVERSE",
       "NO_THRESHOLD_FIT",
-      "NO_FAMILY_CLOSE_ON_SAMPLE_INVALID"
+      "NO_FAMILY_CLOSE_ON_SAMPLE_INVALID",
+      "NO_TIME_SEPARATED_MECHANISM_ON_Y_EQUALS_X",
+      "NO_MOVE_2_EARNED"
     ],
     "tied_pairs": 0,
-    "verdict": "DIRECTIONAL_HINT_NOT_CONFIRMATION"
+    "time_separated_complete_xy_count": 0,
+    "verdict": "SAMPLE_INVALID_INSUFFICIENT_COMPLETE_XY",
+    "y_equals_x_count": 2
   },
   "new_provider_requests": 3,
   "non_claims": [
@@ -123,7 +132,9 @@
     "NO_THRESHOLD_FIT",
     "NO_A24_OR_T21A_SAMPLE",
     "NO_H3600_OR_H14400_OBSERVATION",
-    "NO_FAMILY_CLOSE_ON_SAMPLE_INVALID"
+    "NO_FAMILY_CLOSE_ON_SAMPLE_INVALID",
+    "NO_TIME_SEPARATED_MECHANISM_ON_Y_EQUALS_X",
+    "NO_MOVE_2_EARNED"
   ],
   "observations": [
     {
@@ -895,6 +906,6 @@
   "schema": "smial.quote-native-friction-h900-falsifier.runtime-receipt",
   "schema_version": "1.0",
   "started_at": "2026-08-18T08:11:39Z",
-  "terminal_outcome": "DIRECTIONAL_HINT_NOT_CONFIRMATION",
+  "terminal_outcome": "SAMPLE_INVALID_INSUFFICIENT_COMPLETE_XY",
   "wave": "due"
 }

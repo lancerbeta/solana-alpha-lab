@@ -24552,7 +24552,7 @@ records:
   as_of: '2026-08-18'
   truth_owner: QUOTE_NATIVE_FRICTION_H900_FALSIFIER_V1
   location: {kind: git_path, logical_uri: 'repo://docs/tasks/QUOTE_NATIVE_FRICTION_H900_FALSIFIER_V1.md', repository_path: docs/tasks/QUOTE_NATIVE_FRICTION_H900_FALSIFIER_V1.md}
-  integrity: {kind: sha256, sha256: 18442c1e58cd68eb0db7d317d3ed513850400c5dfc8b0a9cd4bf54087f0c2685}
+  integrity: {kind: sha256, sha256: d3b195a5991fcf776b418522a5a0e37fe7bed51913d79d412b6611a13779fb91}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: contains, target_asset_id: MODULE-QUOTE-NATIVE-FRICTION-H900-FALSIFIER-001}
@@ -24583,13 +24583,13 @@ records:
 - asset_id: MODULE-QUOTE-NATIVE-FRICTION-H900-FALSIFIER-001
   record_version: '1.0'
   asset_type: script
-  purpose: Fail-closed t0-friction clock and predeclared X to Y score with missing-not-zero.
+  purpose: Fail-closed t0-friction clock and predeclared X to Y score; Y equals X is sample-invalid, not a hint.
   status: IMPLEMENTED_UNVERIFIED
   origin: REPOSITORY
   as_of: '2026-08-18'
   truth_owner: QUOTE_NATIVE_FRICTION_H900_FALSIFIER_V1
   location: {kind: git_path, logical_uri: 'repo://src/solana_alpha_lab/quote_native_friction_h900_falsifier.py', repository_path: src/solana_alpha_lab/quote_native_friction_h900_falsifier.py}
-  integrity: {kind: sha256, sha256: 0ee7d346847be1482335b7485b22cc5e2ddc177c7371cabf5306ca3aa8402434}
+  integrity: {kind: sha256, sha256: 82822609498b70cd1538dad939e5cef1579b2649287e444e111e039f65808cf8}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: depends_on, target_asset_id: CONFIG-QUOTE-NATIVE-FRICTION-H900-FALSIFIER-001}
@@ -24619,13 +24619,13 @@ records:
 - asset_id: TEST-QUOTE-NATIVE-FRICTION-H900-FALSIFIER-001
   record_version: '1.0'
   asset_type: script
-  purpose: Targeted tests that A24/T21 A are forbidden, missing X is not zero, and concordance is predeclared.
+  purpose: Targeted tests that A24/T21 A are forbidden, missing X is not zero, and Y equals X is not a hint.
   status: IMPLEMENTED_UNVERIFIED
   origin: REPOSITORY
   as_of: '2026-08-18'
   truth_owner: QUOTE_NATIVE_FRICTION_H900_FALSIFIER_V1
   location: {kind: git_path, logical_uri: 'repo://tests/test_quote_native_friction_h900_falsifier.py', repository_path: tests/test_quote_native_friction_h900_falsifier.py}
-  integrity: {kind: sha256, sha256: fa31bc1e2044f31e8f16eb9789cfc61c36f00ec8e7e092f734817bae2392f357}
+  integrity: {kind: sha256, sha256: bb5d4aad8bcecbf6ab4729165956e2ba0765cdb7a6bd94be76de80b70590b7e7}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: depends_on, target_asset_id: MODULE-QUOTE-NATIVE-FRICTION-H900-FALSIFIER-001}
@@ -24637,13 +24637,13 @@ records:
 - asset_id: EVIDENCE-QUOTE-NATIVE-FRICTION-H900-FALSIFIER-001
   record_version: '1.0'
   asset_type: evidence
-  purpose: Observed unused-T21 t0 friction clock plus honest +15m sells; Y equals X on complete cells.
+  purpose: Observed unused-T21 t0 friction clock plus honest +15m sells; Y equals X is sample-invalid.
   status: IMPLEMENTED_UNVERIFIED
   origin: REPOSITORY
   as_of: '2026-08-18'
   truth_owner: QUOTE_NATIVE_FRICTION_H900_FALSIFIER_V1
   location: {kind: git_path, logical_uri: 'repo://docs/evidence/quote_native_friction_h900_falsifier/a1_quote_native_friction_h900_falsifier_runtime_receipt_v1.json', repository_path: docs/evidence/quote_native_friction_h900_falsifier/a1_quote_native_friction_h900_falsifier_runtime_receipt_v1.json}
-  integrity: {kind: sha256, sha256: 201b26f0a85a85460faf3a3ed58a7d1f002068f44e2db79bdc3dd9a68a4d7fe2}
+  integrity: {kind: sha256, sha256: 19536c8a574b01c6127682454a4fc4c064af11b7a066b1306fd9bcab42ae5de9}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: derived_from, target_asset_id: CTRL-QUOTE-NATIVE-FRICTION-H900-FALSIFIER-001}
@@ -24651,19 +24651,19 @@ records:
   - {relation_type: validated_by, target_asset_id: TEST-QUOTE-NATIVE-FRICTION-H900-FALSIFIER-001}
   consumers: [FACTORY-001, GOAL-OWNER]
   evidence: []
-  search_terms: [QUOTE_NATIVE, FRICTION, H900, DIRECTIONAL_HINT_NOT_CONFIRMATION]
+  search_terms: [QUOTE_NATIVE, FRICTION, H900, SAMPLE_INVALID_INSUFFICIENT_COMPLETE_XY]
   classification: {contains_secrets: false, contains_raw_data: false, sensitivity: INTERNAL_NON_SECRET}
 
 - asset_id: EVIDENCE-QUOTE-NATIVE-FRICTION-H900-FALSIFIER-ACCEPTANCE-001
   record_version: '1.0'
   asset_type: evidence
-  purpose: Acceptance that two complete X/Y cells ranked as hinted but Y equaled X on a stale cohort.
+  purpose: Acceptance that two complete X/Y cells were Y equals X and therefore sample-invalid.
   status: IMPLEMENTED_UNVERIFIED
   origin: REPOSITORY
   as_of: '2026-08-18'
   truth_owner: QUOTE_NATIVE_FRICTION_H900_FALSIFIER_V1
   location: {kind: git_path, logical_uri: 'repo://docs/evidence/quote_native_friction_h900_falsifier/a1_quote_native_friction_h900_falsifier_acceptance_v1.json', repository_path: docs/evidence/quote_native_friction_h900_falsifier/a1_quote_native_friction_h900_falsifier_acceptance_v1.json}
-  integrity: {kind: sha256, sha256: a3aee9c0ce2526b295f36039d6d6d83dac1004fb269cd0c533128ca540489078}
+  integrity: {kind: sha256, sha256: 9e201f0d55c46f24669386e9e3584f8b877d490037e7495ca305a477b5f20074}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations: [{relation_type: derived_from, target_asset_id: EVIDENCE-QUOTE-NATIVE-FRICTION-H900-FALSIFIER-001}]
   consumers: [FACTORY-001, GOAL-OWNER]
@@ -24674,13 +24674,13 @@ records:
 - asset_id: REPORT-QUOTE-NATIVE-FRICTION-H900-FALSIFIER-001
   record_version: '1.0'
   asset_type: control_document
-  purpose: Russian owner readout for the friction look, Y-equals-X limitation, and no MOVE 2.
+  purpose: Russian owner readout for the friction look, sample-invalid Y-equals-X, and no MOVE 2.
   status: IMPLEMENTED_UNVERIFIED
   origin: REPOSITORY
   as_of: '2026-08-18'
   truth_owner: QUOTE_NATIVE_FRICTION_H900_FALSIFIER_V1
   location: {kind: git_path, logical_uri: 'repo://docs/reports/quote_native_friction_h900_falsifier/a1_owner_readout_v1.md', repository_path: docs/reports/quote_native_friction_h900_falsifier/a1_owner_readout_v1.md}
-  integrity: {kind: sha256, sha256: 4925b457adb66fd570537a81206843c2886fa405b76352723ec5bb63a6c5636c}
+  integrity: {kind: sha256, sha256: 481fe2dd06225034ec60554882fb10d0658f9475ff9cd8e1dd54d9e0394c1590}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations: [{relation_type: derived_from, target_asset_id: EVIDENCE-QUOTE-NATIVE-FRICTION-H900-FALSIFIER-ACCEPTANCE-001}]
   consumers: [FACTORY-001, GOAL-OWNER]

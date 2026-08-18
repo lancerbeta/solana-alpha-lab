@@ -133,5 +133,5 @@ Consumed H900 outcomes on A24 and T21 A are development evidence only and are no
 4. Observable delayed sell is only `SELL_H900` inside `due_at` plus slack. `SELL_H3600` and `SELL_H14400` are `EXPLICIT_GAP`.
 5. Keyless GET `https://api.jup.ag/swap/v2/order` without `taker`. No `/execute`, `/build`, wallet, `.env`, or transaction bytes in git.
 6. Provider requests ≤ 16, retries 0, fallbacks 0. HTTP 429 is not retried.
-7. Mechanism score treats missing as missing. Family is not closed on `SAMPLE_INVALID_*`.
+7. Mechanism score treats missing as missing. Complete cells with Y equal to X are not time-separated and cannot emit `DIRECTIONAL_HINT_NOT_CONFIRMATION`; they score `SAMPLE_INVALID_INSUFFICIENT_COMPLETE_XY`. Family is not closed on `SAMPLE_INVALID_*`.
 8. Russian readout names X/Y, concordance, and limitations.

@@ -239,7 +239,7 @@ def score_mechanism(observations: list[Mapping[str, Any]]) -> dict[str, object]:
             continue
         by_identity.setdefault(identity_id, {})[kind] = row
     cells: list[dict[str, object]] = []
-    complete: list[tuple[str, Decimal, Decimal]] = []
+    complete: list[tuple[str, Decimal, Decimal, bool]] = []
     h900_observed = 0
     h900_no_route = 0
     for identity_id, kinds in by_identity.items():
@@ -261,6 +261,11 @@ def score_mechanism(observations: list[Mapping[str, Any]]) -> dict[str, object]:
             h900_observed += 1
         if sell_terminal == "NO_ROUTE":
             h900_no_route += 1
+        y_equals_x = (
+            Decimal(x_value) == Decimal(y_value)
+            if x_value is not None and y_value is not None
+            else None
+        )
         cell = {
             "identity_id": identity_id,
             "buy_terminal": str(buy.get("terminal") or "") if isinstance(buy, Mapping) else "",
@@ -270,18 +275,20 @@ def score_mechanism(observations: list[Mapping[str, Any]]) -> dict[str, object]:
             "y_quoted_liquidation_recovery": y_value,
             "x_status": "OBSERVED" if x_value is not None else "MISSING",
             "y_status": "OBSERVED" if y_value is not None else "MISSING",
+            "y_equals_x": y_equals_x,
             "router": (buy.get("quote") or {}).get("router") if isinstance(buy, Mapping) else None,
             "price_impact_pct": (buy.get("quote") or {}).get("price_impact_pct") if isinstance(buy, Mapping) else None,
             "fee_bps": (buy.get("quote") or {}).get("fee_bps") if isinstance(buy, Mapping) else None,
         }
         cells.append(cell)
         if x_value is not None and y_value is not None:
-            complete.append((identity_id, Decimal(x_value), Decimal(y_value)))
+            complete.append((identity_id, Decimal(x_value), Decimal(y_value), bool(y_equals_x)))
+    time_separated = [item for item in complete if not item[3]]
     concordant = 0
     discordant = 0
     tied = 0
-    for index, (_, x_left, y_left) in enumerate(complete):
-        for _, x_right, y_right in complete[index + 1 :]:
+    for index, (_, x_left, y_left, _) in enumerate(time_separated):
+        for _, x_right, y_right, _ in time_separated[index + 1 :]:
             x_delta = x_left - x_right
             y_delta = y_left - y_right
             if x_delta == 0 or y_delta == 0:
@@ -295,20 +302,31 @@ def score_mechanism(observations: list[Mapping[str, Any]]) -> dict[str, object]:
     concordance_rate = (
         str(Decimal(concordant) / Decimal(comparable_pairs)) if comparable_pairs else None
     )
-    if len(complete) < 2:
-        if h900_observed == 0 and h900_no_route >= 1:
-            verdict = "SAMPLE_INVALID_ROUTE_DOMINATED"
-        else:
-            verdict = "SAMPLE_INVALID_INSUFFICIENT_COMPLETE_XY"
-    elif comparable_pairs == 0:
+    y_equals_x_count = sum(1 for item in complete if item[3])
+    if len(complete) < 2 and h900_observed == 0 and h900_no_route >= 1:
+        verdict = "SAMPLE_INVALID_ROUTE_DOMINATED"
+    elif len(time_separated) < 2 or comparable_pairs == 0:
         verdict = "SAMPLE_INVALID_INSUFFICIENT_COMPLETE_XY"
     elif concordant > discordant:
         verdict = "DIRECTIONAL_HINT_NOT_CONFIRMATION"
     else:
         verdict = "MECHANISM_NOT_SUPPORTED_ON_THIS_SAMPLE"
+    non_claims = [
+        "NOT_NETRETURN",
+        "NOT_ALPHA",
+        "NOT_LIVE_UNIVERSE",
+        "NO_THRESHOLD_FIT",
+        "NO_FAMILY_CLOSE_ON_SAMPLE_INVALID",
+    ]
+    if y_equals_x_count:
+        non_claims.extend(
+            ["NO_TIME_SEPARATED_MECHANISM_ON_Y_EQUALS_X", "NO_MOVE_2_EARNED"]
+        )
     return {
         "expected_direction": "more_negative_t0_roundtrip_friction_ranks_more_negative_h900_quoted_recovery",
         "complete_xy_count": len(complete),
+        "time_separated_complete_xy_count": len(time_separated),
+        "y_equals_x_count": y_equals_x_count,
         "concordant_pairs": concordant,
         "discordant_pairs": discordant,
         "tied_pairs": tied,
@@ -318,13 +336,7 @@ def score_mechanism(observations: list[Mapping[str, Any]]) -> dict[str, object]:
         "verdict": verdict,
         "family_close": False,
         "cells": cells,
-        "non_claims": [
-            "NOT_NETRETURN",
-            "NOT_ALPHA",
-            "NOT_LIVE_UNIVERSE",
-            "NO_THRESHOLD_FIT",
-            "NO_FAMILY_CLOSE_ON_SAMPLE_INVALID",
-        ],
+        "non_claims": non_claims,
     }
 
 
@@ -547,6 +559,7 @@ def run_wave(
             raw_bodies[str(row["observation_id"])] = bytes(body)
         observations.append(recorded)
     mechanism = score_mechanism(observations)
+    y_equals_x_count = int(mechanism.get("y_equals_x_count") or 0)
 
     h900_missed = any(str(item.get("terminal")) == "MISSED_OFFSET" for item in observations)
     t0_buys_quoted = sum(
@@ -602,6 +615,7 @@ def run_wave(
             ) else "",
             "STALE_OUTCOME_BLIND_T21_UNUSED_NOT_LIVE_UNIVERSE",
             "H3600_H14400_EXPLICIT_GAP_NO_BACKFILL",
+            "Y_EQUALS_X_ON_COMPLETE_CELLS_QUOTE_UNCHANGED_OVER_900S" if y_equals_x_count else "",
         ) if code],
         "observations": observations,
         "raw_bodies": raw_bodies,
@@ -618,5 +632,10 @@ def run_wave(
             "NO_A24_OR_T21A_SAMPLE",
             "NO_H3600_OR_H14400_OBSERVATION",
             "NO_FAMILY_CLOSE_ON_SAMPLE_INVALID",
+            *(
+                ["NO_TIME_SEPARATED_MECHANISM_ON_Y_EQUALS_X", "NO_MOVE_2_EARNED"]
+                if y_equals_x_count
+                else []
+            ),
         ],
     }

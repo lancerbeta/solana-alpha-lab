@@ -4,7 +4,7 @@
 
 ## Что получилось
 
-Терминал машины: `DIRECTIONAL_HINT_NOT_CONFIRMATION`. Это **не** confirmation, не NetReturn, не live universe и не MOVE 2.
+Терминал машины: `SAMPLE_INVALID_INSUFFICIENT_COMPLETE_XY`. Это **не** directional hint, не confirmation, не NetReturn, не live universe и не MOVE 2.
 
 `panel_started_at`: `2026-08-18T07:56:21Z`. Всего 9 keyless GET на `JUPITER-SOLANA-SWAP-V2-ORDER-001`, без taker, без `/execute`, без credential/.env. Retry 0. Cash $0.
 
@@ -21,9 +21,9 @@ Quote-only atomic amounts (не fill, не NetReturn):
 | T21_R3_MINT_1 | 10000000 | RATE_LIMITED | 9752928 | missing | −2.471% |
 | T21_R3_MINT_2 | NOT_REACHED | NOT_REACHED | SCHEDULED | missing | missing |
 
-Полных X+Y клеток: **2**. Concordance 1/1, поэтому машина дала directional hint. На обеих полных клетках **Y в точности равен X** (тот же `outAmount`). За 900 секунд quoted liquidation не сдвинулась. Это не предсказание будущего, а застывшая котировка stale cohort.
+Полных X+Y клеток: **2**. Time-separated клеток: **0**. Concordance не считается. На обеих полных клетках **Y в точности равен X** (тот же `outAmount`). За 900 секунд quoted liquidation не сдвинулась. Это не предсказание будущего, а застывшая котировка stale cohort; машина поэтому ставит `SAMPLE_INVALID_*`, а не hint.
 
-`SAMPLE_INVALID` не ставился: две полные клетки есть. Family **не** закрывается. Порог не подбирался.
+Family **не** закрывается. Порог не подбирался.
 
 ## Что это не значит
 
