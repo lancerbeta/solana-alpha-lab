@@ -375,6 +375,22 @@ def _halted_remainder(row: Mapping[str, Any], *, results: Mapping[str, Mapping[s
     return recorded
 
 
+def _require_schedule_matches_cells(schedule: list[Mapping[str, Any]]) -> None:
+    seen: list[tuple[str, str]] = []
+    seen_ids: set[str] = set()
+    for row in schedule:
+        identity_id = str(row.get("identity_id") or "")
+        mint = str(row.get("mint") or "")
+        _require(identity_id not in FORBIDDEN_IDS, "A24_OR_T21A_SELECTED")
+        _require(mint not in FORBIDDEN_MINTS, "A24_OR_T21A_SELECTED")
+        if identity_id not in seen_ids:
+            seen_ids.add(identity_id)
+            seen.append((identity_id, mint))
+        if str(row.get("kind") or "") == "BUY_T0":
+            _require(str(row.get("amount") or "") == "10000000", "NOTIONAL_DRIFT")
+    _require(tuple(seen) == tuple((identity_id, mint) for identity_id, mint, _ in CELLS), "CELL_DRIFT")
+
+
 def run_wave(
     policy: Mapping[str, Any],
     *,
@@ -391,8 +407,8 @@ def run_wave(
     if wave == "due":
         _require(isinstance(prior_receipt, Mapping), "PRIOR_RECEIPT_REQUIRED")
         assert prior_receipt is not None
-        _require(prior_receipt.get("atom_id") == ATOM_ID, "OLD_DUE_AT_REBUILT_OR_OLD_RECEIPT_MUTATED")
         _require(prior_receipt.get("atom_id") != CONSUMED_ATOM, "CONSUMED_H900_OUTCOME_REUSED")
+        _require(prior_receipt.get("atom_id") == ATOM_ID, "OLD_DUE_AT_REBUILT_OR_OLD_RECEIPT_MUTATED")
     bindings = bind_identity_sources(root)
     started_at = now.astimezone(UTC)
     tick = clock or _ticking_clock(started_at)
@@ -404,6 +420,7 @@ def run_wave(
         _require(isinstance(raw_schedule, list) and len(raw_schedule) == SCHEDULE_COUNT, "PRIOR_SCHEDULE_INVALID")
         schedule = [dict(item) for item in raw_schedule if isinstance(item, Mapping)]
         _require(len(schedule) == SCHEDULE_COUNT, "SCHEDULE_COUNT_DRIFT")
+        _require_schedule_matches_cells(schedule)
         prior_requests = int(prior_receipt.get("provider_requests", 0))
         _require(prior_requests >= 0, "PRIOR_REQUESTS_INVALID")
     else:

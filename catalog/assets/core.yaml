@@ -24589,7 +24589,7 @@ records:
   as_of: '2026-08-18'
   truth_owner: QUOTE_NATIVE_FRICTION_H900_FALSIFIER_V1
   location: {kind: git_path, logical_uri: 'repo://src/solana_alpha_lab/quote_native_friction_h900_falsifier.py', repository_path: src/solana_alpha_lab/quote_native_friction_h900_falsifier.py}
-  integrity: {kind: sha256, sha256: 82822609498b70cd1538dad939e5cef1579b2649287e444e111e039f65808cf8}
+  integrity: {kind: sha256, sha256: ea9cc34c3280a6beb1d0230508dc628b9e9d0e76b81e876aa6d530c80ab706ce}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: depends_on, target_asset_id: CONFIG-QUOTE-NATIVE-FRICTION-H900-FALSIFIER-001}
@@ -24625,7 +24625,7 @@ records:
   as_of: '2026-08-18'
   truth_owner: QUOTE_NATIVE_FRICTION_H900_FALSIFIER_V1
   location: {kind: git_path, logical_uri: 'repo://tests/test_quote_native_friction_h900_falsifier.py', repository_path: tests/test_quote_native_friction_h900_falsifier.py}
-  integrity: {kind: sha256, sha256: bb5d4aad8bcecbf6ab4729165956e2ba0765cdb7a6bd94be76de80b70590b7e7}
+  integrity: {kind: sha256, sha256: f727a282684cf635cf2bc496b75689d8b895c3b72dc25d83ff5004932bd6408f}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: depends_on, target_asset_id: MODULE-QUOTE-NATIVE-FRICTION-H900-FALSIFIER-001}

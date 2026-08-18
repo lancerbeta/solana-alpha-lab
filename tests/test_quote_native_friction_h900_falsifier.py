@@ -109,6 +109,15 @@ class FrictionH900Tests(unittest.TestCase):
         validate_policy(policy, root=ROOT)
         cells = [(item["identity_id"], item["mint"], item["notional_atomic"]) for item in policy["cells"]]
         self.assertEqual(tuple(cells), CELLS)
+        self.assertEqual(
+            tuple(item[1] for item in CELLS),
+            (
+                "2HU2VftbJ7Fp9P5pEbneNsRhax8boHhTVS1KLnYrpump",
+                "2JdM5MHiXjsQz5QgnSQfbidZDTVXCLki74jMYgJapump",
+                "CWfuB1HDEp9W3xT3prBX8EPa1TQWKh1PmWFot3Gkpump",
+                "8LRXPgAdhFktQzXjRVWgqWBWnMZTexjxsMrtQTQ6pump",
+            ),
+        )
         self.assertNotIn(A24_MINT, str(cells))
         self.assertNotIn(T21_MINTS[0], str(cells))
         self.assertNotIn("A24_POST_MIGRATION", str(cells))
@@ -141,13 +150,34 @@ class FrictionH900Tests(unittest.TestCase):
 
     def test_due_wave_rejects_consumed_h900_receipt(self) -> None:
         old = json.loads(CONSUMED_RECEIPT.read_text(encoding="utf-8"))
-        with self.assertRaisesRegex(Exception, "CONSUMED_H900_OUTCOME_REUSED|OLD_DUE_AT_REBUILT"):
+        with self.assertRaisesRegex(Exception, "CONSUMED_H900_OUTCOME_REUSED"):
             run_wave(
                 _policy(),
                 root=ROOT,
                 wave="due",
                 now=datetime(2026, 8, 18, 10, 15, tzinfo=UTC),
                 prior_receipt=old,
+                opener=_ScriptedOpener([]),
+            )
+
+    def test_due_wave_rejects_forbidden_identity_in_prior(self) -> None:
+        quoted = _quote_body()
+        t0 = run_wave(
+            _policy(),
+            root=ROOT,
+            wave="t0",
+            now=datetime(2026, 8, 18, 10, 0, tzinfo=UTC),
+            opener=_ScriptedOpener([(quoted, 200)] * 8),
+        )
+        t0["observations"][0]["identity_id"] = "A24_POST_MIGRATION"
+        t0["observations"][0]["mint"] = A24_MINT
+        with self.assertRaisesRegex(Exception, "A24_OR_T21A_SELECTED"):
+            run_wave(
+                _policy(),
+                root=ROOT,
+                wave="due",
+                now=datetime(2026, 8, 18, 10, 15, tzinfo=UTC),
+                prior_receipt=t0,
                 opener=_ScriptedOpener([]),
             )
 
@@ -164,6 +194,10 @@ class FrictionH900Tests(unittest.TestCase):
         self.assertEqual(receipt["terminal_outcome"], "T0_FRICTION_CLOCK_ARMED")
         self.assertEqual(receipt["new_provider_requests"], 8)
         self.assertEqual(len(opener.requests), 8)
+        identity_ids = [item["identity_id"] for item in receipt["observations"] if item["kind"] == "BUY_T0"]
+        self.assertEqual(identity_ids, [item[0] for item in CELLS])
+        self.assertNotIn("A24_POST_MIGRATION", str(receipt["observations"]))
+        self.assertNotIn("T21_R2_MINT_A", str(receipt["observations"]))
         gaps = [item for item in receipt["observations"] if item["kind"] in {"SELL_H3600", "SELL_H14400"}]
         self.assertTrue(all(item["terminal"] == "EXPLICIT_GAP" for item in gaps))
 
