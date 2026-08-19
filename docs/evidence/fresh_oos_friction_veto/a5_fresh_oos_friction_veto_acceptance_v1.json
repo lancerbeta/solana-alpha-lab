@@ -1,0 +1,145 @@
+{
+  "acceptance_id": "EVIDENCE-FRESH-OOS-FRICTION-VETO-ACCEPTANCE-001",
+  "as_of": "2026-08-19",
+  "atom_id": "FRESH_OOS_BASELINE_VS_FRICTION_VETO_V1",
+  "audition_scientific_terminal": "DIRECTIONAL_HINT_NOT_CONFIRMATION",
+  "audition_terminal": "DIRECTIONAL_HINT_NOT_CONFIRMATION",
+  "capture": {
+    "accepted": true,
+    "attempt_reservation_before_credential_read": true,
+    "blockers": [],
+    "consumed_count": 50,
+    "hash_bound_row_observed_at": true,
+    "searchable_y_kind": "SELL_H900"
+  },
+  "capture_contract": "VALID_CAPTURE_CONTRACT",
+  "cohort": {
+    "excluded_prior_mint_count": 36,
+    "frozen_cell_count": 12,
+    "prior_mint_reused": false,
+    "recent_cell_count": 6,
+    "sample_class": "LIVE_OUTCOME_BLIND_TOKENS_V2_FREE_KEY_EXCLUDING_A1_MOVE2_COMMISSIONING",
+    "traded_cell_count": 6
+  },
+  "criteria": {
+    "concordance_rate": "0.7333333333333333333333333333",
+    "concordant_pairs": 33,
+    "control_kill_triggered": false,
+    "discordant_pairs": 12,
+    "h3600_moved_count": 10,
+    "h3600_role": "PREDECLARED_ROBUSTNESS_NOT_SEARCHABLE_Y",
+    "h3600_y_equals_x_count": 1,
+    "observed_complete_xy": 11,
+    "observed_time_separated": 10,
+    "success_min_complete_xy": 10,
+    "success_min_time_separated": 6,
+    "success_passed": true,
+    "tied_pairs": 0,
+    "traded_complete_xy": 6,
+    "traded_time_separated": 6,
+    "traded_time_separated_share": "1"
+  },
+  "factory_v1_operational_ready": false,
+  "family_close": true,
+  "hypothesis_specific_core_runner_change": false,
+  "limitations": [
+    "SCREENING_HINT_NOT_OOS_CONFIRMATION",
+    "VETO_STRATUM_UNSTABLE_KEPT_TRADED_ONLY",
+    "NO_POST_HOC_THRESHOLD_SEARCH",
+    "NO_FACTORY_V1_OPERATIONAL_READY",
+    "NO_MOVE_3",
+    "NO_EXTEND_TO_SHADOW"
+  ],
+  "move_3": false,
+  "next_boundary": "CLOSE_EXACT_FRICTION_VETO_FAMILY_NO_THRESHOLD_RESCUE",
+  "non_claims": [
+    "NO_EXECUTE",
+    "NO_TAKER_OR_SIGNER",
+    "NO_TRANSACTION_BYTES_IN_GIT",
+    "NO_ALPHA",
+    "NO_NETRETURN",
+    "NO_MOVE_3",
+    "NO_A1_REPLAY_AS_NEW_RESULT",
+    "NO_MOVE_2_AS_NEW_RESULT",
+    "NO_COMMISSIONING_REPLAY_AS_NEW_RESULT",
+    "NO_PAID_PLAN",
+    "NO_SECOND_PROVIDER",
+    "NO_VPS",
+    "NO_POST_HOC_THRESHOLD_SEARCH"
+  ],
+  "owner_decision": "CLOSE_EXACT_FRICTION_VETO_FAMILY",
+  "owner_visible": {
+    "data": true,
+    "decision": true,
+    "estimand": true,
+    "failure": true,
+    "git_archaeology_required": false,
+    "next": true,
+    "population": true,
+    "question": true,
+    "result": true,
+    "robustness": true,
+    "uncertainty": true
+  },
+  "product_terminal": "CLOSE_EXACT_FRICTION_VETO_FAMILY",
+  "project_sources_disposition": {
+    "kind": "NO_CHANGE"
+  },
+  "provider_observations": {
+    "all_http_status_counts": {
+      "200": 47,
+      "400": 3
+    },
+    "credential_reads": 1,
+    "fallbacks": 0,
+    "provider_requests": 50,
+    "retries": 0,
+    "swap_http_status_counts": {
+      "200": 45,
+      "400": 3
+    },
+    "token_http_status_counts": {
+      "200": 2
+    }
+  },
+  "registry": {
+    "path": "configs/provider_route_capability_registry_v9.yaml",
+    "route_ids": [
+      "JUPITER-SOLANA-TOKENS-V2-RECENT-FREE-API-KEY-001",
+      "JUPITER-SOLANA-TOKENS-V2-TOPTRADED-FREE-API-KEY-001",
+      "JUPITER-SOLANA-SWAP-V2-ORDER-FREE-API-KEY-001"
+    ],
+    "sha256": "dc5cdd4c78a8a907f4bb6de16629c4ee2ef7535c437b33ae9bd8b18eb1847aa1"
+  },
+  "schema": "smial.factory-v1-friction-veto.acceptance",
+  "schema_version": "1.0",
+  "scientific_terminal": "CLOSE_EXACT_FRICTION_VETO_FAMILY",
+  "side_effects": {
+    "build_calls": 0,
+    "cash_spend_usd_cents": 0,
+    "execute_calls": 0,
+    "paid_plan": false,
+    "second_provider": false,
+    "taker_supplied": false,
+    "wallet_signer_transaction_actions": 0
+  },
+  "source_runtime_receipt": "docs/evidence/fresh_oos_friction_veto/a5_fresh_oos_friction_veto_runtime_receipt_v1.json",
+  "source_runtime_receipt_sha256": "9eb063cdd44dacf80248d53ed58020961f1f29295294055d231204a71e944276",
+  "terminal": "CLOSE_EXACT_FRICTION_VETO_FAMILY",
+  "veto": {
+    "baseline_n": 11,
+    "kept_n": 6,
+    "kept_strata": [
+      "TRADED"
+    ],
+    "median_y_baseline": "-0.0144859",
+    "median_y_kept": "-0.00198565",
+    "p90_y_baseline": "0.0131158",
+    "p90_y_kept": "0.09733465",
+    "reason": "STRATUM_UNSTABLE",
+    "rule_id": "FRICTION_VETO_WORSE_THAN_SAMPLE_MEDIAN_X_V1",
+    "stratum_unstable": true,
+    "terminal": "CLOSE_EXACT_FRICTION_VETO_FAMILY",
+    "vetoed_n": 5
+  }
+}

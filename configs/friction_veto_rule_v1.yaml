@@ -1,0 +1,18 @@
+schema: smial.factory-v1-friction-veto-rule
+schema_version: '1.0'
+rule_id: FRICTION_VETO_WORSE_THAN_SAMPLE_MEDIAN_X_V1
+atom_id: FRESH_OOS_BASELINE_VS_FRICTION_VETO_V1
+as_of: '2026-08-19'
+x_field: x_quoted_roundtrip_friction
+y_field: y_quoted_liquidation_recovery
+direction: MORE_NEGATIVE_IS_WORSE
+veto: X_LT_SAMPLE_MEDIAN_COMPLETE_XY
+tie: KEEP
+unknown_x_or_y: EXCLUDE_FROM_SCORED_ARMS_KEEP_IN_BASELINE_DESCRIPTION
+pass_terminal: EXTEND_TO_SHADOW
+fail_terminal: CLOSE_EXACT_FRICTION_VETO_FAMILY
+pass_requires:
+  median_y_kept_gt_median_y_baseline: true
+  p90_y_kept_ge_p90_y_baseline: true
+  both_recent_and_traded_kept: true
+post_hoc_threshold_search: false

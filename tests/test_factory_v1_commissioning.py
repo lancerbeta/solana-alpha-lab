@@ -346,7 +346,7 @@ class FactoryV1CommissioningTests(unittest.TestCase):
             self.assertEqual(job["terminal"], runtime["terminal_outcome"])
             store.close()
 
-    def test_default_application_selects_commissioning_spec(self) -> None:
+    def test_commissioning_spec_remains_selectable(self) -> None:
         spec = load_experiment_spec(ROOT, SPEC_RELATIVE)
         self.assertEqual(
             spec["capabilities"],
@@ -354,45 +354,49 @@ class FactoryV1CommissioningTests(unittest.TestCase):
         )
         with tempfile.TemporaryDirectory() as tmp:
             store = OperationalStore(Path(tmp) / "ops.sqlite")
-            app = FactoryApplication(root=ROOT, store=store)
-            self.assertEqual(app.spec_relative, SPEC_RELATIVE)
-            model = app.read_model()
-            self.assertEqual(
-                model["hypothesis"],
-                "HYP-FACTORY-V1-COMMISSIONING-QUOTE-NATIVE-FREE-KEY-V1",
-            )
-            self.assertIn("question", model)
-            self.assertEqual(model["result"], None)
-            store.close()
+            try:
+                app = FactoryApplication(root=ROOT, store=store, spec_relative=SPEC_RELATIVE)
+                self.assertEqual(app.spec_relative, SPEC_RELATIVE)
+                model = app.read_model()
+                self.assertEqual(
+                    model["hypothesis"],
+                    "HYP-FACTORY-V1-COMMISSIONING-QUOTE-NATIVE-FREE-KEY-V1",
+                )
+                self.assertIn("question", model)
+                self.assertEqual(model["result"], None)
+            finally:
+                store.close()
 
     def test_workbench_exposes_hover_copy_blocks_for_exact_phrase(self) -> None:
         with tempfile.TemporaryDirectory() as tmp:
             store = OperationalStore(Path(tmp) / "ops.sqlite")
-            app = FactoryApplication(root=ROOT, store=store)
-            blocks = owner_copy_blocks(app)
-            self.assertEqual(blocks[0]["id"], "exact-owner-phrase")
-            self.assertEqual(blocks[0]["text"], FACTORY_V1_COMMISSIONING_AUTHORITY_PHRASE)
-            self.assertIn("--authority-phrase", blocks[1]["text"])
-            server = serve(app, host="127.0.0.1", port=0)
-            thread = Thread(target=server.serve_forever, daemon=True)
-            thread.start()
             try:
-                host, port = server.server_address[:2]
-                conn = HTTPConnection(host, port, timeout=2)
-                conn.request("GET", "/")
-                response = conn.getresponse()
-                body = response.read().decode("utf-8")
-                self.assertEqual(response.status, 200)
-                self.assertIn("copy-block", body)
-                self.assertIn("copy-btn", body)
-                self.assertIn("Копировать", body)
-                self.assertIn("FACTORY_V1_COMMISSIONING_HYPOTHESIS_V1", body)
-                self.assertIn("pace &gt;=3s", body)
-                self.assertIn(":hover .copy-btn", body)
-                conn.close()
+                app = FactoryApplication(root=ROOT, store=store, spec_relative=SPEC_RELATIVE)
+                blocks = owner_copy_blocks(app)
+                self.assertEqual(blocks[0]["id"], "exact-owner-phrase")
+                self.assertEqual(blocks[0]["text"], FACTORY_V1_COMMISSIONING_AUTHORITY_PHRASE)
+                self.assertIn("--authority-phrase", blocks[1]["text"])
+                server = serve(app, host="127.0.0.1", port=0)
+                thread = Thread(target=server.serve_forever, daemon=True)
+                thread.start()
+                try:
+                    host, port = server.server_address[:2]
+                    conn = HTTPConnection(host, port, timeout=2)
+                    conn.request("GET", "/")
+                    response = conn.getresponse()
+                    body = response.read().decode("utf-8")
+                    self.assertEqual(response.status, 200)
+                    self.assertIn("copy-block", body)
+                    self.assertIn("copy-btn", body)
+                    self.assertIn("Копировать", body)
+                    self.assertIn("FACTORY_V1_COMMISSIONING_HYPOTHESIS_V1", body)
+                    self.assertIn("pace &gt;=3s", body)
+                    self.assertIn(":hover .copy-btn", body)
+                    conn.close()
+                finally:
+                    server.shutdown()
+                    server.server_close()
             finally:
-                server.shutdown()
-                server.server_close()
                 store.close()
 
 

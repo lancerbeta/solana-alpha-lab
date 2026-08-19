@@ -1,0 +1,14 @@
+schema: smial.factory-v1-friction-veto
+schema_version: '1.0'
+contract_id: FACTORY-V1-FRICTION-VETO-001
+atom_id: FRESH_OOS_BASELINE_VS_FRICTION_VETO_V1
+as_of: '2026-08-19'
+experiment_spec_relative: configs/experiment_specs/fresh_oos_baseline_vs_friction_veto_v1.yaml
+allowlisted_capabilities:
+  - CAP-JUPITER-FREE-KEY-QUOTE-NATIVE-BOUNDED-CAPTURE-001
+authority:
+  provider_calls: GATED_BY_EXACT_OWNER_PHRASE
+  credentials: GATED_BY_EXACT_OWNER_PHRASE
+  deployment: false
+  cash_spend: false
+  wallet_signer_transaction: false
