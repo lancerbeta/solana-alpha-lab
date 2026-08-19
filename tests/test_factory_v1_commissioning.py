@@ -5,7 +5,9 @@ import sys
 import tempfile
 import unittest
 from datetime import UTC, datetime, timedelta
+from http.client import HTTPConnection
 from pathlib import Path
+from threading import Thread
 from typing import Any
 
 import jsonschema
@@ -21,6 +23,7 @@ if str(SRC) not in sys.path:
 from solana_alpha_lab.factory.application import FactoryApplication
 from solana_alpha_lab.factory.experiment_spec import load_experiment_spec
 from solana_alpha_lab.factory.operational_store import OperationalStore
+from solana_alpha_lab.factory.workbench import owner_copy_blocks, serve
 from solana_alpha_lab.quote_native_admissible_friction_audition import (
     FACTORY_COMMISSIONING_ATOM_ID,
     FACTORY_V1_COMMISSIONING_AUTHORITY_PHRASE,
@@ -224,6 +227,36 @@ class FactoryV1CommissioningTests(unittest.TestCase):
                 "HYP-FACTORY-V1-COMMISSIONING-QUOTE-NATIVE-FREE-KEY-V1",
             )
             store.close()
+
+    def test_workbench_exposes_hover_copy_blocks_for_exact_phrase(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            store = OperationalStore(Path(tmp) / "ops.sqlite")
+            app = FactoryApplication(root=ROOT, store=store)
+            blocks = owner_copy_blocks(app)
+            self.assertEqual(blocks[0]["id"], "exact-owner-phrase")
+            self.assertEqual(blocks[0]["text"], FACTORY_V1_COMMISSIONING_AUTHORITY_PHRASE)
+            self.assertIn("--authority-phrase", blocks[1]["text"])
+            server = serve(app, host="127.0.0.1", port=0)
+            thread = Thread(target=server.serve_forever, daemon=True)
+            thread.start()
+            try:
+                host, port = server.server_address[:2]
+                conn = HTTPConnection(host, port, timeout=2)
+                conn.request("GET", "/")
+                response = conn.getresponse()
+                body = response.read().decode("utf-8")
+                self.assertEqual(response.status, 200)
+                self.assertIn("copy-block", body)
+                self.assertIn("copy-btn", body)
+                self.assertIn("Копировать", body)
+                self.assertIn("FACTORY_V1_COMMISSIONING_HYPOTHESIS_V1", body)
+                self.assertIn("pace &gt;=3s", body)
+                self.assertIn(":hover .copy-btn", body)
+                conn.close()
+            finally:
+                server.shutdown()
+                server.server_close()
+                store.close()
 
 
 if __name__ == "__main__":

@@ -25719,7 +25719,7 @@ records:
   as_of: '2026-08-19'
   truth_owner: FACTORY_V1_PRODUCT_KERNEL_LOCAL_VERTICAL_SLICE_V1
   location: {kind: git_path, logical_uri: 'repo://src/solana_alpha_lab/factory/workbench.py', repository_path: src/solana_alpha_lab/factory/workbench.py}
-  integrity: {kind: sha256, sha256: 6377ed782d844edf98ca94c451863d76178f2989cda3dd6f05d97376f8c71b4f}
+  integrity: {kind: sha256, sha256: d91b43b3fcf62095d22ad51cd6213a56db6a0466c01a8f9399d9101629168559}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: depends_on, target_asset_id: MODULE-FACTORY-V1-APPLICATION-001}
@@ -25980,7 +25980,7 @@ records:
   as_of: '2026-08-19'
   truth_owner: FACTORY_V1_COMMISSIONING_HYPOTHESIS_V1
   location: {kind: git_path, logical_uri: 'repo://tests/test_factory_v1_commissioning.py', repository_path: tests/test_factory_v1_commissioning.py}
-  integrity: {kind: sha256, sha256: bc94e339fc32a6be7715ce7e29040c4395b1af125003bc5f375f38c33bc74d0a}
+  integrity: {kind: sha256, sha256: 9f4f32072c063ba986c8197b9a8baff8ad4d3f5cb52bf431a80fada65c5c2794}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: depends_on, target_asset_id: CONFIG-EXPERIMENT-SPEC-FACTORY-V1-COMMISSIONING-001}
