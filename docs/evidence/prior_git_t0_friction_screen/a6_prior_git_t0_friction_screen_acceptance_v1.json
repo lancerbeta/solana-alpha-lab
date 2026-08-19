@@ -1,0 +1,150 @@
+{
+  "acceptance_id": "EVIDENCE-PRIOR-GIT-T0-FRICTION-SCREEN-ACCEPTANCE-001",
+  "as_of": "2026-08-19",
+  "atom_id": "PRIOR_GIT_T0_FRICTION_SCREEN_V1",
+  "audition_scientific_terminal": "CLOSE_EXACT_QUOTE_FRICTION_MECHANISM",
+  "audition_terminal": "CLOSE_EXACT_QUOTE_FRICTION_MECHANISM",
+  "capture": {
+    "accepted": true,
+    "attempt_reservation_before_credential_read": true,
+    "blockers": [],
+    "consumed_count": 50,
+    "hash_bound_row_observed_at": true,
+    "searchable_y_kind": "SELL_H900"
+  },
+  "capture_contract": "VALID_CAPTURE_CONTRACT",
+  "cohort": {
+    "excluded_prior_mint_count": 48,
+    "frozen_cell_count": 12,
+    "prior_mint_reused": false,
+    "recent_cell_count": 6,
+    "sample_class": "LIVE_OUTCOME_BLIND_TOKENS_V2_FREE_KEY_EXCLUDING_A1_MOVE2_COMMISSIONING_ATOM5",
+    "traded_cell_count": 6
+  },
+  "criteria": {
+    "concordance_rate": "0.4181818181818181818181818182",
+    "concordant_pairs": 23,
+    "control_kill_triggered": false,
+    "discordant_pairs": 32,
+    "h3600_moved_count": 11,
+    "h3600_role": "PREDECLARED_ROBUSTNESS_NOT_SEARCHABLE_Y",
+    "h3600_y_equals_x_count": 1,
+    "observed_complete_xy": 12,
+    "observed_time_separated": 11,
+    "success_min_complete_xy": 10,
+    "success_min_time_separated": 6,
+    "success_passed": true,
+    "tied_pairs": 0,
+    "traded_complete_xy": 6,
+    "traded_time_separated": 6,
+    "traded_time_separated_share": "1"
+  },
+  "factory_v1_operational_ready": false,
+  "family_close": true,
+  "frozen_x_cutoff": "-0.0205835",
+  "hypothesis_specific_core_runner_change": false,
+  "limitations": [
+    "SCREENING_HINT_NOT_OOS_CONFIRMATION",
+    "T0_SCREEN_STRATUM_UNSTABLE_KEPT_TRADED_ONLY",
+    "CUTOFF_IS_PRIOR_GIT_COMPLETE_XY_X_NOT_LIVE_T0_ONLY_POLICY",
+    "NO_POST_HOC_THRESHOLD_SEARCH",
+    "NO_FACTORY_V1_OPERATIONAL_READY",
+    "NO_MOVE_3",
+    "NO_EXTEND_TO_SHADOW",
+    "NO_ATOM5_SAMPLE_MEDIAN_REUSED"
+  ],
+  "move_3": false,
+  "next_boundary": "CLOSE_EXACT_T0_FRICTION_SCREEN_FAMILY_NO_THRESHOLD_RESCUE",
+  "non_claims": [
+    "NO_EXECUTE",
+    "NO_TAKER_OR_SIGNER",
+    "NO_TRANSACTION_BYTES_IN_GIT",
+    "NO_ALPHA",
+    "NO_NETRETURN",
+    "NO_MOVE_3",
+    "NO_A1_REPLAY_AS_NEW_RESULT",
+    "NO_MOVE_2_AS_NEW_RESULT",
+    "NO_COMMISSIONING_REPLAY_AS_NEW_RESULT",
+    "NO_ATOM5_REPLAY_AS_NEW_RESULT",
+    "NO_PAID_PLAN",
+    "NO_SECOND_PROVIDER",
+    "NO_VPS",
+    "NO_POST_HOC_THRESHOLD_SEARCH",
+    "NO_DEPLOYABLE_T0_POLICY"
+  ],
+  "owner_decision": "CLOSE_EXACT_T0_FRICTION_SCREEN_FAMILY",
+  "owner_visible": {
+    "data": true,
+    "decision": true,
+    "estimand": true,
+    "failure": true,
+    "git_archaeology_required": false,
+    "next": true,
+    "population": true,
+    "question": true,
+    "result": true,
+    "robustness": true,
+    "uncertainty": true
+  },
+  "peeked_atom5_cutoff_unused": "-0.0116887",
+  "product_terminal": "CLOSE_EXACT_T0_FRICTION_SCREEN_FAMILY",
+  "project_sources_disposition": {
+    "kind": "NO_CHANGE"
+  },
+  "provider_observations": {
+    "all_http_status_counts": {
+      "200": 50
+    },
+    "credential_reads": 1,
+    "fallbacks": 0,
+    "provider_requests": 50,
+    "retries": 0,
+    "swap_http_status_counts": {
+      "200": 48
+    },
+    "token_http_status_counts": {
+      "200": 2
+    }
+  },
+  "registry": {
+    "path": "configs/provider_route_capability_registry_v9.yaml",
+    "route_ids": [
+      "JUPITER-SOLANA-TOKENS-V2-RECENT-FREE-API-KEY-001",
+      "JUPITER-SOLANA-TOKENS-V2-TOPTRADED-FREE-API-KEY-001",
+      "JUPITER-SOLANA-SWAP-V2-ORDER-FREE-API-KEY-001"
+    ],
+    "sha256": "dc5cdd4c78a8a907f4bb6de16629c4ee2ef7535c437b33ae9bd8b18eb1847aa1"
+  },
+  "schema": "smial.factory-v1-prior-git-t0-friction-screen.acceptance",
+  "schema_version": "1.0",
+  "scientific_terminal": "CLOSE_EXACT_T0_FRICTION_SCREEN_FAMILY",
+  "side_effects": {
+    "build_calls": 0,
+    "cash_spend_usd_cents": 0,
+    "execute_calls": 0,
+    "paid_plan": false,
+    "second_provider": false,
+    "taker_supplied": false,
+    "wallet_signer_transaction_actions": 0
+  },
+  "source_runtime_receipt": "docs/evidence/prior_git_t0_friction_screen/a6_prior_git_t0_friction_screen_runtime_receipt_v1.json",
+  "source_runtime_receipt_sha256": "6ae33cd32bcc3cddd03b515b9149a827a8faffaf791816f604e8ee209879a207",
+  "t0_screen": {
+    "baseline_n": 12,
+    "frozen_x_cutoff": "-0.0205835",
+    "kept_n": 5,
+    "kept_strata": [
+      "TRADED"
+    ],
+    "median_y_baseline": "-0.0575068",
+    "median_y_kept": "-0.0028178",
+    "p90_y_baseline": "0.07482754",
+    "p90_y_kept": "0.12733976",
+    "reason": "STRATUM_UNSTABLE",
+    "rule_id": "PRIOR_GIT_T0_FRICTION_SCREEN_V1",
+    "stratum_unstable": true,
+    "terminal": "CLOSE_EXACT_T0_FRICTION_SCREEN_FAMILY",
+    "vetoed_n": 7
+  },
+  "terminal": "CLOSE_EXACT_T0_FRICTION_SCREEN_FAMILY"
+}

@@ -428,6 +428,11 @@
       "target_asset_id": "CTRL-FRESH-OOS-BASELINE-VS-FRICTION-VETO-001"
     },
     {
+      "source_asset_id": "CONFIG-CAPTURE-POLICY-PRIOR-GIT-T0-FRICTION-SCREEN-001",
+      "relation": "governed_by",
+      "target_asset_id": "CTRL-PRIOR-GIT-T0-FRICTION-SCREEN-001"
+    },
+    {
       "source_asset_id": "CONFIG-DELIVERY-CAPABILITY-RADAR-001",
       "relation": "governed_by",
       "target_asset_id": "CTRL-DELIVERY-HARNESS-001"
@@ -498,6 +503,16 @@
       "target_asset_id": "CTRL-FRESH-OOS-BASELINE-VS-FRICTION-VETO-001"
     },
     {
+      "source_asset_id": "CONFIG-EXPERIMENT-SPEC-PRIOR-GIT-T0-FRICTION-SCREEN-001",
+      "relation": "depends_on",
+      "target_asset_id": "SCHEMA-EXPERIMENT-SPEC-001"
+    },
+    {
+      "source_asset_id": "CONFIG-EXPERIMENT-SPEC-PRIOR-GIT-T0-FRICTION-SCREEN-001",
+      "relation": "governed_by",
+      "target_asset_id": "CTRL-PRIOR-GIT-T0-FRICTION-SCREEN-001"
+    },
+    {
       "source_asset_id": "CONFIG-EXPERIMENT-SPEC-QUOTE-NATIVE-ADMISSIBLE-OFFLINE-001",
       "relation": "depends_on",
       "target_asset_id": "EVIDENCE-QUOTE-NATIVE-ADMISSIBLE-FRICTION-AUDITION-001"
@@ -558,6 +573,16 @@
       "target_asset_id": "CTRL-FACTORY-V1-OWNER-COCKPIT-001"
     },
     {
+      "source_asset_id": "CONFIG-FACTORY-V1-PRIOR-GIT-T0-FRICTION-SCREEN-001",
+      "relation": "depends_on",
+      "target_asset_id": "SCHEMA-FACTORY-V1-PRIOR-GIT-T0-FRICTION-SCREEN-001"
+    },
+    {
+      "source_asset_id": "CONFIG-FACTORY-V1-PRIOR-GIT-T0-FRICTION-SCREEN-001",
+      "relation": "governed_by",
+      "target_asset_id": "CTRL-PRIOR-GIT-T0-FRICTION-SCREEN-001"
+    },
+    {
       "source_asset_id": "CONFIG-FACTORY-V1-PRODUCT-KERNEL-001",
       "relation": "depends_on",
       "target_asset_id": "SCHEMA-FACTORY-V1-PRODUCT-KERNEL-001"
@@ -611,6 +636,11 @@
       "source_asset_id": "CONFIG-PMF-QUOTE-SLICE-ONE-SHOT-001",
       "relation": "governed_by",
       "target_asset_id": "CTRL-PMF-QUOTE-SLICE-ONE-SHOT-001"
+    },
+    {
+      "source_asset_id": "CONFIG-PRIOR-GIT-T0-FRICTION-SCREEN-RULE-001",
+      "relation": "governed_by",
+      "target_asset_id": "CTRL-PRIOR-GIT-T0-FRICTION-SCREEN-001"
     },
     {
       "source_asset_id": "CONFIG-PROVIDER-ROUTE-CAPABILITY-REGISTRY-001",
@@ -2178,6 +2208,21 @@
       "target_asset_id": "CONFIG-PROVIDER-ROUTE-CAPABILITY-REGISTRY-007"
     },
     {
+      "source_asset_id": "CTRL-PRIOR-GIT-T0-FRICTION-SCREEN-001",
+      "relation": "depends_on",
+      "target_asset_id": "ARCH-INTENT-005"
+    },
+    {
+      "source_asset_id": "CTRL-PRIOR-GIT-T0-FRICTION-SCREEN-001",
+      "relation": "depends_on",
+      "target_asset_id": "MODULE-FACTORY-V1-CAPABILITY-FREE-KEY-CAPTURE-001"
+    },
+    {
+      "source_asset_id": "CTRL-PRIOR-GIT-T0-FRICTION-SCREEN-001",
+      "relation": "validated_by",
+      "target_asset_id": "TEST-PRIOR-GIT-T0-FRICTION-SCREEN-001"
+    },
+    {
       "source_asset_id": "CTRL-PYPROJECT-001",
       "relation": "depends_on",
       "target_asset_id": "ENV-WORKSTATION-001"
@@ -3366,6 +3411,16 @@
       "source_asset_id": "EVIDENCE-PMF-QUOTE-SLICE-ONE-SHOT-ACCEPTANCE-001",
       "relation": "derived_from",
       "target_asset_id": "EVIDENCE-PMF-QUOTE-SLICE-ONE-SHOT-001"
+    },
+    {
+      "source_asset_id": "EVIDENCE-PRIOR-GIT-T0-FRICTION-SCREEN-ACCEPTANCE-001",
+      "relation": "derived_from",
+      "target_asset_id": "EVIDENCE-PRIOR-GIT-T0-FRICTION-SCREEN-RUNTIME-001"
+    },
+    {
+      "source_asset_id": "EVIDENCE-PRIOR-GIT-T0-FRICTION-SCREEN-RUNTIME-001",
+      "relation": "derived_from",
+      "target_asset_id": "CTRL-PRIOR-GIT-T0-FRICTION-SCREEN-001"
     },
     {
       "source_asset_id": "EVIDENCE-QUOTE-NATIVE-ADMISSIBLE-FRICTION-AUDITION-001",
@@ -6908,6 +6963,11 @@
       "target_asset_id": "CONFIG-FACTORY-V1-PRODUCT-KERNEL-001"
     },
     {
+      "source_asset_id": "MODULE-FACTORY-V1-PRIOR-GIT-T0-FRICTION-SCREEN-001",
+      "relation": "governed_by",
+      "target_asset_id": "CTRL-PRIOR-GIT-T0-FRICTION-SCREEN-001"
+    },
+    {
       "source_asset_id": "MODULE-FACTORY-V1-READ-MODEL-001",
       "relation": "depends_on",
       "target_asset_id": "MODULE-FACTORY-V1-OPS-STORE-001"
@@ -8703,6 +8763,11 @@
       "target_asset_id": "EVIDENCE-PMF-QUOTE-SLICE-ONE-SHOT-ACCEPTANCE-001"
     },
     {
+      "source_asset_id": "REPORT-PRIOR-GIT-T0-FRICTION-SCREEN-001",
+      "relation": "derived_from",
+      "target_asset_id": "EVIDENCE-PRIOR-GIT-T0-FRICTION-SCREEN-ACCEPTANCE-001"
+    },
+    {
       "source_asset_id": "REPORT-QUOTE-NATIVE-ADMISSIBLE-FRICTION-AUDITION-001",
       "relation": "derived_from",
       "target_asset_id": "EVIDENCE-QUOTE-NATIVE-ADMISSIBLE-FRICTION-AUDITION-ACCEPTANCE-001"
@@ -8946,6 +9011,11 @@
       "source_asset_id": "SCHEMA-FACTORY-V1-OWNER-COCKPIT-001",
       "relation": "governed_by",
       "target_asset_id": "CTRL-FACTORY-V1-OWNER-COCKPIT-001"
+    },
+    {
+      "source_asset_id": "SCHEMA-FACTORY-V1-PRIOR-GIT-T0-FRICTION-SCREEN-001",
+      "relation": "governed_by",
+      "target_asset_id": "CTRL-PRIOR-GIT-T0-FRICTION-SCREEN-001"
     },
     {
       "source_asset_id": "SCHEMA-FACTORY-V1-PRODUCT-KERNEL-001",
@@ -10491,6 +10561,21 @@
       "source_asset_id": "TEST-PMF-QUOTE-SLICE-ONE-SHOT-001",
       "relation": "depends_on",
       "target_asset_id": "MODULE-PMF-QUOTE-SLICE-ONE-SHOT-001"
+    },
+    {
+      "source_asset_id": "TEST-PRIOR-GIT-T0-FRICTION-SCREEN-001",
+      "relation": "depends_on",
+      "target_asset_id": "CONFIG-EXPERIMENT-SPEC-PRIOR-GIT-T0-FRICTION-SCREEN-001"
+    },
+    {
+      "source_asset_id": "TEST-PRIOR-GIT-T0-FRICTION-SCREEN-001",
+      "relation": "depends_on",
+      "target_asset_id": "CONFIG-PRIOR-GIT-T0-FRICTION-SCREEN-RULE-001"
+    },
+    {
+      "source_asset_id": "TEST-PRIOR-GIT-T0-FRICTION-SCREEN-001",
+      "relation": "depends_on",
+      "target_asset_id": "MODULE-FACTORY-V1-PRIOR-GIT-T0-FRICTION-SCREEN-001"
     },
     {
       "source_asset_id": "TEST-PROVIDER-ROUTE-CAPABILITY-REGISTRY-001",

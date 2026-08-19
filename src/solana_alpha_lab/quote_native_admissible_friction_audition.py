@@ -51,6 +51,7 @@ from solana_alpha_lab.quote_native_live_variation_campaign import (
 ATOM_ID = "QUOTE_NATIVE_ADMISSIBLE_FRICTION_AUDITION_V1"
 FACTORY_COMMISSIONING_ATOM_ID = "FACTORY_V1_COMMISSIONING_HYPOTHESIS_V1"
 FRICTION_VETO_ATOM_ID = "FRESH_OOS_BASELINE_VS_FRICTION_VETO_V1"
+T0_FRICTION_SCREEN_ATOM_ID = "PRIOR_GIT_T0_FRICTION_SCREEN_V1"
 AUTHORITY_PHRASE = (
     "OK QUOTE_NATIVE_ADMISSIBLE_FRICTION_AUDITION_V1: one fresh Jupiter "
     "Free-key quote-native campaign; local process-environment key only; "
@@ -90,6 +91,21 @@ FRICTION_VETO_AUTHORITY_PHRASE = (
     "provider, retry or fallback; cash cap $0; call cap 60; global pace >=3s; "
     "6 RECENT + 6 TRADED live outcome-blind cohort excluding A1, MOVE 2 and "
     "commissioning mints; frozen monotonic veto VETO_IF_X_LT_SAMPLE_MEDIAN; "
+    "hash-bound row observed_at and attempt reservation before credential "
+    "read required for capture PASS; WRAP existing capture plus "
+    "classify_audition_terminal; not MOVE 3; not alpha; not VPS; no post-hoc "
+    "threshold search."
+)
+T0_FRICTION_SCREEN_AUTHORITY_PHRASE = (
+    "OK PRIOR_GIT_T0_FRICTION_SCREEN_V1: one Jupiter Free-key prior-Git "
+    "t0 friction-screen campaign; local process-environment key only; "
+    "Tokens V2 /recent and /toptraded/1h plus quote-only /swap/v2/order; "
+    "x-api-key header only; no .env; no key in URL/log/receipt/Git; no taker, "
+    "/build, /execute, wallet, signer, transaction, paid plan, second "
+    "provider, retry or fallback; cash cap $0; call cap 60; global pace >=3s; "
+    "6 RECENT + 6 TRADED live outcome-blind cohort excluding A1, MOVE 2, "
+    "commissioning and ATOM 5 veto-campaign mints; frozen t0 cutoff from "
+    "prior Git complete-XY X only, not the closed ATOM 5 sample median; "
     "hash-bound row observed_at and attempt reservation before credential "
     "read required for capture PASS; WRAP existing capture plus "
     "classify_audition_terminal; not MOVE 3; not alpha; not VPS; no post-hoc "
@@ -283,6 +299,11 @@ def _validate_policy_shape(policy: Mapping[str, Any]) -> None:
     elif atom_id == FRICTION_VETO_ATOM_ID:
         _require(
             owner_phrase == FRICTION_VETO_AUTHORITY_PHRASE,
+            "AUTHORITY_PHRASE_DRIFT",
+        )
+    elif atom_id == T0_FRICTION_SCREEN_ATOM_ID:
+        _require(
+            owner_phrase == T0_FRICTION_SCREEN_AUTHORITY_PHRASE,
             "AUTHORITY_PHRASE_DRIFT",
         )
     else:

@@ -4,7 +4,9 @@ import json
 import sys
 import tempfile
 import unittest
+from decimal import Decimal
 from pathlib import Path
+from statistics import median
 
 import jsonschema
 import yaml
@@ -23,26 +25,34 @@ from solana_alpha_lab.factory.capabilities import (
     execute_capability,
 )
 from solana_alpha_lab.factory.experiment_spec import load_experiment_spec
-from solana_alpha_lab.factory.friction_veto import (
-    classify_baseline_vs_friction_veto,
-    load_friction_veto_rule,
-)
 from solana_alpha_lab.factory.operational_store import OperationalStore
+from solana_alpha_lab.factory.t0_friction_screen import (
+    CUTOFF_N_COMPLETE_XY,
+    FORBIDDEN_PEEKED_CUTOFF_TEXT,
+    FROZEN_X_CUTOFF,
+    FROZEN_X_CUTOFF_TEXT,
+    SOURCE_RECEIPT_SHA256,
+    classify_prior_git_t0_friction_screen,
+    load_t0_friction_screen_rule,
+)
 from solana_alpha_lab.quote_native_admissible_friction_audition import (
-    FRICTION_VETO_ATOM_ID,
-    FRICTION_VETO_AUTHORITY_PHRASE,
+    T0_FRICTION_SCREEN_ATOM_ID,
+    T0_FRICTION_SCREEN_AUTHORITY_PHRASE,
     canonical_json,
     validate_policy,
 )
 
 
-SPEC_RELATIVE = "configs/experiment_specs/fresh_oos_baseline_vs_friction_veto_v1.yaml"
-POLICY_RELATIVE = "configs/quote_native_fresh_oos_friction_veto_audition_v1.yaml"
-RULE_RELATIVE = "configs/friction_veto_rule_v1.yaml"
-SELECTOR = ROOT / "configs/factory_v1_friction_veto_v1.yaml"
-SELECTOR_SCHEMA = ROOT / "catalog/schemas/factory_v1_friction_veto.schema.json"
+SPEC_RELATIVE = "configs/experiment_specs/prior_git_t0_friction_screen_v1.yaml"
+POLICY_RELATIVE = "configs/quote_native_prior_git_t0_friction_screen_audition_v1.yaml"
+RULE_RELATIVE = "configs/prior_git_t0_friction_screen_rule_v1.yaml"
+SELECTOR = ROOT / "configs/factory_v1_prior_git_t0_friction_screen_v1.yaml"
+SELECTOR_SCHEMA = ROOT / "catalog/schemas/factory_v1_prior_git_t0_friction_screen.schema.json"
 SPEC_SCHEMA = ROOT / "catalog/schemas/experiment_spec.schema.json"
 RUNNER = ROOT / "src/solana_alpha_lab/factory/runner.py"
+ATOM5_RUNTIME = (
+    "docs/evidence/fresh_oos_friction_veto/a5_fresh_oos_friction_veto_runtime_receipt_v1.json"
+)
 
 
 def _copy(root: Path, relative: str) -> None:
@@ -52,7 +62,7 @@ def _copy(root: Path, relative: str) -> None:
     dst.write_bytes(src.read_bytes())
 
 
-def isolated_veto_root(tmp: Path) -> Path:
+def isolated_t0_root(tmp: Path) -> Path:
     _copy(tmp, "catalog/schemas/experiment_spec.schema.json")
     _copy(tmp, SPEC_RELATIVE)
     _copy(tmp, POLICY_RELATIVE)
@@ -72,7 +82,7 @@ def isolated_veto_root(tmp: Path) -> Path:
         "configs/provider_route_capability_registry_v7.yaml",
         "configs/provider_route_capability_registry_v8.yaml",
         "configs/provider_route_capability_registry_v9.yaml",
-        "configs/factory_v1_friction_veto_v1.yaml",
+        "configs/factory_v1_prior_git_t0_friction_screen_v1.yaml",
         "configs/factory_v1_product_kernel_v1.yaml",
     ):
         _copy(tmp, relative)
@@ -93,7 +103,7 @@ def _frozen(identity: str, stratum: str) -> dict[str, str]:
     return {"identity_id": identity, "stratum": stratum, "mint": identity}
 
 
-class FreshOosBaselineVsFrictionVetoTests(unittest.TestCase):
+class PriorGitT0FrictionScreenTests(unittest.TestCase):
     def test_frozen_configs_are_composition_not_vps(self) -> None:
         selector = yaml.safe_load(SELECTOR.read_text(encoding="utf-8"))
         jsonschema.validate(
@@ -103,23 +113,53 @@ class FreshOosBaselineVsFrictionVetoTests(unittest.TestCase):
         jsonschema.validate(spec, json.loads(SPEC_SCHEMA.read_text(encoding="utf-8")))
         policy = yaml.safe_load((ROOT / POLICY_RELATIVE).read_text(encoding="utf-8"))
         validate_policy(policy, root=ROOT)
-        self.assertEqual(policy["atom_id"], FRICTION_VETO_ATOM_ID)
-        self.assertEqual(policy["external_authority"]["owner_phrase"], FRICTION_VETO_AUTHORITY_PHRASE)
-        self.assertEqual(spec["parameters"]["required_owner_phrase"], FRICTION_VETO_AUTHORITY_PHRASE)
-        self.assertEqual(spec["method"], "classify_baseline_vs_friction_veto")
-        self.assertIn("EXCLUSION_COMMISSIONING", [item["requirement_id"] for item in spec["data_requirements"]])
+        self.assertEqual(policy["atom_id"], T0_FRICTION_SCREEN_ATOM_ID)
+        self.assertEqual(
+            policy["external_authority"]["owner_phrase"],
+            T0_FRICTION_SCREEN_AUTHORITY_PHRASE,
+        )
+        self.assertEqual(
+            spec["parameters"]["required_owner_phrase"],
+            T0_FRICTION_SCREEN_AUTHORITY_PHRASE,
+        )
+        self.assertEqual(spec["method"], "classify_prior_git_t0_friction_screen")
+        ids = [item["requirement_id"] for item in spec["data_requirements"]]
+        self.assertIn("EXCLUSION_ATOM5", ids)
         dumped = yaml.safe_dump(selector) + yaml.safe_dump(spec)
         self.assertNotIn("FACTORY_V1_OPERATIONAL_READY", dumped)
+        self.assertNotIn("VPS", spec["question"])
 
     def test_generic_runner_file_is_untouched(self) -> None:
         text = RUNNER.read_text(encoding="utf-8")
         self.assertIn("Contains no hypothesis business logic", text)
-        self.assertNotIn("friction_veto", text)
-        self.assertNotIn("VETO_IF_X", text)
+        self.assertNotIn("t0_friction_screen", text)
+        self.assertNotIn("FROZEN_PRIOR_GIT", text)
+
+    def test_frozen_cutoff_matches_prior_git_complete_xy_median(self) -> None:
+        xs: list[Decimal] = []
+        for relative, digest in SOURCE_RECEIPT_SHA256.items():
+            payload = (ROOT / relative).read_bytes()
+            self.assertEqual(__import__("hashlib").sha256(payload).hexdigest(), digest)
+            receipt = json.loads(payload.decode("utf-8"))
+            for cell in (receipt.get("mechanism") or {}).get("cells") or []:
+                if cell.get("x_status") != "OBSERVED" or cell.get("y_status") != "OBSERVED":
+                    continue
+                x_value = cell.get("x_quoted_roundtrip_friction")
+                y_value = cell.get("y_quoted_liquidation_recovery")
+                if x_value is None or y_value is None:
+                    continue
+                xs.append(Decimal(str(x_value)))
+        self.assertEqual(len(xs), CUTOFF_N_COMPLETE_XY)
+        self.assertEqual(median(xs), FROZEN_X_CUTOFF)
+        self.assertEqual(str(median(xs)), FROZEN_X_CUTOFF_TEXT)
+        atom5 = json.loads((ROOT / ATOM5_RUNTIME).read_text(encoding="utf-8"))
+        peeked = str((atom5.get("veto") or {}).get("x_median") or "")
+        self.assertEqual(peeked, FORBIDDEN_PEEKED_CUTOFF_TEXT)
+        self.assertNotEqual(FROZEN_X_CUTOFF_TEXT, peeked)
 
     def test_missing_phrase_is_blocked_authority_with_zero_calls(self) -> None:
         with tempfile.TemporaryDirectory() as tmp:
-            root = isolated_veto_root(Path(tmp) / "src")
+            root = isolated_t0_root(Path(tmp) / "src")
             spec = load_experiment_spec(root, SPEC_RELATIVE)
             derived = execute_capability(spec, root=root, authority_phrase=None)
             self.assertEqual(derived["status"], "BLOCKED_AUTHORITY")
@@ -127,9 +167,9 @@ class FreshOosBaselineVsFrictionVetoTests(unittest.TestCase):
             self.assertEqual(derived["provider_api_rpc_wss_calls"], 0)
             self.assertEqual(derived["credential_reads"], 0)
 
-    def test_wrong_phrase_is_blocked_authority_with_zero_calls(self) -> None:
+    def test_wrong_phrase_including_go_is_blocked_authority(self) -> None:
         with tempfile.TemporaryDirectory() as tmp:
-            root = isolated_veto_root(Path(tmp) / "src")
+            root = isolated_t0_root(Path(tmp) / "src")
             spec = load_experiment_spec(root, SPEC_RELATIVE)
             derived = execute_capability(spec, root=root, authority_phrase="го")
             self.assertEqual(derived["status"], "BLOCKED_AUTHORITY")
@@ -137,14 +177,14 @@ class FreshOosBaselineVsFrictionVetoTests(unittest.TestCase):
             self.assertEqual(derived["provider_api_rpc_wss_calls"], 0)
             self.assertEqual(derived["credential_reads"], 0)
 
-    def test_veto_improves_when_worse_friction_has_worse_recovery(self) -> None:
-        result = classify_baseline_vs_friction_veto(
+    def test_screen_improves_when_worse_friction_has_worse_recovery(self) -> None:
+        result = classify_prior_git_t0_friction_screen(
             mechanism={
                 "cells": [
                     _cell("r-bad", "-0.04", "-0.10"),
                     _cell("r-good", "-0.01", "-0.02"),
                     _cell("t-bad", "-0.05", "-0.12"),
-                    _cell("t-good", "-0.02", "-0.03"),
+                    _cell("t-good", "-0.01", "-0.03"),
                 ]
             },
             frozen_cells=[
@@ -155,17 +195,18 @@ class FreshOosBaselineVsFrictionVetoTests(unittest.TestCase):
             ],
         )
         self.assertEqual(result["terminal"], "EXTEND_TO_SHADOW")
+        self.assertEqual(result["frozen_x_cutoff"], FROZEN_X_CUTOFF_TEXT)
         self.assertEqual(result["vetoed_n"], 2)
         self.assertEqual(result["kept_n"], 2)
 
-    def test_veto_closes_family_without_uplift(self) -> None:
-        result = classify_baseline_vs_friction_veto(
+    def test_screen_closes_family_without_uplift(self) -> None:
+        result = classify_prior_git_t0_friction_screen(
             mechanism={
                 "cells": [
                     _cell("r-bad", "-0.04", "-0.02"),
                     _cell("r-good", "-0.01", "-0.10"),
                     _cell("t-bad", "-0.05", "-0.03"),
-                    _cell("t-good", "-0.02", "-0.12"),
+                    _cell("t-good", "-0.01", "-0.12"),
                 ]
             },
             frozen_cells=[
@@ -175,40 +216,52 @@ class FreshOosBaselineVsFrictionVetoTests(unittest.TestCase):
                 _frozen("t-good", "TRADED"),
             ],
         )
-        self.assertEqual(result["terminal"], "CLOSE_EXACT_FRICTION_VETO_FAMILY")
+        self.assertEqual(result["terminal"], "CLOSE_EXACT_T0_FRICTION_SCREEN_FAMILY")
         self.assertEqual(result["reason"], "NO_MEDIAN_OR_TAIL_UPLIFT")
 
     def test_one_stratum_kept_is_unstable_fail(self) -> None:
-        result = classify_baseline_vs_friction_veto(
+        result = classify_prior_git_t0_friction_screen(
             mechanism={
                 "cells": [
-                    _cell("r1", "-0.01", "-0.02"),
-                    _cell("r2", "-0.02", "-0.03"),
-                    _cell("t-bad", "-0.09", "-0.20"),
+                    _cell("r1", "-0.04", "-0.02"),
+                    _cell("r2", "-0.05", "-0.03"),
+                    _cell("t-good", "-0.01", "-0.01"),
                 ]
             },
             frozen_cells=[
                 _frozen("r1", "RECENT"),
                 _frozen("r2", "RECENT"),
-                _frozen("t-bad", "TRADED"),
+                _frozen("t-good", "TRADED"),
             ],
         )
-        self.assertEqual(result["terminal"], "CLOSE_EXACT_FRICTION_VETO_FAMILY")
+        self.assertEqual(result["terminal"], "CLOSE_EXACT_T0_FRICTION_SCREEN_FAMILY")
         self.assertEqual(result["reason"], "STRATUM_UNSTABLE")
 
     def test_yaml_rule_binds_the_executed_projector(self) -> None:
-        rule = load_friction_veto_rule(ROOT, RULE_RELATIVE)
-        result = classify_baseline_vs_friction_veto(
-            mechanism={"cells": [_cell("r-bad", "-0.04", "-0.10"), _cell("r-good", "-0.01", "-0.02"), _cell("t-bad", "-0.05", "-0.12"), _cell("t-good", "-0.02", "-0.03")]},
-            frozen_cells=[_frozen("r-bad", "RECENT"), _frozen("r-good", "RECENT"), _frozen("t-bad", "TRADED"), _frozen("t-good", "TRADED")],
+        rule = load_t0_friction_screen_rule(ROOT, RULE_RELATIVE)
+        result = classify_prior_git_t0_friction_screen(
+            mechanism={
+                "cells": [
+                    _cell("r-bad", "-0.04", "-0.10"),
+                    _cell("r-good", "-0.01", "-0.02"),
+                    _cell("t-bad", "-0.05", "-0.12"),
+                    _cell("t-good", "-0.01", "-0.03"),
+                ]
+            },
+            frozen_cells=[
+                _frozen("r-bad", "RECENT"),
+                _frozen("r-good", "RECENT"),
+                _frozen("t-bad", "TRADED"),
+                _frozen("t-good", "TRADED"),
+            ],
             rule=rule,
         )
         self.assertEqual(result["terminal"], "EXTEND_TO_SHADOW")
 
-    def test_spec_exclusions_cover_a1_move2_and_commissioning_mints(self) -> None:
+    def test_spec_exclusions_cover_a1_move2_commissioning_and_atom5(self) -> None:
         spec = load_experiment_spec(ROOT, SPEC_RELATIVE)
         excluded = excluded_mints_from_spec(spec, root=ROOT)
-        self.assertGreaterEqual(len(excluded), 12)
+        self.assertGreaterEqual(len(excluded), 24)
         for item in spec["data_requirements"]:
             if item["kind"] != "GIT_CANONICAL_RECEIPT":
                 continue
@@ -227,13 +280,16 @@ class FreshOosBaselineVsFrictionVetoTests(unittest.TestCase):
         self.assertEqual([row["id"] for row in kept], ["fresh-mint-not-in-prior-receipts"])
 
     def _write_runtime(self, root: Path, *, terminal: str, cells: list, frozen: list) -> None:
-        relative = "docs/evidence/fresh_oos_friction_veto/a5_fresh_oos_friction_veto_runtime_receipt_v1.json"
+        relative = (
+            "docs/evidence/prior_git_t0_friction_screen/"
+            "a6_prior_git_t0_friction_screen_runtime_receipt_v1.json"
+        )
         path = root / relative
         path.parent.mkdir(parents=True, exist_ok=True)
         path.write_bytes(
             canonical_json(
                 {
-                    "atom_id": FRICTION_VETO_ATOM_ID,
+                    "atom_id": T0_FRICTION_SCREEN_ATOM_ID,
                     "terminal_outcome": terminal,
                     "mechanism": {"scored": True, "cells": cells, "verdict": terminal},
                     "frozen_cells": frozen,
@@ -245,9 +301,9 @@ class FreshOosBaselineVsFrictionVetoTests(unittest.TestCase):
             )
         )
 
-    def test_factory_readout_applies_veto_over_synthetic_receipt(self) -> None:
+    def test_factory_readout_applies_screen_over_synthetic_receipt(self) -> None:
         with tempfile.TemporaryDirectory() as tmp:
-            root = isolated_veto_root(Path(tmp) / "src")
+            root = isolated_t0_root(Path(tmp) / "src")
             self._write_runtime(
                 root,
                 terminal="DIRECTIONAL_HINT_NOT_CONFIRMATION",
@@ -255,7 +311,7 @@ class FreshOosBaselineVsFrictionVetoTests(unittest.TestCase):
                     _cell("r-bad", "-0.04", "-0.10"),
                     _cell("r-good", "-0.01", "-0.02"),
                     _cell("t-bad", "-0.05", "-0.12"),
-                    _cell("t-good", "-0.02", "-0.03"),
+                    _cell("t-good", "-0.01", "-0.03"),
                 ],
                 frozen=[
                     _frozen("r-bad", "RECENT"),
@@ -273,7 +329,7 @@ class FreshOosBaselineVsFrictionVetoTests(unittest.TestCase):
 
     def test_factory_readout_closes_family_without_uplift(self) -> None:
         with tempfile.TemporaryDirectory() as tmp:
-            root = isolated_veto_root(Path(tmp) / "src")
+            root = isolated_t0_root(Path(tmp) / "src")
             self._write_runtime(
                 root,
                 terminal="DIRECTIONAL_HINT_NOT_CONFIRMATION",
@@ -281,7 +337,7 @@ class FreshOosBaselineVsFrictionVetoTests(unittest.TestCase):
                     _cell("r-bad", "-0.04", "-0.02"),
                     _cell("r-good", "-0.01", "-0.10"),
                     _cell("t-bad", "-0.05", "-0.03"),
-                    _cell("t-good", "-0.02", "-0.12"),
+                    _cell("t-good", "-0.01", "-0.12"),
                 ],
                 frozen=[
                     _frozen("r-bad", "RECENT"),
@@ -292,11 +348,11 @@ class FreshOosBaselineVsFrictionVetoTests(unittest.TestCase):
             )
             spec = load_experiment_spec(root, SPEC_RELATIVE)
             derived = execute_capability(spec, root=root, authority_phrase=None)
-            self.assertEqual(derived["terminal"], "CLOSE_EXACT_FRICTION_VETO_FAMILY")
+            self.assertEqual(derived["terminal"], "CLOSE_EXACT_T0_FRICTION_SCREEN_FAMILY")
 
-    def test_unscored_capture_terminal_is_not_replaced_by_veto(self) -> None:
+    def test_unscored_capture_terminal_is_not_replaced_by_screen(self) -> None:
         with tempfile.TemporaryDirectory() as tmp:
-            root = isolated_veto_root(Path(tmp) / "src")
+            root = isolated_t0_root(Path(tmp) / "src")
             self._write_runtime(
                 root,
                 terminal="PAUSE_CLOSE_QUOTE_NATIVE_CURRENT_ALPHA_ROUTE",
@@ -305,20 +361,56 @@ class FreshOosBaselineVsFrictionVetoTests(unittest.TestCase):
             )
             spec = load_experiment_spec(root, SPEC_RELATIVE)
             derived = execute_capability(spec, root=root, authority_phrase=None)
-            self.assertEqual(derived["terminal"], "PAUSE_CLOSE_QUOTE_NATIVE_CURRENT_ALPHA_ROUTE")
+            self.assertEqual(
+                derived["terminal"],
+                "PAUSE_CLOSE_QUOTE_NATIVE_CURRENT_ALPHA_ROUTE",
+            )
 
-    def test_application_default_spec_is_the_frozen_veto_experiment(self) -> None:
+    def test_live_receipts_match_hash_bound_spec(self) -> None:
+        spec = yaml.safe_load((ROOT / SPEC_RELATIVE).read_text(encoding="utf-8"))
+        by_id = {item["requirement_id"]: item for item in spec["data_requirements"]}
+        for requirement_id in ("RUNTIME_RECEIPT", "ACCEPTANCE"):
+            item = by_id[requirement_id]
+            payload = (ROOT / item["path"]).read_bytes()
+            self.assertEqual(
+                __import__("hashlib").sha256(payload).hexdigest(),
+                item["sha256"],
+                requirement_id,
+            )
+        receipt = json.loads(
+            (ROOT / by_id["RUNTIME_RECEIPT"]["path"]).read_text(encoding="utf-8")
+        )
+        self.assertEqual(receipt["atom_id"], T0_FRICTION_SCREEN_ATOM_ID)
+        self.assertEqual(
+            receipt["terminal"],
+            "CLOSE_EXACT_T0_FRICTION_SCREEN_FAMILY",
+        )
+        self.assertEqual(receipt["t0_screen"]["reason"], "STRATUM_UNSTABLE")
+        self.assertEqual(receipt["t0_screen"]["frozen_x_cutoff"], FROZEN_X_CUTOFF_TEXT)
+        self.assertNotEqual(
+            receipt["t0_screen"]["frozen_x_cutoff"],
+            FORBIDDEN_PEEKED_CUTOFF_TEXT,
+        )
+
+    def test_application_default_spec_is_the_frozen_t0_screen(self) -> None:
         with tempfile.TemporaryDirectory() as tmp:
             store = OperationalStore(Path(tmp) / "ops.sqlite")
             try:
-                app = FactoryApplication(root=ROOT, store=store, spec_relative=SPEC_RELATIVE)
+                app = FactoryApplication(root=ROOT, store=store)
+                self.assertEqual(app.spec_relative, SPEC_RELATIVE)
+            finally:
+                store.close()
+            root = isolated_t0_root(Path(tmp) / "src")
+            store = OperationalStore(Path(tmp) / "ops-isolated.sqlite")
+            try:
+                app = FactoryApplication(root=root, store=store)
                 self.assertEqual(app.spec_relative, SPEC_RELATIVE)
                 model = app.read_model()
-                self.assertFalse(model["git_archaeology_required"])
+                self.assertEqual(model["status"], "NOT_STARTED")
                 after = app.start()
-                self.assertEqual(after["status"], "COMPLETE")
-                self.assertEqual(after["terminal_result"], "CLOSE_EXACT_FRICTION_VETO_FAMILY")
-                self.assertEqual(after["result"], "CLOSE_EXACT_FRICTION_VETO_FAMILY")
+                self.assertEqual(after["status"], "BLOCKED_AUTHORITY")
+                self.assertEqual(after["blocker"], "OWNER_PHRASE_MISSING")
+                self.assertEqual(after["terminal_result"], "BLOCKED_AUTHORITY")
             finally:
                 store.close()
 
