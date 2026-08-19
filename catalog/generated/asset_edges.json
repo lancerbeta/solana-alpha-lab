@@ -3648,21 +3648,6 @@
       "target_asset_id": "EVIDENCE-QUOTE-SURFACE-RETENTION-FALSIFIER-RUNTIME-001"
     },
     {
-      "source_asset_id": "EVIDENCE-QUOTE-SURFACE-RETENTION-FALSIFIER-DELIVERY-COMPLETION-001",
-      "relation": "derived_from",
-      "target_asset_id": "EVIDENCE-QUOTE-SURFACE-RETENTION-FALSIFIER-FACTORY-FIT-001"
-    },
-    {
-      "source_asset_id": "EVIDENCE-QUOTE-SURFACE-RETENTION-FALSIFIER-FACTORY-FIT-001",
-      "relation": "derived_from",
-      "target_asset_id": "EVIDENCE-QUOTE-SURFACE-RETENTION-FALSIFIER-INDEPENDENT-REVIEW-001"
-    },
-    {
-      "source_asset_id": "EVIDENCE-QUOTE-SURFACE-RETENTION-FALSIFIER-INDEPENDENT-REVIEW-001",
-      "relation": "derived_from",
-      "target_asset_id": "CTRL-QUOTE-SURFACE-RETENTION-FALSIFIER-001"
-    },
-    {
       "source_asset_id": "EVIDENCE-QUOTE-SURFACE-RETENTION-FALSIFIER-RUNTIME-001",
       "relation": "derived_from",
       "target_asset_id": "CTRL-QUOTE-SURFACE-RETENTION-FALSIFIER-001"
