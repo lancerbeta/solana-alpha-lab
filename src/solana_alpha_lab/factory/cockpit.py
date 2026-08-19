@@ -104,9 +104,8 @@ def project_cockpit(
     decision = model.get("decision") or (acceptance or {}).get("owner_decision")
     nxt = (acceptance or {}).get("next_boundary") or model.get("next_safe_action")
     result = (
-        model.get("terminal_result")
-        or (acceptance or {}).get("scientific_terminal")
-        or (acceptance or {}).get("terminal")
+        (acceptance or {}).get("scientific_terminal")
+        or model.get("terminal_result")
         or model.get("result")
     )
     uncertainty = (

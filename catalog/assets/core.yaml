@@ -26299,7 +26299,7 @@ records:
   as_of: '2026-08-19'
   truth_owner: FACTORY_V1_OWNER_COCKPIT_LITE_V1
   location: {kind: git_path, logical_uri: 'repo://src/solana_alpha_lab/factory/cockpit.py', repository_path: src/solana_alpha_lab/factory/cockpit.py}
-  integrity: {kind: sha256, sha256: cff4015622fa68d189c1e86889fe593f1f305e45885117e30c248eaa184e1136}
+  integrity: {kind: sha256, sha256: 33e18993e6397d2b34c087cfa016b37a6485553088421bcd52e1d35b0786c9df}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: governed_by, target_asset_id: CTRL-FACTORY-V1-OWNER-COCKPIT-001}
@@ -26317,7 +26317,7 @@ records:
   as_of: '2026-08-19'
   truth_owner: FACTORY_V1_OWNER_COCKPIT_LITE_V1
   location: {kind: git_path, logical_uri: 'repo://tests/test_factory_v1_owner_cockpit.py', repository_path: tests/test_factory_v1_owner_cockpit.py}
-  integrity: {kind: sha256, sha256: 53c1a5cbfbb9a78f229347be32ab088fb0c6cf50b30d03041577c3bcda29bb97}
+  integrity: {kind: sha256, sha256: 7d6c17d0b351e192d7d2cc935982f2a2aa44542a98d9fe1f437cbd1d58672270}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: depends_on, target_asset_id: MODULE-FACTORY-V1-COCKPIT-001}

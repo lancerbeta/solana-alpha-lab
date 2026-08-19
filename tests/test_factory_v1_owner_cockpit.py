@@ -17,7 +17,7 @@ if str(SRC) not in sys.path:
     sys.path.insert(0, str(SRC))
 
 from solana_alpha_lab.factory.application import FactoryApplication
-from solana_alpha_lab.factory.cockpit import load_cockpit_config
+from solana_alpha_lab.factory.cockpit import load_cockpit_config, project_cockpit
 from solana_alpha_lab.factory.operational_store import OperationalStore
 from solana_alpha_lab.factory.runtime import copy_rehost_allowlist, load_runtime_config
 from solana_alpha_lab.factory.workbench import serve
@@ -97,6 +97,31 @@ class FactoryV1OwnerCockpitLiteTests(unittest.TestCase):
         text = PYPROJECT.read_text(encoding="utf-8")
         for token in ("nicegui", "streamlit", "fastapi", "react", "nextjs"):
             self.assertNotIn(token, text.lower())
+
+    def test_result_prefers_scientific_terminal_over_product_pass(self) -> None:
+        cockpit = project_cockpit(
+            {
+                "question": "q",
+                "estimand": "e",
+                "population": "p",
+                "terminal_result": "FACTORY_COMMISSIONING_LIVE_CYCLE_PASS",
+                "result": "FACTORY_COMMISSIONING_LIVE_CYCLE_PASS",
+                "decision": "product",
+                "next_safe_action": "park",
+            },
+            acceptance={
+                "scientific_terminal": "DIRECTIONAL_HINT_NOT_CONFIRMATION",
+                "terminal": "DIRECTIONAL_HINT_NOT_CONFIRMATION",
+                "product_terminal": "FACTORY_COMMISSIONING_LIVE_CYCLE_PASS",
+                "owner_decision": "COMMISSIONING_PACKET_SCIENTIFIC_HINT_NOT_ALPHA",
+                "limitations": ["SCREENING_HINT_NOT_OOS_CONFIRMATION"],
+                "criteria": {"h3600_role": "PREDECLARED_ROBUSTNESS_NOT_SEARCHABLE_Y"},
+                "cohort": {"sample_class": "LIVE_OUTCOME_BLIND"},
+                "next_boundary": "LATER",
+            },
+        )
+        self.assertEqual(cockpit["packet"]["RESULT"], "DIRECTIONAL_HINT_NOT_CONFIRMATION")
+        self.assertNotEqual(cockpit["packet"]["RESULT"], "FACTORY_COMMISSIONING_LIVE_CYCLE_PASS")
 
     def test_packet_and_attention_are_visible_without_git_archaeology(self) -> None:
         with tempfile.TemporaryDirectory() as tmp:
