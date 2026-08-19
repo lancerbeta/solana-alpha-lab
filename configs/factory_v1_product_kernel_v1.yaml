@@ -1,0 +1,24 @@
+schema: smial.factory-v1-product-kernel
+schema_version: '1.0'
+contract_id: FACTORY-V1-PRODUCT-KERNEL-001
+atom_id: FACTORY_V1_PRODUCT_KERNEL_LOCAL_VERTICAL_SLICE_V1
+as_of: '2026-08-19'
+mode: DIRECT_CURSOR_DELIVERY
+implementation: LOCAL_VERTICAL_SLICE
+golden_experiment_id: EXP-QUOTE-NATIVE-ADMISSIBLE-FRICTION-AUDITION-OFFLINE-001
+allowlisted_capabilities:
+  - CAP-OFFLINE-CANONICAL-RECEIPT-REPLAY-001
+operational_store:
+  kind: SQLITE
+  relative_path: local/factory_v1/operational_state.sqlite
+  owns_scientific_truth: false
+ui_gate:
+  verdict: BUILD
+  selected: stdlib_http_workbench
+  package_adoption: false
+authority:
+  provider_calls: false
+  credentials: false
+  deployment: false
+  cash_spend: false
+  wallet_signer_transaction: false

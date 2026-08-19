@@ -16,7 +16,7 @@ records:
     repository_path: registries/research_cycles.yaml
   integrity:
     kind: sha256
-    sha256: 2ca0195a7617f2f95b7334291c776b78b447ea854b4c43b48dbe0f25fe08f797
+    sha256: a1ee634532859a9ed0fbdb16f16e744804672b0be2b4652cb94be5847fa334d1
   access: &id001
     mode: task_write
     method: file
@@ -46,7 +46,7 @@ records:
     repository_path: registries/hypotheses.yaml
   integrity:
     kind: sha256
-    sha256: 9ee9f983fa6869c0ee1ff6a249e06dd38fc059a956943cfea8539822054236d9
+    sha256: 76a12be98ea62dff302063b20721db3c8442a016dc2c515ed8cc9af560227991
   access: *id001
   relations: *id002
   consumers: *id003
@@ -222,7 +222,7 @@ records:
     repository_path: docs/PROJECT_MAP.md
   integrity:
     kind: sha256
-    sha256: 35b1c42f182ecba1ceae915bc031ffebe48201c5e21bea607cbbafdbc2589a9f
+    sha256: 8e9c78770dcc78c9b1eab71d9b085634036636dcd9de475dc2de8d8b413375d2
   access:
     mode: read_only
     method: file
@@ -282,7 +282,7 @@ records:
     repository_path: catalog/generated/asset_edges.json
   integrity:
     kind: sha256
-    sha256: 10b829fae249c13e7342b0ef14010f700e1678df217fbba49d8b7a15b841042a
+    sha256: 875f5b50a4d5e99ae2a829be5779247e982715d179f3f3c5adc4cc049026bdb9
   access:
     mode: read_only
     method: file

@@ -7,7 +7,7 @@ truth_owner: USER_GOAL_OWNER
 projection_kind: PRODUCT_VISION_NOT_IMPLEMENTATION
 implementation: NOT_IMPLEMENTED
 milestone_id: FACTORY_V1_OPERATIONAL_READY
-milestone_status: NOT_TRIGGERED
+milestone_status: TRIGGERED
 extends:
   - ARCH-INTENT-002
   - ARCH-INTENT-003
@@ -545,7 +545,9 @@ operably.
 ## 26. Roadmap integration
 
 Do not insert a new chain of numbered tasks now. Add one triggered
-milestone `FACTORY_V1_OPERATIONAL_READY` with status `NOT_TRIGGERED`.
+milestone `FACTORY_V1_OPERATIONAL_READY`. Productization is `TRIGGERED`
+for the kernel slice; the milestone itself remains short of
+`FACTORY_V1_OPERATIONAL_READY`.
 
 Activation when any of: owner explicitly selects Factory productization;
 first unattended remote runtime is next; long-running paper/shadow

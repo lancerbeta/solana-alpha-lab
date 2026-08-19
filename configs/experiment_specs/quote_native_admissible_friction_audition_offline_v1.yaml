@@ -1,0 +1,32 @@
+schema: smial.experiment-spec
+schema_version: '1.0'
+experiment_id: EXP-QUOTE-NATIVE-ADMISSIBLE-FRICTION-AUDITION-OFFLINE-001
+hypothesis_version: HYP-QUOTE-NATIVE-FRICTION-H900-V1
+question: Does frozen t0 quoted round-trip friction rank +15m quoted liquidation recovery on the admissible Free-key 6+6 cohort without a new live capture?
+estimand: QuotedRoundTripFriction(t0) -> QuotedLiquidationRecovery(H900)
+population: LIVE_OUTCOME_BLIND_TOKENS_V2_FREE_KEY_6_RECENT_6_TRADED
+data_requirements:
+  - requirement_id: RUNTIME_RECEIPT
+    kind: GIT_CANONICAL_RECEIPT
+    path: docs/evidence/quote_native_admissible_friction_audition/a1_quote_native_admissible_friction_audition_runtime_receipt_v1.json
+    sha256: 75f60a155b7db6ddb8c801c9ff5060ce5e4e7fe641b836ff35edeb91534c308e
+  - requirement_id: ACCEPTANCE
+    kind: GIT_CANONICAL_ACCEPTANCE
+    path: docs/evidence/quote_native_admissible_friction_audition/a1_quote_native_admissible_friction_audition_acceptance_v1.json
+    sha256: 8eea5475e9f67c2949e2a6acd835559ead405af25ebfec77d8c8421c5a493278
+capabilities:
+  - CAP-OFFLINE-CANONICAL-RECEIPT-REPLAY-001
+falsifier: Re-derived terminal from the canonical runtime receipt disagrees with the Git-canonical acceptance terminal.
+method: classify_audition_terminal
+parameters:
+  research_cycle_id: RC-QUOTE-NATIVE-FRICTION-H900-001
+  next_safe_action: PARK_FAMILY_LEAVE_HINT_UNEXTENDED_NO_MOVE_3
+evidence_budget:
+  provider_api_rpc_wss_calls: 0
+holdout_policy: No new holdout is opened; this atom replays already-consumed A1 evidence and does not treat MOVE 2 as a new result.
+terminal_outcomes:
+  - DIRECTIONAL_HINT_NOT_CONFIRMATION
+  - SAMPLE_INVALID_INSUFFICIENT_COMPLETE_XY
+  - SAMPLE_INVALID_TRADED_CONTROL_KILL
+  - CLOSE_EXACT_QUOTE_FRICTION_MECHANISM
+  - PAUSE_CLOSE_QUOTE_NATIVE_CURRENT_ALPHA_ROUTE

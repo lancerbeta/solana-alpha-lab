@@ -473,6 +473,21 @@
       "target_asset_id": "CTRL-DELIVERY-HARNESS-001"
     },
     {
+      "source_asset_id": "CONFIG-EXPERIMENT-SPEC-QUOTE-NATIVE-ADMISSIBLE-OFFLINE-001",
+      "relation": "depends_on",
+      "target_asset_id": "EVIDENCE-QUOTE-NATIVE-ADMISSIBLE-FRICTION-AUDITION-001"
+    },
+    {
+      "source_asset_id": "CONFIG-EXPERIMENT-SPEC-QUOTE-NATIVE-ADMISSIBLE-OFFLINE-001",
+      "relation": "depends_on",
+      "target_asset_id": "EVIDENCE-QUOTE-NATIVE-ADMISSIBLE-FRICTION-AUDITION-ACCEPTANCE-001"
+    },
+    {
+      "source_asset_id": "CONFIG-EXPERIMENT-SPEC-QUOTE-NATIVE-ADMISSIBLE-OFFLINE-001",
+      "relation": "governed_by",
+      "target_asset_id": "SCHEMA-EXPERIMENT-SPEC-001"
+    },
+    {
       "source_asset_id": "CONFIG-FACTORY-V1-OPERATIONAL-READINESS-001",
       "relation": "derived_from",
       "target_asset_id": "CTRL-FACTORY-V1-OPERATIONAL-READINESS-001"
@@ -481,6 +496,16 @@
       "source_asset_id": "CONFIG-FACTORY-V1-OPERATIONAL-READINESS-001",
       "relation": "governed_by",
       "target_asset_id": "ARCH-INTENT-005"
+    },
+    {
+      "source_asset_id": "CONFIG-FACTORY-V1-PRODUCT-KERNEL-001",
+      "relation": "depends_on",
+      "target_asset_id": "SCHEMA-FACTORY-V1-PRODUCT-KERNEL-001"
+    },
+    {
+      "source_asset_id": "CONFIG-FACTORY-V1-PRODUCT-KERNEL-001",
+      "relation": "governed_by",
+      "target_asset_id": "CTRL-FACTORY-V1-PRODUCT-KERNEL-001"
     },
     {
       "source_asset_id": "CONFIG-OWNER-AUTHORITY-PACKET-001",
@@ -1833,6 +1858,26 @@
       "target_asset_id": "TEST-FACTORY-V1-OPERATIONAL-READINESS-001"
     },
     {
+      "source_asset_id": "CTRL-FACTORY-V1-PRODUCT-KERNEL-001",
+      "relation": "contains",
+      "target_asset_id": "CONFIG-FACTORY-V1-PRODUCT-KERNEL-001"
+    },
+    {
+      "source_asset_id": "CTRL-FACTORY-V1-PRODUCT-KERNEL-001",
+      "relation": "depends_on",
+      "target_asset_id": "CONFIG-FACTORY-V1-OPERATIONAL-READINESS-001"
+    },
+    {
+      "source_asset_id": "CTRL-FACTORY-V1-PRODUCT-KERNEL-001",
+      "relation": "governed_by",
+      "target_asset_id": "ARCH-INTENT-005"
+    },
+    {
+      "source_asset_id": "CTRL-FACTORY-V1-PRODUCT-KERNEL-001",
+      "relation": "validated_by",
+      "target_asset_id": "TEST-FACTORY-V1-PRODUCT-KERNEL-001"
+    },
+    {
       "source_asset_id": "CTRL-HANDOFF-PROTOCOL-001",
       "relation": "governed_by",
       "target_asset_id": "CTRL-TASK-04-001"
@@ -2996,6 +3041,21 @@
       "source_asset_id": "EVIDENCE-DELIVERY-HARNESS-INDEPENDENT-REVIEW-001",
       "relation": "validated_by",
       "target_asset_id": "TEST-DELIVERY-HARNESS-001"
+    },
+    {
+      "source_asset_id": "EVIDENCE-FACTORY-V1-PRODUCT-KERNEL-ACCEPTANCE-001",
+      "relation": "depends_on",
+      "target_asset_id": "EVIDENCE-FACTORY-V1-PRODUCT-KERNEL-UI-ADOPT-001"
+    },
+    {
+      "source_asset_id": "EVIDENCE-FACTORY-V1-PRODUCT-KERNEL-ACCEPTANCE-001",
+      "relation": "derived_from",
+      "target_asset_id": "CTRL-FACTORY-V1-PRODUCT-KERNEL-001"
+    },
+    {
+      "source_asset_id": "EVIDENCE-FACTORY-V1-PRODUCT-KERNEL-UI-ADOPT-001",
+      "relation": "derived_from",
+      "target_asset_id": "CTRL-FACTORY-V1-PRODUCT-KERNEL-001"
     },
     {
       "source_asset_id": "EVIDENCE-OWNER-ATTENTION-GATE-001",
@@ -6613,6 +6673,56 @@
       "target_asset_id": "TEST-T05-MIGRATIONS-001"
     },
     {
+      "source_asset_id": "MODULE-FACTORY-V1-APPLICATION-001",
+      "relation": "depends_on",
+      "target_asset_id": "MODULE-FACTORY-V1-READ-MODEL-001"
+    },
+    {
+      "source_asset_id": "MODULE-FACTORY-V1-APPLICATION-001",
+      "relation": "depends_on",
+      "target_asset_id": "MODULE-FACTORY-V1-RUNNER-001"
+    },
+    {
+      "source_asset_id": "MODULE-FACTORY-V1-CAPABILITY-OFFLINE-REPLAY-001",
+      "relation": "depends_on",
+      "target_asset_id": "CONFIG-EXPERIMENT-SPEC-QUOTE-NATIVE-ADMISSIBLE-OFFLINE-001"
+    },
+    {
+      "source_asset_id": "MODULE-FACTORY-V1-CAPABILITY-OFFLINE-REPLAY-001",
+      "relation": "governed_by",
+      "target_asset_id": "CTRL-FACTORY-V1-PRODUCT-KERNEL-001"
+    },
+    {
+      "source_asset_id": "MODULE-FACTORY-V1-EXPERIMENT-SPEC-001",
+      "relation": "depends_on",
+      "target_asset_id": "SCHEMA-EXPERIMENT-SPEC-001"
+    },
+    {
+      "source_asset_id": "MODULE-FACTORY-V1-OPS-STORE-001",
+      "relation": "governed_by",
+      "target_asset_id": "CONFIG-FACTORY-V1-PRODUCT-KERNEL-001"
+    },
+    {
+      "source_asset_id": "MODULE-FACTORY-V1-READ-MODEL-001",
+      "relation": "depends_on",
+      "target_asset_id": "MODULE-FACTORY-V1-OPS-STORE-001"
+    },
+    {
+      "source_asset_id": "MODULE-FACTORY-V1-RUNNER-001",
+      "relation": "depends_on",
+      "target_asset_id": "MODULE-FACTORY-V1-CAPABILITY-OFFLINE-REPLAY-001"
+    },
+    {
+      "source_asset_id": "MODULE-FACTORY-V1-RUNNER-001",
+      "relation": "governed_by",
+      "target_asset_id": "CTRL-FACTORY-V1-PRODUCT-KERNEL-001"
+    },
+    {
+      "source_asset_id": "MODULE-FACTORY-V1-WORKBENCH-001",
+      "relation": "depends_on",
+      "target_asset_id": "MODULE-FACTORY-V1-APPLICATION-001"
+    },
+    {
       "source_asset_id": "MODULE-OWNER-AUTHORITY-PACKET-001",
       "relation": "governed_by",
       "target_asset_id": "CONFIG-OWNER-AUTHORITY-PACKET-001"
@@ -8323,6 +8433,11 @@
       "target_asset_id": "CATALOG-SCHEMA-LIFECYCLE-001"
     },
     {
+      "source_asset_id": "REPORT-FACTORY-V1-PRODUCT-KERNEL-001",
+      "relation": "derived_from",
+      "target_asset_id": "EVIDENCE-FACTORY-V1-PRODUCT-KERNEL-ACCEPTANCE-001"
+    },
+    {
       "source_asset_id": "REPORT-PMF-QUOTE-ATTEMPT-PREP-001",
       "relation": "derived_from",
       "target_asset_id": "EVIDENCE-PMF-QUOTE-ATTEMPT-PREP-ACCEPTANCE-001"
@@ -8571,6 +8686,16 @@
       "source_asset_id": "SCHEMA-DELIVERY-INDEPENDENT-REVIEW-EVIDENCE-001",
       "relation": "validated_by",
       "target_asset_id": "TEST-DELIVERY-HARNESS-001"
+    },
+    {
+      "source_asset_id": "SCHEMA-EXPERIMENT-SPEC-001",
+      "relation": "governed_by",
+      "target_asset_id": "CTRL-FACTORY-V1-PRODUCT-KERNEL-001"
+    },
+    {
+      "source_asset_id": "SCHEMA-FACTORY-V1-PRODUCT-KERNEL-001",
+      "relation": "governed_by",
+      "target_asset_id": "CTRL-FACTORY-V1-PRODUCT-KERNEL-001"
     },
     {
       "source_asset_id": "SCHEMA-OWNER-AUTHORITY-PACKET-001",
@@ -9151,6 +9276,16 @@
       "source_asset_id": "SCRIPT-DELIVERY-HARNESS-001",
       "relation": "validated_by",
       "target_asset_id": "TEST-DELIVERY-HARNESS-001"
+    },
+    {
+      "source_asset_id": "SCRIPT-FACTORY-V1-EXPERIMENT-001",
+      "relation": "depends_on",
+      "target_asset_id": "MODULE-FACTORY-V1-APPLICATION-001"
+    },
+    {
+      "source_asset_id": "SCRIPT-FACTORY-V1-WORKBENCH-001",
+      "relation": "depends_on",
+      "target_asset_id": "MODULE-FACTORY-V1-WORKBENCH-001"
     },
     {
       "source_asset_id": "SCRIPT-OWNER-ATTENTION-GATE-001",
@@ -9926,6 +10061,21 @@
       "source_asset_id": "TEST-FACTORY-V1-OPERATIONAL-READINESS-001",
       "relation": "depends_on",
       "target_asset_id": "CTRL-FACTORY-V1-OPERATIONAL-READINESS-001"
+    },
+    {
+      "source_asset_id": "TEST-FACTORY-V1-PRODUCT-KERNEL-001",
+      "relation": "depends_on",
+      "target_asset_id": "CONFIG-EXPERIMENT-SPEC-QUOTE-NATIVE-ADMISSIBLE-OFFLINE-001"
+    },
+    {
+      "source_asset_id": "TEST-FACTORY-V1-PRODUCT-KERNEL-001",
+      "relation": "depends_on",
+      "target_asset_id": "EVIDENCE-FACTORY-V1-PRODUCT-KERNEL-ACCEPTANCE-001"
+    },
+    {
+      "source_asset_id": "TEST-FACTORY-V1-PRODUCT-KERNEL-001",
+      "relation": "depends_on",
+      "target_asset_id": "MODULE-FACTORY-V1-RUNNER-001"
     },
     {
       "source_asset_id": "TEST-OWNER-ATTENTION-GATE-001",

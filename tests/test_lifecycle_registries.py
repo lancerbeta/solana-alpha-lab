@@ -213,6 +213,16 @@ class LifecycleRegistryTests(unittest.TestCase):
                             "decision",
                         ],
                     )
+                elif registry_type == "research_cycles":
+                    self.assertEqual(
+                        [record["record_id"] for record in document["records"]],
+                        ["RC-QUOTE-NATIVE-FRICTION-H900-001"],
+                    )
+                elif registry_type == "hypotheses":
+                    self.assertEqual(
+                        [record["record_id"] for record in document["records"]],
+                        ["HYP-QUOTE-NATIVE-FRICTION-H900-V1"],
+                    )
                 else:
                     self.assertEqual(document["schema_version"], "1.0")
                     self.assertEqual(document["records"], [])
