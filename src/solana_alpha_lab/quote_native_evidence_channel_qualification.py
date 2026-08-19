@@ -795,19 +795,26 @@ def _execute_schedule(
                             "consumed_call": False,
                         }
                 return [results[str(item["observation_id"])] for item in schedule]
-            parent = results.get(str(row["parent_id"]))
-            if parent is None or parent.get("terminal") != "QUOTE_OBSERVED":
-                results[observation_id] = _halted(row)
-                continue
-            parent_quote = parent.get("quote")
-            if not isinstance(parent_quote, Mapping):
+            parent_id = row.get("parent_id")
+            amount = str(row["amount"]) if row.get("amount") is not None else None
+            parent = results.get(str(parent_id)) if parent_id else None
+            if parent_id:
+                if parent is None or parent.get("terminal") != "QUOTE_OBSERVED":
+                    results[observation_id] = _halted(row)
+                    continue
+                parent_quote = parent.get("quote")
+                if not isinstance(parent_quote, Mapping):
+                    results[observation_id] = _halted(row)
+                    continue
+                amount = str(parent_quote["out_amount"])
+            elif amount is None:
                 results[observation_id] = _halted(row)
                 continue
             result = call(
                 _order_url(
                     input_mint=str(row["input_mint"]),
                     output_mint=str(row["output_mint"]),
-                    amount=str(parent_quote["out_amount"]),
+                    amount=amount,
                     slippage_bps=str(policy["slippage_bps"]),
                 ),
                 observation_id,
@@ -836,7 +843,7 @@ def _execute_schedule(
             retain_order_raw(observation_id, result)
             results[observation_id] = {
                 **row,
-                "amount": str(parent_quote["out_amount"]),
+                "amount": amount,
                 "terminal": terminal,
                 "terminal_error": error,
                 "observed_at": result["observed_at"],

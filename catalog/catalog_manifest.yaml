@@ -1,12 +1,12 @@
 schema_version: '1.0'
 catalog_id: SMIAL-PROJECT-ASSET-CATALOG
-catalog_version: 0.95.0
+catalog_version: 0.96.0
 as_of: '2026-08-19'
 implementation_status: VALIDATED_ACTIVE
 current_checkpoint:
-  assets: 1212
+  assets: 1220
   asset_registries: 4
-  schemas: 57
+  schemas: 58
   queries: 9
   lifecycle_registries: 9
   lifecycle_records: 84
@@ -86,6 +86,7 @@ root_resolver:
   - catalog/schemas/factory_v1_owner_cockpit.schema.json
   - catalog/schemas/factory_v1_friction_veto.schema.json
   - catalog/schemas/factory_v1_prior_git_t0_friction_screen.schema.json
+  - catalog/schemas/factory_v1_quote_surface_retention_falsifier.schema.json
   commands:
     validate:
     - uv

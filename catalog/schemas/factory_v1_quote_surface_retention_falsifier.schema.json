@@ -1,0 +1,52 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://smial.local/schemas/factory_v1_quote_surface_retention_falsifier.schema.json",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema",
+    "schema_version",
+    "contract_id",
+    "atom_id",
+    "as_of",
+    "experiment_spec_relative",
+    "allowlisted_capabilities",
+    "authority"
+  ],
+  "properties": {
+    "schema": {"const": "smial.factory-v1-quote-surface-retention-falsifier"},
+    "schema_version": {"const": "1.0"},
+    "contract_id": {"const": "FACTORY-V1-QUOTE-SURFACE-RETENTION-FALSIFIER-001"},
+    "atom_id": {"const": "QUOTE_SURFACE_RETENTION_FALSIFIER_V1"},
+    "as_of": {"type": "string", "pattern": "^20[0-9]{2}-[0-9]{2}-[0-9]{2}$"},
+    "experiment_spec_relative": {
+      "type": "string",
+      "minLength": 16,
+      "maxLength": 240
+    },
+    "allowlisted_capabilities": {
+      "type": "array",
+      "minItems": 1,
+      "uniqueItems": true,
+      "items": {"type": "string", "pattern": "^CAP-[A-Z0-9]+(?:-[A-Z0-9]+)+$"}
+    },
+    "authority": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "provider_calls",
+        "credentials",
+        "deployment",
+        "cash_spend",
+        "wallet_signer_transaction"
+      ],
+      "properties": {
+        "provider_calls": {"const": "GATED_BY_EXACT_OWNER_PHRASE"},
+        "credentials": {"const": "GATED_BY_EXACT_OWNER_PHRASE"},
+        "deployment": {"const": false},
+        "cash_spend": {"const": false},
+        "wallet_signer_transaction": {"const": false}
+      }
+    }
+  }
+}
