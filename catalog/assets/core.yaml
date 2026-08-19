@@ -26986,7 +26986,7 @@ records:
   as_of: '2026-08-20'
   truth_owner: QUOTE_SURFACE_RETENTION_FALSIFIER_V1
   location: {kind: git_path, logical_uri: 'repo://docs/evidence/quote_surface_retention_falsifier/a1_delivery_independent_review_v1.json', repository_path: docs/evidence/quote_surface_retention_falsifier/a1_delivery_independent_review_v1.json}
-  integrity: {kind: sha256, sha256: b61257afef8ce5df2379d5a601669da53e44f02b5842533aa46325d28c72eeac}
+  integrity: {kind: sha256, sha256: 23a0249a354cd9411b4052e4473489f5c9fb0d1fb1b4053d749cc67e15c1f6c6}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: derived_from, target_asset_id: CTRL-QUOTE-SURFACE-RETENTION-FALSIFIER-001}
@@ -27004,7 +27004,7 @@ records:
   as_of: '2026-08-20'
   truth_owner: QUOTE_SURFACE_RETENTION_FALSIFIER_V1
   location: {kind: git_path, logical_uri: 'repo://docs/evidence/quote_surface_retention_falsifier/a1_delivery_factory_fit_v1.json', repository_path: docs/evidence/quote_surface_retention_falsifier/a1_delivery_factory_fit_v1.json}
-  integrity: {kind: sha256, sha256: 68867176abef71b6a33c6cc0c33e073868ce427c7c0a48ff37d63812d0734d92}
+  integrity: {kind: sha256, sha256: fff2fdf7df19e27a4aaf5b38ccc8e197794db19c773419a5f663c6f00fcef892}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: derived_from, target_asset_id: EVIDENCE-QUOTE-SURFACE-RETENTION-FALSIFIER-INDEPENDENT-REVIEW-001}
@@ -27022,7 +27022,7 @@ records:
   as_of: '2026-08-20'
   truth_owner: QUOTE_SURFACE_RETENTION_FALSIFIER_V1
   location: {kind: git_path, logical_uri: 'repo://docs/evidence/quote_surface_retention_falsifier/a1_delivery_completion_evidence_v1.json', repository_path: docs/evidence/quote_surface_retention_falsifier/a1_delivery_completion_evidence_v1.json}
-  integrity: {kind: sha256, sha256: c081957b679961f09043907bdb7c38f65da3b5d1f4bb0322f540702c30d5cf0e}
+  integrity: {kind: sha256, sha256: c178d23e92a0a8f68be28c6368a9bc0a8b840b23510b8d3fac7425ce86b989ad}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: derived_from, target_asset_id: EVIDENCE-QUOTE-SURFACE-RETENTION-FALSIFIER-FACTORY-FIT-001}
