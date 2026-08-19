@@ -16,7 +16,7 @@
   ],
   "review_id": "FACTORY-V1-PRODUCT-KERNEL-INDEPENDENT-REVIEW-001",
   "reviewed_bindings_sha256": "2d729cc1b19c49e937d445219ac732eba21834187eac9234d937f7eb08c0f7f0",
-  "reviewed_inventory_sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+  "reviewed_inventory_sha256": "adbe80ba9a1985693271198f4467c5fe9d832c7c7ab04ff94649b80df42ef8b6",
   "reviews": [
     {
       "findings": [
