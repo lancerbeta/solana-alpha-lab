@@ -433,6 +433,11 @@
       "target_asset_id": "CTRL-PRIOR-GIT-T0-FRICTION-SCREEN-001"
     },
     {
+      "source_asset_id": "CONFIG-CAPTURE-POLICY-QUOTE-SURFACE-RETENTION-FALSIFIER-001",
+      "relation": "governed_by",
+      "target_asset_id": "CTRL-QUOTE-SURFACE-RETENTION-FALSIFIER-001"
+    },
+    {
       "source_asset_id": "CONFIG-DELIVERY-CAPABILITY-RADAR-001",
       "relation": "governed_by",
       "target_asset_id": "CTRL-DELIVERY-HARNESS-001"
@@ -528,6 +533,16 @@
       "target_asset_id": "SCHEMA-EXPERIMENT-SPEC-001"
     },
     {
+      "source_asset_id": "CONFIG-EXPERIMENT-SPEC-QUOTE-SURFACE-RETENTION-FALSIFIER-001",
+      "relation": "depends_on",
+      "target_asset_id": "SCHEMA-EXPERIMENT-SPEC-001"
+    },
+    {
+      "source_asset_id": "CONFIG-EXPERIMENT-SPEC-QUOTE-SURFACE-RETENTION-FALSIFIER-001",
+      "relation": "governed_by",
+      "target_asset_id": "CTRL-QUOTE-SURFACE-RETENTION-FALSIFIER-001"
+    },
+    {
       "source_asset_id": "CONFIG-FACTORY-V1-COMMISSIONING-001",
       "relation": "depends_on",
       "target_asset_id": "SCHEMA-FACTORY-V1-COMMISSIONING-001"
@@ -601,6 +616,16 @@
       "source_asset_id": "CONFIG-FACTORY-V1-PRODUCTION-LITE-RUNTIME-001",
       "relation": "governed_by",
       "target_asset_id": "CTRL-FACTORY-V1-PRODUCTION-LITE-RUNTIME-001"
+    },
+    {
+      "source_asset_id": "CONFIG-FACTORY-V1-QUOTE-SURFACE-RETENTION-FALSIFIER-001",
+      "relation": "depends_on",
+      "target_asset_id": "SCHEMA-FACTORY-V1-QUOTE-SURFACE-RETENTION-FALSIFIER-001"
+    },
+    {
+      "source_asset_id": "CONFIG-FACTORY-V1-QUOTE-SURFACE-RETENTION-FALSIFIER-001",
+      "relation": "governed_by",
+      "target_asset_id": "CTRL-QUOTE-SURFACE-RETENTION-FALSIFIER-001"
     },
     {
       "source_asset_id": "CONFIG-FRICTION-VETO-RULE-001",
@@ -766,6 +791,11 @@
       "source_asset_id": "CONFIG-QUOTE-NATIVE-QUOTED-BUY-H900-CLOCK-001",
       "relation": "governed_by",
       "target_asset_id": "CTRL-QUOTE-NATIVE-QUOTED-BUY-H900-CLOCK-001"
+    },
+    {
+      "source_asset_id": "CONFIG-QUOTE-SURFACE-RETENTION-RULE-001",
+      "relation": "governed_by",
+      "target_asset_id": "CTRL-QUOTE-SURFACE-RETENTION-FALSIFIER-001"
     },
     {
       "source_asset_id": "CONFIG-T20-COLLECTION-SPEC-001",
@@ -2363,6 +2393,26 @@
       "target_asset_id": "CONFIG-PROVIDER-ROUTE-CAPABILITY-REGISTRY-007"
     },
     {
+      "source_asset_id": "CTRL-QUOTE-SURFACE-RETENTION-FALSIFIER-001",
+      "relation": "depends_on",
+      "target_asset_id": "ARCH-INTENT-005"
+    },
+    {
+      "source_asset_id": "CTRL-QUOTE-SURFACE-RETENTION-FALSIFIER-001",
+      "relation": "depends_on",
+      "target_asset_id": "EVIDENCE-PRIOR-GIT-T0-FRICTION-SCREEN-ACCEPTANCE-001"
+    },
+    {
+      "source_asset_id": "CTRL-QUOTE-SURFACE-RETENTION-FALSIFIER-001",
+      "relation": "depends_on",
+      "target_asset_id": "MODULE-FACTORY-V1-CAPABILITY-FREE-KEY-CAPTURE-001"
+    },
+    {
+      "source_asset_id": "CTRL-QUOTE-SURFACE-RETENTION-FALSIFIER-001",
+      "relation": "validated_by",
+      "target_asset_id": "TEST-QUOTE-SURFACE-RETENTION-FALSIFIER-001"
+    },
+    {
       "source_asset_id": "CTRL-RC001-H13-PARK-FROM-PRIORITY-001",
       "relation": "contains",
       "target_asset_id": "MODULE-RC001-H13-PARK-FROM-PRIORITY-001"
@@ -3591,6 +3641,16 @@
       "source_asset_id": "EVIDENCE-QUOTE-NATIVE-QUOTED-BUY-H900-CLOCK-ACCEPTANCE-001",
       "relation": "derived_from",
       "target_asset_id": "EVIDENCE-QUOTE-NATIVE-QUOTED-BUY-H900-CLOCK-001"
+    },
+    {
+      "source_asset_id": "EVIDENCE-QUOTE-SURFACE-RETENTION-FALSIFIER-ACCEPTANCE-001",
+      "relation": "derived_from",
+      "target_asset_id": "EVIDENCE-QUOTE-SURFACE-RETENTION-FALSIFIER-RUNTIME-001"
+    },
+    {
+      "source_asset_id": "EVIDENCE-QUOTE-SURFACE-RETENTION-FALSIFIER-RUNTIME-001",
+      "relation": "derived_from",
+      "target_asset_id": "CTRL-QUOTE-SURFACE-RETENTION-FALSIFIER-001"
     },
     {
       "source_asset_id": "EVIDENCE-RC001-H13-PARK-FROM-PRIORITY-001",
@@ -6968,6 +7028,11 @@
       "target_asset_id": "CTRL-PRIOR-GIT-T0-FRICTION-SCREEN-001"
     },
     {
+      "source_asset_id": "MODULE-FACTORY-V1-QUOTE-SURFACE-RETENTION-001",
+      "relation": "governed_by",
+      "target_asset_id": "CTRL-QUOTE-SURFACE-RETENTION-FALSIFIER-001"
+    },
+    {
       "source_asset_id": "MODULE-FACTORY-V1-READ-MODEL-001",
       "relation": "depends_on",
       "target_asset_id": "MODULE-FACTORY-V1-OPS-STORE-001"
@@ -8803,6 +8868,11 @@
       "target_asset_id": "EVIDENCE-QUOTE-NATIVE-QUOTED-BUY-H900-CLOCK-ACCEPTANCE-001"
     },
     {
+      "source_asset_id": "REPORT-QUOTE-SURFACE-RETENTION-FALSIFIER-001",
+      "relation": "derived_from",
+      "target_asset_id": "EVIDENCE-QUOTE-SURFACE-RETENTION-FALSIFIER-ACCEPTANCE-001"
+    },
+    {
       "source_asset_id": "REPORT-RC001-H13-PARK-FROM-PRIORITY-001",
       "relation": "derived_from",
       "target_asset_id": "EVIDENCE-RC001-H13-PARK-FROM-PRIORITY-001"
@@ -9026,6 +9096,11 @@
       "source_asset_id": "SCHEMA-FACTORY-V1-PRODUCTION-LITE-RUNTIME-001",
       "relation": "governed_by",
       "target_asset_id": "CTRL-FACTORY-V1-PRODUCTION-LITE-RUNTIME-001"
+    },
+    {
+      "source_asset_id": "SCHEMA-FACTORY-V1-QUOTE-SURFACE-RETENTION-FALSIFIER-001",
+      "relation": "governed_by",
+      "target_asset_id": "CTRL-QUOTE-SURFACE-RETENTION-FALSIFIER-001"
     },
     {
       "source_asset_id": "SCHEMA-OWNER-AUTHORITY-PACKET-001",
@@ -10721,6 +10796,21 @@
       "source_asset_id": "TEST-QUOTE-NATIVE-QUOTED-BUY-H900-CLOCK-001",
       "relation": "depends_on",
       "target_asset_id": "MODULE-QUOTE-NATIVE-QUOTED-BUY-H900-CLOCK-001"
+    },
+    {
+      "source_asset_id": "TEST-QUOTE-SURFACE-RETENTION-FALSIFIER-001",
+      "relation": "depends_on",
+      "target_asset_id": "CONFIG-EXPERIMENT-SPEC-QUOTE-SURFACE-RETENTION-FALSIFIER-001"
+    },
+    {
+      "source_asset_id": "TEST-QUOTE-SURFACE-RETENTION-FALSIFIER-001",
+      "relation": "depends_on",
+      "target_asset_id": "CONFIG-QUOTE-SURFACE-RETENTION-RULE-001"
+    },
+    {
+      "source_asset_id": "TEST-QUOTE-SURFACE-RETENTION-FALSIFIER-001",
+      "relation": "depends_on",
+      "target_asset_id": "MODULE-FACTORY-V1-QUOTE-SURFACE-RETENTION-001"
     },
     {
       "source_asset_id": "TEST-RC001-H13-PARK-FROM-PRIORITY-001",

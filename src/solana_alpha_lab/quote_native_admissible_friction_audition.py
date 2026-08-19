@@ -43,6 +43,8 @@ from solana_alpha_lab.quote_native_friction_h900_falsifier import score_mechanis
 from solana_alpha_lab.quote_native_live_variation_campaign import (
     H3600,
     H900,
+    DEFAULT_OBSERVATION_SCHEDULE,
+    RETENTION_OBSERVATION_SCHEDULE,
     build_schedule,
     score_campaign,
     select_cohort,
@@ -52,6 +54,7 @@ ATOM_ID = "QUOTE_NATIVE_ADMISSIBLE_FRICTION_AUDITION_V1"
 FACTORY_COMMISSIONING_ATOM_ID = "FACTORY_V1_COMMISSIONING_HYPOTHESIS_V1"
 FRICTION_VETO_ATOM_ID = "FRESH_OOS_BASELINE_VS_FRICTION_VETO_V1"
 T0_FRICTION_SCREEN_ATOM_ID = "PRIOR_GIT_T0_FRICTION_SCREEN_V1"
+RETENTION_ATOM_ID = "QUOTE_SURFACE_RETENTION_FALSIFIER_V1"
 AUTHORITY_PHRASE = (
     "OK QUOTE_NATIVE_ADMISSIBLE_FRICTION_AUDITION_V1: one fresh Jupiter "
     "Free-key quote-native campaign; local process-environment key only; "
@@ -110,6 +113,21 @@ T0_FRICTION_SCREEN_AUTHORITY_PHRASE = (
     "read required for capture PASS; WRAP existing capture plus "
     "classify_audition_terminal; not MOVE 3; not alpha; not VPS; no post-hoc "
     "threshold search."
+)
+RETENTION_AUTHORITY_PHRASE = (
+    "OK QUOTE_SURFACE_RETENTION_FALSIFIER_V1: one Jupiter Free-key "
+    "quote-surface retention falsifier; local process-environment key only; "
+    "Tokens V2 /recent and /toptraded/1h plus quote-only /swap/v2/order; "
+    "x-api-key header only; no .env; no key in URL/log/receipt/Git; no taker, "
+    "/build, /execute, wallet, signer, transaction, paid plan, second "
+    "provider, retry or fallback; cash cap $0; call cap 62; global pace >=3s; "
+    "6 RECENT + 6 TRADED live outcome-blind cohort excluding A1, MOVE 2, "
+    "commissioning, ATOM 5 veto and ATOM 6 t0-screen mints; frozen KEEP if "
+    "RETENTION_DELTA >= 0 and H900 routes exist; H3600 exact sell of "
+    "BUY_H900 outAmount; hash-bound row observed_at and attempt reservation "
+    "before credential read required for capture PASS; WRAP existing capture "
+    "plus retention projector; not Atom 2; not alpha; not VPS; no post-hoc "
+    "threshold search; no TRADED-only rescue."
 )
 ENVELOPE_SCHEMA = "smial.quote-native-admissible-friction-audition.capture-envelope"
 RESERVATION_SCHEMA = "smial.quote-native-admissible-friction-audition.attempt-reservation"
@@ -306,8 +324,12 @@ def _validate_policy_shape(policy: Mapping[str, Any]) -> None:
             owner_phrase == T0_FRICTION_SCREEN_AUTHORITY_PHRASE,
             "AUTHORITY_PHRASE_DRIFT",
         )
+    elif atom_id == RETENTION_ATOM_ID:
+        _require(owner_phrase == RETENTION_AUTHORITY_PHRASE, "AUTHORITY_PHRASE_DRIFT")
     else:
         _require(False, "ATOM_ID_DRIFT")
+    retention = atom_id == RETENTION_ATOM_ID
+    expected_call_cap = 62 if retention else CALL_CAP
     _require(authority.get("credential_name") == "JUPITER_API_KEY", "CREDENTIAL_NAME_DRIFT")
     _require(authority.get("credential_reads") == 1, "CREDENTIAL_READ_BUDGET_DRIFT")
     _require(authority.get("dotenv_reads") is False, "DOTENV_READ_NOT_FORBIDDEN")
@@ -315,7 +337,7 @@ def _validate_policy_shape(policy: Mapping[str, Any]) -> None:
     _require(authority.get("build") is False, "BUILD_NOT_FORBIDDEN")
     _require(authority.get("taker") == "OMITTED_QUOTE_ONLY", "TAKER_NOT_OMITTED")
     _require(authority.get("cash_cap_usd_cents") == 0, "CASH_CAP_DRIFT")
-    _require(authority.get("call_cap") == CALL_CAP, "CALL_CAP_DRIFT")
+    _require(authority.get("call_cap") == expected_call_cap, "CALL_CAP_DRIFT")
     _require(quote_route.get("endpoint") == "https://api.jup.ag/swap/v2/order", "QUOTE_ENDPOINT_DRIFT")
     _require(quote_route.get("host") == API_HOST, "QUOTE_HOST_DRIFT")
     _require(quote_route.get("method") == "GET", "QUOTE_METHOD_DRIFT")
@@ -328,21 +350,39 @@ def _validate_policy_shape(policy: Mapping[str, Any]) -> None:
     _require(policy.get("slippage_bps") == "100", "SLIPPAGE_DRIFT")
     _require(policy.get("min_interval_seconds") == MIN_INTERVAL_SECONDS, "PACE_DRIFT")
     _require(policy.get("observable_horizon_seconds") == [H900, H3600], "HORIZON_DRIFT")
-    _require(policy.get("gap_horizon_seconds") == [H14400], "GAP_HORIZON_DRIFT")
     _require(policy.get("lateness_slack_seconds") == LATE_SLACK_SECONDS, "SLACK_DRIFT")
-    _require(policy.get("searchable_y_horizon_seconds") == H900, "SEARCHABLE_Y_DRIFT")
-    _require(
-        policy.get("h3600_role") == "PREDECLARED_ROBUSTNESS_NOT_SEARCHABLE_Y",
-        "H3600_ROLE_DRIFT",
-    )
-    _require(success.get("min_complete_xy") == 10, "SUCCESS_COMPLETE_DRIFT")
-    _require(success.get("min_time_separated") == 6, "SUCCESS_SEPARATED_DRIFT")
-    _require(control_kill.get("min_complete_cells") == 6, "KILL_COMPLETE_DRIFT")
-    _require(control_kill.get("min_time_separated_share") == "0.5", "KILL_SHARE_DRIFT")
+    if retention:
+        _require(
+            policy.get("observation_schedule") == RETENTION_OBSERVATION_SCHEDULE,
+            "OBSERVATION_SCHEDULE_DRIFT",
+        )
+        _require(policy.get("gap_horizon_seconds") == [], "GAP_HORIZON_DRIFT")
+        _require(policy.get("searchable_y_horizon_seconds") == H3600, "SEARCHABLE_Y_DRIFT")
+        _require(
+            policy.get("searchable_y_kind") == "SELL_H3600_FROM_BUY_H900",
+            "SEARCHABLE_Y_KIND_DRIFT",
+        )
+        _require(
+            policy.get("h3600_role") == "SEARCHABLE_FORWARD_QUOTED_RETURN_FROM_BUY_H900",
+            "H3600_ROLE_DRIFT",
+        )
+        _require(success.get("min_complete_decision_outcome_per_stratum") == 4, "SUCCESS_FLOOR_DRIFT")
+        _require(controls.get("provider_requests_max") == 62, "REQUEST_BUDGET_DRIFT")
+    else:
+        _require(policy.get("gap_horizon_seconds") == [H14400], "GAP_HORIZON_DRIFT")
+        _require(policy.get("searchable_y_horizon_seconds") == H900, "SEARCHABLE_Y_DRIFT")
+        _require(
+            policy.get("h3600_role") == "PREDECLARED_ROBUSTNESS_NOT_SEARCHABLE_Y",
+            "H3600_ROLE_DRIFT",
+        )
+        _require(success.get("min_complete_xy") == 10, "SUCCESS_COMPLETE_DRIFT")
+        _require(success.get("min_time_separated") == 6, "SUCCESS_SEPARATED_DRIFT")
+        _require(control_kill.get("min_complete_cells") == 6, "KILL_COMPLETE_DRIFT")
+        _require(control_kill.get("min_time_separated_share") == "0.5", "KILL_SHARE_DRIFT")
+        _require(controls.get("provider_requests_max") == CALL_CAP, "REQUEST_BUDGET_DRIFT")
     _require(controls.get("retries") == 0, "RETRY_NOT_FORBIDDEN")
     _require(controls.get("fallback") is False, "FALLBACK_NOT_FORBIDDEN")
     _require(controls.get("persist_transaction_bytes") is False, "TX_PERSIST_NOT_FORBIDDEN")
-    _require(controls.get("provider_requests_max") == CALL_CAP, "REQUEST_BUDGET_DRIFT")
     _require(controls.get("background_scheduler") is False, "SCHEDULER_NOT_FORBIDDEN")
     _require(controls.get("second_provider") is False, "SECOND_PROVIDER_NOT_FORBIDDEN")
     _require(controls.get("paid_plan") is False, "PAID_PLAN_NOT_FORBIDDEN")
@@ -494,6 +534,8 @@ def run_campaign(
     limits = _policy_mapping(policy.get("runtime_limits"), "LIMITS_INVALID")
     quote_route = _policy_mapping(policy.get("quote_route"), "QUOTE_ROUTE_INVALID")
     discovery = _policy_mapping(policy.get("discovery_routes"), "DISCOVERY_INVALID")
+    authority = _policy_mapping(policy.get("external_authority"), "AUTHORITY_INVALID")
+    schedule_kind = str(policy.get("observation_schedule") or DEFAULT_OBSERVATION_SCHEDULE)
     waiter = time.sleep if sleeper is None else sleeper
     monotonic = time.monotonic if monotonic_clock is None else monotonic_clock
     started_at = clock()
@@ -517,7 +559,7 @@ def run_campaign(
             elapsed = monotonic() - last_call_monotonic
             if elapsed < MIN_INTERVAL_SECONDS:
                 waiter(MIN_INTERVAL_SECONDS - elapsed)
-        if provider_requests >= CALL_CAP:
+        if provider_requests >= int(authority.get("call_cap") or CALL_CAP):
             raise AuditionError("CALL_CAP_EXCEEDED", provider_requests=provider_requests)
         provider_requests += 1
         try:
@@ -666,7 +708,11 @@ def run_campaign(
 
     panel_started_at = clock()
     panel_started_monotonic = monotonic()
-    schedule = build_schedule(cells, panel_started_at=panel_started_at)
+    schedule = build_schedule(
+        cells,
+        panel_started_at=panel_started_at,
+        schedule_kind=schedule_kind,
+    )
     observations = _execute_schedule(
         schedule=schedule,
         policy=policy,
@@ -723,17 +769,29 @@ def run_campaign(
             ),
             "panel_started_at": _format_utc(panel_started_at),
         }
-    campaign = sanitize_wrapped_score(score_campaign(observations))
-    mechanism = sanitize_wrapped_score(score_mechanism(searchable_y_observations(observations)))
-    mechanism["scored"] = True
-    mechanism["searchable_y_kind"] = SEARCHABLE_Y_KIND
-    campaign["h3600_role"] = "PREDECLARED_ROBUSTNESS_NOT_SEARCHABLE_Y"
-    terminal_outcome = classify_audition_terminal(
-        capture=capture,
-        campaign=campaign,
-        mechanism=mechanism,
-    )
-    return {
+    if schedule_kind == RETENTION_OBSERVATION_SCHEDULE:
+        campaign = {
+            "campaign_verdict": "RETENTION_PANEL_CAPTURED",
+            "h3600_role": str(policy.get("h3600_role") or ""),
+        }
+        mechanism = {
+            "scored": False,
+            "searchable_y_kind": "SELL_H3600_FROM_BUY_H900",
+            "cells": [],
+        }
+        terminal_outcome = "RETENTION_PANEL_CAPTURED"
+    else:
+        campaign = sanitize_wrapped_score(score_campaign(observations))
+        mechanism = sanitize_wrapped_score(score_mechanism(searchable_y_observations(observations)))
+        mechanism["scored"] = True
+        mechanism["searchable_y_kind"] = SEARCHABLE_Y_KIND
+        campaign["h3600_role"] = "PREDECLARED_ROBUSTNESS_NOT_SEARCHABLE_Y"
+        terminal_outcome = classify_audition_terminal(
+            capture=capture,
+            campaign=campaign,
+            mechanism=mechanism,
+        )
+    receipt = {
         **_terminal_receipt(
             terminal=terminal_outcome,
             preflight=preflight,
@@ -749,3 +807,7 @@ def run_campaign(
         ),
         "panel_started_at": _format_utc(panel_started_at),
     }
+    if schedule_kind == RETENTION_OBSERVATION_SCHEDULE:
+        receipt["h3600_role"] = str(policy.get("h3600_role") or "")
+        receipt["searchable_y_kind"] = "SELL_H3600_FROM_BUY_H900"
+    return receipt

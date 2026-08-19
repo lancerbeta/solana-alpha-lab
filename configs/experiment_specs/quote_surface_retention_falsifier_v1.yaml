@@ -1,0 +1,62 @@
+schema: smial.experiment-spec
+schema_version: '1.0'
+experiment_id: EXP-QUOTE-SURFACE-RETENTION-FALSIFIER-001
+hypothesis_version: HYP-QUOTE-SURFACE-RETENTION-CONTINUATION-V1
+question: Does within-token quote-surface retention from T0 to H900 have decision utility for a position hypothetically entered at H900 and liquidated at H3600 on a fresh outcome-blind cohort?
+estimand: KEEP versus eligible baseline on H900-to-H3600 ForwardQuotedReturn after frozen RETENTION_DELTA >= 0, not PnL
+population: LIVE_OUTCOME_BLIND_TOKENS_V2_FREE_KEY_6_RECENT_6_TRADED_EXCLUDING_A1_MOVE2_COMMISSIONING_ATOM5_ATOM6
+data_requirements:
+  - requirement_id: CAPTURE_POLICY
+    kind: CAPTURE_POLICY
+    path: configs/quote_native_quote_surface_retention_audition_v1.yaml
+    sha256: 509f55713ae912249135343f052e5c438f5e3ea9baa516b249039a74c0b12c9f
+  - requirement_id: RETENTION_RULE
+    kind: CATALOG_ASSET
+    path: configs/quote_surface_retention_rule_v1.yaml
+    sha256: 6b06a59782b81146851eac2d1ce985cc762e408a56627df92b5cb097932b27fa
+  - requirement_id: EXCLUSION_A1
+    kind: GIT_CANONICAL_RECEIPT
+    path: docs/evidence/quote_native_admissible_friction_audition/a1_quote_native_admissible_friction_audition_runtime_receipt_v1.json
+    sha256: 75f60a155b7db6ddb8c801c9ff5060ce5e4e7fe641b836ff35edeb91534c308e
+  - requirement_id: EXCLUSION_MOVE2
+    kind: GIT_CANONICAL_RECEIPT
+    path: docs/evidence/quote_native_friction_h900_move2_oos/a1_quote_native_friction_h900_move2_oos_runtime_receipt_v1.json
+    sha256: a860888cd6c528c03cffb27146d07da6ed60770d0f1e13d47651b0d63f51b926
+  - requirement_id: EXCLUSION_COMMISSIONING
+    kind: GIT_CANONICAL_RECEIPT
+    path: docs/evidence/factory_v1_commissioning/a2_factory_v1_commissioning_runtime_receipt_v1.json
+    sha256: f83968a0be381f874a38ed214c1f9ff1a5ac46bc433c502417d35d8f31727468
+  - requirement_id: EXCLUSION_ATOM5
+    kind: GIT_CANONICAL_RECEIPT
+    path: docs/evidence/fresh_oos_friction_veto/a5_fresh_oos_friction_veto_runtime_receipt_v1.json
+    sha256: 9eb063cdd44dacf80248d53ed58020961f1f29295294055d231204a71e944276
+  - requirement_id: EXCLUSION_ATOM6
+    kind: GIT_CANONICAL_RECEIPT
+    path: docs/evidence/prior_git_t0_friction_screen/a6_prior_git_t0_friction_screen_runtime_receipt_v1.json
+    sha256: 6ae33cd32bcc3cddd03b515b9149a827a8faffaf791816f604e8ee209879a207
+  - requirement_id: RUNTIME_RECEIPT
+    kind: PROVIDER_BOUNDED_CAPTURE
+    path: docs/evidence/quote_surface_retention_falsifier/a1_quote_surface_retention_falsifier_runtime_receipt_v1.json
+  - requirement_id: ACCEPTANCE
+    kind: PROVIDER_BOUNDED_CAPTURE
+    path: docs/evidence/quote_surface_retention_falsifier/a1_quote_surface_retention_falsifier_acceptance_v1.json
+capabilities:
+  - CAP-JUPITER-FREE-KEY-QUOTE-NATIVE-BOUNDED-CAPTURE-001
+falsifier: Retention KEEP does not improve H900-to-H3600 ForwardQuotedReturn in both strata, or capture requires a hypothesis-specific core runner.
+method: classify_quote_surface_retention
+parameters:
+  research_cycle_id: RC-QUOTE-SURFACE-RETENTION-001
+  capture_policy_relative: configs/quote_native_quote_surface_retention_audition_v1.yaml
+  required_owner_phrase: 'OK QUOTE_SURFACE_RETENTION_FALSIFIER_V1: one Jupiter Free-key quote-surface retention falsifier; local process-environment key only; Tokens V2 /recent and /toptraded/1h plus quote-only /swap/v2/order; x-api-key header only; no .env; no key in URL/log/receipt/Git; no taker, /build, /execute, wallet, signer, transaction, paid plan, second provider, retry or fallback; cash cap $0; call cap 62; global pace >=3s; 6 RECENT + 6 TRADED live outcome-blind cohort excluding A1, MOVE 2, commissioning, ATOM 5 veto and ATOM 6 t0-screen mints; frozen KEEP if RETENTION_DELTA >= 0 and H900 routes exist; H3600 exact sell of BUY_H900 outAmount; hash-bound row observed_at and attempt reservation before credential read required for capture PASS; WRAP existing capture plus retention projector; not Atom 2; not alpha; not VPS; no post-hoc threshold search; no TRADED-only rescue.'
+  next_safe_action: WAIT_EXACT_JUPITER_PHRASE_THEN_SCORE_STRATA_SEPARATELY
+  retention_rule_id: QUOTE_SURFACE_RETENTION_DELTA_NONNEGATIVE_V1
+evidence_budget:
+  provider_api_rpc_wss_calls: 62
+holdout_policy: No reserved OOS split is consumed; this atom uses a new live cohort excluding A1, MOVE 2, commissioning, ATOM 5 and ATOM 6 mints and does not start Atom 2.
+terminal_outcomes:
+  - BLOCKED_AUTHORITY
+  - SAMPLE_INVALID_INSUFFICIENT_COMPLETE_XY
+  - SAMPLE_INVALID_REPLAN_REQUIRED
+  - FRESH_OOS_REPLICATION_EARNED
+  - CLOSE_EXACT_QUOTE_SURFACE_RETENTION_FAMILY
+  - PAUSE_CLOSE_QUOTE_NATIVE_CURRENT_ALPHA_ROUTE

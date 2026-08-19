@@ -1,0 +1,14 @@
+schema: smial.factory-v1-quote-surface-retention-falsifier
+schema_version: '1.0'
+contract_id: FACTORY-V1-QUOTE-SURFACE-RETENTION-FALSIFIER-001
+atom_id: QUOTE_SURFACE_RETENTION_FALSIFIER_V1
+as_of: '2026-08-19'
+experiment_spec_relative: configs/experiment_specs/quote_surface_retention_falsifier_v1.yaml
+allowlisted_capabilities:
+  - CAP-JUPITER-FREE-KEY-QUOTE-NATIVE-BOUNDED-CAPTURE-001
+authority:
+  provider_calls: GATED_BY_EXACT_OWNER_PHRASE
+  credentials: GATED_BY_EXACT_OWNER_PHRASE
+  deployment: false
+  cash_spend: false
+  wallet_signer_transaction: false

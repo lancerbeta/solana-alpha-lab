@@ -1,0 +1,139 @@
+{
+  "acceptance_id": "EVIDENCE-QUOTE-SURFACE-RETENTION-FALSIFIER-ACCEPTANCE-001",
+  "as_of": "2026-08-20",
+  "atom_id": "QUOTE_SURFACE_RETENTION_FALSIFIER_V1",
+  "atom_2": false,
+  "capture": {
+    "accepted": true,
+    "attempt_reservation_before_credential_read": true,
+    "blockers": [],
+    "consumed_count": 62,
+    "hash_bound_row_observed_at": true,
+    "searchable_y_kind": "SELL_H3600_FROM_BUY_H900",
+    "wrap_capture_searchable_y_kind_field": "SELL_H900"
+  },
+  "capture_contract": "VALID_CAPTURE_CONTRACT",
+  "cohort": {
+    "excluded_prior_mint_count": 60,
+    "frozen_cell_count": 12,
+    "prior_mint_reused": false,
+    "recent_cell_count": 6,
+    "sample_class": "LIVE_OUTCOME_BLIND_TOKENS_V2_FREE_KEY_EXCLUDING_A1_MOVE2_COMMISSIONING_ATOM5_ATOM6",
+    "traded_cell_count": 6
+  },
+  "criteria": {
+    "h3600_role": "SEARCHABLE_FORWARD_QUOTED_RETURN_FROM_BUY_H900",
+    "min_complete_decision_outcome_per_stratum": 4,
+    "recent_valid_n": 0,
+    "traded_valid_n": 6,
+    "traded_keep_n": 3,
+    "traded_veto_n": 3,
+    "recent_time_separated_n": 0,
+    "traded_time_separated_n": 6,
+    "provider_typed_failure_cells": 1,
+    "success_passed": false,
+    "reason": "INSUFFICIENT_VALID_CELLS_PER_STRATUM"
+  },
+  "factory_v1_operational_ready": false,
+  "family_close": false,
+  "hypothesis_specific_core_runner_change": false,
+  "limitations": [
+    "SCREENING_HINT_NOT_OOS_CONFIRMATION",
+    "RECENT_H900_REVERSE_EQUALS_H3600_SELL_NOT_TIME_SEPARATED",
+    "TIME_SEPARATION_IS_PRIOR_ATOM_AMOUNT_PROXY_NOT_CLOCK_PIT",
+    "NO_TRADED_ONLY_RESCUE",
+    "NO_POST_HOC_THRESHOLD_SEARCH",
+    "NO_AUTOMATIC_RECAPTURE",
+    "NO_FACTORY_V1_OPERATIONAL_READY",
+    "NO_ATOM_2",
+    "WRAP_CAPTURE_DICT_STILL_LABELS_SEARCHABLE_Y_SELL_H900"
+  ],
+  "next_boundary": "SAMPLE_INVALID_REPLAN_REQUIRED_NO_AUTOMATIC_RECAPTURE",
+  "non_claims": [
+    "NO_EXECUTE",
+    "NO_TAKER_OR_SIGNER",
+    "NO_TRANSACTION_BYTES_IN_GIT",
+    "NO_ALPHA",
+    "NO_NETRETURN",
+    "NO_ATOM_2",
+    "NO_A1_REPLAY_AS_NEW_RESULT",
+    "NO_MOVE_2_AS_NEW_RESULT",
+    "NO_COMMISSIONING_REPLAY_AS_NEW_RESULT",
+    "NO_ATOM5_REPLAY_AS_NEW_RESULT",
+    "NO_ATOM6_REPLAY_AS_NEW_RESULT",
+    "NO_PAID_PLAN",
+    "NO_SECOND_PROVIDER",
+    "NO_VPS",
+    "NO_POST_HOC_THRESHOLD_SEARCH",
+    "NO_TRADED_ONLY_RESCUE"
+  ],
+  "owner_decision": "SAMPLE_INVALID_REPLAN_REQUIRED",
+  "owner_visible": {
+    "data": true,
+    "decision": true,
+    "estimand": true,
+    "failure": true,
+    "git_archaeology_required": false,
+    "next": true,
+    "population": true,
+    "question": true,
+    "result": true,
+    "robustness": true,
+    "uncertainty": true
+  },
+  "product_terminal": "SAMPLE_INVALID_REPLAN_REQUIRED",
+  "project_sources_disposition": {
+    "kind": "NO_CHANGE"
+  },
+  "provider_observations": {
+    "all_http_status_counts": {
+      "200": 60,
+      "400": 2
+    },
+    "credential_reads": 1,
+    "fallbacks": 0,
+    "provider_requests": 62,
+    "retries": 0,
+    "swap_http_status_counts": {
+      "200": 58,
+      "400": 2
+    },
+    "token_http_status_counts": {
+      "200": 2
+    }
+  },
+  "registry": {
+    "path": "configs/provider_route_capability_registry_v9.yaml",
+    "route_ids": [
+      "JUPITER-SOLANA-TOKENS-V2-RECENT-FREE-API-KEY-001",
+      "JUPITER-SOLANA-TOKENS-V2-TOPTRADED-FREE-API-KEY-001",
+      "JUPITER-SOLANA-SWAP-V2-ORDER-FREE-API-KEY-001"
+    ],
+    "sha256": "dc5cdd4c78a8a907f4bb6de16629c4ee2ef7535c437b33ae9bd8b18eb1847aa1"
+  },
+  "retention": {
+    "baseline_n": 6,
+    "kept_n_in_terminal_packet": 0,
+    "recent_valid_n": 0,
+    "rule_id": "QUOTE_SURFACE_RETENTION_DELTA_NONNEGATIVE_V1",
+    "reason": "INSUFFICIENT_VALID_CELLS_PER_STRATUM",
+    "terminal": "SAMPLE_INVALID_REPLAN_REQUIRED",
+    "traded_valid_n": 6,
+    "vetoed_n_in_terminal_packet": 0
+  },
+  "schema": "smial.factory-v1-quote-surface-retention-falsifier.acceptance",
+  "schema_version": "1.0",
+  "scientific_terminal": "SAMPLE_INVALID_REPLAN_REQUIRED",
+  "side_effects": {
+    "build_calls": 0,
+    "cash_spend_usd_cents": 0,
+    "execute_calls": 0,
+    "paid_plan": false,
+    "second_provider": false,
+    "taker_supplied": false,
+    "wallet_signer_transaction_actions": 0
+  },
+  "source_runtime_receipt": "docs/evidence/quote_surface_retention_falsifier/a1_quote_surface_retention_falsifier_runtime_receipt_v1.json",
+  "source_runtime_receipt_sha256": "1ba86f85127e819fb9a520e1f6e947d0ea57c5c0834e622ad64f11acd207d02e",
+  "vps": false
+}

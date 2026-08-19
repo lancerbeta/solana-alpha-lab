@@ -15,6 +15,10 @@ from solana_alpha_lab.factory.friction_veto import (
     apply_friction_veto_to_receipt,
     load_friction_veto_rule,
 )
+from solana_alpha_lab.factory.quote_surface_retention import (
+    apply_quote_surface_retention_to_receipt,
+    load_quote_surface_retention_rule,
+)
 from solana_alpha_lab.factory.t0_friction_screen import (
     apply_t0_friction_screen_to_receipt,
     load_t0_friction_screen_rule,
@@ -22,6 +26,7 @@ from solana_alpha_lab.factory.t0_friction_screen import (
 from solana_alpha_lab.quote_native_admissible_friction_audition import (
     FACTORY_COMMISSIONING_ATOM_ID,
     FRICTION_VETO_ATOM_ID,
+    RETENTION_ATOM_ID,
     T0_FRICTION_SCREEN_ATOM_ID,
     AuditionError,
     attempt_reservation_document,
@@ -219,6 +224,12 @@ def _overlay_veto_receipt(
             raise CapabilityError("T0_SCREEN_RULE_MISSING")
         rule = load_t0_friction_screen_rule(root, str(rule_item["path"]))
         return apply_t0_friction_screen_to_receipt(receipt, rule=rule)
+    if atom_id == RETENTION_ATOM_ID:
+        rule_item = requirements.get("RETENTION_RULE")
+        if rule_item is None:
+            raise CapabilityError("RETENTION_RULE_MISSING")
+        rule = load_quote_surface_retention_rule(root, str(rule_item["path"]))
+        return apply_quote_surface_retention_to_receipt(receipt, rule=rule)
     return dict(receipt)
 
 
@@ -311,6 +322,7 @@ def capture_quote_native_free_key(
         FACTORY_COMMISSIONING_ATOM_ID,
         FRICTION_VETO_ATOM_ID,
         T0_FRICTION_SCREEN_ATOM_ID,
+        RETENTION_ATOM_ID,
     }:
         raise CapabilityError("ATOM_ID_NOT_ALLOWLISTED")
     if authority_phrase != expected_phrase:
@@ -437,7 +449,7 @@ def execute_capability(
     if capability_id == CAP_OFFLINE_CANONICAL_RECEIPT_REPLAY and budget != 0:
         raise CapabilityError("PROVIDER_BUDGET_NOT_ZERO")
     if capability_id == CAP_JUPITER_FREE_KEY_QUOTE_NATIVE_BOUNDED_CAPTURE:
-        if budget < 1 or budget > 60:
+        if budget < 1 or budget > 62:
             raise CapabilityError("PROVIDER_BUDGET_INVALID")
     return handler(
         spec,

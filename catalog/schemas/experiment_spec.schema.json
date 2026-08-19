@@ -82,7 +82,7 @@
       "additionalProperties": false,
       "required": ["provider_api_rpc_wss_calls"],
       "properties": {
-        "provider_api_rpc_wss_calls": {"type": "integer", "minimum": 0, "maximum": 60}
+        "provider_api_rpc_wss_calls": {"type": "integer", "minimum": 0, "maximum": 62}
       }
     },
     "holdout_policy": {"type": "string", "minLength": 8, "maxLength": 240},

@@ -341,10 +341,15 @@ def select_cohort(
     }
 
 
+DEFAULT_OBSERVATION_SCHEDULE = "T0_BUY_REVERSE_SELL_H900_H3600"
+RETENTION_OBSERVATION_SCHEDULE = "QUOTE_SURFACE_RETENTION_T0_H900_H3600"
+
+
 def build_schedule(
     cells: list[Mapping[str, Any]],
     *,
     panel_started_at: datetime,
+    schedule_kind: str = DEFAULT_OBSERVATION_SCHEDULE,
 ) -> list[dict[str, object]]:
     started = _format_utc(panel_started_at)
     rows: list[dict[str, object]] = []
@@ -385,6 +390,66 @@ def build_schedule(
                 "due_at": started,
                 "horizon_seconds": 0,
             }
+        )
+        if schedule_kind == RETENTION_OBSERVATION_SCHEDULE:
+            buy_h900_id = f"{identity_id}:{NOTIONAL}:BUY_H900"
+            h900_due = panel_started_at.astimezone(UTC) + timedelta(seconds=H900)
+            h3600_due = panel_started_at.astimezone(UTC) + timedelta(seconds=H3600)
+            rows.append(
+                {
+                    "observation_id": buy_h900_id,
+                    "identity_id": identity_id,
+                    "mint": mint,
+                    "stratum": mapped["stratum"],
+                    "kind": "BUY_H900",
+                    "wave": "horizon",
+                    "input_mint": WRAPPED_SOL,
+                    "output_mint": mint,
+                    "amount": NOTIONAL,
+                    "parent_id": None,
+                    "due_at": _format_utc(h900_due),
+                    "horizon_seconds": H900,
+                    "lateness_slack_seconds": SLACK,
+                }
+            )
+            rows.append(
+                {
+                    "observation_id": f"{identity_id}:{NOTIONAL}:REVERSE_H900",
+                    "identity_id": identity_id,
+                    "mint": mint,
+                    "stratum": mapped["stratum"],
+                    "kind": "REVERSE_H900",
+                    "wave": "horizon",
+                    "input_mint": mint,
+                    "output_mint": WRAPPED_SOL,
+                    "amount": None,
+                    "parent_id": buy_h900_id,
+                    "due_at": _format_utc(h900_due),
+                    "horizon_seconds": H900,
+                    "lateness_slack_seconds": SLACK,
+                }
+            )
+            rows.append(
+                {
+                    "observation_id": f"{identity_id}:{NOTIONAL}:SELL_H3600",
+                    "identity_id": identity_id,
+                    "mint": mint,
+                    "stratum": mapped["stratum"],
+                    "kind": "SELL_H3600",
+                    "wave": "horizon",
+                    "input_mint": mint,
+                    "output_mint": WRAPPED_SOL,
+                    "amount": None,
+                    "parent_id": buy_h900_id,
+                    "due_at": _format_utc(h3600_due),
+                    "horizon_seconds": H3600,
+                    "lateness_slack_seconds": SLACK,
+                }
+            )
+            continue
+        _require(
+            schedule_kind == DEFAULT_OBSERVATION_SCHEDULE,
+            "OBSERVATION_SCHEDULE_UNKNOWN",
         )
         for horizon, kind, wave, terminal in (
             (H900, "SELL_H900", "horizon", None),

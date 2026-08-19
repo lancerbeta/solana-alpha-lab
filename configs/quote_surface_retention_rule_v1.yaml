@@ -1,0 +1,26 @@
+schema: smial.factory-v1-quote-surface-retention-rule
+schema_version: '1.0'
+rule_id: QUOTE_SURFACE_RETENTION_DELTA_NONNEGATIVE_V1
+atom_id: QUOTE_SURFACE_RETENTION_FALSIFIER_V1
+as_of: '2026-08-19'
+x_field: retention_delta
+y_field: forward_quoted_return_h900_h3600
+keep: RETENTION_DELTA_GE_ZERO_AND_H900_ROUTES_EXIST
+veto: RETENTION_DELTA_LT_ZERO_OR_H900_NO_ROUTE
+unknown: TRANSPORT_SCHEMA_OR_DATA_UNCERTAINTY
+unknown_is_not_veto: true
+unknown_is_not_numeric_zero: true
+h3600_no_route: PATH_RISK_NEVER_NUMERIC_ZERO
+tie_at_zero: KEEP
+min_complete_decision_outcome_per_stratum: 4
+pass_terminal: FRESH_OOS_REPLICATION_EARNED
+fail_terminal: CLOSE_EXACT_QUOTE_SURFACE_RETENTION_FAMILY
+inconclusive_terminal: SAMPLE_INVALID_REPLAN_REQUIRED
+pass_requires:
+  median_y_kept_gt_median_y_baseline: true
+  p90_y_kept_ge_p90_y_baseline: true
+  both_recent_and_traded_kept: true
+  same_direction_in_both_strata: true
+primary_analysis: STRATA_SEPARATE_NO_POOLED_PASS
+traded_only_rescue: false
+post_hoc_threshold_search: false

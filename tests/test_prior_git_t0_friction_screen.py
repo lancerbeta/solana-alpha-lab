@@ -392,14 +392,8 @@ class PriorGitT0FrictionScreenTests(unittest.TestCase):
             FORBIDDEN_PEEKED_CUTOFF_TEXT,
         )
 
-    def test_application_default_spec_is_the_frozen_t0_screen(self) -> None:
+    def test_application_default_spec_is_the_frozen_t0_screen_when_retention_absent(self) -> None:
         with tempfile.TemporaryDirectory() as tmp:
-            store = OperationalStore(Path(tmp) / "ops.sqlite")
-            try:
-                app = FactoryApplication(root=ROOT, store=store)
-                self.assertEqual(app.spec_relative, SPEC_RELATIVE)
-            finally:
-                store.close()
             root = isolated_t0_root(Path(tmp) / "src")
             store = OperationalStore(Path(tmp) / "ops-isolated.sqlite")
             try:
