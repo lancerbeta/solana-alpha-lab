@@ -1,0 +1,87 @@
+{
+  "acceptance_id": "FACTORY-V1-COMMISSIONING-DELIVERY-COMPLETION-001",
+  "active_stop_conditions": [],
+  "as_of": "2026-08-19",
+  "base_main": "2cb335dc65360cc8444dd32d7be21ade5fb18c40",
+  "capability_radar_now": "NONE",
+  "cloud_bundle_mode": "OWNER_MANAGED_OPTIONAL_EXPORT",
+  "cloud_bundle_required_by_harness": false,
+  "cloud_bundle_smoke_required": false,
+  "factory_fit": {
+    "path": "docs/evidence/factory_v1_commissioning/a2_delivery_factory_fit_v1.json",
+    "sha256": "85f95416fe615ba958982c8e36fc82ec440fb637ce6923fff798d31d7200c8fa",
+    "verdict": "PASS"
+  },
+  "implementation_bindings": {
+    "catalog/assets/core.yaml": "3e2f54869e22ee0697870690e1c731b805df4341dfa53d7834737f94275bef92",
+    "catalog/assets/lifecycle.yaml": "6b2ad27e357dc27c3ac5391297c7aa25cd993f6ad2e6fa77aa348d76c6f465b6",
+    "catalog/catalog_manifest.yaml": "2f438e30eecacab63991ef1b8a6e6ea7ed3123510f4701c9134843c3a866e5b9",
+    "catalog/generated/asset_edges.json": "c69baadd22b86294e4c2df0719f058d6b1cae51d678ab48aae1c3a25c98c4a2c",
+    "catalog/schemas/experiment_spec.schema.json": "02abc5665202010dcfe8be31f1d5e7d8e7c1f5b4576b990e33820687f5c9ff0e",
+    "catalog/schemas/factory_v1_commissioning.schema.json": "26e5b291a7f03077cb0681650c7d2d2b9d43401bce8bff252d7865c845d14b36",
+    "configs/experiment_specs/factory_v1_commissioning_quote_native_free_key_v1.yaml": "190e219428a8b0ab3f2ab0831aee02d7f3a8235a82d3b1483168df91e2d0c699",
+    "configs/factory_v1_commissioning_v1.yaml": "9fc35154c0d6d8b97b93a602ba4cc70f261153a830a337ad4163491d8e74ef50",
+    "configs/quote_native_factory_commissioning_audition_v1.yaml": "f39d8a2335676c1f116f20f818509f55787562ffa5d5cb7736f270cc0c88abdc",
+    "docs/PROJECT_MAP.md": "4fd38cce34fa8f8e0519acb83358a78105171a1402e047871945226695e6254b",
+    "docs/evidence/factory_v1_commissioning/a2_factory_v1_commissioning_acceptance_v1.json": "fe575fb897c72a8ca1c184b3e815ecfa1507813349b468fade96b08fb78aa0dc",
+    "docs/evidence/factory_v1_commissioning/a2_factory_v1_commissioning_runtime_receipt_v1.json": "f83968a0be381f874a38ed214c1f9ff1a5ac46bc433c502417d35d8f31727468",
+    "docs/reports/factory_v1_commissioning/a2_owner_readout_v1.md": "91e781806b5a8df239e4efa0c18964341f067bb86ebc9219318cbcea5fa439ca",
+    "docs/tasks/FACTORY_V1_COMMISSIONING_HYPOTHESIS_V1.md": "96a432c57d86fac4613bed31bf8f92cddeddd46effcbae2784de41507b7c3cca",
+    "scripts/run_factory_commissioning_capture.py": "b7c5bdfb8042c9a2be8bbc281694f73abdaf3318c374261dcf9e32cc652b0861",
+    "scripts/run_factory_experiment.py": "e3f963dd3b27b34fcfa801a4bc406eccde854842508f3be19ad62b82f31da548",
+    "scripts/run_factory_workbench.py": "b1404dde5d09da9a941413fb7dc284386c04196f0d40dbbac3a193eba59a9b37",
+    "src/solana_alpha_lab/factory/application.py": "a94b9c427cc3bcaf6a8d1d38652e4afeb6397334f1583ce8447f6b6950716215",
+    "src/solana_alpha_lab/factory/capabilities.py": "94f6cb388d5174a49af4474b1961ab8276ded94765df069e5f120685f73bcd53",
+    "src/solana_alpha_lab/factory/read_model.py": "dd5c46b54015148ce2a1021fe632970da748024f595bbaa7a9b7b7e7117c6cad",
+    "src/solana_alpha_lab/factory/runner.py": "d8d22bcb51fb6992d40f09e58274c52e0f9942c12d043cc57b96ffca524e918f",
+    "src/solana_alpha_lab/factory/workbench.py": "d91b43b3fcf62095d22ad51cd6213a56db6a0466c01a8f9399d9101629168559",
+    "src/solana_alpha_lab/quote_native_admissible_friction_audition.py": "1b8e38bda5474ba5c09a954f4800070dc958203964f6e704e68730659fc13251",
+    "tests/test_factory_v1_commissioning.py": "82ce9720f443409535306aae849a9c4c4bb1a2aee68e7921e9fc6430fcad8e5e",
+    "tests/test_factory_v1_product_kernel.py": "25b201285077b0b3ea360bbf6c85415e96b28729fbcdbdd5a24a39623e1d393c"
+  },
+  "non_claims": [
+    "NO_CANONICAL_DONE",
+    "NO_FACTORY_V1_OPERATIONAL_READY",
+    "NO_ALPHA_PNL_OR_NETRETURN",
+    "NO_MOVE_3",
+    "NO_VPS",
+    "NO_NEW_UI_PACKAGE"
+  ],
+  "owner_attention_triggers": {
+    "auth_or_access_recovery": false,
+    "external_material_action": false,
+    "material_owner_decision": false,
+    "unresolved_safety_or_truth_conflict": false,
+    "user_only_activation": false
+  },
+  "project_sources_disposition": {
+    "kind": "NO_CHANGE"
+  },
+  "schema": "smial.delivery-completion-evidence",
+  "schema_version": "1.0",
+  "side_effects": {
+    "cash_spend_usd_cents": 0,
+    "credential_reads": 1,
+    "fallbacks": 0,
+    "provider_requests": 50,
+    "retries": 0,
+    "wallet_signer_transaction_actions": 0
+  },
+  "state_change": "FACTORY_COMMISSIONING_LIVE_CYCLE_PASS",
+  "task_id": "FACTORY_V1_COMMISSIONING_HYPOTHESIS_V1",
+  "validation": {
+    "full_gate": "ENFORCED_BY_PROJECT_BOUND_VALIDATION",
+    "github_ci": "ENFORCED_LIVE_AT_GUARDED_MERGE",
+    "independent_review": {
+      "path": "docs/evidence/factory_v1_commissioning/a2_delivery_independent_review_v1.json",
+      "sha256": "b7dafbcb90081226642bcd547d210c8011d23f842b055edef239da158dd7ae43",
+      "verdict": "PASS"
+    },
+    "project_checks": [
+      "PASS_FACTORY_V1_COMMISSIONING_TESTS",
+      "PASS_FACTORY_V1_PRODUCT_KERNEL_TESTS",
+      "PASS_CATALOG_VALIDATION"
+    ],
+    "targeted": "PASS_FACTORY_V1_COMMISSIONING_TESTS"
+  }
+}
