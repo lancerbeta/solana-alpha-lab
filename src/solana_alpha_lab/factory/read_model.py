@@ -132,5 +132,5 @@ def project_read_model(
         "recommendation": recommendation,
         "next_safe_action": next_action,
         "next": next_action,
-        "git_archaeology_required": False,
+        "git_archaeology_required": bool(missing),
     }

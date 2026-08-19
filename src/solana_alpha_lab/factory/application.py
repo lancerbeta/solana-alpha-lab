@@ -2,12 +2,15 @@
 
 from __future__ import annotations
 
+import hashlib
+import json
 from pathlib import Path
 from typing import Any
 
 import yaml
 
-from solana_alpha_lab.factory.experiment_spec import load_experiment_spec
+from solana_alpha_lab.factory.cockpit import pinned_produced_gaps, project_cockpit
+from solana_alpha_lab.factory.experiment_spec import load_experiment_spec, requirement_map
 from solana_alpha_lab.factory.operational_store import OperationalStore
 from solana_alpha_lab.factory.read_model import project_read_model
 from solana_alpha_lab.factory.runner import ExperimentRunner, ExperimentRunnerError
@@ -83,6 +86,28 @@ class FactoryApplication:
                 store=self.store,
                 process_alive=True,
             )
+        spec = load_experiment_spec(self.root, self.spec_relative)
+        gaps = pinned_produced_gaps(spec, self.root)
+        acceptance_item = requirement_map(spec).get("ACCEPTANCE")
+        acceptance = None
+        if acceptance_item is not None and "ACCEPTANCE" not in gaps and not any(
+            item.startswith("ACCEPTANCE:") for item in gaps
+        ):
+            acceptance_path = self.root / str(acceptance_item["path"])
+            expected = str(acceptance_item.get("sha256") or "")
+            if acceptance_path.is_file():
+                payload = acceptance_path.read_bytes()
+                if not expected or hashlib.sha256(payload).hexdigest() == expected:
+                    loaded = json.loads(payload.decode("utf-8"))
+                    acceptance = loaded if isinstance(loaded, dict) else None
+        cockpit = project_cockpit(
+            model,
+            acceptance=acceptance,
+            runtime=model.get("runtime") if isinstance(model.get("runtime"), dict) else None,
+            pinned_produced_gaps=gaps,
+        )
+        model["cockpit"] = cockpit
+        model["git_archaeology_required"] = bool(cockpit["git_archaeology_required"])
         return model
 
     def freeze_hypothesis(self) -> dict[str, Any]:
