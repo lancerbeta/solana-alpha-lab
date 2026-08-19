@@ -76,7 +76,7 @@ context_requirements:
     ARCHITECTURE_DECISIONS:
       - docs/architecture/intents/ARCH-INTENT-005-factory-v1-operational-readiness-and-owner-experience.md
     DELIVERY_EVIDENCE:
-      - docs/evidence/fresh_oos_friction_veto/a5_fresh_oos_friction_veto_acceptance_v1.json
+      - docs/evidence/prior_git_t0_friction_screen/a6_delivery_completion_evidence_v1.json
     HISTORICAL_CONTEXT: []
 ---
 

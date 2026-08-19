@@ -26577,7 +26577,7 @@ records:
   as_of: '2026-08-19'
   truth_owner: PRIOR_GIT_T0_FRICTION_SCREEN_V1
   location: {kind: git_path, logical_uri: 'repo://docs/tasks/PRIOR_GIT_T0_FRICTION_SCREEN_V1.md', repository_path: docs/tasks/PRIOR_GIT_T0_FRICTION_SCREEN_V1.md}
-  integrity: {kind: sha256, sha256: 1d18589472da363c37fcadf3a82e70ff95c14af903013d9b4061be9f33b0bb4c}
+  integrity: {kind: sha256, sha256: 95041dc78c74a4463de887821d699347ae4e0711e785de052c771d76a307220a}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: depends_on, target_asset_id: ARCH-INTENT-005}
