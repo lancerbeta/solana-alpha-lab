@@ -9,14 +9,14 @@
   "cloud_bundle_smoke_required": false,
   "factory_fit": {
     "path": "docs/evidence/factory_v1_product_kernel/a1_delivery_factory_fit_v1.json",
-    "sha256": "35597fa1b523c2b253af85aac5dd125d28b68b54ede357a9790c2d5cfb060e52",
+    "sha256": "f81708df0b0e0585133cfc455b45182604fdabec1325ac73e65ae2308492cdfe",
     "verdict": "PASS"
   },
   "implementation_bindings": {
     "catalog/assets/architecture.yaml": "58b4b11b5c8891b4d4fee3eea4097f1e6237e4f8c1b366fefb407eeea9bd2616",
-    "catalog/assets/core.yaml": "4e6572862b96f923eb9f269f4038dc545e139021d53540eb6d9535c31855c927",
-    "catalog/assets/lifecycle.yaml": "863e24efb0bbe084c3ee9b9451a64895d70f1040751a05fe2911804f982c166e",
-    "catalog/catalog_manifest.yaml": "02122bfb78624629fcea0fde07bab9af3620f29d663e2eb98752f40231e61eb9",
+    "catalog/assets/core.yaml": "7e266b5d0ed73f8fea451d5e9efc400b6a0b8b50081270860c6d55e5cb1a3dc5",
+    "catalog/assets/lifecycle.yaml": "c155b852c10326fa759d06ea71055dfc3f9ad821d89be70610214d77e5ca33aa",
+    "catalog/catalog_manifest.yaml": "ca4cc2bf10bec1b313ca6e8eea3749660012ee9613b93c78f424b0be2754f5d2",
     "catalog/generated/asset_edges.json": "875f5b50a4d5e99ae2a829be5779247e982715d179f3f3c5adc4cc049026bdb9",
     "catalog/schemas/experiment_spec.schema.json": "20683bdac2d97a4190158659a9f9adaa7c7c9c37f0093def9cd4146fce187576",
     "catalog/schemas/factory_v1_product_kernel.schema.json": "a08aa39c7a3398f8d1e28f6963d6a233085a3d95bfce9c6e825b6e9d71a2734e",
@@ -27,10 +27,8 @@
     "docs/architecture/intents/ARCH-INTENT-005-factory-v1-operational-readiness-and-owner-experience.md": "a082380352a458f35db3673fff23bde3c8edb41fc129a9fab495429ede583877",
     "docs/evidence/factory_v1_product_kernel/a1_factory_v1_product_kernel_acceptance_v1.json": "3b60c2a29ba879eda18c729f6ef8f230800b511f7cda22cdf1b58fc724d6cf03",
     "docs/evidence/factory_v1_product_kernel/a1_ui_adopt_gate_v1.json": "07349539c01f5e07422d64ccd9efcdba1970ac34a0e18ca9cdd5a18fe5a8107d",
-    "docs/reports/factory_v1_product_kernel/a1_owner_readout_v1.md": "1f8c1a2559f6346a3bd84fac09bc9900cdc49b70a17571563e52900457623db9",
-    "docs/tasks/FACTORY_V1_PRODUCT_KERNEL_LOCAL_VERTICAL_SLICE_V1.md": "b408233ddbec1c7e3db017b3d87573d51041360938cb03d4addc1a0c4713fc8a",
-    "registries/hypotheses.yaml": "76a12be98ea62dff302063b20721db3c8442a016dc2c515ed8cc9af560227991",
-    "registries/research_cycles.yaml": "a1ee634532859a9ed0fbdb16f16e744804672b0be2b4652cb94be5847fa334d1",
+    "docs/reports/factory_v1_product_kernel/a1_owner_readout_v1.md": "8150759254bde9406a1923db86715746a2a2667ce1bc5dd7bbd664d8bd91a6f5",
+    "docs/tasks/FACTORY_V1_PRODUCT_KERNEL_LOCAL_VERTICAL_SLICE_V1.md": "509134f5cf09e99526284a952cf31f2e78761fca1ed334ba566d6a06006b5564",
     "scripts/run_factory_experiment.py": "0bb09c00914a9774f1b84b8e6f6824ca507407e0580bd5e440b0a6bf46bb90aa",
     "scripts/run_factory_workbench.py": "d34a451f37912e8acce4aeeffb1a79fedfc162a3c262621ac91193bbc32185a1",
     "src/solana_alpha_lab/factory/__init__.py": "394c42972ada8441f74aecfee7b23b36aea135e473a088b250dca3d12d6098f0",
@@ -41,10 +39,8 @@
     "src/solana_alpha_lab/factory/read_model.py": "e5faad3111635abb4994d8aed22be981441d8a0a915c75d61789e0c2b1f5f284",
     "src/solana_alpha_lab/factory/runner.py": "b6ecad60eb79a414a75978e4bdd75485baf3e6a08cc90d4327ca0233f71ae891",
     "src/solana_alpha_lab/factory/workbench.py": "c1ad641eaae2d2958a729fca9fb4128639aec847c4860e40121498b6013139a8",
-    "tests/test_catalog.py": "d7c4aaf1e9eaa54271a2f92b81454a144a7ff95ab1564b169d18888bd4fa109b",
     "tests/test_factory_v1_operational_readiness.py": "b65898f8879f27721f5a228b91924f2a15301ace3a873823fde81ecf09ce5380",
-    "tests/test_factory_v1_product_kernel.py": "f966185460a492da2a69179b25149175d7fd237d0605a09598a916ceecc57cff",
-    "tests/test_lifecycle_registries.py": "434b38d48b056501e6c30fa8391258bf69596fcdb17489dd4c119ad0c83abd77"
+    "tests/test_factory_v1_product_kernel.py": "6ad0c4068e10b08b5d9a5de44a21e8f26a75038b737d99216eb363eeb59819fd"
   },
   "non_claims": [
     "NO_CANONICAL_DONE",
@@ -82,7 +78,7 @@
     "github_ci": "ENFORCED_LIVE_AT_GUARDED_MERGE",
     "independent_review": {
       "path": "docs/evidence/factory_v1_product_kernel/a1_delivery_independent_review_v1.json",
-      "sha256": "b2d5ce212c9fe5af9e2d0a723105f309876ccea2e1bd8519bc12e28f9fa1ccfc",
+      "sha256": "5a3f48e122b6937cc9f6ab7371a45e8d937979c3f37225820676911b22fefc24",
       "verdict": "PASS"
     },
     "project_checks": [

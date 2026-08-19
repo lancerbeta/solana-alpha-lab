@@ -9,7 +9,7 @@ current_checkpoint:
   schemas: 52
   queries: 9
   lifecycle_registries: 9
-  lifecycle_records: 86
+  lifecycle_records: 84
 root_resolver:
   asset_registries:
   - catalog/assets/core.yaml

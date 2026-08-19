@@ -25530,7 +25530,7 @@ records:
   as_of: '2026-08-19'
   truth_owner: FACTORY_V1_PRODUCT_KERNEL_LOCAL_VERTICAL_SLICE_V1
   location: {kind: git_path, logical_uri: 'repo://docs/tasks/FACTORY_V1_PRODUCT_KERNEL_LOCAL_VERTICAL_SLICE_V1.md', repository_path: docs/tasks/FACTORY_V1_PRODUCT_KERNEL_LOCAL_VERTICAL_SLICE_V1.md}
-  integrity: {kind: sha256, sha256: b408233ddbec1c7e3db017b3d87573d51041360938cb03d4addc1a0c4713fc8a}
+  integrity: {kind: sha256, sha256: 509134f5cf09e99526284a952cf31f2e78761fca1ed334ba566d6a06006b5564}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: governed_by, target_asset_id: ARCH-INTENT-005}
@@ -25773,7 +25773,7 @@ records:
   as_of: '2026-08-19'
   truth_owner: FACTORY_V1_PRODUCT_KERNEL_LOCAL_VERTICAL_SLICE_V1
   location: {kind: git_path, logical_uri: 'repo://tests/test_factory_v1_product_kernel.py', repository_path: tests/test_factory_v1_product_kernel.py}
-  integrity: {kind: sha256, sha256: f966185460a492da2a69179b25149175d7fd237d0605a09598a916ceecc57cff}
+  integrity: {kind: sha256, sha256: 6ad0c4068e10b08b5d9a5de44a21e8f26a75038b737d99216eb363eeb59819fd}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: depends_on, target_asset_id: MODULE-FACTORY-V1-RUNNER-001}
@@ -25830,7 +25830,7 @@ records:
   as_of: '2026-08-19'
   truth_owner: FACTORY_V1_PRODUCT_KERNEL_LOCAL_VERTICAL_SLICE_V1
   location: {kind: git_path, logical_uri: 'repo://docs/reports/factory_v1_product_kernel/a1_owner_readout_v1.md', repository_path: docs/reports/factory_v1_product_kernel/a1_owner_readout_v1.md}
-  integrity: {kind: sha256, sha256: 1f8c1a2559f6346a3bd84fac09bc9900cdc49b70a17571563e52900457623db9}
+  integrity: {kind: sha256, sha256: 8150759254bde9406a1923db86715746a2a2667ce1bc5dd7bbd664d8bd91a6f5}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: derived_from, target_asset_id: EVIDENCE-FACTORY-V1-PRODUCT-KERNEL-ACCEPTANCE-001}

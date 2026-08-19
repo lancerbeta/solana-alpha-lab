@@ -12,7 +12,8 @@ pipeline. Это не `FACTORY_V1_OPERATIONAL_READY`, не alpha и не MOVE 3.
 
 Локальный Workbench (stdlib HTTP, только localhost) показывает:
 
-- hypothesis `HYP-QUOTE-NATIVE-FRICTION-H900-V1`
+- hypothesis `HYP-QUOTE-NATIVE-FRICTION-H900-V1` из ExperimentSpec;
+  production-реестры hypothesis/cycle остаются пустыми до commissioning freeze
 - question / estimand / population
 - available vs missing evidence
 - experiment status

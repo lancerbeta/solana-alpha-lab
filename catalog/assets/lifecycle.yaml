@@ -16,7 +16,7 @@ records:
     repository_path: registries/research_cycles.yaml
   integrity:
     kind: sha256
-    sha256: a1ee634532859a9ed0fbdb16f16e744804672b0be2b4652cb94be5847fa334d1
+    sha256: 2ca0195a7617f2f95b7334291c776b78b447ea854b4c43b48dbe0f25fe08f797
   access: &id001
     mode: task_write
     method: file
@@ -46,7 +46,7 @@ records:
     repository_path: registries/hypotheses.yaml
   integrity:
     kind: sha256
-    sha256: 76a12be98ea62dff302063b20721db3c8442a016dc2c515ed8cc9af560227991
+    sha256: 9ee9f983fa6869c0ee1ff6a249e06dd38fc059a956943cfea8539822054236d9
   access: *id001
   relations: *id002
   consumers: *id003

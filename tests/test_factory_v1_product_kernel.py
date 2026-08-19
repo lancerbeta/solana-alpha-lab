@@ -17,7 +17,7 @@ SRC = ROOT / "src"
 if str(SRC) not in sys.path:
     sys.path.insert(0, str(SRC))
 
-from solana_alpha_lab.factory.application import FactoryApplication
+from solana_alpha_lab.factory.application import ApplicationError, FactoryApplication
 from solana_alpha_lab.factory.experiment_spec import load_experiment_spec
 from solana_alpha_lab.factory.operational_store import OperationalStore
 from solana_alpha_lab.factory.runner import ExperimentRunner
@@ -148,7 +148,9 @@ class FactoryV1ProductKernelTests(unittest.TestCase):
         before = hypotheses.read_bytes()
         with tempfile.TemporaryDirectory() as tmp:
             store = OperationalStore(Path(tmp) / "ops.sqlite")
-            FactoryApplication(root=ROOT, store=store).freeze_hypothesis()
+            app = FactoryApplication(root=ROOT, store=store)
+            with self.assertRaises(ApplicationError):
+                app.freeze_hypothesis()
             store.close()
         self.assertEqual(hypotheses.read_bytes(), before)
 
@@ -158,7 +160,7 @@ class FactoryV1ProductKernelTests(unittest.TestCase):
             app = FactoryApplication(root=ROOT, store=store)
             before = app.read_model()
             self.assertEqual(before["hypothesis"], "HYP-QUOTE-NATIVE-FRICTION-H900-V1")
-            self.assertEqual(before["hypothesis_status"], "ACTIVE")
+            self.assertEqual(before["hypothesis_status"], "UNKNOWN")
             self.assertFalse(before["git_archaeology_required"])
             self.assertEqual(before["status"], "NOT_STARTED")
             after = app.start()

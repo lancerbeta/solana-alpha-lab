@@ -34,7 +34,6 @@ managed_write_set:
   - tests/test_factory_v1_product_kernel.py
   - tests/test_factory_v1_operational_readiness.py
   - tests/test_catalog.py
-  - tests/test_lifecycle_registries.py
   - registries/research_cycles.yaml
   - registries/hypotheses.yaml
   - catalog/assets/architecture.yaml

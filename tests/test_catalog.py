@@ -94,21 +94,8 @@ class CatalogImportTests(unittest.TestCase):
                 not records
                 for registry_type, records in production_records.items()
                 if registry_type
-                not in {
-                    "global_trial_ledger",
-                    "decisions_negative_results",
-                    "research_cycles",
-                    "hypotheses",
-                }
+                not in {"global_trial_ledger", "decisions_negative_results"}
             )
-        )
-        self.assertEqual(
-            [record["record_id"] for record in production_records["research_cycles"]],
-            ["RC-QUOTE-NATIVE-FRICTION-H900-001"],
-        )
-        self.assertEqual(
-            [record["record_id"] for record in production_records["hypotheses"]],
-            ["HYP-QUOTE-NATIVE-FRICTION-H900-V1"],
         )
 
     def test_current_checkpoint_drift_fails_closed(self) -> None:

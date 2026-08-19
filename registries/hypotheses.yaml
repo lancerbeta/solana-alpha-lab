@@ -1,16 +1,7 @@
 schema_version: '1.0'
 registry_id: SMIAL-REGISTRY-HYPOTHESES
 registry_type: hypotheses
-as_of: '2026-08-19'
+as_of: '2026-07-21'
 truth_owner: TASK-03
-source_asset_ids:
-- EVIDENCE-QUOTE-NATIVE-ADMISSIBLE-FRICTION-AUDITION-ACCEPTANCE-001
-records:
-- record_kind: hypothesis
-  record_id: HYP-QUOTE-NATIVE-FRICTION-H900-V1
-  status: ACTIVE
-  created_at: '2026-08-18T00:00:00Z'
-  evidence_asset_ids:
-  - EVIDENCE-QUOTE-NATIVE-ADMISSIBLE-FRICTION-AUDITION-ACCEPTANCE-001
-  research_cycle_id: RC-QUOTE-NATIVE-FRICTION-H900-001
-  statement: Frozen QuotedRoundTripFriction at t0 ranks QuotedLiquidationRecovery at H900 on an admissible live 6+6 Free-key cohort.
+source_asset_ids: []
+records: []

@@ -1,15 +1,7 @@
 schema_version: '1.0'
 registry_id: SMIAL-REGISTRY-RESEARCH-CYCLES
 registry_type: research_cycles
-as_of: '2026-08-19'
+as_of: '2026-07-21'
 truth_owner: TASK-03
-source_asset_ids:
-- EVIDENCE-QUOTE-NATIVE-ADMISSIBLE-FRICTION-AUDITION-ACCEPTANCE-001
-records:
-- record_kind: research_cycle
-  record_id: RC-QUOTE-NATIVE-FRICTION-H900-001
-  status: ACTIVE
-  created_at: '2026-08-18T00:00:00Z'
-  evidence_asset_ids:
-  - EVIDENCE-QUOTE-NATIVE-ADMISSIBLE-FRICTION-AUDITION-ACCEPTANCE-001
-  title: Quote-native t0 friction to H900 quoted liquidation screening
+source_asset_ids: []
+records: []
