@@ -55,7 +55,7 @@ class FactoryV1OperationalReadinessTests(unittest.TestCase):
         self.assertEqual(document["status"], "ACCEPTED_DIRECTION_NOT_IMPLEMENTED")
         self.assertEqual(document["implementation"], "NOT_IMPLEMENTED")
         self.assertEqual(document["milestone_id"], "FACTORY_V1_OPERATIONAL_READY")
-        self.assertEqual(document["milestone_status"], "NOT_TRIGGERED")
+        self.assertEqual(document["milestone_status"], "TRIGGERED")
         self.assertEqual(
             document["extends"],
             ["ARCH-INTENT-002", "ARCH-INTENT-003", "ARCH-INTENT-004", "DELIVERY_HARNESS_V1"],
@@ -84,7 +84,15 @@ class FactoryV1OperationalReadinessTests(unittest.TestCase):
         self.assertEqual(contract["implementation"], "NOT_IMPLEMENTED")
         self.assertEqual(contract["mode"], "DESIGN_ONLY")
         self.assertEqual(contract["milestone"]["milestone_id"], "FACTORY_V1_OPERATIONAL_READY")
-        self.assertEqual(contract["milestone"]["status"], "NOT_TRIGGERED")
+        self.assertEqual(contract["milestone"]["status"], "TRIGGERED")
+        self.assertEqual(
+            contract["milestone"]["triggered_by"],
+            "OWNER_EXPLICITLY_SELECTS_FACTORY_PRODUCTIZATION",
+        )
+        self.assertEqual(
+            contract["milestone"]["kernel_atom"],
+            "FACTORY_V1_PRODUCT_KERNEL_LOCAL_VERTICAL_SLICE_V1",
+        )
         self.assertFalse(contract["live_roadmap_binding"]["numbered_task_chain_inserted"])
         self.assertEqual(
             contract["live_roadmap_binding"]["historical_project_sources_roadmaps"],

@@ -1,0 +1,40 @@
+{
+  "schema": "smial.factory-v1-product-kernel.acceptance",
+  "schema_version": "1.0",
+  "acceptance_id": "EVIDENCE-FACTORY-V1-PRODUCT-KERNEL-ACCEPTANCE-001",
+  "as_of": "2026-08-19",
+  "atom_id": "FACTORY_V1_PRODUCT_KERNEL_LOCAL_VERTICAL_SLICE_V1",
+  "terminal": "FACTORY_KERNEL_GOLDEN_REPLAY_PASS",
+  "golden_experiment_id": "EXP-QUOTE-NATIVE-ADMISSIBLE-FRICTION-AUDITION-OFFLINE-001",
+  "golden_terminal": "DIRECTIONAL_HINT_NOT_CONFIRMATION",
+  "hypothesis_specific_core_runner_change": false,
+  "provider_api_rpc_wss_calls": 0,
+  "ui_gate": "BUILD_STDLIB_HTTP_WORKBENCH",
+  "factory_v1_operational_ready": false,
+  "move_3": false,
+  "owner_visible": {
+    "hypothesis_state": true,
+    "experiment_state": true,
+    "blockers": true,
+    "evidence_and_decision": true,
+    "next_safe_action": true,
+    "git_archaeology_required": false
+  },
+  "limitations": [
+    "LOCAL_VERTICAL_SLICE_ONLY",
+    "NO_VPS",
+    "NO_NEW_MARKET_BYTE",
+    "NO_FACTORY_V1_OPERATIONAL_READY"
+  ],
+  "non_claims": [
+    "NO_ALPHA",
+    "NO_NETRETURN",
+    "NO_MOVE_3",
+    "NO_PROVIDER_CALL",
+    "NO_UI_PACKAGE_ADOPTION",
+    "NO_CANONICAL_DONE_AS_OPERATIONAL_READY"
+  ],
+  "project_sources_disposition": {
+    "kind": "NO_CHANGE"
+  }
+}

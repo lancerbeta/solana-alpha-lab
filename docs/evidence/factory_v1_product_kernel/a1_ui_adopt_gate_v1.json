@@ -1,0 +1,36 @@
+{
+  "schema": "smial.factory-v1-product-kernel.ui-adopt-gate",
+  "schema_version": "1.0",
+  "gate_id": "FACTORY-V1-PRODUCT-KERNEL-UI-ADOPT-001",
+  "as_of": "2026-08-19",
+  "atom_id": "FACTORY_V1_PRODUCT_KERNEL_LOCAL_VERTICAL_SLICE_V1",
+  "candidates": [
+    {
+      "name": "NiceGUI",
+      "verdict": "DEFER",
+      "reason": "Maintained Python-native server UI, but package adoption is outside this atom's authority."
+    },
+    {
+      "name": "Streamlit",
+      "verdict": "REJECT_FOR_V1_SLICE",
+      "reason": "Low frontend burden, but session-state apps risk becoming a second truth store for commands."
+    },
+    {
+      "name": "FastAPI_plus_htmx",
+      "verdict": "DEFER",
+      "reason": "Good command/read split, but adds a web framework dependency without a second consumer."
+    }
+  ],
+  "selected": {
+    "verdict": "BUILD",
+    "name": "stdlib_http_workbench",
+    "package_adoption": false,
+    "owns_scientific_truth": false
+  },
+  "authority": {
+    "provider_calls": false,
+    "credentials": false,
+    "deployment": false,
+    "new_dependency": false
+  }
+}

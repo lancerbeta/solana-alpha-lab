@@ -49,7 +49,10 @@ domain_policy_integration:
     code is a Factory Fit architecture warning.
 milestone:
   milestone_id: FACTORY_V1_OPERATIONAL_READY
-  status: NOT_TRIGGERED
+  status: TRIGGERED
+  triggered_by: OWNER_EXPLICITLY_SELECTS_FACTORY_PRODUCTIZATION
+  triggered_as_of: '2026-08-19'
+  kernel_atom: FACTORY_V1_PRODUCT_KERNEL_LOCAL_VERTICAL_SLICE_V1
   activation_when_any:
     - OWNER_EXPLICITLY_SELECTS_FACTORY_PRODUCTIZATION
     - FIRST_UNATTENDED_REMOTE_RUNTIME_IS_NEXT

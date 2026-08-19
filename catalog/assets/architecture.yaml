@@ -168,7 +168,7 @@ records:
 - asset_id: ARCH-INTENT-005
   record_version: '1.0'
   asset_type: architecture_intent
-  purpose: Accepted Factory v1 operational-readiness milestone and owner-experience direction; productization remains NOT_TRIGGERED and unimplemented.
+  purpose: Accepted Factory v1 operational-readiness milestone and owner-experience direction; productization is TRIGGERED for the kernel slice and remains short of FACTORY_V1_OPERATIONAL_READY.
   status: ACCEPTED_DIRECTION_NOT_IMPLEMENTED
   origin: REPOSITORY
   as_of: '2026-08-18'
@@ -179,7 +179,7 @@ records:
     repository_path: docs/architecture/intents/ARCH-INTENT-005-factory-v1-operational-readiness-and-owner-experience.md
   integrity:
     kind: sha256
-    sha256: 3ce4780376a710fa5731e76e629c2d42aa351730a404abe88541c0ae9f8ce0bb
+    sha256: a082380352a458f35db3673fff23bde3c8edb41fc129a9fab495429ede583877
   access:
     mode: read_only
     method: file
