@@ -15,6 +15,7 @@ from solana_alpha_lab.factory.runner import ExperimentRunner, ExperimentRunnerEr
 HYPOTHESES_RELATIVE = "registries/hypotheses.yaml"
 RESEARCH_CYCLES_RELATIVE = "registries/research_cycles.yaml"
 KERNEL_CONFIG_RELATIVE = "configs/factory_v1_product_kernel_v1.yaml"
+COMMISSIONING_CONFIG_RELATIVE = "configs/factory_v1_commissioning_v1.yaml"
 GOLDEN_SPEC_RELATIVE = (
     "configs/experiment_specs/quote_native_admissible_friction_audition_offline_v1.yaml"
 )
@@ -35,6 +36,14 @@ def kernel_config(root: Path) -> dict[str, Any]:
     return _load_yaml(root, KERNEL_CONFIG_RELATIVE)
 
 
+def commissioning_spec_relative(root: Path) -> str:
+    path = root / COMMISSIONING_CONFIG_RELATIVE
+    if not path.is_file():
+        return GOLDEN_SPEC_RELATIVE
+    loaded = _load_yaml(root, COMMISSIONING_CONFIG_RELATIVE)
+    return str(loaded["experiment_spec_relative"])
+
+
 def ops_store_path(root: Path) -> Path:
     relative = str(kernel_config(root)["operational_store"]["relative_path"])
     if Path(relative).is_absolute() or ".." in Path(relative).parts:
@@ -43,11 +52,19 @@ def ops_store_path(root: Path) -> Path:
 
 
 class FactoryApplication:
-    def __init__(self, *, root: Path, store: OperationalStore | None = None) -> None:
+    def __init__(
+        self,
+        *,
+        root: Path,
+        store: OperationalStore | None = None,
+        spec_relative: str | None = None,
+        authority_phrase: str | None = None,
+    ) -> None:
         self.root = root
         self.store = store or OperationalStore(ops_store_path(root))
         self.runner = ExperimentRunner(root=root, store=self.store)
-        self.spec_relative = GOLDEN_SPEC_RELATIVE
+        self.spec_relative = spec_relative or commissioning_spec_relative(root)
+        self.authority_phrase = authority_phrase
 
     def read_model(self) -> dict[str, Any]:
         hypotheses = _load_yaml(self.root, HYPOTHESES_RELATIVE)
@@ -80,9 +97,18 @@ class FactoryApplication:
         )
         return self.read_model()
 
-    def start(self) -> dict[str, Any]:
+    def start(
+        self,
+        authority_phrase: str | None = None,
+        capture_hooks: dict[str, Any] | None = None,
+    ) -> dict[str, Any]:
+        phrase = self.authority_phrase if authority_phrase is None else authority_phrase
         try:
-            self.runner.start(self.spec_relative)
+            self.runner.start(
+                self.spec_relative,
+                authority_phrase=phrase,
+                capture_hooks=capture_hooks,
+            )
         except ExperimentRunnerError as exc:
             raise ApplicationError(str(exc)) from exc
         return self.read_model()

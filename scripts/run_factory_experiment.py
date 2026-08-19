@@ -19,8 +19,14 @@ from solana_alpha_lab.factory.application import ApplicationError, FactoryApplic
 def main() -> int:
     parser = argparse.ArgumentParser()
     parser.add_argument("--root", type=Path, default=ROOT)
+    parser.add_argument("--spec", default=None)
+    parser.add_argument("--authority-phrase", default=None)
     args = parser.parse_args()
-    app = FactoryApplication(root=args.root.resolve())
+    app = FactoryApplication(
+        root=args.root.resolve(),
+        spec_relative=args.spec,
+        authority_phrase=args.authority_phrase,
+    )
     try:
         model = app.start()
     except ApplicationError as exc:
