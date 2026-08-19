@@ -227,7 +227,7 @@ class FactoryV1OwnerCockpitLiteTests(unittest.TestCase):
                 home = _get(app, "/")
                 self.assertIn("copy-block", home)
                 self.assertIn("Копировать", home)
-                self.assertIn("FACTORY_V1_COMMISSIONING_HYPOTHESIS_V1", home)
+                self.assertIn("FRESH_OOS_BASELINE_VS_FRICTION_VETO_V1", home)
             finally:
                 store.close()
 

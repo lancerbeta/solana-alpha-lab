@@ -11,9 +11,13 @@ from typing import Any, Callable
 
 import yaml
 
+from solana_alpha_lab.factory.friction_veto import (
+    apply_friction_veto_to_receipt,
+    load_friction_veto_rule,
+)
 from solana_alpha_lab.quote_native_admissible_friction_audition import (
     FACTORY_COMMISSIONING_ATOM_ID,
-    FACTORY_V1_COMMISSIONING_AUTHORITY_PHRASE,
+    FRICTION_VETO_ATOM_ID,
     AuditionError,
     attempt_reservation_document,
     canonical_json,
@@ -169,6 +173,43 @@ def replay_canonical_receipts(
     }
 
 
+def excluded_mints_from_spec(spec: Mapping[str, Any], *, root: Path) -> set[str]:
+    excluded: set[str] = set()
+    for item in spec["data_requirements"]:
+        if str(item.get("kind")) == "GIT_CANONICAL_RECEIPT":
+            excluded.update(_frozen_mints(root, str(item["path"])))
+    return excluded
+
+
+def drop_excluded_rows(
+    rows: list[Mapping[str, Any]],
+    excluded: set[str],
+) -> list[Mapping[str, Any]]:
+    kept: list[Mapping[str, Any]] = []
+    for row in rows:
+        mint = row.get("id")
+        if isinstance(mint, str) and mint in excluded:
+            continue
+        kept.append(row)
+    return kept
+
+
+def _overlay_veto_receipt(
+    spec: Mapping[str, Any],
+    *,
+    root: Path,
+    receipt: Mapping[str, Any],
+) -> dict[str, Any]:
+    if str(receipt.get("atom_id") or "") != FRICTION_VETO_ATOM_ID:
+        return dict(receipt)
+    requirements = {str(item["requirement_id"]): item for item in spec["data_requirements"]}
+    rule_item = requirements.get("VETO_RULE")
+    if rule_item is None:
+        raise CapabilityError("VETO_RULE_MISSING")
+    rule = load_friction_veto_rule(root, str(rule_item["path"]))
+    return apply_friction_veto_to_receipt(receipt, rule=rule)
+
+
 def _blocked_authority(coverage: Mapping[str, Any], blocker: str) -> dict[str, Any]:
     return {
         "status": "BLOCKED_AUTHORITY",
@@ -225,7 +266,11 @@ def capture_quote_native_free_key(
         }
     requirements = {str(item["requirement_id"]): item for item in spec["data_requirements"]}
     if "RUNTIME_RECEIPT" in coverage["available"]:
-        runtime = _load_json(root, str(requirements["RUNTIME_RECEIPT"]["path"]))
+        runtime = _overlay_veto_receipt(
+            spec,
+            root=root,
+            receipt=_load_json(root, str(requirements["RUNTIME_RECEIPT"]["path"])),
+        )
         terminal = str(runtime.get("terminal_outcome") or runtime.get("terminal") or "")
         return {
             "status": "COMPLETE",
@@ -241,8 +286,17 @@ def capture_quote_native_free_key(
             "receipt_relative": str(requirements["RUNTIME_RECEIPT"]["path"]),
         }
     expected_phrase = str(spec["parameters"]["required_owner_phrase"])
-    if expected_phrase != FACTORY_V1_COMMISSIONING_AUTHORITY_PHRASE:
-        raise CapabilityError("COMMISSIONING_PHRASE_DRIFT")
+    policy_relative = str(requirements["CAPTURE_POLICY"]["path"])
+    policy = yaml.safe_load((root / policy_relative).read_text(encoding="utf-8"))
+    if not isinstance(policy, dict):
+        raise CapabilityError("CAPTURE_POLICY_INVALID")
+    validate_policy(policy, root=root)
+    atom_id = str(policy.get("atom_id") or "")
+    policy_phrase = str((policy.get("external_authority") or {}).get("owner_phrase") or "")
+    if expected_phrase != policy_phrase:
+        raise CapabilityError("AUTHORITY_PHRASE_DRIFT")
+    if atom_id not in {FACTORY_COMMISSIONING_ATOM_ID, FRICTION_VETO_ATOM_ID}:
+        raise CapabilityError("ATOM_ID_NOT_ALLOWLISTED")
     if authority_phrase != expected_phrase:
         blocker = (
             "OWNER_PHRASE_MISSING"
@@ -250,13 +304,7 @@ def capture_quote_native_free_key(
             else "AUTHORITY_PHRASE_INVALID"
         )
         return _blocked_authority(coverage, blocker)
-    policy_relative = str(requirements["CAPTURE_POLICY"]["path"])
-    policy = yaml.safe_load((root / policy_relative).read_text(encoding="utf-8"))
-    if not isinstance(policy, dict):
-        raise CapabilityError("CAPTURE_POLICY_INVALID")
-    validate_policy(policy, root=root)
-    excluded = _frozen_mints(root, str(requirements["EXCLUSION_A1"]["path"]))
-    excluded.update(_frozen_mints(root, str(requirements["EXCLUSION_MOVE2"]["path"])))
+    excluded = excluded_mints_from_spec(spec, root=root)
     hooks = dict(capture_hooks or {})
     clock = hooks.get("clock", lambda: datetime.now(UTC))
     started_at = clock()
@@ -264,7 +312,7 @@ def capture_quote_native_free_key(
     reservation = attempt_reservation_document(
         started_at=started_at.astimezone(UTC).isoformat(timespec="seconds").replace("+00:00", "Z"),
         policy_sha256=policy_sha256,
-        atom_id=FACTORY_COMMISSIONING_ATOM_ID,
+        atom_id=atom_id,
     )
     import os
 
@@ -278,13 +326,7 @@ def capture_quote_native_free_key(
         traded_payload: list[Mapping[str, Any]],
     ) -> dict[str, object]:
         def drop(rows: list[Mapping[str, Any]]) -> list[Mapping[str, Any]]:
-            kept: list[Mapping[str, Any]] = []
-            for row in rows:
-                mint = row.get("id")
-                if isinstance(mint, str) and mint in excluded:
-                    continue
-                kept.append(row)
-            return kept
+            return drop_excluded_rows(rows, excluded)
 
         return select_cohort(drop(recent_payload), drop(traded_payload))
 
@@ -312,9 +354,10 @@ def capture_quote_native_free_key(
             "credential_reads": 1,
         }
     receipt = dict(receipt)
-    receipt["atom_id"] = FACTORY_COMMISSIONING_ATOM_ID
+    receipt["atom_id"] = atom_id
     receipt["non_claims"] = list(FACTORY_NON_CLAIMS)
     receipt["excluded_prior_mints"] = sorted(excluded)
+    receipt = _overlay_veto_receipt(spec, root=root, receipt=receipt)
     frozen = receipt.get("frozen_cells")
     if isinstance(frozen, list):
         reused = [
@@ -331,7 +374,7 @@ def capture_quote_native_free_key(
                 "result": "PRIOR_MINT_REUSED",
                 "uncertainty": "COHORT_NOT_COMMISSIONING_FRESH",
                 "robustness": "NOT_SCORED",
-                "failure_modes": ["A1_OR_MOVE2_MINT_REUSE"],
+                "failure_modes": ["PRIOR_MINT_REUSED"],
                 "provider_api_rpc_wss_calls": int(receipt.get("provider_requests") or 0),
                 "credential_reads": int(receipt.get("credential_reads") or 0),
             }

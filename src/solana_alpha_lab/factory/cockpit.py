@@ -74,13 +74,14 @@ def pinned_produced_gaps(spec: Mapping[str, Any], root: Path) -> list[str]:
         if str(item.get("kind")) != "PROVIDER_BOUNDED_CAPTURE":
             continue
         expected = item.get("sha256")
-        if not expected:
-            continue
         relative = str(item.get("path") or "")
         path = root / relative
         requirement_id = str(item.get("requirement_id") or relative)
         if path.is_file() is False:
             gaps.append(requirement_id)
+            continue
+        if not expected:
+            gaps.append(f"{requirement_id}:UNPINNED")
             continue
         digest = hashlib.sha256(path.read_bytes()).hexdigest()
         if digest != str(expected):

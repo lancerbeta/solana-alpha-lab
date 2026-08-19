@@ -19,6 +19,7 @@ HYPOTHESES_RELATIVE = "registries/hypotheses.yaml"
 RESEARCH_CYCLES_RELATIVE = "registries/research_cycles.yaml"
 KERNEL_CONFIG_RELATIVE = "configs/factory_v1_product_kernel_v1.yaml"
 COMMISSIONING_CONFIG_RELATIVE = "configs/factory_v1_commissioning_v1.yaml"
+FRICTION_VETO_CONFIG_RELATIVE = "configs/factory_v1_friction_veto_v1.yaml"
 RUNTIME_CONFIG_RELATIVE = "configs/factory_v1_production_lite_runtime_v1.yaml"
 GOLDEN_SPEC_RELATIVE = (
     "configs/experiment_specs/quote_native_admissible_friction_audition_offline_v1.yaml"
@@ -41,6 +42,10 @@ def kernel_config(root: Path) -> dict[str, Any]:
 
 
 def commissioning_spec_relative(root: Path) -> str:
+    veto_path = root / FRICTION_VETO_CONFIG_RELATIVE
+    if veto_path.is_file():
+        loaded = _load_yaml(root, FRICTION_VETO_CONFIG_RELATIVE)
+        return str(loaded["experiment_spec_relative"])
     path = root / COMMISSIONING_CONFIG_RELATIVE
     if not path.is_file():
         return GOLDEN_SPEC_RELATIVE

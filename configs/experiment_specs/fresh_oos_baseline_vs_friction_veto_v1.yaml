@@ -1,0 +1,56 @@
+schema: smial.experiment-spec
+schema_version: '1.0'
+experiment_id: EXP-FRESH-OOS-BASELINE-VS-FRICTION-VETO-001
+hypothesis_version: HYP-FRESH-OOS-BASELINE-VS-FRICTION-VETO-V1
+question: Does a frozen t0-friction veto improve H900 quoted-exit median and right tail versus the same eligible baseline on a fresh outcome-blind cohort?
+estimand: baseline eligible H900 quoted liquidation recovery versus same baseline after VETO_IF_X_LT_SAMPLE_MEDIAN
+population: LIVE_OUTCOME_BLIND_TOKENS_V2_FREE_KEY_6_RECENT_6_TRADED_EXCLUDING_A1_MOVE2_COMMISSIONING
+data_requirements:
+  - requirement_id: CAPTURE_POLICY
+    kind: CAPTURE_POLICY
+    path: configs/quote_native_fresh_oos_friction_veto_audition_v1.yaml
+    sha256: ed27a7f3f7f4dd9640083f46a8ec60f39e6c422719423c5c32108c92599ecdc3
+  - requirement_id: VETO_RULE
+    kind: CATALOG_ASSET
+    path: configs/friction_veto_rule_v1.yaml
+    sha256: 55b22887fbd5d544127e7d8208ad8df176da8ffdf181f7c5d4d5546520d87010
+  - requirement_id: EXCLUSION_A1
+    kind: GIT_CANONICAL_RECEIPT
+    path: docs/evidence/quote_native_admissible_friction_audition/a1_quote_native_admissible_friction_audition_runtime_receipt_v1.json
+    sha256: 75f60a155b7db6ddb8c801c9ff5060ce5e4e7fe641b836ff35edeb91534c308e
+  - requirement_id: EXCLUSION_MOVE2
+    kind: GIT_CANONICAL_RECEIPT
+    path: docs/evidence/quote_native_friction_h900_move2_oos/a1_quote_native_friction_h900_move2_oos_runtime_receipt_v1.json
+    sha256: a860888cd6c528c03cffb27146d07da6ed60770d0f1e13d47651b0d63f51b926
+  - requirement_id: EXCLUSION_COMMISSIONING
+    kind: GIT_CANONICAL_RECEIPT
+    path: docs/evidence/factory_v1_commissioning/a2_factory_v1_commissioning_runtime_receipt_v1.json
+    sha256: f83968a0be381f874a38ed214c1f9ff1a5ac46bc433c502417d35d8f31727468
+  - requirement_id: RUNTIME_RECEIPT
+    kind: PROVIDER_BOUNDED_CAPTURE
+    path: docs/evidence/fresh_oos_friction_veto/a5_fresh_oos_friction_veto_runtime_receipt_v1.json
+  - requirement_id: ACCEPTANCE
+    kind: PROVIDER_BOUNDED_CAPTURE
+    path: docs/evidence/fresh_oos_friction_veto/a5_fresh_oos_friction_veto_acceptance_v1.json
+capabilities:
+  - CAP-JUPITER-FREE-KEY-QUOTE-NATIVE-BOUNDED-CAPTURE-001
+falsifier: Fresh OOS veto does not improve median and retained right tail, or the effect is one stratum, or capture requires a hypothesis-specific core runner.
+method: classify_baseline_vs_friction_veto
+parameters:
+  research_cycle_id: RC-FRESH-OOS-BASELINE-VS-FRICTION-VETO-001
+  capture_policy_relative: configs/quote_native_fresh_oos_friction_veto_audition_v1.yaml
+  required_owner_phrase: 'OK FRESH_OOS_BASELINE_VS_FRICTION_VETO_V1: one Jupiter Free-key fresh OOS baseline-vs-friction-veto campaign; local process-environment key only; Tokens V2 /recent and /toptraded/1h plus quote-only /swap/v2/order; x-api-key header only; no .env; no key in URL/log/receipt/Git; no taker, /build, /execute, wallet, signer, transaction, paid plan, second provider, retry or fallback; cash cap $0; call cap 60; global pace >=3s; 6 RECENT + 6 TRADED live outcome-blind cohort excluding A1, MOVE 2 and commissioning mints; frozen monotonic veto VETO_IF_X_LT_SAMPLE_MEDIAN; hash-bound row observed_at and attempt reservation before credential read required for capture PASS; WRAP existing capture plus classify_audition_terminal; not MOVE 3; not alpha; not VPS; no post-hoc threshold search.'
+  next_safe_action: WAIT_EXACT_OWNER_PHRASE
+  veto_rule_id: FRICTION_VETO_WORSE_THAN_SAMPLE_MEDIAN_X_V1
+evidence_budget:
+  provider_api_rpc_wss_calls: 60
+holdout_policy: No reserved OOS split is consumed; this atom uses a new live cohort excluding A1, MOVE 2 and commissioning mints and does not start MOVE 3.
+terminal_outcomes:
+  - BLOCKED_AUTHORITY
+  - DIRECTIONAL_HINT_NOT_CONFIRMATION
+  - SAMPLE_INVALID_INSUFFICIENT_COMPLETE_XY
+  - SAMPLE_INVALID_TRADED_CONTROL_KILL
+  - CLOSE_EXACT_QUOTE_FRICTION_MECHANISM
+  - EXTEND_TO_SHADOW
+  - CLOSE_EXACT_FRICTION_VETO_FAMILY
+  - PAUSE_CLOSE_QUOTE_NATIVE_CURRENT_ALPHA_ROUTE

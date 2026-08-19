@@ -25277,7 +25277,7 @@ records:
   as_of: '2026-08-18'
   truth_owner: QUOTE_NATIVE_ADMISSIBLE_FRICTION_AUDITION_V1
   location: {kind: git_path, logical_uri: 'repo://src/solana_alpha_lab/quote_native_admissible_friction_audition.py', repository_path: src/solana_alpha_lab/quote_native_admissible_friction_audition.py}
-  integrity: {kind: sha256, sha256: 1b8e38bda5474ba5c09a954f4800070dc958203964f6e704e68730659fc13251}
+  integrity: {kind: sha256, sha256: 3bf243b10b21613fb8116c8329c9995ca9fefc97f8dbd34a5728fc6b1f8bf44a}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: depends_on, target_asset_id: CONFIG-QUOTE-NATIVE-ADMISSIBLE-FRICTION-AUDITION-001}
@@ -25645,7 +25645,7 @@ records:
   as_of: '2026-08-19'
   truth_owner: FACTORY_V1_PRODUCT_KERNEL_LOCAL_VERTICAL_SLICE_V1
   location: {kind: git_path, logical_uri: 'repo://src/solana_alpha_lab/factory/capabilities.py', repository_path: src/solana_alpha_lab/factory/capabilities.py}
-  integrity: {kind: sha256, sha256: 94f6cb388d5174a49af4474b1961ab8276ded94765df069e5f120685f73bcd53}
+  integrity: {kind: sha256, sha256: 65d99315bb50db04e82948d21bf4f905e3f8b6465c3c30283ca4d6a040d67c9d}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: governed_by, target_asset_id: CTRL-FACTORY-V1-PRODUCT-KERNEL-001}
@@ -25664,7 +25664,7 @@ records:
   as_of: '2026-08-19'
   truth_owner: FACTORY_V1_PRODUCT_KERNEL_LOCAL_VERTICAL_SLICE_V1
   location: {kind: git_path, logical_uri: 'repo://src/solana_alpha_lab/factory/application.py', repository_path: src/solana_alpha_lab/factory/application.py}
-  integrity: {kind: sha256, sha256: 1925607e3fbd053bf74f602ee9a8a177b120fc2604b62af77abad9a45fc928e5}
+  integrity: {kind: sha256, sha256: 3e5b7730c9dc330d6e29305b78b8d275d826f148134b85e0d8cd3fda147c78d6}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: depends_on, target_asset_id: MODULE-FACTORY-V1-RUNNER-001}
@@ -25962,7 +25962,7 @@ records:
   as_of: '2026-08-19'
   truth_owner: FACTORY_V1_COMMISSIONING_HYPOTHESIS_V1
   location: {kind: git_path, logical_uri: 'repo://src/solana_alpha_lab/factory/capabilities.py', repository_path: src/solana_alpha_lab/factory/capabilities.py}
-  integrity: {kind: sha256, sha256: 94f6cb388d5174a49af4474b1961ab8276ded94765df069e5f120685f73bcd53}
+  integrity: {kind: sha256, sha256: 65d99315bb50db04e82948d21bf4f905e3f8b6465c3c30283ca4d6a040d67c9d}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: governed_by, target_asset_id: CTRL-FACTORY-V1-COMMISSIONING-HYPOTHESIS-001}
@@ -25981,7 +25981,7 @@ records:
   as_of: '2026-08-19'
   truth_owner: FACTORY_V1_COMMISSIONING_HYPOTHESIS_V1
   location: {kind: git_path, logical_uri: 'repo://tests/test_factory_v1_commissioning.py', repository_path: tests/test_factory_v1_commissioning.py}
-  integrity: {kind: sha256, sha256: 82ce9720f443409535306aae849a9c4c4bb1a2aee68e7921e9fc6430fcad8e5e}
+  integrity: {kind: sha256, sha256: 152a9a0a087079347b3a1e2dfdb5b6166bcb2dffcf6c0e6bd7d59172acb37e29}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: depends_on, target_asset_id: CONFIG-EXPERIMENT-SPEC-FACTORY-V1-COMMISSIONING-001}
@@ -26299,7 +26299,7 @@ records:
   as_of: '2026-08-19'
   truth_owner: FACTORY_V1_OWNER_COCKPIT_LITE_V1
   location: {kind: git_path, logical_uri: 'repo://src/solana_alpha_lab/factory/cockpit.py', repository_path: src/solana_alpha_lab/factory/cockpit.py}
-  integrity: {kind: sha256, sha256: 33e18993e6397d2b34c087cfa016b37a6485553088421bcd52e1d35b0786c9df}
+  integrity: {kind: sha256, sha256: 9ae851eaf30b011d1fc67d999721454f6eddfd8305133453b76b252f6a5a77bf}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: governed_by, target_asset_id: CTRL-FACTORY-V1-OWNER-COCKPIT-001}
@@ -26317,7 +26317,7 @@ records:
   as_of: '2026-08-19'
   truth_owner: FACTORY_V1_OWNER_COCKPIT_LITE_V1
   location: {kind: git_path, logical_uri: 'repo://tests/test_factory_v1_owner_cockpit.py', repository_path: tests/test_factory_v1_owner_cockpit.py}
-  integrity: {kind: sha256, sha256: 7d6c17d0b351e192d7d2cc935982f2a2aa44542a98d9fe1f437cbd1d58672270}
+  integrity: {kind: sha256, sha256: db52e8332d2a8df3fd1a7d4eec7cca75cdc3e6dbb001a43af923dfd768925b95}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: depends_on, target_asset_id: MODULE-FACTORY-V1-COCKPIT-001}
@@ -26362,4 +26362,154 @@ records:
   consumers: [FACTORY-001, FACTORY-V1-OWNER-COCKPIT-001, GOAL-OWNER]
   evidence: []
   search_terms: [FACTORY_V1, COCKPIT, OWNER_READOUT]
+  classification: {contains_secrets: false, contains_raw_data: false, sensitivity: INTERNAL_NON_SECRET}
+
+- asset_id: CTRL-FRESH-OOS-BASELINE-VS-FRICTION-VETO-001
+  record_version: '1.0'
+  asset_type: control_document
+  purpose: Exact DIRECT_CURSOR_DELIVERY contract for the fresh OOS baseline-versus-friction-veto Factory experiment.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-08-19'
+  truth_owner: FRESH_OOS_BASELINE_VS_FRICTION_VETO_V1
+  location: {kind: git_path, logical_uri: 'repo://docs/tasks/FRESH_OOS_BASELINE_VS_FRICTION_VETO_V1.md', repository_path: docs/tasks/FRESH_OOS_BASELINE_VS_FRICTION_VETO_V1.md}
+  integrity: {kind: sha256, sha256: 9a5a82898f929e0406cb499181f56549fe04c8312109604c7047f765ffb8c390}
+  access: {mode: read_only, method: file, network_required: false, secrets_required: false}
+  relations:
+  - {relation_type: depends_on, target_asset_id: ARCH-INTENT-005}
+  - {relation_type: depends_on, target_asset_id: MODULE-FACTORY-V1-CAPABILITY-FREE-KEY-CAPTURE-001}
+  - {relation_type: validated_by, target_asset_id: TEST-FRESH-OOS-BASELINE-VS-FRICTION-VETO-001}
+  consumers: [FACTORY-001, FRESH-OOS-FRICTION-VETO-001, GOAL-OWNER]
+  evidence: []
+  search_terms: [FACTORY_V1, FRICTION_VETO, CONTRACT]
+  classification: {contains_secrets: false, contains_raw_data: false, sensitivity: INTERNAL_NON_SECRET}
+
+- asset_id: CONFIG-FACTORY-V1-FRICTION-VETO-001
+  record_version: '1.0'
+  asset_type: configuration
+  purpose: Machine-readable selector for the frozen baseline-versus-friction-veto ExperimentSpec.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-08-19'
+  truth_owner: FRESH_OOS_BASELINE_VS_FRICTION_VETO_V1
+  location: {kind: git_path, logical_uri: 'repo://configs/factory_v1_friction_veto_v1.yaml', repository_path: configs/factory_v1_friction_veto_v1.yaml}
+  integrity: {kind: sha256, sha256: c8a82be0472771ef105af2be4eba697ab5c86af6d1f9e308181d514cd6a2e91d}
+  access: {mode: read_only, method: file, network_required: false, secrets_required: false}
+  relations:
+  - {relation_type: governed_by, target_asset_id: CTRL-FRESH-OOS-BASELINE-VS-FRICTION-VETO-001}
+  - {relation_type: depends_on, target_asset_id: SCHEMA-FACTORY-V1-FRICTION-VETO-001}
+  consumers: [FACTORY-001, FRESH-OOS-FRICTION-VETO-001, GOAL-OWNER]
+  evidence: []
+  search_terms: [FACTORY_V1, FRICTION_VETO, CONFIG]
+  classification: {contains_secrets: false, contains_raw_data: false, sensitivity: INTERNAL_NON_SECRET}
+
+- asset_id: SCHEMA-FACTORY-V1-FRICTION-VETO-001
+  record_version: '1.0'
+  asset_type: schema
+  purpose: JSON Schema for the Factory friction-veto selector configuration.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-08-19'
+  truth_owner: FRESH_OOS_BASELINE_VS_FRICTION_VETO_V1
+  location: {kind: git_path, logical_uri: 'repo://catalog/schemas/factory_v1_friction_veto.schema.json', repository_path: catalog/schemas/factory_v1_friction_veto.schema.json}
+  integrity: {kind: sha256, sha256: b73cb34dc82eda1970485671bc72e5e975b670f78e009541bbb96b2af239f2d0}
+  access: {mode: read_only, method: file, network_required: false, secrets_required: false}
+  relations:
+  - {relation_type: governed_by, target_asset_id: CTRL-FRESH-OOS-BASELINE-VS-FRICTION-VETO-001}
+  consumers: [FACTORY-001, FRESH-OOS-FRICTION-VETO-001, GOAL-OWNER]
+  evidence: []
+  search_terms: [FACTORY_V1, FRICTION_VETO, SCHEMA]
+  classification: {contains_secrets: false, contains_raw_data: false, sensitivity: INTERNAL_NON_SECRET}
+
+- asset_id: CONFIG-FRICTION-VETO-RULE-001
+  record_version: '1.0'
+  asset_type: configuration
+  purpose: Frozen monotonic median-X friction veto rule with no post-hoc threshold search.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-08-19'
+  truth_owner: FRESH_OOS_BASELINE_VS_FRICTION_VETO_V1
+  location: {kind: git_path, logical_uri: 'repo://configs/friction_veto_rule_v1.yaml', repository_path: configs/friction_veto_rule_v1.yaml}
+  integrity: {kind: sha256, sha256: 55b22887fbd5d544127e7d8208ad8df176da8ffdf181f7c5d4d5546520d87010}
+  access: {mode: read_only, method: file, network_required: false, secrets_required: false}
+  relations:
+  - {relation_type: governed_by, target_asset_id: CTRL-FRESH-OOS-BASELINE-VS-FRICTION-VETO-001}
+  consumers: [FACTORY-001, FRESH-OOS-FRICTION-VETO-001, GOAL-OWNER]
+  evidence: []
+  search_terms: [FACTORY_V1, FRICTION_VETO, RULE]
+  classification: {contains_secrets: false, contains_raw_data: false, sensitivity: INTERNAL_NON_SECRET}
+
+- asset_id: CONFIG-EXPERIMENT-SPEC-FRESH-OOS-FRICTION-VETO-001
+  record_version: '1.0'
+  asset_type: configuration
+  purpose: ExperimentSpec for the fresh OOS baseline-versus-friction-veto live cycle.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-08-19'
+  truth_owner: FRESH_OOS_BASELINE_VS_FRICTION_VETO_V1
+  location: {kind: git_path, logical_uri: 'repo://configs/experiment_specs/fresh_oos_baseline_vs_friction_veto_v1.yaml', repository_path: configs/experiment_specs/fresh_oos_baseline_vs_friction_veto_v1.yaml}
+  integrity: {kind: sha256, sha256: f2e2e00d0b15008c811b7248104fc0264309ce50a5844d74191c5623647b2f81}
+  access: {mode: read_only, method: file, network_required: false, secrets_required: false}
+  relations:
+  - {relation_type: governed_by, target_asset_id: CTRL-FRESH-OOS-BASELINE-VS-FRICTION-VETO-001}
+  - {relation_type: depends_on, target_asset_id: SCHEMA-EXPERIMENT-SPEC-001}
+  consumers: [FACTORY-001, FRESH-OOS-FRICTION-VETO-001, GOAL-OWNER]
+  evidence: []
+  search_terms: [FACTORY_V1, FRICTION_VETO, EXPERIMENT_SPEC]
+  classification: {contains_secrets: false, contains_raw_data: false, sensitivity: INTERNAL_NON_SECRET}
+
+- asset_id: CONFIG-CAPTURE-POLICY-FRESH-OOS-FRICTION-VETO-001
+  record_version: '1.0'
+  asset_type: configuration
+  purpose: WRAP of the Free-key 6+6 audition envelope excluding A1, MOVE 2 and commissioning mints.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-08-19'
+  truth_owner: FRESH_OOS_BASELINE_VS_FRICTION_VETO_V1
+  location: {kind: git_path, logical_uri: 'repo://configs/quote_native_fresh_oos_friction_veto_audition_v1.yaml', repository_path: configs/quote_native_fresh_oos_friction_veto_audition_v1.yaml}
+  integrity: {kind: sha256, sha256: ed27a7f3f7f4dd9640083f46a8ec60f39e6c422719423c5c32108c92599ecdc3}
+  access: {mode: read_only, method: file, network_required: false, secrets_required: false}
+  relations:
+  - {relation_type: governed_by, target_asset_id: CTRL-FRESH-OOS-BASELINE-VS-FRICTION-VETO-001}
+  consumers: [FACTORY-001, FRESH-OOS-FRICTION-VETO-001, GOAL-OWNER]
+  evidence: []
+  search_terms: [FACTORY_V1, FRICTION_VETO, CAPTURE_POLICY]
+  classification: {contains_secrets: false, contains_raw_data: false, sensitivity: INTERNAL_NON_SECRET}
+
+- asset_id: MODULE-FACTORY-V1-FRICTION-VETO-001
+  record_version: '1.0'
+  asset_type: script
+  purpose: Frozen baseline-versus-median-X friction veto projector over capture receipt cells.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-08-19'
+  truth_owner: FRESH_OOS_BASELINE_VS_FRICTION_VETO_V1
+  location: {kind: git_path, logical_uri: 'repo://src/solana_alpha_lab/factory/friction_veto.py', repository_path: src/solana_alpha_lab/factory/friction_veto.py}
+  integrity: {kind: sha256, sha256: 04f2410de383306b520f29dfe2121cd8b5f88c9b2c993b44a7331aa33f78f1b7}
+  access: {mode: read_only, method: file, network_required: false, secrets_required: false}
+  relations:
+  - {relation_type: governed_by, target_asset_id: CTRL-FRESH-OOS-BASELINE-VS-FRICTION-VETO-001}
+  consumers: [FACTORY-001, FRESH-OOS-FRICTION-VETO-001, GOAL-OWNER]
+  evidence: []
+  search_terms: [FACTORY_V1, FRICTION_VETO, PROJECTION]
+  classification: {contains_secrets: false, contains_raw_data: false, sensitivity: INTERNAL_NON_SECRET}
+
+- asset_id: TEST-FRESH-OOS-BASELINE-VS-FRICTION-VETO-001
+  record_version: '1.0'
+  asset_type: script
+  purpose: Fail-closed tests for veto composition, phrase gating and synthetic decision utility.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-08-19'
+  truth_owner: FRESH_OOS_BASELINE_VS_FRICTION_VETO_V1
+  location: {kind: git_path, logical_uri: 'repo://tests/test_fresh_oos_baseline_vs_friction_veto.py', repository_path: tests/test_fresh_oos_baseline_vs_friction_veto.py}
+  integrity: {kind: sha256, sha256: 5b253693a7b91ad894a14775121fff14d01034ff4f8fd1a27b479ce811e4a0cc}
+  access: {mode: read_only, method: file, network_required: false, secrets_required: false}
+  relations:
+  - {relation_type: depends_on, target_asset_id: MODULE-FACTORY-V1-FRICTION-VETO-001}
+  - {relation_type: depends_on, target_asset_id: CONFIG-EXPERIMENT-SPEC-FRESH-OOS-FRICTION-VETO-001}
+  - {relation_type: depends_on, target_asset_id: CONFIG-FRICTION-VETO-RULE-001}
+  consumers: [FACTORY-001, FRESH-OOS-FRICTION-VETO-001, GOAL-OWNER]
+  evidence: []
+  search_terms: [FACTORY_V1, FRICTION_VETO, TESTS]
   classification: {contains_secrets: false, contains_raw_data: false, sensitivity: INTERNAL_NON_SECRET}

@@ -423,6 +423,11 @@
       "target_asset_id": "CONTRACT-CANARY-SPECIFICATION-ONLY-001"
     },
     {
+      "source_asset_id": "CONFIG-CAPTURE-POLICY-FRESH-OOS-FRICTION-VETO-001",
+      "relation": "governed_by",
+      "target_asset_id": "CTRL-FRESH-OOS-BASELINE-VS-FRICTION-VETO-001"
+    },
+    {
       "source_asset_id": "CONFIG-DELIVERY-CAPABILITY-RADAR-001",
       "relation": "governed_by",
       "target_asset_id": "CTRL-DELIVERY-HARNESS-001"
@@ -483,6 +488,16 @@
       "target_asset_id": "CTRL-FACTORY-V1-COMMISSIONING-HYPOTHESIS-001"
     },
     {
+      "source_asset_id": "CONFIG-EXPERIMENT-SPEC-FRESH-OOS-FRICTION-VETO-001",
+      "relation": "depends_on",
+      "target_asset_id": "SCHEMA-EXPERIMENT-SPEC-001"
+    },
+    {
+      "source_asset_id": "CONFIG-EXPERIMENT-SPEC-FRESH-OOS-FRICTION-VETO-001",
+      "relation": "governed_by",
+      "target_asset_id": "CTRL-FRESH-OOS-BASELINE-VS-FRICTION-VETO-001"
+    },
+    {
       "source_asset_id": "CONFIG-EXPERIMENT-SPEC-QUOTE-NATIVE-ADMISSIBLE-OFFLINE-001",
       "relation": "depends_on",
       "target_asset_id": "EVIDENCE-QUOTE-NATIVE-ADMISSIBLE-FRICTION-AUDITION-001"
@@ -506,6 +521,16 @@
       "source_asset_id": "CONFIG-FACTORY-V1-COMMISSIONING-001",
       "relation": "governed_by",
       "target_asset_id": "CTRL-FACTORY-V1-COMMISSIONING-HYPOTHESIS-001"
+    },
+    {
+      "source_asset_id": "CONFIG-FACTORY-V1-FRICTION-VETO-001",
+      "relation": "depends_on",
+      "target_asset_id": "SCHEMA-FACTORY-V1-FRICTION-VETO-001"
+    },
+    {
+      "source_asset_id": "CONFIG-FACTORY-V1-FRICTION-VETO-001",
+      "relation": "governed_by",
+      "target_asset_id": "CTRL-FRESH-OOS-BASELINE-VS-FRICTION-VETO-001"
     },
     {
       "source_asset_id": "CONFIG-FACTORY-V1-LINUX-RUNTIME-UNIT-001",
@@ -551,6 +576,11 @@
       "source_asset_id": "CONFIG-FACTORY-V1-PRODUCTION-LITE-RUNTIME-001",
       "relation": "governed_by",
       "target_asset_id": "CTRL-FACTORY-V1-PRODUCTION-LITE-RUNTIME-001"
+    },
+    {
+      "source_asset_id": "CONFIG-FRICTION-VETO-RULE-001",
+      "relation": "governed_by",
+      "target_asset_id": "CTRL-FRESH-OOS-BASELINE-VS-FRICTION-VETO-001"
     },
     {
       "source_asset_id": "CONFIG-OWNER-AUTHORITY-PACKET-001",
@@ -1981,6 +2011,21 @@
       "source_asset_id": "CTRL-FACTORY-V1-PRODUCTION-LITE-RUNTIME-001",
       "relation": "validated_by",
       "target_asset_id": "TEST-FACTORY-V1-PRODUCTION-LITE-RUNTIME-001"
+    },
+    {
+      "source_asset_id": "CTRL-FRESH-OOS-BASELINE-VS-FRICTION-VETO-001",
+      "relation": "depends_on",
+      "target_asset_id": "ARCH-INTENT-005"
+    },
+    {
+      "source_asset_id": "CTRL-FRESH-OOS-BASELINE-VS-FRICTION-VETO-001",
+      "relation": "depends_on",
+      "target_asset_id": "MODULE-FACTORY-V1-CAPABILITY-FREE-KEY-CAPTURE-001"
+    },
+    {
+      "source_asset_id": "CTRL-FRESH-OOS-BASELINE-VS-FRICTION-VETO-001",
+      "relation": "validated_by",
+      "target_asset_id": "TEST-FRESH-OOS-BASELINE-VS-FRICTION-VETO-001"
     },
     {
       "source_asset_id": "CTRL-HANDOFF-PROTOCOL-001",
@@ -6843,6 +6888,11 @@
       "target_asset_id": "SCHEMA-EXPERIMENT-SPEC-001"
     },
     {
+      "source_asset_id": "MODULE-FACTORY-V1-FRICTION-VETO-001",
+      "relation": "governed_by",
+      "target_asset_id": "CTRL-FRESH-OOS-BASELINE-VS-FRICTION-VETO-001"
+    },
+    {
       "source_asset_id": "MODULE-FACTORY-V1-OPS-STORE-001",
       "relation": "governed_by",
       "target_asset_id": "CONFIG-FACTORY-V1-PRODUCT-KERNEL-001"
@@ -8873,6 +8923,11 @@
       "target_asset_id": "CTRL-FACTORY-V1-COMMISSIONING-HYPOTHESIS-001"
     },
     {
+      "source_asset_id": "SCHEMA-FACTORY-V1-FRICTION-VETO-001",
+      "relation": "governed_by",
+      "target_asset_id": "CTRL-FRESH-OOS-BASELINE-VS-FRICTION-VETO-001"
+    },
+    {
       "source_asset_id": "SCHEMA-FACTORY-V1-OWNER-COCKPIT-001",
       "relation": "governed_by",
       "target_asset_id": "CTRL-FACTORY-V1-OWNER-COCKPIT-001"
@@ -10316,6 +10371,21 @@
       "source_asset_id": "TEST-FACTORY-V1-PRODUCTION-LITE-RUNTIME-001",
       "relation": "depends_on",
       "target_asset_id": "MODULE-FACTORY-V1-RUNTIME-001"
+    },
+    {
+      "source_asset_id": "TEST-FRESH-OOS-BASELINE-VS-FRICTION-VETO-001",
+      "relation": "depends_on",
+      "target_asset_id": "CONFIG-EXPERIMENT-SPEC-FRESH-OOS-FRICTION-VETO-001"
+    },
+    {
+      "source_asset_id": "TEST-FRESH-OOS-BASELINE-VS-FRICTION-VETO-001",
+      "relation": "depends_on",
+      "target_asset_id": "CONFIG-FRICTION-VETO-RULE-001"
+    },
+    {
+      "source_asset_id": "TEST-FRESH-OOS-BASELINE-VS-FRICTION-VETO-001",
+      "relation": "depends_on",
+      "target_asset_id": "MODULE-FACTORY-V1-FRICTION-VETO-001"
     },
     {
       "source_asset_id": "TEST-OWNER-ATTENTION-GATE-001",
