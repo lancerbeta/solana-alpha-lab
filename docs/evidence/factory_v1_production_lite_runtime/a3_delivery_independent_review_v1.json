@@ -15,8 +15,8 @@
     "GOAL_DOD_CRITIC"
   ],
   "review_id": "FACTORY-V1-PRODUCTION-LITE-RUNTIME-INDEPENDENT-REVIEW-001",
-  "reviewed_bindings_sha256": "bc1269d983579be4719c6dad722a8c139f9b4430df223a14a6516a51f1f49b3d",
-  "reviewed_inventory_sha256": "cb932d7af1a3faf5c0a7492f8ed6dba98a793c82d93ff248a1d1da27e91ec9b7",
+  "reviewed_bindings_sha256": "3c050b9d9d0a1858c7e2c4b36f9d3a33af28e0f9228d9d24cc5c180233f637e0",
+  "reviewed_inventory_sha256": "7d7207e5af79ccdf6d9bfab8a3c331852a07073ac6c569597f26fa41536d5025",
   "reviews": [
     {
       "findings": [

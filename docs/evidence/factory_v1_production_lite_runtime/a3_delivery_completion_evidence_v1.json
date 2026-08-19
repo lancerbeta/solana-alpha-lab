@@ -9,11 +9,11 @@
   "cloud_bundle_smoke_required": false,
   "factory_fit": {
     "path": "docs/evidence/factory_v1_production_lite_runtime/a3_delivery_factory_fit_v1.json",
-    "sha256": "6cecb3d6bba33794b2e515f1df81c9db86d798c78114b52cc44cf469e7419f56",
+    "sha256": "828a7fc95db7a013a477ac544101ae137af95e04804f3d2f7d7a547c0f656145",
     "verdict": "PASS"
   },
   "implementation_bindings": {
-    "catalog/assets/core.yaml": "d2a1a76e68c7d5345473e1a838a2476e957485c1471997aa66bbaea06dec2006",
+    "catalog/assets/core.yaml": "6e85320b064724e260515d65671d7ef026a706f35d9428a652766118a02a6eef",
     "catalog/assets/lifecycle.yaml": "e98e8d2a605aaab865b2a18d3d264d9e6c86d921e6b80f9a001aa1708e95dfbc",
     "catalog/catalog_manifest.yaml": "1ec384bd7b33647f26bbda7daa4b62e7ec11105774232af413d0e89518a09aef",
     "catalog/generated/asset_edges.json": "5a2234d59dd6e74ed95ea9e34de4c846c6df2f931617a4d40e8fb77b645a9a7a",
@@ -21,7 +21,7 @@
     "configs/factory_v1_linux_runtime/factory-v1-workbench.service": "27d94addca2d2eec3d9e66512dbda6dc40e32804446972a0582f487ce77477ca",
     "configs/factory_v1_production_lite_runtime_v1.yaml": "ea33463cbac2c912cc8d97356e0d05433c4055e05b4c422ecc892f7f09738f60",
     "docs/PROJECT_MAP.md": "6f459b6c2cbbbe96b0cd4b8a4ad9ba37ede05653b48baeb34457f0f3e95435b0",
-    "docs/evidence/factory_v1_production_lite_runtime/a3_factory_v1_runtime_acceptance_v1.json": "4c0e6d0100e2dc943a1c0b1f72b9ac81fa96b00d2a775f8be85a8612a8f674bd",
+    "docs/evidence/factory_v1_production_lite_runtime/a3_factory_v1_runtime_acceptance_v1.json": "9a9a71c5ca65eb8ef963e06bc2501ea630b6f90a80de37264bb72816808dbf40",
     "docs/reports/factory_v1_production_lite_runtime/a3_owner_readout_v1.md": "2b2e0563de7195ac5b712d86d00c29156f37532ff3251e795f8596f83ec97bee",
     "docs/tasks/FACTORY_V1_PRODUCTION_LITE_LINUX_RUNTIME_V1.md": "c5670d93b6611b08708ab991fe4790edf4a514bcf37d94774b0faf6781c3d9ca",
     "scripts/run_factory_runtime.py": "91c426713ce052be4e3ed23c459cde0fbe0f789e86cb54083028f3f668098be5",
@@ -65,7 +65,7 @@
     "github_ci": "ENFORCED_LIVE_AT_GUARDED_MERGE",
     "independent_review": {
       "path": "docs/evidence/factory_v1_production_lite_runtime/a3_delivery_independent_review_v1.json",
-      "sha256": "a908f5e8b5f41fce0bbe7b2a9240a954a107ce875af2baebd3e40c432b62b985",
+      "sha256": "679b0e437aa4c6ab2c2a8b2972df8e2895268ce2d3c3b9708ca23ba8400d2b1d",
       "verdict": "PASS"
     },
     "project_checks": [
