@@ -15,8 +15,8 @@
     "GOAL_DOD_CRITIC"
   ],
   "review_id": "FACTORY-V1-PRODUCT-KERNEL-INDEPENDENT-REVIEW-001",
-  "reviewed_bindings_sha256": "2d729cc1b19c49e937d445219ac732eba21834187eac9234d937f7eb08c0f7f0",
-  "reviewed_inventory_sha256": "adbe80ba9a1985693271198f4467c5fe9d832c7c7ab04ff94649b80df42ef8b6",
+  "reviewed_bindings_sha256": "6a2597e093d80330ca0b22657a3605268e757a0ef2e4afa37f9cc7f5e1a8cb58",
+  "reviewed_inventory_sha256": "68227c4a2eaeefa53e5a51b6b15c469951c0e1457eba6eb0b6434c71632094a7",
   "reviews": [
     {
       "findings": [
