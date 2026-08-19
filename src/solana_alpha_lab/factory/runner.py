@@ -68,6 +68,8 @@ class ExperimentRunner:
         existing = self.store.get_job(job_id_for(str(spec["experiment_id"])))
         if existing and existing["status"] in {"STOPPED", "PARKED"}:
             raise ExperimentRunnerError("JOB_NOT_RUNNABLE")
+        if existing and existing["status"] == "COMPLETE":
+            return existing
         coverage = resolve_data_requirements(spec, root=self.root)
         running = self._job_record(
             spec,

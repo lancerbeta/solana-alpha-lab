@@ -72,6 +72,15 @@ def isolated_commissioning_root(tmp: Path) -> Path:
     return tmp
 
 
+def isolated_commissioning_root_with_bound_receipts(tmp: Path) -> Path:
+    root = isolated_commissioning_root(tmp)
+    spec = yaml.safe_load((ROOT / SPEC_RELATIVE).read_text(encoding="utf-8"))
+    for item in spec["data_requirements"]:
+        if item["kind"] == "PROVIDER_BOUNDED_CAPTURE":
+            _copy(root, item["path"])
+    return root
+
+
 class _Response:
     def __init__(self, body: bytes, *, status: int, headers: dict[str, str]) -> None:
         self._body = __import__("io").BytesIO(body)
@@ -210,6 +219,25 @@ class FactoryV1CommissioningTests(unittest.TestCase):
             excluded = set(receipt["excluded_prior_mints"])
             for cell in receipt.get("frozen_cells") or []:
                 self.assertNotIn(cell["mint"], excluded)
+            first_requests = len(opener.requests)
+            runtime_bytes = runtime_path.read_bytes()
+            job = store.get_job("JOB-EXP-FACTORY-V1-COMMISSIONING-QUOTE-NATIVE-FREE-KEY-001")
+            assert job is not None
+            first_terminal = job["terminal"]
+            second = app.start(
+                authority_phrase=FACTORY_V1_COMMISSIONING_AUTHORITY_PHRASE,
+                capture_hooks={
+                    "environ": {"JUPITER_API_KEY": "test-key-not-a-secret"},
+                    "opener": opener,
+                    "clock": clock,
+                    "sleeper": clock.sleep,
+                    "preflight_fn": lambda *_args, **_kwargs: {"credential_reads": 0},
+                },
+            )
+            self.assertEqual(second["status"], "COMPLETE")
+            self.assertEqual(second["terminal_result"], first_terminal)
+            self.assertEqual(len(opener.requests), first_requests)
+            self.assertEqual(runtime_path.read_bytes(), runtime_bytes)
             store.close()
 
     def test_live_receipts_are_hash_bound_and_exclude_prior_mints(self) -> None:
@@ -240,6 +268,83 @@ class FactoryV1CommissioningTests(unittest.TestCase):
         blob = runtime_path.read_bytes().decode("utf-8").lower()
         self.assertNotIn("jupiter_api_key", blob)
         self.assertNotIn("x-api-key", blob)
+
+    def test_hash_bound_receipt_projects_without_network_or_phrase(self) -> None:
+        runtime = json.loads(
+            (
+                ROOT
+                / "docs/evidence/factory_v1_commissioning"
+                / "a2_factory_v1_commissioning_runtime_receipt_v1.json"
+            ).read_text(encoding="utf-8")
+        )
+        opener = _SequenceOpener([])
+        with tempfile.TemporaryDirectory() as tmp:
+            root = isolated_commissioning_root_with_bound_receipts(Path(tmp))
+            store = OperationalStore(root / "ops.sqlite")
+            app = FactoryApplication(root=root, store=store, spec_relative=SPEC_RELATIVE)
+            after = app.start(
+                authority_phrase=FACTORY_V1_COMMISSIONING_AUTHORITY_PHRASE,
+                capture_hooks={
+                    "environ": {},
+                    "opener": opener,
+                },
+            )
+            self.assertEqual(after["status"], "COMPLETE")
+            self.assertEqual(after["terminal_result"], runtime["terminal_outcome"])
+            self.assertEqual(after["result"], runtime["terminal_outcome"])
+            self.assertEqual(len(opener.requests), 0)
+            job = store.get_job("JOB-EXP-FACTORY-V1-COMMISSIONING-QUOTE-NATIVE-FREE-KEY-001")
+            assert job is not None
+            self.assertEqual(job["evidence"]["provider_api_rpc_wss_calls"], runtime["provider_requests"])
+            self.assertEqual(job["evidence"]["credential_reads"], runtime["credential_reads"])
+            without_phrase = FactoryApplication(
+                root=root, store=store, spec_relative=SPEC_RELATIVE
+            ).start()
+            self.assertEqual(without_phrase["status"], "COMPLETE")
+            self.assertEqual(without_phrase["terminal_result"], runtime["terminal_outcome"])
+            self.assertEqual(len(opener.requests), 0)
+            store.close()
+
+    def test_workbench_start_after_complete_does_not_clobber_git(self) -> None:
+        runtime = json.loads(
+            (
+                ROOT
+                / "docs/evidence/factory_v1_commissioning"
+                / "a2_factory_v1_commissioning_runtime_receipt_v1.json"
+            ).read_text(encoding="utf-8")
+        )
+        with tempfile.TemporaryDirectory() as tmp:
+            root = isolated_commissioning_root_with_bound_receipts(Path(tmp))
+            store = OperationalStore(root / "ops.sqlite")
+            app = FactoryApplication(root=root, store=store, spec_relative=SPEC_RELATIVE)
+            first = app.start()
+            self.assertEqual(first["status"], "COMPLETE")
+            server = serve(app, host="127.0.0.1", port=0)
+            thread = Thread(target=server.serve_forever, daemon=True)
+            thread.start()
+            try:
+                host, port = server.server_address[:2]
+                conn = HTTPConnection(host, port, timeout=2)
+                conn.request(
+                    "POST",
+                    "/",
+                    body="command=START",
+                    headers={"Content-Type": "application/x-www-form-urlencoded"},
+                )
+                response = conn.getresponse()
+                body = response.read().decode("utf-8")
+                self.assertEqual(response.status, 200)
+                self.assertIn("COMPLETE", body)
+                self.assertIn(runtime["terminal_outcome"], body)
+                conn.close()
+            finally:
+                server.shutdown()
+                server.server_close()
+            job = store.get_job("JOB-EXP-FACTORY-V1-COMMISSIONING-QUOTE-NATIVE-FREE-KEY-001")
+            assert job is not None
+            self.assertEqual(job["status"], "COMPLETE")
+            self.assertEqual(job["terminal"], runtime["terminal_outcome"])
+            store.close()
 
     def test_default_application_selects_commissioning_spec(self) -> None:
         spec = load_experiment_spec(ROOT, SPEC_RELATIVE)

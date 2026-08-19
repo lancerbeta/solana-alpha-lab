@@ -223,6 +223,23 @@ def capture_quote_native_free_key(
             "provider_api_rpc_wss_calls": 0,
             "credential_reads": 0,
         }
+    requirements = {str(item["requirement_id"]): item for item in spec["data_requirements"]}
+    if "RUNTIME_RECEIPT" in coverage["available"]:
+        runtime = _load_json(root, str(requirements["RUNTIME_RECEIPT"]["path"]))
+        terminal = str(runtime.get("terminal_outcome") or runtime.get("terminal") or "")
+        return {
+            "status": "COMPLETE",
+            "blocker": "NONE",
+            "coverage": coverage,
+            "terminal": terminal,
+            "result": terminal,
+            "uncertainty": "SCREENING_HINT_NOT_OOS_CONFIRMATION",
+            "robustness": str(runtime.get("h3600_role") or "UNKNOWN"),
+            "failure_modes": list(runtime.get("non_claims") or FACTORY_NON_CLAIMS),
+            "provider_api_rpc_wss_calls": int(runtime.get("provider_requests") or 0),
+            "credential_reads": int(runtime.get("credential_reads") or 0),
+            "receipt_relative": str(requirements["RUNTIME_RECEIPT"]["path"]),
+        }
     expected_phrase = str(spec["parameters"]["required_owner_phrase"])
     if expected_phrase != FACTORY_V1_COMMISSIONING_AUTHORITY_PHRASE:
         raise CapabilityError("COMMISSIONING_PHRASE_DRIFT")
@@ -233,7 +250,6 @@ def capture_quote_native_free_key(
             else "AUTHORITY_PHRASE_INVALID"
         )
         return _blocked_authority(coverage, blocker)
-    requirements = {str(item["requirement_id"]): item for item in spec["data_requirements"]}
     policy_relative = str(requirements["CAPTURE_POLICY"]["path"])
     policy = yaml.safe_load((root / policy_relative).read_text(encoding="utf-8"))
     if not isinstance(policy, dict):

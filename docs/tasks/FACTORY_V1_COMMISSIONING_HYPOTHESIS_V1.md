@@ -79,7 +79,7 @@ context_requirements:
     ARCHITECTURE_DECISIONS:
       - docs/architecture/intents/ARCH-INTENT-005-factory-v1-operational-readiness-and-owner-experience.md
     DELIVERY_EVIDENCE:
-      - docs/evidence/factory_v1_product_kernel/a1_factory_v1_product_kernel_acceptance_v1.json
+      - docs/evidence/factory_v1_commissioning/a2_delivery_completion_evidence_v1.json
     HISTORICAL_CONTEXT: []
 ---
 

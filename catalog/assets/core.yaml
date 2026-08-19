@@ -25626,7 +25626,7 @@ records:
   as_of: '2026-08-19'
   truth_owner: FACTORY_V1_PRODUCT_KERNEL_LOCAL_VERTICAL_SLICE_V1
   location: {kind: git_path, logical_uri: 'repo://src/solana_alpha_lab/factory/runner.py', repository_path: src/solana_alpha_lab/factory/runner.py}
-  integrity: {kind: sha256, sha256: 43f674e45d805a2f1e676c8b20a41626ac2ec8f2a6b5ac0a741da68a980b52c8}
+  integrity: {kind: sha256, sha256: d8d22bcb51fb6992d40f09e58274c52e0f9942c12d043cc57b96ffca524e918f}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: governed_by, target_asset_id: CTRL-FACTORY-V1-PRODUCT-KERNEL-001}
@@ -25645,7 +25645,7 @@ records:
   as_of: '2026-08-19'
   truth_owner: FACTORY_V1_PRODUCT_KERNEL_LOCAL_VERTICAL_SLICE_V1
   location: {kind: git_path, logical_uri: 'repo://src/solana_alpha_lab/factory/capabilities.py', repository_path: src/solana_alpha_lab/factory/capabilities.py}
-  integrity: {kind: sha256, sha256: de8d06bb6c7e3fe0e13deda71062ca2cbefb11aabac58a0f0e00a5af91efb99d}
+  integrity: {kind: sha256, sha256: 94f6cb388d5174a49af4474b1961ab8276ded94765df069e5f120685f73bcd53}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: governed_by, target_asset_id: CTRL-FACTORY-V1-PRODUCT-KERNEL-001}
@@ -25773,7 +25773,7 @@ records:
   as_of: '2026-08-19'
   truth_owner: FACTORY_V1_PRODUCT_KERNEL_LOCAL_VERTICAL_SLICE_V1
   location: {kind: git_path, logical_uri: 'repo://tests/test_factory_v1_product_kernel.py', repository_path: tests/test_factory_v1_product_kernel.py}
-  integrity: {kind: sha256, sha256: 01ff5027b47c2cf904d76ae905fce4d9bf2e2bce4c56fdb13345fe96490c0ee0}
+  integrity: {kind: sha256, sha256: 25b201285077b0b3ea360bbf6c85415e96b28729fbcdbdd5a24a39623e1d393c}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: depends_on, target_asset_id: MODULE-FACTORY-V1-RUNNER-001}
@@ -25866,7 +25866,7 @@ records:
   as_of: '2026-08-19'
   truth_owner: FACTORY_V1_COMMISSIONING_HYPOTHESIS_V1
   location: {kind: git_path, logical_uri: 'repo://docs/tasks/FACTORY_V1_COMMISSIONING_HYPOTHESIS_V1.md', repository_path: docs/tasks/FACTORY_V1_COMMISSIONING_HYPOTHESIS_V1.md}
-  integrity: {kind: sha256, sha256: a66a4e75e9f5d191238b42419688dd7c66d48c123126b302d43a412d49091618}
+  integrity: {kind: sha256, sha256: 96a432c57d86fac4613bed31bf8f92cddeddd46effcbae2784de41507b7c3cca}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: governed_by, target_asset_id: ARCH-INTENT-005}
@@ -25961,7 +25961,7 @@ records:
   as_of: '2026-08-19'
   truth_owner: FACTORY_V1_COMMISSIONING_HYPOTHESIS_V1
   location: {kind: git_path, logical_uri: 'repo://src/solana_alpha_lab/factory/capabilities.py', repository_path: src/solana_alpha_lab/factory/capabilities.py}
-  integrity: {kind: sha256, sha256: de8d06bb6c7e3fe0e13deda71062ca2cbefb11aabac58a0f0e00a5af91efb99d}
+  integrity: {kind: sha256, sha256: 94f6cb388d5174a49af4474b1961ab8276ded94765df069e5f120685f73bcd53}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: governed_by, target_asset_id: CTRL-FACTORY-V1-COMMISSIONING-HYPOTHESIS-001}
@@ -25980,7 +25980,7 @@ records:
   as_of: '2026-08-19'
   truth_owner: FACTORY_V1_COMMISSIONING_HYPOTHESIS_V1
   location: {kind: git_path, logical_uri: 'repo://tests/test_factory_v1_commissioning.py', repository_path: tests/test_factory_v1_commissioning.py}
-  integrity: {kind: sha256, sha256: 95b40457080f14cb57476787d34701d68333a53d647340aefcaed6c938035c80}
+  integrity: {kind: sha256, sha256: 82ce9720f443409535306aae849a9c4c4bb1a2aee68e7921e9fc6430fcad8e5e}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: depends_on, target_asset_id: CONFIG-EXPERIMENT-SPEC-FACTORY-V1-COMMISSIONING-001}
