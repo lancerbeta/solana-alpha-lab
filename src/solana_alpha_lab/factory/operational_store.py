@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import json
+import shutil
 import sqlite3
 from datetime import UTC, datetime
 from pathlib import Path
@@ -23,7 +24,10 @@ class OperationalStore:
             raise OperationalStoreError("OPS_STORE_PATH_NOT_ABSOLUTE")
         path.parent.mkdir(parents=True, exist_ok=True)
         self.path = path
-        self._conn = sqlite3.connect(path, check_same_thread=False)
+        self._connect()
+
+    def _connect(self) -> None:
+        self._conn = sqlite3.connect(self.path, check_same_thread=False)
         self._conn.row_factory = sqlite3.Row
         self._conn.execute("PRAGMA journal_mode=WAL")
         self._conn.execute(
@@ -59,6 +63,16 @@ class OperationalStore:
                 ack_id INTEGER PRIMARY KEY AUTOINCREMENT,
                 created_at TEXT NOT NULL,
                 note TEXT NOT NULL
+            )
+            """
+        )
+        self._conn.execute(
+            """
+            CREATE TABLE IF NOT EXISTS runtime_events (
+                event_id INTEGER PRIMARY KEY AUTOINCREMENT,
+                kind TEXT NOT NULL,
+                created_at TEXT NOT NULL,
+                payload_json TEXT NOT NULL
             )
             """
         )
@@ -136,3 +150,53 @@ class OperationalStore:
             (_now(), note),
         )
         self._conn.commit()
+
+    def record_runtime_event(self, *, kind: str, payload: Mapping[str, Any]) -> None:
+        self._conn.execute(
+            "INSERT INTO runtime_events(kind, created_at, payload_json) VALUES (?, ?, ?)",
+            (kind, _now(), json.dumps(dict(payload), sort_keys=True)),
+        )
+        self._conn.commit()
+
+    def runtime_events(self) -> list[dict[str, Any]]:
+        rows = self._conn.execute(
+            "SELECT event_id, kind, created_at, payload_json FROM runtime_events ORDER BY event_id ASC"
+        ).fetchall()
+        events = []
+        for row in rows:
+            payload = dict(row)
+            payload["payload"] = json.loads(payload.pop("payload_json"))
+            events.append(payload)
+        return events
+
+    def backup_to(self, dest: Path) -> None:
+        if dest.is_absolute() is False:
+            raise OperationalStoreError("OPS_STORE_PATH_NOT_ABSOLUTE")
+        dest.parent.mkdir(parents=True, exist_ok=True)
+        if dest.exists():
+            dest.unlink()
+        replica = sqlite3.connect(dest)
+        try:
+            self._conn.backup(replica)
+            replica.commit()
+        finally:
+            replica.close()
+
+    def restore_from(self, src: Path) -> None:
+        if src.is_absolute() is False:
+            raise OperationalStoreError("OPS_STORE_PATH_NOT_ABSOLUTE")
+        if src.is_file() is False:
+            raise OperationalStoreError("ROLLBACK_SNAPSHOT_MISSING")
+        preserved_kinds = {str(event["kind"]) for event in self.runtime_events()}
+        self._conn.close()
+        shutil.copy2(src, self.path)
+        wal = Path(str(self.path) + "-wal")
+        shm = Path(str(self.path) + "-shm")
+        if wal.exists():
+            wal.unlink()
+        if shm.exists():
+            shm.unlink()
+        self._connect()
+        after_kinds = {str(event["kind"]) for event in self.runtime_events()}
+        for kind in sorted(preserved_kinds - after_kinds):
+            self.record_runtime_event(kind=kind, payload={"preserved_across_rollback": True})

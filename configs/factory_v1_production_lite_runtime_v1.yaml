@@ -1,0 +1,56 @@
+schema: smial.factory-v1-production-lite-runtime
+schema_version: '1.0'
+contract_id: FACTORY-V1-PRODUCTION-LITE-RUNTIME-001
+atom_id: FACTORY_V1_PRODUCTION_LITE_LINUX_RUNTIME_V1
+as_of: '2026-08-19'
+mode: DIRECT_CURSOR_DELIVERY
+implementation: LOCAL_LINUX_SHAPED_PROOF
+target:
+  kind: ONE_ORDINARY_SUPPORTED_LINUX_VPS
+  purchase: LATER_EXTERNAL_AUTHORITY
+  proof_host: LOCAL_PROCESS_PLUS_SYSTEMD_UNIT_TEMPLATE
+deploy_version: factory-v1-runtime-v1.0
+previous_deploy_version: factory-v1-runtime-v0.9
+rpo_max: 24h
+rto_max: 12h
+operational_store:
+  kind: SQLITE
+  relative_path: local/factory_v1/operational_state.sqlite
+  snapshot_relative_path: local/factory_v1/operational_state.snapshot.sqlite
+  owns_scientific_truth: false
+workbench:
+  bind: 127.0.0.1
+  port: 8765
+systemd_unit_relative: configs/factory_v1_linux_runtime/factory-v1-workbench.service
+rehost_relative_paths:
+  - src/solana_alpha_lab/
+  - catalog/schemas/experiment_spec.schema.json
+  - catalog/schemas/factory_v1_product_kernel.schema.json
+  - catalog/schemas/factory_v1_commissioning.schema.json
+  - catalog/schemas/factory_v1_production_lite_runtime.schema.json
+  - configs/factory_v1_product_kernel_v1.yaml
+  - configs/factory_v1_commissioning_v1.yaml
+  - configs/factory_v1_production_lite_runtime_v1.yaml
+  - configs/factory_v1_linux_runtime/factory-v1-workbench.service
+  - configs/experiment_specs/factory_v1_commissioning_quote_native_free_key_v1.yaml
+  - configs/quote_native_factory_commissioning_audition_v1.yaml
+  - configs/provider_route_capability_registry_v6.yaml
+  - configs/provider_route_capability_registry_v7.yaml
+  - configs/provider_route_capability_registry_v8.yaml
+  - configs/provider_route_capability_registry_v9.yaml
+  - docs/evidence/factory_v1_commissioning/a2_factory_v1_commissioning_runtime_receipt_v1.json
+  - docs/evidence/factory_v1_commissioning/a2_factory_v1_commissioning_acceptance_v1.json
+  - docs/evidence/quote_native_admissible_friction_audition/a1_quote_native_admissible_friction_audition_runtime_receipt_v1.json
+  - docs/evidence/quote_native_friction_h900_move2_oos/a1_quote_native_friction_h900_move2_oos_runtime_receipt_v1.json
+  - registries/hypotheses.yaml
+  - registries/research_cycles.yaml
+health:
+  process_alive_alone_is_not_healthy: true
+  backup_status_when_unproved: EXPLICIT_UNKNOWN
+  healthy_verdict_forbidden: true
+authority:
+  provider_calls: false
+  credentials: false
+  deployment: false
+  cash_spend: false
+  wallet_signer_transaction: false
