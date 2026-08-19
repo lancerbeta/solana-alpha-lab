@@ -1,0 +1,36 @@
+{
+  "acceptance_id": "FACTORY-V1-OWNER-COCKPIT-ACCEPTANCE-001",
+  "as_of": "2026-08-19",
+  "atom_id": "FACTORY_V1_OWNER_COCKPIT_LITE_V1",
+  "backup_status": "EXPLICIT_UNKNOWN",
+  "git_archaeology_required": false,
+  "implementation": "WORKBENCH_WRAP_NO_NEW_UI_PACKAGE",
+  "non_claims": [
+    "NO_FACTORY_V1_OPERATIONAL_READY",
+    "NO_VPS_PURCHASE_OR_DEPLOY",
+    "NO_NEW_UI_PACKAGE",
+    "NO_COCKPIT_BREADTH",
+    "NO_ALPHA_PNL_OR_NETRETURN",
+    "NO_MOVE_3",
+    "NO_LIVE_JUPITER",
+    "NO_CANONICAL_DONE",
+    "NO_DRIVE_BACKUP_PASS",
+    "NO_SENTRY"
+  ],
+  "owner_decision": "OWNER_COCKPIT_LITE_OPERABILITY_PASS",
+  "project_sources_disposition": {
+    "kind": "NO_CHANGE"
+  },
+  "proofs": {
+    "attention_queue": true,
+    "hidden_ia_not_rendered": true,
+    "owner_packet_visible": true,
+    "runtime_health_visible": true
+  },
+  "purchase": "LATER_EXTERNAL_AUTHORITY",
+  "question": "Can the owner operate the commissioning cycle and runtime health from Workbench without Git archaeology?",
+  "schema": "smial.factory-v1-owner-cockpit-acceptance",
+  "schema_version": "1.0",
+  "scientific_truth_owner": "GIT",
+  "terminal": "OWNER_COCKPIT_LITE_OPERABILITY_PASS"
+}

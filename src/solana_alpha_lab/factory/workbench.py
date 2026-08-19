@@ -6,12 +6,14 @@ import html
 import json
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from typing import Any
-from urllib.parse import parse_qs
+from urllib.parse import parse_qs, urlparse
 
 from solana_alpha_lab.factory.application import ApplicationError, FactoryApplication
 from solana_alpha_lab.factory.experiment_spec import load_experiment_spec
 
 COMMANDS = ("FREEZE", "START", "STOP", "PARK", "RECORD_DECISION")
+NAV = (("/", "HOME"), ("/research", "RESEARCH"), ("/system", "SYSTEM"))
+HIDDEN_NAV = ("MARKET", "OPERATIONS", "ECONOMICS")
 
 
 def owner_copy_blocks(app: FactoryApplication) -> list[dict[str, str]]:
@@ -58,22 +60,95 @@ def _copy_sections(blocks: list[dict[str, str]]) -> str:
     )
 
 
-def _page(model: dict[str, Any], *, copy_blocks: list[dict[str, str]] | None = None, error: str = "") -> bytes:
-    rows = "".join(
-        f"<tr><th>{html.escape(key)}</th><td>{html.escape(json.dumps(value, ensure_ascii=False) if not isinstance(value, str) else value)}</td></tr>"
-        for key, value in model.items()
+def _nav(active: str) -> str:
+    links = []
+    for href, name in NAV:
+        current = " aria-current=\"page\"" if name == active else ""
+        links.append(f'<a href="{href}"{current}>{html.escape(name)}</a>')
+    return "<nav>" + " · ".join(links) + "</nav>"
+
+
+def _rows(mapping: dict[str, Any]) -> str:
+    return "".join(
+        f"<tr><th>{html.escape(str(key))}</th><td>{html.escape(_cell(value))}</td></tr>"
+        for key, value in mapping.items()
     )
+
+
+def _cell(value: Any) -> str:
+    if isinstance(value, str):
+        return value
+    return json.dumps(value, ensure_ascii=False)
+
+
+def _attention(items: list[dict[str, Any]]) -> str:
+    if not items:
+        return "<p>Нет attention items.</p>"
+    cards = []
+    for item in items:
+        cards.append(
+            "<article class=\"attention\">"
+            f"<h3>{html.escape(str(item.get('id') or ''))}</h3>"
+            "<table>"
+            f"<tr><th>WHY_NOW</th><td>{html.escape(_cell(item.get('WHY_NOW')))}</td></tr>"
+            f"<tr><th>IMPACT</th><td>{html.escape(_cell(item.get('IMPACT')))}</td></tr>"
+            f"<tr><th>EVIDENCE</th><td>{html.escape(_cell(item.get('EVIDENCE')))}</td></tr>"
+            f"<tr><th>NEXT_SAFE_ACTION</th><td>{html.escape(_cell(item.get('NEXT_SAFE_ACTION')))}</td></tr>"
+            "</table></article>"
+        )
+    return "".join(cards)
+
+
+def _page(
+    model: dict[str, Any],
+    *,
+    surface: str,
+    copy_blocks: list[dict[str, str]] | None = None,
+    error: str = "",
+) -> bytes:
+    cockpit = model.get("cockpit") if isinstance(model.get("cockpit"), dict) else {}
+    packet = cockpit.get("packet") if isinstance(cockpit.get("packet"), dict) else {}
+    runtime = model.get("runtime") if isinstance(model.get("runtime"), dict) else {}
+    notice = f"<p class=\"error\">{html.escape(error)}</p>" if error else ""
     buttons = "".join(
         f'<button type="submit" name="command" value="{command}">{command}</button>'
         for command in COMMANDS
     )
-    notice = f"<p class=\"error\">{html.escape(error)}</p>" if error else ""
+    archaeology = "true" if cockpit.get("git_archaeology_required") else "false"
+    sections = {
+        "HOME": (
+            "<h2>Attention / Today</h2>"
+            + _attention(list(cockpit.get("attention") or []))
+            + "<h2>Owner packet</h2><table>"
+            + _rows(packet)
+            + "</table><h2>Cycle state</h2><table>"
+            + _rows(
+                {
+                    "status": model.get("status") or "",
+                    "blocker": model.get("blocker") or "",
+                    "hypothesis": model.get("hypothesis") or "",
+                }
+            )
+            + "</table><h2>System health</h2><table>"
+            + _rows(
+                {
+                    "verdict": runtime.get("verdict") or "UNAVAILABLE",
+                    "backup_status": runtime.get("backup_status") or cockpit.get("backup_status") or "EXPLICIT_UNKNOWN",
+                    "deploy_version": runtime.get("deploy_version") or "",
+                }
+            )
+            + "</table>"
+        ),
+        "RESEARCH": "<h2>Research packet</h2><table>" + _rows(packet) + "</table>",
+        "SYSTEM": "<h2>Runtime</h2><table>" + _rows(runtime) + "</table>",
+    }
     body = f"""<!doctype html>
 <html lang="ru"><head><meta charset="utf-8"><title>Factory v1 Workbench</title>
 <style>
 body {{ font-family: sans-serif; margin: 2rem; max-width: 960px; }}
 th {{ text-align: left; padding-right: 1rem; vertical-align: top; }}
 .error {{ color: #a40000; }}
+nav a[aria-current="page"] {{ font-weight: bold; }}
 form button {{ margin-right: 0.5rem; }}
 .copy-hint {{ color: #444; }}
 .copy-block {{ position: relative; margin: 1rem 0; padding: 0.75rem 1rem; border: 1px solid #ccc; background: #f7f7f7; }}
@@ -82,15 +157,15 @@ form button {{ margin-right: 0.5rem; }}
 .copy-btn {{ opacity: 0; pointer-events: none; }}
 .copy-block:hover .copy-btn, .copy-block:focus-within .copy-btn {{ opacity: 1; pointer-events: auto; }}
 .copy-text {{ white-space: pre-wrap; word-break: break-word; margin: 0.75rem 0 0; }}
+.attention {{ border: 1px solid #ccc; padding: 0.75rem 1rem; margin: 0.75rem 0; }}
 </style></head><body>
 <h1>Factory v1 — локальный срез владельца</h1>
-<p>Проекция. UI не владеет научной истиной. START без точной owner phrase не читает ключ и не вызывает Jupiter.</p>
+<p>Проекция. UI не владеет научной истиной. START без точной owner phrase не читает ключ и не вызывает Jupiter. git_archaeology_required={html.escape(archaeology)}. Operational-ready milestone is not claimed.</p>
+{_nav(surface)}
 {notice}
-{_copy_sections(copy_blocks or [])}
-<table>{rows}</table>
-<form method="post">
-{buttons}
-</form>
+{_copy_sections(copy_blocks or []) if surface == "HOME" else ""}
+{sections.get(surface) or ""}
+{("<form method=\"post\" action=\"/\">" + buttons + "</form>") if surface == "HOME" else ""}
 <script>
 document.querySelectorAll(".copy-btn").forEach(function (button) {{
   button.addEventListener("click", function () {{
@@ -117,6 +192,8 @@ document.querySelectorAll(".copy-btn").forEach(function (button) {{
 </script>
 </body></html>
 """
+    if any(f">{name}<" in body for name in HIDDEN_NAV):
+        raise ApplicationError("EMPTY_ENTERPRISE_SCREENS")
     return body.encode("utf-8")
 
 
@@ -125,10 +202,11 @@ def make_handler(app: FactoryApplication) -> type[BaseHTTPRequestHandler]:
         def log_message(self, format: str, *args: object) -> None:
             return
 
-        def _render(self, error: str = "") -> None:
+        def _render(self, surface: str, error: str = "") -> None:
             body = _page(
                 app.read_model(),
-                copy_blocks=owner_copy_blocks(app),
+                surface=surface,
+                copy_blocks=owner_copy_blocks(app) if surface == "HOME" else [],
                 error=error,
             )
             self.send_response(200)
@@ -138,10 +216,13 @@ def make_handler(app: FactoryApplication) -> type[BaseHTTPRequestHandler]:
             self.wfile.write(body)
 
         def do_GET(self) -> None:  # noqa: N802
-            if self.path not in {"/", "/index.html"}:
+            path = urlparse(self.path).path
+            surfaces = {"/": "HOME", "/index.html": "HOME", "/research": "RESEARCH", "/system": "SYSTEM"}
+            surface = surfaces.get(path)
+            if surface is None:
                 self.send_error(404)
                 return
-            self._render()
+            self._render(surface)
 
         def do_POST(self) -> None:  # noqa: N802
             length = int(self.headers.get("Content-Length") or 0)
@@ -164,7 +245,7 @@ def make_handler(app: FactoryApplication) -> type[BaseHTTPRequestHandler]:
                     raise ApplicationError("COMMAND_NOT_ALLOWLISTED")
             except ApplicationError as exc:
                 error = str(exc)
-            self._render(error=error)
+            self._render("HOME", error=error)
 
     return Handler
 

@@ -1,0 +1,69 @@
+{
+  "as_of": "2026-08-19",
+  "non_claims": [
+    "NO_CRYPTOGRAPHIC_REVIEWER_IDENTITY",
+    "REVIEW_IS_NOT_SEMANTIC_DONE",
+    "NO_FACTORY_V1_OPERATIONAL_READY",
+    "NO_ALPHA_OR_CASHFLOW",
+    "NO_MOVE_3",
+    "NO_CANONICAL_DONE",
+    "NO_VPS_PURCHASE_OR_DEPLOY",
+    "NO_NEW_UI_PACKAGE"
+  ],
+  "required_roles": [
+    "ARCHITECTURE_CRITIC",
+    "CODE_REVIEWER",
+    "GOAL_DOD_CRITIC"
+  ],
+  "review_id": "FACTORY-V1-OWNER-COCKPIT-INDEPENDENT-REVIEW-001",
+  "reviewed_bindings_sha256": "bb7def6e764182455143aeddfe8cd39e74809ebccb1206baecb56a25d0ab9738",
+  "reviewed_inventory_sha256": "114339c7c73e8507ac7d5d527c0721d452db7808045f01160fa2cdcfd6d9fe72",
+  "reviews": [
+    {
+      "findings": [
+        "CHECKED_ARCHAEOLOGY_PINNED_PRODUCED_GAPS",
+        "CHECKED_SCIENTIFIC_RESULT_NOT_PRODUCT_TERMINAL",
+        "CHECKED_ACCEPTANCE_HASH_BOUND",
+        "CHECKED_HIDDEN_IA",
+        "CHECKED_NO_HEALTHY_FROM_PROCESS_ALIVE",
+        "CHECKED_NO_UI_PACKAGE",
+        "CHECKED_NO_RECAPTURE",
+        "CHECKED_NO_VPS",
+        "CHECKED_NO_OPERATIONAL_READY_CLAIM",
+        "CHECKED_CATALOG_INTEGRITY_REBOUND"
+      ],
+      "role": "CODE_REVIEWER",
+      "verdict": "PASS"
+    },
+    {
+      "findings": [
+        "CHECKED_DECISION_DELTA_PATCH_NOT_VPS",
+        "CHECKED_FALSIFIER_MISSING_ACCEPTANCE",
+        "CHECKED_FALSIFIER_MISSING_RUNTIME_RECEIPT",
+        "CHECKED_FALSIFIER_MISSING_BOTH",
+        "CHECKED_NAMED_CONSUMER_HOME",
+        "CHECKED_NON_CLAIMS",
+        "CHECKED_OWNER_PATH_ARCHAEOLOGY_OVERLAY"
+      ],
+      "role": "GOAL_DOD_CRITIC",
+      "verdict": "PASS"
+    },
+    {
+      "findings": [
+        "CHECKED_TRUTH_OWNERS",
+        "CHECKED_NO_SECOND_TRUTH_STORE",
+        "CHECKED_WRAP_STDLIB_WORKBENCH",
+        "CHECKED_LOCALHOST",
+        "CHECKED_AUTHORITY_CLOSED",
+        "CHECKED_RESULT_SCIENTIFIC_TERMINAL",
+        "CHECKED_NO_CATALOG_CYCLE"
+      ],
+      "role": "ARCHITECTURE_CRITIC",
+      "verdict": "PASS"
+    }
+  ],
+  "schema": "smial.delivery-independent-review-evidence",
+  "schema_version": "1.0",
+  "task_id": "FACTORY_V1_OWNER_COCKPIT_LITE_V1",
+  "verdict": "PASS"
+}

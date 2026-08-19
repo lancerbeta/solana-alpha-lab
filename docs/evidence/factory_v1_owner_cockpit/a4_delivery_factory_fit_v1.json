@@ -1,0 +1,38 @@
+{
+  "as_of": "2026-08-19",
+  "capability_radar": {
+    "now": "NONE",
+    "watch": "LATER_EXACT_VPS_OR_DRIVE_BACKUP_GATE"
+  },
+  "dimensions": {
+    "build_vs_buy": "PASS_WRAP_EXISTING_STDLIB_WORKBENCH",
+    "context_efficiency": "PASS_ONE_EXACT_CONTRACT_PATCH_NOT_VPS",
+    "execution_to_cashflow": "NOT_APPLICABLE",
+    "flexibility_and_history": "PASS_ARCH_INTENT_005_TRIGGERED_NOT_READY",
+    "mission": "PASS_OWNER_OPERABILITY_WITHOUT_ALPHA_OR_OPERATIONAL_READY",
+    "monitoring_and_recovery": "PASS_RUNTIME_PROJECTION_BACKUP_EXPLICIT_UNKNOWN",
+    "owner_operability": "PASS_PACKET_ATTENTION_HOME_RESEARCH_SYSTEM",
+    "red_team": "PASS_NO_HEALTHY_FROM_ALIVE_NO_ARCHAEOLOGY_LIE",
+    "research_truth": "PASS_GIT_RECEIPTS_REMAIN_SCIENCE",
+    "security": "PASS_LOCALHOST_NO_SECRETS_NO_PROVIDER"
+  },
+  "limits": [
+    "NO_FACTORY_V1_OPERATIONAL_READY",
+    "NO_VPS_PURCHASE_OR_DEPLOY",
+    "NO_COCKPIT_BREADTH",
+    "NO_DRIVE_BACKUP_PASS",
+    "NO_MOVE_3",
+    "NO_ALPHA_OR_CASHFLOW",
+    "NO_CANONICAL_DONE",
+    "NO_NEW_UI_PACKAGE"
+  ],
+  "mode": "FULL_REVIEW",
+  "recovery": "REVERT_ONLY_THIS_COCKPIT_ATOM; PRESERVE_COMMISSIONING_AND_RUNTIME_RECEIPTS.",
+  "review_id": "FACTORY-V1-OWNER-COCKPIT-FACTORY-FIT-001",
+  "reviewed_bindings_sha256": "bb7def6e764182455143aeddfe8cd39e74809ebccb1206baecb56a25d0ab9738",
+  "reviewed_inventory_sha256": "114339c7c73e8507ac7d5d527c0721d452db7808045f01160fa2cdcfd6d9fe72",
+  "schema": "smial.delivery-harness-factory-fit",
+  "schema_version": "1.0",
+  "task_id": "FACTORY_V1_OWNER_COCKPIT_LITE_V1",
+  "verdict": "PASS"
+}
