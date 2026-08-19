@@ -1,0 +1,28 @@
+schema: smial.factory-v1-prior-git-t0-friction-screen-rule
+schema_version: '1.0'
+rule_id: PRIOR_GIT_T0_FRICTION_SCREEN_V1
+atom_id: PRIOR_GIT_T0_FRICTION_SCREEN_V1
+as_of: '2026-08-19'
+x_field: x_quoted_roundtrip_friction
+y_field: y_quoted_liquidation_recovery
+direction: MORE_NEGATIVE_IS_WORSE
+veto: X_LT_FROZEN_PRIOR_GIT_MEDIAN
+tie: KEEP
+unknown_x_or_y: EXCLUDE_FROM_SCORED_ARMS_KEEP_IN_BASELINE_DESCRIPTION
+frozen_x_cutoff: '-0.0205835'
+forbidden_peeked_cutoff: '-0.0116887'
+cutoff_n_complete_xy: 33
+cutoff_source_receipts:
+  - path: docs/evidence/quote_native_admissible_friction_audition/a1_quote_native_admissible_friction_audition_runtime_receipt_v1.json
+    sha256: 75f60a155b7db6ddb8c801c9ff5060ce5e4e7fe641b836ff35edeb91534c308e
+  - path: docs/evidence/quote_native_friction_h900_move2_oos/a1_quote_native_friction_h900_move2_oos_runtime_receipt_v1.json
+    sha256: a860888cd6c528c03cffb27146d07da6ed60770d0f1e13d47651b0d63f51b926
+  - path: docs/evidence/factory_v1_commissioning/a2_factory_v1_commissioning_runtime_receipt_v1.json
+    sha256: f83968a0be381f874a38ed214c1f9ff1a5ac46bc433c502417d35d8f31727468
+pass_terminal: EXTEND_TO_SHADOW
+fail_terminal: CLOSE_EXACT_T0_FRICTION_SCREEN_FAMILY
+pass_requires:
+  median_y_kept_gt_median_y_baseline: true
+  p90_y_kept_ge_p90_y_baseline: true
+  both_recent_and_traded_kept: true
+post_hoc_threshold_search: false

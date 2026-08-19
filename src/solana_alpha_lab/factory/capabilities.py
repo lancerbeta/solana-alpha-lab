@@ -15,9 +15,14 @@ from solana_alpha_lab.factory.friction_veto import (
     apply_friction_veto_to_receipt,
     load_friction_veto_rule,
 )
+from solana_alpha_lab.factory.t0_friction_screen import (
+    apply_t0_friction_screen_to_receipt,
+    load_t0_friction_screen_rule,
+)
 from solana_alpha_lab.quote_native_admissible_friction_audition import (
     FACTORY_COMMISSIONING_ATOM_ID,
     FRICTION_VETO_ATOM_ID,
+    T0_FRICTION_SCREEN_ATOM_ID,
     AuditionError,
     attempt_reservation_document,
     canonical_json,
@@ -200,14 +205,21 @@ def _overlay_veto_receipt(
     root: Path,
     receipt: Mapping[str, Any],
 ) -> dict[str, Any]:
-    if str(receipt.get("atom_id") or "") != FRICTION_VETO_ATOM_ID:
-        return dict(receipt)
+    atom_id = str(receipt.get("atom_id") or "")
     requirements = {str(item["requirement_id"]): item for item in spec["data_requirements"]}
-    rule_item = requirements.get("VETO_RULE")
-    if rule_item is None:
-        raise CapabilityError("VETO_RULE_MISSING")
-    rule = load_friction_veto_rule(root, str(rule_item["path"]))
-    return apply_friction_veto_to_receipt(receipt, rule=rule)
+    if atom_id == FRICTION_VETO_ATOM_ID:
+        rule_item = requirements.get("VETO_RULE")
+        if rule_item is None:
+            raise CapabilityError("VETO_RULE_MISSING")
+        rule = load_friction_veto_rule(root, str(rule_item["path"]))
+        return apply_friction_veto_to_receipt(receipt, rule=rule)
+    if atom_id == T0_FRICTION_SCREEN_ATOM_ID:
+        rule_item = requirements.get("SCREEN_RULE")
+        if rule_item is None:
+            raise CapabilityError("T0_SCREEN_RULE_MISSING")
+        rule = load_t0_friction_screen_rule(root, str(rule_item["path"]))
+        return apply_t0_friction_screen_to_receipt(receipt, rule=rule)
+    return dict(receipt)
 
 
 def _blocked_authority(coverage: Mapping[str, Any], blocker: str) -> dict[str, Any]:
@@ -295,7 +307,11 @@ def capture_quote_native_free_key(
     policy_phrase = str((policy.get("external_authority") or {}).get("owner_phrase") or "")
     if expected_phrase != policy_phrase:
         raise CapabilityError("AUTHORITY_PHRASE_DRIFT")
-    if atom_id not in {FACTORY_COMMISSIONING_ATOM_ID, FRICTION_VETO_ATOM_ID}:
+    if atom_id not in {
+        FACTORY_COMMISSIONING_ATOM_ID,
+        FRICTION_VETO_ATOM_ID,
+        T0_FRICTION_SCREEN_ATOM_ID,
+    }:
         raise CapabilityError("ATOM_ID_NOT_ALLOWLISTED")
     if authority_phrase != expected_phrase:
         blocker = (
