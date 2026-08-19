@@ -25811,7 +25811,7 @@ records:
   as_of: '2026-08-19'
   truth_owner: FACTORY_V1_PRODUCT_KERNEL_LOCAL_VERTICAL_SLICE_V1
   location: {kind: git_path, logical_uri: 'repo://docs/evidence/factory_v1_product_kernel/a1_factory_v1_product_kernel_acceptance_v1.json', repository_path: docs/evidence/factory_v1_product_kernel/a1_factory_v1_product_kernel_acceptance_v1.json}
-  integrity: {kind: sha256, sha256: 3b60c2a29ba879eda18c729f6ef8f230800b511f7cda22cdf1b58fc724d6cf03}
+  integrity: {kind: sha256, sha256: 6fc8eb6aa942debbd3b141101c1b221d98aa6bcd1b0577655efdd2a98b0ac2a0}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: derived_from, target_asset_id: CTRL-FACTORY-V1-PRODUCT-KERNEL-001}
