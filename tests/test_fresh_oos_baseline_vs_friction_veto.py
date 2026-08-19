@@ -56,11 +56,15 @@ def isolated_veto_root(tmp: Path) -> Path:
     _copy(tmp, "catalog/schemas/experiment_spec.schema.json")
     _copy(tmp, SPEC_RELATIVE)
     _copy(tmp, POLICY_RELATIVE)
-    spec = yaml.safe_load((ROOT / SPEC_RELATIVE).read_text(encoding="utf-8"))
-    for item in spec["data_requirements"]:
+    spec_text = yaml.safe_load((ROOT / SPEC_RELATIVE).read_text(encoding="utf-8"))
+    for item in spec_text["data_requirements"]:
         if item["kind"] == "PROVIDER_BOUNDED_CAPTURE":
+            item.pop("sha256", None)
             continue
         _copy(tmp, item["path"])
+    spec_dst = tmp / SPEC_RELATIVE
+    spec_dst.parent.mkdir(parents=True, exist_ok=True)
+    spec_dst.write_text(yaml.safe_dump(spec_text, sort_keys=False), encoding="utf-8")
     for relative in (
         "registries/hypotheses.yaml",
         "registries/research_cycles.yaml",
@@ -310,8 +314,11 @@ class FreshOosBaselineVsFrictionVetoTests(unittest.TestCase):
                 app = FactoryApplication(root=ROOT, store=store)
                 self.assertEqual(app.spec_relative, SPEC_RELATIVE)
                 model = app.read_model()
-                self.assertTrue(model["git_archaeology_required"])
-                self.assertEqual(model["cockpit"]["terminal"], "OWNER_COCKPIT_LITE_BLOCKED")
+                self.assertFalse(model["git_archaeology_required"])
+                after = app.start()
+                self.assertEqual(after["status"], "COMPLETE")
+                self.assertEqual(after["terminal_result"], "CLOSE_EXACT_FRICTION_VETO_FAMILY")
+                self.assertEqual(after["result"], "CLOSE_EXACT_FRICTION_VETO_FAMILY")
             finally:
                 store.close()
 

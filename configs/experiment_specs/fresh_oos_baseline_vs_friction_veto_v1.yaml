@@ -29,9 +29,11 @@ data_requirements:
   - requirement_id: RUNTIME_RECEIPT
     kind: PROVIDER_BOUNDED_CAPTURE
     path: docs/evidence/fresh_oos_friction_veto/a5_fresh_oos_friction_veto_runtime_receipt_v1.json
+    sha256: 9eb063cdd44dacf80248d53ed58020961f1f29295294055d231204a71e944276
   - requirement_id: ACCEPTANCE
     kind: PROVIDER_BOUNDED_CAPTURE
     path: docs/evidence/fresh_oos_friction_veto/a5_fresh_oos_friction_veto_acceptance_v1.json
+    sha256: 43474a64b9c3a0a9699c216a12b5661e0e3298deb8ad0341a201b0b8609875aa
 capabilities:
   - CAP-JUPITER-FREE-KEY-QUOTE-NATIVE-BOUNDED-CAPTURE-001
 falsifier: Fresh OOS veto does not improve median and retained right tail, or the effect is one stratum, or capture requires a hypothesis-specific core runner.
@@ -40,7 +42,7 @@ parameters:
   research_cycle_id: RC-FRESH-OOS-BASELINE-VS-FRICTION-VETO-001
   capture_policy_relative: configs/quote_native_fresh_oos_friction_veto_audition_v1.yaml
   required_owner_phrase: 'OK FRESH_OOS_BASELINE_VS_FRICTION_VETO_V1: one Jupiter Free-key fresh OOS baseline-vs-friction-veto campaign; local process-environment key only; Tokens V2 /recent and /toptraded/1h plus quote-only /swap/v2/order; x-api-key header only; no .env; no key in URL/log/receipt/Git; no taker, /build, /execute, wallet, signer, transaction, paid plan, second provider, retry or fallback; cash cap $0; call cap 60; global pace >=3s; 6 RECENT + 6 TRADED live outcome-blind cohort excluding A1, MOVE 2 and commissioning mints; frozen monotonic veto VETO_IF_X_LT_SAMPLE_MEDIAN; hash-bound row observed_at and attempt reservation before credential read required for capture PASS; WRAP existing capture plus classify_audition_terminal; not MOVE 3; not alpha; not VPS; no post-hoc threshold search.'
-  next_safe_action: WAIT_EXACT_OWNER_PHRASE
+  next_safe_action: CLOSE_EXACT_FRICTION_VETO_FAMILY_NO_THRESHOLD_RESCUE
   veto_rule_id: FRICTION_VETO_WORSE_THAN_SAMPLE_MEDIAN_X_V1
 evidence_budget:
   provider_api_rpc_wss_calls: 60

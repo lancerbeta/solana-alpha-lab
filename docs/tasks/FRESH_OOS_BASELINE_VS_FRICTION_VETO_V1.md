@@ -66,7 +66,7 @@ context_requirements:
     - CONFIG-FACTORY-V1-PRODUCT-KERNEL-001
     - EVIDENCE-FACTORY-V1-COMMISSIONING-ACCEPTANCE-001
     - MODULE-FACTORY-V1-CAPABILITY-FREE-KEY-CAPTURE-001
-  l2_roles: [ARCHITECTURE_DECISIONS]
+  l2_roles: [ARCHITECTURE_DECISIONS, DELIVERY_EVIDENCE]
   l3_roles: []
   roadmap_path: configs/factory_v1_operational_readiness_v1.yaml
   exact_role_paths:
@@ -75,7 +75,8 @@ context_requirements:
       - configs/provider_route_capability_registry_v9.yaml
     ARCHITECTURE_DECISIONS:
       - docs/architecture/intents/ARCH-INTENT-005-factory-v1-operational-readiness-and-owner-experience.md
-    DELIVERY_EVIDENCE: []
+    DELIVERY_EVIDENCE:
+      - docs/evidence/fresh_oos_friction_veto/a5_delivery_completion_evidence_v1.json
     HISTORICAL_CONTEXT: []
 ---
 
@@ -188,8 +189,7 @@ Frozen hypothesis:
 
 ## Merge evidence
 
-After live capture, bind `l2_roles` to include `DELIVERY_EVIDENCE` and set
-`exact_role_paths.DELIVERY_EVIDENCE` to exactly one
+After live capture, `l2_roles` includes `DELIVERY_EVIDENCE` bound to exactly one
 `smial.delivery-completion-evidence` for this atom:
 
 `docs/evidence/fresh_oos_friction_veto/a5_delivery_completion_evidence_v1.json`

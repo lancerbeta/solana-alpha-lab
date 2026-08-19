@@ -26373,7 +26373,7 @@ records:
   as_of: '2026-08-19'
   truth_owner: FRESH_OOS_BASELINE_VS_FRICTION_VETO_V1
   location: {kind: git_path, logical_uri: 'repo://docs/tasks/FRESH_OOS_BASELINE_VS_FRICTION_VETO_V1.md', repository_path: docs/tasks/FRESH_OOS_BASELINE_VS_FRICTION_VETO_V1.md}
-  integrity: {kind: sha256, sha256: 9a5a82898f929e0406cb499181f56549fe04c8312109604c7047f765ffb8c390}
+  integrity: {kind: sha256, sha256: 319404f87f8d0f7390f89edc56a84162d8048a3c520a32f2b5d4d6591113116a}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: depends_on, target_asset_id: ARCH-INTENT-005}
@@ -26448,7 +26448,7 @@ records:
   as_of: '2026-08-19'
   truth_owner: FRESH_OOS_BASELINE_VS_FRICTION_VETO_V1
   location: {kind: git_path, logical_uri: 'repo://configs/experiment_specs/fresh_oos_baseline_vs_friction_veto_v1.yaml', repository_path: configs/experiment_specs/fresh_oos_baseline_vs_friction_veto_v1.yaml}
-  integrity: {kind: sha256, sha256: f2e2e00d0b15008c811b7248104fc0264309ce50a5844d74191c5623647b2f81}
+  integrity: {kind: sha256, sha256: 3f8766d353f9daa2e4e7cbee9dd62014f3479e07950763ac7c0d2717c9b90927}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: governed_by, target_asset_id: CTRL-FRESH-OOS-BASELINE-VS-FRICTION-VETO-001}
@@ -26503,7 +26503,7 @@ records:
   as_of: '2026-08-19'
   truth_owner: FRESH_OOS_BASELINE_VS_FRICTION_VETO_V1
   location: {kind: git_path, logical_uri: 'repo://tests/test_fresh_oos_baseline_vs_friction_veto.py', repository_path: tests/test_fresh_oos_baseline_vs_friction_veto.py}
-  integrity: {kind: sha256, sha256: 5b253693a7b91ad894a14775121fff14d01034ff4f8fd1a27b479ce811e4a0cc}
+  integrity: {kind: sha256, sha256: d0319b725e33afafd0f589152083e1186dec4eae34f8466766a2d87c13fb341f}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: depends_on, target_asset_id: MODULE-FACTORY-V1-FRICTION-VETO-001}
@@ -26512,4 +26512,58 @@ records:
   consumers: [FACTORY-001, FRESH-OOS-FRICTION-VETO-001, GOAL-OWNER]
   evidence: []
   search_terms: [FACTORY_V1, FRICTION_VETO, TESTS]
+  classification: {contains_secrets: false, contains_raw_data: false, sensitivity: INTERNAL_NON_SECRET}
+
+- asset_id: EVIDENCE-FRESH-OOS-FRICTION-VETO-RUNTIME-001
+  record_version: '1.0'
+  asset_type: evidence
+  purpose: Live Free-key runtime receipt for the fresh OOS baseline-versus-friction-veto campaign.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-08-19'
+  truth_owner: FRESH_OOS_BASELINE_VS_FRICTION_VETO_V1
+  location: {kind: git_path, logical_uri: 'repo://docs/evidence/fresh_oos_friction_veto/a5_fresh_oos_friction_veto_runtime_receipt_v1.json', repository_path: docs/evidence/fresh_oos_friction_veto/a5_fresh_oos_friction_veto_runtime_receipt_v1.json}
+  integrity: {kind: sha256, sha256: 9eb063cdd44dacf80248d53ed58020961f1f29295294055d231204a71e944276}
+  access: {mode: read_only, method: file, network_required: false, secrets_required: false}
+  relations:
+  - {relation_type: derived_from, target_asset_id: CTRL-FRESH-OOS-BASELINE-VS-FRICTION-VETO-001}
+  consumers: [FACTORY-001, FRESH-OOS-FRICTION-VETO-001, GOAL-OWNER]
+  evidence: []
+  search_terms: [FACTORY_V1, FRICTION_VETO, RUNTIME]
+  classification: {contains_secrets: false, contains_raw_data: false, sensitivity: INTERNAL_NON_SECRET}
+
+- asset_id: EVIDENCE-FRESH-OOS-FRICTION-VETO-ACCEPTANCE-001
+  record_version: '1.0'
+  asset_type: evidence
+  purpose: Acceptance packet closing the exact median-X friction veto family on STRATUM_UNSTABLE.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-08-19'
+  truth_owner: FRESH_OOS_BASELINE_VS_FRICTION_VETO_V1
+  location: {kind: git_path, logical_uri: 'repo://docs/evidence/fresh_oos_friction_veto/a5_fresh_oos_friction_veto_acceptance_v1.json', repository_path: docs/evidence/fresh_oos_friction_veto/a5_fresh_oos_friction_veto_acceptance_v1.json}
+  integrity: {kind: sha256, sha256: 43474a64b9c3a0a9699c216a12b5661e0e3298deb8ad0341a201b0b8609875aa}
+  access: {mode: read_only, method: file, network_required: false, secrets_required: false}
+  relations:
+  - {relation_type: derived_from, target_asset_id: EVIDENCE-FRESH-OOS-FRICTION-VETO-RUNTIME-001}
+  consumers: [FACTORY-001, FRESH-OOS-FRICTION-VETO-001, GOAL-OWNER]
+  evidence: []
+  search_terms: [FACTORY_V1, FRICTION_VETO, ACCEPTANCE]
+  classification: {contains_secrets: false, contains_raw_data: false, sensitivity: INTERNAL_NON_SECRET}
+
+- asset_id: REPORT-FRESH-OOS-FRICTION-VETO-001
+  record_version: '1.0'
+  asset_type: control_document
+  purpose: Russian owner readout of the fresh OOS friction-veto close.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-08-19'
+  truth_owner: FRESH_OOS_BASELINE_VS_FRICTION_VETO_V1
+  location: {kind: git_path, logical_uri: 'repo://docs/reports/fresh_oos_friction_veto/a5_owner_readout_v1.md', repository_path: docs/reports/fresh_oos_friction_veto/a5_owner_readout_v1.md}
+  integrity: {kind: sha256, sha256: c1985704adeac8de335b71b1bdfeef79d2e0fe531e4ad226e2966710362e5ac3}
+  access: {mode: read_only, method: file, network_required: false, secrets_required: false}
+  relations:
+  - {relation_type: derived_from, target_asset_id: EVIDENCE-FRESH-OOS-FRICTION-VETO-ACCEPTANCE-001}
+  consumers: [FACTORY-001, FRESH-OOS-FRICTION-VETO-001, GOAL-OWNER]
+  evidence: []
+  search_terms: [FACTORY_V1, FRICTION_VETO, OWNER_READOUT]
   classification: {contains_secrets: false, contains_raw_data: false, sensitivity: INTERNAL_NON_SECRET}

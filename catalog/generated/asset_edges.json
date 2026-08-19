@@ -3228,6 +3228,16 @@
       "target_asset_id": "CTRL-FACTORY-V1-PRODUCTION-LITE-RUNTIME-001"
     },
     {
+      "source_asset_id": "EVIDENCE-FRESH-OOS-FRICTION-VETO-ACCEPTANCE-001",
+      "relation": "derived_from",
+      "target_asset_id": "EVIDENCE-FRESH-OOS-FRICTION-VETO-RUNTIME-001"
+    },
+    {
+      "source_asset_id": "EVIDENCE-FRESH-OOS-FRICTION-VETO-RUNTIME-001",
+      "relation": "derived_from",
+      "target_asset_id": "CTRL-FRESH-OOS-BASELINE-VS-FRICTION-VETO-001"
+    },
+    {
       "source_asset_id": "EVIDENCE-OWNER-ATTENTION-GATE-001",
       "relation": "derived_from",
       "target_asset_id": "POLICY-OWNER-ATTENTION-GATE-001"
@@ -8661,6 +8671,11 @@
       "source_asset_id": "REPORT-FACTORY-V1-PRODUCTION-LITE-RUNTIME-001",
       "relation": "derived_from",
       "target_asset_id": "EVIDENCE-FACTORY-V1-PRODUCTION-LITE-RUNTIME-ACCEPTANCE-001"
+    },
+    {
+      "source_asset_id": "REPORT-FRESH-OOS-FRICTION-VETO-001",
+      "relation": "derived_from",
+      "target_asset_id": "EVIDENCE-FRESH-OOS-FRICTION-VETO-ACCEPTANCE-001"
     },
     {
       "source_asset_id": "REPORT-PMF-QUOTE-ATTEMPT-PREP-001",
