@@ -85,7 +85,6 @@ context_requirements:
       - docs/architecture/intents/ARCH-INTENT-005-factory-v1-operational-readiness-and-owner-experience.md
     DELIVERY_EVIDENCE:
       - docs/evidence/quote_native_admissible_friction_audition/a1_quote_native_admissible_friction_audition_acceptance_v1.json
-      - docs/evidence/factory_v1_operational_readiness/a1_delivery_completion_evidence_v1.json
       - docs/evidence/factory_v1_product_kernel/a1_factory_v1_product_kernel_acceptance_v1.json
       - docs/evidence/factory_v1_product_kernel/a1_delivery_completion_evidence_v1.json
       - docs/evidence/factory_v1_product_kernel/a1_delivery_independent_review_v1.json

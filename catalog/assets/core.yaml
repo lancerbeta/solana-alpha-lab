@@ -25530,7 +25530,7 @@ records:
   as_of: '2026-08-19'
   truth_owner: FACTORY_V1_PRODUCT_KERNEL_LOCAL_VERTICAL_SLICE_V1
   location: {kind: git_path, logical_uri: 'repo://docs/tasks/FACTORY_V1_PRODUCT_KERNEL_LOCAL_VERTICAL_SLICE_V1.md', repository_path: docs/tasks/FACTORY_V1_PRODUCT_KERNEL_LOCAL_VERTICAL_SLICE_V1.md}
-  integrity: {kind: sha256, sha256: 509134f5cf09e99526284a952cf31f2e78761fca1ed334ba566d6a06006b5564}
+  integrity: {kind: sha256, sha256: bd821fd97cb3b4df0bcd1eb723f2396addf39de0f130c6f25351053f8e31c38c}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: governed_by, target_asset_id: ARCH-INTENT-005}
