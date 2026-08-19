@@ -25277,7 +25277,7 @@ records:
   as_of: '2026-08-18'
   truth_owner: QUOTE_NATIVE_ADMISSIBLE_FRICTION_AUDITION_V1
   location: {kind: git_path, logical_uri: 'repo://src/solana_alpha_lab/quote_native_admissible_friction_audition.py', repository_path: src/solana_alpha_lab/quote_native_admissible_friction_audition.py}
-  integrity: {kind: sha256, sha256: 68e3ec03fae9b8e4f5f4105feae5197755867932d7170fd7a5a1f38f023e89a4}
+  integrity: {kind: sha256, sha256: 1b8e38bda5474ba5c09a954f4800070dc958203964f6e704e68730659fc13251}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: depends_on, target_asset_id: CONFIG-QUOTE-NATIVE-ADMISSIBLE-FRICTION-AUDITION-001}
@@ -25588,7 +25588,7 @@ records:
   as_of: '2026-08-19'
   truth_owner: FACTORY_V1_PRODUCT_KERNEL_LOCAL_VERTICAL_SLICE_V1
   location: {kind: git_path, logical_uri: 'repo://catalog/schemas/experiment_spec.schema.json', repository_path: catalog/schemas/experiment_spec.schema.json}
-  integrity: {kind: sha256, sha256: 20683bdac2d97a4190158659a9f9adaa7c7c9c37f0093def9cd4146fce187576}
+  integrity: {kind: sha256, sha256: 02abc5665202010dcfe8be31f1d5e7d8e7c1f5b4576b990e33820687f5c9ff0e}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: governed_by, target_asset_id: CTRL-FACTORY-V1-PRODUCT-KERNEL-001}
@@ -25626,7 +25626,7 @@ records:
   as_of: '2026-08-19'
   truth_owner: FACTORY_V1_PRODUCT_KERNEL_LOCAL_VERTICAL_SLICE_V1
   location: {kind: git_path, logical_uri: 'repo://src/solana_alpha_lab/factory/runner.py', repository_path: src/solana_alpha_lab/factory/runner.py}
-  integrity: {kind: sha256, sha256: b6ecad60eb79a414a75978e4bdd75485baf3e6a08cc90d4327ca0233f71ae891}
+  integrity: {kind: sha256, sha256: 43f674e45d805a2f1e676c8b20a41626ac2ec8f2a6b5ac0a741da68a980b52c8}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: governed_by, target_asset_id: CTRL-FACTORY-V1-PRODUCT-KERNEL-001}
@@ -25645,7 +25645,7 @@ records:
   as_of: '2026-08-19'
   truth_owner: FACTORY_V1_PRODUCT_KERNEL_LOCAL_VERTICAL_SLICE_V1
   location: {kind: git_path, logical_uri: 'repo://src/solana_alpha_lab/factory/capabilities.py', repository_path: src/solana_alpha_lab/factory/capabilities.py}
-  integrity: {kind: sha256, sha256: ed763ae4cd7260b4cbaa96454b9002debd15f5786283e0851e7f3006d29a3fd7}
+  integrity: {kind: sha256, sha256: de8d06bb6c7e3fe0e13deda71062ca2cbefb11aabac58a0f0e00a5af91efb99d}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: governed_by, target_asset_id: CTRL-FACTORY-V1-PRODUCT-KERNEL-001}
@@ -25664,7 +25664,7 @@ records:
   as_of: '2026-08-19'
   truth_owner: FACTORY_V1_PRODUCT_KERNEL_LOCAL_VERTICAL_SLICE_V1
   location: {kind: git_path, logical_uri: 'repo://src/solana_alpha_lab/factory/application.py', repository_path: src/solana_alpha_lab/factory/application.py}
-  integrity: {kind: sha256, sha256: 9940dde55521b8e2e4b4a3c2662ac60cae8c10f59847e740b1a68ff79bf63e1e}
+  integrity: {kind: sha256, sha256: a94b9c427cc3bcaf6a8d1d38652e4afeb6397334f1583ce8447f6b6950716215}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: depends_on, target_asset_id: MODULE-FACTORY-V1-RUNNER-001}
@@ -25683,7 +25683,7 @@ records:
   as_of: '2026-08-19'
   truth_owner: FACTORY_V1_PRODUCT_KERNEL_LOCAL_VERTICAL_SLICE_V1
   location: {kind: git_path, logical_uri: 'repo://src/solana_alpha_lab/factory/read_model.py', repository_path: src/solana_alpha_lab/factory/read_model.py}
-  integrity: {kind: sha256, sha256: e5faad3111635abb4994d8aed22be981441d8a0a915c75d61789e0c2b1f5f284}
+  integrity: {kind: sha256, sha256: dd5c46b54015148ce2a1021fe632970da748024f595bbaa7a9b7b7e7117c6cad}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: depends_on, target_asset_id: MODULE-FACTORY-V1-OPS-STORE-001}
@@ -25719,7 +25719,7 @@ records:
   as_of: '2026-08-19'
   truth_owner: FACTORY_V1_PRODUCT_KERNEL_LOCAL_VERTICAL_SLICE_V1
   location: {kind: git_path, logical_uri: 'repo://src/solana_alpha_lab/factory/workbench.py', repository_path: src/solana_alpha_lab/factory/workbench.py}
-  integrity: {kind: sha256, sha256: c1ad641eaae2d2958a729fca9fb4128639aec847c4860e40121498b6013139a8}
+  integrity: {kind: sha256, sha256: 6377ed782d844edf98ca94c451863d76178f2989cda3dd6f05d97376f8c71b4f}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: depends_on, target_asset_id: MODULE-FACTORY-V1-APPLICATION-001}
@@ -25737,7 +25737,7 @@ records:
   as_of: '2026-08-19'
   truth_owner: FACTORY_V1_PRODUCT_KERNEL_LOCAL_VERTICAL_SLICE_V1
   location: {kind: git_path, logical_uri: 'repo://scripts/run_factory_experiment.py', repository_path: scripts/run_factory_experiment.py}
-  integrity: {kind: sha256, sha256: 0bb09c00914a9774f1b84b8e6f6824ca507407e0580bd5e440b0a6bf46bb90aa}
+  integrity: {kind: sha256, sha256: e3f963dd3b27b34fcfa801a4bc406eccde854842508f3be19ad62b82f31da548}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: depends_on, target_asset_id: MODULE-FACTORY-V1-APPLICATION-001}
@@ -25755,7 +25755,7 @@ records:
   as_of: '2026-08-19'
   truth_owner: FACTORY_V1_PRODUCT_KERNEL_LOCAL_VERTICAL_SLICE_V1
   location: {kind: git_path, logical_uri: 'repo://scripts/run_factory_workbench.py', repository_path: scripts/run_factory_workbench.py}
-  integrity: {kind: sha256, sha256: d34a451f37912e8acce4aeeffb1a79fedfc162a3c262621ac91193bbc32185a1}
+  integrity: {kind: sha256, sha256: b1404dde5d09da9a941413fb7dc284386c04196f0d40dbbac3a193eba59a9b37}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: depends_on, target_asset_id: MODULE-FACTORY-V1-WORKBENCH-001}
@@ -25773,7 +25773,7 @@ records:
   as_of: '2026-08-19'
   truth_owner: FACTORY_V1_PRODUCT_KERNEL_LOCAL_VERTICAL_SLICE_V1
   location: {kind: git_path, logical_uri: 'repo://tests/test_factory_v1_product_kernel.py', repository_path: tests/test_factory_v1_product_kernel.py}
-  integrity: {kind: sha256, sha256: 6ad0c4068e10b08b5d9a5de44a21e8f26a75038b737d99216eb363eeb59819fd}
+  integrity: {kind: sha256, sha256: 01ff5027b47c2cf904d76ae905fce4d9bf2e2bce4c56fdb13345fe96490c0ee0}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: depends_on, target_asset_id: MODULE-FACTORY-V1-RUNNER-001}
@@ -25855,4 +25855,137 @@ records:
   consumers: [FACTORY-001, FACTORY-V1-PRODUCT-KERNEL-001, GOAL-OWNER]
   evidence: []
   search_terms: [FACTORY_V1, EXPERIMENT_SPEC, LOADER]
+  classification: {contains_secrets: false, contains_raw_data: false, sensitivity: INTERNAL_NON_SECRET}
+
+- asset_id: CTRL-FACTORY-V1-COMMISSIONING-HYPOTHESIS-001
+  record_version: '1.0'
+  asset_type: control_document
+  purpose: Exact DIRECT_CURSOR_DELIVERY contract for the Factory v1 commissioning hypothesis.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-08-19'
+  truth_owner: FACTORY_V1_COMMISSIONING_HYPOTHESIS_V1
+  location: {kind: git_path, logical_uri: 'repo://docs/tasks/FACTORY_V1_COMMISSIONING_HYPOTHESIS_V1.md', repository_path: docs/tasks/FACTORY_V1_COMMISSIONING_HYPOTHESIS_V1.md}
+  integrity: {kind: sha256, sha256: 9a578bb24a7717e0547b62b1ddb1865d22aead0f50a28a4f3155f0a34c978a62}
+  access: {mode: read_only, method: file, network_required: false, secrets_required: false}
+  relations:
+  - {relation_type: governed_by, target_asset_id: ARCH-INTENT-005}
+  - {relation_type: depends_on, target_asset_id: CTRL-FACTORY-V1-PRODUCT-KERNEL-001}
+  - {relation_type: contains, target_asset_id: CONFIG-FACTORY-V1-COMMISSIONING-001}
+  - {relation_type: validated_by, target_asset_id: TEST-FACTORY-V1-COMMISSIONING-001}
+  consumers: [FACTORY-001, FACTORY-V1-COMMISSIONING-001, GOAL-OWNER]
+  evidence: []
+  search_terms: [FACTORY_V1, COMMISSIONING, HYPOTHESIS]
+  classification: {contains_secrets: false, contains_raw_data: false, sensitivity: INTERNAL_NON_SECRET}
+
+- asset_id: CONFIG-FACTORY-V1-COMMISSIONING-001
+  record_version: '1.0'
+  asset_type: configuration
+  purpose: Machine-readable Factory commissioning slice selecting the live Free-key ExperimentSpec.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-08-19'
+  truth_owner: FACTORY_V1_COMMISSIONING_HYPOTHESIS_V1
+  location: {kind: git_path, logical_uri: 'repo://configs/factory_v1_commissioning_v1.yaml', repository_path: configs/factory_v1_commissioning_v1.yaml}
+  integrity: {kind: sha256, sha256: 9fc35154c0d6d8b97b93a602ba4cc70f261153a830a337ad4163491d8e74ef50}
+  access: {mode: read_only, method: file, network_required: false, secrets_required: false}
+  relations:
+  - {relation_type: governed_by, target_asset_id: CTRL-FACTORY-V1-COMMISSIONING-HYPOTHESIS-001}
+  - {relation_type: depends_on, target_asset_id: SCHEMA-FACTORY-V1-COMMISSIONING-001}
+  consumers: [FACTORY-001, FACTORY-V1-COMMISSIONING-001, GOAL-OWNER]
+  evidence: []
+  search_terms: [FACTORY_V1, COMMISSIONING, CONFIG]
+  classification: {contains_secrets: false, contains_raw_data: false, sensitivity: INTERNAL_NON_SECRET}
+
+- asset_id: SCHEMA-FACTORY-V1-COMMISSIONING-001
+  record_version: '1.0'
+  asset_type: schema
+  purpose: JSON Schema for the Factory v1 commissioning configuration and gated authority.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-08-19'
+  truth_owner: FACTORY_V1_COMMISSIONING_HYPOTHESIS_V1
+  location: {kind: git_path, logical_uri: 'repo://catalog/schemas/factory_v1_commissioning.schema.json', repository_path: catalog/schemas/factory_v1_commissioning.schema.json}
+  integrity: {kind: sha256, sha256: 26e5b291a7f03077cb0681650c7d2d2b9d43401bce8bff252d7865c845d14b36}
+  access: {mode: read_only, method: file, network_required: false, secrets_required: false}
+  relations:
+  - {relation_type: governed_by, target_asset_id: CTRL-FACTORY-V1-COMMISSIONING-HYPOTHESIS-001}
+  consumers: [FACTORY-001, FACTORY-V1-COMMISSIONING-001, GOAL-OWNER]
+  evidence: []
+  search_terms: [FACTORY_V1, COMMISSIONING, SCHEMA]
+  classification: {contains_secrets: false, contains_raw_data: false, sensitivity: INTERNAL_NON_SECRET}
+
+- asset_id: CONFIG-EXPERIMENT-SPEC-FACTORY-V1-COMMISSIONING-001
+  record_version: '1.0'
+  asset_type: configuration
+  purpose: ExperimentSpec for the Factory-commissioned Jupiter Free-key quote-native live cycle.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-08-19'
+  truth_owner: FACTORY_V1_COMMISSIONING_HYPOTHESIS_V1
+  location: {kind: git_path, logical_uri: 'repo://configs/experiment_specs/factory_v1_commissioning_quote_native_free_key_v1.yaml', repository_path: configs/experiment_specs/factory_v1_commissioning_quote_native_free_key_v1.yaml}
+  integrity: {kind: sha256, sha256: 5a1f6b9cc54218222f6d9aa4dcf6ec4ce50c4b01034cc60ea0f08c9f5351ff69}
+  access: {mode: read_only, method: file, network_required: false, secrets_required: false}
+  relations:
+  - {relation_type: governed_by, target_asset_id: CTRL-FACTORY-V1-COMMISSIONING-HYPOTHESIS-001}
+  - {relation_type: depends_on, target_asset_id: SCHEMA-EXPERIMENT-SPEC-001}
+  consumers: [FACTORY-001, FACTORY-V1-COMMISSIONING-001, GOAL-OWNER]
+  evidence: []
+  search_terms: [FACTORY_V1, EXPERIMENT_SPEC, COMMISSIONING]
+  classification: {contains_secrets: false, contains_raw_data: false, sensitivity: INTERNAL_NON_SECRET}
+
+- asset_id: CONFIG-QUOTE-NATIVE-FACTORY-COMMISSIONING-AUDITION-001
+  record_version: '1.0'
+  asset_type: configuration
+  purpose: Capture policy for Factory commissioning; WRAP of the admissible audition envelope with a new owner phrase.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-08-19'
+  truth_owner: FACTORY_V1_COMMISSIONING_HYPOTHESIS_V1
+  location: {kind: git_path, logical_uri: 'repo://configs/quote_native_factory_commissioning_audition_v1.yaml', repository_path: configs/quote_native_factory_commissioning_audition_v1.yaml}
+  integrity: {kind: sha256, sha256: f39d8a2335676c1f116f20f818509f55787562ffa5d5cb7736f270cc0c88abdc}
+  access: {mode: read_only, method: file, network_required: false, secrets_required: false}
+  relations:
+  - {relation_type: governed_by, target_asset_id: CTRL-FACTORY-V1-COMMISSIONING-HYPOTHESIS-001}
+  consumers: [FACTORY-001, FACTORY-V1-COMMISSIONING-001, GOAL-OWNER]
+  evidence: []
+  search_terms: [FACTORY_V1, CAPTURE_POLICY, COMMISSIONING]
+  classification: {contains_secrets: false, contains_raw_data: false, sensitivity: INTERNAL_NON_SECRET}
+
+- asset_id: MODULE-FACTORY-V1-CAPABILITY-FREE-KEY-CAPTURE-001
+  record_version: '1.0'
+  asset_type: script
+  purpose: Allowlisted Factory WRAP of run_campaign plus classify_audition_terminal with fail-closed owner-phrase gating.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-08-19'
+  truth_owner: FACTORY_V1_COMMISSIONING_HYPOTHESIS_V1
+  location: {kind: git_path, logical_uri: 'repo://src/solana_alpha_lab/factory/capabilities.py', repository_path: src/solana_alpha_lab/factory/capabilities.py}
+  integrity: {kind: sha256, sha256: de8d06bb6c7e3fe0e13deda71062ca2cbefb11aabac58a0f0e00a5af91efb99d}
+  access: {mode: read_only, method: file, network_required: false, secrets_required: false}
+  relations:
+  - {relation_type: governed_by, target_asset_id: CTRL-FACTORY-V1-COMMISSIONING-HYPOTHESIS-001}
+  - {relation_type: depends_on, target_asset_id: MODULE-QUOTE-NATIVE-ADMISSIBLE-FRICTION-AUDITION-001}
+  consumers: [FACTORY-001, FACTORY-V1-COMMISSIONING-001, GOAL-OWNER]
+  evidence: []
+  search_terms: [FACTORY_V1, FREE_KEY, CAPTURE]
+  classification: {contains_secrets: false, contains_raw_data: false, sensitivity: INTERNAL_NON_SECRET}
+
+- asset_id: TEST-FACTORY-V1-COMMISSIONING-001
+  record_version: '1.0'
+  asset_type: script
+  purpose: Fail-closed tests for Factory commissioning phrase gating and mocked Free-key WRAP.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-08-19'
+  truth_owner: FACTORY_V1_COMMISSIONING_HYPOTHESIS_V1
+  location: {kind: git_path, logical_uri: 'repo://tests/test_factory_v1_commissioning.py', repository_path: tests/test_factory_v1_commissioning.py}
+  integrity: {kind: sha256, sha256: bc94e339fc32a6be7715ce7e29040c4395b1af125003bc5f375f38c33bc74d0a}
+  access: {mode: read_only, method: file, network_required: false, secrets_required: false}
+  relations:
+  - {relation_type: depends_on, target_asset_id: CONFIG-EXPERIMENT-SPEC-FACTORY-V1-COMMISSIONING-001}
+  - {relation_type: depends_on, target_asset_id: MODULE-FACTORY-V1-CAPABILITY-FREE-KEY-CAPTURE-001}
+  consumers: [FACTORY-001, FACTORY-V1-COMMISSIONING-001, GOAL-OWNER]
+  evidence: []
+  search_terms: [FACTORY_V1, COMMISSIONING, TESTS]
   classification: {contains_secrets: false, contains_raw_data: false, sensitivity: INTERNAL_NON_SECRET}

@@ -114,7 +114,9 @@ class FactoryV1ProductKernelTests(unittest.TestCase):
             job = restarted.latest_job()
             assert job is not None
             self.assertEqual(job["status"], "COMPLETE")
-            model = FactoryApplication(root=ROOT, store=restarted).read_model()
+            model = FactoryApplication(
+                root=ROOT, store=restarted, spec_relative=SPEC_RELATIVE
+            ).read_model()
             self.assertEqual(model["terminal_result"], "DIRECTIONAL_HINT_NOT_CONFIRMATION")
             self.assertFalse(model["missing_data"])
             restarted.close()
@@ -157,7 +159,7 @@ class FactoryV1ProductKernelTests(unittest.TestCase):
     def test_application_read_model_and_workbench_are_projections(self) -> None:
         with tempfile.TemporaryDirectory() as tmp:
             store = OperationalStore(Path(tmp) / "ops.sqlite")
-            app = FactoryApplication(root=ROOT, store=store)
+            app = FactoryApplication(root=ROOT, store=store, spec_relative=SPEC_RELATIVE)
             before = app.read_model()
             self.assertEqual(before["hypothesis"], "HYP-QUOTE-NATIVE-FRICTION-H900-V1")
             self.assertEqual(before["hypothesis_status"], "UNKNOWN")

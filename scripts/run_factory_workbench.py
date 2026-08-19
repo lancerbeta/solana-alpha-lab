@@ -19,10 +19,11 @@ from solana_alpha_lab.factory.workbench import serve  # noqa: E402
 def main() -> int:
     parser = argparse.ArgumentParser()
     parser.add_argument("--root", type=Path, default=ROOT)
+    parser.add_argument("--spec", default=None)
     parser.add_argument("--host", default="127.0.0.1")
     parser.add_argument("--port", type=int, default=8765)
     args = parser.parse_args()
-    app = FactoryApplication(root=args.root.resolve())
+    app = FactoryApplication(root=args.root.resolve(), spec_relative=args.spec)
     server = serve(app, host=args.host, port=args.port)
     print(f"FACTORY_WORKBENCH_LISTEN http://{args.host}:{args.port}/")
     try:

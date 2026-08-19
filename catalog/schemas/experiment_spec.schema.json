@@ -34,13 +34,38 @@
       "items": {
         "type": "object",
         "additionalProperties": false,
-        "required": ["requirement_id", "kind", "path", "sha256"],
+        "required": ["requirement_id", "kind", "path"],
         "properties": {
           "requirement_id": {"type": "string", "minLength": 3, "maxLength": 120},
-          "kind": {"enum": ["GIT_CANONICAL_RECEIPT", "GIT_CANONICAL_ACCEPTANCE", "CATALOG_ASSET"]},
+          "kind": {
+            "enum": [
+              "GIT_CANONICAL_RECEIPT",
+              "GIT_CANONICAL_ACCEPTANCE",
+              "CATALOG_ASSET",
+              "CAPTURE_POLICY",
+              "PROVIDER_BOUNDED_CAPTURE"
+            ]
+          },
           "path": {"type": "string", "minLength": 8, "maxLength": 240},
           "sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"}
-        }
+        },
+        "allOf": [
+          {
+            "if": {
+              "properties": {
+                "kind": {
+                  "enum": [
+                    "GIT_CANONICAL_RECEIPT",
+                    "GIT_CANONICAL_ACCEPTANCE",
+                    "CATALOG_ASSET",
+                    "CAPTURE_POLICY"
+                  ]
+                }
+              }
+            },
+            "then": {"required": ["sha256"]}
+          }
+        ]
       }
     },
     "capabilities": {
@@ -57,7 +82,7 @@
       "additionalProperties": false,
       "required": ["provider_api_rpc_wss_calls"],
       "properties": {
-        "provider_api_rpc_wss_calls": {"type": "integer", "const": 0}
+        "provider_api_rpc_wss_calls": {"type": "integer", "minimum": 0, "maximum": 60}
       }
     },
     "holdout_policy": {"type": "string", "minLength": 8, "maxLength": 240},

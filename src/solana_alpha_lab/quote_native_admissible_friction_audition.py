@@ -49,6 +49,7 @@ from solana_alpha_lab.quote_native_live_variation_campaign import (
 )
 
 ATOM_ID = "QUOTE_NATIVE_ADMISSIBLE_FRICTION_AUDITION_V1"
+FACTORY_COMMISSIONING_ATOM_ID = "FACTORY_V1_COMMISSIONING_HYPOTHESIS_V1"
 AUTHORITY_PHRASE = (
     "OK QUOTE_NATIVE_ADMISSIBLE_FRICTION_AUDITION_V1: one fresh Jupiter "
     "Free-key quote-native campaign; local process-environment key only; "
@@ -65,6 +66,19 @@ AUTHORITY_PHRASE = (
     "capture PASS plus sample valid plus no direction closes the exact "
     "mechanism; directional hint stops and leaves MOVE 2 as a later contract; "
     "no H13/H11/H07/H02 unpark; no NetReturn/alpha."
+)
+FACTORY_V1_COMMISSIONING_AUTHORITY_PHRASE = (
+    "OK FACTORY_V1_COMMISSIONING_HYPOTHESIS_V1: one Jupiter Free-key "
+    "Factory-commissioned quote-native campaign; local process-environment key "
+    "only; Tokens V2 /recent and /toptraded/1h plus quote-only /swap/v2/order; "
+    "x-api-key header only; no .env; no key in URL/log/receipt/Git; no taker, "
+    "/build, /execute, wallet, signer, transaction, paid plan, second "
+    "provider, retry or fallback; cash cap $0; call cap 60; global pace >=3s; "
+    "6 RECENT + 6 TRADED live outcome-blind cohort excluding A1 and MOVE 2 "
+    "mints; hash-bound row observed_at and attempt reservation before "
+    "credential read required for capture PASS; WRAP existing "
+    "classify_audition_terminal; not MOVE 3; not alpha; scientific FAIL may "
+    "still be product PASS."
 )
 ENVELOPE_SCHEMA = "smial.quote-native-admissible-friction-audition.capture-envelope"
 RESERVATION_SCHEMA = "smial.quote-native-admissible-friction-audition.attempt-reservation"
@@ -111,9 +125,14 @@ def capture_envelope(
     }
 
 
-def attempt_reservation_document(*, started_at: str, policy_sha256: str) -> dict[str, object]:
+def attempt_reservation_document(
+    *,
+    started_at: str,
+    policy_sha256: str,
+    atom_id: str = ATOM_ID,
+) -> dict[str, object]:
     payload = {
-        "atom_id": ATOM_ID,
+        "atom_id": atom_id,
         "credential_reads": 0,
         "policy_sha256": policy_sha256,
         "provider_requests": 0,
@@ -141,6 +160,7 @@ def evaluate_capture(
     expected_reservation = attempt_reservation_document(
         started_at=str(reservation.get("started_at") or ""),
         policy_sha256=str(reservation.get("policy_sha256") or ""),
+        atom_id=str(reservation.get("atom_id") or ATOM_ID),
     )
     if reservation.get("reservation_sha256") != expected_reservation["reservation_sha256"]:
         blockers.append("RESERVATION_HASH_MISMATCH")
@@ -236,8 +256,17 @@ def _validate_policy_shape(policy: Mapping[str, Any]) -> None:
     traded = _policy_mapping(discovery.get("traded"), "DISCOVERY_TRADED_INVALID")
     success = _policy_mapping(policy.get("success"), "SUCCESS_INVALID")
     control_kill = _policy_mapping(policy.get("control_kill"), "CONTROL_KILL_INVALID")
-    _require(policy.get("atom_id") == ATOM_ID, "ATOM_ID_DRIFT")
-    _require(authority.get("owner_phrase") == AUTHORITY_PHRASE, "AUTHORITY_PHRASE_DRIFT")
+    atom_id = policy.get("atom_id")
+    owner_phrase = authority.get("owner_phrase")
+    if atom_id == ATOM_ID:
+        _require(owner_phrase == AUTHORITY_PHRASE, "AUTHORITY_PHRASE_DRIFT")
+    elif atom_id == FACTORY_COMMISSIONING_ATOM_ID:
+        _require(
+            owner_phrase == FACTORY_V1_COMMISSIONING_AUTHORITY_PHRASE,
+            "AUTHORITY_PHRASE_DRIFT",
+        )
+    else:
+        _require(False, "ATOM_ID_DRIFT")
     _require(authority.get("credential_name") == "JUPITER_API_KEY", "CREDENTIAL_NAME_DRIFT")
     _require(authority.get("credential_reads") == 1, "CREDENTIAL_READ_BUDGET_DRIFT")
     _require(authority.get("dotenv_reads") is False, "DOTENV_READ_NOT_FORBIDDEN")
@@ -373,7 +402,7 @@ def _terminal_receipt(
     return {
         "schema": "smial.quote-native-admissible-friction-audition.runtime-receipt",
         "schema_version": "1.0",
-        "atom_id": ATOM_ID,
+        "atom_id": str(reservation.get("atom_id") or ATOM_ID),
         "terminal_outcome": terminal,
         "preflight": dict(preflight),
         "credential_reads": credential_reads,

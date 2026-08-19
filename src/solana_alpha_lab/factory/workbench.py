@@ -32,7 +32,7 @@ th {{ text-align: left; padding-right: 1rem; vertical-align: top; }}
 button {{ margin-right: 0.5rem; }}
 </style></head><body>
 <h1>Factory v1 — локальный срез владельца</h1>
-<p>Проекция. UI не является владельцем научной истины и не вызывает provider.</p>
+<p>Проекция. UI не владеет научной истиной. START без точной owner phrase не читает ключ и не вызывает Jupiter.</p>
 {notice}
 <table>{rows}</table>
 <form method="post">

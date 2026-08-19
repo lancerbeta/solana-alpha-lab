@@ -53,7 +53,13 @@ class ExperimentRunner:
             "evidence": dict(evidence),
         }
 
-    def start(self, spec_relative: str) -> dict[str, Any]:
+    def start(
+        self,
+        spec_relative: str,
+        *,
+        authority_phrase: str | None = None,
+        capture_hooks: Mapping[str, Any] | None = None,
+    ) -> dict[str, Any]:
         try:
             spec = load_experiment_spec(self.root, spec_relative)
             digest = spec_sha256(self.root, spec_relative)
@@ -81,7 +87,12 @@ class ExperimentRunner:
             self.store.upsert_job(blocked)
             return blocked
         try:
-            result = execute_capability(spec, root=self.root)
+            result = execute_capability(
+                spec,
+                root=self.root,
+                authority_phrase=authority_phrase,
+                capture_hooks=capture_hooks,
+            )
         except CapabilityError as exc:
             failed = dict(running)
             failed["status"] = "FAILED"
