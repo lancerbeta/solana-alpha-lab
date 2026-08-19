@@ -3413,6 +3413,16 @@
       "target_asset_id": "EVIDENCE-PMF-QUOTE-SLICE-ONE-SHOT-001"
     },
     {
+      "source_asset_id": "EVIDENCE-PRIOR-GIT-T0-FRICTION-SCREEN-ACCEPTANCE-001",
+      "relation": "derived_from",
+      "target_asset_id": "EVIDENCE-PRIOR-GIT-T0-FRICTION-SCREEN-RUNTIME-001"
+    },
+    {
+      "source_asset_id": "EVIDENCE-PRIOR-GIT-T0-FRICTION-SCREEN-RUNTIME-001",
+      "relation": "derived_from",
+      "target_asset_id": "CTRL-PRIOR-GIT-T0-FRICTION-SCREEN-001"
+    },
+    {
       "source_asset_id": "EVIDENCE-QUOTE-NATIVE-ADMISSIBLE-FRICTION-AUDITION-001",
       "relation": "depends_on",
       "target_asset_id": "CONFIG-PROVIDER-ROUTE-CAPABILITY-REGISTRY-009"
@@ -8751,6 +8761,11 @@
       "source_asset_id": "REPORT-PMF-QUOTE-SLICE-ONE-SHOT-001",
       "relation": "derived_from",
       "target_asset_id": "EVIDENCE-PMF-QUOTE-SLICE-ONE-SHOT-ACCEPTANCE-001"
+    },
+    {
+      "source_asset_id": "REPORT-PRIOR-GIT-T0-FRICTION-SCREEN-001",
+      "relation": "derived_from",
+      "target_asset_id": "EVIDENCE-PRIOR-GIT-T0-FRICTION-SCREEN-ACCEPTANCE-001"
     },
     {
       "source_asset_id": "REPORT-QUOTE-NATIVE-ADMISSIBLE-FRICTION-AUDITION-001",

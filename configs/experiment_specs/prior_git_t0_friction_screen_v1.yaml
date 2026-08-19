@@ -33,9 +33,11 @@ data_requirements:
   - requirement_id: RUNTIME_RECEIPT
     kind: PROVIDER_BOUNDED_CAPTURE
     path: docs/evidence/prior_git_t0_friction_screen/a6_prior_git_t0_friction_screen_runtime_receipt_v1.json
+    sha256: 6ae33cd32bcc3cddd03b515b9149a827a8faffaf791816f604e8ee209879a207
   - requirement_id: ACCEPTANCE
     kind: PROVIDER_BOUNDED_CAPTURE
     path: docs/evidence/prior_git_t0_friction_screen/a6_prior_git_t0_friction_screen_acceptance_v1.json
+    sha256: 42625fd47e55f5bd9916cb6c9c6b606e655e791dc24eaf1178af4ee86fceda70
 capabilities:
   - CAP-JUPITER-FREE-KEY-QUOTE-NATIVE-BOUNDED-CAPTURE-001
 falsifier: Prior-Git t0 screen does not improve median and retained right tail, or the effect is one stratum, or capture requires a hypothesis-specific core runner.

@@ -26652,7 +26652,7 @@ records:
   as_of: '2026-08-19'
   truth_owner: PRIOR_GIT_T0_FRICTION_SCREEN_V1
   location: {kind: git_path, logical_uri: 'repo://configs/experiment_specs/prior_git_t0_friction_screen_v1.yaml', repository_path: configs/experiment_specs/prior_git_t0_friction_screen_v1.yaml}
-  integrity: {kind: sha256, sha256: 269dbc8e8d6a8d903329b158b52726969bd7f204a106fc440f5f272a932b3f1a}
+  integrity: {kind: sha256, sha256: f6da0e556549a698175586a05c4b90fe4cc32d013e9e9cc1e5d1105c80e472da}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: governed_by, target_asset_id: CTRL-PRIOR-GIT-T0-FRICTION-SCREEN-001}
@@ -26707,7 +26707,7 @@ records:
   as_of: '2026-08-19'
   truth_owner: PRIOR_GIT_T0_FRICTION_SCREEN_V1
   location: {kind: git_path, logical_uri: 'repo://tests/test_prior_git_t0_friction_screen.py', repository_path: tests/test_prior_git_t0_friction_screen.py}
-  integrity: {kind: sha256, sha256: c3ea784521b5a302aaa9d625ddad8a8d98d13c7e2c3230a4e3dddbdf80bdb806}
+  integrity: {kind: sha256, sha256: 3ed1d6d8ddb434e6b903581a50b17c54ddb318ec463db8cc1c6aaa16ee8a9efb}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: depends_on, target_asset_id: MODULE-FACTORY-V1-PRIOR-GIT-T0-FRICTION-SCREEN-001}
@@ -26716,4 +26716,58 @@ records:
   consumers: [FACTORY-001, PRIOR-GIT-T0-FRICTION-SCREEN-001, GOAL-OWNER]
   evidence: []
   search_terms: [FACTORY_V1, T0_FRICTION_SCREEN, TEST]
+  classification: {contains_secrets: false, contains_raw_data: false, sensitivity: INTERNAL_NON_SECRET}
+
+- asset_id: EVIDENCE-PRIOR-GIT-T0-FRICTION-SCREEN-RUNTIME-001
+  record_version: '1.0'
+  asset_type: evidence
+  purpose: Live Free-key runtime receipt for the prior-Git t0 friction-screen campaign.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-08-19'
+  truth_owner: PRIOR_GIT_T0_FRICTION_SCREEN_V1
+  location: {kind: git_path, logical_uri: 'repo://docs/evidence/prior_git_t0_friction_screen/a6_prior_git_t0_friction_screen_runtime_receipt_v1.json', repository_path: docs/evidence/prior_git_t0_friction_screen/a6_prior_git_t0_friction_screen_runtime_receipt_v1.json}
+  integrity: {kind: sha256, sha256: 6ae33cd32bcc3cddd03b515b9149a827a8faffaf791816f604e8ee209879a207}
+  access: {mode: read_only, method: file, network_required: false, secrets_required: false}
+  relations:
+  - {relation_type: derived_from, target_asset_id: CTRL-PRIOR-GIT-T0-FRICTION-SCREEN-001}
+  consumers: [FACTORY-001, PRIOR-GIT-T0-FRICTION-SCREEN-001, GOAL-OWNER]
+  evidence: []
+  search_terms: [FACTORY_V1, T0_FRICTION_SCREEN, RUNTIME]
+  classification: {contains_secrets: false, contains_raw_data: false, sensitivity: INTERNAL_NON_SECRET}
+
+- asset_id: EVIDENCE-PRIOR-GIT-T0-FRICTION-SCREEN-ACCEPTANCE-001
+  record_version: '1.0'
+  asset_type: evidence
+  purpose: Acceptance packet closing the exact prior-Git t0 friction-screen family on STRATUM_UNSTABLE.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-08-19'
+  truth_owner: PRIOR_GIT_T0_FRICTION_SCREEN_V1
+  location: {kind: git_path, logical_uri: 'repo://docs/evidence/prior_git_t0_friction_screen/a6_prior_git_t0_friction_screen_acceptance_v1.json', repository_path: docs/evidence/prior_git_t0_friction_screen/a6_prior_git_t0_friction_screen_acceptance_v1.json}
+  integrity: {kind: sha256, sha256: 42625fd47e55f5bd9916cb6c9c6b606e655e791dc24eaf1178af4ee86fceda70}
+  access: {mode: read_only, method: file, network_required: false, secrets_required: false}
+  relations:
+  - {relation_type: derived_from, target_asset_id: EVIDENCE-PRIOR-GIT-T0-FRICTION-SCREEN-RUNTIME-001}
+  consumers: [FACTORY-001, PRIOR-GIT-T0-FRICTION-SCREEN-001, GOAL-OWNER]
+  evidence: []
+  search_terms: [FACTORY_V1, T0_FRICTION_SCREEN, ACCEPTANCE]
+  classification: {contains_secrets: false, contains_raw_data: false, sensitivity: INTERNAL_NON_SECRET}
+
+- asset_id: REPORT-PRIOR-GIT-T0-FRICTION-SCREEN-001
+  record_version: '1.0'
+  asset_type: control_document
+  purpose: Russian owner readout of the prior-Git t0 friction-screen close.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-08-19'
+  truth_owner: PRIOR_GIT_T0_FRICTION_SCREEN_V1
+  location: {kind: git_path, logical_uri: 'repo://docs/reports/prior_git_t0_friction_screen/a6_owner_readout_v1.md', repository_path: docs/reports/prior_git_t0_friction_screen/a6_owner_readout_v1.md}
+  integrity: {kind: sha256, sha256: b3369ed495bc6767d702ce5a9d43bb573fe47a2c58a7831904da08ee39a76b03}
+  access: {mode: read_only, method: file, network_required: false, secrets_required: false}
+  relations:
+  - {relation_type: derived_from, target_asset_id: EVIDENCE-PRIOR-GIT-T0-FRICTION-SCREEN-ACCEPTANCE-001}
+  consumers: [FACTORY-001, PRIOR-GIT-T0-FRICTION-SCREEN-001, GOAL-OWNER]
+  evidence: []
+  search_terms: [FACTORY_V1, T0_FRICTION_SCREEN, OWNER_READOUT]
   classification: {contains_secrets: false, contains_raw_data: false, sensitivity: INTERNAL_NON_SECRET}

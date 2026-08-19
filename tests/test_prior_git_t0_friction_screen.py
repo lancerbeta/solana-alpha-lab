@@ -366,11 +366,44 @@ class PriorGitT0FrictionScreenTests(unittest.TestCase):
                 "PAUSE_CLOSE_QUOTE_NATIVE_CURRENT_ALPHA_ROUTE",
             )
 
+    def test_live_receipts_match_hash_bound_spec(self) -> None:
+        spec = yaml.safe_load((ROOT / SPEC_RELATIVE).read_text(encoding="utf-8"))
+        by_id = {item["requirement_id"]: item for item in spec["data_requirements"]}
+        for requirement_id in ("RUNTIME_RECEIPT", "ACCEPTANCE"):
+            item = by_id[requirement_id]
+            payload = (ROOT / item["path"]).read_bytes()
+            self.assertEqual(
+                __import__("hashlib").sha256(payload).hexdigest(),
+                item["sha256"],
+                requirement_id,
+            )
+        receipt = json.loads(
+            (ROOT / by_id["RUNTIME_RECEIPT"]["path"]).read_text(encoding="utf-8")
+        )
+        self.assertEqual(receipt["atom_id"], T0_FRICTION_SCREEN_ATOM_ID)
+        self.assertEqual(
+            receipt["terminal"],
+            "CLOSE_EXACT_T0_FRICTION_SCREEN_FAMILY",
+        )
+        self.assertEqual(receipt["t0_screen"]["reason"], "STRATUM_UNSTABLE")
+        self.assertEqual(receipt["t0_screen"]["frozen_x_cutoff"], FROZEN_X_CUTOFF_TEXT)
+        self.assertNotEqual(
+            receipt["t0_screen"]["frozen_x_cutoff"],
+            FORBIDDEN_PEEKED_CUTOFF_TEXT,
+        )
+
     def test_application_default_spec_is_the_frozen_t0_screen(self) -> None:
         with tempfile.TemporaryDirectory() as tmp:
             store = OperationalStore(Path(tmp) / "ops.sqlite")
             try:
                 app = FactoryApplication(root=ROOT, store=store)
+                self.assertEqual(app.spec_relative, SPEC_RELATIVE)
+            finally:
+                store.close()
+            root = isolated_t0_root(Path(tmp) / "src")
+            store = OperationalStore(Path(tmp) / "ops-isolated.sqlite")
+            try:
+                app = FactoryApplication(root=root, store=store)
                 self.assertEqual(app.spec_relative, SPEC_RELATIVE)
                 model = app.read_model()
                 self.assertEqual(model["status"], "NOT_STARTED")
