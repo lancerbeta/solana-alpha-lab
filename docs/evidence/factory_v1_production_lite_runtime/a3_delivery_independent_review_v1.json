@@ -1,0 +1,70 @@
+{
+  "as_of": "2026-08-19",
+  "non_claims": [
+    "NO_CRYPTOGRAPHIC_REVIEWER_IDENTITY",
+    "REVIEW_IS_NOT_SEMANTIC_DONE",
+    "NO_FACTORY_V1_OPERATIONAL_READY",
+    "NO_ALPHA_OR_CASHFLOW",
+    "NO_MOVE_3",
+    "NO_CANONICAL_DONE",
+    "NO_VPS_PURCHASE_OR_DEPLOY"
+  ],
+  "required_roles": [
+    "ARCHITECTURE_CRITIC",
+    "CODE_REVIEWER",
+    "GOAL_DOD_CRITIC"
+  ],
+  "review_id": "FACTORY-V1-PRODUCTION-LITE-RUNTIME-INDEPENDENT-REVIEW-001",
+  "reviewed_bindings_sha256": "3c050b9d9d0a1858c7e2c4b36f9d3a33af28e0f9228d9d24cc5c180233f637e0",
+  "reviewed_inventory_sha256": "7d7207e5af79ccdf6d9bfab8a3c331852a07073ac6c569597f26fa41536d5025",
+  "reviews": [
+    {
+      "findings": [
+        "CHECKED_PROVE_ISOLATED_REHOST",
+        "CHECKED_PROVE_REQUIRES_RUNTIME_PROVED_BACKUP_UNKNOWN",
+        "CHECKED_GIT_EVIDENCE_MISSING_ON_SPEC_COVERAGE_GAP",
+        "CHECKED_NO_HEALTHY_FROM_PROCESS_ALIVE",
+        "CHECKED_NO_RECAPTURE",
+        "CHECKED_NO_LIVE_PROVIDER_OR_CREDENTIAL",
+        "CHECKED_NO_SECRETS",
+        "CHECKED_NO_VPS_PURCHASE_OR_DEPLOY",
+        "CHECKED_NO_OPERATIONAL_READY_CLAIM",
+        "CHECKED_CATALOG_INTEGRITY_REBOUND"
+      ],
+      "role": "CODE_REVIEWER",
+      "verdict": "PASS"
+    },
+    {
+      "findings": [
+        "CHECKED_DECISION_DELTA",
+        "CHECKED_FALSIFIER_HEALTHY_FROM_ALIVE",
+        "CHECKED_FALSIFIER_ROLLBACK_GIT",
+        "CHECKED_FALSIFIER_REHOST_JUPITER",
+        "CHECKED_FALSIFIER_VPS_AND_READY",
+        "CHECKED_DOD_RUNTIME_PROOF",
+        "CHECKED_NAMED_CONSUMER",
+        "CHECKED_NON_CLAIMS"
+      ],
+      "role": "GOAL_DOD_CRITIC",
+      "verdict": "PASS"
+    },
+    {
+      "findings": [
+        "CHECKED_TRUTH_OWNERS",
+        "CHECKED_NO_SECOND_TRUTH_STORE",
+        "CHECKED_AUTHORITY_CLOSED",
+        "CHECKED_HEALTHY_FORBIDDEN",
+        "CHECKED_ADOPT_WRAP",
+        "CHECKED_LOCALHOST",
+        "CHECKED_ROLLBACK_IS_OPS_NOT_GIT",
+        "CHECKED_REHOST_ALLOWLIST"
+      ],
+      "role": "ARCHITECTURE_CRITIC",
+      "verdict": "PASS"
+    }
+  ],
+  "schema": "smial.delivery-independent-review-evidence",
+  "schema_version": "1.0",
+  "task_id": "FACTORY_V1_PRODUCTION_LITE_LINUX_RUNTIME_V1",
+  "verdict": "PASS"
+}

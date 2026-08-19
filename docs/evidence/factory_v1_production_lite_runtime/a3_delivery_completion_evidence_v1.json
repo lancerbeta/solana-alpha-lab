@@ -1,0 +1,78 @@
+{
+  "acceptance_id": "FACTORY-V1-PRODUCTION-LITE-RUNTIME-DELIVERY-COMPLETION-001",
+  "active_stop_conditions": [],
+  "as_of": "2026-08-19",
+  "base_main": "9bf0a6f7f0f77b8af783e30d187f329d61b094dd",
+  "capability_radar_now": "NONE",
+  "cloud_bundle_mode": "OWNER_MANAGED_OPTIONAL_EXPORT",
+  "cloud_bundle_required_by_harness": false,
+  "cloud_bundle_smoke_required": false,
+  "factory_fit": {
+    "path": "docs/evidence/factory_v1_production_lite_runtime/a3_delivery_factory_fit_v1.json",
+    "sha256": "828a7fc95db7a013a477ac544101ae137af95e04804f3d2f7d7a547c0f656145",
+    "verdict": "PASS"
+  },
+  "implementation_bindings": {
+    "catalog/assets/core.yaml": "6e85320b064724e260515d65671d7ef026a706f35d9428a652766118a02a6eef",
+    "catalog/assets/lifecycle.yaml": "e98e8d2a605aaab865b2a18d3d264d9e6c86d921e6b80f9a001aa1708e95dfbc",
+    "catalog/catalog_manifest.yaml": "1ec384bd7b33647f26bbda7daa4b62e7ec11105774232af413d0e89518a09aef",
+    "catalog/generated/asset_edges.json": "5a2234d59dd6e74ed95ea9e34de4c846c6df2f931617a4d40e8fb77b645a9a7a",
+    "catalog/schemas/factory_v1_production_lite_runtime.schema.json": "f2eec050dd0ce3c5775b65c8d71bfbb5cc78e6977ac3a98e23ed0a7a9ea8e5b5",
+    "configs/factory_v1_linux_runtime/factory-v1-workbench.service": "27d94addca2d2eec3d9e66512dbda6dc40e32804446972a0582f487ce77477ca",
+    "configs/factory_v1_production_lite_runtime_v1.yaml": "ea33463cbac2c912cc8d97356e0d05433c4055e05b4c422ecc892f7f09738f60",
+    "docs/PROJECT_MAP.md": "6f459b6c2cbbbe96b0cd4b8a4ad9ba37ede05653b48baeb34457f0f3e95435b0",
+    "docs/evidence/factory_v1_production_lite_runtime/a3_factory_v1_runtime_acceptance_v1.json": "9a9a71c5ca65eb8ef963e06bc2501ea630b6f90a80de37264bb72816808dbf40",
+    "docs/reports/factory_v1_production_lite_runtime/a3_owner_readout_v1.md": "2b2e0563de7195ac5b712d86d00c29156f37532ff3251e795f8596f83ec97bee",
+    "docs/tasks/FACTORY_V1_PRODUCTION_LITE_LINUX_RUNTIME_V1.md": "c5670d93b6611b08708ab991fe4790edf4a514bcf37d94774b0faf6781c3d9ca",
+    "scripts/run_factory_runtime.py": "91c426713ce052be4e3ed23c459cde0fbe0f789e86cb54083028f3f668098be5",
+    "src/solana_alpha_lab/factory/application.py": "79ca009df807f680a330687703f83662f66ceffb569ba89c58529afc0b2ba78b",
+    "src/solana_alpha_lab/factory/operational_store.py": "f80133ad9385f9c8c73ea90bf04079bb2acdd69be3b05ac8a23a3ecf7b404d93",
+    "src/solana_alpha_lab/factory/runtime.py": "bd6d871616891d3be2a804e8a5e0db7b0c23002a4078e81efc3fa2b39dbb793a",
+    "tests/test_factory_v1_production_lite_runtime.py": "0411c4c2433410974fb594c150ab25a20fd1ab705237311becb7437d00b9246d"
+  },
+  "non_claims": [
+    "NO_CANONICAL_DONE",
+    "NO_FACTORY_V1_OPERATIONAL_READY",
+    "NO_ALPHA_PNL_OR_NETRETURN",
+    "NO_MOVE_3",
+    "NO_VPS_PURCHASE_OR_DEPLOY",
+    "NO_NEW_UI_PACKAGE"
+  ],
+  "owner_attention_triggers": {
+    "auth_or_access_recovery": false,
+    "external_material_action": false,
+    "material_owner_decision": false,
+    "unresolved_safety_or_truth_conflict": false,
+    "user_only_activation": false
+  },
+  "project_sources_disposition": {
+    "kind": "NO_CHANGE"
+  },
+  "schema": "smial.delivery-completion-evidence",
+  "schema_version": "1.0",
+  "side_effects": {
+    "cash_spend_usd_cents": 0,
+    "credential_reads": 0,
+    "fallbacks": 0,
+    "provider_requests": 0,
+    "retries": 0,
+    "wallet_signer_transaction_actions": 0
+  },
+  "state_change": "PRODUCTION_LITE_LINUX_RUNTIME_PROOF_PASS",
+  "task_id": "FACTORY_V1_PRODUCTION_LITE_LINUX_RUNTIME_V1",
+  "validation": {
+    "full_gate": "ENFORCED_BY_PROJECT_BOUND_VALIDATION",
+    "github_ci": "ENFORCED_LIVE_AT_GUARDED_MERGE",
+    "independent_review": {
+      "path": "docs/evidence/factory_v1_production_lite_runtime/a3_delivery_independent_review_v1.json",
+      "sha256": "679b0e437aa4c6ab2c2a8b2972df8e2895268ce2d3c3b9708ca23ba8400d2b1d",
+      "verdict": "PASS"
+    },
+    "project_checks": [
+      "PASS_UNITTEST_FACTORY_V1_RUNTIME",
+      "PASS_CATALOG_VALIDATE",
+      "PASS_GENERATOR_NAVIGATION_CHECK"
+    ],
+    "targeted": "PASS_UNITTEST_FACTORY_V1_RUNTIME"
+  }
+}

@@ -1,0 +1,34 @@
+{
+  "acceptance_id": "FACTORY-V1-PRODUCTION-LITE-RUNTIME-ACCEPTANCE-001",
+  "as_of": "2026-08-19",
+  "atom_id": "FACTORY_V1_PRODUCTION_LITE_LINUX_RUNTIME_V1",
+  "backup_status": "EXPLICIT_UNKNOWN",
+  "git_evidence": "HASH_BOUND",
+  "implementation": "LOCAL_LINUX_SHAPED_PROOF",
+  "non_claims": [
+    "NO_FACTORY_V1_OPERATIONAL_READY",
+    "NO_VPS_PURCHASE_OR_DEPLOY",
+    "NO_ALPHA_PNL_OR_NETRETURN",
+    "NO_MOVE_3",
+    "NO_LIVE_JUPITER",
+    "NO_CANONICAL_DONE",
+    "NO_COCKPIT_BREADTH",
+    "NO_DRIVE_BACKUP_PASS"
+  ],
+  "owner_decision": "PRODUCTION_LITE_LINUX_RUNTIME_PROOF_PASS",
+  "proofs": {
+    "clean_rehost": true,
+    "deploy_version_visible": true,
+    "restart_recovery": true,
+    "rollback": true
+  },
+  "purchase": "LATER_EXTERNAL_AUTHORITY",
+  "project_sources_disposition": {
+    "kind": "NO_CHANGE"
+  },
+  "question": "Can Factory recover on a VPS-shaped Linux runtime without a new scientific byte?",
+  "schema": "smial.factory-v1-production-lite-runtime-acceptance",
+  "schema_version": "1.0",
+  "scientific_truth_owner": "GIT",
+  "terminal": "PRODUCTION_LITE_LINUX_RUNTIME_PROOF_PASS"
+}

@@ -16,6 +16,7 @@ HYPOTHESES_RELATIVE = "registries/hypotheses.yaml"
 RESEARCH_CYCLES_RELATIVE = "registries/research_cycles.yaml"
 KERNEL_CONFIG_RELATIVE = "configs/factory_v1_product_kernel_v1.yaml"
 COMMISSIONING_CONFIG_RELATIVE = "configs/factory_v1_commissioning_v1.yaml"
+RUNTIME_CONFIG_RELATIVE = "configs/factory_v1_production_lite_runtime_v1.yaml"
 GOLDEN_SPEC_RELATIVE = (
     "configs/experiment_specs/quote_native_admissible_friction_audition_offline_v1.yaml"
 )
@@ -68,12 +69,21 @@ class FactoryApplication:
 
     def read_model(self) -> dict[str, Any]:
         hypotheses = _load_yaml(self.root, HYPOTHESES_RELATIVE)
-        return project_read_model(
+        model = project_read_model(
             root=self.root,
             store=self.store,
             spec_relative=self.spec_relative,
             hypothesis_registry=hypotheses,
         )
+        if (self.root / RUNTIME_CONFIG_RELATIVE).is_file():
+            from solana_alpha_lab.factory.runtime import project_runtime_health
+
+            model["runtime"] = project_runtime_health(
+                root=self.root,
+                store=self.store,
+                process_alive=True,
+            )
+        return model
 
     def freeze_hypothesis(self) -> dict[str, Any]:
         spec = load_experiment_spec(self.root, self.spec_relative)

@@ -1,0 +1,38 @@
+{
+  "as_of": "2026-08-19",
+  "capability_radar": {
+    "now": "NONE",
+    "watch": "ATOM_4_COCKPIT_OR_LATER_EXACT_VPS_HOST_GATE"
+  },
+  "dimensions": {
+    "build_vs_buy": "PASS_ADOPT_SYSTEMD_TEMPLATE_WRAP_SQLITE_BACKUP_STDLIB_SUPERVISOR",
+    "context_efficiency": "PASS_ONE_EXACT_CONTRACT_PATCH_NOT_VPS_PURCHASE",
+    "execution_to_cashflow": "NOT_APPLICABLE",
+    "flexibility_and_history": "PASS_ARCH_INTENT_005_TRIGGERED_NOT_READY_HISTORICAL_SOURCES_UNTOUCHED",
+    "mission": "PASS_RUNTIME_PROOF_WITHOUT_ALPHA_OR_OPERATIONAL_READY",
+    "monitoring_and_recovery": "PASS_RESTART_ROLLBACK_REHOST_BACKUP_EXPLICIT_UNKNOWN",
+    "owner_operability": "PASS_WORKBENCH_RUNTIME_PROJECTION_VERSION_AND_HEALTH",
+    "red_team": "PASS_NO_HEALTHY_FROM_ALIVE_NO_VPS_NO_OPERATIONAL_READY_LIE",
+    "research_truth": "PASS_GIT_RECEIPTS_REMAIN_SCIENCE_SQLITE_PROJECTION_ONLY",
+    "security": "PASS_LOCALHOST_BIND_NO_SECRETS_NO_PROVIDER"
+  },
+  "limits": [
+    "NO_FACTORY_V1_OPERATIONAL_READY",
+    "NO_VPS_PURCHASE_OR_DEPLOY",
+    "NO_COCKPIT_BREADTH",
+    "NO_DRIVE_BACKUP_PASS",
+    "NO_MOVE_3",
+    "NO_ALPHA_OR_CASHFLOW",
+    "NO_CANONICAL_DONE",
+    "NO_NEW_UI_PACKAGE"
+  ],
+  "mode": "FULL_REVIEW",
+  "recovery": "REVERT_ONLY_THIS_RUNTIME_ATOM; PRESERVE_COMMISSIONING_AND_KERNEL_RECEIPTS; SQLite_UNDER_LOCAL_IS_NOT_GIT_TRUTH.",
+  "review_id": "FACTORY-V1-PRODUCTION-LITE-RUNTIME-FACTORY-FIT-001",
+  "reviewed_bindings_sha256": "3c050b9d9d0a1858c7e2c4b36f9d3a33af28e0f9228d9d24cc5c180233f637e0",
+  "reviewed_inventory_sha256": "7d7207e5af79ccdf6d9bfab8a3c331852a07073ac6c569597f26fa41536d5025",
+  "schema": "smial.delivery-harness-factory-fit",
+  "schema_version": "1.0",
+  "task_id": "FACTORY_V1_PRODUCTION_LITE_LINUX_RUNTIME_V1",
+  "verdict": "PASS"
+}

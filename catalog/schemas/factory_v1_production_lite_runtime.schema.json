@@ -1,0 +1,117 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://smial.local/schemas/factory_v1_production_lite_runtime.schema.json",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema",
+    "schema_version",
+    "contract_id",
+    "atom_id",
+    "as_of",
+    "mode",
+    "implementation",
+    "target",
+    "deploy_version",
+    "previous_deploy_version",
+    "rpo_max",
+    "rto_max",
+    "operational_store",
+    "workbench",
+    "systemd_unit_relative",
+    "rehost_relative_paths",
+    "health",
+    "authority"
+  ],
+  "properties": {
+    "schema": {"const": "smial.factory-v1-production-lite-runtime"},
+    "schema_version": {"const": "1.0"},
+    "contract_id": {"const": "FACTORY-V1-PRODUCTION-LITE-RUNTIME-001"},
+    "atom_id": {"const": "FACTORY_V1_PRODUCTION_LITE_LINUX_RUNTIME_V1"},
+    "as_of": {"type": "string", "pattern": "^20[0-9]{2}-[0-9]{2}-[0-9]{2}$"},
+    "mode": {"const": "DIRECT_CURSOR_DELIVERY"},
+    "implementation": {"const": "LOCAL_LINUX_SHAPED_PROOF"},
+    "target": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["kind", "purchase", "proof_host"],
+      "properties": {
+        "kind": {"const": "ONE_ORDINARY_SUPPORTED_LINUX_VPS"},
+        "purchase": {"const": "LATER_EXTERNAL_AUTHORITY"},
+        "proof_host": {"const": "LOCAL_PROCESS_PLUS_SYSTEMD_UNIT_TEMPLATE"}
+      }
+    },
+    "deploy_version": {"type": "string", "minLength": 8, "maxLength": 64},
+    "previous_deploy_version": {"type": "string", "minLength": 8, "maxLength": 64},
+    "rpo_max": {"const": "24h"},
+    "rto_max": {"const": "12h"},
+    "operational_store": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["kind", "relative_path", "snapshot_relative_path", "owns_scientific_truth"],
+      "properties": {
+        "kind": {"const": "SQLITE"},
+        "relative_path": {"type": "string", "minLength": 8},
+        "snapshot_relative_path": {"type": "string", "minLength": 8},
+        "owns_scientific_truth": {"const": false}
+      }
+    },
+    "workbench": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["bind", "port"],
+      "properties": {
+        "bind": {"const": "127.0.0.1"},
+        "port": {"type": "integer", "minimum": 1, "maximum": 65535}
+      }
+    },
+    "systemd_unit_relative": {
+      "type": "string",
+      "minLength": 16,
+      "maxLength": 240
+    },
+    "rehost_relative_paths": {
+      "type": "array",
+      "minItems": 8,
+      "uniqueItems": true,
+      "items": {
+        "type": "string",
+        "minLength": 8,
+        "maxLength": 240,
+        "pattern": "^[A-Za-z0-9._/-]+$"
+      }
+    },
+    "health": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "process_alive_alone_is_not_healthy",
+        "backup_status_when_unproved",
+        "healthy_verdict_forbidden"
+      ],
+      "properties": {
+        "process_alive_alone_is_not_healthy": {"const": true},
+        "backup_status_when_unproved": {"const": "EXPLICIT_UNKNOWN"},
+        "healthy_verdict_forbidden": {"const": true}
+      }
+    },
+    "authority": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "provider_calls",
+        "credentials",
+        "deployment",
+        "cash_spend",
+        "wallet_signer_transaction"
+      ],
+      "properties": {
+        "provider_calls": {"const": false},
+        "credentials": {"const": false},
+        "deployment": {"const": false},
+        "cash_spend": {"const": false},
+        "wallet_signer_transaction": {"const": false}
+      }
+    }
+  }
+}

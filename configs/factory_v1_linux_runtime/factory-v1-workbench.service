@@ -1,0 +1,15 @@
+[Unit]
+Description=Factory v1 production-lite Workbench
+Documentation=docs/tasks/FACTORY_V1_PRODUCTION_LITE_LINUX_RUNTIME_V1.md
+After=network-online.target
+
+[Service]
+Type=simple
+WorkingDirectory=/opt/solana-alpha-lab
+ExecStart=/usr/bin/uv run --locked --managed-python python -B scripts/run_factory_workbench.py --host 127.0.0.1 --port 8765
+Restart=on-failure
+RestartSec=3
+NoNewPrivileges=true
+
+[Install]
+WantedBy=multi-user.target
