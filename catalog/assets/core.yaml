@@ -26205,7 +26205,7 @@ records:
   as_of: '2026-08-19'
   truth_owner: FACTORY_V1_PRODUCTION_LITE_LINUX_RUNTIME_V1
   location: {kind: git_path, logical_uri: 'repo://docs/evidence/factory_v1_production_lite_runtime/a3_factory_v1_runtime_acceptance_v1.json', repository_path: docs/evidence/factory_v1_production_lite_runtime/a3_factory_v1_runtime_acceptance_v1.json}
-  integrity: {kind: sha256, sha256: 4c0e6d0100e2dc943a1c0b1f72b9ac81fa96b00d2a775f8be85a8612a8f674bd}
+  integrity: {kind: sha256, sha256: 9a9a71c5ca65eb8ef963e06bc2501ea630b6f90a80de37264bb72816808dbf40}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: derived_from, target_asset_id: CTRL-FACTORY-V1-PRODUCTION-LITE-RUNTIME-001}

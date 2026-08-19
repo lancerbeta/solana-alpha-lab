@@ -23,6 +23,9 @@
     "rollback": true
   },
   "purchase": "LATER_EXTERNAL_AUTHORITY",
+  "project_sources_disposition": {
+    "kind": "NO_CHANGE"
+  },
   "question": "Can Factory recover on a VPS-shaped Linux runtime without a new scientific byte?",
   "schema": "smial.factory-v1-production-lite-runtime-acceptance",
   "schema_version": "1.0",
