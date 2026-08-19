@@ -17,7 +17,7 @@
   ],
   "review_id": "FACTORY-V1-OWNER-COCKPIT-INDEPENDENT-REVIEW-001",
   "reviewed_bindings_sha256": "bb7def6e764182455143aeddfe8cd39e74809ebccb1206baecb56a25d0ab9738",
-  "reviewed_inventory_sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+  "reviewed_inventory_sha256": "114339c7c73e8507ac7d5d527c0721d452db7808045f01160fa2cdcfd6d9fe72",
   "reviews": [
     {
       "findings": [
