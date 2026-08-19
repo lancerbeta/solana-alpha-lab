@@ -72,7 +72,7 @@ context_requirements:
     - CONFIG-FACTORY-V1-PRODUCT-KERNEL-001
     - EVIDENCE-PRIOR-GIT-T0-FRICTION-SCREEN-ACCEPTANCE-001
     - MODULE-FACTORY-V1-CAPABILITY-FREE-KEY-CAPTURE-001
-  l2_roles: [ARCHITECTURE_DECISIONS]
+  l2_roles: [ARCHITECTURE_DECISIONS, DELIVERY_EVIDENCE]
   l3_roles: []
   roadmap_path: configs/factory_v1_operational_readiness_v1.yaml
   exact_role_paths:
@@ -81,7 +81,8 @@ context_requirements:
       - configs/provider_route_capability_registry_v9.yaml
     ARCHITECTURE_DECISIONS:
       - docs/architecture/intents/ARCH-INTENT-005-factory-v1-operational-readiness-and-owner-experience.md
-    DELIVERY_EVIDENCE: []
+    DELIVERY_EVIDENCE:
+      - docs/evidence/quote_surface_retention_falsifier/a1_delivery_completion_evidence_v1.json
     HISTORICAL_CONTEXT: []
 ---
 

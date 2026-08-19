@@ -3643,6 +3643,31 @@
       "target_asset_id": "EVIDENCE-QUOTE-NATIVE-QUOTED-BUY-H900-CLOCK-001"
     },
     {
+      "source_asset_id": "EVIDENCE-QUOTE-SURFACE-RETENTION-FALSIFIER-ACCEPTANCE-001",
+      "relation": "derived_from",
+      "target_asset_id": "EVIDENCE-QUOTE-SURFACE-RETENTION-FALSIFIER-RUNTIME-001"
+    },
+    {
+      "source_asset_id": "EVIDENCE-QUOTE-SURFACE-RETENTION-FALSIFIER-DELIVERY-COMPLETION-001",
+      "relation": "derived_from",
+      "target_asset_id": "EVIDENCE-QUOTE-SURFACE-RETENTION-FALSIFIER-FACTORY-FIT-001"
+    },
+    {
+      "source_asset_id": "EVIDENCE-QUOTE-SURFACE-RETENTION-FALSIFIER-FACTORY-FIT-001",
+      "relation": "derived_from",
+      "target_asset_id": "EVIDENCE-QUOTE-SURFACE-RETENTION-FALSIFIER-INDEPENDENT-REVIEW-001"
+    },
+    {
+      "source_asset_id": "EVIDENCE-QUOTE-SURFACE-RETENTION-FALSIFIER-INDEPENDENT-REVIEW-001",
+      "relation": "derived_from",
+      "target_asset_id": "CTRL-QUOTE-SURFACE-RETENTION-FALSIFIER-001"
+    },
+    {
+      "source_asset_id": "EVIDENCE-QUOTE-SURFACE-RETENTION-FALSIFIER-RUNTIME-001",
+      "relation": "derived_from",
+      "target_asset_id": "CTRL-QUOTE-SURFACE-RETENTION-FALSIFIER-001"
+    },
+    {
       "source_asset_id": "EVIDENCE-RC001-H13-PARK-FROM-PRIORITY-001",
       "relation": "depends_on",
       "target_asset_id": "CONFIG-T28-RC001-REGISTRY-FREEZE-001"
@@ -8856,6 +8881,11 @@
       "source_asset_id": "REPORT-QUOTE-NATIVE-QUOTED-BUY-H900-CLOCK-001",
       "relation": "derived_from",
       "target_asset_id": "EVIDENCE-QUOTE-NATIVE-QUOTED-BUY-H900-CLOCK-ACCEPTANCE-001"
+    },
+    {
+      "source_asset_id": "REPORT-QUOTE-SURFACE-RETENTION-FALSIFIER-001",
+      "relation": "derived_from",
+      "target_asset_id": "EVIDENCE-QUOTE-SURFACE-RETENTION-FALSIFIER-ACCEPTANCE-001"
     },
     {
       "source_asset_id": "REPORT-RC001-H13-PARK-FROM-PRIORITY-001",

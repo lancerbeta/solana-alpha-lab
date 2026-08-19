@@ -26781,7 +26781,7 @@ records:
   as_of: '2026-08-19'
   truth_owner: QUOTE_SURFACE_RETENTION_FALSIFIER_V1
   location: {kind: git_path, logical_uri: 'repo://docs/tasks/QUOTE_SURFACE_RETENTION_FALSIFIER_V1.md', repository_path: docs/tasks/QUOTE_SURFACE_RETENTION_FALSIFIER_V1.md}
-  integrity: {kind: sha256, sha256: cf9779006940bc9adfbf63506508ec17e24045cc3ffe7fa49ff1d294b1384000}
+  integrity: {kind: sha256, sha256: 0d41017b8c49776930461de7bac642a9ffe4b8470186fd44b822beb5b0731ffb}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: depends_on, target_asset_id: ARCH-INTENT-005}
@@ -26921,4 +26921,112 @@ records:
   consumers: [FACTORY-001, QUOTE-SURFACE-RETENTION-FALSIFIER-001, GOAL-OWNER]
   evidence: []
   search_terms: [FACTORY_V1, QUOTE_SURFACE_RETENTION, TEST]
+  classification: {contains_secrets: false, contains_raw_data: false, sensitivity: INTERNAL_NON_SECRET}
+
+- asset_id: EVIDENCE-QUOTE-SURFACE-RETENTION-FALSIFIER-RUNTIME-001
+  record_version: '1.0'
+  asset_type: evidence
+  purpose: Live Free-key runtime receipt for the quote-surface retention falsifier campaign.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-08-20'
+  truth_owner: QUOTE_SURFACE_RETENTION_FALSIFIER_V1
+  location: {kind: git_path, logical_uri: 'repo://docs/evidence/quote_surface_retention_falsifier/a1_quote_surface_retention_falsifier_runtime_receipt_v1.json', repository_path: docs/evidence/quote_surface_retention_falsifier/a1_quote_surface_retention_falsifier_runtime_receipt_v1.json}
+  integrity: {kind: sha256, sha256: 1ba86f85127e819fb9a520e1f6e947d0ea57c5c0834e622ad64f11acd207d02e}
+  access: {mode: read_only, method: file, network_required: false, secrets_required: false}
+  relations:
+  - {relation_type: derived_from, target_asset_id: CTRL-QUOTE-SURFACE-RETENTION-FALSIFIER-001}
+  consumers: [FACTORY-001, QUOTE-SURFACE-RETENTION-FALSIFIER-001, GOAL-OWNER]
+  evidence: []
+  search_terms: [FACTORY_V1, QUOTE_SURFACE_RETENTION, RUNTIME]
+  classification: {contains_secrets: false, contains_raw_data: false, sensitivity: INTERNAL_NON_SECRET}
+
+- asset_id: EVIDENCE-QUOTE-SURFACE-RETENTION-FALSIFIER-ACCEPTANCE-001
+  record_version: '1.0'
+  asset_type: evidence
+  purpose: Acceptance packet recording SAMPLE_INVALID_REPLAN_REQUIRED without TRADED-only rescue.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-08-20'
+  truth_owner: QUOTE_SURFACE_RETENTION_FALSIFIER_V1
+  location: {kind: git_path, logical_uri: 'repo://docs/evidence/quote_surface_retention_falsifier/a1_quote_surface_retention_falsifier_acceptance_v1.json', repository_path: docs/evidence/quote_surface_retention_falsifier/a1_quote_surface_retention_falsifier_acceptance_v1.json}
+  integrity: {kind: sha256, sha256: 1c5c76f9b79be0357b71011900dd499fc177c708c884d3aa444545cde0ce41e3}
+  access: {mode: read_only, method: file, network_required: false, secrets_required: false}
+  relations:
+  - {relation_type: derived_from, target_asset_id: EVIDENCE-QUOTE-SURFACE-RETENTION-FALSIFIER-RUNTIME-001}
+  consumers: [FACTORY-001, QUOTE-SURFACE-RETENTION-FALSIFIER-001, GOAL-OWNER]
+  evidence: []
+  search_terms: [FACTORY_V1, QUOTE_SURFACE_RETENTION, ACCEPTANCE]
+  classification: {contains_secrets: false, contains_raw_data: false, sensitivity: INTERNAL_NON_SECRET}
+
+- asset_id: REPORT-QUOTE-SURFACE-RETENTION-FALSIFIER-001
+  record_version: '1.0'
+  asset_type: control_document
+  purpose: Russian owner readout of the quote-surface retention sample-invalid result.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-08-20'
+  truth_owner: QUOTE_SURFACE_RETENTION_FALSIFIER_V1
+  location: {kind: git_path, logical_uri: 'repo://docs/reports/quote_surface_retention_falsifier/a1_owner_readout_v1.md', repository_path: docs/reports/quote_surface_retention_falsifier/a1_owner_readout_v1.md}
+  integrity: {kind: sha256, sha256: cc5ce58469b130b80e97b8369f66b331dfe3a0bcc08d7c47701af190102fd7c7}
+  access: {mode: read_only, method: file, network_required: false, secrets_required: false}
+  relations:
+  - {relation_type: derived_from, target_asset_id: EVIDENCE-QUOTE-SURFACE-RETENTION-FALSIFIER-ACCEPTANCE-001}
+  consumers: [FACTORY-001, QUOTE-SURFACE-RETENTION-FALSIFIER-001, GOAL-OWNER]
+  evidence: []
+  search_terms: [FACTORY_V1, QUOTE_SURFACE_RETENTION, OWNER_READOUT]
+  classification: {contains_secrets: false, contains_raw_data: false, sensitivity: INTERNAL_NON_SECRET}
+
+- asset_id: EVIDENCE-QUOTE-SURFACE-RETENTION-FALSIFIER-INDEPENDENT-REVIEW-001
+  record_version: '1.0'
+  asset_type: evidence
+  purpose: Isolated code, goal/DoD and architecture review of the quote-surface retention atom.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-08-20'
+  truth_owner: QUOTE_SURFACE_RETENTION_FALSIFIER_V1
+  location: {kind: git_path, logical_uri: 'repo://docs/evidence/quote_surface_retention_falsifier/a1_delivery_independent_review_v1.json', repository_path: docs/evidence/quote_surface_retention_falsifier/a1_delivery_independent_review_v1.json}
+  integrity: {kind: sha256, sha256: b61257afef8ce5df2379d5a601669da53e44f02b5842533aa46325d28c72eeac}
+  access: {mode: read_only, method: file, network_required: false, secrets_required: false}
+  relations:
+  - {relation_type: derived_from, target_asset_id: CTRL-QUOTE-SURFACE-RETENTION-FALSIFIER-001}
+  consumers: [FACTORY-001, QUOTE-SURFACE-RETENTION-FALSIFIER-001, GOAL-OWNER]
+  evidence: []
+  search_terms: [FACTORY_V1, QUOTE_SURFACE_RETENTION, INDEPENDENT_REVIEW]
+  classification: {contains_secrets: false, contains_raw_data: false, sensitivity: INTERNAL_NON_SECRET}
+
+- asset_id: EVIDENCE-QUOTE-SURFACE-RETENTION-FALSIFIER-FACTORY-FIT-001
+  record_version: '1.0'
+  asset_type: evidence
+  purpose: FULL_REVIEW Factory Fit for the quote-surface retention inconclusive packet.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-08-20'
+  truth_owner: QUOTE_SURFACE_RETENTION_FALSIFIER_V1
+  location: {kind: git_path, logical_uri: 'repo://docs/evidence/quote_surface_retention_falsifier/a1_delivery_factory_fit_v1.json', repository_path: docs/evidence/quote_surface_retention_falsifier/a1_delivery_factory_fit_v1.json}
+  integrity: {kind: sha256, sha256: 68867176abef71b6a33c6cc0c33e073868ce427c7c0a48ff37d63812d0734d92}
+  access: {mode: read_only, method: file, network_required: false, secrets_required: false}
+  relations:
+  - {relation_type: derived_from, target_asset_id: EVIDENCE-QUOTE-SURFACE-RETENTION-FALSIFIER-INDEPENDENT-REVIEW-001}
+  consumers: [FACTORY-001, QUOTE-SURFACE-RETENTION-FALSIFIER-001, GOAL-OWNER]
+  evidence: []
+  search_terms: [FACTORY_V1, QUOTE_SURFACE_RETENTION, FACTORY_FIT]
+  classification: {contains_secrets: false, contains_raw_data: false, sensitivity: INTERNAL_NON_SECRET}
+
+- asset_id: EVIDENCE-QUOTE-SURFACE-RETENTION-FALSIFIER-DELIVERY-COMPLETION-001
+  record_version: '1.0'
+  asset_type: evidence
+  purpose: Delivery-completion evidence binding this atom to SAMPLE_INVALID_REPLAN_REQUIRED.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-08-20'
+  truth_owner: QUOTE_SURFACE_RETENTION_FALSIFIER_V1
+  location: {kind: git_path, logical_uri: 'repo://docs/evidence/quote_surface_retention_falsifier/a1_delivery_completion_evidence_v1.json', repository_path: docs/evidence/quote_surface_retention_falsifier/a1_delivery_completion_evidence_v1.json}
+  integrity: {kind: sha256, sha256: c081957b679961f09043907bdb7c38f65da3b5d1f4bb0322f540702c30d5cf0e}
+  access: {mode: read_only, method: file, network_required: false, secrets_required: false}
+  relations:
+  - {relation_type: derived_from, target_asset_id: EVIDENCE-QUOTE-SURFACE-RETENTION-FALSIFIER-FACTORY-FIT-001}
+  consumers: [FACTORY-001, QUOTE-SURFACE-RETENTION-FALSIFIER-001, GOAL-OWNER]
+  evidence: []
+  search_terms: [FACTORY_V1, QUOTE_SURFACE_RETENTION, DELIVERY_COMPLETION]
   classification: {contains_secrets: false, contains_raw_data: false, sensitivity: INTERNAL_NON_SECRET}
