@@ -1,0 +1,3775 @@
+{
+  "atom_id": "FACTORY_V1_COMMISSIONING_HYPOTHESIS_V1",
+  "attempt_reservation": {
+    "atom_id": "FACTORY_V1_COMMISSIONING_HYPOTHESIS_V1",
+    "credential_reads": 0,
+    "policy_sha256": "f39d8a2335676c1f116f20f818509f55787562ffa5d5cb7736f270cc0c88abdc",
+    "provider_requests": 0,
+    "reservation_sha256": "a37612f955ffe945032e65f9085d91b2c392238939804363d672565cd7c30adb",
+    "schema": "smial.quote-native-admissible-friction-audition.attempt-reservation",
+    "schema_version": "1.0",
+    "started_at": "2026-08-19T06:27:48Z",
+    "state": "STARTED"
+  },
+  "campaign": {
+    "campaign_verdict": "VARIATION_PRESENT_NOT_MECHANISM",
+    "cells": [
+      {
+        "buy_terminal": "QUOTE_OBSERVED",
+        "fee_bps": {
+          "status": "OBSERVED",
+          "value": 10
+        },
+        "h900_terminal": "QUOTE_OBSERVED",
+        "identity_id": "RECENT_1",
+        "price_impact_pct": {
+          "status": "OBSERVED",
+          "value": "-0.013650012127098564"
+        },
+        "reverse_terminal": "QUOTE_OBSERVED",
+        "router": "metis",
+        "x_quoted_roundtrip_friction": "-0.0272609",
+        "x_status": "OBSERVED",
+        "y_equals_x": false,
+        "y_quoted_liquidation_recovery": "-0.0889127",
+        "y_status": "OBSERVED"
+      },
+      {
+        "buy_terminal": "QUOTE_OBSERVED",
+        "fee_bps": {
+          "status": "OBSERVED",
+          "value": 10
+        },
+        "h900_terminal": "QUOTE_OBSERVED",
+        "identity_id": "RECENT_2",
+        "price_impact_pct": {
+          "status": "OBSERVED",
+          "value": "-0.004679868444468378"
+        },
+        "reverse_terminal": "QUOTE_OBSERVED",
+        "router": "metis",
+        "x_quoted_roundtrip_friction": "-0.0272803",
+        "x_status": "OBSERVED",
+        "y_equals_x": true,
+        "y_quoted_liquidation_recovery": "-0.0272803",
+        "y_status": "OBSERVED"
+      },
+      {
+        "buy_terminal": "QUOTE_OBSERVED",
+        "fee_bps": {
+          "status": "OBSERVED",
+          "value": 10
+        },
+        "h900_terminal": "QUOTE_OBSERVED",
+        "identity_id": "RECENT_3",
+        "price_impact_pct": {
+          "status": "OBSERVED",
+          "value": "-0.013339574366765297"
+        },
+        "reverse_terminal": "QUOTE_OBSERVED",
+        "router": "metis",
+        "x_quoted_roundtrip_friction": "-0.026866",
+        "x_status": "OBSERVED",
+        "y_equals_x": false,
+        "y_quoted_liquidation_recovery": "-0.024282",
+        "y_status": "OBSERVED"
+      },
+      {
+        "buy_terminal": "QUOTE_OBSERVED",
+        "fee_bps": {
+          "status": "OBSERVED",
+          "value": 10
+        },
+        "h900_terminal": "PROVIDER_TYPED_FAILURE",
+        "identity_id": "RECENT_4",
+        "price_impact_pct": {
+          "status": "OBSERVED",
+          "value": "0.6316837640286217"
+        },
+        "reverse_terminal": "PROVIDER_TYPED_FAILURE",
+        "router": "metis",
+        "x_quoted_roundtrip_friction": null,
+        "x_status": "MISSING",
+        "y_equals_x": null,
+        "y_quoted_liquidation_recovery": null,
+        "y_status": "MISSING"
+      },
+      {
+        "buy_terminal": "QUOTE_OBSERVED",
+        "fee_bps": {
+          "status": "OBSERVED",
+          "value": 10
+        },
+        "h900_terminal": "QUOTE_OBSERVED",
+        "identity_id": "RECENT_5",
+        "price_impact_pct": {
+          "status": "OBSERVED",
+          "value": "0.0258007328746056"
+        },
+        "reverse_terminal": "QUOTE_OBSERVED",
+        "router": "metis",
+        "x_quoted_roundtrip_friction": "-0.0272814",
+        "x_status": "OBSERVED",
+        "y_equals_x": true,
+        "y_quoted_liquidation_recovery": "-0.0272814",
+        "y_status": "OBSERVED"
+      },
+      {
+        "buy_terminal": "QUOTE_OBSERVED",
+        "fee_bps": {
+          "status": "OBSERVED",
+          "value": 10
+        },
+        "h900_terminal": "QUOTE_OBSERVED",
+        "identity_id": "RECENT_6",
+        "price_impact_pct": {
+          "status": "OBSERVED",
+          "value": "-0.035563539260135626"
+        },
+        "reverse_terminal": "QUOTE_OBSERVED",
+        "router": "metis",
+        "x_quoted_roundtrip_friction": "-0.0243116",
+        "x_status": "OBSERVED",
+        "y_equals_x": false,
+        "y_quoted_liquidation_recovery": "-0.0715899",
+        "y_status": "OBSERVED"
+      },
+      {
+        "buy_terminal": "QUOTE_OBSERVED",
+        "fee_bps": {
+          "status": "OBSERVED",
+          "value": 10
+        },
+        "h900_terminal": "QUOTE_OBSERVED",
+        "identity_id": "TRADED_1",
+        "price_impact_pct": {
+          "status": "OBSERVED",
+          "value": "-0.052842634369070336"
+        },
+        "reverse_terminal": "QUOTE_OBSERVED",
+        "router": "metis",
+        "x_quoted_roundtrip_friction": "-0.0177117",
+        "x_status": "OBSERVED",
+        "y_equals_x": false,
+        "y_quoted_liquidation_recovery": "0.2182865",
+        "y_status": "OBSERVED"
+      },
+      {
+        "buy_terminal": "QUOTE_OBSERVED",
+        "fee_bps": {
+          "status": "OBSERVED",
+          "value": 10
+        },
+        "h900_terminal": "QUOTE_OBSERVED",
+        "identity_id": "TRADED_2",
+        "price_impact_pct": {
+          "status": "OBSERVED",
+          "value": "-0.0017033606261026876"
+        },
+        "reverse_terminal": "QUOTE_OBSERVED",
+        "router": "metis",
+        "x_quoted_roundtrip_friction": "-0.0043414",
+        "x_status": "OBSERVED",
+        "y_equals_x": false,
+        "y_quoted_liquidation_recovery": "-0.0046679",
+        "y_status": "OBSERVED"
+      },
+      {
+        "buy_terminal": "QUOTE_OBSERVED",
+        "fee_bps": {
+          "status": "OBSERVED",
+          "value": 10
+        },
+        "h900_terminal": "QUOTE_OBSERVED",
+        "identity_id": "TRADED_3",
+        "price_impact_pct": {
+          "status": "OBSERVED",
+          "value": "-0.014288065961311512"
+        },
+        "reverse_terminal": "QUOTE_OBSERVED",
+        "router": "metis",
+        "x_quoted_roundtrip_friction": "-0.0174628",
+        "x_status": "OBSERVED",
+        "y_equals_x": false,
+        "y_quoted_liquidation_recovery": "-0.0686042",
+        "y_status": "OBSERVED"
+      },
+      {
+        "buy_terminal": "QUOTE_OBSERVED",
+        "fee_bps": {
+          "status": "OBSERVED",
+          "value": 10
+        },
+        "h900_terminal": "QUOTE_OBSERVED",
+        "identity_id": "TRADED_4",
+        "price_impact_pct": {
+          "status": "OBSERVED",
+          "value": "-0.00120324716553413"
+        },
+        "reverse_terminal": "QUOTE_OBSERVED",
+        "router": "dflow",
+        "x_quoted_roundtrip_friction": "-0.0026104",
+        "x_status": "OBSERVED",
+        "y_equals_x": false,
+        "y_quoted_liquidation_recovery": "-0.0026175",
+        "y_status": "OBSERVED"
+      },
+      {
+        "buy_terminal": "QUOTE_OBSERVED",
+        "fee_bps": {
+          "status": "OBSERVED",
+          "value": 10
+        },
+        "h900_terminal": "QUOTE_OBSERVED",
+        "identity_id": "TRADED_5",
+        "price_impact_pct": {
+          "status": "OBSERVED",
+          "value": "-0.024579425697671516"
+        },
+        "reverse_terminal": "QUOTE_OBSERVED",
+        "router": "metis",
+        "x_quoted_roundtrip_friction": "-0.0292213",
+        "x_status": "OBSERVED",
+        "y_equals_x": false,
+        "y_quoted_liquidation_recovery": "-0.1465172",
+        "y_status": "OBSERVED"
+      },
+      {
+        "buy_terminal": "QUOTE_OBSERVED",
+        "fee_bps": {
+          "status": "OBSERVED",
+          "value": 10
+        },
+        "h900_terminal": "QUOTE_OBSERVED",
+        "identity_id": "TRADED_6",
+        "price_impact_pct": {
+          "status": "OBSERVED",
+          "value": "-0.03225944215107612"
+        },
+        "reverse_terminal": "QUOTE_OBSERVED",
+        "router": "metis",
+        "x_quoted_roundtrip_friction": "-0.0161336",
+        "x_status": "OBSERVED",
+        "y_equals_x": false,
+        "y_quoted_liquidation_recovery": "-0.317142",
+        "y_status": "OBSERVED"
+      }
+    ],
+    "complete_xy_count": 11,
+    "h3600_moved_count": 10,
+    "h3600_role": "PREDECLARED_ROBUSTNESS_NOT_SEARCHABLE_Y",
+    "h3600_y_equals_x_count": 1,
+    "h900_no_route_count": 0,
+    "h900_quote_observed_count": 11,
+    "recent_complete_xy_count": 5,
+    "recent_time_separated_count": 3,
+    "time_separated_complete_xy_count": 9,
+    "traded_complete_xy_count": 6,
+    "traded_time_separated_count": 6,
+    "traded_time_separated_share": "1",
+    "verdict": "VARIATION_PRESENT_NOT_MECHANISM",
+    "y_equals_x_count": 2
+  },
+  "capture": {
+    "accepted": true,
+    "blockers": [],
+    "consumed_count": 50,
+    "searchable_y_kind": "SELL_H900"
+  },
+  "credential_reads": 1,
+  "discovery_observations": [
+    {
+      "capture_envelope_sha256": "2628f06d88dee1d7dc0ab571fe25bb07d8e059e20ee0be428473c2071b11f54f",
+      "consumed_call": true,
+      "kind": "DISCOVERY_RECENT",
+      "observation_id": "DISCOVERY:RECENT",
+      "observed_at": "2026-08-19T06:27:49Z",
+      "terminal": "TOKEN_LIST_OBSERVED",
+      "terminal_error": null,
+      "transport": {
+        "http_status": 200,
+        "request_count": 1,
+        "response_bytes": 47208,
+        "response_sha256": "c006311198f87404f9cbc7c2516275e72b1e264f5d3f50f7a436d2cbaa836cd9",
+        "safe_response_headers": {
+          "x-api-gateway-request-id": "drGRot82vU3Qh0NqHK--AJjJy8hGNPBIuwI7-qP_wHZiwPByPuL9tQ=="
+        },
+        "url_has_api_key": false,
+        "url_has_taker": false
+      }
+    },
+    {
+      "capture_envelope_sha256": "3e0aae262a29795d2ac8b8e5cad0c8168d4e128f8589200f1bf7410812725c67",
+      "consumed_call": true,
+      "kind": "DISCOVERY_TRADED",
+      "observation_id": "DISCOVERY:TRADED",
+      "observed_at": "2026-08-19T06:27:52Z",
+      "terminal": "TOKEN_LIST_OBSERVED",
+      "terminal_error": null,
+      "transport": {
+        "http_status": 200,
+        "request_count": 1,
+        "response_bytes": 124118,
+        "response_sha256": "2e0498f250c260dc66b9386479a4f04df0ee406f8701cfe9dd999af78722e6d6",
+        "safe_response_headers": {
+          "x-api-gateway-request-id": "ZdvTfnzAG0PCk9rK_SnUe68xi4NeKSS_UaBM3iyufRm2WrblKofsow=="
+        },
+        "url_has_api_key": false,
+        "url_has_taker": false
+      }
+    }
+  ],
+  "excluded_prior_mints": [
+    "2DmETQpE7UeqPeqzgbUGYveQgLXyrYke9CEXUCdXpump",
+    "2PCeJ1rjTk7YEw3K1qQWfHvpNqxwmqx5vQfk4pLtpump",
+    "2mG7vDMrZYFyFS2bz3AsrJizFoiAYurY5kc4MPqfpump",
+    "3sjE2Aoe4Kx5r43jfJ7BDjNiWmNx485zFMcHPW2jpump",
+    "5GPcqULdATnNibbaaSEUHhiSiXw1NitiMWCFMjUhpump",
+    "6hzmCLfzQPeVX5qQgqQdAAxexf5BAcMQHyZUJKbNpump",
+    "8ZkUY4EM1nhWf2hihmWiPKaRy3gqxdoMD5LMQsPMpump",
+    "98sMhvDwXj1RQi5c5Mndm3vPe9cBqPrbLaufMXFNMh5g",
+    "9cRCn9rGT8V2imeM2BaKs13yhMEais3ruM3rPvTGpump",
+    "AEGnbhx3mR2mf32dqH6AzWeJf3vRi6cRsYkD3FnSpump",
+    "ApZuxdpzMrbEYTGEzeY9afh5pj9d6qPRJCTgQYiipbKg",
+    "BwEs2ErcYNNaq4uebUyfonESH6LPYEWYQFyus2SQgdiN",
+    "CS4m16fNezMW1DNMsv4R3dCy6ipGg6gvnYBCmbDypump",
+    "DwSQeTtRdRhW7kSs3YXYgjmP7Hz9QWEFsie29q8mpump",
+    "EpSjX6gghH8B1Yw6A98pj6iK5yMUiBMscx7jqBnpump",
+    "Ff8cXtod5wSKP7w2uYjTbW1eH6tBYjeNvGjmxePbpump",
+    "FsupHnatRFADqfincPWWwBKiYG73KFHgkSvzRnoFxtiK",
+    "GnYTdZJR4cW7C12fjZq9zE6XBgQde4yximXij9k7pump",
+    "GtUBJZku8UWaaQAL5RyBYYTdTAphJ5gGMep5Hdsrpump",
+    "H11rCkJjj7CvkvJTF7mF7TxAVpxmr4UK8WEU5d52pump",
+    "RmtMAYVTTFv2iK9muMrXEoAnSSsZPPgRPbqZCKwNDYk",
+    "SPCXxcqXj6e5dJDVNovHN8744zkbhM2bYudU45BimGb",
+    "cbbtcf3aa214zXHbiAZQwf4122FBYbraNdFqgw4iMij",
+    "pumpCmXqMfrsAkQ5r49WcJnRayYRqmXz6ae8H7H9Dfn"
+  ],
+  "execute_calls": 0,
+  "fallbacks": 0,
+  "family_close": false,
+  "frozen_cells": [
+    {
+      "first_pool_created_at": "2026-08-19T06:27:39Z",
+      "identity_id": "RECENT_1",
+      "liquidity": 2365.492444417389,
+      "mint": "Ei7qzUYq5WTe9ggZBwzsnGkc59MDiR3bYAC79zFGpump",
+      "notional_atomic": "10000000",
+      "source_kind": "LIVE_TOKENS_V2_RECENT",
+      "stratum": "RECENT"
+    },
+    {
+      "first_pool_created_at": "2026-08-19T06:27:37Z",
+      "identity_id": "RECENT_2",
+      "liquidity": 3736.8352816972465,
+      "mint": "GvqDAS2f5mGLLYqj1mGx7UNA8xRsMbcr1LiVn3Uxpump",
+      "notional_atomic": "10000000",
+      "source_kind": "LIVE_TOKENS_V2_RECENT",
+      "stratum": "RECENT"
+    },
+    {
+      "first_pool_created_at": "2026-08-19T06:27:35Z",
+      "identity_id": "RECENT_3",
+      "liquidity": 2045.8484496349342,
+      "mint": "Gg3tDsRFSQnAdUyTtGuMSCBbnG2ikdohLjufLo4ypump",
+      "notional_atomic": "10000000",
+      "source_kind": "LIVE_TOKENS_V2_RECENT",
+      "stratum": "RECENT"
+    },
+    {
+      "first_pool_created_at": "2026-08-19T06:27:34Z",
+      "identity_id": "RECENT_4",
+      "liquidity": 2338.660498195136,
+      "mint": "8XJ9LH4WmDYYjEpm7gG5zMutR2Zrng58jc6sv7wKpump",
+      "notional_atomic": "10000000",
+      "source_kind": "LIVE_TOKENS_V2_RECENT",
+      "stratum": "RECENT"
+    },
+    {
+      "first_pool_created_at": "2026-08-19T06:27:29Z",
+      "identity_id": "RECENT_5",
+      "liquidity": 2492.8051916863888,
+      "mint": "27FbKmWWBqxqDqF4we8DguAu9sRHzvztGZLnJpejpump",
+      "notional_atomic": "10000000",
+      "source_kind": "LIVE_TOKENS_V2_RECENT",
+      "stratum": "RECENT"
+    },
+    {
+      "first_pool_created_at": "2026-08-19T06:27:23Z",
+      "identity_id": "RECENT_6",
+      "liquidity": 2667.4159263352362,
+      "mint": "G6PCj1bKM1poG6QCHtE9WjZZydMUb7MKGTSrkQwz9a6v",
+      "notional_atomic": "10000000",
+      "source_kind": "LIVE_TOKENS_V2_RECENT",
+      "stratum": "RECENT"
+    },
+    {
+      "first_pool_created_at": "2026-08-18T09:50:20Z",
+      "identity_id": "TRADED_1",
+      "liquidity": 21049.733067026315,
+      "mint": "6jRTP7MWb8ihnXLJc3R58i5ExrMvAxV9CybXPvYepump",
+      "notional_atomic": "10000000",
+      "source_kind": "LIVE_TOKENS_V2_TOPTRADED",
+      "stratum": "TRADED"
+    },
+    {
+      "first_pool_created_at": "2025-10-15T16:28:00Z",
+      "identity_id": "TRADED_2",
+      "liquidity": 571511.509847825,
+      "mint": "AymATz4TCL9sWNEEV9Kvyz45CHVhDZ6kUgjTJPzLpU9P",
+      "notional_atomic": "10000000",
+      "source_kind": "LIVE_TOKENS_V2_TOPTRADED",
+      "stratum": "TRADED"
+    },
+    {
+      "first_pool_created_at": "2026-08-17T16:48:48Z",
+      "identity_id": "TRADED_3",
+      "liquidity": 162333.3033787566,
+      "mint": "zj1jpp7QMveWHLs61vL9KMZf254KvW7j4AAmBF8ry2k",
+      "notional_atomic": "10000000",
+      "source_kind": "LIVE_TOKENS_V2_TOPTRADED",
+      "stratum": "TRADED"
+    },
+    {
+      "first_pool_created_at": "2026-05-02T03:31:54Z",
+      "identity_id": "TRADED_4",
+      "liquidity": 7623536.347446064,
+      "mint": "CWZ6BsdnjkDVTGkmL6bGbJXXig6ceef12KvyGQW14cMt",
+      "notional_atomic": "10000000",
+      "source_kind": "LIVE_TOKENS_V2_TOPTRADED",
+      "stratum": "TRADED"
+    },
+    {
+      "first_pool_created_at": "2026-08-19T05:09:09Z",
+      "identity_id": "TRADED_5",
+      "liquidity": 5095.264514171312,
+      "mint": "6Bcypi5Wp6vSoBhHaics4iRFYuDFVQZLDbRNTWoypump",
+      "notional_atomic": "10000000",
+      "source_kind": "LIVE_TOKENS_V2_TOPTRADED",
+      "stratum": "TRADED"
+    },
+    {
+      "first_pool_created_at": "2026-08-19T06:01:57Z",
+      "identity_id": "TRADED_6",
+      "liquidity": 5885.739742043333,
+      "mint": "uXZAPyQLRWVf2HyfHNVXMLymYUNpgGNv2v3APZRXnja",
+      "notional_atomic": "10000000",
+      "source_kind": "LIVE_TOKENS_V2_TOPTRADED",
+      "stratum": "TRADED"
+    }
+  ],
+  "h3600_role": "PREDECLARED_ROBUSTNESS_NOT_SEARCHABLE_Y",
+  "mechanism": {
+    "cells": [
+      {
+        "buy_terminal": "QUOTE_OBSERVED",
+        "fee_bps": {
+          "status": "OBSERVED",
+          "value": 10
+        },
+        "h900_terminal": "QUOTE_OBSERVED",
+        "identity_id": "RECENT_1",
+        "price_impact_pct": {
+          "status": "OBSERVED",
+          "value": "-0.013650012127098564"
+        },
+        "reverse_terminal": "QUOTE_OBSERVED",
+        "router": "metis",
+        "x_quoted_roundtrip_friction": "-0.0272609",
+        "x_status": "OBSERVED",
+        "y_equals_x": false,
+        "y_quoted_liquidation_recovery": "-0.0889127",
+        "y_status": "OBSERVED"
+      },
+      {
+        "buy_terminal": "QUOTE_OBSERVED",
+        "fee_bps": {
+          "status": "OBSERVED",
+          "value": 10
+        },
+        "h900_terminal": "QUOTE_OBSERVED",
+        "identity_id": "RECENT_2",
+        "price_impact_pct": {
+          "status": "OBSERVED",
+          "value": "-0.004679868444468378"
+        },
+        "reverse_terminal": "QUOTE_OBSERVED",
+        "router": "metis",
+        "x_quoted_roundtrip_friction": "-0.0272803",
+        "x_status": "OBSERVED",
+        "y_equals_x": true,
+        "y_quoted_liquidation_recovery": "-0.0272803",
+        "y_status": "OBSERVED"
+      },
+      {
+        "buy_terminal": "QUOTE_OBSERVED",
+        "fee_bps": {
+          "status": "OBSERVED",
+          "value": 10
+        },
+        "h900_terminal": "QUOTE_OBSERVED",
+        "identity_id": "RECENT_3",
+        "price_impact_pct": {
+          "status": "OBSERVED",
+          "value": "-0.013339574366765297"
+        },
+        "reverse_terminal": "QUOTE_OBSERVED",
+        "router": "metis",
+        "x_quoted_roundtrip_friction": "-0.026866",
+        "x_status": "OBSERVED",
+        "y_equals_x": false,
+        "y_quoted_liquidation_recovery": "-0.024282",
+        "y_status": "OBSERVED"
+      },
+      {
+        "buy_terminal": "QUOTE_OBSERVED",
+        "fee_bps": {
+          "status": "OBSERVED",
+          "value": 10
+        },
+        "h900_terminal": "PROVIDER_TYPED_FAILURE",
+        "identity_id": "RECENT_4",
+        "price_impact_pct": {
+          "status": "OBSERVED",
+          "value": "0.6316837640286217"
+        },
+        "reverse_terminal": "PROVIDER_TYPED_FAILURE",
+        "router": "metis",
+        "x_quoted_roundtrip_friction": null,
+        "x_status": "MISSING",
+        "y_equals_x": null,
+        "y_quoted_liquidation_recovery": null,
+        "y_status": "MISSING"
+      },
+      {
+        "buy_terminal": "QUOTE_OBSERVED",
+        "fee_bps": {
+          "status": "OBSERVED",
+          "value": 10
+        },
+        "h900_terminal": "QUOTE_OBSERVED",
+        "identity_id": "RECENT_5",
+        "price_impact_pct": {
+          "status": "OBSERVED",
+          "value": "0.0258007328746056"
+        },
+        "reverse_terminal": "QUOTE_OBSERVED",
+        "router": "metis",
+        "x_quoted_roundtrip_friction": "-0.0272814",
+        "x_status": "OBSERVED",
+        "y_equals_x": true,
+        "y_quoted_liquidation_recovery": "-0.0272814",
+        "y_status": "OBSERVED"
+      },
+      {
+        "buy_terminal": "QUOTE_OBSERVED",
+        "fee_bps": {
+          "status": "OBSERVED",
+          "value": 10
+        },
+        "h900_terminal": "QUOTE_OBSERVED",
+        "identity_id": "RECENT_6",
+        "price_impact_pct": {
+          "status": "OBSERVED",
+          "value": "-0.035563539260135626"
+        },
+        "reverse_terminal": "QUOTE_OBSERVED",
+        "router": "metis",
+        "x_quoted_roundtrip_friction": "-0.0243116",
+        "x_status": "OBSERVED",
+        "y_equals_x": false,
+        "y_quoted_liquidation_recovery": "-0.0715899",
+        "y_status": "OBSERVED"
+      },
+      {
+        "buy_terminal": "QUOTE_OBSERVED",
+        "fee_bps": {
+          "status": "OBSERVED",
+          "value": 10
+        },
+        "h900_terminal": "QUOTE_OBSERVED",
+        "identity_id": "TRADED_1",
+        "price_impact_pct": {
+          "status": "OBSERVED",
+          "value": "-0.052842634369070336"
+        },
+        "reverse_terminal": "QUOTE_OBSERVED",
+        "router": "metis",
+        "x_quoted_roundtrip_friction": "-0.0177117",
+        "x_status": "OBSERVED",
+        "y_equals_x": false,
+        "y_quoted_liquidation_recovery": "0.2182865",
+        "y_status": "OBSERVED"
+      },
+      {
+        "buy_terminal": "QUOTE_OBSERVED",
+        "fee_bps": {
+          "status": "OBSERVED",
+          "value": 10
+        },
+        "h900_terminal": "QUOTE_OBSERVED",
+        "identity_id": "TRADED_2",
+        "price_impact_pct": {
+          "status": "OBSERVED",
+          "value": "-0.0017033606261026876"
+        },
+        "reverse_terminal": "QUOTE_OBSERVED",
+        "router": "metis",
+        "x_quoted_roundtrip_friction": "-0.0043414",
+        "x_status": "OBSERVED",
+        "y_equals_x": false,
+        "y_quoted_liquidation_recovery": "-0.0046679",
+        "y_status": "OBSERVED"
+      },
+      {
+        "buy_terminal": "QUOTE_OBSERVED",
+        "fee_bps": {
+          "status": "OBSERVED",
+          "value": 10
+        },
+        "h900_terminal": "QUOTE_OBSERVED",
+        "identity_id": "TRADED_3",
+        "price_impact_pct": {
+          "status": "OBSERVED",
+          "value": "-0.014288065961311512"
+        },
+        "reverse_terminal": "QUOTE_OBSERVED",
+        "router": "metis",
+        "x_quoted_roundtrip_friction": "-0.0174628",
+        "x_status": "OBSERVED",
+        "y_equals_x": false,
+        "y_quoted_liquidation_recovery": "-0.0686042",
+        "y_status": "OBSERVED"
+      },
+      {
+        "buy_terminal": "QUOTE_OBSERVED",
+        "fee_bps": {
+          "status": "OBSERVED",
+          "value": 10
+        },
+        "h900_terminal": "QUOTE_OBSERVED",
+        "identity_id": "TRADED_4",
+        "price_impact_pct": {
+          "status": "OBSERVED",
+          "value": "-0.00120324716553413"
+        },
+        "reverse_terminal": "QUOTE_OBSERVED",
+        "router": "dflow",
+        "x_quoted_roundtrip_friction": "-0.0026104",
+        "x_status": "OBSERVED",
+        "y_equals_x": false,
+        "y_quoted_liquidation_recovery": "-0.0026175",
+        "y_status": "OBSERVED"
+      },
+      {
+        "buy_terminal": "QUOTE_OBSERVED",
+        "fee_bps": {
+          "status": "OBSERVED",
+          "value": 10
+        },
+        "h900_terminal": "QUOTE_OBSERVED",
+        "identity_id": "TRADED_5",
+        "price_impact_pct": {
+          "status": "OBSERVED",
+          "value": "-0.024579425697671516"
+        },
+        "reverse_terminal": "QUOTE_OBSERVED",
+        "router": "metis",
+        "x_quoted_roundtrip_friction": "-0.0292213",
+        "x_status": "OBSERVED",
+        "y_equals_x": false,
+        "y_quoted_liquidation_recovery": "-0.1465172",
+        "y_status": "OBSERVED"
+      },
+      {
+        "buy_terminal": "QUOTE_OBSERVED",
+        "fee_bps": {
+          "status": "OBSERVED",
+          "value": 10
+        },
+        "h900_terminal": "QUOTE_OBSERVED",
+        "identity_id": "TRADED_6",
+        "price_impact_pct": {
+          "status": "OBSERVED",
+          "value": "-0.03225944215107612"
+        },
+        "reverse_terminal": "QUOTE_OBSERVED",
+        "router": "metis",
+        "x_quoted_roundtrip_friction": "-0.0161336",
+        "x_status": "OBSERVED",
+        "y_equals_x": false,
+        "y_quoted_liquidation_recovery": "-0.317142",
+        "y_status": "OBSERVED"
+      }
+    ],
+    "complete_xy_count": 11,
+    "concordance_rate": "0.6944444444444444444444444444",
+    "concordant_pairs": 25,
+    "discordant_pairs": 11,
+    "expected_direction": "more_negative_t0_roundtrip_friction_ranks_more_negative_h900_quoted_recovery",
+    "h900_no_route_count": 0,
+    "h900_quote_observed_count": 11,
+    "scored": true,
+    "searchable_y_kind": "SELL_H900",
+    "tied_pairs": 0,
+    "time_separated_complete_xy_count": 9,
+    "verdict": "DIRECTIONAL_HINT_NOT_CONFIRMATION",
+    "y_equals_x_count": 2
+  },
+  "non_claims": [
+    "NO_EXECUTE",
+    "NO_TAKER_OR_SIGNER",
+    "NO_TRANSACTION_BYTES_IN_GIT",
+    "NO_ALPHA",
+    "NO_NETRETURN",
+    "NO_MOVE_3",
+    "NO_A1_REPLAY_AS_NEW_RESULT",
+    "NO_MOVE_2_AS_NEW_RESULT",
+    "NO_PAID_PLAN",
+    "NO_SECOND_PROVIDER",
+    "SCIENTIFIC_FAIL_MAY_STILL_BE_PRODUCT_PASS"
+  ],
+  "observations": [
+    {
+      "amount": "10000000",
+      "capture_envelope_sha256": "2c91112f866bd930beab928fd982d756cf28df98ab5cbf7b29ca6895573cc98b",
+      "consumed_call": true,
+      "due_at": "2026-08-19T06:27:52Z",
+      "horizon_seconds": 0,
+      "identity_id": "RECENT_1",
+      "input_mint": "So11111111111111111111111111111111111111112",
+      "kind": "BUY_T0",
+      "mint": "Ei7qzUYq5WTe9ggZBwzsnGkc59MDiR3bYAC79zFGpump",
+      "observation_id": "RECENT_1:10000000:BUY_T0",
+      "observed_at": "2026-08-19T06:27:55Z",
+      "output_mint": "Ei7qzUYq5WTe9ggZBwzsnGkc59MDiR3bYAC79zFGpump",
+      "parent_id": null,
+      "quote": {
+        "error_code": null,
+        "fee_bps": {
+          "status": "OBSERVED",
+          "value": 10
+        },
+        "in_amount": "10000000",
+        "mode": "manual",
+        "out_amount": "330422483317",
+        "platform_fee": {
+          "status": "OBSERVED",
+          "value": {
+            "feeBps": 10,
+            "feeMint": "So11111111111111111111111111111111111111112"
+          }
+        },
+        "price_impact_pct": {
+          "status": "OBSERVED",
+          "value": "-0.013650012127098564"
+        },
+        "request_id_present": true,
+        "route_plan": {
+          "fee_amounts_present": false,
+          "hop_count": 1,
+          "status": "OBSERVED"
+        },
+        "router": "metis",
+        "surface": "QUOTE_OBSERVED",
+        "transaction_present": false
+      },
+      "stratum": "RECENT",
+      "terminal": "QUOTE_OBSERVED",
+      "terminal_error": null,
+      "transport": {
+        "http_status": 200,
+        "request_count": 1,
+        "response_bytes": 1264,
+        "response_sha256": "78b18f8ca2761742a286c981d8011f7fa31df596a24db0f582f8a530ceb2419f",
+        "safe_response_headers": {
+          "x-api-gateway-request-id": "UEtIRQIP-clIlQDmHKsAAXD9EGWe-23mPAEzxvMuzic6Y5qe7lIj9A=="
+        },
+        "url_has_api_key": false,
+        "url_has_taker": false
+      },
+      "wave": "t0"
+    },
+    {
+      "amount": "330422483317",
+      "capture_envelope_sha256": "bcca99114dcd2f376717d7454d1c95666c3acc5f2c7fcf785bb70551be07afa6",
+      "consumed_call": true,
+      "due_at": "2026-08-19T06:27:52Z",
+      "horizon_seconds": 0,
+      "identity_id": "RECENT_1",
+      "input_mint": "Ei7qzUYq5WTe9ggZBwzsnGkc59MDiR3bYAC79zFGpump",
+      "kind": "REVERSE_T0",
+      "mint": "Ei7qzUYq5WTe9ggZBwzsnGkc59MDiR3bYAC79zFGpump",
+      "observation_id": "RECENT_1:10000000:REVERSE_T0",
+      "observed_at": "2026-08-19T06:27:59Z",
+      "output_mint": "So11111111111111111111111111111111111111112",
+      "parent_id": "RECENT_1:10000000:BUY_T0",
+      "quote": {
+        "error_code": null,
+        "fee_bps": {
+          "status": "OBSERVED",
+          "value": 10
+        },
+        "in_amount": "330422483317",
+        "mode": "manual",
+        "out_amount": "9727391",
+        "platform_fee": {
+          "status": "OBSERVED",
+          "value": {
+            "feeBps": 10,
+            "feeMint": "So11111111111111111111111111111111111111112"
+          }
+        },
+        "price_impact_pct": {
+          "status": "OBSERVED",
+          "value": "-0.013799247772338714"
+        },
+        "request_id_present": true,
+        "route_plan": {
+          "fee_amounts_present": false,
+          "hop_count": 1,
+          "status": "OBSERVED"
+        },
+        "router": "metis",
+        "surface": "QUOTE_OBSERVED",
+        "transaction_present": false
+      },
+      "stratum": "RECENT",
+      "terminal": "QUOTE_OBSERVED",
+      "terminal_error": null,
+      "transport": {
+        "http_status": 200,
+        "request_count": 1,
+        "response_bytes": 1257,
+        "response_sha256": "75378f4823b4bc70da1d49cdf6f6c666402bb2b5b6e8082a91f57ecfd23461a0",
+        "safe_response_headers": {
+          "x-api-gateway-request-id": "1HU1PFEec61OIPu3v8woA-r8Rp1R-6beQ1qCT8_-u1svKRS6BZPBBA=="
+        },
+        "url_has_api_key": false,
+        "url_has_taker": false
+      },
+      "wave": "t0"
+    },
+    {
+      "amount": "330422483317",
+      "capture_envelope_sha256": "38ca98335e8e44811a059a136a82f096c8d694e0336aaaf4c36e07666a39f8af",
+      "consumed_call": true,
+      "due_at": "2026-08-19T06:42:52Z",
+      "horizon_seconds": 900,
+      "identity_id": "RECENT_1",
+      "input_mint": "Ei7qzUYq5WTe9ggZBwzsnGkc59MDiR3bYAC79zFGpump",
+      "kind": "SELL_H900",
+      "lateness_slack_seconds": 120,
+      "mint": "Ei7qzUYq5WTe9ggZBwzsnGkc59MDiR3bYAC79zFGpump",
+      "observation_id": "RECENT_1:10000000:SELL_H900",
+      "observed_at": "2026-08-19T06:42:52Z",
+      "output_mint": "So11111111111111111111111111111111111111112",
+      "parent_id": "RECENT_1:10000000:BUY_T0",
+      "quote": {
+        "error_code": null,
+        "fee_bps": {
+          "status": "OBSERVED",
+          "value": 10
+        },
+        "in_amount": "330422483317",
+        "mode": "manual",
+        "out_amount": "9110873",
+        "platform_fee": {
+          "status": "OBSERVED",
+          "value": {
+            "feeBps": 10,
+            "feeMint": "So11111111111111111111111111111111111111112"
+          }
+        },
+        "price_impact_pct": {
+          "status": "OBSERVED",
+          "value": "-0.014120813469562734"
+        },
+        "request_id_present": true,
+        "route_plan": {
+          "fee_amounts_present": false,
+          "hop_count": 1,
+          "status": "OBSERVED"
+        },
+        "router": "metis",
+        "surface": "QUOTE_OBSERVED",
+        "transaction_present": false
+      },
+      "stratum": "RECENT",
+      "terminal": "QUOTE_OBSERVED",
+      "terminal_error": null,
+      "transport": {
+        "http_status": 200,
+        "request_count": 1,
+        "response_bytes": 1254,
+        "response_sha256": "264ba60afc53aad44b9d7c904598dd7986d1e0e6e98a5ecba49ecef8bb12cd4d",
+        "safe_response_headers": {
+          "x-api-gateway-request-id": "kv-5R64znbK6fGFMFjZ2TnYL-ZikY7ZV_4cUbJcxOyyLc8Pa-9kTRg=="
+        },
+        "url_has_api_key": false,
+        "url_has_taker": false
+      },
+      "wave": "horizon"
+    },
+    {
+      "amount": "330422483317",
+      "capture_envelope_sha256": "c3a85575482840feea17f897afde320e3904ab80e9cf7878c00eedf97550a7a3",
+      "consumed_call": true,
+      "due_at": "2026-08-19T07:27:52Z",
+      "horizon_seconds": 3600,
+      "identity_id": "RECENT_1",
+      "input_mint": "Ei7qzUYq5WTe9ggZBwzsnGkc59MDiR3bYAC79zFGpump",
+      "kind": "SELL_H3600",
+      "lateness_slack_seconds": 120,
+      "mint": "Ei7qzUYq5WTe9ggZBwzsnGkc59MDiR3bYAC79zFGpump",
+      "observation_id": "RECENT_1:10000000:SELL_H3600",
+      "observed_at": "2026-08-19T07:27:52Z",
+      "output_mint": "So11111111111111111111111111111111111111112",
+      "parent_id": "RECENT_1:10000000:BUY_T0",
+      "quote": {
+        "error_code": null,
+        "fee_bps": {
+          "status": "OBSERVED",
+          "value": 10
+        },
+        "in_amount": "330422483317",
+        "mode": "manual",
+        "out_amount": "9110873",
+        "platform_fee": {
+          "status": "OBSERVED",
+          "value": {
+            "feeBps": 10,
+            "feeMint": "So11111111111111111111111111111111111111112"
+          }
+        },
+        "price_impact_pct": {
+          "status": "OBSERVED",
+          "value": "-0.012391987346917816"
+        },
+        "request_id_present": true,
+        "route_plan": {
+          "fee_amounts_present": false,
+          "hop_count": 1,
+          "status": "OBSERVED"
+        },
+        "router": "metis",
+        "surface": "QUOTE_OBSERVED",
+        "transaction_present": false
+      },
+      "stratum": "RECENT",
+      "terminal": "QUOTE_OBSERVED",
+      "terminal_error": null,
+      "transport": {
+        "http_status": 200,
+        "request_count": 1,
+        "response_bytes": 1257,
+        "response_sha256": "8b3b35a5060e6d1d1373288226225d08dfec1ccdcbb33344a6aceabd434f0972",
+        "safe_response_headers": {
+          "x-api-gateway-request-id": "fmGCn89BiRQJ1-Riy9iPMeumWVngmjQF1U17cKpo2X9-lTRci6ttYg=="
+        },
+        "url_has_api_key": false,
+        "url_has_taker": false
+      },
+      "wave": "horizon"
+    },
+    {
+      "amount": null,
+      "consumed_call": false,
+      "due_at": "2026-08-19T10:27:52Z",
+      "horizon_seconds": 14400,
+      "identity_id": "RECENT_1",
+      "input_mint": "Ei7qzUYq5WTe9ggZBwzsnGkc59MDiR3bYAC79zFGpump",
+      "kind": "SELL_H14400",
+      "lateness_slack_seconds": 120,
+      "mint": "Ei7qzUYq5WTe9ggZBwzsnGkc59MDiR3bYAC79zFGpump",
+      "observation_id": "RECENT_1:10000000:SELL_H14400",
+      "output_mint": "So11111111111111111111111111111111111111112",
+      "parent_id": "RECENT_1:10000000:BUY_T0",
+      "stratum": "RECENT",
+      "terminal": "EXPLICIT_GAP",
+      "wave": "gap"
+    },
+    {
+      "amount": "10000000",
+      "capture_envelope_sha256": "07fb2e0a9ddec9033c2d949c121eed0c46122c6c0793d8dbbb1e9a0efaf7f927",
+      "consumed_call": true,
+      "due_at": "2026-08-19T06:27:52Z",
+      "horizon_seconds": 0,
+      "identity_id": "RECENT_2",
+      "input_mint": "So11111111111111111111111111111111111111112",
+      "kind": "BUY_T0",
+      "mint": "GvqDAS2f5mGLLYqj1mGx7UNA8xRsMbcr1LiVn3Uxpump",
+      "observation_id": "RECENT_2:10000000:BUY_T0",
+      "observed_at": "2026-08-19T06:28:02Z",
+      "output_mint": "GvqDAS2f5mGLLYqj1mGx7UNA8xRsMbcr1LiVn3Uxpump",
+      "parent_id": null,
+      "quote": {
+        "error_code": null,
+        "fee_bps": {
+          "status": "OBSERVED",
+          "value": 10
+        },
+        "in_amount": "10000000",
+        "mode": "manual",
+        "out_amount": "351596580459",
+        "platform_fee": {
+          "status": "OBSERVED",
+          "value": {
+            "feeBps": 10,
+            "feeMint": "So11111111111111111111111111111111111111112"
+          }
+        },
+        "price_impact_pct": {
+          "status": "OBSERVED",
+          "value": "-0.004679868444468378"
+        },
+        "request_id_present": true,
+        "route_plan": {
+          "fee_amounts_present": false,
+          "hop_count": 1,
+          "status": "OBSERVED"
+        },
+        "router": "metis",
+        "surface": "QUOTE_OBSERVED",
+        "transaction_present": false
+      },
+      "stratum": "RECENT",
+      "terminal": "QUOTE_OBSERVED",
+      "terminal_error": null,
+      "transport": {
+        "http_status": 200,
+        "request_count": 1,
+        "response_bytes": 1264,
+        "response_sha256": "065cb2d3b1611f17384ae45dcbad86729038e2965c23df44d2d1851abc99d4ef",
+        "safe_response_headers": {
+          "x-api-gateway-request-id": "fAVzZPTfnOEtWeln1qI4mmrizmMvn4XfFLFolWLL3m9s9kRcFm0qcg=="
+        },
+        "url_has_api_key": false,
+        "url_has_taker": false
+      },
+      "wave": "t0"
+    },
+    {
+      "amount": "351596580459",
+      "capture_envelope_sha256": "513d8d6bb3bcde1109333a9ac3e31d1da7aa0c9377eeb004bd968582476aadbe",
+      "consumed_call": true,
+      "due_at": "2026-08-19T06:27:52Z",
+      "horizon_seconds": 0,
+      "identity_id": "RECENT_2",
+      "input_mint": "GvqDAS2f5mGLLYqj1mGx7UNA8xRsMbcr1LiVn3Uxpump",
+      "kind": "REVERSE_T0",
+      "mint": "GvqDAS2f5mGLLYqj1mGx7UNA8xRsMbcr1LiVn3Uxpump",
+      "observation_id": "RECENT_2:10000000:REVERSE_T0",
+      "observed_at": "2026-08-19T06:28:05Z",
+      "output_mint": "So11111111111111111111111111111111111111112",
+      "parent_id": "RECENT_2:10000000:BUY_T0",
+      "quote": {
+        "error_code": null,
+        "fee_bps": {
+          "status": "OBSERVED",
+          "value": 10
+        },
+        "in_amount": "351596580459",
+        "mode": "manual",
+        "out_amount": "9727197",
+        "platform_fee": {
+          "status": "OBSERVED",
+          "value": {
+            "feeBps": 10,
+            "feeMint": "So11111111111111111111111111111111111111112"
+          }
+        },
+        "price_impact_pct": {
+          "status": "OBSERVED",
+          "value": "-0.022706695905176367"
+        },
+        "request_id_present": true,
+        "route_plan": {
+          "fee_amounts_present": false,
+          "hop_count": 1,
+          "status": "OBSERVED"
+        },
+        "router": "metis",
+        "surface": "QUOTE_OBSERVED",
+        "transaction_present": false
+      },
+      "stratum": "RECENT",
+      "terminal": "QUOTE_OBSERVED",
+      "terminal_error": null,
+      "transport": {
+        "http_status": 200,
+        "request_count": 1,
+        "response_bytes": 1256,
+        "response_sha256": "ac5915914dbad8746f7e259f555c3301e99002e8e461c51989a488cadac87469",
+        "safe_response_headers": {
+          "x-api-gateway-request-id": "w7aFOAp-4DH9L8rFv6dGh1PM3xQhgi1LC6FicrUXGod-kg2a9xOxbg=="
+        },
+        "url_has_api_key": false,
+        "url_has_taker": false
+      },
+      "wave": "t0"
+    },
+    {
+      "amount": "351596580459",
+      "capture_envelope_sha256": "ba7ada602f05a0392733a1239b298a2502705c46dfa49296eeb285224af948e3",
+      "consumed_call": true,
+      "due_at": "2026-08-19T06:42:52Z",
+      "horizon_seconds": 900,
+      "identity_id": "RECENT_2",
+      "input_mint": "GvqDAS2f5mGLLYqj1mGx7UNA8xRsMbcr1LiVn3Uxpump",
+      "kind": "SELL_H900",
+      "lateness_slack_seconds": 120,
+      "mint": "GvqDAS2f5mGLLYqj1mGx7UNA8xRsMbcr1LiVn3Uxpump",
+      "observation_id": "RECENT_2:10000000:SELL_H900",
+      "observed_at": "2026-08-19T06:42:56Z",
+      "output_mint": "So11111111111111111111111111111111111111112",
+      "parent_id": "RECENT_2:10000000:BUY_T0",
+      "quote": {
+        "error_code": null,
+        "fee_bps": {
+          "status": "OBSERVED",
+          "value": 10
+        },
+        "in_amount": "351596580459",
+        "mode": "manual",
+        "out_amount": "9727197",
+        "platform_fee": {
+          "status": "OBSERVED",
+          "value": {
+            "feeBps": 10,
+            "feeMint": "So11111111111111111111111111111111111111112"
+          }
+        },
+        "price_impact_pct": {
+          "status": "OBSERVED",
+          "value": "-0.022319955195460917"
+        },
+        "request_id_present": true,
+        "route_plan": {
+          "fee_amounts_present": false,
+          "hop_count": 1,
+          "status": "OBSERVED"
+        },
+        "router": "metis",
+        "surface": "QUOTE_OBSERVED",
+        "transaction_present": false
+      },
+      "stratum": "RECENT",
+      "terminal": "QUOTE_OBSERVED",
+      "terminal_error": null,
+      "transport": {
+        "http_status": 200,
+        "request_count": 1,
+        "response_bytes": 1256,
+        "response_sha256": "da49eb75beb044173ca680b7dade32f33f3dad110c9aaed1827fb0b8ce017517",
+        "safe_response_headers": {
+          "x-api-gateway-request-id": "sfyUFNNOWHA-ysxaQSaQ3vvBV-_Yk_9AVuDyf1bTA6I59jDUVn-Hrw=="
+        },
+        "url_has_api_key": false,
+        "url_has_taker": false
+      },
+      "wave": "horizon"
+    },
+    {
+      "amount": "351596580459",
+      "capture_envelope_sha256": "47f80f180c86923d179f8459db9291e5387b1a94eff60f62899c034031853557",
+      "consumed_call": true,
+      "due_at": "2026-08-19T07:27:52Z",
+      "horizon_seconds": 3600,
+      "identity_id": "RECENT_2",
+      "input_mint": "GvqDAS2f5mGLLYqj1mGx7UNA8xRsMbcr1LiVn3Uxpump",
+      "kind": "SELL_H3600",
+      "lateness_slack_seconds": 120,
+      "mint": "GvqDAS2f5mGLLYqj1mGx7UNA8xRsMbcr1LiVn3Uxpump",
+      "observation_id": "RECENT_2:10000000:SELL_H3600",
+      "observed_at": "2026-08-19T07:27:56Z",
+      "output_mint": "So11111111111111111111111111111111111111112",
+      "parent_id": "RECENT_2:10000000:BUY_T0",
+      "quote": {
+        "error_code": null,
+        "fee_bps": {
+          "status": "OBSERVED",
+          "value": 10
+        },
+        "in_amount": "351596580459",
+        "mode": "manual",
+        "out_amount": "9727197",
+        "platform_fee": {
+          "status": "OBSERVED",
+          "value": {
+            "feeBps": 10,
+            "feeMint": "So11111111111111111111111111111111111111112"
+          }
+        },
+        "price_impact_pct": {
+          "status": "OBSERVED",
+          "value": "-0.02090782554555926"
+        },
+        "request_id_present": true,
+        "route_plan": {
+          "fee_amounts_present": false,
+          "hop_count": 1,
+          "status": "OBSERVED"
+        },
+        "router": "metis",
+        "surface": "QUOTE_OBSERVED",
+        "transaction_present": false
+      },
+      "stratum": "RECENT",
+      "terminal": "QUOTE_OBSERVED",
+      "terminal_error": null,
+      "transport": {
+        "http_status": 200,
+        "request_count": 1,
+        "response_bytes": 1252,
+        "response_sha256": "e5d079f01b97ede7bb064c6dc5793455fdb97f92c8fedfaef29cd88276e13915",
+        "safe_response_headers": {
+          "x-api-gateway-request-id": "_H2TC5TwdHFsBkGA-4la9RwtA_q5YFn4PUyvChWbVJDoqZULWqOM5Q=="
+        },
+        "url_has_api_key": false,
+        "url_has_taker": false
+      },
+      "wave": "horizon"
+    },
+    {
+      "amount": null,
+      "consumed_call": false,
+      "due_at": "2026-08-19T10:27:52Z",
+      "horizon_seconds": 14400,
+      "identity_id": "RECENT_2",
+      "input_mint": "GvqDAS2f5mGLLYqj1mGx7UNA8xRsMbcr1LiVn3Uxpump",
+      "kind": "SELL_H14400",
+      "lateness_slack_seconds": 120,
+      "mint": "GvqDAS2f5mGLLYqj1mGx7UNA8xRsMbcr1LiVn3Uxpump",
+      "observation_id": "RECENT_2:10000000:SELL_H14400",
+      "output_mint": "So11111111111111111111111111111111111111112",
+      "parent_id": "RECENT_2:10000000:BUY_T0",
+      "stratum": "RECENT",
+      "terminal": "EXPLICIT_GAP",
+      "wave": "gap"
+    },
+    {
+      "amount": "10000000",
+      "capture_envelope_sha256": "6a36e1a4f3be84935a5aa0272b94ed95226376aa183d4466f599c7306c630efd",
+      "consumed_call": true,
+      "due_at": "2026-08-19T06:27:52Z",
+      "horizon_seconds": 0,
+      "identity_id": "RECENT_3",
+      "input_mint": "So11111111111111111111111111111111111111112",
+      "kind": "BUY_T0",
+      "mint": "Gg3tDsRFSQnAdUyTtGuMSCBbnG2ikdohLjufLo4ypump",
+      "observation_id": "RECENT_3:10000000:BUY_T0",
+      "observed_at": "2026-08-19T06:28:09Z",
+      "output_mint": "Gg3tDsRFSQnAdUyTtGuMSCBbnG2ikdohLjufLo4ypump",
+      "parent_id": null,
+      "quote": {
+        "error_code": null,
+        "fee_bps": {
+          "status": "OBSERVED",
+          "value": 10
+        },
+        "in_amount": "10000000",
+        "mode": "manual",
+        "out_amount": "149401247586",
+        "platform_fee": {
+          "status": "OBSERVED",
+          "value": {
+            "feeBps": 10,
+            "feeMint": "So11111111111111111111111111111111111111112"
+          }
+        },
+        "price_impact_pct": {
+          "status": "OBSERVED",
+          "value": "-0.013339574366765297"
+        },
+        "request_id_present": true,
+        "route_plan": {
+          "fee_amounts_present": false,
+          "hop_count": 3,
+          "status": "OBSERVED"
+        },
+        "router": "metis",
+        "surface": "QUOTE_OBSERVED",
+        "transaction_present": false
+      },
+      "stratum": "RECENT",
+      "terminal": "QUOTE_OBSERVED",
+      "terminal_error": null,
+      "transport": {
+        "http_status": 200,
+        "request_count": 1,
+        "response_bytes": 1878,
+        "response_sha256": "5f27927a8c65080930a0447e6e3701e42fb8b69ad14cf60cea5c1fcbe5a0e102",
+        "safe_response_headers": {
+          "x-api-gateway-request-id": "m17nnWnma3MR7uO8nRicA2yA_RMp66mFrHN7sQ0oMiKBxWGxF9gXUg=="
+        },
+        "url_has_api_key": false,
+        "url_has_taker": false
+      },
+      "wave": "t0"
+    },
+    {
+      "amount": "149401247586",
+      "capture_envelope_sha256": "eefa812e0f9e8458ec07e0512e18e92cc5f4cdd4b67218b18335fd1034ee3e8f",
+      "consumed_call": true,
+      "due_at": "2026-08-19T06:27:52Z",
+      "horizon_seconds": 0,
+      "identity_id": "RECENT_3",
+      "input_mint": "Gg3tDsRFSQnAdUyTtGuMSCBbnG2ikdohLjufLo4ypump",
+      "kind": "REVERSE_T0",
+      "mint": "Gg3tDsRFSQnAdUyTtGuMSCBbnG2ikdohLjufLo4ypump",
+      "observation_id": "RECENT_3:10000000:REVERSE_T0",
+      "observed_at": "2026-08-19T06:28:12Z",
+      "output_mint": "So11111111111111111111111111111111111111112",
+      "parent_id": "RECENT_3:10000000:BUY_T0",
+      "quote": {
+        "error_code": null,
+        "fee_bps": {
+          "status": "OBSERVED",
+          "value": 10
+        },
+        "in_amount": "149401247586",
+        "mode": "manual",
+        "out_amount": "9731340",
+        "platform_fee": {
+          "status": "OBSERVED",
+          "value": {
+            "feeBps": 10,
+            "feeMint": "So11111111111111111111111111111111111111112"
+          }
+        },
+        "price_impact_pct": {
+          "status": "OBSERVED",
+          "value": "-0.013709301885249275"
+        },
+        "request_id_present": true,
+        "route_plan": {
+          "fee_amounts_present": false,
+          "hop_count": 3,
+          "status": "OBSERVED"
+        },
+        "router": "metis",
+        "surface": "QUOTE_OBSERVED",
+        "transaction_present": false
+      },
+      "stratum": "RECENT",
+      "terminal": "QUOTE_OBSERVED",
+      "terminal_error": null,
+      "transport": {
+        "http_status": 200,
+        "request_count": 1,
+        "response_bytes": 1865,
+        "response_sha256": "e0ba5f13192936945cb77f2c3505ee73cee2ddfec6ac29af7c55d3a8203fb479",
+        "safe_response_headers": {
+          "x-api-gateway-request-id": "ILgi2hfUnEcOmXEI_aZlMxwA0Ny7OF-i-fjiQjGAkpVPc6fBF4EZKA=="
+        },
+        "url_has_api_key": false,
+        "url_has_taker": false
+      },
+      "wave": "t0"
+    },
+    {
+      "amount": "149401247586",
+      "capture_envelope_sha256": "7c792d8f5d6a687fbbe4e1f2cc99d05d23bf8c0177b5b073ffb69af9982f906c",
+      "consumed_call": true,
+      "due_at": "2026-08-19T06:42:52Z",
+      "horizon_seconds": 900,
+      "identity_id": "RECENT_3",
+      "input_mint": "Gg3tDsRFSQnAdUyTtGuMSCBbnG2ikdohLjufLo4ypump",
+      "kind": "SELL_H900",
+      "lateness_slack_seconds": 120,
+      "mint": "Gg3tDsRFSQnAdUyTtGuMSCBbnG2ikdohLjufLo4ypump",
+      "observation_id": "RECENT_3:10000000:SELL_H900",
+      "observed_at": "2026-08-19T06:42:59Z",
+      "output_mint": "So11111111111111111111111111111111111111112",
+      "parent_id": "RECENT_3:10000000:BUY_T0",
+      "quote": {
+        "error_code": null,
+        "fee_bps": {
+          "status": "OBSERVED",
+          "value": 10
+        },
+        "in_amount": "149401247586",
+        "mode": "manual",
+        "out_amount": "9757180",
+        "platform_fee": {
+          "status": "OBSERVED",
+          "value": {
+            "feeBps": 10,
+            "feeMint": "So11111111111111111111111111111111111111112"
+          }
+        },
+        "price_impact_pct": {
+          "status": "OBSERVED",
+          "value": "-0.010761708711623847"
+        },
+        "request_id_present": true,
+        "route_plan": {
+          "fee_amounts_present": false,
+          "hop_count": 2,
+          "status": "OBSERVED"
+        },
+        "router": "dflow",
+        "surface": "QUOTE_OBSERVED",
+        "transaction_present": false
+      },
+      "stratum": "RECENT",
+      "terminal": "QUOTE_OBSERVED",
+      "terminal_error": null,
+      "transport": {
+        "http_status": 200,
+        "request_count": 1,
+        "response_bytes": 1561,
+        "response_sha256": "1c03e266b8803fa7633e0cb231a18513a4adf7d0c80adfe663f18ec48639416c",
+        "safe_response_headers": {
+          "x-api-gateway-request-id": "QZQfmh5JEQ2LNqLYsuyw470Jk9c9HQztMIGPd79hxa2txb1gbeCQ1Q=="
+        },
+        "url_has_api_key": false,
+        "url_has_taker": false
+      },
+      "wave": "horizon"
+    },
+    {
+      "amount": "149401247586",
+      "capture_envelope_sha256": "786298063ee8a500f5861b76e308166f945e3ae1ff7e8cab5a0ce1d8808345af",
+      "consumed_call": true,
+      "due_at": "2026-08-19T07:27:52Z",
+      "horizon_seconds": 3600,
+      "identity_id": "RECENT_3",
+      "input_mint": "Gg3tDsRFSQnAdUyTtGuMSCBbnG2ikdohLjufLo4ypump",
+      "kind": "SELL_H3600",
+      "lateness_slack_seconds": 120,
+      "mint": "Gg3tDsRFSQnAdUyTtGuMSCBbnG2ikdohLjufLo4ypump",
+      "observation_id": "RECENT_3:10000000:SELL_H3600",
+      "observed_at": "2026-08-19T07:27:59Z",
+      "output_mint": "So11111111111111111111111111111111111111112",
+      "parent_id": "RECENT_3:10000000:BUY_T0",
+      "quote": {
+        "error_code": null,
+        "fee_bps": {
+          "status": "OBSERVED",
+          "value": 10
+        },
+        "in_amount": "149401247586",
+        "mode": "manual",
+        "out_amount": "9743696",
+        "platform_fee": {
+          "status": "OBSERVED",
+          "value": {
+            "feeBps": 10,
+            "feeMint": "So11111111111111111111111111111111111111112"
+          }
+        },
+        "price_impact_pct": {
+          "status": "OBSERVED",
+          "value": "-0.010777761254856794"
+        },
+        "request_id_present": true,
+        "route_plan": {
+          "fee_amounts_present": false,
+          "hop_count": 2,
+          "status": "OBSERVED"
+        },
+        "router": "dflow",
+        "surface": "QUOTE_OBSERVED",
+        "transaction_present": false
+      },
+      "stratum": "RECENT",
+      "terminal": "QUOTE_OBSERVED",
+      "terminal_error": null,
+      "transport": {
+        "http_status": 200,
+        "request_count": 1,
+        "response_bytes": 1561,
+        "response_sha256": "ee823009707c30e266aa525bcc3352cc1346ad637dbbb857b9b9115f209c1235",
+        "safe_response_headers": {
+          "x-api-gateway-request-id": "OoqL_NQqi7OmR25hjbX0UQxwYzop_5JLA-ylLIFXbxFuik54Aom1_w=="
+        },
+        "url_has_api_key": false,
+        "url_has_taker": false
+      },
+      "wave": "horizon"
+    },
+    {
+      "amount": null,
+      "consumed_call": false,
+      "due_at": "2026-08-19T10:27:52Z",
+      "horizon_seconds": 14400,
+      "identity_id": "RECENT_3",
+      "input_mint": "Gg3tDsRFSQnAdUyTtGuMSCBbnG2ikdohLjufLo4ypump",
+      "kind": "SELL_H14400",
+      "lateness_slack_seconds": 120,
+      "mint": "Gg3tDsRFSQnAdUyTtGuMSCBbnG2ikdohLjufLo4ypump",
+      "observation_id": "RECENT_3:10000000:SELL_H14400",
+      "output_mint": "So11111111111111111111111111111111111111112",
+      "parent_id": "RECENT_3:10000000:BUY_T0",
+      "stratum": "RECENT",
+      "terminal": "EXPLICIT_GAP",
+      "wave": "gap"
+    },
+    {
+      "amount": "10000000",
+      "capture_envelope_sha256": "4162577dd264e9e516cf81da62c94ffcfb2bc4301492d77f8be4c50ccadb67f7",
+      "consumed_call": true,
+      "due_at": "2026-08-19T06:27:52Z",
+      "horizon_seconds": 0,
+      "identity_id": "RECENT_4",
+      "input_mint": "So11111111111111111111111111111111111111112",
+      "kind": "BUY_T0",
+      "mint": "8XJ9LH4WmDYYjEpm7gG5zMutR2Zrng58jc6sv7wKpump",
+      "observation_id": "RECENT_4:10000000:BUY_T0",
+      "observed_at": "2026-08-19T06:28:15Z",
+      "output_mint": "8XJ9LH4WmDYYjEpm7gG5zMutR2Zrng58jc6sv7wKpump",
+      "parent_id": null,
+      "quote": {
+        "error_code": null,
+        "fee_bps": {
+          "status": "OBSERVED",
+          "value": 10
+        },
+        "in_amount": "10000000",
+        "mode": "manual",
+        "out_amount": "3032751247104",
+        "platform_fee": {
+          "status": "OBSERVED",
+          "value": {
+            "feeBps": 10,
+            "feeMint": "So11111111111111111111111111111111111111112"
+          }
+        },
+        "price_impact_pct": {
+          "status": "OBSERVED",
+          "value": "0.6316837640286217"
+        },
+        "request_id_present": true,
+        "route_plan": {
+          "fee_amounts_present": false,
+          "hop_count": 1,
+          "status": "OBSERVED"
+        },
+        "router": "metis",
+        "surface": "QUOTE_OBSERVED",
+        "transaction_present": false
+      },
+      "stratum": "RECENT",
+      "terminal": "QUOTE_OBSERVED",
+      "terminal_error": null,
+      "transport": {
+        "http_status": 200,
+        "request_count": 1,
+        "response_bytes": 1262,
+        "response_sha256": "70340b6e3f87a55f7c904bead24390cc213a09f5bb853cb7727c5e788cd39fc5",
+        "safe_response_headers": {
+          "x-api-gateway-request-id": "ElVdtcWfLsb4VONtYJQUQS4kk-Ohg8l0fBg8I1XaNqCxRhANND6OtA=="
+        },
+        "url_has_api_key": false,
+        "url_has_taker": false
+      },
+      "wave": "t0"
+    },
+    {
+      "amount": "3032751247104",
+      "capture_envelope_sha256": "0f87a19c6376b0b8105ecae5a395f26de65ddb7ad1ac9c447b3a14af55e2d3f2",
+      "consumed_call": true,
+      "due_at": "2026-08-19T06:27:52Z",
+      "horizon_seconds": 0,
+      "identity_id": "RECENT_4",
+      "input_mint": "8XJ9LH4WmDYYjEpm7gG5zMutR2Zrng58jc6sv7wKpump",
+      "kind": "REVERSE_T0",
+      "mint": "8XJ9LH4WmDYYjEpm7gG5zMutR2Zrng58jc6sv7wKpump",
+      "observation_id": "RECENT_4:10000000:REVERSE_T0",
+      "observed_at": "2026-08-19T06:28:19Z",
+      "output_mint": "So11111111111111111111111111111111111111112",
+      "parent_id": "RECENT_4:10000000:BUY_T0",
+      "quote": null,
+      "stratum": "RECENT",
+      "terminal": "PROVIDER_TYPED_FAILURE",
+      "terminal_error": "HTTP_400",
+      "transport": {
+        "http_status": 400,
+        "request_count": 1,
+        "response_bytes": 83,
+        "response_sha256": "6bcba1611033e4041bca7125bf92faaf0b8f4dab165a161ed4f4843bd771af49",
+        "safe_response_headers": {
+          "x-api-gateway-request-id": "nNM_Yw2oCDHmM-pXPDvTTpP5ay6UfdeWwgiZDNyk2rViAAOuXD7TiQ=="
+        },
+        "url_has_api_key": false,
+        "url_has_taker": false
+      },
+      "wave": "t0"
+    },
+    {
+      "amount": "3032751247104",
+      "capture_envelope_sha256": "63523d746c3bdbe7be4fa21215877bd194ebd7cb203ac709ae0385c5cdecfd0b",
+      "consumed_call": true,
+      "due_at": "2026-08-19T06:42:52Z",
+      "horizon_seconds": 900,
+      "identity_id": "RECENT_4",
+      "input_mint": "8XJ9LH4WmDYYjEpm7gG5zMutR2Zrng58jc6sv7wKpump",
+      "kind": "SELL_H900",
+      "lateness_slack_seconds": 120,
+      "mint": "8XJ9LH4WmDYYjEpm7gG5zMutR2Zrng58jc6sv7wKpump",
+      "observation_id": "RECENT_4:10000000:SELL_H900",
+      "observed_at": "2026-08-19T06:43:02Z",
+      "output_mint": "So11111111111111111111111111111111111111112",
+      "parent_id": "RECENT_4:10000000:BUY_T0",
+      "quote": null,
+      "stratum": "RECENT",
+      "terminal": "PROVIDER_TYPED_FAILURE",
+      "terminal_error": "HTTP_400",
+      "transport": {
+        "http_status": 400,
+        "request_count": 1,
+        "response_bytes": 83,
+        "response_sha256": "4e00b53040e6ef0fde9890ae02401d88bc55eb23ec6c0c8988cf4eae8f1e706c",
+        "safe_response_headers": {
+          "x-api-gateway-request-id": "V2piR6UKqkEEUuXsPFz1gSazbWPmFvyZeKOzfWSoj2lX4hSLVuZ1SA=="
+        },
+        "url_has_api_key": false,
+        "url_has_taker": false
+      },
+      "wave": "horizon"
+    },
+    {
+      "amount": "3032751247104",
+      "capture_envelope_sha256": "fb9f6ec25480a97af3c9da03d513de368666d90637c646d26568f75b32988eb3",
+      "consumed_call": true,
+      "due_at": "2026-08-19T07:27:52Z",
+      "horizon_seconds": 3600,
+      "identity_id": "RECENT_4",
+      "input_mint": "8XJ9LH4WmDYYjEpm7gG5zMutR2Zrng58jc6sv7wKpump",
+      "kind": "SELL_H3600",
+      "lateness_slack_seconds": 120,
+      "mint": "8XJ9LH4WmDYYjEpm7gG5zMutR2Zrng58jc6sv7wKpump",
+      "observation_id": "RECENT_4:10000000:SELL_H3600",
+      "observed_at": "2026-08-19T07:28:02Z",
+      "output_mint": "So11111111111111111111111111111111111111112",
+      "parent_id": "RECENT_4:10000000:BUY_T0",
+      "quote": null,
+      "stratum": "RECENT",
+      "terminal": "PROVIDER_TYPED_FAILURE",
+      "terminal_error": "HTTP_400",
+      "transport": {
+        "http_status": 400,
+        "request_count": 1,
+        "response_bytes": 83,
+        "response_sha256": "7d41387d15d24617b40a7e94cafbf6ac99e23b2546d7566bf58dfc54b719ffce",
+        "safe_response_headers": {
+          "x-api-gateway-request-id": "rRCHm4kvdDweEDJRCCGznqnaNaeJGkiggw0b2-3rxthBl0qhFSYWLA=="
+        },
+        "url_has_api_key": false,
+        "url_has_taker": false
+      },
+      "wave": "horizon"
+    },
+    {
+      "amount": null,
+      "consumed_call": false,
+      "due_at": "2026-08-19T10:27:52Z",
+      "horizon_seconds": 14400,
+      "identity_id": "RECENT_4",
+      "input_mint": "8XJ9LH4WmDYYjEpm7gG5zMutR2Zrng58jc6sv7wKpump",
+      "kind": "SELL_H14400",
+      "lateness_slack_seconds": 120,
+      "mint": "8XJ9LH4WmDYYjEpm7gG5zMutR2Zrng58jc6sv7wKpump",
+      "observation_id": "RECENT_4:10000000:SELL_H14400",
+      "output_mint": "So11111111111111111111111111111111111111112",
+      "parent_id": "RECENT_4:10000000:BUY_T0",
+      "stratum": "RECENT",
+      "terminal": "EXPLICIT_GAP",
+      "wave": "gap"
+    },
+    {
+      "amount": "10000000",
+      "capture_envelope_sha256": "3e5efaa9dcbfce4dca5cef3586544bc64a1d75fe2211c686f4f695d9171c93df",
+      "consumed_call": true,
+      "due_at": "2026-08-19T06:27:52Z",
+      "horizon_seconds": 0,
+      "identity_id": "RECENT_5",
+      "input_mint": "So11111111111111111111111111111111111111112",
+      "kind": "BUY_T0",
+      "mint": "27FbKmWWBqxqDqF4we8DguAu9sRHzvztGZLnJpejpump",
+      "observation_id": "RECENT_5:10000000:BUY_T0",
+      "observed_at": "2026-08-19T06:28:22Z",
+      "output_mint": "27FbKmWWBqxqDqF4we8DguAu9sRHzvztGZLnJpejpump",
+      "parent_id": null,
+      "quote": {
+        "error_code": null,
+        "fee_bps": {
+          "status": "OBSERVED",
+          "value": 10
+        },
+        "in_amount": "10000000",
+        "mode": "manual",
+        "out_amount": "352781556449",
+        "platform_fee": {
+          "status": "OBSERVED",
+          "value": {
+            "feeBps": 10,
+            "feeMint": "So11111111111111111111111111111111111111112"
+          }
+        },
+        "price_impact_pct": {
+          "status": "OBSERVED",
+          "value": "0.0258007328746056"
+        },
+        "request_id_present": true,
+        "route_plan": {
+          "fee_amounts_present": false,
+          "hop_count": 1,
+          "status": "OBSERVED"
+        },
+        "router": "metis",
+        "surface": "QUOTE_OBSERVED",
+        "transaction_present": false
+      },
+      "stratum": "RECENT",
+      "terminal": "QUOTE_OBSERVED",
+      "terminal_error": null,
+      "transport": {
+        "http_status": 200,
+        "request_count": 1,
+        "response_bytes": 1258,
+        "response_sha256": "b2102f42f6473c583ef2ce1a81826669d4d11115f76f018b409fde3ebd225a2f",
+        "safe_response_headers": {
+          "x-api-gateway-request-id": "4EGcjgS4d7wA24-QytEwxuqS2Ccpy6n2zBb0tLUJdrWB4TGlluk3zQ=="
+        },
+        "url_has_api_key": false,
+        "url_has_taker": false
+      },
+      "wave": "t0"
+    },
+    {
+      "amount": "352781556449",
+      "capture_envelope_sha256": "6c5182bf08516920206230884261cf5175d72186a7b53fe174e3ae76826890f2",
+      "consumed_call": true,
+      "due_at": "2026-08-19T06:27:52Z",
+      "horizon_seconds": 0,
+      "identity_id": "RECENT_5",
+      "input_mint": "27FbKmWWBqxqDqF4we8DguAu9sRHzvztGZLnJpejpump",
+      "kind": "REVERSE_T0",
+      "mint": "27FbKmWWBqxqDqF4we8DguAu9sRHzvztGZLnJpejpump",
+      "observation_id": "RECENT_5:10000000:REVERSE_T0",
+      "observed_at": "2026-08-19T06:28:25Z",
+      "output_mint": "So11111111111111111111111111111111111111112",
+      "parent_id": "RECENT_5:10000000:BUY_T0",
+      "quote": {
+        "error_code": null,
+        "fee_bps": {
+          "status": "OBSERVED",
+          "value": 10
+        },
+        "in_amount": "352781556449",
+        "mode": "manual",
+        "out_amount": "9727186",
+        "platform_fee": {
+          "status": "OBSERVED",
+          "value": {
+            "feeBps": 10,
+            "feeMint": "So11111111111111111111111111111111111111112"
+          }
+        },
+        "price_impact_pct": {
+          "status": "OBSERVED",
+          "value": "-0.05174702178838704"
+        },
+        "request_id_present": true,
+        "route_plan": {
+          "fee_amounts_present": false,
+          "hop_count": 1,
+          "status": "OBSERVED"
+        },
+        "router": "metis",
+        "surface": "QUOTE_OBSERVED",
+        "transaction_present": false
+      },
+      "stratum": "RECENT",
+      "terminal": "QUOTE_OBSERVED",
+      "terminal_error": null,
+      "transport": {
+        "http_status": 200,
+        "request_count": 1,
+        "response_bytes": 1255,
+        "response_sha256": "b4aa40c2cc5d4ac4f55354753835d0f4db57dac1e27a62ecddf43f4c7c86aa69",
+        "safe_response_headers": {
+          "x-api-gateway-request-id": "gUUTQDjbcZjfknkRcjO5-arwt0_Jq5K01rQrkWnb9Z6tr3AOIvUNXg=="
+        },
+        "url_has_api_key": false,
+        "url_has_taker": false
+      },
+      "wave": "t0"
+    },
+    {
+      "amount": "352781556449",
+      "capture_envelope_sha256": "d9c891a61dcbd2958f11512f0e03dfaa64d99e417813da45e6a32133d936b4b9",
+      "consumed_call": true,
+      "due_at": "2026-08-19T06:42:52Z",
+      "horizon_seconds": 900,
+      "identity_id": "RECENT_5",
+      "input_mint": "27FbKmWWBqxqDqF4we8DguAu9sRHzvztGZLnJpejpump",
+      "kind": "SELL_H900",
+      "lateness_slack_seconds": 120,
+      "mint": "27FbKmWWBqxqDqF4we8DguAu9sRHzvztGZLnJpejpump",
+      "observation_id": "RECENT_5:10000000:SELL_H900",
+      "observed_at": "2026-08-19T06:43:06Z",
+      "output_mint": "So11111111111111111111111111111111111111112",
+      "parent_id": "RECENT_5:10000000:BUY_T0",
+      "quote": {
+        "error_code": null,
+        "fee_bps": {
+          "status": "OBSERVED",
+          "value": 10
+        },
+        "in_amount": "352781556449",
+        "mode": "manual",
+        "out_amount": "9727186",
+        "platform_fee": {
+          "status": "OBSERVED",
+          "value": {
+            "feeBps": 10,
+            "feeMint": "So11111111111111111111111111111111111111112"
+          }
+        },
+        "price_impact_pct": {
+          "status": "OBSERVED",
+          "value": "-0.051227916798679524"
+        },
+        "request_id_present": true,
+        "route_plan": {
+          "fee_amounts_present": false,
+          "hop_count": 1,
+          "status": "OBSERVED"
+        },
+        "router": "metis",
+        "surface": "QUOTE_OBSERVED",
+        "transaction_present": false
+      },
+      "stratum": "RECENT",
+      "terminal": "QUOTE_OBSERVED",
+      "terminal_error": null,
+      "transport": {
+        "http_status": 200,
+        "request_count": 1,
+        "response_bytes": 1257,
+        "response_sha256": "32e10d2eacae739d7bdd0d006f49a86354ff42aa1fe28d54cc86aa55cc12c1d9",
+        "safe_response_headers": {
+          "x-api-gateway-request-id": "LepH8K5zwJME6Fp3_yJQcoc_-mq1BRXZXXCCjOOr8hfzRh0gr7MEKA=="
+        },
+        "url_has_api_key": false,
+        "url_has_taker": false
+      },
+      "wave": "horizon"
+    },
+    {
+      "amount": "352781556449",
+      "capture_envelope_sha256": "e7da065f628c28157596e8cff3e92651e4ffc5a91e5db7e9126c39956ed190d3",
+      "consumed_call": true,
+      "due_at": "2026-08-19T07:27:52Z",
+      "horizon_seconds": 3600,
+      "identity_id": "RECENT_5",
+      "input_mint": "27FbKmWWBqxqDqF4we8DguAu9sRHzvztGZLnJpejpump",
+      "kind": "SELL_H3600",
+      "lateness_slack_seconds": 120,
+      "mint": "27FbKmWWBqxqDqF4we8DguAu9sRHzvztGZLnJpejpump",
+      "observation_id": "RECENT_5:10000000:SELL_H3600",
+      "observed_at": "2026-08-19T07:28:06Z",
+      "output_mint": "So11111111111111111111111111111111111111112",
+      "parent_id": "RECENT_5:10000000:BUY_T0",
+      "quote": {
+        "error_code": null,
+        "fee_bps": {
+          "status": "OBSERVED",
+          "value": 10
+        },
+        "in_amount": "352781556449",
+        "mode": "manual",
+        "out_amount": "36220444",
+        "platform_fee": {
+          "status": "OBSERVED",
+          "value": {
+            "feeBps": 10,
+            "feeMint": "So11111111111111111111111111111111111111112"
+          }
+        },
+        "price_impact_pct": {
+          "status": "OBSERVED",
+          "value": "-0.00583733454608403"
+        },
+        "request_id_present": true,
+        "route_plan": {
+          "fee_amounts_present": false,
+          "hop_count": 1,
+          "status": "OBSERVED"
+        },
+        "router": "dflow",
+        "surface": "QUOTE_OBSERVED",
+        "transaction_present": false
+      },
+      "stratum": "RECENT",
+      "terminal": "QUOTE_OBSERVED",
+      "terminal_error": null,
+      "transport": {
+        "http_status": 200,
+        "request_count": 1,
+        "response_bytes": 1257,
+        "response_sha256": "bb1a06ea1112f7674b25ca0222a4341b8411fcbb626010ada929e36e21095e1b",
+        "safe_response_headers": {
+          "x-api-gateway-request-id": "iy_ZUC9jrX6QigEMaIOJ_VeOq1vokDOejR9_r6XD83OOInM75C7DIw=="
+        },
+        "url_has_api_key": false,
+        "url_has_taker": false
+      },
+      "wave": "horizon"
+    },
+    {
+      "amount": null,
+      "consumed_call": false,
+      "due_at": "2026-08-19T10:27:52Z",
+      "horizon_seconds": 14400,
+      "identity_id": "RECENT_5",
+      "input_mint": "27FbKmWWBqxqDqF4we8DguAu9sRHzvztGZLnJpejpump",
+      "kind": "SELL_H14400",
+      "lateness_slack_seconds": 120,
+      "mint": "27FbKmWWBqxqDqF4we8DguAu9sRHzvztGZLnJpejpump",
+      "observation_id": "RECENT_5:10000000:SELL_H14400",
+      "output_mint": "So11111111111111111111111111111111111111112",
+      "parent_id": "RECENT_5:10000000:BUY_T0",
+      "stratum": "RECENT",
+      "terminal": "EXPLICIT_GAP",
+      "wave": "gap"
+    },
+    {
+      "amount": "10000000",
+      "capture_envelope_sha256": "67f47186e5c93344e823ec964f7fc8be3ffb59b110a3d21af7adcdd424f57d83",
+      "consumed_call": true,
+      "due_at": "2026-08-19T06:27:52Z",
+      "horizon_seconds": 0,
+      "identity_id": "RECENT_6",
+      "input_mint": "So11111111111111111111111111111111111111112",
+      "kind": "BUY_T0",
+      "mint": "G6PCj1bKM1poG6QCHtE9WjZZydMUb7MKGTSrkQwz9a6v",
+      "observation_id": "RECENT_6:10000000:BUY_T0",
+      "observed_at": "2026-08-19T06:28:28Z",
+      "output_mint": "G6PCj1bKM1poG6QCHtE9WjZZydMUb7MKGTSrkQwz9a6v",
+      "parent_id": null,
+      "quote": {
+        "error_code": null,
+        "fee_bps": {
+          "status": "OBSERVED",
+          "value": 10
+        },
+        "in_amount": "10000000",
+        "mode": "manual",
+        "out_amount": "336706924369",
+        "platform_fee": {
+          "status": "OBSERVED",
+          "value": {
+            "feeBps": 10,
+            "feeMint": "So11111111111111111111111111111111111111112"
+          }
+        },
+        "price_impact_pct": {
+          "status": "OBSERVED",
+          "value": "-0.035563539260135626"
+        },
+        "request_id_present": true,
+        "route_plan": {
+          "fee_amounts_present": false,
+          "hop_count": 1,
+          "status": "OBSERVED"
+        },
+        "router": "metis",
+        "surface": "QUOTE_OBSERVED",
+        "transaction_present": false
+      },
+      "stratum": "RECENT",
+      "terminal": "QUOTE_OBSERVED",
+      "terminal_error": null,
+      "transport": {
+        "http_status": 200,
+        "request_count": 1,
+        "response_bytes": 1263,
+        "response_sha256": "ef81f0288394e388a6bafcf32141105ab3e655818e1ecdf8412daa8954f30e63",
+        "safe_response_headers": {
+          "x-api-gateway-request-id": "Wj9dUJ_a77AFAjABTLgX33dWQdQytFDF1ZwPj8D7sWi4TcAfhsoVJw=="
+        },
+        "url_has_api_key": false,
+        "url_has_taker": false
+      },
+      "wave": "t0"
+    },
+    {
+      "amount": "336706924369",
+      "capture_envelope_sha256": "d82ba59a688fa3de6fb52d3a1b17def0656998a7b0d2d5bece1da376db7b702d",
+      "consumed_call": true,
+      "due_at": "2026-08-19T06:27:52Z",
+      "horizon_seconds": 0,
+      "identity_id": "RECENT_6",
+      "input_mint": "G6PCj1bKM1poG6QCHtE9WjZZydMUb7MKGTSrkQwz9a6v",
+      "kind": "REVERSE_T0",
+      "mint": "G6PCj1bKM1poG6QCHtE9WjZZydMUb7MKGTSrkQwz9a6v",
+      "observation_id": "RECENT_6:10000000:REVERSE_T0",
+      "observed_at": "2026-08-19T06:28:32Z",
+      "output_mint": "So11111111111111111111111111111111111111112",
+      "parent_id": "RECENT_6:10000000:BUY_T0",
+      "quote": {
+        "error_code": null,
+        "fee_bps": {
+          "status": "OBSERVED",
+          "value": 10
+        },
+        "in_amount": "336706924369",
+        "mode": "manual",
+        "out_amount": "9756884",
+        "platform_fee": {
+          "status": "OBSERVED",
+          "value": {
+            "feeBps": 10,
+            "feeMint": "So11111111111111111111111111111111111111112"
+          }
+        },
+        "price_impact_pct": {
+          "status": "OBSERVED",
+          "value": "0.01166685387599676"
+        },
+        "request_id_present": true,
+        "route_plan": {
+          "fee_amounts_present": false,
+          "hop_count": 1,
+          "status": "OBSERVED"
+        },
+        "router": "dflow",
+        "surface": "QUOTE_OBSERVED",
+        "transaction_present": false
+      },
+      "stratum": "RECENT",
+      "terminal": "QUOTE_OBSERVED",
+      "terminal_error": null,
+      "transport": {
+        "http_status": 200,
+        "request_count": 1,
+        "response_bytes": 1253,
+        "response_sha256": "4ec5a3c51e08d595854cedfb31bd0df761d9825ccb8464a04c9abbd14f8f918b",
+        "safe_response_headers": {
+          "x-api-gateway-request-id": "FSk0sNQpAw7H4DFyvziRGzx8S6grv9CCTw8NW0kh4ZRsQW57e9o2FA=="
+        },
+        "url_has_api_key": false,
+        "url_has_taker": false
+      },
+      "wave": "t0"
+    },
+    {
+      "amount": "336706924369",
+      "capture_envelope_sha256": "2e5e0125d2a370ae1497f8b0aa798bb83dc373e0b62d1f8d3e1689bb13d9c446",
+      "consumed_call": true,
+      "due_at": "2026-08-19T06:42:52Z",
+      "horizon_seconds": 900,
+      "identity_id": "RECENT_6",
+      "input_mint": "G6PCj1bKM1poG6QCHtE9WjZZydMUb7MKGTSrkQwz9a6v",
+      "kind": "SELL_H900",
+      "lateness_slack_seconds": 120,
+      "mint": "G6PCj1bKM1poG6QCHtE9WjZZydMUb7MKGTSrkQwz9a6v",
+      "observation_id": "RECENT_6:10000000:SELL_H900",
+      "observed_at": "2026-08-19T06:43:09Z",
+      "output_mint": "So11111111111111111111111111111111111111112",
+      "parent_id": "RECENT_6:10000000:BUY_T0",
+      "quote": {
+        "error_code": null,
+        "fee_bps": {
+          "status": "OBSERVED",
+          "value": 10
+        },
+        "in_amount": "336706924369",
+        "mode": "manual",
+        "out_amount": "9284101",
+        "platform_fee": {
+          "status": "OBSERVED",
+          "value": {
+            "feeBps": 10,
+            "feeMint": "So11111111111111111111111111111111111111112"
+          }
+        },
+        "price_impact_pct": {
+          "status": "OBSERVED",
+          "value": "-0.03620793376244285"
+        },
+        "request_id_present": true,
+        "route_plan": {
+          "fee_amounts_present": false,
+          "hop_count": 1,
+          "status": "OBSERVED"
+        },
+        "router": "metis",
+        "surface": "QUOTE_OBSERVED",
+        "transaction_present": false
+      },
+      "stratum": "RECENT",
+      "terminal": "QUOTE_OBSERVED",
+      "terminal_error": null,
+      "transport": {
+        "http_status": 200,
+        "request_count": 1,
+        "response_bytes": 1255,
+        "response_sha256": "4023607a5f6f13f478e0bdee5cb8e3a9c87aa0a729351addb634dac8fc1fd0b6",
+        "safe_response_headers": {
+          "x-api-gateway-request-id": "3Gxw8YX67uJFLJLD09vL7Eto0JzduASRpzVODr8_2nVUuVnaIOfApQ=="
+        },
+        "url_has_api_key": false,
+        "url_has_taker": false
+      },
+      "wave": "horizon"
+    },
+    {
+      "amount": "336706924369",
+      "capture_envelope_sha256": "223f11af7da3004ff13a2d02ca8566963bd186d6728d7e98247e2ab3c9711f57",
+      "consumed_call": true,
+      "due_at": "2026-08-19T07:27:52Z",
+      "horizon_seconds": 3600,
+      "identity_id": "RECENT_6",
+      "input_mint": "G6PCj1bKM1poG6QCHtE9WjZZydMUb7MKGTSrkQwz9a6v",
+      "kind": "SELL_H3600",
+      "lateness_slack_seconds": 120,
+      "mint": "G6PCj1bKM1poG6QCHtE9WjZZydMUb7MKGTSrkQwz9a6v",
+      "observation_id": "RECENT_6:10000000:SELL_H3600",
+      "observed_at": "2026-08-19T07:28:09Z",
+      "output_mint": "So11111111111111111111111111111111111111112",
+      "parent_id": "RECENT_6:10000000:BUY_T0",
+      "quote": {
+        "error_code": null,
+        "fee_bps": {
+          "status": "OBSERVED",
+          "value": 10
+        },
+        "in_amount": "336706924369",
+        "mode": "manual",
+        "out_amount": "9284101",
+        "platform_fee": {
+          "status": "OBSERVED",
+          "value": {
+            "feeBps": 10,
+            "feeMint": "So11111111111111111111111111111111111111112"
+          }
+        },
+        "price_impact_pct": {
+          "status": "OBSERVED",
+          "value": "-0.03512114538268948"
+        },
+        "request_id_present": true,
+        "route_plan": {
+          "fee_amounts_present": false,
+          "hop_count": 1,
+          "status": "OBSERVED"
+        },
+        "router": "metis",
+        "surface": "QUOTE_OBSERVED",
+        "transaction_present": false
+      },
+      "stratum": "RECENT",
+      "terminal": "QUOTE_OBSERVED",
+      "terminal_error": null,
+      "transport": {
+        "http_status": 200,
+        "request_count": 1,
+        "response_bytes": 1256,
+        "response_sha256": "67436ad759a08f146adc73bc31580b514ae3de309619e797ae7e49aafe06b7e9",
+        "safe_response_headers": {
+          "x-api-gateway-request-id": "q_JMg2fsqFz67uOyJGC_-77NHsxSO2kqAgvB6t3andikwHCnX3VCGA=="
+        },
+        "url_has_api_key": false,
+        "url_has_taker": false
+      },
+      "wave": "horizon"
+    },
+    {
+      "amount": null,
+      "consumed_call": false,
+      "due_at": "2026-08-19T10:27:52Z",
+      "horizon_seconds": 14400,
+      "identity_id": "RECENT_6",
+      "input_mint": "G6PCj1bKM1poG6QCHtE9WjZZydMUb7MKGTSrkQwz9a6v",
+      "kind": "SELL_H14400",
+      "lateness_slack_seconds": 120,
+      "mint": "G6PCj1bKM1poG6QCHtE9WjZZydMUb7MKGTSrkQwz9a6v",
+      "observation_id": "RECENT_6:10000000:SELL_H14400",
+      "output_mint": "So11111111111111111111111111111111111111112",
+      "parent_id": "RECENT_6:10000000:BUY_T0",
+      "stratum": "RECENT",
+      "terminal": "EXPLICIT_GAP",
+      "wave": "gap"
+    },
+    {
+      "amount": "10000000",
+      "capture_envelope_sha256": "87e074ab80d30b5064414646b7aaf178992356c280034f2f47a5aac8d947e809",
+      "consumed_call": true,
+      "due_at": "2026-08-19T06:27:52Z",
+      "horizon_seconds": 0,
+      "identity_id": "TRADED_1",
+      "input_mint": "So11111111111111111111111111111111111111112",
+      "kind": "BUY_T0",
+      "mint": "6jRTP7MWb8ihnXLJc3R58i5ExrMvAxV9CybXPvYepump",
+      "observation_id": "TRADED_1:10000000:BUY_T0",
+      "observed_at": "2026-08-19T06:28:35Z",
+      "output_mint": "6jRTP7MWb8ihnXLJc3R58i5ExrMvAxV9CybXPvYepump",
+      "parent_id": null,
+      "quote": {
+        "error_code": null,
+        "fee_bps": {
+          "status": "OBSERVED",
+          "value": 10
+        },
+        "in_amount": "10000000",
+        "mode": "manual",
+        "out_amount": "4387073893",
+        "platform_fee": {
+          "status": "OBSERVED",
+          "value": {
+            "feeBps": 10,
+            "feeMint": "So11111111111111111111111111111111111111112"
+          }
+        },
+        "price_impact_pct": {
+          "status": "OBSERVED",
+          "value": "-0.052842634369070336"
+        },
+        "request_id_present": true,
+        "route_plan": {
+          "fee_amounts_present": false,
+          "hop_count": 1,
+          "status": "OBSERVED"
+        },
+        "router": "metis",
+        "surface": "QUOTE_OBSERVED",
+        "transaction_present": false
+      },
+      "stratum": "TRADED",
+      "terminal": "QUOTE_OBSERVED",
+      "terminal_error": null,
+      "transport": {
+        "http_status": 200,
+        "request_count": 1,
+        "response_bytes": 1261,
+        "response_sha256": "19073c956b3805c74b281f5b488c046cee65f8778dad4d2311e03caf4793bd3b",
+        "safe_response_headers": {
+          "x-api-gateway-request-id": "Y_oCVzTBrdpqq49kZLRkZmzlOstRtigK4n61wwQuIe6ImAVvgM1htQ=="
+        },
+        "url_has_api_key": false,
+        "url_has_taker": false
+      },
+      "wave": "t0"
+    },
+    {
+      "amount": "4387073893",
+      "capture_envelope_sha256": "d4f7751d43484d227db9eaf248e72920afbb7fef9da8e9d3d7bc9179e0db9933",
+      "consumed_call": true,
+      "due_at": "2026-08-19T06:27:52Z",
+      "horizon_seconds": 0,
+      "identity_id": "TRADED_1",
+      "input_mint": "6jRTP7MWb8ihnXLJc3R58i5ExrMvAxV9CybXPvYepump",
+      "kind": "REVERSE_T0",
+      "mint": "6jRTP7MWb8ihnXLJc3R58i5ExrMvAxV9CybXPvYepump",
+      "observation_id": "TRADED_1:10000000:REVERSE_T0",
+      "observed_at": "2026-08-19T06:28:38Z",
+      "output_mint": "So11111111111111111111111111111111111111112",
+      "parent_id": "TRADED_1:10000000:BUY_T0",
+      "quote": {
+        "error_code": null,
+        "fee_bps": {
+          "status": "OBSERVED",
+          "value": 10
+        },
+        "in_amount": "4387073893",
+        "mode": "manual",
+        "out_amount": "9822883",
+        "platform_fee": {
+          "status": "OBSERVED",
+          "value": {
+            "feeBps": 10,
+            "feeMint": "So11111111111111111111111111111111111111112"
+          }
+        },
+        "price_impact_pct": {
+          "status": "OBSERVED",
+          "value": "-0.003512239144731457"
+        },
+        "request_id_present": true,
+        "route_plan": {
+          "fee_amounts_present": false,
+          "hop_count": 1,
+          "status": "OBSERVED"
+        },
+        "router": "metis",
+        "surface": "QUOTE_OBSERVED",
+        "transaction_present": false
+      },
+      "stratum": "TRADED",
+      "terminal": "QUOTE_OBSERVED",
+      "terminal_error": null,
+      "transport": {
+        "http_status": 200,
+        "request_count": 1,
+        "response_bytes": 1257,
+        "response_sha256": "677b70f6de5cfff0f3599816e225ec2b784a45cb47a7218e612a42d82e1bf50f",
+        "safe_response_headers": {
+          "x-api-gateway-request-id": "v2f-d6Bw4ARli7k6R3CMUC6n536j-2mFs1Fez8WtmLRkixcyK3Vccw=="
+        },
+        "url_has_api_key": false,
+        "url_has_taker": false
+      },
+      "wave": "t0"
+    },
+    {
+      "amount": "4387073893",
+      "capture_envelope_sha256": "f2eb00f1b1e7dcff5b1ee88f0b362bf864faa3792bbfba77f13ef7b18989d1cf",
+      "consumed_call": true,
+      "due_at": "2026-08-19T06:42:52Z",
+      "horizon_seconds": 900,
+      "identity_id": "TRADED_1",
+      "input_mint": "6jRTP7MWb8ihnXLJc3R58i5ExrMvAxV9CybXPvYepump",
+      "kind": "SELL_H900",
+      "lateness_slack_seconds": 120,
+      "mint": "6jRTP7MWb8ihnXLJc3R58i5ExrMvAxV9CybXPvYepump",
+      "observation_id": "TRADED_1:10000000:SELL_H900",
+      "observed_at": "2026-08-19T06:43:12Z",
+      "output_mint": "So11111111111111111111111111111111111111112",
+      "parent_id": "TRADED_1:10000000:BUY_T0",
+      "quote": {
+        "error_code": null,
+        "fee_bps": {
+          "status": "OBSERVED",
+          "value": 10
+        },
+        "in_amount": "4387073893",
+        "mode": "manual",
+        "out_amount": "12182865",
+        "platform_fee": {
+          "status": "OBSERVED",
+          "value": {
+            "feeBps": 10,
+            "feeMint": "So11111111111111111111111111111111111111112"
+          }
+        },
+        "price_impact_pct": {
+          "status": "OBSERVED",
+          "value": "-0.007021446328969944"
+        },
+        "request_id_present": true,
+        "route_plan": {
+          "fee_amounts_present": false,
+          "hop_count": 1,
+          "status": "OBSERVED"
+        },
+        "router": "metis",
+        "surface": "QUOTE_OBSERVED",
+        "transaction_present": false
+      },
+      "stratum": "TRADED",
+      "terminal": "QUOTE_OBSERVED",
+      "terminal_error": null,
+      "transport": {
+        "http_status": 200,
+        "request_count": 1,
+        "response_bytes": 1259,
+        "response_sha256": "0026e4ddcb0ec71c3fdb5036a032ebd549208b97bdfe29e500f3db8a6226f506",
+        "safe_response_headers": {
+          "x-api-gateway-request-id": "7O4nBxffazWvcxfH0RCL2_OF8h94QA8hCLXFzWkOd4gQCY20Pv_7gQ=="
+        },
+        "url_has_api_key": false,
+        "url_has_taker": false
+      },
+      "wave": "horizon"
+    },
+    {
+      "amount": "4387073893",
+      "capture_envelope_sha256": "16274cc40dd489c1246eef66da90fb5867af0e5841eef768f528419740bb9f20",
+      "consumed_call": true,
+      "due_at": "2026-08-19T07:27:52Z",
+      "horizon_seconds": 3600,
+      "identity_id": "TRADED_1",
+      "input_mint": "6jRTP7MWb8ihnXLJc3R58i5ExrMvAxV9CybXPvYepump",
+      "kind": "SELL_H3600",
+      "lateness_slack_seconds": 120,
+      "mint": "6jRTP7MWb8ihnXLJc3R58i5ExrMvAxV9CybXPvYepump",
+      "observation_id": "TRADED_1:10000000:SELL_H3600",
+      "observed_at": "2026-08-19T07:28:12Z",
+      "output_mint": "So11111111111111111111111111111111111111112",
+      "parent_id": "TRADED_1:10000000:BUY_T0",
+      "quote": {
+        "error_code": null,
+        "fee_bps": {
+          "status": "OBSERVED",
+          "value": 10
+        },
+        "in_amount": "4387073893",
+        "mode": "manual",
+        "out_amount": "8240651",
+        "platform_fee": {
+          "status": "OBSERVED",
+          "value": {
+            "feeBps": 10,
+            "feeMint": "So11111111111111111111111111111111111111112"
+          }
+        },
+        "price_impact_pct": {
+          "status": "OBSERVED",
+          "value": "0.0011956706068452863"
+        },
+        "request_id_present": true,
+        "route_plan": {
+          "fee_amounts_present": false,
+          "hop_count": 1,
+          "status": "OBSERVED"
+        },
+        "router": "metis",
+        "surface": "QUOTE_OBSERVED",
+        "transaction_present": false
+      },
+      "stratum": "TRADED",
+      "terminal": "QUOTE_OBSERVED",
+      "terminal_error": null,
+      "transport": {
+        "http_status": 200,
+        "request_count": 1,
+        "response_bytes": 1257,
+        "response_sha256": "07f6e21ef01dd53995d108deca9685814e278947793c9d701370383ed1bb97b1",
+        "safe_response_headers": {
+          "x-api-gateway-request-id": "W9Sb05gKl0Xo4YY0w3oc3VSuQeEoANNLQqON-yE6InyuuB908hDh1g=="
+        },
+        "url_has_api_key": false,
+        "url_has_taker": false
+      },
+      "wave": "horizon"
+    },
+    {
+      "amount": null,
+      "consumed_call": false,
+      "due_at": "2026-08-19T10:27:52Z",
+      "horizon_seconds": 14400,
+      "identity_id": "TRADED_1",
+      "input_mint": "6jRTP7MWb8ihnXLJc3R58i5ExrMvAxV9CybXPvYepump",
+      "kind": "SELL_H14400",
+      "lateness_slack_seconds": 120,
+      "mint": "6jRTP7MWb8ihnXLJc3R58i5ExrMvAxV9CybXPvYepump",
+      "observation_id": "TRADED_1:10000000:SELL_H14400",
+      "output_mint": "So11111111111111111111111111111111111111112",
+      "parent_id": "TRADED_1:10000000:BUY_T0",
+      "stratum": "TRADED",
+      "terminal": "EXPLICIT_GAP",
+      "wave": "gap"
+    },
+    {
+      "amount": "10000000",
+      "capture_envelope_sha256": "a085d8de41e6d091142b1c87c327e652618fe8abaf565742189e8360cc19fecb",
+      "consumed_call": true,
+      "due_at": "2026-08-19T06:27:52Z",
+      "horizon_seconds": 0,
+      "identity_id": "TRADED_2",
+      "input_mint": "So11111111111111111111111111111111111111112",
+      "kind": "BUY_T0",
+      "mint": "AymATz4TCL9sWNEEV9Kvyz45CHVhDZ6kUgjTJPzLpU9P",
+      "observation_id": "TRADED_2:10000000:BUY_T0",
+      "observed_at": "2026-08-19T06:28:42Z",
+      "output_mint": "AymATz4TCL9sWNEEV9Kvyz45CHVhDZ6kUgjTJPzLpU9P",
+      "parent_id": null,
+      "quote": {
+        "error_code": null,
+        "fee_bps": {
+          "status": "OBSERVED",
+          "value": 10
+        },
+        "in_amount": "10000000",
+        "mode": "manual",
+        "out_amount": "177",
+        "platform_fee": {
+          "status": "OBSERVED",
+          "value": {
+            "feeBps": 10,
+            "feeMint": "So11111111111111111111111111111111111111112"
+          }
+        },
+        "price_impact_pct": {
+          "status": "OBSERVED",
+          "value": "-0.0017033606261026876"
+        },
+        "request_id_present": true,
+        "route_plan": {
+          "fee_amounts_present": false,
+          "hop_count": 2,
+          "status": "OBSERVED"
+        },
+        "router": "metis",
+        "surface": "QUOTE_OBSERVED",
+        "transaction_present": false
+      },
+      "stratum": "TRADED",
+      "terminal": "QUOTE_OBSERVED",
+      "terminal_error": null,
+      "transport": {
+        "http_status": 200,
+        "request_count": 1,
+        "response_bytes": 1540,
+        "response_sha256": "c681f290a3bcc463f199efd6e69c5b677c3dee78a5bc1b1fdd5f524150e96111",
+        "safe_response_headers": {
+          "x-api-gateway-request-id": "-Y69IU-pgJJtWXaAUj0Ovre37y179oS47j8J1JF_O8cWu-VvWVOKoA=="
+        },
+        "url_has_api_key": false,
+        "url_has_taker": false
+      },
+      "wave": "t0"
+    },
+    {
+      "amount": "177",
+      "capture_envelope_sha256": "d0588867015cae9adc780c85f90ace21ee238c648536b28a6b4c068bac56ffc7",
+      "consumed_call": true,
+      "due_at": "2026-08-19T06:27:52Z",
+      "horizon_seconds": 0,
+      "identity_id": "TRADED_2",
+      "input_mint": "AymATz4TCL9sWNEEV9Kvyz45CHVhDZ6kUgjTJPzLpU9P",
+      "kind": "REVERSE_T0",
+      "mint": "AymATz4TCL9sWNEEV9Kvyz45CHVhDZ6kUgjTJPzLpU9P",
+      "observation_id": "TRADED_2:10000000:REVERSE_T0",
+      "observed_at": "2026-08-19T06:28:45Z",
+      "output_mint": "So11111111111111111111111111111111111111112",
+      "parent_id": "TRADED_2:10000000:BUY_T0",
+      "quote": {
+        "error_code": null,
+        "fee_bps": {
+          "status": "OBSERVED",
+          "value": 10
+        },
+        "in_amount": "177",
+        "mode": "manual",
+        "out_amount": "9956586",
+        "platform_fee": {
+          "status": "OBSERVED",
+          "value": {
+            "feeBps": 10,
+            "feeMint": "So11111111111111111111111111111111111111112"
+          }
+        },
+        "price_impact_pct": {
+          "status": "OBSERVED",
+          "value": "-0.0025328660206897996"
+        },
+        "request_id_present": true,
+        "route_plan": {
+          "fee_amounts_present": false,
+          "hop_count": 2,
+          "status": "OBSERVED"
+        },
+        "router": "dflow",
+        "surface": "QUOTE_OBSERVED",
+        "transaction_present": false
+      },
+      "stratum": "TRADED",
+      "terminal": "QUOTE_OBSERVED",
+      "terminal_error": null,
+      "transport": {
+        "http_status": 200,
+        "request_count": 1,
+        "response_bytes": 1547,
+        "response_sha256": "63bc9c4797ead3ce8fee8beb6f377cee80d10f9c2227809c8972cd176a0bd404",
+        "safe_response_headers": {
+          "x-api-gateway-request-id": "Yf7XLMmYFnADcSvSuqD96GIMd5-KXLhoF3aN7S00SApkeA-SXb0PGg=="
+        },
+        "url_has_api_key": false,
+        "url_has_taker": false
+      },
+      "wave": "t0"
+    },
+    {
+      "amount": "177",
+      "capture_envelope_sha256": "af4c0c07d17e68073a29c2084194b8d208f07dde0c8d429a16bf27b7525f3ef0",
+      "consumed_call": true,
+      "due_at": "2026-08-19T06:42:52Z",
+      "horizon_seconds": 900,
+      "identity_id": "TRADED_2",
+      "input_mint": "AymATz4TCL9sWNEEV9Kvyz45CHVhDZ6kUgjTJPzLpU9P",
+      "kind": "SELL_H900",
+      "lateness_slack_seconds": 120,
+      "mint": "AymATz4TCL9sWNEEV9Kvyz45CHVhDZ6kUgjTJPzLpU9P",
+      "observation_id": "TRADED_2:10000000:SELL_H900",
+      "observed_at": "2026-08-19T06:43:16Z",
+      "output_mint": "So11111111111111111111111111111111111111112",
+      "parent_id": "TRADED_2:10000000:BUY_T0",
+      "quote": {
+        "error_code": null,
+        "fee_bps": {
+          "status": "OBSERVED",
+          "value": 10
+        },
+        "in_amount": "177",
+        "mode": "manual",
+        "out_amount": "9953321",
+        "platform_fee": {
+          "status": "OBSERVED",
+          "value": {
+            "feeBps": 10,
+            "feeMint": "So11111111111111111111111111111111111111112"
+          }
+        },
+        "price_impact_pct": {
+          "status": "OBSERVED",
+          "value": "-0.0017150662703916508"
+        },
+        "request_id_present": true,
+        "route_plan": {
+          "fee_amounts_present": false,
+          "hop_count": 2,
+          "status": "OBSERVED"
+        },
+        "router": "dflow",
+        "surface": "QUOTE_OBSERVED",
+        "transaction_present": false
+      },
+      "stratum": "TRADED",
+      "terminal": "QUOTE_OBSERVED",
+      "terminal_error": null,
+      "transport": {
+        "http_status": 200,
+        "request_count": 1,
+        "response_bytes": 1543,
+        "response_sha256": "28ad51aede17affbeee3991b602d672bc531fc365c6f45ebe27590bcd1031f27",
+        "safe_response_headers": {
+          "x-api-gateway-request-id": "KKw18-matGZ-Hg53w9LX_zQ4ECm4KA-fP0kVJVokLZDNe6yaEIuSTg=="
+        },
+        "url_has_api_key": false,
+        "url_has_taker": false
+      },
+      "wave": "horizon"
+    },
+    {
+      "amount": "177",
+      "capture_envelope_sha256": "62fe977323f921335829731a834b9b2e08dd9394b0780b346efa068ce5eec60a",
+      "consumed_call": true,
+      "due_at": "2026-08-19T07:27:52Z",
+      "horizon_seconds": 3600,
+      "identity_id": "TRADED_2",
+      "input_mint": "AymATz4TCL9sWNEEV9Kvyz45CHVhDZ6kUgjTJPzLpU9P",
+      "kind": "SELL_H3600",
+      "lateness_slack_seconds": 120,
+      "mint": "AymATz4TCL9sWNEEV9Kvyz45CHVhDZ6kUgjTJPzLpU9P",
+      "observation_id": "TRADED_2:10000000:SELL_H3600",
+      "observed_at": "2026-08-19T07:28:16Z",
+      "output_mint": "So11111111111111111111111111111111111111112",
+      "parent_id": "TRADED_2:10000000:BUY_T0",
+      "quote": {
+        "error_code": null,
+        "fee_bps": {
+          "status": "OBSERVED",
+          "value": 10
+        },
+        "in_amount": "177",
+        "mode": "manual",
+        "out_amount": "9967939",
+        "platform_fee": {
+          "status": "OBSERVED",
+          "value": {
+            "feeBps": 10,
+            "feeMint": "So11111111111111111111111111111111111111112"
+          }
+        },
+        "price_impact_pct": {
+          "status": "OBSERVED",
+          "value": "-0.002213913808061889"
+        },
+        "request_id_present": true,
+        "route_plan": {
+          "fee_amounts_present": false,
+          "hop_count": 2,
+          "status": "OBSERVED"
+        },
+        "router": "dflow",
+        "surface": "QUOTE_OBSERVED",
+        "transaction_present": false
+      },
+      "stratum": "TRADED",
+      "terminal": "QUOTE_OBSERVED",
+      "terminal_error": null,
+      "transport": {
+        "http_status": 200,
+        "request_count": 1,
+        "response_bytes": 1543,
+        "response_sha256": "a5e651926caf88f054391dc58b88fcf4679329f260a11c052eaec82e9cab5264",
+        "safe_response_headers": {
+          "x-api-gateway-request-id": "RrLdfhAwRAZMVKEhdXivRJRfDWT56_9xWe5FbnyOarFPpDC2m5_O6g=="
+        },
+        "url_has_api_key": false,
+        "url_has_taker": false
+      },
+      "wave": "horizon"
+    },
+    {
+      "amount": null,
+      "consumed_call": false,
+      "due_at": "2026-08-19T10:27:52Z",
+      "horizon_seconds": 14400,
+      "identity_id": "TRADED_2",
+      "input_mint": "AymATz4TCL9sWNEEV9Kvyz45CHVhDZ6kUgjTJPzLpU9P",
+      "kind": "SELL_H14400",
+      "lateness_slack_seconds": 120,
+      "mint": "AymATz4TCL9sWNEEV9Kvyz45CHVhDZ6kUgjTJPzLpU9P",
+      "observation_id": "TRADED_2:10000000:SELL_H14400",
+      "output_mint": "So11111111111111111111111111111111111111112",
+      "parent_id": "TRADED_2:10000000:BUY_T0",
+      "stratum": "TRADED",
+      "terminal": "EXPLICIT_GAP",
+      "wave": "gap"
+    },
+    {
+      "amount": "10000000",
+      "capture_envelope_sha256": "22787eb402b42c4ec2570338e39fbed54cd8015b06f2ace20ea311ffa1c928a2",
+      "consumed_call": true,
+      "due_at": "2026-08-19T06:27:52Z",
+      "horizon_seconds": 0,
+      "identity_id": "TRADED_3",
+      "input_mint": "So11111111111111111111111111111111111111112",
+      "kind": "BUY_T0",
+      "mint": "zj1jpp7QMveWHLs61vL9KMZf254KvW7j4AAmBF8ry2k",
+      "observation_id": "TRADED_3:10000000:BUY_T0",
+      "observed_at": "2026-08-19T06:28:49Z",
+      "output_mint": "zj1jpp7QMveWHLs61vL9KMZf254KvW7j4AAmBF8ry2k",
+      "parent_id": null,
+      "quote": {
+        "error_code": null,
+        "fee_bps": {
+          "status": "OBSERVED",
+          "value": 10
+        },
+        "in_amount": "10000000",
+        "mode": "manual",
+        "out_amount": "440617548",
+        "platform_fee": {
+          "status": "OBSERVED",
+          "value": {
+            "feeBps": 10,
+            "feeMint": "So11111111111111111111111111111111111111112"
+          }
+        },
+        "price_impact_pct": {
+          "status": "OBSERVED",
+          "value": "-0.014288065961311512"
+        },
+        "request_id_present": true,
+        "route_plan": {
+          "fee_amounts_present": false,
+          "hop_count": 2,
+          "status": "OBSERVED"
+        },
+        "router": "metis",
+        "surface": "QUOTE_OBSERVED",
+        "transaction_present": false
+      },
+      "stratum": "TRADED",
+      "terminal": "QUOTE_OBSERVED",
+      "terminal_error": null,
+      "transport": {
+        "http_status": 200,
+        "request_count": 1,
+        "response_bytes": 1570,
+        "response_sha256": "e09a62d4850641fee3d9f5b2bd51d8bfca9037ac3382513f623c6fb2c632c75f",
+        "safe_response_headers": {
+          "x-api-gateway-request-id": "ggPxkTimbO6I1wE0wh4kAhZnwJh7gfDuuaBnxzwqyEmCjNCQpw0HIw=="
+        },
+        "url_has_api_key": false,
+        "url_has_taker": false
+      },
+      "wave": "t0"
+    },
+    {
+      "amount": "440617548",
+      "capture_envelope_sha256": "d780a240203fe0ff18fcfa301d8537a346fc298e7f4f0d44eb1e1d293866bc9e",
+      "consumed_call": true,
+      "due_at": "2026-08-19T06:27:52Z",
+      "horizon_seconds": 0,
+      "identity_id": "TRADED_3",
+      "input_mint": "zj1jpp7QMveWHLs61vL9KMZf254KvW7j4AAmBF8ry2k",
+      "kind": "REVERSE_T0",
+      "mint": "zj1jpp7QMveWHLs61vL9KMZf254KvW7j4AAmBF8ry2k",
+      "observation_id": "TRADED_3:10000000:REVERSE_T0",
+      "observed_at": "2026-08-19T06:28:52Z",
+      "output_mint": "So11111111111111111111111111111111111111112",
+      "parent_id": "TRADED_3:10000000:BUY_T0",
+      "quote": {
+        "error_code": null,
+        "fee_bps": {
+          "status": "OBSERVED",
+          "value": 10
+        },
+        "in_amount": "440617548",
+        "mode": "manual",
+        "out_amount": "9825372",
+        "platform_fee": {
+          "status": "OBSERVED",
+          "value": {
+            "feeBps": 10,
+            "feeMint": "So11111111111111111111111111111111111111112"
+          }
+        },
+        "price_impact_pct": {
+          "status": "OBSERVED",
+          "value": "-0.002180024067484121"
+        },
+        "request_id_present": true,
+        "route_plan": {
+          "fee_amounts_present": false,
+          "hop_count": 1,
+          "status": "OBSERVED"
+        },
+        "router": "metis",
+        "surface": "QUOTE_OBSERVED",
+        "transaction_present": false
+      },
+      "stratum": "TRADED",
+      "terminal": "QUOTE_OBSERVED",
+      "terminal_error": null,
+      "transport": {
+        "http_status": 200,
+        "request_count": 1,
+        "response_bytes": 1254,
+        "response_sha256": "06ffef308a49ade7dad39d6bad28bea8947e577fba7c5e28fef7724a282ecb99",
+        "safe_response_headers": {
+          "x-api-gateway-request-id": "3y5WO-dCD--dwQG2v34GL354AbKbIXg2AoZARwuZhht6iyZbYAxscg=="
+        },
+        "url_has_api_key": false,
+        "url_has_taker": false
+      },
+      "wave": "t0"
+    },
+    {
+      "amount": "440617548",
+      "capture_envelope_sha256": "ab086b5d1b63e54cb7385085c4a069b71b8ff58feaac9cf2d670e6ff6c7a14a5",
+      "consumed_call": true,
+      "due_at": "2026-08-19T06:42:52Z",
+      "horizon_seconds": 900,
+      "identity_id": "TRADED_3",
+      "input_mint": "zj1jpp7QMveWHLs61vL9KMZf254KvW7j4AAmBF8ry2k",
+      "kind": "SELL_H900",
+      "lateness_slack_seconds": 120,
+      "mint": "zj1jpp7QMveWHLs61vL9KMZf254KvW7j4AAmBF8ry2k",
+      "observation_id": "TRADED_3:10000000:SELL_H900",
+      "observed_at": "2026-08-19T06:43:19Z",
+      "output_mint": "So11111111111111111111111111111111111111112",
+      "parent_id": "TRADED_3:10000000:BUY_T0",
+      "quote": {
+        "error_code": null,
+        "fee_bps": {
+          "status": "OBSERVED",
+          "value": 10
+        },
+        "in_amount": "440617548",
+        "mode": "manual",
+        "out_amount": "9313958",
+        "platform_fee": {
+          "status": "OBSERVED",
+          "value": {
+            "feeBps": 10,
+            "feeMint": "So11111111111111111111111111111111111111112"
+          }
+        },
+        "price_impact_pct": {
+          "status": "OBSERVED",
+          "value": "-0.010926391534847792"
+        },
+        "request_id_present": true,
+        "route_plan": {
+          "fee_amounts_present": false,
+          "hop_count": 1,
+          "status": "OBSERVED"
+        },
+        "router": "metis",
+        "surface": "QUOTE_OBSERVED",
+        "transaction_present": false
+      },
+      "stratum": "TRADED",
+      "terminal": "QUOTE_OBSERVED",
+      "terminal_error": null,
+      "transport": {
+        "http_status": 200,
+        "request_count": 1,
+        "response_bytes": 1253,
+        "response_sha256": "40dd2214ad499471f89acc13c84682bc5d279dcc9fadfda825c14f71dbae3359",
+        "safe_response_headers": {
+          "x-api-gateway-request-id": "9TR88sYA8HtWIFcKIZVfualUpC2440lOaplZtIepKlqbAaZZNFruUQ=="
+        },
+        "url_has_api_key": false,
+        "url_has_taker": false
+      },
+      "wave": "horizon"
+    },
+    {
+      "amount": "440617548",
+      "capture_envelope_sha256": "07ff42a1c2e8e649ead34dc074db8c26fee645899513b4871a8142fdffaa42cf",
+      "consumed_call": true,
+      "due_at": "2026-08-19T07:27:52Z",
+      "horizon_seconds": 3600,
+      "identity_id": "TRADED_3",
+      "input_mint": "zj1jpp7QMveWHLs61vL9KMZf254KvW7j4AAmBF8ry2k",
+      "kind": "SELL_H3600",
+      "lateness_slack_seconds": 120,
+      "mint": "zj1jpp7QMveWHLs61vL9KMZf254KvW7j4AAmBF8ry2k",
+      "observation_id": "TRADED_3:10000000:SELL_H3600",
+      "observed_at": "2026-08-19T07:28:19Z",
+      "output_mint": "So11111111111111111111111111111111111111112",
+      "parent_id": "TRADED_3:10000000:BUY_T0",
+      "quote": {
+        "error_code": null,
+        "fee_bps": {
+          "status": "OBSERVED",
+          "value": 10
+        },
+        "in_amount": "440617548",
+        "mode": "manual",
+        "out_amount": "9712617",
+        "platform_fee": {
+          "status": "OBSERVED",
+          "value": {
+            "feeBps": 10,
+            "feeMint": "So11111111111111111111111111111111111111112"
+          }
+        },
+        "price_impact_pct": {
+          "status": "OBSERVED",
+          "value": "-0.007181358464429086"
+        },
+        "request_id_present": true,
+        "route_plan": {
+          "fee_amounts_present": false,
+          "hop_count": 1,
+          "status": "OBSERVED"
+        },
+        "router": "metis",
+        "surface": "QUOTE_OBSERVED",
+        "transaction_present": false
+      },
+      "stratum": "TRADED",
+      "terminal": "QUOTE_OBSERVED",
+      "terminal_error": null,
+      "transport": {
+        "http_status": 200,
+        "request_count": 1,
+        "response_bytes": 1253,
+        "response_sha256": "0fdd6fbc172ea3c2fe7862abc30e5d2caa74f0681704deddea65edcf8e9ff8b4",
+        "safe_response_headers": {
+          "x-api-gateway-request-id": "C4vqo-nnZ19RhyWgNW-ew88BNlKLJCsPPXoBclg7nYoTypZIvV3Arw=="
+        },
+        "url_has_api_key": false,
+        "url_has_taker": false
+      },
+      "wave": "horizon"
+    },
+    {
+      "amount": null,
+      "consumed_call": false,
+      "due_at": "2026-08-19T10:27:52Z",
+      "horizon_seconds": 14400,
+      "identity_id": "TRADED_3",
+      "input_mint": "zj1jpp7QMveWHLs61vL9KMZf254KvW7j4AAmBF8ry2k",
+      "kind": "SELL_H14400",
+      "lateness_slack_seconds": 120,
+      "mint": "zj1jpp7QMveWHLs61vL9KMZf254KvW7j4AAmBF8ry2k",
+      "observation_id": "TRADED_3:10000000:SELL_H14400",
+      "output_mint": "So11111111111111111111111111111111111111112",
+      "parent_id": "TRADED_3:10000000:BUY_T0",
+      "stratum": "TRADED",
+      "terminal": "EXPLICIT_GAP",
+      "wave": "gap"
+    },
+    {
+      "amount": "10000000",
+      "capture_envelope_sha256": "71261860b3fd1d65785aed06e46a39a0f16598431ba812beccaf64125c45e533",
+      "consumed_call": true,
+      "due_at": "2026-08-19T06:27:52Z",
+      "horizon_seconds": 0,
+      "identity_id": "TRADED_4",
+      "input_mint": "So11111111111111111111111111111111111111112",
+      "kind": "BUY_T0",
+      "mint": "CWZ6BsdnjkDVTGkmL6bGbJXXig6ceef12KvyGQW14cMt",
+      "observation_id": "TRADED_4:10000000:BUY_T0",
+      "observed_at": "2026-08-19T06:28:55Z",
+      "output_mint": "CWZ6BsdnjkDVTGkmL6bGbJXXig6ceef12KvyGQW14cMt",
+      "parent_id": null,
+      "quote": {
+        "error_code": null,
+        "fee_bps": {
+          "status": "OBSERVED",
+          "value": 10
+        },
+        "in_amount": "10000000",
+        "mode": "manual",
+        "out_amount": "18604902",
+        "platform_fee": {
+          "status": "OBSERVED",
+          "value": {
+            "feeBps": 10,
+            "feeMint": "So11111111111111111111111111111111111111112"
+          }
+        },
+        "price_impact_pct": {
+          "status": "OBSERVED",
+          "value": "-0.00120324716553413"
+        },
+        "request_id_present": true,
+        "route_plan": {
+          "fee_amounts_present": false,
+          "hop_count": 3,
+          "status": "OBSERVED"
+        },
+        "router": "dflow",
+        "surface": "QUOTE_OBSERVED",
+        "transaction_present": false
+      },
+      "stratum": "TRADED",
+      "terminal": "QUOTE_OBSERVED",
+      "terminal_error": null,
+      "transport": {
+        "http_status": 200,
+        "request_count": 1,
+        "response_bytes": 1861,
+        "response_sha256": "3cf3ede8cdb06939a42fc156d42ccf8d7f698d4f3f10d7492f1bcffd5ad9c5c8",
+        "safe_response_headers": {
+          "x-api-gateway-request-id": "gT1QdG0eqxIb4JtIEq0wol1kx9UsSG5pEB19obS2uxTUAHxsoWEkaw=="
+        },
+        "url_has_api_key": false,
+        "url_has_taker": false
+      },
+      "wave": "t0"
+    },
+    {
+      "amount": "18604902",
+      "capture_envelope_sha256": "3b43cda2bc95fb289d077ed6dd37089afec04b143e39599decc7b3479a73751e",
+      "consumed_call": true,
+      "due_at": "2026-08-19T06:27:52Z",
+      "horizon_seconds": 0,
+      "identity_id": "TRADED_4",
+      "input_mint": "CWZ6BsdnjkDVTGkmL6bGbJXXig6ceef12KvyGQW14cMt",
+      "kind": "REVERSE_T0",
+      "mint": "CWZ6BsdnjkDVTGkmL6bGbJXXig6ceef12KvyGQW14cMt",
+      "observation_id": "TRADED_4:10000000:REVERSE_T0",
+      "observed_at": "2026-08-19T06:28:58Z",
+      "output_mint": "So11111111111111111111111111111111111111112",
+      "parent_id": "TRADED_4:10000000:BUY_T0",
+      "quote": {
+        "error_code": null,
+        "fee_bps": {
+          "status": "OBSERVED",
+          "value": 10
+        },
+        "in_amount": "18604902",
+        "mode": "manual",
+        "out_amount": "9973896",
+        "platform_fee": {
+          "status": "OBSERVED",
+          "value": {
+            "feeBps": 10,
+            "feeMint": "So11111111111111111111111111111111111111112"
+          }
+        },
+        "price_impact_pct": {
+          "status": "OBSERVED",
+          "value": "-0.0014088480268609153"
+        },
+        "request_id_present": true,
+        "route_plan": {
+          "fee_amounts_present": false,
+          "hop_count": 3,
+          "status": "OBSERVED"
+        },
+        "router": "metis",
+        "surface": "QUOTE_OBSERVED",
+        "transaction_present": false
+      },
+      "stratum": "TRADED",
+      "terminal": "QUOTE_OBSERVED",
+      "terminal_error": null,
+      "transport": {
+        "http_status": 200,
+        "request_count": 1,
+        "response_bytes": 1871,
+        "response_sha256": "5d219732ae3a6718821fccaaebaf66f77d27d224232048ace094a6e917a09fa5",
+        "safe_response_headers": {
+          "x-api-gateway-request-id": "RtALd2AseoCEW1FeO_rPmZZKR7oRQRZs9LI3R4zkCBmqz23DH5avoA=="
+        },
+        "url_has_api_key": false,
+        "url_has_taker": false
+      },
+      "wave": "t0"
+    },
+    {
+      "amount": "18604902",
+      "capture_envelope_sha256": "1524d058af0f5bf490313e1997bb4c2a21184a3d922a6c3e99b84ec257e042ff",
+      "consumed_call": true,
+      "due_at": "2026-08-19T06:42:52Z",
+      "horizon_seconds": 900,
+      "identity_id": "TRADED_4",
+      "input_mint": "CWZ6BsdnjkDVTGkmL6bGbJXXig6ceef12KvyGQW14cMt",
+      "kind": "SELL_H900",
+      "lateness_slack_seconds": 120,
+      "mint": "CWZ6BsdnjkDVTGkmL6bGbJXXig6ceef12KvyGQW14cMt",
+      "observation_id": "TRADED_4:10000000:SELL_H900",
+      "observed_at": "2026-08-19T06:43:22Z",
+      "output_mint": "So11111111111111111111111111111111111111112",
+      "parent_id": "TRADED_4:10000000:BUY_T0",
+      "quote": {
+        "error_code": null,
+        "fee_bps": {
+          "status": "OBSERVED",
+          "value": 10
+        },
+        "in_amount": "18604902",
+        "mode": "manual",
+        "out_amount": "9973825",
+        "platform_fee": {
+          "status": "OBSERVED",
+          "value": {
+            "feeBps": 10,
+            "feeMint": "So11111111111111111111111111111111111111112"
+          }
+        },
+        "price_impact_pct": {
+          "status": "OBSERVED",
+          "value": "-0.0006652105605909043"
+        },
+        "request_id_present": true,
+        "route_plan": {
+          "fee_amounts_present": false,
+          "hop_count": 3,
+          "status": "OBSERVED"
+        },
+        "router": "metis",
+        "surface": "QUOTE_OBSERVED",
+        "transaction_present": false
+      },
+      "stratum": "TRADED",
+      "terminal": "QUOTE_OBSERVED",
+      "terminal_error": null,
+      "transport": {
+        "http_status": 200,
+        "request_count": 1,
+        "response_bytes": 1869,
+        "response_sha256": "0d2e22899ce41047ff02b07ec25fe16daf51791d79aed53712bfd977c2d73dc7",
+        "safe_response_headers": {
+          "x-api-gateway-request-id": "0f4S5Lk63wB8YuCSCKUon47w5eJRl6Lp_9LrMcgpugtBI0sQ3eRqDg=="
+        },
+        "url_has_api_key": false,
+        "url_has_taker": false
+      },
+      "wave": "horizon"
+    },
+    {
+      "amount": "18604902",
+      "capture_envelope_sha256": "069fbbaf4c1e6a81ad0243779d0357de792c1919b7d168768fb989ce5e3324cb",
+      "consumed_call": true,
+      "due_at": "2026-08-19T07:27:52Z",
+      "horizon_seconds": 3600,
+      "identity_id": "TRADED_4",
+      "input_mint": "CWZ6BsdnjkDVTGkmL6bGbJXXig6ceef12KvyGQW14cMt",
+      "kind": "SELL_H3600",
+      "lateness_slack_seconds": 120,
+      "mint": "CWZ6BsdnjkDVTGkmL6bGbJXXig6ceef12KvyGQW14cMt",
+      "observation_id": "TRADED_4:10000000:SELL_H3600",
+      "observed_at": "2026-08-19T07:28:22Z",
+      "output_mint": "So11111111111111111111111111111111111111112",
+      "parent_id": "TRADED_4:10000000:BUY_T0",
+      "quote": {
+        "error_code": null,
+        "fee_bps": {
+          "status": "OBSERVED",
+          "value": 10
+        },
+        "in_amount": "18604902",
+        "mode": "manual",
+        "out_amount": "9987736",
+        "platform_fee": {
+          "status": "OBSERVED",
+          "value": {
+            "feeBps": 10,
+            "feeMint": "So11111111111111111111111111111111111111112"
+          }
+        },
+        "price_impact_pct": {
+          "status": "OBSERVED",
+          "value": "-0.0013865604744716345"
+        },
+        "request_id_present": true,
+        "route_plan": {
+          "fee_amounts_present": false,
+          "hop_count": 5,
+          "status": "OBSERVED"
+        },
+        "router": "metis",
+        "surface": "QUOTE_OBSERVED",
+        "transaction_present": false
+      },
+      "stratum": "TRADED",
+      "terminal": "QUOTE_OBSERVED",
+      "terminal_error": null,
+      "transport": {
+        "http_status": 200,
+        "request_count": 1,
+        "response_bytes": 2474,
+        "response_sha256": "992ce398158654d419002c1c3fc78903fd5710125ffcd71496222a330a49a3d7",
+        "safe_response_headers": {
+          "x-api-gateway-request-id": "Oe75Z-zIV4sbn3cHr7wZ2yljAOJvGZBff0Fz5ALnVd2oHjQk5yxw3w=="
+        },
+        "url_has_api_key": false,
+        "url_has_taker": false
+      },
+      "wave": "horizon"
+    },
+    {
+      "amount": null,
+      "consumed_call": false,
+      "due_at": "2026-08-19T10:27:52Z",
+      "horizon_seconds": 14400,
+      "identity_id": "TRADED_4",
+      "input_mint": "CWZ6BsdnjkDVTGkmL6bGbJXXig6ceef12KvyGQW14cMt",
+      "kind": "SELL_H14400",
+      "lateness_slack_seconds": 120,
+      "mint": "CWZ6BsdnjkDVTGkmL6bGbJXXig6ceef12KvyGQW14cMt",
+      "observation_id": "TRADED_4:10000000:SELL_H14400",
+      "output_mint": "So11111111111111111111111111111111111111112",
+      "parent_id": "TRADED_4:10000000:BUY_T0",
+      "stratum": "TRADED",
+      "terminal": "EXPLICIT_GAP",
+      "wave": "gap"
+    },
+    {
+      "amount": "10000000",
+      "capture_envelope_sha256": "2320769f7a3b20eb02638627df8d727315c33198c136aef3e719076ea0cd1097",
+      "consumed_call": true,
+      "due_at": "2026-08-19T06:27:52Z",
+      "horizon_seconds": 0,
+      "identity_id": "TRADED_5",
+      "input_mint": "So11111111111111111111111111111111111111112",
+      "kind": "BUY_T0",
+      "mint": "6Bcypi5Wp6vSoBhHaics4iRFYuDFVQZLDbRNTWoypump",
+      "observation_id": "TRADED_5:10000000:BUY_T0",
+      "observed_at": "2026-08-19T06:29:02Z",
+      "output_mint": "6Bcypi5Wp6vSoBhHaics4iRFYuDFVQZLDbRNTWoypump",
+      "parent_id": null,
+      "quote": {
+        "error_code": null,
+        "fee_bps": {
+          "status": "OBSERVED",
+          "value": 10
+        },
+        "in_amount": "10000000",
+        "mode": "manual",
+        "out_amount": "39719296367",
+        "platform_fee": {
+          "status": "OBSERVED",
+          "value": {
+            "feeBps": 10,
+            "feeMint": "So11111111111111111111111111111111111111112"
+          }
+        },
+        "price_impact_pct": {
+          "status": "OBSERVED",
+          "value": "-0.024579425697671516"
+        },
+        "request_id_present": true,
+        "route_plan": {
+          "fee_amounts_present": false,
+          "hop_count": 1,
+          "status": "OBSERVED"
+        },
+        "router": "metis",
+        "surface": "QUOTE_OBSERVED",
+        "transaction_present": false
+      },
+      "stratum": "TRADED",
+      "terminal": "QUOTE_OBSERVED",
+      "terminal_error": null,
+      "transport": {
+        "http_status": 200,
+        "request_count": 1,
+        "response_bytes": 1265,
+        "response_sha256": "a3655ae87d0a3539e445f614f65fa672465b2d8db87f445a7878213da8a3568e",
+        "safe_response_headers": {
+          "x-api-gateway-request-id": "Gh5ulzYVX2eYiXkHrBWQvI1RTZQcdJF2r5eM_oRHMQGkRLekjXaOKA=="
+        },
+        "url_has_api_key": false,
+        "url_has_taker": false
+      },
+      "wave": "t0"
+    },
+    {
+      "amount": "39719296367",
+      "capture_envelope_sha256": "81ed22b7c39ab405ba2d6b5b95860cb125792adbef279be47d1635f84bfb8462",
+      "consumed_call": true,
+      "due_at": "2026-08-19T06:27:52Z",
+      "horizon_seconds": 0,
+      "identity_id": "TRADED_5",
+      "input_mint": "6Bcypi5Wp6vSoBhHaics4iRFYuDFVQZLDbRNTWoypump",
+      "kind": "REVERSE_T0",
+      "mint": "6Bcypi5Wp6vSoBhHaics4iRFYuDFVQZLDbRNTWoypump",
+      "observation_id": "TRADED_5:10000000:REVERSE_T0",
+      "observed_at": "2026-08-19T06:29:05Z",
+      "output_mint": "So11111111111111111111111111111111111111112",
+      "parent_id": "TRADED_5:10000000:BUY_T0",
+      "quote": {
+        "error_code": null,
+        "fee_bps": {
+          "status": "OBSERVED",
+          "value": 10
+        },
+        "in_amount": "39719296367",
+        "mode": "manual",
+        "out_amount": "9707787",
+        "platform_fee": {
+          "status": "OBSERVED",
+          "value": {
+            "feeBps": 10,
+            "feeMint": "So11111111111111111111111111111111111111112"
+          }
+        },
+        "price_impact_pct": {
+          "status": "OBSERVED",
+          "value": "-0.004758843953695136"
+        },
+        "request_id_present": true,
+        "route_plan": {
+          "fee_amounts_present": false,
+          "hop_count": 1,
+          "status": "OBSERVED"
+        },
+        "router": "metis",
+        "surface": "QUOTE_OBSERVED",
+        "transaction_present": false
+      },
+      "stratum": "TRADED",
+      "terminal": "QUOTE_OBSERVED",
+      "terminal_error": null,
+      "transport": {
+        "http_status": 200,
+        "request_count": 1,
+        "response_bytes": 1260,
+        "response_sha256": "6e337f411bdcef3b25e8c6617eebbc5cdf90d721063c7925d8e2acbef3b126f7",
+        "safe_response_headers": {
+          "x-api-gateway-request-id": "OrRkmbMFlZTJj9c7tQelpBx8nYNteH-1iFeJJ5nNJD3E9P1JZRtyqQ=="
+        },
+        "url_has_api_key": false,
+        "url_has_taker": false
+      },
+      "wave": "t0"
+    },
+    {
+      "amount": "39719296367",
+      "capture_envelope_sha256": "6902a0e52e41698d54742d30e008e14418f073008e32b1ff71ba908ffaa78f90",
+      "consumed_call": true,
+      "due_at": "2026-08-19T06:42:52Z",
+      "horizon_seconds": 900,
+      "identity_id": "TRADED_5",
+      "input_mint": "6Bcypi5Wp6vSoBhHaics4iRFYuDFVQZLDbRNTWoypump",
+      "kind": "SELL_H900",
+      "lateness_slack_seconds": 120,
+      "mint": "6Bcypi5Wp6vSoBhHaics4iRFYuDFVQZLDbRNTWoypump",
+      "observation_id": "TRADED_5:10000000:SELL_H900",
+      "observed_at": "2026-08-19T06:43:26Z",
+      "output_mint": "So11111111111111111111111111111111111111112",
+      "parent_id": "TRADED_5:10000000:BUY_T0",
+      "quote": {
+        "error_code": null,
+        "fee_bps": {
+          "status": "OBSERVED",
+          "value": 10
+        },
+        "in_amount": "39719296367",
+        "mode": "manual",
+        "out_amount": "8534828",
+        "platform_fee": {
+          "status": "OBSERVED",
+          "value": {
+            "feeBps": 10,
+            "feeMint": "So11111111111111111111111111111111111111112"
+          }
+        },
+        "price_impact_pct": {
+          "status": "OBSERVED",
+          "value": "-0.0030528307866886754"
+        },
+        "request_id_present": true,
+        "route_plan": {
+          "fee_amounts_present": false,
+          "hop_count": 1,
+          "status": "OBSERVED"
+        },
+        "router": "metis",
+        "surface": "QUOTE_OBSERVED",
+        "transaction_present": false
+      },
+      "stratum": "TRADED",
+      "terminal": "QUOTE_OBSERVED",
+      "terminal_error": null,
+      "transport": {
+        "http_status": 200,
+        "request_count": 1,
+        "response_bytes": 1261,
+        "response_sha256": "7457b35ae86ba05171e2002f47cbaefdbc8c2bd243252f7684f31dacfce10055",
+        "safe_response_headers": {
+          "x-api-gateway-request-id": "x0F-0v2wpkEkutssq-EWcxb_8BcunS5vPzOKQk1cm_Xrsh1A2ESEZA=="
+        },
+        "url_has_api_key": false,
+        "url_has_taker": false
+      },
+      "wave": "horizon"
+    },
+    {
+      "amount": "39719296367",
+      "capture_envelope_sha256": "3a5ea8dbbb73ebb31b967281db1536b1c453dd3488908e421df9c013779c8681",
+      "consumed_call": true,
+      "due_at": "2026-08-19T07:27:52Z",
+      "horizon_seconds": 3600,
+      "identity_id": "TRADED_5",
+      "input_mint": "6Bcypi5Wp6vSoBhHaics4iRFYuDFVQZLDbRNTWoypump",
+      "kind": "SELL_H3600",
+      "lateness_slack_seconds": 120,
+      "mint": "6Bcypi5Wp6vSoBhHaics4iRFYuDFVQZLDbRNTWoypump",
+      "observation_id": "TRADED_5:10000000:SELL_H3600",
+      "observed_at": "2026-08-19T07:28:26Z",
+      "output_mint": "So11111111111111111111111111111111111111112",
+      "parent_id": "TRADED_5:10000000:BUY_T0",
+      "quote": {
+        "error_code": null,
+        "fee_bps": {
+          "status": "OBSERVED",
+          "value": 10
+        },
+        "in_amount": "39719296367",
+        "mode": "manual",
+        "out_amount": "5389722",
+        "platform_fee": {
+          "status": "OBSERVED",
+          "value": {
+            "feeBps": 10,
+            "feeMint": "So11111111111111111111111111111111111111112"
+          }
+        },
+        "price_impact_pct": {
+          "status": "OBSERVED",
+          "value": "-0.011916864201636488"
+        },
+        "request_id_present": true,
+        "route_plan": {
+          "fee_amounts_present": false,
+          "hop_count": 1,
+          "status": "OBSERVED"
+        },
+        "router": "metis",
+        "surface": "QUOTE_OBSERVED",
+        "transaction_present": false
+      },
+      "stratum": "TRADED",
+      "terminal": "QUOTE_OBSERVED",
+      "terminal_error": null,
+      "transport": {
+        "http_status": 200,
+        "request_count": 1,
+        "response_bytes": 1262,
+        "response_sha256": "28e07773028ea9b90e3c53323afaf7061cde956bc0d594173383a52e8fd15c46",
+        "safe_response_headers": {
+          "x-api-gateway-request-id": "1tCtikNLj1quCi5EO0VTjR1poXmoBkMvUk_gF4hoKFVtq2xKrUS2Yg=="
+        },
+        "url_has_api_key": false,
+        "url_has_taker": false
+      },
+      "wave": "horizon"
+    },
+    {
+      "amount": null,
+      "consumed_call": false,
+      "due_at": "2026-08-19T10:27:52Z",
+      "horizon_seconds": 14400,
+      "identity_id": "TRADED_5",
+      "input_mint": "6Bcypi5Wp6vSoBhHaics4iRFYuDFVQZLDbRNTWoypump",
+      "kind": "SELL_H14400",
+      "lateness_slack_seconds": 120,
+      "mint": "6Bcypi5Wp6vSoBhHaics4iRFYuDFVQZLDbRNTWoypump",
+      "observation_id": "TRADED_5:10000000:SELL_H14400",
+      "output_mint": "So11111111111111111111111111111111111111112",
+      "parent_id": "TRADED_5:10000000:BUY_T0",
+      "stratum": "TRADED",
+      "terminal": "EXPLICIT_GAP",
+      "wave": "gap"
+    },
+    {
+      "amount": "10000000",
+      "capture_envelope_sha256": "f9f2bb320e8cf203987a9a36b7adc00b00affc9167c7e1ab407ec32317f654af",
+      "consumed_call": true,
+      "due_at": "2026-08-19T06:27:52Z",
+      "horizon_seconds": 0,
+      "identity_id": "TRADED_6",
+      "input_mint": "So11111111111111111111111111111111111111112",
+      "kind": "BUY_T0",
+      "mint": "uXZAPyQLRWVf2HyfHNVXMLymYUNpgGNv2v3APZRXnja",
+      "observation_id": "TRADED_6:10000000:BUY_T0",
+      "observed_at": "2026-08-19T06:29:08Z",
+      "output_mint": "uXZAPyQLRWVf2HyfHNVXMLymYUNpgGNv2v3APZRXnja",
+      "parent_id": null,
+      "quote": {
+        "error_code": null,
+        "fee_bps": {
+          "status": "OBSERVED",
+          "value": 10
+        },
+        "in_amount": "10000000",
+        "mode": "manual",
+        "out_amount": "37415111832",
+        "platform_fee": {
+          "status": "OBSERVED",
+          "value": {
+            "feeBps": 10,
+            "feeMint": "So11111111111111111111111111111111111111112"
+          }
+        },
+        "price_impact_pct": {
+          "status": "OBSERVED",
+          "value": "-0.03225944215107612"
+        },
+        "request_id_present": true,
+        "route_plan": {
+          "fee_amounts_present": false,
+          "hop_count": 1,
+          "status": "OBSERVED"
+        },
+        "router": "metis",
+        "surface": "QUOTE_OBSERVED",
+        "transaction_present": false
+      },
+      "stratum": "TRADED",
+      "terminal": "QUOTE_OBSERVED",
+      "terminal_error": null,
+      "transport": {
+        "http_status": 200,
+        "request_count": 1,
+        "response_bytes": 1260,
+        "response_sha256": "d2a75188ff305e86905aee48db7b48be49463f40e154f31894c57fb939c334aa",
+        "safe_response_headers": {
+          "x-api-gateway-request-id": "_Xoa1yk-ji9mBYGgP7juVzYthP8P2Ru88o5T-oBohIQc4zdMuvArbA=="
+        },
+        "url_has_api_key": false,
+        "url_has_taker": false
+      },
+      "wave": "t0"
+    },
+    {
+      "amount": "37415111832",
+      "capture_envelope_sha256": "5183cdc620748f9b2346f03c1681ce478b4b2195c492dcc6927af9bfb5771a93",
+      "consumed_call": true,
+      "due_at": "2026-08-19T06:27:52Z",
+      "horizon_seconds": 0,
+      "identity_id": "TRADED_6",
+      "input_mint": "uXZAPyQLRWVf2HyfHNVXMLymYUNpgGNv2v3APZRXnja",
+      "kind": "REVERSE_T0",
+      "mint": "uXZAPyQLRWVf2HyfHNVXMLymYUNpgGNv2v3APZRXnja",
+      "observation_id": "TRADED_6:10000000:REVERSE_T0",
+      "observed_at": "2026-08-19T06:29:12Z",
+      "output_mint": "So11111111111111111111111111111111111111112",
+      "parent_id": "TRADED_6:10000000:BUY_T0",
+      "quote": {
+        "error_code": null,
+        "fee_bps": {
+          "status": "OBSERVED",
+          "value": 10
+        },
+        "in_amount": "37415111832",
+        "mode": "manual",
+        "out_amount": "9838664",
+        "platform_fee": {
+          "status": "OBSERVED",
+          "value": {
+            "feeBps": 10,
+            "feeMint": "So11111111111111111111111111111111111111112"
+          }
+        },
+        "price_impact_pct": {
+          "status": "OBSERVED",
+          "value": "0.016663393944054902"
+        },
+        "request_id_present": true,
+        "route_plan": {
+          "fee_amounts_present": false,
+          "hop_count": 1,
+          "status": "OBSERVED"
+        },
+        "router": "dflow",
+        "surface": "QUOTE_OBSERVED",
+        "transaction_present": false
+      },
+      "stratum": "TRADED",
+      "terminal": "QUOTE_OBSERVED",
+      "terminal_error": null,
+      "transport": {
+        "http_status": 200,
+        "request_count": 1,
+        "response_bytes": 1253,
+        "response_sha256": "76dd19712b885c500a9e591f30242915b2210578a330d8678af01c326f4244a0",
+        "safe_response_headers": {
+          "x-api-gateway-request-id": "rkVeF770hqtyScLO7jpM6LWzGKdYSf51_rZmcJQV53QZjgYk0NL_hQ=="
+        },
+        "url_has_api_key": false,
+        "url_has_taker": false
+      },
+      "wave": "t0"
+    },
+    {
+      "amount": "37415111832",
+      "capture_envelope_sha256": "060b412f1a181c0f1ecad6f15f8b31f4e14c755344c6be9545f56516d4413b50",
+      "consumed_call": true,
+      "due_at": "2026-08-19T06:42:52Z",
+      "horizon_seconds": 900,
+      "identity_id": "TRADED_6",
+      "input_mint": "uXZAPyQLRWVf2HyfHNVXMLymYUNpgGNv2v3APZRXnja",
+      "kind": "SELL_H900",
+      "lateness_slack_seconds": 120,
+      "mint": "uXZAPyQLRWVf2HyfHNVXMLymYUNpgGNv2v3APZRXnja",
+      "observation_id": "TRADED_6:10000000:SELL_H900",
+      "observed_at": "2026-08-19T06:43:29Z",
+      "output_mint": "So11111111111111111111111111111111111111112",
+      "parent_id": "TRADED_6:10000000:BUY_T0",
+      "quote": {
+        "error_code": null,
+        "fee_bps": {
+          "status": "OBSERVED",
+          "value": 10
+        },
+        "in_amount": "37415111832",
+        "mode": "manual",
+        "out_amount": "6828580",
+        "platform_fee": {
+          "status": "OBSERVED",
+          "value": {
+            "feeBps": 10,
+            "feeMint": "So11111111111111111111111111111111111111112"
+          }
+        },
+        "price_impact_pct": {
+          "status": "OBSERVED",
+          "value": "0.001356516266994876"
+        },
+        "request_id_present": true,
+        "route_plan": {
+          "fee_amounts_present": false,
+          "hop_count": 1,
+          "status": "OBSERVED"
+        },
+        "router": "dflow",
+        "surface": "QUOTE_OBSERVED",
+        "transaction_present": false
+      },
+      "stratum": "TRADED",
+      "terminal": "QUOTE_OBSERVED",
+      "terminal_error": null,
+      "transport": {
+        "http_status": 200,
+        "request_count": 1,
+        "response_bytes": 1254,
+        "response_sha256": "845609a543ecbca5db901d67b6b1c3fec094b470d37bff269fafbc78e496b138",
+        "safe_response_headers": {
+          "x-api-gateway-request-id": "gMyGRdM7_8mGXIm6gqy4BM90xJt2QwzuaVk5sFuFc40qZbEZI7X6cw=="
+        },
+        "url_has_api_key": false,
+        "url_has_taker": false
+      },
+      "wave": "horizon"
+    },
+    {
+      "amount": "37415111832",
+      "capture_envelope_sha256": "df20a193dbcd731ddf98204bc67245e0ddc5a27a9ffe1c3c028af49135c70776",
+      "consumed_call": true,
+      "due_at": "2026-08-19T07:27:52Z",
+      "horizon_seconds": 3600,
+      "identity_id": "TRADED_6",
+      "input_mint": "uXZAPyQLRWVf2HyfHNVXMLymYUNpgGNv2v3APZRXnja",
+      "kind": "SELL_H3600",
+      "lateness_slack_seconds": 120,
+      "mint": "uXZAPyQLRWVf2HyfHNVXMLymYUNpgGNv2v3APZRXnja",
+      "observation_id": "TRADED_6:10000000:SELL_H3600",
+      "observed_at": "2026-08-19T07:28:29Z",
+      "output_mint": "So11111111111111111111111111111111111111112",
+      "parent_id": "TRADED_6:10000000:BUY_T0",
+      "quote": {
+        "error_code": null,
+        "fee_bps": {
+          "status": "OBSERVED",
+          "value": 10
+        },
+        "in_amount": "37415111832",
+        "mode": "manual",
+        "out_amount": "6730836",
+        "platform_fee": {
+          "status": "OBSERVED",
+          "value": {
+            "feeBps": 10,
+            "feeMint": "So11111111111111111111111111111111111111112"
+          }
+        },
+        "price_impact_pct": {
+          "status": "OBSERVED",
+          "value": "0.00578810441867172"
+        },
+        "request_id_present": true,
+        "route_plan": {
+          "fee_amounts_present": false,
+          "hop_count": 1,
+          "status": "OBSERVED"
+        },
+        "router": "dflow",
+        "surface": "QUOTE_OBSERVED",
+        "transaction_present": false
+      },
+      "stratum": "TRADED",
+      "terminal": "QUOTE_OBSERVED",
+      "terminal_error": null,
+      "transport": {
+        "http_status": 200,
+        "request_count": 1,
+        "response_bytes": 1253,
+        "response_sha256": "3d5156132bcc936315e4927d051af5e680e9e2f1262f3e38c0760b8050ee23c1",
+        "safe_response_headers": {
+          "x-api-gateway-request-id": "V78FVOsxb9wngYOuphfc0Ld5dmoFD5iu8i1DcJo3p1EfrLmKEUpADQ=="
+        },
+        "url_has_api_key": false,
+        "url_has_taker": false
+      },
+      "wave": "horizon"
+    },
+    {
+      "amount": null,
+      "consumed_call": false,
+      "due_at": "2026-08-19T10:27:52Z",
+      "horizon_seconds": 14400,
+      "identity_id": "TRADED_6",
+      "input_mint": "uXZAPyQLRWVf2HyfHNVXMLymYUNpgGNv2v3APZRXnja",
+      "kind": "SELL_H14400",
+      "lateness_slack_seconds": 120,
+      "mint": "uXZAPyQLRWVf2HyfHNVXMLymYUNpgGNv2v3APZRXnja",
+      "observation_id": "TRADED_6:10000000:SELL_H14400",
+      "output_mint": "So11111111111111111111111111111111111111112",
+      "parent_id": "TRADED_6:10000000:BUY_T0",
+      "stratum": "TRADED",
+      "terminal": "EXPLICIT_GAP",
+      "wave": "gap"
+    }
+  ],
+  "panel_started_at": "2026-08-19T06:27:52Z",
+  "preflight": {
+    "credential_reads": 0,
+    "dns_resolved": true,
+    "host": "api.jup.ag",
+    "observed_at": "2026-08-19T06:27:48Z",
+    "port": 443,
+    "provider_requests": 0,
+    "schema": "smial.pmf-quote-slice-one-shot.credential-free-preflight",
+    "schema_version": "1.0",
+    "tcp_443": true,
+    "tls_verified": true,
+    "tls_version": "TLSv1.3"
+  },
+  "provider_requests": 50,
+  "retries": 0,
+  "schema": "smial.quote-native-admissible-friction-audition.runtime-receipt",
+  "schema_version": "1.0",
+  "searchable_y_kind": "SELL_H900",
+  "terminal_outcome": "DIRECTIONAL_HINT_NOT_CONFIRMATION"
+}

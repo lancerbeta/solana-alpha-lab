@@ -21,9 +21,11 @@ data_requirements:
   - requirement_id: RUNTIME_RECEIPT
     kind: PROVIDER_BOUNDED_CAPTURE
     path: docs/evidence/factory_v1_commissioning/a2_factory_v1_commissioning_runtime_receipt_v1.json
+    sha256: f83968a0be381f874a38ed214c1f9ff1a5ac46bc433c502417d35d8f31727468
   - requirement_id: ACCEPTANCE
     kind: PROVIDER_BOUNDED_CAPTURE
     path: docs/evidence/factory_v1_commissioning/a2_factory_v1_commissioning_acceptance_v1.json
+    sha256: fe575fb897c72a8ca1c184b3e815ecfa1507813349b468fade96b08fb78aa0dc
 capabilities:
   - CAP-JUPITER-FREE-KEY-QUOTE-NATIVE-BOUNDED-CAPTURE-001
 falsifier: Live capture cannot complete except by a hypothesis-specific core runner, or the new cohort reuses A1 or MOVE 2 mints, or MOVE 3 is started.

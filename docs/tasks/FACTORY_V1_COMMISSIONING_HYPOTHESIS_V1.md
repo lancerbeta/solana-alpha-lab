@@ -28,6 +28,7 @@ managed_write_set:
   - src/solana_alpha_lab/factory/workbench.py
   - scripts/run_factory_experiment.py
   - scripts/run_factory_workbench.py
+  - scripts/run_factory_commissioning_capture.py
   - tests/test_factory_v1_product_kernel.py
   - tests/test_factory_v1_commissioning.py
   - catalog/assets/core.yaml

@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import hashlib
 import json
 import sys
 import tempfile
@@ -211,6 +212,35 @@ class FactoryV1CommissioningTests(unittest.TestCase):
                 self.assertNotIn(cell["mint"], excluded)
             store.close()
 
+    def test_live_receipts_are_hash_bound_and_exclude_prior_mints(self) -> None:
+        spec = load_experiment_spec(ROOT, SPEC_RELATIVE)
+        requirements = {item["requirement_id"]: item for item in spec["data_requirements"]}
+        runtime_path = ROOT / requirements["RUNTIME_RECEIPT"]["path"]
+        acceptance_path = ROOT / requirements["ACCEPTANCE"]["path"]
+        self.assertEqual(
+            requirements["RUNTIME_RECEIPT"]["sha256"],
+            hashlib.sha256(runtime_path.read_bytes()).hexdigest(),
+        )
+        self.assertEqual(
+            requirements["ACCEPTANCE"]["sha256"],
+            hashlib.sha256(acceptance_path.read_bytes()).hexdigest(),
+        )
+        runtime = json.loads(runtime_path.read_text(encoding="utf-8"))
+        acceptance = json.loads(acceptance_path.read_text(encoding="utf-8"))
+        self.assertEqual(runtime["atom_id"], FACTORY_COMMISSIONING_ATOM_ID)
+        self.assertEqual(runtime["terminal_outcome"], "DIRECTIONAL_HINT_NOT_CONFIRMATION")
+        self.assertEqual(acceptance["product_terminal"], "FACTORY_COMMISSIONING_LIVE_CYCLE_PASS")
+        self.assertFalse(acceptance["factory_v1_operational_ready"])
+        self.assertFalse(acceptance["move_3"])
+        self.assertEqual(acceptance["project_sources_disposition"]["kind"], "NO_CHANGE")
+        excluded = set(runtime["excluded_prior_mints"])
+        self.assertGreaterEqual(len(excluded), 12)
+        for cell in runtime["frozen_cells"]:
+            self.assertNotIn(cell["mint"], excluded)
+        blob = runtime_path.read_bytes().decode("utf-8").lower()
+        self.assertNotIn("jupiter_api_key", blob)
+        self.assertNotIn("x-api-key", blob)
+
     def test_default_application_selects_commissioning_spec(self) -> None:
         spec = load_experiment_spec(ROOT, SPEC_RELATIVE)
         self.assertEqual(
@@ -226,6 +256,8 @@ class FactoryV1CommissioningTests(unittest.TestCase):
                 model["hypothesis"],
                 "HYP-FACTORY-V1-COMMISSIONING-QUOTE-NATIVE-FREE-KEY-V1",
             )
+            self.assertIn("question", model)
+            self.assertEqual(model["result"], None)
             store.close()
 
     def test_workbench_exposes_hover_copy_blocks_for_exact_phrase(self) -> None:

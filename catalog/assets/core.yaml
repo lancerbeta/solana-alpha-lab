@@ -25866,7 +25866,7 @@ records:
   as_of: '2026-08-19'
   truth_owner: FACTORY_V1_COMMISSIONING_HYPOTHESIS_V1
   location: {kind: git_path, logical_uri: 'repo://docs/tasks/FACTORY_V1_COMMISSIONING_HYPOTHESIS_V1.md', repository_path: docs/tasks/FACTORY_V1_COMMISSIONING_HYPOTHESIS_V1.md}
-  integrity: {kind: sha256, sha256: 9a578bb24a7717e0547b62b1ddb1865d22aead0f50a28a4f3155f0a34c978a62}
+  integrity: {kind: sha256, sha256: a66a4e75e9f5d191238b42419688dd7c66d48c123126b302d43a412d49091618}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: governed_by, target_asset_id: ARCH-INTENT-005}
@@ -25924,7 +25924,7 @@ records:
   as_of: '2026-08-19'
   truth_owner: FACTORY_V1_COMMISSIONING_HYPOTHESIS_V1
   location: {kind: git_path, logical_uri: 'repo://configs/experiment_specs/factory_v1_commissioning_quote_native_free_key_v1.yaml', repository_path: configs/experiment_specs/factory_v1_commissioning_quote_native_free_key_v1.yaml}
-  integrity: {kind: sha256, sha256: 5a1f6b9cc54218222f6d9aa4dcf6ec4ce50c4b01034cc60ea0f08c9f5351ff69}
+  integrity: {kind: sha256, sha256: 190e219428a8b0ab3f2ab0831aee02d7f3a8235a82d3b1483168df91e2d0c699}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: governed_by, target_asset_id: CTRL-FACTORY-V1-COMMISSIONING-HYPOTHESIS-001}
@@ -25980,7 +25980,7 @@ records:
   as_of: '2026-08-19'
   truth_owner: FACTORY_V1_COMMISSIONING_HYPOTHESIS_V1
   location: {kind: git_path, logical_uri: 'repo://tests/test_factory_v1_commissioning.py', repository_path: tests/test_factory_v1_commissioning.py}
-  integrity: {kind: sha256, sha256: 9f4f32072c063ba986c8197b9a8baff8ad4d3f5cb52bf431a80fada65c5c2794}
+  integrity: {kind: sha256, sha256: 95b40457080f14cb57476787d34701d68333a53d647340aefcaed6c938035c80}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: depends_on, target_asset_id: CONFIG-EXPERIMENT-SPEC-FACTORY-V1-COMMISSIONING-001}
@@ -25988,4 +25988,76 @@ records:
   consumers: [FACTORY-001, FACTORY-V1-COMMISSIONING-001, GOAL-OWNER]
   evidence: []
   search_terms: [FACTORY_V1, COMMISSIONING, TESTS]
+  classification: {contains_secrets: false, contains_raw_data: false, sensitivity: INTERNAL_NON_SECRET}
+
+- asset_id: SCRIPT-FACTORY-V1-COMMISSIONING-CAPTURE-001
+  record_version: '1.0'
+  asset_type: script
+  purpose: CLI that starts the Factory commissioning live capture after the exact owner phrase.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-08-19'
+  truth_owner: FACTORY_V1_COMMISSIONING_HYPOTHESIS_V1
+  location: {kind: git_path, logical_uri: 'repo://scripts/run_factory_commissioning_capture.py', repository_path: scripts/run_factory_commissioning_capture.py}
+  integrity: {kind: sha256, sha256: b7c5bdfb8042c9a2be8bbc281694f73abdaf3318c374261dcf9e32cc652b0861}
+  access: {mode: read_only, method: file, network_required: false, secrets_required: false}
+  relations:
+  - {relation_type: depends_on, target_asset_id: MODULE-FACTORY-V1-APPLICATION-001}
+  consumers: [FACTORY-001, FACTORY-V1-COMMISSIONING-001, GOAL-OWNER]
+  evidence: []
+  search_terms: [FACTORY_V1, COMMISSIONING, CAPTURE]
+  classification: {contains_secrets: false, contains_raw_data: false, sensitivity: INTERNAL_NON_SECRET}
+
+- asset_id: EVIDENCE-FACTORY-V1-COMMISSIONING-RUNTIME-001
+  record_version: '1.0'
+  asset_type: evidence
+  purpose: Hash-bound runtime receipt of the Factory-commissioned Free-key quote-native campaign.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-08-19'
+  truth_owner: FACTORY_V1_COMMISSIONING_HYPOTHESIS_V1
+  location: {kind: git_path, logical_uri: 'repo://docs/evidence/factory_v1_commissioning/a2_factory_v1_commissioning_runtime_receipt_v1.json', repository_path: docs/evidence/factory_v1_commissioning/a2_factory_v1_commissioning_runtime_receipt_v1.json}
+  integrity: {kind: sha256, sha256: f83968a0be381f874a38ed214c1f9ff1a5ac46bc433c502417d35d8f31727468}
+  access: {mode: read_only, method: file, network_required: false, secrets_required: false}
+  relations:
+  - {relation_type: derived_from, target_asset_id: CTRL-FACTORY-V1-COMMISSIONING-HYPOTHESIS-001}
+  consumers: [FACTORY-001, FACTORY-V1-COMMISSIONING-001, GOAL-OWNER]
+  evidence: []
+  search_terms: [FACTORY_V1, COMMISSIONING, RUNTIME]
+  classification: {contains_secrets: false, contains_raw_data: false, sensitivity: INTERNAL_NON_SECRET}
+
+- asset_id: EVIDENCE-FACTORY-V1-COMMISSIONING-ACCEPTANCE-001
+  record_version: '1.0'
+  asset_type: evidence
+  purpose: Acceptance that Factory completed one live Free-key cycle; scientific hint is not alpha.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-08-19'
+  truth_owner: FACTORY_V1_COMMISSIONING_HYPOTHESIS_V1
+  location: {kind: git_path, logical_uri: 'repo://docs/evidence/factory_v1_commissioning/a2_factory_v1_commissioning_acceptance_v1.json', repository_path: docs/evidence/factory_v1_commissioning/a2_factory_v1_commissioning_acceptance_v1.json}
+  integrity: {kind: sha256, sha256: fe575fb897c72a8ca1c184b3e815ecfa1507813349b468fade96b08fb78aa0dc}
+  access: {mode: read_only, method: file, network_required: false, secrets_required: false}
+  relations:
+  - {relation_type: derived_from, target_asset_id: EVIDENCE-FACTORY-V1-COMMISSIONING-RUNTIME-001}
+  consumers: [FACTORY-001, FACTORY-V1-COMMISSIONING-001, GOAL-OWNER]
+  evidence: []
+  search_terms: [FACTORY_V1, COMMISSIONING, ACCEPTANCE]
+  classification: {contains_secrets: false, contains_raw_data: false, sensitivity: INTERNAL_NON_SECRET}
+
+- asset_id: REPORT-FACTORY-V1-COMMISSIONING-001
+  record_version: '1.0'
+  asset_type: control_document
+  purpose: Russian owner readout of the Factory commissioning packet and non-claims.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-08-19'
+  truth_owner: FACTORY_V1_COMMISSIONING_HYPOTHESIS_V1
+  location: {kind: git_path, logical_uri: 'repo://docs/reports/factory_v1_commissioning/a2_owner_readout_v1.md', repository_path: docs/reports/factory_v1_commissioning/a2_owner_readout_v1.md}
+  integrity: {kind: sha256, sha256: 91e781806b5a8df239e4efa0c18964341f067bb86ebc9219318cbcea5fa439ca}
+  access: {mode: read_only, method: file, network_required: false, secrets_required: false}
+  relations:
+  - {relation_type: derived_from, target_asset_id: EVIDENCE-FACTORY-V1-COMMISSIONING-ACCEPTANCE-001}
+  consumers: [FACTORY-001, FACTORY-V1-COMMISSIONING-001, GOAL-OWNER]
+  evidence: []
+  search_terms: [FACTORY_V1, COMMISSIONING, OWNER_READOUT]
   classification: {contains_secrets: false, contains_raw_data: false, sensitivity: INTERNAL_NON_SECRET}
