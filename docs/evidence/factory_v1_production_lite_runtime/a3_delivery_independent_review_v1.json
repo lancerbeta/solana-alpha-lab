@@ -16,7 +16,7 @@
   ],
   "review_id": "FACTORY-V1-PRODUCTION-LITE-RUNTIME-INDEPENDENT-REVIEW-001",
   "reviewed_bindings_sha256": "bc1269d983579be4719c6dad722a8c139f9b4430df223a14a6516a51f1f49b3d",
-  "reviewed_inventory_sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+  "reviewed_inventory_sha256": "cb932d7af1a3faf5c0a7492f8ed6dba98a793c82d93ff248a1d1da27e91ec9b7",
   "reviews": [
     {
       "findings": [

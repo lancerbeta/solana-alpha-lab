@@ -9,7 +9,7 @@
   "cloud_bundle_smoke_required": false,
   "factory_fit": {
     "path": "docs/evidence/factory_v1_production_lite_runtime/a3_delivery_factory_fit_v1.json",
-    "sha256": "50e359895e6706d7036550c75071c54a6d72a2aa40507e198204b1182f10391a",
+    "sha256": "6cecb3d6bba33794b2e515f1df81c9db86d798c78114b52cc44cf469e7419f56",
     "verdict": "PASS"
   },
   "implementation_bindings": {
@@ -65,7 +65,7 @@
     "github_ci": "ENFORCED_LIVE_AT_GUARDED_MERGE",
     "independent_review": {
       "path": "docs/evidence/factory_v1_production_lite_runtime/a3_delivery_independent_review_v1.json",
-      "sha256": "c289ce2f616d493b03d6b7330db9282dd24b8b8ace73bf4998ebb82dd16e1887",
+      "sha256": "a908f5e8b5f41fce0bbe7b2a9240a954a107ce875af2baebd3e40c432b62b985",
       "verdict": "PASS"
     },
     "project_checks": [
