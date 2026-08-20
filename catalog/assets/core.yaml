@@ -25645,7 +25645,7 @@ records:
   as_of: '2026-08-19'
   truth_owner: FACTORY_V1_PRODUCT_KERNEL_LOCAL_VERTICAL_SLICE_V1
   location: {kind: git_path, logical_uri: 'repo://src/solana_alpha_lab/factory/capabilities.py', repository_path: src/solana_alpha_lab/factory/capabilities.py}
-  integrity: {kind: sha256, sha256: 38acafe3b0446bf9c3dff190a65473f7a1abadbcd48ffabc5171c90c438a852a}
+  integrity: {kind: sha256, sha256: f700617061bc844d4f083d2352f04de7e7f8381a6fec556a804c9bf6984b96c3}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: governed_by, target_asset_id: CTRL-FACTORY-V1-PRODUCT-KERNEL-001}
@@ -25962,7 +25962,7 @@ records:
   as_of: '2026-08-19'
   truth_owner: FACTORY_V1_COMMISSIONING_HYPOTHESIS_V1
   location: {kind: git_path, logical_uri: 'repo://src/solana_alpha_lab/factory/capabilities.py', repository_path: src/solana_alpha_lab/factory/capabilities.py}
-  integrity: {kind: sha256, sha256: 38acafe3b0446bf9c3dff190a65473f7a1abadbcd48ffabc5171c90c438a852a}
+  integrity: {kind: sha256, sha256: f700617061bc844d4f083d2352f04de7e7f8381a6fec556a804c9bf6984b96c3}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: governed_by, target_asset_id: CTRL-FACTORY-V1-COMMISSIONING-HYPOTHESIS-001}
@@ -26894,7 +26894,7 @@ records:
   as_of: '2026-08-19'
   truth_owner: QUOTE_SURFACE_RETENTION_FALSIFIER_V1
   location: {kind: git_path, logical_uri: 'repo://src/solana_alpha_lab/factory/quote_surface_retention.py', repository_path: src/solana_alpha_lab/factory/quote_surface_retention.py}
-  integrity: {kind: sha256, sha256: 60848b09d5a537fa983a73d96cfe4619be323dbae4e1d5609e011e22272461d3}
+  integrity: {kind: sha256, sha256: 942b8230cde7e52def99e3a26d003141d9a2842def769125692d2f0244794ef5}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: governed_by, target_asset_id: CTRL-QUOTE-SURFACE-RETENTION-FALSIFIER-001}
@@ -26975,4 +26975,100 @@ records:
   consumers: [FACTORY-001, QUOTE-SURFACE-RETENTION-FALSIFIER-001, GOAL-OWNER]
   evidence: []
   search_terms: [FACTORY_V1, QUOTE_SURFACE_RETENTION, OWNER_READOUT]
+  classification: {contains_secrets: false, contains_raw_data: false, sensitivity: INTERNAL_NON_SECRET}
+
+- asset_id: CTRL-QUOTE-SURFACE-RETENTION-CLOCK-QUALIFY-001
+  record_version: '1.0'
+  asset_type: control_document
+  purpose: Exact DIRECT_CURSOR_DELIVERY contract for offline quote-surface retention clock qualification.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-08-20'
+  truth_owner: QUOTE_SURFACE_RETENTION_CLOCK_QUALIFY_V1
+  location: {kind: git_path, logical_uri: 'repo://docs/tasks/QUOTE_SURFACE_RETENTION_CLOCK_QUALIFY_V1.md', repository_path: docs/tasks/QUOTE_SURFACE_RETENTION_CLOCK_QUALIFY_V1.md}
+  integrity: {kind: sha256, sha256: 0d689488e53c4bfa9111a68b83e93b73ad00bd6c4e34da3f483c1e4623e82dfe}
+  access: {mode: read_only, method: file, network_required: false, secrets_required: false}
+  relations:
+  - {relation_type: depends_on, target_asset_id: CTRL-QUOTE-SURFACE-RETENTION-FALSIFIER-001}
+  - {relation_type: depends_on, target_asset_id: EVIDENCE-QUOTE-SURFACE-RETENTION-FALSIFIER-RUNTIME-001}
+  - {relation_type: depends_on, target_asset_id: MODULE-FACTORY-V1-QUOTE-SURFACE-RETENTION-001}
+  - {relation_type: validated_by, target_asset_id: TEST-QUOTE-SURFACE-RETENTION-CLOCK-QUALIFY-001}
+  consumers: [FACTORY-001, QUOTE-SURFACE-RETENTION-CLOCK-QUALIFY-001, GOAL-OWNER]
+  evidence: []
+  search_terms: [FACTORY_V1, QUOTE_SURFACE_RETENTION, CLOCK_QUALIFY, CONTRACT]
+  classification: {contains_secrets: false, contains_raw_data: false, sensitivity: INTERNAL_NON_SECRET}
+
+- asset_id: MODULE-QUOTE-SURFACE-RETENTION-CLOCK-001
+  record_version: '1.0'
+  asset_type: script
+  purpose: Clock-only PIT validator that must not see Y or quote amounts.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-08-20'
+  truth_owner: QUOTE_SURFACE_RETENTION_CLOCK_QUALIFY_V1
+  location: {kind: git_path, logical_uri: 'repo://src/solana_alpha_lab/factory/quote_surface_retention_clock.py', repository_path: src/solana_alpha_lab/factory/quote_surface_retention_clock.py}
+  integrity: {kind: sha256, sha256: b7abda2b4e3ffae1c791e8285fbb633d7b0eaa25d3ac0b5553ecae9a6455d4af}
+  access: {mode: read_only, method: file, network_required: false, secrets_required: false}
+  relations:
+  - {relation_type: governed_by, target_asset_id: CTRL-QUOTE-SURFACE-RETENTION-CLOCK-QUALIFY-001}
+  consumers: [FACTORY-001, QUOTE-SURFACE-RETENTION-CLOCK-QUALIFY-001, GOAL-OWNER]
+  evidence: []
+  search_terms: [FACTORY_V1, QUOTE_SURFACE_RETENTION, CLOCK]
+  classification: {contains_secrets: false, contains_raw_data: false, sensitivity: INTERNAL_NON_SECRET}
+
+- asset_id: MODULE-DELIVERY-TRACKED-HASH-001
+  record_version: '1.0'
+  asset_type: script
+  purpose: SHA-256 of Git-normalized tracked bytes rather than a Windows working-tree copy.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-08-20'
+  truth_owner: QUOTE_SURFACE_RETENTION_CLOCK_QUALIFY_V1
+  location: {kind: git_path, logical_uri: 'repo://src/solana_alpha_lab/delivery_tracked_hash.py', repository_path: src/solana_alpha_lab/delivery_tracked_hash.py}
+  integrity: {kind: sha256, sha256: 7fa9a1014eb0367709289b9389acf56a74d59de5b7c6367a9746329afd4f6131}
+  access: {mode: read_only, method: file, network_required: false, secrets_required: false}
+  relations:
+  - {relation_type: governed_by, target_asset_id: CTRL-QUOTE-SURFACE-RETENTION-CLOCK-QUALIFY-001}
+  consumers: [FACTORY-001, QUOTE-SURFACE-RETENTION-CLOCK-QUALIFY-001, GOAL-OWNER]
+  evidence: []
+  search_terms: [FACTORY_V1, TRACKED_HASH, GIT_BLOB]
+  classification: {contains_secrets: false, contains_raw_data: false, sensitivity: INTERNAL_NON_SECRET}
+
+- asset_id: TEST-QUOTE-SURFACE-RETENTION-CLOCK-QUALIFY-001
+  record_version: '1.0'
+  asset_type: script
+  purpose: Six adversarial clock vectors, leak rejection, and PR 156 structural replay.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-08-20'
+  truth_owner: QUOTE_SURFACE_RETENTION_CLOCK_QUALIFY_V1
+  location: {kind: git_path, logical_uri: 'repo://tests/test_quote_surface_retention_clock.py', repository_path: tests/test_quote_surface_retention_clock.py}
+  integrity: {kind: sha256, sha256: 063f306d011e249be606f887e2a3fd1b179317b6a6908955dd5c152287e1ace6}
+  access: {mode: read_only, method: file, network_required: false, secrets_required: false}
+  relations:
+  - {relation_type: depends_on, target_asset_id: MODULE-QUOTE-SURFACE-RETENTION-CLOCK-001}
+  - {relation_type: depends_on, target_asset_id: MODULE-FACTORY-V1-QUOTE-SURFACE-RETENTION-001}
+  - {relation_type: depends_on, target_asset_id: MODULE-DELIVERY-TRACKED-HASH-001}
+  consumers: [FACTORY-001, QUOTE-SURFACE-RETENTION-CLOCK-QUALIFY-001, GOAL-OWNER]
+  evidence: []
+  search_terms: [FACTORY_V1, QUOTE_SURFACE_RETENTION, CLOCK, TEST]
+  classification: {contains_secrets: false, contains_raw_data: false, sensitivity: INTERNAL_NON_SECRET}
+
+- asset_id: EVIDENCE-QUOTE-SURFACE-RETENTION-CLOCK-QUALIFY-001
+  record_version: '1.0'
+  asset_type: evidence
+  purpose: Engineering-only clock qualification of consumed PR 156; not a scientific reclassification.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-08-20'
+  truth_owner: QUOTE_SURFACE_RETENTION_CLOCK_QUALIFY_V1
+  location: {kind: git_path, logical_uri: 'repo://docs/evidence/quote_surface_retention_clock_qualify/q1_engineering_qualification_v1.json', repository_path: docs/evidence/quote_surface_retention_clock_qualify/q1_engineering_qualification_v1.json}
+  integrity: {kind: sha256, sha256: c7c925301cc1bbff59680aa12c2c60e1fbeb50674cf28de1d7219e36364dbdb5}
+  access: {mode: read_only, method: file, network_required: false, secrets_required: false}
+  relations:
+  - {relation_type: derived_from, target_asset_id: EVIDENCE-QUOTE-SURFACE-RETENTION-FALSIFIER-RUNTIME-001}
+  - {relation_type: governed_by, target_asset_id: CTRL-QUOTE-SURFACE-RETENTION-CLOCK-QUALIFY-001}
+  consumers: [FACTORY-001, QUOTE-SURFACE-RETENTION-CLOCK-QUALIFY-001, GOAL-OWNER]
+  evidence: []
+  search_terms: [FACTORY_V1, QUOTE_SURFACE_RETENTION, CLOCK_QUALIFY, ENGINEERING_ONLY]
   classification: {contains_secrets: false, contains_raw_data: false, sensitivity: INTERNAL_NON_SECRET}
