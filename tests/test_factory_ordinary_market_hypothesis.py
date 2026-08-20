@@ -1,0 +1,173 @@
+from __future__ import annotations
+
+import hashlib
+import json
+import subprocess
+import sys
+import tempfile
+import unittest
+from pathlib import Path
+
+import jsonschema
+import yaml
+
+ROOT = Path(__file__).resolve().parents[1]
+SRC = ROOT / "src"
+if str(SRC) not in sys.path:
+    sys.path.insert(0, str(SRC))
+
+from solana_alpha_lab.factory.application import FactoryApplication
+from solana_alpha_lab.factory.experiment_spec import load_experiment_spec
+from solana_alpha_lab.factory.market_feature_surface import (
+    PASS_TERMINAL,
+    resolve_feature_snapshot,
+)
+from solana_alpha_lab.factory.operational_store import OperationalStore
+from solana_alpha_lab.factory.workbench import _page
+
+SPEC = "configs/experiment_specs/ordinary_price_path_buy_pressure_v1.yaml"
+ARCHETYPE = "configs/experiment_specs/market_feature_price_path_archetype_v1.yaml"
+SCHEMA = ROOT / "catalog/schemas/experiment_spec.schema.json"
+SCRIPT = ROOT / "scripts/run_factory_ordinary_market_hypothesis.py"
+FEATURE_CATALOG = ROOT / "registries/feature_catalog.yaml"
+HYPOTHESES = ROOT / "registries/hypotheses.yaml"
+RESEARCH_CYCLES = ROOT / "registries/research_cycles.yaml"
+PRODUCT_TERMINAL = "ORDINARY_HYPOTHESIS_COMPOSED_NOT_PROMOTABLE"
+FACTORY_CORE = {
+    "src/solana_alpha_lab/factory/runner.py": "d8d22bcb51fb6992d40f09e58274c52e0f9942c12d043cc57b96ffca524e918f",
+    "src/solana_alpha_lab/factory/capabilities.py": "31384242c928eae20e3029a04beef5a50e44c314e0c51d7255799b32c1e7ee65",
+    "src/solana_alpha_lab/factory/read_model.py": "1bdc9b61e5a4bb579d93f66d99eac9db7f6aaed44c9d79dcb781f89725d7fef1",
+    "src/solana_alpha_lab/factory/workbench.py": "18b16798a2b8d0303586e260a9fcb8272b27cb922e633d9d5e294d69a08ddd66",
+    "src/solana_alpha_lab/factory/market_feature_surface.py": "f077e823d4acf6c6b5adb15c96e315361df7729197af422deb69b35b0a06131f",
+    "src/solana_alpha_lab/factory/application.py": "82a08b513f12ffcb0b95a3343f2004e2faea2e374ecd3a27b3c9fd4e87cf5173",
+}
+
+
+def sha256(path: Path) -> str:
+    return hashlib.sha256(path.read_bytes()).hexdigest()
+
+
+class FactoryOrdinaryMarketHypothesisTests(unittest.TestCase):
+    def test_spec_validates_and_is_not_a_fourth_archetype(self) -> None:
+        spec = load_experiment_spec(ROOT, SPEC)
+        jsonschema.validate(spec, json.loads(SCHEMA.read_text(encoding="utf-8")))
+        archetype = load_experiment_spec(ROOT, ARCHETYPE)
+        self.assertEqual(spec["experiment_id"], "EXP-ORDINARY-PRICE-PATH-HYPOTHESIS-001")
+        self.assertEqual(
+            spec["hypothesis_version"], "HYP-ORDINARY-PRICE-PATH-BUY-PRESSURE-V1"
+        )
+        self.assertNotEqual(spec["experiment_id"], archetype["experiment_id"])
+        self.assertNotEqual(spec["hypothesis_version"], archetype["hypothesis_version"])
+        self.assertNotEqual(spec["question"], archetype["question"])
+        self.assertEqual(spec["parameters"]["next_safe_action"], "DO_NOT_PROMOTE")
+        self.assertEqual(spec["parameters"]["product_terminal"], PRODUCT_TERMINAL)
+        self.assertNotIn("FEAT-VOLUME-15M", spec["required_feature_ids"])
+        self.assertNotIn("FEAT-AGE-SINCE-CREATION", spec["required_feature_ids"])
+
+    def test_factory_core_python_unchanged(self) -> None:
+        for relative, expected in FACTORY_CORE.items():
+            self.assertEqual(sha256(ROOT / relative), expected, relative)
+
+    def test_runner_source_has_no_feature_ids(self) -> None:
+        source = (ROOT / "src/solana_alpha_lab/factory/runner.py").read_text(
+            encoding="utf-8"
+        )
+        self.assertNotIn("required_feature_ids", source)
+        self.assertNotIn("FEAT-", source)
+        self.assertNotIn("market_feature_surface", source)
+
+    def test_task28_skeletons_stay_empty(self) -> None:
+        for path in (FEATURE_CATALOG, HYPOTHESES, RESEARCH_CYCLES):
+            loaded = yaml.safe_load(path.read_text(encoding="utf-8"))
+            self.assertEqual(loaded["records"], [])
+
+    def test_buy_pressure_computes_and_returns_stay_unknown(self) -> None:
+        spec = load_experiment_spec(ROOT, SPEC)
+        snapshot = resolve_feature_snapshot(spec, root=ROOT)
+        by_id = {row["feature_id"]: row for row in snapshot["features"]}
+        self.assertEqual(by_id["FEAT-TARGET-TRADE-COUNT"]["value"], 149)
+        self.assertEqual(by_id["FEAT-TARGET-TRADE-COUNT"]["value_status"], "COMPUTED")
+        self.assertAlmostEqual(by_id["FEAT-BUY-SELL-COUNT-RATIO"]["value"], 96 / 53)
+        for feature_id in (
+            "FEAT-RETURN-15M",
+            "FEAT-PEAK-RETURN-SINCE-START",
+            "FEAT-DRAWDOWN-FROM-RUNNING-PEAK",
+        ):
+            self.assertEqual(by_id[feature_id]["value_status"], "UNKNOWN")
+            self.assertIsNone(by_id[feature_id]["value"])
+            self.assertNotEqual(by_id[feature_id]["value"], 0)
+        self.assertEqual(snapshot["terminal"], PASS_TERMINAL)
+        self.assertEqual(snapshot["pit_ready_count"], 0)
+
+    def test_ordinary_hypothesis_composes_through_generic_runner(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            store = OperationalStore(Path(tmp) / "ops.sqlite")
+            try:
+                app = FactoryApplication(root=ROOT, store=store, spec_relative=SPEC)
+                model = app.start()
+                self.assertEqual(model["status"], "COMPLETE", model)
+                self.assertEqual(model["terminal_result"], PASS_TERMINAL)
+                self.assertEqual(
+                    model["hypothesis"], "HYP-ORDINARY-PRICE-PATH-BUY-PRESSURE-V1"
+                )
+                self.assertEqual(model["next_safe_action"], "DO_NOT_PROMOTE")
+                body = _page(model, surface="HOME").decode("utf-8")
+                self.assertIn("HYP-ORDINARY-PRICE-PATH-BUY-PRESSURE-V1", body)
+                self.assertIn("DO_NOT_PROMOTE", body)
+                self.assertIn("FEAT-TARGET-TRADE-COUNT", body)
+                self.assertIn("FEAT-RETURN-15M", body)
+            finally:
+                store.close()
+
+    def test_cli_classifies_not_promotable_without_runner_change(self) -> None:
+        completed = subprocess.run(
+            [sys.executable, str(SCRIPT), "--root", str(ROOT), "--spec", SPEC],
+            check=False,
+            capture_output=True,
+            text=True,
+            cwd=str(ROOT),
+        )
+        self.assertEqual(completed.returncode, 0, completed.stderr)
+        payload = json.loads(completed.stdout)
+        self.assertEqual(payload["capability_terminal"], PASS_TERMINAL)
+        self.assertEqual(payload["product_terminal"], PRODUCT_TERMINAL)
+        self.assertEqual(payload["next_safe_action"], "DO_NOT_PROMOTE")
+
+    def test_same_cli_does_not_treat_coverage_archetype_as_promotion_stop(self) -> None:
+        completed = subprocess.run(
+            [sys.executable, str(SCRIPT), "--root", str(ROOT), "--spec", ARCHETYPE],
+            check=False,
+            capture_output=True,
+            text=True,
+            cwd=str(ROOT),
+        )
+        self.assertNotEqual(completed.returncode, 0, completed.stdout)
+        payload = json.loads(completed.stdout)
+        self.assertEqual(payload["capability_terminal"], PASS_TERMINAL)
+        self.assertEqual(payload["product_terminal"], "NOT_AN_ORDINARY_PROMOTION_STOP")
+        self.assertEqual(payload["next_safe_action"], "INSPECT_FEATURE_COVERAGE")
+
+    def test_existing_experiment_cli_composes_the_ordinary_spec(self) -> None:
+        completed = subprocess.run(
+            [
+                sys.executable,
+                str(ROOT / "scripts/run_factory_experiment.py"),
+                "--root",
+                str(ROOT),
+                "--spec",
+                SPEC,
+            ],
+            check=False,
+            capture_output=True,
+            text=True,
+            cwd=str(ROOT),
+        )
+        self.assertEqual(completed.returncode, 0, completed.stderr)
+        payload = json.loads(completed.stdout)
+        self.assertEqual(payload["status"], "COMPLETE")
+        self.assertEqual(payload["hypothesis"], "HYP-ORDINARY-PRICE-PATH-BUY-PRESSURE-V1")
+        self.assertEqual(payload["next_safe_action"], "DO_NOT_PROMOTE")
+
+
+if __name__ == "__main__":
+    unittest.main()

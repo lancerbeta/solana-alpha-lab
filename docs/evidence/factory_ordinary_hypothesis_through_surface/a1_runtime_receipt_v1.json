@@ -1,0 +1,78 @@
+{
+  "atom_id": "FACTORY_ORDINARY_HYPOTHESIS_THROUGH_SURFACE_V1",
+  "capability_terminal": "FEATURE_SURFACE_COMPOSITION_PASS",
+  "credential_reads": 0,
+  "experiment_id": "EXP-ORDINARY-PRICE-PATH-HYPOTHESIS-001",
+  "factory_core_touched": false,
+  "features": [
+    {
+      "availability_class": "HISTORICAL_RECONSTRUCTIBLE",
+      "available_to_strategy_semantics": "RETROSPECTIVE_ONLY_NOT_PROSPECTIVE_PIT",
+      "coverage_domain": "D06",
+      "display": "✓ FEAT-TARGET-TRADE-COUNT HISTORICAL_RECONSTRUCTIBLE",
+      "feature_id": "FEAT-TARGET-TRADE-COUNT",
+      "units": "count",
+      "value": 149,
+      "value_status": "COMPUTED"
+    },
+    {
+      "availability_class": "HISTORICAL_RECONSTRUCTIBLE",
+      "available_to_strategy_semantics": "RETROSPECTIVE_ONLY_NOT_PROSPECTIVE_PIT",
+      "coverage_domain": "D06",
+      "display": "✓ FEAT-BUY-SELL-COUNT-RATIO HISTORICAL_RECONSTRUCTIBLE",
+      "feature_id": "FEAT-BUY-SELL-COUNT-RATIO",
+      "units": "ratio",
+      "value": 1.8113207547169812,
+      "value_status": "COMPUTED"
+    },
+    {
+      "availability_class": "HISTORICAL_RECONSTRUCTIBLE",
+      "available_to_strategy_semantics": "RETROSPECTIVE_ONLY_NOT_PROSPECTIVE_PIT",
+      "coverage_domain": "D07",
+      "display": "! FEAT-RETURN-15M HISTORICAL_RECONSTRUCTIBLE",
+      "feature_id": "FEAT-RETURN-15M",
+      "units": "fraction",
+      "value": null,
+      "value_status": "UNKNOWN"
+    },
+    {
+      "availability_class": "HISTORICAL_RECONSTRUCTIBLE",
+      "available_to_strategy_semantics": "RETROSPECTIVE_ONLY_NOT_PROSPECTIVE_PIT",
+      "coverage_domain": "D07",
+      "display": "! FEAT-PEAK-RETURN-SINCE-START HISTORICAL_RECONSTRUCTIBLE",
+      "feature_id": "FEAT-PEAK-RETURN-SINCE-START",
+      "units": "fraction",
+      "value": null,
+      "value_status": "UNKNOWN"
+    },
+    {
+      "availability_class": "HISTORICAL_RECONSTRUCTIBLE",
+      "available_to_strategy_semantics": "RETROSPECTIVE_ONLY_NOT_PROSPECTIVE_PIT",
+      "coverage_domain": "D07",
+      "display": "! FEAT-DRAWDOWN-FROM-RUNNING-PEAK HISTORICAL_RECONSTRUCTIBLE",
+      "feature_id": "FEAT-DRAWDOWN-FROM-RUNNING-PEAK",
+      "units": "fraction",
+      "value": null,
+      "value_status": "UNKNOWN"
+    }
+  ],
+  "hypothesis_version": "HYP-ORDINARY-PRICE-PATH-BUY-PRESSURE-V1",
+  "next_safe_action": "DO_NOT_PROMOTE",
+  "non_claims": [
+    "NO_PIT_READY",
+    "NO_ALPHA",
+    "NO_FEATURE_STORE",
+    "NO_TASK28_UNFREEZE",
+    "NO_FOURTH_ARCHETYPE",
+    "NO_VPS",
+    "NO_PROVIDER",
+    "NO_FACTORY_V1_OPERATIONAL_READY"
+  ],
+  "pit_ready_count": 0,
+  "product_terminal": "ORDINARY_HYPOTHESIS_COMPOSED_NOT_PROMOTABLE",
+  "provider_api_rpc_wss_calls": 0,
+  "schema": "smial.factory-ordinary-hypothesis-through-surface.runtime",
+  "schema_version": "1.0",
+  "status": "COMPLETE",
+  "task28_skeletons": "UNCHANGED_EMPTY"
+}

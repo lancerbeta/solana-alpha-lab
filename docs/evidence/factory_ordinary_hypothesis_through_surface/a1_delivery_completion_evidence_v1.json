@@ -1,0 +1,77 @@
+{
+  "acceptance_id": "FACTORY-ORDINARY-HYPOTHESIS-THROUGH-SURFACE-DELIVERY-COMPLETION-001",
+  "active_stop_conditions": [],
+  "as_of": "2026-08-20",
+  "base_main": "2913ef33dfd4c4776628f7005f9c48050e17292b",
+  "capability_radar_now": "NONE",
+  "cloud_bundle_mode": "OWNER_MANAGED_OPTIONAL_EXPORT",
+  "cloud_bundle_required_by_harness": false,
+  "cloud_bundle_smoke_required": false,
+  "factory_fit": {
+    "path": "docs/evidence/factory_ordinary_hypothesis_through_surface/a1_delivery_factory_fit_v1.json",
+    "sha256": "dfebdc81728873dd20e309d740077e0cd6886c70aa681f68236118820a73e27c",
+    "verdict": "PASS"
+  },
+  "implementation_bindings": {
+    "catalog/assets/core.yaml": "4789fd6e23496a6aea984231843fd851ee2d739311ba8a378eea93d98b1af033",
+    "catalog/assets/lifecycle.yaml": "10ab923fd550a11be7d2a6f7aa914a194e1158d70bef32b2281f8c3468c3f238",
+    "catalog/catalog_manifest.yaml": "a66ed15a8670358b91c19649b7908f007a15e7f11543fe460e35b7d4179400a7",
+    "catalog/generated/asset_edges.json": "a9d91b8582452b9c93f3675f71737f6ed399231af4d35afc3e4827478ac91cbb",
+    "configs/experiment_specs/ordinary_price_path_buy_pressure_v1.yaml": "69bdcc3f04a990e62276d358fb4c1311a5e95e7d08953298664441b9e4f5bb12",
+    "docs/PROJECT_MAP.md": "6dcd2c89ad4b8f63c4ef2f03fde63b7ba569838ac630f779ed4cdb459e14d41d",
+    "docs/evidence/factory_ordinary_hypothesis_through_surface/a1_acceptance_v1.json": "52c6eaf0cf020f500dcdea9bc2f1ba3c27f9ab80ffd7d72091d09697177acd17",
+    "docs/evidence/factory_ordinary_hypothesis_through_surface/a1_runtime_receipt_v1.json": "16ea7e540b45bb98aa61c23d6668bfabb4b5ca46bc6c09e6c60b50e664e3def7",
+    "docs/reports/factory_ordinary_hypothesis_through_surface/a1_owner_readout_v1.md": "1f8957cd96f7954ad6fdca7ed34a826b9ce55e39a93d291ec5611a63245f14ec",
+    "docs/tasks/FACTORY_ORDINARY_HYPOTHESIS_THROUGH_SURFACE_V1.md": "1a277f596cdd800a0f67da5b3462ba111749d911415dfa30a2c192976ebba4d7",
+    "scripts/run_factory_ordinary_market_hypothesis.py": "72d479df06067bc4afae4b4a105e88825963b45b08a57747e64aa1e741a0df72",
+    "tests/test_factory_ordinary_market_hypothesis.py": "84cdf0140a7768a28386b7ce99bd82b4d0bceaefcc74b1cbf88a4fb4e8089d72"
+  },
+  "non_claims": [
+    "NO_CANONICAL_DONE",
+    "NO_PIT_READY",
+    "NO_ALPHA_PNL_OR_NETRETURN",
+    "NO_FEATURE_STORE",
+    "NO_TASK28_UNFREEZE",
+    "NO_FOURTH_ARCHETYPE",
+    "NO_PROVIDER_OR_CREDENTIAL",
+    "NO_VPS",
+    "NO_FACTORY_V1_OPERATIONAL_READY",
+    "CAPABILITY_PASS_IS_NOT_PROMOTION"
+  ],
+  "owner_attention_triggers": {
+    "auth_or_access_recovery": false,
+    "external_material_action": false,
+    "material_owner_decision": false,
+    "unresolved_safety_or_truth_conflict": false,
+    "user_only_activation": false
+  },
+  "project_sources_disposition": {
+    "kind": "NO_CHANGE"
+  },
+  "schema": "smial.delivery-completion-evidence",
+  "schema_version": "1.0",
+  "side_effects": {
+    "cash_spend_usd_cents": 0,
+    "credential_reads": 0,
+    "fallbacks": 0,
+    "provider_requests": 0,
+    "retries": 0,
+    "wallet_signer_transaction_actions": 0
+  },
+  "state_change": "ORDINARY_HYPOTHESIS_COMPOSED_NOT_PROMOTABLE",
+  "task_id": "FACTORY_ORDINARY_HYPOTHESIS_THROUGH_SURFACE_V1",
+  "validation": {
+    "full_gate": "ENFORCED_BY_PROJECT_BOUND_VALIDATION",
+    "github_ci": "ENFORCED_LIVE_AT_GUARDED_MERGE",
+    "independent_review": {
+      "path": "docs/evidence/factory_ordinary_hypothesis_through_surface/a1_delivery_independent_review_v1.json",
+      "sha256": "44d261ba0d103fdae68a163c218b36516a8be57a5963c920a9a552111aa58b3f",
+      "verdict": "PASS"
+    },
+    "project_checks": [
+      "PASS_CATALOG_VALIDATE",
+      "PASS_GENERATOR_CHECK"
+    ],
+    "targeted": "PASS_FACTORY_ORDINARY_HYPOTHESIS_TESTS"
+  }
+}
