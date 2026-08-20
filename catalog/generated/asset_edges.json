@@ -713,6 +713,11 @@
       "target_asset_id": "CTRL-FRESH-OOS-BASELINE-VS-FRICTION-VETO-001"
     },
     {
+      "source_asset_id": "CONFIG-ORDINARY-MARKET-PIT-LOCAL-RAW-ENVELOPE-BIND-001",
+      "relation": "depends_on",
+      "target_asset_id": "CTRL-ORDINARY-MARKET-PIT-LOCAL-RAW-ENVELOPE-BIND-001"
+    },
+    {
       "source_asset_id": "CONFIG-ORDINARY-MARKET-PIT-PRIMARY-X-BIND-001",
       "relation": "depends_on",
       "target_asset_id": "CTRL-ORDINARY-MARKET-PIT-PRIMARY-X-BIND-001"
@@ -2228,6 +2233,11 @@
       "target_asset_id": "TEST-T06-CATALOG-001"
     },
     {
+      "source_asset_id": "CTRL-ORDINARY-MARKET-PIT-LOCAL-RAW-ENVELOPE-BIND-001",
+      "relation": "governed_by",
+      "target_asset_id": "ARCH-INTENT-005"
+    },
+    {
       "source_asset_id": "CTRL-ORDINARY-MARKET-PIT-PRIMARY-X-BIND-001",
       "relation": "governed_by",
       "target_asset_id": "ARCH-INTENT-005"
@@ -3536,6 +3546,16 @@
       "source_asset_id": "EVIDENCE-FRESH-OOS-FRICTION-VETO-RUNTIME-001",
       "relation": "derived_from",
       "target_asset_id": "CTRL-FRESH-OOS-BASELINE-VS-FRICTION-VETO-001"
+    },
+    {
+      "source_asset_id": "EVIDENCE-ORDINARY-MARKET-PIT-LOCAL-RAW-ENVELOPE-BIND-ACCEPTANCE-001",
+      "relation": "derived_from",
+      "target_asset_id": "EVIDENCE-ORDINARY-MARKET-PIT-LOCAL-RAW-ENVELOPE-BIND-RUNTIME-001"
+    },
+    {
+      "source_asset_id": "EVIDENCE-ORDINARY-MARKET-PIT-LOCAL-RAW-ENVELOPE-BIND-RUNTIME-001",
+      "relation": "derived_from",
+      "target_asset_id": "CTRL-ORDINARY-MARKET-PIT-LOCAL-RAW-ENVELOPE-BIND-001"
     },
     {
       "source_asset_id": "EVIDENCE-ORDINARY-MARKET-PIT-PRIMARY-X-BIND-ACCEPTANCE-001",
@@ -7338,6 +7358,11 @@
       "target_asset_id": "MODULE-FACTORY-V1-APPLICATION-001"
     },
     {
+      "source_asset_id": "MODULE-ORDINARY-MARKET-PIT-LOCAL-RAW-ENVELOPE-001",
+      "relation": "depends_on",
+      "target_asset_id": "CONFIG-ORDINARY-MARKET-PIT-LOCAL-RAW-ENVELOPE-BIND-001"
+    },
+    {
       "source_asset_id": "MODULE-ORDINARY-MARKET-PIT-PRIMARY-X-001",
       "relation": "depends_on",
       "target_asset_id": "CONFIG-ORDINARY-MARKET-PIT-PRIMARY-X-BIND-001"
@@ -9103,6 +9128,11 @@
       "target_asset_id": "EVIDENCE-FRESH-OOS-FRICTION-VETO-ACCEPTANCE-001"
     },
     {
+      "source_asset_id": "REPORT-ORDINARY-MARKET-PIT-LOCAL-RAW-ENVELOPE-BIND-OWNER-READOUT-001",
+      "relation": "derived_from",
+      "target_asset_id": "EVIDENCE-ORDINARY-MARKET-PIT-LOCAL-RAW-ENVELOPE-BIND-ACCEPTANCE-001"
+    },
+    {
       "source_asset_id": "REPORT-ORDINARY-MARKET-PIT-PRIMARY-X-BIND-OWNER-READOUT-001",
       "relation": "derived_from",
       "target_asset_id": "EVIDENCE-ORDINARY-MARKET-PIT-PRIMARY-X-BIND-ACCEPTANCE-001"
@@ -10038,6 +10068,11 @@
       "target_asset_id": "MODULE-FACTORY-V1-WORKBENCH-001"
     },
     {
+      "source_asset_id": "SCRIPT-ORDINARY-MARKET-PIT-LOCAL-RAW-ENVELOPE-BIND-001",
+      "relation": "depends_on",
+      "target_asset_id": "MODULE-ORDINARY-MARKET-PIT-LOCAL-RAW-ENVELOPE-001"
+    },
+    {
       "source_asset_id": "SCRIPT-ORDINARY-MARKET-PIT-PRIMARY-X-BIND-001",
       "relation": "depends_on",
       "target_asset_id": "MODULE-ORDINARY-MARKET-PIT-PRIMARY-X-001"
@@ -10901,6 +10936,11 @@
       "source_asset_id": "TEST-FRESH-OOS-BASELINE-VS-FRICTION-VETO-001",
       "relation": "depends_on",
       "target_asset_id": "MODULE-FACTORY-V1-FRICTION-VETO-001"
+    },
+    {
+      "source_asset_id": "TEST-ORDINARY-MARKET-PIT-LOCAL-RAW-ENVELOPE-BIND-001",
+      "relation": "depends_on",
+      "target_asset_id": "MODULE-ORDINARY-MARKET-PIT-LOCAL-RAW-ENVELOPE-001"
     },
     {
       "source_asset_id": "TEST-ORDINARY-MARKET-PIT-PRIMARY-X-BIND-001",

@@ -1,0 +1,25 @@
+{
+  "acceptance_id": "ORDINARY-MARKET-PIT-LOCAL-RAW-ENVELOPE-BIND-ACCEPTANCE-001",
+  "as_of": "2026-08-20",
+  "cloud_bundle_mode": "OWNER_MANAGED_OPTIONAL_EXPORT",
+  "next_safe_action": "OFFLINE_N12_ASSOCIATION_OR_FRESH_SAMPLE_OWNER_CHOICE",
+  "non_claims": [
+    "NO_PIT_READY",
+    "NO_LIVE_CAPTURE",
+    "NO_ALPHA",
+    "NO_FDV_AS_MCAP",
+    "NO_QUOTE_AS_PREDICTOR",
+    "NO_FACTORY_PYTHON",
+    "NO_RAW_BODY_IN_GIT",
+    "NO_CANONICAL_DONE"
+  ],
+  "pit_ready": false,
+  "project_sources_disposition": {
+    "kind": "NO_CHANGE"
+  },
+  "promotable": false,
+  "schema": "smial.ordinary-market-pit-local-raw-envelope-bind-acceptance",
+  "schema_version": "1.0",
+  "task_id": "ORDINARY_MARKET_PIT_LOCAL_RAW_ENVELOPE_BIND_V1",
+  "verdict": "LOCAL_RAW_ENVELOPES_BIND_PRIMARY_X"
+}
