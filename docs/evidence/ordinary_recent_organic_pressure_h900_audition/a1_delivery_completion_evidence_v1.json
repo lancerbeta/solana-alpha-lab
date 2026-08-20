@@ -34,10 +34,7 @@
     "tests/test_quote_native_evidence_channel_qualification.py": "e44e8bfbf32071fe14acff12799ec1d80dc4447e3d7741af703392f51baf1130",
     "tests/test_quote_native_evidence_fit_panel.py": "a98703f7416a338ce98110332e7ebf437a958f2822e5eeaf6d690b29cceec0cb"
   },
-  "active_stop_conditions": [
-    "DECISION_TIME_ELIGIBLE_BELOW_18",
-    "RANKABLE_H900_BELOW_14"
-  ],
+  "active_stop_conditions": [],
   "owner_attention_triggers": {
     "auth_or_access_recovery": false,
     "material_owner_decision": false,
