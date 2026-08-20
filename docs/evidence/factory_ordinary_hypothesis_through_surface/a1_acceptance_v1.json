@@ -1,0 +1,48 @@
+{
+  "acceptance_id": "EVIDENCE-FACTORY-ORDINARY-HYPOTHESIS-ACCEPTANCE-001",
+  "as_of": "2026-08-20",
+  "atom_id": "FACTORY_ORDINARY_HYPOTHESIS_THROUGH_SURFACE_V1",
+  "capability_terminal": "FEATURE_SURFACE_COMPOSITION_PASS",
+  "computed_from_git": {
+    "FEAT-BUY-SELL-COUNT-RATIO": 1.8113207547169812,
+    "FEAT-TARGET-TRADE-COUNT": 149
+  },
+  "factory_core_touched": false,
+  "limitations": [
+    "A24 96-slot panel is local-only; path/return/drawdown stay UNKNOWN",
+    "No feature is PIT_READY",
+    "TASK-28 skeletons remain empty by freeze",
+    "Capability PASS is composition, not promotion"
+  ],
+  "next_boundary": "Not VPS. Not operational-ready. Next ordinary hypothesis as config, or FACTORY_PRODUCTIZATION_REPLAN if this only restated coverage.",
+  "non_claims": [
+    "NO_PIT_READY",
+    "NO_ALPHA",
+    "NO_NETRETURN",
+    "NO_FEATURE_STORE",
+    "NO_TASK28_UNFREEZE",
+    "NO_FOURTH_ARCHETYPE",
+    "NO_VPS",
+    "NO_PROVIDER",
+    "NO_FACTORY_V1_OPERATIONAL_READY"
+  ],
+  "owner_decision": "ORDINARY_HYPOTHESIS_COMPOSED_NOT_PROMOTABLE",
+  "pit_ready_count": 0,
+  "product_pass": true,
+  "product_terminal": "ORDINARY_HYPOTHESIS_COMPOSED_NOT_PROMOTABLE",
+  "project_sources_disposition": {
+    "kind": "NO_CHANGE"
+  },
+  "promotable": false,
+  "schema": "smial.factory-ordinary-hypothesis-through-surface.acceptance",
+  "schema_version": "1.0",
+  "scientific_alpha": false,
+  "source_runtime_receipt": "docs/evidence/factory_ordinary_hypothesis_through_surface/a1_runtime_receipt_v1.json",
+  "source_runtime_receipt_sha256": "16ea7e540b45bb98aa61c23d6668bfabb4b5ca46bc6c09e6c60b50e664e3def7",
+  "task28_skeletons": "UNCHANGED_EMPTY",
+  "typed_gaps": [
+    "FEAT-RETURN-15M",
+    "FEAT-PEAK-RETURN-SINCE-START",
+    "FEAT-DRAWDOWN-FROM-RUNNING-PEAK"
+  ]
+}

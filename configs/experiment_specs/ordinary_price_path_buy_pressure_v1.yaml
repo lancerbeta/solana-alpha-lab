@@ -1,0 +1,40 @@
+schema: smial.experiment-spec
+schema_version: '1.0'
+experiment_id: EXP-ORDINARY-PRICE-PATH-HYPOTHESIS-001
+hypothesis_version: HYP-ORDINARY-PRICE-PATH-BUY-PRESSURE-V1
+question: Does Git-canonical A24 buy-pressure and trade-count admit a promotable price-path hypothesis, or do typed UNKNOWN returns forbid promotion?
+estimand: PromotionDecision(buy_pressure, trade_count, return_path) from Git-canonical A24; UNKNOWN returns are not zeros
+population: A24_LIMITED_DIAGNOSTIC_POOL_DAY_RETROSPECTIVE
+data_requirements:
+  - requirement_id: SURFACE_CONFIG
+    kind: CATALOG_ASSET
+    path: configs/factory_v1_common_market_feature_surface_v1.yaml
+    sha256: 8e51f6e565be137bb1863637121abf5cdf94c8603976eb4b0252371ba650cb39
+  - requirement_id: A24_RUNTIME
+    kind: GIT_CANONICAL_RECEIPT
+    path: docs/evidence/task30/a24_raw_to_pit_admissibility_runtime_receipt_v1.json
+    sha256: 6b0f16d80ec72e46507755c09c79e434b6a8de0cf5f50d6f7e18e63fcdac75c4
+  - requirement_id: A24_ACCEPTANCE
+    kind: GIT_CANONICAL_ACCEPTANCE
+    path: docs/evidence/task30/a24_raw_to_pit_admissibility_acceptance_v1.json
+    sha256: 257e81801afbfa3ba6bf64e8c25b41009e560bb168e9a01d92c606ca4bcdb183
+capabilities:
+  - CAP-OFFLINE-MARKET-FEATURE-RESOLVE-001
+required_feature_ids:
+  - FEAT-TARGET-TRADE-COUNT
+  - FEAT-BUY-SELL-COUNT-RATIO
+  - FEAT-RETURN-15M
+  - FEAT-PEAK-RETURN-SINCE-START
+  - FEAT-DRAWDOWN-FROM-RUNNING-PEAK
+falsifier: Composing this ExperimentSpec requires Factory Python change, UNKNOWN returns become 0, or this spec is treated as a fourth coverage archetype.
+method: resolve_market_feature_snapshot
+parameters:
+  hypothesis_kind: ORDINARY_PRICE_PATH
+  next_safe_action: DO_NOT_PROMOTE
+  product_terminal: ORDINARY_HYPOTHESIS_COMPOSED_NOT_PROMOTABLE
+evidence_budget:
+  provider_api_rpc_wss_calls: 0
+holdout_policy: No holdout is opened; promotion is forbidden while Git-canonical returns stay typed UNKNOWN.
+terminal_outcomes:
+  - FEATURE_SURFACE_COMPOSITION_PASS
+  - ORDINARY_HYPOTHESIS_COMPOSED_NOT_PROMOTABLE
