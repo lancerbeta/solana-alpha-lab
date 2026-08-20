@@ -1,0 +1,55 @@
+{
+  "schema": "smial.ordinary-recent-organic-pressure-h900-audition.acceptance",
+  "schema_version": "1.0",
+  "acceptance_id": "EVIDENCE-ORDINARY-RECENT-ORGANIC-PRESSURE-H900-AUDITION-001",
+  "as_of": "2026-08-21",
+  "atom_id": "ORDINARY_RECENT_ORGANIC_PRESSURE_H900_AUDITION_V1",
+  "owner_phrase_authorized": true,
+  "owner_decision": "INVALID_EVIDENCE_REPLAN",
+  "runtime_terminal": "INVALID_EVIDENCE_YIELD",
+  "runtime_receipt": "docs/evidence/ordinary_recent_organic_pressure_h900_audition/a1_ordinary_recent_organic_pressure_h900_audition_runtime_receipt_v1.json",
+  "runtime_receipt_sha256": "20cff315f225f405f2daca493acbc3ff66ef7910d718e769c2e22fdcf0dd4040",
+  "prior_mints_sha256": "9bb4ea567fad40ea34cd48d77351e98cb839608ff1c36dd992d07cdce12c4ed5",
+  "discovery": {
+    "recent_terminal": "TOKEN_LIST_OBSERVED",
+    "search_terminal": "TOKEN_LIST_OBSERVED",
+    "frozen_candidates": 24,
+    "provider_requests": 2,
+    "raw_retention": "A4_OUTSIDE_GIT"
+  },
+  "eligibility": {
+    "decision_time_eligible": 2,
+    "minimum_required": 18,
+    "x_missing": 22,
+    "x_missing_reason": "ORGANIC_OR_LIQUIDITY_FIELD_MISSING_OR_INVALID",
+    "rankable_h900": 0,
+    "minimum_rankable_required": 14
+  },
+  "quotes": {
+    "buy_t0_calls": 0,
+    "sell_h900_calls": 0,
+    "quote_observed": 0,
+    "h900_observed": 0
+  },
+  "cheapest_falsifier": "DECISION_TIME_ELIGIBLE_BELOW_18",
+  "cheapest_falsifier_result": "TRIGGERED",
+  "side_effects": {
+    "cash_spend_usd_cents": 0,
+    "credential_reads": 1,
+    "execute_calls": 0,
+    "fallbacks": 0,
+    "retries": 0,
+    "wallet_signer_transaction_actions": 0
+  },
+  "non_claims": [
+    "NO_EARN_FRESH_OOS",
+    "NO_CLOSE_ORGANIC_PRESSURE_CANDIDATE",
+    "NO_ALPHA",
+    "NO_NETRETURN",
+    "NO_EXECUTION",
+    "NO_QUOTE_OR_H900_OBSERVATION",
+    "NO_STRATEGY_OR_SHADOW",
+    "UNKNOWN_OR_MISSING_IS_NOT_ZERO",
+    "NO_SECOND_PROVIDER_OR_RETRY"
+  ]
+}

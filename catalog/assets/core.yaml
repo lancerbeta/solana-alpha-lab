@@ -28397,3 +28397,110 @@ records:
   evidence: []
   search_terms: [ORDINARY_RECENT, ORGANIC_PRESSURE, H900, AUDITION, TESTS]
   classification: {contains_secrets: false, contains_raw_data: false, sensitivity: INTERNAL_NON_SECRET}
+- asset_id: EVIDENCE-ORDINARY-RECENT-ORGANIC-PRESSURE-H900-AUDITION-001
+  record_version: '1.0'
+  asset_type: evidence
+  purpose: Append-only runtime receipt for the bounded fresh organic-pressure H900 audition, including typed insufficient-yield outcome.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-08-21'
+  truth_owner: ORDINARY_RECENT_ORGANIC_PRESSURE_H900_AUDITION_V1
+  location: {kind: git_path, logical_uri: 'repo://docs/evidence/ordinary_recent_organic_pressure_h900_audition/a1_ordinary_recent_organic_pressure_h900_audition_runtime_receipt_v1.json', repository_path: docs/evidence/ordinary_recent_organic_pressure_h900_audition/a1_ordinary_recent_organic_pressure_h900_audition_runtime_receipt_v1.json}
+  integrity: {kind: sha256, sha256: 20cff315f225f405f2daca493acbc3ff66ef7910d718e769c2e22fdcf0dd4040}
+  access: {mode: read_only, method: file, network_required: false, secrets_required: false}
+  relations:
+  - {relation_type: derived_from, target_asset_id: CTRL-ORDINARY-RECENT-ORGANIC-PRESSURE-H900-AUDITION-001}
+  - {relation_type: depends_on, target_asset_id: CONFIG-ORDINARY-RECENT-ORGANIC-PRESSURE-H900-AUDITION-001}
+  - {relation_type: validated_by, target_asset_id: TEST-ORDINARY-RECENT-ORGANIC-PRESSURE-H900-AUDITION-001}
+  consumers: [FACTORY-001, GOAL-OWNER]
+  evidence: []
+  search_terms: [ORDINARY_RECENT, ORGANIC_PRESSURE, H900, RUNTIME, INVALID_EVIDENCE_YIELD]
+  classification: {contains_secrets: false, contains_raw_data: false, sensitivity: INTERNAL_NON_SECRET}
+- asset_id: EVIDENCE-ORDINARY-RECENT-ORGANIC-PRESSURE-H900-AUDITION-ACCEPTANCE-001
+  record_version: '1.0'
+  asset_type: evidence
+  purpose: Acceptance binding the fresh cohort, insufficient organic-field yield, zero quote calls, and explicit replan outcome.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-08-21'
+  truth_owner: ORDINARY_RECENT_ORGANIC_PRESSURE_H900_AUDITION_V1
+  location: {kind: git_path, logical_uri: 'repo://docs/evidence/ordinary_recent_organic_pressure_h900_audition/a1_ordinary_recent_organic_pressure_h900_audition_acceptance_v1.json', repository_path: docs/evidence/ordinary_recent_organic_pressure_h900_audition/a1_ordinary_recent_organic_pressure_h900_audition_acceptance_v1.json}
+  integrity: {kind: sha256, sha256: ce11be8fd3cf85a79cb0b5c86cd9bbde0b2980590df82c65d6bc9a6097d0b792}
+  access: {mode: read_only, method: file, network_required: false, secrets_required: false}
+  relations: [{relation_type: derived_from, target_asset_id: EVIDENCE-ORDINARY-RECENT-ORGANIC-PRESSURE-H900-AUDITION-001}]
+  consumers: [FACTORY-001, GOAL-OWNER]
+  evidence: []
+  search_terms: [ORDINARY_RECENT, ORGANIC_PRESSURE, ACCEPTANCE, INVALID_EVIDENCE_REPLAN]
+  classification: {contains_secrets: false, contains_raw_data: false, sensitivity: INTERNAL_NON_SECRET}
+- asset_id: REPORT-ORDINARY-RECENT-ORGANIC-PRESSURE-H900-AUDITION-001
+  record_version: '1.0'
+  asset_type: control_document
+  purpose: Russian owner readout distinguishing insufficient organic-field coverage from zero pressure and recording the replan boundary.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-08-21'
+  truth_owner: ORDINARY_RECENT_ORGANIC_PRESSURE_H900_AUDITION_V1
+  location: {kind: git_path, logical_uri: 'repo://docs/reports/ordinary_recent_organic_pressure_h900_audition/a1_owner_readout_v1.md', repository_path: docs/reports/ordinary_recent_organic_pressure_h900_audition/a1_owner_readout_v1.md}
+  integrity: {kind: sha256, sha256: 54ada77b17f770a68706a36d880e8fa5433135340c29f564a7360a5bef412bf1}
+  access: {mode: read_only, method: file, network_required: false, secrets_required: false}
+  relations: [{relation_type: derived_from, target_asset_id: EVIDENCE-ORDINARY-RECENT-ORGANIC-PRESSURE-H900-AUDITION-ACCEPTANCE-001}]
+  consumers: [FACTORY-001, GOAL-OWNER]
+  evidence: []
+  search_terms: [ORDINARY_RECENT, ORGANIC_PRESSURE, OWNER_READOUT, REPLAN]
+  classification: {contains_secrets: false, contains_raw_data: false, sensitivity: INTERNAL_NON_SECRET}
+- asset_id: EVIDENCE-ORDINARY-RECENT-ORGANIC-PRESSURE-H900-AUDITION-DELIVERY-COMPLETION-001
+  record_version: '1.0'
+  asset_type: evidence
+  purpose: Guard-consumable completion evidence for the exact organic-pressure audition inventory without alpha or strategy promotion.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-08-21'
+  truth_owner: ORDINARY_RECENT_ORGANIC_PRESSURE_H900_AUDITION_V1
+  location: {kind: git_path, logical_uri: 'repo://docs/evidence/ordinary_recent_organic_pressure_h900_audition/a1_delivery_completion_evidence_v1.json', repository_path: docs/evidence/ordinary_recent_organic_pressure_h900_audition/a1_delivery_completion_evidence_v1.json}
+  integrity: {kind: none, note: 'Content integrity is owned by the live completion-review-fit hash chain; embedding its SHA here would create an indirect self-reference through the reviewed inventory.'}
+  access: {mode: read_only, method: file, network_required: false, secrets_required: false}
+  relations:
+  - {relation_type: derived_from, target_asset_id: EVIDENCE-ORDINARY-RECENT-ORGANIC-PRESSURE-H900-AUDITION-001}
+  - {relation_type: depends_on, target_asset_id: EVIDENCE-ORDINARY-RECENT-ORGANIC-PRESSURE-H900-AUDITION-ACCEPTANCE-001}
+  - {relation_type: depends_on, target_asset_id: EVIDENCE-ORDINARY-RECENT-ORGANIC-PRESSURE-H900-AUDITION-DELIVERY-INDEPENDENT-REVIEW-001}
+  - {relation_type: depends_on, target_asset_id: EVIDENCE-ORDINARY-RECENT-ORGANIC-PRESSURE-H900-AUDITION-DELIVERY-FACTORY-FIT-001}
+  consumers: [FACTORY-001, GOAL-OWNER]
+  evidence: []
+  search_terms: [ORDINARY_RECENT, DELIVERY_COMPLETION, INVALID_EVIDENCE_REPLAN]
+  classification: {contains_secrets: false, contains_raw_data: false, sensitivity: INTERNAL_NON_SECRET}
+- asset_id: EVIDENCE-ORDINARY-RECENT-ORGANIC-PRESSURE-H900-AUDITION-DELIVERY-INDEPENDENT-REVIEW-001
+  record_version: '1.0'
+  asset_type: evidence
+  purpose: Required-role review evidence bound to the exact non-self-referential organic-pressure audition inventory.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-08-21'
+  truth_owner: ORDINARY_RECENT_ORGANIC_PRESSURE_H900_AUDITION_V1
+  location: {kind: git_path, logical_uri: 'repo://docs/evidence/ordinary_recent_organic_pressure_h900_audition/a1_delivery_independent_review_v1.json', repository_path: docs/evidence/ordinary_recent_organic_pressure_h900_audition/a1_delivery_independent_review_v1.json}
+  integrity: {kind: none, note: 'Content integrity is owned by the live completion-review-fit hash chain; embedding its SHA here would create an indirect self-reference through the reviewed inventory.'}
+  access: {mode: read_only, method: file, network_required: false, secrets_required: false}
+  relations:
+  - {relation_type: derived_from, target_asset_id: EVIDENCE-ORDINARY-RECENT-ORGANIC-PRESSURE-H900-AUDITION-001}
+  - {relation_type: depends_on, target_asset_id: SCHEMA-DELIVERY-INDEPENDENT-REVIEW-EVIDENCE-001}
+  consumers: [FACTORY-001, GOAL-OWNER]
+  evidence: []
+  search_terms: [ORDINARY_RECENT, INDEPENDENT_REVIEW, CODE_REVIEWER, GOAL_DOD_CRITIC, ARCHITECTURE_CRITIC]
+  classification: {contains_secrets: false, contains_raw_data: false, sensitivity: INTERNAL_NON_SECRET}
+- asset_id: EVIDENCE-ORDINARY-RECENT-ORGANIC-PRESSURE-H900-AUDITION-DELIVERY-FACTORY-FIT-001
+  record_version: '1.0'
+  asset_type: evidence
+  purpose: FULL Factory Fit review preserving the insufficient-yield truth, no-switch outcome, and bounded recovery path.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-08-21'
+  truth_owner: ORDINARY_RECENT_ORGANIC_PRESSURE_H900_AUDITION_V1
+  location: {kind: git_path, logical_uri: 'repo://docs/evidence/ordinary_recent_organic_pressure_h900_audition/a1_delivery_factory_fit_v1.json', repository_path: docs/evidence/ordinary_recent_organic_pressure_h900_audition/a1_delivery_factory_fit_v1.json}
+  integrity: {kind: none, note: 'Content integrity is owned by the live completion-review-fit hash chain; embedding its SHA here would create an indirect self-reference through the reviewed inventory.'}
+  access: {mode: read_only, method: file, network_required: false, secrets_required: false}
+  relations:
+  - {relation_type: derived_from, target_asset_id: EVIDENCE-ORDINARY-RECENT-ORGANIC-PRESSURE-H900-AUDITION-001}
+  - {relation_type: depends_on, target_asset_id: EVIDENCE-ORDINARY-RECENT-ORGANIC-PRESSURE-H900-AUDITION-DELIVERY-INDEPENDENT-REVIEW-001}
+  consumers: [FACTORY-001, GOAL-OWNER]
+  evidence: []
+  search_terms: [ORDINARY_RECENT, FACTORY_FIT, FULL_REVIEW, NO_SWITCH, REPLAN]
+  classification: {contains_secrets: false, contains_raw_data: false, sensitivity: INTERNAL_NON_SECRET}

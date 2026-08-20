@@ -3623,6 +3623,66 @@
       "target_asset_id": "CTRL-ORDINARY-MARKET-PIT-PRIMARY-X-BIND-001"
     },
     {
+      "source_asset_id": "EVIDENCE-ORDINARY-RECENT-ORGANIC-PRESSURE-H900-AUDITION-001",
+      "relation": "depends_on",
+      "target_asset_id": "CONFIG-ORDINARY-RECENT-ORGANIC-PRESSURE-H900-AUDITION-001"
+    },
+    {
+      "source_asset_id": "EVIDENCE-ORDINARY-RECENT-ORGANIC-PRESSURE-H900-AUDITION-001",
+      "relation": "derived_from",
+      "target_asset_id": "CTRL-ORDINARY-RECENT-ORGANIC-PRESSURE-H900-AUDITION-001"
+    },
+    {
+      "source_asset_id": "EVIDENCE-ORDINARY-RECENT-ORGANIC-PRESSURE-H900-AUDITION-001",
+      "relation": "validated_by",
+      "target_asset_id": "TEST-ORDINARY-RECENT-ORGANIC-PRESSURE-H900-AUDITION-001"
+    },
+    {
+      "source_asset_id": "EVIDENCE-ORDINARY-RECENT-ORGANIC-PRESSURE-H900-AUDITION-ACCEPTANCE-001",
+      "relation": "derived_from",
+      "target_asset_id": "EVIDENCE-ORDINARY-RECENT-ORGANIC-PRESSURE-H900-AUDITION-001"
+    },
+    {
+      "source_asset_id": "EVIDENCE-ORDINARY-RECENT-ORGANIC-PRESSURE-H900-AUDITION-DELIVERY-COMPLETION-001",
+      "relation": "depends_on",
+      "target_asset_id": "EVIDENCE-ORDINARY-RECENT-ORGANIC-PRESSURE-H900-AUDITION-ACCEPTANCE-001"
+    },
+    {
+      "source_asset_id": "EVIDENCE-ORDINARY-RECENT-ORGANIC-PRESSURE-H900-AUDITION-DELIVERY-COMPLETION-001",
+      "relation": "depends_on",
+      "target_asset_id": "EVIDENCE-ORDINARY-RECENT-ORGANIC-PRESSURE-H900-AUDITION-DELIVERY-FACTORY-FIT-001"
+    },
+    {
+      "source_asset_id": "EVIDENCE-ORDINARY-RECENT-ORGANIC-PRESSURE-H900-AUDITION-DELIVERY-COMPLETION-001",
+      "relation": "depends_on",
+      "target_asset_id": "EVIDENCE-ORDINARY-RECENT-ORGANIC-PRESSURE-H900-AUDITION-DELIVERY-INDEPENDENT-REVIEW-001"
+    },
+    {
+      "source_asset_id": "EVIDENCE-ORDINARY-RECENT-ORGANIC-PRESSURE-H900-AUDITION-DELIVERY-COMPLETION-001",
+      "relation": "derived_from",
+      "target_asset_id": "EVIDENCE-ORDINARY-RECENT-ORGANIC-PRESSURE-H900-AUDITION-001"
+    },
+    {
+      "source_asset_id": "EVIDENCE-ORDINARY-RECENT-ORGANIC-PRESSURE-H900-AUDITION-DELIVERY-FACTORY-FIT-001",
+      "relation": "depends_on",
+      "target_asset_id": "EVIDENCE-ORDINARY-RECENT-ORGANIC-PRESSURE-H900-AUDITION-DELIVERY-INDEPENDENT-REVIEW-001"
+    },
+    {
+      "source_asset_id": "EVIDENCE-ORDINARY-RECENT-ORGANIC-PRESSURE-H900-AUDITION-DELIVERY-FACTORY-FIT-001",
+      "relation": "derived_from",
+      "target_asset_id": "EVIDENCE-ORDINARY-RECENT-ORGANIC-PRESSURE-H900-AUDITION-001"
+    },
+    {
+      "source_asset_id": "EVIDENCE-ORDINARY-RECENT-ORGANIC-PRESSURE-H900-AUDITION-DELIVERY-INDEPENDENT-REVIEW-001",
+      "relation": "depends_on",
+      "target_asset_id": "SCHEMA-DELIVERY-INDEPENDENT-REVIEW-EVIDENCE-001"
+    },
+    {
+      "source_asset_id": "EVIDENCE-ORDINARY-RECENT-ORGANIC-PRESSURE-H900-AUDITION-DELIVERY-INDEPENDENT-REVIEW-001",
+      "relation": "derived_from",
+      "target_asset_id": "EVIDENCE-ORDINARY-RECENT-ORGANIC-PRESSURE-H900-AUDITION-001"
+    },
+    {
       "source_asset_id": "EVIDENCE-OWNER-ATTENTION-GATE-001",
       "relation": "derived_from",
       "target_asset_id": "POLICY-OWNER-ATTENTION-GATE-001"
@@ -9231,6 +9291,11 @@
       "source_asset_id": "REPORT-ORDINARY-MARKET-PIT-PRIMARY-X-BIND-OWNER-READOUT-001",
       "relation": "derived_from",
       "target_asset_id": "EVIDENCE-ORDINARY-MARKET-PIT-PRIMARY-X-BIND-ACCEPTANCE-001"
+    },
+    {
+      "source_asset_id": "REPORT-ORDINARY-RECENT-ORGANIC-PRESSURE-H900-AUDITION-001",
+      "relation": "derived_from",
+      "target_asset_id": "EVIDENCE-ORDINARY-RECENT-ORGANIC-PRESSURE-H900-AUDITION-ACCEPTANCE-001"
     },
     {
       "source_asset_id": "REPORT-PMF-QUOTE-ATTEMPT-PREP-001",
