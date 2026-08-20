@@ -138,8 +138,8 @@ X; RECENT complete n=4 < min_stratum_n=6.
   and Kendall comparable-pairs rank. FORK nothing in Factory Python. BUILD
   tests that always run on Git receipts (no skipTest).
 - **Invariants:** Y = `y_quoted_liquidation_recovery` only; UNKNOWN != 0;
-  min_stratum_n=6 frozen a priori; `FORWARD_SNAPSHOT_NOT_PIT_READY`;
-  TASK-28 empty; 0 provider calls.
+  min_stratum_n=6 frozen a priori; `y_equals_x` rows are excluded from rank;
+  `FORWARD_SNAPSHOT_NOT_PIT_READY`; TASK-28 empty; 0 provider calls.
 - **Affected surfaces:** association config, projector, CLI, tests, receipts.
   Not Factory Python, not A4, not quote scorers.
 - **Failure modes:** hash drift; skipTest without proof (forbidden here);

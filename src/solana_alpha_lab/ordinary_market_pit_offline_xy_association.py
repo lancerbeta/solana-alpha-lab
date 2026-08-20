@@ -25,6 +25,8 @@ FAMILY_DECISION = "DEFER_FRESH_PIT_CAPTURE"
 CONFIG_RELATIVE = "configs/ordinary_market_pit_offline_xy_association_v1.yaml"
 Y_FIELD = "y_quoted_liquidation_recovery"
 FORBIDDEN_Y_FIELDS = ("x_quoted_roundtrip_friction",)
+Y_SOURCE_ATOM_ID = "QUOTE_NATIVE_EVIDENCE_CHANNEL_QUALIFICATION_V1"
+Y_HORIZON_SECONDS = 900
 MIN_STRATUM_N = 6
 STRATA = ("RECENT", "TRADED")
 
@@ -51,6 +53,10 @@ def load_association_config(root: Path) -> dict[str, Any]:
         raise OfflineXyAssociationError("FAMILY_DECISION_NOT_DEFER")
     if loaded.get("product_terminal") != PRODUCT_TERMINAL:
         raise OfflineXyAssociationError("PRODUCT_TERMINAL_DRIFT")
+    if loaded.get("y_source_atom_id") != Y_SOURCE_ATOM_ID:
+        raise OfflineXyAssociationError("Y_SOURCE_ATOM_DRIFT")
+    if int(loaded.get("y_horizon_seconds") or 0) != Y_HORIZON_SECONDS:
+        raise OfflineXyAssociationError("Y_HORIZON_DRIFT")
     return loaded
 
 
@@ -148,12 +154,25 @@ def _join_status(*, x_bound: bool, y_observed: bool, x_value: Decimal | None, y_
     return "INCOMPLETE_XY"
 
 
+def _rankable(rows: list[dict[str, Any]]) -> list[dict[str, Any]]:
+    return [
+        row
+        for row in rows
+        if row["join_status"] == "COMPLETE_XY" and row.get("y_equals_x") is False
+    ]
+
+
 def _stratum_block(rows: list[dict[str, Any]], *, min_n: int) -> dict[str, Any]:
     complete = [row for row in rows if row["join_status"] == "COMPLETE_XY"]
-    n = len(complete)
-    if n < min_n:
+    rankable = _rankable(rows)
+    base = {
+        "n_complete": len(complete),
+        "n_rankable": len(rankable),
+        "n_y_equals_x_excluded": len(complete) - len(rankable),
+    }
+    if len(rankable) < min_n:
         return {
-            "n_complete": n,
+            **base,
             "status": "INCONCLUSIVE_STRATUM",
             "concordant_pairs": None,
             "discordant_pairs": None,
@@ -162,11 +181,11 @@ def _stratum_block(rows: list[dict[str, Any]], *, min_n: int) -> dict[str, Any]:
             "hint": "BELOW_MIN_STRATUM_N",
         }
     rank = kendall_comparable(
-        [Decimal(str(row["x_value"])) for row in complete],
-        [Decimal(str(row["y_value"])) for row in complete],
+        [Decimal(str(row["x_value"])) for row in rankable],
+        [Decimal(str(row["y_value"])) for row in rankable],
     )
     return {
-        "n_complete": n,
+        **base,
         "status": "EXPLORATORY_RANK_COMPUTED",
         **rank,
     }
@@ -178,10 +197,20 @@ def associate_offline_xy(root: Path, config: Mapping[str, Any] | None = None) ->
     qualification = _load_pinned_json(root, loaded["y_receipt"], label="Y_RECEIPT")
     if bind.get("product_terminal") != "LOCAL_RAW_ENVELOPES_BIND_PRIMARY_X":
         raise OfflineXyAssociationError("X_RECEIPT_TERMINAL_DRIFT")
+    if qualification.get("atom_id") != Y_SOURCE_ATOM_ID:
+        raise OfflineXyAssociationError("Y_ATOM_ID_MISMATCH")
     cells = _campaign_cells(qualification)
     bind_rows = bind.get("rows")
     if not isinstance(bind_rows, list) or not bind_rows:
         raise OfflineXyAssociationError("X_ROWS_MISSING")
+
+    y_panel_started_at = qualification.get("panel_started_at")
+    envelopes = bind.get("envelopes") or []
+    x_snapshot_run = None
+    if isinstance(envelopes, list) and envelopes and isinstance(envelopes[0], Mapping):
+        path = str(envelopes[0].get("path") or "")
+        if path.startswith("run="):
+            x_snapshot_run = path.split("/", 1)[0].removeprefix("run=")
 
     rows: list[dict[str, Any]] = []
     for item in bind_rows:
@@ -200,6 +229,9 @@ def associate_offline_xy(root: Path, config: Mapping[str, Any] | None = None) ->
         y_value = _finite_decimal(cell.get(Y_FIELD)) if y_observed else None
         if y_status != "OBSERVED" and y_value is not None:
             raise OfflineXyAssociationError("MISSING_Y_NUMERIC_LEAK")
+        y_equals_x = cell.get("y_equals_x")
+        if y_equals_x not in {True, False, None}:
+            raise OfflineXyAssociationError("Y_EQUALS_X_INVALID")
         join_status = _join_status(
             x_bound=x_bound,
             y_observed=y_observed,
@@ -216,6 +248,9 @@ def associate_offline_xy(root: Path, config: Mapping[str, Any] | None = None) ->
                 "y_status": y_status,
                 "y_field": Y_FIELD,
                 "y_value": str(y_value) if y_value is not None else None,
+                "y_equals_x": y_equals_x,
+                "y_source_atom_id": Y_SOURCE_ATOM_ID,
+                "y_horizon_seconds": Y_HORIZON_SECONDS,
                 "join_status": join_status,
                 "pit_ready": False,
                 "availability_class": AVAILABILITY_CLASS,
@@ -248,6 +283,12 @@ def associate_offline_xy(root: Path, config: Mapping[str, Any] | None = None) ->
         "pit_ready_count": 0,
         "provider_api_rpc_wss_calls": 0,
         "y_field": Y_FIELD,
+        "y_source_atom_id": Y_SOURCE_ATOM_ID,
+        "y_horizon_seconds": Y_HORIZON_SECONDS,
+        "y_panel_started_at": y_panel_started_at,
+        "x_snapshot_run": x_snapshot_run,
+        "clock_alignment": "SAME_CAPTURE_WINDOW_NOT_INDEPENDENT_PIT",
+        "y_equals_x_count": sum(1 for row in rows if row.get("y_equals_x") is True),
         "forbidden_y_fields": list(FORBIDDEN_Y_FIELDS),
         "min_stratum_n": MIN_STRATUM_N,
         "factory_runner": FACTORY_RUNNER,

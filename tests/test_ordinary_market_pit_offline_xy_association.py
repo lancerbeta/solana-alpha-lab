@@ -57,13 +57,20 @@ def _bind_row(identity: str, stratum: str, value: float, status: str = "PRIMARY_
     }
 
 
-def _cell(identity: str, y_status: str, y_value: object, friction: object = "-0.01") -> dict[str, object]:
+def _cell(
+    identity: str,
+    y_status: str,
+    y_value: object,
+    friction: object = "-0.01",
+    y_equals_x: object = False,
+) -> dict[str, object]:
     return {
         "identity_id": identity,
         "x_quoted_roundtrip_friction": friction,
         "x_status": "OBSERVED" if friction is not None else "MISSING",
         "y_quoted_liquidation_recovery": y_value,
         "y_status": y_status,
+        "y_equals_x": y_equals_x,
     }
 
 
@@ -76,6 +83,8 @@ def _config_text(x_sha: str, y_sha: str) -> str:
         "hypothesis_version: HYP-ORDINARY-LIQUIDITY-COVERAGE-PIT-V1\n"
         "y_field: y_quoted_liquidation_recovery\n"
         "forbidden_y_fields: [x_quoted_roundtrip_friction]\n"
+        "y_source_atom_id: QUOTE_NATIVE_EVIDENCE_CHANNEL_QUALIFICATION_V1\n"
+        "y_horizon_seconds: 900\n"
         "min_stratum_n: 6\n"
         "availability_class: FORWARD_SNAPSHOT_NOT_PIT_READY\n"
         "family_decision: DEFER_FRESH_PIT_CAPTURE\n"
@@ -126,9 +135,11 @@ class OrdinaryMarketPitOfflineXyAssociationTests(unittest.TestCase):
                 ],
             }
             qual = {
+                "atom_id": "QUOTE_NATIVE_EVIDENCE_CHANNEL_QUALIFICATION_V1",
+                "panel_started_at": "2026-08-18T12:43:07Z",
                 "campaign": {
                     "cells": [
-                        _cell("RECENT_1", "MISSING", None),
+                        _cell("RECENT_1", "MISSING", None, y_equals_x=None),
                         _cell("RECENT_2", "OBSERVED", "-0.03"),
                         _cell("TRADED_1", "OBSERVED", "-0.01"),
                         _cell("TRADED_2", "OBSERVED", "-0.02"),
@@ -186,11 +197,20 @@ class OrdinaryMarketPitOfflineXyAssociationTests(unittest.TestCase):
         self.assertLess(result["strata"]["RECENT"]["n_complete"], MIN_STRATUM_N)
         self.assertEqual(result["strata"]["RECENT"]["status"], "INCONCLUSIVE_STRATUM")
         self.assertEqual(result["strata"]["TRADED"]["n_complete"], 6)
+        self.assertEqual(result["strata"]["TRADED"]["n_rankable"], 6)
+        self.assertEqual(result["strata"]["TRADED"]["n_y_equals_x_excluded"], 0)
         self.assertEqual(result["strata"]["TRADED"]["status"], "EXPLORATORY_RANK_COMPUTED")
         self.assertEqual(result["strata"]["TRADED"]["concordant_pairs"], 5)
         self.assertEqual(result["strata"]["TRADED"]["discordant_pairs"], 10)
         self.assertEqual(result["strata"]["TRADED"]["hint"], "EXPLORATORY_NEGATIVE")
         self.assertEqual(result["combined"]["n_complete"], 10)
+        self.assertEqual(result["combined"]["n_rankable"], 8)
+        self.assertEqual(result["combined"]["n_y_equals_x_excluded"], 2)
+        self.assertEqual(result["y_equals_x_count"], 2)
+        self.assertEqual(result["y_source_atom_id"], "QUOTE_NATIVE_EVIDENCE_CHANNEL_QUALIFICATION_V1")
+        self.assertEqual(result["clock_alignment"], "SAME_CAPTURE_WINDOW_NOT_INDEPENDENT_PIT")
+        equals = [row["identity_id"] for row in result["rows"] if row.get("y_equals_x") is True]
+        self.assertEqual(equals, ["RECENT_5", "RECENT_6"])
         self.assertEqual(result["combined"]["status"], "EXPLORATORY_COMBINED_NOT_FAMILY_DECISION")
         self.assertEqual(result["pit_ready_count"], 0)
         self.assertEqual(result["provider_api_rpc_wss_calls"], 0)

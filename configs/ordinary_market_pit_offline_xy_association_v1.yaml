@@ -12,6 +12,8 @@ primary_x:
   forbidden_substitutes: [fdv, usdPrice, circSupply, totalSupply]
 y_field: y_quoted_liquidation_recovery
 forbidden_y_fields: [x_quoted_roundtrip_friction]
+y_source_atom_id: QUOTE_NATIVE_EVIDENCE_CHANNEL_QUALIFICATION_V1
+y_horizon_seconds: 900
 min_stratum_n: 6
 availability_class: FORWARD_SNAPSHOT_NOT_PIT_READY
 family_decision: DEFER_FRESH_PIT_CAPTURE

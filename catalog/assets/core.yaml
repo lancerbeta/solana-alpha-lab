@@ -28115,7 +28115,7 @@ records:
   as_of: '2026-08-20'
   truth_owner: ORDINARY_MARKET_PIT_OFFLINE_XY_ASSOCIATION_V1
   location: {kind: git_path, logical_uri: 'repo://docs/tasks/ORDINARY_MARKET_PIT_OFFLINE_XY_ASSOCIATION_V1.md', repository_path: docs/tasks/ORDINARY_MARKET_PIT_OFFLINE_XY_ASSOCIATION_V1.md}
-  integrity: {kind: sha256, sha256: 07b75d8a91b2396ce7598d3e51b1b3746047476fd05ed7b7d7a1e9a6e6c364dd}
+  integrity: {kind: sha256, sha256: 871f64d13ee859a8a81f77de4671791f7a83c881c02117dfd8ca23f06d54ac03}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: governed_by, target_asset_id: ARCH-INTENT-005}
@@ -28132,7 +28132,7 @@ records:
   as_of: '2026-08-20'
   truth_owner: ORDINARY_MARKET_PIT_OFFLINE_XY_ASSOCIATION_V1
   location: {kind: git_path, logical_uri: 'repo://configs/ordinary_market_pit_offline_xy_association_v1.yaml', repository_path: configs/ordinary_market_pit_offline_xy_association_v1.yaml}
-  integrity: {kind: sha256, sha256: 0052b58bceeb7165673d92e0e8d4ccd4add2823f38c55654b95afb278d4ef29d}
+  integrity: {kind: sha256, sha256: 7cb8c3b81f2e869114ba8bcc54a0d29f74af4a29b2e35476562687d0aaa67577}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: depends_on, target_asset_id: CTRL-ORDINARY-MARKET-PIT-OFFLINE-XY-ASSOCIATION-001}
@@ -28149,7 +28149,7 @@ records:
   as_of: '2026-08-20'
   truth_owner: ORDINARY_MARKET_PIT_OFFLINE_XY_ASSOCIATION_V1
   location: {kind: git_path, logical_uri: 'repo://src/solana_alpha_lab/ordinary_market_pit_offline_xy_association.py', repository_path: src/solana_alpha_lab/ordinary_market_pit_offline_xy_association.py}
-  integrity: {kind: sha256, sha256: bbcb96602dde728dd4de3dafee060acfe7943fd7e8e42f16e0b2fb0bde5f7c7e}
+  integrity: {kind: sha256, sha256: 09337f6a525fe4a0e7763a26b9bc9923f37d009a0a2467fa5f806ac9f532d596}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: depends_on, target_asset_id: CONFIG-ORDINARY-MARKET-PIT-OFFLINE-XY-ASSOCIATION-001}
@@ -28184,7 +28184,7 @@ records:
   as_of: '2026-08-20'
   truth_owner: ORDINARY_MARKET_PIT_OFFLINE_XY_ASSOCIATION_V1
   location: {kind: git_path, logical_uri: 'repo://tests/test_ordinary_market_pit_offline_xy_association.py', repository_path: tests/test_ordinary_market_pit_offline_xy_association.py}
-  integrity: {kind: sha256, sha256: fc740ffb717c3b05c48d7700313926dfaeee264e9c257cb37ce4065743f769ab}
+  integrity: {kind: sha256, sha256: 1a54cca5c7d913fdd428c09998e5d1855ba3c7cf9b1f6dae296713f3505864a9}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: depends_on, target_asset_id: MODULE-ORDINARY-MARKET-PIT-OFFLINE-XY-ASSOCIATION-001}
@@ -28201,7 +28201,7 @@ records:
   as_of: '2026-08-20'
   truth_owner: ORDINARY_MARKET_PIT_OFFLINE_XY_ASSOCIATION_V1
   location: {kind: git_path, logical_uri: 'repo://docs/evidence/ordinary_market_pit_offline_xy_association/a1_runtime_receipt_v1.json', repository_path: docs/evidence/ordinary_market_pit_offline_xy_association/a1_runtime_receipt_v1.json}
-  integrity: {kind: sha256, sha256: 79e83c65a8c54126c36a0747ae0b3071352eb165cfd635e7d89bef2140a2d255}
+  integrity: {kind: sha256, sha256: 5eb515449a6a156f3cbf7fca2b09bc4f7d9c340a8d1c6ca69b7dcf47c4014c6f}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: derived_from, target_asset_id: CTRL-ORDINARY-MARKET-PIT-OFFLINE-XY-ASSOCIATION-001}
@@ -28235,7 +28235,7 @@ records:
   as_of: '2026-08-20'
   truth_owner: ORDINARY_MARKET_PIT_OFFLINE_XY_ASSOCIATION_V1
   location: {kind: git_path, logical_uri: 'repo://docs/reports/ordinary_market_pit_offline_xy_association/a1_owner_readout_v1.md', repository_path: docs/reports/ordinary_market_pit_offline_xy_association/a1_owner_readout_v1.md}
-  integrity: {kind: sha256, sha256: a604724045cffd3d4cf884e3c6b521368d28b2ed49efe39b1937e0b7ea6cc82b}
+  integrity: {kind: sha256, sha256: c17ca06163da0946fd0f7c3edbcb065443a968cc4b2e34e6a8c9045a786f6d70}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: derived_from, target_asset_id: EVIDENCE-ORDINARY-MARKET-PIT-OFFLINE-XY-ASSOCIATION-ACCEPTANCE-001}
