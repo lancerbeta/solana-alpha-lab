@@ -26986,7 +26986,7 @@ records:
   as_of: '2026-08-20'
   truth_owner: QUOTE_SURFACE_RETENTION_CLOCK_QUALIFY_V1
   location: {kind: git_path, logical_uri: 'repo://docs/tasks/QUOTE_SURFACE_RETENTION_CLOCK_QUALIFY_V1.md', repository_path: docs/tasks/QUOTE_SURFACE_RETENTION_CLOCK_QUALIFY_V1.md}
-  integrity: {kind: sha256, sha256: e67fa17cc9bf4e8da7575cb13e0fd2a4135d6d80de4e4615268da9f3aa37e31d}
+  integrity: {kind: sha256, sha256: 0d689488e53c4bfa9111a68b83e93b73ad00bd6c4e34da3f483c1e4623e82dfe}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: depends_on, target_asset_id: CTRL-QUOTE-SURFACE-RETENTION-FALSIFIER-001}

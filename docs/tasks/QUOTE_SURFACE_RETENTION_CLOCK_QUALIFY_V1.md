@@ -66,6 +66,7 @@ context_requirements:
     ARCHITECTURE_DECISIONS:
       - docs/architecture/intents/ARCH-INTENT-005-factory-v1-operational-readiness-and-owner-experience.md
     DELIVERY_EVIDENCE:
+      - docs/evidence/quote_surface_retention_clock_qualify/q1_delivery_completion_evidence_v1.json
       - docs/evidence/quote_surface_retention_falsifier/a1_quote_surface_retention_falsifier_runtime_receipt_v1.json
       - docs/evidence/quote_surface_retention_falsifier/a1_quote_surface_retention_falsifier_acceptance_v1.json
     HISTORICAL_CONTEXT: []
