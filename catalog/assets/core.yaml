@@ -27563,7 +27563,7 @@ records:
   as_of: '2026-08-20'
   truth_owner: FACTORY_COMMON_MARKET_FEATURE_SURFACE_V1
   location: {kind: git_path, logical_uri: 'repo://docs/evidence/factory_v1_common_market_feature_surface/a1_factory_v1_common_market_feature_surface_runtime_receipt_v1.json', repository_path: docs/evidence/factory_v1_common_market_feature_surface/a1_factory_v1_common_market_feature_surface_runtime_receipt_v1.json}
-  integrity: {kind: sha256, sha256: a53ccb9c831ed2ca0b66bdcdfed9d3597b65b885bc913bd52a2235929da8d91c}
+  integrity: {kind: sha256, sha256: 32cd85290356e08ad708442ad7fbc6c97dec97b63059792a732308cafd0821ea}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: derived_from, target_asset_id: CTRL-FACTORY-V1-COMMON-MARKET-FEATURE-SURFACE-001}
