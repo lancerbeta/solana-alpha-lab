@@ -1,7 +1,41 @@
 {
   "as_of": "2026-08-20",
-  "reviewed_bindings_sha256": "0000000000000000000000000000000000000000000000000000000000000000",
-  "reviewed_inventory_sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+  "capability_radar": {
+    "now": "NONE",
+    "watch": "OWNER_BOUNDED_FRESH_PIT_CAPTURE"
+  },
+  "dimensions": {
+    "build_vs_buy": "PASS_ADOPT_GIT_RECEIPTS_WRAP_JOIN",
+    "context_efficiency": "PASS_JOIN_BEFORE_LIVE_CAPTURE",
+    "execution_to_cashflow": "PASS_NO_LIVE_NO_NETRETURN",
+    "flexibility_and_history": "PASS_TASK28_SKELETONS_UNCHANGED",
+    "mission": "PASS_HONEST_QUOTED_SUBSET_NOT_N12_PANEL",
+    "monitoring_and_recovery": "PASS_REVERT_THIS_ATOM_ONLY",
+    "owner_operability": "PASS_MUV3_NOT_EARNED",
+    "red_team": "PASS_NO_PIT_READY_Y_EQUALS_X_EXCLUDED_UNKNOWN_NOT_ZERO",
+    "research_truth": "PASS_FORWARD_SNAPSHOT_NOT_PIT_READY",
+    "security": "PASS_ZERO_PROVIDER_GIT_ONLY"
+  },
+  "limits": [
+    "NO_PIT_READY",
+    "NO_LIVE_CAPTURE",
+    "NO_ALPHA",
+    "NO_FAMILY_CLOSE",
+    "NO_EARN_REPLICATION",
+    "NO_FACTORY_PYTHON",
+    "NO_TASK28_UNFREEZE",
+    "NO_VPS",
+    "NO_QUOTE_AS_PREDICTOR",
+    "NO_N12_AS_CLEAN_PANEL",
+    "CAPABILITY_PASS_IS_NOT_PROMOTION",
+    "Y_CAPTURED_FOR_A_DIFFERENT_ESTIMAND"
+  ],
+  "mode": "FULL_REVIEW",
+  "recovery": "REVERT_ONLY_THIS_ATOM; PRESERVE_FACTORY_PYTHON; PRESERVE_TASK28_SKELETONS",
+  "review_id": "ORDINARY-MARKET-PIT-OFFLINE-XY-ASSOCIATION-FACTORY-FIT-001",
+  "reviewed_bindings_sha256": "092238d77bf9711bffcf4eef24cd2fe7567bd5e1c8e52499d8af677e953c05ab",
+  "reviewed_inventory_sha256": "27299051142773ca3ea1fb803a3a34dc9e37a87c708f009fd7161632b51450bd",
+  "schema": "smial.delivery-harness-factory-fit",
   "schema_version": "1.0",
   "task_id": "ORDINARY_MARKET_PIT_OFFLINE_XY_ASSOCIATION_V1",
   "verdict": "PASS"
