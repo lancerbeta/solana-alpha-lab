@@ -1,0 +1,76 @@
+{
+  "as_of": "2026-08-20",
+  "non_claims": [
+    "NO_CRYPTOGRAPHIC_REVIEWER_IDENTITY",
+    "REVIEW_IS_NOT_SEMANTIC_DONE",
+    "NO_LIVE_PIT_OR_EXECUTION_CLAIM",
+    "NO_ALPHA_PNL_OR_NETRETURN",
+    "NO_CANONICAL_DONE",
+    "NO_SINGLE_AGENT_REVIEW_FALLBACK",
+    "NO_FACTORY_V1_OPERATIONAL_READY",
+    "NO_FILLABLE_NAMED_KEEP_ON_QUOTE_ONLY"
+  ],
+  "required_roles": [
+    "ARCHITECTURE_CRITIC",
+    "CODE_REVIEWER",
+    "GOAL_DOD_CRITIC"
+  ],
+  "review_id": "PMF-QUOTE-STAY-OVERLAY-INDEPENDENT-REVIEW-001",
+  "reviewed_bindings_sha256": "f48e76ac5737fdc9f56b91750d40a763e7cb9805adf51f37d3b6790e88e789b1",
+  "reviewed_inventory_sha256": "7a03350fc405a9b89071c76958d942369717523487aaf5bc9a410956cdd5f111",
+  "reviews": [
+    {
+      "findings": [
+        "CHECKED_SECRETS",
+        "CHECKED_NETWORK_CREDENTIAL",
+        "CHECKED_EXECUTE_TAKER",
+        "CHECKED_PROMOTE_QUOTE_TO_TOUCH_OR_FILLABLE",
+        "CHECKED_MISSING_FEE_TREATED_AS_ZERO",
+        "CHECKED_CONFIRMATORY_PR156_SCIENCE",
+        "CHECKED_QUOTE_ONLY_KEEP_REOPENED",
+        "CHECKED_WRITE_SET_LEAKAGE_V6_V7_RC001_TRIAL_LEDGER",
+        "CHECKED_TESTS_BINDER_LIE",
+        "CHECKED_CATALOG_HASH_DRIFT",
+        "CHECKED_EXTRA_BLANK_EOF"
+      ],
+      "role": "CODE_REVIEWER",
+      "verdict": "PASS"
+    },
+    {
+      "findings": [
+        "CHECKED_DECISION_DELTA",
+        "CHECKED_CHEAPEST_FALSIFIER",
+        "CHECKED_NON_CLAIMS",
+        "CHECKED_USER_VISIBLE_OUTCOME",
+        "CHECKED_EVIDENCE_BUDGET",
+        "CHECKED_DOD",
+        "CHECKED_CATALOG_AND_IDENTITY",
+        "CHECKED_NOT_BUREAUCRACY"
+      ],
+      "role": "GOAL_DOD_CRITIC",
+      "verdict": "PASS"
+    },
+    {
+      "findings": [
+        "CHECKED_BOUNDARIES",
+        "CHECKED_SCHEMAS_AND_LAYERS",
+        "CHECKED_TRUTH_OWNERSHIP",
+        "CHECKED_CROSS_TASK_PRIVATE_API",
+        "CHECKED_PIT_AND_AVAILABILITY",
+        "CHECKED_FILLABLE_FROM_QUOTE",
+        "CHECKED_DESIGN_PROBE_NOT_SCIENCE",
+        "CHECKED_KEEP_REOPEN",
+        "CHECKED_DUCKDB_VS_GIT",
+        "CHECKED_EXECUTE_PHRASE",
+        "CHECKED_BLAST_RADIUS_AND_RECOVERY",
+        "CHECKED_SAFER_ALTERNATIVE"
+      ],
+      "role": "ARCHITECTURE_CRITIC",
+      "verdict": "PASS"
+    }
+  ],
+  "schema": "smial.delivery-independent-review-evidence",
+  "schema_version": "1.0",
+  "task_id": "PMF-QUOTE-STAY-OVERLAY-V1",
+  "verdict": "PASS"
+}

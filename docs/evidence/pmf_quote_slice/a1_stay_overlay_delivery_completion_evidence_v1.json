@@ -1,0 +1,85 @@
+{
+  "acceptance_id": "PMF-QUOTE-STAY-OVERLAY-DELIVERY-COMPLETION-001",
+  "active_stop_conditions": [],
+  "as_of": "2026-08-20",
+  "base_main": "5975685ec093ad0247954be7e56e58e1a0e2799f",
+  "capability_radar_now": "NONE",
+  "cloud_bundle_mode": "OWNER_MANAGED_OPTIONAL_EXPORT",
+  "cloud_bundle_required_by_harness": false,
+  "cloud_bundle_smoke_required": false,
+  "factory_fit": {
+    "path": "docs/evidence/pmf_quote_slice/a1_stay_overlay_delivery_factory_fit_v1.json",
+    "sha256": "b40b4cd0dade1d9b95ee462d5a513f8280f5eee6150b2e740f18cce44473c995",
+    "verdict": "PASS"
+  },
+  "implementation_bindings": {
+    "catalog/assets/core.yaml": "64b4cdb51224cdc52d89b1921985d59e1c6658a800ccda43d77c02898af7f54f",
+    "catalog/assets/lifecycle.yaml": "5c004a4882442c58a1fde24b57c6d0db3c422ca9bb8a25119e54b919424fe275",
+    "catalog/catalog_manifest.yaml": "63b2f8c0c0c9eea0cb4b00f6d935d8637ec5fa5d3877ac35dcd27bf2abed6a36",
+    "catalog/generated/asset_edges.json": "c59eb59ccaed8a342be63bf3a3919b438a407cf682df57ebd76b8fd30937abcd",
+    "configs/pmf_quote_stay_overlay_v1.yaml": "f4d57b8fb0a9d4e451b0cb6a561b11358ae4da673c31d9cd24b4da11e6040cc9",
+    "docs/PROJECT_MAP.md": "7f602a1869060c069de27662972441c76a36d3bfe6b62d846d804ddbbeb2c486",
+    "docs/evidence/pmf_quote_slice/a1_pmf_quote_stay_overlay_acceptance_v1.json": "7b2f4250b8ede01a232c9cea2d124ff49afc667070d12bfd44a8d9ddce55be3f",
+    "docs/evidence/pmf_quote_slice/a1_pmf_quote_stay_overlay_runtime_receipt_v1.json": "626033278081b3c91e9f007f67fa817e7efca51d235d2d2b358281aef8d54492",
+    "docs/reports/pmf_quote_slice/a1_stay_overlay_owner_readout_v1.md": "f8cec1191737f18bc87184a2d8ff847b052e8248fbad36f0f375e879a571f582",
+    "docs/tasks/PMF-QUOTE-STAY-OVERLAY-V1.md": "7fc0a5922b7e9bc7ca910bcf348266621b46f350b5ff37ad72343c5f80d23dc6",
+    "scripts/run_pmf_quote_stay_overlay.py": "f67f63951a5250a171e1e8bf71e06fa0354e09fce00715e926f3c5fd636ca053",
+    "src/solana_alpha_lab/pmf_quote_stay_overlay.py": "e744440c2d3046e2ba65816e4e52874fcf2a6578db5c189f9882658f9061c126",
+    "tests/test_pmf_quote_stay_overlay.py": "b168a975298c2b8788cbed1dbee58d0fc60e63c7cd46a50f5f2f6075f28754d9"
+  },
+  "non_claims": [
+    "NO_CANONICAL_DONE",
+    "NO_LIVE_PIT_OR_EXECUTION_CLAIM",
+    "NO_ALPHA_PNL_OR_NETRETURN",
+    "NO_EXECUTE_OR_BUILD",
+    "NO_TAKER_OR_SIGNER",
+    "NO_TOUCH_OR_FILLABLE_FROM_QUOTE",
+    "NO_FILLABLE_NAMED_KEEP_ON_QUOTE_ONLY",
+    "NO_QUOTE_ONLY_KEEP_6_PLUS_6",
+    "NO_FEE_ZERO_FROM_ABSENCE",
+    "NO_H11_UNPARK",
+    "NO_H13_OR_H02_TRIAL",
+    "NO_PROVIDER_OR_CREDENTIAL",
+    "NO_RC001_FREEZE_MUTATION",
+    "NO_EXECUTE_PHRASE_AUTHORIZED",
+    "NO_FACTORY_V1_OPERATIONAL_READY",
+    "NO_ATOM_2"
+  ],
+  "owner_attention_triggers": {
+    "auth_or_access_recovery": false,
+    "external_material_action": false,
+    "material_owner_decision": false,
+    "unresolved_safety_or_truth_conflict": false,
+    "user_only_activation": false
+  },
+  "project_sources_disposition": {
+    "kind": "NO_CHANGE"
+  },
+  "schema": "smial.delivery-completion-evidence",
+  "schema_version": "1.0",
+  "side_effects": {
+    "cash_spend_usd_cents": 0,
+    "credential_reads": 0,
+    "fallbacks": 0,
+    "provider_requests": 0,
+    "retries": 0,
+    "wallet_signer_transaction_actions": 0
+  },
+  "state_change": "QUOTE_STAY_OVERLAY_BOUND_SCREENING_EXHAUSTED",
+  "task_id": "PMF-QUOTE-STAY-OVERLAY-V1",
+  "validation": {
+    "full_gate": "ENFORCED_BY_PROJECT_BOUND_VALIDATION",
+    "github_ci": "ENFORCED_LIVE_AT_GUARDED_MERGE",
+    "independent_review": {
+      "path": "docs/evidence/pmf_quote_slice/a1_stay_overlay_delivery_independent_review_v1.json",
+      "sha256": "54623b0dda1b967a6ec57e3d1e3a030366cc5326c8d92e5d558f5874a49f5ba4",
+      "verdict": "PASS"
+    },
+    "project_checks": [
+      "PASS_TARGETED_PMF_QUOTE_STAY_OVERLAY_TESTS",
+      "PASS_CATALOG_VALIDATE",
+      "PASS_GENERATOR_NAVIGATION_CHECK"
+    ],
+    "targeted": "PASS_PMF_QUOTE_STAY_OVERLAY_TESTS"
+  }
+}

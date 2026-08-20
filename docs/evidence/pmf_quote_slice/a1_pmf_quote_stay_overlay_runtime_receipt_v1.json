@@ -1,0 +1,107 @@
+{
+  "adoption_route": "WRAP_OWNER_FORK_AND_CONFIRMATORY_CLOSE_NO_PROVIDER",
+  "atom_2": false,
+  "atom_id": "PMF-QUOTE-STAY-OVERLAY-V1",
+  "attempt_status": "FROZEN_OFFLINE_NOT_STARTED",
+  "build": "FORBIDDEN",
+  "confirmatory_acceptance_sha256": "a3042173201e93c84a79df6e81fbf9e954da63ace9b68b0a7451fa64513d0bce",
+  "confirmatory_product_terminal": "CLOSE_EXACT_QUOTE_SURFACE_RETENTION_FAMILY",
+  "confirmatory_runtime_sha256": "35c19fd8566db93d77a811ef255835243cbdac62c94023041c274d6a1ab4c6c5",
+  "confirmatory_scientific_terminal": "CLOSE_EXACT_QUOTE_SURFACE_RETENTION_FAMILY",
+  "credential_reads": 0,
+  "design_probe": {
+    "buy_h900_hop_count_eq_1": {
+      "RECENT": 6,
+      "TRADED": 3
+    },
+    "science": false,
+    "why_not_quoted_path_keep": "RECENT_NO_CONTRAST_TRADED_BELOW_FLOOR",
+    "y_path_risk_true_n": 0
+  },
+  "execute": "FORBIDDEN",
+  "execute_phrase_status": "INELIGIBLE",
+  "factory_v1_operational_ready": false,
+  "fee_fact_status": "UNPAID_NOT_STARTED",
+  "fillable_named_keep_on_quote_only": "FORBIDDEN",
+  "forbidden_follow_ons": [
+    "JUPITER_EXECUTE_OR_BUILD",
+    "TAKER_OR_SIGNER_SUPPLIED",
+    "PROMOTE_QUOTE_TO_TOUCH_OR_FILLABLE",
+    "FILLABLE_NAMED_KEEP_ON_QUOTE_ONLY",
+    "QUOTE_ONLY_KEEP_SCREENING_REOPENED",
+    "QUOTED_PATH_QUALITY_6_PLUS_6_WITHOUT_NEW_PHRASE",
+    "TOUCH_FACT_AUTO_STARTED",
+    "FEE_FACT_AUTO_STARTED",
+    "MISSING_FEE_TREATED_AS_ZERO",
+    "NETRETURN_OR_CASHFLOW_CLAIM",
+    "LOCAL_RAW_USED_AS_GIT_TRUTH",
+    "H11_UNPARK_OR_SAMPLE_CAMPAIGN",
+    "H13_TRIAL",
+    "H02_H10_H14_TRIAL",
+    "LIVE_PIT_OR_CASHFLOW_CLAIM",
+    "EXECUTE_PHRASE_OFFERED_AS_AUTHORIZED",
+    "ATOM_2_FROM_RETENTION",
+    "FACTORY_V1_OPERATIONAL_READY_CLAIM"
+  ],
+  "h11_unparked": false,
+  "h13_or_h02_started": false,
+  "input_mint": "So11111111111111111111111111111111111111112",
+  "local_raw_used_as_git_truth": false,
+  "missing_facts": {
+    "fees": {
+      "does_not_prove": [
+        "NETRETURN"
+      ],
+      "missing_fact": "TYPED_FEE_COMPONENTS_WITH_SOURCE_AND_CONFIDENCE_ABSENCE_IS_NOT_ZERO",
+      "missing_is_not_zero": true,
+      "observed_reason": "SANITIZED_RECEIPT_HAS_NO_FEE_COMPONENTS",
+      "state": "NOT_COMPUTABLE",
+      "task26_layer": "FEES"
+    },
+    "fillable": {
+      "does_not_prove": [
+        "FILL",
+        "FEES",
+        "NETRETURN"
+      ],
+      "missing_fact": "TYPED_ATTEMPT_OR_SIMULATE_WITH_TAKER_NOT_AUTHORIZED_HERE",
+      "observed_reason": "NO_TAKER_NO_TRANSACTION_NO_SIMULATE",
+      "state": "NOT_EVIDENCED",
+      "task26_layer": "ATTEMPT"
+    },
+    "touch": {
+      "does_not_prove": [
+        "FILLABLE",
+        "FEES",
+        "NETRETURN"
+      ],
+      "missing_fact": "PIT_SAFE_TOUCH_OBSERVATION_NOT_ANOTHER_ORDER_QUOTE_AND_NOT_EXECUTE",
+      "observed_reason": "QUOTE_IS_NOT_TOUCH",
+      "state": "NOT_EVIDENCED",
+      "task26_layer": "QUOTE"
+    }
+  },
+  "notional_atomic": "10000000",
+  "output_mint": "DMwbVy48dWVKGe9z1pcVnwF3HLMLrqWdDLfbvx8RchhK",
+  "overlay_terminal": "QUOTE_COST_OVERLAY_BOUND_FILLABLE_NOT_EVIDENCED",
+  "owner_fork_acceptance_sha256": "2b2bac38eb87fe36d32a40d5817b6c4e37a9f23b4a3c4fe28c1db3e15ec9a2c4",
+  "owner_fork_config_sha256": "edcf412f589248f0a7d88dc525b6c5a92fb245f2fd8a306df9401bab80c50a85",
+  "owner_fork_runtime_sha256": "e76e25aab611b77ab11e97ad4e6849a1f15dbd5f0f4fcc48d77bc8aa9395b1be",
+  "owner_fork_terminal": "QUOTE_OWNER_FORK_MISSING_FACTS_NAMED",
+  "owner_phrase": "OK PMF-QUOTE-STAY-OVERLAY: accept Touch/Fillable/fees not evidenced",
+  "provider_requests": 0,
+  "quote_only_keep_screening": "EXHAUSTED",
+  "quoted_path_quality_6_plus_6": "NOT_AUTHORIZED",
+  "receipt_id": "EVIDENCE-PMF-QUOTE-STAY-OVERLAY-001",
+  "remaining_unpaid_owner_phrases": [
+    "OK PMF-QUOTE-TOUCH-FACT: authorize a non-execute Touch observation",
+    "OK PMF-QUOTE-FEE-FACT: authorize a quote-layer fee-field observation, no execute"
+  ],
+  "route_id": "JUPITER-SOLANA-SWAP-V2-ORDER-001",
+  "schema": "smial.pmf-quote-stay-overlay.runtime-receipt",
+  "schema_version": "1.0",
+  "taker": "OMITTED_QUOTE_ONLY",
+  "task26_contract_sha256": "aac003cf7ba2742d310893c81af3ae4a032a52b719f2f56d80171a6486351efd",
+  "terminal": "QUOTE_STAY_OVERLAY_BOUND_SCREENING_EXHAUSTED",
+  "touch_fact_status": "UNPAID_NOT_STARTED"
+}
