@@ -1,0 +1,207 @@
+{
+  "schema": "smial.factory-v1-common-market-feature-surface.runtime",
+  "schema_version": "1.0",
+  "atom_id": "FACTORY_COMMON_MARKET_FEATURE_SURFACE_V1",
+  "terminal": "FEATURE_SURFACE_COMPOSITION_PASS",
+  "task28_skeletons": "UNCHANGED_EMPTY",
+  "pit_ready_count": 0,
+  "provider_api_rpc_wss_calls": 0,
+  "credential_reads": 0,
+  "runner_touched": false,
+  "feature_count": 18,
+  "jobs": [
+    {
+      "spec": "configs/experiment_specs/market_feature_price_path_archetype_v1.yaml",
+      "experiment_id": "EXP-MARKET-FEATURE-PRICE-PATH-ARCHETYPE-001",
+      "status": "COMPLETE",
+      "terminal": "FEATURE_SURFACE_COMPOSITION_PASS",
+      "features": [
+        {
+          "feature_id": "FEAT-AGE-SINCE-CREATION",
+          "availability_class": "MISSING",
+          "value_status": "NOT_AVAILABLE",
+          "value": null,
+          "units": "seconds",
+          "coverage_domain": "D01",
+          "available_to_strategy_semantics": "NOT_AVAILABLE",
+          "display": "— FEAT-AGE-SINCE-CREATION MISSING"
+        },
+        {
+          "feature_id": "FEAT-RETURN-15M",
+          "availability_class": "HISTORICAL_RECONSTRUCTIBLE",
+          "value_status": "UNKNOWN",
+          "value": null,
+          "units": "fraction",
+          "coverage_domain": "D07",
+          "available_to_strategy_semantics": "RETROSPECTIVE_ONLY_NOT_PROSPECTIVE_PIT",
+          "display": "! FEAT-RETURN-15M HISTORICAL_RECONSTRUCTIBLE"
+        },
+        {
+          "feature_id": "FEAT-PEAK-RETURN-SINCE-START",
+          "availability_class": "HISTORICAL_RECONSTRUCTIBLE",
+          "value_status": "UNKNOWN",
+          "value": null,
+          "units": "fraction",
+          "coverage_domain": "D07",
+          "available_to_strategy_semantics": "RETROSPECTIVE_ONLY_NOT_PROSPECTIVE_PIT",
+          "display": "! FEAT-PEAK-RETURN-SINCE-START HISTORICAL_RECONSTRUCTIBLE"
+        },
+        {
+          "feature_id": "FEAT-DRAWDOWN-FROM-RUNNING-PEAK",
+          "availability_class": "HISTORICAL_RECONSTRUCTIBLE",
+          "value_status": "UNKNOWN",
+          "value": null,
+          "units": "fraction",
+          "coverage_domain": "D07",
+          "available_to_strategy_semantics": "RETROSPECTIVE_ONLY_NOT_PROSPECTIVE_PIT",
+          "display": "! FEAT-DRAWDOWN-FROM-RUNNING-PEAK HISTORICAL_RECONSTRUCTIBLE"
+        },
+        {
+          "feature_id": "FEAT-VOLUME-15M",
+          "availability_class": "HISTORICAL_RECONSTRUCTIBLE",
+          "value_status": "UNKNOWN",
+          "value": null,
+          "units": "token_units",
+          "coverage_domain": "D06",
+          "available_to_strategy_semantics": "RETROSPECTIVE_ONLY_NOT_PROSPECTIVE_PIT",
+          "display": "! FEAT-VOLUME-15M HISTORICAL_RECONSTRUCTIBLE"
+        },
+        {
+          "feature_id": "FEAT-BUY-SELL-COUNT-RATIO",
+          "availability_class": "HISTORICAL_RECONSTRUCTIBLE",
+          "value_status": "COMPUTED",
+          "value": 1.8113207547169812,
+          "units": "ratio",
+          "coverage_domain": "D06",
+          "available_to_strategy_semantics": "RETROSPECTIVE_ONLY_NOT_PROSPECTIVE_PIT",
+          "display": "✓ FEAT-BUY-SELL-COUNT-RATIO HISTORICAL_RECONSTRUCTIBLE"
+        },
+        {
+          "feature_id": "FEAT-TARGET-TRADE-COUNT",
+          "availability_class": "HISTORICAL_RECONSTRUCTIBLE",
+          "value_status": "COMPUTED",
+          "value": 149,
+          "units": "count",
+          "coverage_domain": "D06",
+          "available_to_strategy_semantics": "RETROSPECTIVE_ONLY_NOT_PROSPECTIVE_PIT",
+          "display": "✓ FEAT-TARGET-TRADE-COUNT HISTORICAL_RECONSTRUCTIBLE"
+        }
+      ]
+    },
+    {
+      "spec": "configs/experiment_specs/market_feature_liquidity_archetype_v1.yaml",
+      "experiment_id": "EXP-MARKET-FEATURE-LIQUIDITY-ARCHETYPE-001",
+      "status": "COMPLETE",
+      "terminal": "FEATURE_SURFACE_COMPOSITION_PASS",
+      "features": [
+        {
+          "feature_id": "FEAT-POOL-LIQUIDITY",
+          "availability_class": "HISTORICAL_RECONSTRUCTIBLE",
+          "value_status": "UNKNOWN",
+          "value": null,
+          "units": "quote_atomic",
+          "coverage_domain": "D05",
+          "available_to_strategy_semantics": "RETROSPECTIVE_ONLY_NOT_PROSPECTIVE_PIT",
+          "display": "! FEAT-POOL-LIQUIDITY HISTORICAL_RECONSTRUCTIBLE"
+        },
+        {
+          "feature_id": "FEAT-LIQUIDITY-RETENTION",
+          "availability_class": "HISTORICAL_RECONSTRUCTIBLE",
+          "value_status": "UNKNOWN",
+          "value": null,
+          "units": "fraction",
+          "coverage_domain": "D05",
+          "available_to_strategy_semantics": "RETROSPECTIVE_ONLY_NOT_PROSPECTIVE_PIT",
+          "display": "! FEAT-LIQUIDITY-RETENTION HISTORICAL_RECONSTRUCTIBLE"
+        },
+        {
+          "feature_id": "FEAT-MCAP-TO-LIQUIDITY",
+          "availability_class": "MISSING",
+          "value_status": "NOT_AVAILABLE",
+          "value": null,
+          "units": "ratio",
+          "coverage_domain": "D05",
+          "available_to_strategy_semantics": "NOT_AVAILABLE",
+          "display": "— FEAT-MCAP-TO-LIQUIDITY MISSING"
+        },
+        {
+          "feature_id": "FEAT-QUOTE-AVAILABILITY",
+          "availability_class": "FORWARD_ONLY",
+          "value_status": "COMPUTED",
+          "value": 1.0,
+          "units": "fraction",
+          "coverage_domain": "D08",
+          "available_to_strategy_semantics": "HISTORICAL_CAPTURE_NOT_STRATEGY_AVAILABLE",
+          "display": "✓ FEAT-QUOTE-AVAILABILITY FORWARD_ONLY"
+        },
+        {
+          "feature_id": "FEAT-QUOTED-ROUND-TRIP-FRICTION",
+          "availability_class": "FORWARD_ONLY",
+          "value_status": "UNKNOWN",
+          "value": null,
+          "units": "fraction",
+          "coverage_domain": "D08",
+          "available_to_strategy_semantics": "HISTORICAL_CAPTURE_NOT_STRATEGY_AVAILABLE",
+          "display": "! FEAT-QUOTED-ROUND-TRIP-FRICTION FORWARD_ONLY"
+        },
+        {
+          "feature_id": "FEAT-ROUTE-STATUS",
+          "availability_class": "FORWARD_ONLY",
+          "value_status": "UNKNOWN",
+          "value": null,
+          "units": "status",
+          "coverage_domain": "D09",
+          "available_to_strategy_semantics": "HISTORICAL_CAPTURE_NOT_STRATEGY_AVAILABLE",
+          "display": "! FEAT-ROUTE-STATUS FORWARD_ONLY"
+        }
+      ]
+    },
+    {
+      "spec": "configs/experiment_specs/market_feature_creator_pressure_archetype_v1.yaml",
+      "experiment_id": "EXP-MARKET-FEATURE-CREATOR-PRESSURE-ARCHETYPE-001",
+      "status": "COMPLETE",
+      "terminal": "FEATURE_SURFACE_COMPOSITION_PASS",
+      "features": [
+        {
+          "feature_id": "FEAT-CREATOR-DIRECT-SHARE",
+          "availability_class": "MISSING",
+          "value_status": "NOT_AVAILABLE",
+          "value": null,
+          "units": "fraction",
+          "coverage_domain": "D11",
+          "available_to_strategy_semantics": "NOT_AVAILABLE",
+          "display": "— FEAT-CREATOR-DIRECT-SHARE MISSING"
+        },
+        {
+          "feature_id": "FEAT-CREATOR-DIRECT-SELL-AMOUNT",
+          "availability_class": "MISSING",
+          "value_status": "NOT_AVAILABLE",
+          "value": null,
+          "units": "token_units",
+          "coverage_domain": "D13",
+          "available_to_strategy_semantics": "NOT_AVAILABLE",
+          "display": "— FEAT-CREATOR-DIRECT-SELL-AMOUNT MISSING"
+        },
+        {
+          "feature_id": "FEAT-CREATOR-CLUSTER-SHARE",
+          "availability_class": "MISSING_CAPABILITY",
+          "value_status": "MISSING_CAPABILITY",
+          "value": null,
+          "units": "fraction",
+          "coverage_domain": "D12",
+          "available_to_strategy_semantics": "NOT_AVAILABLE",
+          "display": "— FEAT-CREATOR-CLUSTER-SHARE MISSING_CAPABILITY"
+        }
+      ]
+    }
+  ],
+  "non_claims": [
+    "NO_PIT_READY",
+    "NO_ALPHA",
+    "NO_FEATURE_STORE",
+    "NO_TASK28_UNFREEZE",
+    "NO_CREATOR_CLUSTER",
+    "NO_VPS",
+    "NO_PROVIDER"
+  ]
+}

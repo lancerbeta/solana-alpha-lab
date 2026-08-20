@@ -25588,7 +25588,7 @@ records:
   as_of: '2026-08-19'
   truth_owner: FACTORY_V1_PRODUCT_KERNEL_LOCAL_VERTICAL_SLICE_V1
   location: {kind: git_path, logical_uri: 'repo://catalog/schemas/experiment_spec.schema.json', repository_path: catalog/schemas/experiment_spec.schema.json}
-  integrity: {kind: sha256, sha256: 3f3247997911931109a8ecd80e623d925f90d2be8e17015f27f0e70f6797c383}
+  integrity: {kind: sha256, sha256: c42e374fc942b168ea30d25f901b81bde04861426003492061d37d651c60bc69}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: governed_by, target_asset_id: CTRL-FACTORY-V1-PRODUCT-KERNEL-001}
@@ -25645,7 +25645,7 @@ records:
   as_of: '2026-08-19'
   truth_owner: FACTORY_V1_PRODUCT_KERNEL_LOCAL_VERTICAL_SLICE_V1
   location: {kind: git_path, logical_uri: 'repo://src/solana_alpha_lab/factory/capabilities.py', repository_path: src/solana_alpha_lab/factory/capabilities.py}
-  integrity: {kind: sha256, sha256: fc97dfdfcd41f76a7da260004bad9ebc3b9bf62321756bea777a272de36ef7aa}
+  integrity: {kind: sha256, sha256: 31384242c928eae20e3029a04beef5a50e44c314e0c51d7255799b32c1e7ee65}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: governed_by, target_asset_id: CTRL-FACTORY-V1-PRODUCT-KERNEL-001}
@@ -25684,7 +25684,7 @@ records:
   as_of: '2026-08-19'
   truth_owner: FACTORY_V1_PRODUCT_KERNEL_LOCAL_VERTICAL_SLICE_V1
   location: {kind: git_path, logical_uri: 'repo://src/solana_alpha_lab/factory/read_model.py', repository_path: src/solana_alpha_lab/factory/read_model.py}
-  integrity: {kind: sha256, sha256: bc12c7ba3e9ce68be610a724959f0e57b300124c69fe5ed1d1b6440c6f92e326}
+  integrity: {kind: sha256, sha256: 1bdc9b61e5a4bb579d93f66d99eac9db7f6aaed44c9d79dcb781f89725d7fef1}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: depends_on, target_asset_id: MODULE-FACTORY-V1-OPS-STORE-001}
@@ -25720,7 +25720,7 @@ records:
   as_of: '2026-08-19'
   truth_owner: FACTORY_V1_PRODUCT_KERNEL_LOCAL_VERTICAL_SLICE_V1
   location: {kind: git_path, logical_uri: 'repo://src/solana_alpha_lab/factory/workbench.py', repository_path: src/solana_alpha_lab/factory/workbench.py}
-  integrity: {kind: sha256, sha256: ea36bfc4da659cd39294cf827840f4e5496eec7d94f43615bd7e5d10c01c2c27}
+  integrity: {kind: sha256, sha256: 18b16798a2b8d0303586e260a9fcb8272b27cb922e633d9d5e294d69a08ddd66}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: depends_on, target_asset_id: MODULE-FACTORY-V1-APPLICATION-001}
@@ -25962,7 +25962,7 @@ records:
   as_of: '2026-08-19'
   truth_owner: FACTORY_V1_COMMISSIONING_HYPOTHESIS_V1
   location: {kind: git_path, logical_uri: 'repo://src/solana_alpha_lab/factory/capabilities.py', repository_path: src/solana_alpha_lab/factory/capabilities.py}
-  integrity: {kind: sha256, sha256: fc97dfdfcd41f76a7da260004bad9ebc3b9bf62321756bea777a272de36ef7aa}
+  integrity: {kind: sha256, sha256: 31384242c928eae20e3029a04beef5a50e44c314e0c51d7255799b32c1e7ee65}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: governed_by, target_asset_id: CTRL-FACTORY-V1-COMMISSIONING-HYPOTHESIS-001}
@@ -27387,4 +27387,223 @@ records:
   consumers: [FACTORY-001, GOAL-OWNER]
   evidence: []
   search_terms: [PMF, STAY_OVERLAY, OWNER_READOUT]
+  classification: {contains_secrets: false, contains_raw_data: false, sensitivity: INTERNAL_NON_SECRET}
+
+- asset_id: CTRL-FACTORY-V1-COMMON-MARKET-FEATURE-SURFACE-001
+  record_version: '1.0'
+  asset_type: control_document
+  purpose: Exact DIRECT_CURSOR_DELIVERY contract for the Factory common market feature surface.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-08-20'
+  truth_owner: FACTORY_COMMON_MARKET_FEATURE_SURFACE_V1
+  location: {kind: git_path, logical_uri: 'repo://docs/tasks/FACTORY_COMMON_MARKET_FEATURE_SURFACE_V1.md', repository_path: docs/tasks/FACTORY_COMMON_MARKET_FEATURE_SURFACE_V1.md}
+  integrity: {kind: sha256, sha256: 192b756735f7ed60da83f7475e7649c8ed0678e24c1d90c224a7406fa6499405}
+  access: {mode: read_only, method: file, network_required: false, secrets_required: false}
+  relations:
+  - {relation_type: governed_by, target_asset_id: ARCH-INTENT-005}
+  consumers: [FACTORY-001, GOAL-OWNER]
+  evidence: []
+  search_terms: [FACTORY_V1, FEATURE_SURFACE, CONTRACT]
+  classification: {contains_secrets: false, contains_raw_data: false, sensitivity: INTERNAL_NON_SECRET}
+
+- asset_id: SCHEMA-FACTORY-V1-COMMON-MARKET-FEATURE-SURFACE-001
+  record_version: '1.0'
+  asset_type: schema
+  purpose: JSON Schema for the Factory-owned reusable market feature surface.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-08-20'
+  truth_owner: FACTORY_COMMON_MARKET_FEATURE_SURFACE_V1
+  location: {kind: git_path, logical_uri: 'repo://catalog/schemas/factory_v1_common_market_feature_surface.schema.json', repository_path: catalog/schemas/factory_v1_common_market_feature_surface.schema.json}
+  integrity: {kind: sha256, sha256: 532e0e0ee8fb497e5f54ea117319554d3ffa47224a941112978430022574c24d}
+  access: {mode: read_only, method: file, network_required: false, secrets_required: false}
+  relations:
+  - {relation_type: governed_by, target_asset_id: CTRL-FACTORY-V1-COMMON-MARKET-FEATURE-SURFACE-001}
+  consumers: [FACTORY-001, GOAL-OWNER]
+  evidence: []
+  search_terms: [FACTORY_V1, FEATURE_SURFACE, SCHEMA]
+  classification: {contains_secrets: false, contains_raw_data: false, sensitivity: INTERNAL_NON_SECRET}
+
+- asset_id: CONFIG-FACTORY-V1-COMMON-MARKET-FEATURE-SURFACE-001
+  record_version: '1.0'
+  asset_type: configuration
+  purpose: Machine-readable 18-feature Factory surface with honest availability classes.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-08-20'
+  truth_owner: FACTORY_COMMON_MARKET_FEATURE_SURFACE_V1
+  location: {kind: git_path, logical_uri: 'repo://configs/factory_v1_common_market_feature_surface_v1.yaml', repository_path: configs/factory_v1_common_market_feature_surface_v1.yaml}
+  integrity: {kind: sha256, sha256: 8e51f6e565be137bb1863637121abf5cdf94c8603976eb4b0252371ba650cb39}
+  access: {mode: read_only, method: file, network_required: false, secrets_required: false}
+  relations:
+  - {relation_type: depends_on, target_asset_id: SCHEMA-FACTORY-V1-COMMON-MARKET-FEATURE-SURFACE-001}
+  consumers: [FACTORY-001, GOAL-OWNER]
+  evidence: []
+  search_terms: [FACTORY_V1, FEATURE_SURFACE, CONFIG]
+  classification: {contains_secrets: false, contains_raw_data: false, sensitivity: INTERNAL_NON_SECRET}
+
+- asset_id: MODULE-FACTORY-V1-MARKET-FEATURE-SURFACE-001
+  record_version: '1.0'
+  asset_type: script
+  purpose: Offline FeatureResolver over Git-canonical A24 and A1 receipts.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-08-20'
+  truth_owner: FACTORY_COMMON_MARKET_FEATURE_SURFACE_V1
+  location: {kind: git_path, logical_uri: 'repo://src/solana_alpha_lab/factory/market_feature_surface.py', repository_path: src/solana_alpha_lab/factory/market_feature_surface.py}
+  integrity: {kind: sha256, sha256: f077e823d4acf6c6b5adb15c96e315361df7729197af422deb69b35b0a06131f}
+  access: {mode: read_only, method: file, network_required: false, secrets_required: false}
+  relations:
+  - {relation_type: depends_on, target_asset_id: CONFIG-FACTORY-V1-COMMON-MARKET-FEATURE-SURFACE-001}
+  consumers: [FACTORY-001, GOAL-OWNER]
+  evidence: []
+  search_terms: [FACTORY_V1, FEATURE_SURFACE, RESOLVER]
+  classification: {contains_secrets: false, contains_raw_data: false, sensitivity: INTERNAL_NON_SECRET}
+
+- asset_id: CONFIG-EXPERIMENT-SPEC-MARKET-FEATURE-PRICE-PATH-001
+  record_version: '1.0'
+  asset_type: configuration
+  purpose: Price-path archetype ExperimentSpec consuming the common feature surface.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-08-20'
+  truth_owner: FACTORY_COMMON_MARKET_FEATURE_SURFACE_V1
+  location: {kind: git_path, logical_uri: 'repo://configs/experiment_specs/market_feature_price_path_archetype_v1.yaml', repository_path: configs/experiment_specs/market_feature_price_path_archetype_v1.yaml}
+  integrity: {kind: sha256, sha256: 01857135be161ba50c5e93089e403fb0d9bbd4f0f1cbb481b4bf0aec9e0c4c71}
+  access: {mode: read_only, method: file, network_required: false, secrets_required: false}
+  relations:
+  - {relation_type: depends_on, target_asset_id: SCHEMA-EXPERIMENT-SPEC-001}
+  - {relation_type: depends_on, target_asset_id: CONFIG-FACTORY-V1-COMMON-MARKET-FEATURE-SURFACE-001}
+  consumers: [FACTORY-001, GOAL-OWNER]
+  evidence: []
+  search_terms: [FACTORY_V1, FEATURE_SURFACE, PRICE_PATH]
+  classification: {contains_secrets: false, contains_raw_data: false, sensitivity: INTERNAL_NON_SECRET}
+
+- asset_id: CONFIG-EXPERIMENT-SPEC-MARKET-FEATURE-LIQUIDITY-001
+  record_version: '1.0'
+  asset_type: configuration
+  purpose: Liquidity or quote archetype ExperimentSpec consuming the common feature surface.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-08-20'
+  truth_owner: FACTORY_COMMON_MARKET_FEATURE_SURFACE_V1
+  location: {kind: git_path, logical_uri: 'repo://configs/experiment_specs/market_feature_liquidity_archetype_v1.yaml', repository_path: configs/experiment_specs/market_feature_liquidity_archetype_v1.yaml}
+  integrity: {kind: sha256, sha256: 55e7edaec281b0e235871176f6e658bd3847a137fc3a0d9b51c77f589a52732e}
+  access: {mode: read_only, method: file, network_required: false, secrets_required: false}
+  relations:
+  - {relation_type: depends_on, target_asset_id: SCHEMA-EXPERIMENT-SPEC-001}
+  - {relation_type: depends_on, target_asset_id: CONFIG-FACTORY-V1-COMMON-MARKET-FEATURE-SURFACE-001}
+  consumers: [FACTORY-001, GOAL-OWNER]
+  evidence: []
+  search_terms: [FACTORY_V1, FEATURE_SURFACE, LIQUIDITY]
+  classification: {contains_secrets: false, contains_raw_data: false, sensitivity: INTERNAL_NON_SECRET}
+
+- asset_id: CONFIG-EXPERIMENT-SPEC-MARKET-FEATURE-CREATOR-PRESSURE-001
+  record_version: '1.0'
+  asset_type: configuration
+  purpose: Creator-pressure archetype ExperimentSpec with typed MISSING_CAPABILITY.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-08-20'
+  truth_owner: FACTORY_COMMON_MARKET_FEATURE_SURFACE_V1
+  location: {kind: git_path, logical_uri: 'repo://configs/experiment_specs/market_feature_creator_pressure_archetype_v1.yaml', repository_path: configs/experiment_specs/market_feature_creator_pressure_archetype_v1.yaml}
+  integrity: {kind: sha256, sha256: 4b7422679a16ce23d1b146646334552774089f544ad06199eef23ac2373db14f}
+  access: {mode: read_only, method: file, network_required: false, secrets_required: false}
+  relations:
+  - {relation_type: depends_on, target_asset_id: SCHEMA-EXPERIMENT-SPEC-001}
+  - {relation_type: depends_on, target_asset_id: CONFIG-FACTORY-V1-COMMON-MARKET-FEATURE-SURFACE-001}
+  consumers: [FACTORY-001, GOAL-OWNER]
+  evidence: []
+  search_terms: [FACTORY_V1, FEATURE_SURFACE, CREATOR]
+  classification: {contains_secrets: false, contains_raw_data: false, sensitivity: INTERNAL_NON_SECRET}
+
+- asset_id: TEST-FACTORY-V1-COMMON-MARKET-FEATURE-SURFACE-001
+  record_version: '1.0'
+  asset_type: script
+  purpose: Targeted tests that three archetypes compose without runner.py changes.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-08-20'
+  truth_owner: FACTORY_COMMON_MARKET_FEATURE_SURFACE_V1
+  location: {kind: git_path, logical_uri: 'repo://tests/test_factory_v1_common_market_feature_surface.py', repository_path: tests/test_factory_v1_common_market_feature_surface.py}
+  integrity: {kind: sha256, sha256: af823fc60c985479d8cf84f301e8d1b9615ba8a8897b2cdcd05b97079df2dd75}
+  access: {mode: read_only, method: file, network_required: false, secrets_required: false}
+  relations:
+  - {relation_type: depends_on, target_asset_id: MODULE-FACTORY-V1-MARKET-FEATURE-SURFACE-001}
+  consumers: [FACTORY-001, GOAL-OWNER]
+  evidence: []
+  search_terms: [FACTORY_V1, FEATURE_SURFACE, TESTS]
+  classification: {contains_secrets: false, contains_raw_data: false, sensitivity: INTERNAL_NON_SECRET}
+
+- asset_id: SCRIPT-FACTORY-V1-COMMON-MARKET-FEATURE-SURFACE-001
+  record_version: '1.0'
+  asset_type: script
+  purpose: Offline runner that composes the three market-feature archetype specs.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-08-20'
+  truth_owner: FACTORY_COMMON_MARKET_FEATURE_SURFACE_V1
+  location: {kind: git_path, logical_uri: 'repo://scripts/run_factory_market_feature_surface.py', repository_path: scripts/run_factory_market_feature_surface.py}
+  integrity: {kind: sha256, sha256: 836b9d13bbd11b65e248006f380495b021f0d0cb762d836daaae296377e5def1}
+  access: {mode: read_only, method: file, network_required: false, secrets_required: false}
+  relations:
+  - {relation_type: depends_on, target_asset_id: MODULE-FACTORY-V1-MARKET-FEATURE-SURFACE-001}
+  consumers: [FACTORY-001, GOAL-OWNER]
+  evidence: []
+  search_terms: [FACTORY_V1, FEATURE_SURFACE, CLI]
+  classification: {contains_secrets: false, contains_raw_data: false, sensitivity: INTERNAL_NON_SECRET}
+
+- asset_id: EVIDENCE-FACTORY-V1-COMMON-MARKET-FEATURE-SURFACE-001
+  record_version: '1.0'
+  asset_type: evidence
+  purpose: Runtime receipt for offline composition of three feature-surface archetypes.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-08-20'
+  truth_owner: FACTORY_COMMON_MARKET_FEATURE_SURFACE_V1
+  location: {kind: git_path, logical_uri: 'repo://docs/evidence/factory_v1_common_market_feature_surface/a1_factory_v1_common_market_feature_surface_runtime_receipt_v1.json', repository_path: docs/evidence/factory_v1_common_market_feature_surface/a1_factory_v1_common_market_feature_surface_runtime_receipt_v1.json}
+  integrity: {kind: sha256, sha256: 32cd85290356e08ad708442ad7fbc6c97dec97b63059792a732308cafd0821ea}
+  access: {mode: read_only, method: file, network_required: false, secrets_required: false}
+  relations:
+  - {relation_type: derived_from, target_asset_id: CTRL-FACTORY-V1-COMMON-MARKET-FEATURE-SURFACE-001}
+  consumers: [FACTORY-001, GOAL-OWNER]
+  evidence: []
+  search_terms: [FACTORY_V1, FEATURE_SURFACE, RUNTIME]
+  classification: {contains_secrets: false, contains_raw_data: false, sensitivity: INTERNAL_NON_SECRET}
+
+- asset_id: EVIDENCE-FACTORY-V1-COMMON-MARKET-FEATURE-SURFACE-ACCEPTANCE-001
+  record_version: '1.0'
+  asset_type: evidence
+  purpose: Acceptance that the feature surface composes with typed gaps and no PIT_READY claim.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-08-20'
+  truth_owner: FACTORY_COMMON_MARKET_FEATURE_SURFACE_V1
+  location: {kind: git_path, logical_uri: 'repo://docs/evidence/factory_v1_common_market_feature_surface/a1_factory_v1_common_market_feature_surface_acceptance_v1.json', repository_path: docs/evidence/factory_v1_common_market_feature_surface/a1_factory_v1_common_market_feature_surface_acceptance_v1.json}
+  integrity: {kind: sha256, sha256: d527bd1ea52e9a0dae83200331b8d60db0c10d4f0a4ff1656058a358d256804a}
+  access: {mode: read_only, method: file, network_required: false, secrets_required: false}
+  relations:
+  - {relation_type: depends_on, target_asset_id: EVIDENCE-FACTORY-V1-COMMON-MARKET-FEATURE-SURFACE-001}
+  consumers: [FACTORY-001, GOAL-OWNER]
+  evidence: []
+  search_terms: [FACTORY_V1, FEATURE_SURFACE, ACCEPTANCE]
+  classification: {contains_secrets: false, contains_raw_data: false, sensitivity: INTERNAL_NON_SECRET}
+
+- asset_id: REPORT-FACTORY-V1-COMMON-MARKET-FEATURE-SURFACE-001
+  record_version: '1.0'
+  asset_type: control_document
+  purpose: Russian owner readout for the common market feature surface composition.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-08-20'
+  truth_owner: FACTORY_COMMON_MARKET_FEATURE_SURFACE_V1
+  location: {kind: git_path, logical_uri: 'repo://docs/reports/factory_v1_common_market_feature_surface/a1_owner_readout_v1.md', repository_path: docs/reports/factory_v1_common_market_feature_surface/a1_owner_readout_v1.md}
+  integrity: {kind: sha256, sha256: 64478805f17d39f6d8ebc06f746b1bcc4fea444a406146aa1b66d078beb4e9cf}
+  access: {mode: read_only, method: file, network_required: false, secrets_required: false}
+  relations:
+  - {relation_type: derived_from, target_asset_id: EVIDENCE-FACTORY-V1-COMMON-MARKET-FEATURE-SURFACE-ACCEPTANCE-001}
+  consumers: [FACTORY-001, GOAL-OWNER]
+  evidence: []
+  search_terms: [FACTORY_V1, FEATURE_SURFACE, OWNER_READOUT]
   classification: {contains_secrets: false, contains_raw_data: false, sensitivity: INTERNAL_NON_SECRET}

@@ -1,0 +1,73 @@
+{
+  "as_of": "2026-08-20",
+  "non_claims": [
+    "NO_CRYPTOGRAPHIC_REVIEWER_IDENTITY",
+    "REVIEW_IS_NOT_SEMANTIC_DONE",
+    "NO_LIVE_PIT_OR_EXECUTION_CLAIM",
+    "NO_ALPHA_PNL_OR_NETRETURN",
+    "NO_CANONICAL_DONE",
+    "NO_SINGLE_AGENT_REVIEW_FALLBACK",
+    "NO_FACTORY_V1_OPERATIONAL_READY",
+    "NO_PIT_READY"
+  ],
+  "required_roles": [
+    "ARCHITECTURE_CRITIC",
+    "CODE_REVIEWER",
+    "GOAL_DOD_CRITIC"
+  ],
+  "review_id": "FACTORY-COMMON-MARKET-FEATURE-SURFACE-INDEPENDENT-REVIEW-001",
+  "reviewed_bindings_sha256": "9cde7e6919f3aa36103770310c68c6d49761fd3202bdd82c1a8e3751d43208c5",
+  "reviewed_inventory_sha256": "ea839b1c5b1d1f85d558a9e3bfc97f779e26172fbb585398bea309fc0959dcc6",
+  "reviews": [
+    {
+      "findings": [
+        "CHECKED_SECRETS",
+        "CHECKED_NETWORK_CREDENTIAL",
+        "CHECKED_RUNNER_COUPLING",
+        "CHECKED_TASK28_SKELETONS",
+        "CHECKED_PIT_READY_FORBIDDEN",
+        "CHECKED_UNKNOWN_NOT_ZERO",
+        "CHECKED_CREATOR_CLUSTER_MISSING_CAPABILITY",
+        "CHECKED_DUPLICATE_HANDLER_REMOVED",
+        "CHECKED_EXPERIMENT_SPEC_BACK_COMPAT",
+        "CHECKED_CATALOG_HASH_DRIFT"
+      ],
+      "role": "CODE_REVIEWER",
+      "verdict": "PASS"
+    },
+    {
+      "findings": [
+        "CHECKED_DECISION_DELTA",
+        "CHECKED_CHEAPEST_FALSIFIER",
+        "CHECKED_NON_CLAIMS",
+        "CHECKED_USER_VISIBLE_OUTCOME",
+        "CHECKED_EVIDENCE_BUDGET",
+        "CHECKED_DOD",
+        "CHECKED_TASK28_FREEZE_INTENTIONAL",
+        "CHECKED_NOT_BUREAUCRACY"
+      ],
+      "role": "GOAL_DOD_CRITIC",
+      "verdict": "PASS"
+    },
+    {
+      "findings": [
+        "CHECKED_BOUNDARIES",
+        "CHECKED_SCHEMAS_AND_LAYERS",
+        "CHECKED_TRUTH_OWNERSHIP",
+        "CHECKED_PIT_AND_AVAILABILITY",
+        "CHECKED_QUOTE_SHARE_NOT_KEEP",
+        "CHECKED_FEATURE_STORE_ABSENT",
+        "CHECKED_RUNNER_HAS_NO_FEATURE_IDS",
+        "CHECKED_CREATOR_CLUSTER",
+        "CHECKED_BLAST_RADIUS_AND_RECOVERY",
+        "CHECKED_SAFER_ALTERNATIVE"
+      ],
+      "role": "ARCHITECTURE_CRITIC",
+      "verdict": "PASS"
+    }
+  ],
+  "schema": "smial.delivery-independent-review-evidence",
+  "schema_version": "1.0",
+  "task_id": "FACTORY_COMMON_MARKET_FEATURE_SURFACE_V1",
+  "verdict": "PASS"
+}

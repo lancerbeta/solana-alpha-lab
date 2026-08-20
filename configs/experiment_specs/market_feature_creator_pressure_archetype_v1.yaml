@@ -1,0 +1,29 @@
+schema: smial.experiment-spec
+schema_version: '1.0'
+experiment_id: EXP-MARKET-FEATURE-CREATOR-PRESSURE-ARCHETYPE-001
+hypothesis_version: HYP-MARKET-FEATURE-CREATOR-PRESSURE-V1
+question: Can creator-pressure features be declared with typed MISSING and MISSING_CAPABILITY instead of an entity-graph overlay?
+estimand: FeatureCoverage(creator_pressure) with direct facts missing and cluster explicitly not a capability
+population: NO_HOLDER_SNAPSHOT_NO_ENTITY_CLUSTER
+data_requirements:
+  - requirement_id: SURFACE_CONFIG
+    kind: CATALOG_ASSET
+    path: configs/factory_v1_common_market_feature_surface_v1.yaml
+    sha256: 8e51f6e565be137bb1863637121abf5cdf94c8603976eb4b0252371ba650cb39
+capabilities:
+  - CAP-OFFLINE-MARKET-FEATURE-RESOLVE-001
+required_feature_ids:
+  - FEAT-CREATOR-DIRECT-SHARE
+  - FEAT-CREATOR-DIRECT-SELL-AMOUNT
+  - FEAT-CREATOR-CLUSTER-SHARE
+falsifier: Creator cluster is computed, missing share becomes zero, or runner.py changes for this spec.
+method: resolve_market_feature_snapshot
+parameters:
+  archetype_id: ARCHETYPE-CREATOR-PRESSURE
+  next_safe_action: INSPECT_FEATURE_COVERAGE
+evidence_budget:
+  provider_api_rpc_wss_calls: 0
+holdout_policy: No holdout is opened; this atom does not collect holder snapshots or revive TASK-24 entity inference.
+terminal_outcomes:
+  - FEATURE_SURFACE_COMPOSITION_PASS
+  - FEATURE_SURFACE_TYPED_GAPS_ONLY

@@ -1,0 +1,41 @@
+{
+  "as_of": "2026-08-20",
+  "capability_radar": {
+    "now": "NONE",
+    "watch": "MOVE2_ORDINARY_HYPOTHESIS_THROUGH_FEATURE_SURFACE"
+  },
+  "dimensions": {
+    "build_vs_buy": "PASS_WRAP_A24_A1_RECEIPTS_BUILD_NO_FEATURE_STORE",
+    "context_efficiency": "PASS_ONE_SURFACE_THREE_ARCHETYPE_SPECS",
+    "execution_to_cashflow": "PASS_NO_NETRETURN_NO_KEEP_REOPEN",
+    "flexibility_and_history": "PASS_TASK28_SKELETONS_UNCHANGED",
+    "mission": "PASS_ORDINARY_HYPOTHESIS_AS_FEATURE_IDS",
+    "monitoring_and_recovery": "PASS_REVERT_THIS_ATOM_ONLY",
+    "owner_operability": "PASS_COCKPIT_REQUIRED_FEATURES_TABLE",
+    "red_team": "PASS_NO_PIT_READY_UNKNOWN_NOT_ZERO_NO_CLUSTER",
+    "research_truth": "PASS_TYPED_GAPS_FORWARD_ONLY_QUOTE_NOT_KEEP",
+    "security": "PASS_ZERO_PROVIDER_ZERO_CREDENTIAL"
+  },
+  "limits": [
+    "NO_PIT_READY",
+    "NO_ALPHA",
+    "NO_NETRETURN",
+    "NO_FEATURE_STORE",
+    "NO_TASK28_UNFREEZE",
+    "NO_CREATOR_CLUSTER",
+    "NO_VPS",
+    "NO_PROVIDER",
+    "NO_FACTORY_V1_OPERATIONAL_READY",
+    "NO_ATOM_2",
+    "QUOTE_SHARE_IS_NOT_KEEP"
+  ],
+  "mode": "FULL_REVIEW",
+  "recovery": "REVERT_ONLY_THIS_ATOM_TRACKED_OUTPUTS; PRESERVE_TASK28_SKELETONS; PRESERVE_A24_A1_RECEIPTS; PRESERVE_RUNNER_PY",
+  "review_id": "FACTORY-COMMON-MARKET-FEATURE-SURFACE-FACTORY-FIT-001",
+  "reviewed_bindings_sha256": "9cde7e6919f3aa36103770310c68c6d49761fd3202bdd82c1a8e3751d43208c5",
+  "reviewed_inventory_sha256": "ea839b1c5b1d1f85d558a9e3bfc97f779e26172fbb585398bea309fc0959dcc6",
+  "schema": "smial.delivery-harness-factory-fit",
+  "schema_version": "1.0",
+  "task_id": "FACTORY_COMMON_MARKET_FEATURE_SURFACE_V1",
+  "verdict": "PASS"
+}
