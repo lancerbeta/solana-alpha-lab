@@ -1,0 +1,35 @@
+schema: smial.experiment-spec
+schema_version: '1.0'
+experiment_id: EXP-ORDINARY-LIQUIDITY-QUOTE-HYPOTHESIS-001
+hypothesis_version: HYP-ORDINARY-LIQUIDITY-QUOTE-PRESSURE-V1
+question: Does Git-canonical A1 quote availability plus typed UNKNOWN friction admit a promotable execution hypothesis, or do FORWARD_ONLY quote and UNKNOWN friction forbid promotion?
+estimand: PromotionDecision(quote_availability, quoted_friction, pool_liquidity) from Git A1; FORWARD_ONLY is not KEEP
+population: A1_FREE_KEY_QUOTE_CELLS_AND_A24_POOL_DAY
+data_requirements:
+  - requirement_id: SURFACE_CONFIG
+    kind: CATALOG_ASSET
+    path: configs/factory_v1_common_market_feature_surface_v1.yaml
+    sha256: 8e51f6e565be137bb1863637121abf5cdf94c8603976eb4b0252371ba650cb39
+  - requirement_id: A1_RUNTIME
+    kind: GIT_CANONICAL_RECEIPT
+    path: docs/evidence/quote_native_admissible_friction_audition/a1_quote_native_admissible_friction_audition_runtime_receipt_v1.json
+    sha256: 75f60a155b7db6ddb8c801c9ff5060ce5e4e7fe641b836ff35edeb91534c308e
+capabilities:
+  - CAP-OFFLINE-MARKET-FEATURE-RESOLVE-001
+required_feature_ids:
+  - FEAT-QUOTE-AVAILABILITY
+  - FEAT-QUOTED-ROUND-TRIP-FRICTION
+  - FEAT-POOL-LIQUIDITY
+  - FEAT-LIQUIDITY-RETENTION
+falsifier: Classifying this YAML requires Factory Python or a new CLI, quote KEEP is reopened, or UNKNOWN friction becomes 0.
+method: resolve_market_feature_snapshot
+parameters:
+  hypothesis_kind: ORDINARY_LIQUIDITY_EXECUTION
+  next_safe_action: DO_NOT_PROMOTE
+  product_terminal: ORDINARY_HYPOTHESIS_COMPOSED_NOT_PROMOTABLE
+evidence_budget:
+  provider_api_rpc_wss_calls: 0
+holdout_policy: No holdout is opened; quote observation stays forward-only and cannot promote an execution hypothesis.
+terminal_outcomes:
+  - FEATURE_SURFACE_COMPOSITION_PASS
+  - ORDINARY_HYPOTHESIS_COMPOSED_NOT_PROMOTABLE

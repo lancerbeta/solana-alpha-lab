@@ -1,0 +1,40 @@
+{
+  "as_of": "2026-08-20",
+  "capability_radar": {
+    "now": "NONE",
+    "watch": "SCIENTIFIC_WALL_TYPED_UNKNOWN_OR_OWNER_PIT_FORK"
+  },
+  "dimensions": {
+    "build_vs_buy": "PASS_ADOPT_CLI_WRAP_ONE_YAML",
+    "context_efficiency": "PASS_REUSE_EXISTING_SPEC_CLI",
+    "execution_to_cashflow": "PASS_NO_KEEP_NO_NETRETURN",
+    "flexibility_and_history": "PASS_TASK28_SKELETONS_UNCHANGED",
+    "mission": "PASS_SECOND_ORDINARY_HYPOTHESIS_AS_YAML",
+    "monitoring_and_recovery": "PASS_REVERT_THIS_ATOM_ONLY",
+    "owner_operability": "PASS_NO_NEW_CLI",
+    "red_team": "PASS_NOT_MOVE_3_NO_PIT_READY_UNKNOWN_NOT_ZERO",
+    "research_truth": "PASS_FORWARD_ONLY_QUOTE_UNKNOWN_FRICTION",
+    "security": "PASS_ZERO_PROVIDER"
+  },
+  "limits": [
+    "NO_PIT_READY",
+    "NO_ALPHA",
+    "NO_QUOTE_KEEP",
+    "NO_NEW_CLI",
+    "NO_FACTORY_PYTHON",
+    "NO_TASK28_UNFREEZE",
+    "NO_VPS",
+    "NO_FACTORY_V1_OPERATIONAL_READY",
+    "NO_MOVE_3_PLATFORM_SLICE",
+    "CAPABILITY_PASS_IS_NOT_PROMOTION"
+  ],
+  "mode": "FULL_REVIEW",
+  "recovery": "REVERT_ONLY_THIS_ATOM_TRACKED_OUTPUTS; PRESERVE_CLI_AND_FACTORY_PYTHON; PRESERVE_TASK28_SKELETONS",
+  "review_id": "FACTORY-ORDINARY-LIQUIDITY-HYPOTHESIS-YAML-FACTORY-FIT-001",
+  "reviewed_bindings_sha256": "19c820f6e9d386e4c1a55a71f3b14566b2c96110b8666140a95d7368b316dfe5",
+  "reviewed_inventory_sha256": "cbf9434adf6fb51715a963c5b1e990a1a52ec771e3cf94a4d2d4253b6fbed835",
+  "schema": "smial.delivery-harness-factory-fit",
+  "schema_version": "1.0",
+  "task_id": "FACTORY_ORDINARY_LIQUIDITY_HYPOTHESIS_YAML_V1",
+  "verdict": "PASS"
+}

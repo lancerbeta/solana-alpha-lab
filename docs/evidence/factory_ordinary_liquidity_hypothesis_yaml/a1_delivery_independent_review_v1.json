@@ -1,0 +1,66 @@
+{
+  "as_of": "2026-08-20",
+  "non_claims": [
+    "NO_CRYPTOGRAPHIC_REVIEWER_IDENTITY",
+    "REVIEW_IS_NOT_SEMANTIC_DONE",
+    "NO_LIVE_PIT_OR_EXECUTION_CLAIM",
+    "NO_ALPHA_PNL_OR_NETRETURN",
+    "NO_CANONICAL_DONE",
+    "NO_SINGLE_AGENT_REVIEW_FALLBACK",
+    "NO_FACTORY_V1_OPERATIONAL_READY",
+    "NO_PIT_READY"
+  ],
+  "required_roles": [
+    "ARCHITECTURE_CRITIC",
+    "CODE_REVIEWER",
+    "GOAL_DOD_CRITIC"
+  ],
+  "review_id": "FACTORY-ORDINARY-LIQUIDITY-HYPOTHESIS-YAML-INDEPENDENT-REVIEW-001",
+  "reviewed_bindings_sha256": "19c820f6e9d386e4c1a55a71f3b14566b2c96110b8666140a95d7368b316dfe5",
+  "reviewed_inventory_sha256": "cbf9434adf6fb51715a963c5b1e990a1a52ec771e3cf94a4d2d4253b6fbed835",
+  "reviews": [
+    {
+      "findings": [
+        "CHECKED_FACTORY_CORE_PYTHON_UNCHANGED",
+        "CHECKED_CLI_BYTES_UNCHANGED",
+        "CHECKED_FORWARD_ONLY_NOT_KEEP",
+        "CHECKED_UNKNOWN_NOT_ZERO",
+        "CHECKED_NOT_LIQUIDITY_ARCHETYPE",
+        "CHECKED_NO_SECRETS_NO_PROVIDER",
+        "CHECKED_TASK28_SKELETONS_EMPTY"
+      ],
+      "role": "CODE_REVIEWER",
+      "verdict": "PASS"
+    },
+    {
+      "findings": [
+        "CHECKED_NOT_MOVE_3",
+        "CHECKED_DECISION_DELTA",
+        "CHECKED_CHEAPEST_FALSIFIER",
+        "CHECKED_SECOND_FAMILY_YAML",
+        "CHECKED_NON_CLAIMS",
+        "CHECKED_DOD",
+        "CHECKED_NOT_BUREAUCRACY"
+      ],
+      "role": "GOAL_DOD_CRITIC",
+      "verdict": "PASS"
+    },
+    {
+      "findings": [
+        "CHECKED_YAML_ONLY_SECOND_FAMILY",
+        "CHECKED_NO_FACTORY_PYTHON_FORK",
+        "CHECKED_CLI_NOT_FORKED",
+        "CHECKED_QUOTE_FORWARD_ONLY",
+        "CHECKED_TASK28_FREEZE",
+        "CHECKED_BLAST_RADIUS_REVERT_BRANCH",
+        "CHECKED_CAPABILITY_PASS_IS_NOT_PROMOTION"
+      ],
+      "role": "ARCHITECTURE_CRITIC",
+      "verdict": "PASS"
+    }
+  ],
+  "schema": "smial.delivery-independent-review-evidence",
+  "schema_version": "1.0",
+  "task_id": "FACTORY_ORDINARY_LIQUIDITY_HYPOTHESIS_YAML_V1",
+  "verdict": "PASS"
+}

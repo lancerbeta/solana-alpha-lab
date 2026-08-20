@@ -27,8 +27,11 @@ from solana_alpha_lab.factory.workbench import _page
 
 SPEC = "configs/experiment_specs/ordinary_price_path_buy_pressure_v1.yaml"
 ARCHETYPE = "configs/experiment_specs/market_feature_price_path_archetype_v1.yaml"
+LIQUIDITY_SPEC = "configs/experiment_specs/ordinary_liquidity_quote_pressure_v1.yaml"
+LIQUIDITY_ARCHETYPE = "configs/experiment_specs/market_feature_liquidity_archetype_v1.yaml"
 SCHEMA = ROOT / "catalog/schemas/experiment_spec.schema.json"
 SCRIPT = ROOT / "scripts/run_factory_ordinary_market_hypothesis.py"
+CLI_SHA256 = "72d479df06067bc4afae4b4a105e88825963b45b08a57747e64aa1e741a0df72"
 FEATURE_CATALOG = ROOT / "registries/feature_catalog.yaml"
 HYPOTHESES = ROOT / "registries/hypotheses.yaml"
 RESEARCH_CYCLES = ROOT / "registries/research_cycles.yaml"
@@ -167,6 +170,59 @@ class FactoryOrdinaryMarketHypothesisTests(unittest.TestCase):
         self.assertEqual(payload["status"], "COMPLETE")
         self.assertEqual(payload["hypothesis"], "HYP-ORDINARY-PRICE-PATH-BUY-PRESSURE-V1")
         self.assertEqual(payload["next_safe_action"], "DO_NOT_PROMOTE")
+
+    def test_ordinary_hypothesis_cli_bytes_unchanged(self) -> None:
+        self.assertEqual(sha256(SCRIPT), CLI_SHA256)
+
+    def test_liquidity_yaml_is_not_the_liquidity_archetype(self) -> None:
+        spec = load_experiment_spec(ROOT, LIQUIDITY_SPEC)
+        jsonschema.validate(spec, json.loads(SCHEMA.read_text(encoding="utf-8")))
+        archetype = load_experiment_spec(ROOT, LIQUIDITY_ARCHETYPE)
+        self.assertEqual(
+            spec["experiment_id"], "EXP-ORDINARY-LIQUIDITY-QUOTE-HYPOTHESIS-001"
+        )
+        self.assertEqual(
+            spec["hypothesis_version"], "HYP-ORDINARY-LIQUIDITY-QUOTE-PRESSURE-V1"
+        )
+        self.assertNotEqual(spec["experiment_id"], archetype["experiment_id"])
+        self.assertNotEqual(spec["question"], archetype["question"])
+        self.assertEqual(spec["parameters"]["next_safe_action"], "DO_NOT_PROMOTE")
+        self.assertEqual(spec["parameters"]["product_terminal"], PRODUCT_TERMINAL)
+        self.assertNotIn("FEAT-MCAP-TO-LIQUIDITY", spec["required_feature_ids"])
+        self.assertNotIn("FEAT-ROUTE-STATUS", spec["required_feature_ids"])
+
+    def test_liquidity_quote_is_forward_only_and_friction_stays_unknown(self) -> None:
+        spec = load_experiment_spec(ROOT, LIQUIDITY_SPEC)
+        snapshot = resolve_feature_snapshot(spec, root=ROOT)
+        by_id = {row["feature_id"]: row for row in snapshot["features"]}
+        self.assertEqual(by_id["FEAT-QUOTE-AVAILABILITY"]["value"], 1.0)
+        self.assertEqual(by_id["FEAT-QUOTE-AVAILABILITY"]["availability_class"], "FORWARD_ONLY")
+        self.assertEqual(
+            by_id["FEAT-QUOTE-AVAILABILITY"]["available_to_strategy_semantics"],
+            "HISTORICAL_CAPTURE_NOT_STRATEGY_AVAILABLE",
+        )
+        self.assertEqual(by_id["FEAT-QUOTED-ROUND-TRIP-FRICTION"]["value_status"], "UNKNOWN")
+        self.assertIsNone(by_id["FEAT-QUOTED-ROUND-TRIP-FRICTION"]["value"])
+        self.assertNotEqual(by_id["FEAT-QUOTED-ROUND-TRIP-FRICTION"]["value"], 0)
+        self.assertEqual(by_id["FEAT-POOL-LIQUIDITY"]["value_status"], "UNKNOWN")
+        self.assertEqual(snapshot["pit_ready_count"], 0)
+
+    def test_existing_cli_classifies_liquidity_yaml_not_promotable(self) -> None:
+        completed = subprocess.run(
+            [sys.executable, str(SCRIPT), "--root", str(ROOT), "--spec", LIQUIDITY_SPEC],
+            check=False,
+            capture_output=True,
+            text=True,
+            cwd=str(ROOT),
+        )
+        self.assertEqual(completed.returncode, 0, completed.stderr)
+        payload = json.loads(completed.stdout)
+        self.assertEqual(payload["capability_terminal"], PASS_TERMINAL)
+        self.assertEqual(payload["product_terminal"], PRODUCT_TERMINAL)
+        self.assertEqual(payload["next_safe_action"], "DO_NOT_PROMOTE")
+        self.assertEqual(
+            payload["hypothesis_version"], "HYP-ORDINARY-LIQUIDITY-QUOTE-PRESSURE-V1"
+        )
 
 
 if __name__ == "__main__":
