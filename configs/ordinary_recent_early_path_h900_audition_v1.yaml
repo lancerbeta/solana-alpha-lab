@@ -1,0 +1,78 @@
+schema: smial.ordinary-recent-early-path-h900-audition
+schema_version: '1.0'
+atom_id: ORDINARY_RECENT_EARLY_PATH_H900_AUDITION_V1
+as_of: '2026-08-21'
+external_authority:
+  owner_phrase: 'OK ORDINARY_RECENT_EARLY_PATH_H900_AUDITION_V1: one bounded Jupiter Free-key read-only campaign using a local process-environment key only; Tokens V2 /recent plus one bulk /tokens/v2/search for frozen mints plus quote-only /swap/v2/order; x-api-key header only; no .env read, no key in URL/log/receipt/Git, no taker, /build, /execute, wallet, signer, transaction, paid plan, second provider, retry or fallback; cash cap $0; call cap 60; global provider pace >=3s; 24 fresh project-eligible recent candidates excluding all prior consumed mints including ORDINARY_RECENT_ORGANIC_PRESSURE_H900_AUDITION_V1; wait until pool age >=5m before the single bulk T0 resnapshot; X = (mcap_T5 / mcap_recent) - 1 from /recent freeze row and that T0 snapshot only; quote-only BUY at T0 and quote-only SELL at H900; UNKNOWN is never zero; organic-pressure, flow-pressure, TX_IMBALANCE, H3600/H4, Strategy, Bot, Shadow, alpha and NetReturn forbidden.'
+  credential_name: JUPITER_API_KEY
+  credential_reads: 1
+  dotenv_reads: false
+  execute: false
+  build: false
+  taker: OMITTED_QUOTE_ONLY
+  cash_cap_usd_cents: 0
+  call_cap: 60
+registry: configs/provider_route_capability_registry_v10.yaml
+routes:
+  recent:
+    route_id: JUPITER-SOLANA-TOKENS-V2-RECENT-FREE-API-KEY-001
+    endpoint: https://api.jup.ag/tokens/v2/recent
+    host: api.jup.ag
+    method: GET
+  search:
+    route_id: JUPITER-SOLANA-TOKENS-V2-SEARCH-FREE-API-KEY-001
+    endpoint: https://api.jup.ag/tokens/v2/search
+    host: api.jup.ag
+    method: GET
+  quote:
+    route_id: JUPITER-SOLANA-SWAP-V2-ORDER-FREE-API-KEY-001
+    endpoint: https://api.jup.ag/swap/v2/order
+    host: api.jup.ag
+    method: GET
+wrapped_sol_mint: So11111111111111111111111111111111111111112
+population:
+  launchpad: pump.fun
+  target_candidates: 24
+  seasoning_seconds: 300
+  prior_mints_required: true
+  prior_mints_input: OPERATOR_SUPPLIED_OUTSIDE_GIT
+decision_snapshot:
+  source: TOKENS_V2_SEARCH_BULK_RESPONSE
+  one_call_max_mints: 100
+  x_formula: (mcap_T5 / mcap_recent) - 1
+  missing_is_zero: false
+quote:
+  slippage_bps: '100'
+  notional_atomic: '10000000'
+  horizon_seconds: 900
+  lateness_slack_seconds: 120
+decision_rule:
+  min_decision_time_eligible: 18
+  min_rankable_h900: 14
+  tau_b_floor: '0.20'
+  top_x_quartile: true
+  top_quartile_median_y_gt: 0
+  top_quartile_median_gt_rest: true
+  leave_one_out_positive_share: '0.75'
+  selected_market_execution_unavailable_forbidden: true
+execution_controls:
+  retries: 0
+  fallback: false
+  persist_transaction_bytes: false
+  provider_requests_max: 60
+  min_interval_seconds: 3
+  background_scheduler: false
+  second_provider: false
+  paid_plan: false
+runtime_limits:
+  timeout_seconds: 20.0
+  max_response_bytes: 2000000
+raw_retention:
+  body: A4_OUTSIDE_GIT
+  response_headers: SAFE_ALLOWLIST_ONLY
+non_claims:
+  alpha: false
+  netreturn: false
+  execution: false
+  strategy: false
+  shadow: false

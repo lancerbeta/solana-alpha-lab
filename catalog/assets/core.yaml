@@ -28354,7 +28354,7 @@ records:
   as_of: '2026-08-20'
   truth_owner: ORDINARY_RECENT_ORGANIC_PRESSURE_H900_AUDITION_V1
   location: {kind: git_path, logical_uri: 'repo://src/solana_alpha_lab/ordinary_recent_organic_pressure_h900_audition.py', repository_path: src/solana_alpha_lab/ordinary_recent_organic_pressure_h900_audition.py}
-  integrity: {kind: sha256, sha256: 81e723ab64bf4cd67814004a573845c746e6a13177dad87954fcc940a5ae4b72}
+  integrity: {kind: sha256, sha256: dbf9af28e32ab450c1f98153f5ecabb0234d45b4963be731681c931c8b343916}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: depends_on, target_asset_id: CONFIG-ORDINARY-RECENT-ORGANIC-PRESSURE-H900-AUDITION-001}
@@ -28503,4 +28503,92 @@ records:
   consumers: [FACTORY-001, GOAL-OWNER]
   evidence: []
   search_terms: [ORDINARY_RECENT, FACTORY_FIT, FULL_REVIEW, NO_SWITCH, REPLAN]
+  classification: {contains_secrets: false, contains_raw_data: false, sensitivity: INTERNAL_NON_SECRET}
+- asset_id: CTRL-ORDINARY-RECENT-EARLY-PATH-H900-AUDITION-001
+  record_version: '1.0'
+  asset_type: control_document
+  purpose: Exact bounded contract for a fresh project-eligible recent-to-T+5 mcap-path H900 quote-only audition.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-08-21'
+  truth_owner: ORDINARY_RECENT_EARLY_PATH_H900_AUDITION_V1
+  location: {kind: git_path, logical_uri: 'repo://docs/tasks/ORDINARY_RECENT_EARLY_PATH_H900_AUDITION_V1.md', repository_path: docs/tasks/ORDINARY_RECENT_EARLY_PATH_H900_AUDITION_V1.md}
+  integrity: {kind: sha256, sha256: 59bcc389ef5bb76fc8958150cd37990ea35375d71f2bf2d8e6568917fb15182e}
+  access: {mode: read_only, method: file, network_required: false, secrets_required: false}
+  relations:
+  - {relation_type: contains, target_asset_id: CONFIG-ORDINARY-RECENT-EARLY-PATH-H900-AUDITION-001}
+  - {relation_type: contains, target_asset_id: MODULE-ORDINARY-RECENT-EARLY-PATH-H900-AUDITION-001}
+  - {relation_type: contains, target_asset_id: SCRIPT-ORDINARY-RECENT-EARLY-PATH-H900-AUDITION-001}
+  - {relation_type: validated_by, target_asset_id: TEST-ORDINARY-RECENT-EARLY-PATH-H900-AUDITION-001}
+  consumers: [FACTORY-001, GOAL-OWNER]
+  evidence: []
+  search_terms: [ORDINARY_RECENT, EARLY_PATH, H900, AUDITION, TASK_CONTRACT]
+  classification: {contains_secrets: false, contains_raw_data: false, sensitivity: INTERNAL_NON_SECRET}
+- asset_id: CONFIG-ORDINARY-RECENT-EARLY-PATH-H900-AUDITION-001
+  record_version: '1.0'
+  asset_type: configuration
+  purpose: Frozen population, recent-to-T+5 mcap-path formula, quote-only horizons, decision thresholds, and campaign controls.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-08-21'
+  truth_owner: ORDINARY_RECENT_EARLY_PATH_H900_AUDITION_V1
+  location: {kind: git_path, logical_uri: 'repo://configs/ordinary_recent_early_path_h900_audition_v1.yaml', repository_path: configs/ordinary_recent_early_path_h900_audition_v1.yaml}
+  integrity: {kind: sha256, sha256: e7e35cb950a468cda61027e5fea0d3c55903c471cdce6b5a735b48c94ce40c7f}
+  access: {mode: read_only, method: file, network_required: false, secrets_required: false}
+  relations:
+  - {relation_type: governed_by, target_asset_id: CTRL-ORDINARY-RECENT-EARLY-PATH-H900-AUDITION-001}
+  - {relation_type: depends_on, target_asset_id: CONFIG-PROVIDER-ROUTE-CAPABILITY-REGISTRY-010}
+  consumers: [FACTORY-001, GOAL-OWNER]
+  evidence: []
+  search_terms: [ORDINARY_RECENT, EARLY_PATH, H900, CONFIG]
+  classification: {contains_secrets: false, contains_raw_data: false, sensitivity: INTERNAL_NON_SECRET}
+- asset_id: MODULE-ORDINARY-RECENT-EARLY-PATH-H900-AUDITION-001
+  record_version: '1.0'
+  asset_type: script
+  purpose: Fail-closed recent-to-T+5 mcap-path projector wrapping the existing H900 audition campaign.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-08-21'
+  truth_owner: ORDINARY_RECENT_EARLY_PATH_H900_AUDITION_V1
+  location: {kind: git_path, logical_uri: 'repo://src/solana_alpha_lab/ordinary_recent_early_path_h900_audition.py', repository_path: src/solana_alpha_lab/ordinary_recent_early_path_h900_audition.py}
+  integrity: {kind: sha256, sha256: 7a31576f9d29d84230dde74ccdccebae96884a462e4f89d12afa48eb4dbfdbaa}
+  access: {mode: read_only, method: file, network_required: false, secrets_required: false}
+  relations:
+  - {relation_type: depends_on, target_asset_id: CONFIG-ORDINARY-RECENT-EARLY-PATH-H900-AUDITION-001}
+  - {relation_type: depends_on, target_asset_id: MODULE-ORDINARY-RECENT-ORGANIC-PRESSURE-H900-AUDITION-001}
+  consumers: [FACTORY-001, GOAL-OWNER]
+  evidence: []
+  search_terms: [ORDINARY_RECENT, EARLY_PATH, H900, AUDITION, MODULE]
+  classification: {contains_secrets: false, contains_raw_data: false, sensitivity: INTERNAL_NON_SECRET}
+- asset_id: SCRIPT-ORDINARY-RECENT-EARLY-PATH-H900-AUDITION-001
+  record_version: '1.0'
+  asset_type: script
+  purpose: Foreground runner for the early-path H900 audition after the exact owner phrase.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-08-21'
+  truth_owner: ORDINARY_RECENT_EARLY_PATH_H900_AUDITION_V1
+  location: {kind: git_path, logical_uri: 'repo://scripts/run_ordinary_recent_early_path_h900_audition.py', repository_path: scripts/run_ordinary_recent_early_path_h900_audition.py}
+  integrity: {kind: sha256, sha256: cab610b2279e4f0eca07cf40c834905b19710d25e20868355f4814948e42ba4b}
+  access: {mode: read_only, method: file, network_required: false, secrets_required: false}
+  relations: [{relation_type: depends_on, target_asset_id: MODULE-ORDINARY-RECENT-EARLY-PATH-H900-AUDITION-001}]
+  consumers: [FACTORY-001, GOAL-OWNER]
+  evidence: []
+  search_terms: [ORDINARY_RECENT, EARLY_PATH, H900, RUNNER]
+  classification: {contains_secrets: false, contains_raw_data: false, sensitivity: INTERNAL_NON_SECRET}
+- asset_id: TEST-ORDINARY-RECENT-EARLY-PATH-H900-AUDITION-001
+  record_version: '1.0'
+  asset_type: script
+  purpose: Targeted tests for mcap-path X, missing-is-not-zero, organic/flow exclusion, and quote skip on invalid evidence yield.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-08-21'
+  truth_owner: ORDINARY_RECENT_EARLY_PATH_H900_AUDITION_V1
+  location: {kind: git_path, logical_uri: 'repo://tests/test_ordinary_recent_early_path_h900_audition.py', repository_path: tests/test_ordinary_recent_early_path_h900_audition.py}
+  integrity: {kind: sha256, sha256: 0478d6f81af04d91e8e8b044f02c539fb250c9cba28acf45edcd47b35fb197e7}
+  access: {mode: read_only, method: file, network_required: false, secrets_required: false}
+  relations: [{relation_type: depends_on, target_asset_id: MODULE-ORDINARY-RECENT-EARLY-PATH-H900-AUDITION-001}]
+  consumers: [FACTORY-001]
+  evidence: []
+  search_terms: [ORDINARY_RECENT, EARLY_PATH, H900, TEST]
   classification: {contains_secrets: false, contains_raw_data: false, sensitivity: INTERNAL_NON_SECRET}
