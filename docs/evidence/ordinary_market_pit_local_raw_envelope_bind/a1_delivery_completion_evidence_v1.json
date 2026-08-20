@@ -9,11 +9,11 @@
   "cloud_bundle_smoke_required": false,
   "factory_fit": {
     "path": "docs/evidence/ordinary_market_pit_local_raw_envelope_bind/a1_delivery_factory_fit_v1.json",
-    "sha256": "526ecdd9df39b341af553e6bfbb3eff4ac8f2285d55c62745f91dd676c046707",
+    "sha256": "008b1c055576a2e1c70128d26ad90b6aedd7249dbac95b0579d1e3a8cb9b7719",
     "verdict": "PASS"
   },
   "implementation_bindings": {
-    "catalog/assets/core.yaml": "1fc0205adf75398afabb2316e3748b09b47833c3e365bc7ba2d8ce8ac6f1b4f9",
+    "catalog/assets/core.yaml": "45315d5be3c6695d68911e205462fc20105877a86bd0a39dc61ab9b90306a040",
     "catalog/assets/lifecycle.yaml": "f52194d9506ae0b1900172e1eb237f02cf25dab8ae8f8921a33bf2c2e8d33ea1",
     "catalog/catalog_manifest.yaml": "7191ff5e24c76bb770e2fb2fe3f31397e831de158d3b0a0aa0e3480d428a3406",
     "catalog/generated/asset_edges.json": "8f0823c45870f964e4ff56f01a472d4c170bb30ad92442c933165e888a8133a3",
@@ -25,7 +25,7 @@
     "docs/tasks/ORDINARY_MARKET_PIT_LOCAL_RAW_ENVELOPE_BIND_V1.md": "9170c43a1fe73a7cd1e2ca9c8547b2795916ef14c99a461fc2b82d37d220f4e0",
     "scripts/run_ordinary_market_pit_local_raw_envelope_bind.py": "7ca041d7b31c2084a2bbd4d2fe3c783758113b11cec5ea0a8e76a41fd5af3b9b",
     "src/solana_alpha_lab/ordinary_market_pit_local_raw_envelope.py": "1b3f647fd63a706e59d6ea6537d33f28edb327f48e81c49c2adc3629e40c901d",
-    "tests/test_ordinary_market_pit_local_raw_envelope_bind.py": "6279e4d271e0e1333ddf0ea82030fa740efb3732e7fc5515b94ae22580d35bec"
+    "tests/test_ordinary_market_pit_local_raw_envelope_bind.py": "72948362037be6475d19a6f72f8ae530e4780ae2be97536f7a4cfbb1448551d3"
   },
   "non_claims": [
     "NO_CANONICAL_DONE",
@@ -67,7 +67,7 @@
     "github_ci": "ENFORCED_LIVE_AT_GUARDED_MERGE",
     "independent_review": {
       "path": "docs/evidence/ordinary_market_pit_local_raw_envelope_bind/a1_delivery_independent_review_v1.json",
-      "sha256": "07481cc099e10e1642eb45070f07b18eb23dd37171a7ef8fa28d2e980648afee",
+      "sha256": "984562651e077c6bdd73a745c0c4a1dcc3498397976fbaea319783ea9ff7a0ca",
       "verdict": "PASS"
     },
     "project_checks": [

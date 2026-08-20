@@ -17,8 +17,8 @@
     "GOAL_DOD_CRITIC"
   ],
   "review_id": "ORDINARY-MARKET-PIT-LOCAL-RAW-ENVELOPE-BIND-INDEPENDENT-REVIEW-001",
-  "reviewed_bindings_sha256": "390abcea4ef5ccc083d7bb613c4047bfde3d42c3683fc53c8b7c68b0af1c8ce5",
-  "reviewed_inventory_sha256": "6fc2f442494b44c27a7c27a3051a00ab3db5091b125fcaa35202268fedbe9031",
+  "reviewed_bindings_sha256": "c7ff2eadf980ab174ce1a9c9edcb483ae16e3b50b6054c7f0c56ce134d9939fa",
+  "reviewed_inventory_sha256": "ecec08e4adbb75bcee8eafa1271e59a147b4616c90647405b869cc4253194291",
   "reviews": [
     {
       "findings": [
@@ -32,7 +32,8 @@
         "CHECKED_ZERO_PROVIDER_CALLS",
         "CHECKED_NO_PIT_READY",
         "CHECKED_NO_RAW_BODY_IN_GIT",
-        "CHECKED_NO_SECRETS"
+        "CHECKED_NO_SECRETS",
+        "CHECKED_SKIP_PROOF_ON_LOCAL_A4_TESTS"
       ],
       "role": "CODE_REVIEWER",
       "verdict": "PASS"
