@@ -9,11 +9,21 @@
   "cloud_bundle_smoke_required": false,
   "factory_fit": {
     "path": "docs/evidence/factory_ordinary_liquidity_hypothesis_yaml/a1_delivery_factory_fit_v1.json",
-    "sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+    "sha256": "8b8e50f89c63870cb3a435909207afc68e3d365f56fc0150ef1d740614725f7c",
     "verdict": "PASS"
   },
   "implementation_bindings": {
-    "docs/tasks/FACTORY_ORDINARY_LIQUIDITY_HYPOTHESIS_YAML_V1.md": "0000000000000000000000000000000000000000000000000000000000000000"
+    "catalog/assets/core.yaml": "343d9af385c37806069c37bf3f3593143500ac562c719cc16a64d0834dd8b7e2",
+    "catalog/assets/lifecycle.yaml": "335da49554248a067a6365fe062b5dd02d587caa1319d8d6b8283ac311f246c2",
+    "catalog/catalog_manifest.yaml": "3013a18490387f015f9054d86b64b3716a8271a89f16b2586194fdf9272d695a",
+    "catalog/generated/asset_edges.json": "8a20a8340bc3953287b902f258b104db4d29902bca1ab8c1562abe1bb59ff5a6",
+    "configs/experiment_specs/ordinary_liquidity_quote_pressure_v1.yaml": "9d10767160c234417b73c1d8c50ce2f3abb6bf1d2afc89b211b72c830ac6f1cd",
+    "docs/PROJECT_MAP.md": "18d77a02a9af49deaad596f9c22e62feb85217cb41fa051df12f50c9256eba8b",
+    "docs/evidence/factory_ordinary_liquidity_hypothesis_yaml/a1_acceptance_v1.json": "f169abb9a37fb2936e98e4b9b85d0850e163423e5713abdfb98b254ef84760f1",
+    "docs/evidence/factory_ordinary_liquidity_hypothesis_yaml/a1_runtime_receipt_v1.json": "cbe2d7a80b486384cefe08492b853ad5d91cdc617dee9ddd35c03a85ba3fda99",
+    "docs/reports/factory_ordinary_liquidity_hypothesis_yaml/a1_owner_readout_v1.md": "d1b54e3a71c3387cdb467761338a22fc83a0e50519b226ac91aae864fdf43c8a",
+    "docs/tasks/FACTORY_ORDINARY_LIQUIDITY_HYPOTHESIS_YAML_V1.md": "fa72e341ccb65e2ca696fd8788e64de33f5cce462962069938167a2b5bbd2824",
+    "tests/test_factory_ordinary_market_hypothesis.py": "e813fcc99f3332d8ed5aea2a27fb639aae70459fe249413fa9f59663495cd657"
   },
   "non_claims": [
     "NO_CANONICAL_DONE",
@@ -54,11 +64,12 @@
     "github_ci": "ENFORCED_LIVE_AT_GUARDED_MERGE",
     "independent_review": {
       "path": "docs/evidence/factory_ordinary_liquidity_hypothesis_yaml/a1_delivery_independent_review_v1.json",
-      "sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+      "sha256": "d0d9f911928ebd877d9997a260293f61b1224c8f375ea3fa8158cee2a551d050",
       "verdict": "PASS"
     },
     "project_checks": [
-      "PASS_CATALOG_VALIDATE"
+      "PASS_CATALOG_VALIDATE",
+      "PASS_GENERATOR_CHECK"
     ],
     "targeted": "PASS_FACTORY_ORDINARY_HYPOTHESIS_TESTS"
   }
