@@ -1,0 +1,38 @@
+schema: smial.ordinary-market-pit-local-raw-envelope-bind
+schema_version: '1.0'
+bind_id: ORDINARY-MARKET-PIT-LOCAL-RAW-ENVELOPE-BIND-001
+as_of: '2026-08-20'
+hypothesis_version: HYP-ORDINARY-LIQUIDITY-COVERAGE-PIT-V1
+question: Does a higher liquidity-to-mcap snapshot at decision time associate with a better frozen-horizon executable quoted outcome, within RECENT and TOPTRADED separately?
+estimand: RankEffect(liquidity/mcap at Tokens V2 snapshot) vs frozen-horizon quoted return or typed route failure
+primary_x:
+  kind: LIQUIDITY_OVER_MCAP
+  numerator_field: liquidity
+  denominator_field: mcap
+  forbidden_substitutes: [fdv, usdPrice, circSupply, totalSupply]
+availability_class: FORWARD_SNAPSHOT_NOT_PIT_READY
+available_to_strategy_semantics: SNAPSHOT_AT_OBSERVED_AT_NOT_RETROSPECTIVE_PIT
+qualification_receipt:
+  path: docs/evidence/quote_native_evidence_channel_qualification/a1_quote_native_evidence_channel_qualification_runtime_receipt_v1.json
+  sha256: d10e0d74de9d175dfcf5e3fd2408e3736d0fa8b94f52d804a34dce590a89e56f
+local_raw_root: local/quote_native_evidence_channel_qualification
+envelopes:
+  - observation_id: DISCOVERY:RECENT
+    stratum: RECENT
+    expected_sha256: bbb7db19f08d8bace5b138ab61dbe8cd60f6dbda856a18fc2c277a0778018ad0
+  - observation_id: DISCOVERY:TRADED
+    stratum: TRADED
+    expected_sha256: 6baa4a05e3dc9597116f7e65e36772fe43ddeedf7fc349bead6dd0196bde31e5
+next_safe_action: OFFLINE_N12_ASSOCIATION_OR_FRESH_SAMPLE_OWNER_CHOICE
+product_terminal: LOCAL_RAW_ENVELOPES_BIND_PRIMARY_X
+raw_retention: A4_OUTSIDE_GIT
+non_claims:
+  - NO_PIT_READY
+  - NO_LIVE_CAPTURE
+  - NO_ALPHA
+  - NO_FDV_AS_MCAP
+  - NO_QUOTE_AS_PREDICTOR
+  - NO_FACTORY_PYTHON
+  - NO_RAW_BODY_IN_GIT
+evidence_budget:
+  provider_api_rpc_wss_calls: 0

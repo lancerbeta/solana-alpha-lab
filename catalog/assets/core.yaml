@@ -27969,3 +27969,140 @@ records:
   evidence: []
   search_terms: [ORDINARY_MARKET, PIT, LIQUIDITY, MCAP]
   classification: {contains_secrets: false, contains_raw_data: false, sensitivity: INTERNAL_NON_SECRET}
+
+- asset_id: CTRL-ORDINARY-MARKET-PIT-LOCAL-RAW-ENVELOPE-BIND-001
+  record_version: '1.0'
+  asset_type: control_document
+  purpose: Exact contract that binds liquidity/mcap from local hash-verified Tokens V2 envelopes.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-08-20'
+  truth_owner: ORDINARY_MARKET_PIT_LOCAL_RAW_ENVELOPE_BIND_V1
+  location: {kind: git_path, logical_uri: 'repo://docs/tasks/ORDINARY_MARKET_PIT_LOCAL_RAW_ENVELOPE_BIND_V1.md', repository_path: docs/tasks/ORDINARY_MARKET_PIT_LOCAL_RAW_ENVELOPE_BIND_V1.md}
+  integrity: {kind: sha256, sha256: 9170c43a1fe73a7cd1e2ca9c8547b2795916ef14c99a461fc2b82d37d220f4e0}
+  access: {mode: read_only, method: file, network_required: false, secrets_required: false}
+  relations:
+  - {relation_type: governed_by, target_asset_id: ARCH-INTENT-005}
+  consumers: [FACTORY-001, GOAL-OWNER]
+  evidence: []
+  search_terms: [ORDINARY_MARKET, PIT, LIQUIDITY, MCAP, A4]
+  classification: {contains_secrets: false, contains_raw_data: false, sensitivity: INTERNAL_NON_SECRET}
+- asset_id: CONFIG-ORDINARY-MARKET-PIT-LOCAL-RAW-ENVELOPE-BIND-001
+  record_version: '1.0'
+  asset_type: configuration
+  purpose: Pins qualification receipt and A4 discovery envelope hashes for local X bind.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-08-20'
+  truth_owner: ORDINARY_MARKET_PIT_LOCAL_RAW_ENVELOPE_BIND_V1
+  location: {kind: git_path, logical_uri: 'repo://configs/ordinary_market_pit_local_raw_envelope_bind_v1.yaml', repository_path: configs/ordinary_market_pit_local_raw_envelope_bind_v1.yaml}
+  integrity: {kind: sha256, sha256: c7567bbde539742badcb0ae8156ba3a8ae162e2f2951eebd3adc1ce7312f77be}
+  access: {mode: read_only, method: file, network_required: false, secrets_required: false}
+  relations:
+  - {relation_type: depends_on, target_asset_id: CTRL-ORDINARY-MARKET-PIT-LOCAL-RAW-ENVELOPE-BIND-001}
+  consumers: [FACTORY-001, GOAL-OWNER]
+  evidence: []
+  search_terms: [ORDINARY_MARKET, PIT, LIQUIDITY, MCAP, A4]
+  classification: {contains_secrets: false, contains_raw_data: false, sensitivity: INTERNAL_NON_SECRET}
+- asset_id: MODULE-ORDINARY-MARKET-PIT-LOCAL-RAW-ENVELOPE-001
+  record_version: '1.0'
+  asset_type: script
+  purpose: Fail-closed join of local Tokens V2 envelopes onto the Git qualification cohort.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-08-20'
+  truth_owner: ORDINARY_MARKET_PIT_LOCAL_RAW_ENVELOPE_BIND_V1
+  location: {kind: git_path, logical_uri: 'repo://src/solana_alpha_lab/ordinary_market_pit_local_raw_envelope.py', repository_path: src/solana_alpha_lab/ordinary_market_pit_local_raw_envelope.py}
+  integrity: {kind: sha256, sha256: 1b3f647fd63a706e59d6ea6537d33f28edb327f48e81c49c2adc3629e40c901d}
+  access: {mode: read_only, method: file, network_required: false, secrets_required: false}
+  relations:
+  - {relation_type: depends_on, target_asset_id: CONFIG-ORDINARY-MARKET-PIT-LOCAL-RAW-ENVELOPE-BIND-001}
+  consumers: [FACTORY-001, GOAL-OWNER]
+  evidence: []
+  search_terms: [ORDINARY_MARKET, PIT, LIQUIDITY, MCAP, A4]
+  classification: {contains_secrets: false, contains_raw_data: false, sensitivity: INTERNAL_NON_SECRET}
+- asset_id: SCRIPT-ORDINARY-MARKET-PIT-LOCAL-RAW-ENVELOPE-BIND-001
+  record_version: '1.0'
+  asset_type: script
+  purpose: Offline CLI that binds primary X from local A4 envelopes without network.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-08-20'
+  truth_owner: ORDINARY_MARKET_PIT_LOCAL_RAW_ENVELOPE_BIND_V1
+  location: {kind: git_path, logical_uri: 'repo://scripts/run_ordinary_market_pit_local_raw_envelope_bind.py', repository_path: scripts/run_ordinary_market_pit_local_raw_envelope_bind.py}
+  integrity: {kind: sha256, sha256: 7ca041d7b31c2084a2bbd4d2fe3c783758113b11cec5ea0a8e76a41fd5af3b9b}
+  access: {mode: read_only, method: file, network_required: false, secrets_required: false}
+  relations:
+  - {relation_type: depends_on, target_asset_id: MODULE-ORDINARY-MARKET-PIT-LOCAL-RAW-ENVELOPE-001}
+  consumers: [FACTORY-001, GOAL-OWNER]
+  evidence: []
+  search_terms: [ORDINARY_MARKET, PIT, LIQUIDITY, MCAP, A4]
+  classification: {contains_secrets: false, contains_raw_data: false, sensitivity: INTERNAL_NON_SECRET}
+- asset_id: TEST-ORDINARY-MARKET-PIT-LOCAL-RAW-ENVELOPE-BIND-001
+  record_version: '1.0'
+  asset_type: script
+  purpose: Tests local envelope hash pins, fdv rejection, and Git cells still lack mcap.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-08-20'
+  truth_owner: ORDINARY_MARKET_PIT_LOCAL_RAW_ENVELOPE_BIND_V1
+  location: {kind: git_path, logical_uri: 'repo://tests/test_ordinary_market_pit_local_raw_envelope_bind.py', repository_path: tests/test_ordinary_market_pit_local_raw_envelope_bind.py}
+  integrity: {kind: sha256, sha256: 72948362037be6475d19a6f72f8ae530e4780ae2be97536f7a4cfbb1448551d3}
+  access: {mode: read_only, method: file, network_required: false, secrets_required: false}
+  relations:
+  - {relation_type: depends_on, target_asset_id: MODULE-ORDINARY-MARKET-PIT-LOCAL-RAW-ENVELOPE-001}
+  consumers: [FACTORY-001, GOAL-OWNER]
+  evidence: []
+  search_terms: [ORDINARY_MARKET, PIT, LIQUIDITY, MCAP, A4]
+  classification: {contains_secrets: false, contains_raw_data: false, sensitivity: INTERNAL_NON_SECRET}
+- asset_id: EVIDENCE-ORDINARY-MARKET-PIT-LOCAL-RAW-ENVELOPE-BIND-RUNTIME-001
+  record_version: '1.0'
+  asset_type: evidence
+  purpose: Runtime receipt that 12 local A4 cohort cells bind liquidity/mcap.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-08-20'
+  truth_owner: ORDINARY_MARKET_PIT_LOCAL_RAW_ENVELOPE_BIND_V1
+  location: {kind: git_path, logical_uri: 'repo://docs/evidence/ordinary_market_pit_local_raw_envelope_bind/a1_runtime_receipt_v1.json', repository_path: docs/evidence/ordinary_market_pit_local_raw_envelope_bind/a1_runtime_receipt_v1.json}
+  integrity: {kind: sha256, sha256: 978b4e1d6736cbfca602ee2a8b5446820cc2afc0c58d26fba576625edf8ac190}
+  access: {mode: read_only, method: file, network_required: false, secrets_required: false}
+  relations:
+  - {relation_type: derived_from, target_asset_id: CTRL-ORDINARY-MARKET-PIT-LOCAL-RAW-ENVELOPE-BIND-001}
+  consumers: [FACTORY-001, GOAL-OWNER]
+  evidence: []
+  search_terms: [ORDINARY_MARKET, PIT, LIQUIDITY, MCAP, A4]
+  classification: {contains_secrets: false, contains_raw_data: false, sensitivity: INTERNAL_NON_SECRET}
+- asset_id: EVIDENCE-ORDINARY-MARKET-PIT-LOCAL-RAW-ENVELOPE-BIND-ACCEPTANCE-001
+  record_version: '1.0'
+  asset_type: evidence
+  purpose: Acceptance that local raw envelopes bind primary X and live capture is not required for mcap.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-08-20'
+  truth_owner: ORDINARY_MARKET_PIT_LOCAL_RAW_ENVELOPE_BIND_V1
+  location: {kind: git_path, logical_uri: 'repo://docs/evidence/ordinary_market_pit_local_raw_envelope_bind/a1_acceptance_v1.json', repository_path: docs/evidence/ordinary_market_pit_local_raw_envelope_bind/a1_acceptance_v1.json}
+  integrity: {kind: sha256, sha256: 0d20e03d7b9f7805a9f26d0dbcf7a591682f530e14485c970840d16e775befb4}
+  access: {mode: read_only, method: file, network_required: false, secrets_required: false}
+  relations:
+  - {relation_type: derived_from, target_asset_id: EVIDENCE-ORDINARY-MARKET-PIT-LOCAL-RAW-ENVELOPE-BIND-RUNTIME-001}
+  consumers: [FACTORY-001, GOAL-OWNER]
+  evidence: []
+  search_terms: [ORDINARY_MARKET, PIT, LIQUIDITY, MCAP, A4]
+  classification: {contains_secrets: false, contains_raw_data: false, sensitivity: INTERNAL_NON_SECRET}
+- asset_id: REPORT-ORDINARY-MARKET-PIT-LOCAL-RAW-ENVELOPE-BIND-OWNER-READOUT-001
+  record_version: '1.0'
+  asset_type: control_document
+  purpose: Russian owner readout of the local raw envelope bind stop.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-08-20'
+  truth_owner: ORDINARY_MARKET_PIT_LOCAL_RAW_ENVELOPE_BIND_V1
+  location: {kind: git_path, logical_uri: 'repo://docs/reports/ordinary_market_pit_local_raw_envelope_bind/a1_owner_readout_v1.md', repository_path: docs/reports/ordinary_market_pit_local_raw_envelope_bind/a1_owner_readout_v1.md}
+  integrity: {kind: sha256, sha256: b2f8dbd792dbd4ac6874a9bbb4b1ea55476d66041731bdefc860f55e5dbe194d}
+  access: {mode: read_only, method: file, network_required: false, secrets_required: false}
+  relations:
+  - {relation_type: derived_from, target_asset_id: EVIDENCE-ORDINARY-MARKET-PIT-LOCAL-RAW-ENVELOPE-BIND-ACCEPTANCE-001}
+  consumers: [FACTORY-001, GOAL-OWNER]
+  evidence: []
+  search_terms: [ORDINARY_MARKET, PIT, LIQUIDITY, MCAP, A4]
+  classification: {contains_secrets: false, contains_raw_data: false, sensitivity: INTERNAL_NON_SECRET}
