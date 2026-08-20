@@ -1,0 +1,49 @@
+{
+  "acceptance_id": "EVIDENCE-FACTORY-ORDINARY-LIQUIDITY-HYPOTHESIS-ACCEPTANCE-001",
+  "as_of": "2026-08-20",
+  "atom_id": "FACTORY_ORDINARY_LIQUIDITY_HYPOTHESIS_YAML_V1",
+  "capability_terminal": "FEATURE_SURFACE_COMPOSITION_PASS",
+  "cli_bytes_unchanged": true,
+  "computed_from_git": {
+    "FEAT-QUOTE-AVAILABILITY": 1.0
+  },
+  "factory_core_touched": false,
+  "limitations": [
+    "Quote 1.0 is FORWARD_ONLY historical A1, not KEEP",
+    "Friction and pool liquidity stay typed UNKNOWN",
+    "Existing --spec CLI classified this YAML without byte changes"
+  ],
+  "next_boundary": "Not VPS. Not MOVE 3. Further YAML families optional; scientific wall is typed UNKNOWN / no PIT.",
+  "non_claims": [
+    "NO_PIT_READY",
+    "NO_ALPHA",
+    "NO_NETRETURN",
+    "NO_QUOTE_KEEP",
+    "NO_NEW_CLI",
+    "NO_FACTORY_PYTHON",
+    "NO_TASK28_UNFREEZE",
+    "NO_VPS",
+    "NO_FACTORY_V1_OPERATIONAL_READY",
+    "NO_MOVE_3_PLATFORM_SLICE"
+  ],
+  "owner_decision": "ORDINARY_HYPOTHESIS_COMPOSED_NOT_PROMOTABLE",
+  "pit_ready_count": 0,
+  "product_pass": true,
+  "product_terminal": "ORDINARY_HYPOTHESIS_COMPOSED_NOT_PROMOTABLE",
+  "project_sources_disposition": {
+    "kind": "NO_CHANGE"
+  },
+  "promotable": false,
+  "quote_class": "FORWARD_ONLY",
+  "schema": "smial.factory-ordinary-liquidity-hypothesis-yaml.acceptance",
+  "schema_version": "1.0",
+  "scientific_alpha": false,
+  "source_runtime_receipt": "docs/evidence/factory_ordinary_liquidity_hypothesis_yaml/a1_runtime_receipt_v1.json",
+  "source_runtime_receipt_sha256": "cbe2d7a80b486384cefe08492b853ad5d91cdc617dee9ddd35c03a85ba3fda99",
+  "task28_skeletons": "UNCHANGED_EMPTY",
+  "typed_gaps": [
+    "FEAT-QUOTED-ROUND-TRIP-FRICTION",
+    "FEAT-POOL-LIQUIDITY",
+    "FEAT-LIQUIDITY-RETENTION"
+  ]
+}

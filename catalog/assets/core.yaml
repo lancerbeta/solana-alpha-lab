@@ -27654,7 +27654,7 @@ records:
   as_of: '2026-08-20'
   truth_owner: FACTORY_ORDINARY_HYPOTHESIS_THROUGH_SURFACE_V1
   location: {kind: git_path, logical_uri: 'repo://tests/test_factory_ordinary_market_hypothesis.py', repository_path: tests/test_factory_ordinary_market_hypothesis.py}
-  integrity: {kind: sha256, sha256: 84cdf0140a7768a28386b7ce99bd82b4d0bceaefcc74b1cbf88a4fb4e8089d72}
+  integrity: {kind: sha256, sha256: e813fcc99f3332d8ed5aea2a27fb639aae70459fe249413fa9f59663495cd657}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: depends_on, target_asset_id: CONFIG-EXPERIMENT-SPEC-ORDINARY-PRICE-PATH-BUY-PRESSURE-001}
@@ -27730,6 +27730,97 @@ records:
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: derived_from, target_asset_id: EVIDENCE-FACTORY-ORDINARY-HYPOTHESIS-ACCEPTANCE-001}
+  consumers: [FACTORY-001, GOAL-OWNER]
+  evidence: []
+  search_terms: [FACTORY_V1, ORDINARY_HYPOTHESIS, OWNER_READOUT]
+  classification: {contains_secrets: false, contains_raw_data: false, sensitivity: INTERNAL_NON_SECRET}
+
+- asset_id: CTRL-FACTORY-ORDINARY-LIQUIDITY-HYPOTHESIS-YAML-001
+  record_version: '1.0'
+  asset_type: control_document
+  purpose: Exact DIRECT_CURSOR_DELIVERY contract for a second ordinary hypothesis as YAML only.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-08-20'
+  truth_owner: FACTORY_ORDINARY_LIQUIDITY_HYPOTHESIS_YAML_V1
+  location: {kind: git_path, logical_uri: 'repo://docs/tasks/FACTORY_ORDINARY_LIQUIDITY_HYPOTHESIS_YAML_V1.md', repository_path: docs/tasks/FACTORY_ORDINARY_LIQUIDITY_HYPOTHESIS_YAML_V1.md}
+  integrity: {kind: sha256, sha256: fa72e341ccb65e2ca696fd8788e64de33f5cce462962069938167a2b5bbd2824}
+  access: {mode: read_only, method: file, network_required: false, secrets_required: false}
+  relations:
+  - {relation_type: governed_by, target_asset_id: ARCH-INTENT-005}
+  consumers: [FACTORY-001, GOAL-OWNER]
+  evidence: []
+  search_terms: [FACTORY_V1, ORDINARY_HYPOTHESIS, CONTRACT]
+  classification: {contains_secrets: false, contains_raw_data: false, sensitivity: INTERNAL_NON_SECRET}
+
+- asset_id: CONFIG-EXPERIMENT-SPEC-ORDINARY-LIQUIDITY-QUOTE-PRESSURE-001
+  record_version: '1.0'
+  asset_type: configuration
+  purpose: Ordinary liquidity/quote ExperimentSpec classified by the existing --spec CLI.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-08-20'
+  truth_owner: FACTORY_ORDINARY_LIQUIDITY_HYPOTHESIS_YAML_V1
+  location: {kind: git_path, logical_uri: 'repo://configs/experiment_specs/ordinary_liquidity_quote_pressure_v1.yaml', repository_path: configs/experiment_specs/ordinary_liquidity_quote_pressure_v1.yaml}
+  integrity: {kind: sha256, sha256: 9d10767160c234417b73c1d8c50ce2f3abb6bf1d2afc89b211b72c830ac6f1cd}
+  access: {mode: read_only, method: file, network_required: false, secrets_required: false}
+  relations:
+  - {relation_type: depends_on, target_asset_id: SCHEMA-EXPERIMENT-SPEC-001}
+  - {relation_type: depends_on, target_asset_id: CONFIG-FACTORY-V1-COMMON-MARKET-FEATURE-SURFACE-001}
+  consumers: [FACTORY-001, GOAL-OWNER]
+  evidence: []
+  search_terms: [FACTORY_V1, ORDINARY_HYPOTHESIS, LIQUIDITY]
+  classification: {contains_secrets: false, contains_raw_data: false, sensitivity: INTERNAL_NON_SECRET}
+
+- asset_id: EVIDENCE-FACTORY-ORDINARY-LIQUIDITY-HYPOTHESIS-RUNTIME-001
+  record_version: '1.0'
+  asset_type: evidence
+  purpose: Runtime receipt that the existing CLI classified the liquidity YAML not-promotable.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-08-20'
+  truth_owner: FACTORY_ORDINARY_LIQUIDITY_HYPOTHESIS_YAML_V1
+  location: {kind: git_path, logical_uri: 'repo://docs/evidence/factory_ordinary_liquidity_hypothesis_yaml/a1_runtime_receipt_v1.json', repository_path: docs/evidence/factory_ordinary_liquidity_hypothesis_yaml/a1_runtime_receipt_v1.json}
+  integrity: {kind: sha256, sha256: cbe2d7a80b486384cefe08492b853ad5d91cdc617dee9ddd35c03a85ba3fda99}
+  access: {mode: read_only, method: file, network_required: false, secrets_required: false}
+  relations:
+  - {relation_type: derived_from, target_asset_id: CTRL-FACTORY-ORDINARY-LIQUIDITY-HYPOTHESIS-YAML-001}
+  consumers: [FACTORY-001, GOAL-OWNER]
+  evidence: []
+  search_terms: [FACTORY_V1, ORDINARY_HYPOTHESIS, RUNTIME]
+  classification: {contains_secrets: false, contains_raw_data: false, sensitivity: INTERNAL_NON_SECRET}
+
+- asset_id: EVIDENCE-FACTORY-ORDINARY-LIQUIDITY-HYPOTHESIS-ACCEPTANCE-001
+  record_version: '1.0'
+  asset_type: evidence
+  purpose: Acceptance that a second ordinary hypothesis is YAML-only and not promotable.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-08-20'
+  truth_owner: FACTORY_ORDINARY_LIQUIDITY_HYPOTHESIS_YAML_V1
+  location: {kind: git_path, logical_uri: 'repo://docs/evidence/factory_ordinary_liquidity_hypothesis_yaml/a1_acceptance_v1.json', repository_path: docs/evidence/factory_ordinary_liquidity_hypothesis_yaml/a1_acceptance_v1.json}
+  integrity: {kind: sha256, sha256: f169abb9a37fb2936e98e4b9b85d0850e163423e5713abdfb98b254ef84760f1}
+  access: {mode: read_only, method: file, network_required: false, secrets_required: false}
+  relations:
+  - {relation_type: derived_from, target_asset_id: EVIDENCE-FACTORY-ORDINARY-LIQUIDITY-HYPOTHESIS-RUNTIME-001}
+  consumers: [FACTORY-001, GOAL-OWNER]
+  evidence: []
+  search_terms: [FACTORY_V1, ORDINARY_HYPOTHESIS, ACCEPTANCE]
+  classification: {contains_secrets: false, contains_raw_data: false, sensitivity: INTERNAL_NON_SECRET}
+
+- asset_id: REPORT-FACTORY-ORDINARY-LIQUIDITY-HYPOTHESIS-OWNER-READOUT-001
+  record_version: '1.0'
+  asset_type: control_document
+  purpose: Russian owner readout for the ordinary liquidity YAML hypothesis.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-08-20'
+  truth_owner: FACTORY_ORDINARY_LIQUIDITY_HYPOTHESIS_YAML_V1
+  location: {kind: git_path, logical_uri: 'repo://docs/reports/factory_ordinary_liquidity_hypothesis_yaml/a1_owner_readout_v1.md', repository_path: docs/reports/factory_ordinary_liquidity_hypothesis_yaml/a1_owner_readout_v1.md}
+  integrity: {kind: sha256, sha256: d1b54e3a71c3387cdb467761338a22fc83a0e50519b226ac91aae864fdf43c8a}
+  access: {mode: read_only, method: file, network_required: false, secrets_required: false}
+  relations:
+  - {relation_type: derived_from, target_asset_id: EVIDENCE-FACTORY-ORDINARY-LIQUIDITY-HYPOTHESIS-ACCEPTANCE-001}
   consumers: [FACTORY-001, GOAL-OWNER]
   evidence: []
   search_terms: [FACTORY_V1, ORDINARY_HYPOTHESIS, OWNER_READOUT]

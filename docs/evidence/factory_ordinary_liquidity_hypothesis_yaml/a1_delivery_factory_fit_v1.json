@@ -1,0 +1,34 @@
+{
+  "as_of": "2026-08-20",
+  "capability_radar": {
+    "now": "NONE",
+    "watch": "PENDING_BIND"
+  },
+  "dimensions": {
+    "build_vs_buy": "PENDING_BIND",
+    "context_efficiency": "PENDING_BIND",
+    "execution_to_cashflow": "PENDING_BIND",
+    "flexibility_and_history": "PENDING_BIND",
+    "mission": "PENDING_BIND",
+    "monitoring_and_recovery": "PENDING_BIND",
+    "owner_operability": "PENDING_BIND",
+    "red_team": "PENDING_BIND",
+    "research_truth": "PENDING_BIND",
+    "security": "PENDING_BIND"
+  },
+  "limits": [
+    "NO_PIT_READY",
+    "NO_ALPHA",
+    "NO_QUOTE_KEEP",
+    "NO_MOVE_3_PLATFORM_SLICE"
+  ],
+  "mode": "FULL_REVIEW",
+  "recovery": "REVERT_ONLY_THIS_ATOM",
+  "review_id": "FACTORY-ORDINARY-LIQUIDITY-HYPOTHESIS-YAML-FACTORY-FIT-001",
+  "reviewed_bindings_sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+  "reviewed_inventory_sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+  "schema": "smial.delivery-harness-factory-fit",
+  "schema_version": "1.0",
+  "task_id": "FACTORY_ORDINARY_LIQUIDITY_HYPOTHESIS_YAML_V1",
+  "verdict": "PASS"
+}

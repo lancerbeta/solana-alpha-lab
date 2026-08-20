@@ -1,0 +1,68 @@
+{
+  "atom_id": "FACTORY_ORDINARY_LIQUIDITY_HYPOTHESIS_YAML_V1",
+  "capability_terminal": "FEATURE_SURFACE_COMPOSITION_PASS",
+  "cli_bytes_unchanged": true,
+  "experiment_id": "EXP-ORDINARY-LIQUIDITY-QUOTE-HYPOTHESIS-001",
+  "factory_core_touched": false,
+  "features": [
+    {
+      "availability_class": "FORWARD_ONLY",
+      "available_to_strategy_semantics": "HISTORICAL_CAPTURE_NOT_STRATEGY_AVAILABLE",
+      "coverage_domain": "D08",
+      "display": "✓ FEAT-QUOTE-AVAILABILITY FORWARD_ONLY",
+      "feature_id": "FEAT-QUOTE-AVAILABILITY",
+      "units": "fraction",
+      "value": 1.0,
+      "value_status": "COMPUTED"
+    },
+    {
+      "availability_class": "FORWARD_ONLY",
+      "available_to_strategy_semantics": "HISTORICAL_CAPTURE_NOT_STRATEGY_AVAILABLE",
+      "coverage_domain": "D08",
+      "display": "! FEAT-QUOTED-ROUND-TRIP-FRICTION FORWARD_ONLY",
+      "feature_id": "FEAT-QUOTED-ROUND-TRIP-FRICTION",
+      "units": "fraction",
+      "value": null,
+      "value_status": "UNKNOWN"
+    },
+    {
+      "availability_class": "HISTORICAL_RECONSTRUCTIBLE",
+      "available_to_strategy_semantics": "RETROSPECTIVE_ONLY_NOT_PROSPECTIVE_PIT",
+      "coverage_domain": "D05",
+      "display": "! FEAT-POOL-LIQUIDITY HISTORICAL_RECONSTRUCTIBLE",
+      "feature_id": "FEAT-POOL-LIQUIDITY",
+      "units": "quote_atomic",
+      "value": null,
+      "value_status": "UNKNOWN"
+    },
+    {
+      "availability_class": "HISTORICAL_RECONSTRUCTIBLE",
+      "available_to_strategy_semantics": "RETROSPECTIVE_ONLY_NOT_PROSPECTIVE_PIT",
+      "coverage_domain": "D05",
+      "display": "! FEAT-LIQUIDITY-RETENTION HISTORICAL_RECONSTRUCTIBLE",
+      "feature_id": "FEAT-LIQUIDITY-RETENTION",
+      "units": "fraction",
+      "value": null,
+      "value_status": "UNKNOWN"
+    }
+  ],
+  "hypothesis_version": "HYP-ORDINARY-LIQUIDITY-QUOTE-PRESSURE-V1",
+  "next_safe_action": "DO_NOT_PROMOTE",
+  "non_claims": [
+    "NO_PIT_READY",
+    "NO_ALPHA",
+    "NO_QUOTE_KEEP",
+    "NO_NEW_CLI",
+    "NO_FACTORY_PYTHON",
+    "NO_TASK28_UNFREEZE",
+    "NO_VPS",
+    "NO_MOVE_3_PLATFORM_SLICE"
+  ],
+  "pit_ready_count": 0,
+  "product_terminal": "ORDINARY_HYPOTHESIS_COMPOSED_NOT_PROMOTABLE",
+  "provider_api_rpc_wss_calls": 0,
+  "schema": "smial.factory-ordinary-liquidity-hypothesis-yaml.runtime",
+  "schema_version": "1.0",
+  "status": "COMPLETE",
+  "task28_skeletons": "UNCHANGED_EMPTY"
+}

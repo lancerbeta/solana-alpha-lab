@@ -543,6 +543,16 @@
       "target_asset_id": "SCHEMA-EXPERIMENT-SPEC-001"
     },
     {
+      "source_asset_id": "CONFIG-EXPERIMENT-SPEC-ORDINARY-LIQUIDITY-QUOTE-PRESSURE-001",
+      "relation": "depends_on",
+      "target_asset_id": "CONFIG-FACTORY-V1-COMMON-MARKET-FEATURE-SURFACE-001"
+    },
+    {
+      "source_asset_id": "CONFIG-EXPERIMENT-SPEC-ORDINARY-LIQUIDITY-QUOTE-PRESSURE-001",
+      "relation": "depends_on",
+      "target_asset_id": "SCHEMA-EXPERIMENT-SPEC-001"
+    },
+    {
       "source_asset_id": "CONFIG-EXPERIMENT-SPEC-ORDINARY-PRICE-PATH-BUY-PRESSURE-001",
       "relation": "depends_on",
       "target_asset_id": "CONFIG-FACTORY-V1-COMMON-MARKET-FEATURE-SURFACE-001"
@@ -2063,6 +2073,11 @@
       "target_asset_id": "ARCH-INTENT-005"
     },
     {
+      "source_asset_id": "CTRL-FACTORY-ORDINARY-LIQUIDITY-HYPOTHESIS-YAML-001",
+      "relation": "governed_by",
+      "target_asset_id": "ARCH-INTENT-005"
+    },
+    {
       "source_asset_id": "CTRL-FACTORY-V1-COMMISSIONING-HYPOTHESIS-001",
       "relation": "contains",
       "target_asset_id": "CONFIG-FACTORY-V1-COMMISSIONING-001"
@@ -3446,6 +3461,16 @@
       "source_asset_id": "EVIDENCE-FACTORY-ORDINARY-HYPOTHESIS-RUNTIME-001",
       "relation": "derived_from",
       "target_asset_id": "CTRL-FACTORY-ORDINARY-HYPOTHESIS-THROUGH-SURFACE-001"
+    },
+    {
+      "source_asset_id": "EVIDENCE-FACTORY-ORDINARY-LIQUIDITY-HYPOTHESIS-ACCEPTANCE-001",
+      "relation": "derived_from",
+      "target_asset_id": "EVIDENCE-FACTORY-ORDINARY-LIQUIDITY-HYPOTHESIS-RUNTIME-001"
+    },
+    {
+      "source_asset_id": "EVIDENCE-FACTORY-ORDINARY-LIQUIDITY-HYPOTHESIS-RUNTIME-001",
+      "relation": "derived_from",
+      "target_asset_id": "CTRL-FACTORY-ORDINARY-LIQUIDITY-HYPOTHESIS-YAML-001"
     },
     {
       "source_asset_id": "EVIDENCE-FACTORY-V1-COMMISSIONING-ACCEPTANCE-001",
@@ -9016,6 +9041,11 @@
       "source_asset_id": "REPORT-FACTORY-ORDINARY-HYPOTHESIS-OWNER-READOUT-001",
       "relation": "derived_from",
       "target_asset_id": "EVIDENCE-FACTORY-ORDINARY-HYPOTHESIS-ACCEPTANCE-001"
+    },
+    {
+      "source_asset_id": "REPORT-FACTORY-ORDINARY-LIQUIDITY-HYPOTHESIS-OWNER-READOUT-001",
+      "relation": "derived_from",
+      "target_asset_id": "EVIDENCE-FACTORY-ORDINARY-LIQUIDITY-HYPOTHESIS-ACCEPTANCE-001"
     },
     {
       "source_asset_id": "REPORT-FACTORY-V1-COMMISSIONING-001",
