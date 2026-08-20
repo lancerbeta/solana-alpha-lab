@@ -1,0 +1,27 @@
+{
+  "acceptance_id": "ORDINARY-MARKET-PIT-OFFLINE-XY-ASSOCIATION-ACCEPTANCE-001",
+  "as_of": "2026-08-20",
+  "cloud_bundle_mode": "OWNER_MANAGED_OPTIONAL_EXPORT",
+  "family_decision": "DEFER_FRESH_PIT_CAPTURE",
+  "next_safe_action": "OWNER_BOUNDED_FRESH_PIT_CAPTURE",
+  "non_claims": [
+    "NO_PIT_READY",
+    "NO_LIVE_CAPTURE",
+    "NO_ALPHA",
+    "NO_FAMILY_CLOSE",
+    "NO_EARN_REPLICATION",
+    "NO_QUOTE_AS_PREDICTOR",
+    "NO_FACTORY_PYTHON",
+    "NO_N12_AS_CLEAN_PANEL",
+    "NO_CANONICAL_DONE"
+  ],
+  "pit_ready": false,
+  "project_sources_disposition": {
+    "kind": "NO_CHANGE"
+  },
+  "promotable": false,
+  "schema": "smial.ordinary-market-pit-offline-xy-association-acceptance",
+  "schema_version": "1.0",
+  "task_id": "ORDINARY_MARKET_PIT_OFFLINE_XY_ASSOCIATION_V1",
+  "verdict": "EXPLORATORY_ASSOCIATION_NOT_PIT"
+}
