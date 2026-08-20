@@ -61,5 +61,8 @@
     "NO_PROVIDER",
     "NO_FACTORY_V1_OPERATIONAL_READY",
     "NO_ATOM_2"
-  ]
+  ],
+  "project_sources_disposition": {
+    "kind": "NO_CHANGE"
+  }
 }
