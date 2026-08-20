@@ -36,6 +36,10 @@ ORDER_URL = (
     "outputMint=ExampleMint111111111111111111111111111111111&"
     "amount=10000000&slippageBps=100"
 )
+SEARCH_URL = (
+    "https://api.jup.ag/tokens/v2/search?query="
+    "MintA111111111111111111111111111111111111111%2CMintB222222222222222222222222222222222222222"
+)
 LIMITS = {"timeout_seconds": 20.0, "max_response_bytes": 500_000}
 CONFIG_PATH = ROOT / "configs/quote_native_evidence_channel_qualification_v1.yaml"
 RUNTIME_RECEIPT_PATH = (
@@ -385,6 +389,20 @@ class CredentialTransportTests(unittest.TestCase):
                 limits=LIMITS,
                 opener=_Opener(_Response(b"{}", status=200, headers={})),
             )
+
+    def test_tokens_search_query_is_allowlisted_for_frozen_mint_batches(self) -> None:
+        key = "test-free-key-not-a-secret"
+        opener = _Opener(_Response(b"[]", status=200, headers={}))
+        result = perform_credentialed_get(
+            SEARCH_URL,
+            api_key=key,
+            limits=LIMITS,
+            opener=opener,
+        )
+
+        self.assertEqual(result["http_status"], 200)
+        self.assertEqual(len(opener.requests), 1)
+        self.assertNotIn("x-api-key", opener.requests[0].full_url.lower())
 
 
 class CampaignBoundaryTests(unittest.TestCase):

@@ -728,6 +728,16 @@
       "target_asset_id": "CTRL-ORDINARY-MARKET-PIT-PRIMARY-X-BIND-001"
     },
     {
+      "source_asset_id": "CONFIG-ORDINARY-RECENT-ORGANIC-PRESSURE-H900-AUDITION-001",
+      "relation": "depends_on",
+      "target_asset_id": "CONFIG-PROVIDER-ROUTE-CAPABILITY-REGISTRY-010"
+    },
+    {
+      "source_asset_id": "CONFIG-ORDINARY-RECENT-ORGANIC-PRESSURE-H900-AUDITION-001",
+      "relation": "governed_by",
+      "target_asset_id": "CTRL-ORDINARY-RECENT-ORGANIC-PRESSURE-H900-AUDITION-001"
+    },
+    {
       "source_asset_id": "CONFIG-OWNER-AUTHORITY-PACKET-001",
       "relation": "governed_by",
       "target_asset_id": "CONTRACT-OWNER-AUTHORITY-PACKET-001"
@@ -846,6 +856,11 @@
       "source_asset_id": "CONFIG-PROVIDER-ROUTE-CAPABILITY-REGISTRY-009",
       "relation": "derived_from",
       "target_asset_id": "CONFIG-PROVIDER-ROUTE-CAPABILITY-REGISTRY-008"
+    },
+    {
+      "source_asset_id": "CONFIG-PROVIDER-ROUTE-CAPABILITY-REGISTRY-010",
+      "relation": "derived_from",
+      "target_asset_id": "CONFIG-PROVIDER-ROUTE-CAPABILITY-REGISTRY-009"
     },
     {
       "source_asset_id": "CONFIG-QUOTE-NATIVE-ADMISSIBLE-FRICTION-AUDITION-001",
@@ -2251,6 +2266,26 @@
       "source_asset_id": "CTRL-ORDINARY-MARKET-PIT-PRIMARY-X-BIND-001",
       "relation": "governed_by",
       "target_asset_id": "ARCH-INTENT-005"
+    },
+    {
+      "source_asset_id": "CTRL-ORDINARY-RECENT-ORGANIC-PRESSURE-H900-AUDITION-001",
+      "relation": "contains",
+      "target_asset_id": "CONFIG-ORDINARY-RECENT-ORGANIC-PRESSURE-H900-AUDITION-001"
+    },
+    {
+      "source_asset_id": "CTRL-ORDINARY-RECENT-ORGANIC-PRESSURE-H900-AUDITION-001",
+      "relation": "contains",
+      "target_asset_id": "MODULE-ORDINARY-RECENT-ORGANIC-PRESSURE-H900-AUDITION-001"
+    },
+    {
+      "source_asset_id": "CTRL-ORDINARY-RECENT-ORGANIC-PRESSURE-H900-AUDITION-001",
+      "relation": "contains",
+      "target_asset_id": "SCRIPT-ORDINARY-RECENT-ORGANIC-PRESSURE-H900-AUDITION-001"
+    },
+    {
+      "source_asset_id": "CTRL-ORDINARY-RECENT-ORGANIC-PRESSURE-H900-AUDITION-001",
+      "relation": "validated_by",
+      "target_asset_id": "TEST-ORDINARY-RECENT-ORGANIC-PRESSURE-H900-AUDITION-001"
     },
     {
       "source_asset_id": "CTRL-OWNER-ATTENTION-GATE-001",
@@ -7398,6 +7433,26 @@
       "target_asset_id": "CONFIG-ORDINARY-MARKET-PIT-PRIMARY-X-BIND-001"
     },
     {
+      "source_asset_id": "MODULE-ORDINARY-RECENT-ORGANIC-PRESSURE-H900-AUDITION-001",
+      "relation": "depends_on",
+      "target_asset_id": "CONFIG-ORDINARY-RECENT-ORGANIC-PRESSURE-H900-AUDITION-001"
+    },
+    {
+      "source_asset_id": "MODULE-ORDINARY-RECENT-ORGANIC-PRESSURE-H900-AUDITION-001",
+      "relation": "depends_on",
+      "target_asset_id": "MODULE-PROVIDER-ROUTE-CAPABILITY-REGISTRY-010"
+    },
+    {
+      "source_asset_id": "MODULE-ORDINARY-RECENT-ORGANIC-PRESSURE-H900-AUDITION-001",
+      "relation": "depends_on",
+      "target_asset_id": "MODULE-QUOTE-NATIVE-EVIDENCE-CHANNEL-QUALIFICATION-001"
+    },
+    {
+      "source_asset_id": "MODULE-ORDINARY-RECENT-ORGANIC-PRESSURE-H900-AUDITION-001",
+      "relation": "depends_on",
+      "target_asset_id": "MODULE-QUOTE-NATIVE-EVIDENCE-FIT-PANEL-001"
+    },
+    {
       "source_asset_id": "MODULE-OWNER-AUTHORITY-PACKET-001",
       "relation": "governed_by",
       "target_asset_id": "CONFIG-OWNER-AUTHORITY-PACKET-001"
@@ -7521,6 +7576,11 @@
       "source_asset_id": "MODULE-PROVIDER-ROUTE-CAPABILITY-REGISTRY-009",
       "relation": "depends_on",
       "target_asset_id": "CONFIG-PROVIDER-ROUTE-CAPABILITY-REGISTRY-009"
+    },
+    {
+      "source_asset_id": "MODULE-PROVIDER-ROUTE-CAPABILITY-REGISTRY-010",
+      "relation": "depends_on",
+      "target_asset_id": "CONFIG-PROVIDER-ROUTE-CAPABILITY-REGISTRY-010"
     },
     {
       "source_asset_id": "MODULE-QUOTE-NATIVE-ADMISSIBLE-FRICTION-AUDITION-001",
@@ -9543,6 +9603,11 @@
       "target_asset_id": "CONFIG-PROVIDER-ROUTE-CAPABILITY-REGISTRY-009"
     },
     {
+      "source_asset_id": "SCHEMA-PROVIDER-ROUTE-CAPABILITY-REGISTRY-010",
+      "relation": "governed_by",
+      "target_asset_id": "CONFIG-PROVIDER-ROUTE-CAPABILITY-REGISTRY-010"
+    },
+    {
       "source_asset_id": "SCHEMA-T05-CANONICAL-DDL-001",
       "relation": "governed_by",
       "target_asset_id": "CTRL-TASK-05-001"
@@ -10116,6 +10181,11 @@
       "source_asset_id": "SCRIPT-ORDINARY-MARKET-PIT-PRIMARY-X-BIND-001",
       "relation": "depends_on",
       "target_asset_id": "MODULE-ORDINARY-MARKET-PIT-PRIMARY-X-001"
+    },
+    {
+      "source_asset_id": "SCRIPT-ORDINARY-RECENT-ORGANIC-PRESSURE-H900-AUDITION-001",
+      "relation": "depends_on",
+      "target_asset_id": "MODULE-ORDINARY-RECENT-ORGANIC-PRESSURE-H900-AUDITION-001"
     },
     {
       "source_asset_id": "SCRIPT-OWNER-ATTENTION-GATE-001",
@@ -10993,6 +11063,11 @@
       "target_asset_id": "MODULE-ORDINARY-MARKET-PIT-PRIMARY-X-001"
     },
     {
+      "source_asset_id": "TEST-ORDINARY-RECENT-ORGANIC-PRESSURE-H900-AUDITION-001",
+      "relation": "depends_on",
+      "target_asset_id": "MODULE-ORDINARY-RECENT-ORGANIC-PRESSURE-H900-AUDITION-001"
+    },
+    {
       "source_asset_id": "TEST-OWNER-ATTENTION-GATE-001",
       "relation": "depends_on",
       "target_asset_id": "POLICY-OWNER-ATTENTION-GATE-001"
@@ -11201,6 +11276,11 @@
       "source_asset_id": "TEST-PROVIDER-ROUTE-CAPABILITY-REGISTRY-009",
       "relation": "depends_on",
       "target_asset_id": "MODULE-PROVIDER-ROUTE-CAPABILITY-REGISTRY-009"
+    },
+    {
+      "source_asset_id": "TEST-PROVIDER-ROUTE-CAPABILITY-REGISTRY-010",
+      "relation": "depends_on",
+      "target_asset_id": "MODULE-PROVIDER-ROUTE-CAPABILITY-REGISTRY-010"
     },
     {
       "source_asset_id": "TEST-QUOTE-NATIVE-ADMISSIBLE-FRICTION-AUDITION-001",

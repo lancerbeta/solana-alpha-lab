@@ -45,6 +45,8 @@ def _quote_body(**overrides: object) -> bytes:
     payload = {
         "transaction": None,
         "requestId": "req-1",
+        "inputMint": WRAPPED_SOL,
+        "outputMint": A24_MINT,
         "inAmount": "10000000",
         "outAmount": "12345",
         "router": "dflow",
@@ -151,6 +153,40 @@ class QuoteNativePanelTests(unittest.TestCase):
         self.assertEqual(absent["price_impact_pct"]["status"], "ABSENT")
         self.assertEqual(absent["platform_fee"]["status"], "ABSENT")
         self.assertIsNone(absent["price_impact_pct"]["value"])
+
+    def test_quote_error_taxonomy_is_explicit_not_route_substring_based(self) -> None:
+        market = project_quote(
+            _quote_body(
+                inAmount=None,
+                outAmount=None,
+                router=None,
+                mode=None,
+                errorCode="TOKEN_NOT_TRADABLE",
+            )
+        )
+        notional = project_quote(
+            _quote_body(
+                inAmount=None,
+                outAmount=None,
+                router=None,
+                mode=None,
+                errorCode="ROUTE_PLAN_DOES_NOT_CONSUME_ALL_THE_AMOUNT",
+            )
+        )
+        unknown = project_quote(
+            _quote_body(
+                inAmount=None,
+                outAmount=None,
+                router=None,
+                mode=None,
+                errorCode="PROVIDER_NEW_TYPED_FAILURE",
+            )
+        )
+
+        self.assertEqual(market["terminal_class"], "MARKET_EXECUTION_UNAVAILABLE")
+        self.assertEqual(market["surface"], "PROVIDER_TYPED_FAILURE")
+        self.assertEqual(notional["terminal_class"], "NOTIONAL_EXECUTION_UNAVAILABLE")
+        self.assertEqual(unknown["terminal_class"], "UNKNOWN_TYPED_FAILURE")
 
     def test_transaction_bytes_fail_closed(self) -> None:
         with self.assertRaisesRegex(Exception, "QUOTE_RETURNED_TRANSACTION"):

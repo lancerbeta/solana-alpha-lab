@@ -46,6 +46,17 @@ SLICE_RELATIVE = "configs/pmf_quote_slice_v1.yaml"
 T21_RELATIVE = "configs/task21_final_cohort_freeze_v1.yaml"
 PROTOCOL_COMPARABLE = frozenset({"QUOTE_OBSERVED", "NO_ROUTE", "PROVIDER_TYPED_FAILURE"})
 CONTINUABLE = frozenset({"SCHEDULED", "NOT_REACHED"})
+_MARKET_EXECUTION_ERROR_CODES = frozenset(
+    {
+        "NO_ROUTES_FOUND",
+        "COULD_NOT_FIND_ANY_ROUTE",
+        "TOKEN_NOT_TRADABLE",
+        "MARKET_NOT_FOUND",
+    }
+)
+_NOTIONAL_EXECUTION_ERROR_CODES = frozenset(
+    {"ROUTE_PLAN_DOES_NOT_CONSUME_ALL_THE_AMOUNT"}
+)
 
 
 class PanelError(ValueError):
@@ -186,6 +197,8 @@ def project_quote(body: bytes) -> dict[str, object]:
     _require(isinstance(payload, dict), "QUOTE_JSON_INVALID")
     _require(payload.get("transaction") is None, "QUOTE_RETURNED_TRANSACTION")
     error_code = payload.get("errorCode") or payload.get("error")
+    input_mint = payload.get("inputMint")
+    output_mint = payload.get("outputMint")
     in_amount = payload.get("inAmount")
     out_amount = payload.get("outAmount")
     router = payload.get("router")
@@ -202,6 +215,8 @@ def project_quote(body: bytes) -> dict[str, object]:
                     fee_amounts_present = True
                     break
     quote = {
+        "input_mint": input_mint if type(input_mint) is str and input_mint else None,
+        "output_mint": output_mint if type(output_mint) is str and output_mint else None,
         "in_amount": in_amount if type(in_amount) is str and in_amount else None,
         "out_amount": out_amount if type(out_amount) is str and out_amount else None,
         "router": router if type(router) is str and router else None,
@@ -219,10 +234,20 @@ def project_quote(body: bytes) -> dict[str, object]:
         },
     }
     if quote["in_amount"] and quote["out_amount"] and quote["router"] and quote["mode"]:
+        quote["terminal_class"] = "QUOTE_OBSERVED"
         quote["surface"] = "QUOTE_OBSERVED"
         return quote
     if quote["error_code"]:
         code = str(quote["error_code"]).upper()
+        if code in _MARKET_EXECUTION_ERROR_CODES:
+            terminal_class = "MARKET_EXECUTION_UNAVAILABLE"
+        elif code in _NOTIONAL_EXECUTION_ERROR_CODES:
+            terminal_class = "NOTIONAL_EXECUTION_UNAVAILABLE"
+        else:
+            terminal_class = "UNKNOWN_TYPED_FAILURE"
+        quote["terminal_class"] = terminal_class
+        # Preserve the legacy surface for existing quote-native consumers;
+        # new auditions consume terminal_class, never a substring heuristic.
         quote["surface"] = "NO_ROUTE" if "ROUTE" in code else "PROVIDER_TYPED_FAILURE"
         return quote
     raise PanelError("QUOTE_SHAPE_INCOMPARABLE")
