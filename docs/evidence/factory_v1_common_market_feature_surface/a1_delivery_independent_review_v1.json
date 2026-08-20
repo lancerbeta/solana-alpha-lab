@@ -16,8 +16,8 @@
     "GOAL_DOD_CRITIC"
   ],
   "review_id": "FACTORY-COMMON-MARKET-FEATURE-SURFACE-INDEPENDENT-REVIEW-001",
-  "reviewed_bindings_sha256": "c3653e3dc7539d2841d5a31d6a72797f71787965cb2565c5b7ce3c95144607bf",
-  "reviewed_inventory_sha256": "c3653e3dc7539d2841d5a31d6a72797f71787965cb2565c5b7ce3c95144607bf",
+  "reviewed_bindings_sha256": "9cde7e6919f3aa36103770310c68c6d49761fd3202bdd82c1a8e3751d43208c5",
+  "reviewed_inventory_sha256": "ea839b1c5b1d1f85d558a9e3bfc97f779e26172fbb585398bea309fc0959dcc6",
   "reviews": [
     {
       "findings": [
