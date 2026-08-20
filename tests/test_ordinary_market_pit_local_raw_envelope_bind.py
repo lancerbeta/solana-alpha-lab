@@ -258,9 +258,9 @@ class OrdinaryMarketPitLocalRawEnvelopeBindTests(unittest.TestCase):
             self.assertTrue(result["rows"][0]["substitute_rejected"])
             self.assertEqual(result["primary_x_bound_count"], 1)
 
+    # DELIVERY_PREFLIGHT_NONCRITICAL_SKIP: docs/evidence/ordinary_market_pit_local_raw_envelope_bind/a1_runtime_receipt_v1.json
+    @unittest.skipUnless(LOCAL_RAW_ROOT.is_dir(), "LOCAL_A4_ABSENT")
     def test_local_a4_recompute_matches_committed_receipt(self) -> None:
-        if not LOCAL_RAW_ROOT.is_dir():
-            self.skipTest("LOCAL_A4_ABSENT")
         config = load_local_raw_config(ROOT)
         result = bind_local_raw_envelopes(ROOT, config)
         committed = json.loads(RECEIPT_PATH.read_text(encoding="utf-8"))
@@ -274,9 +274,9 @@ class OrdinaryMarketPitLocalRawEnvelopeBindTests(unittest.TestCase):
             [(row["identity_id"], row["value"], row["mcap"]) for row in committed["rows"]],
         )
 
+    # DELIVERY_PREFLIGHT_NONCRITICAL_SKIP: docs/evidence/ordinary_market_pit_local_raw_envelope_bind/a1_runtime_receipt_v1.json
+    @unittest.skipUnless(LOCAL_RAW_ROOT.is_dir(), "LOCAL_A4_ABSENT")
     def test_cli_binds_local_envelopes_without_network(self) -> None:
-        if not LOCAL_RAW_ROOT.is_dir():
-            self.skipTest("LOCAL_A4_ABSENT")
         completed = subprocess.run(
             [sys.executable, str(SCRIPT), "--root", str(ROOT)],
             check=False,
