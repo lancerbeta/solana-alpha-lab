@@ -1,6 +1,73 @@
 {
   "as_of": "2026-08-20",
+  "non_claims": [
+    "NO_CRYPTOGRAPHIC_REVIEWER_IDENTITY",
+    "REVIEW_IS_NOT_SEMANTIC_DONE",
+    "NO_LIVE_PIT_OR_EXECUTION_CLAIM",
+    "NO_ALPHA_PNL_OR_NETRETURN",
+    "NO_CANONICAL_DONE",
+    "NO_SINGLE_AGENT_REVIEW_FALLBACK",
+    "NO_PIT_READY",
+    "NO_FACTORY_V1_OPERATIONAL_READY",
+    "NO_RAW_BODY_IN_GIT"
+  ],
+  "required_roles": [
+    "ARCHITECTURE_CRITIC",
+    "CODE_REVIEWER",
+    "GOAL_DOD_CRITIC"
+  ],
   "review_id": "ORDINARY-MARKET-PIT-LOCAL-RAW-ENVELOPE-BIND-INDEPENDENT-REVIEW-001",
+  "reviewed_bindings_sha256": "390abcea4ef5ccc083d7bb613c4047bfde3d42c3683fc53c8b7c68b0af1c8ce5",
+  "reviewed_inventory_sha256": "6fc2f442494b44c27a7c27a3051a00ab3db5091b125fcaa35202268fedbe9031",
+  "reviews": [
+    {
+      "findings": [
+        "CHECKED_NO_FACTORY_PYTHON",
+        "CHECKED_RUNNER_SHA256",
+        "CHECKED_GIT_CELLS_STILL_LACK_MCAP",
+        "CHECKED_LOCAL_A4_HASH_PINS",
+        "CHECKED_TWELVE_OF_TWELVE_BOUND",
+        "CHECKED_FDV_NOT_MCAP_SUBSTITUTE",
+        "CHECKED_UNKNOWN_NOT_ZERO",
+        "CHECKED_ZERO_PROVIDER_CALLS",
+        "CHECKED_NO_PIT_READY",
+        "CHECKED_NO_RAW_BODY_IN_GIT",
+        "CHECKED_NO_SECRETS"
+      ],
+      "role": "CODE_REVIEWER",
+      "verdict": "PASS"
+    },
+    {
+      "findings": [
+        "CHECKED_DECISION_DELTA",
+        "CHECKED_NAMED_CONSUMER",
+        "CHECKED_CHEAPEST_FALSIFIER",
+        "CHECKED_NOT_LIVE_JUPITER_FOR_MCAP",
+        "CHECKED_DOD",
+        "CHECKED_NOT_BUREAUCRACY",
+        "CHECKED_NON_CLAIMS",
+        "CHECKED_NO_PIT_READY_INFLATION",
+        "RESIDUAL_N12_OVERSTATES_QUOTED_SUBSET"
+      ],
+      "role": "GOAL_DOD_CRITIC",
+      "verdict": "PASS"
+    },
+    {
+      "findings": [
+        "CHECKED_PROJECTOR_WRAPS_BIND_PRIMARY_X",
+        "CHECKED_NO_FACTORY_PYTHON_FORK",
+        "CHECKED_A4_OUTSIDE_GIT",
+        "CHECKED_AVAILABILITY_CLASS",
+        "CHECKED_FDV_NOT_MCAP",
+        "CHECKED_TASK28_FREEZE",
+        "CHECKED_BLAST_RADIUS",
+        "RESIDUAL_CI_FIXTURES_SKIP_LOCAL_A4",
+        "RESIDUAL_SNAPSHOT_CLOCK_NOT_PROJECTED"
+      ],
+      "role": "ARCHITECTURE_CRITIC",
+      "verdict": "PASS"
+    }
+  ],
   "schema": "smial.delivery-independent-review-evidence",
   "schema_version": "1.0",
   "task_id": "ORDINARY_MARKET_PIT_LOCAL_RAW_ENVELOPE_BIND_V1",

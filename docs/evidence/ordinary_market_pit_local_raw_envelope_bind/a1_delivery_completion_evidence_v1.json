@@ -1,11 +1,79 @@
 {
   "acceptance_id": "ORDINARY-MARKET-PIT-LOCAL-RAW-ENVELOPE-BIND-DELIVERY-COMPLETION-001",
+  "active_stop_conditions": [],
   "as_of": "2026-08-20",
+  "base_main": "06702dc8e5a6e5ff01b07a0959baa005c46192fe",
+  "capability_radar_now": "NONE",
+  "cloud_bundle_mode": "OWNER_MANAGED_OPTIONAL_EXPORT",
+  "cloud_bundle_required_by_harness": false,
+  "cloud_bundle_smoke_required": false,
+  "factory_fit": {
+    "path": "docs/evidence/ordinary_market_pit_local_raw_envelope_bind/a1_delivery_factory_fit_v1.json",
+    "sha256": "526ecdd9df39b341af553e6bfbb3eff4ac8f2285d55c62745f91dd676c046707",
+    "verdict": "PASS"
+  },
+  "implementation_bindings": {
+    "catalog/assets/core.yaml": "1fc0205adf75398afabb2316e3748b09b47833c3e365bc7ba2d8ce8ac6f1b4f9",
+    "catalog/assets/lifecycle.yaml": "f52194d9506ae0b1900172e1eb237f02cf25dab8ae8f8921a33bf2c2e8d33ea1",
+    "catalog/catalog_manifest.yaml": "7191ff5e24c76bb770e2fb2fe3f31397e831de158d3b0a0aa0e3480d428a3406",
+    "catalog/generated/asset_edges.json": "8f0823c45870f964e4ff56f01a472d4c170bb30ad92442c933165e888a8133a3",
+    "configs/ordinary_market_pit_local_raw_envelope_bind_v1.yaml": "c7567bbde539742badcb0ae8156ba3a8ae162e2f2951eebd3adc1ce7312f77be",
+    "docs/PROJECT_MAP.md": "4b5e55e6d5df2cb040e7ae56be850849e325d2b9915cca39ea381c8c087ac6ff",
+    "docs/evidence/ordinary_market_pit_local_raw_envelope_bind/a1_acceptance_v1.json": "0d20e03d7b9f7805a9f26d0dbcf7a591682f530e14485c970840d16e775befb4",
+    "docs/evidence/ordinary_market_pit_local_raw_envelope_bind/a1_runtime_receipt_v1.json": "978b4e1d6736cbfca602ee2a8b5446820cc2afc0c58d26fba576625edf8ac190",
+    "docs/reports/ordinary_market_pit_local_raw_envelope_bind/a1_owner_readout_v1.md": "b2f8dbd792dbd4ac6874a9bbb4b1ea55476d66041731bdefc860f55e5dbe194d",
+    "docs/tasks/ORDINARY_MARKET_PIT_LOCAL_RAW_ENVELOPE_BIND_V1.md": "9170c43a1fe73a7cd1e2ca9c8547b2795916ef14c99a461fc2b82d37d220f4e0",
+    "scripts/run_ordinary_market_pit_local_raw_envelope_bind.py": "7ca041d7b31c2084a2bbd4d2fe3c783758113b11cec5ea0a8e76a41fd5af3b9b",
+    "src/solana_alpha_lab/ordinary_market_pit_local_raw_envelope.py": "1b3f647fd63a706e59d6ea6537d33f28edb327f48e81c49c2adc3629e40c901d",
+    "tests/test_ordinary_market_pit_local_raw_envelope_bind.py": "6279e4d271e0e1333ddf0ea82030fa740efb3732e7fc5515b94ae22580d35bec"
+  },
+  "non_claims": [
+    "NO_CANONICAL_DONE",
+    "NO_PIT_READY",
+    "NO_LIVE_CAPTURE",
+    "NO_ALPHA_PNL_OR_NETRETURN",
+    "NO_FDV_AS_MCAP",
+    "NO_FACTORY_PYTHON",
+    "NO_TASK28_UNFREEZE",
+    "NO_VPS",
+    "NO_QUOTE_AS_PREDICTOR",
+    "NO_RAW_BODY_IN_GIT",
+    "NO_FACTORY_V1_OPERATIONAL_READY"
+  ],
+  "owner_attention_triggers": {
+    "auth_or_access_recovery": false,
+    "external_material_action": false,
+    "material_owner_decision": false,
+    "unresolved_safety_or_truth_conflict": false,
+    "user_only_activation": false
+  },
   "project_sources_disposition": {
     "kind": "NO_CHANGE"
   },
   "schema": "smial.delivery-completion-evidence",
   "schema_version": "1.0",
+  "side_effects": {
+    "cash_spend_usd_cents": 0,
+    "credential_reads": 0,
+    "fallbacks": 0,
+    "provider_requests": 0,
+    "retries": 0,
+    "wallet_signer_transaction_actions": 0
+  },
+  "state_change": "LOCAL_RAW_ENVELOPES_BIND_PRIMARY_X",
   "task_id": "ORDINARY_MARKET_PIT_LOCAL_RAW_ENVELOPE_BIND_V1",
-  "verdict": "PASS"
+  "validation": {
+    "full_gate": "ENFORCED_BY_PROJECT_BOUND_VALIDATION",
+    "github_ci": "ENFORCED_LIVE_AT_GUARDED_MERGE",
+    "independent_review": {
+      "path": "docs/evidence/ordinary_market_pit_local_raw_envelope_bind/a1_delivery_independent_review_v1.json",
+      "sha256": "07481cc099e10e1642eb45070f07b18eb23dd37171a7ef8fa28d2e980648afee",
+      "verdict": "PASS"
+    },
+    "project_checks": [
+      "PASS_CATALOG_VALIDATE",
+      "PASS_GENERATOR_CHECK"
+    ],
+    "targeted": "PASS_ORDINARY_MARKET_PIT_LOCAL_RAW_ENVELOPE_BIND_TESTS"
+  }
 }
