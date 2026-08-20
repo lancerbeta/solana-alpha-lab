@@ -1,0 +1,38 @@
+schema: smial.ordinary-market-pit-offline-xy-association
+schema_version: '1.0'
+association_id: ORDINARY-MARKET-PIT-OFFLINE-XY-ASSOCIATION-001
+as_of: '2026-08-20'
+hypothesis_version: HYP-ORDINARY-LIQUIDITY-COVERAGE-PIT-V1
+question: On the already-quoted qualification subset, does higher liquidity/mcap rank with better frozen-horizon quoted liquidation recovery, within RECENT and TRADED separately?
+estimand: RankEffect(liquidity/mcap at Tokens V2 snapshot) vs y_quoted_liquidation_recovery
+primary_x:
+  kind: LIQUIDITY_OVER_MCAP
+  numerator_field: liquidity
+  denominator_field: mcap
+  forbidden_substitutes: [fdv, usdPrice, circSupply, totalSupply]
+y_field: y_quoted_liquidation_recovery
+forbidden_y_fields: [x_quoted_roundtrip_friction]
+y_source_atom_id: QUOTE_NATIVE_EVIDENCE_CHANNEL_QUALIFICATION_V1
+y_horizon_seconds: 900
+min_stratum_n: 6
+availability_class: FORWARD_SNAPSHOT_NOT_PIT_READY
+family_decision: DEFER_FRESH_PIT_CAPTURE
+product_terminal: EXPLORATORY_ASSOCIATION_NOT_PIT
+x_receipt:
+  path: docs/evidence/ordinary_market_pit_local_raw_envelope_bind/a1_runtime_receipt_v1.json
+  sha256: 978b4e1d6736cbfca602ee2a8b5446820cc2afc0c58d26fba576625edf8ac190
+y_receipt:
+  path: docs/evidence/quote_native_evidence_channel_qualification/a1_quote_native_evidence_channel_qualification_runtime_receipt_v1.json
+  sha256: d10e0d74de9d175dfcf5e3fd2408e3736d0fa8b94f52d804a34dce590a89e56f
+next_safe_action: OWNER_BOUNDED_FRESH_PIT_CAPTURE
+non_claims:
+  - NO_PIT_READY
+  - NO_LIVE_CAPTURE
+  - NO_ALPHA
+  - NO_FAMILY_CLOSE
+  - NO_EARN_REPLICATION
+  - NO_QUOTE_AS_PREDICTOR
+  - NO_FACTORY_PYTHON
+  - NO_N12_AS_CLEAN_PANEL
+evidence_budget:
+  provider_api_rpc_wss_calls: 0
