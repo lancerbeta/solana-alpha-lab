@@ -27242,3 +27242,149 @@ records:
   evidence: []
   search_terms: [FACTORY_V1, QUOTE_SURFACE_RETENTION, CONFIRMATORY, OWNER_READOUT]
   classification: {contains_secrets: false, contains_raw_data: false, sensitivity: INTERNAL_NON_SECRET}
+
+- asset_id: CTRL-PMF-QUOTE-STAY-OVERLAY-001
+  record_version: '1.0'
+  asset_type: control_document
+  purpose: Harness-valid contract that binds stay-overlay and freezes quote-only KEEP screening as exhausted.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-08-20'
+  truth_owner: PMF-QUOTE-STAY-OVERLAY-V1
+  location: {kind: git_path, logical_uri: 'repo://docs/tasks/PMF-QUOTE-STAY-OVERLAY-V1.md', repository_path: docs/tasks/PMF-QUOTE-STAY-OVERLAY-V1.md}
+  integrity: {kind: sha256, sha256: 7fc0a5922b7e9bc7ca910bcf348266621b46f350b5ff37ad72343c5f80d23dc6}
+  access: {mode: read_only, method: file, network_required: false, secrets_required: false}
+  relations:
+  - {relation_type: contains, target_asset_id: MODULE-PMF-QUOTE-STAY-OVERLAY-001}
+  - {relation_type: contains, target_asset_id: SCRIPT-PMF-QUOTE-STAY-OVERLAY-001}
+  - {relation_type: depends_on, target_asset_id: EVIDENCE-PMF-QUOTE-OWNER-FORK-ACCEPTANCE-001}
+  - {relation_type: depends_on, target_asset_id: EVIDENCE-QUOTE-SURFACE-RETENTION-CONFIRMATORY-ACCEPTANCE-001}
+  consumers: [FACTORY-001, GOAL-OWNER]
+  evidence: []
+  search_terms: [PMF, TASK_CONTRACT, STAY_OVERLAY, QUOTE_ONLY_KEEP]
+  classification: {contains_secrets: false, contains_raw_data: false, sensitivity: INTERNAL_NON_SECRET}
+
+- asset_id: CONFIG-PMF-QUOTE-STAY-OVERLAY-001
+  record_version: '1.0'
+  asset_type: configuration
+  purpose: Bound stay-overlay policy over owner-fork and confirmatory close without execute.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-08-20'
+  truth_owner: PMF-QUOTE-STAY-OVERLAY-V1
+  location: {kind: git_path, logical_uri: 'repo://configs/pmf_quote_stay_overlay_v1.yaml', repository_path: configs/pmf_quote_stay_overlay_v1.yaml}
+  integrity: {kind: sha256, sha256: f4d57b8fb0a9d4e451b0cb6a561b11358ae4da673c31d9cd24b4da11e6040cc9}
+  access: {mode: read_only, method: file, network_required: false, secrets_required: false}
+  relations: [{relation_type: governed_by, target_asset_id: CTRL-PMF-QUOTE-STAY-OVERLAY-001}]
+  consumers: [FACTORY-001]
+  evidence: []
+  search_terms: [PMF, STAY_OVERLAY, CONFIG]
+  classification: {contains_secrets: false, contains_raw_data: false, sensitivity: INTERNAL_NON_SECRET}
+
+- asset_id: MODULE-PMF-QUOTE-STAY-OVERLAY-001
+  record_version: '1.0'
+  asset_type: script
+  purpose: Fail-closed stay-overlay binder that quote-only KEEP screening is exhausted.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-08-20'
+  truth_owner: PMF-QUOTE-STAY-OVERLAY-V1
+  location: {kind: git_path, logical_uri: 'repo://src/solana_alpha_lab/pmf_quote_stay_overlay.py', repository_path: src/solana_alpha_lab/pmf_quote_stay_overlay.py}
+  integrity: {kind: sha256, sha256: e744440c2d3046e2ba65816e4e52874fcf2a6578db5c189f9882658f9061c126}
+  access: {mode: read_only, method: file, network_required: false, secrets_required: false}
+  relations: [{relation_type: depends_on, target_asset_id: CONFIG-PMF-QUOTE-STAY-OVERLAY-001}]
+  consumers: [FACTORY-001]
+  evidence: []
+  search_terms: [PMF, STAY_OVERLAY, MODULE]
+  classification: {contains_secrets: false, contains_raw_data: false, sensitivity: INTERNAL_NON_SECRET}
+
+- asset_id: SCRIPT-PMF-QUOTE-STAY-OVERLAY-001
+  record_version: '1.0'
+  asset_type: script
+  purpose: Offline runner that emits the stay-overlay acceptance and Russian owner readout.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-08-20'
+  truth_owner: PMF-QUOTE-STAY-OVERLAY-V1
+  location: {kind: git_path, logical_uri: 'repo://scripts/run_pmf_quote_stay_overlay.py', repository_path: scripts/run_pmf_quote_stay_overlay.py}
+  integrity: {kind: sha256, sha256: f67f63951a5250a171e1e8bf71e06fa0354e09fce00715e926f3c5fd636ca053}
+  access: {mode: read_only, method: file, network_required: false, secrets_required: false}
+  relations: [{relation_type: depends_on, target_asset_id: MODULE-PMF-QUOTE-STAY-OVERLAY-001}]
+  consumers: [FACTORY-001]
+  evidence: []
+  search_terms: [PMF, STAY_OVERLAY, RUNNER]
+  classification: {contains_secrets: false, contains_raw_data: false, sensitivity: INTERNAL_NON_SECRET}
+
+- asset_id: TEST-PMF-QUOTE-STAY-OVERLAY-001
+  record_version: '1.0'
+  asset_type: script
+  purpose: Targeted tests that stay-overlay binds screening exhausted and does not offer execute.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-08-20'
+  truth_owner: PMF-QUOTE-STAY-OVERLAY-V1
+  location: {kind: git_path, logical_uri: 'repo://tests/test_pmf_quote_stay_overlay.py', repository_path: tests/test_pmf_quote_stay_overlay.py}
+  integrity: {kind: sha256, sha256: b168a975298c2b8788cbed1dbee58d0fc60e63c7cd46a50f5f2f6075f28754d9}
+  access: {mode: read_only, method: file, network_required: false, secrets_required: false}
+  relations:
+  - {relation_type: depends_on, target_asset_id: MODULE-PMF-QUOTE-STAY-OVERLAY-001}
+  - {relation_type: depends_on, target_asset_id: EVIDENCE-PMF-QUOTE-STAY-OVERLAY-001}
+  consumers: [FACTORY-001]
+  evidence: []
+  search_terms: [PMF, STAY_OVERLAY, TESTS]
+  classification: {contains_secrets: false, contains_raw_data: false, sensitivity: INTERNAL_NON_SECRET}
+
+- asset_id: EVIDENCE-PMF-QUOTE-STAY-OVERLAY-001
+  record_version: '1.0'
+  asset_type: evidence
+  purpose: Hash-bound stay-overlay that quote-only KEEP screening is exhausted and Fillable stays not evidenced.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-08-20'
+  truth_owner: PMF-QUOTE-STAY-OVERLAY-V1
+  location: {kind: git_path, logical_uri: 'repo://docs/evidence/pmf_quote_slice/a1_pmf_quote_stay_overlay_runtime_receipt_v1.json', repository_path: docs/evidence/pmf_quote_slice/a1_pmf_quote_stay_overlay_runtime_receipt_v1.json}
+  integrity: {kind: sha256, sha256: 626033278081b3c91e9f007f67fa817e7efca51d235d2d2b358281aef8d54492}
+  access: {mode: read_only, method: file, network_required: false, secrets_required: false}
+  relations:
+  - {relation_type: derived_from, target_asset_id: CTRL-PMF-QUOTE-STAY-OVERLAY-001}
+  - {relation_type: depends_on, target_asset_id: EVIDENCE-PMF-QUOTE-OWNER-FORK-ACCEPTANCE-001}
+  - {relation_type: depends_on, target_asset_id: EVIDENCE-QUOTE-SURFACE-RETENTION-CONFIRMATORY-ACCEPTANCE-001}
+  - {relation_type: validated_by, target_asset_id: TEST-PMF-QUOTE-STAY-OVERLAY-001}
+  consumers: [FACTORY-001, GOAL-OWNER]
+  evidence: []
+  search_terms: [PMF, STAY_OVERLAY, SCREENING_EXHAUSTED]
+  classification: {contains_secrets: false, contains_raw_data: false, sensitivity: INTERNAL_NON_SECRET}
+
+- asset_id: EVIDENCE-PMF-QUOTE-STAY-OVERLAY-ACCEPTANCE-001
+  record_version: '1.0'
+  asset_type: evidence
+  purpose: Acceptance that stay-overlay is bound and quote-only KEEP screening is exhausted.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-08-20'
+  truth_owner: PMF-QUOTE-STAY-OVERLAY-V1
+  location: {kind: git_path, logical_uri: 'repo://docs/evidence/pmf_quote_slice/a1_pmf_quote_stay_overlay_acceptance_v1.json', repository_path: docs/evidence/pmf_quote_slice/a1_pmf_quote_stay_overlay_acceptance_v1.json}
+  integrity: {kind: sha256, sha256: 7b2f4250b8ede01a232c9cea2d124ff49afc667070d12bfd44a8d9ddce55be3f}
+  access: {mode: read_only, method: file, network_required: false, secrets_required: false}
+  relations: [{relation_type: derived_from, target_asset_id: EVIDENCE-PMF-QUOTE-STAY-OVERLAY-001}]
+  consumers: [FACTORY-001, GOAL-OWNER]
+  evidence: []
+  search_terms: [PMF, STAY_OVERLAY, ACCEPTANCE]
+  classification: {contains_secrets: false, contains_raw_data: false, sensitivity: INTERNAL_NON_SECRET}
+
+- asset_id: REPORT-PMF-QUOTE-STAY-OVERLAY-001
+  record_version: '1.0'
+  asset_type: control_document
+  purpose: Russian owner readout that quote-only KEEP screening is exhausted and Jupiter is not started.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-08-20'
+  truth_owner: PMF-QUOTE-STAY-OVERLAY-V1
+  location: {kind: git_path, logical_uri: 'repo://docs/reports/pmf_quote_slice/a1_stay_overlay_owner_readout_v1.md', repository_path: docs/reports/pmf_quote_slice/a1_stay_overlay_owner_readout_v1.md}
+  integrity: {kind: sha256, sha256: f8cec1191737f18bc87184a2d8ff847b052e8248fbad36f0f375e879a571f582}
+  access: {mode: read_only, method: file, network_required: false, secrets_required: false}
+  relations: [{relation_type: derived_from, target_asset_id: EVIDENCE-PMF-QUOTE-STAY-OVERLAY-ACCEPTANCE-001}]
+  consumers: [FACTORY-001, GOAL-OWNER]
+  evidence: []
+  search_terms: [PMF, STAY_OVERLAY, OWNER_READOUT]
+  classification: {contains_secrets: false, contains_raw_data: false, sensitivity: INTERNAL_NON_SECRET}

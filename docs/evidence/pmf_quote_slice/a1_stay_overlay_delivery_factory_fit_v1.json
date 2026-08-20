@@ -1,0 +1,31 @@
+{
+  "as_of": "2026-08-20",
+  "capability_radar": {
+    "now": "NONE",
+    "watch": "TOUCH_FACT_STILL_UNPAID"
+  },
+  "dimensions": {
+    "build_vs_buy": "PENDING",
+    "context_efficiency": "PENDING",
+    "execution_to_cashflow": "PENDING",
+    "flexibility_and_history": "PENDING",
+    "mission": "PENDING",
+    "monitoring_and_recovery": "PENDING",
+    "owner_operability": "PENDING",
+    "red_team": "PENDING",
+    "research_truth": "PENDING",
+    "security": "PENDING"
+  },
+  "limits": [
+    "NO_EXECUTE_OR_BUILD"
+  ],
+  "mode": "FULL_REVIEW",
+  "recovery": "REVERT_ONLY_THIS_ATOM_TRACKED_OUTPUTS",
+  "review_id": "PMF-QUOTE-STAY-OVERLAY-FACTORY-FIT-001",
+  "reviewed_bindings_sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+  "reviewed_inventory_sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+  "schema": "smial.delivery-harness-factory-fit",
+  "schema_version": "1.0",
+  "task_id": "PMF-QUOTE-STAY-OVERLAY-V1",
+  "verdict": "NOT_READY"
+}

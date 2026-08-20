@@ -1,0 +1,48 @@
+{
+  "as_of": "2026-08-20",
+  "non_claims": [
+    "NO_CRYPTOGRAPHIC_REVIEWER_IDENTITY",
+    "REVIEW_IS_NOT_SEMANTIC_DONE",
+    "NO_LIVE_PIT_OR_EXECUTION_CLAIM",
+    "NO_ALPHA_PNL_OR_NETRETURN",
+    "NO_CANONICAL_DONE",
+    "NO_SINGLE_AGENT_REVIEW_FALLBACK",
+    "NO_FACTORY_V1_OPERATIONAL_READY",
+    "NO_FILLABLE_NAMED_KEEP_ON_QUOTE_ONLY"
+  ],
+  "required_roles": [
+    "ARCHITECTURE_CRITIC",
+    "CODE_REVIEWER",
+    "GOAL_DOD_CRITIC"
+  ],
+  "review_id": "PMF-QUOTE-STAY-OVERLAY-INDEPENDENT-REVIEW-001",
+  "reviewed_bindings_sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+  "reviewed_inventory_sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+  "reviews": [
+    {
+      "findings": [
+        "PENDING_ISOLATED_REVIEW"
+      ],
+      "role": "CODE_REVIEWER",
+      "verdict": "NOT_READY"
+    },
+    {
+      "findings": [
+        "PENDING_ISOLATED_REVIEW"
+      ],
+      "role": "GOAL_DOD_CRITIC",
+      "verdict": "NOT_READY"
+    },
+    {
+      "findings": [
+        "PENDING_ISOLATED_REVIEW"
+      ],
+      "role": "ARCHITECTURE_CRITIC",
+      "verdict": "NOT_READY"
+    }
+  ],
+  "schema": "smial.delivery-independent-review-evidence",
+  "schema_version": "1.0",
+  "task_id": "PMF-QUOTE-STAY-OVERLAY-V1",
+  "verdict": "NOT_READY"
+}
