@@ -1,0 +1,82 @@
+{
+  "schema": "smial.delivery-completion-evidence",
+  "schema_version": "1.0",
+  "acceptance_id": "ORDINARY-RECENT-ORGANIC-PRESSURE-H900-AUDITION-DELIVERY-COMPLETION-001",
+  "as_of": "2026-08-21",
+  "task_id": "ORDINARY_RECENT_ORGANIC_PRESSURE_H900_AUDITION_V1",
+  "state_change": "INVALID_EVIDENCE_REPLAN_TYPED_AFTER_FRESH_DISCOVERY",
+  "base_main": "97030e71f2a2f0348327a1b996c2f2efa5d03f5e",
+  "cloud_bundle_mode": "OWNER_MANAGED_OPTIONAL_EXPORT",
+  "cloud_bundle_required_by_harness": false,
+  "cloud_bundle_smoke_required": false,
+  "capability_radar_now": "NONE",
+  "implementation_bindings": {
+    "catalog/assets/core.yaml": "6151b59831eb4fc6f6bfe3bd2e8d526435025e04a1f0436c496c993f468faf57",
+    "catalog/assets/lifecycle.yaml": "507612f94d4fdd0f55ac14307e6c753f9e121d24eceff1b5d14507c7191fb892",
+    "catalog/catalog_manifest.yaml": "f192ebc30eb4fc07fa1da0799b0bdf098ffd170582253e1e7ddd90bcae2ceb5d",
+    "catalog/generated/asset_edges.json": "77384d764ac2effcc589756fcd56c8759b9147b004c1d27798dd5b284ecd2be7",
+    "catalog/schemas/provider_route_capability_registry_v10.schema.json": "58dcdc093154281d6d8076162b1939759da5756f6e88a9d7e0cf37aa3b41fa7b",
+    "configs/ordinary_recent_organic_pressure_h900_audition_v1.yaml": "c5b1e81ab34cebd47dc24c0d37474a889977faef3ad17e58ccf4acec3e0dd608",
+    "configs/provider_route_capability_registry_v10.yaml": "b56dbc70819d52281cd5cd62e86c5b759ef3c3dd3bff8787faf2a605b496c2dc",
+    "docs/OPERATOR_NAVIGATION.md": "dba905ef661dcc3db74b7899ea99df56a86d807fb2eb61412864741dd12ed201",
+    "docs/PROJECT_MAP.md": "2be17e51bcdd8be870b8798b3c4c9f64f1749976d7382631901f62a3db220104",
+    "docs/evidence/ordinary_recent_organic_pressure_h900_audition/a1_ordinary_recent_organic_pressure_h900_audition_acceptance_v1.json": "2693aadf71285ec1381f4fb8eec78fe33996e5612932f3ead30d5cd5b9dcadf6",
+    "docs/evidence/ordinary_recent_organic_pressure_h900_audition/a1_ordinary_recent_organic_pressure_h900_audition_runtime_receipt_v1.json": "20cff315f225f405f2daca493acbc3ff66ef7910d718e769c2e22fdcf0dd4040",
+    "docs/reports/ordinary_recent_organic_pressure_h900_audition/a1_owner_readout_v1.md": "54ada77b17f770a68706a36d880e8fa5433135340c29f564a7360a5bef412bf1",
+    "docs/tasks/ORDINARY_RECENT_ORGANIC_PRESSURE_H900_AUDITION_V1.md": "a8f7c576b8cac64709c8df68759c0709aec4d407182ace87c86e216274a018ba",
+    "scripts/run_ordinary_recent_organic_pressure_h900_audition.py": "dfeeb5dda4c3c26e9c7ab02255dd28e96334eaf3515e8595b72254f4fbedaf28",
+    "src/solana_alpha_lab/ordinary_recent_organic_pressure_h900_audition.py": "81e723ab64bf4cd67814004a573845c746e6a13177dad87954fcc940a5ae4b72",
+    "src/solana_alpha_lab/provider_route_capability_registry_v10.py": "3914f43593432a21101e52701dc3b6c3be22811cb635370b8c0520fac48a6e00",
+    "src/solana_alpha_lab/quote_native_evidence_channel_qualification.py": "8634b0b0deb49754856f358772e4659929550cafceff57e17680b6d9f5affd37",
+    "src/solana_alpha_lab/quote_native_evidence_fit_panel.py": "68a171229af2ebf9bf3018d691ea7ed10779cce0d329237b7e8a057eec4f1650",
+    "tests/test_ordinary_recent_organic_pressure_h900_audition.py": "8b0da0632d216f13ef88bcb8d71d486f2dc34028b1154788e6ea3b2bceb06dfa",
+    "tests/test_provider_route_capability_registry_v10.py": "8b8b9c88bfb70e5a7feb1ac1db6102760040c807b8f1ead368184e06e35fe834",
+    "tests/test_quote_native_evidence_channel_qualification.py": "e44e8bfbf32071fe14acff12799ec1d80dc4447e3d7741af703392f51baf1130",
+    "tests/test_quote_native_evidence_fit_panel.py": "a98703f7416a338ce98110332e7ebf437a958f2822e5eeaf6d690b29cceec0cb"
+  },
+  "active_stop_conditions": [],
+  "owner_attention_triggers": {
+    "auth_or_access_recovery": false,
+    "material_owner_decision": false,
+    "user_only_activation": false,
+    "external_material_action": false,
+    "unresolved_safety_or_truth_conflict": false
+  },
+  "factory_fit": {
+    "path": "docs/evidence/ordinary_recent_organic_pressure_h900_audition/a1_delivery_factory_fit_v1.json",
+    "sha256": "e0bb87347a8d568e972a8a688567aca141ad20385451418f6cf5e1bd3e0dbf2c",
+    "verdict": "PASS"
+  },
+  "validation": {
+    "targeted": "PASS_ORDINARY_RECENT_ORGANIC_PRESSURE_H900_AUDITION_TESTS",
+    "independent_review": {
+      "path": "docs/evidence/ordinary_recent_organic_pressure_h900_audition/a1_delivery_independent_review_v1.json",
+      "sha256": "7e7155fe3697e67baf9374e75278094ad9c4ddfaa7ea94075c1d041c1dec7b43",
+      "verdict": "PASS"
+    },
+    "full_gate": "ENFORCED_BY_PROJECT_BOUND_VALIDATION",
+    "github_ci": "ENFORCED_LIVE_AT_GUARDED_MERGE",
+    "project_checks": [
+      "PASS_ORDINARY_RECENT_ORGANIC_PRESSURE_H900_AUDITION_TESTS",
+      "PASS_CATALOG_VALIDATION",
+      "PASS_NAVIGATION_CHECK",
+      "PASS_SECRET_SCAN"
+    ]
+  },
+  "non_claims": [
+    "NO_EARN_FRESH_OOS",
+    "NO_CLOSE_ORGANIC_PRESSURE_CANDIDATE",
+    "NO_ALPHA_NETRETURN_OR_CASHFLOW",
+    "NO_EXECUTION_OR_QUOTE_OBSERVATION",
+    "NO_STRATEGY_BOT_SHADOW_H3600_OR_H4",
+    "NO_CANONICAL_DONE"
+  ],
+  "side_effects": {
+    "cash_spend_usd_cents": 0,
+    "credential_reads": 1,
+    "fallbacks": 0,
+    "provider_requests": 2,
+    "retries": 0,
+    "wallet_signer_transaction_actions": 0
+  }
+}

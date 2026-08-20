@@ -39,6 +39,7 @@ ALLOWED_PATHS = frozenset(
     {
         "/tokens/v2/recent",
         "/tokens/v2/toptraded/1h",
+        "/tokens/v2/search",
         "/swap/v2/order",
     }
 )
@@ -123,6 +124,14 @@ def _validate_request_url(url: str) -> None:
             set(query_keys) == {"inputMint", "outputMint", "amount", "slippageBps"}
             and len(query_keys) == 4
             and all(bool(value) for _, value in query_pairs),
+            "QUERY_ALLOWLIST_DRIFT",
+        )
+        return
+    if parsed.path == "/tokens/v2/search":
+        _require(
+            len(query_pairs) == 1
+            and query_keys == ["query"]
+            and bool(query_pairs[0][1]),
             "QUERY_ALLOWLIST_DRIFT",
         )
         return

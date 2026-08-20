@@ -1,0 +1,816 @@
+{
+  "atom_id": "ORDINARY_RECENT_ORGANIC_PRESSURE_H900_AUDITION_V1",
+  "attempt_reservation": {
+    "atom_id": "ORDINARY_RECENT_ORGANIC_PRESSURE_H900_AUDITION_V1",
+    "credential_reads": 0,
+    "policy_sha256": "c5b1e81ab34cebd47dc24c0d37474a889977faef3ad17e58ccf4acec3e0dd608",
+    "provider_requests": 0,
+    "reservation_sha256": "2fd314503027be04b9fff0c8107c8773c9c20f436a61393987ea711d1f7c2043",
+    "schema": "smial.ordinary-recent-organic-pressure-h900-audition.attempt-reservation",
+    "schema_version": "1.0",
+    "started_at": "2026-08-20T21:00:26Z",
+    "state": "STARTED"
+  },
+  "candidate_observations": [
+    {
+      "age_seconds": 311.0,
+      "decision_snapshot_at": "2026-08-20T21:05:27Z",
+      "mint": "GH4xWQeXdAkmcPkLQga9cYDzxYfxZUXqRZxPsWehpump",
+      "x": null,
+      "x_inputs": {
+        "firstPool.createdAt": "2026-08-20T21:00:16Z",
+        "liquidity": 2626.1662346626886,
+        "stats5m.buyOrganicVolume": null,
+        "stats5m.sellOrganicVolume": null,
+        "updatedAt": "2026-08-20T21:04:49.431444049Z"
+      },
+      "x_reason": "ORGANIC_OR_LIQUIDITY_FIELD_MISSING_OR_INVALID",
+      "x_source": {
+        "field_paths": [
+          "stats5m.buyOrganicVolume",
+          "stats5m.sellOrganicVolume",
+          "liquidity",
+          "firstPool.createdAt",
+          "updatedAt"
+        ],
+        "observation_id": "DISCOVERY:SEARCH_T5",
+        "response_sha256": "17dd093d7193961cf47f8ffc424494bc4251f575296031ad865672ec1b58221e",
+        "row_mint": "GH4xWQeXdAkmcPkLQga9cYDzxYfxZUXqRZxPsWehpump",
+        "row_sha256": "35d2d397902ae446d7b8d680efa1ae4ed7f91bafe55fc345878b69772843a508"
+      },
+      "x_status": "MISSING"
+    },
+    {
+      "age_seconds": 311.0,
+      "decision_snapshot_at": "2026-08-20T21:05:27Z",
+      "mint": "7AsHCjYtmtYupTCYUE43c6YD1S1ZsKdy3KW1gEXipump",
+      "x": null,
+      "x_inputs": {
+        "firstPool.createdAt": "2026-08-20T21:00:16Z",
+        "liquidity": 2624.7621840029115,
+        "stats5m.buyOrganicVolume": null,
+        "stats5m.sellOrganicVolume": null,
+        "updatedAt": "2026-08-20T21:00:40.163399003Z"
+      },
+      "x_reason": "ORGANIC_OR_LIQUIDITY_FIELD_MISSING_OR_INVALID",
+      "x_source": {
+        "field_paths": [
+          "stats5m.buyOrganicVolume",
+          "stats5m.sellOrganicVolume",
+          "liquidity",
+          "firstPool.createdAt",
+          "updatedAt"
+        ],
+        "observation_id": "DISCOVERY:SEARCH_T5",
+        "response_sha256": "17dd093d7193961cf47f8ffc424494bc4251f575296031ad865672ec1b58221e",
+        "row_mint": "7AsHCjYtmtYupTCYUE43c6YD1S1ZsKdy3KW1gEXipump",
+        "row_sha256": "4285f8e5f41b24f1db3ac2808a20bc506dfa646ac1032fd0671064236d37e7ae"
+      },
+      "x_status": "MISSING"
+    },
+    {
+      "age_seconds": 313.0,
+      "decision_snapshot_at": "2026-08-20T21:05:27Z",
+      "mint": "ALq6HM8MCjTWrn6a5HEiPm3t6jees6AD3JVooUKpump",
+      "x": null,
+      "x_inputs": {
+        "firstPool.createdAt": "2026-08-20T21:00:14Z",
+        "liquidity": 2628.9140441222376,
+        "stats5m.buyOrganicVolume": null,
+        "stats5m.sellOrganicVolume": null,
+        "updatedAt": "2026-08-20T21:03:34.877893631Z"
+      },
+      "x_reason": "ORGANIC_OR_LIQUIDITY_FIELD_MISSING_OR_INVALID",
+      "x_source": {
+        "field_paths": [
+          "stats5m.buyOrganicVolume",
+          "stats5m.sellOrganicVolume",
+          "liquidity",
+          "firstPool.createdAt",
+          "updatedAt"
+        ],
+        "observation_id": "DISCOVERY:SEARCH_T5",
+        "response_sha256": "17dd093d7193961cf47f8ffc424494bc4251f575296031ad865672ec1b58221e",
+        "row_mint": "ALq6HM8MCjTWrn6a5HEiPm3t6jees6AD3JVooUKpump",
+        "row_sha256": "eb4947055586df4d5c18283e0f337fa3d7650aa571a8e825a7f5b37038b2c627"
+      },
+      "x_status": "MISSING"
+    },
+    {
+      "age_seconds": 313.0,
+      "decision_snapshot_at": "2026-08-20T21:05:27Z",
+      "mint": "4Whpse6Q3WB6CARLqR7pnTuDyeDH6kkAjVcfxjMDpump",
+      "x": null,
+      "x_inputs": {
+        "firstPool.createdAt": "2026-08-20T21:00:14Z",
+        "liquidity": 2628.606899433924,
+        "stats5m.buyOrganicVolume": null,
+        "stats5m.sellOrganicVolume": null,
+        "updatedAt": "2026-08-20T21:03:38.019016434Z"
+      },
+      "x_reason": "ORGANIC_OR_LIQUIDITY_FIELD_MISSING_OR_INVALID",
+      "x_source": {
+        "field_paths": [
+          "stats5m.buyOrganicVolume",
+          "stats5m.sellOrganicVolume",
+          "liquidity",
+          "firstPool.createdAt",
+          "updatedAt"
+        ],
+        "observation_id": "DISCOVERY:SEARCH_T5",
+        "response_sha256": "17dd093d7193961cf47f8ffc424494bc4251f575296031ad865672ec1b58221e",
+        "row_mint": "4Whpse6Q3WB6CARLqR7pnTuDyeDH6kkAjVcfxjMDpump",
+        "row_sha256": "ba0cfa84fd84add49dae7224a87e17f1f65d8c5225c1dfb719251d082b751a49"
+      },
+      "x_status": "MISSING"
+    },
+    {
+      "age_seconds": 314.0,
+      "decision_snapshot_at": "2026-08-20T21:05:27Z",
+      "mint": "eu1n5nu54q9QFRht3MSewjWT3bhyeDVg7Fc22sRpump",
+      "x": null,
+      "x_inputs": {
+        "firstPool.createdAt": "2026-08-20T21:00:13Z",
+        "liquidity": 2628.628853372513,
+        "stats5m.buyOrganicVolume": null,
+        "stats5m.sellOrganicVolume": null,
+        "updatedAt": "2026-08-20T21:04:27.77529081Z"
+      },
+      "x_reason": "ORGANIC_OR_LIQUIDITY_FIELD_MISSING_OR_INVALID",
+      "x_source": {
+        "field_paths": [
+          "stats5m.buyOrganicVolume",
+          "stats5m.sellOrganicVolume",
+          "liquidity",
+          "firstPool.createdAt",
+          "updatedAt"
+        ],
+        "observation_id": "DISCOVERY:SEARCH_T5",
+        "response_sha256": "17dd093d7193961cf47f8ffc424494bc4251f575296031ad865672ec1b58221e",
+        "row_mint": "eu1n5nu54q9QFRht3MSewjWT3bhyeDVg7Fc22sRpump",
+        "row_sha256": "c51f1b5b8def900ca380181047bd10fb3cbecff2d771fac9f1e36b4fa577ca42"
+      },
+      "x_status": "MISSING"
+    },
+    {
+      "age_seconds": 317.0,
+      "decision_snapshot_at": "2026-08-20T21:05:27Z",
+      "mint": "G37HEUobZiWFKH9nEcC4QV47DiK4ducTb8CrNYddpump",
+      "x": null,
+      "x_inputs": {
+        "firstPool.createdAt": "2026-08-20T21:00:10Z",
+        "liquidity": 2628.628852846821,
+        "stats5m.buyOrganicVolume": null,
+        "stats5m.sellOrganicVolume": null,
+        "updatedAt": "2026-08-20T21:04:26.775271007Z"
+      },
+      "x_reason": "ORGANIC_OR_LIQUIDITY_FIELD_MISSING_OR_INVALID",
+      "x_source": {
+        "field_paths": [
+          "stats5m.buyOrganicVolume",
+          "stats5m.sellOrganicVolume",
+          "liquidity",
+          "firstPool.createdAt",
+          "updatedAt"
+        ],
+        "observation_id": "DISCOVERY:SEARCH_T5",
+        "response_sha256": "17dd093d7193961cf47f8ffc424494bc4251f575296031ad865672ec1b58221e",
+        "row_mint": "G37HEUobZiWFKH9nEcC4QV47DiK4ducTb8CrNYddpump",
+        "row_sha256": "0944c77728ad01e6991873785c4a2de15f697d1d7be53d40d44a63b9edeb799e"
+      },
+      "x_status": "MISSING"
+    },
+    {
+      "age_seconds": 321.0,
+      "decision_snapshot_at": "2026-08-20T21:05:27Z",
+      "mint": "DR55Hc3vCvt6RH8tA4XGg2PmT3rSCxu4w3TwaftDpump",
+      "x": null,
+      "x_inputs": {
+        "firstPool.createdAt": "2026-08-20T21:00:06Z",
+        "liquidity": 2631.144672335178,
+        "stats5m.buyOrganicVolume": null,
+        "stats5m.sellOrganicVolume": null,
+        "updatedAt": "2026-08-20T21:01:33.34924454Z"
+      },
+      "x_reason": "ORGANIC_OR_LIQUIDITY_FIELD_MISSING_OR_INVALID",
+      "x_source": {
+        "field_paths": [
+          "stats5m.buyOrganicVolume",
+          "stats5m.sellOrganicVolume",
+          "liquidity",
+          "firstPool.createdAt",
+          "updatedAt"
+        ],
+        "observation_id": "DISCOVERY:SEARCH_T5",
+        "response_sha256": "17dd093d7193961cf47f8ffc424494bc4251f575296031ad865672ec1b58221e",
+        "row_mint": "DR55Hc3vCvt6RH8tA4XGg2PmT3rSCxu4w3TwaftDpump",
+        "row_sha256": "d0166cb469b09f1a2ac667ff4775297a1e50a60ce769cf44e331fda3782ac17f"
+      },
+      "x_status": "MISSING"
+    },
+    {
+      "age_seconds": 324.0,
+      "decision_snapshot_at": "2026-08-20T21:05:27Z",
+      "mint": "FaH9cUik6f4Q5eQFrN7HEyHoZGUQmAjgNRzjhyAApump",
+      "x": null,
+      "x_inputs": {
+        "firstPool.createdAt": "2026-08-20T21:00:03Z",
+        "liquidity": 2627.229296032461,
+        "stats5m.buyOrganicVolume": null,
+        "stats5m.sellOrganicVolume": null,
+        "updatedAt": "2026-08-20T21:04:37.492085242Z"
+      },
+      "x_reason": "ORGANIC_OR_LIQUIDITY_FIELD_MISSING_OR_INVALID",
+      "x_source": {
+        "field_paths": [
+          "stats5m.buyOrganicVolume",
+          "stats5m.sellOrganicVolume",
+          "liquidity",
+          "firstPool.createdAt",
+          "updatedAt"
+        ],
+        "observation_id": "DISCOVERY:SEARCH_T5",
+        "response_sha256": "17dd093d7193961cf47f8ffc424494bc4251f575296031ad865672ec1b58221e",
+        "row_mint": "FaH9cUik6f4Q5eQFrN7HEyHoZGUQmAjgNRzjhyAApump",
+        "row_sha256": "c78ab6ceba7de0675efa7f53b9dcfc6e7183d19bdd83b91141265a365fc0d8c2"
+      },
+      "x_status": "MISSING"
+    },
+    {
+      "age_seconds": 329.0,
+      "decision_snapshot_at": "2026-08-20T21:05:27Z",
+      "mint": "24wN4esPQvJKhr5GP1bid8whJZ1nsDrS3xc6d2Bupump",
+      "x": null,
+      "x_inputs": {
+        "firstPool.createdAt": "2026-08-20T20:59:58Z",
+        "liquidity": 2624.7621840029115,
+        "stats5m.buyOrganicVolume": null,
+        "stats5m.sellOrganicVolume": null,
+        "updatedAt": "2026-08-20T21:02:50.69572219Z"
+      },
+      "x_reason": "ORGANIC_OR_LIQUIDITY_FIELD_MISSING_OR_INVALID",
+      "x_source": {
+        "field_paths": [
+          "stats5m.buyOrganicVolume",
+          "stats5m.sellOrganicVolume",
+          "liquidity",
+          "firstPool.createdAt",
+          "updatedAt"
+        ],
+        "observation_id": "DISCOVERY:SEARCH_T5",
+        "response_sha256": "17dd093d7193961cf47f8ffc424494bc4251f575296031ad865672ec1b58221e",
+        "row_mint": "24wN4esPQvJKhr5GP1bid8whJZ1nsDrS3xc6d2Bupump",
+        "row_sha256": "d0c2b66ce7c3b3a3b9efbf7d3e31256ec49cf2c8bd187900a51bbe507fb96b65"
+      },
+      "x_status": "MISSING"
+    },
+    {
+      "age_seconds": 331.0,
+      "decision_snapshot_at": "2026-08-20T21:05:27Z",
+      "mint": "G1K53gxtp7yZ5oALh3JeFvVg2P8rgqaqxe2GpcvLpump",
+      "x": null,
+      "x_inputs": {
+        "firstPool.createdAt": "2026-08-20T20:59:56Z",
+        "liquidity": 2628.6068992586934,
+        "stats5m.buyOrganicVolume": null,
+        "stats5m.sellOrganicVolume": null,
+        "updatedAt": "2026-08-20T21:04:24.785474826Z"
+      },
+      "x_reason": "ORGANIC_OR_LIQUIDITY_FIELD_MISSING_OR_INVALID",
+      "x_source": {
+        "field_paths": [
+          "stats5m.buyOrganicVolume",
+          "stats5m.sellOrganicVolume",
+          "liquidity",
+          "firstPool.createdAt",
+          "updatedAt"
+        ],
+        "observation_id": "DISCOVERY:SEARCH_T5",
+        "response_sha256": "17dd093d7193961cf47f8ffc424494bc4251f575296031ad865672ec1b58221e",
+        "row_mint": "G1K53gxtp7yZ5oALh3JeFvVg2P8rgqaqxe2GpcvLpump",
+        "row_sha256": "9f05dbf8653a194abbbd8080d72e83811faad3d7b102d2b0cd2561b1573396e2"
+      },
+      "x_status": "MISSING"
+    },
+    {
+      "age_seconds": 332.0,
+      "decision_snapshot_at": "2026-08-20T21:05:27Z",
+      "mint": "B3RxMHKs7xNDgmwCTmNLVSDnvstf7AgFrAVgeKaEpump",
+      "x": null,
+      "x_inputs": {
+        "firstPool.createdAt": "2026-08-20T20:59:55Z",
+        "liquidity": 29.994365251866565,
+        "stats5m.buyOrganicVolume": null,
+        "stats5m.sellOrganicVolume": null,
+        "updatedAt": "2026-08-20T21:04:57.425174499Z"
+      },
+      "x_reason": "ORGANIC_OR_LIQUIDITY_FIELD_MISSING_OR_INVALID",
+      "x_source": {
+        "field_paths": [
+          "stats5m.buyOrganicVolume",
+          "stats5m.sellOrganicVolume",
+          "liquidity",
+          "firstPool.createdAt",
+          "updatedAt"
+        ],
+        "observation_id": "DISCOVERY:SEARCH_T5",
+        "response_sha256": "17dd093d7193961cf47f8ffc424494bc4251f575296031ad865672ec1b58221e",
+        "row_mint": "B3RxMHKs7xNDgmwCTmNLVSDnvstf7AgFrAVgeKaEpump",
+        "row_sha256": "96e381eaf0bc7ec099bfc232e0ff7f36cc1a79854baedc0037f89b3672278e09"
+      },
+      "x_status": "MISSING"
+    },
+    {
+      "age_seconds": 335.0,
+      "decision_snapshot_at": "2026-08-20T21:05:27Z",
+      "mint": "GNrgNR6WBUmjRBLZCdcaTid5Ttfvcp7uPWpBv1Wwpump",
+      "x": null,
+      "x_inputs": {
+        "firstPool.createdAt": "2026-08-20T20:59:52Z",
+        "liquidity": 2627.2005052019404,
+        "stats5m.buyOrganicVolume": null,
+        "stats5m.sellOrganicVolume": null,
+        "updatedAt": "2026-08-20T21:04:39.178130091Z"
+      },
+      "x_reason": "ORGANIC_OR_LIQUIDITY_FIELD_MISSING_OR_INVALID",
+      "x_source": {
+        "field_paths": [
+          "stats5m.buyOrganicVolume",
+          "stats5m.sellOrganicVolume",
+          "liquidity",
+          "firstPool.createdAt",
+          "updatedAt"
+        ],
+        "observation_id": "DISCOVERY:SEARCH_T5",
+        "response_sha256": "17dd093d7193961cf47f8ffc424494bc4251f575296031ad865672ec1b58221e",
+        "row_mint": "GNrgNR6WBUmjRBLZCdcaTid5Ttfvcp7uPWpBv1Wwpump",
+        "row_sha256": "ebc5013d4c57945b09b8d9926fc5be02c599e44d116910537ea56ec771b0024c"
+      },
+      "x_status": "MISSING"
+    },
+    {
+      "age_seconds": 335.0,
+      "decision_snapshot_at": "2026-08-20T21:05:27Z",
+      "mint": "5QPS5h94yW5FUr8Pc9M7QkyDUxRxQPL2DHhCHWGbpump",
+      "x": null,
+      "x_inputs": {
+        "firstPool.createdAt": "2026-08-20T20:59:52Z",
+        "liquidity": 2633.2489778417,
+        "stats5m.buyOrganicVolume": null,
+        "stats5m.sellOrganicVolume": null,
+        "updatedAt": "2026-08-20T21:02:39.373600207Z"
+      },
+      "x_reason": "ORGANIC_OR_LIQUIDITY_FIELD_MISSING_OR_INVALID",
+      "x_source": {
+        "field_paths": [
+          "stats5m.buyOrganicVolume",
+          "stats5m.sellOrganicVolume",
+          "liquidity",
+          "firstPool.createdAt",
+          "updatedAt"
+        ],
+        "observation_id": "DISCOVERY:SEARCH_T5",
+        "response_sha256": "17dd093d7193961cf47f8ffc424494bc4251f575296031ad865672ec1b58221e",
+        "row_mint": "5QPS5h94yW5FUr8Pc9M7QkyDUxRxQPL2DHhCHWGbpump",
+        "row_sha256": "c67b4cb3638c8f8e35cb8eb351f2f87d31512c749a40e1a310f64ddc4e9a987b"
+      },
+      "x_status": "MISSING"
+    },
+    {
+      "age_seconds": 339.0,
+      "decision_snapshot_at": "2026-08-20T21:05:27Z",
+      "mint": "CDBFwvMeZavNUSeczj8jufe6m9ohhAdCxbJjwUQapump",
+      "x": -0.0007708417017915877,
+      "x_inputs": {
+        "firstPool.createdAt": "2026-08-20T20:59:48Z",
+        "liquidity": 2626.1881695300294,
+        "stats5m.buyOrganicVolume": 28.87326238696254,
+        "stats5m.sellOrganicVolume": 30.897637744788003,
+        "updatedAt": "2026-08-20T21:01:35.875038595Z"
+      },
+      "x_reason": null,
+      "x_source": {
+        "field_paths": [
+          "stats5m.buyOrganicVolume",
+          "stats5m.sellOrganicVolume",
+          "liquidity",
+          "firstPool.createdAt",
+          "updatedAt"
+        ],
+        "observation_id": "DISCOVERY:SEARCH_T5",
+        "response_sha256": "17dd093d7193961cf47f8ffc424494bc4251f575296031ad865672ec1b58221e",
+        "row_mint": "CDBFwvMeZavNUSeczj8jufe6m9ohhAdCxbJjwUQapump",
+        "row_sha256": "4f381a994ce0f2bfe99cc15e1eb96d8d317e6ca219c307529072248c11611888"
+      },
+      "x_status": "ELIGIBLE"
+    },
+    {
+      "age_seconds": null,
+      "decision_snapshot_at": "2026-08-20T21:05:27Z",
+      "mint": "GcQXv2QuRJkV1BomVLWwc3qWT55U3zns8pAAtZ9Spump",
+      "x": null,
+      "x_inputs": {
+        "firstPool.createdAt": "2026-08-20T20:59:46Z",
+        "liquidity": null,
+        "stats5m.buyOrganicVolume": null,
+        "stats5m.sellOrganicVolume": null,
+        "updatedAt": "2026-08-20T21:02:48.495380478Z"
+      },
+      "x_reason": "REQUIRED_OBJECT_ABSENT",
+      "x_source": {
+        "field_paths": [
+          "stats5m.buyOrganicVolume",
+          "stats5m.sellOrganicVolume",
+          "liquidity",
+          "firstPool.createdAt",
+          "updatedAt"
+        ],
+        "observation_id": "DISCOVERY:SEARCH_T5",
+        "response_sha256": "17dd093d7193961cf47f8ffc424494bc4251f575296031ad865672ec1b58221e",
+        "row_mint": "GcQXv2QuRJkV1BomVLWwc3qWT55U3zns8pAAtZ9Spump",
+        "row_sha256": "12780c6dbe7d2236234ffd703dc37448aaa337cda72bf801cdbc4e3abac62a49"
+      },
+      "x_status": "MISSING"
+    },
+    {
+      "age_seconds": 342.0,
+      "decision_snapshot_at": "2026-08-20T21:05:27Z",
+      "mint": "7YEMfFkMDe7ai5AyiSKq5PB9MZ6TGYWi4iBR2h9qpump",
+      "x": 0.2163770499863715,
+      "x_inputs": {
+        "firstPool.createdAt": "2026-08-20T20:59:45Z",
+        "liquidity": 2624.784111342401,
+        "stats5m.buyOrganicVolume": 1025.3022193417432,
+        "stats5m.sellOrganicVolume": 457.35917647837476,
+        "updatedAt": "2026-08-20T21:04:29.776129453Z"
+      },
+      "x_reason": null,
+      "x_source": {
+        "field_paths": [
+          "stats5m.buyOrganicVolume",
+          "stats5m.sellOrganicVolume",
+          "liquidity",
+          "firstPool.createdAt",
+          "updatedAt"
+        ],
+        "observation_id": "DISCOVERY:SEARCH_T5",
+        "response_sha256": "17dd093d7193961cf47f8ffc424494bc4251f575296031ad865672ec1b58221e",
+        "row_mint": "7YEMfFkMDe7ai5AyiSKq5PB9MZ6TGYWi4iBR2h9qpump",
+        "row_sha256": "ef06af7cbd422bd5e4761ea46f49011704369cd1b95aa784b9fd3c39e622d99b"
+      },
+      "x_status": "ELIGIBLE"
+    },
+    {
+      "age_seconds": 343.0,
+      "decision_snapshot_at": "2026-08-20T21:05:27Z",
+      "mint": "8jtg2wuqjDWWArpwxMQnpfFq3MQFnqreKPWGgzZopump",
+      "x": null,
+      "x_inputs": {
+        "firstPool.createdAt": "2026-08-20T20:59:44Z",
+        "liquidity": 2624.7841114298885,
+        "stats5m.buyOrganicVolume": null,
+        "stats5m.sellOrganicVolume": null,
+        "updatedAt": "2026-08-20T21:04:29.776491205Z"
+      },
+      "x_reason": "ORGANIC_OR_LIQUIDITY_FIELD_MISSING_OR_INVALID",
+      "x_source": {
+        "field_paths": [
+          "stats5m.buyOrganicVolume",
+          "stats5m.sellOrganicVolume",
+          "liquidity",
+          "firstPool.createdAt",
+          "updatedAt"
+        ],
+        "observation_id": "DISCOVERY:SEARCH_T5",
+        "response_sha256": "17dd093d7193961cf47f8ffc424494bc4251f575296031ad865672ec1b58221e",
+        "row_mint": "8jtg2wuqjDWWArpwxMQnpfFq3MQFnqreKPWGgzZopump",
+        "row_sha256": "3b08df5637c83db7c3681b50fadf1d7c86ce83846a2d5d6531470cb741a07f7d"
+      },
+      "x_status": "MISSING"
+    },
+    {
+      "age_seconds": 346.0,
+      "decision_snapshot_at": "2026-08-20T21:05:27Z",
+      "mint": "6FRCDuqp6aTD8Q66DLeetfWd7KUhYsVnPzVwCHrTpump",
+      "x": null,
+      "x_inputs": {
+        "firstPool.createdAt": "2026-08-20T20:59:41Z",
+        "liquidity": 2628.6068992586934,
+        "stats5m.buyOrganicVolume": null,
+        "stats5m.sellOrganicVolume": null,
+        "updatedAt": "2026-08-20T21:04:06.851891895Z"
+      },
+      "x_reason": "ORGANIC_OR_LIQUIDITY_FIELD_MISSING_OR_INVALID",
+      "x_source": {
+        "field_paths": [
+          "stats5m.buyOrganicVolume",
+          "stats5m.sellOrganicVolume",
+          "liquidity",
+          "firstPool.createdAt",
+          "updatedAt"
+        ],
+        "observation_id": "DISCOVERY:SEARCH_T5",
+        "response_sha256": "17dd093d7193961cf47f8ffc424494bc4251f575296031ad865672ec1b58221e",
+        "row_mint": "6FRCDuqp6aTD8Q66DLeetfWd7KUhYsVnPzVwCHrTpump",
+        "row_sha256": "691ba8ce70434b6c5678e9ad2c66fd9c621c11545c3a437a3d6d9d8884682269"
+      },
+      "x_status": "MISSING"
+    },
+    {
+      "age_seconds": null,
+      "decision_snapshot_at": "2026-08-20T21:05:27Z",
+      "mint": "Ht1W89awqut813LmhTtGw2QxrfUVcSE1mHAFvAA7pump",
+      "x": null,
+      "x_inputs": {
+        "firstPool.createdAt": "2026-08-20T20:59:38Z",
+        "liquidity": 3412.070064479254,
+        "stats5m.buyOrganicVolume": null,
+        "stats5m.sellOrganicVolume": null,
+        "updatedAt": "2026-08-20T21:00:25.774501512Z"
+      },
+      "x_reason": "REQUIRED_OBJECT_ABSENT",
+      "x_source": {
+        "field_paths": [
+          "stats5m.buyOrganicVolume",
+          "stats5m.sellOrganicVolume",
+          "liquidity",
+          "firstPool.createdAt",
+          "updatedAt"
+        ],
+        "observation_id": "DISCOVERY:SEARCH_T5",
+        "response_sha256": "17dd093d7193961cf47f8ffc424494bc4251f575296031ad865672ec1b58221e",
+        "row_mint": "Ht1W89awqut813LmhTtGw2QxrfUVcSE1mHAFvAA7pump",
+        "row_sha256": "a9fb8ac89d45031bef9a8e33f4d3f4f4828abd690ef56dab4b59bd10b6299145"
+      },
+      "x_status": "MISSING"
+    },
+    {
+      "age_seconds": 350.0,
+      "decision_snapshot_at": "2026-08-20T21:05:27Z",
+      "mint": "ArZ6BkZTYVputvMo8yya7kFZeJbX9m5gRz1trfXcpump",
+      "x": null,
+      "x_inputs": {
+        "firstPool.createdAt": "2026-08-20T20:59:37Z",
+        "liquidity": 2624.7841063556343,
+        "stats5m.buyOrganicVolume": null,
+        "stats5m.sellOrganicVolume": null,
+        "updatedAt": "2026-08-20T21:04:25.774992618Z"
+      },
+      "x_reason": "ORGANIC_OR_LIQUIDITY_FIELD_MISSING_OR_INVALID",
+      "x_source": {
+        "field_paths": [
+          "stats5m.buyOrganicVolume",
+          "stats5m.sellOrganicVolume",
+          "liquidity",
+          "firstPool.createdAt",
+          "updatedAt"
+        ],
+        "observation_id": "DISCOVERY:SEARCH_T5",
+        "response_sha256": "17dd093d7193961cf47f8ffc424494bc4251f575296031ad865672ec1b58221e",
+        "row_mint": "ArZ6BkZTYVputvMo8yya7kFZeJbX9m5gRz1trfXcpump",
+        "row_sha256": "e89eb2a923c77ddb4fe83c34501ab4d9b791682e9864ceee815126b7f9cb90a9"
+      },
+      "x_status": "MISSING"
+    },
+    {
+      "age_seconds": 353.0,
+      "decision_snapshot_at": "2026-08-20T21:05:27Z",
+      "mint": "2dsA6ifRF8HrDrz7AmmH7jnqoEAo2pHgvyZPr85opump",
+      "x": null,
+      "x_inputs": {
+        "firstPool.createdAt": "2026-08-20T20:59:34Z",
+        "liquidity": 2628.60689969677,
+        "stats5m.buyOrganicVolume": null,
+        "stats5m.sellOrganicVolume": null,
+        "updatedAt": "2026-08-20T21:04:25.775802131Z"
+      },
+      "x_reason": "ORGANIC_OR_LIQUIDITY_FIELD_MISSING_OR_INVALID",
+      "x_source": {
+        "field_paths": [
+          "stats5m.buyOrganicVolume",
+          "stats5m.sellOrganicVolume",
+          "liquidity",
+          "firstPool.createdAt",
+          "updatedAt"
+        ],
+        "observation_id": "DISCOVERY:SEARCH_T5",
+        "response_sha256": "17dd093d7193961cf47f8ffc424494bc4251f575296031ad865672ec1b58221e",
+        "row_mint": "2dsA6ifRF8HrDrz7AmmH7jnqoEAo2pHgvyZPr85opump",
+        "row_sha256": "31e40b97844edfe262d2d4c552e87881c7eec37dc466ccbc217a4a95ef5fa83a"
+      },
+      "x_status": "MISSING"
+    },
+    {
+      "age_seconds": 354.0,
+      "decision_snapshot_at": "2026-08-20T21:05:27Z",
+      "mint": "6VYibFrNio1qmEqbnRcEfg9Ykm4pEenLYic1wv48pump",
+      "x": null,
+      "x_inputs": {
+        "firstPool.createdAt": "2026-08-20T20:59:33Z",
+        "liquidity": 2624.630697288579,
+        "stats5m.buyOrganicVolume": null,
+        "stats5m.sellOrganicVolume": null,
+        "updatedAt": "2026-08-20T21:00:26.975049741Z"
+      },
+      "x_reason": "ORGANIC_OR_LIQUIDITY_FIELD_MISSING_OR_INVALID",
+      "x_source": {
+        "field_paths": [
+          "stats5m.buyOrganicVolume",
+          "stats5m.sellOrganicVolume",
+          "liquidity",
+          "firstPool.createdAt",
+          "updatedAt"
+        ],
+        "observation_id": "DISCOVERY:SEARCH_T5",
+        "response_sha256": "17dd093d7193961cf47f8ffc424494bc4251f575296031ad865672ec1b58221e",
+        "row_mint": "6VYibFrNio1qmEqbnRcEfg9Ykm4pEenLYic1wv48pump",
+        "row_sha256": "4a395392ff8ed1deed190ab561c150fd1044ed818f90c72feb54ec4bf7e9a8e9"
+      },
+      "x_status": "MISSING"
+    },
+    {
+      "age_seconds": 356.0,
+      "decision_snapshot_at": "2026-08-20T21:05:27Z",
+      "mint": "FK45aLc8Vi4M9XKewxQs2uE7oUafxFF9N1Md4Yrpump",
+      "x": null,
+      "x_inputs": {
+        "firstPool.createdAt": "2026-08-20T20:59:31Z",
+        "liquidity": 2624.784106705583,
+        "stats5m.buyOrganicVolume": null,
+        "stats5m.sellOrganicVolume": null,
+        "updatedAt": "2026-08-20T21:04:24.779720142Z"
+      },
+      "x_reason": "ORGANIC_OR_LIQUIDITY_FIELD_MISSING_OR_INVALID",
+      "x_source": {
+        "field_paths": [
+          "stats5m.buyOrganicVolume",
+          "stats5m.sellOrganicVolume",
+          "liquidity",
+          "firstPool.createdAt",
+          "updatedAt"
+        ],
+        "observation_id": "DISCOVERY:SEARCH_T5",
+        "response_sha256": "17dd093d7193961cf47f8ffc424494bc4251f575296031ad865672ec1b58221e",
+        "row_mint": "FK45aLc8Vi4M9XKewxQs2uE7oUafxFF9N1Md4Yrpump",
+        "row_sha256": "98ebffa3ab41f043de3a533e8ac22a79d7f53e670075f66de937d36c6ed5c5c3"
+      },
+      "x_status": "MISSING"
+    },
+    {
+      "age_seconds": 358.0,
+      "decision_snapshot_at": "2026-08-20T21:05:27Z",
+      "mint": "rmVGdnEpKyS51yZXgptnnCrTxL6ELbSuTh77QeDpump",
+      "x": null,
+      "x_inputs": {
+        "firstPool.createdAt": "2026-08-20T20:59:29Z",
+        "liquidity": 2628.628852846821,
+        "stats5m.buyOrganicVolume": null,
+        "stats5m.sellOrganicVolume": null,
+        "updatedAt": "2026-08-20T21:04:26.775563733Z"
+      },
+      "x_reason": "ORGANIC_OR_LIQUIDITY_FIELD_MISSING_OR_INVALID",
+      "x_source": {
+        "field_paths": [
+          "stats5m.buyOrganicVolume",
+          "stats5m.sellOrganicVolume",
+          "liquidity",
+          "firstPool.createdAt",
+          "updatedAt"
+        ],
+        "observation_id": "DISCOVERY:SEARCH_T5",
+        "response_sha256": "17dd093d7193961cf47f8ffc424494bc4251f575296031ad865672ec1b58221e",
+        "row_mint": "rmVGdnEpKyS51yZXgptnnCrTxL6ELbSuTh77QeDpump",
+        "row_sha256": "d2c6bd6c2417c91ac8515554fe60cd75fdd5a91754f423159904ec1022f12ebd"
+      },
+      "x_status": "MISSING"
+    }
+  ],
+  "credential_reads": 1,
+  "decision_time_eligible": 2,
+  "discovery_observations": [
+    {
+      "consumed_call": true,
+      "observation_id": "DISCOVERY:RECENT",
+      "observed_at": "2026-08-20T21:00:27Z",
+      "terminal": "TOKEN_LIST_OBSERVED",
+      "terminal_error": null,
+      "transport": {
+        "http_status": 200,
+        "request_count": 1,
+        "response_bytes": 52318,
+        "response_sha256": "67c70465d81d2f7f40e62426a8f0418a3022b4c11501caedf630a3ff291c63a6",
+        "safe_response_headers": {
+          "x-api-gateway-request-id": "xva2x-kYYQAA2qDYEH6dI9IkFTGoqTFy723u3Vgq94hkS0sZwpShXg=="
+        },
+        "url_has_api_key": false,
+        "url_has_taker": false
+      }
+    },
+    {
+      "consumed_call": true,
+      "observation_id": "DISCOVERY:SEARCH_T5",
+      "observed_at": "2026-08-20T21:05:27Z",
+      "terminal": "TOKEN_LIST_OBSERVED",
+      "terminal_error": null,
+      "transport": {
+        "http_status": 200,
+        "request_count": 1,
+        "response_bytes": 44330,
+        "response_sha256": "17dd093d7193961cf47f8ffc424494bc4251f575296031ad865672ec1b58221e",
+        "safe_response_headers": {
+          "x-api-gateway-request-id": "b730gLTBA7EvaiyVL8j7eWyAA0SQul2cqERyGQSEJDe3FatkHFH0jQ=="
+        },
+        "url_has_api_key": false,
+        "url_has_taker": false
+      }
+    }
+  ],
+  "execute_calls": 0,
+  "fallbacks": 0,
+  "frozen_mints": [
+    "GH4xWQeXdAkmcPkLQga9cYDzxYfxZUXqRZxPsWehpump",
+    "7AsHCjYtmtYupTCYUE43c6YD1S1ZsKdy3KW1gEXipump",
+    "ALq6HM8MCjTWrn6a5HEiPm3t6jees6AD3JVooUKpump",
+    "4Whpse6Q3WB6CARLqR7pnTuDyeDH6kkAjVcfxjMDpump",
+    "eu1n5nu54q9QFRht3MSewjWT3bhyeDVg7Fc22sRpump",
+    "G37HEUobZiWFKH9nEcC4QV47DiK4ducTb8CrNYddpump",
+    "DR55Hc3vCvt6RH8tA4XGg2PmT3rSCxu4w3TwaftDpump",
+    "FaH9cUik6f4Q5eQFrN7HEyHoZGUQmAjgNRzjhyAApump",
+    "24wN4esPQvJKhr5GP1bid8whJZ1nsDrS3xc6d2Bupump",
+    "G1K53gxtp7yZ5oALh3JeFvVg2P8rgqaqxe2GpcvLpump",
+    "B3RxMHKs7xNDgmwCTmNLVSDnvstf7AgFrAVgeKaEpump",
+    "GNrgNR6WBUmjRBLZCdcaTid5Ttfvcp7uPWpBv1Wwpump",
+    "5QPS5h94yW5FUr8Pc9M7QkyDUxRxQPL2DHhCHWGbpump",
+    "CDBFwvMeZavNUSeczj8jufe6m9ohhAdCxbJjwUQapump",
+    "GcQXv2QuRJkV1BomVLWwc3qWT55U3zns8pAAtZ9Spump",
+    "7YEMfFkMDe7ai5AyiSKq5PB9MZ6TGYWi4iBR2h9qpump",
+    "8jtg2wuqjDWWArpwxMQnpfFq3MQFnqreKPWGgzZopump",
+    "6FRCDuqp6aTD8Q66DLeetfWd7KUhYsVnPzVwCHrTpump",
+    "Ht1W89awqut813LmhTtGw2QxrfUVcSE1mHAFvAA7pump",
+    "ArZ6BkZTYVputvMo8yya7kFZeJbX9m5gRz1trfXcpump",
+    "2dsA6ifRF8HrDrz7AmmH7jnqoEAo2pHgvyZPr85opump",
+    "6VYibFrNio1qmEqbnRcEfg9Ykm4pEenLYic1wv48pump",
+    "FK45aLc8Vi4M9XKewxQs2uE7oUafxFF9N1Md4Yrpump",
+    "rmVGdnEpKyS51yZXgptnnCrTxL6ELbSuTh77QeDpump"
+  ],
+  "non_claims": [
+    "NO_EXECUTE",
+    "NO_TAKER_OR_SIGNER",
+    "NO_TRANSACTION_BYTES_IN_GIT",
+    "NO_ALPHA",
+    "NO_NETRETURN",
+    "NO_STRATEGY_OR_SHADOW",
+    "NO_H3600_OR_H4",
+    "NO_SECOND_PROVIDER"
+  ],
+  "observations": [],
+  "preflight": {
+    "credential_reads": 0,
+    "dns_resolved": true,
+    "host": "api.jup.ag",
+    "observed_at": "2026-08-20T21:00:26Z",
+    "port": 443,
+    "provider_requests": 0,
+    "schema": "smial.pmf-quote-slice-one-shot.credential-free-preflight",
+    "schema_version": "1.0",
+    "tcp_443": true,
+    "tls_verified": true,
+    "tls_version": "TLSv1.3"
+  },
+  "prior_mints_sha256": "9bb4ea567fad40ea34cd48d77351e98cb839608ff1c36dd992d07cdce12c4ed5",
+  "provider_requests": 2,
+  "rankable_h900": 0,
+  "raw_retention": {
+    "manifests": [
+      {
+        "bytes": 52318,
+        "capture_envelope_sha256": "a5412e12e5b3442dc5914458e8872b2651f970698fc16bb9fefc54bda6ed4ad2",
+        "envelope_path": "run=20260820T210026Z/DISCOVERY_RECENT.envelope.json",
+        "observation_id": "DISCOVERY:RECENT",
+        "observed_at": "2026-08-20T21:00:27Z",
+        "path": "run=20260820T210026Z/DISCOVERY_RECENT.body",
+        "retention": "A4_OUTSIDE_GIT",
+        "sha256": "67c70465d81d2f7f40e62426a8f0418a3022b4c11501caedf630a3ff291c63a6"
+      },
+      {
+        "bytes": 44330,
+        "capture_envelope_sha256": "63e355c342f9c570d1b7a23cff748c83b4161dff594345f5b513dc580aca5e61",
+        "envelope_path": "run=20260820T210026Z/DISCOVERY_SEARCH_T5.envelope.json",
+        "observation_id": "DISCOVERY:SEARCH_T5",
+        "observed_at": "2026-08-20T21:05:27Z",
+        "path": "run=20260820T210026Z/DISCOVERY_SEARCH_T5.body",
+        "retention": "A4_OUTSIDE_GIT",
+        "sha256": "17dd093d7193961cf47f8ffc424494bc4251f575296031ad865672ec1b58221e"
+      }
+    ],
+    "mode": "A4_OUTSIDE_GIT"
+  },
+  "receipt_id": "EVIDENCE-ORDINARY-RECENT-ORGANIC-PRESSURE-H900-AUDITION-001",
+  "retries": 0,
+  "schema": "smial.ordinary-recent-organic-pressure-h900-audition.runtime-receipt",
+  "schema_version": "1.0",
+  "score": {
+    "terminal": "INVALID_EVIDENCE_YIELD"
+  },
+  "terminal_outcome": "INVALID_EVIDENCE_YIELD"
+}

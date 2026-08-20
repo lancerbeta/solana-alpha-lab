@@ -1,0 +1,53 @@
+{
+  "schema": "smial.delivery-independent-review-evidence",
+  "schema_version": "1.0",
+  "review_id": "ORDINARY-RECENT-ORGANIC-PRESSURE-H900-AUDITION-INDEPENDENT-REVIEW-001",
+  "as_of": "2026-08-21",
+  "task_id": "ORDINARY_RECENT_ORGANIC_PRESSURE_H900_AUDITION_V1",
+  "reviewed_bindings_sha256": "75e9e23495849b98515064c8cd8f6d284df3bd8cdbe042ac5c19036804a37b8d",
+  "reviewed_inventory_sha256": "3ae9f6feace7afd00987aa28598a9c4b5b093399b1c3b53154abd2660d315da0",
+  "required_roles": [
+    "ARCHITECTURE_CRITIC",
+    "CODE_REVIEWER",
+    "GOAL_DOD_CRITIC"
+  ],
+  "reviews": [
+    {
+      "role": "ARCHITECTURE_CRITIC",
+      "verdict": "PASS",
+      "findings": [
+        "CHECKED_TYPED_INSUFFICIENT_YIELD_REPLAN",
+        "CHECKED_NO_QUOTE_CALL_AFTER_ELIGIBILITY_FLOOR",
+        "CHECKED_NO_ALPHA_OR_STRATEGY_PROMOTION"
+      ]
+    },
+    {
+      "role": "CODE_REVIEWER",
+      "verdict": "PASS",
+      "findings": [
+        "CHECKED_RUNTIME_RECEIPT_HASH_BINDING",
+        "CHECKED_CREDENTIAL_READ_ONCE_AFTER_PREFLIGHT",
+        "CHECKED_NO_RETRY_FALLBACK_EXECUTE_OR_TRANSACTION"
+      ]
+    },
+    {
+      "role": "GOAL_DOD_CRITIC",
+      "verdict": "PASS",
+      "findings": [
+        "CHECKED_24_CANDIDATE_FREEZE",
+        "CHECKED_2_OF_24_ELIGIBLE_IS_BELOW_18_FLOOR",
+        "CHECKED_UNKNOWN_OR_MISSING_NOT_ZERO",
+        "CHECKED_NEXT_IS_REPLAN_NOT_SUFFIX_ATOM"
+      ]
+    }
+  ],
+  "verdict": "PASS",
+  "non_claims": [
+    "NO_CRYPTOGRAPHIC_REVIEWER_IDENTITY",
+    "REVIEW_IS_NOT_SEMANTIC_DONE",
+    "NO_ALPHA_NETRETURN_OR_CASHFLOW",
+    "NO_EXECUTION_OR_QUOTE_OBSERVATION",
+    "NO_STRATEGY_OR_SHADOW",
+    "INVALID_EVIDENCE_REPLAN_REMAINS_OWNER_NEXT_DECISION"
+  ]
+}
