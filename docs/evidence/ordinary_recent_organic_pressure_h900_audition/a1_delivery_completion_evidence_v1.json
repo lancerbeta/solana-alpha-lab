@@ -11,7 +11,7 @@
   "cloud_bundle_smoke_required": false,
   "capability_radar_now": "NONE",
   "implementation_bindings": {
-    "catalog/assets/core.yaml": "f6b7987d4bf8dc52938eb8e9aa14c4779749906d55447e848713723bd6dca5cf",
+    "catalog/assets/core.yaml": "6151b59831eb4fc6f6bfe3bd2e8d526435025e04a1f0436c496c993f468faf57",
     "catalog/assets/lifecycle.yaml": "507612f94d4fdd0f55ac14307e6c753f9e121d24eceff1b5d14507c7191fb892",
     "catalog/catalog_manifest.yaml": "f192ebc30eb4fc07fa1da0799b0bdf098ffd170582253e1e7ddd90bcae2ceb5d",
     "catalog/generated/asset_edges.json": "77384d764ac2effcc589756fcd56c8759b9147b004c1d27798dd5b284ecd2be7",
@@ -23,7 +23,7 @@
     "docs/evidence/ordinary_recent_organic_pressure_h900_audition/a1_ordinary_recent_organic_pressure_h900_audition_acceptance_v1.json": "2693aadf71285ec1381f4fb8eec78fe33996e5612932f3ead30d5cd5b9dcadf6",
     "docs/evidence/ordinary_recent_organic_pressure_h900_audition/a1_ordinary_recent_organic_pressure_h900_audition_runtime_receipt_v1.json": "20cff315f225f405f2daca493acbc3ff66ef7910d718e769c2e22fdcf0dd4040",
     "docs/reports/ordinary_recent_organic_pressure_h900_audition/a1_owner_readout_v1.md": "54ada77b17f770a68706a36d880e8fa5433135340c29f564a7360a5bef412bf1",
-    "docs/tasks/ORDINARY_RECENT_ORGANIC_PRESSURE_H900_AUDITION_V1.md": "fb3d2518d961a9062d3f272586bf117e74e49a4c4a5147486207d6a7db44c268",
+    "docs/tasks/ORDINARY_RECENT_ORGANIC_PRESSURE_H900_AUDITION_V1.md": "a8f7c576b8cac64709c8df68759c0709aec4d407182ace87c86e216274a018ba",
     "scripts/run_ordinary_recent_organic_pressure_h900_audition.py": "dfeeb5dda4c3c26e9c7ab02255dd28e96334eaf3515e8595b72254f4fbedaf28",
     "src/solana_alpha_lab/ordinary_recent_organic_pressure_h900_audition.py": "81e723ab64bf4cd67814004a573845c746e6a13177dad87954fcc940a5ae4b72",
     "src/solana_alpha_lab/provider_route_capability_registry_v10.py": "3914f43593432a21101e52701dc3b6c3be22811cb635370b8c0520fac48a6e00",
@@ -47,14 +47,14 @@
   },
   "factory_fit": {
     "path": "docs/evidence/ordinary_recent_organic_pressure_h900_audition/a1_delivery_factory_fit_v1.json",
-    "sha256": "14684d74873a784491a455a8f71349b57098e1763b987d30d5bd9c030ddab6d2",
+    "sha256": "c27f6c953ea57e7fe5910ac4b773a46679ef0406f3552bb585aef2eb98aea41d",
     "verdict": "PASS"
   },
   "validation": {
     "targeted": "PASS_ORDINARY_RECENT_ORGANIC_PRESSURE_H900_AUDITION_TESTS",
     "independent_review": {
       "path": "docs/evidence/ordinary_recent_organic_pressure_h900_audition/a1_delivery_independent_review_v1.json",
-      "sha256": "916b0bcbb9d6d6c241fd9d917f0b1d51f876c38c6dc5bdece13bc407e8178376",
+      "sha256": "d7c62951bed25b85660ecb89ecea703739f1cab66ce776fbee1255e2d207cd0a",
       "verdict": "PASS"
     },
     "full_gate": "ENFORCED_BY_PROJECT_BOUND_VALIDATION",

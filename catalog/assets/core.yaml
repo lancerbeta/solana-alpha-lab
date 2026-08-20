@@ -28252,7 +28252,7 @@ records:
   as_of: '2026-08-20'
   truth_owner: ORDINARY_RECENT_ORGANIC_PRESSURE_H900_AUDITION_V1
   location: {kind: git_path, logical_uri: 'repo://docs/tasks/ORDINARY_RECENT_ORGANIC_PRESSURE_H900_AUDITION_V1.md', repository_path: docs/tasks/ORDINARY_RECENT_ORGANIC_PRESSURE_H900_AUDITION_V1.md}
-  integrity: {kind: sha256, sha256: fb3d2518d961a9062d3f272586bf117e74e49a4c4a5147486207d6a7db44c268}
+  integrity: {kind: sha256, sha256: a8f7c576b8cac64709c8df68759c0709aec4d407182ace87c86e216274a018ba}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: contains, target_asset_id: CONFIG-ORDINARY-RECENT-ORGANIC-PRESSURE-H900-AUDITION-001}
