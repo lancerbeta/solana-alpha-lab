@@ -10,6 +10,9 @@
   "runtime_receipt": "docs/evidence/ordinary_recent_organic_pressure_h900_audition/a1_ordinary_recent_organic_pressure_h900_audition_runtime_receipt_v1.json",
   "runtime_receipt_sha256": "20cff315f225f405f2daca493acbc3ff66ef7910d718e769c2e22fdcf0dd4040",
   "prior_mints_sha256": "9bb4ea567fad40ea34cd48d77351e98cb839608ff1c36dd992d07cdce12c4ed5",
+  "project_sources_disposition": {
+    "kind": "NO_CHANGE"
+  },
   "discovery": {
     "recent_terminal": "TOKEN_LIST_OBSERVED",
     "search_terminal": "TOKEN_LIST_OBSERVED",

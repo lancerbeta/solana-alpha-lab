@@ -28425,7 +28425,7 @@ records:
   as_of: '2026-08-21'
   truth_owner: ORDINARY_RECENT_ORGANIC_PRESSURE_H900_AUDITION_V1
   location: {kind: git_path, logical_uri: 'repo://docs/evidence/ordinary_recent_organic_pressure_h900_audition/a1_ordinary_recent_organic_pressure_h900_audition_acceptance_v1.json', repository_path: docs/evidence/ordinary_recent_organic_pressure_h900_audition/a1_ordinary_recent_organic_pressure_h900_audition_acceptance_v1.json}
-  integrity: {kind: sha256, sha256: ce11be8fd3cf85a79cb0b5c86cd9bbde0b2980590df82c65d6bc9a6097d0b792}
+  integrity: {kind: sha256, sha256: 2693aadf71285ec1381f4fb8eec78fe33996e5612932f3ead30d5cd5b9dcadf6}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations: [{relation_type: derived_from, target_asset_id: EVIDENCE-ORDINARY-RECENT-ORGANIC-PRESSURE-H900-AUDITION-001}]
   consumers: [FACTORY-001, GOAL-OWNER]
