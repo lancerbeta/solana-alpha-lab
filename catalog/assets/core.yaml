@@ -25277,7 +25277,7 @@ records:
   as_of: '2026-08-18'
   truth_owner: QUOTE_NATIVE_ADMISSIBLE_FRICTION_AUDITION_V1
   location: {kind: git_path, logical_uri: 'repo://src/solana_alpha_lab/quote_native_admissible_friction_audition.py', repository_path: src/solana_alpha_lab/quote_native_admissible_friction_audition.py}
-  integrity: {kind: sha256, sha256: 4edd39f384dbaefdd68adf1ef23e6e32fb234f40fc3090d3b9aa2683d7e45e32}
+  integrity: {kind: sha256, sha256: 2ffb60b1b40933ad4bdde44b6c621c6097759b11d497637c379fc333a51edc99}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: depends_on, target_asset_id: CONFIG-QUOTE-NATIVE-ADMISSIBLE-FRICTION-AUDITION-001}
@@ -25645,7 +25645,7 @@ records:
   as_of: '2026-08-19'
   truth_owner: FACTORY_V1_PRODUCT_KERNEL_LOCAL_VERTICAL_SLICE_V1
   location: {kind: git_path, logical_uri: 'repo://src/solana_alpha_lab/factory/capabilities.py', repository_path: src/solana_alpha_lab/factory/capabilities.py}
-  integrity: {kind: sha256, sha256: f700617061bc844d4f083d2352f04de7e7f8381a6fec556a804c9bf6984b96c3}
+  integrity: {kind: sha256, sha256: fc97dfdfcd41f76a7da260004bad9ebc3b9bf62321756bea777a272de36ef7aa}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: governed_by, target_asset_id: CTRL-FACTORY-V1-PRODUCT-KERNEL-001}
@@ -25664,7 +25664,7 @@ records:
   as_of: '2026-08-19'
   truth_owner: FACTORY_V1_PRODUCT_KERNEL_LOCAL_VERTICAL_SLICE_V1
   location: {kind: git_path, logical_uri: 'repo://src/solana_alpha_lab/factory/application.py', repository_path: src/solana_alpha_lab/factory/application.py}
-  integrity: {kind: sha256, sha256: 579bb14f69407501dad9faf04ff085f182fe091bbfacf5db9505c487283af423}
+  integrity: {kind: sha256, sha256: 82a08b513f12ffcb0b95a3343f2004e2faea2e374ecd3a27b3c9fd4e87cf5173}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: depends_on, target_asset_id: MODULE-FACTORY-V1-RUNNER-001}
@@ -25962,7 +25962,7 @@ records:
   as_of: '2026-08-19'
   truth_owner: FACTORY_V1_COMMISSIONING_HYPOTHESIS_V1
   location: {kind: git_path, logical_uri: 'repo://src/solana_alpha_lab/factory/capabilities.py', repository_path: src/solana_alpha_lab/factory/capabilities.py}
-  integrity: {kind: sha256, sha256: f700617061bc844d4f083d2352f04de7e7f8381a6fec556a804c9bf6984b96c3}
+  integrity: {kind: sha256, sha256: fc97dfdfcd41f76a7da260004bad9ebc3b9bf62321756bea777a272de36ef7aa}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: governed_by, target_asset_id: CTRL-FACTORY-V1-COMMISSIONING-HYPOTHESIS-001}
@@ -26317,7 +26317,7 @@ records:
   as_of: '2026-08-19'
   truth_owner: FACTORY_V1_OWNER_COCKPIT_LITE_V1
   location: {kind: git_path, logical_uri: 'repo://tests/test_factory_v1_owner_cockpit.py', repository_path: tests/test_factory_v1_owner_cockpit.py}
-  integrity: {kind: sha256, sha256: 8dc1d65fb457f9a1b64b1e6e55150e6a6896ce1739ef8fbaae71573458356a2e}
+  integrity: {kind: sha256, sha256: b69589fc08190abd8c1008d3aa235f95cca773a1df75e89df98d31d9ebe59c2e}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: depends_on, target_asset_id: MODULE-FACTORY-V1-COCKPIT-001}
@@ -26912,7 +26912,7 @@ records:
   as_of: '2026-08-19'
   truth_owner: QUOTE_SURFACE_RETENTION_FALSIFIER_V1
   location: {kind: git_path, logical_uri: 'repo://tests/test_quote_surface_retention_falsifier.py', repository_path: tests/test_quote_surface_retention_falsifier.py}
-  integrity: {kind: sha256, sha256: 84da1d9b8353470b5086b2b7d99391de39355934ffd07f6043add18465285f14}
+  integrity: {kind: sha256, sha256: 40bccff9775f4de87d2fe1437c38c712dc425c830823661a128e41bb8790805b}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: depends_on, target_asset_id: MODULE-FACTORY-V1-QUOTE-SURFACE-RETENTION-001}
@@ -27071,4 +27071,174 @@ records:
   consumers: [FACTORY-001, QUOTE-SURFACE-RETENTION-CLOCK-QUALIFY-001, GOAL-OWNER]
   evidence: []
   search_terms: [FACTORY_V1, QUOTE_SURFACE_RETENTION, CLOCK_QUALIFY, ENGINEERING_ONLY]
+  classification: {contains_secrets: false, contains_raw_data: false, sensitivity: INTERNAL_NON_SECRET}
+
+- asset_id: CTRL-QUOTE-SURFACE-RETENTION-CONFIRMATORY-001
+  record_version: '1.0'
+  asset_type: control_document
+  purpose: Exact DIRECT_CURSOR_DELIVERY contract for the quote-surface retention confirmatory 6+6.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-08-20'
+  truth_owner: QUOTE_SURFACE_RETENTION_CONFIRMATORY_V1
+  location: {kind: git_path, logical_uri: 'repo://docs/tasks/QUOTE_SURFACE_RETENTION_CONFIRMATORY_V1.md', repository_path: docs/tasks/QUOTE_SURFACE_RETENTION_CONFIRMATORY_V1.md}
+  integrity: {kind: sha256, sha256: 0d2c0d40544997be4936fc5121b33117c91dc342b48bce795d87ee190cccb981}
+  access: {mode: read_only, method: file, network_required: false, secrets_required: false}
+  relations:
+  - {relation_type: depends_on, target_asset_id: CTRL-QUOTE-SURFACE-RETENTION-FALSIFIER-001}
+  - {relation_type: depends_on, target_asset_id: CTRL-QUOTE-SURFACE-RETENTION-CLOCK-QUALIFY-001}
+  - {relation_type: depends_on, target_asset_id: EVIDENCE-QUOTE-SURFACE-RETENTION-FALSIFIER-RUNTIME-001}
+  - {relation_type: depends_on, target_asset_id: MODULE-FACTORY-V1-QUOTE-SURFACE-RETENTION-001}
+  - {relation_type: validated_by, target_asset_id: TEST-QUOTE-SURFACE-RETENTION-CONFIRMATORY-001}
+  consumers: [FACTORY-001, QUOTE-SURFACE-RETENTION-CONFIRMATORY-001, GOAL-OWNER]
+  evidence: []
+  search_terms: [FACTORY_V1, QUOTE_SURFACE_RETENTION, CONFIRMATORY, CONTRACT]
+  classification: {contains_secrets: false, contains_raw_data: false, sensitivity: INTERNAL_NON_SECRET}
+
+- asset_id: CONFIG-FACTORY-V1-QUOTE-SURFACE-RETENTION-CONFIRMATORY-001
+  record_version: '1.0'
+  asset_type: configuration
+  purpose: Machine-readable selector for the confirmatory quote-surface retention ExperimentSpec.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-08-20'
+  truth_owner: QUOTE_SURFACE_RETENTION_CONFIRMATORY_V1
+  location: {kind: git_path, logical_uri: 'repo://configs/factory_v1_quote_surface_retention_confirmatory_v1.yaml', repository_path: configs/factory_v1_quote_surface_retention_confirmatory_v1.yaml}
+  integrity: {kind: sha256, sha256: 2e9fbc58f99ed69f9873cc7dd7346b854eb0a631ba3f4932063db0189b3bbc8d}
+  access: {mode: read_only, method: file, network_required: false, secrets_required: false}
+  relations:
+  - {relation_type: governed_by, target_asset_id: CTRL-QUOTE-SURFACE-RETENTION-CONFIRMATORY-001}
+  - {relation_type: depends_on, target_asset_id: SCHEMA-FACTORY-V1-QUOTE-SURFACE-RETENTION-CONFIRMATORY-001}
+  consumers: [FACTORY-001, QUOTE-SURFACE-RETENTION-CONFIRMATORY-001, GOAL-OWNER]
+  evidence: []
+  search_terms: [FACTORY_V1, QUOTE_SURFACE_RETENTION, CONFIRMATORY, CONFIG]
+  classification: {contains_secrets: false, contains_raw_data: false, sensitivity: INTERNAL_NON_SECRET}
+
+- asset_id: SCHEMA-FACTORY-V1-QUOTE-SURFACE-RETENTION-CONFIRMATORY-001
+  record_version: '1.0'
+  asset_type: schema
+  purpose: JSON Schema for the Factory quote-surface retention confirmatory selector.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-08-20'
+  truth_owner: QUOTE_SURFACE_RETENTION_CONFIRMATORY_V1
+  location: {kind: git_path, logical_uri: 'repo://catalog/schemas/factory_v1_quote_surface_retention_confirmatory.schema.json', repository_path: catalog/schemas/factory_v1_quote_surface_retention_confirmatory.schema.json}
+  integrity: {kind: sha256, sha256: c9685c96951afd77bda7755ae1639a55e05665d94bcc6d033dedc4e96aafdc95}
+  access: {mode: read_only, method: file, network_required: false, secrets_required: false}
+  relations:
+  - {relation_type: governed_by, target_asset_id: CTRL-QUOTE-SURFACE-RETENTION-CONFIRMATORY-001}
+  consumers: [FACTORY-001, QUOTE-SURFACE-RETENTION-CONFIRMATORY-001, GOAL-OWNER]
+  evidence: []
+  search_terms: [FACTORY_V1, QUOTE_SURFACE_RETENTION, CONFIRMATORY, SCHEMA]
+  classification: {contains_secrets: false, contains_raw_data: false, sensitivity: INTERNAL_NON_SECRET}
+
+- asset_id: CONFIG-EXPERIMENT-SPEC-QUOTE-SURFACE-RETENTION-CONFIRMATORY-001
+  record_version: '1.0'
+  asset_type: configuration
+  purpose: ExperimentSpec for the quote-surface retention confirmatory live cycle.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-08-20'
+  truth_owner: QUOTE_SURFACE_RETENTION_CONFIRMATORY_V1
+  location: {kind: git_path, logical_uri: 'repo://configs/experiment_specs/quote_surface_retention_confirmatory_v1.yaml', repository_path: configs/experiment_specs/quote_surface_retention_confirmatory_v1.yaml}
+  integrity: {kind: sha256, sha256: 7f25df28373e10092a31c92384c959c08aa55064081ea63e62a9a57b419e575f}
+  access: {mode: read_only, method: file, network_required: false, secrets_required: false}
+  relations:
+  - {relation_type: governed_by, target_asset_id: CTRL-QUOTE-SURFACE-RETENTION-CONFIRMATORY-001}
+  - {relation_type: depends_on, target_asset_id: SCHEMA-EXPERIMENT-SPEC-001}
+  consumers: [FACTORY-001, QUOTE-SURFACE-RETENTION-CONFIRMATORY-001, GOAL-OWNER]
+  evidence: []
+  search_terms: [FACTORY_V1, QUOTE_SURFACE_RETENTION, CONFIRMATORY, EXPERIMENT_SPEC]
+  classification: {contains_secrets: false, contains_raw_data: false, sensitivity: INTERNAL_NON_SECRET}
+
+- asset_id: CONFIG-CAPTURE-POLICY-QUOTE-SURFACE-RETENTION-CONFIRMATORY-001
+  record_version: '1.0'
+  asset_type: configuration
+  purpose: WRAP of the Free-key 6+6 retention schedule excluding A1, MOVE 2, commissioning, ATOM 5, ATOM 6 and PR 156 mints.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-08-20'
+  truth_owner: QUOTE_SURFACE_RETENTION_CONFIRMATORY_V1
+  location: {kind: git_path, logical_uri: 'repo://configs/quote_native_quote_surface_retention_confirmatory_audition_v1.yaml', repository_path: configs/quote_native_quote_surface_retention_confirmatory_audition_v1.yaml}
+  integrity: {kind: sha256, sha256: 49f7391f3dd4d0bf32b14a73bd323ea9f738dd90cd5e2d12ab79a27420f8110f}
+  access: {mode: read_only, method: file, network_required: false, secrets_required: false}
+  relations:
+  - {relation_type: governed_by, target_asset_id: CTRL-QUOTE-SURFACE-RETENTION-CONFIRMATORY-001}
+  consumers: [FACTORY-001, QUOTE-SURFACE-RETENTION-CONFIRMATORY-001, GOAL-OWNER]
+  evidence: []
+  search_terms: [FACTORY_V1, QUOTE_SURFACE_RETENTION, CONFIRMATORY, CAPTURE_POLICY]
+  classification: {contains_secrets: false, contains_raw_data: false, sensitivity: INTERNAL_NON_SECRET}
+
+- asset_id: TEST-QUOTE-SURFACE-RETENTION-CONFIRMATORY-001
+  record_version: '1.0'
+  asset_type: script
+  purpose: Fail-closed tests for confirmatory phrase gating, PR 156 exclusion and overlay pin.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-08-20'
+  truth_owner: QUOTE_SURFACE_RETENTION_CONFIRMATORY_V1
+  location: {kind: git_path, logical_uri: 'repo://tests/test_quote_surface_retention_confirmatory.py', repository_path: tests/test_quote_surface_retention_confirmatory.py}
+  integrity: {kind: sha256, sha256: c1cee9f948689dee939f4dd45323297a6a744ad935c59a5803e5b488758fc1e2}
+  access: {mode: read_only, method: file, network_required: false, secrets_required: false}
+  relations:
+  - {relation_type: depends_on, target_asset_id: CONFIG-EXPERIMENT-SPEC-QUOTE-SURFACE-RETENTION-CONFIRMATORY-001}
+  - {relation_type: depends_on, target_asset_id: CONFIG-CAPTURE-POLICY-QUOTE-SURFACE-RETENTION-CONFIRMATORY-001}
+  - {relation_type: depends_on, target_asset_id: MODULE-FACTORY-V1-QUOTE-SURFACE-RETENTION-001}
+  consumers: [FACTORY-001, QUOTE-SURFACE-RETENTION-CONFIRMATORY-001, GOAL-OWNER]
+  evidence: []
+  search_terms: [FACTORY_V1, QUOTE_SURFACE_RETENTION, CONFIRMATORY, TEST]
+  classification: {contains_secrets: false, contains_raw_data: false, sensitivity: INTERNAL_NON_SECRET}
+
+- asset_id: EVIDENCE-QUOTE-SURFACE-RETENTION-CONFIRMATORY-RUNTIME-001
+  record_version: '1.0'
+  asset_type: evidence
+  purpose: Live Free-key runtime receipt for the quote-surface retention confirmatory 6+6.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-08-20'
+  truth_owner: QUOTE_SURFACE_RETENTION_CONFIRMATORY_V1
+  location: {kind: git_path, logical_uri: 'repo://docs/evidence/quote_surface_retention_confirmatory/c1_quote_surface_retention_confirmatory_runtime_receipt_v1.json', repository_path: docs/evidence/quote_surface_retention_confirmatory/c1_quote_surface_retention_confirmatory_runtime_receipt_v1.json}
+  integrity: {kind: sha256, sha256: 35c19fd8566db93d77a811ef255835243cbdac62c94023041c274d6a1ab4c6c5}
+  access: {mode: read_only, method: file, network_required: false, secrets_required: false}
+  relations:
+  - {relation_type: derived_from, target_asset_id: CTRL-QUOTE-SURFACE-RETENTION-CONFIRMATORY-001}
+  consumers: [FACTORY-001, QUOTE-SURFACE-RETENTION-CONFIRMATORY-001, GOAL-OWNER]
+  evidence: []
+  search_terms: [FACTORY_V1, QUOTE_SURFACE_RETENTION, CONFIRMATORY, RUNTIME]
+  classification: {contains_secrets: false, contains_raw_data: false, sensitivity: INTERNAL_NON_SECRET}
+
+- asset_id: EVIDENCE-QUOTE-SURFACE-RETENTION-CONFIRMATORY-ACCEPTANCE-001
+  record_version: '1.0'
+  asset_type: evidence
+  purpose: Acceptance packet recording CLOSE_EXACT_QUOTE_SURFACE_RETENTION_FAMILY without Atom 2.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-08-20'
+  truth_owner: QUOTE_SURFACE_RETENTION_CONFIRMATORY_V1
+  location: {kind: git_path, logical_uri: 'repo://docs/evidence/quote_surface_retention_confirmatory/c1_quote_surface_retention_confirmatory_acceptance_v1.json', repository_path: docs/evidence/quote_surface_retention_confirmatory/c1_quote_surface_retention_confirmatory_acceptance_v1.json}
+  integrity: {kind: sha256, sha256: a3042173201e93c84a79df6e81fbf9e954da63ace9b68b0a7451fa64513d0bce}
+  access: {mode: read_only, method: file, network_required: false, secrets_required: false}
+  relations:
+  - {relation_type: derived_from, target_asset_id: EVIDENCE-QUOTE-SURFACE-RETENTION-CONFIRMATORY-RUNTIME-001}
+  consumers: [FACTORY-001, QUOTE-SURFACE-RETENTION-CONFIRMATORY-001, GOAL-OWNER]
+  evidence: []
+  search_terms: [FACTORY_V1, QUOTE_SURFACE_RETENTION, CONFIRMATORY, ACCEPTANCE]
+  classification: {contains_secrets: false, contains_raw_data: false, sensitivity: INTERNAL_NON_SECRET}
+
+- asset_id: REPORT-QUOTE-SURFACE-RETENTION-CONFIRMATORY-001
+  record_version: '1.0'
+  asset_type: control_document
+  purpose: Russian owner readout of the quote-surface retention family-close confirmatory result.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-08-20'
+  truth_owner: QUOTE_SURFACE_RETENTION_CONFIRMATORY_V1
+  location: {kind: git_path, logical_uri: 'repo://docs/reports/quote_surface_retention_confirmatory/c1_owner_readout_v1.md', repository_path: docs/reports/quote_surface_retention_confirmatory/c1_owner_readout_v1.md}
+  integrity: {kind: sha256, sha256: dddbb6364fe59b2f3a51393923dac6d36577d326232bc25a009110a64799d9b7}
+  access: {mode: read_only, method: file, network_required: false, secrets_required: false}
+  relations:
+  - {relation_type: derived_from, target_asset_id: EVIDENCE-QUOTE-SURFACE-RETENTION-CONFIRMATORY-ACCEPTANCE-001}
+  consumers: [FACTORY-001, QUOTE-SURFACE-RETENTION-CONFIRMATORY-001, GOAL-OWNER]
+  evidence: []
+  search_terms: [FACTORY_V1, QUOTE_SURFACE_RETENTION, CONFIRMATORY, OWNER_READOUT]
   classification: {contains_secrets: false, contains_raw_data: false, sensitivity: INTERNAL_NON_SECRET}

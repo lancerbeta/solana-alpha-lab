@@ -55,6 +55,8 @@ FACTORY_COMMISSIONING_ATOM_ID = "FACTORY_V1_COMMISSIONING_HYPOTHESIS_V1"
 FRICTION_VETO_ATOM_ID = "FRESH_OOS_BASELINE_VS_FRICTION_VETO_V1"
 T0_FRICTION_SCREEN_ATOM_ID = "PRIOR_GIT_T0_FRICTION_SCREEN_V1"
 RETENTION_ATOM_ID = "QUOTE_SURFACE_RETENTION_FALSIFIER_V1"
+CONFIRMATORY_ATOM_ID = "QUOTE_SURFACE_RETENTION_CONFIRMATORY_V1"
+RETENTION_FAMILY_ATOM_IDS = frozenset({RETENTION_ATOM_ID, CONFIRMATORY_ATOM_ID})
 AUTHORITY_PHRASE = (
     "OK QUOTE_NATIVE_ADMISSIBLE_FRICTION_AUDITION_V1: one fresh Jupiter "
     "Free-key quote-native campaign; local process-environment key only; "
@@ -128,6 +130,23 @@ RETENTION_AUTHORITY_PHRASE = (
     "before credential read required for capture PASS; WRAP existing capture "
     "plus retention projector; not Atom 2; not alpha; not VPS; no post-hoc "
     "threshold search; no TRADED-only rescue."
+)
+CONFIRMATORY_AUTHORITY_PHRASE = (
+    "OK QUOTE_SURFACE_RETENTION_CONFIRMATORY_V1: one Jupiter Free-key "
+    "quote-surface retention confirmatory 6+6 after clock qualification; "
+    "local process-environment key only; Tokens V2 /recent and /toptraded/1h "
+    "plus quote-only /swap/v2/order; x-api-key header only; no .env; no key "
+    "in URL/log/receipt/Git; no taker, /build, /execute, wallet, signer, "
+    "transaction, paid plan, second provider, retry or fallback; cash cap $0; "
+    "call cap 62; global pace >=3s; 6 RECENT + 6 TRADED live outcome-blind "
+    "cohort excluding A1, MOVE 2, commissioning, ATOM 5 veto, ATOM 6 "
+    "t0-screen and PR 156 falsifier mints; frozen KEEP if RETENTION_DELTA >= 0 "
+    "and H900 routes exist; clock_valid from due_at/observed_at/terminal only; "
+    "H3600 exact sell of BUY_H900 outAmount; hash-bound row observed_at and "
+    "attempt reservation before credential read required for capture PASS; "
+    "WRAP existing capture plus retention projector; not recapture of PR 156; "
+    "not Atom 2; not alpha; not VPS; no post-hoc threshold search; no "
+    "TRADED-only rescue."
 )
 ENVELOPE_SCHEMA = "smial.quote-native-admissible-friction-audition.capture-envelope"
 RESERVATION_SCHEMA = "smial.quote-native-admissible-friction-audition.attempt-reservation"
@@ -326,9 +345,11 @@ def _validate_policy_shape(policy: Mapping[str, Any]) -> None:
         )
     elif atom_id == RETENTION_ATOM_ID:
         _require(owner_phrase == RETENTION_AUTHORITY_PHRASE, "AUTHORITY_PHRASE_DRIFT")
+    elif atom_id == CONFIRMATORY_ATOM_ID:
+        _require(owner_phrase == CONFIRMATORY_AUTHORITY_PHRASE, "AUTHORITY_PHRASE_DRIFT")
     else:
         _require(False, "ATOM_ID_DRIFT")
-    retention = atom_id == RETENTION_ATOM_ID
+    retention = atom_id in RETENTION_FAMILY_ATOM_IDS
     expected_call_cap = 62 if retention else CALL_CAP
     _require(authority.get("credential_name") == "JUPITER_API_KEY", "CREDENTIAL_NAME_DRIFT")
     _require(authority.get("credential_reads") == 1, "CREDENTIAL_READ_BUDGET_DRIFT")
