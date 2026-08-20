@@ -1,0 +1,34 @@
+schema: smial.ordinary-market-pit-primary-x-bind
+schema_version: '1.0'
+bind_id: ORDINARY-MARKET-PIT-PRIMARY-X-BIND-001
+as_of: '2026-08-20'
+hypothesis_version: HYP-ORDINARY-LIQUIDITY-COVERAGE-PIT-V1
+question: Does a higher liquidity-to-mcap snapshot at decision time associate with a better frozen-horizon executable quoted outcome, within RECENT and TOPTRADED separately?
+estimand: RankEffect(liquidity/mcap at Tokens V2 snapshot) vs frozen-horizon quoted return or typed route failure
+primary_x:
+  kind: LIQUIDITY_OVER_MCAP
+  numerator_field: liquidity
+  denominator_field: mcap
+  forbidden_substitutes: [fdv, usdPrice, circSupply, totalSupply]
+availability_class: FORWARD_SNAPSHOT_NOT_PIT_READY
+available_to_strategy_semantics: SNAPSHOT_AT_OBSERVED_AT_NOT_RETROSPECTIVE_PIT
+git_retained_cells:
+  path: docs/evidence/quote_native_evidence_channel_qualification/a1_quote_native_evidence_channel_qualification_runtime_receipt_v1.json
+  sha256: d10e0d74de9d175dfcf5e3fd2408e3736d0fa8b94f52d804a34dce590a89e56f
+  note: Qualification receipt is the live Tokens V2 cell shape. Recheck sha256 in tests; do not invent mcap.
+provider_routes:
+  - JUPITER-SOLANA-TOKENS-V2-RECENT-001
+  - JUPITER-SOLANA-TOKENS-V2-TOPTRADED-001
+registry: configs/provider_route_capability_registry_v9.yaml
+next_safe_action: OWNER_BOUNDED_JUPITER_CAPTURE_WITH_RAW_RETENTION
+product_terminal: GIT_RETAINED_CELLS_CANNOT_BIND_PRIMARY_X
+raw_retention_required_next: GIT_CANONICAL_TOKEN_LIST_ENVELOPE
+non_claims:
+  - NO_PIT_READY
+  - NO_LIVE_CAPTURE
+  - NO_ALPHA
+  - NO_FDV_AS_MCAP
+  - NO_QUOTE_AS_PREDICTOR
+  - NO_FACTORY_PYTHON
+evidence_budget:
+  provider_api_rpc_wss_calls: 0

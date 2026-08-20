@@ -1,0 +1,25 @@
+{
+  "acceptance_id": "ORDINARY-MARKET-PIT-PRIMARY-X-BIND-ACCEPTANCE-001",
+  "as_of": "2026-08-20",
+  "cloud_bundle_mode": "OWNER_MANAGED_OPTIONAL_EXPORT",
+  "next_safe_action": "OWNER_BOUNDED_JUPITER_CAPTURE_WITH_RAW_RETENTION",
+  "non_claims": [
+    "NO_PIT_READY",
+    "NO_LIVE_CAPTURE",
+    "NO_ALPHA",
+    "NO_FDV_AS_MCAP",
+    "NO_QUOTE_AS_PREDICTOR",
+    "NO_FACTORY_PYTHON",
+    "NO_VPS",
+    "NO_CANONICAL_DONE"
+  ],
+  "pit_ready": false,
+  "project_sources_disposition": {
+    "kind": "NO_CHANGE"
+  },
+  "promotable": false,
+  "schema": "smial.ordinary-market-pit-primary-x-bind-acceptance",
+  "schema_version": "1.0",
+  "task_id": "ORDINARY_MARKET_PIT_PRIMARY_X_BIND_V1",
+  "verdict": "GIT_RETAINED_CELLS_CANNOT_BIND_PRIMARY_X"
+}
