@@ -5,7 +5,7 @@
   "as_of": "2026-08-21",
   "task_id": "ORDINARY_RECENT_ORGANIC_PRESSURE_H900_AUDITION_V1",
   "reviewed_bindings_sha256": "d29bbc6f97c96fcc833bb4a864ff6e8fbaa64947f322349d17e7a10c7f26e9c3",
-  "reviewed_inventory_sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+  "reviewed_inventory_sha256": "5f2df903ade6cf908221ed8c439e6a5c38963cdea1e2e6b2539767c7ae2ccfc6",
   "mode": "FULL_REVIEW",
   "verdict": "PASS",
   "dimensions": {
