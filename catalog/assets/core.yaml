@@ -27398,7 +27398,7 @@ records:
   as_of: '2026-08-20'
   truth_owner: FACTORY_COMMON_MARKET_FEATURE_SURFACE_V1
   location: {kind: git_path, logical_uri: 'repo://docs/tasks/FACTORY_COMMON_MARKET_FEATURE_SURFACE_V1.md', repository_path: docs/tasks/FACTORY_COMMON_MARKET_FEATURE_SURFACE_V1.md}
-  integrity: {kind: sha256, sha256: 45ca3cffadcda4a290ea807e33ee20a6fecb7e46339b89d331c6274acc5ea12c}
+  integrity: {kind: sha256, sha256: 192b756735f7ed60da83f7475e7649c8ed0678e24c1d90c224a7406fa6499405}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: governed_by, target_asset_id: ARCH-INTENT-005}

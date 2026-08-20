@@ -87,6 +87,9 @@ context_requirements:
       - docs/evidence/task30/a24_raw_to_pit_admissibility_runtime_receipt_v1.json
       - docs/evidence/task30/a24_raw_to_pit_admissibility_acceptance_v1.json
       - docs/evidence/pmf_quote_slice/a1_pmf_quote_stay_overlay_acceptance_v1.json
+      - docs/evidence/factory_v1_common_market_feature_surface/a1_delivery_completion_evidence_v1.json
+      - docs/evidence/factory_v1_common_market_feature_surface/a1_delivery_independent_review_v1.json
+      - docs/evidence/factory_v1_common_market_feature_surface/a1_delivery_factory_fit_v1.json
     HISTORICAL_CONTEXT:
       - docs/evidence/pre_git/task01/hypothesis_data_coverage_matrix_v1.md
 ---
