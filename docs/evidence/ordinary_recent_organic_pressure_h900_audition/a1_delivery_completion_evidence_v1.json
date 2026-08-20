@@ -47,14 +47,14 @@
   },
   "factory_fit": {
     "path": "docs/evidence/ordinary_recent_organic_pressure_h900_audition/a1_delivery_factory_fit_v1.json",
-    "sha256": "c27f6c953ea57e7fe5910ac4b773a46679ef0406f3552bb585aef2eb98aea41d",
+    "sha256": "e0bb87347a8d568e972a8a688567aca141ad20385451418f6cf5e1bd3e0dbf2c",
     "verdict": "PASS"
   },
   "validation": {
     "targeted": "PASS_ORDINARY_RECENT_ORGANIC_PRESSURE_H900_AUDITION_TESTS",
     "independent_review": {
       "path": "docs/evidence/ordinary_recent_organic_pressure_h900_audition/a1_delivery_independent_review_v1.json",
-      "sha256": "d7c62951bed25b85660ecb89ecea703739f1cab66ce776fbee1255e2d207cd0a",
+      "sha256": "7e7155fe3697e67baf9374e75278094ad9c4ddfaa7ea94075c1d041c1dec7b43",
       "verdict": "PASS"
     },
     "full_gate": "ENFORCED_BY_PROJECT_BOUND_VALIDATION",

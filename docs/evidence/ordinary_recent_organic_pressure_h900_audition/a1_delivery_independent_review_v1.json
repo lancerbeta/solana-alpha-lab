@@ -5,7 +5,7 @@
   "as_of": "2026-08-21",
   "task_id": "ORDINARY_RECENT_ORGANIC_PRESSURE_H900_AUDITION_V1",
   "reviewed_bindings_sha256": "75e9e23495849b98515064c8cd8f6d284df3bd8cdbe042ac5c19036804a37b8d",
-  "reviewed_inventory_sha256": "075ef2018f0b1440dcbde06f924cd62df8dfb3d1eca295231561b6203b76f934",
+  "reviewed_inventory_sha256": "3ae9f6feace7afd00987aa28598a9c4b5b093399b1c3b53154abd2660d315da0",
   "required_roles": [
     "ARCHITECTURE_CRITIC",
     "CODE_REVIEWER",
