@@ -1,11 +1,78 @@
 {
   "acceptance_id": "ORDINARY-MARKET-PIT-PRIMARY-X-BIND-DELIVERY-COMPLETION-001",
+  "active_stop_conditions": [],
   "as_of": "2026-08-20",
-  "review_id": "ORDINARY-MARKET-PIT-PRIMARY-X-BIND-DELIVERY-COMPLETION-001",
-  "reviewed_bindings_sha256": "0000000000000000000000000000000000000000000000000000000000000000",
-  "reviewed_inventory_sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+  "base_main": "370819f7d1c3d339c3920fc722c83975185812e6",
+  "capability_radar_now": "NONE",
+  "cloud_bundle_mode": "OWNER_MANAGED_OPTIONAL_EXPORT",
+  "cloud_bundle_required_by_harness": false,
+  "cloud_bundle_smoke_required": false,
+  "factory_fit": {
+    "path": "docs/evidence/ordinary_market_pit_primary_x_bind/a1_delivery_factory_fit_v1.json",
+    "sha256": "9589bb954bffe8942a78e3eeed9627573fa5686bab2a725d64c9d62f4aeaefe0",
+    "verdict": "PASS"
+  },
+  "implementation_bindings": {
+    "catalog/assets/core.yaml": "703501a4f1a8234b4647cf23bc889c00a441467666551f565b4f63ae18b6198e",
+    "catalog/assets/lifecycle.yaml": "c246c9821b637af50ba4fab7ec5ac2b9f7ac86b24a31a90917c0cc1787523451",
+    "catalog/catalog_manifest.yaml": "295a4453793e5e8ebdac14468257fa3d32f24d3be12b578c0af921e6930960c7",
+    "catalog/generated/asset_edges.json": "0cfd7e10f59f58a81f4a7704ffc49e56f96f7936b5d18d698682addf4eb4c877",
+    "configs/ordinary_market_pit_primary_x_bind_v1.yaml": "d4ecd56b1398fc50ba38c29a45b2086582cd356220ec7fa77c223b3e89972955",
+    "docs/PROJECT_MAP.md": "2704ac79fdc1b46f8dc932d10f173192b27808b8b287d7c9cc10d65fffff1f1d",
+    "docs/evidence/ordinary_market_pit_primary_x_bind/a1_acceptance_v1.json": "a7291fb96f6e6c80e0eb35f335542e6bba6676e8a732e6e2cb399774ae5dbc39",
+    "docs/evidence/ordinary_market_pit_primary_x_bind/a1_runtime_receipt_v1.json": "b1c33683000f6837e2a6ec461e98c7f98eca793bd19403714e15376858730152",
+    "docs/reports/ordinary_market_pit_primary_x_bind/a1_owner_readout_v1.md": "ba1f47ca54116b0175a2a81a7b2009656688deeb82526d61c8acd671e11e0c33",
+    "docs/tasks/ORDINARY_MARKET_PIT_PRIMARY_X_BIND_V1.md": "d07d74de82b7a1960e5265849e0e1692d07d40b879bfba9ee03f829157a8d827",
+    "scripts/run_ordinary_market_pit_primary_x_bind.py": "e90c1baed090bbb3bcd0c18707ec5cc2a4ffa018d4fb366bfa942a4275f75432",
+    "src/solana_alpha_lab/ordinary_market_pit_primary_x.py": "315d076558423198b76b74ce8aaa2dfc9548a323a938eb67fbb8854b836dfda4",
+    "tests/test_ordinary_market_pit_primary_x_bind.py": "bc3b4357c573c548005fae267ed50a1d847a93b1e8578c44c13300ec11f91c33"
+  },
+  "non_claims": [
+    "NO_CANONICAL_DONE",
+    "NO_PIT_READY",
+    "NO_LIVE_CAPTURE",
+    "NO_ALPHA_PNL_OR_NETRETURN",
+    "NO_FDV_AS_MCAP",
+    "NO_FACTORY_PYTHON",
+    "NO_TASK28_UNFREEZE",
+    "NO_VPS",
+    "NO_QUOTE_AS_PREDICTOR",
+    "NO_FACTORY_V1_OPERATIONAL_READY"
+  ],
+  "owner_attention_triggers": {
+    "auth_or_access_recovery": false,
+    "external_material_action": false,
+    "material_owner_decision": false,
+    "unresolved_safety_or_truth_conflict": false,
+    "user_only_activation": false
+  },
+  "project_sources_disposition": {
+    "kind": "NO_CHANGE"
+  },
   "schema": "smial.delivery-completion-evidence",
   "schema_version": "1.0",
+  "side_effects": {
+    "cash_spend_usd_cents": 0,
+    "credential_reads": 0,
+    "fallbacks": 0,
+    "provider_requests": 0,
+    "retries": 0,
+    "wallet_signer_transaction_actions": 0
+  },
+  "state_change": "GIT_RETAINED_CELLS_CANNOT_BIND_PRIMARY_X",
   "task_id": "ORDINARY_MARKET_PIT_PRIMARY_X_BIND_V1",
-  "verdict": "PENDING_BIND"
+  "validation": {
+    "full_gate": "ENFORCED_BY_PROJECT_BOUND_VALIDATION",
+    "github_ci": "ENFORCED_LIVE_AT_GUARDED_MERGE",
+    "independent_review": {
+      "path": "docs/evidence/ordinary_market_pit_primary_x_bind/a1_delivery_independent_review_v1.json",
+      "sha256": "6367471c15232bbfe6d5c7af1eb63ea1aab29af5941e65fff2829d4cd99464e2",
+      "verdict": "PASS"
+    },
+    "project_checks": [
+      "PASS_CATALOG_VALIDATE",
+      "PASS_GENERATOR_CHECK"
+    ],
+    "targeted": "PASS_ORDINARY_MARKET_PIT_PRIMARY_X_BIND_TESTS"
+  }
 }

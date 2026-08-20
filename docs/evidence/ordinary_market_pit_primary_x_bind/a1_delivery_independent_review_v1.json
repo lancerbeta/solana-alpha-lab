@@ -1,11 +1,68 @@
 {
-  "acceptance_id": "ORDINARY-MARKET-PIT-PRIMARY-X-BIND-INDEPENDENT-REVIEW-001",
   "as_of": "2026-08-20",
+  "non_claims": [
+    "NO_CRYPTOGRAPHIC_REVIEWER_IDENTITY",
+    "REVIEW_IS_NOT_SEMANTIC_DONE",
+    "NO_LIVE_PIT_OR_EXECUTION_CLAIM",
+    "NO_ALPHA_PNL_OR_NETRETURN",
+    "NO_CANONICAL_DONE",
+    "NO_SINGLE_AGENT_REVIEW_FALLBACK",
+    "NO_PIT_READY",
+    "NO_FACTORY_V1_OPERATIONAL_READY"
+  ],
+  "required_roles": [
+    "ARCHITECTURE_CRITIC",
+    "CODE_REVIEWER",
+    "GOAL_DOD_CRITIC"
+  ],
   "review_id": "ORDINARY-MARKET-PIT-PRIMARY-X-BIND-INDEPENDENT-REVIEW-001",
-  "reviewed_bindings_sha256": "0000000000000000000000000000000000000000000000000000000000000000",
-  "reviewed_inventory_sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+  "reviewed_bindings_sha256": "fe481ebf40bb5c9fcf6f791d542cc5816872c21f6ca97ff54539f5fcba8906d9",
+  "reviewed_inventory_sha256": "01745426239f3b7abe409160870101d6947c2a6809d52d829b849127368ba6a8",
+  "reviews": [
+    {
+      "findings": [
+        "CHECKED_NO_FACTORY_PYTHON",
+        "CHECKED_RUNNER_SHA256",
+        "CHECKED_GIT_CELLS_CANNOT_BIND_MCAP",
+        "CHECKED_FDV_NOT_MCAP_SUBSTITUTE",
+        "CHECKED_UNKNOWN_NOT_ZERO",
+        "CHECKED_ZERO_PROVIDER_CALLS",
+        "CHECKED_NO_PIT_READY",
+        "CHECKED_NO_SECRETS"
+      ],
+      "role": "CODE_REVIEWER",
+      "verdict": "PASS"
+    },
+    {
+      "findings": [
+        "CHECKED_DECISION_DELTA",
+        "CHECKED_NAMED_CONSUMER",
+        "CHECKED_CHEAPEST_FALSIFIER",
+        "CHECKED_DOD",
+        "CHECKED_NOT_BUREAUCRACY",
+        "CHECKED_NON_CLAIMS",
+        "CHECKED_NO_PIT_READY_INFLATION"
+      ],
+      "role": "GOAL_DOD_CRITIC",
+      "verdict": "PASS"
+    },
+    {
+      "findings": [
+        "CHECKED_PROJECTOR_OWNERSHIP",
+        "CHECKED_NO_FACTORY_PYTHON_FORK",
+        "CHECKED_NO_FEATURE_STORE",
+        "CHECKED_QUOTE_NOT_PREDICTOR",
+        "CHECKED_AVAILABILITY_CLASS",
+        "CHECKED_FDV_NOT_MCAP",
+        "CHECKED_TASK28_FREEZE",
+        "CHECKED_BLAST_RADIUS"
+      ],
+      "role": "ARCHITECTURE_CRITIC",
+      "verdict": "PASS"
+    }
+  ],
   "schema": "smial.delivery-independent-review-evidence",
   "schema_version": "1.0",
   "task_id": "ORDINARY_MARKET_PIT_PRIMARY_X_BIND_V1",
-  "verdict": "PENDING_BIND"
+  "verdict": "PASS"
 }
