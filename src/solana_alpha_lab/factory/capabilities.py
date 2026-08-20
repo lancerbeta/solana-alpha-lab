@@ -11,6 +11,11 @@ from typing import Any, Callable
 
 import yaml
 
+from solana_alpha_lab.factory.market_feature_surface import (
+    CAP_OFFLINE_MARKET_FEATURE_RESOLVE,
+    FeatureSurfaceError,
+    resolve_feature_snapshot,
+)
 from solana_alpha_lab.factory.friction_veto import (
     apply_friction_veto_to_receipt,
     load_friction_veto_rule,
@@ -434,9 +439,60 @@ def capture_quote_native_free_key(
     }
 
 
+def resolve_market_feature_surface(
+    spec: Mapping[str, Any],
+    *,
+    root: Path,
+    authority_phrase: str | None = None,
+    capture_hooks: Mapping[str, Any] | None = None,
+) -> dict[str, Any]:
+    del authority_phrase, capture_hooks
+    coverage = resolve_data_requirements(spec, root=root)
+    if not coverage["sufficient"]:
+        return {
+            "status": "BLOCKED_DATA",
+            "blocker": "MISSING_OR_MISMATCHED_EVIDENCE",
+            "coverage": coverage,
+            "terminal": None,
+            "provider_api_rpc_wss_calls": 0,
+            "credential_reads": 0,
+        }
+    try:
+        snapshot = resolve_feature_snapshot(spec, root=root)
+    except FeatureSurfaceError as exc:
+        return {
+            "status": "FAILED",
+            "blocker": str(exc),
+            "coverage": coverage,
+            "terminal": None,
+            "provider_api_rpc_wss_calls": 0,
+            "credential_reads": 0,
+        }
+    return {
+        "status": "COMPLETE",
+        "blocker": "NONE",
+        "coverage": coverage,
+        "terminal": snapshot["terminal"],
+        "result": snapshot["terminal"],
+        "required_features": snapshot["features"],
+        "uncertainty": "TYPED_GAPS_NOT_ALPHA",
+        "robustness": "OFFLINE_GIT_RECEIPTS_ONLY",
+        "failure_modes": [
+            "NO_PIT_READY",
+            "NO_ALPHA",
+            "NO_FEATURE_STORE",
+            "TASK28_SKELETONS_UNCHANGED",
+        ],
+        "provider_api_rpc_wss_calls": 0,
+        "credential_reads": 0,
+        "snapshot": snapshot,
+    }
+
+
 CAPABILITY_ROUTER: dict[str, Callable[..., dict[str, Any]]] = {
     CAP_OFFLINE_CANONICAL_RECEIPT_REPLAY: replay_canonical_receipts,
     CAP_JUPITER_FREE_KEY_QUOTE_NATIVE_BOUNDED_CAPTURE: capture_quote_native_free_key,
+    CAP_OFFLINE_MARKET_FEATURE_RESOLVE: resolve_market_feature_surface,
 }
 
 
@@ -456,6 +512,8 @@ def execute_capability(
         raise CapabilityError("CAPABILITY_NOT_ALLOWLISTED")
     budget = int(spec["evidence_budget"]["provider_api_rpc_wss_calls"])
     if capability_id == CAP_OFFLINE_CANONICAL_RECEIPT_REPLAY and budget != 0:
+        raise CapabilityError("PROVIDER_BUDGET_NOT_ZERO")
+    if capability_id == CAP_OFFLINE_MARKET_FEATURE_RESOLVE and budget != 0:
         raise CapabilityError("PROVIDER_BUDGET_NOT_ZERO")
     if capability_id == CAP_JUPITER_FREE_KEY_QUOTE_NATIVE_BOUNDED_CAPTURE:
         if budget < 1 or budget > 62:

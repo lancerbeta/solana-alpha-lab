@@ -1,0 +1,176 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://smial.local/schemas/factory_v1_common_market_feature_surface.schema.json",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema",
+    "schema_version",
+    "contract_id",
+    "atom_id",
+    "as_of",
+    "mode",
+    "implementation",
+    "task28_skeletons",
+    "allowlisted_capability",
+    "method",
+    "fixtures",
+    "archetypes",
+    "features",
+    "authority"
+  ],
+  "properties": {
+    "schema": {"const": "smial.factory-v1-common-market-feature-surface"},
+    "schema_version": {"const": "1.0"},
+    "contract_id": {"const": "FACTORY-V1-COMMON-MARKET-FEATURE-SURFACE-001"},
+    "atom_id": {"const": "FACTORY_COMMON_MARKET_FEATURE_SURFACE_V1"},
+    "as_of": {"type": "string", "pattern": "^20[0-9]{2}-[0-9]{2}-[0-9]{2}$"},
+    "mode": {"const": "DIRECT_CURSOR_DELIVERY"},
+    "implementation": {"const": "WRAP_EXISTING_GIT_EVIDENCE_NO_FEATURE_STORE"},
+    "task28_skeletons": {"const": "UNCHANGED_EMPTY"},
+    "allowlisted_capability": {"const": "CAP-OFFLINE-MARKET-FEATURE-RESOLVE-001"},
+    "method": {"const": "resolve_market_feature_snapshot"},
+    "fixtures": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["a24_runtime", "a24_acceptance", "a1_runtime"],
+      "properties": {
+        "a24_runtime": {"$ref": "#/$defs/fixture"},
+        "a24_acceptance": {"$ref": "#/$defs/fixture"},
+        "a1_runtime": {"$ref": "#/$defs/fixture"}
+      }
+    },
+    "archetypes": {
+      "type": "array",
+      "minItems": 3,
+      "maxItems": 3,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["archetype_id", "title", "required_feature_ids"],
+        "properties": {
+          "archetype_id": {
+            "type": "string",
+            "pattern": "^ARCHETYPE-[A-Z0-9]+(?:-[A-Z0-9]+)+$"
+          },
+          "title": {"type": "string", "minLength": 8, "maxLength": 80},
+          "required_feature_ids": {
+            "type": "array",
+            "minItems": 3,
+            "uniqueItems": true,
+            "items": {"$ref": "#/$defs/feature_id"}
+          }
+        }
+      }
+    },
+    "features": {
+      "type": "array",
+      "minItems": 15,
+      "maxItems": 20,
+      "items": {"$ref": "#/$defs/feature"}
+    },
+    "authority": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "provider_calls",
+        "credentials",
+        "deployment",
+        "cash_spend",
+        "wallet_signer_transaction",
+        "ui_package_adoption"
+      ],
+      "properties": {
+        "provider_calls": {"const": false},
+        "credentials": {"const": false},
+        "deployment": {"const": false},
+        "cash_spend": {"const": false},
+        "wallet_signer_transaction": {"const": false},
+        "ui_package_adoption": {"const": false}
+      }
+    }
+  },
+  "$defs": {
+    "feature_id": {
+      "type": "string",
+      "pattern": "^FEAT-[A-Z0-9]+(?:-[A-Z0-9]+)+$"
+    },
+    "fixture": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["path", "sha256"],
+      "properties": {
+        "path": {"type": "string", "minLength": 16, "maxLength": 240},
+        "sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"}
+      }
+    },
+    "feature": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "feature_id",
+        "version",
+        "description",
+        "units",
+        "entity_scope",
+        "coverage_domain",
+        "availability_class",
+        "missingness",
+        "event_time_semantics",
+        "available_to_strategy_semantics",
+        "compute",
+        "consumers"
+      ],
+      "properties": {
+        "feature_id": {"$ref": "#/$defs/feature_id"},
+        "version": {"const": "1.0"},
+        "description": {"type": "string", "minLength": 12, "maxLength": 240},
+        "units": {"type": "string", "minLength": 1, "maxLength": 40},
+        "entity_scope": {
+          "enum": ["POOL_DAY", "MINT_CAPTURE", "CREATOR_WALLET", "CREATOR_CLUSTER"]
+        },
+        "coverage_domain": {
+          "enum": ["D01", "D05", "D06", "D07", "D08", "D09", "D11", "D12", "D13"]
+        },
+        "availability_class": {
+          "enum": [
+            "PIT_READY",
+            "HISTORICAL_RECONSTRUCTIBLE",
+            "FORWARD_ONLY",
+            "PARTIAL",
+            "MISSING",
+            "MISSING_CAPABILITY"
+          ]
+        },
+        "missingness": {"type": "string", "minLength": 8, "maxLength": 80},
+        "event_time_semantics": {"type": "string", "minLength": 8, "maxLength": 80},
+        "available_to_strategy_semantics": {
+          "type": "string",
+          "minLength": 8,
+          "maxLength": 80
+        },
+        "compute": {
+          "enum": [
+            "NONE",
+            "A24_TARGET_BUY_COUNT",
+            "A24_TARGET_SELL_COUNT",
+            "A24_BUY_SELL_COUNT_RATIO",
+            "A24_TARGET_TRADE_COUNT",
+            "A24_OBSERVED_TRADE_SLOTS",
+            "A24_UNKNOWN_COVERAGE_COUNT",
+            "A1_QUOTE_OBSERVED_SHARE"
+          ]
+        },
+        "consumers": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": {
+            "type": "string",
+            "pattern": "^ARCHETYPE-[A-Z0-9]+(?:-[A-Z0-9]+)+$"
+          }
+        }
+      }
+    }
+  }
+}

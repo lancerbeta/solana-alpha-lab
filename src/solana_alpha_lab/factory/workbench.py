@@ -75,6 +75,20 @@ def _rows(mapping: dict[str, Any]) -> str:
     )
 
 
+def _feature_rows(features: list[dict[str, Any]]) -> str:
+    if not features:
+        return "<tr><td>NONE</td></tr>"
+    return "".join(
+        "<tr><th>"
+        + html.escape(str(item.get("feature_id") or ""))
+        + "</th><td>"
+        + html.escape(str(item.get("display") or item.get("availability_class") or ""))
+        + "</td></tr>"
+        for item in features
+        if isinstance(item, dict)
+    )
+
+
 def _cell(value: Any) -> str:
     if isinstance(value, str):
         return value
@@ -129,6 +143,8 @@ def _page(
                     "hypothesis": model.get("hypothesis") or "",
                 }
             )
+            + "</table><h2>Required features</h2><table>"
+            + _feature_rows(list(model.get("required_features") or []))
             + "</table><h2>System health</h2><table>"
             + _rows(
                 {

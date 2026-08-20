@@ -8,10 +8,15 @@ from typing import Any, Mapping
 
 from solana_alpha_lab.factory.capabilities import (
     CAP_JUPITER_FREE_KEY_QUOTE_NATIVE_BOUNDED_CAPTURE,
+    CAP_OFFLINE_MARKET_FEATURE_RESOLVE,
     execute_capability,
     resolve_data_requirements,
 )
 from solana_alpha_lab.factory.experiment_spec import load_experiment_spec, requirement_map
+from solana_alpha_lab.factory.market_feature_surface import (
+    FeatureSurfaceError,
+    resolve_feature_snapshot,
+)
 from solana_alpha_lab.factory.operational_store import OperationalStore
 
 
@@ -99,6 +104,18 @@ def project_read_model(
     packet_decision = None
     if status == "COMPLETE":
         packet_decision = (acceptance or {}).get("owner_decision") or (acceptance or {}).get("terminal")
+    required_features: list[dict[str, Any]] = []
+    if spec.get("required_feature_ids") and CAP_OFFLINE_MARKET_FEATURE_RESOLVE in list(
+        spec.get("capabilities") or []
+    ):
+        stored_features = evidence.get("required_features")
+        if isinstance(stored_features, list) and stored_features:
+            required_features = [item for item in stored_features if isinstance(item, dict)]
+        else:
+            try:
+                required_features = resolve_feature_snapshot(spec, root=root)["features"]
+            except FeatureSurfaceError:
+                required_features = []
     return {
         "hypothesis": hypothesis_id,
         "hypothesis_status": hypothesis_status,
@@ -133,4 +150,5 @@ def project_read_model(
         "next_safe_action": next_action,
         "next": next_action,
         "git_archaeology_required": bool(missing),
+        "required_features": required_features,
     }

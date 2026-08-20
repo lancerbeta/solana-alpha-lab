@@ -1,0 +1,65 @@
+{
+  "schema": "smial.factory-v1-common-market-feature-surface.acceptance",
+  "schema_version": "1.0",
+  "acceptance_id": "EVIDENCE-FACTORY-V1-COMMON-MARKET-FEATURE-SURFACE-ACCEPTANCE-001",
+  "as_of": "2026-08-20",
+  "atom_id": "FACTORY_COMMON_MARKET_FEATURE_SURFACE_V1",
+  "terminal": "FEATURE_SURFACE_COMPOSITION_PASS",
+  "product_pass": true,
+  "scientific_alpha": false,
+  "pit_ready_count": 0,
+  "task28_skeletons": "UNCHANGED_EMPTY",
+  "runner_touched": false,
+  "source_runtime_receipt": "docs/evidence/factory_v1_common_market_feature_surface/a1_factory_v1_common_market_feature_surface_runtime_receipt_v1.json",
+  "source_runtime_receipt_sha256": "a53ccb9c831ed2ca0b66bdcdfed9d3597b65b885bc913bd52a2235929da8d91c",
+  "composition": {
+    "archetypes": 3,
+    "capability": "CAP-OFFLINE-MARKET-FEATURE-RESOLVE-001",
+    "provider_api_rpc_wss_calls": 0,
+    "credential_reads": 0
+  },
+  "computed_from_git": {
+    "FEAT-TARGET-TRADE-COUNT": 149,
+    "FEAT-BUY-SELL-COUNT-RATIO": 1.8113207547169812,
+    "FEAT-QUOTE-AVAILABILITY": 1.0
+  },
+  "typed_gaps": [
+    "FEAT-RETURN-15M",
+    "FEAT-PEAK-RETURN-SINCE-START",
+    "FEAT-DRAWDOWN-FROM-RUNNING-PEAK",
+    "FEAT-VOLUME-15M",
+    "FEAT-POOL-LIQUIDITY",
+    "FEAT-LIQUIDITY-RETENTION",
+    "FEAT-QUOTED-ROUND-TRIP-FRICTION",
+    "FEAT-ROUTE-STATUS"
+  ],
+  "not_available": [
+    "FEAT-AGE-SINCE-CREATION",
+    "FEAT-MCAP-TO-LIQUIDITY",
+    "FEAT-CREATOR-DIRECT-SHARE",
+    "FEAT-CREATOR-DIRECT-SELL-AMOUNT"
+  ],
+  "missing_capability": [
+    "FEAT-CREATOR-CLUSTER-SHARE"
+  ],
+  "owner_decision": "FEATURE_SURFACE_V1_COMPOSES_WITH_TYPED_GAPS",
+  "next_boundary": "MOVE 2 is a later exact contract: one ordinary hypothesis through this surface with Factory core change target 0.",
+  "limitations": [
+    "A24 96-slot panel is local-only; path/return/drawdown/volume stay UNKNOWN",
+    "No feature is PIT_READY",
+    "TASK-03/28 feature_catalog skeleton remains empty by freeze",
+    "Quote availability 1.0 is a historical A1 observation, not a KEEP screen"
+  ],
+  "non_claims": [
+    "NO_PIT_READY",
+    "NO_ALPHA",
+    "NO_NETRETURN",
+    "NO_FEATURE_STORE",
+    "NO_TASK28_UNFREEZE",
+    "NO_CREATOR_CLUSTER",
+    "NO_VPS",
+    "NO_PROVIDER",
+    "NO_FACTORY_V1_OPERATIONAL_READY",
+    "NO_ATOM_2"
+  ]
+}

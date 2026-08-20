@@ -1,0 +1,270 @@
+schema: smial.factory-v1-common-market-feature-surface
+schema_version: '1.0'
+contract_id: FACTORY-V1-COMMON-MARKET-FEATURE-SURFACE-001
+atom_id: FACTORY_COMMON_MARKET_FEATURE_SURFACE_V1
+as_of: '2026-08-20'
+mode: DIRECT_CURSOR_DELIVERY
+implementation: WRAP_EXISTING_GIT_EVIDENCE_NO_FEATURE_STORE
+task28_skeletons: UNCHANGED_EMPTY
+allowlisted_capability: CAP-OFFLINE-MARKET-FEATURE-RESOLVE-001
+method: resolve_market_feature_snapshot
+fixtures:
+  a24_runtime:
+    path: docs/evidence/task30/a24_raw_to_pit_admissibility_runtime_receipt_v1.json
+    sha256: 6b0f16d80ec72e46507755c09c79e434b6a8de0cf5f50d6f7e18e63fcdac75c4
+  a24_acceptance:
+    path: docs/evidence/task30/a24_raw_to_pit_admissibility_acceptance_v1.json
+    sha256: 257e81801afbfa3ba6bf64e8c25b41009e560bb168e9a01d92c606ca4bcdb183
+  a1_runtime:
+    path: docs/evidence/quote_native_admissible_friction_audition/a1_quote_native_admissible_friction_audition_runtime_receipt_v1.json
+    sha256: 75f60a155b7db6ddb8c801c9ff5060ce5e4e7fe641b836ff35edeb91534c308e
+archetypes:
+  - archetype_id: ARCHETYPE-PRICE-PATH
+    title: Price path / activity
+    required_feature_ids:
+      - FEAT-AGE-SINCE-CREATION
+      - FEAT-RETURN-15M
+      - FEAT-PEAK-RETURN-SINCE-START
+      - FEAT-DRAWDOWN-FROM-RUNNING-PEAK
+      - FEAT-VOLUME-15M
+      - FEAT-BUY-SELL-COUNT-RATIO
+      - FEAT-TARGET-TRADE-COUNT
+  - archetype_id: ARCHETYPE-LIQUIDITY-EXECUTION
+    title: Liquidity / quote observation
+    required_feature_ids:
+      - FEAT-POOL-LIQUIDITY
+      - FEAT-LIQUIDITY-RETENTION
+      - FEAT-MCAP-TO-LIQUIDITY
+      - FEAT-QUOTE-AVAILABILITY
+      - FEAT-QUOTED-ROUND-TRIP-FRICTION
+      - FEAT-ROUTE-STATUS
+  - archetype_id: ARCHETYPE-CREATOR-PRESSURE
+    title: Creator pressure
+    required_feature_ids:
+      - FEAT-CREATOR-DIRECT-SHARE
+      - FEAT-CREATOR-DIRECT-SELL-AMOUNT
+      - FEAT-CREATOR-CLUSTER-SHARE
+features:
+  - feature_id: FEAT-AGE-SINCE-CREATION
+    version: '1.0'
+    description: Seconds from mint creation to as-of. A24 Git receipt has no creation clock.
+    units: seconds
+    entity_scope: POOL_DAY
+    coverage_domain: D01
+    availability_class: MISSING
+    missingness: typed_not_available
+    event_time_semantics: creation_signature_absent
+    available_to_strategy_semantics: NOT_AVAILABLE
+    compute: NONE
+    consumers: [ARCHETYPE-PRICE-PATH]
+  - feature_id: FEAT-RETURN-15M
+    version: '1.0'
+    description: 15m close-to-close return. Reconstructible from the local A24 panel, not from the Git receipt.
+    units: fraction
+    entity_scope: POOL_DAY
+    coverage_domain: D07
+    availability_class: HISTORICAL_RECONSTRUCTIBLE
+    missingness: typed_unknown
+    event_time_semantics: on_chain_buy_sell_event_timestamp
+    available_to_strategy_semantics: RETROSPECTIVE_ONLY_NOT_PROSPECTIVE_PIT
+    compute: NONE
+    consumers: [ARCHETYPE-PRICE-PATH]
+  - feature_id: FEAT-PEAK-RETURN-SINCE-START
+    version: '1.0'
+    description: Peak return over the A24 day. Panel rows are local-only.
+    units: fraction
+    entity_scope: POOL_DAY
+    coverage_domain: D07
+    availability_class: HISTORICAL_RECONSTRUCTIBLE
+    missingness: typed_unknown
+    event_time_semantics: on_chain_buy_sell_event_timestamp
+    available_to_strategy_semantics: RETROSPECTIVE_ONLY_NOT_PROSPECTIVE_PIT
+    compute: NONE
+    consumers: [ARCHETYPE-PRICE-PATH]
+  - feature_id: FEAT-DRAWDOWN-FROM-RUNNING-PEAK
+    version: '1.0'
+    description: Drawdown from running peak. Panel rows are local-only.
+    units: fraction
+    entity_scope: POOL_DAY
+    coverage_domain: D07
+    availability_class: HISTORICAL_RECONSTRUCTIBLE
+    missingness: typed_unknown
+    event_time_semantics: on_chain_buy_sell_event_timestamp
+    available_to_strategy_semantics: RETROSPECTIVE_ONLY_NOT_PROSPECTIVE_PIT
+    compute: NONE
+    consumers: [ARCHETYPE-PRICE-PATH]
+  - feature_id: FEAT-VOLUME-15M
+    version: '1.0'
+    description: 15m traded base/quote volume. Not present on the A24 Git receipt.
+    units: token_units
+    entity_scope: POOL_DAY
+    coverage_domain: D06
+    availability_class: HISTORICAL_RECONSTRUCTIBLE
+    missingness: typed_unknown
+    event_time_semantics: on_chain_buy_sell_event_timestamp
+    available_to_strategy_semantics: RETROSPECTIVE_ONLY_NOT_PROSPECTIVE_PIT
+    compute: NONE
+    consumers: [ARCHETYPE-PRICE-PATH]
+  - feature_id: FEAT-BUY-SELL-COUNT-RATIO
+    version: '1.0'
+    description: A24 target buy count divided by target sell count from the Git runtime receipt.
+    units: ratio
+    entity_scope: POOL_DAY
+    coverage_domain: D06
+    availability_class: HISTORICAL_RECONSTRUCTIBLE
+    missingness: typed_unknown_if_no_sells
+    event_time_semantics: on_chain_buy_sell_event_timestamp
+    available_to_strategy_semantics: RETROSPECTIVE_ONLY_NOT_PROSPECTIVE_PIT
+    compute: A24_BUY_SELL_COUNT_RATIO
+    consumers: [ARCHETYPE-PRICE-PATH]
+  - feature_id: FEAT-TARGET-TRADE-COUNT
+    version: '1.0'
+    description: A24 target pool PumpSwap trade count from the Git runtime receipt.
+    units: count
+    entity_scope: POOL_DAY
+    coverage_domain: D06
+    availability_class: HISTORICAL_RECONSTRUCTIBLE
+    missingness: fail_closed_if_receipt_missing
+    event_time_semantics: on_chain_buy_sell_event_timestamp
+    available_to_strategy_semantics: RETROSPECTIVE_ONLY_NOT_PROSPECTIVE_PIT
+    compute: A24_TARGET_TRADE_COUNT
+    consumers: [ARCHETYPE-PRICE-PATH]
+  - feature_id: FEAT-OBSERVED-TRADE-SLOTS
+    version: '1.0'
+    description: A24 observed trade slot count from the Git runtime receipt.
+    units: count
+    entity_scope: POOL_DAY
+    coverage_domain: D06
+    availability_class: HISTORICAL_RECONSTRUCTIBLE
+    missingness: fail_closed_if_receipt_missing
+    event_time_semantics: slot_of_target_trades
+    available_to_strategy_semantics: RETROSPECTIVE_ONLY_NOT_PROSPECTIVE_PIT
+    compute: A24_OBSERVED_TRADE_SLOTS
+    consumers: [ARCHETYPE-PRICE-PATH]
+  - feature_id: FEAT-UNKNOWN-COVERAGE-COUNT
+    version: '1.0'
+    description: A24 UNKNOWN_COVERAGE slot count. Zero is observed, not filled missingness.
+    units: count
+    entity_scope: POOL_DAY
+    coverage_domain: D07
+    availability_class: HISTORICAL_RECONSTRUCTIBLE
+    missingness: observed_zero_allowed
+    event_time_semantics: slot_coverage_class
+    available_to_strategy_semantics: RETROSPECTIVE_ONLY_NOT_PROSPECTIVE_PIT
+    compute: A24_UNKNOWN_COVERAGE_COUNT
+    consumers: [ARCHETYPE-PRICE-PATH]
+  - feature_id: FEAT-POOL-LIQUIDITY
+    version: '1.0'
+    description: Pool reserves/liquidity. Not present on the A24 Git receipt.
+    units: quote_atomic
+    entity_scope: POOL_DAY
+    coverage_domain: D05
+    availability_class: HISTORICAL_RECONSTRUCTIBLE
+    missingness: typed_unknown
+    event_time_semantics: pool_state_slot
+    available_to_strategy_semantics: RETROSPECTIVE_ONLY_NOT_PROSPECTIVE_PIT
+    compute: NONE
+    consumers: [ARCHETYPE-LIQUIDITY-EXECUTION]
+  - feature_id: FEAT-LIQUIDITY-RETENTION
+    version: '1.0'
+    description: Liquidity retained across the A24 window. Requires panel/reserve path not in Git.
+    units: fraction
+    entity_scope: POOL_DAY
+    coverage_domain: D05
+    availability_class: HISTORICAL_RECONSTRUCTIBLE
+    missingness: typed_unknown
+    event_time_semantics: pool_state_slot
+    available_to_strategy_semantics: RETROSPECTIVE_ONLY_NOT_PROSPECTIVE_PIT
+    compute: NONE
+    consumers: [ARCHETYPE-LIQUIDITY-EXECUTION]
+  - feature_id: FEAT-MCAP-TO-LIQUIDITY
+    version: '1.0'
+    description: Implied mcap over liquidity. No valuation inputs in the pinned Git receipts.
+    units: ratio
+    entity_scope: POOL_DAY
+    coverage_domain: D05
+    availability_class: MISSING
+    missingness: typed_not_available
+    event_time_semantics: not_applicable
+    available_to_strategy_semantics: NOT_AVAILABLE
+    compute: NONE
+    consumers: [ARCHETYPE-LIQUIDITY-EXECUTION]
+  - feature_id: FEAT-QUOTE-AVAILABILITY
+    version: '1.0'
+    description: Share of A1 frozen cells with QUOTE_OBSERVED buy terminal. Forward-only observation, not PIT.
+    units: fraction
+    entity_scope: MINT_CAPTURE
+    coverage_domain: D08
+    availability_class: FORWARD_ONLY
+    missingness: fail_closed_if_receipt_missing
+    event_time_semantics: quote_request_response_time
+    available_to_strategy_semantics: HISTORICAL_CAPTURE_NOT_STRATEGY_AVAILABLE
+    compute: A1_QUOTE_OBSERVED_SHARE
+    consumers: [ARCHETYPE-LIQUIDITY-EXECUTION]
+  - feature_id: FEAT-QUOTED-ROUND-TRIP-FRICTION
+    version: '1.0'
+    description: Quoted round-trip friction as a reusable feature. Numeric KEEP overlay is not recomputed.
+    units: fraction
+    entity_scope: MINT_CAPTURE
+    coverage_domain: D08
+    availability_class: FORWARD_ONLY
+    missingness: typed_unknown
+    event_time_semantics: quote_request_response_time
+    available_to_strategy_semantics: HISTORICAL_CAPTURE_NOT_STRATEGY_AVAILABLE
+    compute: NONE
+    consumers: [ARCHETYPE-LIQUIDITY-EXECUTION]
+  - feature_id: FEAT-ROUTE-STATUS
+    version: '1.0'
+    description: Quote/route failure class as a reusable feature. No-route is not zero.
+    units: status
+    entity_scope: MINT_CAPTURE
+    coverage_domain: D09
+    availability_class: FORWARD_ONLY
+    missingness: typed_unknown
+    event_time_semantics: quote_request_response_time
+    available_to_strategy_semantics: HISTORICAL_CAPTURE_NOT_STRATEGY_AVAILABLE
+    compute: NONE
+    consumers: [ARCHETYPE-LIQUIDITY-EXECUTION]
+  - feature_id: FEAT-CREATOR-DIRECT-SHARE
+    version: '1.0'
+    description: Direct creator token share. No holder snapshot is pinned in Git.
+    units: fraction
+    entity_scope: CREATOR_WALLET
+    coverage_domain: D11
+    availability_class: MISSING
+    missingness: typed_not_available
+    event_time_semantics: holder_snapshot_absent
+    available_to_strategy_semantics: NOT_AVAILABLE
+    compute: NONE
+    consumers: [ARCHETYPE-CREATOR-PRESSURE]
+  - feature_id: FEAT-CREATOR-DIRECT-SELL-AMOUNT
+    version: '1.0'
+    description: Direct creator sell amount. Attribution is not in the pinned receipts.
+    units: token_units
+    entity_scope: CREATOR_WALLET
+    coverage_domain: D13
+    availability_class: MISSING
+    missingness: typed_not_available
+    event_time_semantics: creator_sell_event_absent
+    available_to_strategy_semantics: NOT_AVAILABLE
+    compute: NONE
+    consumers: [ARCHETYPE-CREATOR-PRESSURE]
+  - feature_id: FEAT-CREATOR-CLUSTER-SHARE
+    version: '1.0'
+    description: Inferred creator-cluster share. TASK-24 entity route stays a missing capability.
+    units: fraction
+    entity_scope: CREATOR_CLUSTER
+    coverage_domain: D12
+    availability_class: MISSING_CAPABILITY
+    missingness: typed_not_available
+    event_time_semantics: entity_inference_forbidden
+    available_to_strategy_semantics: NOT_AVAILABLE
+    compute: NONE
+    consumers: [ARCHETYPE-CREATOR-PRESSURE]
+authority:
+  provider_calls: false
+  credentials: false
+  deployment: false
+  cash_spend: false
+  wallet_signer_transaction: false
+  ui_package_adoption: false

@@ -1,0 +1,41 @@
+schema: smial.experiment-spec
+schema_version: '1.0'
+experiment_id: EXP-MARKET-FEATURE-PRICE-PATH-ARCHETYPE-001
+hypothesis_version: HYP-MARKET-FEATURE-PRICE-PATH-V1
+question: Can a price-path archetype declare reusable market features without a hypothesis-specific runner change?
+estimand: FeatureCoverage(price_path) from Git-canonical A24 counts, not prospective PIT return
+population: A24_LIMITED_DIAGNOSTIC_POOL_DAY_RETROSPECTIVE
+data_requirements:
+  - requirement_id: SURFACE_CONFIG
+    kind: CATALOG_ASSET
+    path: configs/factory_v1_common_market_feature_surface_v1.yaml
+    sha256: 8e51f6e565be137bb1863637121abf5cdf94c8603976eb4b0252371ba650cb39
+  - requirement_id: A24_RUNTIME
+    kind: GIT_CANONICAL_RECEIPT
+    path: docs/evidence/task30/a24_raw_to_pit_admissibility_runtime_receipt_v1.json
+    sha256: 6b0f16d80ec72e46507755c09c79e434b6a8de0cf5f50d6f7e18e63fcdac75c4
+  - requirement_id: A24_ACCEPTANCE
+    kind: GIT_CANONICAL_ACCEPTANCE
+    path: docs/evidence/task30/a24_raw_to_pit_admissibility_acceptance_v1.json
+    sha256: 257e81801afbfa3ba6bf64e8c25b41009e560bb168e9a01d92c606ca4bcdb183
+capabilities:
+  - CAP-OFFLINE-MARKET-FEATURE-RESOLVE-001
+required_feature_ids:
+  - FEAT-AGE-SINCE-CREATION
+  - FEAT-RETURN-15M
+  - FEAT-PEAK-RETURN-SINCE-START
+  - FEAT-DRAWDOWN-FROM-RUNNING-PEAK
+  - FEAT-VOLUME-15M
+  - FEAT-BUY-SELL-COUNT-RATIO
+  - FEAT-TARGET-TRADE-COUNT
+falsifier: Second archetype requires ExperimentRunner source changes or UNKNOWN path features become numeric zeros.
+method: resolve_market_feature_snapshot
+parameters:
+  archetype_id: ARCHETYPE-PRICE-PATH
+  next_safe_action: INSPECT_FEATURE_COVERAGE
+evidence_budget:
+  provider_api_rpc_wss_calls: 0
+holdout_policy: No holdout is opened; this atom composes coverage from already-accepted Git receipts.
+terminal_outcomes:
+  - FEATURE_SURFACE_COMPOSITION_PASS
+  - FEATURE_SURFACE_TYPED_GAPS_ONLY
