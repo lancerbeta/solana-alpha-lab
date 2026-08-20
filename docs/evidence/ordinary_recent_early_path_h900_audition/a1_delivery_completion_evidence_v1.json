@@ -1,0 +1,73 @@
+{
+  "schema": "smial.delivery-completion-evidence",
+  "schema_version": "1.0",
+  "acceptance_id": "ORDINARY-RECENT-EARLY-PATH-H900-AUDITION-DELIVERY-COMPLETION-001",
+  "as_of": "2026-08-21",
+  "task_id": "ORDINARY_RECENT_EARLY_PATH_H900_AUDITION_V1",
+  "state_change": "INVALID_EVIDENCE_REPLAN_TYPED_AFTER_FRESH_CAPTURE",
+  "base_main": "7fd43e5f4bdeba147a6927e4cb1b19a4b7baa827",
+  "cloud_bundle_mode": "OWNER_MANAGED_OPTIONAL_EXPORT",
+  "cloud_bundle_required_by_harness": false,
+  "cloud_bundle_smoke_required": false,
+  "capability_radar_now": "NONE",
+  "implementation_bindings": {
+    "catalog/assets/core.yaml": "4438af50d5f6eaccc232d845b3625c0c40840833329bf0f23b267369f268a94b",
+    "catalog/assets/lifecycle.yaml": "3a7a005f139ef884458f63547eac355648ea24f5505bce488b136d0f21865877",
+    "catalog/catalog_manifest.yaml": "8cf91849d6f06984b36c6a462380c1b439c616bf9994764c42207602ad5925aa",
+    "catalog/generated/asset_edges.json": "dbb4837fe9ef93f56a3dd241968edc457d16986dcec367826172fc3111ccbcc4",
+    "configs/ordinary_recent_early_path_h900_audition_v1.yaml": "e7e35cb950a468cda61027e5fea0d3c55903c471cdce6b5a735b48c94ce40c7f",
+    "docs/PROJECT_MAP.md": "f4238da1066c1c6cdbf1f76bd5a004c0a24202b4995d6611e89c60a4df9243d7",
+    "docs/tasks/ORDINARY_RECENT_EARLY_PATH_H900_AUDITION_V1.md": "51475b2058bb6409b9006491ed249ba20e1e1708233f393898a6aabeb2e55dd1",
+    "scripts/run_ordinary_recent_early_path_h900_audition.py": "cab610b2279e4f0eca07cf40c834905b19710d25e20868355f4814948e42ba4b",
+    "src/solana_alpha_lab/ordinary_recent_early_path_h900_audition.py": "7a31576f9d29d84230dde74ccdccebae96884a462e4f89d12afa48eb4dbfdbaa",
+    "src/solana_alpha_lab/ordinary_recent_organic_pressure_h900_audition.py": "dbf9af28e32ab450c1f98153f5ecabb0234d45b4963be731681c931c8b343916",
+    "tests/test_ordinary_recent_early_path_h900_audition.py": "e86f6364d21327a028ff80db1006d94be2878009b4fa1c45eb6bc9f9745b85bd",
+    "docs/evidence/ordinary_recent_early_path_h900_audition/a1_ordinary_recent_early_path_h900_audition_acceptance_v1.json": "039738b40a234d73160eddf6afd2168faebb1ed2c184d021a8e9513779bf9149",
+    "docs/evidence/ordinary_recent_early_path_h900_audition/a1_ordinary_recent_early_path_h900_audition_runtime_receipt_v1.json": "0acdc847eaf404bf61845cd471b17b91cf6255f24edc82363c2f10a74e7d786b",
+    "docs/reports/ordinary_recent_early_path_h900_audition/a1_owner_readout_v1.md": "8ac4c4e3a031252800d551cb015e415f873295d523cd6e78bd22c5ed28e66c7b"
+  },
+  "active_stop_conditions": [],
+  "owner_attention_triggers": {
+    "auth_or_access_recovery": false,
+    "material_owner_decision": false,
+    "user_only_activation": false,
+    "external_material_action": false,
+    "unresolved_safety_or_truth_conflict": false
+  },
+  "factory_fit": {
+    "path": "docs/evidence/ordinary_recent_early_path_h900_audition/a1_delivery_factory_fit_v1.json",
+    "sha256": "ef4647646908dfe14b7b18a5a62c5de5d7a9b291a2d9ad9239fb4bc782a42432",
+    "verdict": "PASS"
+  },
+  "validation": {
+    "targeted": "PASS_ORDINARY_RECENT_EARLY_PATH_H900_AUDITION_TESTS",
+    "independent_review": {
+      "path": "docs/evidence/ordinary_recent_early_path_h900_audition/a1_delivery_independent_review_v1.json",
+      "sha256": "4ee4f95c8c744ca7bb8593fdc77f57f99679200182118e972c51edb512c3be5e",
+      "verdict": "PASS"
+    },
+    "full_gate": "ENFORCED_BY_PROJECT_BOUND_VALIDATION",
+    "github_ci": "ENFORCED_LIVE_AT_GUARDED_MERGE",
+    "project_checks": [
+      "PASS_ORDINARY_RECENT_EARLY_PATH_H900_AUDITION_TESTS",
+      "PASS_CATALOG_VALIDATION",
+      "PASS_NAVIGATION_CHECK",
+      "PASS_SECRET_SCAN"
+    ]
+  },
+  "non_claims": [
+    "NO_EARN_FRESH_OOS",
+    "NO_CLOSE_EARLY_PATH_CANDIDATE",
+    "NO_ALPHA_NETRETURN_OR_CASHFLOW",
+    "NO_STRATEGY_BOT_SHADOW_H3600_OR_H4",
+    "NO_CANONICAL_DONE"
+  ],
+  "side_effects": {
+    "cash_spend_usd_cents": 0,
+    "credential_reads": 1,
+    "fallbacks": 0,
+    "provider_requests": 44,
+    "retries": 0,
+    "wallet_signer_transaction_actions": 0
+  }
+}

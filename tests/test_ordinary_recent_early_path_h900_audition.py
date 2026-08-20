@@ -213,6 +213,31 @@ class EarlyPathAuditionTests(unittest.TestCase):
         )
         self.assertEqual(result["terminal"], CLOSE_TERMINAL)
 
+    def test_score_selected_quartile_unknown_quote_is_invalid_evidence_yield(self) -> None:
+        rows = [
+            {
+                "mint": f"mint-{index:02d}",
+                "x": (index - 9) / 100.0,
+                "h900_terminal": "UNKNOWN_TYPED_FAILURE" if index == 17 else "QUOTE_OBSERVED",
+                "y": None if index == 17 else (index - 9) / 100.0,
+            }
+            for index in range(18)
+        ]
+        result = score_audition(
+            rows,
+            min_decision_time_eligible=18,
+            min_rankable_h900=14,
+            tau_floor=0.20,
+            leave_one_out_positive_share=0.75,
+            close_terminal=CLOSE_TERMINAL,
+        )
+        self.assertEqual(result["terminal"], "INVALID_EVIDENCE_YIELD")
+        self.assertTrue(result["selected_top_quartile_non_quote"])
+        self.assertFalse(result["selected_market_execution_unavailable"])
+        self.assertGreaterEqual(int(result["rankable_h900"]), 14)
+        self.assertNotEqual(result["terminal"], CLOSE_TERMINAL)
+        self.assertNotEqual(result["terminal"], "EARN_FRESH_OOS")
+
     def test_campaign_projects_recent_to_t5_mcap_and_skips_quotes_when_mcap_missing(self) -> None:
         policy = yaml.safe_load(CONFIG_PATH.read_text(encoding="utf-8"))
         recent = [_row(index, mcap=1000.0) for index in range(24)]

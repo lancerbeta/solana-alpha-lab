@@ -26,6 +26,12 @@ managed_write_set:
   - catalog/generated/asset_edges.json
   - docs/PROJECT_MAP.md
   - docs/OPERATOR_NAVIGATION.md
+  - docs/evidence/ordinary_recent_early_path_h900_audition/a1_ordinary_recent_early_path_h900_audition_runtime_receipt_v1.json
+  - docs/evidence/ordinary_recent_early_path_h900_audition/a1_ordinary_recent_early_path_h900_audition_acceptance_v1.json
+  - docs/evidence/ordinary_recent_early_path_h900_audition/a1_delivery_independent_review_v1.json
+  - docs/evidence/ordinary_recent_early_path_h900_audition/a1_delivery_factory_fit_v1.json
+  - docs/evidence/ordinary_recent_early_path_h900_audition/a1_delivery_completion_evidence_v1.json
+  - docs/reports/ordinary_recent_early_path_h900_audition/a1_owner_readout_v1.md
 external_caps:
   network: true
   credentials: true
