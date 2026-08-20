@@ -1,0 +1,93 @@
+{
+  "schema": "smial.measurement-qualification-receipt",
+  "schema_version": "1.0",
+  "as_of": "2026-08-20",
+  "atom_id": "QUOTE_SURFACE_RETENTION_CLOCK_QUALIFY_V1",
+  "evidence_class": "ENGINEERING_QUALIFICATION_ONLY",
+  "selection_eligible": false,
+  "confirmation_eligible": false,
+  "promotion_eligible": false,
+  "reusable_as_holdout": false,
+  "scientific_reclassification": false,
+  "provider_api_rpc_wss_calls": 0,
+  "consumed_runtime_receipt": "docs/evidence/quote_surface_retention_falsifier/a1_quote_surface_retention_falsifier_runtime_receipt_v1.json",
+  "consumed_runtime_sha256": "1ba86f85127e819fb9a520e1f6e947d0ea57c5c0834e622ad64f11acd207d02e",
+  "clock_counts": {
+    "recent_clock_valid_n": 5,
+    "traded_clock_valid_n": 6,
+    "clock_invalid_n": 0,
+    "clock_unknown_n": 1,
+    "unknown_identity_id": "RECENT_4"
+  },
+  "adversarial_vectors": [
+    "SAME_VALUE_DIFFERENT_VALID_CLOCK",
+    "DIFFERENT_VALUE_SAME_CLOCK",
+    "H3600_BEFORE_H900",
+    "H3600_OUTSIDE_WINDOW",
+    "OBSERVED_AT_MISSING",
+    "PROVIDER_400"
+  ],
+  "consumed_mints": [
+    {
+      "identity_id": "RECENT_1",
+      "stratum": "RECENT",
+      "mint": "pbvZYuBSihVuhuJNYmT6xVjU93p6Kxpe2am94RYpump"
+    },
+    {
+      "identity_id": "RECENT_2",
+      "stratum": "RECENT",
+      "mint": "8aoNgfWZXuAyscJqH8tRPacSMneyVqLR8YtwS7Lupump"
+    },
+    {
+      "identity_id": "RECENT_3",
+      "stratum": "RECENT",
+      "mint": "DEpHMHhfzWreGJ8Naar11vsesLuj2BGdoRnTJd5Spump"
+    },
+    {
+      "identity_id": "RECENT_4",
+      "stratum": "RECENT",
+      "mint": "FeZRvo1JgeJcnvL3MtSxNi62xm4AYDMLzyt6b7knpump"
+    },
+    {
+      "identity_id": "RECENT_5",
+      "stratum": "RECENT",
+      "mint": "AV7fTGieMLg4MuJYuRfoPH6oVWVGbvud76SCmiv4pump"
+    },
+    {
+      "identity_id": "RECENT_6",
+      "stratum": "RECENT",
+      "mint": "4syFtaxa5c83s9uWvvfQbkZX9ShTfCMzVG95DCLbpump"
+    },
+    {
+      "identity_id": "TRADED_1",
+      "stratum": "TRADED",
+      "mint": "6p6xgHyF7AeE6TZkSmFsko444wqoP15icUSqi2jfGiPN"
+    },
+    {
+      "identity_id": "TRADED_2",
+      "stratum": "TRADED",
+      "mint": "27G8MtK7VtTcCHkpASjSDdkWWYfoqT6ggEuKidVJidD4"
+    },
+    {
+      "identity_id": "TRADED_3",
+      "stratum": "TRADED",
+      "mint": "MRNAzXzhNcaEXJPibHEn8cd4vyekCDiivTyEwswLUCT"
+    },
+    {
+      "identity_id": "TRADED_4",
+      "stratum": "TRADED",
+      "mint": "3bLw2fp44SGrAp19XAtaLmutCksRDRDvjLyTbWD7iEqV"
+    },
+    {
+      "identity_id": "TRADED_5",
+      "stratum": "TRADED",
+      "mint": "AdmJtpwZXfkv1HMYG4GiRwu5dm2aJJp9JNZf6nGXpump"
+    },
+    {
+      "identity_id": "TRADED_6",
+      "stratum": "TRADED",
+      "mint": "SiLVFMgD3eD2rgK628NbTBq9MnuJF5FW2CRaVyTB35L"
+    }
+  ],
+  "next_boundary": "CONFIRMATORY_CAPTURE_REQUIRES_EXACT_OWNER_PHRASE_AFTER_THIS_PR"
+}

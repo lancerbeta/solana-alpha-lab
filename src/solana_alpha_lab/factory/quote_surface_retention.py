@@ -9,6 +9,12 @@ from typing import Any, Mapping
 
 import yaml
 
+from solana_alpha_lab.factory.quote_surface_retention_clock import (
+    CLOCK_VALID,
+    clock_metadata_from_observation,
+    evaluate_retention_cell_clock,
+)
+
 RULE_ID = "QUOTE_SURFACE_RETENTION_DELTA_NONNEGATIVE_V1"
 X_FIELD = "retention_delta"
 Y_FIELD = "forward_quoted_return_h900_h3600"
@@ -244,11 +250,19 @@ def score_retention_observations(
             y_path_risk = True
         elif isinstance(sell, Mapping) and str(sell.get("terminal") or "") not in {"SCHEDULED", "NOT_REACHED", ""}:
             y_status = "UNKNOWN"
-        reverse_out = _quote_out(reverse_h900) if h900_rev_ok else None
-        sell_out = _quote_out(sell) if isinstance(sell, Mapping) and sell.get("terminal") == QUOTE_OBSERVED else None
-        time_separated = (
-            y_status == "OBSERVED" and reverse_out is not None and sell_out is not None and reverse_out != sell_out
-        )
+        if (
+            isinstance(buy_h900, Mapping)
+            and isinstance(reverse_h900, Mapping)
+            and isinstance(sell, Mapping)
+        ):
+            clock_status = evaluate_retention_cell_clock(
+                clock_metadata_from_observation(buy_h900),
+                clock_metadata_from_observation(reverse_h900),
+                clock_metadata_from_observation(sell),
+            )
+        else:
+            clock_status = "UNKNOWN"
+        time_separated = clock_status == CLOCK_VALID
         cells.append(
             {
                 "identity_id": identity_id,
@@ -261,6 +275,7 @@ def score_retention_observations(
                 "y_status": y_status,
                 "y_path_risk": y_path_risk,
                 "forward_quoted_return_h900_h3600": str(y_value) if y_value is not None else None,
+                "clock_status": clock_status,
                 "time_separated": time_separated,
                 "h900_no_route": h900_no_route,
             }

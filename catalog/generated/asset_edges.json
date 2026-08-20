@@ -2393,6 +2393,26 @@
       "target_asset_id": "CONFIG-PROVIDER-ROUTE-CAPABILITY-REGISTRY-007"
     },
     {
+      "source_asset_id": "CTRL-QUOTE-SURFACE-RETENTION-CLOCK-QUALIFY-001",
+      "relation": "depends_on",
+      "target_asset_id": "CTRL-QUOTE-SURFACE-RETENTION-FALSIFIER-001"
+    },
+    {
+      "source_asset_id": "CTRL-QUOTE-SURFACE-RETENTION-CLOCK-QUALIFY-001",
+      "relation": "depends_on",
+      "target_asset_id": "EVIDENCE-QUOTE-SURFACE-RETENTION-FALSIFIER-RUNTIME-001"
+    },
+    {
+      "source_asset_id": "CTRL-QUOTE-SURFACE-RETENTION-CLOCK-QUALIFY-001",
+      "relation": "depends_on",
+      "target_asset_id": "MODULE-FACTORY-V1-QUOTE-SURFACE-RETENTION-001"
+    },
+    {
+      "source_asset_id": "CTRL-QUOTE-SURFACE-RETENTION-CLOCK-QUALIFY-001",
+      "relation": "validated_by",
+      "target_asset_id": "TEST-QUOTE-SURFACE-RETENTION-CLOCK-QUALIFY-001"
+    },
+    {
       "source_asset_id": "CTRL-QUOTE-SURFACE-RETENTION-FALSIFIER-001",
       "relation": "depends_on",
       "target_asset_id": "ARCH-INTENT-005"
@@ -3641,6 +3661,16 @@
       "source_asset_id": "EVIDENCE-QUOTE-NATIVE-QUOTED-BUY-H900-CLOCK-ACCEPTANCE-001",
       "relation": "derived_from",
       "target_asset_id": "EVIDENCE-QUOTE-NATIVE-QUOTED-BUY-H900-CLOCK-001"
+    },
+    {
+      "source_asset_id": "EVIDENCE-QUOTE-SURFACE-RETENTION-CLOCK-QUALIFY-001",
+      "relation": "derived_from",
+      "target_asset_id": "EVIDENCE-QUOTE-SURFACE-RETENTION-FALSIFIER-RUNTIME-001"
+    },
+    {
+      "source_asset_id": "EVIDENCE-QUOTE-SURFACE-RETENTION-CLOCK-QUALIFY-001",
+      "relation": "governed_by",
+      "target_asset_id": "CTRL-QUOTE-SURFACE-RETENTION-CLOCK-QUALIFY-001"
     },
     {
       "source_asset_id": "EVIDENCE-QUOTE-SURFACE-RETENTION-FALSIFIER-ACCEPTANCE-001",
@@ -6968,6 +6998,11 @@
       "target_asset_id": "TEST-T05-MIGRATIONS-001"
     },
     {
+      "source_asset_id": "MODULE-DELIVERY-TRACKED-HASH-001",
+      "relation": "governed_by",
+      "target_asset_id": "CTRL-QUOTE-SURFACE-RETENTION-CLOCK-QUALIFY-001"
+    },
+    {
       "source_asset_id": "MODULE-FACTORY-V1-APPLICATION-001",
       "relation": "depends_on",
       "target_asset_id": "MODULE-FACTORY-V1-COCKPIT-001"
@@ -7266,6 +7301,11 @@
       "source_asset_id": "MODULE-QUOTE-NATIVE-QUOTED-BUY-H900-CLOCK-001",
       "relation": "depends_on",
       "target_asset_id": "MODULE-QUOTE-NATIVE-EVIDENCE-FIT-PANEL-001"
+    },
+    {
+      "source_asset_id": "MODULE-QUOTE-SURFACE-RETENTION-CLOCK-001",
+      "relation": "governed_by",
+      "target_asset_id": "CTRL-QUOTE-SURFACE-RETENTION-CLOCK-QUALIFY-001"
     },
     {
       "source_asset_id": "MODULE-RC001-H13-PARK-FROM-PRIORITY-001",
@@ -10796,6 +10836,21 @@
       "source_asset_id": "TEST-QUOTE-NATIVE-QUOTED-BUY-H900-CLOCK-001",
       "relation": "depends_on",
       "target_asset_id": "MODULE-QUOTE-NATIVE-QUOTED-BUY-H900-CLOCK-001"
+    },
+    {
+      "source_asset_id": "TEST-QUOTE-SURFACE-RETENTION-CLOCK-QUALIFY-001",
+      "relation": "depends_on",
+      "target_asset_id": "MODULE-DELIVERY-TRACKED-HASH-001"
+    },
+    {
+      "source_asset_id": "TEST-QUOTE-SURFACE-RETENTION-CLOCK-QUALIFY-001",
+      "relation": "depends_on",
+      "target_asset_id": "MODULE-FACTORY-V1-QUOTE-SURFACE-RETENTION-001"
+    },
+    {
+      "source_asset_id": "TEST-QUOTE-SURFACE-RETENTION-CLOCK-QUALIFY-001",
+      "relation": "depends_on",
+      "target_asset_id": "MODULE-QUOTE-SURFACE-RETENTION-CLOCK-001"
     },
     {
       "source_asset_id": "TEST-QUOTE-SURFACE-RETENTION-FALSIFIER-001",

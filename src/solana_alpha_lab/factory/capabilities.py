@@ -16,6 +16,9 @@ from solana_alpha_lab.factory.friction_veto import (
     load_friction_veto_rule,
 )
 from solana_alpha_lab.factory.quote_surface_retention import (
+    INCONCLUSIVE_TERMINAL,
+    PASS_TERMINAL,
+    FAIL_TERMINAL,
     apply_quote_surface_retention_to_receipt,
     load_quote_surface_retention_rule,
 )
@@ -225,6 +228,9 @@ def _overlay_veto_receipt(
         rule = load_t0_friction_screen_rule(root, str(rule_item["path"]))
         return apply_t0_friction_screen_to_receipt(receipt, rule=rule)
     if atom_id == RETENTION_ATOM_ID:
+        existing = str(receipt.get("terminal_outcome") or receipt.get("terminal") or "")
+        if existing in {INCONCLUSIVE_TERMINAL, PASS_TERMINAL, FAIL_TERMINAL}:
+            return dict(receipt)
         rule_item = requirements.get("RETENTION_RULE")
         if rule_item is None:
             raise CapabilityError("RETENTION_RULE_MISSING")
