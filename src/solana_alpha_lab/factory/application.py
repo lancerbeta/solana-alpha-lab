@@ -22,6 +22,7 @@ COMMISSIONING_CONFIG_RELATIVE = "configs/factory_v1_commissioning_v1.yaml"
 FRICTION_VETO_CONFIG_RELATIVE = "configs/factory_v1_friction_veto_v1.yaml"
 T0_FRICTION_SCREEN_CONFIG_RELATIVE = "configs/factory_v1_prior_git_t0_friction_screen_v1.yaml"
 RETENTION_CONFIG_RELATIVE = "configs/factory_v1_quote_surface_retention_falsifier_v1.yaml"
+CONFIRMATORY_CONFIG_RELATIVE = "configs/factory_v1_quote_surface_retention_confirmatory_v1.yaml"
 RUNTIME_CONFIG_RELATIVE = "configs/factory_v1_production_lite_runtime_v1.yaml"
 GOLDEN_SPEC_RELATIVE = (
     "configs/experiment_specs/quote_native_admissible_friction_audition_offline_v1.yaml"
@@ -44,6 +45,10 @@ def kernel_config(root: Path) -> dict[str, Any]:
 
 
 def commissioning_spec_relative(root: Path) -> str:
+    confirmatory_path = root / CONFIRMATORY_CONFIG_RELATIVE
+    if confirmatory_path.is_file():
+        loaded = _load_yaml(root, CONFIRMATORY_CONFIG_RELATIVE)
+        return str(loaded["experiment_spec_relative"])
     retention_path = root / RETENTION_CONFIG_RELATIVE
     if retention_path.is_file():
         loaded = _load_yaml(root, RETENTION_CONFIG_RELATIVE)

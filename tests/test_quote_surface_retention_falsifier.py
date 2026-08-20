@@ -392,14 +392,8 @@ class QuoteSurfaceRetentionFalsifierTests(unittest.TestCase):
         )
         self.assertEqual([row["id"] for row in kept], ["fresh-mint-not-in-prior-receipts"])
 
-    def test_application_default_spec_is_the_retention_falsifier(self) -> None:
+    def test_application_default_spec_is_the_retention_falsifier_when_confirmatory_absent(self) -> None:
         with tempfile.TemporaryDirectory() as tmp:
-            store = OperationalStore(Path(tmp) / "ops.sqlite")
-            try:
-                app = FactoryApplication(root=ROOT, store=store)
-                self.assertEqual(app.spec_relative, SPEC_RELATIVE)
-            finally:
-                store.close()
             root = isolated_retention_root(Path(tmp) / "src")
             store = OperationalStore(Path(tmp) / "ops-isolated.sqlite")
             try:

@@ -1,0 +1,151 @@
+{
+  "acceptance_id": "EVIDENCE-QUOTE-SURFACE-RETENTION-CONFIRMATORY-ACCEPTANCE-001",
+  "as_of": "2026-08-20",
+  "atom_2": false,
+  "atom_id": "QUOTE_SURFACE_RETENTION_CONFIRMATORY_V1",
+  "capture": {
+    "accepted": true,
+    "attempt_reservation_before_credential_read": true,
+    "blockers": [],
+    "consumed_count": 62,
+    "hash_bound_row_observed_at": true,
+    "searchable_y_kind": "SELL_H3600_FROM_BUY_H900",
+    "wrap_capture_searchable_y_kind_field": "SELL_H900"
+  },
+  "capture_contract": "VALID_CAPTURE_CONTRACT",
+  "cohort": {
+    "excluded_prior_mint_count": 72,
+    "frozen_cell_count": 12,
+    "prior_mint_reused": false,
+    "recent_cell_count": 6,
+    "sample_class": "LIVE_OUTCOME_BLIND_TOKENS_V2_FREE_KEY_EXCLUDING_A1_MOVE2_COMMISSIONING_ATOM5_ATOM6_PR156",
+    "traded_cell_count": 6
+  },
+  "criteria": {
+    "h3600_role": "SEARCHABLE_FORWARD_QUOTED_RETURN_FROM_BUY_H900",
+    "min_complete_decision_outcome_per_stratum": 4,
+    "provider_typed_failure_cells": 1,
+    "reason": "NO_MEDIAN_OR_TAIL_UPLIFT",
+    "recent_keep_n": 2,
+    "recent_time_separated_n": 5,
+    "recent_valid_n": 5,
+    "recent_veto_n": 3,
+    "success_passed": false,
+    "traded_keep_n": 4,
+    "traded_time_separated_n": 6,
+    "traded_valid_n": 6,
+    "traded_veto_n": 2
+  },
+  "factory_v1_operational_ready": false,
+  "family_close": true,
+  "hypothesis_specific_core_runner_change": false,
+  "limitations": [
+    "SCREENING_HINT_NOT_OOS_CONFIRMATION",
+    "WRAP_RUNTIME_FAMILY_CLOSE_FIELD_IS_FRICTION_HELPER_NOT_RETENTION",
+    "WRAP_CAPTURE_DICT_STILL_LABELS_SEARCHABLE_Y_SELL_H900",
+    "NO_TRADED_ONLY_RESCUE",
+    "NO_POST_HOC_THRESHOLD_SEARCH",
+    "NO_AUTOMATIC_RECAPTURE",
+    "NO_FACTORY_V1_OPERATIONAL_READY",
+    "NO_ATOM_2"
+  ],
+  "next_boundary": "CLOSE_EXACT_QUOTE_SURFACE_RETENTION_FAMILY_NO_ATOM_2",
+  "non_claims": [
+    "NO_EXECUTE",
+    "NO_TAKER_OR_SIGNER",
+    "NO_TRANSACTION_BYTES_IN_GIT",
+    "NO_ALPHA",
+    "NO_NETRETURN",
+    "NO_ATOM_2",
+    "NO_A1_REPLAY_AS_NEW_RESULT",
+    "NO_MOVE_2_AS_NEW_RESULT",
+    "NO_COMMISSIONING_REPLAY_AS_NEW_RESULT",
+    "NO_ATOM5_REPLAY_AS_NEW_RESULT",
+    "NO_ATOM6_REPLAY_AS_NEW_RESULT",
+    "NO_PR156_REPLAY_AS_NEW_RESULT",
+    "NO_PAID_PLAN",
+    "NO_SECOND_PROVIDER",
+    "NO_VPS",
+    "NO_POST_HOC_THRESHOLD_SEARCH",
+    "NO_TRADED_ONLY_RESCUE"
+  ],
+  "owner_decision": "CLOSE_EXACT_QUOTE_SURFACE_RETENTION_FAMILY",
+  "owner_visible": {
+    "data": true,
+    "decision": true,
+    "estimand": true,
+    "failure": true,
+    "git_archaeology_required": false,
+    "next": true,
+    "population": true,
+    "question": true,
+    "result": true,
+    "robustness": true,
+    "uncertainty": true
+  },
+  "product_terminal": "CLOSE_EXACT_QUOTE_SURFACE_RETENTION_FAMILY",
+  "project_sources_disposition": {
+    "kind": "NO_CHANGE"
+  },
+  "provider_observations": {
+    "all_http_status_counts": {
+      "200": 59,
+      "400": 3
+    },
+    "credential_reads": 1,
+    "fallbacks": 0,
+    "provider_requests": 62,
+    "retries": 0,
+    "swap_http_status_counts": {
+      "200": 57,
+      "400": 3
+    },
+    "token_http_status_counts": {
+      "200": 2
+    }
+  },
+  "registry": {
+    "path": "configs/provider_route_capability_registry_v9.yaml",
+    "route_ids": [
+      "JUPITER-SOLANA-TOKENS-V2-RECENT-FREE-API-KEY-001",
+      "JUPITER-SOLANA-TOKENS-V2-TOPTRADED-FREE-API-KEY-001",
+      "JUPITER-SOLANA-SWAP-V2-ORDER-FREE-API-KEY-001"
+    ],
+    "sha256": "dc5cdd4c78a8a907f4bb6de16629c4ee2ef7535c437b33ae9bd8b18eb1847aa1"
+  },
+  "retention": {
+    "baseline_n": 11,
+    "kept_n": 6,
+    "kept_strata": [
+      "RECENT",
+      "TRADED"
+    ],
+    "median_y_baseline": "-0.0272693",
+    "median_y_kept": "-0.0272814",
+    "p90_y_baseline": "0.7529128",
+    "p90_y_kept": "0.4983044",
+    "reason": "NO_MEDIAN_OR_TAIL_UPLIFT",
+    "recent_valid_n": 5,
+    "rule_id": "QUOTE_SURFACE_RETENTION_DELTA_NONNEGATIVE_V1",
+    "same_direction": true,
+    "stratum_unstable": false,
+    "terminal": "CLOSE_EXACT_QUOTE_SURFACE_RETENTION_FAMILY",
+    "traded_valid_n": 6,
+    "vetoed_n": 5
+  },
+  "schema": "smial.factory-v1-quote-surface-retention-confirmatory.acceptance",
+  "schema_version": "1.0",
+  "scientific_terminal": "CLOSE_EXACT_QUOTE_SURFACE_RETENTION_FAMILY",
+  "side_effects": {
+    "build_calls": 0,
+    "cash_spend_usd_cents": 0,
+    "execute_calls": 0,
+    "paid_plan": false,
+    "second_provider": false,
+    "taker_supplied": false,
+    "wallet_signer_transaction_actions": 0
+  },
+  "source_runtime_receipt": "docs/evidence/quote_surface_retention_confirmatory/c1_quote_surface_retention_confirmatory_runtime_receipt_v1.json",
+  "source_runtime_receipt_sha256": "35c19fd8566db93d77a811ef255835243cbdac62c94023041c274d6a1ab4c6c5",
+  "vps": false
+}

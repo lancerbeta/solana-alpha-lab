@@ -1,0 +1,63 @@
+schema: smial.quote-native-admissible-friction-audition
+schema_version: '1.0'
+atom_id: QUOTE_SURFACE_RETENTION_CONFIRMATORY_V1
+as_of: '2026-08-20'
+observation_schedule: QUOTE_SURFACE_RETENTION_T0_H900_H3600
+external_authority:
+  owner_phrase: 'OK QUOTE_SURFACE_RETENTION_CONFIRMATORY_V1: one Jupiter Free-key quote-surface retention confirmatory 6+6 after clock qualification; local process-environment key only; Tokens V2 /recent and /toptraded/1h plus quote-only /swap/v2/order; x-api-key header only; no .env; no key in URL/log/receipt/Git; no taker, /build, /execute, wallet, signer, transaction, paid plan, second provider, retry or fallback; cash cap $0; call cap 62; global pace >=3s; 6 RECENT + 6 TRADED live outcome-blind cohort excluding A1, MOVE 2, commissioning, ATOM 5 veto, ATOM 6 t0-screen and PR 156 falsifier mints; frozen KEEP if RETENTION_DELTA >= 0 and H900 routes exist; clock_valid from due_at/observed_at/terminal only; H3600 exact sell of BUY_H900 outAmount; hash-bound row observed_at and attempt reservation before credential read required for capture PASS; WRAP existing capture plus retention projector; not recapture of PR 156; not Atom 2; not alpha; not VPS; no post-hoc threshold search; no TRADED-only rescue.'
+  credential_name: JUPITER_API_KEY
+  credential_reads: 1
+  dotenv_reads: false
+  execute: false
+  build: false
+  taker: OMITTED_QUOTE_ONLY
+  cash_cap_usd_cents: 0
+  call_cap: 62
+registry: configs/provider_route_capability_registry_v9.yaml
+quote_route:
+  route_id: JUPITER-SOLANA-SWAP-V2-ORDER-FREE-API-KEY-001
+  endpoint: https://api.jup.ag/swap/v2/order
+  host: api.jup.ag
+  method: GET
+discovery_routes:
+  recent:
+    route_id: JUPITER-SOLANA-TOKENS-V2-RECENT-FREE-API-KEY-001
+    endpoint: https://api.jup.ag/tokens/v2/recent
+  traded:
+    route_id: JUPITER-SOLANA-TOKENS-V2-TOPTRADED-FREE-API-KEY-001
+    endpoint: https://api.jup.ag/tokens/v2/toptraded/1h
+wrapped_sol_mint: So11111111111111111111111111111111111111112
+slippage_bps: '100'
+notional_atomic: '10000000'
+recent_cell_count: 6
+traded_cell_count: 6
+liquidity_floor_usd: 1000
+min_interval_seconds: 3
+observable_horizon_seconds: [900, 3600]
+gap_horizon_seconds: []
+lateness_slack_seconds: 120
+searchable_y_horizon_seconds: 3600
+searchable_y_kind: SELL_H3600_FROM_BUY_H900
+h3600_role: SEARCHABLE_FORWARD_QUOTED_RETURN_FROM_BUY_H900
+control_kill:
+  min_complete_cells: 4
+  min_time_separated_share: '0'
+success:
+  min_complete_xy: 8
+  min_time_separated: 8
+  min_complete_decision_outcome_per_stratum: 4
+runtime_limits:
+  timeout_seconds: 20.0
+  max_response_bytes: 2000000
+execution_controls:
+  retries: 0
+  fallback: false
+  persist_transaction_bytes: false
+  provider_requests_max: 62
+  background_scheduler: false
+  second_provider: false
+  paid_plan: false
+raw_retention:
+  body: A4_OUTSIDE_GIT
+  response_headers: SAFE_ALLOWLIST_ONLY
+  capture_envelope: HASH_BOUND_AT_WRITE

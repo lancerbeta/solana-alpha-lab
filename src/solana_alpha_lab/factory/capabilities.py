@@ -29,7 +29,9 @@ from solana_alpha_lab.factory.t0_friction_screen import (
 from solana_alpha_lab.quote_native_admissible_friction_audition import (
     FACTORY_COMMISSIONING_ATOM_ID,
     FRICTION_VETO_ATOM_ID,
+    CONFIRMATORY_ATOM_ID,
     RETENTION_ATOM_ID,
+    RETENTION_FAMILY_ATOM_IDS,
     T0_FRICTION_SCREEN_ATOM_ID,
     AuditionError,
     attempt_reservation_document,
@@ -227,7 +229,7 @@ def _overlay_veto_receipt(
             raise CapabilityError("T0_SCREEN_RULE_MISSING")
         rule = load_t0_friction_screen_rule(root, str(rule_item["path"]))
         return apply_t0_friction_screen_to_receipt(receipt, rule=rule)
-    if atom_id == RETENTION_ATOM_ID:
+    if atom_id in RETENTION_FAMILY_ATOM_IDS:
         existing = str(receipt.get("terminal_outcome") or receipt.get("terminal") or "")
         if existing in {INCONCLUSIVE_TERMINAL, PASS_TERMINAL, FAIL_TERMINAL}:
             return dict(receipt)
@@ -329,6 +331,7 @@ def capture_quote_native_free_key(
         FRICTION_VETO_ATOM_ID,
         T0_FRICTION_SCREEN_ATOM_ID,
         RETENTION_ATOM_ID,
+        CONFIRMATORY_ATOM_ID,
     }:
         raise CapabilityError("ATOM_ID_NOT_ALLOWLISTED")
     if authority_phrase != expected_phrase:
