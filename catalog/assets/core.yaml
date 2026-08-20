@@ -27825,3 +27825,147 @@ records:
   evidence: []
   search_terms: [FACTORY_V1, ORDINARY_HYPOTHESIS, OWNER_READOUT]
   classification: {contains_secrets: false, contains_raw_data: false, sensitivity: INTERNAL_NON_SECRET}
+
+- asset_id: CTRL-ORDINARY-MARKET-PIT-PRIMARY-X-BIND-001
+  record_version: '1.0'
+  asset_type: control_document
+  purpose: Exact contract that freezes liquidity/mcap bind before live PIT capture.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-08-20'
+  truth_owner: ORDINARY_MARKET_PIT_PRIMARY_X_BIND_V1
+  location: {kind: git_path, logical_uri: 'repo://docs/tasks/ORDINARY_MARKET_PIT_PRIMARY_X_BIND_V1.md', repository_path: docs/tasks/ORDINARY_MARKET_PIT_PRIMARY_X_BIND_V1.md}
+  integrity: {kind: sha256, sha256: d07d74de82b7a1960e5265849e0e1692d07d40b879bfba9ee03f829157a8d827}
+  access: {mode: read_only, method: file, network_required: false, secrets_required: false}
+  relations:
+  - {relation_type: governed_by, target_asset_id: ARCH-INTENT-005}
+  consumers: [FACTORY-001, GOAL-OWNER]
+  evidence: []
+  search_terms: [ORDINARY_MARKET, PIT, LIQUIDITY, MCAP]
+  classification: {contains_secrets: false, contains_raw_data: false, sensitivity: INTERNAL_NON_SECRET}
+
+- asset_id: CONFIG-ORDINARY-MARKET-PIT-PRIMARY-X-BIND-001
+  record_version: '1.0'
+  asset_type: configuration
+  purpose: Frozen primary X definition liquidity/mcap and Git cell receipt pin.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-08-20'
+  truth_owner: ORDINARY_MARKET_PIT_PRIMARY_X_BIND_V1
+  location: {kind: git_path, logical_uri: 'repo://configs/ordinary_market_pit_primary_x_bind_v1.yaml', repository_path: configs/ordinary_market_pit_primary_x_bind_v1.yaml}
+  integrity: {kind: sha256, sha256: d4ecd56b1398fc50ba38c29a45b2086582cd356220ec7fa77c223b3e89972955}
+  access: {mode: read_only, method: file, network_required: false, secrets_required: false}
+  relations:
+  - {relation_type: depends_on, target_asset_id: CTRL-ORDINARY-MARKET-PIT-PRIMARY-X-BIND-001}
+  consumers: [FACTORY-001, GOAL-OWNER]
+  evidence: []
+  search_terms: [ORDINARY_MARKET, PIT, LIQUIDITY, MCAP]
+  classification: {contains_secrets: false, contains_raw_data: false, sensitivity: INTERNAL_NON_SECRET}
+
+- asset_id: MODULE-ORDINARY-MARKET-PIT-PRIMARY-X-001
+  record_version: '1.0'
+  asset_type: script
+  purpose: Fail-closed Tokens V2 snapshot projector for liquidity/mcap.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-08-20'
+  truth_owner: ORDINARY_MARKET_PIT_PRIMARY_X_BIND_V1
+  location: {kind: git_path, logical_uri: 'repo://src/solana_alpha_lab/ordinary_market_pit_primary_x.py', repository_path: src/solana_alpha_lab/ordinary_market_pit_primary_x.py}
+  integrity: {kind: sha256, sha256: 315d076558423198b76b74ce8aaa2dfc9548a323a938eb67fbb8854b836dfda4}
+  access: {mode: read_only, method: file, network_required: false, secrets_required: false}
+  relations:
+  - {relation_type: depends_on, target_asset_id: CONFIG-ORDINARY-MARKET-PIT-PRIMARY-X-BIND-001}
+  consumers: [FACTORY-001, GOAL-OWNER]
+  evidence: []
+  search_terms: [ORDINARY_MARKET, PIT, LIQUIDITY, MCAP]
+  classification: {contains_secrets: false, contains_raw_data: false, sensitivity: INTERNAL_NON_SECRET}
+
+- asset_id: SCRIPT-ORDINARY-MARKET-PIT-PRIMARY-X-BIND-001
+  record_version: '1.0'
+  asset_type: script
+  purpose: Offline CLI that classifies Git-retained Tokens V2 cells cannot bind primary X.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-08-20'
+  truth_owner: ORDINARY_MARKET_PIT_PRIMARY_X_BIND_V1
+  location: {kind: git_path, logical_uri: 'repo://scripts/run_ordinary_market_pit_primary_x_bind.py', repository_path: scripts/run_ordinary_market_pit_primary_x_bind.py}
+  integrity: {kind: sha256, sha256: e90c1baed090bbb3bcd0c18707ec5cc2a4ffa018d4fb366bfa942a4275f75432}
+  access: {mode: read_only, method: file, network_required: false, secrets_required: false}
+  relations:
+  - {relation_type: depends_on, target_asset_id: MODULE-ORDINARY-MARKET-PIT-PRIMARY-X-001}
+  consumers: [FACTORY-001, GOAL-OWNER]
+  evidence: []
+  search_terms: [ORDINARY_MARKET, PIT, LIQUIDITY, MCAP]
+  classification: {contains_secrets: false, contains_raw_data: false, sensitivity: INTERNAL_NON_SECRET}
+
+- asset_id: TEST-ORDINARY-MARKET-PIT-PRIMARY-X-BIND-001
+  record_version: '1.0'
+  asset_type: script
+  purpose: Tests Git cells lack mcap, fdv is not a substitute, and Factory runner is unchanged.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-08-20'
+  truth_owner: ORDINARY_MARKET_PIT_PRIMARY_X_BIND_V1
+  location: {kind: git_path, logical_uri: 'repo://tests/test_ordinary_market_pit_primary_x_bind.py', repository_path: tests/test_ordinary_market_pit_primary_x_bind.py}
+  integrity: {kind: sha256, sha256: bc3b4357c573c548005fae267ed50a1d847a93b1e8578c44c13300ec11f91c33}
+  access: {mode: read_only, method: file, network_required: false, secrets_required: false}
+  relations:
+  - {relation_type: depends_on, target_asset_id: MODULE-ORDINARY-MARKET-PIT-PRIMARY-X-001}
+  consumers: [FACTORY-001, GOAL-OWNER]
+  evidence: []
+  search_terms: [ORDINARY_MARKET, PIT, LIQUIDITY, MCAP]
+  classification: {contains_secrets: false, contains_raw_data: false, sensitivity: INTERNAL_NON_SECRET}
+
+- asset_id: EVIDENCE-ORDINARY-MARKET-PIT-PRIMARY-X-BIND-RUNTIME-001
+  record_version: '1.0'
+  asset_type: evidence
+  purpose: Runtime receipt that 12 Git qualification cells cannot bind liquidity/mcap.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-08-20'
+  truth_owner: ORDINARY_MARKET_PIT_PRIMARY_X_BIND_V1
+  location: {kind: git_path, logical_uri: 'repo://docs/evidence/ordinary_market_pit_primary_x_bind/a1_runtime_receipt_v1.json', repository_path: docs/evidence/ordinary_market_pit_primary_x_bind/a1_runtime_receipt_v1.json}
+  integrity: {kind: sha256, sha256: b1c33683000f6837e2a6ec461e98c7f98eca793bd19403714e15376858730152}
+  access: {mode: read_only, method: file, network_required: false, secrets_required: false}
+  relations:
+  - {relation_type: derived_from, target_asset_id: CTRL-ORDINARY-MARKET-PIT-PRIMARY-X-BIND-001}
+  consumers: [FACTORY-001, GOAL-OWNER]
+  evidence: []
+  search_terms: [ORDINARY_MARKET, PIT, LIQUIDITY, MCAP]
+  classification: {contains_secrets: false, contains_raw_data: false, sensitivity: INTERNAL_NON_SECRET}
+
+- asset_id: EVIDENCE-ORDINARY-MARKET-PIT-PRIMARY-X-BIND-ACCEPTANCE-001
+  record_version: '1.0'
+  asset_type: evidence
+  purpose: Acceptance that Git-retained cells cannot bind primary X and live capture is next.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-08-20'
+  truth_owner: ORDINARY_MARKET_PIT_PRIMARY_X_BIND_V1
+  location: {kind: git_path, logical_uri: 'repo://docs/evidence/ordinary_market_pit_primary_x_bind/a1_acceptance_v1.json', repository_path: docs/evidence/ordinary_market_pit_primary_x_bind/a1_acceptance_v1.json}
+  integrity: {kind: sha256, sha256: a7291fb96f6e6c80e0eb35f335542e6bba6676e8a732e6e2cb399774ae5dbc39}
+  access: {mode: read_only, method: file, network_required: false, secrets_required: false}
+  relations:
+  - {relation_type: derived_from, target_asset_id: EVIDENCE-ORDINARY-MARKET-PIT-PRIMARY-X-BIND-RUNTIME-001}
+  consumers: [FACTORY-001, GOAL-OWNER]
+  evidence: []
+  search_terms: [ORDINARY_MARKET, PIT, LIQUIDITY, MCAP]
+  classification: {contains_secrets: false, contains_raw_data: false, sensitivity: INTERNAL_NON_SECRET}
+
+- asset_id: REPORT-ORDINARY-MARKET-PIT-PRIMARY-X-BIND-OWNER-READOUT-001
+  record_version: '1.0'
+  asset_type: control_document
+  purpose: Russian owner readout of the primary X bind stop.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-08-20'
+  truth_owner: ORDINARY_MARKET_PIT_PRIMARY_X_BIND_V1
+  location: {kind: git_path, logical_uri: 'repo://docs/reports/ordinary_market_pit_primary_x_bind/a1_owner_readout_v1.md', repository_path: docs/reports/ordinary_market_pit_primary_x_bind/a1_owner_readout_v1.md}
+  integrity: {kind: sha256, sha256: ba1f47ca54116b0175a2a81a7b2009656688deeb82526d61c8acd671e11e0c33}
+  access: {mode: read_only, method: file, network_required: false, secrets_required: false}
+  relations:
+  - {relation_type: derived_from, target_asset_id: EVIDENCE-ORDINARY-MARKET-PIT-PRIMARY-X-BIND-ACCEPTANCE-001}
+  consumers: [FACTORY-001, GOAL-OWNER]
+  evidence: []
+  search_terms: [ORDINARY_MARKET, PIT, LIQUIDITY, MCAP]
+  classification: {contains_secrets: false, contains_raw_data: false, sensitivity: INTERNAL_NON_SECRET}

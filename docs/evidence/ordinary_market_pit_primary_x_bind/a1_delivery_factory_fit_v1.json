@@ -1,0 +1,39 @@
+{
+  "as_of": "2026-08-20",
+  "capability_radar": {
+    "now": "NONE",
+    "watch": "OWNER_BOUNDED_JUPITER_CAPTURE_WITH_RAW_RETENTION"
+  },
+  "dimensions": {
+    "build_vs_buy": "PASS_ADOPT_TOKENS_V2_WRAP_PROJECTOR",
+    "context_efficiency": "PASS_GIT_ONLY_PREFLIGHT",
+    "execution_to_cashflow": "PASS_NO_LIVE_NO_NETRETURN",
+    "flexibility_and_history": "PASS_TASK28_SKELETONS_UNCHANGED",
+    "mission": "PASS_FREEZE_X_BEFORE_LIVE_CAPTURE",
+    "monitoring_and_recovery": "PASS_REVERT_THIS_ATOM_ONLY",
+    "owner_operability": "PASS_CLEAR_NEXT_CAPTURE_RETENTION",
+    "red_team": "PASS_NO_PIT_READY_FDV_NOT_MCAP_UNKNOWN_NOT_ZERO",
+    "research_truth": "PASS_FORWARD_SNAPSHOT_NOT_PIT_READY",
+    "security": "PASS_ZERO_PROVIDER"
+  },
+  "limits": [
+    "NO_PIT_READY",
+    "NO_LIVE_CAPTURE",
+    "NO_ALPHA",
+    "NO_FDV_AS_MCAP",
+    "NO_FACTORY_PYTHON",
+    "NO_TASK28_UNFREEZE",
+    "NO_VPS",
+    "NO_QUOTE_AS_PREDICTOR",
+    "CAPABILITY_PASS_IS_NOT_PROMOTION"
+  ],
+  "mode": "FULL_REVIEW",
+  "recovery": "REVERT_ONLY_THIS_ATOM; PRESERVE_FACTORY_PYTHON; PRESERVE_TASK28_SKELETONS",
+  "review_id": "ORDINARY-MARKET-PIT-PRIMARY-X-BIND-FACTORY-FIT-001",
+  "reviewed_bindings_sha256": "fe481ebf40bb5c9fcf6f791d542cc5816872c21f6ca97ff54539f5fcba8906d9",
+  "reviewed_inventory_sha256": "01745426239f3b7abe409160870101d6947c2a6809d52d829b849127368ba6a8",
+  "schema": "smial.delivery-harness-factory-fit",
+  "schema_version": "1.0",
+  "task_id": "ORDINARY_MARKET_PIT_PRIMARY_X_BIND_V1",
+  "verdict": "PASS"
+}
