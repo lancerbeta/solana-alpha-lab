@@ -498,6 +498,11 @@
       "target_asset_id": "CTRL-EARLY-ICP-FREEZE-AND-MATURITY-BRANCH-CLOSE-001"
     },
     {
+      "source_asset_id": "CONFIG-EARLY-STATE-TO-PAPER-VERTICAL-SLICE-001",
+      "relation": "governed_by",
+      "target_asset_id": "CTRL-EARLY-STATE-TO-PAPER-VERTICAL-SLICE-001"
+    },
+    {
       "source_asset_id": "CONFIG-EXPERIMENT-SPEC-FACTORY-V1-COMMISSIONING-001",
       "relation": "depends_on",
       "target_asset_id": "SCHEMA-EXPERIMENT-SPEC-001"
@@ -2158,6 +2163,36 @@
       "target_asset_id": "TEST-EARLY-ICP-FREEZE-ACCEPTANCE-001"
     },
     {
+      "source_asset_id": "CTRL-EARLY-STATE-TO-PAPER-VERTICAL-SLICE-001",
+      "relation": "contains",
+      "target_asset_id": "CONFIG-EARLY-STATE-TO-PAPER-VERTICAL-SLICE-001"
+    },
+    {
+      "source_asset_id": "CTRL-EARLY-STATE-TO-PAPER-VERTICAL-SLICE-001",
+      "relation": "contains",
+      "target_asset_id": "MODULE-EARLY-STATE-HYPOTHESIS-001"
+    },
+    {
+      "source_asset_id": "CTRL-EARLY-STATE-TO-PAPER-VERTICAL-SLICE-001",
+      "relation": "contains",
+      "target_asset_id": "MODULE-PAPER-PLANE-ENGINE-001"
+    },
+    {
+      "source_asset_id": "CTRL-EARLY-STATE-TO-PAPER-VERTICAL-SLICE-001",
+      "relation": "contains",
+      "target_asset_id": "SCHEMA-STRATEGY-VERSION-001"
+    },
+    {
+      "source_asset_id": "CTRL-EARLY-STATE-TO-PAPER-VERTICAL-SLICE-001",
+      "relation": "depends_on",
+      "target_asset_id": "EVIDENCE-EARLY-ICP-FREEZE-RUNTIME-001"
+    },
+    {
+      "source_asset_id": "CTRL-EARLY-STATE-TO-PAPER-VERTICAL-SLICE-001",
+      "relation": "validated_by",
+      "target_asset_id": "TEST-EARLY-STATE-PAPER-001"
+    },
+    {
       "source_asset_id": "CTRL-FACTORY-ORDINARY-HYPOTHESIS-THROUGH-SURFACE-001",
       "relation": "governed_by",
       "target_asset_id": "ARCH-INTENT-005"
@@ -3726,6 +3761,46 @@
       "source_asset_id": "EVIDENCE-EARLY-ICP-FREEZE-RUNTIME-001",
       "relation": "derived_from",
       "target_asset_id": "CTRL-EARLY-ICP-FREEZE-AND-MATURITY-BRANCH-CLOSE-001"
+    },
+    {
+      "source_asset_id": "EVIDENCE-EARLY-STATE-PAPER-ACCEPTANCE-001",
+      "relation": "derived_from",
+      "target_asset_id": "EVIDENCE-EARLY-STATE-PAPER-RUNTIME-001"
+    },
+    {
+      "source_asset_id": "EVIDENCE-EARLY-STATE-PAPER-DELIVERY-COMPLETION-001",
+      "relation": "depends_on",
+      "target_asset_id": "SCHEMA-DELIVERY-COMPLETION-EVIDENCE-001"
+    },
+    {
+      "source_asset_id": "EVIDENCE-EARLY-STATE-PAPER-DELIVERY-COMPLETION-001",
+      "relation": "derived_from",
+      "target_asset_id": "EVIDENCE-EARLY-STATE-PAPER-ACCEPTANCE-001"
+    },
+    {
+      "source_asset_id": "EVIDENCE-EARLY-STATE-PAPER-DELIVERY-FACTORY-FIT-001",
+      "relation": "depends_on",
+      "target_asset_id": "EVIDENCE-EARLY-STATE-PAPER-DELIVERY-INDEPENDENT-REVIEW-001"
+    },
+    {
+      "source_asset_id": "EVIDENCE-EARLY-STATE-PAPER-DELIVERY-FACTORY-FIT-001",
+      "relation": "derived_from",
+      "target_asset_id": "EVIDENCE-EARLY-STATE-PAPER-RUNTIME-001"
+    },
+    {
+      "source_asset_id": "EVIDENCE-EARLY-STATE-PAPER-DELIVERY-INDEPENDENT-REVIEW-001",
+      "relation": "depends_on",
+      "target_asset_id": "SCHEMA-DELIVERY-INDEPENDENT-REVIEW-EVIDENCE-001"
+    },
+    {
+      "source_asset_id": "EVIDENCE-EARLY-STATE-PAPER-DELIVERY-INDEPENDENT-REVIEW-001",
+      "relation": "derived_from",
+      "target_asset_id": "EVIDENCE-EARLY-STATE-PAPER-RUNTIME-001"
+    },
+    {
+      "source_asset_id": "EVIDENCE-EARLY-STATE-PAPER-RUNTIME-001",
+      "relation": "derived_from",
+      "target_asset_id": "CTRL-EARLY-STATE-TO-PAPER-VERTICAL-SLICE-001"
     },
     {
       "source_asset_id": "EVIDENCE-FACTORY-ORDINARY-HYPOTHESIS-ACCEPTANCE-001",
@@ -7788,6 +7863,11 @@
       "target_asset_id": "MODULE-IN-SCOPE-POPULATION-SUPPLY-GATE-001"
     },
     {
+      "source_asset_id": "MODULE-EARLY-STATE-HYPOTHESIS-001",
+      "relation": "depends_on",
+      "target_asset_id": "CONFIG-EARLY-STATE-TO-PAPER-VERTICAL-SLICE-001"
+    },
+    {
       "source_asset_id": "MODULE-FACTORY-V1-APPLICATION-001",
       "relation": "depends_on",
       "target_asset_id": "MODULE-FACTORY-V1-COCKPIT-001"
@@ -7976,6 +8056,16 @@
       "source_asset_id": "MODULE-OWNER-AUTHORITY-PACKET-001",
       "relation": "produces",
       "target_asset_id": "EVIDENCE-OWNER-AUTHORITY-PACKET-A1-001"
+    },
+    {
+      "source_asset_id": "MODULE-PAPER-PLANE-ENGINE-001",
+      "relation": "depends_on",
+      "target_asset_id": "SCHEMA-STRATEGY-VERSION-001"
+    },
+    {
+      "source_asset_id": "MODULE-PAPER-PLANE-ENGINE-001",
+      "relation": "governed_by",
+      "target_asset_id": "SCHEMA-STRATEGY-VERSION-001"
     },
     {
       "source_asset_id": "MODULE-PMF-QUOTE-ATTEMPT-PREP-001",
@@ -9698,6 +9788,11 @@
       "target_asset_id": "EVIDENCE-EARLY-ICP-FREEZE-ACCEPTANCE-001"
     },
     {
+      "source_asset_id": "REPORT-EARLY-STATE-PAPER-OWNER-READOUT-001",
+      "relation": "derived_from",
+      "target_asset_id": "EVIDENCE-EARLY-STATE-PAPER-ACCEPTANCE-001"
+    },
+    {
       "source_asset_id": "REPORT-FACTORY-ORDINARY-HYPOTHESIS-OWNER-READOUT-001",
       "relation": "derived_from",
       "target_asset_id": "EVIDENCE-FACTORY-ORDINARY-HYPOTHESIS-ACCEPTANCE-001"
@@ -10151,6 +10246,11 @@
       "source_asset_id": "SCHEMA-PROVIDER-ROUTE-CAPABILITY-REGISTRY-010",
       "relation": "governed_by",
       "target_asset_id": "CONFIG-PROVIDER-ROUTE-CAPABILITY-REGISTRY-010"
+    },
+    {
+      "source_asset_id": "SCHEMA-STRATEGY-VERSION-001",
+      "relation": "governed_by",
+      "target_asset_id": "CTRL-EARLY-STATE-TO-PAPER-VERTICAL-SLICE-001"
     },
     {
       "source_asset_id": "SCHEMA-T05-CANONICAL-DDL-001",
@@ -10686,6 +10786,11 @@
       "source_asset_id": "SCRIPT-EARLY-ICP-FREEZE-RUNNER-001",
       "relation": "depends_on",
       "target_asset_id": "MODULE-EARLY-ICP-FREEZE-ACCEPTANCE-001"
+    },
+    {
+      "source_asset_id": "SCRIPT-EARLY-STATE-RUNNER-001",
+      "relation": "depends_on",
+      "target_asset_id": "MODULE-PAPER-PLANE-ENGINE-001"
     },
     {
       "source_asset_id": "SCRIPT-FACTORY-ORDINARY-MARKET-HYPOTHESIS-001",
@@ -11433,6 +11538,26 @@
       "target_asset_id": "CTRL-DELIVERY-HARNESS-001"
     },
     {
+      "source_asset_id": "STRAT-V-EARLY-LIQ-FLOOR-V1-001",
+      "relation": "depends_on",
+      "target_asset_id": "MODULE-PAPER-PLANE-ENGINE-001"
+    },
+    {
+      "source_asset_id": "STRAT-V-EARLY-LIQ-FLOOR-V1-001",
+      "relation": "governed_by",
+      "target_asset_id": "SCHEMA-STRATEGY-VERSION-001"
+    },
+    {
+      "source_asset_id": "STRAT-V-EARLY-NETFLOW-TILT-V1-001",
+      "relation": "depends_on",
+      "target_asset_id": "MODULE-PAPER-PLANE-ENGINE-001"
+    },
+    {
+      "source_asset_id": "STRAT-V-EARLY-NETFLOW-TILT-V1-001",
+      "relation": "governed_by",
+      "target_asset_id": "SCHEMA-STRATEGY-VERSION-001"
+    },
+    {
       "source_asset_id": "TASK-T30-A14P-R1-AUTH-RECOVERY-001",
       "relation": "governed_by",
       "target_asset_id": "CONTRACT-T30-A14P-R1-AUTH-RECOVERY-001"
@@ -11531,6 +11656,11 @@
       "source_asset_id": "TEST-EARLY-ICP-FREEZE-ACCEPTANCE-001",
       "relation": "depends_on",
       "target_asset_id": "MODULE-EARLY-ICP-FREEZE-ACCEPTANCE-001"
+    },
+    {
+      "source_asset_id": "TEST-EARLY-STATE-PAPER-001",
+      "relation": "depends_on",
+      "target_asset_id": "MODULE-PAPER-PLANE-ENGINE-001"
     },
     {
       "source_asset_id": "TEST-FACTORY-ORDINARY-HYPOTHESIS-THROUGH-SURFACE-001",

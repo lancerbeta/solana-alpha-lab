@@ -1,0 +1,47 @@
+schema: smial.strategy-version
+schema_version: '1.0'
+strategy_id: STRAT-V-EARLY-LIQ-FLOOR
+strategy_version: V1
+title: EARLY liquidity floor state (commissioning)
+source_decision_asset_id: EVIDENCE-EARLY-STATE-PAPER-RUNTIME-001
+hypothesis_ids:
+  - HYP-EARLY-STATE-LIQ-FLOOR-V1
+evidence_class: RETAINED_OFFLINE_DECISION
+population_id: ICP-EARLY-PUMPFUN-V1
+icp_binding:
+  launchpad: pump.fun
+  age_band_seconds:
+    min: 300
+    max_exclusive: 900
+  liquidity_usd_min: 1000
+signal_rule:
+  feature: X_LIQUIDITY_USD
+  bin_op: ">="
+  bin_threshold: 2000
+entry_rule:
+  when_signal_kind_in:
+    - SIMULATED_FILL
+exit_rule:
+  kind: NEXT_OBSERVATION
+notional_policy:
+  notional_usd: 100
+  fee_bps: 100
+  fill_basis: DECISION_TIME_PRICE_THEN_NEXT_SNAPSHOT
+risk_policy:
+  max_open_positions: 5
+data_requirements:
+  - requirement_id: ICP_FREEZE_RUNTIME
+    path: docs/evidence/early_icp_freeze/a1_runtime_receipt_v1.json
+    sha256: efe98d0aa4f2017e205e18344e6c908b686a7b3630387e85770199d839222be3
+  - requirement_id: LIVE_SEARCH_BODY
+    path: local/in_scope_population_live_supply_gate/71b1e477322066b1a5876ad22769fb22465641ce2749f5a5e519f3099f20389a.body
+    sha256: 71b1e477322066b1a5876ad22769fb22465641ce2749f5a5e519f3099f20389a
+execution_requirements:
+  engine: paper_plane_v1
+mode_eligibility:
+  paper: true
+  shadow: true
+  micro_live: false
+commissioning_only: true
+created_at: '2026-08-21T00:00:00Z'
+spec_sha256: 88ccb03e0a06b1e3b6698c17de25f8fc49224d45566413c358807cc9403cc95b

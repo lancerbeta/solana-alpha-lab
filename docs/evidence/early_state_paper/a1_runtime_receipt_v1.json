@@ -1,0 +1,448 @@
+{
+  "atom_id": "EARLY_STATE_TO_PAPER_VERTICAL_SLICE_V1",
+  "commissioning": {
+    "bot_instances": [
+      {
+        "bot_instance_id": "BOT-STRAT-V-EARLY-LIQ-FLOOR-V1-PAPER",
+        "mode": "PAPER",
+        "started_at": "2026-08-21T19:14:21Z",
+        "status": "RUNNING",
+        "stopped_at": null,
+        "strategy_id": "STRAT-V-EARLY-LIQ-FLOOR",
+        "strategy_version": "STRAT-V-EARLY-LIQ-FLOOR-V1"
+      },
+      {
+        "bot_instance_id": "BOT-STRAT-V-EARLY-NETFLOW-TILT-V1-PAPER",
+        "mode": "PAPER",
+        "started_at": "2026-08-21T19:14:21Z",
+        "status": "RUNNING",
+        "stopped_at": null,
+        "strategy_id": "STRAT-V-EARLY-NETFLOW-TILT",
+        "strategy_version": "STRAT-V-EARLY-NETFLOW-TILT-V1"
+      }
+    ],
+    "engine": "paper_plane_v1",
+    "factory_core_python_changed": false,
+    "per_strategy": [
+      {
+        "bot_instance_id": "BOT-STRAT-V-EARLY-LIQ-FLOOR-V1-PAPER",
+        "no_signal_or_unknown": 0,
+        "signal_feature": "X_LIQUIDITY_USD",
+        "simulated_fills": 27,
+        "strategy_id": "STRAT-V-EARLY-LIQ-FLOOR",
+        "strategy_relative": "configs/strategies/STRAT-V-EARLY-LIQ-FLOOR-COMMISSIONING-V1.yaml",
+        "strategy_version": "V1"
+      },
+      {
+        "bot_instance_id": "BOT-STRAT-V-EARLY-NETFLOW-TILT-V1-PAPER",
+        "no_signal_or_unknown": 24,
+        "signal_feature": "X_NETFLOW_SHARE",
+        "simulated_fills": 3,
+        "strategy_id": "STRAT-V-EARLY-NETFLOW-TILT",
+        "strategy_relative": "configs/strategies/STRAT-V-EARLY-NETFLOW-TILT-COMMISSIONING-V1.yaml",
+        "strategy_version": "V1"
+      }
+    ],
+    "positions": [
+      {
+        "bot_instance_id": "BOT-STRAT-V-EARLY-LIQ-FLOOR-V1-PAPER",
+        "closed_at": "2026-08-21T19:14:21Z",
+        "entered_notional_usd": 100.0,
+        "exit_notional_usd": null,
+        "mint": "24y7PiS7EoTJRG7FcmJwR7AaT39yeSWVLERYakY3pump",
+        "opened_at": "2026-08-21T19:14:21Z",
+        "position_id": "POS-BOT-STRAT-V-EARLY-LIQ-FLOOR-V1-PAPER-24y7PiS7EoTJ-SIMULATED_FILL",
+        "signal_kind": "SIMULATED_FILL",
+        "state": "RECONCILED"
+      },
+      {
+        "bot_instance_id": "BOT-STRAT-V-EARLY-LIQ-FLOOR-V1-PAPER",
+        "closed_at": "2026-08-21T19:14:21Z",
+        "entered_notional_usd": 100.0,
+        "exit_notional_usd": null,
+        "mint": "3PSfnWrG7tqZAYMndjqbohwy5sEozhM3CWZj5hudQV7F",
+        "opened_at": "2026-08-21T19:14:21Z",
+        "position_id": "POS-BOT-STRAT-V-EARLY-LIQ-FLOOR-V1-PAPER-3PSfnWrG7tqZ-SIMULATED_FILL",
+        "signal_kind": "SIMULATED_FILL",
+        "state": "RECONCILED"
+      },
+      {
+        "bot_instance_id": "BOT-STRAT-V-EARLY-LIQ-FLOOR-V1-PAPER",
+        "closed_at": "2026-08-21T19:14:21Z",
+        "entered_notional_usd": 100.0,
+        "exit_notional_usd": null,
+        "mint": "4kR7KAoAeUVy5TWzMSSP3j4edipHGa3qPbTtrBYEpump",
+        "opened_at": "2026-08-21T19:14:21Z",
+        "position_id": "POS-BOT-STRAT-V-EARLY-LIQ-FLOOR-V1-PAPER-4kR7KAoAeUVy-SIMULATED_FILL",
+        "signal_kind": "SIMULATED_FILL",
+        "state": "RECONCILED"
+      },
+      {
+        "bot_instance_id": "BOT-STRAT-V-EARLY-LIQ-FLOOR-V1-PAPER",
+        "closed_at": "2026-08-21T19:14:21Z",
+        "entered_notional_usd": 100.0,
+        "exit_notional_usd": null,
+        "mint": "5Aw1L1mCBFNZQvQBaPWzAo4HFTtuD2VHP4khgipjpump",
+        "opened_at": "2026-08-21T19:14:21Z",
+        "position_id": "POS-BOT-STRAT-V-EARLY-LIQ-FLOOR-V1-PAPER-5Aw1L1mCBFNZ-SIMULATED_FILL",
+        "signal_kind": "SIMULATED_FILL",
+        "state": "RECONCILED"
+      },
+      {
+        "bot_instance_id": "BOT-STRAT-V-EARLY-LIQ-FLOOR-V1-PAPER",
+        "closed_at": "2026-08-21T19:14:21Z",
+        "entered_notional_usd": 100.0,
+        "exit_notional_usd": null,
+        "mint": "5gvpURKi7g695zd7jJPVkyY3bo11fccsv2XBhkqApump",
+        "opened_at": "2026-08-21T19:14:21Z",
+        "position_id": "POS-BOT-STRAT-V-EARLY-LIQ-FLOOR-V1-PAPER-5gvpURKi7g69-SIMULATED_FILL",
+        "signal_kind": "SIMULATED_FILL",
+        "state": "RECONCILED"
+      },
+      {
+        "bot_instance_id": "BOT-STRAT-V-EARLY-LIQ-FLOOR-V1-PAPER",
+        "closed_at": "2026-08-21T19:14:21Z",
+        "entered_notional_usd": 100.0,
+        "exit_notional_usd": null,
+        "mint": "5zJGbdRNWP4obMYa3PxzCiFmE6rneR61oDg8fmp1pump",
+        "opened_at": "2026-08-21T19:14:21Z",
+        "position_id": "POS-BOT-STRAT-V-EARLY-LIQ-FLOOR-V1-PAPER-5zJGbdRNWP4o-SIMULATED_FILL",
+        "signal_kind": "SIMULATED_FILL",
+        "state": "RECONCILED"
+      },
+      {
+        "bot_instance_id": "BOT-STRAT-V-EARLY-LIQ-FLOOR-V1-PAPER",
+        "closed_at": "2026-08-21T19:14:21Z",
+        "entered_notional_usd": 100.0,
+        "exit_notional_usd": null,
+        "mint": "6AzxAKbvcENnDBgfAdZKBMWYKxAd5LCypEGZoLx7pump",
+        "opened_at": "2026-08-21T19:14:21Z",
+        "position_id": "POS-BOT-STRAT-V-EARLY-LIQ-FLOOR-V1-PAPER-6AzxAKbvcENn-SIMULATED_FILL",
+        "signal_kind": "SIMULATED_FILL",
+        "state": "RECONCILED"
+      },
+      {
+        "bot_instance_id": "BOT-STRAT-V-EARLY-LIQ-FLOOR-V1-PAPER",
+        "closed_at": "2026-08-21T19:14:21Z",
+        "entered_notional_usd": 100.0,
+        "exit_notional_usd": null,
+        "mint": "6VTduCit8TuG6jiepAmAAiM6xYRLCJEihtsqGktRpump",
+        "opened_at": "2026-08-21T19:14:21Z",
+        "position_id": "POS-BOT-STRAT-V-EARLY-LIQ-FLOOR-V1-PAPER-6VTduCit8TuG-SIMULATED_FILL",
+        "signal_kind": "SIMULATED_FILL",
+        "state": "RECONCILED"
+      },
+      {
+        "bot_instance_id": "BOT-STRAT-V-EARLY-LIQ-FLOOR-V1-PAPER",
+        "closed_at": "2026-08-21T19:14:21Z",
+        "entered_notional_usd": 100.0,
+        "exit_notional_usd": null,
+        "mint": "7H6sTyAh1B78LEMgCdnZr4HTdSRGiTUnix9XgNd8pump",
+        "opened_at": "2026-08-21T19:14:21Z",
+        "position_id": "POS-BOT-STRAT-V-EARLY-LIQ-FLOOR-V1-PAPER-7H6sTyAh1B78-SIMULATED_FILL",
+        "signal_kind": "SIMULATED_FILL",
+        "state": "RECONCILED"
+      },
+      {
+        "bot_instance_id": "BOT-STRAT-V-EARLY-LIQ-FLOOR-V1-PAPER",
+        "closed_at": "2026-08-21T19:14:21Z",
+        "entered_notional_usd": 100.0,
+        "exit_notional_usd": null,
+        "mint": "7qM6BAu4m8GTGsGeQgHxE2XQrqAeYzLw95EjJCGbpump",
+        "opened_at": "2026-08-21T19:14:21Z",
+        "position_id": "POS-BOT-STRAT-V-EARLY-LIQ-FLOOR-V1-PAPER-7qM6BAu4m8GT-SIMULATED_FILL",
+        "signal_kind": "SIMULATED_FILL",
+        "state": "RECONCILED"
+      },
+      {
+        "bot_instance_id": "BOT-STRAT-V-EARLY-LIQ-FLOOR-V1-PAPER",
+        "closed_at": "2026-08-21T19:14:21Z",
+        "entered_notional_usd": 100.0,
+        "exit_notional_usd": null,
+        "mint": "9xLxc7CAPQKPPMySS3mRZ6w3kc4YnWfT7rkTw3gypump",
+        "opened_at": "2026-08-21T19:14:21Z",
+        "position_id": "POS-BOT-STRAT-V-EARLY-LIQ-FLOOR-V1-PAPER-9xLxc7CAPQKP-SIMULATED_FILL",
+        "signal_kind": "SIMULATED_FILL",
+        "state": "RECONCILED"
+      },
+      {
+        "bot_instance_id": "BOT-STRAT-V-EARLY-LIQ-FLOOR-V1-PAPER",
+        "closed_at": "2026-08-21T19:14:21Z",
+        "entered_notional_usd": 100.0,
+        "exit_notional_usd": null,
+        "mint": "A49ctbSiKitkR1eaXFns9E4nEG5pHX9KwqkDHzxfpump",
+        "opened_at": "2026-08-21T19:14:21Z",
+        "position_id": "POS-BOT-STRAT-V-EARLY-LIQ-FLOOR-V1-PAPER-A49ctbSiKitk-SIMULATED_FILL",
+        "signal_kind": "SIMULATED_FILL",
+        "state": "RECONCILED"
+      },
+      {
+        "bot_instance_id": "BOT-STRAT-V-EARLY-LIQ-FLOOR-V1-PAPER",
+        "closed_at": "2026-08-21T19:14:21Z",
+        "entered_notional_usd": 100.0,
+        "exit_notional_usd": null,
+        "mint": "BiKXZptQ4Y2VffQEoRScX4o8p6woD6vFrMPQagg3pump",
+        "opened_at": "2026-08-21T19:14:21Z",
+        "position_id": "POS-BOT-STRAT-V-EARLY-LIQ-FLOOR-V1-PAPER-BiKXZptQ4Y2V-SIMULATED_FILL",
+        "signal_kind": "SIMULATED_FILL",
+        "state": "RECONCILED"
+      },
+      {
+        "bot_instance_id": "BOT-STRAT-V-EARLY-LIQ-FLOOR-V1-PAPER",
+        "closed_at": "2026-08-21T19:14:21Z",
+        "entered_notional_usd": 100.0,
+        "exit_notional_usd": null,
+        "mint": "CujDcrdRUki7krJgQdkTCrVhsJDdeBVniv7TF8Bmpump",
+        "opened_at": "2026-08-21T19:14:21Z",
+        "position_id": "POS-BOT-STRAT-V-EARLY-LIQ-FLOOR-V1-PAPER-CujDcrdRUki7-SIMULATED_FILL",
+        "signal_kind": "SIMULATED_FILL",
+        "state": "RECONCILED"
+      },
+      {
+        "bot_instance_id": "BOT-STRAT-V-EARLY-LIQ-FLOOR-V1-PAPER",
+        "closed_at": "2026-08-21T19:14:21Z",
+        "entered_notional_usd": 100.0,
+        "exit_notional_usd": null,
+        "mint": "Dw8uVUE2gZpxjqTBd3gVapPiQzzrSBDUXTKFKfjvpump",
+        "opened_at": "2026-08-21T19:14:21Z",
+        "position_id": "POS-BOT-STRAT-V-EARLY-LIQ-FLOOR-V1-PAPER-Dw8uVUE2gZpx-SIMULATED_FILL",
+        "signal_kind": "SIMULATED_FILL",
+        "state": "RECONCILED"
+      },
+      {
+        "bot_instance_id": "BOT-STRAT-V-EARLY-LIQ-FLOOR-V1-PAPER",
+        "closed_at": "2026-08-21T19:14:21Z",
+        "entered_notional_usd": 100.0,
+        "exit_notional_usd": null,
+        "mint": "E2rWhobuvRxsHtuh53ZojxSBKsVBUW7Ump1AGxFGpump",
+        "opened_at": "2026-08-21T19:14:21Z",
+        "position_id": "POS-BOT-STRAT-V-EARLY-LIQ-FLOOR-V1-PAPER-E2rWhobuvRxs-SIMULATED_FILL",
+        "signal_kind": "SIMULATED_FILL",
+        "state": "RECONCILED"
+      },
+      {
+        "bot_instance_id": "BOT-STRAT-V-EARLY-LIQ-FLOOR-V1-PAPER",
+        "closed_at": "2026-08-21T19:14:21Z",
+        "entered_notional_usd": 100.0,
+        "exit_notional_usd": null,
+        "mint": "EGbK1JVGNHtuo66ET7vcNUaN4UYL7xZjJgB9hfdbpump",
+        "opened_at": "2026-08-21T19:14:21Z",
+        "position_id": "POS-BOT-STRAT-V-EARLY-LIQ-FLOOR-V1-PAPER-EGbK1JVGNHtu-SIMULATED_FILL",
+        "signal_kind": "SIMULATED_FILL",
+        "state": "RECONCILED"
+      },
+      {
+        "bot_instance_id": "BOT-STRAT-V-EARLY-LIQ-FLOOR-V1-PAPER",
+        "closed_at": "2026-08-21T19:14:21Z",
+        "entered_notional_usd": 100.0,
+        "exit_notional_usd": null,
+        "mint": "EPiDR8qrr7ESnmmjFLvy8QFrj1j8nyUVZ2ydMH9xpump",
+        "opened_at": "2026-08-21T19:14:21Z",
+        "position_id": "POS-BOT-STRAT-V-EARLY-LIQ-FLOOR-V1-PAPER-EPiDR8qrr7ES-SIMULATED_FILL",
+        "signal_kind": "SIMULATED_FILL",
+        "state": "RECONCILED"
+      },
+      {
+        "bot_instance_id": "BOT-STRAT-V-EARLY-LIQ-FLOOR-V1-PAPER",
+        "closed_at": "2026-08-21T19:14:21Z",
+        "entered_notional_usd": 100.0,
+        "exit_notional_usd": null,
+        "mint": "FHRXowjDXRiUHhHpuhCSR3kWeLfdvBT5Zs3LTbXKpump",
+        "opened_at": "2026-08-21T19:14:21Z",
+        "position_id": "POS-BOT-STRAT-V-EARLY-LIQ-FLOOR-V1-PAPER-FHRXowjDXRiU-SIMULATED_FILL",
+        "signal_kind": "SIMULATED_FILL",
+        "state": "RECONCILED"
+      },
+      {
+        "bot_instance_id": "BOT-STRAT-V-EARLY-LIQ-FLOOR-V1-PAPER",
+        "closed_at": "2026-08-21T19:14:21Z",
+        "entered_notional_usd": 100.0,
+        "exit_notional_usd": null,
+        "mint": "FeGDfHBowYd75BMRjkrkD7HqYyMFvuVMSCjgkAHmpump",
+        "opened_at": "2026-08-21T19:14:21Z",
+        "position_id": "POS-BOT-STRAT-V-EARLY-LIQ-FLOOR-V1-PAPER-FeGDfHBowYd7-SIMULATED_FILL",
+        "signal_kind": "SIMULATED_FILL",
+        "state": "RECONCILED"
+      },
+      {
+        "bot_instance_id": "BOT-STRAT-V-EARLY-LIQ-FLOOR-V1-PAPER",
+        "closed_at": "2026-08-21T19:14:21Z",
+        "entered_notional_usd": 100.0,
+        "exit_notional_usd": null,
+        "mint": "G2FN35qUigZK482Cdy7zkbkexMh1Bdj1E1eAuyzzpump",
+        "opened_at": "2026-08-21T19:14:21Z",
+        "position_id": "POS-BOT-STRAT-V-EARLY-LIQ-FLOOR-V1-PAPER-G2FN35qUigZK-SIMULATED_FILL",
+        "signal_kind": "SIMULATED_FILL",
+        "state": "RECONCILED"
+      },
+      {
+        "bot_instance_id": "BOT-STRAT-V-EARLY-LIQ-FLOOR-V1-PAPER",
+        "closed_at": "2026-08-21T19:14:21Z",
+        "entered_notional_usd": 100.0,
+        "exit_notional_usd": null,
+        "mint": "GL4GhSkQZAge4XSawAYvZCYk9SeD9dXpR8YsaNSfpump",
+        "opened_at": "2026-08-21T19:14:21Z",
+        "position_id": "POS-BOT-STRAT-V-EARLY-LIQ-FLOOR-V1-PAPER-GL4GhSkQZAge-SIMULATED_FILL",
+        "signal_kind": "SIMULATED_FILL",
+        "state": "RECONCILED"
+      },
+      {
+        "bot_instance_id": "BOT-STRAT-V-EARLY-LIQ-FLOOR-V1-PAPER",
+        "closed_at": "2026-08-21T19:14:21Z",
+        "entered_notional_usd": 100.0,
+        "exit_notional_usd": null,
+        "mint": "GyV4U17CN5uW9wQK1r9WEYy4utBfw2SKnae98MgUpump",
+        "opened_at": "2026-08-21T19:14:21Z",
+        "position_id": "POS-BOT-STRAT-V-EARLY-LIQ-FLOOR-V1-PAPER-GyV4U17CN5uW-SIMULATED_FILL",
+        "signal_kind": "SIMULATED_FILL",
+        "state": "RECONCILED"
+      },
+      {
+        "bot_instance_id": "BOT-STRAT-V-EARLY-LIQ-FLOOR-V1-PAPER",
+        "closed_at": "2026-08-21T19:14:21Z",
+        "entered_notional_usd": 100.0,
+        "exit_notional_usd": null,
+        "mint": "HUHjv5UG26x5WjyRCaaAGMKNnigX3J4CneHkcH5Lpump",
+        "opened_at": "2026-08-21T19:14:21Z",
+        "position_id": "POS-BOT-STRAT-V-EARLY-LIQ-FLOOR-V1-PAPER-HUHjv5UG26x5-SIMULATED_FILL",
+        "signal_kind": "SIMULATED_FILL",
+        "state": "RECONCILED"
+      },
+      {
+        "bot_instance_id": "BOT-STRAT-V-EARLY-LIQ-FLOOR-V1-PAPER",
+        "closed_at": "2026-08-21T19:14:21Z",
+        "entered_notional_usd": 100.0,
+        "exit_notional_usd": null,
+        "mint": "Te413aew5Pb16Y4k4vYniK7omEceCkjxJuPYgsmpump",
+        "opened_at": "2026-08-21T19:14:21Z",
+        "position_id": "POS-BOT-STRAT-V-EARLY-LIQ-FLOOR-V1-PAPER-Te413aew5Pb1-SIMULATED_FILL",
+        "signal_kind": "SIMULATED_FILL",
+        "state": "RECONCILED"
+      },
+      {
+        "bot_instance_id": "BOT-STRAT-V-EARLY-LIQ-FLOOR-V1-PAPER",
+        "closed_at": "2026-08-21T19:14:21Z",
+        "entered_notional_usd": 100.0,
+        "exit_notional_usd": null,
+        "mint": "sQBLDEnZQqbGaMj7zY6PnbMFygFfkHncyiPdsHrpump",
+        "opened_at": "2026-08-21T19:14:21Z",
+        "position_id": "POS-BOT-STRAT-V-EARLY-LIQ-FLOOR-V1-PAPER-sQBLDEnZQqbG-SIMULATED_FILL",
+        "signal_kind": "SIMULATED_FILL",
+        "state": "RECONCILED"
+      },
+      {
+        "bot_instance_id": "BOT-STRAT-V-EARLY-LIQ-FLOOR-V1-PAPER",
+        "closed_at": "2026-08-21T19:14:21Z",
+        "entered_notional_usd": 100.0,
+        "exit_notional_usd": null,
+        "mint": "w9ihx9Kb5oZteAXAyc7sbfQcECaJkehoKFo6Sg4pump",
+        "opened_at": "2026-08-21T19:14:21Z",
+        "position_id": "POS-BOT-STRAT-V-EARLY-LIQ-FLOOR-V1-PAPER-w9ihx9Kb5oZt-SIMULATED_FILL",
+        "signal_kind": "SIMULATED_FILL",
+        "state": "RECONCILED"
+      },
+      {
+        "bot_instance_id": "BOT-STRAT-V-EARLY-NETFLOW-TILT-V1-PAPER",
+        "closed_at": "2026-08-21T19:14:21Z",
+        "entered_notional_usd": 100.0,
+        "exit_notional_usd": null,
+        "mint": "6VTduCit8TuG6jiepAmAAiM6xYRLCJEihtsqGktRpump",
+        "opened_at": "2026-08-21T19:14:21Z",
+        "position_id": "POS-BOT-STRAT-V-EARLY-NETFLOW-TILT-V1-PAPER-6VTduCit8TuG-SIMULATED_FILL",
+        "signal_kind": "SIMULATED_FILL",
+        "state": "RECONCILED"
+      },
+      {
+        "bot_instance_id": "BOT-STRAT-V-EARLY-NETFLOW-TILT-V1-PAPER",
+        "closed_at": "2026-08-21T19:14:21Z",
+        "entered_notional_usd": 100.0,
+        "exit_notional_usd": null,
+        "mint": "Te413aew5Pb16Y4k4vYniK7omEceCkjxJuPYgsmpump",
+        "opened_at": "2026-08-21T19:14:21Z",
+        "position_id": "POS-BOT-STRAT-V-EARLY-NETFLOW-TILT-V1-PAPER-Te413aew5Pb1-SIMULATED_FILL",
+        "signal_kind": "SIMULATED_FILL",
+        "state": "RECONCILED"
+      },
+      {
+        "bot_instance_id": "BOT-STRAT-V-EARLY-NETFLOW-TILT-V1-PAPER",
+        "closed_at": "2026-08-21T19:14:21Z",
+        "entered_notional_usd": 100.0,
+        "exit_notional_usd": null,
+        "mint": "w9ihx9Kb5oZteAXAyc7sbfQcECaJkehoKFo6Sg4pump",
+        "opened_at": "2026-08-21T19:14:21Z",
+        "position_id": "POS-BOT-STRAT-V-EARLY-NETFLOW-TILT-V1-PAPER-w9ihx9Kb5oZt-SIMULATED_FILL",
+        "signal_kind": "SIMULATED_FILL",
+        "state": "RECONCILED"
+      }
+    ]
+  },
+  "credential_reads": 0,
+  "factory_core_python_changed": false,
+  "factory_runner_sha256": "d8d22bcb51fb6992d40f09e58274c52e0f9942c12d043cc57b96ffca524e918f",
+  "non_claims": [
+    "NO_ALPHA",
+    "NO_NETRETURN",
+    "NO_REAL_FILLS",
+    "NO_MICRO_LIVE",
+    "NO_THRESHOLD_SEARCH",
+    "NO_ML",
+    "SIMULATED_FILL_NEVER_REAL_FILL",
+    "NO_CANONICAL_DONE"
+  ],
+  "operations_view": {
+    "blocker": "NONE",
+    "bot": "BOT-STRAT-V-EARLY-LIQ-FLOOR-V1-PAPER; BOT-STRAT-V-EARLY-NETFLOW-TILT-V1-PAPER",
+    "exit_readiness": "NOT_APPLICABLE",
+    "mode": "PAPER; PAPER",
+    "next_safe_action": "CONTINUE_PAPER_OBSERVATION",
+    "position": "0 open / 30 total",
+    "reconciliation": "CLEAN",
+    "signal": "SIMULATED_FILL x30",
+    "strategy": "STRAT-V-EARLY-LIQ-FLOOR-V1; STRAT-V-EARLY-NETFLOW-TILT-V1"
+  },
+  "provider_api_rpc_wss_calls": 0,
+  "scientific": {
+    "alive_and_liquid_n": 27,
+    "atom_id": "EARLY_STATE_TO_PAPER_VERTICAL_SLICE_V1",
+    "bin_op": ">=",
+    "bin_threshold": "2000",
+    "bins": {
+      "HIGH": {
+        "coverage": "1",
+        "median_y": "1",
+        "n": 27,
+        "non_degenerate_spread": true
+      },
+      "LOW": {
+        "coverage": "0",
+        "median_y": null,
+        "n": 0,
+        "non_degenerate_spread": false
+      }
+    },
+    "credential_reads": 0,
+    "feature": "X_LIQUIDITY_USD",
+    "joined_n": 27,
+    "non_claims": [
+      "NO_ALPHA",
+      "NO_NETRETURN",
+      "NO_REAL_FILLS",
+      "NO_MICRO_LIVE",
+      "NO_THRESHOLD_SEARCH",
+      "NO_ML",
+      "SIMULATED_FILL_NEVER_REAL_FILL",
+      "NO_CANONICAL_DONE"
+    ],
+    "promotion_gate": {
+      "higher_bin_strictly_better_required": true,
+      "min_bin_n": 8,
+      "min_coverage": "0.7",
+      "passed": false
+    },
+    "provider_api_rpc_wss_calls": 0,
+    "stage": "FROZEN_STATE_EVALUATION",
+    "terminal": "EARLY_STATE_NO_DECISION_VALUE",
+    "unknown_netflow_excluded_n": 21
+  },
+  "stage": "FROZEN_STATE_EVALUATION"
+}

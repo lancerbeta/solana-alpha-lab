@@ -1,0 +1,107 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "repo://catalog/schemas/strategy_version.schema.json",
+  "title": "SMIAL StrategyVersion minimal truth contract",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema",
+    "schema_version",
+    "strategy_id",
+    "strategy_version",
+    "title",
+    "source_decision_asset_id",
+    "hypothesis_ids",
+    "evidence_class",
+    "population_id",
+    "icp_binding",
+    "signal_rule",
+    "entry_rule",
+    "exit_rule",
+    "notional_policy",
+    "risk_policy",
+    "data_requirements",
+    "execution_requirements",
+    "mode_eligibility",
+    "commissioning_only",
+    "created_at",
+    "spec_sha256"
+  ],
+  "properties": {
+    "schema": {"const": "smial.strategy-version"},
+    "schema_version": {"const": "1.0"},
+    "strategy_id": {"type": "string", "pattern": "^STRAT-[A-Z0-9]+(?:-[A-Z0-9]+)*$"},
+    "strategy_version": {"type": "string", "pattern": "^V[0-9]+$"},
+    "title": {"type": "string", "minLength": 4, "maxLength": 160},
+    "source_decision_asset_id": {"type": "string", "minLength": 6, "maxLength": 120},
+    "hypothesis_ids": {
+      "type": "array", "minItems": 1, "uniqueItems": true,
+      "items": {"type": "string", "pattern": "^HYP-[A-Z0-9]+(?:-[A-Z0-9]+)*$"}
+    },
+    "evidence_class": {
+      "enum": ["RETAINED_OFFLINE_DECISION", "PIT_LIVE_DECISION"]
+    },
+    "population_id": {"type": "string", "pattern": "^ICP-[A-Z0-9]+(?:-[A-Z0-9]+)*$"},
+    "icp_binding": {"type": "object", "additionalProperties": false, "required": ["launchpad", "age_band_seconds", "liquidity_usd_min"], "properties": {
+      "launchpad": {"const": "pump.fun"},
+      "age_band_seconds": {"type": "object", "additionalProperties": false, "required": ["min", "max_exclusive"], "properties": {
+        "min": {"const": 300},
+        "max_exclusive": {"const": 900}
+      }},
+      "liquidity_usd_min": {"const": 1000}
+    }},
+    "signal_rule": {"$ref": "#/$defs/signal_rule"},
+    "entry_rule": {"type": "object", "additionalProperties": false, "required": ["when_signal_kind_in"], "properties": {
+      "when_signal_kind_in": {"type": "array", "minItems": 1, "uniqueItems": true, "items": {"enum": ["SIMULATED_FILL", "SHADOW_EXECUTABLE"]}}
+    }},
+    "exit_rule": {"type": "object", "additionalProperties": false, "required": ["kind"], "properties": {
+      "kind": {"enum": ["NEXT_OBSERVATION"]}
+    }},
+    "notional_policy": {"type": "object", "additionalProperties": false, "required": ["notional_usd", "fee_bps", "fill_basis"], "properties": {
+      "notional_usd": {"type": "number", "exclusiveMinimum": 0},
+      "fee_bps": {"type": "integer", "minimum": 0, "maximum": 10000},
+      "fill_basis": {"enum": ["DECISION_TIME_PRICE_THEN_NEXT_SNAPSHOT"]}
+    }},
+    "risk_policy": {"type": "object", "additionalProperties": false, "required": ["max_open_positions"], "properties": {
+      "max_open_positions": {"type": "integer", "minimum": 1}
+    }},
+    "data_requirements": {"type": "array", "minItems": 2, "maxItems": 8, "items": {"type": "object", "additionalProperties": false, "required": ["requirement_id", "path", "sha256"], "properties": {
+      "requirement_id": {"type": "string", "minLength": 3, "maxLength": 80},
+      "path": {"type": "string", "minLength": 6, "maxLength": 240},
+      "sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"}
+    }}},
+    "execution_requirements": {"type": "object", "additionalProperties": false, "required": ["engine"], "properties": {
+      "engine": {"const": "paper_plane_v1"}
+    }},
+    "mode_eligibility": {"type": "object", "additionalProperties": false, "required": ["paper", "shadow", "micro_live"], "properties": {
+      "paper": {"const": true},
+      "shadow": {"type": "boolean"},
+      "micro_live": {"const": false}
+    }},
+    "commissioning_only": {"const": true},
+    "created_at": {"type": "string", "pattern": "^20[0-9]{2}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}Z$"},
+    "spec_sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"}
+  },
+  "$defs": {
+    "field_ref": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["field"],
+      "properties": {
+        "field": {"enum": ["X_LIQUIDITY_USD", "X_NETFLOW_SHARE", "Y_LIQUIDITY_RATIO"]},
+        "op": {"enum": [">=", "<", ">", "<="]},
+        "threshold": {"type": "number"}
+      }
+    },
+    "signal_rule": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["feature", "bin_op", "bin_threshold"],
+      "properties": {
+        "feature": {"enum": ["X_LIQUIDITY_USD", "X_NETFLOW_SHARE"]},
+        "bin_op": {"enum": [">=", ">"]},
+        "bin_threshold": {"type": "number"}
+      }
+    }
+  }
+}

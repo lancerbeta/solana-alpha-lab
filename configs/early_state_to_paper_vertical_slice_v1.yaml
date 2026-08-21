@@ -1,0 +1,35 @@
+schema: smial.early-state-to-paper-vertical-slice
+schema_version: '1.0'
+atom_id: EARLY_STATE_TO_PAPER_VERTICAL_SLICE_V1
+as_of: '2026-08-21'
+stage: FROZEN_STATE_EVALUATION
+factory_runner: src/solana_alpha_lab/factory/runner.py
+factory_runner_sha256: d8d22bcb51fb6992d40f09e58274c52e0f9942c12d043cc57b96ffca524e918f
+icp:
+  population_id: ICP-EARLY-PUMPFUN-V1
+  launchpad: pump.fun
+  liquidity_usd_min: 1000
+decision_time_observed_at: '2026-08-21T12:23:26Z'
+frozen_rule:
+  feature: X_LIQUIDITY_USD
+  bin_op: '>='
+  bin_threshold: 2000
+pins:
+  decision_search_body:
+    path: local/in_scope_population_live_supply_gate/71b1e477322066b1a5876ad22769fb22465641ce2749f5a5e519f3099f20389a.body
+    sha256: 71b1e477322066b1a5876ad22769fb22465641ce2749f5a5e519f3099f20389a
+  later_search_body:
+    path: local/early_icp_freeze_maturity_probe/132ab5a5dfe876c7.body
+    sha256: 132ab5a5dfe876c7e04a50edd93edeb49f62f42e8958452cfd59a6cc7f803bdd
+  icp_freeze_runtime:
+    path: docs/evidence/early_icp_freeze/a1_runtime_receipt_v1.json
+    sha256: efe98d0aa4f2017e205e18344e6c908b686a7b3630387e85770199d839222be3
+paper_plane_store_relative: local/factory_v1/paper_plane_state.sqlite
+strategies:
+  - configs/strategies/STRAT-V-EARLY-LIQ-FLOOR-COMMISSIONING-V1.yaml
+  - configs/strategies/STRAT-V-EARLY-NETFLOW-TILT-COMMISSIONING-V1.yaml
+non_claims:
+  alpha: false
+  netreturn: false
+  real_fills: false
+  micro_live: false
