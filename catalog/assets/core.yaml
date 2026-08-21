@@ -28708,7 +28708,7 @@ records:
   as_of: '2026-08-21'
   truth_owner: ORDINARY_RECENT_EARLY_PATH_H900_FAILED_QUOTES_MEU_REPROJECT_V1
   location: {kind: git_path, logical_uri: 'repo://docs/tasks/ORDINARY_RECENT_EARLY_PATH_H900_FAILED_QUOTES_MEU_REPROJECT_V1.md', repository_path: docs/tasks/ORDINARY_RECENT_EARLY_PATH_H900_FAILED_QUOTES_MEU_REPROJECT_V1.md}
-  integrity: {kind: sha256, sha256: 6f4c460c62b59d37f31b53f39d7bd437eb46d2a0aefcee4aec47e0bbaf695d87}
+  integrity: {kind: sha256, sha256: 2328e368ea31f28dffd061b6e40e7abe68adc0eb81cde04218977f9d5be48e16}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: contains, target_asset_id: CONFIG-ORDINARY-RECENT-EARLY-PATH-H900-FAILED-QUOTES-MEU-REPROJECT-001}

@@ -11,7 +11,7 @@
   "cloud_bundle_smoke_required": false,
   "capability_radar_now": "NONE",
   "implementation_bindings": {
-    "docs/tasks/ORDINARY_RECENT_EARLY_PATH_H900_FAILED_QUOTES_MEU_REPROJECT_V1.md": "6f4c460c62b59d37f31b53f39d7bd437eb46d2a0aefcee4aec47e0bbaf695d87",
+    "docs/tasks/ORDINARY_RECENT_EARLY_PATH_H900_FAILED_QUOTES_MEU_REPROJECT_V1.md": "2328e368ea31f28dffd061b6e40e7abe68adc0eb81cde04218977f9d5be48e16",
     "configs/ordinary_recent_early_path_h900_failed_quotes_meu_reproject_v1.yaml": "92f2badf80fd72457c0e955a30b393fcd674c1c85d899cf6945e5d18863dac7c",
     "src/solana_alpha_lab/quote_native_evidence_fit_panel.py": "fb2bc6a1f54aa0357cd400c110b9f4442e235dbe784de32066428572f96cd484",
     "src/solana_alpha_lab/ordinary_recent_early_path_h900_failed_quotes_meu_reproject.py": "731d71e221811839aa82c280b8be9957caaccf8947638337e0577e766b2b3f99",
@@ -26,7 +26,8 @@
     "docs/evidence/ordinary_recent_early_path_h900_failed_quotes_meu_reproject/a1_ordinary_recent_early_path_h900_failed_quotes_meu_reproject_runtime_receipt_v1.json": "0e9d19cad1b0d701cc9f6951c440e7438a56d46b518e26d9b70679e93c331cea",
     "docs/evidence/ordinary_recent_early_path_h900_failed_quotes_meu_reproject/a1_ordinary_recent_early_path_h900_failed_quotes_meu_reproject_acceptance_v1.json": "87eae671eefa0d36c582d3f098c904d6fd1a71286097f11f60c5180f7a1e47ea",
     "docs/reports/ordinary_recent_early_path_h900_failed_quotes_meu_reproject/a1_owner_readout_v1.md": "0de1a9a733e6d8aab7df1d22d7eeea15bcf0a4110053e7dde77ec9c6b788f6a4",
-    "catalog/assets/core.yaml": "b844fe2aba59d21bcd58e04ad4db2156c28ba7f3d2cb170709cfb661ea247801",
+    "catalog/assets/core.yaml": "80db56192f983b901118e7f9f17296de2621148863b4ce001fcf2e1b3c45972f",
+    "catalog/assets/lifecycle.yaml": "6a68c1addcdc5c82bfaaf91540e95254117c0c923b6d9827b98a184b4cb14c0e",
     "catalog/catalog_manifest.yaml": "0aefa581e84de1d6749b2b1d1a4991a6cdc327fe2e825e09f10c18a0928cfc8c",
     "catalog/generated/asset_edges.json": "8fbf87edabf003e790e21694ba449794ef4f44dbb082c98789051f0681c624a9",
     "docs/PROJECT_MAP.md": "819cbb1fe458c3baee94714b96881af1d3245b7888d52f7a9cb9428448e07b61",
@@ -42,14 +43,14 @@
   },
   "factory_fit": {
     "path": "docs/evidence/ordinary_recent_early_path_h900_failed_quotes_meu_reproject/a1_delivery_factory_fit_v1.json",
-    "sha256": "7478309268597e42b1b9f821a2e7591cfcc8589d96b25dad86db79f804982f26",
+    "sha256": "PLACEHOLDER",
     "verdict": "PASS"
   },
   "validation": {
     "targeted": "PASS_ORDINARY_RECENT_EARLY_PATH_H900_FAILED_QUOTES_MEU_REPROJECT_TESTS",
     "independent_review": {
       "path": "docs/evidence/ordinary_recent_early_path_h900_failed_quotes_meu_reproject/a1_delivery_independent_review_v1.json",
-      "sha256": "ff2053b44862d9c12e2c3434ee10f845e928c8d0613ac375d3c9b2e949d18d52",
+      "sha256": "PLACEHOLDER",
       "verdict": "PASS"
     },
     "full_gate": "ENFORCED_BY_PROJECT_BOUND_VALIDATION",

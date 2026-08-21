@@ -33,6 +33,7 @@ managed_write_set:
   - docs/evidence/ordinary_recent_early_path_h900_failed_quotes_meu_reproject/a1_delivery_completion_evidence_v1.json
   - docs/reports/ordinary_recent_early_path_h900_failed_quotes_meu_reproject/a1_owner_readout_v1.md
   - catalog/assets/core.yaml
+  - catalog/assets/lifecycle.yaml
   - catalog/catalog_manifest.yaml
   - catalog/generated/asset_edges.json
   - docs/PROJECT_MAP.md
