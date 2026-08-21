@@ -713,6 +713,11 @@
       "target_asset_id": "CTRL-FRESH-OOS-BASELINE-VS-FRICTION-VETO-001"
     },
     {
+      "source_asset_id": "CONFIG-IN-SCOPE-POPULATION-AND-STATE-DISCOVERY-001",
+      "relation": "governed_by",
+      "target_asset_id": "CTRL-IN-SCOPE-POPULATION-AND-STATE-DISCOVERY-001"
+    },
+    {
       "source_asset_id": "CONFIG-IN-SCOPE-POPULATION-FIT-RECONCILIATION-001",
       "relation": "governed_by",
       "target_asset_id": "CTRL-IN-SCOPE-POPULATION-FIT-RECONCILIATION-001"
@@ -2248,6 +2253,36 @@
       "target_asset_id": "CTRL-TASK-04-001"
     },
     {
+      "source_asset_id": "CTRL-IN-SCOPE-POPULATION-AND-STATE-DISCOVERY-001",
+      "relation": "contains",
+      "target_asset_id": "CONFIG-IN-SCOPE-POPULATION-AND-STATE-DISCOVERY-001"
+    },
+    {
+      "source_asset_id": "CTRL-IN-SCOPE-POPULATION-AND-STATE-DISCOVERY-001",
+      "relation": "contains",
+      "target_asset_id": "MODULE-IN-SCOPE-POPULATION-SUPPLY-GATE-001"
+    },
+    {
+      "source_asset_id": "CTRL-IN-SCOPE-POPULATION-AND-STATE-DISCOVERY-001",
+      "relation": "contains",
+      "target_asset_id": "SCRIPT-IN-SCOPE-POPULATION-SUPPLY-GATE-001"
+    },
+    {
+      "source_asset_id": "CTRL-IN-SCOPE-POPULATION-AND-STATE-DISCOVERY-001",
+      "relation": "depends_on",
+      "target_asset_id": "EVIDENCE-IN-SCOPE-POPULATION-FIT-RECONCILIATION-ACCEPTANCE-001"
+    },
+    {
+      "source_asset_id": "CTRL-IN-SCOPE-POPULATION-AND-STATE-DISCOVERY-001",
+      "relation": "depends_on",
+      "target_asset_id": "EVIDENCE-ORDINARY-RECENT-EARLY-PATH-H900-AUDITION-001"
+    },
+    {
+      "source_asset_id": "CTRL-IN-SCOPE-POPULATION-AND-STATE-DISCOVERY-001",
+      "relation": "validated_by",
+      "target_asset_id": "TEST-IN-SCOPE-POPULATION-SUPPLY-GATE-001"
+    },
+    {
       "source_asset_id": "CTRL-IN-SCOPE-POPULATION-FIT-RECONCILIATION-001",
       "relation": "contains",
       "target_asset_id": "CONFIG-IN-SCOPE-POPULATION-FIT-RECONCILIATION-001"
@@ -3696,6 +3731,46 @@
       "source_asset_id": "EVIDENCE-FRESH-OOS-FRICTION-VETO-RUNTIME-001",
       "relation": "derived_from",
       "target_asset_id": "CTRL-FRESH-OOS-BASELINE-VS-FRICTION-VETO-001"
+    },
+    {
+      "source_asset_id": "EVIDENCE-IN-SCOPE-POPULATION-AND-STATE-DISCOVERY-ACCEPTANCE-001",
+      "relation": "derived_from",
+      "target_asset_id": "EVIDENCE-IN-SCOPE-POPULATION-AND-STATE-DISCOVERY-RUNTIME-001"
+    },
+    {
+      "source_asset_id": "EVIDENCE-IN-SCOPE-POPULATION-AND-STATE-DISCOVERY-DELIVERY-COMPLETION-001",
+      "relation": "depends_on",
+      "target_asset_id": "SCHEMA-DELIVERY-COMPLETION-EVIDENCE-001"
+    },
+    {
+      "source_asset_id": "EVIDENCE-IN-SCOPE-POPULATION-AND-STATE-DISCOVERY-DELIVERY-COMPLETION-001",
+      "relation": "derived_from",
+      "target_asset_id": "EVIDENCE-IN-SCOPE-POPULATION-AND-STATE-DISCOVERY-ACCEPTANCE-001"
+    },
+    {
+      "source_asset_id": "EVIDENCE-IN-SCOPE-POPULATION-AND-STATE-DISCOVERY-DELIVERY-FACTORY-FIT-001",
+      "relation": "depends_on",
+      "target_asset_id": "EVIDENCE-IN-SCOPE-POPULATION-AND-STATE-DISCOVERY-DELIVERY-INDEPENDENT-REVIEW-001"
+    },
+    {
+      "source_asset_id": "EVIDENCE-IN-SCOPE-POPULATION-AND-STATE-DISCOVERY-DELIVERY-FACTORY-FIT-001",
+      "relation": "derived_from",
+      "target_asset_id": "EVIDENCE-IN-SCOPE-POPULATION-AND-STATE-DISCOVERY-RUNTIME-001"
+    },
+    {
+      "source_asset_id": "EVIDENCE-IN-SCOPE-POPULATION-AND-STATE-DISCOVERY-DELIVERY-INDEPENDENT-REVIEW-001",
+      "relation": "depends_on",
+      "target_asset_id": "SCHEMA-DELIVERY-INDEPENDENT-REVIEW-EVIDENCE-001"
+    },
+    {
+      "source_asset_id": "EVIDENCE-IN-SCOPE-POPULATION-AND-STATE-DISCOVERY-DELIVERY-INDEPENDENT-REVIEW-001",
+      "relation": "derived_from",
+      "target_asset_id": "EVIDENCE-IN-SCOPE-POPULATION-AND-STATE-DISCOVERY-RUNTIME-001"
+    },
+    {
+      "source_asset_id": "EVIDENCE-IN-SCOPE-POPULATION-AND-STATE-DISCOVERY-RUNTIME-001",
+      "relation": "derived_from",
+      "target_asset_id": "CTRL-IN-SCOPE-POPULATION-AND-STATE-DISCOVERY-001"
     },
     {
       "source_asset_id": "EVIDENCE-IN-SCOPE-POPULATION-FIT-RECONCILIATION-ACCEPTANCE-001",
@@ -7743,6 +7818,11 @@
       "target_asset_id": "CONFIG-IN-SCOPE-POPULATION-FIT-RECONCILIATION-001"
     },
     {
+      "source_asset_id": "MODULE-IN-SCOPE-POPULATION-SUPPLY-GATE-001",
+      "relation": "depends_on",
+      "target_asset_id": "CONFIG-IN-SCOPE-POPULATION-AND-STATE-DISCOVERY-001"
+    },
+    {
       "source_asset_id": "MODULE-ORDINARY-MARKET-PIT-LOCAL-RAW-ENVELOPE-001",
       "relation": "depends_on",
       "target_asset_id": "CONFIG-ORDINARY-MARKET-PIT-LOCAL-RAW-ENVELOPE-BIND-001"
@@ -9573,6 +9653,11 @@
       "target_asset_id": "EVIDENCE-FRESH-OOS-FRICTION-VETO-ACCEPTANCE-001"
     },
     {
+      "source_asset_id": "REPORT-IN-SCOPE-POPULATION-AND-STATE-DISCOVERY-OWNER-READOUT-001",
+      "relation": "derived_from",
+      "target_asset_id": "EVIDENCE-IN-SCOPE-POPULATION-AND-STATE-DISCOVERY-ACCEPTANCE-001"
+    },
+    {
       "source_asset_id": "REPORT-IN-SCOPE-POPULATION-FIT-RECONCILIATION-OWNER-READOUT-001",
       "relation": "derived_from",
       "target_asset_id": "EVIDENCE-IN-SCOPE-POPULATION-FIT-RECONCILIATION-ACCEPTANCE-001"
@@ -10548,6 +10633,11 @@
       "target_asset_id": "MODULE-IN-SCOPE-POPULATION-FIT-RECONCILIATION-001"
     },
     {
+      "source_asset_id": "SCRIPT-IN-SCOPE-POPULATION-SUPPLY-GATE-001",
+      "relation": "depends_on",
+      "target_asset_id": "MODULE-IN-SCOPE-POPULATION-SUPPLY-GATE-001"
+    },
+    {
       "source_asset_id": "SCRIPT-ORDINARY-MARKET-PIT-LOCAL-RAW-ENVELOPE-BIND-001",
       "relation": "depends_on",
       "target_asset_id": "MODULE-ORDINARY-MARKET-PIT-LOCAL-RAW-ENVELOPE-001"
@@ -11441,6 +11531,11 @@
       "source_asset_id": "TEST-IN-SCOPE-POPULATION-FIT-RECONCILIATION-001",
       "relation": "depends_on",
       "target_asset_id": "MODULE-IN-SCOPE-POPULATION-FIT-RECONCILIATION-001"
+    },
+    {
+      "source_asset_id": "TEST-IN-SCOPE-POPULATION-SUPPLY-GATE-001",
+      "relation": "depends_on",
+      "target_asset_id": "MODULE-IN-SCOPE-POPULATION-SUPPLY-GATE-001"
     },
     {
       "source_asset_id": "TEST-ORDINARY-MARKET-PIT-LOCAL-RAW-ENVELOPE-BIND-001",

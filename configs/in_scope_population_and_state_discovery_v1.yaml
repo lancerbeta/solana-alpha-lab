@@ -1,0 +1,35 @@
+schema: smial.in-scope-population-and-state-discovery
+schema_version: '1.0'
+atom_id: IN_SCOPE_POPULATION_AND_STATE_DISCOVERY_V1
+as_of: '2026-08-21'
+stage: SUPPLY_GATE_OFFLINE
+factory_runner: src/solana_alpha_lab/factory/runner.py
+factory_runner_sha256: d8d22bcb51fb6992d40f09e58274c52e0f9942c12d043cc57b96ffca524e918f
+frozen_population:
+  path: docs/evidence/in_scope_population_fit_reconciliation/a1_acceptance_v1.json
+  sha256: 87b7e90ffb32f88b2b6b2aee014670c0176836b2b34f5c38d75a08605f6abd20
+pins:
+  atom1_runtime:
+    path: docs/evidence/in_scope_population_fit_reconciliation/a1_runtime_receipt_v1.json
+    sha256: 8547ac4ffa91516f246969d14a6859feae3c343d2dacc261530c8a528823cee2
+  early_path_runtime:
+    path: docs/evidence/ordinary_recent_early_path_h900_audition/a1_ordinary_recent_early_path_h900_audition_runtime_receipt_v1.json
+    sha256: 0acdc847eaf404bf61845cd471b17b91cf6255f24edc82363c2f10a74e7d786b
+supply:
+  early_n_min: 12
+  seasoned_n_min: 12
+  liquidity_usd_min: 1000
+  launchpad: pump.fun
+harvest:
+  instant_three_call: FORBIDDEN_FOR_EARLY
+  early: WAIT_THEN_SEARCH
+  seasoned: TOPTRADED_SEARCH_RECLASSIFY
+live_capture:
+  authorized: false
+  owner_phrase: null
+non_claims:
+  alpha: false
+  netreturn: false
+  quotes: false
+  state_rules: false
+  live_provider: false
