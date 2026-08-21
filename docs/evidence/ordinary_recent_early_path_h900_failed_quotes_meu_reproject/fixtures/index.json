@@ -1,0 +1,30 @@
+{
+  "schema": "smial.early-path-failed-quotes-fixtures",
+  "schema_version": "1.0",
+  "bodies": [
+    {
+      "mint": "3FxiMpjvVrrodGGaujN3MAJjEAqbzoJATSqTiRYNpump",
+      "response_sha256": "50ef83cfc5f72edd191f39c4a3ce5a6b7a90ec48456a82d92af35c976c0ba3b1",
+      "http_status": 400,
+      "bytes": 83
+    },
+    {
+      "mint": "3U5AGugrnviTgTSgkcwmZJmQGvi55gyihrgipekJpump",
+      "response_sha256": "839d8c8a933f4dced65a9b4afed09169436bf21cd24161d78ff731e5303535ea",
+      "http_status": 400,
+      "bytes": 83
+    },
+    {
+      "mint": "24wo2jV6GkwkynA3qMqYUbGpLBL4o68ujLsHRiXzpump",
+      "response_sha256": "788e47d2a69a3d8563fce09928f7285e9a9aec6a13c75f62062cb67205680ca1",
+      "http_status": 400,
+      "bytes": 83
+    },
+    {
+      "mint": "G45iogfmnJP6jxr7xVU48C1TLcDRZKN7EcTyMGsqpump",
+      "response_sha256": "4f39d14ee53b98d4e5a351591232d2280fcee6e26ff65eb012b042d08a8a2090",
+      "http_status": 400,
+      "bytes": 83
+    }
+  ]
+}
