@@ -30,6 +30,7 @@ class DeliveryHarnessSkillTests(unittest.TestCase):
         self.assertIn("Do not use for orientation phrases", metadata["description"])
         self.assertIn("classifies the turn as `ORIENTATION`", text)
         self.assertIn("probe and fix that on the working path", text)
+        self.assertIn("before Catalog, receipts, reviews", text)
         self.assertIn("Do not document a five-second mechanical miss", text)
         self.assertFalse((ROOT / ".cursor/skills").exists())
 
