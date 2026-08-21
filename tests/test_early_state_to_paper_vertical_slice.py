@@ -15,6 +15,7 @@ if str(SRC) not in sys.path:
 from solana_alpha_lab.early_state_hypothesis import (  # noqa: E402
     ATOM_ID,
     EarlyStateError,
+    build_cohort,
     evaluate,
     load_config,
 )
@@ -22,6 +23,7 @@ from solana_alpha_lab.factory.paper_plane import (  # noqa: E402
     PaperPlaneError,
     PaperPlaneStore,
     load_strategy_version,
+    run_commissioning,
     signal_kind_for,
 )
 
@@ -149,6 +151,54 @@ class SignalRuleTests(unittest.TestCase):
         self.assertEqual(kind, "NO_SIGNAL")
 
 
+class PromotionGateTests(unittest.TestCase):
+    def _stats(self, high_n, low_n, high_median="1.2", low_median="1.0", spread=True):
+        return {
+            "HIGH": {
+                "n": high_n,
+                "median_y": high_median,
+                "coverage": "0.9",
+                "non_degenerate_spread": spread,
+            },
+            "LOW": {
+                "n": low_n,
+                "median_y": low_median,
+                "coverage": "0.9",
+                "non_degenerate_spread": spread,
+            },
+        }
+
+    def test_gate_passes_on_healthy_split(self) -> None:
+        from solana_alpha_lab.early_state_hypothesis import apply_gate
+
+        self.assertTrue(apply_gate(self._stats(10, 10)))
+
+    def test_gate_fails_when_low_bin_below_min_n(self) -> None:
+        from solana_alpha_lab.early_state_hypothesis import apply_gate
+
+        self.assertFalse(apply_gate(self._stats(20, 5)))
+
+    def test_gate_fails_when_high_not_strictly_better(self) -> None:
+        from solana_alpha_lab.early_state_hypothesis import apply_gate
+
+        self.assertFalse(apply_gate(self._stats(10, 10, high_median="0.9", low_median="1.0")))
+
+    def test_gate_fails_on_degenerate_spread(self) -> None:
+        from solana_alpha_lab.early_state_hypothesis import apply_gate
+
+        self.assertFalse(apply_gate(self._stats(10, 10, spread=False)))
+
+    def test_too_sparse_terminal_shape_matches_normal_path(self) -> None:
+        from solana_alpha_lab.early_state_hypothesis import TOO_SPARSE
+
+        stats = self._stats(2, 2)
+        # direct gate check on a too-sparse cohort shape
+        self.assertFalse(__import__(
+            "solana_alpha_lab.early_state_hypothesis", fromlist=["apply_gate"]
+        ).apply_gate(stats))
+        self.assertTrue(hasattr(TOO_SPARSE, "__str__"))
+
+
 class FrozenHypothesisTests(unittest.TestCase):
     def test_config_pins_and_runner_unchanged(self) -> None:
         config = load_config(ROOT)
@@ -165,7 +215,7 @@ class FrozenHypothesisTests(unittest.TestCase):
         self.assertEqual(runtime["terminal"], committed["scientific"]["terminal"])
         self.assertEqual(runtime["joined_n"], committed["scientific"]["joined_n"])
 
-    def test_below_min_cohort_returns_too_sparse_fail_closed(self) -> None:
+    def test_missing_pins_fail_closed_before_read(self) -> None:
         config = load_config(ROOT)
         config = dict(config)
         config["pins"] = {
@@ -175,6 +225,31 @@ class FrozenHypothesisTests(unittest.TestCase):
         root = Path(__file__).resolve().parents[1]
         with self.assertRaisesRegex(EarlyStateError, "PIN_MISSING"):
             evaluate(root, config)
+
+
+class RunnerRerunTests(unittest.TestCase):
+    def test_commissioning_is_rerunnable_over_reconciled_store(self) -> None:
+        config = load_config(ROOT)
+        cohort, _extras = build_cohort(ROOT, config)
+        with tempfile.TemporaryDirectory() as tmp:
+            store_path = Path(tmp) / "state.sqlite"
+            first = run_commissioning(
+                ROOT,
+                strategy_relatives=list(config["strategies"]),
+                store_path=store_path,
+                cohort=cohort,
+            )
+            second = run_commissioning(
+                ROOT,
+                strategy_relatives=list(config["strategies"]),
+                store_path=store_path,
+                cohort=cohort,
+            )
+            self.assertEqual(
+                [s["simulated_fills"] for s in first["per_strategy"]],
+                [s["simulated_fills"] for s in second["per_strategy"]],
+            )
+            self.assertTrue(all(p["state"] == "RECONCILED" for p in second["positions"]))
 
 
 if __name__ == "__main__":

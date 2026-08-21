@@ -175,6 +175,25 @@ def bin_of(feature: str, op: str, threshold: Decimal, value: Decimal | None) -> 
     raise EarlyStateError("BIN_OP_INVALID")
 
 
+def apply_gate(stats: dict[str, Any]) -> bool:
+    """Pure pre-declared promotion gate. No fitting, no rescue."""
+
+    high_first = stats["HIGH"]["n"] >= MIN_BIN_N and bool(stats["HIGH"]["non_degenerate_spread"])
+    low_first = stats["LOW"]["n"] >= MIN_BIN_N and bool(stats["LOW"]["non_degenerate_spread"])
+    coverage_ok = all(
+        Decimal(s["coverage"]) >= MIN_COVERAGE for s in stats.values()
+    )
+    medians_comparable = (
+        stats["HIGH"]["median_y"] is not None
+        and stats["LOW"]["median_y"] is not None
+    )
+    higher_better = (
+        medians_comparable
+        and Decimal(stats["HIGH"]["median_y"]) > Decimal(stats["LOW"]["median_y"])
+    )
+    return high_first and low_first and coverage_ok and higher_better
+
+
 def evaluate(root: Path, config: dict[str, Any] | None = None) -> dict[str, Any]:
     config = config or load_config(root)
     for key, pin in config["pins"].items():
@@ -209,7 +228,13 @@ def evaluate(root: Path, config: dict[str, Any] | None = None) -> dict[str, Any]
         values = bins[label]
         n = len(values)
         median = median_of(values)
-        coverage = Decimal(n) / Decimal(joined_n) if joined_n else Decimal(0)
+        alive_in_bin = sum(
+            1
+            for row in cohort
+            if row["alive_and_liquid"]
+            and bin_of(feature, op, threshold, row[feature]) == label
+        )
+        coverage = Decimal(n) / Decimal(alive_in_bin) if alive_in_bin else Decimal(0)
         spread_ok = len(set(values)) >= 2 if n else False
         stats[label] = {
             "n": n,
@@ -217,20 +242,7 @@ def evaluate(root: Path, config: dict[str, Any] | None = None) -> dict[str, Any]
             "coverage": str(coverage),
             "non_degenerate_spread": spread_ok,
         }
-    high_first = stats["HIGH"]["n"] >= MIN_BIN_N and bool(stats["HIGH"]["non_degenerate_spread"])
-    low_first = stats["LOW"]["n"] >= MIN_BIN_N and bool(stats["LOW"]["non_degenerate_spread"])
-    coverage_ok = all(
-        Decimal(s["coverage"]) >= MIN_COVERAGE for s in stats.values()
-    )
-    medians_comparable = (
-        stats["HIGH"]["median_y"] is not None
-        and stats["LOW"]["median_y"] is not None
-    )
-    higher_better = (
-        medians_comparable
-        and Decimal(stats["HIGH"]["median_y"]) > Decimal(stats["LOW"]["median_y"])
-    )
-    promoted = high_first and low_first and coverage_ok and higher_better
+    promoted = apply_gate(stats)
     terminal = PROMOTION_CANDIDATE if promoted else NO_DECISION_VALUE
     return {
         "atom_id": ATOM_ID,
@@ -308,11 +320,15 @@ def project_operational_view(
         if unreconciled
         else ("CONTINUE_PAPER_OBSERVATION" if bots else "START_PAPER_BOT")
     )
+    filled = sum(1 for p in positions if p.get("signal_kind") == "SIMULATED_FILL")
+    signal_summary = (
+        f"SIMULATED_FILL x{filled}" if filled else "NO_SIGNAL"
+    )
     return {
         "strategy": "; ".join(sorted({str(b.get("strategy_version")) for b in bots})) or "NONE",
         "bot": "; ".join(str(b.get("bot_instance_id")) for b in bots) or "NONE",
         "mode": "; ".join(str(b.get("mode")) for b in bots) or "NONE",
-        "signal": runtime.get("last_signal_kind") or "UNKNOWN",
+        "signal": signal_summary,
         "position": f"{len(open_positions)} open / {len(positions)} total",
         "exit_readiness": "READY_NEXT_OBSERVATION" if open_positions else "NOT_APPLICABLE",
         "reconciliation": "CLEAN" if not unreconciled else f"{len(unreconciled)} UNRECONCILED",

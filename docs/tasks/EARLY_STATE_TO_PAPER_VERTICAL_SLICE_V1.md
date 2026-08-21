@@ -22,7 +22,6 @@ managed_write_set:
   - src/solana_alpha_lab/early_state_hypothesis.py
   - src/solana_alpha_lab/factory/paper_plane.py
   - scripts/run_early_state_hypothesis.py
-  - scripts/run_paper_plane_commissioning.py
   - tests/test_early_state_to_paper_vertical_slice.py
   - catalog/assets/core.yaml
   - catalog/catalog_manifest.yaml

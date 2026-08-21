@@ -23,7 +23,7 @@
     "next_safe_action": "CONTINUE_PAPER_OBSERVATION",
     "position": "0 open / 30 total",
     "reconciliation": "CLEAN",
-    "signal": "UNKNOWN",
+    "signal": "SIMULATED_FILL x30",
     "strategy": "STRAT-V-EARLY-LIQ-FLOOR-V1; STRAT-V-EARLY-NETFLOW-TILT-V1"
   },
   "product_terminal": "GENERIC_RESEARCH_TO_PAPER_PLANE_PASS",

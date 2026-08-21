@@ -29489,7 +29489,7 @@ records:
   as_of: '2026-08-21'
   truth_owner: EARLY_STATE_TO_PAPER_VERTICAL_SLICE_V1
   location: {kind: git_path, logical_uri: 'repo://docs/tasks/EARLY_STATE_TO_PAPER_VERTICAL_SLICE_V1.md', repository_path: docs/tasks/EARLY_STATE_TO_PAPER_VERTICAL_SLICE_V1.md}
-  integrity: {kind: sha256, sha256: 9c2655638798221116bfa3b3a91ef984a519de4faa1ba951efc080eb5ad0b911}
+  integrity: {kind: sha256, sha256: f136f4d3662bcbdb3bc15bf116d3f945f022b7063742182860e578a73cfe33e3}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: contains, target_asset_id: CONFIG-EARLY-STATE-TO-PAPER-VERTICAL-SLICE-001}
@@ -29580,7 +29580,7 @@ records:
   as_of: '2026-08-21'
   truth_owner: EARLY_STATE_TO_PAPER_VERTICAL_SLICE_V1
   location: {kind: git_path, logical_uri: 'repo://src/solana_alpha_lab/early_state_hypothesis.py', repository_path: src/solana_alpha_lab/early_state_hypothesis.py}
-  integrity: {kind: sha256, sha256: e2f6a945cc94d952a08b30315765cf499b6e6e6daae7fc0737a61e9aa4a9c42d}
+  integrity: {kind: sha256, sha256: 7c8b51d7358c487db0e0488829aca774aec45271aa08fdd9aeb142b263266c7a}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations: [{relation_type: depends_on, target_asset_id: CONFIG-EARLY-STATE-TO-PAPER-VERTICAL-SLICE-001}]
   consumers: [FACTORY-001, GOAL-OWNER]
@@ -29596,7 +29596,7 @@ records:
   as_of: '2026-08-21'
   truth_owner: EARLY_STATE_TO_PAPER_VERTICAL_SLICE_V1
   location: {kind: git_path, logical_uri: 'repo://src/solana_alpha_lab/factory/paper_plane.py', repository_path: src/solana_alpha_lab/factory/paper_plane.py}
-  integrity: {kind: sha256, sha256: 0dfc1a9ee01c175c2b1667ab8795dc96243ea0b1e55f288fc4a6fd8c16c0ceb5}
+  integrity: {kind: sha256, sha256: c66164fc9f6607ddc92d594cd7d8b868b9dc68387bae48b481f3a00b0e5b094e}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: governed_by, target_asset_id: SCHEMA-STRATEGY-VERSION-001}
@@ -29630,7 +29630,7 @@ records:
   as_of: '2026-08-21'
   truth_owner: EARLY_STATE_TO_PAPER_VERTICAL_SLICE_V1
   location: {kind: git_path, logical_uri: 'repo://tests/test_early_state_to_paper_vertical_slice.py', repository_path: tests/test_early_state_to_paper_vertical_slice.py}
-  integrity: {kind: sha256, sha256: ccceb83fd2cb340f94b548a89eadf275dd9d563629757a8818ed6ff690164322}
+  integrity: {kind: sha256, sha256: 3193b78c495c3ea43825e36d31ffd03ab405bb389396c4b5f6cd3b55e626e620}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations: [{relation_type: depends_on, target_asset_id: MODULE-PAPER-PLANE-ENGINE-001}]
   consumers: [FACTORY-001, GOAL-OWNER]
@@ -29646,7 +29646,7 @@ records:
   as_of: '2026-08-21'
   truth_owner: EARLY_STATE_TO_PAPER_VERTICAL_SLICE_V1
   location: {kind: git_path, logical_uri: 'repo://docs/evidence/early_state_paper/a1_runtime_receipt_v1.json', repository_path: docs/evidence/early_state_paper/a1_runtime_receipt_v1.json}
-  integrity: {kind: sha256, sha256: f8022663a71b4359e33b5011e69071e2d06ec45c840f9eff01e781095d627917}
+  integrity: {kind: sha256, sha256: ba6fec2f44969550206008d388703fbe3de39503cb378b5ec2b3610d7863cfdb}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations: [{relation_type: derived_from, target_asset_id: CTRL-EARLY-STATE-TO-PAPER-VERTICAL-SLICE-001}]
   consumers: [FACTORY-001, GOAL-OWNER]
@@ -29662,7 +29662,7 @@ records:
   as_of: '2026-08-21'
   truth_owner: EARLY_STATE_TO_PAPER_VERTICAL_SLICE_V1
   location: {kind: git_path, logical_uri: 'repo://docs/evidence/early_state_paper/a1_acceptance_v1.json', repository_path: docs/evidence/early_state_paper/a1_acceptance_v1.json}
-  integrity: {kind: sha256, sha256: e9980a93124ce40b68945b0802f706df2d85aa1d4c566bd400da76bb7c501d0d}
+  integrity: {kind: sha256, sha256: 6335b0f3a7fa940d6fea48849ee2f7c2239c66c9e15584cd07af53fc74fccd07}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations: [{relation_type: derived_from, target_asset_id: EVIDENCE-EARLY-STATE-PAPER-RUNTIME-001}]
   consumers: [FACTORY-001, GOAL-OWNER]

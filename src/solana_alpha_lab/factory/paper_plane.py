@@ -245,6 +245,9 @@ class PaperPlaneStore:
         ).fetchone()
         return dict(row) if row else None
 
+    def position_id_for(self, *, bot_instance_id: str, mint: str, signal_kind: str) -> str:
+        return f"POS-{bot_instance_id}-{mint[:12]}-{signal_kind}"
+
     def positions(self) -> list[dict[str, Any]]:
         rows = self._conn.execute("SELECT * FROM positions ORDER BY opened_at").fetchall()
         return [dict(row) for row in rows]
@@ -258,8 +261,9 @@ class PaperPlaneStore:
         self.transition(position_id, "SIGNALLED")
         self.transition(position_id, "INTENT_CREATED")
         self.transition(position_id, "ATTEMPTING")
+        self.transition(position_id, "OPEN")
         self._conn.execute(
-            "UPDATE positions SET state='OPEN', signal_kind='SIMULATED_FILL', entered_notional_usd=? WHERE position_id=?",
+            "UPDATE positions SET entered_notional_usd=? WHERE position_id=?",
             (float(notional_usd), position_id),
         )
         self._conn.commit()
@@ -286,7 +290,16 @@ def run_commissioning(
             for row in cohort:
                 kind = signal_kind_for(strategy, row)
                 if kind == "SIMULATED_FILL":
-                    position_id, realized = store.fill_paper(
+                    position_id = store.position_id_for(
+                        bot_instance_id=bot["bot_instance_id"],
+                        mint=str(row.get("mint")),
+                        signal_kind="SIMULATED_FILL",
+                    )
+                    existing = store.get_position(position_id)
+                    if existing is not None and existing["state"] == "RECONCILED":
+                        filled += 1
+                        continue
+                    _, realized = store.fill_paper(
                         bot_instance_id=bot["bot_instance_id"],
                         mint=str(row.get("mint")),
                         notional_usd=Decimal(
