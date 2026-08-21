@@ -82,7 +82,9 @@ context_requirements:
     ARCHITECTURE_DECISIONS:
       - docs/architecture/intents/ARCH-INTENT-005-factory-v1-operational-readiness-and-owner-experience.md
     DELIVERY_EVIDENCE:
-      - docs/evidence/ordinary_recent_organic_pressure_h900_audition/a1_ordinary_recent_organic_pressure_h900_audition_acceptance_v1.json
+      - docs/evidence/ordinary_recent_early_path_h900_audition/a1_delivery_completion_evidence_v1.json
+      - docs/evidence/ordinary_recent_early_path_h900_audition/a1_delivery_independent_review_v1.json
+      - docs/evidence/ordinary_recent_early_path_h900_audition/a1_delivery_factory_fit_v1.json
     HISTORICAL_CONTEXT: []
 ---
 

@@ -28513,7 +28513,7 @@ records:
   as_of: '2026-08-21'
   truth_owner: ORDINARY_RECENT_EARLY_PATH_H900_AUDITION_V1
   location: {kind: git_path, logical_uri: 'repo://docs/tasks/ORDINARY_RECENT_EARLY_PATH_H900_AUDITION_V1.md', repository_path: docs/tasks/ORDINARY_RECENT_EARLY_PATH_H900_AUDITION_V1.md}
-  integrity: {kind: sha256, sha256: 51475b2058bb6409b9006491ed249ba20e1e1708233f393898a6aabeb2e55dd1}
+  integrity: {kind: sha256, sha256: f0b7d8d6145d731a276992897f8f4f94f2616276641cef909cd2a4b4b2dc4572}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: contains, target_asset_id: CONFIG-ORDINARY-RECENT-EARLY-PATH-H900-AUDITION-001}
