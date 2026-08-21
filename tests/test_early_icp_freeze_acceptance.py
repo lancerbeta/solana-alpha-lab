@@ -23,9 +23,12 @@ from solana_alpha_lab.early_icp_freeze_acceptance import (  # noqa: E402
     project_cohort,
     project_seasoned_branch_close,
     reconcile,
+    verify_local_pins,
 )
 
 DECISION_TIME = datetime(2026, 8, 21, 12, 23, 26, tzinfo=timezone.utc)
+LIVE_EVIDENCE_ROOT = ROOT / "local/in_scope_population_live_supply_gate"
+LIVE_EVIDENCE_PRESENT = (LIVE_EVIDENCE_ROOT / "probe_runtime_receipt_v1.json").is_file()
 
 
 def _row(**overrides: object) -> dict[str, object]:
@@ -49,6 +52,8 @@ class EarlyIcpFreezeAcceptanceTests(unittest.TestCase):
             config["factory_runner_sha256"],
         )
 
+    # DELIVERY_PREFLIGHT_NONCRITICAL_SKIP: docs/evidence/early_icp_freeze/a1_runtime_receipt_v1.json
+    @unittest.skipUnless(LIVE_EVIDENCE_PRESENT, "LOCAL_A4_ABSENT")
     def test_pinned_local_evidence_replay_confirms_early_only_icp(self) -> None:
         config = load_config(ROOT)
         runtime = reconcile(ROOT, config)
@@ -131,12 +136,16 @@ class EarlyIcpFreezeAcceptanceTests(unittest.TestCase):
         )
         self.assertIsNone(candidate)
 
+    # DELIVERY_PREFLIGHT_NONCRITICAL_SKIP: docs/evidence/early_icp_freeze/a1_runtime_receipt_v1.json
+    @unittest.skipUnless(LIVE_EVIDENCE_PRESENT, "LOCAL_A4_ABSENT")
     def test_seasoned_branch_close_reports_toptraded_not_same_population(self) -> None:
         config = load_config(ROOT)
         close = project_seasoned_branch_close(ROOT, config)
         self.assertEqual(close["terminal"], TOPTRADED_NOT_SAME_POPULATION)
         self.assertGreater(close["rows_n"], 0)
 
+    # DELIVERY_PREFLIGHT_NONCRITICAL_SKIP: docs/evidence/early_icp_freeze/a1_runtime_receipt_v1.json
+    @unittest.skipUnless(LIVE_EVIDENCE_PRESENT, "LOCAL_A4_ABSENT")
     def test_cohort_projection_fails_closed_below_minimum(self) -> None:
         config = load_config(ROOT)
         weakened = dict(config)
@@ -144,6 +153,8 @@ class EarlyIcpFreezeAcceptanceTests(unittest.TestCase):
         with self.assertRaisesRegex(IcpFreezeError, "EARLY_N_BELOW_MINIMUM"):
             project_cohort(ROOT, weakened)
 
+    # DELIVERY_PREFLIGHT_NONCRITICAL_SKIP: docs/evidence/early_icp_freeze/a1_runtime_receipt_v1.json
+    @unittest.skipUnless(LIVE_EVIDENCE_PRESENT, "LOCAL_A4_ABSENT")
     def test_pin_hash_drift_detected(self) -> None:
         config = load_config(ROOT)
         pin_path = (ROOT / config["pins"]["live_search_body"]["path"]).resolve()
@@ -156,8 +167,10 @@ class EarlyIcpFreezeAcceptanceTests(unittest.TestCase):
 
         with unittest.mock.patch.object(Path, "read_bytes", poisoned_read_bytes):
             with self.assertRaisesRegex(IcpFreezeError, "PIN_HASH_MISMATCH:live_search_body"):
-                load_config(ROOT)
+                verify_local_pins(ROOT, config)
 
+    # DELIVERY_PREFLIGHT_NONCRITICAL_SKIP: docs/evidence/early_icp_freeze/a1_acceptance_v1.json
+    @unittest.skipUnless(LIVE_EVIDENCE_PRESENT, "LOCAL_A4_ABSENT")
     def test_acceptance_builds_from_runtime(self) -> None:
         config = load_config(ROOT)
         runtime = reconcile(ROOT, config)

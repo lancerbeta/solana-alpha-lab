@@ -29284,7 +29284,7 @@ records:
   as_of: '2026-08-21'
   truth_owner: EARLY_ICP_FREEZE_AND_MATURITY_BRANCH_CLOSE_V1
   location: {kind: git_path, logical_uri: 'repo://docs/tasks/EARLY_ICP_FREEZE_AND_MATURITY_BRANCH_CLOSE_V1.md', repository_path: docs/tasks/EARLY_ICP_FREEZE_AND_MATURITY_BRANCH_CLOSE_V1.md}
-  integrity: {kind: sha256, sha256: 3989babb2a9898b466fbdb68b4dcd1e9c99ebf0b2783602b1bec7ff48c412c37}
+  integrity: {kind: sha256, sha256: dad99f141af55ca07938bd8730b488ce0432fcb76aa9342847685827d079ca39}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: contains, target_asset_id: CONFIG-EARLY-ICP-FREEZE-AND-MATURITY-BRANCH-CLOSE-001}
@@ -29321,7 +29321,7 @@ records:
   as_of: '2026-08-21'
   truth_owner: EARLY_ICP_FREEZE_AND_MATURITY_BRANCH_CLOSE_V1
   location: {kind: git_path, logical_uri: 'repo://src/solana_alpha_lab/early_icp_freeze_acceptance.py', repository_path: src/solana_alpha_lab/early_icp_freeze_acceptance.py}
-  integrity: {kind: sha256, sha256: 22022ea5ff2166ebb45d1656f5a4c65052e201c088f6e039a24d42749b6541f5}
+  integrity: {kind: sha256, sha256: 682f074ab091744c925fbe7a18b78886ea25c91694d306cbf830d82fbcb0ad5e}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: depends_on, target_asset_id: CONFIG-EARLY-ICP-FREEZE-AND-MATURITY-BRANCH-CLOSE-001}
@@ -29371,7 +29371,7 @@ records:
   as_of: '2026-08-21'
   truth_owner: EARLY_ICP_FREEZE_AND_MATURITY_BRANCH_CLOSE_V1
   location: {kind: git_path, logical_uri: 'repo://tests/test_early_icp_freeze_acceptance.py', repository_path: tests/test_early_icp_freeze_acceptance.py}
-  integrity: {kind: sha256, sha256: 6e2b3acca6ec9ea5267a5567dd00bc328ee5d01e6e64c23eb49cb8f8e696163a}
+  integrity: {kind: sha256, sha256: b47d4661dbc52b2c17fb5693e3f71fb4dd42dbf21a8bb2c6e8094b1a5f217487}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations: [{relation_type: depends_on, target_asset_id: MODULE-EARLY-ICP-FREEZE-ACCEPTANCE-001}]
   consumers: [FACTORY-001, GOAL-OWNER]

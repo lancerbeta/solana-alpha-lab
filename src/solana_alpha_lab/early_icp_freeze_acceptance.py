@@ -64,14 +64,25 @@ def load_config(root: Path) -> dict[str, Any]:
     payload = yaml.safe_load((root / CONFIG_RELATIVE).read_bytes())
     _require(isinstance(payload, dict), "CONFIG_NOT_MAPPING")
     _require(payload.get("atom_id") == ATOM_ID, "ATOM_ID_DRIFT")
+    band = payload.get("frozen_icp", {}).get("age_band_seconds", {})
+    _require(
+        int(band.get("min", -1)) == int(AGE_MIN_SECONDS)
+        and int(band.get("max_exclusive", -1)) == int(AGE_MAX_EXCLUSIVE_SECONDS),
+        "FROZEN_ICP_BAND_DRIFT",
+    )
     runner = root / payload["factory_runner"]
     _require(runner.is_file(), "FACTORY_RUNNER_MISSING")
     _require(sha256_file(runner) == payload["factory_runner_sha256"], "FACTORY_RUNNER_DRIFT")
-    for key, pin in payload["pins"].items():
+    return payload
+
+
+def verify_local_pins(root: Path, config: dict[str, Any]) -> None:
+    """Fail-closed over retained A4_OUTSIDE_GIT bytes; absent bytes are an explicit gap."""
+
+    for key, pin in config["pins"].items():
         path = root / pin["path"]
         _require(path.is_file(), f"PIN_MISSING:{key}")
         _require(sha256_file(path) == pin["sha256"], f"PIN_HASH_MISMATCH:{key}")
-    return payload
 
 
 def canonical_candidate(
@@ -225,6 +236,7 @@ def project_maturity_probe(root: Path, config: dict[str, Any]) -> dict[str, Any]
 
 def reconcile(root: Path, config: dict[str, Any] | None = None) -> dict[str, Any]:
     config = config or load_config(root)
+    verify_local_pins(root, config)
     cohort = project_cohort(root, config)
     seasoned = project_seasoned_branch_close(root, config)
     probe = project_maturity_probe(root, config)

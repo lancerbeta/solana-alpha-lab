@@ -88,7 +88,8 @@ Owner direction: `muv-5.md` ATOM 1. This Git contract is the bounded write set.
 The retained local runtime evidence of the already-run live Stage A attempt
 exists outside Git at `local/in_scope_population_live_supply_gate/`
 (hash-enveloped raw bodies plus `probe_runtime_receipt_v1.json`,
-receipt sha256 `bd35bebf03494e6e274ca39d6b10c2a6fbab4dacd163554f469c5a2cf08e3f66`).
+receipt sha256 `adf4afb5ccfa18e09d7c9c3c8c61ce28903c9b8421e3891d068474601e961cab`,
+matching the config pin).
 Live supply: EARLY n=27 (>=12) via WAIT_THEN_SEARCH; `/toptraded`-derived
 SEASONED n=5 with launchpad selection confounding. Work proceeds from these
 retained bytes. No reconstruction from chat text and no fresh cohort.
