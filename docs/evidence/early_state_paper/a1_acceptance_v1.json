@@ -1,0 +1,44 @@
+{
+  "acceptance_id": "EARLY-STATE-PAPER-ACCEPTANCE-001",
+  "as_of": "2026-08-21",
+  "cloud_bundle_mode": "OWNER_MANAGED_OPTIONAL_EXPORT",
+  "leverage_config_only_pass": true,
+  "micro_live_authorized": false,
+  "next_safe_action": "ATOM3_FACTORY_REMOTE_OPERATIONS_V1",
+  "non_claims": [
+    "NO_ALPHA",
+    "NO_NETRETURN",
+    "NO_REAL_FILLS",
+    "NO_MICRO_LIVE",
+    "NO_THRESHOLD_SEARCH",
+    "NO_ML",
+    "SIMULATED_FILL_NEVER_REAL_FILL",
+    "NO_CANONICAL_DONE"
+  ],
+  "operations_view": {
+    "blocker": "NONE",
+    "bot": "BOT-STRAT-V-EARLY-LIQ-FLOOR-V1-PAPER; BOT-STRAT-V-EARLY-NETFLOW-TILT-V1-PAPER",
+    "exit_readiness": "NOT_APPLICABLE",
+    "mode": "PAPER; PAPER",
+    "next_safe_action": "CONTINUE_PAPER_OBSERVATION",
+    "position": "0 open / 30 total",
+    "reconciliation": "CLEAN",
+    "signal": "UNKNOWN",
+    "strategy": "STRAT-V-EARLY-LIQ-FLOOR-V1; STRAT-V-EARLY-NETFLOW-TILT-V1"
+  },
+  "product_terminal": "GENERIC_RESEARCH_TO_PAPER_PLANE_PASS",
+  "project_sources_disposition": {
+    "kind": "NO_CHANGE"
+  },
+  "promotable": false,
+  "provider_api_rpc_wss_calls": 0,
+  "schema": "smial.early-state-paper.acceptance",
+  "schema_version": "1.0",
+  "scientific_terminal": "EARLY_STATE_NO_DECISION_VALUE",
+  "simulated_fills_by_strategy": {
+    "STRAT-V-EARLY-LIQ-FLOOR": 27,
+    "STRAT-V-EARLY-NETFLOW-TILT": 3
+  },
+  "strategy_versions_commissioned": 2,
+  "task_id": "EARLY_STATE_TO_PAPER_VERTICAL_SLICE_V1"
+}

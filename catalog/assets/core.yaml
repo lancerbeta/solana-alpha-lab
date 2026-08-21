@@ -29480,3 +29480,262 @@ records:
   evidence: []
   search_terms: [EARLY, ICP_FREEZE, FACTORY_FIT]
   classification: {contains_secrets: false, contains_raw_data: false, sensitivity: INTERNAL_NON_SECRET}
+- asset_id: CTRL-EARLY-STATE-TO-PAPER-VERTICAL-SLICE-001
+  record_version: '1.0'
+  asset_type: control_document
+  purpose: Exact contract for the frozen EARLY state hypothesis and the generic research-to-paper plane.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-08-21'
+  truth_owner: EARLY_STATE_TO_PAPER_VERTICAL_SLICE_V1
+  location: {kind: git_path, logical_uri: 'repo://docs/tasks/EARLY_STATE_TO_PAPER_VERTICAL_SLICE_V1.md', repository_path: docs/tasks/EARLY_STATE_TO_PAPER_VERTICAL_SLICE_V1.md}
+  integrity: {kind: sha256, sha256: 9c2655638798221116bfa3b3a91ef984a519de4faa1ba951efc080eb5ad0b911}
+  access: {mode: read_only, method: file, network_required: false, secrets_required: false}
+  relations:
+  - {relation_type: contains, target_asset_id: CONFIG-EARLY-STATE-TO-PAPER-VERTICAL-SLICE-001}
+  - {relation_type: contains, target_asset_id: SCHEMA-STRATEGY-VERSION-001}
+  - {relation_type: contains, target_asset_id: MODULE-EARLY-STATE-HYPOTHESIS-001}
+  - {relation_type: contains, target_asset_id: MODULE-PAPER-PLANE-ENGINE-001}
+  - {relation_type: validated_by, target_asset_id: TEST-EARLY-STATE-PAPER-001}
+  - {relation_type: depends_on, target_asset_id: EVIDENCE-EARLY-ICP-FREEZE-RUNTIME-001}
+  consumers: [FACTORY-001, GOAL-OWNER]
+  evidence: []
+  search_terms: [EARLY, STATE, PAPER_PLANE, STRATEGY_VERSION, VERTICAL_SLICE]
+  classification: {contains_secrets: false, contains_raw_data: false, sensitivity: INTERNAL_NON_SECRET}
+- asset_id: CONFIG-EARLY-STATE-TO-PAPER-VERTICAL-SLICE-001
+  record_version: '1.0'
+  asset_type: configuration
+  purpose: Hash-pinned frozen rule and retained-byte pins for the EARLY state evaluation and commissioning.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-08-21'
+  truth_owner: EARLY_STATE_TO_PAPER_VERTICAL_SLICE_V1
+  location: {kind: git_path, logical_uri: 'repo://configs/early_state_to_paper_vertical_slice_v1.yaml', repository_path: configs/early_state_to_paper_vertical_slice_v1.yaml}
+  integrity: {kind: sha256, sha256: 31f6a801a7f74e56be77c29fc64fb5fb4de773cb0d20fefbeaeac6e62f4b3a88}
+  access: {mode: read_only, method: file, network_required: false, secrets_required: false}
+  relations: [{relation_type: governed_by, target_asset_id: CTRL-EARLY-STATE-TO-PAPER-VERTICAL-SLICE-001}]
+  consumers: [FACTORY-001, GOAL-OWNER]
+  evidence: []
+  search_terms: [EARLY, STATE, CONFIG]
+  classification: {contains_secrets: false, contains_raw_data: false, sensitivity: INTERNAL_NON_SECRET}
+- asset_id: SCHEMA-STRATEGY-VERSION-001
+  record_version: '1.0'
+  asset_type: schema
+  purpose: Minimal StrategyVersion truth contract; micro_live rejected at load time by schema const.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-08-21'
+  truth_owner: EARLY_STATE_TO_PAPER_VERTICAL_SLICE_V1
+  location: {kind: git_path, logical_uri: 'repo://catalog/schemas/strategy_version.schema.json', repository_path: catalog/schemas/strategy_version.schema.json}
+  integrity: {kind: sha256, sha256: 38cd3d8b5f4bad9add9c3b98934c8a0b9f828788f58ed3a1e271987d3a0d63b1}
+  access: {mode: read_only, method: file, network_required: false, secrets_required: false}
+  relations:
+  - {relation_type: governed_by, target_asset_id: CTRL-EARLY-STATE-TO-PAPER-VERTICAL-SLICE-001}
+  consumers: [FACTORY-001, GOAL-OWNER]
+  evidence: []
+  search_terms: [STRATEGY_VERSION, SCHEMA, CONTRACT]
+  classification: {contains_secrets: false, contains_raw_data: false, sensitivity: INTERNAL_NON_SECRET}
+- asset_id: STRAT-V-EARLY-LIQ-FLOOR-V1-001
+  record_version: '1.0'
+  asset_type: configuration
+  purpose: COMMISSIONING_ONLY StrategyVersion on the X_LIQUIDITY_USD >= 2000 frozen bin.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-08-21'
+  truth_owner: EARLY_STATE_TO_PAPER_VERTICAL_SLICE_V1
+  location: {kind: git_path, logical_uri: 'repo://configs/strategies/STRAT-V-EARLY-LIQ-FLOOR-COMMISSIONING-V1.yaml', repository_path: configs/strategies/STRAT-V-EARLY-LIQ-FLOOR-COMMISSIONING-V1.yaml}
+  integrity: {kind: sha256, sha256: b32a155be731cb138a3ef211308a8cd77ac074880c006835c66be0eb3f75cd59}
+  access: {mode: read_only, method: file, network_required: false, secrets_required: false}
+  relations:
+  - {relation_type: governed_by, target_asset_id: SCHEMA-STRATEGY-VERSION-001}
+  - {relation_type: depends_on, target_asset_id: MODULE-PAPER-PLANE-ENGINE-001}
+  consumers: [FACTORY-001, GOAL-OWNER]
+  evidence: []
+  search_terms: [STRATEGY, LIQ_FLOOR, COMMISSIONING_ONLY]
+  classification: {contains_secrets: false, contains_raw_data: false, sensitivity: INTERNAL_NON_SECRET}
+- asset_id: STRAT-V-EARLY-NETFLOW-TILT-V1-001
+  record_version: '1.0'
+  asset_type: configuration
+  purpose: COMMISSIONING_ONLY StrategyVersion on the X_NETFLOW_SHARE > 0 frozen bin; leverage twin of the liq floor.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-08-21'
+  truth_owner: EARLY_STATE_TO_PAPER_VERTICAL_SLICE_V1
+  location: {kind: git_path, logical_uri: 'repo://configs/strategies/STRAT-V-EARLY-NETFLOW-TILT-COMMISSIONING-V1.yaml', repository_path: configs/strategies/STRAT-V-EARLY-NETFLOW-TILT-COMMISSIONING-V1.yaml}
+  integrity: {kind: sha256, sha256: 636cc6cba092675f1e2cf9dd763b40d0f02cca4f61da491cb1ff63ccfa06b554}
+  access: {mode: read_only, method: file, network_required: false, secrets_required: false}
+  relations:
+  - {relation_type: governed_by, target_asset_id: SCHEMA-STRATEGY-VERSION-001}
+  - {relation_type: depends_on, target_asset_id: MODULE-PAPER-PLANE-ENGINE-001}
+  consumers: [FACTORY-001, GOAL-OWNER]
+  evidence: []
+  search_terms: [STRATEGY, NETFLOW_TILT, COMMISSIONING_ONLY]
+  classification: {contains_secrets: false, contains_raw_data: false, sensitivity: INTERNAL_NON_SECRET}
+- asset_id: MODULE-EARLY-STATE-HYPOTHESIS-001
+  record_version: '1.0'
+  asset_type: script
+  purpose: Offline frozen-state evaluation over Atom-1 pinned bytes with the pre-declared promotion gate.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-08-21'
+  truth_owner: EARLY_STATE_TO_PAPER_VERTICAL_SLICE_V1
+  location: {kind: git_path, logical_uri: 'repo://src/solana_alpha_lab/early_state_hypothesis.py', repository_path: src/solana_alpha_lab/early_state_hypothesis.py}
+  integrity: {kind: sha256, sha256: b257ffe5258bf10587081d1252167b9e0e8c02bfdbea8f88132d49109841fc09}
+  access: {mode: read_only, method: file, network_required: false, secrets_required: false}
+  relations: [{relation_type: depends_on, target_asset_id: CONFIG-EARLY-STATE-TO-PAPER-VERTICAL-SLICE-001}]
+  consumers: [FACTORY-001, GOAL-OWNER]
+  evidence: []
+  search_terms: [EARLY, STATE, HYPOTHESIS, FROZEN_RULE]
+  classification: {contains_secrets: false, contains_raw_data: false, sensitivity: INTERNAL_NON_SECRET}
+- asset_id: MODULE-PAPER-PLANE-ENGINE-001
+  record_version: '1.0'
+  asset_type: script
+  purpose: Generic data-driven paper engine - StrategyVersion configs in, bot and position lifecycle out; REAL_FILL impossible.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-08-21'
+  truth_owner: EARLY_STATE_TO_PAPER_VERTICAL_SLICE_V1
+  location: {kind: git_path, logical_uri: 'repo://src/solana_alpha_lab/factory/paper_plane.py', repository_path: src/solana_alpha_lab/factory/paper_plane.py}
+  integrity: {kind: sha256, sha256: 0dfc1a9ee01c175c2b1667ab8795dc96243ea0b1e55f288fc4a6fd8c16c0ceb5}
+  access: {mode: read_only, method: file, network_required: false, secrets_required: false}
+  relations:
+  - {relation_type: governed_by, target_asset_id: SCHEMA-STRATEGY-VERSION-001}
+  - {relation_type: depends_on, target_asset_id: SCHEMA-STRATEGY-VERSION-001}
+  consumers: [FACTORY-001, GOAL-OWNER]
+  evidence: []
+  search_terms: [PAPER_PLANE, BOT_INSTANCE, POSITION_LIFECYCLE, SIMULATED_FILL]
+  classification: {contains_secrets: false, contains_raw_data: false, sensitivity: INTERNAL_NON_SECRET}
+- asset_id: SCRIPT-EARLY-STATE-RUNNER-001
+  record_version: '1.0'
+  asset_type: script
+  purpose: Offline CLI driving scientific evaluation plus two-strategy paper commissioning and OPERATIONS projection.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-08-21'
+  truth_owner: EARLY_STATE_TO_PAPER_VERTICAL_SLICE_V1
+  location: {kind: git_path, logical_uri: 'repo://scripts/run_early_state_hypothesis.py', repository_path: scripts/run_early_state_hypothesis.py}
+  integrity: {kind: sha256, sha256: 135282be8dcd1d14f9d1abf965fafdc02ee81d560afb6a0bbf74cae308885f4f}
+  access: {mode: read_only, method: file, network_required: false, secrets_required: false}
+  relations: [{relation_type: depends_on, target_asset_id: MODULE-PAPER-PLANE-ENGINE-001}]
+  consumers: [FACTORY-001, GOAL-OWNER]
+  evidence: []
+  search_terms: [EARLY, STATE, RUNNER, OPERATIONS_VIEW]
+  classification: {contains_secrets: false, contains_raw_data: false, sensitivity: INTERNAL_NON_SECRET}
+- asset_id: TEST-EARLY-STATE-PAPER-001
+  record_version: '1.0'
+  asset_type: script
+  purpose: Tests strategy self-hash, micro_live rejection, lifecycle fail-closed transitions and pinned replay parity.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-08-21'
+  truth_owner: EARLY_STATE_TO_PAPER_VERTICAL_SLICE_V1
+  location: {kind: git_path, logical_uri: 'repo://tests/test_early_state_to_paper_vertical_slice.py', repository_path: tests/test_early_state_to_paper_vertical_slice.py}
+  integrity: {kind: sha256, sha256: ccceb83fd2cb340f94b548a89eadf275dd9d563629757a8818ed6ff690164322}
+  access: {mode: read_only, method: file, network_required: false, secrets_required: false}
+  relations: [{relation_type: depends_on, target_asset_id: MODULE-PAPER-PLANE-ENGINE-001}]
+  consumers: [FACTORY-001, GOAL-OWNER]
+  evidence: []
+  search_terms: [EARLY, STATE, TEST]
+  classification: {contains_secrets: false, contains_raw_data: false, sensitivity: INTERNAL_NON_SECRET}
+- asset_id: EVIDENCE-EARLY-STATE-PAPER-RUNTIME-001
+  record_version: '1.0'
+  asset_type: evidence
+  purpose: Runtime packet - NO_DECISION_VALUE science plus GENERIC_RESEARCH_TO_PAPER_PLANE_PASS product result.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-08-21'
+  truth_owner: EARLY_STATE_TO_PAPER_VERTICAL_SLICE_V1
+  location: {kind: git_path, logical_uri: 'repo://docs/evidence/early_state_paper/a1_runtime_receipt_v1.json', repository_path: docs/evidence/early_state_paper/a1_runtime_receipt_v1.json}
+  integrity: {kind: sha256, sha256: 9e6556c97afee1dbb3285e26c2bcd23c77d3c9e751e088fd503a36855533921a}
+  access: {mode: read_only, method: file, network_required: false, secrets_required: false}
+  relations: [{relation_type: derived_from, target_asset_id: CTRL-EARLY-STATE-TO-PAPER-VERTICAL-SLICE-001}]
+  consumers: [FACTORY-001, GOAL-OWNER]
+  evidence: []
+  search_terms: [EARLY, STATE, RUNTIME, PAPER]
+  classification: {contains_secrets: false, contains_raw_data: false, sensitivity: INTERNAL_NON_SECRET}
+- asset_id: EVIDENCE-EARLY-STATE-PAPER-ACCEPTANCE-001
+  record_version: '1.0'
+  asset_type: evidence
+  purpose: Acceptance binding both terminals, leverage pass and OPERATIONS view for the vertical slice atom.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-08-21'
+  truth_owner: EARLY_STATE_TO_PAPER_VERTICAL_SLICE_V1
+  location: {kind: git_path, logical_uri: 'repo://docs/evidence/early_state_paper/a1_acceptance_v1.json', repository_path: docs/evidence/early_state_paper/a1_acceptance_v1.json}
+  integrity: {kind: sha256, sha256: e9980a93124ce40b68945b0802f706df2d85aa1d4c566bd400da76bb7c501d0d}
+  access: {mode: read_only, method: file, network_required: false, secrets_required: false}
+  relations: [{relation_type: derived_from, target_asset_id: EVIDENCE-EARLY-STATE-PAPER-RUNTIME-001}]
+  consumers: [FACTORY-001, GOAL-OWNER]
+  evidence: []
+  search_terms: [EARLY, STATE, ACCEPTANCE]
+  classification: {contains_secrets: false, contains_raw_data: false, sensitivity: INTERNAL_NON_SECRET}
+- asset_id: REPORT-EARLY-STATE-PAPER-OWNER-READOUT-001
+  record_version: '1.0'
+  asset_type: control_document
+  purpose: Russian owner readout of the honest no-decision-value science and working research-to-paper path.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-08-21'
+  truth_owner: EARLY_STATE_TO_PAPER_VERTICAL_SLICE_V1
+  location: {kind: git_path, logical_uri: 'repo://docs/reports/early_state_paper/a1_owner_readout_v1.md', repository_path: docs/reports/early_state_paper/a1_owner_readout_v1.md}
+  integrity: {kind: sha256, sha256: d6c99039a2c1dbdd283d22a9c4d60caf839be25e4f487d728e12602d0639bc13}
+  access: {mode: read_only, method: file, network_required: false, secrets_required: false}
+  relations: [{relation_type: derived_from, target_asset_id: EVIDENCE-EARLY-STATE-PAPER-ACCEPTANCE-001}]
+  consumers: [FACTORY-001, GOAL-OWNER]
+  evidence: []
+  search_terms: [EARLY, STATE, OWNER_READOUT]
+  classification: {contains_secrets: false, contains_raw_data: false, sensitivity: INTERNAL_NON_SECRET}
+- asset_id: EVIDENCE-EARLY-STATE-PAPER-DELIVERY-COMPLETION-001
+  record_version: '1.0'
+  asset_type: evidence
+  purpose: Delivery completion evidence for the EARLY state to paper vertical slice atom.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-08-21'
+  truth_owner: EARLY_STATE_TO_PAPER_VERTICAL_SLICE_V1
+  location: {kind: git_path, logical_uri: 'repo://docs/evidence/early_state_paper/a1_delivery_completion_evidence_v1.json', repository_path: docs/evidence/early_state_paper/a1_delivery_completion_evidence_v1.json}
+  integrity: {kind: none, note: 'Content integrity is owned by the live completion-review-fit hash chain.'}
+  access: {mode: read_only, method: file, network_required: false, secrets_required: false}
+  relations:
+  - {relation_type: derived_from, target_asset_id: EVIDENCE-EARLY-STATE-PAPER-ACCEPTANCE-001}
+  - {relation_type: depends_on, target_asset_id: SCHEMA-DELIVERY-COMPLETION-EVIDENCE-001}
+  consumers: [FACTORY-001, GOAL-OWNER]
+  evidence: []
+  search_terms: [EARLY, STATE, DELIVERY_COMPLETION]
+  classification: {contains_secrets: false, contains_raw_data: false, sensitivity: INTERNAL_NON_SECRET}
+- asset_id: EVIDENCE-EARLY-STATE-PAPER-DELIVERY-INDEPENDENT-REVIEW-001
+  record_version: '1.0'
+  asset_type: evidence
+  purpose: Required-role review evidence for the EARLY state to paper vertical slice atom.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-08-21'
+  truth_owner: EARLY_STATE_TO_PAPER_VERTICAL_SLICE_V1
+  location: {kind: git_path, logical_uri: 'repo://docs/evidence/early_state_paper/a1_delivery_independent_review_v1.json', repository_path: docs/evidence/early_state_paper/a1_delivery_independent_review_v1.json}
+  integrity: {kind: none, note: 'Content integrity is owned by the live completion-review-fit hash chain.'}
+  access: {mode: read_only, method: file, network_required: false, secrets_required: false}
+  relations:
+  - {relation_type: derived_from, target_asset_id: EVIDENCE-EARLY-STATE-PAPER-RUNTIME-001}
+  - {relation_type: depends_on, target_asset_id: SCHEMA-DELIVERY-INDEPENDENT-REVIEW-EVIDENCE-001}
+  consumers: [FACTORY-001, GOAL-OWNER]
+  evidence: []
+  search_terms: [EARLY, STATE, INDEPENDENT_REVIEW]
+  classification: {contains_secrets: false, contains_raw_data: false, sensitivity: INTERNAL_NON_SECRET}
+- asset_id: EVIDENCE-EARLY-STATE-PAPER-DELIVERY-FACTORY-FIT-001
+  record_version: '1.0'
+  asset_type: evidence
+  purpose: FULL Factory Fit preserving zero core change across the vertical slice atom.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-08-21'
+  truth_owner: EARLY_STATE_TO_PAPER_VERTICAL_SLICE_V1
+  location: {kind: git_path, logical_uri: 'repo://docs/evidence/early_state_paper/a1_delivery_factory_fit_v1.json', repository_path: docs/evidence/early_state_paper/a1_delivery_factory_fit_v1.json}
+  integrity: {kind: none, note: 'Content integrity is owned by the live completion-review-fit hash chain.'}
+  access: {mode: read_only, method: file, network_required: false, secrets_required: false}
+  relations:
+  - {relation_type: derived_from, target_asset_id: EVIDENCE-EARLY-STATE-PAPER-RUNTIME-001}
+  - {relation_type: depends_on, target_asset_id: EVIDENCE-EARLY-STATE-PAPER-DELIVERY-INDEPENDENT-REVIEW-001}
+  consumers: [FACTORY-001, GOAL-OWNER]
+  evidence: []
+  search_terms: [EARLY, STATE, FACTORY_FIT]
+  classification: {contains_secrets: false, contains_raw_data: false, sensitivity: INTERNAL_NON_SECRET}
