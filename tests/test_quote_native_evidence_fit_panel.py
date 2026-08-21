@@ -188,6 +188,18 @@ class QuoteNativePanelTests(unittest.TestCase):
         self.assertEqual(notional["terminal_class"], "NOTIONAL_EXECUTION_UNAVAILABLE")
         self.assertEqual(unknown["terminal_class"], "UNKNOWN_TYPED_FAILURE")
 
+        failed_quotes = project_quote(
+            json.dumps(
+                {
+                    "requestId": "01a0216b-8b58-726c-b959-56d483df6662",
+                    "error": "Failed to get quotes",
+                }
+            ).encode("utf-8")
+        )
+        self.assertEqual(failed_quotes["terminal_class"], "MARKET_EXECUTION_UNAVAILABLE")
+        self.assertEqual(failed_quotes["error_code"], "Failed to get quotes")
+        self.assertEqual(failed_quotes["surface"], "PROVIDER_TYPED_FAILURE")
+
     def test_transaction_bytes_fail_closed(self) -> None:
         with self.assertRaisesRegex(Exception, "QUOTE_RETURNED_TRANSACTION"):
             project_quote(_quote_body(transaction="AAAA"))

@@ -24292,7 +24292,7 @@ records:
   as_of: '2026-08-18'
   truth_owner: QUOTE_NATIVE_EVIDENCE_FIT_PANEL_V1
   location: {kind: git_path, logical_uri: 'repo://src/solana_alpha_lab/quote_native_evidence_fit_panel.py', repository_path: src/solana_alpha_lab/quote_native_evidence_fit_panel.py}
-  integrity: {kind: sha256, sha256: 68a171229af2ebf9bf3018d691ea7ed10779cce0d329237b7e8a057eec4f1650}
+  integrity: {kind: sha256, sha256: fb2bc6a1f54aa0357cd400c110b9f4442e235dbe784de32066428572f96cd484}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: depends_on, target_asset_id: CONFIG-QUOTE-NATIVE-EVIDENCE-FIT-PANEL-001}
@@ -24328,7 +24328,7 @@ records:
   as_of: '2026-08-18'
   truth_owner: QUOTE_NATIVE_EVIDENCE_FIT_PANEL_V1
   location: {kind: git_path, logical_uri: 'repo://tests/test_quote_native_evidence_fit_panel.py', repository_path: tests/test_quote_native_evidence_fit_panel.py}
-  integrity: {kind: sha256, sha256: a98703f7416a338ce98110332e7ebf437a958f2822e5eeaf6d690b29cceec0cb}
+  integrity: {kind: sha256, sha256: 1f89e94d3d98a5448ae181b6793ea3fb5c7c96d27ac36a26e60485db1da4e3bb}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: depends_on, target_asset_id: MODULE-QUOTE-NATIVE-EVIDENCE-FIT-PANEL-001}
@@ -28698,4 +28698,202 @@ records:
   consumers: [FACTORY-001, GOAL-OWNER]
   evidence: []
   search_terms: [ORDINARY_RECENT, FACTORY_FIT, FULL_REVIEW, NO_SWITCH, REPLAN]
+  classification: {contains_secrets: false, contains_raw_data: false, sensitivity: INTERNAL_NON_SECRET}
+- asset_id: CTRL-ORDINARY-RECENT-EARLY-PATH-H900-FAILED-QUOTES-MEU-REPROJECT-001
+  record_version: '1.0'
+  asset_type: control_document
+  purpose: Exact offline contract that binds Failed-to-get-quotes as MEU and reprojects the frozen early-path receipt to CLOSE.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-08-21'
+  truth_owner: ORDINARY_RECENT_EARLY_PATH_H900_FAILED_QUOTES_MEU_REPROJECT_V1
+  location: {kind: git_path, logical_uri: 'repo://docs/tasks/ORDINARY_RECENT_EARLY_PATH_H900_FAILED_QUOTES_MEU_REPROJECT_V1.md', repository_path: docs/tasks/ORDINARY_RECENT_EARLY_PATH_H900_FAILED_QUOTES_MEU_REPROJECT_V1.md}
+  integrity: {kind: sha256, sha256: 2328e368ea31f28dffd061b6e40e7abe68adc0eb81cde04218977f9d5be48e16}
+  access: {mode: read_only, method: file, network_required: false, secrets_required: false}
+  relations:
+  - {relation_type: contains, target_asset_id: CONFIG-ORDINARY-RECENT-EARLY-PATH-H900-FAILED-QUOTES-MEU-REPROJECT-001}
+  - {relation_type: contains, target_asset_id: MODULE-ORDINARY-RECENT-EARLY-PATH-H900-FAILED-QUOTES-MEU-REPROJECT-001}
+  - {relation_type: contains, target_asset_id: SCRIPT-ORDINARY-RECENT-EARLY-PATH-H900-FAILED-QUOTES-MEU-REPROJECT-001}
+  - {relation_type: validated_by, target_asset_id: TEST-ORDINARY-RECENT-EARLY-PATH-H900-FAILED-QUOTES-MEU-REPROJECT-001}
+  - {relation_type: depends_on, target_asset_id: EVIDENCE-ORDINARY-RECENT-EARLY-PATH-H900-AUDITION-001}
+  - {relation_type: depends_on, target_asset_id: MODULE-QUOTE-NATIVE-EVIDENCE-FIT-PANEL-001}
+  consumers: [FACTORY-001, GOAL-OWNER]
+  evidence: []
+  search_terms: [ORDINARY_RECENT, EARLY_PATH, FAILED_QUOTES, MEU, REPROJECT, TASK_CONTRACT]
+  classification: {contains_secrets: false, contains_raw_data: false, sensitivity: INTERNAL_NON_SECRET}
+- asset_id: CONFIG-ORDINARY-RECENT-EARLY-PATH-H900-FAILED-QUOTES-MEU-REPROJECT-001
+  record_version: '1.0'
+  asset_type: configuration
+  purpose: Hash-pinned offline reproject bindings for the frozen early-path receipt and Failed-to-get-quotes fixtures.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-08-21'
+  truth_owner: ORDINARY_RECENT_EARLY_PATH_H900_FAILED_QUOTES_MEU_REPROJECT_V1
+  location: {kind: git_path, logical_uri: 'repo://configs/ordinary_recent_early_path_h900_failed_quotes_meu_reproject_v1.yaml', repository_path: configs/ordinary_recent_early_path_h900_failed_quotes_meu_reproject_v1.yaml}
+  integrity: {kind: sha256, sha256: 4e5e8325488bc58ca077983a23859eca9ebddd1392f9cc481469c48f3d2bbce3}
+  access: {mode: read_only, method: file, network_required: false, secrets_required: false}
+  relations:
+  - {relation_type: governed_by, target_asset_id: CTRL-ORDINARY-RECENT-EARLY-PATH-H900-FAILED-QUOTES-MEU-REPROJECT-001}
+  - {relation_type: depends_on, target_asset_id: CONFIG-ORDINARY-RECENT-EARLY-PATH-H900-AUDITION-001}
+  consumers: [FACTORY-001, GOAL-OWNER]
+  evidence: []
+  search_terms: [ORDINARY_RECENT, EARLY_PATH, FAILED_QUOTES, MEU, CONFIG]
+  classification: {contains_secrets: false, contains_raw_data: false, sensitivity: INTERNAL_NON_SECRET}
+- asset_id: MODULE-ORDINARY-RECENT-EARLY-PATH-H900-FAILED-QUOTES-MEU-REPROJECT-001
+  record_version: '1.0'
+  asset_type: script
+  purpose: Offline Failed-to-get-quotes MEU remap and early-path score reproject without provider calls.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-08-21'
+  truth_owner: ORDINARY_RECENT_EARLY_PATH_H900_FAILED_QUOTES_MEU_REPROJECT_V1
+  location: {kind: git_path, logical_uri: 'repo://src/solana_alpha_lab/ordinary_recent_early_path_h900_failed_quotes_meu_reproject.py', repository_path: src/solana_alpha_lab/ordinary_recent_early_path_h900_failed_quotes_meu_reproject.py}
+  integrity: {kind: sha256, sha256: 62f79e7bc8a254a51fbdfb31c398e66fff14ee53312f3a881645b940fe03dae6}
+  access: {mode: read_only, method: file, network_required: false, secrets_required: false}
+  relations:
+  - {relation_type: depends_on, target_asset_id: CONFIG-ORDINARY-RECENT-EARLY-PATH-H900-FAILED-QUOTES-MEU-REPROJECT-001}
+  - {relation_type: depends_on, target_asset_id: MODULE-ORDINARY-RECENT-EARLY-PATH-H900-AUDITION-001}
+  - {relation_type: depends_on, target_asset_id: MODULE-QUOTE-NATIVE-EVIDENCE-FIT-PANEL-001}
+  consumers: [FACTORY-001, GOAL-OWNER]
+  evidence: []
+  search_terms: [ORDINARY_RECENT, EARLY_PATH, FAILED_QUOTES, MEU, MODULE]
+  classification: {contains_secrets: false, contains_raw_data: false, sensitivity: INTERNAL_NON_SECRET}
+- asset_id: SCRIPT-ORDINARY-RECENT-EARLY-PATH-H900-FAILED-QUOTES-MEU-REPROJECT-001
+  record_version: '1.0'
+  asset_type: script
+  purpose: Offline runner that writes the MEU reproject runtime receipt and acceptance.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-08-21'
+  truth_owner: ORDINARY_RECENT_EARLY_PATH_H900_FAILED_QUOTES_MEU_REPROJECT_V1
+  location: {kind: git_path, logical_uri: 'repo://scripts/run_ordinary_recent_early_path_h900_failed_quotes_meu_reproject.py', repository_path: scripts/run_ordinary_recent_early_path_h900_failed_quotes_meu_reproject.py}
+  integrity: {kind: sha256, sha256: ca23bba3500417a0fe84d1c34c6f623786ce0453975ff9fe65fb3357bee92942}
+  access: {mode: read_only, method: file, network_required: false, secrets_required: false}
+  relations: [{relation_type: depends_on, target_asset_id: MODULE-ORDINARY-RECENT-EARLY-PATH-H900-FAILED-QUOTES-MEU-REPROJECT-001}]
+  consumers: [FACTORY-001, GOAL-OWNER]
+  evidence: []
+  search_terms: [ORDINARY_RECENT, EARLY_PATH, FAILED_QUOTES, MEU, RUNNER]
+  classification: {contains_secrets: false, contains_raw_data: false, sensitivity: INTERNAL_NON_SECRET}
+- asset_id: TEST-ORDINARY-RECENT-EARLY-PATH-H900-FAILED-QUOTES-MEU-REPROJECT-001
+  record_version: '1.0'
+  asset_type: script
+  purpose: Targeted tests that Failed-to-get-quotes binds as MEU and offline reproject closes early-path without provider calls.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-08-21'
+  truth_owner: ORDINARY_RECENT_EARLY_PATH_H900_FAILED_QUOTES_MEU_REPROJECT_V1
+  location: {kind: git_path, logical_uri: 'repo://tests/test_ordinary_recent_early_path_h900_failed_quotes_meu_reproject.py', repository_path: tests/test_ordinary_recent_early_path_h900_failed_quotes_meu_reproject.py}
+  integrity: {kind: sha256, sha256: 3cf4b39b2d85c786dce6965f1cbe8774e77040ab0f561818fda2a0a5d20708fd}
+  access: {mode: read_only, method: file, network_required: false, secrets_required: false}
+  relations: [{relation_type: depends_on, target_asset_id: MODULE-ORDINARY-RECENT-EARLY-PATH-H900-FAILED-QUOTES-MEU-REPROJECT-001}]
+  consumers: [FACTORY-001]
+  evidence: []
+  search_terms: [ORDINARY_RECENT, EARLY_PATH, FAILED_QUOTES, MEU, TEST]
+  classification: {contains_secrets: false, contains_raw_data: false, sensitivity: INTERNAL_NON_SECRET}
+- asset_id: EVIDENCE-ORDINARY-RECENT-EARLY-PATH-H900-FAILED-QUOTES-MEU-REPROJECT-001
+  record_version: '1.0'
+  asset_type: evidence
+  purpose: Offline runtime receipt remapping four Failed-to-get-quotes H900 bodies to MEU and scoring CLOSE_EARLY_PATH_CANDIDATE.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-08-21'
+  truth_owner: ORDINARY_RECENT_EARLY_PATH_H900_FAILED_QUOTES_MEU_REPROJECT_V1
+  location: {kind: git_path, logical_uri: 'repo://docs/evidence/ordinary_recent_early_path_h900_failed_quotes_meu_reproject/a1_ordinary_recent_early_path_h900_failed_quotes_meu_reproject_runtime_receipt_v1.json', repository_path: docs/evidence/ordinary_recent_early_path_h900_failed_quotes_meu_reproject/a1_ordinary_recent_early_path_h900_failed_quotes_meu_reproject_runtime_receipt_v1.json}
+  integrity: {kind: sha256, sha256: ef007a07464a7b83cc957cf95e5cf95ab6bb20a8314a99fc7fd1602b7e494330}
+  access: {mode: read_only, method: file, network_required: false, secrets_required: false}
+  relations:
+  - {relation_type: derived_from, target_asset_id: CTRL-ORDINARY-RECENT-EARLY-PATH-H900-FAILED-QUOTES-MEU-REPROJECT-001}
+  - {relation_type: depends_on, target_asset_id: EVIDENCE-ORDINARY-RECENT-EARLY-PATH-H900-AUDITION-001}
+  - {relation_type: validated_by, target_asset_id: TEST-ORDINARY-RECENT-EARLY-PATH-H900-FAILED-QUOTES-MEU-REPROJECT-001}
+  consumers: [FACTORY-001, GOAL-OWNER]
+  evidence: []
+  search_terms: [ORDINARY_RECENT, EARLY_PATH, FAILED_QUOTES, MEU, RUNTIME, CLOSE]
+  classification: {contains_secrets: false, contains_raw_data: false, sensitivity: INTERNAL_NON_SECRET}
+- asset_id: EVIDENCE-ORDINARY-RECENT-EARLY-PATH-H900-FAILED-QUOTES-MEU-REPROJECT-ACCEPTANCE-001
+  record_version: '1.0'
+  asset_type: evidence
+  purpose: Acceptance binding CLOSE_EARLY_PATH_CANDIDATE after MEU taxonomy bind while preserving historical INVALID_EVIDENCE_REPLAN.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-08-21'
+  truth_owner: ORDINARY_RECENT_EARLY_PATH_H900_FAILED_QUOTES_MEU_REPROJECT_V1
+  location: {kind: git_path, logical_uri: 'repo://docs/evidence/ordinary_recent_early_path_h900_failed_quotes_meu_reproject/a1_ordinary_recent_early_path_h900_failed_quotes_meu_reproject_acceptance_v1.json', repository_path: docs/evidence/ordinary_recent_early_path_h900_failed_quotes_meu_reproject/a1_ordinary_recent_early_path_h900_failed_quotes_meu_reproject_acceptance_v1.json}
+  integrity: {kind: sha256, sha256: 4e546f9925d8878f79411d21cf718f6d9784b073aec3334a262f58b98d8ca01f}
+  access: {mode: read_only, method: file, network_required: false, secrets_required: false}
+  relations: [{relation_type: derived_from, target_asset_id: EVIDENCE-ORDINARY-RECENT-EARLY-PATH-H900-FAILED-QUOTES-MEU-REPROJECT-001}]
+  consumers: [FACTORY-001, GOAL-OWNER]
+  evidence: []
+  search_terms: [ORDINARY_RECENT, EARLY_PATH, FAILED_QUOTES, MEU, ACCEPTANCE, CLOSE]
+  classification: {contains_secrets: false, contains_raw_data: false, sensitivity: INTERNAL_NON_SECRET}
+- asset_id: REPORT-ORDINARY-RECENT-EARLY-PATH-H900-FAILED-QUOTES-MEU-REPROJECT-001
+  record_version: '1.0'
+  asset_type: control_document
+  purpose: Russian owner readout for the offline MEU reproject close of the early-path candidate.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-08-21'
+  truth_owner: ORDINARY_RECENT_EARLY_PATH_H900_FAILED_QUOTES_MEU_REPROJECT_V1
+  location: {kind: git_path, logical_uri: 'repo://docs/reports/ordinary_recent_early_path_h900_failed_quotes_meu_reproject/a1_owner_readout_v1.md', repository_path: docs/reports/ordinary_recent_early_path_h900_failed_quotes_meu_reproject/a1_owner_readout_v1.md}
+  integrity: {kind: sha256, sha256: 0de1a9a733e6d8aab7df1d22d7eeea15bcf0a4110053e7dde77ec9c6b788f6a4}
+  access: {mode: read_only, method: file, network_required: false, secrets_required: false}
+  relations: [{relation_type: derived_from, target_asset_id: EVIDENCE-ORDINARY-RECENT-EARLY-PATH-H900-FAILED-QUOTES-MEU-REPROJECT-ACCEPTANCE-001}]
+  consumers: [FACTORY-001, GOAL-OWNER]
+  evidence: []
+  search_terms: [ORDINARY_RECENT, EARLY_PATH, FAILED_QUOTES, MEU, READOUT]
+  classification: {contains_secrets: false, contains_raw_data: false, sensitivity: INTERNAL_NON_SECRET}
+- asset_id: EVIDENCE-ORDINARY-RECENT-EARLY-PATH-H900-FAILED-QUOTES-MEU-REPROJECT-DELIVERY-COMPLETION-001
+  record_version: '1.0'
+  asset_type: evidence
+  purpose: Guard-consumable completion evidence for the offline MEU reproject inventory without alpha promotion.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-08-21'
+  truth_owner: ORDINARY_RECENT_EARLY_PATH_H900_FAILED_QUOTES_MEU_REPROJECT_V1
+  location: {kind: git_path, logical_uri: 'repo://docs/evidence/ordinary_recent_early_path_h900_failed_quotes_meu_reproject/a1_delivery_completion_evidence_v1.json', repository_path: docs/evidence/ordinary_recent_early_path_h900_failed_quotes_meu_reproject/a1_delivery_completion_evidence_v1.json}
+  integrity: {kind: none, note: 'Content integrity is owned by the live completion-review-fit hash chain; embedding its SHA here would create an indirect self-reference through the reviewed inventory.'}
+  access: {mode: read_only, method: file, network_required: false, secrets_required: false}
+  relations:
+  - {relation_type: derived_from, target_asset_id: EVIDENCE-ORDINARY-RECENT-EARLY-PATH-H900-FAILED-QUOTES-MEU-REPROJECT-001}
+  - {relation_type: depends_on, target_asset_id: EVIDENCE-ORDINARY-RECENT-EARLY-PATH-H900-FAILED-QUOTES-MEU-REPROJECT-ACCEPTANCE-001}
+  - {relation_type: depends_on, target_asset_id: EVIDENCE-ORDINARY-RECENT-EARLY-PATH-H900-FAILED-QUOTES-MEU-REPROJECT-DELIVERY-INDEPENDENT-REVIEW-001}
+  - {relation_type: depends_on, target_asset_id: EVIDENCE-ORDINARY-RECENT-EARLY-PATH-H900-FAILED-QUOTES-MEU-REPROJECT-DELIVERY-FACTORY-FIT-001}
+  consumers: [FACTORY-001, GOAL-OWNER]
+  evidence: []
+  search_terms: [ORDINARY_RECENT, EARLY_PATH, FAILED_QUOTES, MEU, DELIVERY_COMPLETION]
+  classification: {contains_secrets: false, contains_raw_data: false, sensitivity: INTERNAL_NON_SECRET}
+- asset_id: EVIDENCE-ORDINARY-RECENT-EARLY-PATH-H900-FAILED-QUOTES-MEU-REPROJECT-DELIVERY-INDEPENDENT-REVIEW-001
+  record_version: '1.0'
+  asset_type: evidence
+  purpose: Required-role review evidence bound to the exact non-self-referential MEU reproject inventory.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-08-21'
+  truth_owner: ORDINARY_RECENT_EARLY_PATH_H900_FAILED_QUOTES_MEU_REPROJECT_V1
+  location: {kind: git_path, logical_uri: 'repo://docs/evidence/ordinary_recent_early_path_h900_failed_quotes_meu_reproject/a1_delivery_independent_review_v1.json', repository_path: docs/evidence/ordinary_recent_early_path_h900_failed_quotes_meu_reproject/a1_delivery_independent_review_v1.json}
+  integrity: {kind: none, note: 'Content integrity is owned by the live completion-review-fit hash chain; embedding its SHA here would create an indirect self-reference through the reviewed inventory.'}
+  access: {mode: read_only, method: file, network_required: false, secrets_required: false}
+  relations:
+  - {relation_type: derived_from, target_asset_id: EVIDENCE-ORDINARY-RECENT-EARLY-PATH-H900-FAILED-QUOTES-MEU-REPROJECT-001}
+  - {relation_type: depends_on, target_asset_id: SCHEMA-DELIVERY-INDEPENDENT-REVIEW-EVIDENCE-001}
+  consumers: [FACTORY-001, GOAL-OWNER]
+  evidence: []
+  search_terms: [ORDINARY_RECENT, EARLY_PATH, FAILED_QUOTES, MEU, INDEPENDENT_REVIEW]
+  classification: {contains_secrets: false, contains_raw_data: false, sensitivity: INTERNAL_NON_SECRET}
+- asset_id: EVIDENCE-ORDINARY-RECENT-EARLY-PATH-H900-FAILED-QUOTES-MEU-REPROJECT-DELIVERY-FACTORY-FIT-001
+  record_version: '1.0'
+  asset_type: evidence
+  purpose: FULL Factory Fit review preserving CLOSE_EARLY_PATH_CANDIDATE after MEU bind without a second live campaign.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-08-21'
+  truth_owner: ORDINARY_RECENT_EARLY_PATH_H900_FAILED_QUOTES_MEU_REPROJECT_V1
+  location: {kind: git_path, logical_uri: 'repo://docs/evidence/ordinary_recent_early_path_h900_failed_quotes_meu_reproject/a1_delivery_factory_fit_v1.json', repository_path: docs/evidence/ordinary_recent_early_path_h900_failed_quotes_meu_reproject/a1_delivery_factory_fit_v1.json}
+  integrity: {kind: none, note: 'Content integrity is owned by the live completion-review-fit hash chain; embedding its SHA here would create an indirect self-reference through the reviewed inventory.'}
+  access: {mode: read_only, method: file, network_required: false, secrets_required: false}
+  relations:
+  - {relation_type: derived_from, target_asset_id: EVIDENCE-ORDINARY-RECENT-EARLY-PATH-H900-FAILED-QUOTES-MEU-REPROJECT-001}
+  - {relation_type: depends_on, target_asset_id: EVIDENCE-ORDINARY-RECENT-EARLY-PATH-H900-FAILED-QUOTES-MEU-REPROJECT-DELIVERY-INDEPENDENT-REVIEW-001}
+  consumers: [FACTORY-001, GOAL-OWNER]
+  evidence: []
+  search_terms: [ORDINARY_RECENT, EARLY_PATH, FAILED_QUOTES, MEU, FACTORY_FIT, CLOSE]
   classification: {contains_secrets: false, contains_raw_data: false, sensitivity: INTERNAL_NON_SECRET}

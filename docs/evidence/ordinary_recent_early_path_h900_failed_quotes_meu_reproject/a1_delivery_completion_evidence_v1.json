@@ -1,0 +1,81 @@
+{
+  "schema": "smial.delivery-completion-evidence",
+  "schema_version": "1.0",
+  "acceptance_id": "ORDINARY-RECENT-EARLY-PATH-H900-FAILED-QUOTES-MEU-REPROJECT-DELIVERY-COMPLETION-001",
+  "as_of": "2026-08-21",
+  "task_id": "ORDINARY_RECENT_EARLY_PATH_H900_FAILED_QUOTES_MEU_REPROJECT_V1",
+  "state_change": "CLOSE_EARLY_PATH_CANDIDATE_AFTER_FAILED_QUOTES_MEU_REPROJECT",
+  "base_main": "18fe269525b7d73d44eaffa4aec0900448edfd5d",
+  "cloud_bundle_mode": "OWNER_MANAGED_OPTIONAL_EXPORT",
+  "cloud_bundle_required_by_harness": false,
+  "cloud_bundle_smoke_required": false,
+  "capability_radar_now": "NONE",
+  "implementation_bindings": {
+    "docs/tasks/ORDINARY_RECENT_EARLY_PATH_H900_FAILED_QUOTES_MEU_REPROJECT_V1.md": "2328e368ea31f28dffd061b6e40e7abe68adc0eb81cde04218977f9d5be48e16",
+    "configs/ordinary_recent_early_path_h900_failed_quotes_meu_reproject_v1.yaml": "4e5e8325488bc58ca077983a23859eca9ebddd1392f9cc481469c48f3d2bbce3",
+    "src/solana_alpha_lab/quote_native_evidence_fit_panel.py": "fb2bc6a1f54aa0357cd400c110b9f4442e235dbe784de32066428572f96cd484",
+    "src/solana_alpha_lab/ordinary_recent_early_path_h900_failed_quotes_meu_reproject.py": "62f79e7bc8a254a51fbdfb31c398e66fff14ee53312f3a881645b940fe03dae6",
+    "scripts/run_ordinary_recent_early_path_h900_failed_quotes_meu_reproject.py": "ca23bba3500417a0fe84d1c34c6f623786ce0453975ff9fe65fb3357bee92942",
+    "tests/test_ordinary_recent_early_path_h900_failed_quotes_meu_reproject.py": "3cf4b39b2d85c786dce6965f1cbe8774e77040ab0f561818fda2a0a5d20708fd",
+    "tests/test_quote_native_evidence_fit_panel.py": "1f89e94d3d98a5448ae181b6793ea3fb5c7c96d27ac36a26e60485db1da4e3bb",
+    "docs/evidence/ordinary_recent_early_path_h900_failed_quotes_meu_reproject/fixtures/index.json": "6109101e979a832db39bab5c019460cc0e13a6db79d679946408cdf53163b3b3",
+    "docs/evidence/ordinary_recent_early_path_h900_failed_quotes_meu_reproject/fixtures/50ef83cfc5f72edd191f39c4a3ce5a6b7a90ec48456a82d92af35c976c0ba3b1.body": "50ef83cfc5f72edd191f39c4a3ce5a6b7a90ec48456a82d92af35c976c0ba3b1",
+    "docs/evidence/ordinary_recent_early_path_h900_failed_quotes_meu_reproject/fixtures/839d8c8a933f4dced65a9b4afed09169436bf21cd24161d78ff731e5303535ea.body": "839d8c8a933f4dced65a9b4afed09169436bf21cd24161d78ff731e5303535ea",
+    "docs/evidence/ordinary_recent_early_path_h900_failed_quotes_meu_reproject/fixtures/788e47d2a69a3d8563fce09928f7285e9a9aec6a13c75f62062cb67205680ca1.body": "788e47d2a69a3d8563fce09928f7285e9a9aec6a13c75f62062cb67205680ca1",
+    "docs/evidence/ordinary_recent_early_path_h900_failed_quotes_meu_reproject/fixtures/4f39d14ee53b98d4e5a351591232d2280fcee6e26ff65eb012b042d08a8a2090.body": "4f39d14ee53b98d4e5a351591232d2280fcee6e26ff65eb012b042d08a8a2090",
+    "docs/evidence/ordinary_recent_early_path_h900_failed_quotes_meu_reproject/a1_ordinary_recent_early_path_h900_failed_quotes_meu_reproject_runtime_receipt_v1.json": "ef007a07464a7b83cc957cf95e5cf95ab6bb20a8314a99fc7fd1602b7e494330",
+    "docs/evidence/ordinary_recent_early_path_h900_failed_quotes_meu_reproject/a1_ordinary_recent_early_path_h900_failed_quotes_meu_reproject_acceptance_v1.json": "4e546f9925d8878f79411d21cf718f6d9784b073aec3334a262f58b98d8ca01f",
+    "docs/reports/ordinary_recent_early_path_h900_failed_quotes_meu_reproject/a1_owner_readout_v1.md": "0de1a9a733e6d8aab7df1d22d7eeea15bcf0a4110053e7dde77ec9c6b788f6a4",
+    "catalog/assets/core.yaml": "0134bf2e543fbfb17910a488b4fe5630fe908ea3e3c6791d7e539a9be0816f50",
+    "catalog/assets/lifecycle.yaml": "7d9976bfd878b57b7bfe71997b7256892530696b05af59cfa76c41d1fe29be5b",
+    "catalog/catalog_manifest.yaml": "0aefa581e84de1d6749b2b1d1a4991a6cdc327fe2e825e09f10c18a0928cfc8c",
+    "catalog/generated/asset_edges.json": "8fbf87edabf003e790e21694ba449794ef4f44dbb082c98789051f0681c624a9",
+    "docs/PROJECT_MAP.md": "819cbb1fe458c3baee94714b96881af1d3245b7888d52f7a9cb9428448e07b61",
+    "docs/OPERATOR_NAVIGATION.md": "dba905ef661dcc3db74b7899ea99df56a86d807fb2eb61412864741dd12ed201"
+  },
+  "active_stop_conditions": [],
+  "owner_attention_triggers": {
+    "auth_or_access_recovery": false,
+    "material_owner_decision": false,
+    "user_only_activation": false,
+    "external_material_action": false,
+    "unresolved_safety_or_truth_conflict": false
+  },
+  "factory_fit": {
+    "path": "docs/evidence/ordinary_recent_early_path_h900_failed_quotes_meu_reproject/a1_delivery_factory_fit_v1.json",
+    "sha256": "f1f7174d78dd40400af61bca0459bd5571f2315a8c3da7b61c301866f0fe12ee",
+    "verdict": "PASS"
+  },
+  "validation": {
+    "targeted": "PASS_ORDINARY_RECENT_EARLY_PATH_H900_FAILED_QUOTES_MEU_REPROJECT_TESTS",
+    "independent_review": {
+      "path": "docs/evidence/ordinary_recent_early_path_h900_failed_quotes_meu_reproject/a1_delivery_independent_review_v1.json",
+      "sha256": "b6e34c97826ee4088819a1117870a5da8ec197b7fb6bb7a052fe7073571da952",
+      "verdict": "PASS"
+    },
+    "full_gate": "ENFORCED_BY_PROJECT_BOUND_VALIDATION",
+    "github_ci": "ENFORCED_LIVE_AT_GUARDED_MERGE",
+    "project_checks": [
+      "PASS_ORDINARY_RECENT_EARLY_PATH_H900_FAILED_QUOTES_MEU_REPROJECT_TESTS",
+      "PASS_CATALOG_VALIDATION",
+      "PASS_NAVIGATION_CHECK",
+      "PASS_SECRET_SCAN"
+    ]
+  },
+  "non_claims": [
+    "NO_EARN_FRESH_OOS",
+    "NO_ALPHA_NETRETURN_OR_CASHFLOW",
+    "NO_STRATEGY_BOT_SHADOW_H3600_OR_H4",
+    "NO_SECOND_LIVE_CAMPAIGN",
+    "NO_CANONICAL_DONE",
+    "MEU_BIND_IS_TAXONOMY_UNDER_FROZEN_RULE"
+  ],
+  "side_effects": {
+    "cash_spend_usd_cents": 0,
+    "credential_reads": 0,
+    "fallbacks": 0,
+    "provider_requests": 0,
+    "retries": 0,
+    "wallet_signer_transaction_actions": 0
+  }
+}

@@ -52,6 +52,8 @@ _MARKET_EXECUTION_ERROR_CODES = frozenset(
         "COULD_NOT_FIND_ANY_ROUTE",
         "TOKEN_NOT_TRADABLE",
         "MARKET_NOT_FOUND",
+        # Exact Jupiter swap/v2/order prose after whitespace-normalized uppercasing.
+        "FAILED TO GET QUOTES",
     }
 )
 _NOTIONAL_EXECUTION_ERROR_CODES = frozenset(
@@ -238,7 +240,7 @@ def project_quote(body: bytes) -> dict[str, object]:
         quote["surface"] = "QUOTE_OBSERVED"
         return quote
     if quote["error_code"]:
-        code = str(quote["error_code"]).upper()
+        code = " ".join(str(quote["error_code"]).upper().split())
         if code in _MARKET_EXECUTION_ERROR_CODES:
             terminal_class = "MARKET_EXECUTION_UNAVAILABLE"
         elif code in _NOTIONAL_EXECUTION_ERROR_CODES:

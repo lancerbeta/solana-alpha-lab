@@ -1,0 +1,36 @@
+{
+  "schema": "smial.delivery-harness-factory-fit",
+  "schema_version": "1.0",
+  "review_id": "ORDINARY-RECENT-EARLY-PATH-H900-FAILED-QUOTES-MEU-REPROJECT-FACTORY-FIT-001",
+  "as_of": "2026-08-21",
+  "task_id": "ORDINARY_RECENT_EARLY_PATH_H900_FAILED_QUOTES_MEU_REPROJECT_V1",
+  "reviewed_bindings_sha256": "fb21d5f90109fe0a74a7befb8e207e370ab56a2d702fef000afdd8d114101328",
+  "reviewed_inventory_sha256": "187d4a7fe55ba43ed4603930bf20c6de0d11ebfa22e4b0a6319b259f9fb16406",
+  "mode": "FULL_REVIEW",
+  "verdict": "PASS",
+  "dimensions": {
+    "mission": "PASS_CLOSE_EARLY_PATH_AFTER_MEU_BIND",
+    "flexibility_and_history": "PASS_PRESERVE_HISTORICAL_YIELD_RECEIPT",
+    "context_efficiency": "PASS_ZERO_PROVIDER_OFFLINE_REPROJECT",
+    "research_truth": "PASS_SELECTED_MEU_BLOCKS_EARN",
+    "owner_operability": "PASS_RUSSIAN_READOUT_NAMES_NEXT_ESTIMAND",
+    "execution_to_cashflow": "NOT_APPLICABLE_QUOTE_ONLY_NO_EXECUTION",
+    "monitoring_and_recovery": "PASS_HASH_PINNED_FIXTURES_NO_RETRY",
+    "build_vs_buy": "PASS_EXTEND_SHARED_PROJECT_QUOTE_TAXONOMY",
+    "security": "PASS_NO_CREDENTIAL_OR_PROVIDER_CALL",
+    "red_team": "PASS_CLOSE_NOT_EARN_WHEN_SELECTED_MEU"
+  },
+  "capability_radar": {
+    "now": "NONE",
+    "watch": "NEW_SIMPLE_MARKET_STATE_ESTIMAND_AFTER_EARLY_PATH_CLOSE"
+  },
+  "recovery": "REVERT BRANCH; DO NOT REWRITE HISTORICAL EARLY-PATH YIELD ACCEPTANCE; DO NOT RELAUNCH SAME LIVE CAMPAIGN",
+  "limits": [
+    "NO_EARN_FRESH_OOS",
+    "NO_ALPHA_NETRETURN_OR_CASHFLOW",
+    "NO_SECOND_LIVE_EARLY_PATH_CAMPAIGN",
+    "NO_ORGANIC_FLOW_OR_TX_IMBALANCE_X",
+    "NO_STRATEGY_BOT_SHADOW_H3600_OR_H4",
+    "MEU_BIND_IS_NOT_INDEPENDENT_MARKET_DEATH_PROOF"
+  ]
+}

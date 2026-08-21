@@ -1,0 +1,52 @@
+{
+  "acceptance_id": "EVIDENCE-ORDINARY-RECENT-EARLY-PATH-H900-FAILED-QUOTES-MEU-REPROJECT-001",
+  "as_of": "2026-08-21",
+  "atom_id": "ORDINARY_RECENT_EARLY_PATH_H900_FAILED_QUOTES_MEU_REPROJECT_V1",
+  "cheapest_falsifier": "SELECTED_TOP_QUARTILE_MARKET_EXECUTION_UNAVAILABLE",
+  "cheapest_falsifier_result": "TRIGGERED",
+  "decision_time_eligible": 21,
+  "failed_quotes_remapped_to_meu": 4,
+  "historical_source_owner_decision_preserved": "INVALID_EVIDENCE_REPLAN",
+  "non_claims": [
+    "NO_NEW_PROVIDER_CAPTURE",
+    "NO_EARN_FRESH_OOS",
+    "NO_ALPHA",
+    "NO_NETRETURN",
+    "NO_STRATEGY_OR_SHADOW",
+    "HISTORICAL_INVALID_EVIDENCE_YIELD_NOT_REWRITTEN"
+  ],
+  "owner_decision": "CLOSE_EARLY_PATH_CANDIDATE",
+  "project_sources_disposition": {
+    "kind": "NO_CHANGE"
+  },
+  "rankable_h900": 17,
+  "runtime_terminal": "CLOSE_EARLY_PATH_CANDIDATE",
+  "schema": "smial.ordinary-recent-early-path-h900-failed-quotes-meu-reproject.acceptance",
+  "schema_version": "1.0",
+  "score_observed_not_applied_as_earn": {
+    "leave_one_out_positive_share": 1.0,
+    "note": "Frozen EARN thresholds are not applied: selected top-X quartile contains MARKET_EXECUTION_UNAVAILABLE after Failed-to-get-quotes bind.",
+    "rest_median_y": -0.0272814,
+    "tau_b": 0.40980057093238403,
+    "top_quartile_median_y": -0.0272814
+  },
+  "selected_market_execution_unavailable": true,
+  "selected_top_quartile_non_quote": true,
+  "side_effects": {
+    "cash_spend_usd_cents": 0,
+    "credential_reads": 0,
+    "execute_calls": 0,
+    "fallbacks": 0,
+    "provider_requests": 0,
+    "retries": 0,
+    "wallet_signer_transaction_actions": 0
+  },
+  "source_atom_id": "ORDINARY_RECENT_EARLY_PATH_H900_AUDITION_V1",
+  "source_runtime_receipt": "docs/evidence/ordinary_recent_early_path_h900_audition/a1_ordinary_recent_early_path_h900_audition_runtime_receipt_v1.json",
+  "source_runtime_receipt_sha256": "0acdc847eaf404bf61845cd471b17b91cf6255f24edc82363c2f10a74e7d786b",
+  "taxonomy_bind": {
+    "jupiter_error_message": "Failed to get quotes",
+    "prior_misclass": "UNKNOWN_TYPED_FAILURE",
+    "terminal_class": "MARKET_EXECUTION_UNAVAILABLE"
+  }
+}
