@@ -4,8 +4,8 @@
   "review_id": "ORDINARY-RECENT-EARLY-PATH-H900-FAILED-QUOTES-MEU-REPROJECT-INDEPENDENT-REVIEW-001",
   "as_of": "2026-08-21",
   "task_id": "ORDINARY_RECENT_EARLY_PATH_H900_FAILED_QUOTES_MEU_REPROJECT_V1",
-  "reviewed_bindings_sha256": "6ce4b685c9139a9e077a07758900a589995b699a9e011b5bbbfa167a53dde2b9",
-  "reviewed_inventory_sha256": "61f4bb7b2903595ceb8c3c8e30b8be911ac92d0763721f70f346ba0f81bdecea",
+  "reviewed_bindings_sha256": "fb21d5f90109fe0a74a7befb8e207e370ab56a2d702fef000afdd8d114101328",
+  "reviewed_inventory_sha256": "PLACEHOLDER",
   "required_roles": [
     "ARCHITECTURE_CRITIC",
     "CODE_REVIEWER",

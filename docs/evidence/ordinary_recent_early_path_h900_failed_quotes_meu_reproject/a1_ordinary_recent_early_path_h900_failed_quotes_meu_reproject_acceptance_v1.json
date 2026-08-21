@@ -16,6 +16,9 @@
     "HISTORICAL_INVALID_EVIDENCE_YIELD_NOT_REWRITTEN"
   ],
   "owner_decision": "CLOSE_EARLY_PATH_CANDIDATE",
+  "project_sources_disposition": {
+    "kind": "NO_CHANGE"
+  },
   "rankable_h900": 17,
   "runtime_terminal": "CLOSE_EARLY_PATH_CANDIDATE",
   "schema": "smial.ordinary-recent-early-path-h900-failed-quotes-meu-reproject.acceptance",

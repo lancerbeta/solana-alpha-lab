@@ -220,6 +220,7 @@ def build_acceptance(runtime_receipt: Mapping[str, Any]) -> dict[str, Any]:
         "atom_id": ATOM_ID,
         "owner_decision": CLOSE_TERMINAL,
         "runtime_terminal": score.get("terminal"),
+        "project_sources_disposition": {"kind": "NO_CHANGE"},
         "source_atom_id": runtime_receipt.get("source_atom_id"),
         "source_runtime_receipt": runtime_receipt.get("source_runtime_receipt"),
         "source_runtime_receipt_sha256": runtime_receipt.get("source_runtime_receipt_sha256"),

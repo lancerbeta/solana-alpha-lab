@@ -16,7 +16,7 @@ bindings:
   early_path_policy: configs/ordinary_recent_early_path_h900_audition_v1.yaml
   expected_hashes:
     source_runtime_receipt_sha256: 0acdc847eaf404bf61845cd471b17b91cf6255f24edc82363c2f10a74e7d786b
-    fixture_index_sha256: 5d311b142b0d651fb61a3f09388deb9e4a9517b7801fb0afb63084411dd0c0d0
+    fixture_index_sha256: 6109101e979a832db39bab5c019460cc0e13a6db79d679946408cdf53163b3b3
     early_path_policy_sha256: e7e35cb950a468cda61027e5fea0d3c55903c471cdce6b5a735b48c94ce40c7f
 taxonomy_bind:
   jupiter_error_message: Failed to get quotes

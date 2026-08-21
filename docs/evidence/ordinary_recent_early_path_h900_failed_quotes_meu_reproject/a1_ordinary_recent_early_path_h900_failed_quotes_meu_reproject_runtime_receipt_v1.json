@@ -6,7 +6,7 @@
   "early_path_policy_sha256": "e7e35cb950a468cda61027e5fea0d3c55903c471cdce6b5a735b48c94ce40c7f",
   "failed_quotes_remapped_to_meu": 4,
   "fixture_index": "docs/evidence/ordinary_recent_early_path_h900_failed_quotes_meu_reproject/fixtures/index.json",
-  "fixture_index_sha256": "5d311b142b0d651fb61a3f09388deb9e4a9517b7801fb0afb63084411dd0c0d0",
+  "fixture_index_sha256": "6109101e979a832db39bab5c019460cc0e13a6db79d679946408cdf53163b3b3",
   "non_claims": [
     "NO_NEW_PROVIDER_CAPTURE",
     "NO_EARN_FRESH_OOS",
