@@ -1,0 +1,58 @@
+{
+  "acceptance_id": "IN-SCOPE-POPULATION-FIT-RECONCILIATION-ACCEPTANCE-001",
+  "as_of": "2026-08-21",
+  "cloud_bundle_mode": "OWNER_MANAGED_OPTIONAL_EXPORT",
+  "frozen_atom2_population": {
+    "COMMON": {
+      "decision_time_fields_only": true,
+      "exclude_consumed_mints": true,
+      "liquidity_usd_min": 1000,
+      "notional_atomic": 10000000,
+      "quote_notional_sol": "0.01"
+    },
+    "EARLY": {
+      "inclusive": "[5m, 15m)",
+      "pool_age_seconds": [
+        300,
+        900
+      ]
+    },
+    "SEASONED": {
+      "inclusive": "[30m, 120m]",
+      "pool_age_seconds": [
+        1800,
+        7200
+      ]
+    },
+    "candidate_sources_allowed": [
+      "/recent",
+      "/toptraded/1h"
+    ],
+    "domain": {
+      "launchpad": "pump.fun",
+      "network": "Solana"
+    },
+    "immutable_for": "IN_SCOPE_POPULATION_AND_STATE_DISCOVERY_V1",
+    "reclassify_via": "tokens_v2_search_bulk",
+    "source_does_not_define_population": true
+  },
+  "next_safe_action": "IN_SCOPE_POPULATION_AND_STATE_DISCOVERY_V1",
+  "non_claims": [
+    "NO_ALPHA",
+    "NO_NETRETURN",
+    "NO_TRADED_PRODUCT_POPULATION",
+    "NO_FEATURE_TOURNAMENT",
+    "NO_PROVIDER_CALL",
+    "NO_FACTORY_RUNNER_CHANGE",
+    "NO_CANONICAL_DONE"
+  ],
+  "project_sources_disposition": {
+    "kind": "NO_CHANGE"
+  },
+  "promotable": false,
+  "provider_api_rpc_wss_calls": 0,
+  "schema": "smial.in-scope-population-fit-reconciliation.acceptance",
+  "schema_version": "1.0",
+  "task_id": "IN_SCOPE_POPULATION_FIT_RECONCILIATION_V1",
+  "verdict": "NOMINATE_IN_SCOPE_MATURITY_BOUNDARY_TEST"
+}

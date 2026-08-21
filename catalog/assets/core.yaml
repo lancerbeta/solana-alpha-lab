@@ -28897,3 +28897,193 @@ records:
   evidence: []
   search_terms: [ORDINARY_RECENT, EARLY_PATH, FAILED_QUOTES, MEU, FACTORY_FIT, CLOSE]
   classification: {contains_secrets: false, contains_raw_data: false, sensitivity: INTERNAL_NON_SECRET}
+- asset_id: CTRL-IN-SCOPE-POPULATION-FIT-RECONCILIATION-001
+  record_version: '1.0'
+  asset_type: control_document
+  purpose: Exact zero-provider contract that reconciles named H900 receipts into a Population Fit decision.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-08-21'
+  truth_owner: IN_SCOPE_POPULATION_FIT_RECONCILIATION_V1
+  location: {kind: git_path, logical_uri: 'repo://docs/tasks/IN_SCOPE_POPULATION_FIT_RECONCILIATION_V1.md', repository_path: docs/tasks/IN_SCOPE_POPULATION_FIT_RECONCILIATION_V1.md}
+  integrity: {kind: sha256, sha256: 3bb840163282b20043cf2703eb685e00eb8519fa18bb37f7ebdc733e1b1dcd72}
+  access: {mode: read_only, method: file, network_required: false, secrets_required: false}
+  relations:
+  - {relation_type: contains, target_asset_id: CONFIG-IN-SCOPE-POPULATION-FIT-RECONCILIATION-001}
+  - {relation_type: contains, target_asset_id: MODULE-IN-SCOPE-POPULATION-FIT-RECONCILIATION-001}
+  - {relation_type: contains, target_asset_id: SCRIPT-IN-SCOPE-POPULATION-FIT-RECONCILIATION-001}
+  - {relation_type: validated_by, target_asset_id: TEST-IN-SCOPE-POPULATION-FIT-RECONCILIATION-001}
+  - {relation_type: depends_on, target_asset_id: EVIDENCE-ORDINARY-RECENT-EARLY-PATH-H900-AUDITION-001}
+  - {relation_type: depends_on, target_asset_id: EVIDENCE-FRESH-OOS-FRICTION-VETO-RUNTIME-001}
+  consumers: [FACTORY-001, GOAL-OWNER]
+  evidence: []
+  search_terms: [POPULATION_FIT, IN_SCOPE, EARLY, SEASONED, TASK_CONTRACT]
+  classification: {contains_secrets: false, contains_raw_data: false, sensitivity: INTERNAL_NON_SECRET}
+- asset_id: CONFIG-IN-SCOPE-POPULATION-FIT-RECONCILIATION-001
+  record_version: '1.0'
+  asset_type: configuration
+  purpose: Hash-pinned named market receipts and MEU overlay for offline Population Fit.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-08-21'
+  truth_owner: IN_SCOPE_POPULATION_FIT_RECONCILIATION_V1
+  location: {kind: git_path, logical_uri: 'repo://configs/in_scope_population_fit_reconciliation_v1.yaml', repository_path: configs/in_scope_population_fit_reconciliation_v1.yaml}
+  integrity: {kind: sha256, sha256: 5eaafd767cc8b24eb63052e67c3a91019f1c152cf7776cb19b6ecb29181199ef}
+  access: {mode: read_only, method: file, network_required: false, secrets_required: false}
+  relations:
+  - {relation_type: governed_by, target_asset_id: CTRL-IN-SCOPE-POPULATION-FIT-RECONCILIATION-001}
+  consumers: [FACTORY-001, GOAL-OWNER]
+  evidence: []
+  search_terms: [POPULATION_FIT, IN_SCOPE, CONFIG, RECEIPT_PINS]
+  classification: {contains_secrets: false, contains_raw_data: false, sensitivity: INTERNAL_NON_SECRET}
+- asset_id: MODULE-IN-SCOPE-POPULATION-FIT-RECONCILIATION-001
+  record_version: '1.0'
+  asset_type: script
+  purpose: Thin offline projector that builds the campaign population matrix and freezes ATOM 2 or STOP.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-08-21'
+  truth_owner: IN_SCOPE_POPULATION_FIT_RECONCILIATION_V1
+  location: {kind: git_path, logical_uri: 'repo://src/solana_alpha_lab/in_scope_population_fit_reconciliation.py', repository_path: src/solana_alpha_lab/in_scope_population_fit_reconciliation.py}
+  integrity: {kind: sha256, sha256: b2408c71ab07bb9450219b436b2113b8c8d45bbfa1db0d6a817e382ce6cc8cca}
+  access: {mode: read_only, method: file, network_required: false, secrets_required: false}
+  relations:
+  - {relation_type: depends_on, target_asset_id: CONFIG-IN-SCOPE-POPULATION-FIT-RECONCILIATION-001}
+  consumers: [FACTORY-001, GOAL-OWNER]
+  evidence: []
+  search_terms: [POPULATION_FIT, IN_SCOPE, MODULE, OFFLINE]
+  classification: {contains_secrets: false, contains_raw_data: false, sensitivity: INTERNAL_NON_SECRET}
+- asset_id: SCRIPT-IN-SCOPE-POPULATION-FIT-RECONCILIATION-001
+  record_version: '1.0'
+  asset_type: script
+  purpose: Offline CLI that writes the Population Fit runtime receipt and acceptance without network.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-08-21'
+  truth_owner: IN_SCOPE_POPULATION_FIT_RECONCILIATION_V1
+  location: {kind: git_path, logical_uri: 'repo://scripts/run_in_scope_population_fit_reconciliation.py', repository_path: scripts/run_in_scope_population_fit_reconciliation.py}
+  integrity: {kind: sha256, sha256: aa9ee7da536a63c4753d802bfa55545f91ca4343f6c53bef630f59e12f1e27cf}
+  access: {mode: read_only, method: file, network_required: false, secrets_required: false}
+  relations: [{relation_type: depends_on, target_asset_id: MODULE-IN-SCOPE-POPULATION-FIT-RECONCILIATION-001}]
+  consumers: [FACTORY-001, GOAL-OWNER]
+  evidence: []
+  search_terms: [POPULATION_FIT, IN_SCOPE, RUNNER]
+  classification: {contains_secrets: false, contains_raw_data: false, sensitivity: INTERNAL_NON_SECRET}
+- asset_id: TEST-IN-SCOPE-POPULATION-FIT-RECONCILIATION-001
+  record_version: '1.0'
+  asset_type: script
+  purpose: Tests hash pins, MEU overlay, y_equals_x exclusion, and NOMINATE without provider calls.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-08-21'
+  truth_owner: IN_SCOPE_POPULATION_FIT_RECONCILIATION_V1
+  location: {kind: git_path, logical_uri: 'repo://tests/test_in_scope_population_fit_reconciliation.py', repository_path: tests/test_in_scope_population_fit_reconciliation.py}
+  integrity: {kind: sha256, sha256: 0a398cae11b5545be9f6fcd213597ca1ff482698fb64bbf9c518bf4774ee7ce8}
+  access: {mode: read_only, method: file, network_required: false, secrets_required: false}
+  relations: [{relation_type: depends_on, target_asset_id: MODULE-IN-SCOPE-POPULATION-FIT-RECONCILIATION-001}]
+  consumers: [FACTORY-001, GOAL-OWNER]
+  evidence: []
+  search_terms: [POPULATION_FIT, IN_SCOPE, TEST]
+  classification: {contains_secrets: false, contains_raw_data: false, sensitivity: INTERNAL_NON_SECRET}
+- asset_id: EVIDENCE-IN-SCOPE-POPULATION-FIT-RECONCILIATION-RUNTIME-001
+  record_version: '1.0'
+  asset_type: evidence
+  purpose: Campaign-level population matrix and NOMINATE terminal from named Git H900 receipts.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-08-21'
+  truth_owner: IN_SCOPE_POPULATION_FIT_RECONCILIATION_V1
+  location: {kind: git_path, logical_uri: 'repo://docs/evidence/in_scope_population_fit_reconciliation/a1_runtime_receipt_v1.json', repository_path: docs/evidence/in_scope_population_fit_reconciliation/a1_runtime_receipt_v1.json}
+  integrity: {kind: sha256, sha256: 8547ac4ffa91516f246969d14a6859feae3c343d2dacc261530c8a528823cee2}
+  access: {mode: read_only, method: file, network_required: false, secrets_required: false}
+  relations: [{relation_type: derived_from, target_asset_id: CTRL-IN-SCOPE-POPULATION-FIT-RECONCILIATION-001}]
+  consumers: [FACTORY-001, GOAL-OWNER]
+  evidence: []
+  search_terms: [POPULATION_FIT, IN_SCOPE, RUNTIME, NOMINATE]
+  classification: {contains_secrets: false, contains_raw_data: false, sensitivity: INTERNAL_NON_SECRET}
+- asset_id: EVIDENCE-IN-SCOPE-POPULATION-FIT-RECONCILIATION-ACCEPTANCE-001
+  record_version: '1.0'
+  asset_type: evidence
+  purpose: Acceptance that ATOM 2 EARLY/SEASONED bounds are frozen and TRADED is not a product population.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-08-21'
+  truth_owner: IN_SCOPE_POPULATION_FIT_RECONCILIATION_V1
+  location: {kind: git_path, logical_uri: 'repo://docs/evidence/in_scope_population_fit_reconciliation/a1_acceptance_v1.json', repository_path: docs/evidence/in_scope_population_fit_reconciliation/a1_acceptance_v1.json}
+  integrity: {kind: sha256, sha256: 87b7e90ffb32f88b2b6b2aee014670c0176836b2b34f5c38d75a08605f6abd20}
+  access: {mode: read_only, method: file, network_required: false, secrets_required: false}
+  relations: [{relation_type: derived_from, target_asset_id: EVIDENCE-IN-SCOPE-POPULATION-FIT-RECONCILIATION-RUNTIME-001}]
+  consumers: [FACTORY-001, GOAL-OWNER]
+  evidence: []
+  search_terms: [POPULATION_FIT, IN_SCOPE, ACCEPTANCE, FROZEN]
+  classification: {contains_secrets: false, contains_raw_data: false, sensitivity: INTERNAL_NON_SECRET}
+- asset_id: REPORT-IN-SCOPE-POPULATION-FIT-RECONCILIATION-OWNER-READOUT-001
+  record_version: '1.0'
+  asset_type: control_document
+  purpose: Russian owner readout of the Population Fit NOMINATE and frozen ATOM 2 contract.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-08-21'
+  truth_owner: IN_SCOPE_POPULATION_FIT_RECONCILIATION_V1
+  location: {kind: git_path, logical_uri: 'repo://docs/reports/in_scope_population_fit_reconciliation/a1_owner_readout_v1.md', repository_path: docs/reports/in_scope_population_fit_reconciliation/a1_owner_readout_v1.md}
+  integrity: {kind: sha256, sha256: 79c10042537437d60d9ae7f80474c6352efe8a0c7e545603adc6114ddbea8abf}
+  access: {mode: read_only, method: file, network_required: false, secrets_required: false}
+  relations: [{relation_type: derived_from, target_asset_id: EVIDENCE-IN-SCOPE-POPULATION-FIT-RECONCILIATION-ACCEPTANCE-001}]
+  consumers: [FACTORY-001, GOAL-OWNER]
+  evidence: []
+  search_terms: [POPULATION_FIT, IN_SCOPE, OWNER_READOUT]
+  classification: {contains_secrets: false, contains_raw_data: false, sensitivity: INTERNAL_NON_SECRET}
+- asset_id: EVIDENCE-IN-SCOPE-POPULATION-FIT-RECONCILIATION-DELIVERY-COMPLETION-001
+  record_version: '1.0'
+  asset_type: evidence
+  purpose: Delivery completion evidence for the zero-provider Population Fit decision atom.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-08-21'
+  truth_owner: IN_SCOPE_POPULATION_FIT_RECONCILIATION_V1
+  location: {kind: git_path, logical_uri: 'repo://docs/evidence/in_scope_population_fit_reconciliation/a1_delivery_completion_evidence_v1.json', repository_path: docs/evidence/in_scope_population_fit_reconciliation/a1_delivery_completion_evidence_v1.json}
+  integrity: {kind: none, note: 'Content integrity is owned by the live completion-review-fit hash chain; embedding its SHA here would create an indirect self-reference through the reviewed inventory.'}
+  access: {mode: read_only, method: file, network_required: false, secrets_required: false}
+  relations:
+  - {relation_type: derived_from, target_asset_id: EVIDENCE-IN-SCOPE-POPULATION-FIT-RECONCILIATION-ACCEPTANCE-001}
+  - {relation_type: depends_on, target_asset_id: SCHEMA-DELIVERY-COMPLETION-EVIDENCE-001}
+  consumers: [FACTORY-001, GOAL-OWNER]
+  evidence: []
+  search_terms: [POPULATION_FIT, IN_SCOPE, DELIVERY_COMPLETION]
+  classification: {contains_secrets: false, contains_raw_data: false, sensitivity: INTERNAL_NON_SECRET}
+- asset_id: EVIDENCE-IN-SCOPE-POPULATION-FIT-RECONCILIATION-DELIVERY-INDEPENDENT-REVIEW-001
+  record_version: '1.0'
+  asset_type: evidence
+  purpose: Required-role review evidence bound to the exact non-self-referential Population Fit inventory.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-08-21'
+  truth_owner: IN_SCOPE_POPULATION_FIT_RECONCILIATION_V1
+  location: {kind: git_path, logical_uri: 'repo://docs/evidence/in_scope_population_fit_reconciliation/a1_delivery_independent_review_v1.json', repository_path: docs/evidence/in_scope_population_fit_reconciliation/a1_delivery_independent_review_v1.json}
+  integrity: {kind: none, note: 'Content integrity is owned by the live completion-review-fit hash chain; embedding its SHA here would create an indirect self-reference through the reviewed inventory.'}
+  access: {mode: read_only, method: file, network_required: false, secrets_required: false}
+  relations:
+  - {relation_type: derived_from, target_asset_id: EVIDENCE-IN-SCOPE-POPULATION-FIT-RECONCILIATION-RUNTIME-001}
+  - {relation_type: depends_on, target_asset_id: SCHEMA-DELIVERY-INDEPENDENT-REVIEW-EVIDENCE-001}
+  consumers: [FACTORY-001, GOAL-OWNER]
+  evidence: []
+  search_terms: [POPULATION_FIT, IN_SCOPE, INDEPENDENT_REVIEW]
+  classification: {contains_secrets: false, contains_raw_data: false, sensitivity: INTERNAL_NON_SECRET}
+- asset_id: EVIDENCE-IN-SCOPE-POPULATION-FIT-RECONCILIATION-DELIVERY-FACTORY-FIT-001
+  record_version: '1.0'
+  asset_type: evidence
+  purpose: FULL Factory Fit review preserving NOMINATE without a live campaign or Factory runner change.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-08-21'
+  truth_owner: IN_SCOPE_POPULATION_FIT_RECONCILIATION_V1
+  location: {kind: git_path, logical_uri: 'repo://docs/evidence/in_scope_population_fit_reconciliation/a1_delivery_factory_fit_v1.json', repository_path: docs/evidence/in_scope_population_fit_reconciliation/a1_delivery_factory_fit_v1.json}
+  integrity: {kind: none, note: 'Content integrity is owned by the live completion-review-fit hash chain; embedding its SHA here would create an indirect self-reference through the reviewed inventory.'}
+  access: {mode: read_only, method: file, network_required: false, secrets_required: false}
+  relations:
+  - {relation_type: derived_from, target_asset_id: EVIDENCE-IN-SCOPE-POPULATION-FIT-RECONCILIATION-RUNTIME-001}
+  - {relation_type: depends_on, target_asset_id: EVIDENCE-IN-SCOPE-POPULATION-FIT-RECONCILIATION-DELIVERY-INDEPENDENT-REVIEW-001}
+  consumers: [FACTORY-001, GOAL-OWNER]
+  evidence: []
+  search_terms: [POPULATION_FIT, IN_SCOPE, FACTORY_FIT]
+  classification: {contains_secrets: false, contains_raw_data: false, sensitivity: INTERNAL_NON_SECRET}
