@@ -29096,7 +29096,7 @@ records:
   as_of: '2026-08-21'
   truth_owner: IN_SCOPE_POPULATION_AND_STATE_DISCOVERY_V1
   location: {kind: git_path, logical_uri: 'repo://docs/tasks/IN_SCOPE_POPULATION_AND_STATE_DISCOVERY_V1.md', repository_path: docs/tasks/IN_SCOPE_POPULATION_AND_STATE_DISCOVERY_V1.md}
-  integrity: {kind: sha256, sha256: 3ff5b4ec5a2d5d3cfe6ffdb6e6b131dc37c4887932282f06100c3fbce074c377}
+  integrity: {kind: sha256, sha256: 8d81cab833c36c44cd27e8dbe92ce07fefa40e6967ba5b1f98c1bc1e2aa77fb6}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: contains, target_asset_id: CONFIG-IN-SCOPE-POPULATION-AND-STATE-DISCOVERY-001}
