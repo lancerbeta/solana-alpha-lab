@@ -493,6 +493,11 @@
       "target_asset_id": "CTRL-DELIVERY-HARNESS-001"
     },
     {
+      "source_asset_id": "CONFIG-EARLY-ICP-FREEZE-AND-MATURITY-BRANCH-CLOSE-001",
+      "relation": "governed_by",
+      "target_asset_id": "CTRL-EARLY-ICP-FREEZE-AND-MATURITY-BRANCH-CLOSE-001"
+    },
+    {
       "source_asset_id": "CONFIG-EXPERIMENT-SPEC-FACTORY-V1-COMMISSIONING-001",
       "relation": "depends_on",
       "target_asset_id": "SCHEMA-EXPERIMENT-SPEC-001"
@@ -2128,6 +2133,31 @@
       "target_asset_id": "TEST-DELIVERY-HARNESS-001"
     },
     {
+      "source_asset_id": "CTRL-EARLY-ICP-FREEZE-AND-MATURITY-BRANCH-CLOSE-001",
+      "relation": "contains",
+      "target_asset_id": "CONFIG-EARLY-ICP-FREEZE-AND-MATURITY-BRANCH-CLOSE-001"
+    },
+    {
+      "source_asset_id": "CTRL-EARLY-ICP-FREEZE-AND-MATURITY-BRANCH-CLOSE-001",
+      "relation": "contains",
+      "target_asset_id": "MODULE-EARLY-ICP-FREEZE-ACCEPTANCE-001"
+    },
+    {
+      "source_asset_id": "CTRL-EARLY-ICP-FREEZE-AND-MATURITY-BRANCH-CLOSE-001",
+      "relation": "contains",
+      "target_asset_id": "SCRIPT-MATURITY-PROBE-LOOKUP-001"
+    },
+    {
+      "source_asset_id": "CTRL-EARLY-ICP-FREEZE-AND-MATURITY-BRANCH-CLOSE-001",
+      "relation": "depends_on",
+      "target_asset_id": "EVIDENCE-IN-SCOPE-POPULATION-AND-STATE-DISCOVERY-RUNTIME-001"
+    },
+    {
+      "source_asset_id": "CTRL-EARLY-ICP-FREEZE-AND-MATURITY-BRANCH-CLOSE-001",
+      "relation": "validated_by",
+      "target_asset_id": "TEST-EARLY-ICP-FREEZE-ACCEPTANCE-001"
+    },
+    {
       "source_asset_id": "CTRL-FACTORY-ORDINARY-HYPOTHESIS-THROUGH-SURFACE-001",
       "relation": "governed_by",
       "target_asset_id": "ARCH-INTENT-005"
@@ -3656,6 +3686,46 @@
       "source_asset_id": "EVIDENCE-DELIVERY-HARNESS-INDEPENDENT-REVIEW-001",
       "relation": "validated_by",
       "target_asset_id": "TEST-DELIVERY-HARNESS-001"
+    },
+    {
+      "source_asset_id": "EVIDENCE-EARLY-ICP-FREEZE-ACCEPTANCE-001",
+      "relation": "derived_from",
+      "target_asset_id": "EVIDENCE-EARLY-ICP-FREEZE-RUNTIME-001"
+    },
+    {
+      "source_asset_id": "EVIDENCE-EARLY-ICP-FREEZE-DELIVERY-COMPLETION-001",
+      "relation": "depends_on",
+      "target_asset_id": "SCHEMA-DELIVERY-COMPLETION-EVIDENCE-001"
+    },
+    {
+      "source_asset_id": "EVIDENCE-EARLY-ICP-FREEZE-DELIVERY-COMPLETION-001",
+      "relation": "derived_from",
+      "target_asset_id": "EVIDENCE-EARLY-ICP-FREEZE-ACCEPTANCE-001"
+    },
+    {
+      "source_asset_id": "EVIDENCE-EARLY-ICP-FREEZE-DELIVERY-FACTORY-FIT-001",
+      "relation": "depends_on",
+      "target_asset_id": "EVIDENCE-EARLY-ICP-FREEZE-DELIVERY-INDEPENDENT-REVIEW-001"
+    },
+    {
+      "source_asset_id": "EVIDENCE-EARLY-ICP-FREEZE-DELIVERY-FACTORY-FIT-001",
+      "relation": "derived_from",
+      "target_asset_id": "EVIDENCE-EARLY-ICP-FREEZE-RUNTIME-001"
+    },
+    {
+      "source_asset_id": "EVIDENCE-EARLY-ICP-FREEZE-DELIVERY-INDEPENDENT-REVIEW-001",
+      "relation": "depends_on",
+      "target_asset_id": "SCHEMA-DELIVERY-INDEPENDENT-REVIEW-EVIDENCE-001"
+    },
+    {
+      "source_asset_id": "EVIDENCE-EARLY-ICP-FREEZE-DELIVERY-INDEPENDENT-REVIEW-001",
+      "relation": "derived_from",
+      "target_asset_id": "EVIDENCE-EARLY-ICP-FREEZE-RUNTIME-001"
+    },
+    {
+      "source_asset_id": "EVIDENCE-EARLY-ICP-FREEZE-RUNTIME-001",
+      "relation": "derived_from",
+      "target_asset_id": "CTRL-EARLY-ICP-FREEZE-AND-MATURITY-BRANCH-CLOSE-001"
     },
     {
       "source_asset_id": "EVIDENCE-FACTORY-ORDINARY-HYPOTHESIS-ACCEPTANCE-001",
@@ -7708,6 +7778,16 @@
       "target_asset_id": "CTRL-QUOTE-SURFACE-RETENTION-CLOCK-QUALIFY-001"
     },
     {
+      "source_asset_id": "MODULE-EARLY-ICP-FREEZE-ACCEPTANCE-001",
+      "relation": "depends_on",
+      "target_asset_id": "CONFIG-EARLY-ICP-FREEZE-AND-MATURITY-BRANCH-CLOSE-001"
+    },
+    {
+      "source_asset_id": "MODULE-EARLY-ICP-FREEZE-ACCEPTANCE-001",
+      "relation": "derived_from",
+      "target_asset_id": "MODULE-IN-SCOPE-POPULATION-SUPPLY-GATE-001"
+    },
+    {
       "source_asset_id": "MODULE-FACTORY-V1-APPLICATION-001",
       "relation": "depends_on",
       "target_asset_id": "MODULE-FACTORY-V1-COCKPIT-001"
@@ -9613,6 +9693,11 @@
       "target_asset_id": "CATALOG-SCHEMA-LIFECYCLE-001"
     },
     {
+      "source_asset_id": "REPORT-EARLY-ICP-FREEZE-OWNER-READOUT-001",
+      "relation": "derived_from",
+      "target_asset_id": "EVIDENCE-EARLY-ICP-FREEZE-ACCEPTANCE-001"
+    },
+    {
       "source_asset_id": "REPORT-FACTORY-ORDINARY-HYPOTHESIS-OWNER-READOUT-001",
       "relation": "derived_from",
       "target_asset_id": "EVIDENCE-FACTORY-ORDINARY-HYPOTHESIS-ACCEPTANCE-001"
@@ -10598,6 +10683,11 @@
       "target_asset_id": "TEST-DELIVERY-HARNESS-001"
     },
     {
+      "source_asset_id": "SCRIPT-EARLY-ICP-FREEZE-RUNNER-001",
+      "relation": "depends_on",
+      "target_asset_id": "MODULE-EARLY-ICP-FREEZE-ACCEPTANCE-001"
+    },
+    {
       "source_asset_id": "SCRIPT-FACTORY-ORDINARY-MARKET-HYPOTHESIS-001",
       "relation": "depends_on",
       "target_asset_id": "CONFIG-EXPERIMENT-SPEC-ORDINARY-PRICE-PATH-BUY-PRESSURE-001"
@@ -10636,6 +10726,11 @@
       "source_asset_id": "SCRIPT-IN-SCOPE-POPULATION-SUPPLY-GATE-001",
       "relation": "depends_on",
       "target_asset_id": "MODULE-IN-SCOPE-POPULATION-SUPPLY-GATE-001"
+    },
+    {
+      "source_asset_id": "SCRIPT-MATURITY-PROBE-LOOKUP-001",
+      "relation": "depends_on",
+      "target_asset_id": "CONFIG-EARLY-ICP-FREEZE-AND-MATURITY-BRANCH-CLOSE-001"
     },
     {
       "source_asset_id": "SCRIPT-ORDINARY-MARKET-PIT-LOCAL-RAW-ENVELOPE-BIND-001",
@@ -11431,6 +11526,11 @@
       "source_asset_id": "TEST-DELIVERY-HARNESS-001",
       "relation": "depends_on",
       "target_asset_id": "POLICY-OWNER-ATTENTION-GATE-002"
+    },
+    {
+      "source_asset_id": "TEST-EARLY-ICP-FREEZE-ACCEPTANCE-001",
+      "relation": "depends_on",
+      "target_asset_id": "MODULE-EARLY-ICP-FREEZE-ACCEPTANCE-001"
     },
     {
       "source_asset_id": "TEST-FACTORY-ORDINARY-HYPOTHESIS-THROUGH-SURFACE-001",

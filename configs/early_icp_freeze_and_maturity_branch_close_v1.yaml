@@ -1,0 +1,47 @@
+schema: smial.early-icp-freeze-and-maturity-branch-close
+schema_version: '1.0'
+atom_id: EARLY_ICP_FREEZE_AND_MATURITY_BRANCH_CLOSE_V1
+as_of: '2026-08-21'
+stage: ICP_FREEZE_ACCEPTANCE
+factory_runner: src/solana_alpha_lab/factory/runner.py
+factory_runner_sha256: d8d22bcb51fb6992d40f09e58274c52e0f9942c12d043cc57b96ffca524e918f
+frozen_icp:
+  icp_id: ICP-EARLY-PUMPFUN-V1
+  domain: solana/pump.fun
+  age_band_seconds: {min: 300, max_exclusive: 900}
+  liquidity_usd_min: 1000
+  launchpad: pump.fun
+  acquisition: WAIT_THEN_SEARCH
+pins:
+  live_recent_body:
+    path: local/in_scope_population_live_supply_gate/251e8318d899eae78d2e4551d9e0ba175e50be769cb7fd7edd1e6f178d443c15.body
+    sha256: 251e8318d899eae78d2e4551d9e0ba175e50be769cb7fd7edd1e6f178d443c15
+  live_search_body:
+    path: local/in_scope_population_live_supply_gate/71b1e477322066b1a5876ad22769fb22465641ce2749f5a5e519f3099f20389a.body
+    sha256: 71b1e477322066b1a5876ad22769fb22465641ce2749f5a5e519f3099f20389a
+  live_traded_body:
+    path: local/in_scope_population_live_supply_gate/94e5afb547112bcfe6c86bfaa8b6ef112882cad80c77b065b4ce125d03a78e70.body
+    sha256: 94e5afb547112bcfe6c86bfaa8b6ef112882cad80c77b065b4ce125d03a78e70
+  live_stage_a_receipt:
+    path: local/in_scope_population_live_supply_gate/probe_runtime_receipt_v1.json
+    sha256: adf4afb5ccfa18e09d7c9c3c8c61ce28903c9b8421e3891d068474601e961cab
+  maturity_probe_receipt:
+    path: local/early_icp_freeze_maturity_probe/maturity_probe_runtime_receipt_v1.json
+    sha256: 82dff53b5215be7e15bada803da89b13d7698cd3cde27915b8e133263e4c92c5
+supply_thresholds:
+  early_n_min: 12
+decision_time_observed_at: '2026-08-21T12:23:26Z'
+seasoned_branch_close:
+  terminal: TOPTRADED_NOT_SAME_POPULATION
+  rationale: toptraded rows are selected winners/older assets/unknown-launchpad, not the same product population; acquisition design invalid, not seasoned supply failure.
+optional_maturity_probe:
+  executed_once: true
+  second_attempt: FORBIDDEN
+  window_policy: EXPLICIT_GAP_NO_BACKFILL_AFTER_CLOSE
+non_claims:
+  alpha: false
+  netreturn: false
+  quotes: false
+  state_rules: false
+  strategy_or_bot: false
+  new_provider: false

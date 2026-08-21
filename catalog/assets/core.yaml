@@ -29275,3 +29275,208 @@ records:
   evidence: []
   search_terms: [POPULATION, SUPPLY_GATE, FACTORY_FIT]
   classification: {contains_secrets: false, contains_raw_data: false, sensitivity: INTERNAL_NON_SECRET}
+- asset_id: CTRL-EARLY-ICP-FREEZE-AND-MATURITY-BRANCH-CLOSE-001
+  record_version: '1.0'
+  asset_type: control_document
+  purpose: Exact contract freezing ICP-EARLY-PUMPFUN-V1 and closing the /toptraded SEASONED acquisition branch.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-08-21'
+  truth_owner: EARLY_ICP_FREEZE_AND_MATURITY_BRANCH_CLOSE_V1
+  location: {kind: git_path, logical_uri: 'repo://docs/tasks/EARLY_ICP_FREEZE_AND_MATURITY_BRANCH_CLOSE_V1.md', repository_path: docs/tasks/EARLY_ICP_FREEZE_AND_MATURITY_BRANCH_CLOSE_V1.md}
+  integrity: {kind: sha256, sha256: fc61f0ef83b186e75901ef8215acdb81e9f0acd0f6c507a7d5f5a202c1c3e511}
+  access: {mode: read_only, method: file, network_required: false, secrets_required: false}
+  relations:
+  - {relation_type: contains, target_asset_id: CONFIG-EARLY-ICP-FREEZE-AND-MATURITY-BRANCH-CLOSE-001}
+  - {relation_type: contains, target_asset_id: SCRIPT-MATURITY-PROBE-LOOKUP-001}
+  - {relation_type: contains, target_asset_id: MODULE-EARLY-ICP-FREEZE-ACCEPTANCE-001}
+  - {relation_type: validated_by, target_asset_id: TEST-EARLY-ICP-FREEZE-ACCEPTANCE-001}
+  - {relation_type: depends_on, target_asset_id: EVIDENCE-IN-SCOPE-POPULATION-AND-STATE-DISCOVERY-RUNTIME-001}
+  consumers: [FACTORY-001, GOAL-OWNER]
+  evidence: []
+  search_terms: [EARLY, ICP_FREEZE, MATURITY, TOPTRADED_NOT_SAME_POPULATION]
+  classification: {contains_secrets: false, contains_raw_data: false, sensitivity: INTERNAL_NON_SECRET}
+- asset_id: CONFIG-EARLY-ICP-FREEZE-AND-MATURITY-BRANCH-CLOSE-001
+  record_version: '1.0'
+  asset_type: configuration
+  purpose: Hash-pinned frozen EARLY ICP and retained live-evidence pins for the offline freeze acceptance.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-08-21'
+  truth_owner: EARLY_ICP_FREEZE_AND_MATURITY_BRANCH_CLOSE_V1
+  location: {kind: git_path, logical_uri: 'repo://configs/early_icp_freeze_and_maturity_branch_close_v1.yaml', repository_path: configs/early_icp_freeze_and_maturity_branch_close_v1.yaml}
+  integrity: {kind: sha256, sha256: eedf76dff5c2392943dec85fcfd9b46cbec7864ecff49323799c363bbcc084eb}
+  access: {mode: read_only, method: file, network_required: false, secrets_required: false}
+  relations: [{relation_type: governed_by, target_asset_id: CTRL-EARLY-ICP-FREEZE-AND-MATURITY-BRANCH-CLOSE-001}]
+  consumers: [FACTORY-001, GOAL-OWNER]
+  evidence: []
+  search_terms: [EARLY, ICP_FREEZE, CONFIG, WAIT_THEN_SEARCH]
+  classification: {contains_secrets: false, contains_raw_data: false, sensitivity: INTERNAL_NON_SECRET}
+- asset_id: MODULE-EARLY-ICP-FREEZE-ACCEPTANCE-001
+  record_version: '1.0'
+  asset_type: script
+  purpose: Offline projector deriving the EARLY-only ICP decision from hash-pinned retained bytes.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-08-21'
+  truth_owner: EARLY_ICP_FREEZE_AND_MATURITY_BRANCH_CLOSE_V1
+  location: {kind: git_path, logical_uri: 'repo://src/solana_alpha_lab/early_icp_freeze_acceptance.py', repository_path: src/solana_alpha_lab/early_icp_freeze_acceptance.py}
+  integrity: {kind: sha256, sha256: 682f074ab091744c925fbe7a18b78886ea25c91694d306cbf830d82fbcb0ad5e}
+  access: {mode: read_only, method: file, network_required: false, secrets_required: false}
+  relations:
+  - {relation_type: depends_on, target_asset_id: CONFIG-EARLY-ICP-FREEZE-AND-MATURITY-BRANCH-CLOSE-001}
+  - {relation_type: derived_from, target_asset_id: MODULE-IN-SCOPE-POPULATION-SUPPLY-GATE-001}
+  consumers: [FACTORY-001, GOAL-OWNER]
+  evidence: []
+  search_terms: [EARLY, ICP_FREEZE, ACCEPTANCE, MODULE]
+  classification: {contains_secrets: false, contains_raw_data: false, sensitivity: INTERNAL_NON_SECRET}
+- asset_id: SCRIPT-EARLY-ICP-FREEZE-RUNNER-001
+  record_version: '1.0'
+  asset_type: script
+  purpose: Offline CLI that writes the EARLY ICP freeze runtime and acceptance receipts.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-08-21'
+  truth_owner: EARLY_ICP_FREEZE_AND_MATURITY_BRANCH_CLOSE_V1
+  location: {kind: git_path, logical_uri: 'repo://scripts/run_early_icp_freeze_acceptance.py', repository_path: scripts/run_early_icp_freeze_acceptance.py}
+  integrity: {kind: sha256, sha256: cf3c99ddf7274c2f61cf4131beccd9b1b6bb2b31d961370b49d26e9949bab04f}
+  access: {mode: read_only, method: file, network_required: false, secrets_required: false}
+  relations: [{relation_type: depends_on, target_asset_id: MODULE-EARLY-ICP-FREEZE-ACCEPTANCE-001}]
+  consumers: [FACTORY-001, GOAL-OWNER]
+  evidence: []
+  search_terms: [EARLY, ICP_FREEZE, RUNNER]
+  classification: {contains_secrets: false, contains_raw_data: false, sensitivity: INTERNAL_NON_SECRET}
+- asset_id: SCRIPT-MATURITY-PROBE-LOOKUP-001
+  record_version: '1.0'
+  asset_type: script
+  purpose: One-shot same-cohort maturity later-search over retained EARLY mints; no second attempt.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-08-21'
+  truth_owner: EARLY_ICP_FREEZE_AND_MATURITY_BRANCH_CLOSE_V1
+  location: {kind: git_path, logical_uri: 'repo://scripts/probe_early_cohort_maturity_lookup.py', repository_path: scripts/probe_early_cohort_maturity_lookup.py}
+  integrity: {kind: sha256, sha256: f0ef7130bccc91b3aab3f26db19bb170d63527b390cfd61cc4a0c1aa87ac7062}
+  access: {mode: read_only, method: file, network_required: false, secrets_required: false}
+  relations: [{relation_type: depends_on, target_asset_id: CONFIG-EARLY-ICP-FREEZE-AND-MATURITY-BRANCH-CLOSE-001}]
+  consumers: [FACTORY-001, GOAL-OWNER]
+  evidence: []
+  search_terms: [MATURITY_PROBE, SAME_COHORT, LATER_SEARCH]
+  classification: {contains_secrets: false, contains_raw_data: false, sensitivity: INTERNAL_NON_SECRET}
+- asset_id: TEST-EARLY-ICP-FREEZE-ACCEPTANCE-001
+  record_version: '1.0'
+  asset_type: script
+  purpose: Tests pinned replay, source-vs-population separation, fail-closed membership, and branch close.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-08-21'
+  truth_owner: EARLY_ICP_FREEZE_AND_MATURITY_BRANCH_CLOSE_V1
+  location: {kind: git_path, logical_uri: 'repo://tests/test_early_icp_freeze_acceptance.py', repository_path: tests/test_early_icp_freeze_acceptance.py}
+  integrity: {kind: sha256, sha256: b47d4661dbc52b2c17fb5693e3f71fb4dd42dbf21a8bb2c6e8094b1a5f217487}
+  access: {mode: read_only, method: file, network_required: false, secrets_required: false}
+  relations: [{relation_type: depends_on, target_asset_id: MODULE-EARLY-ICP-FREEZE-ACCEPTANCE-001}]
+  consumers: [FACTORY-001, GOAL-OWNER]
+  evidence: []
+  search_terms: [EARLY, ICP_FREEZE, TEST]
+  classification: {contains_secrets: false, contains_raw_data: false, sensitivity: INTERNAL_NON_SECRET}
+- asset_id: EVIDENCE-EARLY-ICP-FREEZE-RUNTIME-001
+  record_version: '1.0'
+  asset_type: evidence
+  purpose: Runtime packet confirming 27 product EARLY from retained bytes and closing the seasoned branch.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-08-21'
+  truth_owner: EARLY_ICP_FREEZE_AND_MATURITY_BRANCH_CLOSE_V1
+  location: {kind: git_path, logical_uri: 'repo://docs/evidence/early_icp_freeze/a1_runtime_receipt_v1.json', repository_path: docs/evidence/early_icp_freeze/a1_runtime_receipt_v1.json}
+  integrity: {kind: sha256, sha256: efe98d0aa4f2017e205e18344e6c908b686a7b3630387e85770199d839222be3}
+  access: {mode: read_only, method: file, network_required: false, secrets_required: false}
+  relations: [{relation_type: derived_from, target_asset_id: CTRL-EARLY-ICP-FREEZE-AND-MATURITY-BRANCH-CLOSE-001}]
+  consumers: [FACTORY-001, GOAL-OWNER]
+  evidence: []
+  search_terms: [EARLY, ICP_FREEZE, RUNTIME]
+  classification: {contains_secrets: false, contains_raw_data: false, sensitivity: INTERNAL_NON_SECRET}
+- asset_id: EVIDENCE-EARLY-ICP-FREEZE-ACCEPTANCE-001
+  record_version: '1.0'
+  asset_type: evidence
+  purpose: Acceptance freezing ICP-EARLY-PUMPFUN-V1 with maturity off the critical path.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-08-21'
+  truth_owner: EARLY_ICP_FREEZE_AND_MATURITY_BRANCH_CLOSE_V1
+  location: {kind: git_path, logical_uri: 'repo://docs/evidence/early_icp_freeze/a1_acceptance_v1.json', repository_path: docs/evidence/early_icp_freeze/a1_acceptance_v1.json}
+  integrity: {kind: sha256, sha256: 1ac5d994f8355fb71befbd4dc83d4d646bca8a32675065f7091422ebac375caf}
+  access: {mode: read_only, method: file, network_required: false, secrets_required: false}
+  relations: [{relation_type: derived_from, target_asset_id: EVIDENCE-EARLY-ICP-FREEZE-RUNTIME-001}]
+  consumers: [FACTORY-001, GOAL-OWNER]
+  evidence: []
+  search_terms: [EARLY, ICP_FREEZE, ACCEPTANCE]
+  classification: {contains_secrets: false, contains_raw_data: false, sensitivity: INTERNAL_NON_SECRET}
+- asset_id: REPORT-EARLY-ICP-FREEZE-OWNER-READOUT-001
+  record_version: '1.0'
+  asset_type: control_document
+  purpose: Russian owner readout of the EARLY-only ICP freeze and seasoned branch close.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-08-21'
+  truth_owner: EARLY_ICP_FREEZE_AND_MATURITY_BRANCH_CLOSE_V1
+  location: {kind: git_path, logical_uri: 'repo://docs/reports/early_icp_freeze/a1_owner_readout_v1.md', repository_path: docs/reports/early_icp_freeze/a1_owner_readout_v1.md}
+  integrity: {kind: sha256, sha256: 3284717dc590a29359ac3f1e59b1363eff68a0bf37d69f77466fc7fcdc40b0b3}
+  access: {mode: read_only, method: file, network_required: false, secrets_required: false}
+  relations: [{relation_type: derived_from, target_asset_id: EVIDENCE-EARLY-ICP-FREEZE-ACCEPTANCE-001}]
+  consumers: [FACTORY-001, GOAL-OWNER]
+  evidence: []
+  search_terms: [EARLY, ICP_FREEZE, OWNER_READOUT]
+  classification: {contains_secrets: false, contains_raw_data: false, sensitivity: INTERNAL_NON_SECRET}
+- asset_id: EVIDENCE-EARLY-ICP-FREEZE-DELIVERY-COMPLETION-001
+  record_version: '1.0'
+  asset_type: evidence
+  purpose: Delivery completion evidence for the EARLY ICP freeze atom.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-08-21'
+  truth_owner: EARLY_ICP_FREEZE_AND_MATURITY_BRANCH_CLOSE_V1
+  location: {kind: git_path, logical_uri: 'repo://docs/evidence/early_icp_freeze/a1_delivery_completion_evidence_v1.json', repository_path: docs/evidence/early_icp_freeze/a1_delivery_completion_evidence_v1.json}
+  integrity: {kind: none, note: 'Content integrity is owned by the live completion-review-fit hash chain; embedding its SHA here would create an indirect self-reference through the reviewed inventory.'}
+  access: {mode: read_only, method: file, network_required: false, secrets_required: false}
+  relations:
+  - {relation_type: derived_from, target_asset_id: EVIDENCE-EARLY-ICP-FREEZE-ACCEPTANCE-001}
+  - {relation_type: depends_on, target_asset_id: SCHEMA-DELIVERY-COMPLETION-EVIDENCE-001}
+  consumers: [FACTORY-001, GOAL-OWNER]
+  evidence: []
+  search_terms: [EARLY, ICP_FREEZE, DELIVERY_COMPLETION]
+  classification: {contains_secrets: false, contains_raw_data: false, sensitivity: INTERNAL_NON_SECRET}
+- asset_id: EVIDENCE-EARLY-ICP-FREEZE-DELIVERY-INDEPENDENT-REVIEW-001
+  record_version: '1.0'
+  asset_type: evidence
+  purpose: Required-role review evidence for the EARLY ICP freeze atom.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-08-21'
+  truth_owner: EARLY_ICP_FREEZE_AND_MATURITY_BRANCH_CLOSE_V1
+  location: {kind: git_path, logical_uri: 'repo://docs/evidence/early_icp_freeze/a1_delivery_independent_review_v1.json', repository_path: docs/evidence/early_icp_freeze/a1_delivery_independent_review_v1.json}
+  integrity: {kind: none, note: 'Content integrity is owned by the live completion-review-fit hash chain; embedding its SHA here would create an indirect self-reference through the reviewed inventory.'}
+  access: {mode: read_only, method: file, network_required: false, secrets_required: false}
+  relations:
+  - {relation_type: derived_from, target_asset_id: EVIDENCE-EARLY-ICP-FREEZE-RUNTIME-001}
+  - {relation_type: depends_on, target_asset_id: SCHEMA-DELIVERY-INDEPENDENT-REVIEW-EVIDENCE-001}
+  consumers: [FACTORY-001, GOAL-OWNER]
+  evidence: []
+  search_terms: [EARLY, ICP_FREEZE, INDEPENDENT_REVIEW]
+  classification: {contains_secrets: false, contains_raw_data: false, sensitivity: INTERNAL_NON_SECRET}
+- asset_id: EVIDENCE-EARLY-ICP-FREEZE-DELIVERY-FACTORY-FIT-001
+  record_version: '1.0'
+  asset_type: evidence
+  purpose: FULL Factory Fit preserving the freeze without quotes, X, or Factory runner change.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-08-21'
+  truth_owner: EARLY_ICP_FREEZE_AND_MATURITY_BRANCH_CLOSE_V1
+  location: {kind: git_path, logical_uri: 'repo://docs/evidence/early_icp_freeze/a1_delivery_factory_fit_v1.json', repository_path: docs/evidence/early_icp_freeze/a1_delivery_factory_fit_v1.json}
+  integrity: {kind: none, note: 'Content integrity is owned by the live completion-review-fit hash chain; embedding its SHA here would create an indirect self-reference through the reviewed inventory.'}
+  access: {mode: read_only, method: file, network_required: false, secrets_required: false}
+  relations:
+  - {relation_type: derived_from, target_asset_id: EVIDENCE-EARLY-ICP-FREEZE-RUNTIME-001}
+  - {relation_type: depends_on, target_asset_id: EVIDENCE-EARLY-ICP-FREEZE-DELIVERY-INDEPENDENT-REVIEW-001}
+  consumers: [FACTORY-001, GOAL-OWNER]
+  evidence: []
+  search_terms: [EARLY, ICP_FREEZE, FACTORY_FIT]
+  classification: {contains_secrets: false, contains_raw_data: false, sensitivity: INTERNAL_NON_SECRET}

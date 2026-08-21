@@ -1,0 +1,57 @@
+{
+  "atom_id": "EARLY_ICP_FREEZE_AND_MATURITY_BRANCH_CLOSE_V1",
+  "decision": {
+    "maturity_on_critical_path": false,
+    "seasoned_branch_terminal": "TOPTRADED_NOT_SAME_POPULATION",
+    "terminal": "EARLY_ONLY_ICP_CONFIRMED"
+  },
+  "early_cohort": {
+    "acquisition": "WAIT_THEN_SEARCH",
+    "cohort_source_body_sha256": "71b1e477322066b1a5876ad22769fb22465641ce2749f5a5e519f3099f20389a",
+    "early_n": 27,
+    "excluded_no_launchpad_n": 19,
+    "excluded_older_than_120m_n": 14
+  },
+  "factory_runner_sha256": "d8d22bcb51fb6992d40f09e58274c52e0f9942c12d043cc57b96ffca524e918f",
+  "frozen_icp": {
+    "acquisition": "WAIT_THEN_SEARCH",
+    "age_band_seconds": {
+      "max_exclusive": 900,
+      "min": 300
+    },
+    "domain": "solana/pump.fun",
+    "icp_id": "ICP-EARLY-PUMPFUN-V1",
+    "launchpad": "pump.fun",
+    "liquidity_usd_min": 1000
+  },
+  "non_claims": [
+    "NO_ALPHA",
+    "NO_NETRETURN",
+    "NO_QUOTES",
+    "NO_STATE_RULES",
+    "NO_STRATEGY_OR_BOT",
+    "NO_NEW_PROVIDER",
+    "NO_SECOND_TOPTRADED_ATTEMPT",
+    "NO_THRESHOLD_RESCUE",
+    "NO_CANONICAL_DONE"
+  ],
+  "optional_maturity_probe": {
+    "alive_pumpfun_liq_ge_min_n": 27,
+    "executed_once": true,
+    "icp_change": "NONE",
+    "inside_valid_observation_window": true,
+    "note": "probe answers only whether maturity could matter later; frozen ICP stays EARLY either way",
+    "probe_observed_at": "2026-08-21T13:39:05Z",
+    "same_population_seasoned_band_n": 27
+  },
+  "provider_api_rpc_wss_calls": 0,
+  "seasoned_branch_close": {
+    "note": "source=/toptraded never grants population=SEASONED; acquisition design invalid, not seasoned supply failure",
+    "product_seasoned_n_from_source_alone": 0,
+    "rows_n": 50,
+    "source_channel": "DISCOVERY:TRADED",
+    "terminal": "TOPTRADED_NOT_SAME_POPULATION",
+    "unknown_launchpad_n": 29
+  },
+  "stage": "ICP_FREEZE_ACCEPTANCE"
+}
