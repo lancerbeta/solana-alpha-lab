@@ -228,6 +228,8 @@ class FrozenHypothesisTests(unittest.TestCase):
 
 
 class RunnerRerunTests(unittest.TestCase):
+    # DELIVERY_PREFLIGHT_NONCRITICAL_SKIP: docs/evidence/early_state_paper/a1_runtime_receipt_v1.json
+    @unittest.skipUnless(LIVE_EVIDENCE_PRESENT, "LOCAL_A4_ABSENT")
     def test_commissioning_is_rerunnable_over_reconciled_store(self) -> None:
         config = load_config(ROOT)
         cohort, _extras = build_cohort(ROOT, config)

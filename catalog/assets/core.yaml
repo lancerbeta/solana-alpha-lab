@@ -29630,7 +29630,7 @@ records:
   as_of: '2026-08-21'
   truth_owner: EARLY_STATE_TO_PAPER_VERTICAL_SLICE_V1
   location: {kind: git_path, logical_uri: 'repo://tests/test_early_state_to_paper_vertical_slice.py', repository_path: tests/test_early_state_to_paper_vertical_slice.py}
-  integrity: {kind: sha256, sha256: 3193b78c495c3ea43825e36d31ffd03ab405bb389396c4b5f6cd3b55e626e620}
+  integrity: {kind: sha256, sha256: d74604845ad5aed974589a550f30fb3af220658a4a4a8045bde787c5a0ce6d69}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations: [{relation_type: depends_on, target_asset_id: MODULE-PAPER-PLANE-ENGINE-001}]
   consumers: [FACTORY-001, GOAL-OWNER]
