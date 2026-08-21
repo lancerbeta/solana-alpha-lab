@@ -38,7 +38,10 @@ evidence/time budget breach.
 
 Routine bounded delivery is autonomous. Use targeted tests; after bootstrap
 the guarded merge is the sole project-bound gate executor for the unchanged
-fingerprint. Code review is mandatory. Goal/DoD, architecture and refactor critics
+fingerprint. If a leftover space, encoded query, wrong endpoint or shape can
+still fail the atom, probe and fix it on the working path before Catalog,
+receipts, reviews or PR. Do not document a five-second mechanical miss.
+Code review is mandatory. Goal/DoD, architecture and refactor critics
 are trigger-routed and must run in isolated context. `SINGLE_AGENT_REVIEW_FALLBACK`
 is `NOT_READY` for merge; deterministic validation still runs.
 

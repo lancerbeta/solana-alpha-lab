@@ -735,7 +735,7 @@ records:
     repository_path: AGENTS.md
   integrity:
     kind: sha256
-    sha256: 808f38cad4954d49faf933328943ac49625d14d694bb17555f9d2f732b65f142
+    sha256: 020485abe150a88a9b779af848712c300697a2fc665d499972d011560d06e459
   access:
     mode: read_only
     method: file
@@ -13619,7 +13619,7 @@ records:
   as_of: '2026-08-14'
   truth_owner: TASK-30
   location: {kind: git_path, logical_uri: 'repo://docs/evidence/task30/a20r1_provider_route_capability_registry_acceptance_v1.json', repository_path: docs/evidence/task30/a20r1_provider_route_capability_registry_acceptance_v1.json}
-  integrity: {kind: sha256, sha256: 5dbaffbf7579ecfa851bb4ef527ed31af740952f1d61dd6a27df46e88280775b}
+  integrity: {kind: sha256, sha256: f0484630e5eaa1a3d581d6e418ca7e6f955cb1c409340e18cb71b7681ed2abe9}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: derived_from, target_asset_id: CONFIG-PROVIDER-ROUTE-CAPABILITY-REGISTRY-004}
@@ -19872,7 +19872,7 @@ records:
   as_of: '2026-08-14'
   truth_owner: CTRL-DELIVERY-HARNESS-001
   location: {kind: git_path, logical_uri: 'repo://.agents/skills/delivery-harness/SKILL.md', repository_path: .agents/skills/delivery-harness/SKILL.md}
-  integrity: {kind: sha256, sha256: 20fb89acf4c171c7202b4925b231f5736b767a58fd1acb2256c74ab4a265bfea}
+  integrity: {kind: sha256, sha256: aaac17170f0643614a21bbbfc7751c3c106703984e0261d08cbd1814c84beb0f}
   access: *t25_read_file
   relations:
   - {relation_type: governed_by, target_asset_id: CTRL-DELIVERY-HARNESS-001}
@@ -19926,7 +19926,7 @@ records:
   as_of: '2026-08-14'
   truth_owner: CTRL-DELIVERY-HARNESS-001
   location: {kind: git_path, logical_uri: 'repo://docs/agent/DELIVERY_HARNESS_PROTOCOL.md', repository_path: docs/agent/DELIVERY_HARNESS_PROTOCOL.md}
-  integrity: {kind: sha256, sha256: ad0a43b9c3ad2dc66abc8fa7bf60ddd0571037acc84a9a416d2e259118b3e422}
+  integrity: {kind: sha256, sha256: eb999e03c2c4e84c06cdcf768184d7f3834b85a6fc853e05ace7e634beba735e}
   access: *t25_read_file
   relations:
   - {relation_type: governed_by, target_asset_id: ADR-DIRECT-DELIVERY-HARNESS-005}
