@@ -66,6 +66,9 @@ context_requirements:
     ARCHITECTURE_DECISIONS:
       - docs/architecture/intents/ARCH-INTENT-005-factory-v1-operational-readiness-and-owner-experience.md
     DELIVERY_EVIDENCE:
+      - docs/evidence/early_icp_freeze/a1_delivery_completion_evidence_v1.json
+      - docs/evidence/early_icp_freeze/a1_delivery_independent_review_v1.json
+      - docs/evidence/early_icp_freeze/a1_delivery_factory_fit_v1.json
       - docs/evidence/in_scope_population_and_state_discovery/a1_runtime_receipt_v1.json
       - docs/evidence/in_scope_population_and_state_discovery/a1_acceptance_v1.json
       - docs/evidence/in_scope_population_fit_reconciliation/a1_runtime_receipt_v1.json

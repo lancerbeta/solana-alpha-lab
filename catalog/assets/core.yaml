@@ -29284,7 +29284,7 @@ records:
   as_of: '2026-08-21'
   truth_owner: EARLY_ICP_FREEZE_AND_MATURITY_BRANCH_CLOSE_V1
   location: {kind: git_path, logical_uri: 'repo://docs/tasks/EARLY_ICP_FREEZE_AND_MATURITY_BRANCH_CLOSE_V1.md', repository_path: docs/tasks/EARLY_ICP_FREEZE_AND_MATURITY_BRANCH_CLOSE_V1.md}
-  integrity: {kind: sha256, sha256: dad99f141af55ca07938bd8730b488ce0432fcb76aa9342847685827d079ca39}
+  integrity: {kind: sha256, sha256: fc61f0ef83b186e75901ef8215acdb81e9f0acd0f6c507a7d5f5a202c1c3e511}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: contains, target_asset_id: CONFIG-EARLY-ICP-FREEZE-AND-MATURITY-BRANCH-CLOSE-001}
