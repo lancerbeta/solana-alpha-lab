@@ -24,6 +24,7 @@ managed_write_set:
   - scripts/run_early_state_hypothesis.py
   - tests/test_early_state_to_paper_vertical_slice.py
   - catalog/assets/core.yaml
+  - catalog/assets/lifecycle.yaml
   - catalog/catalog_manifest.yaml
   - catalog/generated/asset_edges.json
   - docs/PROJECT_MAP.md

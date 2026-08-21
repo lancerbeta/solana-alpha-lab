@@ -29489,7 +29489,7 @@ records:
   as_of: '2026-08-21'
   truth_owner: EARLY_STATE_TO_PAPER_VERTICAL_SLICE_V1
   location: {kind: git_path, logical_uri: 'repo://docs/tasks/EARLY_STATE_TO_PAPER_VERTICAL_SLICE_V1.md', repository_path: docs/tasks/EARLY_STATE_TO_PAPER_VERTICAL_SLICE_V1.md}
-  integrity: {kind: sha256, sha256: f136f4d3662bcbdb3bc15bf116d3f945f022b7063742182860e578a73cfe33e3}
+  integrity: {kind: sha256, sha256: 5a26ba4673d340a95661ae59cf3a9abbd009f61bbd538181e814f52b9fb4f7a8}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: contains, target_asset_id: CONFIG-EARLY-STATE-TO-PAPER-VERTICAL-SLICE-001}
