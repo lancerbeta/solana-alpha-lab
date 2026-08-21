@@ -60,11 +60,16 @@ def load_config(root: Path) -> dict[str, Any]:
     payload = yaml.safe_load((root / CONFIG_RELATIVE).read_bytes())
     _require(isinstance(payload, dict), "CONFIG_NOT_MAPPING")
     _require(payload.get("atom_id") == ATOM_ID, "ATOM_ID_DRIFT")
-    for key, pin in payload["pins"].items():
+    return payload
+
+
+def verify_local_pins(root: Path, config: dict[str, Any]) -> None:
+    """Fail-closed over retained A4_OUTSIDE_GIT bytes; absent bytes are an explicit gap."""
+
+    for key, pin in config["pins"].items():
         path = root / pin["path"]
         _require(path.is_file(), f"PIN_MISSING:{key}")
         _require(sha256_file(path) == pin["sha256"], f"PIN_HASH_MISMATCH:{key}")
-    return payload
 
 
 def build_cohort(

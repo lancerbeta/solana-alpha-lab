@@ -29580,7 +29580,7 @@ records:
   as_of: '2026-08-21'
   truth_owner: EARLY_STATE_TO_PAPER_VERTICAL_SLICE_V1
   location: {kind: git_path, logical_uri: 'repo://src/solana_alpha_lab/early_state_hypothesis.py', repository_path: src/solana_alpha_lab/early_state_hypothesis.py}
-  integrity: {kind: sha256, sha256: b257ffe5258bf10587081d1252167b9e0e8c02bfdbea8f88132d49109841fc09}
+  integrity: {kind: sha256, sha256: e2f6a945cc94d952a08b30315765cf499b6e6e6daae7fc0737a61e9aa4a9c42d}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations: [{relation_type: depends_on, target_asset_id: CONFIG-EARLY-STATE-TO-PAPER-VERTICAL-SLICE-001}]
   consumers: [FACTORY-001, GOAL-OWNER]
@@ -29646,7 +29646,7 @@ records:
   as_of: '2026-08-21'
   truth_owner: EARLY_STATE_TO_PAPER_VERTICAL_SLICE_V1
   location: {kind: git_path, logical_uri: 'repo://docs/evidence/early_state_paper/a1_runtime_receipt_v1.json', repository_path: docs/evidence/early_state_paper/a1_runtime_receipt_v1.json}
-  integrity: {kind: sha256, sha256: 9e6556c97afee1dbb3285e26c2bcd23c77d3c9e751e088fd503a36855533921a}
+  integrity: {kind: sha256, sha256: f8022663a71b4359e33b5011e69071e2d06ec45c840f9eff01e781095d627917}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations: [{relation_type: derived_from, target_asset_id: CTRL-EARLY-STATE-TO-PAPER-VERTICAL-SLICE-001}]
   consumers: [FACTORY-001, GOAL-OWNER]
