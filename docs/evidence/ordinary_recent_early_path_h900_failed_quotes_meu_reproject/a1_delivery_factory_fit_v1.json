@@ -5,7 +5,7 @@
   "as_of": "2026-08-21",
   "task_id": "ORDINARY_RECENT_EARLY_PATH_H900_FAILED_QUOTES_MEU_REPROJECT_V1",
   "reviewed_bindings_sha256": "0dfe3f5ebc69def57a2b4d1f8d2249c5d22fc4a81887e0809d1b03cfc09ad805",
-  "reviewed_inventory_sha256": "PLACEHOLDER",
+  "reviewed_inventory_sha256": "020788d8d6fb5c0c991ac0de70235d32e58c844f10e2063a725957c41401273e",
   "mode": "FULL_REVIEW",
   "verdict": "PASS",
   "dimensions": {
