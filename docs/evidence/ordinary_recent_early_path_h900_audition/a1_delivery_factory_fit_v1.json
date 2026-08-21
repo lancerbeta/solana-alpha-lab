@@ -1,0 +1,37 @@
+{
+  "schema": "smial.delivery-harness-factory-fit",
+  "schema_version": "1.0",
+  "review_id": "ORDINARY-RECENT-EARLY-PATH-H900-AUDITION-FACTORY-FIT-001",
+  "as_of": "2026-08-21",
+  "task_id": "ORDINARY_RECENT_EARLY_PATH_H900_AUDITION_V1",
+  "reviewed_bindings_sha256": "85e728cc31d7297d76da7cba49f3ac89ba9217c39b6db84920ede335fb5da69b",
+  "reviewed_inventory_sha256": "1ec8560e252c0a4d686691cac8c9997b8e5dfa484a92f9c4dc7fd61bbf0170b8",
+  "mode": "FULL_REVIEW",
+  "verdict": "PASS",
+  "dimensions": {
+    "mission": "PASS_REPLAN_ON_INCOMPLETE_SELECTED_QUARTILE_H900",
+    "flexibility_and_history": "PASS_PRESERVE_RAW_RECEIPT_AND_TYPED_GAP",
+    "context_efficiency": "PASS_ONE_BOUNDED_CAMPAIGN_NO_SUFFIX_ATOM",
+    "research_truth": "PASS_MISSING_IS_NOT_ZERO_AND_RULE_NOT_APPLIED",
+    "owner_operability": "PASS_RUSSIAN_READOUT_NAMES_NEXT_REPLAN_BOUNDARY",
+    "execution_to_cashflow": "NOT_APPLICABLE_QUOTE_ONLY_NO_EXECUTION",
+    "monitoring_and_recovery": "PASS_CREATE_ONLY_RECEIPT_AND_NO_RETRY",
+    "build_vs_buy": "PASS_WRAP_EXISTING_CAMPAIGN_AND_MCAP_PROJECTOR",
+    "security": "PASS_KEY_NOT_IN_URL_LOG_RECEIPT_OR_GIT",
+    "red_team": "PASS_YIELD_WHEN_SELECTED_QUARTILE_QUOTE_INCOMPLETE"
+  },
+  "capability_radar": {
+    "now": "NONE",
+    "watch": "OWNER_REPLAN_ONLY_IF_SELECTED_QUARTILE_H900_CAN_BE_QUOTE_COMPLETE"
+  },
+  "recovery": "PRESERVE_APPEND_ONLY_RAW_RECEIPT; REPLAN QUOTE-COMPLETE SELECTED QUARTILE BEFORE ANY SECOND CAMPAIGN; DO NOT RETRY THIS RUN",
+  "limits": [
+    "NO_EARN_FRESH_OOS",
+    "NO_CLOSE_EARLY_PATH_CANDIDATE",
+    "NO_ALPHA_NETRETURN_OR_CASHFLOW",
+    "NO_EXECUTE_BUILD_TAKER_WALLET_SIGNER_OR_TRANSACTION",
+    "NO_SECOND_PROVIDER_OR_PAID_PLAN",
+    "NO_STRATEGY_BOT_SHADOW_H3600_OR_H4",
+    "NO_ORGANIC_FLOW_OR_TX_IMBALANCE_X"
+  ]
+}

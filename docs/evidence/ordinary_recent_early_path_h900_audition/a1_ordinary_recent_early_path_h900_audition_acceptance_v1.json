@@ -1,0 +1,73 @@
+{
+  "schema": "smial.ordinary-recent-early-path-h900-audition.acceptance",
+  "schema_version": "1.0",
+  "acceptance_id": "EVIDENCE-ORDINARY-RECENT-EARLY-PATH-H900-AUDITION-001",
+  "as_of": "2026-08-21",
+  "atom_id": "ORDINARY_RECENT_EARLY_PATH_H900_AUDITION_V1",
+  "owner_phrase_authorized": true,
+  "owner_decision": "INVALID_EVIDENCE_REPLAN",
+  "runtime_terminal": "INVALID_EVIDENCE_YIELD",
+  "runtime_receipt": "docs/evidence/ordinary_recent_early_path_h900_audition/a1_ordinary_recent_early_path_h900_audition_runtime_receipt_v1.json",
+  "runtime_receipt_sha256": "0acdc847eaf404bf61845cd471b17b91cf6255f24edc82363c2f10a74e7d786b",
+  "prior_mints_sha256": "f7f88369804c4f7794e31e47bb3b2ac041cddd2a38755480ef6b9d13aeddeb9d",
+  "project_sources_disposition": {
+    "kind": "NO_CHANGE"
+  },
+  "discovery": {
+    "recent_terminal": "TOKEN_LIST_OBSERVED",
+    "search_terminal": "TOKEN_LIST_OBSERVED",
+    "frozen_candidates": 24,
+    "recent_response_sha256": "a2a61a3622cd398bf59c9154c98eb413d410926d52890fd0833fb19fafa56792",
+    "search_response_sha256": "213aaa5dd8e301555e68e96fabbe27c8bc2db950bdd332fc8f7bff932f41fd9b",
+    "provider_requests": 44,
+    "raw_retention": "A4_OUTSIDE_GIT"
+  },
+  "eligibility": {
+    "decision_time_eligible": 21,
+    "minimum_required": 18,
+    "x_missing": 3,
+    "x_missing_reason": "MCAP_FIELD_MISSING_OR_INVALID",
+    "x_observed_exact_zero": 6,
+    "rankable_h900": 17,
+    "minimum_rankable_required": 14
+  },
+  "quotes": {
+    "buy_t0_calls": 21,
+    "buy_t0_quote_observed": 21,
+    "sell_h900_calls": 21,
+    "h900_quote_observed": 17,
+    "h900_unknown_typed_failure": 4,
+    "h900_unknown_http_status": 400,
+    "selected_top_quartile_non_quote": true,
+    "selected_market_execution_unavailable": false
+  },
+  "score_observed_not_applied": {
+    "tau_b": 0.40980057093238403,
+    "top_quartile_median_y": -0.0272814,
+    "rest_median_y": -0.0272814,
+    "leave_one_out_positive_share": 1.0,
+    "note": "Frozen rule was not applied: selected top-X quartile is not fully QUOTE_OBSERVED."
+  },
+  "cheapest_falsifier": "SELECTED_TOP_QUARTILE_H900_NOT_QUOTE_OBSERVED",
+  "cheapest_falsifier_result": "TRIGGERED",
+  "side_effects": {
+    "cash_spend_usd_cents": 0,
+    "credential_reads": 1,
+    "execute_calls": 0,
+    "fallbacks": 0,
+    "retries": 0,
+    "wallet_signer_transaction_actions": 0
+  },
+  "non_claims": [
+    "NO_EARN_FRESH_OOS",
+    "NO_CLOSE_EARLY_PATH_CANDIDATE",
+    "NO_ALPHA",
+    "NO_NETRETURN",
+    "NO_EXECUTION",
+    "NO_STRATEGY_OR_SHADOW",
+    "UNKNOWN_OR_MISSING_IS_NOT_ZERO",
+    "OBSERVED_ZERO_MCAP_PATH_IS_NOT_IMPUTED",
+    "NO_ORGANIC_FLOW_OR_TX_IMBALANCE_X",
+    "NO_SECOND_PROVIDER_OR_RETRY"
+  ]
+}

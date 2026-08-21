@@ -28354,7 +28354,7 @@ records:
   as_of: '2026-08-20'
   truth_owner: ORDINARY_RECENT_ORGANIC_PRESSURE_H900_AUDITION_V1
   location: {kind: git_path, logical_uri: 'repo://src/solana_alpha_lab/ordinary_recent_organic_pressure_h900_audition.py', repository_path: src/solana_alpha_lab/ordinary_recent_organic_pressure_h900_audition.py}
-  integrity: {kind: sha256, sha256: 81e723ab64bf4cd67814004a573845c746e6a13177dad87954fcc940a5ae4b72}
+  integrity: {kind: sha256, sha256: dbf9af28e32ab450c1f98153f5ecabb0234d45b4963be731681c931c8b343916}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: depends_on, target_asset_id: CONFIG-ORDINARY-RECENT-ORGANIC-PRESSURE-H900-AUDITION-001}
@@ -28500,6 +28500,201 @@ records:
   relations:
   - {relation_type: derived_from, target_asset_id: EVIDENCE-ORDINARY-RECENT-ORGANIC-PRESSURE-H900-AUDITION-001}
   - {relation_type: depends_on, target_asset_id: EVIDENCE-ORDINARY-RECENT-ORGANIC-PRESSURE-H900-AUDITION-DELIVERY-INDEPENDENT-REVIEW-001}
+  consumers: [FACTORY-001, GOAL-OWNER]
+  evidence: []
+  search_terms: [ORDINARY_RECENT, FACTORY_FIT, FULL_REVIEW, NO_SWITCH, REPLAN]
+  classification: {contains_secrets: false, contains_raw_data: false, sensitivity: INTERNAL_NON_SECRET}
+- asset_id: CTRL-ORDINARY-RECENT-EARLY-PATH-H900-AUDITION-001
+  record_version: '1.0'
+  asset_type: control_document
+  purpose: Exact bounded contract for a fresh project-eligible recent-to-T+5 mcap-path H900 quote-only audition.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-08-21'
+  truth_owner: ORDINARY_RECENT_EARLY_PATH_H900_AUDITION_V1
+  location: {kind: git_path, logical_uri: 'repo://docs/tasks/ORDINARY_RECENT_EARLY_PATH_H900_AUDITION_V1.md', repository_path: docs/tasks/ORDINARY_RECENT_EARLY_PATH_H900_AUDITION_V1.md}
+  integrity: {kind: sha256, sha256: f0b7d8d6145d731a276992897f8f4f94f2616276641cef909cd2a4b4b2dc4572}
+  access: {mode: read_only, method: file, network_required: false, secrets_required: false}
+  relations:
+  - {relation_type: contains, target_asset_id: CONFIG-ORDINARY-RECENT-EARLY-PATH-H900-AUDITION-001}
+  - {relation_type: contains, target_asset_id: MODULE-ORDINARY-RECENT-EARLY-PATH-H900-AUDITION-001}
+  - {relation_type: contains, target_asset_id: SCRIPT-ORDINARY-RECENT-EARLY-PATH-H900-AUDITION-001}
+  - {relation_type: validated_by, target_asset_id: TEST-ORDINARY-RECENT-EARLY-PATH-H900-AUDITION-001}
+  consumers: [FACTORY-001, GOAL-OWNER]
+  evidence: []
+  search_terms: [ORDINARY_RECENT, EARLY_PATH, H900, AUDITION, TASK_CONTRACT]
+  classification: {contains_secrets: false, contains_raw_data: false, sensitivity: INTERNAL_NON_SECRET}
+- asset_id: CONFIG-ORDINARY-RECENT-EARLY-PATH-H900-AUDITION-001
+  record_version: '1.0'
+  asset_type: configuration
+  purpose: Frozen population, recent-to-T+5 mcap-path formula, quote-only horizons, decision thresholds, and campaign controls.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-08-21'
+  truth_owner: ORDINARY_RECENT_EARLY_PATH_H900_AUDITION_V1
+  location: {kind: git_path, logical_uri: 'repo://configs/ordinary_recent_early_path_h900_audition_v1.yaml', repository_path: configs/ordinary_recent_early_path_h900_audition_v1.yaml}
+  integrity: {kind: sha256, sha256: e7e35cb950a468cda61027e5fea0d3c55903c471cdce6b5a735b48c94ce40c7f}
+  access: {mode: read_only, method: file, network_required: false, secrets_required: false}
+  relations:
+  - {relation_type: governed_by, target_asset_id: CTRL-ORDINARY-RECENT-EARLY-PATH-H900-AUDITION-001}
+  - {relation_type: depends_on, target_asset_id: CONFIG-PROVIDER-ROUTE-CAPABILITY-REGISTRY-010}
+  consumers: [FACTORY-001, GOAL-OWNER]
+  evidence: []
+  search_terms: [ORDINARY_RECENT, EARLY_PATH, H900, CONFIG]
+  classification: {contains_secrets: false, contains_raw_data: false, sensitivity: INTERNAL_NON_SECRET}
+- asset_id: MODULE-ORDINARY-RECENT-EARLY-PATH-H900-AUDITION-001
+  record_version: '1.0'
+  asset_type: script
+  purpose: Fail-closed recent-to-T+5 mcap-path projector wrapping the existing H900 audition campaign.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-08-21'
+  truth_owner: ORDINARY_RECENT_EARLY_PATH_H900_AUDITION_V1
+  location: {kind: git_path, logical_uri: 'repo://src/solana_alpha_lab/ordinary_recent_early_path_h900_audition.py', repository_path: src/solana_alpha_lab/ordinary_recent_early_path_h900_audition.py}
+  integrity: {kind: sha256, sha256: 7a31576f9d29d84230dde74ccdccebae96884a462e4f89d12afa48eb4dbfdbaa}
+  access: {mode: read_only, method: file, network_required: false, secrets_required: false}
+  relations:
+  - {relation_type: depends_on, target_asset_id: CONFIG-ORDINARY-RECENT-EARLY-PATH-H900-AUDITION-001}
+  - {relation_type: depends_on, target_asset_id: MODULE-ORDINARY-RECENT-ORGANIC-PRESSURE-H900-AUDITION-001}
+  consumers: [FACTORY-001, GOAL-OWNER]
+  evidence: []
+  search_terms: [ORDINARY_RECENT, EARLY_PATH, H900, AUDITION, MODULE]
+  classification: {contains_secrets: false, contains_raw_data: false, sensitivity: INTERNAL_NON_SECRET}
+- asset_id: SCRIPT-ORDINARY-RECENT-EARLY-PATH-H900-AUDITION-001
+  record_version: '1.0'
+  asset_type: script
+  purpose: Foreground runner for the early-path H900 audition after the exact owner phrase.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-08-21'
+  truth_owner: ORDINARY_RECENT_EARLY_PATH_H900_AUDITION_V1
+  location: {kind: git_path, logical_uri: 'repo://scripts/run_ordinary_recent_early_path_h900_audition.py', repository_path: scripts/run_ordinary_recent_early_path_h900_audition.py}
+  integrity: {kind: sha256, sha256: cab610b2279e4f0eca07cf40c834905b19710d25e20868355f4814948e42ba4b}
+  access: {mode: read_only, method: file, network_required: false, secrets_required: false}
+  relations: [{relation_type: depends_on, target_asset_id: MODULE-ORDINARY-RECENT-EARLY-PATH-H900-AUDITION-001}]
+  consumers: [FACTORY-001, GOAL-OWNER]
+  evidence: []
+  search_terms: [ORDINARY_RECENT, EARLY_PATH, H900, RUNNER]
+  classification: {contains_secrets: false, contains_raw_data: false, sensitivity: INTERNAL_NON_SECRET}
+- asset_id: TEST-ORDINARY-RECENT-EARLY-PATH-H900-AUDITION-001
+  record_version: '1.0'
+  asset_type: script
+  purpose: Targeted tests for mcap-path X, missing-is-not-zero, organic/flow exclusion, and quote skip on invalid evidence yield.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-08-21'
+  truth_owner: ORDINARY_RECENT_EARLY_PATH_H900_AUDITION_V1
+  location: {kind: git_path, logical_uri: 'repo://tests/test_ordinary_recent_early_path_h900_audition.py', repository_path: tests/test_ordinary_recent_early_path_h900_audition.py}
+  integrity: {kind: sha256, sha256: e86f6364d21327a028ff80db1006d94be2878009b4fa1c45eb6bc9f9745b85bd}
+  access: {mode: read_only, method: file, network_required: false, secrets_required: false}
+  relations: [{relation_type: depends_on, target_asset_id: MODULE-ORDINARY-RECENT-EARLY-PATH-H900-AUDITION-001}]
+  consumers: [FACTORY-001]
+  evidence: []
+  search_terms: [ORDINARY_RECENT, EARLY_PATH, H900, TEST]
+  classification: {contains_secrets: false, contains_raw_data: false, sensitivity: INTERNAL_NON_SECRET}
+- asset_id: EVIDENCE-ORDINARY-RECENT-EARLY-PATH-H900-AUDITION-001
+  record_version: '1.0'
+  asset_type: evidence
+  purpose: Append-only runtime receipt for the bounded fresh early-path H900 audition, including typed insufficient-yield outcome.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-08-21'
+  truth_owner: ORDINARY_RECENT_EARLY_PATH_H900_AUDITION_V1
+  location: {kind: git_path, logical_uri: 'repo://docs/evidence/ordinary_recent_early_path_h900_audition/a1_ordinary_recent_early_path_h900_audition_runtime_receipt_v1.json', repository_path: docs/evidence/ordinary_recent_early_path_h900_audition/a1_ordinary_recent_early_path_h900_audition_runtime_receipt_v1.json}
+  integrity: {kind: sha256, sha256: 0acdc847eaf404bf61845cd471b17b91cf6255f24edc82363c2f10a74e7d786b}
+  access: {mode: read_only, method: file, network_required: false, secrets_required: false}
+  relations:
+  - {relation_type: derived_from, target_asset_id: CTRL-ORDINARY-RECENT-EARLY-PATH-H900-AUDITION-001}
+  - {relation_type: depends_on, target_asset_id: CONFIG-ORDINARY-RECENT-EARLY-PATH-H900-AUDITION-001}
+  - {relation_type: validated_by, target_asset_id: TEST-ORDINARY-RECENT-EARLY-PATH-H900-AUDITION-001}
+  consumers: [FACTORY-001, GOAL-OWNER]
+  evidence: []
+  search_terms: [ORDINARY_RECENT, EARLY_PATH, H900, RUNTIME, INVALID_EVIDENCE_YIELD]
+  classification: {contains_secrets: false, contains_raw_data: false, sensitivity: INTERNAL_NON_SECRET}
+- asset_id: EVIDENCE-ORDINARY-RECENT-EARLY-PATH-H900-AUDITION-ACCEPTANCE-001
+  record_version: '1.0'
+  asset_type: evidence
+  purpose: Acceptance binding the fresh cohort, selected-quartile H900 quote gap, and explicit replan outcome.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-08-21'
+  truth_owner: ORDINARY_RECENT_EARLY_PATH_H900_AUDITION_V1
+  location: {kind: git_path, logical_uri: 'repo://docs/evidence/ordinary_recent_early_path_h900_audition/a1_ordinary_recent_early_path_h900_audition_acceptance_v1.json', repository_path: docs/evidence/ordinary_recent_early_path_h900_audition/a1_ordinary_recent_early_path_h900_audition_acceptance_v1.json}
+  integrity: {kind: sha256, sha256: 039738b40a234d73160eddf6afd2168faebb1ed2c184d021a8e9513779bf9149}
+  access: {mode: read_only, method: file, network_required: false, secrets_required: false}
+  relations: [{relation_type: derived_from, target_asset_id: EVIDENCE-ORDINARY-RECENT-EARLY-PATH-H900-AUDITION-001}]
+  consumers: [FACTORY-001, GOAL-OWNER]
+  evidence: []
+  search_terms: [ORDINARY_RECENT, EARLY_PATH, ACCEPTANCE, INVALID_EVIDENCE_REPLAN]
+  classification: {contains_secrets: false, contains_raw_data: false, sensitivity: INTERNAL_NON_SECRET}
+- asset_id: REPORT-ORDINARY-RECENT-EARLY-PATH-H900-AUDITION-001
+  record_version: '1.0'
+  asset_type: control_document
+  purpose: Russian owner readout distinguishing incomplete selected-quartile H900 quotes from a closed early-path rule and recording the replan boundary.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-08-21'
+  truth_owner: ORDINARY_RECENT_EARLY_PATH_H900_AUDITION_V1
+  location: {kind: git_path, logical_uri: 'repo://docs/reports/ordinary_recent_early_path_h900_audition/a1_owner_readout_v1.md', repository_path: docs/reports/ordinary_recent_early_path_h900_audition/a1_owner_readout_v1.md}
+  integrity: {kind: sha256, sha256: 8ac4c4e3a031252800d551cb015e415f873295d523cd6e78bd22c5ed28e66c7b}
+  access: {mode: read_only, method: file, network_required: false, secrets_required: false}
+  relations: [{relation_type: derived_from, target_asset_id: EVIDENCE-ORDINARY-RECENT-EARLY-PATH-H900-AUDITION-ACCEPTANCE-001}]
+  consumers: [FACTORY-001, GOAL-OWNER]
+  evidence: []
+  search_terms: [ORDINARY_RECENT, EARLY_PATH, OWNER_READOUT, REPLAN]
+  classification: {contains_secrets: false, contains_raw_data: false, sensitivity: INTERNAL_NON_SECRET}
+- asset_id: EVIDENCE-ORDINARY-RECENT-EARLY-PATH-H900-AUDITION-DELIVERY-COMPLETION-001
+  record_version: '1.0'
+  asset_type: evidence
+  purpose: Guard-consumable completion evidence for the exact early-path audition inventory without alpha or strategy promotion.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-08-21'
+  truth_owner: ORDINARY_RECENT_EARLY_PATH_H900_AUDITION_V1
+  location: {kind: git_path, logical_uri: 'repo://docs/evidence/ordinary_recent_early_path_h900_audition/a1_delivery_completion_evidence_v1.json', repository_path: docs/evidence/ordinary_recent_early_path_h900_audition/a1_delivery_completion_evidence_v1.json}
+  integrity: {kind: none, note: 'Content integrity is owned by the live completion-review-fit hash chain; embedding its SHA here would create an indirect self-reference through the reviewed inventory.'}
+  access: {mode: read_only, method: file, network_required: false, secrets_required: false}
+  relations:
+  - {relation_type: derived_from, target_asset_id: EVIDENCE-ORDINARY-RECENT-EARLY-PATH-H900-AUDITION-001}
+  - {relation_type: depends_on, target_asset_id: EVIDENCE-ORDINARY-RECENT-EARLY-PATH-H900-AUDITION-ACCEPTANCE-001}
+  - {relation_type: depends_on, target_asset_id: EVIDENCE-ORDINARY-RECENT-EARLY-PATH-H900-AUDITION-DELIVERY-INDEPENDENT-REVIEW-001}
+  - {relation_type: depends_on, target_asset_id: EVIDENCE-ORDINARY-RECENT-EARLY-PATH-H900-AUDITION-DELIVERY-FACTORY-FIT-001}
+  consumers: [FACTORY-001, GOAL-OWNER]
+  evidence: []
+  search_terms: [ORDINARY_RECENT, DELIVERY_COMPLETION, INVALID_EVIDENCE_REPLAN]
+  classification: {contains_secrets: false, contains_raw_data: false, sensitivity: INTERNAL_NON_SECRET}
+- asset_id: EVIDENCE-ORDINARY-RECENT-EARLY-PATH-H900-AUDITION-DELIVERY-INDEPENDENT-REVIEW-001
+  record_version: '1.0'
+  asset_type: evidence
+  purpose: Required-role review evidence bound to the exact non-self-referential early-path audition inventory.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-08-21'
+  truth_owner: ORDINARY_RECENT_EARLY_PATH_H900_AUDITION_V1
+  location: {kind: git_path, logical_uri: 'repo://docs/evidence/ordinary_recent_early_path_h900_audition/a1_delivery_independent_review_v1.json', repository_path: docs/evidence/ordinary_recent_early_path_h900_audition/a1_delivery_independent_review_v1.json}
+  integrity: {kind: none, note: 'Content integrity is owned by the live completion-review-fit hash chain; embedding its SHA here would create an indirect self-reference through the reviewed inventory.'}
+  access: {mode: read_only, method: file, network_required: false, secrets_required: false}
+  relations:
+  - {relation_type: derived_from, target_asset_id: EVIDENCE-ORDINARY-RECENT-EARLY-PATH-H900-AUDITION-001}
+  - {relation_type: depends_on, target_asset_id: SCHEMA-DELIVERY-INDEPENDENT-REVIEW-EVIDENCE-001}
+  consumers: [FACTORY-001, GOAL-OWNER]
+  evidence: []
+  search_terms: [ORDINARY_RECENT, INDEPENDENT_REVIEW, CODE_REVIEWER, GOAL_DOD_CRITIC, ARCHITECTURE_CRITIC]
+  classification: {contains_secrets: false, contains_raw_data: false, sensitivity: INTERNAL_NON_SECRET}
+- asset_id: EVIDENCE-ORDINARY-RECENT-EARLY-PATH-H900-AUDITION-DELIVERY-FACTORY-FIT-001
+  record_version: '1.0'
+  asset_type: evidence
+  purpose: FULL Factory Fit review preserving the insufficient-yield truth, no-switch outcome, and bounded recovery path.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-08-21'
+  truth_owner: ORDINARY_RECENT_EARLY_PATH_H900_AUDITION_V1
+  location: {kind: git_path, logical_uri: 'repo://docs/evidence/ordinary_recent_early_path_h900_audition/a1_delivery_factory_fit_v1.json', repository_path: docs/evidence/ordinary_recent_early_path_h900_audition/a1_delivery_factory_fit_v1.json}
+  integrity: {kind: none, note: 'Content integrity is owned by the live completion-review-fit hash chain; embedding its SHA here would create an indirect self-reference through the reviewed inventory.'}
+  access: {mode: read_only, method: file, network_required: false, secrets_required: false}
+  relations:
+  - {relation_type: derived_from, target_asset_id: EVIDENCE-ORDINARY-RECENT-EARLY-PATH-H900-AUDITION-001}
+  - {relation_type: depends_on, target_asset_id: EVIDENCE-ORDINARY-RECENT-EARLY-PATH-H900-AUDITION-DELIVERY-INDEPENDENT-REVIEW-001}
   consumers: [FACTORY-001, GOAL-OWNER]
   evidence: []
   search_terms: [ORDINARY_RECENT, FACTORY_FIT, FULL_REVIEW, NO_SWITCH, REPLAN]

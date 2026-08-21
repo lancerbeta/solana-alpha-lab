@@ -295,6 +295,7 @@ def score_audition(
     min_rankable_h900: int,
     tau_floor: float,
     leave_one_out_positive_share: float,
+    close_terminal: str = "CLOSE_ORGANIC_PRESSURE_CANDIDATE",
 ) -> dict[str, object]:
     eligible = [row for row in rows if _number(row.get("x"))]
     rankable = [
@@ -360,7 +361,7 @@ def score_audition(
         and loo_share >= leave_one_out_positive_share
         and not bool(result["selected_market_execution_unavailable"])
     )
-    return {"terminal": "EARN_FRESH_OOS" if passes else "CLOSE_ORGANIC_PRESSURE_CANDIDATE", **result}
+    return {"terminal": "EARN_FRESH_OOS" if passes else close_terminal, **result}
 
 
 def _mapping(value: object, code: str) -> Mapping[str, Any]:
@@ -368,12 +369,22 @@ def _mapping(value: object, code: str) -> Mapping[str, Any]:
     return value
 
 
-def validate_policy(policy: Mapping[str, Any], *, root: Path) -> None:
-    _require(policy.get("schema") == "smial.ordinary-recent-organic-pressure-h900-audition", "SCHEMA_DRIFT")
+def validate_policy(
+    policy: Mapping[str, Any],
+    *,
+    root: Path,
+    expected_atom_id: str = ATOM_ID,
+    expected_authority_phrase: str = AUTHORITY_PHRASE,
+    expected_schema: str = "smial.ordinary-recent-organic-pressure-h900-audition",
+    expected_x_formula: str = (
+        "(stats5m.buyOrganicVolume - stats5m.sellOrganicVolume) / top-level liquidity"
+    ),
+) -> None:
+    _require(policy.get("schema") == expected_schema, "SCHEMA_DRIFT")
     _require(policy.get("schema_version") == "1.0", "SCHEMA_VERSION_DRIFT")
-    _require(policy.get("atom_id") == ATOM_ID, "ATOM_ID_DRIFT")
+    _require(policy.get("atom_id") == expected_atom_id, "ATOM_ID_DRIFT")
     authority = _mapping(policy.get("external_authority"), "AUTHORITY_INVALID")
-    _require(authority.get("owner_phrase") == AUTHORITY_PHRASE, "AUTHORITY_PHRASE_DRIFT")
+    _require(authority.get("owner_phrase") == expected_authority_phrase, "AUTHORITY_PHRASE_DRIFT")
     _require(authority.get("credential_name") == "JUPITER_API_KEY", "CREDENTIAL_NAME_DRIFT")
     _require(authority.get("credential_reads") == 1, "CREDENTIAL_READ_BUDGET_DRIFT")
     _require(authority.get("dotenv_reads") is False, "DOTENV_READ_NOT_FORBIDDEN")
@@ -416,11 +427,7 @@ def validate_policy(policy: Mapping[str, Any], *, root: Path) -> None:
     snapshot = _mapping(policy.get("decision_snapshot"), "DECISION_SNAPSHOT_INVALID")
     _require(snapshot.get("source") == "TOKENS_V2_SEARCH_BULK_RESPONSE", "SNAPSHOT_SOURCE_DRIFT")
     _require(snapshot.get("one_call_max_mints") == 100, "SEARCH_BATCH_LIMIT_DRIFT")
-    _require(
-        snapshot.get("x_formula")
-        == "(stats5m.buyOrganicVolume - stats5m.sellOrganicVolume) / top-level liquidity",
-        "X_FORMULA_DRIFT",
-    )
+    _require(snapshot.get("x_formula") == expected_x_formula, "X_FORMULA_DRIFT")
     _require(snapshot.get("missing_is_zero") is False, "MISSING_ZERO_DRIFT")
     quote_policy = _mapping(policy.get("quote"), "QUOTE_POLICY_INVALID")
     _require(quote_policy.get("slippage_bps") == SLIPPAGE_BPS, "SLIPPAGE_DRIFT")
@@ -533,11 +540,13 @@ def _failure_receipt(
     provider_requests: int,
     discovery_observations: list[dict[str, object]],
     non_claims: list[str],
+    atom_id: str = ATOM_ID,
+    receipt_schema: str = "smial.ordinary-recent-organic-pressure-h900-audition.runtime-receipt",
 ) -> dict[str, object]:
     return {
-        "schema": "smial.ordinary-recent-organic-pressure-h900-audition.runtime-receipt",
+        "schema": receipt_schema,
         "schema_version": "1.0",
-        "atom_id": ATOM_ID,
+        "atom_id": atom_id,
         "terminal_outcome": terminal,
         "preflight": dict(preflight),
         "credential_reads": credential_reads,
@@ -568,10 +577,26 @@ def run_campaign(
     sleeper: Any = time.sleep,
     monotonic_clock: Any = time.monotonic,
     raw_sink: Any = None,
+    atom_id: str = ATOM_ID,
+    expected_authority_phrase: str = AUTHORITY_PHRASE,
+    expected_schema: str = "smial.ordinary-recent-organic-pressure-h900-audition",
+    expected_x_formula: str = (
+        "(stats5m.buyOrganicVolume - stats5m.sellOrganicVolume) / top-level liquidity"
+    ),
+    receipt_schema: str = "smial.ordinary-recent-organic-pressure-h900-audition.runtime-receipt",
+    close_terminal: str = "CLOSE_ORGANIC_PRESSURE_CANDIDATE",
+    project_x: Any = None,
 ) -> dict[str, object]:
-    validate_policy(policy, root=Path(__file__).resolve().parents[2])
+    validate_policy(
+        policy,
+        root=Path(__file__).resolve().parents[2],
+        expected_atom_id=atom_id,
+        expected_authority_phrase=expected_authority_phrase,
+        expected_schema=expected_schema,
+        expected_x_formula=expected_x_formula,
+    )
     authority = _mapping(policy["external_authority"], "AUTHORITY_INVALID")
-    _require(authority_phrase == authority.get("owner_phrase") == AUTHORITY_PHRASE, "AUTHORITY_PHRASE_INVALID")
+    _require(authority_phrase == authority.get("owner_phrase") == expected_authority_phrase, "AUTHORITY_PHRASE_INVALID")
     _require(reservation.get("state") == "STARTED", "ATTEMPT_RESERVATION_REQUIRED")
     _require(reservation.get("credential_reads") == 0, "CREDENTIAL_READ_BEFORE_ATTEMPT_RESERVATION")
     _require(bool(excluded_mints), "PRIOR_MINT_EXCLUSION_INPUT_REQUIRED")
@@ -593,6 +618,19 @@ def run_campaign(
     last_monotonic: float | None = None
     waiter = sleeper
     monotonic = monotonic_clock
+    selected_project_x = project_x
+
+    def default_project_x(
+        _recent_row: Mapping[str, Any],
+        t5_row: Mapping[str, Any] | None,
+        snapshot_at: datetime,
+    ) -> dict[str, object]:
+        if not isinstance(t5_row, Mapping):
+            return {"status": "MISSING", "value": None, "reason": "SEARCH_MINT_NOT_RETURNED"}
+        return project_organic_pressure(t5_row, snapshot_at=snapshot_at)
+
+    if selected_project_x is None:
+        selected_project_x = default_project_x
 
     def call(url: str) -> dict[str, object]:
         nonlocal provider_requests, last_monotonic
@@ -657,6 +695,8 @@ def run_campaign(
             provider_requests=provider_requests,
             discovery_observations=discovery_observations,
             non_claims=non_claims,
+            atom_id=atom_id,
+            receipt_schema=receipt_schema,
         )
     try:
         recent_observed_at = _parse_datetime(recent_result["observed_at"], "RECENT_TIMESTAMP_INVALID")
@@ -668,6 +708,8 @@ def run_campaign(
             provider_requests=provider_requests,
             discovery_observations=discovery_observations,
             non_claims=non_claims,
+            atom_id=atom_id,
+            receipt_schema=receipt_schema,
         ) | {"terminal_error_code": str(exc)}
     candidates = select_frozen_candidates(
         recent_rows,
@@ -682,6 +724,8 @@ def run_campaign(
             provider_requests=provider_requests,
             discovery_observations=discovery_observations,
             non_claims=non_claims,
+            atom_id=atom_id,
+            receipt_schema=receipt_schema,
         ) | {"frozen_mints": [str(row["id"]) for row in candidates]}
     seasoning_due = recent_observed_at + timedelta(seconds=SEASONING_SECONDS)
     for candidate in candidates:
@@ -724,6 +768,8 @@ def run_campaign(
             provider_requests=provider_requests,
             discovery_observations=discovery_observations,
             non_claims=non_claims,
+            atom_id=atom_id,
+            receipt_schema=receipt_schema,
         ) | {"frozen_mints": [str(row["id"]) for row in candidates]}
     expected_mints = [str(row["id"]) for row in candidates]
     expected_mint_set = set(expected_mints)
@@ -746,6 +792,8 @@ def run_campaign(
             provider_requests=provider_requests,
             discovery_observations=discovery_observations,
             non_claims=non_claims,
+            atom_id=atom_id,
+            receipt_schema=receipt_schema,
         ) | {
             "frozen_mints": expected_mints,
             "snapshot_response_sha256": search_result.get("response_sha256"),
@@ -764,6 +812,8 @@ def run_campaign(
             provider_requests=provider_requests,
             discovery_observations=discovery_observations,
             non_claims=non_claims,
+            atom_id=atom_id,
+            receipt_schema=receipt_schema,
         ) | {
             "frozen_mints": expected_mints,
             "snapshot_response_sha256": search_result.get("response_sha256"),
@@ -773,14 +823,26 @@ def run_campaign(
     for candidate in candidates:
         mint = str(candidate["id"])
         row = search_by_mint.get(mint)
-        x_result = (
-            project_organic_pressure(row, snapshot_at=search_observed_at)
-            if isinstance(row, Mapping)
-            else {"status": "MISSING", "value": None, "reason": "SEARCH_MINT_NOT_RETURNED"}
-        )
+        x_result = selected_project_x(candidate, row if isinstance(row, Mapping) else None, search_observed_at)
         row_sha256 = _row_sha256(row) if isinstance(row, Mapping) else None
         stats = row.get("stats5m") if isinstance(row, Mapping) else None
         first_pool = row.get("firstPool") if isinstance(row, Mapping) else None
+        default_field_paths = [
+            "stats5m.buyOrganicVolume",
+            "stats5m.sellOrganicVolume",
+            "liquidity",
+            "firstPool.createdAt",
+            "updatedAt",
+        ]
+        default_inputs = {
+            "stats5m.buyOrganicVolume": stats.get("buyOrganicVolume") if isinstance(stats, Mapping) else None,
+            "stats5m.sellOrganicVolume": stats.get("sellOrganicVolume") if isinstance(stats, Mapping) else None,
+            "liquidity": row.get("liquidity") if isinstance(row, Mapping) else None,
+            "firstPool.createdAt": first_pool.get("createdAt") if isinstance(first_pool, Mapping) else None,
+            "updatedAt": row.get("updatedAt") if isinstance(row, Mapping) else None,
+        }
+        field_paths = x_result.get("field_paths")
+        inputs = x_result.get("inputs")
         candidate_observations.append(
             {
                 "mint": mint,
@@ -792,23 +854,13 @@ def run_campaign(
                 "x_source": {
                     "observation_id": "DISCOVERY:SEARCH_T5",
                     "response_sha256": search_result.get("response_sha256"),
+                    "recent_response_sha256": recent_result.get("response_sha256"),
                     "row_sha256": row_sha256,
+                    "recent_row_sha256": _row_sha256(candidate),
                     "row_mint": mint,
-                    "field_paths": [
-                        "stats5m.buyOrganicVolume",
-                        "stats5m.sellOrganicVolume",
-                        "liquidity",
-                        "firstPool.createdAt",
-                        "updatedAt",
-                    ],
+                    "field_paths": field_paths if isinstance(field_paths, list) else default_field_paths,
                 },
-                "x_inputs": {
-                    "stats5m.buyOrganicVolume": stats.get("buyOrganicVolume") if isinstance(stats, Mapping) else None,
-                    "stats5m.sellOrganicVolume": stats.get("sellOrganicVolume") if isinstance(stats, Mapping) else None,
-                    "liquidity": row.get("liquidity") if isinstance(row, Mapping) else None,
-                    "firstPool.createdAt": first_pool.get("createdAt") if isinstance(first_pool, Mapping) else None,
-                    "updatedAt": row.get("updatedAt") if isinstance(row, Mapping) else None,
-                },
+                "x_inputs": inputs if isinstance(inputs, Mapping) else default_inputs,
             }
         )
     eligible = [row for row in candidate_observations if row.get("x_status") == "ELIGIBLE"]
@@ -821,6 +873,8 @@ def run_campaign(
             provider_requests=provider_requests,
             discovery_observations=discovery_observations,
             non_claims=non_claims,
+            atom_id=atom_id,
+            receipt_schema=receipt_schema,
         ) | {
             "frozen_mints": [str(row["id"]) for row in candidates],
             "candidate_observations": candidate_observations,
@@ -919,6 +973,8 @@ def run_campaign(
             provider_requests=provider_requests,
             discovery_observations=discovery_observations,
             non_claims=non_claims,
+            atom_id=atom_id,
+            receipt_schema=receipt_schema,
         ) | {
             "frozen_mints": expected_mints,
             "candidate_observations": candidate_observations,
@@ -949,6 +1005,8 @@ def run_campaign(
                 provider_requests=provider_requests,
                 discovery_observations=discovery_observations,
                 non_claims=non_claims,
+                atom_id=atom_id,
+                receipt_schema=receipt_schema,
             ) | {
                 "frozen_mints": expected_mints,
                 "candidate_observations": candidate_observations,
@@ -980,6 +1038,8 @@ def run_campaign(
                 provider_requests=provider_requests,
                 discovery_observations=discovery_observations,
                 non_claims=non_claims,
+                atom_id=atom_id,
+                receipt_schema=receipt_schema,
             ) | {
                 "frozen_mints": expected_mints,
                 "candidate_observations": candidate_observations,
@@ -1004,6 +1064,8 @@ def run_campaign(
                 provider_requests=provider_requests,
                 discovery_observations=discovery_observations,
                 non_claims=non_claims,
+                atom_id=atom_id,
+                receipt_schema=receipt_schema,
             ) | {
                 "frozen_mints": expected_mints,
                 "candidate_observations": candidate_observations,
@@ -1028,6 +1090,8 @@ def run_campaign(
                 provider_requests=provider_requests,
                 discovery_observations=discovery_observations,
                 non_claims=non_claims,
+                atom_id=atom_id,
+                receipt_schema=receipt_schema,
             ) | {
                 "frozen_mints": expected_mints,
                 "candidate_observations": candidate_observations,
@@ -1072,11 +1136,12 @@ def run_campaign(
         min_rankable_h900=int(decision_rules["min_rankable_h900"]),
         tau_floor=float(decision_rules["tau_b_floor"]),
         leave_one_out_positive_share=float(decision_rules["leave_one_out_positive_share"]),
+        close_terminal=close_terminal,
     )
     return {
-        "schema": "smial.ordinary-recent-organic-pressure-h900-audition.runtime-receipt",
+        "schema": receipt_schema,
         "schema_version": "1.0",
-        "atom_id": ATOM_ID,
+        "atom_id": atom_id,
         "terminal_outcome": score["terminal"],
         "preflight": preflight,
         "credential_reads": credential_reads,
