@@ -45,6 +45,21 @@ Code review is mandatory. Goal/DoD, architecture and refactor critics
 are trigger-routed and must run in isolated context. `SINGLE_AGENT_REVIEW_FALLBACK`
 is `NOT_READY` for merge; deterministic validation still runs.
 
+### Derived-hash maintenance
+
+Catalog integrity hashes, generated navigation views and manifest checkpoints
+are derived state. The only sanctioned repair is:
+
+```text
+uv run --locked --managed-python python -B scripts/harness_sync.py --apply
+```
+
+`--check` reports drift without writing. Never hand-edit a derived `sha256:`
+field or generated projection; manual rebinding caused repeated red CI runs on
+2026-08-21 (LF/CRLF blob drift). Primary records (source files, task contracts,
+evidence) stay read-only to sync; if the catalog itself fails validation,
+fix the primary record first — sync never invents records.
+
 ### Finish and merge
 
 Run Factory Fit, Product Horizon and capability radar. Record exact inventory,
