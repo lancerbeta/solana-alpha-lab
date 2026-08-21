@@ -18,16 +18,16 @@
     "scripts/run_ordinary_recent_early_path_h900_failed_quotes_meu_reproject.py": "ca23bba3500417a0fe84d1c34c6f623786ce0453975ff9fe65fb3357bee92942",
     "tests/test_ordinary_recent_early_path_h900_failed_quotes_meu_reproject.py": "3cf4b39b2d85c786dce6965f1cbe8774e77040ab0f561818fda2a0a5d20708fd",
     "tests/test_quote_native_evidence_fit_panel.py": "1f89e94d3d98a5448ae181b6793ea3fb5c7c96d27ac36a26e60485db1da4e3bb",
-    "docs/evidence/ordinary_recent_early_path_h900_failed_quotes_meu_reproject/fixtures/index.json": "5d311b142b0d651fb61a3f09388deb9e4a9517b7801fb0afb63084411dd0c0d0",
+    "docs/evidence/ordinary_recent_early_path_h900_failed_quotes_meu_reproject/fixtures/index.json": "6109101e979a832db39bab5c019460cc0e13a6db79d679946408cdf53163b3b3",
     "docs/evidence/ordinary_recent_early_path_h900_failed_quotes_meu_reproject/fixtures/50ef83cfc5f72edd191f39c4a3ce5a6b7a90ec48456a82d92af35c976c0ba3b1.body": "50ef83cfc5f72edd191f39c4a3ce5a6b7a90ec48456a82d92af35c976c0ba3b1",
     "docs/evidence/ordinary_recent_early_path_h900_failed_quotes_meu_reproject/fixtures/839d8c8a933f4dced65a9b4afed09169436bf21cd24161d78ff731e5303535ea.body": "839d8c8a933f4dced65a9b4afed09169436bf21cd24161d78ff731e5303535ea",
     "docs/evidence/ordinary_recent_early_path_h900_failed_quotes_meu_reproject/fixtures/788e47d2a69a3d8563fce09928f7285e9a9aec6a13c75f62062cb67205680ca1.body": "788e47d2a69a3d8563fce09928f7285e9a9aec6a13c75f62062cb67205680ca1",
     "docs/evidence/ordinary_recent_early_path_h900_failed_quotes_meu_reproject/fixtures/4f39d14ee53b98d4e5a351591232d2280fcee6e26ff65eb012b042d08a8a2090.body": "4f39d14ee53b98d4e5a351591232d2280fcee6e26ff65eb012b042d08a8a2090",
-    "docs/evidence/ordinary_recent_early_path_h900_failed_quotes_meu_reproject/a1_ordinary_recent_early_path_h900_failed_quotes_meu_reproject_runtime_receipt_v1.json": "0e9d19cad1b0d701cc9f6951c440e7438a56d46b518e26d9b70679e93c331cea",
-    "docs/evidence/ordinary_recent_early_path_h900_failed_quotes_meu_reproject/a1_ordinary_recent_early_path_h900_failed_quotes_meu_reproject_acceptance_v1.json": "87eae671eefa0d36c582d3f098c904d6fd1a71286097f11f60c5180f7a1e47ea",
+    "docs/evidence/ordinary_recent_early_path_h900_failed_quotes_meu_reproject/a1_ordinary_recent_early_path_h900_failed_quotes_meu_reproject_runtime_receipt_v1.json": "9369f4051065b89bc0769ba6d350f330211c98bfb5357d871f2150a42dacc251",
+    "docs/evidence/ordinary_recent_early_path_h900_failed_quotes_meu_reproject/a1_ordinary_recent_early_path_h900_failed_quotes_meu_reproject_acceptance_v1.json": "e991bebf1a5a7f3873c0d3c52397c8deb6be6a9738ef826224f851ae3bbe4373",
     "docs/reports/ordinary_recent_early_path_h900_failed_quotes_meu_reproject/a1_owner_readout_v1.md": "0de1a9a733e6d8aab7df1d22d7eeea15bcf0a4110053e7dde77ec9c6b788f6a4",
-    "catalog/assets/core.yaml": "80db56192f983b901118e7f9f17296de2621148863b4ce001fcf2e1b3c45972f",
-    "catalog/assets/lifecycle.yaml": "6a68c1addcdc5c82bfaaf91540e95254117c0c923b6d9827b98a184b4cb14c0e",
+    "catalog/assets/core.yaml": "24d8e02401a4d037815d701e1d42bedec284dcc247ff71e6a27929af53924853",
+    "catalog/assets/lifecycle.yaml": "7d9976bfd878b57b7bfe71997b7256892530696b05af59cfa76c41d1fe29be5b",
     "catalog/catalog_manifest.yaml": "0aefa581e84de1d6749b2b1d1a4991a6cdc327fe2e825e09f10c18a0928cfc8c",
     "catalog/generated/asset_edges.json": "8fbf87edabf003e790e21694ba449794ef4f44dbb082c98789051f0681c624a9",
     "docs/PROJECT_MAP.md": "819cbb1fe458c3baee94714b96881af1d3245b7888d52f7a9cb9428448e07b61",
@@ -43,14 +43,14 @@
   },
   "factory_fit": {
     "path": "docs/evidence/ordinary_recent_early_path_h900_failed_quotes_meu_reproject/a1_delivery_factory_fit_v1.json",
-    "sha256": "9dc154928abaef867315d6ab2a84eb4d1d0995a5610219b276c839b4790b867e",
+    "sha256": "PLACEHOLDER",
     "verdict": "PASS"
   },
   "validation": {
     "targeted": "PASS_ORDINARY_RECENT_EARLY_PATH_H900_FAILED_QUOTES_MEU_REPROJECT_TESTS",
     "independent_review": {
       "path": "docs/evidence/ordinary_recent_early_path_h900_failed_quotes_meu_reproject/a1_delivery_independent_review_v1.json",
-      "sha256": "e0e9d5d84f40ee0e264a9eb4d0b151bf933ed2a859ea0a800b9ae05540262827",
+      "sha256": "PLACEHOLDER",
       "verdict": "PASS"
     },
     "full_gate": "ENFORCED_BY_PROJECT_BOUND_VALIDATION",

@@ -28799,7 +28799,7 @@ records:
   as_of: '2026-08-21'
   truth_owner: ORDINARY_RECENT_EARLY_PATH_H900_FAILED_QUOTES_MEU_REPROJECT_V1
   location: {kind: git_path, logical_uri: 'repo://docs/evidence/ordinary_recent_early_path_h900_failed_quotes_meu_reproject/a1_ordinary_recent_early_path_h900_failed_quotes_meu_reproject_runtime_receipt_v1.json', repository_path: docs/evidence/ordinary_recent_early_path_h900_failed_quotes_meu_reproject/a1_ordinary_recent_early_path_h900_failed_quotes_meu_reproject_runtime_receipt_v1.json}
-  integrity: {kind: sha256, sha256: 0e9d19cad1b0d701cc9f6951c440e7438a56d46b518e26d9b70679e93c331cea}
+  integrity: {kind: sha256, sha256: 9369f4051065b89bc0769ba6d350f330211c98bfb5357d871f2150a42dacc251}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: derived_from, target_asset_id: CTRL-ORDINARY-RECENT-EARLY-PATH-H900-FAILED-QUOTES-MEU-REPROJECT-001}
@@ -28818,7 +28818,7 @@ records:
   as_of: '2026-08-21'
   truth_owner: ORDINARY_RECENT_EARLY_PATH_H900_FAILED_QUOTES_MEU_REPROJECT_V1
   location: {kind: git_path, logical_uri: 'repo://docs/evidence/ordinary_recent_early_path_h900_failed_quotes_meu_reproject/a1_ordinary_recent_early_path_h900_failed_quotes_meu_reproject_acceptance_v1.json', repository_path: docs/evidence/ordinary_recent_early_path_h900_failed_quotes_meu_reproject/a1_ordinary_recent_early_path_h900_failed_quotes_meu_reproject_acceptance_v1.json}
-  integrity: {kind: sha256, sha256: 87eae671eefa0d36c582d3f098c904d6fd1a71286097f11f60c5180f7a1e47ea}
+  integrity: {kind: sha256, sha256: e991bebf1a5a7f3873c0d3c52397c8deb6be6a9738ef826224f851ae3bbe4373}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations: [{relation_type: derived_from, target_asset_id: EVIDENCE-ORDINARY-RECENT-EARLY-PATH-H900-FAILED-QUOTES-MEU-REPROJECT-001}]
   consumers: [FACTORY-001, GOAL-OWNER]
