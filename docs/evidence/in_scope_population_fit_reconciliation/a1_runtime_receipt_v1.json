@@ -1,0 +1,538 @@
+{
+  "atom_id": "IN_SCOPE_POPULATION_FIT_RECONCILIATION_V1",
+  "campaign_matrix": [
+    {
+      "by_source_stratum": {
+        "RECENT": {
+          "MARKET_EXECUTION_UNAVAILABLE_n": 0,
+          "PROVIDER_MEASUREMENT_FAILURE_n": 0,
+          "QUOTE_OBSERVED_n": 6,
+          "Y": {
+            "median": "-0.07064145",
+            "n": 4,
+            "p25": "-0.214355200",
+            "p75": "0.144975850",
+            "positive_share": "0.25",
+            "worst": "-0.6254446"
+          },
+          "age_seconds": {
+            "max": "60.0",
+            "median": "41.0",
+            "min": "18.0",
+            "n": 6
+          },
+          "decision_time_eligible_n": 6,
+          "population_bands": {
+            "BETWEEN_15_30": 0,
+            "EARLY": 0,
+            "OLDER": 0,
+            "SEASONED": 0,
+            "ULTRA_FRESH": 6,
+            "UNKNOWN_AGE": 0
+          },
+          "time_separated_numeric_H900_n": 4,
+          "y_equals_x_excluded_n": 2
+        },
+        "TRADED": {
+          "MARKET_EXECUTION_UNAVAILABLE_n": 0,
+          "PROVIDER_MEASUREMENT_FAILURE_n": 0,
+          "QUOTE_OBSERVED_n": 6,
+          "Y": {
+            "median": "-0.00177095",
+            "n": 6,
+            "p25": "-0.004709600",
+            "p75": "0.002080075",
+            "positive_share": "0.3333333333333333333333333333",
+            "worst": "-0.1674824"
+          },
+          "age_seconds": {
+            "max": "56091194.0",
+            "median": "16199972.0",
+            "min": "16919.0",
+            "n": 6
+          },
+          "decision_time_eligible_n": 6,
+          "population_bands": {
+            "BETWEEN_15_30": 0,
+            "EARLY": 0,
+            "OLDER": 6,
+            "SEASONED": 0,
+            "ULTRA_FRESH": 0,
+            "UNKNOWN_AGE": 0
+          },
+          "time_separated_numeric_H900_n": 6,
+          "y_equals_x_excluded_n": 0
+        }
+      },
+      "campaign_id": "QUOTE_NATIVE_ADMISSIBLE_FRICTION_AUDITION_V1",
+      "capture_accepted": true,
+      "kept_strata": [],
+      "kind": "quote_native",
+      "n_rows": 12,
+      "paired_source_deltas": {
+        "delta_MEU_rate": "0",
+        "delta_median_Y": "0.06887050",
+        "delta_positive_share": "0.0833333333333333333333333333"
+      },
+      "searchable_y_kind": "SELL_H900",
+      "stratum_unstable": false,
+      "terminal_outcome": "DIRECTIONAL_HINT_NOT_CONFIRMATION"
+    },
+    {
+      "by_source_stratum": {
+        "RECENT": {
+          "MARKET_EXECUTION_UNAVAILABLE_n": 0,
+          "PROVIDER_MEASUREMENT_FAILURE_n": 0,
+          "QUOTE_OBSERVED_n": 4,
+          "Y": {
+            "median": "-0.0735655",
+            "n": 3,
+            "p25": "-0.183351050",
+            "p75": "-0.072074550",
+            "positive_share": "0",
+            "worst": "-0.2931366"
+          },
+          "age_seconds": {
+            "max": "69.0",
+            "median": "45.5",
+            "min": "19.0",
+            "n": 6
+          },
+          "decision_time_eligible_n": 6,
+          "population_bands": {
+            "BETWEEN_15_30": 0,
+            "EARLY": 0,
+            "OLDER": 0,
+            "SEASONED": 0,
+            "ULTRA_FRESH": 6,
+            "UNKNOWN_AGE": 0
+          },
+          "time_separated_numeric_H900_n": 3,
+          "y_equals_x_excluded_n": 1
+        },
+        "TRADED": {
+          "MARKET_EXECUTION_UNAVAILABLE_n": 0,
+          "PROVIDER_MEASUREMENT_FAILURE_n": 0,
+          "QUOTE_OBSERVED_n": 6,
+          "Y": {
+            "median": "-0.1389801",
+            "n": 6,
+            "p25": "-0.400916450",
+            "p75": "0.014609600",
+            "positive_share": "0.3333333333333333333333333333",
+            "worst": "-0.4800564"
+          },
+          "age_seconds": {
+            "max": "5892583.0",
+            "median": "48748.0",
+            "min": "426.0",
+            "n": 6
+          },
+          "decision_time_eligible_n": 6,
+          "population_bands": {
+            "BETWEEN_15_30": 1,
+            "EARLY": 1,
+            "OLDER": 3,
+            "SEASONED": 1,
+            "ULTRA_FRESH": 0,
+            "UNKNOWN_AGE": 0
+          },
+          "time_separated_numeric_H900_n": 6,
+          "y_equals_x_excluded_n": 0
+        }
+      },
+      "campaign_id": "QUOTE_NATIVE_FRICTION_H900_MOVE2_OOS_V1",
+      "capture_accepted": true,
+      "kept_strata": [],
+      "kind": "quote_native",
+      "n_rows": 12,
+      "paired_source_deltas": {
+        "delta_MEU_rate": "0",
+        "delta_median_Y": "-0.0654146",
+        "delta_positive_share": "0.3333333333333333333333333333"
+      },
+      "searchable_y_kind": "SELL_H900",
+      "stratum_unstable": false,
+      "terminal_outcome": "REPLICATED_SIGN_NOT_ALPHA"
+    },
+    {
+      "by_source_stratum": {
+        "RECENT": {
+          "MARKET_EXECUTION_UNAVAILABLE_n": 0,
+          "PROVIDER_MEASUREMENT_FAILURE_n": 1,
+          "QUOTE_OBSERVED_n": 5,
+          "Y": {
+            "median": "-0.0715899",
+            "n": 3,
+            "p25": "-0.080251300",
+            "p75": "-0.047935950",
+            "positive_share": "0",
+            "worst": "-0.0889127"
+          },
+          "age_seconds": {
+            "max": "65.0",
+            "median": "37.5",
+            "min": "16.0",
+            "n": 6
+          },
+          "decision_time_eligible_n": 6,
+          "population_bands": {
+            "BETWEEN_15_30": 0,
+            "EARLY": 0,
+            "OLDER": 0,
+            "SEASONED": 0,
+            "ULTRA_FRESH": 6,
+            "UNKNOWN_AGE": 0
+          },
+          "time_separated_numeric_H900_n": 3,
+          "y_equals_x_excluded_n": 2
+        },
+        "TRADED": {
+          "MARKET_EXECUTION_UNAVAILABLE_n": 0,
+          "PROVIDER_MEASUREMENT_FAILURE_n": 0,
+          "QUOTE_OBSERVED_n": 6,
+          "Y": {
+            "median": "-0.03663605",
+            "n": 6,
+            "p25": "-0.127038950",
+            "p75": "-0.003130100",
+            "positive_share": "0.1666666666666666666666666667",
+            "worst": "-0.317142"
+          },
+          "age_seconds": {
+            "max": "26575242.0",
+            "median": "104948.0",
+            "min": "1631.0",
+            "n": 6
+          },
+          "decision_time_eligible_n": 6,
+          "population_bands": {
+            "BETWEEN_15_30": 1,
+            "EARLY": 0,
+            "OLDER": 4,
+            "SEASONED": 1,
+            "ULTRA_FRESH": 0,
+            "UNKNOWN_AGE": 0
+          },
+          "time_separated_numeric_H900_n": 6,
+          "y_equals_x_excluded_n": 0
+        }
+      },
+      "campaign_id": "FACTORY_V1_COMMISSIONING_HYPOTHESIS_V1",
+      "capture_accepted": true,
+      "kept_strata": [],
+      "kind": "quote_native",
+      "n_rows": 12,
+      "paired_source_deltas": {
+        "delta_MEU_rate": "0",
+        "delta_median_Y": "0.03495385",
+        "delta_positive_share": "0.1666666666666666666666666667"
+      },
+      "searchable_y_kind": "SELL_H900",
+      "stratum_unstable": false,
+      "terminal_outcome": "DIRECTIONAL_HINT_NOT_CONFIRMATION"
+    },
+    {
+      "by_source_stratum": {
+        "RECENT": {
+          "MARKET_EXECUTION_UNAVAILABLE_n": 0,
+          "PROVIDER_MEASUREMENT_FAILURE_n": 1,
+          "QUOTE_OBSERVED_n": 5,
+          "Y": {
+            "median": "-0.12535195",
+            "n": 4,
+            "p25": "-0.146194025",
+            "p75": "-0.101813075",
+            "positive_share": "0",
+            "worst": "-0.1543751"
+          },
+          "age_seconds": {
+            "max": "63.0",
+            "median": "40.0",
+            "min": "18.0",
+            "n": 6
+          },
+          "decision_time_eligible_n": 6,
+          "population_bands": {
+            "BETWEEN_15_30": 0,
+            "EARLY": 0,
+            "OLDER": 0,
+            "SEASONED": 0,
+            "ULTRA_FRESH": 6,
+            "UNKNOWN_AGE": 0
+          },
+          "time_separated_numeric_H900_n": 4,
+          "y_equals_x_excluded_n": 1
+        },
+        "TRADED": {
+          "MARKET_EXECUTION_UNAVAILABLE_n": 0,
+          "PROVIDER_MEASUREMENT_FAILURE_n": 0,
+          "QUOTE_OBSERVED_n": 6,
+          "Y": {
+            "median": "-0.00198565",
+            "n": 6,
+            "p25": "-0.008182100",
+            "p75": "0.009361650",
+            "positive_share": "0.3333333333333333333333333333",
+            "worst": "-0.0144859"
+          },
+          "age_seconds": {
+            "max": "36111432.0",
+            "median": "4959730.5",
+            "min": "7170.0",
+            "n": 6
+          },
+          "decision_time_eligible_n": 6,
+          "population_bands": {
+            "BETWEEN_15_30": 0,
+            "EARLY": 0,
+            "OLDER": 5,
+            "SEASONED": 1,
+            "ULTRA_FRESH": 0,
+            "UNKNOWN_AGE": 0
+          },
+          "time_separated_numeric_H900_n": 6,
+          "y_equals_x_excluded_n": 0
+        }
+      },
+      "campaign_id": "FRESH_OOS_BASELINE_VS_FRICTION_VETO_V1",
+      "capture_accepted": true,
+      "kept_strata": [
+        "TRADED"
+      ],
+      "kind": "quote_native",
+      "n_rows": 12,
+      "paired_source_deltas": {
+        "delta_MEU_rate": "0",
+        "delta_median_Y": "0.12336630",
+        "delta_positive_share": "0.3333333333333333333333333333"
+      },
+      "searchable_y_kind": "SELL_H900",
+      "stratum_unstable": true,
+      "terminal_outcome": "CLOSE_EXACT_FRICTION_VETO_FAMILY"
+    },
+    {
+      "by_source_stratum": {
+        "RECENT": {
+          "MARKET_EXECUTION_UNAVAILABLE_n": 0,
+          "PROVIDER_MEASUREMENT_FAILURE_n": 0,
+          "QUOTE_OBSERVED_n": 6,
+          "Y": {
+            "median": "-0.0750566",
+            "n": 5,
+            "p25": "-0.109820400",
+            "p75": "-0.039957000",
+            "positive_share": "0",
+            "worst": "-0.1433361"
+          },
+          "age_seconds": {
+            "max": "58.0",
+            "median": "36.0",
+            "min": "16.0",
+            "n": 6
+          },
+          "decision_time_eligible_n": 6,
+          "population_bands": {
+            "BETWEEN_15_30": 0,
+            "EARLY": 0,
+            "OLDER": 0,
+            "SEASONED": 0,
+            "ULTRA_FRESH": 6,
+            "UNKNOWN_AGE": 0
+          },
+          "time_separated_numeric_H900_n": 5,
+          "y_equals_x_excluded_n": 1
+        },
+        "TRADED": {
+          "MARKET_EXECUTION_UNAVAILABLE_n": 0,
+          "PROVIDER_MEASUREMENT_FAILURE_n": 0,
+          "QUOTE_OBSERVED_n": 6,
+          "Y": {
+            "median": "-0.1302377",
+            "n": 6,
+            "p25": "-0.473424725",
+            "p75": "0.061886650",
+            "positive_share": "0.3333333333333333333333333333",
+            "worst": "-0.8745286"
+          },
+          "age_seconds": {
+            "max": "26613571.0",
+            "median": "31034.5",
+            "min": "2753.0",
+            "n": 6
+          },
+          "decision_time_eligible_n": 6,
+          "population_bands": {
+            "BETWEEN_15_30": 0,
+            "EARLY": 0,
+            "OLDER": 3,
+            "SEASONED": 3,
+            "ULTRA_FRESH": 0,
+            "UNKNOWN_AGE": 0
+          },
+          "time_separated_numeric_H900_n": 6,
+          "y_equals_x_excluded_n": 0
+        }
+      },
+      "campaign_id": "PRIOR_GIT_T0_FRICTION_SCREEN_V1",
+      "capture_accepted": true,
+      "kept_strata": [
+        "TRADED"
+      ],
+      "kind": "quote_native",
+      "n_rows": 12,
+      "paired_source_deltas": {
+        "delta_MEU_rate": "0",
+        "delta_median_Y": "-0.0551811",
+        "delta_positive_share": "0.3333333333333333333333333333"
+      },
+      "searchable_y_kind": "SELL_H900",
+      "stratum_unstable": true,
+      "terminal_outcome": "CLOSE_EXACT_T0_FRICTION_SCREEN_FAMILY"
+    },
+    {
+      "by_source_stratum": {
+        "RECENT": {
+          "MARKET_EXECUTION_UNAVAILABLE_n": 4,
+          "PROVIDER_MEASUREMENT_FAILURE_n": 0,
+          "QUOTE_OBSERVED_n": 17,
+          "Y": {
+            "median": "-0.0272814",
+            "n": 17,
+            "p25": "-0.027929300",
+            "p75": "-0.027281400",
+            "positive_share": "0",
+            "worst": "-0.5333736"
+          },
+          "age_seconds": {
+            "max": "373.0",
+            "median": "351.0",
+            "min": "305.0",
+            "n": 24
+          },
+          "decision_time_eligible_n": 21,
+          "population_bands": {
+            "BETWEEN_15_30": 0,
+            "EARLY": 24,
+            "OLDER": 0,
+            "SEASONED": 0,
+            "ULTRA_FRESH": 0,
+            "UNKNOWN_AGE": 0
+          },
+          "time_separated_numeric_H900_n": 17,
+          "y_equals_x_excluded_n": 0
+        }
+      },
+      "campaign_id": "ORDINARY_RECENT_EARLY_PATH_H900_AUDITION_V1",
+      "capture_accepted": true,
+      "kept_strata": [],
+      "kind": "early_path",
+      "n_rows": 24,
+      "one_arm_recent_corroboration": true,
+      "paired_source_deltas": null,
+      "scientific_terminal_before_overlay": "INVALID_EVIDENCE_YIELD",
+      "searchable_y_kind": "SELL_H900",
+      "stratum_unstable": false,
+      "terminal_outcome": "INVALID_EVIDENCE_YIELD"
+    }
+  ],
+  "cash_spend_usd_cents": 0,
+  "classification_overlay_used_as_market_observation": false,
+  "credential_reads": 0,
+  "decision": {
+    "comparable_y_surface": true,
+    "criteria": {
+      "independent_valid_windows": {
+        "n": 6,
+        "pass": true
+      },
+      "material_source_stratum_instability": {
+        "campaigns": [
+          "FRESH_OOS_BASELINE_VS_FRICTION_VETO_V1",
+          "PRIOR_GIT_T0_FRICTION_SCREEN_V1"
+        ],
+        "kept_strata": {
+          "FRESH_OOS_BASELINE_VS_FRICTION_VETO_V1": [
+            "TRADED"
+          ],
+          "PRIOR_GIT_T0_FRICTION_SCREEN_V1": [
+            "TRADED"
+          ]
+        },
+        "pass": true
+      },
+      "maturity_definable_pre_outcome": {
+        "bounds_changed_by_y": false,
+        "missing_age_n": 0,
+        "pass": true,
+        "seasoned_source_supply_n": 6
+      },
+      "traded_not_product_population": {
+        "launchpad_known_on_traded": false,
+        "pass": true,
+        "traded_age_max_seconds": "56091194.0",
+        "traded_n": 30
+      },
+      "very_early_not_positive": {
+        "early_median": "-0.0272814",
+        "early_n": 17,
+        "early_positive_n": 0,
+        "pass": true,
+        "traded_in_early_age_excluded_n": 1,
+        "ultra_fresh_recent_median": "-0.0773254",
+        "ultra_fresh_recent_n": 19
+      }
+    },
+    "frozen_atom2_population": {
+      "COMMON": {
+        "decision_time_fields_only": true,
+        "exclude_consumed_mints": true,
+        "liquidity_usd_min": 1000,
+        "notional_atomic": 10000000,
+        "quote_notional_sol": "0.01"
+      },
+      "EARLY": {
+        "inclusive": "[5m, 15m)",
+        "pool_age_seconds": [
+          300,
+          900
+        ]
+      },
+      "SEASONED": {
+        "inclusive": "[30m, 120m]",
+        "pool_age_seconds": [
+          1800,
+          7200
+        ]
+      },
+      "candidate_sources_allowed": [
+        "/recent",
+        "/toptraded/1h"
+      ],
+      "domain": {
+        "launchpad": "pump.fun",
+        "network": "Solana"
+      },
+      "immutable_for": "IN_SCOPE_POPULATION_AND_STATE_DISCOVERY_V1",
+      "reclassify_via": "tokens_v2_search_bulk",
+      "source_does_not_define_population": true
+    },
+    "terminal": "NOMINATE_IN_SCOPE_MATURITY_BOUNDARY_TEST"
+  },
+  "duplicate_accounting": "PASS",
+  "factory_runner_sha256": "d8d22bcb51fb6992d40f09e58274c52e0f9942c12d043cc57b96ffca524e918f",
+  "mint_reuse_across_campaigns": 0,
+  "non_claims": [
+    "NO_ALPHA",
+    "NO_NETRETURN",
+    "NO_TRADED_PRODUCT_POPULATION",
+    "NO_FEATURE_TOURNAMENT",
+    "NO_PROVIDER_CALL",
+    "NO_FACTORY_RUNNER_CHANGE",
+    "NO_CANONICAL_DONE"
+  ],
+  "provider_api_rpc_wss_calls": 0,
+  "row_inventory_n": 84,
+  "schema": "smial.in-scope-population-fit-reconciliation.runtime-receipt",
+  "schema_version": "1.0"
+}

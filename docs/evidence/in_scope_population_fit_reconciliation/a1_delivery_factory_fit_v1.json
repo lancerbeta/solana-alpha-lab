@@ -1,0 +1,36 @@
+{
+  "schema": "smial.delivery-harness-factory-fit",
+  "schema_version": "1.0",
+  "review_id": "IN-SCOPE-POPULATION-FIT-RECONCILIATION-FACTORY-FIT-001",
+  "as_of": "2026-08-21",
+  "task_id": "IN_SCOPE_POPULATION_FIT_RECONCILIATION_V1",
+  "reviewed_bindings_sha256": "6cfeeca25076a7e251ffe2c2f779c14b6145ef7d17a2f26c765e3060c072abfe",
+  "reviewed_inventory_sha256": "1dcc3cb4e5537f5b7898dcfeb161dbe4709143f477969855e8cc117c3922b131",
+  "mode": "FULL_REVIEW",
+  "verdict": "PASS",
+  "dimensions": {
+    "mission": "PASS_POPULATION_FIT_BEFORE_FEATURE_FIT",
+    "flexibility_and_history": "PASS_HASH_PINNED_NAMED_RECEIPTS_PRESERVE_HISTORY",
+    "context_efficiency": "PASS_OFFLINE_PROJECTOR_ZERO_PROVIDER",
+    "research_truth": "PASS_SOURCE_DISTINCT_FROM_PRODUCT_EARLY",
+    "owner_operability": "PASS_RUSSIAN_READOUT_AND_FROZEN_BOUNDS",
+    "execution_to_cashflow": "NOT_APPLICABLE_QUOTE_ONLY_NO_EXECUTION",
+    "monitoring_and_recovery": "PASS_REVERT_THIS_ATOM_PRESERVE_FACTORY_RUNNER",
+    "build_vs_buy": "PASS_THIN_OFFLINE_PROJECTOR_OVER_GIT_JSON",
+    "security": "PASS_NO_CREDENTIAL_OR_PROVIDER_CALL",
+    "red_team": "PASS_TRADED_CANNOT_ENTER_PRODUCT_EARLY_Y"
+  },
+  "capability_radar": {
+    "now": "NONE",
+    "watch": "IN_SCOPE_POPULATION_AND_STATE_DISCOVERY_V1"
+  },
+  "recovery": "REVERT_ONLY_THIS_ATOM; PRESERVE_FACTORY_RUNNER",
+  "limits": [
+    "NO_ALPHA",
+    "NO_PROVIDER_CALL",
+    "NO_TRADED_PRODUCT_POPULATION",
+    "NO_FACTORY_RUNNER_CHANGE",
+    "NO_ATOM2_CAMPAIGN",
+    "NO_CANONICAL_DONE"
+  ]
+}
