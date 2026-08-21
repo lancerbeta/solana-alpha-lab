@@ -29678,7 +29678,7 @@ records:
   as_of: '2026-08-21'
   truth_owner: EARLY_STATE_TO_PAPER_VERTICAL_SLICE_V1
   location: {kind: git_path, logical_uri: 'repo://docs/reports/early_state_paper/a1_owner_readout_v1.md', repository_path: docs/reports/early_state_paper/a1_owner_readout_v1.md}
-  integrity: {kind: sha256, sha256: d6c99039a2c1dbdd283d22a9c4d60caf839be25e4f487d728e12602d0639bc13}
+  integrity: {kind: sha256, sha256: eaeff5d50a908d5a2a059a048b83fab7572af381eb8393bc909f53fd08f37aba}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations: [{relation_type: derived_from, target_asset_id: EVIDENCE-EARLY-STATE-PAPER-ACCEPTANCE-001}]
   consumers: [FACTORY-001, GOAL-OWNER]
