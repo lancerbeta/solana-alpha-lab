@@ -1,0 +1,32 @@
+{
+  "acceptance_id": "IN-SCOPE-POPULATION-AND-STATE-DISCOVERY-ACCEPTANCE-001",
+  "as_of": "2026-08-21",
+  "cloud_bundle_mode": "OWNER_MANAGED_OPTIONAL_EXPORT",
+  "harvest": {
+    "early": "WAIT_THEN_SEARCH",
+    "instant_three_call": "FORBIDDEN_FOR_EARLY",
+    "note": "early-path compact Git rows have EARLY ages; launchpad and liquidity are absent so they are not product EARLY yet",
+    "seasoned": "TOPTRADED_SEARCH_RECLASSIFY",
+    "wait_ages_in_early_band_n": 24,
+    "wait_product_early_n_with_liquidity": 0
+  },
+  "next_safe_action": "LIVE_CAPTURE_BLOCKED_NO_OWNER_PHRASE",
+  "non_claims": [
+    "NO_ALPHA",
+    "NO_NETRETURN",
+    "NO_QUOTES",
+    "NO_STATE_RULES",
+    "NO_LIVE_PROVIDER",
+    "NO_CANONICAL_DONE"
+  ],
+  "project_sources_disposition": {
+    "kind": "NO_CHANGE"
+  },
+  "promotable": false,
+  "provider_api_rpc_wss_calls": 0,
+  "schema": "smial.in-scope-population-and-state-discovery.acceptance",
+  "schema_version": "1.0",
+  "stage_b_authorized": false,
+  "task_id": "IN_SCOPE_POPULATION_AND_STATE_DISCOVERY_V1",
+  "verdict": "INSTANT_RECENT_CANNOT_FILL_EARLY"
+}
