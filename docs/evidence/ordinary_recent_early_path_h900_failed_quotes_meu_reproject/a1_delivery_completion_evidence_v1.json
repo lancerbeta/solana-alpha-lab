@@ -43,14 +43,14 @@
   },
   "factory_fit": {
     "path": "docs/evidence/ordinary_recent_early_path_h900_failed_quotes_meu_reproject/a1_delivery_factory_fit_v1.json",
-    "sha256": "PLACEHOLDER",
+    "sha256": "f1f7174d78dd40400af61bca0459bd5571f2315a8c3da7b61c301866f0fe12ee",
     "verdict": "PASS"
   },
   "validation": {
     "targeted": "PASS_ORDINARY_RECENT_EARLY_PATH_H900_FAILED_QUOTES_MEU_REPROJECT_TESTS",
     "independent_review": {
       "path": "docs/evidence/ordinary_recent_early_path_h900_failed_quotes_meu_reproject/a1_delivery_independent_review_v1.json",
-      "sha256": "PLACEHOLDER",
+      "sha256": "b6e34c97826ee4088819a1117870a5da8ec197b7fb6bb7a052fe7073571da952",
       "verdict": "PASS"
     },
     "full_gate": "ENFORCED_BY_PROJECT_BOUND_VALIDATION",
