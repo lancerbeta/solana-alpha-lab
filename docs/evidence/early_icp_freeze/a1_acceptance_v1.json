@@ -1,0 +1,29 @@
+{
+  "acceptance_id": "EARLY-ICP-FREEZE-ACCEPTANCE-001",
+  "as_of": "2026-08-21",
+  "cloud_bundle_mode": "OWNER_MANAGED_OPTIONAL_EXPORT",
+  "frozen_icp_id": "ICP-EARLY-PUMPFUN-V1",
+  "maturity_on_critical_path": false,
+  "next_safe_action": "ATOM2_EARLY_STATE_TO_PAPER_VERTICAL_SLICE_V1",
+  "non_claims": [
+    "NO_ALPHA",
+    "NO_NETRETURN",
+    "NO_QUOTES",
+    "NO_STATE_RULES",
+    "NO_STRATEGY_OR_BOT",
+    "NO_NEW_PROVIDER",
+    "NO_SECOND_TOPTRADED_ATTEMPT",
+    "NO_THRESHOLD_RESCUE",
+    "NO_CANONICAL_DONE"
+  ],
+  "project_sources_disposition": {
+    "kind": "NO_CHANGE"
+  },
+  "promotable": false,
+  "provider_api_rpc_wss_calls": 0,
+  "schema": "smial.early-icp-freeze.acceptance",
+  "schema_version": "1.0",
+  "seasoned_branch_terminal": "TOPTRADED_NOT_SAME_POPULATION",
+  "task_id": "EARLY_ICP_FREEZE_AND_MATURITY_BRANCH_CLOSE_V1",
+  "verdict": "EARLY_ONLY_ICP_CONFIRMED"
+}
