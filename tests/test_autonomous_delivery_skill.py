@@ -98,6 +98,8 @@ class AutonomousDeliverySkillTests(unittest.TestCase):
     def test_agents_front_door_stays_harness_owned_without_skill_body(self) -> None:
         text = AGENTS.read_text(encoding="utf-8")
         self.assertIn(".agents/skills/delivery-harness/SKILL.md", text)
+        self.assertIn("probe it on the working path first", text)
+        self.assertIn("Do not write the result packet", text)
         self.assertNotIn("## AUTONOMOUS_DELIVERY_CONTINUE", text)
         self.assertNotIn("Never take the next `TASK-XX` by number", text)
         self.assertLessEqual(len(AGENTS.read_bytes()), 12 * 1024)

@@ -43,6 +43,10 @@ implementation, tests and review are phases, not automatic owner gates.
 
 Use bounded routine autonomy without micro-approval. Apply test-first behavior
 for changed behavior and the smallest targeted checks during implementation.
+If a leftover space, encoded query, wrong endpoint or shape can still fail the
+atom, probe and fix that on the working path before Catalog, receipts, reviews
+or PR. Do not document a five-second mechanical miss.
+
 After bootstrap the guarded merge is the sole project-bound gate executor for
 an unchanged fingerprint. Generated consumers are routine
 propagation; unrelated changes stay untouched.

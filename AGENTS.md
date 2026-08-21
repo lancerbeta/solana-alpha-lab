@@ -90,6 +90,13 @@ first material blocker, consult the exact reuse registry and a smallest useful
 set of official/maintained solutions before inventing infrastructure. This
 research grants no dependency, provider, cost or external authority.
 
+If a cheap mechanical fail can still kill the atom — wrong URL/path/header,
+encoded comma/space, phrase or config drift, missing process key, call-cap or
+payload shape — probe it on the working path first. Fix in place and re-probe.
+Do not write the result packet (Catalog, receipts, readout, reviews, PR) around
+a five-second fail. Ceremony starts only after that probe is viable or the
+terminal is a real product/evidence result, not a leftover syntax miss.
+
 ## ACTIVE_TIME_GATE_CHECK
 
 Before selecting new work, read `control/active_time_gates.json`; a due
