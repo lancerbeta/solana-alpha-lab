@@ -531,6 +531,22 @@ class SyncGoldenTests(unittest.TestCase):
         self.assertEqual(applied.returncode, 0, applied.stderr)
         self.assertEqual(before, target.read_bytes())
 
+    def test_apply_twice_is_cross_invocation_noop(self) -> None:
+        first = _run(
+            [sys.executable, "-B", "scripts/harness_sync.py", "--apply"],
+            cwd=self.worktree,
+        )
+        self.assertEqual(first.returncode, 0, first.stderr)
+        status_after_first = _run(["git", "status", "--porcelain"], cwd=self.worktree).stdout
+        second = _run(
+            [sys.executable, "-B", "scripts/harness_sync.py", "--apply"],
+            cwd=self.worktree,
+        )
+        self.assertEqual(second.returncode, 0, second.stderr)
+        status_after_second = _run(["git", "status", "--porcelain"], cwd=self.worktree).stdout
+        self.assertEqual(status_after_first, status_after_second)
+        self.assertNotEqual(status_after_first.strip(), "")
+
 
 if __name__ == "__main__":
     unittest.main()

@@ -256,6 +256,7 @@ def check_drift() -> list[str]:
     nav = subprocess.run(
         [sys.executable, "-B", str(ROOT / "scripts" / "generate_navigation.py"), "--check"],
         capture_output=True,
+        env={**__import__("os").environ, "PYTHONDONTWRITEBYTECODE": "1"},
     )
     if nav.returncode != 0:
         detail = nav.stdout.decode("utf-8", errors="replace").strip().splitlines()[-1:]
