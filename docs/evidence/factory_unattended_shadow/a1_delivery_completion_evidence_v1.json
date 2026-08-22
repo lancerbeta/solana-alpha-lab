@@ -9,10 +9,32 @@
   "cloud_bundle_smoke_required": false,
   "factory_fit": {
     "path": "docs/evidence/factory_unattended_shadow/a1_delivery_factory_fit_v1.json",
-    "sha256": "PENDING_BIND",
+    "sha256": "57d997bf7f88dd37e6a827d405458322c870b056c1f31c5e3f69a462ec7a3a82",
     "verdict": "PASS"
   },
-  "implementation_bindings": {},
+  "implementation_bindings": {
+    "catalog/assets/core.yaml": "84ad73bde5fb7360f72d2ad490126407aa63432ac204ba7572e7577197fbc80d",
+    "catalog/assets/lifecycle.yaml": "c79da4547a0622c1cd6f5853033ca86be533750c1942e56b29058444b845dc53",
+    "catalog/catalog_manifest.yaml": "79348483cee77b1b42a15f6c2b5fb0a3b5859ddcf39ee549843d0687f4ffa8d9",
+    "catalog/generated/asset_edges.json": "d4a874f027d9d58184d77d6dea995efba9fc5025ce66397f5a8d34aaf4261e95",
+    "configs/factory_remote_ops/factory-paper-heartbeat.service": "ae0805f99743d229c19c6773868551265427666d3d7a87c747f5bd0d0c359cb1",
+    "configs/factory_unattended_shadow_cohort_fixture_v1.json": "5c61275f0ea6e36b1f1f9368c7e8cff5c461b4a2d291859310f2c09e227a4a48",
+    "configs/factory_unattended_shadow_vertical_slice_v1.yaml": "973d32f0841b5190ca650c8270a9fd25f4b1dea9502bf1b0d439e67bed6d6c26",
+    "docs/PROJECT_MAP.md": "1ded58ff2976a71b7f4c2fae8204bfd88589ab0ed23ed26141e19f73b5eb46fc",
+    "docs/evidence/factory_unattended_shadow/a1_acceptance_v1.json": "6a8d49221fa4673e2bbceeaf0ddd9daf48b13657aff82dccc559147d6e6415b3",
+    "docs/evidence/factory_unattended_shadow/a1_backup_receipt_v1.json": "1d17f9ebf1121e442e27d86aafb77788d5bc65e5251f6cd659968039bb695795",
+    "docs/evidence/factory_unattended_shadow/a1_host_proof_v1.json": "e58c46215ca48991fd5a565700f6ad1587a631e19584d8d3de618c62fff85802",
+    "docs/evidence/factory_unattended_shadow/a1_runtime_receipt_v1.json": "3aecf3ff72b392fc9c9de5b15fdef75946913fba2475dfa70bb42b5004024a79",
+    "docs/operator/FACTORY_REMOTE_HOST.md": "d5b073f7385c30c02f5a469ebcba119633f6948af4ceb7d847fa0d60599dbcd7",
+    "docs/operator/factory_remote_host_v1.yaml": "5e9b05931b2e2cb2cfa311e93581ba6e35c74136b70d1cb495466d006a1c1234",
+    "docs/reports/factory_unattended_shadow/a1_owner_readout_v1.md": "e565bf13c7ac45cdeb2f7a5ba6b8b6db9af3a3c90cf31149a52bff7fa0658000",
+    "docs/tasks/FACTORY_UNATTENDED_SHADOW_VERTICAL_SLICE_V1.md": "c4187146d2aa0baf2928e625e5321f840b7f7cd34a2ca455e39dedb88505f383",
+    "scripts/run_factory_unattended_shadow_tick.py": "2d288c84f3a1bd8c380f386723758720d9dc684e00f77d46f1dfcafb0a05bdfe",
+    "src/solana_alpha_lab/factory/paper_plane.py": "ef93969a3bc193a2fb19454115ce29359f066eb10272def507d11cb2253e3bd9",
+    "src/solana_alpha_lab/factory/remote_ops.py": "2b4b8dceaaa3db198e8f40cdd4b8333b39b6e61512ca3efaf7d1a3a3e196289b",
+    "src/solana_alpha_lab/factory/unattended_shadow.py": "cc22bc408e46cb0129765edb7d6dd8158a19e223ed1e2525cb1a1836f1634d73",
+    "tests/test_factory_unattended_shadow_vertical_slice.py": "1ff6b433df4bfcac81bae6633855b7647abf81692eb7b7fd6aa414a6b5f3bb0d"
+  },
   "non_claims": [
     "NO_CANONICAL_DONE",
     "NO_SCIENTIFIC_SHADOW_PASS",
@@ -49,7 +71,7 @@
     "github_ci": "ENFORCED_LIVE_AT_GUARDED_MERGE",
     "independent_review": {
       "path": "docs/evidence/factory_unattended_shadow/a1_delivery_independent_review_v1.json",
-      "sha256": "PENDING_BIND",
+      "sha256": "12000826c67f1246806d38a8b9a29a2046453b91d8fdd9725082fb0de18a5f16",
       "verdict": "PASS"
     },
     "project_checks": [
