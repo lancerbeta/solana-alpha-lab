@@ -123,6 +123,10 @@ class FactoryStaticGateTests(unittest.TestCase):
         self.assertEqual(completed.returncode, 0, completed.stdout + completed.stderr)
         self.assertIn("FACTORY_STATIC: PASS", completed.stdout)
 
+    def test_factory_static_disables_ruff_cache(self) -> None:
+        source = (ROOT / "scripts/validate_factory_static.py").read_text(encoding="utf-8")
+        self.assertIn('"--no-cache"', source)
+
 
 class ProcessPolicyTests(unittest.TestCase):
     def test_domain_policy_names_freeze_and_kill_switch(self) -> None:

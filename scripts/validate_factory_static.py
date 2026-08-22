@@ -26,6 +26,7 @@ def main() -> int:
             "dev",
             "ruff",
             "check",
+            "--no-cache",
             str(FACTORY_ROOT.relative_to(ROOT)).replace("\\", "/"),
         ],
         cwd=str(ROOT),
