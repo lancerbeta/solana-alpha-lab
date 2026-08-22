@@ -68,6 +68,10 @@ merge_policy:
     - scripts/harness_sync.py
     - scripts/validate.ps1
     - scripts/validate_baton.py
+    - scripts/validate_task04.py
+    - pyproject.toml
+    - uv.lock
+    - src/solana_alpha_lab/factory/runtime.py
     - delivery-harness/policies/solana-alpha-lab.md
     - catalog/schemas/delivery_harness_completion_evidence.schema.json
     - tests/test_ci.py

@@ -25,6 +25,7 @@ managed_write_set:
   - scripts/delivery_efficiency.py
   - scripts/validate_factory_static.py
   - scripts/validate_baseline.py
+  - scripts/validate_task04.py
   - tests/test_task23_catalog_repository_factory_fit.py
   - scripts/validate_ci.py
   - src/solana_alpha_lab/factory/runtime.py
