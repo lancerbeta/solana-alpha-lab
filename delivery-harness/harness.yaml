@@ -73,12 +73,11 @@ merge_policy:
     - tests/test_ci.py
     - tests/test_ci_messages.py
     - tests/test_process_throughput_guardrails.py
+    - tests/test_task23_catalog_repository_factory_fit.py
     - tests/test_delivery_harness_adapters.py
-    - AGENTS.md
     - .agents/skills/delivery-harness/SKILL.md
     - .cursor/agents/owner-ux-critic.md
     - delivery-harness/templates/portable-core/dot-cursor/commands/delivery-review.md
-    - tests/test_delivery_harness_adapters.py
     - tests/test_delivery_harness_authority.py
     - tests/test_delivery_harness_bootstrap.py
     - tests/test_delivery_harness_context.py

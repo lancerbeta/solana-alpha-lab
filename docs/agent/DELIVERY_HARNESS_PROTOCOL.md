@@ -95,11 +95,23 @@ The summary does not replace validation; it only surfaces the sanctioned repair.
 
 ### Process throughput guardrails
 
-After the harness-sync control sprint, the domain policy freezes control-plane
-changes for the next five substantive product/research atoms unless a confirmed
-blocker appears on the active atom.
+After the harness-sync control sprint (derived-hash sync, evidence binding,
+actionable CI drift messages), the control plane is **frozen** for the next
+**five substantive product or research atoms**.
 
-Completion evidence MAY include optional `delivery_efficiency` counts. Use:
+During the freeze, do not change `delivery-harness/`, owner-attention gate
+semantics, evidence protocol, CI architecture, or harness scripts except for a
+**confirmed blocker** on the active atom (machine `DENY`, repeated friction on
+the working path, or a security defect).
+
+Completion evidence MAY include optional `delivery_efficiency` counts:
+
+- `substantive_commits` — product/research implementation commits;
+- `repair_commits` — derived-hash, evidence-rebind, or CI-drift repair commits;
+- `control_only_commits` — control/harness-only commits;
+- `repair_ratio` — `(repair + control_only) / total` when total > 0.
+
+Use:
 
 ```text
 uv run --locked --managed-python python -B scripts/delivery_efficiency.py --base <oid> --head HEAD --json

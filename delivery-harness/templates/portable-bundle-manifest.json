@@ -66,7 +66,7 @@
     {
       "source": "catalog/schemas/delivery_harness_completion_evidence.schema.json",
       "destination": "catalog/schemas/delivery_harness_completion_evidence.schema.json",
-      "sha256": "fa6af92585341f34e4314552f71ae1688c82ffdfc4e6b44f347c6efac786d353"
+      "sha256": "bc01b3e0df011658ac87fab92ed31f15527ffd2a10923d67be7aa56e1d44b67a"
     },
     {
       "source": "catalog/schemas/delivery_harness_independent_review_evidence.schema.json",
@@ -126,7 +126,7 @@
     {
       "source": "delivery-harness/templates/portable-core/dot-cursor/commands/delivery-review.md",
       "destination": ".cursor/commands/delivery-review.md",
-      "sha256": "152c0a264f9fc0c5d138ef965cbdf51dce9ebdab60d9b3f7e21875a58f6429f4"
+      "sha256": "f201246efe7cf15da45ed82c4dcc0c4f24468b053c09df6d4c10bda5a2a02d5f"
     },
     {
       "source": "delivery-harness/templates/portable-core/dot-cursor/commands/delivery-finish.md",

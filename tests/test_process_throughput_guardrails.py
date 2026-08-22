@@ -9,6 +9,7 @@ import unittest
 from pathlib import Path
 
 import jsonschema
+import yaml
 
 ROOT = Path(__file__).resolve().parents[1]
 SCRIPTS = ROOT / "scripts"
@@ -134,12 +135,18 @@ class FactoryStaticGateTests(unittest.TestCase):
 
 
 class ProcessPolicyTests(unittest.TestCase):
-    def test_domain_policy_names_freeze_and_kill_switch(self) -> None:
-        text = (ROOT / "delivery-harness/policies/solana-alpha-lab.md").read_text(encoding="utf-8")
-        self.assertIn("CONTROL_PLANE_FREEZE_AND_CEREMONY_TAX", text)
+    def test_protocol_names_freeze_and_kill_switch(self) -> None:
+        text = (ROOT / "docs/agent/DELIVERY_HARNESS_PROTOCOL.md").read_text(encoding="utf-8")
         self.assertIn("five substantive product or research atoms", text)
         self.assertIn("repair_commits >= 2", text)
         self.assertIn("repair_ratio > 0.30", text)
+
+    def test_control_write_prefixes_are_unique(self) -> None:
+        document = yaml.safe_load(
+            (ROOT / "delivery-harness/harness.yaml").read_text(encoding="utf-8")
+        )
+        prefixes = document["merge_policy"]["harness_control_write_prefixes"]
+        self.assertEqual(prefixes, list(dict.fromkeys(prefixes)))
 
     def test_owner_ux_critic_is_registered_with_triggers(self) -> None:
         critic = (ROOT / ".cursor/agents/owner-ux-critic.md").read_text(encoding="utf-8")
