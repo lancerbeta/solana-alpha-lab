@@ -865,7 +865,7 @@ records:
     repository_path: scripts/validate.ps1
   integrity:
     kind: sha256
-    sha256: 9ff25add15508c93fab60af271304162160db73ab1637cb8ea0c2d22a453e2d7
+    sha256: 57edb946648ecf4cd95948dc7f5b39b47c07399858aa845c30c5033e4b9d225d
   access:
     mode: read_only
     method: command
@@ -936,7 +936,7 @@ records:
     repository_path: scripts/validate_ci.py
   integrity:
     kind: sha256
-    sha256: 848817360dba1648241f73ab898108858b624f04184da362f965edc4bb56e635
+    sha256: ad9617dc213bd392614909706bc1f112b03c6bed5ff5b8bb7eccffa6b5be6795
   access:
     mode: read_only
     method: command
@@ -4794,7 +4794,7 @@ records:
     repository_path: scripts/validate_baton.py
   integrity:
     kind: sha256
-    sha256: dce0138ce90b64c04abad2bf9ca959b1ee0d9529f8871082400d3061237339c1
+    sha256: f7f3dd034c9df58b22c8d5cded36c69ba67cb35fa99fc074400be4d85f363000
   access:
     mode: read_only
     method: file
@@ -19727,7 +19727,7 @@ records:
   as_of: '2026-08-15'
   truth_owner: CTRL-DELIVERY-HARNESS-001
   location: {kind: git_path, logical_uri: 'repo://delivery-harness/harness.yaml', repository_path: delivery-harness/harness.yaml}
-  integrity: {kind: sha256, sha256: 82fc0c16053d1f3168e0f380684e742b3bf18e5e6eafb6fac21e522a4af86d9e}
+  integrity: {kind: sha256, sha256: 5f131c48d5f6794dfbc4dd0316512d44e6fcc6e195f59da7302113d507b2f774}
   access: *t25_read_file
   relations:
   - {relation_type: governed_by, target_asset_id: CTRL-DELIVERY-HARNESS-001}
@@ -19926,7 +19926,7 @@ records:
   as_of: '2026-08-14'
   truth_owner: CTRL-DELIVERY-HARNESS-001
   location: {kind: git_path, logical_uri: 'repo://docs/agent/DELIVERY_HARNESS_PROTOCOL.md', repository_path: docs/agent/DELIVERY_HARNESS_PROTOCOL.md}
-  integrity: {kind: sha256, sha256: 2551827de75f78197dd857d94b81014f74642dbc8906d095934caaf8fa672efd}
+  integrity: {kind: sha256, sha256: fb2a5429c8235c594929abe0cc4cb8355b31bd4efcac832c6b2c7601bb6c41e3}
   access: *t25_read_file
   relations:
   - {relation_type: governed_by, target_asset_id: ADR-DIRECT-DELIVERY-HARNESS-005}
