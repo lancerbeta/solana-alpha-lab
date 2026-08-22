@@ -29,6 +29,9 @@
     "signal": "SHADOW_EXECUTABLE",
     "strategy": "STRAT-V-EARLY-LIQ-FLOOR"
   },
+  "project_sources_disposition": {
+    "kind": "NO_CHANGE"
+  },
   "schema": "smial.factory-unattended-shadow.acceptance",
   "schema_version": "1.0",
   "scientific_shadow_pass": false,

@@ -27,7 +27,7 @@
   "mode": "FULL_REVIEW",
   "recovery": "REVERT_THIS_ATOM; PRESERVE_FACTORY_RUNNER; KEEP_REMOTE_OPS_BASELINE",
   "review_id": "FACTORY-UNATTENDED-SHADOW-FACTORY-FIT-001",
-  "reviewed_bindings_sha256": "6b5011a3f64d1aafb1dcf541a5f957a34dc60b224deaa36f22b9e7ea332b7b91",
+  "reviewed_bindings_sha256": "f4abd8b84cffdf9da95c583cfad05879c5e2ae6573339612cf08161005bc2bc7",
   "reviewed_inventory_sha256": "c0f50056818104b22d6e830f8e7e081dfe50405d1df595b84cfadc920efd487f",
   "schema": "smial.delivery-harness-factory-fit",
   "schema_version": "1.0",

@@ -30337,7 +30337,7 @@ records:
   as_of: '2026-08-22'
   truth_owner: FACTORY_UNATTENDED_SHADOW_VERTICAL_SLICE_V1
   location: {kind: git_path, logical_uri: 'repo://docs/evidence/factory_unattended_shadow/a1_acceptance_v1.json', repository_path: docs/evidence/factory_unattended_shadow/a1_acceptance_v1.json}
-  integrity: {kind: sha256, sha256: 6a8d49221fa4673e2bbceeaf0ddd9daf48b13657aff82dccc559147d6e6415b3}
+  integrity: {kind: sha256, sha256: 70c07ac509df44e76cffec5ed5a85c5da9e39634a7deb4708ce99d9cc1f10224}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: depends_on, target_asset_id: EVIDENCE-FACTORY-UNATTENDED-SHADOW-HOST-PROOF-001}
