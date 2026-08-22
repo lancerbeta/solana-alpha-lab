@@ -152,18 +152,22 @@ def apply_asset_hashes(changed_files: set[str]) -> list[str]:
 
 
 def observed_checkpoint() -> dict[str, int]:
+    """Mirror validate_catalog.observed_catalog_checkpoint semantics exactly."""
     manifest = yaml.safe_load((ROOT / MANIFEST_RELATIVE).read_text(encoding="utf-8"))
     counts = {
         "assets": 0,
         "asset_registries": len(manifest["root_resolver"]["asset_registries"]),
         "schemas": len(manifest["root_resolver"]["schemas"]),
-        "queries": len(manifest["root_resolver"]["query_registries"]),
+        "queries": 0,
         "lifecycle_registries": len(manifest["root_resolver"]["lifecycle_registries"]),
         "lifecycle_records": 0,
     }
     for registry_relative in manifest["root_resolver"]["asset_registries"]:
         document = yaml.safe_load((ROOT / registry_relative).read_text(encoding="utf-8"))
         counts["assets"] += len(document.get("records", []))
+    for query_relative in manifest["root_resolver"]["query_registries"]:
+        document = yaml.safe_load((ROOT / query_relative).read_text(encoding="utf-8"))
+        counts["queries"] += len(document.get("recipes", []))
     for registry_relative in manifest["root_resolver"]["lifecycle_registries"]:
         document = yaml.safe_load((ROOT / registry_relative).read_text(encoding="utf-8"))
         counts["lifecycle_records"] += len(document.get("records", []))
