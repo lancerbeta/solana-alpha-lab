@@ -1,0 +1,45 @@
+{
+  "alert_sink": "TELEGRAM_BOT_API",
+  "as_of": "2026-08-22",
+  "atom_id": "FACTORY_REMOTE_OPERATIONS_V1",
+  "backup_entries": [
+    {
+      "bytes": 8,
+      "path": "local/factory_v1/operational_state.sqlite",
+      "sha256": "95ba44ee0607ceda372dcd469ac3f4ab98341635d1aa6f8fc388f7dd696b482a"
+    },
+    {
+      "bytes": 20480,
+      "path": "local/factory_v1/paper_plane_state.sqlite",
+      "sha256": "cd2653daa91383ac00905eb347d12100e828eaa59bfa91626958d764bc0cccef"
+    }
+  ],
+  "backup_independent": true,
+  "health_verdict_sample": "RUNTIME_PROVED_BACKUP_INDEPENDENT",
+  "implementation": "GIT_SIDE_REMOTE_OPS_PROOF",
+  "non_claims": [
+    "NO_VPS_PURCHASE_OR_DEPLOY",
+    "NO_TELEGRAM_TOKEN_READ",
+    "NO_FACTORY_V1_OPERATIONAL_READY",
+    "NO_ALPHA",
+    "NO_CANONICAL_DONE",
+    "NO_PUBLIC_ADMIN"
+  ],
+  "process_alive_alone_healthy": false,
+  "provider_api_rpc_wss_calls": 0,
+  "purchase": "OWNER_EXTERNAL_GATE",
+  "rejected_sku": "CLOUD_VPS_1_GEN2",
+  "schema": "smial.factory-remote-operations.runtime",
+  "schema_version": "1.0",
+  "security": {
+    "fail2ban": true,
+    "firewall_deny_default": true,
+    "password_ssh": false,
+    "permit_root_login": false,
+    "public_admin": false,
+    "secrets_in_git": false
+  },
+  "sku": "CLOUD_VPS_4_GEN2",
+  "terminal": "FACTORY_REMOTE_OPERATIONS_GIT_READY",
+  "workbench_bind": "127.0.0.1"
+}

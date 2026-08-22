@@ -1,0 +1,11 @@
+[Unit]
+Description=Factory paper-plane heartbeat every 5 minutes
+
+[Timer]
+OnBootSec=30s
+OnUnitActiveSec=300s
+Persistent=true
+Unit=factory-paper-heartbeat.service
+
+[Install]
+WantedBy=timers.target

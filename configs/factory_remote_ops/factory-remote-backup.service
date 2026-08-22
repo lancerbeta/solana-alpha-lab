@@ -1,0 +1,10 @@
+[Unit]
+Description=Factory remote-ops independent-domain backup
+Documentation=docs/tasks/FACTORY_REMOTE_OPERATIONS_V1.md
+
+[Service]
+Type=oneshot
+WorkingDirectory=/opt/solana-alpha-lab
+EnvironmentFile=-/etc/solana-alpha-lab/secrets.env
+ExecStart=/usr/bin/uv run --locked --managed-python python -B scripts/factory_remote_doctor.py --backup
+NoNewPrivileges=true

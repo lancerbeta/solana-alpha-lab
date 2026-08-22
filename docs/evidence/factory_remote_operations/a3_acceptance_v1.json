@@ -1,0 +1,44 @@
+{
+  "acceptance_id": "FACTORY-REMOTE-OPERATIONS-ACCEPTANCE-001",
+  "as_of": "2026-08-22",
+  "atom_id": "FACTORY_REMOTE_OPERATIONS_V1",
+  "backup_status": "INDEPENDENT_BUNDLE_PROVED_OFFLINE",
+  "cloud_bundle_mode": "OWNER_MANAGED_OPTIONAL_EXPORT",
+  "implementation": "GIT_SIDE_REMOTE_OPS_PROOF",
+  "next_safe_action": "OWNER_INFRASTRUCTURE_PACKET",
+  "non_claims": [
+    "NO_VPS_PURCHASE_OR_DEPLOY",
+    "NO_TELEGRAM_TOKEN_READ",
+    "NO_FACTORY_V1_OPERATIONAL_READY",
+    "NO_ALPHA",
+    "NO_NETRETURN",
+    "NO_PUBLIC_ADMIN",
+    "NO_POSTGRES",
+    "NO_CANONICAL_DONE",
+    "GOOGLE_DRIVE_NOT_PRIMARY_BACKUP"
+  ],
+  "owner_decision": "FACTORY_REMOTE_OPERATIONS_GIT_READY",
+  "project_sources_disposition": {
+    "kind": "NO_CHANGE"
+  },
+  "provider_api_rpc_wss_calls": 0,
+  "purchase": "OWNER_EXTERNAL_GATE",
+  "reuse": {
+    "adopt": ["systemd", "sshd", "nftables", "fail2ban"],
+    "wrap": ["FactoryRuntime", "content_addressed_backup", "telegram_bot_api_http"],
+    "fork": [],
+    "build": ["composed_health_doctor_alert_dedup"]
+  },
+  "schema": "smial.factory-remote-operations.acceptance",
+  "schema_version": "1.0",
+  "scientific_truth_owner": "GIT",
+  "security": {
+    "password_ssh": false,
+    "permit_root_login": false,
+    "public_admin": false,
+    "secret_defaults": false
+  },
+  "sku": "CLOUD_VPS_4_GEN2",
+  "task_id": "FACTORY_REMOTE_OPERATIONS_V1",
+  "terminal": "FACTORY_REMOTE_OPERATIONS_GIT_READY"
+}

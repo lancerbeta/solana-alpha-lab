@@ -29739,3 +29739,173 @@ records:
   evidence: []
   search_terms: [EARLY, STATE, FACTORY_FIT]
   classification: {contains_secrets: false, contains_raw_data: false, sensitivity: INTERNAL_NON_SECRET}
+- asset_id: CTRL-FACTORY-REMOTE-OPERATIONS-001
+  record_version: '1.0'
+  asset_type: control_document
+  purpose: Exact contract for Git-SHA remote operations, independent backup, composed health and Telegram alerts without a public admin surface.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-08-22'
+  truth_owner: FACTORY_REMOTE_OPERATIONS_V1
+  location: {kind: git_path, logical_uri: 'repo://docs/tasks/FACTORY_REMOTE_OPERATIONS_V1.md', repository_path: docs/tasks/FACTORY_REMOTE_OPERATIONS_V1.md}
+  integrity: {kind: sha256, sha256: 570d2b2c7c9666da0efd4f1d0eeb12ddd23b590dbe36b1f4a2e921dbda930087}
+  access: {mode: read_only, method: file, network_required: false, secrets_required: false}
+  relations:
+  - {relation_type: contains, target_asset_id: CONFIG-FACTORY-REMOTE-OPERATIONS-001}
+  - {relation_type: contains, target_asset_id: SCHEMA-FACTORY-REMOTE-OPERATIONS-001}
+  - {relation_type: contains, target_asset_id: MODULE-FACTORY-REMOTE-OPS-001}
+  - {relation_type: validated_by, target_asset_id: TEST-FACTORY-REMOTE-OPERATIONS-001}
+  - {relation_type: depends_on, target_asset_id: CTRL-FACTORY-V1-PRODUCTION-LITE-RUNTIME-001}
+  consumers: [FACTORY-001, GOAL-OWNER]
+  evidence: []
+  search_terms: [FACTORY, REMOTE_OPS, VPS, BACKUP, TELEGRAM, SECURITY]
+  classification: {contains_secrets: false, contains_raw_data: false, sensitivity: INTERNAL_NON_SECRET}
+- asset_id: CONFIG-FACTORY-REMOTE-OPERATIONS-001
+  record_version: '1.0'
+  asset_type: configuration
+  purpose: Machine-readable remote-ops freeze for Cherry VPS 4, loopback Workbench, independent backup and env-name-only Telegram sink.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-08-22'
+  truth_owner: FACTORY_REMOTE_OPERATIONS_V1
+  location: {kind: git_path, logical_uri: 'repo://configs/factory_remote_operations_v1.yaml', repository_path: configs/factory_remote_operations_v1.yaml}
+  integrity: {kind: sha256, sha256: 4fbdd8e630dd6f0cac6e45114c4488f4fb89d6d2961a71cac9eb3bac24527c15}
+  access: {mode: read_only, method: file, network_required: false, secrets_required: false}
+  relations:
+  - {relation_type: governed_by, target_asset_id: CTRL-FACTORY-REMOTE-OPERATIONS-001}
+  - {relation_type: depends_on, target_asset_id: SCHEMA-FACTORY-REMOTE-OPERATIONS-001}
+  consumers: [FACTORY-001, GOAL-OWNER]
+  evidence: []
+  search_terms: [FACTORY, REMOTE_OPS, CONFIG, CHERRY]
+  classification: {contains_secrets: false, contains_raw_data: false, sensitivity: INTERNAL_NON_SECRET}
+- asset_id: SCHEMA-FACTORY-REMOTE-OPERATIONS-001
+  record_version: '1.0'
+  asset_type: schema
+  purpose: JSON Schema for the Factory remote-operations contract.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-08-22'
+  truth_owner: FACTORY_REMOTE_OPERATIONS_V1
+  location: {kind: git_path, logical_uri: 'repo://catalog/schemas/factory_remote_operations.schema.json', repository_path: catalog/schemas/factory_remote_operations.schema.json}
+  integrity: {kind: sha256, sha256: efed40bba47682d595256ffedbca1f55e562f4b9aac26f6e95b7ba96b30043d4}
+  access: {mode: read_only, method: file, network_required: false, secrets_required: false}
+  relations: [{relation_type: governed_by, target_asset_id: CTRL-FACTORY-REMOTE-OPERATIONS-001}]
+  consumers: [FACTORY-001, GOAL-OWNER]
+  evidence: []
+  search_terms: [FACTORY, REMOTE_OPS, SCHEMA]
+  classification: {contains_secrets: false, contains_raw_data: false, sensitivity: INTERNAL_NON_SECRET}
+- asset_id: MODULE-FACTORY-REMOTE-OPS-001
+  record_version: '1.0'
+  asset_type: script
+  purpose: Composed health, independent backup, alert dedup and security-template verifier. Secrets have no defaults.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-08-22'
+  truth_owner: FACTORY_REMOTE_OPERATIONS_V1
+  location: {kind: git_path, logical_uri: 'repo://src/solana_alpha_lab/factory/remote_ops.py', repository_path: src/solana_alpha_lab/factory/remote_ops.py}
+  integrity: {kind: sha256, sha256: 62c7b1a618a6505c3c56f584f4b4bec0cfa38de02a39897e4120d9dcb172d86a}
+  access: {mode: read_only, method: file, network_required: false, secrets_required: false}
+  relations: [{relation_type: governed_by, target_asset_id: CTRL-FACTORY-REMOTE-OPERATIONS-001}]
+  consumers: [FACTORY-001, GOAL-OWNER]
+  evidence: []
+  search_terms: [FACTORY, REMOTE_OPS, HEALTH, BACKUP, ALERT]
+  classification: {contains_secrets: false, contains_raw_data: false, sensitivity: INTERNAL_NON_SECRET}
+- asset_id: SCRIPT-FACTORY-REMOTE-DOCTOR-001
+  record_version: '1.0'
+  asset_type: script
+  purpose: Agent-readable JSON doctor for remote operations without printing secrets.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-08-22'
+  truth_owner: FACTORY_REMOTE_OPERATIONS_V1
+  location: {kind: git_path, logical_uri: 'repo://scripts/factory_remote_doctor.py', repository_path: scripts/factory_remote_doctor.py}
+  integrity: {kind: sha256, sha256: 75ed68adf1b6740220ea820c72c469098670f6a7a652a16fd79bbd6be2a889f1}
+  access: {mode: read_only, method: file, network_required: false, secrets_required: false}
+  relations: [{relation_type: depends_on, target_asset_id: MODULE-FACTORY-REMOTE-OPS-001}]
+  consumers: [FACTORY-001, GOAL-OWNER]
+  evidence: []
+  search_terms: [FACTORY, REMOTE_OPS, DOCTOR]
+  classification: {contains_secrets: false, contains_raw_data: false, sensitivity: INTERNAL_NON_SECRET}
+- asset_id: SCRIPT-FACTORY-REMOTE-INSTALL-001
+  record_version: '1.0'
+  asset_type: script
+  purpose: Dry-run installer that refuses live apply without the owner infrastructure packet.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-08-22'
+  truth_owner: FACTORY_REMOTE_OPERATIONS_V1
+  location: {kind: git_path, logical_uri: 'repo://scripts/factory_remote_install.py', repository_path: scripts/factory_remote_install.py}
+  integrity: {kind: sha256, sha256: b3a969c2c67150933228bd515fd0426526932e57de7d051ff43e48ed8e16337a}
+  access: {mode: read_only, method: file, network_required: false, secrets_required: false}
+  relations: [{relation_type: depends_on, target_asset_id: MODULE-FACTORY-REMOTE-OPS-001}]
+  consumers: [FACTORY-001, GOAL-OWNER]
+  evidence: []
+  search_terms: [FACTORY, REMOTE_OPS, INSTALL]
+  classification: {contains_secrets: false, contains_raw_data: false, sensitivity: INTERNAL_NON_SECRET}
+- asset_id: TEST-FACTORY-REMOTE-OPERATIONS-001
+  record_version: '1.0'
+  asset_type: script
+  purpose: Fail-closed tests for security baseline, independent backup restore, alert dedup and process-alive-is-not-healthy.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-08-22'
+  truth_owner: FACTORY_REMOTE_OPERATIONS_V1
+  location: {kind: git_path, logical_uri: 'repo://tests/test_factory_remote_operations.py', repository_path: tests/test_factory_remote_operations.py}
+  integrity: {kind: sha256, sha256: 8309e13f6e980b17e7e39fa67aa0662b4d3916dfe2badb1d70bfd724bf32eec3}
+  access: {mode: read_only, method: file, network_required: false, secrets_required: false}
+  relations:
+  - {relation_type: depends_on, target_asset_id: CONFIG-FACTORY-REMOTE-OPERATIONS-001}
+  - {relation_type: depends_on, target_asset_id: MODULE-FACTORY-REMOTE-OPS-001}
+  - {relation_type: depends_on, target_asset_id: EVIDENCE-FACTORY-REMOTE-OPERATIONS-RUNTIME-001}
+  consumers: [FACTORY-001, GOAL-OWNER]
+  evidence: []
+  search_terms: [FACTORY, REMOTE_OPS, TEST]
+  classification: {contains_secrets: false, contains_raw_data: false, sensitivity: INTERNAL_NON_SECRET}
+- asset_id: EVIDENCE-FACTORY-REMOTE-OPERATIONS-RUNTIME-001
+  record_version: '1.0'
+  asset_type: evidence
+  purpose: Offline runtime receipt that Git-side remote operations proved independent backup and security templates without a VPS purchase.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-08-22'
+  truth_owner: FACTORY_REMOTE_OPERATIONS_V1
+  location: {kind: git_path, logical_uri: 'repo://docs/evidence/factory_remote_operations/a3_runtime_receipt_v1.json', repository_path: docs/evidence/factory_remote_operations/a3_runtime_receipt_v1.json}
+  integrity: {kind: sha256, sha256: 72951bc40c631b1189e442bcd52beb88157a17121f74d9ab1270675b41a22893}
+  access: {mode: read_only, method: file, network_required: false, secrets_required: false}
+  relations: [{relation_type: derived_from, target_asset_id: CTRL-FACTORY-REMOTE-OPERATIONS-001}]
+  consumers: [FACTORY-001, GOAL-OWNER]
+  evidence: []
+  search_terms: [FACTORY, REMOTE_OPS, RUNTIME]
+  classification: {contains_secrets: false, contains_raw_data: false, sensitivity: INTERNAL_NON_SECRET}
+- asset_id: EVIDENCE-FACTORY-REMOTE-OPERATIONS-ACCEPTANCE-001
+  record_version: '1.0'
+  asset_type: evidence
+  purpose: Acceptance that FACTORY_REMOTE_OPERATIONS_GIT_READY with live host still OWNER_EXTERNAL_GATE.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-08-22'
+  truth_owner: FACTORY_REMOTE_OPERATIONS_V1
+  location: {kind: git_path, logical_uri: 'repo://docs/evidence/factory_remote_operations/a3_acceptance_v1.json', repository_path: docs/evidence/factory_remote_operations/a3_acceptance_v1.json}
+  integrity: {kind: sha256, sha256: 26e742d50ba3b8453e7ee9f1cc88de60b8a4c8df1f2fc962a9dc8d20563c510f}
+  access: {mode: read_only, method: file, network_required: false, secrets_required: false}
+  relations: [{relation_type: derived_from, target_asset_id: EVIDENCE-FACTORY-REMOTE-OPERATIONS-RUNTIME-001}]
+  consumers: [FACTORY-001, GOAL-OWNER]
+  evidence: []
+  search_terms: [FACTORY, REMOTE_OPS, ACCEPTANCE]
+  classification: {contains_secrets: false, contains_raw_data: false, sensitivity: INTERNAL_NON_SECRET}
+- asset_id: REPORT-FACTORY-REMOTE-OPERATIONS-001
+  record_version: '1.0'
+  asset_type: control_document
+  purpose: Russian owner readout of Git-side remote operations and the one infrastructure packet.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-08-22'
+  truth_owner: FACTORY_REMOTE_OPERATIONS_V1
+  location: {kind: git_path, logical_uri: 'repo://docs/reports/factory_remote_operations/a3_owner_readout_v1.md', repository_path: docs/reports/factory_remote_operations/a3_owner_readout_v1.md}
+  integrity: {kind: sha256, sha256: 28f8691e4e1f382cef001d9c131c0bb0dd9811e0e9edfc5bbae2946d2c597a1f}
+  access: {mode: read_only, method: file, network_required: false, secrets_required: false}
+  relations: [{relation_type: derived_from, target_asset_id: EVIDENCE-FACTORY-REMOTE-OPERATIONS-ACCEPTANCE-001}]
+  consumers: [FACTORY-001, GOAL-OWNER]
+  evidence: []
+  search_terms: [FACTORY, REMOTE_OPS, OWNER_READOUT]
+  classification: {contains_secrets: false, contains_raw_data: false, sensitivity: INTERNAL_NON_SECRET}

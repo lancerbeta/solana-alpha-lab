@@ -1,0 +1,228 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://smial.local/schemas/factory_remote_operations.schema.json",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema",
+    "schema_version",
+    "contract_id",
+    "atom_id",
+    "as_of",
+    "mode",
+    "implementation",
+    "target",
+    "deploy",
+    "workbench",
+    "stores",
+    "backup",
+    "monitoring",
+    "alert",
+    "security",
+    "units",
+    "health",
+    "authority"
+  ],
+  "properties": {
+    "schema": {"const": "smial.factory-remote-operations"},
+    "schema_version": {"const": "1.0"},
+    "contract_id": {"const": "FACTORY-REMOTE-OPERATIONS-001"},
+    "atom_id": {"const": "FACTORY_REMOTE_OPERATIONS_V1"},
+    "as_of": {"type": "string", "pattern": "^20[0-9]{2}-[0-9]{2}-[0-9]{2}$"},
+    "mode": {"const": "DIRECT_CURSOR_DELIVERY"},
+    "implementation": {"const": "GIT_SIDE_REMOTE_OPS_PROOF"},
+    "target": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "kind",
+        "provider",
+        "sku",
+        "rejected_sku",
+        "vcpu",
+        "ram_gb",
+        "ram_scale_target_gb",
+        "storage_gb",
+        "storage_scale_target_gb",
+        "os",
+        "location_preference",
+        "payment",
+        "purchase",
+        "plan_url"
+      ],
+      "properties": {
+        "kind": {"const": "ONE_ORDINARY_SUPPORTED_LINUX_VPS"},
+        "provider": {"const": "CHERRY_SERVERS"},
+        "sku": {"const": "CLOUD_VPS_4_GEN2"},
+        "rejected_sku": {"const": "CLOUD_VPS_1_GEN2"},
+        "vcpu": {"const": 4},
+        "ram_gb": {"const": 4},
+        "ram_scale_target_gb": {"const": 6},
+        "storage_gb": {"const": 80},
+        "storage_scale_target_gb": {"const": 100},
+        "os": {"const": "ubuntu-24.04"},
+        "location_preference": {"const": "EU"},
+        "payment": {"const": "CRYPTO_DOCUMENTED"},
+        "purchase": {"const": "OWNER_EXTERNAL_GATE"},
+        "plan_url": {
+          "const": "https://www.cherryservers.com/pricing/virtual-servers/b2-4-4gb-80s-shared"
+        }
+      }
+    },
+    "deploy": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["pin_kind", "version", "previous_version", "rpo_max", "rto_max"],
+      "properties": {
+        "pin_kind": {"const": "GIT_SHA"},
+        "version": {"type": "string", "minLength": 8, "maxLength": 64},
+        "previous_version": {"type": "string", "minLength": 8, "maxLength": 64},
+        "rpo_max": {"const": "24h"},
+        "rto_max": {"const": "12h"}
+      }
+    },
+    "workbench": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["bind", "port", "access"],
+      "properties": {
+        "bind": {"const": "127.0.0.1"},
+        "port": {"const": 8765},
+        "access": {"const": "SSH_TUNNEL_ONLY"}
+      }
+    },
+    "stores": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["kind", "operational_relative", "paper_relative", "owns_scientific_truth"],
+      "properties": {
+        "kind": {"const": "SQLITE"},
+        "operational_relative": {"type": "string", "minLength": 8},
+        "paper_relative": {"type": "string", "minLength": 8},
+        "owns_scientific_truth": {"const": false}
+      }
+    },
+    "backup": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "kind",
+        "independent_sink_relative",
+        "source_relative_paths",
+        "same_parent_forbidden",
+        "google_drive_role"
+      ],
+      "properties": {
+        "kind": {"const": "CONTENT_ADDRESSED_BUNDLE"},
+        "independent_sink_relative": {"type": "string", "minLength": 8},
+        "source_relative_paths": {
+          "type": "array",
+          "minItems": 2,
+          "uniqueItems": true,
+          "items": {"type": "string", "minLength": 8}
+        },
+        "same_parent_forbidden": {"const": true},
+        "google_drive_role": {"const": "OPTIONAL_COLD_COPY_NOT_DOD"}
+      }
+    },
+    "monitoring": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "freshness_max_seconds",
+        "stall_max_seconds",
+        "disk_used_percent_max",
+        "heartbeat_relative"
+      ],
+      "properties": {
+        "freshness_max_seconds": {"type": "integer", "minimum": 60, "maximum": 86400},
+        "stall_max_seconds": {"type": "integer", "minimum": 60, "maximum": 86400},
+        "disk_used_percent_max": {"type": "integer", "minimum": 50, "maximum": 95},
+        "heartbeat_relative": {"type": "string", "minLength": 8}
+      }
+    },
+    "alert": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["sink", "token_env", "chat_id_env", "dedup"],
+      "properties": {
+        "sink": {"const": "TELEGRAM_BOT_API"},
+        "token_env": {"const": "FACTORY_TELEGRAM_BOT_TOKEN"},
+        "chat_id_env": {"const": "FACTORY_TELEGRAM_CHAT_ID"},
+        "dedup": {"const": true}
+      }
+    },
+    "security": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "sshd_relative",
+        "nftables_relative",
+        "fail2ban_relative",
+        "secrets_example_relative",
+        "password_ssh",
+        "permit_root_login",
+        "public_admin"
+      ],
+      "properties": {
+        "sshd_relative": {"type": "string", "minLength": 8},
+        "nftables_relative": {"type": "string", "minLength": 8},
+        "fail2ban_relative": {"type": "string", "minLength": 8},
+        "secrets_example_relative": {"type": "string", "minLength": 8},
+        "password_ssh": {"const": false},
+        "permit_root_login": {"const": false},
+        "public_admin": {"const": false}
+      }
+    },
+    "units": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "workbench_relative",
+        "health_relative",
+        "backup_service_relative",
+        "backup_timer_relative",
+        "paper_heartbeat_relative"
+      ],
+      "properties": {
+        "workbench_relative": {"type": "string", "minLength": 8},
+        "health_relative": {"type": "string", "minLength": 8},
+        "backup_service_relative": {"type": "string", "minLength": 8},
+        "backup_timer_relative": {"type": "string", "minLength": 8},
+        "paper_heartbeat_relative": {"type": "string", "minLength": 8}
+      }
+    },
+    "health": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "process_alive_alone_is_not_healthy",
+        "healthy_verdict_forbidden",
+        "backup_status_when_unproved"
+      ],
+      "properties": {
+        "process_alive_alone_is_not_healthy": {"const": true},
+        "healthy_verdict_forbidden": {"const": true},
+        "backup_status_when_unproved": {"const": "EXPLICIT_UNKNOWN"}
+      }
+    },
+    "authority": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "provider_calls",
+        "credentials",
+        "deployment",
+        "cash_spend",
+        "wallet_signer_transaction"
+      ],
+      "properties": {
+        "provider_calls": {"const": false},
+        "credentials": {"const": false},
+        "deployment": {"const": false},
+        "cash_spend": {"const": false},
+        "wallet_signer_transaction": {"const": false}
+      }
+    }
+  }
+}
