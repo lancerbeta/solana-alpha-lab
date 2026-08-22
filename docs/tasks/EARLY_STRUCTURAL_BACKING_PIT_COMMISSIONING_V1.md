@@ -87,11 +87,11 @@ context_requirements:
     ARCHITECTURE_DECISIONS:
     - docs/architecture/intents/ARCH-INTENT-005-factory-v1-operational-readiness-and-owner-experience.md
     DELIVERY_EVIDENCE:
-    - docs/evidence/ordinary_market_pit_offline_xy_association/a1_acceptance_v1.json
     - docs/evidence/early_structural_backing_pit_commissioning/a1_delivery_completion_evidence_v1.json
     - docs/evidence/early_structural_backing_pit_commissioning/a1_delivery_independent_review_v1.json
     - docs/evidence/early_structural_backing_pit_commissioning/a1_delivery_factory_fit_v1.json
-    HISTORICAL_CONTEXT: []
+    HISTORICAL_CONTEXT:
+    - docs/evidence/ordinary_market_pit_offline_xy_association/a1_acceptance_v1.json
 ---
 
 # EARLY_STRUCTURAL_BACKING_PIT_COMMISSIONING_V1

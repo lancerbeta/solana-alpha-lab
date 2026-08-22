@@ -29952,7 +29952,7 @@ records:
   as_of: '2026-08-22'
   truth_owner: EARLY_STRUCTURAL_BACKING_PIT_COMMISSIONING_V1
   location: {kind: git_path, logical_uri: 'repo://docs/tasks/EARLY_STRUCTURAL_BACKING_PIT_COMMISSIONING_V1.md', repository_path: docs/tasks/EARLY_STRUCTURAL_BACKING_PIT_COMMISSIONING_V1.md}
-  integrity: {kind: sha256, sha256: dc22e0b5f0f257f9e8d6b9ff739bce4085e07598d4f1fe62d0a0febe1e337fca}
+  integrity: {kind: sha256, sha256: 09204fc043bb6df5f01ee44c257ef7b8a62c0885a5a4563b5d3d29e057cb77d9}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: contains, target_asset_id: CONFIG-EARLY-STRUCTURAL-BACKING-PIT-COMMISSIONING-001}
