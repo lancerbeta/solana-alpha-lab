@@ -21,6 +21,8 @@ from solana_alpha_lab.factory.remote_ops import (
     RemoteOpsError,
     doctor_packet,
     emit_alert,
+    emit_health_alert,
+    format_alert,
     load_config,
     package_backup,
     project_health,
@@ -107,6 +109,9 @@ class FactoryRemoteOperationsTests(unittest.TestCase):
         self.assertFalse(security["permit_root_login"])
         self.assertFalse(security["public_admin"])
         self.assertTrue(security["fail2ban"])
+        sshd = (ROOT / "configs/factory_remote_ops/sshd_factory.conf").read_text(encoding="utf-8")
+        self.assertIn("AllowUsers factory", sshd)
+        self.assertIn("PermitRootLogin no", sshd)
         unit = (ROOT / "configs/factory_v1_linux_runtime/factory-v1-workbench.service").read_text(
             encoding="utf-8"
         )
@@ -232,10 +237,83 @@ class FactoryRemoteOperationsTests(unittest.TestCase):
             self.assertFalse(second["delivered"])
             self.assertTrue(second["deduped"])
             self.assertEqual(len(sent), 1)
-            self.assertIn("WHAT:", sent[0])
-            self.assertIn("WHY IT MATTERS:", sent[0])
-            self.assertIn("CURRENT SAFE STATE:", sent[0])
-            self.assertIn("REQUIRED ACTION:", sent[0])
+            self.assertIn("🛠️", sent[0])
+            self.assertIn("🔵", sent[0])
+            self.assertIn("📈", sent[0])
+            self.assertIn("<b>FACTORY</b>", sent[0])
+            self.assertIn("<code>OPS</code>", sent[0])
+            self.assertIn("<b>ЧТО</b>", sent[0])
+            self.assertIn("<b>ПОЧЕМУ ЭТО ВАЖНО</b>", sent[0])
+            self.assertIn("<b>СЕЙЧАС БЕЗОПАСНО</b>", sent[0])
+            self.assertIn("<b>ЧТО СДЕЛАТЬ</b>", sent[0])
+            self.assertIn("<b>ТОРГОВЛЯ</b>", sent[0])
+            self.assertIn("<b>ХОСТ</b>", sent[0])
+            self.assertIn("Напишите агенту: процесс Factory упал", sent[0])
+            self.assertIn("SSH tunnel", sent[0])
+            self.assertIn("<code>127.0.0.1:8765</code>", sent[0])
+            self.assertNotIn("WHAT:", sent[0])
+            trade = format_alert(
+                what="x",
+                why_it_matters="y",
+                current_safe_state="z",
+                required_action="a",
+                kind="TRADE",
+            )
+            security = format_alert(
+                what="x",
+                why_it_matters="y",
+                current_safe_state="z",
+                required_action="a",
+                kind="SECURITY",
+            )
+            self.assertIn("🟢", trade)
+            self.assertIn("📈", trade)
+            self.assertIn("<code>TRADE</code>", trade)
+            self.assertIn("ожидание контура", trade)
+            mocked = format_alert(
+                what="Paper-бот закрыл смоделированную позицию",
+                why_it_matters="Так будет выглядеть рутина гипотезы, пока нет live",
+                current_safe_state="NO_NEW_ENTRIES",
+                required_action="Ничего, это эмуляция",
+                kind="TRADE",
+                trade={
+                    "emulation": True,
+                    "action": "позиция закрыта",
+                    "bot": "paper-h900-01",
+                    "hypothesis": "H900-MOCK",
+                    "ticker": "$PEPEMOCK",
+                    "mint_short": "Paper1111…mock",
+                    "side": "long",
+                    "notional_usd": "$18.50",
+                    "pnl_usd": "+$0.74",
+                    "horizon": "H900",
+                    "state": "RECONCILED",
+                },
+            )
+            self.assertIn("ЭМУЛЯЦИЯ", mocked)
+            self.assertIn("$PEPEMOCK", mocked)
+            self.assertIn("paper-h900-01", mocked)
+            self.assertIn("не деньги", mocked)
+            with self.assertRaisesRegex(RemoteOpsError, "TRADE_BLOCK_REQUIRES_EMULATION"):
+                format_alert(
+                    what="x",
+                    why_it_matters="y",
+                    current_safe_state="z",
+                    required_action="a",
+                    kind="TRADE",
+                    trade={"emulation": False, "ticker": "$X"},
+                )
+            self.assertIn("🔴", security)
+            self.assertIn("🛡️", security)
+            self.assertIn("<code>SEC</code>", security)
+            with self.assertRaisesRegex(RemoteOpsError, "ALERT_KIND_INVALID"):
+                format_alert(
+                    what="x",
+                    why_it_matters="y",
+                    current_safe_state="z",
+                    required_action="a",
+                    kind="NEWS",
+                )
             with self.assertRaisesRegex(RemoteOpsError, "SECRET_MISSING"):
                 emit_alert(
                     config=config,
@@ -263,6 +341,113 @@ class FactoryRemoteOperationsTests(unittest.TestCase):
             proved = prove_git_side(root, isolated_sink=Path(tmp) / "sink")
             self.assertEqual(proved["terminal"], "FACTORY_REMOTE_OPERATIONS_GIT_READY")
             self.assertEqual(proved["purchase"], "OWNER_EXTERNAL_GATE")
+
+    def test_bot_stall_when_progress_stale_heartbeat_fresh(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            root = _copy_tree(Path(tmp) / "src")
+            _seed_stores(root)
+            write_heartbeat(root)
+            package_backup(root)
+            path = root / load_config(root)["monitoring"]["heartbeat_relative"]
+            payload = json.loads(path.read_text(encoding="utf-8"))
+            payload["progress_at"] = (datetime.now(UTC) - timedelta(hours=2)).isoformat().replace(
+                "+00:00", "Z"
+            )
+            path.write_text(json.dumps(payload), encoding="utf-8")
+            health = project_health(root=root, process_alive=True)
+            self.assertEqual(health["dimensions"]["data_freshness"], "OK")
+            self.assertEqual(health["verdict"], "DEGRADED_BOT_STALL")
+
+    def test_unreadable_paper_store_is_dirty(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            root = _copy_tree(Path(tmp) / "src")
+            _seed_stores(root)
+            write_heartbeat(root)
+            paper = root / load_config(root)["stores"]["paper_relative"]
+            paper.write_bytes(b"not-a-sqlite-database")
+            health = project_health(root=root, process_alive=True)
+            self.assertEqual(health["paper"]["store"], "UNREADABLE")
+            self.assertEqual(health["verdict"], "UNHEALTHY_UNRESOLVED_POSITION")
+
+    def test_backup_sink_env_absolute_and_rejects_store_parent(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            root = _copy_tree(Path(tmp) / "src")
+            _seed_stores(root)
+            sink = Path(tmp) / "volume-sink"
+            packed = package_backup(
+                root,
+                environ={"FACTORY_BACKUP_SINK": str(sink)},
+            )
+            self.assertTrue((sink / packed["bundle"]).is_file())
+            health = project_health(
+                root=root,
+                process_alive=True,
+                environ={"FACTORY_BACKUP_SINK": str(sink)},
+            )
+            self.assertEqual(health["backup_domain"], "ABSOLUTE_SINK_SAME_VOLUME")
+            with self.assertRaisesRegex(RemoteOpsError, "BACKUP_SINK_NOT_INDEPENDENT"):
+                package_backup(
+                    root,
+                    environ={"FACTORY_BACKUP_SINK": str(root / "local/factory_v1")},
+                )
+            with self.assertRaisesRegex(RemoteOpsError, "BACKUP_SINK_ENV_NOT_ABSOLUTE"):
+                package_backup(root, environ={"FACTORY_BACKUP_SINK": "relative/sink"})
+
+    def test_health_alert_emits_once_from_packet(self) -> None:
+        config = load_config(ROOT)
+        with tempfile.TemporaryDirectory() as tmp:
+            root = _copy_tree(Path(tmp) / "src")
+            _seed_stores(root)
+            store = Path(tmp) / "alerts.json"
+            sent: list[str] = []
+
+            def transport(token: str, body: str) -> None:
+                sent.append(body)
+
+            packet = {
+                "verdict": "UNHEALTHY_NOT_RUNNING",
+                "alert_configured": True,
+                "next_safe_action": "START_REMOTE_PROCESSES",
+            }
+            env = {
+                "FACTORY_TELEGRAM_BOT_TOKEN": "placeholder-token",
+                "FACTORY_TELEGRAM_CHAT_ID": "1",
+            }
+            first = emit_health_alert(
+                root=root,
+                packet=packet,
+                config=config,
+                store=store,
+                environ=env,
+                transport=transport,
+            )
+            second = emit_health_alert(
+                root=root,
+                packet=packet,
+                config=config,
+                store=store,
+                environ=env,
+                transport=transport,
+            )
+            self.assertTrue(first["delivered"])
+            self.assertTrue(second["deduped"])
+            self.assertEqual(len(sent), 1)
+            self.assertNotIn("text", first)
+            skip = emit_health_alert(
+                root=root,
+                packet={"verdict": "RUNTIME_PROVED_BACKUP_INDEPENDENT", "alert_configured": True},
+                config=config,
+                store=store,
+                environ=env,
+                transport=transport,
+            )
+            self.assertEqual(skip["skipped"], "NO_INCIDENT")
+
+    def test_doctor_cli_does_not_force_process_alive(self) -> None:
+        source = (ROOT / "scripts/factory_remote_doctor.py").read_text(encoding="utf-8")
+        self.assertNotIn("default=True", source)
+        self.assertIn("observe_workbench_alive", source)
+        self.assertIn("emit_health_alert", source)
 
     def test_install_apply_refuses_without_owner_packet(self) -> None:
         completed = subprocess.run(

@@ -618,6 +618,11 @@
       "target_asset_id": "CTRL-QUOTE-SURFACE-RETENTION-FALSIFIER-001"
     },
     {
+      "source_asset_id": "CONFIG-FACTORY-REMOTE-HOST-LOCATOR-001",
+      "relation": "governed_by",
+      "target_asset_id": "CTRL-FACTORY-REMOTE-OPERATIONS-001"
+    },
+    {
       "source_asset_id": "CONFIG-FACTORY-REMOTE-OPERATIONS-001",
       "relation": "depends_on",
       "target_asset_id": "SCHEMA-FACTORY-REMOTE-OPERATIONS-001"
@@ -2215,7 +2220,17 @@
     {
       "source_asset_id": "CTRL-FACTORY-REMOTE-OPERATIONS-001",
       "relation": "contains",
+      "target_asset_id": "CONFIG-FACTORY-REMOTE-HOST-LOCATOR-001"
+    },
+    {
+      "source_asset_id": "CTRL-FACTORY-REMOTE-OPERATIONS-001",
+      "relation": "contains",
       "target_asset_id": "CONFIG-FACTORY-REMOTE-OPERATIONS-001"
+    },
+    {
+      "source_asset_id": "CTRL-FACTORY-REMOTE-OPERATIONS-001",
+      "relation": "contains",
+      "target_asset_id": "DOC-FACTORY-REMOTE-HOST-001"
     },
     {
       "source_asset_id": "CTRL-FACTORY-REMOTE-OPERATIONS-001",
@@ -3626,6 +3641,11 @@
       "source_asset_id": "DOC-CANARY-SPECIFICATION-ONLY-001",
       "relation": "derived_from",
       "target_asset_id": "EVIDENCE-OWNER-AUTHORITY-PACKET-A2-001"
+    },
+    {
+      "source_asset_id": "DOC-FACTORY-REMOTE-HOST-001",
+      "relation": "governed_by",
+      "target_asset_id": "CTRL-FACTORY-REMOTE-OPERATIONS-001"
     },
     {
       "source_asset_id": "DOC-OWNER-AUTHORITY-PACKET-001",

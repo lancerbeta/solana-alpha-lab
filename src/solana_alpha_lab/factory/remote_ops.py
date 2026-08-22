@@ -7,6 +7,7 @@ HEALTHY. Backup on the same parent as live stores is not independent.
 from __future__ import annotations
 
 import hashlib
+import html
 import io
 import json
 import os
@@ -30,6 +31,7 @@ UNRESOLVED_STATES = frozenset(
     {"OPEN", "PARTIAL", "UNKNOWN", "UNRESOLVED", "EXIT_REQUIRED", "EXITING"}
 )
 TELEGRAM_API = "https://api.telegram.org/bot{token}/sendMessage"
+BACKUP_SINK_ENV = "FACTORY_BACKUP_SINK"
 
 
 class RemoteOpsError(ValueError):
@@ -104,6 +106,8 @@ def verify_security_templates(root: Path, config: Mapping[str, Any] | None = Non
         failures.append("PASSWORD_SSH_NOT_DENIED")
     if "PermitRootLogin no" not in sshd:
         failures.append("ROOT_LOGIN_NOT_DENIED")
+    if "AllowUsers factory" not in sshd:
+        failures.append("SSH_USER_NOT_FACTORY_ONLY")
     if "PasswordAuthentication yes" in sshd or "PermitRootLogin yes" in sshd:
         failures.append("INSECURE_SSH_AFFIRMATIVE")
     if "policy drop" not in nft:
@@ -180,7 +184,7 @@ def _paper_unresolved(root: Path, paper_relative: str) -> dict[str, Any]:
         ).fetchone()[0]
         bots = conn.execute("SELECT COUNT(*) FROM bot_instances").fetchone()[0]
     except sqlite3.Error:
-        return {"present": True, "unresolved": 0, "total": 0, "bots": 0, "store": "UNREADABLE"}
+        return {"present": True, "unresolved": 1, "total": 0, "bots": 0, "store": "UNREADABLE"}
     finally:
         conn.close()
     return {"present": True, "unresolved": int(unresolved), "total": int(total), "bots": int(bots)}
@@ -195,6 +199,48 @@ def _heartbeat(root: Path, relative: str) -> dict[str, Any] | None:
     except (OSError, json.JSONDecodeError):
         return None
     return payload if isinstance(payload, dict) else None
+
+
+def _volume_id(path: Path) -> int | None:
+    try:
+        target = path if path.exists() else path.parent
+        return int(target.stat().st_dev)
+    except OSError:
+        return None
+
+
+def backup_domain_for(
+    root: Path,
+    loaded: Mapping[str, Any],
+    sink: Path,
+    environ: Mapping[str, str],
+) -> str:
+    named = str(environ.get(BACKUP_SINK_ENV) or "").strip()
+    if not named:
+        return "PARENT_INDEPENDENT_GIT_SIDE"
+    live = _safe_relative(root, str(loaded["stores"]["operational_relative"])).parent
+    live_dev = _volume_id(live)
+    sink_dev = _volume_id(sink)
+    if live_dev is None or sink_dev is None:
+        return "ABSOLUTE_SINK_DEVICE_UNKNOWN"
+    if live_dev == sink_dev:
+        return "ABSOLUTE_SINK_SAME_VOLUME"
+    return "VOLUME_INDEPENDENT_ENV_SINK"
+
+
+def resolve_backup_sink(
+    root: Path,
+    loaded: Mapping[str, Any],
+    environ: Mapping[str, str] | None = None,
+) -> Path:
+    env = environ if environ is not None else os.environ
+    named = str(env.get(BACKUP_SINK_ENV) or "").strip()
+    if named:
+        sink = Path(named)
+        if sink.is_absolute() is False:
+            raise RemoteOpsError("BACKUP_SINK_ENV_NOT_ABSOLUTE")
+        return sink.resolve()
+    return _safe_relative(root, str(loaded["backup"]["independent_sink_relative"]))
 
 
 def _backup_newest(sink: Path) -> dict[str, Any] | None:
@@ -224,20 +270,23 @@ def project_health(
 ) -> dict[str, Any]:
     loaded = dict(config) if config is not None else load_config(root)
     clock = now or datetime.now(UTC)
+    env = environ if environ is not None else os.environ
     security = verify_security_templates(root, loaded)
     heartbeat = _heartbeat(root, str(loaded["monitoring"]["heartbeat_relative"]))
     heartbeat_at = str(heartbeat.get("observed_at") or "") if heartbeat else ""
+    progress_at = str(heartbeat.get("progress_at") or heartbeat_at) if heartbeat else ""
     freshness_age = _age_seconds(heartbeat_at, clock)
+    stall_age = _age_seconds(progress_at, clock)
     paper = _paper_unresolved(root, str(loaded["stores"]["paper_relative"]))
-    sink = _safe_relative(root, str(loaded["backup"]["independent_sink_relative"]))
+    sink = resolve_backup_sink(root, loaded, env)
     backup = _backup_newest(sink)
     backup_age = _age_seconds(str(backup["mtime"]) if backup else None, clock)
     disk = _disk_used_percent(root)
-    env = environ if environ is not None else os.environ
     alert_configured = bool(
         env.get(str(loaded["alert"]["token_env"]), "").strip()
         and env.get(str(loaded["alert"]["chat_id_env"]), "").strip()
     )
+    domain = backup_domain_for(root, loaded, sink, env)
     dimensions = {
         "process": "ALIVE" if process_alive else "DOWN",
         "security": "PASS",
@@ -250,8 +299,8 @@ def project_health(
         "provider_route": "UNOBSERVED_GIT_SIDE",
         "job_bot_progress": (
             "OK"
-            if freshness_age is not None
-            and freshness_age <= int(loaded["monitoring"]["stall_max_seconds"])
+            if stall_age is not None
+            and stall_age <= int(loaded["monitoring"]["stall_max_seconds"])
             else "STALLED"
         ),
         "unresolved_position": "DIRTY" if int(paper.get("unresolved") or 0) > 0 else "CLEAN",
@@ -286,7 +335,11 @@ def project_health(
         next_safe_action = "FREE_DISK_OR_SCALE_STORAGE"
     elif process_alive and dimensions["backup_age"] == "OK" and dimensions["data_freshness"] == "OK":
         verdict = "RUNTIME_PROVED_BACKUP_INDEPENDENT"
-        next_safe_action = "OWNER_INFRASTRUCTURE_PACKET_THEN_LIVE_HOST"
+        next_safe_action = (
+            "CONTINUE_UNATTENDED_AGENT_RESTORES"
+            if alert_configured
+            else "OWNER_INFRASTRUCTURE_PACKET_THEN_LIVE_HOST"
+        )
     else:
         verdict = "DEGRADED_PROCESS_ALIVE_BACKUP_UNKNOWN"
         next_safe_action = "COMPLETE_REMOTE_OPS_PROOFS"
@@ -319,6 +372,8 @@ def project_health(
         "backup": backup,
         "disk_used_percent": disk,
         "heartbeat_age_seconds": freshness_age,
+        "stall_age_seconds": stall_age,
+        "backup_domain": domain,
         "alert_configured": alert_configured,
         "next_safe_action": next_safe_action,
         "rpo_max": loaded["deploy"]["rpo_max"],
@@ -331,9 +386,11 @@ def write_heartbeat(root: Path, *, config: Mapping[str, Any] | None = None) -> P
     loaded = dict(config) if config is not None else load_config(root)
     path = _safe_relative(root, str(loaded["monitoring"]["heartbeat_relative"]))
     path.parent.mkdir(parents=True, exist_ok=True)
+    stamp = _now()
     payload = {
         "kind": "PAPER_HEARTBEAT",
-        "observed_at": _now(),
+        "observed_at": stamp,
+        "progress_at": stamp,
         "deploy_version": loaded["deploy"]["version"],
     }
     path.write_text(json.dumps(payload, indent=2, sort_keys=True) + "\n", encoding="utf-8")
@@ -362,10 +419,13 @@ def package_backup(
     *,
     config: Mapping[str, Any] | None = None,
     sink_override: Path | None = None,
+    environ: Mapping[str, str] | None = None,
 ) -> dict[str, Any]:
     loaded = dict(config) if config is not None else load_config(root)
-    sink = sink_override.resolve() if sink_override is not None else _safe_relative(
-        root, str(loaded["backup"]["independent_sink_relative"])
+    sink = (
+        sink_override.resolve()
+        if sink_override is not None
+        else resolve_backup_sink(root, loaded, environ)
     )
     _assert_independent_sink(root, loaded, sink)
     sink.mkdir(parents=True, exist_ok=True)
@@ -434,18 +494,128 @@ def restore_backup_isolated(
     return {"restored": restored, "count": len(restored)}
 
 
+ALERT_CODE_RU = {
+    "START_REMOTE_PROCESSES": "Напишите агенту: процесс Factory упал. Сами не SSH и не Linux.",
+    "INSPECT_UNRESOLVED_POSITIONS": "Напишите агенту: есть незакрытая paper-позиция. SQLite не трогайте.",
+    "RUN_INDEPENDENT_BACKUP": "Напишите агенту: нужен независимый backup. Сами не копируйте файлы.",
+    "WRITE_PAPER_HEARTBEAT": "Напишите агенту: heartbeat paper устарел. Сами ничего не запускайте.",
+    "RESTART_PAPER_HEARTBEAT": "Напишите агенту: paper-бот не продвигается. Сами не systemctl.",
+    "FREE_DISK_OR_SCALE_STORAGE": "Напишите агенту: диск тесен. Сами не заходите на хост.",
+    "OWNER_INFRASTRUCTURE_PACKET_THEN_LIVE_HOST": "Пакет хоста уже выполнен. Дальше агент и Git merge, не Linux.",
+    "CONTINUE_UNATTENDED_AGENT_RESTORES": "Ничего не делать. Хост чинит агент.",
+    "COMPLETE_REMOTE_OPS_PROOFS": "Напишите агенту: remote-ops доказательства не закрыты.",
+    "NO_NEW_ENTRIES": "Новые входы не открывать. Это не команда зайти на сервер.",
+    "RUNTIME_PROVED_BACKUP_INDEPENDENT": "Backup parent-independent, runtime жив. Не operational-ready.",
+}
+
+
+ALERT_KINDS = frozenset({"OPS", "TRADE", "SECURITY"})
+ALERT_KIND_UI = {
+    "OPS": {
+        "mark": "OPS",
+        "ru": "эксплуатация",
+        "icon": "🛠️",
+        "swatch": "🔵",
+    },
+    "TRADE": {
+        "mark": "TRADE",
+        "ru": "торговля",
+        "icon": "📈",
+        "swatch": "🟢",
+    },
+    "SECURITY": {
+        "mark": "SEC",
+        "ru": "безопасность",
+        "icon": "🛡️",
+        "swatch": "🔴",
+    },
+}
+
+
+TRADE_BLOCK_KEYS = frozenset(
+    {
+        "emulation",
+        "action",
+        "bot",
+        "hypothesis",
+        "ticker",
+        "mint_short",
+        "side",
+        "notional_usd",
+        "pnl_usd",
+        "horizon",
+        "state",
+    }
+)
+
+
+def _format_trade_block(kind: str, trade: Mapping[str, Any] | None) -> str:
+    if trade is None:
+        if kind == "TRADE":
+            return "ожидание контура · нет live-сделок · не alpha"
+        return "нет live-сделок · блок зарезервирован · не alpha"
+    extra = set(trade) - TRADE_BLOCK_KEYS
+    if extra:
+        raise RemoteOpsError("TRADE_BLOCK_KEYS_UNKNOWN")
+    if trade.get("emulation") is not True:
+        raise RemoteOpsError("TRADE_BLOCK_REQUIRES_EMULATION")
+    lines = [
+        "<b>ЭМУЛЯЦИЯ</b> · paper/shadow · не live · не alpha · не деньги",
+        f"действие: {html.escape(str(trade.get('action') or '—'), quote=True)}",
+        f"бот: <code>{html.escape(str(trade.get('bot') or '—'), quote=True)}</code>",
+        f"гипотеза: <code>{html.escape(str(trade.get('hypothesis') or '—'), quote=True)}</code>",
+        f"тикер: <code>{html.escape(str(trade.get('ticker') or '—'), quote=True)}</code>",
+        f"mint: <code>{html.escape(str(trade.get('mint_short') or '—'), quote=True)}</code>",
+        f"сторона: {html.escape(str(trade.get('side') or '—'), quote=True)}",
+        f"размер: {html.escape(str(trade.get('notional_usd') or '—'), quote=True)}",
+        f"PnL paper: {html.escape(str(trade.get('pnl_usd') or '—'), quote=True)}",
+        f"горизонт: <code>{html.escape(str(trade.get('horizon') or '—'), quote=True)}</code>",
+        f"состояние: <code>{html.escape(str(trade.get('state') or '—'), quote=True)}</code>",
+    ]
+    return "\n".join(lines)
+
+
+def _alert_ru(value: str) -> str:
+    return ALERT_CODE_RU.get(value, value)
+
+
 def format_alert(
     *,
     what: str,
     why_it_matters: str,
     current_safe_state: str,
     required_action: str,
+    kind: str = "OPS",
+    host_label: str = "factory-remote-ops",
+    trade: Mapping[str, Any] | None = None,
 ) -> str:
+    if kind not in ALERT_KINDS:
+        raise RemoteOpsError("ALERT_KIND_INVALID")
+    ui = ALERT_KIND_UI[kind]
+    what_h = html.escape(_alert_ru(what), quote=True)
+    why_h = html.escape(_alert_ru(why_it_matters), quote=True)
+    safe_h = html.escape(_alert_ru(current_safe_state), quote=True)
+    action_h = html.escape(_alert_ru(required_action), quote=True)
+    host_h = html.escape(host_label, quote=True)
+    kind_h = html.escape(ui["mark"], quote=True)
+    kind_ru = html.escape(ui["ru"], quote=True)
+    swatch = ui["swatch"]
+    icon = ui["icon"]
+    trade_h = _format_trade_block(kind, trade)
     return (
-        f"WHAT: {what}\n"
-        f"WHY IT MATTERS: {why_it_matters}\n"
-        f"CURRENT SAFE STATE: {current_safe_state}\n"
-        f"REQUIRED ACTION: {required_action}"
+        f"{swatch} {icon} <b>FACTORY</b> · <code>{kind_h}</code> · {kind_ru}\n"
+        f"\n"
+        f"{swatch} <b>ЧТО</b>\n{what_h}\n"
+        f"\n"
+        f"{swatch} <b>ПОЧЕМУ ЭТО ВАЖНО</b>\n{why_h}\n"
+        f"\n"
+        f"{swatch} <b>СЕЙЧАС БЕЗОПАСНО</b>\n{safe_h}\n"
+        f"\n"
+        f"{swatch} <b>ЧТО СДЕЛАТЬ</b>\n{action_h}\n"
+        f"\n"
+        f"🟢 📈 <b>ТОРГОВЛЯ</b>\n{trade_h}\n"
+        f"\n"
+        f"⚪ 🖥️ <b>ХОСТ</b>\n<code>{host_h}</code> · Workbench только SSH tunnel · <code>127.0.0.1:8765</code>"
     )
 
 
@@ -460,6 +630,9 @@ def emit_alert(
     store: Path,
     environ: Mapping[str, str] | None = None,
     transport: Callable[[str, str], None] | None = None,
+    kind: str = "OPS",
+    host_label: str = "factory-remote-ops",
+    trade: Mapping[str, Any] | None = None,
 ) -> dict[str, Any]:
     if not incident_key or "/" in incident_key or ".." in incident_key:
         raise RemoteOpsError("INCIDENT_KEY_INVALID")
@@ -484,10 +657,20 @@ def emit_alert(
         why_it_matters=why_it_matters,
         current_safe_state=current_safe_state,
         required_action=required_action,
+        kind=kind,
+        host_label=host_label,
+        trade=trade,
     )
     if transport is None:
         url = TELEGRAM_API.format(token=token)
-        payload = urllib.parse.urlencode({"chat_id": chat_id, "text": body}).encode("utf-8")
+        payload = urllib.parse.urlencode(
+            {
+                "chat_id": chat_id,
+                "text": body,
+                "parse_mode": "HTML",
+                "disable_web_page_preview": "true",
+            }
+        ).encode("utf-8")
         request = urllib.request.Request(url, data=payload, method="POST")
         try:
             with urllib.request.urlopen(request, timeout=10) as response:
@@ -505,8 +688,42 @@ def emit_alert(
         "deduped": False,
         "incident_key": incident_key,
         "sent_count": len(sent),
+        "kind": kind,
         "text": body,
     }
+
+
+def emit_health_alert(
+    *,
+    root: Path,
+    packet: Mapping[str, Any],
+    config: Mapping[str, Any],
+    store: Path | None = None,
+    environ: Mapping[str, str] | None = None,
+    transport: Callable[[str, str], None] | None = None,
+) -> dict[str, Any]:
+    if packet.get("verdict") == "RUNTIME_PROVED_BACKUP_INDEPENDENT":
+        return {"delivered": False, "skipped": "NO_INCIDENT"}
+    if packet.get("alert_configured") is not True:
+        return {"delivered": False, "skipped": "ALERT_SINK_UNCONFIGURED"}
+    incident_key = str(packet.get("verdict") or "")
+    if not incident_key:
+        raise RemoteOpsError("INCIDENT_KEY_INVALID")
+    path = store if store is not None else root / "local/factory_v1/alert_dedup.json"
+    result = emit_alert(
+        config=config,
+        incident_key=incident_key,
+        what=incident_key,
+        why_it_matters=incident_key,
+        current_safe_state="NO_NEW_ENTRIES",
+        required_action=str(packet.get("next_safe_action") or "COMPLETE_REMOTE_OPS_PROOFS"),
+        store=path,
+        environ=environ,
+        transport=transport,
+        kind="OPS",
+    )
+    result.pop("text", None)
+    return result
 
 
 def doctor_packet(

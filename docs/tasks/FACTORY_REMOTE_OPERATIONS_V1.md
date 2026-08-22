@@ -42,6 +42,9 @@ managed_write_set:
   - docs/evidence/factory_remote_operations/a3_delivery_independent_review_v1.json
   - docs/evidence/factory_remote_operations/a3_delivery_factory_fit_v1.json
   - docs/reports/factory_remote_operations/a3_owner_readout_v1.md
+  - docs/operator/FACTORY_REMOTE_HOST.md
+  - docs/operator/factory_remote_host_v1.yaml
+  - .cursor/rules/50-factory-remote-host.mdc
 external_caps:
   network: false
   credentials: false
@@ -78,8 +81,9 @@ context_requirements:
     ARCHITECTURE_DECISIONS:
       - docs/architecture/intents/ARCH-INTENT-005-factory-v1-operational-readiness-and-owner-experience.md
     DELIVERY_EVIDENCE:
-      - docs/evidence/factory_v1_production_lite_runtime/a3_delivery_completion_evidence_v1.json
-      - docs/evidence/early_state_paper/a1_delivery_completion_evidence_v1.json
+      - docs/evidence/factory_remote_operations/a3_delivery_completion_evidence_v1.json
+      - docs/evidence/factory_remote_operations/a3_delivery_independent_review_v1.json
+      - docs/evidence/factory_remote_operations/a3_delivery_factory_fit_v1.json
     HISTORICAL_CONTEXT: []
 ---
 
@@ -187,9 +191,10 @@ admin surface is the Habr failure mode.
   operational-ready claim. After Git-side proofs, at exact-head CI for
   the merge phrase, unless the owner packet has already returned and
   live proof is in-scope for the same contract.
-- `NEXT:` owner completes the infrastructure packet; then live fault
-  injection on the real host. Atom 4 commissioning stays blocked on
-  remote ops being actually hosted.
+- `NEXT:` PR then exact-head CI then owner merge phrase. Atom 4
+  (`muv-5` second hypothesis / foundation freeze) only after `main`.
+  Volume-independent backup remains `FACTORY_BACKUP_SINK` on another
+  mount. Paper-engine systemd is not this atom.
 - `ADOPTION_ROUTE=ADOPT_SYSTEMD_SSHD_NFT_FAIL2BAN_WRAP_RUNTIME_BACKUP_TELEGRAM`
 - `REPLAN_TRIGGER:` second consecutive preparatory-only merge; cheapest
   falsifier cannot run; provider pivot away from Cherry after this
@@ -207,8 +212,9 @@ admin surface is the Habr failure mode.
    next_safe_action. Never HEALTHY from process_alive alone.
 4. Backup packager writes a content-addressed bundle to an independent
    sink; isolated restore matches hashes; same-parent sink is rejected.
-5. Alert emitter sends WHAT / WHY / SAFE STATE / ACTION once per
-   incident_key.
+5. Alert emitter sends a Russian owner body (ЧТО / ПОЧЕМУ ЭТО ВАЖНО /
+   СЕЙЧАС БЕЗОПАСНО / ЧТО СДЕЛАТЬ) once per incident_key. Code kwargs
+   stay English.
 6. Offline fault injection: kill process, stale heartbeat, stalled bot,
    restore, duplicate incident.
 7. Owner packet names the exact Cherry SKU, Ubuntu 24.04, SSH key-only,

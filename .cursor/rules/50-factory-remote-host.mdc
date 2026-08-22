@@ -1,0 +1,27 @@
+---
+description: Factory live VPS locator — SSH, doctor, secrets paths, no guessing
+globs: []
+alwaysApply: true
+---
+
+# Factory remote host
+
+Before any Factory VPS / Cherry / SSH / doctor / workbench / remote-ops
+action, read and obey:
+
+- `docs/operator/FACTORY_REMOTE_HOST.md`
+- `docs/operator/factory_remote_host_v1.yaml`
+
+Do not discover the host from chat recency, Issues, or branch names.
+Use the YAML IPv4, hostname `factory-remote-ops`, deploy root
+`/opt/solana-alpha-lab`, and SSH identity basename `id_ed25519_factory`.
+
+SSH user is `factory` only. Root SSH is denied. Workbench is
+`127.0.0.1:8765` via SSH tunnel only.
+
+Never read, print or commit `local/factory_remote_ops/secrets.env` or
+`/etc/solana-alpha-lab/secrets.env`. Never put tokens in receipts.
+
+Owner standing grant for `FACTORY_REMOTE_OPERATIONS_V1`: mutate this
+host without micro-approvals. Stop for wallet/signer/tx, a new provider,
+or a new atom.
