@@ -15,8 +15,8 @@
     "GOAL_DOD_CRITIC"
   ],
   "review_id": "FACTORY-REMOTE-OPERATIONS-INDEPENDENT-REVIEW-001",
-  "reviewed_bindings_sha256": "fbc9db0d4fbc62a651dcecae95337363a12c66bf49c21ce80f23ada13df9a558",
-  "reviewed_inventory_sha256": "c9afe42a4fef9be851db0b46b5759c39030cfc987fb0bda35681d3e099ac6578",
+  "reviewed_bindings_sha256": "b9db01140ae0a76150a7c53df238f2e132c835e8a5cf8099d9839ea7e1b0c45d",
+  "reviewed_inventory_sha256": "ba7754f14c30ed99a2770e90286b92cb7550ed337af4af8c2a13feaf80597eac",
   "reviews": [
     {
       "findings": [
