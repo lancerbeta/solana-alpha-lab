@@ -11,7 +11,11 @@
   "cloud_bundle_smoke_required": false,
   "capability_radar_now": "NONE",
   "implementation_bindings": {
-    "scripts/harness_sync.py": "0000000000000000000000000000000000000000000000000000000000000000"
+    "delivery-harness/harness.yaml": "82fc0c16053d1f3168e0f380684e742b3bf18e5e6eafb6fac21e522a4af86d9e",
+    "docs/agent/DELIVERY_HARNESS_PROTOCOL.md": "2551827de75f78197dd857d94b81014f74642dbc8906d095934caaf8fa672efd",
+    "docs/tasks/CTRL-HARNESS-SYNC-DELIVERY-EVIDENCE-BINDINGS-V1.md": "280244e1ef468c6590dcdf05ff57cb480cd3c3045dad0d908bbf601269fe75d9",
+    "scripts/harness_sync.py": "87c7560e02dd553da9456fa7bc3c6010be83977c6a38e8cc90b6d3d728a4d4f9",
+    "tests/test_harness_sync_bindings.py": "b3ad2daa51629404733b3f1a37d5fcd6fa173cf02d751251783933de3e29196a"
   },
   "active_stop_conditions": [],
   "owner_attention_triggers": {
@@ -23,14 +27,14 @@
   },
   "factory_fit": {
     "path": "docs/evidence/control/a1_harness_sync_delivery_evidence_bindings_factory_fit_v1.json",
-    "sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+    "sha256": "36ac04891b1f7cd36b8a689d0858dd141e0bf09b9c5da13649632fe821a6207b",
     "verdict": "PASS"
   },
   "validation": {
     "targeted": "PASS_HARNESS_SYNC_BINDINGS_TESTS",
     "independent_review": {
       "path": "docs/evidence/control/a1_harness_sync_delivery_evidence_bindings_review_v1.json",
-      "sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+      "sha256": "1286a3ac692b6e9a75ac9017c58f8da7a2710bc40fcdc48be10f38177909af5f",
       "verdict": "PASS"
     },
     "full_gate": "ENFORCED_BY_PROJECT_BOUND_VALIDATION",
