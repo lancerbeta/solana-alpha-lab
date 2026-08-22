@@ -5,7 +5,7 @@
   "as_of": "2026-08-22",
   "task_id": "ARCH_INTENT_006_HYPOTHESIS_DISCOVERY_SURFACE_V1",
   "reviewed_bindings_sha256": "72dd91f23e9bf08c70c41682f054af94c171425d926fa33f7c9a454ecff36950",
-  "reviewed_inventory_sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+  "reviewed_inventory_sha256": "826fd9ef9d426de50c330bcedd6eb668da0c1ee16a6612e7cfd3dc81bab7f9bb",
   "required_roles": [
     "ARCHITECTURE_CRITIC",
     "CODE_REVIEWER",

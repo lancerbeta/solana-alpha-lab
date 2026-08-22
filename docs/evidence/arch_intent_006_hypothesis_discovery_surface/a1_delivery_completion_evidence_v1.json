@@ -33,14 +33,14 @@
   },
   "factory_fit": {
     "path": "docs/evidence/arch_intent_006_hypothesis_discovery_surface/a1_delivery_factory_fit_v1.json",
-    "sha256": "c5d489fd24994557a3fb46be34bbe2db138bb2c3d04411530dc897cce512f8f0",
+    "sha256": "ba2d95d349b2617edf50cf5f1242d3bfce4dab074c88a46375e3a59be55c3494",
     "verdict": "PASS"
   },
   "validation": {
     "targeted": "PASS_ARCH_INTENT_006_BINDING_TESTS",
     "independent_review": {
       "path": "docs/evidence/arch_intent_006_hypothesis_discovery_surface/a1_delivery_independent_review_v1.json",
-      "sha256": "d9780d05b9a50ec6f2ea362750cec564d536330560f8805f24d42f9e976a6705",
+      "sha256": "3550cc308a326c026c355b4bd3a33fa8b89df082c68b957170a96a744bf874fb",
       "verdict": "PASS"
     },
     "full_gate": "ENFORCED_BY_PROJECT_BOUND_VALIDATION",
