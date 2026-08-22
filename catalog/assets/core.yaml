@@ -30114,7 +30114,7 @@ records:
   as_of: '2026-08-22'
   truth_owner: EARLY_STRUCTURAL_BACKING_PIT_COMMISSIONING_V1
   location: {kind: git_path, logical_uri: 'repo://docs/evidence/early_structural_backing_pit_commissioning/a1_delivery_independent_review_v1.json', repository_path: docs/evidence/early_structural_backing_pit_commissioning/a1_delivery_independent_review_v1.json}
-  integrity: {kind: sha256, sha256: a58f1750b654e8c123846af036abf1e80c16f1ab1517a934799a4d49c808643f}
+  integrity: {kind: none, note: 'Content integrity is owned by the live completion-review-fit hash chain; embedding its SHA here would create an indirect self-reference through the reviewed inventory.'}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: derived_from, target_asset_id: EVIDENCE-EARLY-STRUCTURAL-BACKING-PIT-WINDOW-A-001}
@@ -30132,7 +30132,7 @@ records:
   as_of: '2026-08-22'
   truth_owner: EARLY_STRUCTURAL_BACKING_PIT_COMMISSIONING_V1
   location: {kind: git_path, logical_uri: 'repo://docs/evidence/early_structural_backing_pit_commissioning/a1_delivery_factory_fit_v1.json', repository_path: docs/evidence/early_structural_backing_pit_commissioning/a1_delivery_factory_fit_v1.json}
-  integrity: {kind: sha256, sha256: 9cbe381dd21200406000be20846b8c677bdbd8b89c469122fc8ee91d1e8167c7}
+  integrity: {kind: none, note: 'Content integrity is owned by the live completion-review-fit hash chain; embedding its SHA here would create an indirect self-reference through the reviewed inventory.'}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: derived_from, target_asset_id: EVIDENCE-EARLY-STRUCTURAL-BACKING-PIT-WINDOW-A-001}
@@ -30150,7 +30150,7 @@ records:
   as_of: '2026-08-22'
   truth_owner: EARLY_STRUCTURAL_BACKING_PIT_COMMISSIONING_V1
   location: {kind: git_path, logical_uri: 'repo://docs/evidence/early_structural_backing_pit_commissioning/a1_delivery_completion_evidence_v1.json', repository_path: docs/evidence/early_structural_backing_pit_commissioning/a1_delivery_completion_evidence_v1.json}
-  integrity: {kind: sha256, sha256: 50462fb2e86a827f44356cf1a3e01c378788cb34bccdb86e7b8e55a275cbf1cc}
+  integrity: {kind: none, note: 'Content integrity is owned by the live completion-review-fit hash chain; embedding its SHA here would create an indirect self-reference through the reviewed inventory.'}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: derived_from, target_asset_id: EVIDENCE-EARLY-STRUCTURAL-BACKING-PIT-WINDOW-A-001}
