@@ -798,7 +798,7 @@ records:
     repository_path: pyproject.toml
   integrity:
     kind: sha256
-    sha256: cbf0034d3a5236331598c565c08081cb8ef425c9d68c8ecedbffa986f5256bf3
+    sha256: 647a6a2d4f3c45c88872cc7d07fbdfdb035db0ee5aa6e27371bd1a235d6db0c2
   access:
     mode: read_only
     method: file
@@ -831,7 +831,7 @@ records:
     repository_path: uv.lock
   integrity:
     kind: sha256
-    sha256: 7d0090e2ff4bc350e78a8bbbdc4755561361aa15c49b835f71e447a9019f507b
+    sha256: 3b75cc1c5a2c0c83560beaf1a57c4543b885e0909c75db6d1939e90d09eefedb
   access:
     mode: read_only
     method: file
@@ -2142,7 +2142,7 @@ records:
     repository_path: scripts/validate_task04.py
   integrity:
     kind: sha256
-    sha256: e580983d0368ff315de3a237d09a21dc703c4cbea98101d3c8a21b069515471a
+    sha256: c8ab8c3f7116050f20cdbc6cf5aa708de4a3c6e01912670970c167087020c06b
   access:
     mode: read_only
     method: command
@@ -2180,7 +2180,7 @@ records:
     repository_path: scripts/validate_baseline.py
   integrity:
     kind: sha256
-    sha256: 58caa2bd474d257624da42abe1c9afc859a5c7e505e6167f43274d0e2e510081
+    sha256: 01015422e37cc3099813c2fc5dd134902d73fae2163f549597ef1fa08c55ddca
   access:
     mode: read_only
     method: command
@@ -13138,7 +13138,7 @@ records:
     repository_path: tests/test_task23_catalog_repository_factory_fit.py
   integrity:
     kind: sha256
-    sha256: 45a6583e9ccb847593234ebdd7b2c92d487ea2cb8cd8fc9b3ba9a57d84b7fdda
+    sha256: 484aeb7a9febe6e0425c935bb49368d70a72acd75f0378749cb6321353b6083b
   access: *t23_read_file
   relations:
   - relation_type: depends_on

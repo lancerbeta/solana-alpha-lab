@@ -64,7 +64,7 @@
     "scripts/delivery_harness.py": "d06591f57e88048bc10e83d18a11694903786055098e8caa6869673b739e636c",
     "scripts/owner_attention_gate.py": "3e329ce17ca6b12ca338a051a349751ee6ed881c9aab1704a7194b0683d5d538",
     "scripts/validate_baton.py": "f7f3dd034c9df58b22c8d5cded36c69ba67cb35fa99fc074400be4d85f363000",
-    "scripts/validate_task04.py": "e580983d0368ff315de3a237d09a21dc703c4cbea98101d3c8a21b069515471a",
+    "scripts/validate_task04.py": "c8ab8c3f7116050f20cdbc6cf5aa708de4a3c6e01912670970c167087020c06b",
     "src/solana_alpha_lab/t21_finish_gate.py": "4e9cf571cbfdfa3a106bc8e4015c6c9d8a5e0c44ece80241e196f5bf36ae368b",
     "tests/test_delivery_harness_adapters.py": "36ba82667d92c5e5ccff7755246604db65da50e1920e44b61d12606d55b53842",
     "tests/test_delivery_harness_authority.py": "53de75079801a5e6727f0f5647d726c1cf9e565a21941ad421fca9bec12be940",

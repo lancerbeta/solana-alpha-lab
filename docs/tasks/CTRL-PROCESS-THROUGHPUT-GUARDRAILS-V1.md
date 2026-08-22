@@ -70,7 +70,7 @@ context_requirements:
 After the harness-sync control sprint (#174–176), protect product/research
 throughput with three lightweight guardrails: an explicit control-plane freeze
 policy, optional `delivery_efficiency` ceremony metrics on completion evidence,
-and a scoped `ruff` gate for `src/solana_alpha_lab/factory/`.
+and a scoped Factory Python compile gate for `src/solana_alpha_lab/factory/`.
 
 ## PRD
 
@@ -82,7 +82,7 @@ and a scoped `ruff` gate for `src/solana_alpha_lab/factory/`.
 - **Downstream consumer:** owner and direct agents selecting/replanning work;
   FINISH phase completion evidence.
 - **Success observable:** policy names freeze + kill-switch; completion schema
-  accepts efficiency block; `validate_ci.py` runs factory ruff PASS; helper
+  accepts efficiency block; `validate_ci.py` runs FACTORY_STATIC PASS; helper
   script emits counts for a sample PR range.
 - **Cheapest falsifier:** if the next 3 product atoms still need ≥2 repair
   commits each despite #174–176, freeze alone failed and `finish` orchestration
@@ -103,17 +103,20 @@ and a scoped `ruff` gate for `src/solana_alpha_lab/factory/`.
 
 ## SSD
 
-- **Design:** policy section in domain policy; optional schema extension;
+- **Design:** policy freeze lives in the delivery protocol because domain policy
+  and `AGENTS.md` are hash-bound by TASK-30; optional schema extension;
   `scripts/delivery_efficiency.py` classifies `base..head` commits by path
-  heuristics; `scripts/validate_factory_static.py` wraps pinned `ruff check`
-  on factory only; wired into existing `validate_ci.py` child commands.
+  heuristics; `scripts/validate_factory_static.py` compiles Factory Python
+  without a lock-changing linter pin; wired into existing `validate_ci.py`
+  child commands.
 - **Invariants:** harness semantics unchanged; historical completion evidence
-  remains valid without `delivery_efficiency`; ruff scope limited to factory.
+  remains valid without `delivery_efficiency`; factory static does not mutate
+  `pyproject.toml` or `uv.lock`.
 - **Kill-switch:** if 3 consecutive substantive product/research atoms each have
   `repair_commits >= 2` or `repair_ratio > 0.30`, stop and replan process
   (likely `finish` orchestration atom) before more control work.
 - **Validation:** schema unit test; delivery_efficiency classification test;
-  factory ruff gate test; existing CI green.
+  factory static compile test; existing CI green.
 
 ## Decision capsule
 
@@ -121,7 +124,7 @@ and a scoped `ruff` gate for `src/solana_alpha_lab/factory/`.
   measuring throughput and guarding Factory code cheaply.
 - `UNCERTAINTY_REMOVED`: whether ceremony tax can be tracked without a new
   dashboard or harness feature.
-- `CAPABILITY_OR_EVIDENCE`: freeze policy, schema field, git helper, ruff gate.
+- `CAPABILITY_OR_EVIDENCE`: freeze policy, schema field, git helper, factory static gate.
 
 ## STOP
 

@@ -124,14 +124,10 @@ class FactoryStaticGateTests(unittest.TestCase):
         self.assertEqual(completed.returncode, 0, completed.stdout + completed.stderr)
         self.assertIn("FACTORY_STATIC: PASS", completed.stdout)
 
-    def test_factory_static_disables_ruff_cache(self) -> None:
+    def test_factory_static_does_not_invoke_ruff(self) -> None:
         source = (ROOT / "scripts/validate_factory_static.py").read_text(encoding="utf-8")
-        self.assertIn('"--no-cache"', source)
-
-    def test_baseline_allows_ruff_dev_group(self) -> None:
-        source = (ROOT / "scripts/validate_baseline.py").read_text(encoding="utf-8")
-        self.assertIn('"dev": ["ruff==0.11.12"]', source)
-        self.assertIn('"security": ["pip-audit==2.10.1"]', source)
+        self.assertNotIn("ruff", source.casefold())
+        self.assertIn("compile(", source)
 
 
 class ProcessPolicyTests(unittest.TestCase):
