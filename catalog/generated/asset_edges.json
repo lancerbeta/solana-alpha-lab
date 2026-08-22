@@ -618,6 +618,21 @@
       "target_asset_id": "CTRL-QUOTE-SURFACE-RETENTION-FALSIFIER-001"
     },
     {
+      "source_asset_id": "CONFIG-FACTORY-REMOTE-HOST-LOCATOR-001",
+      "relation": "governed_by",
+      "target_asset_id": "CTRL-FACTORY-REMOTE-OPERATIONS-001"
+    },
+    {
+      "source_asset_id": "CONFIG-FACTORY-REMOTE-OPERATIONS-001",
+      "relation": "depends_on",
+      "target_asset_id": "SCHEMA-FACTORY-REMOTE-OPERATIONS-001"
+    },
+    {
+      "source_asset_id": "CONFIG-FACTORY-REMOTE-OPERATIONS-001",
+      "relation": "governed_by",
+      "target_asset_id": "CTRL-FACTORY-REMOTE-OPERATIONS-001"
+    },
+    {
       "source_asset_id": "CONFIG-FACTORY-V1-COMMISSIONING-001",
       "relation": "depends_on",
       "target_asset_id": "SCHEMA-FACTORY-V1-COMMISSIONING-001"
@@ -2203,6 +2218,41 @@
       "target_asset_id": "ARCH-INTENT-005"
     },
     {
+      "source_asset_id": "CTRL-FACTORY-REMOTE-OPERATIONS-001",
+      "relation": "contains",
+      "target_asset_id": "CONFIG-FACTORY-REMOTE-HOST-LOCATOR-001"
+    },
+    {
+      "source_asset_id": "CTRL-FACTORY-REMOTE-OPERATIONS-001",
+      "relation": "contains",
+      "target_asset_id": "CONFIG-FACTORY-REMOTE-OPERATIONS-001"
+    },
+    {
+      "source_asset_id": "CTRL-FACTORY-REMOTE-OPERATIONS-001",
+      "relation": "contains",
+      "target_asset_id": "DOC-FACTORY-REMOTE-HOST-001"
+    },
+    {
+      "source_asset_id": "CTRL-FACTORY-REMOTE-OPERATIONS-001",
+      "relation": "contains",
+      "target_asset_id": "MODULE-FACTORY-REMOTE-OPS-001"
+    },
+    {
+      "source_asset_id": "CTRL-FACTORY-REMOTE-OPERATIONS-001",
+      "relation": "contains",
+      "target_asset_id": "SCHEMA-FACTORY-REMOTE-OPERATIONS-001"
+    },
+    {
+      "source_asset_id": "CTRL-FACTORY-REMOTE-OPERATIONS-001",
+      "relation": "depends_on",
+      "target_asset_id": "CTRL-FACTORY-V1-PRODUCTION-LITE-RUNTIME-001"
+    },
+    {
+      "source_asset_id": "CTRL-FACTORY-REMOTE-OPERATIONS-001",
+      "relation": "validated_by",
+      "target_asset_id": "TEST-FACTORY-REMOTE-OPERATIONS-001"
+    },
+    {
       "source_asset_id": "CTRL-FACTORY-V1-COMMISSIONING-HYPOTHESIS-001",
       "relation": "contains",
       "target_asset_id": "CONFIG-FACTORY-V1-COMMISSIONING-001"
@@ -3593,6 +3643,11 @@
       "target_asset_id": "EVIDENCE-OWNER-AUTHORITY-PACKET-A2-001"
     },
     {
+      "source_asset_id": "DOC-FACTORY-REMOTE-HOST-001",
+      "relation": "governed_by",
+      "target_asset_id": "CTRL-FACTORY-REMOTE-OPERATIONS-001"
+    },
+    {
       "source_asset_id": "DOC-OWNER-AUTHORITY-PACKET-001",
       "relation": "derived_from",
       "target_asset_id": "EVIDENCE-T26C-A3-CATALOG-FACTORY-FIT-001"
@@ -3821,6 +3876,16 @@
       "source_asset_id": "EVIDENCE-FACTORY-ORDINARY-LIQUIDITY-HYPOTHESIS-RUNTIME-001",
       "relation": "derived_from",
       "target_asset_id": "CTRL-FACTORY-ORDINARY-LIQUIDITY-HYPOTHESIS-YAML-001"
+    },
+    {
+      "source_asset_id": "EVIDENCE-FACTORY-REMOTE-OPERATIONS-ACCEPTANCE-001",
+      "relation": "derived_from",
+      "target_asset_id": "EVIDENCE-FACTORY-REMOTE-OPERATIONS-RUNTIME-001"
+    },
+    {
+      "source_asset_id": "EVIDENCE-FACTORY-REMOTE-OPERATIONS-RUNTIME-001",
+      "relation": "derived_from",
+      "target_asset_id": "CTRL-FACTORY-REMOTE-OPERATIONS-001"
     },
     {
       "source_asset_id": "EVIDENCE-FACTORY-V1-COMMISSIONING-ACCEPTANCE-001",
@@ -7868,6 +7933,11 @@
       "target_asset_id": "CONFIG-EARLY-STATE-TO-PAPER-VERTICAL-SLICE-001"
     },
     {
+      "source_asset_id": "MODULE-FACTORY-REMOTE-OPS-001",
+      "relation": "governed_by",
+      "target_asset_id": "CTRL-FACTORY-REMOTE-OPERATIONS-001"
+    },
+    {
       "source_asset_id": "MODULE-FACTORY-V1-APPLICATION-001",
       "relation": "depends_on",
       "target_asset_id": "MODULE-FACTORY-V1-COCKPIT-001"
@@ -9803,6 +9873,11 @@
       "target_asset_id": "EVIDENCE-FACTORY-ORDINARY-LIQUIDITY-HYPOTHESIS-ACCEPTANCE-001"
     },
     {
+      "source_asset_id": "REPORT-FACTORY-REMOTE-OPERATIONS-001",
+      "relation": "derived_from",
+      "target_asset_id": "EVIDENCE-FACTORY-REMOTE-OPERATIONS-ACCEPTANCE-001"
+    },
+    {
       "source_asset_id": "REPORT-FACTORY-V1-COMMISSIONING-001",
       "relation": "derived_from",
       "target_asset_id": "EVIDENCE-FACTORY-V1-COMMISSIONING-ACCEPTANCE-001"
@@ -10146,6 +10221,11 @@
       "source_asset_id": "SCHEMA-EXPERIMENT-SPEC-001",
       "relation": "governed_by",
       "target_asset_id": "CTRL-FACTORY-V1-PRODUCT-KERNEL-001"
+    },
+    {
+      "source_asset_id": "SCHEMA-FACTORY-REMOTE-OPERATIONS-001",
+      "relation": "governed_by",
+      "target_asset_id": "CTRL-FACTORY-REMOTE-OPERATIONS-001"
     },
     {
       "source_asset_id": "SCHEMA-FACTORY-V1-COMMISSIONING-001",
@@ -10796,6 +10876,16 @@
       "source_asset_id": "SCRIPT-FACTORY-ORDINARY-MARKET-HYPOTHESIS-001",
       "relation": "depends_on",
       "target_asset_id": "CONFIG-EXPERIMENT-SPEC-ORDINARY-PRICE-PATH-BUY-PRESSURE-001"
+    },
+    {
+      "source_asset_id": "SCRIPT-FACTORY-REMOTE-DOCTOR-001",
+      "relation": "depends_on",
+      "target_asset_id": "MODULE-FACTORY-REMOTE-OPS-001"
+    },
+    {
+      "source_asset_id": "SCRIPT-FACTORY-REMOTE-INSTALL-001",
+      "relation": "depends_on",
+      "target_asset_id": "MODULE-FACTORY-REMOTE-OPS-001"
     },
     {
       "source_asset_id": "SCRIPT-FACTORY-V1-COMMISSIONING-CAPTURE-001",
@@ -11666,6 +11756,21 @@
       "source_asset_id": "TEST-FACTORY-ORDINARY-HYPOTHESIS-THROUGH-SURFACE-001",
       "relation": "depends_on",
       "target_asset_id": "CONFIG-EXPERIMENT-SPEC-ORDINARY-PRICE-PATH-BUY-PRESSURE-001"
+    },
+    {
+      "source_asset_id": "TEST-FACTORY-REMOTE-OPERATIONS-001",
+      "relation": "depends_on",
+      "target_asset_id": "CONFIG-FACTORY-REMOTE-OPERATIONS-001"
+    },
+    {
+      "source_asset_id": "TEST-FACTORY-REMOTE-OPERATIONS-001",
+      "relation": "depends_on",
+      "target_asset_id": "EVIDENCE-FACTORY-REMOTE-OPERATIONS-RUNTIME-001"
+    },
+    {
+      "source_asset_id": "TEST-FACTORY-REMOTE-OPERATIONS-001",
+      "relation": "depends_on",
+      "target_asset_id": "MODULE-FACTORY-REMOTE-OPS-001"
     },
     {
       "source_asset_id": "TEST-FACTORY-V1-COMMISSIONING-001",

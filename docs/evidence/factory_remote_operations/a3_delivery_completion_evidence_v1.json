@@ -1,0 +1,90 @@
+{
+  "acceptance_id": "FACTORY-REMOTE-OPERATIONS-DELIVERY-COMPLETION-001",
+  "active_stop_conditions": [],
+  "as_of": "2026-08-22",
+  "base_main": "37f66155738432dcd19ac366c930cadcf65170e8",
+  "capability_radar_now": "NONE",
+  "cloud_bundle_mode": "OWNER_MANAGED_OPTIONAL_EXPORT",
+  "cloud_bundle_required_by_harness": false,
+  "cloud_bundle_smoke_required": false,
+  "factory_fit": {
+    "path": "docs/evidence/factory_remote_operations/a3_delivery_factory_fit_v1.json",
+    "sha256": "04f1ecace89b69ed0c4e0f34890e6748b360d9eb88e4f9cc42f951a9a19599fa",
+    "verdict": "PASS"
+  },
+  "implementation_bindings": {
+    ".cursor/rules/50-factory-remote-host.mdc": "f4d8e13aaf5a3d7ad22f91212a9062855074dc426f171bdbb33901a0a4083f16",
+    "catalog/assets/core.yaml": "6f08328f400ce7ec4fe0ede45685576f323af467585167da53bf505d644ad766",
+    "catalog/assets/lifecycle.yaml": "a54c3bc599a2f6f67ef0c943a8652355df54c24b25cfd1d71de9ac5f62231a7b",
+    "catalog/catalog_manifest.yaml": "b100c832071af1dc941266b374fda1222c85e54cb78a3e7c1c728203a838bb3d",
+    "catalog/generated/asset_edges.json": "5191e2dc1c79dd9d256d848de38aa2d197b8a070aaf4037c7abe2490e9a704da",
+    "catalog/schemas/factory_remote_operations.schema.json": "efed40bba47682d595256ffedbca1f55e562f4b9aac26f6e95b7ba96b30043d4",
+    "configs/factory_remote_operations_v1.yaml": "4fbdd8e630dd6f0cac6e45114c4488f4fb89d6d2961a71cac9eb3bac24527c15",
+    "configs/factory_remote_ops/factory-paper-heartbeat.service": "ea8a05fb4bc1e682ec1db9869fb420d98c232510dec671374780c1cd5ae19f79",
+    "configs/factory_remote_ops/factory-paper-heartbeat.timer": "b7cd29941362633a22d9b215763bf736623787d741736e39672f29ae4f9a7671",
+    "configs/factory_remote_ops/factory-remote-backup.service": "ee2212d8f74e93c4fcbddddf3fd76546edbdc900e9a623a5129a96c816825405",
+    "configs/factory_remote_ops/factory-remote-backup.timer": "f3663a95da6fb89aadba0ff5d55f4122ebdba49355747d397071297e8e4da5e6",
+    "configs/factory_remote_ops/factory-remote-health.service": "d12596f103d6611f0c1775c7436bc769b0473beef282670c3e9818ee824624ac",
+    "configs/factory_remote_ops/fail2ban_sshd.local": "4fa205cb80a773a9b6b4bae5619086935e49c4808977c9adc09b7b3b7a948739",
+    "configs/factory_remote_ops/nftables_factory.conf": "fd8740c0388a3fc7eb12490bcfa3c0e94d4238a6c66a888c3a0ece3277fbd365",
+    "configs/factory_remote_ops/secrets.env.example": "63b46f1be6607d687e6b2a53e5d1f8feb2a8140edb6207bd1c835887823c637c",
+    "configs/factory_remote_ops/sshd_factory.conf": "b2063732a330fca669670f66d9eae0d99cf460af032e28bb904f804febb46887",
+    "docs/PROJECT_MAP.md": "fd4d1805f2b2219a4b3246e8a646f445db05115f0727af82228233219d97f368",
+    "docs/evidence/control/delivery_harness_acceptance_v1.json": "8797f6ccfa1189e3529ef03cce13fdee51c5e618d4cee4a8c0f875335b6f47cf",
+    "docs/evidence/factory_remote_operations/a3_acceptance_v1.json": "9770d6bc0dc55272651d3c5e67fec927581ed6b7ee04d01f572ad75a23750cff",
+    "docs/evidence/factory_remote_operations/a3_runtime_receipt_v1.json": "efc00023ddd5fac89537529e9cce3534786332c149e83bb7456ec1bb536c409f",
+    "docs/operator/FACTORY_REMOTE_HOST.md": "957c06c6d93c284c09bde323bce38b40a235cb9a6cec62c79448f7c408dc4337",
+    "docs/operator/factory_remote_host_v1.yaml": "4a7783fac263bc7f6b161ea0fc68a95bb5247fef821c4648c29a697007c2a13e",
+    "docs/reports/factory_remote_operations/a3_owner_readout_v1.md": "14c5a4f9b2465e058b5b58e79038eb75b3af94db28306e1c593face5ca9d9684",
+    "docs/tasks/FACTORY_REMOTE_OPERATIONS_V1.md": "f0bdec9663ead408fb6aecba4ef88e27e49a1724e939cfb06939751dd98cdd30",
+    "scripts/factory_remote_doctor.py": "3cd094721001fd6ec3f86d8029b891b55724a830ebd1796d4e5cc6d41bdb5173",
+    "scripts/factory_remote_install.py": "b3a969c2c67150933228bd515fd0426526932e57de7d051ff43e48ed8e16337a",
+    "src/solana_alpha_lab/factory/remote_ops.py": "b8726d91ea970ea9b65d250e9dff9a87b6c4b47d334e5afe0697e24b2e499839",
+    "tests/test_delivery_harness_adapters.py": "29cf8d4aba3f19e2769cabb9bb442c1e1580262c54bad0148e4c99554e7a9dc6",
+    "tests/test_factory_remote_operations.py": "272cde6812f0c7a18e95a1ce7ebb5d1bc1007d217e54837f537cfaeddadbf7b6"
+  },
+  "non_claims": [
+    "NO_CANONICAL_DONE",
+    "NO_FACTORY_V1_OPERATIONAL_READY",
+    "NO_ALPHA_PNL_OR_NETRETURN",
+    "NO_PAPER_ENGINE_SYSTEMD_IN_THIS_ATOM",
+    "NO_VOLUME_INDEPENDENT_BACKUP_WITHOUT_OTHER_DEVICE"
+  ],
+  "owner_attention_triggers": {
+    "auth_or_access_recovery": false,
+    "external_material_action": false,
+    "material_owner_decision": false,
+    "unresolved_safety_or_truth_conflict": false,
+    "user_only_activation": false
+  },
+  "project_sources_disposition": {
+    "kind": "NO_CHANGE"
+  },
+  "schema": "smial.delivery-completion-evidence",
+  "schema_version": "1.0",
+  "side_effects": {
+    "cash_spend_usd_cents": 0,
+    "credential_reads": 0,
+    "fallbacks": 0,
+    "provider_requests": 0,
+    "retries": 0,
+    "wallet_signer_transaction_actions": 0
+  },
+  "state_change": "FACTORY_REMOTE_OPERATIONS_GIT_READY",
+  "task_id": "FACTORY_REMOTE_OPERATIONS_V1",
+  "validation": {
+    "full_gate": "ENFORCED_BY_PROJECT_BOUND_VALIDATION",
+    "github_ci": "ENFORCED_LIVE_AT_GUARDED_MERGE",
+    "independent_review": {
+      "path": "docs/evidence/factory_remote_operations/a3_delivery_independent_review_v1.json",
+      "sha256": "f6861b5bdb19f6a8882dc4e83a201f04eeed8cca74dd0808b1a8769f41b45217",
+      "verdict": "PASS"
+    },
+    "project_checks": [
+      "PASS_UNITTEST_FACTORY_REMOTE_OPERATIONS",
+      "PASS_CATALOG_VALIDATE",
+      "PASS_GENERATOR_NAVIGATION_CHECK"
+    ],
+    "targeted": "PASS_UNITTEST_FACTORY_REMOTE_OPERATIONS"
+  }
+}

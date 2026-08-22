@@ -1,0 +1,54 @@
+schema: smial.factory-remote-host-locator
+schema_version: "1.0"
+contract_id: FACTORY-REMOTE-OPERATIONS-001
+atom_id: FACTORY_REMOTE_OPERATIONS_V1
+as_of: "2026-08-22"
+# Public operational locator only. No tokens, keys, or .env values.
+provider: CHERRY_SERVERS
+sku: CLOUD_VPS_4_GEN2
+os: ubuntu-24.04
+region: LT
+cherry_portal: https://portal.cherryservers.com/
+cherry_hostname: factory-remote-ops
+cherry_instance_id: "973818"
+ipv4: "5.199.174.153"
+ssh:
+  port: 22
+  identity_basename: id_ed25519_factory
+  user_live: factory
+  user_bootstrap: DENIED_AFTER_APPLY
+  extra_args:
+    - IdentitiesOnly=yes
+    - BatchMode=yes
+paths:
+  deploy_root: /opt/solana-alpha-lab
+  secrets_host: /etc/solana-alpha-lab/secrets.env
+  secrets_operator_relative: local/factory_remote_ops/secrets.env
+  notes_operator_relative: local/factory_remote_ops/OWNER_PACKET_NOTES.txt
+  backup_sink_relative: local/factory_v1_backup_sink
+  backup_sink_env: FACTORY_BACKUP_SINK
+  backup_sink_env_rule: ABSOLUTE_OTHER_VOLUME_OR_PARENT_INDEPENDENT_GIT_SIDE
+  sshd_dropin: /etc/ssh/sshd_config.d/99-factory.conf
+workbench:
+  bind: 127.0.0.1
+  port: 8765
+  access: SSH_TUNNEL_ONLY
+units:
+  - factory-v1-workbench.service
+  - factory-remote-health.service
+  - factory-paper-heartbeat.timer
+  - factory-remote-backup.timer
+commands:
+  doctor: cd /opt/solana-alpha-lab && sudo /usr/bin/uv run --locked --managed-python python -B scripts/factory_remote_doctor.py
+  heartbeat: cd /opt/solana-alpha-lab && /usr/bin/uv run --locked --managed-python python -B scripts/factory_remote_doctor.py --heartbeat
+  backup: cd /opt/solana-alpha-lab && /usr/bin/uv run --locked --managed-python python -B scripts/factory_remote_doctor.py --backup
+  units: systemctl is-active factory-v1-workbench.service factory-remote-health.service nftables fail2ban
+authority:
+  live_mutate: STANDING_WITHIN_FACTORY_REMOTE_OPERATIONS_V1
+  owner_micro_approval: FORBIDDEN
+  secrets_in_chat_or_git: FORBIDDEN
+forbidden:
+  - PRINT_OR_COMMIT_SECRETS
+  - PUBLIC_BIND_8765
+  - PASSWORD_SSH
+  - ABSOLUTE_OPERATOR_HOME_IN_GIT

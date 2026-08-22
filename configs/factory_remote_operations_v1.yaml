@@ -1,0 +1,79 @@
+schema: smial.factory-remote-operations
+schema_version: '1.0'
+contract_id: FACTORY-REMOTE-OPERATIONS-001
+atom_id: FACTORY_REMOTE_OPERATIONS_V1
+as_of: '2026-08-22'
+mode: DIRECT_CURSOR_DELIVERY
+implementation: GIT_SIDE_REMOTE_OPS_PROOF
+target:
+  kind: ONE_ORDINARY_SUPPORTED_LINUX_VPS
+  provider: CHERRY_SERVERS
+  sku: CLOUD_VPS_4_GEN2
+  rejected_sku: CLOUD_VPS_1_GEN2
+  vcpu: 4
+  ram_gb: 4
+  ram_scale_target_gb: 6
+  storage_gb: 80
+  storage_scale_target_gb: 100
+  os: ubuntu-24.04
+  location_preference: EU
+  payment: CRYPTO_DOCUMENTED
+  purchase: OWNER_EXTERNAL_GATE
+  plan_url: https://www.cherryservers.com/pricing/virtual-servers/b2-4-4gb-80s-shared
+deploy:
+  pin_kind: GIT_SHA
+  version: factory-remote-ops-v1.0
+  previous_version: factory-v1-runtime-v1.0
+  rpo_max: 24h
+  rto_max: 12h
+workbench:
+  bind: 127.0.0.1
+  port: 8765
+  access: SSH_TUNNEL_ONLY
+stores:
+  kind: SQLITE
+  operational_relative: local/factory_v1/operational_state.sqlite
+  paper_relative: local/factory_v1/paper_plane_state.sqlite
+  owns_scientific_truth: false
+backup:
+  kind: CONTENT_ADDRESSED_BUNDLE
+  independent_sink_relative: local/factory_v1_backup_sink
+  source_relative_paths:
+    - local/factory_v1/operational_state.sqlite
+    - local/factory_v1/paper_plane_state.sqlite
+  same_parent_forbidden: true
+  google_drive_role: OPTIONAL_COLD_COPY_NOT_DOD
+monitoring:
+  freshness_max_seconds: 900
+  stall_max_seconds: 1800
+  disk_used_percent_max: 85
+  heartbeat_relative: local/factory_v1/paper_heartbeat.json
+alert:
+  sink: TELEGRAM_BOT_API
+  token_env: FACTORY_TELEGRAM_BOT_TOKEN
+  chat_id_env: FACTORY_TELEGRAM_CHAT_ID
+  dedup: true
+security:
+  sshd_relative: configs/factory_remote_ops/sshd_factory.conf
+  nftables_relative: configs/factory_remote_ops/nftables_factory.conf
+  fail2ban_relative: configs/factory_remote_ops/fail2ban_sshd.local
+  secrets_example_relative: configs/factory_remote_ops/secrets.env.example
+  password_ssh: false
+  permit_root_login: false
+  public_admin: false
+units:
+  workbench_relative: configs/factory_v1_linux_runtime/factory-v1-workbench.service
+  health_relative: configs/factory_remote_ops/factory-remote-health.service
+  backup_service_relative: configs/factory_remote_ops/factory-remote-backup.service
+  backup_timer_relative: configs/factory_remote_ops/factory-remote-backup.timer
+  paper_heartbeat_relative: configs/factory_remote_ops/factory-paper-heartbeat.service
+health:
+  process_alive_alone_is_not_healthy: true
+  healthy_verdict_forbidden: true
+  backup_status_when_unproved: EXPLICIT_UNKNOWN
+authority:
+  provider_calls: false
+  credentials: false
+  deployment: false
+  cash_spend: false
+  wallet_signer_transaction: false

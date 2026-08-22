@@ -1,0 +1,16 @@
+[Unit]
+Description=Factory remote-ops health and alert loop
+Documentation=docs/tasks/FACTORY_REMOTE_OPERATIONS_V1.md
+After=network-online.target factory-v1-workbench.service
+
+[Service]
+Type=simple
+WorkingDirectory=/opt/solana-alpha-lab
+EnvironmentFile=-/etc/solana-alpha-lab/secrets.env
+ExecStart=/usr/bin/uv run --locked --managed-python python -B scripts/factory_remote_doctor.py --loop
+Restart=on-failure
+RestartSec=5
+NoNewPrivileges=true
+
+[Install]
+WantedBy=multi-user.target

@@ -1,0 +1,10 @@
+[Unit]
+Description=Factory paper-plane heartbeat
+Documentation=docs/tasks/FACTORY_REMOTE_OPERATIONS_V1.md
+After=network-online.target
+
+[Service]
+Type=oneshot
+WorkingDirectory=/opt/solana-alpha-lab
+ExecStart=/usr/bin/uv run --locked --managed-python python -B scripts/factory_remote_doctor.py --heartbeat
+NoNewPrivileges=true
