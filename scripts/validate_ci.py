@@ -634,6 +634,7 @@ def child_commands() -> list[tuple[str, list[str]]]:
         ),
         ("BATON_VALIDATION", [python, "-B", "scripts/validate_baton.py"]),
         ("CATALOG_VALIDATION", [python, "-B", "scripts/validate_catalog.py"]),
+        ("FACTORY_STATIC", [python, "-B", "scripts/validate_factory_static.py"]),
         (
             "CATALOG_RESOLUTION",
             [

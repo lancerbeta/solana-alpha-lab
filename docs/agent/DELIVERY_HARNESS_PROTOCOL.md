@@ -41,9 +41,12 @@ the guarded merge is the sole project-bound gate executor for the unchanged
 fingerprint. If a leftover space, encoded query, wrong endpoint or shape can
 still fail the atom, probe and fix it on the working path before Catalog,
 receipts, reviews or PR. Do not document a five-second mechanical miss.
-Code review is mandatory. Goal/DoD, architecture and refactor critics
-are trigger-routed and must run in isolated context. `SINGLE_AGENT_REVIEW_FALLBACK`
-is `NOT_READY` for merge; deterministic validation still runs.
+Code review is mandatory. Goal/DoD, architecture, refactor and owner-UX critics
+are trigger-routed and must run in isolated context. Launch `owner-ux-critic`
+only when the diff changes owner-operable surfaces (CLI/console entrypoints,
+manual operator flows, readouts, cockpit/workbench interaction, or owner-facing
+error/next-action copy). `SINGLE_AGENT_REVIEW_FALLBACK` is `NOT_READY` for merge;
+deterministic validation still runs.
 
 ### Derived-hash maintenance
 
@@ -89,6 +92,27 @@ uv run --locked --managed-python python -B scripts/harness_sync.py --check --pat
 ```
 
 The summary does not replace validation; it only surfaces the sanctioned repair.
+
+### Process throughput guardrails
+
+After the harness-sync control sprint, the domain policy freezes control-plane
+changes for the next five substantive product/research atoms unless a confirmed
+blocker appears on the active atom.
+
+Completion evidence MAY include optional `delivery_efficiency` counts. Use:
+
+```text
+uv run --locked --managed-python python -B scripts/delivery_efficiency.py --base <oid> --head HEAD --json
+```
+
+Factory Python is guarded by a scoped static gate:
+
+```text
+uv run --locked --managed-python python -B scripts/validate_factory_static.py
+```
+
+Replan the process if three consecutive product atoms each show
+`repair_commits >= 2` or `repair_ratio > 0.30`.
 
 ### Finish and merge
 

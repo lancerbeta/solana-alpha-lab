@@ -189,7 +189,13 @@ class DeliveryHarnessAdapterTests(unittest.TestCase):
             self.assertNotRegex(text.casefold(), r"search (the )?(latest|newest|current)")
 
     def test_custom_critics_are_read_only_and_have_deterministic_fallback(self) -> None:
-        expected = {"code-reviewer", "goal-dod-critic", "architecture-critic", "refactor-critic"}
+        expected = {
+            "code-reviewer",
+            "goal-dod-critic",
+            "architecture-critic",
+            "refactor-critic",
+            "owner-ux-critic",
+        }
         paths = sorted((CURSOR / "agents").glob("*.md"))
         self.assertEqual({frontmatter(path)["name"] for path in paths}, expected)
         for path in paths:

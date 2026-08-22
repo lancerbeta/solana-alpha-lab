@@ -477,6 +477,7 @@ class CiOwnedDeliveryPilotTests(unittest.TestCase):
                 "SECRET_REJECTION",
                 "BATON_VALIDATION",
                 "CATALOG_VALIDATION",
+                "FACTORY_STATIC",
                 "CATALOG_RESOLUTION",
                 "GENERATED_NAVIGATION",
                 "PRE_GIT_IMPORT_VALIDATION",
@@ -550,6 +551,7 @@ class PlatformGateContractTests(unittest.TestCase):
         commands = {label: command for label, command in ci.child_commands()}
         self.assertIn("scripts/secret_scan.py", commands["SECRET_REJECTION"])
         self.assertIn("scripts/validate_catalog.py", commands["CATALOG_VALIDATION"])
+        self.assertIn("scripts/validate_factory_static.py", commands["FACTORY_STATIC"])
         self.assertIn("scripts/generate_navigation.py", commands["GENERATED_NAVIGATION"])
         self.assertIn("--check", commands["GENERATED_NAVIGATION"])
         self.assertIn("scripts/validate_task04.py", commands["TASK04_ARCHITECTURE"])

@@ -11,7 +11,6 @@ from typing import Any, Mapping
 import yaml
 
 from solana_alpha_lab.factory.application import (
-    COMMISSIONING_CONFIG_RELATIVE,
     FactoryApplication,
     commissioning_spec_relative,
     ops_store_path,

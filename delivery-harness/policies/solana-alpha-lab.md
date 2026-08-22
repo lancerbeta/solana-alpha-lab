@@ -197,6 +197,33 @@ work before `earliest_at`. The marker grants no provider, spend, deployment,
 credential, wallet, signer, transaction, merge or destructive authority. Only
 its declared resolution owner may terminally update it with exact evidence.
 
+## CONTROL_PLANE_FREEZE_AND_CEREMONY_TAX
+
+After the harness-sync control sprint (derived-hash sync, evidence binding,
+actionable CI drift messages), the control plane is **frozen** for the next
+**five substantive product or research atoms**.
+
+During the freeze, do not change `delivery-harness/`, owner-attention gate
+semantics, evidence protocol, CI architecture, or harness scripts except for a
+**confirmed blocker** on the active atom (machine `DENY`, repeated friction on
+the working path, or a security defect).
+
+Each substantive atom SHOULD record optional `delivery_efficiency` on its
+completion evidence:
+
+- `substantive_commits` — product/research implementation commits;
+- `repair_commits` — derived-hash, evidence-rebind, or CI-drift repair commits;
+- `control_only_commits` — control/harness-only commits;
+- `repair_ratio` — `(repair + control_only) / total` when total > 0.
+
+Use `scripts/delivery_efficiency.py --base <oid> --head <oid>` as the bounded
+git helper; do not invent counts from memory.
+
+**Kill-switch / replan trigger:** if **three consecutive** substantive
+product/research atoms each show `repair_commits >= 2` or `repair_ratio > 0.30`,
+stop harness polish and open a process replan atom (likely deterministic
+`finish` orchestration) before more control-plane work.
+
 ## SECURITY_AND_CASH_BOUNDARY
 
 Secrets never enter chat, repo, logs, URLs or receipts. Signer is isolated.
