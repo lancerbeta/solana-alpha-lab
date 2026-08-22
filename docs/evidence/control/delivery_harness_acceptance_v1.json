@@ -74,7 +74,8 @@
     "tests/test_t21_finish_gate.py": "6986160663e6960303429c990e7ec105d70b18bba1afeb03d8acc6ffe1a0b458",
     "tests/test_task21_dataset_freeze_acceptance.py": "f8f57a7d964bc499e301d613a5a1d2952bf133106b48e174c3002f373c8b6967",
     "tests/test_task21_durable_resume_router_binding.py": "948246dde3dd4e70b7af591b5c8fcedc5ed0b8e6e43f53efedcb197ea07ad1b3",
-    "tests/test_task21_owner_pulse.py": "4efe09496a5a37d744ab412fedb3a12581dcff93807c92b39d351230a9ffcd7c"
+    "tests/test_task21_owner_pulse.py": "4efe09496a5a37d744ab412fedb3a12581dcff93807c92b39d351230a9ffcd7c",
+    "scripts/validate_task04.py": "e580983d0368ff315de3a237d09a21dc703c4cbea98101d3c8a21b069515471a"
   },
   "active_stop_conditions": [],
   "owner_attention_triggers": {

@@ -55,6 +55,7 @@ EXPECTED_RUNTIME_VERSIONS = {
     "prometheus-client": "0.25.0",
 }
 EXPECTED_SECURITY_GROUP = ["pip-audit==2.10.1"]
+EXPECTED_DEV_GROUP = ["ruff==0.11.12"]
 EXPECTED_VERDICT_COUNTS = {
     "ADOPT": 13,
     "WRAP": 8,
@@ -613,7 +614,10 @@ def validate_dependency_contract(document: dict[str, Any]) -> None:
     if "pydantic-core==2.46.4" in project.get("dependencies", []):
         raise Task04ValidationError("pydantic_core_must_remain_transitive")
     groups = document.get("dependency-groups", {})
-    if groups != {"security": EXPECTED_SECURITY_GROUP}:
+    if groups != {
+        "security": EXPECTED_SECURITY_GROUP,
+        "dev": EXPECTED_DEV_GROUP,
+    }:
         raise Task04ValidationError("security_dependency_group_mismatch")
     uv = document.get("tool", {}).get("uv", {})
     local = document.get("tool", {}).get("solana-alpha-lab", {})
