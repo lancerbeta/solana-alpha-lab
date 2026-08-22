@@ -518,6 +518,16 @@
       "target_asset_id": "CTRL-EARLY-STATE-TO-PAPER-VERTICAL-SLICE-001"
     },
     {
+      "source_asset_id": "CONFIG-EARLY-STRUCTURAL-BACKING-PIT-COMMISSIONING-001",
+      "relation": "depends_on",
+      "target_asset_id": "CONFIG-PROVIDER-ROUTE-CAPABILITY-REGISTRY-010"
+    },
+    {
+      "source_asset_id": "CONFIG-EARLY-STRUCTURAL-BACKING-PIT-COMMISSIONING-001",
+      "relation": "governed_by",
+      "target_asset_id": "CTRL-EARLY-STRUCTURAL-BACKING-PIT-COMMISSIONING-001"
+    },
+    {
       "source_asset_id": "CONFIG-EXPERIMENT-SPEC-FACTORY-V1-COMMISSIONING-001",
       "relation": "depends_on",
       "target_asset_id": "SCHEMA-EXPERIMENT-SPEC-001"
@@ -2223,6 +2233,36 @@
       "target_asset_id": "TEST-EARLY-STATE-PAPER-001"
     },
     {
+      "source_asset_id": "CTRL-EARLY-STRUCTURAL-BACKING-PIT-COMMISSIONING-001",
+      "relation": "contains",
+      "target_asset_id": "CONFIG-EARLY-STRUCTURAL-BACKING-PIT-COMMISSIONING-001"
+    },
+    {
+      "source_asset_id": "CTRL-EARLY-STRUCTURAL-BACKING-PIT-COMMISSIONING-001",
+      "relation": "contains",
+      "target_asset_id": "MODULE-EARLY-STRUCTURAL-BACKING-PIT-COMMISSIONING-001"
+    },
+    {
+      "source_asset_id": "CTRL-EARLY-STRUCTURAL-BACKING-PIT-COMMISSIONING-001",
+      "relation": "contains",
+      "target_asset_id": "SCRIPT-EARLY-STRUCTURAL-BACKING-PIT-COMMISSIONING-001"
+    },
+    {
+      "source_asset_id": "CTRL-EARLY-STRUCTURAL-BACKING-PIT-COMMISSIONING-001",
+      "relation": "depends_on",
+      "target_asset_id": "MODULE-ORDINARY-MARKET-PIT-PRIMARY-X-001"
+    },
+    {
+      "source_asset_id": "CTRL-EARLY-STRUCTURAL-BACKING-PIT-COMMISSIONING-001",
+      "relation": "depends_on",
+      "target_asset_id": "MODULE-ORDINARY-RECENT-ORGANIC-PRESSURE-H900-AUDITION-001"
+    },
+    {
+      "source_asset_id": "CTRL-EARLY-STRUCTURAL-BACKING-PIT-COMMISSIONING-001",
+      "relation": "validated_by",
+      "target_asset_id": "TEST-EARLY-STRUCTURAL-BACKING-PIT-COMMISSIONING-001"
+    },
+    {
       "source_asset_id": "CTRL-FACTORY-ORDINARY-HYPOTHESIS-THROUGH-SURFACE-001",
       "relation": "governed_by",
       "target_asset_id": "ARCH-INTENT-005"
@@ -3871,6 +3911,66 @@
       "source_asset_id": "EVIDENCE-EARLY-STATE-PAPER-RUNTIME-001",
       "relation": "derived_from",
       "target_asset_id": "CTRL-EARLY-STATE-TO-PAPER-VERTICAL-SLICE-001"
+    },
+    {
+      "source_asset_id": "EVIDENCE-EARLY-STRUCTURAL-BACKING-PIT-ACCEPTANCE-001",
+      "relation": "derived_from",
+      "target_asset_id": "EVIDENCE-EARLY-STRUCTURAL-BACKING-PIT-FAMILY-DECISION-001"
+    },
+    {
+      "source_asset_id": "EVIDENCE-EARLY-STRUCTURAL-BACKING-PIT-DELIVERY-COMPLETION-001",
+      "relation": "depends_on",
+      "target_asset_id": "EVIDENCE-EARLY-STRUCTURAL-BACKING-PIT-ACCEPTANCE-001"
+    },
+    {
+      "source_asset_id": "EVIDENCE-EARLY-STRUCTURAL-BACKING-PIT-DELIVERY-COMPLETION-001",
+      "relation": "depends_on",
+      "target_asset_id": "EVIDENCE-EARLY-STRUCTURAL-BACKING-PIT-DELIVERY-FACTORY-FIT-001"
+    },
+    {
+      "source_asset_id": "EVIDENCE-EARLY-STRUCTURAL-BACKING-PIT-DELIVERY-COMPLETION-001",
+      "relation": "depends_on",
+      "target_asset_id": "EVIDENCE-EARLY-STRUCTURAL-BACKING-PIT-DELIVERY-INDEPENDENT-REVIEW-001"
+    },
+    {
+      "source_asset_id": "EVIDENCE-EARLY-STRUCTURAL-BACKING-PIT-DELIVERY-COMPLETION-001",
+      "relation": "derived_from",
+      "target_asset_id": "EVIDENCE-EARLY-STRUCTURAL-BACKING-PIT-WINDOW-A-001"
+    },
+    {
+      "source_asset_id": "EVIDENCE-EARLY-STRUCTURAL-BACKING-PIT-DELIVERY-FACTORY-FIT-001",
+      "relation": "depends_on",
+      "target_asset_id": "EVIDENCE-EARLY-STRUCTURAL-BACKING-PIT-DELIVERY-INDEPENDENT-REVIEW-001"
+    },
+    {
+      "source_asset_id": "EVIDENCE-EARLY-STRUCTURAL-BACKING-PIT-DELIVERY-FACTORY-FIT-001",
+      "relation": "derived_from",
+      "target_asset_id": "EVIDENCE-EARLY-STRUCTURAL-BACKING-PIT-WINDOW-A-001"
+    },
+    {
+      "source_asset_id": "EVIDENCE-EARLY-STRUCTURAL-BACKING-PIT-DELIVERY-INDEPENDENT-REVIEW-001",
+      "relation": "depends_on",
+      "target_asset_id": "SCHEMA-DELIVERY-INDEPENDENT-REVIEW-EVIDENCE-001"
+    },
+    {
+      "source_asset_id": "EVIDENCE-EARLY-STRUCTURAL-BACKING-PIT-DELIVERY-INDEPENDENT-REVIEW-001",
+      "relation": "derived_from",
+      "target_asset_id": "EVIDENCE-EARLY-STRUCTURAL-BACKING-PIT-WINDOW-A-001"
+    },
+    {
+      "source_asset_id": "EVIDENCE-EARLY-STRUCTURAL-BACKING-PIT-FAMILY-DECISION-001",
+      "relation": "derived_from",
+      "target_asset_id": "EVIDENCE-EARLY-STRUCTURAL-BACKING-PIT-WINDOW-A-001"
+    },
+    {
+      "source_asset_id": "EVIDENCE-EARLY-STRUCTURAL-BACKING-PIT-WINDOW-A-001",
+      "relation": "depends_on",
+      "target_asset_id": "CONFIG-EARLY-STRUCTURAL-BACKING-PIT-COMMISSIONING-001"
+    },
+    {
+      "source_asset_id": "EVIDENCE-EARLY-STRUCTURAL-BACKING-PIT-WINDOW-A-001",
+      "relation": "derived_from",
+      "target_asset_id": "CTRL-EARLY-STRUCTURAL-BACKING-PIT-COMMISSIONING-001"
     },
     {
       "source_asset_id": "EVIDENCE-FACTORY-ORDINARY-HYPOTHESIS-ACCEPTANCE-001",
@@ -7948,6 +8048,21 @@
       "target_asset_id": "CONFIG-EARLY-STATE-TO-PAPER-VERTICAL-SLICE-001"
     },
     {
+      "source_asset_id": "MODULE-EARLY-STRUCTURAL-BACKING-PIT-COMMISSIONING-001",
+      "relation": "depends_on",
+      "target_asset_id": "CONFIG-EARLY-STRUCTURAL-BACKING-PIT-COMMISSIONING-001"
+    },
+    {
+      "source_asset_id": "MODULE-EARLY-STRUCTURAL-BACKING-PIT-COMMISSIONING-001",
+      "relation": "depends_on",
+      "target_asset_id": "MODULE-ORDINARY-MARKET-PIT-PRIMARY-X-001"
+    },
+    {
+      "source_asset_id": "MODULE-EARLY-STRUCTURAL-BACKING-PIT-COMMISSIONING-001",
+      "relation": "depends_on",
+      "target_asset_id": "MODULE-ORDINARY-RECENT-ORGANIC-PRESSURE-H900-AUDITION-001"
+    },
+    {
       "source_asset_id": "MODULE-FACTORY-REMOTE-OPS-001",
       "relation": "governed_by",
       "target_asset_id": "CTRL-FACTORY-REMOTE-OPERATIONS-001"
@@ -9878,6 +9993,11 @@
       "target_asset_id": "EVIDENCE-EARLY-STATE-PAPER-ACCEPTANCE-001"
     },
     {
+      "source_asset_id": "REPORT-EARLY-STRUCTURAL-BACKING-PIT-COMMISSIONING-001",
+      "relation": "derived_from",
+      "target_asset_id": "EVIDENCE-EARLY-STRUCTURAL-BACKING-PIT-ACCEPTANCE-001"
+    },
+    {
       "source_asset_id": "REPORT-FACTORY-ORDINARY-HYPOTHESIS-OWNER-READOUT-001",
       "relation": "derived_from",
       "target_asset_id": "EVIDENCE-FACTORY-ORDINARY-HYPOTHESIS-ACCEPTANCE-001"
@@ -10888,6 +11008,11 @@
       "target_asset_id": "MODULE-PAPER-PLANE-ENGINE-001"
     },
     {
+      "source_asset_id": "SCRIPT-EARLY-STRUCTURAL-BACKING-PIT-COMMISSIONING-001",
+      "relation": "depends_on",
+      "target_asset_id": "MODULE-EARLY-STRUCTURAL-BACKING-PIT-COMMISSIONING-001"
+    },
+    {
       "source_asset_id": "SCRIPT-FACTORY-ORDINARY-MARKET-HYPOTHESIS-001",
       "relation": "depends_on",
       "target_asset_id": "CONFIG-EXPERIMENT-SPEC-ORDINARY-PRICE-PATH-BUY-PRESSURE-001"
@@ -11766,6 +11891,11 @@
       "source_asset_id": "TEST-EARLY-STATE-PAPER-001",
       "relation": "depends_on",
       "target_asset_id": "MODULE-PAPER-PLANE-ENGINE-001"
+    },
+    {
+      "source_asset_id": "TEST-EARLY-STRUCTURAL-BACKING-PIT-COMMISSIONING-001",
+      "relation": "depends_on",
+      "target_asset_id": "MODULE-EARLY-STRUCTURAL-BACKING-PIT-COMMISSIONING-001"
     },
     {
       "source_asset_id": "TEST-FACTORY-ORDINARY-HYPOTHESIS-THROUGH-SURFACE-001",

@@ -1,0 +1,77 @@
+{
+  "acceptance_id": "EARLY-STRUCTURAL-BACKING-PIT-DELIVERY-COMPLETION-001",
+  "active_stop_conditions": [],
+  "as_of": "2026-08-22",
+  "base_main": "7d0e5b958590070b9178b35104f54c6d84fe1134",
+  "capability_radar_now": "NONE",
+  "cloud_bundle_mode": "OWNER_MANAGED_OPTIONAL_EXPORT",
+  "cloud_bundle_required_by_harness": false,
+  "cloud_bundle_smoke_required": false,
+  "factory_fit": {
+    "path": "docs/evidence/early_structural_backing_pit_commissioning/a1_delivery_factory_fit_v1.json",
+    "sha256": "61b60999178e8de5b6540bd40ec22c32bd74063f62da82849cef889ac07f7de0",
+    "verdict": "PASS"
+  },
+  "implementation_bindings": {
+    "catalog/assets/core.yaml": "6e62aaa18851c83b5369fd8fe112c4c6419d6c0cabd0d475a185f68ec7c8c5d7",
+    "catalog/assets/lifecycle.yaml": "f98fe14a44c2affccb3dfd8c219a74f09e875c35e1421ac8f431c4a446a978c4",
+    "catalog/catalog_manifest.yaml": "6dd56fda7548d7eb4b31148d7b8e4646567f9bb8fcd60c817c4a9a16ccd67780",
+    "catalog/generated/asset_edges.json": "1f9a98c59e550a930554142a7c3ca549e6dfa928f71166ddcb4267e9b86e4b3d",
+    "configs/early_structural_backing_pit_commissioning_v1.yaml": "620bbfdf671534df21076013f02759dd11773b9d3935d365ca8859a34af01f93",
+    "docs/PROJECT_MAP.md": "015ae702774ee1ee76f0eecd65977e619cc6e94d17b94f4a9727f27e6089d9e1",
+    "docs/evidence/early_structural_backing_pit_commissioning/a1_acceptance_v1.json": "16197a90a7555d4dc77dee9868a7bd82c4191079e9bc1a8711cc7ec913d25d73",
+    "docs/evidence/early_structural_backing_pit_commissioning/a1_family_decision_v1.json": "6a3a125c89d00ee635667f832e4b82a8ee11c6702d11ffc2eae26026a70022b6",
+    "docs/evidence/early_structural_backing_pit_commissioning/a1_window_a_runtime_receipt_v1.json": "8a6647de6e22de81a2be59474bc6e2021ceae740b778113b820b99b158c948be",
+    "docs/reports/early_structural_backing_pit_commissioning/a1_owner_readout_v1.md": "d1215ba06a0cfa338d51db813420e4048330f3d8275262dfcbcd7e1773cfa6b5",
+    "docs/tasks/EARLY_STRUCTURAL_BACKING_PIT_COMMISSIONING_V1.md": "09204fc043bb6df5f01ee44c257ef7b8a62c0885a5a4563b5d3d29e057cb77d9",
+    "scripts/run_early_structural_backing_pit_commissioning.py": "d5f8ce2abd1d6ca84c1138831337bb5555af535d7ca878083b7398b907444711",
+    "src/solana_alpha_lab/early_structural_backing_pit_commissioning.py": "f424e9297d1f613c0bedeb33551122acf9f9e4bc249b70d548020c2456c618b2",
+    "tests/test_early_structural_backing_pit_commissioning.py": "992aa9d59989795f5f6b4b891ac0576f35297b8552efb060939052579335999a"
+  },
+  "non_claims": [
+    "NO_CANONICAL_DONE",
+    "NO_EARN_SHADOW",
+    "NO_ALPHA",
+    "NO_NETRETURN",
+    "NO_EXECUTE",
+    "NO_WINDOW_B",
+    "NO_VPS",
+    "NO_FACTORY_V1_OPERATIONAL_READY"
+  ],
+  "owner_attention_triggers": {
+    "auth_or_access_recovery": false,
+    "external_material_action": false,
+    "material_owner_decision": false,
+    "unresolved_safety_or_truth_conflict": false,
+    "user_only_activation": false
+  },
+  "project_sources_disposition": {
+    "kind": "NO_CHANGE"
+  },
+  "schema": "smial.delivery-completion-evidence",
+  "schema_version": "1.0",
+  "side_effects": {
+    "cash_spend_usd_cents": 0,
+    "credential_reads": 1,
+    "fallbacks": 0,
+    "provider_requests": 39,
+    "retries": 0,
+    "wallet_signer_transaction_actions": 0
+  },
+  "state_change": "CLOSE_EARLY_STRUCTURAL_BACKING_FAMILY",
+  "task_id": "EARLY_STRUCTURAL_BACKING_PIT_COMMISSIONING_V1",
+  "validation": {
+    "full_gate": "ENFORCED_BY_PROJECT_BOUND_VALIDATION",
+    "github_ci": "ENFORCED_LIVE_AT_GUARDED_MERGE",
+    "independent_review": {
+      "path": "docs/evidence/early_structural_backing_pit_commissioning/a1_delivery_independent_review_v1.json",
+      "sha256": "48b4121785671f52ba7e27421f46745e9866ac1ef51fec101f3f33d265a3f712",
+      "verdict": "PASS"
+    },
+    "project_checks": [
+      "PASS_CATALOG_VALIDATE",
+      "PASS_GENERATOR_CHECK"
+    ],
+    "targeted": "PASS_EARLY_STRUCTURAL_BACKING_PIT_COMMISSIONING_TESTS"
+  }
+}

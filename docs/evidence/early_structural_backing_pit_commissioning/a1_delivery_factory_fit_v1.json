@@ -1,0 +1,36 @@
+{
+  "as_of": "2026-08-22",
+  "capability_radar": {
+    "now": "NONE",
+    "watch": "ATOM_2_UNATTENDED_SHADOW_COMMISSIONING_ONLY"
+  },
+  "dimensions": {
+    "build_vs_buy": "PASS_ADOPT_ORGANIC_WRAP_BIND_PRIMARY_X",
+    "context_efficiency": "PASS_ONE_ATOM_CAPTURE_PLUS_DECISION",
+    "execution_to_cashflow": "PASS_QUOTE_ONLY_NO_NETRETURN",
+    "flexibility_and_history": "PASS_RUNNER_UNCHANGED",
+    "mission": "PASS_FAMILY_CLOSED_ON_NONPOSITIVE_TAU",
+    "monitoring_and_recovery": "PASS_REVERT_ATOM_KEEP_OBSERVATIONS",
+    "owner_operability": "PASS_TYPED_CLOSE_NEXT_ATOM2_COMMISSIONING_ONLY",
+    "red_team": "PASS_FDV_REJECT_UNKNOWN_NOT_ZERO_NO_THIRD_WINDOW",
+    "research_truth": "PASS_PROSPECTIVE_PIT_WINDOW_A",
+    "security": "PASS_PHRASE_GATED_FREE_KEY"
+  },
+  "limits": [
+    "NO_EARN_SHADOW",
+    "NO_ALPHA",
+    "NO_CANONICAL_DONE",
+    "NO_VPS",
+    "NO_MICRO_LIVE",
+    "CAPABILITY_PASS_IS_NOT_PROMOTION"
+  ],
+  "mode": "FULL_REVIEW",
+  "recovery": "REVERT_THIS_ATOM; PRESERVE_FACTORY_RUNNER; KEEP_CONSUMED_MINTS_HISTORICAL",
+  "review_id": "EARLY-STRUCTURAL-BACKING-PIT-FACTORY-FIT-001",
+  "reviewed_bindings_sha256": "5bda730f9455619999b7d893f1374ac075f070edeb5cad4ab1edaf665923601a",
+  "reviewed_inventory_sha256": "514e09885b7790ce757df875c9e09fa88424600ce195d13c2ca7eea4e1f0f2bc",
+  "schema": "smial.delivery-harness-factory-fit",
+  "schema_version": "1.0",
+  "task_id": "EARLY_STRUCTURAL_BACKING_PIT_COMMISSIONING_V1",
+  "verdict": "PASS"
+}

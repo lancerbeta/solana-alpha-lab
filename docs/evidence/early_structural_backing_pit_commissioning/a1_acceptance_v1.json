@@ -1,0 +1,26 @@
+{
+  "acceptance_id": "EARLY-STRUCTURAL-BACKING-PIT-COMMISSIONING-ACCEPTANCE-001",
+  "as_of": "2026-08-22",
+  "cloud_bundle_mode": "OWNER_MANAGED_OPTIONAL_EXPORT",
+  "next_safe_action": "ATOM_2_COMMISSIONING_ONLY_ALLOWED",
+  "non_claims": [
+    "NO_EARN_SHADOW",
+    "NO_ALPHA",
+    "NO_NETRETURN",
+    "NO_EXECUTE",
+    "NO_WINDOW_B",
+    "NO_CANONICAL_DONE",
+    "NO_SHADOW_RUNTIME"
+  ],
+  "product_composition": "PASS_EXISTING_CAMPAIGN_NO_FACTORY_RUNNER_CHANGE",
+  "project_sources_disposition": {
+    "kind": "NO_CHANGE"
+  },
+  "promotable": false,
+  "schema": "smial.early-structural-backing-pit-commissioning-acceptance",
+  "schema_version": "1.0",
+  "scientific_terminal": "CLOSE_EARLY_STRUCTURAL_BACKING_FAMILY",
+  "task_id": "EARLY_STRUCTURAL_BACKING_PIT_COMMISSIONING_V1",
+  "verdict": "CLOSE_EARLY_STRUCTURAL_BACKING_FAMILY",
+  "window_b_ran": false
+}
