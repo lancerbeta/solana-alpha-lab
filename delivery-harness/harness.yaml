@@ -57,16 +57,31 @@ merge_policy:
     - docs/tasks/CTRL-HARNESS-SYNC-DERIVED-HASHES-V1.md
     - docs/tasks/CTRL-HARNESS-SYNC-DELIVERY-EVIDENCE-BINDINGS-V1.md
     - docs/tasks/CTRL-HARNESS-SYNC-CI-FAIL-CLOSED-MESSAGES-V1.md
+    - docs/tasks/CTRL-PROCESS-THROUGHPUT-GUARDRAILS-V1.md
     - scripts/delivery_harness.py
+    - scripts/delivery_efficiency.py
+    - scripts/validate_factory_static.py
+    - scripts/validate_baseline.py
     - scripts/owner_attention_gate.py
     - scripts/validate_ci.py
     - scripts/ci_fail_closed_messages.py
     - scripts/harness_sync.py
     - scripts/validate.ps1
     - scripts/validate_baton.py
+    - scripts/validate_task04.py
+    - pyproject.toml
+    - uv.lock
+    - src/solana_alpha_lab/factory/runtime.py
+    - delivery-harness/policies/solana-alpha-lab.md
+    - catalog/schemas/delivery_harness_completion_evidence.schema.json
     - tests/test_ci.py
     - tests/test_ci_messages.py
+    - tests/test_process_throughput_guardrails.py
+    - tests/test_task23_catalog_repository_factory_fit.py
     - tests/test_delivery_harness_adapters.py
+    - .agents/skills/delivery-harness/SKILL.md
+    - .cursor/agents/owner-ux-critic.md
+    - delivery-harness/templates/portable-core/dot-cursor/commands/delivery-review.md
     - tests/test_delivery_harness_authority.py
     - tests/test_delivery_harness_bootstrap.py
     - tests/test_delivery_harness_context.py

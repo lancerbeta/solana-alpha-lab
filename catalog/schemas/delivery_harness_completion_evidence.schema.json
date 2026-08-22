@@ -80,6 +80,17 @@
       }
     },
     "non_claims": {"type": "array", "minItems": 1, "uniqueItems": true, "items": {"type": "string", "minLength": 1}},
-    "side_effects": {"type": "object"}
+    "side_effects": {"type": "object"},
+    "delivery_efficiency": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["substantive_commits", "repair_commits", "control_only_commits"],
+      "properties": {
+        "substantive_commits": {"type": "integer", "minimum": 0},
+        "repair_commits": {"type": "integer", "minimum": 0},
+        "control_only_commits": {"type": "integer", "minimum": 0},
+        "repair_ratio": {"type": "number", "minimum": 0, "maximum": 1}
+      }
+    }
   }
 }

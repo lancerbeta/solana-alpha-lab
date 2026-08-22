@@ -41,9 +41,12 @@ the guarded merge is the sole project-bound gate executor for the unchanged
 fingerprint. If a leftover space, encoded query, wrong endpoint or shape can
 still fail the atom, probe and fix it on the working path before Catalog,
 receipts, reviews or PR. Do not document a five-second mechanical miss.
-Code review is mandatory. Goal/DoD, architecture and refactor critics
-are trigger-routed and must run in isolated context. `SINGLE_AGENT_REVIEW_FALLBACK`
-is `NOT_READY` for merge; deterministic validation still runs.
+Code review is mandatory. Goal/DoD, architecture, refactor and owner-UX critics
+are trigger-routed and must run in isolated context. Launch `owner-ux-critic`
+only when the diff changes owner-operable surfaces (CLI/console entrypoints,
+manual operator flows, readouts, cockpit/workbench interaction, or owner-facing
+error/next-action copy). `SINGLE_AGENT_REVIEW_FALLBACK` is `NOT_READY` for merge;
+deterministic validation still runs.
 
 ### Derived-hash maintenance
 
@@ -89,6 +92,39 @@ uv run --locked --managed-python python -B scripts/harness_sync.py --check --pat
 ```
 
 The summary does not replace validation; it only surfaces the sanctioned repair.
+
+### Process throughput guardrails
+
+After the harness-sync control sprint (derived-hash sync, evidence binding,
+actionable CI drift messages), the control plane is **frozen** for the next
+**five substantive product or research atoms**.
+
+During the freeze, do not change `delivery-harness/`, owner-attention gate
+semantics, evidence protocol, CI architecture, or harness scripts except for a
+**confirmed blocker** on the active atom (machine `DENY`, repeated friction on
+the working path, or a security defect).
+
+Completion evidence MAY include optional `delivery_efficiency` counts:
+
+- `substantive_commits` — product/research implementation commits;
+- `repair_commits` — derived-hash, evidence-rebind, or CI-drift repair commits;
+- `control_only_commits` — control/harness-only commits;
+- `repair_ratio` — `(repair + control_only) / total` when total > 0.
+
+Use:
+
+```text
+uv run --locked --managed-python python -B scripts/delivery_efficiency.py --base <oid> --head HEAD --json
+```
+
+Factory Python is guarded by a scoped static gate:
+
+```text
+uv run --locked --managed-python python -B scripts/validate_factory_static.py
+```
+
+Replan the process if three consecutive product atoms each show
+`repair_commits >= 2` or `repair_ratio > 0.30`.
 
 ### Finish and merge
 
