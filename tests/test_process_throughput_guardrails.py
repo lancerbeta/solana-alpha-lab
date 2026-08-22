@@ -127,6 +127,11 @@ class FactoryStaticGateTests(unittest.TestCase):
         source = (ROOT / "scripts/validate_factory_static.py").read_text(encoding="utf-8")
         self.assertIn('"--no-cache"', source)
 
+    def test_baseline_allows_ruff_dev_group(self) -> None:
+        source = (ROOT / "scripts/validate_baseline.py").read_text(encoding="utf-8")
+        self.assertIn('"dev": ["ruff==0.11.12"]', source)
+        self.assertIn('"security": ["pip-audit==2.10.1"]', source)
+
 
 class ProcessPolicyTests(unittest.TestCase):
     def test_domain_policy_names_freeze_and_kill_switch(self) -> None:

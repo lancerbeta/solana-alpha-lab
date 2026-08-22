@@ -24,6 +24,7 @@ managed_write_set:
   - catalog/schemas/delivery_harness_completion_evidence.schema.json
   - scripts/delivery_efficiency.py
   - scripts/validate_factory_static.py
+  - scripts/validate_baseline.py
   - scripts/validate_ci.py
   - src/solana_alpha_lab/factory/runtime.py
   - tests/test_process_throughput_guardrails.py

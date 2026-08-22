@@ -2180,7 +2180,7 @@ records:
     repository_path: scripts/validate_baseline.py
   integrity:
     kind: sha256
-    sha256: 01015422e37cc3099813c2fc5dd134902d73fae2163f549597ef1fa08c55ddca
+    sha256: 58caa2bd474d257624da42abe1c9afc859a5c7e505e6167f43274d0e2e510081
   access:
     mode: read_only
     method: command
@@ -19727,7 +19727,7 @@ records:
   as_of: '2026-08-15'
   truth_owner: CTRL-DELIVERY-HARNESS-001
   location: {kind: git_path, logical_uri: 'repo://delivery-harness/harness.yaml', repository_path: delivery-harness/harness.yaml}
-  integrity: {kind: sha256, sha256: 54645b33aec311979d9b60adf8b2d05bf69d1ba3efac055225f6f561a8a00547}
+  integrity: {kind: sha256, sha256: a6854a3d7236c2d54a6454a8ac6cdf94a5ed003f5e9ff5d97697d84304080a73}
   access: *t25_read_file
   relations:
   - {relation_type: governed_by, target_asset_id: CTRL-DELIVERY-HARNESS-001}

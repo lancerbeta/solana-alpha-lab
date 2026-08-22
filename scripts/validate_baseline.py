@@ -5835,7 +5835,11 @@ def validate() -> None:
     if uses_current_runtime_contract(state):
         assert_check(
             "security_dependency_group",
-            metadata.get("dependency-groups") == {"security": ["pip-audit==2.10.1"]},
+            metadata.get("dependency-groups")
+            == {
+                "dev": ["ruff==0.11.12"],
+                "security": ["pip-audit==2.10.1"],
+            },
         )
         assert_check(
             "mutable_tool_metadata_removed",

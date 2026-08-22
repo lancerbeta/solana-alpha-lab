@@ -61,6 +61,7 @@ merge_policy:
     - scripts/delivery_harness.py
     - scripts/delivery_efficiency.py
     - scripts/validate_factory_static.py
+    - scripts/validate_baseline.py
     - scripts/owner_attention_gate.py
     - scripts/validate_ci.py
     - scripts/ci_fail_closed_messages.py
