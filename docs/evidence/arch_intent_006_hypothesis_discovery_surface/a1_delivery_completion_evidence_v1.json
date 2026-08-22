@@ -1,0 +1,70 @@
+{
+  "schema": "smial.delivery-completion-evidence",
+  "schema_version": "1.0",
+  "acceptance_id": "ARCH-INTENT-006-DELIVERY-COMPLETION-001",
+  "as_of": "2026-08-22",
+  "task_id": "ARCH_INTENT_006_HYPOTHESIS_DISCOVERY_SURFACE_V1",
+  "state_change": "ARCH_INTENT_006_HORIZON_MEMORY_REGISTERED",
+  "base_main": "6d55144d95d05b4f0c833ed4b2caac2d8534d448",
+  "cloud_bundle_mode": "OWNER_MANAGED_OPTIONAL_EXPORT",
+  "cloud_bundle_required_by_harness": false,
+  "cloud_bundle_smoke_required": false,
+  "capability_radar_now": "NONE",
+  "implementation_bindings": {
+    "catalog/assets/architecture.yaml": "a42d7b8ded9aee855297cbf259fd8c8cba280f5d6c86f3d25dafdfdd324a0bb3",
+    "catalog/assets/lifecycle.yaml": "121e7f0c2b10b017a6c1f17ac092a0d388fc82751fe023d10712ea3383272df7",
+    "catalog/catalog_manifest.yaml": "2aa370b25e82374a7675c6d9b5610d87de7ac1191abd376d957d874bcf1bfdb7",
+    "catalog/generated/asset_edges.json": "ecaf4fb7ae997be17c44b27b0f0da234d2b57501dc502a3c40bde47388a03c44",
+    "docs/PROJECT_MAP.md": "f3b7e37d9a8df941fc5771e252f76cb769b9d931f8e15aef60c397754f960e0b",
+    "docs/architecture/intents/ARCH-INTENT-006-hypothesis-discovery-and-opportunity-surface.md": "3c1992c5c5b6b9d39ada33d41596a1cc7c1d6c317084b1e920bd7138a1d63f97",
+    "tests/test_arch_intent_006_hypothesis_discovery_surface.py": "c8dfd10e6d1c2539ea2baa6eb674ea08b2ef07b90606f2ffde294f12e646e4c6",
+    "docs/tasks/ARCH_INTENT_006_HYPOTHESIS_DISCOVERY_SURFACE_V1.md": "ebb79312a77c4bb4f424a2166b4e87bd136e6cf9035af57a2d54f4cca491e200"
+  },
+  "active_stop_conditions": [],
+  "owner_attention_triggers": {
+    "auth_or_access_recovery": false,
+    "material_owner_decision": false,
+    "user_only_activation": false,
+    "external_material_action": false,
+    "unresolved_safety_or_truth_conflict": false
+  },
+  "project_sources_disposition": {
+    "kind": "NO_CHANGE"
+  },
+  "factory_fit": {
+    "path": "docs/evidence/arch_intent_006_hypothesis_discovery_surface/a1_delivery_factory_fit_v1.json",
+    "sha256": "ba2d95d349b2617edf50cf5f1242d3bfce4dab074c88a46375e3a59be55c3494",
+    "verdict": "PASS"
+  },
+  "validation": {
+    "targeted": "PASS_ARCH_INTENT_006_BINDING_TESTS",
+    "independent_review": {
+      "path": "docs/evidence/arch_intent_006_hypothesis_discovery_surface/a1_delivery_independent_review_v1.json",
+      "sha256": "3550cc308a326c026c355b4bd3a33fa8b89df082c68b957170a96a744bf874fb",
+      "verdict": "PASS"
+    },
+    "full_gate": "ENFORCED_BY_PROJECT_BOUND_VALIDATION",
+    "github_ci": "ENFORCED_LIVE_AT_GUARDED_MERGE",
+    "project_checks": [
+      "PASS_ARCH_INTENT_006_BINDING_TESTS",
+      "PASS_CATALOG_VALIDATION",
+      "PASS_NAVIGATION_CHECK",
+      "PASS_SECRET_SCAN"
+    ]
+  },
+  "non_claims": [
+    "NO_GENERATOR_OR_RANKER_IMPLEMENTED",
+    "NO_ROADMAP_ACTIVATION",
+    "NO_TASK28_UNFREEZE",
+    "NO_ALPHA_OR_CASHFLOW",
+    "NO_CANONICAL_DONE"
+  ],
+  "side_effects": {
+    "cash_spend_usd_cents": 0,
+    "credential_reads": 0,
+    "fallbacks": 0,
+    "provider_requests": 0,
+    "retries": 0,
+    "wallet_signer_transaction_actions": 0
+  }
+}

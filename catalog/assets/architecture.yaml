@@ -215,3 +215,48 @@ records:
     retention: TRACKED_REFERENCE
     canonicality: CURRENT_INTENT
     availability_note: Git-native registration by FACTORY-V1-OPERATIONAL-READINESS-V1; not a TASK-21 import and not implementation evidence.
+- asset_id: ARCH-INTENT-006
+  record_version: '1.0'
+  asset_type: architecture_intent
+  purpose: Accepted product-horizon memory for a bounded hypothesis discovery and opportunity surface upstream of the existing hypothesis lifecycle; not implementation and not a roadmap activation.
+  status: ACCEPTED_DIRECTION_NOT_IMPLEMENTED
+  origin: REPOSITORY
+  as_of: '2026-08-22'
+  truth_owner: USER_GOAL_OWNER
+  location:
+    kind: git_path
+    logical_uri: repo://docs/architecture/intents/ARCH-INTENT-006-hypothesis-discovery-and-opportunity-surface.md
+    repository_path: docs/architecture/intents/ARCH-INTENT-006-hypothesis-discovery-and-opportunity-surface.md
+  integrity:
+    kind: sha256
+    sha256: 3c1992c5c5b6b9d39ada33d41596a1cc7c1d6c317084b1e920bd7138a1d63f97
+  access:
+    mode: read_only
+    method: file
+    recipe_id: QUERY-CATALOG-RESOLVE-ASSET-001
+    network_required: false
+    secrets_required: false
+  relations:
+  - relation_type: derived_from
+    target_asset_id: ARCH-INTENT-001
+  - relation_type: derived_from
+    target_asset_id: ARCH-INTENT-002
+  - relation_type: derived_from
+    target_asset_id: ARCH-INTENT-005
+  consumers:
+  - GOAL-OWNER
+  - REG-RESEARCH-001
+  evidence: []
+  classification:
+    contains_secrets: false
+    contains_raw_data: false
+    sensitivity: INTERNAL_NON_SECRET
+  provenance:
+    created_at: '2026-08-22'
+    first_reliable_available_at: '2026-08-22'
+    imported_by_task: DESIGN_ONLY_PRODUCT_HORIZON_MEMORY
+    import_mode: REGISTERED_CURRENT_INTENT
+    past_availability_claim: NO_PAST_AVAILABILITY_CLAIM
+    retention: TRACKED_REFERENCE
+    canonicality: CURRENT_INTENT
+    availability_note: Horizon memory only; does not authorize generator, provider, trial, holdout, roadmap insertion or TASK-28 unfreeze.
