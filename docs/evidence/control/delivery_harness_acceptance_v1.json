@@ -39,7 +39,7 @@
     "control/owner_attention_gate_v2.yaml": "6c4cb1ec1d709510e36b0b3d10f2e17272a28ff902e432847d27a8edf2be372d",
     "delivery-harness/capability-radar.yaml": "6f68bfa257f5e227a96552f785c8f9eede7126c9e1f84eb2a5ed4bdf64d0d0e8",
     "delivery-harness/context-map.yaml": "ca881df9da3884deb480327f2fd070e249572aa50f1d8eef30e877b5dfbbcf4d",
-    "delivery-harness/harness.yaml": "c5b1c5401ac06c2167cea98c579b3fae83d6dd7286541c4141a31a9290623ff1",
+    "delivery-harness/harness.yaml": "82fc0c16053d1f3168e0f380684e742b3bf18e5e6eafb6fac21e522a4af86d9e",
     "delivery-harness/policies/solana-alpha-lab.md": "ff8667d46d2e8aa00e5fc1d5409cebd04f49cbf313e486f5b014e5777ba4328f",
     "delivery-harness/project-profile.yaml": "5aff7be56febd2ebadab76ae6f86e7023dd1f5a6facf9bed58f07747779d3df1",
     "delivery-harness/templates/bootstrap-prompt.md": "0af2660e84b4f37d917832db88e5a03069fc85c3a331bc9476e24eddee171aef",

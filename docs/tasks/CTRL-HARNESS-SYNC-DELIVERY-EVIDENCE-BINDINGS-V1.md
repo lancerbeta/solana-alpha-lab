@@ -19,6 +19,7 @@ managed_write_set:
   - tests/test_harness_sync_bindings.py
   - docs/agent/DELIVERY_HARNESS_PROTOCOL.md
   - delivery-harness/harness.yaml
+  - docs/evidence/control/delivery_harness_acceptance_v1.json
   - docs/evidence/control/a1_harness_sync_delivery_evidence_bindings_acceptance_v1.json
   - docs/evidence/control/a1_harness_sync_delivery_evidence_bindings_review_v1.json
   - docs/evidence/control/a1_harness_sync_delivery_evidence_bindings_factory_fit_v1.json
