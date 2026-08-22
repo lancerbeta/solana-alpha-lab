@@ -55,6 +55,7 @@ merge_policy:
     - docs/tasks/CTRL-CI-OWNED-PRODUCT-SCHEMA-ELIGIBILITY-V1.md
     - docs/tasks/CTRL-AUTONOMOUS-DELIVERY-SKILL-V1.md
     - docs/tasks/CTRL-HARNESS-SYNC-DERIVED-HASHES-V1.md
+    - docs/tasks/CTRL-HARNESS-SYNC-DELIVERY-EVIDENCE-BINDINGS-V1.md
     - scripts/delivery_harness.py
     - scripts/owner_attention_gate.py
     - scripts/validate_ci.py
@@ -69,6 +70,7 @@ merge_policy:
     - tests/test_delivery_harness_skill.py
     - tests/test_autonomous_delivery_skill.py
     - tests/test_harness_sync.py
+    - tests/test_harness_sync_bindings.py
 context_lanes:
   L0: always_loaded_front_door
   L1: exact_task_capsule

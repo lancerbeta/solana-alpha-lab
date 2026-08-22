@@ -4,6 +4,7 @@
 from __future__ import annotations
 
 import argparse
+import hashlib
 import json
 import re
 import subprocess
@@ -310,12 +311,451 @@ def apply_sync() -> dict[str, Any]:
     }
 
 
-def main() -> int:
+def _run_git(args: list[str], root: Path | None = None) -> bytes:
+    completed = subprocess.run(
+        args,
+        cwd=str(root or ROOT),
+        stdout=subprocess.PIPE,
+        stderr=subprocess.PIPE,
+        check=False,
+        shell=False,
+    )
+    if completed.returncode != 0:
+        raise HarnessSyncError("GIT_READ_FAILED")
+    return completed.stdout
+
+
+def _parse_task_frontmatter(path: Path, task_id: str) -> dict[str, Any]:
+    try:
+        text = path.read_text(encoding="utf-8")
+    except OSError as exc:
+        raise HarnessSyncError("TASK_NOT_FOUND") from exc
+    match = re.match(r"\A---\r?\n(.*?)\r?\n---\r?\n", text, re.DOTALL)
+    if match is None:
+        raise HarnessSyncError("TASK_NOT_FOUND")
+    metadata = yaml.safe_load(match.group(1))
+    if not isinstance(metadata, dict) or metadata.get("task_id") != task_id:
+        raise HarnessSyncError("TASK_NOT_FOUND")
+    return metadata
+
+
+def resolve_task_contract(task_id: str, *, contract: str | None = None) -> tuple[str, dict[str, Any]]:
+    if contract is not None:
+        relative = contract.replace("\\", "/")
+        metadata = _parse_task_frontmatter(ROOT / relative, task_id)
+        return relative, metadata
+    matches: list[tuple[str, dict[str, Any]]] = []
+    tasks_dir = ROOT / "docs/tasks"
+    if not tasks_dir.is_dir():
+        raise HarnessSyncError("TASK_NOT_FOUND")
+    for path in sorted(tasks_dir.glob("*.md")):
+        try:
+            metadata = _parse_task_frontmatter(path, task_id)
+        except HarnessSyncError:
+            continue
+        matches.append((path.relative_to(ROOT).as_posix(), metadata))
+    if len(matches) != 1:
+        raise HarnessSyncError("TASK_NOT_FOUND")
+    return matches[0]
+
+
+def _managed_write_set(metadata: dict[str, Any]) -> list[str]:
+    managed = metadata.get("managed_write_set")
+    if not isinstance(managed, list) or not managed:
+        raise HarnessSyncError("MANAGED_WRITE_SET_INVALID")
+    normalized: list[str] = []
+    for item in managed:
+        if not isinstance(item, str) or not item:
+            raise HarnessSyncError("MANAGED_WRITE_SET_INVALID")
+        normalized.append(item.replace("\\", "/"))
+    if len(set(normalized)) != len(normalized):
+        raise HarnessSyncError("MANAGED_WRITE_SET_INVALID")
+    return normalized
+
+
+def _delivery_evidence_paths(metadata: dict[str, Any]) -> tuple[str, str, str]:
+    requirements = metadata.get("context_requirements")
+    if not isinstance(requirements, dict):
+        raise HarnessSyncError("DELIVERY_EVIDENCE_PATHS_INCOMPLETE")
+    paths_by_role = requirements.get("exact_role_paths")
+    if not isinstance(paths_by_role, dict):
+        raise HarnessSyncError("DELIVERY_EVIDENCE_PATHS_INCOMPLETE")
+    delivery_paths = paths_by_role.get("DELIVERY_EVIDENCE")
+    if not isinstance(delivery_paths, list) or len(delivery_paths) != 3:
+        raise HarnessSyncError("DELIVERY_EVIDENCE_PATHS_INCOMPLETE")
+    completion = review = fit = None
+    for relative in delivery_paths:
+        if not isinstance(relative, str):
+            raise HarnessSyncError("DELIVERY_EVIDENCE_PATHS_INCOMPLETE")
+        path = ROOT / relative.replace("\\", "/")
+        if not path.is_file():
+            raise HarnessSyncError("DELIVERY_EVIDENCE_PATHS_INCOMPLETE")
+        payload = json.loads(path.read_text(encoding="utf-8"))
+        schema = payload.get("schema")
+        if schema == "smial.delivery-completion-evidence":
+            completion = relative.replace("\\", "/")
+        elif schema == "smial.delivery-independent-review-evidence":
+            review = relative.replace("\\", "/")
+        elif schema == "smial.delivery-harness-factory-fit":
+            fit = relative.replace("\\", "/")
+    if not (completion and review and fit):
+        raise HarnessSyncError("DELIVERY_EVIDENCE_PATHS_INCOMPLETE")
+    return completion, review, fit
+
+
+def _git_binding(metadata: dict[str, Any]) -> tuple[str, str]:
+    binding = metadata.get("git_binding")
+    if not isinstance(binding, dict):
+        raise HarnessSyncError("GIT_BINDING_INVALID")
+    expected_base = binding.get("expected_base")
+    expected_branch = binding.get("expected_branch")
+    if not (
+        isinstance(expected_base, str)
+        and re.fullmatch(r"[0-9a-f]{40}", expected_base)
+        and isinstance(expected_branch, str)
+        and expected_branch
+    ):
+        raise HarnessSyncError("GIT_BINDING_INVALID")
+    return expected_base, expected_branch
+
+
+def _path_in_managed_write_set(path: str, managed: list[str]) -> bool:
+    from owner_attention_gate import path_in_managed_write_set
+
+    return path_in_managed_write_set(path, managed)
+
+
+def _decode_git_name_status(value: bytes) -> list[tuple[str, str]]:
+    from owner_attention_gate import decode_git_name_status
+
+    return decode_git_name_status(value)
+
+
+def _canonical_json_bytes(value: Any) -> bytes:
+    from owner_attention_gate import canonical_json_bytes
+
+    return canonical_json_bytes(value)
+
+
+def _sha256_bytes(value: bytes) -> str:
+    from owner_attention_gate import sha256_bytes
+
+    return sha256_bytes(value)
+
+
+def _delivery_inventory_sha256(
+    *,
+    expected_base: str,
+    head: str,
+    excluded_paths: set[str],
+) -> str:
+    from owner_attention_gate import delivery_inventory_sha256
+
+    return delivery_inventory_sha256(
+        ROOT,
+        expected_base=expected_base,
+        head=head,
+        excluded_paths=excluded_paths,
+        runner=_run_git,
+    )
+
+
+def build_implementation_bindings(
+    *,
+    expected_base: str,
+    head: str,
+    managed: list[str],
+    excluded: set[str],
+) -> dict[str, str]:
+    output = _run_git(
+        ["git", "diff", "--name-status", "--no-renames", "-z", f"{expected_base}...{head}"]
+    )
+    bindings: dict[str, str] = {}
+    for status, path in _decode_git_name_status(output):
+        if path in excluded:
+            continue
+        if status == "D":
+            continue
+        if not _path_in_managed_write_set(path, managed):
+            raise HarnessSyncError(f"BINDING_SCOPE_VIOLATION:{path}")
+        candidate = ROOT / path
+        if candidate.is_file():
+            payload = candidate.read_bytes()
+        else:
+            payload = _run_git(["git", "show", f"{head}:{path}"])
+        bindings[path] = hashlib.sha256(payload).hexdigest()
+    if not bindings:
+        raise HarnessSyncError("BINDING_INVENTORY_EMPTY")
+    return dict(sorted(bindings.items()))
+
+
+def _assert_bind_allowed(completion_path: str) -> None:
+    try:
+        ahead = int(_run_git(["git", "rev-list", "--count", f"origin/main..HEAD"]).decode("ascii").strip())
+    except ValueError as exc:
+        raise HarnessSyncError("EVIDENCE_FROZEN") from exc
+    if ahead == 0:
+        raise HarnessSyncError("EVIDENCE_FROZEN")
+
+
+def _write_json(path: Path, payload: dict[str, Any]) -> None:
+    path.write_bytes(
+        (json.dumps(payload, ensure_ascii=False, indent=2) + "\n").encode("utf-8")
+    )
+
+
+def _load_json(path: Path) -> dict[str, Any]:
+    payload = json.loads(path.read_text(encoding="utf-8"))
+    if not isinstance(payload, dict):
+        raise HarnessSyncError("DELIVERY_EVIDENCE_INVALID")
+    return payload
+
+
+def compute_evidence_chain(
+    *,
+    task_id: str,
+    contract: str | None = None,
+    head: str | None = None,
+) -> dict[str, Any]:
+    _, metadata = resolve_task_contract(task_id, contract=contract)
+    expected_base, _branch = _git_binding(metadata)
+    if head is None:
+        head = _run_git(["git", "rev-parse", "HEAD"]).decode("ascii").strip()
+    if re.fullmatch(r"[0-9a-f]{40}", head) is None:
+        raise HarnessSyncError("HEAD_INVALID")
+    managed = _managed_write_set(metadata)
+    completion_path, review_path, fit_path = _delivery_evidence_paths(metadata)
+    excluded = {completion_path, review_path, fit_path}
+    bindings = build_implementation_bindings(
+        expected_base=expected_base,
+        head=head,
+        managed=managed,
+        excluded=excluded,
+    )
+    bindings_sha = _sha256_bytes(_canonical_json_bytes(bindings))
+    inventory_sha = _delivery_inventory_sha256(
+        expected_base=expected_base,
+        head=head,
+        excluded_paths=excluded,
+    )
+    return {
+        "task_id": task_id,
+        "expected_base": expected_base,
+        "head": head,
+        "completion_path": completion_path,
+        "review_path": review_path,
+        "fit_path": fit_path,
+        "implementation_bindings": bindings,
+        "reviewed_bindings_sha256": bindings_sha,
+        "reviewed_inventory_sha256": inventory_sha,
+    }
+
+
+def verify_evidence_chain(*, task_id: str, contract: str | None = None, head: str | None = None) -> list[str]:
+    expected = compute_evidence_chain(task_id=task_id, contract=contract, head=head)
+    problems: list[str] = []
+    completion = _load_json(ROOT / expected["completion_path"])
+    review = _load_json(ROOT / expected["review_path"])
+    fit = _load_json(ROOT / expected["fit_path"])
+    if completion.get("implementation_bindings") != expected["implementation_bindings"]:
+        problems.append("implementation_bindings_mismatch")
+    if completion.get("base_main") != expected["expected_base"]:
+        problems.append("base_main_mismatch")
+    if review.get("reviewed_bindings_sha256") != expected["reviewed_bindings_sha256"]:
+        problems.append("review_bindings_sha_mismatch")
+    if review.get("reviewed_inventory_sha256") != expected["reviewed_inventory_sha256"]:
+        problems.append("review_inventory_sha_mismatch")
+    if fit.get("reviewed_bindings_sha256") != expected["reviewed_bindings_sha256"]:
+        problems.append("fit_bindings_sha_mismatch")
+    if fit.get("reviewed_inventory_sha256") != expected["reviewed_inventory_sha256"]:
+        problems.append("fit_inventory_sha_mismatch")
+    problems.extend(
+        _verify_nested_evidence_hashes(
+            completion=completion,
+            review_path=expected["review_path"],
+            fit_path=expected["fit_path"],
+        )
+    )
+    return problems
+
+
+def _verify_nested_evidence_hashes(
+    *,
+    completion: dict[str, Any],
+    review_path: str,
+    fit_path: str,
+) -> list[str]:
+    problems: list[str] = []
+    review_sha = hashlib.sha256((ROOT / review_path).read_bytes()).hexdigest()
+    fit_sha = hashlib.sha256((ROOT / fit_path).read_bytes()).hexdigest()
+    review_binding = completion.get("validation", {}).get("independent_review", {})
+    fit_binding = completion.get("factory_fit", {})
+    if not isinstance(review_binding, dict) or review_binding.get("sha256") != review_sha:
+        problems.append("completion_review_sha_mismatch")
+    if not isinstance(fit_binding, dict) or fit_binding.get("sha256") != fit_sha:
+        problems.append("completion_fit_sha_mismatch")
+    return problems
+
+
+def verify_evidence_chain_internal(completion_path: str) -> list[str]:
+    completion = _load_json(ROOT / completion_path)
+    bindings = completion.get("implementation_bindings")
+    if not isinstance(bindings, dict) or not bindings:
+        return ["implementation_bindings_missing"]
+    bindings_sha = _sha256_bytes(_canonical_json_bytes(dict(sorted(bindings.items()))))
+    review_binding = completion.get("validation", {}).get("independent_review", {})
+    fit_binding = completion.get("factory_fit", {})
+    if not isinstance(review_binding, dict) or not isinstance(review_binding.get("path"), str):
+        return ["completion_review_path_missing"]
+    if not isinstance(fit_binding, dict) or not isinstance(fit_binding.get("path"), str):
+        return ["completion_fit_path_missing"]
+    review_path = review_binding["path"].replace("\\", "/")
+    fit_path = fit_binding["path"].replace("\\", "/")
+    review = _load_json(ROOT / review_path)
+    fit = _load_json(ROOT / fit_path)
+    problems: list[str] = []
+    if review.get("reviewed_bindings_sha256") != bindings_sha:
+        problems.append("review_bindings_sha_mismatch")
+    if fit.get("reviewed_bindings_sha256") != bindings_sha:
+        problems.append("fit_bindings_sha_mismatch")
+    if review.get("reviewed_inventory_sha256") != fit.get("reviewed_inventory_sha256"):
+        problems.append("review_fit_inventory_sha_mismatch")
+    for path, expected_sha in bindings.items():
+        if not isinstance(path, str) or not isinstance(expected_sha, str):
+            problems.append("implementation_binding_invalid")
+            continue
+        candidate = ROOT / path
+        if not candidate.is_file():
+            problems.append(f"binding_target_missing:{path}")
+            continue
+        if hashlib.sha256(candidate.read_bytes()).hexdigest() != expected_sha:
+            problems.append(f"binding_target_hash_mismatch:{path}")
+    problems.extend(
+        _verify_nested_evidence_hashes(
+            completion=completion,
+            review_path=review_path,
+            fit_path=fit_path,
+        )
+    )
+    return problems
+
+
+def apply_evidence_chain(*, task_id: str, contract: str | None = None, head: str | None = None) -> dict[str, Any]:
+    expected = compute_evidence_chain(task_id=task_id, contract=contract, head=head)
+    _assert_bind_allowed(expected["completion_path"])
+    review_path = ROOT / expected["review_path"]
+    fit_path = ROOT / expected["fit_path"]
+    completion_path = ROOT / expected["completion_path"]
+    review = _load_json(review_path)
+    fit = _load_json(fit_path)
+    completion = _load_json(completion_path)
+    review["reviewed_bindings_sha256"] = expected["reviewed_bindings_sha256"]
+    review["reviewed_inventory_sha256"] = expected["reviewed_inventory_sha256"]
+    fit["reviewed_bindings_sha256"] = expected["reviewed_bindings_sha256"]
+    fit["reviewed_inventory_sha256"] = expected["reviewed_inventory_sha256"]
+    _write_json(review_path, review)
+    _write_json(fit_path, fit)
+    review_sha = hashlib.sha256(review_path.read_bytes()).hexdigest()
+    fit_sha = hashlib.sha256(fit_path.read_bytes()).hexdigest()
+    completion["implementation_bindings"] = expected["implementation_bindings"]
+    completion["base_main"] = expected["expected_base"]
+    if not isinstance(completion.get("factory_fit"), dict):
+        raise HarnessSyncError("DELIVERY_EVIDENCE_INVALID")
+    if not isinstance(completion.get("validation"), dict):
+        raise HarnessSyncError("DELIVERY_EVIDENCE_INVALID")
+    if not isinstance(completion["validation"].get("independent_review"), dict):
+        raise HarnessSyncError("DELIVERY_EVIDENCE_INVALID")
+    completion["factory_fit"]["sha256"] = fit_sha
+    completion["validation"]["independent_review"]["sha256"] = review_sha
+    _write_json(completion_path, completion)
+    return {
+        "mode": "bind-evidence-apply",
+        "task_id": task_id,
+        "head": expected["head"],
+        "expected_base": expected["expected_base"],
+        "changed_files": sorted(
+            {expected["completion_path"], expected["review_path"], expected["fit_path"]}
+        ),
+        "binding_count": len(expected["implementation_bindings"]),
+        "reviewed_bindings_sha256": expected["reviewed_bindings_sha256"],
+        "reviewed_inventory_sha256": expected["reviewed_inventory_sha256"],
+    }
+
+
+def verify_all_delivered_evidence() -> dict[str, Any]:
+    results: list[dict[str, Any]] = []
+    for completion_file in sorted((ROOT / "docs/evidence").glob("**/a1_delivery_completion_evidence_v1.json")):
+        relative = completion_file.relative_to(ROOT).as_posix()
+        payload = _load_json(completion_file)
+        task_id = payload.get("task_id")
+        if not isinstance(task_id, str) or not task_id:
+            results.append({"path": relative, "status": "SKIP", "reason": "missing_task_id"})
+            continue
+        try:
+            problems = verify_evidence_chain_internal(relative)
+        except HarnessSyncError as exc:
+            results.append({"path": relative, "task_id": task_id, "status": "ERROR", "reason": str(exc)})
+            continue
+        results.append(
+            {
+                "path": relative,
+                "task_id": task_id,
+                "status": "PASS" if not problems else "MISMATCH",
+                "problems": problems,
+            }
+        )
+    passed = sum(1 for item in results if item.get("status") == "PASS")
+    mismatched = sum(1 for item in results if item.get("status") == "MISMATCH")
+    return {
+        "mode": "bind-evidence-verify-all-delivered",
+        "total": len(results),
+        "passed": passed,
+        "mismatched": mismatched,
+        "results": results,
+    }
+
+
+def bind_evidence_main(argv: list[str]) -> int:
+    parser = argparse.ArgumentParser(description="Bind delivery-evidence hash chains for task closure.")
+    parser.add_argument("--task-id", help="Exact task_id from the task contract")
+    parser.add_argument("--contract", help="Optional task contract path under the repository root")
+    parser.add_argument("--head", help="Optional explicit head OID (defaults to HEAD)")
+    mode = parser.add_mutually_exclusive_group(required=True)
+    mode.add_argument("--apply", action="store_true", help="write bound delivery-evidence chain")
+    mode.add_argument("--verify", action="store_true", help="verify bound delivery-evidence chain")
+    mode.add_argument(
+        "--verify-all-delivered",
+        action="store_true",
+        help="read-only audit of historical delivery completion chains",
+    )
+    args = parser.parse_args(argv)
+    if args.verify_all_delivered:
+        print(json.dumps(verify_all_delivered_evidence(), indent=2))
+        return 0
+    if not args.task_id:
+        print("HARNESS_SYNC_ERROR: --task-id is required", file=sys.stderr)
+        return 2
+    if args.verify:
+        problems = verify_evidence_chain(
+            task_id=args.task_id, contract=args.contract, head=args.head
+        )
+        if problems:
+            for problem in problems:
+                print(f"BIND_EVIDENCE_DRIFT: {problem}", file=sys.stderr)
+            return 1
+        print("HARNESS_SYNC_BIND_EVIDENCE: PASS")
+        return 0
+    result = apply_evidence_chain(task_id=args.task_id, contract=args.contract, head=args.head)
+    print(json.dumps(result, indent=2))
+    return 0
+
+
+def sync_main(argv: list[str]) -> int:
     parser = argparse.ArgumentParser(description=__doc__)
     mode = parser.add_mutually_exclusive_group(required=True)
     mode.add_argument("--apply", action="store_true", help="repair derived drift")
     mode.add_argument("--check", action="store_true", help="verify derived state only")
-    args = parser.parse_args()
+    args = parser.parse_args(argv)
 
     if args.check:
         problems = check_drift()
@@ -329,6 +769,13 @@ def main() -> int:
     result = apply_sync()
     print(json.dumps(result, indent=2))
     return 0
+
+
+def main(argv: list[str] | None = None) -> int:
+    argv = list(sys.argv[1:] if argv is None else argv)
+    if argv and argv[0] == "bind-evidence":
+        return bind_evidence_main(argv[1:])
+    return sync_main(argv)
 
 
 if __name__ == "__main__":
