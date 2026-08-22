@@ -1,0 +1,37 @@
+{
+  "schema": "smial.delivery-harness-factory-fit",
+  "schema_version": "1.0",
+  "review_id": "ARCH-INTENT-006-FACTORY-FIT-001",
+  "as_of": "2026-08-22",
+  "task_id": "ARCH_INTENT_006_HYPOTHESIS_DISCOVERY_SURFACE_V1",
+  "reviewed_bindings_sha256": "72dd91f23e9bf08c70c41682f054af94c171425d926fa33f7c9a454ecff36950",
+  "reviewed_inventory_sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+  "mode": "FULL_REVIEW",
+  "verdict": "PASS",
+  "dimensions": {
+    "mission": "PASS_HORIZON_MEMORY_FOR_NEXT_BOTTLENECK_AFTER_FACTORY_EXECUTION",
+    "flexibility_and_history": "PASS_EXTENDS_001_002_005_WITHOUT_REPLACING_OWNERS",
+    "context_efficiency": "PASS_ONE_INTENT_PLUS_CATALOG_BINDING_NO_ENGINE",
+    "research_truth": "PASS_WATCH_ONLY_NO_HOLDOUT_NO_ALPHA_CLAIM",
+    "owner_operability": "PASS_NAMED_CONSUMERS_AND_ACTIVATION_TRIGGER_EXPLICIT",
+    "execution_to_cashflow": "NOT_APPLICABLE_DESIGN_ONLY_HORIZON",
+    "monitoring_and_recovery": "PASS_REVERT_INTENT_AND_CATALOG_RECORD",
+    "build_vs_buy": "PASS_NO_NEW_PLATFORM_ADOPT_EXISTING_LIFECYCLE_HANDOFF",
+    "security": "PASS_NO_SECRETS_NO_PROVIDER_NO_SIGNER",
+    "red_team": "PASS_NO_GENERATOR_ROADMAP_OR_TASK28_UNFREEZE_BY_REGISTRATION"
+  },
+  "capability_radar": {
+    "now": "NONE",
+    "watch": "ACTIVATE_ONLY_WHEN_FACTORY_OUTPACES_HYPOTHESIS_SUPPLY"
+  },
+  "recovery": "REVERT ARCH-INTENT-006 BYTES AND CATALOG RECORD; DO NOT BUILD GENERATOR FROM THIS MERGE.",
+  "limits": [
+    "NO_GENERATOR_OR_RANKER",
+    "NO_ROADMAP_INSERTION",
+    "NO_TASK28_UNFREEZE",
+    "NO_PROVIDER_OR_NETWORK",
+    "NO_HOLDOUT_OR_TRIAL",
+    "NO_ALPHA_OR_CASHFLOW",
+    "NO_CANONICAL_DONE"
+  ]
+}

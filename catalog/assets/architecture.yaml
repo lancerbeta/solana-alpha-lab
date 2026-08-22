@@ -229,7 +229,7 @@ records:
     repository_path: docs/architecture/intents/ARCH-INTENT-006-hypothesis-discovery-and-opportunity-surface.md
   integrity:
     kind: sha256
-    sha256: 9b376efb1825645f8b070c7ade7c65f5ea09af2dfa42e9d7b22970bede1042e2
+    sha256: 3c1992c5c5b6b9d39ada33d41596a1cc7c1d6c317084b1e920bd7138a1d63f97
   access:
     mode: read_only
     method: file
@@ -244,9 +244,8 @@ records:
   - relation_type: derived_from
     target_asset_id: ARCH-INTENT-005
   consumers:
-  - FACTORY-001
-  - REG-RESEARCH-001
   - GOAL-OWNER
+  - REG-RESEARCH-001
   evidence: []
   classification:
     contains_secrets: false

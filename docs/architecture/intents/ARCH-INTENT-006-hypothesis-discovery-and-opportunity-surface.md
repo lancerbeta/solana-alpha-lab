@@ -7,6 +7,10 @@ truth_owner: USER_GOAL_OWNER
 projection_kind: PRODUCT_HORIZON_NOT_IMPLEMENTATION
 implementation: NOT_IMPLEMENTED
 product_layer_id: HYPOTHESIS_DISCOVERY_AND_OPPORTUNITY_SURFACE
+activation_mode: WATCH_ONLY_UNTIL_ENTRY_GATE
+named_consumers:
+  - FUTURE_DISCOVERY_RANKER_ENTRY_GATE
+  - GOAL_OWNER_HYPOTHESIS_PRIORITIZATION
 extends:
   - ARCH-INTENT-001
   - ARCH-INTENT-002
@@ -40,7 +44,21 @@ implicitly:
 > search-budget-limited discovery and ranking of new hypothesis candidates from
 > the available market / data / context / mechanism space.
 
-## 1. Product layer
+## 1. Named consumers
+
+This horizon memory is for:
+
+1. `FUTURE_DISCOVERY_RANKER_ENTRY_GATE` — a future discovery / Candidate Ranker
+   Entry Gate that must resolve draft candidates against the draft-candidate
+   minimum contract before any build atom;
+2. `GOAL_OWNER_HYPOTHESIS_PRIORITIZATION` — owner prioritization when Factory
+   throughput outpaces high-quality next-hypothesis supply.
+
+Factory execution speed is an **activation precondition**, not the primary
+consumer of this memory. This record does not advise or insert roadmap items
+and remains WATCH-only until the activation trigger.
+
+## 2. Product layer
 
 `HYPOTHESIS_DISCOVERY_AND_OPPORTUNITY_SURFACE` is a future product layer
 **upstream of** the existing hypothesis / ExperimentSpec lifecycle.
@@ -55,7 +73,7 @@ It does not replace:
   ARCH-INTENT-002 and CONTRACT-T16;
 - existing Factory availability semantics.
 
-## 2. Purpose
+## 3. Purpose
 
 When activated later under a separate Entry Gate, the layer should:
 
@@ -70,11 +88,11 @@ When activated later under a separate Entry Gate, the layer should:
 5. hand an accepted draft into the **existing** hypothesis lifecycle /
    ExperimentSpec path, never into a second research lifecycle.
 
-## 3. Orthogonal vocabularies
+## 4. Orthogonal vocabularies
 
 Do not collapse these into one taxonomy.
 
-### 3.1 Truth / availability classes (existing Factory owners)
+### 4.1 Truth / availability classes (existing Factory owners)
 
 Reuse the current Factory semantics without replacement:
 
@@ -87,7 +105,7 @@ Reuse the current Factory semantics without replacement:
 
 These remain owned by the Factory feature surface / research-truth contracts.
 
-### 3.2 Semantic / product tags (discovery inventory only)
+### 4.2 Semantic / product tags (discovery inventory only)
 
 Allowed product tags for opportunity inventory, orthogonal to truth class:
 
@@ -101,7 +119,7 @@ A tag never asserts availability, PIT safety, alpha, or permission to acquire
 data. Tags are not a second truth taxonomy and must not fork
 `factory_v1_common_market_feature_surface_v1` or TASK-28 catalogs.
 
-## 4. Draft-candidate minimum contract
+## 5. Draft-candidate minimum contract
 
 A future draft candidate record must carry at least:
 
@@ -123,7 +141,7 @@ A future draft candidate record must carry at least:
 Acceptance of a draft means only that it may enter the existing hypothesis
 intake. It is not evidence of alpha and not a trial result.
 
-## 5. Research safety
+## 6. Research safety
 
 - AI, clustering and pattern mining are **exploration-only**.
 - Any outcome-inspecting search that affects selection must be registered
@@ -135,7 +153,7 @@ intake. It is not evidence of alpha and not a trial result.
   `AI_ASSISTED_EXPLORATION`, external research, derivation) never substitutes
   for evidence (ARCH-INTENT-002).
 
-## 6. Explicitly allowed low-cost context examples
+## 7. Explicitly allowed low-cost context examples
 
 The following may appear as low-cost candidate context / inventory items
 **without asserting impact**:
@@ -151,7 +169,7 @@ Their product tag is typically `EXOGENOUS_CHEAP_CONTEXT` or
 `MECHANISM_PRIOR`. Availability remains an existing Factory class. Presence in
 inventory is not a claim that the variable predicts returns.
 
-## 7. Activation trigger
+## 8. Activation trigger
 
 Do **not** build this layer until at least one trigger is observed under a
 separate owner Entry Gate:
@@ -163,7 +181,7 @@ separate owner Entry Gate:
 
 Until then this record is WATCH-only horizon memory.
 
-## 8. Non-goals before trigger
+## 9. Non-goals before trigger
 
 Before the activation trigger, do not:
 
@@ -177,7 +195,7 @@ Before the activation trigger, do not:
 - create a parallel hypothesis lifecycle;
 - alter the active execution roadmap solely because this horizon exists.
 
-## 9. Expected future architecture (not implemented)
+## 10. Expected future architecture (not implemented)
 
 ```text
 Knowledge / Feature Surface + Research Memory
@@ -191,7 +209,7 @@ Knowledge / Feature Surface + Research Memory
 Truth owners stay Git / Catalog / registries / Factory feature surface. This
 intent adds no new authority plane.
 
-## 10. Relation to prior intents
+## 11. Relation to prior intents
 
 - ARCH-INTENT-001 / 002 already allow observation, data mining and AI-assisted
   exploration as **inputs** to the factory loop. They do not name a bounded
@@ -201,7 +219,7 @@ intent adds no new authority plane.
   hypotheses through reusable Factory capabilities. This intent preserves the
   **next** bottleneck after that readiness becomes real.
 
-## 11. Current claim
+## 12. Current claim
 
 `ACCEPTED_DIRECTION_NOT_IMPLEMENTED`.
 

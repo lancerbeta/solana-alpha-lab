@@ -1,0 +1,53 @@
+{
+  "schema": "smial.delivery-independent-review-evidence",
+  "schema_version": "1.0",
+  "review_id": "ARCH-INTENT-006-INDEPENDENT-REVIEW-001",
+  "as_of": "2026-08-22",
+  "task_id": "ARCH_INTENT_006_HYPOTHESIS_DISCOVERY_SURFACE_V1",
+  "reviewed_bindings_sha256": "72dd91f23e9bf08c70c41682f054af94c171425d926fa33f7c9a454ecff36950",
+  "reviewed_inventory_sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+  "required_roles": [
+    "ARCHITECTURE_CRITIC",
+    "CODE_REVIEWER",
+    "GOAL_DOD_CRITIC"
+  ],
+  "reviews": [
+    {
+      "role": "ARCHITECTURE_CRITIC",
+      "verdict": "PASS",
+      "findings": [
+        "CHECKED_HORIZON_MEMORY_NOT_SECOND_FEATURE_CATALOG",
+        "CHECKED_ORTHOGONAL_TAGS_VS_FACTORY_AVAILABILITY",
+        "CHECKED_NO_ROADMAP_OR_TASK28_MUTATION"
+      ]
+    },
+    {
+      "role": "CODE_REVIEWER",
+      "verdict": "PASS",
+      "findings": [
+        "CHECKED_CATALOG_SHA256_BOUND_TO_INTENT_BYTES",
+        "CHECKED_BINDING_TESTS_LOCK_NAMED_CONSUMERS",
+        "CHECKED_WRITE_SET_DOCS_CATALOG_TESTS_ONLY"
+      ]
+    },
+    {
+      "role": "GOAL_DOD_CRITIC",
+      "verdict": "PASS",
+      "findings": [
+        "CHECKED_NAMED_CONSUMERS_FUTURE_RANKER_AND_GOAL_OWNER",
+        "CHECKED_WATCH_ONLY_UNTIL_ENTRY_GATE",
+        "CHECKED_NO_GENERATOR_OR_ROADMAP_ACTIVATION",
+        "CHECKED_DRAFT_CANDIDATE_MINIMUM_CONTRACT_PRESENT"
+      ]
+    }
+  ],
+  "verdict": "PASS",
+  "non_claims": [
+    "NO_CRYPTOGRAPHIC_REVIEWER_IDENTITY",
+    "REVIEW_IS_NOT_SEMANTIC_DONE",
+    "NO_GENERATOR_OR_RANKER_IMPLEMENTED",
+    "NO_ALPHA_OR_CASHFLOW",
+    "NO_ROADMAP_ACTIVATION",
+    "NO_FACTORY_V1_OPERATIONAL_READY"
+  ]
+}

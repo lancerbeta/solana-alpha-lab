@@ -40,6 +40,14 @@ class ArchIntent006HypothesisDiscoverySurfaceTests(unittest.TestCase):
         self.assertEqual(document["implementation"], "NOT_IMPLEMENTED")
         self.assertEqual(document["projection_kind"], "PRODUCT_HORIZON_NOT_IMPLEMENTATION")
         self.assertEqual(document["product_layer_id"], LAYER_ID)
+        self.assertEqual(document["activation_mode"], "WATCH_ONLY_UNTIL_ENTRY_GATE")
+        self.assertEqual(
+            set(document["named_consumers"]),
+            {
+                "FUTURE_DISCOVERY_RANKER_ENTRY_GATE",
+                "GOAL_OWNER_HYPOTHESIS_PRIORITIZATION",
+            },
+        )
         self.assertFalse(document["authority"]["provider_read"])
         self.assertFalse(document["authority"]["wallet_signer_transaction"])
         self.assertFalse(document["authority"]["cash_spend"])
@@ -58,6 +66,10 @@ class ArchIntent006HypothesisDiscoverySurfaceTests(unittest.TestCase):
         self.assertIn("not use the holdout", text.lower())
         self.assertIn("spray LLM ideas", text)
         self.assertIn("vector DB / RAG", text)
+        self.assertIn("WATCH-only", text)
+        self.assertIn("does not advise or insert roadmap items", text)
+        self.assertIn("`mechanism`", text)
+        self.assertIn("MARKET_OBSERVABLE", text)
         self.assertNotIn("AUTHORIZED_TO_BUILD_NOW", text)
 
     def test_catalog_registration_is_content_bound(self) -> None:
@@ -69,6 +81,13 @@ class ArchIntent006HypothesisDiscoverySurfaceTests(unittest.TestCase):
             {item["target_asset_id"] for item in record["relations"]},
             {"ARCH-INTENT-001", "ARCH-INTENT-002", "ARCH-INTENT-005"},
         )
+        self.assertTrue(
+            all(
+                not str(item["target_asset_id"]).startswith("ROADMAP-")
+                for item in record["relations"]
+            )
+        )
+        self.assertEqual(set(record["consumers"]), {"GOAL-OWNER", "REG-RESEARCH-001"})
 
         manifest = yaml.safe_load(MANIFEST_PATH.read_text(encoding="utf-8"))
         self.assertIn(INTENT_ID, manifest["mandatory_asset_ids"])
