@@ -18,11 +18,23 @@ from solana_alpha_lab.ordinary_market_pit_primary_x import (
 from solana_alpha_lab.ordinary_recent_organic_pressure_h900_audition import (
     OrganicPressureError,
     SEASONING_SECONDS,
-    _parse_datetime,
     run_campaign,
     score_audition,
     validate_policy,
 )
+
+
+def _parse_utc(value: object, code: str) -> datetime:
+    if not isinstance(value, str) or not value:
+        raise OrganicPressureError(code)
+    normalized = value[:-1] + "+00:00" if value.endswith("Z") else value
+    try:
+        parsed = datetime.fromisoformat(normalized)
+    except ValueError as exc:
+        raise OrganicPressureError(code) from exc
+    if parsed.tzinfo is None:
+        raise OrganicPressureError(code)
+    return parsed.astimezone(UTC)
 
 ATOM_ID = "EARLY_STRUCTURAL_BACKING_PIT_COMMISSIONING_V1"
 POLICY_SCHEMA = "smial.early-structural-backing-pit-commissioning"
@@ -83,8 +95,8 @@ def project_structural_backing(
         result["reason"] = "REQUIRED_OBJECT_ABSENT"
         return result
     try:
-        created_at = _parse_datetime(pool.get("createdAt"), "FIRST_POOL_TIMESTAMP_INVALID")
-        updated_at = _parse_datetime(t5_row.get("updatedAt"), "UPDATED_TIMESTAMP_INVALID")
+        created_at = _parse_utc(pool.get("createdAt"), "FIRST_POOL_TIMESTAMP_INVALID")
+        updated_at = _parse_utc(t5_row.get("updatedAt"), "UPDATED_TIMESTAMP_INVALID")
     except OrganicPressureError as exc:
         result["reason"] = str(exc)
         return result
@@ -145,6 +157,34 @@ def validate_structural_backing_policy(policy: Mapping[str, Any], *, root: Any) 
         expected_schema=POLICY_SCHEMA,
         expected_x_formula=X_FORMULA,
     )
+    population = policy.get("population")
+    if not isinstance(population, Mapping):
+        raise OrganicPressureError("POPULATION_INVALID")
+    if population.get("icp_id") != ICP_ID:
+        raise OrganicPressureError("ICP_ID_DRIFT")
+    if float(population.get("liquidity_usd_min", -1)) != LIQUIDITY_USD_MIN:
+        raise OrganicPressureError("LIQUIDITY_MIN_DRIFT")
+    band = population.get("age_band_seconds")
+    if not isinstance(band, Mapping):
+        raise OrganicPressureError("AGE_BAND_INVALID")
+    if int(band.get("min", -1)) != int(AGE_MIN_SECONDS):
+        raise OrganicPressureError("AGE_MIN_DRIFT")
+    if int(band.get("max_exclusive", -1)) != int(AGE_MAX_EXCLUSIVE_SECONDS):
+        raise OrganicPressureError("AGE_MAX_DRIFT")
+    snapshot = policy.get("decision_snapshot")
+    if not isinstance(snapshot, Mapping) or snapshot.get("fdv_substitute") != "forbidden":
+        raise OrganicPressureError("FDV_SUBSTITUTE_DRIFT")
+    windows = policy.get("windows")
+    if not isinstance(windows, Mapping):
+        raise OrganicPressureError("WINDOWS_INVALID")
+    if int(windows.get("max_windows", -1)) != 2 or windows.get("third_window") != "forbidden":
+        raise OrganicPressureError("WINDOW_BUDGET_DRIFT")
+    if windows.get("window_b_only_if_a_not_close") is not True:
+        raise OrganicPressureError("WINDOW_B_GATE_DRIFT")
+    if policy.get("factory_runner") != FACTORY_RUNNER:
+        raise OrganicPressureError("FACTORY_RUNNER_PATH_DRIFT")
+    if policy.get("factory_runner_sha256") != FACTORY_RUNNER_SHA256:
+        raise OrganicPressureError("FACTORY_RUNNER_HASH_DRIFT")
 
 
 def run_structural_backing_campaign(policy: Mapping[str, Any], **kwargs: Any) -> dict[str, object]:

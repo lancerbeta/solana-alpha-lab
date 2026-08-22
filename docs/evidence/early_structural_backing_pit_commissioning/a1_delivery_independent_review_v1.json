@@ -1,0 +1,69 @@
+{
+  "as_of": "2026-08-22",
+  "non_claims": [
+    "NO_CRYPTOGRAPHIC_REVIEWER_IDENTITY",
+    "REVIEW_IS_NOT_SEMANTIC_DONE",
+    "NO_CANONICAL_DONE",
+    "NO_SINGLE_AGENT_REVIEW_FALLBACK",
+    "NO_EARN_SHADOW",
+    "NO_ALPHA",
+    "NO_NETRETURN",
+    "NO_FACTORY_V1_OPERATIONAL_READY"
+  ],
+  "required_roles": [
+    "ARCHITECTURE_CRITIC",
+    "CODE_REVIEWER",
+    "GOAL_DOD_CRITIC"
+  ],
+  "review_id": "EARLY-STRUCTURAL-BACKING-PIT-INDEPENDENT-REVIEW-001",
+  "reviewed_bindings_sha256": "08bbceb1b76bebb2d846932652a5fc6d0a66673b4e8c125d745d5c86d2530728",
+  "reviewed_inventory_sha256": "cb1d97c2cde8b0c1aa66a2d82488646b6ef4ae5332fa76b74babb0293d6bb7e9",
+  "reviews": [
+    {
+      "findings": [
+        "CHECKED_RUNNER_UNCHANGED",
+        "CHECKED_PHRASE_GATE_ZERO_CALLS",
+        "CHECKED_UNKNOWN_NOT_ZERO",
+        "CHECKED_FDV_REJECTED",
+        "CHECKED_ICP_AGE_LIQ",
+        "CHECKED_NO_SECRETS_IN_RECEIPT",
+        "CHECKED_WINDOW_A_CLOSE_NO_B",
+        "FIXED_PRIVATE_PARSE_IMPORT_INLINED",
+        "FIXED_ICP_YAML_PIN_IN_VALIDATE",
+        "RESIDUAL_CLOSE_SUBTYPE_NOT_SPLIT"
+      ],
+      "role": "CODE_REVIEWER",
+      "verdict": "PASS"
+    },
+    {
+      "findings": [
+        "CHECKED_DECISION_DELTA",
+        "CHECKED_NAMED_CONSUMER_ATOM2_COMMISSIONING_ONLY",
+        "CHECKED_CHEAPEST_FALSIFIER",
+        "CHECKED_CLOSE_NOT_EARN_SHADOW",
+        "CHECKED_NON_CLAIMS",
+        "CHECKED_NO_CANONICAL_DONE",
+        "CHECKED_DOD_AFTER_TRIO_BIND"
+      ],
+      "role": "GOAL_DOD_CRITIC",
+      "verdict": "PASS"
+    },
+    {
+      "findings": [
+        "CHECKED_QUOTE_NE_FILL",
+        "CHECKED_FDV_NE_MCAP",
+        "CHECKED_FACTORY_BLAST_RADIUS_ZERO",
+        "CHECKED_CREDENTIAL_ORDER",
+        "FIXED_ICP_POLICY_PIN",
+        "FIXED_NO_PRIVATE_UNDERSCORE_IMPORT",
+        "RESIDUAL_MEU_AND_TAU_BOTH_TRUE_ON_CLOSE"
+      ],
+      "role": "ARCHITECTURE_CRITIC",
+      "verdict": "PASS"
+    }
+  ],
+  "schema": "smial.delivery-independent-review-evidence",
+  "schema_version": "1.0",
+  "task_id": "EARLY_STRUCTURAL_BACKING_PIT_COMMISSIONING_V1",
+  "verdict": "PASS"
+}

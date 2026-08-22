@@ -29952,7 +29952,7 @@ records:
   as_of: '2026-08-22'
   truth_owner: EARLY_STRUCTURAL_BACKING_PIT_COMMISSIONING_V1
   location: {kind: git_path, logical_uri: 'repo://docs/tasks/EARLY_STRUCTURAL_BACKING_PIT_COMMISSIONING_V1.md', repository_path: docs/tasks/EARLY_STRUCTURAL_BACKING_PIT_COMMISSIONING_V1.md}
-  integrity: {kind: sha256, sha256: 944268f9bffa250c86674505ef2cd7839f9e06088c45226dc36140cb6c63341f}
+  integrity: {kind: sha256, sha256: dc22e0b5f0f257f9e8d6b9ff739bce4085e07598d4f1fe62d0a0febe1e337fca}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: contains, target_asset_id: CONFIG-EARLY-STRUCTURAL-BACKING-PIT-COMMISSIONING-001}
@@ -29992,7 +29992,7 @@ records:
   as_of: '2026-08-22'
   truth_owner: EARLY_STRUCTURAL_BACKING_PIT_COMMISSIONING_V1
   location: {kind: git_path, logical_uri: 'repo://src/solana_alpha_lab/early_structural_backing_pit_commissioning.py', repository_path: src/solana_alpha_lab/early_structural_backing_pit_commissioning.py}
-  integrity: {kind: sha256, sha256: 8197269cdb5064ae4d3aa68444a3c562bed8f6c651ad3bdb0d9319755973e668}
+  integrity: {kind: sha256, sha256: f424e9297d1f613c0bedeb33551122acf9f9e4bc249b70d548020c2456c618b2}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: depends_on, target_asset_id: CONFIG-EARLY-STRUCTURAL-BACKING-PIT-COMMISSIONING-001}
@@ -30104,4 +30104,60 @@ records:
   consumers: [FACTORY-001, GOAL-OWNER]
   evidence: []
   search_terms: [EARLY, STRUCTURAL_BACKING, OWNER_READOUT]
+  classification: {contains_secrets: false, contains_raw_data: false, sensitivity: INTERNAL_NON_SECRET}
+- asset_id: EVIDENCE-EARLY-STRUCTURAL-BACKING-PIT-DELIVERY-INDEPENDENT-REVIEW-001
+  record_version: '1.0'
+  asset_type: evidence
+  purpose: Required-role review evidence for structural-backing PIT closeout.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-08-22'
+  truth_owner: EARLY_STRUCTURAL_BACKING_PIT_COMMISSIONING_V1
+  location: {kind: git_path, logical_uri: 'repo://docs/evidence/early_structural_backing_pit_commissioning/a1_delivery_independent_review_v1.json', repository_path: docs/evidence/early_structural_backing_pit_commissioning/a1_delivery_independent_review_v1.json}
+  integrity: {kind: sha256, sha256: a58f1750b654e8c123846af036abf1e80c16f1ab1517a934799a4d49c808643f}
+  access: {mode: read_only, method: file, network_required: false, secrets_required: false}
+  relations:
+  - {relation_type: derived_from, target_asset_id: EVIDENCE-EARLY-STRUCTURAL-BACKING-PIT-WINDOW-A-001}
+  - {relation_type: depends_on, target_asset_id: SCHEMA-DELIVERY-INDEPENDENT-REVIEW-EVIDENCE-001}
+  consumers: [FACTORY-001, GOAL-OWNER]
+  evidence: []
+  search_terms: [EARLY, STRUCTURAL_BACKING, DELIVERY]
+  classification: {contains_secrets: false, contains_raw_data: false, sensitivity: INTERNAL_NON_SECRET}
+- asset_id: EVIDENCE-EARLY-STRUCTURAL-BACKING-PIT-DELIVERY-FACTORY-FIT-001
+  record_version: '1.0'
+  asset_type: evidence
+  purpose: FULL Factory Fit for Window A CLOSE with commissioning-only next.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-08-22'
+  truth_owner: EARLY_STRUCTURAL_BACKING_PIT_COMMISSIONING_V1
+  location: {kind: git_path, logical_uri: 'repo://docs/evidence/early_structural_backing_pit_commissioning/a1_delivery_factory_fit_v1.json', repository_path: docs/evidence/early_structural_backing_pit_commissioning/a1_delivery_factory_fit_v1.json}
+  integrity: {kind: sha256, sha256: 9cbe381dd21200406000be20846b8c677bdbd8b89c469122fc8ee91d1e8167c7}
+  access: {mode: read_only, method: file, network_required: false, secrets_required: false}
+  relations:
+  - {relation_type: derived_from, target_asset_id: EVIDENCE-EARLY-STRUCTURAL-BACKING-PIT-WINDOW-A-001}
+  - {relation_type: depends_on, target_asset_id: EVIDENCE-EARLY-STRUCTURAL-BACKING-PIT-DELIVERY-INDEPENDENT-REVIEW-001}
+  consumers: [FACTORY-001, GOAL-OWNER]
+  evidence: []
+  search_terms: [EARLY, STRUCTURAL_BACKING, DELIVERY]
+  classification: {contains_secrets: false, contains_raw_data: false, sensitivity: INTERNAL_NON_SECRET}
+- asset_id: EVIDENCE-EARLY-STRUCTURAL-BACKING-PIT-DELIVERY-COMPLETION-001
+  record_version: '1.0'
+  asset_type: evidence
+  purpose: Guard-consumable completion evidence for structural-backing PIT Atom 1.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-08-22'
+  truth_owner: EARLY_STRUCTURAL_BACKING_PIT_COMMISSIONING_V1
+  location: {kind: git_path, logical_uri: 'repo://docs/evidence/early_structural_backing_pit_commissioning/a1_delivery_completion_evidence_v1.json', repository_path: docs/evidence/early_structural_backing_pit_commissioning/a1_delivery_completion_evidence_v1.json}
+  integrity: {kind: sha256, sha256: 50462fb2e86a827f44356cf1a3e01c378788cb34bccdb86e7b8e55a275cbf1cc}
+  access: {mode: read_only, method: file, network_required: false, secrets_required: false}
+  relations:
+  - {relation_type: derived_from, target_asset_id: EVIDENCE-EARLY-STRUCTURAL-BACKING-PIT-WINDOW-A-001}
+  - {relation_type: depends_on, target_asset_id: EVIDENCE-EARLY-STRUCTURAL-BACKING-PIT-ACCEPTANCE-001}
+  - {relation_type: depends_on, target_asset_id: EVIDENCE-EARLY-STRUCTURAL-BACKING-PIT-DELIVERY-INDEPENDENT-REVIEW-001}
+  - {relation_type: depends_on, target_asset_id: EVIDENCE-EARLY-STRUCTURAL-BACKING-PIT-DELIVERY-FACTORY-FIT-001}
+  consumers: [FACTORY-001, GOAL-OWNER]
+  evidence: []
+  search_terms: [EARLY, STRUCTURAL_BACKING, DELIVERY]
   classification: {contains_secrets: false, contains_raw_data: false, sensitivity: INTERNAL_NON_SECRET}

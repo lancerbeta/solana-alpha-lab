@@ -3918,6 +3918,46 @@
       "target_asset_id": "EVIDENCE-EARLY-STRUCTURAL-BACKING-PIT-FAMILY-DECISION-001"
     },
     {
+      "source_asset_id": "EVIDENCE-EARLY-STRUCTURAL-BACKING-PIT-DELIVERY-COMPLETION-001",
+      "relation": "depends_on",
+      "target_asset_id": "EVIDENCE-EARLY-STRUCTURAL-BACKING-PIT-ACCEPTANCE-001"
+    },
+    {
+      "source_asset_id": "EVIDENCE-EARLY-STRUCTURAL-BACKING-PIT-DELIVERY-COMPLETION-001",
+      "relation": "depends_on",
+      "target_asset_id": "EVIDENCE-EARLY-STRUCTURAL-BACKING-PIT-DELIVERY-FACTORY-FIT-001"
+    },
+    {
+      "source_asset_id": "EVIDENCE-EARLY-STRUCTURAL-BACKING-PIT-DELIVERY-COMPLETION-001",
+      "relation": "depends_on",
+      "target_asset_id": "EVIDENCE-EARLY-STRUCTURAL-BACKING-PIT-DELIVERY-INDEPENDENT-REVIEW-001"
+    },
+    {
+      "source_asset_id": "EVIDENCE-EARLY-STRUCTURAL-BACKING-PIT-DELIVERY-COMPLETION-001",
+      "relation": "derived_from",
+      "target_asset_id": "EVIDENCE-EARLY-STRUCTURAL-BACKING-PIT-WINDOW-A-001"
+    },
+    {
+      "source_asset_id": "EVIDENCE-EARLY-STRUCTURAL-BACKING-PIT-DELIVERY-FACTORY-FIT-001",
+      "relation": "depends_on",
+      "target_asset_id": "EVIDENCE-EARLY-STRUCTURAL-BACKING-PIT-DELIVERY-INDEPENDENT-REVIEW-001"
+    },
+    {
+      "source_asset_id": "EVIDENCE-EARLY-STRUCTURAL-BACKING-PIT-DELIVERY-FACTORY-FIT-001",
+      "relation": "derived_from",
+      "target_asset_id": "EVIDENCE-EARLY-STRUCTURAL-BACKING-PIT-WINDOW-A-001"
+    },
+    {
+      "source_asset_id": "EVIDENCE-EARLY-STRUCTURAL-BACKING-PIT-DELIVERY-INDEPENDENT-REVIEW-001",
+      "relation": "depends_on",
+      "target_asset_id": "SCHEMA-DELIVERY-INDEPENDENT-REVIEW-EVIDENCE-001"
+    },
+    {
+      "source_asset_id": "EVIDENCE-EARLY-STRUCTURAL-BACKING-PIT-DELIVERY-INDEPENDENT-REVIEW-001",
+      "relation": "derived_from",
+      "target_asset_id": "EVIDENCE-EARLY-STRUCTURAL-BACKING-PIT-WINDOW-A-001"
+    },
+    {
       "source_asset_id": "EVIDENCE-EARLY-STRUCTURAL-BACKING-PIT-FAMILY-DECISION-001",
       "relation": "derived_from",
       "target_asset_id": "EVIDENCE-EARLY-STRUCTURAL-BACKING-PIT-WINDOW-A-001"

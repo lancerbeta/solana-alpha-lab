@@ -1,0 +1,72 @@
+{
+  "acceptance_id": "EARLY-STRUCTURAL-BACKING-PIT-DELIVERY-COMPLETION-001",
+  "active_stop_conditions": [],
+  "as_of": "2026-08-22",
+  "base_main": "7d0e5b958590070b9178b35104f54c6d84fe1134",
+  "capability_radar_now": "NONE",
+  "cloud_bundle_mode": "OWNER_MANAGED_OPTIONAL_EXPORT",
+  "cloud_bundle_required_by_harness": false,
+  "cloud_bundle_smoke_required": false,
+  "factory_fit": {
+    "path": "docs/evidence/early_structural_backing_pit_commissioning/a1_delivery_factory_fit_v1.json",
+    "sha256": "9cbe381dd21200406000be20846b8c677bdbd8b89c469122fc8ee91d1e8167c7",
+    "verdict": "PASS"
+  },
+  "implementation_bindings": {
+    "configs/early_structural_backing_pit_commissioning_v1.yaml": "620bbfdf671534df21076013f02759dd11773b9d3935d365ca8859a34af01f93",
+    "docs/evidence/early_structural_backing_pit_commissioning/a1_acceptance_v1.json": "16197a90a7555d4dc77dee9868a7bd82c4191079e9bc1a8711cc7ec913d25d73",
+    "docs/evidence/early_structural_backing_pit_commissioning/a1_family_decision_v1.json": "6a3a125c89d00ee635667f832e4b82a8ee11c6702d11ffc2eae26026a70022b6",
+    "docs/evidence/early_structural_backing_pit_commissioning/a1_window_a_runtime_receipt_v1.json": "8a6647de6e22de81a2be59474bc6e2021ceae740b778113b820b99b158c948be",
+    "docs/reports/early_structural_backing_pit_commissioning/a1_owner_readout_v1.md": "d1215ba06a0cfa338d51db813420e4048330f3d8275262dfcbcd7e1773cfa6b5",
+    "docs/tasks/EARLY_STRUCTURAL_BACKING_PIT_COMMISSIONING_V1.md": "944268f9bffa250c86674505ef2cd7839f9e06088c45226dc36140cb6c63341f",
+    "scripts/run_early_structural_backing_pit_commissioning.py": "d5f8ce2abd1d6ca84c1138831337bb5555af535d7ca878083b7398b907444711",
+    "src/solana_alpha_lab/early_structural_backing_pit_commissioning.py": "f424e9297d1f613c0bedeb33551122acf9f9e4bc249b70d548020c2456c618b2",
+    "tests/test_early_structural_backing_pit_commissioning.py": "992aa9d59989795f5f6b4b891ac0576f35297b8552efb060939052579335999a"
+  },
+  "non_claims": [
+    "NO_CANONICAL_DONE",
+    "NO_EARN_SHADOW",
+    "NO_ALPHA",
+    "NO_NETRETURN",
+    "NO_EXECUTE",
+    "NO_WINDOW_B",
+    "NO_VPS",
+    "NO_FACTORY_V1_OPERATIONAL_READY"
+  ],
+  "owner_attention_triggers": {
+    "auth_or_access_recovery": false,
+    "external_material_action": false,
+    "material_owner_decision": false,
+    "unresolved_safety_or_truth_conflict": false,
+    "user_only_activation": false
+  },
+  "project_sources_disposition": {
+    "kind": "NO_CHANGE"
+  },
+  "schema": "smial.delivery-completion-evidence",
+  "schema_version": "1.0",
+  "side_effects": {
+    "cash_spend_usd_cents": 0,
+    "credential_reads": 1,
+    "fallbacks": 0,
+    "provider_requests": 39,
+    "retries": 0,
+    "wallet_signer_transaction_actions": 0
+  },
+  "state_change": "CLOSE_EARLY_STRUCTURAL_BACKING_FAMILY",
+  "task_id": "EARLY_STRUCTURAL_BACKING_PIT_COMMISSIONING_V1",
+  "validation": {
+    "full_gate": "ENFORCED_BY_PROJECT_BOUND_VALIDATION",
+    "github_ci": "ENFORCED_LIVE_AT_GUARDED_MERGE",
+    "independent_review": {
+      "path": "docs/evidence/early_structural_backing_pit_commissioning/a1_delivery_independent_review_v1.json",
+      "sha256": "a58f1750b654e8c123846af036abf1e80c16f1ab1517a934799a4d49c808643f",
+      "verdict": "PASS"
+    },
+    "project_checks": [
+      "PASS_CATALOG_VALIDATE",
+      "PASS_GENERATOR_CHECK"
+    ],
+    "targeted": "PASS_EARLY_STRUCTURAL_BACKING_PIT_COMMISSIONING_TESTS"
+  }
+}
