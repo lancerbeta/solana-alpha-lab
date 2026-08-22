@@ -43,7 +43,7 @@ ssh -i "$env:USERPROFILE\.ssh\id_ed25519_factory" -o IdentitiesOnly=yes -o Batch
 ```
 
 ```
-/usr/bin/uv run --locked --managed-python python -B scripts/factory_remote_doctor.py --heartbeat
+/usr/bin/uv run --locked --managed-python python -B scripts/run_factory_unattended_shadow_tick.py
 ```
 
 ```

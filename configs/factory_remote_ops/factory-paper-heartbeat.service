@@ -1,10 +1,11 @@
 [Unit]
-Description=Factory paper-plane heartbeat
-Documentation=docs/tasks/FACTORY_REMOTE_OPERATIONS_V1.md
+Description=Factory COMMISSIONING_ONLY unattended SHADOW tick + heartbeat
+Documentation=docs/tasks/FACTORY_UNATTENDED_SHADOW_VERTICAL_SLICE_V1.md
 After=network-online.target
 
 [Service]
 Type=oneshot
 WorkingDirectory=/opt/solana-alpha-lab
-ExecStart=/usr/bin/uv run --locked --managed-python python -B scripts/factory_remote_doctor.py --heartbeat
+# Tick first so heartbeat progress_at reflects bot/store work, not wall clock alone.
+ExecStart=/usr/bin/uv run --locked --managed-python python -B scripts/run_factory_unattended_shadow_tick.py
 NoNewPrivileges=true

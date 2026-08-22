@@ -1,0 +1,23 @@
+schema: smial.factory-unattended-shadow-vertical-slice
+schema_version: '1.0'
+atom_id: FACTORY_UNATTENDED_SHADOW_VERTICAL_SLICE_V1
+as_of: '2026-08-22'
+stage: COMMISSIONING_ONLY_UNATTENDED_SHADOW
+factory_runner: src/solana_alpha_lab/factory/runner.py
+factory_runner_sha256: d8d22bcb51fb6992d40f09e58274c52e0f9942c12d043cc57b96ffca524e918f
+scientific_promotion: FORBIDDEN_AFTER_ATOM1_CLOSE
+strategy_relative: configs/strategies/STRAT-V-EARLY-LIQ-FLOOR-COMMISSIONING-V1.yaml
+paper_plane_store_relative: local/factory_v1/paper_plane_state.sqlite
+max_rows_per_tick: 8
+cohort_source: GIT_TRACKED_FIXTURE
+cohort_fixture_relative: configs/factory_unattended_shadow_cohort_fixture_v1.json
+early_state_config_relative: configs/early_state_to_paper_vertical_slice_v1.yaml
+remote_ops_config_relative: configs/factory_remote_operations_v1.yaml
+heartbeat_kind: SHADOW_HEARTBEAT
+non_claims:
+  alpha: false
+  netreturn: false
+  real_fills: false
+  micro_live: false
+  scientific_shadow_pass: false
+  factory_v1_operational_ready: false

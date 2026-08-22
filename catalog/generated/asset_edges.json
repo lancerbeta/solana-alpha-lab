@@ -658,6 +658,21 @@
       "target_asset_id": "CTRL-FACTORY-REMOTE-OPERATIONS-001"
     },
     {
+      "source_asset_id": "CONFIG-FACTORY-UNATTENDED-SHADOW-COHORT-FIXTURE-001",
+      "relation": "governed_by",
+      "target_asset_id": "CTRL-FACTORY-UNATTENDED-SHADOW-VERTICAL-SLICE-001"
+    },
+    {
+      "source_asset_id": "CONFIG-FACTORY-UNATTENDED-SHADOW-VERTICAL-SLICE-001",
+      "relation": "depends_on",
+      "target_asset_id": "STRAT-V-EARLY-LIQ-FLOOR-V1-001"
+    },
+    {
+      "source_asset_id": "CONFIG-FACTORY-UNATTENDED-SHADOW-VERTICAL-SLICE-001",
+      "relation": "governed_by",
+      "target_asset_id": "CTRL-FACTORY-UNATTENDED-SHADOW-VERTICAL-SLICE-001"
+    },
+    {
       "source_asset_id": "CONFIG-FACTORY-V1-COMMISSIONING-001",
       "relation": "depends_on",
       "target_asset_id": "SCHEMA-FACTORY-V1-COMMISSIONING-001"
@@ -2306,6 +2321,26 @@
       "source_asset_id": "CTRL-FACTORY-REMOTE-OPERATIONS-001",
       "relation": "validated_by",
       "target_asset_id": "TEST-FACTORY-REMOTE-OPERATIONS-001"
+    },
+    {
+      "source_asset_id": "CTRL-FACTORY-UNATTENDED-SHADOW-VERTICAL-SLICE-001",
+      "relation": "contains",
+      "target_asset_id": "CONFIG-FACTORY-UNATTENDED-SHADOW-VERTICAL-SLICE-001"
+    },
+    {
+      "source_asset_id": "CTRL-FACTORY-UNATTENDED-SHADOW-VERTICAL-SLICE-001",
+      "relation": "contains",
+      "target_asset_id": "MODULE-FACTORY-UNATTENDED-SHADOW-001"
+    },
+    {
+      "source_asset_id": "CTRL-FACTORY-UNATTENDED-SHADOW-VERTICAL-SLICE-001",
+      "relation": "contains",
+      "target_asset_id": "SCRIPT-FACTORY-UNATTENDED-SHADOW-TICK-001"
+    },
+    {
+      "source_asset_id": "CTRL-FACTORY-UNATTENDED-SHADOW-VERTICAL-SLICE-001",
+      "relation": "validated_by",
+      "target_asset_id": "TEST-FACTORY-UNATTENDED-SHADOW-VERTICAL-SLICE-001"
     },
     {
       "source_asset_id": "CTRL-FACTORY-V1-COMMISSIONING-HYPOTHESIS-001",
@@ -8068,6 +8103,16 @@
       "target_asset_id": "CTRL-FACTORY-REMOTE-OPERATIONS-001"
     },
     {
+      "source_asset_id": "MODULE-FACTORY-UNATTENDED-SHADOW-001",
+      "relation": "depends_on",
+      "target_asset_id": "MODULE-PAPER-PLANE-ENGINE-001"
+    },
+    {
+      "source_asset_id": "MODULE-FACTORY-UNATTENDED-SHADOW-001",
+      "relation": "governed_by",
+      "target_asset_id": "CTRL-FACTORY-UNATTENDED-SHADOW-VERTICAL-SLICE-001"
+    },
+    {
       "source_asset_id": "MODULE-FACTORY-V1-APPLICATION-001",
       "relation": "depends_on",
       "target_asset_id": "MODULE-FACTORY-V1-COCKPIT-001"
@@ -11028,6 +11073,16 @@
       "target_asset_id": "MODULE-FACTORY-REMOTE-OPS-001"
     },
     {
+      "source_asset_id": "SCRIPT-FACTORY-UNATTENDED-SHADOW-TICK-001",
+      "relation": "depends_on",
+      "target_asset_id": "MODULE-FACTORY-UNATTENDED-SHADOW-001"
+    },
+    {
+      "source_asset_id": "SCRIPT-FACTORY-UNATTENDED-SHADOW-TICK-001",
+      "relation": "governed_by",
+      "target_asset_id": "CTRL-FACTORY-UNATTENDED-SHADOW-VERTICAL-SLICE-001"
+    },
+    {
       "source_asset_id": "SCRIPT-FACTORY-V1-COMMISSIONING-CAPTURE-001",
       "relation": "depends_on",
       "target_asset_id": "MODULE-FACTORY-V1-APPLICATION-001"
@@ -11916,6 +11971,11 @@
       "source_asset_id": "TEST-FACTORY-REMOTE-OPERATIONS-001",
       "relation": "depends_on",
       "target_asset_id": "MODULE-FACTORY-REMOTE-OPS-001"
+    },
+    {
+      "source_asset_id": "TEST-FACTORY-UNATTENDED-SHADOW-VERTICAL-SLICE-001",
+      "relation": "depends_on",
+      "target_asset_id": "MODULE-FACTORY-UNATTENDED-SHADOW-001"
     },
     {
       "source_asset_id": "TEST-FACTORY-V1-COMMISSIONING-001",

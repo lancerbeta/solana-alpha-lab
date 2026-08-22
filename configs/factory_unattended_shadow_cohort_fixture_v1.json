@@ -1,0 +1,67 @@
+{
+  "rows": [
+    {
+      "X_LIQUIDITY_USD": 2709.612817762119,
+      "X_NETFLOW_SHARE": null,
+      "mint": "24y7PiS7EoTJRG7FcmJwR7AaT39yeSWVLERYakY3pump"
+    },
+    {
+      "X_LIQUIDITY_USD": 2711.423494775999,
+      "X_NETFLOW_SHARE": null,
+      "mint": "3PSfnWrG7tqZAYMndjqbohwy5sEozhM3CWZj5hudQV7F"
+    },
+    {
+      "X_LIQUIDITY_USD": 2715.4933750282667,
+      "X_NETFLOW_SHARE": null,
+      "mint": "4kR7KAoAeUVy5TWzMSSP3j4edipHGa3qPbTtrBYEpump"
+    },
+    {
+      "X_LIQUIDITY_USD": 2783.1328797563187,
+      "X_NETFLOW_SHARE": null,
+      "mint": "5Aw1L1mCBFNZQvQBaPWzAo4HFTtuD2VHP4khgipjpump"
+    },
+    {
+      "X_LIQUIDITY_USD": 2710.145891721638,
+      "X_NETFLOW_SHARE": null,
+      "mint": "5gvpURKi7g695zd7jJPVkyY3bo11fccsv2XBhkqApump"
+    },
+    {
+      "X_LIQUIDITY_USD": 2881.0514459675096,
+      "X_NETFLOW_SHARE": -0.5903589449638651,
+      "mint": "5zJGbdRNWP4obMYa3PxzCiFmE6rneR61oDg8fmp1pump"
+    },
+    {
+      "X_LIQUIDITY_USD": 2711.264739530406,
+      "X_NETFLOW_SHARE": null,
+      "mint": "6AzxAKbvcENnDBgfAdZKBMWYKxAd5LCypEGZoLx7pump"
+    },
+    {
+      "X_LIQUIDITY_USD": 2930.655855892821,
+      "X_NETFLOW_SHARE": 0.09224492516345761,
+      "mint": "6VTduCit8TuG6jiepAmAAiM6xYRLCJEihtsqGktRpump"
+    },
+    {
+      "X_LIQUIDITY_USD": 2806.7832412316757,
+      "X_NETFLOW_SHARE": -0.03032976364928382,
+      "mint": "7H6sTyAh1B78LEMgCdnZr4HTdSRGiTUnix9XgNd8pump"
+    },
+    {
+      "X_LIQUIDITY_USD": 6289.417560541317,
+      "X_NETFLOW_SHARE": -0.10595197030169184,
+      "mint": "7qM6BAu4m8GTGsGeQgHxE2XQrqAeYzLw95EjJCGbpump"
+    },
+    {
+      "X_LIQUIDITY_USD": 2789.6397159922685,
+      "X_NETFLOW_SHARE": null,
+      "mint": "9xLxc7CAPQKPPMySS3mRZ6w3kc4YnWfT7rkTw3gypump"
+    },
+    {
+      "X_LIQUIDITY_USD": 2709.612817852434,
+      "X_NETFLOW_SHARE": null,
+      "mint": "A49ctbSiKitkR1eaXFns9E4nEG5pHX9KwqkDHzxfpump"
+    }
+  ],
+  "schema": "smial.factory-unattended-shadow-cohort-fixture",
+  "schema_version": "1.0",
+  "source": "EARLY_STATE_PINNED_OFFLINE"
+}
