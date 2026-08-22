@@ -18,12 +18,14 @@ managed_write_set:
   - scripts/harness_sync.py
   - tests/test_harness_sync.py
   - docs/agent/DELIVERY_HARNESS_PROTOCOL.md
+  - delivery-harness/harness.yaml
   - catalog/generated/asset_edges.json
   - docs/PROJECT_MAP.md
   - docs/OPERATOR_NAVIGATION.md
   - catalog/assets/core.yaml
   - catalog/assets/lifecycle.yaml
   - catalog/catalog_manifest.yaml
+  - docs/evidence/control/delivery_harness_acceptance_v1.json
 external_caps:
   network: false
   credentials: false
