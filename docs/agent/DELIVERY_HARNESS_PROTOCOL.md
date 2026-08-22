@@ -60,6 +60,19 @@ field or generated projection; manual rebinding caused repeated red CI runs on
 evidence) stay read-only to sync; if the catalog itself fails validation,
 fix the primary record first — sync never invents records.
 
+### Delivery-evidence binding
+
+FINISH closes the delivery-evidence hash chain with:
+
+```text
+uv run --locked --managed-python python -B scripts/harness_sync.py bind-evidence --task-id <TASK_ID> --apply
+```
+
+`bind-evidence --verify` checks the active branch chain against the task
+contract scope. `bind-evidence --verify-all-delivered` is a read-only audit of
+historical completion chains. Sync updates only binding fields the guard reads;
+verdicts, findings and non-claims remain agent-owned.
+
 ### Finish and merge
 
 Run Factory Fit, Product Horizon and capability radar. Record exact inventory,
