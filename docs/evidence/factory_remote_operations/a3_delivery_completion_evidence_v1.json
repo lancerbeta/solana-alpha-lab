@@ -9,12 +9,12 @@
   "cloud_bundle_smoke_required": false,
   "factory_fit": {
     "path": "docs/evidence/factory_remote_operations/a3_delivery_factory_fit_v1.json",
-    "sha256": "ea0a0136ea16ad2cbe33bfcfac899e685f6cb4eaadce069e5aea47fa1312626d",
+    "sha256": "ceafa2dd18064605a8a3c871676944b511f02c5d4c93b26c6476d6fcea20ff29",
     "verdict": "PASS"
   },
   "implementation_bindings": {
     ".cursor/rules/50-factory-remote-host.mdc": "f4d8e13aaf5a3d7ad22f91212a9062855074dc426f171bdbb33901a0a4083f16",
-    "catalog/assets/core.yaml": "71cfd1bea9e30184c85e7a5274ae13b4628f95c34791a7c10d9f40eaababef7e",
+    "catalog/assets/core.yaml": "15644def7e13a3f6633830f26f9bae6ff46751f048509302a0f24721bbf6ab5a",
     "catalog/assets/lifecycle.yaml": "a54c3bc599a2f6f67ef0c943a8652355df54c24b25cfd1d71de9ac5f62231a7b",
     "catalog/catalog_manifest.yaml": "b100c832071af1dc941266b374fda1222c85e54cb78a3e7c1c728203a838bb3d",
     "catalog/generated/asset_edges.json": "5191e2dc1c79dd9d256d848de38aa2d197b8a070aaf4037c7abe2490e9a704da",
@@ -35,10 +35,11 @@
     "docs/operator/FACTORY_REMOTE_HOST.md": "957c06c6d93c284c09bde323bce38b40a235cb9a6cec62c79448f7c408dc4337",
     "docs/operator/factory_remote_host_v1.yaml": "4a7783fac263bc7f6b161ea0fc68a95bb5247fef821c4648c29a697007c2a13e",
     "docs/reports/factory_remote_operations/a3_owner_readout_v1.md": "14c5a4f9b2465e058b5b58e79038eb75b3af94db28306e1c593face5ca9d9684",
-    "docs/tasks/FACTORY_REMOTE_OPERATIONS_V1.md": "f1d889df75b332f15c71ea8d81ad56ca953d42d9ef9326ff58d9a05a1fd70b08",
+    "docs/tasks/FACTORY_REMOTE_OPERATIONS_V1.md": "597fca556fadf25995bf932e09f00aa51d71f5146e168469cd9b18e146cc89f8",
     "scripts/factory_remote_doctor.py": "3cd094721001fd6ec3f86d8029b891b55724a830ebd1796d4e5cc6d41bdb5173",
     "scripts/factory_remote_install.py": "b3a969c2c67150933228bd515fd0426526932e57de7d051ff43e48ed8e16337a",
     "src/solana_alpha_lab/factory/remote_ops.py": "b8726d91ea970ea9b65d250e9dff9a87b6c4b47d334e5afe0697e24b2e499839",
+    "tests/test_delivery_harness_adapters.py": "29cf8d4aba3f19e2769cabb9bb442c1e1580262c54bad0148e4c99554e7a9dc6",
     "tests/test_factory_remote_operations.py": "272cde6812f0c7a18e95a1ce7ebb5d1bc1007d217e54837f537cfaeddadbf7b6"
   },
   "non_claims": [
@@ -75,7 +76,7 @@
     "github_ci": "ENFORCED_LIVE_AT_GUARDED_MERGE",
     "independent_review": {
       "path": "docs/evidence/factory_remote_operations/a3_delivery_independent_review_v1.json",
-      "sha256": "2b9f54ac2bbf3650dafbd5994922dacede5d34d1bc74655c2248690adabd503e",
+      "sha256": "0c5abb2455802ea590fc3184d019b7113dd420dd7b8ca923ea104f780143ac9f",
       "verdict": "PASS"
     },
     "project_checks": [
