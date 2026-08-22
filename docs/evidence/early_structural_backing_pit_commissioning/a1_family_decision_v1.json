@@ -1,0 +1,25 @@
+{
+  "as_of": "2026-08-22",
+  "atom_id": "EARLY_STRUCTURAL_BACKING_PIT_COMMISSIONING_V1",
+  "credential_reads": 1,
+  "decision_time_eligible": 19,
+  "execute_calls": 0,
+  "family_decision": "CLOSE_EARLY_STRUCTURAL_BACKING_FAMILY",
+  "non_claims": [
+    "NO_EARN_SHADOW",
+    "NO_ALPHA",
+    "NO_NETRETURN",
+    "NO_EXECUTE",
+    "NO_WINDOW_B"
+  ],
+  "provider_requests": 39,
+  "rankable_h900": 15,
+  "reason": "WINDOW_A_SCIENTIFIC_KILL",
+  "schema": "smial.early-structural-backing-pit-commissioning.family-decision",
+  "schema_version": "1.0",
+  "tau_b_window_a": -0.08223919396586149,
+  "window_a_receipt": "docs/evidence/early_structural_backing_pit_commissioning/a1_window_a_runtime_receipt_v1.json",
+  "window_a_terminal": "CLOSE_EARLY_STRUCTURAL_BACKING_FAMILY",
+  "window_b_ran": false,
+  "window_b_required": false
+}
