@@ -16,7 +16,7 @@
   ],
   "review_id": "FACTORY-UNATTENDED-SHADOW-INDEPENDENT-REVIEW-001",
   "reviewed_bindings_sha256": "f4abd8b84cffdf9da95c583cfad05879c5e2ae6573339612cf08161005bc2bc7",
-  "reviewed_inventory_sha256": "c0f50056818104b22d6e830f8e7e081dfe50405d1df595b84cfadc920efd487f",
+  "reviewed_inventory_sha256": "0d6d865635621b7c8bc68c54b3ad20905250b69b2db5dd396b2dc79a26ee6ad1",
   "reviews": [
     {
       "agent_id": "2cbf72e1-274b-4edc-a95b-2223f3bf3be0",
