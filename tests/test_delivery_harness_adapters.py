@@ -97,6 +97,7 @@ class DeliveryHarnessAdapterTests(unittest.TestCase):
                 "20-validation.mdc",
                 "30-security-and-secrets.mdc",
                 "40-catalog-and-evidence.mdc",
+                "50-factory-remote-host.mdc",
             },
         )
         always = []
@@ -114,6 +115,7 @@ class DeliveryHarnessAdapterTests(unittest.TestCase):
                 "00-authority.mdc",
                 "10-input-routing.mdc",
                 "30-security-and-secrets.mdc",
+                "50-factory-remote-host.mdc",
             },
         )
         self.assertLessEqual(sum(path.stat().st_size for path in always), 6 * 1024)

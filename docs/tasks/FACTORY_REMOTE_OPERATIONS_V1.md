@@ -45,6 +45,7 @@ managed_write_set:
   - docs/operator/FACTORY_REMOTE_HOST.md
   - docs/operator/factory_remote_host_v1.yaml
   - .cursor/rules/50-factory-remote-host.mdc
+  - tests/test_delivery_harness_adapters.py
 external_caps:
   network: false
   credentials: false
