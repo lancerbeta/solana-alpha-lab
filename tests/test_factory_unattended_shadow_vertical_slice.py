@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import hashlib
+import json
 import sys
 import tempfile
 import unittest
@@ -13,10 +14,6 @@ SRC = ROOT / "src"
 if str(SRC) not in sys.path:
     sys.path.insert(0, str(SRC))
 
-from solana_alpha_lab.early_state_hypothesis import (  # noqa: E402
-    build_cohort,
-    load_config as load_early_state_config,
-)
 from solana_alpha_lab.factory.paper_plane import PaperPlaneStore, run_shadow_tick  # noqa: E402
 from solana_alpha_lab.factory.remote_ops import (  # noqa: E402
     package_backup,
@@ -31,6 +28,15 @@ from solana_alpha_lab.factory.unattended_shadow import (  # noqa: E402
     run_unattended_shadow_tick,
 )
 
+FIXTURE = ROOT / "configs/factory_unattended_shadow_cohort_fixture_v1.json"
+
+
+def _fixture_rows() -> list[dict]:
+    payload = json.loads(FIXTURE.read_text(encoding="utf-8"))
+    rows = payload["rows"]
+    assert isinstance(rows, list) and rows
+    return rows
+
 
 class FactoryUnattendedShadowTests(unittest.TestCase):
     def test_factory_runner_pin(self) -> None:
@@ -40,8 +46,7 @@ class FactoryUnattendedShadowTests(unittest.TestCase):
         self.assertEqual(digest, FACTORY_RUNNER_SHA256)
 
     def test_shadow_tick_rejects_real_fill_and_uses_shadow_mode(self) -> None:
-        early = load_early_state_config(ROOT)
-        cohort, _ = build_cohort(ROOT, early)
+        cohort = _fixture_rows()
         with tempfile.TemporaryDirectory() as tmp:
             store_path = Path(tmp) / "paper.sqlite"
             result = run_shadow_tick(
@@ -79,8 +84,7 @@ class FactoryUnattendedShadowTests(unittest.TestCase):
             self.assertIn('"progress_at": "2026-08-22T00:00:00Z"', text)
 
     def test_restart_preserves_reconciled_positions(self) -> None:
-        early = load_early_state_config(ROOT)
-        cohort, _ = build_cohort(ROOT, early)
+        cohort = _fixture_rows()
         with tempfile.TemporaryDirectory() as tmp:
             store_path = Path(tmp) / "paper.sqlite"
             first = run_shadow_tick(
@@ -104,8 +108,7 @@ class FactoryUnattendedShadowTests(unittest.TestCase):
                 store.close()
 
     def test_isolated_backup_restore_of_paper_sqlite(self) -> None:
-        early = load_early_state_config(ROOT)
-        cohort, _ = build_cohort(ROOT, early)
+        cohort = _fixture_rows()
         with tempfile.TemporaryDirectory() as tmp:
             root = Path(tmp)
             store_rel = "local/factory_v1/paper_plane_state.sqlite"
@@ -139,11 +142,6 @@ class FactoryUnattendedShadowTests(unittest.TestCase):
             self.assertEqual(before, after)
 
     def test_end_to_end_tick_writes_receipt_fields(self) -> None:
-        early = load_early_state_config(ROOT)
-        try:
-            build_cohort(ROOT, early)
-        except Exception as exc:  # noqa: BLE001
-            self.skipTest(f"pinned cohort unavailable: {exc}")
         with tempfile.TemporaryDirectory() as tmp:
             store_path = Path(tmp) / "shadow.sqlite"
             result = run_unattended_shadow_tick(ROOT, store_path=store_path)

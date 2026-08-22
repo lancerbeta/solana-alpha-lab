@@ -37,6 +37,8 @@ managed_write_set:
 - docs/PROJECT_MAP.md
 - docs/OPERATOR_NAVIGATION.md
 - docs/evidence/factory_unattended_shadow/a1_runtime_receipt_v1.json
+- docs/evidence/factory_unattended_shadow/a1_backup_receipt_v1.json
+- docs/evidence/factory_unattended_shadow/a1_host_proof_v1.json
 - docs/evidence/factory_unattended_shadow/a1_acceptance_v1.json
 - docs/evidence/factory_unattended_shadow/a1_delivery_completion_evidence_v1.json
 - docs/evidence/factory_unattended_shadow/a1_delivery_independent_review_v1.json
@@ -126,10 +128,13 @@ Cockpit OPERATIONS unhide, Postgres, Kubernetes, strategy tuning, new provider.
 
 ## Definition of Done
 
-1. Zero-network tests: SHADOW≠REAL_FILL, runner SHA pin, heartbeat
-   `progress_at` from store, restart preserves bots/positions, isolated
-   backup restore hash-equivalent.
+1. Zero-network tests over the git-tracked cohort fixture: SHADOW≠REAL_FILL,
+   runner SHA pin, heartbeat accepts explicit `progress_at` after store work,
+   restart preserves reconciled bots/positions, isolated backup restore
+   hash-equivalent.
 2. Live host: shadow tick unit/timer applied; one kill/restart; one backup +
-   isolated restore of live paper SQLite; doctor sees non-stale progress.
+   isolated restore of live paper SQLite; heartbeat kind `SHADOW_HEARTBEAT`.
+   (`progress_at` is the post-tick stamp after store mutations — not a second
+   scheduler clock alone.)
 3. Delivery trio with `integrity.kind=none`; Factory Fit FULL_REVIEW;
    exact-head CI; owner merge phrase.

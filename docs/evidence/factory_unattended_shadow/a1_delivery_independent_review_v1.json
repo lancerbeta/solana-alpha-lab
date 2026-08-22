@@ -1,0 +1,65 @@
+{
+  "as_of": "2026-08-22",
+  "non_claims": [
+    "NO_CRYPTOGRAPHIC_REVIEWER_IDENTITY",
+    "REVIEW_IS_NOT_SEMANTIC_DONE",
+    "NO_CANONICAL_DONE",
+    "NO_SINGLE_AGENT_REVIEW_FALLBACK",
+    "NO_SCIENTIFIC_SHADOW_PASS",
+    "NO_ALPHA",
+    "NO_FACTORY_V1_OPERATIONAL_READY"
+  ],
+  "required_roles": [
+    "ARCHITECTURE_CRITIC",
+    "CODE_REVIEWER",
+    "GOAL_DOD_CRITIC"
+  ],
+  "review_id": "FACTORY-UNATTENDED-SHADOW-INDEPENDENT-REVIEW-001",
+  "reviewed_bindings_sha256": "PENDING_BIND",
+  "reviewed_inventory_sha256": "PENDING_BIND",
+  "reviews": [
+    {
+      "findings": [
+        "CHECKED_ADOPT_PAPER_PLANE_REMOTE_OPS",
+        "CHECKED_WRAP_HEARTBEAT_GENERIC_TICK",
+        "CHECKED_RUNNER_PIN_UNCHANGED",
+        "CHECKED_NO_COCKPIT_OPERATIONS_UNHIDE",
+        "CHECKED_SHADOW_EXECUTABLE_NEVER_REAL_FILL",
+        "CHECKED_NO_SECOND_SCHEDULER",
+        "FIXED_DOD_PROGRESS_AT_WORDING_POST_TICK",
+        "RESIDUAL_SAME_TICK_LIFECYCLE_SMOKE_NOT_DURABLE_OPEN",
+        "RESIDUAL_SHARED_SQLITE_WITH_PAPER_PATH"
+      ],
+      "role": "ARCHITECTURE_CRITIC",
+      "verdict": "PASS"
+    },
+    {
+      "findings": [
+        "CHECKED_REAL_FILL_HARD_FAIL_IN_TICK",
+        "CHECKED_COMMISSIONING_ONLY_FAIL_CLOSED",
+        "CHECKED_NO_SECRETS",
+        "FIXED_TESTS_USE_GIT_TRACKED_FIXTURE",
+        "CHECKED_HEARTBEAT_KIND_SHADOW",
+        "RESIDUAL_MAX_OPEN_POSITIONS_NOT_ENFORCED_ON_INSTANT_RECONCILE"
+      ],
+      "role": "CODE_REVIEWER",
+      "verdict": "PASS"
+    },
+    {
+      "findings": [
+        "CHECKED_DECISION_DELTA_OPS_LINE",
+        "CHECKED_NAMED_CONSUMER_ATOM3",
+        "CHECKED_NONCLAIMS_NO_SCIENTIFIC_PROMOTION",
+        "CHECKED_DRIVE_NOT_PRIMARY",
+        "CHECKED_LIVE_HOST_TICK_RESTART_BACKUP_RESTORE",
+        "CHECKED_NO_FALSE_CANONICAL_DONE"
+      ],
+      "role": "GOAL_DOD_CRITIC",
+      "verdict": "PASS"
+    }
+  ],
+  "schema": "smial.delivery-independent-review-evidence",
+  "schema_version": "1.0",
+  "task_id": "FACTORY_UNATTENDED_SHADOW_VERTICAL_SLICE_V1",
+  "verdict": "PASS"
+}

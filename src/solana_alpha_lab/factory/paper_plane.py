@@ -388,6 +388,8 @@ def run_shadow_tick(
         rows = list(cohort) if max_rows is None else list(cohort)[:max_rows]
         for row in rows:
             kind = signal_kind_for(strategy, row)
+            if kind == "REAL_FILL":
+                raise PaperPlaneError("REAL_FILL_FORBIDDEN_IN_SHADOW_TICK")
             # Config entry may name SIMULATED_FILL; SHADOW tick maps a positive
             # signal to SHADOW_EXECUTABLE observation without claiming fill.
             if kind in {"SIMULATED_FILL", "SHADOW_EXECUTABLE"}:

@@ -1,0 +1,36 @@
+{
+  "as_of": "2026-08-22",
+  "capability_radar": {
+    "now": "NONE",
+    "watch": "ATOM_3_FACTORY_V1_OPERATIONAL_READY"
+  },
+  "dimensions": {
+    "build_vs_buy": "PASS_ADOPT_PAPER_PLANE_WRAP_HEARTBEAT",
+    "context_efficiency": "PASS_ONE_ATOM_OPS_LINE",
+    "execution_to_cashflow": "PASS_NO_SIGNING_NO_NETRETURN",
+    "flexibility_and_history": "PASS_RUNNER_UNCHANGED",
+    "mission": "PASS_COMMISSIONING_ONLY_AFTER_ATOM1_CLOSE",
+    "monitoring_and_recovery": "PASS_RESTART_BACKUP_ISOLATED_RESTORE",
+    "owner_operability": "PASS_NINE_FIELD_OPERATIONS_JSON",
+    "red_team": "PASS_REAL_FILL_HARD_FAIL_NO_STRATEGY_UNIT",
+    "research_truth": "PASS_SCIENTIFIC_PROMOTION_FORBIDDEN",
+    "security": "PASS_NO_SECRETS_LOCALHOST_WORKBENCH"
+  },
+  "limits": [
+    "NO_EARN_SHADOW",
+    "NO_ALPHA",
+    "NO_CANONICAL_DONE",
+    "NO_MICRO_LIVE",
+    "CAPABILITY_PASS_IS_NOT_PROMOTION",
+    "NO_DRIVE_PRIMARY_BACKUP"
+  ],
+  "mode": "FULL_REVIEW",
+  "recovery": "REVERT_THIS_ATOM; PRESERVE_FACTORY_RUNNER; KEEP_REMOTE_OPS_BASELINE",
+  "review_id": "FACTORY-UNATTENDED-SHADOW-FACTORY-FIT-001",
+  "reviewed_bindings_sha256": "PENDING_BIND",
+  "reviewed_inventory_sha256": "PENDING_BIND",
+  "schema": "smial.delivery-harness-factory-fit",
+  "schema_version": "1.0",
+  "task_id": "FACTORY_UNATTENDED_SHADOW_VERTICAL_SLICE_V1",
+  "verdict": "PASS"
+}

@@ -1,0 +1,36 @@
+{
+  "acceptance_id": "FACTORY-UNATTENDED-SHADOW-ACCEPTANCE-001",
+  "as_of": "2026-08-22",
+  "atom_id": "FACTORY_UNATTENDED_SHADOW_VERTICAL_SLICE_V1",
+  "evidence": {
+    "backup_receipt": "docs/evidence/factory_unattended_shadow/a1_backup_receipt_v1.json",
+    "host_proof": "docs/evidence/factory_unattended_shadow/a1_host_proof_v1.json",
+    "runtime_receipt": "docs/evidence/factory_unattended_shadow/a1_runtime_receipt_v1.json"
+  },
+  "factory_core_python_changed": false,
+  "factory_runner_sha256": "d8d22bcb51fb6992d40f09e58274c52e0f9942c12d043cc57b96ffca524e918f",
+  "non_claims": [
+    "NO_ALPHA",
+    "NO_NETRETURN",
+    "NO_REAL_FILL",
+    "NO_MICRO_LIVE",
+    "NO_SCIENTIFIC_SHADOW_PROMOTION",
+    "NO_FACTORY_V1_OPERATIONAL_READY",
+    "NO_CANONICAL_DONE"
+  ],
+  "operations_view": {
+    "blocker": "NONE",
+    "bot": "BOT-STRAT-V-EARLY-LIQ-FLOOR-V1-SHADOW",
+    "exit_readiness": "IDLE",
+    "mode": "SHADOW",
+    "next_safe_action": "ATOM_3_FACTORY_V1_OPERATIONAL_READY_IF_STILL_KEPT",
+    "position": "NONE_OPEN",
+    "reconciliation": "CLEAN",
+    "signal": "SHADOW_EXECUTABLE",
+    "strategy": "STRAT-V-EARLY-LIQ-FLOOR"
+  },
+  "schema": "smial.factory-unattended-shadow.acceptance",
+  "schema_version": "1.0",
+  "scientific_shadow_pass": false,
+  "verdict": "PRODUCT_PASS_COMMISSIONING_ONLY"
+}
