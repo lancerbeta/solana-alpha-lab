@@ -71,7 +71,7 @@
     "github_ci": "ENFORCED_LIVE_AT_GUARDED_MERGE",
     "independent_review": {
       "path": "docs/evidence/factory_unattended_shadow/a1_delivery_independent_review_v1.json",
-      "sha256": "12000826c67f1246806d38a8b9a29a2046453b91d8fdd9725082fb0de18a5f16",
+      "sha256": "f68780c07c200d57191a3af142628ced3cc12f3fad392889ec51af50e41c73f3",
       "verdict": "PASS"
     },
     "project_checks": [
