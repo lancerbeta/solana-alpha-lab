@@ -75,6 +75,16 @@ try {
                 throw "PRE_COMMIT_SECRET_CHECK_FAILED"
             }
 
+            $derivedSync = Invoke-NativeResult -File "uv.exe" -Arguments @(
+                "run", "--locked", "--managed-python", "python", "-B",
+                ".\scripts\harness_sync.py", "--check", "--paths-from-staging"
+            )
+            $derivedSync.Lines | ForEach-Object { Write-Output $_ }
+            if ($derivedSync.ExitCode -ne 0) {
+                throw "PRE_COMMIT_DERIVED_HASH_DRIFT"
+            }
+
+            Write-Output "PRE_COMMIT_DERIVED_SYNC: PASS"
             Write-Output "PRE_COMMIT_JIT: PASS"
             Write-Output "RESULT: PASS"
         }

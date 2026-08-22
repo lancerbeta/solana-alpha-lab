@@ -235,41 +235,82 @@ def run_nav_generator() -> list[str]:
     return [f"navigation generator: {output}"]
 
 
-def check_drift() -> list[str]:
+def read_staged_paths() -> set[str]:
+    completed = subprocess.run(
+        ["git", "diff", "--cached", "--name-only"],
+        cwd=str(ROOT),
+        stdout=subprocess.PIPE,
+        stderr=subprocess.PIPE,
+        check=False,
+        text=True,
+    )
+    _require(completed.returncode == 0, "STAGED_PATHS_UNAVAILABLE")
+    return {line.strip() for line in completed.stdout.splitlines() if line.strip()}
+
+
+def drift_scopes_for_paths(paths: set[str]) -> dict[str, bool]:
+    if not paths:
+        return {"assets": False, "checkpoint": False, "navigation": False}
+    records = collect_asset_records()
+    repository_paths = {info["repository_path"] for info in records.values()}
+    registries = set(ASSET_REGISTRIES)
+    nav_outputs = set(NAV_OUTPUTS)
+    return {
+        "assets": bool(paths & (registries | repository_paths)),
+        "checkpoint": bool(paths & (registries | {MANIFEST_RELATIVE})),
+        "navigation": bool(paths & (nav_outputs | registries | repository_paths)),
+    }
+
+
+def check_drift(*, scoped_paths: set[str] | None = None) -> list[str]:
+    scopes = (
+        {"assets": True, "checkpoint": True, "navigation": True}
+        if scoped_paths is None
+        else drift_scopes_for_paths(scoped_paths)
+    )
+    if not any(scopes.values()):
+        return []
+
     problems: list[str] = []
     records = collect_asset_records()
-    for asset_id, info in sorted(records.items()):
-        try:
-            desired = desired_sha256(info["repository_path"])
-        except HarnessSyncError as exc:
-            problems.append(str(exc))
-            continue
-        registry_file = ROOT / info["registry"]
-        current = _current_block_sha(registry_file.read_text(encoding="utf-8"), asset_id)
-        if current != desired:
+    if scopes["assets"]:
+        for asset_id, info in sorted(records.items()):
+            if scoped_paths is not None:
+                if info["registry"] not in scoped_paths and info["repository_path"] not in scoped_paths:
+                    continue
+            try:
+                desired = desired_sha256(info["repository_path"])
+            except HarnessSyncError as exc:
+                problems.append(str(exc))
+                continue
+            registry_file = ROOT / info["registry"]
+            current = _current_block_sha(registry_file.read_text(encoding="utf-8"), asset_id)
+            if current != desired:
+                problems.append(
+                    f"sha256_mismatch:{asset_id}:{info['registry']}; run harness_sync.py --apply"
+                )
+    if scopes["checkpoint"]:
+        observed = observed_checkpoint()
+        manifest = yaml.safe_load((ROOT / MANIFEST_RELATIVE).read_text(encoding="utf-8"))
+        if manifest.get("current_checkpoint") != observed:
             problems.append(
-                f"sha256_mismatch:{asset_id}:{info['registry']}; run harness_sync.py --apply"
+                "catalog_current_checkpoint_drift:"
+                f"registered={json.dumps(manifest.get('current_checkpoint'), sort_keys=True)}:"
+                f"observed={json.dumps(observed, sort_keys=True)}; run harness_sync.py --apply"
             )
-    observed = observed_checkpoint()
-    manifest = yaml.safe_load((ROOT / MANIFEST_RELATIVE).read_text(encoding="utf-8"))
-    if manifest.get("current_checkpoint") != observed:
-        problems.append(
-            "catalog_current_checkpoint_drift:"
-            f"registered={json.dumps(manifest.get('current_checkpoint'), sort_keys=True)}:"
-            f"observed={json.dumps(observed, sort_keys=True)}; run harness_sync.py --apply"
+    if scopes["navigation"]:
+        nav = subprocess.run(
+            [sys.executable, "-B", str(ROOT / "scripts" / "generate_navigation.py"), "--check"],
+            capture_output=True,
+            env={**__import__("os").environ, "PYTHONDONTWRITEBYTECODE": "1"},
         )
-    nav = subprocess.run(
-        [sys.executable, "-B", str(ROOT / "scripts" / "generate_navigation.py"), "--check"],
-        capture_output=True,
-        env={**__import__("os").environ, "PYTHONDONTWRITEBYTECODE": "1"},
-    )
-    if nav.returncode != 0:
-        detail = nav.stdout.decode("utf-8", errors="replace").strip().splitlines()[-1:]
-        problems.append(
-            "navigation_projection_stale"
-            + (f":{detail[0]}" if detail else "")
-            + "; run harness_sync.py --apply"
-        )
+        if nav.returncode != 0:
+            detail = nav.stdout.decode("utf-8", errors="replace").strip().splitlines()[-1:]
+            problems.append(
+                "navigation_projection_stale"
+                + (f":{detail[0]}" if detail else "")
+                + "; run harness_sync.py --apply"
+            )
     return problems
 
 
@@ -755,10 +796,18 @@ def sync_main(argv: list[str]) -> int:
     mode = parser.add_mutually_exclusive_group(required=True)
     mode.add_argument("--apply", action="store_true", help="repair derived drift")
     mode.add_argument("--check", action="store_true", help="verify derived state only")
+    parser.add_argument(
+        "--paths-from-staging",
+        action="store_true",
+        help="with --check, verify drift only for git-staged paths",
+    )
     args = parser.parse_args(argv)
 
     if args.check:
-        problems = check_drift()
+        if args.paths_from_staging:
+            problems = check_drift(scoped_paths=read_staged_paths())
+        else:
+            problems = check_drift()
         if problems:
             for problem in problems:
                 print(f"DERIVED_HASH_DRIFT: {problem}", file=sys.stderr)

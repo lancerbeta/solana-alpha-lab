@@ -56,11 +56,16 @@ merge_policy:
     - docs/tasks/CTRL-AUTONOMOUS-DELIVERY-SKILL-V1.md
     - docs/tasks/CTRL-HARNESS-SYNC-DERIVED-HASHES-V1.md
     - docs/tasks/CTRL-HARNESS-SYNC-DELIVERY-EVIDENCE-BINDINGS-V1.md
+    - docs/tasks/CTRL-HARNESS-SYNC-CI-FAIL-CLOSED-MESSAGES-V1.md
     - scripts/delivery_harness.py
     - scripts/owner_attention_gate.py
     - scripts/validate_ci.py
+    - scripts/ci_fail_closed_messages.py
     - scripts/harness_sync.py
+    - scripts/validate.ps1
+    - scripts/validate_baton.py
     - tests/test_ci.py
+    - tests/test_ci_messages.py
     - tests/test_delivery_harness_adapters.py
     - tests/test_delivery_harness_authority.py
     - tests/test_delivery_harness_bootstrap.py

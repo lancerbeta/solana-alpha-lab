@@ -702,12 +702,25 @@ def run_checked(
         completed = execute(command, **arguments)
     except subprocess.TimeoutExpired as exc:
         raise CiValidationError(f"{label.lower()}_timeout") from exc
+    combined = "\n".join(
+        part.strip()
+        for part in (completed.stdout, completed.stderr)
+        if part and part.strip()
+    )
+    if completed.returncode != 0:
+        from ci_fail_closed_messages import derived_hash_drift_summary, is_derived_hash_drift
+
+        if is_derived_hash_drift(combined):
+            print(derived_hash_drift_summary())
+        if completed.stdout.strip():
+            print(completed.stdout.strip())
+        if completed.stderr.strip():
+            print(completed.stderr.strip())
+        raise CiValidationError(f"{label.lower()}_failed:{completed.returncode}")
     if completed.stdout.strip():
         print(completed.stdout.strip())
     if completed.stderr.strip():
         print(completed.stderr.strip())
-    if completed.returncode != 0:
-        raise CiValidationError(f"{label.lower()}_failed:{completed.returncode}")
     print(f"{label}: PASS")
     return completed
 

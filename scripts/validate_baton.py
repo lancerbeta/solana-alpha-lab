@@ -695,6 +695,9 @@ def validate_cursor_and_templates() -> None:
         "[switch]$PreCommit",
         '"diff", "--cached", "--check"',
         r".\scripts\secret_scan.py",
+        r".\scripts\harness_sync.py",
+        "--paths-from-staging",
+        "PRE_COMMIT_DERIVED_SYNC: PASS",
         "PRE_COMMIT_JIT: PASS",
         r".\scripts\validate_ci.py",
     ]:
@@ -920,6 +923,10 @@ def main(argv: list[str] | None = None) -> int:
     try:
         validate(focused=args.focused)
     except BatonValidationError as exc:
+        from ci_fail_closed_messages import emit_derived_hash_drift_summary, is_derived_hash_drift
+
+        if is_derived_hash_drift(str(exc)):
+            emit_derived_hash_drift_summary()
         print("BATON_VALIDATION: FAIL")
         print(f"ERROR_TYPE: {type(exc).__name__}")
         print(f"ERROR: {exc}")

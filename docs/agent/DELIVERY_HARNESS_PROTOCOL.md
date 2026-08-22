@@ -73,6 +73,23 @@ contract scope. `bind-evidence --verify-all-delivered` is a read-only audit of
 historical completion chains. Sync updates only binding fields the guard reads;
 verdicts, findings and non-claims remain agent-owned.
 
+### CI fail-closed presentation
+
+When derived hashes drift, child validators still fail closed. Before their
+details, `validate_ci.py` and `validate_baton.py` print one actionable line:
+
+```text
+DERIVED_HASH_DRIFT: run uv run --locked --managed-python python -B scripts/harness_sync.py --apply
+```
+
+Pre-commit runs a scoped staging check only:
+
+```text
+uv run --locked --managed-python python -B scripts/harness_sync.py --check --paths-from-staging
+```
+
+The summary does not replace validation; it only surfaces the sanctioned repair.
+
 ### Finish and merge
 
 Run Factory Fit, Product Horizon and capability radar. Record exact inventory,
