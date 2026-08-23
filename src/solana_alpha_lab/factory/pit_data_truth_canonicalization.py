@@ -373,6 +373,9 @@ def canonicalize_from_repository(
         "acceptance_id": "FACTORY-V1-PIT-DATA-TRUTH-CANONICALIZATION-001",
         "task_id": "FACTORY_V1_PIT_DATA_TRUTH_CANONICALIZATION_V1",
         "terminal": PIT_TERMINAL,
+        "project_sources_disposition": {
+            "kind": "NO_CHANGE",
+        },
         "readiness": {
             "pit_lineage_ready": True,
             "explicit_missingness_preserved": True,

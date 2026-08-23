@@ -9,6 +9,7 @@
     "acceptance_id",
     "task_id",
     "terminal",
+    "project_sources_disposition",
     "readiness",
     "feature",
     "projection",
@@ -26,6 +27,12 @@
     "acceptance_id": {"const": "FACTORY-V1-PIT-DATA-TRUTH-CANONICALIZATION-001"},
     "task_id": {"const": "FACTORY_V1_PIT_DATA_TRUTH_CANONICALIZATION_V1"},
     "terminal": {"const": "FACTORY_V1_PIT_DATA_TRUTH_CANONICALIZATION_PASS"},
+    "project_sources_disposition": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["kind"],
+      "properties": {"kind": {"const": "NO_CHANGE"}}
+    },
     "readiness": {
       "type": "object",
       "additionalProperties": false,

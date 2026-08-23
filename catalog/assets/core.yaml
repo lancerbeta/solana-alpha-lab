@@ -30446,7 +30446,7 @@ records:
   as_of: '2026-08-23'
   truth_owner: FACTORY_V1_OPERATIONAL_READINESS_CLOSEOUT_V1
   location: {kind: git_path, logical_uri: 'repo://configs/factory_v1_operational_readiness_closeout_v1.yaml', repository_path: configs/factory_v1_operational_readiness_closeout_v1.yaml}
-  integrity: {kind: sha256, sha256: d185ce77b3dd0a20e49fa12c14a4573d9b8623f536ac852f3a7d76e71e8c7cdb}
+  integrity: {kind: sha256, sha256: 0e2e1fb28e1a6886ceb9204266c5b30f0b6c2204daa06447efad709715b5d1ca}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: governed_by, target_asset_id: CTRL-FACTORY-V1-OPERATIONAL-READINESS-CLOSEOUT-001}
@@ -30646,7 +30646,7 @@ records:
   as_of: '2026-08-23'
   truth_owner: FACTORY_V1_PIT_DATA_TRUTH_CANONICALIZATION_V1
   location: {kind: git_path, logical_uri: 'repo://catalog/schemas/factory_v1_pit_data_truth_canonicalization.schema.json', repository_path: catalog/schemas/factory_v1_pit_data_truth_canonicalization.schema.json}
-  integrity: {kind: sha256, sha256: 1828d1f2f4317cc90ce9fa99d3e3392e00d651fa0bb576dcfae88844f2bf25f1}
+  integrity: {kind: sha256, sha256: 406d7bea01d8e5c386cbd5d52b3cc1273f3d4c0a32a87c65dee05e6837e5379a}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: governed_by, target_asset_id: CTRL-FACTORY-V1-PIT-DATA-TRUTH-CANONICALIZATION-001}
@@ -30663,7 +30663,7 @@ records:
   as_of: '2026-08-23'
   truth_owner: FACTORY_V1_PIT_DATA_TRUTH_CANONICALIZATION_V1
   location: {kind: git_path, logical_uri: 'repo://src/solana_alpha_lab/factory/pit_data_truth_canonicalization.py', repository_path: src/solana_alpha_lab/factory/pit_data_truth_canonicalization.py}
-  integrity: {kind: sha256, sha256: dde9b5d221d7da4320a3ba14ea7e4be29d18a54cf5cd3ba7f59e923ff699b6be}
+  integrity: {kind: sha256, sha256: 922e26dee0132b074fe46476d3351dcb7d54fe4eb9b9fd64f338f161921127c8}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: governed_by, target_asset_id: CTRL-FACTORY-V1-PIT-DATA-TRUTH-CANONICALIZATION-001}
@@ -30734,7 +30734,7 @@ records:
   as_of: '2026-08-23'
   truth_owner: FACTORY_V1_PIT_DATA_TRUTH_CANONICALIZATION_V1
   location: {kind: git_path, logical_uri: 'repo://docs/evidence/factory_v1_pit_data_truth_canonicalization/a1_acceptance_v1.json', repository_path: docs/evidence/factory_v1_pit_data_truth_canonicalization/a1_acceptance_v1.json}
-  integrity: {kind: sha256, sha256: ce20b85ca637cacafed505aadc7ac970872c9978f682a625080b54c5df9880a5}
+  integrity: {kind: sha256, sha256: b9298a455fd30e12d9822899f0c2a9931c5b83af84e2db00d0e7b00b10a271f8}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: depends_on, target_asset_id: EVIDENCE-FACTORY-V1-PIT-DATA-TRUTH-CANONICALIZATION-RUNTIME-001}

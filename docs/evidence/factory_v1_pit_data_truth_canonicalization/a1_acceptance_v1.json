@@ -34,6 +34,9 @@
     "NO_SCIENTIFIC_SHADOW",
     "NO_MICRO_LIVE"
   ],
+  "project_sources_disposition": {
+    "kind": "NO_CHANGE"
+  },
   "projection": {
     "candidate_count": 24,
     "decision_snapshot_at": "2026-08-22T20:23:39Z",
