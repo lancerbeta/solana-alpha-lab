@@ -86,7 +86,10 @@ context_requirements:
     - docs/operator/FACTORY_REMOTE_HOST.md
     ARCHITECTURE_DECISIONS:
     - docs/architecture/intents/ARCH-INTENT-005-factory-v1-operational-readiness-and-owner-experience.md
-    DELIVERY_EVIDENCE: []
+    DELIVERY_EVIDENCE:
+    - docs/evidence/factory_v1_live_ops_hardening/a1_delivery_completion_evidence_v1.json
+    - docs/evidence/factory_v1_live_ops_hardening/a1_delivery_independent_review_v1.json
+    - docs/evidence/factory_v1_live_ops_hardening/a1_delivery_factory_fit_v1.json
     HISTORICAL_CONTEXT:
     - docs/evidence/factory_remote_operations/a3_acceptance_v1.json
     - docs/evidence/factory_unattended_shadow/a1_host_proof_v1.json
