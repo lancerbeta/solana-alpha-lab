@@ -30622,7 +30622,7 @@ records:
   as_of: '2026-08-23'
   truth_owner: FACTORY_V1_PIT_DATA_TRUTH_CANONICALIZATION_V1
   location: {kind: git_path, logical_uri: 'repo://docs/tasks/FACTORY_V1_PIT_DATA_TRUTH_CANONICALIZATION_V1.md', repository_path: docs/tasks/FACTORY_V1_PIT_DATA_TRUTH_CANONICALIZATION_V1.md}
-  integrity: {kind: sha256, sha256: 4abbfde01177fca046e5736af93919a7b9a2b7db909609ce037e037f06845c9d}
+  integrity: {kind: sha256, sha256: c6db93c3b0e5dfe7b931ca57c4ca0ef36d46027d516cfbf404705993a7e309de}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: governed_by, target_asset_id: ARCH-INTENT-005}
