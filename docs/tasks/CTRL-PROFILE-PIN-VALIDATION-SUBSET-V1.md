@@ -20,6 +20,8 @@ managed_write_set:
   - delivery-harness/harness.yaml
   - docs/agent/DELIVERY_HARNESS_PROTOCOL.md
   - catalog/assets/core.yaml
+  - delivery-harness/templates/portable-bundle-manifest.json
+  - docs/evidence/control/delivery_harness_acceptance_v1.json
   - docs/evidence/control/a1_profile_pin_validation_subset_completion_v1.json
   - docs/evidence/control/a1_profile_pin_validation_subset_review_v1.json
   - docs/evidence/control/a1_profile_pin_validation_subset_factory_fit_v1.json
