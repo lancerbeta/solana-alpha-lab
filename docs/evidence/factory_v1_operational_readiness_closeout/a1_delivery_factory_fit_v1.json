@@ -1,0 +1,36 @@
+{
+  "as_of": "2026-08-23",
+  "capability_radar": {
+    "now": "NONE",
+    "watch": "CLOSE_NAMED_REPLAN_GAPS"
+  },
+  "dimensions": {
+    "build_vs_buy": "PASS_ADOPT_RECEIPTS_BUILD_EVALUATOR_ONLY",
+    "context_efficiency": "PASS_ONE_KILL_OR_FREEZE_ATOM",
+    "execution_to_cashflow": "PASS_NO_SIGNING",
+    "flexibility_and_history": "PASS_RUNNER_UNCHANGED",
+    "mission": "PASS_HONEST_REPLAN_NOT_FALSE_READY",
+    "monitoring_and_recovery": "PASS_GAPS_NAMED_NOT_PAPERED",
+    "owner_operability": "PASS_CLI_AND_READOUT_DECISION_PACKET",
+    "red_team": "PASS_NO_MOSTLY_READY_NO_PROXY_SECURITY",
+    "research_truth": "PASS_NO_ALPHA_CLAIM_PIT_COUNT_HARDENED",
+    "security": "PASS_POSITIVE_FINANCIAL_GATE_FIELD_NAMED_GAP"
+  },
+  "limits": [
+    "NO_FACTORY_V1_OPERATIONAL_READY",
+    "NO_FOUNDATION_FREEZE",
+    "NO_ALPHA",
+    "NO_CANONICAL_DONE",
+    "CAPABILITY_PASS_IS_NOT_PROMOTION",
+    "READY_AUTHORITY_CLOSEOUT_PREDICATE_SET_ONLY"
+  ],
+  "mode": "FULL_REVIEW",
+  "recovery": "REVERT_THIS_ATOM; KEEP_READINESS_DIRECTION_CONTRACT; PRESERVE_SLICE_RECEIPTS",
+  "review_id": "FACTORY-V1-READINESS-CLOSEOUT-FACTORY-FIT-001",
+  "reviewed_bindings_sha256": "PENDING_BIND",
+  "reviewed_inventory_sha256": "PENDING_BIND",
+  "schema": "smial.delivery-harness-factory-fit",
+  "schema_version": "1.0",
+  "task_id": "FACTORY_V1_OPERATIONAL_READINESS_CLOSEOUT_V1",
+  "verdict": "PASS"
+}

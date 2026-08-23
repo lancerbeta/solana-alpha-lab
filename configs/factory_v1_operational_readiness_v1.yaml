@@ -85,11 +85,11 @@ current_product_stage:
   research_memory: FUNCTIONAL
   data_evidence_spine: FUNCTIONAL_WITH_GAPS
   provider_routes: PARTIAL
-  generic_hypothesis_runner: NOT_OPERATIONAL_AS_PRODUCT
-  owner_cockpit: NOT_IMPLEMENTED
-  production_lite_runtime: NOT_IMPLEMENTED
-  unattended_monitoring: NOT_IMPLEMENTED
-  paper_shadow_position_operations: NOT_OPERATIONAL
+  generic_hypothesis_runner: OPERATIONAL_AS_PRODUCT_KERNEL_AND_COMMISSIONING
+  owner_cockpit: COCKPIT_LITE_IMPLEMENTED
+  production_lite_runtime: LOCAL_LINUX_SHAPED_PROOF_PASS
+  unattended_monitoring: PARTIAL_REMOTE_OPS_AND_SHADOW
+  paper_shadow_position_operations: COMMISSIONING_ONLY_UNATTENDED_SHADOW_PASS
   micro_live: OUT_OF_SCOPE_FOR_FACTORY_V1
 gate:
   commissioning:
@@ -192,6 +192,13 @@ non_goals:
   - broad all-Solana data warehouse
   - advanced ML before simple methods fail
   - generic plugin marketplace
+closeout:
+  task_id: FACTORY_V1_OPERATIONAL_READINESS_CLOSEOUT_V1
+  terminal: FACTORY_PRODUCTIZATION_REPLAN
+  factory_v1_operational_ready: false
+  foundation_freeze: INACTIVE
+  named_gap_count: 11
+  ready_authority: CLOSEOUT_PREDICATE_SET_ONLY
 capability_radar:
   now: NONE
   watch:

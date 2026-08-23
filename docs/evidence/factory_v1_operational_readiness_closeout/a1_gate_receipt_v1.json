@@ -1,0 +1,196 @@
+{
+  "as_of": "2026-08-23",
+  "factory_runner_sha256": "d8d22bcb51fb6992d40f09e58274c52e0f9942c12d043cc57b96ffca524e918f",
+  "factory_v1_operational_ready": false,
+  "foundation_freeze": "INACTIVE",
+  "named_gaps": [
+    "RUNTIME_LIVE_DEPLOY_ROLLBACK:FIELD_MISMATCH:live_deploy_rollback:None!=True",
+    "RUNTIME_LIVE_CLEAN_REHOST:FIELD_MISMATCH:live_clean_rehost:None!=True",
+    "DATA_FACTORY_PIT_LINEAGE_RECEIPT:FIELD_MISMATCH:pit_ready_count:0!=1",
+    "MONITORING_PROVIDER_FAILURE_ALERT:FIELD_MISMATCH:provider_failure_alert_tested:None!=True",
+    "MONITORING_LIVE_STALE_DATA_ALERT:FIELD_MISMATCH:checks.stale_data_alert:None!='PASS'",
+    "MONITORING_LIVE_BOT_STALL_ALERT:FIELD_MISMATCH:checks.bot_stall_alert:None!='PASS'",
+    "SECURITY_FINANCIAL_GATED:FIELD_MISMATCH:security.destructive_and_financial_actions_separately_gated:None!=True",
+    "DATA_EXPLICIT_MISSINGNESS:FIELD_MISMATCH:explicit_missingness_preserved:None!=True",
+    "DATA_PROVIDER_HEALTH_VISIBLE:FIELD_MISMATCH:provider_health_visible:None!=True",
+    "TIME_TO_EVIDENCE_FIRST_BYTE:FIELD_MISMATCH:first_market_byte_within_one_preparatory_step:None!=True",
+    "ENTRY_GATE_RESOLVES_READINESS_CONTRACT:YAML_MISMATCH:domain_policy_integration.entry_gate_resolves_this_file:False!=True"
+  ],
+  "next_safe_action": "CLOSE_NAMED_REPLAN_GAPS_BEFORE_ATOM4",
+  "non_claims": [
+    "NO_ALPHA",
+    "NO_SCIENTIFIC_SHADOW_PASS",
+    "NO_MOSTLY_READY",
+    "NO_FALSE_READY_WITHOUT_ALL_PREDICATES",
+    "NO_READY_FROM_UNBOUND_READINESS_YAML_GATE_LEAVES",
+    "NO_PROXY_NONCLAIM_AS_SECURITY_GATE"
+  ],
+  "predicates": [
+    {
+      "dimension": "commissioning",
+      "evidence_path": "docs/evidence/factory_v1_product_kernel/a1_factory_v1_product_kernel_acceptance_v1.json",
+      "gap": null,
+      "id": "COMMISSIONING_GOLDEN_REPLAY",
+      "verdict": "PASS"
+    },
+    {
+      "dimension": "commissioning",
+      "evidence_path": "docs/evidence/factory_v1_commissioning/a2_factory_v1_commissioning_acceptance_v1.json",
+      "gap": null,
+      "id": "COMMISSIONING_FRESH_HYPOTHESIS_E2E",
+      "verdict": "PASS"
+    },
+    {
+      "dimension": "leverage",
+      "evidence_path": "docs/evidence/factory_unattended_shadow/a1_acceptance_v1.json",
+      "gap": null,
+      "id": "LEVERAGE_NO_TASK_SPECIFIC_CORE_RUNNER",
+      "verdict": "PASS"
+    },
+    {
+      "dimension": "owner_operability",
+      "evidence_path": "docs/evidence/factory_v1_owner_cockpit/a4_factory_v1_cockpit_acceptance_v1.json",
+      "gap": null,
+      "id": "OWNER_OPERABILITY_COCKPIT_LITE",
+      "verdict": "PASS"
+    },
+    {
+      "dimension": "runtime",
+      "evidence_path": "docs/evidence/factory_v1_production_lite_runtime/a3_factory_v1_runtime_acceptance_v1.json",
+      "gap": null,
+      "id": "RUNTIME_LOCAL_LINUX_SHAPED_PROOF",
+      "verdict": "PASS"
+    },
+    {
+      "dimension": "runtime",
+      "evidence_path": "docs/evidence/factory_unattended_shadow/a1_host_proof_v1.json",
+      "gap": null,
+      "id": "RUNTIME_LIVE_HOST_AND_SHADOW_WORKER",
+      "verdict": "PASS"
+    },
+    {
+      "dimension": "runtime",
+      "evidence_path": "docs/evidence/factory_remote_operations/a3_acceptance_v1.json",
+      "gap": "FIELD_MISMATCH:live_deploy_rollback:None!=True",
+      "id": "RUNTIME_LIVE_DEPLOY_ROLLBACK",
+      "verdict": "FAIL"
+    },
+    {
+      "dimension": "runtime",
+      "evidence_path": "docs/evidence/factory_remote_operations/a3_acceptance_v1.json",
+      "gap": "FIELD_MISMATCH:live_clean_rehost:None!=True",
+      "id": "RUNTIME_LIVE_CLEAN_REHOST",
+      "verdict": "FAIL"
+    },
+    {
+      "dimension": "data",
+      "evidence_path": "docs/evidence/factory_unattended_shadow/a1_host_proof_v1.json",
+      "gap": null,
+      "id": "DATA_LIVE_BACKUP_ISOLATED_RESTORE",
+      "verdict": "PASS"
+    },
+    {
+      "dimension": "data",
+      "evidence_path": "docs/evidence/factory_v1_common_market_feature_surface/a1_factory_v1_common_market_feature_surface_acceptance_v1.json",
+      "gap": "FIELD_MISMATCH:pit_ready_count:0!=1",
+      "id": "DATA_FACTORY_PIT_LINEAGE_RECEIPT",
+      "verdict": "FAIL"
+    },
+    {
+      "dimension": "monitoring",
+      "evidence_path": "docs/evidence/factory_v1_owner_cockpit/a4_factory_v1_cockpit_acceptance_v1.json",
+      "gap": null,
+      "id": "MONITORING_HEALTH_VIEW",
+      "verdict": "PASS"
+    },
+    {
+      "dimension": "monitoring",
+      "evidence_path": "docs/evidence/factory_remote_operations/a3_runtime_receipt_v1.json",
+      "gap": null,
+      "id": "MONITORING_DEDUP_TESTED",
+      "verdict": "PASS"
+    },
+    {
+      "dimension": "monitoring",
+      "evidence_path": "docs/evidence/factory_remote_operations/a3_runtime_receipt_v1.json",
+      "gap": "FIELD_MISMATCH:provider_failure_alert_tested:None!=True",
+      "id": "MONITORING_PROVIDER_FAILURE_ALERT",
+      "verdict": "FAIL"
+    },
+    {
+      "dimension": "monitoring",
+      "evidence_path": "docs/evidence/factory_unattended_shadow/a1_host_proof_v1.json",
+      "gap": "FIELD_MISMATCH:checks.stale_data_alert:None!='PASS'",
+      "id": "MONITORING_LIVE_STALE_DATA_ALERT",
+      "verdict": "FAIL"
+    },
+    {
+      "dimension": "monitoring",
+      "evidence_path": "docs/evidence/factory_unattended_shadow/a1_host_proof_v1.json",
+      "gap": "FIELD_MISMATCH:checks.bot_stall_alert:None!='PASS'",
+      "id": "MONITORING_LIVE_BOT_STALL_ALERT",
+      "verdict": "FAIL"
+    },
+    {
+      "dimension": "security",
+      "evidence_path": "docs/evidence/factory_remote_operations/a3_acceptance_v1.json",
+      "gap": null,
+      "id": "SECURITY_SECRETS_OUTSIDE_REPO",
+      "verdict": "PASS"
+    },
+    {
+      "dimension": "security",
+      "evidence_path": "docs/evidence/factory_remote_operations/a3_acceptance_v1.json",
+      "gap": null,
+      "id": "SECURITY_LOCALHOST_UI",
+      "verdict": "PASS"
+    },
+    {
+      "dimension": "security",
+      "evidence_path": "docs/evidence/factory_remote_operations/a3_acceptance_v1.json",
+      "gap": "FIELD_MISMATCH:security.destructive_and_financial_actions_separately_gated:None!=True",
+      "id": "SECURITY_FINANCIAL_GATED",
+      "verdict": "FAIL"
+    },
+    {
+      "dimension": "data",
+      "evidence_path": "docs/evidence/factory_v1_common_market_feature_surface/a1_factory_v1_common_market_feature_surface_acceptance_v1.json",
+      "gap": "FIELD_MISMATCH:explicit_missingness_preserved:None!=True",
+      "id": "DATA_EXPLICIT_MISSINGNESS",
+      "verdict": "FAIL"
+    },
+    {
+      "dimension": "data",
+      "evidence_path": "docs/evidence/factory_remote_operations/a3_runtime_receipt_v1.json",
+      "gap": "FIELD_MISMATCH:provider_health_visible:None!=True",
+      "id": "DATA_PROVIDER_HEALTH_VISIBLE",
+      "verdict": "FAIL"
+    },
+    {
+      "dimension": "time_to_evidence",
+      "evidence_path": "docs/evidence/factory_v1_commissioning/a2_factory_v1_commissioning_acceptance_v1.json",
+      "gap": "FIELD_MISMATCH:first_market_byte_within_one_preparatory_step:None!=True",
+      "id": "TIME_TO_EVIDENCE_FIRST_BYTE",
+      "verdict": "FAIL"
+    },
+    {
+      "dimension": "truth",
+      "evidence_path": "configs/factory_v1_operational_readiness_v1.yaml",
+      "gap": "YAML_MISMATCH:domain_policy_integration.entry_gate_resolves_this_file:False!=True",
+      "id": "ENTRY_GATE_RESOLVES_READINESS_CONTRACT",
+      "verdict": "FAIL"
+    }
+  ],
+  "ready_authority": "CLOSEOUT_PREDICATE_SET_ONLY",
+  "reconciled_product_stage": {
+    "generic_hypothesis_runner": "OPERATIONAL_AS_PRODUCT_KERNEL_AND_COMMISSIONING",
+    "owner_cockpit": "COCKPIT_LITE_IMPLEMENTED",
+    "paper_shadow_position_operations": "COMMISSIONING_ONLY_UNATTENDED_SHADOW_PASS",
+    "production_lite_runtime": "LOCAL_LINUX_SHAPED_PROOF_PASS",
+    "unattended_monitoring": "PARTIAL_REMOTE_OPS_AND_SHADOW"
+  },
+  "schema": "smial.factory-v1-operational-readiness-closeout.gate",
+  "schema_version": "1.0",
+  "task_id": "FACTORY_V1_OPERATIONAL_READINESS_CLOSEOUT_V1",
+  "terminal": "FACTORY_PRODUCTIZATION_REPLAN"
+}

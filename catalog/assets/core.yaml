@@ -24367,7 +24367,7 @@ records:
   as_of: '2026-08-18'
   truth_owner: FACTORY-V1-OPERATIONAL-READINESS-V1
   location: {kind: git_path, logical_uri: 'repo://configs/factory_v1_operational_readiness_v1.yaml', repository_path: configs/factory_v1_operational_readiness_v1.yaml}
-  integrity: {kind: sha256, sha256: c0f2e245d9f36cd12e13d464399d189f03227047432674698cdb37361634c22c}
+  integrity: {kind: sha256, sha256: b861e9d91c98e04e7e73eb256d4924d9470934713793edf8059fc9bb71562838}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: governed_by, target_asset_id: ARCH-INTENT-005}
@@ -30416,4 +30416,199 @@ records:
   consumers: [FACTORY-001, GOAL-OWNER]
   evidence: []
   search_terms: [FACTORY, UNATTENDED_SHADOW, DELIVERY]
+  classification: {contains_secrets: false, contains_raw_data: false, sensitivity: INTERNAL_NON_SECRET}
+- asset_id: CTRL-FACTORY-V1-OPERATIONAL-READINESS-CLOSEOUT-001
+  record_version: '1.0'
+  asset_type: control_document
+  purpose: Kill-or-freeze Atom 3 contract for FACTORY_V1_OPERATIONAL_READY closeout.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-08-23'
+  truth_owner: FACTORY_V1_OPERATIONAL_READINESS_CLOSEOUT_V1
+  location: {kind: git_path, logical_uri: 'repo://docs/tasks/FACTORY_V1_OPERATIONAL_READINESS_CLOSEOUT_V1.md', repository_path: docs/tasks/FACTORY_V1_OPERATIONAL_READINESS_CLOSEOUT_V1.md}
+  integrity: {kind: sha256, sha256: 30d049ad140928e02d5e04f1b003ae1a916baf5b73a342af5131d39017544e9d}
+  access: {mode: read_only, method: file, network_required: false, secrets_required: false}
+  relations:
+  - {relation_type: contains, target_asset_id: CONFIG-FACTORY-V1-OPERATIONAL-READINESS-CLOSEOUT-001}
+  - {relation_type: contains, target_asset_id: MODULE-FACTORY-V1-OPERATIONAL-READINESS-CLOSEOUT-001}
+  - {relation_type: validated_by, target_asset_id: TEST-FACTORY-V1-OPERATIONAL-READINESS-CLOSEOUT-001}
+  - {relation_type: validated_by, target_asset_id: EVIDENCE-FACTORY-V1-OPERATIONAL-READINESS-CLOSEOUT-ACCEPTANCE-001}
+  consumers: [FACTORY-001, GOAL-OWNER]
+  evidence: []
+  search_terms: [FACTORY_V1, OPERATIONAL_READY, CLOSEOUT, REPLAN]
+  classification: {contains_secrets: false, contains_raw_data: false, sensitivity: INTERNAL_NON_SECRET}
+- asset_id: CONFIG-FACTORY-V1-OPERATIONAL-READINESS-CLOSEOUT-001
+  record_version: '1.0'
+  asset_type: configuration
+  purpose: Predicate bindings for readiness closeout gate evaluator.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-08-23'
+  truth_owner: FACTORY_V1_OPERATIONAL_READINESS_CLOSEOUT_V1
+  location: {kind: git_path, logical_uri: 'repo://configs/factory_v1_operational_readiness_closeout_v1.yaml', repository_path: configs/factory_v1_operational_readiness_closeout_v1.yaml}
+  integrity: {kind: sha256, sha256: 16cf5d1c38e4c898581731f0e2d0f3840e3b20560f4fe241c9da0583f4ec2843}
+  access: {mode: read_only, method: file, network_required: false, secrets_required: false}
+  relations:
+  - {relation_type: governed_by, target_asset_id: CTRL-FACTORY-V1-OPERATIONAL-READINESS-CLOSEOUT-001}
+  - {relation_type: depends_on, target_asset_id: CONFIG-FACTORY-V1-OPERATIONAL-READINESS-001}
+  consumers: [FACTORY-001, GOAL-OWNER]
+  evidence: []
+  search_terms: [FACTORY_V1, CLOSEOUT, PREDICATE]
+  classification: {contains_secrets: false, contains_raw_data: false, sensitivity: INTERNAL_NON_SECRET}
+- asset_id: MODULE-FACTORY-V1-OPERATIONAL-READINESS-CLOSEOUT-001
+  record_version: '1.0'
+  asset_type: script
+  purpose: Predicate evaluator for FACTORY_V1 operational readiness closeout.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-08-23'
+  truth_owner: FACTORY_V1_OPERATIONAL_READINESS_CLOSEOUT_V1
+  location: {kind: git_path, logical_uri: 'repo://src/solana_alpha_lab/factory/operational_readiness_closeout.py', repository_path: src/solana_alpha_lab/factory/operational_readiness_closeout.py}
+  integrity: {kind: sha256, sha256: 3fe4351109eae9adf04b521b3f575b9abdc254b109ac27b7ca92e7cfc0794223}
+  access: {mode: read_only, method: file, network_required: false, secrets_required: false}
+  relations:
+  - {relation_type: governed_by, target_asset_id: CTRL-FACTORY-V1-OPERATIONAL-READINESS-CLOSEOUT-001}
+  consumers: [FACTORY-001, GOAL-OWNER]
+  evidence: []
+  search_terms: [FACTORY_V1, CLOSEOUT, EVALUATOR]
+  classification: {contains_secrets: false, contains_raw_data: false, sensitivity: INTERNAL_NON_SECRET}
+- asset_id: SCRIPT-FACTORY-V1-OPERATIONAL-READINESS-CLOSEOUT-001
+  record_version: '1.0'
+  asset_type: script
+  purpose: CLI for readiness closeout evaluation and stage reconciliation.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-08-23'
+  truth_owner: FACTORY_V1_OPERATIONAL_READINESS_CLOSEOUT_V1
+  location: {kind: git_path, logical_uri: 'repo://scripts/run_factory_v1_operational_readiness_closeout.py', repository_path: scripts/run_factory_v1_operational_readiness_closeout.py}
+  integrity: {kind: sha256, sha256: 14438374cceb5061cc545394d45c60841b32c4d91edc8b3f94ce88e67aa378dd}
+  access: {mode: read_only, method: file, network_required: false, secrets_required: false}
+  relations:
+  - {relation_type: depends_on, target_asset_id: MODULE-FACTORY-V1-OPERATIONAL-READINESS-CLOSEOUT-001}
+  consumers: [FACTORY-001, GOAL-OWNER]
+  evidence: []
+  search_terms: [FACTORY_V1, CLOSEOUT, CLI]
+  classification: {contains_secrets: false, contains_raw_data: false, sensitivity: INTERNAL_NON_SECRET}
+- asset_id: TEST-FACTORY-V1-OPERATIONAL-READINESS-CLOSEOUT-001
+  record_version: '1.0'
+  asset_type: script
+  purpose: Zero-network tests for readiness closeout gate.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-08-23'
+  truth_owner: FACTORY_V1_OPERATIONAL_READINESS_CLOSEOUT_V1
+  location: {kind: git_path, logical_uri: 'repo://tests/test_factory_v1_operational_readiness_closeout.py', repository_path: tests/test_factory_v1_operational_readiness_closeout.py}
+  integrity: {kind: sha256, sha256: 93c3240f645b72c05e20ad887c605be5f0c0f0a210d509ebeccffa5bb49ba652}
+  access: {mode: read_only, method: file, network_required: false, secrets_required: false}
+  relations:
+  - {relation_type: depends_on, target_asset_id: MODULE-FACTORY-V1-OPERATIONAL-READINESS-CLOSEOUT-001}
+  consumers: [FACTORY-001, GOAL-OWNER]
+  evidence: []
+  search_terms: [FACTORY_V1, CLOSEOUT, TEST]
+  classification: {contains_secrets: false, contains_raw_data: false, sensitivity: INTERNAL_NON_SECRET}
+- asset_id: EVIDENCE-FACTORY-V1-OPERATIONAL-READINESS-CLOSEOUT-GATE-001
+  record_version: '1.0'
+  asset_type: evidence
+  purpose: Gate receipt listing predicate PASS/FAIL and named REPLAN gaps.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-08-23'
+  truth_owner: FACTORY_V1_OPERATIONAL_READINESS_CLOSEOUT_V1
+  location: {kind: git_path, logical_uri: 'repo://docs/evidence/factory_v1_operational_readiness_closeout/a1_gate_receipt_v1.json', repository_path: docs/evidence/factory_v1_operational_readiness_closeout/a1_gate_receipt_v1.json}
+  integrity: {kind: sha256, sha256: 2a7a40e4e11298ef4745ada203d94f0ce796584b3024f5133e9fb66df50a7ab5}
+  access: {mode: read_only, method: file, network_required: false, secrets_required: false}
+  relations:
+  - {relation_type: governed_by, target_asset_id: CTRL-FACTORY-V1-OPERATIONAL-READINESS-CLOSEOUT-001}
+  consumers: [FACTORY-001, GOAL-OWNER]
+  evidence: []
+  search_terms: [FACTORY_V1, CLOSEOUT, GATE]
+  classification: {contains_secrets: false, contains_raw_data: false, sensitivity: INTERNAL_NON_SECRET}
+- asset_id: EVIDENCE-FACTORY-V1-OPERATIONAL-READINESS-CLOSEOUT-ACCEPTANCE-001
+  record_version: '1.0'
+  asset_type: evidence
+  purpose: Acceptance for FACTORY_PRODUCTIZATION_REPLAN closeout terminal.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-08-23'
+  truth_owner: FACTORY_V1_OPERATIONAL_READINESS_CLOSEOUT_V1
+  location: {kind: git_path, logical_uri: 'repo://docs/evidence/factory_v1_operational_readiness_closeout/a1_acceptance_v1.json', repository_path: docs/evidence/factory_v1_operational_readiness_closeout/a1_acceptance_v1.json}
+  integrity: {kind: sha256, sha256: 1e78cacff3484dd46014440d8364ed1b65dd2e215bcf9a044432ba457aa36202}
+  access: {mode: read_only, method: file, network_required: false, secrets_required: false}
+  relations:
+  - {relation_type: depends_on, target_asset_id: EVIDENCE-FACTORY-V1-OPERATIONAL-READINESS-CLOSEOUT-GATE-001}
+  consumers: [FACTORY-001, GOAL-OWNER]
+  evidence: []
+  search_terms: [FACTORY_V1, CLOSEOUT, ACCEPTANCE]
+  classification: {contains_secrets: false, contains_raw_data: false, sensitivity: INTERNAL_NON_SECRET}
+- asset_id: REPORT-FACTORY-V1-OPERATIONAL-READINESS-CLOSEOUT-001
+  record_version: '1.0'
+  asset_type: control_document
+  purpose: Owner readout of readiness closeout REPLAN and named gaps.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-08-23'
+  truth_owner: FACTORY_V1_OPERATIONAL_READINESS_CLOSEOUT_V1
+  location: {kind: git_path, logical_uri: 'repo://docs/reports/factory_v1_operational_readiness_closeout/a1_owner_readout_v1.md', repository_path: docs/reports/factory_v1_operational_readiness_closeout/a1_owner_readout_v1.md}
+  integrity: {kind: sha256, sha256: 0239e49af9693c4c6c630008afc5ec781aab21cab043dab974d863c4bb1d4bc9}
+  access: {mode: read_only, method: file, network_required: false, secrets_required: false}
+  relations:
+  - {relation_type: derived_from, target_asset_id: EVIDENCE-FACTORY-V1-OPERATIONAL-READINESS-CLOSEOUT-ACCEPTANCE-001}
+  consumers: [FACTORY-001, GOAL-OWNER]
+  evidence: []
+  search_terms: [FACTORY_V1, CLOSEOUT, OWNER_READOUT]
+  classification: {contains_secrets: false, contains_raw_data: false, sensitivity: INTERNAL_NON_SECRET}
+- asset_id: EVIDENCE-FACTORY-V1-OPERATIONAL-READINESS-CLOSEOUT-DELIVERY-INDEPENDENT-REVIEW-001
+  record_version: '1.0'
+  asset_type: evidence
+  purpose: Required-role review evidence for readiness closeout.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-08-23'
+  truth_owner: FACTORY_V1_OPERATIONAL_READINESS_CLOSEOUT_V1
+  location: {kind: git_path, logical_uri: 'repo://docs/evidence/factory_v1_operational_readiness_closeout/a1_delivery_independent_review_v1.json', repository_path: docs/evidence/factory_v1_operational_readiness_closeout/a1_delivery_independent_review_v1.json}
+  integrity: {kind: none, note: 'Content integrity is owned by the live completion-review-fit hash chain; embedding its SHA here would create an indirect self-reference through the reviewed inventory.'}
+  access: {mode: read_only, method: file, network_required: false, secrets_required: false}
+  relations:
+  - {relation_type: derived_from, target_asset_id: EVIDENCE-FACTORY-V1-OPERATIONAL-READINESS-CLOSEOUT-ACCEPTANCE-001}
+  - {relation_type: depends_on, target_asset_id: SCHEMA-DELIVERY-INDEPENDENT-REVIEW-EVIDENCE-001}
+  consumers: [FACTORY-001, GOAL-OWNER]
+  evidence: []
+  search_terms: [FACTORY_V1, CLOSEOUT, DELIVERY]
+  classification: {contains_secrets: false, contains_raw_data: false, sensitivity: INTERNAL_NON_SECRET}
+- asset_id: EVIDENCE-FACTORY-V1-OPERATIONAL-READINESS-CLOSEOUT-DELIVERY-FACTORY-FIT-001
+  record_version: '1.0'
+  asset_type: evidence
+  purpose: FULL Factory Fit for readiness closeout REPLAN.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-08-23'
+  truth_owner: FACTORY_V1_OPERATIONAL_READINESS_CLOSEOUT_V1
+  location: {kind: git_path, logical_uri: 'repo://docs/evidence/factory_v1_operational_readiness_closeout/a1_delivery_factory_fit_v1.json', repository_path: docs/evidence/factory_v1_operational_readiness_closeout/a1_delivery_factory_fit_v1.json}
+  integrity: {kind: none, note: 'Content integrity is owned by the live completion-review-fit hash chain; embedding its SHA here would create an indirect self-reference through the reviewed inventory.'}
+  access: {mode: read_only, method: file, network_required: false, secrets_required: false}
+  relations:
+  - {relation_type: derived_from, target_asset_id: EVIDENCE-FACTORY-V1-OPERATIONAL-READINESS-CLOSEOUT-ACCEPTANCE-001}
+  - {relation_type: depends_on, target_asset_id: EVIDENCE-FACTORY-V1-OPERATIONAL-READINESS-CLOSEOUT-DELIVERY-INDEPENDENT-REVIEW-001}
+  consumers: [FACTORY-001, GOAL-OWNER]
+  evidence: []
+  search_terms: [FACTORY_V1, CLOSEOUT, DELIVERY]
+  classification: {contains_secrets: false, contains_raw_data: false, sensitivity: INTERNAL_NON_SECRET}
+- asset_id: EVIDENCE-FACTORY-V1-OPERATIONAL-READINESS-CLOSEOUT-DELIVERY-COMPLETION-001
+  record_version: '1.0'
+  asset_type: evidence
+  purpose: Guard-consumable completion evidence for readiness closeout Atom 3.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-08-23'
+  truth_owner: FACTORY_V1_OPERATIONAL_READINESS_CLOSEOUT_V1
+  location: {kind: git_path, logical_uri: 'repo://docs/evidence/factory_v1_operational_readiness_closeout/a1_delivery_completion_evidence_v1.json', repository_path: docs/evidence/factory_v1_operational_readiness_closeout/a1_delivery_completion_evidence_v1.json}
+  integrity: {kind: none, note: 'Content integrity is owned by the live completion-review-fit hash chain; embedding its SHA here would create an indirect self-reference through the reviewed inventory.'}
+  access: {mode: read_only, method: file, network_required: false, secrets_required: false}
+  relations:
+  - {relation_type: derived_from, target_asset_id: EVIDENCE-FACTORY-V1-OPERATIONAL-READINESS-CLOSEOUT-ACCEPTANCE-001}
+  - {relation_type: depends_on, target_asset_id: EVIDENCE-FACTORY-V1-OPERATIONAL-READINESS-CLOSEOUT-DELIVERY-INDEPENDENT-REVIEW-001}
+  - {relation_type: depends_on, target_asset_id: EVIDENCE-FACTORY-V1-OPERATIONAL-READINESS-CLOSEOUT-DELIVERY-FACTORY-FIT-001}
+  consumers: [FACTORY-001, GOAL-OWNER]
+  evidence: []
+  search_terms: [FACTORY_V1, CLOSEOUT, DELIVERY]
   classification: {contains_secrets: false, contains_raw_data: false, sensitivity: INTERNAL_NON_SECRET}

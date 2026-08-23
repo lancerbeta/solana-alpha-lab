@@ -713,6 +713,16 @@
       "target_asset_id": "ARCH-INTENT-005"
     },
     {
+      "source_asset_id": "CONFIG-FACTORY-V1-OPERATIONAL-READINESS-CLOSEOUT-001",
+      "relation": "depends_on",
+      "target_asset_id": "CONFIG-FACTORY-V1-OPERATIONAL-READINESS-001"
+    },
+    {
+      "source_asset_id": "CONFIG-FACTORY-V1-OPERATIONAL-READINESS-CLOSEOUT-001",
+      "relation": "governed_by",
+      "target_asset_id": "CTRL-FACTORY-V1-OPERATIONAL-READINESS-CLOSEOUT-001"
+    },
+    {
       "source_asset_id": "CONFIG-FACTORY-V1-OWNER-COCKPIT-001",
       "relation": "depends_on",
       "target_asset_id": "SCHEMA-FACTORY-V1-OWNER-COCKPIT-001"
@@ -2391,6 +2401,26 @@
       "source_asset_id": "CTRL-FACTORY-V1-OPERATIONAL-READINESS-001",
       "relation": "validated_by",
       "target_asset_id": "TEST-FACTORY-V1-OPERATIONAL-READINESS-001"
+    },
+    {
+      "source_asset_id": "CTRL-FACTORY-V1-OPERATIONAL-READINESS-CLOSEOUT-001",
+      "relation": "contains",
+      "target_asset_id": "CONFIG-FACTORY-V1-OPERATIONAL-READINESS-CLOSEOUT-001"
+    },
+    {
+      "source_asset_id": "CTRL-FACTORY-V1-OPERATIONAL-READINESS-CLOSEOUT-001",
+      "relation": "contains",
+      "target_asset_id": "MODULE-FACTORY-V1-OPERATIONAL-READINESS-CLOSEOUT-001"
+    },
+    {
+      "source_asset_id": "CTRL-FACTORY-V1-OPERATIONAL-READINESS-CLOSEOUT-001",
+      "relation": "validated_by",
+      "target_asset_id": "EVIDENCE-FACTORY-V1-OPERATIONAL-READINESS-CLOSEOUT-ACCEPTANCE-001"
+    },
+    {
+      "source_asset_id": "CTRL-FACTORY-V1-OPERATIONAL-READINESS-CLOSEOUT-001",
+      "relation": "validated_by",
+      "target_asset_id": "TEST-FACTORY-V1-OPERATIONAL-READINESS-CLOSEOUT-001"
     },
     {
       "source_asset_id": "CTRL-FACTORY-V1-OWNER-COCKPIT-001",
@@ -4126,6 +4156,51 @@
       "source_asset_id": "EVIDENCE-FACTORY-V1-COMMON-MARKET-FEATURE-SURFACE-ACCEPTANCE-001",
       "relation": "depends_on",
       "target_asset_id": "EVIDENCE-FACTORY-V1-COMMON-MARKET-FEATURE-SURFACE-001"
+    },
+    {
+      "source_asset_id": "EVIDENCE-FACTORY-V1-OPERATIONAL-READINESS-CLOSEOUT-ACCEPTANCE-001",
+      "relation": "depends_on",
+      "target_asset_id": "EVIDENCE-FACTORY-V1-OPERATIONAL-READINESS-CLOSEOUT-GATE-001"
+    },
+    {
+      "source_asset_id": "EVIDENCE-FACTORY-V1-OPERATIONAL-READINESS-CLOSEOUT-DELIVERY-COMPLETION-001",
+      "relation": "depends_on",
+      "target_asset_id": "EVIDENCE-FACTORY-V1-OPERATIONAL-READINESS-CLOSEOUT-DELIVERY-FACTORY-FIT-001"
+    },
+    {
+      "source_asset_id": "EVIDENCE-FACTORY-V1-OPERATIONAL-READINESS-CLOSEOUT-DELIVERY-COMPLETION-001",
+      "relation": "depends_on",
+      "target_asset_id": "EVIDENCE-FACTORY-V1-OPERATIONAL-READINESS-CLOSEOUT-DELIVERY-INDEPENDENT-REVIEW-001"
+    },
+    {
+      "source_asset_id": "EVIDENCE-FACTORY-V1-OPERATIONAL-READINESS-CLOSEOUT-DELIVERY-COMPLETION-001",
+      "relation": "derived_from",
+      "target_asset_id": "EVIDENCE-FACTORY-V1-OPERATIONAL-READINESS-CLOSEOUT-ACCEPTANCE-001"
+    },
+    {
+      "source_asset_id": "EVIDENCE-FACTORY-V1-OPERATIONAL-READINESS-CLOSEOUT-DELIVERY-FACTORY-FIT-001",
+      "relation": "depends_on",
+      "target_asset_id": "EVIDENCE-FACTORY-V1-OPERATIONAL-READINESS-CLOSEOUT-DELIVERY-INDEPENDENT-REVIEW-001"
+    },
+    {
+      "source_asset_id": "EVIDENCE-FACTORY-V1-OPERATIONAL-READINESS-CLOSEOUT-DELIVERY-FACTORY-FIT-001",
+      "relation": "derived_from",
+      "target_asset_id": "EVIDENCE-FACTORY-V1-OPERATIONAL-READINESS-CLOSEOUT-ACCEPTANCE-001"
+    },
+    {
+      "source_asset_id": "EVIDENCE-FACTORY-V1-OPERATIONAL-READINESS-CLOSEOUT-DELIVERY-INDEPENDENT-REVIEW-001",
+      "relation": "depends_on",
+      "target_asset_id": "SCHEMA-DELIVERY-INDEPENDENT-REVIEW-EVIDENCE-001"
+    },
+    {
+      "source_asset_id": "EVIDENCE-FACTORY-V1-OPERATIONAL-READINESS-CLOSEOUT-DELIVERY-INDEPENDENT-REVIEW-001",
+      "relation": "derived_from",
+      "target_asset_id": "EVIDENCE-FACTORY-V1-OPERATIONAL-READINESS-CLOSEOUT-ACCEPTANCE-001"
+    },
+    {
+      "source_asset_id": "EVIDENCE-FACTORY-V1-OPERATIONAL-READINESS-CLOSEOUT-GATE-001",
+      "relation": "governed_by",
+      "target_asset_id": "CTRL-FACTORY-V1-OPERATIONAL-READINESS-CLOSEOUT-001"
     },
     {
       "source_asset_id": "EVIDENCE-FACTORY-V1-OWNER-COCKPIT-ACCEPTANCE-001",
@@ -8238,6 +8313,11 @@
       "target_asset_id": "CONFIG-FACTORY-V1-COMMON-MARKET-FEATURE-SURFACE-001"
     },
     {
+      "source_asset_id": "MODULE-FACTORY-V1-OPERATIONAL-READINESS-CLOSEOUT-001",
+      "relation": "governed_by",
+      "target_asset_id": "CTRL-FACTORY-V1-OPERATIONAL-READINESS-CLOSEOUT-001"
+    },
+    {
       "source_asset_id": "MODULE-FACTORY-V1-OPS-STORE-001",
       "relation": "governed_by",
       "target_asset_id": "CONFIG-FACTORY-V1-PRODUCT-KERNEL-001"
@@ -10143,6 +10223,11 @@
       "target_asset_id": "EVIDENCE-FACTORY-V1-COMMON-MARKET-FEATURE-SURFACE-ACCEPTANCE-001"
     },
     {
+      "source_asset_id": "REPORT-FACTORY-V1-OPERATIONAL-READINESS-CLOSEOUT-001",
+      "relation": "derived_from",
+      "target_asset_id": "EVIDENCE-FACTORY-V1-OPERATIONAL-READINESS-CLOSEOUT-ACCEPTANCE-001"
+    },
+    {
       "source_asset_id": "REPORT-FACTORY-V1-OWNER-COCKPIT-001",
       "relation": "derived_from",
       "target_asset_id": "EVIDENCE-FACTORY-V1-OWNER-COCKPIT-ACCEPTANCE-001"
@@ -11173,6 +11258,11 @@
       "target_asset_id": "MODULE-FACTORY-V1-APPLICATION-001"
     },
     {
+      "source_asset_id": "SCRIPT-FACTORY-V1-OPERATIONAL-READINESS-CLOSEOUT-001",
+      "relation": "depends_on",
+      "target_asset_id": "MODULE-FACTORY-V1-OPERATIONAL-READINESS-CLOSEOUT-001"
+    },
+    {
       "source_asset_id": "SCRIPT-FACTORY-V1-RUNTIME-001",
       "relation": "depends_on",
       "target_asset_id": "MODULE-FACTORY-V1-RUNTIME-001"
@@ -12081,6 +12171,11 @@
       "source_asset_id": "TEST-FACTORY-V1-OPERATIONAL-READINESS-001",
       "relation": "depends_on",
       "target_asset_id": "CTRL-FACTORY-V1-OPERATIONAL-READINESS-001"
+    },
+    {
+      "source_asset_id": "TEST-FACTORY-V1-OPERATIONAL-READINESS-CLOSEOUT-001",
+      "relation": "depends_on",
+      "target_asset_id": "MODULE-FACTORY-V1-OPERATIONAL-READINESS-CLOSEOUT-001"
     },
     {
       "source_asset_id": "TEST-FACTORY-V1-OWNER-COCKPIT-001",
