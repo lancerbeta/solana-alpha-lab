@@ -306,6 +306,16 @@ class LiveOpsHardeningPhase0Tests(unittest.TestCase):
         self.assertEqual(acceptance["monitoring"]["alert_transport"], "LIVE")
         self.assertEqual(acceptance["host_proof_sha256"], hp_sha)
 
+    def test_host_proof_rejects_inconsistent_release_steps(self) -> None:
+        host = json.loads(HOST_PROOF.read_text(encoding="utf-8"))
+        host["runtime"]["previous_sha"] = "63429c0965e3d775edeaaadeb183b40f3352ec0c"
+        with self.assertRaisesRegex(LiveOpsHardeningError, "HOST_PROOF_ROLLBACK_STEP_MISMATCH"):
+            validate_host_proof(host)
+        host = json.loads(HOST_PROOF.read_text(encoding="utf-8"))
+        host["release_steps"][-1]["doctor_verdict"] = "DEGRADED_BACKUP_AGE"
+        with self.assertRaisesRegex(LiveOpsHardeningError, "HOST_PROOF_FINAL_DOCTOR_NOT_PROVED"):
+            validate_host_proof(host)
+
 
 if __name__ == "__main__":
     unittest.main()

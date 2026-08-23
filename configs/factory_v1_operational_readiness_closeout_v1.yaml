@@ -55,7 +55,7 @@ predicates:
     evidence_path: docs/evidence/factory_v1_live_ops_hardening/a1_host_proof_v1.json
     schema_path: catalog/schemas/factory_v1_live_ops_hardening_host_proof.schema.json
     schema_sha256: 815be5c7bccfa54147273eb00022c329be4aa501bbf6c95d623ebf44b6da567e
-    evidence_sha256: cf9611f333153ee378df4f2821c9cc55a3cea23a7978e7435ca4087ead9b5ac3
+    evidence_sha256: 8eff14d05cb9c08f2d9ac8c4164d4a356dc95e1260074ede1cd879b804be694a
     require:
       host: factory-remote-ops
       runtime.live_deploy_rollback: true
@@ -65,7 +65,7 @@ predicates:
     evidence_path: docs/evidence/factory_v1_live_ops_hardening/a1_host_proof_v1.json
     schema_path: catalog/schemas/factory_v1_live_ops_hardening_host_proof.schema.json
     schema_sha256: 815be5c7bccfa54147273eb00022c329be4aa501bbf6c95d623ebf44b6da567e
-    evidence_sha256: cf9611f333153ee378df4f2821c9cc55a3cea23a7978e7435ca4087ead9b5ac3
+    evidence_sha256: 8eff14d05cb9c08f2d9ac8c4164d4a356dc95e1260074ede1cd879b804be694a
     require:
       host: factory-remote-ops
       runtime.live_clean_rehost: true
@@ -100,7 +100,7 @@ predicates:
     evidence_path: docs/evidence/factory_v1_live_ops_hardening/a1_host_proof_v1.json
     schema_path: catalog/schemas/factory_v1_live_ops_hardening_host_proof.schema.json
     schema_sha256: 815be5c7bccfa54147273eb00022c329be4aa501bbf6c95d623ebf44b6da567e
-    evidence_sha256: cf9611f333153ee378df4f2821c9cc55a3cea23a7978e7435ca4087ead9b5ac3
+    evidence_sha256: 8eff14d05cb9c08f2d9ac8c4164d4a356dc95e1260074ede1cd879b804be694a
     require:
       monitoring.provider_failure_alert_tested: true
       monitoring.alert_transport: LIVE
@@ -109,7 +109,7 @@ predicates:
     evidence_path: docs/evidence/factory_v1_live_ops_hardening/a1_host_proof_v1.json
     schema_path: catalog/schemas/factory_v1_live_ops_hardening_host_proof.schema.json
     schema_sha256: 815be5c7bccfa54147273eb00022c329be4aa501bbf6c95d623ebf44b6da567e
-    evidence_sha256: cf9611f333153ee378df4f2821c9cc55a3cea23a7978e7435ca4087ead9b5ac3
+    evidence_sha256: 8eff14d05cb9c08f2d9ac8c4164d4a356dc95e1260074ede1cd879b804be694a
     require:
       monitoring.checks.stale_data_alert: PASS
       monitoring.alert_transport: LIVE
@@ -118,7 +118,7 @@ predicates:
     evidence_path: docs/evidence/factory_v1_live_ops_hardening/a1_host_proof_v1.json
     schema_path: catalog/schemas/factory_v1_live_ops_hardening_host_proof.schema.json
     schema_sha256: 815be5c7bccfa54147273eb00022c329be4aa501bbf6c95d623ebf44b6da567e
-    evidence_sha256: cf9611f333153ee378df4f2821c9cc55a3cea23a7978e7435ca4087ead9b5ac3
+    evidence_sha256: 8eff14d05cb9c08f2d9ac8c4164d4a356dc95e1260074ede1cd879b804be694a
     require:
       monitoring.checks.bot_stall_alert: PASS
       monitoring.alert_transport: LIVE
@@ -137,7 +137,7 @@ predicates:
     evidence_path: docs/evidence/factory_v1_live_ops_hardening/a1_host_proof_v1.json
     schema_path: catalog/schemas/factory_v1_live_ops_hardening_host_proof.schema.json
     schema_sha256: 815be5c7bccfa54147273eb00022c329be4aa501bbf6c95d623ebf44b6da567e
-    evidence_sha256: cf9611f333153ee378df4f2821c9cc55a3cea23a7978e7435ca4087ead9b5ac3
+    evidence_sha256: 8eff14d05cb9c08f2d9ac8c4164d4a356dc95e1260074ede1cd879b804be694a
     require:
       # Positive gating proof — non-claim scientific_shadow_pass:false is not enough.
       security.destructive_and_financial_actions_separately_gated: true
@@ -156,7 +156,7 @@ predicates:
     evidence_path: docs/evidence/factory_v1_live_ops_hardening/a1_host_proof_v1.json
     schema_path: catalog/schemas/factory_v1_live_ops_hardening_host_proof.schema.json
     schema_sha256: 815be5c7bccfa54147273eb00022c329be4aa501bbf6c95d623ebf44b6da567e
-    evidence_sha256: cf9611f333153ee378df4f2821c9cc55a3cea23a7978e7435ca4087ead9b5ac3
+    evidence_sha256: 8eff14d05cb9c08f2d9ac8c4164d4a356dc95e1260074ede1cd879b804be694a
     require:
       monitoring.provider_health_visible: true
       provider_clock.status: NOT_REQUIRED

@@ -2,7 +2,7 @@
   "deploy_sha": "07b628c5ee2a6141e76753e9c859859b3bbecc6d",
   "host": "factory-remote-ops",
   "host_proof_bound": true,
-  "host_proof_sha256": "cf9611f333153ee378df4f2821c9cc55a3cea23a7978e7435ca4087ead9b5ac3",
+  "host_proof_sha256": "8eff14d05cb9c08f2d9ac8c4164d4a356dc95e1260074ede1cd879b804be694a",
   "non_claims": [
     "NO_FACTORY_V1_OPERATIONAL_READY",
     "NO_FOUNDATION_FREEZE",
@@ -23,7 +23,7 @@
     "live_clean_rehost": true,
     "live_deploy_rollback": true,
     "live_forward_restore": true,
-    "previous_sha": "63429c0965e3d775edeaaadeb183b40f3352ec0c",
+    "previous_sha": "b7f10c77007bd2897d4d044564e93b0f3172ef08",
     "release_steps": [
       {
         "doctor_verdict": "DEGRADED_BACKUP_AGE",

@@ -683,6 +683,51 @@ def require_live_runtime(runtime: Mapping[str, Any]) -> None:
         raise LiveOpsHardeningError("LIVE_RELEASE_STEPS_REQUIRED")
 
 
+def _require_release_steps_consistent(
+    *,
+    deploy_sha: str,
+    runtime: Mapping[str, Any],
+    steps: list[Any],
+) -> None:
+    """Bind release_steps to start/previous/target/deploy_sha and final doctor."""
+
+    target_sha = str(runtime.get("target_sha") or "")
+    start_sha = str(runtime.get("start_sha") or "")
+    previous_sha = str(runtime.get("previous_sha") or "")
+    if target_sha != deploy_sha:
+        raise LiveOpsHardeningError("HOST_PROOF_TARGET_DEPLOY_MISMATCH")
+    if len(start_sha) != 40 or len(previous_sha) != 40:
+        raise LiveOpsHardeningError("HOST_PROOF_RUNTIME_SHA_INVALID")
+    normalized: list[dict[str, Any]] = []
+    for item in steps:
+        if not isinstance(item, Mapping):
+            raise LiveOpsHardeningError("HOST_PROOF_RELEASE_STEP_INVALID")
+        step_name = str(item.get("step") or "")
+        step_sha = str(item.get("sha") or "")
+        if not step_name or len(step_sha) != 40:
+            raise LiveOpsHardeningError("HOST_PROOF_RELEASE_STEP_SHA_INVALID")
+        normalized.append(dict(item))
+    step_shas = {str(item["sha"]) for item in normalized}
+    if start_sha not in step_shas:
+        raise LiveOpsHardeningError("HOST_PROOF_START_SHA_NOT_IN_STEPS")
+    if previous_sha not in step_shas:
+        raise LiveOpsHardeningError("HOST_PROOF_PREVIOUS_SHA_NOT_IN_STEPS")
+    rollback_hits = [
+        item
+        for item in normalized
+        if "ROLLBACK" in str(item.get("step") or "").upper()
+        and str(item.get("sha")) == previous_sha
+    ]
+    if not rollback_hits:
+        raise LiveOpsHardeningError("HOST_PROOF_ROLLBACK_STEP_MISMATCH")
+    final = normalized[-1]
+    if str(final.get("sha")) != deploy_sha:
+        raise LiveOpsHardeningError("HOST_PROOF_FINAL_STEP_SHA_MISMATCH")
+    doctor = str(final.get("doctor_verdict") or "")
+    if not doctor.startswith("RUNTIME_PROVED"):
+        raise LiveOpsHardeningError("HOST_PROOF_FINAL_DOCTOR_NOT_PROVED")
+
+
 def validate_host_proof(host_proof: Mapping[str, Any]) -> dict[str, Any]:
     """Machine-gate live host proof before acceptance / closeout binding."""
 
@@ -696,15 +741,23 @@ def validate_host_proof(host_proof: Mapping[str, Any]) -> dict[str, Any]:
     runtime = host_proof.get("runtime")
     if not isinstance(runtime, Mapping):
         raise LiveOpsHardeningError("HOST_PROOF_RUNTIME_MISSING")
+    steps = (
+        host_proof.get("release_steps")
+        or runtime.get("release_steps")
+        or host_proof.get("steps")
+    )
     require_live_runtime(
         {
             **dict(runtime),
             "host": host_proof.get("host"),
             "deploy_sha": deploy_sha,
-            "release_steps": host_proof.get("release_steps")
-            or runtime.get("release_steps")
-            or host_proof.get("steps"),
+            "release_steps": steps,
         }
+    )
+    if not isinstance(steps, list):
+        raise LiveOpsHardeningError("LIVE_RELEASE_STEPS_REQUIRED")
+    _require_release_steps_consistent(
+        deploy_sha=deploy_sha, runtime=runtime, steps=steps
     )
     cleanup = host_proof.get("cleanup")
     if not isinstance(cleanup, Mapping):

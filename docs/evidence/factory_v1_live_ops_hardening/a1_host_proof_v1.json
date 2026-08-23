@@ -9,7 +9,7 @@
     "live_forward_restore": true,
     "live_clean_rehost": true,
     "start_sha": "b7f10c77007bd2897d4d044564e93b0f3172ef08",
-    "previous_sha": "63429c0965e3d775edeaaadeb183b40f3352ec0c",
+    "previous_sha": "b7f10c77007bd2897d4d044564e93b0f3172ef08",
     "target_sha": "07b628c5ee2a6141e76753e9c859859b3bbecc6d"
   },
   "release_steps": [
