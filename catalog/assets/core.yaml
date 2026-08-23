@@ -30426,7 +30426,7 @@ records:
   as_of: '2026-08-23'
   truth_owner: FACTORY_V1_OPERATIONAL_READINESS_CLOSEOUT_V1
   location: {kind: git_path, logical_uri: 'repo://docs/tasks/FACTORY_V1_OPERATIONAL_READINESS_CLOSEOUT_V1.md', repository_path: docs/tasks/FACTORY_V1_OPERATIONAL_READINESS_CLOSEOUT_V1.md}
-  integrity: {kind: sha256, sha256: 30d049ad140928e02d5e04f1b003ae1a916baf5b73a342af5131d39017544e9d}
+  integrity: {kind: sha256, sha256: 6d2f55816675255d44823c0164a28524161296dd400c3da27c1f587e264e5c55}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: contains, target_asset_id: CONFIG-FACTORY-V1-OPERATIONAL-READINESS-CLOSEOUT-001}

@@ -67,6 +67,7 @@ context_requirements:
   roadmap_path: configs/factory_v1_operational_readiness_v1.yaml
   exact_role_paths:
     LIFECYCLE: []
+    EXTERNAL_ROUTE_KNOWLEDGE: []
     ARCHITECTURE_DECISIONS:
     - docs/architecture/intents/ARCH-INTENT-005-factory-v1-operational-readiness-and-owner-experience.md
     DELIVERY_EVIDENCE:
