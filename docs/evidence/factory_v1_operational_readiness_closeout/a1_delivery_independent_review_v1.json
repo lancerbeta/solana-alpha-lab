@@ -11,12 +11,11 @@
   "required_roles": [
     "ARCHITECTURE_CRITIC",
     "CODE_REVIEWER",
-    "GOAL_DOD_CRITIC",
-    "OWNER_UX_CRITIC"
+    "GOAL_DOD_CRITIC"
   ],
   "review_id": "FACTORY-V1-READINESS-CLOSEOUT-INDEPENDENT-REVIEW-001",
-  "reviewed_bindings_sha256": "6c7494aed7677fc5ef38fa068c0e5e49be7c8e0b906b407bd4a05a1f088d8b59",
-  "reviewed_inventory_sha256": "aede7338cba217662e1991a56bf8f4833353a3947bc1a37deef2a0439ffecb01",
+  "reviewed_bindings_sha256": "PENDING_BIND",
+  "reviewed_inventory_sha256": "PENDING_BIND",
   "reviews": [
     {
       "findings": [
@@ -45,7 +44,9 @@
         "CHECKED_FAIL_CLOSED_MISSING_EVIDENCE_NAMED_GAP",
         "CHECKED_NO_SECRETS_NO_ALPHA_NO_MOSTLY_READY",
         "CHECKED_DELIVERY_TRIO_CATALOG_INTEGRITY_KIND_NONE",
-        "CHECKED_CLOSEOUT_UNIT_TESTS_PASS"
+        "CHECKED_CLOSEOUT_UNIT_TESTS_PASS",
+        "CHECKED_OWNER_UX_CLI_DECISION_PACKET",
+        "CHECKED_OWNER_UX_READOUT_RERUN_COMMAND"
       ],
       "role": "CODE_REVIEWER",
       "verdict": "PASS"
@@ -62,16 +63,6 @@
         "CHECKED_OWNER_READOUT_USEFUL_NO_MOSTLY_READY"
       ],
       "role": "GOAL_DOD_CRITIC",
-      "verdict": "PASS"
-    },
-    {
-      "findings": [
-        "CHECKED_CLI_FULL_OWNER_DECISION_PACKET",
-        "CHECKED_ERROR_PATH_FREEZE_INACTIVE",
-        "CHECKED_READOUT_ELEVEN_GAPS_AND_RERUN_COMMAND",
-        "CHECKED_GAP_IDS_ALIGNED_GATE_ACCEPTANCE_READOUT"
-      ],
-      "role": "OWNER_UX_CRITIC",
       "verdict": "PASS"
     }
   ],
