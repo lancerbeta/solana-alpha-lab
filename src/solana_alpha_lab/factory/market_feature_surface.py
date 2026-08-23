@@ -11,7 +11,9 @@ import jsonschema
 import yaml
 
 from solana_alpha_lab.factory.pit_data_truth_canonicalization import (
+    PIT_FEATURE_ID,
     PIT_TERMINAL,
+    PitCanonicalizationError,
     canonicalize_from_repository,
 )
 
@@ -212,12 +214,40 @@ def resolve_feature_snapshot(
     )
     if needs_pit:
         pit_fixture = fixtures["a1_pit_runtime"]
-        _load_json(
-            root,
-            str(pit_fixture["path"]),
-            str(pit_fixture["sha256"]),
-        )
-    pit = canonicalize_from_repository(root) if needs_pit else None
+        try:
+            pit = canonicalize_from_repository(
+                root,
+                runtime_relative=str(pit_fixture["path"]),
+                runtime_sha256=str(pit_fixture["sha256"]),
+            )
+        except PitCanonicalizationError as exc:
+            raise FeatureSurfaceError(
+                f"PIT_CANONICALIZATION_FAILED:{exc}"
+            ) from exc
+        pit_features = [
+            index[feature_id]
+            for feature_id in required
+            if str(index[feature_id]["compute"]) == "A1_PIT_LIQUIDITY_TO_MCAP_RATIO"
+        ]
+        if len(pit_features) != 1:
+            raise FeatureSurfaceError("PIT_FEATURE_BINDING_AMBIGUOUS")
+        surface_feature = pit_features[0]
+        acceptance_feature = pit["feature"]
+        if (
+            surface_feature["feature_id"] != PIT_FEATURE_ID
+            or acceptance_feature["feature_id"] != PIT_FEATURE_ID
+            or surface_feature["units"] != acceptance_feature["units"]
+            or surface_feature["entity_scope"] != acceptance_feature["entity_scope"]
+            or surface_feature["availability_class"]
+            != acceptance_feature["availability_class"]
+            or "liquidity USD divided by token market cap USD"
+            not in str(surface_feature["description"])
+            or acceptance_feature["formula"] != "liquidity / mcap"
+            or surface_feature["compute"] != "A1_PIT_LIQUIDITY_TO_MCAP_RATIO"
+        ):
+            raise FeatureSurfaceError("PIT_FEATURE_BINDING_MISMATCH")
+    else:
+        pit = None
     rows: list[dict[str, Any]] = []
     for feature_id in required:
         feature = index[feature_id]
@@ -236,22 +266,34 @@ def resolve_feature_snapshot(
         value_status = _value_status_for(availability, computed_status)
         if value_status != "COMPUTED":
             value = None
-        rows.append(
-            {
-                "feature_id": feature_id,
-                "availability_class": availability,
-                "value_status": value_status,
-                "value": value,
-                "units": feature["units"],
-                "coverage_domain": feature["coverage_domain"],
-                "available_to_strategy_semantics": feature[
-                    "available_to_strategy_semantics"
-                ],
-                "display": (
-                    f"{DISPLAY_MARK[value_status]} {feature_id} {availability}"
-                ),
-            }
-        )
+        row = {
+            "feature_id": feature_id,
+            "availability_class": availability,
+            "value_status": value_status,
+            "value": value,
+            "units": feature["units"],
+            "coverage_domain": feature["coverage_domain"],
+            "available_to_strategy_semantics": feature[
+                "available_to_strategy_semantics"
+            ],
+            "display": f"{DISPLAY_MARK[value_status]} {feature_id} {availability}",
+        }
+        if value_status == "PIT_READY":
+            if pit is None:
+                raise FeatureSurfaceError("PIT_ACCEPTANCE_REQUIRED")
+            row.update(
+                {
+                    "pit_acceptance_id": pit["acceptance_id"],
+                    "pit_entity_scope": pit["feature"]["entity_scope"],
+                    "pit_decision_snapshot_at": pit["projection"][
+                        "decision_snapshot_at"
+                    ],
+                    "pit_candidate_count": pit["projection"]["candidate_count"],
+                    "pit_eligible_count": pit["projection"]["eligible_count"],
+                    "pit_missing_count": pit["projection"]["missing_count"],
+                }
+            )
+        rows.append(row)
     return {
         "schema": "smial.factory-v1-market-feature-snapshot",
         "schema_version": "1.0",

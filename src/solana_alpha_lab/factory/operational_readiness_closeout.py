@@ -7,6 +7,7 @@ import json
 from pathlib import Path
 from typing import Any
 
+import jsonschema
 import yaml
 
 FACTORY_RUNNER_SHA256 = (
@@ -94,6 +95,56 @@ def evaluate_predicate(
     if not isinstance(require, dict) or not require:
         raise CloseoutError(f"PREDICATE_REQUIRE_INVALID:{pred_id}")
     payload = _load_json(evidence_path)
+    schema_rel = predicate.get("schema_path")
+    schema_sha = predicate.get("schema_sha256")
+    evidence_sha = predicate.get("evidence_sha256")
+    if any(value is not None for value in (schema_rel, schema_sha, evidence_sha)):
+        if not all(
+            isinstance(value, str) and value
+            for value in (schema_rel, schema_sha, evidence_sha)
+        ):
+            raise CloseoutError(f"PREDICATE_SCHEMA_BINDING_INVALID:{pred_id}")
+        schema_path = root / str(schema_rel)
+        if not schema_path.is_file():
+            return {
+                "id": pred_id,
+                "dimension": predicate.get("dimension"),
+                "verdict": "FAIL",
+                "gap": f"MISSING_SCHEMA:{schema_rel}",
+                "evidence_path": evidence_rel,
+            }
+        if _sha256(evidence_path) != evidence_sha:
+            return {
+                "id": pred_id,
+                "dimension": predicate.get("dimension"),
+                "verdict": "FAIL",
+                "gap": "EVIDENCE_HASH_MISMATCH",
+                "evidence_path": evidence_rel,
+            }
+        if _sha256(schema_path) != schema_sha:
+            return {
+                "id": pred_id,
+                "dimension": predicate.get("dimension"),
+                "verdict": "FAIL",
+                "gap": "SCHEMA_HASH_MISMATCH",
+                "evidence_path": evidence_rel,
+            }
+        try:
+            schema_payload = _load_json(schema_path)
+            jsonschema.validate(payload, schema_payload)
+        except (
+            OSError,
+            json.JSONDecodeError,
+            jsonschema.SchemaError,
+            jsonschema.ValidationError,
+        ):
+            return {
+                "id": pred_id,
+                "dimension": predicate.get("dimension"),
+                "verdict": "FAIL",
+                "gap": "EVIDENCE_SCHEMA_INVALID",
+                "evidence_path": evidence_rel,
+            }
     for key, expected in require.items():
         observed = _dig(payload, str(key))
         if observed != expected:

@@ -74,6 +74,7 @@
         "row_status_counts",
         "missing_reason_counts",
         "decision_snapshot_at",
+        "search_observed_at",
         "source_observation_id",
         "source_response_sha256",
         "rows"
@@ -91,6 +92,7 @@
           "additionalProperties": {"type": "integer", "minimum": 0}
         },
         "decision_snapshot_at": {"type": "string", "format": "date-time"},
+        "search_observed_at": {"type": "string", "format": "date-time"},
         "source_observation_id": {"const": "DISCOVERY:SEARCH_T5"},
         "source_response_sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
         "rows": {
@@ -101,6 +103,8 @@
             "type": "object",
             "additionalProperties": false,
             "required": [
+              "mint",
+              "source_row_mint",
               "status",
               "value",
               "reason",
@@ -109,6 +113,8 @@
               "source_response_sha256"
             ],
             "properties": {
+              "mint": {"type": "string", "minLength": 1},
+              "source_row_mint": {"type": "string", "minLength": 1},
               "status": {"enum": ["ELIGIBLE", "MISSING"]},
               "value": {"type": ["number", "null"]},
               "reason": {"type": ["string", "null"]},

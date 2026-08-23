@@ -53,6 +53,17 @@ class FactoryV1PitDataTruthCanonicalizationTests(unittest.TestCase):
         self.assertEqual(acceptance["projection"]["candidate_count"], 24)
         self.assertEqual(acceptance["projection"]["eligible_count"], 19)
         self.assertEqual(acceptance["projection"]["missing_count"], 5)
+        self.assertEqual(
+            acceptance["projection"]["search_observed_at"],
+            acceptance["projection"]["decision_snapshot_at"],
+        )
+        self.assertEqual(
+            len({row["mint"] for row in acceptance["projection"]["rows"]}),
+            24,
+        )
+        self.assertTrue(
+            all(row["mint"] == row["source_row_mint"] for row in acceptance["projection"]["rows"])
+        )
         self.assertEqual(acceptance["scientific_family"]["terminal"], "CLOSED")
         self.assertFalse(acceptance["scientific_family"]["reopened"])
         self.assertFalse(acceptance["factory_runner_changed"])
@@ -100,6 +111,88 @@ class FactoryV1PitDataTruthCanonicalizationTests(unittest.TestCase):
         self.assertEqual(projected["status"], "MISSING")
         self.assertEqual(projected["reason"], "FDV_OR_SUBSTITUTE_REJECTED")
         self.assertIsNone(projected["value"])
+
+    def test_fdv_field_cannot_enter_the_canonical_input(self) -> None:
+        module = _projector_module()
+        runtime = json.loads(
+            (
+                ROOT
+                / "docs/evidence/early_structural_backing_pit_commissioning/"
+                "a1_window_a_runtime_receipt_v1.json"
+            ).read_text(encoding="utf-8")
+        )
+        row = deepcopy(
+            next(
+                item
+                for item in runtime["candidate_observations"]
+                if item["x_status"] == "ELIGIBLE"
+            )
+        )
+        row["x_inputs"]["fdv"] = row["x_inputs"]["mcap"]
+
+        with self.assertRaises(module.PitCanonicalizationError) as raised:
+            module.project_candidate(row)
+
+        self.assertEqual(str(raised.exception), "FDV_FIELD_NOT_ADMISSIBLE")
+
+    def test_missing_reason_must_match_recomputed_reason(self) -> None:
+        module = _projector_module()
+        runtime = json.loads(
+            (
+                ROOT
+                / "docs/evidence/early_structural_backing_pit_commissioning/"
+                "a1_window_a_runtime_receipt_v1.json"
+            ).read_text(encoding="utf-8")
+        )
+        row = deepcopy(
+            next(
+                item
+                for item in runtime["candidate_observations"]
+                if item["x_reason"] == "UPDATED_TIMESTAMP_IN_FUTURE"
+            )
+        )
+        row["x_reason"] = "MCAP_OR_LIQUIDITY_MISSING"
+
+        with self.assertRaises(module.PitCanonicalizationError) as raised:
+            module.project_candidate(row)
+
+        self.assertEqual(str(raised.exception), "MISSING_REASON_MISMATCH")
+
+    def test_entity_identity_must_be_bound_to_source_row(self) -> None:
+        module = _projector_module()
+        runtime = json.loads(
+            (
+                ROOT
+                / "docs/evidence/early_structural_backing_pit_commissioning/"
+                "a1_window_a_runtime_receipt_v1.json"
+            ).read_text(encoding="utf-8")
+        )
+        row = deepcopy(runtime["candidate_observations"][0])
+        row["mint"] = "different-mint"
+
+        with self.assertRaises(module.PitCanonicalizationError) as raised:
+            module.project_candidate(row)
+
+        self.assertEqual(str(raised.exception), "ROW_MINT_LINEAGE_MISMATCH")
+
+    def test_duplicate_mint_decision_snapshot_keys_fail_closed(self) -> None:
+        module = _projector_module()
+        runtime = json.loads(
+            (
+                ROOT
+                / "docs/evidence/early_structural_backing_pit_commissioning/"
+                "a1_window_a_runtime_receipt_v1.json"
+            ).read_text(encoding="utf-8")
+        )
+        first = module.project_candidate(runtime["candidate_observations"][0])
+        duplicate = deepcopy(first)
+
+        with self.assertRaises(module.PitCanonicalizationError) as raised:
+            module._validate_unique_entity_keys([first, duplicate])
+
+        self.assertEqual(
+            str(raised.exception), "DUPLICATE_MINT_DECISION_SNAPSHOT"
+        )
 
     def test_recorded_ratio_mismatch_fails_closed(self) -> None:
         module = _projector_module()
@@ -149,6 +242,10 @@ class FactoryV1PitDataTruthCanonicalizationTests(unittest.TestCase):
         self.assertEqual(snapshot["pit_ready_count"], 1)
         self.assertEqual(snapshot["features"][0]["value_status"], "PIT_READY")
         self.assertIsNone(snapshot["features"][0]["value"])
+        self.assertEqual(snapshot["features"][0]["pit_acceptance_id"], "FACTORY-V1-PIT-DATA-TRUTH-CANONICALIZATION-001")
+        self.assertEqual(snapshot["features"][0]["pit_candidate_count"], 24)
+        self.assertEqual(snapshot["features"][0]["pit_eligible_count"], 19)
+        self.assertEqual(snapshot["features"][0]["pit_missing_count"], 5)
 
 
 if __name__ == "__main__":

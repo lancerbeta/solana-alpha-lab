@@ -17,13 +17,17 @@ objective: Canonicalize the already accepted prospective Atom 1 market truth int
 managed_write_set:
 - docs/tasks/FACTORY_V1_PIT_DATA_TRUTH_CANONICALIZATION_V1.md
 - configs/factory_v1_common_market_feature_surface_v1.yaml
+- configs/factory_v1_operational_readiness_closeout_v1.yaml
 - catalog/schemas/factory_v1_common_market_feature_surface.schema.json
 - catalog/schemas/factory_v1_pit_data_truth_canonicalization.schema.json
 - src/solana_alpha_lab/factory/market_feature_surface.py
+- src/solana_alpha_lab/factory/operational_readiness_closeout.py
 - src/solana_alpha_lab/factory/pit_data_truth_canonicalization.py
 - scripts/run_factory_v1_pit_data_truth_canonicalization.py
 - tests/test_factory_v1_pit_data_truth_canonicalization.py
 - tests/test_factory_v1_common_market_feature_surface.py
+- tests/test_factory_v1_operational_readiness_closeout.py
+- tests/test_factory_ordinary_market_hypothesis.py
 - configs/experiment_specs/market_feature_price_path_archetype_v1.yaml
 - configs/experiment_specs/market_feature_liquidity_archetype_v1.yaml
 - configs/experiment_specs/market_feature_creator_pressure_archetype_v1.yaml

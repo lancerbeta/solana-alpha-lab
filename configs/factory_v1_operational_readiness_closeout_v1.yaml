@@ -68,10 +68,12 @@ predicates:
       checks.isolated_restore_hash_match: true
   - id: DATA_FACTORY_PIT_LINEAGE_RECEIPT
     dimension: data
-    evidence_path: docs/evidence/factory_v1_common_market_feature_surface/a1_factory_v1_common_market_feature_surface_acceptance_v1.json
+    evidence_path: docs/evidence/factory_v1_pit_data_truth_canonicalization/a1_acceptance_v1.json
+    schema_path: catalog/schemas/factory_v1_pit_data_truth_canonicalization.schema.json
+    schema_sha256: d5a21d1a83780abb59e69b43bb96a6cfea2bc9074b8e8f12c4641a9ef97eed16
+    evidence_sha256: ce20b85ca637cacafed505aadc7ac970872c9978f682a625080b54c5df9880a5
     require:
-      # Positive PIT count — NO_PIT receipts (pit_ready_count: 0) cannot satisfy.
-      pit_ready_count: 1
+      readiness.pit_lineage_ready: true
   - id: MONITORING_HEALTH_VIEW
     dimension: monitoring
     evidence_path: docs/evidence/factory_v1_owner_cockpit/a4_factory_v1_cockpit_acceptance_v1.json
@@ -115,9 +117,12 @@ predicates:
       security.destructive_and_financial_actions_separately_gated: true
   - id: DATA_EXPLICIT_MISSINGNESS
     dimension: data
-    evidence_path: docs/evidence/factory_v1_common_market_feature_surface/a1_factory_v1_common_market_feature_surface_acceptance_v1.json
+    evidence_path: docs/evidence/factory_v1_pit_data_truth_canonicalization/a1_acceptance_v1.json
+    schema_path: catalog/schemas/factory_v1_pit_data_truth_canonicalization.schema.json
+    schema_sha256: d5a21d1a83780abb59e69b43bb96a6cfea2bc9074b8e8f12c4641a9ef97eed16
+    evidence_sha256: ce20b85ca637cacafed505aadc7ac970872c9978f682a625080b54c5df9880a5
     require:
-      explicit_missingness_preserved: true
+      readiness.explicit_missingness_preserved: true
   - id: DATA_PROVIDER_HEALTH_VISIBLE
     dimension: data
     evidence_path: docs/evidence/factory_remote_operations/a3_runtime_receipt_v1.json
@@ -125,9 +130,12 @@ predicates:
       provider_health_visible: true
   - id: TIME_TO_EVIDENCE_FIRST_BYTE
     dimension: time_to_evidence
-    evidence_path: docs/evidence/factory_v1_commissioning/a2_factory_v1_commissioning_acceptance_v1.json
+    evidence_path: docs/evidence/factory_v1_pit_data_truth_canonicalization/a1_acceptance_v1.json
+    schema_path: catalog/schemas/factory_v1_pit_data_truth_canonicalization.schema.json
+    schema_sha256: d5a21d1a83780abb59e69b43bb96a6cfea2bc9074b8e8f12c4641a9ef97eed16
+    evidence_sha256: ce20b85ca637cacafed505aadc7ac970872c9978f682a625080b54c5df9880a5
     require:
-      first_market_byte_within_one_preparatory_step: true
+      readiness.first_market_byte_within_one_preparatory_step: true
   - id: ENTRY_GATE_RESOLVES_READINESS_CONTRACT
     dimension: truth
     evidence_path: configs/factory_v1_operational_readiness_v1.yaml

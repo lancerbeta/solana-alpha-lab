@@ -47,6 +47,7 @@ REQUIRED_FIELD_PATHS = {
     "updatedAt",
     "launchpad",
 }
+FDV_FIELD_NAMES = {"fdv", "fullydilutedvaluation"}
 PIT_AVAILABILITY_SCOPE = (
     "Tokens V2 decision snapshot on ICP-EARLY-PUMPFUN-V1; explicit "
     "decision_snapshot_at; liquidity and mcap field availability checks; "
@@ -111,6 +112,26 @@ def _count(value: object) -> int:
         raise PitCanonicalizationError("HISTORICAL_SIDE_EFFECT_COUNT_INVALID")
 
 
+def _validate_entity_identity(
+    row: Mapping[str, Any], source: Mapping[str, Any]
+) -> str:
+    mint = row.get("mint")
+    if not isinstance(mint, str) or not mint:
+        raise PitCanonicalizationError("ROW_MINT_INVALID")
+    if source.get("row_mint") != mint:
+        raise PitCanonicalizationError("ROW_MINT_LINEAGE_MISMATCH")
+    return mint
+
+
+def _validate_unique_entity_keys(rows: list[Mapping[str, Any]]) -> None:
+    keys = {
+        (row.get("mint"), row.get("decision_snapshot_at"))
+        for row in rows
+    }
+    if len(keys) != len(rows):
+        raise PitCanonicalizationError("DUPLICATE_MINT_DECISION_SNAPSHOT")
+
+
 def _missing_result(
     row: Mapping[str, Any],
     *,
@@ -120,11 +141,16 @@ def _missing_result(
     source = row.get("x_source")
     if not isinstance(source, Mapping):
         raise PitCanonicalizationError("ROW_SOURCE_LINEAGE_MISSING")
+    mint = _validate_entity_identity(row, source)
     if row.get("x") is not None:
         raise PitCanonicalizationError("MISSING_ROW_HAS_NUMERIC_VALUE")
     if row.get("x_status") != "MISSING":
         raise PitCanonicalizationError("ROW_STATUS_NOT_EXPLICIT_MISSING")
+    if row.get("x_reason") != reason:
+        raise PitCanonicalizationError("MISSING_REASON_MISMATCH")
     return {
+        "mint": mint,
+        "source_row_mint": source.get("row_mint"),
         "status": "MISSING",
         "value": None,
         "reason": reason,
@@ -143,10 +169,24 @@ def project_candidate(row: Mapping[str, Any]) -> dict[str, Any]:
     source = row.get("x_source")
     if not isinstance(inputs, Mapping) or not isinstance(source, Mapping):
         raise PitCanonicalizationError("ROW_INPUTS_OR_SOURCE_INVALID")
+    mint = _validate_entity_identity(row, source)
     if source.get("observation_id") != SEARCH_OBSERVATION_ID:
         raise PitCanonicalizationError("ROW_OBSERVATION_ID_INVALID")
-    if not REQUIRED_FIELD_PATHS.issubset(set(source.get("field_paths") or [])):
+    field_paths = source.get("field_paths")
+    if not isinstance(field_paths, list) or not all(
+        isinstance(path, str) for path in field_paths
+    ):
+        raise PitCanonicalizationError("ROW_FIELD_LINEAGE_INVALID")
+    if not REQUIRED_FIELD_PATHS.issubset(set(field_paths)):
         raise PitCanonicalizationError("ROW_FIELD_LINEAGE_INCOMPLETE")
+    if any(
+        path.rsplit(".", 1)[-1].casefold() in FDV_FIELD_NAMES
+        for path in field_paths
+    ) or any(
+        isinstance(key, str) and key.casefold() in FDV_FIELD_NAMES
+        for key in inputs
+    ):
+        raise PitCanonicalizationError("FDV_FIELD_NOT_ADMISSIBLE")
     response_sha256 = source.get("response_sha256")
     row_sha256 = source.get("row_sha256")
     if not isinstance(response_sha256, str) or not isinstance(row_sha256, str):
@@ -166,6 +206,8 @@ def project_candidate(row: Mapping[str, Any]) -> dict[str, Any]:
 
     existing_reason = row.get("x_reason")
     if existing_reason == "FDV_OR_SUBSTITUTE_REJECTED":
+        if inputs.get("mcap") is not None or inputs.get("liquidity") is not None:
+            raise PitCanonicalizationError("FDV_REJECTION_WITH_NUMERIC_INPUT")
         return _missing_result(
             row,
             reason="FDV_OR_SUBSTITUTE_REJECTED",
@@ -208,6 +250,8 @@ def project_candidate(row: Mapping[str, Any]) -> dict[str, Any]:
     ):
         raise PitCanonicalizationError("RECORDED_RATIO_MISMATCH")
     return {
+        "mint": mint,
+        "source_row_mint": source.get("row_mint"),
         "status": "ELIGIBLE",
         "value": value,
         "reason": None,
@@ -241,11 +285,21 @@ def _validate_first_byte_basis(root: Path) -> dict[str, Any]:
     }
 
 
-def canonicalize_from_repository(root: Path) -> dict[str, Any]:
+def canonicalize_from_repository(
+    root: Path,
+    *,
+    runtime_relative: str = SOURCE_RUNTIME_RELATIVE,
+    runtime_sha256: str = SOURCE_RUNTIME_SHA256,
+) -> dict[str, Any]:
     """Build the current A4 acceptance from hash-pinned Git evidence."""
 
     root = root.resolve()
-    runtime = _read_json(root, SOURCE_RUNTIME_RELATIVE, SOURCE_RUNTIME_SHA256)
+    if (
+        runtime_relative != SOURCE_RUNTIME_RELATIVE
+        or runtime_sha256 != SOURCE_RUNTIME_SHA256
+    ):
+        raise PitCanonicalizationError("PIT_RUNTIME_BINDING_MISMATCH")
+    runtime = _read_json(root, runtime_relative, runtime_sha256)
     source_acceptance = _read_json(
         root, SOURCE_ACCEPTANCE_RELATIVE, SOURCE_ACCEPTANCE_SHA256
     )
@@ -289,8 +343,13 @@ def canonicalize_from_repository(root: Path) -> dict[str, Any]:
         raise PitCanonicalizationError("SEARCH_SOURCE_HASH_MISMATCH")
     if search_manifest.get("retention") != "A4_OUTSIDE_GIT":
         raise PitCanonicalizationError("RAW_BYTES_IMPORTED_AS_GIT_TRUTH")
+    search_observed_at = _parse_utc(
+        search_manifest.get("observed_at"),
+        "SEARCH_OBSERVED_TIMESTAMP_INVALID",
+    )
 
     projected = [project_candidate(row) for row in candidates]
+    _validate_unique_entity_keys(projected)
     if any(row["source_response_sha256"] != search_hash for row in projected):
         raise PitCanonicalizationError("ROW_SOURCE_HASH_MISMATCH")
     eligible = [row for row in projected if row["status"] == "ELIGIBLE"]
@@ -302,6 +361,9 @@ def canonicalize_from_repository(root: Path) -> dict[str, Any]:
     decision_times = {row["decision_snapshot_at"] for row in projected}
     if len(decision_times) != 1:
         raise PitCanonicalizationError("DECISION_SNAPSHOT_NOT_SINGLETON")
+    decision_snapshot_at = next(iter(decision_times))
+    if _parse_utc(decision_snapshot_at, "DECISION_TIMESTAMP_INVALID") != search_observed_at:
+        raise PitCanonicalizationError("DECISION_TIMESTAMP_NOT_BOUND_TO_SEARCH")
 
     row_status_counts = dict(Counter(row["status"] for row in projected))
     missing_reason_counts = dict(Counter(row["reason"] for row in missing))
@@ -332,7 +394,8 @@ def canonicalize_from_repository(root: Path) -> dict[str, Any]:
             "missing_count": len(missing),
             "row_status_counts": row_status_counts,
             "missing_reason_counts": missing_reason_counts,
-            "decision_snapshot_at": next(iter(decision_times)),
+            "decision_snapshot_at": decision_snapshot_at,
+            "search_observed_at": str(search_manifest["observed_at"]),
             "source_observation_id": SEARCH_OBSERVATION_ID,
             "source_response_sha256": search_hash,
             "rows": projected,
@@ -368,6 +431,9 @@ def canonicalize_from_repository(root: Path) -> dict[str, Any]:
         "non_claims": [
             "NO_NEW_MARKET_CAPTURE",
             "NO_SCIENTIFIC_HYPOTHESIS_PROMOTION",
+            "NO_A5_LIVE_OPERATIONAL_HARDENING",
+            "NO_A6_POLICY_CERTIFICATION",
+            "NO_RAW_BODY_RECOVERY_FROM_GIT",
             "NO_FACTORY_V1_OPERATIONAL_READY",
             "NO_ALPHA",
             "NO_NETRETURN",

@@ -19,10 +19,12 @@ missingness и формулу `liquidity / mcap`.
 - 5 типизированных `MISSING`;
 - `FEAT-TOKEN-LIQUIDITY-USD-TO-MCAP-RATIO`;
 - scope: `MINT_DECISION_SNAPSHOT`;
+- entity key uniqueness: `(mint, decision_snapshot_at)` is fail-closed and every
+  projected row is bound to `x_source.row_mint`;
 - `UPDATED_TIMESTAMP_IN_FUTURE` не допускается;
 - FDV не используется как substitute для market cap;
 - исторический источник и acquisition timing сохранены как lineage, raw batch
-  остаётся вне Git;
+  остаётся вне Git и не заявляется как recoverable из Git receipts;
 - текущий A4 прогон: `network_calls=0`, `provider_calls=0`,
   `credential_reads=0`, `cash_spend_usd_cents=0`;
 - Factory runner не менялся: SHA `d8d22bcb51fb6992d40f09e58274c52e0f9942c12d043cc57b96ffca524e918f`.
@@ -33,11 +35,17 @@ missingness и формулу `liquidity / mcap`.
 ## Граница результата
 
 Изменение закрывает canonicalization gap в data-truth блоке и делает capability
-доступной через common market feature surface. Оно не утверждает:
+доступной через common market feature surface. Три A4 predicate closeout теперь
+читают эту acceptance с проверкой её schema SHA и exact evidence SHA; остальные
+readiness gaps сохраняются. Поэтому текущий общий closeout остаётся
+`FACTORY_PRODUCTIZATION_REPLAN`, а не `FACTORY_V1_OPERATIONAL_READY`.
+
+Оно не утверждает:
 
 - SHADOW, VPS, micro-live или execution;
 - alpha, PnL, NetReturn или cashflow;
 - Factory operational READY или Foundation Freeze;
+- A5 live operational hardening или A6 policy certification;
 - научное превосходство feature family;
 - замену исторического Atom 1 evidence или старого inverse feature ID.
 
@@ -50,4 +58,5 @@ live-host действием.
 ```text
 uv run --locked --managed-python python -B scripts/run_factory_v1_pit_data_truth_canonicalization.py --root . --write-evidence
 uv run --locked --managed-python python -B -m unittest discover -s tests -p "test_factory_v1_pit_data_truth_canonicalization.py" -v
+uv run --locked --managed-python python -B scripts/delivery_harness.py check
 ```
