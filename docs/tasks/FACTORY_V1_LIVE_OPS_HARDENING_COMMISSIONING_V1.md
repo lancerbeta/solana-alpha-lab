@@ -76,6 +76,7 @@ context_requirements:
   l2_roles:
   - ARCHITECTURE_DECISIONS
   - EXTERNAL_ROUTE_KNOWLEDGE
+  - DELIVERY_EVIDENCE
   l3_roles:
   - HISTORICAL_CONTEXT
   roadmap_path: configs/factory_v1_operational_readiness_v1.yaml
