@@ -30170,7 +30170,7 @@ records:
   as_of: '2026-08-22'
   truth_owner: FACTORY_UNATTENDED_SHADOW_VERTICAL_SLICE_V1
   location: {kind: git_path, logical_uri: 'repo://docs/tasks/FACTORY_UNATTENDED_SHADOW_VERTICAL_SLICE_V1.md', repository_path: docs/tasks/FACTORY_UNATTENDED_SHADOW_VERTICAL_SLICE_V1.md}
-  integrity: {kind: sha256, sha256: c4187146d2aa0baf2928e625e5321f840b7f7cd34a2ca455e39dedb88505f383}
+  integrity: {kind: sha256, sha256: 8a261058989faf29e53ea8c5e511ca50b387b1ab35148ede4db5f698256dfcd7}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: contains, target_asset_id: CONFIG-FACTORY-UNATTENDED-SHADOW-VERTICAL-SLICE-001}
