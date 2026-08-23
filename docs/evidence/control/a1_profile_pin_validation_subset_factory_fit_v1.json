@@ -4,8 +4,8 @@
   "review_id": "PROFILE-PIN-VALIDATION-SUBSET-FACTORY-FIT-001",
   "as_of": "2026-08-23",
   "task_id": "CTRL-PROFILE-PIN-VALIDATION-SUBSET-V1",
-  "reviewed_bindings_sha256": "1b7aa99d97f799f36528d28752906c200abf1bb49f8fdcfc3cb6c8022eb6d5f0",
-  "reviewed_inventory_sha256": "8c6bc0e605cbc03e3251425d2694806c2fe11582576d1ff8ecb16d722075eea5",
+  "reviewed_bindings_sha256": "9cb83d1ce27c40fa50403d88753bcfea2188c6f51d2fee3e6a34b83d5645df7e",
+  "reviewed_inventory_sha256": "05819c3a139b11c81dbcc4ea5cb6950d6fb16c57c149a19519b920276ed9d233",
   "mode": "FULL_REVIEW",
   "verdict": "PASS",
   "dimensions": {

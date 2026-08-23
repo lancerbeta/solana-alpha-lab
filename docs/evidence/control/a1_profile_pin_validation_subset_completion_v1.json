@@ -11,10 +11,12 @@
   "cloud_bundle_smoke_required": false,
   "capability_radar_now": "NONE",
   "implementation_bindings": {
-    "catalog/assets/core.yaml": "39513869ab465215b94ebba58f31d680e57579e4838e87cf1432f6ccb044df45",
+    "catalog/assets/core.yaml": "6019fbc8fe1a8b79a265d69e115bd3fe89165d4890f1d3eb50865c6358570b74",
     "delivery-harness/harness.yaml": "7c33e5446ca97390a29743fcc069d4ac2857fb1fb13e221a4d9d433db502f932",
+    "delivery-harness/templates/portable-bundle-manifest.json": "cc3098d1c3eecafb22bab3fee23f6623be565e5c9f04033b424dc59d1f9a31a5",
     "docs/agent/DELIVERY_HARNESS_PROTOCOL.md": "bf9d0047cfff1da61890f29d80150c075bc6ed4feb683cf449546d8b2ef4c023",
-    "docs/tasks/CTRL-PROFILE-PIN-VALIDATION-SUBSET-V1.md": "738e73e22a08e7a26194f9f200c8c540a3516f562bddfddc02003f231817ee97",
+    "docs/evidence/control/delivery_harness_acceptance_v1.json": "768cb857958809c1aeabc6e3cda393c3055c4b3e30c2095d2c1a91ac460058e3",
+    "docs/tasks/CTRL-PROFILE-PIN-VALIDATION-SUBSET-V1.md": "658859b601257131c540e56ff994c89f6e71a95715652f62f60770e7d103ea20",
     "scripts/owner_attention_gate.py": "dd2b77e0db202aacd5fad9c2119bbd3ee32e30019eb466fbf9a858bbfe89441b",
     "tests/test_delivery_harness_merge_guard.py": "14df68c49a4e3d49c1d96641e220eab7f53c5d784d2780b6d0c1041b8864f627"
   },
@@ -28,14 +30,14 @@
   },
   "factory_fit": {
     "path": "docs/evidence/control/a1_profile_pin_validation_subset_factory_fit_v1.json",
-    "sha256": "274e2a7e5291452158cab00d7b77a517de28c13388dff5684fe9625fc1f3fc2f",
+    "sha256": "db3d6837f0c69afa4f9b0917a11020ebd58dc1868e336eba0173b31b8bbc40ef",
     "verdict": "PASS"
   },
   "validation": {
     "targeted": "PASS_PROFILE_PIN_VALIDATION_SUBSET_TESTS",
     "independent_review": {
       "path": "docs/evidence/control/a1_profile_pin_validation_subset_review_v1.json",
-      "sha256": "760407c26d96c7f7e33813b00674cb33429108137387c677354e2f3a245fab19",
+      "sha256": "14c150471a3a1f451c8303db1db86df6b5786a5b9eb0165572c5d1221bccd811",
       "verdict": "PASS"
     },
     "full_gate": "ENFORCED_BY_PROJECT_BOUND_VALIDATION",
