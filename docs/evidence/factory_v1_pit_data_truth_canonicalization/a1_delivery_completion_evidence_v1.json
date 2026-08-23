@@ -1,11 +1,6 @@
 {
   "acceptance_id": "FACTORY-V1-PIT-DATA-TRUTH-CANONICALIZATION-DELIVERY-COMPLETION-001",
-  "active_stop_conditions": [
-    "NO_PROVIDER_NETWORK_OR_RPC_CALL",
-    "NO_NEW_CAPTURE_OR_RECAPTURE",
-    "NO_SCIENTIFIC_REEVALUATION_OR_THRESHOLD_SEARCH",
-    "NO_SHADOW_VPS_MICRO_LIVE_OR_READY_CLAIM"
-  ],
+  "active_stop_conditions": [],
   "as_of": "2026-08-23",
   "base_main": "0cba257da5240057df4bb8ff91cf3a7f3c0feb9f",
   "capability_radar_now": "PIT_DATA_TRUTH_CANONICALIZATION_PASS",
