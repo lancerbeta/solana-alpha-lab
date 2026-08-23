@@ -1,0 +1,36 @@
+{
+  "as_of": "2026-08-24",
+  "capability_radar": {
+    "now": "NONE",
+    "watch": "LIVE_PHRASE_THEN_ONE_WINDOW_FALSIFIER"
+  },
+  "dimensions": {
+    "build_vs_buy": "PASS_ADOPT_BIND_PRIMARY_X_WRAP_TWO_SNAPSHOT_LN",
+    "context_efficiency": "PASS_ONE_ATOM_OFFLINE_PLUS_PHRASE_GATE",
+    "execution_to_cashflow": "PASS_QUOTE_ONLY_NO_NETRETURN",
+    "flexibility_and_history": "PASS_RUNNER_UNCHANGED",
+    "mission": "PASS_TEMPORAL_DIVERGENCE_NOT_LEVEL",
+    "monitoring_and_recovery": "PASS_REVERT_ATOM_KEEP_OBSERVATIONS",
+    "owner_operability": "PASS_PASTEABLE_COMMAND_TYPED_TERMINALS_AND_PHRASE_GATE",
+    "red_team": "PASS_NO_CLOSED_FAMILY_BUCKET_REOPEN",
+    "research_truth": "PASS_SIGN_ONLY_TAU_NO_THRESHOLD_SEARCH",
+    "security": "PASS_PHRASE_GATED_FREE_KEY"
+  },
+  "limits": [
+    "NO_ALPHA",
+    "NO_SHADOW",
+    "NO_CANONICAL_DONE",
+    "NO_DISCOVERY_OR_A7",
+    "NO_LIVE_CAPTURE_WITHOUT_PHRASE",
+    "CAPABILITY_PASS_IS_NOT_PROMOTION"
+  ],
+  "mode": "FULL_REVIEW",
+  "recovery": "REVERT_THIS_ATOM; PRESERVE_FACTORY_RUNNER; KEEP_CONSUMED_MINTS_HISTORICAL",
+  "review_id": "EARLY-VALUATION-LIQUIDITY-DIVERGENCE-FACTORY-FIT-001",
+  "reviewed_bindings_sha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+  "reviewed_inventory_sha256": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+  "schema": "smial.delivery-harness-factory-fit",
+  "schema_version": "1.0",
+  "task_id": "EARLY_VALUATION_LIQUIDITY_DIVERGENCE_CONFIRMATION_V1",
+  "verdict": "PASS"
+}

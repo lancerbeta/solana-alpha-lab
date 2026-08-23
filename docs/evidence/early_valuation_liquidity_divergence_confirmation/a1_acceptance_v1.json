@@ -1,0 +1,31 @@
+{
+  "acceptance_id": "EARLY-VALUATION-LIQUIDITY-DIVERGENCE-ACCEPTANCE-001",
+  "as_of": "2026-08-24",
+  "cloud_bundle_mode": "OWNER_MANAGED_OPTIONAL_EXPORT",
+  "composition": "PASS_BIND_PRIMARY_X_TWICE_PLUS_LN_WRAP",
+  "entry_verdict": "START_WITH_PATCH",
+  "factory_runner_sha256": "d8d22bcb51fb6992d40f09e58274c52e0f9942c12d043cc57b96ffca524e918f",
+  "live_capture": "BLOCKED_UNTIL_EXACT_OWNER_PHRASE",
+  "next_safe_action": "PASTE_EXACT_OWNER_PHRASE_THEN_ONE_WINDOW",
+  "non_claims": [
+    "NO_ALPHA",
+    "NO_NETRETURN",
+    "NO_EXECUTE",
+    "NO_SHADOW",
+    "NO_DISCOVERY_OR_A7",
+    "NO_WINDOW_B",
+    "NO_CLOSED_FAMILY_THRESHOLD_REOPEN",
+    "NO_CANONICAL_DONE"
+  ],
+  "product_composition": "PASS_EXISTING_HELPERS_NO_FACTORY_RUNNER_CHANGE",
+  "project_sources_disposition": {
+    "kind": "NO_CHANGE"
+  },
+  "promotable": false,
+  "schema": "smial.early-valuation-liquidity-divergence-confirmation-acceptance",
+  "schema_version": "1.0",
+  "scientific_terminal": null,
+  "task_id": "EARLY_VALUATION_LIQUIDITY_DIVERGENCE_CONFIRMATION_V1",
+  "verdict": "OFFLINE_COMPOSITION_READY_LIVE_CAPTURE_REQUIRES_PHRASE",
+  "x_formula": "ln(R1/R0)"
+}

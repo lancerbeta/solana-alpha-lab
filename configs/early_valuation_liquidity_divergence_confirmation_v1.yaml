@@ -1,0 +1,98 @@
+schema: smial.early-valuation-liquidity-divergence-confirmation
+schema_version: '1.0'
+atom_id: EARLY_VALUATION_LIQUIDITY_DIVERGENCE_CONFIRMATION_V1
+as_of: '2026-08-24'
+external_authority:
+  owner_phrase: 'OK EARLY_VALUATION_LIQUIDITY_DIVERGENCE_CONFIRMATION_V1: one bounded Jupiter Free-key read-only PIT campaign using a local process-environment key only; Tokens V2 /recent plus two bulk /tokens/v2/search snapshots 300s apart plus quote-only /swap/v2/order; x-api-key header only; no .env read, no key in URL/log/receipt/Git, no taker, /build, /execute, wallet, signer, transaction, paid plan, second provider, retry or fallback; cash cap $0; call cap 60; global provider pace >=3s; ICP-EARLY-PUMPFUN-V1 fresh mints only excluding all prior consumed mints; X = ln(R1/R0) from FEAT-TOKEN-LIQUIDITY-USD-TO-MCAP-RATIO at two prospective search snapshots (mcap != fdv; UNKNOWN never zero); no closed-family threshold, window or quartile reopen; quote-only BUY after the second snapshot and quote-only SELL at H900; one window only; Factory runner unchanged; Discovery, A7, Strategy, Bot, Shadow, alpha, NetReturn and micro-live forbidden.'
+  credential_name: JUPITER_API_KEY
+  credential_reads: 1
+  dotenv_reads: false
+  execute: false
+  build: false
+  taker: OMITTED_QUOTE_ONLY
+  cash_cap_usd_cents: 0
+  call_cap: 60
+registry: configs/provider_route_capability_registry_v10.yaml
+routes:
+  recent:
+    route_id: JUPITER-SOLANA-TOKENS-V2-RECENT-FREE-API-KEY-001
+    endpoint: https://api.jup.ag/tokens/v2/recent
+    host: api.jup.ag
+    method: GET
+  search:
+    route_id: JUPITER-SOLANA-TOKENS-V2-SEARCH-FREE-API-KEY-001
+    endpoint: https://api.jup.ag/tokens/v2/search
+    host: api.jup.ag
+    method: GET
+  quote:
+    route_id: JUPITER-SOLANA-SWAP-V2-ORDER-FREE-API-KEY-001
+    endpoint: https://api.jup.ag/swap/v2/order
+    host: api.jup.ag
+    method: GET
+wrapped_sol_mint: So11111111111111111111111111111111111111112
+population:
+  launchpad: pump.fun
+  icp_id: ICP-EARLY-PUMPFUN-V1
+  target_candidates: 24
+  seasoning_seconds: 300
+  confirmation_seconds: 300
+  r0_age_band_seconds:
+    min: 300
+    max_exclusive: 600
+  r1_age_band_seconds:
+    min: 600
+    max_exclusive: 900
+  liquidity_usd_min: 1000
+  prior_mints_required: true
+  prior_mints_input: OPERATOR_SUPPLIED_OUTSIDE_GIT
+decision_snapshot:
+  source: TOKENS_V2_SEARCH_TWO_PROSPECTIVE_SNAPSHOTS
+  one_call_max_mints: 100
+  feature_id: FEAT-TOKEN-LIQUIDITY-USD-TO-MCAP-RATIO
+  x_formula: ln(R1/R0)
+  missing_is_zero: false
+  fdv_substitute: forbidden
+  run_campaign_black_box: forbidden
+quote:
+  slippage_bps: '100'
+  notional_atomic: '10000000'
+  horizon_seconds: 900
+  lateness_slack_seconds: 120
+  buy_after: SECOND_SNAPSHOT
+decision_rule:
+  min_decision_time_eligible: 10
+  min_rankable_h900: 8
+  score_kind: SIGN_ONLY_KENDALL_TAU_B
+  tau_b_floor: forbidden
+  top_x_quartile: false
+  leave_one_out_positive_share: forbidden
+  close_if_tau_b_le_zero: true
+windows:
+  max_windows: 1
+  window_b: forbidden
+  third_window: forbidden
+execution_controls:
+  retries: 0
+  fallback: false
+  persist_transaction_bytes: false
+  provider_requests_max: 60
+  min_interval_seconds: 3
+  background_scheduler: false
+  second_provider: false
+  paid_plan: false
+runtime_limits:
+  timeout_seconds: 20.0
+  max_response_bytes: 2000000
+raw_retention:
+  body: A4_OUTSIDE_GIT
+  response_headers: SAFE_ALLOWLIST_ONLY
+non_claims:
+  alpha: false
+  netreturn: false
+  execution: false
+  strategy: false
+  shadow: false
+  discovery: false
+  a7: false
+factory_runner: src/solana_alpha_lab/factory/runner.py
+factory_runner_sha256: d8d22bcb51fb6992d40f09e58274c52e0f9942c12d043cc57b96ffca524e918f

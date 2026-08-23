@@ -528,6 +528,16 @@
       "target_asset_id": "CTRL-EARLY-STRUCTURAL-BACKING-PIT-COMMISSIONING-001"
     },
     {
+      "source_asset_id": "CONFIG-EARLY-VALUATION-LIQUIDITY-DIVERGENCE-CONFIRMATION-001",
+      "relation": "depends_on",
+      "target_asset_id": "CONFIG-PROVIDER-ROUTE-CAPABILITY-REGISTRY-010"
+    },
+    {
+      "source_asset_id": "CONFIG-EARLY-VALUATION-LIQUIDITY-DIVERGENCE-CONFIRMATION-001",
+      "relation": "governed_by",
+      "target_asset_id": "CTRL-EARLY-VALUATION-LIQUIDITY-DIVERGENCE-CONFIRMATION-001"
+    },
+    {
       "source_asset_id": "CONFIG-EXPERIMENT-SPEC-FACTORY-V1-COMMISSIONING-001",
       "relation": "depends_on",
       "target_asset_id": "SCHEMA-EXPERIMENT-SPEC-001"
@@ -2286,6 +2296,36 @@
       "source_asset_id": "CTRL-EARLY-STRUCTURAL-BACKING-PIT-COMMISSIONING-001",
       "relation": "validated_by",
       "target_asset_id": "TEST-EARLY-STRUCTURAL-BACKING-PIT-COMMISSIONING-001"
+    },
+    {
+      "source_asset_id": "CTRL-EARLY-VALUATION-LIQUIDITY-DIVERGENCE-CONFIRMATION-001",
+      "relation": "contains",
+      "target_asset_id": "CONFIG-EARLY-VALUATION-LIQUIDITY-DIVERGENCE-CONFIRMATION-001"
+    },
+    {
+      "source_asset_id": "CTRL-EARLY-VALUATION-LIQUIDITY-DIVERGENCE-CONFIRMATION-001",
+      "relation": "contains",
+      "target_asset_id": "MODULE-EARLY-VALUATION-LIQUIDITY-DIVERGENCE-CONFIRMATION-001"
+    },
+    {
+      "source_asset_id": "CTRL-EARLY-VALUATION-LIQUIDITY-DIVERGENCE-CONFIRMATION-001",
+      "relation": "contains",
+      "target_asset_id": "SCRIPT-EARLY-VALUATION-LIQUIDITY-DIVERGENCE-CONFIRMATION-001"
+    },
+    {
+      "source_asset_id": "CTRL-EARLY-VALUATION-LIQUIDITY-DIVERGENCE-CONFIRMATION-001",
+      "relation": "depends_on",
+      "target_asset_id": "MODULE-ORDINARY-MARKET-PIT-PRIMARY-X-001"
+    },
+    {
+      "source_asset_id": "CTRL-EARLY-VALUATION-LIQUIDITY-DIVERGENCE-CONFIRMATION-001",
+      "relation": "depends_on",
+      "target_asset_id": "MODULE-ORDINARY-RECENT-ORGANIC-PRESSURE-H900-AUDITION-001"
+    },
+    {
+      "source_asset_id": "CTRL-EARLY-VALUATION-LIQUIDITY-DIVERGENCE-CONFIRMATION-001",
+      "relation": "validated_by",
+      "target_asset_id": "TEST-EARLY-VALUATION-LIQUIDITY-DIVERGENCE-CONFIRMATION-001"
     },
     {
       "source_asset_id": "CTRL-FACTORY-ORDINARY-HYPOTHESIS-THROUGH-SURFACE-001",
@@ -4086,6 +4126,41 @@
       "source_asset_id": "EVIDENCE-EARLY-STRUCTURAL-BACKING-PIT-WINDOW-A-001",
       "relation": "derived_from",
       "target_asset_id": "CTRL-EARLY-STRUCTURAL-BACKING-PIT-COMMISSIONING-001"
+    },
+    {
+      "source_asset_id": "EVIDENCE-EARLY-VALUATION-LIQUIDITY-DIVERGENCE-ACCEPTANCE-001",
+      "relation": "derived_from",
+      "target_asset_id": "CTRL-EARLY-VALUATION-LIQUIDITY-DIVERGENCE-CONFIRMATION-001"
+    },
+    {
+      "source_asset_id": "EVIDENCE-EARLY-VALUATION-LIQUIDITY-DIVERGENCE-DELIVERY-COMPLETION-001",
+      "relation": "depends_on",
+      "target_asset_id": "EVIDENCE-EARLY-VALUATION-LIQUIDITY-DIVERGENCE-DELIVERY-FACTORY-FIT-001"
+    },
+    {
+      "source_asset_id": "EVIDENCE-EARLY-VALUATION-LIQUIDITY-DIVERGENCE-DELIVERY-COMPLETION-001",
+      "relation": "depends_on",
+      "target_asset_id": "EVIDENCE-EARLY-VALUATION-LIQUIDITY-DIVERGENCE-DELIVERY-INDEPENDENT-REVIEW-001"
+    },
+    {
+      "source_asset_id": "EVIDENCE-EARLY-VALUATION-LIQUIDITY-DIVERGENCE-DELIVERY-COMPLETION-001",
+      "relation": "derived_from",
+      "target_asset_id": "EVIDENCE-EARLY-VALUATION-LIQUIDITY-DIVERGENCE-ACCEPTANCE-001"
+    },
+    {
+      "source_asset_id": "EVIDENCE-EARLY-VALUATION-LIQUIDITY-DIVERGENCE-DELIVERY-FACTORY-FIT-001",
+      "relation": "depends_on",
+      "target_asset_id": "EVIDENCE-EARLY-VALUATION-LIQUIDITY-DIVERGENCE-DELIVERY-INDEPENDENT-REVIEW-001"
+    },
+    {
+      "source_asset_id": "EVIDENCE-EARLY-VALUATION-LIQUIDITY-DIVERGENCE-DELIVERY-FACTORY-FIT-001",
+      "relation": "derived_from",
+      "target_asset_id": "EVIDENCE-EARLY-VALUATION-LIQUIDITY-DIVERGENCE-ACCEPTANCE-001"
+    },
+    {
+      "source_asset_id": "EVIDENCE-EARLY-VALUATION-LIQUIDITY-DIVERGENCE-DELIVERY-INDEPENDENT-REVIEW-001",
+      "relation": "derived_from",
+      "target_asset_id": "EVIDENCE-EARLY-VALUATION-LIQUIDITY-DIVERGENCE-ACCEPTANCE-001"
     },
     {
       "source_asset_id": "EVIDENCE-FACTORY-ORDINARY-HYPOTHESIS-ACCEPTANCE-001",
@@ -8338,6 +8413,21 @@
       "target_asset_id": "MODULE-ORDINARY-RECENT-ORGANIC-PRESSURE-H900-AUDITION-001"
     },
     {
+      "source_asset_id": "MODULE-EARLY-VALUATION-LIQUIDITY-DIVERGENCE-CONFIRMATION-001",
+      "relation": "depends_on",
+      "target_asset_id": "CONFIG-EARLY-VALUATION-LIQUIDITY-DIVERGENCE-CONFIRMATION-001"
+    },
+    {
+      "source_asset_id": "MODULE-EARLY-VALUATION-LIQUIDITY-DIVERGENCE-CONFIRMATION-001",
+      "relation": "depends_on",
+      "target_asset_id": "MODULE-ORDINARY-MARKET-PIT-PRIMARY-X-001"
+    },
+    {
+      "source_asset_id": "MODULE-EARLY-VALUATION-LIQUIDITY-DIVERGENCE-CONFIRMATION-001",
+      "relation": "depends_on",
+      "target_asset_id": "MODULE-ORDINARY-RECENT-ORGANIC-PRESSURE-H900-AUDITION-001"
+    },
+    {
       "source_asset_id": "MODULE-FACTORY-REMOTE-OPS-001",
       "relation": "governed_by",
       "target_asset_id": "CTRL-FACTORY-REMOTE-OPERATIONS-001"
@@ -11338,6 +11428,16 @@
       "target_asset_id": "MODULE-EARLY-STRUCTURAL-BACKING-PIT-COMMISSIONING-001"
     },
     {
+      "source_asset_id": "SCRIPT-EARLY-VALUATION-LIQUIDITY-DIVERGENCE-CONFIRMATION-001",
+      "relation": "depends_on",
+      "target_asset_id": "MODULE-EARLY-VALUATION-LIQUIDITY-DIVERGENCE-CONFIRMATION-001"
+    },
+    {
+      "source_asset_id": "SCRIPT-EARLY-VALUATION-LIQUIDITY-DIVERGENCE-CONFIRMATION-001",
+      "relation": "governed_by",
+      "target_asset_id": "CTRL-EARLY-VALUATION-LIQUIDITY-DIVERGENCE-CONFIRMATION-001"
+    },
+    {
       "source_asset_id": "SCRIPT-FACTORY-ORDINARY-MARKET-HYPOTHESIS-001",
       "relation": "depends_on",
       "target_asset_id": "CONFIG-EXPERIMENT-SPEC-ORDINARY-PRICE-PATH-BUY-PRESSURE-001"
@@ -12241,6 +12341,11 @@
       "source_asset_id": "TEST-EARLY-STRUCTURAL-BACKING-PIT-COMMISSIONING-001",
       "relation": "depends_on",
       "target_asset_id": "MODULE-EARLY-STRUCTURAL-BACKING-PIT-COMMISSIONING-001"
+    },
+    {
+      "source_asset_id": "TEST-EARLY-VALUATION-LIQUIDITY-DIVERGENCE-CONFIRMATION-001",
+      "relation": "depends_on",
+      "target_asset_id": "MODULE-EARLY-VALUATION-LIQUIDITY-DIVERGENCE-CONFIRMATION-001"
     },
     {
       "source_asset_id": "TEST-FACTORY-ORDINARY-HYPOTHESIS-THROUGH-SURFACE-001",
