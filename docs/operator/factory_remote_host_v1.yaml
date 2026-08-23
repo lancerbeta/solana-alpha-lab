@@ -40,7 +40,7 @@ units:
   - factory-remote-backup.timer
 commands:
   doctor: cd /opt/solana-alpha-lab && sudo /usr/bin/uv run --locked --managed-python python -B scripts/factory_remote_doctor.py
-  heartbeat: cd /opt/solana-alpha-lab && /usr/bin/uv run --locked --managed-python python -B scripts/factory_remote_doctor.py --heartbeat
+  heartbeat: cd /opt/solana-alpha-lab && /usr/bin/uv run --locked --managed-python python -B scripts/run_factory_unattended_shadow_tick.py
   backup: cd /opt/solana-alpha-lab && /usr/bin/uv run --locked --managed-python python -B scripts/factory_remote_doctor.py --backup
   units: systemctl is-active factory-v1-workbench.service factory-remote-health.service nftables fail2ban
 authority:

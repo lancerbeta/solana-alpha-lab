@@ -29596,7 +29596,7 @@ records:
   as_of: '2026-08-21'
   truth_owner: EARLY_STATE_TO_PAPER_VERTICAL_SLICE_V1
   location: {kind: git_path, logical_uri: 'repo://src/solana_alpha_lab/factory/paper_plane.py', repository_path: src/solana_alpha_lab/factory/paper_plane.py}
-  integrity: {kind: sha256, sha256: c66164fc9f6607ddc92d594cd7d8b868b9dc68387bae48b481f3a00b0e5b094e}
+  integrity: {kind: sha256, sha256: ef93969a3bc193a2fb19454115ce29359f066eb10272def507d11cb2253e3bd9}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: governed_by, target_asset_id: SCHEMA-STRATEGY-VERSION-001}
@@ -29805,7 +29805,7 @@ records:
   as_of: '2026-08-22'
   truth_owner: FACTORY_REMOTE_OPERATIONS_V1
   location: {kind: git_path, logical_uri: 'repo://src/solana_alpha_lab/factory/remote_ops.py', repository_path: src/solana_alpha_lab/factory/remote_ops.py}
-  integrity: {kind: sha256, sha256: b8726d91ea970ea9b65d250e9dff9a87b6c4b47d334e5afe0697e24b2e499839}
+  integrity: {kind: sha256, sha256: 2b4b8dceaaa3db198e8f40cdd4b8333b39b6e61512ca3efaf7d1a3a3e196289b}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations: [{relation_type: governed_by, target_asset_id: CTRL-FACTORY-REMOTE-OPERATIONS-001}]
   consumers: [FACTORY-001, GOAL-OWNER]
@@ -29920,7 +29920,7 @@ records:
   as_of: '2026-08-22'
   truth_owner: FACTORY_REMOTE_OPERATIONS_V1
   location: {kind: git_path, logical_uri: 'repo://docs/operator/FACTORY_REMOTE_HOST.md', repository_path: docs/operator/FACTORY_REMOTE_HOST.md}
-  integrity: {kind: sha256, sha256: 957c06c6d93c284c09bde323bce38b40a235cb9a6cec62c79448f7c408dc4337}
+  integrity: {kind: sha256, sha256: d5b073f7385c30c02f5a469ebcba119633f6948af4ceb7d847fa0d60599dbcd7}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations: [{relation_type: governed_by, target_asset_id: CTRL-FACTORY-REMOTE-OPERATIONS-001}]
   consumers: [FACTORY-001, GOAL-OWNER]
@@ -29936,7 +29936,7 @@ records:
   as_of: '2026-08-22'
   truth_owner: FACTORY_REMOTE_OPERATIONS_V1
   location: {kind: git_path, logical_uri: 'repo://docs/operator/factory_remote_host_v1.yaml', repository_path: docs/operator/factory_remote_host_v1.yaml}
-  integrity: {kind: sha256, sha256: 4a7783fac263bc7f6b161ea0fc68a95bb5247fef821c4648c29a697007c2a13e}
+  integrity: {kind: sha256, sha256: 5e9b05931b2e2cb2cfa311e93581ba6e35c74136b70d1cb495466d006a1c1234}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations: [{relation_type: governed_by, target_asset_id: CTRL-FACTORY-REMOTE-OPERATIONS-001}]
   consumers: [FACTORY-001, GOAL-OWNER]
@@ -30160,4 +30160,260 @@ records:
   consumers: [FACTORY-001, GOAL-OWNER]
   evidence: []
   search_terms: [EARLY, STRUCTURAL_BACKING, DELIVERY]
+  classification: {contains_secrets: false, contains_raw_data: false, sensitivity: INTERNAL_NON_SECRET}
+- asset_id: CTRL-FACTORY-UNATTENDED-SHADOW-VERTICAL-SLICE-001
+  record_version: '1.0'
+  asset_type: control_document
+  purpose: Exact Atom-2 contract for COMMISSIONING_ONLY unattended SHADOW on factory-remote-ops.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-08-22'
+  truth_owner: FACTORY_UNATTENDED_SHADOW_VERTICAL_SLICE_V1
+  location: {kind: git_path, logical_uri: 'repo://docs/tasks/FACTORY_UNATTENDED_SHADOW_VERTICAL_SLICE_V1.md', repository_path: docs/tasks/FACTORY_UNATTENDED_SHADOW_VERTICAL_SLICE_V1.md}
+  integrity: {kind: sha256, sha256: 8a261058989faf29e53ea8c5e511ca50b387b1ab35148ede4db5f698256dfcd7}
+  access: {mode: read_only, method: file, network_required: false, secrets_required: false}
+  relations:
+  - {relation_type: contains, target_asset_id: CONFIG-FACTORY-UNATTENDED-SHADOW-VERTICAL-SLICE-001}
+  - {relation_type: contains, target_asset_id: MODULE-FACTORY-UNATTENDED-SHADOW-001}
+  - {relation_type: contains, target_asset_id: SCRIPT-FACTORY-UNATTENDED-SHADOW-TICK-001}
+  - {relation_type: validated_by, target_asset_id: TEST-FACTORY-UNATTENDED-SHADOW-VERTICAL-SLICE-001}
+  - {relation_type: validated_by, target_asset_id: EVIDENCE-FACTORY-UNATTENDED-SHADOW-ACCEPTANCE-001}
+  - {relation_type: validated_by, target_asset_id: EVIDENCE-FACTORY-UNATTENDED-SHADOW-DELIVERY-COMPLETION-001}
+  consumers: [FACTORY-001, GOAL-OWNER]
+  evidence: []
+  search_terms: ['FACTORY', 'UNATTENDED_SHADOW', 'COMMISSIONING_ONLY']
+  classification: {contains_secrets: false, contains_raw_data: false, sensitivity: INTERNAL_NON_SECRET}
+
+- asset_id: CONFIG-FACTORY-UNATTENDED-SHADOW-VERTICAL-SLICE-001
+  record_version: '1.0'
+  asset_type: configuration
+  purpose: Config for COMMISSIONING_ONLY unattended SHADOW tick and runner pin.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-08-22'
+  truth_owner: FACTORY_UNATTENDED_SHADOW_VERTICAL_SLICE_V1
+  location: {kind: git_path, logical_uri: 'repo://configs/factory_unattended_shadow_vertical_slice_v1.yaml', repository_path: configs/factory_unattended_shadow_vertical_slice_v1.yaml}
+  integrity: {kind: sha256, sha256: 973d32f0841b5190ca650c8270a9fd25f4b1dea9502bf1b0d439e67bed6d6c26}
+  access: {mode: read_only, method: file, network_required: false, secrets_required: false}
+  relations:
+  - {relation_type: governed_by, target_asset_id: CTRL-FACTORY-UNATTENDED-SHADOW-VERTICAL-SLICE-001}
+  - {relation_type: depends_on, target_asset_id: STRAT-V-EARLY-LIQ-FLOOR-V1-001}
+  consumers: [FACTORY-001, GOAL-OWNER]
+  evidence: []
+  search_terms: ['FACTORY', 'SHADOW', 'CONFIG']
+  classification: {contains_secrets: false, contains_raw_data: false, sensitivity: INTERNAL_NON_SECRET}
+
+- asset_id: CONFIG-FACTORY-UNATTENDED-SHADOW-COHORT-FIXTURE-001
+  record_version: '1.0'
+  asset_type: configuration
+  purpose: Git-tracked offline cohort fixture for unattended SHADOW commissioning ticks.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-08-22'
+  truth_owner: FACTORY_UNATTENDED_SHADOW_VERTICAL_SLICE_V1
+  location: {kind: git_path, logical_uri: 'repo://configs/factory_unattended_shadow_cohort_fixture_v1.json', repository_path: configs/factory_unattended_shadow_cohort_fixture_v1.json}
+  integrity: {kind: sha256, sha256: 5c61275f0ea6e36b1f1f9368c7e8cff5c461b4a2d291859310f2c09e227a4a48}
+  access: {mode: read_only, method: file, network_required: false, secrets_required: false}
+  relations:
+  - {relation_type: governed_by, target_asset_id: CTRL-FACTORY-UNATTENDED-SHADOW-VERTICAL-SLICE-001}
+  consumers: [FACTORY-001, GOAL-OWNER]
+  evidence: []
+  search_terms: ['FACTORY', 'SHADOW', 'COHORT']
+  classification: {contains_secrets: false, contains_raw_data: false, sensitivity: INTERNAL_NON_SECRET}
+
+- asset_id: MODULE-FACTORY-UNATTENDED-SHADOW-001
+  record_version: '1.0'
+  asset_type: script
+  purpose: Unattended SHADOW tick over fixture cohort with real heartbeat progress.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-08-22'
+  truth_owner: FACTORY_UNATTENDED_SHADOW_VERTICAL_SLICE_V1
+  location: {kind: git_path, logical_uri: 'repo://src/solana_alpha_lab/factory/unattended_shadow.py', repository_path: src/solana_alpha_lab/factory/unattended_shadow.py}
+  integrity: {kind: sha256, sha256: cc22bc408e46cb0129765edb7d6dd8158a19e223ed1e2525cb1a1836f1634d73}
+  access: {mode: read_only, method: file, network_required: false, secrets_required: false}
+  relations:
+  - {relation_type: governed_by, target_asset_id: CTRL-FACTORY-UNATTENDED-SHADOW-VERTICAL-SLICE-001}
+  - {relation_type: depends_on, target_asset_id: MODULE-PAPER-PLANE-ENGINE-001}
+  consumers: [FACTORY-001, GOAL-OWNER]
+  evidence: []
+  search_terms: ['FACTORY', 'SHADOW', 'TICK']
+  classification: {contains_secrets: false, contains_raw_data: false, sensitivity: INTERNAL_NON_SECRET}
+
+- asset_id: SCRIPT-FACTORY-UNATTENDED-SHADOW-TICK-001
+  record_version: '1.0'
+  asset_type: script
+  purpose: CLI entry for one unattended SHADOW tick.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-08-22'
+  truth_owner: FACTORY_UNATTENDED_SHADOW_VERTICAL_SLICE_V1
+  location: {kind: git_path, logical_uri: 'repo://scripts/run_factory_unattended_shadow_tick.py', repository_path: scripts/run_factory_unattended_shadow_tick.py}
+  integrity: {kind: sha256, sha256: 2d288c84f3a1bd8c380f386723758720d9dc684e00f77d46f1dfcafb0a05bdfe}
+  access: {mode: read_only, method: file, network_required: false, secrets_required: false}
+  relations:
+  - {relation_type: governed_by, target_asset_id: CTRL-FACTORY-UNATTENDED-SHADOW-VERTICAL-SLICE-001}
+  - {relation_type: depends_on, target_asset_id: MODULE-FACTORY-UNATTENDED-SHADOW-001}
+  consumers: [FACTORY-001, GOAL-OWNER]
+  evidence: []
+  search_terms: ['FACTORY', 'SHADOW', 'CLI']
+  classification: {contains_secrets: false, contains_raw_data: false, sensitivity: INTERNAL_NON_SECRET}
+
+- asset_id: TEST-FACTORY-UNATTENDED-SHADOW-VERTICAL-SLICE-001
+  record_version: '1.0'
+  asset_type: script
+  purpose: Zero-network tests for unattended SHADOW commissioning.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-08-22'
+  truth_owner: FACTORY_UNATTENDED_SHADOW_VERTICAL_SLICE_V1
+  location: {kind: git_path, logical_uri: 'repo://tests/test_factory_unattended_shadow_vertical_slice.py', repository_path: tests/test_factory_unattended_shadow_vertical_slice.py}
+  integrity: {kind: sha256, sha256: 1ff6b433df4bfcac81bae6633855b7647abf81692eb7b7fd6aa414a6b5f3bb0d}
+  access: {mode: read_only, method: file, network_required: false, secrets_required: false}
+  relations:
+  - {relation_type: depends_on, target_asset_id: MODULE-FACTORY-UNATTENDED-SHADOW-001}
+  consumers: [FACTORY-001, GOAL-OWNER]
+  evidence: []
+  search_terms: ['FACTORY', 'SHADOW', 'TEST']
+  classification: {contains_secrets: false, contains_raw_data: false, sensitivity: INTERNAL_NON_SECRET}
+- asset_id: EVIDENCE-FACTORY-UNATTENDED-SHADOW-RUNTIME-001
+  record_version: '1.0'
+  asset_type: evidence
+  purpose: Live host tick receipt for COMMISSIONING_ONLY unattended SHADOW.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-08-22'
+  truth_owner: FACTORY_UNATTENDED_SHADOW_VERTICAL_SLICE_V1
+  location: {kind: git_path, logical_uri: 'repo://docs/evidence/factory_unattended_shadow/a1_runtime_receipt_v1.json', repository_path: docs/evidence/factory_unattended_shadow/a1_runtime_receipt_v1.json}
+  integrity: {kind: sha256, sha256: 3aecf3ff72b392fc9c9de5b15fdef75946913fba2475dfa70bb42b5004024a79}
+  access: {mode: read_only, method: file, network_required: false, secrets_required: false}
+  relations:
+  - {relation_type: governed_by, target_asset_id: CTRL-FACTORY-UNATTENDED-SHADOW-VERTICAL-SLICE-001}
+  consumers: [FACTORY-001, GOAL-OWNER]
+  evidence: []
+  search_terms: [FACTORY, UNATTENDED_SHADOW, RUNTIME]
+  classification: {contains_secrets: false, contains_raw_data: false, sensitivity: INTERNAL_NON_SECRET}
+- asset_id: EVIDENCE-FACTORY-UNATTENDED-SHADOW-BACKUP-001
+  record_version: '1.0'
+  asset_type: evidence
+  purpose: Live paper SQLite backup bundle receipt with isolated-restore hashes.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-08-22'
+  truth_owner: FACTORY_UNATTENDED_SHADOW_VERTICAL_SLICE_V1
+  location: {kind: git_path, logical_uri: 'repo://docs/evidence/factory_unattended_shadow/a1_backup_receipt_v1.json', repository_path: docs/evidence/factory_unattended_shadow/a1_backup_receipt_v1.json}
+  integrity: {kind: sha256, sha256: 1d17f9ebf1121e442e27d86aafb77788d5bc65e5251f6cd659968039bb695795}
+  access: {mode: read_only, method: file, network_required: false, secrets_required: false}
+  relations:
+  - {relation_type: governed_by, target_asset_id: CTRL-FACTORY-UNATTENDED-SHADOW-VERTICAL-SLICE-001}
+  consumers: [FACTORY-001, GOAL-OWNER]
+  evidence: []
+  search_terms: [FACTORY, UNATTENDED_SHADOW, BACKUP]
+  classification: {contains_secrets: false, contains_raw_data: false, sensitivity: INTERNAL_NON_SECRET}
+- asset_id: EVIDENCE-FACTORY-UNATTENDED-SHADOW-HOST-PROOF-001
+  record_version: '1.0'
+  asset_type: evidence
+  purpose: Aggregated host proof for tick, restart, heartbeat and restore.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-08-22'
+  truth_owner: FACTORY_UNATTENDED_SHADOW_VERTICAL_SLICE_V1
+  location: {kind: git_path, logical_uri: 'repo://docs/evidence/factory_unattended_shadow/a1_host_proof_v1.json', repository_path: docs/evidence/factory_unattended_shadow/a1_host_proof_v1.json}
+  integrity: {kind: sha256, sha256: e58c46215ca48991fd5a565700f6ad1587a631e19584d8d3de618c62fff85802}
+  access: {mode: read_only, method: file, network_required: false, secrets_required: false}
+  relations:
+  - {relation_type: depends_on, target_asset_id: EVIDENCE-FACTORY-UNATTENDED-SHADOW-RUNTIME-001}
+  - {relation_type: depends_on, target_asset_id: EVIDENCE-FACTORY-UNATTENDED-SHADOW-BACKUP-001}
+  consumers: [FACTORY-001, GOAL-OWNER]
+  evidence: []
+  search_terms: [FACTORY, UNATTENDED_SHADOW, HOST_PROOF]
+  classification: {contains_secrets: false, contains_raw_data: false, sensitivity: INTERNAL_NON_SECRET}
+- asset_id: EVIDENCE-FACTORY-UNATTENDED-SHADOW-ACCEPTANCE-001
+  record_version: '1.0'
+  asset_type: evidence
+  purpose: Product acceptance for COMMISSIONING_ONLY unattended SHADOW ops line.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-08-22'
+  truth_owner: FACTORY_UNATTENDED_SHADOW_VERTICAL_SLICE_V1
+  location: {kind: git_path, logical_uri: 'repo://docs/evidence/factory_unattended_shadow/a1_acceptance_v1.json', repository_path: docs/evidence/factory_unattended_shadow/a1_acceptance_v1.json}
+  integrity: {kind: sha256, sha256: 70c07ac509df44e76cffec5ed5a85c5da9e39634a7deb4708ce99d9cc1f10224}
+  access: {mode: read_only, method: file, network_required: false, secrets_required: false}
+  relations:
+  - {relation_type: depends_on, target_asset_id: EVIDENCE-FACTORY-UNATTENDED-SHADOW-HOST-PROOF-001}
+  consumers: [FACTORY-001, GOAL-OWNER]
+  evidence: []
+  search_terms: [FACTORY, UNATTENDED_SHADOW, ACCEPTANCE]
+  classification: {contains_secrets: false, contains_raw_data: false, sensitivity: INTERNAL_NON_SECRET}
+- asset_id: REPORT-FACTORY-UNATTENDED-SHADOW-001
+  record_version: '1.0'
+  asset_type: control_document
+  purpose: Owner readout of COMMISSIONING_ONLY unattended SHADOW product pass.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-08-22'
+  truth_owner: FACTORY_UNATTENDED_SHADOW_VERTICAL_SLICE_V1
+  location: {kind: git_path, logical_uri: 'repo://docs/reports/factory_unattended_shadow/a1_owner_readout_v1.md', repository_path: docs/reports/factory_unattended_shadow/a1_owner_readout_v1.md}
+  integrity: {kind: sha256, sha256: e565bf13c7ac45cdeb2f7a5ba6b8b6db9af3a3c90cf31149a52bff7fa0658000}
+  access: {mode: read_only, method: file, network_required: false, secrets_required: false}
+  relations:
+  - {relation_type: derived_from, target_asset_id: EVIDENCE-FACTORY-UNATTENDED-SHADOW-ACCEPTANCE-001}
+  consumers: [FACTORY-001, GOAL-OWNER]
+  evidence: []
+  search_terms: [FACTORY, UNATTENDED_SHADOW, OWNER_READOUT]
+  classification: {contains_secrets: false, contains_raw_data: false, sensitivity: INTERNAL_NON_SECRET}
+- asset_id: EVIDENCE-FACTORY-UNATTENDED-SHADOW-DELIVERY-INDEPENDENT-REVIEW-001
+  record_version: '1.0'
+  asset_type: evidence
+  purpose: Required-role review evidence for unattended SHADOW vertical slice.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-08-22'
+  truth_owner: FACTORY_UNATTENDED_SHADOW_VERTICAL_SLICE_V1
+  location: {kind: git_path, logical_uri: 'repo://docs/evidence/factory_unattended_shadow/a1_delivery_independent_review_v1.json', repository_path: docs/evidence/factory_unattended_shadow/a1_delivery_independent_review_v1.json}
+  integrity: {kind: none, note: 'Content integrity is owned by the live completion-review-fit hash chain; embedding its SHA here would create an indirect self-reference through the reviewed inventory.'}
+  access: {mode: read_only, method: file, network_required: false, secrets_required: false}
+  relations:
+  - {relation_type: derived_from, target_asset_id: EVIDENCE-FACTORY-UNATTENDED-SHADOW-ACCEPTANCE-001}
+  - {relation_type: depends_on, target_asset_id: SCHEMA-DELIVERY-INDEPENDENT-REVIEW-EVIDENCE-001}
+  consumers: [FACTORY-001, GOAL-OWNER]
+  evidence: []
+  search_terms: [FACTORY, UNATTENDED_SHADOW, DELIVERY]
+  classification: {contains_secrets: false, contains_raw_data: false, sensitivity: INTERNAL_NON_SECRET}
+- asset_id: EVIDENCE-FACTORY-UNATTENDED-SHADOW-DELIVERY-FACTORY-FIT-001
+  record_version: '1.0'
+  asset_type: evidence
+  purpose: FULL Factory Fit for COMMISSIONING_ONLY unattended SHADOW.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-08-22'
+  truth_owner: FACTORY_UNATTENDED_SHADOW_VERTICAL_SLICE_V1
+  location: {kind: git_path, logical_uri: 'repo://docs/evidence/factory_unattended_shadow/a1_delivery_factory_fit_v1.json', repository_path: docs/evidence/factory_unattended_shadow/a1_delivery_factory_fit_v1.json}
+  integrity: {kind: none, note: 'Content integrity is owned by the live completion-review-fit hash chain; embedding its SHA here would create an indirect self-reference through the reviewed inventory.'}
+  access: {mode: read_only, method: file, network_required: false, secrets_required: false}
+  relations:
+  - {relation_type: derived_from, target_asset_id: EVIDENCE-FACTORY-UNATTENDED-SHADOW-ACCEPTANCE-001}
+  - {relation_type: depends_on, target_asset_id: EVIDENCE-FACTORY-UNATTENDED-SHADOW-DELIVERY-INDEPENDENT-REVIEW-001}
+  consumers: [FACTORY-001, GOAL-OWNER]
+  evidence: []
+  search_terms: [FACTORY, UNATTENDED_SHADOW, DELIVERY]
+  classification: {contains_secrets: false, contains_raw_data: false, sensitivity: INTERNAL_NON_SECRET}
+- asset_id: EVIDENCE-FACTORY-UNATTENDED-SHADOW-DELIVERY-COMPLETION-001
+  record_version: '1.0'
+  asset_type: evidence
+  purpose: Guard-consumable completion evidence for unattended SHADOW Atom 2.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-08-22'
+  truth_owner: FACTORY_UNATTENDED_SHADOW_VERTICAL_SLICE_V1
+  location: {kind: git_path, logical_uri: 'repo://docs/evidence/factory_unattended_shadow/a1_delivery_completion_evidence_v1.json', repository_path: docs/evidence/factory_unattended_shadow/a1_delivery_completion_evidence_v1.json}
+  integrity: {kind: none, note: 'Content integrity is owned by the live completion-review-fit hash chain; embedding its SHA here would create an indirect self-reference through the reviewed inventory.'}
+  access: {mode: read_only, method: file, network_required: false, secrets_required: false}
+  relations:
+  - {relation_type: derived_from, target_asset_id: EVIDENCE-FACTORY-UNATTENDED-SHADOW-ACCEPTANCE-001}
+  - {relation_type: depends_on, target_asset_id: EVIDENCE-FACTORY-UNATTENDED-SHADOW-DELIVERY-INDEPENDENT-REVIEW-001}
+  - {relation_type: depends_on, target_asset_id: EVIDENCE-FACTORY-UNATTENDED-SHADOW-DELIVERY-FACTORY-FIT-001}
+  consumers: [FACTORY-001, GOAL-OWNER]
+  evidence: []
+  search_terms: [FACTORY, UNATTENDED_SHADOW, DELIVERY]
   classification: {contains_secrets: false, contains_raw_data: false, sensitivity: INTERNAL_NON_SECRET}

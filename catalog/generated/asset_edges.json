@@ -658,6 +658,21 @@
       "target_asset_id": "CTRL-FACTORY-REMOTE-OPERATIONS-001"
     },
     {
+      "source_asset_id": "CONFIG-FACTORY-UNATTENDED-SHADOW-COHORT-FIXTURE-001",
+      "relation": "governed_by",
+      "target_asset_id": "CTRL-FACTORY-UNATTENDED-SHADOW-VERTICAL-SLICE-001"
+    },
+    {
+      "source_asset_id": "CONFIG-FACTORY-UNATTENDED-SHADOW-VERTICAL-SLICE-001",
+      "relation": "depends_on",
+      "target_asset_id": "STRAT-V-EARLY-LIQ-FLOOR-V1-001"
+    },
+    {
+      "source_asset_id": "CONFIG-FACTORY-UNATTENDED-SHADOW-VERTICAL-SLICE-001",
+      "relation": "governed_by",
+      "target_asset_id": "CTRL-FACTORY-UNATTENDED-SHADOW-VERTICAL-SLICE-001"
+    },
+    {
       "source_asset_id": "CONFIG-FACTORY-V1-COMMISSIONING-001",
       "relation": "depends_on",
       "target_asset_id": "SCHEMA-FACTORY-V1-COMMISSIONING-001"
@@ -2306,6 +2321,36 @@
       "source_asset_id": "CTRL-FACTORY-REMOTE-OPERATIONS-001",
       "relation": "validated_by",
       "target_asset_id": "TEST-FACTORY-REMOTE-OPERATIONS-001"
+    },
+    {
+      "source_asset_id": "CTRL-FACTORY-UNATTENDED-SHADOW-VERTICAL-SLICE-001",
+      "relation": "contains",
+      "target_asset_id": "CONFIG-FACTORY-UNATTENDED-SHADOW-VERTICAL-SLICE-001"
+    },
+    {
+      "source_asset_id": "CTRL-FACTORY-UNATTENDED-SHADOW-VERTICAL-SLICE-001",
+      "relation": "contains",
+      "target_asset_id": "MODULE-FACTORY-UNATTENDED-SHADOW-001"
+    },
+    {
+      "source_asset_id": "CTRL-FACTORY-UNATTENDED-SHADOW-VERTICAL-SLICE-001",
+      "relation": "contains",
+      "target_asset_id": "SCRIPT-FACTORY-UNATTENDED-SHADOW-TICK-001"
+    },
+    {
+      "source_asset_id": "CTRL-FACTORY-UNATTENDED-SHADOW-VERTICAL-SLICE-001",
+      "relation": "validated_by",
+      "target_asset_id": "EVIDENCE-FACTORY-UNATTENDED-SHADOW-ACCEPTANCE-001"
+    },
+    {
+      "source_asset_id": "CTRL-FACTORY-UNATTENDED-SHADOW-VERTICAL-SLICE-001",
+      "relation": "validated_by",
+      "target_asset_id": "EVIDENCE-FACTORY-UNATTENDED-SHADOW-DELIVERY-COMPLETION-001"
+    },
+    {
+      "source_asset_id": "CTRL-FACTORY-UNATTENDED-SHADOW-VERTICAL-SLICE-001",
+      "relation": "validated_by",
+      "target_asset_id": "TEST-FACTORY-UNATTENDED-SHADOW-VERTICAL-SLICE-001"
     },
     {
       "source_asset_id": "CTRL-FACTORY-V1-COMMISSIONING-HYPOTHESIS-001",
@@ -4001,6 +4046,66 @@
       "source_asset_id": "EVIDENCE-FACTORY-REMOTE-OPERATIONS-RUNTIME-001",
       "relation": "derived_from",
       "target_asset_id": "CTRL-FACTORY-REMOTE-OPERATIONS-001"
+    },
+    {
+      "source_asset_id": "EVIDENCE-FACTORY-UNATTENDED-SHADOW-ACCEPTANCE-001",
+      "relation": "depends_on",
+      "target_asset_id": "EVIDENCE-FACTORY-UNATTENDED-SHADOW-HOST-PROOF-001"
+    },
+    {
+      "source_asset_id": "EVIDENCE-FACTORY-UNATTENDED-SHADOW-BACKUP-001",
+      "relation": "governed_by",
+      "target_asset_id": "CTRL-FACTORY-UNATTENDED-SHADOW-VERTICAL-SLICE-001"
+    },
+    {
+      "source_asset_id": "EVIDENCE-FACTORY-UNATTENDED-SHADOW-DELIVERY-COMPLETION-001",
+      "relation": "depends_on",
+      "target_asset_id": "EVIDENCE-FACTORY-UNATTENDED-SHADOW-DELIVERY-FACTORY-FIT-001"
+    },
+    {
+      "source_asset_id": "EVIDENCE-FACTORY-UNATTENDED-SHADOW-DELIVERY-COMPLETION-001",
+      "relation": "depends_on",
+      "target_asset_id": "EVIDENCE-FACTORY-UNATTENDED-SHADOW-DELIVERY-INDEPENDENT-REVIEW-001"
+    },
+    {
+      "source_asset_id": "EVIDENCE-FACTORY-UNATTENDED-SHADOW-DELIVERY-COMPLETION-001",
+      "relation": "derived_from",
+      "target_asset_id": "EVIDENCE-FACTORY-UNATTENDED-SHADOW-ACCEPTANCE-001"
+    },
+    {
+      "source_asset_id": "EVIDENCE-FACTORY-UNATTENDED-SHADOW-DELIVERY-FACTORY-FIT-001",
+      "relation": "depends_on",
+      "target_asset_id": "EVIDENCE-FACTORY-UNATTENDED-SHADOW-DELIVERY-INDEPENDENT-REVIEW-001"
+    },
+    {
+      "source_asset_id": "EVIDENCE-FACTORY-UNATTENDED-SHADOW-DELIVERY-FACTORY-FIT-001",
+      "relation": "derived_from",
+      "target_asset_id": "EVIDENCE-FACTORY-UNATTENDED-SHADOW-ACCEPTANCE-001"
+    },
+    {
+      "source_asset_id": "EVIDENCE-FACTORY-UNATTENDED-SHADOW-DELIVERY-INDEPENDENT-REVIEW-001",
+      "relation": "depends_on",
+      "target_asset_id": "SCHEMA-DELIVERY-INDEPENDENT-REVIEW-EVIDENCE-001"
+    },
+    {
+      "source_asset_id": "EVIDENCE-FACTORY-UNATTENDED-SHADOW-DELIVERY-INDEPENDENT-REVIEW-001",
+      "relation": "derived_from",
+      "target_asset_id": "EVIDENCE-FACTORY-UNATTENDED-SHADOW-ACCEPTANCE-001"
+    },
+    {
+      "source_asset_id": "EVIDENCE-FACTORY-UNATTENDED-SHADOW-HOST-PROOF-001",
+      "relation": "depends_on",
+      "target_asset_id": "EVIDENCE-FACTORY-UNATTENDED-SHADOW-BACKUP-001"
+    },
+    {
+      "source_asset_id": "EVIDENCE-FACTORY-UNATTENDED-SHADOW-HOST-PROOF-001",
+      "relation": "depends_on",
+      "target_asset_id": "EVIDENCE-FACTORY-UNATTENDED-SHADOW-RUNTIME-001"
+    },
+    {
+      "source_asset_id": "EVIDENCE-FACTORY-UNATTENDED-SHADOW-RUNTIME-001",
+      "relation": "governed_by",
+      "target_asset_id": "CTRL-FACTORY-UNATTENDED-SHADOW-VERTICAL-SLICE-001"
     },
     {
       "source_asset_id": "EVIDENCE-FACTORY-V1-COMMISSIONING-ACCEPTANCE-001",
@@ -8068,6 +8173,16 @@
       "target_asset_id": "CTRL-FACTORY-REMOTE-OPERATIONS-001"
     },
     {
+      "source_asset_id": "MODULE-FACTORY-UNATTENDED-SHADOW-001",
+      "relation": "depends_on",
+      "target_asset_id": "MODULE-PAPER-PLANE-ENGINE-001"
+    },
+    {
+      "source_asset_id": "MODULE-FACTORY-UNATTENDED-SHADOW-001",
+      "relation": "governed_by",
+      "target_asset_id": "CTRL-FACTORY-UNATTENDED-SHADOW-VERTICAL-SLICE-001"
+    },
+    {
       "source_asset_id": "MODULE-FACTORY-V1-APPLICATION-001",
       "relation": "depends_on",
       "target_asset_id": "MODULE-FACTORY-V1-COCKPIT-001"
@@ -10013,6 +10128,11 @@
       "target_asset_id": "EVIDENCE-FACTORY-REMOTE-OPERATIONS-ACCEPTANCE-001"
     },
     {
+      "source_asset_id": "REPORT-FACTORY-UNATTENDED-SHADOW-001",
+      "relation": "derived_from",
+      "target_asset_id": "EVIDENCE-FACTORY-UNATTENDED-SHADOW-ACCEPTANCE-001"
+    },
+    {
       "source_asset_id": "REPORT-FACTORY-V1-COMMISSIONING-001",
       "relation": "derived_from",
       "target_asset_id": "EVIDENCE-FACTORY-V1-COMMISSIONING-ACCEPTANCE-001"
@@ -11028,6 +11148,16 @@
       "target_asset_id": "MODULE-FACTORY-REMOTE-OPS-001"
     },
     {
+      "source_asset_id": "SCRIPT-FACTORY-UNATTENDED-SHADOW-TICK-001",
+      "relation": "depends_on",
+      "target_asset_id": "MODULE-FACTORY-UNATTENDED-SHADOW-001"
+    },
+    {
+      "source_asset_id": "SCRIPT-FACTORY-UNATTENDED-SHADOW-TICK-001",
+      "relation": "governed_by",
+      "target_asset_id": "CTRL-FACTORY-UNATTENDED-SHADOW-VERTICAL-SLICE-001"
+    },
+    {
       "source_asset_id": "SCRIPT-FACTORY-V1-COMMISSIONING-CAPTURE-001",
       "relation": "depends_on",
       "target_asset_id": "MODULE-FACTORY-V1-APPLICATION-001"
@@ -11916,6 +12046,11 @@
       "source_asset_id": "TEST-FACTORY-REMOTE-OPERATIONS-001",
       "relation": "depends_on",
       "target_asset_id": "MODULE-FACTORY-REMOTE-OPS-001"
+    },
+    {
+      "source_asset_id": "TEST-FACTORY-UNATTENDED-SHADOW-VERTICAL-SLICE-001",
+      "relation": "depends_on",
+      "target_asset_id": "MODULE-FACTORY-UNATTENDED-SHADOW-001"
     },
     {
       "source_asset_id": "TEST-FACTORY-V1-COMMISSIONING-001",

@@ -334,3 +334,106 @@ def run_commissioning(
         }
     finally:
         store.close()
+
+
+def observe_shadow(
+    store: PaperPlaneStore,
+    *,
+    bot_instance_id: str,
+    mint: str,
+    notional_usd: Decimal,
+) -> tuple[str, str]:
+    """SHADOW observation lifecycle. Never REAL_FILL."""
+
+    position_id = store.open_position(
+        bot_instance_id=bot_instance_id,
+        mint=mint,
+        signal_kind="SHADOW_EXECUTABLE",
+    )
+    store.transition(position_id, "SIGNALLED")
+    store.transition(position_id, "INTENT_CREATED")
+    store.transition(position_id, "ATTEMPTING")
+    store.transition(position_id, "OPEN")
+    store._conn.execute(
+        "UPDATE positions SET entered_notional_usd=? WHERE position_id=?",
+        (float(notional_usd), position_id),
+    )
+    store._conn.commit()
+    return position_id, "SHADOW_EXECUTABLE"
+
+
+def run_shadow_tick(
+    root: Path,
+    *,
+    strategy_relative: str,
+    store_path: Path,
+    cohort: list[Mapping[str, Any]],
+    max_rows: int | None = None,
+) -> dict[str, Any]:
+    """One unattended SHADOW tick for a COMMISSIONING_ONLY StrategyVersion."""
+
+    strategy = load_strategy_version(root, strategy_relative)
+    if strategy.get("commissioning_only") is not True:
+        raise PaperPlaneError("SHADOW_REQUIRES_COMMISSIONING_ONLY")
+    if strategy.get("mode_eligibility", {}).get("shadow") is not True:
+        raise PaperPlaneError("SHADOW_MODE_NOT_ELIGIBLE")
+    if strategy.get("mode_eligibility", {}).get("micro_live") is not False:
+        raise PaperPlaneError("MICRO_LIVE_FORBIDDEN")
+
+    store = PaperPlaneStore(store_path)
+    try:
+        bot = store.start_bot(strategy, mode="SHADOW")
+        observed = 0
+        skipped = 0
+        rows = list(cohort) if max_rows is None else list(cohort)[:max_rows]
+        for row in rows:
+            kind = signal_kind_for(strategy, row)
+            if kind == "REAL_FILL":
+                raise PaperPlaneError("REAL_FILL_FORBIDDEN_IN_SHADOW_TICK")
+            # Config entry may name SIMULATED_FILL; SHADOW tick maps a positive
+            # signal to SHADOW_EXECUTABLE observation without claiming fill.
+            if kind in {"SIMULATED_FILL", "SHADOW_EXECUTABLE"}:
+                position_id = store.position_id_for(
+                    bot_instance_id=bot["bot_instance_id"],
+                    mint=str(row.get("mint")),
+                    signal_kind="SHADOW_EXECUTABLE",
+                )
+                existing = store.get_position(position_id)
+                if existing is not None and existing["state"] == "RECONCILED":
+                    observed += 1
+                    continue
+                _, realized = observe_shadow(
+                    store,
+                    bot_instance_id=bot["bot_instance_id"],
+                    mint=str(row.get("mint")),
+                    notional_usd=Decimal(str(strategy["notional_policy"]["notional_usd"])),
+                )
+                if realized != "SHADOW_EXECUTABLE":
+                    raise PaperPlaneError("SHADOW_SIGNAL_DRIFT")
+                store.transition(position_id, "EXIT_REQUIRED")
+                store.transition(position_id, "EXITING")
+                store.transition(position_id, "CLOSED")
+                store.transition(position_id, "RECONCILED")
+                observed += 1
+            else:
+                skipped += 1
+        progress_at = _now()
+        return {
+            "engine": "paper_plane_v1",
+            "mode": "SHADOW",
+            "commissioning_only": True,
+            "factory_core_python_changed": False,
+            "strategy_relative": strategy_relative,
+            "strategy_id": strategy["strategy_id"],
+            "bot_instance_id": bot["bot_instance_id"],
+            "shadow_observations": observed,
+            "no_signal_or_unknown": skipped,
+            "progress_at": progress_at,
+            "bot_instances": store.bots(),
+            "positions": store.positions(),
+            "open_positions": sum(
+                1 for item in store.positions() if item["state"] not in {"RECONCILED", "CLOSED"}
+            ),
+        }
+    finally:
+        store.close()

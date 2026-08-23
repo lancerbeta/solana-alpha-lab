@@ -382,15 +382,21 @@ def project_health(
     }
 
 
-def write_heartbeat(root: Path, *, config: Mapping[str, Any] | None = None) -> Path:
+def write_heartbeat(
+    root: Path,
+    *,
+    config: Mapping[str, Any] | None = None,
+    kind: str = "PAPER_HEARTBEAT",
+    progress_at: str | None = None,
+) -> Path:
     loaded = dict(config) if config is not None else load_config(root)
     path = _safe_relative(root, str(loaded["monitoring"]["heartbeat_relative"]))
     path.parent.mkdir(parents=True, exist_ok=True)
     stamp = _now()
     payload = {
-        "kind": "PAPER_HEARTBEAT",
+        "kind": kind,
         "observed_at": stamp,
-        "progress_at": stamp,
+        "progress_at": progress_at or stamp,
         "deploy_version": loaded["deploy"]["version"],
     }
     path.write_text(json.dumps(payload, indent=2, sort_keys=True) + "\n", encoding="utf-8")

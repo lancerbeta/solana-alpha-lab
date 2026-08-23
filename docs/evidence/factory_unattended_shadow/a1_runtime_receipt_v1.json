@@ -1,0 +1,142 @@
+{
+  "atom_id": "FACTORY_UNATTENDED_SHADOW_VERTICAL_SLICE_V1",
+  "cohort_rows_available": 12,
+  "commissioning_only": true,
+  "factory_core_python_changed": false,
+  "factory_runner_sha256": "d8d22bcb51fb6992d40f09e58274c52e0f9942c12d043cc57b96ffca524e918f",
+  "heartbeat_path": "local/factory_v1/paper_heartbeat.json",
+  "non_claims": {
+    "alpha": false,
+    "factory_v1_operational_ready": false,
+    "micro_live": false,
+    "netreturn": false,
+    "real_fills": false,
+    "scientific_shadow_pass": false
+  },
+  "operations_view": {
+    "blocker": "NONE",
+    "bot": "BOT-STRAT-V-EARLY-LIQ-FLOOR-V1-SHADOW",
+    "exit_readiness": "IDLE",
+    "mode": "SHADOW",
+    "next_safe_action": "CONTINUE_SHADOW_COMMISSIONING",
+    "position": "NONE_OPEN",
+    "reconciliation": "CLEAN",
+    "signal": "SHADOW_EXECUTABLE",
+    "strategy": "STRAT-V-EARLY-LIQ-FLOOR"
+  },
+  "scientific_shadow_pass": false,
+  "tick": {
+    "bot_instance_id": "BOT-STRAT-V-EARLY-LIQ-FLOOR-V1-SHADOW",
+    "bot_instances": [
+      {
+        "bot_instance_id": "BOT-STRAT-V-EARLY-LIQ-FLOOR-V1-SHADOW",
+        "mode": "SHADOW",
+        "started_at": "2026-08-22T22:43:21Z",
+        "status": "RUNNING",
+        "stopped_at": null,
+        "strategy_id": "STRAT-V-EARLY-LIQ-FLOOR",
+        "strategy_version": "STRAT-V-EARLY-LIQ-FLOOR-V1"
+      }
+    ],
+    "commissioning_only": true,
+    "engine": "paper_plane_v1",
+    "factory_core_python_changed": false,
+    "mode": "SHADOW",
+    "no_signal_or_unknown": 0,
+    "open_positions": 0,
+    "positions": [
+      {
+        "bot_instance_id": "BOT-STRAT-V-EARLY-LIQ-FLOOR-V1-SHADOW",
+        "closed_at": "2026-08-22T22:43:21Z",
+        "entered_notional_usd": 100.0,
+        "exit_notional_usd": null,
+        "mint": "24y7PiS7EoTJRG7FcmJwR7AaT39yeSWVLERYakY3pump",
+        "opened_at": "2026-08-22T22:43:21Z",
+        "position_id": "POS-BOT-STRAT-V-EARLY-LIQ-FLOOR-V1-SHADOW-24y7PiS7EoTJ-SHADOW_EXECUTABLE",
+        "signal_kind": "SHADOW_EXECUTABLE",
+        "state": "RECONCILED"
+      },
+      {
+        "bot_instance_id": "BOT-STRAT-V-EARLY-LIQ-FLOOR-V1-SHADOW",
+        "closed_at": "2026-08-22T22:43:21Z",
+        "entered_notional_usd": 100.0,
+        "exit_notional_usd": null,
+        "mint": "3PSfnWrG7tqZAYMndjqbohwy5sEozhM3CWZj5hudQV7F",
+        "opened_at": "2026-08-22T22:43:21Z",
+        "position_id": "POS-BOT-STRAT-V-EARLY-LIQ-FLOOR-V1-SHADOW-3PSfnWrG7tqZ-SHADOW_EXECUTABLE",
+        "signal_kind": "SHADOW_EXECUTABLE",
+        "state": "RECONCILED"
+      },
+      {
+        "bot_instance_id": "BOT-STRAT-V-EARLY-LIQ-FLOOR-V1-SHADOW",
+        "closed_at": "2026-08-22T22:43:21Z",
+        "entered_notional_usd": 100.0,
+        "exit_notional_usd": null,
+        "mint": "4kR7KAoAeUVy5TWzMSSP3j4edipHGa3qPbTtrBYEpump",
+        "opened_at": "2026-08-22T22:43:21Z",
+        "position_id": "POS-BOT-STRAT-V-EARLY-LIQ-FLOOR-V1-SHADOW-4kR7KAoAeUVy-SHADOW_EXECUTABLE",
+        "signal_kind": "SHADOW_EXECUTABLE",
+        "state": "RECONCILED"
+      },
+      {
+        "bot_instance_id": "BOT-STRAT-V-EARLY-LIQ-FLOOR-V1-SHADOW",
+        "closed_at": "2026-08-22T22:43:21Z",
+        "entered_notional_usd": 100.0,
+        "exit_notional_usd": null,
+        "mint": "5Aw1L1mCBFNZQvQBaPWzAo4HFTtuD2VHP4khgipjpump",
+        "opened_at": "2026-08-22T22:43:21Z",
+        "position_id": "POS-BOT-STRAT-V-EARLY-LIQ-FLOOR-V1-SHADOW-5Aw1L1mCBFNZ-SHADOW_EXECUTABLE",
+        "signal_kind": "SHADOW_EXECUTABLE",
+        "state": "RECONCILED"
+      },
+      {
+        "bot_instance_id": "BOT-STRAT-V-EARLY-LIQ-FLOOR-V1-SHADOW",
+        "closed_at": "2026-08-22T22:43:21Z",
+        "entered_notional_usd": 100.0,
+        "exit_notional_usd": null,
+        "mint": "5gvpURKi7g695zd7jJPVkyY3bo11fccsv2XBhkqApump",
+        "opened_at": "2026-08-22T22:43:21Z",
+        "position_id": "POS-BOT-STRAT-V-EARLY-LIQ-FLOOR-V1-SHADOW-5gvpURKi7g69-SHADOW_EXECUTABLE",
+        "signal_kind": "SHADOW_EXECUTABLE",
+        "state": "RECONCILED"
+      },
+      {
+        "bot_instance_id": "BOT-STRAT-V-EARLY-LIQ-FLOOR-V1-SHADOW",
+        "closed_at": "2026-08-22T22:43:21Z",
+        "entered_notional_usd": 100.0,
+        "exit_notional_usd": null,
+        "mint": "5zJGbdRNWP4obMYa3PxzCiFmE6rneR61oDg8fmp1pump",
+        "opened_at": "2026-08-22T22:43:21Z",
+        "position_id": "POS-BOT-STRAT-V-EARLY-LIQ-FLOOR-V1-SHADOW-5zJGbdRNWP4o-SHADOW_EXECUTABLE",
+        "signal_kind": "SHADOW_EXECUTABLE",
+        "state": "RECONCILED"
+      },
+      {
+        "bot_instance_id": "BOT-STRAT-V-EARLY-LIQ-FLOOR-V1-SHADOW",
+        "closed_at": "2026-08-22T22:43:21Z",
+        "entered_notional_usd": 100.0,
+        "exit_notional_usd": null,
+        "mint": "6AzxAKbvcENnDBgfAdZKBMWYKxAd5LCypEGZoLx7pump",
+        "opened_at": "2026-08-22T22:43:21Z",
+        "position_id": "POS-BOT-STRAT-V-EARLY-LIQ-FLOOR-V1-SHADOW-6AzxAKbvcENn-SHADOW_EXECUTABLE",
+        "signal_kind": "SHADOW_EXECUTABLE",
+        "state": "RECONCILED"
+      },
+      {
+        "bot_instance_id": "BOT-STRAT-V-EARLY-LIQ-FLOOR-V1-SHADOW",
+        "closed_at": "2026-08-22T22:43:21Z",
+        "entered_notional_usd": 100.0,
+        "exit_notional_usd": null,
+        "mint": "6VTduCit8TuG6jiepAmAAiM6xYRLCJEihtsqGktRpump",
+        "opened_at": "2026-08-22T22:43:21Z",
+        "position_id": "POS-BOT-STRAT-V-EARLY-LIQ-FLOOR-V1-SHADOW-6VTduCit8TuG-SHADOW_EXECUTABLE",
+        "signal_kind": "SHADOW_EXECUTABLE",
+        "state": "RECONCILED"
+      }
+    ],
+    "progress_at": "2026-08-22T22:43:21Z",
+    "shadow_observations": 8,
+    "strategy_id": "STRAT-V-EARLY-LIQ-FLOOR",
+    "strategy_relative": "configs/strategies/STRAT-V-EARLY-LIQ-FLOOR-COMMISSIONING-V1.yaml"
+  }
+}
