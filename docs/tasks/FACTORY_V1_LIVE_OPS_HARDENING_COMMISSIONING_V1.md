@@ -22,11 +22,13 @@ managed_write_set:
 - configs/factory_v1_live_ops_hardening_v1.yaml
 - configs/factory_v1_operational_readiness_closeout_v1.yaml
 - catalog/schemas/factory_v1_live_ops_hardening.schema.json
+- catalog/schemas/factory_v1_live_ops_hardening_host_proof.schema.json
 - src/solana_alpha_lab/factory/remote_ops.py
 - src/solana_alpha_lab/factory/live_ops_hardening.py
 - src/solana_alpha_lab/factory/operational_readiness_closeout.py
 - scripts/run_factory_v1_live_ops_hardening.py
 - scripts/factory_live_release.py
+- scripts/factory_remote_doctor.py
 - tests/test_factory_v1_live_ops_hardening.py
 - tests/test_factory_remote_operations.py
 - tests/test_factory_v1_operational_readiness_closeout.py
