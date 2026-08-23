@@ -14,6 +14,14 @@ FACTORY_RUNNER_SHA256 = (
     "d8d22bcb51fb6992d40f09e58274c52e0f9942c12d043cc57b96ffca524e918f"
 )
 
+A4_DATA_PREDICATE_IDS = frozenset(
+    {
+        "DATA_FACTORY_PIT_LINEAGE_RECEIPT",
+        "DATA_EXPLICIT_MISSINGNESS",
+        "TIME_TO_EVIDENCE_FIRST_BYTE",
+    }
+)
+
 
 class CloseoutError(ValueError):
     """Fail-closed closeout evaluation error."""
@@ -189,7 +197,14 @@ def evaluate_closeout(root: Path) -> dict[str, Any]:
     if gaps:
         terminal = "FACTORY_PRODUCTIZATION_REPLAN"
         ready = False
-        next_safe = "CLOSE_NAMED_REPLAN_GAPS_BEFORE_ATOM4"
+        failed_ids = {
+            item["id"] for item in results if item["verdict"] != "PASS"
+        }
+        next_safe = (
+            "PIT_CANONICALIZATION_EVIDENCE_INSUFFICIENT"
+            if failed_ids & A4_DATA_PREDICATE_IDS
+            else "A5_LIVE_OPS_HARDENING_COMMISSIONING"
+        )
     else:
         terminal = "FACTORY_V1_OPERATIONAL_READY"
         ready = True

@@ -41,6 +41,10 @@ class FactoryV1OperationalReadinessCloseoutTests(unittest.TestCase):
         self.assertNotIn("DATA_EXPLICIT_MISSINGNESS", gap_ids)
         self.assertNotIn("TIME_TO_EVIDENCE_FIRST_BYTE", gap_ids)
         self.assertIn("ENTRY_GATE_RESOLVES_READINESS_CONTRACT", gap_ids)
+        self.assertEqual(
+            gate["next_safe_action"],
+            "A5_LIVE_OPS_HARDENING_COMMISSIONING",
+        )
         # Must still pass known slice predicates (positive fields, not proxies).
         by_id = {item["id"]: item for item in gate["predicates"]}
         self.assertEqual(by_id["COMMISSIONING_GOLDEN_REPLAY"]["verdict"], "PASS")
@@ -206,6 +210,43 @@ class FactoryV1OperationalReadinessCloseoutTests(unittest.TestCase):
             gate = evaluate_closeout(root)
             self.assertEqual(gate["terminal"], "FACTORY_PRODUCTIZATION_REPLAN")
             self.assertTrue(gate["named_gaps"][0].startswith("MISSING_ONE:MISSING_EVIDENCE:"))
+
+    def test_a4_data_gap_routes_to_data_replan(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            (root / "configs").mkdir()
+            (root / "src/solana_alpha_lab/factory").mkdir(parents=True)
+            (root / "src/solana_alpha_lab/factory/runner.py").write_bytes(
+                (ROOT / "src/solana_alpha_lab/factory/runner.py").read_bytes()
+            )
+            cfg = {
+                "task_id": "T",
+                "as_of": "2026-08-23",
+                "runner_path": "src/solana_alpha_lab/factory/runner.py",
+                "runner_pin_sha256": FACTORY_RUNNER_SHA256,
+                "foundation_freeze_on_ready": True,
+                "reconciled_product_stage_on_any_closeout": {"owner_cockpit": "X"},
+                "non_claims": ["NO_ALPHA"],
+                "predicates": [
+                    {
+                        "id": "DATA_EXPLICIT_MISSINGNESS",
+                        "dimension": "data",
+                        "evidence_path": "docs/missing.json",
+                        "require": {"terminal": "PASS"},
+                    }
+                ],
+            }
+            (root / "configs/factory_v1_operational_readiness_closeout_v1.yaml").write_text(
+                __import__("yaml").safe_dump(cfg, sort_keys=False),
+                encoding="utf-8",
+            )
+
+            gate = evaluate_closeout(root)
+
+            self.assertEqual(
+                gate["next_safe_action"],
+                "PIT_CANONICALIZATION_EVIDENCE_INSUFFICIENT",
+            )
 
     def test_a4_receipt_hash_and_schema_binding_fail_closed(self) -> None:
         with tempfile.TemporaryDirectory() as tmp:

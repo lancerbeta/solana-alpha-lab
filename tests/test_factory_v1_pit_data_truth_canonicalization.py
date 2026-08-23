@@ -112,6 +112,60 @@ class FactoryV1PitDataTruthCanonicalizationTests(unittest.TestCase):
         self.assertEqual(projected["reason"], "FDV_OR_SUBSTITUTE_REJECTED")
         self.assertIsNone(projected["value"])
 
+    def test_missing_mcap_or_liquidity_stays_typed_missing(self) -> None:
+        module = _projector_module()
+        runtime = json.loads(
+            (
+                ROOT
+                / "docs/evidence/early_structural_backing_pit_commissioning/"
+                "a1_window_a_runtime_receipt_v1.json"
+            ).read_text(encoding="utf-8")
+        )
+        row = deepcopy(
+            next(
+                item
+                for item in runtime["candidate_observations"]
+                if item["x_status"] == "ELIGIBLE"
+            )
+        )
+        row["x_inputs"]["mcap"] = None
+        row["x"] = None
+        row["x_status"] = "MISSING"
+        row["x_reason"] = "MCAP_OR_LIQUIDITY_MISSING"
+
+        projected = module.project_candidate(row)
+
+        self.assertEqual(projected["status"], "MISSING")
+        self.assertEqual(projected["reason"], "MCAP_OR_LIQUIDITY_MISSING")
+        self.assertIsNone(projected["value"])
+
+    def test_non_positive_input_stays_typed_invalid(self) -> None:
+        module = _projector_module()
+        runtime = json.loads(
+            (
+                ROOT
+                / "docs/evidence/early_structural_backing_pit_commissioning/"
+                "a1_window_a_runtime_receipt_v1.json"
+            ).read_text(encoding="utf-8")
+        )
+        row = deepcopy(
+            next(
+                item
+                for item in runtime["candidate_observations"]
+                if item["x_status"] == "ELIGIBLE"
+            )
+        )
+        row["x_inputs"]["liquidity"] = 0
+        row["x"] = None
+        row["x_status"] = "MISSING"
+        row["x_reason"] = "INVALID_INPUT"
+
+        projected = module.project_candidate(row)
+
+        self.assertEqual(projected["status"], "MISSING")
+        self.assertEqual(projected["reason"], "INVALID_INPUT")
+        self.assertIsNone(projected["value"])
+
     def test_fdv_field_cannot_enter_the_canonical_input(self) -> None:
         module = _projector_module()
         runtime = json.loads(

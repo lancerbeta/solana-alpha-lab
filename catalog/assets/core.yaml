@@ -30464,7 +30464,7 @@ records:
   as_of: '2026-08-23'
   truth_owner: FACTORY_V1_OPERATIONAL_READINESS_CLOSEOUT_V1
   location: {kind: git_path, logical_uri: 'repo://src/solana_alpha_lab/factory/operational_readiness_closeout.py', repository_path: src/solana_alpha_lab/factory/operational_readiness_closeout.py}
-  integrity: {kind: sha256, sha256: 72c04ce364063256bcd4bc3fb684a912d31f6c356b7e6e2c4b087e661354fe5e}
+  integrity: {kind: sha256, sha256: 3f7da9048de0a955a40ff294ba9098b643113af32eb7fc06abbb39ddd938b375}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: governed_by, target_asset_id: CTRL-FACTORY-V1-OPERATIONAL-READINESS-CLOSEOUT-001}
@@ -30498,7 +30498,7 @@ records:
   as_of: '2026-08-23'
   truth_owner: FACTORY_V1_OPERATIONAL_READINESS_CLOSEOUT_V1
   location: {kind: git_path, logical_uri: 'repo://tests/test_factory_v1_operational_readiness_closeout.py', repository_path: tests/test_factory_v1_operational_readiness_closeout.py}
-  integrity: {kind: sha256, sha256: 40992d1d598ef46383a0d9fa2d541604e95d913b6e98566d23a9d1441042678e}
+  integrity: {kind: sha256, sha256: ee4ea0b8924f894b524fc856bf593daf8902b54d006fd66027f35dea5a58e771}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: depends_on, target_asset_id: MODULE-FACTORY-V1-OPERATIONAL-READINESS-CLOSEOUT-001}
@@ -30699,7 +30699,7 @@ records:
   as_of: '2026-08-23'
   truth_owner: FACTORY_V1_PIT_DATA_TRUTH_CANONICALIZATION_V1
   location: {kind: git_path, logical_uri: 'repo://tests/test_factory_v1_pit_data_truth_canonicalization.py', repository_path: tests/test_factory_v1_pit_data_truth_canonicalization.py}
-  integrity: {kind: sha256, sha256: 4a59f601ec3c3d95d9c308e571fb30232bf51b20cd53f6b7d8a0ef1fa8ba21e3}
+  integrity: {kind: sha256, sha256: e0f0bf5af69aff989c417afafc75eb6b6ea6a459d4bb0c2d6155c9b618fc09ec}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: depends_on, target_asset_id: MODULE-FACTORY-V1-PIT-DATA-TRUTH-CANONICALIZATION-001}
