@@ -45,15 +45,25 @@ def sha256(path: Path) -> str:
 
 
 class FactoryCommonMarketFeatureSurfaceTests(unittest.TestCase):
-    def test_surface_config_validates_and_has_no_pit_ready(self) -> None:
+    def test_surface_config_validates_and_exposes_bounded_pit_ready_feature(self) -> None:
         config = load_surface_config(ROOT)
         jsonschema.validate(
             config, json.loads(SURFACE_SCHEMA.read_text(encoding="utf-8"))
         )
-        self.assertEqual(len(config["features"]), 18)
-        self.assertFalse(
-            any(item["availability_class"] == "PIT_READY" for item in config["features"])
+        self.assertEqual(len(config["features"]), 19)
+        pit = next(
+            item
+            for item in config["features"]
+            if item["feature_id"] == "FEAT-TOKEN-LIQUIDITY-USD-TO-MCAP-RATIO"
         )
+        self.assertEqual(pit["availability_class"], "PIT_READY")
+        self.assertEqual(pit["entity_scope"], "MINT_DECISION_SNAPSHOT")
+        inverse = next(
+            item
+            for item in config["features"]
+            if item["feature_id"] == "FEAT-MCAP-TO-LIQUIDITY"
+        )
+        self.assertEqual(inverse["availability_class"], "MISSING")
         cluster = next(
             item
             for item in config["features"]

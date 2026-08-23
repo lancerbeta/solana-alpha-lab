@@ -1,0 +1,34 @@
+{
+  "factory_runner": {
+    "changed": false,
+    "path": "src/solana_alpha_lab/factory/runner.py",
+    "sha256": "d8d22bcb51fb6992d40f09e58274c52e0f9942c12d043cc57b96ffca524e918f"
+  },
+  "projection": {
+    "candidate_count": 24,
+    "decision_snapshot_at": "2026-08-22T20:23:39Z",
+    "eligible_count": 19,
+    "missing_count": 5,
+    "missing_reason_counts": {
+      "FDV_OR_SUBSTITUTE_REJECTED": 2,
+      "LIQUIDITY_BELOW_ICP_MIN": 1,
+      "UPDATED_TIMESTAMP_IN_FUTURE": 2
+    }
+  },
+  "schema": "smial.factory-v1-pit-data-truth-canonicalization.runtime-receipt",
+  "schema_version": "1.0",
+  "side_effects": {
+    "cash_spend_usd_cents": 0,
+    "credential_reads": 0,
+    "network_calls": 0,
+    "provider_calls": 0,
+    "wallet_signer_transaction_actions": 0
+  },
+  "source": {
+    "path": "docs/evidence/early_structural_backing_pit_commissioning/a1_window_a_runtime_receipt_v1.json",
+    "retention": "A4_OUTSIDE_GIT_RAW_BYTES_NOT_IMPORTED",
+    "sha256": "8a6647de6e22de81a2be59474bc6e2021ceae740b778113b820b99b158c948be"
+  },
+  "task_id": "FACTORY_V1_PIT_DATA_TRUTH_CANONICALIZATION_V1",
+  "terminal": "FACTORY_V1_PIT_DATA_TRUTH_CANONICALIZATION_PASS"
+}

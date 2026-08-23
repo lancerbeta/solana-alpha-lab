@@ -1,0 +1,39 @@
+{
+  "as_of": "2026-08-23",
+  "capability_radar": {
+    "now": "PIT_DATA_TRUTH_CANONICALIZATION_PASS",
+    "watch": "A5_LIVE_OPS_HARDENING_COMMISSIONING"
+  },
+  "dimensions": {
+    "build_vs_buy": "PASS_REUSE_ACCEPTED_ATOM1_BYTES_WITH_THIN_PROJECTOR",
+    "context_efficiency": "PASS_ZERO_NETWORK_CANONICALIZATION",
+    "execution_to_cashflow": "NOT_APPLICABLE_NO_EXECUTION_IN_A4",
+    "flexibility_and_history": "PASS_RUNNER_AND_HISTORICAL_RECEIPTS_PRESERVED",
+    "mission": "PASS_REUSABLE_PIT_TRUTH_WITHOUT_FALSE_READY",
+    "monitoring_and_recovery": "PASS_TYPED_GAPS_AND_HASH_BOUND_RECEIPTS",
+    "owner_operability": "PASS_RUSSIAN_READOUT_AND_REPRODUCER_COMMAND",
+    "red_team": "PASS_FDV_FUTURE_TIMESTAMP_ZERO_AND_RATIO_DRIFT_REJECTED",
+    "research_truth": "PASS_EXPLICIT_PIT_SCOPE_AND_MISSINGNESS",
+    "security": "PASS_NO_CURRENT_NETWORK_CREDENTIAL_OR_CASH_SIDE_EFFECTS"
+  },
+  "limits": [
+    "NO_PROVIDER",
+    "NO_NEW_CAPTURE",
+    "NO_SCIENTIFIC_REEVALUATION",
+    "NO_SHADOW_OR_VPS",
+    "NO_ALPHA_OR_NETRETURN",
+    "NO_FACTORY_V1_OPERATIONAL_READY",
+    "NO_FOUNDATION_FREEZE",
+    "NO_CANONICAL_DONE",
+    "CAPABILITY_PASS_IS_NOT_PROMOTION"
+  ],
+  "mode": "FULL_REVIEW",
+  "recovery": "REVERT_THIS_ATOM; PRESERVE_ATOM1_RECEIPTS_AND_FACTORY_RUNNER; KEEP_TYPED_GAPS.",
+  "review_id": "FACTORY-V1-PIT-DATA-TRUTH-CANONICALIZATION-FACTORY-FIT-001",
+  "reviewed_bindings_sha256": "19ea3c0cbd04ac91a9094e59f2076edd90f0aee3107ba61fcff353b47d7ff72c",
+  "reviewed_inventory_sha256": "6e445182d7d40d7b592029c11891f741ef450623f3556e68ccf56e5d688228df",
+  "schema": "smial.delivery-harness-factory-fit",
+  "schema_version": "1.0",
+  "task_id": "FACTORY_V1_PIT_DATA_TRUTH_CANONICALIZATION_V1",
+  "verdict": "PASS"
+}

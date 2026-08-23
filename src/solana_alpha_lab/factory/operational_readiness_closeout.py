@@ -7,10 +7,23 @@ import json
 from pathlib import Path
 from typing import Any
 
+import jsonschema
 import yaml
 
 FACTORY_RUNNER_SHA256 = (
     "d8d22bcb51fb6992d40f09e58274c52e0f9942c12d043cc57b96ffca524e918f"
+)
+
+A4_PIT_ACCEPTANCE_RELATIVE = (
+    "docs/evidence/factory_v1_pit_data_truth_canonicalization/a1_acceptance_v1.json"
+)
+
+A4_DATA_PREDICATE_IDS = frozenset(
+    {
+        "DATA_FACTORY_PIT_LINEAGE_RECEIPT",
+        "DATA_EXPLICIT_MISSINGNESS",
+        "TIME_TO_EVIDENCE_FIRST_BYTE",
+    }
 )
 
 
@@ -34,6 +47,22 @@ def _load_json(path: Path) -> dict[str, Any]:
     if not isinstance(payload, dict):
         raise CloseoutError(f"JSON_NOT_OBJECT:{path.as_posix()}")
     return payload
+
+
+def _a4_replay_error(
+    root: Path, evidence_relative: str, payload: dict[str, Any]
+) -> str | None:
+    if evidence_relative != A4_PIT_ACCEPTANCE_RELATIVE:
+        return None
+    try:
+        from solana_alpha_lab.factory.pit_data_truth_canonicalization import (
+            canonicalize_from_repository,
+        )
+
+        canonical = canonicalize_from_repository(root)
+    except Exception:
+        return "EVIDENCE_REPLAY_FAILED"
+    return None if payload == canonical else "EVIDENCE_REPLAY_MISMATCH"
 
 
 def _dig(payload: dict[str, Any], dotted: str) -> Any:
@@ -94,6 +123,65 @@ def evaluate_predicate(
     if not isinstance(require, dict) or not require:
         raise CloseoutError(f"PREDICATE_REQUIRE_INVALID:{pred_id}")
     payload = _load_json(evidence_path)
+    schema_rel = predicate.get("schema_path")
+    schema_sha = predicate.get("schema_sha256")
+    evidence_sha = predicate.get("evidence_sha256")
+    if any(value is not None for value in (schema_rel, schema_sha, evidence_sha)):
+        if not all(
+            isinstance(value, str) and value
+            for value in (schema_rel, schema_sha, evidence_sha)
+        ):
+            raise CloseoutError(f"PREDICATE_SCHEMA_BINDING_INVALID:{pred_id}")
+        schema_path = root / str(schema_rel)
+        if not schema_path.is_file():
+            return {
+                "id": pred_id,
+                "dimension": predicate.get("dimension"),
+                "verdict": "FAIL",
+                "gap": f"MISSING_SCHEMA:{schema_rel}",
+                "evidence_path": evidence_rel,
+            }
+        if _sha256(evidence_path) != evidence_sha:
+            return {
+                "id": pred_id,
+                "dimension": predicate.get("dimension"),
+                "verdict": "FAIL",
+                "gap": "EVIDENCE_HASH_MISMATCH",
+                "evidence_path": evidence_rel,
+            }
+        if _sha256(schema_path) != schema_sha:
+            return {
+                "id": pred_id,
+                "dimension": predicate.get("dimension"),
+                "verdict": "FAIL",
+                "gap": "SCHEMA_HASH_MISMATCH",
+                "evidence_path": evidence_rel,
+            }
+        try:
+            schema_payload = _load_json(schema_path)
+            jsonschema.validate(payload, schema_payload)
+        except (
+            OSError,
+            json.JSONDecodeError,
+            jsonschema.SchemaError,
+            jsonschema.ValidationError,
+        ):
+            return {
+                "id": pred_id,
+                "dimension": predicate.get("dimension"),
+                "verdict": "FAIL",
+                "gap": "EVIDENCE_SCHEMA_INVALID",
+                "evidence_path": evidence_rel,
+            }
+        replay_error = _a4_replay_error(root, evidence_rel, payload)
+        if replay_error is not None:
+            return {
+                "id": pred_id,
+                "dimension": predicate.get("dimension"),
+                "verdict": "FAIL",
+                "gap": replay_error,
+                "evidence_path": evidence_rel,
+            }
     for key, expected in require.items():
         observed = _dig(payload, str(key))
         if observed != expected:
@@ -138,7 +226,14 @@ def evaluate_closeout(root: Path) -> dict[str, Any]:
     if gaps:
         terminal = "FACTORY_PRODUCTIZATION_REPLAN"
         ready = False
-        next_safe = "CLOSE_NAMED_REPLAN_GAPS_BEFORE_ATOM4"
+        failed_ids = {
+            item["id"] for item in results if item["verdict"] != "PASS"
+        }
+        next_safe = (
+            "PIT_CANONICALIZATION_EVIDENCE_INSUFFICIENT"
+            if failed_ids & A4_DATA_PREDICATE_IDS
+            else "A5_LIVE_OPS_HARDENING_COMMISSIONING"
+        )
     else:
         terminal = "FACTORY_V1_OPERATIONAL_READY"
         ready = True

@@ -1,0 +1,90 @@
+{
+  "acceptance_id": "FACTORY-V1-PIT-DATA-TRUTH-CANONICALIZATION-DELIVERY-COMPLETION-001",
+  "active_stop_conditions": [],
+  "as_of": "2026-08-23",
+  "base_main": "0cba257da5240057df4bb8ff91cf3a7f3c0feb9f",
+  "capability_radar_now": "PIT_DATA_TRUTH_CANONICALIZATION_PASS",
+  "cloud_bundle_mode": "OWNER_MANAGED_OPTIONAL_EXPORT",
+  "cloud_bundle_required_by_harness": false,
+  "cloud_bundle_smoke_required": false,
+  "factory_fit": {
+    "path": "docs/evidence/factory_v1_pit_data_truth_canonicalization/a1_delivery_factory_fit_v1.json",
+    "sha256": "708c17f4c25830fdad9514819a0dab7dd7459113bb047a09e84208dfc276b9c3",
+    "verdict": "PASS"
+  },
+  "implementation_bindings": {
+    "catalog/assets/core.yaml": "291015fa0b3395593376dde1496556b0c78efde6480d7b8ff8996d9c6eb989b5",
+    "catalog/assets/lifecycle.yaml": "51c05761c3e8f67e842d21b699c5a1291c83b74518e93050283926da7b4058eb",
+    "catalog/catalog_manifest.yaml": "0ee9dce2f0477e9ffcdaaaa8b9f98a2a8ad407818ca6e7c139e278684094c846",
+    "catalog/generated/asset_edges.json": "489bb2197779b5e235b77d570fcf6d165421d2f238bbb5ac2fc3cfbe9e705799",
+    "catalog/schemas/factory_v1_common_market_feature_surface.schema.json": "6f86c8a3139d1576833dd3205aa1f695c6e8a1eace0cb8e99d9018ecc82d49db",
+    "catalog/schemas/factory_v1_pit_data_truth_canonicalization.schema.json": "406d7bea01d8e5c386cbd5d52b3cc1273f3d4c0a32a87c65dee05e6837e5379a",
+    "configs/experiment_specs/market_feature_creator_pressure_archetype_v1.yaml": "be4e96d87d3041c1f92eddf8a1ab82eccba6bc1546f313271e90fd5914fb7103",
+    "configs/experiment_specs/market_feature_liquidity_archetype_v1.yaml": "65d6a399300416af1e4ee8bd067516d197e25e58520f8dd26ccaf145b434b1d2",
+    "configs/experiment_specs/market_feature_price_path_archetype_v1.yaml": "6916ad4a8fe90b4c13b90821aba88e1a74be5b9d3248d92601f9bec0f99a5e9f",
+    "configs/experiment_specs/ordinary_liquidity_quote_pressure_v1.yaml": "0568bbe172e4bbe9623fe3fd50f3718b7dea8ba49853e1b521c99b95edfaca74",
+    "configs/experiment_specs/ordinary_price_path_buy_pressure_v1.yaml": "b3ee621f429bda46b0e351af8ba7f96df91f82d69610f3946fd7511d1c719d15",
+    "configs/factory_v1_common_market_feature_surface_v1.yaml": "625d22a4fe1cee8de3cdfb56d728bc7089227d06f3244d5ea6c4e5e1d936247c",
+    "configs/factory_v1_operational_readiness_closeout_v1.yaml": "0e2e1fb28e1a6886ceb9204266c5b30f0b6c2204daa06447efad709715b5d1ca",
+    "docs/PROJECT_MAP.md": "cc3a1e6b4e2a7953e9e4bbce24b887948bb918827376da7e637a6d87cd8964ac",
+    "docs/evidence/factory_v1_pit_data_truth_canonicalization/a1_acceptance_v1.json": "b9298a455fd30e12d9822899f0c2a9931c5b83af84e2db00d0e7b00b10a271f8",
+    "docs/evidence/factory_v1_pit_data_truth_canonicalization/a1_runtime_receipt_v1.json": "b87986da77d1bea23b3c1bc13fb88845621bc22e76d7f921e32af485d943aa78",
+    "docs/reports/factory_v1_pit_data_truth_canonicalization/a1_owner_readout_v1.md": "2293e4c593aea69d55ee20c350f39bbbfb881d2984e7713167bd790f18d9343e",
+    "docs/tasks/FACTORY_V1_PIT_DATA_TRUTH_CANONICALIZATION_V1.md": "81bc6ceb69b3f41d6674eae8e261c3b9e62b9144b7e83f3e42c229adb59abd21",
+    "scripts/run_factory_v1_pit_data_truth_canonicalization.py": "2d5f68b57bc60aa6f3d63190b7fee4d5f6d42db03ba340b85ffa108a12a5e7f3",
+    "src/solana_alpha_lab/factory/market_feature_surface.py": "e6bbb655629da5582eaf30571a07ca37dac28aefdb93a4b808cf57ae45958e2b",
+    "src/solana_alpha_lab/factory/operational_readiness_closeout.py": "0f0ba5cc43f44eb2f7bbf425498de27576a99a339e7925e61b88b5d6390f216b",
+    "src/solana_alpha_lab/factory/pit_data_truth_canonicalization.py": "922e26dee0132b074fe46476d3351dcb7d54fe4eb9b9fd64f338f161921127c8",
+    "tests/test_factory_ordinary_market_hypothesis.py": "7a9b99f56847d03facb6f184a3db19fb69837c16733a77d4f8662dc4e41bcc5c",
+    "tests/test_factory_v1_common_market_feature_surface.py": "a9da3f8520a5beaa3524091149d03c21a36b9b1fc60d6615a196116bf4cf2085",
+    "tests/test_factory_v1_operational_readiness_closeout.py": "27a0a8d8d0618eedabb12696adc7113a7c82162ae40f45961c5f23cad1458114",
+    "tests/test_factory_v1_pit_data_truth_canonicalization.py": "cf72debbdef2f1dc2c27e78b2be6286f425f7498ce97adef09e8a1ec37a1facd"
+  },
+  "non_claims": [
+    "NO_CANONICAL_DONE",
+    "NO_FACTORY_V1_OPERATIONAL_READY",
+    "NO_FOUNDATION_FREEZE",
+    "NO_ALPHA",
+    "NO_NETRETURN_OR_CASHFLOW",
+    "NO_SHADOW_VPS_OR_MICRO_LIVE",
+    "NO_PROVIDER_OR_RECAPTURE"
+  ],
+  "owner_attention_triggers": {
+    "auth_or_access_recovery": false,
+    "external_material_action": false,
+    "material_owner_decision": false,
+    "unresolved_safety_or_truth_conflict": false,
+    "user_only_activation": false
+  },
+  "project_sources_disposition": {
+    "kind": "NO_CHANGE"
+  },
+  "schema": "smial.delivery-completion-evidence",
+  "schema_version": "1.0",
+  "side_effects": {
+    "cash_spend_usd_cents": 0,
+    "credential_reads": 0,
+    "fallbacks": 0,
+    "provider_requests": 0,
+    "retries": 0,
+    "wallet_signer_transaction_actions": 0
+  },
+  "state_change": "FACTORY_V1_PIT_DATA_TRUTH_CANONICALIZATION_PASS",
+  "task_id": "FACTORY_V1_PIT_DATA_TRUTH_CANONICALIZATION_V1",
+  "validation": {
+    "full_gate": "ENFORCED_BY_PROJECT_BOUND_VALIDATION",
+    "github_ci": "ENFORCED_LIVE_AT_GUARDED_MERGE",
+    "independent_review": {
+      "path": "docs/evidence/factory_v1_pit_data_truth_canonicalization/a1_delivery_independent_review_v1.json",
+      "sha256": "d39d099cb22c29e9f7a3d1568cc08e320d8ad051bdd0d608d0b22920eb675b10",
+      "verdict": "PASS"
+    },
+    "project_checks": [
+      "PASS_A4_ACCEPTANCE_SCHEMA",
+      "PASS_A4_TARGETED_TESTS",
+      "PASS_COMMON_MARKET_FEATURE_SURFACE_TESTS",
+      "PASS_GENERATOR_CHECK"
+    ],
+    "targeted": "PASS_FACTORY_V1_PIT_DATA_TRUTH_CANONICALIZATION_TESTS"
+  }
+}
