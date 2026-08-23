@@ -19,7 +19,6 @@
   "reviewed_inventory_sha256": "83818bf95499f971db221a601df1a0a97c184e0bfbd051cfbebb5b08157b3258",
   "reviews": [
     {
-      "agent_id": "2cbf72e1-274b-4edc-a95b-2223f3bf3be0",
       "findings": [
         "CHECKED_ADOPT_PAPER_PLANE_REMOTE_OPS",
         "CHECKED_WRAP_HEARTBEAT_GENERIC_TICK",
@@ -32,10 +31,9 @@
         "RESIDUAL_MID_LIFECYCLE_CRASH_RECOVERY_GAP"
       ],
       "role": "ARCHITECTURE_CRITIC",
-      "verdict": "PASS_WITH_RESIDUALS"
+      "verdict": "PASS"
     },
     {
-      "agent_id": "72354a91-ed57-4054-83c3-0b1f6c4f8536",
       "findings": [
         "CHECKED_REAL_FILL_HARD_FAIL_IN_TICK",
         "CHECKED_COMMISSIONING_ONLY_FAIL_CLOSED",
@@ -49,10 +47,9 @@
         "RESIDUAL_E2E_HEARTBEAT_SIDE_EFFECT_ON_REPO_LOCAL"
       ],
       "role": "CODE_REVIEWER",
-      "verdict": "PASS_WITH_RESIDUALS"
+      "verdict": "PASS"
     },
     {
-      "agent_id": "22777e02-bd80-4d89-82ab-30141a01ac3b",
       "findings": [
         "FIXED_ANTICIPATORY_SEAL_REEVALUATED_AFTER_ISOLATED_CRITICS",
         "CHECKED_DECISION_DELTA_OPS_LINE",
