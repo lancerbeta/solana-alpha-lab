@@ -11,7 +11,12 @@
   "cloud_bundle_smoke_required": false,
   "capability_radar_now": "NONE",
   "implementation_bindings": {
-    "delivery-harness/harness.yaml": "0000000000000000000000000000000000000000000000000000000000000000"
+    "catalog/assets/core.yaml": "39513869ab465215b94ebba58f31d680e57579e4838e87cf1432f6ccb044df45",
+    "delivery-harness/harness.yaml": "7c33e5446ca97390a29743fcc069d4ac2857fb1fb13e221a4d9d433db502f932",
+    "docs/agent/DELIVERY_HARNESS_PROTOCOL.md": "bf9d0047cfff1da61890f29d80150c075bc6ed4feb683cf449546d8b2ef4c023",
+    "docs/tasks/CTRL-PROFILE-PIN-VALIDATION-SUBSET-V1.md": "738e73e22a08e7a26194f9f200c8c540a3516f562bddfddc02003f231817ee97",
+    "scripts/owner_attention_gate.py": "dd2b77e0db202aacd5fad9c2119bbd3ee32e30019eb466fbf9a858bbfe89441b",
+    "tests/test_delivery_harness_merge_guard.py": "14df68c49a4e3d49c1d96641e220eab7f53c5d784d2780b6d0c1041b8864f627"
   },
   "active_stop_conditions": [],
   "owner_attention_triggers": {
@@ -23,14 +28,14 @@
   },
   "factory_fit": {
     "path": "docs/evidence/control/a1_profile_pin_validation_subset_factory_fit_v1.json",
-    "sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+    "sha256": "274e2a7e5291452158cab00d7b77a517de28c13388dff5684fe9625fc1f3fc2f",
     "verdict": "PASS"
   },
   "validation": {
     "targeted": "PASS_PROFILE_PIN_VALIDATION_SUBSET_TESTS",
     "independent_review": {
       "path": "docs/evidence/control/a1_profile_pin_validation_subset_review_v1.json",
-      "sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+      "sha256": "760407c26d96c7f7e33813b00674cb33429108137387c677354e2f3a245fab19",
       "verdict": "PASS"
     },
     "full_gate": "ENFORCED_BY_PROJECT_BOUND_VALIDATION",
