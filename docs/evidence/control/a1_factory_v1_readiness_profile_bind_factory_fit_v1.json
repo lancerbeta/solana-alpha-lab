@@ -1,0 +1,32 @@
+{
+  "as_of": "2026-08-24",
+  "capability_radar": {
+    "now": "NONE",
+    "watch": "TRIGGER"
+  },
+  "dimensions": {
+    "build_vs_buy": "PASS",
+    "context_efficiency": "PASS",
+    "execution_to_cashflow": "PASS",
+    "flexibility_and_history": "PASS",
+    "mission": "PASS",
+    "monitoring_and_recovery": "PASS",
+    "owner_operability": "PASS",
+    "red_team": "PASS",
+    "research_truth": "PASS",
+    "security": "PASS"
+  },
+  "limits": [
+    "NO_PRODUCT_ACCEPTANCE",
+    "NO_FACTORY_V1_RECERTIFICATION"
+  ],
+  "mode": "FULL_REVIEW",
+  "recovery": "REVERT",
+  "review_id": "FACTORY-V1-READINESS-PROFILE-BIND-FACTORY-FIT-001",
+  "reviewed_bindings_sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+  "reviewed_inventory_sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+  "schema": "smial.delivery-harness-factory-fit",
+  "schema_version": "1.0",
+  "task_id": "CTRL-FACTORY-V1-READINESS-PROFILE-BIND-V1",
+  "verdict": "PASS"
+}
