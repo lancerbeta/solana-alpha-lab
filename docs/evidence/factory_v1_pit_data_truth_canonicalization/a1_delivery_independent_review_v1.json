@@ -14,8 +14,8 @@
     "GOAL_DOD_CRITIC"
   ],
   "review_id": "FACTORY-V1-PIT-DATA-TRUTH-CANONICALIZATION-INDEPENDENT-REVIEW-001",
-  "reviewed_bindings_sha256": "22aa98981597595e57fd48511f8465363c8aea7ad035e9ec2b90316b5558fb34",
-  "reviewed_inventory_sha256": "d35c44da4af33ef74ef626b83a634d9d1b0ad1aeb14d08cc489e5237c7e940e3",
+  "reviewed_bindings_sha256": "19ea3c0cbd04ac91a9094e59f2076edd90f0aee3107ba61fcff353b47d7ff72c",
+  "reviewed_inventory_sha256": "6e445182d7d40d7b592029c11891f741ef450623f3556e68ccf56e5d688228df",
   "reviews": [
     {
       "findings": [
