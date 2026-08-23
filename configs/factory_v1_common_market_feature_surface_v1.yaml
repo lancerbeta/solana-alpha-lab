@@ -199,6 +199,7 @@ features:
     entity_scope: MINT_DECISION_SNAPSHOT
     coverage_domain: D05
     availability_class: PIT_READY
+    availability_scope: "Tokens V2 decision snapshot on ICP-EARLY-PUMPFUN-V1; explicit decision_snapshot_at; liquidity and mcap field availability checks; updatedAt at or before decision time; source route and acquisition timing pinned to the accepted Atom 1 receipt"
     missingness: typed_missing_or_not_available_at_decision
     event_time_semantics: decision_snapshot_at_with_updatedAt_bound
     available_to_strategy_semantics: BOUNDED_PIT_READY_EXPLICIT_SCOPE

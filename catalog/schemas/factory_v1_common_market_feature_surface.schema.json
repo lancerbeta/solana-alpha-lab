@@ -150,6 +150,11 @@
           "minLength": 8,
           "maxLength": 80
         },
+        "availability_scope": {
+          "type": "string",
+          "minLength": 20,
+          "maxLength": 320
+        },
         "compute": {
           "enum": [
             "NONE",
@@ -172,7 +177,26 @@
             "pattern": "^ARCHETYPE-[A-Z0-9]+(?:-[A-Z0-9]+)+$"
           }
         }
-      }
+      },
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "feature_id": {
+                "const": "FEAT-TOKEN-LIQUIDITY-USD-TO-MCAP-RATIO"
+              }
+            }
+          },
+          "then": {
+            "required": ["availability_scope"],
+            "properties": {
+              "availability_scope": {
+                "const": "Tokens V2 decision snapshot on ICP-EARLY-PUMPFUN-V1; explicit decision_snapshot_at; liquidity and mcap field availability checks; updatedAt at or before decision time; source route and acquisition timing pinned to the accepted Atom 1 receipt"
+              }
+            }
+          }
+        }
+      ]
     }
   }
 }

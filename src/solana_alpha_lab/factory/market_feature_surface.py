@@ -12,6 +12,7 @@ import yaml
 
 from solana_alpha_lab.factory.pit_data_truth_canonicalization import (
     PIT_FEATURE_ID,
+    PIT_AVAILABILITY_SCOPE,
     PIT_TERMINAL,
     PitCanonicalizationError,
     canonicalize_from_repository,
@@ -240,6 +241,11 @@ def resolve_feature_snapshot(
             or surface_feature["entity_scope"] != acceptance_feature["entity_scope"]
             or surface_feature["availability_class"]
             != acceptance_feature["availability_class"]
+            or surface_feature.get("availability_scope") != PIT_AVAILABILITY_SCOPE
+            or acceptance_feature.get("availability_scope")
+            != PIT_AVAILABILITY_SCOPE
+            or surface_feature.get("availability_scope")
+            != acceptance_feature.get("availability_scope")
             or "liquidity USD divided by token market cap USD"
             not in str(surface_feature["description"])
             or acceptance_feature["formula"] != "liquidity / mcap"
@@ -285,6 +291,7 @@ def resolve_feature_snapshot(
                 {
                     "pit_acceptance_id": pit["acceptance_id"],
                     "pit_entity_scope": pit["feature"]["entity_scope"],
+                    "pit_availability_scope": pit["feature"]["availability_scope"],
                     "pit_decision_snapshot_at": pit["projection"][
                         "decision_snapshot_at"
                     ],

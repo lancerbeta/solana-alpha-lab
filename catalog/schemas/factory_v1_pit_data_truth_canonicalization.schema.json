@@ -56,7 +56,9 @@
       "properties": {
         "feature_id": {"const": "FEAT-TOKEN-LIQUIDITY-USD-TO-MCAP-RATIO"},
         "availability_class": {"const": "PIT_READY"},
-        "availability_scope": {"type": "string", "minLength": 20},
+        "availability_scope": {
+          "const": "Tokens V2 decision snapshot on ICP-EARLY-PUMPFUN-V1; explicit decision_snapshot_at; liquidity and mcap field availability checks; updatedAt at or before decision time; source route and acquisition timing pinned to the accepted Atom 1 receipt"
+        },
         "concept": {"const": "token liquidity USD / token market cap USD"},
         "entity_scope": {"const": "MINT_DECISION_SNAPSHOT"},
         "units": {"const": "ratio"},

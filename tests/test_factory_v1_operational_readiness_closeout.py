@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import hashlib
 import json
+import shutil
 import sys
 import tempfile
 import unittest
@@ -66,6 +67,14 @@ class FactoryV1OperationalReadinessCloseoutTests(unittest.TestCase):
             (root / "src/solana_alpha_lab/factory/runner.py").write_bytes(
                 (ROOT / "src/solana_alpha_lab/factory/runner.py").read_bytes()
             )
+            for relative in (
+                "docs/evidence/early_structural_backing_pit_commissioning/a1_window_a_runtime_receipt_v1.json",
+                "docs/evidence/early_structural_backing_pit_commissioning/a1_acceptance_v1.json",
+                "docs/tasks/EARLY_STRUCTURAL_BACKING_PIT_COMMISSIONING_V1.md",
+            ):
+                target = root / relative
+                target.parent.mkdir(parents=True, exist_ok=True)
+                shutil.copyfile(ROOT / relative, target)
             cfg = json.loads(
                 json.dumps(
                     __import__("yaml").safe_load(
@@ -282,6 +291,78 @@ class FactoryV1OperationalReadinessCloseoutTests(unittest.TestCase):
                 if item.startswith("DATA_FACTORY_PIT_LINEAGE_RECEIPT:")
             )
             self.assertTrue(a4_gap.endswith("EVIDENCE_HASH_MISMATCH"))
+
+    def test_a4_schema_valid_forgery_fails_replay_binding(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            config_path = root / "configs/factory_v1_operational_readiness_closeout_v1.yaml"
+            config_path.parent.mkdir(parents=True)
+            config = __import__("yaml").safe_load(
+                (ROOT / "configs/factory_v1_operational_readiness_closeout_v1.yaml").read_text(
+                    encoding="utf-8"
+                )
+            )
+            config_path.write_text(
+                __import__("yaml").safe_dump(config, sort_keys=False),
+                encoding="utf-8",
+            )
+            runner_path = root / "src/solana_alpha_lab/factory/runner.py"
+            runner_path.parent.mkdir(parents=True)
+            runner_path.write_bytes((ROOT / "src/solana_alpha_lab/factory/runner.py").read_bytes())
+            for relative in (
+                "docs/evidence/early_structural_backing_pit_commissioning/a1_window_a_runtime_receipt_v1.json",
+                "docs/evidence/early_structural_backing_pit_commissioning/a1_acceptance_v1.json",
+                "docs/tasks/EARLY_STRUCTURAL_BACKING_PIT_COMMISSIONING_V1.md",
+            ):
+                target = root / relative
+                target.parent.mkdir(parents=True, exist_ok=True)
+                shutil.copyfile(ROOT / relative, target)
+            acceptance_path = root / "docs/evidence/factory_v1_pit_data_truth_canonicalization/a1_acceptance_v1.json"
+            acceptance_path.parent.mkdir(parents=True)
+            acceptance = json.loads(
+                (ROOT / "docs/evidence/factory_v1_pit_data_truth_canonicalization/a1_acceptance_v1.json").read_text(
+                    encoding="utf-8"
+                )
+            )
+            acceptance["projection"]["rows"][1]["mint"] = acceptance["projection"]["rows"][0]["mint"]
+            acceptance["projection"]["rows"][1]["source_row_mint"] = acceptance["projection"]["rows"][0]["source_row_mint"]
+            acceptance_path.write_text(
+                json.dumps(acceptance, indent=2, sort_keys=True) + "\n",
+                encoding="utf-8",
+            )
+            schema_path = root / "catalog/schemas/factory_v1_pit_data_truth_canonicalization.schema.json"
+            schema_path.parent.mkdir(parents=True)
+            shutil.copyfile(
+                ROOT / "catalog/schemas/factory_v1_pit_data_truth_canonicalization.schema.json",
+                schema_path,
+            )
+            acceptance_sha = hashlib.sha256(acceptance_path.read_bytes()).hexdigest()
+            schema_sha = hashlib.sha256(schema_path.read_bytes()).hexdigest()
+            for predicate in config["predicates"]:
+                if predicate["evidence_path"] == "docs/evidence/factory_v1_pit_data_truth_canonicalization/a1_acceptance_v1.json":
+                    predicate["evidence_sha256"] = acceptance_sha
+                    predicate["schema_sha256"] = schema_sha
+            config_path.write_text(
+                __import__("yaml").safe_dump(config, sort_keys=False),
+                encoding="utf-8",
+            )
+
+            gate = evaluate_closeout(root)
+            a4_gaps = [
+                item
+                for item in gate["named_gaps"]
+                if item.split(":", 1)[0]
+                in {
+                    "DATA_FACTORY_PIT_LINEAGE_RECEIPT",
+                    "DATA_EXPLICIT_MISSINGNESS",
+                    "TIME_TO_EVIDENCE_FIRST_BYTE",
+                }
+            ]
+            self.assertEqual(len(a4_gaps), 3)
+            self.assertTrue(
+                all(item.endswith("EVIDENCE_REPLAY_MISMATCH") for item in a4_gaps),
+                a4_gaps,
+            )
 
 
 if __name__ == "__main__":

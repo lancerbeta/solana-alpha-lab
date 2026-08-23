@@ -70,7 +70,7 @@ predicates:
     dimension: data
     evidence_path: docs/evidence/factory_v1_pit_data_truth_canonicalization/a1_acceptance_v1.json
     schema_path: catalog/schemas/factory_v1_pit_data_truth_canonicalization.schema.json
-    schema_sha256: d5a21d1a83780abb59e69b43bb96a6cfea2bc9074b8e8f12c4641a9ef97eed16
+    schema_sha256: 1828d1f2f4317cc90ce9fa99d3e3392e00d651fa0bb576dcfae88844f2bf25f1
     evidence_sha256: ce20b85ca637cacafed505aadc7ac970872c9978f682a625080b54c5df9880a5
     require:
       readiness.pit_lineage_ready: true
@@ -119,7 +119,7 @@ predicates:
     dimension: data
     evidence_path: docs/evidence/factory_v1_pit_data_truth_canonicalization/a1_acceptance_v1.json
     schema_path: catalog/schemas/factory_v1_pit_data_truth_canonicalization.schema.json
-    schema_sha256: d5a21d1a83780abb59e69b43bb96a6cfea2bc9074b8e8f12c4641a9ef97eed16
+    schema_sha256: 1828d1f2f4317cc90ce9fa99d3e3392e00d651fa0bb576dcfae88844f2bf25f1
     evidence_sha256: ce20b85ca637cacafed505aadc7ac970872c9978f682a625080b54c5df9880a5
     require:
       readiness.explicit_missingness_preserved: true
@@ -132,7 +132,7 @@ predicates:
     dimension: time_to_evidence
     evidence_path: docs/evidence/factory_v1_pit_data_truth_canonicalization/a1_acceptance_v1.json
     schema_path: catalog/schemas/factory_v1_pit_data_truth_canonicalization.schema.json
-    schema_sha256: d5a21d1a83780abb59e69b43bb96a6cfea2bc9074b8e8f12c4641a9ef97eed16
+    schema_sha256: 1828d1f2f4317cc90ce9fa99d3e3392e00d651fa0bb576dcfae88844f2bf25f1
     evidence_sha256: ce20b85ca637cacafed505aadc7ac970872c9978f682a625080b54c5df9880a5
     require:
       readiness.first_market_byte_within_one_preparatory_step: true

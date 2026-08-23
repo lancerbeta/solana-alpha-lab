@@ -301,6 +301,50 @@ class FactoryV1PitDataTruthCanonicalizationTests(unittest.TestCase):
         self.assertEqual(snapshot["features"][0]["pit_eligible_count"], 19)
         self.assertEqual(snapshot["features"][0]["pit_missing_count"], 5)
 
+    def test_availability_scope_is_bound_by_acceptance_schema(self) -> None:
+        module = _projector_module()
+        acceptance = module.canonicalize_from_repository(ROOT)
+        schema = json.loads(
+            (
+                ROOT
+                / "catalog/schemas/factory_v1_pit_data_truth_canonicalization.schema.json"
+            ).read_text(encoding="utf-8")
+        )
+        acceptance["feature"]["availability_scope"] = (
+            "GLOBAL_ALL_PROVIDERS_ALL_HORIZONS"
+        )
+
+        with self.assertRaises(jsonschema.ValidationError):
+            jsonschema.validate(acceptance, schema)
+
+    def test_surface_rejects_availability_scope_mismatch(self) -> None:
+        module = _projector_module()
+        config = yaml.safe_load(
+            (ROOT / "configs/factory_v1_common_market_feature_surface_v1.yaml").read_text(
+                encoding="utf-8"
+            )
+        )
+        pit = next(
+            item
+            for item in config["features"]
+            if item["feature_id"] == module.PIT_FEATURE_ID
+        )
+        pit["availability_scope"] = "GLOBAL_ALL_PROVIDERS_ALL_HORIZONS"
+
+        from solana_alpha_lab.factory.market_feature_surface import (
+            FeatureSurfaceError,
+            resolve_feature_snapshot,
+        )
+
+        with self.assertRaises(FeatureSurfaceError) as raised:
+            resolve_feature_snapshot(
+                {"required_feature_ids": [module.PIT_FEATURE_ID]},
+                root=ROOT,
+                config=config,
+            )
+
+        self.assertEqual(str(raised.exception), "PIT_FEATURE_BINDING_MISMATCH")
+
 
 if __name__ == "__main__":
     unittest.main()

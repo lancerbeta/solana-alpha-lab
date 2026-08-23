@@ -447,6 +447,7 @@ __all__ = [
     "ATOM_1_ID",
     "ATOM_1_TERMINAL",
     "FACTORY_RUNNER_SHA256",
+    "PIT_AVAILABILITY_SCOPE",
     "PIT_FEATURE_ID",
     "PIT_TERMINAL",
     "PitCanonicalizationError",
