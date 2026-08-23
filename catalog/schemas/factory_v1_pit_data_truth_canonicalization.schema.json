@@ -1,0 +1,209 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://smial.local/schemas/factory_v1_pit_data_truth_canonicalization.schema.json",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema",
+    "schema_version",
+    "acceptance_id",
+    "task_id",
+    "terminal",
+    "readiness",
+    "feature",
+    "projection",
+    "source_lineage",
+    "first_market_byte_basis",
+    "scientific_family",
+    "factory_runner_changed",
+    "factory_runner",
+    "side_effects",
+    "non_claims"
+  ],
+  "properties": {
+    "schema": {"const": "smial.factory-v1-pit-data-truth-canonicalization.acceptance"},
+    "schema_version": {"const": "1.0"},
+    "acceptance_id": {"const": "FACTORY-V1-PIT-DATA-TRUTH-CANONICALIZATION-001"},
+    "task_id": {"const": "FACTORY_V1_PIT_DATA_TRUTH_CANONICALIZATION_V1"},
+    "terminal": {"const": "FACTORY_V1_PIT_DATA_TRUTH_CANONICALIZATION_PASS"},
+    "readiness": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "pit_lineage_ready",
+        "explicit_missingness_preserved",
+        "first_market_byte_within_one_preparatory_step"
+      ],
+      "properties": {
+        "pit_lineage_ready": {"const": true},
+        "explicit_missingness_preserved": {"const": true},
+        "first_market_byte_within_one_preparatory_step": {"const": true}
+      }
+    },
+    "feature": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "feature_id",
+        "availability_class",
+        "availability_scope",
+        "concept",
+        "entity_scope",
+        "units",
+        "formula",
+        "fdv_substitution"
+      ],
+      "properties": {
+        "feature_id": {"const": "FEAT-TOKEN-LIQUIDITY-USD-TO-MCAP-RATIO"},
+        "availability_class": {"const": "PIT_READY"},
+        "availability_scope": {"type": "string", "minLength": 20},
+        "concept": {"const": "token liquidity USD / token market cap USD"},
+        "entity_scope": {"const": "MINT_DECISION_SNAPSHOT"},
+        "units": {"const": "ratio"},
+        "formula": {"const": "liquidity / mcap"},
+        "fdv_substitution": {"const": "forbidden"}
+      }
+    },
+    "projection": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "candidate_count",
+        "eligible_count",
+        "missing_count",
+        "row_status_counts",
+        "missing_reason_counts",
+        "decision_snapshot_at",
+        "source_observation_id",
+        "source_response_sha256",
+        "rows"
+      ],
+      "properties": {
+        "candidate_count": {"const": 24},
+        "eligible_count": {"const": 19},
+        "missing_count": {"const": 5},
+        "row_status_counts": {
+          "type": "object",
+          "additionalProperties": {"type": "integer", "minimum": 0}
+        },
+        "missing_reason_counts": {
+          "type": "object",
+          "additionalProperties": {"type": "integer", "minimum": 0}
+        },
+        "decision_snapshot_at": {"type": "string", "format": "date-time"},
+        "source_observation_id": {"const": "DISCOVERY:SEARCH_T5"},
+        "source_response_sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+        "rows": {
+          "type": "array",
+          "minItems": 24,
+          "maxItems": 24,
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "status",
+              "value",
+              "reason",
+              "decision_snapshot_at",
+              "source_row_sha256",
+              "source_response_sha256"
+            ],
+            "properties": {
+              "status": {"enum": ["ELIGIBLE", "MISSING"]},
+              "value": {"type": ["number", "null"]},
+              "reason": {"type": ["string", "null"]},
+              "decision_snapshot_at": {"type": "string", "format": "date-time"},
+              "source_row_sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+              "source_response_sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"}
+            }
+          }
+        }
+      }
+    },
+    "source_lineage": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "runtime_path",
+        "runtime_sha256",
+        "acceptance_path",
+        "acceptance_sha256",
+        "raw_retention",
+        "historical_provider_calls",
+        "historical_credential_reads"
+      ],
+      "properties": {
+        "runtime_path": {"const": "docs/evidence/early_structural_backing_pit_commissioning/a1_window_a_runtime_receipt_v1.json"},
+        "runtime_sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+        "acceptance_path": {"const": "docs/evidence/early_structural_backing_pit_commissioning/a1_acceptance_v1.json"},
+        "acceptance_sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+        "raw_retention": {"const": "A4_OUTSIDE_GIT"},
+        "historical_provider_calls": {"type": "integer", "minimum": 0},
+        "historical_credential_reads": {"type": "integer", "minimum": 0}
+      }
+    },
+    "first_market_byte_basis": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "predecessor_decision",
+        "capture_atom",
+        "preparatory_only_atoms_between",
+        "basis_task_path",
+        "basis_task_sha256"
+      ],
+      "properties": {
+        "predecessor_decision": {"const": "DEFER_FRESH_PIT_CAPTURE"},
+        "capture_atom": {"const": "EARLY_STRUCTURAL_BACKING_PIT_COMMISSIONING_V1"},
+        "preparatory_only_atoms_between": {"const": 0},
+        "basis_task_path": {"const": "docs/tasks/EARLY_STRUCTURAL_BACKING_PIT_COMMISSIONING_V1.md"},
+        "basis_task_sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"}
+      }
+    },
+    "scientific_family": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["family", "terminal", "reopened", "source_terminal"],
+      "properties": {
+        "family": {"const": "EARLY_STRUCTURAL_BACKING"},
+        "terminal": {"const": "CLOSED"},
+        "reopened": {"const": false},
+        "source_terminal": {"const": "CLOSE_EARLY_STRUCTURAL_BACKING_FAMILY"}
+      }
+    },
+    "factory_runner_changed": {"const": false},
+    "factory_runner": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["path", "sha256"],
+      "properties": {
+        "path": {"const": "src/solana_alpha_lab/factory/runner.py"},
+        "sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"}
+      }
+    },
+    "side_effects": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "provider_calls",
+        "credential_reads",
+        "network_calls",
+        "cash_spend_usd_cents",
+        "wallet_signer_transaction_actions"
+      ],
+      "properties": {
+        "provider_calls": {"const": 0},
+        "credential_reads": {"const": 0},
+        "network_calls": {"const": 0},
+        "cash_spend_usd_cents": {"const": 0},
+        "wallet_signer_transaction_actions": {"const": 0}
+      }
+    },
+    "non_claims": {
+      "type": "array",
+      "minItems": 1,
+      "uniqueItems": true,
+      "items": {"type": "string"}
+    }
+  }
+}

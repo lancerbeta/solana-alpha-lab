@@ -18,6 +18,9 @@ fixtures:
   a1_runtime:
     path: docs/evidence/quote_native_admissible_friction_audition/a1_quote_native_admissible_friction_audition_runtime_receipt_v1.json
     sha256: 75f60a155b7db6ddb8c801c9ff5060ce5e4e7fe641b836ff35edeb91534c308e
+  a1_pit_runtime:
+    path: docs/evidence/early_structural_backing_pit_commissioning/a1_window_a_runtime_receipt_v1.json
+    sha256: 8a6647de6e22de81a2be59474bc6e2021ceae740b778113b820b99b158c948be
 archetypes:
   - archetype_id: ARCHETYPE-PRICE-PATH
     title: Price path / activity
@@ -188,6 +191,18 @@ features:
     event_time_semantics: not_applicable
     available_to_strategy_semantics: NOT_AVAILABLE
     compute: NONE
+    consumers: [ARCHETYPE-LIQUIDITY-EXECUTION]
+  - feature_id: FEAT-TOKEN-LIQUIDITY-USD-TO-MCAP-RATIO
+    version: '1.0'
+    description: Decision-time token liquidity USD divided by token market cap USD from the accepted Atom 1 snapshot.
+    units: ratio
+    entity_scope: MINT_DECISION_SNAPSHOT
+    coverage_domain: D05
+    availability_class: PIT_READY
+    missingness: typed_missing_or_not_available_at_decision
+    event_time_semantics: decision_snapshot_at_with_updatedAt_bound
+    available_to_strategy_semantics: BOUNDED_PIT_READY_EXPLICIT_SCOPE
+    compute: A1_PIT_LIQUIDITY_TO_MCAP_RATIO
     consumers: [ARCHETYPE-LIQUIDITY-EXECUTION]
   - feature_id: FEAT-QUOTE-AVAILABILITY
     version: '1.0'

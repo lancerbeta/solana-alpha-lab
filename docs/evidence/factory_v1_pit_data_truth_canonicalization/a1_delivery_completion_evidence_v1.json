@@ -1,0 +1,70 @@
+{
+  "acceptance_id": "FACTORY-V1-PIT-DATA-TRUTH-CANONICALIZATION-DELIVERY-COMPLETION-001",
+  "active_stop_conditions": [
+    "NO_PROVIDER_NETWORK_OR_RPC_CALL",
+    "NO_NEW_CAPTURE_OR_RECAPTURE",
+    "NO_SCIENTIFIC_REEVALUATION_OR_THRESHOLD_SEARCH",
+    "NO_SHADOW_VPS_MICRO_LIVE_OR_READY_CLAIM"
+  ],
+  "as_of": "2026-08-23",
+  "base_main": "0cba257da5240057df4bb8ff91cf3a7f3c0feb9f",
+  "capability_radar_now": "PIT_DATA_TRUTH_CANONICALIZATION_PASS",
+  "cloud_bundle_mode": "OWNER_MANAGED_OPTIONAL_EXPORT",
+  "cloud_bundle_required_by_harness": false,
+  "cloud_bundle_smoke_required": false,
+  "factory_fit": {
+    "path": "docs/evidence/factory_v1_pit_data_truth_canonicalization/a1_delivery_factory_fit_v1.json",
+    "sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+    "verdict": "PASS"
+  },
+  "implementation_bindings": {
+    "docs/tasks/FACTORY_V1_PIT_DATA_TRUTH_CANONICALIZATION_V1.md": "0000000000000000000000000000000000000000000000000000000000000000"
+  },
+  "non_claims": [
+    "NO_CANONICAL_DONE",
+    "NO_FACTORY_V1_OPERATIONAL_READY",
+    "NO_FOUNDATION_FREEZE",
+    "NO_ALPHA",
+    "NO_NETRETURN_OR_CASHFLOW",
+    "NO_SHADOW_VPS_OR_MICRO_LIVE",
+    "NO_PROVIDER_OR_RECAPTURE"
+  ],
+  "owner_attention_triggers": {
+    "auth_or_access_recovery": false,
+    "external_material_action": false,
+    "material_owner_decision": false,
+    "unresolved_safety_or_truth_conflict": false,
+    "user_only_activation": false
+  },
+  "project_sources_disposition": {
+    "kind": "NO_CHANGE"
+  },
+  "schema": "smial.delivery-completion-evidence",
+  "schema_version": "1.0",
+  "side_effects": {
+    "cash_spend_usd_cents": 0,
+    "credential_reads": 0,
+    "fallbacks": 0,
+    "provider_requests": 0,
+    "retries": 0,
+    "wallet_signer_transaction_actions": 0
+  },
+  "state_change": "FACTORY_V1_PIT_DATA_TRUTH_CANONICALIZATION_PASS",
+  "task_id": "FACTORY_V1_PIT_DATA_TRUTH_CANONICALIZATION_V1",
+  "validation": {
+    "full_gate": "ENFORCED_BY_PROJECT_BOUND_VALIDATION",
+    "github_ci": "ENFORCED_LIVE_AT_GUARDED_MERGE",
+    "independent_review": {
+      "path": "docs/evidence/factory_v1_pit_data_truth_canonicalization/a1_delivery_independent_review_v1.json",
+      "sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+      "verdict": "PASS"
+    },
+    "project_checks": [
+      "PASS_A4_ACCEPTANCE_SCHEMA",
+      "PASS_A4_TARGETED_TESTS",
+      "PASS_COMMON_MARKET_FEATURE_SURFACE_TESTS",
+      "PASS_GENERATOR_CHECK"
+    ],
+    "targeted": "PASS_FACTORY_V1_PIT_DATA_TRUTH_CANONICALIZATION_TESTS"
+  }
+}

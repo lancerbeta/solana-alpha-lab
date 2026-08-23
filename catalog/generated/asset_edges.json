@@ -2438,6 +2438,46 @@
       "target_asset_id": "TEST-FACTORY-V1-OWNER-COCKPIT-001"
     },
     {
+      "source_asset_id": "CTRL-FACTORY-V1-PIT-DATA-TRUTH-CANONICALIZATION-001",
+      "relation": "contains",
+      "target_asset_id": "MODULE-FACTORY-V1-PIT-DATA-TRUTH-CANONICALIZATION-001"
+    },
+    {
+      "source_asset_id": "CTRL-FACTORY-V1-PIT-DATA-TRUTH-CANONICALIZATION-001",
+      "relation": "contains",
+      "target_asset_id": "SCHEMA-FACTORY-V1-PIT-DATA-TRUTH-CANONICALIZATION-001"
+    },
+    {
+      "source_asset_id": "CTRL-FACTORY-V1-PIT-DATA-TRUTH-CANONICALIZATION-001",
+      "relation": "contains",
+      "target_asset_id": "SCRIPT-FACTORY-V1-PIT-DATA-TRUTH-CANONICALIZATION-001"
+    },
+    {
+      "source_asset_id": "CTRL-FACTORY-V1-PIT-DATA-TRUTH-CANONICALIZATION-001",
+      "relation": "depends_on",
+      "target_asset_id": "EVIDENCE-EARLY-STRUCTURAL-BACKING-PIT-ACCEPTANCE-001"
+    },
+    {
+      "source_asset_id": "CTRL-FACTORY-V1-PIT-DATA-TRUTH-CANONICALIZATION-001",
+      "relation": "depends_on",
+      "target_asset_id": "EVIDENCE-EARLY-STRUCTURAL-BACKING-PIT-WINDOW-A-001"
+    },
+    {
+      "source_asset_id": "CTRL-FACTORY-V1-PIT-DATA-TRUTH-CANONICALIZATION-001",
+      "relation": "governed_by",
+      "target_asset_id": "ARCH-INTENT-005"
+    },
+    {
+      "source_asset_id": "CTRL-FACTORY-V1-PIT-DATA-TRUTH-CANONICALIZATION-001",
+      "relation": "validated_by",
+      "target_asset_id": "EVIDENCE-FACTORY-V1-PIT-DATA-TRUTH-CANONICALIZATION-ACCEPTANCE-001"
+    },
+    {
+      "source_asset_id": "CTRL-FACTORY-V1-PIT-DATA-TRUTH-CANONICALIZATION-001",
+      "relation": "validated_by",
+      "target_asset_id": "TEST-FACTORY-V1-PIT-DATA-TRUTH-CANONICALIZATION-001"
+    },
+    {
       "source_asset_id": "CTRL-FACTORY-V1-PRODUCT-KERNEL-001",
       "relation": "contains",
       "target_asset_id": "CONFIG-FACTORY-V1-PRODUCT-KERNEL-001"
@@ -4206,6 +4246,61 @@
       "source_asset_id": "EVIDENCE-FACTORY-V1-OWNER-COCKPIT-ACCEPTANCE-001",
       "relation": "derived_from",
       "target_asset_id": "CTRL-FACTORY-V1-OWNER-COCKPIT-001"
+    },
+    {
+      "source_asset_id": "EVIDENCE-FACTORY-V1-PIT-DATA-TRUTH-CANONICALIZATION-ACCEPTANCE-001",
+      "relation": "depends_on",
+      "target_asset_id": "EVIDENCE-FACTORY-V1-PIT-DATA-TRUTH-CANONICALIZATION-RUNTIME-001"
+    },
+    {
+      "source_asset_id": "EVIDENCE-FACTORY-V1-PIT-DATA-TRUTH-CANONICALIZATION-ACCEPTANCE-001",
+      "relation": "depends_on",
+      "target_asset_id": "SCHEMA-FACTORY-V1-PIT-DATA-TRUTH-CANONICALIZATION-001"
+    },
+    {
+      "source_asset_id": "EVIDENCE-FACTORY-V1-PIT-DATA-TRUTH-CANONICALIZATION-ACCEPTANCE-001",
+      "relation": "validated_by",
+      "target_asset_id": "TEST-FACTORY-V1-PIT-DATA-TRUTH-CANONICALIZATION-001"
+    },
+    {
+      "source_asset_id": "EVIDENCE-FACTORY-V1-PIT-DATA-TRUTH-CANONICALIZATION-DELIVERY-COMPLETION-001",
+      "relation": "depends_on",
+      "target_asset_id": "EVIDENCE-FACTORY-V1-PIT-DATA-TRUTH-CANONICALIZATION-DELIVERY-FACTORY-FIT-001"
+    },
+    {
+      "source_asset_id": "EVIDENCE-FACTORY-V1-PIT-DATA-TRUTH-CANONICALIZATION-DELIVERY-COMPLETION-001",
+      "relation": "depends_on",
+      "target_asset_id": "EVIDENCE-FACTORY-V1-PIT-DATA-TRUTH-CANONICALIZATION-DELIVERY-INDEPENDENT-REVIEW-001"
+    },
+    {
+      "source_asset_id": "EVIDENCE-FACTORY-V1-PIT-DATA-TRUTH-CANONICALIZATION-DELIVERY-COMPLETION-001",
+      "relation": "derived_from",
+      "target_asset_id": "EVIDENCE-FACTORY-V1-PIT-DATA-TRUTH-CANONICALIZATION-ACCEPTANCE-001"
+    },
+    {
+      "source_asset_id": "EVIDENCE-FACTORY-V1-PIT-DATA-TRUTH-CANONICALIZATION-DELIVERY-FACTORY-FIT-001",
+      "relation": "depends_on",
+      "target_asset_id": "EVIDENCE-FACTORY-V1-PIT-DATA-TRUTH-CANONICALIZATION-DELIVERY-INDEPENDENT-REVIEW-001"
+    },
+    {
+      "source_asset_id": "EVIDENCE-FACTORY-V1-PIT-DATA-TRUTH-CANONICALIZATION-DELIVERY-FACTORY-FIT-001",
+      "relation": "derived_from",
+      "target_asset_id": "EVIDENCE-FACTORY-V1-PIT-DATA-TRUTH-CANONICALIZATION-ACCEPTANCE-001"
+    },
+    {
+      "source_asset_id": "EVIDENCE-FACTORY-V1-PIT-DATA-TRUTH-CANONICALIZATION-DELIVERY-INDEPENDENT-REVIEW-001",
+      "relation": "depends_on",
+      "target_asset_id": "SCHEMA-DELIVERY-INDEPENDENT-REVIEW-EVIDENCE-001"
+    },
+    {
+      "source_asset_id": "EVIDENCE-FACTORY-V1-PIT-DATA-TRUTH-CANONICALIZATION-DELIVERY-INDEPENDENT-REVIEW-001",
+      "relation": "derived_from",
+      "target_asset_id": "EVIDENCE-FACTORY-V1-PIT-DATA-TRUTH-CANONICALIZATION-ACCEPTANCE-001"
+    },
+    {
+      "source_asset_id": "EVIDENCE-FACTORY-V1-PIT-DATA-TRUTH-CANONICALIZATION-RUNTIME-001",
+      "relation": "derived_from",
+      "target_asset_id": "CTRL-FACTORY-V1-PIT-DATA-TRUTH-CANONICALIZATION-001"
     },
     {
       "source_asset_id": "EVIDENCE-FACTORY-V1-PRODUCT-KERNEL-ACCEPTANCE-001",
@@ -8323,6 +8418,21 @@
       "target_asset_id": "CONFIG-FACTORY-V1-PRODUCT-KERNEL-001"
     },
     {
+      "source_asset_id": "MODULE-FACTORY-V1-PIT-DATA-TRUTH-CANONICALIZATION-001",
+      "relation": "depends_on",
+      "target_asset_id": "CONFIG-FACTORY-V1-COMMON-MARKET-FEATURE-SURFACE-001"
+    },
+    {
+      "source_asset_id": "MODULE-FACTORY-V1-PIT-DATA-TRUTH-CANONICALIZATION-001",
+      "relation": "depends_on",
+      "target_asset_id": "EVIDENCE-EARLY-STRUCTURAL-BACKING-PIT-WINDOW-A-001"
+    },
+    {
+      "source_asset_id": "MODULE-FACTORY-V1-PIT-DATA-TRUTH-CANONICALIZATION-001",
+      "relation": "governed_by",
+      "target_asset_id": "CTRL-FACTORY-V1-PIT-DATA-TRUTH-CANONICALIZATION-001"
+    },
+    {
       "source_asset_id": "MODULE-FACTORY-V1-PRIOR-GIT-T0-FRICTION-SCREEN-001",
       "relation": "governed_by",
       "target_asset_id": "CTRL-PRIOR-GIT-T0-FRICTION-SCREEN-001"
@@ -10233,6 +10343,11 @@
       "target_asset_id": "EVIDENCE-FACTORY-V1-OWNER-COCKPIT-ACCEPTANCE-001"
     },
     {
+      "source_asset_id": "REPORT-FACTORY-V1-PIT-DATA-TRUTH-CANONICALIZATION-001",
+      "relation": "derived_from",
+      "target_asset_id": "EVIDENCE-FACTORY-V1-PIT-DATA-TRUTH-CANONICALIZATION-ACCEPTANCE-001"
+    },
+    {
       "source_asset_id": "REPORT-FACTORY-V1-PRODUCT-KERNEL-001",
       "relation": "derived_from",
       "target_asset_id": "EVIDENCE-FACTORY-V1-PRODUCT-KERNEL-ACCEPTANCE-001"
@@ -10586,6 +10701,11 @@
       "source_asset_id": "SCHEMA-FACTORY-V1-OWNER-COCKPIT-001",
       "relation": "governed_by",
       "target_asset_id": "CTRL-FACTORY-V1-OWNER-COCKPIT-001"
+    },
+    {
+      "source_asset_id": "SCHEMA-FACTORY-V1-PIT-DATA-TRUTH-CANONICALIZATION-001",
+      "relation": "governed_by",
+      "target_asset_id": "CTRL-FACTORY-V1-PIT-DATA-TRUTH-CANONICALIZATION-001"
     },
     {
       "source_asset_id": "SCHEMA-FACTORY-V1-PRIOR-GIT-T0-FRICTION-SCREEN-001",
@@ -11261,6 +11381,11 @@
       "source_asset_id": "SCRIPT-FACTORY-V1-OPERATIONAL-READINESS-CLOSEOUT-001",
       "relation": "depends_on",
       "target_asset_id": "MODULE-FACTORY-V1-OPERATIONAL-READINESS-CLOSEOUT-001"
+    },
+    {
+      "source_asset_id": "SCRIPT-FACTORY-V1-PIT-DATA-TRUTH-CANONICALIZATION-001",
+      "relation": "depends_on",
+      "target_asset_id": "MODULE-FACTORY-V1-PIT-DATA-TRUTH-CANONICALIZATION-001"
     },
     {
       "source_asset_id": "SCRIPT-FACTORY-V1-RUNTIME-001",
@@ -12191,6 +12316,16 @@
       "source_asset_id": "TEST-FACTORY-V1-OWNER-COCKPIT-001",
       "relation": "depends_on",
       "target_asset_id": "MODULE-FACTORY-V1-COCKPIT-001"
+    },
+    {
+      "source_asset_id": "TEST-FACTORY-V1-PIT-DATA-TRUTH-CANONICALIZATION-001",
+      "relation": "depends_on",
+      "target_asset_id": "MODULE-FACTORY-V1-PIT-DATA-TRUTH-CANONICALIZATION-001"
+    },
+    {
+      "source_asset_id": "TEST-FACTORY-V1-PIT-DATA-TRUTH-CANONICALIZATION-001",
+      "relation": "depends_on",
+      "target_asset_id": "SCHEMA-FACTORY-V1-PIT-DATA-TRUTH-CANONICALIZATION-001"
     },
     {
       "source_asset_id": "TEST-FACTORY-V1-PRODUCT-KERNEL-001",

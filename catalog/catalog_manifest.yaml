@@ -4,9 +4,9 @@ catalog_version: 0.119.0
 as_of: '2026-08-23'
 implementation_status: VALIDATED_ACTIVE
 current_checkpoint:
-  assets: 1429
+  assets: 1440
   asset_registries: 4
-  schemas: 63
+  schemas: 64
   queries: 9
   lifecycle_registries: 9
   lifecycle_records: 84
@@ -91,6 +91,7 @@ root_resolver:
   - catalog/schemas/factory_v1_quote_surface_retention_falsifier.schema.json
   - catalog/schemas/factory_v1_quote_surface_retention_confirmatory.schema.json
   - catalog/schemas/factory_v1_common_market_feature_surface.schema.json
+  - catalog/schemas/factory_v1_pit_data_truth_canonicalization.schema.json
   - catalog/schemas/provider_route_capability_registry_v10.schema.json
   commands:
     validate:

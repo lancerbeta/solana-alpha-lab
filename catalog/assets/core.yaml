@@ -27416,7 +27416,7 @@ records:
   as_of: '2026-08-20'
   truth_owner: FACTORY_COMMON_MARKET_FEATURE_SURFACE_V1
   location: {kind: git_path, logical_uri: 'repo://catalog/schemas/factory_v1_common_market_feature_surface.schema.json', repository_path: catalog/schemas/factory_v1_common_market_feature_surface.schema.json}
-  integrity: {kind: sha256, sha256: 532e0e0ee8fb497e5f54ea117319554d3ffa47224a941112978430022574c24d}
+  integrity: {kind: sha256, sha256: 26f401154ba40b7e81ef363b2bc2f9f4bd941cabe85c5946f3325dd016cab022}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: governed_by, target_asset_id: CTRL-FACTORY-V1-COMMON-MARKET-FEATURE-SURFACE-001}
@@ -27428,13 +27428,13 @@ records:
 - asset_id: CONFIG-FACTORY-V1-COMMON-MARKET-FEATURE-SURFACE-001
   record_version: '1.0'
   asset_type: configuration
-  purpose: Machine-readable 18-feature Factory surface with honest availability classes.
+  purpose: Machine-readable 19-feature Factory surface with honest availability classes.
   status: IMPLEMENTED_UNVERIFIED
   origin: REPOSITORY
   as_of: '2026-08-20'
   truth_owner: FACTORY_COMMON_MARKET_FEATURE_SURFACE_V1
   location: {kind: git_path, logical_uri: 'repo://configs/factory_v1_common_market_feature_surface_v1.yaml', repository_path: configs/factory_v1_common_market_feature_surface_v1.yaml}
-  integrity: {kind: sha256, sha256: 8e51f6e565be137bb1863637121abf5cdf94c8603976eb4b0252371ba650cb39}
+  integrity: {kind: sha256, sha256: 0df0403771aabb9abbd63b8325b21236fce70c273c6f47edae8c4c8a5e84cf0e}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: depends_on, target_asset_id: SCHEMA-FACTORY-V1-COMMON-MARKET-FEATURE-SURFACE-001}
@@ -27452,7 +27452,7 @@ records:
   as_of: '2026-08-20'
   truth_owner: FACTORY_COMMON_MARKET_FEATURE_SURFACE_V1
   location: {kind: git_path, logical_uri: 'repo://src/solana_alpha_lab/factory/market_feature_surface.py', repository_path: src/solana_alpha_lab/factory/market_feature_surface.py}
-  integrity: {kind: sha256, sha256: f077e823d4acf6c6b5adb15c96e315361df7729197af422deb69b35b0a06131f}
+  integrity: {kind: sha256, sha256: 1ea4c38558c8453f91adeecf7c0559e5f45337ba6d81438fba49e66e3dd9c4be}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: depends_on, target_asset_id: CONFIG-FACTORY-V1-COMMON-MARKET-FEATURE-SURFACE-001}
@@ -27470,7 +27470,7 @@ records:
   as_of: '2026-08-20'
   truth_owner: FACTORY_COMMON_MARKET_FEATURE_SURFACE_V1
   location: {kind: git_path, logical_uri: 'repo://configs/experiment_specs/market_feature_price_path_archetype_v1.yaml', repository_path: configs/experiment_specs/market_feature_price_path_archetype_v1.yaml}
-  integrity: {kind: sha256, sha256: 01857135be161ba50c5e93089e403fb0d9bbd4f0f1cbb481b4bf0aec9e0c4c71}
+  integrity: {kind: sha256, sha256: d786132172501262460b16d93983ad5b9bb723d8730f13cc147e16c9ce251f75}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: depends_on, target_asset_id: SCHEMA-EXPERIMENT-SPEC-001}
@@ -27489,7 +27489,7 @@ records:
   as_of: '2026-08-20'
   truth_owner: FACTORY_COMMON_MARKET_FEATURE_SURFACE_V1
   location: {kind: git_path, logical_uri: 'repo://configs/experiment_specs/market_feature_liquidity_archetype_v1.yaml', repository_path: configs/experiment_specs/market_feature_liquidity_archetype_v1.yaml}
-  integrity: {kind: sha256, sha256: 55e7edaec281b0e235871176f6e658bd3847a137fc3a0d9b51c77f589a52732e}
+  integrity: {kind: sha256, sha256: 71a533350a85799c32ea1522be891709f21076ab1a6d2dd0bf58ef377887c0a7}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: depends_on, target_asset_id: SCHEMA-EXPERIMENT-SPEC-001}
@@ -27508,7 +27508,7 @@ records:
   as_of: '2026-08-20'
   truth_owner: FACTORY_COMMON_MARKET_FEATURE_SURFACE_V1
   location: {kind: git_path, logical_uri: 'repo://configs/experiment_specs/market_feature_creator_pressure_archetype_v1.yaml', repository_path: configs/experiment_specs/market_feature_creator_pressure_archetype_v1.yaml}
-  integrity: {kind: sha256, sha256: 4b7422679a16ce23d1b146646334552774089f544ad06199eef23ac2373db14f}
+  integrity: {kind: sha256, sha256: f6c8792776179da730093180b13e8e6bf8d4969205aa1ced3a8ff92ce2fe449c}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: depends_on, target_asset_id: SCHEMA-EXPERIMENT-SPEC-001}
@@ -27527,7 +27527,7 @@ records:
   as_of: '2026-08-20'
   truth_owner: FACTORY_COMMON_MARKET_FEATURE_SURFACE_V1
   location: {kind: git_path, logical_uri: 'repo://tests/test_factory_v1_common_market_feature_surface.py', repository_path: tests/test_factory_v1_common_market_feature_surface.py}
-  integrity: {kind: sha256, sha256: af823fc60c985479d8cf84f301e8d1b9615ba8a8897b2cdcd05b97079df2dd75}
+  integrity: {kind: sha256, sha256: a9da3f8520a5beaa3524091149d03c21a36b9b1fc60d6615a196116bf4cf2085}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: depends_on, target_asset_id: MODULE-FACTORY-V1-MARKET-FEATURE-SURFACE-001}
@@ -27635,7 +27635,7 @@ records:
   as_of: '2026-08-20'
   truth_owner: FACTORY_ORDINARY_HYPOTHESIS_THROUGH_SURFACE_V1
   location: {kind: git_path, logical_uri: 'repo://configs/experiment_specs/ordinary_price_path_buy_pressure_v1.yaml', repository_path: configs/experiment_specs/ordinary_price_path_buy_pressure_v1.yaml}
-  integrity: {kind: sha256, sha256: 69bdcc3f04a990e62276d358fb4c1311a5e95e7d08953298664441b9e4f5bb12}
+  integrity: {kind: sha256, sha256: bd45238ddbd7748711e66971c9ebf31a9dc3eae722ea7434eebbf3a15ed40149}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: depends_on, target_asset_id: SCHEMA-EXPERIMENT-SPEC-001}
@@ -27762,7 +27762,7 @@ records:
   as_of: '2026-08-20'
   truth_owner: FACTORY_ORDINARY_LIQUIDITY_HYPOTHESIS_YAML_V1
   location: {kind: git_path, logical_uri: 'repo://configs/experiment_specs/ordinary_liquidity_quote_pressure_v1.yaml', repository_path: configs/experiment_specs/ordinary_liquidity_quote_pressure_v1.yaml}
-  integrity: {kind: sha256, sha256: 9d10767160c234417b73c1d8c50ce2f3abb6bf1d2afc89b211b72c830ac6f1cd}
+  integrity: {kind: sha256, sha256: 4f7730ade641a58a3968a7d4e42dbc2f315b8f6f7a4a8761bd87977dc045d46a}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: depends_on, target_asset_id: SCHEMA-EXPERIMENT-SPEC-001}
@@ -30611,4 +30611,208 @@ records:
   consumers: [FACTORY-001, GOAL-OWNER]
   evidence: []
   search_terms: [FACTORY_V1, CLOSEOUT, DELIVERY]
+  classification: {contains_secrets: false, contains_raw_data: false, sensitivity: INTERNAL_NON_SECRET}
+
+- asset_id: CTRL-FACTORY-V1-PIT-DATA-TRUTH-CANONICALIZATION-001
+  record_version: '1.0'
+  asset_type: control_document
+  purpose: Exact DIRECT_CODEX_DELIVERY contract for bounded PIT data-truth canonicalization after Atom 1.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-08-23'
+  truth_owner: FACTORY_V1_PIT_DATA_TRUTH_CANONICALIZATION_V1
+  location: {kind: git_path, logical_uri: 'repo://docs/tasks/FACTORY_V1_PIT_DATA_TRUTH_CANONICALIZATION_V1.md', repository_path: docs/tasks/FACTORY_V1_PIT_DATA_TRUTH_CANONICALIZATION_V1.md}
+  integrity: {kind: sha256, sha256: d14e758eeae0f52f925690c94527198db06a08aa35fa97eb43dcc1d2dd682be5}
+  access: {mode: read_only, method: file, network_required: false, secrets_required: false}
+  relations:
+  - {relation_type: governed_by, target_asset_id: ARCH-INTENT-005}
+  - {relation_type: depends_on, target_asset_id: EVIDENCE-EARLY-STRUCTURAL-BACKING-PIT-ACCEPTANCE-001}
+  - {relation_type: depends_on, target_asset_id: EVIDENCE-EARLY-STRUCTURAL-BACKING-PIT-WINDOW-A-001}
+  - {relation_type: contains, target_asset_id: SCHEMA-FACTORY-V1-PIT-DATA-TRUTH-CANONICALIZATION-001}
+  - {relation_type: contains, target_asset_id: MODULE-FACTORY-V1-PIT-DATA-TRUTH-CANONICALIZATION-001}
+  - {relation_type: contains, target_asset_id: SCRIPT-FACTORY-V1-PIT-DATA-TRUTH-CANONICALIZATION-001}
+  - {relation_type: validated_by, target_asset_id: TEST-FACTORY-V1-PIT-DATA-TRUTH-CANONICALIZATION-001}
+  - {relation_type: validated_by, target_asset_id: EVIDENCE-FACTORY-V1-PIT-DATA-TRUTH-CANONICALIZATION-ACCEPTANCE-001}
+  consumers: [FACTORY-001, GOAL-OWNER]
+  evidence: []
+  search_terms: [FACTORY_V1, PIT, DATA_TRUTH, CANONICALIZATION, A4]
+  classification: {contains_secrets: false, contains_raw_data: false, sensitivity: INTERNAL_NON_SECRET}
+- asset_id: SCHEMA-FACTORY-V1-PIT-DATA-TRUTH-CANONICALIZATION-001
+  record_version: '1.0'
+  asset_type: schema
+  purpose: JSON Schema for the fail-closed PIT data-truth canonicalization acceptance.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-08-23'
+  truth_owner: FACTORY_V1_PIT_DATA_TRUTH_CANONICALIZATION_V1
+  location: {kind: git_path, logical_uri: 'repo://catalog/schemas/factory_v1_pit_data_truth_canonicalization.schema.json', repository_path: catalog/schemas/factory_v1_pit_data_truth_canonicalization.schema.json}
+  integrity: {kind: sha256, sha256: 8fb435781857271327249942d0df19a90289c43b69a30d83894ab5b05aa2f89c}
+  access: {mode: read_only, method: file, network_required: false, secrets_required: false}
+  relations:
+  - {relation_type: governed_by, target_asset_id: CTRL-FACTORY-V1-PIT-DATA-TRUTH-CANONICALIZATION-001}
+  consumers: [FACTORY-001, GOAL-OWNER]
+  evidence: []
+  search_terms: [FACTORY_V1, PIT, DATA_TRUTH, SCHEMA]
+  classification: {contains_secrets: false, contains_raw_data: false, sensitivity: INTERNAL_NON_SECRET}
+- asset_id: MODULE-FACTORY-V1-PIT-DATA-TRUTH-CANONICALIZATION-001
+  record_version: '1.0'
+  asset_type: script
+  purpose: Pure projector that revalidates accepted Atom 1 observations into a bounded PIT feature contract.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-08-23'
+  truth_owner: FACTORY_V1_PIT_DATA_TRUTH_CANONICALIZATION_V1
+  location: {kind: git_path, logical_uri: 'repo://src/solana_alpha_lab/factory/pit_data_truth_canonicalization.py', repository_path: src/solana_alpha_lab/factory/pit_data_truth_canonicalization.py}
+  integrity: {kind: sha256, sha256: 108a94d28b6e1404ec8f63d94d1c9cad0e3c2d52715c6966e20e27b2a75fc972}
+  access: {mode: read_only, method: file, network_required: false, secrets_required: false}
+  relations:
+  - {relation_type: governed_by, target_asset_id: CTRL-FACTORY-V1-PIT-DATA-TRUTH-CANONICALIZATION-001}
+  - {relation_type: depends_on, target_asset_id: EVIDENCE-EARLY-STRUCTURAL-BACKING-PIT-WINDOW-A-001}
+  - {relation_type: depends_on, target_asset_id: CONFIG-FACTORY-V1-COMMON-MARKET-FEATURE-SURFACE-001}
+  consumers: [FACTORY-001, GOAL-OWNER]
+  evidence: []
+  search_terms: [FACTORY_V1, PIT, PROJECTOR, DATA_TRUTH]
+  classification: {contains_secrets: false, contains_raw_data: false, sensitivity: INTERNAL_NON_SECRET}
+- asset_id: SCRIPT-FACTORY-V1-PIT-DATA-TRUTH-CANONICALIZATION-001
+  record_version: '1.0'
+  asset_type: script
+  purpose: Offline zero-network CLI that emits the A4 PIT runtime and acceptance receipts.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-08-23'
+  truth_owner: FACTORY_V1_PIT_DATA_TRUTH_CANONICALIZATION_V1
+  location: {kind: git_path, logical_uri: 'repo://scripts/run_factory_v1_pit_data_truth_canonicalization.py', repository_path: scripts/run_factory_v1_pit_data_truth_canonicalization.py}
+  integrity: {kind: sha256, sha256: ba3f2b485cd84973ccadf471ddb5b1096054127dc01db785fc5e013be9a05eba}
+  access: {mode: read_only, method: file, network_required: false, secrets_required: false}
+  relations:
+  - {relation_type: depends_on, target_asset_id: MODULE-FACTORY-V1-PIT-DATA-TRUTH-CANONICALIZATION-001}
+  consumers: [FACTORY-001, GOAL-OWNER]
+  evidence: []
+  search_terms: [FACTORY_V1, PIT, CANONICALIZATION, CLI]
+  classification: {contains_secrets: false, contains_raw_data: false, sensitivity: INTERNAL_NON_SECRET}
+- asset_id: TEST-FACTORY-V1-PIT-DATA-TRUTH-CANONICALIZATION-001
+  record_version: '1.0'
+  asset_type: script
+  purpose: Zero-network adversarial tests for PIT lineage, missingness, timestamp and ratio boundaries.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-08-23'
+  truth_owner: FACTORY_V1_PIT_DATA_TRUTH_CANONICALIZATION_V1
+  location: {kind: git_path, logical_uri: 'repo://tests/test_factory_v1_pit_data_truth_canonicalization.py', repository_path: tests/test_factory_v1_pit_data_truth_canonicalization.py}
+  integrity: {kind: sha256, sha256: 2dd1a3b302572a0d6cf998a788fba3400bb8f666e2d56f3342e62e1c7d4236ee}
+  access: {mode: read_only, method: file, network_required: false, secrets_required: false}
+  relations:
+  - {relation_type: depends_on, target_asset_id: MODULE-FACTORY-V1-PIT-DATA-TRUTH-CANONICALIZATION-001}
+  - {relation_type: depends_on, target_asset_id: SCHEMA-FACTORY-V1-PIT-DATA-TRUTH-CANONICALIZATION-001}
+  consumers: [FACTORY-001, GOAL-OWNER]
+  evidence: []
+  search_terms: [FACTORY_V1, PIT, CANONICALIZATION, TEST]
+  classification: {contains_secrets: false, contains_raw_data: false, sensitivity: INTERNAL_NON_SECRET}
+- asset_id: EVIDENCE-FACTORY-V1-PIT-DATA-TRUTH-CANONICALIZATION-RUNTIME-001
+  record_version: '1.0'
+  asset_type: evidence
+  purpose: Runtime receipt for the zero-network A4 PIT projector and unchanged Factory runner.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-08-23'
+  truth_owner: FACTORY_V1_PIT_DATA_TRUTH_CANONICALIZATION_V1
+  location: {kind: git_path, logical_uri: 'repo://docs/evidence/factory_v1_pit_data_truth_canonicalization/a1_runtime_receipt_v1.json', repository_path: docs/evidence/factory_v1_pit_data_truth_canonicalization/a1_runtime_receipt_v1.json}
+  integrity: {kind: sha256, sha256: b87986da77d1bea23b3c1bc13fb88845621bc22e76d7f921e32af485d943aa78}
+  access: {mode: read_only, method: file, network_required: false, secrets_required: false}
+  relations:
+  - {relation_type: derived_from, target_asset_id: CTRL-FACTORY-V1-PIT-DATA-TRUTH-CANONICALIZATION-001}
+  consumers: [FACTORY-001, GOAL-OWNER]
+  evidence: []
+  search_terms: [FACTORY_V1, PIT, CANONICALIZATION, RUNTIME]
+  classification: {contains_secrets: false, contains_raw_data: false, sensitivity: INTERNAL_NON_SECRET}
+- asset_id: EVIDENCE-FACTORY-V1-PIT-DATA-TRUTH-CANONICALIZATION-ACCEPTANCE-001
+  record_version: '1.0'
+  asset_type: evidence
+  purpose: Acceptance proving reusable PIT lineage, explicit missingness and first-byte economy without recapture.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-08-23'
+  truth_owner: FACTORY_V1_PIT_DATA_TRUTH_CANONICALIZATION_V1
+  location: {kind: git_path, logical_uri: 'repo://docs/evidence/factory_v1_pit_data_truth_canonicalization/a1_acceptance_v1.json', repository_path: docs/evidence/factory_v1_pit_data_truth_canonicalization/a1_acceptance_v1.json}
+  integrity: {kind: sha256, sha256: 7ced4b3021b0ab26c3f5fd92a8611b6f44e7bd9ca67e219f9a495d94b16faba4}
+  access: {mode: read_only, method: file, network_required: false, secrets_required: false}
+  relations:
+  - {relation_type: depends_on, target_asset_id: EVIDENCE-FACTORY-V1-PIT-DATA-TRUTH-CANONICALIZATION-RUNTIME-001}
+  - {relation_type: validated_by, target_asset_id: TEST-FACTORY-V1-PIT-DATA-TRUTH-CANONICALIZATION-001}
+  - {relation_type: depends_on, target_asset_id: SCHEMA-FACTORY-V1-PIT-DATA-TRUTH-CANONICALIZATION-001}
+  consumers: [FACTORY-001, GOAL-OWNER]
+  evidence: []
+  search_terms: [FACTORY_V1, PIT, CANONICALIZATION, ACCEPTANCE]
+  classification: {contains_secrets: false, contains_raw_data: false, sensitivity: INTERNAL_NON_SECRET}
+- asset_id: REPORT-FACTORY-V1-PIT-DATA-TRUTH-CANONICALIZATION-001
+  record_version: '1.0'
+  asset_type: control_document
+  purpose: Russian owner readout for A4 PIT data-truth canonicalization and its non-claims.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-08-23'
+  truth_owner: FACTORY_V1_PIT_DATA_TRUTH_CANONICALIZATION_V1
+  location: {kind: git_path, logical_uri: 'repo://docs/reports/factory_v1_pit_data_truth_canonicalization/a1_owner_readout_v1.md', repository_path: docs/reports/factory_v1_pit_data_truth_canonicalization/a1_owner_readout_v1.md}
+  integrity: {kind: sha256, sha256: bc68fa2a713de0898a977295326aa62a8b7bc60d2b4205a615390c4b81aa0eb5}
+  access: {mode: read_only, method: file, network_required: false, secrets_required: false}
+  relations:
+  - {relation_type: derived_from, target_asset_id: EVIDENCE-FACTORY-V1-PIT-DATA-TRUTH-CANONICALIZATION-ACCEPTANCE-001}
+  consumers: [FACTORY-001, GOAL-OWNER]
+  evidence: []
+  search_terms: [FACTORY_V1, PIT, CANONICALIZATION, OWNER_READOUT]
+  classification: {contains_secrets: false, contains_raw_data: false, sensitivity: INTERNAL_NON_SECRET}
+- asset_id: EVIDENCE-FACTORY-V1-PIT-DATA-TRUTH-CANONICALIZATION-DELIVERY-INDEPENDENT-REVIEW-001
+  record_version: '1.0'
+  asset_type: evidence
+  purpose: Required-role independent review evidence for A4 delivery.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-08-23'
+  truth_owner: FACTORY_V1_PIT_DATA_TRUTH_CANONICALIZATION_V1
+  location: {kind: git_path, logical_uri: 'repo://docs/evidence/factory_v1_pit_data_truth_canonicalization/a1_delivery_independent_review_v1.json', repository_path: docs/evidence/factory_v1_pit_data_truth_canonicalization/a1_delivery_independent_review_v1.json}
+  integrity: {kind: none, note: 'Content integrity is owned by the live completion-review-fit hash chain; embedding its SHA here would create an indirect self-reference through the reviewed inventory.'}
+  access: {mode: read_only, method: file, network_required: false, secrets_required: false}
+  relations:
+  - {relation_type: derived_from, target_asset_id: EVIDENCE-FACTORY-V1-PIT-DATA-TRUTH-CANONICALIZATION-ACCEPTANCE-001}
+  - {relation_type: depends_on, target_asset_id: SCHEMA-DELIVERY-INDEPENDENT-REVIEW-EVIDENCE-001}
+  consumers: [FACTORY-001, GOAL-OWNER]
+  evidence: []
+  search_terms: [FACTORY_V1, PIT, CANONICALIZATION, DELIVERY]
+  classification: {contains_secrets: false, contains_raw_data: false, sensitivity: INTERNAL_NON_SECRET}
+- asset_id: EVIDENCE-FACTORY-V1-PIT-DATA-TRUTH-CANONICALIZATION-DELIVERY-FACTORY-FIT-001
+  record_version: '1.0'
+  asset_type: evidence
+  purpose: FULL Factory Fit evidence for A4 PIT data-truth canonicalization.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-08-23'
+  truth_owner: FACTORY_V1_PIT_DATA_TRUTH_CANONICALIZATION_V1
+  location: {kind: git_path, logical_uri: 'repo://docs/evidence/factory_v1_pit_data_truth_canonicalization/a1_delivery_factory_fit_v1.json', repository_path: docs/evidence/factory_v1_pit_data_truth_canonicalization/a1_delivery_factory_fit_v1.json}
+  integrity: {kind: none, note: 'Content integrity is owned by the live completion-review-fit hash chain; embedding its SHA here would create an indirect self-reference through the reviewed inventory.'}
+  access: {mode: read_only, method: file, network_required: false, secrets_required: false}
+  relations:
+  - {relation_type: derived_from, target_asset_id: EVIDENCE-FACTORY-V1-PIT-DATA-TRUTH-CANONICALIZATION-ACCEPTANCE-001}
+  - {relation_type: depends_on, target_asset_id: EVIDENCE-FACTORY-V1-PIT-DATA-TRUTH-CANONICALIZATION-DELIVERY-INDEPENDENT-REVIEW-001}
+  consumers: [FACTORY-001, GOAL-OWNER]
+  evidence: []
+  search_terms: [FACTORY_V1, PIT, CANONICALIZATION, FACTORY_FIT]
+  classification: {contains_secrets: false, contains_raw_data: false, sensitivity: INTERNAL_NON_SECRET}
+- asset_id: EVIDENCE-FACTORY-V1-PIT-DATA-TRUTH-CANONICALIZATION-DELIVERY-COMPLETION-001
+  record_version: '1.0'
+  asset_type: evidence
+  purpose: Guard-consumable completion evidence for A4 before the exact-head merge gate.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-08-23'
+  truth_owner: FACTORY_V1_PIT_DATA_TRUTH_CANONICALIZATION_V1
+  location: {kind: git_path, logical_uri: 'repo://docs/evidence/factory_v1_pit_data_truth_canonicalization/a1_delivery_completion_evidence_v1.json', repository_path: docs/evidence/factory_v1_pit_data_truth_canonicalization/a1_delivery_completion_evidence_v1.json}
+  integrity: {kind: none, note: 'Content integrity is owned by the live completion-review-fit hash chain; embedding its SHA here would create an indirect self-reference through the reviewed inventory.'}
+  access: {mode: read_only, method: file, network_required: false, secrets_required: false}
+  relations:
+  - {relation_type: derived_from, target_asset_id: EVIDENCE-FACTORY-V1-PIT-DATA-TRUTH-CANONICALIZATION-ACCEPTANCE-001}
+  - {relation_type: depends_on, target_asset_id: EVIDENCE-FACTORY-V1-PIT-DATA-TRUTH-CANONICALIZATION-DELIVERY-INDEPENDENT-REVIEW-001}
+  - {relation_type: depends_on, target_asset_id: EVIDENCE-FACTORY-V1-PIT-DATA-TRUTH-CANONICALIZATION-DELIVERY-FACTORY-FIT-001}
+  consumers: [FACTORY-001, GOAL-OWNER]
+  evidence: []
+  search_terms: [FACTORY_V1, PIT, CANONICALIZATION, COMPLETION]
   classification: {contains_secrets: false, contains_raw_data: false, sensitivity: INTERNAL_NON_SECRET}

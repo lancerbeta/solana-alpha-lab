@@ -10,6 +10,11 @@ from typing import Any, Mapping
 import jsonschema
 import yaml
 
+from solana_alpha_lab.factory.pit_data_truth_canonicalization import (
+    PIT_TERMINAL,
+    canonicalize_from_repository,
+)
+
 SURFACE_CONFIG_RELATIVE = "configs/factory_v1_common_market_feature_surface_v1.yaml"
 SURFACE_SCHEMA_RELATIVE = (
     "catalog/schemas/factory_v1_common_market_feature_surface.schema.json"
@@ -18,6 +23,7 @@ CAP_OFFLINE_MARKET_FEATURE_RESOLVE = "CAP-OFFLINE-MARKET-FEATURE-RESOLVE-001"
 PASS_TERMINAL = "FEATURE_SURFACE_COMPOSITION_PASS"
 DISPLAY_MARK = {
     "COMPUTED": "✓",
+    "PIT_READY": "✓",
     "UNKNOWN": "!",
     "NOT_AVAILABLE": "—",
     "MISSING_CAPABILITY": "—",
@@ -101,6 +107,7 @@ def _compute(
     *,
     a24: Mapping[str, Any] | None,
     a1: Mapping[str, Any] | None,
+    pit: Mapping[str, Any] | None,
 ) -> tuple[str, float | int | None]:
     if compute == "NONE":
         return "UNKNOWN", None
@@ -134,6 +141,14 @@ def _compute(
             raise FeatureSurfaceError("A1_RUNTIME_REQUIRED")
         share = _quote_observed_share(a1)
         return ("COMPUTED", share) if share is not None else ("UNKNOWN", None)
+    if compute == "A1_PIT_LIQUIDITY_TO_MCAP_RATIO":
+        if pit is None:
+            raise FeatureSurfaceError("A1_PIT_RUNTIME_REQUIRED")
+        if pit.get("terminal") != PIT_TERMINAL:
+            return "UNKNOWN", None
+        # The generic surface exposes capability status. Per-mint numeric rows
+        # remain owned by the bounded A4 projector, not an aggregate snapshot.
+        return "PIT_READY", None
     raise FeatureSurfaceError("COMPUTE_NOT_ALLOWLISTED")
 
 
@@ -142,6 +157,8 @@ def _value_status_for(availability: str, computed_status: str) -> str:
         return "MISSING_CAPABILITY"
     if availability == "MISSING":
         return "NOT_AVAILABLE"
+    if availability == "PIT_READY":
+        return "PIT_READY" if computed_status == "PIT_READY" else "UNKNOWN"
     if computed_status == "COMPUTED":
         return "COMPUTED"
     return "UNKNOWN"
@@ -170,13 +187,14 @@ def resolve_feature_snapshot(
     index = feature_index(surface)
     needs_a24 = False
     needs_a1 = False
+    needs_pit = False
     for feature_id in required:
         feature = index.get(feature_id)
         if feature is None:
             raise FeatureSurfaceError("FEATURE_NOT_IN_SURFACE")
         compute = str(feature["compute"])
         needs_a24 = needs_a24 or compute.startswith("A24_")
-        needs_a1 = needs_a1 or compute.startswith("A1_")
+        needs_a1 = needs_a1 or compute == "A1_QUOTE_OBSERVED_SHARE"
     fixtures = surface["fixtures"]
     a24 = (
         _load_json(root, str(fixtures["a24_runtime"]["path"]), str(fixtures["a24_runtime"]["sha256"]))
@@ -188,16 +206,27 @@ def resolve_feature_snapshot(
         if needs_a1
         else None
     )
+    needs_pit = any(
+        str(index[feature_id]["compute"]) == "A1_PIT_LIQUIDITY_TO_MCAP_RATIO"
+        for feature_id in required
+    )
+    if needs_pit:
+        pit_fixture = fixtures["a1_pit_runtime"]
+        _load_json(
+            root,
+            str(pit_fixture["path"]),
+            str(pit_fixture["sha256"]),
+        )
+    pit = canonicalize_from_repository(root) if needs_pit else None
     rows: list[dict[str, Any]] = []
     for feature_id in required:
         feature = index[feature_id]
         availability = str(feature["availability_class"])
-        if availability == "PIT_READY":
-            raise FeatureSurfaceError("PIT_READY_FORBIDDEN_ON_RETROSPECTIVE_SURFACE")
         computed_status, value = _compute(
             str(feature["compute"]),
             a24=a24,
             a1=a1,
+            pit=pit,
         )
         if availability in {"MISSING", "MISSING_CAPABILITY"}:
             computed_status, value = (
@@ -230,7 +259,9 @@ def resolve_feature_snapshot(
         "experiment_id": spec.get("experiment_id"),
         "required_feature_ids": required,
         "features": rows,
-        "pit_ready_count": 0,
+        "pit_ready_count": sum(
+            1 for row in rows if row["value_status"] == "PIT_READY"
+        ),
         "provider_api_rpc_wss_calls": 0,
         "terminal": PASS_TERMINAL,
     }

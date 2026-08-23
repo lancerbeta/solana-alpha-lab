@@ -9,7 +9,7 @@ data_requirements:
   - requirement_id: SURFACE_CONFIG
     kind: CATALOG_ASSET
     path: configs/factory_v1_common_market_feature_surface_v1.yaml
-    sha256: 8e51f6e565be137bb1863637121abf5cdf94c8603976eb4b0252371ba650cb39
+    sha256: 0df0403771aabb9abbd63b8325b21236fce70c273c6f47edae8c4c8a5e84cf0e
   - requirement_id: A24_RUNTIME
     kind: GIT_CANONICAL_RECEIPT
     path: docs/evidence/task30/a24_raw_to_pit_admissibility_runtime_receipt_v1.json
