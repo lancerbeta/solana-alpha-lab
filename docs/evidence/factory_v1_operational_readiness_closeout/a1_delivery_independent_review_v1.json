@@ -15,8 +15,8 @@
     "OWNER_UX_CRITIC"
   ],
   "review_id": "FACTORY-V1-READINESS-CLOSEOUT-INDEPENDENT-REVIEW-001",
-  "reviewed_bindings_sha256": "PENDING_BIND",
-  "reviewed_inventory_sha256": "PENDING_BIND",
+  "reviewed_bindings_sha256": "f97c1fab2f25302d49ec437d0d66d73fd07198839a3dfe1f6184990a9cbffdd4",
+  "reviewed_inventory_sha256": "721cd0391cde677350961057db8f7b2898d7fe6f903df5c8d3f050e6f24f9e1c",
   "reviews": [
     {
       "findings": [
