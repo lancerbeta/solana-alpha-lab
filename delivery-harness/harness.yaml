@@ -89,6 +89,7 @@ merge_policy:
     - tests/test_delivery_harness_context.py
     - tests/test_delivery_harness_contract.py
     - tests/test_delivery_harness_merge_guard.py
+    - tests/test_delivery_harness_factory_v1_readiness_bind.py
     - tests/test_delivery_harness_skill.py
     - tests/test_autonomous_delivery_skill.py
     - tests/test_harness_sync.py
