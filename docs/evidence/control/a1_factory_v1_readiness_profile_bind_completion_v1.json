@@ -9,11 +9,20 @@
   "cloud_bundle_smoke_required": false,
   "factory_fit": {
     "path": "docs/evidence/control/a1_factory_v1_readiness_profile_bind_factory_fit_v1.json",
-    "sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+    "sha256": "8ffd5525e31e0d13e6b1dda3b397d8f6d772fd0c820d008e548dc11f8070aaae",
     "verdict": "PASS"
   },
   "implementation_bindings": {
-    "docs/tasks/CTRL-FACTORY-V1-READINESS-PROFILE-BIND-V1.md": "e55ddd324ae614c97494c96f1aa683646fb0971ce9ce184ec8af02a9ef4097f1"
+    "catalog/assets/core.yaml": "c549f8be25182dba6b77b5682f39798bd92cabdae633cb5c630a2f6b312676c2",
+    "catalog/schemas/delivery_harness_project_profile.schema.json": "cba6d3d113346081e6352869969b0a3c6f422187db54a6f5b0c7313f4df188f0",
+    "delivery-harness/harness.yaml": "f70638945cf98327486780dc4c99c5d93318142d9983501538a93a5911a266a8",
+    "delivery-harness/project-profile.yaml": "311c76061dcf41e29ac5942b9fc421076f22e10300dc9cbf976c16ecc564af02",
+    "delivery-harness/templates/portable-bundle-manifest.json": "597880ea08bcfe4bce440e9f7661900645e0b5e3fb37ab5e8eec5509e6ca2ad6",
+    "docs/agent/DELIVERY_HARNESS_PROTOCOL.md": "85412b86f2fbfecb2348d9cd15bf1a88a30b2b6960ee742d4392cbb45e37ff17",
+    "docs/evidence/control/delivery_harness_acceptance_v1.json": "d5fd36c005ba4b2a899b2d22666807d17244a6a7abcb8903d138400471df8933",
+    "docs/tasks/CTRL-FACTORY-V1-READINESS-PROFILE-BIND-V1.md": "e55ddd324ae614c97494c96f1aa683646fb0971ce9ce184ec8af02a9ef4097f1",
+    "scripts/delivery_harness.py": "65fc24b3569ad50d15042e63ae597cd7e066de9b89a291a9798d8c29f8c44c44",
+    "tests/test_delivery_harness_factory_v1_readiness_bind.py": "5c3a66c4f3fd279ea29d2222f918cd255f7a858654c7338feb580bb92ac1c2c7"
   },
   "non_claims": [
     "NO_CANONICAL_DONE",
@@ -45,7 +54,7 @@
     "github_ci": "ENFORCED_LIVE_AT_GUARDED_MERGE",
     "independent_review": {
       "path": "docs/evidence/control/a1_factory_v1_readiness_profile_bind_review_v1.json",
-      "sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+      "sha256": "9402c2ceb7d43a782f45f0f1c204220a436eeab10141bd951ad6e77ab45c4feb",
       "verdict": "PASS"
     },
     "project_checks": [
