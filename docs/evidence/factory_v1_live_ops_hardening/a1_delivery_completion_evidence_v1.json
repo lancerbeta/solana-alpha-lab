@@ -9,7 +9,7 @@
   "cloud_bundle_smoke_required": false,
   "factory_fit": {
     "path": "docs/evidence/factory_v1_live_ops_hardening/a1_delivery_factory_fit_v1.json",
-    "sha256": "dcbdcd0f4b24b1665a3b31b0613d269357b6a1d853408caeb0d1ad7609b3959b",
+    "sha256": "872ad00e92df0030d267170f81452d2b1693dfeb21714538c99b51b0a7556e4b",
     "verdict": "PASS"
   },
   "implementation_bindings": {
@@ -22,7 +22,7 @@
     "docs/evidence/factory_v1_live_ops_hardening/a1_host_proof_v1.json": "8eff14d05cb9c08f2d9ac8c4164d4a356dc95e1260074ede1cd879b804be694a",
     "docs/evidence/factory_v1_live_ops_hardening/a1_runtime_receipt_v1.json": "bcf1e63e0ce2ccf41ca32f269d9540462206de07ea0301e759a1de5ab5d7d6be",
     "docs/reports/factory_v1_live_ops_hardening/a1_owner_readout_v1.md": "14742dbe4347f680f2bc7c04a2c17e47b81815755e507547dd61eab0a4c450fe",
-    "docs/tasks/FACTORY_V1_LIVE_OPS_HARDENING_COMMISSIONING_V1.md": "2d7e233e19a78f5c7f215237a97e20f74799017255a9a1eb68cefc4b84753078",
+    "docs/tasks/FACTORY_V1_LIVE_OPS_HARDENING_COMMISSIONING_V1.md": "1fab485cc1a1e1e092b75d9af20647d97e6601325e1bd6d22e3eade2fda06a4c",
     "scripts/factory_live_release.py": "cf4e23198a1217f113a7a922286afbc3bd79c041a5d13cf50934cad1a514e298",
     "scripts/factory_remote_doctor.py": "3685886e24574297b88a6e9754f950ddd9f40505bf7c20ee35203b06b691d4be",
     "scripts/run_factory_v1_live_ops_hardening.py": "3c8c9163435f6ca7c76711207f3f033f93bfa4ac918497d1fc4a6d5af4c5c2bb",
@@ -68,7 +68,7 @@
     "github_ci": "ENFORCED_LIVE_AT_GUARDED_MERGE",
     "independent_review": {
       "path": "docs/evidence/factory_v1_live_ops_hardening/a1_delivery_independent_review_v1.json",
-      "sha256": "474fbd51bd31fe53b82a891fc418ceb7a3bd54e9afb02b45160630d3f088e3f3",
+      "sha256": "39f5d3cf1f3e4f5fb75eb671fb9c5ee9e9fbf270c3ffff548829cbb568712203",
       "verdict": "PASS"
     },
     "project_checks": [
