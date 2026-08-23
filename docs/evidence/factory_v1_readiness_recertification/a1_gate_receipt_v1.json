@@ -1,0 +1,191 @@
+{
+  "as_of": "2026-08-23",
+  "factory_runner_sha256": "d8d22bcb51fb6992d40f09e58274c52e0f9942c12d043cc57b96ffca524e918f",
+  "factory_v1_operational_ready": true,
+  "foundation_freeze": "ACTIVE",
+  "named_gaps": [],
+  "next_safe_action": "FOUNDATION_FREEZE_ACTIVE_ATOM4_ELIGIBLE_IF_KEPT",
+  "non_claims": [
+    "NO_ALPHA",
+    "NO_SCIENTIFIC_SHADOW_PASS",
+    "NO_MOSTLY_READY",
+    "NO_FALSE_READY_WITHOUT_ALL_PREDICATES",
+    "NO_READY_FROM_UNBOUND_READINESS_YAML_GATE_LEAVES",
+    "NO_PROXY_NONCLAIM_AS_SECURITY_GATE"
+  ],
+  "predicates": [
+    {
+      "dimension": "commissioning",
+      "evidence_path": "docs/evidence/factory_v1_product_kernel/a1_factory_v1_product_kernel_acceptance_v1.json",
+      "gap": null,
+      "id": "COMMISSIONING_GOLDEN_REPLAY",
+      "verdict": "PASS"
+    },
+    {
+      "dimension": "commissioning",
+      "evidence_path": "docs/evidence/factory_v1_commissioning/a2_factory_v1_commissioning_acceptance_v1.json",
+      "gap": null,
+      "id": "COMMISSIONING_FRESH_HYPOTHESIS_E2E",
+      "verdict": "PASS"
+    },
+    {
+      "dimension": "leverage",
+      "evidence_path": "docs/evidence/factory_unattended_shadow/a1_acceptance_v1.json",
+      "gap": null,
+      "id": "LEVERAGE_NO_TASK_SPECIFIC_CORE_RUNNER",
+      "verdict": "PASS"
+    },
+    {
+      "dimension": "owner_operability",
+      "evidence_path": "docs/evidence/factory_v1_owner_cockpit/a4_factory_v1_cockpit_acceptance_v1.json",
+      "gap": null,
+      "id": "OWNER_OPERABILITY_COCKPIT_LITE",
+      "verdict": "PASS"
+    },
+    {
+      "dimension": "runtime",
+      "evidence_path": "docs/evidence/factory_v1_production_lite_runtime/a3_factory_v1_runtime_acceptance_v1.json",
+      "gap": null,
+      "id": "RUNTIME_LOCAL_LINUX_SHAPED_PROOF",
+      "verdict": "PASS"
+    },
+    {
+      "dimension": "runtime",
+      "evidence_path": "docs/evidence/factory_unattended_shadow/a1_host_proof_v1.json",
+      "gap": null,
+      "id": "RUNTIME_LIVE_HOST_AND_SHADOW_WORKER",
+      "verdict": "PASS"
+    },
+    {
+      "dimension": "runtime",
+      "evidence_path": "docs/evidence/factory_v1_live_ops_hardening/a1_host_proof_v1.json",
+      "gap": null,
+      "id": "RUNTIME_LIVE_DEPLOY_ROLLBACK",
+      "verdict": "PASS"
+    },
+    {
+      "dimension": "runtime",
+      "evidence_path": "docs/evidence/factory_v1_live_ops_hardening/a1_host_proof_v1.json",
+      "gap": null,
+      "id": "RUNTIME_LIVE_CLEAN_REHOST",
+      "verdict": "PASS"
+    },
+    {
+      "dimension": "data",
+      "evidence_path": "docs/evidence/factory_unattended_shadow/a1_host_proof_v1.json",
+      "gap": null,
+      "id": "DATA_LIVE_BACKUP_ISOLATED_RESTORE",
+      "verdict": "PASS"
+    },
+    {
+      "dimension": "data",
+      "evidence_path": "docs/evidence/factory_v1_pit_data_truth_canonicalization/a1_acceptance_v1.json",
+      "gap": null,
+      "id": "DATA_FACTORY_PIT_LINEAGE_RECEIPT",
+      "verdict": "PASS"
+    },
+    {
+      "dimension": "monitoring",
+      "evidence_path": "docs/evidence/factory_v1_owner_cockpit/a4_factory_v1_cockpit_acceptance_v1.json",
+      "gap": null,
+      "id": "MONITORING_HEALTH_VIEW",
+      "verdict": "PASS"
+    },
+    {
+      "dimension": "monitoring",
+      "evidence_path": "docs/evidence/factory_remote_operations/a3_runtime_receipt_v1.json",
+      "gap": null,
+      "id": "MONITORING_DEDUP_TESTED",
+      "verdict": "PASS"
+    },
+    {
+      "dimension": "monitoring",
+      "evidence_path": "docs/evidence/factory_v1_live_ops_hardening/a1_host_proof_v1.json",
+      "gap": null,
+      "id": "MONITORING_PROVIDER_FAILURE_ALERT",
+      "verdict": "PASS"
+    },
+    {
+      "dimension": "monitoring",
+      "evidence_path": "docs/evidence/factory_v1_live_ops_hardening/a1_host_proof_v1.json",
+      "gap": null,
+      "id": "MONITORING_LIVE_STALE_DATA_ALERT",
+      "verdict": "PASS"
+    },
+    {
+      "dimension": "monitoring",
+      "evidence_path": "docs/evidence/factory_v1_live_ops_hardening/a1_host_proof_v1.json",
+      "gap": null,
+      "id": "MONITORING_LIVE_BOT_STALL_ALERT",
+      "verdict": "PASS"
+    },
+    {
+      "dimension": "security",
+      "evidence_path": "docs/evidence/factory_remote_operations/a3_acceptance_v1.json",
+      "gap": null,
+      "id": "SECURITY_SECRETS_OUTSIDE_REPO",
+      "verdict": "PASS"
+    },
+    {
+      "dimension": "security",
+      "evidence_path": "docs/evidence/factory_remote_operations/a3_acceptance_v1.json",
+      "gap": null,
+      "id": "SECURITY_LOCALHOST_UI",
+      "verdict": "PASS"
+    },
+    {
+      "dimension": "security",
+      "evidence_path": "docs/evidence/factory_v1_live_ops_hardening/a1_host_proof_v1.json",
+      "gap": null,
+      "id": "SECURITY_FINANCIAL_GATED",
+      "verdict": "PASS"
+    },
+    {
+      "dimension": "data",
+      "evidence_path": "docs/evidence/factory_v1_pit_data_truth_canonicalization/a1_acceptance_v1.json",
+      "gap": null,
+      "id": "DATA_EXPLICIT_MISSINGNESS",
+      "verdict": "PASS"
+    },
+    {
+      "dimension": "data",
+      "evidence_path": "docs/evidence/factory_v1_live_ops_hardening/a1_host_proof_v1.json",
+      "gap": null,
+      "id": "DATA_PROVIDER_HEALTH_VISIBLE",
+      "verdict": "PASS"
+    },
+    {
+      "dimension": "time_to_evidence",
+      "evidence_path": "docs/evidence/factory_v1_pit_data_truth_canonicalization/a1_acceptance_v1.json",
+      "gap": null,
+      "id": "TIME_TO_EVIDENCE_FIRST_BYTE",
+      "verdict": "PASS"
+    },
+    {
+      "dimension": "truth",
+      "evidence_path": "configs/factory_v1_operational_readiness_v1.yaml",
+      "gap": null,
+      "id": "ENTRY_GATE_RESOLVES_READINESS_CONTRACT",
+      "verdict": "PASS"
+    },
+    {
+      "dimension": "truth",
+      "evidence_path": "delivery-harness/project-profile.yaml",
+      "gap": null,
+      "id": "ENTRY_GATE_PROFILE_BINDS_READINESS_CONTRACT",
+      "verdict": "PASS"
+    }
+  ],
+  "ready_authority": "CLOSEOUT_PREDICATE_SET_ONLY",
+  "reconciled_product_stage": {
+    "generic_hypothesis_runner": "OPERATIONAL_AS_PRODUCT_KERNEL_AND_COMMISSIONING",
+    "owner_cockpit": "COCKPIT_LITE_IMPLEMENTED",
+    "paper_shadow_position_operations": "COMMISSIONING_ONLY_UNATTENDED_SHADOW_PASS",
+    "production_lite_runtime": "LOCAL_LINUX_SHAPED_PROOF_PASS",
+    "unattended_monitoring": "PARTIAL_REMOTE_OPS_AND_SHADOW"
+  },
+  "schema": "smial.factory-v1-operational-readiness-closeout.gate",
+  "schema_version": "1.0",
+  "task_id": "FACTORY_V1_OPERATIONAL_READINESS_CLOSEOUT_V1",
+  "terminal": "FACTORY_V1_OPERATIONAL_READY"
+}
