@@ -62,7 +62,7 @@
     "github_ci": "ENFORCED_LIVE_AT_GUARDED_MERGE",
     "independent_review": {
       "path": "docs/evidence/factory_v1_operational_readiness_closeout/a1_delivery_independent_review_v1.json",
-      "sha256": "707215cbb5d8e53bb275c6dd74674d3f08067d5176c824298c8a8269b733f865",
+      "sha256": "890c3f1db426fd08499461044dd875772443bcfe1449b92d02e17b30bdadef1e",
       "verdict": "PASS"
     },
     "project_checks": [

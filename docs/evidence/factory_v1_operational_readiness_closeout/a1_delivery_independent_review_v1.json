@@ -14,8 +14,8 @@
     "GOAL_DOD_CRITIC"
   ],
   "review_id": "FACTORY-V1-READINESS-CLOSEOUT-INDEPENDENT-REVIEW-001",
-  "reviewed_bindings_sha256": "PENDING_BIND",
-  "reviewed_inventory_sha256": "PENDING_BIND",
+  "reviewed_bindings_sha256": "6c7494aed7677fc5ef38fa068c0e5e49be7c8e0b906b407bd4a05a1f088d8b59",
+  "reviewed_inventory_sha256": "aede7338cba217662e1991a56bf8f4833353a3947bc1a37deef2a0439ffecb01",
   "reviews": [
     {
       "findings": [
