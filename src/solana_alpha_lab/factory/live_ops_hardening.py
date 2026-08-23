@@ -242,7 +242,10 @@ def compose_health_clocks(
         "market_data": market,
         "provider": provider,
     }
-    packet["provider_health_visible"] = True
+    # Visible means the provider clock is projected (including explicit NOT_REQUIRED).
+    packet["provider_health_visible"] = isinstance(provider.get("status"), str) and bool(
+        provider.get("status")
+    )
     packet["diagnostic_inject_active"] = inject is not None
     return packet
 
@@ -498,8 +501,10 @@ def prove_local_release_rollback(
     if after_forward != target_sha:
         raise LiveOpsHardeningError("FORWARD_RESTORE_MISMATCH")
     return {
-        "live_deploy_rollback": True,
-        "live_forward_restore": True,
+        "local_deploy_rollback": True,
+        "local_forward_restore": True,
+        "live_deploy_rollback": False,
+        "live_forward_restore": False,
         "start_sha": start,
         "target_sha": target_sha,
         "previous_sha": previous_sha,
@@ -540,7 +545,8 @@ def prove_local_clean_rehost(*, src_root: Path, empty_root: Path, relatives: lis
         encoding="utf-8",
     )
     return {
-        "live_clean_rehost": True,
+        "local_clean_rehost": True,
+        "live_clean_rehost": False,
         "copied_count": len(copied),
         "empty_root": str(empty_root),
         "copied_venv": False,
@@ -648,12 +654,86 @@ def run_fault_matrix(
         "stale_data_alert": "PASS" if stale_alert.get("delivered") else "FAIL",
         "bot_stall_alert": "PASS" if stall_alert.get("delivered") else "FAIL",
         "provider_failure_alert_tested": bool(provider_alert.get("delivered")),
-        "provider_health_visible": True,
+        "provider_health_visible": bool(provider.get("provider_health_visible")),
+        "alert_transport": "LIVE" if transport is None else "MOCK",
         "checks": {
             "stale_data_alert": "PASS" if stale_alert.get("delivered") else "FAIL",
             "bot_stall_alert": "PASS" if stall_alert.get("delivered") else "FAIL",
         },
     }
+
+
+def require_live_runtime(runtime: Mapping[str, Any]) -> None:
+    """Fail closed: local phase0 stamps must never satisfy live predicates."""
+
+    if runtime.get("live_deploy_rollback") is not True:
+        raise LiveOpsHardeningError("LIVE_DEPLOY_ROLLBACK_REQUIRED")
+    if runtime.get("live_forward_restore") is not True:
+        raise LiveOpsHardeningError("LIVE_FORWARD_RESTORE_REQUIRED")
+    if runtime.get("live_clean_rehost") is not True:
+        raise LiveOpsHardeningError("LIVE_CLEAN_REHOST_REQUIRED")
+    host = str(runtime.get("host") or "")
+    if host != "factory-remote-ops":
+        raise LiveOpsHardeningError("LIVE_HOST_REQUIRED")
+    deploy_sha = str(runtime.get("deploy_sha") or runtime.get("target_sha") or "")
+    if len(deploy_sha) != 40:
+        raise LiveOpsHardeningError("LIVE_DEPLOY_SHA_REQUIRED")
+    steps = runtime.get("release_steps")
+    if not isinstance(steps, list) or len(steps) < 3:
+        raise LiveOpsHardeningError("LIVE_RELEASE_STEPS_REQUIRED")
+
+
+def validate_host_proof(host_proof: Mapping[str, Any]) -> dict[str, Any]:
+    """Machine-gate live host proof before acceptance / closeout binding."""
+
+    if host_proof.get("schema") != "smial.factory-v1-live-ops-hardening.host-proof":
+        raise LiveOpsHardeningError("HOST_PROOF_SCHEMA_INVALID")
+    if host_proof.get("host") != "factory-remote-ops":
+        raise LiveOpsHardeningError("HOST_PROOF_HOST_INVALID")
+    deploy_sha = str(host_proof.get("deploy_sha") or "")
+    if len(deploy_sha) != 40:
+        raise LiveOpsHardeningError("HOST_PROOF_DEPLOY_SHA_INVALID")
+    runtime = host_proof.get("runtime")
+    if not isinstance(runtime, Mapping):
+        raise LiveOpsHardeningError("HOST_PROOF_RUNTIME_MISSING")
+    require_live_runtime(
+        {
+            **dict(runtime),
+            "host": host_proof.get("host"),
+            "deploy_sha": deploy_sha,
+            "release_steps": host_proof.get("release_steps")
+            or runtime.get("release_steps")
+            or host_proof.get("steps"),
+        }
+    )
+    cleanup = host_proof.get("cleanup")
+    if not isinstance(cleanup, Mapping):
+        raise LiveOpsHardeningError("HOST_PROOF_CLEANUP_MISSING")
+    if cleanup.get("final_deploy_sha") != deploy_sha:
+        raise LiveOpsHardeningError("HOST_PROOF_FINAL_SHA_MISMATCH")
+    if cleanup.get("diagnostic_inject_cleared") is not True:
+        raise LiveOpsHardeningError("HOST_PROOF_DIAGNOSTIC_NOT_CLEARED")
+    if cleanup.get("rehost_proof_root_destroyed") is not True:
+        raise LiveOpsHardeningError("HOST_PROOF_REHOST_NOT_DESTROYED")
+    monitoring = host_proof.get("monitoring")
+    if not isinstance(monitoring, Mapping):
+        raise LiveOpsHardeningError("HOST_PROOF_MONITORING_MISSING")
+    if monitoring.get("alert_transport") != "LIVE":
+        raise LiveOpsHardeningError("HOST_PROOF_ALERT_TRANSPORT_NOT_LIVE")
+    security = host_proof.get("security")
+    if not isinstance(security, Mapping):
+        raise LiveOpsHardeningError("HOST_PROOF_SECURITY_MISSING")
+    hits = security.get("financial_command_surface_hits")
+    if not isinstance(hits, list) or hits:
+        raise LiveOpsHardeningError("HOST_PROOF_FINANCIAL_SURFACE_NOT_CLEAN")
+    provider_clock = host_proof.get("provider_clock")
+    if not isinstance(provider_clock, Mapping):
+        raise LiveOpsHardeningError("HOST_PROOF_PROVIDER_CLOCK_MISSING")
+    if not str(provider_clock.get("status") or ""):
+        raise LiveOpsHardeningError("HOST_PROOF_PROVIDER_CLOCK_STATUS_MISSING")
+    if monitoring.get("provider_health_visible") is not True:
+        raise LiveOpsHardeningError("HOST_PROOF_PROVIDER_HEALTH_NOT_VISIBLE")
+    return dict(host_proof)
 
 
 def build_acceptance(
@@ -663,7 +743,25 @@ def build_acceptance(
     incident_lifecycle: Mapping[str, Any],
     security: Mapping[str, Any],
     side_effects: Mapping[str, Any] | None = None,
+    host: str | None = None,
+    deploy_sha: str | None = None,
+    host_proof_sha256: str | None = None,
+    live_bound: bool = False,
 ) -> dict[str, Any]:
+    if live_bound is not True:
+        raise LiveOpsHardeningError("ACCEPTANCE_REQUIRES_LIVE_HOST_PROOF")
+    require_live_runtime(
+        {
+            **dict(runtime),
+            "host": host,
+            "deploy_sha": deploy_sha or runtime.get("deploy_sha") or runtime.get("target_sha"),
+            "release_steps": runtime.get("release_steps"),
+        }
+    )
+    if not host_proof_sha256 or len(host_proof_sha256) != 64:
+        raise LiveOpsHardeningError("HOST_PROOF_SHA_REQUIRED")
+    if monitoring.get("alert_transport") != "LIVE":
+        raise LiveOpsHardeningError("ACCEPTANCE_ALERT_TRANSPORT_NOT_LIVE")
     effects = {
         "provider_market_calls": 0,
         "wallet_signer_transaction_actions": 0,
@@ -671,6 +769,7 @@ def build_acceptance(
         "credential_reads": int((side_effects or {}).get("credential_reads") or 0),
         "network_calls": int((side_effects or {}).get("network_calls") or 0),
     }
+    resolved_sha = str(deploy_sha or runtime.get("deploy_sha") or runtime.get("target_sha"))
     return {
         "schema": "smial.factory-v1-live-ops-hardening.acceptance",
         "schema_version": "1.0",
@@ -678,10 +777,16 @@ def build_acceptance(
         "task_id": "FACTORY_V1_LIVE_OPS_HARDENING_COMMISSIONING_V1",
         "terminal": PASS_TERMINAL,
         "project_sources_disposition": {"kind": "NO_CHANGE"},
+        "host": "factory-remote-ops",
+        "deploy_sha": resolved_sha,
+        "host_proof_sha256": host_proof_sha256,
         "runtime": {
-            "live_deploy_rollback": bool(runtime.get("live_deploy_rollback")),
-            "live_forward_restore": bool(runtime.get("live_forward_restore")),
-            "live_clean_rehost": bool(runtime.get("live_clean_rehost")),
+            "live_deploy_rollback": True,
+            "live_forward_restore": True,
+            "live_clean_rehost": True,
+            "target_sha": resolved_sha,
+            "previous_sha": str(runtime.get("previous_sha") or ""),
+            "start_sha": str(runtime.get("start_sha") or ""),
         },
         "monitoring": {
             "provider_health_visible": bool(monitoring.get("provider_health_visible")),
@@ -690,6 +795,7 @@ def build_acceptance(
             or monitoring.get("checks", {}).get("stale_data_alert") == "PASS",
             "bot_stall_alert_tested": monitoring.get("bot_stall_alert") == "PASS"
             or monitoring.get("checks", {}).get("bot_stall_alert") == "PASS",
+            "alert_transport": "LIVE",
             "checks": {
                 "stale_data_alert": monitoring.get("checks", {}).get("stale_data_alert", "FAIL"),
                 "bot_stall_alert": monitoring.get("checks", {}).get("bot_stall_alert", "FAIL"),
@@ -710,6 +816,9 @@ def build_acceptance(
             "transaction_submit_capability_present": bool(
                 security.get("transaction_submit_capability_present")
             ),
+            "financial_command_surface_hits": list(
+                security.get("financial_command_surface_hits") or []
+            ),
         },
         "side_effects": effects,
         "non_claims": [
@@ -721,6 +830,7 @@ def build_acceptance(
             "NO_MICRO_LIVE",
             "NO_SECOND_VPS",
             "NO_A6_POLICY_CERTIFICATION",
+            "NO_PHASE0_LOCAL_AS_LIVE_PASS",
         ],
     }
 
@@ -829,19 +939,16 @@ def prove_phase0_local(root: Path) -> dict[str, Any]:
         finally:
             _run_git(root, "worktree", "remove", "--force", str(work))
 
-    acceptance = build_acceptance(
-        runtime={**release, **rehost},
-        monitoring=faults,
-        incident_lifecycle=lifecycle,
-        security=financial,
-        side_effects={"credential_reads": 0, "network_calls": 0},
-    )
-    if acceptance["terminal"] != PASS_TERMINAL:
-        raise LiveOpsHardeningError("PHASE0_ACCEPTANCE_TERMINAL")
+    # Phase0 must never mint live_* or PASS acceptance — those require host proof.
+    if release.get("live_deploy_rollback") is True or rehost.get("live_clean_rehost") is True:
+        raise LiveOpsHardeningError("PHASE0_MUST_NOT_CLAIM_LIVE")
     return {
         "phase": 0,
         "terminal": "PHASE0_LOCAL_PASS",
-        "acceptance_draft": acceptance,
+        "local_runtime": {**release, **rehost},
+        "local_monitoring": faults,
+        "local_incident_lifecycle": lifecycle,
+        "local_security": financial,
         "alerts_delivered": len(delivered),
         "diagnostic_inject_cleared": True,
     }

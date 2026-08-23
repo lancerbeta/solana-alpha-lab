@@ -24,8 +24,10 @@ authority = DENIED.
 
 ## Граница
 
-Семь A5 readiness predicates теперь читают A5 acceptance. Остаётся один
-governance gap: `ENTRY_GATE_RESOLVES_READINESS_CONTRACT` → следующий атом A6.
+Семь A5 readiness predicates теперь читают **host proof**
+(`a1_host_proof_v1.json`, `alert_transport: LIVE`, release_steps, cleanup),
+а не phase0-local stamps. Остаётся один governance gap:
+`ENTRY_GATE_RESOLVES_READINESS_CONTRACT` → следующий атом A6.
 
 Не утверждает READY, Foundation Freeze, alpha, scientific SHADOW, REAL_FILL.
 

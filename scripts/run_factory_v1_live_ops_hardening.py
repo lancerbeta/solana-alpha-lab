@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import argparse
+import hashlib
 import json
 import sys
 from pathlib import Path
@@ -17,14 +18,9 @@ from solana_alpha_lab.factory.live_ops_hardening import (
     PASS_TERMINAL,
     LiveOpsHardeningError,
     build_acceptance,
-    clear_diagnostic_inject,
-    prove_financial_boundary,
-    prove_incident_lifecycle,
-    prove_local_clean_rehost,
     prove_phase0_local,
-    run_fault_matrix,
+    validate_host_proof,
 )
-from solana_alpha_lab.factory.remote_ops import load_config, package_backup, write_heartbeat
 
 EVIDENCE_DIR = Path("docs/evidence/factory_v1_live_ops_hardening")
 
@@ -45,36 +41,43 @@ def main() -> int:
     parser.add_argument(
         "--acceptance-from-json",
         type=Path,
-        help="Merge live host proof fields into acceptance",
+        help="Validated live host proof JSON; required for PASS acceptance",
     )
     args = parser.parse_args()
     root = args.root.resolve()
 
     phase0 = prove_phase0_local(root)
-    acceptance = dict(phase0["acceptance_draft"])
-    host_proof: dict[str, Any] | None = None
-    if args.acceptance_from_json is not None:
-        host_proof = json.loads(args.acceptance_from_json.read_text(encoding="utf-8"))
-        runtime = dict(acceptance["runtime"])
-        monitoring = dict(acceptance["monitoring"])
-        security = dict(acceptance["security"])
-        incident = dict(acceptance["incident_lifecycle"])
-        if isinstance(host_proof.get("runtime"), dict):
-            runtime.update(host_proof["runtime"])
-        if isinstance(host_proof.get("monitoring"), dict):
-            monitoring.update(host_proof["monitoring"])
-        if isinstance(host_proof.get("security"), dict):
-            security.update(host_proof["security"])
-        if isinstance(host_proof.get("incident_lifecycle"), dict):
-            incident.update(host_proof["incident_lifecycle"])
-        acceptance = build_acceptance(
-            runtime=runtime,
-            monitoring=monitoring,
-            incident_lifecycle=incident,
-            security=security,
-            side_effects=host_proof.get("side_effects") or acceptance["side_effects"],
-        )
+    if args.phase0_only:
+        print(json.dumps({"terminal": phase0["terminal"], "phase": 0}, indent=2))
+        return 0
 
+    if args.acceptance_from_json is None:
+        raise LiveOpsHardeningError("HOST_PROOF_REQUIRED_FOR_PASS")
+
+    host_path = args.acceptance_from_json.resolve()
+    host_proof = validate_host_proof(json.loads(host_path.read_text(encoding="utf-8")))
+    host_proof_sha256 = hashlib.sha256(host_path.read_bytes()).hexdigest()
+    acceptance = build_acceptance(
+        runtime={
+            **dict(host_proof["runtime"]),
+            "release_steps": host_proof["release_steps"],
+            "host": host_proof["host"],
+            "deploy_sha": host_proof["deploy_sha"],
+        },
+        monitoring=host_proof["monitoring"],
+        incident_lifecycle=host_proof["incident_lifecycle"],
+        security={
+            **dict(host_proof["security"]),
+            "financial_command_surface_hits": list(
+                host_proof["security"].get("financial_command_surface_hits") or []
+            ),
+        },
+        side_effects=host_proof.get("side_effects"),
+        host=str(host_proof["host"]),
+        deploy_sha=str(host_proof["deploy_sha"]),
+        host_proof_sha256=host_proof_sha256,
+        live_bound=True,
+    )
     if acceptance["terminal"] != PASS_TERMINAL:
         raise LiveOpsHardeningError("ACCEPTANCE_NOT_PASS")
 
@@ -83,19 +86,46 @@ def main() -> int:
         "schema_version": "1.0",
         "task_id": "FACTORY_V1_LIVE_OPS_HARDENING_COMMISSIONING_V1",
         "terminal": acceptance["terminal"],
-        "phase0": {"terminal": phase0["terminal"], "alerts_delivered": phase0["alerts_delivered"]},
-        "host_proof_bound": host_proof is not None,
+        "host": acceptance["host"],
+        "deploy_sha": acceptance["deploy_sha"],
+        "host_proof_sha256": host_proof_sha256,
+        "host_proof_bound": True,
+        "release_sequence": {
+            "start_sha": acceptance["runtime"]["start_sha"],
+            "previous_sha": acceptance["runtime"]["previous_sha"],
+            "target_sha": acceptance["runtime"]["target_sha"],
+            "live_deploy_rollback": True,
+            "live_forward_restore": True,
+            "live_clean_rehost": True,
+            "release_steps": host_proof["release_steps"],
+            "left_on_rollback_sha": False,
+        },
+        "phase0": {
+            "terminal": phase0["terminal"],
+            "alerts_delivered": phase0["alerts_delivered"],
+        },
         "side_effects": acceptance["side_effects"],
+        "non_claims": acceptance["non_claims"],
     }
 
     if args.write_evidence:
         out = root / EVIDENCE_DIR
         _write_json(out / "a1_runtime_receipt_v1.json", runtime_receipt)
-        if host_proof is not None:
-            _write_json(out / "a1_host_proof_v1.json", host_proof)
+        _write_json(out / "a1_host_proof_v1.json", dict(host_proof))
         _write_json(out / "a1_acceptance_v1.json", acceptance)
 
-    print(json.dumps({"terminal": acceptance["terminal"], "phase0": phase0["terminal"]}, indent=2))
+    print(
+        json.dumps(
+            {
+                "terminal": acceptance["terminal"],
+                "phase0": phase0["terminal"],
+                "host": acceptance["host"],
+                "deploy_sha": acceptance["deploy_sha"],
+                "host_proof_bound": True,
+            },
+            indent=2,
+        )
+    )
     return 0
 
 

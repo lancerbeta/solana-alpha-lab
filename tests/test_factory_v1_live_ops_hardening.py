@@ -1,7 +1,7 @@
 from __future__ import annotations
 
+import hashlib
 import json
-import sqlite3
 import sys
 import tempfile
 import unittest
@@ -17,6 +17,7 @@ if str(SRC) not in sys.path:
 
 from solana_alpha_lab.factory.live_ops_hardening import (
     LiveOpsHardeningError,
+    build_acceptance,
     clear_diagnostic_inject,
     compose_health_clocks,
     prove_financial_boundary,
@@ -25,6 +26,7 @@ from solana_alpha_lab.factory.live_ops_hardening import (
     prove_local_release_rollback,
     prove_phase0_local,
     run_fault_matrix,
+    validate_host_proof,
     write_diagnostic_inject,
 )
 from solana_alpha_lab.factory.remote_ops import (
@@ -34,6 +36,8 @@ from solana_alpha_lab.factory.remote_ops import (
 )
 
 SCHEMA = ROOT / "catalog/schemas/factory_v1_live_ops_hardening.schema.json"
+HOST_SCHEMA = ROOT / "catalog/schemas/factory_v1_live_ops_hardening_host_proof.schema.json"
+HOST_PROOF = ROOT / "docs/evidence/factory_v1_live_ops_hardening/a1_host_proof_v1.json"
 COPY_RELATIVES = [
     "catalog/schemas/factory_remote_operations.schema.json",
     "configs/factory_remote_operations_v1.yaml",
@@ -72,6 +76,8 @@ def _seed_stores(root: Path) -> None:
     ops.write_bytes(b"ops-seed")
     if paper.is_file():
         paper.unlink()
+    import sqlite3
+
     conn = sqlite3.connect(paper)
     conn.execute(
         "CREATE TABLE bot_instances (bot_instance_id TEXT PRIMARY KEY, strategy_id TEXT, strategy_version TEXT, mode TEXT, status TEXT, started_at TEXT, stopped_at TEXT)"
@@ -162,6 +168,7 @@ class LiveOpsHardeningPhase0Tests(unittest.TestCase):
         self.assertEqual(proof["shadow_financial_authority"], "DENIED")
         self.assertFalse(proof["signer_material_present"])
         self.assertFalse(proof["transaction_submit_capability_present"])
+        self.assertEqual(proof["financial_command_surface_hits"], [])
 
     def test_local_release_rollback_and_rehost(self) -> None:
         import subprocess
@@ -179,8 +186,10 @@ class LiveOpsHardeningPhase0Tests(unittest.TestCase):
                 release = prove_local_release_rollback(
                     work_root=work, target_sha=head, previous_sha=parent
                 )
-                self.assertTrue(release["live_deploy_rollback"])
-                self.assertTrue(release["live_forward_restore"])
+                self.assertTrue(release["local_deploy_rollback"])
+                self.assertTrue(release["local_forward_restore"])
+                self.assertFalse(release["live_deploy_rollback"])
+                self.assertFalse(release["live_forward_restore"])
                 self.assertFalse(release["left_on_rollback_sha"])
             finally:
                 subprocess.check_call(
@@ -195,7 +204,8 @@ class LiveOpsHardeningPhase0Tests(unittest.TestCase):
                     "configs/factory_remote_operations_v1.yaml",
                 ],
             )
-            self.assertTrue(rehost["live_clean_rehost"])
+            self.assertTrue(rehost["local_clean_rehost"])
+            self.assertFalse(rehost["live_clean_rehost"])
             self.assertFalse(rehost["copied_venv"])
 
     def test_archive_deploy_preserves_local(self) -> None:
@@ -230,7 +240,7 @@ class LiveOpsHardeningPhase0Tests(unittest.TestCase):
             self.assertFalse((deploy / "stale.txt").exists())
             self.assertTrue((deploy / "configs/factory_remote_operations_v1.yaml").is_file())
 
-    def test_fault_matrix_and_phase0(self) -> None:
+    def test_fault_matrix_marks_mock_transport(self) -> None:
         with tempfile.TemporaryDirectory() as tmp:
             root = _copy_tree(Path(tmp) / "src")
             _seed_stores(root)
@@ -248,15 +258,53 @@ class LiveOpsHardeningPhase0Tests(unittest.TestCase):
             self.assertEqual(faults["checks"]["bot_stall_alert"], "PASS")
             self.assertTrue(faults["provider_failure_alert_tested"])
             self.assertTrue(faults["provider_health_visible"])
+            self.assertEqual(faults["alert_transport"], "MOCK")
             self.assertFalse(
                 (root / "local/factory_v1/diagnostic_health_inject.json").is_file()
             )
 
+    def test_phase0_never_mints_live_pass_acceptance(self) -> None:
         phase0 = prove_phase0_local(ROOT)
         self.assertEqual(phase0["terminal"], "PHASE0_LOCAL_PASS")
-        acceptance = phase0["acceptance_draft"]
+        self.assertNotIn("acceptance_draft", phase0)
+        self.assertFalse(phase0["local_runtime"]["live_deploy_rollback"])
+        self.assertFalse(phase0["local_runtime"]["live_clean_rehost"])
+        self.assertEqual(phase0["local_monitoring"]["alert_transport"], "MOCK")
+        with self.assertRaisesRegex(LiveOpsHardeningError, "ACCEPTANCE_REQUIRES_LIVE_HOST_PROOF"):
+            build_acceptance(
+                runtime=phase0["local_runtime"],
+                monitoring=phase0["local_monitoring"],
+                incident_lifecycle=phase0["local_incident_lifecycle"],
+                security=phase0["local_security"],
+                live_bound=False,
+            )
+
+    def test_host_proof_builds_live_acceptance(self) -> None:
+        host = json.loads(HOST_PROOF.read_text(encoding="utf-8"))
+        jsonschema.validate(host, json.loads(HOST_SCHEMA.read_text(encoding="utf-8")))
+        validate_host_proof(host)
+        hp_sha = hashlib.sha256(HOST_PROOF.read_bytes()).hexdigest()
+        acceptance = build_acceptance(
+            runtime={
+                **host["runtime"],
+                "release_steps": host["release_steps"],
+                "host": host["host"],
+                "deploy_sha": host["deploy_sha"],
+            },
+            monitoring=host["monitoring"],
+            incident_lifecycle=host["incident_lifecycle"],
+            security=host["security"],
+            side_effects=host["side_effects"],
+            host=host["host"],
+            deploy_sha=host["deploy_sha"],
+            host_proof_sha256=hp_sha,
+            live_bound=True,
+        )
         jsonschema.validate(acceptance, json.loads(SCHEMA.read_text(encoding="utf-8")))
         self.assertEqual(acceptance["terminal"], "FACTORY_V1_LIVE_OPS_HARDENING_PASS")
+        self.assertEqual(acceptance["host"], "factory-remote-ops")
+        self.assertEqual(acceptance["monitoring"]["alert_transport"], "LIVE")
+        self.assertEqual(acceptance["host_proof_sha256"], hp_sha)
 
 
 if __name__ == "__main__":
