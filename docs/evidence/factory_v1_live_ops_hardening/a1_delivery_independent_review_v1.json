@@ -15,8 +15,8 @@
     "GOAL_DOD_CRITIC"
   ],
   "review_id": "FACTORY-V1-LIVE-OPS-HARDENING-INDEPENDENT-REVIEW-001",
-  "reviewed_bindings_sha256": "PENDING_BIND",
-  "reviewed_inventory_sha256": "PENDING_BIND",
+  "reviewed_bindings_sha256": "d75c56131d1d9c955d5d70a83fd07f9eddcbbac76d4fd6be641cc31cd4ae5ff7",
+  "reviewed_inventory_sha256": "fc07277db8ccb63a746ad8c4298fd12a42e6ae7fa16eb2ef632edb95ce911758",
   "reviews": [
     {
       "findings": [

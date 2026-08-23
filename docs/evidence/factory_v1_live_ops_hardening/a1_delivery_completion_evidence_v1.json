@@ -9,10 +9,29 @@
   "cloud_bundle_smoke_required": false,
   "factory_fit": {
     "path": "docs/evidence/factory_v1_live_ops_hardening/a1_delivery_factory_fit_v1.json",
-    "sha256": "PENDING_BIND",
+    "sha256": "dcbdcd0f4b24b1665a3b31b0613d269357b6a1d853408caeb0d1ad7609b3959b",
     "verdict": "PASS"
   },
-  "implementation_bindings": {},
+  "implementation_bindings": {
+    "catalog/assets/core.yaml": "f5b20f343841234f6ab54fb367a0c320d5deb3f5dca3a98710d5d9a04dd7d919",
+    "catalog/schemas/factory_v1_live_ops_hardening.schema.json": "36b0e1fbfee4efc6c9384d111179a31a9bd7718fda16950eba53f99ede12c02e",
+    "catalog/schemas/factory_v1_live_ops_hardening_host_proof.schema.json": "815be5c7bccfa54147273eb00022c329be4aa501bbf6c95d623ebf44b6da567e",
+    "configs/factory_v1_live_ops_hardening_v1.yaml": "9f90e333202f7b390245670a554471a8e5d2129a3509372d6d735fbccea75d9f",
+    "configs/factory_v1_operational_readiness_closeout_v1.yaml": "e8689b729c10c808009aeccdf29a0cb73283d9636661c39215767feff2a6fb38",
+    "docs/evidence/factory_v1_live_ops_hardening/a1_acceptance_v1.json": "4a916fd82b72a233901cceae5e05a11aad40077add73aec4281890c4582c2121",
+    "docs/evidence/factory_v1_live_ops_hardening/a1_host_proof_v1.json": "8eff14d05cb9c08f2d9ac8c4164d4a356dc95e1260074ede1cd879b804be694a",
+    "docs/evidence/factory_v1_live_ops_hardening/a1_runtime_receipt_v1.json": "bcf1e63e0ce2ccf41ca32f269d9540462206de07ea0301e759a1de5ab5d7d6be",
+    "docs/reports/factory_v1_live_ops_hardening/a1_owner_readout_v1.md": "14742dbe4347f680f2bc7c04a2c17e47b81815755e507547dd61eab0a4c450fe",
+    "docs/tasks/FACTORY_V1_LIVE_OPS_HARDENING_COMMISSIONING_V1.md": "2d7e233e19a78f5c7f215237a97e20f74799017255a9a1eb68cefc4b84753078",
+    "scripts/factory_live_release.py": "cf4e23198a1217f113a7a922286afbc3bd79c041a5d13cf50934cad1a514e298",
+    "scripts/factory_remote_doctor.py": "3685886e24574297b88a6e9754f950ddd9f40505bf7c20ee35203b06b691d4be",
+    "scripts/run_factory_v1_live_ops_hardening.py": "3c8c9163435f6ca7c76711207f3f033f93bfa4ac918497d1fc4a6d5af4c5c2bb",
+    "src/solana_alpha_lab/factory/live_ops_hardening.py": "fc10c4c652f21e988d8a3625e5a2c6ccc5a96102db53b99edda33860cf7d8201",
+    "src/solana_alpha_lab/factory/operational_readiness_closeout.py": "beaf40f933326c7d91032bf75860c9a848084efb7bcb787326c15d40b8f00f0b",
+    "src/solana_alpha_lab/factory/remote_ops.py": "f4e7a37194a26b91c2653a1fa7a4343882e5f5e21c0e2626b19d5cb3f4a0d7df",
+    "tests/test_factory_v1_live_ops_hardening.py": "6d7f382cb9c0d928ef3c1de27b1260c19b103924a2d2459fc8accc65fef00a07",
+    "tests/test_factory_v1_operational_readiness_closeout.py": "dcd4a47e27357d607029d71484362229950e35ab76affbaa5f32bb6af840c5f3"
+  },
   "non_claims": [
     "NO_CANONICAL_DONE",
     "NO_FACTORY_V1_OPERATIONAL_READY",
@@ -49,7 +68,7 @@
     "github_ci": "ENFORCED_LIVE_AT_GUARDED_MERGE",
     "independent_review": {
       "path": "docs/evidence/factory_v1_live_ops_hardening/a1_delivery_independent_review_v1.json",
-      "sha256": "PENDING_BIND",
+      "sha256": "474fbd51bd31fe53b82a891fc418ceb7a3bd54e9afb02b45160630d3f088e3f3",
       "verdict": "PASS"
     },
     "project_checks": [
