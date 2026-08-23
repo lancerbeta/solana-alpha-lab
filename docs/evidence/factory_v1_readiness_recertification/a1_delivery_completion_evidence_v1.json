@@ -9,11 +9,28 @@
   "cloud_bundle_smoke_required": false,
   "factory_fit": {
     "path": "docs/evidence/factory_v1_readiness_recertification/a1_delivery_factory_fit_v1.json",
-    "sha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+    "sha256": "6b44f36c270ab3d5bdb7e2c138b5c55bad95cbb2dbc64ef23935bd90712d6022",
     "verdict": "PASS"
   },
   "implementation_bindings": {
-    "configs/factory_v1_operational_readiness_v1.yaml": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+    "catalog/assets/core.yaml": "d017dcd118a6601ec7e95935a7ecb6be2db2e3de2c5db6cd1af68d602250e192",
+    "catalog/assets/lifecycle.yaml": "8c3060ff3e712178d88f5a589509cace6bc606c86117f0ea501d9ce4b6e96272",
+    "catalog/schemas/delivery_harness_project_profile.schema.json": "cba6d3d113346081e6352869969b0a3c6f422187db54a6f5b0c7313f4df188f0",
+    "configs/factory_v1_operational_readiness_closeout_v1.yaml": "8d97ca64254514de6ea557ba0b8656c6b19a7e967f0492a93c5b2339cd7d6baf",
+    "configs/factory_v1_operational_readiness_v1.yaml": "0a887caafbbfc44ba240cd0a9bb86b648a8c9d4fbbb954ab13c0e5062831d1c4",
+    "delivery-harness/project-profile.yaml": "311c76061dcf41e29ac5942b9fc421076f22e10300dc9cbf976c16ecc564af02",
+    "delivery-harness/templates/portable-bundle-manifest.json": "d8be20ac6dc67745df99ad09fad26dd9ed130376d9bf608a123b94b8b55df1c5",
+    "docs/PROJECT_MAP.md": "061140a7659b427c2cb889e6e0a47c1e7a33238faa1a26cd76b44733cfda866d",
+    "docs/evidence/control/delivery_harness_acceptance_v1.json": "fd2e257268888f6a518d038e44462c8d85967ffec5a4e3dd1440b50b1a9e45d8",
+    "docs/evidence/factory_v1_readiness_recertification/a1_acceptance_v1.json": "0add108577c2cad5205124e776eb4e9823749c016ed177bd6a156fe902effe37",
+    "docs/evidence/factory_v1_readiness_recertification/a1_gate_receipt_v1.json": "dbea53c07a05d5158ca1ed262fdb958c2d3d4e50e48fc28dcb86b967eb9ed17d",
+    "docs/reports/factory_v1_readiness_recertification/a1_owner_readout_v1.md": "8909e05065313b12696a51410136bddd7f0e3425d3ba66684a2ec9f30e82798a",
+    "docs/tasks/FACTORY_V1_READINESS_RECERTIFICATION_AND_FREEZE_V1.md": "0b7fac441eae051e53838a39bf7028b7d8dd2f5b388298df6cc8491b5b7eb603",
+    "scripts/delivery_harness.py": "9ad3d4c07533ea017a5fbe257876773721e8e9eab7d6b825d40428c9775441b3",
+    "tests/test_factory_v1_operational_readiness.py": "7c8c84cead33d9e9d6cbcc7cffb805a26d25bc84527d8ab9a6097813ccf4a7c4",
+    "tests/test_factory_v1_operational_readiness_closeout.py": "7323f099b08abf2cf06b976a56c4bc3f88d974885640723cd040301dbeffe71d",
+    "tests/test_factory_v1_production_lite_runtime.py": "5187fbbd6b9c711a0cb5a9ceedc78a5af87fa4bd4f097f74cf18849b5afa65ab",
+    "tests/test_factory_v1_readiness_recertification.py": "563b793a53fc4d84e9ed2ba9989a00cd2de0dfe83c80de0e467818d2fad7c7ab"
   },
   "non_claims": [
     "NO_CANONICAL_DONE",
@@ -49,7 +66,7 @@
     "github_ci": "ENFORCED_LIVE_AT_GUARDED_MERGE",
     "independent_review": {
       "path": "docs/evidence/factory_v1_readiness_recertification/a1_delivery_independent_review_v1.json",
-      "sha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "sha256": "41caab74f698548ac00baff9793811530b69737b208313f478c5df15e77d2229",
       "verdict": "PASS"
     },
     "project_checks": [

@@ -13,8 +13,8 @@
     "GOAL_DOD_CRITIC"
   ],
   "review_id": "FACTORY-V1-READINESS-RECERTIFICATION-INDEPENDENT-REVIEW-001",
-  "reviewed_bindings_sha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
-  "reviewed_inventory_sha256": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+  "reviewed_bindings_sha256": "335d55d8163f4d3395b4b0f3fbcf8b72bc75a956d9eca66ab08dd5e823501bab",
+  "reviewed_inventory_sha256": "e27ee03189941fe557131bd3adedf72f3c666cca01c783bd4c0801bdd062e3d8",
   "reviews": [
     {
       "findings": [
