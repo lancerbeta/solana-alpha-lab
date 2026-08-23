@@ -1,0 +1,61 @@
+schema: smial.factory-v1-live-ops-hardening
+schema_version: "1.0"
+contract_id: FACTORY-V1-LIVE-OPS-HARDENING-001
+task_id: FACTORY_V1_LIVE_OPS_HARDENING_COMMISSIONING_V1
+as_of: "2026-08-23"
+implementation: LIVE_OPS_HARDENING_COMMISSIONING
+host_locator_path: docs/operator/factory_remote_host_v1.yaml
+deploy:
+  exact_sha_required: true
+  forbid_branch_tip_without_readback: true
+  sequence:
+    - BACKUP_OPS_STATE
+    - STOP_AFFECTED_UNITS
+    - CHECKOUT_DETACH_TARGET_SHA
+    - UV_SYNC_LOCKED
+    - START_UNITS
+    - DOCTOR_READBACK
+    - COMMISSIONING_SHADOW_TICK
+    - ROLLBACK_PREVIOUS_KNOWN_GOOD_SHA
+    - DOCTOR_READBACK
+    - FORWARD_RESTORE_TARGET_SHA
+    - DOCTOR_READBACK
+  final_host_must_not_remain_on_rollback_sha: true
+rehost:
+  mode: EMPTY_ROOT_ON_EXISTING_HOST
+  forbid_copy_venv: true
+  forbid_copy_existing_checkout: true
+  destroy_proof_root_after_freeze: true
+  second_host_terminal: REHOST_CONTRACT_REQUIRES_SECOND_HOST
+health:
+  clocks:
+    - worker
+    - progress
+    - market_data
+    - provider
+  commissioning_default_applicability: NOT_REQUIRED_COMMISSIONING_ONLY
+  forbid_provider_ok_without_observation: true
+incident_lifecycle:
+  states: [CLEAR, OPEN, RECOVERED]
+  require:
+    first_delivery: PASS
+    duplicate_dedup: PASS
+    recovery: PASS
+    recurrence_redelivery: PASS
+financial_boundary:
+  shadow_financial_authority: DENIED
+  signer_material_present: false
+  transaction_submit_capability_present: false
+  destructive_and_financial_actions_separately_gated: true
+side_effect_caps:
+  provider_market_calls: 0
+  wallet_signer_transaction_actions: 0
+  cash_spend_usd_cents: 0
+non_claims:
+  - NO_FACTORY_V1_OPERATIONAL_READY
+  - NO_FOUNDATION_FREEZE
+  - NO_ALPHA
+  - NO_SCIENTIFIC_SHADOW
+  - NO_REAL_FILL
+  - NO_MICRO_LIVE
+  - NO_SECOND_VPS

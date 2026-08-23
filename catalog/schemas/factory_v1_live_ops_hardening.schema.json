@@ -1,0 +1,119 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://smial.local/schemas/factory_v1_live_ops_hardening.schema.json",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema",
+    "schema_version",
+    "acceptance_id",
+    "task_id",
+    "terminal",
+    "project_sources_disposition",
+    "runtime",
+    "monitoring",
+    "incident_lifecycle",
+    "security",
+    "side_effects",
+    "non_claims"
+  ],
+  "properties": {
+    "schema": {"const": "smial.factory-v1-live-ops-hardening.acceptance"},
+    "schema_version": {"const": "1.0"},
+    "acceptance_id": {"const": "FACTORY-V1-LIVE-OPS-HARDENING-001"},
+    "task_id": {"const": "FACTORY_V1_LIVE_OPS_HARDENING_COMMISSIONING_V1"},
+    "terminal": {"const": "FACTORY_V1_LIVE_OPS_HARDENING_PASS"},
+    "project_sources_disposition": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["kind"],
+      "properties": {"kind": {"const": "NO_CHANGE"}}
+    },
+    "runtime": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["live_deploy_rollback", "live_forward_restore", "live_clean_rehost"],
+      "properties": {
+        "live_deploy_rollback": {"const": true},
+        "live_forward_restore": {"const": true},
+        "live_clean_rehost": {"const": true}
+      }
+    },
+    "monitoring": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "provider_health_visible",
+        "provider_failure_alert_tested",
+        "stale_data_alert_tested",
+        "bot_stall_alert_tested",
+        "checks"
+      ],
+      "properties": {
+        "provider_health_visible": {"const": true},
+        "provider_failure_alert_tested": {"const": true},
+        "stale_data_alert_tested": {"const": true},
+        "bot_stall_alert_tested": {"const": true},
+        "checks": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["stale_data_alert", "bot_stall_alert"],
+          "properties": {
+            "stale_data_alert": {"const": "PASS"},
+            "bot_stall_alert": {"const": "PASS"}
+          }
+        }
+      }
+    },
+    "incident_lifecycle": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["first_delivery", "duplicate_dedup", "recovery", "recurrence_redelivery"],
+      "properties": {
+        "first_delivery": {"const": "PASS"},
+        "duplicate_dedup": {"const": "PASS"},
+        "recovery": {"const": "PASS"},
+        "recurrence_redelivery": {"const": "PASS"}
+      }
+    },
+    "security": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "destructive_and_financial_actions_separately_gated",
+        "shadow_financial_authority",
+        "signer_material_present",
+        "transaction_submit_capability_present"
+      ],
+      "properties": {
+        "destructive_and_financial_actions_separately_gated": {"const": true},
+        "shadow_financial_authority": {"const": "DENIED"},
+        "signer_material_present": {"const": false},
+        "transaction_submit_capability_present": {"const": false}
+      }
+    },
+    "side_effects": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "provider_market_calls",
+        "wallet_signer_transaction_actions",
+        "cash_spend_usd_cents",
+        "credential_reads",
+        "network_calls"
+      ],
+      "properties": {
+        "provider_market_calls": {"const": 0},
+        "wallet_signer_transaction_actions": {"const": 0},
+        "cash_spend_usd_cents": {"const": 0},
+        "credential_reads": {"type": "integer", "minimum": 0},
+        "network_calls": {"type": "integer", "minimum": 0}
+      }
+    },
+    "non_claims": {
+      "type": "array",
+      "minItems": 1,
+      "items": {"type": "string", "minLength": 1}
+    }
+  }
+}
