@@ -246,10 +246,10 @@ def resolve_backup_sink(
 def _backup_newest(sink: Path) -> dict[str, Any] | None:
     if sink.is_dir() is False:
         return None
-    bundles = sorted(sink.glob("BACKUP_*.zip"))
+    bundles = list(sink.glob("BACKUP_*.zip"))
     if not bundles:
         return None
-    newest = bundles[-1]
+    newest = max(bundles, key=lambda path: path.stat().st_mtime)
     return {
         "path": newest.name,
         "sha256": newest.stem.replace("BACKUP_", "", 1),

@@ -1,0 +1,58 @@
+{
+  "as_of": "2026-08-23",
+  "non_claims": [
+    "NO_CRYPTOGRAPHIC_REVIEWER_IDENTITY",
+    "REVIEW_IS_NOT_SEMANTIC_DONE",
+    "NO_CANONICAL_DONE",
+    "NO_FACTORY_V1_OPERATIONAL_READY",
+    "NO_ALPHA_OR_NETRETURN",
+    "NO_SECOND_VPS",
+    "NO_A6_POLICY_CERTIFICATION"
+  ],
+  "required_roles": [
+    "ARCHITECTURE_CRITIC",
+    "CODE_REVIEWER",
+    "GOAL_DOD_CRITIC"
+  ],
+  "review_id": "FACTORY-V1-LIVE-OPS-HARDENING-INDEPENDENT-REVIEW-001",
+  "reviewed_bindings_sha256": "ea13b0b776080ac256ae7132990447de1e631407a687f51188d33ef04a322813",
+  "reviewed_inventory_sha256": "a83ab756919da1115021cc4f84ca565908262518cdb42de6ad743bccc25b81e7",
+  "reviews": [
+    {
+      "findings": [
+        "CHECKED_PHASE0_CANNOT_MINT_LIVE_OR_PASS",
+        "CHECKED_BUILD_ACCEPTANCE_REQUIRES_LIVE_BOUND_HOST_PROOF",
+        "CHECKED_CLOSEOUT_BINDS_SHA_PINNED_HOST_PROOF",
+        "CHECKED_ALERT_TRANSPORT_LIVE_REQUIRED",
+        "CHECKED_RELEASE_STEPS_CONSISTENT_WITH_RUNTIME_SHAS"
+      ],
+      "role": "CODE_REVIEWER",
+      "verdict": "PASS"
+    },
+    {
+      "findings": [
+        "CHECKED_A6_CONSUMER_DISTINGUISHES_LIVE_FROM_PHASE0",
+        "CHECKED_SEVEN_A5_PREDICATES_HOST_PROOF_BOUND",
+        "CHECKED_STOP_BEFORE_READY_AND_A6_POLICY",
+        "CHECKED_ENTRY_GATE_REMAINS_SOLE_CLOSEOUT_GAP"
+      ],
+      "role": "GOAL_DOD_CRITIC",
+      "verdict": "PASS"
+    },
+    {
+      "findings": [
+        "CHECKED_HOST_PROOF_VS_ACCEPTANCE_SCHEMA_SPLIT",
+        "CHECKED_RELEASE_STEPS_START_PREVIOUS_FINAL_DOCTOR_GATES",
+        "CHECKED_FINANCIAL_DENIED_AND_EMPTY_COMMAND_SURFACE",
+        "CHECKED_REMOTE_OPS_LIVE_OPS_RELEASE_LAYERING",
+        "RESIDUAL_PRIVATE_HELPER_IMPORT_NON_BLOCKING"
+      ],
+      "role": "ARCHITECTURE_CRITIC",
+      "verdict": "PASS"
+    }
+  ],
+  "schema": "smial.delivery-independent-review-evidence",
+  "schema_version": "1.0",
+  "task_id": "FACTORY_V1_LIVE_OPS_HARDENING_COMMISSIONING_V1",
+  "verdict": "PASS"
+}

@@ -35,16 +35,16 @@ class FactoryV1OperationalReadinessCloseoutTests(unittest.TestCase):
         self.assertEqual(gate["foundation_freeze"], "INACTIVE")
         self.assertGreaterEqual(len(gate["named_gaps"]), 1)
         gap_ids = {item.split(":", 1)[0] for item in gate["named_gaps"]}
-        self.assertIn("RUNTIME_LIVE_DEPLOY_ROLLBACK", gap_ids)
-        self.assertIn("MONITORING_PROVIDER_FAILURE_ALERT", gap_ids)
-        self.assertIn("SECURITY_FINANCIAL_GATED", gap_ids)
+        self.assertNotIn("RUNTIME_LIVE_DEPLOY_ROLLBACK", gap_ids)
+        self.assertNotIn("MONITORING_PROVIDER_FAILURE_ALERT", gap_ids)
+        self.assertNotIn("SECURITY_FINANCIAL_GATED", gap_ids)
         self.assertNotIn("DATA_FACTORY_PIT_LINEAGE_RECEIPT", gap_ids)
         self.assertNotIn("DATA_EXPLICIT_MISSINGNESS", gap_ids)
         self.assertNotIn("TIME_TO_EVIDENCE_FIRST_BYTE", gap_ids)
-        self.assertIn("ENTRY_GATE_RESOLVES_READINESS_CONTRACT", gap_ids)
+        self.assertEqual(gap_ids, {"ENTRY_GATE_RESOLVES_READINESS_CONTRACT"})
         self.assertEqual(
             gate["next_safe_action"],
-            "A5_LIVE_OPS_HARDENING_COMMISSIONING",
+            "A6_READINESS_RECERTIFICATION_AND_FREEZE",
         )
         # Must still pass known slice predicates (positive fields, not proxies).
         by_id = {item["id"]: item for item in gate["predicates"]}
@@ -57,6 +57,13 @@ class FactoryV1OperationalReadinessCloseoutTests(unittest.TestCase):
         self.assertEqual(by_id["DATA_FACTORY_PIT_LINEAGE_RECEIPT"]["verdict"], "PASS")
         self.assertEqual(by_id["DATA_EXPLICIT_MISSINGNESS"]["verdict"], "PASS")
         self.assertEqual(by_id["TIME_TO_EVIDENCE_FIRST_BYTE"]["verdict"], "PASS")
+        self.assertEqual(by_id["RUNTIME_LIVE_DEPLOY_ROLLBACK"]["verdict"], "PASS")
+        self.assertEqual(by_id["RUNTIME_LIVE_CLEAN_REHOST"]["verdict"], "PASS")
+        self.assertEqual(by_id["MONITORING_PROVIDER_FAILURE_ALERT"]["verdict"], "PASS")
+        self.assertEqual(by_id["MONITORING_LIVE_STALE_DATA_ALERT"]["verdict"], "PASS")
+        self.assertEqual(by_id["MONITORING_LIVE_BOT_STALL_ALERT"]["verdict"], "PASS")
+        self.assertEqual(by_id["DATA_PROVIDER_HEALTH_VISIBLE"]["verdict"], "PASS")
+        self.assertEqual(by_id["SECURITY_FINANCIAL_GATED"]["verdict"], "PASS")
 
     def test_all_pass_fixture_emits_ready_and_freeze(self) -> None:
         with tempfile.TemporaryDirectory() as tmp:

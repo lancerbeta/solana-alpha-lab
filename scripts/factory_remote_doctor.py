@@ -28,6 +28,11 @@ WORKBENCH_UNIT = "factory-v1-workbench.service"
 
 
 def _git_sha(root: Path) -> str | None:
+    pin = root / ".factory_deploy_sha"
+    if pin.is_file():
+        value = pin.read_text(encoding="utf-8").strip()
+        if len(value) == 40:
+            return value
     try:
         return subprocess.check_output(
             ["git", "-C", str(root), "rev-parse", "HEAD"],

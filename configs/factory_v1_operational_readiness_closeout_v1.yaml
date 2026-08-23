@@ -52,14 +52,25 @@ predicates:
       scientific_shadow_pass: false
   - id: RUNTIME_LIVE_DEPLOY_ROLLBACK
     dimension: runtime
-    evidence_path: docs/evidence/factory_remote_operations/a3_acceptance_v1.json
+    evidence_path: docs/evidence/factory_v1_live_ops_hardening/a1_host_proof_v1.json
+    schema_path: catalog/schemas/factory_v1_live_ops_hardening_host_proof.schema.json
+    schema_sha256: 815be5c7bccfa54147273eb00022c329be4aa501bbf6c95d623ebf44b6da567e
+    evidence_sha256: 8eff14d05cb9c08f2d9ac8c4164d4a356dc95e1260074ede1cd879b804be694a
     require:
-      live_deploy_rollback: true
+      host: factory-remote-ops
+      runtime.live_deploy_rollback: true
+      monitoring.alert_transport: LIVE
   - id: RUNTIME_LIVE_CLEAN_REHOST
     dimension: runtime
-    evidence_path: docs/evidence/factory_remote_operations/a3_acceptance_v1.json
+    evidence_path: docs/evidence/factory_v1_live_ops_hardening/a1_host_proof_v1.json
+    schema_path: catalog/schemas/factory_v1_live_ops_hardening_host_proof.schema.json
+    schema_sha256: 815be5c7bccfa54147273eb00022c329be4aa501bbf6c95d623ebf44b6da567e
+    evidence_sha256: 8eff14d05cb9c08f2d9ac8c4164d4a356dc95e1260074ede1cd879b804be694a
     require:
-      live_clean_rehost: true
+      host: factory-remote-ops
+      runtime.live_clean_rehost: true
+      cleanup.rehost_proof_root_destroyed: true
+      monitoring.alert_transport: LIVE
   - id: DATA_LIVE_BACKUP_ISOLATED_RESTORE
     dimension: data
     evidence_path: docs/evidence/factory_unattended_shadow/a1_host_proof_v1.json
@@ -86,19 +97,31 @@ predicates:
       live_host.telegram_boot_alert_deduped: true
   - id: MONITORING_PROVIDER_FAILURE_ALERT
     dimension: monitoring
-    evidence_path: docs/evidence/factory_remote_operations/a3_runtime_receipt_v1.json
+    evidence_path: docs/evidence/factory_v1_live_ops_hardening/a1_host_proof_v1.json
+    schema_path: catalog/schemas/factory_v1_live_ops_hardening_host_proof.schema.json
+    schema_sha256: 815be5c7bccfa54147273eb00022c329be4aa501bbf6c95d623ebf44b6da567e
+    evidence_sha256: 8eff14d05cb9c08f2d9ac8c4164d4a356dc95e1260074ede1cd879b804be694a
     require:
-      provider_failure_alert_tested: true
+      monitoring.provider_failure_alert_tested: true
+      monitoring.alert_transport: LIVE
   - id: MONITORING_LIVE_STALE_DATA_ALERT
     dimension: monitoring
-    evidence_path: docs/evidence/factory_unattended_shadow/a1_host_proof_v1.json
+    evidence_path: docs/evidence/factory_v1_live_ops_hardening/a1_host_proof_v1.json
+    schema_path: catalog/schemas/factory_v1_live_ops_hardening_host_proof.schema.json
+    schema_sha256: 815be5c7bccfa54147273eb00022c329be4aa501bbf6c95d623ebf44b6da567e
+    evidence_sha256: 8eff14d05cb9c08f2d9ac8c4164d4a356dc95e1260074ede1cd879b804be694a
     require:
-      checks.stale_data_alert: PASS
+      monitoring.checks.stale_data_alert: PASS
+      monitoring.alert_transport: LIVE
   - id: MONITORING_LIVE_BOT_STALL_ALERT
     dimension: monitoring
-    evidence_path: docs/evidence/factory_unattended_shadow/a1_host_proof_v1.json
+    evidence_path: docs/evidence/factory_v1_live_ops_hardening/a1_host_proof_v1.json
+    schema_path: catalog/schemas/factory_v1_live_ops_hardening_host_proof.schema.json
+    schema_sha256: 815be5c7bccfa54147273eb00022c329be4aa501bbf6c95d623ebf44b6da567e
+    evidence_sha256: 8eff14d05cb9c08f2d9ac8c4164d4a356dc95e1260074ede1cd879b804be694a
     require:
-      checks.bot_stall_alert: PASS
+      monitoring.checks.bot_stall_alert: PASS
+      monitoring.alert_transport: LIVE
   - id: SECURITY_SECRETS_OUTSIDE_REPO
     dimension: security
     evidence_path: docs/evidence/factory_remote_operations/a3_acceptance_v1.json
@@ -111,10 +134,15 @@ predicates:
       security.public_admin: false
   - id: SECURITY_FINANCIAL_GATED
     dimension: security
-    evidence_path: docs/evidence/factory_remote_operations/a3_acceptance_v1.json
+    evidence_path: docs/evidence/factory_v1_live_ops_hardening/a1_host_proof_v1.json
+    schema_path: catalog/schemas/factory_v1_live_ops_hardening_host_proof.schema.json
+    schema_sha256: 815be5c7bccfa54147273eb00022c329be4aa501bbf6c95d623ebf44b6da567e
+    evidence_sha256: 8eff14d05cb9c08f2d9ac8c4164d4a356dc95e1260074ede1cd879b804be694a
     require:
       # Positive gating proof — non-claim scientific_shadow_pass:false is not enough.
       security.destructive_and_financial_actions_separately_gated: true
+      security.shadow_financial_authority: DENIED
+      security.financial_command_surface_hits: []
   - id: DATA_EXPLICIT_MISSINGNESS
     dimension: data
     evidence_path: docs/evidence/factory_v1_pit_data_truth_canonicalization/a1_acceptance_v1.json
@@ -125,9 +153,14 @@ predicates:
       readiness.explicit_missingness_preserved: true
   - id: DATA_PROVIDER_HEALTH_VISIBLE
     dimension: data
-    evidence_path: docs/evidence/factory_remote_operations/a3_runtime_receipt_v1.json
+    evidence_path: docs/evidence/factory_v1_live_ops_hardening/a1_host_proof_v1.json
+    schema_path: catalog/schemas/factory_v1_live_ops_hardening_host_proof.schema.json
+    schema_sha256: 815be5c7bccfa54147273eb00022c329be4aa501bbf6c95d623ebf44b6da567e
+    evidence_sha256: 8eff14d05cb9c08f2d9ac8c4164d4a356dc95e1260074ede1cd879b804be694a
     require:
-      provider_health_visible: true
+      monitoring.provider_health_visible: true
+      provider_clock.status: NOT_REQUIRED
+      monitoring.alert_transport: LIVE
   - id: TIME_TO_EVIDENCE_FIRST_BYTE
     dimension: time_to_evidence
     evidence_path: docs/evidence/factory_v1_pit_data_truth_canonicalization/a1_acceptance_v1.json

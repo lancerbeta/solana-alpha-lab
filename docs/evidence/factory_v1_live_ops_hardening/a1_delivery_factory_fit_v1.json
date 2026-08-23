@@ -1,0 +1,38 @@
+{
+  "as_of": "2026-08-23",
+  "capability_radar": {
+    "now": "LIVE_OPS_HARDENING_COMMISSIONING_PASS",
+    "watch": "A6_READINESS_RECERTIFICATION_AND_FREEZE"
+  },
+  "dimensions": {
+    "build_vs_buy": "PASS_WRAP_REMOTE_OPS_AND_EXISTING_HOST",
+    "context_efficiency": "PASS_PHASE0_BEFORE_LIVE_HOST_CEREMONY",
+    "execution_to_cashflow": "NOT_APPLICABLE_NO_FINANCIAL_AUTHORITY",
+    "flexibility_and_history": "PASS_EXACT_SHA_DEPLOY_ROLLBACK_FORWARD",
+    "mission": "PASS_LIVE_HOST_RECOVERY_AND_OBSERVABILITY_WITHOUT_READY",
+    "monitoring_and_recovery": "PASS_COMPOSED_CLOCKS_LIVE_ALERTS_INCIDENT_LIFECYCLE",
+    "owner_operability": "PASS_RUSSIAN_READOUT_AND_HOST_PROOF_RECEIPTS",
+    "red_team": "PASS_PHASE0_CANNOT_SATISFY_LIVE_CLOSEOUT",
+    "research_truth": "PASS_NON_CLAIM_NO_SCIENTIFIC_SHADOW_OR_ALPHA",
+    "security": "PASS_FINANCIAL_DENIED_SEPARATE_FROM_DEPLOY"
+  },
+  "limits": [
+    "NO_SECOND_VPS",
+    "NO_PROVIDER_MARKET_CALLS",
+    "NO_WALLET_SIGNER_TRANSACTION",
+    "NO_FACTORY_V1_OPERATIONAL_READY",
+    "NO_FOUNDATION_FREEZE",
+    "NO_A6_POLICY_CERTIFICATION",
+    "NO_CANONICAL_DONE",
+    "CAPABILITY_PASS_IS_NOT_PROMOTION"
+  ],
+  "mode": "FULL_REVIEW",
+  "recovery": "REVERT_THIS_ATOM; PRESERVE_REMOTE_HOST_AND_PRIOR_A4_RECEIPTS; KEEP_PHASE0_NON_LIVE.",
+  "review_id": "FACTORY-V1-LIVE-OPS-HARDENING-FACTORY-FIT-001",
+  "reviewed_bindings_sha256": "ea13b0b776080ac256ae7132990447de1e631407a687f51188d33ef04a322813",
+  "reviewed_inventory_sha256": "a83ab756919da1115021cc4f84ca565908262518cdb42de6ad743bccc25b81e7",
+  "schema": "smial.delivery-harness-factory-fit",
+  "schema_version": "1.0",
+  "task_id": "FACTORY_V1_LIVE_OPS_HARDENING_COMMISSIONING_V1",
+  "verdict": "PASS"
+}

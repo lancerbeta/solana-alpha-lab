@@ -29805,7 +29805,7 @@ records:
   as_of: '2026-08-22'
   truth_owner: FACTORY_REMOTE_OPERATIONS_V1
   location: {kind: git_path, logical_uri: 'repo://src/solana_alpha_lab/factory/remote_ops.py', repository_path: src/solana_alpha_lab/factory/remote_ops.py}
-  integrity: {kind: sha256, sha256: 2b4b8dceaaa3db198e8f40cdd4b8333b39b6e61512ca3efaf7d1a3a3e196289b}
+  integrity: {kind: sha256, sha256: f4e7a37194a26b91c2653a1fa7a4343882e5f5e21c0e2626b19d5cb3f4a0d7df}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations: [{relation_type: governed_by, target_asset_id: CTRL-FACTORY-REMOTE-OPERATIONS-001}]
   consumers: [FACTORY-001, GOAL-OWNER]
@@ -29821,7 +29821,7 @@ records:
   as_of: '2026-08-22'
   truth_owner: FACTORY_REMOTE_OPERATIONS_V1
   location: {kind: git_path, logical_uri: 'repo://scripts/factory_remote_doctor.py', repository_path: scripts/factory_remote_doctor.py}
-  integrity: {kind: sha256, sha256: 3cd094721001fd6ec3f86d8029b891b55724a830ebd1796d4e5cc6d41bdb5173}
+  integrity: {kind: sha256, sha256: 3685886e24574297b88a6e9754f950ddd9f40505bf7c20ee35203b06b691d4be}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations: [{relation_type: depends_on, target_asset_id: MODULE-FACTORY-REMOTE-OPS-001}]
   consumers: [FACTORY-001, GOAL-OWNER]
@@ -30446,7 +30446,7 @@ records:
   as_of: '2026-08-23'
   truth_owner: FACTORY_V1_OPERATIONAL_READINESS_CLOSEOUT_V1
   location: {kind: git_path, logical_uri: 'repo://configs/factory_v1_operational_readiness_closeout_v1.yaml', repository_path: configs/factory_v1_operational_readiness_closeout_v1.yaml}
-  integrity: {kind: sha256, sha256: 0e2e1fb28e1a6886ceb9204266c5b30f0b6c2204daa06447efad709715b5d1ca}
+  integrity: {kind: sha256, sha256: e8689b729c10c808009aeccdf29a0cb73283d9636661c39215767feff2a6fb38}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: governed_by, target_asset_id: CTRL-FACTORY-V1-OPERATIONAL-READINESS-CLOSEOUT-001}
@@ -30464,7 +30464,7 @@ records:
   as_of: '2026-08-23'
   truth_owner: FACTORY_V1_OPERATIONAL_READINESS_CLOSEOUT_V1
   location: {kind: git_path, logical_uri: 'repo://src/solana_alpha_lab/factory/operational_readiness_closeout.py', repository_path: src/solana_alpha_lab/factory/operational_readiness_closeout.py}
-  integrity: {kind: sha256, sha256: 0f0ba5cc43f44eb2f7bbf425498de27576a99a339e7925e61b88b5d6390f216b}
+  integrity: {kind: sha256, sha256: beaf40f933326c7d91032bf75860c9a848084efb7bcb787326c15d40b8f00f0b}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: governed_by, target_asset_id: CTRL-FACTORY-V1-OPERATIONAL-READINESS-CLOSEOUT-001}
@@ -30498,7 +30498,7 @@ records:
   as_of: '2026-08-23'
   truth_owner: FACTORY_V1_OPERATIONAL_READINESS_CLOSEOUT_V1
   location: {kind: git_path, logical_uri: 'repo://tests/test_factory_v1_operational_readiness_closeout.py', repository_path: tests/test_factory_v1_operational_readiness_closeout.py}
-  integrity: {kind: sha256, sha256: 27a0a8d8d0618eedabb12696adc7113a7c82162ae40f45961c5f23cad1458114}
+  integrity: {kind: sha256, sha256: dcd4a47e27357d607029d71484362229950e35ab76affbaa5f32bb6af840c5f3}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: depends_on, target_asset_id: MODULE-FACTORY-V1-OPERATIONAL-READINESS-CLOSEOUT-001}
