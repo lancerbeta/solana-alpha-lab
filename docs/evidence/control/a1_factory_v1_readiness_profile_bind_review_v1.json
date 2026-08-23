@@ -1,0 +1,35 @@
+{
+  "as_of": "2026-08-24",
+  "non_claims": [
+    "NO_CRYPTOGRAPHIC_REVIEWER_IDENTITY"
+  ],
+  "required_roles": [
+    "CODE_REVIEWER",
+    "GOAL_DOD_CRITIC",
+    "ARCHITECTURE_CRITIC"
+  ],
+  "review_id": "FACTORY-V1-READINESS-PROFILE-BIND-REVIEW-001",
+  "reviewed_bindings_sha256": "1387b6a4ab99e64efd30dd4b1af727336538f0f559fa359121c77977a5730e7c",
+  "reviewed_inventory_sha256": "25588b84f3b9323e090620b3a80cef4f16dde0d43ad3be64f0d37c294bea1cff",
+  "reviews": [
+    {
+      "findings": [],
+      "role": "CODE_REVIEWER",
+      "verdict": "PASS"
+    },
+    {
+      "findings": [],
+      "role": "GOAL_DOD_CRITIC",
+      "verdict": "PASS"
+    },
+    {
+      "findings": [],
+      "role": "ARCHITECTURE_CRITIC",
+      "verdict": "PASS"
+    }
+  ],
+  "schema": "smial.delivery-independent-review-evidence",
+  "schema_version": "1.0",
+  "task_id": "CTRL-FACTORY-V1-READINESS-PROFILE-BIND-V1",
+  "verdict": "PASS"
+}

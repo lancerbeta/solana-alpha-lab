@@ -41,7 +41,7 @@
     {
       "source": "catalog/schemas/delivery_harness_project_profile.schema.json",
       "destination": "catalog/schemas/delivery_harness_project_profile.schema.json",
-      "sha256": "66bf134c4de09a4ed94d55c75c1fe2a955f6040acbd11eab9421b05959413677"
+      "sha256": "cba6d3d113346081e6352869969b0a3c6f422187db54a6f5b0c7313f4df188f0"
     },
     {
       "source": "catalog/schemas/delivery_harness_context_map.schema.json",

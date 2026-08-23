@@ -149,6 +149,12 @@ Guarded merge requires every key present on the expected-base
 live-only top-level keys do not raise `PROJECT_PROFILE_BASE_BINDING_INVALID`.
 Changing `validation` commands or `repository` identity still fails closed.
 
+When the bound profile sets `factory_v1_readiness_contract`, Entry Gate
+selects that file in task context and `check` fail-closes on a wrong path,
+missing file, invalid mapping, or a present-but-wrong
+`live_invariant_owner`. The product stamp `entry_gate_resolves_this_file`
+is not a `check` predicate.
+
 Validation commands are project-profile bindings, not portable-core guesses.
 The guard executes them with `shell=false`; it never trusts a pre-existing local
 receipt. A portable seed with null bindings may CHECK and build CONTEXT, but it

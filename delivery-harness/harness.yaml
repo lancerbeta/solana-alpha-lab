@@ -59,6 +59,7 @@ merge_policy:
     - docs/tasks/CTRL-HARNESS-SYNC-CI-FAIL-CLOSED-MESSAGES-V1.md
     - docs/tasks/CTRL-PROCESS-THROUGHPUT-GUARDRAILS-V1.md
     - docs/tasks/CTRL-PROFILE-PIN-VALIDATION-SUBSET-V1.md
+    - docs/tasks/CTRL-FACTORY-V1-READINESS-PROFILE-BIND-V1.md
     - scripts/delivery_harness.py
     - scripts/delivery_efficiency.py
     - scripts/validate_factory_static.py
@@ -88,6 +89,7 @@ merge_policy:
     - tests/test_delivery_harness_context.py
     - tests/test_delivery_harness_contract.py
     - tests/test_delivery_harness_merge_guard.py
+    - tests/test_delivery_harness_factory_v1_readiness_bind.py
     - tests/test_delivery_harness_skill.py
     - tests/test_autonomous_delivery_skill.py
     - tests/test_harness_sync.py

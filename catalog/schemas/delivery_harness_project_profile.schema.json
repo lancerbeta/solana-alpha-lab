@@ -21,7 +21,8 @@
         "credential_scan": {"oneOf": [{"type": "null"}, {"$ref": "#/$defs/standalone_command"}]}
       }
     },
-    "authority": {"type": "object", "additionalProperties": false, "required": ["external_system", "signing_or_financial_action", "cash_spend", "cloud_export_mutation"], "properties": {"external_system": {"const": false}, "signing_or_financial_action": {"const": false}, "cash_spend": {"const": false}, "cloud_export_mutation": {"const": false}}}
+    "authority": {"type": "object", "additionalProperties": false, "required": ["external_system", "signing_or_financial_action", "cash_spend", "cloud_export_mutation"], "properties": {"external_system": {"const": false}, "signing_or_financial_action": {"const": false}, "cash_spend": {"const": false}, "cloud_export_mutation": {"const": false}}},
+    "factory_v1_readiness_contract": {"type": ["string", "null"], "pattern": "^configs/factory_v1_operational_readiness_v1\\.yaml$"}
   },
   "$defs": {
     "argv": {
