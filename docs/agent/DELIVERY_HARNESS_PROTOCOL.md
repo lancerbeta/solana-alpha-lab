@@ -144,6 +144,11 @@ ordered parents are exactly the frozen base then approved head, plus exact push
 CI success. Read-only polling needs no
 second owner approval; merge submission alone is never a completed delivery.
 
+Guarded merge requires every key present on the expected-base
+`delivery-harness/project-profile.yaml` to match the live profile. Additive
+live-only top-level keys do not raise `PROJECT_PROFILE_BASE_BINDING_INVALID`.
+Changing `validation` commands or `repository` identity still fails closed.
+
 Validation commands are project-profile bindings, not portable-core guesses.
 The guard executes them with `shell=false`; it never trusts a pre-existing local
 receipt. A portable seed with null bindings may CHECK and build CONTEXT, but it

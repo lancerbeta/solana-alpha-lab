@@ -233,6 +233,25 @@ def _profile_validation(profile: dict[str, Any]) -> dict[str, Any]:
     return validation
 
 
+def _live_profile_matches_base_keys(
+    profile: dict[str, Any], base_profile: dict[str, Any]
+) -> bool:
+    if not isinstance(profile.get("repository"), dict) or not isinstance(
+        profile.get("validation"), dict
+    ):
+        return False
+    if not isinstance(base_profile.get("repository"), dict) or not isinstance(
+        base_profile.get("validation"), dict
+    ):
+        return False
+    for key, value in base_profile.items():
+        if key not in profile:
+            return False
+        if canonical_json_bytes(profile[key]) != canonical_json_bytes(value):
+            return False
+    return True
+
+
 def load_base_bound_profile(
     root: Path, *, expected_base: str, runner=run_read
 ) -> dict[str, Any]:
@@ -250,7 +269,7 @@ def load_base_bound_profile(
         )
     except (OSError, ValueError):
         raise ValueError("PROJECT_PROFILE_BASE_BINDING_INVALID") from None
-    if canonical_json_bytes(profile) != canonical_json_bytes(base_profile):
+    if not _live_profile_matches_base_keys(profile, base_profile):
         raise ValueError("PROJECT_PROFILE_BASE_BINDING_INVALID")
     repository = profile.get("repository")
     if not isinstance(repository, dict) or set(repository) != {"name", "default_branch"}:

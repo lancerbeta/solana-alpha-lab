@@ -990,6 +990,164 @@ class DeliveryHarnessMergeGuardTests(unittest.TestCase):
                     root, expected_base=MAIN, runner=runner
                 )
 
+    def test_base_bound_profile_allows_additive_top_level_keys(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            write_validation_profile(
+                root,
+                primary={
+                    "argv": ["project-primary"],
+                    "result_owner": "FOCUSED_PLUS_EXACT_PR_CI",
+                    "trusted_paths": ["validator.txt"],
+                },
+                fallback=None,
+                credential_scan={
+                    "argv": ["project-secret-scan"],
+                    "trusted_paths": ["scanner.txt"],
+                },
+            )
+            base_bytes = (root / "delivery-harness/project-profile.yaml").read_bytes()
+            live = json.loads(base_bytes.decode("utf-8"))
+            live["factory_v1_readiness_contract"] = (
+                "configs/factory_v1_operational_readiness_v1.yaml"
+            )
+            (root / "delivery-harness/project-profile.yaml").write_text(
+                json.dumps(live), encoding="utf-8"
+            )
+
+            def runner(args: list[str], cwd: Path) -> bytes:
+                if args[:2] == ["git", "show"] and str(args[2]).endswith(
+                    "delivery-harness/project-profile.yaml"
+                ):
+                    return base_bytes
+                raise AssertionError(args)
+
+            profile = self.module.load_base_bound_profile(
+                root, expected_base=MAIN, runner=runner
+            )
+            self.assertEqual(
+                profile["factory_v1_readiness_contract"],
+                "configs/factory_v1_operational_readiness_v1.yaml",
+            )
+
+    def test_base_bound_profile_rejects_existing_non_validation_key_drift(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            write_validation_profile(
+                root,
+                primary={
+                    "argv": ["project-primary"],
+                    "result_owner": "FOCUSED_PLUS_EXACT_PR_CI",
+                    "trusted_paths": ["validator.txt"],
+                },
+                fallback=None,
+                credential_scan={
+                    "argv": ["project-secret-scan"],
+                    "trusted_paths": ["scanner.txt"],
+                },
+            )
+            shared = json.loads(
+                (root / "delivery-harness/project-profile.yaml").read_text(
+                    encoding="utf-8"
+                )
+            )
+            shared["bindings"] = {"context_map": "delivery-harness/context-map.yaml"}
+            base_bytes = json.dumps(shared).encode("utf-8")
+            (root / "delivery-harness/project-profile.yaml").write_bytes(base_bytes)
+            live = json.loads(base_bytes.decode("utf-8"))
+            live["bindings"] = {"context_map": "delivery-harness/other-map.yaml"}
+            (root / "delivery-harness/project-profile.yaml").write_text(
+                json.dumps(live), encoding="utf-8"
+            )
+
+            def runner(args: list[str], cwd: Path) -> bytes:
+                if args[:2] == ["git", "show"] and str(args[2]).endswith(
+                    "delivery-harness/project-profile.yaml"
+                ):
+                    return base_bytes
+                raise AssertionError(args)
+
+            with self.assertRaisesRegex(
+                ValueError, "PROJECT_PROFILE_BASE_BINDING_INVALID"
+            ):
+                self.module.load_base_bound_profile(
+                    root, expected_base=MAIN, runner=runner
+                )
+
+    def test_base_bound_profile_rejects_validation_drift(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            write_validation_profile(
+                root,
+                primary={
+                    "argv": ["project-primary"],
+                    "result_owner": "FOCUSED_PLUS_EXACT_PR_CI",
+                    "trusted_paths": ["validator.txt"],
+                },
+                fallback=None,
+                credential_scan={
+                    "argv": ["project-secret-scan"],
+                    "trusted_paths": ["scanner.txt"],
+                },
+            )
+            base_bytes = (root / "delivery-harness/project-profile.yaml").read_bytes()
+            live = json.loads(base_bytes.decode("utf-8"))
+            live["validation"]["github_ci_bound"] = False
+            (root / "delivery-harness/project-profile.yaml").write_text(
+                json.dumps(live), encoding="utf-8"
+            )
+
+            def runner(args: list[str], cwd: Path) -> bytes:
+                if args[:2] == ["git", "show"] and str(args[2]).endswith(
+                    "delivery-harness/project-profile.yaml"
+                ):
+                    return base_bytes
+                raise AssertionError(args)
+
+            with self.assertRaisesRegex(
+                ValueError, "PROJECT_PROFILE_BASE_BINDING_INVALID"
+            ):
+                self.module.load_base_bound_profile(
+                    root, expected_base=MAIN, runner=runner
+                )
+
+    def test_base_bound_profile_rejects_repository_drift(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            write_validation_profile(
+                root,
+                primary={
+                    "argv": ["project-primary"],
+                    "result_owner": "FOCUSED_PLUS_EXACT_PR_CI",
+                    "trusted_paths": ["validator.txt"],
+                },
+                fallback=None,
+                credential_scan={
+                    "argv": ["project-secret-scan"],
+                    "trusted_paths": ["scanner.txt"],
+                },
+            )
+            base_bytes = (root / "delivery-harness/project-profile.yaml").read_bytes()
+            live = json.loads(base_bytes.decode("utf-8"))
+            live["repository"]["default_branch"] = "trunk"
+            (root / "delivery-harness/project-profile.yaml").write_text(
+                json.dumps(live), encoding="utf-8"
+            )
+
+            def runner(args: list[str], cwd: Path) -> bytes:
+                if args[:2] == ["git", "show"] and str(args[2]).endswith(
+                    "delivery-harness/project-profile.yaml"
+                ):
+                    return base_bytes
+                raise AssertionError(args)
+
+            with self.assertRaisesRegex(
+                ValueError, "PROJECT_PROFILE_BASE_BINDING_INVALID"
+            ):
+                self.module.load_base_bound_profile(
+                    root, expected_base=MAIN, runner=runner
+                )
+
     def test_ci_owned_gate_rejects_changed_workflow_bytes(self) -> None:
         with tempfile.TemporaryDirectory() as directory:
             root = Path(directory)
