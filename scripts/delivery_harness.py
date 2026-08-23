@@ -96,6 +96,7 @@ def load_yaml_unique(text: str) -> Any:
 ROOT = Path(__file__).resolve().parents[1]
 HARNESS_PATH = "delivery-harness/harness.yaml"
 PROFILE_PATH = "delivery-harness/project-profile.yaml"
+FACTORY_V1_READINESS_CONTRACT = "configs/factory_v1_operational_readiness_v1.yaml"
 CONTEXT_MAP_PATH = "delivery-harness/context-map.yaml"
 RADAR_PATH = "delivery-harness/capability-radar.yaml"
 CONTEXT_RECEIPT_SCHEMA = "catalog/schemas/delivery_harness_context_receipt.schema.json"
@@ -142,6 +143,31 @@ def sha256_bytes(value: bytes) -> str:
 
 def sha256_file(path: Path) -> str:
     return sha256_bytes(path.read_bytes())
+
+
+def factory_v1_readiness_contract_errors(
+    root: Path, profile: dict[str, Any]
+) -> list[str]:
+    """Fail closed when a bound profile names a readiness contract it cannot resolve."""
+    binding = profile.get("factory_v1_readiness_contract")
+    if binding is None or binding == "":
+        return []
+    if not isinstance(binding, str) or binding != FACTORY_V1_READINESS_CONTRACT:
+        return ["FACTORY_V1_READINESS_CONTRACT_PATH_MISMATCH"]
+    path = root / binding
+    if not path.is_file():
+        return ["FACTORY_V1_READINESS_CONTRACT_MISSING"]
+    try:
+        payload = load_mapping(path)
+    except (OSError, UnicodeDecodeError, ValueError, YAML_ERROR):
+        return ["FACTORY_V1_READINESS_CONTRACT_INVALID"]
+    integration = payload.get("domain_policy_integration")
+    if not isinstance(integration, dict):
+        return ["FACTORY_V1_READINESS_CONTRACT_UNRESOLVED"]
+    owner = integration.get("live_invariant_owner")
+    if owner is not None and owner != "scripts/delivery_harness.py":
+        return ["FACTORY_V1_READINESS_CONTRACT_OWNER_MISMATCH"]
+    return []
 
 
 def validate_context_role_set(context_map: dict[str, Any]) -> None:
@@ -635,6 +661,19 @@ def build_context_receipt(
                 max_inline_bytes=max_inline,
             )
         )
+    readiness_relative = profile.get("factory_v1_readiness_contract")
+    if isinstance(readiness_relative, str) and readiness_relative:
+        selected.append(
+            reference_for_path(
+                root,
+                readiness_relative,
+                semantic_role="MISSION_AND_INVARIANTS",
+                lane="L0",
+                truth_owner="REPOSITORY_POLICY",
+                stable_id="CONFIG-FACTORY-V1-OPERATIONAL-READINESS-001",
+                max_inline_bytes=max_inline,
+            )
+        )
 
     roadmap = task_metadata["context_requirements"]["roadmap_path"]
     if roadmap is None:
@@ -937,6 +976,7 @@ def check_harness(root: Path) -> dict[str, Any]:
             validate_repository_origin(root, profile["repository"]["name"])
         except ValueError:
             errors.append("REPOSITORY_IDENTITY_DIVERGENCE")
+        errors.extend(factory_v1_readiness_contract_errors(root, profile))
     active_baton_paths = [
         ".cursor/rules/50-github-baton.mdc",
         ".cursor/commands/baton-preflight.md",
