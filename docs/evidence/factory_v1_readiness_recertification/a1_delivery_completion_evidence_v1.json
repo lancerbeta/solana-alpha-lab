@@ -1,0 +1,62 @@
+{
+  "acceptance_id": "FACTORY-V1-READINESS-RECERTIFICATION-DELIVERY-COMPLETION-001",
+  "active_stop_conditions": [],
+  "as_of": "2026-08-23",
+  "base_main": "b785dd13860572b5509cd9a9a0bd5f05babc7ed9",
+  "capability_radar_now": "FACTORY_V1_OPERATIONAL_READY_FOUNDATION_FREEZE_ACTIVE",
+  "cloud_bundle_mode": "OWNER_MANAGED_OPTIONAL_EXPORT",
+  "cloud_bundle_required_by_harness": false,
+  "cloud_bundle_smoke_required": false,
+  "factory_fit": {
+    "path": "docs/evidence/factory_v1_readiness_recertification/a1_delivery_factory_fit_v1.json",
+    "sha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+    "verdict": "PASS"
+  },
+  "implementation_bindings": {
+    "configs/factory_v1_operational_readiness_v1.yaml": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+  },
+  "non_claims": [
+    "NO_CANONICAL_DONE",
+    "NO_ALPHA",
+    "NO_NETRETURN_OR_CASHFLOW",
+    "NO_DOMAIN_POLICY_MUTATION",
+    "NO_A7_PLUS_WITHOUT_TRIGGER"
+  ],
+  "owner_attention_triggers": {
+    "auth_or_access_recovery": false,
+    "external_material_action": false,
+    "material_owner_decision": true,
+    "unresolved_safety_or_truth_conflict": false,
+    "user_only_activation": false
+  },
+  "project_sources_disposition": {
+    "kind": "NO_CHANGE"
+  },
+  "schema": "smial.delivery-completion-evidence",
+  "schema_version": "1.0",
+  "side_effects": {
+    "cash_spend_usd_cents": 0,
+    "credential_reads": 0,
+    "fallbacks": 0,
+    "provider_requests": 0,
+    "retries": 0,
+    "wallet_signer_transaction_actions": 0
+  },
+  "state_change": "FACTORY_V1_OPERATIONAL_READY_FOUNDATION_FREEZE_ACTIVE",
+  "task_id": "FACTORY_V1_READINESS_RECERTIFICATION_AND_FREEZE_V1",
+  "validation": {
+    "full_gate": "ENFORCED_BY_PROJECT_BOUND_VALIDATION",
+    "github_ci": "ENFORCED_LIVE_AT_GUARDED_MERGE",
+    "independent_review": {
+      "path": "docs/evidence/factory_v1_readiness_recertification/a1_delivery_independent_review_v1.json",
+      "sha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "verdict": "PASS"
+    },
+    "project_checks": [
+      "PASS_ENTRY_GATE_FAIL_CLOSED",
+      "PASS_CLOSEOUT_READY_AND_FREEZE",
+      "PASS_DOMAIN_POLICY_UNTOUCHED"
+    ],
+    "targeted": "PASS_FACTORY_V1_READINESS_RECERTIFICATION_TESTS"
+  }
+}

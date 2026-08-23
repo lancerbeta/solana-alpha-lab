@@ -1,0 +1,39 @@
+{
+  "as_of": "2026-08-23",
+  "capability_radar": {
+    "now": "NONE",
+    "watch": "OWNER_DECISION_KEEP_FREEZE_OR_NAMED_A7_TRIGGER"
+  },
+  "dimensions": {
+    "build_vs_buy": "PASS_REUSE_ENTRY_GATE_AND_EXISTING_CLOSEOUT_PREDICATES",
+    "context_efficiency": "PASS_PROFILE_BOUND_ALWAYS_LOAD_WITHOUT_DOMAIN_POLICY_EDIT",
+    "execution_to_cashflow": "NOT_APPLICABLE_NO_EXECUTION_IN_A6",
+    "flexibility_and_history": "PASS_HASH_BOUND_DOMAIN_POLICY_AND_PROJECT_SOURCES_UNTOUCHED",
+    "mission": "PASS_ENTRY_GATE_RESOLVES_READINESS_AND_FREEZE_WITHOUT_FALSE_STAMP",
+    "monitoring_and_recovery": "PASS_FALSE_FLAG_FAILS_CHECK_INDEPENDENTLY",
+    "owner_operability": "PASS_RUSSIAN_READOUT_READY_AND_FREEZE",
+    "red_team": "PASS_BOOLEAN_STAMP_ALONE_CANNOT_SATISFY_PROFILE_PREDICATE_OR_CHECK",
+    "research_truth": "PASS_NON_CLAIM_NO_ALPHA_SHADOW_OR_CANONICAL_DONE",
+    "security": "PASS_NO_NETWORK_CREDENTIAL_WALLET_OR_CASH_SIDE_EFFECTS"
+  },
+  "limits": [
+    "NO_ALPHA",
+    "NO_SCIENTIFIC_SHADOW",
+    "NO_CANONICAL_DONE",
+    "NO_DOMAIN_POLICY_MUTATION",
+    "NO_SECOND_VPS",
+    "NO_A7_PLUS_WITHOUT_TRIGGER",
+    "FOUNDATION_FREEZE_IS_NOT_SCIENTIFIC_PROMOTION",
+    "CAPABILITY_PASS_IS_NOT_CASHFLOW",
+    "YAML_CAPABILITY_RADAR_NOW_REMAINS_NONE"
+  ],
+  "mode": "FULL_REVIEW",
+  "recovery": "REVERT_THIS_ATOM; PRESERVE_A4_A5_HOST_AND_PIT_RECEIPTS; KEEP_DOMAIN_POLICY_BYTES.",
+  "review_id": "FACTORY-V1-READINESS-RECERTIFICATION-FACTORY-FIT-001",
+  "reviewed_bindings_sha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+  "reviewed_inventory_sha256": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+  "schema": "smial.delivery-harness-factory-fit",
+  "schema_version": "1.0",
+  "task_id": "FACTORY_V1_READINESS_RECERTIFICATION_AND_FREEZE_V1",
+  "verdict": "PASS"
+}

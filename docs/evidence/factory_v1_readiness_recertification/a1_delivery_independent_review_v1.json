@@ -1,0 +1,58 @@
+{
+  "as_of": "2026-08-23",
+  "non_claims": [
+    "NO_CRYPTOGRAPHIC_REVIEWER_IDENTITY",
+    "REVIEW_IS_NOT_SEMANTIC_DONE",
+    "NO_CANONICAL_DONE",
+    "NO_ALPHA_OR_NETRETURN",
+    "NO_A7_PLUS_WITHOUT_TRIGGER"
+  ],
+  "required_roles": [
+    "ARCHITECTURE_CRITIC",
+    "CODE_REVIEWER",
+    "GOAL_DOD_CRITIC"
+  ],
+  "review_id": "FACTORY-V1-READINESS-RECERTIFICATION-INDEPENDENT-REVIEW-001",
+  "reviewed_bindings_sha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+  "reviewed_inventory_sha256": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+  "reviews": [
+    {
+      "findings": [
+        "CHECKED_PROFILE_BINDING_OPTIONAL_FOR_PORTABLE",
+        "CHECKED_CHECK_HARNESS_FAILS_ON_FALSE_FLAG",
+        "CHECKED_CHECK_HARNESS_PROPAGATES_HELPER_ERRORS",
+        "CHECKED_CHECK_HARNESS_FAILS_WITHOUT_LIVE_INVARIANT_OWNER",
+        "CHECKED_CONTEXT_SELECTS_BOUND_READINESS_FILE",
+        "CHECKED_CLOSEOUT_REQUIRES_BOTH_YAML_FLAG_AND_PROFILE_BINDING",
+        "CHECKED_DOMAIN_POLICY_BYTES_UNCHANGED"
+      ],
+      "role": "CODE_REVIEWER",
+      "verdict": "PASS"
+    },
+    {
+      "findings": [
+        "CHECKED_DECISION_DELTA_IS_ENTRY_GATE_RESOLUTION_NOT_BOOLEAN_STAMP",
+        "CHECKED_READY_AND_FOUNDATION_FREEZE_FROM_FULL_PREDICATE_SET",
+        "CHECKED_STOP_BEFORE_ALPHA_DOMAIN_POLICY_AND_A7",
+        "CHECKED_NEXT_IS_OWNER_DECISION_NOT_AUTOMATIC_A7"
+      ],
+      "role": "GOAL_DOD_CRITIC",
+      "verdict": "PASS"
+    },
+    {
+      "findings": [
+        "CHECKED_CHECK_HARNESS_PROPAGATES_UNRESOLVED_ONTO_ENTRY_GATE_ERRORS",
+        "CHECKED_LIVE_INVARIANT_OWNER_IS_DELIVERY_HARNESS_NOT_DOMAIN_POLICY",
+        "CHECKED_PORTABLE_PROFILE_OMITS_BINDING",
+        "CHECKED_CLOSEOUT_SECOND_PREDICATE_BINDS_PROJECT_PROFILE",
+        "CHECKED_HISTORICAL_CLOSEOUT_REPLAN_RECEIPTS_NOT_OVERWRITTEN"
+      ],
+      "role": "ARCHITECTURE_CRITIC",
+      "verdict": "PASS"
+    }
+  ],
+  "schema": "smial.delivery-independent-review-evidence",
+  "schema_version": "1.0",
+  "task_id": "FACTORY_V1_READINESS_RECERTIFICATION_AND_FREEZE_V1",
+  "verdict": "PASS"
+}

@@ -1,0 +1,36 @@
+{
+  "acceptance_id": "FACTORY-V1-READINESS-RECERTIFICATION-ACCEPTANCE-001",
+  "as_of": "2026-08-23",
+  "atom_id": "FACTORY_V1_READINESS_RECERTIFICATION_AND_FREEZE_V1",
+  "cloud_bundle_mode": "OWNER_MANAGED_OPTIONAL_EXPORT",
+  "entry_gate": {
+    "check_harness_fail_closed_on_false_flag": true,
+    "context_selects_readiness_contract": true,
+    "live_invariant_owner": "scripts/delivery_harness.py",
+    "profile_binding": "configs/factory_v1_operational_readiness_v1.yaml"
+  },
+  "factory_v1_operational_ready": true,
+  "foundation_freeze": "ACTIVE",
+  "gate_receipt": "docs/evidence/factory_v1_readiness_recertification/a1_gate_receipt_v1.json",
+  "named_gap_count": 0,
+  "named_gaps": [],
+  "next_safe_action": "FOUNDATION_FREEZE_ACTIVE_ATOM4_ELIGIBLE_IF_KEPT",
+  "non_claims": [
+    "NO_ALPHA",
+    "NO_SCIENTIFIC_SHADOW_PASS",
+    "NO_MOSTLY_READY",
+    "NO_CANONICAL_DONE",
+    "NO_DOMAIN_POLICY_MUTATION",
+    "NO_HISTORICAL_PROJECT_SOURCES_ROADMAP_MUTATION",
+    "NO_A7_PLUS_WITHOUT_READY_AND_TRIGGER"
+  ],
+  "project_sources_disposition": {
+    "kind": "NO_CHANGE"
+  },
+  "ready_authority": "CLOSEOUT_PREDICATE_SET_ONLY",
+  "schema": "smial.factory-v1-readiness-recertification.acceptance",
+  "schema_version": "1.0",
+  "task_id": "FACTORY_V1_READINESS_RECERTIFICATION_AND_FREEZE_V1",
+  "terminal": "FACTORY_V1_OPERATIONAL_READY",
+  "verdict": "FACTORY_V1_OPERATIONAL_READY"
+}

@@ -266,8 +266,8 @@ class FactoryV1ProductionLiteRuntimeTests(unittest.TestCase):
         self.assertFalse(kernel["authority"]["provider_calls"])
         self.assertFalse(kernel["authority"]["deployment"])
         self.assertEqual(commissioning["authority"]["deployment"], False)
-        self.assertEqual(readiness["implementation"], "NOT_IMPLEMENTED")
-        self.assertEqual(readiness["milestone"]["status"], "TRIGGERED")
+        self.assertEqual(readiness["implementation"], "OPERATIONAL_READY")
+        self.assertEqual(readiness["milestone"]["status"], "PASS")
         self.assertEqual(
             readiness["runtime_objectives"]["actual_vps_provider_purchase"],
             "LATER_EXTERNAL_AUTHORITY",

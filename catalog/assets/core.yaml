@@ -19745,7 +19745,7 @@ records:
   as_of: '2026-08-14'
   truth_owner: CTRL-DELIVERY-HARNESS-001
   location: {kind: git_path, logical_uri: 'repo://delivery-harness/project-profile.yaml', repository_path: delivery-harness/project-profile.yaml}
-  integrity: {kind: sha256, sha256: 5aff7be56febd2ebadab76ae6f86e7023dd1f5a6facf9bed58f07747779d3df1}
+  integrity: {kind: sha256, sha256: 311c76061dcf41e29ac5942b9fc421076f22e10300dc9cbf976c16ecc564af02}
   access: *t25_read_file
   relations:
   - {relation_type: governed_by, target_asset_id: CTRL-DELIVERY-HARNESS-001}
@@ -19799,7 +19799,7 @@ records:
   as_of: '2026-08-14'
   truth_owner: CTRL-DELIVERY-HARNESS-001
   location: {kind: git_path, logical_uri: 'repo://delivery-harness/templates/portable-bundle-manifest.json', repository_path: delivery-harness/templates/portable-bundle-manifest.json}
-  integrity: {kind: sha256, sha256: f4f698880dfe59e885fe5868937c88148181fd2ebc3923b3737e6d690d78ca07}
+  integrity: {kind: sha256, sha256: d8be20ac6dc67745df99ad09fad26dd9ed130376d9bf608a123b94b8b55df1c5}
   access: *t25_read_file
   relations:
   - {relation_type: governed_by, target_asset_id: CTRL-DELIVERY-HARNESS-001}
@@ -19818,7 +19818,7 @@ records:
   as_of: '2026-08-14'
   truth_owner: CTRL-DELIVERY-HARNESS-001
   location: {kind: git_path, logical_uri: 'repo://scripts/delivery_harness.py', repository_path: scripts/delivery_harness.py}
-  integrity: {kind: sha256, sha256: d06591f57e88048bc10e83d18a11694903786055098e8caa6869673b739e636c}
+  integrity: {kind: sha256, sha256: 9ad3d4c07533ea017a5fbe257876773721e8e9eab7d6b825d40428c9775441b3}
   access: *t25_read_file
   relations:
   - {relation_type: governed_by, target_asset_id: CONFIG-DELIVERY-HARNESS-001}
@@ -24361,13 +24361,13 @@ records:
 - asset_id: CONFIG-FACTORY-V1-OPERATIONAL-READINESS-001
   record_version: '1.0'
   asset_type: configuration
-  purpose: Machine-readable Factory v1 readiness milestone, gate, truth owners and TRIGGERED kernel activation contract.
-  status: ACCEPTED_DIRECTION_NOT_IMPLEMENTED
+  purpose: Machine-readable Factory v1 readiness contract resolved by Entry Gate; READY after A6 recertification.
+  status: VALIDATED_ACTIVE
   origin: REPOSITORY
   as_of: '2026-08-18'
   truth_owner: FACTORY-V1-OPERATIONAL-READINESS-V1
   location: {kind: git_path, logical_uri: 'repo://configs/factory_v1_operational_readiness_v1.yaml', repository_path: configs/factory_v1_operational_readiness_v1.yaml}
-  integrity: {kind: sha256, sha256: b861e9d91c98e04e7e73eb256d4924d9470934713793edf8059fc9bb71562838}
+  integrity: {kind: sha256, sha256: 0a887caafbbfc44ba240cd0a9bb86b648a8c9d4fbbb954ab13c0e5062831d1c4}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: governed_by, target_asset_id: ARCH-INTENT-005}
@@ -24386,7 +24386,7 @@ records:
   as_of: '2026-08-18'
   truth_owner: FACTORY-V1-OPERATIONAL-READINESS-V1
   location: {kind: git_path, logical_uri: 'repo://tests/test_factory_v1_operational_readiness.py', repository_path: tests/test_factory_v1_operational_readiness.py}
-  integrity: {kind: sha256, sha256: b65898f8879f27721f5a228b91924f2a15301ace3a873823fde81ecf09ce5380}
+  integrity: {kind: sha256, sha256: 7c8c84cead33d9e9d6cbcc7cffb805a26d25bc84527d8ab9a6097813ccf4a7c4}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: depends_on, target_asset_id: ARCH-INTENT-005}
@@ -26186,7 +26186,7 @@ records:
   as_of: '2026-08-19'
   truth_owner: FACTORY_V1_PRODUCTION_LITE_LINUX_RUNTIME_V1
   location: {kind: git_path, logical_uri: 'repo://tests/test_factory_v1_production_lite_runtime.py', repository_path: tests/test_factory_v1_production_lite_runtime.py}
-  integrity: {kind: sha256, sha256: 0411c4c2433410974fb594c150ab25a20fd1ab705237311becb7437d00b9246d}
+  integrity: {kind: sha256, sha256: 5187fbbd6b9c711a0cb5a9ceedc78a5af87fa4bd4f097f74cf18849b5afa65ab}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: depends_on, target_asset_id: MODULE-FACTORY-V1-RUNTIME-001}
@@ -30446,7 +30446,7 @@ records:
   as_of: '2026-08-23'
   truth_owner: FACTORY_V1_OPERATIONAL_READINESS_CLOSEOUT_V1
   location: {kind: git_path, logical_uri: 'repo://configs/factory_v1_operational_readiness_closeout_v1.yaml', repository_path: configs/factory_v1_operational_readiness_closeout_v1.yaml}
-  integrity: {kind: sha256, sha256: e8689b729c10c808009aeccdf29a0cb73283d9636661c39215767feff2a6fb38}
+  integrity: {kind: sha256, sha256: 8d97ca64254514de6ea557ba0b8656c6b19a7e967f0492a93c5b2339cd7d6baf}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: governed_by, target_asset_id: CTRL-FACTORY-V1-OPERATIONAL-READINESS-CLOSEOUT-001}
@@ -30498,7 +30498,7 @@ records:
   as_of: '2026-08-23'
   truth_owner: FACTORY_V1_OPERATIONAL_READINESS_CLOSEOUT_V1
   location: {kind: git_path, logical_uri: 'repo://tests/test_factory_v1_operational_readiness_closeout.py', repository_path: tests/test_factory_v1_operational_readiness_closeout.py}
-  integrity: {kind: sha256, sha256: dcd4a47e27357d607029d71484362229950e35ab76affbaa5f32bb6af840c5f3}
+  integrity: {kind: sha256, sha256: 7323f099b08abf2cf06b976a56c4bc3f88d974885640723cd040301dbeffe71d}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: depends_on, target_asset_id: MODULE-FACTORY-V1-OPERATIONAL-READINESS-CLOSEOUT-001}

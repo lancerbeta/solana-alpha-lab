@@ -80,11 +80,11 @@ class FactoryV1OperationalReadinessTests(unittest.TestCase):
         contract = yaml.safe_load(CONFIG_PATH.read_text(encoding="utf-8"))
         self.assertEqual(contract["schema"], "smial.factory-v1-operational-readiness")
         self.assertEqual(contract["intent_id"], INTENT_ID)
-        self.assertEqual(contract["status"], "ACCEPTED_DIRECTION_NOT_IMPLEMENTED")
-        self.assertEqual(contract["implementation"], "NOT_IMPLEMENTED")
-        self.assertEqual(contract["mode"], "DESIGN_ONLY")
+        self.assertEqual(contract["status"], "IMPLEMENTED_VALIDATED")
+        self.assertEqual(contract["implementation"], "OPERATIONAL_READY")
+        self.assertEqual(contract["mode"], "DIRECT_CURSOR_DELIVERY")
         self.assertEqual(contract["milestone"]["milestone_id"], "FACTORY_V1_OPERATIONAL_READY")
-        self.assertEqual(contract["milestone"]["status"], "TRIGGERED")
+        self.assertEqual(contract["milestone"]["status"], "PASS")
         self.assertEqual(
             contract["milestone"]["triggered_by"],
             "OWNER_EXPLICITLY_SELECTS_FACTORY_PRODUCTIZATION",
@@ -106,12 +106,15 @@ class FactoryV1OperationalReadinessTests(unittest.TestCase):
             contract["domain_policy_integration"]["patch_status"],
             "NOT_APPLIED_HASH_BOUND_HISTORICAL_RECEIPTS",
         )
-        self.assertFalse(contract["domain_policy_integration"]["entry_gate_resolves_this_file"])
+        self.assertTrue(contract["domain_policy_integration"]["entry_gate_resolves_this_file"])
         self.assertEqual(
             contract["domain_policy_integration"]["deferred_invariant_record"],
             "configs/factory_v1_operational_readiness_v1.yaml",
         )
-        self.assertNotIn("live_invariant_owner", contract["domain_policy_integration"])
+        self.assertEqual(
+            contract["domain_policy_integration"]["live_invariant_owner"],
+            "scripts/delivery_harness.py",
+        )
         self.assertFalse(contract["milestone"]["start_task35a_as_parallel_chain"])
         self.assertEqual(
             contract["milestone"]["historical_numbered_cockpit_candidate"],

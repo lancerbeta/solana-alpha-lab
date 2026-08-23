@@ -45,5 +45,6 @@
     "signing_or_financial_action": false,
     "cash_spend": false,
     "cloud_export_mutation": false
-  }
+  },
+  "factory_v1_readiness_contract": "configs/factory_v1_operational_readiness_v1.yaml"
 }
