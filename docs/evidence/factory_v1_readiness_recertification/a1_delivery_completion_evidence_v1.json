@@ -1,0 +1,61 @@
+{
+  "acceptance_id": "FACTORY-V1-READINESS-RECERTIFICATION-DELIVERY-COMPLETION-001",
+  "active_stop_conditions": [],
+  "as_of": "2026-08-24",
+  "base_main": "961dc963065cb2f428389bb9cb75ac0ebda18c23",
+  "capability_radar_now": "NONE",
+  "cloud_bundle_mode": "OWNER_MANAGED_OPTIONAL_EXPORT",
+  "cloud_bundle_required_by_harness": false,
+  "cloud_bundle_smoke_required": false,
+  "factory_fit": {
+    "path": "docs/evidence/factory_v1_readiness_recertification/a1_delivery_factory_fit_v1.json",
+    "sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+    "verdict": "PASS"
+  },
+  "implementation_bindings": {
+    "docs/tasks/FACTORY_V1_READINESS_RECERTIFICATION_AND_FREEZE_V1.md": "0000000000000000000000000000000000000000000000000000000000000000"
+  },
+  "non_claims": [
+    "NO_CANONICAL_DONE",
+    "NO_ALPHA",
+    "NO_A7_WITHOUT_EXPLICIT_TRIGGER",
+    "NO_CHECK_PASS_AS_FACTORY_READY",
+    "NO_PR_185_MERGE"
+  ],
+  "owner_attention_triggers": {
+    "auth_or_access_recovery": false,
+    "external_material_action": false,
+    "material_owner_decision": false,
+    "unresolved_safety_or_truth_conflict": false,
+    "user_only_activation": false
+  },
+  "project_sources_disposition": {
+    "kind": "NO_CHANGE"
+  },
+  "schema": "smial.delivery-completion-evidence",
+  "schema_version": "1.0",
+  "side_effects": {
+    "cash_spend_usd_cents": 0,
+    "credential_reads": 0,
+    "fallbacks": 0,
+    "provider_requests": 0,
+    "retries": 0,
+    "wallet_signer_transaction_actions": 0
+  },
+  "state_change": "FACTORY_V1_OPERATIONAL_READY_AND_FOUNDATION_FREEZE",
+  "task_id": "FACTORY_V1_READINESS_RECERTIFICATION_AND_FREEZE_V1",
+  "validation": {
+    "full_gate": "ENFORCED_BY_PROJECT_BOUND_VALIDATION",
+    "github_ci": "ENFORCED_LIVE_AT_GUARDED_MERGE",
+    "independent_review": {
+      "path": "docs/evidence/factory_v1_readiness_recertification/a1_delivery_independent_review_v1.json",
+      "sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+      "verdict": "PASS"
+    },
+    "project_checks": [
+      "PASS_FACTORY_V1_READINESS_RECERTIFICATION_TESTS",
+      "PASS_GENERATOR_CHECK"
+    ],
+    "targeted": "PASS_FACTORY_V1_READINESS_RECERTIFICATION_TESTS"
+  }
+}
