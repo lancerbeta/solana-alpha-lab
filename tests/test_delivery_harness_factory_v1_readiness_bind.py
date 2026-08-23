@@ -76,12 +76,16 @@ class FactoryV1ReadinessProfileBindTests(unittest.TestCase):
     def test_bound_profile_names_readiness_contract(self) -> None:
         self.assertEqual(self.profile["factory_v1_readiness_contract"], READINESS)
 
-    def test_live_check_passes_without_product_ready_stamp(self) -> None:
+    def test_live_check_passes_with_bound_readiness_contract(self) -> None:
         readiness = yaml.safe_load(
             (ROOT / READINESS).read_text(encoding="utf-8")
         )
-        self.assertFalse(
+        self.assertTrue(
             readiness["domain_policy_integration"]["entry_gate_resolves_this_file"]
+        )
+        self.assertEqual(
+            readiness["domain_policy_integration"]["live_invariant_owner"],
+            "scripts/delivery_harness.py",
         )
         result = self.module.check_harness(ROOT)
         self.assertEqual(result["status"], "PASS")

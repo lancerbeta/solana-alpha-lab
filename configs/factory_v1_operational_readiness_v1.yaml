@@ -5,9 +5,9 @@ artifact_kind: PRODUCT_VISION_PRD_SSD
 artifact_id: FACTORY-V1-OPERATIONAL-READINESS-V1
 intent_id: ARCH-INTENT-005
 as_of: '2026-08-18'
-status: ACCEPTED_DIRECTION_NOT_IMPLEMENTED
-mode: DESIGN_ONLY
-implementation: NOT_IMPLEMENTED
+status: IMPLEMENTED_VALIDATED
+mode: DIRECT_CURSOR_DELIVERY
+implementation: OPERATIONAL_READY
 authority:
   repository_product_mutation: false
   provider_calls: false
@@ -30,14 +30,15 @@ must_not_replace:
   - lifecycle registries as lifecycle truth
   - existing PIT/missingness/holdout/execution boundaries
 live_roadmap_binding:
-  harness_resolution: PER_TASK_ROADMAP_PATH
+  harness_resolution: PROFILE_BOUND_ALWAYS
   this_contract_path: configs/factory_v1_operational_readiness_v1.yaml
   historical_project_sources_roadmaps: DO_NOT_MODIFY
   numbered_task_chain_inserted: false
 domain_policy_integration:
   patch_status: NOT_APPLIED_HASH_BOUND_HISTORICAL_RECEIPTS
   deferred_invariant_record: configs/factory_v1_operational_readiness_v1.yaml
-  entry_gate_resolves_this_file: false
+  entry_gate_resolves_this_file: true
+  live_invariant_owner: scripts/delivery_harness.py
   existing_overlap: FACTORY_LEVERAGE_INVARIANT
   invariant: >-
     When FACTORY_V1_OPERATIONAL_READY is triggered, Entry Gate and Factory Fit
@@ -49,7 +50,7 @@ domain_policy_integration:
     code is a Factory Fit architecture warning.
 milestone:
   milestone_id: FACTORY_V1_OPERATIONAL_READY
-  status: TRIGGERED
+  status: PASS
   triggered_by: OWNER_EXPLICITLY_SELECTS_FACTORY_PRODUCTIZATION
   triggered_as_of: '2026-08-19'
   kernel_atom: FACTORY_V1_PRODUCT_KERNEL_LOCAL_VERTICAL_SLICE_V1
@@ -194,10 +195,10 @@ non_goals:
   - generic plugin marketplace
 closeout:
   task_id: FACTORY_V1_OPERATIONAL_READINESS_CLOSEOUT_V1
-  terminal: FACTORY_PRODUCTIZATION_REPLAN
-  factory_v1_operational_ready: false
-  foundation_freeze: INACTIVE
-  named_gap_count: 11
+  terminal: FACTORY_V1_OPERATIONAL_READY
+  factory_v1_operational_ready: true
+  foundation_freeze: ACTIVE
+  named_gap_count: 0
   ready_authority: CLOSEOUT_PREDICATE_SET_ONLY
 capability_radar:
   now: NONE

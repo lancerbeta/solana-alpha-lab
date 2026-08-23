@@ -1,0 +1,30 @@
+{
+  "acceptance_id": "FACTORY-V1-READINESS-RECERTIFICATION-ACCEPTANCE-001",
+  "as_of": "2026-08-24",
+  "atom_id": "FACTORY_V1_READINESS_RECERTIFICATION_AND_FREEZE_V1",
+  "cloud_bundle_mode": "OWNER_MANAGED_OPTIONAL_EXPORT",
+  "factory_runner_sha256": "d8d22bcb51fb6992d40f09e58274c52e0f9942c12d043cc57b96ffca524e918f",
+  "foundation_freeze": "ACTIVE",
+  "gate_receipt": "docs/evidence/factory_v1_readiness_recertification/a1_gate_receipt_v1.json",
+  "named_gap_count": 0,
+  "named_gaps": [],
+  "next_safe_action": "FOUNDATION_FREEZE_ACTIVE_ATOM4_ELIGIBLE_IF_KEPT",
+  "non_claims": [
+    "NO_ALPHA",
+    "NO_SCIENTIFIC_SHADOW_PASS",
+    "NO_MOSTLY_READY",
+    "NO_CANONICAL_DONE",
+    "NO_A7_WITHOUT_EXPLICIT_TRIGGER",
+    "NO_READY_FROM_UNBOUND_READINESS_YAML_GATE_LEAVES",
+    "NO_CHECK_PASS_AS_FACTORY_READY"
+  ],
+  "project_sources_disposition": {
+    "kind": "NO_CHANGE"
+  },
+  "ready_authority": "CLOSEOUT_PREDICATE_SET_ONLY",
+  "schema": "smial.factory-v1-readiness-recertification.acceptance",
+  "schema_version": "1.0",
+  "task_id": "FACTORY_V1_READINESS_RECERTIFICATION_AND_FREEZE_V1",
+  "terminal": "FACTORY_V1_OPERATIONAL_READY",
+  "verdict": "FACTORY_V1_OPERATIONAL_READY"
+}

@@ -1,0 +1,36 @@
+{
+  "as_of": "2026-08-24",
+  "capability_radar": {
+    "now": "NONE",
+    "watch": "OWNER_KEEP_FREEZE_OR_NAME_A7"
+  },
+  "dimensions": {
+    "build_vs_buy": "PASS_NO_NEW_RUNTIME_ADOPT_EXISTING_CLOSEOUT",
+    "context_efficiency": "PASS_ONE_STAMP_AND_BIND_ATOM",
+    "execution_to_cashflow": "PASS_NO_SIGNING_NO_CASH",
+    "flexibility_and_history": "PASS_CONTROL_RUNTIME_UNTOUCHED",
+    "mission": "PASS_CLOSEOUT_READY_AND_FREEZE_ACTIVE",
+    "monitoring_and_recovery": "PASS_FALSE_STAMP_REOPENS_GAP",
+    "owner_operability": "PASS_READOUT_AND_GATE_RECEIPT",
+    "red_team": "PASS_NO_MOSTLY_READY_NO_CHECK_AS_READY",
+    "research_truth": "PASS_NO_ALPHA_PIT_STAYS_PRIOR_PINNED_JSON",
+    "security": "PASS_NO_POLICY_HASH_NO_SECRETS"
+  },
+  "limits": [
+    "NO_ALPHA",
+    "NO_CANONICAL_DONE",
+    "NO_A7_WITHOUT_EXPLICIT_TRIGGER",
+    "READY_AUTHORITY_CLOSEOUT_PREDICATE_SET_ONLY",
+    "CHECK_PASS_IS_NOT_FACTORY_READY",
+    "YAML_STAMP_CAN_MINT_READY_AFTER_SLICE2_BIND"
+  ],
+  "mode": "FULL_REVIEW",
+  "recovery": "REVERT_THIS_ATOM; KEEP_PROFILE_BIND; DO_NOT_MERGE_PR_185; DO_NOT_START_A7.",
+  "review_id": "FACTORY-V1-READINESS-RECERTIFICATION-FACTORY-FIT-001",
+  "reviewed_bindings_sha256": "826f965391f349016a46c961425fff13cd24e284ade3c0838c7d12c6b5777cb2",
+  "reviewed_inventory_sha256": "24ef1624d4c67852d01d0eb61ccfd7ffda6cb3a07da1b65049c4d0263ad44edb",
+  "schema": "smial.delivery-harness-factory-fit",
+  "schema_version": "1.0",
+  "task_id": "FACTORY_V1_READINESS_RECERTIFICATION_AND_FREEZE_V1",
+  "verdict": "PASS"
+}
