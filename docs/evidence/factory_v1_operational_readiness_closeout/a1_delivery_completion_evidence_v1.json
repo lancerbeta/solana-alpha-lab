@@ -1,0 +1,74 @@
+{
+  "acceptance_id": "FACTORY-V1-READINESS-CLOSEOUT-DELIVERY-COMPLETION-001",
+  "active_stop_conditions": [],
+  "as_of": "2026-08-23",
+  "base_main": "22fbcdd23573c5d751b16462c41413f71a32152f",
+  "capability_radar_now": "NONE",
+  "cloud_bundle_mode": "OWNER_MANAGED_OPTIONAL_EXPORT",
+  "cloud_bundle_required_by_harness": false,
+  "cloud_bundle_smoke_required": false,
+  "factory_fit": {
+    "path": "docs/evidence/factory_v1_operational_readiness_closeout/a1_delivery_factory_fit_v1.json",
+    "sha256": "4ced184847fceb40fdade169b0de675fb0f54411cbb0ca3891e7bb83ca1f4aab",
+    "verdict": "PASS"
+  },
+  "implementation_bindings": {
+    "catalog/assets/core.yaml": "4e438eceaeaa7706e4b40e53aa9021a3bb0773653d15d87958e42f1e40ee7d44",
+    "catalog/assets/lifecycle.yaml": "bbc903c79f95797ab6edf6b0d50217452282176f8ab3189e0d8911929685af2f",
+    "catalog/catalog_manifest.yaml": "92e16d6c1ee4c0a539e66198801c53e3fe9313e892ac87942a8ca70c687f0803",
+    "catalog/generated/asset_edges.json": "d041b9e34522f3b57e6fbdfb29433be956a757a4c2e1f1d68e41a4c575e23750",
+    "configs/factory_v1_operational_readiness_closeout_v1.yaml": "16cf5d1c38e4c898581731f0e2d0f3840e3b20560f4fe241c9da0583f4ec2843",
+    "configs/factory_v1_operational_readiness_v1.yaml": "b861e9d91c98e04e7e73eb256d4924d9470934713793edf8059fc9bb71562838",
+    "docs/PROJECT_MAP.md": "072aabba959dc35c3a6d8f7351ce233265ccbdf0115fe5821ef1a42dc8f4f962",
+    "docs/evidence/factory_v1_operational_readiness_closeout/a1_acceptance_v1.json": "1e78cacff3484dd46014440d8364ed1b65dd2e215bcf9a044432ba457aa36202",
+    "docs/evidence/factory_v1_operational_readiness_closeout/a1_gate_receipt_v1.json": "2a7a40e4e11298ef4745ada203d94f0ce796584b3024f5133e9fb66df50a7ab5",
+    "docs/reports/factory_v1_operational_readiness_closeout/a1_owner_readout_v1.md": "0239e49af9693c4c6c630008afc5ec781aab21cab043dab974d863c4bb1d4bc9",
+    "docs/tasks/FACTORY_V1_OPERATIONAL_READINESS_CLOSEOUT_V1.md": "6d2f55816675255d44823c0164a28524161296dd400c3da27c1f587e264e5c55",
+    "scripts/run_factory_v1_operational_readiness_closeout.py": "14438374cceb5061cc545394d45c60841b32c4d91edc8b3f94ce88e67aa378dd",
+    "src/solana_alpha_lab/factory/operational_readiness_closeout.py": "3fe4351109eae9adf04b521b3f575b9abdc254b109ac27b7ca92e7cfc0794223",
+    "tests/test_factory_v1_operational_readiness_closeout.py": "93c3240f645b72c05e20ad887c605be5f0c0f0a210d509ebeccffa5bb49ba652"
+  },
+  "non_claims": [
+    "NO_CANONICAL_DONE",
+    "NO_FACTORY_V1_OPERATIONAL_READY",
+    "NO_FOUNDATION_FREEZE",
+    "NO_ALPHA",
+    "NO_EXECUTE"
+  ],
+  "owner_attention_triggers": {
+    "auth_or_access_recovery": false,
+    "external_material_action": false,
+    "material_owner_decision": false,
+    "unresolved_safety_or_truth_conflict": false,
+    "user_only_activation": false
+  },
+  "project_sources_disposition": {
+    "kind": "NO_CHANGE"
+  },
+  "schema": "smial.delivery-completion-evidence",
+  "schema_version": "1.0",
+  "side_effects": {
+    "cash_spend_usd_cents": 0,
+    "credential_reads": 0,
+    "fallbacks": 0,
+    "provider_requests": 0,
+    "retries": 0,
+    "wallet_signer_transaction_actions": 0
+  },
+  "state_change": "FACTORY_PRODUCTIZATION_REPLAN",
+  "task_id": "FACTORY_V1_OPERATIONAL_READINESS_CLOSEOUT_V1",
+  "validation": {
+    "full_gate": "ENFORCED_BY_PROJECT_BOUND_VALIDATION",
+    "github_ci": "ENFORCED_LIVE_AT_GUARDED_MERGE",
+    "independent_review": {
+      "path": "docs/evidence/factory_v1_operational_readiness_closeout/a1_delivery_independent_review_v1.json",
+      "sha256": "890c3f1db426fd08499461044dd875772443bcfe1449b92d02e17b30bdadef1e",
+      "verdict": "PASS"
+    },
+    "project_checks": [
+      "PASS_CATALOG_VALIDATE",
+      "PASS_GENERATOR_CHECK"
+    ],
+    "targeted": "PASS_FACTORY_V1_OPERATIONAL_READINESS_CLOSEOUT_TESTS"
+  }
+}

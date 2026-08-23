@@ -1,0 +1,149 @@
+schema: smial.factory-v1-operational-readiness-closeout
+schema_version: '1.0'
+contract_id: FACTORY-V1-OPERATIONAL-READINESS-CLOSEOUT-001
+as_of: '2026-08-23'
+task_id: FACTORY_V1_OPERATIONAL_READINESS_CLOSEOUT_V1
+readiness_contract_path: configs/factory_v1_operational_readiness_v1.yaml
+# READY / Foundation Freeze authority is exactly this predicate list.
+# Aspirational gate: leaves in readiness YAML are not auto-evaluated until bound here.
+ready_authority: CLOSEOUT_PREDICATE_SET_ONLY
+readiness_gate_tree_status: ASPIRATIONAL_UNTIL_BOUND_AS_PREDICATE
+runner_pin_sha256: d8d22bcb51fb6992d40f09e58274c52e0f9942c12d043cc57b96ffca524e918f
+runner_path: src/solana_alpha_lab/factory/runner.py
+predicates:
+  - id: COMMISSIONING_GOLDEN_REPLAY
+    dimension: commissioning
+    evidence_path: docs/evidence/factory_v1_product_kernel/a1_factory_v1_product_kernel_acceptance_v1.json
+    require:
+      terminal: FACTORY_KERNEL_GOLDEN_REPLAY_PASS
+      hypothesis_specific_core_runner_change: false
+  - id: COMMISSIONING_FRESH_HYPOTHESIS_E2E
+    dimension: commissioning
+    evidence_path: docs/evidence/factory_v1_commissioning/a2_factory_v1_commissioning_acceptance_v1.json
+    require:
+      product_terminal: FACTORY_COMMISSIONING_LIVE_CYCLE_PASS
+      hypothesis_specific_core_runner_change: false
+  - id: LEVERAGE_NO_TASK_SPECIFIC_CORE_RUNNER
+    dimension: leverage
+    evidence_path: docs/evidence/factory_unattended_shadow/a1_acceptance_v1.json
+    require:
+      factory_core_python_changed: false
+      factory_runner_sha256: d8d22bcb51fb6992d40f09e58274c52e0f9942c12d043cc57b96ffca524e918f
+  - id: OWNER_OPERABILITY_COCKPIT_LITE
+    dimension: owner_operability
+    evidence_path: docs/evidence/factory_v1_owner_cockpit/a4_factory_v1_cockpit_acceptance_v1.json
+    require:
+      terminal: OWNER_COCKPIT_LITE_OPERABILITY_PASS
+      git_archaeology_required: false
+  - id: RUNTIME_LOCAL_LINUX_SHAPED_PROOF
+    dimension: runtime
+    evidence_path: docs/evidence/factory_v1_production_lite_runtime/a3_factory_v1_runtime_acceptance_v1.json
+    require:
+      terminal: PRODUCTION_LITE_LINUX_RUNTIME_PROOF_PASS
+      proofs.restart_recovery: true
+      proofs.rollback: true
+  - id: RUNTIME_LIVE_HOST_AND_SHADOW_WORKER
+    dimension: runtime
+    evidence_path: docs/evidence/factory_unattended_shadow/a1_host_proof_v1.json
+    require:
+      checks.shadow_tick: PASS
+      checks.timer_active_after_restart: true
+      checks.service_start_after_stop: true
+      scientific_shadow_pass: false
+  - id: RUNTIME_LIVE_DEPLOY_ROLLBACK
+    dimension: runtime
+    evidence_path: docs/evidence/factory_remote_operations/a3_acceptance_v1.json
+    require:
+      live_deploy_rollback: true
+  - id: RUNTIME_LIVE_CLEAN_REHOST
+    dimension: runtime
+    evidence_path: docs/evidence/factory_remote_operations/a3_acceptance_v1.json
+    require:
+      live_clean_rehost: true
+  - id: DATA_LIVE_BACKUP_ISOLATED_RESTORE
+    dimension: data
+    evidence_path: docs/evidence/factory_unattended_shadow/a1_host_proof_v1.json
+    require:
+      checks.live_sqlite_backup: PASS
+      checks.isolated_restore_hash_match: true
+  - id: DATA_FACTORY_PIT_LINEAGE_RECEIPT
+    dimension: data
+    evidence_path: docs/evidence/factory_v1_common_market_feature_surface/a1_factory_v1_common_market_feature_surface_acceptance_v1.json
+    require:
+      # Positive PIT count — NO_PIT receipts (pit_ready_count: 0) cannot satisfy.
+      pit_ready_count: 1
+  - id: MONITORING_HEALTH_VIEW
+    dimension: monitoring
+    evidence_path: docs/evidence/factory_v1_owner_cockpit/a4_factory_v1_cockpit_acceptance_v1.json
+    require:
+      proofs.runtime_health_visible: true
+  - id: MONITORING_DEDUP_TESTED
+    dimension: monitoring
+    evidence_path: docs/evidence/factory_remote_operations/a3_runtime_receipt_v1.json
+    require:
+      live_host.telegram_boot_alert_deduped: true
+  - id: MONITORING_PROVIDER_FAILURE_ALERT
+    dimension: monitoring
+    evidence_path: docs/evidence/factory_remote_operations/a3_runtime_receipt_v1.json
+    require:
+      provider_failure_alert_tested: true
+  - id: MONITORING_LIVE_STALE_DATA_ALERT
+    dimension: monitoring
+    evidence_path: docs/evidence/factory_unattended_shadow/a1_host_proof_v1.json
+    require:
+      checks.stale_data_alert: PASS
+  - id: MONITORING_LIVE_BOT_STALL_ALERT
+    dimension: monitoring
+    evidence_path: docs/evidence/factory_unattended_shadow/a1_host_proof_v1.json
+    require:
+      checks.bot_stall_alert: PASS
+  - id: SECURITY_SECRETS_OUTSIDE_REPO
+    dimension: security
+    evidence_path: docs/evidence/factory_remote_operations/a3_acceptance_v1.json
+    require:
+      security.secret_defaults: false
+  - id: SECURITY_LOCALHOST_UI
+    dimension: security
+    evidence_path: docs/evidence/factory_remote_operations/a3_acceptance_v1.json
+    require:
+      security.public_admin: false
+  - id: SECURITY_FINANCIAL_GATED
+    dimension: security
+    evidence_path: docs/evidence/factory_remote_operations/a3_acceptance_v1.json
+    require:
+      # Positive gating proof — non-claim scientific_shadow_pass:false is not enough.
+      security.destructive_and_financial_actions_separately_gated: true
+  - id: DATA_EXPLICIT_MISSINGNESS
+    dimension: data
+    evidence_path: docs/evidence/factory_v1_common_market_feature_surface/a1_factory_v1_common_market_feature_surface_acceptance_v1.json
+    require:
+      explicit_missingness_preserved: true
+  - id: DATA_PROVIDER_HEALTH_VISIBLE
+    dimension: data
+    evidence_path: docs/evidence/factory_remote_operations/a3_runtime_receipt_v1.json
+    require:
+      provider_health_visible: true
+  - id: TIME_TO_EVIDENCE_FIRST_BYTE
+    dimension: time_to_evidence
+    evidence_path: docs/evidence/factory_v1_commissioning/a2_factory_v1_commissioning_acceptance_v1.json
+    require:
+      first_market_byte_within_one_preparatory_step: true
+  - id: ENTRY_GATE_RESOLVES_READINESS_CONTRACT
+    dimension: truth
+    evidence_path: configs/factory_v1_operational_readiness_v1.yaml
+    require_yaml:
+      domain_policy_integration.entry_gate_resolves_this_file: true
+reconciled_product_stage_on_any_closeout:
+  generic_hypothesis_runner: OPERATIONAL_AS_PRODUCT_KERNEL_AND_COMMISSIONING
+  owner_cockpit: COCKPIT_LITE_IMPLEMENTED
+  production_lite_runtime: LOCAL_LINUX_SHAPED_PROOF_PASS
+  unattended_monitoring: PARTIAL_REMOTE_OPS_AND_SHADOW
+  paper_shadow_position_operations: COMMISSIONING_ONLY_UNATTENDED_SHADOW_PASS
+foundation_freeze_on_ready: true
+non_claims:
+  - NO_ALPHA
+  - NO_SCIENTIFIC_SHADOW_PASS
+  - NO_MOSTLY_READY
+  - NO_FALSE_READY_WITHOUT_ALL_PREDICATES
+  - NO_READY_FROM_UNBOUND_READINESS_YAML_GATE_LEAVES
+  - NO_PROXY_NONCLAIM_AS_SECURITY_GATE
