@@ -1,0 +1,34 @@
+{
+  "schema": "smial.factory-v1-live-ops-hardening.runtime-receipt",
+  "schema_version": "1.0",
+  "task_id": "FACTORY_V1_LIVE_OPS_HARDENING_COMMISSIONING_V1",
+  "terminal": "FACTORY_V1_LIVE_OPS_HARDENING_PASS",
+  "host": "factory-remote-ops",
+  "deploy_sha": "07b628c5ee2a6141e76753e9c859859b3bbecc6d",
+  "release_sequence": {
+    "start_sha": "b7f10c77007bd2897d4d044564e93b0f3172ef08",
+    "previous_sha": "63429c0965e3d775edeaaadeb183b40f3352ec0c",
+    "target_sha": "07b628c5ee2a6141e76753e9c859859b3bbecc6d",
+    "live_deploy_rollback": true,
+    "live_forward_restore": true,
+    "left_on_rollback_sha": false
+  },
+  "phase0": {
+    "terminal": "PHASE0_LOCAL_PASS"
+  },
+  "side_effects": {
+    "provider_market_calls": 0,
+    "wallet_signer_transaction_actions": 0,
+    "cash_spend_usd_cents": 0,
+    "credential_reads": 1,
+    "network_calls": 2
+  },
+  "non_claims": [
+    "NO_FACTORY_V1_OPERATIONAL_READY",
+    "NO_FOUNDATION_FREEZE",
+    "NO_ALPHA",
+    "NO_SCIENTIFIC_SHADOW",
+    "NO_REAL_FILL",
+    "NO_SECOND_VPS"
+  ]
+}

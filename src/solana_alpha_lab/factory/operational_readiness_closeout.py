@@ -26,6 +26,18 @@ A4_DATA_PREDICATE_IDS = frozenset(
     }
 )
 
+A5_LIVE_OPS_PREDICATE_IDS = frozenset(
+    {
+        "RUNTIME_LIVE_DEPLOY_ROLLBACK",
+        "RUNTIME_LIVE_CLEAN_REHOST",
+        "MONITORING_PROVIDER_FAILURE_ALERT",
+        "MONITORING_LIVE_STALE_DATA_ALERT",
+        "MONITORING_LIVE_BOT_STALL_ALERT",
+        "DATA_PROVIDER_HEALTH_VISIBLE",
+        "SECURITY_FINANCIAL_GATED",
+    }
+)
+
 
 class CloseoutError(ValueError):
     """Fail-closed closeout evaluation error."""
@@ -232,7 +244,11 @@ def evaluate_closeout(root: Path) -> dict[str, Any]:
         next_safe = (
             "PIT_CANONICALIZATION_EVIDENCE_INSUFFICIENT"
             if failed_ids & A4_DATA_PREDICATE_IDS
-            else "A5_LIVE_OPS_HARDENING_COMMISSIONING"
+            else (
+                "A5_LIVE_OPS_HARDENING_COMMISSIONING"
+                if failed_ids & A5_LIVE_OPS_PREDICATE_IDS
+                else "A6_READINESS_RECERTIFICATION_AND_FREEZE"
+            )
         )
     else:
         terminal = "FACTORY_V1_OPERATIONAL_READY"

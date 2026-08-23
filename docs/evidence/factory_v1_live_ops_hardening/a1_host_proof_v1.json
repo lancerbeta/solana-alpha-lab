@@ -1,0 +1,57 @@
+{
+  "cleanup": {
+    "diagnostic_inject_cleared": true,
+    "final_deploy_sha": "07b628c5ee2a6141e76753e9c859859b3bbecc6d",
+    "rehost_proof_root_destroyed": true
+  },
+  "deploy_sha": "07b628c5ee2a6141e76753e9c859859b3bbecc6d",
+  "host": "factory-remote-ops",
+  "incident_lifecycle": {
+    "duplicate_dedup": "PASS",
+    "first_delivery": "PASS",
+    "incident_key": "DEGRADED_STALE_DATA",
+    "recovery": "PASS",
+    "recurrence_redelivery": "PASS"
+  },
+  "monitoring": {
+    "bot_stall_alert": "PASS",
+    "checks": {
+      "bot_stall_alert": "PASS",
+      "stale_data_alert": "PASS"
+    },
+    "provider_failure_alert_tested": true,
+    "provider_health_visible": true,
+    "stale_data_alert": "PASS"
+  },
+  "non_claims": [
+    "NO_FACTORY_V1_OPERATIONAL_READY",
+    "NO_ALPHA",
+    "NO_SCIENTIFIC_SHADOW",
+    "NO_REAL_FILL",
+    "NO_SECOND_VPS"
+  ],
+  "runtime": {
+    "live_clean_rehost": true,
+    "live_deploy_rollback": true,
+    "live_forward_restore": true,
+    "previous_sha": "63429c0965e3d775edeaaadeb183b40f3352ec0c",
+    "start_sha": "b7f10c77007bd2897d4d044564e93b0f3172ef08",
+    "target_sha": "07b628c5ee2a6141e76753e9c859859b3bbecc6d"
+  },
+  "schema": "smial.factory-v1-live-ops-hardening.host-proof",
+  "schema_version": "1.0",
+  "security": {
+    "destructive_and_financial_actions_separately_gated": true,
+    "shadow_financial_authority": "DENIED",
+    "signer_material_present": false,
+    "transaction_submit_capability_present": false
+  },
+  "side_effects": {
+    "cash_spend_usd_cents": 0,
+    "credential_reads": 1,
+    "network_calls": 2,
+    "provider_market_calls": 0,
+    "wallet_signer_transaction_actions": 0
+  },
+  "task_id": "FACTORY_V1_LIVE_OPS_HARDENING_COMMISSIONING_V1"
+}
