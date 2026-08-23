@@ -29805,7 +29805,7 @@ records:
   as_of: '2026-08-22'
   truth_owner: FACTORY_REMOTE_OPERATIONS_V1
   location: {kind: git_path, logical_uri: 'repo://src/solana_alpha_lab/factory/remote_ops.py', repository_path: src/solana_alpha_lab/factory/remote_ops.py}
-  integrity: {kind: sha256, sha256: 2b4b8dceaaa3db198e8f40cdd4b8333b39b6e61512ca3efaf7d1a3a3e196289b}
+  integrity: {kind: sha256, sha256: f4e7a37194a26b91c2653a1fa7a4343882e5f5e21c0e2626b19d5cb3f4a0d7df}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations: [{relation_type: governed_by, target_asset_id: CTRL-FACTORY-REMOTE-OPERATIONS-001}]
   consumers: [FACTORY-001, GOAL-OWNER]
