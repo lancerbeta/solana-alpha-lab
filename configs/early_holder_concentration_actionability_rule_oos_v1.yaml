@@ -1,0 +1,57 @@
+schema: smial.holder-concentration-top-quartile-veto
+schema_version: '1.0'
+atom_id: EARLY_HOLDER_CONCENTRATION_ACTIONABILITY_RULE_OOS_V1
+as_of: '2026-08-24'
+rule_id: HOLDER_CONCENTRATION_TOP_QUARTILE_VETO_V1
+phase_a:
+  network: false
+  provider: false
+  development_receipts:
+    - docs/evidence/early_holder_concentration_h900_falsifier/a1_runtime_receipt_v1.json
+    - docs/evidence/early_holder_concentration_h900_confirmatory_oos/a1_runtime_receipt_v1.json
+rule:
+  icp_id: ICP-EARLY-PUMPFUN-V1
+  x_formula: audit.topHoldersPercentage
+  missing_is_zero: false
+  veto_fraction_denominator: 4
+  sort:
+    - x_descending
+    - mint_lexical
+  labels:
+    pass: PASS
+    veto_high_x: VETO_HIGH_X
+    unknown: VETO_UNKNOWN
+  forbidden:
+    - absolute_x_threshold
+    - median_split
+    - tercile
+    - lowest_quartile_selection
+    - continuous_fitted_score
+    - optimized_k
+    - optimized_percentile
+    - pooled_quartile_recompute
+metrics:
+  operational_bad: MARKET_EXECUTION_UNAVAILABLE_OR_RANKABLE_Y_LT_0
+  impute_y_for_market_execution_unavailable: false
+  median_y_rankable_only: true
+  mean_y_and_p25_diagnostic_only: true
+survival:
+  pass_decision_time_count_min: 12
+  directional_both_windows: true
+  pooled_median_y_pass_gt_0: true
+  downside_both_windows: true
+terminals:
+  phase_a_fail: REPLICATED_RELATION_NOT_ACTIONABLE_AS_TOP_QUARTILE_VETO
+  phase_a_survive: PHASE_A_SURVIVES_TOP_QUARTILE_VETO
+  invalid: INVALID_EVIDENCE_REPLAN
+  oos_fail: CLOSE_HOLDER_CONCENTRATION_TOP_QUARTILE_VETO_RULE
+  oos_pass: EARN_PAPER_HOLDER_CONCENTRATION_TOP_QUARTILE_VETO
+limitations:
+  jupiter_top_holders_pool_exclusion: UNKNOWN
+non_claims:
+  alpha: false
+  netreturn: false
+  execution: false
+  strategy: false
+  shadow: false
+  paper: false

@@ -1,0 +1,156 @@
+{
+  "adjudication": {
+    "coverage": {
+      "EARLY_HOLDER_CONCENTRATION_H900_CONFIRMATORY_OOS_V1": true,
+      "EARLY_HOLDER_CONCENTRATION_H900_FALSIFIER_V1": true
+    },
+    "directional_utility": {
+      "EARLY_HOLDER_CONCENTRATION_H900_CONFIRMATORY_OOS_V1": false,
+      "EARLY_HOLDER_CONCENTRATION_H900_FALSIFIER_V1": false
+    },
+    "downside_utility": {
+      "EARLY_HOLDER_CONCENTRATION_H900_CONFIRMATORY_OOS_V1": false,
+      "EARLY_HOLDER_CONCENTRATION_H900_FALSIFIER_V1": false
+    },
+    "economic_plausibility_pooled_median_y_pass_gt_0": false,
+    "survived": false,
+    "terminal": "REPLICATED_RELATION_NOT_ACTIONABLE_AS_TOP_QUARTILE_VETO"
+  },
+  "atom_id": "EARLY_HOLDER_CONCENTRATION_ACTIONABILITY_RULE_OOS_V1",
+  "development_receipts": [
+    "docs/evidence/early_holder_concentration_h900_falsifier/a1_runtime_receipt_v1.json",
+    "docs/evidence/early_holder_concentration_h900_confirmatory_oos/a1_runtime_receipt_v1.json"
+  ],
+  "labeled_row_counts": {
+    "EARLY_HOLDER_CONCENTRATION_H900_CONFIRMATORY_OOS_V1": 24,
+    "EARLY_HOLDER_CONCENTRATION_H900_FALSIFIER_V1": 24
+  },
+  "mechanism_status": "HOLDER_CONCENTRATION_MECHANISM_REPLICATED",
+  "network": false,
+  "non_claims": {
+    "alpha": false,
+    "execution": false,
+    "netreturn": false,
+    "paper": false,
+    "shadow": false,
+    "strategy": false
+  },
+  "pooled": {
+    "all_x_valid": {
+      "h900_quote_available": 37,
+      "market_execution_unavailable": 7,
+      "mean_y": -0.056706402702702705,
+      "median_y": -0.0272814,
+      "negative_y_rate": 1.0,
+      "operational_bad_rate": 1.0,
+      "p25_y": -0.0272814,
+      "rankable_count": 37
+    },
+    "decision_time_eligible_count": 48,
+    "pass": {
+      "h900_quote_available": 32,
+      "market_execution_unavailable": 0,
+      "mean_y": -0.031206990625,
+      "median_y": -0.0272814,
+      "negative_y_rate": 1.0,
+      "operational_bad_rate": 1.0,
+      "p25_y": -0.0272814,
+      "rankable_count": 32
+    },
+    "pass_count": 32,
+    "veto_high_x": {
+      "h900_quote_available": 5,
+      "market_execution_unavailable": 7,
+      "mean_y": -0.21990264,
+      "median_y": -0.2312574,
+      "negative_y_rate": 1.0,
+      "operational_bad_rate": 1.0,
+      "p25_y": -0.3441751,
+      "rankable_count": 5
+    },
+    "veto_high_x_count": 12,
+    "x_missing_count": 4,
+    "x_valid_count": 44
+  },
+  "provider": false,
+  "rule_id": "HOLDER_CONCENTRATION_TOP_QUARTILE_VETO_V1",
+  "schema": "smial.holder-concentration-top-quartile-veto-phase-a",
+  "schema_version": "1.0",
+  "terminal": "REPLICATED_RELATION_NOT_ACTIONABLE_AS_TOP_QUARTILE_VETO",
+  "windows": {
+    "EARLY_HOLDER_CONCENTRATION_H900_CONFIRMATORY_OOS_V1": {
+      "all_x_valid": {
+        "h900_quote_available": 18,
+        "market_execution_unavailable": 4,
+        "mean_y": -0.04199027777777778,
+        "median_y": -0.0272814,
+        "negative_y_rate": 1.0,
+        "operational_bad_rate": 1.0,
+        "p25_y": -0.0272814,
+        "rankable_count": 18
+      },
+      "decision_time_eligible_count": 24,
+      "pass": {
+        "h900_quote_available": 16,
+        "market_execution_unavailable": 0,
+        "mean_y": -0.0310803875,
+        "median_y": -0.0272814,
+        "negative_y_rate": 1.0,
+        "operational_bad_rate": 1.0,
+        "p25_y": -0.0272814,
+        "rankable_count": 16
+      },
+      "pass_count": 16,
+      "veto_high_x": {
+        "h900_quote_available": 2,
+        "market_execution_unavailable": 4,
+        "mean_y": -0.1292694,
+        "median_y": -0.1292694,
+        "negative_y_rate": 1.0,
+        "operational_bad_rate": 1.0,
+        "p25_y": -0.1802634,
+        "rankable_count": 2
+      },
+      "veto_high_x_count": 6,
+      "x_missing_count": 2,
+      "x_valid_count": 22
+    },
+    "EARLY_HOLDER_CONCENTRATION_H900_FALSIFIER_V1": {
+      "all_x_valid": {
+        "h900_quote_available": 19,
+        "market_execution_unavailable": 3,
+        "mean_y": -0.0706479947368421,
+        "median_y": -0.0272814,
+        "negative_y_rate": 1.0,
+        "operational_bad_rate": 1.0,
+        "p25_y": -0.034013550000000004,
+        "rankable_count": 19
+      },
+      "decision_time_eligible_count": 24,
+      "pass": {
+        "h900_quote_available": 16,
+        "market_execution_unavailable": 0,
+        "mean_y": -0.03133359375,
+        "median_y": -0.0272814,
+        "negative_y_rate": 1.0,
+        "operational_bad_rate": 1.0,
+        "p25_y": -0.027323100000000003,
+        "rankable_count": 16
+      },
+      "pass_count": 16,
+      "veto_high_x": {
+        "h900_quote_available": 3,
+        "market_execution_unavailable": 3,
+        "mean_y": -0.2803248,
+        "median_y": -0.3441751,
+        "negative_y_rate": 1.0,
+        "operational_bad_rate": 1.0,
+        "p25_y": -0.4068465,
+        "rankable_count": 3
+      },
+      "veto_high_x_count": 6,
+      "x_missing_count": 2,
+      "x_valid_count": 22
+    }
+  }
+}
