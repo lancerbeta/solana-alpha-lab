@@ -1,0 +1,39 @@
+{
+  "acceptance_id": "EARLY-VALUATION-LIQUIDITY-DIVERGENCE-ACCEPTANCE-001",
+  "as_of": "2026-08-24",
+  "cloud_bundle_mode": "OWNER_MANAGED_OPTIONAL_EXPORT",
+  "composition": "PASS_BIND_PRIMARY_X_TWICE_PLUS_LN_WRAP",
+  "entry_verdict": "START_WITH_PATCH",
+  "factory_runner_sha256": "d8d22bcb51fb6992d40f09e58274c52e0f9942c12d043cc57b96ffca524e918f",
+  "live_capture": "ONE_WINDOW_COMPLETED",
+  "next_safe_action": "NO_NEXT_HYPOTHESIS_ATOM_FACTORY_ECONOMICS_CHECK_ONLY",
+  "non_claims": [
+    "NO_ALPHA",
+    "NO_NETRETURN",
+    "NO_EXECUTE",
+    "NO_SHADOW",
+    "NO_DISCOVERY_OR_A7",
+    "NO_WINDOW_B",
+    "NO_CLOSED_FAMILY_THRESHOLD_REOPEN",
+    "NO_CANONICAL_DONE"
+  ],
+  "product_composition": "PASS_EXISTING_HELPERS_NO_FACTORY_RUNNER_CHANGE",
+  "project_sources_disposition": {
+    "kind": "NO_CHANGE"
+  },
+  "promotable": false,
+  "provider_requests": 47,
+  "runtime_receipt_sha256": "a8c8df4a7c02a8e6cf4d2be2fe004f2cfbff170efcf5645064788ea20f12db63",
+  "schema": "smial.early-valuation-liquidity-divergence-confirmation-acceptance",
+  "schema_version": "1.0",
+  "scientific_terminal": "CLOSE_VALUATION_LIQUIDITY_DIVERGENCE_FAMILY",
+  "score": {
+    "decision_time_eligible": 22,
+    "rankable_h900": 20,
+    "score_kind": "SIGN_ONLY_KENDALL_TAU_B",
+    "tau_b": -0.08035714285714286
+  },
+  "task_id": "EARLY_VALUATION_LIQUIDITY_DIVERGENCE_CONFIRMATION_V1",
+  "verdict": "CLOSE_VALUATION_LIQUIDITY_DIVERGENCE_FAMILY",
+  "x_formula": "ln(R1/R0)"
+}

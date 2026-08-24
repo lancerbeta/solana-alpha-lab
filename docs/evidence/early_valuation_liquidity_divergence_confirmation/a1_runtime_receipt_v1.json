@@ -1,0 +1,2483 @@
+{
+  "atom_id": "EARLY_VALUATION_LIQUIDITY_DIVERGENCE_CONFIRMATION_V1",
+  "attempt_reservation": {
+    "atom_id": "EARLY_VALUATION_LIQUIDITY_DIVERGENCE_CONFIRMATION_V1",
+    "credential_reads": 0,
+    "policy_sha256": "14d446310edc025ad7b64c24bb42f0a43276539e85165c4ed9b548cc56a52942",
+    "provider_requests": 0,
+    "reservation_sha256": "e95d1adaea461eabcfb5eef9feac9ad8a05c3572f197f5cd0e5616a2077dd9ab",
+    "schema": "smial.early-valuation-liquidity-divergence-confirmation.attempt-reservation",
+    "schema_version": "1.0",
+    "started_at": "2026-08-24T00:19:22Z",
+    "state": "STARTED",
+    "window": "ONE"
+  },
+  "candidate_observations": [
+    {
+      "age_r0_seconds": 307.0,
+      "age_r1_seconds": 607.0,
+      "confirmation_interval_seconds": 300.0,
+      "decision_snapshot_r0_at": "2026-08-24T00:24:22Z",
+      "decision_snapshot_r1_at": "2026-08-24T00:29:22Z",
+      "mint": "7DtkuLZfHmF51sifFtd2AjdZe9R77JDAUtHZgUJtpump",
+      "x": 0.016170845547511255,
+      "x_inputs": {
+        "firstPool.createdAt": "2026-08-24T00:19:15Z",
+        "r0.liquidity": 2877.2031773678286,
+        "r0.mcap": 2706.371736157279,
+        "r0.updatedAt": "2026-08-24T00:24:16.808160209Z",
+        "r1.liquidity": 2877.2031773678286,
+        "r1.mcap": 2662.9593701605268,
+        "r1.updatedAt": "2026-08-24T00:29:21.605392784Z"
+      },
+      "x_reason": null,
+      "x_source": {
+        "field_paths": [
+          "liquidity",
+          "mcap",
+          "firstPool.createdAt",
+          "updatedAt",
+          "launchpad"
+        ],
+        "r0_response_sha256": "f84cea38c076a1189e664454d0a23b11ab716cb255fc296c432ef77ef5d5fd21",
+        "r0_row_sha256": "6fb775b970d92335115c9bfd4c096bb4be92826555ec1170da15c841d756ad06",
+        "r1_response_sha256": "debf1f3c75dbb6182ef47ce53c4e81db7553d8f69792d897de024557a1e1a2ad",
+        "r1_row_sha256": "a87d8fb7e8ecc4742d9be2c5b72e63ba3151d71754c7d934c3cd15a993848a8c"
+      },
+      "x_status": "ELIGIBLE"
+    },
+    {
+      "age_r0_seconds": 309.0,
+      "age_r1_seconds": 609.0,
+      "confirmation_interval_seconds": 300.0,
+      "decision_snapshot_r0_at": "2026-08-24T00:24:22Z",
+      "decision_snapshot_r1_at": "2026-08-24T00:29:22Z",
+      "mint": "9Hxqi3RUkohAUhxjmU6EGBQYuR5teisUQiuu7pSppump",
+      "x": 0.021956636080403207,
+      "x_inputs": {
+        "firstPool.createdAt": "2026-08-24T00:19:13Z",
+        "r0.liquidity": 2853.6823895856796,
+        "r0.mcap": 37.89061047883622,
+        "r0.updatedAt": "2026-08-24T00:21:59.9417984Z",
+        "r1.liquidity": 2849.867987781928,
+        "r1.mcap": 37.01818013694753,
+        "r1.updatedAt": "2026-08-24T00:26:46.173430007Z"
+      },
+      "x_reason": null,
+      "x_source": {
+        "field_paths": [
+          "liquidity",
+          "mcap",
+          "firstPool.createdAt",
+          "updatedAt",
+          "launchpad"
+        ],
+        "r0_response_sha256": "f84cea38c076a1189e664454d0a23b11ab716cb255fc296c432ef77ef5d5fd21",
+        "r0_row_sha256": "71b2e9546daa17c8b04ea730ace26062f439652b3679f8902246892ab34d6658",
+        "r1_response_sha256": "debf1f3c75dbb6182ef47ce53c4e81db7553d8f69792d897de024557a1e1a2ad",
+        "r1_row_sha256": "85e780a98b01ee8848cb159b0d68b8e098faaba179f766341ea89594264f9a2a"
+      },
+      "x_status": "ELIGIBLE"
+    },
+    {
+      "age_r0_seconds": 309.0,
+      "age_r1_seconds": 609.0,
+      "confirmation_interval_seconds": 300.0,
+      "decision_snapshot_r0_at": "2026-08-24T00:24:22Z",
+      "decision_snapshot_r1_at": "2026-08-24T00:29:22Z",
+      "mint": "7f6NmLjESmy5qWm5GRemwyg6TtH44SczsGqfs3HWpump",
+      "x": null,
+      "x_inputs": {
+        "firstPool.createdAt": "2026-08-24T00:19:13Z",
+        "r0.liquidity": null,
+        "r0.mcap": null,
+        "r0.updatedAt": "2026-08-24T00:19:17.619438588Z",
+        "r1.liquidity": null,
+        "r1.mcap": null,
+        "r1.updatedAt": "2026-08-24T00:19:17.619438588Z"
+      },
+      "x_reason": "FDV_OR_SUBSTITUTE_REJECTED",
+      "x_source": {
+        "field_paths": [
+          "liquidity",
+          "mcap",
+          "firstPool.createdAt",
+          "updatedAt",
+          "launchpad"
+        ],
+        "r0_response_sha256": "f84cea38c076a1189e664454d0a23b11ab716cb255fc296c432ef77ef5d5fd21",
+        "r0_row_sha256": "04efcccab41095a08482453f2428dec99a60726f34c1db7c7ea50caacfb507d7",
+        "r1_response_sha256": "debf1f3c75dbb6182ef47ce53c4e81db7553d8f69792d897de024557a1e1a2ad",
+        "r1_row_sha256": "04efcccab41095a08482453f2428dec99a60726f34c1db7c7ea50caacfb507d7"
+      },
+      "x_status": "MISSING"
+    },
+    {
+      "age_r0_seconds": 309.0,
+      "age_r1_seconds": 609.0,
+      "confirmation_interval_seconds": 300.0,
+      "decision_snapshot_r0_at": "2026-08-24T00:24:22Z",
+      "decision_snapshot_r1_at": "2026-08-24T00:29:22Z",
+      "mint": "5rae7LpBXiy9z5YRf1wegWKxE5EovPbPvUv3E2Frpump",
+      "x": 0.0,
+      "x_inputs": {
+        "firstPool.createdAt": "2026-08-24T00:19:13Z",
+        "r0.liquidity": 2851.1135712878227,
+        "r0.mcap": 2661.4206680697507,
+        "r0.updatedAt": "2026-08-24T00:19:24.976598515Z",
+        "r1.liquidity": 2851.1135712878227,
+        "r1.mcap": 2661.4206680697507,
+        "r1.updatedAt": "2026-08-24T00:19:24.976598515Z"
+      },
+      "x_reason": null,
+      "x_source": {
+        "field_paths": [
+          "liquidity",
+          "mcap",
+          "firstPool.createdAt",
+          "updatedAt",
+          "launchpad"
+        ],
+        "r0_response_sha256": "f84cea38c076a1189e664454d0a23b11ab716cb255fc296c432ef77ef5d5fd21",
+        "r0_row_sha256": "11b4ec65a9821c70797b44c89e42955a4843cdf60d810b1b93989b86e364f1ff",
+        "r1_response_sha256": "debf1f3c75dbb6182ef47ce53c4e81db7553d8f69792d897de024557a1e1a2ad",
+        "r1_row_sha256": "4f7b9d45ad34377f166710a8417a7fdf48ce9d797c89d552e700b6d32272e0c9"
+      },
+      "x_status": "ELIGIBLE"
+    },
+    {
+      "age_r0_seconds": 309.0,
+      "age_r1_seconds": 609.0,
+      "confirmation_interval_seconds": 300.0,
+      "decision_snapshot_r0_at": "2026-08-24T00:24:22Z",
+      "decision_snapshot_r1_at": "2026-08-24T00:29:22Z",
+      "mint": "3BowLEJtiCRgCMp35XxM3AhVduYixX92nAJFfCoVpump",
+      "x": -6.533140365091085e-05,
+      "x_inputs": {
+        "firstPool.createdAt": "2026-08-24T00:19:13Z",
+        "r0.liquidity": 2851.301288096562,
+        "r0.mcap": 2657.1673465209083,
+        "r0.updatedAt": "2026-08-24T00:20:03.722144878Z",
+        "r1.liquidity": 2846.183071623941,
+        "r1.mcap": 2652.570899889032,
+        "r1.updatedAt": "2026-08-24T00:24:45.639553028Z"
+      },
+      "x_reason": null,
+      "x_source": {
+        "field_paths": [
+          "liquidity",
+          "mcap",
+          "firstPool.createdAt",
+          "updatedAt",
+          "launchpad"
+        ],
+        "r0_response_sha256": "f84cea38c076a1189e664454d0a23b11ab716cb255fc296c432ef77ef5d5fd21",
+        "r0_row_sha256": "c1baecc11b2bdaf85cd8783d1fe13138869756225757e84682bfc52df2b20bd4",
+        "r1_response_sha256": "debf1f3c75dbb6182ef47ce53c4e81db7553d8f69792d897de024557a1e1a2ad",
+        "r1_row_sha256": "43be0c6b39fe948994cec170ca2a44bf21422dc0dbe3ca0d26e34c4fe2b5086a"
+      },
+      "x_status": "ELIGIBLE"
+    },
+    {
+      "age_r0_seconds": 320.0,
+      "age_r1_seconds": 620.0,
+      "confirmation_interval_seconds": 300.0,
+      "decision_snapshot_r0_at": "2026-08-24T00:24:22Z",
+      "decision_snapshot_r1_at": "2026-08-24T00:29:22Z",
+      "mint": "6sG6SUnEezgcD3iavHd6hHxhhK6MksFVp9dCkkAxpump",
+      "x": 0.0,
+      "x_inputs": {
+        "firstPool.createdAt": "2026-08-24T00:19:02Z",
+        "r0.liquidity": 2851.1135712878227,
+        "r0.mcap": 1832.0655926329034,
+        "r0.updatedAt": "2026-08-24T00:23:39.92521447Z",
+        "r1.liquidity": 2851.1135712878227,
+        "r1.mcap": 1832.0655926329034,
+        "r1.updatedAt": "2026-08-24T00:23:39.92521447Z"
+      },
+      "x_reason": null,
+      "x_source": {
+        "field_paths": [
+          "liquidity",
+          "mcap",
+          "firstPool.createdAt",
+          "updatedAt",
+          "launchpad"
+        ],
+        "r0_response_sha256": "f84cea38c076a1189e664454d0a23b11ab716cb255fc296c432ef77ef5d5fd21",
+        "r0_row_sha256": "b60702b46b967e6f20161be8f29f61a76edf29aef3aec1fa4fc4d0c5abbb8239",
+        "r1_response_sha256": "debf1f3c75dbb6182ef47ce53c4e81db7553d8f69792d897de024557a1e1a2ad",
+        "r1_row_sha256": "03402c0616d3e6171e547ebbb343fd5a226e5528d4ed3dae26cc146bc1f2f0ea"
+      },
+      "x_status": "ELIGIBLE"
+    },
+    {
+      "age_r0_seconds": 326.0,
+      "age_r1_seconds": 626.0,
+      "confirmation_interval_seconds": 300.0,
+      "decision_snapshot_r0_at": "2026-08-24T00:24:22Z",
+      "decision_snapshot_r1_at": "2026-08-24T00:29:22Z",
+      "mint": "7NDU1h24BULm4rxGrPbGGFfDUUPWbw9ZfxkcvJv5pump",
+      "x": 0.05113053305006377,
+      "x_inputs": {
+        "firstPool.createdAt": "2026-08-24T00:18:56Z",
+        "r0.liquidity": 2847.0411156645387,
+        "r0.mcap": 10.40788409758731,
+        "r0.updatedAt": "2026-08-24T00:24:20.864655523Z",
+        "r1.liquidity": 2846.810639250124,
+        "r1.mcap": 9.888298772867525,
+        "r1.updatedAt": "2026-08-24T00:24:49.59145952Z"
+      },
+      "x_reason": null,
+      "x_source": {
+        "field_paths": [
+          "liquidity",
+          "mcap",
+          "firstPool.createdAt",
+          "updatedAt",
+          "launchpad"
+        ],
+        "r0_response_sha256": "f84cea38c076a1189e664454d0a23b11ab716cb255fc296c432ef77ef5d5fd21",
+        "r0_row_sha256": "b8042cad76f74698c3bb2f14d3f6b706d0e51a8256a6db43955aea5ca517ad18",
+        "r1_response_sha256": "debf1f3c75dbb6182ef47ce53c4e81db7553d8f69792d897de024557a1e1a2ad",
+        "r1_row_sha256": "6b1c6f8dd3e8570524b387475166a823afb1c9624992787ecd52463eff0e16d9"
+      },
+      "x_status": "ELIGIBLE"
+    },
+    {
+      "age_r0_seconds": 334.0,
+      "age_r1_seconds": 634.0,
+      "confirmation_interval_seconds": 300.0,
+      "decision_snapshot_r0_at": "2026-08-24T00:24:22Z",
+      "decision_snapshot_r1_at": "2026-08-24T00:29:22Z",
+      "mint": "ChYuSyGLMCXAjmMcobjf5XmmPLmMz1dqj9hZN1awpump",
+      "x": 0.024328173763435677,
+      "x_inputs": {
+        "firstPool.createdAt": "2026-08-24T00:18:48Z",
+        "r0.liquidity": 5797.074912963239,
+        "r0.mcap": 10877.735007559502,
+        "r0.updatedAt": "2026-08-24T00:24:21.406586907Z",
+        "r1.liquidity": 5584.097052705352,
+        "r1.mcap": 10226.26230745703,
+        "r1.updatedAt": "2026-08-24T00:28:48.893565477Z"
+      },
+      "x_reason": null,
+      "x_source": {
+        "field_paths": [
+          "liquidity",
+          "mcap",
+          "firstPool.createdAt",
+          "updatedAt",
+          "launchpad"
+        ],
+        "r0_response_sha256": "f84cea38c076a1189e664454d0a23b11ab716cb255fc296c432ef77ef5d5fd21",
+        "r0_row_sha256": "580db61cd8a8dbe25eed88a07dee27c58d319d6cd016ede8834d0eb58d8a467f",
+        "r1_response_sha256": "debf1f3c75dbb6182ef47ce53c4e81db7553d8f69792d897de024557a1e1a2ad",
+        "r1_row_sha256": "1071ae4f2760b5ae8989fe9d398ee34e6ef5ed64d5b6d2118d4b069a62012b62"
+      },
+      "x_status": "ELIGIBLE"
+    },
+    {
+      "age_r0_seconds": 334.0,
+      "age_r1_seconds": 634.0,
+      "confirmation_interval_seconds": 300.0,
+      "decision_snapshot_r0_at": "2026-08-24T00:24:22Z",
+      "decision_snapshot_r1_at": "2026-08-24T00:29:22Z",
+      "mint": "6EXUWkwJoByhqwHGWMGPod52uL6xhbezUxNGXCn1pump",
+      "x": 0.0,
+      "x_inputs": {
+        "firstPool.createdAt": "2026-08-24T00:18:48Z",
+        "r0.liquidity": 2850.4881750704335,
+        "r0.mcap": 2657.2614458476487,
+        "r0.updatedAt": "2026-08-24T00:21:28.819851954Z",
+        "r1.liquidity": 2850.4881750704335,
+        "r1.mcap": 2657.2614458476487,
+        "r1.updatedAt": "2026-08-24T00:21:28.819851954Z"
+      },
+      "x_reason": null,
+      "x_source": {
+        "field_paths": [
+          "liquidity",
+          "mcap",
+          "firstPool.createdAt",
+          "updatedAt",
+          "launchpad"
+        ],
+        "r0_response_sha256": "f84cea38c076a1189e664454d0a23b11ab716cb255fc296c432ef77ef5d5fd21",
+        "r0_row_sha256": "7802f3d73af054eb5be43b7be73ba2adfc7e90deece1ab1eaa9026496ec4e53a",
+        "r1_response_sha256": "debf1f3c75dbb6182ef47ce53c4e81db7553d8f69792d897de024557a1e1a2ad",
+        "r1_row_sha256": "1f46f25fd517dcccd0d7d61deafab297867c8ba27068cb3b6af28d4bd235ab4a"
+      },
+      "x_status": "ELIGIBLE"
+    },
+    {
+      "age_r0_seconds": 347.0,
+      "age_r1_seconds": 647.0,
+      "confirmation_interval_seconds": 300.0,
+      "decision_snapshot_r0_at": "2026-08-24T00:24:22Z",
+      "decision_snapshot_r1_at": "2026-08-24T00:29:22Z",
+      "mint": "2zj5Rx4vEwZbY3seuQwcqwm2DwxjboUhKzFgrL95pump",
+      "x": 0.0,
+      "x_inputs": {
+        "firstPool.createdAt": "2026-08-24T00:18:35Z",
+        "r0.liquidity": 2850.4643696191256,
+        "r0.mcap": 2657.1866720538833,
+        "r0.updatedAt": "2026-08-24T00:20:59.533322824Z",
+        "r1.liquidity": 2850.4643696191256,
+        "r1.mcap": 2657.1866720538833,
+        "r1.updatedAt": "2026-08-24T00:20:59.533322824Z"
+      },
+      "x_reason": null,
+      "x_source": {
+        "field_paths": [
+          "liquidity",
+          "mcap",
+          "firstPool.createdAt",
+          "updatedAt",
+          "launchpad"
+        ],
+        "r0_response_sha256": "f84cea38c076a1189e664454d0a23b11ab716cb255fc296c432ef77ef5d5fd21",
+        "r0_row_sha256": "cbbb2a398e6a5dcce02968ef9b2b5018e2f08ee7a1c8481b0cf0bd979c90c705",
+        "r1_response_sha256": "debf1f3c75dbb6182ef47ce53c4e81db7553d8f69792d897de024557a1e1a2ad",
+        "r1_row_sha256": "6cc45da4056f285717a0221446c62f0fe634fde02bddc5b670c7aabe1c62abba"
+      },
+      "x_status": "ELIGIBLE"
+    },
+    {
+      "age_r0_seconds": 348.0,
+      "age_r1_seconds": 648.0,
+      "confirmation_interval_seconds": 300.0,
+      "decision_snapshot_r0_at": "2026-08-24T00:24:22Z",
+      "decision_snapshot_r1_at": "2026-08-24T00:29:22Z",
+      "mint": "HRJ3HpLUpV4Nf4YdqBp4sUczJzkzHc4aJemm1z7Qpump",
+      "x": 0.005967858700387717,
+      "x_inputs": {
+        "firstPool.createdAt": "2026-08-24T00:18:34Z",
+        "r0.liquidity": 3057.8374329544995,
+        "r0.mcap": 3061.9515087011537,
+        "r0.updatedAt": "2026-08-24T00:24:08.207905334Z",
+        "r1.liquidity": 2991.5621784657587,
+        "r1.mcap": 2977.763084165597,
+        "r1.updatedAt": "2026-08-24T00:28:23.570429445Z"
+      },
+      "x_reason": null,
+      "x_source": {
+        "field_paths": [
+          "liquidity",
+          "mcap",
+          "firstPool.createdAt",
+          "updatedAt",
+          "launchpad"
+        ],
+        "r0_response_sha256": "f84cea38c076a1189e664454d0a23b11ab716cb255fc296c432ef77ef5d5fd21",
+        "r0_row_sha256": "f99c0134ee1dbfcc299823f09af67d3f1720ef0ceec2f5edbff21ea18a2c0615",
+        "r1_response_sha256": "debf1f3c75dbb6182ef47ce53c4e81db7553d8f69792d897de024557a1e1a2ad",
+        "r1_row_sha256": "94b10c21b6007ac56daaac724d1c26cb38d5ce7e0b4065e16228f8e0dd4ec17d"
+      },
+      "x_status": "ELIGIBLE"
+    },
+    {
+      "age_r0_seconds": 348.0,
+      "age_r1_seconds": 648.0,
+      "confirmation_interval_seconds": 300.0,
+      "decision_snapshot_r0_at": "2026-08-24T00:24:22Z",
+      "decision_snapshot_r1_at": "2026-08-24T00:29:22Z",
+      "mint": "GEQJ4tnk3dfMuh1j77Nu9djjcq47pGsCqhayZa9opump",
+      "x": 0.0,
+      "x_inputs": {
+        "firstPool.createdAt": "2026-08-24T00:18:34Z",
+        "r0.liquidity": 2853.1476005950904,
+        "r0.mcap": 1180.9933544853427,
+        "r0.updatedAt": "2026-08-24T00:21:59.822005559Z",
+        "r1.liquidity": 2853.1476005950904,
+        "r1.mcap": 1180.9933544853427,
+        "r1.updatedAt": "2026-08-24T00:21:59.822005559Z"
+      },
+      "x_reason": null,
+      "x_source": {
+        "field_paths": [
+          "liquidity",
+          "mcap",
+          "firstPool.createdAt",
+          "updatedAt",
+          "launchpad"
+        ],
+        "r0_response_sha256": "f84cea38c076a1189e664454d0a23b11ab716cb255fc296c432ef77ef5d5fd21",
+        "r0_row_sha256": "f8e7822cc2973ed6d9b8a2be2d82ffe602fd77e7bb5689832a057b8fe49ad042",
+        "r1_response_sha256": "debf1f3c75dbb6182ef47ce53c4e81db7553d8f69792d897de024557a1e1a2ad",
+        "r1_row_sha256": "e4d7f375b3de87ee63677522b6c782dd90e21ce07d56755cc8922039ad52416b"
+      },
+      "x_status": "ELIGIBLE"
+    },
+    {
+      "age_r0_seconds": 350.0,
+      "age_r1_seconds": 650.0,
+      "confirmation_interval_seconds": 300.0,
+      "decision_snapshot_r0_at": "2026-08-24T00:24:22Z",
+      "decision_snapshot_r1_at": "2026-08-24T00:29:22Z",
+      "mint": "6QLbyAg7HZZvVw21hzvya5JYboiEuiRY8okESUsApump",
+      "x": 0.0,
+      "x_inputs": {
+        "firstPool.createdAt": "2026-08-24T00:18:32Z",
+        "r0.liquidity": 2850.464369144075,
+        "r0.mcap": 2657.2589353892963,
+        "r0.updatedAt": "2026-08-24T00:22:56.619341636Z",
+        "r1.liquidity": 2850.464369144075,
+        "r1.mcap": 2657.2589353892963,
+        "r1.updatedAt": "2026-08-24T00:29:00.968111909Z"
+      },
+      "x_reason": null,
+      "x_source": {
+        "field_paths": [
+          "liquidity",
+          "mcap",
+          "firstPool.createdAt",
+          "updatedAt",
+          "launchpad"
+        ],
+        "r0_response_sha256": "f84cea38c076a1189e664454d0a23b11ab716cb255fc296c432ef77ef5d5fd21",
+        "r0_row_sha256": "e426546d0bda52728f6259f9110cb6a56e73dd27aedf30ad7451b0a634d2ba94",
+        "r1_response_sha256": "debf1f3c75dbb6182ef47ce53c4e81db7553d8f69792d897de024557a1e1a2ad",
+        "r1_row_sha256": "d7bd8f367bd30f424ecdbb29c4b19d2e1821fa3b5627b1cc8cc2d531c85f6a73"
+      },
+      "x_status": "ELIGIBLE"
+    },
+    {
+      "age_r0_seconds": 351.0,
+      "age_r1_seconds": 651.0,
+      "confirmation_interval_seconds": 300.0,
+      "decision_snapshot_r0_at": "2026-08-24T00:24:22Z",
+      "decision_snapshot_r1_at": "2026-08-24T00:29:22Z",
+      "mint": "EfGijxcoKcVtVD6cPjBAs2qQT12FxKL51oDLR7ncpump",
+      "x": 0.0003295177771755876,
+      "x_inputs": {
+        "firstPool.createdAt": "2026-08-24T00:18:31Z",
+        "r0.liquidity": 2869.2490777860808,
+        "r0.mcap": 2692.4022584685536,
+        "r0.updatedAt": "2026-08-24T00:20:52.486187797Z",
+        "r1.liquidity": 2845.6972651948504,
+        "r1.mcap": 2669.42230015741,
+        "r1.updatedAt": "2026-08-24T00:26:32.025784951Z"
+      },
+      "x_reason": null,
+      "x_source": {
+        "field_paths": [
+          "liquidity",
+          "mcap",
+          "firstPool.createdAt",
+          "updatedAt",
+          "launchpad"
+        ],
+        "r0_response_sha256": "f84cea38c076a1189e664454d0a23b11ab716cb255fc296c432ef77ef5d5fd21",
+        "r0_row_sha256": "289388bec367224bb89d75d13f54eb64855adb767cccc34ed58b257c21e5d76b",
+        "r1_response_sha256": "debf1f3c75dbb6182ef47ce53c4e81db7553d8f69792d897de024557a1e1a2ad",
+        "r1_row_sha256": "9fb59d2a019f353bfbc557be176d67d46e4ae7edd60e9d48a419b085c7ad96c4"
+      },
+      "x_status": "ELIGIBLE"
+    },
+    {
+      "age_r0_seconds": 355.0,
+      "age_r1_seconds": 655.0,
+      "confirmation_interval_seconds": 300.0,
+      "decision_snapshot_r0_at": "2026-08-24T00:24:22Z",
+      "decision_snapshot_r1_at": "2026-08-24T00:29:22Z",
+      "mint": "EwurRSEkBHk5HXzizPsPXvPUVWQz5HzaXKobjf6gpump",
+      "x": 0.0,
+      "x_inputs": {
+        "firstPool.createdAt": "2026-08-24T00:18:27Z",
+        "r0.liquidity": 2849.4734424502662,
+        "r0.mcap": 2743.979406016375,
+        "r0.updatedAt": "2026-08-24T00:23:58.872765439Z",
+        "r1.liquidity": 2849.4734424502662,
+        "r1.mcap": 2743.979406016375,
+        "r1.updatedAt": "2026-08-24T00:23:58.872765439Z"
+      },
+      "x_reason": null,
+      "x_source": {
+        "field_paths": [
+          "liquidity",
+          "mcap",
+          "firstPool.createdAt",
+          "updatedAt",
+          "launchpad"
+        ],
+        "r0_response_sha256": "f84cea38c076a1189e664454d0a23b11ab716cb255fc296c432ef77ef5d5fd21",
+        "r0_row_sha256": "f0659aecbd7695144add3f546c3ee3bda00a1efcbb480e7359956a7f90626b05",
+        "r1_response_sha256": "debf1f3c75dbb6182ef47ce53c4e81db7553d8f69792d897de024557a1e1a2ad",
+        "r1_row_sha256": "ab78fa38e41e9c32b2bf96a44c7dad733b16aa22cffc7798535e5b84e3586b74"
+      },
+      "x_status": "ELIGIBLE"
+    },
+    {
+      "age_r0_seconds": 355.0,
+      "age_r1_seconds": 655.0,
+      "confirmation_interval_seconds": 300.0,
+      "decision_snapshot_r0_at": "2026-08-24T00:24:22Z",
+      "decision_snapshot_r1_at": "2026-08-24T00:29:22Z",
+      "mint": "2wThCZrgHdtCSqhyjkAfyf1kx5vfRv7ydmDMUB7ypump",
+      "x": 0.0,
+      "x_inputs": {
+        "firstPool.createdAt": "2026-08-24T00:18:27Z",
+        "r0.liquidity": 2850.4643699041562,
+        "r0.mcap": 2657.1943637124145,
+        "r0.updatedAt": "2026-08-24T00:20:58.558415982Z",
+        "r1.liquidity": 2850.4643699041562,
+        "r1.mcap": 2657.1943637124145,
+        "r1.updatedAt": "2026-08-24T00:20:58.558415982Z"
+      },
+      "x_reason": null,
+      "x_source": {
+        "field_paths": [
+          "liquidity",
+          "mcap",
+          "firstPool.createdAt",
+          "updatedAt",
+          "launchpad"
+        ],
+        "r0_response_sha256": "f84cea38c076a1189e664454d0a23b11ab716cb255fc296c432ef77ef5d5fd21",
+        "r0_row_sha256": "304eaa4a94b6a5d82902ebc1a4acc5b8d01eb5108c76c6ef65cbee9dd2b76651",
+        "r1_response_sha256": "debf1f3c75dbb6182ef47ce53c4e81db7553d8f69792d897de024557a1e1a2ad",
+        "r1_row_sha256": "a503a9acc084dd40fe24ab300b0af266ebe4848aa40fae568a12b7a8d2390d20"
+      },
+      "x_status": "ELIGIBLE"
+    },
+    {
+      "age_r0_seconds": 361.0,
+      "age_r1_seconds": 661.0,
+      "confirmation_interval_seconds": 300.0,
+      "decision_snapshot_r0_at": "2026-08-24T00:24:22Z",
+      "decision_snapshot_r1_at": "2026-08-24T00:29:22Z",
+      "mint": "65vMUTKWP7hf1rdaY43h11CikLFeuS7VfM7iJkUcpump",
+      "x": 0.0,
+      "x_inputs": {
+        "firstPool.createdAt": "2026-08-24T00:18:21Z",
+        "r0.liquidity": 2851.1373857721032,
+        "r0.mcap": 2666.701903578882,
+        "r0.updatedAt": "2026-08-24T00:23:58.87278805Z",
+        "r1.liquidity": 2851.1373857721032,
+        "r1.mcap": 2666.701903578882,
+        "r1.updatedAt": "2026-08-24T00:28:49.810598902Z"
+      },
+      "x_reason": null,
+      "x_source": {
+        "field_paths": [
+          "liquidity",
+          "mcap",
+          "firstPool.createdAt",
+          "updatedAt",
+          "launchpad"
+        ],
+        "r0_response_sha256": "f84cea38c076a1189e664454d0a23b11ab716cb255fc296c432ef77ef5d5fd21",
+        "r0_row_sha256": "9378efa8e3a8cc7816f5e5c54bf186dcb08176530b708cba343971ec378c7ae7",
+        "r1_response_sha256": "debf1f3c75dbb6182ef47ce53c4e81db7553d8f69792d897de024557a1e1a2ad",
+        "r1_row_sha256": "e5d023b502f8e5cbaebe0e4f52e5b7e548bbf2fe8d0ff7bd9ac8d7cd629f88ac"
+      },
+      "x_status": "ELIGIBLE"
+    },
+    {
+      "age_r0_seconds": 369.0,
+      "age_r1_seconds": 669.0,
+      "confirmation_interval_seconds": 300.0,
+      "decision_snapshot_r0_at": "2026-08-24T00:24:22Z",
+      "decision_snapshot_r1_at": "2026-08-24T00:29:22Z",
+      "mint": "AFgUfvWNmsEsmAwb7CtgKDtnh631mJHeeVar4h4Npump",
+      "x": 0.0,
+      "x_inputs": {
+        "firstPool.createdAt": "2026-08-24T00:18:13Z",
+        "r0.liquidity": 2849.4972395309387,
+        "r0.mcap": 2743.979406016375,
+        "r0.updatedAt": "2026-08-24T00:23:48.726579931Z",
+        "r1.liquidity": 2849.4972395309387,
+        "r1.mcap": 2743.979406016375,
+        "r1.updatedAt": "2026-08-24T00:23:48.726579931Z"
+      },
+      "x_reason": null,
+      "x_source": {
+        "field_paths": [
+          "liquidity",
+          "mcap",
+          "firstPool.createdAt",
+          "updatedAt",
+          "launchpad"
+        ],
+        "r0_response_sha256": "f84cea38c076a1189e664454d0a23b11ab716cb255fc296c432ef77ef5d5fd21",
+        "r0_row_sha256": "01d215529bfd33ed30623cb514e1b89c8fe3ee21f90a98fa504bb549cf8407e7",
+        "r1_response_sha256": "debf1f3c75dbb6182ef47ce53c4e81db7553d8f69792d897de024557a1e1a2ad",
+        "r1_row_sha256": "eadc534c4285a6964ab566ae4c7ab6256a5e9912befd0d1ff42ecbca5666bdfe"
+      },
+      "x_status": "ELIGIBLE"
+    },
+    {
+      "age_r0_seconds": 373.0,
+      "age_r1_seconds": 673.0,
+      "confirmation_interval_seconds": 300.0,
+      "decision_snapshot_r0_at": "2026-08-24T00:24:22Z",
+      "decision_snapshot_r1_at": "2026-08-24T00:29:22Z",
+      "mint": "FHcrjgUJkZjZ1i1HTHe45B9eiKcP41Ti6itMRXCupump",
+      "x": null,
+      "x_inputs": {
+        "firstPool.createdAt": "2026-08-24T00:18:09Z",
+        "r0.liquidity": null,
+        "r0.mcap": null,
+        "r0.updatedAt": "2026-08-24T00:18:14.81904129Z",
+        "r1.liquidity": null,
+        "r1.mcap": null,
+        "r1.updatedAt": "2026-08-24T00:25:34.516213405Z"
+      },
+      "x_reason": "FDV_OR_SUBSTITUTE_REJECTED",
+      "x_source": {
+        "field_paths": [
+          "liquidity",
+          "mcap",
+          "firstPool.createdAt",
+          "updatedAt",
+          "launchpad"
+        ],
+        "r0_response_sha256": "f84cea38c076a1189e664454d0a23b11ab716cb255fc296c432ef77ef5d5fd21",
+        "r0_row_sha256": "417aa0accf456cf74eb0b468389cf80da4bdd0d64f30752d0c30499ef21a00e1",
+        "r1_response_sha256": "debf1f3c75dbb6182ef47ce53c4e81db7553d8f69792d897de024557a1e1a2ad",
+        "r1_row_sha256": "f2133f75ad78ca508e9564e0484532dcc07342a4602686c39086615dec9ece86"
+      },
+      "x_status": "MISSING"
+    },
+    {
+      "age_r0_seconds": 374.0,
+      "age_r1_seconds": 674.0,
+      "confirmation_interval_seconds": 300.0,
+      "decision_snapshot_r0_at": "2026-08-24T00:24:22Z",
+      "decision_snapshot_r1_at": "2026-08-24T00:29:22Z",
+      "mint": "AY6AxCvVXMZvkJH5UVTyXnbKe81s64X9bBnoUbvCpump",
+      "x": 0.0,
+      "x_inputs": {
+        "firstPool.createdAt": "2026-08-24T00:18:08Z",
+        "r0.liquidity": 2846.748157384831,
+        "r0.mcap": 1.8695423487889105,
+        "r0.updatedAt": "2026-08-24T00:24:20.243496932Z",
+        "r1.liquidity": 2846.748157384831,
+        "r1.mcap": 1.8695423487889105,
+        "r1.updatedAt": "2026-08-24T00:28:46.314815385Z"
+      },
+      "x_reason": null,
+      "x_source": {
+        "field_paths": [
+          "liquidity",
+          "mcap",
+          "firstPool.createdAt",
+          "updatedAt",
+          "launchpad"
+        ],
+        "r0_response_sha256": "f84cea38c076a1189e664454d0a23b11ab716cb255fc296c432ef77ef5d5fd21",
+        "r0_row_sha256": "7974a0a424daca9b7a6755b7a1b6bd57354b35f030be94d2aba8d6484ff3a9a6",
+        "r1_response_sha256": "debf1f3c75dbb6182ef47ce53c4e81db7553d8f69792d897de024557a1e1a2ad",
+        "r1_row_sha256": "fd99a66dedd0ae176d105ba3ab5e75c912af8c7c0da55549725c720bcbbdb714"
+      },
+      "x_status": "ELIGIBLE"
+    },
+    {
+      "age_r0_seconds": 375.0,
+      "age_r1_seconds": 675.0,
+      "confirmation_interval_seconds": 300.0,
+      "decision_snapshot_r0_at": "2026-08-24T00:24:22Z",
+      "decision_snapshot_r1_at": "2026-08-24T00:29:22Z",
+      "mint": "9CkVkXnDmgYEEwbVTzcZpGukdoRbRyp1EykoWXSwpump",
+      "x": 0.0,
+      "x_inputs": {
+        "firstPool.createdAt": "2026-08-24T00:18:07Z",
+        "r0.liquidity": 2852.0969887442416,
+        "r0.mcap": 2662.346189169901,
+        "r0.updatedAt": "2026-08-24T00:19:18.418853271Z",
+        "r1.liquidity": 2852.0969887442416,
+        "r1.mcap": 2662.346189169901,
+        "r1.updatedAt": "2026-08-24T00:25:56.318478479Z"
+      },
+      "x_reason": null,
+      "x_source": {
+        "field_paths": [
+          "liquidity",
+          "mcap",
+          "firstPool.createdAt",
+          "updatedAt",
+          "launchpad"
+        ],
+        "r0_response_sha256": "f84cea38c076a1189e664454d0a23b11ab716cb255fc296c432ef77ef5d5fd21",
+        "r0_row_sha256": "5afa7e6425aef807d43011dab830c866f21ec06995e28244b042c167b4cf8a21",
+        "r1_response_sha256": "debf1f3c75dbb6182ef47ce53c4e81db7553d8f69792d897de024557a1e1a2ad",
+        "r1_row_sha256": "58abaf6222b1e50e5d39fe8d8d09578272756282682a456168544613376e7fd7"
+      },
+      "x_status": "ELIGIBLE"
+    },
+    {
+      "age_r0_seconds": 376.0,
+      "age_r1_seconds": 676.0,
+      "confirmation_interval_seconds": 300.0,
+      "decision_snapshot_r0_at": "2026-08-24T00:24:22Z",
+      "decision_snapshot_r1_at": "2026-08-24T00:29:22Z",
+      "mint": "BqPKnqsPjsdAbhgA46i8ptgRPT9Vyg8Z9UHfEWwypump",
+      "x": 0.0,
+      "x_inputs": {
+        "firstPool.createdAt": "2026-08-24T00:18:06Z",
+        "r0.liquidity": 2851.1373876727384,
+        "r0.mcap": 2663.172666943015,
+        "r0.updatedAt": "2026-08-24T00:23:48.820153989Z",
+        "r1.liquidity": 2851.1373876727384,
+        "r1.mcap": 2663.172666943015,
+        "r1.updatedAt": "2026-08-24T00:25:24.926473064Z"
+      },
+      "x_reason": null,
+      "x_source": {
+        "field_paths": [
+          "liquidity",
+          "mcap",
+          "firstPool.createdAt",
+          "updatedAt",
+          "launchpad"
+        ],
+        "r0_response_sha256": "f84cea38c076a1189e664454d0a23b11ab716cb255fc296c432ef77ef5d5fd21",
+        "r0_row_sha256": "32ed39c8a414f41c9b80d541d9f8fbcf513b555d2352f988ff10c943948718d1",
+        "r1_response_sha256": "debf1f3c75dbb6182ef47ce53c4e81db7553d8f69792d897de024557a1e1a2ad",
+        "r1_row_sha256": "84b11e42bfc73dc34cf6bb22dc27c383fe770baaf7695c20ddb9aa8b444abd22"
+      },
+      "x_status": "ELIGIBLE"
+    },
+    {
+      "age_r0_seconds": 377.0,
+      "age_r1_seconds": 677.0,
+      "confirmation_interval_seconds": 300.0,
+      "decision_snapshot_r0_at": "2026-08-24T00:24:22Z",
+      "decision_snapshot_r1_at": "2026-08-24T00:29:22Z",
+      "mint": "3GJd7Tp32xG6WmKfUwqFcdWCEYvUTA6GuzTVPLjNpump",
+      "x": 0.0,
+      "x_inputs": {
+        "firstPool.createdAt": "2026-08-24T00:18:05Z",
+        "r0.liquidity": 2851.4051132039094,
+        "r0.mcap": 2659.0159926044134,
+        "r0.updatedAt": "2026-08-24T00:20:41.323011664Z",
+        "r1.liquidity": 2851.4051132039094,
+        "r1.mcap": 2659.0159926044134,
+        "r1.updatedAt": "2026-08-24T00:20:41.323011664Z"
+      },
+      "x_reason": null,
+      "x_source": {
+        "field_paths": [
+          "liquidity",
+          "mcap",
+          "firstPool.createdAt",
+          "updatedAt",
+          "launchpad"
+        ],
+        "r0_response_sha256": "f84cea38c076a1189e664454d0a23b11ab716cb255fc296c432ef77ef5d5fd21",
+        "r0_row_sha256": "ed22bf5ef9da9198e85600c274c1e8bc90543ea349c388df95460cf316b454db",
+        "r1_response_sha256": "debf1f3c75dbb6182ef47ce53c4e81db7553d8f69792d897de024557a1e1a2ad",
+        "r1_row_sha256": "1e816ea9950acf57f2fefcedfd1d575d41a636fa12260c57fbe2e85cc60abeae"
+      },
+      "x_status": "ELIGIBLE"
+    },
+    {
+      "age_r0_seconds": 378.0,
+      "age_r1_seconds": 678.0,
+      "confirmation_interval_seconds": 300.0,
+      "decision_snapshot_r0_at": "2026-08-24T00:24:22Z",
+      "decision_snapshot_r1_at": "2026-08-24T00:29:22Z",
+      "mint": "RXHSUKJEjNhtp1NVgQGe6ybijyypxt5c3GDnL4upump",
+      "x": 0.23843266211470437,
+      "x_inputs": {
+        "firstPool.createdAt": "2026-08-24T00:18:04Z",
+        "r0.liquidity": 2847.2450298288895,
+        "r0.mcap": 120.43527163238512,
+        "r0.updatedAt": "2026-08-24T00:24:11.857716327Z",
+        "r1.liquidity": 2847.57682079547,
+        "r1.mcap": 94.89739975073411,
+        "r1.updatedAt": "2026-08-24T00:25:27.227759633Z"
+      },
+      "x_reason": null,
+      "x_source": {
+        "field_paths": [
+          "liquidity",
+          "mcap",
+          "firstPool.createdAt",
+          "updatedAt",
+          "launchpad"
+        ],
+        "r0_response_sha256": "f84cea38c076a1189e664454d0a23b11ab716cb255fc296c432ef77ef5d5fd21",
+        "r0_row_sha256": "438a8f4d40c8c178aeb4ec57b99dd036712bd7e2749e9e6c3ae2b64fec6630fb",
+        "r1_response_sha256": "debf1f3c75dbb6182ef47ce53c4e81db7553d8f69792d897de024557a1e1a2ad",
+        "r1_row_sha256": "0ff797d8ea1703b50832cf1e6731301c93b0d2d265b7b65781f4ff5c1f45ae75"
+      },
+      "x_status": "ELIGIBLE"
+    }
+  ],
+  "credential_reads": 1,
+  "discovery_observations": [
+    {
+      "observation_id": "DISCOVERY:RECENT",
+      "observed_at": "2026-08-24T00:19:22Z",
+      "terminal": "TOKEN_LIST_OBSERVED",
+      "terminal_error": null,
+      "transport": {
+        "http_status": 200,
+        "request_count": 1,
+        "response_bytes": 50018,
+        "response_sha256": "37f9533fc7226cfee14ef5a0a67fbe0d393fc0439683ce88100c4ad85618edf4",
+        "safe_response_headers": {
+          "x-api-gateway-request-id": "xRW1hi0fWAM0liK42KUGOnalLcDADPhNctKFWcbk7jFH8qjOGwZOWw=="
+        },
+        "url_has_api_key": false,
+        "url_has_taker": false
+      }
+    },
+    {
+      "observation_id": "DISCOVERY:SEARCH_R0",
+      "observed_at": "2026-08-24T00:24:22Z",
+      "terminal": "TOKEN_LIST_OBSERVED",
+      "terminal_error": null,
+      "transport": {
+        "http_status": 200,
+        "request_count": 1,
+        "response_bytes": 43907,
+        "response_sha256": "f84cea38c076a1189e664454d0a23b11ab716cb255fc296c432ef77ef5d5fd21",
+        "safe_response_headers": {
+          "x-api-gateway-request-id": "25Wody4fi-mKfsHnicQ2GDGcyXjiV9d0EMm2r0nj3pV4jjAKyI9Pzw=="
+        },
+        "url_has_api_key": false,
+        "url_has_taker": false
+      }
+    },
+    {
+      "observation_id": "DISCOVERY:SEARCH_R1",
+      "observed_at": "2026-08-24T00:29:22Z",
+      "terminal": "TOKEN_LIST_OBSERVED",
+      "terminal_error": null,
+      "transport": {
+        "http_status": 200,
+        "request_count": 1,
+        "response_bytes": 41445,
+        "response_sha256": "debf1f3c75dbb6182ef47ce53c4e81db7553d8f69792d897de024557a1e1a2ad",
+        "safe_response_headers": {
+          "x-api-gateway-request-id": "Zv3ZcHcWIA4o60KoQ_05aX7BrOhICBXy93F3a_l3rCnIrwgsrxERoQ=="
+        },
+        "url_has_api_key": false,
+        "url_has_taker": false
+      }
+    }
+  ],
+  "execute_calls": 0,
+  "factory_runner_sha256": "d8d22bcb51fb6992d40f09e58274c52e0f9942c12d043cc57b96ffca524e918f",
+  "fallbacks": 0,
+  "non_claims": [
+    "NO_EXECUTE",
+    "NO_TAKER_OR_SIGNER",
+    "NO_TRANSACTION_BYTES_IN_GIT",
+    "NO_ALPHA",
+    "NO_NETRETURN",
+    "NO_STRATEGY_OR_SHADOW",
+    "NO_DISCOVERY_OR_A7",
+    "NO_CLOSED_FAMILY_THRESHOLD_REOPEN",
+    "NO_SECOND_PROVIDER"
+  ],
+  "observations": [
+    {
+      "age_r0_seconds": 307.0,
+      "age_r1_seconds": 607.0,
+      "buy_observed_at": "2026-08-24T00:29:25Z",
+      "buy_out_amount": "351939239456",
+      "buy_terminal": "QUOTE_OBSERVED",
+      "buy_transport": {
+        "http_status": 200,
+        "request_count": 1,
+        "response_bytes": 1264,
+        "response_sha256": "aee398e1396b8bff45b10c96d779f136b0b7a5d7bb4d612face50e875030c5e7",
+        "safe_response_headers": {
+          "x-api-gateway-request-id": "F8jdBOqE-0X4vOH5rfuphFH6T6AGiQm9QqG0Dvs7Z_LMAOXojGOMsQ=="
+        },
+        "url_has_api_key": false,
+        "url_has_taker": false
+      },
+      "confirmation_interval_seconds": 300.0,
+      "decision_snapshot_r0_at": "2026-08-24T00:24:22Z",
+      "decision_snapshot_r1_at": "2026-08-24T00:29:22Z",
+      "h900_due_at": "2026-08-24T00:44:25Z",
+      "h900_terminal": "QUOTE_OBSERVED",
+      "mint": "7DtkuLZfHmF51sifFtd2AjdZe9R77JDAUtHZgUJtpump",
+      "x": 0.016170845547511255,
+      "x_inputs": {
+        "firstPool.createdAt": "2026-08-24T00:19:15Z",
+        "r0.liquidity": 2877.2031773678286,
+        "r0.mcap": 2706.371736157279,
+        "r0.updatedAt": "2026-08-24T00:24:16.808160209Z",
+        "r1.liquidity": 2877.2031773678286,
+        "r1.mcap": 2662.9593701605268,
+        "r1.updatedAt": "2026-08-24T00:29:21.605392784Z"
+      },
+      "x_reason": null,
+      "x_source": {
+        "field_paths": [
+          "liquidity",
+          "mcap",
+          "firstPool.createdAt",
+          "updatedAt",
+          "launchpad"
+        ],
+        "r0_response_sha256": "f84cea38c076a1189e664454d0a23b11ab716cb255fc296c432ef77ef5d5fd21",
+        "r0_row_sha256": "6fb775b970d92335115c9bfd4c096bb4be92826555ec1170da15c841d756ad06",
+        "r1_response_sha256": "debf1f3c75dbb6182ef47ce53c4e81db7553d8f69792d897de024557a1e1a2ad",
+        "r1_row_sha256": "a87d8fb7e8ecc4742d9be2c5b72e63ba3151d71754c7d934c3cd15a993848a8c"
+      },
+      "x_status": "ELIGIBLE",
+      "y": -0.0272806
+    },
+    {
+      "age_r0_seconds": 309.0,
+      "age_r1_seconds": 609.0,
+      "buy_observed_at": "2026-08-24T00:29:29Z",
+      "buy_out_amount": "25025184370985",
+      "buy_terminal": "QUOTE_OBSERVED",
+      "buy_transport": {
+        "http_status": 200,
+        "request_count": 1,
+        "response_bytes": 1268,
+        "response_sha256": "bcf771e5992b6d7508a854fc6e69f487c69d1a5c50f02c9308a46d90ea2cd2b5",
+        "safe_response_headers": {
+          "x-api-gateway-request-id": "vc-WP6fr8UGKVXMkdPvd10tTdGJJGiGL4E5lJxwivOs6yyBv6-14oQ=="
+        },
+        "url_has_api_key": false,
+        "url_has_taker": false
+      },
+      "confirmation_interval_seconds": 300.0,
+      "decision_snapshot_r0_at": "2026-08-24T00:24:22Z",
+      "decision_snapshot_r1_at": "2026-08-24T00:29:22Z",
+      "h900_due_at": "2026-08-24T00:44:29Z",
+      "h900_terminal": "QUOTE_OBSERVED",
+      "mint": "9Hxqi3RUkohAUhxjmU6EGBQYuR5teisUQiuu7pSppump",
+      "x": 0.021956636080403207,
+      "x_inputs": {
+        "firstPool.createdAt": "2026-08-24T00:19:13Z",
+        "r0.liquidity": 2853.6823895856796,
+        "r0.mcap": 37.89061047883622,
+        "r0.updatedAt": "2026-08-24T00:21:59.9417984Z",
+        "r1.liquidity": 2849.867987781928,
+        "r1.mcap": 37.01818013694753,
+        "r1.updatedAt": "2026-08-24T00:26:46.173430007Z"
+      },
+      "x_reason": null,
+      "x_source": {
+        "field_paths": [
+          "liquidity",
+          "mcap",
+          "firstPool.createdAt",
+          "updatedAt",
+          "launchpad"
+        ],
+        "r0_response_sha256": "f84cea38c076a1189e664454d0a23b11ab716cb255fc296c432ef77ef5d5fd21",
+        "r0_row_sha256": "71b2e9546daa17c8b04ea730ace26062f439652b3679f8902246892ab34d6658",
+        "r1_response_sha256": "debf1f3c75dbb6182ef47ce53c4e81db7553d8f69792d897de024557a1e1a2ad",
+        "r1_row_sha256": "85e780a98b01ee8848cb159b0d68b8e098faaba179f766341ea89594264f9a2a"
+      },
+      "x_status": "ELIGIBLE",
+      "y": -0.0705602
+    },
+    {
+      "age_r0_seconds": 309.0,
+      "age_r1_seconds": 609.0,
+      "buy_observed_at": "2026-08-24T00:29:32Z",
+      "buy_out_amount": "352781556755",
+      "buy_terminal": "QUOTE_OBSERVED",
+      "buy_transport": {
+        "http_status": 200,
+        "request_count": 1,
+        "response_bytes": 1264,
+        "response_sha256": "99ac890e8446756a446b7d9d57d599f708ad5461d3d885ea75a43cee359f41e7",
+        "safe_response_headers": {
+          "x-api-gateway-request-id": "IpnP9a7_G1iRftjSIvk5qQ68va-okDRonwatTYUhJTiikoozS9WcJA=="
+        },
+        "url_has_api_key": false,
+        "url_has_taker": false
+      },
+      "confirmation_interval_seconds": 300.0,
+      "decision_snapshot_r0_at": "2026-08-24T00:24:22Z",
+      "decision_snapshot_r1_at": "2026-08-24T00:29:22Z",
+      "h900_due_at": "2026-08-24T00:44:32Z",
+      "h900_terminal": "QUOTE_OBSERVED",
+      "mint": "5rae7LpBXiy9z5YRf1wegWKxE5EovPbPvUv3E2Frpump",
+      "x": 0.0,
+      "x_inputs": {
+        "firstPool.createdAt": "2026-08-24T00:19:13Z",
+        "r0.liquidity": 2851.1135712878227,
+        "r0.mcap": 2661.4206680697507,
+        "r0.updatedAt": "2026-08-24T00:19:24.976598515Z",
+        "r1.liquidity": 2851.1135712878227,
+        "r1.mcap": 2661.4206680697507,
+        "r1.updatedAt": "2026-08-24T00:19:24.976598515Z"
+      },
+      "x_reason": null,
+      "x_source": {
+        "field_paths": [
+          "liquidity",
+          "mcap",
+          "firstPool.createdAt",
+          "updatedAt",
+          "launchpad"
+        ],
+        "r0_response_sha256": "f84cea38c076a1189e664454d0a23b11ab716cb255fc296c432ef77ef5d5fd21",
+        "r0_row_sha256": "11b4ec65a9821c70797b44c89e42955a4843cdf60d810b1b93989b86e364f1ff",
+        "r1_response_sha256": "debf1f3c75dbb6182ef47ce53c4e81db7553d8f69792d897de024557a1e1a2ad",
+        "r1_row_sha256": "4f7b9d45ad34377f166710a8417a7fdf48ce9d797c89d552e700b6d32272e0c9"
+      },
+      "x_status": "ELIGIBLE",
+      "y": -0.0272814
+    },
+    {
+      "age_r0_seconds": 309.0,
+      "age_r1_seconds": 609.0,
+      "buy_observed_at": "2026-08-24T00:29:35Z",
+      "buy_out_amount": "352781556755",
+      "buy_terminal": "QUOTE_OBSERVED",
+      "buy_transport": {
+        "http_status": 200,
+        "request_count": 1,
+        "response_bytes": 1264,
+        "response_sha256": "37a941a3df6d221a87d8c792d37891557cff86f83318d934eb2e94519dd79559",
+        "safe_response_headers": {
+          "x-api-gateway-request-id": "XXqmROBnpNGj88a3mP-r4ejSfwdSHG6jR0BH9hmLS1dEUcafzOLysQ=="
+        },
+        "url_has_api_key": false,
+        "url_has_taker": false
+      },
+      "confirmation_interval_seconds": 300.0,
+      "decision_snapshot_r0_at": "2026-08-24T00:24:22Z",
+      "decision_snapshot_r1_at": "2026-08-24T00:29:22Z",
+      "h900_due_at": "2026-08-24T00:44:35Z",
+      "h900_terminal": "QUOTE_OBSERVED",
+      "mint": "3BowLEJtiCRgCMp35XxM3AhVduYixX92nAJFfCoVpump",
+      "x": -6.533140365091085e-05,
+      "x_inputs": {
+        "firstPool.createdAt": "2026-08-24T00:19:13Z",
+        "r0.liquidity": 2851.301288096562,
+        "r0.mcap": 2657.1673465209083,
+        "r0.updatedAt": "2026-08-24T00:20:03.722144878Z",
+        "r1.liquidity": 2846.183071623941,
+        "r1.mcap": 2652.570899889032,
+        "r1.updatedAt": "2026-08-24T00:24:45.639553028Z"
+      },
+      "x_reason": null,
+      "x_source": {
+        "field_paths": [
+          "liquidity",
+          "mcap",
+          "firstPool.createdAt",
+          "updatedAt",
+          "launchpad"
+        ],
+        "r0_response_sha256": "f84cea38c076a1189e664454d0a23b11ab716cb255fc296c432ef77ef5d5fd21",
+        "r0_row_sha256": "c1baecc11b2bdaf85cd8783d1fe13138869756225757e84682bfc52df2b20bd4",
+        "r1_response_sha256": "debf1f3c75dbb6182ef47ce53c4e81db7553d8f69792d897de024557a1e1a2ad",
+        "r1_row_sha256": "43be0c6b39fe948994cec170ca2a44bf21422dc0dbe3ca0d26e34c4fe2b5086a"
+      },
+      "x_status": "ELIGIBLE",
+      "y": -0.0272814
+    },
+    {
+      "age_r0_seconds": 320.0,
+      "age_r1_seconds": 620.0,
+      "buy_observed_at": "2026-08-24T00:29:39Z",
+      "buy_out_amount": "523482342865",
+      "buy_terminal": "QUOTE_OBSERVED",
+      "buy_transport": {
+        "http_status": 200,
+        "request_count": 1,
+        "response_bytes": 1259,
+        "response_sha256": "d9899ee460e9f5aa09e62b6a8d58e2f98bcb3f4e6684717bf40f3c84d9538fd1",
+        "safe_response_headers": {
+          "x-api-gateway-request-id": "G940B4c5VSHKWfihrd-NQAPGOvHMyH9-DRGYDS28CTIEmDKturi8Iw=="
+        },
+        "url_has_api_key": false,
+        "url_has_taker": false
+      },
+      "confirmation_interval_seconds": 300.0,
+      "decision_snapshot_r0_at": "2026-08-24T00:24:22Z",
+      "decision_snapshot_r1_at": "2026-08-24T00:29:22Z",
+      "h900_due_at": "2026-08-24T00:44:39Z",
+      "h900_terminal": "MARKET_EXECUTION_UNAVAILABLE",
+      "mint": "6sG6SUnEezgcD3iavHd6hHxhhK6MksFVp9dCkkAxpump",
+      "x": 0.0,
+      "x_inputs": {
+        "firstPool.createdAt": "2026-08-24T00:19:02Z",
+        "r0.liquidity": 2851.1135712878227,
+        "r0.mcap": 1832.0655926329034,
+        "r0.updatedAt": "2026-08-24T00:23:39.92521447Z",
+        "r1.liquidity": 2851.1135712878227,
+        "r1.mcap": 1832.0655926329034,
+        "r1.updatedAt": "2026-08-24T00:23:39.92521447Z"
+      },
+      "x_reason": null,
+      "x_source": {
+        "field_paths": [
+          "liquidity",
+          "mcap",
+          "firstPool.createdAt",
+          "updatedAt",
+          "launchpad"
+        ],
+        "r0_response_sha256": "f84cea38c076a1189e664454d0a23b11ab716cb255fc296c432ef77ef5d5fd21",
+        "r0_row_sha256": "b60702b46b967e6f20161be8f29f61a76edf29aef3aec1fa4fc4d0c5abbb8239",
+        "r1_response_sha256": "debf1f3c75dbb6182ef47ce53c4e81db7553d8f69792d897de024557a1e1a2ad",
+        "r1_row_sha256": "03402c0616d3e6171e547ebbb343fd5a226e5528d4ed3dae26cc146bc1f2f0ea"
+      },
+      "x_status": "ELIGIBLE",
+      "y": null
+    },
+    {
+      "age_r0_seconds": 326.0,
+      "age_r1_seconds": 626.0,
+      "buy_observed_at": "2026-08-24T00:29:42Z",
+      "buy_out_amount": "88746528726529",
+      "buy_terminal": "QUOTE_OBSERVED",
+      "buy_transport": {
+        "http_status": 200,
+        "request_count": 1,
+        "response_bytes": 1268,
+        "response_sha256": "1c29192a209c99b875ba5f9bf5acb4a51d3f63a52462d5d3c7c2af1a03b174e9",
+        "safe_response_headers": {
+          "x-api-gateway-request-id": "Ux1KapD5hd7oyI5Wz-XxLw4dnStaKT3z-JItVsbckYqXxJhDXm-Wtg=="
+        },
+        "url_has_api_key": false,
+        "url_has_taker": false
+      },
+      "confirmation_interval_seconds": 300.0,
+      "decision_snapshot_r0_at": "2026-08-24T00:24:22Z",
+      "decision_snapshot_r1_at": "2026-08-24T00:29:22Z",
+      "h900_due_at": "2026-08-24T00:44:42Z",
+      "h900_terminal": "MARKET_EXECUTION_UNAVAILABLE",
+      "mint": "7NDU1h24BULm4rxGrPbGGFfDUUPWbw9ZfxkcvJv5pump",
+      "x": 0.05113053305006377,
+      "x_inputs": {
+        "firstPool.createdAt": "2026-08-24T00:18:56Z",
+        "r0.liquidity": 2847.0411156645387,
+        "r0.mcap": 10.40788409758731,
+        "r0.updatedAt": "2026-08-24T00:24:20.864655523Z",
+        "r1.liquidity": 2846.810639250124,
+        "r1.mcap": 9.888298772867525,
+        "r1.updatedAt": "2026-08-24T00:24:49.59145952Z"
+      },
+      "x_reason": null,
+      "x_source": {
+        "field_paths": [
+          "liquidity",
+          "mcap",
+          "firstPool.createdAt",
+          "updatedAt",
+          "launchpad"
+        ],
+        "r0_response_sha256": "f84cea38c076a1189e664454d0a23b11ab716cb255fc296c432ef77ef5d5fd21",
+        "r0_row_sha256": "b8042cad76f74698c3bb2f14d3f6b706d0e51a8256a6db43955aea5ca517ad18",
+        "r1_response_sha256": "debf1f3c75dbb6182ef47ce53c4e81db7553d8f69792d897de024557a1e1a2ad",
+        "r1_row_sha256": "6b1c6f8dd3e8570524b387475166a823afb1c9624992787ecd52463eff0e16d9"
+      },
+      "x_status": "ELIGIBLE",
+      "y": null
+    },
+    {
+      "age_r0_seconds": 334.0,
+      "age_r1_seconds": 634.0,
+      "buy_observed_at": "2026-08-24T00:29:46Z",
+      "buy_out_amount": "91388839189",
+      "buy_terminal": "QUOTE_OBSERVED",
+      "buy_transport": {
+        "http_status": 200,
+        "request_count": 1,
+        "response_bytes": 1259,
+        "response_sha256": "0f16aa7baca44555e5c512339b3084266629ef16dcf4e09946cf618e48923af7",
+        "safe_response_headers": {
+          "x-api-gateway-request-id": "z-K1blPnvB7BOmqcFz-mpfCe-cXC4cGYFMTvHzbW-kb6iVD_LTXlWg=="
+        },
+        "url_has_api_key": false,
+        "url_has_taker": false
+      },
+      "confirmation_interval_seconds": 300.0,
+      "decision_snapshot_r0_at": "2026-08-24T00:24:22Z",
+      "decision_snapshot_r1_at": "2026-08-24T00:29:22Z",
+      "h900_due_at": "2026-08-24T00:44:46Z",
+      "h900_terminal": "QUOTE_OBSERVED",
+      "mint": "ChYuSyGLMCXAjmMcobjf5XmmPLmMz1dqj9hZN1awpump",
+      "x": 0.024328173763435677,
+      "x_inputs": {
+        "firstPool.createdAt": "2026-08-24T00:18:48Z",
+        "r0.liquidity": 5797.074912963239,
+        "r0.mcap": 10877.735007559502,
+        "r0.updatedAt": "2026-08-24T00:24:21.406586907Z",
+        "r1.liquidity": 5584.097052705352,
+        "r1.mcap": 10226.26230745703,
+        "r1.updatedAt": "2026-08-24T00:28:48.893565477Z"
+      },
+      "x_reason": null,
+      "x_source": {
+        "field_paths": [
+          "liquidity",
+          "mcap",
+          "firstPool.createdAt",
+          "updatedAt",
+          "launchpad"
+        ],
+        "r0_response_sha256": "f84cea38c076a1189e664454d0a23b11ab716cb255fc296c432ef77ef5d5fd21",
+        "r0_row_sha256": "580db61cd8a8dbe25eed88a07dee27c58d319d6cd016ede8834d0eb58d8a467f",
+        "r1_response_sha256": "debf1f3c75dbb6182ef47ce53c4e81db7553d8f69792d897de024557a1e1a2ad",
+        "r1_row_sha256": "1071ae4f2760b5ae8989fe9d398ee34e6ef5ed64d5b6d2118d4b069a62012b62"
+      },
+      "x_status": "ELIGIBLE",
+      "y": 0.081223
+    },
+    {
+      "age_r0_seconds": 334.0,
+      "age_r1_seconds": 634.0,
+      "buy_observed_at": "2026-08-24T00:29:49Z",
+      "buy_out_amount": "352781556731",
+      "buy_terminal": "QUOTE_OBSERVED",
+      "buy_transport": {
+        "http_status": 200,
+        "request_count": 1,
+        "response_bytes": 1264,
+        "response_sha256": "b61fcb0e1bb914fb50513032ae39068309ad8d8c5affd88938e9fa6fd87fed6b",
+        "safe_response_headers": {
+          "x-api-gateway-request-id": "Vhp2EHhMWu1iyr6CNoIelxIwynjLQulAOcI5xM1tFpYkd_HvwwaW2g=="
+        },
+        "url_has_api_key": false,
+        "url_has_taker": false
+      },
+      "confirmation_interval_seconds": 300.0,
+      "decision_snapshot_r0_at": "2026-08-24T00:24:22Z",
+      "decision_snapshot_r1_at": "2026-08-24T00:29:22Z",
+      "h900_due_at": "2026-08-24T00:44:49Z",
+      "h900_terminal": "QUOTE_OBSERVED",
+      "mint": "6EXUWkwJoByhqwHGWMGPod52uL6xhbezUxNGXCn1pump",
+      "x": 0.0,
+      "x_inputs": {
+        "firstPool.createdAt": "2026-08-24T00:18:48Z",
+        "r0.liquidity": 2850.4881750704335,
+        "r0.mcap": 2657.2614458476487,
+        "r0.updatedAt": "2026-08-24T00:21:28.819851954Z",
+        "r1.liquidity": 2850.4881750704335,
+        "r1.mcap": 2657.2614458476487,
+        "r1.updatedAt": "2026-08-24T00:21:28.819851954Z"
+      },
+      "x_reason": null,
+      "x_source": {
+        "field_paths": [
+          "liquidity",
+          "mcap",
+          "firstPool.createdAt",
+          "updatedAt",
+          "launchpad"
+        ],
+        "r0_response_sha256": "f84cea38c076a1189e664454d0a23b11ab716cb255fc296c432ef77ef5d5fd21",
+        "r0_row_sha256": "7802f3d73af054eb5be43b7be73ba2adfc7e90deece1ab1eaa9026496ec4e53a",
+        "r1_response_sha256": "debf1f3c75dbb6182ef47ce53c4e81db7553d8f69792d897de024557a1e1a2ad",
+        "r1_row_sha256": "1f46f25fd517dcccd0d7d61deafab297867c8ba27068cb3b6af28d4bd235ab4a"
+      },
+      "x_status": "ELIGIBLE",
+      "y": -0.0272814
+    },
+    {
+      "age_r0_seconds": 347.0,
+      "age_r1_seconds": 647.0,
+      "buy_observed_at": "2026-08-24T00:29:52Z",
+      "buy_out_amount": "352781556696",
+      "buy_terminal": "QUOTE_OBSERVED",
+      "buy_transport": {
+        "http_status": 200,
+        "request_count": 1,
+        "response_bytes": 1262,
+        "response_sha256": "c450331cc14a353184ad144101a942ed2e7e54f4d42a1df1cfca3af7dbb228c7",
+        "safe_response_headers": {
+          "x-api-gateway-request-id": "HLYpFdRJf7qGrPx-iTR_GGi3LCvoVAjJFg5bJP-tX7_foird5kCuPQ=="
+        },
+        "url_has_api_key": false,
+        "url_has_taker": false
+      },
+      "confirmation_interval_seconds": 300.0,
+      "decision_snapshot_r0_at": "2026-08-24T00:24:22Z",
+      "decision_snapshot_r1_at": "2026-08-24T00:29:22Z",
+      "h900_due_at": "2026-08-24T00:44:52Z",
+      "h900_terminal": "QUOTE_OBSERVED",
+      "mint": "2zj5Rx4vEwZbY3seuQwcqwm2DwxjboUhKzFgrL95pump",
+      "x": 0.0,
+      "x_inputs": {
+        "firstPool.createdAt": "2026-08-24T00:18:35Z",
+        "r0.liquidity": 2850.4643696191256,
+        "r0.mcap": 2657.1866720538833,
+        "r0.updatedAt": "2026-08-24T00:20:59.533322824Z",
+        "r1.liquidity": 2850.4643696191256,
+        "r1.mcap": 2657.1866720538833,
+        "r1.updatedAt": "2026-08-24T00:20:59.533322824Z"
+      },
+      "x_reason": null,
+      "x_source": {
+        "field_paths": [
+          "liquidity",
+          "mcap",
+          "firstPool.createdAt",
+          "updatedAt",
+          "launchpad"
+        ],
+        "r0_response_sha256": "f84cea38c076a1189e664454d0a23b11ab716cb255fc296c432ef77ef5d5fd21",
+        "r0_row_sha256": "cbbb2a398e6a5dcce02968ef9b2b5018e2f08ee7a1c8481b0cf0bd979c90c705",
+        "r1_response_sha256": "debf1f3c75dbb6182ef47ce53c4e81db7553d8f69792d897de024557a1e1a2ad",
+        "r1_row_sha256": "6cc45da4056f285717a0221446c62f0fe634fde02bddc5b670c7aabe1c62abba"
+      },
+      "x_status": "ELIGIBLE",
+      "y": -0.0272814
+    },
+    {
+      "age_r0_seconds": 348.0,
+      "age_r1_seconds": 648.0,
+      "buy_observed_at": "2026-08-24T00:29:56Z",
+      "buy_out_amount": "318393913586",
+      "buy_terminal": "QUOTE_OBSERVED",
+      "buy_transport": {
+        "http_status": 200,
+        "request_count": 1,
+        "response_bytes": 1263,
+        "response_sha256": "05d7cf8d72d57eec54cc02684db219584e6ee12741b5e9bd8e4f51eb43f01f6c",
+        "safe_response_headers": {
+          "x-api-gateway-request-id": "vynRIhC3hrC5Cz97djyy7ziSjoZvYSoLvIRGzlwldJZirwWT1k6o7Q=="
+        },
+        "url_has_api_key": false,
+        "url_has_taker": false
+      },
+      "confirmation_interval_seconds": 300.0,
+      "decision_snapshot_r0_at": "2026-08-24T00:24:22Z",
+      "decision_snapshot_r1_at": "2026-08-24T00:29:22Z",
+      "h900_due_at": "2026-08-24T00:44:56Z",
+      "h900_terminal": "QUOTE_OBSERVED",
+      "mint": "HRJ3HpLUpV4Nf4YdqBp4sUczJzkzHc4aJemm1z7Qpump",
+      "x": 0.005967858700387717,
+      "x_inputs": {
+        "firstPool.createdAt": "2026-08-24T00:18:34Z",
+        "r0.liquidity": 3057.8374329544995,
+        "r0.mcap": 3061.9515087011537,
+        "r0.updatedAt": "2026-08-24T00:24:08.207905334Z",
+        "r1.liquidity": 2991.5621784657587,
+        "r1.mcap": 2977.763084165597,
+        "r1.updatedAt": "2026-08-24T00:28:23.570429445Z"
+      },
+      "x_reason": null,
+      "x_source": {
+        "field_paths": [
+          "liquidity",
+          "mcap",
+          "firstPool.createdAt",
+          "updatedAt",
+          "launchpad"
+        ],
+        "r0_response_sha256": "f84cea38c076a1189e664454d0a23b11ab716cb255fc296c432ef77ef5d5fd21",
+        "r0_row_sha256": "f99c0134ee1dbfcc299823f09af67d3f1720ef0ceec2f5edbff21ea18a2c0615",
+        "r1_response_sha256": "debf1f3c75dbb6182ef47ce53c4e81db7553d8f69792d897de024557a1e1a2ad",
+        "r1_row_sha256": "94b10c21b6007ac56daaac724d1c26cb38d5ce7e0b4065e16228f8e0dd4ec17d"
+      },
+      "x_status": "ELIGIBLE",
+      "y": -0.0516911
+    },
+    {
+      "age_r0_seconds": 348.0,
+      "age_r1_seconds": 648.0,
+      "buy_observed_at": "2026-08-24T00:29:59Z",
+      "buy_out_amount": "1248108045531",
+      "buy_terminal": "QUOTE_OBSERVED",
+      "buy_transport": {
+        "http_status": 200,
+        "request_count": 1,
+        "response_bytes": 1262,
+        "response_sha256": "3df3cfab3f69166a1b8545113378a0cd78418d34c0efe0c0408dd549cc4cbb24",
+        "safe_response_headers": {
+          "x-api-gateway-request-id": "KFgRlebA5NErzKXUFJap5fix5XfHWjPlcUeZ2KTNhf8gKa1Ee5uy6g=="
+        },
+        "url_has_api_key": false,
+        "url_has_taker": false
+      },
+      "confirmation_interval_seconds": 300.0,
+      "decision_snapshot_r0_at": "2026-08-24T00:24:22Z",
+      "decision_snapshot_r1_at": "2026-08-24T00:29:22Z",
+      "h900_due_at": "2026-08-24T00:44:59Z",
+      "h900_terminal": "QUOTE_OBSERVED",
+      "mint": "GEQJ4tnk3dfMuh1j77Nu9djjcq47pGsCqhayZa9opump",
+      "x": 0.0,
+      "x_inputs": {
+        "firstPool.createdAt": "2026-08-24T00:18:34Z",
+        "r0.liquidity": 2853.1476005950904,
+        "r0.mcap": 1180.9933544853427,
+        "r0.updatedAt": "2026-08-24T00:21:59.822005559Z",
+        "r1.liquidity": 2853.1476005950904,
+        "r1.mcap": 1180.9933544853427,
+        "r1.updatedAt": "2026-08-24T00:21:59.822005559Z"
+      },
+      "x_reason": null,
+      "x_source": {
+        "field_paths": [
+          "liquidity",
+          "mcap",
+          "firstPool.createdAt",
+          "updatedAt",
+          "launchpad"
+        ],
+        "r0_response_sha256": "f84cea38c076a1189e664454d0a23b11ab716cb255fc296c432ef77ef5d5fd21",
+        "r0_row_sha256": "f8e7822cc2973ed6d9b8a2be2d82ffe602fd77e7bb5689832a057b8fe49ad042",
+        "r1_response_sha256": "debf1f3c75dbb6182ef47ce53c4e81db7553d8f69792d897de024557a1e1a2ad",
+        "r1_row_sha256": "e4d7f375b3de87ee63677522b6c782dd90e21ce07d56755cc8922039ad52416b"
+      },
+      "x_status": "ELIGIBLE",
+      "y": -0.0288975
+    },
+    {
+      "age_r0_seconds": 350.0,
+      "age_r1_seconds": 650.0,
+      "buy_observed_at": "2026-08-24T00:30:02Z",
+      "buy_out_amount": "352781556755",
+      "buy_terminal": "QUOTE_OBSERVED",
+      "buy_transport": {
+        "http_status": 200,
+        "request_count": 1,
+        "response_bytes": 1262,
+        "response_sha256": "fd7464c39e9056fd8fdbf66653577bb8e8cccf8ff29996eed8766e7d61ebcb55",
+        "safe_response_headers": {
+          "x-api-gateway-request-id": "SD8yji9QVeELSkrD_tQP1dCnnh_r-shgH4exceJizkhJvtux4T8X8A=="
+        },
+        "url_has_api_key": false,
+        "url_has_taker": false
+      },
+      "confirmation_interval_seconds": 300.0,
+      "decision_snapshot_r0_at": "2026-08-24T00:24:22Z",
+      "decision_snapshot_r1_at": "2026-08-24T00:29:22Z",
+      "h900_due_at": "2026-08-24T00:45:02Z",
+      "h900_terminal": "QUOTE_OBSERVED",
+      "mint": "6QLbyAg7HZZvVw21hzvya5JYboiEuiRY8okESUsApump",
+      "x": 0.0,
+      "x_inputs": {
+        "firstPool.createdAt": "2026-08-24T00:18:32Z",
+        "r0.liquidity": 2850.464369144075,
+        "r0.mcap": 2657.2589353892963,
+        "r0.updatedAt": "2026-08-24T00:22:56.619341636Z",
+        "r1.liquidity": 2850.464369144075,
+        "r1.mcap": 2657.2589353892963,
+        "r1.updatedAt": "2026-08-24T00:29:00.968111909Z"
+      },
+      "x_reason": null,
+      "x_source": {
+        "field_paths": [
+          "liquidity",
+          "mcap",
+          "firstPool.createdAt",
+          "updatedAt",
+          "launchpad"
+        ],
+        "r0_response_sha256": "f84cea38c076a1189e664454d0a23b11ab716cb255fc296c432ef77ef5d5fd21",
+        "r0_row_sha256": "e426546d0bda52728f6259f9110cb6a56e73dd27aedf30ad7451b0a634d2ba94",
+        "r1_response_sha256": "debf1f3c75dbb6182ef47ce53c4e81db7553d8f69792d897de024557a1e1a2ad",
+        "r1_row_sha256": "d7bd8f367bd30f424ecdbb29c4b19d2e1821fa3b5627b1cc8cc2d531c85f6a73"
+      },
+      "x_status": "ELIGIBLE",
+      "y": -0.0272814
+    },
+    {
+      "age_r0_seconds": 351.0,
+      "age_r1_seconds": 651.0,
+      "buy_observed_at": "2026-08-24T00:30:06Z",
+      "buy_out_amount": "352781556743",
+      "buy_terminal": "QUOTE_OBSERVED",
+      "buy_transport": {
+        "http_status": 200,
+        "request_count": 1,
+        "response_bytes": 1263,
+        "response_sha256": "434494c0c87b53a57bbad7e78292c30eca285f65e2c2971eaf1d269c7e103471",
+        "safe_response_headers": {
+          "x-api-gateway-request-id": "2ENHCspvMM2RERyuxEJ5oZAynXcwxW8sm4-RcTXGmRXbDQe0x4Z1LA=="
+        },
+        "url_has_api_key": false,
+        "url_has_taker": false
+      },
+      "confirmation_interval_seconds": 300.0,
+      "decision_snapshot_r0_at": "2026-08-24T00:24:22Z",
+      "decision_snapshot_r1_at": "2026-08-24T00:29:22Z",
+      "h900_due_at": "2026-08-24T00:45:06Z",
+      "h900_terminal": "QUOTE_OBSERVED",
+      "mint": "EfGijxcoKcVtVD6cPjBAs2qQT12FxKL51oDLR7ncpump",
+      "x": 0.0003295177771755876,
+      "x_inputs": {
+        "firstPool.createdAt": "2026-08-24T00:18:31Z",
+        "r0.liquidity": 2869.2490777860808,
+        "r0.mcap": 2692.4022584685536,
+        "r0.updatedAt": "2026-08-24T00:20:52.486187797Z",
+        "r1.liquidity": 2845.6972651948504,
+        "r1.mcap": 2669.42230015741,
+        "r1.updatedAt": "2026-08-24T00:26:32.025784951Z"
+      },
+      "x_reason": null,
+      "x_source": {
+        "field_paths": [
+          "liquidity",
+          "mcap",
+          "firstPool.createdAt",
+          "updatedAt",
+          "launchpad"
+        ],
+        "r0_response_sha256": "f84cea38c076a1189e664454d0a23b11ab716cb255fc296c432ef77ef5d5fd21",
+        "r0_row_sha256": "289388bec367224bb89d75d13f54eb64855adb767cccc34ed58b257c21e5d76b",
+        "r1_response_sha256": "debf1f3c75dbb6182ef47ce53c4e81db7553d8f69792d897de024557a1e1a2ad",
+        "r1_row_sha256": "9fb59d2a019f353bfbc557be176d67d46e4ae7edd60e9d48a419b085c7ad96c4"
+      },
+      "x_status": "ELIGIBLE",
+      "y": -0.0272814
+    },
+    {
+      "age_r0_seconds": 355.0,
+      "age_r1_seconds": 655.0,
+      "buy_observed_at": "2026-08-24T00:30:09Z",
+      "buy_out_amount": "352781556696",
+      "buy_terminal": "QUOTE_OBSERVED",
+      "buy_transport": {
+        "http_status": 200,
+        "request_count": 1,
+        "response_bytes": 1258,
+        "response_sha256": "4d6ae92e29d2705a6e994ac6b892286b036b58bdd1c96763e11dfda0bf342812",
+        "safe_response_headers": {
+          "x-api-gateway-request-id": "GtiiUm4CClRFhZRaKqVk5eteG1eWssvuGM_beIXwH42yi9n0XA45pw=="
+        },
+        "url_has_api_key": false,
+        "url_has_taker": false
+      },
+      "confirmation_interval_seconds": 300.0,
+      "decision_snapshot_r0_at": "2026-08-24T00:24:22Z",
+      "decision_snapshot_r1_at": "2026-08-24T00:29:22Z",
+      "h900_due_at": "2026-08-24T00:45:09Z",
+      "h900_terminal": "QUOTE_OBSERVED",
+      "mint": "EwurRSEkBHk5HXzizPsPXvPUVWQz5HzaXKobjf6gpump",
+      "x": 0.0,
+      "x_inputs": {
+        "firstPool.createdAt": "2026-08-24T00:18:27Z",
+        "r0.liquidity": 2849.4734424502662,
+        "r0.mcap": 2743.979406016375,
+        "r0.updatedAt": "2026-08-24T00:23:58.872765439Z",
+        "r1.liquidity": 2849.4734424502662,
+        "r1.mcap": 2743.979406016375,
+        "r1.updatedAt": "2026-08-24T00:23:58.872765439Z"
+      },
+      "x_reason": null,
+      "x_source": {
+        "field_paths": [
+          "liquidity",
+          "mcap",
+          "firstPool.createdAt",
+          "updatedAt",
+          "launchpad"
+        ],
+        "r0_response_sha256": "f84cea38c076a1189e664454d0a23b11ab716cb255fc296c432ef77ef5d5fd21",
+        "r0_row_sha256": "f0659aecbd7695144add3f546c3ee3bda00a1efcbb480e7359956a7f90626b05",
+        "r1_response_sha256": "debf1f3c75dbb6182ef47ce53c4e81db7553d8f69792d897de024557a1e1a2ad",
+        "r1_row_sha256": "ab78fa38e41e9c32b2bf96a44c7dad733b16aa22cffc7798535e5b84e3586b74"
+      },
+      "x_status": "ELIGIBLE",
+      "y": -0.0272814
+    },
+    {
+      "age_r0_seconds": 355.0,
+      "age_r1_seconds": 655.0,
+      "buy_observed_at": "2026-08-24T00:30:12Z",
+      "buy_out_amount": "352781556661",
+      "buy_terminal": "QUOTE_OBSERVED",
+      "buy_transport": {
+        "http_status": 200,
+        "request_count": 1,
+        "response_bytes": 1262,
+        "response_sha256": "1aa3ea7a97fc0ec03698abb1834226cdce90960d99075f38936ed0f43a96a3aa",
+        "safe_response_headers": {
+          "x-api-gateway-request-id": "mh16rIT2msu9q6oMLcfEnF2vqEBabPhUj58sCedMFU0qTB9AfCexlw=="
+        },
+        "url_has_api_key": false,
+        "url_has_taker": false
+      },
+      "confirmation_interval_seconds": 300.0,
+      "decision_snapshot_r0_at": "2026-08-24T00:24:22Z",
+      "decision_snapshot_r1_at": "2026-08-24T00:29:22Z",
+      "h900_due_at": "2026-08-24T00:45:12Z",
+      "h900_terminal": "QUOTE_OBSERVED",
+      "mint": "2wThCZrgHdtCSqhyjkAfyf1kx5vfRv7ydmDMUB7ypump",
+      "x": 0.0,
+      "x_inputs": {
+        "firstPool.createdAt": "2026-08-24T00:18:27Z",
+        "r0.liquidity": 2850.4643699041562,
+        "r0.mcap": 2657.1943637124145,
+        "r0.updatedAt": "2026-08-24T00:20:58.558415982Z",
+        "r1.liquidity": 2850.4643699041562,
+        "r1.mcap": 2657.1943637124145,
+        "r1.updatedAt": "2026-08-24T00:20:58.558415982Z"
+      },
+      "x_reason": null,
+      "x_source": {
+        "field_paths": [
+          "liquidity",
+          "mcap",
+          "firstPool.createdAt",
+          "updatedAt",
+          "launchpad"
+        ],
+        "r0_response_sha256": "f84cea38c076a1189e664454d0a23b11ab716cb255fc296c432ef77ef5d5fd21",
+        "r0_row_sha256": "304eaa4a94b6a5d82902ebc1a4acc5b8d01eb5108c76c6ef65cbee9dd2b76651",
+        "r1_response_sha256": "debf1f3c75dbb6182ef47ce53c4e81db7553d8f69792d897de024557a1e1a2ad",
+        "r1_row_sha256": "a503a9acc084dd40fe24ab300b0af266ebe4848aa40fae568a12b7a8d2390d20"
+      },
+      "x_status": "ELIGIBLE",
+      "y": -0.0272814
+    },
+    {
+      "age_r0_seconds": 361.0,
+      "age_r1_seconds": 661.0,
+      "buy_observed_at": "2026-08-24T00:30:16Z",
+      "buy_out_amount": "352781556343",
+      "buy_terminal": "QUOTE_OBSERVED",
+      "buy_transport": {
+        "http_status": 200,
+        "request_count": 1,
+        "response_bytes": 1265,
+        "response_sha256": "58c82cfdbe96c6684f2c628a71414821a2cda00271613b1c9b759413b68bc402",
+        "safe_response_headers": {
+          "x-api-gateway-request-id": "28HWhPt6aYv67y30r6qg8aBHiXncvdq_3OCSTIgbEyXQ7UqZbhwhzw=="
+        },
+        "url_has_api_key": false,
+        "url_has_taker": false
+      },
+      "confirmation_interval_seconds": 300.0,
+      "decision_snapshot_r0_at": "2026-08-24T00:24:22Z",
+      "decision_snapshot_r1_at": "2026-08-24T00:29:22Z",
+      "h900_due_at": "2026-08-24T00:45:16Z",
+      "h900_terminal": "QUOTE_OBSERVED",
+      "mint": "65vMUTKWP7hf1rdaY43h11CikLFeuS7VfM7iJkUcpump",
+      "x": 0.0,
+      "x_inputs": {
+        "firstPool.createdAt": "2026-08-24T00:18:21Z",
+        "r0.liquidity": 2851.1373857721032,
+        "r0.mcap": 2666.701903578882,
+        "r0.updatedAt": "2026-08-24T00:23:58.87278805Z",
+        "r1.liquidity": 2851.1373857721032,
+        "r1.mcap": 2666.701903578882,
+        "r1.updatedAt": "2026-08-24T00:28:49.810598902Z"
+      },
+      "x_reason": null,
+      "x_source": {
+        "field_paths": [
+          "liquidity",
+          "mcap",
+          "firstPool.createdAt",
+          "updatedAt",
+          "launchpad"
+        ],
+        "r0_response_sha256": "f84cea38c076a1189e664454d0a23b11ab716cb255fc296c432ef77ef5d5fd21",
+        "r0_row_sha256": "9378efa8e3a8cc7816f5e5c54bf186dcb08176530b708cba343971ec378c7ae7",
+        "r1_response_sha256": "debf1f3c75dbb6182ef47ce53c4e81db7553d8f69792d897de024557a1e1a2ad",
+        "r1_row_sha256": "e5d023b502f8e5cbaebe0e4f52e5b7e548bbf2fe8d0ff7bd9ac8d7cd629f88ac"
+      },
+      "x_status": "ELIGIBLE",
+      "y": -0.0272814
+    },
+    {
+      "age_r0_seconds": 369.0,
+      "age_r1_seconds": 669.0,
+      "buy_observed_at": "2026-08-24T00:30:19Z",
+      "buy_out_amount": "352781556743",
+      "buy_terminal": "QUOTE_OBSERVED",
+      "buy_transport": {
+        "http_status": 200,
+        "request_count": 1,
+        "response_bytes": 1261,
+        "response_sha256": "a46ba48c657980684a37180c9140448aab1c12a4fd7db00e7ae47e7908b9e5a3",
+        "safe_response_headers": {
+          "x-api-gateway-request-id": "NY_b98PTl0UCXRnuI_8N589ie05jw4OcYsaVw6XMbK8_Fg4lQem2EQ=="
+        },
+        "url_has_api_key": false,
+        "url_has_taker": false
+      },
+      "confirmation_interval_seconds": 300.0,
+      "decision_snapshot_r0_at": "2026-08-24T00:24:22Z",
+      "decision_snapshot_r1_at": "2026-08-24T00:29:22Z",
+      "h900_due_at": "2026-08-24T00:45:19Z",
+      "h900_terminal": "QUOTE_OBSERVED",
+      "mint": "AFgUfvWNmsEsmAwb7CtgKDtnh631mJHeeVar4h4Npump",
+      "x": 0.0,
+      "x_inputs": {
+        "firstPool.createdAt": "2026-08-24T00:18:13Z",
+        "r0.liquidity": 2849.4972395309387,
+        "r0.mcap": 2743.979406016375,
+        "r0.updatedAt": "2026-08-24T00:23:48.726579931Z",
+        "r1.liquidity": 2849.4972395309387,
+        "r1.mcap": 2743.979406016375,
+        "r1.updatedAt": "2026-08-24T00:23:48.726579931Z"
+      },
+      "x_reason": null,
+      "x_source": {
+        "field_paths": [
+          "liquidity",
+          "mcap",
+          "firstPool.createdAt",
+          "updatedAt",
+          "launchpad"
+        ],
+        "r0_response_sha256": "f84cea38c076a1189e664454d0a23b11ab716cb255fc296c432ef77ef5d5fd21",
+        "r0_row_sha256": "01d215529bfd33ed30623cb514e1b89c8fe3ee21f90a98fa504bb549cf8407e7",
+        "r1_response_sha256": "debf1f3c75dbb6182ef47ce53c4e81db7553d8f69792d897de024557a1e1a2ad",
+        "r1_row_sha256": "eadc534c4285a6964ab566ae4c7ab6256a5e9912befd0d1ff42ecbca5666bdfe"
+      },
+      "x_status": "ELIGIBLE",
+      "y": -0.0272814
+    },
+    {
+      "age_r0_seconds": 374.0,
+      "age_r1_seconds": 674.0,
+      "buy_observed_at": "2026-08-24T00:30:22Z",
+      "buy_out_amount": "472156189420995",
+      "buy_terminal": "QUOTE_OBSERVED",
+      "buy_transport": {
+        "http_status": 200,
+        "request_count": 1,
+        "response_bytes": 1270,
+        "response_sha256": "d9066f048103d3d2b5a849b5fb9f34ad6e525236f3f64c2a255e499fc5af8d57",
+        "safe_response_headers": {
+          "x-api-gateway-request-id": "vYe1HKuKv6x5je4jpTWvddSI0uskLhiUiTmGl8_menphTnrow8r-ZQ=="
+        },
+        "url_has_api_key": false,
+        "url_has_taker": false
+      },
+      "confirmation_interval_seconds": 300.0,
+      "decision_snapshot_r0_at": "2026-08-24T00:24:22Z",
+      "decision_snapshot_r1_at": "2026-08-24T00:29:22Z",
+      "h900_due_at": "2026-08-24T00:45:22Z",
+      "h900_terminal": "QUOTE_OBSERVED",
+      "mint": "AY6AxCvVXMZvkJH5UVTyXnbKe81s64X9bBnoUbvCpump",
+      "x": 0.0,
+      "x_inputs": {
+        "firstPool.createdAt": "2026-08-24T00:18:08Z",
+        "r0.liquidity": 2846.748157384831,
+        "r0.mcap": 1.8695423487889105,
+        "r0.updatedAt": "2026-08-24T00:24:20.243496932Z",
+        "r1.liquidity": 2846.748157384831,
+        "r1.mcap": 1.8695423487889105,
+        "r1.updatedAt": "2026-08-24T00:28:46.314815385Z"
+      },
+      "x_reason": null,
+      "x_source": {
+        "field_paths": [
+          "liquidity",
+          "mcap",
+          "firstPool.createdAt",
+          "updatedAt",
+          "launchpad"
+        ],
+        "r0_response_sha256": "f84cea38c076a1189e664454d0a23b11ab716cb255fc296c432ef77ef5d5fd21",
+        "r0_row_sha256": "7974a0a424daca9b7a6755b7a1b6bd57354b35f030be94d2aba8d6484ff3a9a6",
+        "r1_response_sha256": "debf1f3c75dbb6182ef47ce53c4e81db7553d8f69792d897de024557a1e1a2ad",
+        "r1_row_sha256": "fd99a66dedd0ae176d105ba3ab5e75c912af8c7c0da55549725c720bcbbdb714"
+      },
+      "x_status": "ELIGIBLE",
+      "y": -0.4812578
+    },
+    {
+      "age_r0_seconds": 375.0,
+      "age_r1_seconds": 675.0,
+      "buy_observed_at": "2026-08-24T00:30:26Z",
+      "buy_out_amount": "352781556755",
+      "buy_terminal": "QUOTE_OBSERVED",
+      "buy_transport": {
+        "http_status": 200,
+        "request_count": 1,
+        "response_bytes": 1265,
+        "response_sha256": "3a07f6ac59d18295ee060d2f3f853e85951571f3ee907d673401d6c92958140b",
+        "safe_response_headers": {
+          "x-api-gateway-request-id": "NGXbEeDhz79SD-5LpqkC-HfF_sstWLoTXf3LnVcGSgwstd4R4z-sYA=="
+        },
+        "url_has_api_key": false,
+        "url_has_taker": false
+      },
+      "confirmation_interval_seconds": 300.0,
+      "decision_snapshot_r0_at": "2026-08-24T00:24:22Z",
+      "decision_snapshot_r1_at": "2026-08-24T00:29:22Z",
+      "h900_due_at": "2026-08-24T00:45:26Z",
+      "h900_terminal": "QUOTE_OBSERVED",
+      "mint": "9CkVkXnDmgYEEwbVTzcZpGukdoRbRyp1EykoWXSwpump",
+      "x": 0.0,
+      "x_inputs": {
+        "firstPool.createdAt": "2026-08-24T00:18:07Z",
+        "r0.liquidity": 2852.0969887442416,
+        "r0.mcap": 2662.346189169901,
+        "r0.updatedAt": "2026-08-24T00:19:18.418853271Z",
+        "r1.liquidity": 2852.0969887442416,
+        "r1.mcap": 2662.346189169901,
+        "r1.updatedAt": "2026-08-24T00:25:56.318478479Z"
+      },
+      "x_reason": null,
+      "x_source": {
+        "field_paths": [
+          "liquidity",
+          "mcap",
+          "firstPool.createdAt",
+          "updatedAt",
+          "launchpad"
+        ],
+        "r0_response_sha256": "f84cea38c076a1189e664454d0a23b11ab716cb255fc296c432ef77ef5d5fd21",
+        "r0_row_sha256": "5afa7e6425aef807d43011dab830c866f21ec06995e28244b042c167b4cf8a21",
+        "r1_response_sha256": "debf1f3c75dbb6182ef47ce53c4e81db7553d8f69792d897de024557a1e1a2ad",
+        "r1_row_sha256": "58abaf6222b1e50e5d39fe8d8d09578272756282682a456168544613376e7fd7"
+      },
+      "x_status": "ELIGIBLE",
+      "y": -0.0272814
+    },
+    {
+      "age_r0_seconds": 376.0,
+      "age_r1_seconds": 676.0,
+      "buy_observed_at": "2026-08-24T00:30:29Z",
+      "buy_out_amount": "352781556109",
+      "buy_terminal": "QUOTE_OBSERVED",
+      "buy_transport": {
+        "http_status": 200,
+        "request_count": 1,
+        "response_bytes": 1261,
+        "response_sha256": "4301d3901c689c04c37e41839da49617f8cc759a5b884768f3d002a4a1aa57e2",
+        "safe_response_headers": {
+          "x-api-gateway-request-id": "o1f-v8Yzlf9kjDk8pBphhNzHUq2j7K7OLQ7yT_NVuuf7vKaASRHPaA=="
+        },
+        "url_has_api_key": false,
+        "url_has_taker": false
+      },
+      "confirmation_interval_seconds": 300.0,
+      "decision_snapshot_r0_at": "2026-08-24T00:24:22Z",
+      "decision_snapshot_r1_at": "2026-08-24T00:29:22Z",
+      "h900_due_at": "2026-08-24T00:45:29Z",
+      "h900_terminal": "QUOTE_OBSERVED",
+      "mint": "BqPKnqsPjsdAbhgA46i8ptgRPT9Vyg8Z9UHfEWwypump",
+      "x": 0.0,
+      "x_inputs": {
+        "firstPool.createdAt": "2026-08-24T00:18:06Z",
+        "r0.liquidity": 2851.1373876727384,
+        "r0.mcap": 2663.172666943015,
+        "r0.updatedAt": "2026-08-24T00:23:48.820153989Z",
+        "r1.liquidity": 2851.1373876727384,
+        "r1.mcap": 2663.172666943015,
+        "r1.updatedAt": "2026-08-24T00:25:24.926473064Z"
+      },
+      "x_reason": null,
+      "x_source": {
+        "field_paths": [
+          "liquidity",
+          "mcap",
+          "firstPool.createdAt",
+          "updatedAt",
+          "launchpad"
+        ],
+        "r0_response_sha256": "f84cea38c076a1189e664454d0a23b11ab716cb255fc296c432ef77ef5d5fd21",
+        "r0_row_sha256": "32ed39c8a414f41c9b80d541d9f8fbcf513b555d2352f988ff10c943948718d1",
+        "r1_response_sha256": "debf1f3c75dbb6182ef47ce53c4e81db7553d8f69792d897de024557a1e1a2ad",
+        "r1_row_sha256": "84b11e42bfc73dc34cf6bb22dc27c383fe770baaf7695c20ddb9aa8b444abd22"
+      },
+      "x_status": "ELIGIBLE",
+      "y": -0.0272814
+    },
+    {
+      "age_r0_seconds": 377.0,
+      "age_r1_seconds": 677.0,
+      "buy_observed_at": "2026-08-24T00:30:32Z",
+      "buy_out_amount": "352781556743",
+      "buy_terminal": "QUOTE_OBSERVED",
+      "buy_transport": {
+        "http_status": 200,
+        "request_count": 1,
+        "response_bytes": 1264,
+        "response_sha256": "b9741bb497b90096e64cb8a0d886a499ac2251a3dd5a19fcaead35c702ead2f4",
+        "safe_response_headers": {
+          "x-api-gateway-request-id": "IasP6UB-xaLoy1wRxVDyAOqA9QZw5M-FZBn1z5uWt8XSqIvJ8fqQlQ=="
+        },
+        "url_has_api_key": false,
+        "url_has_taker": false
+      },
+      "confirmation_interval_seconds": 300.0,
+      "decision_snapshot_r0_at": "2026-08-24T00:24:22Z",
+      "decision_snapshot_r1_at": "2026-08-24T00:29:22Z",
+      "h900_due_at": "2026-08-24T00:45:32Z",
+      "h900_terminal": "QUOTE_OBSERVED",
+      "mint": "3GJd7Tp32xG6WmKfUwqFcdWCEYvUTA6GuzTVPLjNpump",
+      "x": 0.0,
+      "x_inputs": {
+        "firstPool.createdAt": "2026-08-24T00:18:05Z",
+        "r0.liquidity": 2851.4051132039094,
+        "r0.mcap": 2659.0159926044134,
+        "r0.updatedAt": "2026-08-24T00:20:41.323011664Z",
+        "r1.liquidity": 2851.4051132039094,
+        "r1.mcap": 2659.0159926044134,
+        "r1.updatedAt": "2026-08-24T00:20:41.323011664Z"
+      },
+      "x_reason": null,
+      "x_source": {
+        "field_paths": [
+          "liquidity",
+          "mcap",
+          "firstPool.createdAt",
+          "updatedAt",
+          "launchpad"
+        ],
+        "r0_response_sha256": "f84cea38c076a1189e664454d0a23b11ab716cb255fc296c432ef77ef5d5fd21",
+        "r0_row_sha256": "ed22bf5ef9da9198e85600c274c1e8bc90543ea349c388df95460cf316b454db",
+        "r1_response_sha256": "debf1f3c75dbb6182ef47ce53c4e81db7553d8f69792d897de024557a1e1a2ad",
+        "r1_row_sha256": "1e816ea9950acf57f2fefcedfd1d575d41a636fa12260c57fbe2e85cc60abeae"
+      },
+      "x_status": "ELIGIBLE",
+      "y": -0.0272814
+    },
+    {
+      "age_r0_seconds": 378.0,
+      "age_r1_seconds": 678.0,
+      "buy_observed_at": "2026-08-24T00:30:36Z",
+      "buy_out_amount": "13408565051205",
+      "buy_terminal": "QUOTE_OBSERVED",
+      "buy_transport": {
+        "http_status": 200,
+        "request_count": 1,
+        "response_bytes": 1265,
+        "response_sha256": "9043b936a694cdb918e06de37ed1b08fa34cbf7cb712921f54a10050b44c09cd",
+        "safe_response_headers": {
+          "x-api-gateway-request-id": "pFr9GbBbDyQjIANecfqVUWHTmbXpkiyVs4faoToBV5MWqo2_W9d1WQ=="
+        },
+        "url_has_api_key": false,
+        "url_has_taker": false
+      },
+      "confirmation_interval_seconds": 300.0,
+      "decision_snapshot_r0_at": "2026-08-24T00:24:22Z",
+      "decision_snapshot_r1_at": "2026-08-24T00:29:22Z",
+      "h900_due_at": "2026-08-24T00:45:36Z",
+      "h900_terminal": "QUOTE_OBSERVED",
+      "mint": "RXHSUKJEjNhtp1NVgQGe6ybijyypxt5c3GDnL4upump",
+      "x": 0.23843266211470437,
+      "x_inputs": {
+        "firstPool.createdAt": "2026-08-24T00:18:04Z",
+        "r0.liquidity": 2847.2450298288895,
+        "r0.mcap": 120.43527163238512,
+        "r0.updatedAt": "2026-08-24T00:24:11.857716327Z",
+        "r1.liquidity": 2847.57682079547,
+        "r1.mcap": 94.89739975073411,
+        "r1.updatedAt": "2026-08-24T00:25:27.227759633Z"
+      },
+      "x_reason": null,
+      "x_source": {
+        "field_paths": [
+          "liquidity",
+          "mcap",
+          "firstPool.createdAt",
+          "updatedAt",
+          "launchpad"
+        ],
+        "r0_response_sha256": "f84cea38c076a1189e664454d0a23b11ab716cb255fc296c432ef77ef5d5fd21",
+        "r0_row_sha256": "438a8f4d40c8c178aeb4ec57b99dd036712bd7e2749e9e6c3ae2b64fec6630fb",
+        "r1_response_sha256": "debf1f3c75dbb6182ef47ce53c4e81db7553d8f69792d897de024557a1e1a2ad",
+        "r1_row_sha256": "0ff797d8ea1703b50832cf1e6731301c93b0d2d265b7b65781f4ff5c1f45ae75"
+      },
+      "x_status": "ELIGIBLE",
+      "y": -0.0578442
+    }
+  ],
+  "preflight": {
+    "credential_reads": 0,
+    "dns_resolved": true,
+    "host": "api.jup.ag",
+    "observed_at": "2026-08-24T00:19:22Z",
+    "port": 443,
+    "provider_requests": 0,
+    "schema": "smial.pmf-quote-slice-one-shot.credential-free-preflight",
+    "schema_version": "1.0",
+    "tcp_443": true,
+    "tls_verified": true,
+    "tls_version": "TLSv1.3"
+  },
+  "prior_mints_sha256": "943c8911c91a1e37f64fc3ae49417da618e8f7f0f004130f51503e5f4d0f7b46",
+  "provider_requests": 47,
+  "raw_retention": {
+    "manifests": [
+      {
+        "bytes": 50018,
+        "capture_envelope_sha256": "d4835d0f6beb21d0bcbd040150ba5c285989f3f9b283709bddda78a985ff0abf",
+        "envelope_path": "run=20260824T001922Z/DISCOVERY_RECENT.envelope.json",
+        "observation_id": "DISCOVERY:RECENT",
+        "observed_at": "2026-08-24T00:19:22Z",
+        "path": "run=20260824T001922Z/DISCOVERY_RECENT.body",
+        "retention": "A4_OUTSIDE_GIT",
+        "sha256": "37f9533fc7226cfee14ef5a0a67fbe0d393fc0439683ce88100c4ad85618edf4"
+      },
+      {
+        "bytes": 43907,
+        "capture_envelope_sha256": "619465c8fe29fca80fe6ba2081f6401fb9dc04aa558a862db9731b5971968a30",
+        "envelope_path": "run=20260824T001922Z/DISCOVERY_SEARCH_R0.envelope.json",
+        "observation_id": "DISCOVERY:SEARCH_R0",
+        "observed_at": "2026-08-24T00:24:22Z",
+        "path": "run=20260824T001922Z/DISCOVERY_SEARCH_R0.body",
+        "retention": "A4_OUTSIDE_GIT",
+        "sha256": "f84cea38c076a1189e664454d0a23b11ab716cb255fc296c432ef77ef5d5fd21"
+      },
+      {
+        "bytes": 41445,
+        "capture_envelope_sha256": "675676bf5954187f17f46ca128d0176db6a5b77f563728f1fc669725d2f896e1",
+        "envelope_path": "run=20260824T001922Z/DISCOVERY_SEARCH_R1.envelope.json",
+        "observation_id": "DISCOVERY:SEARCH_R1",
+        "observed_at": "2026-08-24T00:29:22Z",
+        "path": "run=20260824T001922Z/DISCOVERY_SEARCH_R1.body",
+        "retention": "A4_OUTSIDE_GIT",
+        "sha256": "debf1f3c75dbb6182ef47ce53c4e81db7553d8f69792d897de024557a1e1a2ad"
+      },
+      {
+        "bytes": 1264,
+        "capture_envelope_sha256": "854aaeeffc787d72abe1921e642baede3bad1dd387276f04caa5b68d063980c4",
+        "envelope_path": "run=20260824T001922Z/7DtkuLZfHmF51sifFtd2AjdZe9R77JDAUtHZgUJtpump_BUY_T1.envelope.json",
+        "observation_id": "7DtkuLZfHmF51sifFtd2AjdZe9R77JDAUtHZgUJtpump:BUY_T1",
+        "observed_at": "2026-08-24T00:29:25Z",
+        "path": "run=20260824T001922Z/7DtkuLZfHmF51sifFtd2AjdZe9R77JDAUtHZgUJtpump_BUY_T1.body",
+        "retention": "A4_OUTSIDE_GIT",
+        "sha256": "aee398e1396b8bff45b10c96d779f136b0b7a5d7bb4d612face50e875030c5e7"
+      },
+      {
+        "bytes": 1268,
+        "capture_envelope_sha256": "b8485ac9d5c2618158f0895ee6f355539bcf32384708a5f394d91944098ad58c",
+        "envelope_path": "run=20260824T001922Z/9Hxqi3RUkohAUhxjmU6EGBQYuR5teisUQiuu7pSppump_BUY_T1.envelope.json",
+        "observation_id": "9Hxqi3RUkohAUhxjmU6EGBQYuR5teisUQiuu7pSppump:BUY_T1",
+        "observed_at": "2026-08-24T00:29:29Z",
+        "path": "run=20260824T001922Z/9Hxqi3RUkohAUhxjmU6EGBQYuR5teisUQiuu7pSppump_BUY_T1.body",
+        "retention": "A4_OUTSIDE_GIT",
+        "sha256": "bcf771e5992b6d7508a854fc6e69f487c69d1a5c50f02c9308a46d90ea2cd2b5"
+      },
+      {
+        "bytes": 1264,
+        "capture_envelope_sha256": "80bd0601dcc4a5dd0933de14a723d94b31a9aa76f25bc6bf024929e1fc89aea0",
+        "envelope_path": "run=20260824T001922Z/5rae7LpBXiy9z5YRf1wegWKxE5EovPbPvUv3E2Frpump_BUY_T1.envelope.json",
+        "observation_id": "5rae7LpBXiy9z5YRf1wegWKxE5EovPbPvUv3E2Frpump:BUY_T1",
+        "observed_at": "2026-08-24T00:29:32Z",
+        "path": "run=20260824T001922Z/5rae7LpBXiy9z5YRf1wegWKxE5EovPbPvUv3E2Frpump_BUY_T1.body",
+        "retention": "A4_OUTSIDE_GIT",
+        "sha256": "99ac890e8446756a446b7d9d57d599f708ad5461d3d885ea75a43cee359f41e7"
+      },
+      {
+        "bytes": 1264,
+        "capture_envelope_sha256": "b98cb4e0f0f4e013cd1762212215320166fcc4097737072ab0d2f16f8c8157e8",
+        "envelope_path": "run=20260824T001922Z/3BowLEJtiCRgCMp35XxM3AhVduYixX92nAJFfCoVpump_BUY_T1.envelope.json",
+        "observation_id": "3BowLEJtiCRgCMp35XxM3AhVduYixX92nAJFfCoVpump:BUY_T1",
+        "observed_at": "2026-08-24T00:29:35Z",
+        "path": "run=20260824T001922Z/3BowLEJtiCRgCMp35XxM3AhVduYixX92nAJFfCoVpump_BUY_T1.body",
+        "retention": "A4_OUTSIDE_GIT",
+        "sha256": "37a941a3df6d221a87d8c792d37891557cff86f83318d934eb2e94519dd79559"
+      },
+      {
+        "bytes": 1259,
+        "capture_envelope_sha256": "2c541d576ef39b0c44a380dd7a58c458e50f70646a85f2b6fbfd8b5f8d0b5eed",
+        "envelope_path": "run=20260824T001922Z/6sG6SUnEezgcD3iavHd6hHxhhK6MksFVp9dCkkAxpump_BUY_T1.envelope.json",
+        "observation_id": "6sG6SUnEezgcD3iavHd6hHxhhK6MksFVp9dCkkAxpump:BUY_T1",
+        "observed_at": "2026-08-24T00:29:39Z",
+        "path": "run=20260824T001922Z/6sG6SUnEezgcD3iavHd6hHxhhK6MksFVp9dCkkAxpump_BUY_T1.body",
+        "retention": "A4_OUTSIDE_GIT",
+        "sha256": "d9899ee460e9f5aa09e62b6a8d58e2f98bcb3f4e6684717bf40f3c84d9538fd1"
+      },
+      {
+        "bytes": 1268,
+        "capture_envelope_sha256": "438539ef69b57ca0beeda26b14a6f9b55bf10c46ca3c1ebd2bc94adac6232fd3",
+        "envelope_path": "run=20260824T001922Z/7NDU1h24BULm4rxGrPbGGFfDUUPWbw9ZfxkcvJv5pump_BUY_T1.envelope.json",
+        "observation_id": "7NDU1h24BULm4rxGrPbGGFfDUUPWbw9ZfxkcvJv5pump:BUY_T1",
+        "observed_at": "2026-08-24T00:29:42Z",
+        "path": "run=20260824T001922Z/7NDU1h24BULm4rxGrPbGGFfDUUPWbw9ZfxkcvJv5pump_BUY_T1.body",
+        "retention": "A4_OUTSIDE_GIT",
+        "sha256": "1c29192a209c99b875ba5f9bf5acb4a51d3f63a52462d5d3c7c2af1a03b174e9"
+      },
+      {
+        "bytes": 1259,
+        "capture_envelope_sha256": "25405a4df8f228ddae5b7032609f226b44e6e4ac02368bf471616f93daadf3e8",
+        "envelope_path": "run=20260824T001922Z/ChYuSyGLMCXAjmMcobjf5XmmPLmMz1dqj9hZN1awpump_BUY_T1.envelope.json",
+        "observation_id": "ChYuSyGLMCXAjmMcobjf5XmmPLmMz1dqj9hZN1awpump:BUY_T1",
+        "observed_at": "2026-08-24T00:29:46Z",
+        "path": "run=20260824T001922Z/ChYuSyGLMCXAjmMcobjf5XmmPLmMz1dqj9hZN1awpump_BUY_T1.body",
+        "retention": "A4_OUTSIDE_GIT",
+        "sha256": "0f16aa7baca44555e5c512339b3084266629ef16dcf4e09946cf618e48923af7"
+      },
+      {
+        "bytes": 1264,
+        "capture_envelope_sha256": "1562b18c82ed851375d540e936fc7560d741b9620c356d8ea69ee077f0b0c308",
+        "envelope_path": "run=20260824T001922Z/6EXUWkwJoByhqwHGWMGPod52uL6xhbezUxNGXCn1pump_BUY_T1.envelope.json",
+        "observation_id": "6EXUWkwJoByhqwHGWMGPod52uL6xhbezUxNGXCn1pump:BUY_T1",
+        "observed_at": "2026-08-24T00:29:49Z",
+        "path": "run=20260824T001922Z/6EXUWkwJoByhqwHGWMGPod52uL6xhbezUxNGXCn1pump_BUY_T1.body",
+        "retention": "A4_OUTSIDE_GIT",
+        "sha256": "b61fcb0e1bb914fb50513032ae39068309ad8d8c5affd88938e9fa6fd87fed6b"
+      },
+      {
+        "bytes": 1262,
+        "capture_envelope_sha256": "e41c46ef3eb0ca75dd314bf70fdeb0214ed95a91ebbbbeec17186b0c066de29f",
+        "envelope_path": "run=20260824T001922Z/2zj5Rx4vEwZbY3seuQwcqwm2DwxjboUhKzFgrL95pump_BUY_T1.envelope.json",
+        "observation_id": "2zj5Rx4vEwZbY3seuQwcqwm2DwxjboUhKzFgrL95pump:BUY_T1",
+        "observed_at": "2026-08-24T00:29:52Z",
+        "path": "run=20260824T001922Z/2zj5Rx4vEwZbY3seuQwcqwm2DwxjboUhKzFgrL95pump_BUY_T1.body",
+        "retention": "A4_OUTSIDE_GIT",
+        "sha256": "c450331cc14a353184ad144101a942ed2e7e54f4d42a1df1cfca3af7dbb228c7"
+      },
+      {
+        "bytes": 1263,
+        "capture_envelope_sha256": "519bf224f33803d2bf7936a84b2312157bcab410fa47ff44031417845fb04abb",
+        "envelope_path": "run=20260824T001922Z/HRJ3HpLUpV4Nf4YdqBp4sUczJzkzHc4aJemm1z7Qpump_BUY_T1.envelope.json",
+        "observation_id": "HRJ3HpLUpV4Nf4YdqBp4sUczJzkzHc4aJemm1z7Qpump:BUY_T1",
+        "observed_at": "2026-08-24T00:29:56Z",
+        "path": "run=20260824T001922Z/HRJ3HpLUpV4Nf4YdqBp4sUczJzkzHc4aJemm1z7Qpump_BUY_T1.body",
+        "retention": "A4_OUTSIDE_GIT",
+        "sha256": "05d7cf8d72d57eec54cc02684db219584e6ee12741b5e9bd8e4f51eb43f01f6c"
+      },
+      {
+        "bytes": 1262,
+        "capture_envelope_sha256": "7b6139e65f5ba885bd5e2734b226ed925eebbe0b432b30a751396441408ed586",
+        "envelope_path": "run=20260824T001922Z/GEQJ4tnk3dfMuh1j77Nu9djjcq47pGsCqhayZa9opump_BUY_T1.envelope.json",
+        "observation_id": "GEQJ4tnk3dfMuh1j77Nu9djjcq47pGsCqhayZa9opump:BUY_T1",
+        "observed_at": "2026-08-24T00:29:59Z",
+        "path": "run=20260824T001922Z/GEQJ4tnk3dfMuh1j77Nu9djjcq47pGsCqhayZa9opump_BUY_T1.body",
+        "retention": "A4_OUTSIDE_GIT",
+        "sha256": "3df3cfab3f69166a1b8545113378a0cd78418d34c0efe0c0408dd549cc4cbb24"
+      },
+      {
+        "bytes": 1262,
+        "capture_envelope_sha256": "4c8520db1bb13ae81f2d5b9712ea0b222a95a71a2edd0c995350494d1b72bb0d",
+        "envelope_path": "run=20260824T001922Z/6QLbyAg7HZZvVw21hzvya5JYboiEuiRY8okESUsApump_BUY_T1.envelope.json",
+        "observation_id": "6QLbyAg7HZZvVw21hzvya5JYboiEuiRY8okESUsApump:BUY_T1",
+        "observed_at": "2026-08-24T00:30:02Z",
+        "path": "run=20260824T001922Z/6QLbyAg7HZZvVw21hzvya5JYboiEuiRY8okESUsApump_BUY_T1.body",
+        "retention": "A4_OUTSIDE_GIT",
+        "sha256": "fd7464c39e9056fd8fdbf66653577bb8e8cccf8ff29996eed8766e7d61ebcb55"
+      },
+      {
+        "bytes": 1263,
+        "capture_envelope_sha256": "eec8eca323cd2b0716c7043b82f4ac75b786a2ba189ce9c6c4a3a4c7477e106b",
+        "envelope_path": "run=20260824T001922Z/EfGijxcoKcVtVD6cPjBAs2qQT12FxKL51oDLR7ncpump_BUY_T1.envelope.json",
+        "observation_id": "EfGijxcoKcVtVD6cPjBAs2qQT12FxKL51oDLR7ncpump:BUY_T1",
+        "observed_at": "2026-08-24T00:30:06Z",
+        "path": "run=20260824T001922Z/EfGijxcoKcVtVD6cPjBAs2qQT12FxKL51oDLR7ncpump_BUY_T1.body",
+        "retention": "A4_OUTSIDE_GIT",
+        "sha256": "434494c0c87b53a57bbad7e78292c30eca285f65e2c2971eaf1d269c7e103471"
+      },
+      {
+        "bytes": 1258,
+        "capture_envelope_sha256": "103409579a126d54041a38ea689d82d8ecab30323db3a8a74669879bd8b57fbc",
+        "envelope_path": "run=20260824T001922Z/EwurRSEkBHk5HXzizPsPXvPUVWQz5HzaXKobjf6gpump_BUY_T1.envelope.json",
+        "observation_id": "EwurRSEkBHk5HXzizPsPXvPUVWQz5HzaXKobjf6gpump:BUY_T1",
+        "observed_at": "2026-08-24T00:30:09Z",
+        "path": "run=20260824T001922Z/EwurRSEkBHk5HXzizPsPXvPUVWQz5HzaXKobjf6gpump_BUY_T1.body",
+        "retention": "A4_OUTSIDE_GIT",
+        "sha256": "4d6ae92e29d2705a6e994ac6b892286b036b58bdd1c96763e11dfda0bf342812"
+      },
+      {
+        "bytes": 1262,
+        "capture_envelope_sha256": "1a361aff65e83a378a5a0c43c1cab7197115f900c71bae5f1de921a09591bbb8",
+        "envelope_path": "run=20260824T001922Z/2wThCZrgHdtCSqhyjkAfyf1kx5vfRv7ydmDMUB7ypump_BUY_T1.envelope.json",
+        "observation_id": "2wThCZrgHdtCSqhyjkAfyf1kx5vfRv7ydmDMUB7ypump:BUY_T1",
+        "observed_at": "2026-08-24T00:30:12Z",
+        "path": "run=20260824T001922Z/2wThCZrgHdtCSqhyjkAfyf1kx5vfRv7ydmDMUB7ypump_BUY_T1.body",
+        "retention": "A4_OUTSIDE_GIT",
+        "sha256": "1aa3ea7a97fc0ec03698abb1834226cdce90960d99075f38936ed0f43a96a3aa"
+      },
+      {
+        "bytes": 1265,
+        "capture_envelope_sha256": "8322ad80f7a58ec0fa79715ac0bad02bb9c8ebd777f4ed8a1ca21cd7da459e4b",
+        "envelope_path": "run=20260824T001922Z/65vMUTKWP7hf1rdaY43h11CikLFeuS7VfM7iJkUcpump_BUY_T1.envelope.json",
+        "observation_id": "65vMUTKWP7hf1rdaY43h11CikLFeuS7VfM7iJkUcpump:BUY_T1",
+        "observed_at": "2026-08-24T00:30:16Z",
+        "path": "run=20260824T001922Z/65vMUTKWP7hf1rdaY43h11CikLFeuS7VfM7iJkUcpump_BUY_T1.body",
+        "retention": "A4_OUTSIDE_GIT",
+        "sha256": "58c82cfdbe96c6684f2c628a71414821a2cda00271613b1c9b759413b68bc402"
+      },
+      {
+        "bytes": 1261,
+        "capture_envelope_sha256": "b171dc23f3cbcad5792205bb0373211a8526b4866b513c2581a53889717b3f2e",
+        "envelope_path": "run=20260824T001922Z/AFgUfvWNmsEsmAwb7CtgKDtnh631mJHeeVar4h4Npump_BUY_T1.envelope.json",
+        "observation_id": "AFgUfvWNmsEsmAwb7CtgKDtnh631mJHeeVar4h4Npump:BUY_T1",
+        "observed_at": "2026-08-24T00:30:19Z",
+        "path": "run=20260824T001922Z/AFgUfvWNmsEsmAwb7CtgKDtnh631mJHeeVar4h4Npump_BUY_T1.body",
+        "retention": "A4_OUTSIDE_GIT",
+        "sha256": "a46ba48c657980684a37180c9140448aab1c12a4fd7db00e7ae47e7908b9e5a3"
+      },
+      {
+        "bytes": 1270,
+        "capture_envelope_sha256": "7ee6177f280986c8ef2772766802f915d7c1c12bbc4d91c212e6959f0fac7a67",
+        "envelope_path": "run=20260824T001922Z/AY6AxCvVXMZvkJH5UVTyXnbKe81s64X9bBnoUbvCpump_BUY_T1.envelope.json",
+        "observation_id": "AY6AxCvVXMZvkJH5UVTyXnbKe81s64X9bBnoUbvCpump:BUY_T1",
+        "observed_at": "2026-08-24T00:30:22Z",
+        "path": "run=20260824T001922Z/AY6AxCvVXMZvkJH5UVTyXnbKe81s64X9bBnoUbvCpump_BUY_T1.body",
+        "retention": "A4_OUTSIDE_GIT",
+        "sha256": "d9066f048103d3d2b5a849b5fb9f34ad6e525236f3f64c2a255e499fc5af8d57"
+      },
+      {
+        "bytes": 1265,
+        "capture_envelope_sha256": "53015c2c628c3bd08ccc3d5b0c160617d82b3bc5bf45c4a73a6063c29ddeb7de",
+        "envelope_path": "run=20260824T001922Z/9CkVkXnDmgYEEwbVTzcZpGukdoRbRyp1EykoWXSwpump_BUY_T1.envelope.json",
+        "observation_id": "9CkVkXnDmgYEEwbVTzcZpGukdoRbRyp1EykoWXSwpump:BUY_T1",
+        "observed_at": "2026-08-24T00:30:26Z",
+        "path": "run=20260824T001922Z/9CkVkXnDmgYEEwbVTzcZpGukdoRbRyp1EykoWXSwpump_BUY_T1.body",
+        "retention": "A4_OUTSIDE_GIT",
+        "sha256": "3a07f6ac59d18295ee060d2f3f853e85951571f3ee907d673401d6c92958140b"
+      },
+      {
+        "bytes": 1261,
+        "capture_envelope_sha256": "7c007cfc5ac65e13e1ac5d327c389324a1f75c2a42b71e700a4a32489e216436",
+        "envelope_path": "run=20260824T001922Z/BqPKnqsPjsdAbhgA46i8ptgRPT9Vyg8Z9UHfEWwypump_BUY_T1.envelope.json",
+        "observation_id": "BqPKnqsPjsdAbhgA46i8ptgRPT9Vyg8Z9UHfEWwypump:BUY_T1",
+        "observed_at": "2026-08-24T00:30:29Z",
+        "path": "run=20260824T001922Z/BqPKnqsPjsdAbhgA46i8ptgRPT9Vyg8Z9UHfEWwypump_BUY_T1.body",
+        "retention": "A4_OUTSIDE_GIT",
+        "sha256": "4301d3901c689c04c37e41839da49617f8cc759a5b884768f3d002a4a1aa57e2"
+      },
+      {
+        "bytes": 1264,
+        "capture_envelope_sha256": "c8d05cca9c8c6a8be6e2052e805264792c73a8438112afc9c812d531f08efb3a",
+        "envelope_path": "run=20260824T001922Z/3GJd7Tp32xG6WmKfUwqFcdWCEYvUTA6GuzTVPLjNpump_BUY_T1.envelope.json",
+        "observation_id": "3GJd7Tp32xG6WmKfUwqFcdWCEYvUTA6GuzTVPLjNpump:BUY_T1",
+        "observed_at": "2026-08-24T00:30:32Z",
+        "path": "run=20260824T001922Z/3GJd7Tp32xG6WmKfUwqFcdWCEYvUTA6GuzTVPLjNpump_BUY_T1.body",
+        "retention": "A4_OUTSIDE_GIT",
+        "sha256": "b9741bb497b90096e64cb8a0d886a499ac2251a3dd5a19fcaead35c702ead2f4"
+      },
+      {
+        "bytes": 1265,
+        "capture_envelope_sha256": "ef89f41301d9bcd8fc20523e69faade69a946df049508ccadfe4394a44890fa3",
+        "envelope_path": "run=20260824T001922Z/RXHSUKJEjNhtp1NVgQGe6ybijyypxt5c3GDnL4upump_BUY_T1.envelope.json",
+        "observation_id": "RXHSUKJEjNhtp1NVgQGe6ybijyypxt5c3GDnL4upump:BUY_T1",
+        "observed_at": "2026-08-24T00:30:36Z",
+        "path": "run=20260824T001922Z/RXHSUKJEjNhtp1NVgQGe6ybijyypxt5c3GDnL4upump_BUY_T1.body",
+        "retention": "A4_OUTSIDE_GIT",
+        "sha256": "9043b936a694cdb918e06de37ed1b08fa34cbf7cb712921f54a10050b44c09cd"
+      },
+      {
+        "bytes": 1257,
+        "capture_envelope_sha256": "99c50ded361840b1970ba7b49958e8f2ddfdf30ebe032d0e7ea92b0104fb145f",
+        "envelope_path": "run=20260824T001922Z/7DtkuLZfHmF51sifFtd2AjdZe9R77JDAUtHZgUJtpump_SELL_H900.envelope.json",
+        "observation_id": "7DtkuLZfHmF51sifFtd2AjdZe9R77JDAUtHZgUJtpump:SELL_H900",
+        "observed_at": "2026-08-24T00:44:25Z",
+        "path": "run=20260824T001922Z/7DtkuLZfHmF51sifFtd2AjdZe9R77JDAUtHZgUJtpump_SELL_H900.body",
+        "retention": "A4_OUTSIDE_GIT",
+        "sha256": "cd754b6582f3ab04b74c2d50a5a39c7de121aed2de42cd3f67c8d4870ef60f13"
+      },
+      {
+        "bytes": 1260,
+        "capture_envelope_sha256": "d31cf84ded81c0b13f728960dcfda26310b6be191c60c956e3a44c9b32c1ab0b",
+        "envelope_path": "run=20260824T001922Z/9Hxqi3RUkohAUhxjmU6EGBQYuR5teisUQiuu7pSppump_SELL_H900.envelope.json",
+        "observation_id": "9Hxqi3RUkohAUhxjmU6EGBQYuR5teisUQiuu7pSppump:SELL_H900",
+        "observed_at": "2026-08-24T00:44:29Z",
+        "path": "run=20260824T001922Z/9Hxqi3RUkohAUhxjmU6EGBQYuR5teisUQiuu7pSppump_SELL_H900.body",
+        "retention": "A4_OUTSIDE_GIT",
+        "sha256": "38ae98c83fe841b653f2aff91733d1834d5bf863b3efcc4bfcf931e92743bb5c"
+      },
+      {
+        "bytes": 1257,
+        "capture_envelope_sha256": "8d944051cac473d34e9d98f67b988fd325c4c7263a55d66b25ee3c8fd41f53d3",
+        "envelope_path": "run=20260824T001922Z/5rae7LpBXiy9z5YRf1wegWKxE5EovPbPvUv3E2Frpump_SELL_H900.envelope.json",
+        "observation_id": "5rae7LpBXiy9z5YRf1wegWKxE5EovPbPvUv3E2Frpump:SELL_H900",
+        "observed_at": "2026-08-24T00:44:32Z",
+        "path": "run=20260824T001922Z/5rae7LpBXiy9z5YRf1wegWKxE5EovPbPvUv3E2Frpump_SELL_H900.body",
+        "retention": "A4_OUTSIDE_GIT",
+        "sha256": "b4c8823bbee573a96b0353f61a680fc434906220eb07a3c861183ca7e2b2af29"
+      },
+      {
+        "bytes": 1257,
+        "capture_envelope_sha256": "63b6cff245b462ec00a9c08583a40b4936c48da6d3b168ee110305c43710ee1e",
+        "envelope_path": "run=20260824T001922Z/3BowLEJtiCRgCMp35XxM3AhVduYixX92nAJFfCoVpump_SELL_H900.envelope.json",
+        "observation_id": "3BowLEJtiCRgCMp35XxM3AhVduYixX92nAJFfCoVpump:SELL_H900",
+        "observed_at": "2026-08-24T00:44:36Z",
+        "path": "run=20260824T001922Z/3BowLEJtiCRgCMp35XxM3AhVduYixX92nAJFfCoVpump_SELL_H900.body",
+        "retention": "A4_OUTSIDE_GIT",
+        "sha256": "f5fe04d02003250ebb95484601ae8786adace6e306222adac3ea944a135a3a9a"
+      },
+      {
+        "bytes": 83,
+        "capture_envelope_sha256": "699edace3e6297e182945a84c21d4cf3e99c2d404d976e90b1d16e16ca3c68dc",
+        "envelope_path": "run=20260824T001922Z/6sG6SUnEezgcD3iavHd6hHxhhK6MksFVp9dCkkAxpump_SELL_H900.envelope.json",
+        "observation_id": "6sG6SUnEezgcD3iavHd6hHxhhK6MksFVp9dCkkAxpump:SELL_H900",
+        "observed_at": "2026-08-24T00:44:39Z",
+        "path": "run=20260824T001922Z/6sG6SUnEezgcD3iavHd6hHxhhK6MksFVp9dCkkAxpump_SELL_H900.body",
+        "retention": "A4_OUTSIDE_GIT",
+        "sha256": "63249251d6ff420c2fe2ed7d0775ce692d8e16e577599a8e7e3f5b2bdd6cc2ca"
+      },
+      {
+        "bytes": 83,
+        "capture_envelope_sha256": "8beac99e989f27371be3d1051363151fe6fad43512f0b5cae4ec5af30205f9d5",
+        "envelope_path": "run=20260824T001922Z/7NDU1h24BULm4rxGrPbGGFfDUUPWbw9ZfxkcvJv5pump_SELL_H900.envelope.json",
+        "observation_id": "7NDU1h24BULm4rxGrPbGGFfDUUPWbw9ZfxkcvJv5pump:SELL_H900",
+        "observed_at": "2026-08-24T00:44:42Z",
+        "path": "run=20260824T001922Z/7NDU1h24BULm4rxGrPbGGFfDUUPWbw9ZfxkcvJv5pump_SELL_H900.body",
+        "retention": "A4_OUTSIDE_GIT",
+        "sha256": "d85f83a02e5c0033353a554e220fcd4afc580b67d04b2de6cfdab69b7eddc7b4"
+      },
+      {
+        "bytes": 1258,
+        "capture_envelope_sha256": "b6a6f5c65d54bf3f2fbd8984595b2b056224f671ec52eefb1e4ab3d8c55ed4e9",
+        "envelope_path": "run=20260824T001922Z/ChYuSyGLMCXAjmMcobjf5XmmPLmMz1dqj9hZN1awpump_SELL_H900.envelope.json",
+        "observation_id": "ChYuSyGLMCXAjmMcobjf5XmmPLmMz1dqj9hZN1awpump:SELL_H900",
+        "observed_at": "2026-08-24T00:44:46Z",
+        "path": "run=20260824T001922Z/ChYuSyGLMCXAjmMcobjf5XmmPLmMz1dqj9hZN1awpump_SELL_H900.body",
+        "retention": "A4_OUTSIDE_GIT",
+        "sha256": "ed25f134e610bfdd39863429014f36e2acd4f5e5c12139a51818d61d16e4aaf0"
+      },
+      {
+        "bytes": 1257,
+        "capture_envelope_sha256": "8696f32a1798e3aaf7a66e9a613007c6ded94bb309f6f751c9de860ed541e33c",
+        "envelope_path": "run=20260824T001922Z/6EXUWkwJoByhqwHGWMGPod52uL6xhbezUxNGXCn1pump_SELL_H900.envelope.json",
+        "observation_id": "6EXUWkwJoByhqwHGWMGPod52uL6xhbezUxNGXCn1pump:SELL_H900",
+        "observed_at": "2026-08-24T00:44:49Z",
+        "path": "run=20260824T001922Z/6EXUWkwJoByhqwHGWMGPod52uL6xhbezUxNGXCn1pump_SELL_H900.body",
+        "retention": "A4_OUTSIDE_GIT",
+        "sha256": "7498ecb113c2e627761808bfd3493e156bdb2c8051153a8e0ef7e17112707f44"
+      },
+      {
+        "bytes": 1255,
+        "capture_envelope_sha256": "8d6465c839b1dc1b9f0833a22dc287a4c900188c62bd1055a799b7cd9a9d0538",
+        "envelope_path": "run=20260824T001922Z/2zj5Rx4vEwZbY3seuQwcqwm2DwxjboUhKzFgrL95pump_SELL_H900.envelope.json",
+        "observation_id": "2zj5Rx4vEwZbY3seuQwcqwm2DwxjboUhKzFgrL95pump:SELL_H900",
+        "observed_at": "2026-08-24T00:44:53Z",
+        "path": "run=20260824T001922Z/2zj5Rx4vEwZbY3seuQwcqwm2DwxjboUhKzFgrL95pump_SELL_H900.body",
+        "retention": "A4_OUTSIDE_GIT",
+        "sha256": "a9f0d96913a8190cf36f63d8582c6827df6bc302df0db4cee0f8a400d18af6f1"
+      },
+      {
+        "bytes": 1253,
+        "capture_envelope_sha256": "424612ea9bcde44c3140111d885dc3dbd8d71073d2f8ef321bf54ce636376ea8",
+        "envelope_path": "run=20260824T001922Z/HRJ3HpLUpV4Nf4YdqBp4sUczJzkzHc4aJemm1z7Qpump_SELL_H900.envelope.json",
+        "observation_id": "HRJ3HpLUpV4Nf4YdqBp4sUczJzkzHc4aJemm1z7Qpump:SELL_H900",
+        "observed_at": "2026-08-24T00:44:56Z",
+        "path": "run=20260824T001922Z/HRJ3HpLUpV4Nf4YdqBp4sUczJzkzHc4aJemm1z7Qpump_SELL_H900.body",
+        "retention": "A4_OUTSIDE_GIT",
+        "sha256": "791692c1d6c99f5b0d52c73412457cce9de082132f24e8cdc6c35d472e99829e"
+      },
+      {
+        "bytes": 1258,
+        "capture_envelope_sha256": "7364b0687bb98f08add8fef39a4a070f19bae23863a3958b4f1e6d78db851186",
+        "envelope_path": "run=20260824T001922Z/GEQJ4tnk3dfMuh1j77Nu9djjcq47pGsCqhayZa9opump_SELL_H900.envelope.json",
+        "observation_id": "GEQJ4tnk3dfMuh1j77Nu9djjcq47pGsCqhayZa9opump:SELL_H900",
+        "observed_at": "2026-08-24T00:44:59Z",
+        "path": "run=20260824T001922Z/GEQJ4tnk3dfMuh1j77Nu9djjcq47pGsCqhayZa9opump_SELL_H900.body",
+        "retention": "A4_OUTSIDE_GIT",
+        "sha256": "0f83e9f38772dd23711d32d855e3ecfa177fa613b615d2fd3219ab65f5bbed97"
+      },
+      {
+        "bytes": 1255,
+        "capture_envelope_sha256": "55522d68f62ec3a01f8204a15798ef4289b5753dc310c164d9224a5f47db3f12",
+        "envelope_path": "run=20260824T001922Z/6QLbyAg7HZZvVw21hzvya5JYboiEuiRY8okESUsApump_SELL_H900.envelope.json",
+        "observation_id": "6QLbyAg7HZZvVw21hzvya5JYboiEuiRY8okESUsApump:SELL_H900",
+        "observed_at": "2026-08-24T00:45:03Z",
+        "path": "run=20260824T001922Z/6QLbyAg7HZZvVw21hzvya5JYboiEuiRY8okESUsApump_SELL_H900.body",
+        "retention": "A4_OUTSIDE_GIT",
+        "sha256": "1cadfc4ba55703997403c96cda0ef2a3889e5ad46f48e450e8d1c47ec2f709ee"
+      },
+      {
+        "bytes": 1256,
+        "capture_envelope_sha256": "a594d328cf9109259c3c36608ad69a23e26cec8d9bc6b112223122dee50d2d37",
+        "envelope_path": "run=20260824T001922Z/EfGijxcoKcVtVD6cPjBAs2qQT12FxKL51oDLR7ncpump_SELL_H900.envelope.json",
+        "observation_id": "EfGijxcoKcVtVD6cPjBAs2qQT12FxKL51oDLR7ncpump:SELL_H900",
+        "observed_at": "2026-08-24T00:45:06Z",
+        "path": "run=20260824T001922Z/EfGijxcoKcVtVD6cPjBAs2qQT12FxKL51oDLR7ncpump_SELL_H900.body",
+        "retention": "A4_OUTSIDE_GIT",
+        "sha256": "c8815ab0c77b5fd83666f0f3b0e39eddb61db0b3a6df5da20da449ee1ef022ae"
+      },
+      {
+        "bytes": 1253,
+        "capture_envelope_sha256": "dcbbab00d1115e5cc4f00d005cace053d8a596ac9bc0d53c70a6068cfa6f3b5c",
+        "envelope_path": "run=20260824T001922Z/EwurRSEkBHk5HXzizPsPXvPUVWQz5HzaXKobjf6gpump_SELL_H900.envelope.json",
+        "observation_id": "EwurRSEkBHk5HXzizPsPXvPUVWQz5HzaXKobjf6gpump:SELL_H900",
+        "observed_at": "2026-08-24T00:45:09Z",
+        "path": "run=20260824T001922Z/EwurRSEkBHk5HXzizPsPXvPUVWQz5HzaXKobjf6gpump_SELL_H900.body",
+        "retention": "A4_OUTSIDE_GIT",
+        "sha256": "f2963d531dc30b285cfef9e7ad04470b61a0c972bc5734175335791ed308b259"
+      },
+      {
+        "bytes": 1254,
+        "capture_envelope_sha256": "e1c5ce0e7fda99d819e6f624ba7545fc5fef796227d2965abc5fbcd55660d099",
+        "envelope_path": "run=20260824T001922Z/2wThCZrgHdtCSqhyjkAfyf1kx5vfRv7ydmDMUB7ypump_SELL_H900.envelope.json",
+        "observation_id": "2wThCZrgHdtCSqhyjkAfyf1kx5vfRv7ydmDMUB7ypump:SELL_H900",
+        "observed_at": "2026-08-24T00:45:13Z",
+        "path": "run=20260824T001922Z/2wThCZrgHdtCSqhyjkAfyf1kx5vfRv7ydmDMUB7ypump_SELL_H900.body",
+        "retention": "A4_OUTSIDE_GIT",
+        "sha256": "0af996a16683e616eed5b9b14fd025b3a045c81fedf1431dd7c68cad6ed87d5d"
+      },
+      {
+        "bytes": 1255,
+        "capture_envelope_sha256": "1ac895443d5217d2ae3568472229b9868e85040969837d179e827e7bb4ecb8de",
+        "envelope_path": "run=20260824T001922Z/65vMUTKWP7hf1rdaY43h11CikLFeuS7VfM7iJkUcpump_SELL_H900.envelope.json",
+        "observation_id": "65vMUTKWP7hf1rdaY43h11CikLFeuS7VfM7iJkUcpump:SELL_H900",
+        "observed_at": "2026-08-24T00:45:16Z",
+        "path": "run=20260824T001922Z/65vMUTKWP7hf1rdaY43h11CikLFeuS7VfM7iJkUcpump_SELL_H900.body",
+        "retention": "A4_OUTSIDE_GIT",
+        "sha256": "98b95ebcd4b3da739a137b6d1fb3b2a95282a1a99cb492bc2466ed3850547d88"
+      },
+      {
+        "bytes": 1249,
+        "capture_envelope_sha256": "648802be657083347231e8c83113bf96b1bfb3685734f1706a3cdd76583a7ada",
+        "envelope_path": "run=20260824T001922Z/AFgUfvWNmsEsmAwb7CtgKDtnh631mJHeeVar4h4Npump_SELL_H900.envelope.json",
+        "observation_id": "AFgUfvWNmsEsmAwb7CtgKDtnh631mJHeeVar4h4Npump:SELL_H900",
+        "observed_at": "2026-08-24T00:45:19Z",
+        "path": "run=20260824T001922Z/AFgUfvWNmsEsmAwb7CtgKDtnh631mJHeeVar4h4Npump_SELL_H900.body",
+        "retention": "A4_OUTSIDE_GIT",
+        "sha256": "5498e945556350986879dc18c6cdd0eb56f773c32a2df011d0f11e9dcd3c98f1"
+      },
+      {
+        "bytes": 1265,
+        "capture_envelope_sha256": "36af31df6d331c20e636b1559ecfaf04b097560f7f77ab106878740c49c07463",
+        "envelope_path": "run=20260824T001922Z/AY6AxCvVXMZvkJH5UVTyXnbKe81s64X9bBnoUbvCpump_SELL_H900.envelope.json",
+        "observation_id": "AY6AxCvVXMZvkJH5UVTyXnbKe81s64X9bBnoUbvCpump:SELL_H900",
+        "observed_at": "2026-08-24T00:45:23Z",
+        "path": "run=20260824T001922Z/AY6AxCvVXMZvkJH5UVTyXnbKe81s64X9bBnoUbvCpump_SELL_H900.body",
+        "retention": "A4_OUTSIDE_GIT",
+        "sha256": "f7be10c6d478e15c01d250f716b70db5b90661909004f8129210c2b7acbda102"
+      },
+      {
+        "bytes": 1256,
+        "capture_envelope_sha256": "6d3b9c9b09129a6158d3a55e7353454a6141ddd710e5e0263786e37c1b33d7b2",
+        "envelope_path": "run=20260824T001922Z/9CkVkXnDmgYEEwbVTzcZpGukdoRbRyp1EykoWXSwpump_SELL_H900.envelope.json",
+        "observation_id": "9CkVkXnDmgYEEwbVTzcZpGukdoRbRyp1EykoWXSwpump:SELL_H900",
+        "observed_at": "2026-08-24T00:45:26Z",
+        "path": "run=20260824T001922Z/9CkVkXnDmgYEEwbVTzcZpGukdoRbRyp1EykoWXSwpump_SELL_H900.body",
+        "retention": "A4_OUTSIDE_GIT",
+        "sha256": "6b158ec4d6bebc9c918b657840ae640350698af139ae20efb37d81f5d96b6678"
+      },
+      {
+        "bytes": 1256,
+        "capture_envelope_sha256": "db1e1495af03caae9ddf789627afb6a0c21c2ae3ed6c584b1d8735d86531e70a",
+        "envelope_path": "run=20260824T001922Z/BqPKnqsPjsdAbhgA46i8ptgRPT9Vyg8Z9UHfEWwypump_SELL_H900.envelope.json",
+        "observation_id": "BqPKnqsPjsdAbhgA46i8ptgRPT9Vyg8Z9UHfEWwypump:SELL_H900",
+        "observed_at": "2026-08-24T00:45:30Z",
+        "path": "run=20260824T001922Z/BqPKnqsPjsdAbhgA46i8ptgRPT9Vyg8Z9UHfEWwypump_SELL_H900.body",
+        "retention": "A4_OUTSIDE_GIT",
+        "sha256": "fb1e287098db92dae4e1063cc62d466dfcc47e8f288034bd46e70cbf41088d36"
+      },
+      {
+        "bytes": 1256,
+        "capture_envelope_sha256": "e7c6735fb9ec2bc5a63368af1c6d26d953b2c8ca442d7176693d5f5c60d4f2fe",
+        "envelope_path": "run=20260824T001922Z/3GJd7Tp32xG6WmKfUwqFcdWCEYvUTA6GuzTVPLjNpump_SELL_H900.envelope.json",
+        "observation_id": "3GJd7Tp32xG6WmKfUwqFcdWCEYvUTA6GuzTVPLjNpump:SELL_H900",
+        "observed_at": "2026-08-24T00:45:33Z",
+        "path": "run=20260824T001922Z/3GJd7Tp32xG6WmKfUwqFcdWCEYvUTA6GuzTVPLjNpump_SELL_H900.body",
+        "retention": "A4_OUTSIDE_GIT",
+        "sha256": "16e41e999f463afc9c2ee3bda98b6415a3ea08a5c4aca3b72e70ba350e2344bd"
+      },
+      {
+        "bytes": 1258,
+        "capture_envelope_sha256": "80bdc9ebe48de8c8998b17c5772558cf35caef21f20770cb9fce574b1cd3983b",
+        "envelope_path": "run=20260824T001922Z/RXHSUKJEjNhtp1NVgQGe6ybijyypxt5c3GDnL4upump_SELL_H900.envelope.json",
+        "observation_id": "RXHSUKJEjNhtp1NVgQGe6ybijyypxt5c3GDnL4upump:SELL_H900",
+        "observed_at": "2026-08-24T00:45:36Z",
+        "path": "run=20260824T001922Z/RXHSUKJEjNhtp1NVgQGe6ybijyypxt5c3GDnL4upump_SELL_H900.body",
+        "retention": "A4_OUTSIDE_GIT",
+        "sha256": "d19022c4dcb779dc8a33d2fa07fe18df17ba582bfc5ae69d0dc34df81da6f5f1"
+      }
+    ],
+    "mode": "A4_OUTSIDE_GIT"
+  },
+  "receipt_id": "EVIDENCE-EARLY-VALUATION-LIQUIDITY-DIVERGENCE-RUNTIME-001",
+  "retries": 0,
+  "schema": "smial.early-valuation-liquidity-divergence-confirmation.runtime-receipt",
+  "schema_version": "1.0",
+  "score": {
+    "decision_time_eligible": 22,
+    "leave_one_out_positive_share": null,
+    "rankable_h900": 20,
+    "score_kind": "SIGN_ONLY_KENDALL_TAU_B",
+    "tau_b": -0.08035714285714286,
+    "terminal": "CLOSE_VALUATION_LIQUIDITY_DIVERGENCE_FAMILY",
+    "top_quartile_median_y": null
+  },
+  "terminal_outcome": "CLOSE_VALUATION_LIQUIDITY_DIVERGENCE_FAMILY"
+}
