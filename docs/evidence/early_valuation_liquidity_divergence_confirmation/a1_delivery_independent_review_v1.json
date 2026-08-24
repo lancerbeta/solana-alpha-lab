@@ -17,8 +17,8 @@
     "OWNER_UX_CRITIC"
   ],
   "review_id": "EARLY-VALUATION-LIQUIDITY-DIVERGENCE-INDEPENDENT-REVIEW-001",
-  "reviewed_bindings_sha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
-  "reviewed_inventory_sha256": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+  "reviewed_bindings_sha256": "6fd050f967f349124ddb90896206e45c76cdb6cbf291c056590d8b6fae762547",
+  "reviewed_inventory_sha256": "9d6381f8845e8c4ef1cbe8e55541cf55503a8e63078511d2193b635063edb043",
   "reviews": [
     {
       "findings": [

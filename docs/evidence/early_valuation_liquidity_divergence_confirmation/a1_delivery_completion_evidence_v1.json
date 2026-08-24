@@ -9,10 +9,23 @@
   "cloud_bundle_smoke_required": false,
   "factory_fit": {
     "path": "docs/evidence/early_valuation_liquidity_divergence_confirmation/a1_delivery_factory_fit_v1.json",
-    "sha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+    "sha256": "02d5a8082b1ec19e0be4b578d17ce48429e5737b554b3fc1256621915c0f4719",
     "verdict": "PASS"
   },
-  "implementation_bindings": {},
+  "implementation_bindings": {
+    "catalog/assets/core.yaml": "59347bed7daf9798f4a64152a8ab5c4c547230d8aadbeac03b1f0c3d47c51e68",
+    "catalog/assets/lifecycle.yaml": "cc19ee9246cab9a81985bdd9e26a61e970319293174c522027596c8ac33b5aef",
+    "catalog/catalog_manifest.yaml": "3ae1debb9e229cc7df085815f9c1c4fdbf69757208d68b8c300a6c7a5d4c2c46",
+    "catalog/generated/asset_edges.json": "a670cc5fac5f999450f8544d41fa273e7e26b8308cc0a28212b28a0d6adf319f",
+    "configs/early_valuation_liquidity_divergence_confirmation_v1.yaml": "14d446310edc025ad7b64c24bb42f0a43276539e85165c4ed9b548cc56a52942",
+    "docs/PROJECT_MAP.md": "69566b9240b19513e112cd790c9a2665d564e6169c9b119c4b0de4311c2289a2",
+    "docs/evidence/early_valuation_liquidity_divergence_confirmation/a1_acceptance_v1.json": "dae5d63f90b5ce3e82cf989bb6e131b95fd8ee36b66ceef101123f98d8bf34d6",
+    "docs/reports/early_valuation_liquidity_divergence_confirmation/a1_owner_readout_v1.md": "78fa760ad8d032484d96991fc6435a758d785bd7de4804bb900a9dc97312dbdf",
+    "docs/tasks/EARLY_VALUATION_LIQUIDITY_DIVERGENCE_CONFIRMATION_V1.md": "e364e1a24bb0c4b7619511cb889c3c796900f5b686d8ef9543bfcb08e75cab30",
+    "scripts/run_early_valuation_liquidity_divergence_confirmation.py": "70c15d472b3cfa0ce28151b374fcb46f8a6b0296a5111c7f11227b99183a4e74",
+    "src/solana_alpha_lab/early_valuation_liquidity_divergence_confirmation.py": "1a2fa6fa9748093607f937cd5f0f19f9119b73594769b570a22a4f8e103486e2",
+    "tests/test_early_valuation_liquidity_divergence_confirmation.py": "b5768575324f87dc6082743329fffd685b97cf633cb7283beab40a484f0d23ab"
+  },
   "non_claims": [
     "NO_CANONICAL_DONE",
     "NO_ALPHA",
@@ -49,7 +62,7 @@
     "github_ci": "ENFORCED_LIVE_AT_GUARDED_MERGE",
     "independent_review": {
       "path": "docs/evidence/early_valuation_liquidity_divergence_confirmation/a1_delivery_independent_review_v1.json",
-      "sha256": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+      "sha256": "0d4450bc7f44429159cb59b0ab6cba769fb358b91fe5cc8a4e4aa1c43e9c5fd6",
       "verdict": "PASS"
     },
     "project_checks": [
