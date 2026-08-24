@@ -57,7 +57,7 @@ X-valid и не даёт median PASS > 0.
 
 `docs/evidence/early_holder_concentration_actionability_rule_oos/a1_phase_a_receipt_v1.json`
 
-SHA-256: `924e6d8087bfe281922aee291cdf16fa3323b09a8a9633ca520a59626b0c2c39`
+SHA-256: `8cbba959465bcbabd997be352b7d3b67e25e082bc15613ec49ef5684051340f9`
 
 `decision_time_eligible_count` = ICP freeze cohort (24 на окно), включая
 X-missing. `x_valid_count` = 22. Coverage D смотрит PASS count, не 24.
