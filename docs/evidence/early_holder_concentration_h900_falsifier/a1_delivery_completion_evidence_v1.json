@@ -9,10 +9,26 @@
   "cloud_bundle_smoke_required": false,
   "factory_fit": {
     "path": "docs/evidence/early_holder_concentration_h900_falsifier/a1_delivery_factory_fit_v1.json",
-    "sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+    "sha256": "af18200bcad3e81d3d3876bf93781bc0276e8ae0e7cd4f3c7ad8da6e744075d8",
     "verdict": "PASS"
   },
-  "implementation_bindings": {},
+  "implementation_bindings": {
+    "catalog/assets/core.yaml": "fd6d3b7f169f35b5bda32516a15e373c5368b8e5d279441bdfc8425a21937c63",
+    "catalog/assets/lifecycle.yaml": "0c7ef6a9d174405c7c7725328749a5ff38dd44df85a4b10fd039737a47caa5b9",
+    "catalog/catalog_manifest.yaml": "63e54f3bdbbece4f68a6673e104367bb21b1548d43bde588012b8c0a58d92394",
+    "catalog/generated/asset_edges.json": "a9babd1a9916258e34aef323c79579be2d9d3cb7c35f43f4f94df13acce1424a",
+    "configs/early_holder_concentration_h900_falsifier_v1.yaml": "af9a4f388cfd5dccb6d4efb4abd06bbd63577b6a9f2d527147c9c705df17ceaa",
+    "docs/PROJECT_MAP.md": "e9b937082c3cc4d349b6fe91f23d203835501b5b545594830af7ea627b9cf2b6",
+    "docs/evidence/early_holder_concentration_h900_falsifier/a1_acceptance_v1.json": "9e73879bb766662ae8838296dfec0a891e8ba87f52d7f3ad7398830d7a042730",
+    "docs/evidence/early_holder_concentration_h900_falsifier/a1_runtime_receipt_v1.json": "7a6f05aadb29ee277d0eaec9379885b5585f1fc369f9d5d959b993ef6982bcef",
+    "docs/reports/early_holder_concentration_h900_falsifier/a1_owner_readout_v1.md": "460a4a99eb09db863cb30c77ba63bf6f845b7d189daff7cbce4ceb71fd63d063",
+    "docs/tasks/EARLY_HOLDER_CONCENTRATION_H900_FALSIFIER_V1.md": "de5ae8008fd0dd7b3d52b037f86dd6d1a3c650a26d5d892eb3c5c62f22263b6b",
+    "scripts/run_early_holder_concentration_h900_falsifier.py": "cff07723affbc3d0af2c72937c76283f67c77905fb8c8ff208036a6b583b17e9",
+    "src/solana_alpha_lab/early_holder_concentration_h900_falsifier.py": "2eb0c85927b30db2cf27c4f2a9cd6ea865891d830075dfda2503df41b8e86114",
+    "src/solana_alpha_lab/ordinary_recent_organic_pressure_h900_audition.py": "de04bca9cb2b9a400df7ec53f2b0258c21da5d00d4645a99fc97f70f9d374b04",
+    "tests/test_early_holder_concentration_h900_falsifier.py": "7ec6d2a36cb16ea0edeae28a0592b2c55644a75a1dc4775711765d2b51fe98d6",
+    "tests/test_ordinary_recent_organic_pressure_h900_audition.py": "ea59557769f792d4cd10a1fd4fbbf16aecbddd422de3f48286981421457c19f7"
+  },
   "non_claims": [
     "NO_CANONICAL_DONE",
     "NO_ALPHA",
@@ -49,7 +65,7 @@
     "github_ci": "ENFORCED_LIVE_AT_GUARDED_MERGE",
     "independent_review": {
       "path": "docs/evidence/early_holder_concentration_h900_falsifier/a1_delivery_independent_review_v1.json",
-      "sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+      "sha256": "880898655bb3e747ec8f066c12912879a33966f900a12f7f9861952b754c9d39",
       "verdict": "PASS"
     },
     "project_checks": [

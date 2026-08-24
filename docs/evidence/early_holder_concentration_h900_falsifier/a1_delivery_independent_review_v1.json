@@ -17,8 +17,8 @@
     "GOAL_DOD_CRITIC"
   ],
   "review_id": "EARLY-HOLDER-CONCENTRATION-H900-INDEPENDENT-REVIEW-001",
-  "reviewed_bindings_sha256": "0000000000000000000000000000000000000000000000000000000000000000",
-  "reviewed_inventory_sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+  "reviewed_bindings_sha256": "44b6da93e79d9fbef413035ad22aab75fbe02ea6575323d8e5afd069861f12cd",
+  "reviewed_inventory_sha256": "92a8df2ef54df1d6f18171f6ced4c114356b6c833ee39fe95eca6af42c1ff0ff",
   "reviews": [
     {
       "findings": [
