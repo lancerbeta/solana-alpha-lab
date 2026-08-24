@@ -28354,7 +28354,7 @@ records:
   as_of: '2026-08-20'
   truth_owner: ORDINARY_RECENT_ORGANIC_PRESSURE_H900_AUDITION_V1
   location: {kind: git_path, logical_uri: 'repo://src/solana_alpha_lab/ordinary_recent_organic_pressure_h900_audition.py', repository_path: src/solana_alpha_lab/ordinary_recent_organic_pressure_h900_audition.py}
-  integrity: {kind: sha256, sha256: de04bca9cb2b9a400df7ec53f2b0258c21da5d00d4645a99fc97f70f9d374b04}
+  integrity: {kind: sha256, sha256: 7b765c300e712dd4c13061c44e9a6b7fed466eb084ae725e09b236bb9665dc49}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: depends_on, target_asset_id: CONFIG-ORDINARY-RECENT-ORGANIC-PRESSURE-H900-AUDITION-001}

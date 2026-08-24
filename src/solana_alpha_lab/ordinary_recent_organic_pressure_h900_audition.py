@@ -434,6 +434,9 @@ def validate_policy(
         "(stats5m.buyOrganicVolume - stats5m.sellOrganicVolume) / top-level liquidity"
     ),
     require_legacy_decision_rule: bool = True,
+    expected_seasoning_seconds: int = SEASONING_SECONDS,
+    expected_direction: str = "NEGATIVE",
+    expected_score_kind: str = "SIGN_ONLY_KENDALL_TAU_B",
 ) -> None:
     _require(policy.get("schema") == expected_schema, "SCHEMA_DRIFT")
     _require(policy.get("schema_version") == "1.0", "SCHEMA_VERSION_DRIFT")
@@ -477,7 +480,7 @@ def validate_policy(
     population = _mapping(policy.get("population"), "POPULATION_INVALID")
     _require(population.get("launchpad") == "pump.fun", "POPULATION_PREDICATE_DRIFT")
     _require(population.get("target_candidates") == TARGET_CANDIDATES, "TARGET_CANDIDATE_DRIFT")
-    _require(population.get("seasoning_seconds") == SEASONING_SECONDS, "SEASONING_DRIFT")
+    _require(population.get("seasoning_seconds") == expected_seasoning_seconds, "SEASONING_DRIFT")
     _require(population.get("prior_mints_required") is True, "PRIOR_MINT_EXCLUSION_NOT_REQUIRED")
     snapshot = _mapping(policy.get("decision_snapshot"), "DECISION_SNAPSHOT_INVALID")
     _require(snapshot.get("source") == "TOKENS_V2_SEARCH_BULK_RESPONSE", "SNAPSHOT_SOURCE_DRIFT")
@@ -502,8 +505,8 @@ def validate_policy(
     else:
         for key in LEGACY_DECISION_KEYS:
             _require(key not in decision_rule, f"LEGACY_DECISION_KEY_FORBIDDEN:{key}")
-        _require(decision_rule.get("expected_direction") == "NEGATIVE", "EXPECTED_DIRECTION_DRIFT")
-        _require(decision_rule.get("score_kind") == "SIGN_ONLY_KENDALL_TAU_B", "SCORE_KIND_DRIFT")
+        _require(decision_rule.get("expected_direction") == expected_direction, "EXPECTED_DIRECTION_DRIFT")
+        _require(decision_rule.get("score_kind") == expected_score_kind, "SCORE_KIND_DRIFT")
         for name in ("close_terminal", "earn_terminal", "invalid_terminal"):
             value = decision_rule.get(name)
             _require(isinstance(value, str) and bool(value), f"DECISION_TERMINAL_DRIFT:{name}")
@@ -653,6 +656,9 @@ def run_campaign(
     score_fn: Any = None,
     require_legacy_decision_rule: bool = True,
     insufficient_yield_terminal: str = "INVALID_EVIDENCE_YIELD",
+    expected_seasoning_seconds: int = SEASONING_SECONDS,
+    expected_direction: str = "NEGATIVE",
+    expected_score_kind: str = "SIGN_ONLY_KENDALL_TAU_B",
 ) -> dict[str, object]:
     validate_policy(
         policy,
@@ -662,6 +668,9 @@ def run_campaign(
         expected_schema=expected_schema,
         expected_x_formula=expected_x_formula,
         require_legacy_decision_rule=require_legacy_decision_rule,
+        expected_seasoning_seconds=expected_seasoning_seconds,
+        expected_direction=expected_direction,
+        expected_score_kind=expected_score_kind,
     )
     authority = _mapping(policy["external_authority"], "AUTHORITY_INVALID")
     _require(authority_phrase == authority.get("owner_phrase") == expected_authority_phrase, "AUTHORITY_PHRASE_INVALID")
@@ -795,7 +804,7 @@ def run_campaign(
             atom_id=atom_id,
             receipt_schema=receipt_schema,
         ) | {"frozen_mints": [str(row["id"]) for row in candidates]}
-    seasoning_due = recent_observed_at + timedelta(seconds=SEASONING_SECONDS)
+    seasoning_due = recent_observed_at + timedelta(seconds=expected_seasoning_seconds)
     for candidate in candidates:
         pool = candidate.get("firstPool")
         if not isinstance(pool, Mapping):
@@ -806,7 +815,7 @@ def run_campaign(
             continue
         if created_at > recent_observed_at:
             continue
-        seasoning_due = max(seasoning_due, created_at + timedelta(seconds=SEASONING_SECONDS))
+        seasoning_due = max(seasoning_due, created_at + timedelta(seconds=expected_seasoning_seconds))
     wait_seconds = (seasoning_due - clock()).total_seconds()
     if wait_seconds > 0:
         waiter(wait_seconds)
