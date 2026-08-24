@@ -1,0 +1,66 @@
+{
+  "as_of": "2026-08-24",
+  "non_claims": [
+    "NO_CRYPTOGRAPHIC_REVIEWER_IDENTITY",
+    "REVIEW_IS_NOT_SEMANTIC_DONE",
+    "NO_CANONICAL_DONE",
+    "NO_SINGLE_AGENT_REVIEW_FALLBACK",
+    "NO_ALPHA",
+    "NO_NETRETURN",
+    "NO_CAUSAL_WAIT_TREATMENT",
+    "NO_AUTOMATIC_SELECTOR_OR_45M_60M"
+  ],
+  "required_roles": [
+    "ARCHITECTURE_CRITIC",
+    "CODE_REVIEWER",
+    "GOAL_DOD_CRITIC"
+  ],
+  "review_id": "SEASONED-30M-H900-BASE-RATE-INDEPENDENT-REVIEW-001",
+  "reviewed_bindings_sha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+  "reviewed_inventory_sha256": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+  "reviews": [
+    {
+      "findings": [
+        "CHECKED_ONE_RUN_CAMPAIGN_WRAP_NO_SECOND_RUNTIME",
+        "CHECKED_DEFAULT_SEASONING_300_CONSUMER_1800",
+        "CHECKED_ELIGIBILITY_MARKER_NOT_SCIENTIFIC_X",
+        "CHECKED_Y_UNADJUSTED_MEU_NON_NUMERIC",
+        "CHECKED_PROVIDER_CLASS_OVERRIDES_FLOOR_DATA",
+        "CHECKED_ONE_WINDOW_CREATE_ONLY",
+        "CHECKED_LIVE_FLOORS_ELIGIBLE_19_RANKABLE_18",
+        "CHECKED_LIVE_POSITIVE_EXECUTABLE_COUNT_ZERO",
+        "CHECKED_EXECUTE_RETRY_FALLBACK_ZERO"
+      ],
+      "role": "CODE_REVIEWER",
+      "verdict": "PASS"
+    },
+    {
+      "findings": [
+        "CHECKED_ESTIMAND_BASE_RATE_NOT_RANKING",
+        "CHECKED_TERMINAL_NO_POSITIVE_MASS_ON_VALID_FLOORS",
+        "CHECKED_NO_AGE_OR_LIQUIDITY_RESCUE",
+        "CHECKED_NO_AUTOMATIC_NEXT_ATOM",
+        "CHECKED_PRE_LIVE_NOT_TREATED_AS_DONE",
+        "CHECKED_FRICTION_FLOOR_DIAGNOSTIC_NOT_CLASSIFIER"
+      ],
+      "role": "GOAL_DOD_CRITIC",
+      "verdict": "PASS"
+    },
+    {
+      "findings": [
+        "CHECKED_FACTORY_RUNNER_UNCHANGED",
+        "CHECKED_NARROW_EXPECTED_SEASONING_SECONDS_SEAM",
+        "CHECKED_QUOTE_NE_FILL",
+        "CHECKED_TASK_LOCAL_POPULATION_NOT_ICP_EARLY",
+        "CHECKED_NO_GENERIC_SCHEDULER",
+        "CHECKED_ONE_BULK_SEARCH_AFTER_SEASONING"
+      ],
+      "role": "ARCHITECTURE_CRITIC",
+      "verdict": "PASS"
+    }
+  ],
+  "schema": "smial.delivery-independent-review-evidence",
+  "schema_version": "1.0",
+  "task_id": "SEASONED_30M_H900_BASE_RATE_PROBE_V1",
+  "verdict": "PASS"
+}

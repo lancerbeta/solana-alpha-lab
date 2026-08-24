@@ -21,6 +21,7 @@ managed_write_set:
 - src/solana_alpha_lab/seasoned_30m_h900_base_rate_probe.py
 - scripts/run_seasoned_30m_h900_base_rate_probe.py
 - tests/test_seasoned_30m_h900_base_rate_probe.py
+- catalog/assets/core.yaml
 - docs/evidence/seasoned_30m_h900_base_rate_probe/a1_runtime_receipt_v1.json
 - docs/evidence/seasoned_30m_h900_base_rate_probe/a1_delivery_completion_evidence_v1.json
 - docs/evidence/seasoned_30m_h900_base_rate_probe/a1_delivery_independent_review_v1.json
@@ -63,7 +64,9 @@ context_requirements:
     ARCHITECTURE_DECISIONS:
     - docs/architecture/intents/ARCH-INTENT-005-factory-v1-operational-readiness-and-owner-experience.md
     DELIVERY_EVIDENCE:
-    - docs/tasks/SEASONED_30M_H900_BASE_RATE_PROBE_V1.md
+    - docs/evidence/seasoned_30m_h900_base_rate_probe/a1_delivery_completion_evidence_v1.json
+    - docs/evidence/seasoned_30m_h900_base_rate_probe/a1_delivery_independent_review_v1.json
+    - docs/evidence/seasoned_30m_h900_base_rate_probe/a1_delivery_factory_fit_v1.json
     HISTORICAL_CONTEXT: []
 ---
 

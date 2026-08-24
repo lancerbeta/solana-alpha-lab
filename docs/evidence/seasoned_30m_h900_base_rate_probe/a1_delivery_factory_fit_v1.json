@@ -1,0 +1,37 @@
+{
+  "as_of": "2026-08-24",
+  "capability_radar": {
+    "now": "NONE",
+    "watch": "DESIGN_ONLY_REFRAME_NO_AUTO_SELECTOR"
+  },
+  "dimensions": {
+    "build_vs_buy": "PASS_ADOPT_RUN_CAMPAIGN_WRAP_ELIGIBILITY_AND_BASE_RATE_SCORER",
+    "context_efficiency": "PASS_SEAM_PLUS_ONE_LIVE_CONSUMER",
+    "execution_to_cashflow": "PASS_QUOTE_ONLY_NO_NETRETURN",
+    "flexibility_and_history": "PASS_RUNNER_UNCHANGED_DEFAULT_300S_PRESERVED",
+    "mission": "PASS_TYPED_NO_POSITIVE_MASS_TERMINAL",
+    "monitoring_and_recovery": "PASS_REVERT_ATOM_KEEP_CONSUMED_MINTS",
+    "owner_operability": "PASS_TYPED_TERMINALS_AND_PHRASE_GATE",
+    "red_team": "PASS_NO_AUTO_SELECTOR_NO_AGE_RESCUE_NO_SHADOW",
+    "research_truth": "PASS_ONE_WINDOW_BASE_RATE_ZERO_POSITIVES_NO_CAUSAL_WAIT_CLAIM",
+    "security": "PASS_PHRASE_GATED_FREE_KEY"
+  },
+  "limits": [
+    "NO_ALPHA",
+    "NO_SHADOW",
+    "NO_CANONICAL_DONE",
+    "NO_CAUSAL_WAIT_TREATMENT",
+    "NO_AUTOMATIC_SELECTOR_OR_45M_60M",
+    "ONE_WINDOW_NOT_REPRESENTATIVE_30_TO_60M_MARKET",
+    "CAPABILITY_PASS_IS_NOT_PROMOTION"
+  ],
+  "mode": "FULL_REVIEW",
+  "recovery": "REVERT_THIS_ATOM; PRESERVE_FACTORY_RUNNER; KEEP_CONSUMED_MINTS_HISTORICAL",
+  "review_id": "SEASONED-30M-H900-BASE-RATE-FACTORY-FIT-001",
+  "reviewed_bindings_sha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+  "reviewed_inventory_sha256": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+  "schema": "smial.delivery-harness-factory-fit",
+  "schema_version": "1.0",
+  "task_id": "SEASONED_30M_H900_BASE_RATE_PROBE_V1",
+  "verdict": "PASS"
+}
