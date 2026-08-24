@@ -508,6 +508,16 @@
       "target_asset_id": "CTRL-DELIVERY-HARNESS-001"
     },
     {
+      "source_asset_id": "CONFIG-EARLY-HOLDER-CONCENTRATION-H900-FALSIFIER-001",
+      "relation": "depends_on",
+      "target_asset_id": "CONFIG-PROVIDER-ROUTE-CAPABILITY-REGISTRY-010"
+    },
+    {
+      "source_asset_id": "CONFIG-EARLY-HOLDER-CONCENTRATION-H900-FALSIFIER-001",
+      "relation": "governed_by",
+      "target_asset_id": "CTRL-EARLY-HOLDER-CONCENTRATION-H900-FALSIFIER-001"
+    },
+    {
       "source_asset_id": "CONFIG-EARLY-ICP-FREEZE-AND-MATURITY-BRANCH-CLOSE-001",
       "relation": "governed_by",
       "target_asset_id": "CTRL-EARLY-ICP-FREEZE-AND-MATURITY-BRANCH-CLOSE-001"
@@ -2211,6 +2221,36 @@
       "source_asset_id": "CTRL-DELIVERY-HARNESS-001",
       "relation": "validated_by",
       "target_asset_id": "TEST-DELIVERY-HARNESS-001"
+    },
+    {
+      "source_asset_id": "CTRL-EARLY-HOLDER-CONCENTRATION-H900-FALSIFIER-001",
+      "relation": "contains",
+      "target_asset_id": "CONFIG-EARLY-HOLDER-CONCENTRATION-H900-FALSIFIER-001"
+    },
+    {
+      "source_asset_id": "CTRL-EARLY-HOLDER-CONCENTRATION-H900-FALSIFIER-001",
+      "relation": "contains",
+      "target_asset_id": "MODULE-EARLY-HOLDER-CONCENTRATION-H900-FALSIFIER-001"
+    },
+    {
+      "source_asset_id": "CTRL-EARLY-HOLDER-CONCENTRATION-H900-FALSIFIER-001",
+      "relation": "contains",
+      "target_asset_id": "SCRIPT-EARLY-HOLDER-CONCENTRATION-H900-FALSIFIER-001"
+    },
+    {
+      "source_asset_id": "CTRL-EARLY-HOLDER-CONCENTRATION-H900-FALSIFIER-001",
+      "relation": "depends_on",
+      "target_asset_id": "MODULE-ORDINARY-RECENT-ORGANIC-PRESSURE-H900-AUDITION-001"
+    },
+    {
+      "source_asset_id": "CTRL-EARLY-HOLDER-CONCENTRATION-H900-FALSIFIER-001",
+      "relation": "derived_from",
+      "target_asset_id": "EVIDENCE-EARLY-HOLDER-CONCENTRATION-H900-RUNTIME-001"
+    },
+    {
+      "source_asset_id": "CTRL-EARLY-HOLDER-CONCENTRATION-H900-FALSIFIER-001",
+      "relation": "validated_by",
+      "target_asset_id": "TEST-EARLY-HOLDER-CONCENTRATION-H900-FALSIFIER-001"
     },
     {
       "source_asset_id": "CTRL-EARLY-ICP-FREEZE-AND-MATURITY-BRANCH-CLOSE-001",
@@ -3991,6 +4031,46 @@
       "source_asset_id": "EVIDENCE-DELIVERY-HARNESS-INDEPENDENT-REVIEW-001",
       "relation": "validated_by",
       "target_asset_id": "TEST-DELIVERY-HARNESS-001"
+    },
+    {
+      "source_asset_id": "EVIDENCE-EARLY-HOLDER-CONCENTRATION-H900-ACCEPTANCE-001",
+      "relation": "derived_from",
+      "target_asset_id": "CTRL-EARLY-HOLDER-CONCENTRATION-H900-FALSIFIER-001"
+    },
+    {
+      "source_asset_id": "EVIDENCE-EARLY-HOLDER-CONCENTRATION-H900-DELIVERY-COMPLETION-001",
+      "relation": "depends_on",
+      "target_asset_id": "EVIDENCE-EARLY-HOLDER-CONCENTRATION-H900-DELIVERY-FACTORY-FIT-001"
+    },
+    {
+      "source_asset_id": "EVIDENCE-EARLY-HOLDER-CONCENTRATION-H900-DELIVERY-COMPLETION-001",
+      "relation": "depends_on",
+      "target_asset_id": "EVIDENCE-EARLY-HOLDER-CONCENTRATION-H900-DELIVERY-INDEPENDENT-REVIEW-001"
+    },
+    {
+      "source_asset_id": "EVIDENCE-EARLY-HOLDER-CONCENTRATION-H900-DELIVERY-COMPLETION-001",
+      "relation": "derived_from",
+      "target_asset_id": "EVIDENCE-EARLY-HOLDER-CONCENTRATION-H900-ACCEPTANCE-001"
+    },
+    {
+      "source_asset_id": "EVIDENCE-EARLY-HOLDER-CONCENTRATION-H900-DELIVERY-FACTORY-FIT-001",
+      "relation": "depends_on",
+      "target_asset_id": "EVIDENCE-EARLY-HOLDER-CONCENTRATION-H900-DELIVERY-INDEPENDENT-REVIEW-001"
+    },
+    {
+      "source_asset_id": "EVIDENCE-EARLY-HOLDER-CONCENTRATION-H900-DELIVERY-FACTORY-FIT-001",
+      "relation": "derived_from",
+      "target_asset_id": "EVIDENCE-EARLY-HOLDER-CONCENTRATION-H900-ACCEPTANCE-001"
+    },
+    {
+      "source_asset_id": "EVIDENCE-EARLY-HOLDER-CONCENTRATION-H900-DELIVERY-INDEPENDENT-REVIEW-001",
+      "relation": "derived_from",
+      "target_asset_id": "EVIDENCE-EARLY-HOLDER-CONCENTRATION-H900-ACCEPTANCE-001"
+    },
+    {
+      "source_asset_id": "EVIDENCE-EARLY-HOLDER-CONCENTRATION-H900-RUNTIME-001",
+      "relation": "derived_from",
+      "target_asset_id": "EVIDENCE-EARLY-HOLDER-CONCENTRATION-H900-ACCEPTANCE-001"
     },
     {
       "source_asset_id": "EVIDENCE-EARLY-ICP-FREEZE-ACCEPTANCE-001",
@@ -8393,6 +8473,16 @@
       "target_asset_id": "CTRL-QUOTE-SURFACE-RETENTION-CLOCK-QUALIFY-001"
     },
     {
+      "source_asset_id": "MODULE-EARLY-HOLDER-CONCENTRATION-H900-FALSIFIER-001",
+      "relation": "depends_on",
+      "target_asset_id": "CONFIG-EARLY-HOLDER-CONCENTRATION-H900-FALSIFIER-001"
+    },
+    {
+      "source_asset_id": "MODULE-EARLY-HOLDER-CONCENTRATION-H900-FALSIFIER-001",
+      "relation": "depends_on",
+      "target_asset_id": "MODULE-ORDINARY-RECENT-ORGANIC-PRESSURE-H900-AUDITION-001"
+    },
+    {
       "source_asset_id": "MODULE-EARLY-ICP-FREEZE-ACCEPTANCE-001",
       "relation": "depends_on",
       "target_asset_id": "CONFIG-EARLY-ICP-FREEZE-AND-MATURITY-BRANCH-CLOSE-001"
@@ -11423,6 +11513,16 @@
       "target_asset_id": "TEST-DELIVERY-HARNESS-001"
     },
     {
+      "source_asset_id": "SCRIPT-EARLY-HOLDER-CONCENTRATION-H900-FALSIFIER-001",
+      "relation": "depends_on",
+      "target_asset_id": "MODULE-EARLY-HOLDER-CONCENTRATION-H900-FALSIFIER-001"
+    },
+    {
+      "source_asset_id": "SCRIPT-EARLY-HOLDER-CONCENTRATION-H900-FALSIFIER-001",
+      "relation": "governed_by",
+      "target_asset_id": "CTRL-EARLY-HOLDER-CONCENTRATION-H900-FALSIFIER-001"
+    },
+    {
       "source_asset_id": "SCRIPT-EARLY-ICP-FREEZE-RUNNER-001",
       "relation": "depends_on",
       "target_asset_id": "MODULE-EARLY-ICP-FREEZE-ACCEPTANCE-001"
@@ -12336,6 +12436,11 @@
       "source_asset_id": "TEST-DELIVERY-HARNESS-001",
       "relation": "depends_on",
       "target_asset_id": "POLICY-OWNER-ATTENTION-GATE-002"
+    },
+    {
+      "source_asset_id": "TEST-EARLY-HOLDER-CONCENTRATION-H900-FALSIFIER-001",
+      "relation": "depends_on",
+      "target_asset_id": "MODULE-EARLY-HOLDER-CONCENTRATION-H900-FALSIFIER-001"
     },
     {
       "source_asset_id": "TEST-EARLY-ICP-FREEZE-ACCEPTANCE-001",
