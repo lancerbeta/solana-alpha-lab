@@ -28354,7 +28354,7 @@ records:
   as_of: '2026-08-20'
   truth_owner: ORDINARY_RECENT_ORGANIC_PRESSURE_H900_AUDITION_V1
   location: {kind: git_path, logical_uri: 'repo://src/solana_alpha_lab/ordinary_recent_organic_pressure_h900_audition.py', repository_path: src/solana_alpha_lab/ordinary_recent_organic_pressure_h900_audition.py}
-  integrity: {kind: sha256, sha256: dbf9af28e32ab450c1f98153f5ecabb0234d45b4963be731681c931c8b343916}
+  integrity: {kind: sha256, sha256: de04bca9cb2b9a400df7ec53f2b0258c21da5d00d4645a99fc97f70f9d374b04}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: depends_on, target_asset_id: CONFIG-ORDINARY-RECENT-ORGANIC-PRESSURE-H900-AUDITION-001}
@@ -28390,7 +28390,7 @@ records:
   as_of: '2026-08-20'
   truth_owner: ORDINARY_RECENT_ORGANIC_PRESSURE_H900_AUDITION_V1
   location: {kind: git_path, logical_uri: 'repo://tests/test_ordinary_recent_organic_pressure_h900_audition.py', repository_path: tests/test_ordinary_recent_organic_pressure_h900_audition.py}
-  integrity: {kind: sha256, sha256: 8b0da0632d216f13ef88bcb8d71d486f2dc34028b1154788e6ea3b2bceb06dfa}
+  integrity: {kind: sha256, sha256: ea59557769f792d4cd10a1fd4fbbf16aecbddd422de3f48286981421457c19f7}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations: [{relation_type: depends_on, target_asset_id: MODULE-ORDINARY-RECENT-ORGANIC-PRESSURE-H900-AUDITION-001}]
   consumers: [FACTORY-001, GOAL-OWNER]
@@ -30998,4 +30998,185 @@ records:
   consumers: [FACTORY-001, GOAL-OWNER]
   evidence: []
   search_terms: [EARLY, VALUATION, DIVERGENCE, COMPLETION]
+  classification: {contains_secrets: false, contains_raw_data: false, sensitivity: INTERNAL_NON_SECRET}
+- asset_id: CTRL-EARLY-HOLDER-CONCENTRATION-H900-FALSIFIER-001
+  record_version: '1.0'
+  asset_type: control_document
+  purpose: Exact contract for EARLY holder-concentration H900 sign-only PIT falsifier.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-08-24'
+  truth_owner: EARLY_HOLDER_CONCENTRATION_H900_FALSIFIER_V1
+  location: {kind: git_path, logical_uri: 'repo://docs/tasks/EARLY_HOLDER_CONCENTRATION_H900_FALSIFIER_V1.md', repository_path: docs/tasks/EARLY_HOLDER_CONCENTRATION_H900_FALSIFIER_V1.md}
+  integrity: {kind: sha256, sha256: de5ae8008fd0dd7b3d52b037f86dd6d1a3c650a26d5d892eb3c5c62f22263b6b}
+  access: {mode: read_only, method: file, network_required: false, secrets_required: false}
+  relations:
+  - {relation_type: contains, target_asset_id: CONFIG-EARLY-HOLDER-CONCENTRATION-H900-FALSIFIER-001}
+  - {relation_type: contains, target_asset_id: MODULE-EARLY-HOLDER-CONCENTRATION-H900-FALSIFIER-001}
+  - {relation_type: contains, target_asset_id: SCRIPT-EARLY-HOLDER-CONCENTRATION-H900-FALSIFIER-001}
+  - {relation_type: validated_by, target_asset_id: TEST-EARLY-HOLDER-CONCENTRATION-H900-FALSIFIER-001}
+  - {relation_type: derived_from, target_asset_id: EVIDENCE-EARLY-HOLDER-CONCENTRATION-H900-RUNTIME-001}
+  - {relation_type: depends_on, target_asset_id: MODULE-ORDINARY-RECENT-ORGANIC-PRESSURE-H900-AUDITION-001}
+  consumers: [FACTORY-001, GOAL-OWNER]
+  evidence: []
+  search_terms: [EARLY, HOLDER, CONCENTRATION, PIT, TASK_CONTRACT]
+  classification: {contains_secrets: false, contains_raw_data: false, sensitivity: INTERNAL_NON_SECRET}
+- asset_id: CONFIG-EARLY-HOLDER-CONCENTRATION-H900-FALSIFIER-001
+  record_version: '1.0'
+  asset_type: configuration
+  purpose: Frozen one-snapshot topHoldersPercentage policy, ICP population and sign-only score.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-08-24'
+  truth_owner: EARLY_HOLDER_CONCENTRATION_H900_FALSIFIER_V1
+  location: {kind: git_path, logical_uri: 'repo://configs/early_holder_concentration_h900_falsifier_v1.yaml', repository_path: configs/early_holder_concentration_h900_falsifier_v1.yaml}
+  integrity: {kind: sha256, sha256: af9a4f388cfd5dccb6d4efb4abd06bbd63577b6a9f2d527147c9c705df17ceaa}
+  access: {mode: read_only, method: file, network_required: false, secrets_required: false}
+  relations:
+  - {relation_type: governed_by, target_asset_id: CTRL-EARLY-HOLDER-CONCENTRATION-H900-FALSIFIER-001}
+  - {relation_type: depends_on, target_asset_id: CONFIG-PROVIDER-ROUTE-CAPABILITY-REGISTRY-010}
+  consumers: [FACTORY-001, GOAL-OWNER]
+  evidence: []
+  search_terms: [EARLY, HOLDER, CONCENTRATION, CONFIG]
+  classification: {contains_secrets: false, contains_raw_data: false, sensitivity: INTERNAL_NON_SECRET}
+- asset_id: MODULE-EARLY-HOLDER-CONCENTRATION-H900-FALSIFIER-001
+  record_version: '1.0'
+  asset_type: script
+  purpose: WRAP projector for audit.topHoldersPercentage without a new campaign runtime.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-08-24'
+  truth_owner: EARLY_HOLDER_CONCENTRATION_H900_FALSIFIER_V1
+  location: {kind: git_path, logical_uri: 'repo://src/solana_alpha_lab/early_holder_concentration_h900_falsifier.py', repository_path: src/solana_alpha_lab/early_holder_concentration_h900_falsifier.py}
+  integrity: {kind: sha256, sha256: 2eb0c85927b30db2cf27c4f2a9cd6ea865891d830075dfda2503df41b8e86114}
+  access: {mode: read_only, method: file, network_required: false, secrets_required: false}
+  relations:
+  - {relation_type: depends_on, target_asset_id: CONFIG-EARLY-HOLDER-CONCENTRATION-H900-FALSIFIER-001}
+  - {relation_type: depends_on, target_asset_id: MODULE-ORDINARY-RECENT-ORGANIC-PRESSURE-H900-AUDITION-001}
+  consumers: [FACTORY-001, GOAL-OWNER]
+  evidence: []
+  search_terms: [EARLY, HOLDER, CONCENTRATION, MODULE]
+  classification: {contains_secrets: false, contains_raw_data: false, sensitivity: INTERNAL_NON_SECRET}
+- asset_id: SCRIPT-EARLY-HOLDER-CONCENTRATION-H900-FALSIFIER-001
+  record_version: '1.0'
+  asset_type: script
+  purpose: Phrase-gated CLI for one holder-concentration H900 PIT window.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-08-24'
+  truth_owner: EARLY_HOLDER_CONCENTRATION_H900_FALSIFIER_V1
+  location: {kind: git_path, logical_uri: 'repo://scripts/run_early_holder_concentration_h900_falsifier.py', repository_path: scripts/run_early_holder_concentration_h900_falsifier.py}
+  integrity: {kind: sha256, sha256: cff07723affbc3d0af2c72937c76283f67c77905fb8c8ff208036a6b583b17e9}
+  access: {mode: read_only, method: file, network_required: false, secrets_required: false}
+  relations:
+  - {relation_type: governed_by, target_asset_id: CTRL-EARLY-HOLDER-CONCENTRATION-H900-FALSIFIER-001}
+  - {relation_type: depends_on, target_asset_id: MODULE-EARLY-HOLDER-CONCENTRATION-H900-FALSIFIER-001}
+  consumers: [FACTORY-001, GOAL-OWNER]
+  evidence: []
+  search_terms: [EARLY, HOLDER, CONCENTRATION, CLI]
+  classification: {contains_secrets: false, contains_raw_data: false, sensitivity: INTERNAL_NON_SECRET}
+- asset_id: TEST-EARLY-HOLDER-CONCENTRATION-H900-FALSIFIER-001
+  record_version: '1.0'
+  asset_type: script
+  purpose: Zero-network tests for holder X missingness, sign-only Kendall and runner pin.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-08-24'
+  truth_owner: EARLY_HOLDER_CONCENTRATION_H900_FALSIFIER_V1
+  location: {kind: git_path, logical_uri: 'repo://tests/test_early_holder_concentration_h900_falsifier.py', repository_path: tests/test_early_holder_concentration_h900_falsifier.py}
+  integrity: {kind: sha256, sha256: 7ec6d2a36cb16ea0edeae28a0592b2c55644a75a1dc4775711765d2b51fe98d6}
+  access: {mode: read_only, method: file, network_required: false, secrets_required: false}
+  relations:
+  - {relation_type: depends_on, target_asset_id: MODULE-EARLY-HOLDER-CONCENTRATION-H900-FALSIFIER-001}
+  consumers: [FACTORY-001, GOAL-OWNER]
+  evidence: []
+  search_terms: [EARLY, HOLDER, CONCENTRATION, TEST]
+  classification: {contains_secrets: false, contains_raw_data: false, sensitivity: INTERNAL_NON_SECRET}
+- asset_id: EVIDENCE-EARLY-HOLDER-CONCENTRATION-H900-ACCEPTANCE-001
+  record_version: '1.0'
+  asset_type: evidence
+  purpose: Live one-window acceptance; confirmatory OOS earned on negative sign-only tau_b.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-08-24'
+  truth_owner: EARLY_HOLDER_CONCENTRATION_H900_FALSIFIER_V1
+  location: {kind: git_path, logical_uri: 'repo://docs/evidence/early_holder_concentration_h900_falsifier/a1_acceptance_v1.json', repository_path: docs/evidence/early_holder_concentration_h900_falsifier/a1_acceptance_v1.json}
+  integrity: {kind: sha256, sha256: 9e73879bb766662ae8838296dfec0a891e8ba87f52d7f3ad7398830d7a042730}
+  access: {mode: read_only, method: file, network_required: false, secrets_required: false}
+  relations:
+  - {relation_type: derived_from, target_asset_id: CTRL-EARLY-HOLDER-CONCENTRATION-H900-FALSIFIER-001}
+  consumers: [FACTORY-001, GOAL-OWNER]
+  evidence: []
+  search_terms: [EARLY, HOLDER, CONCENTRATION, ACCEPTANCE]
+  classification: {contains_secrets: false, contains_raw_data: false, sensitivity: INTERNAL_NON_SECRET}
+- asset_id: EVIDENCE-EARLY-HOLDER-CONCENTRATION-H900-RUNTIME-001
+  record_version: '1.0'
+  asset_type: evidence
+  purpose: One-window live receipt for topHoldersPercentage vs H900; raw bodies remain outside Git.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-08-24'
+  truth_owner: EARLY_HOLDER_CONCENTRATION_H900_FALSIFIER_V1
+  location: {kind: git_path, logical_uri: 'repo://docs/evidence/early_holder_concentration_h900_falsifier/a1_runtime_receipt_v1.json', repository_path: docs/evidence/early_holder_concentration_h900_falsifier/a1_runtime_receipt_v1.json}
+  integrity: {kind: sha256, sha256: 7a6f05aadb29ee277d0eaec9379885b5585f1fc369f9d5d959b993ef6982bcef}
+  access: {mode: read_only, method: file, network_required: false, secrets_required: false}
+  relations:
+  - {relation_type: derived_from, target_asset_id: EVIDENCE-EARLY-HOLDER-CONCENTRATION-H900-ACCEPTANCE-001}
+  consumers: [FACTORY-001, GOAL-OWNER]
+  evidence: []
+  search_terms: [EARLY, HOLDER, CONCENTRATION, RUNTIME]
+  classification: {contains_secrets: false, contains_raw_data: false, sensitivity: INTERNAL_NON_SECRET}
+- asset_id: EVIDENCE-EARLY-HOLDER-CONCENTRATION-H900-DELIVERY-INDEPENDENT-REVIEW-001
+  record_version: '1.0'
+  asset_type: evidence
+  purpose: Isolated code, goal/DoD and architecture review for the holder-concentration atom.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-08-24'
+  truth_owner: EARLY_HOLDER_CONCENTRATION_H900_FALSIFIER_V1
+  location: {kind: git_path, logical_uri: 'repo://docs/evidence/early_holder_concentration_h900_falsifier/a1_delivery_independent_review_v1.json', repository_path: docs/evidence/early_holder_concentration_h900_falsifier/a1_delivery_independent_review_v1.json}
+  integrity: {kind: none, note: 'Content integrity is owned by the live completion-review-fit hash chain; embedding its SHA here would create an indirect self-reference through the reviewed inventory.'}
+  access: {mode: read_only, method: file, network_required: false, secrets_required: false}
+  relations:
+  - {relation_type: derived_from, target_asset_id: EVIDENCE-EARLY-HOLDER-CONCENTRATION-H900-ACCEPTANCE-001}
+  consumers: [FACTORY-001, GOAL-OWNER]
+  evidence: []
+  search_terms: [EARLY, HOLDER, CONCENTRATION, REVIEW]
+  classification: {contains_secrets: false, contains_raw_data: false, sensitivity: INTERNAL_NON_SECRET}
+- asset_id: EVIDENCE-EARLY-HOLDER-CONCENTRATION-H900-DELIVERY-FACTORY-FIT-001
+  record_version: '1.0'
+  asset_type: evidence
+  purpose: Factory Fit for WRAP score_fn composition with runner unchanged.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-08-24'
+  truth_owner: EARLY_HOLDER_CONCENTRATION_H900_FALSIFIER_V1
+  location: {kind: git_path, logical_uri: 'repo://docs/evidence/early_holder_concentration_h900_falsifier/a1_delivery_factory_fit_v1.json', repository_path: docs/evidence/early_holder_concentration_h900_falsifier/a1_delivery_factory_fit_v1.json}
+  integrity: {kind: none, note: 'Content integrity is owned by the live completion-review-fit hash chain; embedding its SHA here would create an indirect self-reference through the reviewed inventory.'}
+  access: {mode: read_only, method: file, network_required: false, secrets_required: false}
+  relations:
+  - {relation_type: derived_from, target_asset_id: EVIDENCE-EARLY-HOLDER-CONCENTRATION-H900-ACCEPTANCE-001}
+  - {relation_type: depends_on, target_asset_id: EVIDENCE-EARLY-HOLDER-CONCENTRATION-H900-DELIVERY-INDEPENDENT-REVIEW-001}
+  consumers: [FACTORY-001, GOAL-OWNER]
+  evidence: []
+  search_terms: [EARLY, HOLDER, CONCENTRATION, FACTORY_FIT]
+  classification: {contains_secrets: false, contains_raw_data: false, sensitivity: INTERNAL_NON_SECRET}
+- asset_id: EVIDENCE-EARLY-HOLDER-CONCENTRATION-H900-DELIVERY-COMPLETION-001
+  record_version: '1.0'
+  asset_type: evidence
+  purpose: Guard-consumable completion evidence before the exact-head merge gate.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-08-24'
+  truth_owner: EARLY_HOLDER_CONCENTRATION_H900_FALSIFIER_V1
+  location: {kind: git_path, logical_uri: 'repo://docs/evidence/early_holder_concentration_h900_falsifier/a1_delivery_completion_evidence_v1.json', repository_path: docs/evidence/early_holder_concentration_h900_falsifier/a1_delivery_completion_evidence_v1.json}
+  integrity: {kind: none, note: 'Content integrity is owned by the live completion-review-fit hash chain; embedding its SHA here would create an indirect self-reference through the reviewed inventory.'}
+  access: {mode: read_only, method: file, network_required: false, secrets_required: false}
+  relations:
+  - {relation_type: derived_from, target_asset_id: EVIDENCE-EARLY-HOLDER-CONCENTRATION-H900-ACCEPTANCE-001}
+  - {relation_type: depends_on, target_asset_id: EVIDENCE-EARLY-HOLDER-CONCENTRATION-H900-DELIVERY-INDEPENDENT-REVIEW-001}
+  - {relation_type: depends_on, target_asset_id: EVIDENCE-EARLY-HOLDER-CONCENTRATION-H900-DELIVERY-FACTORY-FIT-001}
+  consumers: [FACTORY-001, GOAL-OWNER]
+  evidence: []
+  search_terms: [EARLY, HOLDER, CONCENTRATION, COMPLETION]
   classification: {contains_secrets: false, contains_raw_data: false, sensitivity: INTERNAL_NON_SECRET}

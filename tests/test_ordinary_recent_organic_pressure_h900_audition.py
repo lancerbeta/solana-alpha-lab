@@ -25,6 +25,7 @@ from solana_alpha_lab.ordinary_recent_organic_pressure_h900_audition import (  #
     project_organic_pressure,
     run_campaign,
     score_audition,
+    score_sign_only_kendall,
     select_frozen_candidates,
     validate_policy,
 )
@@ -598,6 +599,191 @@ class OrganicPressureAuditionTests(unittest.TestCase):
             body_files = list(raw_root.rglob("*.body"))
             self.assertEqual([path for path in body_files if "BUY_T0" in path.name], [])
             self.assertTrue(all(b"forbidden-transaction-bytes" not in path.read_bytes() for path in body_files))
+
+    def test_sign_only_kendall_uses_negative_direction_without_quartile_or_loo(self) -> None:
+        negative = [
+            {
+                "mint": f"mint-{index:02d}",
+                "x": float(index),
+                "h900_terminal": "QUOTE_OBSERVED",
+                "y": float(23 - index),
+            }
+            for index in range(18)
+        ]
+        earned = score_sign_only_kendall(
+            negative,
+            min_decision_time_eligible=18,
+            min_rankable_h900=14,
+            expected_direction="NEGATIVE",
+            close_terminal="CLOSE_HOLDER_CONCENTRATION_FAMILY",
+            earn_terminal="EARN_ONE_CONFIRMATORY_FRESH_OOS",
+            invalid_terminal="INVALID_EVIDENCE_REPLAN",
+        )
+        self.assertLess(earned["tau_b"], 0)
+        self.assertEqual(earned["terminal"], "EARN_ONE_CONFIRMATORY_FRESH_OOS")
+        self.assertEqual(earned["score_kind"], "SIGN_ONLY_KENDALL_TAU_B")
+        self.assertIsNone(earned["top_quartile_median_y"])
+        self.assertIsNone(earned["leave_one_out_positive_share"])
+
+        positive = [
+            {
+                "mint": f"mint-{index:02d}",
+                "x": float(index),
+                "h900_terminal": "QUOTE_OBSERVED",
+                "y": float(index),
+            }
+            for index in range(18)
+        ]
+        closed = score_sign_only_kendall(
+            positive,
+            min_decision_time_eligible=18,
+            min_rankable_h900=14,
+            expected_direction="NEGATIVE",
+            close_terminal="CLOSE_HOLDER_CONCENTRATION_FAMILY",
+            earn_terminal="EARN_ONE_CONFIRMATORY_FRESH_OOS",
+            invalid_terminal="INVALID_EVIDENCE_REPLAN",
+        )
+        self.assertGreaterEqual(closed["tau_b"], 0)
+        self.assertEqual(closed["terminal"], "CLOSE_HOLDER_CONCENTRATION_FAMILY")
+
+        short = negative[:16]
+        invalid = score_sign_only_kendall(
+            short,
+            min_decision_time_eligible=18,
+            min_rankable_h900=14,
+            expected_direction="NEGATIVE",
+            close_terminal="CLOSE_HOLDER_CONCENTRATION_FAMILY",
+            earn_terminal="EARN_ONE_CONFIRMATORY_FRESH_OOS",
+            invalid_terminal="INVALID_EVIDENCE_REPLAN",
+        )
+        self.assertEqual(invalid["terminal"], "INVALID_EVIDENCE_REPLAN")
+        self.assertIsNone(invalid["tau_b"])
+
+        singleton = [
+            {"mint": "mint-00", "x": 1.0, "h900_terminal": "QUOTE_OBSERVED", "y": 0.1}
+        ]
+        degenerate = score_sign_only_kendall(
+            singleton,
+            min_decision_time_eligible=0,
+            min_rankable_h900=0,
+            expected_direction="NEGATIVE",
+            close_terminal="CLOSE_HOLDER_CONCENTRATION_FAMILY",
+            earn_terminal="EARN_ONE_CONFIRMATORY_FRESH_OOS",
+            invalid_terminal="INVALID_EVIDENCE_REPLAN",
+        )
+        self.assertIsNone(degenerate["tau_b"])
+        self.assertEqual(degenerate["terminal"], "INVALID_EVIDENCE_REPLAN")
+
+        tied_x = [
+            {
+                "mint": f"mint-{index:02d}",
+                "x": 12.5,
+                "h900_terminal": "QUOTE_OBSERVED",
+                "y": float(index),
+            }
+            for index in range(18)
+        ]
+        undefined = score_sign_only_kendall(
+            tied_x,
+            min_decision_time_eligible=18,
+            min_rankable_h900=14,
+            expected_direction="NEGATIVE",
+            close_terminal="CLOSE_HOLDER_CONCENTRATION_FAMILY",
+            earn_terminal="EARN_ONE_CONFIRMATORY_FRESH_OOS",
+            invalid_terminal="INVALID_EVIDENCE_REPLAN",
+        )
+        self.assertIsNone(undefined["tau_b"])
+        self.assertEqual(undefined["terminal"], "INVALID_EVIDENCE_REPLAN")
+
+        with self.assertRaisesRegex(OrganicPressureError, "EXPECTED_DIRECTION_UNSUPPORTED"):
+            score_sign_only_kendall(
+                negative,
+                min_decision_time_eligible=18,
+                min_rankable_h900=14,
+                expected_direction="POSITIVE",
+                close_terminal="CLOSE",
+                earn_terminal="EARN",
+                invalid_terminal="INVALID",
+            )
+
+    def test_injected_score_fn_replaces_legacy_scorer_without_changing_default_path(self) -> None:
+        policy = yaml.safe_load(CONFIG_PATH.read_text(encoding="utf-8"))
+        self.assertIsInstance(policy, dict)
+        candidates = [
+            {
+                "id": f"mint-{index:02d}",
+                "launchpad": "pump.fun",
+                "liquidity": 1000.0,
+                "stats5m": {
+                    "buyOrganicVolume": 100.0 + index,
+                    "sellOrganicVolume": 10.0,
+                },
+                "firstPool": {"createdAt": "2026-08-20T12:00:00Z"},
+                "updatedAt": "2026-08-20T12:05:00Z",
+            }
+            for index in range(24)
+        ]
+
+        def injected(rows: list[dict[str, object]]) -> dict[str, object]:
+            return {
+                "terminal": "INJECTED_TERMINAL",
+                "decision_time_eligible": 24,
+                "rankable_h900": len(rows),
+                "tau_b": -0.5,
+                "score_kind": "SIGN_ONLY_KENDALL_TAU_B",
+            }
+
+        clock = _Clock()
+        injected_receipt = run_campaign(
+            policy,
+            authority_phrase=AUTHORITY_PHRASE,
+            reservation={"state": "STARTED", "credential_reads": 0},
+            excluded_mints={"prior"},
+            credential_loader=lambda: "test-free-key-not-a-secret",
+            preflight_fn=lambda *_args, **_kwargs: {"credential_reads": 0},
+            opener=_CampaignOpener(candidates),
+            clock=clock.now,
+            sleeper=clock.sleep,
+            score_fn=injected,
+        )
+        self.assertEqual(injected_receipt["terminal_outcome"], "INJECTED_TERMINAL")
+        self.assertEqual(injected_receipt["score"]["score_kind"], "SIGN_ONLY_KENDALL_TAU_B")
+
+        default_clock = _Clock()
+        default_receipt = run_campaign(
+            policy,
+            authority_phrase=AUTHORITY_PHRASE,
+            reservation={"state": "STARTED", "credential_reads": 0},
+            excluded_mints={"prior"},
+            credential_loader=lambda: "test-free-key-not-a-secret",
+            preflight_fn=lambda *_args, **_kwargs: {"credential_reads": 0},
+            opener=_CampaignOpener(candidates),
+            clock=default_clock.now,
+            sleeper=default_clock.sleep,
+        )
+        self.assertIn(
+            default_receipt["terminal_outcome"],
+            {"EARN_FRESH_OOS", "CLOSE_ORGANIC_PRESSURE_CANDIDATE"},
+        )
+        self.assertIn("top_quartile_median_y", default_receipt["score"])
+        self.assertNotEqual(default_receipt["terminal_outcome"], "INJECTED_TERMINAL")
+
+    def test_structural_backing_wrapper_keeps_legacy_scorer_default(self) -> None:
+        import inspect
+
+        from solana_alpha_lab.early_structural_backing_pit_commissioning import (
+            run_structural_backing_campaign,
+        )
+
+        source = inspect.getsource(run_structural_backing_campaign)
+        self.assertNotIn("score_fn", source)
+        self.assertIn("project_x=project_structural_backing", source)
+
+    def test_non_legacy_policy_forbids_tau_quartile_loo_keys(self) -> None:
+        policy = yaml.safe_load(CONFIG_PATH.read_text(encoding="utf-8"))
+        self.assertIsInstance(policy, dict)
+        with self.assertRaisesRegex(OrganicPressureError, "LEGACY_DECISION_KEY_FORBIDDEN:tau_b_floor"):
+            validate_policy(policy, root=ROOT, require_legacy_decision_rule=False)
 
 
 if __name__ == "__main__":
