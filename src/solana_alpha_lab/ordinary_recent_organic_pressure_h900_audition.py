@@ -782,7 +782,7 @@ def run_campaign(
     )
     if len(candidates) != TARGET_CANDIDATES:
         return _failure_receipt(
-            terminal="INVALID_EVIDENCE_YIELD",
+            terminal=insufficient_yield_terminal,
             preflight=preflight,
             credential_reads=credential_reads,
             provider_requests=provider_requests,

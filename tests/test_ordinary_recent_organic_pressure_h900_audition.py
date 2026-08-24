@@ -747,6 +747,17 @@ class OrganicPressureAuditionTests(unittest.TestCase):
         self.assertIn("top_quartile_median_y", default_receipt["score"])
         self.assertNotEqual(default_receipt["terminal_outcome"], "INJECTED_TERMINAL")
 
+    def test_structural_backing_wrapper_keeps_legacy_scorer_default(self) -> None:
+        import inspect
+
+        from solana_alpha_lab.early_structural_backing_pit_commissioning import (
+            run_structural_backing_campaign,
+        )
+
+        source = inspect.getsource(run_structural_backing_campaign)
+        self.assertNotIn("score_fn", source)
+        self.assertIn("project_x=project_structural_backing", source)
+
     def test_non_legacy_policy_forbids_tau_quartile_loo_keys(self) -> None:
         policy = yaml.safe_load(CONFIG_PATH.read_text(encoding="utf-8"))
         self.assertIsInstance(policy, dict)

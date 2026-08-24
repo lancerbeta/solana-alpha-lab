@@ -24,6 +24,8 @@ if str(SRC) not in sys.path:
 from solana_alpha_lab.early_holder_concentration_h900_falsifier import (  # noqa: E402
     ATOM_ID,
     AUTHORITY_PHRASE,
+    CLOSE_TERMINAL,
+    EARN_TERMINAL,
     RECEIPT_SCHEMA,
     run_holder_concentration_campaign,
     validate_holder_concentration_policy,
@@ -271,6 +273,10 @@ def _owner_next_for_terminal(terminal: str) -> str:
     return "INVALID_EVIDENCE_REPLAN_DISTINGUISH_DATA_VS_RUNTIME_NO_AUTOMATIC_RETRY"
 
 
+def owner_exit_blocked(terminal: str) -> bool:
+    return terminal not in {CLOSE_TERMINAL, EARN_TERMINAL}
+
+
 def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(
         description=__doc__,
@@ -324,7 +330,7 @@ def main() -> int:
         return 2
     terminal = str(receipt.get("terminal_outcome") or "INVALID_EVIDENCE_REPLAN")
     error_code = str(receipt.get("terminal_error_code") or "")
-    blocked = terminal == "INVALID_EVIDENCE_REPLAN"
+    blocked = owner_exit_blocked(terminal)
     print(
         json.dumps(
             {

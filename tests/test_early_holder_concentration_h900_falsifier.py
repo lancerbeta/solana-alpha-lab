@@ -214,6 +214,22 @@ class HolderConcentrationFalsifierTests(unittest.TestCase):
         )
         self.assertEqual(too_old["status"], "TOO_OLD")
 
+        future_pool = project_holder_concentration(
+            recent,
+            _row(0, created_at="2026-08-24T12:10:00Z", updated_at="2026-08-24T12:10:00Z"),
+            observed_at,
+        )
+        self.assertEqual(future_pool["status"], "MISSING")
+        self.assertEqual(future_pool["reason"], "FIRST_POOL_TIMESTAMP_IN_FUTURE")
+
+        future_updated = project_holder_concentration(
+            recent,
+            _row(0, created_at="2026-08-24T11:55:00Z", updated_at="2026-08-24T12:06:00Z"),
+            observed_at,
+        )
+        self.assertEqual(future_updated["status"], "MISSING")
+        self.assertEqual(future_updated["reason"], "UPDATED_TIMESTAMP_IN_FUTURE")
+
         low_liq = project_holder_concentration(recent, _row(0, liquidity=500.0), observed_at)
         self.assertEqual(low_liq["status"], "MISSING")
         self.assertEqual(low_liq["reason"], "LIQUIDITY_BELOW_ICP_MIN")
@@ -308,6 +324,34 @@ class HolderConcentrationFalsifierTests(unittest.TestCase):
         self.assertEqual(receipt["terminal_outcome"], INVALID_TERMINAL)
         self.assertEqual(receipt["decision_time_eligible"], 0)
         self.assertLess(receipt["provider_requests"], 10)
+
+    def test_short_frozen_cohort_is_invalid_evidence_replan_not_yield(self) -> None:
+        policy = yaml.safe_load(CONFIG_PATH.read_text(encoding="utf-8"))
+        recent = [_row(index) for index in range(10)]
+        search = [_row(index) for index in range(10)]
+        clock = _Clock()
+        receipt = run_holder_concentration_campaign(
+            policy,
+            authority_phrase=AUTHORITY_PHRASE,
+            reservation={"state": "STARTED", "credential_reads": 0},
+            excluded_mints={"prior"},
+            credential_loader=lambda: "test-key",
+            preflight_fn=lambda *_args, **_kwargs: {"credential_reads": 0, "provider_requests": 0},
+            opener=_PathOpener(recent, search),
+            clock=clock.now,
+            sleeper=clock.sleep,
+            monotonic_clock=lambda: 0.0,
+        )
+        self.assertEqual(receipt["terminal_outcome"], INVALID_TERMINAL)
+        self.assertNotEqual(receipt["terminal_outcome"], "INVALID_EVIDENCE_YIELD")
+
+    def test_cli_blocks_non_close_non_earn_terminals(self) -> None:
+        from scripts.run_early_holder_concentration_h900_falsifier import owner_exit_blocked
+
+        self.assertFalse(owner_exit_blocked(CLOSE_TERMINAL))
+        self.assertFalse(owner_exit_blocked(EARN_TERMINAL))
+        self.assertTrue(owner_exit_blocked(INVALID_TERMINAL))
+        self.assertTrue(owner_exit_blocked("INVALID_EVIDENCE_YIELD"))
 
 
 if __name__ == "__main__":

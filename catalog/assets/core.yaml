@@ -28354,7 +28354,7 @@ records:
   as_of: '2026-08-20'
   truth_owner: ORDINARY_RECENT_ORGANIC_PRESSURE_H900_AUDITION_V1
   location: {kind: git_path, logical_uri: 'repo://src/solana_alpha_lab/ordinary_recent_organic_pressure_h900_audition.py', repository_path: src/solana_alpha_lab/ordinary_recent_organic_pressure_h900_audition.py}
-  integrity: {kind: sha256, sha256: cebd838399e32565740eaf0840ee39c192965b3fb14fe094c36748a78adcbd03}
+  integrity: {kind: sha256, sha256: de388a0b01734236abb24ce8c7a798996d137e15cc3c8a89ffdbc0fd02b1df29}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: depends_on, target_asset_id: CONFIG-ORDINARY-RECENT-ORGANIC-PRESSURE-H900-AUDITION-001}
@@ -28390,7 +28390,7 @@ records:
   as_of: '2026-08-20'
   truth_owner: ORDINARY_RECENT_ORGANIC_PRESSURE_H900_AUDITION_V1
   location: {kind: git_path, logical_uri: 'repo://tests/test_ordinary_recent_organic_pressure_h900_audition.py', repository_path: tests/test_ordinary_recent_organic_pressure_h900_audition.py}
-  integrity: {kind: sha256, sha256: 2b2a7c73acd07293160f4129da351ee828e2a43ecc446de0b1b1393bdae813a2}
+  integrity: {kind: sha256, sha256: 05ca5f9dbd62a71aefb310065254d83808c71562f63094979c14aa48b8189af6}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations: [{relation_type: depends_on, target_asset_id: MODULE-ORDINARY-RECENT-ORGANIC-PRESSURE-H900-AUDITION-001}]
   consumers: [FACTORY-001, GOAL-OWNER]
