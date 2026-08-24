@@ -49,13 +49,13 @@
   "schema_version": "1.0",
   "side_effects": {
     "cash_spend_usd_cents": 0,
-    "credential_reads": 0,
+    "credential_reads": 1,
     "fallbacks": 0,
-    "provider_requests": 0,
+    "provider_requests": 47,
     "retries": 0,
     "wallet_signer_transaction_actions": 0
   },
-  "state_change": "OFFLINE_COMPOSITION_READY_LIVE_CAPTURE_REQUIRES_PHRASE",
+  "state_change": "CLOSE_VALUATION_LIQUIDITY_DIVERGENCE_FAMILY",
   "task_id": "EARLY_VALUATION_LIQUIDITY_DIVERGENCE_CONFIRMATION_V1",
   "validation": {
     "full_gate": "ENFORCED_BY_PROJECT_BOUND_VALIDATION",

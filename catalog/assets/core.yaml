@@ -30825,13 +30825,14 @@ records:
   as_of: '2026-08-24'
   truth_owner: EARLY_VALUATION_LIQUIDITY_DIVERGENCE_CONFIRMATION_V1
   location: {kind: git_path, logical_uri: 'repo://docs/tasks/EARLY_VALUATION_LIQUIDITY_DIVERGENCE_CONFIRMATION_V1.md', repository_path: docs/tasks/EARLY_VALUATION_LIQUIDITY_DIVERGENCE_CONFIRMATION_V1.md}
-  integrity: {kind: sha256, sha256: e364e1a24bb0c4b7619511cb889c3c796900f5b686d8ef9543bfcb08e75cab30}
+  integrity: {kind: sha256, sha256: 0777ee5be4365b6eb6bd6f795bcda05614a198d1919ebf35ff432f95ab81ca2f}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: contains, target_asset_id: CONFIG-EARLY-VALUATION-LIQUIDITY-DIVERGENCE-CONFIRMATION-001}
   - {relation_type: contains, target_asset_id: MODULE-EARLY-VALUATION-LIQUIDITY-DIVERGENCE-CONFIRMATION-001}
   - {relation_type: contains, target_asset_id: SCRIPT-EARLY-VALUATION-LIQUIDITY-DIVERGENCE-CONFIRMATION-001}
   - {relation_type: validated_by, target_asset_id: TEST-EARLY-VALUATION-LIQUIDITY-DIVERGENCE-CONFIRMATION-001}
+  - {relation_type: derived_from, target_asset_id: EVIDENCE-EARLY-VALUATION-LIQUIDITY-DIVERGENCE-RUNTIME-001}
   - {relation_type: depends_on, target_asset_id: MODULE-ORDINARY-MARKET-PIT-PRIMARY-X-001}
   - {relation_type: depends_on, target_asset_id: MODULE-ORDINARY-RECENT-ORGANIC-PRESSURE-H900-AUDITION-001}
   consumers: [FACTORY-001, GOAL-OWNER]
@@ -30913,19 +30914,36 @@ records:
 - asset_id: EVIDENCE-EARLY-VALUATION-LIQUIDITY-DIVERGENCE-ACCEPTANCE-001
   record_version: '1.0'
   asset_type: evidence
-  purpose: Offline composition acceptance; live capture blocked until exact owner phrase.
+  purpose: Live one-window acceptance; family closed on nonpositive sign-only tau_b.
   status: IMPLEMENTED_UNVERIFIED
   origin: REPOSITORY
   as_of: '2026-08-24'
   truth_owner: EARLY_VALUATION_LIQUIDITY_DIVERGENCE_CONFIRMATION_V1
   location: {kind: git_path, logical_uri: 'repo://docs/evidence/early_valuation_liquidity_divergence_confirmation/a1_acceptance_v1.json', repository_path: docs/evidence/early_valuation_liquidity_divergence_confirmation/a1_acceptance_v1.json}
-  integrity: {kind: sha256, sha256: dae5d63f90b5ce3e82cf989bb6e131b95fd8ee36b66ceef101123f98d8bf34d6}
+  integrity: {kind: sha256, sha256: 65db145dec3361f75a0db3e05a86b64d2f93429f95d778b11059bffd7b4d90df}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: derived_from, target_asset_id: CTRL-EARLY-VALUATION-LIQUIDITY-DIVERGENCE-CONFIRMATION-001}
   consumers: [FACTORY-001, GOAL-OWNER]
   evidence: []
   search_terms: [EARLY, VALUATION, DIVERGENCE, ACCEPTANCE]
+  classification: {contains_secrets: false, contains_raw_data: false, sensitivity: INTERNAL_NON_SECRET}
+- asset_id: EVIDENCE-EARLY-VALUATION-LIQUIDITY-DIVERGENCE-RUNTIME-001
+  record_version: '1.0'
+  asset_type: evidence
+  purpose: One-window live receipt for ln(R1/R0) vs H900; raw bodies remain outside Git.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-08-24'
+  truth_owner: EARLY_VALUATION_LIQUIDITY_DIVERGENCE_CONFIRMATION_V1
+  location: {kind: git_path, logical_uri: 'repo://docs/evidence/early_valuation_liquidity_divergence_confirmation/a1_runtime_receipt_v1.json', repository_path: docs/evidence/early_valuation_liquidity_divergence_confirmation/a1_runtime_receipt_v1.json}
+  integrity: {kind: sha256, sha256: a8c8df4a7c02a8e6cf4d2be2fe004f2cfbff170efcf5645064788ea20f12db63}
+  access: {mode: read_only, method: file, network_required: false, secrets_required: false}
+  relations:
+  - {relation_type: derived_from, target_asset_id: EVIDENCE-EARLY-VALUATION-LIQUIDITY-DIVERGENCE-ACCEPTANCE-001}
+  consumers: [FACTORY-001, GOAL-OWNER]
+  evidence: []
+  search_terms: [EARLY, VALUATION, DIVERGENCE, RUNTIME]
   classification: {contains_secrets: false, contains_raw_data: false, sensitivity: INTERNAL_NON_SECRET}
 - asset_id: EVIDENCE-EARLY-VALUATION-LIQUIDITY-DIVERGENCE-DELIVERY-INDEPENDENT-REVIEW-001
   record_version: '1.0'

@@ -29,6 +29,7 @@ managed_write_set:
 - docs/PROJECT_MAP.md
 - docs/OPERATOR_NAVIGATION.md
 - docs/evidence/early_valuation_liquidity_divergence_confirmation/a1_acceptance_v1.json
+- docs/evidence/early_valuation_liquidity_divergence_confirmation/a1_runtime_receipt_v1.json
 - docs/evidence/early_valuation_liquidity_divergence_confirmation/a1_delivery_completion_evidence_v1.json
 - docs/evidence/early_valuation_liquidity_divergence_confirmation/a1_delivery_independent_review_v1.json
 - docs/evidence/early_valuation_liquidity_divergence_confirmation/a1_delivery_factory_fit_v1.json

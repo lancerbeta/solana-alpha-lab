@@ -2,84 +2,44 @@
 
 ## Verdict
 
-`OFFLINE_COMPOSITION_READY_LIVE_CAPTURE_REQUIRES_PHRASE`
+`CLOSE_VALUATION_LIQUIDITY_DIVERGENCE_FAMILY`
 
-Entry Gate: `START_WITH_PATCH`. Это не повтор закрытой семьи
-EARLY_STRUCTURAL_BACKING: там тестировали абсолютный уровень
-`liquidity/mcap`; здесь — фиксированное изменение `X = ln(R1/R0)` на двух
-prospective snapshots через 300s. Factory runner не менялся.
+Одно authorized Jupiter Free-key окно завершено. Sign-only Kendall tau_b
+`X = ln(R1/R0)` против quote-only H900 Y отрицательный:
 
-Discovery / A7 выключены. Положительный первый sample не даёт SHADOW, alpha,
-поиска порога, второго интервала, нового провайдера, кошелька или micro-live.
+- `tau_b = -0.08035714285714286`
+- decision-time eligible: 22 (пол 10)
+- rankable H900: 20 (пол 8)
+- 2 non-rankable: BUY `QUOTE_OBSERVED`, SELL H900 `MARKET_EXECUTION_UNAVAILABLE`, `Y=null`
+- provider requests: 47 / 60
+- credential reads: 1
+- execute / taker / wallet / signer / tx: 0
+- quartile / LOO / `tau_b_floor=0.20`: не открывались
 
-## Что готово
+Закрытая семья EARLY_STRUCTURAL_BACKING тестировала уровень. Этот candidate
+тестировал temporal change и тоже не дал положительного знака.
 
-- YAML policy + WRAP projector + CLI.
-- Zero-network тесты: temporal ≠ level; UNKNOWN≠0; fdv reject; R0 age;
-  R1 liquidity floor; `createdAt` mismatch; typed stop →
-  `INVALID_EVIDENCE_REPLAN`; неверная фраза читает 0 credentials; два search
-  вызова; `run_campaign` не вызывается; sign-only score.
-- Live capture остаётся за той же exact owner-phrase. Отдельного
-  подготовительного атома нет.
+Discovery / A7 / SHADOW / alpha / Window B / confirmatory OOS — нет.
 
-## Что не сделано
+## Runtime receipt
 
-Свежего provider read нет. Научного терминала ещё нет.
+`docs/evidence/early_valuation_liquidity_divergence_confirmation/a1_runtime_receipt_v1.json`
 
-## Единственные научные терминалы
+SHA-256: `a8c8df4a7c02a8e6cf4d2be2fe004f2cfbff170efcf5645064788ea20f12db63`
 
-После одной authorized window ровно один из трёх:
+Raw provider bodies остаются вне Git.
 
-- `CLOSE_VALUATION_LIQUIDITY_DIVERGENCE_FAMILY`
-- `INVALID_EVIDENCE_REPLAN`
-- `EARN_ONE_CONFIRMATORY_FRESH_OOS`
+## Что дальше
 
-CLI печатает `owner_state=DONE|BLOCKED`, `terminal_outcome` и `next`.
-`INVALID_EVIDENCE_REPLAN` и pre-campaign ошибки дают exit 2.
+Не строить ничего вокруг этой гипотезы. Не прыгать к следующей идее.
 
-## Live capture
+Короткий Factory economics check (owner, не новый software atom):
 
-`JUPITER_API_KEY` уже должен быть в process environment. Не читать `.env`.
-Не вставлять ключ в команду, URL, лог, receipt или Git.
+следующая prospective temporal hypothesis выражается через уже появившийся
+machinery без нового campaign module, или это реальный Factory gap?
 
-`--excluded-mints-file` — локальный файл вне Git, непустой JSON:
-
-```json
-{"mints":["<prior-consumed-mint>"]}
-```
-
-Список — все ранее consumed mints. Пустой или битый файл =
-`PRIOR_MINT_EXCLUSION_INPUT_INVALID` → `INVALID_EVIDENCE_REPLAN`.
-
-На PowerShell фразу передавать **single-quoted**: в тексте есть `$0` и `;`.
-Double-quoted строка разъедет точное совпадение.
-
-Одно окно. После reservation процесс молча ждёт ~300s, затем ~900s.
-Не перезапускать и не жать Ctrl+C, чтобы «попробовать ещё раз»:
-повтор = `CREATE_ONLY_EXISTS` → `INVALID_EVIDENCE_REPLAN`, reservation
-уже сожжена.
-
-Exact owner phrase:
-
-```
-OK EARLY_VALUATION_LIQUIDITY_DIVERGENCE_CONFIRMATION_V1: one bounded Jupiter Free-key read-only PIT campaign using a local process-environment key only; Tokens V2 /recent plus two bulk /tokens/v2/search snapshots 300s apart plus quote-only /swap/v2/order; x-api-key header only; no .env read, no key in URL/log/receipt/Git, no taker, /build, /execute, wallet, signer, transaction, paid plan, second provider, retry or fallback; cash cap $0; call cap 60; global provider pace >=3s; ICP-EARLY-PUMPFUN-V1 fresh mints only excluding all prior consumed mints; X = ln(R1/R0) from FEAT-TOKEN-LIQUIDITY-USD-TO-MCAP-RATIO at two prospective search snapshots (mcap != fdv; UNKNOWN never zero); no closed-family threshold, window or quartile reopen; quote-only BUY after the second snapshot and quote-only SELL at H900; one window only; Factory runner unchanged; Discovery, A7, Strategy, Bot, Shadow, alpha, NetReturn and micro-live forbidden.
-```
-
-PowerShell live command (подставить локальный excluded-mints path; фраза уже
-в single quotes):
-
-```
-uv run --locked --managed-python python -B scripts/run_early_valuation_liquidity_divergence_confirmation.py --owner-phrase 'OK EARLY_VALUATION_LIQUIDITY_DIVERGENCE_CONFIRMATION_V1: one bounded Jupiter Free-key read-only PIT campaign using a local process-environment key only; Tokens V2 /recent plus two bulk /tokens/v2/search snapshots 300s apart plus quote-only /swap/v2/order; x-api-key header only; no .env read, no key in URL/log/receipt/Git, no taker, /build, /execute, wallet, signer, transaction, paid plan, second provider, retry or fallback; cash cap $0; call cap 60; global provider pace >=3s; ICP-EARLY-PUMPFUN-V1 fresh mints only excluding all prior consumed mints; X = ln(R1/R0) from FEAT-TOKEN-LIQUIDITY-USD-TO-MCAP-RATIO at two prospective search snapshots (mcap != fdv; UNKNOWN never zero); no closed-family threshold, window or quartile reopen; quote-only BUY after the second snapshot and quote-only SELL at H900; one window only; Factory runner unchanged; Discovery, A7, Strategy, Bot, Shadow, alpha, NetReturn and micro-live forbidden.' --excluded-mints-file local/excluded-mints.json
-```
-
-## Merge phrase
-
-После exact-head CI, не раньше. Owner никогда не нажимает GitHub Merge.
-Шаблон (N и 40-hex подставятся после PR):
-
-```
-PR #<N>, head <40-hex> проверен; ready + merge разрешаю.
-```
+Merge этого PR — только чтобы зафиксировать scientific terminal на `main`.
+Новая merge-фраза понадобится после exact-head CI на новом head.
 
 ## Non-claims
 
