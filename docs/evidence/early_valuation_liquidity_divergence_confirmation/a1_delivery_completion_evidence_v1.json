@@ -62,7 +62,7 @@
     "github_ci": "ENFORCED_LIVE_AT_GUARDED_MERGE",
     "independent_review": {
       "path": "docs/evidence/early_valuation_liquidity_divergence_confirmation/a1_delivery_independent_review_v1.json",
-      "sha256": "0d4450bc7f44429159cb59b0ab6cba769fb358b91fe5cc8a4e4aa1c43e9c5fd6",
+      "sha256": "4e78b3e3ffe006fd9bbac9893218eb022492d7e86a38c62c07358471a539d0ba",
       "verdict": "PASS"
     },
     "project_checks": [
