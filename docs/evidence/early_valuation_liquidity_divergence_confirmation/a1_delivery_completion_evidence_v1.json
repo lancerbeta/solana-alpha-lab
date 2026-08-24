@@ -9,19 +9,20 @@
   "cloud_bundle_smoke_required": false,
   "factory_fit": {
     "path": "docs/evidence/early_valuation_liquidity_divergence_confirmation/a1_delivery_factory_fit_v1.json",
-    "sha256": "02d5a8082b1ec19e0be4b578d17ce48429e5737b554b3fc1256621915c0f4719",
+    "sha256": "ef75a4789876c7d6f536be2406f07a580e027ab19e5660dd0f27bbe18a5129ce",
     "verdict": "PASS"
   },
   "implementation_bindings": {
-    "catalog/assets/core.yaml": "59347bed7daf9798f4a64152a8ab5c4c547230d8aadbeac03b1f0c3d47c51e68",
-    "catalog/assets/lifecycle.yaml": "cc19ee9246cab9a81985bdd9e26a61e970319293174c522027596c8ac33b5aef",
-    "catalog/catalog_manifest.yaml": "3ae1debb9e229cc7df085815f9c1c4fdbf69757208d68b8c300a6c7a5d4c2c46",
-    "catalog/generated/asset_edges.json": "a670cc5fac5f999450f8544d41fa273e7e26b8308cc0a28212b28a0d6adf319f",
+    "catalog/assets/core.yaml": "9ca78b79ad3b9c30289ac2bf16f580f7fc343b7e14b6ba126f12144f565ac51e",
+    "catalog/assets/lifecycle.yaml": "b63f2718be26dc85f9f0bbb603fb3bac37a4932626e99fd1e88d3180fb9f0f88",
+    "catalog/catalog_manifest.yaml": "0c8f895f664fe938a8f8399548488e0ef8e04b6bac4a35bfd3abf8dcb214f36c",
+    "catalog/generated/asset_edges.json": "737e8fb06cf29e1159a6e7e0ecd7c247016bfa630a305460027dbe58964bb668",
     "configs/early_valuation_liquidity_divergence_confirmation_v1.yaml": "14d446310edc025ad7b64c24bb42f0a43276539e85165c4ed9b548cc56a52942",
-    "docs/PROJECT_MAP.md": "69566b9240b19513e112cd790c9a2665d564e6169c9b119c4b0de4311c2289a2",
-    "docs/evidence/early_valuation_liquidity_divergence_confirmation/a1_acceptance_v1.json": "dae5d63f90b5ce3e82cf989bb6e131b95fd8ee36b66ceef101123f98d8bf34d6",
-    "docs/reports/early_valuation_liquidity_divergence_confirmation/a1_owner_readout_v1.md": "78fa760ad8d032484d96991fc6435a758d785bd7de4804bb900a9dc97312dbdf",
-    "docs/tasks/EARLY_VALUATION_LIQUIDITY_DIVERGENCE_CONFIRMATION_V1.md": "e364e1a24bb0c4b7619511cb889c3c796900f5b686d8ef9543bfcb08e75cab30",
+    "docs/PROJECT_MAP.md": "b57665c4e5745956bc053f5102d6df2fddaf68fd5e5a58726dca09bd7921b681",
+    "docs/evidence/early_valuation_liquidity_divergence_confirmation/a1_acceptance_v1.json": "65db145dec3361f75a0db3e05a86b64d2f93429f95d778b11059bffd7b4d90df",
+    "docs/evidence/early_valuation_liquidity_divergence_confirmation/a1_runtime_receipt_v1.json": "a8c8df4a7c02a8e6cf4d2be2fe004f2cfbff170efcf5645064788ea20f12db63",
+    "docs/reports/early_valuation_liquidity_divergence_confirmation/a1_owner_readout_v1.md": "e2f0b7e5229bf5fd126902f998b53e701b1db7905813637e8e3c5a8ff797778a",
+    "docs/tasks/EARLY_VALUATION_LIQUIDITY_DIVERGENCE_CONFIRMATION_V1.md": "0777ee5be4365b6eb6bd6f795bcda05614a198d1919ebf35ff432f95ab81ca2f",
     "scripts/run_early_valuation_liquidity_divergence_confirmation.py": "70c15d472b3cfa0ce28151b374fcb46f8a6b0296a5111c7f11227b99183a4e74",
     "src/solana_alpha_lab/early_valuation_liquidity_divergence_confirmation.py": "1a2fa6fa9748093607f937cd5f0f19f9119b73594769b570a22a4f8e103486e2",
     "tests/test_early_valuation_liquidity_divergence_confirmation.py": "b5768575324f87dc6082743329fffd685b97cf633cb7283beab40a484f0d23ab"
@@ -62,7 +63,7 @@
     "github_ci": "ENFORCED_LIVE_AT_GUARDED_MERGE",
     "independent_review": {
       "path": "docs/evidence/early_valuation_liquidity_divergence_confirmation/a1_delivery_independent_review_v1.json",
-      "sha256": "4e78b3e3ffe006fd9bbac9893218eb022492d7e86a38c62c07358471a539d0ba",
+      "sha256": "9eb62dd8ab0e569f36f8b1e2a39c4a6793a2846009e9f23dd6c8b4b103505c2f",
       "verdict": "PASS"
     },
     "project_checks": [
