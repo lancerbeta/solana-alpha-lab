@@ -1,0 +1,42 @@
+{
+  "acceptance_id": "EARLY-HOLDER-CONCENTRATION-H900-CONFIRMATORY-ACCEPTANCE-001",
+  "as_of": "2026-08-24",
+  "cloud_bundle_mode": "OWNER_MANAGED_OPTIONAL_EXPORT",
+  "composition": "ADOPT_EXISTING_WRAPPER_IDENTITY_ALLOWLIST",
+  "entry_verdict": "START_AS_WRITTEN",
+  "factory_runner_sha256": "d8d22bcb51fb6992d40f09e58274c52e0f9942c12d043cc57b96ffca524e918f",
+  "limitations": {
+    "jupiter_top_holders_pool_exclusion": "UNKNOWN"
+  },
+  "live_capture": "ONE_WINDOW_COMPLETED",
+  "next_safe_action": "STOP_DESIGN_ONLY_HOLDER_CONCENTRATION_ACTIONABILITY_ADJUDICATION",
+  "non_claims": [
+    "NO_ALPHA",
+    "NO_NETRETURN",
+    "NO_EXECUTE",
+    "NO_SHADOW",
+    "NO_DISCOVERY_OR_A7",
+    "NO_THIRD_SAMPLE",
+    "NO_THRESHOLD_OR_ACTIONABLE_RULE",
+    "NO_CANONICAL_DONE"
+  ],
+  "product_composition": "PASS_EXISTING_CAMPAIGN_NO_FACTORY_RUNNER_CHANGE",
+  "project_sources_disposition": {
+    "kind": "NO_CHANGE"
+  },
+  "promotable": false,
+  "provider_requests": 46,
+  "runtime_receipt_sha256": "9fd3408ff9e18ecda9fde0108c6d217fd4a3819738d0b4a0bb2129bcbaec895a",
+  "schema": "smial.early-holder-concentration-h900-falsifier-acceptance",
+  "schema_version": "1.0",
+  "scientific_terminal": "HOLDER_CONCENTRATION_MECHANISM_REPLICATED",
+  "score": {
+    "decision_time_eligible": 22,
+    "rankable_h900": 18,
+    "score_kind": "SIGN_ONLY_KENDALL_TAU_B",
+    "tau_b": -0.16468280637257554
+  },
+  "task_id": "EARLY_HOLDER_CONCENTRATION_H900_CONFIRMATORY_OOS_V1",
+  "verdict": "HOLDER_CONCENTRATION_MECHANISM_REPLICATED",
+  "x_formula": "audit.topHoldersPercentage"
+}

@@ -1,0 +1,3239 @@
+{
+  "atom_id": "EARLY_HOLDER_CONCENTRATION_H900_CONFIRMATORY_OOS_V1",
+  "attempt_reservation": {
+    "atom_id": "EARLY_HOLDER_CONCENTRATION_H900_CONFIRMATORY_OOS_V1",
+    "credential_reads": 0,
+    "policy_sha256": "41d490d9d4862dd61d3d31c264523cefd2536ebf16d4b798ca646ca24a4876e9",
+    "provider_requests": 0,
+    "reservation_sha256": "b6fb14fb7ca313f5b0378fe1446a4c5f3530f01c1fa1eb3fa3d1391c93673c8d",
+    "schema": "smial.early-holder-concentration-h900-falsifier.attempt-reservation",
+    "schema_version": "1.0",
+    "started_at": "2026-08-24T14:15:30Z",
+    "state": "STARTED",
+    "window": "ONE"
+  },
+  "candidate_observations": [
+    {
+      "age_seconds": 306.0,
+      "decision_snapshot_at": "2026-08-24T14:20:30Z",
+      "mint": "2bSKSNrkD7xyMxuZVD8CxMWwmEMmqKCJragXjA8cpump",
+      "x": 1.4666353712718,
+      "x_inputs": {
+        "audit.topHoldersPercentage": 1.4666353712718,
+        "firstPool.createdAt": "2026-08-24T14:15:24Z",
+        "launchpad": "pump.fun",
+        "liquidity": 2907.6257732374092,
+        "updatedAt": "2026-08-24T14:17:54.821493121Z"
+      },
+      "x_reason": null,
+      "x_source": {
+        "field_paths": [
+          "audit.topHoldersPercentage",
+          "liquidity",
+          "firstPool.createdAt",
+          "updatedAt",
+          "launchpad"
+        ],
+        "observation_id": "DISCOVERY:SEARCH_T5",
+        "recent_response_sha256": "3ed5438a6c8af4bd4d94fb731bb2421b4fd2c61b4845ede02944df62e24f926c",
+        "recent_row_sha256": "37f68c7856c0fb5f3d69bd3054fefb1a4219f362181d85532052c4b34663bfe0",
+        "response_sha256": "9e6e074210fe5e6d5e6e04a96fddd9b9e90230199384fdba8fa5688713c3be83",
+        "row_mint": "2bSKSNrkD7xyMxuZVD8CxMWwmEMmqKCJragXjA8cpump",
+        "row_sha256": "3a9996c92c44d4a6a891de03a2b9f2d2818ff295142b2b2232c9627df450b859"
+      },
+      "x_status": "ELIGIBLE"
+    },
+    {
+      "age_seconds": 312.0,
+      "decision_snapshot_at": "2026-08-24T14:20:30Z",
+      "mint": "QnPzHXbzu8PPrJUVv61JxygNigkNmJ4cKJag3U2pump",
+      "x": 24.69129387274193,
+      "x_inputs": {
+        "audit.topHoldersPercentage": 24.69129387274193,
+        "firstPool.createdAt": "2026-08-24T14:15:18Z",
+        "launchpad": "pump.fun",
+        "liquidity": 1178.8047078695208,
+        "updatedAt": "2026-08-24T14:20:29.872148519Z"
+      },
+      "x_reason": null,
+      "x_source": {
+        "field_paths": [
+          "audit.topHoldersPercentage",
+          "liquidity",
+          "firstPool.createdAt",
+          "updatedAt",
+          "launchpad"
+        ],
+        "observation_id": "DISCOVERY:SEARCH_T5",
+        "recent_response_sha256": "3ed5438a6c8af4bd4d94fb731bb2421b4fd2c61b4845ede02944df62e24f926c",
+        "recent_row_sha256": "78ef7b1ddabbc63410da53dcbaa2716a6d7a70db545faee1d6211ce0c70481bd",
+        "response_sha256": "9e6e074210fe5e6d5e6e04a96fddd9b9e90230199384fdba8fa5688713c3be83",
+        "row_mint": "QnPzHXbzu8PPrJUVv61JxygNigkNmJ4cKJag3U2pump",
+        "row_sha256": "80645ccb0e490bdeb84fa550f1d109043c51c586ed3b70f337403bf92a1faa45"
+      },
+      "x_status": "ELIGIBLE"
+    },
+    {
+      "age_seconds": 313.0,
+      "decision_snapshot_at": "2026-08-24T14:20:30Z",
+      "mint": "G87oWxD7n3vTP2d9mFrsdM52fa1p9eB8e16hbg4mpump",
+      "x": 9.754545454545399,
+      "x_inputs": {
+        "audit.topHoldersPercentage": 9.754545454545399,
+        "firstPool.createdAt": "2026-08-24T14:15:17Z",
+        "launchpad": "pump.fun",
+        "liquidity": 2862.9740537377547,
+        "updatedAt": "2026-08-24T14:16:46.618490096Z"
+      },
+      "x_reason": null,
+      "x_source": {
+        "field_paths": [
+          "audit.topHoldersPercentage",
+          "liquidity",
+          "firstPool.createdAt",
+          "updatedAt",
+          "launchpad"
+        ],
+        "observation_id": "DISCOVERY:SEARCH_T5",
+        "recent_response_sha256": "3ed5438a6c8af4bd4d94fb731bb2421b4fd2c61b4845ede02944df62e24f926c",
+        "recent_row_sha256": "a355728762428dbec68f64acde857da660afaffe23b2dde14b6c1b0c1c851e43",
+        "response_sha256": "9e6e074210fe5e6d5e6e04a96fddd9b9e90230199384fdba8fa5688713c3be83",
+        "row_mint": "G87oWxD7n3vTP2d9mFrsdM52fa1p9eB8e16hbg4mpump",
+        "row_sha256": "10d2383e394d53a8dcea71c526109eb624cd9cbcbb92eafde3590469a1411610"
+      },
+      "x_status": "ELIGIBLE"
+    },
+    {
+      "age_seconds": 314.0,
+      "decision_snapshot_at": "2026-08-24T14:20:30Z",
+      "mint": "GzAJTJRD8VyWNHbr6Lw3gaUS8XNYLKj19igBnphspump",
+      "x": 3.4199203154141005,
+      "x_inputs": {
+        "audit.topHoldersPercentage": 3.4199203154141005,
+        "firstPool.createdAt": "2026-08-24T14:15:16Z",
+        "launchpad": "pump.fun",
+        "liquidity": 2866.056620881006,
+        "updatedAt": "2026-08-24T14:16:33.337492146Z"
+      },
+      "x_reason": null,
+      "x_source": {
+        "field_paths": [
+          "audit.topHoldersPercentage",
+          "liquidity",
+          "firstPool.createdAt",
+          "updatedAt",
+          "launchpad"
+        ],
+        "observation_id": "DISCOVERY:SEARCH_T5",
+        "recent_response_sha256": "3ed5438a6c8af4bd4d94fb731bb2421b4fd2c61b4845ede02944df62e24f926c",
+        "recent_row_sha256": "3522a3f1a3ccdeeb73660ff999e0cc5a9c0c1dd7d78537412ebf622e28c0f9e0",
+        "response_sha256": "9e6e074210fe5e6d5e6e04a96fddd9b9e90230199384fdba8fa5688713c3be83",
+        "row_mint": "GzAJTJRD8VyWNHbr6Lw3gaUS8XNYLKj19igBnphspump",
+        "row_sha256": "8365de061d4ed4d3adeef30885461961c5737338cc8377bc8c25206d4c6c7bd9"
+      },
+      "x_status": "ELIGIBLE"
+    },
+    {
+      "age_seconds": 317.0,
+      "decision_snapshot_at": "2026-08-24T14:20:30Z",
+      "mint": "GmirbJAfC5xe2TmfP44RrVqKygAgtyZAFQhwjtLtpump",
+      "x": 5.422768150032,
+      "x_inputs": {
+        "audit.topHoldersPercentage": 5.422768150032,
+        "firstPool.createdAt": "2026-08-24T14:15:13Z",
+        "launchpad": "pump.fun",
+        "liquidity": 2881.4814979804473,
+        "updatedAt": "2026-08-24T14:18:43.63051167Z"
+      },
+      "x_reason": null,
+      "x_source": {
+        "field_paths": [
+          "audit.topHoldersPercentage",
+          "liquidity",
+          "firstPool.createdAt",
+          "updatedAt",
+          "launchpad"
+        ],
+        "observation_id": "DISCOVERY:SEARCH_T5",
+        "recent_response_sha256": "3ed5438a6c8af4bd4d94fb731bb2421b4fd2c61b4845ede02944df62e24f926c",
+        "recent_row_sha256": "1df81a9b704db7f8400c5b5335cd4b120c20ef21f7a51ad86e41a4a6de8dd252",
+        "response_sha256": "9e6e074210fe5e6d5e6e04a96fddd9b9e90230199384fdba8fa5688713c3be83",
+        "row_mint": "GmirbJAfC5xe2TmfP44RrVqKygAgtyZAFQhwjtLtpump",
+        "row_sha256": "207b38160a2a6d4911b48f278269415c96fcaee2dedc6993e70fce7c962eb739"
+      },
+      "x_status": "ELIGIBLE"
+    },
+    {
+      "age_seconds": 318.0,
+      "decision_snapshot_at": "2026-08-24T14:20:30Z",
+      "mint": "F2iCc374ho3Xm4wjPVYjGNDhHYPV6RrDd4vy5wvEpump",
+      "x": 13.9683463401506,
+      "x_inputs": {
+        "audit.topHoldersPercentage": 13.9683463401506,
+        "firstPool.createdAt": "2026-08-24T14:15:12Z",
+        "launchpad": "pump.fun",
+        "liquidity": 2862.974337347062,
+        "updatedAt": "2026-08-24T14:16:46.743391598Z"
+      },
+      "x_reason": null,
+      "x_source": {
+        "field_paths": [
+          "audit.topHoldersPercentage",
+          "liquidity",
+          "firstPool.createdAt",
+          "updatedAt",
+          "launchpad"
+        ],
+        "observation_id": "DISCOVERY:SEARCH_T5",
+        "recent_response_sha256": "3ed5438a6c8af4bd4d94fb731bb2421b4fd2c61b4845ede02944df62e24f926c",
+        "recent_row_sha256": "7494f6db88e167b41ee6a54bc2288c32a884ee8f89c5721f7c601ec348cd97f4",
+        "response_sha256": "9e6e074210fe5e6d5e6e04a96fddd9b9e90230199384fdba8fa5688713c3be83",
+        "row_mint": "F2iCc374ho3Xm4wjPVYjGNDhHYPV6RrDd4vy5wvEpump",
+        "row_sha256": "53dabf9919d964866fbaf74dde76f8fc59759a74a8ad94ca5fafd87228d06106"
+      },
+      "x_status": "ELIGIBLE"
+    },
+    {
+      "age_seconds": 319.0,
+      "decision_snapshot_at": "2026-08-24T14:20:30Z",
+      "mint": "3K3hr1DLvSbxWc1pvV5oJbqx6bkVxKow8Ubfn1m23ce7",
+      "x": 12.147218068698,
+      "x_inputs": {
+        "audit.topHoldersPercentage": 12.147218068698,
+        "firstPool.createdAt": "2026-08-24T14:15:11Z",
+        "launchpad": "pump.fun",
+        "liquidity": 3234.615731447882,
+        "updatedAt": "2026-08-24T14:20:26.824385635Z"
+      },
+      "x_reason": null,
+      "x_source": {
+        "field_paths": [
+          "audit.topHoldersPercentage",
+          "liquidity",
+          "firstPool.createdAt",
+          "updatedAt",
+          "launchpad"
+        ],
+        "observation_id": "DISCOVERY:SEARCH_T5",
+        "recent_response_sha256": "3ed5438a6c8af4bd4d94fb731bb2421b4fd2c61b4845ede02944df62e24f926c",
+        "recent_row_sha256": "017a8b6f854dac44271853708d3f61bd29f7e65e6052e515735c5e66bd2bcaa9",
+        "response_sha256": "9e6e074210fe5e6d5e6e04a96fddd9b9e90230199384fdba8fa5688713c3be83",
+        "row_mint": "3K3hr1DLvSbxWc1pvV5oJbqx6bkVxKow8Ubfn1m23ce7",
+        "row_sha256": "2db0af6c433a58000c48224865c5b48d16de6db967aeea5b5c12dd057cba1352"
+      },
+      "x_status": "ELIGIBLE"
+    },
+    {
+      "age_seconds": 325.0,
+      "decision_snapshot_at": "2026-08-24T14:20:30Z",
+      "mint": "9AHsCqJWSt6K78cpwxXJkjby9JTkXb1qiYUmtEuppump",
+      "x": 49.4059513874657,
+      "x_inputs": {
+        "audit.topHoldersPercentage": 49.4059513874657,
+        "firstPool.createdAt": "2026-08-24T14:15:05Z",
+        "launchpad": "pump.fun",
+        "liquidity": 2862.9979639490884,
+        "updatedAt": "2026-08-24T14:16:43.466367015Z"
+      },
+      "x_reason": null,
+      "x_source": {
+        "field_paths": [
+          "audit.topHoldersPercentage",
+          "liquidity",
+          "firstPool.createdAt",
+          "updatedAt",
+          "launchpad"
+        ],
+        "observation_id": "DISCOVERY:SEARCH_T5",
+        "recent_response_sha256": "3ed5438a6c8af4bd4d94fb731bb2421b4fd2c61b4845ede02944df62e24f926c",
+        "recent_row_sha256": "b90cfe0613f7b31b3c2a16e38258ddeb24cd74b3299bccedfdc866fa9b0de72c",
+        "response_sha256": "9e6e074210fe5e6d5e6e04a96fddd9b9e90230199384fdba8fa5688713c3be83",
+        "row_mint": "9AHsCqJWSt6K78cpwxXJkjby9JTkXb1qiYUmtEuppump",
+        "row_sha256": "8c0f4608d7502bb0daef0726d69b270ffe53f55ffb035927099f3424e04dba9f"
+      },
+      "x_status": "ELIGIBLE"
+    },
+    {
+      "age_seconds": 327.0,
+      "decision_snapshot_at": "2026-08-24T14:20:30Z",
+      "mint": "A3yH7eKWAEwzs8sFZFRADoHuJmB65p1JgN6SnhNhpump",
+      "x": 0.09770853342260001,
+      "x_inputs": {
+        "audit.topHoldersPercentage": 0.09770853342260001,
+        "firstPool.createdAt": "2026-08-24T14:15:03Z",
+        "launchpad": "pump.fun",
+        "liquidity": 2868.6925591898676,
+        "updatedAt": "2026-08-24T14:20:29.82019902Z"
+      },
+      "x_reason": null,
+      "x_source": {
+        "field_paths": [
+          "audit.topHoldersPercentage",
+          "liquidity",
+          "firstPool.createdAt",
+          "updatedAt",
+          "launchpad"
+        ],
+        "observation_id": "DISCOVERY:SEARCH_T5",
+        "recent_response_sha256": "3ed5438a6c8af4bd4d94fb731bb2421b4fd2c61b4845ede02944df62e24f926c",
+        "recent_row_sha256": "166a8c7f03c23062a79d493ca9e1b4fd2760b9b4d34b601434bdd1856ecd2ddb",
+        "response_sha256": "9e6e074210fe5e6d5e6e04a96fddd9b9e90230199384fdba8fa5688713c3be83",
+        "row_mint": "A3yH7eKWAEwzs8sFZFRADoHuJmB65p1JgN6SnhNhpump",
+        "row_sha256": "6630525dd4c93bb69355c7030eee6f941863ee8eb5b1bc323ab2675efd2e406c"
+      },
+      "x_status": "ELIGIBLE"
+    },
+    {
+      "age_seconds": 327.0,
+      "decision_snapshot_at": "2026-08-24T14:20:30Z",
+      "mint": "6dFXGwVe1tqooJugvKL24iTsuQQhEPqk3UiF2h1wpump",
+      "x": 4.0084600016413,
+      "x_inputs": {
+        "audit.topHoldersPercentage": 4.0084600016413,
+        "firstPool.createdAt": "2026-08-24T14:15:03Z",
+        "launchpad": "pump.fun",
+        "liquidity": 2862.99796423537,
+        "updatedAt": "2026-08-24T14:16:43.267795993Z"
+      },
+      "x_reason": null,
+      "x_source": {
+        "field_paths": [
+          "audit.topHoldersPercentage",
+          "liquidity",
+          "firstPool.createdAt",
+          "updatedAt",
+          "launchpad"
+        ],
+        "observation_id": "DISCOVERY:SEARCH_T5",
+        "recent_response_sha256": "3ed5438a6c8af4bd4d94fb731bb2421b4fd2c61b4845ede02944df62e24f926c",
+        "recent_row_sha256": "f3c3c7dbf4dc2de6ad149656c33e2711daaa55af9a2b3d7ecb9510967520a39f",
+        "response_sha256": "9e6e074210fe5e6d5e6e04a96fddd9b9e90230199384fdba8fa5688713c3be83",
+        "row_mint": "6dFXGwVe1tqooJugvKL24iTsuQQhEPqk3UiF2h1wpump",
+        "row_sha256": "e3c5e90c2ca10e96e042db396e3e91c9a6b5c3a76dfda65775c826e8d7a354d6"
+      },
+      "x_status": "ELIGIBLE"
+    },
+    {
+      "age_seconds": 328.0,
+      "decision_snapshot_at": "2026-08-24T14:20:30Z",
+      "mint": "A41MotvroFg7smyFtEtgwdFxck894GVivz8XybaEpump",
+      "x": 50.0962001476109,
+      "x_inputs": {
+        "audit.topHoldersPercentage": 50.0962001476109,
+        "firstPool.createdAt": "2026-08-24T14:15:02Z",
+        "launchpad": "pump.fun",
+        "liquidity": 2862.9979639490884,
+        "updatedAt": "2026-08-24T14:16:02.41870519Z"
+      },
+      "x_reason": null,
+      "x_source": {
+        "field_paths": [
+          "audit.topHoldersPercentage",
+          "liquidity",
+          "firstPool.createdAt",
+          "updatedAt",
+          "launchpad"
+        ],
+        "observation_id": "DISCOVERY:SEARCH_T5",
+        "recent_response_sha256": "3ed5438a6c8af4bd4d94fb731bb2421b4fd2c61b4845ede02944df62e24f926c",
+        "recent_row_sha256": "c4a0ddb87ba48868999ab4041c421d1b2afb37bd94a7c1496bf1d4746462830f",
+        "response_sha256": "9e6e074210fe5e6d5e6e04a96fddd9b9e90230199384fdba8fa5688713c3be83",
+        "row_mint": "A41MotvroFg7smyFtEtgwdFxck894GVivz8XybaEpump",
+        "row_sha256": "eb98eb028cb4b719ea142f3ac882cbfca17c9515ed2b716838a5aaa1c1b264cd"
+      },
+      "x_status": "ELIGIBLE"
+    },
+    {
+      "age_seconds": 336.0,
+      "decision_snapshot_at": "2026-08-24T14:20:30Z",
+      "mint": "LHrQc7eLdzmEgZ9CCK2ug5j21ffaMgmZTGk7fQopump",
+      "x": null,
+      "x_inputs": {
+        "audit.topHoldersPercentage": null,
+        "firstPool.createdAt": "2026-08-24T14:14:54Z",
+        "launchpad": "pump.fun",
+        "liquidity": 2862.974262723079,
+        "updatedAt": "2026-08-24T14:20:28.66982187Z"
+      },
+      "x_reason": "TOP_HOLDERS_PERCENTAGE_ABSENT",
+      "x_source": {
+        "field_paths": [
+          "audit.topHoldersPercentage",
+          "liquidity",
+          "firstPool.createdAt",
+          "updatedAt",
+          "launchpad"
+        ],
+        "observation_id": "DISCOVERY:SEARCH_T5",
+        "recent_response_sha256": "3ed5438a6c8af4bd4d94fb731bb2421b4fd2c61b4845ede02944df62e24f926c",
+        "recent_row_sha256": "ba90815a34e77114e2bdef8efa6a9ad3da3c49772a78abb047a8e76ac448b10d",
+        "response_sha256": "9e6e074210fe5e6d5e6e04a96fddd9b9e90230199384fdba8fa5688713c3be83",
+        "row_mint": "LHrQc7eLdzmEgZ9CCK2ug5j21ffaMgmZTGk7fQopump",
+        "row_sha256": "91c46acd547225d28f56aba27614de74926c3b75c063fedaf967686ad97a8061"
+      },
+      "x_status": "MISSING"
+    },
+    {
+      "age_seconds": 337.0,
+      "decision_snapshot_at": "2026-08-24T14:20:30Z",
+      "mint": "269T16ngA1txT4zXXxcryHHRB8FUH3tFdzrwxgzCpump",
+      "x": 1.6287405120465999,
+      "x_inputs": {
+        "audit.topHoldersPercentage": 1.6287405120465999,
+        "firstPool.createdAt": "2026-08-24T14:14:53Z",
+        "launchpad": "pump.fun",
+        "liquidity": 2911.9373428164454,
+        "updatedAt": "2026-08-24T14:20:08.497237303Z"
+      },
+      "x_reason": null,
+      "x_source": {
+        "field_paths": [
+          "audit.topHoldersPercentage",
+          "liquidity",
+          "firstPool.createdAt",
+          "updatedAt",
+          "launchpad"
+        ],
+        "observation_id": "DISCOVERY:SEARCH_T5",
+        "recent_response_sha256": "3ed5438a6c8af4bd4d94fb731bb2421b4fd2c61b4845ede02944df62e24f926c",
+        "recent_row_sha256": "a16336a80c95b7183117208938fa792225ef35a2fbc180086b41dde47289bbd4",
+        "response_sha256": "9e6e074210fe5e6d5e6e04a96fddd9b9e90230199384fdba8fa5688713c3be83",
+        "row_mint": "269T16ngA1txT4zXXxcryHHRB8FUH3tFdzrwxgzCpump",
+        "row_sha256": "d4a3052d8d5a50ee797f5663610f1f907367e4e6c71a7f88c3e31d08ae6ec4b2"
+      },
+      "x_status": "ELIGIBLE"
+    },
+    {
+      "age_seconds": 344.0,
+      "decision_snapshot_at": "2026-08-24T14:20:30Z",
+      "mint": "84AUTkf6ZYdPLqhwvY4arQLrrJrcPPN1twrWqaFapump",
+      "x": 3.5440549600129003,
+      "x_inputs": {
+        "audit.topHoldersPercentage": 3.5440549600129003,
+        "firstPool.createdAt": "2026-08-24T14:14:46Z",
+        "launchpad": "pump.fun",
+        "liquidity": 2862.997964712505,
+        "updatedAt": "2026-08-24T14:20:18.95426223Z"
+      },
+      "x_reason": null,
+      "x_source": {
+        "field_paths": [
+          "audit.topHoldersPercentage",
+          "liquidity",
+          "firstPool.createdAt",
+          "updatedAt",
+          "launchpad"
+        ],
+        "observation_id": "DISCOVERY:SEARCH_T5",
+        "recent_response_sha256": "3ed5438a6c8af4bd4d94fb731bb2421b4fd2c61b4845ede02944df62e24f926c",
+        "recent_row_sha256": "670b5b5e34da2ff050cebfc6840cc1269bfcbf73a63f3af01f51b69cf6921988",
+        "response_sha256": "9e6e074210fe5e6d5e6e04a96fddd9b9e90230199384fdba8fa5688713c3be83",
+        "row_mint": "84AUTkf6ZYdPLqhwvY4arQLrrJrcPPN1twrWqaFapump",
+        "row_sha256": "868e6e60c1d03e574a2e43e0810ab71f85735bf3ece3359f491e0b77afa0a9b0"
+      },
+      "x_status": "ELIGIBLE"
+    },
+    {
+      "age_seconds": 349.0,
+      "decision_snapshot_at": "2026-08-24T14:20:30Z",
+      "mint": "5UQA6Rom1d6gpuPF83aTJerWrtshpK4Sz2RdmvPUpump",
+      "x": 50.07838552465995,
+      "x_inputs": {
+        "audit.topHoldersPercentage": 50.07838552465995,
+        "firstPool.createdAt": "2026-08-24T14:14:41Z",
+        "launchpad": "pump.fun",
+        "liquidity": 2862.9740537377547,
+        "updatedAt": "2026-08-24T14:16:05.630173664Z"
+      },
+      "x_reason": null,
+      "x_source": {
+        "field_paths": [
+          "audit.topHoldersPercentage",
+          "liquidity",
+          "firstPool.createdAt",
+          "updatedAt",
+          "launchpad"
+        ],
+        "observation_id": "DISCOVERY:SEARCH_T5",
+        "recent_response_sha256": "3ed5438a6c8af4bd4d94fb731bb2421b4fd2c61b4845ede02944df62e24f926c",
+        "recent_row_sha256": "cca412370d6c96aaf24ef8391a604486c9800802f8fa0f6946689709415eb1d7",
+        "response_sha256": "9e6e074210fe5e6d5e6e04a96fddd9b9e90230199384fdba8fa5688713c3be83",
+        "row_mint": "5UQA6Rom1d6gpuPF83aTJerWrtshpK4Sz2RdmvPUpump",
+        "row_sha256": "10900aa905fff04f7425b0fd422175c3faa9e78d65e0a6bd3a2216f694b8f602"
+      },
+      "x_status": "ELIGIBLE"
+    },
+    {
+      "age_seconds": 352.0,
+      "decision_snapshot_at": "2026-08-24T14:20:30Z",
+      "mint": "9LSepVSsCnpgbDrhep2aa62Seq9ZSDMoWshpnVQgpump",
+      "x": 7.1282916621583565,
+      "x_inputs": {
+        "audit.topHoldersPercentage": 7.1282916621583565,
+        "firstPool.createdAt": "2026-08-24T14:14:38Z",
+        "launchpad": "pump.fun",
+        "liquidity": 3144.064988371294,
+        "updatedAt": "2026-08-24T14:20:29.821183521Z"
+      },
+      "x_reason": null,
+      "x_source": {
+        "field_paths": [
+          "audit.topHoldersPercentage",
+          "liquidity",
+          "firstPool.createdAt",
+          "updatedAt",
+          "launchpad"
+        ],
+        "observation_id": "DISCOVERY:SEARCH_T5",
+        "recent_response_sha256": "3ed5438a6c8af4bd4d94fb731bb2421b4fd2c61b4845ede02944df62e24f926c",
+        "recent_row_sha256": "2fcf45fc816f7f05c65ac9bf1633f8700d0f71dec78e646cb5a6e95b434985d7",
+        "response_sha256": "9e6e074210fe5e6d5e6e04a96fddd9b9e90230199384fdba8fa5688713c3be83",
+        "row_mint": "9LSepVSsCnpgbDrhep2aa62Seq9ZSDMoWshpnVQgpump",
+        "row_sha256": "f9ccb88e17717e4373adc894136c1fbc26d71efade235696bda8e215a73bac57"
+      },
+      "x_status": "ELIGIBLE"
+    },
+    {
+      "age_seconds": 354.0,
+      "decision_snapshot_at": "2026-08-24T14:20:30Z",
+      "mint": "LEmNqJg39F9R1eKxYXDghqrkwy7pzCLykJ3WrnUpump",
+      "x": 0.1285531160445,
+      "x_inputs": {
+        "audit.topHoldersPercentage": 0.1285531160445,
+        "firstPool.createdAt": "2026-08-24T14:14:36Z",
+        "launchpad": "pump.fun",
+        "liquidity": 2869.9340662699724,
+        "updatedAt": "2026-08-24T14:20:08.608090045Z"
+      },
+      "x_reason": null,
+      "x_source": {
+        "field_paths": [
+          "audit.topHoldersPercentage",
+          "liquidity",
+          "firstPool.createdAt",
+          "updatedAt",
+          "launchpad"
+        ],
+        "observation_id": "DISCOVERY:SEARCH_T5",
+        "recent_response_sha256": "3ed5438a6c8af4bd4d94fb731bb2421b4fd2c61b4845ede02944df62e24f926c",
+        "recent_row_sha256": "36dab81e556a5a189c47eeef60f8c7b13f2425bce2b564a644927354a7f54197",
+        "response_sha256": "9e6e074210fe5e6d5e6e04a96fddd9b9e90230199384fdba8fa5688713c3be83",
+        "row_mint": "LEmNqJg39F9R1eKxYXDghqrkwy7pzCLykJ3WrnUpump",
+        "row_sha256": "8fcd8890db84b61bc92d735c807e8dd77e3b4acad0a2f191b89c8368355b85d5"
+      },
+      "x_status": "ELIGIBLE"
+    },
+    {
+      "age_seconds": 356.0,
+      "decision_snapshot_at": "2026-08-24T14:20:30Z",
+      "mint": "FpGdZV8iA89GxCuLi2nictRnvPgLBR7jdsvqsZfWpump",
+      "x": 48.4865061105922,
+      "x_inputs": {
+        "audit.topHoldersPercentage": 48.4865061105922,
+        "firstPool.createdAt": "2026-08-24T14:14:34Z",
+        "launchpad": "pump.fun",
+        "liquidity": 2869.645054431165,
+        "updatedAt": "2026-08-24T14:18:07.415213674Z"
+      },
+      "x_reason": null,
+      "x_source": {
+        "field_paths": [
+          "audit.topHoldersPercentage",
+          "liquidity",
+          "firstPool.createdAt",
+          "updatedAt",
+          "launchpad"
+        ],
+        "observation_id": "DISCOVERY:SEARCH_T5",
+        "recent_response_sha256": "3ed5438a6c8af4bd4d94fb731bb2421b4fd2c61b4845ede02944df62e24f926c",
+        "recent_row_sha256": "d251c9b581fba945079284ac06014929694673fcfc536c86b33366b5ef74f1e6",
+        "response_sha256": "9e6e074210fe5e6d5e6e04a96fddd9b9e90230199384fdba8fa5688713c3be83",
+        "row_mint": "FpGdZV8iA89GxCuLi2nictRnvPgLBR7jdsvqsZfWpump",
+        "row_sha256": "cf9983f9dd31af811e77bbae478f3070d37b169b71d142efe2035cc5d9c6313b"
+      },
+      "x_status": "ELIGIBLE"
+    },
+    {
+      "age_seconds": 357.0,
+      "decision_snapshot_at": "2026-08-24T14:20:30Z",
+      "mint": "6urYeh1PKBAHgw7Jg9xf76NSHwA6xY1TEBzpHWafpump",
+      "x": 0.7000928208769001,
+      "x_inputs": {
+        "audit.topHoldersPercentage": 0.7000928208769001,
+        "firstPool.createdAt": "2026-08-24T14:14:33Z",
+        "launchpad": "pump.fun",
+        "liquidity": 2868.7372549773395,
+        "updatedAt": "2026-08-24T14:20:08.608097236Z"
+      },
+      "x_reason": null,
+      "x_source": {
+        "field_paths": [
+          "audit.topHoldersPercentage",
+          "liquidity",
+          "firstPool.createdAt",
+          "updatedAt",
+          "launchpad"
+        ],
+        "observation_id": "DISCOVERY:SEARCH_T5",
+        "recent_response_sha256": "3ed5438a6c8af4bd4d94fb731bb2421b4fd2c61b4845ede02944df62e24f926c",
+        "recent_row_sha256": "d6a57077edda5e5c0f99e2d9d8eb1ab0e0808225278e872ef1e2ce87c96ce501",
+        "response_sha256": "9e6e074210fe5e6d5e6e04a96fddd9b9e90230199384fdba8fa5688713c3be83",
+        "row_mint": "6urYeh1PKBAHgw7Jg9xf76NSHwA6xY1TEBzpHWafpump",
+        "row_sha256": "16d3d47622c4da093b1a040d965359f08a811c1a3471ffad929213f58cbd976e"
+      },
+      "x_status": "ELIGIBLE"
+    },
+    {
+      "age_seconds": 365.0,
+      "decision_snapshot_at": "2026-08-24T14:20:30Z",
+      "mint": "EtFjNsodMzNbNLcuAxpuKhjoPLV9Efs3u1WGrmdDuVzv",
+      "x": null,
+      "x_inputs": {
+        "audit.topHoldersPercentage": null,
+        "firstPool.createdAt": "2026-08-24T14:14:25Z",
+        "launchpad": "pump.fun",
+        "liquidity": 2862.746470382407,
+        "updatedAt": "2026-08-24T14:20:01.985785879Z"
+      },
+      "x_reason": "TOP_HOLDERS_PERCENTAGE_ABSENT",
+      "x_source": {
+        "field_paths": [
+          "audit.topHoldersPercentage",
+          "liquidity",
+          "firstPool.createdAt",
+          "updatedAt",
+          "launchpad"
+        ],
+        "observation_id": "DISCOVERY:SEARCH_T5",
+        "recent_response_sha256": "3ed5438a6c8af4bd4d94fb731bb2421b4fd2c61b4845ede02944df62e24f926c",
+        "recent_row_sha256": "4a1ab1b8b2abef82e3a93a5d3ad4c5867692cb9a645911fb1417f79ca4e94a3f",
+        "response_sha256": "9e6e074210fe5e6d5e6e04a96fddd9b9e90230199384fdba8fa5688713c3be83",
+        "row_mint": "EtFjNsodMzNbNLcuAxpuKhjoPLV9Efs3u1WGrmdDuVzv",
+        "row_sha256": "6df8f6ab11440e31aa24bc0cbfa054a6a8901186132c14fb6d4787aa3631bbdb"
+      },
+      "x_status": "MISSING"
+    },
+    {
+      "age_seconds": 365.0,
+      "decision_snapshot_at": "2026-08-24T14:20:30Z",
+      "mint": "9sMypgMiEpHPj1CZwphxgZhj8rhmB8KPwsNev4Ubpump",
+      "x": 0.0314391625824,
+      "x_inputs": {
+        "audit.topHoldersPercentage": 0.0314391625824,
+        "firstPool.createdAt": "2026-08-24T14:14:25Z",
+        "launchpad": "pump.fun",
+        "liquidity": 2869.7009116025592,
+        "updatedAt": "2026-08-24T14:19:35.881209082Z"
+      },
+      "x_reason": null,
+      "x_source": {
+        "field_paths": [
+          "audit.topHoldersPercentage",
+          "liquidity",
+          "firstPool.createdAt",
+          "updatedAt",
+          "launchpad"
+        ],
+        "observation_id": "DISCOVERY:SEARCH_T5",
+        "recent_response_sha256": "3ed5438a6c8af4bd4d94fb731bb2421b4fd2c61b4845ede02944df62e24f926c",
+        "recent_row_sha256": "cbb29c7772fc5247452daba6d14383232153911de9163ad90db8264a4f40c629",
+        "response_sha256": "9e6e074210fe5e6d5e6e04a96fddd9b9e90230199384fdba8fa5688713c3be83",
+        "row_mint": "9sMypgMiEpHPj1CZwphxgZhj8rhmB8KPwsNev4Ubpump",
+        "row_sha256": "6a77704cfd91d11cbb3f1ffc7445da7f88a845d14564179e36162c3e7a8b2fea"
+      },
+      "x_status": "ELIGIBLE"
+    },
+    {
+      "age_seconds": 369.0,
+      "decision_snapshot_at": "2026-08-24T14:20:30Z",
+      "mint": "HQm1QLogxm6FTTHhMJvmjjaXcESRcUsjoyCYTgqwpump",
+      "x": 0.3520918746848,
+      "x_inputs": {
+        "audit.topHoldersPercentage": 0.3520918746848,
+        "firstPool.createdAt": "2026-08-24T14:14:21Z",
+        "launchpad": "pump.fun",
+        "liquidity": 2862.9742562340366,
+        "updatedAt": "2026-08-24T14:16:04.420946493Z"
+      },
+      "x_reason": null,
+      "x_source": {
+        "field_paths": [
+          "audit.topHoldersPercentage",
+          "liquidity",
+          "firstPool.createdAt",
+          "updatedAt",
+          "launchpad"
+        ],
+        "observation_id": "DISCOVERY:SEARCH_T5",
+        "recent_response_sha256": "3ed5438a6c8af4bd4d94fb731bb2421b4fd2c61b4845ede02944df62e24f926c",
+        "recent_row_sha256": "99ceb7f279624bc2deb0339a5c5f34d4b7403c7b5f8374c040ae202665cc8e32",
+        "response_sha256": "9e6e074210fe5e6d5e6e04a96fddd9b9e90230199384fdba8fa5688713c3be83",
+        "row_mint": "HQm1QLogxm6FTTHhMJvmjjaXcESRcUsjoyCYTgqwpump",
+        "row_sha256": "315c0a7777ae7808b095c1a9dba1084a5349f631fa2a5693468405d1e47285a6"
+      },
+      "x_status": "ELIGIBLE"
+    },
+    {
+      "age_seconds": 369.0,
+      "decision_snapshot_at": "2026-08-24T14:20:30Z",
+      "mint": "GeXLtjoYL3CT4dJn5TBJSZE5UoqwZ1xN7HRej6jkaSSa",
+      "x": 0.7002172022408,
+      "x_inputs": {
+        "audit.topHoldersPercentage": 0.7002172022408,
+        "firstPool.createdAt": "2026-08-24T14:14:21Z",
+        "launchpad": "pump.fun",
+        "liquidity": 2868.7612135114464,
+        "updatedAt": "2026-08-24T14:20:00.722662871Z"
+      },
+      "x_reason": null,
+      "x_source": {
+        "field_paths": [
+          "audit.topHoldersPercentage",
+          "liquidity",
+          "firstPool.createdAt",
+          "updatedAt",
+          "launchpad"
+        ],
+        "observation_id": "DISCOVERY:SEARCH_T5",
+        "recent_response_sha256": "3ed5438a6c8af4bd4d94fb731bb2421b4fd2c61b4845ede02944df62e24f926c",
+        "recent_row_sha256": "2fa9fc37bd348c75df8d3c24319b3e8ba5c7bfd0271e9423cf1362a4da147cee",
+        "response_sha256": "9e6e074210fe5e6d5e6e04a96fddd9b9e90230199384fdba8fa5688713c3be83",
+        "row_mint": "GeXLtjoYL3CT4dJn5TBJSZE5UoqwZ1xN7HRej6jkaSSa",
+        "row_sha256": "bdc5f9a1642e9cb9c7c381721367d209911525f378a3ebb262ddd25f717144ba"
+      },
+      "x_status": "ELIGIBLE"
+    },
+    {
+      "age_seconds": 369.0,
+      "decision_snapshot_at": "2026-08-24T14:20:30Z",
+      "mint": "FkTezLJQkuws55SgdEsvSqbGhv3XGVhUYjfnvXAdV7jy",
+      "x": 6.6285714215231,
+      "x_inputs": {
+        "audit.topHoldersPercentage": 6.6285714215231,
+        "firstPool.createdAt": "2026-08-24T14:14:21Z",
+        "launchpad": "pump.fun",
+        "liquidity": 2862.974054119463,
+        "updatedAt": "2026-08-24T14:20:00.247793826Z"
+      },
+      "x_reason": null,
+      "x_source": {
+        "field_paths": [
+          "audit.topHoldersPercentage",
+          "liquidity",
+          "firstPool.createdAt",
+          "updatedAt",
+          "launchpad"
+        ],
+        "observation_id": "DISCOVERY:SEARCH_T5",
+        "recent_response_sha256": "3ed5438a6c8af4bd4d94fb731bb2421b4fd2c61b4845ede02944df62e24f926c",
+        "recent_row_sha256": "ef9a362ee3bf6ef069307ad0e99ca5eb68557586336e9d27a4f5439af53784d5",
+        "response_sha256": "9e6e074210fe5e6d5e6e04a96fddd9b9e90230199384fdba8fa5688713c3be83",
+        "row_mint": "FkTezLJQkuws55SgdEsvSqbGhv3XGVhUYjfnvXAdV7jy",
+        "row_sha256": "c7a4ace4b6260ee4fa6893840bcc7593e3b5e959296dba2eb3cc6f28b96cbf0b"
+      },
+      "x_status": "ELIGIBLE"
+    }
+  ],
+  "credential_reads": 1,
+  "decision_time_eligible": 22,
+  "discovery_observations": [
+    {
+      "consumed_call": true,
+      "observation_id": "DISCOVERY:RECENT",
+      "observed_at": "2026-08-24T14:15:30Z",
+      "terminal": "TOKEN_LIST_OBSERVED",
+      "terminal_error": null,
+      "transport": {
+        "http_status": 200,
+        "request_count": 1,
+        "response_bytes": 52057,
+        "response_sha256": "3ed5438a6c8af4bd4d94fb731bb2421b4fd2c61b4845ede02944df62e24f926c",
+        "safe_response_headers": {
+          "x-api-gateway-request-id": "AgX9CvCsF5Zw_8FP1cjTj-A_t6GenBOJ8yCFCFxrijQTi2FuWPNa1g=="
+        },
+        "url_has_api_key": false,
+        "url_has_taker": false
+      }
+    },
+    {
+      "consumed_call": true,
+      "observation_id": "DISCOVERY:SEARCH_T5",
+      "observed_at": "2026-08-24T14:20:30Z",
+      "terminal": "TOKEN_LIST_OBSERVED",
+      "terminal_error": null,
+      "transport": {
+        "http_status": 200,
+        "request_count": 1,
+        "response_bytes": 45695,
+        "response_sha256": "9e6e074210fe5e6d5e6e04a96fddd9b9e90230199384fdba8fa5688713c3be83",
+        "safe_response_headers": {
+          "x-api-gateway-request-id": "YBcdtxpchy0vzlT0MIt7b7_MCBtwSq97VGRCHUjNW6YSIWd4E2w-IQ=="
+        },
+        "url_has_api_key": false,
+        "url_has_taker": false
+      }
+    }
+  ],
+  "execute_calls": 0,
+  "fallbacks": 0,
+  "frozen_mints": [
+    "2bSKSNrkD7xyMxuZVD8CxMWwmEMmqKCJragXjA8cpump",
+    "QnPzHXbzu8PPrJUVv61JxygNigkNmJ4cKJag3U2pump",
+    "G87oWxD7n3vTP2d9mFrsdM52fa1p9eB8e16hbg4mpump",
+    "GzAJTJRD8VyWNHbr6Lw3gaUS8XNYLKj19igBnphspump",
+    "GmirbJAfC5xe2TmfP44RrVqKygAgtyZAFQhwjtLtpump",
+    "F2iCc374ho3Xm4wjPVYjGNDhHYPV6RrDd4vy5wvEpump",
+    "3K3hr1DLvSbxWc1pvV5oJbqx6bkVxKow8Ubfn1m23ce7",
+    "9AHsCqJWSt6K78cpwxXJkjby9JTkXb1qiYUmtEuppump",
+    "A3yH7eKWAEwzs8sFZFRADoHuJmB65p1JgN6SnhNhpump",
+    "6dFXGwVe1tqooJugvKL24iTsuQQhEPqk3UiF2h1wpump",
+    "A41MotvroFg7smyFtEtgwdFxck894GVivz8XybaEpump",
+    "LHrQc7eLdzmEgZ9CCK2ug5j21ffaMgmZTGk7fQopump",
+    "269T16ngA1txT4zXXxcryHHRB8FUH3tFdzrwxgzCpump",
+    "84AUTkf6ZYdPLqhwvY4arQLrrJrcPPN1twrWqaFapump",
+    "5UQA6Rom1d6gpuPF83aTJerWrtshpK4Sz2RdmvPUpump",
+    "9LSepVSsCnpgbDrhep2aa62Seq9ZSDMoWshpnVQgpump",
+    "LEmNqJg39F9R1eKxYXDghqrkwy7pzCLykJ3WrnUpump",
+    "FpGdZV8iA89GxCuLi2nictRnvPgLBR7jdsvqsZfWpump",
+    "6urYeh1PKBAHgw7Jg9xf76NSHwA6xY1TEBzpHWafpump",
+    "EtFjNsodMzNbNLcuAxpuKhjoPLV9Efs3u1WGrmdDuVzv",
+    "9sMypgMiEpHPj1CZwphxgZhj8rhmB8KPwsNev4Ubpump",
+    "HQm1QLogxm6FTTHhMJvmjjaXcESRcUsjoyCYTgqwpump",
+    "GeXLtjoYL3CT4dJn5TBJSZE5UoqwZ1xN7HRej6jkaSSa",
+    "FkTezLJQkuws55SgdEsvSqbGhv3XGVhUYjfnvXAdV7jy"
+  ],
+  "h900_due_at": "2026-08-24T14:35:33Z",
+  "h900_lateness_deadline": "2026-08-24T14:37:33Z",
+  "h900_schedule": [
+    {
+      "due_at": "2026-08-24T14:35:33Z",
+      "lateness_deadline": "2026-08-24T14:37:33Z",
+      "mint": "2bSKSNrkD7xyMxuZVD8CxMWwmEMmqKCJragXjA8cpump",
+      "t0_observed_at": "2026-08-24T14:20:33Z"
+    },
+    {
+      "due_at": "2026-08-24T14:35:36Z",
+      "lateness_deadline": "2026-08-24T14:37:36Z",
+      "mint": "QnPzHXbzu8PPrJUVv61JxygNigkNmJ4cKJag3U2pump",
+      "t0_observed_at": "2026-08-24T14:20:36Z"
+    },
+    {
+      "due_at": "2026-08-24T14:35:40Z",
+      "lateness_deadline": "2026-08-24T14:37:40Z",
+      "mint": "G87oWxD7n3vTP2d9mFrsdM52fa1p9eB8e16hbg4mpump",
+      "t0_observed_at": "2026-08-24T14:20:40Z"
+    },
+    {
+      "due_at": "2026-08-24T14:35:43Z",
+      "lateness_deadline": "2026-08-24T14:37:43Z",
+      "mint": "GzAJTJRD8VyWNHbr6Lw3gaUS8XNYLKj19igBnphspump",
+      "t0_observed_at": "2026-08-24T14:20:43Z"
+    },
+    {
+      "due_at": "2026-08-24T14:35:46Z",
+      "lateness_deadline": "2026-08-24T14:37:46Z",
+      "mint": "GmirbJAfC5xe2TmfP44RrVqKygAgtyZAFQhwjtLtpump",
+      "t0_observed_at": "2026-08-24T14:20:46Z"
+    },
+    {
+      "due_at": "2026-08-24T14:35:50Z",
+      "lateness_deadline": "2026-08-24T14:37:50Z",
+      "mint": "F2iCc374ho3Xm4wjPVYjGNDhHYPV6RrDd4vy5wvEpump",
+      "t0_observed_at": "2026-08-24T14:20:50Z"
+    },
+    {
+      "due_at": "2026-08-24T14:35:53Z",
+      "lateness_deadline": "2026-08-24T14:37:53Z",
+      "mint": "3K3hr1DLvSbxWc1pvV5oJbqx6bkVxKow8Ubfn1m23ce7",
+      "t0_observed_at": "2026-08-24T14:20:53Z"
+    },
+    {
+      "due_at": "2026-08-24T14:35:57Z",
+      "lateness_deadline": "2026-08-24T14:37:57Z",
+      "mint": "9AHsCqJWSt6K78cpwxXJkjby9JTkXb1qiYUmtEuppump",
+      "t0_observed_at": "2026-08-24T14:20:57Z"
+    },
+    {
+      "due_at": "2026-08-24T14:36:00Z",
+      "lateness_deadline": "2026-08-24T14:38:00Z",
+      "mint": "A3yH7eKWAEwzs8sFZFRADoHuJmB65p1JgN6SnhNhpump",
+      "t0_observed_at": "2026-08-24T14:21:00Z"
+    },
+    {
+      "due_at": "2026-08-24T14:36:04Z",
+      "lateness_deadline": "2026-08-24T14:38:04Z",
+      "mint": "6dFXGwVe1tqooJugvKL24iTsuQQhEPqk3UiF2h1wpump",
+      "t0_observed_at": "2026-08-24T14:21:04Z"
+    },
+    {
+      "due_at": "2026-08-24T14:36:07Z",
+      "lateness_deadline": "2026-08-24T14:38:07Z",
+      "mint": "A41MotvroFg7smyFtEtgwdFxck894GVivz8XybaEpump",
+      "t0_observed_at": "2026-08-24T14:21:07Z"
+    },
+    {
+      "due_at": "2026-08-24T14:36:10Z",
+      "lateness_deadline": "2026-08-24T14:38:10Z",
+      "mint": "269T16ngA1txT4zXXxcryHHRB8FUH3tFdzrwxgzCpump",
+      "t0_observed_at": "2026-08-24T14:21:10Z"
+    },
+    {
+      "due_at": "2026-08-24T14:36:14Z",
+      "lateness_deadline": "2026-08-24T14:38:14Z",
+      "mint": "84AUTkf6ZYdPLqhwvY4arQLrrJrcPPN1twrWqaFapump",
+      "t0_observed_at": "2026-08-24T14:21:14Z"
+    },
+    {
+      "due_at": "2026-08-24T14:36:17Z",
+      "lateness_deadline": "2026-08-24T14:38:17Z",
+      "mint": "5UQA6Rom1d6gpuPF83aTJerWrtshpK4Sz2RdmvPUpump",
+      "t0_observed_at": "2026-08-24T14:21:17Z"
+    },
+    {
+      "due_at": "2026-08-24T14:36:20Z",
+      "lateness_deadline": "2026-08-24T14:38:20Z",
+      "mint": "9LSepVSsCnpgbDrhep2aa62Seq9ZSDMoWshpnVQgpump",
+      "t0_observed_at": "2026-08-24T14:21:20Z"
+    },
+    {
+      "due_at": "2026-08-24T14:36:24Z",
+      "lateness_deadline": "2026-08-24T14:38:24Z",
+      "mint": "LEmNqJg39F9R1eKxYXDghqrkwy7pzCLykJ3WrnUpump",
+      "t0_observed_at": "2026-08-24T14:21:24Z"
+    },
+    {
+      "due_at": "2026-08-24T14:36:27Z",
+      "lateness_deadline": "2026-08-24T14:38:27Z",
+      "mint": "FpGdZV8iA89GxCuLi2nictRnvPgLBR7jdsvqsZfWpump",
+      "t0_observed_at": "2026-08-24T14:21:27Z"
+    },
+    {
+      "due_at": "2026-08-24T14:36:30Z",
+      "lateness_deadline": "2026-08-24T14:38:30Z",
+      "mint": "6urYeh1PKBAHgw7Jg9xf76NSHwA6xY1TEBzpHWafpump",
+      "t0_observed_at": "2026-08-24T14:21:30Z"
+    },
+    {
+      "due_at": "2026-08-24T14:36:34Z",
+      "lateness_deadline": "2026-08-24T14:38:34Z",
+      "mint": "9sMypgMiEpHPj1CZwphxgZhj8rhmB8KPwsNev4Ubpump",
+      "t0_observed_at": "2026-08-24T14:21:34Z"
+    },
+    {
+      "due_at": "2026-08-24T14:36:37Z",
+      "lateness_deadline": "2026-08-24T14:38:37Z",
+      "mint": "HQm1QLogxm6FTTHhMJvmjjaXcESRcUsjoyCYTgqwpump",
+      "t0_observed_at": "2026-08-24T14:21:37Z"
+    },
+    {
+      "due_at": "2026-08-24T14:36:40Z",
+      "lateness_deadline": "2026-08-24T14:38:40Z",
+      "mint": "GeXLtjoYL3CT4dJn5TBJSZE5UoqwZ1xN7HRej6jkaSSa",
+      "t0_observed_at": "2026-08-24T14:21:40Z"
+    },
+    {
+      "due_at": "2026-08-24T14:36:44Z",
+      "lateness_deadline": "2026-08-24T14:38:44Z",
+      "mint": "FkTezLJQkuws55SgdEsvSqbGhv3XGVhUYjfnvXAdV7jy",
+      "t0_observed_at": "2026-08-24T14:21:44Z"
+    }
+  ],
+  "limitations": {
+    "jupiter_top_holders_pool_exclusion": "UNKNOWN"
+  },
+  "non_claims": [
+    "NO_EXECUTE",
+    "NO_TAKER_OR_SIGNER",
+    "NO_TRANSACTION_BYTES_IN_GIT",
+    "NO_ALPHA",
+    "NO_NETRETURN",
+    "NO_STRATEGY_OR_SHADOW",
+    "NO_H3600_OR_H4",
+    "NO_SECOND_PROVIDER"
+  ],
+  "observations": [
+    {
+      "age_seconds": 306.0,
+      "buy_clock_error": null,
+      "buy_clock_valid": true,
+      "buy_observed_at": "2026-08-24T14:20:33Z",
+      "buy_out_amount": "351331793145",
+      "buy_terminal": "QUOTE_OBSERVED",
+      "buy_transport": {
+        "http_status": 200,
+        "request_count": 1,
+        "response_bytes": 1262,
+        "response_sha256": "0d3044b67741e079aa85f93df1c0b4c05c1021a658eb0bbd163447ab3b98a92a",
+        "safe_response_headers": {
+          "x-api-gateway-request-id": "3V6UgLj9-HQK9FMaRgaJ5fXq1Bes66l0ZU2VmEy2Mxdoa9cYF8T32g=="
+        },
+        "url_has_api_key": false,
+        "url_has_taker": false
+      },
+      "decision_snapshot_at": "2026-08-24T14:20:30Z",
+      "h900": {
+        "due_at": "2026-08-24T14:35:33Z",
+        "expected_input_amount": "351331793145",
+        "input_amount": "351331793145",
+        "input_mint": "2bSKSNrkD7xyMxuZVD8CxMWwmEMmqKCJragXjA8cpump",
+        "lateness_deadline": "2026-08-24T14:37:33Z",
+        "observed_at": "2026-08-24T14:35:33Z",
+        "output_amount": "9687279",
+        "output_mint": "So11111111111111111111111111111111111111112",
+        "source_observation_id": "2bSKSNrkD7xyMxuZVD8CxMWwmEMmqKCJragXjA8cpump:SELL_H900",
+        "transport": {
+          "http_status": 200,
+          "request_count": 1,
+          "response_bytes": 1257,
+          "response_sha256": "405536e19c04441c9a69f25d7a1c8428d98bcd789bae66f0312c64ec6cfc16df",
+          "safe_response_headers": {
+            "x-api-gateway-request-id": "oXBEzqqWxi9mzWcogmIs3YdnPM6mn6Uu8kW7FG6Ssv3mTNhVwPKZFg=="
+          },
+          "url_has_api_key": false,
+          "url_has_taker": false
+        }
+      },
+      "h900_due_at": "2026-08-24T14:35:33Z",
+      "h900_lateness_deadline": "2026-08-24T14:37:33Z",
+      "h900_terminal": "QUOTE_OBSERVED",
+      "mint": "2bSKSNrkD7xyMxuZVD8CxMWwmEMmqKCJragXjA8cpump",
+      "t0": {
+        "expected_input_amount": "10000000",
+        "input_amount": "10000000",
+        "input_mint": "So11111111111111111111111111111111111111112",
+        "observed_at": "2026-08-24T14:20:33Z",
+        "output_amount": "351331793145",
+        "output_mint": "2bSKSNrkD7xyMxuZVD8CxMWwmEMmqKCJragXjA8cpump",
+        "source_observation_id": "2bSKSNrkD7xyMxuZVD8CxMWwmEMmqKCJragXjA8cpump:BUY_T0"
+      },
+      "x": 1.4666353712718,
+      "x_inputs": {
+        "audit.topHoldersPercentage": 1.4666353712718,
+        "firstPool.createdAt": "2026-08-24T14:15:24Z",
+        "launchpad": "pump.fun",
+        "liquidity": 2907.6257732374092,
+        "updatedAt": "2026-08-24T14:17:54.821493121Z"
+      },
+      "x_reason": null,
+      "x_source": {
+        "field_paths": [
+          "audit.topHoldersPercentage",
+          "liquidity",
+          "firstPool.createdAt",
+          "updatedAt",
+          "launchpad"
+        ],
+        "observation_id": "DISCOVERY:SEARCH_T5",
+        "recent_response_sha256": "3ed5438a6c8af4bd4d94fb731bb2421b4fd2c61b4845ede02944df62e24f926c",
+        "recent_row_sha256": "37f68c7856c0fb5f3d69bd3054fefb1a4219f362181d85532052c4b34663bfe0",
+        "response_sha256": "9e6e074210fe5e6d5e6e04a96fddd9b9e90230199384fdba8fa5688713c3be83",
+        "row_mint": "2bSKSNrkD7xyMxuZVD8CxMWwmEMmqKCJragXjA8cpump",
+        "row_sha256": "3a9996c92c44d4a6a891de03a2b9f2d2818ff295142b2b2232c9627df450b859"
+      },
+      "x_status": "ELIGIBLE",
+      "y": -0.0312721
+    },
+    {
+      "age_seconds": 312.0,
+      "buy_clock_error": null,
+      "buy_clock_valid": true,
+      "buy_observed_at": "2026-08-24T14:20:36Z",
+      "buy_out_amount": "197697637384",
+      "buy_terminal": "QUOTE_OBSERVED",
+      "buy_transport": {
+        "http_status": 200,
+        "request_count": 1,
+        "response_bytes": 1264,
+        "response_sha256": "e4c29f25addf162a6278f9db90f4de3781a3b569dbd5eed1dadff714a8ea197f",
+        "safe_response_headers": {
+          "x-api-gateway-request-id": "GXrzbd-kTz89WzII5kvFkdczJYKaUBn8UsiRM-5Lh_fvlaEQIbbzPg=="
+        },
+        "url_has_api_key": false,
+        "url_has_taker": false
+      },
+      "decision_snapshot_at": "2026-08-24T14:20:30Z",
+      "h900": {
+        "due_at": "2026-08-24T14:35:36Z",
+        "expected_input_amount": "197697637384",
+        "input_amount": "197697637384",
+        "input_mint": "QnPzHXbzu8PPrJUVv61JxygNigkNmJ4cKJag3U2pump",
+        "lateness_deadline": "2026-08-24T14:37:36Z",
+        "observed_at": "2026-08-24T14:35:36Z",
+        "output_amount": "7687426",
+        "output_mint": "So11111111111111111111111111111111111111112",
+        "source_observation_id": "QnPzHXbzu8PPrJUVv61JxygNigkNmJ4cKJag3U2pump:SELL_H900",
+        "transport": {
+          "http_status": 200,
+          "request_count": 1,
+          "response_bytes": 1261,
+          "response_sha256": "7f39ac71c94bdd8cb20da3e56295007b315466082eceb76211a87a05d92225ed",
+          "safe_response_headers": {
+            "x-api-gateway-request-id": "6oOh9WGMTqlzFNEjURbfwTRMvWLKIDH9hvpR8EHTPej29GAaAnLobw=="
+          },
+          "url_has_api_key": false,
+          "url_has_taker": false
+        }
+      },
+      "h900_due_at": "2026-08-24T14:35:36Z",
+      "h900_lateness_deadline": "2026-08-24T14:37:36Z",
+      "h900_terminal": "QUOTE_OBSERVED",
+      "mint": "QnPzHXbzu8PPrJUVv61JxygNigkNmJ4cKJag3U2pump",
+      "t0": {
+        "expected_input_amount": "10000000",
+        "input_amount": "10000000",
+        "input_mint": "So11111111111111111111111111111111111111112",
+        "observed_at": "2026-08-24T14:20:36Z",
+        "output_amount": "197697637384",
+        "output_mint": "QnPzHXbzu8PPrJUVv61JxygNigkNmJ4cKJag3U2pump",
+        "source_observation_id": "QnPzHXbzu8PPrJUVv61JxygNigkNmJ4cKJag3U2pump:BUY_T0"
+      },
+      "x": 24.69129387274193,
+      "x_inputs": {
+        "audit.topHoldersPercentage": 24.69129387274193,
+        "firstPool.createdAt": "2026-08-24T14:15:18Z",
+        "launchpad": "pump.fun",
+        "liquidity": 1178.8047078695208,
+        "updatedAt": "2026-08-24T14:20:29.872148519Z"
+      },
+      "x_reason": null,
+      "x_source": {
+        "field_paths": [
+          "audit.topHoldersPercentage",
+          "liquidity",
+          "firstPool.createdAt",
+          "updatedAt",
+          "launchpad"
+        ],
+        "observation_id": "DISCOVERY:SEARCH_T5",
+        "recent_response_sha256": "3ed5438a6c8af4bd4d94fb731bb2421b4fd2c61b4845ede02944df62e24f926c",
+        "recent_row_sha256": "78ef7b1ddabbc63410da53dcbaa2716a6d7a70db545faee1d6211ce0c70481bd",
+        "response_sha256": "9e6e074210fe5e6d5e6e04a96fddd9b9e90230199384fdba8fa5688713c3be83",
+        "row_mint": "QnPzHXbzu8PPrJUVv61JxygNigkNmJ4cKJag3U2pump",
+        "row_sha256": "80645ccb0e490bdeb84fa550f1d109043c51c586ed3b70f337403bf92a1faa45"
+      },
+      "x_status": "ELIGIBLE",
+      "y": -0.2312574
+    },
+    {
+      "age_seconds": 313.0,
+      "buy_clock_error": null,
+      "buy_clock_valid": true,
+      "buy_observed_at": "2026-08-24T14:20:40Z",
+      "buy_out_amount": "352781556755",
+      "buy_terminal": "QUOTE_OBSERVED",
+      "buy_transport": {
+        "http_status": 200,
+        "request_count": 1,
+        "response_bytes": 1257,
+        "response_sha256": "9a705b526e7bf3b484849edb5de5ad0618815e61a364be19a49c583a7e34411b",
+        "safe_response_headers": {
+          "x-api-gateway-request-id": "Ec11M-meAPpXwayijZzqR9CHbUHmkQrNR--X-HOZOKYd0OKQGwXc5g=="
+        },
+        "url_has_api_key": false,
+        "url_has_taker": false
+      },
+      "decision_snapshot_at": "2026-08-24T14:20:30Z",
+      "h900": {
+        "due_at": "2026-08-24T14:35:40Z",
+        "expected_input_amount": "352781556755",
+        "input_amount": "352781556755",
+        "input_mint": "G87oWxD7n3vTP2d9mFrsdM52fa1p9eB8e16hbg4mpump",
+        "lateness_deadline": "2026-08-24T14:37:40Z",
+        "observed_at": "2026-08-24T14:35:40Z",
+        "output_amount": "9727186",
+        "output_mint": "So11111111111111111111111111111111111111112",
+        "source_observation_id": "G87oWxD7n3vTP2d9mFrsdM52fa1p9eB8e16hbg4mpump:SELL_H900",
+        "transport": {
+          "http_status": 200,
+          "request_count": 1,
+          "response_bytes": 1254,
+          "response_sha256": "08933ea1b95acb82e69c4b7a8c06d0a09f0e6ecb39d90b84f755cb3bd570e859",
+          "safe_response_headers": {
+            "x-api-gateway-request-id": "_67xUm57W2sDu19bT_g2OchNYXaaapVqw3iGWQhaggeNCUIe_i-I2g=="
+          },
+          "url_has_api_key": false,
+          "url_has_taker": false
+        }
+      },
+      "h900_due_at": "2026-08-24T14:35:40Z",
+      "h900_lateness_deadline": "2026-08-24T14:37:40Z",
+      "h900_terminal": "QUOTE_OBSERVED",
+      "mint": "G87oWxD7n3vTP2d9mFrsdM52fa1p9eB8e16hbg4mpump",
+      "t0": {
+        "expected_input_amount": "10000000",
+        "input_amount": "10000000",
+        "input_mint": "So11111111111111111111111111111111111111112",
+        "observed_at": "2026-08-24T14:20:40Z",
+        "output_amount": "352781556755",
+        "output_mint": "G87oWxD7n3vTP2d9mFrsdM52fa1p9eB8e16hbg4mpump",
+        "source_observation_id": "G87oWxD7n3vTP2d9mFrsdM52fa1p9eB8e16hbg4mpump:BUY_T0"
+      },
+      "x": 9.754545454545399,
+      "x_inputs": {
+        "audit.topHoldersPercentage": 9.754545454545399,
+        "firstPool.createdAt": "2026-08-24T14:15:17Z",
+        "launchpad": "pump.fun",
+        "liquidity": 2862.9740537377547,
+        "updatedAt": "2026-08-24T14:16:46.618490096Z"
+      },
+      "x_reason": null,
+      "x_source": {
+        "field_paths": [
+          "audit.topHoldersPercentage",
+          "liquidity",
+          "firstPool.createdAt",
+          "updatedAt",
+          "launchpad"
+        ],
+        "observation_id": "DISCOVERY:SEARCH_T5",
+        "recent_response_sha256": "3ed5438a6c8af4bd4d94fb731bb2421b4fd2c61b4845ede02944df62e24f926c",
+        "recent_row_sha256": "a355728762428dbec68f64acde857da660afaffe23b2dde14b6c1b0c1c851e43",
+        "response_sha256": "9e6e074210fe5e6d5e6e04a96fddd9b9e90230199384fdba8fa5688713c3be83",
+        "row_mint": "G87oWxD7n3vTP2d9mFrsdM52fa1p9eB8e16hbg4mpump",
+        "row_sha256": "10d2383e394d53a8dcea71c526109eb624cd9cbcbb92eafde3590469a1411610"
+      },
+      "x_status": "ELIGIBLE",
+      "y": -0.0272814
+    },
+    {
+      "age_seconds": 314.0,
+      "buy_clock_error": null,
+      "buy_clock_valid": true,
+      "buy_observed_at": "2026-08-24T14:20:43Z",
+      "buy_out_amount": "352781556755",
+      "buy_terminal": "QUOTE_OBSERVED",
+      "buy_transport": {
+        "http_status": 200,
+        "request_count": 1,
+        "response_bytes": 1262,
+        "response_sha256": "6c3fc7dec0ed47eda42fdb540e7b57b31ea3777f6a76311f999a5d1a523a138d",
+        "safe_response_headers": {
+          "x-api-gateway-request-id": "73X1muwk1bLk96ZI7qDQICn3NmX--atbgNHvO8Vz673lxA3g6klcTg=="
+        },
+        "url_has_api_key": false,
+        "url_has_taker": false
+      },
+      "decision_snapshot_at": "2026-08-24T14:20:30Z",
+      "h900": {
+        "due_at": "2026-08-24T14:35:43Z",
+        "expected_input_amount": "352781556755",
+        "input_amount": "352781556755",
+        "input_mint": "GzAJTJRD8VyWNHbr6Lw3gaUS8XNYLKj19igBnphspump",
+        "lateness_deadline": "2026-08-24T14:37:43Z",
+        "observed_at": "2026-08-24T14:35:43Z",
+        "output_amount": "9727186",
+        "output_mint": "So11111111111111111111111111111111111111112",
+        "source_observation_id": "GzAJTJRD8VyWNHbr6Lw3gaUS8XNYLKj19igBnphspump:SELL_H900",
+        "transport": {
+          "http_status": 200,
+          "request_count": 1,
+          "response_bytes": 1256,
+          "response_sha256": "57c9139d925d4e14ea7f2c85d824da3dc7cc5691ca316c68e4639d4433b6484f",
+          "safe_response_headers": {
+            "x-api-gateway-request-id": "N7yTdSZhqtlqjzAphoeK26X9nk-lKUbhBmpCBJ7oXGCS1_8ETjmMZg=="
+          },
+          "url_has_api_key": false,
+          "url_has_taker": false
+        }
+      },
+      "h900_due_at": "2026-08-24T14:35:43Z",
+      "h900_lateness_deadline": "2026-08-24T14:37:43Z",
+      "h900_terminal": "QUOTE_OBSERVED",
+      "mint": "GzAJTJRD8VyWNHbr6Lw3gaUS8XNYLKj19igBnphspump",
+      "t0": {
+        "expected_input_amount": "10000000",
+        "input_amount": "10000000",
+        "input_mint": "So11111111111111111111111111111111111111112",
+        "observed_at": "2026-08-24T14:20:43Z",
+        "output_amount": "352781556755",
+        "output_mint": "GzAJTJRD8VyWNHbr6Lw3gaUS8XNYLKj19igBnphspump",
+        "source_observation_id": "GzAJTJRD8VyWNHbr6Lw3gaUS8XNYLKj19igBnphspump:BUY_T0"
+      },
+      "x": 3.4199203154141005,
+      "x_inputs": {
+        "audit.topHoldersPercentage": 3.4199203154141005,
+        "firstPool.createdAt": "2026-08-24T14:15:16Z",
+        "launchpad": "pump.fun",
+        "liquidity": 2866.056620881006,
+        "updatedAt": "2026-08-24T14:16:33.337492146Z"
+      },
+      "x_reason": null,
+      "x_source": {
+        "field_paths": [
+          "audit.topHoldersPercentage",
+          "liquidity",
+          "firstPool.createdAt",
+          "updatedAt",
+          "launchpad"
+        ],
+        "observation_id": "DISCOVERY:SEARCH_T5",
+        "recent_response_sha256": "3ed5438a6c8af4bd4d94fb731bb2421b4fd2c61b4845ede02944df62e24f926c",
+        "recent_row_sha256": "3522a3f1a3ccdeeb73660ff999e0cc5a9c0c1dd7d78537412ebf622e28c0f9e0",
+        "response_sha256": "9e6e074210fe5e6d5e6e04a96fddd9b9e90230199384fdba8fa5688713c3be83",
+        "row_mint": "GzAJTJRD8VyWNHbr6Lw3gaUS8XNYLKj19igBnphspump",
+        "row_sha256": "8365de061d4ed4d3adeef30885461961c5737338cc8377bc8c25206d4c6c7bd9"
+      },
+      "x_status": "ELIGIBLE",
+      "y": -0.0272814
+    },
+    {
+      "age_seconds": 317.0,
+      "buy_clock_error": null,
+      "buy_clock_valid": true,
+      "buy_observed_at": "2026-08-24T14:20:46Z",
+      "buy_out_amount": "349020913957",
+      "buy_terminal": "QUOTE_OBSERVED",
+      "buy_transport": {
+        "http_status": 200,
+        "request_count": 1,
+        "response_bytes": 1257,
+        "response_sha256": "76fd1e5f5596aaf7883dd177fd1e418f03c7ae97420a2a4515ef2026bade6b37",
+        "safe_response_headers": {
+          "x-api-gateway-request-id": "e6j_Qroc8hn18vkDhEU_YpdQaxOl2JTLUk0UIQNQxYo3Mkh6uucTJw=="
+        },
+        "url_has_api_key": false,
+        "url_has_taker": false
+      },
+      "decision_snapshot_at": "2026-08-24T14:20:30Z",
+      "h900": {
+        "due_at": "2026-08-24T14:35:46Z",
+        "expected_input_amount": "349020913957",
+        "input_amount": "349020913957",
+        "input_mint": "GmirbJAfC5xe2TmfP44RrVqKygAgtyZAFQhwjtLtpump",
+        "lateness_deadline": "2026-08-24T14:37:46Z",
+        "observed_at": "2026-08-24T14:35:47Z",
+        "output_amount": "9727221",
+        "output_mint": "So11111111111111111111111111111111111111112",
+        "source_observation_id": "GmirbJAfC5xe2TmfP44RrVqKygAgtyZAFQhwjtLtpump:SELL_H900",
+        "transport": {
+          "http_status": 200,
+          "request_count": 1,
+          "response_bytes": 1255,
+          "response_sha256": "8433769a037a317bc71208c530e459555677fac89116f8a8fa1c7d9bdf00af6c",
+          "safe_response_headers": {
+            "x-api-gateway-request-id": "da-Fw_7IoRxmemawUdi9yvLtrZoaZ3gmKPsnlta1XeDbJDZ8uaJYdg=="
+          },
+          "url_has_api_key": false,
+          "url_has_taker": false
+        }
+      },
+      "h900_due_at": "2026-08-24T14:35:46Z",
+      "h900_lateness_deadline": "2026-08-24T14:37:46Z",
+      "h900_terminal": "QUOTE_OBSERVED",
+      "mint": "GmirbJAfC5xe2TmfP44RrVqKygAgtyZAFQhwjtLtpump",
+      "t0": {
+        "expected_input_amount": "10000000",
+        "input_amount": "10000000",
+        "input_mint": "So11111111111111111111111111111111111111112",
+        "observed_at": "2026-08-24T14:20:46Z",
+        "output_amount": "349020913957",
+        "output_mint": "GmirbJAfC5xe2TmfP44RrVqKygAgtyZAFQhwjtLtpump",
+        "source_observation_id": "GmirbJAfC5xe2TmfP44RrVqKygAgtyZAFQhwjtLtpump:BUY_T0"
+      },
+      "x": 5.422768150032,
+      "x_inputs": {
+        "audit.topHoldersPercentage": 5.422768150032,
+        "firstPool.createdAt": "2026-08-24T14:15:13Z",
+        "launchpad": "pump.fun",
+        "liquidity": 2881.4814979804473,
+        "updatedAt": "2026-08-24T14:18:43.63051167Z"
+      },
+      "x_reason": null,
+      "x_source": {
+        "field_paths": [
+          "audit.topHoldersPercentage",
+          "liquidity",
+          "firstPool.createdAt",
+          "updatedAt",
+          "launchpad"
+        ],
+        "observation_id": "DISCOVERY:SEARCH_T5",
+        "recent_response_sha256": "3ed5438a6c8af4bd4d94fb731bb2421b4fd2c61b4845ede02944df62e24f926c",
+        "recent_row_sha256": "1df81a9b704db7f8400c5b5335cd4b120c20ef21f7a51ad86e41a4a6de8dd252",
+        "response_sha256": "9e6e074210fe5e6d5e6e04a96fddd9b9e90230199384fdba8fa5688713c3be83",
+        "row_mint": "GmirbJAfC5xe2TmfP44RrVqKygAgtyZAFQhwjtLtpump",
+        "row_sha256": "207b38160a2a6d4911b48f278269415c96fcaee2dedc6993e70fce7c962eb739"
+      },
+      "x_status": "ELIGIBLE",
+      "y": -0.0272779
+    },
+    {
+      "age_seconds": 318.0,
+      "buy_clock_error": null,
+      "buy_clock_valid": true,
+      "buy_observed_at": "2026-08-24T14:20:50Z",
+      "buy_out_amount": "352781486904",
+      "buy_terminal": "QUOTE_OBSERVED",
+      "buy_transport": {
+        "http_status": 200,
+        "request_count": 1,
+        "response_bytes": 1262,
+        "response_sha256": "6e1eb8bf6097beb6ddbdbab7b7d7e5745618842fb28ec2e1554b622c52a54df9",
+        "safe_response_headers": {
+          "x-api-gateway-request-id": "YnQNtEZjJwqhuJieelOtLlZ60alw28Xb7_7I8ikIRa-JOnC-7pJG5w=="
+        },
+        "url_has_api_key": false,
+        "url_has_taker": false
+      },
+      "decision_snapshot_at": "2026-08-24T14:20:30Z",
+      "h900": {
+        "due_at": "2026-08-24T14:35:50Z",
+        "expected_input_amount": "352781486904",
+        "input_amount": "352781486904",
+        "input_mint": "F2iCc374ho3Xm4wjPVYjGNDhHYPV6RrDd4vy5wvEpump",
+        "lateness_deadline": "2026-08-24T14:37:50Z",
+        "observed_at": "2026-08-24T14:35:50Z",
+        "output_amount": "9727186",
+        "output_mint": "So11111111111111111111111111111111111111112",
+        "source_observation_id": "F2iCc374ho3Xm4wjPVYjGNDhHYPV6RrDd4vy5wvEpump:SELL_H900",
+        "transport": {
+          "http_status": 200,
+          "request_count": 1,
+          "response_bytes": 1255,
+          "response_sha256": "9046596b03ad98ddb6434a9c9448aa8fc0bce690adc1c87750a2378fa62ca5ff",
+          "safe_response_headers": {
+            "x-api-gateway-request-id": "au2pdXXWM2QFlCv3HAviKSPJ4a11C5yqDlSfniLYLpKZPY_eG8uAqg=="
+          },
+          "url_has_api_key": false,
+          "url_has_taker": false
+        }
+      },
+      "h900_due_at": "2026-08-24T14:35:50Z",
+      "h900_lateness_deadline": "2026-08-24T14:37:50Z",
+      "h900_terminal": "QUOTE_OBSERVED",
+      "mint": "F2iCc374ho3Xm4wjPVYjGNDhHYPV6RrDd4vy5wvEpump",
+      "t0": {
+        "expected_input_amount": "10000000",
+        "input_amount": "10000000",
+        "input_mint": "So11111111111111111111111111111111111111112",
+        "observed_at": "2026-08-24T14:20:50Z",
+        "output_amount": "352781486904",
+        "output_mint": "F2iCc374ho3Xm4wjPVYjGNDhHYPV6RrDd4vy5wvEpump",
+        "source_observation_id": "F2iCc374ho3Xm4wjPVYjGNDhHYPV6RrDd4vy5wvEpump:BUY_T0"
+      },
+      "x": 13.9683463401506,
+      "x_inputs": {
+        "audit.topHoldersPercentage": 13.9683463401506,
+        "firstPool.createdAt": "2026-08-24T14:15:12Z",
+        "launchpad": "pump.fun",
+        "liquidity": 2862.974337347062,
+        "updatedAt": "2026-08-24T14:16:46.743391598Z"
+      },
+      "x_reason": null,
+      "x_source": {
+        "field_paths": [
+          "audit.topHoldersPercentage",
+          "liquidity",
+          "firstPool.createdAt",
+          "updatedAt",
+          "launchpad"
+        ],
+        "observation_id": "DISCOVERY:SEARCH_T5",
+        "recent_response_sha256": "3ed5438a6c8af4bd4d94fb731bb2421b4fd2c61b4845ede02944df62e24f926c",
+        "recent_row_sha256": "7494f6db88e167b41ee6a54bc2288c32a884ee8f89c5721f7c601ec348cd97f4",
+        "response_sha256": "9e6e074210fe5e6d5e6e04a96fddd9b9e90230199384fdba8fa5688713c3be83",
+        "row_mint": "F2iCc374ho3Xm4wjPVYjGNDhHYPV6RrDd4vy5wvEpump",
+        "row_sha256": "53dabf9919d964866fbaf74dde76f8fc59759a74a8ad94ca5fafd87228d06106"
+      },
+      "x_status": "ELIGIBLE",
+      "y": -0.0272814
+    },
+    {
+      "age_seconds": 319.0,
+      "buy_clock_error": null,
+      "buy_clock_valid": true,
+      "buy_observed_at": "2026-08-24T14:20:53Z",
+      "buy_out_amount": "277497511892",
+      "buy_terminal": "QUOTE_OBSERVED",
+      "buy_transport": {
+        "http_status": 200,
+        "request_count": 1,
+        "response_bytes": 1260,
+        "response_sha256": "0e991453c2c87d25e10b9688f47876672b0f78eb3dcab36ae7b06f58c7cab493",
+        "safe_response_headers": {
+          "x-api-gateway-request-id": "-GZ7ibySbmepbm_ZHjpEiqSg1piE1o2E7U1g5i4QT7bk3fbrH82ePQ=="
+        },
+        "url_has_api_key": false,
+        "url_has_taker": false
+      },
+      "decision_snapshot_at": "2026-08-24T14:20:30Z",
+      "h900": {
+        "due_at": "2026-08-24T14:35:53Z",
+        "expected_input_amount": "277497511892",
+        "input_amount": "277497511892",
+        "input_mint": "3K3hr1DLvSbxWc1pvV5oJbqx6bkVxKow8Ubfn1m23ce7",
+        "lateness_deadline": "2026-08-24T14:37:53Z",
+        "observed_at": "2026-08-24T14:35:53Z",
+        "output_amount": "9727909",
+        "output_mint": "So11111111111111111111111111111111111111112",
+        "source_observation_id": "3K3hr1DLvSbxWc1pvV5oJbqx6bkVxKow8Ubfn1m23ce7:SELL_H900",
+        "transport": {
+          "http_status": 200,
+          "request_count": 1,
+          "response_bytes": 1257,
+          "response_sha256": "3bb4c31ada2ab5278f04a459fca4600d20d1cae83ea045630ce2627383b45633",
+          "safe_response_headers": {
+            "x-api-gateway-request-id": "8SQB1zFoGDVUG5Vch_9OV4Vo1i81AZwJ1wJdwpTC2MjgOAWSeqnX1g=="
+          },
+          "url_has_api_key": false,
+          "url_has_taker": false
+        }
+      },
+      "h900_due_at": "2026-08-24T14:35:53Z",
+      "h900_lateness_deadline": "2026-08-24T14:37:53Z",
+      "h900_terminal": "QUOTE_OBSERVED",
+      "mint": "3K3hr1DLvSbxWc1pvV5oJbqx6bkVxKow8Ubfn1m23ce7",
+      "t0": {
+        "expected_input_amount": "10000000",
+        "input_amount": "10000000",
+        "input_mint": "So11111111111111111111111111111111111111112",
+        "observed_at": "2026-08-24T14:20:53Z",
+        "output_amount": "277497511892",
+        "output_mint": "3K3hr1DLvSbxWc1pvV5oJbqx6bkVxKow8Ubfn1m23ce7",
+        "source_observation_id": "3K3hr1DLvSbxWc1pvV5oJbqx6bkVxKow8Ubfn1m23ce7:BUY_T0"
+      },
+      "x": 12.147218068698,
+      "x_inputs": {
+        "audit.topHoldersPercentage": 12.147218068698,
+        "firstPool.createdAt": "2026-08-24T14:15:11Z",
+        "launchpad": "pump.fun",
+        "liquidity": 3234.615731447882,
+        "updatedAt": "2026-08-24T14:20:26.824385635Z"
+      },
+      "x_reason": null,
+      "x_source": {
+        "field_paths": [
+          "audit.topHoldersPercentage",
+          "liquidity",
+          "firstPool.createdAt",
+          "updatedAt",
+          "launchpad"
+        ],
+        "observation_id": "DISCOVERY:SEARCH_T5",
+        "recent_response_sha256": "3ed5438a6c8af4bd4d94fb731bb2421b4fd2c61b4845ede02944df62e24f926c",
+        "recent_row_sha256": "017a8b6f854dac44271853708d3f61bd29f7e65e6052e515735c5e66bd2bcaa9",
+        "response_sha256": "9e6e074210fe5e6d5e6e04a96fddd9b9e90230199384fdba8fa5688713c3be83",
+        "row_mint": "3K3hr1DLvSbxWc1pvV5oJbqx6bkVxKow8Ubfn1m23ce7",
+        "row_sha256": "2db0af6c433a58000c48224865c5b48d16de6db967aeea5b5c12dd057cba1352"
+      },
+      "x_status": "ELIGIBLE",
+      "y": -0.0272091
+    },
+    {
+      "age_seconds": 325.0,
+      "buy_clock_error": null,
+      "buy_clock_valid": true,
+      "buy_observed_at": "2026-08-24T14:20:57Z",
+      "buy_out_amount": "2484595859333",
+      "buy_terminal": "QUOTE_OBSERVED",
+      "buy_transport": {
+        "http_status": 200,
+        "request_count": 1,
+        "response_bytes": 1265,
+        "response_sha256": "45730794eac8e3a2fb2c4d9ead1b117db6d980afffeb7daade8e671602486780",
+        "safe_response_headers": {
+          "x-api-gateway-request-id": "eQKKDY34m8VfT78EbUvqJQWUxc-4RaVf2eCW3l2tvf-YGOxtdpv2qA=="
+        },
+        "url_has_api_key": false,
+        "url_has_taker": false
+      },
+      "decision_snapshot_at": "2026-08-24T14:20:30Z",
+      "h900": {
+        "due_at": "2026-08-24T14:35:57Z",
+        "expected_input_amount": "2484595859333",
+        "input_amount": null,
+        "input_mint": null,
+        "lateness_deadline": "2026-08-24T14:37:57Z",
+        "observed_at": "2026-08-24T14:35:57Z",
+        "output_amount": null,
+        "output_mint": null,
+        "source_observation_id": "9AHsCqJWSt6K78cpwxXJkjby9JTkXb1qiYUmtEuppump:SELL_H900",
+        "transport": {
+          "http_status": 400,
+          "request_count": 1,
+          "response_bytes": 83,
+          "response_sha256": "b015dfb5abbe5da4c0cd5d3f03369d78293e3374a972805f942033abf6e96099",
+          "safe_response_headers": {
+            "x-api-gateway-request-id": "7BwdzMeVB5lSa8jr4xRl026FBKO_N51Xt34jzUa2myD3p69GG0deAQ=="
+          },
+          "url_has_api_key": false,
+          "url_has_taker": false
+        }
+      },
+      "h900_due_at": "2026-08-24T14:35:57Z",
+      "h900_lateness_deadline": "2026-08-24T14:37:57Z",
+      "h900_terminal": "MARKET_EXECUTION_UNAVAILABLE",
+      "mint": "9AHsCqJWSt6K78cpwxXJkjby9JTkXb1qiYUmtEuppump",
+      "t0": {
+        "expected_input_amount": "10000000",
+        "input_amount": "10000000",
+        "input_mint": "So11111111111111111111111111111111111111112",
+        "observed_at": "2026-08-24T14:20:57Z",
+        "output_amount": "2484595859333",
+        "output_mint": "9AHsCqJWSt6K78cpwxXJkjby9JTkXb1qiYUmtEuppump",
+        "source_observation_id": "9AHsCqJWSt6K78cpwxXJkjby9JTkXb1qiYUmtEuppump:BUY_T0"
+      },
+      "x": 49.4059513874657,
+      "x_inputs": {
+        "audit.topHoldersPercentage": 49.4059513874657,
+        "firstPool.createdAt": "2026-08-24T14:15:05Z",
+        "launchpad": "pump.fun",
+        "liquidity": 2862.9979639490884,
+        "updatedAt": "2026-08-24T14:16:43.466367015Z"
+      },
+      "x_reason": null,
+      "x_source": {
+        "field_paths": [
+          "audit.topHoldersPercentage",
+          "liquidity",
+          "firstPool.createdAt",
+          "updatedAt",
+          "launchpad"
+        ],
+        "observation_id": "DISCOVERY:SEARCH_T5",
+        "recent_response_sha256": "3ed5438a6c8af4bd4d94fb731bb2421b4fd2c61b4845ede02944df62e24f926c",
+        "recent_row_sha256": "b90cfe0613f7b31b3c2a16e38258ddeb24cd74b3299bccedfdc866fa9b0de72c",
+        "response_sha256": "9e6e074210fe5e6d5e6e04a96fddd9b9e90230199384fdba8fa5688713c3be83",
+        "row_mint": "9AHsCqJWSt6K78cpwxXJkjby9JTkXb1qiYUmtEuppump",
+        "row_sha256": "8c0f4608d7502bb0daef0726d69b270ffe53f55ffb035927099f3424e04dba9f"
+      },
+      "x_status": "ELIGIBLE",
+      "y": null
+    },
+    {
+      "age_seconds": 327.0,
+      "buy_clock_error": null,
+      "buy_clock_valid": true,
+      "buy_observed_at": "2026-08-24T14:21:00Z",
+      "buy_out_amount": "352139484216",
+      "buy_terminal": "QUOTE_OBSERVED",
+      "buy_transport": {
+        "http_status": 200,
+        "request_count": 1,
+        "response_bytes": 1262,
+        "response_sha256": "a31aa70f8da323e0e5b8cee3568ab8bf7e0e979298e82985126bf88411ee18e4",
+        "safe_response_headers": {
+          "x-api-gateway-request-id": "tR1ybwa8wga9F2NbdfjlGMGyyNBVgTYF57I-rL9myfB72j3lPuhHog=="
+        },
+        "url_has_api_key": false,
+        "url_has_taker": false
+      },
+      "decision_snapshot_at": "2026-08-24T14:20:30Z",
+      "h900": {
+        "due_at": "2026-08-24T14:36:00Z",
+        "expected_input_amount": "352139484216",
+        "input_amount": "352139484216",
+        "input_mint": "A3yH7eKWAEwzs8sFZFRADoHuJmB65p1JgN6SnhNhpump",
+        "lateness_deadline": "2026-08-24T14:38:00Z",
+        "observed_at": "2026-08-24T14:36:00Z",
+        "output_amount": "9756743",
+        "output_mint": "So11111111111111111111111111111111111111112",
+        "source_observation_id": "A3yH7eKWAEwzs8sFZFRADoHuJmB65p1JgN6SnhNhpump:SELL_H900",
+        "transport": {
+          "http_status": 200,
+          "request_count": 1,
+          "response_bytes": 1255,
+          "response_sha256": "4791c9687ceabbea3f2bad7f6bc117860097eafa4dab1b1a39e419dd9f0d2f9b",
+          "safe_response_headers": {
+            "x-api-gateway-request-id": "seo1AUZX_m8Sj1EJBy0haJoLS6FD7l6UgDHJ28_PFOEl-OJGjGr20w=="
+          },
+          "url_has_api_key": false,
+          "url_has_taker": false
+        }
+      },
+      "h900_due_at": "2026-08-24T14:36:00Z",
+      "h900_lateness_deadline": "2026-08-24T14:38:00Z",
+      "h900_terminal": "QUOTE_OBSERVED",
+      "mint": "A3yH7eKWAEwzs8sFZFRADoHuJmB65p1JgN6SnhNhpump",
+      "t0": {
+        "expected_input_amount": "10000000",
+        "input_amount": "10000000",
+        "input_mint": "So11111111111111111111111111111111111111112",
+        "observed_at": "2026-08-24T14:21:00Z",
+        "output_amount": "352139484216",
+        "output_mint": "A3yH7eKWAEwzs8sFZFRADoHuJmB65p1JgN6SnhNhpump",
+        "source_observation_id": "A3yH7eKWAEwzs8sFZFRADoHuJmB65p1JgN6SnhNhpump:BUY_T0"
+      },
+      "x": 0.09770853342260001,
+      "x_inputs": {
+        "audit.topHoldersPercentage": 0.09770853342260001,
+        "firstPool.createdAt": "2026-08-24T14:15:03Z",
+        "launchpad": "pump.fun",
+        "liquidity": 2868.6925591898676,
+        "updatedAt": "2026-08-24T14:20:29.82019902Z"
+      },
+      "x_reason": null,
+      "x_source": {
+        "field_paths": [
+          "audit.topHoldersPercentage",
+          "liquidity",
+          "firstPool.createdAt",
+          "updatedAt",
+          "launchpad"
+        ],
+        "observation_id": "DISCOVERY:SEARCH_T5",
+        "recent_response_sha256": "3ed5438a6c8af4bd4d94fb731bb2421b4fd2c61b4845ede02944df62e24f926c",
+        "recent_row_sha256": "166a8c7f03c23062a79d493ca9e1b4fd2760b9b4d34b601434bdd1856ecd2ddb",
+        "response_sha256": "9e6e074210fe5e6d5e6e04a96fddd9b9e90230199384fdba8fa5688713c3be83",
+        "row_mint": "A3yH7eKWAEwzs8sFZFRADoHuJmB65p1JgN6SnhNhpump",
+        "row_sha256": "6630525dd4c93bb69355c7030eee6f941863ee8eb5b1bc323ab2675efd2e406c"
+      },
+      "x_status": "ELIGIBLE",
+      "y": -0.0243257
+    },
+    {
+      "age_seconds": 327.0,
+      "buy_clock_error": null,
+      "buy_clock_valid": true,
+      "buy_observed_at": "2026-08-24T14:21:04Z",
+      "buy_out_amount": "352781556719",
+      "buy_terminal": "QUOTE_OBSERVED",
+      "buy_transport": {
+        "http_status": 200,
+        "request_count": 1,
+        "response_bytes": 1262,
+        "response_sha256": "38c7c44fb5fcbca43aa7a3c4277560b04a3e44b2bca6a8ebfaaca4756e306ff1",
+        "safe_response_headers": {
+          "x-api-gateway-request-id": "GWs5CiFzuGU26gMuaYBsVM3aYZtfmbhGFKcsBdkT--bjM31UlLlo1w=="
+        },
+        "url_has_api_key": false,
+        "url_has_taker": false
+      },
+      "decision_snapshot_at": "2026-08-24T14:20:30Z",
+      "h900": {
+        "due_at": "2026-08-24T14:36:04Z",
+        "expected_input_amount": "352781556719",
+        "input_amount": "352781556719",
+        "input_mint": "6dFXGwVe1tqooJugvKL24iTsuQQhEPqk3UiF2h1wpump",
+        "lateness_deadline": "2026-08-24T14:38:04Z",
+        "observed_at": "2026-08-24T14:36:04Z",
+        "output_amount": "9727186",
+        "output_mint": "So11111111111111111111111111111111111111112",
+        "source_observation_id": "6dFXGwVe1tqooJugvKL24iTsuQQhEPqk3UiF2h1wpump:SELL_H900",
+        "transport": {
+          "http_status": 200,
+          "request_count": 1,
+          "response_bytes": 1254,
+          "response_sha256": "927723011e47d1c13a00c4ed31af7a50c9dd170d1fb83e6a2b8478fa766dc248",
+          "safe_response_headers": {
+            "x-api-gateway-request-id": "NUbhGew-iSc4uHLFEvrymc51KrtRR9RIkpNDpu1MLBMeEbWgUKgAAg=="
+          },
+          "url_has_api_key": false,
+          "url_has_taker": false
+        }
+      },
+      "h900_due_at": "2026-08-24T14:36:04Z",
+      "h900_lateness_deadline": "2026-08-24T14:38:04Z",
+      "h900_terminal": "QUOTE_OBSERVED",
+      "mint": "6dFXGwVe1tqooJugvKL24iTsuQQhEPqk3UiF2h1wpump",
+      "t0": {
+        "expected_input_amount": "10000000",
+        "input_amount": "10000000",
+        "input_mint": "So11111111111111111111111111111111111111112",
+        "observed_at": "2026-08-24T14:21:04Z",
+        "output_amount": "352781556719",
+        "output_mint": "6dFXGwVe1tqooJugvKL24iTsuQQhEPqk3UiF2h1wpump",
+        "source_observation_id": "6dFXGwVe1tqooJugvKL24iTsuQQhEPqk3UiF2h1wpump:BUY_T0"
+      },
+      "x": 4.0084600016413,
+      "x_inputs": {
+        "audit.topHoldersPercentage": 4.0084600016413,
+        "firstPool.createdAt": "2026-08-24T14:15:03Z",
+        "launchpad": "pump.fun",
+        "liquidity": 2862.99796423537,
+        "updatedAt": "2026-08-24T14:16:43.267795993Z"
+      },
+      "x_reason": null,
+      "x_source": {
+        "field_paths": [
+          "audit.topHoldersPercentage",
+          "liquidity",
+          "firstPool.createdAt",
+          "updatedAt",
+          "launchpad"
+        ],
+        "observation_id": "DISCOVERY:SEARCH_T5",
+        "recent_response_sha256": "3ed5438a6c8af4bd4d94fb731bb2421b4fd2c61b4845ede02944df62e24f926c",
+        "recent_row_sha256": "f3c3c7dbf4dc2de6ad149656c33e2711daaa55af9a2b3d7ecb9510967520a39f",
+        "response_sha256": "9e6e074210fe5e6d5e6e04a96fddd9b9e90230199384fdba8fa5688713c3be83",
+        "row_mint": "6dFXGwVe1tqooJugvKL24iTsuQQhEPqk3UiF2h1wpump",
+        "row_sha256": "e3c5e90c2ca10e96e042db396e3e91c9a6b5c3a76dfda65775c826e8d7a354d6"
+      },
+      "x_status": "ELIGIBLE",
+      "y": -0.0272814
+    },
+    {
+      "age_seconds": 328.0,
+      "buy_clock_error": null,
+      "buy_clock_valid": true,
+      "buy_observed_at": "2026-08-24T14:21:07Z",
+      "buy_out_amount": "163859282228",
+      "buy_terminal": "QUOTE_OBSERVED",
+      "buy_transport": {
+        "http_status": 200,
+        "request_count": 1,
+        "response_bytes": 1265,
+        "response_sha256": "ff05ee29c120cbb9867a67bf9105792f6c7ad59905f771db572eeacc7217acb2",
+        "safe_response_headers": {
+          "x-api-gateway-request-id": "JDCKGc3I3tLe36H5KzRrcCmppOGWim4LA6exS3sOMoD7VF5B8RL5mQ=="
+        },
+        "url_has_api_key": false,
+        "url_has_taker": false
+      },
+      "decision_snapshot_at": "2026-08-24T14:20:30Z",
+      "h900": {
+        "due_at": "2026-08-24T14:36:07Z",
+        "expected_input_amount": "163859282228",
+        "input_amount": null,
+        "input_mint": null,
+        "lateness_deadline": "2026-08-24T14:38:07Z",
+        "observed_at": "2026-08-24T14:36:07Z",
+        "output_amount": null,
+        "output_mint": null,
+        "source_observation_id": "A41MotvroFg7smyFtEtgwdFxck894GVivz8XybaEpump:SELL_H900",
+        "transport": {
+          "http_status": 400,
+          "request_count": 1,
+          "response_bytes": 83,
+          "response_sha256": "5b9e680b3c7eba8a5183bd52163d10800d4c0e4b0b5bae301f07d0242bb87e84",
+          "safe_response_headers": {
+            "x-api-gateway-request-id": "jKp4zOngLB0LwdqCRN6zATPlpcpGC7scfmMOCULoUZPKrqijdAZtVA=="
+          },
+          "url_has_api_key": false,
+          "url_has_taker": false
+        }
+      },
+      "h900_due_at": "2026-08-24T14:36:07Z",
+      "h900_lateness_deadline": "2026-08-24T14:38:07Z",
+      "h900_terminal": "MARKET_EXECUTION_UNAVAILABLE",
+      "mint": "A41MotvroFg7smyFtEtgwdFxck894GVivz8XybaEpump",
+      "t0": {
+        "expected_input_amount": "10000000",
+        "input_amount": "10000000",
+        "input_mint": "So11111111111111111111111111111111111111112",
+        "observed_at": "2026-08-24T14:21:07Z",
+        "output_amount": "163859282228",
+        "output_mint": "A41MotvroFg7smyFtEtgwdFxck894GVivz8XybaEpump",
+        "source_observation_id": "A41MotvroFg7smyFtEtgwdFxck894GVivz8XybaEpump:BUY_T0"
+      },
+      "x": 50.0962001476109,
+      "x_inputs": {
+        "audit.topHoldersPercentage": 50.0962001476109,
+        "firstPool.createdAt": "2026-08-24T14:15:02Z",
+        "launchpad": "pump.fun",
+        "liquidity": 2862.9979639490884,
+        "updatedAt": "2026-08-24T14:16:02.41870519Z"
+      },
+      "x_reason": null,
+      "x_source": {
+        "field_paths": [
+          "audit.topHoldersPercentage",
+          "liquidity",
+          "firstPool.createdAt",
+          "updatedAt",
+          "launchpad"
+        ],
+        "observation_id": "DISCOVERY:SEARCH_T5",
+        "recent_response_sha256": "3ed5438a6c8af4bd4d94fb731bb2421b4fd2c61b4845ede02944df62e24f926c",
+        "recent_row_sha256": "c4a0ddb87ba48868999ab4041c421d1b2afb37bd94a7c1496bf1d4746462830f",
+        "response_sha256": "9e6e074210fe5e6d5e6e04a96fddd9b9e90230199384fdba8fa5688713c3be83",
+        "row_mint": "A41MotvroFg7smyFtEtgwdFxck894GVivz8XybaEpump",
+        "row_sha256": "eb98eb028cb4b719ea142f3ac882cbfca17c9515ed2b716838a5aaa1c1b264cd"
+      },
+      "x_status": "ELIGIBLE",
+      "y": null
+    },
+    {
+      "age_seconds": 337.0,
+      "buy_clock_error": null,
+      "buy_clock_valid": true,
+      "buy_observed_at": "2026-08-24T14:21:10Z",
+      "buy_out_amount": "352781556661",
+      "buy_terminal": "QUOTE_OBSERVED",
+      "buy_transport": {
+        "http_status": 200,
+        "request_count": 1,
+        "response_bytes": 1264,
+        "response_sha256": "6140a38feef7899010f95d3c2bdf81fd4cda6bb9b6a2df3136579a94a9934795",
+        "safe_response_headers": {
+          "x-api-gateway-request-id": "testpDOrwv_0OPfMSf7Kmt3UUTv7KpLqtrvfVDj-xj7BWFr1r3CI_w=="
+        },
+        "url_has_api_key": false,
+        "url_has_taker": false
+      },
+      "decision_snapshot_at": "2026-08-24T14:20:30Z",
+      "h900": {
+        "due_at": "2026-08-24T14:36:10Z",
+        "expected_input_amount": "352781556661",
+        "input_amount": "352781556661",
+        "input_mint": "269T16ngA1txT4zXXxcryHHRB8FUH3tFdzrwxgzCpump",
+        "lateness_deadline": "2026-08-24T14:38:10Z",
+        "observed_at": "2026-08-24T14:36:11Z",
+        "output_amount": "9727186",
+        "output_mint": "So11111111111111111111111111111111111111112",
+        "source_observation_id": "269T16ngA1txT4zXXxcryHHRB8FUH3tFdzrwxgzCpump:SELL_H900",
+        "transport": {
+          "http_status": 200,
+          "request_count": 1,
+          "response_bytes": 1256,
+          "response_sha256": "4a7ec2412be0368583008ffcc9517c9298655301a3ec431e55c047513249f6ee",
+          "safe_response_headers": {
+            "x-api-gateway-request-id": "xyTpvAmEbxcYoRlQkVBCMYh0Pgfiy292aRAKq6O6X6V-kJW1lVuGww=="
+          },
+          "url_has_api_key": false,
+          "url_has_taker": false
+        }
+      },
+      "h900_due_at": "2026-08-24T14:36:10Z",
+      "h900_lateness_deadline": "2026-08-24T14:38:10Z",
+      "h900_terminal": "QUOTE_OBSERVED",
+      "mint": "269T16ngA1txT4zXXxcryHHRB8FUH3tFdzrwxgzCpump",
+      "t0": {
+        "expected_input_amount": "10000000",
+        "input_amount": "10000000",
+        "input_mint": "So11111111111111111111111111111111111111112",
+        "observed_at": "2026-08-24T14:21:10Z",
+        "output_amount": "352781556661",
+        "output_mint": "269T16ngA1txT4zXXxcryHHRB8FUH3tFdzrwxgzCpump",
+        "source_observation_id": "269T16ngA1txT4zXXxcryHHRB8FUH3tFdzrwxgzCpump:BUY_T0"
+      },
+      "x": 1.6287405120465999,
+      "x_inputs": {
+        "audit.topHoldersPercentage": 1.6287405120465999,
+        "firstPool.createdAt": "2026-08-24T14:14:53Z",
+        "launchpad": "pump.fun",
+        "liquidity": 2911.9373428164454,
+        "updatedAt": "2026-08-24T14:20:08.497237303Z"
+      },
+      "x_reason": null,
+      "x_source": {
+        "field_paths": [
+          "audit.topHoldersPercentage",
+          "liquidity",
+          "firstPool.createdAt",
+          "updatedAt",
+          "launchpad"
+        ],
+        "observation_id": "DISCOVERY:SEARCH_T5",
+        "recent_response_sha256": "3ed5438a6c8af4bd4d94fb731bb2421b4fd2c61b4845ede02944df62e24f926c",
+        "recent_row_sha256": "a16336a80c95b7183117208938fa792225ef35a2fbc180086b41dde47289bbd4",
+        "response_sha256": "9e6e074210fe5e6d5e6e04a96fddd9b9e90230199384fdba8fa5688713c3be83",
+        "row_mint": "269T16ngA1txT4zXXxcryHHRB8FUH3tFdzrwxgzCpump",
+        "row_sha256": "d4a3052d8d5a50ee797f5663610f1f907367e4e6c71a7f88c3e31d08ae6ec4b2"
+      },
+      "x_status": "ELIGIBLE",
+      "y": -0.0272814
+    },
+    {
+      "age_seconds": 344.0,
+      "buy_clock_error": null,
+      "buy_clock_valid": true,
+      "buy_observed_at": "2026-08-24T14:21:14Z",
+      "buy_out_amount": "352781556661",
+      "buy_terminal": "QUOTE_OBSERVED",
+      "buy_transport": {
+        "http_status": 200,
+        "request_count": 1,
+        "response_bytes": 1264,
+        "response_sha256": "a9fadde42d9c5aa39d10c2929ea3eddf116dcb6d8feffba1bc652ad88bd6ed10",
+        "safe_response_headers": {
+          "x-api-gateway-request-id": "C5du68mHBZbjE-rvnurt4U_SEbGX4geG24SNteouT6tcQBp0BIUiPg=="
+        },
+        "url_has_api_key": false,
+        "url_has_taker": false
+      },
+      "decision_snapshot_at": "2026-08-24T14:20:30Z",
+      "h900": {
+        "due_at": "2026-08-24T14:36:14Z",
+        "expected_input_amount": "352781556661",
+        "input_amount": "352781556661",
+        "input_mint": "84AUTkf6ZYdPLqhwvY4arQLrrJrcPPN1twrWqaFapump",
+        "lateness_deadline": "2026-08-24T14:38:14Z",
+        "observed_at": "2026-08-24T14:36:14Z",
+        "output_amount": "9727186",
+        "output_mint": "So11111111111111111111111111111111111111112",
+        "source_observation_id": "84AUTkf6ZYdPLqhwvY4arQLrrJrcPPN1twrWqaFapump:SELL_H900",
+        "transport": {
+          "http_status": 200,
+          "request_count": 1,
+          "response_bytes": 1257,
+          "response_sha256": "1ea764687cda45f89da32bf131febced3543a3ebff1237eb8625ff2c9dbac4ec",
+          "safe_response_headers": {
+            "x-api-gateway-request-id": "dgaVrKympsME_SLFTG27pjMxtlIv9bqEUTwIPS4TgpxWTVfb2RV6lw=="
+          },
+          "url_has_api_key": false,
+          "url_has_taker": false
+        }
+      },
+      "h900_due_at": "2026-08-24T14:36:14Z",
+      "h900_lateness_deadline": "2026-08-24T14:38:14Z",
+      "h900_terminal": "QUOTE_OBSERVED",
+      "mint": "84AUTkf6ZYdPLqhwvY4arQLrrJrcPPN1twrWqaFapump",
+      "t0": {
+        "expected_input_amount": "10000000",
+        "input_amount": "10000000",
+        "input_mint": "So11111111111111111111111111111111111111112",
+        "observed_at": "2026-08-24T14:21:14Z",
+        "output_amount": "352781556661",
+        "output_mint": "84AUTkf6ZYdPLqhwvY4arQLrrJrcPPN1twrWqaFapump",
+        "source_observation_id": "84AUTkf6ZYdPLqhwvY4arQLrrJrcPPN1twrWqaFapump:BUY_T0"
+      },
+      "x": 3.5440549600129003,
+      "x_inputs": {
+        "audit.topHoldersPercentage": 3.5440549600129003,
+        "firstPool.createdAt": "2026-08-24T14:14:46Z",
+        "launchpad": "pump.fun",
+        "liquidity": 2862.997964712505,
+        "updatedAt": "2026-08-24T14:20:18.95426223Z"
+      },
+      "x_reason": null,
+      "x_source": {
+        "field_paths": [
+          "audit.topHoldersPercentage",
+          "liquidity",
+          "firstPool.createdAt",
+          "updatedAt",
+          "launchpad"
+        ],
+        "observation_id": "DISCOVERY:SEARCH_T5",
+        "recent_response_sha256": "3ed5438a6c8af4bd4d94fb731bb2421b4fd2c61b4845ede02944df62e24f926c",
+        "recent_row_sha256": "670b5b5e34da2ff050cebfc6840cc1269bfcbf73a63f3af01f51b69cf6921988",
+        "response_sha256": "9e6e074210fe5e6d5e6e04a96fddd9b9e90230199384fdba8fa5688713c3be83",
+        "row_mint": "84AUTkf6ZYdPLqhwvY4arQLrrJrcPPN1twrWqaFapump",
+        "row_sha256": "868e6e60c1d03e574a2e43e0810ab71f85735bf3ece3359f491e0b77afa0a9b0"
+      },
+      "x_status": "ELIGIBLE",
+      "y": -0.0272814
+    },
+    {
+      "age_seconds": 349.0,
+      "buy_clock_error": null,
+      "buy_clock_valid": true,
+      "buy_observed_at": "2026-08-24T14:21:17Z",
+      "buy_out_amount": "971604304678",
+      "buy_terminal": "QUOTE_OBSERVED",
+      "buy_transport": {
+        "http_status": 200,
+        "request_count": 1,
+        "response_bytes": 1264,
+        "response_sha256": "96da7d561242a8d7c61b91cf1048e2531f2164f14ba795fb780b6b418ec35cd7",
+        "safe_response_headers": {
+          "x-api-gateway-request-id": "-yxsG5St6d4m_FqUsuQ5Y87VQoXzY8L1G9S1z_zDmdhKmRN5a2hzdg=="
+        },
+        "url_has_api_key": false,
+        "url_has_taker": false
+      },
+      "decision_snapshot_at": "2026-08-24T14:20:30Z",
+      "h900": {
+        "due_at": "2026-08-24T14:36:17Z",
+        "expected_input_amount": "971604304678",
+        "input_amount": null,
+        "input_mint": null,
+        "lateness_deadline": "2026-08-24T14:38:17Z",
+        "observed_at": "2026-08-24T14:36:18Z",
+        "output_amount": null,
+        "output_mint": null,
+        "source_observation_id": "5UQA6Rom1d6gpuPF83aTJerWrtshpK4Sz2RdmvPUpump:SELL_H900",
+        "transport": {
+          "http_status": 400,
+          "request_count": 1,
+          "response_bytes": 83,
+          "response_sha256": "7fbaf48597509745c21b02e43611c3e72f5385c45918c3a97536dda902f537fc",
+          "safe_response_headers": {
+            "x-api-gateway-request-id": "wjXqpZTxMuU8SW2mXaeCDFHYZMmesLfVetLqgFU732DrDP0s2FFP0A=="
+          },
+          "url_has_api_key": false,
+          "url_has_taker": false
+        }
+      },
+      "h900_due_at": "2026-08-24T14:36:17Z",
+      "h900_lateness_deadline": "2026-08-24T14:38:17Z",
+      "h900_terminal": "MARKET_EXECUTION_UNAVAILABLE",
+      "mint": "5UQA6Rom1d6gpuPF83aTJerWrtshpK4Sz2RdmvPUpump",
+      "t0": {
+        "expected_input_amount": "10000000",
+        "input_amount": "10000000",
+        "input_mint": "So11111111111111111111111111111111111111112",
+        "observed_at": "2026-08-24T14:21:17Z",
+        "output_amount": "971604304678",
+        "output_mint": "5UQA6Rom1d6gpuPF83aTJerWrtshpK4Sz2RdmvPUpump",
+        "source_observation_id": "5UQA6Rom1d6gpuPF83aTJerWrtshpK4Sz2RdmvPUpump:BUY_T0"
+      },
+      "x": 50.07838552465995,
+      "x_inputs": {
+        "audit.topHoldersPercentage": 50.07838552465995,
+        "firstPool.createdAt": "2026-08-24T14:14:41Z",
+        "launchpad": "pump.fun",
+        "liquidity": 2862.9740537377547,
+        "updatedAt": "2026-08-24T14:16:05.630173664Z"
+      },
+      "x_reason": null,
+      "x_source": {
+        "field_paths": [
+          "audit.topHoldersPercentage",
+          "liquidity",
+          "firstPool.createdAt",
+          "updatedAt",
+          "launchpad"
+        ],
+        "observation_id": "DISCOVERY:SEARCH_T5",
+        "recent_response_sha256": "3ed5438a6c8af4bd4d94fb731bb2421b4fd2c61b4845ede02944df62e24f926c",
+        "recent_row_sha256": "cca412370d6c96aaf24ef8391a604486c9800802f8fa0f6946689709415eb1d7",
+        "response_sha256": "9e6e074210fe5e6d5e6e04a96fddd9b9e90230199384fdba8fa5688713c3be83",
+        "row_mint": "5UQA6Rom1d6gpuPF83aTJerWrtshpK4Sz2RdmvPUpump",
+        "row_sha256": "10900aa905fff04f7425b0fd422175c3faa9e78d65e0a6bd3a2216f694b8f602"
+      },
+      "x_status": "ELIGIBLE",
+      "y": null
+    },
+    {
+      "age_seconds": 352.0,
+      "buy_clock_error": null,
+      "buy_clock_valid": true,
+      "buy_observed_at": "2026-08-24T14:21:20Z",
+      "buy_out_amount": "293626508188",
+      "buy_terminal": "QUOTE_OBSERVED",
+      "buy_transport": {
+        "http_status": 200,
+        "request_count": 1,
+        "response_bytes": 1264,
+        "response_sha256": "8a691f3d85613605c3cc74a398ee8f087a7b2b26096f6ca03eb0ff8568c83743",
+        "safe_response_headers": {
+          "x-api-gateway-request-id": "dU_jw7S2M_dMqGS7U0QgHEKTfo30aKuV__mTzaAIVdeTZjepdILu4w=="
+        },
+        "url_has_api_key": false,
+        "url_has_taker": false
+      },
+      "decision_snapshot_at": "2026-08-24T14:20:30Z",
+      "h900": {
+        "due_at": "2026-08-24T14:36:20Z",
+        "expected_input_amount": "293626508188",
+        "input_amount": "293626508188",
+        "input_mint": "9LSepVSsCnpgbDrhep2aa62Seq9ZSDMoWshpnVQgpump",
+        "lateness_deadline": "2026-08-24T14:38:20Z",
+        "observed_at": "2026-08-24T14:36:21Z",
+        "output_amount": "9128940",
+        "output_mint": "So11111111111111111111111111111111111111112",
+        "source_observation_id": "9LSepVSsCnpgbDrhep2aa62Seq9ZSDMoWshpnVQgpump:SELL_H900",
+        "transport": {
+          "http_status": 200,
+          "request_count": 1,
+          "response_bytes": 1257,
+          "response_sha256": "bf77c3ca7e2955bdedbef964b9a29916a67ff1e4d3ec2255b0efadbaa96551a7",
+          "safe_response_headers": {
+            "x-api-gateway-request-id": "XqQNLqFb2ICEc4bGvNrz7e4dOI5fNh0dGKMhcbCt9FT06TaL7W3jqg=="
+          },
+          "url_has_api_key": false,
+          "url_has_taker": false
+        }
+      },
+      "h900_due_at": "2026-08-24T14:36:20Z",
+      "h900_lateness_deadline": "2026-08-24T14:38:20Z",
+      "h900_terminal": "QUOTE_OBSERVED",
+      "mint": "9LSepVSsCnpgbDrhep2aa62Seq9ZSDMoWshpnVQgpump",
+      "t0": {
+        "expected_input_amount": "10000000",
+        "input_amount": "10000000",
+        "input_mint": "So11111111111111111111111111111111111111112",
+        "observed_at": "2026-08-24T14:21:20Z",
+        "output_amount": "293626508188",
+        "output_mint": "9LSepVSsCnpgbDrhep2aa62Seq9ZSDMoWshpnVQgpump",
+        "source_observation_id": "9LSepVSsCnpgbDrhep2aa62Seq9ZSDMoWshpnVQgpump:BUY_T0"
+      },
+      "x": 7.1282916621583565,
+      "x_inputs": {
+        "audit.topHoldersPercentage": 7.1282916621583565,
+        "firstPool.createdAt": "2026-08-24T14:14:38Z",
+        "launchpad": "pump.fun",
+        "liquidity": 3144.064988371294,
+        "updatedAt": "2026-08-24T14:20:29.821183521Z"
+      },
+      "x_reason": null,
+      "x_source": {
+        "field_paths": [
+          "audit.topHoldersPercentage",
+          "liquidity",
+          "firstPool.createdAt",
+          "updatedAt",
+          "launchpad"
+        ],
+        "observation_id": "DISCOVERY:SEARCH_T5",
+        "recent_response_sha256": "3ed5438a6c8af4bd4d94fb731bb2421b4fd2c61b4845ede02944df62e24f926c",
+        "recent_row_sha256": "2fcf45fc816f7f05c65ac9bf1633f8700d0f71dec78e646cb5a6e95b434985d7",
+        "response_sha256": "9e6e074210fe5e6d5e6e04a96fddd9b9e90230199384fdba8fa5688713c3be83",
+        "row_mint": "9LSepVSsCnpgbDrhep2aa62Seq9ZSDMoWshpnVQgpump",
+        "row_sha256": "f9ccb88e17717e4373adc894136c1fbc26d71efade235696bda8e215a73bac57"
+      },
+      "x_status": "ELIGIBLE",
+      "y": -0.087106
+    },
+    {
+      "age_seconds": 354.0,
+      "buy_clock_error": null,
+      "buy_clock_valid": true,
+      "buy_observed_at": "2026-08-24T14:21:24Z",
+      "buy_out_amount": "352781556402",
+      "buy_terminal": "QUOTE_OBSERVED",
+      "buy_transport": {
+        "http_status": 200,
+        "request_count": 1,
+        "response_bytes": 1263,
+        "response_sha256": "7b7115e5a9308001610147b8f0195b5c064b806fa040822c81acdc2e9af5ade3",
+        "safe_response_headers": {
+          "x-api-gateway-request-id": "g2NnaO2DtTdVbYyedetOZ-trkgYL8BWpt9_FJkj9vOubaLFkIslWYQ=="
+        },
+        "url_has_api_key": false,
+        "url_has_taker": false
+      },
+      "decision_snapshot_at": "2026-08-24T14:20:30Z",
+      "h900": {
+        "due_at": "2026-08-24T14:36:24Z",
+        "expected_input_amount": "352781556402",
+        "input_amount": "352781556402",
+        "input_mint": "LEmNqJg39F9R1eKxYXDghqrkwy7pzCLykJ3WrnUpump",
+        "lateness_deadline": "2026-08-24T14:38:24Z",
+        "observed_at": "2026-08-24T14:36:24Z",
+        "output_amount": "9727186",
+        "output_mint": "So11111111111111111111111111111111111111112",
+        "source_observation_id": "LEmNqJg39F9R1eKxYXDghqrkwy7pzCLykJ3WrnUpump:SELL_H900",
+        "transport": {
+          "http_status": 200,
+          "request_count": 1,
+          "response_bytes": 1256,
+          "response_sha256": "e874f3cc4d908b0d9f30a0f9adabff61f06059077a48813187c279de4c8e151b",
+          "safe_response_headers": {
+            "x-api-gateway-request-id": "rFLBqeTqkEyDS8nzzVCC2FFugmI3p0XoT4w3b9R6UZJitMgl78q7Ew=="
+          },
+          "url_has_api_key": false,
+          "url_has_taker": false
+        }
+      },
+      "h900_due_at": "2026-08-24T14:36:24Z",
+      "h900_lateness_deadline": "2026-08-24T14:38:24Z",
+      "h900_terminal": "QUOTE_OBSERVED",
+      "mint": "LEmNqJg39F9R1eKxYXDghqrkwy7pzCLykJ3WrnUpump",
+      "t0": {
+        "expected_input_amount": "10000000",
+        "input_amount": "10000000",
+        "input_mint": "So11111111111111111111111111111111111111112",
+        "observed_at": "2026-08-24T14:21:24Z",
+        "output_amount": "352781556402",
+        "output_mint": "LEmNqJg39F9R1eKxYXDghqrkwy7pzCLykJ3WrnUpump",
+        "source_observation_id": "LEmNqJg39F9R1eKxYXDghqrkwy7pzCLykJ3WrnUpump:BUY_T0"
+      },
+      "x": 0.1285531160445,
+      "x_inputs": {
+        "audit.topHoldersPercentage": 0.1285531160445,
+        "firstPool.createdAt": "2026-08-24T14:14:36Z",
+        "launchpad": "pump.fun",
+        "liquidity": 2869.9340662699724,
+        "updatedAt": "2026-08-24T14:20:08.608090045Z"
+      },
+      "x_reason": null,
+      "x_source": {
+        "field_paths": [
+          "audit.topHoldersPercentage",
+          "liquidity",
+          "firstPool.createdAt",
+          "updatedAt",
+          "launchpad"
+        ],
+        "observation_id": "DISCOVERY:SEARCH_T5",
+        "recent_response_sha256": "3ed5438a6c8af4bd4d94fb731bb2421b4fd2c61b4845ede02944df62e24f926c",
+        "recent_row_sha256": "36dab81e556a5a189c47eeef60f8c7b13f2425bce2b564a644927354a7f54197",
+        "response_sha256": "9e6e074210fe5e6d5e6e04a96fddd9b9e90230199384fdba8fa5688713c3be83",
+        "row_mint": "LEmNqJg39F9R1eKxYXDghqrkwy7pzCLykJ3WrnUpump",
+        "row_sha256": "8fcd8890db84b61bc92d735c807e8dd77e3b4acad0a2f191b89c8368355b85d5"
+      },
+      "x_status": "ELIGIBLE",
+      "y": -0.0272814
+    },
+    {
+      "age_seconds": 356.0,
+      "buy_clock_error": null,
+      "buy_clock_valid": true,
+      "buy_observed_at": "2026-08-24T14:21:27Z",
+      "buy_out_amount": "3429660648988",
+      "buy_terminal": "QUOTE_OBSERVED",
+      "buy_transport": {
+        "http_status": 200,
+        "request_count": 1,
+        "response_bytes": 1267,
+        "response_sha256": "46cc346cffc4e685b6ffc76636334180a2cc7ee6f50207d60025b6190b6fa1d0",
+        "safe_response_headers": {
+          "x-api-gateway-request-id": "IlLVCN6vuzWcGhtnSYxp8lQ2ZHmMxLtJzrKQza9B3O_Rj53F56w4vA=="
+        },
+        "url_has_api_key": false,
+        "url_has_taker": false
+      },
+      "decision_snapshot_at": "2026-08-24T14:20:30Z",
+      "h900": {
+        "due_at": "2026-08-24T14:36:27Z",
+        "expected_input_amount": "3429660648988",
+        "input_amount": null,
+        "input_mint": null,
+        "lateness_deadline": "2026-08-24T14:38:27Z",
+        "observed_at": "2026-08-24T14:36:28Z",
+        "output_amount": null,
+        "output_mint": null,
+        "source_observation_id": "FpGdZV8iA89GxCuLi2nictRnvPgLBR7jdsvqsZfWpump:SELL_H900",
+        "transport": {
+          "http_status": 400,
+          "request_count": 1,
+          "response_bytes": 83,
+          "response_sha256": "1f1e414a8359ab3d43bf5f70ea89e6d38743f6d150c4cdeb36c7f31d6893631e",
+          "safe_response_headers": {
+            "x-api-gateway-request-id": "B7hLzOMkTVZzJ3mGhzCrucpI2PfnGEZnA1hyrdJddP7q8E-KOGrAkw=="
+          },
+          "url_has_api_key": false,
+          "url_has_taker": false
+        }
+      },
+      "h900_due_at": "2026-08-24T14:36:27Z",
+      "h900_lateness_deadline": "2026-08-24T14:38:27Z",
+      "h900_terminal": "MARKET_EXECUTION_UNAVAILABLE",
+      "mint": "FpGdZV8iA89GxCuLi2nictRnvPgLBR7jdsvqsZfWpump",
+      "t0": {
+        "expected_input_amount": "10000000",
+        "input_amount": "10000000",
+        "input_mint": "So11111111111111111111111111111111111111112",
+        "observed_at": "2026-08-24T14:21:27Z",
+        "output_amount": "3429660648988",
+        "output_mint": "FpGdZV8iA89GxCuLi2nictRnvPgLBR7jdsvqsZfWpump",
+        "source_observation_id": "FpGdZV8iA89GxCuLi2nictRnvPgLBR7jdsvqsZfWpump:BUY_T0"
+      },
+      "x": 48.4865061105922,
+      "x_inputs": {
+        "audit.topHoldersPercentage": 48.4865061105922,
+        "firstPool.createdAt": "2026-08-24T14:14:34Z",
+        "launchpad": "pump.fun",
+        "liquidity": 2869.645054431165,
+        "updatedAt": "2026-08-24T14:18:07.415213674Z"
+      },
+      "x_reason": null,
+      "x_source": {
+        "field_paths": [
+          "audit.topHoldersPercentage",
+          "liquidity",
+          "firstPool.createdAt",
+          "updatedAt",
+          "launchpad"
+        ],
+        "observation_id": "DISCOVERY:SEARCH_T5",
+        "recent_response_sha256": "3ed5438a6c8af4bd4d94fb731bb2421b4fd2c61b4845ede02944df62e24f926c",
+        "recent_row_sha256": "d251c9b581fba945079284ac06014929694673fcfc536c86b33366b5ef74f1e6",
+        "response_sha256": "9e6e074210fe5e6d5e6e04a96fddd9b9e90230199384fdba8fa5688713c3be83",
+        "row_mint": "FpGdZV8iA89GxCuLi2nictRnvPgLBR7jdsvqsZfWpump",
+        "row_sha256": "cf9983f9dd31af811e77bbae478f3070d37b169b71d142efe2035cc5d9c6313b"
+      },
+      "x_status": "ELIGIBLE",
+      "y": null
+    },
+    {
+      "age_seconds": 357.0,
+      "buy_clock_error": null,
+      "buy_clock_valid": true,
+      "buy_observed_at": "2026-08-24T14:21:30Z",
+      "buy_out_amount": "352781556625",
+      "buy_terminal": "QUOTE_OBSERVED",
+      "buy_transport": {
+        "http_status": 200,
+        "request_count": 1,
+        "response_bytes": 1264,
+        "response_sha256": "d29fc658160cdf7c389270ddf80f4fe09b8b8c47a9a6a4a6efa44a1100076bd9",
+        "safe_response_headers": {
+          "x-api-gateway-request-id": "Pd7ILg2IKO3FGcIjOC6wEJJVw3XXv67EP_-zgwOoUMOEswyfbhdLNQ=="
+        },
+        "url_has_api_key": false,
+        "url_has_taker": false
+      },
+      "decision_snapshot_at": "2026-08-24T14:20:30Z",
+      "h900": {
+        "due_at": "2026-08-24T14:36:30Z",
+        "expected_input_amount": "352781556625",
+        "input_amount": "352781556625",
+        "input_mint": "6urYeh1PKBAHgw7Jg9xf76NSHwA6xY1TEBzpHWafpump",
+        "lateness_deadline": "2026-08-24T14:38:30Z",
+        "observed_at": "2026-08-24T14:36:31Z",
+        "output_amount": "9727186",
+        "output_mint": "So11111111111111111111111111111111111111112",
+        "source_observation_id": "6urYeh1PKBAHgw7Jg9xf76NSHwA6xY1TEBzpHWafpump:SELL_H900",
+        "transport": {
+          "http_status": 200,
+          "request_count": 1,
+          "response_bytes": 1257,
+          "response_sha256": "a7e3c7510e626b3ed6a3747797660c3e1a46bd0c58ce4b83ff48e6c66a931a92",
+          "safe_response_headers": {
+            "x-api-gateway-request-id": "ne_c1QmJ-MnetNQVcAI_0UnSQcU4pZmGE3qZ9112qnREhS5C70VGVg=="
+          },
+          "url_has_api_key": false,
+          "url_has_taker": false
+        }
+      },
+      "h900_due_at": "2026-08-24T14:36:30Z",
+      "h900_lateness_deadline": "2026-08-24T14:38:30Z",
+      "h900_terminal": "QUOTE_OBSERVED",
+      "mint": "6urYeh1PKBAHgw7Jg9xf76NSHwA6xY1TEBzpHWafpump",
+      "t0": {
+        "expected_input_amount": "10000000",
+        "input_amount": "10000000",
+        "input_mint": "So11111111111111111111111111111111111111112",
+        "observed_at": "2026-08-24T14:21:30Z",
+        "output_amount": "352781556625",
+        "output_mint": "6urYeh1PKBAHgw7Jg9xf76NSHwA6xY1TEBzpHWafpump",
+        "source_observation_id": "6urYeh1PKBAHgw7Jg9xf76NSHwA6xY1TEBzpHWafpump:BUY_T0"
+      },
+      "x": 0.7000928208769001,
+      "x_inputs": {
+        "audit.topHoldersPercentage": 0.7000928208769001,
+        "firstPool.createdAt": "2026-08-24T14:14:33Z",
+        "launchpad": "pump.fun",
+        "liquidity": 2868.7372549773395,
+        "updatedAt": "2026-08-24T14:20:08.608097236Z"
+      },
+      "x_reason": null,
+      "x_source": {
+        "field_paths": [
+          "audit.topHoldersPercentage",
+          "liquidity",
+          "firstPool.createdAt",
+          "updatedAt",
+          "launchpad"
+        ],
+        "observation_id": "DISCOVERY:SEARCH_T5",
+        "recent_response_sha256": "3ed5438a6c8af4bd4d94fb731bb2421b4fd2c61b4845ede02944df62e24f926c",
+        "recent_row_sha256": "d6a57077edda5e5c0f99e2d9d8eb1ab0e0808225278e872ef1e2ce87c96ce501",
+        "response_sha256": "9e6e074210fe5e6d5e6e04a96fddd9b9e90230199384fdba8fa5688713c3be83",
+        "row_mint": "6urYeh1PKBAHgw7Jg9xf76NSHwA6xY1TEBzpHWafpump",
+        "row_sha256": "16d3d47622c4da093b1a040d965359f08a811c1a3471ffad929213f58cbd976e"
+      },
+      "x_status": "ELIGIBLE",
+      "y": -0.0272814
+    },
+    {
+      "age_seconds": 365.0,
+      "buy_clock_error": null,
+      "buy_clock_valid": true,
+      "buy_observed_at": "2026-08-24T14:21:34Z",
+      "buy_out_amount": "352781556743",
+      "buy_terminal": "QUOTE_OBSERVED",
+      "buy_transport": {
+        "http_status": 200,
+        "request_count": 1,
+        "response_bytes": 1260,
+        "response_sha256": "e2a42167c94b5b0b10e869173ef20c559ac80fa5c54d969d0695e256f3bca8c6",
+        "safe_response_headers": {
+          "x-api-gateway-request-id": "27ri0UbSFecZoZlCj37E4GVSukwAIIpjm_DMpazkVqH6hvbMWhxZ2w=="
+        },
+        "url_has_api_key": false,
+        "url_has_taker": false
+      },
+      "decision_snapshot_at": "2026-08-24T14:20:30Z",
+      "h900": {
+        "due_at": "2026-08-24T14:36:34Z",
+        "expected_input_amount": "352781556743",
+        "input_amount": "352781556743",
+        "input_mint": "9sMypgMiEpHPj1CZwphxgZhj8rhmB8KPwsNev4Ubpump",
+        "lateness_deadline": "2026-08-24T14:38:34Z",
+        "observed_at": "2026-08-24T14:36:34Z",
+        "output_amount": "9727186",
+        "output_mint": "So11111111111111111111111111111111111111112",
+        "source_observation_id": "9sMypgMiEpHPj1CZwphxgZhj8rhmB8KPwsNev4Ubpump:SELL_H900",
+        "transport": {
+          "http_status": 200,
+          "request_count": 1,
+          "response_bytes": 1257,
+          "response_sha256": "7c1b5fc15bc3b7a89ee7b69e4d48659296e44e75b2c9a852f513ac0b58092145",
+          "safe_response_headers": {
+            "x-api-gateway-request-id": "FCI4NkXhT8GlruchU4jgEp02PvKP6Buftik3CI8vJbHPu2qXv01Agw=="
+          },
+          "url_has_api_key": false,
+          "url_has_taker": false
+        }
+      },
+      "h900_due_at": "2026-08-24T14:36:34Z",
+      "h900_lateness_deadline": "2026-08-24T14:38:34Z",
+      "h900_terminal": "QUOTE_OBSERVED",
+      "mint": "9sMypgMiEpHPj1CZwphxgZhj8rhmB8KPwsNev4Ubpump",
+      "t0": {
+        "expected_input_amount": "10000000",
+        "input_amount": "10000000",
+        "input_mint": "So11111111111111111111111111111111111111112",
+        "observed_at": "2026-08-24T14:21:34Z",
+        "output_amount": "352781556743",
+        "output_mint": "9sMypgMiEpHPj1CZwphxgZhj8rhmB8KPwsNev4Ubpump",
+        "source_observation_id": "9sMypgMiEpHPj1CZwphxgZhj8rhmB8KPwsNev4Ubpump:BUY_T0"
+      },
+      "x": 0.0314391625824,
+      "x_inputs": {
+        "audit.topHoldersPercentage": 0.0314391625824,
+        "firstPool.createdAt": "2026-08-24T14:14:25Z",
+        "launchpad": "pump.fun",
+        "liquidity": 2869.7009116025592,
+        "updatedAt": "2026-08-24T14:19:35.881209082Z"
+      },
+      "x_reason": null,
+      "x_source": {
+        "field_paths": [
+          "audit.topHoldersPercentage",
+          "liquidity",
+          "firstPool.createdAt",
+          "updatedAt",
+          "launchpad"
+        ],
+        "observation_id": "DISCOVERY:SEARCH_T5",
+        "recent_response_sha256": "3ed5438a6c8af4bd4d94fb731bb2421b4fd2c61b4845ede02944df62e24f926c",
+        "recent_row_sha256": "cbb29c7772fc5247452daba6d14383232153911de9163ad90db8264a4f40c629",
+        "response_sha256": "9e6e074210fe5e6d5e6e04a96fddd9b9e90230199384fdba8fa5688713c3be83",
+        "row_mint": "9sMypgMiEpHPj1CZwphxgZhj8rhmB8KPwsNev4Ubpump",
+        "row_sha256": "6a77704cfd91d11cbb3f1ffc7445da7f88a845d14564179e36162c3e7a8b2fea"
+      },
+      "x_status": "ELIGIBLE",
+      "y": -0.0272814
+    },
+    {
+      "age_seconds": 369.0,
+      "buy_clock_error": null,
+      "buy_clock_valid": true,
+      "buy_observed_at": "2026-08-24T14:21:37Z",
+      "buy_out_amount": "352781506868",
+      "buy_terminal": "QUOTE_OBSERVED",
+      "buy_transport": {
+        "http_status": 200,
+        "request_count": 1,
+        "response_bytes": 1264,
+        "response_sha256": "233f629b79afffb80a030adc802ef267815273bf357ad50ce3d84c086ba6e519",
+        "safe_response_headers": {
+          "x-api-gateway-request-id": "h3zPdqFuCSHO0kRjl5gYiA_6d2L4mgXbgDG78h8V6svN--gL1q8UcA=="
+        },
+        "url_has_api_key": false,
+        "url_has_taker": false
+      },
+      "decision_snapshot_at": "2026-08-24T14:20:30Z",
+      "h900": {
+        "due_at": "2026-08-24T14:36:37Z",
+        "expected_input_amount": "352781506868",
+        "input_amount": "352781506868",
+        "input_mint": "HQm1QLogxm6FTTHhMJvmjjaXcESRcUsjoyCYTgqwpump",
+        "lateness_deadline": "2026-08-24T14:38:37Z",
+        "observed_at": "2026-08-24T14:36:38Z",
+        "output_amount": "9727186",
+        "output_mint": "So11111111111111111111111111111111111111112",
+        "source_observation_id": "HQm1QLogxm6FTTHhMJvmjjaXcESRcUsjoyCYTgqwpump:SELL_H900",
+        "transport": {
+          "http_status": 200,
+          "request_count": 1,
+          "response_bytes": 1254,
+          "response_sha256": "dbfd3a20fdafccba61234b38193e544bfb8702e0673b89eb24723fda54d851e6",
+          "safe_response_headers": {
+            "x-api-gateway-request-id": "IvzYlHMnKCS5mlkntTZQA_yR-fdK0fRdaLcgQ5pWYP97R0SqZxeNzw=="
+          },
+          "url_has_api_key": false,
+          "url_has_taker": false
+        }
+      },
+      "h900_due_at": "2026-08-24T14:36:37Z",
+      "h900_lateness_deadline": "2026-08-24T14:38:37Z",
+      "h900_terminal": "QUOTE_OBSERVED",
+      "mint": "HQm1QLogxm6FTTHhMJvmjjaXcESRcUsjoyCYTgqwpump",
+      "t0": {
+        "expected_input_amount": "10000000",
+        "input_amount": "10000000",
+        "input_mint": "So11111111111111111111111111111111111111112",
+        "observed_at": "2026-08-24T14:21:37Z",
+        "output_amount": "352781506868",
+        "output_mint": "HQm1QLogxm6FTTHhMJvmjjaXcESRcUsjoyCYTgqwpump",
+        "source_observation_id": "HQm1QLogxm6FTTHhMJvmjjaXcESRcUsjoyCYTgqwpump:BUY_T0"
+      },
+      "x": 0.3520918746848,
+      "x_inputs": {
+        "audit.topHoldersPercentage": 0.3520918746848,
+        "firstPool.createdAt": "2026-08-24T14:14:21Z",
+        "launchpad": "pump.fun",
+        "liquidity": 2862.9742562340366,
+        "updatedAt": "2026-08-24T14:16:04.420946493Z"
+      },
+      "x_reason": null,
+      "x_source": {
+        "field_paths": [
+          "audit.topHoldersPercentage",
+          "liquidity",
+          "firstPool.createdAt",
+          "updatedAt",
+          "launchpad"
+        ],
+        "observation_id": "DISCOVERY:SEARCH_T5",
+        "recent_response_sha256": "3ed5438a6c8af4bd4d94fb731bb2421b4fd2c61b4845ede02944df62e24f926c",
+        "recent_row_sha256": "99ceb7f279624bc2deb0339a5c5f34d4b7403c7b5f8374c040ae202665cc8e32",
+        "response_sha256": "9e6e074210fe5e6d5e6e04a96fddd9b9e90230199384fdba8fa5688713c3be83",
+        "row_mint": "HQm1QLogxm6FTTHhMJvmjjaXcESRcUsjoyCYTgqwpump",
+        "row_sha256": "315c0a7777ae7808b095c1a9dba1084a5349f631fa2a5693468405d1e47285a6"
+      },
+      "x_status": "ELIGIBLE",
+      "y": -0.0272814
+    },
+    {
+      "age_seconds": 369.0,
+      "buy_clock_error": null,
+      "buy_clock_valid": true,
+      "buy_observed_at": "2026-08-24T14:21:40Z",
+      "buy_out_amount": "352781556602",
+      "buy_terminal": "QUOTE_OBSERVED",
+      "buy_transport": {
+        "http_status": 200,
+        "request_count": 1,
+        "response_bytes": 1264,
+        "response_sha256": "1e77e820302345c33b3ce1ffc0677d06f14758bfdce8a4a46f41fcaad275773f",
+        "safe_response_headers": {
+          "x-api-gateway-request-id": "rqivD3zvaLR6hLIk0KSsjmnfvUNox1RiTf2WjGdMPb3p0CnIOB1Oew=="
+        },
+        "url_has_api_key": false,
+        "url_has_taker": false
+      },
+      "decision_snapshot_at": "2026-08-24T14:20:30Z",
+      "h900": {
+        "due_at": "2026-08-24T14:36:40Z",
+        "expected_input_amount": "352781556602",
+        "input_amount": "352781556602",
+        "input_mint": "GeXLtjoYL3CT4dJn5TBJSZE5UoqwZ1xN7HRej6jkaSSa",
+        "lateness_deadline": "2026-08-24T14:38:40Z",
+        "observed_at": "2026-08-24T14:36:41Z",
+        "output_amount": "9727186",
+        "output_mint": "So11111111111111111111111111111111111111112",
+        "source_observation_id": "GeXLtjoYL3CT4dJn5TBJSZE5UoqwZ1xN7HRej6jkaSSa:SELL_H900",
+        "transport": {
+          "http_status": 200,
+          "request_count": 1,
+          "response_bytes": 1255,
+          "response_sha256": "dcd32be6018be40a61e9881d6b9a655c46f8d4c9aa2770c68d218a984cb606db",
+          "safe_response_headers": {
+            "x-api-gateway-request-id": "CC9zO0w2y-vxbZlGatEntbDF6BoqYGBbfE4c4I7Q0oz7MpfaiwU52w=="
+          },
+          "url_has_api_key": false,
+          "url_has_taker": false
+        }
+      },
+      "h900_due_at": "2026-08-24T14:36:40Z",
+      "h900_lateness_deadline": "2026-08-24T14:38:40Z",
+      "h900_terminal": "QUOTE_OBSERVED",
+      "mint": "GeXLtjoYL3CT4dJn5TBJSZE5UoqwZ1xN7HRej6jkaSSa",
+      "t0": {
+        "expected_input_amount": "10000000",
+        "input_amount": "10000000",
+        "input_mint": "So11111111111111111111111111111111111111112",
+        "observed_at": "2026-08-24T14:21:40Z",
+        "output_amount": "352781556602",
+        "output_mint": "GeXLtjoYL3CT4dJn5TBJSZE5UoqwZ1xN7HRej6jkaSSa",
+        "source_observation_id": "GeXLtjoYL3CT4dJn5TBJSZE5UoqwZ1xN7HRej6jkaSSa:BUY_T0"
+      },
+      "x": 0.7002172022408,
+      "x_inputs": {
+        "audit.topHoldersPercentage": 0.7002172022408,
+        "firstPool.createdAt": "2026-08-24T14:14:21Z",
+        "launchpad": "pump.fun",
+        "liquidity": 2868.7612135114464,
+        "updatedAt": "2026-08-24T14:20:00.722662871Z"
+      },
+      "x_reason": null,
+      "x_source": {
+        "field_paths": [
+          "audit.topHoldersPercentage",
+          "liquidity",
+          "firstPool.createdAt",
+          "updatedAt",
+          "launchpad"
+        ],
+        "observation_id": "DISCOVERY:SEARCH_T5",
+        "recent_response_sha256": "3ed5438a6c8af4bd4d94fb731bb2421b4fd2c61b4845ede02944df62e24f926c",
+        "recent_row_sha256": "2fa9fc37bd348c75df8d3c24319b3e8ba5c7bfd0271e9423cf1362a4da147cee",
+        "response_sha256": "9e6e074210fe5e6d5e6e04a96fddd9b9e90230199384fdba8fa5688713c3be83",
+        "row_mint": "GeXLtjoYL3CT4dJn5TBJSZE5UoqwZ1xN7HRej6jkaSSa",
+        "row_sha256": "bdc5f9a1642e9cb9c7c381721367d209911525f378a3ebb262ddd25f717144ba"
+      },
+      "x_status": "ELIGIBLE",
+      "y": -0.0272814
+    },
+    {
+      "age_seconds": 369.0,
+      "buy_clock_error": null,
+      "buy_clock_valid": true,
+      "buy_observed_at": "2026-08-24T14:21:44Z",
+      "buy_out_amount": "352781556708",
+      "buy_terminal": "QUOTE_OBSERVED",
+      "buy_transport": {
+        "http_status": 200,
+        "request_count": 1,
+        "response_bytes": 1259,
+        "response_sha256": "fe6e512b41aefe12b17d09cd328bd29bc3af70b36b285ba4375c8a74b17b9bbf",
+        "safe_response_headers": {
+          "x-api-gateway-request-id": "Gf3pCWP9vQ8bxiPnMhFy6jMWWX7D6U6ecDptL-pIFPOeWDeAAmmulw=="
+        },
+        "url_has_api_key": false,
+        "url_has_taker": false
+      },
+      "decision_snapshot_at": "2026-08-24T14:20:30Z",
+      "h900": {
+        "due_at": "2026-08-24T14:36:44Z",
+        "expected_input_amount": "352781556708",
+        "input_amount": "352781556708",
+        "input_mint": "FkTezLJQkuws55SgdEsvSqbGhv3XGVhUYjfnvXAdV7jy",
+        "lateness_deadline": "2026-08-24T14:38:44Z",
+        "observed_at": "2026-08-24T14:36:45Z",
+        "output_amount": "9727186",
+        "output_mint": "So11111111111111111111111111111111111111112",
+        "source_observation_id": "FkTezLJQkuws55SgdEsvSqbGhv3XGVhUYjfnvXAdV7jy:SELL_H900",
+        "transport": {
+          "http_status": 200,
+          "request_count": 1,
+          "response_bytes": 1255,
+          "response_sha256": "f6bc87b8aa3be26f119ce507d7e9622380d2c4f2a31bfbc4b3e7fca7f12f2c42",
+          "safe_response_headers": {
+            "x-api-gateway-request-id": "je9C9Hro_1EYSij5GwTOd9d5Ucw1GiEogGQsuEcvfCx_vQDe7WqSbA=="
+          },
+          "url_has_api_key": false,
+          "url_has_taker": false
+        }
+      },
+      "h900_due_at": "2026-08-24T14:36:44Z",
+      "h900_lateness_deadline": "2026-08-24T14:38:44Z",
+      "h900_terminal": "QUOTE_OBSERVED",
+      "mint": "FkTezLJQkuws55SgdEsvSqbGhv3XGVhUYjfnvXAdV7jy",
+      "t0": {
+        "expected_input_amount": "10000000",
+        "input_amount": "10000000",
+        "input_mint": "So11111111111111111111111111111111111111112",
+        "observed_at": "2026-08-24T14:21:44Z",
+        "output_amount": "352781556708",
+        "output_mint": "FkTezLJQkuws55SgdEsvSqbGhv3XGVhUYjfnvXAdV7jy",
+        "source_observation_id": "FkTezLJQkuws55SgdEsvSqbGhv3XGVhUYjfnvXAdV7jy:BUY_T0"
+      },
+      "x": 6.6285714215231,
+      "x_inputs": {
+        "audit.topHoldersPercentage": 6.6285714215231,
+        "firstPool.createdAt": "2026-08-24T14:14:21Z",
+        "launchpad": "pump.fun",
+        "liquidity": 2862.974054119463,
+        "updatedAt": "2026-08-24T14:20:00.247793826Z"
+      },
+      "x_reason": null,
+      "x_source": {
+        "field_paths": [
+          "audit.topHoldersPercentage",
+          "liquidity",
+          "firstPool.createdAt",
+          "updatedAt",
+          "launchpad"
+        ],
+        "observation_id": "DISCOVERY:SEARCH_T5",
+        "recent_response_sha256": "3ed5438a6c8af4bd4d94fb731bb2421b4fd2c61b4845ede02944df62e24f926c",
+        "recent_row_sha256": "ef9a362ee3bf6ef069307ad0e99ca5eb68557586336e9d27a4f5439af53784d5",
+        "response_sha256": "9e6e074210fe5e6d5e6e04a96fddd9b9e90230199384fdba8fa5688713c3be83",
+        "row_mint": "FkTezLJQkuws55SgdEsvSqbGhv3XGVhUYjfnvXAdV7jy",
+        "row_sha256": "c7a4ace4b6260ee4fa6893840bcc7593e3b5e959296dba2eb3cc6f28b96cbf0b"
+      },
+      "x_status": "ELIGIBLE",
+      "y": -0.0272814
+    }
+  ],
+  "preflight": {
+    "credential_reads": 0,
+    "dns_resolved": true,
+    "host": "api.jup.ag",
+    "observed_at": "2026-08-24T14:15:30Z",
+    "port": 443,
+    "provider_requests": 0,
+    "schema": "smial.pmf-quote-slice-one-shot.credential-free-preflight",
+    "schema_version": "1.0",
+    "tcp_443": true,
+    "tls_verified": true,
+    "tls_version": "TLSv1.3"
+  },
+  "prior_mints_sha256": "ca43ce8c5a92f7c08b79333f4585ca1081766966b408627ccefb0622b6ebc4dd",
+  "provider_requests": 46,
+  "rankable_h900": 18,
+  "raw_retention": {
+    "manifests": [
+      {
+        "bytes": 52057,
+        "capture_envelope_sha256": "79f1d2ced3af18db62e268206638fdd3ef579a8bdc2f96b27355a5f8e1c375d1",
+        "envelope_path": "run=20260824T141530Z/DISCOVERY_RECENT.envelope.json",
+        "observation_id": "DISCOVERY:RECENT",
+        "observed_at": "2026-08-24T14:15:30Z",
+        "path": "run=20260824T141530Z/DISCOVERY_RECENT.body",
+        "retention": "A4_OUTSIDE_GIT",
+        "sha256": "3ed5438a6c8af4bd4d94fb731bb2421b4fd2c61b4845ede02944df62e24f926c"
+      },
+      {
+        "bytes": 45695,
+        "capture_envelope_sha256": "d1b594abe4582c711bce90fdc6c2bfbcf300db3a03d28189df54d6b5c2a2c3bd",
+        "envelope_path": "run=20260824T141530Z/DISCOVERY_SEARCH_T5.envelope.json",
+        "observation_id": "DISCOVERY:SEARCH_T5",
+        "observed_at": "2026-08-24T14:20:30Z",
+        "path": "run=20260824T141530Z/DISCOVERY_SEARCH_T5.body",
+        "retention": "A4_OUTSIDE_GIT",
+        "sha256": "9e6e074210fe5e6d5e6e04a96fddd9b9e90230199384fdba8fa5688713c3be83"
+      },
+      {
+        "bytes": 1262,
+        "capture_envelope_sha256": "d3805d63aa70ea36f8e6b825a8d26a12a3b7c53dedb5826f8716beb165b7da1b",
+        "envelope_path": "run=20260824T141530Z/2bSKSNrkD7xyMxuZVD8CxMWwmEMmqKCJragXjA8cpump_BUY_T0.envelope.json",
+        "observation_id": "2bSKSNrkD7xyMxuZVD8CxMWwmEMmqKCJragXjA8cpump:BUY_T0",
+        "observed_at": "2026-08-24T14:20:33Z",
+        "path": "run=20260824T141530Z/2bSKSNrkD7xyMxuZVD8CxMWwmEMmqKCJragXjA8cpump_BUY_T0.body",
+        "retention": "A4_OUTSIDE_GIT",
+        "sha256": "0d3044b67741e079aa85f93df1c0b4c05c1021a658eb0bbd163447ab3b98a92a"
+      },
+      {
+        "bytes": 1264,
+        "capture_envelope_sha256": "470aaf486dd71778be4986cb0e89d60321f87e03d5585b63ed1851cb11697529",
+        "envelope_path": "run=20260824T141530Z/QnPzHXbzu8PPrJUVv61JxygNigkNmJ4cKJag3U2pump_BUY_T0.envelope.json",
+        "observation_id": "QnPzHXbzu8PPrJUVv61JxygNigkNmJ4cKJag3U2pump:BUY_T0",
+        "observed_at": "2026-08-24T14:20:36Z",
+        "path": "run=20260824T141530Z/QnPzHXbzu8PPrJUVv61JxygNigkNmJ4cKJag3U2pump_BUY_T0.body",
+        "retention": "A4_OUTSIDE_GIT",
+        "sha256": "e4c29f25addf162a6278f9db90f4de3781a3b569dbd5eed1dadff714a8ea197f"
+      },
+      {
+        "bytes": 1257,
+        "capture_envelope_sha256": "2e702eac95f95e4cb05cb4199a2a585482ce31d614ad5f9c47a193f919be8994",
+        "envelope_path": "run=20260824T141530Z/G87oWxD7n3vTP2d9mFrsdM52fa1p9eB8e16hbg4mpump_BUY_T0.envelope.json",
+        "observation_id": "G87oWxD7n3vTP2d9mFrsdM52fa1p9eB8e16hbg4mpump:BUY_T0",
+        "observed_at": "2026-08-24T14:20:40Z",
+        "path": "run=20260824T141530Z/G87oWxD7n3vTP2d9mFrsdM52fa1p9eB8e16hbg4mpump_BUY_T0.body",
+        "retention": "A4_OUTSIDE_GIT",
+        "sha256": "9a705b526e7bf3b484849edb5de5ad0618815e61a364be19a49c583a7e34411b"
+      },
+      {
+        "bytes": 1262,
+        "capture_envelope_sha256": "704e3d24335251e23bd9d68cb2547277fb686bec86ff3a3a6791252f359f034e",
+        "envelope_path": "run=20260824T141530Z/GzAJTJRD8VyWNHbr6Lw3gaUS8XNYLKj19igBnphspump_BUY_T0.envelope.json",
+        "observation_id": "GzAJTJRD8VyWNHbr6Lw3gaUS8XNYLKj19igBnphspump:BUY_T0",
+        "observed_at": "2026-08-24T14:20:43Z",
+        "path": "run=20260824T141530Z/GzAJTJRD8VyWNHbr6Lw3gaUS8XNYLKj19igBnphspump_BUY_T0.body",
+        "retention": "A4_OUTSIDE_GIT",
+        "sha256": "6c3fc7dec0ed47eda42fdb540e7b57b31ea3777f6a76311f999a5d1a523a138d"
+      },
+      {
+        "bytes": 1257,
+        "capture_envelope_sha256": "f0d3857ff47c137bd03de8a5f4a1931050728ab4fb4ae1fc8d422bd27e7f6731",
+        "envelope_path": "run=20260824T141530Z/GmirbJAfC5xe2TmfP44RrVqKygAgtyZAFQhwjtLtpump_BUY_T0.envelope.json",
+        "observation_id": "GmirbJAfC5xe2TmfP44RrVqKygAgtyZAFQhwjtLtpump:BUY_T0",
+        "observed_at": "2026-08-24T14:20:46Z",
+        "path": "run=20260824T141530Z/GmirbJAfC5xe2TmfP44RrVqKygAgtyZAFQhwjtLtpump_BUY_T0.body",
+        "retention": "A4_OUTSIDE_GIT",
+        "sha256": "76fd1e5f5596aaf7883dd177fd1e418f03c7ae97420a2a4515ef2026bade6b37"
+      },
+      {
+        "bytes": 1262,
+        "capture_envelope_sha256": "666f7bfa7d99fb28c5be2340aee3cbeb08a6f674e953c87d9307e9f306b4803a",
+        "envelope_path": "run=20260824T141530Z/F2iCc374ho3Xm4wjPVYjGNDhHYPV6RrDd4vy5wvEpump_BUY_T0.envelope.json",
+        "observation_id": "F2iCc374ho3Xm4wjPVYjGNDhHYPV6RrDd4vy5wvEpump:BUY_T0",
+        "observed_at": "2026-08-24T14:20:50Z",
+        "path": "run=20260824T141530Z/F2iCc374ho3Xm4wjPVYjGNDhHYPV6RrDd4vy5wvEpump_BUY_T0.body",
+        "retention": "A4_OUTSIDE_GIT",
+        "sha256": "6e1eb8bf6097beb6ddbdbab7b7d7e5745618842fb28ec2e1554b622c52a54df9"
+      },
+      {
+        "bytes": 1260,
+        "capture_envelope_sha256": "e2afe2cd6930318d4223223fb63a9a109eb821ea06db2cc42eecb2aa2b423f64",
+        "envelope_path": "run=20260824T141530Z/3K3hr1DLvSbxWc1pvV5oJbqx6bkVxKow8Ubfn1m23ce7_BUY_T0.envelope.json",
+        "observation_id": "3K3hr1DLvSbxWc1pvV5oJbqx6bkVxKow8Ubfn1m23ce7:BUY_T0",
+        "observed_at": "2026-08-24T14:20:53Z",
+        "path": "run=20260824T141530Z/3K3hr1DLvSbxWc1pvV5oJbqx6bkVxKow8Ubfn1m23ce7_BUY_T0.body",
+        "retention": "A4_OUTSIDE_GIT",
+        "sha256": "0e991453c2c87d25e10b9688f47876672b0f78eb3dcab36ae7b06f58c7cab493"
+      },
+      {
+        "bytes": 1265,
+        "capture_envelope_sha256": "461fed622b8ba0ddecd50832aacc2096a13cf453501968c55816eeee2b17ad01",
+        "envelope_path": "run=20260824T141530Z/9AHsCqJWSt6K78cpwxXJkjby9JTkXb1qiYUmtEuppump_BUY_T0.envelope.json",
+        "observation_id": "9AHsCqJWSt6K78cpwxXJkjby9JTkXb1qiYUmtEuppump:BUY_T0",
+        "observed_at": "2026-08-24T14:20:57Z",
+        "path": "run=20260824T141530Z/9AHsCqJWSt6K78cpwxXJkjby9JTkXb1qiYUmtEuppump_BUY_T0.body",
+        "retention": "A4_OUTSIDE_GIT",
+        "sha256": "45730794eac8e3a2fb2c4d9ead1b117db6d980afffeb7daade8e671602486780"
+      },
+      {
+        "bytes": 1262,
+        "capture_envelope_sha256": "c85053afeb5d0e54192faac18cbc530f23766102406460e8869fac27ee931007",
+        "envelope_path": "run=20260824T141530Z/A3yH7eKWAEwzs8sFZFRADoHuJmB65p1JgN6SnhNhpump_BUY_T0.envelope.json",
+        "observation_id": "A3yH7eKWAEwzs8sFZFRADoHuJmB65p1JgN6SnhNhpump:BUY_T0",
+        "observed_at": "2026-08-24T14:21:00Z",
+        "path": "run=20260824T141530Z/A3yH7eKWAEwzs8sFZFRADoHuJmB65p1JgN6SnhNhpump_BUY_T0.body",
+        "retention": "A4_OUTSIDE_GIT",
+        "sha256": "a31aa70f8da323e0e5b8cee3568ab8bf7e0e979298e82985126bf88411ee18e4"
+      },
+      {
+        "bytes": 1262,
+        "capture_envelope_sha256": "f81063408b271360f232301ad4ecdb93cdf406afb0ab26fc0613cda0452d928f",
+        "envelope_path": "run=20260824T141530Z/6dFXGwVe1tqooJugvKL24iTsuQQhEPqk3UiF2h1wpump_BUY_T0.envelope.json",
+        "observation_id": "6dFXGwVe1tqooJugvKL24iTsuQQhEPqk3UiF2h1wpump:BUY_T0",
+        "observed_at": "2026-08-24T14:21:04Z",
+        "path": "run=20260824T141530Z/6dFXGwVe1tqooJugvKL24iTsuQQhEPqk3UiF2h1wpump_BUY_T0.body",
+        "retention": "A4_OUTSIDE_GIT",
+        "sha256": "38c7c44fb5fcbca43aa7a3c4277560b04a3e44b2bca6a8ebfaaca4756e306ff1"
+      },
+      {
+        "bytes": 1265,
+        "capture_envelope_sha256": "732d5a338b3764aa57482c04bc9ee3bb74331fb6c7e400b91b6d188dc3be8f1f",
+        "envelope_path": "run=20260824T141530Z/A41MotvroFg7smyFtEtgwdFxck894GVivz8XybaEpump_BUY_T0.envelope.json",
+        "observation_id": "A41MotvroFg7smyFtEtgwdFxck894GVivz8XybaEpump:BUY_T0",
+        "observed_at": "2026-08-24T14:21:07Z",
+        "path": "run=20260824T141530Z/A41MotvroFg7smyFtEtgwdFxck894GVivz8XybaEpump_BUY_T0.body",
+        "retention": "A4_OUTSIDE_GIT",
+        "sha256": "ff05ee29c120cbb9867a67bf9105792f6c7ad59905f771db572eeacc7217acb2"
+      },
+      {
+        "bytes": 1264,
+        "capture_envelope_sha256": "a75ce99b62ad50a43c6d843d94da0e0ea656249aa0addc6bc4275657c1ffe23f",
+        "envelope_path": "run=20260824T141530Z/269T16ngA1txT4zXXxcryHHRB8FUH3tFdzrwxgzCpump_BUY_T0.envelope.json",
+        "observation_id": "269T16ngA1txT4zXXxcryHHRB8FUH3tFdzrwxgzCpump:BUY_T0",
+        "observed_at": "2026-08-24T14:21:10Z",
+        "path": "run=20260824T141530Z/269T16ngA1txT4zXXxcryHHRB8FUH3tFdzrwxgzCpump_BUY_T0.body",
+        "retention": "A4_OUTSIDE_GIT",
+        "sha256": "6140a38feef7899010f95d3c2bdf81fd4cda6bb9b6a2df3136579a94a9934795"
+      },
+      {
+        "bytes": 1264,
+        "capture_envelope_sha256": "82e1e0afe6760ab8a4cf3bdfec5218e260ab08407cc47b50c16e95b3d44cf00b",
+        "envelope_path": "run=20260824T141530Z/84AUTkf6ZYdPLqhwvY4arQLrrJrcPPN1twrWqaFapump_BUY_T0.envelope.json",
+        "observation_id": "84AUTkf6ZYdPLqhwvY4arQLrrJrcPPN1twrWqaFapump:BUY_T0",
+        "observed_at": "2026-08-24T14:21:14Z",
+        "path": "run=20260824T141530Z/84AUTkf6ZYdPLqhwvY4arQLrrJrcPPN1twrWqaFapump_BUY_T0.body",
+        "retention": "A4_OUTSIDE_GIT",
+        "sha256": "a9fadde42d9c5aa39d10c2929ea3eddf116dcb6d8feffba1bc652ad88bd6ed10"
+      },
+      {
+        "bytes": 1264,
+        "capture_envelope_sha256": "ecba8e8917ec8ff7c7c1f5059ea8be855c575735805e9d127513646160107248",
+        "envelope_path": "run=20260824T141530Z/5UQA6Rom1d6gpuPF83aTJerWrtshpK4Sz2RdmvPUpump_BUY_T0.envelope.json",
+        "observation_id": "5UQA6Rom1d6gpuPF83aTJerWrtshpK4Sz2RdmvPUpump:BUY_T0",
+        "observed_at": "2026-08-24T14:21:17Z",
+        "path": "run=20260824T141530Z/5UQA6Rom1d6gpuPF83aTJerWrtshpK4Sz2RdmvPUpump_BUY_T0.body",
+        "retention": "A4_OUTSIDE_GIT",
+        "sha256": "96da7d561242a8d7c61b91cf1048e2531f2164f14ba795fb780b6b418ec35cd7"
+      },
+      {
+        "bytes": 1264,
+        "capture_envelope_sha256": "82318d137391e893757add67794b5cb28136ea71b21e2fd79598448449159b0f",
+        "envelope_path": "run=20260824T141530Z/9LSepVSsCnpgbDrhep2aa62Seq9ZSDMoWshpnVQgpump_BUY_T0.envelope.json",
+        "observation_id": "9LSepVSsCnpgbDrhep2aa62Seq9ZSDMoWshpnVQgpump:BUY_T0",
+        "observed_at": "2026-08-24T14:21:20Z",
+        "path": "run=20260824T141530Z/9LSepVSsCnpgbDrhep2aa62Seq9ZSDMoWshpnVQgpump_BUY_T0.body",
+        "retention": "A4_OUTSIDE_GIT",
+        "sha256": "8a691f3d85613605c3cc74a398ee8f087a7b2b26096f6ca03eb0ff8568c83743"
+      },
+      {
+        "bytes": 1263,
+        "capture_envelope_sha256": "53e80b448d0043d90a32144810b8835cedd47f91950ca8c460ad3c17835d829b",
+        "envelope_path": "run=20260824T141530Z/LEmNqJg39F9R1eKxYXDghqrkwy7pzCLykJ3WrnUpump_BUY_T0.envelope.json",
+        "observation_id": "LEmNqJg39F9R1eKxYXDghqrkwy7pzCLykJ3WrnUpump:BUY_T0",
+        "observed_at": "2026-08-24T14:21:24Z",
+        "path": "run=20260824T141530Z/LEmNqJg39F9R1eKxYXDghqrkwy7pzCLykJ3WrnUpump_BUY_T0.body",
+        "retention": "A4_OUTSIDE_GIT",
+        "sha256": "7b7115e5a9308001610147b8f0195b5c064b806fa040822c81acdc2e9af5ade3"
+      },
+      {
+        "bytes": 1267,
+        "capture_envelope_sha256": "77e2f86d02c52daeb8a25aaa72ff28e61a56939b5f6ef0d21ed578cf595d4b59",
+        "envelope_path": "run=20260824T141530Z/FpGdZV8iA89GxCuLi2nictRnvPgLBR7jdsvqsZfWpump_BUY_T0.envelope.json",
+        "observation_id": "FpGdZV8iA89GxCuLi2nictRnvPgLBR7jdsvqsZfWpump:BUY_T0",
+        "observed_at": "2026-08-24T14:21:27Z",
+        "path": "run=20260824T141530Z/FpGdZV8iA89GxCuLi2nictRnvPgLBR7jdsvqsZfWpump_BUY_T0.body",
+        "retention": "A4_OUTSIDE_GIT",
+        "sha256": "46cc346cffc4e685b6ffc76636334180a2cc7ee6f50207d60025b6190b6fa1d0"
+      },
+      {
+        "bytes": 1264,
+        "capture_envelope_sha256": "c281e0e15d67da9e907a8080ef8fe79f5a28800c9e97a832424c0c12d72774db",
+        "envelope_path": "run=20260824T141530Z/6urYeh1PKBAHgw7Jg9xf76NSHwA6xY1TEBzpHWafpump_BUY_T0.envelope.json",
+        "observation_id": "6urYeh1PKBAHgw7Jg9xf76NSHwA6xY1TEBzpHWafpump:BUY_T0",
+        "observed_at": "2026-08-24T14:21:30Z",
+        "path": "run=20260824T141530Z/6urYeh1PKBAHgw7Jg9xf76NSHwA6xY1TEBzpHWafpump_BUY_T0.body",
+        "retention": "A4_OUTSIDE_GIT",
+        "sha256": "d29fc658160cdf7c389270ddf80f4fe09b8b8c47a9a6a4a6efa44a1100076bd9"
+      },
+      {
+        "bytes": 1260,
+        "capture_envelope_sha256": "80e2cda845d0540ddf613ee0968313822b8bdf23704f1cff6e0f7b2be4b475c2",
+        "envelope_path": "run=20260824T141530Z/9sMypgMiEpHPj1CZwphxgZhj8rhmB8KPwsNev4Ubpump_BUY_T0.envelope.json",
+        "observation_id": "9sMypgMiEpHPj1CZwphxgZhj8rhmB8KPwsNev4Ubpump:BUY_T0",
+        "observed_at": "2026-08-24T14:21:34Z",
+        "path": "run=20260824T141530Z/9sMypgMiEpHPj1CZwphxgZhj8rhmB8KPwsNev4Ubpump_BUY_T0.body",
+        "retention": "A4_OUTSIDE_GIT",
+        "sha256": "e2a42167c94b5b0b10e869173ef20c559ac80fa5c54d969d0695e256f3bca8c6"
+      },
+      {
+        "bytes": 1264,
+        "capture_envelope_sha256": "176c65c031d2016bf18cb62b6bcb8dc261c8c0bb74cfa409aca71faa77f63539",
+        "envelope_path": "run=20260824T141530Z/HQm1QLogxm6FTTHhMJvmjjaXcESRcUsjoyCYTgqwpump_BUY_T0.envelope.json",
+        "observation_id": "HQm1QLogxm6FTTHhMJvmjjaXcESRcUsjoyCYTgqwpump:BUY_T0",
+        "observed_at": "2026-08-24T14:21:37Z",
+        "path": "run=20260824T141530Z/HQm1QLogxm6FTTHhMJvmjjaXcESRcUsjoyCYTgqwpump_BUY_T0.body",
+        "retention": "A4_OUTSIDE_GIT",
+        "sha256": "233f629b79afffb80a030adc802ef267815273bf357ad50ce3d84c086ba6e519"
+      },
+      {
+        "bytes": 1264,
+        "capture_envelope_sha256": "0047ebba0ecac451b524f42cae49b9e1721ae0c6e79bc78cbb54733f8a1fb42b",
+        "envelope_path": "run=20260824T141530Z/GeXLtjoYL3CT4dJn5TBJSZE5UoqwZ1xN7HRej6jkaSSa_BUY_T0.envelope.json",
+        "observation_id": "GeXLtjoYL3CT4dJn5TBJSZE5UoqwZ1xN7HRej6jkaSSa:BUY_T0",
+        "observed_at": "2026-08-24T14:21:40Z",
+        "path": "run=20260824T141530Z/GeXLtjoYL3CT4dJn5TBJSZE5UoqwZ1xN7HRej6jkaSSa_BUY_T0.body",
+        "retention": "A4_OUTSIDE_GIT",
+        "sha256": "1e77e820302345c33b3ce1ffc0677d06f14758bfdce8a4a46f41fcaad275773f"
+      },
+      {
+        "bytes": 1259,
+        "capture_envelope_sha256": "f534df88d0d82297695ced63999bf0591e178a9606aa3df1da424fca0d4ddd66",
+        "envelope_path": "run=20260824T141530Z/FkTezLJQkuws55SgdEsvSqbGhv3XGVhUYjfnvXAdV7jy_BUY_T0.envelope.json",
+        "observation_id": "FkTezLJQkuws55SgdEsvSqbGhv3XGVhUYjfnvXAdV7jy:BUY_T0",
+        "observed_at": "2026-08-24T14:21:44Z",
+        "path": "run=20260824T141530Z/FkTezLJQkuws55SgdEsvSqbGhv3XGVhUYjfnvXAdV7jy_BUY_T0.body",
+        "retention": "A4_OUTSIDE_GIT",
+        "sha256": "fe6e512b41aefe12b17d09cd328bd29bc3af70b36b285ba4375c8a74b17b9bbf"
+      },
+      {
+        "bytes": 1257,
+        "capture_envelope_sha256": "eded1e19b50b8c8441dbea6863a8fd360780ddbeb176ca0b658f370b02b78e29",
+        "envelope_path": "run=20260824T141530Z/2bSKSNrkD7xyMxuZVD8CxMWwmEMmqKCJragXjA8cpump_SELL_H900.envelope.json",
+        "observation_id": "2bSKSNrkD7xyMxuZVD8CxMWwmEMmqKCJragXjA8cpump:SELL_H900",
+        "observed_at": "2026-08-24T14:35:33Z",
+        "path": "run=20260824T141530Z/2bSKSNrkD7xyMxuZVD8CxMWwmEMmqKCJragXjA8cpump_SELL_H900.body",
+        "retention": "A4_OUTSIDE_GIT",
+        "sha256": "405536e19c04441c9a69f25d7a1c8428d98bcd789bae66f0312c64ec6cfc16df"
+      },
+      {
+        "bytes": 1261,
+        "capture_envelope_sha256": "c170beda4a68962bafbe946c0a4349e2dc9e9c768f6d4d7e6ffd29be0a59b17a",
+        "envelope_path": "run=20260824T141530Z/QnPzHXbzu8PPrJUVv61JxygNigkNmJ4cKJag3U2pump_SELL_H900.envelope.json",
+        "observation_id": "QnPzHXbzu8PPrJUVv61JxygNigkNmJ4cKJag3U2pump:SELL_H900",
+        "observed_at": "2026-08-24T14:35:36Z",
+        "path": "run=20260824T141530Z/QnPzHXbzu8PPrJUVv61JxygNigkNmJ4cKJag3U2pump_SELL_H900.body",
+        "retention": "A4_OUTSIDE_GIT",
+        "sha256": "7f39ac71c94bdd8cb20da3e56295007b315466082eceb76211a87a05d92225ed"
+      },
+      {
+        "bytes": 1254,
+        "capture_envelope_sha256": "206bd5a6c0952d6e425f5bb14088c1b96a4fbeb1ad0cff1b05566abf015a786e",
+        "envelope_path": "run=20260824T141530Z/G87oWxD7n3vTP2d9mFrsdM52fa1p9eB8e16hbg4mpump_SELL_H900.envelope.json",
+        "observation_id": "G87oWxD7n3vTP2d9mFrsdM52fa1p9eB8e16hbg4mpump:SELL_H900",
+        "observed_at": "2026-08-24T14:35:40Z",
+        "path": "run=20260824T141530Z/G87oWxD7n3vTP2d9mFrsdM52fa1p9eB8e16hbg4mpump_SELL_H900.body",
+        "retention": "A4_OUTSIDE_GIT",
+        "sha256": "08933ea1b95acb82e69c4b7a8c06d0a09f0e6ecb39d90b84f755cb3bd570e859"
+      },
+      {
+        "bytes": 1256,
+        "capture_envelope_sha256": "a37c03940261aac1e4aa7e6d3cfc3e9845176c1b1ed14f9cf5849e74d391cba0",
+        "envelope_path": "run=20260824T141530Z/GzAJTJRD8VyWNHbr6Lw3gaUS8XNYLKj19igBnphspump_SELL_H900.envelope.json",
+        "observation_id": "GzAJTJRD8VyWNHbr6Lw3gaUS8XNYLKj19igBnphspump:SELL_H900",
+        "observed_at": "2026-08-24T14:35:43Z",
+        "path": "run=20260824T141530Z/GzAJTJRD8VyWNHbr6Lw3gaUS8XNYLKj19igBnphspump_SELL_H900.body",
+        "retention": "A4_OUTSIDE_GIT",
+        "sha256": "57c9139d925d4e14ea7f2c85d824da3dc7cc5691ca316c68e4639d4433b6484f"
+      },
+      {
+        "bytes": 1255,
+        "capture_envelope_sha256": "d25508599bafd1a6b6c64df218677959f8389f25fa4e8909e0a77cca090cd330",
+        "envelope_path": "run=20260824T141530Z/GmirbJAfC5xe2TmfP44RrVqKygAgtyZAFQhwjtLtpump_SELL_H900.envelope.json",
+        "observation_id": "GmirbJAfC5xe2TmfP44RrVqKygAgtyZAFQhwjtLtpump:SELL_H900",
+        "observed_at": "2026-08-24T14:35:47Z",
+        "path": "run=20260824T141530Z/GmirbJAfC5xe2TmfP44RrVqKygAgtyZAFQhwjtLtpump_SELL_H900.body",
+        "retention": "A4_OUTSIDE_GIT",
+        "sha256": "8433769a037a317bc71208c530e459555677fac89116f8a8fa1c7d9bdf00af6c"
+      },
+      {
+        "bytes": 1255,
+        "capture_envelope_sha256": "05d5ec50f3fd1aeca34c191e37d9ab86adbe2ebd02b05066b36bfc23d96ba39d",
+        "envelope_path": "run=20260824T141530Z/F2iCc374ho3Xm4wjPVYjGNDhHYPV6RrDd4vy5wvEpump_SELL_H900.envelope.json",
+        "observation_id": "F2iCc374ho3Xm4wjPVYjGNDhHYPV6RrDd4vy5wvEpump:SELL_H900",
+        "observed_at": "2026-08-24T14:35:50Z",
+        "path": "run=20260824T141530Z/F2iCc374ho3Xm4wjPVYjGNDhHYPV6RrDd4vy5wvEpump_SELL_H900.body",
+        "retention": "A4_OUTSIDE_GIT",
+        "sha256": "9046596b03ad98ddb6434a9c9448aa8fc0bce690adc1c87750a2378fa62ca5ff"
+      },
+      {
+        "bytes": 1257,
+        "capture_envelope_sha256": "9d708435e2a8643f5903a8e90ced2aaf032e4f668d17c64deda6c9186a159abe",
+        "envelope_path": "run=20260824T141530Z/3K3hr1DLvSbxWc1pvV5oJbqx6bkVxKow8Ubfn1m23ce7_SELL_H900.envelope.json",
+        "observation_id": "3K3hr1DLvSbxWc1pvV5oJbqx6bkVxKow8Ubfn1m23ce7:SELL_H900",
+        "observed_at": "2026-08-24T14:35:53Z",
+        "path": "run=20260824T141530Z/3K3hr1DLvSbxWc1pvV5oJbqx6bkVxKow8Ubfn1m23ce7_SELL_H900.body",
+        "retention": "A4_OUTSIDE_GIT",
+        "sha256": "3bb4c31ada2ab5278f04a459fca4600d20d1cae83ea045630ce2627383b45633"
+      },
+      {
+        "bytes": 83,
+        "capture_envelope_sha256": "638c852f610d814bf2c6898f0a0cf2913f0bb151c28e66291d980429df9d31f8",
+        "envelope_path": "run=20260824T141530Z/9AHsCqJWSt6K78cpwxXJkjby9JTkXb1qiYUmtEuppump_SELL_H900.envelope.json",
+        "observation_id": "9AHsCqJWSt6K78cpwxXJkjby9JTkXb1qiYUmtEuppump:SELL_H900",
+        "observed_at": "2026-08-24T14:35:57Z",
+        "path": "run=20260824T141530Z/9AHsCqJWSt6K78cpwxXJkjby9JTkXb1qiYUmtEuppump_SELL_H900.body",
+        "retention": "A4_OUTSIDE_GIT",
+        "sha256": "b015dfb5abbe5da4c0cd5d3f03369d78293e3374a972805f942033abf6e96099"
+      },
+      {
+        "bytes": 1255,
+        "capture_envelope_sha256": "b17610088c511ef236c5ad79bdb458a682fe097a345bab2bb5741dd6d520c3da",
+        "envelope_path": "run=20260824T141530Z/A3yH7eKWAEwzs8sFZFRADoHuJmB65p1JgN6SnhNhpump_SELL_H900.envelope.json",
+        "observation_id": "A3yH7eKWAEwzs8sFZFRADoHuJmB65p1JgN6SnhNhpump:SELL_H900",
+        "observed_at": "2026-08-24T14:36:00Z",
+        "path": "run=20260824T141530Z/A3yH7eKWAEwzs8sFZFRADoHuJmB65p1JgN6SnhNhpump_SELL_H900.body",
+        "retention": "A4_OUTSIDE_GIT",
+        "sha256": "4791c9687ceabbea3f2bad7f6bc117860097eafa4dab1b1a39e419dd9f0d2f9b"
+      },
+      {
+        "bytes": 1254,
+        "capture_envelope_sha256": "b01fc65dea5fa647acca13424e03eea264ba27247f5db8b985f3fe8c86459b6d",
+        "envelope_path": "run=20260824T141530Z/6dFXGwVe1tqooJugvKL24iTsuQQhEPqk3UiF2h1wpump_SELL_H900.envelope.json",
+        "observation_id": "6dFXGwVe1tqooJugvKL24iTsuQQhEPqk3UiF2h1wpump:SELL_H900",
+        "observed_at": "2026-08-24T14:36:04Z",
+        "path": "run=20260824T141530Z/6dFXGwVe1tqooJugvKL24iTsuQQhEPqk3UiF2h1wpump_SELL_H900.body",
+        "retention": "A4_OUTSIDE_GIT",
+        "sha256": "927723011e47d1c13a00c4ed31af7a50c9dd170d1fb83e6a2b8478fa766dc248"
+      },
+      {
+        "bytes": 83,
+        "capture_envelope_sha256": "6ad304d512a0bfeb577e3192db7323931cc22e44ae6cf35e1bafb369e420945c",
+        "envelope_path": "run=20260824T141530Z/A41MotvroFg7smyFtEtgwdFxck894GVivz8XybaEpump_SELL_H900.envelope.json",
+        "observation_id": "A41MotvroFg7smyFtEtgwdFxck894GVivz8XybaEpump:SELL_H900",
+        "observed_at": "2026-08-24T14:36:07Z",
+        "path": "run=20260824T141530Z/A41MotvroFg7smyFtEtgwdFxck894GVivz8XybaEpump_SELL_H900.body",
+        "retention": "A4_OUTSIDE_GIT",
+        "sha256": "5b9e680b3c7eba8a5183bd52163d10800d4c0e4b0b5bae301f07d0242bb87e84"
+      },
+      {
+        "bytes": 1256,
+        "capture_envelope_sha256": "b9e63cfd9fc2c922eb9f5dd04f0ca7e2b3f48078a50503e220398d84c16993e4",
+        "envelope_path": "run=20260824T141530Z/269T16ngA1txT4zXXxcryHHRB8FUH3tFdzrwxgzCpump_SELL_H900.envelope.json",
+        "observation_id": "269T16ngA1txT4zXXxcryHHRB8FUH3tFdzrwxgzCpump:SELL_H900",
+        "observed_at": "2026-08-24T14:36:11Z",
+        "path": "run=20260824T141530Z/269T16ngA1txT4zXXxcryHHRB8FUH3tFdzrwxgzCpump_SELL_H900.body",
+        "retention": "A4_OUTSIDE_GIT",
+        "sha256": "4a7ec2412be0368583008ffcc9517c9298655301a3ec431e55c047513249f6ee"
+      },
+      {
+        "bytes": 1257,
+        "capture_envelope_sha256": "53ca78670733ae07d19b2e087aab0ebc5a2e436cf121376539811c0e64b28769",
+        "envelope_path": "run=20260824T141530Z/84AUTkf6ZYdPLqhwvY4arQLrrJrcPPN1twrWqaFapump_SELL_H900.envelope.json",
+        "observation_id": "84AUTkf6ZYdPLqhwvY4arQLrrJrcPPN1twrWqaFapump:SELL_H900",
+        "observed_at": "2026-08-24T14:36:14Z",
+        "path": "run=20260824T141530Z/84AUTkf6ZYdPLqhwvY4arQLrrJrcPPN1twrWqaFapump_SELL_H900.body",
+        "retention": "A4_OUTSIDE_GIT",
+        "sha256": "1ea764687cda45f89da32bf131febced3543a3ebff1237eb8625ff2c9dbac4ec"
+      },
+      {
+        "bytes": 83,
+        "capture_envelope_sha256": "35d442fc9b459d5dd902a059f099489ed4be470a4696ca55ce5f2181fff1d3fb",
+        "envelope_path": "run=20260824T141530Z/5UQA6Rom1d6gpuPF83aTJerWrtshpK4Sz2RdmvPUpump_SELL_H900.envelope.json",
+        "observation_id": "5UQA6Rom1d6gpuPF83aTJerWrtshpK4Sz2RdmvPUpump:SELL_H900",
+        "observed_at": "2026-08-24T14:36:18Z",
+        "path": "run=20260824T141530Z/5UQA6Rom1d6gpuPF83aTJerWrtshpK4Sz2RdmvPUpump_SELL_H900.body",
+        "retention": "A4_OUTSIDE_GIT",
+        "sha256": "7fbaf48597509745c21b02e43611c3e72f5385c45918c3a97536dda902f537fc"
+      },
+      {
+        "bytes": 1257,
+        "capture_envelope_sha256": "de2adc9e4dbfca07229e24f9a03eac2056d8254d34fac1d01be8604f785665e5",
+        "envelope_path": "run=20260824T141530Z/9LSepVSsCnpgbDrhep2aa62Seq9ZSDMoWshpnVQgpump_SELL_H900.envelope.json",
+        "observation_id": "9LSepVSsCnpgbDrhep2aa62Seq9ZSDMoWshpnVQgpump:SELL_H900",
+        "observed_at": "2026-08-24T14:36:21Z",
+        "path": "run=20260824T141530Z/9LSepVSsCnpgbDrhep2aa62Seq9ZSDMoWshpnVQgpump_SELL_H900.body",
+        "retention": "A4_OUTSIDE_GIT",
+        "sha256": "bf77c3ca7e2955bdedbef964b9a29916a67ff1e4d3ec2255b0efadbaa96551a7"
+      },
+      {
+        "bytes": 1256,
+        "capture_envelope_sha256": "d56d420c0d6f27acdefc77f56a3c8207ba205eb4523c110d31153447060e8e8a",
+        "envelope_path": "run=20260824T141530Z/LEmNqJg39F9R1eKxYXDghqrkwy7pzCLykJ3WrnUpump_SELL_H900.envelope.json",
+        "observation_id": "LEmNqJg39F9R1eKxYXDghqrkwy7pzCLykJ3WrnUpump:SELL_H900",
+        "observed_at": "2026-08-24T14:36:24Z",
+        "path": "run=20260824T141530Z/LEmNqJg39F9R1eKxYXDghqrkwy7pzCLykJ3WrnUpump_SELL_H900.body",
+        "retention": "A4_OUTSIDE_GIT",
+        "sha256": "e874f3cc4d908b0d9f30a0f9adabff61f06059077a48813187c279de4c8e151b"
+      },
+      {
+        "bytes": 83,
+        "capture_envelope_sha256": "3274933242d6e2479d59ec9ac73aceb93d160c28d4a4821f77eceb4ba05685ea",
+        "envelope_path": "run=20260824T141530Z/FpGdZV8iA89GxCuLi2nictRnvPgLBR7jdsvqsZfWpump_SELL_H900.envelope.json",
+        "observation_id": "FpGdZV8iA89GxCuLi2nictRnvPgLBR7jdsvqsZfWpump:SELL_H900",
+        "observed_at": "2026-08-24T14:36:28Z",
+        "path": "run=20260824T141530Z/FpGdZV8iA89GxCuLi2nictRnvPgLBR7jdsvqsZfWpump_SELL_H900.body",
+        "retention": "A4_OUTSIDE_GIT",
+        "sha256": "1f1e414a8359ab3d43bf5f70ea89e6d38743f6d150c4cdeb36c7f31d6893631e"
+      },
+      {
+        "bytes": 1257,
+        "capture_envelope_sha256": "f84744b4f595df49284bd83ab78d72f2d2ac42daa3a192d5091a4b68ab0e2d38",
+        "envelope_path": "run=20260824T141530Z/6urYeh1PKBAHgw7Jg9xf76NSHwA6xY1TEBzpHWafpump_SELL_H900.envelope.json",
+        "observation_id": "6urYeh1PKBAHgw7Jg9xf76NSHwA6xY1TEBzpHWafpump:SELL_H900",
+        "observed_at": "2026-08-24T14:36:31Z",
+        "path": "run=20260824T141530Z/6urYeh1PKBAHgw7Jg9xf76NSHwA6xY1TEBzpHWafpump_SELL_H900.body",
+        "retention": "A4_OUTSIDE_GIT",
+        "sha256": "a7e3c7510e626b3ed6a3747797660c3e1a46bd0c58ce4b83ff48e6c66a931a92"
+      },
+      {
+        "bytes": 1257,
+        "capture_envelope_sha256": "4b5ab1df75b04d95b0a7fac76e67de9e9bafe48105503264dc9772f5bc3ba501",
+        "envelope_path": "run=20260824T141530Z/9sMypgMiEpHPj1CZwphxgZhj8rhmB8KPwsNev4Ubpump_SELL_H900.envelope.json",
+        "observation_id": "9sMypgMiEpHPj1CZwphxgZhj8rhmB8KPwsNev4Ubpump:SELL_H900",
+        "observed_at": "2026-08-24T14:36:34Z",
+        "path": "run=20260824T141530Z/9sMypgMiEpHPj1CZwphxgZhj8rhmB8KPwsNev4Ubpump_SELL_H900.body",
+        "retention": "A4_OUTSIDE_GIT",
+        "sha256": "7c1b5fc15bc3b7a89ee7b69e4d48659296e44e75b2c9a852f513ac0b58092145"
+      },
+      {
+        "bytes": 1254,
+        "capture_envelope_sha256": "40e885eda98b16afcaeff4a3c4fb09b8c4bd004c799a499eec10b8e4272ea09c",
+        "envelope_path": "run=20260824T141530Z/HQm1QLogxm6FTTHhMJvmjjaXcESRcUsjoyCYTgqwpump_SELL_H900.envelope.json",
+        "observation_id": "HQm1QLogxm6FTTHhMJvmjjaXcESRcUsjoyCYTgqwpump:SELL_H900",
+        "observed_at": "2026-08-24T14:36:38Z",
+        "path": "run=20260824T141530Z/HQm1QLogxm6FTTHhMJvmjjaXcESRcUsjoyCYTgqwpump_SELL_H900.body",
+        "retention": "A4_OUTSIDE_GIT",
+        "sha256": "dbfd3a20fdafccba61234b38193e544bfb8702e0673b89eb24723fda54d851e6"
+      },
+      {
+        "bytes": 1255,
+        "capture_envelope_sha256": "0d8eb68744359a5f41bbe947c45af52880a6d3b75acdaedabb54bce9540648e6",
+        "envelope_path": "run=20260824T141530Z/GeXLtjoYL3CT4dJn5TBJSZE5UoqwZ1xN7HRej6jkaSSa_SELL_H900.envelope.json",
+        "observation_id": "GeXLtjoYL3CT4dJn5TBJSZE5UoqwZ1xN7HRej6jkaSSa:SELL_H900",
+        "observed_at": "2026-08-24T14:36:41Z",
+        "path": "run=20260824T141530Z/GeXLtjoYL3CT4dJn5TBJSZE5UoqwZ1xN7HRej6jkaSSa_SELL_H900.body",
+        "retention": "A4_OUTSIDE_GIT",
+        "sha256": "dcd32be6018be40a61e9881d6b9a655c46f8d4c9aa2770c68d218a984cb606db"
+      },
+      {
+        "bytes": 1255,
+        "capture_envelope_sha256": "5ef0ba42f141c54a263d2b540b89274a68257c7d924f1b738177a4a235ea827f",
+        "envelope_path": "run=20260824T141530Z/FkTezLJQkuws55SgdEsvSqbGhv3XGVhUYjfnvXAdV7jy_SELL_H900.envelope.json",
+        "observation_id": "FkTezLJQkuws55SgdEsvSqbGhv3XGVhUYjfnvXAdV7jy:SELL_H900",
+        "observed_at": "2026-08-24T14:36:45Z",
+        "path": "run=20260824T141530Z/FkTezLJQkuws55SgdEsvSqbGhv3XGVhUYjfnvXAdV7jy_SELL_H900.body",
+        "retention": "A4_OUTSIDE_GIT",
+        "sha256": "f6bc87b8aa3be26f119ce507d7e9622380d2c4f2a31bfbc4b3e7fca7f12f2c42"
+      }
+    ],
+    "mode": "A4_OUTSIDE_GIT"
+  },
+  "receipt_id": "EVIDENCE-EARLY-HOLDER-CONCENTRATION-H900-CONFIRMATORY-RUNTIME-001",
+  "retries": 0,
+  "schema": "smial.early-holder-concentration-h900-falsifier.runtime-receipt",
+  "schema_version": "1.0",
+  "score": {
+    "decision_time_eligible": 22,
+    "expected_direction": "NEGATIVE",
+    "leave_one_out_positive_share": null,
+    "rankable_h900": 18,
+    "rest_median_y": null,
+    "score_kind": "SIGN_ONLY_KENDALL_TAU_B",
+    "selected_market_execution_unavailable": false,
+    "selected_top_quartile_non_quote": false,
+    "tau_b": -0.16468280637257554,
+    "terminal": "HOLDER_CONCENTRATION_MECHANISM_REPLICATED",
+    "top_quartile_median_y": null
+  },
+  "snapshot_response_sha256": "9e6e074210fe5e6d5e6e04a96fddd9b9e90230199384fdba8fa5688713c3be83",
+  "t0_reference_at": "2026-08-24T14:20:30Z",
+  "terminal_outcome": "HOLDER_CONCENTRATION_MECHANISM_REPLICATED"
+}

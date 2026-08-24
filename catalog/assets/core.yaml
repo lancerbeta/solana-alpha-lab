@@ -31048,7 +31048,7 @@ records:
   as_of: '2026-08-24'
   truth_owner: EARLY_HOLDER_CONCENTRATION_H900_FALSIFIER_V1
   location: {kind: git_path, logical_uri: 'repo://src/solana_alpha_lab/early_holder_concentration_h900_falsifier.py', repository_path: src/solana_alpha_lab/early_holder_concentration_h900_falsifier.py}
-  integrity: {kind: sha256, sha256: 2eb0c85927b30db2cf27c4f2a9cd6ea865891d830075dfda2503df41b8e86114}
+  integrity: {kind: sha256, sha256: ae34d6796f7c3a726f816563289d9b6b7a2e302d21a55b969f4909a0fab34889}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: depends_on, target_asset_id: CONFIG-EARLY-HOLDER-CONCENTRATION-H900-FALSIFIER-001}
@@ -31066,7 +31066,7 @@ records:
   as_of: '2026-08-24'
   truth_owner: EARLY_HOLDER_CONCENTRATION_H900_FALSIFIER_V1
   location: {kind: git_path, logical_uri: 'repo://scripts/run_early_holder_concentration_h900_falsifier.py', repository_path: scripts/run_early_holder_concentration_h900_falsifier.py}
-  integrity: {kind: sha256, sha256: cff07723affbc3d0af2c72937c76283f67c77905fb8c8ff208036a6b583b17e9}
+  integrity: {kind: sha256, sha256: 92dac3fbff28459bb6a6274be05f76adf22a4b0580d70256387ba92e94f2bc92}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: governed_by, target_asset_id: CTRL-EARLY-HOLDER-CONCENTRATION-H900-FALSIFIER-001}
@@ -31084,7 +31084,7 @@ records:
   as_of: '2026-08-24'
   truth_owner: EARLY_HOLDER_CONCENTRATION_H900_FALSIFIER_V1
   location: {kind: git_path, logical_uri: 'repo://tests/test_early_holder_concentration_h900_falsifier.py', repository_path: tests/test_early_holder_concentration_h900_falsifier.py}
-  integrity: {kind: sha256, sha256: 7ec6d2a36cb16ea0edeae28a0592b2c55644a75a1dc4775711765d2b51fe98d6}
+  integrity: {kind: sha256, sha256: 53261b65c1b35e0fecc0c39f8bbe1b0c94b82a71ce0378efc71b9434d960b85e}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: depends_on, target_asset_id: MODULE-EARLY-HOLDER-CONCENTRATION-H900-FALSIFIER-001}
@@ -31179,4 +31179,149 @@ records:
   consumers: [FACTORY-001, GOAL-OWNER]
   evidence: []
   search_terms: [EARLY, HOLDER, CONCENTRATION, COMPLETION]
+  classification: {contains_secrets: false, contains_raw_data: false, sensitivity: INTERNAL_NON_SECRET}
+- asset_id: CTRL-EARLY-HOLDER-CONCENTRATION-H900-CONFIRMATORY-OOS-001
+  record_version: '1.0'
+  asset_type: control_document
+  purpose: Exact contract for confirmatory OOS replication of holder-concentration H900.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-08-24'
+  truth_owner: EARLY_HOLDER_CONCENTRATION_H900_CONFIRMATORY_OOS_V1
+  location: {kind: git_path, logical_uri: 'repo://docs/tasks/EARLY_HOLDER_CONCENTRATION_H900_CONFIRMATORY_OOS_V1.md', repository_path: docs/tasks/EARLY_HOLDER_CONCENTRATION_H900_CONFIRMATORY_OOS_V1.md}
+  integrity: {kind: sha256, sha256: 6db641833ec15bfff4e6f2d400a9662229f4b907f64d35ffa384f52889b3efb8}
+  access: {mode: read_only, method: file, network_required: false, secrets_required: false}
+  relations:
+  - {relation_type: contains, target_asset_id: CONFIG-EARLY-HOLDER-CONCENTRATION-H900-CONFIRMATORY-OOS-001}
+  - {relation_type: contains, target_asset_id: TEST-EARLY-HOLDER-CONCENTRATION-H900-CONFIRMATORY-OOS-001}
+  - {relation_type: derived_from, target_asset_id: EVIDENCE-EARLY-HOLDER-CONCENTRATION-H900-CONFIRMATORY-RUNTIME-001}
+  - {relation_type: depends_on, target_asset_id: CTRL-EARLY-HOLDER-CONCENTRATION-H900-FALSIFIER-001}
+  - {relation_type: depends_on, target_asset_id: MODULE-EARLY-HOLDER-CONCENTRATION-H900-FALSIFIER-001}
+  consumers: [FACTORY-001, GOAL-OWNER]
+  evidence: []
+  search_terms: [EARLY, HOLDER, CONCENTRATION, CONFIRMATORY, TASK_CONTRACT]
+  classification: {contains_secrets: false, contains_raw_data: false, sensitivity: INTERNAL_NON_SECRET}
+- asset_id: CONFIG-EARLY-HOLDER-CONCENTRATION-H900-CONFIRMATORY-OOS-001
+  record_version: '1.0'
+  asset_type: configuration
+  purpose: Frozen confirmatory identity binding; same X/Y/floors/sign as the initial window.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-08-24'
+  truth_owner: EARLY_HOLDER_CONCENTRATION_H900_CONFIRMATORY_OOS_V1
+  location: {kind: git_path, logical_uri: 'repo://configs/early_holder_concentration_h900_confirmatory_oos_v1.yaml', repository_path: configs/early_holder_concentration_h900_confirmatory_oos_v1.yaml}
+  integrity: {kind: sha256, sha256: 41d490d9d4862dd61d3d31c264523cefd2536ebf16d4b798ca646ca24a4876e9}
+  access: {mode: read_only, method: file, network_required: false, secrets_required: false}
+  relations:
+  - {relation_type: governed_by, target_asset_id: CTRL-EARLY-HOLDER-CONCENTRATION-H900-CONFIRMATORY-OOS-001}
+  - {relation_type: depends_on, target_asset_id: CONFIG-PROVIDER-ROUTE-CAPABILITY-REGISTRY-010}
+  consumers: [FACTORY-001, GOAL-OWNER]
+  evidence: []
+  search_terms: [EARLY, HOLDER, CONCENTRATION, CONFIRMATORY, CONFIG]
+  classification: {contains_secrets: false, contains_raw_data: false, sensitivity: INTERNAL_NON_SECRET}
+- asset_id: TEST-EARLY-HOLDER-CONCENTRATION-H900-CONFIRMATORY-OOS-001
+  record_version: '1.0'
+  asset_type: script
+  purpose: Zero-network tests for confirmatory identity, terminals and campaign 0-diff.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-08-24'
+  truth_owner: EARLY_HOLDER_CONCENTRATION_H900_CONFIRMATORY_OOS_V1
+  location: {kind: git_path, logical_uri: 'repo://tests/test_early_holder_concentration_h900_confirmatory_oos.py', repository_path: tests/test_early_holder_concentration_h900_confirmatory_oos.py}
+  integrity: {kind: sha256, sha256: e9034bfa9a60d6d868b76ba35872350ebf8400fb7e86cec47b0fab1a8fe9b3a0}
+  access: {mode: read_only, method: file, network_required: false, secrets_required: false}
+  relations:
+  - {relation_type: depends_on, target_asset_id: MODULE-EARLY-HOLDER-CONCENTRATION-H900-FALSIFIER-001}
+  - {relation_type: governed_by, target_asset_id: CTRL-EARLY-HOLDER-CONCENTRATION-H900-CONFIRMATORY-OOS-001}
+  consumers: [FACTORY-001, GOAL-OWNER]
+  evidence: []
+  search_terms: [EARLY, HOLDER, CONCENTRATION, CONFIRMATORY, TEST]
+  classification: {contains_secrets: false, contains_raw_data: false, sensitivity: INTERNAL_NON_SECRET}
+- asset_id: EVIDENCE-EARLY-HOLDER-CONCENTRATION-H900-CONFIRMATORY-ACCEPTANCE-001
+  record_version: '1.0'
+  asset_type: evidence
+  purpose: Live confirmatory acceptance; mechanism replicated on negative sign-only tau_b.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-08-24'
+  truth_owner: EARLY_HOLDER_CONCENTRATION_H900_CONFIRMATORY_OOS_V1
+  location: {kind: git_path, logical_uri: 'repo://docs/evidence/early_holder_concentration_h900_confirmatory_oos/a1_acceptance_v1.json', repository_path: docs/evidence/early_holder_concentration_h900_confirmatory_oos/a1_acceptance_v1.json}
+  integrity: {kind: sha256, sha256: 008316894b3627b42080b257a8884553d873cf968fd5fb242f00d838e9f46567}
+  access: {mode: read_only, method: file, network_required: false, secrets_required: false}
+  relations:
+  - {relation_type: derived_from, target_asset_id: CTRL-EARLY-HOLDER-CONCENTRATION-H900-CONFIRMATORY-OOS-001}
+  consumers: [FACTORY-001, GOAL-OWNER]
+  evidence: []
+  search_terms: [EARLY, HOLDER, CONCENTRATION, CONFIRMATORY, ACCEPTANCE]
+  classification: {contains_secrets: false, contains_raw_data: false, sensitivity: INTERNAL_NON_SECRET}
+- asset_id: EVIDENCE-EARLY-HOLDER-CONCENTRATION-H900-CONFIRMATORY-RUNTIME-001
+  record_version: '1.0'
+  asset_type: evidence
+  purpose: One-window confirmatory receipt; raw bodies remain outside Git.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-08-24'
+  truth_owner: EARLY_HOLDER_CONCENTRATION_H900_CONFIRMATORY_OOS_V1
+  location: {kind: git_path, logical_uri: 'repo://docs/evidence/early_holder_concentration_h900_confirmatory_oos/a1_runtime_receipt_v1.json', repository_path: docs/evidence/early_holder_concentration_h900_confirmatory_oos/a1_runtime_receipt_v1.json}
+  integrity: {kind: sha256, sha256: 9fd3408ff9e18ecda9fde0108c6d217fd4a3819738d0b4a0bb2129bcbaec895a}
+  access: {mode: read_only, method: file, network_required: false, secrets_required: false}
+  relations:
+  - {relation_type: derived_from, target_asset_id: EVIDENCE-EARLY-HOLDER-CONCENTRATION-H900-CONFIRMATORY-ACCEPTANCE-001}
+  consumers: [FACTORY-001, GOAL-OWNER]
+  evidence: []
+  search_terms: [EARLY, HOLDER, CONCENTRATION, CONFIRMATORY, RUNTIME]
+  classification: {contains_secrets: false, contains_raw_data: false, sensitivity: INTERNAL_NON_SECRET}
+- asset_id: EVIDENCE-EARLY-HOLDER-CONCENTRATION-H900-CONFIRMATORY-DELIVERY-INDEPENDENT-REVIEW-001
+  record_version: '1.0'
+  asset_type: evidence
+  purpose: Isolated code, goal/DoD and architecture review for confirmatory OOS.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-08-24'
+  truth_owner: EARLY_HOLDER_CONCENTRATION_H900_CONFIRMATORY_OOS_V1
+  location: {kind: git_path, logical_uri: 'repo://docs/evidence/early_holder_concentration_h900_confirmatory_oos/a1_delivery_independent_review_v1.json', repository_path: docs/evidence/early_holder_concentration_h900_confirmatory_oos/a1_delivery_independent_review_v1.json}
+  integrity: {kind: none, note: 'Content integrity is owned by the live completion-review-fit hash chain; embedding its SHA here would create an indirect self-reference through the reviewed inventory.'}
+  access: {mode: read_only, method: file, network_required: false, secrets_required: false}
+  relations:
+  - {relation_type: derived_from, target_asset_id: EVIDENCE-EARLY-HOLDER-CONCENTRATION-H900-CONFIRMATORY-ACCEPTANCE-001}
+  consumers: [FACTORY-001, GOAL-OWNER]
+  evidence: []
+  search_terms: [EARLY, HOLDER, CONCENTRATION, CONFIRMATORY, REVIEW]
+  classification: {contains_secrets: false, contains_raw_data: false, sensitivity: INTERNAL_NON_SECRET}
+- asset_id: EVIDENCE-EARLY-HOLDER-CONCENTRATION-H900-CONFIRMATORY-DELIVERY-FACTORY-FIT-001
+  record_version: '1.0'
+  asset_type: evidence
+  purpose: Factory Fit for confirmatory reuse of the PR 190 scoring seam.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-08-24'
+  truth_owner: EARLY_HOLDER_CONCENTRATION_H900_CONFIRMATORY_OOS_V1
+  location: {kind: git_path, logical_uri: 'repo://docs/evidence/early_holder_concentration_h900_confirmatory_oos/a1_delivery_factory_fit_v1.json', repository_path: docs/evidence/early_holder_concentration_h900_confirmatory_oos/a1_delivery_factory_fit_v1.json}
+  integrity: {kind: none, note: 'Content integrity is owned by the live completion-review-fit hash chain; embedding its SHA here would create an indirect self-reference through the reviewed inventory.'}
+  access: {mode: read_only, method: file, network_required: false, secrets_required: false}
+  relations:
+  - {relation_type: derived_from, target_asset_id: EVIDENCE-EARLY-HOLDER-CONCENTRATION-H900-CONFIRMATORY-ACCEPTANCE-001}
+  - {relation_type: depends_on, target_asset_id: EVIDENCE-EARLY-HOLDER-CONCENTRATION-H900-CONFIRMATORY-DELIVERY-INDEPENDENT-REVIEW-001}
+  consumers: [FACTORY-001, GOAL-OWNER]
+  evidence: []
+  search_terms: [EARLY, HOLDER, CONCENTRATION, CONFIRMATORY, FACTORY_FIT]
+  classification: {contains_secrets: false, contains_raw_data: false, sensitivity: INTERNAL_NON_SECRET}
+- asset_id: EVIDENCE-EARLY-HOLDER-CONCENTRATION-H900-CONFIRMATORY-DELIVERY-COMPLETION-001
+  record_version: '1.0'
+  asset_type: evidence
+  purpose: Guard-consumable confirmatory completion evidence before the exact-head merge gate.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-08-24'
+  truth_owner: EARLY_HOLDER_CONCENTRATION_H900_CONFIRMATORY_OOS_V1
+  location: {kind: git_path, logical_uri: 'repo://docs/evidence/early_holder_concentration_h900_confirmatory_oos/a1_delivery_completion_evidence_v1.json', repository_path: docs/evidence/early_holder_concentration_h900_confirmatory_oos/a1_delivery_completion_evidence_v1.json}
+  integrity: {kind: none, note: 'Content integrity is owned by the live completion-review-fit hash chain; embedding its SHA here would create an indirect self-reference through the reviewed inventory.'}
+  access: {mode: read_only, method: file, network_required: false, secrets_required: false}
+  relations:
+  - {relation_type: derived_from, target_asset_id: EVIDENCE-EARLY-HOLDER-CONCENTRATION-H900-CONFIRMATORY-ACCEPTANCE-001}
+  - {relation_type: depends_on, target_asset_id: EVIDENCE-EARLY-HOLDER-CONCENTRATION-H900-CONFIRMATORY-DELIVERY-INDEPENDENT-REVIEW-001}
+  - {relation_type: depends_on, target_asset_id: EVIDENCE-EARLY-HOLDER-CONCENTRATION-H900-CONFIRMATORY-DELIVERY-FACTORY-FIT-001}
+  consumers: [FACTORY-001, GOAL-OWNER]
+  evidence: []
+  search_terms: [EARLY, HOLDER, CONCENTRATION, CONFIRMATORY, COMPLETION]
   classification: {contains_secrets: false, contains_raw_data: false, sensitivity: INTERNAL_NON_SECRET}
