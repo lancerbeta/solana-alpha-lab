@@ -162,7 +162,9 @@ class HolderConcentrationFalsifierTests(unittest.TestCase):
         self.assertNotIn("RECENT_ENDPOINT", source)
         self.assertNotIn("time.sleep", source)
         self.assertEqual(source.count("run_campaign("), 1)
-        self.assertIn("score_fn=score_holder_campaign", source)
+        self.assertIn("score_fn=score_fn", source)
+        self.assertIn("score_sign_only_kendall", source)
+        self.assertIn("holder_identity", source)
 
     def test_x_absent_is_missing_never_zero(self) -> None:
         observed_at = datetime(2026, 8, 24, 12, 5, tzinfo=UTC)

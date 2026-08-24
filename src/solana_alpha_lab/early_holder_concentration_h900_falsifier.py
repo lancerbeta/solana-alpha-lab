@@ -19,11 +19,14 @@ from solana_alpha_lab.ordinary_recent_organic_pressure_h900_audition import (
 )
 
 ATOM_ID = "EARLY_HOLDER_CONCENTRATION_H900_FALSIFIER_V1"
+CONFIRMATORY_ATOM_ID = "EARLY_HOLDER_CONCENTRATION_H900_CONFIRMATORY_OOS_V1"
 POLICY_SCHEMA = "smial.early-holder-concentration-h900-falsifier"
 RECEIPT_SCHEMA = "smial.early-holder-concentration-h900-falsifier.runtime-receipt"
 X_FORMULA = "audit.topHoldersPercentage"
 CLOSE_TERMINAL = "CLOSE_HOLDER_CONCENTRATION_FAMILY"
 EARN_TERMINAL = "EARN_ONE_CONFIRMATORY_FRESH_OOS"
+CONFIRMATORY_CLOSE_TERMINAL = "CLOSE_HOLDER_CONCENTRATION_AFTER_FAILED_CONFIRMATION"
+CONFIRMATORY_EARN_TERMINAL = "HOLDER_CONCENTRATION_MECHANISM_REPLICATED"
 INVALID_TERMINAL = "INVALID_EVIDENCE_REPLAN"
 ICP_ID = "ICP-EARLY-PUMPFUN-V1"
 LIQUIDITY_USD_MIN = 1000.0
@@ -56,6 +59,59 @@ AUTHORITY_PHRASE = (
     "no threshold, quartile, LOO, smoothing or second snapshot; Factory "
     "runner unchanged; Strategy, Bot, Shadow, alpha and NetReturn forbidden."
 )
+CONFIRMATORY_AUTHORITY_PHRASE = (
+    "OK EARLY_HOLDER_CONCENTRATION_H900_CONFIRMATORY_OOS_V1: one bounded "
+    "Jupiter Free-key read-only confirmatory campaign using a local "
+    "process-environment key only; Tokens V2 /recent plus one bulk "
+    "/tokens/v2/search for frozen mints plus quote-only /swap/v2/order; "
+    "x-api-key header only; no .env read, no key in URL/log/receipt/Git, no "
+    "taker, /build, /execute, wallet, signer, transaction, paid plan, second "
+    "provider, retry or fallback; cash cap $0; call cap 60; global provider "
+    "pace >=3s; ICP-EARLY-PUMPFUN-V1 population; 24 fresh project-eligible "
+    "recent candidates excluding all prior consumed mints including "
+    "EARLY_HOLDER_CONCENTRATION_H900_FALSIFIER_V1; wait until pool age >=5m "
+    "before the single bulk decision-time search snapshot; X = "
+    "audit.topHoldersPercentage from that search snapshot only (ABSENT never "
+    "zero; scale 0-100); quote-only BUY at decision and quote-only SELL at "
+    "H900; one confirmatory window only; sign-only Kendall tau_b < 0; no "
+    "threshold, quartile, LOO, smoothing or second snapshot; Factory runner "
+    "unchanged; Strategy, Bot, Shadow, alpha and NetReturn forbidden."
+)
+
+
+def holder_identity(policy: Mapping[str, Any]) -> dict[str, str]:
+    atom_id = policy.get("atom_id")
+    if atom_id == ATOM_ID:
+        return {
+            "atom_id": ATOM_ID,
+            "phrase": AUTHORITY_PHRASE,
+            "close": CLOSE_TERMINAL,
+            "earn": EARN_TERMINAL,
+            "invalid": INVALID_TERMINAL,
+            "receipt_id": "EVIDENCE-EARLY-HOLDER-CONCENTRATION-H900-RUNTIME-001",
+            "raw_root": "local/early_holder_concentration_h900_falsifier",
+            "evidence_dir": "docs/evidence/early_holder_concentration_h900_falsifier",
+        }
+    if atom_id == CONFIRMATORY_ATOM_ID:
+        return {
+            "atom_id": CONFIRMATORY_ATOM_ID,
+            "phrase": CONFIRMATORY_AUTHORITY_PHRASE,
+            "close": CONFIRMATORY_CLOSE_TERMINAL,
+            "earn": CONFIRMATORY_EARN_TERMINAL,
+            "invalid": INVALID_TERMINAL,
+            "receipt_id": "EVIDENCE-EARLY-HOLDER-CONCENTRATION-H900-CONFIRMATORY-RUNTIME-001",
+            "raw_root": "local/early_holder_concentration_h900_confirmatory_oos",
+            "evidence_dir": "docs/evidence/early_holder_concentration_h900_confirmatory_oos",
+        }
+    raise OrganicPressureError("ATOM_ID_NOT_IN_HOLDER_IDENTITY_ALLOWLIST")
+
+
+def holder_identity_for_phrase(phrase: str) -> dict[str, str] | None:
+    for atom_id in (ATOM_ID, CONFIRMATORY_ATOM_ID):
+        identity = holder_identity({"atom_id": atom_id})
+        if phrase == identity["phrase"]:
+            return identity
+    return None
 
 
 def _parse_utc(value: object, code: str) -> datetime:
@@ -160,6 +216,7 @@ def project_holder_concentration(
 
 
 def score_holder_campaign(rows: Sequence[Mapping[str, Any]]) -> dict[str, object]:
+    """Falsifier-only helper. Live path uses identity score_fn, not this function."""
     return score_sign_only_kendall(
         rows,
         min_decision_time_eligible=18,
@@ -172,11 +229,12 @@ def score_holder_campaign(rows: Sequence[Mapping[str, Any]]) -> dict[str, object
 
 
 def validate_holder_concentration_policy(policy: Mapping[str, Any], *, root: Any) -> None:
+    identity = holder_identity(policy)
     validate_policy(
         policy,
         root=root,
-        expected_atom_id=ATOM_ID,
-        expected_authority_phrase=AUTHORITY_PHRASE,
+        expected_atom_id=identity["atom_id"],
+        expected_authority_phrase=identity["phrase"],
         expected_schema=POLICY_SCHEMA,
         expected_x_formula=X_FORMULA,
         require_legacy_decision_rule=False,
@@ -205,11 +263,11 @@ def validate_holder_concentration_policy(policy: Mapping[str, Any], *, root: Any
     decision = policy.get("decision_rule")
     if not isinstance(decision, Mapping):
         raise OrganicPressureError("DECISION_RULE_INVALID")
-    if decision.get("close_terminal") != CLOSE_TERMINAL:
+    if decision.get("close_terminal") != identity["close"]:
         raise OrganicPressureError("CLOSE_TERMINAL_DRIFT")
-    if decision.get("earn_terminal") != EARN_TERMINAL:
+    if decision.get("earn_terminal") != identity["earn"]:
         raise OrganicPressureError("EARN_TERMINAL_DRIFT")
-    if decision.get("invalid_terminal") != INVALID_TERMINAL:
+    if decision.get("invalid_terminal") != identity["invalid"]:
         raise OrganicPressureError("INVALID_TERMINAL_DRIFT")
     windows = policy.get("windows")
     if not isinstance(windows, Mapping):
@@ -230,16 +288,29 @@ def validate_holder_concentration_policy(policy: Mapping[str, Any], *, root: Any
 
 
 def run_holder_concentration_campaign(policy: Mapping[str, Any], **kwargs: Any) -> dict[str, object]:
+    identity = holder_identity(policy)
+
+    def score_fn(rows: Sequence[Mapping[str, Any]]) -> dict[str, object]:
+        return score_sign_only_kendall(
+            rows,
+            min_decision_time_eligible=18,
+            min_rankable_h900=14,
+            expected_direction="NEGATIVE",
+            close_terminal=identity["close"],
+            earn_terminal=identity["earn"],
+            invalid_terminal=identity["invalid"],
+        )
+
     receipt = run_campaign(
         policy,
-        atom_id=ATOM_ID,
-        expected_authority_phrase=AUTHORITY_PHRASE,
+        atom_id=identity["atom_id"],
+        expected_authority_phrase=identity["phrase"],
         expected_schema=POLICY_SCHEMA,
         expected_x_formula=X_FORMULA,
         receipt_schema=RECEIPT_SCHEMA,
-        close_terminal=CLOSE_TERMINAL,
+        close_terminal=identity["close"],
         project_x=project_holder_concentration,
-        score_fn=score_holder_campaign,
+        score_fn=score_fn,
         require_legacy_decision_rule=False,
         insufficient_yield_terminal=INVALID_TERMINAL,
         **kwargs,

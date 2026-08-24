@@ -22,11 +22,13 @@ if str(SRC) not in sys.path:
     sys.path.insert(0, str(SRC))
 
 from solana_alpha_lab.early_holder_concentration_h900_falsifier import (  # noqa: E402
-    ATOM_ID,
-    AUTHORITY_PHRASE,
     CLOSE_TERMINAL,
+    CONFIRMATORY_CLOSE_TERMINAL,
+    CONFIRMATORY_EARN_TERMINAL,
     EARN_TERMINAL,
     RECEIPT_SCHEMA,
+    holder_identity,
+    holder_identity_for_phrase,
     run_holder_concentration_campaign,
     validate_holder_concentration_policy,
 )
@@ -42,8 +44,12 @@ from solana_alpha_lab.pmf_quote_slice_one_shot import credential_free_preflight 
 
 
 CONFIG_PATH = ROOT / "configs/early_holder_concentration_h900_falsifier_v1.yaml"
-RAW_ROOT = ROOT / "local/early_holder_concentration_h900_falsifier"
-EVIDENCE_ROOT = ROOT / "docs/evidence/early_holder_concentration_h900_falsifier"
+SUCCESS_TERMINALS = {
+    CLOSE_TERMINAL,
+    EARN_TERMINAL,
+    CONFIRMATORY_CLOSE_TERMINAL,
+    CONFIRMATORY_EARN_TERMINAL,
+}
 TYPED_STOP_TERMINALS = {
     "API_KEY_IN_URL_LOG_RECEIPT_OR_GIT",
     "RAW_BODY_CONTAINS_CREDENTIAL",
@@ -68,9 +74,11 @@ def capture_envelope(*, observation_id: str, observed_at: str, body_sha256: str)
     return {**payload, "envelope_sha256": hashlib.sha256(canonical_json(payload)).hexdigest()}
 
 
-def attempt_reservation_document(*, started_at: str, policy_sha256: str) -> dict[str, object]:
+def attempt_reservation_document(
+    *, started_at: str, policy_sha256: str, atom_id: str
+) -> dict[str, object]:
     payload = {
-        "atom_id": ATOM_ID,
+        "atom_id": atom_id,
         "credential_reads": 0,
         "policy_sha256": policy_sha256,
         "provider_requests": 0,
@@ -92,8 +100,8 @@ def _write_create_only(path: Path, payload: bytes) -> None:
         raise OrganicPressureError("CREATE_ONLY_EXISTS") from exc
 
 
-def _load_policy() -> dict[str, object]:
-    loaded = yaml.safe_load(CONFIG_PATH.read_text(encoding="utf-8"))
+def _load_policy(config_path: Path = CONFIG_PATH) -> dict[str, object]:
+    loaded = yaml.safe_load(config_path.read_text(encoding="utf-8"))
     if not isinstance(loaded, dict):
         raise OrganicPressureError("POLICY_INVALID")
     validate_holder_concentration_policy(loaded, root=ROOT)
@@ -131,7 +139,8 @@ def run_capture(
     authority_phrase: str,
     excluded_mints_path: Path,
     policy: Mapping[str, Any] | None = None,
-    raw_root: Path = RAW_ROOT,
+    config_path: Path = CONFIG_PATH,
+    raw_root: Path | None = None,
     receipt_path: Path | None = None,
     environ: Mapping[str, str] | None = None,
     credential_loader: Callable[[], str] | None = None,
@@ -141,10 +150,15 @@ def run_capture(
     sleeper: Callable[[float], None] = time.sleep,
     monotonic_clock: Callable[[], float] = time.monotonic,
 ) -> dict[str, object]:
-    selected_policy = dict(policy or _load_policy())
+    selected_policy = dict(policy or _load_policy(config_path))
     validate_holder_concentration_policy(selected_policy, root=ROOT)
-    if authority_phrase != AUTHORITY_PHRASE:
+    identity = holder_identity(selected_policy)
+    if authority_phrase != identity["phrase"]:
+        other = holder_identity_for_phrase(authority_phrase)
+        if other is not None and other["atom_id"] != identity["atom_id"]:
+            raise OrganicPressureError("AUTHORITY_PHRASE_CONFIG_MISMATCH")
         raise OrganicPressureError("AUTHORITY_PHRASE_INVALID")
+    selected_raw_root = raw_root if raw_root is not None else ROOT / identity["raw_root"]
     try:
         excluded_mints_bytes = excluded_mints_path.read_bytes()
     except OSError as exc:
@@ -152,18 +166,19 @@ def run_capture(
     excluded_mints = _parse_excluded_mints(excluded_mints_bytes)
     excluded_mints_sha256 = hashlib.sha256(excluded_mints_bytes).hexdigest()
     started_at = clock()
-    policy_sha256 = hashlib.sha256(CONFIG_PATH.read_bytes()).hexdigest()
+    policy_sha256 = hashlib.sha256(config_path.read_bytes()).hexdigest()
     reservation = attempt_reservation_document(
         started_at=_format_utc(started_at),
         policy_sha256=policy_sha256,
+        atom_id=identity["atom_id"],
     )
-    raw_root.mkdir(parents=True, exist_ok=True)
-    reservation_path = raw_root / "campaign_reservation.json"
+    selected_raw_root.mkdir(parents=True, exist_ok=True)
+    reservation_path = selected_raw_root / "campaign_reservation.json"
     _write_create_only(
         reservation_path,
         canonical_json({key: value for key, value in reservation.items() if key != "reservation_sha256"}),
     )
-    raw_directory = raw_root / f"run={_format_utc(started_at).replace('-', '').replace(':', '')}"
+    raw_directory = selected_raw_root / f"run={_format_utc(started_at).replace('-', '').replace(':', '')}"
     manifests: list[dict[str, object]] = []
     credential_reads = 0
     credential_value: str | None = None
@@ -187,8 +202,8 @@ def run_capture(
         manifests.append(
             {
                 "observation_id": observation_id,
-                "path": body_path.relative_to(raw_root).as_posix(),
-                "envelope_path": envelope_path.relative_to(raw_root).as_posix(),
+                "path": body_path.relative_to(selected_raw_root).as_posix(),
+                "envelope_path": envelope_path.relative_to(selected_raw_root).as_posix(),
                 "bytes": len(body),
                 "sha256": body_sha256,
                 "observed_at": observed_at,
@@ -227,7 +242,7 @@ def run_capture(
         receipt = {
             "schema": RECEIPT_SCHEMA,
             "schema_version": "1.0",
-            "atom_id": ATOM_ID,
+            "atom_id": identity["atom_id"],
             "terminal_outcome": _terminal_from_error(exc),
             "terminal_error_code": str(exc),
             "credential_reads": credential_reads,
@@ -238,7 +253,7 @@ def run_capture(
             "observations": [],
             "non_claims": ["NO_EXECUTE", "NO_TAKER_OR_SIGNER", "NO_ALPHA", "NO_NETRETURN"],
         }
-    receipt["receipt_id"] = "EVIDENCE-EARLY-HOLDER-CONCENTRATION-H900-RUNTIME-001"
+    receipt["receipt_id"] = identity["receipt_id"]
     receipt["attempt_reservation"] = reservation
     receipt["prior_mints_sha256"] = excluded_mints_sha256
     receipt["raw_retention"] = {"mode": "A4_OUTSIDE_GIT", "manifests": manifests}
@@ -246,7 +261,7 @@ def run_capture(
     encoded = canonical_json(receipt)
     if credential_value and credential_value.encode("utf-8") in encoded:
         raise OrganicPressureError("API_KEY_IN_URL_LOG_RECEIPT_OR_GIT")
-    target = receipt_path or (EVIDENCE_ROOT / "a1_runtime_receipt_v1.json")
+    target = receipt_path or (ROOT / identity["evidence_dir"] / "a1_runtime_receipt_v1.json")
     _write_create_only(target, encoded)
     return receipt
 
@@ -260,6 +275,8 @@ def _owner_next_for_error(code: str) -> str:
         )
     if code == "AUTHORITY_PHRASE_INVALID":
         return "PASTE_EXACT_FROZEN_PHRASE_AS_SINGLE_QUOTED_POWERSHELL_STRING"
+    if code == "AUTHORITY_PHRASE_CONFIG_MISMATCH":
+        return "PASS_MATCHING_CONFIG_YAML_VIA_--config_FOR_THIS_PHRASE"
     if code == "PRIOR_MINT_EXCLUSION_INPUT_INVALID":
         return "SUPPLY_NONEMPTY_JSON_OBJECT_WITH_MINTS_ARRAY_OF_PRIOR_CONSUMED_MINTS"
     if code == "JUPITER_API_KEY_MISSING_OR_EMPTY":
@@ -272,11 +289,15 @@ def _owner_next_for_terminal(terminal: str) -> str:
         return "FAMILY_CLOSED_NO_RESCUE_NO_SHADOW"
     if terminal == "EARN_ONE_CONFIRMATORY_FRESH_OOS":
         return "STOP_AND_RETURN_TO_OWNER_NO_AUTOMATIC_OOS_NEW_ORCHESTRATION_CODE_EQUALS_ZERO"
+    if terminal == CONFIRMATORY_CLOSE_TERMINAL:
+        return "FAMILY_CLOSED_AFTER_FAILED_CONFIRMATION_NO_RESCUE_NO_THIRD_SAMPLE"
+    if terminal == CONFIRMATORY_EARN_TERMINAL:
+        return "STOP_DESIGN_ONLY_HOLDER_CONCENTRATION_ACTIONABILITY_ADJUDICATION"
     return "INVALID_EVIDENCE_REPLAN_DISTINGUISH_DATA_VS_RUNTIME_NO_AUTOMATIC_RETRY"
 
 
 def owner_exit_blocked(terminal: str) -> bool:
-    return terminal not in {CLOSE_TERMINAL, EARN_TERMINAL}
+    return terminal not in SUCCESS_TERMINALS
 
 
 def parse_args() -> argparse.Namespace:
@@ -285,7 +306,13 @@ def parse_args() -> argparse.Namespace:
         formatter_class=argparse.RawDescriptionHelpFormatter,
         epilog=(
             "Scientific terminals: CLOSE_HOLDER_CONCENTRATION_FAMILY | "
-            "INVALID_EVIDENCE_REPLAN | EARN_ONE_CONFIRMATORY_FRESH_OOS.\n"
+            "EARN_ONE_CONFIRMATORY_FRESH_OOS | "
+            "CLOSE_HOLDER_CONCENTRATION_AFTER_FAILED_CONFIRMATION | "
+            "HOLDER_CONCENTRATION_MECHANISM_REPLICATED | "
+            "INVALID_EVIDENCE_REPLAN.\n"
+            "Default --config is the completed falsifier policy; confirmatory MUST pass "
+            "--config configs/early_holder_concentration_h900_confirmatory_oos_v1.yaml "
+            "or the confirmatory phrase is AUTHORITY_PHRASE_CONFIG_MISMATCH.\n"
             "excluded-mints-file: non-empty JSON {\"mints\":[\"...\"]} of prior consumed "
             "mints, kept outside Git.\n"
             "JUPITER_API_KEY must already be in the process environment; never .env.\n"
@@ -298,6 +325,12 @@ def parse_args() -> argparse.Namespace:
         "--owner-phrase",
         required=True,
         help="Exact frozen owner phrase; single-quoted on PowerShell.",
+    )
+    parser.add_argument(
+        "--config",
+        type=Path,
+        default=CONFIG_PATH,
+        help="Policy YAML; default is the initial falsifier policy.",
     )
     parser.add_argument(
         "--excluded-mints-file",
@@ -314,6 +347,7 @@ def main() -> int:
         receipt = run_capture(
             authority_phrase=args.owner_phrase,
             excluded_mints_path=args.excluded_mints_file,
+            config_path=args.config,
         )
     except (OrganicPressureError, QualificationError) as exc:
         code = str(exc)
