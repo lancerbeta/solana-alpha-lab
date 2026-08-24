@@ -508,6 +508,16 @@
       "target_asset_id": "CTRL-DELIVERY-HARNESS-001"
     },
     {
+      "source_asset_id": "CONFIG-EARLY-HOLDER-CONCENTRATION-H900-CONFIRMATORY-OOS-001",
+      "relation": "depends_on",
+      "target_asset_id": "CONFIG-PROVIDER-ROUTE-CAPABILITY-REGISTRY-010"
+    },
+    {
+      "source_asset_id": "CONFIG-EARLY-HOLDER-CONCENTRATION-H900-CONFIRMATORY-OOS-001",
+      "relation": "governed_by",
+      "target_asset_id": "CTRL-EARLY-HOLDER-CONCENTRATION-H900-CONFIRMATORY-OOS-001"
+    },
+    {
       "source_asset_id": "CONFIG-EARLY-HOLDER-CONCENTRATION-H900-FALSIFIER-001",
       "relation": "depends_on",
       "target_asset_id": "CONFIG-PROVIDER-ROUTE-CAPABILITY-REGISTRY-010"
@@ -2221,6 +2231,31 @@
       "source_asset_id": "CTRL-DELIVERY-HARNESS-001",
       "relation": "validated_by",
       "target_asset_id": "TEST-DELIVERY-HARNESS-001"
+    },
+    {
+      "source_asset_id": "CTRL-EARLY-HOLDER-CONCENTRATION-H900-CONFIRMATORY-OOS-001",
+      "relation": "contains",
+      "target_asset_id": "CONFIG-EARLY-HOLDER-CONCENTRATION-H900-CONFIRMATORY-OOS-001"
+    },
+    {
+      "source_asset_id": "CTRL-EARLY-HOLDER-CONCENTRATION-H900-CONFIRMATORY-OOS-001",
+      "relation": "contains",
+      "target_asset_id": "TEST-EARLY-HOLDER-CONCENTRATION-H900-CONFIRMATORY-OOS-001"
+    },
+    {
+      "source_asset_id": "CTRL-EARLY-HOLDER-CONCENTRATION-H900-CONFIRMATORY-OOS-001",
+      "relation": "depends_on",
+      "target_asset_id": "CTRL-EARLY-HOLDER-CONCENTRATION-H900-FALSIFIER-001"
+    },
+    {
+      "source_asset_id": "CTRL-EARLY-HOLDER-CONCENTRATION-H900-CONFIRMATORY-OOS-001",
+      "relation": "depends_on",
+      "target_asset_id": "MODULE-EARLY-HOLDER-CONCENTRATION-H900-FALSIFIER-001"
+    },
+    {
+      "source_asset_id": "CTRL-EARLY-HOLDER-CONCENTRATION-H900-CONFIRMATORY-OOS-001",
+      "relation": "derived_from",
+      "target_asset_id": "EVIDENCE-EARLY-HOLDER-CONCENTRATION-H900-CONFIRMATORY-RUNTIME-001"
     },
     {
       "source_asset_id": "CTRL-EARLY-HOLDER-CONCENTRATION-H900-FALSIFIER-001",
@@ -4036,6 +4071,46 @@
       "source_asset_id": "EVIDENCE-EARLY-HOLDER-CONCENTRATION-H900-ACCEPTANCE-001",
       "relation": "derived_from",
       "target_asset_id": "CTRL-EARLY-HOLDER-CONCENTRATION-H900-FALSIFIER-001"
+    },
+    {
+      "source_asset_id": "EVIDENCE-EARLY-HOLDER-CONCENTRATION-H900-CONFIRMATORY-ACCEPTANCE-001",
+      "relation": "derived_from",
+      "target_asset_id": "CTRL-EARLY-HOLDER-CONCENTRATION-H900-CONFIRMATORY-OOS-001"
+    },
+    {
+      "source_asset_id": "EVIDENCE-EARLY-HOLDER-CONCENTRATION-H900-CONFIRMATORY-DELIVERY-COMPLETION-001",
+      "relation": "depends_on",
+      "target_asset_id": "EVIDENCE-EARLY-HOLDER-CONCENTRATION-H900-CONFIRMATORY-DELIVERY-FACTORY-FIT-001"
+    },
+    {
+      "source_asset_id": "EVIDENCE-EARLY-HOLDER-CONCENTRATION-H900-CONFIRMATORY-DELIVERY-COMPLETION-001",
+      "relation": "depends_on",
+      "target_asset_id": "EVIDENCE-EARLY-HOLDER-CONCENTRATION-H900-CONFIRMATORY-DELIVERY-INDEPENDENT-REVIEW-001"
+    },
+    {
+      "source_asset_id": "EVIDENCE-EARLY-HOLDER-CONCENTRATION-H900-CONFIRMATORY-DELIVERY-COMPLETION-001",
+      "relation": "derived_from",
+      "target_asset_id": "EVIDENCE-EARLY-HOLDER-CONCENTRATION-H900-CONFIRMATORY-ACCEPTANCE-001"
+    },
+    {
+      "source_asset_id": "EVIDENCE-EARLY-HOLDER-CONCENTRATION-H900-CONFIRMATORY-DELIVERY-FACTORY-FIT-001",
+      "relation": "depends_on",
+      "target_asset_id": "EVIDENCE-EARLY-HOLDER-CONCENTRATION-H900-CONFIRMATORY-DELIVERY-INDEPENDENT-REVIEW-001"
+    },
+    {
+      "source_asset_id": "EVIDENCE-EARLY-HOLDER-CONCENTRATION-H900-CONFIRMATORY-DELIVERY-FACTORY-FIT-001",
+      "relation": "derived_from",
+      "target_asset_id": "EVIDENCE-EARLY-HOLDER-CONCENTRATION-H900-CONFIRMATORY-ACCEPTANCE-001"
+    },
+    {
+      "source_asset_id": "EVIDENCE-EARLY-HOLDER-CONCENTRATION-H900-CONFIRMATORY-DELIVERY-INDEPENDENT-REVIEW-001",
+      "relation": "derived_from",
+      "target_asset_id": "EVIDENCE-EARLY-HOLDER-CONCENTRATION-H900-CONFIRMATORY-ACCEPTANCE-001"
+    },
+    {
+      "source_asset_id": "EVIDENCE-EARLY-HOLDER-CONCENTRATION-H900-CONFIRMATORY-RUNTIME-001",
+      "relation": "derived_from",
+      "target_asset_id": "EVIDENCE-EARLY-HOLDER-CONCENTRATION-H900-CONFIRMATORY-ACCEPTANCE-001"
     },
     {
       "source_asset_id": "EVIDENCE-EARLY-HOLDER-CONCENTRATION-H900-DELIVERY-COMPLETION-001",
@@ -12436,6 +12511,16 @@
       "source_asset_id": "TEST-DELIVERY-HARNESS-001",
       "relation": "depends_on",
       "target_asset_id": "POLICY-OWNER-ATTENTION-GATE-002"
+    },
+    {
+      "source_asset_id": "TEST-EARLY-HOLDER-CONCENTRATION-H900-CONFIRMATORY-OOS-001",
+      "relation": "depends_on",
+      "target_asset_id": "MODULE-EARLY-HOLDER-CONCENTRATION-H900-FALSIFIER-001"
+    },
+    {
+      "source_asset_id": "TEST-EARLY-HOLDER-CONCENTRATION-H900-CONFIRMATORY-OOS-001",
+      "relation": "governed_by",
+      "target_asset_id": "CTRL-EARLY-HOLDER-CONCENTRATION-H900-CONFIRMATORY-OOS-001"
     },
     {
       "source_asset_id": "TEST-EARLY-HOLDER-CONCENTRATION-H900-FALSIFIER-001",

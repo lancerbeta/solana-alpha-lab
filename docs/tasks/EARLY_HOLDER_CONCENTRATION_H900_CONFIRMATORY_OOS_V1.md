@@ -1,7 +1,7 @@
 ---
 task_id: EARLY_HOLDER_CONCENTRATION_H900_CONFIRMATORY_OOS_V1
 task_version: '1.0'
-status: IN_PROGRESS
+status: IMPLEMENTED_UNVERIFIED
 as_of: '2026-08-24'
 owner: GOAL_OWNER
 allowed_routes:
@@ -66,8 +66,10 @@ stop_conditions:
 context_requirements:
   catalog_asset_ids:
   - CTRL-EARLY-HOLDER-CONCENTRATION-H900-FALSIFIER-001
+  - CTRL-EARLY-HOLDER-CONCENTRATION-H900-CONFIRMATORY-OOS-001
   - MODULE-EARLY-HOLDER-CONCENTRATION-H900-FALSIFIER-001
   - EVIDENCE-EARLY-HOLDER-CONCENTRATION-H900-RUNTIME-001
+  - EVIDENCE-EARLY-HOLDER-CONCENTRATION-H900-CONFIRMATORY-RUNTIME-001
   - MODULE-ORDINARY-RECENT-ORGANIC-PRESSURE-H900-AUDITION-001
   - CONFIG-PROVIDER-ROUTE-CAPABILITY-REGISTRY-010
   l2_roles:
@@ -83,9 +85,9 @@ context_requirements:
     ARCHITECTURE_DECISIONS:
     - docs/architecture/intents/ARCH-INTENT-005-factory-v1-operational-readiness-and-owner-experience.md
     DELIVERY_EVIDENCE:
-    - docs/evidence/early_holder_concentration_h900_falsifier/a1_runtime_receipt_v1.json
-    - docs/evidence/early_holder_concentration_h900_falsifier/a1_acceptance_v1.json
-    - docs/evidence/early_holder_concentration_h900_falsifier/a1_delivery_completion_evidence_v1.json
+    - docs/evidence/early_holder_concentration_h900_confirmatory_oos/a1_delivery_completion_evidence_v1.json
+    - docs/evidence/early_holder_concentration_h900_confirmatory_oos/a1_delivery_independent_review_v1.json
+    - docs/evidence/early_holder_concentration_h900_confirmatory_oos/a1_delivery_factory_fit_v1.json
     HISTORICAL_CONTEXT: []
 ---
 

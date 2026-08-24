@@ -1,0 +1,63 @@
+{
+  "acceptance_id": "EARLY-HOLDER-CONCENTRATION-H900-CONFIRMATORY-DELIVERY-COMPLETION-001",
+  "active_stop_conditions": [],
+  "as_of": "2026-08-24",
+  "base_main": "bc744d6f66273165f42df1bb23b467cdaf16532a",
+  "capability_radar_now": "NONE",
+  "cloud_bundle_mode": "OWNER_MANAGED_OPTIONAL_EXPORT",
+  "cloud_bundle_required_by_harness": false,
+  "cloud_bundle_smoke_required": false,
+  "factory_fit": {
+    "path": "docs/evidence/early_holder_concentration_h900_confirmatory_oos/a1_delivery_factory_fit_v1.json",
+    "sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+    "verdict": "PASS"
+  },
+  "implementation_bindings": {
+    "docs/tasks/EARLY_HOLDER_CONCENTRATION_H900_CONFIRMATORY_OOS_V1.md": "0000000000000000000000000000000000000000000000000000000000000000"
+  },
+  "non_claims": [
+    "NO_CANONICAL_DONE",
+    "NO_ALPHA",
+    "NO_NETRETURN",
+    "NO_EXECUTE",
+    "NO_SHADOW",
+    "NO_DISCOVERY_OR_A7",
+    "NO_THIRD_SAMPLE",
+    "NO_THRESHOLD_OR_ACTIONABLE_RULE"
+  ],
+  "owner_attention_triggers": {
+    "auth_or_access_recovery": false,
+    "external_material_action": false,
+    "material_owner_decision": false,
+    "unresolved_safety_or_truth_conflict": false,
+    "user_only_activation": false
+  },
+  "project_sources_disposition": {
+    "kind": "NO_CHANGE"
+  },
+  "schema": "smial.delivery-completion-evidence",
+  "schema_version": "1.0",
+  "side_effects": {
+    "cash_spend_usd_cents": 0,
+    "credential_reads": 1,
+    "fallbacks": 0,
+    "provider_requests": 46,
+    "retries": 0,
+    "wallet_signer_transaction_actions": 0
+  },
+  "state_change": "HOLDER_CONCENTRATION_MECHANISM_REPLICATED",
+  "task_id": "EARLY_HOLDER_CONCENTRATION_H900_CONFIRMATORY_OOS_V1",
+  "validation": {
+    "full_gate": "ENFORCED_BY_PROJECT_BOUND_VALIDATION",
+    "github_ci": "ENFORCED_LIVE_AT_GUARDED_MERGE",
+    "independent_review": {
+      "path": "docs/evidence/early_holder_concentration_h900_confirmatory_oos/a1_delivery_independent_review_v1.json",
+      "sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+      "verdict": "PASS"
+    },
+    "project_checks": [
+      "PASS_TARGETED_HOLDER_CONCENTRATION_CONFIRMATORY_TESTS"
+    ],
+    "targeted": "PASS_EARLY_HOLDER_CONCENTRATION_H900_CONFIRMATORY_TESTS"
+  }
+}
