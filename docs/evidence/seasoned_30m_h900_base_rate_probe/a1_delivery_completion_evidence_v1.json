@@ -1,0 +1,73 @@
+{
+  "acceptance_id": "SEASONED-30M-H900-BASE-RATE-DELIVERY-COMPLETION-001",
+  "active_stop_conditions": [],
+  "as_of": "2026-08-24",
+  "base_main": "a818ac7cf59bc4c193657ecc4cd393c9897dad5b",
+  "capability_radar_now": "NONE",
+  "cloud_bundle_mode": "OWNER_MANAGED_OPTIONAL_EXPORT",
+  "cloud_bundle_required_by_harness": false,
+  "cloud_bundle_smoke_required": false,
+  "factory_fit": {
+    "path": "docs/evidence/seasoned_30m_h900_base_rate_probe/a1_delivery_factory_fit_v1.json",
+    "sha256": "1b94e84379e1fbd42d37bba7e9484d8776eace970d56f9b01b9046b93175354f",
+    "verdict": "PASS"
+  },
+  "implementation_bindings": {
+    "catalog/assets/core.yaml": "5a226063ea06157cb5fcff2811749f0f7ddde7cfc3a23e4d35cd4f8c87bab69e",
+    "catalog/assets/lifecycle.yaml": "a46056ea62f8d66dd6cde2d10757f62b76a0d80857f7b1a3db9e6a560da51e2d",
+    "configs/seasoned_30m_h900_base_rate_probe_v1.yaml": "5320daa0f6505ae189af649ec89fed4b3c615b7b44a77307ff935dbfa5e6f829",
+    "docs/PROJECT_MAP.md": "f94551888e78ed4c6d095c91fae968173d3bbf8f431d3567ab85044a5b43f2bd",
+    "docs/evidence/seasoned_30m_h900_base_rate_probe/a1_runtime_receipt_v1.json": "0dbf58b5c2c061b50bcc850cc31dd42c3b69bfbf5d5d157894f79ef96e4d1087",
+    "docs/reports/seasoned_30m_h900_base_rate_probe/a1_owner_readout_v1.md": "4d7a904e3670653e94df0360e152d31350ecba1e0ef36d277948578a33f8f703",
+    "docs/tasks/SEASONED_30M_H900_BASE_RATE_PROBE_V1.md": "c2c9ddbe3e307c4b02d8020b62aea128e5fb742ecc63ce124cc7bbd99d3888d9",
+    "scripts/run_seasoned_30m_h900_base_rate_probe.py": "b745f7f40b4e96f05b672038b7d5c35bf8eb2d53b7a7cb09851ca388f623282a",
+    "src/solana_alpha_lab/ordinary_recent_organic_pressure_h900_audition.py": "7b765c300e712dd4c13061c44e9a6b7fed466eb084ae725e09b236bb9665dc49",
+    "src/solana_alpha_lab/seasoned_30m_h900_base_rate_probe.py": "6e93ff0147486a134d27e6c038ad297a4c6dab8cd250ff75805703cd692231dd",
+    "tests/test_early_holder_concentration_h900_confirmatory_oos.py": "cc31ec631c3b9016ad105feefbb429d5f102a95c00226a9f1423c9fd69c599a8",
+    "tests/test_seasoned_30m_h900_base_rate_probe.py": "d6f3ef28b48a54ea1da4dd53490ddc540c77309820160e7dcbefd846356e9f41"
+  },
+  "non_claims": [
+    "NO_CANONICAL_DONE",
+    "NO_ALPHA",
+    "NO_NETRETURN",
+    "NO_EXECUTE",
+    "NO_SHADOW",
+    "NO_CAUSAL_WAIT_TREATMENT",
+    "NO_AUTOMATIC_SELECTOR_OR_45M_60M"
+  ],
+  "owner_attention_triggers": {
+    "auth_or_access_recovery": false,
+    "external_material_action": false,
+    "material_owner_decision": false,
+    "unresolved_safety_or_truth_conflict": false,
+    "user_only_activation": false
+  },
+  "project_sources_disposition": {
+    "kind": "NO_CHANGE"
+  },
+  "schema": "smial.delivery-completion-evidence",
+  "schema_version": "1.0",
+  "side_effects": {
+    "cash_spend_usd_cents": 0,
+    "credential_reads": 1,
+    "fallbacks": 0,
+    "provider_requests": 40,
+    "retries": 0,
+    "wallet_signer_transaction_actions": 0
+  },
+  "state_change": "SEASONED_30M_SURFACE_NO_POSITIVE_MASS",
+  "task_id": "SEASONED_30M_H900_BASE_RATE_PROBE_V1",
+  "validation": {
+    "full_gate": "ENFORCED_BY_PROJECT_BOUND_VALIDATION",
+    "github_ci": "ENFORCED_LIVE_AT_GUARDED_MERGE",
+    "independent_review": {
+      "path": "docs/evidence/seasoned_30m_h900_base_rate_probe/a1_delivery_independent_review_v1.json",
+      "sha256": "d74e32d1a693d10d49f993765c7f9090e78c7b442ff27c40860cc3ad0bc6caf3",
+      "verdict": "PASS"
+    },
+    "project_checks": [
+      "PASS_TARGETED_SEASONED_30M_BASE_RATE_TESTS"
+    ],
+    "targeted": "PASS_SEASONED_30M_H900_BASE_RATE_TESTS"
+  }
+}

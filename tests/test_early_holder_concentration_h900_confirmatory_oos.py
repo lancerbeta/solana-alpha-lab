@@ -32,6 +32,7 @@ from solana_alpha_lab.early_holder_concentration_h900_falsifier import (  # noqa
 )
 from solana_alpha_lab.ordinary_recent_organic_pressure_h900_audition import (  # noqa: E402
     OrganicPressureError,
+    SEASONING_SECONDS,
 )
 from scripts.run_early_holder_concentration_h900_falsifier import (  # noqa: E402
     owner_exit_blocked,
@@ -106,20 +107,22 @@ class HolderConcentrationConfirmatoryTests(unittest.TestCase):
         with self.assertRaisesRegex(OrganicPressureError, "ATOM_ID_NOT_IN_HOLDER_IDENTITY_ALLOWLIST"):
             validate_holder_concentration_policy(policy, root=ROOT)
 
-    def test_campaign_and_factory_runner_match_origin_main(self) -> None:
-        for relative in (CAMPAIGN_PATH, RUNNER_PATH):
-            result = subprocess.run(
-                ["git", "diff", "--exit-code", "origin/main", "--", relative],
-                cwd=ROOT,
-                capture_output=True,
-                text=True,
-                check=False,
-            )
-            self.assertEqual(
-                result.returncode,
-                0,
-                f"{relative} drifted from origin/main:\n{result.stdout}{result.stderr}",
-            )
+    def test_factory_runner_matches_origin_main_and_default_seasoning_stays_300(self) -> None:
+        result = subprocess.run(
+            ["git", "diff", "--exit-code", "origin/main", "--", RUNNER_PATH],
+            cwd=ROOT,
+            capture_output=True,
+            text=True,
+            check=False,
+        )
+        self.assertEqual(
+            result.returncode,
+            0,
+            f"{RUNNER_PATH} drifted from origin/main:\n{result.stdout}{result.stderr}",
+        )
+        self.assertEqual(SEASONING_SECONDS, 300)
+        campaign = (ROOT / CAMPAIGN_PATH).read_text(encoding="utf-8")
+        self.assertIn("expected_seasoning_seconds: int = SEASONING_SECONDS", campaign)
 
     def test_mocked_negative_replicates_and_positive_closes_family(self) -> None:
         policy = yaml.safe_load(CONFIG_PATH.read_text(encoding="utf-8"))
