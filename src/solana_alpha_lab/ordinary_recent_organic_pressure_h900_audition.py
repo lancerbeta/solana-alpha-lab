@@ -364,6 +364,56 @@ def score_audition(
     return {"terminal": "EARN_FRESH_OOS" if passes else close_terminal, **result}
 
 
+def score_sign_only_kendall(
+    rows: Sequence[Mapping[str, Any]],
+    *,
+    min_decision_time_eligible: int,
+    min_rankable_h900: int,
+    expected_direction: str,
+    close_terminal: str,
+    earn_terminal: str,
+    invalid_terminal: str,
+) -> dict[str, object]:
+    _require(expected_direction == "NEGATIVE", "EXPECTED_DIRECTION_UNSUPPORTED")
+    eligible = [row for row in rows if _number(row.get("x"))]
+    rankable = [
+        row
+        for row in eligible
+        if row.get("h900_terminal") == QUOTE_OBSERVED and _number(row.get("y"))
+    ]
+    result: dict[str, object] = {
+        "decision_time_eligible": len(eligible),
+        "rankable_h900": len(rankable),
+        "tau_b": None,
+        "score_kind": "SIGN_ONLY_KENDALL_TAU_B",
+        "expected_direction": expected_direction,
+        "top_quartile_median_y": None,
+        "rest_median_y": None,
+        "leave_one_out_positive_share": None,
+        "selected_market_execution_unavailable": False,
+        "selected_top_quartile_non_quote": False,
+    }
+    if len(eligible) < min_decision_time_eligible or len(rankable) < min_rankable_h900:
+        return {"terminal": invalid_terminal, **result}
+    tau = _kendall_tau_b(rankable)
+    result["tau_b"] = tau
+    if tau is None:
+        return {"terminal": invalid_terminal, **result}
+    if tau < 0:
+        return {"terminal": earn_terminal, **result}
+    return {"terminal": close_terminal, **result}
+
+
+LEGACY_DECISION_KEYS = (
+    "tau_b_floor",
+    "top_x_quartile",
+    "top_quartile_median_y_gt",
+    "top_quartile_median_gt_rest",
+    "leave_one_out_positive_share",
+    "selected_market_execution_unavailable_forbidden",
+)
+
+
 def _mapping(value: object, code: str) -> Mapping[str, Any]:
     _require(isinstance(value, Mapping), code)
     return value
@@ -379,6 +429,7 @@ def validate_policy(
     expected_x_formula: str = (
         "(stats5m.buyOrganicVolume - stats5m.sellOrganicVolume) / top-level liquidity"
     ),
+    require_legacy_decision_rule: bool = True,
 ) -> None:
     _require(policy.get("schema") == expected_schema, "SCHEMA_DRIFT")
     _require(policy.get("schema_version") == "1.0", "SCHEMA_VERSION_DRIFT")
@@ -437,12 +488,21 @@ def validate_policy(
     decision_rule = _mapping(policy.get("decision_rule"), "DECISION_RULE_INVALID")
     _require(decision_rule.get("min_decision_time_eligible") == 18, "DECISION_YIELD_DRIFT")
     _require(decision_rule.get("min_rankable_h900") == 14, "RANKABLE_YIELD_DRIFT")
-    _require(decision_rule.get("tau_b_floor") == "0.20", "TAU_FLOOR_DRIFT")
-    _require(decision_rule.get("top_x_quartile") is True, "TOP_QUARTILE_DRIFT")
-    _require(decision_rule.get("top_quartile_median_y_gt") == 0, "TOP_MEDIAN_FLOOR_DRIFT")
-    _require(decision_rule.get("top_quartile_median_gt_rest") is True, "TOP_REST_MEDIAN_DRIFT")
-    _require(decision_rule.get("leave_one_out_positive_share") == "0.75", "LOO_FLOOR_DRIFT")
-    _require(decision_rule.get("selected_market_execution_unavailable_forbidden") is True, "MARKET_TERMINAL_RULE_DRIFT")
+    if require_legacy_decision_rule:
+        _require(decision_rule.get("tau_b_floor") == "0.20", "TAU_FLOOR_DRIFT")
+        _require(decision_rule.get("top_x_quartile") is True, "TOP_QUARTILE_DRIFT")
+        _require(decision_rule.get("top_quartile_median_y_gt") == 0, "TOP_MEDIAN_FLOOR_DRIFT")
+        _require(decision_rule.get("top_quartile_median_gt_rest") is True, "TOP_REST_MEDIAN_DRIFT")
+        _require(decision_rule.get("leave_one_out_positive_share") == "0.75", "LOO_FLOOR_DRIFT")
+        _require(decision_rule.get("selected_market_execution_unavailable_forbidden") is True, "MARKET_TERMINAL_RULE_DRIFT")
+    else:
+        for key in LEGACY_DECISION_KEYS:
+            _require(key not in decision_rule, f"LEGACY_DECISION_KEY_FORBIDDEN:{key}")
+        _require(decision_rule.get("expected_direction") == "NEGATIVE", "EXPECTED_DIRECTION_DRIFT")
+        _require(decision_rule.get("score_kind") == "SIGN_ONLY_KENDALL_TAU_B", "SCORE_KIND_DRIFT")
+        for name in ("close_terminal", "earn_terminal", "invalid_terminal"):
+            value = decision_rule.get(name)
+            _require(isinstance(value, str) and bool(value), f"DECISION_TERMINAL_DRIFT:{name}")
     controls = _mapping(policy.get("execution_controls"), "CONTROLS_INVALID")
     _require(controls.get("retries") == 0, "RETRY_NOT_FORBIDDEN")
     _require(controls.get("fallback") is False, "FALLBACK_NOT_FORBIDDEN")
@@ -586,6 +646,9 @@ def run_campaign(
     receipt_schema: str = "smial.ordinary-recent-organic-pressure-h900-audition.runtime-receipt",
     close_terminal: str = "CLOSE_ORGANIC_PRESSURE_CANDIDATE",
     project_x: Any = None,
+    score_fn: Any = None,
+    require_legacy_decision_rule: bool = True,
+    insufficient_yield_terminal: str = "INVALID_EVIDENCE_YIELD",
 ) -> dict[str, object]:
     validate_policy(
         policy,
@@ -594,6 +657,7 @@ def run_campaign(
         expected_authority_phrase=expected_authority_phrase,
         expected_schema=expected_schema,
         expected_x_formula=expected_x_formula,
+        require_legacy_decision_rule=require_legacy_decision_rule,
     )
     authority = _mapping(policy["external_authority"], "AUTHORITY_INVALID")
     _require(authority_phrase == authority.get("owner_phrase") == expected_authority_phrase, "AUTHORITY_PHRASE_INVALID")
@@ -867,7 +931,7 @@ def run_campaign(
     decision_rules = _mapping(policy["decision_rule"], "DECISION_RULE_INVALID")
     if len(eligible) < int(decision_rules["min_decision_time_eligible"]):
         return _failure_receipt(
-            terminal="INVALID_EVIDENCE_YIELD",
+            terminal=insufficient_yield_terminal,
             preflight=preflight,
             credential_reads=credential_reads,
             provider_requests=provider_requests,
@@ -1130,14 +1194,18 @@ def run_campaign(
                 except (InvalidOperation, OverflowError, ValueError):
                     row["h900_terminal"] = CLIENT_CONTRACT_FAILURE
                     row["y"] = None
-    score = score_audition(
-        rows_for_score,
-        min_decision_time_eligible=int(decision_rules["min_decision_time_eligible"]),
-        min_rankable_h900=int(decision_rules["min_rankable_h900"]),
-        tau_floor=float(decision_rules["tau_b_floor"]),
-        leave_one_out_positive_share=float(decision_rules["leave_one_out_positive_share"]),
-        close_terminal=close_terminal,
-    )
+    if score_fn is None:
+        score = score_audition(
+            rows_for_score,
+            min_decision_time_eligible=int(decision_rules["min_decision_time_eligible"]),
+            min_rankable_h900=int(decision_rules["min_rankable_h900"]),
+            tau_floor=float(decision_rules["tau_b_floor"]),
+            leave_one_out_positive_share=float(decision_rules["leave_one_out_positive_share"]),
+            close_terminal=close_terminal,
+        )
+    else:
+        score = score_fn(rows_for_score)
+        _require(isinstance(score, Mapping) and isinstance(score.get("terminal"), str), "SCORE_FN_INVALID")
     return {
         "schema": receipt_schema,
         "schema_version": "1.0",
