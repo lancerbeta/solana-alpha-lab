@@ -674,6 +674,27 @@ class OrganicPressureAuditionTests(unittest.TestCase):
         self.assertIsNone(degenerate["tau_b"])
         self.assertEqual(degenerate["terminal"], "INVALID_EVIDENCE_REPLAN")
 
+        tied_x = [
+            {
+                "mint": f"mint-{index:02d}",
+                "x": 12.5,
+                "h900_terminal": "QUOTE_OBSERVED",
+                "y": float(index),
+            }
+            for index in range(18)
+        ]
+        undefined = score_sign_only_kendall(
+            tied_x,
+            min_decision_time_eligible=18,
+            min_rankable_h900=14,
+            expected_direction="NEGATIVE",
+            close_terminal="CLOSE_HOLDER_CONCENTRATION_FAMILY",
+            earn_terminal="EARN_ONE_CONFIRMATORY_FRESH_OOS",
+            invalid_terminal="INVALID_EVIDENCE_REPLAN",
+        )
+        self.assertIsNone(undefined["tau_b"])
+        self.assertEqual(undefined["terminal"], "INVALID_EVIDENCE_REPLAN")
+
         with self.assertRaisesRegex(OrganicPressureError, "EXPECTED_DIRECTION_UNSUPPORTED"):
             score_sign_only_kendall(
                 negative,

@@ -13,7 +13,6 @@ from solana_alpha_lab.early_icp_freeze_acceptance import (
 from solana_alpha_lab.ordinary_recent_organic_pressure_h900_audition import (
     OrganicPressureError,
     SEASONING_SECONDS,
-    _number,
     run_campaign,
     score_sign_only_kendall,
     validate_policy,
@@ -39,6 +38,7 @@ FIELD_PATHS = [
 ]
 FACTORY_RUNNER = "src/solana_alpha_lab/factory/runner.py"
 FACTORY_RUNNER_SHA256 = "d8d22bcb51fb6992d40f09e58274c52e0f9942c12d043cc57b96ffca524e918f"
+JUPITER_TOP_HOLDERS_POOL_EXCLUSION = "UNKNOWN"
 AUTHORITY_PHRASE = (
     "OK EARLY_HOLDER_CONCENTRATION_H900_FALSIFIER_V1: one bounded Jupiter "
     "Free-key read-only campaign using a local process-environment key only; "
@@ -69,6 +69,12 @@ def _parse_utc(value: object, code: str) -> datetime:
     if parsed.tzinfo is None:
         raise OrganicPressureError(code)
     return parsed.astimezone(UTC)
+
+
+def _finite_number(value: object) -> bool:
+    if not isinstance(value, (int, float)) or isinstance(value, bool):
+        return False
+    return value == value and value not in {float("inf"), float("-inf")}
 
 
 def project_holder_concentration(
@@ -134,13 +140,13 @@ def project_holder_concentration(
         result["reason"] = "UPDATED_TIMESTAMP_IN_FUTURE"
         return result
     liquidity = t5_row.get("liquidity")
-    if not _number(liquidity) or float(liquidity) < LIQUIDITY_USD_MIN:
+    if not _finite_number(liquidity) or float(liquidity) < LIQUIDITY_USD_MIN:
         result["reason"] = "LIQUIDITY_BELOW_ICP_MIN"
         return result
     if not isinstance(audit, Mapping) or "topHoldersPercentage" not in audit:
         result["reason"] = "TOP_HOLDERS_PERCENTAGE_ABSENT"
         return result
-    if not _number(top_holders):
+    if not _finite_number(top_holders):
         result["reason"] = "TOP_HOLDERS_PERCENTAGE_INVALID"
         return result
     value = float(top_holders)
@@ -216,10 +222,15 @@ def validate_holder_concentration_policy(policy: Mapping[str, Any], *, root: Any
         raise OrganicPressureError("FACTORY_RUNNER_PATH_DRIFT")
     if policy.get("factory_runner_sha256") != FACTORY_RUNNER_SHA256:
         raise OrganicPressureError("FACTORY_RUNNER_HASH_DRIFT")
+    limitations = policy.get("limitations")
+    if not isinstance(limitations, Mapping):
+        raise OrganicPressureError("LIMITATIONS_INVALID")
+    if limitations.get("jupiter_top_holders_pool_exclusion") != JUPITER_TOP_HOLDERS_POOL_EXCLUSION:
+        raise OrganicPressureError("TOP_HOLDERS_POOL_EXCLUSION_LIMITATION_DRIFT")
 
 
 def run_holder_concentration_campaign(policy: Mapping[str, Any], **kwargs: Any) -> dict[str, object]:
-    return run_campaign(
+    receipt = run_campaign(
         policy,
         atom_id=ATOM_ID,
         expected_authority_phrase=AUTHORITY_PHRASE,
@@ -233,3 +244,7 @@ def run_holder_concentration_campaign(policy: Mapping[str, Any], **kwargs: Any) 
         insufficient_yield_terminal=INVALID_TERMINAL,
         **kwargs,
     )
+    receipt["limitations"] = {
+        "jupiter_top_holders_pool_exclusion": JUPITER_TOP_HOLDERS_POOL_EXCLUSION,
+    }
+    return receipt

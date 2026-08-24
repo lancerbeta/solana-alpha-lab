@@ -395,6 +395,10 @@ def score_sign_only_kendall(
     }
     if len(eligible) < min_decision_time_eligible or len(rankable) < min_rankable_h900:
         return {"terminal": invalid_terminal, **result}
+    x_values = [float(row["x"]) for row in rankable]
+    y_values = [float(row["y"]) for row in rankable]
+    if len(set(x_values)) < 2 or len(set(y_values)) < 2:
+        return {"terminal": invalid_terminal, **result}
     tau = _kendall_tau_b(rankable)
     result["tau_b"] = tau
     if tau is None:

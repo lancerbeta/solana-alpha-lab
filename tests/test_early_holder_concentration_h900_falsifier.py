@@ -24,6 +24,7 @@ from solana_alpha_lab.early_holder_concentration_h900_falsifier import (  # noqa
     FACTORY_RUNNER,
     FACTORY_RUNNER_SHA256,
     INVALID_TERMINAL,
+    JUPITER_TOP_HOLDERS_POOL_EXCLUSION,
     X_FORMULA,
     project_holder_concentration,
     run_holder_concentration_campaign,
@@ -183,6 +184,17 @@ class HolderConcentrationFalsifierTests(unittest.TestCase):
         self.assertEqual(zero["status"], "ELIGIBLE")
         self.assertEqual(zero["value"], 0.0)
 
+        extras = dict(_row(0, top_holders=12.5))
+        extras["audit"] = {
+            "topHoldersPercentage": 12.5,
+            "holderCount": 999,
+            "devBalancePercentage": 80.0,
+        }
+        extras["holderCount"] = 999
+        ignored = project_holder_concentration(recent, extras, observed_at)
+        self.assertEqual(ignored["status"], "ELIGIBLE")
+        self.assertEqual(ignored["value"], 12.5)
+
     def test_x_range_predicate_age_and_liquidity(self) -> None:
         observed_at = datetime(2026, 8, 24, 12, 5, tzinfo=UTC)
         recent = _row(0, top_holders=62.5)
@@ -229,6 +241,14 @@ class HolderConcentrationFalsifierTests(unittest.TestCase):
         )
         self.assertEqual(future_updated["status"], "MISSING")
         self.assertEqual(future_updated["reason"], "UPDATED_TIMESTAMP_IN_FUTURE")
+
+        before_pool = project_holder_concentration(
+            recent,
+            _row(0, created_at="2026-08-24T11:55:00Z", updated_at="2026-08-24T11:54:00Z"),
+            observed_at,
+        )
+        self.assertEqual(before_pool["status"], "MISSING")
+        self.assertEqual(before_pool["reason"], "UPDATED_TIMESTAMP_BEFORE_POOL_CREATION")
 
         low_liq = project_holder_concentration(recent, _row(0, liquidity=500.0), observed_at)
         self.assertEqual(low_liq["status"], "MISSING")
@@ -285,6 +305,10 @@ class HolderConcentrationFalsifierTests(unittest.TestCase):
         self.assertEqual(earn_receipt["decision_time_eligible"], 24)
         self.assertLess(earn_receipt["score"]["tau_b"], 0)
         self.assertEqual(earn_receipt["terminal_outcome"], EARN_TERMINAL)
+        self.assertEqual(
+            earn_receipt["limitations"]["jupiter_top_holders_pool_exclusion"],
+            JUPITER_TOP_HOLDERS_POOL_EXCLUSION,
+        )
 
         close_recent = [_row(index, top_holders=float(index)) for index in range(24)]
         close_search = [_row(index, top_holders=float(index)) for index in range(24)]
@@ -352,6 +376,18 @@ class HolderConcentrationFalsifierTests(unittest.TestCase):
         self.assertFalse(owner_exit_blocked(EARN_TERMINAL))
         self.assertTrue(owner_exit_blocked(INVALID_TERMINAL))
         self.assertTrue(owner_exit_blocked("INVALID_EVIDENCE_YIELD"))
+        self.assertTrue(owner_exit_blocked("API_KEY_IN_URL_LOG_RECEIPT_OR_GIT"))
+
+        from scripts.run_early_holder_concentration_h900_falsifier import _terminal_from_error
+
+        self.assertEqual(
+            _terminal_from_error(OrganicPressureError("API_KEY_IN_URL_LOG_RECEIPT_OR_GIT")),
+            "API_KEY_IN_URL_LOG_RECEIPT_OR_GIT",
+        )
+        self.assertEqual(
+            _terminal_from_error(OrganicPressureError("SOME_OTHER_CODE")),
+            "INVALID_EVIDENCE_REPLAN",
+        )
 
 
 if __name__ == "__main__":

@@ -120,7 +120,9 @@ def _safe_observation_stem(observation_id: str) -> str:
 
 
 def _terminal_from_error(exc: OrganicPressureError) -> str:
-    _ = str(exc) in TYPED_STOP_TERMINALS
+    code = str(exc)
+    if code in TYPED_STOP_TERMINALS:
+        return code
     return "INVALID_EVIDENCE_REPLAN"
 
 
