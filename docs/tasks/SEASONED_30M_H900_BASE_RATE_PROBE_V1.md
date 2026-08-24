@@ -21,7 +21,10 @@ managed_write_set:
 - src/solana_alpha_lab/seasoned_30m_h900_base_rate_probe.py
 - scripts/run_seasoned_30m_h900_base_rate_probe.py
 - tests/test_seasoned_30m_h900_base_rate_probe.py
+- tests/test_early_holder_concentration_h900_confirmatory_oos.py
 - catalog/assets/core.yaml
+- catalog/assets/lifecycle.yaml
+- docs/PROJECT_MAP.md
 - docs/evidence/seasoned_30m_h900_base_rate_probe/a1_runtime_receipt_v1.json
 - docs/evidence/seasoned_30m_h900_base_rate_probe/a1_delivery_completion_evidence_v1.json
 - docs/evidence/seasoned_30m_h900_base_rate_probe/a1_delivery_independent_review_v1.json
