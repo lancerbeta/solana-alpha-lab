@@ -16,8 +16,8 @@
     "GOAL_DOD_CRITIC"
   ],
   "review_id": "SEASONED-30M-H900-BASE-RATE-INDEPENDENT-REVIEW-001",
-  "reviewed_bindings_sha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
-  "reviewed_inventory_sha256": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+  "reviewed_bindings_sha256": "80a4eaeba416e0cce97e1c30d709128162204b9711943022baa11cda846077e2",
+  "reviewed_inventory_sha256": "26d4e0c8eae8d107262d05d6069f41b4ad8f8f264b22aae375e31d240d20a50c",
   "reviews": [
     {
       "findings": [
