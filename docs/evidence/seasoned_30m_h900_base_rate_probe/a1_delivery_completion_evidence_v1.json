@@ -9,18 +9,21 @@
   "cloud_bundle_smoke_required": false,
   "factory_fit": {
     "path": "docs/evidence/seasoned_30m_h900_base_rate_probe/a1_delivery_factory_fit_v1.json",
-    "sha256": "931c6e81f8b876a62b6e8203a7593d29d826052a5ecbeea787ea55c8657bd30f",
+    "sha256": "1b94e84379e1fbd42d37bba7e9484d8776eace970d56f9b01b9046b93175354f",
     "verdict": "PASS"
   },
   "implementation_bindings": {
-    "catalog/assets/core.yaml": "2580a1d12b6c02ac98f0060939ca22f039bfcaeddb081e3d8c36be06b287e409",
+    "catalog/assets/core.yaml": "5a226063ea06157cb5fcff2811749f0f7ddde7cfc3a23e4d35cd4f8c87bab69e",
+    "catalog/assets/lifecycle.yaml": "a46056ea62f8d66dd6cde2d10757f62b76a0d80857f7b1a3db9e6a560da51e2d",
     "configs/seasoned_30m_h900_base_rate_probe_v1.yaml": "5320daa0f6505ae189af649ec89fed4b3c615b7b44a77307ff935dbfa5e6f829",
+    "docs/PROJECT_MAP.md": "f94551888e78ed4c6d095c91fae968173d3bbf8f431d3567ab85044a5b43f2bd",
     "docs/evidence/seasoned_30m_h900_base_rate_probe/a1_runtime_receipt_v1.json": "0dbf58b5c2c061b50bcc850cc31dd42c3b69bfbf5d5d157894f79ef96e4d1087",
     "docs/reports/seasoned_30m_h900_base_rate_probe/a1_owner_readout_v1.md": "4d7a904e3670653e94df0360e152d31350ecba1e0ef36d277948578a33f8f703",
-    "docs/tasks/SEASONED_30M_H900_BASE_RATE_PROBE_V1.md": "cacf9ef851c3efc20a363fa405e0c356b129ddc012468117d4af2b178bef7a13",
+    "docs/tasks/SEASONED_30M_H900_BASE_RATE_PROBE_V1.md": "c2c9ddbe3e307c4b02d8020b62aea128e5fb742ecc63ce124cc7bbd99d3888d9",
     "scripts/run_seasoned_30m_h900_base_rate_probe.py": "b745f7f40b4e96f05b672038b7d5c35bf8eb2d53b7a7cb09851ca388f623282a",
     "src/solana_alpha_lab/ordinary_recent_organic_pressure_h900_audition.py": "7b765c300e712dd4c13061c44e9a6b7fed466eb084ae725e09b236bb9665dc49",
     "src/solana_alpha_lab/seasoned_30m_h900_base_rate_probe.py": "6e93ff0147486a134d27e6c038ad297a4c6dab8cd250ff75805703cd692231dd",
+    "tests/test_early_holder_concentration_h900_confirmatory_oos.py": "cc31ec631c3b9016ad105feefbb429d5f102a95c00226a9f1423c9fd69c599a8",
     "tests/test_seasoned_30m_h900_base_rate_probe.py": "d6f3ef28b48a54ea1da4dd53490ddc540c77309820160e7dcbefd846356e9f41"
   },
   "non_claims": [
@@ -59,7 +62,7 @@
     "github_ci": "ENFORCED_LIVE_AT_GUARDED_MERGE",
     "independent_review": {
       "path": "docs/evidence/seasoned_30m_h900_base_rate_probe/a1_delivery_independent_review_v1.json",
-      "sha256": "f6d923f9b7e1a091a50c5d4b7e39196e749a8ec5fb1f910ca484fb79eb3e6134",
+      "sha256": "d74e32d1a693d10d49f993765c7f9090e78c7b442ff27c40860cc3ad0bc6caf3",
       "verdict": "PASS"
     },
     "project_checks": [
