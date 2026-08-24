@@ -21,6 +21,9 @@ managed_write_set:
 - scripts/run_holder_concentration_top_quartile_veto_phase_a.py
 - tests/test_holder_concentration_top_quartile_veto.py
 - docs/evidence/early_holder_concentration_actionability_rule_oos/a1_phase_a_receipt_v1.json
+- docs/evidence/early_holder_concentration_actionability_rule_oos/a1_delivery_completion_evidence_v1.json
+- docs/evidence/early_holder_concentration_actionability_rule_oos/a1_delivery_independent_review_v1.json
+- docs/evidence/early_holder_concentration_actionability_rule_oos/a1_delivery_factory_fit_v1.json
 - docs/reports/early_holder_concentration_actionability_rule_oos/a1_owner_readout_v1.md
 external_caps:
   network: false
@@ -62,8 +65,9 @@ context_requirements:
     ARCHITECTURE_DECISIONS:
     - docs/architecture/intents/ARCH-INTENT-005-factory-v1-operational-readiness-and-owner-experience.md
     DELIVERY_EVIDENCE:
-    - docs/evidence/early_holder_concentration_h900_falsifier/a1_runtime_receipt_v1.json
-    - docs/evidence/early_holder_concentration_h900_confirmatory_oos/a1_runtime_receipt_v1.json
+    - docs/evidence/early_holder_concentration_actionability_rule_oos/a1_delivery_completion_evidence_v1.json
+    - docs/evidence/early_holder_concentration_actionability_rule_oos/a1_delivery_independent_review_v1.json
+    - docs/evidence/early_holder_concentration_actionability_rule_oos/a1_delivery_factory_fit_v1.json
     HISTORICAL_CONTEXT: []
 ---
 
