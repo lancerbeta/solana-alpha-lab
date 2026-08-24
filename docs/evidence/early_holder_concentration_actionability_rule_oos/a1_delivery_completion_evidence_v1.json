@@ -1,0 +1,69 @@
+{
+  "acceptance_id": "EARLY-HOLDER-CONCENTRATION-ACTIONABILITY-DELIVERY-COMPLETION-001",
+  "active_stop_conditions": [],
+  "as_of": "2026-08-24",
+  "base_main": "6d5a7e1cbddb5875ae16f2125c5f3f7a3faed3bd",
+  "capability_radar_now": "NONE",
+  "cloud_bundle_mode": "OWNER_MANAGED_OPTIONAL_EXPORT",
+  "cloud_bundle_required_by_harness": false,
+  "cloud_bundle_smoke_required": false,
+  "factory_fit": {
+    "path": "docs/evidence/early_holder_concentration_actionability_rule_oos/a1_delivery_factory_fit_v1.json",
+    "sha256": "c8ce8f4f6f9cd2ceae8dbf0611b82e5cdd131c838c7dd056547ff0a0cef33df5",
+    "verdict": "PASS"
+  },
+  "implementation_bindings": {
+    "configs/early_holder_concentration_actionability_rule_oos_v1.yaml": "34bf130a9cda203d7449e4b4e340fec01a5835d42b3cddbc404c0605e8d7731a",
+    "docs/evidence/early_holder_concentration_actionability_rule_oos/a1_phase_a_receipt_v1.json": "924e6d8087bfe281922aee291cdf16fa3323b09a8a9633ca520a59626b0c2c39",
+    "docs/reports/early_holder_concentration_actionability_rule_oos/a1_owner_readout_v1.md": "acf0a04f4427ceb96463a4eaeeee640a6f45b58f2d03c6f79e53c2eaa95c8902",
+    "docs/tasks/EARLY_HOLDER_CONCENTRATION_ACTIONABILITY_RULE_OOS_V1.md": "107584c89e148686a7e14ece753602b4618478314eeb2a90e63d71f6261056d7",
+    "scripts/run_holder_concentration_top_quartile_veto_phase_a.py": "529079a65c635c3c9a7161f0b3f414db85e2c3a07fdf9effedaabdb21b03187c",
+    "src/solana_alpha_lab/holder_concentration_top_quartile_veto.py": "6337cd431daff0dc73498737b2ba2ae32ebf643e1f9b268e783ffea1961cb602",
+    "tests/test_holder_concentration_top_quartile_veto.py": "bf0747252eb3b83c294ec2ea558055a7f4e0bbe5baf977eb53c24e265a1ed6b9"
+  },
+  "non_claims": [
+    "NO_CANONICAL_DONE",
+    "NO_ALPHA",
+    "NO_NETRETURN",
+    "NO_PAPER",
+    "NO_STRATEGY",
+    "NO_SHADOW",
+    "NO_LIVE_JUPITER",
+    "NO_RULE_SEARCH"
+  ],
+  "owner_attention_triggers": {
+    "auth_or_access_recovery": false,
+    "external_material_action": false,
+    "material_owner_decision": false,
+    "unresolved_safety_or_truth_conflict": false,
+    "user_only_activation": false
+  },
+  "project_sources_disposition": {
+    "kind": "NO_CHANGE"
+  },
+  "schema": "smial.delivery-completion-evidence",
+  "schema_version": "1.0",
+  "side_effects": {
+    "cash_spend_usd_cents": 0,
+    "credential_reads": 0,
+    "fallbacks": 0,
+    "provider_requests": 0,
+    "retries": 0,
+    "wallet_signer_transaction_actions": 0
+  },
+  "state_change": "REPLICATED_RELATION_NOT_ACTIONABLE_AS_TOP_QUARTILE_VETO",
+  "task_id": "EARLY_HOLDER_CONCENTRATION_ACTIONABILITY_RULE_OOS_V1",
+  "validation": {
+    "full_gate": "ENFORCED_BY_PROJECT_BOUND_VALIDATION",
+    "github_ci": "ENFORCED_LIVE_AT_GUARDED_MERGE",
+    "independent_review": {
+      "path": "docs/evidence/early_holder_concentration_actionability_rule_oos/a1_delivery_independent_review_v1.json",
+      "sha256": "294d2c80891793f7e87994beef50d2318e0f4a8bb176549280f1aff471334b54",
+      "verdict": "PASS"
+    },
+    "project_checks": [
+      "PASS_TARGETED_TOP_QUARTILE_VETO_TESTS"
+    ],
+    "targeted": "PASS_HOLDER_CONCENTRATION_TOP_QUARTILE_VETO_TESTS"
+  }
+}
