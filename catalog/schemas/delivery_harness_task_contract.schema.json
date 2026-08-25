@@ -47,6 +47,18 @@
         "l2_roles": {"type": "array", "uniqueItems": true, "items": {"enum": ["LIFECYCLE", "EXTERNAL_ROUTE_KNOWLEDGE", "ARCHITECTURE_DECISIONS", "DELIVERY_EVIDENCE"]}},
         "l3_roles": {"type": "array", "uniqueItems": true, "items": {"enum": ["HISTORICAL_CONTEXT"]}},
         "roadmap_path": {"type": ["string", "null"]},
+        "exact_role_asset_ids": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["LIFECYCLE", "EXTERNAL_ROUTE_KNOWLEDGE", "ARCHITECTURE_DECISIONS", "DELIVERY_EVIDENCE", "HISTORICAL_CONTEXT"],
+          "properties": {
+            "LIFECYCLE": {"type": "array", "uniqueItems": true, "items": {"type": "string", "minLength": 1}},
+            "EXTERNAL_ROUTE_KNOWLEDGE": {"type": "array", "uniqueItems": true, "items": {"type": "string", "minLength": 1}},
+            "ARCHITECTURE_DECISIONS": {"type": "array", "uniqueItems": true, "items": {"type": "string", "minLength": 1}},
+            "DELIVERY_EVIDENCE": {"type": "array", "uniqueItems": true, "items": {"type": "string", "minLength": 1}},
+            "HISTORICAL_CONTEXT": {"type": "array", "uniqueItems": true, "items": {"type": "string", "minLength": 1}}
+          }
+        },
         "exact_role_paths": {
           "type": "object",
           "additionalProperties": false,

@@ -124,6 +124,15 @@ CONTEXT_ROLE_ORDER = (
     "DELIVERY_EVIDENCE",
     "HISTORICAL_CONTEXT",
 )
+L2_L3_ROLE_ORDER = (
+    "LIFECYCLE",
+    "EXTERNAL_ROUTE_KNOWLEDGE",
+    "ARCHITECTURE_DECISIONS",
+    "DELIVERY_EVIDENCE",
+    "HISTORICAL_CONTEXT",
+)
+RESOLUTION_EXACT_PATH = "EXACT_PATH"
+RESOLUTION_CATALOG_ASSET_ID = "CATALOG_ASSET_ID"
 PORTABLE_MANIFEST_PATH = "delivery-harness/templates/portable-bundle-manifest.json"
 def canonical_json_bytes(value: Any) -> bytes:
     return (
@@ -431,6 +440,7 @@ def reference_for_path(
     truth_owner: str,
     stable_id: str | None,
     max_inline_bytes: int,
+    resolution_method: str = RESOLUTION_EXACT_PATH,
 ) -> dict[str, Any]:
     normalized = safe_relative_path(relative)
     if normalized.startswith("docs/project_sources/") and not (
@@ -453,6 +463,7 @@ def reference_for_path(
             if path.stat().st_size > max_inline_bytes
             else "METADATA_ONLY"
         ),
+        "resolution_method": resolution_method,
     }
 
 
@@ -555,8 +566,83 @@ def catalog_relation_references(
         if not isinstance(relative, str):
             gaps.append({"semantic_role": "STABLE_ASSETS_AND_RELATIONS", "lane": "L1", "truth_owner": "CATALOG", "state": "EXPLICIT_GAP", "reason_code": "CATALOG_ASSET_NOT_RESOLVED"})
             continue
-        selected.append(reference_for_path(root, relative, semantic_role="STABLE_ASSETS_AND_RELATIONS", lane="L1", truth_owner="CATALOG", stable_id=asset_id, max_inline_bytes=max_inline_bytes))
+        selected.append(
+            reference_for_path(
+                root,
+                relative,
+                semantic_role="STABLE_ASSETS_AND_RELATIONS",
+                lane="L1",
+                truth_owner="CATALOG",
+                stable_id=asset_id,
+                max_inline_bytes=max_inline_bytes,
+                resolution_method=RESOLUTION_CATALOG_ASSET_ID,
+            )
+        )
     return selected, gaps
+
+
+def role_asset_ids(requirements: dict[str, Any]) -> dict[str, list[str]]:
+    raw = requirements.get("exact_role_asset_ids")
+    if raw is None:
+        return {role_id: [] for role_id in L2_L3_ROLE_ORDER}
+    if not isinstance(raw, dict) or set(raw) != set(L2_L3_ROLE_ORDER):
+        raise ValueError("CONTEXT_ROLE_UNSUPPORTED")
+    resolved: dict[str, list[str]] = {}
+    for role_id in L2_L3_ROLE_ORDER:
+        values = raw.get(role_id)
+        if not isinstance(values, list) or any(
+            not isinstance(item, str) or not item for item in values
+        ):
+            raise ValueError("CONTEXT_ROLE_UNSUPPORTED")
+        resolved[role_id] = values
+    return resolved
+
+
+def catalog_asset_location(
+    records: dict[str, dict[str, Any]], asset_id: str
+) -> tuple[str, dict[str, Any]]:
+    record = records.get(asset_id)
+    if not isinstance(record, dict):
+        raise ValueError("CONTEXT_ASSET_NOT_FOUND")
+    location = record.get("location")
+    relative = location.get("repository_path") if isinstance(location, dict) else None
+    if not isinstance(relative, str) or not relative:
+        raise ValueError("CONTEXT_ASSET_PATH_MISSING")
+    return relative, record
+
+
+def resolve_catalog_asset_reference(
+    root: Path,
+    records: dict[str, dict[str, Any]],
+    asset_id: str,
+    *,
+    semantic_role: str,
+    lane: str,
+    truth_owner: str,
+    max_inline_bytes: int,
+) -> dict[str, Any]:
+    relative, record = catalog_asset_location(records, asset_id)
+    try:
+        path = resolve_bounded(root, relative, code="CONTEXT_ASSET_PATH_MISSING")
+    except ValueError as exc:
+        raise ValueError("CONTEXT_ASSET_PATH_MISSING") from exc
+    if not path.is_file():
+        raise ValueError("CONTEXT_ASSET_PATH_MISSING")
+    digest = sha256_file(path)
+    integrity = record.get("integrity")
+    declared = integrity.get("sha256") if isinstance(integrity, dict) else None
+    if isinstance(declared, str) and declared != digest:
+        raise ValueError("CONTEXT_HASH_MISMATCH")
+    return reference_for_path(
+        root,
+        relative,
+        semantic_role=semantic_role,
+        lane=lane,
+        truth_owner=truth_owner,
+        stable_id=asset_id,
+        max_inline_bytes=max_inline_bytes,
+        resolution_method=RESOLUTION_CATALOG_ASSET_ID,
+    )
 
 
 def resolve_required_context(
@@ -565,6 +651,7 @@ def resolve_required_context(
     context_map: dict[str, Any],
     *,
     max_inline_bytes: int,
+    records: dict[str, dict[str, Any]] | None = None,
 ) -> tuple[list[dict[str, Any]], list[dict[str, Any]]]:
     selected: list[dict[str, Any]] = []
     gaps: list[dict[str, Any]] = []
@@ -572,20 +659,33 @@ def resolve_required_context(
     requirements = task_metadata["context_requirements"]
     required = set(requirements["l2_roles"]) | set(requirements["l3_roles"])
     paths_by_role = requirements["exact_role_paths"]
-    for role_id in (
-        "LIFECYCLE",
-        "EXTERNAL_ROUTE_KNOWLEDGE",
-        "ARCHITECTURE_DECISIONS",
-        "DELIVERY_EVIDENCE",
-        "HISTORICAL_CONTEXT",
-    ):
+    assets_by_role = role_asset_ids(requirements)
+    catalog_records = records if records is not None else {}
+    for role_id in L2_L3_ROLE_ORDER:
         role = role_by_id[role_id]
         if role_id not in required:
             gaps.append(explicit_gap(role, "DEFERRED_ON_DEMAND"))
             continue
         paths = paths_by_role[role_id]
-        if not paths:
+        asset_ids = assets_by_role[role_id]
+        if not paths and not asset_ids:
             raise ValueError(f"REQUIRED_CONTEXT_REFERENCE_NOT_BOUND:{role_id}")
+        path_set = set(paths)
+        for asset_id in asset_ids:
+            relative, _record = catalog_asset_location(catalog_records, asset_id)
+            if relative in path_set:
+                raise ValueError("CONTEXT_REFERENCE_DUPLICATE")
+            selected.append(
+                resolve_catalog_asset_reference(
+                    root,
+                    catalog_records,
+                    asset_id,
+                    semantic_role=role_id,
+                    lane=role["lane"],
+                    truth_owner=role["truth_owner"],
+                    max_inline_bytes=max_inline_bytes,
+                )
+            )
         for relative in paths:
             selected.append(
                 reference_for_path(
@@ -596,6 +696,7 @@ def resolve_required_context(
                     truth_owner=role["truth_owner"],
                     stable_id=None,
                     max_inline_bytes=max_inline_bytes,
+                    resolution_method=RESOLUTION_EXACT_PATH,
                 )
             )
     return selected, gaps
@@ -701,13 +802,22 @@ def build_context_receipt(
             payload=identity,
         )
     )
-    records = load_catalog_records(root, profile["bindings"]["catalog_manifest"])
+    try:
+        records = load_catalog_records(root, profile["bindings"]["catalog_manifest"])
+    except ValueError as exc:
+        if any(role_asset_ids(task_metadata["context_requirements"]).values()):
+            raise ValueError("CONTEXT_CATALOG_INVALID") from exc
+        raise
     catalog_selected, catalog_gaps = catalog_relation_references(root, records, task_metadata["context_requirements"]["catalog_asset_ids"], max_inline_bytes=max_inline)
     if catalog_gaps:
         raise ValueError("REQUIRED_CATALOG_ASSET_NOT_RESOLVED")
     selected.extend(catalog_selected)
     required_selected, required_gaps = resolve_required_context(
-        root, task_metadata, context_map, max_inline_bytes=max_inline
+        root,
+        task_metadata,
+        context_map,
+        max_inline_bytes=max_inline,
+        records=records,
     )
     selected.extend(required_selected)
     gaps.extend(required_gaps)

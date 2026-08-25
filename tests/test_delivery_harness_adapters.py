@@ -65,7 +65,8 @@ class DeliveryHarnessAdapterTests(unittest.TestCase):
         policy = DOMAIN_POLICY.read_text(encoding="utf-8")
         required = (
             "## ACTIVE_TIME_GATE_CHECK",
-            "configs/provider_route_capability_registry_v3.yaml",
+            "CONFIG-PROVIDER-ROUTE-CAPABILITY-REGISTRY-010",
+            "exact_role_asset_ids",
             "REGISTRY_GAP",
             "## REUSE_FIRST_RECOVERY_TRIGGER",
             "## TRACKED_ONLY_DELIVERY_PREFLIGHT",

@@ -10,7 +10,7 @@
     {"semantic_role": "IMPLEMENTATION_STATE", "lane": "L1", "truth_owner": "GIT", "missingness": "ERROR", "resolver": {"kind": "GIT_IDENTITY", "paths": []}},
     {"semantic_role": "STABLE_ASSETS_AND_RELATIONS", "lane": "L1", "truth_owner": "CATALOG", "missingness": "EXPLICIT_GAP", "resolver": {"kind": "CATALOG_QUERY", "paths": []}},
     {"semantic_role": "LIFECYCLE", "lane": "L2", "truth_owner": "VERSIONED_REGISTRIES", "missingness": "EXPLICIT_GAP", "resolver": {"kind": "EXACT_PATHS", "paths": []}},
-    {"semantic_role": "EXTERNAL_ROUTE_KNOWLEDGE", "lane": "L2", "truth_owner": "EXTERNAL_ROUTE_REGISTRY", "missingness": "EXPLICIT_GAP", "resolver": {"kind": "EXACT_PATHS", "paths": []}},
+    {"semantic_role": "EXTERNAL_ROUTE_KNOWLEDGE", "lane": "L2", "truth_owner": "EXTERNAL_ROUTE_REGISTRY", "missingness": "EXPLICIT_GAP", "resolver": {"kind": "CATALOG_QUERY", "paths": []}},
     {"semantic_role": "ARCHITECTURE_DECISIONS", "lane": "L2", "truth_owner": "ADR_AND_INTENT_REGISTRIES", "missingness": "EXPLICIT_GAP", "resolver": {"kind": "CATALOG_QUERY", "paths": []}},
     {"semantic_role": "DELIVERY_EVIDENCE", "lane": "L2", "truth_owner": "EXACT_CANDIDATE_EVIDENCE", "missingness": "EXPLICIT_GAP", "resolver": {"kind": "CATALOG_QUERY", "paths": []}},
     {"semantic_role": "HISTORICAL_CONTEXT", "lane": "L3", "truth_owner": "ARCHIVES", "missingness": "EXPLICIT_GAP", "resolver": {"kind": "SOURCE_RELEASE_REGISTRY", "paths": []}}
