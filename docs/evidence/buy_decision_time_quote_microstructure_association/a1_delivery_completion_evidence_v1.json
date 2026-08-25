@@ -9,11 +9,24 @@
   "cloud_bundle_smoke_required": false,
   "factory_fit": {
     "path": "docs/evidence/buy_decision_time_quote_microstructure_association/a1_delivery_factory_fit_v1.json",
-    "sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+    "sha256": "928f7d984cebdce8529dfaedd91d5dbe03b0172439ba368f6ae486113ae93b56",
     "verdict": "PASS"
   },
   "implementation_bindings": {
-    "docs/tasks/BUY_DECISION_TIME_QUOTE_MICROSTRUCTURE_ASSOCIATION_V1.md": "0000000000000000000000000000000000000000000000000000000000000000"
+    "catalog/assets/core.yaml": "24b9881fc4f2c456d5fa5de0dabbe76411f1b13198d377e30c402727bbbc8874",
+    "catalog/assets/lifecycle.yaml": "932bd21182de82e2617d5700df19b323665e31c26f8296757b0aa42106e78801",
+    "catalog/catalog_manifest.yaml": "ba852eb222713ca1e1803e507e63a543471e863a51c2f360a0eacc99b8683728",
+    "catalog/generated/asset_edges.json": "3c61fefc26bfc247eae73224e273cc9c7fcb860d3a0f950f3cd4014d09e513cf",
+    "configs/buy_decision_time_quote_microstructure_association_v1.yaml": "3e5788c859db47cd4a1e4275e001fdd0905f1afb9c421595568bca7264c648de",
+    "docs/PROJECT_MAP.md": "21ff0ff85acbb636f5794b2a3a229db03357922061e2d935ed85d5632c23ae03",
+    "docs/evidence/buy_decision_time_quote_microstructure_association/a1_association_input_v1.json": "51f1edd4c3ad9228926c6a68de1be4c1a965d9f48eae9a135700a456f7835485",
+    "docs/evidence/buy_decision_time_quote_microstructure_association/a1_derived_capsule_v1.jsonl": "0d84da721a44728bae5a008305a6dd9cc26775c074f2292d6245a57a8187b5ac",
+    "docs/evidence/buy_decision_time_quote_microstructure_association/a1_runtime_receipt_v1.json": "9eace9a51931e3e448bba15088fcbee01ae16de42c198aea1b9892a1f89f8596",
+    "docs/reports/buy_decision_time_quote_microstructure_association/a1_owner_readout_v1.md": "53e511cc7328ce80ec6e8b08e8b73d8b330fcf0473189742c990348a8ec38099",
+    "docs/tasks/BUY_DECISION_TIME_QUOTE_MICROSTRUCTURE_ASSOCIATION_V1.md": "174592e97941ab3b72894a958652e00e8bae4d595e551e4c8c5c00742230d8f2",
+    "scripts/run_buy_decision_time_quote_microstructure_association.py": "1a110c97f325bd9cb5bd5642ab1ed9c164f54cb4db990b0f7040df54f462a211",
+    "src/solana_alpha_lab/buy_decision_time_quote_microstructure_association.py": "0d6ce422811b7eea13ca97fb3214de8c5e78d30d1243f5c9804262b8c31eed27",
+    "tests/test_buy_decision_time_quote_microstructure_association.py": "a44af82fc8af1ac1da48f334f3e828be048578e55eb36940a0c7e59f3e184204"
   },
   "non_claims": [
     "NO_CANONICAL_DONE",
@@ -52,7 +65,7 @@
     "github_ci": "ENFORCED_LIVE_AT_GUARDED_MERGE",
     "independent_review": {
       "path": "docs/evidence/buy_decision_time_quote_microstructure_association/a1_delivery_independent_review_v1.json",
-      "sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+      "sha256": "3583794463f873e691cef7b907db2b00e0ec72d4cb7d2bd5a6f026725fde3c22",
       "verdict": "PASS"
     },
     "project_checks": [
