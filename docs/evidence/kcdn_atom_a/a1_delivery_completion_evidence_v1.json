@@ -11,7 +11,23 @@
   "cloud_bundle_smoke_required": false,
   "capability_radar_now": "NONE",
   "implementation_bindings": {
-    "src/solana_alpha_lab/catalog_discovery.py": "0000000000000000000000000000000000000000000000000000000000000000"
+    "catalog/assets/core.yaml": "6eeaaa95854668ed5e37ba55ad3be6196544db452b6aafad63bfd8ae1b0ffc7d",
+    "catalog/assets/lifecycle.yaml": "13df132d93db2ad072f44635dc307af4ba94a1298ca1e7a74dc8d1a2e5be5f1b",
+    "catalog/catalog_manifest.yaml": "d29873acf4fee762ba2cb367cb1efacc0c3d61ff9420ff0b9c742a20072494ba",
+    "catalog/fixtures/discovery_gold_queries_v1.yaml": "b0e25d38a0fed6ac3beb260da4943a7c31015f1b064ad288d117a45d9092a9d7",
+    "catalog/generated/asset_edges.json": "a907b6eb68e65ceb5377ccacf7c9ec22abfc575257739e0a0d112f40f4f36352",
+    "catalog/query_recipes.yaml": "ddfd6f271f35e2015a817bdd93ea00889f293fe44ee343a456233e715eaeaaef",
+    "catalog/schemas/catalog_manifest.schema.json": "ef720e1f5d0fca0a43bab1fc28961d60f8f4fc335508ab83175ae1b2e9f5873c",
+    "docs/OPERATOR_NAVIGATION.md": "1dcf971a0cb2dae92cd7497c4f2f7975cee99b5cdaf161d937e08eeb67a84c69",
+    "docs/PROJECT_MAP.md": "f6c9141e8ed1c2083ca3fe273edbc7693ec2a2e3268c101811382182ef3e72e8",
+    "docs/tasks/KCDN_ATOM_A_CANONICAL_BINDINGS_AND_DETERMINISTIC_NAVIGATION_V1.md": "6d9aad2d88ea08fd66522e372527c0c1859e7300a546d574fd8950b323efe8fa",
+    "scripts/catalog_cli.py": "c76025aac347c6a42f6f3a94b99386464cd21ba6b6fef43b97f43363294d0bcf",
+    "scripts/generate_navigation.py": "47afd368120838e97eb6e2fa484099449190f265f65b3e1e838e6194f3f2dbc3",
+    "scripts/validate_catalog.py": "ab9add51e9296c6c1a5c8dbe1a7fc7a79e7e8fadc4a0a7382ea9ea0b0039c0ab",
+    "src/solana_alpha_lab/catalog_discovery.py": "6054ae80e2d828ba8cef3631d60647d14e488b7fccebd29a4edda0b9795f0784",
+    "tests/test_catalog_canonical_binding_discovery.py": "157cc55aa5d3fb90b8557bc5fa69018f623fab28660cd3c6232823f7a888c7cb",
+    "tests/test_harness_sync.py": "029b14f0e64053eb248b7fe0613f865f76fab51f00c692184c2cb327ff567b92",
+    "tests/test_task34a_documentation_foundation.py": "0c88190b271225c1ee5c364fee2ee369e9dadbcad3f46553db9764f80386cf24"
   },
   "active_stop_conditions": [],
   "owner_attention_triggers": {
@@ -23,19 +39,21 @@
   },
   "factory_fit": {
     "path": "docs/evidence/kcdn_atom_a/a1_delivery_factory_fit_v1.json",
-    "sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+    "sha256": "64d5e818ba4b709188b938b83e83e550ed3c0f0297f6df56ca782b70b7c331d6",
     "verdict": "PASS"
   },
   "validation": {
     "targeted": "PASS_FOCUSED_CATALOG_DISCOVERY_AND_NAVIGATION",
     "independent_review": {
       "path": "docs/evidence/kcdn_atom_a/a1_delivery_independent_review_v1.json",
-      "sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+      "sha256": "5f8587838955f5cc947d99281e0ff1fa0c14a1a9fcb4e6a804bbca9c1b1a26f3",
       "verdict": "PASS"
     },
     "full_gate": "ENFORCED_BY_PROJECT_BOUND_VALIDATION",
     "github_ci": "ENFORCED_LIVE_AT_GUARDED_MERGE",
-    "project_checks": ["PASS_VALIDATE_CATALOG"]
+    "project_checks": [
+      "PASS_VALIDATE_CATALOG"
+    ]
   },
   "non_claims": [
     "NO_ALPHA",
