@@ -1705,14 +1705,14 @@ exact duplicate prevented
 promotion not automatic
 ~~~
 
-- [ ] **Step 6: Commit final generated/contract changes**
+- [x] **Step 6: Commit final generated/contract changes**
 
 ~~~text
 git add catalog/query_recipes.yaml catalog/assets/lifecycle.yaml catalog/catalog_manifest.yaml catalog/generated/asset_edges.json docs/PROJECT_MAP.md docs/tasks/HYPOTHESIS_FAST_LANE_AND_RESEARCH_DATA_PLANE_V1.md
 git commit -m "docs(factory): register hypothesis fast-lane foundation"
 ~~~
 
-- [ ] **Step 7: Push one task branch and open one PR**
+- [x] **Step 7: Push one task branch and open one PR**
 
 Do not open intermediate PRs. Let exact-head CI run once on the completed candidate.
 
