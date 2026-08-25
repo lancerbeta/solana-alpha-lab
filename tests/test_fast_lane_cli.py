@@ -198,6 +198,32 @@ class FastLaneCliTests(unittest.TestCase):
             self.assertTrue(payload["proof_matrix"]["append_only_records"])
             self.assertTrue(payload["proof_matrix"]["passport_fields_populated"])
             self.assertTrue(payload["proof_matrix"]["deterministic_dataset_bound"])
+            record_counts = payload["record_receipt"]["record_counts"]
+            for kind in (
+                "RUN_STARTED",
+                "RUN_COMPLETED",
+                "EXPERIMENT_METRIC",
+                "RESEARCH_ARTIFACT",
+                "EVIDENCE_BINDING",
+            ):
+                self.assertGreaterEqual(record_counts[kind], 1)
+            self.assertGreaterEqual(
+                payload["record_receipt"]["hypothesis_version_count"],
+                1,
+            )
+            for field in (
+                "experiment_spec_sha256",
+                "runner_git_sha",
+                "dataset_fingerprints",
+                "config_sha256",
+                "as_of",
+                "availability_cutoff",
+                "scientific_terminal",
+                "result_digest_sha256",
+                "run_key_sha256",
+            ):
+                self.assertIn(field, payload["passport_fields"])
+                self.assertTrue(payload["passport_fields"][field])
             cold_copy = payload["cold_copy_proof"]
             self.assertIsNotNone(cold_copy)
             self.assertTrue(cold_copy["inventory_digest_matches"])

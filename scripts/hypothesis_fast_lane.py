@@ -33,12 +33,16 @@ from solana_alpha_lab.factory.prior_work import (  # noqa: E402
 )
 from solana_alpha_lab.factory.research_store import (  # noqa: E402
     RESEARCH_PROJECTION_LOCATION,
+    RecordKind,
     ResearchStore,
     ResearchStoreError,
 )
 from solana_alpha_lab.factory.run_passport import (  # noqa: E402
+    RunPassport,
+    RunPassportError,
     canonical_sha256,
     experiment_spec_sha256,
+    validate_run_passport,
 )
 from solana_alpha_lab.factory.commissioning_fixture import (  # noqa: E402
     COMMISSIONING_DATASET_MANIFEST_ID,
@@ -351,6 +355,51 @@ def execute_search_prior_work(
     }
 
 
+REQUIRED_RUN_RECORD_COUNTS = {
+    RecordKind.RUN_STARTED: 1,
+    RecordKind.RUN_COMPLETED: 1,
+    RecordKind.EXPERIMENT_METRIC: 1,
+    RecordKind.RESEARCH_ARTIFACT: 1,
+    RecordKind.EVIDENCE_BINDING: 1,
+}
+RUN_PASSPORT_REQUIRED_FIELDS = tuple(RunPassport.model_fields)
+
+
+def verify_commissioning_records(store: ResearchStore, run_id: str) -> dict[str, Any]:
+    counts: dict[str, int] = {kind.value: 0 for kind in REQUIRED_RUN_RECORD_COUNTS}
+    hypothesis_version_count = 0
+    for record in store.iter_committed_records():
+        kind_name = getattr(record.record_kind, "value", record.record_kind)
+        if kind_name == RecordKind.HYPOTHESIS_VERSION.value:
+            hypothesis_version_count += 1
+        if record.run_id != run_id:
+            continue
+        kind_name = getattr(record.record_kind, "value", record.record_kind)
+        if kind_name in counts:
+            counts[kind_name] = counts.get(kind_name, 0) + 1
+    if hypothesis_version_count < 1:
+        raise FastLaneCliError("COMMISSION_HYPOTHESIS_VERSION_MISSING")
+    for kind, minimum in REQUIRED_RUN_RECORD_COUNTS.items():
+        if counts[kind.value] < minimum:
+            raise FastLaneCliError(f"COMMISSION_RECORD_MISSING:{kind.value}")
+    return {
+        "run_id": run_id,
+        "hypothesis_version_count": hypothesis_version_count,
+        "record_counts": counts,
+    }
+
+
+def verify_commissioning_passport(passport: dict[str, Any]) -> dict[str, Any]:
+    missing = [field for field in RUN_PASSPORT_REQUIRED_FIELDS if field not in passport]
+    if missing:
+        raise FastLaneCliError("COMMISSION_PASSPORT_INCOMPLETE")
+    try:
+        validated = validate_run_passport(passport)
+    except RunPassportError as exc:
+        raise FastLaneCliError("COMMISSION_PASSPORT_INVALID") from exc
+    return dict(validated.payload)
+
+
 def verify_result_integrity(data_root: Path, run_id: str) -> dict[str, Any]:
     row = _run_row(data_root, run_id)
     passport = row["passport"]
@@ -616,62 +665,55 @@ def cmd_commission_offline(root: Path, data_root: Path, packet_path: Path) -> in
     store = ResearchStore(data_root)
     diagnostics = store.diagnostics()
     run_id = submit_payload.get("run_id_or_null")
-    integrity_matches = False
-    cold_copy_proof: dict[str, Any] | None = None
-    if isinstance(run_id, str):
-        integrity_payload = verify_result_integrity(data_root, run_id)
-        integrity_matches = bool(integrity_payload.get("result_integrity_matches"))
-        if not integrity_matches:
-            raise FastLaneCliError("COMMISSION_RESULT_INTEGRITY_FAILED")
-        backup_root = data_root / "_cold_copy_backup"
-        restored_root = data_root / "_cold_copy_restored"
-        try:
-            backup = backup_committed_inventory(data_root, backup_root)
-            proof = prove_cold_copy(
-                data_root,
-                backup.backup_root,
-                run_id=run_id,
-                restored_root=restored_root,
-            )
-            cold_copy_proof = {
-                **{
-                    "inventory_digest_matches": (
-                        proof.source_inventory_sha256 == proof.restored_inventory_sha256
-                    ),
-                    "projection_digest_matches": (
-                        proof.source_projection_digest_sha256
-                        == proof.restored_projection_digest_sha256
-                    ),
-                    "result_digest_matches": (
-                        proof.source_result_digest_sha256
-                        == proof.restored_result_digest_sha256
-                    ),
-                    "result_payload_matches": (
-                        proof.source_result_payload_sha256
-                        == proof.restored_result_payload_sha256
-                    ),
-                    "backup_file_count": backup.file_count,
-                    "snapshot_id": backup.snapshot_id,
-                }
-            }
-        except ColdCopyError as exc:
-            raise FastLaneCliError(str(exc)) from exc
+    if not isinstance(run_id, str):
+        raise FastLaneCliError("COMMISSION_RUN_ID_MISSING")
 
-    passport_row = store.find_completed_run_by_id(run_id) if isinstance(run_id, str) else None
-    passport_fields = {}
-    if passport_row is not None:
-        passport = dict(passport_row.payload)
-        passport_fields = {
-            "experiment_spec_sha256": passport.get("experiment_spec_sha256"),
-            "runner_git_sha": passport.get("runner_git_sha"),
-            "dataset_manifest_ids": passport.get("dataset_manifest_ids"),
-            "dataset_fingerprints": passport.get("dataset_fingerprints"),
-            "config_sha256": passport.get("config_sha256"),
-            "as_of": passport.get("as_of"),
-            "availability_cutoff": passport.get("availability_cutoff"),
-            "scientific_terminal": passport.get("scientific_terminal"),
-            "query_recipe_binding": passport.get("query_recipe_binding"),
+    record_receipt = verify_commissioning_records(store, run_id)
+    integrity_payload = verify_result_integrity(data_root, run_id)
+    integrity_matches = bool(integrity_payload.get("result_integrity_matches"))
+    if not integrity_matches:
+        raise FastLaneCliError("COMMISSION_RESULT_INTEGRITY_FAILED")
+
+    passport_row = store.find_completed_run_by_id(run_id)
+    if passport_row is None:
+        raise FastLaneCliError("COMMISSION_PASSPORT_MISSING")
+    passport = verify_commissioning_passport(dict(passport_row.payload))
+    passport_fields = {
+        field: passport.get(field) for field in RUN_PASSPORT_REQUIRED_FIELDS
+    }
+    passport_fields["query_recipe_binding"] = passport.get("query_recipe_binding")
+
+    backup_root = data_root / "_cold_copy_backup"
+    restored_root = data_root / "_cold_copy_restored"
+    try:
+        backup = backup_committed_inventory(data_root, backup_root)
+        proof = prove_cold_copy(
+            data_root,
+            backup.backup_root,
+            run_id=run_id,
+            restored_root=restored_root,
+        )
+        cold_copy_proof = {
+            "inventory_digest_matches": (
+                proof.source_inventory_sha256 == proof.restored_inventory_sha256
+            ),
+            "projection_digest_matches": (
+                proof.source_projection_digest_sha256
+                == proof.restored_projection_digest_sha256
+            ),
+            "result_digest_matches": (
+                proof.source_result_digest_sha256
+                == proof.restored_result_digest_sha256
+            ),
+            "result_payload_matches": (
+                proof.source_result_payload_sha256
+                == proof.restored_result_payload_sha256
+            ),
+            "backup_file_count": backup.file_count,
+            "snapshot_id": backup.snapshot_id,
         }
+    except ColdCopyError as exc:
+        raise FastLaneCliError(str(exc)) from exc
 
     payload = {
         **owner_fields(
@@ -694,11 +736,19 @@ def cmd_commission_offline(root: Path, data_root: Path, packet_path: Path) -> in
         "result_integrity_matches": integrity_matches,
         "committed_inventory_sha256": diagnostics.committed_inventory_sha256,
         "commissioning_dataset_manifest_id": COMMISSIONING_DATASET_MANIFEST_ID,
+        "record_receipt": record_receipt,
         "passport_fields": passport_fields,
         "proof_matrix": {
             "no_git_write_fence": git_before.unchanged(git_after),
-            "append_only_records": integrity_matches,
-            "passport_fields_populated": bool(passport_fields.get("experiment_spec_sha256")),
+            "append_only_records": all(
+                record_receipt["record_counts"][kind.value]
+                >= minimum
+                for kind, minimum in REQUIRED_RUN_RECORD_COUNTS.items()
+            )
+            and record_receipt["hypothesis_version_count"] >= 1,
+            "passport_fields_populated": all(
+                field in passport_fields for field in RUN_PASSPORT_REQUIRED_FIELDS
+            ),
             "deterministic_dataset_bound": COMMISSIONING_DATASET_MANIFEST_ID
             in list(passport_fields.get("dataset_manifest_ids") or []),
             "cold_copy_proof": cold_copy_proof,

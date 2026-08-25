@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 import json
-import shutil
+import uuid
 from dataclasses import dataclass
 from pathlib import Path
 from typing import Any
@@ -122,7 +122,7 @@ def prove_cold_copy(
     run_id: str,
     restored_root: Path,
 ) -> ColdCopyProof:
-    """Restore an existing snapshot to a fresh root, rebuild projection, and compare values."""
+    """Restore to a process-owned unique root; never rmtree the caller path."""
 
     source_store = ResearchStore(source_root)
     source_diag = source_store.diagnostics()
@@ -133,18 +133,17 @@ def prove_cold_copy(
     source_artifact = load_run_result_artifact(source_root, source_passport)
     source_result_payload_sha256 = canonical_sha256(source_artifact["capability_result"])
 
-    if restored_root.exists():
-        shutil.rmtree(restored_root)
-    restore_committed_inventory(snapshot_root, restored_root)
+    fresh_root = restored_root.parent / f"{restored_root.name}-{uuid.uuid4().hex}"
+    restore_committed_inventory(snapshot_root, fresh_root)
 
-    restored_store = ResearchStore(restored_root)
+    restored_store = ResearchStore(fresh_root)
     restored_store.rebuild_projection()
     restored_diag = restored_store.diagnostics()
     restored_row = restored_store.find_completed_run_by_id(run_id)
     if restored_row is None:
         raise ColdCopyError("RESTORED_RUN_NOT_FOUND")
     restored_passport = dict(restored_row.payload)
-    restored_artifact = load_run_result_artifact(restored_root, restored_passport)
+    restored_artifact = load_run_result_artifact(fresh_root, restored_passport)
     restored_result_payload_sha256 = canonical_sha256(
         restored_artifact["capability_result"]
     )

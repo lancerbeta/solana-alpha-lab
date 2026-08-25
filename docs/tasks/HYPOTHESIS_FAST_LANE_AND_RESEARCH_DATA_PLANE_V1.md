@@ -35,6 +35,10 @@ managed_write_set:
 - src/solana_alpha_lab/factory/experiment_spec.py
 - src/solana_alpha_lab/factory/runner.py
 - src/solana_alpha_lab/factory/document_runner.py
+- src/solana_alpha_lab/factory/commissioning_fixture.py
+- src/solana_alpha_lab/factory/fast_lane_cold_copy.py
+- src/solana_alpha_lab/factory/fast_lane_snapshot.py
+- src/solana_alpha_lab/factory/git_write_fence.py
 - scripts/hypothesis_fast_lane.py
 - scripts/query_hypothesis_research_memory.py
 - tests/test_fast_lane_classifier.py
@@ -42,6 +46,7 @@ managed_write_set:
 - tests/test_research_projection.py
 - tests/test_fast_lane_runner.py
 - tests/test_fast_lane_cli.py
+- tests/test_fast_lane_semantic_dod.py
 - tests/test_task16_hypothesis_research_memory_query.py
 - tests/fixtures/fast_lane/**
 - catalog/query_recipes.yaml

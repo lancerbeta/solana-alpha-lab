@@ -4,9 +4,10 @@ from __future__ import annotations
 
 import hashlib
 import json
+import os
 import shutil
-import json
-import shutil
+import stat
+import uuid
 from collections.abc import Sequence
 from dataclasses import dataclass
 from datetime import UTC, datetime
@@ -93,10 +94,28 @@ def _timestamp_text(value: datetime) -> str:
 
 
 def _safe_relative_path(relative: str) -> str:
+    if not relative or "\\" in relative or ":" in relative:
+        raise SnapshotError("LOGICAL_PATH_UNSAFE")
     posix = PurePosixPath(relative)
-    if posix.is_absolute() or ".." in posix.parts:
+    if posix.is_absolute() or ".." in posix.parts or not posix.parts:
         raise SnapshotError("LOGICAL_PATH_UNSAFE")
     return posix.as_posix()
+
+
+def _contained_under(root: Path, candidate: Path) -> bool:
+    try:
+        candidate.resolve().relative_to(root.resolve())
+    except ValueError:
+        return False
+    return True
+
+
+def _require_hex_sha256(value: object, code: str) -> str:
+    if not isinstance(value, str) or len(value) != 64:
+        raise SnapshotError(code)
+    if any(char not in "0123456789abcdef" for char in value):
+        raise SnapshotError(code)
+    return value
 
 
 def _is_excluded_relative(relative: str) -> bool:
@@ -306,13 +325,14 @@ def _load_snapshot(snapshot_root: Path) -> tuple[dict[str, Any], list[SnapshotEn
         object_key = item.get("object_key")
         if not isinstance(logical_path, str) or not isinstance(content_sha256, str):
             raise SnapshotError("SNAPSHOT_INVENTORY_INVALID")
-        if not isinstance(object_key, str):
-            object_key = _object_key(content_sha256)
+        expected_key = _object_key(content_sha256)
+        if isinstance(object_key, str) and object_key != expected_key:
+            raise SnapshotError("SNAPSHOT_OBJECT_KEY_MISMATCH")
         entries.append(
             SnapshotEntry(
                 logical_path=_safe_relative_path(logical_path),
                 content_sha256=content_sha256,
-                object_key=_object_key(content_sha256),
+                object_key=expected_key,
             )
         )
 
@@ -321,51 +341,158 @@ def _load_snapshot(snapshot_root: Path) -> tuple[dict[str, Any], list[SnapshotEn
         raise SnapshotError("SNAPSHOT_INVENTORY_HASH_MISMATCH")
     if manifest.get("entry_count") != len(entries):
         raise SnapshotError("SNAPSHOT_ENTRY_COUNT_MISMATCH")
+    _require_hex_sha256(
+        manifest.get("committed_inventory_sha256"),
+        "SNAPSHOT_COMMITTED_INVENTORY_INVALID",
+    )
     return manifest, entries
 
 
-def restore_snapshot(source: Path, destination: Path) -> SnapshotRestore:
-    """Verify snapshot hashes and publish immutable bytes into a fresh data root."""
-
-    snapshot_root = source.resolve()
-    destination_root = destination.resolve()
-    if destination_root.exists():
-        for child in destination_root.iterdir():
-            if child.is_dir():
-                shutil.rmtree(child)
-            else:
-                child.unlink()
-    else:
-        destination_root.mkdir(parents=True, exist_ok=True)
-
-    manifest, entries = _load_snapshot(snapshot_root)
-
+def _verify_snapshot_objects(
+    snapshot_root: Path,
+    entries: Sequence[SnapshotEntry],
+) -> None:
     for entry in entries:
         if _is_excluded_relative(entry.logical_path):
             raise SnapshotError("SNAPSHOT_ENTRY_EXCLUDED")
         object_path = snapshot_root / entry.object_key
+        if not _contained_under(snapshot_root, object_path):
+            raise SnapshotError("OBJECT_KEY_UNSAFE")
         if object_path.is_symlink() or not object_path.is_file():
             raise SnapshotError("SNAPSHOT_OBJECT_MISSING")
-        content = object_path.read_bytes()
-        observed = _sha256_bytes(content)
+        observed = _sha256_bytes(object_path.read_bytes())
         if observed != entry.content_sha256:
             raise SnapshotError("SNAPSHOT_OBJECT_HASH_MISMATCH")
 
+
+def _is_filesystem_root(path: Path) -> bool:
+    resolved = path.resolve()
+    return resolved.parent == resolved
+
+
+def _is_broad_unsafe_target(path: Path) -> bool:
+    resolved = path.resolve()
+    if _is_filesystem_root(resolved) or _is_filesystem_root(resolved.parent):
+        return True
+    try:
+        home = Path.home().resolve()
+    except OSError:
+        home = None
+    return home is not None and resolved == home
+
+
+def _paths_overlap(left: Path, right: Path) -> bool:
+    left_parts = left.resolve().parts
+    right_parts = right.resolve().parts
+    if left_parts == right_parts:
+        return True
+    shorter, longer = (
+        (left_parts, right_parts)
+        if len(left_parts) <= len(right_parts)
+        else (right_parts, left_parts)
+    )
+    return longer[: len(shorter)] == shorter
+
+
+def _is_link_destination(path: Path) -> bool:
+    if path.is_symlink():
+        return True
+    try:
+        attributes = getattr(path.lstat(), "st_file_attributes", 0)
+    except OSError:
+        return False
+    reparse = getattr(stat, "FILE_ATTRIBUTE_REPARSE_POINT", 0x400)
+    return bool(attributes & reparse)
+
+
+def _assert_destination_publishable(source: Path, destination: Path) -> Path:
+    if _is_link_destination(destination):
+        raise SnapshotError("DESTINATION_SYMLINK")
+    if destination.exists():
+        raise SnapshotError("DESTINATION_EXISTS")
+    destination_root = destination.resolve()
+    if _is_broad_unsafe_target(destination_root):
+        raise SnapshotError("DESTINATION_UNSAFE")
+    if _paths_overlap(source, destination_root):
+        raise SnapshotError("SNAPSHOT_DESTINATION_OVERLAP")
+    parent = destination_root.parent
+    if _is_link_destination(parent) or not parent.is_dir():
+        raise SnapshotError("DESTINATION_PARENT_UNSAFE")
+    return destination_root
+
+
+def _materialize_staging(
+    snapshot_root: Path,
+    staging_root: Path,
+    entries: Sequence[SnapshotEntry],
+) -> None:
+    staging_resolved = staging_root.resolve()
     for entry in entries:
-        target = destination_root / entry.logical_path
+        target = staging_root / entry.logical_path
+        if not _contained_under(staging_resolved, target):
+            raise SnapshotError("LOGICAL_PATH_ESCAPES_STAGING")
         target.parent.mkdir(parents=True, exist_ok=True)
+        if not _contained_under(staging_resolved, target.parent):
+            raise SnapshotError("LOGICAL_PATH_ESCAPES_STAGING")
         shutil.copy2(snapshot_root / entry.object_key, target)
         if _sha256_bytes(target.read_bytes()) != entry.content_sha256:
             raise SnapshotError("RESTORED_OBJECT_HASH_MISMATCH")
 
-    store = ResearchStore(destination_root)
-    restored_inventory_sha256 = store.diagnostics().committed_inventory_sha256
-    expected_inventory = manifest.get("committed_inventory_sha256")
-    if (
-        isinstance(expected_inventory, str)
-        and restored_inventory_sha256 != expected_inventory
-    ):
+
+def _verify_restored_projection(
+    staging_root: Path,
+    manifest: dict[str, Any],
+) -> str:
+    store = ResearchStore(staging_root)
+    try:
+        restored_inventory_sha256 = store.diagnostics().committed_inventory_sha256
+    except ResearchStoreError as exc:
+        raise SnapshotError("RESTORED_INVENTORY_UNAVAILABLE") from exc
+    expected_inventory = _require_hex_sha256(
+        manifest.get("committed_inventory_sha256"),
+        "SNAPSHOT_COMMITTED_INVENTORY_INVALID",
+    )
+    if restored_inventory_sha256 != expected_inventory:
         raise SnapshotError("RESTORED_INVENTORY_MISMATCH")
+    return restored_inventory_sha256
+
+
+def _cleanup_owned_staging(staging_root: Path) -> None:
+    if staging_root.exists() or staging_root.is_symlink():
+        if staging_root.is_symlink() or staging_root.is_file():
+            staging_root.unlink()
+            return
+        shutil.rmtree(staging_root)
+
+
+def restore_snapshot(source: Path, destination: Path) -> SnapshotRestore:
+    """Verify snapshot hashes, then atomically publish into an absent destination."""
+
+    snapshot_root = source.resolve()
+    manifest, entries = _load_snapshot(snapshot_root)
+    _verify_snapshot_objects(snapshot_root, entries)
+    destination_root = _assert_destination_publishable(snapshot_root, destination)
+
+    staging_root = destination_root.parent / f".{destination_root.name}.restore-{uuid.uuid4().hex}"
+    if staging_root.exists() or staging_root.is_symlink():
+        raise SnapshotError("RESTORE_STAGING_EXISTS")
+
+    staging_owned = False
+    published = False
+    try:
+        staging_root.mkdir(parents=False, exist_ok=False)
+        staging_owned = True
+        _materialize_staging(snapshot_root, staging_root, entries)
+        restored_inventory_sha256 = _verify_restored_projection(staging_root, manifest)
+        try:
+            os.replace(staging_root, destination_root)
+        except OSError as exc:
+            raise SnapshotError("RESTORE_PUBLISH_FAILED") from exc
+        published = True
+        staging_owned = False
+    finally:
+        if staging_owned and not published:
+            _cleanup_owned_staging(staging_root)
 
     snapshot_id = str(manifest.get("snapshot_id") or snapshot_root.name)
     inventory_sha256 = str(manifest.get("inventory_sha256") or _inventory_sha256(entries))

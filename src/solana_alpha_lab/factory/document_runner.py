@@ -52,6 +52,8 @@ def _git_head_sha(root: Path) -> str:
         capture_output=True,
         check=False,
     )
+    if completed.returncode != 0:
+        raise ExperimentRunnerError("RUNNER_GIT_SHA_UNAVAILABLE")
     value = completed.stdout.decode("ascii", errors="ignore").strip()
     if len(value) != 40:
         raise ExperimentRunnerError("RUNNER_GIT_SHA_UNAVAILABLE")
