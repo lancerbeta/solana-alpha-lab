@@ -5,6 +5,7 @@ from __future__ import annotations
 import hashlib
 import json
 import re
+import subprocess
 from collections.abc import Mapping
 from dataclasses import dataclass
 from datetime import UTC, datetime
@@ -15,30 +16,27 @@ from typing import Any
 import jsonschema
 import yaml
 
+from solana_alpha_lab.factory.data_resolver import (
+    EvidenceResolutionError,
+    ResolvedEvidence,
+    resolve_catalog_asset,
+    resolve_evidence_bindings,
+    resolve_query_recipe_hashes,
+    verify_implementation_assets,
+)
+from solana_alpha_lab.factory.research_store import ResearchStore, ResearchStoreError
+from solana_alpha_lab.factory.run_passport import (
+    RunPassportError,
+    canonical_sha256,
+    compute_run_key_sha256,
+    experiment_spec_sha256,
+)
+
 SPEC_SCHEMA_RELATIVE = "catalog/schemas/experiment_spec_v1_1.schema.json"
 DESCRIPTOR_SCHEMA_RELATIVE = (
     "catalog/schemas/experiment_capability_descriptor.schema.json"
 )
 CAPABILITY_REGISTRY_RELATIVE = "configs/experiment_capability_registry_v1.yaml"
-_TASK_1_RUN_KEY_DEFAULTS: Mapping[str, Any] = {
-    "hypothesis_definition_sha256": "0" * 64,
-    "capability_closure_sha256": "1" * 64,
-    "runner_git_sha": "2" * 40,
-    "uv_lock_sha256": "3" * 64,
-    "ordered_input_dataset_manifest_ids": (),
-    "ordered_input_dataset_fingerprints": (),
-    "ordered_query_recipe_sha256s": (),
-    "config_sha256": "4" * 64,
-    "holdout_consumption_ids": (),
-    "random_seed_or_null": None,
-}
-_SHA256_FIELDS = (
-    "hypothesis_definition_sha256",
-    "capability_closure_sha256",
-    "uv_lock_sha256",
-    "config_sha256",
-)
-_STABLE_ID_PATTERN = re.compile(r"^[A-Z][A-Z0-9]*(?:-[A-Z0-9]+)+$")
 _SHA256_PATTERN = re.compile(r"^[0-9a-f]{64}$")
 _GIT_SHA_PATTERN = re.compile(r"^[0-9a-f]{40}$")
 
@@ -113,32 +111,6 @@ def _parse_timestamp(value: object) -> datetime:
     return parsed.astimezone(UTC)
 
 
-def _canonical_json_bytes(value: object) -> bytes:
-    return json.dumps(
-        value,
-        ensure_ascii=False,
-        allow_nan=False,
-        separators=(",", ":"),
-        sort_keys=True,
-    ).encode("utf-8")
-
-
-def _validated_string_sequence(
-    value: object,
-    *,
-    pattern: re.Pattern[str],
-) -> list[str]:
-    if not isinstance(value, (list, tuple)):
-        raise ValueError("RUN_KEY_INPUTS_INVALID")
-    normalized = list(value)
-    if any(
-        not isinstance(item, str) or pattern.fullmatch(item) is None
-        for item in normalized
-    ):
-        raise ValueError("RUN_KEY_INPUTS_INVALID")
-    return normalized
-
-
 def _validate_spec(
     submission: Mapping[str, Any],
     *,
@@ -181,81 +153,114 @@ def _validate_spec(
     return spec
 
 
+def _git_head_sha(root: Path) -> str | None:
+    completed = subprocess.run(
+        ["git", "rev-parse", "HEAD"],
+        cwd=root,
+        capture_output=True,
+        check=False,
+    )
+    value = completed.stdout.decode("ascii", errors="ignore").strip()
+    return value if _GIT_SHA_PATTERN.fullmatch(value) is not None else None
+
+
+def _git_show_bytes(root: Path, git_sha: str, relative: str) -> bytes | None:
+    completed = subprocess.run(
+        ["git", "show", f"{git_sha}:{relative}"],
+        cwd=root,
+        capture_output=True,
+        check=False,
+    )
+    return completed.stdout if completed.returncode == 0 else None
+
+
+def _runner_git_sha(submission: Mapping[str, Any], *, root: Path) -> str:
+    supplied = submission.get("runner_git_sha")
+    if supplied is None:
+        supplied = _git_head_sha(root)
+    if (
+        not isinstance(supplied, str)
+        or _GIT_SHA_PATTERN.fullmatch(supplied) is None
+    ):
+        raise ValueError("RUNNER_GIT_SHA_INVALID")
+    return supplied
+
+
+def _hypothesis_definition_sha256(submission: Mapping[str, Any]) -> str:
+    value = submission.get("hypothesis_definition_sha256")
+    if value is None and isinstance(submission.get("hypothesis_version"), Mapping):
+        value = submission["hypothesis_version"].get("definition_sha256")
+    if not isinstance(value, str) or _SHA256_PATTERN.fullmatch(value) is None:
+        raise ValueError("HYPOTHESIS_DEFINITION_SHA256_INVALID")
+    return value
+
+
+def _uv_lock_sha256(root: Path) -> str:
+    path = root / "uv.lock"
+    if path.is_symlink() or not path.is_file():
+        raise ValueError("UV_LOCK_UNAVAILABLE")
+    return hashlib.sha256(path.read_bytes()).hexdigest()
+
+
 def _run_key(
     spec: Mapping[str, Any],
     submission: Mapping[str, Any],
+    *,
+    runner_git_sha: str,
+    implementation_assets: tuple[tuple[str, str], ...],
+    evidence: tuple[ResolvedEvidence, ...],
+    query_recipes: tuple[tuple[str, str], ...],
+    root: Path,
 ) -> str:
-    injected_value = submission.get("run_key_inputs", {})
-    if not isinstance(injected_value, Mapping):
-        raise ValueError("RUN_KEY_INPUTS_INVALID")
-    spec_for_hash = dict(spec)
-    spec_for_hash.pop("what_changed", None)
-    spec_for_hash["as_of"] = (
-        _parse_timestamp(spec_for_hash["as_of"]).isoformat().replace("+00:00", "Z")
+    parameters = spec.get("parameters")
+    if not isinstance(parameters, Mapping):
+        raise ValueError("PARAMETERS_INVALID")
+    random_seed = parameters.get(
+        "random_seed_or_null",
+        parameters.get("random_seed"),
     )
-    spec_for_hash["availability_cutoff"] = (
-        _parse_timestamp(spec_for_hash["availability_cutoff"])
-        .isoformat()
-        .replace("+00:00", "Z")
+    if random_seed is None:
+        normalized_seed: int | None = None
+    elif isinstance(random_seed, int) and not isinstance(random_seed, bool):
+        normalized_seed = random_seed
+    else:
+        raise ValueError("RANDOM_SEED_INVALID")
+    holdouts = submission.get("holdout_consumption_ids", ())
+    datasets = tuple(
+        item for item in evidence if item.source_kind == "DATASET_MANIFEST"
     )
-    for field in ("capabilities", "required_feature_ids", "terminal_outcomes"):
-        if field in spec_for_hash:
-            spec_for_hash[field] = sorted(spec_for_hash[field])
-    experiment_spec_sha256 = hashlib.sha256(
-        _canonical_json_bytes(spec_for_hash)
-    ).hexdigest()
-    payload = {
-        key: injected_value.get(key, default)
-        for key, default in _TASK_1_RUN_KEY_DEFAULTS.items()
+    values = {
+        "hypothesis_definition_sha256": _hypothesis_definition_sha256(submission),
+        "experiment_spec_sha256": experiment_spec_sha256(spec),
+        "capability_id": spec["capability_id"],
+        "capability_closure_sha256": canonical_sha256(
+            {
+                "capability_id": spec["capability_id"],
+                "implementation_assets": [
+                    {"asset_id": asset_id, "sha256": content_sha256}
+                    for asset_id, content_sha256 in implementation_assets
+                ],
+            }
+        ),
+        "runner_git_sha": runner_git_sha,
+        "uv_lock_sha256": _uv_lock_sha256(root),
+        "ordered_input_dataset_manifest_ids": [
+            item.stable_id for item in datasets
+        ],
+        "ordered_input_dataset_fingerprints": [
+            item.dataset_fingerprint for item in datasets
+        ],
+        "ordered_query_recipe_ids": [recipe_id for recipe_id, _ in query_recipes],
+        "ordered_query_recipe_sha256s": [
+            content_sha256 for _, content_sha256 in query_recipes
+        ],
+        "config_sha256": canonical_sha256(parameters),
+        "as_of": spec["as_of"],
+        "availability_cutoff": spec["availability_cutoff"],
+        "holdout_consumption_ids": holdouts,
+        "random_seed_or_null": normalized_seed,
     }
-    payload.update(
-        {
-            "experiment_spec_sha256": experiment_spec_sha256,
-            "capability_id": spec["capability_id"],
-            "ordered_query_recipe_ids": list(spec["query_recipe_ids"]),
-            "as_of": _parse_timestamp(spec["as_of"])
-            .isoformat()
-            .replace("+00:00", "Z"),
-            "availability_cutoff": _parse_timestamp(spec["availability_cutoff"])
-            .isoformat()
-            .replace("+00:00", "Z"),
-        }
-    )
-    for field in _SHA256_FIELDS:
-        value = payload[field]
-        if not isinstance(value, str) or _SHA256_PATTERN.fullmatch(value) is None:
-            raise ValueError("RUN_KEY_INPUTS_INVALID")
-    runner_git_sha = payload["runner_git_sha"]
-    if (
-        not isinstance(runner_git_sha, str)
-        or _GIT_SHA_PATTERN.fullmatch(runner_git_sha) is None
-    ):
-        raise ValueError("RUN_KEY_INPUTS_INVALID")
-    payload["ordered_input_dataset_manifest_ids"] = _validated_string_sequence(
-        payload["ordered_input_dataset_manifest_ids"],
-        pattern=_STABLE_ID_PATTERN,
-    )
-    payload["ordered_input_dataset_fingerprints"] = _validated_string_sequence(
-        payload["ordered_input_dataset_fingerprints"],
-        pattern=_SHA256_PATTERN,
-    )
-    payload["ordered_query_recipe_sha256s"] = _validated_string_sequence(
-        payload["ordered_query_recipe_sha256s"],
-        pattern=_SHA256_PATTERN,
-    )
-    payload["holdout_consumption_ids"] = sorted(
-        _validated_string_sequence(
-            payload["holdout_consumption_ids"],
-            pattern=_STABLE_ID_PATTERN,
-        )
-    )
-    random_seed = payload["random_seed_or_null"]
-    if random_seed is not None and (
-        not isinstance(random_seed, int) or isinstance(random_seed, bool)
-    ):
-        raise ValueError("RUN_KEY_INPUTS_INVALID")
-    canonical = _canonical_json_bytes(payload)
-    return hashlib.sha256(canonical).hexdigest()
+    return compute_run_key_sha256(values)
 
 
 def _change_lane(reason_code: str) -> LaneDecision:
@@ -264,6 +269,24 @@ def _change_lane(reason_code: str) -> LaneDecision:
         "CHANGE_LANE_CAPABILITY_GAP",
         reason_codes=(reason_code,),
         next_action="OPEN_BOUNDED_CAPABILITY_CHANGE",
+    )
+
+
+def _blocked_data(reason_code: str) -> LaneDecision:
+    return _decision(
+        Lane.FAST_LANE,
+        "BLOCKED_DATA",
+        reason_codes=(reason_code,),
+        next_action="RESOLVE_IMMUTABLE_DATA_BINDINGS",
+    )
+
+
+def _deny_integrity(reason_code: str) -> LaneDecision:
+    return _decision(
+        Lane.DENY,
+        "DENY_INTEGRITY_MISMATCH",
+        reason_codes=(reason_code,),
+        next_action="CORRECT_IMMUTABLE_EVIDENCE_BINDING",
     )
 
 
@@ -276,7 +299,6 @@ def classify_lane(
 ) -> LaneDecision:
     """Return one deterministic lane decision without executing a capability."""
 
-    del data_root  # Physical resolution is introduced by the Task 4 resolver.
     spec = _validate_spec(submission, root=root, as_of=as_of)
     if spec is None:
         return _decision(
@@ -295,7 +317,15 @@ def classify_lane(
         )
 
     capability_id = str(spec["capability_id"])
-    descriptor = _load_capabilities(root).get(capability_id)
+    try:
+        descriptor = _load_capabilities(root).get(capability_id)
+    except (OSError, ValueError, yaml.YAMLError, jsonschema.ValidationError):
+        return _decision(
+            Lane.DENY,
+            "DENY_INVALID_SPEC",
+            reason_codes=("EXPERIMENT_SPEC_INVALID",),
+            next_action="CORRECT_EXPERIMENT_SPEC",
+        )
     if descriptor is None:
         return _change_lane("CAPABILITY_NOT_REGISTERED")
     if descriptor["status"] != "ACCEPTED":
@@ -317,47 +347,100 @@ def classify_lane(
     if requested_calls > int(descriptor["max_provider_calls"]):
         return _change_lane("GUARDRAIL_CHANGE_REQUIRED")
 
-    available_value = submission.get("available_data_binding_ids", ())
-    available = (
-        {str(value) for value in available_value}
-        if isinstance(available_value, (list, tuple, set, frozenset))
-        else set()
-    )
-    required = {
-        str(binding["binding_id"])
-        for binding in spec["data_bindings"]
-        if isinstance(binding, Mapping)
-    }
-    if not required.issubset(available):
+    try:
+        resolve_catalog_asset(
+            root,
+            str(descriptor["parameter_schema_asset_id"]),
+        )
+    except EvidenceResolutionError as exc:
+        if exc.code == "CATALOG_ASSET_UNAVAILABLE":
+            return _change_lane("PARAMETER_SCHEMA_MISSING")
+        return _deny_integrity(exc.code)
+
+    try:
+        runner_git_sha = _runner_git_sha(submission, root=root)
+        implementation_assets = verify_implementation_assets(
+            descriptor,
+            root=root,
+            runner_git_sha=runner_git_sha,
+            git_show_bytes=_git_show_bytes,
+        )
+    except (EvidenceResolutionError, OSError, ValueError):
+        return _change_lane("IMPLEMENTATION_HASH_MISMATCH")
+
+    try:
+        query_recipes = resolve_query_recipe_hashes(
+            spec["query_recipe_ids"],
+            root=root,
+        )
+    except EvidenceResolutionError as exc:
+        if exc.code in {
+            "ARBITRARY_CODE_OR_SQL_REQUESTED",
+            "QUERY_IMPLEMENTATION_MISSING",
+        }:
+            return _change_lane(exc.code)
         return _decision(
-            Lane.FAST_LANE,
-            "BLOCKED_DATA",
-            reason_codes=("DATA_BINDING_UNAVAILABLE",),
-            next_action="RESOLVE_IMMUTABLE_DATA_BINDINGS",
+            Lane.DENY,
+            "DENY_INVALID_SPEC",
+            reason_codes=(exc.code,),
+            next_action="CORRECT_EXPERIMENT_SPEC",
         )
 
     try:
-        run_key_sha256 = _run_key(spec, submission)
-    except (TypeError, ValueError):
+        evidence = resolve_evidence_bindings(
+            spec,
+            root=root,
+            data_root=data_root,
+        )
+    except EvidenceResolutionError as exc:
+        if exc.code in {
+            "DATA_BINDING_UNAVAILABLE",
+            "EVIDENCE_UNAVAILABLE_AT_CUTOFF",
+        }:
+            return _blocked_data(exc.code)
+        if exc.code in {
+            "CATALOG_ASSET_INTEGRITY_MISMATCH",
+            "EVIDENCE_HASH_MISMATCH",
+            "DATASET_MANIFEST_INVALID",
+            "RESEARCH_ARTIFACT_INVALID",
+        }:
+            return _deny_integrity(exc.code)
+        return _decision(
+            Lane.DENY,
+            "DENY_INVALID_SPEC",
+            reason_codes=(exc.code,),
+            next_action="CORRECT_EXPERIMENT_SPEC",
+        )
+
+    try:
+        run_key_sha256 = _run_key(
+            spec,
+            submission,
+            runner_git_sha=runner_git_sha,
+            implementation_assets=implementation_assets,
+            evidence=evidence,
+            query_recipes=query_recipes,
+            root=root,
+        )
+    except (RunPassportError, TypeError, ValueError):
         return _decision(
             Lane.DENY,
             "DENY_INVALID_SPEC",
             reason_codes=("RUN_KEY_INPUTS_INVALID",),
             next_action="CORRECT_EXPERIMENT_SPEC",
         )
-    completed_runs = submission.get("completed_runs", {})
-    prior_run_id = (
-        completed_runs.get(run_key_sha256)
-        if isinstance(completed_runs, Mapping)
-        else None
-    )
-    if isinstance(prior_run_id, str) and prior_run_id:
+
+    try:
+        prior_run = ResearchStore(data_root).find_completed_run(run_key_sha256)
+    except ResearchStoreError:
+        return _deny_integrity("RUN_COMPLETED_PASSPORT_INVALID")
+    if prior_run is not None:
         return _decision(
             Lane.FAST_LANE,
             "REPLAY_AVAILABLE",
             reason_codes=("EXACT_DUPLICATE_COMPLETED",),
             run_key_sha256=run_key_sha256,
-            prior_run_id=prior_run_id,
+            prior_run_id=prior_run.run_id,
             next_action="REPLAY_PRIOR_RUN",
         )
 

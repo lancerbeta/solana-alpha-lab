@@ -32,6 +32,11 @@ from solana_alpha_lab.storage.manifests import (
     compute_dataset_manifest_id,
     verify_partition_manifest,
 )
+from solana_alpha_lab.factory.run_passport import (
+    RunPassport,
+    RunPassportError,
+    validate_run_passport,
+)
 
 
 RESEARCH_DATASET_ID = "research-events"
@@ -227,13 +232,6 @@ class ProjectionReceipt:
     projection_digest_sha256: str
     record_count: int
     partition_count: int
-
-
-@dataclass(frozen=True, slots=True)
-class RunPassport:
-    run_id: str
-    run_key_sha256: str
-    payload: Mapping[str, Any]
 
 
 class _PublishDisposition(StrEnum):
@@ -748,6 +746,25 @@ def _validated_data_root(data_root: Path) -> Path:
     if not resolved.is_dir():
         raise ResearchStoreError("DATA_ROOT_MUST_BE_DIRECTORY")
     return resolved
+
+
+def _completed_run_passport(
+    payload: Mapping[str, Any],
+    *,
+    expected_run_key_sha256: str,
+    expected_run_id: str | None,
+) -> RunPassport:
+    try:
+        passport = validate_run_passport(payload)
+    except RunPassportError as exc:
+        raise ResearchStoreError("RUN_COMPLETED_PASSPORT_INVALID") from exc
+    if (
+        passport.run_key_sha256 != expected_run_key_sha256
+        or not isinstance(expected_run_id, str)
+        or passport.run_id != expected_run_id
+    ):
+        raise ResearchStoreError("RUN_COMPLETED_PASSPORT_INVALID")
+    return passport
 
 
 class ResearchStore:
@@ -1351,10 +1368,10 @@ class ResearchStore:
                     payload = json.loads(row[1])
                     if not isinstance(payload, dict):
                         raise ResearchStoreError("RUN_COMPLETED_PASSPORT_INVALID")
-                    return RunPassport(
-                        run_id=row[0],
-                        run_key_sha256=run_key_sha256,
-                        payload=payload,
+                    return _completed_run_passport(
+                        payload,
+                        expected_run_key_sha256=run_key_sha256,
+                        expected_run_id=row[0],
                     )
             except ResearchStoreError:
                 raise
@@ -1374,13 +1391,10 @@ class ResearchStore:
                 isinstance(payload, dict)
                 and payload.get("run_key_sha256") == run_key_sha256
             ):
-                run_id = payload.get("run_id", record.run_id)
-                if not isinstance(run_id, str) or not run_id:
-                    raise ResearchStoreError("RUN_COMPLETED_PASSPORT_INVALID")
-                return RunPassport(
-                    run_id=run_id,
-                    run_key_sha256=run_key_sha256,
-                    payload=payload,
+                return _completed_run_passport(
+                    payload,
+                    expected_run_key_sha256=run_key_sha256,
+                    expected_run_id=record.run_id,
                 )
         return None
 
