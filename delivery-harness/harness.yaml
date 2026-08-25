@@ -42,7 +42,9 @@ merge_policy:
     - .github/**
     - catalog/schemas/**
     - catalog/assets/core.yaml
+    - catalog/assets/lifecycle.yaml
     - catalog/catalog_manifest.yaml
+    - catalog/generated/asset_edges.json
     - control/owner_attention_gate_v2.yaml
     - delivery-harness/**
     - docs/agent/DELIVERY_HARNESS_PROTOCOL.md
@@ -51,6 +53,11 @@ merge_policy:
     - docs/agent/EXECUTION_ROUTER_PROTOCOL.md
     - docs/evidence/control/**
     - docs/evidence/task30/a20r1_provider_route_capability_registry_acceptance_v1.json
+    - docs/evidence/kcdn_atom_b/a1_delivery_completion_evidence_v1.json
+    - docs/evidence/kcdn_atom_b/a1_delivery_factory_fit_v1.json
+    - docs/evidence/kcdn_atom_b/a1_delivery_independent_review_v1.json
+    - docs/PROJECT_MAP.md
+    - docs/tasks/KCDN_ATOM_B_STABLE_DELIVERY_CONTEXT_REFERENCES_V1.md
     - docs/tasks/CTRL-DELIVERY-HARNESS-V1.md
     - docs/tasks/CTRL-CI-OWNED-PRODUCT-SCHEMA-ELIGIBILITY-V1.md
     - docs/tasks/CTRL-AUTONOMOUS-DELIVERY-SKILL-V1.md
@@ -81,6 +88,7 @@ merge_policy:
     - tests/test_process_throughput_guardrails.py
     - tests/test_task23_catalog_repository_factory_fit.py
     - tests/test_delivery_harness_adapters.py
+    - tests/test_delivery_harness_stable_asset_references.py
     - .agents/skills/delivery-harness/SKILL.md
     - .cursor/agents/owner-ux-critic.md
     - delivery-harness/templates/portable-core/dot-cursor/commands/delivery-review.md

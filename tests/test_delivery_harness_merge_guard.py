@@ -1404,6 +1404,79 @@ class DeliveryHarnessMergeGuardTests(unittest.TestCase):
         )
         self.assertFalse(checks["write_set_pass"])
 
+    def test_live_pr_head_write_set_allows_exact_atom_b_paths(self) -> None:
+        atom_b_paths = (
+            "catalog/assets/lifecycle.yaml",
+            "catalog/generated/asset_edges.json",
+            "docs/PROJECT_MAP.md",
+            "docs/evidence/kcdn_atom_b/a1_delivery_completion_evidence_v1.json",
+            "docs/evidence/kcdn_atom_b/a1_delivery_factory_fit_v1.json",
+            "docs/evidence/kcdn_atom_b/a1_delivery_independent_review_v1.json",
+            "docs/tasks/KCDN_ATOM_B_STABLE_DELIVERY_CONTEXT_REFERENCES_V1.md",
+            "tests/test_delivery_harness_stable_asset_references.py",
+        )
+        live = yaml.safe_load(
+            (ROOT / "delivery-harness/harness.yaml").read_text(encoding="utf-8")
+        )
+        portable = json.loads(
+            (ROOT / "delivery-harness/templates/portable-core/delivery-harness/harness.yaml").read_text(
+                encoding="utf-8"
+            )
+        )
+        live_prefixes = live["merge_policy"]["harness_control_write_prefixes"]
+        portable_prefixes = portable["merge_policy"]["harness_control_write_prefixes"]
+        for path in atom_b_paths:
+            self.assertNotIn("/**", path)
+            self.assertIn(path, live_prefixes)
+            self.assertIn(path, portable_prefixes)
+            self.assertTrue(self.module.path_in_managed_write_set(path, live_prefixes))
+            self.assertTrue(self.module.path_in_managed_write_set(path, portable_prefixes))
+        sibling = "docs/evidence/kcdn_atom_a/a1_delivery_completion_evidence_v1.json"
+        self.assertNotIn(sibling, live_prefixes)
+        self.assertFalse(self.module.path_in_managed_write_set(sibling, live_prefixes))
+
+        receipt = live_pr_head_receipt(self.module)
+        runner = FakeRunner()
+        payload = "".join(f"{path}\0" for path in atom_b_paths).encode()
+
+        def atom_b_diff(args: list[str], cwd: Path) -> bytes:
+            if tuple(args[:3]) == ("git", "diff", "--name-only"):
+                return payload
+            if args and args[0] == "uv":
+                return b""
+            return runner(args, cwd)
+
+        checks = self.module.build_delivery_checks(
+            ROOT,
+            context_receipt=receipt,
+            local_head=HEAD,
+            local_tree=TREE,
+            ci_pass=True,
+            runner=atom_b_diff,
+        )
+        self.assertTrue(checks["write_set_pass"])
+
+    def test_live_pr_head_write_set_rejects_sibling_kcdn_atom_a_evidence(self) -> None:
+        receipt = live_pr_head_receipt(self.module)
+        runner = FakeRunner()
+
+        def sibling_diff(args: list[str], cwd: Path) -> bytes:
+            if tuple(args[:3]) == ("git", "diff", "--name-only"):
+                return b"docs/evidence/kcdn_atom_a/a1_delivery_completion_evidence_v1.json\0"
+            if args and args[0] == "uv":
+                return b""
+            return runner(args, cwd)
+
+        checks = self.module.build_delivery_checks(
+            ROOT,
+            context_receipt=receipt,
+            local_head=HEAD,
+            local_tree=TREE,
+            ci_pass=True,
+            runner=sibling_diff,
+        )
+        self.assertFalse(checks["write_set_pass"])
+
     def test_live_pr_head_consumes_exact_head_ci_when_local_gates_fail(self) -> None:
         receipt = live_pr_head_receipt(self.module)
         runner = FakeRunner()

@@ -22,10 +22,12 @@ managed_write_set:
 - catalog/schemas/delivery_harness_context_receipt.schema.json
 - scripts/delivery_harness.py
 - delivery-harness/context-map.yaml
+- delivery-harness/harness.yaml
 - delivery-harness/policies/solana-alpha-lab.md
 - AGENTS.md
 - delivery-harness/templates/portable-core/scripts/delivery_harness.py
 - delivery-harness/templates/portable-core/delivery-harness/context-map.yaml
+- delivery-harness/templates/portable-core/delivery-harness/harness.yaml
 - delivery-harness/templates/portable-bundle-manifest.json
 - docs/evidence/control/delivery_harness_acceptance_v1.json
 - docs/evidence/task30/a20r1_provider_route_capability_registry_acceptance_v1.json
@@ -36,6 +38,7 @@ managed_write_set:
 - docs/PROJECT_MAP.md
 - tests/test_delivery_harness_stable_asset_references.py
 - tests/test_delivery_harness_adapters.py
+- tests/test_delivery_harness_merge_guard.py
 - docs/evidence/kcdn_atom_b/a1_delivery_completion_evidence_v1.json
 - docs/evidence/kcdn_atom_b/a1_delivery_independent_review_v1.json
 - docs/evidence/kcdn_atom_b/a1_delivery_factory_fit_v1.json

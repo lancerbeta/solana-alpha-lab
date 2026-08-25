@@ -19729,7 +19729,7 @@ records:
   as_of: '2026-08-15'
   truth_owner: CTRL-DELIVERY-HARNESS-001
   location: {kind: git_path, logical_uri: 'repo://delivery-harness/harness.yaml', repository_path: delivery-harness/harness.yaml}
-  integrity: {kind: sha256, sha256: f70638945cf98327486780dc4c99c5d93318142d9983501538a93a5911a266a8}
+  integrity: {kind: sha256, sha256: 10bc691cbe53565e20071c0dcd49a6aa77d50292e078d1e6f78d1ea09ea0804d}
   access: *t25_read_file
   relations:
   - {relation_type: governed_by, target_asset_id: CTRL-DELIVERY-HARNESS-001}
@@ -19802,7 +19802,7 @@ records:
   as_of: '2026-08-14'
   truth_owner: CTRL-DELIVERY-HARNESS-001
   location: {kind: git_path, logical_uri: 'repo://delivery-harness/templates/portable-bundle-manifest.json', repository_path: delivery-harness/templates/portable-bundle-manifest.json}
-  integrity: {kind: sha256, sha256: 89dd179472aa3192a2a9e8feccd58498584c0f55885829abf24d977bf0f598c4}
+  integrity: {kind: sha256, sha256: aeb5d6ee2098c953bf902e884c931e66fdbeba532c7b6a3f0206bc44d1db031b}
   access: *t25_read_file
   relations:
   - {relation_type: governed_by, target_asset_id: CTRL-DELIVERY-HARNESS-001}
@@ -31681,7 +31681,7 @@ records:
   as_of: '2026-08-25'
   truth_owner: KCDN_ATOM_B_STABLE_DELIVERY_CONTEXT_REFERENCES_V1
   location: {kind: git_path, logical_uri: 'repo://docs/tasks/KCDN_ATOM_B_STABLE_DELIVERY_CONTEXT_REFERENCES_V1.md', repository_path: docs/tasks/KCDN_ATOM_B_STABLE_DELIVERY_CONTEXT_REFERENCES_V1.md}
-  integrity: {kind: sha256, sha256: d8c1dbf44c479e65c3881f7a1695abef8e1e1c4941444e145045795f752b1bc0}
+  integrity: {kind: sha256, sha256: 88c2fc51c824fd2182d9c130fd41a1129645effe3b400c25926a02e2b2bf2c44}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: depends_on, target_asset_id: CONFIG-DELIVERY-CONTEXT-MAP-001}
