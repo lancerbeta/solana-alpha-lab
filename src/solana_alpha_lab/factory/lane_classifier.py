@@ -4,11 +4,12 @@ from __future__ import annotations
 
 import hashlib
 import json
+import re
 from collections.abc import Mapping
 from dataclasses import dataclass
 from datetime import UTC, datetime
 from enum import StrEnum
-from pathlib import Path
+from pathlib import Path, PurePosixPath, PureWindowsPath
 from typing import Any
 
 import jsonschema
@@ -19,6 +20,27 @@ DESCRIPTOR_SCHEMA_RELATIVE = (
     "catalog/schemas/experiment_capability_descriptor.schema.json"
 )
 CAPABILITY_REGISTRY_RELATIVE = "configs/experiment_capability_registry_v1.yaml"
+_TASK_1_RUN_KEY_DEFAULTS: Mapping[str, Any] = {
+    "hypothesis_definition_sha256": "0" * 64,
+    "capability_closure_sha256": "1" * 64,
+    "runner_git_sha": "2" * 40,
+    "uv_lock_sha256": "3" * 64,
+    "ordered_input_dataset_manifest_ids": (),
+    "ordered_input_dataset_fingerprints": (),
+    "ordered_query_recipe_sha256s": (),
+    "config_sha256": "4" * 64,
+    "holdout_consumption_ids": (),
+    "random_seed_or_null": None,
+}
+_SHA256_FIELDS = (
+    "hypothesis_definition_sha256",
+    "capability_closure_sha256",
+    "uv_lock_sha256",
+    "config_sha256",
+)
+_STABLE_ID_PATTERN = re.compile(r"^[A-Z][A-Z0-9]*(?:-[A-Z0-9]+)+$")
+_SHA256_PATTERN = re.compile(r"^[0-9a-f]{64}$")
+_GIT_SHA_PATTERN = re.compile(r"^[0-9a-f]{40}$")
 
 
 class Lane(StrEnum):
@@ -91,6 +113,32 @@ def _parse_timestamp(value: object) -> datetime:
     return parsed.astimezone(UTC)
 
 
+def _canonical_json_bytes(value: object) -> bytes:
+    return json.dumps(
+        value,
+        ensure_ascii=False,
+        allow_nan=False,
+        separators=(",", ":"),
+        sort_keys=True,
+    ).encode("utf-8")
+
+
+def _validated_string_sequence(
+    value: object,
+    *,
+    pattern: re.Pattern[str],
+) -> list[str]:
+    if not isinstance(value, (list, tuple)):
+        raise ValueError("RUN_KEY_INPUTS_INVALID")
+    normalized = list(value)
+    if any(
+        not isinstance(item, str) or pattern.fullmatch(item) is None
+        for item in normalized
+    ):
+        raise ValueError("RUN_KEY_INPUTS_INVALID")
+    return normalized
+
+
 def _validate_spec(
     submission: Mapping[str, Any],
     *,
@@ -109,6 +157,19 @@ def _validate_spec(
             or capabilities[0] != spec["capability_id"]
         ):
             return None
+        for requirement in spec["data_requirements"]:
+            requirement_path = str(requirement["path"])
+            posix_path = PurePosixPath(requirement_path)
+            windows_path = PureWindowsPath(requirement_path)
+            if (
+                posix_path.is_absolute()
+                or windows_path.is_absolute()
+                or bool(windows_path.drive)
+                or bool(windows_path.root)
+                or ".." in posix_path.parts
+                or ".." in windows_path.parts
+            ):
+                return None
         if as_of.tzinfo is None:
             return None
         spec_as_of = _parse_timestamp(spec["as_of"])
@@ -122,19 +183,78 @@ def _validate_spec(
 
 def _run_key(
     spec: Mapping[str, Any],
-    descriptor: Mapping[str, Any],
+    submission: Mapping[str, Any],
 ) -> str:
+    injected_value = submission.get("run_key_inputs", {})
+    if not isinstance(injected_value, Mapping):
+        raise ValueError("RUN_KEY_INPUTS_INVALID")
+    spec_for_hash = dict(spec)
+    spec_for_hash.pop("what_changed", None)
+    spec_for_hash["as_of"] = (
+        _parse_timestamp(spec_for_hash["as_of"]).isoformat().replace("+00:00", "Z")
+    )
+    spec_for_hash["availability_cutoff"] = (
+        _parse_timestamp(spec_for_hash["availability_cutoff"])
+        .isoformat()
+        .replace("+00:00", "Z")
+    )
+    for field in ("capabilities", "required_feature_ids", "terminal_outcomes"):
+        if field in spec_for_hash:
+            spec_for_hash[field] = sorted(spec_for_hash[field])
+    experiment_spec_sha256 = hashlib.sha256(
+        _canonical_json_bytes(spec_for_hash)
+    ).hexdigest()
     payload = {
-        "experiment_spec": dict(spec),
-        "capability_descriptor": dict(descriptor),
+        key: injected_value.get(key, default)
+        for key, default in _TASK_1_RUN_KEY_DEFAULTS.items()
     }
-    canonical = json.dumps(
-        payload,
-        ensure_ascii=False,
-        allow_nan=False,
-        separators=(",", ":"),
-        sort_keys=True,
-    ).encode("utf-8")
+    payload.update(
+        {
+            "experiment_spec_sha256": experiment_spec_sha256,
+            "capability_id": spec["capability_id"],
+            "ordered_query_recipe_ids": list(spec["query_recipe_ids"]),
+            "as_of": _parse_timestamp(spec["as_of"])
+            .isoformat()
+            .replace("+00:00", "Z"),
+            "availability_cutoff": _parse_timestamp(spec["availability_cutoff"])
+            .isoformat()
+            .replace("+00:00", "Z"),
+        }
+    )
+    for field in _SHA256_FIELDS:
+        value = payload[field]
+        if not isinstance(value, str) or _SHA256_PATTERN.fullmatch(value) is None:
+            raise ValueError("RUN_KEY_INPUTS_INVALID")
+    runner_git_sha = payload["runner_git_sha"]
+    if (
+        not isinstance(runner_git_sha, str)
+        or _GIT_SHA_PATTERN.fullmatch(runner_git_sha) is None
+    ):
+        raise ValueError("RUN_KEY_INPUTS_INVALID")
+    payload["ordered_input_dataset_manifest_ids"] = _validated_string_sequence(
+        payload["ordered_input_dataset_manifest_ids"],
+        pattern=_STABLE_ID_PATTERN,
+    )
+    payload["ordered_input_dataset_fingerprints"] = _validated_string_sequence(
+        payload["ordered_input_dataset_fingerprints"],
+        pattern=_SHA256_PATTERN,
+    )
+    payload["ordered_query_recipe_sha256s"] = _validated_string_sequence(
+        payload["ordered_query_recipe_sha256s"],
+        pattern=_SHA256_PATTERN,
+    )
+    payload["holdout_consumption_ids"] = sorted(
+        _validated_string_sequence(
+            payload["holdout_consumption_ids"],
+            pattern=_STABLE_ID_PATTERN,
+        )
+    )
+    random_seed = payload["random_seed_or_null"]
+    if random_seed is not None and (
+        not isinstance(random_seed, int) or isinstance(random_seed, bool)
+    ):
+        raise ValueError("RUN_KEY_INPUTS_INVALID")
+    canonical = _canonical_json_bytes(payload)
     return hashlib.sha256(canonical).hexdigest()
 
 
@@ -189,6 +309,11 @@ def classify_lane(
     if descriptor["output_zone"] != "DATA_ROOT_ONLY":
         return _change_lane("OUTPUT_SINK_NOT_DATA_PLANE")
     requested_calls = int(spec["evidence_budget"]["provider_api_rpc_wss_calls"])
+    if (
+        descriptor["effect_class"] != "PROVIDER_READ_ONLY_BOUNDED"
+        and requested_calls > 0
+    ):
+        return _change_lane("GUARDRAIL_CHANGE_REQUIRED")
     if requested_calls > int(descriptor["max_provider_calls"]):
         return _change_lane("GUARDRAIL_CHANGE_REQUIRED")
 
@@ -211,7 +336,15 @@ def classify_lane(
             next_action="RESOLVE_IMMUTABLE_DATA_BINDINGS",
         )
 
-    run_key_sha256 = _run_key(spec, descriptor)
+    try:
+        run_key_sha256 = _run_key(spec, submission)
+    except (TypeError, ValueError):
+        return _decision(
+            Lane.DENY,
+            "DENY_INVALID_SPEC",
+            reason_codes=("RUN_KEY_INPUTS_INVALID",),
+            next_action="CORRECT_EXPERIMENT_SPEC",
+        )
     completed_runs = submission.get("completed_runs", {})
     prior_run_id = (
         completed_runs.get(run_key_sha256)

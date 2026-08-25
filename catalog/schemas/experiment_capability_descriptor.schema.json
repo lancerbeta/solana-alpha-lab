@@ -103,6 +103,26 @@
           "max_provider_calls": {"minimum": 1}
         }
       }
+    },
+    {
+      "if": {
+        "properties": {
+          "effect_class": {
+            "enum": [
+              "OFFLINE_READ_ONLY",
+              "OFFLINE_DATA_PLANE_WRITE",
+              "PROMOTION_PREPARE_ONLY"
+            ]
+          }
+        },
+        "required": ["effect_class"]
+      },
+      "then": {
+        "properties": {
+          "provider_policy_asset_id": {"type": "null"},
+          "max_provider_calls": {"const": 0}
+        }
+      }
     }
   ],
   "$defs": {
