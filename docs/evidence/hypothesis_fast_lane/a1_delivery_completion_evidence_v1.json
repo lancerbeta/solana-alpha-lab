@@ -10,7 +10,38 @@
   "cloud_bundle_required_by_harness": false,
   "cloud_bundle_smoke_required": false,
   "capability_radar_now": "NONE",
-  "implementation_bindings": {},
+  "implementation_bindings": {
+    "catalog/assets/core.yaml": "7d0e495356b9ada0a2995e1bccfa7ebed83370cae9ef0a3711f927da32f23d0d",
+    "catalog/assets/lifecycle.yaml": "2dd940652f029f4ce58e76a2d611ff6859110bd218ed10f37e176052626c50f8",
+    "catalog/catalog_manifest.yaml": "52c89b1701506eb35fd37a458f4c0134cbf23257b8833359cb3f2adb7ed3a235",
+    "catalog/generated/asset_edges.json": "0e9b3541bb4c2af36c40ffecdcbc6de3f1ccd1b3866126257cac4175c5f1898e",
+    "catalog/query_recipes.yaml": "048f6af9e46819b310aac7974d4d666a0cccd706e08edf0a02505d262fb6e072",
+    "catalog/schemas/experiment_capability_descriptor.schema.json": "f50f23cfdc279169999bb70d7196ca8a4727083b47baf41e10247a36242baed8",
+    "catalog/schemas/experiment_spec_v1_1.schema.json": "7ba24a5109b539469bdfd0d1d74d88171cffaed03e5819fae3e3b9346d9e2ccd",
+    "catalog/schemas/research_event_envelope.schema.json": "6126305e8a8f490a45bf8e3a324a9ea3a9701380f5705ba9e6ee20ef7e7dfcb9",
+    "catalog/schemas/run_passport.schema.json": "84cbb725d33cf6a1d424b2d428fd219ff84e65c4c04f6eb07b7739f23744cbbc",
+    "configs/experiment_capability_registry_v1.yaml": "cb1198af6393b7d3e6c92b3f6836851fdb8ef76e0194bb519be0eff470d429a1",
+    "configs/hypothesis_fast_lane_v1.yaml": "dd58be68e22e386e65d8bb84bf3fa1e958469d9f4195454eace9469bb480557d",
+    "docs/PROJECT_MAP.md": "de7cba724c574d3695721c7611954179733bb1e253bf77ddb3a42bb271a37bf6",
+    "docs/decisions/ADR-006-hypothesis-fast-lane-research-data-plane.md": "51e4406686cd599349950614cafa2e6200440f5205ff67b21aaa4906389cc21e",
+    "docs/tasks/HYPOTHESIS_FAST_LANE_AND_RESEARCH_DATA_PLANE_V1.md": "eaa817be4c81625d3c427970cf9b9a3595018c5531e40a765723605b2c283865",
+    "schemas/research_memory_projection_v1.sql": "b044f9e5e91d7e76ba51e49681f851c2ec70e528510aa8fdb7342bb2ebb19e67",
+    "scripts/hypothesis_fast_lane.py": "c7e736b4dbd66c0f9f1f584c6e8a2ff89f3141c7a20a6ba5cb37baaa0676b1d5",
+    "src/solana_alpha_lab/factory/data_resolver.py": "22b551e65924113595f0170158e0a13dbb919c6358f17cf72c92087e6e113b19",
+    "src/solana_alpha_lab/factory/experiment_spec.py": "4c9228d9f116a0e101d32dcbd6e04e69e539c1d79c1d0f310d3cfbeb06bab3f7",
+    "src/solana_alpha_lab/factory/lane_classifier.py": "5caee743f7132127f3f5e15f867812b3f271cd32faa225939bb2b7e640ce1b14",
+    "src/solana_alpha_lab/factory/prior_work.py": "9f3e6f5ef567aa9d90bc3c24ea7a36fad5192b211175ceda7ff643170aef252f",
+    "src/solana_alpha_lab/factory/research_store.py": "dae727d1f496f205a07de765a1fc303913da1b1fa2d72a22979a3110dc2086fe",
+    "src/solana_alpha_lab/factory/run_passport.py": "7b6dfbb038acdc20e23aef01d786548bddc38b613ec6c5a86a4080856040f36c",
+    "src/solana_alpha_lab/factory/runner.py": "bfb6a6a37fd822f6415d7b8d13584cdc544ad7d061b141fa6dc6df80a7204f0f",
+    "tests/fixtures/fast_lane/offline_submission.template.json": "1a550df7b332d5967f78893933ec0cd2e6eccc47f6f75761bfb7f56d77ea920d",
+    "tests/test_fast_lane_classifier.py": "88e1dccb74e4970d8e5659bef45fb81cc20618ae2be4eaf29a761cd08b627e90",
+    "tests/test_fast_lane_cli.py": "2387c3e48b96069d9277ca87f201d63095a669dd098329e6457d5e2566bd3821",
+    "tests/test_fast_lane_runner.py": "e8625ddb09b0be66878a11bce91cb9e922dfcbd67bbd4c8e8daaf7b64fd90cfc",
+    "tests/test_research_projection.py": "862a8eee5ccce339d5ced2e62a4650cd6b9f1dbbbf9960c737c923741779a5bd",
+    "tests/test_research_store.py": "1dabcdab6e59596c02282df8f1c095cfb38a89abc4626900c370d91e2de49b61",
+    "tests/test_task16_hypothesis_research_memory_query.py": "8e9b361e1f0a1a50f8e442993130f625ef26701d53cdefdffb72510c490ddfa5"
+  },
   "active_stop_conditions": [
     "TWO_RUNG_LIVE_H900_V1",
     "PROVIDER_API_RPC_WSS"
@@ -24,14 +55,14 @@
   },
   "factory_fit": {
     "path": "docs/evidence/hypothesis_fast_lane/a1_delivery_factory_fit_v1.json",
-    "sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+    "sha256": "ff5f9d99935da306015f9d6b26412186612d582c66c05194849c964164c5c8e8",
     "verdict": "PASS"
   },
   "validation": {
     "targeted": "PASS_FAST_LANE_FOUNDATION_SUITE",
     "independent_review": {
       "path": "docs/evidence/hypothesis_fast_lane/a1_delivery_independent_review_v1.json",
-      "sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+      "sha256": "cfab1b616f2c9f04fb24847786c1c6050ebb5373db0f9447afe2ac924d7e8367",
       "verdict": "PASS"
     },
     "full_gate": "ENFORCED_BY_PROJECT_BOUND_VALIDATION",
