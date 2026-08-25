@@ -74,6 +74,7 @@ records:
   - TASK-23
   - REG-RESEARCH-001
   evidence: []
+  search_terms: [global trial ledger]
   classification: *id004
 - asset_id: REGISTRY-FEATURE-CATALOG-001
   record_version: '1.0'
@@ -207,6 +208,7 @@ records:
   relations: *id002
   consumers: *id003
   evidence: []
+  search_terms: [negative results, decisions registry]
   classification: *id004
 - asset_id: GENERATED-PROJECT-MAP-001
   record_version: '2.25'
@@ -222,7 +224,7 @@ records:
     repository_path: docs/PROJECT_MAP.md
   integrity:
     kind: sha256
-    sha256: 21ff0ff85acbb636f5794b2a3a229db03357922061e2d935ed85d5632c23ae03
+    sha256: f6c9141e8ed1c2083ca3fe273edbc7693ec2a2e3268c101811382182ef3e72e8
   access:
     mode: read_only
     method: file
@@ -282,7 +284,7 @@ records:
     repository_path: catalog/generated/asset_edges.json
   integrity:
     kind: sha256
-    sha256: 3c61fefc26bfc247eae73224e273cc9c7fcb860d3a0f950f3cd4014d09e513cf
+    sha256: a907b6eb68e65ceb5377ccacf7c9ec22abfc575257739e0a0d112f40f4f36352
   access:
     mode: read_only
     method: file

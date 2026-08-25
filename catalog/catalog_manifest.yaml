@@ -1,15 +1,32 @@
-schema_version: '1.0'
+schema_version: '1.1'
 catalog_id: SMIAL-PROJECT-ASSET-CATALOG
-catalog_version: 0.119.0
-as_of: '2026-08-23'
+catalog_version: 0.120.0
+as_of: '2026-08-25'
 implementation_status: VALIDATED_ACTIVE
 current_checkpoint:
-  assets: 1480
+  assets: 1487
   asset_registries: 4
   schemas: 64
-  queries: 9
+  queries: 11
   lifecycle_registries: 9
   lifecycle_records: 84
+canonical_bindings:
+  ACTIVE-PROVIDER-ROUTE-CAPABILITY-REGISTRY:
+    target_asset_id: CONFIG-PROVIDER-ROUTE-CAPABILITY-REGISTRY-010
+    expected_asset_type: configuration
+    semantics: CURRENT_AT_COMMIT
+    rationale: Current used provider route capability lineage head; target status preserved
+    current_use_evidence_asset_ids:
+    - MODULE-PROVIDER-ROUTE-CAPABILITY-REGISTRY-010
+    - CONFIG-EARLY-HOLDER-CONCENTRATION-H900-FALSIFIER-001
+  ACTIVE-FACTORY-MARKET-FEATURE-SURFACE:
+    target_asset_id: CONFIG-FACTORY-V1-COMMON-MARKET-FEATURE-SURFACE-001
+    expected_asset_type: configuration
+    semantics: CURRENT_AT_COMMIT
+    rationale: Active common market feature declaration
+    current_use_evidence_asset_ids:
+    - MODULE-FACTORY-V1-MARKET-FEATURE-SURFACE-001
+    - CONFIG-EXPERIMENT-SPEC-MARKET-FEATURE-PRICE-PATH-001
 root_resolver:
   asset_registries:
   - catalog/assets/core.yaml
@@ -142,6 +159,49 @@ root_resolver:
     - -B
     - scripts/generate_navigation.py
     - --check
+    resolve_binding:
+    - uv
+    - run
+    - --locked
+    - --managed-python
+    - python
+    - -B
+    - scripts/catalog_cli.py
+    - resolve-binding
+    - '{binding_id}'
+    - --json
+    search_assets:
+    - uv
+    - run
+    - --locked
+    - --managed-python
+    - python
+    - -B
+    - scripts/catalog_cli.py
+    - search-assets
+    - --text
+    - '{text}'
+    - --match
+    - '{match}'
+    - --limit
+    - '{limit}'
+    - --explain
+    - --json
+    related_assets:
+    - uv
+    - run
+    - --locked
+    - --managed-python
+    - python
+    - -B
+    - scripts/catalog_cli.py
+    - related-assets
+    - '{asset_id}'
+    - --depth
+    - '{depth}'
+    - --direction
+    - '{direction}'
+    - --json
 policies:
   absolute_paths: FORBIDDEN
   secrets: FORBIDDEN
@@ -819,5 +879,12 @@ mandatory_asset_ids:
 - EVIDENCE-PRIOR-GIT-T0-FRICTION-SCREEN-RUNTIME-001
 - EVIDENCE-PRIOR-GIT-T0-FRICTION-SCREEN-ACCEPTANCE-001
 - REPORT-PRIOR-GIT-T0-FRICTION-SCREEN-001
+- CTRL-KCDN-ATOM-A-001
+- MODULE-CATALOG-DISCOVERY-001
+- FIXTURE-CATALOG-DISCOVERY-GOLD-QUERIES-001
+- TEST-CATALOG-CANONICAL-BINDING-DISCOVERY-001
+- EVIDENCE-KCDN-ATOM-A-DELIVERY-COMPLETION-001
+- EVIDENCE-KCDN-ATOM-A-DELIVERY-INDEPENDENT-REVIEW-001
+- EVIDENCE-KCDN-ATOM-A-DELIVERY-FACTORY-FIT-001
 deferred_capabilities:
 - GRAPH_DATABASE

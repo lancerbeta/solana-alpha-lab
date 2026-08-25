@@ -1,0 +1,35 @@
+{
+  "as_of": "2026-08-25",
+  "capability_radar": {
+    "now": "NONE",
+    "watch": "ATOM_A2_OPTIONAL_FEDERATED_PRIOR_WORK"
+  },
+  "dimensions": {
+    "build_vs_buy": "PASS_WRAP_EXISTING_CATALOG_CLI_NO_NEW_STORE",
+    "context_efficiency": "PASS_ONE_BOUNDED_ATOM_NO_A2_THROUGH_E",
+    "execution_to_cashflow": "PASS_NAVIGATION_ONLY_NO_CASHFLOW",
+    "flexibility_and_history": "PASS_LEGACY_1_0_MANIFEST_AND_CLI_FLAGS_RETAINED",
+    "mission": "PASS_CURRENT_ROOTS_EXACT_AND_CONCEPT_NAV",
+    "monitoring_and_recovery": "PASS_REVERT_ATOM_KEEP_1_0_RECOVERABLE",
+    "owner_operability": "PASS_OPERATOR_NAV_GIT_FIRST",
+    "red_team": "PASS_NO_RAG_NO_RESOLVER_NO_PROVIDER",
+    "research_truth": "PASS_BINDINGS_ARE_CURRENT_AT_COMMIT_NOT_RUNTIME_FOLLOW",
+    "security": "PASS_NO_SECRETS_NO_NETWORK"
+  },
+  "limits": [
+    "NO_ALPHA",
+    "NO_CANONICAL_DONE",
+    "NO_ATOM_A2",
+    "NO_CONTEXT_MAP_PIN",
+    "CRYSTALLIZATION_PACKET_NONE_DOES_NOT_BLOCK"
+  ],
+  "mode": "FULL_REVIEW",
+  "recovery": "REVERT_THIS_ATOM; MANIFEST_1_0_AND_LEGACY_CLI_REMAIN_RECOVERABLE",
+  "review_id": "KCDN-ATOM-A-FACTORY-FIT-001",
+  "reviewed_bindings_sha256": "8714266bf50b21d0100a4d24f4ab8936598f39693fce3545776167ad8f3ae9ff",
+  "reviewed_inventory_sha256": "32132397cee8d7023935a1bd9850469a31f69cd58310dc088df7113af9608d06",
+  "schema": "smial.delivery-harness-factory-fit",
+  "schema_version": "1.0",
+  "task_id": "KCDN_ATOM_A_CANONICAL_BINDINGS_AND_DETERMINISTIC_NAVIGATION_V1",
+  "verdict": "PASS"
+}

@@ -2773,6 +2773,26 @@
       "target_asset_id": "TEST-IN-SCOPE-POPULATION-FIT-RECONCILIATION-001"
     },
     {
+      "source_asset_id": "CTRL-KCDN-ATOM-A-001",
+      "relation": "contains",
+      "target_asset_id": "FIXTURE-CATALOG-DISCOVERY-GOLD-QUERIES-001"
+    },
+    {
+      "source_asset_id": "CTRL-KCDN-ATOM-A-001",
+      "relation": "contains",
+      "target_asset_id": "MODULE-CATALOG-DISCOVERY-001"
+    },
+    {
+      "source_asset_id": "CTRL-KCDN-ATOM-A-001",
+      "relation": "evidenced_by",
+      "target_asset_id": "EVIDENCE-KCDN-ATOM-A-DELIVERY-COMPLETION-001"
+    },
+    {
+      "source_asset_id": "CTRL-KCDN-ATOM-A-001",
+      "relation": "validated_by",
+      "target_asset_id": "TEST-CATALOG-CANONICAL-BINDING-DISCOVERY-001"
+    },
+    {
       "source_asset_id": "CTRL-LATEST-HANDOFF-001",
       "relation": "depends_on",
       "target_asset_id": "CONTRACT-T06-DATASET-MANIFEST-001"
@@ -4751,6 +4771,36 @@
       "source_asset_id": "EVIDENCE-IN-SCOPE-POPULATION-FIT-RECONCILIATION-RUNTIME-001",
       "relation": "derived_from",
       "target_asset_id": "CTRL-IN-SCOPE-POPULATION-FIT-RECONCILIATION-001"
+    },
+    {
+      "source_asset_id": "EVIDENCE-KCDN-ATOM-A-DELIVERY-COMPLETION-001",
+      "relation": "depends_on",
+      "target_asset_id": "EVIDENCE-KCDN-ATOM-A-DELIVERY-FACTORY-FIT-001"
+    },
+    {
+      "source_asset_id": "EVIDENCE-KCDN-ATOM-A-DELIVERY-COMPLETION-001",
+      "relation": "depends_on",
+      "target_asset_id": "EVIDENCE-KCDN-ATOM-A-DELIVERY-INDEPENDENT-REVIEW-001"
+    },
+    {
+      "source_asset_id": "EVIDENCE-KCDN-ATOM-A-DELIVERY-COMPLETION-001",
+      "relation": "derived_from",
+      "target_asset_id": "CTRL-KCDN-ATOM-A-001"
+    },
+    {
+      "source_asset_id": "EVIDENCE-KCDN-ATOM-A-DELIVERY-FACTORY-FIT-001",
+      "relation": "depends_on",
+      "target_asset_id": "EVIDENCE-KCDN-ATOM-A-DELIVERY-INDEPENDENT-REVIEW-001"
+    },
+    {
+      "source_asset_id": "EVIDENCE-KCDN-ATOM-A-DELIVERY-FACTORY-FIT-001",
+      "relation": "derived_from",
+      "target_asset_id": "CTRL-KCDN-ATOM-A-001"
+    },
+    {
+      "source_asset_id": "EVIDENCE-KCDN-ATOM-A-DELIVERY-INDEPENDENT-REVIEW-001",
+      "relation": "derived_from",
+      "target_asset_id": "CTRL-KCDN-ATOM-A-001"
     },
     {
       "source_asset_id": "EVIDENCE-ORDINARY-MARKET-PIT-LOCAL-RAW-ENVELOPE-BIND-ACCEPTANCE-001",
@@ -7848,6 +7898,16 @@
       "target_asset_id": "CONFIG-CANARY-SPECIFICATION-ONLY-001"
     },
     {
+      "source_asset_id": "FIXTURE-CATALOG-DISCOVERY-GOLD-QUERIES-001",
+      "relation": "governed_by",
+      "target_asset_id": "CTRL-KCDN-ATOM-A-001"
+    },
+    {
+      "source_asset_id": "FIXTURE-CATALOG-DISCOVERY-GOLD-QUERIES-001",
+      "relation": "validated_by",
+      "target_asset_id": "TEST-CATALOG-CANONICAL-BINDING-DISCOVERY-001"
+    },
+    {
       "source_asset_id": "FIXTURE-OWNER-AUTHORITY-PACKET-001",
       "relation": "derived_from",
       "target_asset_id": "CONFIG-OWNER-AUTHORITY-PACKET-001"
@@ -8646,6 +8706,16 @@
       "source_asset_id": "MODULE-BUY-DT-QUOTE-MS-ASSOCIATION-001",
       "relation": "depends_on",
       "target_asset_id": "CONFIG-BUY-DT-QUOTE-MS-ASSOCIATION-001"
+    },
+    {
+      "source_asset_id": "MODULE-CATALOG-DISCOVERY-001",
+      "relation": "depends_on",
+      "target_asset_id": "CATALOG-CLI-001"
+    },
+    {
+      "source_asset_id": "MODULE-CATALOG-DISCOVERY-001",
+      "relation": "governed_by",
+      "target_asset_id": "CTRL-KCDN-ATOM-A-001"
     },
     {
       "source_asset_id": "MODULE-DELIVERY-TRACKED-HASH-001",
@@ -12601,6 +12671,16 @@
       "source_asset_id": "TEST-CANARY-SPECIFICATION-ONLY-A2-001",
       "relation": "depends_on",
       "target_asset_id": "EVIDENCE-CANARY-SPECIFICATION-ONLY-A2-001"
+    },
+    {
+      "source_asset_id": "TEST-CATALOG-CANONICAL-BINDING-DISCOVERY-001",
+      "relation": "depends_on",
+      "target_asset_id": "FIXTURE-CATALOG-DISCOVERY-GOLD-QUERIES-001"
+    },
+    {
+      "source_asset_id": "TEST-CATALOG-CANONICAL-BINDING-DISCOVERY-001",
+      "relation": "depends_on",
+      "target_asset_id": "MODULE-CATALOG-DISCOVERY-001"
     },
     {
       "source_asset_id": "TEST-CATALOG-SEARCH-001",
