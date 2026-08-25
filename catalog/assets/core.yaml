@@ -25629,7 +25629,7 @@ records:
   as_of: '2026-08-19'
   truth_owner: FACTORY_V1_PRODUCT_KERNEL_LOCAL_VERTICAL_SLICE_V1
   location: {kind: git_path, logical_uri: 'repo://src/solana_alpha_lab/factory/runner.py', repository_path: src/solana_alpha_lab/factory/runner.py}
-  integrity: {kind: sha256, sha256: d8d22bcb51fb6992d40f09e58274c52e0f9942c12d043cc57b96ffca524e918f}
+  integrity: {kind: sha256, sha256: 5fcc28ea242ace894625ca3774715750d2b18b654b976c66dd698b06852374be}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: governed_by, target_asset_id: CTRL-FACTORY-V1-PRODUCT-KERNEL-001}
@@ -25852,7 +25852,7 @@ records:
   as_of: '2026-08-19'
   truth_owner: FACTORY_V1_PRODUCT_KERNEL_LOCAL_VERTICAL_SLICE_V1
   location: {kind: git_path, logical_uri: 'repo://src/solana_alpha_lab/factory/experiment_spec.py', repository_path: src/solana_alpha_lab/factory/experiment_spec.py}
-  integrity: {kind: sha256, sha256: c4122e1cd9db58bcfc9ffdfcee7f616f9918e2a295f01fd8214d42b1787c61d5}
+  integrity: {kind: sha256, sha256: 4c9228d9f116a0e101d32dcbd6e04e69e539c1d79c1d0f310d3cfbeb06bab3f7}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: depends_on, target_asset_id: SCHEMA-EXPERIMENT-SPEC-001}

@@ -58,6 +58,10 @@ class ResolvedEvidence:
     def to_payload(self) -> dict[str, object]:
         """Return the durable path-free representation for a run event."""
 
+        logical_uri = self.logical_uri
+        if logical_uri.startswith("repo://"):
+            logical_uri = f"smial-data://research/catalog-assets/{self.stable_id}"
+
         return {
             "binding_id": self.binding_id,
             "content_sha256": self.content_sha256,
@@ -67,7 +71,7 @@ class ResolvedEvidence:
                 .isoformat(timespec="microseconds")
                 .replace("+00:00", "Z")
             ),
-            "logical_uri": self.logical_uri,
+            "logical_uri": logical_uri,
             "source_kind": self.source_kind,
             "stable_id": self.stable_id,
         }
