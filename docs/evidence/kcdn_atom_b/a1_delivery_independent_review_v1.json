@@ -17,8 +17,8 @@
     "GOAL_DOD_CRITIC"
   ],
   "review_id": "KCDN-ATOM-B-INDEPENDENT-REVIEW-001",
-  "reviewed_bindings_sha256": "8aad52e4543876b628f8c1b91b579b55af58009ed011dd3a14dfc2d291c7dd4d",
-  "reviewed_inventory_sha256": "78cf3f23cca02671e5e8f2929fb1ee35c32864e71331ffba3db3454b5847e12e",
+  "reviewed_bindings_sha256": "145abf278a8403bce15594294c14942ea2acd8718cf2d0f2427963da52eaba9a",
+  "reviewed_inventory_sha256": "399223a5dba35d257827cf26e37b3713abf918d237e1f027b7aef3d8a6b668e8",
   "reviews": [
     {
       "findings": [

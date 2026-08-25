@@ -11,23 +11,26 @@
   "cloud_bundle_smoke_required": false,
   "capability_radar_now": "NONE",
   "implementation_bindings": {
-    "catalog/assets/core.yaml": "c15b72d061d6afc338eb1f4d79bd2038dffc1bbc1f829418d5c847ba7dd28773",
+    "catalog/assets/core.yaml": "dee3fe70d5a7837e47e6722a0279e4e745ce6298408ae9b668fb713a2c7a63e3",
     "catalog/assets/lifecycle.yaml": "398ede4a5c0f15f3b44eb88f1bb1a20323ffb2c251e488d48d30335893445d8c",
     "catalog/catalog_manifest.yaml": "012bbdaf40119e9911aa145adbd0b4165edc8f51736531ed5bf94408160b8bd7",
     "catalog/generated/asset_edges.json": "94770c733f6577cab301b99a776294f76ec2b20c19b49e9ffa94290cc6277cca",
     "catalog/schemas/delivery_harness_context_receipt.schema.json": "08524ddc202d47ef1654a193538305e29b6007c7f2cc02df692dfaa535a4bcb7",
     "catalog/schemas/delivery_harness_task_contract.schema.json": "9be40d70cfc17364813aa4b1e3e71ec62d32057f413b94440be6eee02c3fbfdc",
     "delivery-harness/context-map.yaml": "9bfd7b35b4e5836f64e918eff5b8495ebb1f5e515e19841f35b44c55b44fe949",
+    "delivery-harness/harness.yaml": "10bc691cbe53565e20071c0dcd49a6aa77d50292e078d1e6f78d1ea09ea0804d",
     "delivery-harness/policies/solana-alpha-lab.md": "61e5dfaa50b3f6cbe99c430c794257aafd9ec33a183b973fa9091cc8c5379d4e",
-    "delivery-harness/templates/portable-bundle-manifest.json": "89dd179472aa3192a2a9e8feccd58498584c0f55885829abf24d977bf0f598c4",
+    "delivery-harness/templates/portable-bundle-manifest.json": "aeb5d6ee2098c953bf902e884c931e66fdbeba532c7b6a3f0206bc44d1db031b",
     "delivery-harness/templates/portable-core/delivery-harness/context-map.yaml": "d37b99984d084aa19c92e56c01d47565cc9a0620ae8da845953930ad9bb7cde1",
+    "delivery-harness/templates/portable-core/delivery-harness/harness.yaml": "0aebf3b5de8b1762117b63c329cbd6b872079572b744598973dbf6dbf7841ac9",
     "delivery-harness/templates/portable-core/scripts/delivery_harness.py": "07e5cf99d33c4eb62041f0de8ec2c417d92723abb034546f7332a83241b4fd60",
     "docs/PROJECT_MAP.md": "0e84a545b1e2832289e2e9852078640fc8c7e8484489ab693c323f85c5f30895",
-    "docs/evidence/control/delivery_harness_acceptance_v1.json": "cdb252f54b4b3cf94936c2685afc797f6604af50219978968d482cc6e209b490",
+    "docs/evidence/control/delivery_harness_acceptance_v1.json": "ee48a50b04235ce790c7fa8f0af2e0f0f0a3f0e00977c2d0ea8e1cd781117704",
     "docs/evidence/task30/a20r1_provider_route_capability_registry_acceptance_v1.json": "7312f8bc7357c5bde47a7b62c885665dd5449e8a81b5abca8acc553b5dfacfb8",
-    "docs/tasks/KCDN_ATOM_B_STABLE_DELIVERY_CONTEXT_REFERENCES_V1.md": "d8c1dbf44c479e65c3881f7a1695abef8e1e1c4941444e145045795f752b1bc0",
+    "docs/tasks/KCDN_ATOM_B_STABLE_DELIVERY_CONTEXT_REFERENCES_V1.md": "88c2fc51c824fd2182d9c130fd41a1129645effe3b400c25926a02e2b2bf2c44",
     "scripts/delivery_harness.py": "afb7d1a560f666ae22ad2b326709a5c589d606339f487791081a699232b01fbc",
     "tests/test_delivery_harness_adapters.py": "a3d11fdb2c476916ada07b2deade239152bf761ce7b2d1bffe2ca695f540a34c",
+    "tests/test_delivery_harness_merge_guard.py": "74a4a04a109ee5eb9f7161017d6090e99f24f02c6e4be805aea466914b8c21ec",
     "tests/test_delivery_harness_stable_asset_references.py": "6f32e03812ef8475fb84c60791252c56cb1285d150136270161ff82834014e39"
   },
   "active_stop_conditions": [],
@@ -40,14 +43,14 @@
   },
   "factory_fit": {
     "path": "docs/evidence/kcdn_atom_b/a1_delivery_factory_fit_v1.json",
-    "sha256": "40e0806ca85a7bb8136135f4b3fd2d86ab8786a3b1c1e44b844cbcc807a7aa01",
+    "sha256": "9706ff0f02dfea363db605faaeddefd6387264b9cad341ca1af88e069173eec7",
     "verdict": "PASS"
   },
   "validation": {
     "targeted": "PASS_FOCUSED_HARNESS_STABLE_ASSET_REFERENCES",
     "independent_review": {
       "path": "docs/evidence/kcdn_atom_b/a1_delivery_independent_review_v1.json",
-      "sha256": "f16b21cbee4fdaeccf823dce0ddfd00d6f1bde4e262bc8d9f38e3371d322f47c",
+      "sha256": "a588153ee7db97525ba5a7e61daa439eb8dbb75b20410cb5809f11e851cf2de3",
       "verdict": "PASS"
     },
     "full_gate": "ENFORCED_BY_PROJECT_BOUND_VALIDATION",
