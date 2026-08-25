@@ -184,6 +184,22 @@ class ResearchStoreTests(unittest.TestCase):
                             transaction_id="RESEARCH-TXN-001",
                         )
 
+    def test_payload_rejects_file_uris_without_committing_records(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            store = self.store(Path(tmp))
+            for value in (
+                "file:///private/secret.json",
+                "file:///C:/secret.json",
+            ):
+                with self.subTest(value=value):
+                    with self.assertRaises(ResearchStoreError) as raised:
+                        store.append(
+                            [event_fixture(payload={"artifact": value})],
+                            transaction_id="RESEARCH-TXN-001",
+                        )
+                    self.assertEqual(raised.exception.code, "PHYSICAL_PATH_FORBIDDEN")
+                    self.assertEqual(tuple(store.iter_committed_records()), ())
+
     def test_payload_hash_mismatch_is_rejected(self) -> None:
         with tempfile.TemporaryDirectory() as tmp:
             store = self.store(Path(tmp))

@@ -43,6 +43,7 @@ _TRANSACTION_ID_RE = re.compile(
 )
 _SAFE_IDENTIFIER_RE = re.compile(r"[A-Za-z0-9][A-Za-z0-9._:-]{0,255}")
 _WINDOWS_DRIVE_RE = re.compile(r"^[A-Za-z]:")
+_URI_SCHEME_RE = re.compile(r"^[A-Za-z][A-Za-z0-9+.-]*:")
 _HASH64_RE = re.compile(r"[0-9a-f]{64}")
 _GIT_SHA_RE = re.compile(r"[0-9a-f]{40}")
 _UNIX_EPOCH = datetime(1970, 1, 1, tzinfo=UTC)
@@ -232,6 +233,11 @@ def _validate_logical_uri(value: str) -> None:
         segment in {"", ".", ".."} for segment in logical.parts
     ):
         raise ResearchStoreError("PHYSICAL_PATH_FORBIDDEN")
+    if len(logical.parts) < 2 or logical.parts[0] not in {
+        "datasets",
+        "research",
+    }:
+        raise ResearchStoreError("PHYSICAL_PATH_FORBIDDEN")
 
 
 def _validate_no_physical_paths(value: Any, *, key: str | None = None) -> None:
@@ -260,6 +266,8 @@ def _validate_no_physical_paths(value: Any, *, key: str | None = None) -> None:
     if (
         value.startswith(("/", "\\"))
         or _WINDOWS_DRIVE_RE.match(value) is not None
+        or _URI_SCHEME_RE.match(value) is not None
+        or "://" in value
         or ".." in normalized.split("/")
     ):
         raise ResearchStoreError("PHYSICAL_PATH_FORBIDDEN")
