@@ -493,11 +493,16 @@ def validate_task(metadata: dict[str, Any], task_id: str) -> None:
             raise ValueError(code)
     else:
         raise ValueError(code)
-    exact_keys(
-        requirements,
-        {"catalog_asset_ids", "l2_roles", "l3_roles", "roadmap_path", "exact_role_paths"},
-        code,
-    )
+    required_requirement_keys = {
+        "catalog_asset_ids",
+        "l2_roles",
+        "l3_roles",
+        "roadmap_path",
+        "exact_role_paths",
+    }
+    allowed_requirement_keys = required_requirement_keys | {"exact_role_asset_ids"}
+    if not required_requirement_keys <= set(requirements) <= allowed_requirement_keys:
+        raise ValueError(code)
     paths = requirements.get("exact_role_paths")
     if not isinstance(paths, dict) or set(paths) != L2_ROLES | L3_ROLES:
         raise ValueError(code)
@@ -517,6 +522,14 @@ def validate_task(metadata: dict[str, Any], task_id: str) -> None:
         and all(unique_strings(value) for value in paths.values())
     ):
         raise ValueError(code)
+    asset_ids = requirements.get("exact_role_asset_ids")
+    if asset_ids is not None:
+        if not isinstance(asset_ids, dict) or set(asset_ids) != L2_ROLES | L3_ROLES:
+            raise ValueError(code)
+        if not all(unique_strings(value) for value in asset_ids.values()):
+            raise ValueError(code)
+        if any(asset_ids[role] for role in asset_ids):
+            raise ValueError("REQUIRED_CATALOG_ASSET_NOT_RESOLVED")
 
 
 def parse_task(root: Path, task_id: str, relative: str) -> tuple[dict[str, Any], Path]:
@@ -568,6 +581,7 @@ def selected(
         "inclusion": (
             "METADATA_ONLY" if path.stat().st_size <= 102400 else "REFERENCE_ONLY"
         ),
+        "resolution_method": "EXACT_PATH",
     }
 
 

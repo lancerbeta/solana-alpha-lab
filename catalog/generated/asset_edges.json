@@ -2793,6 +2793,31 @@
       "target_asset_id": "TEST-CATALOG-CANONICAL-BINDING-DISCOVERY-001"
     },
     {
+      "source_asset_id": "CTRL-KCDN-ATOM-B-001",
+      "relation": "depends_on",
+      "target_asset_id": "CONFIG-DELIVERY-CONTEXT-MAP-001"
+    },
+    {
+      "source_asset_id": "CTRL-KCDN-ATOM-B-001",
+      "relation": "depends_on",
+      "target_asset_id": "CONFIG-PROVIDER-ROUTE-CAPABILITY-REGISTRY-010"
+    },
+    {
+      "source_asset_id": "CTRL-KCDN-ATOM-B-001",
+      "relation": "depends_on",
+      "target_asset_id": "SCRIPT-DELIVERY-HARNESS-001"
+    },
+    {
+      "source_asset_id": "CTRL-KCDN-ATOM-B-001",
+      "relation": "evidenced_by",
+      "target_asset_id": "EVIDENCE-KCDN-ATOM-B-DELIVERY-COMPLETION-001"
+    },
+    {
+      "source_asset_id": "CTRL-KCDN-ATOM-B-001",
+      "relation": "validated_by",
+      "target_asset_id": "TEST-KCDN-ATOM-B-STABLE-CONTEXT-001"
+    },
+    {
       "source_asset_id": "CTRL-LATEST-HANDOFF-001",
       "relation": "depends_on",
       "target_asset_id": "CONTRACT-T06-DATASET-MANIFEST-001"
@@ -4801,6 +4826,36 @@
       "source_asset_id": "EVIDENCE-KCDN-ATOM-A-DELIVERY-INDEPENDENT-REVIEW-001",
       "relation": "derived_from",
       "target_asset_id": "CTRL-KCDN-ATOM-A-001"
+    },
+    {
+      "source_asset_id": "EVIDENCE-KCDN-ATOM-B-DELIVERY-COMPLETION-001",
+      "relation": "depends_on",
+      "target_asset_id": "EVIDENCE-KCDN-ATOM-B-DELIVERY-FACTORY-FIT-001"
+    },
+    {
+      "source_asset_id": "EVIDENCE-KCDN-ATOM-B-DELIVERY-COMPLETION-001",
+      "relation": "depends_on",
+      "target_asset_id": "EVIDENCE-KCDN-ATOM-B-DELIVERY-INDEPENDENT-REVIEW-001"
+    },
+    {
+      "source_asset_id": "EVIDENCE-KCDN-ATOM-B-DELIVERY-COMPLETION-001",
+      "relation": "derived_from",
+      "target_asset_id": "CTRL-KCDN-ATOM-B-001"
+    },
+    {
+      "source_asset_id": "EVIDENCE-KCDN-ATOM-B-DELIVERY-FACTORY-FIT-001",
+      "relation": "depends_on",
+      "target_asset_id": "EVIDENCE-KCDN-ATOM-B-DELIVERY-INDEPENDENT-REVIEW-001"
+    },
+    {
+      "source_asset_id": "EVIDENCE-KCDN-ATOM-B-DELIVERY-FACTORY-FIT-001",
+      "relation": "derived_from",
+      "target_asset_id": "CTRL-KCDN-ATOM-B-001"
+    },
+    {
+      "source_asset_id": "EVIDENCE-KCDN-ATOM-B-DELIVERY-INDEPENDENT-REVIEW-001",
+      "relation": "derived_from",
+      "target_asset_id": "CTRL-KCDN-ATOM-B-001"
     },
     {
       "source_asset_id": "EVIDENCE-ORDINARY-MARKET-PIT-LOCAL-RAW-ENVELOPE-BIND-ACCEPTANCE-001",
@@ -12886,6 +12941,16 @@
       "source_asset_id": "TEST-IN-SCOPE-POPULATION-SUPPLY-GATE-001",
       "relation": "depends_on",
       "target_asset_id": "MODULE-IN-SCOPE-POPULATION-SUPPLY-GATE-001"
+    },
+    {
+      "source_asset_id": "TEST-KCDN-ATOM-B-STABLE-CONTEXT-001",
+      "relation": "depends_on",
+      "target_asset_id": "SCRIPT-DELIVERY-HARNESS-001"
+    },
+    {
+      "source_asset_id": "TEST-KCDN-ATOM-B-STABLE-CONTEXT-001",
+      "relation": "governed_by",
+      "target_asset_id": "CTRL-KCDN-ATOM-B-001"
     },
     {
       "source_asset_id": "TEST-ORDINARY-MARKET-PIT-LOCAL-RAW-ENVELOPE-BIND-001",

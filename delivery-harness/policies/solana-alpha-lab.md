@@ -103,11 +103,15 @@ unhealthy. Before OOS+paper+shadow, Kelly is zero.
 
 ## PROVIDER_ROUTE_REGISTRY
 
-Before building or invoking a provider route, resolve its stable ID through
-`configs/provider_route_capability_registry_v3.yaml` (`PROVIDER-ROUTE-CAPABILITY-REGISTRY-003`).
-It preserves immutable predecessor `PROVIDER_ROUTE_CAPABILITY_REGISTRY_V1` at
-`configs/provider_route_capability_registry_v1.yaml`. A missing record is
-`REGISTRY_GAP`, not provider failure. A record grants no call, credential,
+Before building or invoking a provider route, resolve the current Catalog
+canonical binding once during task design and pin the concrete target asset ID
+in `context_requirements.exact_role_asset_ids`. Do not follow a moving current
+binding at execution time. The current pin is
+`CONFIG-PROVIDER-ROUTE-CAPABILITY-REGISTRY-010`. Historical
+`CONFIG-PROVIDER-ROUTE-CAPABILITY-REGISTRY-003` remains exact-resolvable and is
+not current. Immutable predecessor `PROVIDER_ROUTE_CAPABILITY_REGISTRY_V1`
+stays at `configs/provider_route_capability_registry_v1.yaml`. A missing record
+is `REGISTRY_GAP`, not provider failure. A record grants no call, credential,
 retry, fallback or provider-selection authority.
 
 For an authorized one-shot credentialed attempt under uncertain network

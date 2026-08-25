@@ -1,0 +1,35 @@
+{
+  "as_of": "2026-08-25",
+  "capability_radar": {
+    "now": "NONE",
+    "watch": "ATOM_A2_OPTIONAL_FEDERATED_PRIOR_WORK"
+  },
+  "dimensions": {
+    "build_vs_buy": "PASS_WRAP_EXISTING_CATALOG_AND_HARNESS_NO_NEW_STORE",
+    "context_efficiency": "PASS_ONE_BOUNDED_ATOM_NO_A2_THROUGH_E",
+    "execution_to_cashflow": "PASS_CONTEXT_PIN_ONLY_NO_CASHFLOW",
+    "flexibility_and_history": "PASS_PATH_ONLY_CONTRACTS_REMAIN_VALID",
+    "mission": "PASS_STABLE_ASSET_ID_ROLE_CONTEXT",
+    "monitoring_and_recovery": "PASS_REVERT_ATOM_B_KEEP_ATOM_A",
+    "owner_operability": "PASS_BIND_THEN_PIN_NO_MOVING_V3",
+    "red_team": "PASS_NO_RAG_NO_RESOLVER_NO_PROVIDER",
+    "research_truth": "PASS_PINNED_ASSET_ID_NOT_FOLLOWED_BINDING",
+    "security": "PASS_NO_SECRETS_NO_NETWORK"
+  },
+  "limits": [
+    "NO_ALPHA",
+    "NO_CANONICAL_DONE",
+    "NO_ATOM_A2",
+    "NO_ATOM_C_THROUGH_E",
+    "PATH_ONLY_CONTRACTS_UNCHANGED"
+  ],
+  "mode": "FULL_REVIEW",
+  "recovery": "REVERT_THIS_ATOM; ATOM_A_BINDINGS_AND_PATH_ONLY_CONTRACTS_REMAIN",
+  "review_id": "KCDN-ATOM-B-FACTORY-FIT-001",
+  "reviewed_bindings_sha256": "145abf278a8403bce15594294c14942ea2acd8718cf2d0f2427963da52eaba9a",
+  "reviewed_inventory_sha256": "399223a5dba35d257827cf26e37b3713abf918d237e1f027b7aef3d8a6b668e8",
+  "schema": "smial.delivery-harness-factory-fit",
+  "schema_version": "1.0",
+  "task_id": "KCDN_ATOM_B_STABLE_DELIVERY_CONTEXT_REFERENCES_V1",
+  "verdict": "PASS"
+}

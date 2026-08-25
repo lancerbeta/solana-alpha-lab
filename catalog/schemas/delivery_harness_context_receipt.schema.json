@@ -13,7 +13,8 @@
         "stable_id": {"type": ["string", "null"]},
         "sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
         "state": {"const": "RESOLVED"},
-        "inclusion": {"enum": ["REFERENCE_ONLY", "METADATA_ONLY"]}
+        "inclusion": {"enum": ["REFERENCE_ONLY", "METADATA_ONLY"]},
+        "resolution_method": {"enum": ["EXACT_PATH", "CATALOG_ASSET_ID"]}
       }
     },
     "gap": {

@@ -41,8 +41,8 @@
     "test": {"path": "tests/test_provider_route_capability_registry_v4.py", "sha256": "674a83de8b9fb60d76d188c5d649d28b38c62daeb21a72187773553f30612c99"},
     "runtime": {"path": "docs/evidence/task30/a20p_bitquery_named_partial_pit_route_capture_runtime_receipt_v1.json", "sha256": "fd7a52e6952e12fc48b9a88ed13b6dcfb28dbc9324cb767642fb28806897a185"},
     "agents_policy": {"path": "AGENTS.md", "sha256": "020485abe150a88a9b779af848712c300697a2fc665d499972d011560d06e459"},
-    "context_map": {"path": "delivery-harness/context-map.yaml", "sha256": "ca881df9da3884deb480327f2fd070e249572aa50f1d8eef30e877b5dfbbcf4d"},
-    "domain_policy": {"path": "delivery-harness/policies/solana-alpha-lab.md", "sha256": "ff8667d46d2e8aa00e5fc1d5409cebd04f49cbf313e486f5b014e5777ba4328f"}
+    "context_map": {"path": "delivery-harness/context-map.yaml", "sha256": "9bfd7b35b4e5836f64e918eff5b8495ebb1f5e515e19841f35b44c55b44fe949"},
+    "domain_policy": {"path": "delivery-harness/policies/solana-alpha-lab.md", "sha256": "61e5dfaa50b3f6cbe99c430c794257aafd9ec33a183b973fa9091cc8c5379d4e"}
   },
   "non_claims": {
     "provider_failure": false,
