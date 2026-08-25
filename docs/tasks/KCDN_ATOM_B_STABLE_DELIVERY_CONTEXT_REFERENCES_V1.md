@@ -28,6 +28,7 @@ managed_write_set:
 - delivery-harness/templates/portable-core/delivery-harness/context-map.yaml
 - delivery-harness/templates/portable-bundle-manifest.json
 - docs/evidence/control/delivery_harness_acceptance_v1.json
+- docs/evidence/task30/a20r1_provider_route_capability_registry_acceptance_v1.json
 - catalog/assets/core.yaml
 - catalog/assets/lifecycle.yaml
 - catalog/catalog_manifest.yaml

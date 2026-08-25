@@ -23,7 +23,7 @@
     ".agents/skills/delivery-harness/SKILL.md": "095a52a8c089428dcb39257170e9d811d7678ef000f23859c5d35082313b9520",
     ".cursor/commands/delivery-finish.md": "fb234b0a1faac1b5ee20961ae5be3516bd628608d29cda367e5861dfe7b6083f",
     ".github/ISSUE_TEMPLATE/control-atom.yml": "29cb96ec1b0058f38ea6e9669017bf01ef66552ab1288d68c17d39baa2f29fba",
-    "AGENTS.md": "e03779c23fc53f699817d7df30fb980b1b1e62394be9f4e7ebac23cd477a78c3",
+    "AGENTS.md": "020485abe150a88a9b779af848712c300697a2fc665d499972d011560d06e459",
     "README.md": "539c48304858f0f7a0b54299b785fabef515d0fb39710dcc98c97b9c92000971",
     "catalog/schemas/delivery_harness.schema.json": "5a09c7a0a24b5ced3a2af6ae196b876b8efd11272d65597394007c020b977f05",
     "catalog/schemas/delivery_harness_capability_radar.schema.json": "90253c97e1b9cabc80a48ef2b3ec2b23da5d6a499124184e3a571f8c2ec01734",

@@ -735,7 +735,7 @@ records:
     repository_path: AGENTS.md
   integrity:
     kind: sha256
-    sha256: e03779c23fc53f699817d7df30fb980b1b1e62394be9f4e7ebac23cd477a78c3
+    sha256: 020485abe150a88a9b779af848712c300697a2fc665d499972d011560d06e459
   access:
     mode: read_only
     method: file
@@ -13620,7 +13620,7 @@ records:
   as_of: '2026-08-14'
   truth_owner: TASK-30
   location: {kind: git_path, logical_uri: 'repo://docs/evidence/task30/a20r1_provider_route_capability_registry_acceptance_v1.json', repository_path: docs/evidence/task30/a20r1_provider_route_capability_registry_acceptance_v1.json}
-  integrity: {kind: sha256, sha256: f0484630e5eaa1a3d581d6e418ca7e6f955cb1c409340e18cb71b7681ed2abe9}
+  integrity: {kind: sha256, sha256: 7312f8bc7357c5bde47a7b62c885665dd5449e8a81b5abca8acc553b5dfacfb8}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: derived_from, target_asset_id: CONFIG-PROVIDER-ROUTE-CAPABILITY-REGISTRY-004}
@@ -31681,7 +31681,7 @@ records:
   as_of: '2026-08-25'
   truth_owner: KCDN_ATOM_B_STABLE_DELIVERY_CONTEXT_REFERENCES_V1
   location: {kind: git_path, logical_uri: 'repo://docs/tasks/KCDN_ATOM_B_STABLE_DELIVERY_CONTEXT_REFERENCES_V1.md', repository_path: docs/tasks/KCDN_ATOM_B_STABLE_DELIVERY_CONTEXT_REFERENCES_V1.md}
-  integrity: {kind: sha256, sha256: 9891e7ffb75c04dc19cb9793e76f05427a700d4f7448f13ce4a9d92618607b6b}
+  integrity: {kind: sha256, sha256: d8c1dbf44c479e65c3881f7a1695abef8e1e1c4941444e145045795f752b1bc0}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: depends_on, target_asset_id: CONFIG-DELIVERY-CONTEXT-MAP-001}

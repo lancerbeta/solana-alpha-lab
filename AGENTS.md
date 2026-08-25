@@ -107,9 +107,7 @@ route work or interrupt the owner under `OWNER_MANAGED_OPTIONAL_EXPORT`.
 Provider work must
 also preserve the immutable `PROVIDER_ROUTE_CAPABILITY_REGISTRY_V1` binding at
 `configs/provider_route_capability_registry_v1.yaml`; an absent route is
-`REGISTRY_GAP`, not provider failure or implied authority. Pin the current
-provider-route asset ID in the task (`exact_role_asset_ids`); do not follow a
-moving current binding at execution.
+`REGISTRY_GAP`, not provider failure or implied authority.
 
 ## VALIDATION_AND_REVIEW
 
