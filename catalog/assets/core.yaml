@@ -25629,7 +25629,7 @@ records:
   as_of: '2026-08-19'
   truth_owner: FACTORY_V1_PRODUCT_KERNEL_LOCAL_VERTICAL_SLICE_V1
   location: {kind: git_path, logical_uri: 'repo://src/solana_alpha_lab/factory/runner.py', repository_path: src/solana_alpha_lab/factory/runner.py}
-  integrity: {kind: sha256, sha256: 5fcc28ea242ace894625ca3774715750d2b18b654b976c66dd698b06852374be}
+  integrity: {kind: sha256, sha256: bfb6a6a37fd822f6415d7b8d13584cdc544ad7d061b141fa6dc6df80a7204f0f}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: governed_by, target_asset_id: CTRL-FACTORY-V1-PRODUCT-KERNEL-001}

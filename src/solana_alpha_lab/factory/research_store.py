@@ -234,6 +234,17 @@ class ProjectionReceipt:
     partition_count: int
 
 
+@dataclass(frozen=True, slots=True)
+class StoreDiagnostics:
+    committed_inventory_sha256: str
+    orphan_partition_count: int
+    writer_lease_state: str
+    projection_digest_sha256: str | None
+    cold_rebuild_possible: bool
+    partition_count: int
+    record_count: int
+
+
 class _PublishDisposition(StrEnum):
     CREATED = "CREATED"
     REPLAY_IDENTICAL = "REPLAY_IDENTICAL"
@@ -1398,6 +1409,126 @@ class ResearchStore:
                 )
         return None
 
+    def diagnostics(self) -> StoreDiagnostics:
+        manifests = self._committed_manifests()
+        inventory_payload = [
+            {
+                "content_sha256": manifest.content_sha256,
+                "file_sha256": manifest.file_sha256,
+                "logical_location": manifest.logical_location,
+                "partition_manifest_id": manifest.partition_manifest_id,
+            }
+            for manifest in manifests
+        ]
+        inventory_canonical = json.dumps(
+            inventory_payload,
+            ensure_ascii=False,
+            sort_keys=True,
+            separators=(",", ":"),
+            allow_nan=False,
+        ).encode("utf-8")
+        committed_inventory_sha256 = _sha256(inventory_canonical)
+        orphan_partition_count = self._orphan_partition_count(manifests)
+        writer_lease_state = self._writer_lease_state()
+        projection_digest_sha256 = self._read_projection_digest()
+        cold_rebuild_possible = self._cold_rebuild_possible(manifests)
+        record_count = sum(manifest.row_count for manifest in manifests)
+        return StoreDiagnostics(
+            committed_inventory_sha256=committed_inventory_sha256,
+            orphan_partition_count=orphan_partition_count,
+            writer_lease_state=writer_lease_state,
+            projection_digest_sha256=projection_digest_sha256,
+            cold_rebuild_possible=cold_rebuild_possible,
+            partition_count=len(manifests),
+            record_count=record_count,
+        )
+
+    def _orphan_partition_count(
+        self,
+        manifests: Sequence[PartitionManifest],
+    ) -> int:
+        committed = {manifest.logical_location for manifest in manifests}
+        events_root = self._root / "research/events"
+        if not events_root.exists():
+            return 0
+        if events_root.is_symlink() or not events_root.is_dir():
+            raise ResearchStoreError("EVENTS_DIRECTORY_UNSAFE")
+        count = 0
+        for path in events_root.rglob("*.parquet"):
+            if path.is_symlink() or not path.is_file():
+                raise ResearchStoreError("ORPHAN_PARTITION_UNSAFE")
+            relative = path.relative_to(self._root).as_posix()
+            if relative not in committed:
+                count += 1
+        return count
+
+    def _writer_lease_state(self) -> str:
+        lock_path = self._root / "locks" / "research-writer.lock"
+        if not lock_path.exists():
+            return "FREE"
+        if lock_path.is_symlink() or not lock_path.is_file():
+            return "UNVERIFIABLE"
+        try:
+            lease = json.loads(lock_path.read_text(encoding="utf-8"))
+        except (OSError, json.JSONDecodeError):
+            return "UNVERIFIABLE"
+        if not isinstance(lease, dict):
+            return "UNVERIFIABLE"
+        expiry_raw = lease.get("expiry")
+        if not isinstance(expiry_raw, str):
+            return "HELD"
+        try:
+            expiry = datetime.fromisoformat(expiry_raw.replace("Z", "+00:00"))
+        except ValueError:
+            return "HELD"
+        if expiry.astimezone(UTC) <= datetime.now(UTC):
+            return "STALE"
+        return "HELD"
+
+    def _read_projection_digest(self) -> str | None:
+        projection_path = self._root / RESEARCH_PROJECTION_LOCATION
+        if not projection_path.is_file() or projection_path.is_symlink():
+            return None
+        connection: duckdb.DuckDBPyConnection | None = None
+        try:
+            connection = duckdb.connect(
+                str(projection_path),
+                read_only=True,
+                config={
+                    "enable_external_access": "false",
+                    "allow_unsigned_extensions": "false",
+                },
+            )
+            connection.execute("SET TimeZone = 'UTC'")
+            connection.execute("SET lock_configuration = true")
+            row = connection.execute(
+                """
+                SELECT projection_digest_sha256
+                FROM _projection_metadata
+                WHERE singleton = TRUE
+                """
+            ).fetchone()
+            if row is None:
+                return None
+            digest = row[0]
+            return str(digest) if isinstance(digest, str) else None
+        except duckdb.Error as exc:
+            raise ResearchStoreError("PROJECTION_QUERY_FAILED") from exc
+        finally:
+            if connection is not None:
+                connection.close()
+
+    def _cold_rebuild_possible(
+        self,
+        manifests: Sequence[PartitionManifest],
+    ) -> bool:
+        try:
+            for manifest in manifests:
+                self._verify_partition(manifest)
+        except ResearchStoreError:
+            return False
+        return True
+
 
 __all__ = [
     "CommitDisposition",
@@ -1409,4 +1540,5 @@ __all__ = [
     "ResearchStore",
     "ResearchStoreError",
     "RunPassport",
+    "StoreDiagnostics",
 ]

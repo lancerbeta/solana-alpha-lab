@@ -174,6 +174,13 @@ def _document_response(
     return payload
 
 
+def _event_time(spec: Mapping[str, Any]) -> datetime:
+    raw = spec.get("as_of") or spec.get("availability_cutoff")
+    if not isinstance(raw, str):
+        raise ExperimentRunnerError("EXPERIMENT_AS_OF_INVALID")
+    return datetime.fromisoformat(raw.replace("Z", "+00:00")).astimezone(UTC)
+
+
 class ExperimentRunner:
     def __init__(self, *, root: Path, store: OperationalStore) -> None:
         self.root = root
@@ -383,7 +390,7 @@ class ExperimentRunner:
         run_id = _run_id(lane.run_key_sha256)
         capability_id = str(spec["capability_id"])
         producer_git_sha = _git_head_sha(self.root)
-        now = datetime.now(tz=UTC)
+        now = _event_time(spec)
         transaction_id = f"RESEARCH-TXN-{uuid.uuid4().hex[:16].upper()}"
 
         if git_mutation_count:
@@ -513,6 +520,36 @@ class ExperimentRunner:
             )
 
         records: list[ResearchEvent] = [
+            _research_event(
+                record_id=f"HYPOTHESIS-VERSION-{transaction_id[-16:]}",
+                record_kind=RecordKind.HYPOTHESIS_VERSION,
+                entity_id=str(spec["hypothesis_version"]),
+                hypothesis_version_id=str(spec["hypothesis_version"]),
+                run_id=None,
+                transaction_id=transaction_id,
+                effective_at=now,
+                payload={
+                    "hypothesis_version_id": str(spec["hypothesis_version"]),
+                    "family_id": "HYP-FAMILY-FAST-LANE-001",
+                    "version_ordinal": 1,
+                    "origin_id": "HYP-ORIGIN-FAST-LANE-001",
+                    "origin_kind": "DATA_ANALYSIS",
+                    "research_cycle_id": "RESEARCH-CYCLE-FAST-LANE-001",
+                    "definition_sha256": run_context.hypothesis_definition_sha256,
+                    "statement": str(spec.get("question") or ""),
+                    "mechanism": str(spec.get("method") or ""),
+                    "falsifier": str(spec.get("falsifier") or ""),
+                    "expected_regime_terms": [],
+                    "what_changed": (
+                        str(spec["what_changed"][0])
+                        if isinstance(spec.get("what_changed"), list)
+                        and spec["what_changed"]
+                        else "FAST_LANE_RUN"
+                    ),
+                },
+                producer_capability_id=capability_id,
+                producer_git_sha=producer_git_sha,
+            ),
             _research_event(
                 record_id=f"RUN-STARTED-{transaction_id[-16:]}",
                 record_kind=RecordKind.RUN_STARTED,
