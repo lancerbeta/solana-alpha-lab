@@ -1664,26 +1664,26 @@ git commit -m "feat(factory): add hypothesis fast-lane operator CLI"
 - Consumes: accepted modules, schemas, tests, and query recipes.
 - Produces: static Catalog discovery and exact foundation completion evidence inside the task contract or the repository’s normal completion packet; no dynamic hypothesis/run Catalog entries.
 
-- [ ] **Step 1: Add only static Catalog assets and bounded query recipes**
+- [x] **Step 1: Add only static Catalog assets and bounded query recipes**
 
 Register the CLI, schemas, DDL, config, capability registry, tests, ADR, and task. Do not register runtime records.
 
-- [ ] **Step 2: Generate Catalog/navigation outputs**
+- [x] **Step 2: Generate Catalog/navigation outputs**
 
 Use the accepted generator. Never hand-edit generated files.
 
-- [ ] **Step 3: Run targeted complete behavior suite**
+- [x] **Step 3: Run targeted complete behavior suite**
 
 ~~~text
 uv run --locked --managed-python python -B -m unittest tests.test_fast_lane_classifier tests.test_research_store tests.test_research_projection tests.test_fast_lane_runner tests.test_fast_lane_cli tests.test_task16_hypothesis_research_memory_query tests.test_factory_v1_product_kernel tests.test_factory_v1_commissioning
 uv run --locked --managed-python python -B scripts/validate_catalog.py
 ~~~
 
-- [ ] **Step 4: Run existing repository-prescribed proportional validation**
+- [x] **Step 4: Run existing repository-prescribed proportional validation**
 
 Use Delivery Harness routing for the exact task. Do not change Harness to make the task pass.
 
-- [ ] **Step 5: Perform self-review**
+- [x] **Step 5: Perform self-review**
 
 Verify:
 

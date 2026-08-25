@@ -403,3 +403,111 @@ recipes:
   output_contract:
     format: json
     max_records: 50
+- recipe_id: QUERY-HYPOTHESIS-FAST-LANE-CLASSIFY-001
+  record_version: '1.0'
+  purpose: Classify a bounded Fast Lane submission packet without executing or mutating Git.
+  kind: local_command
+  read_only: true
+  bounded: true
+  network_required: false
+  write_effects: NONE
+  timeout_seconds: 30
+  command:
+  - uv
+  - run
+  - --locked
+  - --managed-python
+  - python
+  - -B
+  - scripts/hypothesis_fast_lane.py
+  - classify
+  - --packet
+  - '{packet_path}'
+  - --as-of
+  - '{as_of}'
+  parameters:
+  - name: packet_path
+    required: true
+    pattern: ^tests/fixtures/fast_lane/[^<>|?*"]+[.]json$
+  - name: as_of
+    required: true
+    pattern: '^20[0-9]{2}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}(?:[.][0-9]{1,6})?Z$'
+  target_asset_ids:
+  - SCRIPT-HYPOTHESIS-FAST-LANE-001
+  - MODULE-FACTORY-V1-LANE-CLASSIFIER-001
+  - CONFIG-HYPOTHESIS-FAST-LANE-V1-001
+  output_contract:
+    format: json
+    max_records: 1
+- recipe_id: QUERY-HYPOTHESIS-FAST-LANE-SHOW-RUN-001
+  record_version: '1.0'
+  purpose: Read one completed Fast Lane run passport from the rebuildable research projection.
+  kind: local_command
+  read_only: true
+  bounded: true
+  network_required: false
+  write_effects: NONE
+  timeout_seconds: 30
+  command:
+  - uv
+  - run
+  - --locked
+  - --managed-python
+  - python
+  - -B
+  - scripts/hypothesis_fast_lane.py
+  - show-run
+  - --run-id
+  - '{run_id}'
+  parameters:
+  - name: run_id
+    required: true
+    pattern: ^RUN-[0-9A-F]{24}$
+  target_asset_ids:
+  - SCRIPT-HYPOTHESIS-FAST-LANE-001
+  - MODULE-FACTORY-V1-RESEARCH-STORE-001
+  - SCHEMA-RESEARCH-MEMORY-PROJECTION-V1-001
+  output_contract:
+    format: json
+    max_records: 1
+- recipe_id: QUERY-HYPOTHESIS-FAST-LANE-SEARCH-PRIOR-WORK-001
+  record_version: '1.0'
+  purpose: Search bounded prior Fast Lane work from the DuckDB research projection at an explicit as-of cutoff.
+  kind: local_command
+  read_only: true
+  bounded: true
+  network_required: false
+  write_effects: NONE
+  timeout_seconds: 30
+  command:
+  - uv
+  - run
+  - --locked
+  - --managed-python
+  - python
+  - -B
+  - scripts/hypothesis_fast_lane.py
+  - search-prior-work
+  - --as-of
+  - '{as_of}'
+  - --max-results
+  - '{max_results}'
+  - --hypothesis-version-id
+  - '{hypothesis_version_id}'
+  parameters:
+  - name: as_of
+    required: true
+    pattern: '^20[0-9]{2}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}(?:[.][0-9]{1,6})?Z$'
+  - name: max_results
+    required: true
+    pattern: '^(?:[1-9]|[1-4][0-9]|50)$'
+  - name: hypothesis_version_id
+    required: true
+    pattern: ^HYP-[A-Z0-9]+(?:-[A-Z0-9]+)*-V[1-9][0-9]*$
+  target_asset_ids:
+  - SCRIPT-HYPOTHESIS-FAST-LANE-001
+  - MODULE-FACTORY-V1-PRIOR-WORK-001
+  - SCHEMA-RESEARCH-MEMORY-PROJECTION-V1-001
+  output_contract:
+    format: json
+    max_records: 50

@@ -3,6 +3,16 @@
   "catalog_id": "SMIAL-PROJECT-ASSET-CATALOG",
   "edges": [
     {
+      "source_asset_id": "ADR-006-HYPOTHESIS-FAST-LANE-001",
+      "relation": "depends_on",
+      "target_asset_id": "ARCH-INTENT-005"
+    },
+    {
+      "source_asset_id": "ADR-006-HYPOTHESIS-FAST-LANE-001",
+      "relation": "governed_by",
+      "target_asset_id": "ADR-MVP-STACK-002"
+    },
+    {
       "source_asset_id": "ADR-CATALOG-BASELINE-001",
       "relation": "governed_by",
       "target_asset_id": "CTRL-TASK-03-001"
@@ -563,6 +573,16 @@
       "target_asset_id": "CTRL-EARLY-VALUATION-LIQUIDITY-DIVERGENCE-CONFIRMATION-001"
     },
     {
+      "source_asset_id": "CONFIG-EXPERIMENT-CAPABILITY-REGISTRY-FAST-LANE-001",
+      "relation": "depends_on",
+      "target_asset_id": "SCHEMA-EXPERIMENT-CAPABILITY-DESCRIPTOR-V1-001"
+    },
+    {
+      "source_asset_id": "CONFIG-EXPERIMENT-CAPABILITY-REGISTRY-FAST-LANE-001",
+      "relation": "governed_by",
+      "target_asset_id": "CTRL-HYPOTHESIS-FAST-LANE-001"
+    },
+    {
       "source_asset_id": "CONFIG-EXPERIMENT-SPEC-FACTORY-V1-COMMISSIONING-001",
       "relation": "depends_on",
       "target_asset_id": "SCHEMA-EXPERIMENT-SPEC-001"
@@ -821,6 +841,11 @@
       "source_asset_id": "CONFIG-FRICTION-VETO-RULE-001",
       "relation": "governed_by",
       "target_asset_id": "CTRL-FRESH-OOS-BASELINE-VS-FRICTION-VETO-001"
+    },
+    {
+      "source_asset_id": "CONFIG-HYPOTHESIS-FAST-LANE-V1-001",
+      "relation": "governed_by",
+      "target_asset_id": "CTRL-HYPOTHESIS-FAST-LANE-001"
     },
     {
       "source_asset_id": "CONFIG-IN-SCOPE-POPULATION-AND-STATE-DISCOVERY-001",
@@ -2711,6 +2736,36 @@
       "source_asset_id": "CTRL-HANDOFF-PROTOCOL-001",
       "relation": "governed_by",
       "target_asset_id": "CTRL-TASK-04-001"
+    },
+    {
+      "source_asset_id": "CTRL-HYPOTHESIS-FAST-LANE-001",
+      "relation": "depends_on",
+      "target_asset_id": "ADR-MVP-STACK-002"
+    },
+    {
+      "source_asset_id": "CTRL-HYPOTHESIS-FAST-LANE-001",
+      "relation": "depends_on",
+      "target_asset_id": "CONFIG-HYPOTHESIS-FAST-LANE-V1-001"
+    },
+    {
+      "source_asset_id": "CTRL-HYPOTHESIS-FAST-LANE-001",
+      "relation": "depends_on",
+      "target_asset_id": "SCRIPT-HYPOTHESIS-FAST-LANE-001"
+    },
+    {
+      "source_asset_id": "CTRL-HYPOTHESIS-FAST-LANE-001",
+      "relation": "evidenced_by",
+      "target_asset_id": "EVIDENCE-HYPOTHESIS-FAST-LANE-DELIVERY-COMPLETION-001"
+    },
+    {
+      "source_asset_id": "CTRL-HYPOTHESIS-FAST-LANE-001",
+      "relation": "governed_by",
+      "target_asset_id": "ADR-006-HYPOTHESIS-FAST-LANE-001"
+    },
+    {
+      "source_asset_id": "CTRL-HYPOTHESIS-FAST-LANE-001",
+      "relation": "validated_by",
+      "target_asset_id": "TEST-HYPOTHESIS-FAST-LANE-ACCEPTANCE-001"
     },
     {
       "source_asset_id": "CTRL-IN-SCOPE-POPULATION-AND-STATE-DISCOVERY-001",
@@ -4716,6 +4771,36 @@
       "source_asset_id": "EVIDENCE-FRESH-OOS-FRICTION-VETO-RUNTIME-001",
       "relation": "derived_from",
       "target_asset_id": "CTRL-FRESH-OOS-BASELINE-VS-FRICTION-VETO-001"
+    },
+    {
+      "source_asset_id": "EVIDENCE-HYPOTHESIS-FAST-LANE-DELIVERY-COMPLETION-001",
+      "relation": "depends_on",
+      "target_asset_id": "EVIDENCE-HYPOTHESIS-FAST-LANE-DELIVERY-FACTORY-FIT-001"
+    },
+    {
+      "source_asset_id": "EVIDENCE-HYPOTHESIS-FAST-LANE-DELIVERY-COMPLETION-001",
+      "relation": "depends_on",
+      "target_asset_id": "EVIDENCE-HYPOTHESIS-FAST-LANE-DELIVERY-INDEPENDENT-REVIEW-001"
+    },
+    {
+      "source_asset_id": "EVIDENCE-HYPOTHESIS-FAST-LANE-DELIVERY-COMPLETION-001",
+      "relation": "derived_from",
+      "target_asset_id": "CTRL-HYPOTHESIS-FAST-LANE-001"
+    },
+    {
+      "source_asset_id": "EVIDENCE-HYPOTHESIS-FAST-LANE-DELIVERY-FACTORY-FIT-001",
+      "relation": "depends_on",
+      "target_asset_id": "EVIDENCE-HYPOTHESIS-FAST-LANE-DELIVERY-INDEPENDENT-REVIEW-001"
+    },
+    {
+      "source_asset_id": "EVIDENCE-HYPOTHESIS-FAST-LANE-DELIVERY-FACTORY-FIT-001",
+      "relation": "derived_from",
+      "target_asset_id": "CTRL-HYPOTHESIS-FAST-LANE-001"
+    },
+    {
+      "source_asset_id": "EVIDENCE-HYPOTHESIS-FAST-LANE-DELIVERY-INDEPENDENT-REVIEW-001",
+      "relation": "derived_from",
+      "target_asset_id": "CTRL-HYPOTHESIS-FAST-LANE-001"
     },
     {
       "source_asset_id": "EVIDENCE-IN-SCOPE-POPULATION-AND-STATE-DISCOVERY-ACCEPTANCE-001",
@@ -7963,6 +8048,11 @@
       "target_asset_id": "TEST-CATALOG-CANONICAL-BINDING-DISCOVERY-001"
     },
     {
+      "source_asset_id": "FIXTURE-HYPOTHESIS-FAST-LANE-OFFLINE-001",
+      "relation": "governed_by",
+      "target_asset_id": "CTRL-HYPOTHESIS-FAST-LANE-001"
+    },
+    {
       "source_asset_id": "FIXTURE-OWNER-AUTHORITY-PACKET-001",
       "relation": "derived_from",
       "target_asset_id": "CONFIG-OWNER-AUTHORITY-PACKET-001"
@@ -8888,6 +8978,11 @@
       "target_asset_id": "CTRL-FACTORY-V1-OWNER-COCKPIT-001"
     },
     {
+      "source_asset_id": "MODULE-FACTORY-V1-DATA-RESOLVER-001",
+      "relation": "governed_by",
+      "target_asset_id": "CTRL-HYPOTHESIS-FAST-LANE-001"
+    },
+    {
       "source_asset_id": "MODULE-FACTORY-V1-EXPERIMENT-SPEC-001",
       "relation": "depends_on",
       "target_asset_id": "SCHEMA-EXPERIMENT-SPEC-001"
@@ -8896,6 +8991,26 @@
       "source_asset_id": "MODULE-FACTORY-V1-FRICTION-VETO-001",
       "relation": "governed_by",
       "target_asset_id": "CTRL-FRESH-OOS-BASELINE-VS-FRICTION-VETO-001"
+    },
+    {
+      "source_asset_id": "MODULE-FACTORY-V1-LANE-CLASSIFIER-001",
+      "relation": "depends_on",
+      "target_asset_id": "CONFIG-EXPERIMENT-CAPABILITY-REGISTRY-FAST-LANE-001"
+    },
+    {
+      "source_asset_id": "MODULE-FACTORY-V1-LANE-CLASSIFIER-001",
+      "relation": "depends_on",
+      "target_asset_id": "MODULE-FACTORY-V1-DATA-RESOLVER-001"
+    },
+    {
+      "source_asset_id": "MODULE-FACTORY-V1-LANE-CLASSIFIER-001",
+      "relation": "depends_on",
+      "target_asset_id": "MODULE-FACTORY-V1-RUN-PASSPORT-001"
+    },
+    {
+      "source_asset_id": "MODULE-FACTORY-V1-LANE-CLASSIFIER-001",
+      "relation": "governed_by",
+      "target_asset_id": "CTRL-HYPOTHESIS-FAST-LANE-001"
     },
     {
       "source_asset_id": "MODULE-FACTORY-V1-MARKET-FEATURE-SURFACE-001",
@@ -8933,6 +9048,21 @@
       "target_asset_id": "CTRL-PRIOR-GIT-T0-FRICTION-SCREEN-001"
     },
     {
+      "source_asset_id": "MODULE-FACTORY-V1-PRIOR-WORK-001",
+      "relation": "depends_on",
+      "target_asset_id": "CONTRACT-T16-HYPOTHESIS-LIFECYCLE-RESEARCH-MEMORY-001"
+    },
+    {
+      "source_asset_id": "MODULE-FACTORY-V1-PRIOR-WORK-001",
+      "relation": "depends_on",
+      "target_asset_id": "SCHEMA-RESEARCH-MEMORY-PROJECTION-V1-001"
+    },
+    {
+      "source_asset_id": "MODULE-FACTORY-V1-PRIOR-WORK-001",
+      "relation": "governed_by",
+      "target_asset_id": "CTRL-HYPOTHESIS-FAST-LANE-001"
+    },
+    {
       "source_asset_id": "MODULE-FACTORY-V1-QUOTE-SURFACE-RETENTION-001",
       "relation": "governed_by",
       "target_asset_id": "CTRL-QUOTE-SURFACE-RETENTION-FALSIFIER-001"
@@ -8941,6 +9071,31 @@
       "source_asset_id": "MODULE-FACTORY-V1-READ-MODEL-001",
       "relation": "depends_on",
       "target_asset_id": "MODULE-FACTORY-V1-OPS-STORE-001"
+    },
+    {
+      "source_asset_id": "MODULE-FACTORY-V1-RESEARCH-STORE-001",
+      "relation": "depends_on",
+      "target_asset_id": "SCHEMA-RESEARCH-EVENT-ENVELOPE-V1-001"
+    },
+    {
+      "source_asset_id": "MODULE-FACTORY-V1-RESEARCH-STORE-001",
+      "relation": "depends_on",
+      "target_asset_id": "SCHEMA-RESEARCH-MEMORY-PROJECTION-V1-001"
+    },
+    {
+      "source_asset_id": "MODULE-FACTORY-V1-RESEARCH-STORE-001",
+      "relation": "governed_by",
+      "target_asset_id": "CTRL-HYPOTHESIS-FAST-LANE-001"
+    },
+    {
+      "source_asset_id": "MODULE-FACTORY-V1-RUN-PASSPORT-001",
+      "relation": "depends_on",
+      "target_asset_id": "SCHEMA-RUN-PASSPORT-V1-001"
+    },
+    {
+      "source_asset_id": "MODULE-FACTORY-V1-RUN-PASSPORT-001",
+      "relation": "governed_by",
+      "target_asset_id": "CTRL-HYPOTHESIS-FAST-LANE-001"
     },
     {
       "source_asset_id": "MODULE-FACTORY-V1-RUNNER-001",
@@ -11173,9 +11328,24 @@
       "target_asset_id": "TEST-DELIVERY-HARNESS-001"
     },
     {
+      "source_asset_id": "SCHEMA-EXPERIMENT-CAPABILITY-DESCRIPTOR-V1-001",
+      "relation": "governed_by",
+      "target_asset_id": "CTRL-HYPOTHESIS-FAST-LANE-001"
+    },
+    {
       "source_asset_id": "SCHEMA-EXPERIMENT-SPEC-001",
       "relation": "governed_by",
       "target_asset_id": "CTRL-FACTORY-V1-PRODUCT-KERNEL-001"
+    },
+    {
+      "source_asset_id": "SCHEMA-EXPERIMENT-SPEC-V1-1-001",
+      "relation": "depends_on",
+      "target_asset_id": "SCHEMA-EXPERIMENT-SPEC-001"
+    },
+    {
+      "source_asset_id": "SCHEMA-EXPERIMENT-SPEC-V1-1-001",
+      "relation": "governed_by",
+      "target_asset_id": "CTRL-HYPOTHESIS-FAST-LANE-001"
     },
     {
       "source_asset_id": "SCHEMA-FACTORY-REMOTE-OPERATIONS-001",
@@ -11286,6 +11456,31 @@
       "source_asset_id": "SCHEMA-PROVIDER-ROUTE-CAPABILITY-REGISTRY-010",
       "relation": "governed_by",
       "target_asset_id": "CONFIG-PROVIDER-ROUTE-CAPABILITY-REGISTRY-010"
+    },
+    {
+      "source_asset_id": "SCHEMA-RESEARCH-EVENT-ENVELOPE-V1-001",
+      "relation": "depends_on",
+      "target_asset_id": "CONTRACT-T06-RAW-PARQUET-001"
+    },
+    {
+      "source_asset_id": "SCHEMA-RESEARCH-EVENT-ENVELOPE-V1-001",
+      "relation": "governed_by",
+      "target_asset_id": "CTRL-HYPOTHESIS-FAST-LANE-001"
+    },
+    {
+      "source_asset_id": "SCHEMA-RESEARCH-MEMORY-PROJECTION-V1-001",
+      "relation": "depends_on",
+      "target_asset_id": "SCHEMA-RESEARCH-EVENT-ENVELOPE-V1-001"
+    },
+    {
+      "source_asset_id": "SCHEMA-RESEARCH-MEMORY-PROJECTION-V1-001",
+      "relation": "governed_by",
+      "target_asset_id": "CTRL-HYPOTHESIS-FAST-LANE-001"
+    },
+    {
+      "source_asset_id": "SCHEMA-RUN-PASSPORT-V1-001",
+      "relation": "governed_by",
+      "target_asset_id": "CTRL-HYPOTHESIS-FAST-LANE-001"
     },
     {
       "source_asset_id": "SCHEMA-STRATEGY-VERSION-001",
@@ -11921,6 +12116,26 @@
       "source_asset_id": "SCRIPT-FACTORY-V1-WORKBENCH-001",
       "relation": "depends_on",
       "target_asset_id": "MODULE-FACTORY-V1-WORKBENCH-001"
+    },
+    {
+      "source_asset_id": "SCRIPT-HYPOTHESIS-FAST-LANE-001",
+      "relation": "depends_on",
+      "target_asset_id": "MODULE-FACTORY-V1-LANE-CLASSIFIER-001"
+    },
+    {
+      "source_asset_id": "SCRIPT-HYPOTHESIS-FAST-LANE-001",
+      "relation": "depends_on",
+      "target_asset_id": "MODULE-FACTORY-V1-RESEARCH-STORE-001"
+    },
+    {
+      "source_asset_id": "SCRIPT-HYPOTHESIS-FAST-LANE-001",
+      "relation": "depends_on",
+      "target_asset_id": "MODULE-FACTORY-V1-RUNNER-001"
+    },
+    {
+      "source_asset_id": "SCRIPT-HYPOTHESIS-FAST-LANE-001",
+      "relation": "governed_by",
+      "target_asset_id": "CTRL-HYPOTHESIS-FAST-LANE-001"
     },
     {
       "source_asset_id": "SCRIPT-IN-SCOPE-POPULATION-FIT-RECONCILIATION-001",
@@ -12931,6 +13146,86 @@
       "source_asset_id": "TEST-FRESH-OOS-BASELINE-VS-FRICTION-VETO-001",
       "relation": "depends_on",
       "target_asset_id": "MODULE-FACTORY-V1-FRICTION-VETO-001"
+    },
+    {
+      "source_asset_id": "TEST-HYPOTHESIS-FAST-LANE-ACCEPTANCE-001",
+      "relation": "depends_on",
+      "target_asset_id": "TEST-HYPOTHESIS-FAST-LANE-CLASSIFIER-001"
+    },
+    {
+      "source_asset_id": "TEST-HYPOTHESIS-FAST-LANE-ACCEPTANCE-001",
+      "relation": "depends_on",
+      "target_asset_id": "TEST-HYPOTHESIS-FAST-LANE-CLI-001"
+    },
+    {
+      "source_asset_id": "TEST-HYPOTHESIS-FAST-LANE-ACCEPTANCE-001",
+      "relation": "depends_on",
+      "target_asset_id": "TEST-HYPOTHESIS-FAST-LANE-PROJECTION-001"
+    },
+    {
+      "source_asset_id": "TEST-HYPOTHESIS-FAST-LANE-ACCEPTANCE-001",
+      "relation": "depends_on",
+      "target_asset_id": "TEST-HYPOTHESIS-FAST-LANE-RUNNER-001"
+    },
+    {
+      "source_asset_id": "TEST-HYPOTHESIS-FAST-LANE-ACCEPTANCE-001",
+      "relation": "depends_on",
+      "target_asset_id": "TEST-HYPOTHESIS-FAST-LANE-STORE-001"
+    },
+    {
+      "source_asset_id": "TEST-HYPOTHESIS-FAST-LANE-ACCEPTANCE-001",
+      "relation": "governed_by",
+      "target_asset_id": "CTRL-HYPOTHESIS-FAST-LANE-001"
+    },
+    {
+      "source_asset_id": "TEST-HYPOTHESIS-FAST-LANE-CLASSIFIER-001",
+      "relation": "depends_on",
+      "target_asset_id": "MODULE-FACTORY-V1-LANE-CLASSIFIER-001"
+    },
+    {
+      "source_asset_id": "TEST-HYPOTHESIS-FAST-LANE-CLASSIFIER-001",
+      "relation": "governed_by",
+      "target_asset_id": "CTRL-HYPOTHESIS-FAST-LANE-001"
+    },
+    {
+      "source_asset_id": "TEST-HYPOTHESIS-FAST-LANE-CLI-001",
+      "relation": "depends_on",
+      "target_asset_id": "SCRIPT-HYPOTHESIS-FAST-LANE-001"
+    },
+    {
+      "source_asset_id": "TEST-HYPOTHESIS-FAST-LANE-CLI-001",
+      "relation": "governed_by",
+      "target_asset_id": "CTRL-HYPOTHESIS-FAST-LANE-001"
+    },
+    {
+      "source_asset_id": "TEST-HYPOTHESIS-FAST-LANE-PROJECTION-001",
+      "relation": "depends_on",
+      "target_asset_id": "MODULE-FACTORY-V1-RESEARCH-STORE-001"
+    },
+    {
+      "source_asset_id": "TEST-HYPOTHESIS-FAST-LANE-PROJECTION-001",
+      "relation": "governed_by",
+      "target_asset_id": "CTRL-HYPOTHESIS-FAST-LANE-001"
+    },
+    {
+      "source_asset_id": "TEST-HYPOTHESIS-FAST-LANE-RUNNER-001",
+      "relation": "depends_on",
+      "target_asset_id": "MODULE-FACTORY-V1-RUNNER-001"
+    },
+    {
+      "source_asset_id": "TEST-HYPOTHESIS-FAST-LANE-RUNNER-001",
+      "relation": "governed_by",
+      "target_asset_id": "CTRL-HYPOTHESIS-FAST-LANE-001"
+    },
+    {
+      "source_asset_id": "TEST-HYPOTHESIS-FAST-LANE-STORE-001",
+      "relation": "depends_on",
+      "target_asset_id": "MODULE-FACTORY-V1-RESEARCH-STORE-001"
+    },
+    {
+      "source_asset_id": "TEST-HYPOTHESIS-FAST-LANE-STORE-001",
+      "relation": "governed_by",
+      "target_asset_id": "CTRL-HYPOTHESIS-FAST-LANE-001"
     },
     {
       "source_asset_id": "TEST-IN-SCOPE-POPULATION-FIT-RECONCILIATION-001",

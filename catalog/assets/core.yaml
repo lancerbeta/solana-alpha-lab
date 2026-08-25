@@ -31765,3 +31765,465 @@ records:
   evidence: []
   search_terms: [KCDN, COMPLETION, DELIVERY_CONTEXT]
   classification: {contains_secrets: false, contains_raw_data: false, sensitivity: INTERNAL_NON_SECRET}
+
+# FAST_LANE_FOUNDATION_V1
+
+- asset_id: CTRL-HYPOTHESIS-FAST-LANE-001
+  record_version: '1.0'
+  asset_type: control_document
+  purpose: Exact contract for the governed hypothesis Fast Lane and research data-plane foundation.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-08-25'
+  truth_owner: HYPOTHESIS_FAST_LANE_AND_RESEARCH_DATA_PLANE_V1
+  location: {kind: git_path, logical_uri: 'repo://docs/tasks/HYPOTHESIS_FAST_LANE_AND_RESEARCH_DATA_PLANE_V1.md', repository_path: docs/tasks/HYPOTHESIS_FAST_LANE_AND_RESEARCH_DATA_PLANE_V1.md}
+  integrity: {kind: sha256, sha256: 461029dbaa249fa4571d8230a586834ff75909dc560b0fe619212de5f91cac92}
+  access: {mode: read_only, method: file, network_required: false, secrets_required: false}
+  relations:
+  - {relation_type: governed_by, target_asset_id: ADR-006-HYPOTHESIS-FAST-LANE-001}
+  - {relation_type: depends_on, target_asset_id: ADR-MVP-STACK-002}
+  - {relation_type: depends_on, target_asset_id: CONFIG-HYPOTHESIS-FAST-LANE-V1-001}
+  - {relation_type: depends_on, target_asset_id: SCRIPT-HYPOTHESIS-FAST-LANE-001}
+  - {relation_type: validated_by, target_asset_id: TEST-HYPOTHESIS-FAST-LANE-ACCEPTANCE-001}
+  - {relation_type: evidenced_by, target_asset_id: EVIDENCE-HYPOTHESIS-FAST-LANE-DELIVERY-COMPLETION-001}
+  consumers: [FACTORY-001, GOAL-OWNER]
+  evidence: []
+  search_terms: [HYPOTHESIS_FAST_LANE, FACTORY_V1]
+  classification: {contains_secrets: false, contains_raw_data: false, sensitivity: INTERNAL_NON_SECRET}
+- asset_id: ADR-006-HYPOTHESIS-FAST-LANE-001
+  record_version: '1.0'
+  asset_type: decision
+  purpose: Accepted three-plane Fast Lane architecture with no-Git write fence and frozen TWO_RUNG boundary.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-08-25'
+  truth_owner: HYPOTHESIS_FAST_LANE_AND_RESEARCH_DATA_PLANE_V1
+  location: {kind: git_path, logical_uri: 'repo://docs/decisions/ADR-006-hypothesis-fast-lane-research-data-plane.md', repository_path: docs/decisions/ADR-006-hypothesis-fast-lane-research-data-plane.md}
+  integrity: {kind: sha256, sha256: 51e4406686cd599349950614cafa2e6200440f5205ff67b21aaa4906389cc21e}
+  access: {mode: read_only, method: file, network_required: false, secrets_required: false}
+  relations:
+  - {relation_type: governed_by, target_asset_id: ADR-MVP-STACK-002}
+  - {relation_type: depends_on, target_asset_id: ARCH-INTENT-005}
+  consumers: [FACTORY-001, GOAL-OWNER]
+  evidence: []
+  search_terms: [HYPOTHESIS_FAST_LANE, FACTORY_V1]
+  classification: {contains_secrets: false, contains_raw_data: false, sensitivity: INTERNAL_NON_SECRET}
+- asset_id: SCHEMA-EXPERIMENT-SPEC-V1-1-001
+  record_version: '1.0'
+  asset_type: schema
+  purpose: ExperimentSpec v1.1 schema for stable data, query, capability and time bindings.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-08-25'
+  truth_owner: HYPOTHESIS_FAST_LANE_AND_RESEARCH_DATA_PLANE_V1
+  location: {kind: git_path, logical_uri: 'repo://catalog/schemas/experiment_spec_v1_1.schema.json', repository_path: catalog/schemas/experiment_spec_v1_1.schema.json}
+  integrity: {kind: sha256, sha256: 7ba24a5109b539469bdfd0d1d74d88171cffaed03e5819fae3e3b9346d9e2ccd}
+  access: {mode: read_only, method: file, network_required: false, secrets_required: false}
+  relations:
+  - {relation_type: governed_by, target_asset_id: CTRL-HYPOTHESIS-FAST-LANE-001}
+  - {relation_type: depends_on, target_asset_id: SCHEMA-EXPERIMENT-SPEC-001}
+  consumers: [FACTORY-001, GOAL-OWNER]
+  evidence: []
+  search_terms: [HYPOTHESIS_FAST_LANE, FACTORY_V1]
+  classification: {contains_secrets: false, contains_raw_data: false, sensitivity: INTERNAL_NON_SECRET}
+- asset_id: SCHEMA-EXPERIMENT-CAPABILITY-DESCRIPTOR-V1-001
+  record_version: '1.0'
+  asset_type: schema
+  purpose: Closed capability descriptor schema for Fast Lane classification and execution gates.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-08-25'
+  truth_owner: HYPOTHESIS_FAST_LANE_AND_RESEARCH_DATA_PLANE_V1
+  location: {kind: git_path, logical_uri: 'repo://catalog/schemas/experiment_capability_descriptor.schema.json', repository_path: catalog/schemas/experiment_capability_descriptor.schema.json}
+  integrity: {kind: sha256, sha256: f50f23cfdc279169999bb70d7196ca8a4727083b47baf41e10247a36242baed8}
+  access: {mode: read_only, method: file, network_required: false, secrets_required: false}
+  relations:
+  - {relation_type: governed_by, target_asset_id: CTRL-HYPOTHESIS-FAST-LANE-001}
+  consumers: [FACTORY-001, GOAL-OWNER]
+  evidence: []
+  search_terms: [HYPOTHESIS_FAST_LANE, FACTORY_V1]
+  classification: {contains_secrets: false, contains_raw_data: false, sensitivity: INTERNAL_NON_SECRET}
+- asset_id: SCHEMA-RESEARCH-EVENT-ENVELOPE-V1-001
+  record_version: '1.0'
+  asset_type: schema
+  purpose: Immutable research event envelope schema for append-only Parquet records.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-08-25'
+  truth_owner: HYPOTHESIS_FAST_LANE_AND_RESEARCH_DATA_PLANE_V1
+  location: {kind: git_path, logical_uri: 'repo://catalog/schemas/research_event_envelope.schema.json', repository_path: catalog/schemas/research_event_envelope.schema.json}
+  integrity: {kind: sha256, sha256: 6126305e8a8f490a45bf8e3a324a9ea3a9701380f5705ba9e6ee20ef7e7dfcb9}
+  access: {mode: read_only, method: file, network_required: false, secrets_required: false}
+  relations:
+  - {relation_type: governed_by, target_asset_id: CTRL-HYPOTHESIS-FAST-LANE-001}
+  - {relation_type: depends_on, target_asset_id: CONTRACT-T06-RAW-PARQUET-001}
+  consumers: [FACTORY-001, GOAL-OWNER]
+  evidence: []
+  search_terms: [HYPOTHESIS_FAST_LANE, FACTORY_V1]
+  classification: {contains_secrets: false, contains_raw_data: false, sensitivity: INTERNAL_NON_SECRET}
+- asset_id: SCHEMA-RUN-PASSPORT-V1-001
+  record_version: '1.0'
+  asset_type: schema
+  purpose: Run passport schema binding completed Fast Lane runs to durable research evidence.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-08-25'
+  truth_owner: HYPOTHESIS_FAST_LANE_AND_RESEARCH_DATA_PLANE_V1
+  location: {kind: git_path, logical_uri: 'repo://catalog/schemas/run_passport.schema.json', repository_path: catalog/schemas/run_passport.schema.json}
+  integrity: {kind: sha256, sha256: 84cbb725d33cf6a1d424b2d428fd219ff84e65c4c04f6eb07b7739f23744cbbc}
+  access: {mode: read_only, method: file, network_required: false, secrets_required: false}
+  relations:
+  - {relation_type: governed_by, target_asset_id: CTRL-HYPOTHESIS-FAST-LANE-001}
+  consumers: [FACTORY-001, GOAL-OWNER]
+  evidence: []
+  search_terms: [HYPOTHESIS_FAST_LANE, FACTORY_V1]
+  classification: {contains_secrets: false, contains_raw_data: false, sensitivity: INTERNAL_NON_SECRET}
+- asset_id: SCHEMA-RESEARCH-MEMORY-PROJECTION-V1-001
+  record_version: '1.0'
+  asset_type: schema
+  purpose: DuckDB projection DDL for rebuildable prior-work and run lookup views.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-08-25'
+  truth_owner: HYPOTHESIS_FAST_LANE_AND_RESEARCH_DATA_PLANE_V1
+  location: {kind: git_path, logical_uri: 'repo://schemas/research_memory_projection_v1.sql', repository_path: schemas/research_memory_projection_v1.sql}
+  integrity: {kind: sha256, sha256: b044f9e5e91d7e76ba51e49681f851c2ec70e528510aa8fdb7342bb2ebb19e67}
+  access: {mode: read_only, method: file, network_required: false, secrets_required: false}
+  relations:
+  - {relation_type: governed_by, target_asset_id: CTRL-HYPOTHESIS-FAST-LANE-001}
+  - {relation_type: depends_on, target_asset_id: SCHEMA-RESEARCH-EVENT-ENVELOPE-V1-001}
+  consumers: [FACTORY-001, GOAL-OWNER]
+  evidence: []
+  search_terms: [HYPOTHESIS_FAST_LANE, FACTORY_V1]
+  classification: {contains_secrets: false, contains_raw_data: false, sensitivity: INTERNAL_NON_SECRET}
+- asset_id: CONFIG-HYPOTHESIS-FAST-LANE-V1-001
+  record_version: '1.0'
+  asset_type: configuration
+  purpose: Foundation config for data-root layout, writer lease policy and frozen TWO_RUNG boundary.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-08-25'
+  truth_owner: HYPOTHESIS_FAST_LANE_AND_RESEARCH_DATA_PLANE_V1
+  location: {kind: git_path, logical_uri: 'repo://configs/hypothesis_fast_lane_v1.yaml', repository_path: configs/hypothesis_fast_lane_v1.yaml}
+  integrity: {kind: sha256, sha256: dd58be68e22e386e65d8bb84bf3fa1e958469d9f4195454eace9469bb480557d}
+  access: {mode: read_only, method: file, network_required: false, secrets_required: false}
+  relations:
+  - {relation_type: governed_by, target_asset_id: CTRL-HYPOTHESIS-FAST-LANE-001}
+  consumers: [FACTORY-001, GOAL-OWNER]
+  evidence: []
+  search_terms: [HYPOTHESIS_FAST_LANE, FACTORY_V1]
+  classification: {contains_secrets: false, contains_raw_data: false, sensitivity: INTERNAL_NON_SECRET}
+- asset_id: CONFIG-EXPERIMENT-CAPABILITY-REGISTRY-FAST-LANE-001
+  record_version: '1.0'
+  asset_type: configuration
+  purpose: Accepted Fast Lane capability registry with output zones and provider authority classes.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-08-25'
+  truth_owner: HYPOTHESIS_FAST_LANE_AND_RESEARCH_DATA_PLANE_V1
+  location: {kind: git_path, logical_uri: 'repo://configs/experiment_capability_registry_v1.yaml', repository_path: configs/experiment_capability_registry_v1.yaml}
+  integrity: {kind: sha256, sha256: cb1198af6393b7d3e6c92b3f6836851fdb8ef76e0194bb519be0eff470d429a1}
+  access: {mode: read_only, method: file, network_required: false, secrets_required: false}
+  relations:
+  - {relation_type: governed_by, target_asset_id: CTRL-HYPOTHESIS-FAST-LANE-001}
+  - {relation_type: depends_on, target_asset_id: SCHEMA-EXPERIMENT-CAPABILITY-DESCRIPTOR-V1-001}
+  consumers: [FACTORY-001, GOAL-OWNER]
+  evidence: []
+  search_terms: [HYPOTHESIS_FAST_LANE, FACTORY_V1]
+  classification: {contains_secrets: false, contains_raw_data: false, sensitivity: INTERNAL_NON_SECRET}
+- asset_id: MODULE-FACTORY-V1-LANE-CLASSIFIER-001
+  record_version: '1.0'
+  asset_type: script
+  purpose: Deterministic Fast Lane classifier with precedence, duplicate detection and owner gates.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-08-25'
+  truth_owner: HYPOTHESIS_FAST_LANE_AND_RESEARCH_DATA_PLANE_V1
+  location: {kind: git_path, logical_uri: 'repo://src/solana_alpha_lab/factory/lane_classifier.py', repository_path: src/solana_alpha_lab/factory/lane_classifier.py}
+  integrity: {kind: sha256, sha256: 5caee743f7132127f3f5e15f867812b3f271cd32faa225939bb2b7e640ce1b14}
+  access: {mode: read_only, method: file, network_required: false, secrets_required: false}
+  relations:
+  - {relation_type: governed_by, target_asset_id: CTRL-HYPOTHESIS-FAST-LANE-001}
+  - {relation_type: depends_on, target_asset_id: CONFIG-EXPERIMENT-CAPABILITY-REGISTRY-FAST-LANE-001}
+  - {relation_type: depends_on, target_asset_id: MODULE-FACTORY-V1-DATA-RESOLVER-001}
+  - {relation_type: depends_on, target_asset_id: MODULE-FACTORY-V1-RUN-PASSPORT-001}
+  consumers: [FACTORY-001, GOAL-OWNER]
+  evidence: []
+  search_terms: [HYPOTHESIS_FAST_LANE, FACTORY_V1]
+  classification: {contains_secrets: false, contains_raw_data: false, sensitivity: INTERNAL_NON_SECRET}
+- asset_id: MODULE-FACTORY-V1-DATA-RESOLVER-001
+  record_version: '1.0'
+  asset_type: script
+  purpose: Stable-ID evidence resolver for catalog assets and dataset manifests.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-08-25'
+  truth_owner: HYPOTHESIS_FAST_LANE_AND_RESEARCH_DATA_PLANE_V1
+  location: {kind: git_path, logical_uri: 'repo://src/solana_alpha_lab/factory/data_resolver.py', repository_path: src/solana_alpha_lab/factory/data_resolver.py}
+  integrity: {kind: sha256, sha256: 22b551e65924113595f0170158e0a13dbb919c6358f17cf72c92087e6e113b19}
+  access: {mode: read_only, method: file, network_required: false, secrets_required: false}
+  relations:
+  - {relation_type: governed_by, target_asset_id: CTRL-HYPOTHESIS-FAST-LANE-001}
+  consumers: [FACTORY-001, GOAL-OWNER]
+  evidence: []
+  search_terms: [HYPOTHESIS_FAST_LANE, FACTORY_V1]
+  classification: {contains_secrets: false, contains_raw_data: false, sensitivity: INTERNAL_NON_SECRET}
+- asset_id: MODULE-FACTORY-V1-RESEARCH-STORE-001
+  record_version: '1.0'
+  asset_type: script
+  purpose: Immutable manifest-last research event store with writer lease and projection rebuild.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-08-25'
+  truth_owner: HYPOTHESIS_FAST_LANE_AND_RESEARCH_DATA_PLANE_V1
+  location: {kind: git_path, logical_uri: 'repo://src/solana_alpha_lab/factory/research_store.py', repository_path: src/solana_alpha_lab/factory/research_store.py}
+  integrity: {kind: sha256, sha256: dae727d1f496f205a07de765a1fc303913da1b1fa2d72a22979a3110dc2086fe}
+  access: {mode: read_only, method: file, network_required: false, secrets_required: false}
+  relations:
+  - {relation_type: governed_by, target_asset_id: CTRL-HYPOTHESIS-FAST-LANE-001}
+  - {relation_type: depends_on, target_asset_id: SCHEMA-RESEARCH-EVENT-ENVELOPE-V1-001}
+  - {relation_type: depends_on, target_asset_id: SCHEMA-RESEARCH-MEMORY-PROJECTION-V1-001}
+  consumers: [FACTORY-001, GOAL-OWNER]
+  evidence: []
+  search_terms: [HYPOTHESIS_FAST_LANE, FACTORY_V1]
+  classification: {contains_secrets: false, contains_raw_data: false, sensitivity: INTERNAL_NON_SECRET}
+- asset_id: MODULE-FACTORY-V1-RUN-PASSPORT-001
+  record_version: '1.0'
+  asset_type: script
+  purpose: Run key and passport validation for completed Fast Lane runs.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-08-25'
+  truth_owner: HYPOTHESIS_FAST_LANE_AND_RESEARCH_DATA_PLANE_V1
+  location: {kind: git_path, logical_uri: 'repo://src/solana_alpha_lab/factory/run_passport.py', repository_path: src/solana_alpha_lab/factory/run_passport.py}
+  integrity: {kind: sha256, sha256: 7b6dfbb038acdc20e23aef01d786548bddc38b613ec6c5a86a4080856040f36c}
+  access: {mode: read_only, method: file, network_required: false, secrets_required: false}
+  relations:
+  - {relation_type: governed_by, target_asset_id: CTRL-HYPOTHESIS-FAST-LANE-001}
+  - {relation_type: depends_on, target_asset_id: SCHEMA-RUN-PASSPORT-V1-001}
+  consumers: [FACTORY-001, GOAL-OWNER]
+  evidence: []
+  search_terms: [HYPOTHESIS_FAST_LANE, FACTORY_V1]
+  classification: {contains_secrets: false, contains_raw_data: false, sensitivity: INTERNAL_NON_SECRET}
+- asset_id: MODULE-FACTORY-V1-PRIOR-WORK-001
+  record_version: '1.0'
+  asset_type: script
+  purpose: Deterministic prior-work scoring and DuckDB adapters for research memory search.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-08-25'
+  truth_owner: HYPOTHESIS_FAST_LANE_AND_RESEARCH_DATA_PLANE_V1
+  location: {kind: git_path, logical_uri: 'repo://src/solana_alpha_lab/factory/prior_work.py', repository_path: src/solana_alpha_lab/factory/prior_work.py}
+  integrity: {kind: sha256, sha256: 9f3e6f5ef567aa9d90bc3c24ea7a36fad5192b211175ceda7ff643170aef252f}
+  access: {mode: read_only, method: file, network_required: false, secrets_required: false}
+  relations:
+  - {relation_type: governed_by, target_asset_id: CTRL-HYPOTHESIS-FAST-LANE-001}
+  - {relation_type: depends_on, target_asset_id: SCHEMA-RESEARCH-MEMORY-PROJECTION-V1-001}
+  - {relation_type: depends_on, target_asset_id: CONTRACT-T16-HYPOTHESIS-LIFECYCLE-RESEARCH-MEMORY-001}
+  consumers: [FACTORY-001, GOAL-OWNER]
+  evidence: []
+  search_terms: [HYPOTHESIS_FAST_LANE, FACTORY_V1]
+  classification: {contains_secrets: false, contains_raw_data: false, sensitivity: INTERNAL_NON_SECRET}
+- asset_id: SCRIPT-HYPOTHESIS-FAST-LANE-001
+  record_version: '1.0'
+  asset_type: script
+  purpose: Operator CLI for classify, submit, doctor, prior-work search, replay and commissioning proof.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-08-25'
+  truth_owner: HYPOTHESIS_FAST_LANE_AND_RESEARCH_DATA_PLANE_V1
+  location: {kind: git_path, logical_uri: 'repo://scripts/hypothesis_fast_lane.py', repository_path: scripts/hypothesis_fast_lane.py}
+  integrity: {kind: sha256, sha256: c7e736b4dbd66c0f9f1f584c6e8a2ff89f3141c7a20a6ba5cb37baaa0676b1d5}
+  access: {mode: read_only, method: command, recipe_id: QUERY-HYPOTHESIS-FAST-LANE-CLASSIFY-001, network_required: false, secrets_required: false}
+  relations:
+  - {relation_type: governed_by, target_asset_id: CTRL-HYPOTHESIS-FAST-LANE-001}
+  - {relation_type: depends_on, target_asset_id: MODULE-FACTORY-V1-LANE-CLASSIFIER-001}
+  - {relation_type: depends_on, target_asset_id: MODULE-FACTORY-V1-RESEARCH-STORE-001}
+  - {relation_type: depends_on, target_asset_id: MODULE-FACTORY-V1-RUNNER-001}
+  consumers: [FACTORY-001, GOAL-OWNER]
+  evidence: []
+  search_terms: [HYPOTHESIS_FAST_LANE, FACTORY_V1]
+  classification: {contains_secrets: false, contains_raw_data: false, sensitivity: INTERNAL_NON_SECRET}
+- asset_id: TEST-HYPOTHESIS-FAST-LANE-CLASSIFIER-001
+  record_version: '1.0'
+  asset_type: script
+  purpose: Classifier matrix tests for Fast Lane precedence, duplicates and authority gates.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-08-25'
+  truth_owner: HYPOTHESIS_FAST_LANE_AND_RESEARCH_DATA_PLANE_V1
+  location: {kind: git_path, logical_uri: 'repo://tests/test_fast_lane_classifier.py', repository_path: tests/test_fast_lane_classifier.py}
+  integrity: {kind: sha256, sha256: 88e1dccb74e4970d8e5659bef45fb81cc20618ae2be4eaf29a761cd08b627e90}
+  access: {mode: read_only, method: file, network_required: false, secrets_required: false}
+  relations:
+  - {relation_type: governed_by, target_asset_id: CTRL-HYPOTHESIS-FAST-LANE-001}
+  - {relation_type: depends_on, target_asset_id: MODULE-FACTORY-V1-LANE-CLASSIFIER-001}
+  consumers: [FACTORY-001]
+  evidence: []
+  search_terms: [HYPOTHESIS_FAST_LANE, FACTORY_V1]
+  classification: {contains_secrets: false, contains_raw_data: false, sensitivity: INTERNAL_NON_SECRET}
+- asset_id: TEST-HYPOTHESIS-FAST-LANE-STORE-001
+  record_version: '1.0'
+  asset_type: script
+  purpose: Research store atomicity, lease, orphan and projection integrity tests.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-08-25'
+  truth_owner: HYPOTHESIS_FAST_LANE_AND_RESEARCH_DATA_PLANE_V1
+  location: {kind: git_path, logical_uri: 'repo://tests/test_research_store.py', repository_path: tests/test_research_store.py}
+  integrity: {kind: sha256, sha256: 1dabcdab6e59596c02282df8f1c095cfb38a89abc4626900c370d91e2de49b61}
+  access: {mode: read_only, method: file, network_required: false, secrets_required: false}
+  relations:
+  - {relation_type: governed_by, target_asset_id: CTRL-HYPOTHESIS-FAST-LANE-001}
+  - {relation_type: depends_on, target_asset_id: MODULE-FACTORY-V1-RESEARCH-STORE-001}
+  consumers: [FACTORY-001]
+  evidence: []
+  search_terms: [HYPOTHESIS_FAST_LANE, FACTORY_V1]
+  classification: {contains_secrets: false, contains_raw_data: false, sensitivity: INTERNAL_NON_SECRET}
+- asset_id: TEST-HYPOTHESIS-FAST-LANE-PROJECTION-001
+  record_version: '1.0'
+  asset_type: script
+  purpose: DuckDB projection rebuild, as-of and prior-work view tests.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-08-25'
+  truth_owner: HYPOTHESIS_FAST_LANE_AND_RESEARCH_DATA_PLANE_V1
+  location: {kind: git_path, logical_uri: 'repo://tests/test_research_projection.py', repository_path: tests/test_research_projection.py}
+  integrity: {kind: sha256, sha256: 862a8eee5ccce339d5ced2e62a4650cd6b9f1dbbbf9960c737c923741779a5bd}
+  access: {mode: read_only, method: file, network_required: false, secrets_required: false}
+  relations:
+  - {relation_type: governed_by, target_asset_id: CTRL-HYPOTHESIS-FAST-LANE-001}
+  - {relation_type: depends_on, target_asset_id: MODULE-FACTORY-V1-RESEARCH-STORE-001}
+  consumers: [FACTORY-001]
+  evidence: []
+  search_terms: [HYPOTHESIS_FAST_LANE, FACTORY_V1]
+  classification: {contains_secrets: false, contains_raw_data: false, sensitivity: INTERNAL_NON_SECRET}
+- asset_id: TEST-HYPOTHESIS-FAST-LANE-RUNNER-001
+  record_version: '1.0'
+  asset_type: script
+  purpose: Document runner git-fence and research persistence tests.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-08-25'
+  truth_owner: HYPOTHESIS_FAST_LANE_AND_RESEARCH_DATA_PLANE_V1
+  location: {kind: git_path, logical_uri: 'repo://tests/test_fast_lane_runner.py', repository_path: tests/test_fast_lane_runner.py}
+  integrity: {kind: sha256, sha256: e8625ddb09b0be66878a11bce91cb9e922dfcbd67bbd4c8e8daaf7b64fd90cfc}
+  access: {mode: read_only, method: file, network_required: false, secrets_required: false}
+  relations:
+  - {relation_type: governed_by, target_asset_id: CTRL-HYPOTHESIS-FAST-LANE-001}
+  - {relation_type: depends_on, target_asset_id: MODULE-FACTORY-V1-RUNNER-001}
+  consumers: [FACTORY-001]
+  evidence: []
+  search_terms: [HYPOTHESIS_FAST_LANE, FACTORY_V1]
+  classification: {contains_secrets: false, contains_raw_data: false, sensitivity: INTERNAL_NON_SECRET}
+- asset_id: TEST-HYPOTHESIS-FAST-LANE-CLI-001
+  record_version: '1.0'
+  asset_type: script
+  purpose: Operator CLI contract, commissioning proof and promotion prepare-only tests.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-08-25'
+  truth_owner: HYPOTHESIS_FAST_LANE_AND_RESEARCH_DATA_PLANE_V1
+  location: {kind: git_path, logical_uri: 'repo://tests/test_fast_lane_cli.py', repository_path: tests/test_fast_lane_cli.py}
+  integrity: {kind: sha256, sha256: 2387c3e48b96069d9277ca87f201d63095a669dd098329e6457d5e2566bd3821}
+  access: {mode: read_only, method: file, network_required: false, secrets_required: false}
+  relations:
+  - {relation_type: governed_by, target_asset_id: CTRL-HYPOTHESIS-FAST-LANE-001}
+  - {relation_type: depends_on, target_asset_id: SCRIPT-HYPOTHESIS-FAST-LANE-001}
+  consumers: [FACTORY-001]
+  evidence: []
+  search_terms: [HYPOTHESIS_FAST_LANE, FACTORY_V1]
+  classification: {contains_secrets: false, contains_raw_data: false, sensitivity: INTERNAL_NON_SECRET}
+- asset_id: TEST-HYPOTHESIS-FAST-LANE-ACCEPTANCE-001
+  record_version: '1.0'
+  asset_type: script
+  purpose: Bounded acceptance bundle referencing classifier, store, projection, runner and CLI tests.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-08-25'
+  truth_owner: HYPOTHESIS_FAST_LANE_AND_RESEARCH_DATA_PLANE_V1
+  location: {kind: git_path, logical_uri: 'repo://tests/test_fast_lane_cli.py', repository_path: tests/test_fast_lane_cli.py}
+  integrity: {kind: sha256, sha256: 2387c3e48b96069d9277ca87f201d63095a669dd098329e6457d5e2566bd3821}
+  access: {mode: read_only, method: file, network_required: false, secrets_required: false}
+  relations:
+  - {relation_type: governed_by, target_asset_id: CTRL-HYPOTHESIS-FAST-LANE-001}
+  - {relation_type: depends_on, target_asset_id: TEST-HYPOTHESIS-FAST-LANE-CLASSIFIER-001}
+  - {relation_type: depends_on, target_asset_id: TEST-HYPOTHESIS-FAST-LANE-STORE-001}
+  - {relation_type: depends_on, target_asset_id: TEST-HYPOTHESIS-FAST-LANE-PROJECTION-001}
+  - {relation_type: depends_on, target_asset_id: TEST-HYPOTHESIS-FAST-LANE-RUNNER-001}
+  - {relation_type: depends_on, target_asset_id: TEST-HYPOTHESIS-FAST-LANE-CLI-001}
+  consumers: [FACTORY-001]
+  evidence: []
+  search_terms: [HYPOTHESIS_FAST_LANE, FACTORY_V1]
+  classification: {contains_secrets: false, contains_raw_data: false, sensitivity: INTERNAL_NON_SECRET}
+- asset_id: FIXTURE-HYPOTHESIS-FAST-LANE-OFFLINE-001
+  record_version: '1.0'
+  asset_type: evidence
+  purpose: Offline commissioning submission fixture reference for Fast Lane CLI proof.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-08-25'
+  truth_owner: HYPOTHESIS_FAST_LANE_AND_RESEARCH_DATA_PLANE_V1
+  location: {kind: git_path, logical_uri: 'repo://tests/fixtures/fast_lane/offline_submission.template.json', repository_path: tests/fixtures/fast_lane/offline_submission.template.json}
+  integrity: {kind: sha256, sha256: 1a550df7b332d5967f78893933ec0cd2e6eccc47f6f75761bfb7f56d77ea920d}
+  access: {mode: read_only, method: file, network_required: false, secrets_required: false}
+  relations:
+  - {relation_type: governed_by, target_asset_id: CTRL-HYPOTHESIS-FAST-LANE-001}
+  consumers: [FACTORY-001]
+  evidence: []
+  search_terms: [HYPOTHESIS_FAST_LANE, FACTORY_V1]
+  classification: {contains_secrets: false, contains_raw_data: false, sensitivity: INTERNAL_NON_SECRET}
+- asset_id: EVIDENCE-HYPOTHESIS-FAST-LANE-DELIVERY-INDEPENDENT-REVIEW-001
+  record_version: '1.0'
+  asset_type: evidence
+  purpose: Isolated critic packet for the Fast Lane foundation atom.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-08-25'
+  truth_owner: HYPOTHESIS_FAST_LANE_AND_RESEARCH_DATA_PLANE_V1
+  location: {kind: git_path, logical_uri: 'repo://docs/evidence/hypothesis_fast_lane/a1_delivery_independent_review_v1.json', repository_path: docs/evidence/hypothesis_fast_lane/a1_delivery_independent_review_v1.json}
+  integrity: {kind: none, note: 'Content integrity is owned by the live completion-review-fit hash chain; embedding its SHA here would create an indirect self-reference through the reviewed inventory.'}
+  access: {mode: read_only, method: file, network_required: false, secrets_required: false}
+  relations:
+  - {relation_type: derived_from, target_asset_id: CTRL-HYPOTHESIS-FAST-LANE-001}
+  consumers: [FACTORY-001, GOAL-OWNER]
+  evidence: []
+  search_terms: [HYPOTHESIS_FAST_LANE, FACTORY_V1]
+  classification: {contains_secrets: false, contains_raw_data: false, sensitivity: INTERNAL_NON_SECRET}
+- asset_id: EVIDENCE-HYPOTHESIS-FAST-LANE-DELIVERY-FACTORY-FIT-001
+  record_version: '1.0'
+  asset_type: evidence
+  purpose: Factory Fit review for Fast Lane foundation without live authority.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-08-25'
+  truth_owner: HYPOTHESIS_FAST_LANE_AND_RESEARCH_DATA_PLANE_V1
+  location: {kind: git_path, logical_uri: 'repo://docs/evidence/hypothesis_fast_lane/a1_delivery_factory_fit_v1.json', repository_path: docs/evidence/hypothesis_fast_lane/a1_delivery_factory_fit_v1.json}
+  integrity: {kind: none, note: 'Content integrity is owned by the live completion-review-fit hash chain; embedding its SHA here would create an indirect self-reference through the reviewed inventory.'}
+  access: {mode: read_only, method: file, network_required: false, secrets_required: false}
+  relations:
+  - {relation_type: derived_from, target_asset_id: CTRL-HYPOTHESIS-FAST-LANE-001}
+  - {relation_type: depends_on, target_asset_id: EVIDENCE-HYPOTHESIS-FAST-LANE-DELIVERY-INDEPENDENT-REVIEW-001}
+  consumers: [FACTORY-001, GOAL-OWNER]
+  evidence: []
+  search_terms: [HYPOTHESIS_FAST_LANE, FACTORY_V1]
+  classification: {contains_secrets: false, contains_raw_data: false, sensitivity: INTERNAL_NON_SECRET}
+- asset_id: EVIDENCE-HYPOTHESIS-FAST-LANE-DELIVERY-COMPLETION-001
+  record_version: '1.0'
+  asset_type: evidence
+  purpose: Guard-consumable completion evidence before the exact-head merge gate for Fast Lane foundation.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-08-25'
+  truth_owner: HYPOTHESIS_FAST_LANE_AND_RESEARCH_DATA_PLANE_V1
+  location: {kind: git_path, logical_uri: 'repo://docs/evidence/hypothesis_fast_lane/a1_delivery_completion_evidence_v1.json', repository_path: docs/evidence/hypothesis_fast_lane/a1_delivery_completion_evidence_v1.json}
+  integrity: {kind: none, note: 'Content integrity is owned by the live completion-review-fit hash chain; embedding its SHA here would create an indirect self-reference through the reviewed inventory.'}
+  access: {mode: read_only, method: file, network_required: false, secrets_required: false}
+  relations:
+  - {relation_type: derived_from, target_asset_id: CTRL-HYPOTHESIS-FAST-LANE-001}
+  - {relation_type: depends_on, target_asset_id: EVIDENCE-HYPOTHESIS-FAST-LANE-DELIVERY-INDEPENDENT-REVIEW-001}
+  - {relation_type: depends_on, target_asset_id: EVIDENCE-HYPOTHESIS-FAST-LANE-DELIVERY-FACTORY-FIT-001}
+  consumers: [FACTORY-001, GOAL-OWNER]
+  evidence: []
+  search_terms: [HYPOTHESIS_FAST_LANE, FACTORY_V1]
+  classification: {contains_secrets: false, contains_raw_data: false, sensitivity: INTERNAL_NON_SECRET}
