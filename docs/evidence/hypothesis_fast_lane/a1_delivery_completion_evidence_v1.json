@@ -54,14 +54,14 @@
   },
   "factory_fit": {
     "path": "docs/evidence/hypothesis_fast_lane/a1_delivery_factory_fit_v1.json",
-    "sha256": "b12d1db8c30802dc2bd7bd216d2c0e62937a3c94634c565b4c08eb7a90b4494b",
+    "sha256": "679954505770449454085616c712c2479d712f4b7631e0453fd6f638c1f578a5",
     "verdict": "PASS"
   },
   "validation": {
     "targeted": "PASS_FAST_LANE_FOUNDATION_SUITE",
     "independent_review": {
       "path": "docs/evidence/hypothesis_fast_lane/a1_delivery_independent_review_v1.json",
-      "sha256": "e20f0118bace8803d622ce962f8990ef8ee98d81df031f97551067854d5c3799",
+      "sha256": "336979ab6942ba6d5789c08dcb1f4fef3c1b20a03ab7474ba9967a1b0188de0a",
       "verdict": "PASS"
     },
     "full_gate": "ENFORCED_BY_PROJECT_BOUND_VALIDATION",

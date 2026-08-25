@@ -27,7 +27,7 @@
   "recovery": "REVERT_THIS_ATOM; LEGACY_FACTORY_PATHS_REMAIN",
   "review_id": "HYPOTHESIS-FAST-LANE-FACTORY-FIT-001",
   "reviewed_bindings_sha256": "c63db878b3506638bb0998a7e0439e80cc20af75bbdfa193c681e89d823fd311",
-  "reviewed_inventory_sha256": "4b850698f7cbba4565d811772c77c8dff7d5f06ea61d34a3d6172755dec5cd73",
+  "reviewed_inventory_sha256": "4472ba4cb9cd0c5227998fafde8b96d332d1b355060d7f3842a2a41bedaf9d71",
   "schema": "smial.delivery-harness-factory-fit",
   "schema_version": "1.0",
   "task_id": "HYPOTHESIS_FAST_LANE_AND_RESEARCH_DATA_PLANE_V1",
