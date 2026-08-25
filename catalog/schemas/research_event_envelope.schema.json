@@ -1,0 +1,131 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://smial.local/schemas/research_event_envelope.schema.json",
+  "title": "SMIAL research event envelope",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "record_id",
+    "record_kind",
+    "entity_id",
+    "hypothesis_version_id",
+    "run_id",
+    "transaction_id",
+    "effective_at",
+    "first_reliable_available_at",
+    "supersedes_record_id",
+    "payload_json",
+    "payload_sha256",
+    "schema_version",
+    "producer_capability_id",
+    "producer_git_sha",
+    "created_at"
+  ],
+  "properties": {
+    "record_id": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 256
+    },
+    "record_kind": {
+      "enum": [
+        "HYPOTHESIS_FAMILY",
+        "HYPOTHESIS_ORIGIN",
+        "RESEARCH_CYCLE",
+        "HYPOTHESIS_VERSION",
+        "RESEARCH_ARTIFACT",
+        "TRIAL",
+        "DECISION_EVENT",
+        "DERIVATION_EDGE",
+        "ACTIVATION_EPOCH",
+        "RUN_STARTED",
+        "RUN_COMPLETED",
+        "RUN_ABORTED",
+        "RUN_INVALID",
+        "EXPERIMENT_METRIC",
+        "EVIDENCE_BINDING",
+        "PROMOTION_CANDIDATE",
+        "CAPABILITY_GAP"
+      ]
+    },
+    "entity_id": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 256
+    },
+    "hypothesis_version_id": {
+      "oneOf": [
+        {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 256
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "run_id": {
+      "oneOf": [
+        {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 256
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "transaction_id": {
+      "type": "string",
+      "pattern": "^RESEARCH-TXN-[A-Z0-9][A-Z0-9._-]{0,243}$"
+    },
+    "effective_at": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "first_reliable_available_at": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "supersedes_record_id": {
+      "oneOf": [
+        {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 256
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "payload_json": {
+      "type": "string",
+      "contentMediaType": "application/json"
+    },
+    "payload_sha256": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{64}$"
+    },
+    "schema_version": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 64
+    },
+    "producer_capability_id": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 256
+    },
+    "producer_git_sha": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{40}$"
+    },
+    "created_at": {
+      "type": "string",
+      "format": "date-time"
+    }
+  }
+}
