@@ -30,6 +30,7 @@ managed_write_set:
 - src/solana_alpha_lab/factory/data_resolver.py
 - src/solana_alpha_lab/factory/lane_classifier.py
 - src/solana_alpha_lab/factory/research_store.py
+- src/solana_alpha_lab/factory/prior_work.py
 - src/solana_alpha_lab/factory/run_passport.py
 - src/solana_alpha_lab/factory/experiment_spec.py
 - src/solana_alpha_lab/factory/runner.py
@@ -41,7 +42,7 @@ managed_write_set:
 - tests/test_fast_lane_runner.py
 - tests/test_fast_lane_cli.py
 - tests/test_task16_hypothesis_research_memory_query.py
-- tests/fixtures/fast_lane/
+- tests/fixtures/fast_lane/**
 - catalog/query_recipes.yaml
 - catalog/assets/lifecycle.yaml
 - catalog/assets/core.yaml
@@ -97,7 +98,10 @@ context_requirements:
     LIFECYCLE: []
     EXTERNAL_ROUTE_KNOWLEDGE: []
     ARCHITECTURE_DECISIONS: []
-    DELIVERY_EVIDENCE: []
+    DELIVERY_EVIDENCE:
+    - docs/evidence/hypothesis_fast_lane/a1_delivery_completion_evidence_v1.json
+    - docs/evidence/hypothesis_fast_lane/a1_delivery_independent_review_v1.json
+    - docs/evidence/hypothesis_fast_lane/a1_delivery_factory_fit_v1.json
     HISTORICAL_CONTEXT: []
 ---
 

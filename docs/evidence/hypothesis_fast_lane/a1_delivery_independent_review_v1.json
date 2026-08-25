@@ -1,0 +1,63 @@
+{
+  "as_of": "2026-08-25",
+  "non_claims": [
+    "NO_CRYPTOGRAPHIC_REVIEWER_IDENTITY",
+    "REVIEW_IS_NOT_SEMANTIC_DONE",
+    "NO_SINGLE_AGENT_REVIEW_FALLBACK",
+    "NO_CANONICAL_DONE",
+    "NO_ALPHA",
+    "NO_NETRETURN",
+    "NO_TWO_RUNG_EXECUTION",
+    "NO_PROVIDER_CALLS",
+    "NO_AUTOMATIC_PROMOTION"
+  ],
+  "required_roles": [
+    "ARCHITECTURE_CRITIC",
+    "CODE_REVIEWER",
+    "GOAL_DOD_CRITIC"
+  ],
+  "review_id": "HYPOTHESIS-FAST-LANE-INDEPENDENT-REVIEW-001",
+  "reviewed_bindings_sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+  "reviewed_inventory_sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+  "reviews": [
+    {
+      "findings": [
+        "CHECKED_CLASSIFIER_PRECEDENCE_MATRIX",
+        "CHECKED_RESEARCH_STORE_MANIFEST_LAST",
+        "CHECKED_RUNNER_GIT_FENCE",
+        "CHECKED_CLI_COMMISSION_OFFLINE_PROOF",
+        "CHECKED_NO_PHYSICAL_PATHS_IN_DURABLE_PAYLOADS",
+        "CHECKED_LEGACY_FACTORY_V1_0_COMPATIBILITY",
+        "CHECKED_PROVIDER_CALLS_ZERO"
+      ],
+      "role": "CODE_REVIEWER",
+      "verdict": "PASS"
+    },
+    {
+      "findings": [
+        "CHECKED_THREE_PLANE_BOUNDARY",
+        "CHECKED_FAST_LANE_NO_GIT_WRITE_FENCE",
+        "CHECKED_PROMOTION_PREPARE_ONLY",
+        "CHECKED_TWO_RUNG_FROZEN",
+        "CHECKED_FOUNDATION_STOP_AT_MERGE_GATE"
+      ],
+      "role": "GOAL_DOD_CRITIC",
+      "verdict": "PASS"
+    },
+    {
+      "findings": [
+        "CHECKED_DUCKDB_READ_MODEL_ONLY",
+        "CHECKED_PARQUET_TRUTH_OUTSIDE_GIT",
+        "CHECKED_SQLITE_OPERATIONAL_ONLY",
+        "CHECKED_NO_DYNAMIC_RUN_IN_CATALOG",
+        "CHECKED_CROSS_PLANE_PRIOR_WORK_ADAPTER"
+      ],
+      "role": "ARCHITECTURE_CRITIC",
+      "verdict": "PASS"
+    }
+  ],
+  "schema": "smial.delivery-independent-review-evidence",
+  "schema_version": "1.0",
+  "task_id": "HYPOTHESIS_FAST_LANE_AND_RESEARCH_DATA_PLANE_V1",
+  "verdict": "PASS"
+}

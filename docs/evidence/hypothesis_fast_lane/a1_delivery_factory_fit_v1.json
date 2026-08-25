@@ -1,0 +1,35 @@
+{
+  "as_of": "2026-08-25",
+  "capability_radar": {
+    "now": "NONE",
+    "watch": "TWO_RUNG_CLASSIFICATION_AFTER_OFFLINE_COMMISSION"
+  },
+  "dimensions": {
+    "build_vs_buy": "PASS_ADOPT_PARQUET_MANIFESTS_DUCKDB_SQLITE",
+    "context_efficiency": "PASS_ONE_FOUNDATION_PR_NO_SUFFIX_ATOMS",
+    "execution_to_cashflow": "PASS_NO_LIVE_AUTHORITY_NO_CASHFLOW",
+    "flexibility_and_history": "PASS_LEGACY_FACTORY_AND_T16_COMPATIBLE",
+    "mission": "PASS_GOVERNED_NO_GIT_FAST_LANE",
+    "monitoring_and_recovery": "PASS_DOCTOR_VERIFY_STORE_COLD_REBUILD",
+    "owner_operability": "PASS_OPERATOR_CLI_AND_COMMISSION_OFFLINE",
+    "red_team": "PASS_NO_PROVIDER_NO_WALLET_NO_GIT_MUTATION",
+    "research_truth": "PASS_IMMUTABLE_EVENTS_AND_RUN_PASSPORT",
+    "security": "PASS_NO_SECRETS_NO_NETWORK"
+  },
+  "limits": [
+    "NO_ALPHA",
+    "NO_CANONICAL_DONE",
+    "NO_TWO_RUNG_EXECUTION",
+    "NO_AUTOMATIC_PROMOTION",
+    "NO_DYNAMIC_RUN_IN_GIT"
+  ],
+  "mode": "FULL_REVIEW",
+  "recovery": "REVERT_THIS_ATOM; LEGACY_FACTORY_PATHS_REMAIN",
+  "review_id": "HYPOTHESIS-FAST-LANE-FACTORY-FIT-001",
+  "reviewed_bindings_sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+  "reviewed_inventory_sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+  "schema": "smial.delivery-harness-factory-fit",
+  "schema_version": "1.0",
+  "task_id": "HYPOTHESIS_FAST_LANE_AND_RESEARCH_DATA_PLANE_V1",
+  "verdict": "PASS"
+}
