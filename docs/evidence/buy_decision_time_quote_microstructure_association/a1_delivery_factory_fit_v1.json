@@ -1,0 +1,37 @@
+{
+  "as_of": "2026-08-25",
+  "capability_radar": {
+    "now": "NONE",
+    "watch": "CURRENT_SURFACE_REFRAME_CONTINUES"
+  },
+  "dimensions": {
+    "build_vs_buy": "PASS_ADOPT_GIT_RECEIPTS_WRAP_A4_EXTRACT",
+    "context_efficiency": "PASS_ASSOCIATION_BEFORE_SELECTOR",
+    "execution_to_cashflow": "PASS_NO_LIVE_NO_NETRETURN",
+    "flexibility_and_history": "PASS_NO_REGISTRY_OR_CONTEXT_MAP_MIGRATION",
+    "mission": "PASS_HONEST_WEAKER_OF_TAILS_NOT_POOLED_ESCAPE",
+    "monitoring_and_recovery": "PASS_REVERT_THIS_ATOM_ONLY",
+    "owner_operability": "PASS_ONE_TYPED_TERMINAL_NO_AUTO_NEXT",
+    "red_team": "PASS_NO_SELECTOR_NO_PVALUE_NO_ABS_X_THRESHOLD",
+    "research_truth": "PASS_WORKING_ASSUMPTION_FRACTION_NOT_FACT",
+    "security": "PASS_ZERO_PROVIDER_NO_RAW_A4_IN_GIT"
+  },
+  "limits": [
+    "NO_PRODUCTION_SELECTOR",
+    "NO_UNIT_FACT",
+    "NO_ALPHA",
+    "NO_LIVE_CAPTURE",
+    "NO_COMBINED_NOT_FLOOR_TERMINAL",
+    "CAPABILITY_PASS_IS_NOT_PROMOTION",
+    "WORSE_TAIL_REPLICATION_DOES_NOT_AUTHORIZE_OVERALL_REPLICATION"
+  ],
+  "mode": "FULL_REVIEW",
+  "recovery": "REVERT_ONLY_THIS_ATOM; PRESERVE_FACTORY_PYTHON; PRESERVE_CONTEXT_MAP",
+  "review_id": "BUY-DT-QUOTE-MS-ASSOCIATION-FACTORY-FIT-001",
+  "reviewed_bindings_sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+  "reviewed_inventory_sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+  "schema": "smial.delivery-harness-factory-fit",
+  "schema_version": "1.0",
+  "task_id": "BUY_DECISION_TIME_QUOTE_MICROSTRUCTURE_ASSOCIATION_V1",
+  "verdict": "PASS"
+}

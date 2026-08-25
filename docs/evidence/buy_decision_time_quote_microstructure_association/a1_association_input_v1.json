@@ -1,0 +1,63 @@
+{
+  "association_predictors": [
+    "X_PRICE_IMPACT"
+  ],
+  "atom_id": "BUY_DECISION_TIME_QUOTE_MICROSTRUCTURE_ASSOCIATION_V1",
+  "combined_not_floor_forbidden": true,
+  "decision_time_label": "BUY_T0",
+  "drop_may_upgrade": false,
+  "extractor_id": "BUY_DT_QUOTE_MS_EXTRACTOR_V1",
+  "extractor_schema_version": "1.0",
+  "floor": {
+    "lamports": 9727186,
+    "notional_atomic": 10000000,
+    "tolerance_lamports": 20
+  },
+  "informative_window": {
+    "min_analysis_rows": 8,
+    "min_family_n": 3,
+    "min_floor_n": 3
+  },
+  "primary_windows": [
+    {
+      "git_receipt_path": "docs/evidence/ordinary_recent_early_path_h900_audition/a1_ordinary_recent_early_path_h900_audition_runtime_receipt_v1.json",
+      "git_receipt_sha256": "0acdc847eaf404bf61845cd471b17b91cf6255f24edc82363c2f10a74e7d786b",
+      "window_id": "W-EP"
+    },
+    {
+      "git_receipt_path": "docs/evidence/early_structural_backing_pit_commissioning/a1_window_a_runtime_receipt_v1.json",
+      "git_receipt_sha256": "8a6647de6e22de81a2be59474bc6e2021ceae740b778113b820b99b158c948be",
+      "window_id": "W-SB"
+    },
+    {
+      "git_receipt_path": "docs/evidence/early_holder_concentration_h900_falsifier/a1_runtime_receipt_v1.json",
+      "git_receipt_sha256": "7a6f05aadb29ee277d0eaec9379885b5585f1fc369f9d5d959b993ef6982bcef",
+      "window_id": "W-HC-A"
+    },
+    {
+      "git_receipt_path": "docs/evidence/early_holder_concentration_h900_confirmatory_oos/a1_runtime_receipt_v1.json",
+      "git_receipt_sha256": "9fd3408ff9e18ecda9fde0108c6d217fd4a3819738d0b4a0bb2129bcbaec895a",
+      "window_id": "W-HC-B"
+    },
+    {
+      "git_receipt_path": "docs/evidence/seasoned_30m_h900_base_rate_probe/a1_runtime_receipt_v1.json",
+      "git_receipt_sha256": "0dbf58b5c2c061b50bcc850cc31dd42c3b69bfbf5d5d157894f79ef96e4d1087",
+      "window_id": "W-S30"
+    }
+  ],
+  "routeplan_eligibility_gates": [
+    "RP_ROUTE_COUNT",
+    "RP_FIRST_LEG_PERCENT"
+  ],
+  "terminal_thresholds": {
+    "absolute_x_threshold_forbidden": true,
+    "combined_not_floor_forbidden": true,
+    "drop_may_upgrade": false,
+    "majority_min": 4,
+    "min_informative_windows": 4,
+    "overall_rule": "WEAKER_OF_FAMILY_TERMINALS"
+  },
+  "unit_assumption": "WORKING_ASSUMPTION_FRACTION",
+  "unit_assumption_is_fact": false,
+  "w_vl_in_primary": false
+}
