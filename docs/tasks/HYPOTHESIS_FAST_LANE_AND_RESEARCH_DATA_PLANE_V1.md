@@ -34,6 +34,7 @@ managed_write_set:
 - src/solana_alpha_lab/factory/run_passport.py
 - src/solana_alpha_lab/factory/experiment_spec.py
 - src/solana_alpha_lab/factory/runner.py
+- src/solana_alpha_lab/factory/document_runner.py
 - scripts/hypothesis_fast_lane.py
 - scripts/query_hypothesis_research_memory.py
 - tests/test_fast_lane_classifier.py

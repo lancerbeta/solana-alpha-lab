@@ -18,6 +18,9 @@ if str(SRC) not in sys.path:
     sys.path.insert(0, str(SRC))
 
 from solana_alpha_lab.factory.prior_work import (  # noqa: E402
+    PriorWorkError,
+    legacy_outcome_semantics,
+    merge_plane_results,
     query_data_plane_prior_work,
     query_hypotheses,
 )
@@ -569,6 +572,36 @@ class ResearchProjectionTests(unittest.TestCase):
             lookup_seconds = time.perf_counter() - started
             self.assertIsNotNone(passport)
             self.assertLessEqual(lookup_seconds, 0.250)
+
+    def test_cross_plane_hash_conflict_fails_closed(self) -> None:
+        legacy = {
+            "results": [
+                {
+                    "hypothesis_version_id": "HYP-VERSION-LIQUIDITY-REVERSAL-V1",
+                    "definition_sha256": "a" * 64,
+                    "score": 5,
+                }
+            ]
+        }
+        data_plane = {
+            "results": [
+                {
+                    "hypothesis_version_id": "HYP-VERSION-LIQUIDITY-REVERSAL-V1",
+                    "definition_sha256": "b" * 64,
+                    "score": 5,
+                }
+            ]
+        }
+        with self.assertRaisesRegex(PriorWorkError, "CROSS_PLANE_ID_CONFLICT"):
+            merge_plane_results(legacy, data_plane, max_results=20)
+
+    def test_legacy_pass_and_fail_outcomes_remain_unresolved(self) -> None:
+        for label in ("PASS", "FAIL"):
+            with self.subTest(label=label):
+                semantics = legacy_outcome_semantics(label)
+                self.assertEqual(semantics["legacy_outcome"], label)
+                self.assertIsNone(semantics["trial_outcome"])
+                self.assertEqual(semantics["diagnostic"], "LEGACY_OUTCOME_UNRESOLVED")
 
 
 if __name__ == "__main__":

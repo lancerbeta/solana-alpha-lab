@@ -37,8 +37,8 @@ from solana_alpha_lab.factory.research_store import (  # noqa: E402
     ResearchStoreError,
 )
 from solana_alpha_lab.factory.run_passport import experiment_spec_sha256  # noqa: E402
-from solana_alpha_lab.factory.runner import (  # noqa: E402
-    ExperimentRunner,
+from solana_alpha_lab.factory.document_runner import (  # noqa: E402
+    DocumentRunner,
     ExperimentRunnerError,
     RunContext,
     repository_status_bytes,
@@ -271,7 +271,7 @@ def execute_submit(
     validated = validate_experiment_document(spec, root=root)
     ops = OperationalStore(data_root / "ops" / "operational_state.sqlite")
     try:
-        runner = ExperimentRunner(root=root, store=ops)
+        runner = DocumentRunner(root=root, store=ops)
         result = runner.start_document(
             validated,
             spec_sha256=experiment_spec_sha256(validated),

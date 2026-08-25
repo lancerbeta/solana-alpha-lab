@@ -25,8 +25,8 @@ from solana_alpha_lab.factory.experiment_spec import (  # noqa: E402
 from solana_alpha_lab.factory.lane_classifier import Lane, classify_lane  # noqa: E402
 from solana_alpha_lab.factory.operational_store import OperationalStore  # noqa: E402
 from solana_alpha_lab.factory.research_store import ResearchStore  # noqa: E402
-from solana_alpha_lab.factory.runner import (  # noqa: E402
-    ExperimentRunner,
+from solana_alpha_lab.factory.document_runner import (  # noqa: E402
+    DocumentRunner,
     RunContext,
     repository_status_bytes,
 )
@@ -76,7 +76,7 @@ class FastLaneRunnerTests(unittest.TestCase):
     def isolated_runner(self, data_root: Path):
         ops = OperationalStore(data_root / "ops" / "operational_state.sqlite")
         try:
-            yield ExperimentRunner(root=ROOT, store=ops)
+            yield DocumentRunner(root=ROOT, store=ops)
         finally:
             ops.close()
 
@@ -191,7 +191,7 @@ class FastLaneRunnerTests(unittest.TestCase):
             with self.isolated_runner(data_root) as runner:
                 packet, decision = self.classify_for(data_root, submission())
                 with patch(
-                    "solana_alpha_lab.factory.runner.repository_status_bytes",
+                    "solana_alpha_lab.factory.document_runner.repository_status_bytes",
                     side_effect=[b"", b"M"],
                 ):
                     result = runner.start_document(
