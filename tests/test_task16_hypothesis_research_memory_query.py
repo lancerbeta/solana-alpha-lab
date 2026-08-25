@@ -9,6 +9,11 @@ import unittest
 from pathlib import Path
 
 from scripts import query_hypothesis_research_memory as memory
+from solana_alpha_lab.factory.prior_work import (
+    PriorWorkError,
+    legacy_outcome_semantics,
+    merge_plane_results,
+)
 
 ROOT = Path(__file__).resolve().parents[1]
 FIXTURE_PATH = (
@@ -246,6 +251,46 @@ class Task16HypothesisResearchMemoryQueryTests(unittest.TestCase):
             with self.subTest(candidate=candidate):
                 with self.assertRaises(memory.MemoryValidationError):
                     memory.query_prior_work(self.document, candidate)
+
+    def test_cross_plane_hash_conflict_fails_closed(self) -> None:
+        legacy = {
+            "results": [
+                {
+                    "hypothesis_version_id": (
+                        "HYP-VERSION-LIQUIDITY-REVERSAL-V1"
+                    ),
+                    "definition_sha256": "a" * 64,
+                    "score": 5,
+                }
+            ]
+        }
+        data_plane = {
+            "results": [
+                {
+                    "hypothesis_version_id": (
+                        "HYP-VERSION-LIQUIDITY-REVERSAL-V1"
+                    ),
+                    "definition_sha256": "b" * 64,
+                    "score": 5,
+                }
+            ]
+        }
+        with self.assertRaisesRegex(
+            PriorWorkError,
+            "CROSS_PLANE_ID_CONFLICT",
+        ):
+            merge_plane_results(legacy, data_plane, max_results=20)
+
+    def test_legacy_pass_and_fail_outcomes_remain_unresolved(self) -> None:
+        for label in ("PASS", "FAIL"):
+            with self.subTest(label=label):
+                semantics = legacy_outcome_semantics(label)
+                self.assertEqual(semantics["legacy_outcome"], label)
+                self.assertIsNone(semantics["trial_outcome"])
+                self.assertEqual(
+                    semantics["diagnostic"],
+                    "LEGACY_OUTCOME_UNRESOLVED",
+                )
 
     def test_duplicate_and_missing_references_fail_closed(self) -> None:
         duplicate = copy.deepcopy(self.document)

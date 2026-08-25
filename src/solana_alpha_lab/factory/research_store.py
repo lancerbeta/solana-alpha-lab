@@ -18,6 +18,7 @@ from enum import StrEnum
 from pathlib import Path, PurePosixPath
 from typing import Annotated, Any
 
+import duckdb
 import pyarrow as pa
 import pyarrow.parquet as pq
 from pydantic import AwareDatetime, BaseModel, ConfigDict, Field, ValidationError
@@ -37,6 +38,45 @@ RESEARCH_DATASET_ID = "research-events"
 RESEARCH_DATASET_VERSION = "1.0"
 RESEARCH_PARQUET_PROFILE = "smial-research-event-envelope-parquet-v1"
 RESEARCH_LOGICAL_URI_PREFIX = "smial-data://"
+RESEARCH_PROJECTION_LOCATION = "projections/research_memory.duckdb"
+RESEARCH_PROJECTION_LOGICAL_URI = (
+    f"{RESEARCH_LOGICAL_URI_PREFIX}{RESEARCH_PROJECTION_LOCATION}"
+)
+_PROJECTION_DDL_PATH = (
+    Path(__file__).resolve().parents[3]
+    / "schemas"
+    / "research_memory_projection_v1.sql"
+)
+_PROJECTION_VIEWS = (
+    "hypotheses",
+    "hypothesis_events",
+    "experiment_runs",
+    "experiment_metrics",
+    "evidence_bindings",
+    "promotion_candidates",
+    "prior_work",
+    "capability_gaps",
+)
+_PROJECTION_COLUMNS = (
+    "record_id",
+    "record_kind",
+    "entity_id",
+    "stable_id",
+    "hypothesis_version_id",
+    "run_id",
+    "transaction_id",
+    "effective_at",
+    "first_reliable_available_at",
+    "supersedes_record_id",
+    "payload_json",
+    "payload_sha256",
+    "definition_sha256",
+    "run_key_sha256",
+    "schema_version",
+    "producer_capability_id",
+    "producer_git_sha",
+    "created_at",
+)
 _LEASE_DURATION = timedelta(minutes=5)
 _TRANSACTION_ID_RE = re.compile(
     r"RESEARCH-TXN-[A-Z0-9][A-Z0-9._-]{0,243}"
@@ -183,6 +223,10 @@ class CommitReceipt:
 @dataclass(frozen=True, slots=True)
 class ProjectionReceipt:
     status: str
+    logical_uri: str
+    projection_digest_sha256: str
+    record_count: int
+    partition_count: int
 
 
 @dataclass(frozen=True, slots=True)
@@ -459,6 +503,116 @@ def _records_from_table(table: pa.Table) -> tuple[ResearchEvent, ...]:
     if records != ordered:
         raise ResearchStoreError("PARQUET_ROW_ORDER_INVALID")
     return records
+
+
+def _payload_object(record: ResearchEvent) -> dict[str, Any]:
+    try:
+        payload = json.loads(record.payload_json)
+    except (TypeError, ValueError, json.JSONDecodeError) as exc:
+        raise ResearchStoreError("PAYLOAD_JSON_INVALID") from exc
+    if not isinstance(payload, dict):
+        raise ResearchStoreError("PAYLOAD_JSON_MUST_BE_OBJECT")
+    return payload
+
+
+_STABLE_ID_FIELDS = {
+    RecordKind.HYPOTHESIS_FAMILY: "family_id",
+    RecordKind.HYPOTHESIS_ORIGIN: "origin_id",
+    RecordKind.RESEARCH_CYCLE: "research_cycle_id",
+    RecordKind.HYPOTHESIS_VERSION: "hypothesis_version_id",
+    RecordKind.RESEARCH_ARTIFACT: "research_artifact_id",
+    RecordKind.TRIAL: "trial_id",
+    RecordKind.DECISION_EVENT: "decision_event_id",
+    RecordKind.DERIVATION_EDGE: "derivation_edge_id",
+    RecordKind.ACTIVATION_EPOCH: "activation_epoch_id",
+    RecordKind.EXPERIMENT_METRIC: "metric_id",
+    RecordKind.EVIDENCE_BINDING: "evidence_binding_id",
+    RecordKind.PROMOTION_CANDIDATE: "promotion_candidate_id",
+    RecordKind.CAPABILITY_GAP: "capability_gap_id",
+}
+
+
+def _projection_stable_id(
+    record: ResearchEvent,
+    payload: Mapping[str, Any],
+) -> str:
+    if record.record_kind in {
+        RecordKind.RUN_STARTED,
+        RecordKind.RUN_COMPLETED,
+        RecordKind.RUN_ABORTED,
+        RecordKind.RUN_INVALID,
+    }:
+        candidate = payload.get("run_id", record.run_id)
+    else:
+        field = _STABLE_ID_FIELDS.get(RecordKind(record.record_kind))
+        candidate = payload.get(field) if field is not None else None
+    stable_id = candidate if isinstance(candidate, str) else record.entity_id
+    if not stable_id:
+        raise ResearchStoreError("PROJECTION_STABLE_ID_MISSING")
+    return stable_id
+
+
+def _projection_record_row(record: ResearchEvent) -> tuple[Any, ...]:
+    payload = _payload_object(record)
+    return (
+        record.record_id,
+        str(record.record_kind),
+        record.entity_id,
+        _projection_stable_id(record, payload),
+        record.hypothesis_version_id,
+        record.run_id,
+        record.transaction_id,
+        record.effective_at.astimezone(UTC).replace(tzinfo=None),
+        record.first_reliable_available_at.astimezone(UTC).replace(tzinfo=None),
+        record.supersedes_record_id,
+        record.payload_json,
+        record.payload_sha256,
+        payload.get("definition_sha256") or payload.get("hypothesis_definition_sha256"),
+        payload.get("run_key_sha256"),
+        record.schema_version,
+        record.producer_capability_id,
+        record.producer_git_sha,
+        record.created_at.astimezone(UTC).replace(tzinfo=None),
+    )
+
+
+def _projection_export_digest(
+    connection: duckdb.DuckDBPyConnection,
+    *,
+    manifests: Sequence[PartitionManifest],
+) -> str:
+    exports: dict[str, Any] = {
+        "manifests": [
+            {
+                "content_sha256": manifest.content_sha256,
+                "file_sha256": manifest.file_sha256,
+                "partition_manifest_id": manifest.partition_manifest_id,
+            }
+            for manifest in manifests
+        ],
+        "views": {},
+    }
+    for view in _PROJECTION_VIEWS:
+        rows = connection.execute(
+            f"""
+            SELECT to_json(export_row)
+            FROM (
+                SELECT *
+                FROM "{view}"
+                ORDER BY ALL
+                LIMIT 1000
+            ) AS export_row
+            """
+        ).fetchall()
+        exports["views"][view] = [row[0] for row in rows]
+    canonical = json.dumps(
+        exports,
+        ensure_ascii=False,
+        sort_keys=True,
+        separators=(",", ":"),
+        allow_nan=False,
+    ).encode("utf-8")
+    return _sha256(canonical)
 
 
 def _is_within(path: Path, root: Path) -> bool:
@@ -993,7 +1147,174 @@ class ResearchStore:
             )
 
     def rebuild_projection(self) -> ProjectionReceipt:
-        raise ResearchStoreError("PROJECTION_NOT_IMPLEMENTED")
+        manifests = self._committed_manifests()
+        records: list[ResearchEvent] = []
+        for manifest in manifests:
+            records.extend(self._verify_partition(manifest))
+
+        stable_ids: dict[tuple[str, str], list[ResearchEvent]] = {}
+        for record in records:
+            payload = _payload_object(record)
+            stable_id = _projection_stable_id(record, payload)
+            key = (str(record.record_kind), stable_id)
+            related = stable_ids.setdefault(key, [])
+            for previous in related:
+                if (
+                    previous.payload_sha256 != record.payload_sha256
+                    and previous.supersedes_record_id != record.record_id
+                    and record.supersedes_record_id != previous.record_id
+                ):
+                    raise ResearchStoreError("DUPLICATE_STABLE_ID_CONFLICT")
+            related.append(record)
+
+        projection_path = _target_path(
+            self._root,
+            RESEARCH_PROJECTION_LOCATION,
+            create_parents=True,
+        )
+        temporary_path = projection_path.with_name(
+            f".{projection_path.name}.{uuid.uuid4().hex}.tmp"
+        )
+        connection: duckdb.DuckDBPyConnection | None = None
+        try:
+            try:
+                ddl = _PROJECTION_DDL_PATH.read_text(encoding="utf-8")
+            except OSError as exc:
+                raise ResearchStoreError("PROJECTION_DDL_UNAVAILABLE") from exc
+            connection = duckdb.connect(
+                str(temporary_path),
+                config={
+                    "enable_external_access": "false",
+                    "allow_unsigned_extensions": "false",
+                },
+            )
+            connection.execute("SET TimeZone = 'UTC'")
+            connection.execute(ddl)
+            if records:
+                load_table = pa.Table.from_pylist(
+                    [
+                        dict(
+                            zip(
+                                _PROJECTION_COLUMNS,
+                                _projection_record_row(record),
+                                strict=True,
+                            )
+                        )
+                        for record in records
+                    ]
+                )
+                connection.register("_projection_load", load_table)
+                connection.execute(
+                    """
+                    INSERT INTO _research_events
+                    SELECT * FROM _projection_load
+                    """
+                )
+                connection.unregister("_projection_load")
+            connection.execute("SET lock_configuration = true")
+
+            observed_count = connection.execute(
+                "SELECT count(*) FROM _research_events"
+            ).fetchone()[0]
+            if observed_count != len(records):
+                raise ResearchStoreError("PROJECTION_RECORD_COUNT_MISMATCH")
+            view_names = {
+                row[0]
+                for row in connection.execute(
+                    """
+                    SELECT table_name
+                    FROM information_schema.views
+                    WHERE table_schema = 'main'
+                    """
+                ).fetchall()
+            }
+            if set(_PROJECTION_VIEWS) - view_names:
+                raise ResearchStoreError("PROJECTION_VIEW_MISSING")
+            invalid_negative = connection.execute(
+                """
+                SELECT count(*)
+                FROM experiment_runs
+                WHERE run_event_kind = 'RUN_INVALID'
+                  AND trial_outcome = 'NEGATIVE'
+                """
+            ).fetchone()[0]
+            if invalid_negative:
+                raise ResearchStoreError("INVALID_IS_NOT_NEGATIVE")
+            for view in _PROJECTION_VIEWS:
+                connection.execute(
+                    f'SELECT * FROM "{view}" ORDER BY ALL LIMIT 10'
+                ).fetchall()
+
+            projection_digest = _projection_export_digest(
+                connection,
+                manifests=manifests,
+            )
+            connection.execute(
+                """
+                INSERT INTO _projection_metadata VALUES (TRUE, ?, ?, ?, '1.0')
+                """,
+                [
+                    projection_digest,
+                    len(records),
+                    len(manifests),
+                ],
+            )
+            connection.execute("CHECKPOINT")
+            connection.close()
+            connection = None
+
+            verification = duckdb.connect(
+                str(temporary_path),
+                read_only=True,
+                config={
+                    "enable_external_access": "false",
+                    "allow_unsigned_extensions": "false",
+                },
+            )
+            try:
+                verification.execute("SET TimeZone = 'UTC'")
+                verification.execute("SET lock_configuration = true")
+                metadata = verification.execute(
+                    """
+                    SELECT
+                        projection_digest_sha256,
+                        record_count,
+                        partition_count
+                    FROM _projection_metadata
+                    WHERE singleton = TRUE
+                    """
+                ).fetchone()
+                if metadata != (
+                    projection_digest,
+                    len(records),
+                    len(manifests),
+                ):
+                    raise ResearchStoreError("PROJECTION_METADATA_READBACK_MISMATCH")
+                verification.execute(
+                    "SELECT * FROM prior_work ORDER BY ALL LIMIT 10"
+                ).fetchall()
+            finally:
+                verification.close()
+
+            os.replace(temporary_path, projection_path)
+            return ProjectionReceipt(
+                status="READY",
+                logical_uri=RESEARCH_PROJECTION_LOGICAL_URI,
+                projection_digest_sha256=projection_digest,
+                record_count=len(records),
+                partition_count=len(manifests),
+            )
+        except ResearchStoreError:
+            raise
+        except (OSError, ValueError, duckdb.Error) as exc:
+            raise ResearchStoreError("PROJECTION_REBUILD_FAILED") from exc
+        finally:
+            if connection is not None:
+                connection.close()
+            try:
+                temporary_path.unlink(missing_ok=True)
+            except OSError as exc:
+                raise ResearchStoreError("TEMPORARY_CLEANUP_FAILED") from exc
 
     def find_completed_run(
         self,
@@ -1001,6 +1322,47 @@ class ResearchStore:
     ) -> RunPassport | None:
         if _HASH64_RE.fullmatch(run_key_sha256) is None:
             raise ResearchStoreError("RUN_KEY_SHA256_INVALID")
+        projection_path = self._root / RESEARCH_PROJECTION_LOCATION
+        if projection_path.is_file() and not projection_path.is_symlink():
+            connection: duckdb.DuckDBPyConnection | None = None
+            try:
+                connection = duckdb.connect(
+                    str(projection_path),
+                    read_only=True,
+                    config={
+                        "enable_external_access": "false",
+                        "allow_unsigned_extensions": "false",
+                    },
+                )
+                connection.execute("SET TimeZone = 'UTC'")
+                connection.execute("SET lock_configuration = true")
+                row = connection.execute(
+                    """
+                    SELECT run_id, payload_json
+                    FROM experiment_runs
+                    WHERE run_event_kind = 'RUN_COMPLETED'
+                      AND run_key_sha256 = ?
+                    ORDER BY record_id
+                    LIMIT 1
+                    """,
+                    [run_key_sha256],
+                ).fetchone()
+                if row is not None:
+                    payload = json.loads(row[1])
+                    if not isinstance(payload, dict):
+                        raise ResearchStoreError("RUN_COMPLETED_PASSPORT_INVALID")
+                    return RunPassport(
+                        run_id=row[0],
+                        run_key_sha256=run_key_sha256,
+                        payload=payload,
+                    )
+            except ResearchStoreError:
+                raise
+            except (ValueError, json.JSONDecodeError, duckdb.Error) as exc:
+                raise ResearchStoreError("PROJECTION_QUERY_FAILED") from exc
+            finally:
+                if connection is not None:
+                    connection.close()
         for record in self.iter_committed_records():
             if record.record_kind != RecordKind.RUN_COMPLETED:
                 continue
