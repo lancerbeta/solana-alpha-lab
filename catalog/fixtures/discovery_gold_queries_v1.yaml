@@ -1,0 +1,160 @@
+schema_version: '1.0'
+fixture_id: FIXTURE-CATALOG-DISCOVERY-GOLD-QUERIES-001
+as_of: '2026-08-25'
+queries:
+- query_id: GQ-CURRENT-PROVIDER-REGISTRY-EN
+  command: search-assets
+  query: current provider route registry
+  required_top_5:
+  - CONFIG-PROVIDER-ROUTE-CAPABILITY-REGISTRY-010
+  forbidden_above:
+    CONFIG-PROVIDER-ROUTE-CAPABILITY-REGISTRY-003: CONFIG-PROVIDER-ROUTE-CAPABILITY-REGISTRY-010
+  rationale: Generic current English lookup must prefer the explicit binding
+- query_id: GQ-CURRENT-PROVIDER-REGISTRY-RU
+  command: search-assets
+  query: актуальный реестр маршрутов провайдеров
+  required_top_5:
+  - CONFIG-PROVIDER-ROUTE-CAPABILITY-REGISTRY-010
+  forbidden_above:
+    CONFIG-PROVIDER-ROUTE-CAPABILITY-REGISTRY-003: CONFIG-PROVIDER-ROUTE-CAPABILITY-REGISTRY-010
+  rationale: Generic current Russian lookup must prefer the explicit binding
+- query_id: GQ-EXACT-PROVIDER-REGISTRY-V3-ID
+  command: search-assets
+  query: CONFIG-PROVIDER-ROUTE-CAPABILITY-REGISTRY-003
+  required_top_5:
+  - CONFIG-PROVIDER-ROUTE-CAPABILITY-REGISTRY-003
+  rationale: Exact historical v3 Catalog ID remains first
+- query_id: GQ-EXACT-PROVIDER-REGISTRY-V3-PATH
+  command: search-assets
+  query: configs/provider_route_capability_registry_v3.yaml
+  required_top_5:
+  - CONFIG-PROVIDER-ROUTE-CAPABILITY-REGISTRY-003
+  rationale: Exact historical v3 repository path remains first
+- query_id: GQ-CURRENT-FEATURE-SURFACE-EN
+  command: search-assets
+  query: current factory market feature surface
+  required_top_5:
+  - CONFIG-FACTORY-V1-COMMON-MARKET-FEATURE-SURFACE-001
+  rationale: Current Factory market feature surface in English
+- query_id: GQ-CURRENT-FEATURE-SURFACE-RU
+  command: search-assets
+  query: актуальная поверхность рыночных признаков
+  required_top_5:
+  - CONFIG-FACTORY-V1-COMMON-MARKET-FEATURE-SURFACE-001
+  rationale: Current Factory market feature surface in Russian
+- query_id: GQ-DELIVERY-HARNESS
+  command: search-assets
+  query: delivery harness
+  required_top_5:
+  - CONFIG-DELIVERY-HARNESS-001
+  rationale: Delivery Harness configuration remains discoverable
+- query_id: GQ-TASK-CONTEXT
+  command: search-assets
+  query: task context
+  required_top_5:
+  - CONFIG-DELIVERY-HARNESS-001
+  rationale: Task context aliases the Delivery Harness contract
+- query_id: GQ-PRIOR-WORK
+  command: search-assets
+  query: prior work
+  required_top_5:
+  - SCRIPT-T16-PRIOR-WORK-QUERY-001
+  rationale: Bounded T16 prior-work command
+- query_id: GQ-HYPOTHESIS-MEMORY
+  command: search-assets
+  query: hypothesis research memory
+  required_top_5:
+  - SCRIPT-T16-PRIOR-WORK-QUERY-001
+  rationale: Hypothesis memory query surface
+- query_id: GQ-HYPOTHESIS-LIFECYCLE
+  command: search-assets
+  query: hypothesis lifecycle
+  required_top_5:
+  - SCRIPT-T16-PRIOR-WORK-QUERY-001
+  rationale: Hypothesis lifecycle research memory
+- query_id: GQ-NEGATIVE-RESULTS
+  command: search-assets
+  query: negative results
+  required_top_5:
+  - REGISTRY-DECISIONS-NEGATIVE-RESULTS-001
+  rationale: Durable negative-results registry
+- query_id: GQ-DECISIONS-REGISTRY
+  command: search-assets
+  query: decisions registry
+  required_top_5:
+  - REGISTRY-DECISIONS-NEGATIVE-RESULTS-001
+  rationale: Decisions and negative-results registry
+- query_id: GQ-GLOBAL-TRIAL-LEDGER
+  command: search-assets
+  query: global trial ledger
+  required_top_5:
+  - REGISTRY-GLOBAL-TRIAL-LEDGER-001
+  rationale: Global trial ledger registry
+- query_id: GQ-HOLDER-CONCENTRATION
+  command: search-assets
+  query: holder concentration
+  required_top_5:
+  - CONFIG-EARLY-HOLDER-CONCENTRATION-H900-FALSIFIER-001
+  rationale: Early holder-concentration falsifier
+- query_id: GQ-FRICTION-VETO
+  command: search-assets
+  query: friction veto
+  required_top_5:
+  - CONFIG-FACTORY-V1-FRICTION-VETO-001
+  rationale: Factory friction-veto selector
+- query_id: GQ-OPERATOR-NAVIGATION
+  command: search-assets
+  query: operator navigation
+  required_top_5:
+  - DOC-T34A-OPERATOR-NAVIGATION-001
+  rationale: Generated operator navigation view
+- query_id: GQ-GENERATED-NAVIGATION
+  command: search-assets
+  query: generated operator route map
+  required_top_5:
+  - DOC-T34A-OPERATOR-NAVIGATION-001
+  rationale: Operator route-map wording
+- query_id: GQ-AMBIGUOUS-REGISTRY
+  command: search-assets
+  query: provider route capability registry
+  required_top_5:
+  - CONFIG-PROVIDER-ROUTE-CAPABILITY-REGISTRY-010
+  forbidden_above:
+    CONFIG-PROVIDER-ROUTE-CAPABILITY-REGISTRY-003: CONFIG-PROVIDER-ROUTE-CAPABILITY-REGISTRY-010
+  rationale: Ambiguous registry wording still ranks the bound current target first
+- query_id: GQ-AMBIGUOUS-FACTORY
+  command: search-assets
+  query: factory_v1 feature_surface
+  match: all
+  required_top_5:
+  - CONFIG-FACTORY-V1-COMMON-MARKET-FEATURE-SURFACE-001
+  rationale: Ambiguous Factory feature-surface tokens remain byte-stable
+- query_id: GQ-NO-RESULT
+  command: search-assets
+  query: zzzxqnosuchcatalogtoken9f3a
+  required_empty: true
+  rationale: Unknown token yields an empty deterministic list
+- query_id: GQ-UNICODE-PUNCTUATION
+  command: search-assets
+  query: "provider\u2010route registry"
+  match: any
+  required_top_5:
+  - CONFIG-PROVIDER-ROUTE-CAPABILITY-REGISTRY-010
+  rationale: Unicode hyphen NFKC-normalizes into the provider-route phrase
+- query_id: GQ-STATUS-FILTER
+  command: search-assets
+  query: provider route capability registry
+  filters:
+    status: VALIDATED_ACTIVE
+  required_top_5:
+  - CONFIG-PROVIDER-ROUTE-CAPABILITY-REGISTRY-003
+  rationale: Status filter is applied before ranking
+- query_id: GQ-CONSUMER-RELATION-FILTER
+  command: search-assets
+  query: provider route capability registry
+  filters:
+    consumer: FACTORY-001
+    relation: derived_from
+  required_top_5:
+  - CONFIG-PROVIDER-ROUTE-CAPABILITY-REGISTRY-010
+  rationale: Consumer and relation filters apply before rank

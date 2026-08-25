@@ -1,6 +1,6 @@
 schema_version: '1.0'
 registry_id: CATALOG-QUERY-REGISTRY-001
-as_of: '2026-07-23'
+as_of: '2026-08-25'
 recipes:
 - recipe_id: QUERY-CATALOG-VALIDATE-001
   record_version: '1.0'
@@ -289,8 +289,8 @@ recipes:
     format: json
     max_records: 50
 - recipe_id: QUERY-CATALOG-SEARCH-ASSETS-001
-  record_version: '1.0'
-  purpose: Search validated Catalog metadata for prior measurements, tests, routes and evidence by stable text terms and optional consumer/status/type filters.
+  record_version: '2.0'
+  purpose: Search validated Catalog metadata for prior measurements, tests, routes and evidence by stable text terms with deterministic ranking and optional consumer/status/type filters.
   kind: local_command
   read_only: true
   bounded: true
@@ -308,14 +308,98 @@ recipes:
   - search-assets
   - --text
   - '{text}'
+  - --match
+  - '{match}'
+  - --limit
+  - '{limit}'
+  - --explain
   - --json
   parameters:
   - name: text
     required: true
-    pattern: '^[A-Za-z0-9][A-Za-z0-9 _:.{}()/-]{0,199}$'
+    pattern: '^[^\x00-\x1f\x7f]{1,200}$'
+  - name: match
+    required: true
+    pattern: '^(all|any)$'
+  - name: limit
+    required: true
+    pattern: '^(?:[1-9]|[1-4][0-9]|50)$'
   target_asset_ids:
   - CATALOG-ROOT-001
   - CATALOG-CLI-001
+  - MODULE-CATALOG-DISCOVERY-001
   output_contract:
     format: json
-    max_records: 1000
+    max_records: 50
+- recipe_id: QUERY-CATALOG-RESOLVE-BINDING-001
+  record_version: '1.0'
+  purpose: Resolve one canonical Catalog binding ID to the pinned current-at-commit asset path and content hash.
+  kind: local_command
+  read_only: true
+  bounded: true
+  network_required: false
+  write_effects: NONE
+  timeout_seconds: 30
+  command:
+  - uv
+  - run
+  - --locked
+  - --managed-python
+  - python
+  - -B
+  - scripts/catalog_cli.py
+  - resolve-binding
+  - '{binding_id}'
+  - --json
+  parameters:
+  - name: binding_id
+    required: true
+    pattern: ^[A-Z][A-Z0-9]*(?:-[A-Z0-9]+)+$
+  target_asset_ids:
+  - CATALOG-ROOT-001
+  - CATALOG-CLI-001
+  - MODULE-CATALOG-DISCOVERY-001
+  output_contract:
+    format: json
+    max_records: 1
+- recipe_id: QUERY-CATALOG-RELATED-ASSETS-001
+  record_version: '1.0'
+  purpose: Traverse declared Catalog relation edges from one asset with breadth-first depth at most two and no inferred authority.
+  kind: local_command
+  read_only: true
+  bounded: true
+  network_required: false
+  write_effects: NONE
+  timeout_seconds: 30
+  command:
+  - uv
+  - run
+  - --locked
+  - --managed-python
+  - python
+  - -B
+  - scripts/catalog_cli.py
+  - related-assets
+  - '{asset_id}'
+  - --depth
+  - '{depth}'
+  - --direction
+  - '{direction}'
+  - --json
+  parameters:
+  - name: asset_id
+    required: true
+    pattern: ^[A-Z][A-Z0-9]*(?:-[A-Z0-9]+)+$
+  - name: depth
+    required: true
+    pattern: '^[12]$'
+  - name: direction
+    required: true
+    pattern: '^(out|in|both)$'
+  target_asset_ids:
+  - CATALOG-ROOT-001
+  - CATALOG-CLI-001
+  - MODULE-CATALOG-DISCOVERY-001
+  output_contract:
+    format: json
+    max_records: 50

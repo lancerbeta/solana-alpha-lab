@@ -10,11 +10,17 @@ from dataclasses import dataclass
 from datetime import datetime
 from pathlib import Path, PurePosixPath, PureWindowsPath
 from typing import Any, Iterable
+import sys
 
 import yaml
 from jsonschema import Draft202012Validator
 
 ROOT = Path(__file__).resolve().parents[1]
+SRC = ROOT / "src"
+if str(SRC) not in sys.path:
+    sys.path.insert(0, str(SRC))
+
+from solana_alpha_lab.catalog_discovery import validate_canonical_bindings, BindingValidationError
 
 
 class CatalogValidationError(RuntimeError):
@@ -242,6 +248,10 @@ def validate_semantics(
     missing_mandatory = set(manifest["mandatory_asset_ids"]) - set(assets)
     if missing_mandatory:
         raise CatalogValidationError("catalog_gap_missing_mandatory:" + ",".join(sorted(missing_mandatory)))
+    try:
+        validate_canonical_bindings(manifest, assets)
+    except BindingValidationError as exc:
+        raise CatalogValidationError(str(exc)) from exc
 
     all_registry_paths = (
         manifest["root_resolver"]["asset_registries"]

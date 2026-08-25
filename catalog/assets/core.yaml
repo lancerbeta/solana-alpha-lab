@@ -1092,7 +1092,7 @@ records:
     repository_path: catalog/schemas/catalog_manifest.schema.json
   integrity:
     kind: sha256
-    sha256: cbd355d4acba52b77d68026255a1dfafb765bb5421f41f312badfbeb3a4b5d8e
+    sha256: ef720e1f5d0fca0a43bab1fc28961d60f8f4fc335508ab83175ae1b2e9f5873c
   access:
     mode: read_only
     method: file
@@ -1183,7 +1183,7 @@ records:
     repository_path: scripts/validate_catalog.py
   integrity:
     kind: sha256
-    sha256: 34e8752f781785a9294aac071f0618a005deb9ceea58d5cabd5190f84d19a810
+    sha256: ab9add51e9296c6c1a5c8dbe1a7fc7a79e7e8fadc4a0a7382ea9ea0b0039c0ab
   access:
     mode: read_only
     method: command
@@ -1215,7 +1215,7 @@ records:
     repository_path: scripts/catalog_cli.py
   integrity:
     kind: sha256
-    sha256: 11114abff162e190933baeb60607cba87921174fa946c23b37fa0eb68551f804
+    sha256: c76025aac347c6a42f6f3a94b99386464cd21ba6b6fef43b97f43363294d0bcf
   access:
     mode: read_only
     method: command
@@ -1474,7 +1474,7 @@ records:
     repository_path: scripts/generate_navigation.py
   integrity:
     kind: sha256
-    sha256: 2c855150a466413fb90ea782d77fc46a74b18a7dfb013ea612181474ae2e82dd
+    sha256: 47afd368120838e97eb6e2fa484099449190f265f65b3e1e838e6194f3f2dbc3
   access:
     mode: task_write
     method: command
@@ -8066,6 +8066,7 @@ records:
   - TASK-16
   - FACTORY-001
   evidence: []
+  search_terms: [prior work, hypothesis research memory, hypothesis lifecycle]
   classification: *t16_internal
 - asset_id: FIXTURE-T16-HYPOTHESIS-RESEARCH-MEMORY-001
   record_version: '1.0'
@@ -17786,13 +17787,14 @@ records:
   as_of: '2026-08-09'
   truth_owner: TASK-34A
   location: {kind: git_path, logical_uri: 'repo://docs/OPERATOR_NAVIGATION.md', repository_path: docs/OPERATOR_NAVIGATION.md}
-  integrity: {kind: sha256, sha256: dba905ef661dcc3db74b7899ea99df56a86d807fb2eb61412864741dd12ed201}
+  integrity: {kind: sha256, sha256: 1dcf971a0cb2dae92cd7497c4f2f7975cee99b5cdaf161d937e08eeb67a84c69}
   access: *t25_read_file
   relations:
   - {relation_type: derived_from, target_asset_id: SCRIPT-T34A-CONTEXT-001}
   - {relation_type: derived_from, target_asset_id: GENERATOR-CATALOG-NAVIGATION-001}
   consumers: [TASK-34, FACTORY-001]
   evidence: []
+  search_terms: [operator navigation, generated operator route map]
   classification: *t25_internal
 
 - asset_id: DOC-T34A-RUNBOOKS-001
@@ -17820,7 +17822,7 @@ records:
   as_of: '2026-08-09'
   truth_owner: TASK-34A
   location: {kind: git_path, logical_uri: 'repo://tests/test_task34a_documentation_foundation.py', repository_path: tests/test_task34a_documentation_foundation.py}
-  integrity: {kind: sha256, sha256: 9fd8b1817505153239615f1f7cf1413e5e01896c8ad5c23bbaae28cc7e37286b}
+  integrity: {kind: sha256, sha256: 0c88190b271225c1ee5c364fee2ee369e9dadbcad3f46553db9764f80386cf24}
   access: *t25_read_file
   relations:
   - {relation_type: depends_on, target_asset_id: MODULE-T34A-DOCUMENTATION-FOUNDATION-001}
@@ -19734,6 +19736,7 @@ records:
   - {relation_type: validated_by, target_asset_id: TEST-DELIVERY-HARNESS-001}
   consumers: [LOCAL-WORK-CODEX, DIRECT-CURSOR-DELIVERY, FACTORY-001]
   evidence: []
+  search_terms: [DELIVERY_HARNESS, task context]
   classification: *t25_internal
 
 - asset_id: CONFIG-DELIVERY-PROJECT-PROFILE-001
@@ -26400,7 +26403,7 @@ records:
   - {relation_type: depends_on, target_asset_id: SCHEMA-FACTORY-V1-FRICTION-VETO-001}
   consumers: [FACTORY-001, FRESH-OOS-FRICTION-VETO-001, GOAL-OWNER]
   evidence: []
-  search_terms: [FACTORY_V1, FRICTION_VETO, CONFIG]
+  search_terms: [FACTORY_V1, FRICTION_VETO, CONFIG, friction veto]
   classification: {contains_secrets: false, contains_raw_data: false, sensitivity: INTERNAL_NON_SECRET}
 
 - asset_id: SCHEMA-FACTORY-V1-FRICTION-VETO-001
@@ -27440,7 +27443,7 @@ records:
   - {relation_type: depends_on, target_asset_id: SCHEMA-FACTORY-V1-COMMON-MARKET-FEATURE-SURFACE-001}
   consumers: [FACTORY-001, GOAL-OWNER]
   evidence: []
-  search_terms: [FACTORY_V1, FEATURE_SURFACE, CONFIG]
+  search_terms: [FACTORY_V1, FEATURE_SURFACE, CONFIG, current factory market feature surface, актуальная поверхность рыночных признаков]
   classification: {contains_secrets: false, contains_raw_data: false, sensitivity: INTERNAL_NON_SECRET}
 
 - asset_id: MODULE-FACTORY-V1-MARKET-FEATURE-SURFACE-001
@@ -28295,7 +28298,7 @@ records:
   relations: [{relation_type: derived_from, target_asset_id: CONFIG-PROVIDER-ROUTE-CAPABILITY-REGISTRY-009}]
   consumers: [FACTORY-001, GOAL-OWNER]
   evidence: []
-  search_terms: [PROVIDER_ROUTE, REGISTRY_V10, JUPITER, TOKENS_V2, SEARCH]
+  search_terms: [PROVIDER_ROUTE, REGISTRY_V10, JUPITER, TOKENS_V2, SEARCH, current provider route registry, актуальный реестр маршрутов провайдеров]
   classification: {contains_secrets: false, contains_raw_data: false, sensitivity: INTERNAL_NON_SECRET}
 - asset_id: SCHEMA-PROVIDER-ROUTE-CAPABILITY-REGISTRY-010
   record_version: '1.0'
@@ -31540,4 +31543,132 @@ records:
   consumers: [GOAL-OWNER]
   evidence: []
   search_terms: [BUY, QUOTE, MICROSTRUCTURE, ASSOCIATION, READOUT]
+  classification: {contains_secrets: false, contains_raw_data: false, sensitivity: INTERNAL_NON_SECRET}
+- asset_id: CTRL-KCDN-ATOM-A-001
+  record_version: '1.0'
+  asset_type: control_document
+  purpose: Exact contract for Catalog canonical bindings, ranked search, related-asset navigation and repaired operator guidance.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-08-25'
+  truth_owner: KCDN_ATOM_A_CANONICAL_BINDINGS_AND_DETERMINISTIC_NAVIGATION_V1
+  location: {kind: git_path, logical_uri: 'repo://docs/tasks/KCDN_ATOM_A_CANONICAL_BINDINGS_AND_DETERMINISTIC_NAVIGATION_V1.md', repository_path: docs/tasks/KCDN_ATOM_A_CANONICAL_BINDINGS_AND_DETERMINISTIC_NAVIGATION_V1.md}
+  integrity: {kind: sha256, sha256: 6d9aad2d88ea08fd66522e372527c0c1859e7300a546d574fd8950b323efe8fa}
+  access: {mode: read_only, method: file, network_required: false, secrets_required: false}
+  relations:
+  - {relation_type: contains, target_asset_id: MODULE-CATALOG-DISCOVERY-001}
+  - {relation_type: contains, target_asset_id: FIXTURE-CATALOG-DISCOVERY-GOLD-QUERIES-001}
+  - {relation_type: validated_by, target_asset_id: TEST-CATALOG-CANONICAL-BINDING-DISCOVERY-001}
+  - {relation_type: evidenced_by, target_asset_id: EVIDENCE-KCDN-ATOM-A-DELIVERY-COMPLETION-001}
+  consumers: [FACTORY-001, GOAL-OWNER]
+  evidence: []
+  search_terms: [CANONICAL_BINDING, DETERMINISTIC_NAVIGATION, CATALOG]
+  classification: {contains_secrets: false, contains_raw_data: false, sensitivity: INTERNAL_NON_SECRET}
+- asset_id: MODULE-CATALOG-DISCOVERY-001
+  record_version: '1.0'
+  asset_type: script
+  purpose: Pure ranked Catalog search, canonical binding resolution and bounded related-asset BFS without a persisted graph.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-08-25'
+  truth_owner: KCDN_ATOM_A_CANONICAL_BINDINGS_AND_DETERMINISTIC_NAVIGATION_V1
+  location: {kind: git_path, logical_uri: 'repo://src/solana_alpha_lab/catalog_discovery.py', repository_path: src/solana_alpha_lab/catalog_discovery.py}
+  integrity: {kind: sha256, sha256: 6054ae80e2d828ba8cef3631d60647d14e488b7fccebd29a4edda0b9795f0784}
+  access: {mode: read_only, method: file, network_required: false, secrets_required: false}
+  relations:
+  - {relation_type: governed_by, target_asset_id: CTRL-KCDN-ATOM-A-001}
+  - {relation_type: depends_on, target_asset_id: CATALOG-CLI-001}
+  consumers: [FACTORY-001, CATALOG-CLI-001]
+  evidence: []
+  search_terms: [CANONICAL_BINDING, SEARCH, RELATED_ASSETS]
+  classification: {contains_secrets: false, contains_raw_data: false, sensitivity: INTERNAL_NON_SECRET}
+- asset_id: FIXTURE-CATALOG-DISCOVERY-GOLD-QUERIES-001
+  record_version: '1.0'
+  asset_type: evidence
+  purpose: Hand-reviewed 24-query gold fixture for current, exact, conceptual and filtered Catalog discovery.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-08-25'
+  truth_owner: KCDN_ATOM_A_CANONICAL_BINDINGS_AND_DETERMINISTIC_NAVIGATION_V1
+  location: {kind: git_path, logical_uri: 'repo://catalog/fixtures/discovery_gold_queries_v1.yaml', repository_path: catalog/fixtures/discovery_gold_queries_v1.yaml}
+  integrity: {kind: sha256, sha256: b0e25d38a0fed6ac3beb260da4943a7c31015f1b064ad288d117a45d9092a9d7}
+  access: {mode: read_only, method: file, network_required: false, secrets_required: false}
+  relations:
+  - {relation_type: governed_by, target_asset_id: CTRL-KCDN-ATOM-A-001}
+  - {relation_type: validated_by, target_asset_id: TEST-CATALOG-CANONICAL-BINDING-DISCOVERY-001}
+  consumers: [FACTORY-001]
+  evidence: []
+  search_terms: [GOLD_QUERY, CATALOG_DISCOVERY]
+  classification: {contains_secrets: false, contains_raw_data: false, sensitivity: INTERNAL_NON_SECRET}
+- asset_id: TEST-CATALOG-CANONICAL-BINDING-DISCOVERY-001
+  record_version: '1.0'
+  asset_type: script
+  purpose: Deterministic tests for Catalog schema 1.1 bindings, ranked search, related-asset BFS and gold queries.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-08-25'
+  truth_owner: KCDN_ATOM_A_CANONICAL_BINDINGS_AND_DETERMINISTIC_NAVIGATION_V1
+  location: {kind: git_path, logical_uri: 'repo://tests/test_catalog_canonical_binding_discovery.py', repository_path: tests/test_catalog_canonical_binding_discovery.py}
+  integrity: {kind: sha256, sha256: 157cc55aa5d3fb90b8557bc5fa69018f623fab28660cd3c6232823f7a888c7cb}
+  access: {mode: read_only, method: file, network_required: false, secrets_required: false}
+  relations:
+  - {relation_type: depends_on, target_asset_id: MODULE-CATALOG-DISCOVERY-001}
+  - {relation_type: depends_on, target_asset_id: FIXTURE-CATALOG-DISCOVERY-GOLD-QUERIES-001}
+  consumers: [FACTORY-001]
+  evidence: []
+  search_terms: [CATALOG_DISCOVERY, GOLD_QUERY, TEST]
+  classification: {contains_secrets: false, contains_raw_data: false, sensitivity: INTERNAL_NON_SECRET}
+- asset_id: EVIDENCE-KCDN-ATOM-A-DELIVERY-INDEPENDENT-REVIEW-001
+  record_version: '1.0'
+  asset_type: evidence
+  purpose: Isolated critic packet for Catalog binding, discovery and operator-navigation delivery.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-08-25'
+  truth_owner: KCDN_ATOM_A_CANONICAL_BINDINGS_AND_DETERMINISTIC_NAVIGATION_V1
+  location: {kind: git_path, logical_uri: 'repo://docs/evidence/kcdn_atom_a/a1_delivery_independent_review_v1.json', repository_path: docs/evidence/kcdn_atom_a/a1_delivery_independent_review_v1.json}
+  integrity: {kind: none, note: 'Content integrity is owned by the live completion-review-fit hash chain; embedding its SHA here would create an indirect self-reference through the reviewed inventory.'}
+  access: {mode: read_only, method: file, network_required: false, secrets_required: false}
+  relations:
+  - {relation_type: derived_from, target_asset_id: CTRL-KCDN-ATOM-A-001}
+  consumers: [FACTORY-001, GOAL-OWNER]
+  evidence: []
+  search_terms: [KCDN, REVIEW, CATALOG_DISCOVERY]
+  classification: {contains_secrets: false, contains_raw_data: false, sensitivity: INTERNAL_NON_SECRET}
+- asset_id: EVIDENCE-KCDN-ATOM-A-DELIVERY-FACTORY-FIT-001
+  record_version: '1.0'
+  asset_type: evidence
+  purpose: Factory Fit for Catalog bindings and deterministic navigation without a new knowledge store.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-08-25'
+  truth_owner: KCDN_ATOM_A_CANONICAL_BINDINGS_AND_DETERMINISTIC_NAVIGATION_V1
+  location: {kind: git_path, logical_uri: 'repo://docs/evidence/kcdn_atom_a/a1_delivery_factory_fit_v1.json', repository_path: docs/evidence/kcdn_atom_a/a1_delivery_factory_fit_v1.json}
+  integrity: {kind: none, note: 'Content integrity is owned by the live completion-review-fit hash chain; embedding its SHA here would create an indirect self-reference through the reviewed inventory.'}
+  access: {mode: read_only, method: file, network_required: false, secrets_required: false}
+  relations:
+  - {relation_type: derived_from, target_asset_id: CTRL-KCDN-ATOM-A-001}
+  - {relation_type: depends_on, target_asset_id: EVIDENCE-KCDN-ATOM-A-DELIVERY-INDEPENDENT-REVIEW-001}
+  consumers: [FACTORY-001, GOAL-OWNER]
+  evidence: []
+  search_terms: [KCDN, FACTORY_FIT, CATALOG_DISCOVERY]
+  classification: {contains_secrets: false, contains_raw_data: false, sensitivity: INTERNAL_NON_SECRET}
+- asset_id: EVIDENCE-KCDN-ATOM-A-DELIVERY-COMPLETION-001
+  record_version: '1.0'
+  asset_type: evidence
+  purpose: Guard-consumable completion evidence before the exact-head merge gate for Atom A.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-08-25'
+  truth_owner: KCDN_ATOM_A_CANONICAL_BINDINGS_AND_DETERMINISTIC_NAVIGATION_V1
+  location: {kind: git_path, logical_uri: 'repo://docs/evidence/kcdn_atom_a/a1_delivery_completion_evidence_v1.json', repository_path: docs/evidence/kcdn_atom_a/a1_delivery_completion_evidence_v1.json}
+  integrity: {kind: none, note: 'Content integrity is owned by the live completion-review-fit hash chain; embedding its SHA here would create an indirect self-reference through the reviewed inventory.'}
+  access: {mode: read_only, method: file, network_required: false, secrets_required: false}
+  relations:
+  - {relation_type: derived_from, target_asset_id: CTRL-KCDN-ATOM-A-001}
+  - {relation_type: depends_on, target_asset_id: EVIDENCE-KCDN-ATOM-A-DELIVERY-INDEPENDENT-REVIEW-001}
+  - {relation_type: depends_on, target_asset_id: EVIDENCE-KCDN-ATOM-A-DELIVERY-FACTORY-FIT-001}
+  consumers: [FACTORY-001, GOAL-OWNER]
+  evidence: []
+  search_terms: [KCDN, COMPLETION, CATALOG_DISCOVERY]
   classification: {contains_secrets: false, contains_raw_data: false, sensitivity: INTERNAL_NON_SECRET}

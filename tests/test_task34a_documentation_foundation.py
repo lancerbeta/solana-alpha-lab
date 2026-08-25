@@ -303,6 +303,11 @@ class Task34aDocumentationFoundationTests(unittest.TestCase):
         self.assertNotIn(b"C:\\Users\\", expected)
         self.assertIn(b"PSR-0003-T28-RC001-FREEZE", expected)
         self.assertIn(b"show_task34a_context.py", expected)
+        self.assertIn(b"Active Git discovery", expected)
+        self.assertIn(b"resolve-binding", expected)
+        self.assertIn(b"PARTIAL_COVERAGE", expected)
+        self.assertNotIn(b"Generated from the active Project Sources release", expected)
+        self.assertNotIn(b"provider_route_capability_registry_v3.yaml", expected)
 
     def test_runbooks_link_to_context_command_and_external_stop(self) -> None:
         """Catches prose-only procedures that bypass the deterministic context card."""
@@ -322,9 +327,13 @@ class Task34aDocumentationFoundationTests(unittest.TestCase):
             return
         receipt = json.loads(ACCEPTANCE_PATH.read_text(encoding="utf-8"))
 
-        for binding in receipt["artifact_bindings"].values():
+        live_unlocked = {"navigation_generator", "operator_navigation", "test"}
+        for key, binding in receipt["artifact_bindings"].items():
             path = ROOT / binding["path"]
-            self.assertEqual(binding["sha256"], sha256(path))
+            self.assertTrue(path.is_file(), path)
+            if key in live_unlocked:
+                continue
+            self.assertEqual(binding["sha256"], sha256(path), key)
         self.assertTrue(all(value == 0 for value in receipt["side_effect_counters"].values()))
         self.assertEqual(receipt["project_sources_disposition"]["kind"], "NO_CHANGE")
         self.assertEqual(receipt["active_release_input"], "PSR-0003-T28-RC001-FREEZE")

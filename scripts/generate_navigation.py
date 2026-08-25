@@ -87,31 +87,83 @@ def render_edge_projection(snapshot: Any) -> bytes:
 
 
 def render_operator_navigation(root: Path, snapshot: Any) -> bytes:
-    """Render stable, repository-native entry points without local runtime paths."""
+    """Render Git-native Catalog discovery first; Project Sources stay historical."""
     context = evaluate_context(root)
-    catalog_ids = (
-        "CATALOG-ROOT-001",
-        "GENERATOR-CATALOG-NAVIGATION-001",
-        "CTRL-AGENTS-001",
-    )
-    available_catalog_ids = [
-        asset_id for asset_id in catalog_ids if asset_id in snapshot.assets
-    ]
+    manifest = snapshot.manifest if isinstance(getattr(snapshot, "manifest", None), dict) else {}
+    bindings = manifest.get("canonical_bindings") or {}
+    binding_lines = []
+    for binding_id in sorted(bindings):
+        spec = bindings[binding_id]
+        binding_lines.append(
+            f"- `{binding_id}` → `{spec['target_asset_id']}` (`{spec.get('semantics', '')}`)"
+        )
+    if not binding_lines:
+        binding_lines.append("- Canonical bindings are unavailable in this synthetic snapshot.")
     lines = [
         "# Operator navigation",
         "",
-        "Generated from the active Project Sources release and validated Catalog. Do not edit manually.",
+        "Generated from the validated Catalog, canonical bindings and Delivery Harness. Do not edit manually.",
         "This is a short route map, not a second truth owner or a documentation portal.",
         "",
-        "## Current binding",
+        "## Active Git discovery",
         "",
-        f"- Active Project Sources release: `{context['active_release_id']}`",
+        "Project Sources release and owner-smoke receipts are not the active discovery path.",
+        "",
+        "1. Exact known Catalog ID:",
+        "",
+        "```powershell",
+        "uv run --locked --managed-python python -B scripts/catalog_cli.py resolve-asset <ASSET_ID> --json",
+        "```",
+        "",
+        "2. Current semantic root (`resolve-binding`):",
+        "",
+        "```powershell",
+        "uv run --locked --managed-python python -B scripts/catalog_cli.py resolve-binding ACTIVE-PROVIDER-ROUTE-CAPABILITY-REGISTRY --json",
+        "```",
+        "",
+        "```powershell",
+        "uv run --locked --managed-python python -B scripts/catalog_cli.py resolve-binding ACTIVE-FACTORY-MARKET-FEATURE-SURFACE --json",
+        "```",
+        "",
+        "Canonical bindings at this commit:",
+        "",
+        *binding_lines,
+        "",
+        "3. Concept search:",
+        "",
+        "```powershell",
+        "uv run --locked --managed-python python -B scripts/catalog_cli.py search-assets --text <QUERY> --match all --limit 20 --explain --json",
+        "```",
+        "",
+        "4. Declared Catalog relations (`related-assets`, depth at most 2, `authority_inferred: false`):",
+        "",
+        "```powershell",
+        "uv run --locked --managed-python python -B scripts/catalog_cli.py related-assets <ASSET_ID> --depth 2 --direction both --json",
+        "```",
+        "",
+        "5. Prior work is `PARTIAL_COVERAGE` in this atom. Use recipe `QUERY-T16-PRIOR-WORK-001` only after substituting its documented parameters. The `prior-work-references` command is not implemented.",
+        "",
+        "6. Task execution context:",
+        "",
+        "```powershell",
+        "uv run --locked --managed-python python -B scripts/delivery_harness.py check",
+        "```",
+        "",
+        "```powershell",
+        "uv run --locked --managed-python python -B scripts/delivery_harness.py context --route DIRECT_CURSOR_DELIVERY --task-id <TASK_ID> --contract <CONTRACT_PATH> --json",
+        "```",
+        "",
+        "7. Exhaustive browsing: generated [`PROJECT_MAP.md`](PROJECT_MAP.md).",
+        "",
+        "## Historical / optional Project Sources",
+        "",
+        "The following is optional owner-managed export diagnostics. It is not the Git discovery path.",
+        "",
+        f"- Historical Project Sources release: `{context['active_release_id']}`",
         f"- Owner-smoke receipt: `{context['activation_receipt']}`",
-        f"- Active task in that release: `{context['active_task_id']}`",
+        f"- Historical task in that release: `{context['active_task_id']}`",
         f"- Bound source roles: `{context['source_role_count']}`",
         "- A local Project Sources mirror is optional diagnostic input; it is never canonical.",
-        "",
-        "## Safe first command",
         "",
         "```powershell",
         "uv run --locked --managed-python python -B scripts/show_task34a_context.py --format text",
@@ -123,9 +175,7 @@ def render_operator_navigation(root: Path, snapshot: Any) -> bytes:
         "uv run --locked --managed-python python -B scripts/show_task34a_context.py --format json --sources-dir <local-sources-directory>",
         "```",
         "",
-        "## Read the result",
-        "",
-        "- `MIRROR_MATCHES_ACTIVE_RELEASE`: the optional bytes agree with the active release.",
+        "- `MIRROR_MATCHES_ACTIVE_RELEASE`: the optional bytes agree with the historical release.",
         "- `STALE_MIRROR_ACTIVE_RELEASE_CONFIRMED` or `MIRROR_UNAVAILABLE`: use the activated registry/receipt; no automatic repair is needed.",
         "- `MIRROR_CONFLICT_REQUIRES_CONTROL_REVIEW`: stop selection and resolve the conflicting Source state before proceeding.",
         "- A `TASK34A_CONTEXT: FAIL` is a release-binding failure, not permission to choose a replacement truth owner.",
@@ -138,19 +188,20 @@ def render_operator_navigation(root: Path, snapshot: Any) -> bytes:
         "",
         "## Catalog anchors",
         "",
+        "- `CATALOG-ROOT-001`",
+        "- `GENERATOR-CATALOG-NAVIGATION-001`",
+        "- `CTRL-AGENTS-001`",
+        "- `QUERY-CATALOG-SEARCH-ASSETS-001`",
+        "- `QUERY-T16-PRIOR-WORK-001`",
+        "",
+        "No provider, credential, wallet, transaction, cash, deployment, or Project Sources UI action is performed by these commands.",
+        "",
     ]
-    if available_catalog_ids:
-        lines.extend(f"- `{asset_id}`" for asset_id in available_catalog_ids)
-    else:
-        lines.append("- Catalog anchors are unavailable in this synthetic snapshot.")
-    lines.extend(
-        [
-            "",
-            "No provider, credential, wallet, transaction, cash, deployment, or Project Sources UI action is performed by these commands.",
-            "",
-        ]
-    )
-    return "\n".join(lines).encode("utf-8")
+    rendered = "\n".join(lines)
+    if "provider_route_capability_registry_v3.yaml" in rendered:
+        raise RuntimeError("operator_navigation_hardcoded_v3_path")
+    return rendered.encode("utf-8")
+
 
 
 def expected_outputs(snapshot: Any) -> dict[str, bytes]:

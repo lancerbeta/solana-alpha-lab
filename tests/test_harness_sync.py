@@ -110,6 +110,10 @@ class SyncGoldenTests(unittest.TestCase):
             ROOT / "src/solana_alpha_lab/task34a_documentation_foundation.py",
             wt / "src/solana_alpha_lab/task34a_documentation_foundation.py",
         )
+        shutil.copy2(
+            ROOT / "src/solana_alpha_lab/catalog_discovery.py",
+            wt / "src/solana_alpha_lab/catalog_discovery.py",
+        )
         (wt / "src/solana_alpha_lab/__init__.py").write_text("", encoding="utf-8")
         sources_dir = wt / "docs/project_sources"
         sources_dir.mkdir(parents=True, exist_ok=True)
@@ -247,10 +251,21 @@ class SyncGoldenTests(unittest.TestCase):
         real_manifest = yaml.safe_load(
             (ROOT / "catalog/catalog_manifest.yaml").read_text(encoding="utf-8")
         )
+        commands = real_manifest["root_resolver"]["commands"]
+        legacy_commands = {
+            key: commands[key]
+            for key in (
+                "validate",
+                "resolve_asset",
+                "resolve_query",
+                "generate_navigation",
+                "check_generated_navigation",
+            )
+        }
         fixture_manifest = {
-            "schema_version": real_manifest["schema_version"],
+            "schema_version": "1.0",
             "catalog_id": real_manifest["catalog_id"],
-            "catalog_version": real_manifest["catalog_version"],
+            "catalog_version": "0.1.0",
             "as_of": "2026-08-22",
             "implementation_status": real_manifest["implementation_status"],
             "current_checkpoint": {
@@ -268,7 +283,7 @@ class SyncGoldenTests(unittest.TestCase):
                     "lifecycle_registries"
                 ],
                 "schemas": list(real_manifest["root_resolver"]["schemas"])[:4],
-                "commands": real_manifest["root_resolver"]["commands"],
+                "commands": legacy_commands,
             },
             "policies": real_manifest["policies"],
             "mandatory_asset_ids": ["CATALOG-ASSET-REGISTRY-CORE-001"],

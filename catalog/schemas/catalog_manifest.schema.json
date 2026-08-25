@@ -1,6 +1,6 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "urn:smial:catalog:manifest:1.0",
+  "$id": "urn:smial:catalog:manifest:1.1",
   "title": "SMIAL Project Asset Catalog manifest",
   "type": "object",
   "additionalProperties": false,
@@ -18,7 +18,7 @@
   ],
   "properties": {
     "schema_version": {
-      "const": "1.0"
+      "enum": ["1.0", "1.1"]
     },
     "catalog_id": {
       "type": "string",
@@ -75,6 +75,9 @@
           "minimum": 0
         }
       }
+    },
+    "canonical_bindings": {
+      "$ref": "#/$defs/canonical_bindings"
     },
     "root_resolver": {
       "type": "object",
@@ -148,6 +151,15 @@
               "$ref": "#/$defs/command"
             },
             "check_generated_navigation": {
+              "$ref": "#/$defs/command"
+            },
+            "resolve_binding": {
+              "$ref": "#/$defs/command"
+            },
+            "search_assets": {
+              "$ref": "#/$defs/command"
+            },
+            "related_assets": {
               "$ref": "#/$defs/command"
             }
           }
@@ -236,6 +248,56 @@
       }
     }
   },
+  "allOf": [
+    {
+      "if": {
+        "properties": {
+          "schema_version": {
+            "const": "1.0"
+          }
+        },
+        "required": ["schema_version"]
+      },
+      "then": {
+        "properties": {
+          "canonical_bindings": false
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "schema_version": {
+            "const": "1.1"
+          }
+        },
+        "required": ["schema_version"]
+      },
+      "then": {
+        "required": ["canonical_bindings"],
+        "properties": {
+          "root_resolver": {
+            "type": "object",
+            "properties": {
+              "commands": {
+                "type": "object",
+                "required": [
+                  "validate",
+                  "resolve_asset",
+                  "resolve_query",
+                  "generate_navigation",
+                  "check_generated_navigation",
+                  "resolve_binding",
+                  "search_assets",
+                  "related_assets"
+                ]
+              }
+            }
+          }
+        }
+      }
+    }
+  ],
   "$defs": {
     "command": {
       "type": "array",
@@ -243,6 +305,51 @@
       "items": {
         "type": "string",
         "minLength": 1
+      }
+    },
+    "canonical_bindings": {
+      "type": "object",
+      "minProperties": 1,
+      "propertyNames": {
+        "pattern": "^[A-Z][A-Z0-9]*(?:-[A-Z0-9]+)+$"
+      },
+      "additionalProperties": {
+        "$ref": "#/$defs/canonical_binding"
+      }
+    },
+    "canonical_binding": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "target_asset_id",
+        "semantics",
+        "rationale"
+      ],
+      "properties": {
+        "target_asset_id": {
+          "type": "string",
+          "pattern": "^[A-Z][A-Z0-9]*(?:-[A-Z0-9]+)+$"
+        },
+        "expected_asset_type": {
+          "type": "string",
+          "minLength": 1
+        },
+        "semantics": {
+          "const": "CURRENT_AT_COMMIT"
+        },
+        "rationale": {
+          "type": "string",
+          "minLength": 8,
+          "maxLength": 500
+        },
+        "current_use_evidence_asset_ids": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": {
+            "type": "string",
+            "pattern": "^[A-Z][A-Z0-9]*(?:-[A-Z0-9]+)+$"
+          }
+        }
       }
     }
   }
