@@ -31325,3 +31325,219 @@ records:
   evidence: []
   search_terms: [EARLY, HOLDER, CONCENTRATION, CONFIRMATORY, COMPLETION]
   classification: {contains_secrets: false, contains_raw_data: false, sensitivity: INTERNAL_NON_SECRET}
+- asset_id: CTRL-BUY-DT-QUOTE-MS-ASSOCIATION-001
+  record_version: '1.0'
+  asset_type: control_document
+  purpose: Exact contract for decision-time BUY_T0 quote microstructure vs frozen H900 tails.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-08-25'
+  truth_owner: BUY_DECISION_TIME_QUOTE_MICROSTRUCTURE_ASSOCIATION_V1
+  location: {kind: git_path, logical_uri: 'repo://docs/tasks/BUY_DECISION_TIME_QUOTE_MICROSTRUCTURE_ASSOCIATION_V1.md', repository_path: docs/tasks/BUY_DECISION_TIME_QUOTE_MICROSTRUCTURE_ASSOCIATION_V1.md}
+  integrity: {kind: sha256, sha256: 174592e97941ab3b72894a958652e00e8bae4d595e551e4c8c5c00742230d8f2}
+  access: {mode: read_only, method: file, network_required: false, secrets_required: false}
+  relations:
+  - {relation_type: governed_by, target_asset_id: ARCH-INTENT-005}
+  - {relation_type: contains, target_asset_id: CONFIG-BUY-DT-QUOTE-MS-ASSOCIATION-001}
+  - {relation_type: contains, target_asset_id: MODULE-BUY-DT-QUOTE-MS-ASSOCIATION-001}
+  - {relation_type: contains, target_asset_id: SCRIPT-BUY-DT-QUOTE-MS-ASSOCIATION-001}
+  - {relation_type: validated_by, target_asset_id: TEST-BUY-DT-QUOTE-MS-ASSOCIATION-001}
+  - {relation_type: derived_from, target_asset_id: EVIDENCE-BUY-DT-QUOTE-MS-ASSOCIATION-RUNTIME-001}
+  - {relation_type: depends_on, target_asset_id: CTRL-ORDINARY-RECENT-EARLY-PATH-H900-AUDITION-001}
+  - {relation_type: depends_on, target_asset_id: CTRL-EARLY-STRUCTURAL-BACKING-PIT-COMMISSIONING-001}
+  - {relation_type: depends_on, target_asset_id: CTRL-EARLY-HOLDER-CONCENTRATION-H900-FALSIFIER-001}
+  - {relation_type: depends_on, target_asset_id: CTRL-EARLY-HOLDER-CONCENTRATION-H900-CONFIRMATORY-OOS-001}
+  consumers: [FACTORY-001, GOAL-OWNER]
+  evidence: []
+  search_terms: [BUY, QUOTE, MICROSTRUCTURE, ASSOCIATION, H900]
+  classification: {contains_secrets: false, contains_raw_data: false, sensitivity: INTERNAL_NON_SECRET}
+- asset_id: CONFIG-BUY-DT-QUOTE-MS-ASSOCIATION-001
+  record_version: '1.0'
+  asset_type: configuration
+  purpose: Frozen windows, floor constants, family contrasts, and terminal thresholds for the association atom.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-08-25'
+  truth_owner: BUY_DECISION_TIME_QUOTE_MICROSTRUCTURE_ASSOCIATION_V1
+  location: {kind: git_path, logical_uri: 'repo://configs/buy_decision_time_quote_microstructure_association_v1.yaml', repository_path: configs/buy_decision_time_quote_microstructure_association_v1.yaml}
+  integrity: {kind: sha256, sha256: 3e5788c859db47cd4a1e4275e001fdd0905f1afb9c421595568bca7264c648de}
+  access: {mode: read_only, method: file, network_required: false, secrets_required: false}
+  relations:
+  - {relation_type: governed_by, target_asset_id: CTRL-BUY-DT-QUOTE-MS-ASSOCIATION-001}
+  consumers: [FACTORY-001, GOAL-OWNER]
+  evidence: []
+  search_terms: [BUY, QUOTE, MICROSTRUCTURE, ASSOCIATION, CONFIG]
+  classification: {contains_secrets: false, contains_raw_data: false, sensitivity: INTERNAL_NON_SECRET}
+- asset_id: MODULE-BUY-DT-QUOTE-MS-ASSOCIATION-001
+  record_version: '1.0'
+  asset_type: script
+  purpose: Offline extractor and scalar association for BUY_T0 priceImpactPct vs frozen H900 tails.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-08-25'
+  truth_owner: BUY_DECISION_TIME_QUOTE_MICROSTRUCTURE_ASSOCIATION_V1
+  location: {kind: git_path, logical_uri: 'repo://src/solana_alpha_lab/buy_decision_time_quote_microstructure_association.py', repository_path: src/solana_alpha_lab/buy_decision_time_quote_microstructure_association.py}
+  integrity: {kind: sha256, sha256: 0d6ce422811b7eea13ca97fb3214de8c5e78d30d1243f5c9804262b8c31eed27}
+  access: {mode: read_only, method: file, network_required: false, secrets_required: false}
+  relations:
+  - {relation_type: depends_on, target_asset_id: CONFIG-BUY-DT-QUOTE-MS-ASSOCIATION-001}
+  consumers: [FACTORY-001, GOAL-OWNER]
+  evidence: []
+  search_terms: [BUY, QUOTE, MICROSTRUCTURE, ASSOCIATION, MODULE]
+  classification: {contains_secrets: false, contains_raw_data: false, sensitivity: INTERNAL_NON_SECRET}
+- asset_id: SCRIPT-BUY-DT-QUOTE-MS-ASSOCIATION-001
+  record_version: '1.0'
+  asset_type: script
+  purpose: Zero-network CLI that writes the Git-trackable derived capsule.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-08-25'
+  truth_owner: BUY_DECISION_TIME_QUOTE_MICROSTRUCTURE_ASSOCIATION_V1
+  location: {kind: git_path, logical_uri: 'repo://scripts/run_buy_decision_time_quote_microstructure_association.py', repository_path: scripts/run_buy_decision_time_quote_microstructure_association.py}
+  integrity: {kind: sha256, sha256: 1a110c97f325bd9cb5bd5642ab1ed9c164f54cb4db990b0f7040df54f462a211}
+  access: {mode: read_only, method: file, network_required: false, secrets_required: false}
+  relations:
+  - {relation_type: depends_on, target_asset_id: MODULE-BUY-DT-QUOTE-MS-ASSOCIATION-001}
+  consumers: [FACTORY-001, GOAL-OWNER]
+  evidence: []
+  search_terms: [BUY, QUOTE, MICROSTRUCTURE, ASSOCIATION, CLI]
+  classification: {contains_secrets: false, contains_raw_data: false, sensitivity: INTERNAL_NON_SECRET}
+- asset_id: TEST-BUY-DT-QUOTE-MS-ASSOCIATION-001
+  record_version: '1.0'
+  asset_type: script
+  purpose: Fixture tests for semantics gate, tail split, drop-downgrade, rescale invariance and W-VL exclusion.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-08-25'
+  truth_owner: BUY_DECISION_TIME_QUOTE_MICROSTRUCTURE_ASSOCIATION_V1
+  location: {kind: git_path, logical_uri: 'repo://tests/test_buy_decision_time_quote_microstructure_association.py', repository_path: tests/test_buy_decision_time_quote_microstructure_association.py}
+  integrity: {kind: sha256, sha256: a44af82fc8af1ac1da48f334f3e828be048578e55eb36940a0c7e59f3e184204}
+  access: {mode: read_only, method: file, network_required: false, secrets_required: false}
+  relations:
+  - {relation_type: depends_on, target_asset_id: MODULE-BUY-DT-QUOTE-MS-ASSOCIATION-001}
+  consumers: [FACTORY-001, GOAL-OWNER]
+  evidence: []
+  search_terms: [BUY, QUOTE, MICROSTRUCTURE, ASSOCIATION, TEST]
+  classification: {contains_secrets: false, contains_raw_data: false, sensitivity: INTERNAL_NON_SECRET}
+- asset_id: EVIDENCE-BUY-DT-QUOTE-MS-ASSOCIATION-CAPSULE-001
+  record_version: '1.0'
+  asset_type: evidence
+  purpose: Git-trackable derived scalars binding BUY_T0 hashes to frozen H900 Y.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-08-25'
+  truth_owner: BUY_DECISION_TIME_QUOTE_MICROSTRUCTURE_ASSOCIATION_V1
+  location: {kind: git_path, logical_uri: 'repo://docs/evidence/buy_decision_time_quote_microstructure_association/a1_derived_capsule_v1.jsonl', repository_path: docs/evidence/buy_decision_time_quote_microstructure_association/a1_derived_capsule_v1.jsonl}
+  integrity: {kind: sha256, sha256: 0d84da721a44728bae5a008305a6dd9cc26775c074f2292d6245a57a8187b5ac}
+  access: {mode: read_only, method: file, network_required: false, secrets_required: false}
+  relations:
+  - {relation_type: derived_from, target_asset_id: CTRL-BUY-DT-QUOTE-MS-ASSOCIATION-001}
+  consumers: [FACTORY-001, GOAL-OWNER]
+  evidence: []
+  search_terms: [BUY, QUOTE, MICROSTRUCTURE, ASSOCIATION, CAPSULE]
+  classification: {contains_secrets: false, contains_raw_data: false, sensitivity: INTERNAL_NON_SECRET}
+- asset_id: EVIDENCE-BUY-DT-QUOTE-MS-ASSOCIATION-INPUT-001
+  record_version: '1.0'
+  asset_type: evidence
+  purpose: Deterministic association input covering windows, hashes, floor, extractor version and frozen thresholds.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-08-25'
+  truth_owner: BUY_DECISION_TIME_QUOTE_MICROSTRUCTURE_ASSOCIATION_V1
+  location: {kind: git_path, logical_uri: 'repo://docs/evidence/buy_decision_time_quote_microstructure_association/a1_association_input_v1.json', repository_path: docs/evidence/buy_decision_time_quote_microstructure_association/a1_association_input_v1.json}
+  integrity: {kind: sha256, sha256: 51f1edd4c3ad9228926c6a68de1be4c1a965d9f48eae9a135700a456f7835485}
+  access: {mode: read_only, method: file, network_required: false, secrets_required: false}
+  relations:
+  - {relation_type: derived_from, target_asset_id: EVIDENCE-BUY-DT-QUOTE-MS-ASSOCIATION-CAPSULE-001}
+  consumers: [FACTORY-001, GOAL-OWNER]
+  evidence: []
+  search_terms: [BUY, QUOTE, MICROSTRUCTURE, ASSOCIATION, INPUT]
+  classification: {contains_secrets: false, contains_raw_data: false, sensitivity: INTERNAL_NON_SECRET}
+- asset_id: EVIDENCE-BUY-DT-QUOTE-MS-ASSOCIATION-RUNTIME-001
+  record_version: '1.0'
+  asset_type: evidence
+  purpose: Typed association terminal; no p-values; no production selector.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-08-25'
+  truth_owner: BUY_DECISION_TIME_QUOTE_MICROSTRUCTURE_ASSOCIATION_V1
+  location: {kind: git_path, logical_uri: 'repo://docs/evidence/buy_decision_time_quote_microstructure_association/a1_runtime_receipt_v1.json', repository_path: docs/evidence/buy_decision_time_quote_microstructure_association/a1_runtime_receipt_v1.json}
+  integrity: {kind: sha256, sha256: 9eace9a51931e3e448bba15088fcbee01ae16de42c198aea1b9892a1f89f8596}
+  access: {mode: read_only, method: file, network_required: false, secrets_required: false}
+  relations:
+  - {relation_type: derived_from, target_asset_id: EVIDENCE-BUY-DT-QUOTE-MS-ASSOCIATION-INPUT-001}
+  consumers: [FACTORY-001, GOAL-OWNER]
+  evidence: []
+  search_terms: [BUY, QUOTE, MICROSTRUCTURE, ASSOCIATION, RUNTIME]
+  classification: {contains_secrets: false, contains_raw_data: false, sensitivity: INTERNAL_NON_SECRET}
+- asset_id: EVIDENCE-BUY-DT-QUOTE-MS-ASSOCIATION-DELIVERY-INDEPENDENT-REVIEW-001
+  record_version: '1.0'
+  asset_type: evidence
+  purpose: Isolated code, goal/DoD and architecture review for the association atom.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-08-25'
+  truth_owner: BUY_DECISION_TIME_QUOTE_MICROSTRUCTURE_ASSOCIATION_V1
+  location: {kind: git_path, logical_uri: 'repo://docs/evidence/buy_decision_time_quote_microstructure_association/a1_delivery_independent_review_v1.json', repository_path: docs/evidence/buy_decision_time_quote_microstructure_association/a1_delivery_independent_review_v1.json}
+  integrity: {kind: none, note: 'Content integrity is owned by the live completion-review-fit hash chain; embedding its SHA here would create an indirect self-reference through the reviewed inventory.'}
+  access: {mode: read_only, method: file, network_required: false, secrets_required: false}
+  relations:
+  - {relation_type: derived_from, target_asset_id: EVIDENCE-BUY-DT-QUOTE-MS-ASSOCIATION-RUNTIME-001}
+  consumers: [FACTORY-001, GOAL-OWNER]
+  evidence: []
+  search_terms: [BUY, QUOTE, MICROSTRUCTURE, ASSOCIATION, REVIEW]
+  classification: {contains_secrets: false, contains_raw_data: false, sensitivity: INTERNAL_NON_SECRET}
+- asset_id: EVIDENCE-BUY-DT-QUOTE-MS-ASSOCIATION-DELIVERY-FACTORY-FIT-001
+  record_version: '1.0'
+  asset_type: evidence
+  purpose: Factory Fit for WRAP extract of retained BUY_T0 fields without a selector.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-08-25'
+  truth_owner: BUY_DECISION_TIME_QUOTE_MICROSTRUCTURE_ASSOCIATION_V1
+  location: {kind: git_path, logical_uri: 'repo://docs/evidence/buy_decision_time_quote_microstructure_association/a1_delivery_factory_fit_v1.json', repository_path: docs/evidence/buy_decision_time_quote_microstructure_association/a1_delivery_factory_fit_v1.json}
+  integrity: {kind: none, note: 'Content integrity is owned by the live completion-review-fit hash chain; embedding its SHA here would create an indirect self-reference through the reviewed inventory.'}
+  access: {mode: read_only, method: file, network_required: false, secrets_required: false}
+  relations:
+  - {relation_type: derived_from, target_asset_id: EVIDENCE-BUY-DT-QUOTE-MS-ASSOCIATION-RUNTIME-001}
+  - {relation_type: depends_on, target_asset_id: EVIDENCE-BUY-DT-QUOTE-MS-ASSOCIATION-DELIVERY-INDEPENDENT-REVIEW-001}
+  consumers: [FACTORY-001, GOAL-OWNER]
+  evidence: []
+  search_terms: [BUY, QUOTE, MICROSTRUCTURE, ASSOCIATION, FACTORY_FIT]
+  classification: {contains_secrets: false, contains_raw_data: false, sensitivity: INTERNAL_NON_SECRET}
+- asset_id: EVIDENCE-BUY-DT-QUOTE-MS-ASSOCIATION-DELIVERY-COMPLETION-001
+  record_version: '1.0'
+  asset_type: evidence
+  purpose: Guard-consumable completion evidence before the exact-head merge gate.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-08-25'
+  truth_owner: BUY_DECISION_TIME_QUOTE_MICROSTRUCTURE_ASSOCIATION_V1
+  location: {kind: git_path, logical_uri: 'repo://docs/evidence/buy_decision_time_quote_microstructure_association/a1_delivery_completion_evidence_v1.json', repository_path: docs/evidence/buy_decision_time_quote_microstructure_association/a1_delivery_completion_evidence_v1.json}
+  integrity: {kind: none, note: 'Content integrity is owned by the live completion-review-fit hash chain; embedding its SHA here would create an indirect self-reference through the reviewed inventory.'}
+  access: {mode: read_only, method: file, network_required: false, secrets_required: false}
+  relations:
+  - {relation_type: derived_from, target_asset_id: EVIDENCE-BUY-DT-QUOTE-MS-ASSOCIATION-RUNTIME-001}
+  - {relation_type: depends_on, target_asset_id: EVIDENCE-BUY-DT-QUOTE-MS-ASSOCIATION-DELIVERY-INDEPENDENT-REVIEW-001}
+  - {relation_type: depends_on, target_asset_id: EVIDENCE-BUY-DT-QUOTE-MS-ASSOCIATION-DELIVERY-FACTORY-FIT-001}
+  consumers: [FACTORY-001, GOAL-OWNER]
+  evidence: []
+  search_terms: [BUY, QUOTE, MICROSTRUCTURE, ASSOCIATION, COMPLETION]
+  classification: {contains_secrets: false, contains_raw_data: false, sensitivity: INTERNAL_NON_SECRET}
+- asset_id: REPORT-BUY-DT-QUOTE-MS-ASSOCIATION-OWNER-READOUT-001
+  record_version: '1.0'
+  asset_type: evidence
+  purpose: Owner readout for the BUY-T0 quote microstructure association terminal.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-08-25'
+  truth_owner: BUY_DECISION_TIME_QUOTE_MICROSTRUCTURE_ASSOCIATION_V1
+  location: {kind: git_path, logical_uri: 'repo://docs/reports/buy_decision_time_quote_microstructure_association/a1_owner_readout_v1.md', repository_path: docs/reports/buy_decision_time_quote_microstructure_association/a1_owner_readout_v1.md}
+  integrity: {kind: sha256, sha256: 53e511cc7328ce80ec6e8b08e8b73d8b330fcf0473189742c990348a8ec38099}
+  access: {mode: read_only, method: file, network_required: false, secrets_required: false}
+  relations:
+  - {relation_type: derived_from, target_asset_id: EVIDENCE-BUY-DT-QUOTE-MS-ASSOCIATION-RUNTIME-001}
+  consumers: [GOAL-OWNER]
+  evidence: []
+  search_terms: [BUY, QUOTE, MICROSTRUCTURE, ASSOCIATION, READOUT]
+  classification: {contains_secrets: false, contains_raw_data: false, sensitivity: INTERNAL_NON_SECRET}

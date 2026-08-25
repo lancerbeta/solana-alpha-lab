@@ -433,6 +433,11 @@
       "target_asset_id": "CTRL-AGENTS-001"
     },
     {
+      "source_asset_id": "CONFIG-BUY-DT-QUOTE-MS-ASSOCIATION-001",
+      "relation": "governed_by",
+      "target_asset_id": "CTRL-BUY-DT-QUOTE-MS-ASSOCIATION-001"
+    },
+    {
       "source_asset_id": "CONFIG-CANARY-SPECIFICATION-ONLY-001",
       "relation": "governed_by",
       "target_asset_id": "CONTRACT-CANARY-SPECIFICATION-ONLY-001"
@@ -2171,6 +2176,56 @@
       "source_asset_id": "CTRL-BATON-SETUP-001",
       "relation": "superseded_by",
       "target_asset_id": "CTRL-DELIVERY-HARNESS-001"
+    },
+    {
+      "source_asset_id": "CTRL-BUY-DT-QUOTE-MS-ASSOCIATION-001",
+      "relation": "contains",
+      "target_asset_id": "CONFIG-BUY-DT-QUOTE-MS-ASSOCIATION-001"
+    },
+    {
+      "source_asset_id": "CTRL-BUY-DT-QUOTE-MS-ASSOCIATION-001",
+      "relation": "contains",
+      "target_asset_id": "MODULE-BUY-DT-QUOTE-MS-ASSOCIATION-001"
+    },
+    {
+      "source_asset_id": "CTRL-BUY-DT-QUOTE-MS-ASSOCIATION-001",
+      "relation": "contains",
+      "target_asset_id": "SCRIPT-BUY-DT-QUOTE-MS-ASSOCIATION-001"
+    },
+    {
+      "source_asset_id": "CTRL-BUY-DT-QUOTE-MS-ASSOCIATION-001",
+      "relation": "depends_on",
+      "target_asset_id": "CTRL-EARLY-HOLDER-CONCENTRATION-H900-CONFIRMATORY-OOS-001"
+    },
+    {
+      "source_asset_id": "CTRL-BUY-DT-QUOTE-MS-ASSOCIATION-001",
+      "relation": "depends_on",
+      "target_asset_id": "CTRL-EARLY-HOLDER-CONCENTRATION-H900-FALSIFIER-001"
+    },
+    {
+      "source_asset_id": "CTRL-BUY-DT-QUOTE-MS-ASSOCIATION-001",
+      "relation": "depends_on",
+      "target_asset_id": "CTRL-EARLY-STRUCTURAL-BACKING-PIT-COMMISSIONING-001"
+    },
+    {
+      "source_asset_id": "CTRL-BUY-DT-QUOTE-MS-ASSOCIATION-001",
+      "relation": "depends_on",
+      "target_asset_id": "CTRL-ORDINARY-RECENT-EARLY-PATH-H900-AUDITION-001"
+    },
+    {
+      "source_asset_id": "CTRL-BUY-DT-QUOTE-MS-ASSOCIATION-001",
+      "relation": "derived_from",
+      "target_asset_id": "EVIDENCE-BUY-DT-QUOTE-MS-ASSOCIATION-RUNTIME-001"
+    },
+    {
+      "source_asset_id": "CTRL-BUY-DT-QUOTE-MS-ASSOCIATION-001",
+      "relation": "governed_by",
+      "target_asset_id": "ARCH-INTENT-005"
+    },
+    {
+      "source_asset_id": "CTRL-BUY-DT-QUOTE-MS-ASSOCIATION-001",
+      "relation": "validated_by",
+      "target_asset_id": "TEST-BUY-DT-QUOTE-MS-ASSOCIATION-001"
     },
     {
       "source_asset_id": "CTRL-CURSOR-WORKPLACE-RECONCILIATION-001",
@@ -3996,6 +4051,51 @@
       "source_asset_id": "EVIDENCE-BATON-A62-001",
       "relation": "derived_from",
       "target_asset_id": "SCRIPT-BATON-VALIDATE-001"
+    },
+    {
+      "source_asset_id": "EVIDENCE-BUY-DT-QUOTE-MS-ASSOCIATION-CAPSULE-001",
+      "relation": "derived_from",
+      "target_asset_id": "CTRL-BUY-DT-QUOTE-MS-ASSOCIATION-001"
+    },
+    {
+      "source_asset_id": "EVIDENCE-BUY-DT-QUOTE-MS-ASSOCIATION-DELIVERY-COMPLETION-001",
+      "relation": "depends_on",
+      "target_asset_id": "EVIDENCE-BUY-DT-QUOTE-MS-ASSOCIATION-DELIVERY-FACTORY-FIT-001"
+    },
+    {
+      "source_asset_id": "EVIDENCE-BUY-DT-QUOTE-MS-ASSOCIATION-DELIVERY-COMPLETION-001",
+      "relation": "depends_on",
+      "target_asset_id": "EVIDENCE-BUY-DT-QUOTE-MS-ASSOCIATION-DELIVERY-INDEPENDENT-REVIEW-001"
+    },
+    {
+      "source_asset_id": "EVIDENCE-BUY-DT-QUOTE-MS-ASSOCIATION-DELIVERY-COMPLETION-001",
+      "relation": "derived_from",
+      "target_asset_id": "EVIDENCE-BUY-DT-QUOTE-MS-ASSOCIATION-RUNTIME-001"
+    },
+    {
+      "source_asset_id": "EVIDENCE-BUY-DT-QUOTE-MS-ASSOCIATION-DELIVERY-FACTORY-FIT-001",
+      "relation": "depends_on",
+      "target_asset_id": "EVIDENCE-BUY-DT-QUOTE-MS-ASSOCIATION-DELIVERY-INDEPENDENT-REVIEW-001"
+    },
+    {
+      "source_asset_id": "EVIDENCE-BUY-DT-QUOTE-MS-ASSOCIATION-DELIVERY-FACTORY-FIT-001",
+      "relation": "derived_from",
+      "target_asset_id": "EVIDENCE-BUY-DT-QUOTE-MS-ASSOCIATION-RUNTIME-001"
+    },
+    {
+      "source_asset_id": "EVIDENCE-BUY-DT-QUOTE-MS-ASSOCIATION-DELIVERY-INDEPENDENT-REVIEW-001",
+      "relation": "derived_from",
+      "target_asset_id": "EVIDENCE-BUY-DT-QUOTE-MS-ASSOCIATION-RUNTIME-001"
+    },
+    {
+      "source_asset_id": "EVIDENCE-BUY-DT-QUOTE-MS-ASSOCIATION-INPUT-001",
+      "relation": "derived_from",
+      "target_asset_id": "EVIDENCE-BUY-DT-QUOTE-MS-ASSOCIATION-CAPSULE-001"
+    },
+    {
+      "source_asset_id": "EVIDENCE-BUY-DT-QUOTE-MS-ASSOCIATION-RUNTIME-001",
+      "relation": "derived_from",
+      "target_asset_id": "EVIDENCE-BUY-DT-QUOTE-MS-ASSOCIATION-INPUT-001"
     },
     {
       "source_asset_id": "EVIDENCE-CANARY-SPECIFICATION-ONLY-A1-001",
@@ -8543,6 +8643,11 @@
       "target_asset_id": "TEST-T05-MIGRATIONS-001"
     },
     {
+      "source_asset_id": "MODULE-BUY-DT-QUOTE-MS-ASSOCIATION-001",
+      "relation": "depends_on",
+      "target_asset_id": "CONFIG-BUY-DT-QUOTE-MS-ASSOCIATION-001"
+    },
+    {
       "source_asset_id": "MODULE-DELIVERY-TRACKED-HASH-001",
       "relation": "governed_by",
       "target_asset_id": "CTRL-QUOTE-SURFACE-RETENTION-CLOCK-QUALIFY-001"
@@ -10553,6 +10658,11 @@
       "target_asset_id": "CATALOG-SCHEMA-LIFECYCLE-001"
     },
     {
+      "source_asset_id": "REPORT-BUY-DT-QUOTE-MS-ASSOCIATION-OWNER-READOUT-001",
+      "relation": "derived_from",
+      "target_asset_id": "EVIDENCE-BUY-DT-QUOTE-MS-ASSOCIATION-RUNTIME-001"
+    },
+    {
       "source_asset_id": "REPORT-EARLY-ICP-FREEZE-OWNER-READOUT-001",
       "relation": "derived_from",
       "target_asset_id": "EVIDENCE-EARLY-ICP-FREEZE-ACCEPTANCE-001"
@@ -11578,6 +11688,11 @@
       "target_asset_id": "CTRL-DELIVERY-HARNESS-001"
     },
     {
+      "source_asset_id": "SCRIPT-BUY-DT-QUOTE-MS-ASSOCIATION-001",
+      "relation": "depends_on",
+      "target_asset_id": "MODULE-BUY-DT-QUOTE-MS-ASSOCIATION-001"
+    },
+    {
       "source_asset_id": "SCRIPT-DELIVERY-HARNESS-001",
       "relation": "governed_by",
       "target_asset_id": "CONFIG-DELIVERY-HARNESS-001"
@@ -12461,6 +12576,11 @@
       "source_asset_id": "TEST-BATON-SCOPE-001",
       "relation": "governed_by",
       "target_asset_id": "CTRL-BATON-SETUP-001"
+    },
+    {
+      "source_asset_id": "TEST-BUY-DT-QUOTE-MS-ASSOCIATION-001",
+      "relation": "depends_on",
+      "target_asset_id": "MODULE-BUY-DT-QUOTE-MS-ASSOCIATION-001"
     },
     {
       "source_asset_id": "TEST-CANARY-SPECIFICATION-ONLY-001",

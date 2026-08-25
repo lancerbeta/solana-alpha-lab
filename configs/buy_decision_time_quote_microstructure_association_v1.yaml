@@ -1,0 +1,91 @@
+schema: smial.buy-decision-time-quote-microstructure-association
+schema_version: '1.0'
+atom_id: BUY_DECISION_TIME_QUOTE_MICROSTRUCTURE_ASSOCIATION_V1
+as_of: '2026-08-25'
+extractor_id: BUY_DT_QUOTE_MS_EXTRACTOR_V1
+extractor_schema_version: '1.0'
+capsule_schema_version: capsule.buy-dt-quote-ms.v1
+decision_time_label: BUY_T0
+unit_assumption: WORKING_ASSUMPTION_FRACTION
+unit_assumption_is_fact: false
+association_predictors:
+  - X_PRICE_IMPACT
+routeplan_eligibility_gates:
+  - RP_ROUTE_COUNT
+  - RP_FIRST_LEG_PERCENT
+forbidden_x:
+  - H900_SELL
+  - post_outcome_quote
+  - usdPrice
+  - lastTrade
+  - priceImpact_native_float
+  - raw_routePlan_search
+  - taker
+  - transaction
+floor:
+  lamports: 9727186
+  tolerance_lamports: 20
+  notional_atomic: 10000000
+informative_window:
+  min_analysis_rows: 8
+  min_floor_n: 3
+  min_family_n: 3
+families:
+  - BETTER
+  - WORSE
+terminal_thresholds:
+  min_informative_windows: 4
+  majority_min: 4
+  drop_may_upgrade: false
+  overall_rule: WEAKER_OF_FAMILY_TERMINALS
+  combined_not_floor_forbidden: true
+  absolute_x_threshold_forbidden: true
+primary_windows:
+  - window_id: W-EP
+    git_receipt_path: docs/evidence/ordinary_recent_early_path_h900_audition/a1_ordinary_recent_early_path_h900_audition_runtime_receipt_v1.json
+    git_receipt_sha256: 0acdc847eaf404bf61845cd471b17b91cf6255f24edc82363c2f10a74e7d786b
+    a4_root: local/ordinary_recent_early_path_h900_audition
+  - window_id: W-SB
+    git_receipt_path: docs/evidence/early_structural_backing_pit_commissioning/a1_window_a_runtime_receipt_v1.json
+    git_receipt_sha256: 8a6647de6e22de81a2be59474bc6e2021ceae740b778113b820b99b158c948be
+    a4_root: local/early_structural_backing_pit_commissioning
+  - window_id: W-HC-A
+    git_receipt_path: docs/evidence/early_holder_concentration_h900_falsifier/a1_runtime_receipt_v1.json
+    git_receipt_sha256: 7a6f05aadb29ee277d0eaec9379885b5585f1fc369f9d5d959b993ef6982bcef
+    a4_root: local/early_holder_concentration_h900_falsifier
+  - window_id: W-HC-B
+    git_receipt_path: docs/evidence/early_holder_concentration_h900_confirmatory_oos/a1_runtime_receipt_v1.json
+    git_receipt_sha256: 9fd3408ff9e18ecda9fde0108c6d217fd4a3819738d0b4a0bb2129bcbaec895a
+    a4_root: local/early_holder_concentration_h900_confirmatory_oos
+  - window_id: W-S30
+    git_receipt_path: docs/evidence/seasoned_30m_h900_base_rate_probe/a1_runtime_receipt_v1.json
+    git_receipt_sha256: 0dbf58b5c2c061b50bcc850cc31dd42c3b69bfbf5d5d157894f79ef96e4d1087
+    a4_root: local/seasoned_30m_h900_base_rate_probe
+sensitivity_window:
+  window_id: W-VL
+  quote_tag: BUY_T1
+  git_receipt_path: docs/evidence/early_valuation_liquidity_divergence_confirmation/a1_runtime_receipt_v1.json
+  git_receipt_sha256: a8c8df4a7c02a8e6cf4d2be2fe004f2cfbff170efcf5645064788ea20f12db63
+  a4_root: local/early_valuation_liquidity_divergence_confirmation
+  may_change_primary_terminal: false
+outputs:
+  capsule_jsonl: docs/evidence/buy_decision_time_quote_microstructure_association/a1_derived_capsule_v1.jsonl
+  association_input: docs/evidence/buy_decision_time_quote_microstructure_association/a1_association_input_v1.json
+  runtime_receipt: docs/evidence/buy_decision_time_quote_microstructure_association/a1_runtime_receipt_v1.json
+next_by_terminal:
+  SEMANTICS_BLOCKED: STOP
+  LOCAL_ONLY_NONREPRODUCIBLE: STOP
+  RETAINED_ASSOCIATION_NULL_CLOSE: PARK_BUY_IMPACT_AS_SELECTOR_X
+  RETAINED_ASSOCIATION_DIRECTIONAL_WATCH: STOP
+  RETAINED_ASSOCIATION_REPLICATION_WORTHY: WRITE_REPLICATION_CONTRACT_ONLY
+non_claims:
+  - NO_PRODUCTION_SELECTOR
+  - NO_ALPHA
+  - NO_NETRETURN
+  - NO_UNIT_FACT
+  - NO_LIVE_PROVIDER
+  - NO_AUTOMATIC_NEXT
+evidence_budget:
+  provider_api_rpc_wss_calls: 0
+  credentials: 0
+  cash_spend_usd_cents: 0
