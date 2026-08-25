@@ -36,11 +36,30 @@ from solana_alpha_lab.factory.research_store import (  # noqa: E402
     ResearchStore,
     ResearchStoreError,
 )
-from solana_alpha_lab.factory.run_passport import experiment_spec_sha256  # noqa: E402
+from solana_alpha_lab.factory.run_passport import (  # noqa: E402
+    canonical_sha256,
+    experiment_spec_sha256,
+)
+from solana_alpha_lab.factory.commissioning_fixture import (  # noqa: E402
+    COMMISSIONING_DATASET_MANIFEST_ID,
+    publish_commissioning_dataset,
+)
+from solana_alpha_lab.factory.fast_lane_cold_copy import (  # noqa: E402
+    ColdCopyError,
+    backup_committed_inventory,
+    load_run_result_artifact,
+    prove_cold_copy,
+)
+from solana_alpha_lab.factory.fast_lane_snapshot import (  # noqa: E402
+    SnapshotError,
+    export_snapshot,
+    restore_snapshot,
+)
 from solana_alpha_lab.factory.document_runner import (  # noqa: E402
     DocumentRunner,
     ExperimentRunnerError,
     RunContext,
+    repository_git_snapshot,
     repository_status_bytes,
 )
 
@@ -332,26 +351,35 @@ def execute_search_prior_work(
     }
 
 
-def execute_replay(data_root: Path, run_id: str) -> dict[str, Any]:
+def verify_result_integrity(data_root: Path, run_id: str) -> dict[str, Any]:
     row = _run_row(data_root, run_id)
     passport = row["passport"]
-    replay_digest = str(passport.get("result_digest_sha256") or "")
-    stored_again = str(passport.get("result_digest_sha256") or "")
-    matches = bool(replay_digest) and replay_digest == stored_again
+    artifact = load_run_result_artifact(data_root, passport)
+    recomputed_digest = canonical_sha256(artifact["capability_result"])
+    stored_digest = str(passport.get("result_digest_sha256") or "")
+    matches = bool(stored_digest) and recomputed_digest == stored_digest
     return {
         **owner_fields(
             lane=Lane.FAST_LANE.value,
-            status="REPLAY_OK" if matches else "REPLAY_MISMATCH",
+            status="RESULT_INTEGRITY_OK" if matches else "RESULT_INTEGRITY_MISMATCH",
             scientific_terminal=str(row["scientific_terminal"]),
-            reason_codes=[] if matches else ["REPLAY_DIGEST_MISMATCH"],
+            reason_codes=[] if matches else ["RESULT_DIGEST_MISMATCH"],
             run_id_or_null=run_id,
             git_mutation_count=0,
             provider_calls_actual=int(passport.get("provider_calls_actual") or 0),
             next_action="PREPARE_PROMOTION" if matches else "SHOW_RUN",
         ),
-        "result_digest_sha256": replay_digest,
-        "replay_digest_matches": matches,
+        "result_digest_sha256": stored_digest,
+        "recomputed_result_digest_sha256": recomputed_digest,
+        "result_integrity_matches": matches,
+        "result_artifact_id": passport.get("result_artifact_id"),
     }
+
+
+def execute_replay(data_root: Path, run_id: str) -> dict[str, Any]:
+    """Backward-compatible alias for independent result integrity verification."""
+
+    return verify_result_integrity(data_root, run_id)
 
 
 def cmd_classify(
@@ -480,8 +508,8 @@ def cmd_search_prior_work(data_root: Path, query: dict[str, Any]) -> int:
 
 
 def cmd_replay(data_root: Path, run_id: str) -> int:
-    payload = execute_replay(data_root, run_id)
-    return emit(payload, exit_code=0 if payload["replay_digest_matches"] else 2)
+    payload = verify_result_integrity(data_root, run_id)
+    return emit(payload, exit_code=0 if payload["result_integrity_matches"] else 2)
 
 
 def cmd_prepare_promotion(data_root: Path, run_id: str) -> int:
@@ -547,7 +575,8 @@ def cmd_rebuild_projection(data_root: Path) -> int:
 
 
 def cmd_commission_offline(root: Path, data_root: Path, packet_path: Path) -> int:
-    git_before = repository_status_bytes(root)
+    publish_commissioning_dataset(data_root)
+    git_before = repository_git_snapshot(root)
     submit_payload = execute_submit(
         root,
         data_root,
@@ -558,8 +587,8 @@ def cmd_commission_offline(root: Path, data_root: Path, packet_path: Path) -> in
     )
     if blocked_exit_code(submit_payload) != 0 or submit_payload.get("status") != "COMPLETE":
         raise FastLaneCliError("COMMISSION_SUBMIT_FAILED")
-    git_after = repository_status_bytes(root)
-    if git_before != git_after:
+    git_after = repository_git_snapshot(root)
+    if not git_before.unchanged(git_after):
         raise FastLaneCliError("GIT_MUTATION_DETECTED")
 
     rebuild_payload = execute_rebuild_projection(data_root)
@@ -587,10 +616,62 @@ def cmd_commission_offline(root: Path, data_root: Path, packet_path: Path) -> in
     store = ResearchStore(data_root)
     diagnostics = store.diagnostics()
     run_id = submit_payload.get("run_id_or_null")
-    replay_matches = False
+    integrity_matches = False
+    cold_copy_proof: dict[str, Any] | None = None
     if isinstance(run_id, str):
-        replay_payload = execute_replay(data_root, run_id)
-        replay_matches = bool(replay_payload.get("replay_digest_matches"))
+        integrity_payload = verify_result_integrity(data_root, run_id)
+        integrity_matches = bool(integrity_payload.get("result_integrity_matches"))
+        if not integrity_matches:
+            raise FastLaneCliError("COMMISSION_RESULT_INTEGRITY_FAILED")
+        backup_root = data_root / "_cold_copy_backup"
+        restored_root = data_root / "_cold_copy_restored"
+        try:
+            backup = backup_committed_inventory(data_root, backup_root)
+            proof = prove_cold_copy(
+                data_root,
+                backup.backup_root,
+                run_id=run_id,
+                restored_root=restored_root,
+            )
+            cold_copy_proof = {
+                **{
+                    "inventory_digest_matches": (
+                        proof.source_inventory_sha256 == proof.restored_inventory_sha256
+                    ),
+                    "projection_digest_matches": (
+                        proof.source_projection_digest_sha256
+                        == proof.restored_projection_digest_sha256
+                    ),
+                    "result_digest_matches": (
+                        proof.source_result_digest_sha256
+                        == proof.restored_result_digest_sha256
+                    ),
+                    "result_payload_matches": (
+                        proof.source_result_payload_sha256
+                        == proof.restored_result_payload_sha256
+                    ),
+                    "backup_file_count": backup.file_count,
+                    "snapshot_id": backup.snapshot_id,
+                }
+            }
+        except ColdCopyError as exc:
+            raise FastLaneCliError(str(exc)) from exc
+
+    passport_row = store.find_completed_run_by_id(run_id) if isinstance(run_id, str) else None
+    passport_fields = {}
+    if passport_row is not None:
+        passport = dict(passport_row.payload)
+        passport_fields = {
+            "experiment_spec_sha256": passport.get("experiment_spec_sha256"),
+            "runner_git_sha": passport.get("runner_git_sha"),
+            "dataset_manifest_ids": passport.get("dataset_manifest_ids"),
+            "dataset_fingerprints": passport.get("dataset_fingerprints"),
+            "config_sha256": passport.get("config_sha256"),
+            "as_of": passport.get("as_of"),
+            "availability_cutoff": passport.get("availability_cutoff"),
+            "scientific_terminal": passport.get("scientific_terminal"),
+            "query_recipe_binding": passport.get("query_recipe_binding"),
+        }
 
     payload = {
         **owner_fields(
@@ -603,12 +684,78 @@ def cmd_commission_offline(root: Path, data_root: Path, packet_path: Path) -> in
             provider_calls_actual=0,
             next_action="VERIFY_STORE",
         ),
-        "git_status_unchanged": git_before == git_after,
+        "terminal": "FOUNDATION_VALIDATION_REPAIR_COMPLETE",
+        "git_snapshot_unchanged": git_before.unchanged(git_after),
+        "git_head_sha": git_after.head_sha,
+        "git_symbolic_ref": git_after.symbolic_ref,
         "provider_calls_actual": 0,
         "projection_digest_sha256": rebuild_payload.get("projection_digest_sha256"),
         "prior_work_match_count": len(search_payload.get("results") or []),
-        "replay_digest_matches": replay_matches,
+        "result_integrity_matches": integrity_matches,
         "committed_inventory_sha256": diagnostics.committed_inventory_sha256,
+        "commissioning_dataset_manifest_id": COMMISSIONING_DATASET_MANIFEST_ID,
+        "passport_fields": passport_fields,
+        "proof_matrix": {
+            "no_git_write_fence": git_before.unchanged(git_after),
+            "append_only_records": integrity_matches,
+            "passport_fields_populated": bool(passport_fields.get("experiment_spec_sha256")),
+            "deterministic_dataset_bound": COMMISSIONING_DATASET_MANIFEST_ID
+            in list(passport_fields.get("dataset_manifest_ids") or []),
+            "cold_copy_proof": cold_copy_proof,
+        },
+        "cold_copy_proof": cold_copy_proof,
+    }
+    return emit(payload)
+
+
+def cmd_backup_export(data_root: Path, destination: Path) -> int:
+    try:
+        exported = export_snapshot(data_root, destination)
+    except SnapshotError as exc:
+        raise FastLaneCliError(str(exc)) from exc
+    payload = {
+        **owner_fields(
+            lane=Lane.FAST_LANE.value,
+            status="BACKUP_EXPORT_OK",
+            scientific_terminal="INCONCLUSIVE",
+            reason_codes=[],
+            run_id_or_null=None,
+            git_mutation_count=0,
+            provider_calls_actual=0,
+            next_action="RESTORE_SNAPSHOT",
+        ),
+        "snapshot_id": exported.snapshot_id,
+        "snapshot_root": exported.snapshot_root.name,
+        "inventory_sha256": exported.inventory_sha256,
+        "committed_inventory_sha256": exported.committed_inventory_sha256,
+        "created_at": exported.created_at,
+        "entry_count": exported.entry_count,
+    }
+    return emit(payload)
+
+
+def cmd_restore_snapshot(source: Path, destination: Path) -> int:
+    try:
+        restored = restore_snapshot(source, destination)
+        rebuild = ResearchStore(destination).rebuild_projection()
+    except (SnapshotError, ResearchStoreError) as exc:
+        raise FastLaneCliError(str(exc)) from exc
+    payload = {
+        **owner_fields(
+            lane=Lane.FAST_LANE.value,
+            status="RESTORE_OK",
+            scientific_terminal="INCONCLUSIVE",
+            reason_codes=[],
+            run_id_or_null=None,
+            git_mutation_count=0,
+            provider_calls_actual=0,
+            next_action="VERIFY_STORE",
+        ),
+        "snapshot_id": restored.snapshot_id,
+        "inventory_sha256": restored.inventory_sha256,
+        "committed_inventory_sha256": restored.committed_inventory_sha256,
+        "entry_count": restored.entry_count,
+        "projection_digest_sha256": rebuild.projection_digest_sha256,
     }
     return emit(payload)
 
@@ -663,6 +810,15 @@ def build_parser() -> argparse.ArgumentParser:
     search.add_argument("--capability-id", action="append", default=[])
     search.add_argument("--trial-outcome", action="append", default=[])
     search.add_argument("--scientific-terminal", action="append", default=[])
+
+    backup = subparsers.add_parser("backup")
+    backup_sub = backup.add_subparsers(dest="backup_command", required=True)
+    backup_export = backup_sub.add_parser("export")
+    backup_export.add_argument("--destination", type=Path, required=True)
+
+    restore = subparsers.add_parser("restore")
+    restore.add_argument("--source", type=Path, required=True)
+    restore.add_argument("--destination", type=Path, required=True)
     return parser
 
 
@@ -728,6 +884,15 @@ def main(argv: list[str] | None = None) -> int:
                 root,
                 data_root,
                 args.packet.resolve(),
+            )
+        if args.command == "backup":
+            if args.backup_command == "export":
+                return cmd_backup_export(data_root, args.destination.resolve())
+            raise FastLaneCliError("COMMAND_UNSUPPORTED")
+        if args.command == "restore":
+            return cmd_restore_snapshot(
+                args.source.resolve(),
+                args.destination.resolve(),
             )
         raise FastLaneCliError("COMMAND_UNSUPPORTED")
     except FastLaneCliError as exc:

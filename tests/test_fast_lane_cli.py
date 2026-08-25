@@ -10,6 +10,15 @@ import unittest
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
+SRC = ROOT / "src"
+if str(SRC) not in sys.path:
+    sys.path.insert(0, str(SRC))
+
+from solana_alpha_lab.factory.commissioning_fixture import (  # noqa: E402
+    COMMISSIONING_DATASET_MANIFEST_ID,
+    commissioning_dataset_fingerprint,
+    publish_commissioning_dataset,
+)
 CLI = ROOT / "scripts" / "hypothesis_fast_lane.py"
 CATALOG_SHA = hashlib.sha256(
     (ROOT / "catalog/schemas/experiment_spec.schema.json").read_bytes()
@@ -71,7 +80,15 @@ def offline_submission_packet() -> dict[str, object]:
             "source_kind": "CATALOG_ASSET",
             "stable_id": "SCHEMA-EXPERIMENT-SPEC-001",
             "expected_content_sha256_or_dataset_fingerprint": CATALOG_SHA,
-        }
+        },
+        {
+            "binding_id": "BINDING-COMMISSIONING-DATASET-001",
+            "source_kind": "DATASET_MANIFEST",
+            "stable_id": COMMISSIONING_DATASET_MANIFEST_ID,
+            "expected_content_sha256_or_dataset_fingerprint": (
+                commissioning_dataset_fingerprint(ROOT)
+            ),
+        },
     ]
     base["query_recipe_ids"] = []
     base["capability_id"] = "CAP-OFFLINE-CANONICAL-RECEIPT-REPLAY-001"
@@ -88,7 +105,12 @@ def offline_submission_packet() -> dict[str, object]:
     }
 
 
+def prepare_data_root(data_root: Path) -> None:
+    publish_commissioning_dataset(data_root)
+
+
 def packet_fixture_path(directory: Path) -> Path:
+    prepare_data_root(directory)
     path = directory / "offline_submission.json"
     path.write_text(
         json.dumps(offline_submission_packet(), indent=2),
@@ -167,11 +189,25 @@ class FastLaneCliTests(unittest.TestCase):
             payload = json.loads(completed.stdout)
             self.assert_owner_contract(payload)
             self.assertEqual(payload["status"], "COMMISSION_OFFLINE_OK")
-            self.assertTrue(payload["git_status_unchanged"])
+            self.assertTrue(payload["git_snapshot_unchanged"])
             self.assertEqual(payload["provider_calls_actual"], 0)
-            self.assertTrue(payload["replay_digest_matches"])
+            self.assertTrue(payload["result_integrity_matches"])
             self.assertGreaterEqual(payload["prior_work_match_count"], 1)
             self.assertIsNotNone(payload["run_id_or_null"])
+            self.assertTrue(payload["proof_matrix"]["no_git_write_fence"])
+            self.assertTrue(payload["proof_matrix"]["append_only_records"])
+            self.assertTrue(payload["proof_matrix"]["passport_fields_populated"])
+            self.assertTrue(payload["proof_matrix"]["deterministic_dataset_bound"])
+            cold_copy = payload["cold_copy_proof"]
+            self.assertIsNotNone(cold_copy)
+            self.assertTrue(cold_copy["inventory_digest_matches"])
+            self.assertTrue(cold_copy["projection_digest_matches"])
+            self.assertTrue(cold_copy["result_payload_matches"])
+            passport_fields = payload["passport_fields"]
+            self.assertEqual(
+                passport_fields["query_recipe_binding"]["status"],
+                "NOT_APPLICABLE",
+            )
 
     def test_prepare_promotion_is_prepare_only(self) -> None:
         with tempfile.TemporaryDirectory() as tmp:

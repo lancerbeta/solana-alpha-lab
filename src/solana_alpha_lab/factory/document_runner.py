@@ -16,6 +16,12 @@ from solana_alpha_lab.factory.capabilities import CapabilityError, execute_capab
 from solana_alpha_lab.factory.data_resolver import (
     EvidenceResolutionError,
     resolve_evidence_bindings,
+    resolve_query_recipe_hashes,
+)
+from solana_alpha_lab.factory.git_write_fence import (
+    RepositoryGitSnapshot,
+    repository_git_snapshot,
+    repository_status_bytes,
 )
 from solana_alpha_lab.factory.lane_classifier import Lane, LaneDecision
 from solana_alpha_lab.factory.research_store import (
@@ -37,16 +43,6 @@ class RunContext:
     data_root: Path
     hypothesis_definition_sha256: str
     lane_decision: LaneDecision
-
-
-def repository_status_bytes(root: Path) -> bytes:
-    completed = subprocess.run(
-        ["git", "status", "--porcelain=v1", "-z"],
-        cwd=root,
-        capture_output=True,
-        check=False,
-    )
-    return completed.stdout
 
 
 def _git_head_sha(root: Path) -> str:
@@ -255,7 +251,7 @@ class DocumentRunner(ExperimentRunner):
         if lane.run_key_sha256 is None:
             raise ExperimentRunnerError("RUN_KEY_SHA256_REQUIRED")
 
-        git_before = repository_status_bytes(self.root)
+        git_before = repository_git_snapshot(self.root)
         try:
             capability_result = execute_capability(
                 spec,
@@ -274,8 +270,8 @@ class DocumentRunner(ExperimentRunner):
                 provider_calls_actual=0,
                 next_action="CORRECT_CAPABILITY_INPUT",
             )
-        git_after = repository_status_bytes(self.root)
-        git_mutation_count = 0 if git_before == git_after else 1
+        git_after = repository_git_snapshot(self.root)
+        git_mutation_count = 0 if git_before.unchanged(git_after) else 1
 
         run_id = _run_id(lane.run_key_sha256)
         capability_id = str(spec["capability_id"])
@@ -288,8 +284,12 @@ class DocumentRunner(ExperimentRunner):
                 "run_id": run_id,
                 "run_key_sha256": lane.run_key_sha256,
                 "reason_code": "GIT_MUTATION_DETECTED",
-                "git_status_before_sha256": hashlib.sha256(git_before).hexdigest(),
-                "git_status_after_sha256": hashlib.sha256(git_after).hexdigest(),
+                "git_snapshot_before_sha256": git_before.composite_sha256,
+                "git_snapshot_after_sha256": git_after.composite_sha256,
+                "git_head_before": git_before.head_sha,
+                "git_head_after": git_after.head_sha,
+                "git_symbolic_ref_before": git_before.symbolic_ref,
+                "git_symbolic_ref_after": git_after.symbolic_ref,
             }
             try:
                 ResearchStore(run_context.data_root).append(
@@ -340,6 +340,59 @@ class DocumentRunner(ExperimentRunner):
         except EvidenceResolutionError:
             evidence = ()
 
+        query_recipe_ids = list(spec.get("query_recipe_ids") or [])
+        if query_recipe_ids:
+            resolved_recipes = resolve_query_recipe_hashes(
+                query_recipe_ids,
+                root=self.root,
+            )
+            query_recipe_sha256s = [recipe_sha for _, recipe_sha in resolved_recipes]
+            query_recipe_binding = {
+                "status": "BOUND",
+                "recipes": [
+                    {
+                        "recipe_id": recipe_id,
+                        "query_recipe_sha256": recipe_sha,
+                    }
+                    for recipe_id, recipe_sha in resolved_recipes
+                ],
+            }
+        else:
+            query_recipe_sha256s = []
+            query_recipe_binding = {
+                "status": "NOT_APPLICABLE",
+                "reason": "CAPABILITY_DESCRIPTOR_QUERY_RECIPE_NOT_REQUIRED",
+            }
+
+        result_artifact_id = f"RESULT-ARTIFACT-{run_id.removeprefix('RUN-')}"
+        result_artifact_logical_uri = (
+            f"smial-data://research/artifacts/results/{result_artifact_id}.json"
+        )
+        result_artifact_payload = {
+            "research_artifact_id": result_artifact_id,
+            "logical_uri": result_artifact_logical_uri,
+            "artifact_kind": "CAPABILITY_RESULT",
+            "capability_result": capability_result,
+            "first_reliable_available_at": now.isoformat().replace("+00:00", "Z"),
+        }
+        result_artifact_path = (
+            run_context.data_root
+            / "research"
+            / "artifacts"
+            / "results"
+            / f"{result_artifact_id}.json"
+        )
+        result_artifact_path.parent.mkdir(parents=True, exist_ok=True)
+        result_artifact_path.write_text(
+            json.dumps(
+                result_artifact_payload,
+                ensure_ascii=False,
+                sort_keys=True,
+                indent=2,
+            ),
+            encoding="utf-8",
+        )
+
         passport_payload: dict[str, Any] = {
             "run_id": run_id,
             "run_key_sha256": lane.run_key_sha256,
@@ -365,8 +418,9 @@ class DocumentRunner(ExperimentRunner):
                 for item in evidence
                 if item.dataset_fingerprint is not None
             ],
-            "query_recipe_ids": list(spec.get("query_recipe_ids") or []),
-            "query_recipe_sha256s": [],
+            "query_recipe_ids": query_recipe_ids,
+            "query_recipe_sha256s": query_recipe_sha256s,
+            "query_recipe_binding": query_recipe_binding,
             "config_sha256": canonical_sha256(spec.get("parameters") or {}),
             "as_of": spec["as_of"],
             "availability_cutoff": spec["availability_cutoff"],
@@ -384,6 +438,8 @@ class DocumentRunner(ExperimentRunner):
             "trial_outcome": trial_outcome,
             "scientific_terminal": scientific_terminal,
             "result_digest_sha256": canonical_sha256(capability_result),
+            "result_artifact_id": result_artifact_id,
+            "result_artifact_logical_uri": result_artifact_logical_uri,
             "artifact_manifest_sha256": hashlib.sha256(
                 json.dumps(
                     capability_result,
@@ -465,17 +521,69 @@ class DocumentRunner(ExperimentRunner):
                 producer_git_sha=producer_git_sha,
             ),
         ]
+        metric_id = f"METRIC-TERMINAL-MATCH-{transaction_id[-8:]}"
+        records.append(
+            _research_event(
+                record_id=metric_id,
+                record_kind=RecordKind.EXPERIMENT_METRIC,
+                entity_id=metric_id,
+                hypothesis_version_id=str(spec["hypothesis_version"]),
+                run_id=run_id,
+                transaction_id=transaction_id,
+                effective_at=now,
+                payload={
+                    "metric_id": metric_id,
+                    "metric_name": "accepted_terminal_match",
+                    "scalar_value": (
+                        1.0
+                        if capability_result.get("terminal")
+                        == capability_result.get("accepted_terminal")
+                        else 0.0
+                    ),
+                    "unit": "boolean",
+                    "run_id": run_id,
+                },
+                producer_capability_id=capability_id,
+                producer_git_sha=producer_git_sha,
+            )
+        )
+        records.append(
+            _research_event(
+                record_id=result_artifact_id,
+                record_kind=RecordKind.RESEARCH_ARTIFACT,
+                entity_id=result_artifact_id,
+                hypothesis_version_id=str(spec["hypothesis_version"]),
+                run_id=run_id,
+                transaction_id=transaction_id,
+                effective_at=now,
+                payload={
+                    "research_artifact_id": result_artifact_id,
+                    "logical_uri": result_artifact_logical_uri,
+                    "artifact_kind": "CAPABILITY_RESULT",
+                    "content_sha256": canonical_sha256(
+                        result_artifact_payload["capability_result"]
+                    ),
+                    "result_digest_sha256": passport_payload["result_digest_sha256"],
+                    "capability_result": capability_result,
+                },
+                producer_capability_id=capability_id,
+                producer_git_sha=producer_git_sha,
+            )
+        )
         for index, item in enumerate(evidence):
+            binding_record_id = f"EVIDENCE-BINDING-{index + 1:03d}-{transaction_id[-8:]}"
+            binding_payload = dict(item.to_payload())
+            binding_payload["evidence_binding_id"] = binding_record_id
             records.append(
                 _research_event(
-                    record_id=f"EVIDENCE-BINDING-{index + 1:03d}-{transaction_id[-8:]}",
+                    record_id=binding_record_id,
                     record_kind=RecordKind.EVIDENCE_BINDING,
-                    entity_id=run_id,
+                    entity_id=binding_record_id,
                     hypothesis_version_id=str(spec["hypothesis_version"]),
                     run_id=run_id,
                     transaction_id=transaction_id,
                     effective_at=now,
-                    payload=item.to_payload(),
+                    payload=binding_payload,
                     producer_capability_id=capability_id,
                     producer_git_sha=producer_git_sha,
                 )
@@ -502,5 +610,6 @@ __all__ = [
     "DocumentRunner",
     "ExperimentRunnerError",
     "RunContext",
+    "repository_git_snapshot",
     "repository_status_bytes",
 ]

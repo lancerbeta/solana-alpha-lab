@@ -28,7 +28,13 @@ from solana_alpha_lab.factory.research_store import ResearchStore  # noqa: E402
 from solana_alpha_lab.factory.document_runner import (  # noqa: E402
     DocumentRunner,
     RunContext,
-    repository_status_bytes,
+    repository_git_snapshot,
+)
+from solana_alpha_lab.factory.git_write_fence import RepositoryGitSnapshot  # noqa: E402
+from solana_alpha_lab.factory.commissioning_fixture import (  # noqa: E402
+    COMMISSIONING_DATASET_MANIFEST_ID,
+    commissioning_dataset_fingerprint,
+    publish_commissioning_dataset,
 )
 from tests.test_fast_lane_classifier import (  # noqa: E402
     AS_OF,
@@ -60,7 +66,15 @@ def offline_v1_1_spec() -> dict[str, object]:
             "expected_content_sha256_or_dataset_fingerprint": (
                 CATALOG_ASSET_CONTENT_SHA256
             ),
-        }
+        },
+        {
+            "binding_id": "BINDING-COMMISSIONING-DATASET-001",
+            "source_kind": "DATASET_MANIFEST",
+            "stable_id": COMMISSIONING_DATASET_MANIFEST_ID,
+            "expected_content_sha256_or_dataset_fingerprint": (
+                commissioning_dataset_fingerprint(ROOT)
+            ),
+        },
     ]
     base["query_recipe_ids"] = []
     base["capability_id"] = OFFLINE_CAPABILITY
@@ -113,6 +127,7 @@ class FastLaneRunnerTests(unittest.TestCase):
     def test_offline_document_run_does_not_mutate_repo(self) -> None:
         with tempfile.TemporaryDirectory() as tmp:
             data_root = Path(tmp)
+            publish_commissioning_dataset(data_root)
             with self.isolated_runner(data_root) as runner:
                 spec = offline_v1_1_spec()
                 packet, decision = self.classify_for(
@@ -123,7 +138,7 @@ class FastLaneRunnerTests(unittest.TestCase):
                     },
                 )
                 self.assertEqual(decision.terminal, "FAST_LANE_READY")
-                before = repository_status_bytes(ROOT)
+                before = repository_git_snapshot(ROOT)
                 result = runner.start_document(
                     spec,
                     spec_sha256=hashlib.sha256(
@@ -135,9 +150,9 @@ class FastLaneRunnerTests(unittest.TestCase):
                         lane_decision=decision,
                     ),
                 )
-                after = repository_status_bytes(ROOT)
+                after = repository_git_snapshot(ROOT)
                 self.assertEqual(result["status"], "COMPLETE")
-                self.assertEqual(before, after)
+                self.assertTrue(before.unchanged(after))
                 self.assertEqual(result["git_mutation_count"], 0)
                 self.assertEqual(result["provider_calls_actual"], 0)
                 self.assertIsNotNone(result["run_id_or_null"])
@@ -145,6 +160,7 @@ class FastLaneRunnerTests(unittest.TestCase):
     def test_capability_gap_does_not_execute(self) -> None:
         with tempfile.TemporaryDirectory() as tmp:
             data_root = Path(tmp)
+            publish_commissioning_dataset(data_root)
             with self.isolated_runner(data_root) as runner:
                 packet, decision = self.classify_for(
                     data_root,
@@ -167,6 +183,7 @@ class FastLaneRunnerTests(unittest.TestCase):
     def test_owner_gate_missing_phrase_makes_zero_provider_calls(self) -> None:
         with tempfile.TemporaryDirectory() as tmp:
             data_root = Path(tmp)
+            publish_commissioning_dataset(data_root)
             with self.isolated_runner(data_root) as runner:
                 packet, decision = self.classify_for(
                     data_root,
@@ -188,11 +205,30 @@ class FastLaneRunnerTests(unittest.TestCase):
     def test_git_mutation_detected_without_auto_revert(self) -> None:
         with tempfile.TemporaryDirectory() as tmp:
             data_root = Path(tmp)
+            publish_commissioning_dataset(data_root)
             with self.isolated_runner(data_root) as runner:
                 packet, decision = self.classify_for(data_root, submission())
                 with patch(
-                    "solana_alpha_lab.factory.document_runner.repository_status_bytes",
-                    side_effect=[b"", b"M"],
+                    "solana_alpha_lab.factory.document_runner.repository_git_snapshot",
+                    side_effect=[
+                        repository_git_snapshot(ROOT),
+                        RepositoryGitSnapshot(
+                            head_sha="f" * 40,
+                            symbolic_ref=repository_git_snapshot(ROOT).symbolic_ref,
+                            porcelain_sha256=repository_git_snapshot(ROOT).porcelain_sha256,
+                            index_worktree_sha256="a" * 64,
+                            refs_digest_sha256=repository_git_snapshot(ROOT).refs_digest_sha256,
+                            composite_sha256="b" * 64,
+                        ),
+                    ],
+                ), patch(
+                    "solana_alpha_lab.factory.document_runner.execute_capability",
+                    return_value={
+                        "status": "COMPLETE",
+                        "terminal": "INCONCLUSIVE",
+                        "accepted_terminal": "INCONCLUSIVE",
+                        "provider_api_rpc_wss_calls": 0,
+                    },
                 ):
                     result = runner.start_document(
                         packet["experiment_spec"],  # type: ignore[arg-type]
@@ -210,6 +246,7 @@ class FastLaneRunnerTests(unittest.TestCase):
     def test_completed_run_is_persisted_outside_git(self) -> None:
         with tempfile.TemporaryDirectory() as tmp:
             data_root = Path(tmp)
+            publish_commissioning_dataset(data_root)
             with self.isolated_runner(data_root) as runner:
                 spec = offline_v1_1_spec()
                 _, decision = self.classify_for(

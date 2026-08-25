@@ -1409,6 +1409,69 @@ class ResearchStore:
                 )
         return None
 
+    def find_completed_run_by_id(self, run_id: str) -> RunPassport | None:
+        if _SAFE_IDENTIFIER_RE.fullmatch(run_id) is None:
+            raise ResearchStoreError("RUN_ID_INVALID")
+        projection_path = self._root / RESEARCH_PROJECTION_LOCATION
+        if projection_path.is_file() and not projection_path.is_symlink():
+            connection: duckdb.DuckDBPyConnection | None = None
+            try:
+                connection = duckdb.connect(
+                    str(projection_path),
+                    read_only=True,
+                    config={
+                        "enable_external_access": "false",
+                        "allow_unsigned_extensions": "false",
+                    },
+                )
+                connection.execute("SET TimeZone = 'UTC'")
+                connection.execute("SET lock_configuration = true")
+                row = connection.execute(
+                    """
+                    SELECT run_id, payload_json, run_key_sha256
+                    FROM experiment_runs
+                    WHERE run_event_kind = 'RUN_COMPLETED'
+                      AND run_id = ?
+                    ORDER BY record_id
+                    LIMIT 1
+                    """,
+                    [run_id],
+                ).fetchone()
+                if row is not None:
+                    payload = json.loads(row[1])
+                    if not isinstance(payload, dict):
+                        raise ResearchStoreError("RUN_COMPLETED_PASSPORT_INVALID")
+                    return _completed_run_passport(
+                        payload,
+                        expected_run_key_sha256=str(row[2]),
+                        expected_run_id=row[0],
+                    )
+            except ResearchStoreError:
+                raise
+            except (ValueError, json.JSONDecodeError, duckdb.Error) as exc:
+                raise ResearchStoreError("PROJECTION_QUERY_FAILED") from exc
+            finally:
+                if connection is not None:
+                    connection.close()
+        for record in self.iter_committed_records():
+            if record.record_kind != RecordKind.RUN_COMPLETED:
+                continue
+            if record.run_id != run_id:
+                continue
+            try:
+                payload = json.loads(record.payload_json)
+            except (ValueError, json.JSONDecodeError) as exc:
+                raise ResearchStoreError("PAYLOAD_JSON_INVALID") from exc
+            if isinstance(payload, dict):
+                run_key_sha256 = payload.get("run_key_sha256")
+                if isinstance(run_key_sha256, str):
+                    return _completed_run_passport(
+                        payload,
+                        expected_run_key_sha256=run_key_sha256,
+                        expected_run_id=run_id,
+                    )
+        return None
+
     def diagnostics(self) -> StoreDiagnostics:
         manifests = self._committed_manifests()
         inventory_payload = [
