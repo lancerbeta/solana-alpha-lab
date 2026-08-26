@@ -9,7 +9,7 @@
   "cloud_bundle_smoke_required": false,
   "factory_fit": {
     "path": "docs/evidence/hypothesis_forge_independent_critic/a1_delivery_factory_fit_v1.json",
-    "sha256": "4f8f86977d4f4b3f09993a641a439a0885851cdc4d212f13fc66ac0ddfc3a6eb",
+    "sha256": "9bce4ac473c804fcd0c895994832885c963b2d5bdc46465e36f77d4b56a59faf",
     "verdict": "PASS"
   },
   "implementation_bindings": {
@@ -22,7 +22,7 @@
     "configs/hypothesis_forge_independent_critic_v1.yaml": "f0478b98dee336841511482e61ca137363d91bd3d24ae8967c0f8e362f1f0be8",
     "docs/evidence/control/delivery_harness_acceptance_v1.json": "2cc36909c5b83bb25d3281beaffccf776a9d09268f18914829894954a550eb39",
     "docs/operator/HYPOTHESIS_FORGE_AND_INDEPENDENT_CRITIC_OPERATOR_V1.md": "9d72e2635d95005e88ec7517bd74a4abf7d4739044aa584e8c63057de74d4b95",
-    "docs/tasks/HYPOTHESIS_FORGE_AND_INDEPENDENT_CRITIC_V1.md": "5f8f77baf74b23a3cd2faf81fed24da2d0744457d724be828d00db1ebe9456e0",
+    "docs/tasks/HYPOTHESIS_FORGE_AND_INDEPENDENT_CRITIC_V1.md": "2ed2067f02f1eaa1a89927454f0c1acec28bb6c3a6e40d33447cb57b592fa9f1",
     "tests/fixtures/hypothesis_forge/critic_input_packet_valid_v1.json": "4f98272c58a94e52e25b7c116047fe2bfaee9a410f4ffeb5cc77fb1334e7c876",
     "tests/fixtures/hypothesis_forge/synthesis_handoff_complete_pass_fast_lane_v1.json": "8fd6ad52685470299d2534b4d86963ac3ba9b910c7995c73bba0d211d0fa6b50",
     "tests/fixtures/hypothesis_forge/synthesis_handoff_complete_v1.json": "382f8aa4969a97b8a78f94d217c37a0072bb8ebb2ce25a905612fc23e12f4261",
@@ -60,7 +60,7 @@
     "github_ci": "ENFORCED_LIVE_AT_GUARDED_MERGE",
     "independent_review": {
       "path": "docs/evidence/hypothesis_forge_independent_critic/a1_delivery_independent_review_v1.json",
-      "sha256": "273237452623cbb8671fc01ac8c9887f65913432c413b808180e438b17de1e68",
+      "sha256": "e2c2f4a365fbe9162c4e57bc95f496654be253e63c106fc1f27f4b2e02edc976",
       "verdict": "PASS"
     },
     "project_checks": [

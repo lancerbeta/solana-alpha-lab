@@ -14,8 +14,8 @@
     "GOAL_DOD_CRITIC"
   ],
   "review_id": "HFIC-INDEPENDENT-REVIEW-002",
-  "reviewed_bindings_sha256": "16e195882b06c6c1abd467e63b1c36b93ddc36bc8ce84d297a0ebe62d110328f",
-  "reviewed_inventory_sha256": "58054d979f6576a5b8c3cceadb5767367352cf24e5d6c6fb406ad7e36b67fdc8",
+  "reviewed_bindings_sha256": "c64473600495be953cce305443bf0c464d91de17dafa3ea94cadd45ea042cc5c",
+  "reviewed_inventory_sha256": "5016bab4f4b44eb8a273d8b8afbe6114497e4d7956d1233ea71bd16b62c341f5",
   "reviews": [
     {
       "findings": [
