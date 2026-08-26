@@ -2,14 +2,14 @@
   "acceptance_id": "HFIC-DELIVERY-COMPLETION-001",
   "active_stop_conditions": [],
   "as_of": "2026-08-26",
-  "base_main": "e1c8c3f4f31707fa2ae2de7b161e5954f517fd7a",
+  "base_main": "71984b5e72fe2639c2e6ad1785ee7caace33cb16",
   "capability_radar_now": "NONE",
   "cloud_bundle_mode": "OWNER_MANAGED_OPTIONAL_EXPORT",
   "cloud_bundle_required_by_harness": false,
   "cloud_bundle_smoke_required": false,
   "factory_fit": {
     "path": "docs/evidence/hypothesis_forge_independent_critic/a1_delivery_factory_fit_v1.json",
-    "sha256": "9bce4ac473c804fcd0c895994832885c963b2d5bdc46465e36f77d4b56a59faf",
+    "sha256": "943b0116a477f39a89b88dac3d49f8aacd423292fdcd914d2b9b10324b31b060",
     "verdict": "PASS"
   },
   "implementation_bindings": {
@@ -20,9 +20,9 @@
     "catalog/schemas/hypothesis_critic_input_v1.schema.json": "a4d7075ad9b1c3ccaa3abd3c0b2791d78dc85162f7120e13d2b1d2c11879009f",
     "catalog/schemas/hypothesis_forge_synthesis_handoff_v1.schema.json": "5417bb63869ac12bb94706399ff8c9f6af2bc4d36f8d8d087426884898c56ceb",
     "configs/hypothesis_forge_independent_critic_v1.yaml": "f0478b98dee336841511482e61ca137363d91bd3d24ae8967c0f8e362f1f0be8",
-    "docs/evidence/control/delivery_harness_acceptance_v1.json": "2cc36909c5b83bb25d3281beaffccf776a9d09268f18914829894954a550eb39",
+    "docs/evidence/control/delivery_harness_acceptance_v1.json": "e9aa53e4a57203df9f6b5b5c8f0c48e6bf39c90ac8fb1f1d618f036f01f49675",
     "docs/operator/HYPOTHESIS_FORGE_AND_INDEPENDENT_CRITIC_OPERATOR_V1.md": "9d72e2635d95005e88ec7517bd74a4abf7d4739044aa584e8c63057de74d4b95",
-    "docs/tasks/HYPOTHESIS_FORGE_AND_INDEPENDENT_CRITIC_V1.md": "2ed2067f02f1eaa1a89927454f0c1acec28bb6c3a6e40d33447cb57b592fa9f1",
+    "docs/tasks/HYPOTHESIS_FORGE_AND_INDEPENDENT_CRITIC_V1.md": "44dee454085b0eecacbc8b94fe01a30b127c68ad8dbeba7dae107991910764d3",
     "tests/fixtures/hypothesis_forge/critic_input_packet_valid_v1.json": "4f98272c58a94e52e25b7c116047fe2bfaee9a410f4ffeb5cc77fb1334e7c876",
     "tests/fixtures/hypothesis_forge/synthesis_handoff_complete_pass_fast_lane_v1.json": "8fd6ad52685470299d2534b4d86963ac3ba9b910c7995c73bba0d211d0fa6b50",
     "tests/fixtures/hypothesis_forge/synthesis_handoff_complete_v1.json": "382f8aa4969a97b8a78f94d217c37a0072bb8ebb2ce25a905612fc23e12f4261",
@@ -60,7 +60,7 @@
     "github_ci": "ENFORCED_LIVE_AT_GUARDED_MERGE",
     "independent_review": {
       "path": "docs/evidence/hypothesis_forge_independent_critic/a1_delivery_independent_review_v1.json",
-      "sha256": "e2c2f4a365fbe9162c4e57bc95f496654be253e63c106fc1f27f4b2e02edc976",
+      "sha256": "8595f729ab5f4658aa4a3b087eab50ae337d0947ffcf3581ccdb1fafeaf19b0f",
       "verdict": "PASS"
     },
     "project_checks": [

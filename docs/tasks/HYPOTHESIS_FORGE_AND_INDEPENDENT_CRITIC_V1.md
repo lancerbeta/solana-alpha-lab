@@ -7,9 +7,9 @@ owner: GOAL_OWNER
 allowed_routes: [DIRECT_CURSOR_DELIVERY]
 expected_repository: lancerbeta/solana-alpha-lab
 git_binding:
-  expected_base: e1c8c3f4f31707fa2ae2de7b161e5954f517fd7a
+  expected_base: 71984b5e72fe2639c2e6ad1785ee7caace33cb16
   expected_upstream: origin/main
-  expected_upstream_oid: e1c8c3f4f31707fa2ae2de7b161e5954f517fd7a
+  expected_upstream_oid: 71984b5e72fe2639c2e6ad1785ee7caace33cb16
   expected_branch: cursor/hypothesis-forge-independent-critic-v1
   dirty_mode: ALLOW_REPORTED
 objective: Wire manual Hypothesis Forge (explicit slash only) and mandatory Independent Critic auto-handoff after synthesis in new context under MANUAL_FALLBACK_UNTIL_GENERATOR, with schemas, operator pack, skills and tests; design/discovery only with zero provider, Git mutation or experiment execution.
