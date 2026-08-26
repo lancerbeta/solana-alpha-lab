@@ -55,7 +55,10 @@ Immediately after a valid `CRITIC_INPUT_PACKET`:
 3. Do not mark the evening cycle done, do not propose execution tasks, and do not
    treat synthesis as finished until the critic returns one terminal and one NEXT.
 4. After critic returns, emit handoff with `synthesis_status: SYNTHESIS_COMPLETE`,
-   `critic_terminal`, and `critic_report_present: true`.
+   `critic_terminal`, `critic_report_present: true`, and when the final terminal is
+   post-classification (`PASS_FAST_LANE_READY`, `PASS_CHANGE_LANE_REQUIRED`,
+   `PASS_DATA_OPTION_REQUIRED`): `classifier_receipt_present: true` plus
+   `lane_classifier_terminal` from offline `classify_lane()`.
 
 If packet validation fails, return `STATUS=NOT_READY`, keep
 `synthesis_status: FORGE_NOT_READY`, and one repair action. Do not launch critic

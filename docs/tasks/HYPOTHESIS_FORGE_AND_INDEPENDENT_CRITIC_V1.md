@@ -29,6 +29,7 @@ managed_write_set:
   - tests/fixtures/hypothesis_forge/critic_input_packet_valid_v1.json
   - tests/fixtures/hypothesis_forge/synthesis_handoff_pending_critic_v1.json
   - tests/fixtures/hypothesis_forge/synthesis_handoff_complete_v1.json
+  - tests/fixtures/hypothesis_forge/synthesis_handoff_complete_pass_fast_lane_v1.json
   - docs/evidence/hypothesis_forge_independent_critic/a1_delivery_completion_evidence_v1.json
   - docs/evidence/hypothesis_forge_independent_critic/a1_delivery_independent_review_v1.json
   - docs/evidence/hypothesis_forge_independent_critic/a1_delivery_factory_fit_v1.json
@@ -115,4 +116,5 @@ context_requirements:
 ## Factory Fit and Product Horizon
 
 `FACTORY_FIT_REVIEW=PROPORTIONAL`. `PRODUCT_HORIZON_NOW=NONE`.
-`CAPABILITY_RADAR_NOW=NONE`.
+`CAPABILITY_RADAR_NOW=NONE`. Catalog asset registration for HFIC bindings is
+deferred to a follow-on atom; this PR wires operator/skills/schemas only.

@@ -44,10 +44,26 @@ the required isolated context.
 
 ## Terminals
 
-Use exactly one terminal from the B4 policy in the operator pack. Common outcomes:
+Use exactly one terminal from operator pack **B4** — the sole PASS entry before
+classification is `PASS_TO_CLASSIFICATION`. Do not emit `PASS_FAST_LANE_READY`,
+`PASS_CHANGE_LANE_REQUIRED` or `PASS_DATA_OPTION_REQUIRED` without completing
+**B5**: schema-valid ExperimentSpec plus deterministic offline `classify_lane()`.
+
+B4 terminals (choose one):
+
+- `PASS_TO_CLASSIFICATION` — then run B5 classifier mapping
+- `REVISE_ONCE` — bounded repair once; no mechanism change
+- `KILL_DUPLICATE_OR_PREVIOUSLY_CLOSED`, `KILL_MECHANISM`, `KILL_PIT_OR_LEAKAGE`,
+  `KILL_EXECUTION_OR_ECONOMICS`, `KILL_DATA_INFEASIBLE`,
+  `KILL_STATISTICALLY_UNIDENTIFIABLE`, `KILL_LOW_INFORMATION_VALUE`,
+  `KILL_PREPARATORY_LOOP`, `KILL_UNBOUND_EVIDENCE`
+- `NO_WORTHY_HYPOTHESIS`, `OWNER_DECISION_REQUIRED`
+
+After B5 classifier only (never by narrative):
 
 - `PASS_FAST_LANE_READY`, `PASS_CHANGE_LANE_REQUIRED`, `PASS_DATA_OPTION_REQUIRED`
-- `REVISE_ONCE` (once, bounded, no mechanism change)
-- `KILL_*`, `NO_WORTHY_HYPOTHESIS`, `OWNER_DECISION_REQUIRED`
+
+Record `lane_classifier_terminal` and `classifier_receipt_present: true` in the
+synthesis handoff whenever the final terminal is post-classification.
 
 Speak to the owner in Russian; keep terminal enums and schema fields canonical.

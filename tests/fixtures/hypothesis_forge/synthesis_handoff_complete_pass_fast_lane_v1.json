@@ -10,10 +10,10 @@
   "forge_report_present": true,
   "critic_input_packet_present": true,
   "critic_input_packet_sha256": "4f98272c58a94e52e25b7c116047fe2bfaee9a410f4ffeb5cc77fb1334e7c876",
-  "critic_terminal": "KILL_DUPLICATE_OR_PREVIOUSLY_CLOSED",
+  "critic_terminal": "PASS_FAST_LANE_READY",
   "critic_report_present": true,
-  "classifier_receipt_present": false,
-  "lane_classifier_terminal": null,
+  "classifier_receipt_present": true,
+  "lane_classifier_terminal": "FAST_LANE_OWNER_GATE_REQUIRED",
   "critic_context_isolation": "NEW_CONTEXT_REQUIRED",
   "authority": {
     "git_mutation": 0,
