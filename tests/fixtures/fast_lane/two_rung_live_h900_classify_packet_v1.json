@@ -1,0 +1,116 @@
+{
+  "experiment_spec": {
+    "schema": "smial.experiment-spec",
+    "schema_version": "1.1",
+    "experiment_id": "EXP-FACTORY-V1-COMMISSIONING-QUOTE-NATIVE-FREE-KEY-001",
+    "hypothesis_version": "HYP-FACTORY-V1-COMMISSIONING-QUOTE-NATIVE-FREE-KEY-V1",
+    "question": "Can the owner start from Factory and complete one bounded Jupiter Free-key quote-native experiment through ExperimentSpec without a hypothesis-specific core runner?",
+    "estimand": "QuotedRoundTripFriction(t0) -> QuotedLiquidationRecovery(H900)",
+    "population": "LIVE_OUTCOME_BLIND_TOKENS_V2_FREE_KEY_6_RECENT_6_TRADED_EXCLUDING_A1_MOVE2",
+    "data_requirements": [
+      {
+        "requirement_id": "CAPTURE_POLICY",
+        "kind": "CAPTURE_POLICY",
+        "path": "configs/quote_native_factory_commissioning_audition_v1.yaml",
+        "sha256": "f39d8a2335676c1f116f20f818509f55787562ffa5d5cb7736f270cc0c88abdc"
+      },
+      {
+        "requirement_id": "EXCLUSION_A1",
+        "kind": "GIT_CANONICAL_RECEIPT",
+        "path": "docs/evidence/quote_native_admissible_friction_audition/a1_quote_native_admissible_friction_audition_runtime_receipt_v1.json",
+        "sha256": "75f60a155b7db6ddb8c801c9ff5060ce5e4e7fe641b836ff35edeb91534c308e"
+      },
+      {
+        "requirement_id": "EXCLUSION_MOVE2",
+        "kind": "GIT_CANONICAL_RECEIPT",
+        "path": "docs/evidence/quote_native_friction_h900_move2_oos/a1_quote_native_friction_h900_move2_oos_runtime_receipt_v1.json",
+        "sha256": "a860888cd6c528c03cffb27146d07da6ed60770d0f1e13d47651b0d63f51b926"
+      },
+      {
+        "requirement_id": "RUNTIME_RECEIPT",
+        "kind": "PROVIDER_BOUNDED_CAPTURE",
+        "path": "docs/evidence/factory_v1_commissioning/a2_factory_v1_commissioning_runtime_receipt_v1.json",
+        "sha256": "f83968a0be381f874a38ed214c1f9ff1a5ac46bc433c502417d35d8f31727468"
+      },
+      {
+        "requirement_id": "ACCEPTANCE",
+        "kind": "PROVIDER_BOUNDED_CAPTURE",
+        "path": "docs/evidence/factory_v1_commissioning/a2_factory_v1_commissioning_acceptance_v1.json",
+        "sha256": "fe575fb897c72a8ca1c184b3e815ecfa1507813349b468fade96b08fb78aa0dc"
+      }
+    ],
+    "capabilities": [
+      "CAP-JUPITER-FREE-KEY-QUOTE-NATIVE-BOUNDED-CAPTURE-001"
+    ],
+    "falsifier": "Live capture cannot complete except by a hypothesis-specific core runner, or the new cohort reuses A1 or MOVE 2 mints, or MOVE 3 is started.",
+    "method": "classify_audition_terminal",
+    "parameters": {
+      "research_cycle_id": "RC-FACTORY-V1-COMMISSIONING-QUOTE-NATIVE-001",
+      "capture_policy_relative": "configs/quote_native_factory_commissioning_audition_v1.yaml",
+      "required_owner_phrase": "OK FACTORY_V1_COMMISSIONING_HYPOTHESIS_V1: one Jupiter Free-key Factory-commissioned quote-native campaign; local process-environment key only; Tokens V2 /recent and /toptraded/1h plus quote-only /swap/v2/order; x-api-key header only; no .env; no key in URL/log/receipt/Git; no taker, /build, /execute, wallet, signer, transaction, paid plan, second provider, retry or fallback; cash cap $0; call cap 60; global pace >=3s; 6 RECENT + 6 TRADED live outcome-blind cohort excluding A1 and MOVE 2 mints; hash-bound row observed_at and attempt reservation before credential read required for capture PASS; WRAP existing classify_audition_terminal; not MOVE 3; not alpha; scientific FAIL may still be product PASS.",
+      "next_safe_action": "WAIT_EXACT_OWNER_PHRASE"
+    },
+    "evidence_budget": {
+      "provider_api_rpc_wss_calls": 60
+    },
+    "holdout_policy": "No new holdout is opened; this atom commissions Factory with a new live cohort and does not consume a reserved OOS split or start MOVE 3.",
+    "terminal_outcomes": [
+      "BLOCKED_AUTHORITY",
+      "DIRECTIONAL_HINT_NOT_CONFIRMATION",
+      "SAMPLE_INVALID_INSUFFICIENT_COMPLETE_XY",
+      "SAMPLE_INVALID_TRADED_CONTROL_KILL",
+      "CLOSE_EXACT_QUOTE_FRICTION_MECHANISM",
+      "PAUSE_CLOSE_QUOTE_NATIVE_CURRENT_ALPHA_ROUTE"
+    ],
+    "capability_id": "CAP-JUPITER-FREE-KEY-QUOTE-NATIVE-BOUNDED-CAPTURE-001",
+    "parameter_schema_asset_id": "SCHEMA-EXPERIMENT-SPEC-001",
+    "query_recipe_ids": [],
+    "as_of": "2026-08-25T00:00:00Z",
+    "availability_cutoff": "2026-08-25T00:00:00Z",
+    "what_changed": [
+      "TWO_RUNG_LIVE_H900_V1_CLASSIFY_ONLY"
+    ],
+    "data_bindings": [
+      {
+        "binding_id": "BINDING-CAPTURE-POLICY",
+        "source_kind": "CATALOG_ASSET",
+        "stable_id": "CONFIG-QUOTE-NATIVE-FACTORY-COMMISSIONING-AUDITION-001",
+        "expected_content_sha256_or_dataset_fingerprint": "f39d8a2335676c1f116f20f818509f55787562ffa5d5cb7736f270cc0c88abdc"
+      },
+      {
+        "binding_id": "BINDING-EXCLUSION-A1",
+        "source_kind": "CATALOG_ASSET",
+        "stable_id": "EVIDENCE-QUOTE-NATIVE-ADMISSIBLE-FRICTION-AUDITION-001",
+        "expected_content_sha256_or_dataset_fingerprint": "75f60a155b7db6ddb8c801c9ff5060ce5e4e7fe641b836ff35edeb91534c308e"
+      },
+      {
+        "binding_id": "BINDING-EXCLUSION-MOVE2",
+        "source_kind": "CATALOG_ASSET",
+        "stable_id": "EVIDENCE-QUOTE-NATIVE-FRICTION-H900-MOVE2-OOS-001",
+        "expected_content_sha256_or_dataset_fingerprint": "a860888cd6c528c03cffb27146d07da6ed60770d0f1e13d47651b0d63f51b926"
+      },
+      {
+        "binding_id": "BINDING-RUNTIME-RECEIPT",
+        "source_kind": "CATALOG_ASSET",
+        "stable_id": "EVIDENCE-FACTORY-V1-COMMISSIONING-RUNTIME-001",
+        "expected_content_sha256_or_dataset_fingerprint": "f83968a0be381f874a38ed214c1f9ff1a5ac46bc433c502417d35d8f31727468"
+      },
+      {
+        "binding_id": "BINDING-ACCEPTANCE",
+        "source_kind": "CATALOG_ASSET",
+        "stable_id": "EVIDENCE-FACTORY-V1-COMMISSIONING-ACCEPTANCE-001",
+        "expected_content_sha256_or_dataset_fingerprint": "fe575fb897c72a8ca1c184b3e815ecfa1507813349b468fade96b08fb78aa0dc"
+      }
+    ]
+  },
+  "hypothesis_definition_sha256": "b03e2ede9f202c09011f1fc1b97ce89210ea176e6118b341804e5a00e2f7e8df",
+  "available_data_binding_ids": [
+    "BINDING-CAPTURE-POLICY",
+    "BINDING-EXCLUSION-A1",
+    "BINDING-EXCLUSION-MOVE2",
+    "BINDING-RUNTIME-RECEIPT",
+    "BINDING-ACCEPTANCE"
+  ],
+  "completed_runs": {},
+  "promotion_requested": false
+}

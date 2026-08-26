@@ -59,3 +59,22 @@ capabilities:
     determinism_class: BOUNDED_NONDETERMINISTIC
     promotion_authority: NONE
     query_recipe_required: false
+
+  - capability_id: CAP-JUPITER-FREE-KEY-QUOTE-NATIVE-BOUNDED-CAPTURE-001
+    status: ACCEPTED
+    entrypoint: solana_alpha_lab.factory.capabilities:capture_quote_native_free_key
+    implementation_asset_ids:
+      - MODULE-FACTORY-V1-CAPABILITY-FREE-KEY-CAPTURE-001
+    parameter_schema_asset_id: SCHEMA-EXPERIMENT-SPEC-001
+    input_kinds:
+      - CATALOG_ASSET
+    output_kinds:
+      - RAW_API_EVENT
+    effect_class: PROVIDER_READ_ONLY_BOUNDED
+    output_zone: DATA_ROOT_ONLY
+    provider_policy_asset_id: CONFIG-PROVIDER-ROUTE-CAPABILITY-REGISTRY-009
+    max_provider_calls: 60
+    supports_pit: true
+    determinism_class: BOUNDED_NONDETERMINISTIC
+    promotion_authority: NONE
+    query_recipe_required: false
