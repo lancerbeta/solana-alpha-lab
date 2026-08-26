@@ -15,7 +15,7 @@
   ],
   "review_id": "HFIC-INDEPENDENT-REVIEW-002",
   "reviewed_bindings_sha256": "b30bd3eb486bbd2cbd7bac8b90b60ce3ebafdfc1e4291cac254005e2fb8c27ee",
-  "reviewed_inventory_sha256": "d0a398542d5c884dff7c3a643ab45f6ea88c2b4d2a94c06da302e6bbecb8f6a4",
+  "reviewed_inventory_sha256": "64103c93419f9fe65bfeec05a6671c8a1d6a676d6ef689f47bb40a8f0390d826",
   "reviews": [
     {
       "findings": [
