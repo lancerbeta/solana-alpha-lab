@@ -32236,7 +32236,7 @@ records:
   as_of: '2026-08-26'
   truth_owner: HYPOTHESIS_FORGE_OPERATIONAL_CLOSURE_V1
   location: {kind: git_path, logical_uri: 'repo://docs/tasks/HYPOTHESIS_FORGE_OPERATIONAL_CLOSURE_V1.md', repository_path: docs/tasks/HYPOTHESIS_FORGE_OPERATIONAL_CLOSURE_V1.md}
-  integrity: {kind: sha256, sha256: d9d9c0e471edd704f3ac4d7f0c6c32f9696733baace80b8ac58eec67022165d1}
+  integrity: {kind: sha256, sha256: 1d558b79bafe984891f77a71cad73ffa235e6bc96f4b0660bf534f7ad8736e0a}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: governed_by, target_asset_id: CTRL-HYPOTHESIS-FAST-LANE-001}

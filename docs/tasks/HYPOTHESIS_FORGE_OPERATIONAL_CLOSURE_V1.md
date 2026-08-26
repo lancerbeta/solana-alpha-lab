@@ -33,6 +33,7 @@ managed_write_set:
 - src/solana_alpha_lab/factory/data_root.py
 - src/solana_alpha_lab/factory/prior_work.py
 - src/solana_alpha_lab/factory/commissioning_proof.py
+- src/solana_alpha_lab/factory/document_runner.py
 - scripts/hypothesis_forge.py
 - scripts/hypothesis_fast_lane.py
 - schemas/research_memory_projection_v1.sql
