@@ -8,9 +8,9 @@ allowed_routes:
 - DIRECT_CURSOR_DELIVERY
 expected_repository: lancerbeta/solana-alpha-lab
 git_binding:
-  expected_base: 016904b4991a0c8f3e81daf821de90eebf0cea79
+  expected_base: 7935f9acd8ff51c8d906d9b91d9ca4c2ab03ac2d
   expected_upstream: origin/main
-  expected_upstream_oid: 016904b4991a0c8f3e81daf821de90eebf0cea79
+  expected_upstream_oid: 7935f9acd8ff51c8d906d9b91d9ca4c2ab03ac2d
   expected_branch: cursor/hypothesis-fast-lane-research-data-plane
   dirty_mode: ALLOW_REPORTED
 objective: Build one governed no-Git Fast Lane so a structured hypothesis can be

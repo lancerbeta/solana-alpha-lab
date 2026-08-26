@@ -31777,7 +31777,7 @@ records:
   as_of: '2026-08-25'
   truth_owner: HYPOTHESIS_FAST_LANE_AND_RESEARCH_DATA_PLANE_V1
   location: {kind: git_path, logical_uri: 'repo://docs/tasks/HYPOTHESIS_FAST_LANE_AND_RESEARCH_DATA_PLANE_V1.md', repository_path: docs/tasks/HYPOTHESIS_FAST_LANE_AND_RESEARCH_DATA_PLANE_V1.md}
-  integrity: {kind: sha256, sha256: 1dea827836362c70c772c57d1c030451fcfbbaba9b496d746ddd4ec44e8d7550}
+  integrity: {kind: sha256, sha256: 039fe8499d98f170f7a20e1ba84b0623f7c4d7ed0a02a759b73280eac084dc26}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: governed_by, target_asset_id: ADR-006-HYPOTHESIS-FAST-LANE-001}
