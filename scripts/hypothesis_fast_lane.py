@@ -47,6 +47,14 @@ from solana_alpha_lab.factory.commissioning_fixture import (  # noqa: E402
     COMMISSIONING_DATASET_MANIFEST_ID,
     publish_commissioning_dataset,
 )
+from solana_alpha_lab.factory.commissioning_proof import (  # noqa: E402
+    CommissioningProofError,
+    REQUIRED_RUN_RECORD_COUNTS,
+    RUN_PASSPORT_REQUIRED_FIELDS,
+    verify_commissioning_passport as _verify_commissioning_passport,
+    verify_commissioning_records as _verify_commissioning_records,
+    verify_result_integrity as _verify_result_integrity,
+)
 from solana_alpha_lab.factory.fast_lane_cold_copy import (  # noqa: E402
     ColdCopyError,
     backup_committed_inventory,
@@ -341,73 +349,51 @@ def execute_search_prior_work(
     }
 
 
-REQUIRED_RUN_RECORD_COUNTS = {
-    RecordKind.RUN_STARTED: 1,
-    RecordKind.RUN_COMPLETED: 1,
-    RecordKind.EXPERIMENT_METRIC: 1,
-    RecordKind.RESEARCH_ARTIFACT: 1,
-    RecordKind.EVIDENCE_BINDING: 1,
-}
-RUN_PASSPORT_REQUIRED_FIELDS = tuple(RunPassport.model_fields)
-
-
 def verify_commissioning_records(store: ResearchStore, run_id: str) -> dict[str, Any]:
-    counts: dict[str, int] = {kind.value: 0 for kind in REQUIRED_RUN_RECORD_COUNTS}
-    hypothesis_version_count = 0
-    for record in store.iter_committed_records():
-        kind_name = getattr(record.record_kind, "value", record.record_kind)
-        if kind_name == RecordKind.HYPOTHESIS_VERSION.value:
-            hypothesis_version_count += 1
-        if record.run_id != run_id:
-            continue
-        kind_name = getattr(record.record_kind, "value", record.record_kind)
-        if kind_name in counts:
-            counts[kind_name] = counts.get(kind_name, 0) + 1
-    if hypothesis_version_count < 1:
-        raise FastLaneCliError("COMMISSION_HYPOTHESIS_VERSION_MISSING")
-    for kind, minimum in REQUIRED_RUN_RECORD_COUNTS.items():
-        if counts[kind.value] < minimum:
-            raise FastLaneCliError(f"COMMISSION_RECORD_MISSING:{kind.value}")
-    return {
-        "run_id": run_id,
-        "hypothesis_version_count": hypothesis_version_count,
-        "record_counts": counts,
-    }
+    try:
+        return _verify_commissioning_records(store, run_id)
+    except CommissioningProofError as exc:
+        raise FastLaneCliError(str(exc)) from exc
 
 
 def verify_commissioning_passport(passport: dict[str, Any]) -> dict[str, Any]:
-    missing = [field for field in RUN_PASSPORT_REQUIRED_FIELDS if field not in passport]
-    if missing:
-        raise FastLaneCliError("COMMISSION_PASSPORT_INCOMPLETE")
     try:
-        validated = validate_run_passport(passport)
-    except RunPassportError as exc:
-        raise FastLaneCliError("COMMISSION_PASSPORT_INVALID") from exc
-    return dict(validated.payload)
+        return _verify_commissioning_passport(passport)
+    except CommissioningProofError as exc:
+        raise FastLaneCliError(str(exc)) from exc
 
 
 def verify_result_integrity(data_root: Path, run_id: str) -> dict[str, Any]:
-    row = _run_row(data_root, run_id)
-    passport = row["passport"]
-    artifact = load_run_result_artifact(data_root, passport)
-    recomputed_digest = canonical_sha256(artifact["capability_result"])
-    stored_digest = str(passport.get("result_digest_sha256") or "")
-    matches = bool(stored_digest) and recomputed_digest == stored_digest
+    try:
+        integrity = _verify_result_integrity(data_root, run_id)
+    except CommissioningProofError as exc:
+        if str(exc) == "COMMISSION_RESULT_INTEGRITY_FAILED":
+            return {
+                **owner_fields(
+                    lane=Lane.FAST_LANE.value,
+                    status="RESULT_INTEGRITY_MISMATCH",
+                    scientific_terminal="INVALID",
+                    reason_codes=["RESULT_DIGEST_MISMATCH"],
+                    run_id_or_null=run_id,
+                    git_mutation_count=0,
+                    provider_calls_actual=0,
+                    next_action="SHOW_RUN",
+                ),
+                "result_integrity_matches": False,
+            }
+        raise FastLaneCliError(str(exc)) from exc
     return {
         **owner_fields(
             lane=Lane.FAST_LANE.value,
-            status="RESULT_INTEGRITY_OK" if matches else "RESULT_INTEGRITY_MISMATCH",
-            scientific_terminal=str(row["scientific_terminal"]),
-            reason_codes=[] if matches else ["RESULT_DIGEST_MISMATCH"],
+            status="RESULT_INTEGRITY_OK",
+            scientific_terminal=str(integrity.get("scientific_terminal") or "INCONCLUSIVE"),
+            reason_codes=[],
             run_id_or_null=run_id,
-            git_mutation_count=0,
-            provider_calls_actual=int(passport.get("provider_calls_actual") or 0),
-            next_action="PREPARE_PROMOTION" if matches else "SHOW_RUN",
+            git_mutation_count=int(integrity.get("git_mutation_count") or 0),
+            provider_calls_actual=int(integrity.get("provider_calls_actual") or 0),
+            next_action="PREPARE_PROMOTION",
         ),
-        "result_digest_sha256": stored_digest,
-        "recomputed_result_digest_sha256": recomputed_digest,
-        "result_integrity_matches": matches,
-        "result_artifact_id": passport.get("result_artifact_id"),
+        **integrity,
     }
 
 

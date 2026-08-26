@@ -123,6 +123,9 @@ class HficOperationalClosureContractTests(unittest.TestCase):
         self.assertIn("HFIC-V1.1", text)
         self.assertIn("RETURN_EXISTING_SESSION", text)
         self.assertIn("RESUME_CRITIC", text)
+        self.assertIn("FORGE_DRAFT", text)
+        self.assertIn("RESUME_REVISE", text)
+        self.assertIn("RESUME_CLASSIFY", text)
         self.assertNotRegex(text, re.compile(r"Execute \*\*PROMPT A\*\* from the operator pack \(`HFIC-V1\.0`\)"))
 
     def test_critic_skill_returns_result_schema_and_does_not_persist(self) -> None:
@@ -143,3 +146,22 @@ class HficOperationalClosureContractTests(unittest.TestCase):
         self.assertIn("END PROMPT A", text)
         self.assertIn("BEGIN PROMPT B", text)
         self.assertIn("display-only", text.casefold())
+        self.assertIn("FORGE_DRAFT", text)
+        self.assertIn("hypothesis_forge_draft_v1", text)
+
+    def test_prompt_a_fixture_is_schema_valid_forge_draft(self) -> None:
+        draft = load_json(ROOT / "tests/fixtures/hypothesis_forge/prompt_a_forge_draft_v1.json")
+        self.assertEqual(schema_errors(draft, DRAFT_SCHEMA), [])
+        self.assertEqual(draft["generator_prompt_version"], "HFIC-V1.1")
+
+    def test_hfic_python_tests_do_not_nest_uv(self) -> None:
+        for path in (
+            ROOT / "tests/test_hfic_cli.py",
+            ROOT / "tests/test_hfic_session.py",
+            ROOT / "tests/test_hfic_preflight.py",
+        ):
+            text = path.read_text(encoding="utf-8")
+            self.assertNotIn("uv run", text)
+            if path.name == "test_hfic_cli.py":
+                self.assertIn("sys.executable", text)
+                self.assertIn("-B", text)

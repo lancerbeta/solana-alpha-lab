@@ -5,6 +5,13 @@
   "owner_focus": "AUTO",
   "preflight_receipt_id": "HFIC-PREFLIGHT-FIXTURE-001",
   "preflight_receipt_sha256": "11aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+  "research_memory_as_of": "2026-08-25T00:00:00Z",
+  "truth_roots_used": [
+    "catalog/catalog_manifest.yaml"
+  ],
+  "prior_work_receipts": [
+    "QUERY-HFIC-SESSION-BY-SEARCH-KEY-001"
+  ],
   "authority": {
     "git_mutation": 0,
     "experiment_execution": 0,

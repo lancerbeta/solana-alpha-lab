@@ -34,7 +34,10 @@ from solana_alpha_lab.factory.hfic_preflight import (  # noqa: E402
 from solana_alpha_lab.factory.hfic_session import (  # noqa: E402
     HficSessionError,
     PENDING_STATES,
+    apply_classification,
+    apply_revision,
     backfill_legacy,
+    canonical_preflight_receipt_sha256,
     find_session_by_search_key,
     freeze_draft,
     list_hfic_sessions,
@@ -176,9 +179,10 @@ def cmd_preflight(
         _assert_no_path_leak(payload, str(data_root), str(repo_root))
         return emit(payload, exit_code=2)
     payload = {
-        **receipt,
         **active.redacted_receipt(),
+        **receipt,
     }
+    payload["preflight_receipt_sha256"] = canonical_preflight_receipt_sha256(payload)
     _assert_no_path_leak(payload, str(data_root), str(repo_root))
     exit_code = 0 if receipt["action"] != "STOP" else 2
     return emit(payload, exit_code=exit_code)
@@ -239,12 +243,70 @@ def cmd_finalize(
         critic_result,
         store=store,
         repo_root=repo_root,
+        data_root=data_root,
     )
     git_after = repository_git_snapshot(repo_root)
     if not git_before.unchanged(git_after):
         raise HficCliError("GIT_MUTATION_DETECTED")
     _assert_no_path_leak(receipt, str(data_root), str(repo_root))
     return emit(receipt)
+
+
+def cmd_revise(
+    repo_root: Path,
+    session_id: str,
+    draft_path: Path,
+    explicit_data_root: Path | None,
+) -> int:
+    from solana_alpha_lab.factory.hfic_session import load_session_bundle
+
+    git_before = repository_git_snapshot(repo_root)
+    draft = _load_json_file(draft_path)
+    data_root = _store_root(repo_root, explicit_data_root)
+    store = ResearchStore(data_root)
+    frozen = load_session_bundle(store, session_id)
+    if frozen is None:
+        raise HficCliError("SESSION_NOT_FOUND")
+    payload = apply_revision(
+        frozen,
+        draft,
+        store=store,
+        repo_root=repo_root,
+    )
+    git_after = repository_git_snapshot(repo_root)
+    if not git_before.unchanged(git_after):
+        raise HficCliError("GIT_MUTATION_DETECTED")
+    _assert_no_path_leak(payload, str(data_root), str(repo_root))
+    return emit(payload)
+
+
+def cmd_classify(
+    repo_root: Path,
+    session_id: str,
+    spec_path: Path,
+    explicit_data_root: Path | None,
+) -> int:
+    from solana_alpha_lab.factory.hfic_session import load_session_bundle
+
+    git_before = repository_git_snapshot(repo_root)
+    packet = _load_json_file(spec_path)
+    data_root = _store_root(repo_root, explicit_data_root)
+    store = ResearchStore(data_root)
+    frozen = load_session_bundle(store, session_id)
+    if frozen is None:
+        raise HficCliError("SESSION_NOT_FOUND")
+    payload = apply_classification(
+        frozen,
+        packet,
+        store=store,
+        repo_root=repo_root,
+        data_root=data_root,
+    )
+    git_after = repository_git_snapshot(repo_root)
+    if not git_before.unchanged(git_after):
+        raise HficCliError("GIT_MUTATION_DETECTED")
+    _assert_no_path_leak(payload, str(data_root), str(repo_root))
+    return emit(payload)
 
 
 def cmd_show_session(
@@ -380,6 +442,16 @@ def build_parser() -> argparse.ArgumentParser:
     finalize.add_argument("--critic-result", type=Path, required=True)
     finalize.add_argument("--format", choices=("json",), default="json")
 
+    revise = subparsers.add_parser("revise")
+    revise.add_argument("--session-id", required=True)
+    revise.add_argument("--draft", type=Path, required=True)
+    revise.add_argument("--format", choices=("json",), default="json")
+
+    classify_cmd = subparsers.add_parser("classify")
+    classify_cmd.add_argument("--session-id", required=True)
+    classify_cmd.add_argument("--experiment-spec", type=Path, required=True)
+    classify_cmd.add_argument("--format", choices=("json",), default="json")
+
     show_session_cmd = subparsers.add_parser("show-session")
     show_session_cmd.add_argument("--session-id", default=None)
     show_session_cmd.add_argument("--search-key", default=None)
@@ -436,6 +508,20 @@ def main(argv: list[str] | None = None) -> int:
                 repo_root,
                 args.session_id,
                 args.critic_result,
+                args.data_root,
+            )
+        if args.command == "revise":
+            return cmd_revise(
+                repo_root,
+                args.session_id,
+                args.draft,
+                args.data_root,
+            )
+        if args.command == "classify":
+            return cmd_classify(
+                repo_root,
+                args.session_id,
+                args.experiment_spec,
                 args.data_root,
             )
         if args.command == "show-session":

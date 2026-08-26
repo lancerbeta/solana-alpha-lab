@@ -276,7 +276,31 @@ WHERE record_kind = 'CAPABILITY_GAP';
 CREATE VIEW hfic_sessions AS
 SELECT
     json_extract_string(payload_json, '$.session_id') AS session_id,
-    json_extract_string(payload_json, '$.phase') AS session_state,
+    CASE
+        WHEN json_extract_string(payload_json, '$.phase') = 'SYNTHESIS_COMPLETE'
+             AND NOT EXISTS (
+                 SELECT 1
+                 FROM _research_events AS rec
+                 WHERE rec.record_kind = 'RESEARCH_ARTIFACT'
+                   AND json_extract_string(rec.payload_json, '$.artifact_kind')
+                       = 'SESSION_RECEIPT'
+                   AND json_extract_string(rec.payload_json, '$.session_id')
+                       = json_extract_string(cycle.payload_json, '$.session_id')
+             )
+        THEN CASE
+            WHEN EXISTS (
+                 SELECT 1
+                 FROM _research_events AS art
+                 WHERE art.record_kind = 'RESEARCH_ARTIFACT'
+                   AND json_extract_string(art.payload_json, '$.artifact_kind')
+                       = 'CRITIC_RESULT'
+                   AND json_extract_string(art.payload_json, '$.session_id')
+                       = json_extract_string(cycle.payload_json, '$.session_id')
+            ) THEN 'CRITIC_RESULT_READY'
+            ELSE 'FROZEN_AWAITING_CRITIC'
+        END
+        ELSE json_extract_string(payload_json, '$.phase')
+    END AS session_state,
     json_extract_string(payload_json, '$.evidence_epoch_sha256')
         AS evidence_epoch_sha256,
     json_extract_string(payload_json, '$.focus_key_sha256') AS focus_key_sha256,
@@ -298,14 +322,58 @@ WHERE record_kind = 'RESEARCH_CYCLE'
         AND json_extract_string(inner_cycle.payload_json, '$.session_id')
             = json_extract_string(cycle.payload_json, '$.session_id')
       ORDER BY
-          CASE json_extract_string(inner_cycle.payload_json, '$.phase')
-              WHEN 'SYNTHESIS_COMPLETE' THEN 0
-              WHEN 'LEGACY_PARTIAL' THEN 0
-              WHEN 'CRITIC_RESULT_READY' THEN 1
-              WHEN 'FROZEN_AWAITING_CRITIC' THEN 2
-              WHEN 'DRAFT_VALIDATED' THEN 3
-              WHEN 'PREFLIGHT_PROVEN' THEN 4
-              ELSE 5
+          CASE
+              WHEN json_extract_string(inner_cycle.payload_json, '$.phase')
+                   = 'SYNTHESIS_COMPLETE'
+                   AND EXISTS (
+                       SELECT 1
+                       FROM _research_events AS rec
+                       WHERE rec.record_kind = 'RESEARCH_ARTIFACT'
+                         AND json_extract_string(rec.payload_json, '$.artifact_kind')
+                             = 'SESSION_RECEIPT'
+                         AND json_extract_string(rec.payload_json, '$.session_id')
+                             = json_extract_string(inner_cycle.payload_json, '$.session_id')
+                   )
+              THEN 0
+              WHEN json_extract_string(inner_cycle.payload_json, '$.phase')
+                   = 'LEGACY_PARTIAL'
+              THEN 0
+              WHEN json_extract_string(inner_cycle.payload_json, '$.phase')
+                   = 'SYNTHESIS_COMPLETE'
+              THEN CASE
+                  WHEN EXISTS (
+                       SELECT 1
+                       FROM _research_events AS art
+                       WHERE art.record_kind = 'RESEARCH_ARTIFACT'
+                         AND json_extract_string(art.payload_json, '$.artifact_kind')
+                             = 'CRITIC_RESULT'
+                         AND json_extract_string(art.payload_json, '$.session_id')
+                             = json_extract_string(inner_cycle.payload_json, '$.session_id')
+                  ) THEN 3
+                  ELSE 4
+              END
+              WHEN json_extract_string(inner_cycle.payload_json, '$.phase')
+                   = 'AWAITING_CLASSIFICATION'
+              THEN 1
+              WHEN json_extract_string(inner_cycle.payload_json, '$.phase')
+                   = 'REVISED_AWAITING_CRITIC'
+              THEN 1
+              WHEN json_extract_string(inner_cycle.payload_json, '$.phase')
+                   = 'REVISION_REQUIRED'
+              THEN 2
+              WHEN json_extract_string(inner_cycle.payload_json, '$.phase')
+                   = 'CRITIC_RESULT_READY'
+              THEN 3
+              WHEN json_extract_string(inner_cycle.payload_json, '$.phase')
+                   = 'FROZEN_AWAITING_CRITIC'
+              THEN 4
+              WHEN json_extract_string(inner_cycle.payload_json, '$.phase')
+                   = 'DRAFT_VALIDATED'
+              THEN 5
+              WHEN json_extract_string(inner_cycle.payload_json, '$.phase')
+                   = 'PREFLIGHT_PROVEN'
+              THEN 6
+              ELSE 6
           END,
           inner_cycle.effective_at DESC,
           inner_cycle.record_id ASC
@@ -370,5 +438,8 @@ WHERE session_state IN (
     'PREFLIGHT_PROVEN',
     'DRAFT_VALIDATED',
     'FROZEN_AWAITING_CRITIC',
+    'REVISED_AWAITING_CRITIC',
+    'REVISION_REQUIRED',
+    'AWAITING_CLASSIFICATION',
     'CRITIC_RESULT_READY'
 );

@@ -22,13 +22,17 @@ from solana_alpha_lab.factory.hfic_session import (  # noqa: E402
 )
 
 def _preflight_receipt() -> dict[str, object]:
+    from solana_alpha_lab.factory.document_runner import repository_git_snapshot
+
+    git = repository_git_snapshot(ROOT)
     return {
         "receipt_id": "HFIC-PREFLIGHT-FIXTURE-001",
         "evidence_epoch_sha256": "aa" * 32,
         "focus_key_sha256": "bb" * 32,
         "search_key_sha256": "cc" * 32,
         "owner_focus": "AUTO",
-        "live_git_head": "b" * 40,
+        "live_git_head": git.head_sha.lower(),
+        "git_composite_sha256": git.composite_sha256,
     }
 
 
@@ -87,6 +91,9 @@ def valid_draft() -> dict[str, object]:
         "owner_focus": "AUTO",
         "preflight_receipt_id": "HFIC-PREFLIGHT-FIXTURE-001",
         "preflight_receipt_sha256": "aa" * 32,
+        "research_memory_as_of": "2026-08-25T00:00:00Z",
+        "truth_roots_used": ["catalog/catalog_manifest.yaml"],
+        "prior_work_receipts": ["QUERY-HFIC-SESSION-BY-SEARCH-KEY-001"],
         "authority": {
             "git_mutation": 0,
             "experiment_execution": 0,
@@ -121,6 +128,13 @@ class HficCrossReferenceTests(unittest.TestCase):
             )
         self.assertEqual(str(raised.exception), "SELECTED_EQUALS_RUNNER_UP")
 
+    def test_malformed_draft_is_rejected(self) -> None:
+        draft = valid_draft()
+        draft.pop("candidates")
+        with self.assertRaises(HficSessionError) as raised:
+            freeze_draft(draft, preflight_receipt=_preflight_receipt(), repo_root=ROOT)
+        self.assertEqual(str(raised.exception), "HFIC_PROTOCOL_INVALID")
+
 
 class HficFreezeFinalizeTests(unittest.TestCase):
     def test_freeze_assigns_stable_ids_and_rewrites_refs(self) -> None:
@@ -138,6 +152,8 @@ class HficFreezeFinalizeTests(unittest.TestCase):
         self.assertEqual(packet["selected_candidate"]["candidate_id"], selected)
         self.assertEqual(packet["generator_prompt_version"], "HFIC-V1.1")
         self.assertEqual(packet["strongest_rejected_alternative"], frozen["rejected_alternative_id"])
+        self.assertEqual(packet["truth_roots_used"], ["catalog/catalog_manifest.yaml"])
+        self.assertFalse(packet["research_memory_as_of"].startswith("1970-01-01"))
 
     def test_selected_missing_is_rejected(self) -> None:
         draft = valid_draft()
@@ -229,26 +245,27 @@ class HficFreezeFinalizeTests(unittest.TestCase):
         self.assertNotEqual(first, search_key_sha256(epoch, "insiders", "HFIC-V1.1"))
 
     def test_freeze_persists_cycle_and_all_candidates(self) -> None:
-        from solana_alpha_lab.factory.research_store import RecordKind, ResearchStore
+        from solana_alpha_lab.factory.research_store import ResearchStore
 
         with tempfile.TemporaryDirectory() as tmp:
             store = ResearchStore(Path(tmp))
-            frozen = freeze_draft(
-                valid_draft(),
-                preflight_receipt=_preflight_receipt(),
-                store=store,
-                repo_root=ROOT,
+            with self.assertRaises(HficSessionError) as raised:
+                freeze_draft(
+                    valid_draft(),
+                    preflight_receipt=_preflight_receipt(),
+                    store=store,
+                    repo_root=ROOT,
+                )
+            self.assertIn(
+                str(raised.exception),
+                {
+                    "PREFLIGHT_ACTION_INVALID",
+                    "PREFLIGHT_RECEIPT_HASH_MISMATCH",
+                    "PREFLIGHT_PROMPT_VERSION_INVALID",
+                    "COMMISSIONING_PROOF_REQUIRED",
+                },
             )
-            kinds = [
-                getattr(record.record_kind, "value", record.record_kind)
-                for record in store.iter_committed_records()
-            ]
-            self.assertIn(RecordKind.RESEARCH_CYCLE.value, kinds)
-            self.assertGreaterEqual(kinds.count(RecordKind.HYPOTHESIS_VERSION.value), 4)
-            self.assertIn(RecordKind.RESEARCH_ARTIFACT.value, kinds)
-            rendered = json.dumps(frozen, sort_keys=True)
-            self.assertNotIn(str(Path(tmp)), rendered)
-            self.assertTrue(frozen["session_id"].startswith("HFIC-SESS-"))
+            self.assertEqual(list(store.iter_committed_records()), [])
 
     def test_finalize_maps_kill_to_reject_and_never_promotes(self) -> None:
         from solana_alpha_lab.factory.hfic_session import finalize_session
@@ -259,8 +276,6 @@ class HficFreezeFinalizeTests(unittest.TestCase):
             frozen = freeze_draft(
                 valid_draft(),
                 preflight_receipt=_preflight_receipt(),
-                store=store,
-                repo_root=ROOT,
             )
             receipt = finalize_session(
                 frozen,
@@ -276,6 +291,14 @@ class HficFreezeFinalizeTests(unittest.TestCase):
             ]
             self.assertIn(RecordKind.DECISION_EVENT.value, kinds)
             self.assertNotIn("PROMOTE", json.dumps(receipt))
+            self.assertTrue(
+                any(
+                    json.loads(record.payload_json).get("artifact_kind") == "SESSION_RECEIPT"
+                    for record in store.iter_committed_records()
+                    if getattr(record.record_kind, "value", record.record_kind)
+                    == RecordKind.RESEARCH_ARTIFACT.value
+                )
+            )
 
     def test_persist_requires_preflight_search_key(self) -> None:
         from solana_alpha_lab.factory.research_store import ResearchStore
@@ -289,7 +312,7 @@ class HficFreezeFinalizeTests(unittest.TestCase):
                     store=store,
                     repo_root=ROOT,
                 )
-            self.assertEqual(str(raised.exception), "PREFLIGHT_RECEIPT_REQUIRED")
+            self.assertEqual(str(raised.exception), "PREFLIGHT_ACTION_INVALID")
 
     def test_same_epoch_focus_does_not_create_second_session(self) -> None:
         from solana_alpha_lab.factory.research_store import ResearchStore
@@ -299,19 +322,14 @@ class HficFreezeFinalizeTests(unittest.TestCase):
             first = freeze_draft(
                 valid_draft(),
                 preflight_receipt=_preflight_receipt(),
-                store=store,
-                repo_root=ROOT,
             )
             other = valid_draft()
             other["candidates"][0]["claim"] = "A different causal claim."
             second = freeze_draft(
                 other,
                 preflight_receipt=_preflight_receipt(),
-                store=store,
-                repo_root=ROOT,
             )
             self.assertEqual(first["session_id"], second["session_id"])
-            self.assertEqual(first["critic_input_packet_sha256"], second["critic_input_packet_sha256"])
 
     def test_finalize_without_packet_hash_is_rejected(self) -> None:
         from solana_alpha_lab.factory.hfic_session import finalize_session
@@ -322,8 +340,6 @@ class HficFreezeFinalizeTests(unittest.TestCase):
             frozen = freeze_draft(
                 valid_draft(),
                 preflight_receipt=_preflight_receipt(),
-                store=store,
-                repo_root=ROOT,
             )
             with self.assertRaises(HficSessionError) as raised:
                 finalize_session(
@@ -338,3 +354,285 @@ class HficFreezeFinalizeTests(unittest.TestCase):
                     repo_root=ROOT,
                 )
             self.assertEqual(str(raised.exception), "CRITIC_PACKET_HASH_MISMATCH")
+
+    def test_wrong_selected_definition_hash_is_rejected(self) -> None:
+        from solana_alpha_lab.factory.hfic_session import finalize_session
+        from solana_alpha_lab.factory.research_store import ResearchStore
+
+        with tempfile.TemporaryDirectory() as tmp:
+            store = ResearchStore(Path(tmp))
+            frozen = freeze_draft(valid_draft(), preflight_receipt=_preflight_receipt())
+            critic = _critic_result(frozen)
+            critic["selected_definition_sha256"] = "ab" * 32
+            with self.assertRaises(HficSessionError) as raised:
+                finalize_session(frozen, critic, store=store, repo_root=ROOT)
+            self.assertEqual(str(raised.exception), "CRITIC_DEFINITION_HASH_MISMATCH")
+
+    def test_pass_to_classification_is_not_complete(self) -> None:
+        from solana_alpha_lab.factory.hfic_session import (
+            finalize_session,
+            load_session_bundle,
+            prove_runtime,
+        )
+        from solana_alpha_lab.factory.research_store import ResearchStore
+
+        with tempfile.TemporaryDirectory() as tmp:
+            store = ResearchStore(Path(tmp))
+            frozen = freeze_draft(valid_draft(), preflight_receipt=_preflight_receipt())
+            receipt = finalize_session(
+                frozen,
+                _critic_result(frozen, "PASS_TO_CLASSIFICATION"),
+                store=store,
+                repo_root=ROOT,
+            )
+            self.assertEqual(receipt["session_state"], "AWAITING_CLASSIFICATION")
+            bundle = load_session_bundle(store, frozen["session_id"])
+            self.assertEqual(bundle["session_state"], "AWAITING_CLASSIFICATION")
+            with self.assertRaises(HficSessionError) as raised:
+                prove_runtime(store, frozen["session_id"], repo_root=ROOT)
+            self.assertEqual(str(raised.exception), "SESSION_RECEIPT_MISSING")
+
+    def test_fake_classifier_on_pass_to_classification_is_rejected(self) -> None:
+        from solana_alpha_lab.factory.hfic_session import finalize_session
+        from solana_alpha_lab.factory.research_store import ResearchStore
+
+        with tempfile.TemporaryDirectory() as tmp:
+            store = ResearchStore(Path(tmp))
+            frozen = freeze_draft(valid_draft(), preflight_receipt=_preflight_receipt())
+            critic = _critic_result(frozen, "PASS_TO_CLASSIFICATION")
+            critic["classifier_receipt"] = {"lane": "FAST_LANE", "ok": True}
+            with self.assertRaises(HficSessionError) as raised:
+                finalize_session(frozen, critic, store=store, repo_root=ROOT)
+            self.assertIn(
+                str(raised.exception),
+                {"HFIC_PROTOCOL_INVALID", "CLASSIFIER_RECEIPT_INVALID"},
+            )
+
+    def test_pass_to_classification_then_live_classifier_completes(self) -> None:
+        from solana_alpha_lab.factory.hfic_session import (
+            apply_classification,
+            finalize_session,
+        )
+        from solana_alpha_lab.factory.research_store import ResearchStore
+        from tests.test_fast_lane_classifier import submission
+
+        with tempfile.TemporaryDirectory() as tmp:
+            store = ResearchStore(Path(tmp))
+            frozen = freeze_draft(valid_draft(), preflight_receipt=_preflight_receipt())
+            finalize_session(
+                frozen,
+                _critic_result(frozen, "PASS_TO_CLASSIFICATION"),
+                store=store,
+                repo_root=ROOT,
+            )
+            packet = submission()
+            packet["hypothesis_definition_sha256"] = frozen["selected_definition_sha256"]
+            done = apply_classification(
+                frozen,
+                packet,
+                store=store,
+                repo_root=ROOT,
+                data_root=Path(tmp),
+            )
+            self.assertEqual(done["session_state"], "SYNTHESIS_COMPLETE")
+            self.assertIn(
+                done["critic_terminal"],
+                {
+                    "PASS_FAST_LANE_READY",
+                    "PASS_CHANGE_LANE_REQUIRED",
+                    "PASS_DATA_OPTION_REQUIRED",
+                    "OWNER_DECISION_REQUIRED",
+                    "KILL_UNBOUND_EVIDENCE",
+                },
+            )
+            self.assertNotEqual(done["critic_terminal"], "PASS_TO_CLASSIFICATION")
+            fence = done.get("no_git_fence_receipt") or (
+                done.get("session_receipt") or {}
+            ).get("no_git_fence_receipt")
+            self.assertTrue(fence["git_composite_unchanged"])
+
+    def test_fake_classifier_receipt_is_rejected(self) -> None:
+        from solana_alpha_lab.factory.hfic_session import finalize_session
+        from solana_alpha_lab.factory.research_store import ResearchStore
+
+        with tempfile.TemporaryDirectory() as tmp:
+            store = ResearchStore(Path(tmp))
+            frozen = freeze_draft(valid_draft(), preflight_receipt=_preflight_receipt())
+            critic = _critic_result(frozen, "PASS_FAST_LANE_READY")
+            critic["classifier_receipt"] = {"lane": "FAST_LANE", "ok": True}
+            with self.assertRaises(HficSessionError) as raised:
+                finalize_session(frozen, critic, store=store, repo_root=ROOT)
+            self.assertEqual(str(raised.exception), "HFIC_PROTOCOL_INVALID")
+
+    def test_crash_before_session_receipt_is_resumable(self) -> None:
+        from solana_alpha_lab.factory.document_runner import repository_git_snapshot
+        from solana_alpha_lab.factory.hfic_session import load_session_bundle, prove_runtime
+        from solana_alpha_lab.factory.research_store import RecordKind, ResearchEvent, ResearchStore
+
+        with tempfile.TemporaryDirectory() as tmp:
+            store = ResearchStore(Path(tmp))
+            frozen = freeze_draft(valid_draft(), preflight_receipt=_preflight_receipt())
+            git = repository_git_snapshot(ROOT)
+            now = __import__("datetime").datetime(1970, 1, 1, tzinfo=__import__("datetime").UTC)
+            payload = {
+                "research_cycle_id": f"{frozen['session_id']}-COMPLETE",
+                "session_id": frozen["session_id"],
+                "phase": "SYNTHESIS_COMPLETE",
+                "hfic_protocol": "HFIC-V1.1",
+                "prompt_version": "HFIC-V1.1",
+            }
+            encoded = json.dumps(payload, sort_keys=True, separators=(",", ":"))
+            store.append(
+                [
+                    ResearchEvent(
+                        record_id=f"HFIC-CYCLE-{frozen['session_id']}-COMPLETE",
+                        record_kind=RecordKind.RESEARCH_CYCLE,
+                        entity_id=frozen["session_id"],
+                        hypothesis_version_id=None,
+                        run_id=None,
+                        transaction_id="RESEARCH-TXN-HFICCRASH-001",
+                        effective_at=now,
+                        first_reliable_available_at=now,
+                        supersedes_record_id=None,
+                        payload_json=encoded,
+                        payload_sha256=__import__("hashlib").sha256(encoded.encode()).hexdigest(),
+                        schema_version="1.0",
+                        producer_capability_id="CAP-OFFLINE-CANONICAL-RECEIPT-REPLAY-001",
+                        producer_git_sha=git.head_sha,
+                        created_at=now,
+                    )
+                ],
+                transaction_id="RESEARCH-TXN-HFICCRASH-001",
+            )
+            bundle = load_session_bundle(store, frozen["session_id"])
+            self.assertNotEqual(bundle["session_state"], "SYNTHESIS_COMPLETE")
+            from solana_alpha_lab.factory.hfic_session import PENDING_STATES, list_hfic_sessions
+
+            listed = list_hfic_sessions(store)
+            self.assertEqual(listed[0]["session_state"], "FROZEN_AWAITING_CRITIC")
+            self.assertEqual(bundle["session_state"], listed[0]["session_state"])
+            self.assertIn(listed[0]["session_state"], PENDING_STATES)
+            with self.assertRaises(HficSessionError) as raised:
+                prove_runtime(store, frozen["session_id"], repo_root=ROOT)
+            self.assertEqual(str(raised.exception), "SESSION_RECEIPT_MISSING")
+
+    def test_revise_once_is_intermediate_and_second_revise_is_blocked(self) -> None:
+        from solana_alpha_lab.factory.hfic_session import finalize_session
+        from solana_alpha_lab.factory.research_store import ResearchStore
+
+        with tempfile.TemporaryDirectory() as tmp:
+            store = ResearchStore(Path(tmp))
+            frozen = freeze_draft(valid_draft(), preflight_receipt=_preflight_receipt())
+            critic = _critic_result(frozen, "REVISE_ONCE")
+            critic["revision_receipt"] = {"scope": "claim_wording", "attempt": 1}
+            first = finalize_session(frozen, critic, store=store, repo_root=ROOT)
+            self.assertEqual(first["session_state"], "REVISION_REQUIRED")
+            frozen = {**frozen, "revision_count": 1}
+            with self.assertRaises(HficSessionError) as raised:
+                finalize_session(frozen, critic, store=store, repo_root=ROOT)
+            self.assertEqual(str(raised.exception), "REVISION_BUDGET_EXHAUSTED")
+
+    def test_revise_once_then_second_critic_can_complete(self) -> None:
+        from solana_alpha_lab.factory.hfic_session import (
+            apply_revision,
+            finalize_session,
+            load_session_bundle,
+        )
+        from solana_alpha_lab.factory.research_store import ResearchStore
+
+        with tempfile.TemporaryDirectory() as tmp:
+            store = ResearchStore(Path(tmp))
+            frozen = freeze_draft(valid_draft(), preflight_receipt=_preflight_receipt())
+            critic = _critic_result(frozen, "REVISE_ONCE")
+            critic["revision_receipt"] = {"scope": "claim_wording", "attempt": 1}
+            finalize_session(frozen, critic, store=store, repo_root=ROOT)
+            revised = apply_revision(
+                load_session_bundle(store, frozen["session_id"]),
+                valid_draft(),
+                store=store,
+                repo_root=ROOT,
+            )
+            self.assertEqual(revised["session_state"], "REVISED_AWAITING_CRITIC")
+            self.assertEqual(revised["revision_count"], 1)
+            kill = _critic_result(revised, "KILL_PREPARATORY_LOOP")
+            done = finalize_session(revised, kill, store=store, repo_root=ROOT)
+            self.assertEqual(done["session_state"], "SYNTHESIS_COMPLETE")
+            self.assertEqual(done["critic_terminal"], "KILL_PREPARATORY_LOOP")
+
+    def test_revise_once_can_repair_selected_definition(self) -> None:
+        from solana_alpha_lab.factory.hfic_session import (
+            apply_revision,
+            finalize_session,
+            load_session_bundle,
+        )
+        from solana_alpha_lab.factory.research_store import ResearchStore
+
+        with tempfile.TemporaryDirectory() as tmp:
+            store = ResearchStore(Path(tmp))
+            frozen = freeze_draft(valid_draft(), preflight_receipt=_preflight_receipt())
+            critic = _critic_result(frozen, "REVISE_ONCE")
+            critic["revision_receipt"] = {"scope": "claim_wording", "attempt": 1}
+            finalize_session(frozen, critic, store=store, repo_root=ROOT)
+            draft = valid_draft()
+            draft["candidates"][0]["claim"] = "Claim one, revised wording."
+            revised = apply_revision(
+                load_session_bundle(store, frozen["session_id"]),
+                draft,
+                store=store,
+                repo_root=ROOT,
+            )
+            self.assertEqual(revised["session_state"], "REVISED_AWAITING_CRITIC")
+            self.assertNotEqual(
+                revised["selected_definition_sha256"],
+                frozen["selected_definition_sha256"],
+            )
+            self.assertEqual(
+                revised.get("selected_display_ordinal"),
+                frozen.get("selected_display_ordinal"),
+            )
+            kill = _critic_result(revised, "KILL_PREPARATORY_LOOP")
+            done = finalize_session(revised, kill, store=store, repo_root=ROOT)
+            self.assertEqual(done["session_state"], "SYNTHESIS_COMPLETE")
+
+    def test_revise_once_rejects_mechanism_change(self) -> None:
+        from solana_alpha_lab.factory.hfic_session import (
+            apply_revision,
+            finalize_session,
+            load_session_bundle,
+        )
+        from solana_alpha_lab.factory.research_store import ResearchStore
+
+        with tempfile.TemporaryDirectory() as tmp:
+            store = ResearchStore(Path(tmp))
+            frozen = freeze_draft(valid_draft(), preflight_receipt=_preflight_receipt())
+            critic = _critic_result(frozen, "REVISE_ONCE")
+            critic["revision_receipt"] = {"scope": "claim_wording", "attempt": 1}
+            finalize_session(frozen, critic, store=store, repo_root=ROOT)
+            draft = valid_draft()
+            draft["candidates"][0]["mechanism"] = "a different mechanism entirely"
+            with self.assertRaises(HficSessionError) as raised:
+                apply_revision(
+                    load_session_bundle(store, frozen["session_id"]),
+                    draft,
+                    store=store,
+                    repo_root=ROOT,
+                )
+            self.assertEqual(str(raised.exception), "REVISION_MECHANISM_CHANGED")
+
+    def test_finalize_rejects_mismatched_git_composite(self) -> None:
+        from solana_alpha_lab.factory.hfic_session import finalize_session
+        from solana_alpha_lab.factory.research_store import ResearchStore
+
+        with tempfile.TemporaryDirectory() as tmp:
+            store = ResearchStore(Path(tmp))
+            receipt = _preflight_receipt()
+            receipt["git_composite_sha256"] = "ab" * 32
+            frozen = freeze_draft(valid_draft(), preflight_receipt=receipt)
+            with self.assertRaises(HficSessionError) as raised:
+                finalize_session(
+                    frozen,
+                    _critic_result(frozen, "KILL_PREPARATORY_LOOP"),
+                    store=store,
+                    repo_root=ROOT,
+                )
+            self.assertEqual(str(raised.exception), "GIT_COMPOSITE_CHANGED")

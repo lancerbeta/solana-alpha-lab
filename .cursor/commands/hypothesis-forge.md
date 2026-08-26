@@ -1,7 +1,7 @@
 # Hypothesis Forge
 
 Explicit owner invoke only. Runs `MANUAL_FALLBACK_UNTIL_GENERATOR` synthesis
-through executable `preflight` → optional PROMPT A → `freeze` → isolated Critic
+through executable `preflight` → FORGE_DRAFT (PROMPT A) → `freeze` → isolated Critic
 → `finalize`. Happy path: no owner copy/paste after `/hypothesis-forge`.
 
 Read and follow `.agents/skills/hypothesis-forge/SKILL.md` and

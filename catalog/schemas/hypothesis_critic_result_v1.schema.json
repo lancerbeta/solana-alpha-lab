@@ -56,6 +56,8 @@
     "material_defects": {"type": "array", "items": {"type": "string"}},
     "revision_receipt": {"type": ["object", "null"]},
     "classifier_receipt": {"type": ["object", "null"]},
+    "experiment_spec": {"type": ["object", "null"]},
+    "experiment_spec_packet": {"type": ["object", "null"]},
     "authority": {
       "type": "object",
       "additionalProperties": false,
@@ -87,7 +89,10 @@
         "properties": {
           "classifier_receipt": {
             "type": "object",
-            "minProperties": 1
+            "required": ["schema"],
+            "properties": {
+              "schema": {"const": "smial.hfic-classifier-receipt"}
+            }
           }
         }
       }
@@ -101,6 +106,23 @@
         "required": ["revision_receipt"],
         "properties": {
           "revision_receipt": {"type": "object", "minProperties": 1}
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {"critic_terminal": {"const": "PASS_TO_CLASSIFICATION"}},
+        "required": ["critic_terminal"]
+      },
+      "then": {
+        "not": {
+          "required": ["classifier_receipt"],
+          "properties": {
+            "classifier_receipt": {
+              "type": "object",
+              "minProperties": 1
+            }
+          }
         }
       }
     }

@@ -39,18 +39,28 @@ Happy path — no owner copy/paste between the slash command and the final termi
    - `RESUME_CRITIC` → use `critic_input_packet` from the preflight JSON
      (canonical frozen bytes); do not generate.
    - `RESUME_FINALIZE` → run finalize only.
+   - `RESUME_REVISE` → apply exactly one bounded revision, then isolated Critic.
+   - `RESUME_CLASSIFY` → schema-valid ExperimentSpec + network-free `classify_lane()`,
+     then finalize. `PASS_TO_CLASSIFICATION` is not complete.
    - `STOP` → report the named terminal; stop.
    - `START_NEW_SESSION` → continue.
 3. Only for `START_NEW_SESSION`, run **PROMPT A** from the operator pack using
    `HFIC-V1.1` and only the bounded `FORGE_CONTEXT_PACKET` plus explicitly
    resolved evidence. Display ordinals are display-only; do not invent canonical IDs.
+   Output a machine-valid `FORGE_DRAFT` (`hypothesis_forge_draft_v1.schema.json`).
+   Copy `truth_roots_used`, `prior_work_receipts` and `research_memory_as_of` from
+   preflight. Do **not** emit `CRITIC_INPUT_PACKET`; freeze is the only packet builder.
 4. Write machine `FORGE_DRAFT` to an OS temp file.
 5. Run `python -B scripts/hypothesis_forge.py freeze --draft <temp> --preflight-receipt <temp> --format json`.
    Frozen packet is authority. One schema-repair attempt, then `HFIC_PROTOCOL_INVALID`.
 6. **Mandatory auto-handoff:** launch Independent Critic in a new isolated context
    with only the frozen packet. Do not persist from Critic.
-7. After critic returns `hypothesis_critic_result_v1`, run
-   `python -B scripts/hypothesis_forge.py finalize --session-id <id> --critic-result <temp> --format json`.
+7. After critic returns `hypothesis_critic_result_v1`:
+   - `REVISE_ONCE` → persist intermediate; one revision; second Critic must PASS/KILL.
+   - `PASS_TO_CLASSIFICATION` → persist intermediate; run classifier; then finalize.
+   - `KILL_*` / `NO_WORTHY_HYPOTHESIS` → `finalize`.
+   Fake/nonempty classifier objects are invalid. Final `PASS_*` requires a live
+   network-free classifier receipt bound to session/selected/spec hash.
 8. Verify `SYNTHESIS_COMPLETE` / RDP receipt, Git mutation 0, provider calls 0
    before telling the owner the cycle is complete.
 9. On crash/retry, resume; never regenerate the same evidence+focus search.

@@ -15,6 +15,10 @@ from solana_alpha_lab.factory.commissioning_fixture import (
     COMMISSIONING_DATASET_MANIFEST_ID,
     commissioning_dataset_fingerprint,
 )
+from solana_alpha_lab.factory.commissioning_proof import (
+    CommissioningProofError,
+    prove_fast_lane_commissioned as _prove_fast_lane_commissioned,
+)
 from solana_alpha_lab.factory.hfic_session import (
     PENDING_STATES,
     PROMPT_VERSION,
@@ -31,15 +35,7 @@ from solana_alpha_lab.factory.research_store import (
     ResearchStore,
     ResearchStoreError,
 )
-from solana_alpha_lab.factory.run_passport import (
-    RunPassportError,
-    canonical_sha256,
-    validate_run_passport,
-)
-from solana_alpha_lab.factory.fast_lane_cold_copy import (
-    ColdCopyError,
-    load_run_result_artifact,
-)
+from solana_alpha_lab.factory.run_passport import canonical_sha256
 
 
 AUTO_FOCUS = "AUTO"
@@ -68,67 +64,9 @@ class HficPreflightError(ValueError):
 
 def prove_fast_lane_commissioned(data_root: Path) -> dict[str, Any]:
     try:
-        store = ResearchStore(Path(data_root))
-    except ResearchStoreError as exc:
-        raise HficPreflightError("FAST_LANE_NOT_COMMISSIONED") from exc
-    completed: dict[str, Any] | None = None
-    has_metric = False
-    has_binding = False
-    has_hypothesis = False
-    for record in store.iter_committed_records():
-        kind = getattr(record.record_kind, "value", record.record_kind)
-        if kind == RecordKind.EXPERIMENT_METRIC.value:
-            has_metric = True
-        elif kind == RecordKind.EVIDENCE_BINDING.value:
-            has_binding = True
-        elif kind == RecordKind.HYPOTHESIS_VERSION.value:
-            has_hypothesis = True
-        if kind != RecordKind.RUN_COMPLETED.value:
-            continue
-        try:
-            payload = json.loads(record.payload_json)
-        except (ValueError, json.JSONDecodeError):
-            continue
-        if not isinstance(payload, dict):
-            continue
-        manifests = list(payload.get("dataset_manifest_ids") or []) + list(
-            payload.get("ordered_input_dataset_manifest_ids") or []
-        )
-        encoded = json.dumps(payload, ensure_ascii=False)
-        if COMMISSIONING_DATASET_MANIFEST_ID not in manifests and (
-            COMMISSIONING_DATASET_MANIFEST_ID not in encoded
-        ):
-            continue
-        completed = payload
-    if (
-        completed is None
-        or not has_metric
-        or not has_binding
-        or not has_hypothesis
-    ):
-        raise HficPreflightError("FAST_LANE_NOT_COMMISSIONED")
-    try:
-        passport = dict(validate_run_passport(completed).payload)
-    except RunPassportError as exc:
-        raise HficPreflightError("FAST_LANE_NOT_COMMISSIONED") from exc
-    if int(passport.get("provider_calls_actual") or 0) != 0:
-        raise HficPreflightError("FAST_LANE_NOT_COMMISSIONED")
-    try:
-        artifact = load_run_result_artifact(Path(data_root), passport)
-    except ColdCopyError as exc:
-        raise HficPreflightError("FAST_LANE_NOT_COMMISSIONED") from exc
-    stored_digest = str(passport.get("result_digest_sha256") or "")
-    recomputed = canonical_sha256(artifact["capability_result"])
-    if not stored_digest or recomputed != stored_digest:
-        raise HficPreflightError("FAST_LANE_NOT_COMMISSIONED")
-    return {
-        "status": "NO_GIT_FAST_LANE_PROVEN",
-        "commissioning_dataset_manifest_id": COMMISSIONING_DATASET_MANIFEST_ID,
-        "provider_calls_actual": 0,
-        "git_mutation_count": int(passport.get("git_mutation_count") or 0),
-        "run_id": passport.get("run_id"),
-        "result_artifact_id": passport.get("result_artifact_id"),
-    }
+        return _prove_fast_lane_commissioned(Path(data_root))
+    except CommissioningProofError as exc:
+        raise HficPreflightError(str(exc)) from exc
 
 
 def is_fast_lane_commissioned(data_root: Path) -> bool:
@@ -303,6 +241,10 @@ def decide_preflight_action(
         session_id = str(chosen.get("session_id") or "")
         if state == "CRITIC_RESULT_READY":
             return ("RESUME_FINALIZE", session_id)
+        if state == "REVISION_REQUIRED":
+            return ("RESUME_REVISE", session_id)
+        if state == "AWAITING_CLASSIFICATION":
+            return ("RESUME_CLASSIFY", session_id)
         if state in PENDING_STATES:
             return ("RESUME_CRITIC", session_id)
         return ("RETURN_EXISTING_SESSION", session_id)
@@ -405,6 +347,10 @@ def run_preflight(
         "live_git_head": live_git_head,
         "git_composite_sha256": git_composite,
         "store_inventory_digest": digest,
+        "data_root_fingerprint_sha256": digest,
+        "research_memory_as_of": str(
+            proof.get("research_memory_as_of") or "2026-08-25T00:00:00Z"
+        ),
         "session_id": bound_session if action != "STOP" else None,
         "commissioning": {
             "status": proof["status"],
@@ -424,10 +370,18 @@ def run_preflight(
                 "QUERY-HFIC-PENDING-SESSION-001",
             ],
             "truth_roots_used": [
-                "repo://catalog/catalog_manifest.yaml",
-                "repo://configs/hypothesis_forge_independent_critic_v1.yaml",
+                "catalog/catalog_manifest.yaml",
+                "configs/hypothesis_forge_independent_critic_v1.yaml",
             ],
             "commissioning_status": proof["status"],
+            "research_memory_as_of": str(
+                proof.get("research_memory_as_of") or "2026-08-25T00:00:00Z"
+            ),
+            "prior_work_receipts": [
+                "QUERY-HFIC-EXACT-RELATED-PRIOR-001",
+                "QUERY-HFIC-SESSION-BY-SEARCH-KEY-001",
+                "QUERY-HFIC-PENDING-SESSION-001",
+            ],
             "ranked_prior_candidate_ids": [],
         },
         "authority": {
@@ -451,19 +405,38 @@ def run_preflight(
         if len(prior_ids) >= 5:
             break
     receipt_body["forge_context_packet"]["ranked_prior_candidate_ids"] = prior_ids
+    context_priors = list(
+        receipt_body["forge_context_packet"]["prior_work_receipts"]
+    ) + prior_ids
+    receipt_body["forge_context_packet"]["prior_work_receipts"] = context_priors[:8]
     if bound_session and action in {
         "RESUME_CRITIC",
         "RESUME_FINALIZE",
+        "RESUME_REVISE",
+        "RESUME_CLASSIFY",
         "RETURN_EXISTING_SESSION",
     }:
         bundle = load_session_bundle(store, bound_session)
         if bundle is not None:
+            actual_state = str(bundle.get("session_state") or "")
+            if action == "RETURN_EXISTING_SESSION" and actual_state != "SYNTHESIS_COMPLETE":
+                if actual_state == "REVISION_REQUIRED":
+                    action = "RESUME_REVISE"
+                elif actual_state == "AWAITING_CLASSIFICATION":
+                    action = "RESUME_CLASSIFY"
+                elif actual_state == "CRITIC_RESULT_READY":
+                    action = "RESUME_FINALIZE"
+                else:
+                    action = "RESUME_CRITIC"
+                receipt_body["action"] = action
             if bundle.get("critic_input_packet"):
                 receipt_body["critic_input_packet"] = bundle["critic_input_packet"]
                 receipt_body["critic_input_packet_sha256"] = bundle.get(
                     "critic_input_packet_sha256"
                 )
-            if action == "RESUME_FINALIZE" and bundle.get("critic_result"):
+            if action in {"RESUME_FINALIZE", "RESUME_CLASSIFY"} and bundle.get(
+                "critic_result"
+            ):
                 receipt_body["critic_result"] = bundle["critic_result"]
             if action == "RETURN_EXISTING_SESSION":
                 receipt_body["session_state"] = bundle.get("session_state")

@@ -16,7 +16,23 @@ if str(SRC) not in sys.path:
 CLI = ROOT / "scripts" / "hypothesis_forge.py"
 
 
+def bind_draft(draft: dict, receipt: dict) -> dict:
+    bound = dict(draft)
+    bound["preflight_receipt_id"] = receipt["receipt_id"]
+    bound["preflight_receipt_sha256"] = receipt["preflight_receipt_sha256"]
+    bound["research_memory_as_of"] = receipt["research_memory_as_of"]
+    context = receipt.get("forge_context_packet") or {}
+    bound["truth_roots_used"] = list(context.get("truth_roots_used") or bound.get("truth_roots_used") or [])
+    bound["prior_work_receipts"] = list(
+        context.get("prior_work_receipts") or bound.get("prior_work_receipts") or []
+    )
+    bound["owner_focus"] = receipt.get("owner_focus") or bound.get("owner_focus")
+    return bound
+
+
 def run_cli(*args: str, data_root: Path, env: dict[str, str] | None = None) -> subprocess.CompletedProcess[str]:
+    # Nested uv inside GitHub's 10-minute validate job blows the budget.
+    # CLI tests must exec the current interpreter with -B only.
     merged = dict(os.environ)
     if env:
         merged.update(env)
@@ -51,6 +67,8 @@ class HficCliContractTests(unittest.TestCase):
             "show-session",
             "prior",
             "pending",
+            "revise",
+            "classify",
             "backfill-legacy",
             "prove-runtime",
         ):
@@ -154,11 +172,21 @@ class HficTempRootE2ETests(unittest.TestCase):
             self.assertNotIn(str(data_root), preflight.stdout)
             receipt_path = Path(tmp) / "preflight.json"
             receipt_path.write_text(preflight.stdout, encoding="utf-8")
+            happy_bound = Path(tmp) / "draft_bound.json"
+            happy_bound.write_text(
+                json.dumps(bind_draft(json.loads(happy.read_text(encoding="utf-8")), preflight_payload)),
+                encoding="utf-8",
+            )
+            mismatch_bound = Path(tmp) / "draft_mismatch.json"
+            mismatch_bound.write_text(
+                json.dumps(bind_draft(json.loads(mismatch.read_text(encoding="utf-8")), preflight_payload)),
+                encoding="utf-8",
+            )
 
             blocked = run_cli(
                 "freeze",
                 "--draft",
-                str(mismatch),
+                str(mismatch_bound),
                 "--preflight-receipt",
                 str(receipt_path),
                 "--format",
@@ -171,7 +199,7 @@ class HficTempRootE2ETests(unittest.TestCase):
             frozen_run = run_cli(
                 "freeze",
                 "--draft",
-                str(happy),
+                str(happy_bound),
                 "--preflight-receipt",
                 str(receipt_path),
                 "--format",
@@ -181,6 +209,9 @@ class HficTempRootE2ETests(unittest.TestCase):
             self.assertEqual(frozen_run.returncode, 0, frozen_run.stderr)
             frozen = json.loads(frozen_run.stdout)
             self.assertEqual(frozen["session_state"], "FROZEN_AWAITING_CRITIC")
+            packet = frozen["critic_input_packet"]
+            self.assertTrue(packet["truth_roots_used"])
+            self.assertFalse(str(packet["research_memory_as_of"]).startswith("1970-01-01"))
             self.assertGreaterEqual(len(frozen["candidate_ids"]), 4)
             session_id = frozen["session_id"]
             search_key = preflight_payload["search_key_sha256"]
@@ -216,7 +247,7 @@ class HficTempRootE2ETests(unittest.TestCase):
             freeze_again = run_cli(
                 "freeze",
                 "--draft",
-                str(happy),
+                str(happy_bound),
                 "--preflight-receipt",
                 str(receipt_path),
                 "--format",
@@ -225,6 +256,30 @@ class HficTempRootE2ETests(unittest.TestCase):
             )
             self.assertEqual(freeze_again.returncode, 0, freeze_again.stderr)
             self.assertEqual(json.loads(freeze_again.stdout)["session_id"], session_id)
+
+            forged = dict(preflight_payload)
+            forged["preflight_receipt_sha256"] = "ff" * 32
+            forged_path = Path(tmp) / "forged_preflight.json"
+            forged_path.write_text(json.dumps(forged), encoding="utf-8")
+            forged_draft = bind_draft(
+                json.loads(happy.read_text(encoding="utf-8")),
+                preflight_payload,
+            )
+            forged_draft["preflight_receipt_sha256"] = "ff" * 32
+            forged_draft_path = Path(tmp) / "forged_draft.json"
+            forged_draft_path.write_text(json.dumps(forged_draft), encoding="utf-8")
+            forged_run = run_cli(
+                "freeze",
+                "--draft",
+                str(forged_draft_path),
+                "--preflight-receipt",
+                str(forged_path),
+                "--format",
+                "json",
+                data_root=data_root,
+            )
+            self.assertNotEqual(forged_run.returncode, 0, forged_run.stdout)
+            self.assertIn("PREFLIGHT_RECEIPT_HASH_MISMATCH", forged_run.stderr)
 
             resume = run_cli(
                 "preflight",
