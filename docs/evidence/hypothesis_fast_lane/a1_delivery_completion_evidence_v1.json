@@ -47,10 +47,7 @@
     "tests/test_research_projection.py": "1deef044e9499d3d5faa449c195e02ab2d14784c23f0f6aafe41cec8aaa2afd5",
     "tests/test_research_store.py": "1dabcdab6e59596c02282df8f1c095cfb38a89abc4626900c370d91e2de49b61"
   },
-  "active_stop_conditions": [
-    "TWO_RUNG_LIVE_H900_V1",
-    "PROVIDER_API_RPC_WSS"
-  ],
+  "active_stop_conditions": [],
   "owner_attention_triggers": {
     "auth_or_access_recovery": false,
     "material_owner_decision": false,
