@@ -161,6 +161,20 @@ class CommissioningProofTests(unittest.TestCase):
             verify_commissioning_passport({"git_mutation_count": 1, "provider_calls_actual": 0})
         self.assertEqual(str(raised.exception), "COMMISSION_GIT_MUTATION")
 
+    def test_missing_git_mutation_count_is_rejected(self) -> None:
+        from solana_alpha_lab.factory.commissioning_proof import (
+            CommissioningProofError,
+            verify_commissioning_passport,
+        )
+
+        passport = {
+            "provider_calls_actual": 0,
+            "run_id": "RUN-FAST-LANE-COMMISSIONING-FIXTURE-001",
+        }
+        with self.assertRaises(CommissioningProofError) as raised:
+            verify_commissioning_passport(passport)
+        self.assertEqual(str(raised.exception), "COMMISSION_GIT_MUTATION_COUNT_MISSING")
+
     def test_owner_json_never_contains_physical_path(self) -> None:
         with tempfile.TemporaryDirectory() as tmp:
             repo = Path(tmp) / "repo"

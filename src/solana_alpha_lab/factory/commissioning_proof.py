@@ -61,8 +61,10 @@ def _manifest_ids(payload: dict[str, Any]) -> list[str]:
 
 
 def verify_commissioning_passport(passport: dict[str, Any]) -> dict[str, Any]:
+    if "git_mutation_count" not in passport:
+        raise CommissioningProofError("COMMISSION_GIT_MUTATION_COUNT_MISSING")
     raw_git = passport.get("git_mutation_count")
-    if raw_git is not None and int(raw_git) != 0:
+    if int(raw_git) != 0:
         raise CommissioningProofError("COMMISSION_GIT_MUTATION")
     missing = [field for field in RUN_PASSPORT_REQUIRED_FIELDS if field not in passport]
     if missing:
@@ -155,6 +157,11 @@ def verify_result_integrity(data_root: Path, run_id: str) -> dict[str, Any]:
     stored_digest = str(passport.get("result_digest_sha256") or "")
     if not stored_digest or recomputed_digest != stored_digest:
         raise CommissioningProofError("COMMISSION_RESULT_INTEGRITY_FAILED")
+    if "git_mutation_count" not in passport:
+        raise CommissioningProofError("COMMISSION_GIT_MUTATION_COUNT_MISSING")
+    git_mutation_count = int(passport["git_mutation_count"])
+    if git_mutation_count != 0:
+        raise CommissioningProofError("COMMISSION_GIT_MUTATION")
     return {
         "run_id": run_id,
         "result_digest_sha256": stored_digest,
@@ -162,7 +169,7 @@ def verify_result_integrity(data_root: Path, run_id: str) -> dict[str, Any]:
         "result_integrity_matches": True,
         "result_artifact_id": passport.get("result_artifact_id"),
         "provider_calls_actual": int(passport.get("provider_calls_actual") or 0),
-        "git_mutation_count": int(passport.get("git_mutation_count") or 0),
+        "git_mutation_count": int(passport["git_mutation_count"]),
         "scientific_terminal": str(passport.get("scientific_terminal") or ""),
     }
 

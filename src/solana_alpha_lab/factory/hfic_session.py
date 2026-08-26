@@ -101,6 +101,7 @@ _FINAL_PASS_TERMINALS = frozenset(
 _CLASSIFIER_RECEIPT_SCHEMA = "smial.hfic-classifier-receipt"
 _PLACEHOLDER_TIME = "1970-01-01T00:00:00Z"
 _FORBIDDEN_DECISION_TERMINALS = frozenset({"PROMOTE", "PROMOTION_LANE"})
+_INTERMEDIATE_CRITIC_TERMINALS = frozenset({"REVISE_ONCE", "PASS_TO_CLASSIFICATION"})
 
 
 class HficSessionError(ValueError):
@@ -264,6 +265,8 @@ def bind_preflight_receipt(
         raise HficSessionError("COMMISSIONING_PROOF_REQUIRED")
     if int(commissioning.get("provider_calls_actual", -1)) != 0:
         raise HficSessionError("COMMISSIONING_PROVIDER_CALLS")
+    if "git_mutation_count" not in commissioning:
+        raise HficSessionError("COMMISSIONING_GIT_MUTATION_COUNT_MISSING")
     if int(commissioning.get("git_mutation_count", -1)) != 0:
         raise HficSessionError("COMMISSIONING_GIT_MUTATION")
     data_root = Path(getattr(store, "_root"))
@@ -395,6 +398,7 @@ def freeze_draft(
         )
         if bound["research_memory_as_of"] != memory_as_of:
             raise HficSessionError("RESEARCH_MEMORY_AS_OF_MISMATCH")
+        _validate_draft_forge_context_binding(draft, preflight_receipt, bound)
     git_head = "0" * 40
     if bound is not None:
         git_head = str(bound["live_git_head"])
@@ -1060,6 +1064,210 @@ def _canonical_bytes(payload: Mapping[str, Any]) -> bytes:
     ).encode("utf-8")
 
 
+def _canonical_json_hash(document: Mapping[str, Any]) -> str:
+    return hashlib.sha256(_canonical_bytes(document)).hexdigest()
+
+
+def _validate_draft_forge_context_binding(
+    draft: Mapping[str, Any],
+    receipt: Mapping[str, Any],
+    bound: Mapping[str, Any],
+) -> None:
+    forge = receipt.get("forge_context_packet")
+    if not isinstance(forge, Mapping):
+        raise HficSessionError("FORGE_CONTEXT_REQUIRED")
+    draft_roots = _nonempty_str_list(
+        draft.get("truth_roots_used"),
+        code="TRUTH_ROOTS_REQUIRED",
+    )
+    forge_roots = _nonempty_str_list(
+        forge.get("truth_roots_used"),
+        code="FORGE_CONTEXT_REQUIRED",
+    )
+    if draft_roots != forge_roots:
+        raise HficSessionError("TRUTH_ROOTS_MISMATCH")
+    draft_prior = _nonempty_str_list(
+        draft.get("prior_work_receipts") or draft.get("prior_work_queries"),
+        code="PRIOR_WORK_RECEIPTS_REQUIRED",
+    )
+    forge_prior = _nonempty_str_list(
+        forge.get("prior_work_receipts"),
+        code="FORGE_CONTEXT_REQUIRED",
+    )
+    if draft_prior != forge_prior:
+        raise HficSessionError("PRIOR_WORK_MISMATCH")
+    draft_focus = str(draft.get("owner_focus") or "AUTO")
+    if draft_focus != str(bound.get("owner_focus") or forge.get("owner_focus") or "AUTO"):
+        raise HficSessionError("FOCUS_CONTEXT_DRIFT")
+    forge_memory = forge.get("research_memory_as_of")
+    if isinstance(forge_memory, str) and forge_memory.strip():
+        if _require_memory_timestamp(draft.get("research_memory_as_of")) != forge_memory.strip():
+            raise HficSessionError("RESEARCH_MEMORY_AS_OF_MISMATCH")
+    forge_epoch = str(forge.get("evidence_epoch_sha256") or "")
+    if forge_epoch and forge_epoch != str(bound.get("evidence_epoch_sha256") or ""):
+        raise HficSessionError("EVIDENCE_EPOCH_DRIFT")
+    forge_search = str(forge.get("search_key_sha256") or "")
+    if forge_search and forge_search != str(bound.get("search_key_sha256") or ""):
+        raise HficSessionError("SEARCH_KEY_DRIFT")
+
+
+def _validate_revision_context_lock(
+    existing: Mapping[str, Any],
+    revised_draft: Mapping[str, Any],
+) -> None:
+    memory_as_of = _require_memory_timestamp(revised_draft.get("research_memory_as_of"))
+    if memory_as_of != str(existing.get("research_memory_as_of") or ""):
+        raise HficSessionError("RESEARCH_MEMORY_AS_OF_MISMATCH")
+    draft_focus = str(revised_draft.get("owner_focus") or "AUTO")
+    if draft_focus != str(existing.get("owner_focus") or "AUTO"):
+        raise HficSessionError("FOCUS_CONTEXT_DRIFT")
+    for key, code in (
+        ("evidence_epoch_sha256", "EVIDENCE_EPOCH_DRIFT"),
+        ("focus_key_sha256", "FOCUS_KEY_DRIFT"),
+        ("search_key_sha256", "SEARCH_KEY_DRIFT"),
+    ):
+        left = str(existing.get(key) or "")
+        right = str(revised_draft.get(key) or left)
+        if right and left and right != left:
+            raise HficSessionError(code)
+    packet = existing.get("critic_input_packet")
+    if not isinstance(packet, Mapping):
+        raise HficSessionError("CRITIC_INPUT_ARTIFACT_MISSING")
+    draft_roots = _nonempty_str_list(
+        revised_draft.get("truth_roots_used"),
+        code="TRUTH_ROOTS_REQUIRED",
+    )
+    packet_roots = _nonempty_str_list(
+        packet.get("truth_roots_used"),
+        code="CRITIC_INPUT_ARTIFACT_MISSING",
+    )
+    if draft_roots != packet_roots:
+        raise HficSessionError("TRUTH_ROOTS_MISMATCH")
+    draft_prior = _nonempty_str_list(
+        revised_draft.get("prior_work_receipts") or revised_draft.get("prior_work_queries"),
+        code="PRIOR_WORK_RECEIPTS_REQUIRED",
+    )
+    packet_prior = _nonempty_str_list(
+        packet.get("prior_work_queries"),
+        code="CRITIC_INPUT_ARTIFACT_MISSING",
+    )
+    if draft_prior != packet_prior:
+        raise HficSessionError("PRIOR_WORK_MISMATCH")
+
+
+def _artifact_missing_code(artifact_kind: str) -> str:
+    mapping = {
+        "CRITIC_INPUT_PACKET": "CRITIC_INPUT_ARTIFACT_MISSING",
+        "CRITIC_RESULT": "CRITIC_RESULT_ARTIFACT_MISSING",
+        "SESSION_RECEIPT": "SESSION_RECEIPT_MISSING",
+    }
+    return mapping.get(artifact_kind, "SESSION_ARTIFACT_MISSING")
+
+
+def _load_artifact_by_sha(
+    artifacts: Sequence[tuple[dict[str, Any], str | None]],
+    *,
+    artifact_kind: str,
+    expected_sha: str,
+) -> tuple[dict[str, Any], dict[str, Any], str]:
+    missing = _artifact_missing_code(artifact_kind)
+    matches: list[tuple[dict[str, Any], dict[str, Any], str]] = []
+    for wrapper, raw in artifacts:
+        if wrapper.get("artifact_kind") != artifact_kind:
+            continue
+        observed_sha = str(wrapper.get("payload_sha256") or "")
+        if observed_sha != expected_sha:
+            continue
+        if not isinstance(raw, str):
+            raise HficSessionError(missing)
+        actual_hash = hashlib.sha256(raw.encode("utf-8")).hexdigest()
+        if actual_hash != expected_sha:
+            raise HficSessionError("ARTIFACT_HASH_MISMATCH")
+        parsed = json.loads(raw)
+        if not isinstance(parsed, dict):
+            raise HficSessionError(missing)
+        recomputed = _canonical_json_hash(parsed)
+        if recomputed != expected_sha:
+            hash_code = (
+                "CRITIC_INPUT_HASH_MISMATCH"
+                if artifact_kind == "CRITIC_INPUT_PACKET"
+                else (
+                    "CRITIC_RESULT_HASH_MISMATCH"
+                    if artifact_kind == "CRITIC_RESULT"
+                    else "SESSION_RECEIPT_HASH_MISMATCH"
+                )
+            )
+            raise HficSessionError(hash_code)
+        matches.append((wrapper, parsed, expected_sha))
+    if not matches:
+        raise HficSessionError(missing)
+    return matches[0]
+
+
+def _verify_complete_hash_chain(
+    cycle: Mapping[str, Any],
+    *,
+    session_receipt: Mapping[str, Any],
+    critic_input_sha: str,
+    critic_result_sha: str,
+    receipt_sha: str,
+) -> None:
+    cycle_input = str(cycle.get("critic_input_packet_sha256") or "")
+    cycle_result = str(cycle.get("critic_result_sha256") or "")
+    cycle_receipt = str(cycle.get("session_receipt_sha256") or "")
+    receipt_input = str(session_receipt.get("critic_input_packet_sha256") or "")
+    receipt_result = str(session_receipt.get("critic_result_sha256") or "")
+    if not cycle_input or cycle_input != critic_input_sha:
+        raise HficSessionError("CRITIC_INPUT_HASH_MISMATCH")
+    if not cycle_result or cycle_result != critic_result_sha:
+        raise HficSessionError("CRITIC_RESULT_HASH_MISMATCH")
+    if not cycle_receipt or cycle_receipt != receipt_sha:
+        raise HficSessionError("SESSION_RECEIPT_HASH_MISMATCH")
+    if receipt_input != critic_input_sha:
+        raise HficSessionError("SESSION_RECEIPT_HASH_MISMATCH")
+    if receipt_result != critic_result_sha:
+        raise HficSessionError("SESSION_RECEIPT_HASH_MISMATCH")
+    for key in (
+        "evidence_epoch_sha256",
+        "focus_key_sha256",
+        "search_key_sha256",
+        "session_id",
+        "selected_candidate_id",
+    ):
+        left = str(cycle.get(key) or "")
+        right = str(session_receipt.get(key) or "")
+        if left and right and left != right:
+            raise HficSessionError("SESSION_RECEIPT_HASH_MISMATCH")
+
+
+def _verify_store_reference_resolution(
+    store: Any,
+    bundle: Mapping[str, Any],
+) -> None:
+    known_hypothesis: set[str] = set()
+    known_decisions: set[str] = set()
+    session_id = str(bundle["session_id"])
+    candidate_ids = [str(item) for item in (bundle.get("candidate_ids") or []) if str(item)]
+    for record in store.iter_committed_records():
+        kind = getattr(record.record_kind, "value", record.record_kind)
+        payload = json.loads(record.payload_json)
+        if payload.get("session_id") != session_id:
+            continue
+        if kind == "HYPOTHESIS_VERSION":
+            hyp_id = str(payload.get("hypothesis_version_id") or record.entity_id)
+            known_hypothesis.add(hyp_id)
+        elif kind == "DECISION_EVENT":
+            decision_id = str(payload.get("decision_event_id") or record.entity_id)
+            known_decisions.add(decision_id)
+    if len(known_hypothesis) >= len(candidate_ids):
+        for candidate_id in candidate_ids:
+            if candidate_id not in known_hypothesis:
+                raise HficSessionError("CANDIDATE_REFERENCE_UNRESOLVED")
+    for decision_id in bundle.get("decision_event_ids") or []:
+        if str(decision_id) not in known_decisions:
+            raise HficSessionError("DECISION_REFERENCE_UNRESOLVED")
+
+
 def _effective_cycle_phase(
     phase: object,
     *,
@@ -1229,6 +1437,7 @@ def persist_intermediate_cycle(
         repo_root, git, session_id, "CAP-OFFLINE-CANONICAL-RECEIPT-REPLAY-001"
     )
     critic_bytes = _canonical_bytes(critic_result)
+    critic_result_sha256 = hashlib.sha256(critic_bytes).hexdigest()
     records = [
         event(
             record_id=f"HFIC-CYCLE-{session_id}-{phase}",
@@ -1250,6 +1459,7 @@ def persist_intermediate_cycle(
                 "critic_terminal": critic_result.get("critic_terminal"),
                 "next": str(critic_result.get("next") or "STOP"),
                 "critic_input_packet_sha256": frozen.get("critic_input_packet_sha256"),
+                "critic_result_sha256": critic_result_sha256,
                 "selected_definition_sha256": frozen.get("selected_definition_sha256"),
                 "selected_display_ordinal": frozen.get("selected_display_ordinal"),
                 "git_composite_sha256": frozen.get("git_composite_sha256"),
@@ -1327,6 +1537,9 @@ def apply_revision(
     store: Any,
     repo_root: Any,
 ) -> dict[str, Any]:
+    from solana_alpha_lab.factory.document_runner import repository_git_snapshot
+    from solana_alpha_lab.factory.research_store import RecordKind
+
     existing = load_session_bundle(store, str(frozen["session_id"]))
     if existing is None:
         raise HficSessionError("SESSION_NOT_FOUND")
@@ -1334,28 +1547,119 @@ def apply_revision(
         raise HficSessionError("REVISION_NOT_PENDING")
     if int(existing.get("revision_count") or 0) >= 1:
         raise HficSessionError("REVISION_BUDGET_EXHAUSTED")
-    rebuilt = freeze_draft(revised_draft, preflight_receipt=None, store=None, repo_root=repo_root)
+    if repo_root is not None:
+        _validate_json_schema(
+            revised_draft,
+            Path(repo_root) / "catalog/schemas/hypothesis_forge_draft_v1.schema.json",
+        )
+    _validate_revision_context_lock(existing, revised_draft)
+    candidates = revised_draft.get("candidates")
+    if not isinstance(candidates, list) or not (
+        MIN_CANDIDATES <= len(candidates) <= MAX_CANDIDATES
+    ):
+        raise HficSessionError("HFIC_PROTOCOL_INVALID")
+    try:
+        draft_identities = assign_portfolio_ids(candidates)
+    except HficIdentityError as exc:
+        raise HficSessionError(str(exc)) from exc
+    selected_index = _resolve_ref(
+        revised_draft.get("selected_candidate_ref"),
+        draft_identities,
+    )
+    if selected_index < 0:
+        raise HficSessionError("REVISION_SELECTED_CHANGED")
     original_ordinal = frozen.get("selected_display_ordinal")
     if original_ordinal is None:
         original_ordinal = existing.get("selected_display_ordinal")
-    rebuilt_ordinal = rebuilt.get("selected_display_ordinal")
+    selected_identity = draft_identities[selected_index]
     if (
         original_ordinal is not None
-        and rebuilt_ordinal is not None
-        and original_ordinal != rebuilt_ordinal
+        and selected_identity.display_ordinal is not None
+        and selected_identity.display_ordinal != original_ordinal
     ):
         raise HficSessionError("REVISION_SELECTED_CHANGED")
-    if original_ordinal is None and rebuilt["selected_candidate_id"] != frozen["selected_candidate_id"]:
+    original_selected_id = str(
+        existing.get("selected_candidate_id") or frozen.get("selected_candidate_id") or ""
+    )
+    if not original_selected_id:
         raise HficSessionError("REVISION_SELECTED_CHANGED")
-    original_selected = {}
-    packet_in = frozen.get("critic_input_packet")
+    stored_by_id = {
+        str(card.get("hypothesis_version_id")): card
+        for card in (existing.get("candidates") or [])
+    }
+    id_to_draft = {item.candidate_id: item for item in draft_identities}
+    packet_in = existing.get("critic_input_packet")
+    runner_up_index = _resolve_ref(
+        revised_draft.get("runner_up_candidate_ref"),
+        draft_identities,
+    )
+    if runner_up_index < 0:
+        raise HficSessionError("REVISION_PORTFOLIO_CHANGED")
+    runner_up_id = draft_identities[runner_up_index].candidate_id
+    if runner_up_id != existing.get("runner_up_candidate_id"):
+        raise HficSessionError("REVISION_PORTFOLIO_CHANGED")
+    rejected_index = _resolve_ref(
+        revised_draft.get("strongest_rejected_alternative"),
+        draft_identities,
+    )
+    if rejected_index < 0:
+        raise HficSessionError("REVISION_PORTFOLIO_CHANGED")
+    rejected_id = draft_identities[rejected_index].candidate_id
+    rejected_id_existing = existing.get("rejected_alternative_id")
+    if not rejected_id_existing and isinstance(packet_in, Mapping):
+        rejected_id_existing = packet_in.get("strongest_rejected_alternative")
+    if rejected_id != rejected_id_existing:
+        raise HficSessionError("REVISION_PORTFOLIO_CHANGED")
+    original_selected: dict[str, Any] = {}
     if isinstance(packet_in, Mapping):
         selected_card = packet_in.get("selected_candidate")
         if isinstance(selected_card, Mapping):
-            original_selected = selected_card
-    rebuilt_selected = rebuilt["critic_input_packet"]["selected_candidate"]
-    from solana_alpha_lab.factory.hfic_identity import normalize_text
-
+            original_selected = dict(selected_card)
+    selected_card = candidates[selected_index]
+    rebuilt_selected = {
+        "candidate_id": selected_identity.candidate_id,
+        "claim": str(selected_card.get("claim") or ""),
+        "nearest_prior_and_difference": str(
+            selected_card.get("nearest_prior_and_difference") or "NOT_DECLARED_IN_DRAFT"
+        ),
+        "actor_counterparty": str(selected_card.get("actor_counterparty") or ""),
+        "mechanism": str(selected_card.get("mechanism") or ""),
+        "why_not_arbitraged": str(
+            selected_card.get("why_not_arbitraged") or "NOT_DECLARED_IN_DRAFT"
+        ),
+        "population": str(selected_card.get("population") or ""),
+        "decision_timestamp": str(selected_card.get("decision_timestamp") or ""),
+        "primary_x": str(selected_card.get("primary_x_family") or ""),
+        "primary_y": str(selected_card.get("primary_y") or ""),
+        "horizon_notional": str(selected_card.get("horizon_notional") or ""),
+        "disconfirming_prediction": str(
+            selected_card.get("disconfirming_prediction") or "NOT_DECLARED_IN_DRAFT"
+        ),
+        "negative_control": str(selected_card.get("negative_control") or ""),
+        "alternative_world": str(
+            selected_card.get("alternative_world") or "NOT_DECLARED_IN_DRAFT"
+        ),
+        "confounders": selected_card.get("confounders") or ["NOT_DECLARED_IN_DRAFT"],
+        "pit_leakage_survivorship_risks": selected_card.get(
+            "pit_leakage_survivorship_risks"
+        )
+        or ["NOT_DECLARED_IN_DRAFT"],
+        "execution_capacity_risks": selected_card.get("execution_capacity_risks")
+        or ["NOT_DECLARED_IN_DRAFT"],
+        "available_data_bindings": selected_card.get("available_data_bindings") or [],
+        "missing_or_forward_only_data": selected_card.get("missing_or_forward_only_data")
+        or [],
+        "proposed_method": str(selected_card.get("proposed_method") or "NOT_DECLARED_IN_DRAFT"),
+        "cheapest_falsifier": str(selected_card.get("cheapest_falsifier") or ""),
+        "pass_fail_inconclusive_semantics": str(
+            selected_card.get("pass_fail_inconclusive_semantics") or "NOT_DECLARED_IN_DRAFT"
+        ),
+        "decision_unlocked": str(
+            selected_card.get("decision_unlocked") or "NOT_DECLARED_IN_DRAFT"
+        ),
+    }
+    if not isinstance(packet_in, Mapping):
+        raise HficSessionError("CRITIC_INPUT_ARTIFACT_MISSING")
     for field in (
         "mechanism",
         "actor_counterparty",
@@ -1371,11 +1675,44 @@ def apply_revision(
             raise HficSessionError("REVISION_MECHANISM_CHANGED")
         if normalize_text(left) != normalize_text(right):
             raise HficSessionError("REVISION_MECHANISM_CHANGED")
-    packet = rebuilt["critic_input_packet"]
-    packet_bytes = _canonical_bytes(packet)
-    from solana_alpha_lab.factory.document_runner import repository_git_snapshot
-    from solana_alpha_lab.factory.research_store import RecordKind
-
+    existing_ids = {
+        str(item) for item in (existing.get("candidate_ids") or []) if str(item)
+    }
+    draft_ids = {item.candidate_id for item in draft_identities}
+    non_selected_existing = existing_ids - {original_selected_id}
+    non_selected_draft = draft_ids - {selected_identity.candidate_id}
+    if non_selected_existing != non_selected_draft:
+        raise HficSessionError("REVISION_PORTFOLIO_CHANGED")
+    for candidate_id in non_selected_existing:
+        stored = stored_by_id.get(candidate_id)
+        draft_match = id_to_draft.get(candidate_id)
+        if draft_match is None:
+            raise HficSessionError("REVISION_PORTFOLIO_CHANGED")
+        if stored is not None and str(stored.get("definition_sha256") or "") != draft_match.full_sha256:
+            raise HficSessionError("REVISION_PORTFOLIO_CHANGED")
+    packet = dict(packet_in)
+    packet["selected_candidate"] = rebuilt_selected
+    packet["strongest_rejected_alternative"] = rejected_id
+    packet["research_memory_as_of"] = str(existing.get("research_memory_as_of") or "")
+    packet["owner_focus"] = str(existing.get("owner_focus") or "AUTO")
+    packet["truth_roots_used"] = _nonempty_str_list(
+        revised_draft.get("truth_roots_used"),
+        code="TRUTH_ROOTS_REQUIRED",
+    )
+    packet["prior_work_queries"] = _nonempty_str_list(
+        revised_draft.get("prior_work_receipts") or revised_draft.get("prior_work_queries"),
+        code="PRIOR_WORK_RECEIPTS_REQUIRED",
+    )
+    if repo_root is not None:
+        _validate_json_schema(
+            packet,
+            Path(repo_root) / "catalog/schemas/hypothesis_critic_input_v1.schema.json",
+        )
+    packet_sha = _canonical_json_hash(packet)
+    candidate_ids = [
+        selected_identity.candidate_id if str(item) == original_selected_id else str(item)
+        for item in (existing.get("candidate_ids") or [])
+    ]
     git = repository_git_snapshot(Path(repo_root))
     session_id = str(frozen["session_id"])
     transaction_id = f"RESEARCH-TXN-HFICREV-{session_id[-16:]}"
@@ -1393,18 +1730,19 @@ def apply_revision(
                 "phase": "REVISED_AWAITING_CRITIC",
                 "hfic_protocol": PROMPT_VERSION,
                 "prompt_version": PROMPT_VERSION,
-                "owner_focus": frozen.get("owner_focus") or "AUTO",
-                "evidence_epoch_sha256": frozen.get("evidence_epoch_sha256") or "",
-                "focus_key_sha256": frozen.get("focus_key_sha256") or "",
-                "search_key_sha256": frozen.get("search_key_sha256") or "",
-                "selected_candidate_id": rebuilt["selected_candidate_id"],
-                "runner_up_candidate_id": rebuilt.get("runner_up_candidate_id"),
-                "candidate_ids": list(rebuilt.get("candidate_ids") or []),
-                "critic_input_packet_sha256": hashlib.sha256(packet_bytes).hexdigest(),
-                "selected_definition_sha256": rebuilt["selected_definition_sha256"],
-                "selected_display_ordinal": rebuilt.get("selected_display_ordinal"),
-                "git_composite_sha256": frozen.get("git_composite_sha256"),
-                "research_memory_as_of": frozen.get("research_memory_as_of"),
+                "owner_focus": existing.get("owner_focus") or "AUTO",
+                "evidence_epoch_sha256": existing.get("evidence_epoch_sha256") or "",
+                "focus_key_sha256": existing.get("focus_key_sha256") or "",
+                "search_key_sha256": existing.get("search_key_sha256") or "",
+                "selected_candidate_id": selected_identity.candidate_id,
+                "runner_up_candidate_id": runner_up_id,
+                "rejected_alternative_id": rejected_id,
+                "candidate_ids": candidate_ids,
+                "critic_input_packet_sha256": packet_sha,
+                "selected_definition_sha256": selected_identity.full_sha256,
+                "selected_display_ordinal": selected_identity.display_ordinal,
+                "git_composite_sha256": existing.get("git_composite_sha256"),
+                "research_memory_as_of": existing.get("research_memory_as_of"),
                 "revision_count": 1,
             },
             transaction_id=transaction_id,
@@ -1412,18 +1750,48 @@ def apply_revision(
         event(
             record_id=f"HFIC-ART-CRITIC-INPUT-{session_id}-REV1",
             kind=RecordKind.RESEARCH_ARTIFACT,
-            entity_id=f"HFIC-ART-CRITIC-INPUT-{session_id}",
+            entity_id=f"HFIC-ART-CRITIC-INPUT-{session_id}-REV1",
             payload={
-                "research_artifact_id": f"HFIC-ART-CRITIC-INPUT-{session_id}",
+                "research_artifact_id": f"HFIC-ART-CRITIC-INPUT-{session_id}-REV1",
                 "session_id": session_id,
                 "hfic_protocol": PROMPT_VERSION,
                 "artifact_kind": "CRITIC_INPUT_PACKET",
-                "payload_canonical": packet_bytes.decode("utf-8"),
-                "payload_sha256": hashlib.sha256(packet_bytes).hexdigest(),
+                "payload_canonical": _canonical_bytes(packet).decode("utf-8"),
+                "payload_sha256": packet_sha,
             },
             transaction_id=transaction_id,
         ),
     ]
+    if selected_identity.candidate_id != original_selected_id:
+        records.append(
+            event(
+                record_id=f"HFIC-HYP-{selected_identity.candidate_id}",
+                kind=RecordKind.HYPOTHESIS_VERSION,
+                entity_id=selected_identity.candidate_id,
+                hypothesis_version_id=selected_identity.candidate_id,
+                payload={
+                    "hypothesis_version_id": selected_identity.candidate_id,
+                    "session_id": session_id,
+                    "hfic_protocol": PROMPT_VERSION,
+                    "statement": selected_identity.definition["claim"],
+                    "claim": selected_identity.definition["claim"],
+                    "mechanism": selected_identity.definition["mechanism"],
+                    "actor_counterparty": selected_identity.definition["actor_counterparty"],
+                    "population": selected_identity.definition["population"],
+                    "decision_timestamp": selected_identity.definition["decision_timestamp"],
+                    "primary_x_family": selected_identity.definition["primary_x_family"],
+                    "primary_y": selected_identity.definition["primary_y"],
+                    "horizon_notional": selected_identity.definition["horizon_notional"],
+                    "negative_control": selected_identity.definition["negative_control"],
+                    "falsifier": selected_identity.definition["cheapest_falsifier"],
+                    "cheapest_falsifier": selected_identity.definition["cheapest_falsifier"],
+                    "definition_sha256": selected_identity.full_sha256,
+                    "role_in_session": "SELECTED",
+                    "supersedes_hypothesis_version_id": original_selected_id,
+                },
+                transaction_id=transaction_id,
+            )
+        )
     store.append(records, transaction_id=transaction_id)
     store.rebuild_projection()
     updated = load_session_bundle(store, session_id)
@@ -1764,17 +2132,10 @@ def _validate_json_schema(document: Mapping[str, Any], schema_path: Path) -> Non
 
 
 def load_session_bundle(store: Any, session_id: str) -> dict[str, Any] | None:
-    cycle: dict[str, Any] | None = None
     cycles: list[dict[str, Any]] = []
-    candidates: list[str] = []
     candidate_cards: list[dict[str, Any]] = []
     decisions: list[dict[str, Any]] = []
-    critic_input = None
-    critic_result = None
-    critic_input_sha = None
-    critic_result_sha = None
-    session_receipt = None
-    classifier_receipt = None
+    artifacts: list[tuple[dict[str, Any], str | None]] = []
     for record in store.iter_committed_records():
         kind = getattr(record.record_kind, "value", record.record_kind)
         payload = json.loads(record.payload_json)
@@ -1783,37 +2144,40 @@ def load_session_bundle(store: Any, session_id: str) -> dict[str, Any] | None:
         if kind == "RESEARCH_CYCLE":
             cycles.append(payload)
             continue
-        elif kind == "HYPOTHESIS_VERSION":
-            candidate_id = str(payload.get("hypothesis_version_id") or record.entity_id)
-            candidates.append(candidate_id)
+        if kind == "HYPOTHESIS_VERSION":
             candidate_cards.append(payload)
         elif kind == "DECISION_EVENT":
             decisions.append(payload)
         elif kind == "RESEARCH_ARTIFACT":
-            artifact_kind = payload.get("artifact_kind")
             raw = payload.get("payload_canonical")
             expected_hash = payload.get("payload_sha256")
             if isinstance(raw, str) and isinstance(expected_hash, str):
                 actual_hash = hashlib.sha256(raw.encode("utf-8")).hexdigest()
                 if actual_hash != expected_hash:
                     raise HficSessionError("ARTIFACT_HASH_MISMATCH")
-            if artifact_kind == "CRITIC_INPUT_PACKET":
-                critic_input_sha = payload.get("payload_sha256")
-                if isinstance(raw, str):
-                    critic_input = json.loads(raw)
-            elif artifact_kind == "CRITIC_RESULT":
-                critic_result_sha = payload.get("payload_sha256")
-                if isinstance(raw, str):
-                    critic_result = json.loads(raw)
-            elif artifact_kind == "SESSION_RECEIPT":
-                if isinstance(raw, str):
-                    session_receipt = json.loads(raw)
-            elif artifact_kind == "CLASSIFIER_RECEIPT":
-                if isinstance(raw, str):
-                    classifier_receipt = json.loads(raw)
-    has_receipt = isinstance(session_receipt, Mapping)
-    has_critic = critic_result is not None
+            artifacts.append((payload, raw if isinstance(raw, str) else None))
+    if not cycles:
+        return None
+    cycle: dict[str, Any] | None = None
     for payload in cycles:
+        receipt_sha = str(payload.get("session_receipt_sha256") or "")
+        result_sha = str(payload.get("critic_result_sha256") or "")
+        has_receipt = bool(
+            receipt_sha
+            and any(
+                wrapper.get("artifact_kind") == "SESSION_RECEIPT"
+                and str(wrapper.get("payload_sha256") or "") == receipt_sha
+                for wrapper, _raw in artifacts
+            )
+        )
+        has_critic = bool(
+            result_sha
+            and any(
+                wrapper.get("artifact_kind") == "CRITIC_RESULT"
+                and str(wrapper.get("payload_sha256") or "") == result_sha
+                for wrapper, _raw in artifacts
+            )
+        )
         effective = _effective_cycle_phase(
             payload.get("phase"),
             has_receipt=has_receipt,
@@ -1827,42 +2191,66 @@ def load_session_bundle(store: Any, session_id: str) -> dict[str, Any] | None:
     if cycle is None:
         return None
     unique_ids: list[str] = []
-    for item in candidates:
-        if item not in unique_ids:
+    for card in candidate_cards:
+        item = str(card.get("hypothesis_version_id") or "")
+        if item and item not in unique_ids:
             unique_ids.append(item)
     decision_ids = [
         str(item.get("decision_event_id"))
         for item in decisions
         if item.get("decision_event_id")
     ]
+    expected_input_sha = str(cycle.get("critic_input_packet_sha256") or "")
+    expected_result_sha = str(cycle.get("critic_result_sha256") or "")
+    expected_receipt_sha = str(cycle.get("session_receipt_sha256") or "")
+    critic_input = None
+    critic_input_sha = None
+    critic_result = None
+    critic_result_sha = None
+    session_receipt = None
+    classifier_receipt = None
+    if expected_input_sha:
+        _wrapper, critic_input, critic_input_sha = _load_artifact_by_sha(
+            artifacts,
+            artifact_kind="CRITIC_INPUT_PACKET",
+            expected_sha=expected_input_sha,
+        )
+    if expected_result_sha:
+        _wrapper, critic_result, critic_result_sha = _load_artifact_by_sha(
+            artifacts,
+            artifact_kind="CRITIC_RESULT",
+            expected_sha=expected_result_sha,
+        )
+    if expected_receipt_sha:
+        _wrapper, session_receipt, receipt_sha = _load_artifact_by_sha(
+            artifacts,
+            artifact_kind="SESSION_RECEIPT",
+            expected_sha=expected_receipt_sha,
+        )
+        if critic_input_sha is None or critic_result_sha is None:
+            raise HficSessionError("SESSION_RECEIPT_HASH_MISMATCH")
+        _verify_complete_hash_chain(
+            cycle,
+            session_receipt=session_receipt,
+            critic_input_sha=critic_input_sha,
+            critic_result_sha=critic_result_sha,
+            receipt_sha=receipt_sha,
+        )
+    if isinstance(session_receipt, Mapping):
+        for wrapper, raw in artifacts:
+            if wrapper.get("artifact_kind") != "CLASSIFIER_RECEIPT":
+                continue
+            if isinstance(raw, str):
+                classifier_receipt = json.loads(raw)
+            break
+    elif isinstance(critic_result, Mapping):
+        embedded = critic_result.get("classifier_receipt")
+        if isinstance(embedded, Mapping):
+            classifier_receipt = dict(embedded)
     state = str(cycle.get("phase") or "FROZEN_AWAITING_CRITIC")
     if state == "SYNTHESIS_COMPLETE" and not isinstance(session_receipt, Mapping):
         state = "CRITIC_RESULT_READY" if critic_result is not None else "FROZEN_AWAITING_CRITIC"
-    if critic_input is not None and critic_input_sha:
-        recomputed = hashlib.sha256(
-            json.dumps(
-                critic_input,
-                ensure_ascii=False,
-                sort_keys=True,
-                separators=(",", ":"),
-                allow_nan=False,
-            ).encode("utf-8")
-        ).hexdigest()
-        if recomputed != critic_input_sha:
-            raise HficSessionError("CRITIC_INPUT_HASH_MISMATCH")
-    if critic_result is not None and critic_result_sha:
-        recomputed = hashlib.sha256(
-            json.dumps(
-                critic_result,
-                ensure_ascii=False,
-                sort_keys=True,
-                separators=(",", ":"),
-                allow_nan=False,
-            ).encode("utf-8")
-        ).hexdigest()
-        if recomputed != critic_result_sha:
-            raise HficSessionError("CRITIC_RESULT_HASH_MISMATCH")
-    return {
+    bundle = {
         "session_id": session_id,
         "session_state": state,
         "prompt_version": cycle.get("prompt_version") or PROMPT_VERSION,
@@ -1877,11 +2265,11 @@ def load_session_bundle(store: Any, session_id: str) -> dict[str, Any] | None:
         "selected_display_ordinal": cycle.get("selected_display_ordinal"),
         "candidate_ids": cycle.get("candidate_ids") or unique_ids,
         "critic_input_packet": critic_input,
-        "critic_input_packet_sha256": cycle.get("critic_input_packet_sha256")
-        or critic_input_sha,
+        "critic_input_packet_sha256": expected_input_sha or critic_input_sha,
         "critic_result": critic_result,
         "critic_result_sha256": critic_result_sha,
         "session_receipt": session_receipt,
+        "session_receipt_sha256": expected_receipt_sha or None,
         "classifier_receipt": classifier_receipt,
         "revision_count": int(cycle.get("revision_count") or 0),
         "git_composite_sha256": cycle.get("git_composite_sha256"),
@@ -1908,6 +2296,9 @@ def load_session_bundle(store: Any, session_id: str) -> dict[str, Any] | None:
             "provider_api_rpc_wss_calls": 0,
         },
     }
+    if state == "SYNTHESIS_COMPLETE":
+        _verify_store_reference_resolution(store, bundle)
+    return bundle
 
 
 def show_session(store: Any, session_id: str, *, repo_root: Any = None) -> dict[str, Any]:
@@ -2039,6 +2430,17 @@ def prove_runtime(
         raise HficSessionError("SESSION_RECEIPT_MISSING")
     if bundle.get("session_state") != "SYNTHESIS_COMPLETE":
         raise HficSessionError("SESSION_NOT_COMPLETE")
+    terminal = str(bundle.get("critic_terminal") or "")
+    if terminal in _INTERMEDIATE_CRITIC_TERMINALS:
+        raise HficSessionError("CRITIC_RESULT_NOT_FINAL")
+    receipt_input = str(receipt.get("critic_input_packet_sha256") or "")
+    receipt_result = str(receipt.get("critic_result_sha256") or "")
+    bundle_input = str(bundle.get("critic_input_packet_sha256") or "")
+    bundle_result = str(bundle.get("critic_result_sha256") or "")
+    if not receipt_input or receipt_input != bundle_input:
+        raise HficSessionError("SESSION_RECEIPT_HASH_MISMATCH")
+    if not receipt_result or receipt_result != bundle_result:
+        raise HficSessionError("SESSION_RECEIPT_HASH_MISMATCH")
     shown = show_session(store, session_id, repo_root=repo_root)
     after = repository_git_snapshot(Path(repo_root))
     if not before.unchanged(after):
@@ -2059,6 +2461,7 @@ def prove_runtime(
     provider_calls = int(fence.get("provider_calls_actual", -1))
     if provider_calls != 0:
         raise HficSessionError("PROVIDER_CALLS_NONZERO")
+    _verify_store_reference_resolution(store, bundle)
     return {
         **shown,
         "runtime_no_git": "PROVEN",

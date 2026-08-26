@@ -664,3 +664,232 @@ class HficFreezeFinalizeTests(unittest.TestCase):
                     repo_root=ROOT,
                 )
             self.assertEqual(str(raised.exception), "GIT_COMPOSITE_CHANGED")
+
+
+def _persist_frozen_portfolio(
+    store: object,
+    frozen: dict[str, object],
+    draft: dict[str, object],
+) -> None:
+    from solana_alpha_lab.factory.hfic_identity import assign_portfolio_ids
+    from solana_alpha_lab.factory.hfic_session import persist_frozen_session
+
+    identities = assign_portfolio_ids(draft["candidates"])
+    persist_frozen_session(
+        store,
+        frozen,
+        repo_root=ROOT,
+        identities=identities,
+        draft=draft,
+    )
+    store.rebuild_projection()
+
+
+class HficHashBoundAndRevisionClosureTests(unittest.TestCase):
+    def test_pass_to_classification_reload_prove_runtime_is_identical(self) -> None:
+        from solana_alpha_lab.factory.hfic_session import (
+            apply_classification,
+            finalize_session,
+            load_session_bundle,
+            prove_runtime,
+        )
+        from solana_alpha_lab.factory.research_store import ResearchStore
+        from tests.test_fast_lane_classifier import submission
+
+        with tempfile.TemporaryDirectory() as tmp:
+            store = ResearchStore(Path(tmp))
+            draft = valid_draft()
+            frozen = freeze_draft(draft, preflight_receipt=_preflight_receipt())
+            _persist_frozen_portfolio(store, frozen, draft)
+            finalize_session(
+                frozen,
+                _critic_result(frozen, "PASS_TO_CLASSIFICATION"),
+                store=store,
+                repo_root=ROOT,
+            )
+            packet = submission()
+            packet["hypothesis_definition_sha256"] = frozen["selected_definition_sha256"]
+            apply_classification(
+                frozen,
+                packet,
+                store=store,
+                repo_root=ROOT,
+                data_root=Path(tmp),
+            )
+            reloaded = load_session_bundle(store, str(frozen["session_id"]))
+            self.assertEqual(reloaded["session_state"], "SYNTHESIS_COMPLETE")
+            first = prove_runtime(store, str(frozen["session_id"]), repo_root=ROOT)
+            second = prove_runtime(store, str(frozen["session_id"]), repo_root=ROOT)
+            self.assertEqual(first, second)
+
+    def test_revise_once_reload_prove_runtime_is_identical(self) -> None:
+        from solana_alpha_lab.factory.hfic_session import (
+            apply_revision,
+            finalize_session,
+            load_session_bundle,
+            prove_runtime,
+        )
+        from solana_alpha_lab.factory.research_store import ResearchStore
+
+        with tempfile.TemporaryDirectory() as tmp:
+            store = ResearchStore(Path(tmp))
+            draft = valid_draft()
+            frozen = freeze_draft(draft, preflight_receipt=_preflight_receipt())
+            _persist_frozen_portfolio(store, frozen, draft)
+            critic = _critic_result(frozen, "REVISE_ONCE")
+            critic["revision_receipt"] = {"scope": "claim_wording", "attempt": 1}
+            finalize_session(frozen, critic, store=store, repo_root=ROOT)
+            revised_draft = valid_draft()
+            revised_draft["candidates"][0]["claim"] = "Claim one, revised wording."
+            revised = apply_revision(
+                load_session_bundle(store, str(frozen["session_id"])),
+                revised_draft,
+                store=store,
+                repo_root=ROOT,
+            )
+            done = finalize_session(
+                revised,
+                _critic_result(revised, "KILL_PREPARATORY_LOOP"),
+                store=store,
+                repo_root=ROOT,
+            )
+            self.assertEqual(done["session_state"], "SYNTHESIS_COMPLETE")
+            reloaded = load_session_bundle(store, str(frozen["session_id"]))
+            self.assertEqual(reloaded["session_state"], "SYNTHESIS_COMPLETE")
+            first = prove_runtime(store, str(frozen["session_id"]), repo_root=ROOT)
+            second = prove_runtime(store, str(frozen["session_id"]), repo_root=ROOT)
+            self.assertEqual(first, second)
+
+    def test_after_revision_all_candidate_and_decision_ids_resolve(self) -> None:
+        from solana_alpha_lab.factory.hfic_session import (
+            apply_revision,
+            finalize_session,
+            load_session_bundle,
+            prove_runtime,
+        )
+        from solana_alpha_lab.factory.research_store import ResearchStore
+
+        with tempfile.TemporaryDirectory() as tmp:
+            store = ResearchStore(Path(tmp))
+            draft = valid_draft()
+            frozen = freeze_draft(draft, preflight_receipt=_preflight_receipt())
+            _persist_frozen_portfolio(store, frozen, draft)
+            critic = _critic_result(frozen, "REVISE_ONCE")
+            critic["revision_receipt"] = {"scope": "claim_wording", "attempt": 1}
+            finalize_session(frozen, critic, store=store, repo_root=ROOT)
+            revised_draft = valid_draft()
+            revised_draft["candidates"][0]["claim"] = "Claim one, revised wording."
+            revised = apply_revision(
+                load_session_bundle(store, str(frozen["session_id"])),
+                revised_draft,
+                store=store,
+                repo_root=ROOT,
+            )
+            finalize_session(
+                revised,
+                _critic_result(revised, "KILL_PREPARATORY_LOOP"),
+                store=store,
+                repo_root=ROOT,
+            )
+            bundle = load_session_bundle(store, str(frozen["session_id"]))
+            prove_runtime(store, str(frozen["session_id"]), repo_root=ROOT)
+            known_hypothesis = {
+                str(record.entity_id)
+                for record in store.iter_committed_records()
+                if getattr(record.record_kind, "value", record.record_kind)
+                == "HYPOTHESIS_VERSION"
+            }
+            known_decisions = {
+                str(record.entity_id)
+                for record in store.iter_committed_records()
+                if getattr(record.record_kind, "value", record.record_kind)
+                == "DECISION_EVENT"
+            }
+            for candidate_id in bundle["candidate_ids"]:
+                self.assertIn(str(candidate_id), known_hypothesis)
+            for decision_id in bundle["decision_event_ids"]:
+                self.assertIn(str(decision_id), known_decisions)
+
+    def test_revision_context_drift_is_denied(self) -> None:
+        from solana_alpha_lab.factory.hfic_session import (
+            apply_revision,
+            finalize_session,
+            load_session_bundle,
+        )
+        from solana_alpha_lab.factory.research_store import ResearchStore
+
+        with tempfile.TemporaryDirectory() as tmp:
+            store = ResearchStore(Path(tmp))
+            draft = valid_draft()
+            frozen = freeze_draft(draft, preflight_receipt=_preflight_receipt())
+            _persist_frozen_portfolio(store, frozen, draft)
+            critic = _critic_result(frozen, "REVISE_ONCE")
+            critic["revision_receipt"] = {"scope": "claim_wording", "attempt": 1}
+            finalize_session(frozen, critic, store=store, repo_root=ROOT)
+            drift = valid_draft()
+            drift["research_memory_as_of"] = "2026-08-26T00:00:00Z"
+            with self.assertRaises(HficSessionError) as raised:
+                apply_revision(
+                    load_session_bundle(store, str(frozen["session_id"])),
+                    drift,
+                    store=store,
+                    repo_root=ROOT,
+                )
+            self.assertEqual(str(raised.exception), "RESEARCH_MEMORY_AS_OF_MISMATCH")
+
+    def test_draft_forge_context_binding_rejects_truth_roots_drift(self) -> None:
+        from solana_alpha_lab.factory.hfic_session import (
+            HficSessionError,
+            _validate_draft_forge_context_binding,
+        )
+
+        draft = valid_draft()
+        bound = {
+            "owner_focus": "AUTO",
+            "evidence_epoch_sha256": "aa" * 32,
+            "search_key_sha256": "cc" * 32,
+            "research_memory_as_of": draft["research_memory_as_of"],
+        }
+        receipt = {
+            "forge_context_packet": {
+                "truth_roots_used": ["catalog/other.yaml"],
+                "prior_work_receipts": draft["prior_work_receipts"],
+                "research_memory_as_of": draft["research_memory_as_of"],
+                "evidence_epoch_sha256": bound["evidence_epoch_sha256"],
+                "search_key_sha256": bound["search_key_sha256"],
+                "owner_focus": "AUTO",
+            }
+        }
+        with self.assertRaises(HficSessionError) as raised:
+            _validate_draft_forge_context_binding(draft, receipt, bound)
+        self.assertEqual(str(raised.exception), "TRUTH_ROOTS_MISMATCH")
+
+    def test_stale_intermediate_critic_result_is_not_selected(self) -> None:
+        from solana_alpha_lab.factory.hfic_session import finalize_session, load_session_bundle
+        from solana_alpha_lab.factory.research_store import ResearchStore
+
+        with tempfile.TemporaryDirectory() as tmp:
+            store = ResearchStore(Path(tmp))
+            draft = valid_draft()
+            frozen = freeze_draft(draft, preflight_receipt=_preflight_receipt())
+            _persist_frozen_portfolio(store, frozen, draft)
+            revise = _critic_result(frozen, "REVISE_ONCE")
+            revise["revision_receipt"] = {"scope": "claim_wording", "attempt": 1}
+            finalize_session(frozen, revise, store=store, repo_root=ROOT)
+            revised_draft = valid_draft()
+            revised_draft["candidates"][0]["claim"] = "Claim one, revised wording."
+            from solana_alpha_lab.factory.hfic_session import apply_revision
+
+            apply_revision(
+                load_session_bundle(store, str(frozen["session_id"])),
+                revised_draft,
+                store=store,
+                repo_root=ROOT,
+            )
+            bundle = load_session_bundle(store, str(frozen["session_id"]))
+            self.assertEqual(bundle["session_state"], "REVISED_AWAITING_CRITIC")
+            self.assertIsNone(bundle.get("critic_result"))
+            self.assertNotEqual(
+                str(bundle.get("critic_terminal") or ""),
+                "REVISE_ONCE",
+            )
