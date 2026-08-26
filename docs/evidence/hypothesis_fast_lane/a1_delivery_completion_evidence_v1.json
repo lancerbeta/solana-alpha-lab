@@ -5,13 +5,13 @@
   "as_of": "2026-08-25",
   "task_id": "HYPOTHESIS_FAST_LANE_AND_RESEARCH_DATA_PLANE_V1",
   "state_change": "HYPOTHESIS_FAST_LANE_FOUNDATION_CANDIDATE",
-  "base_main": "016904b4991a0c8f3e81daf821de90eebf0cea79",
+  "base_main": "7935f9acd8ff51c8d906d9b91d9ca4c2ab03ac2d",
   "cloud_bundle_mode": "OWNER_MANAGED_OPTIONAL_EXPORT",
   "cloud_bundle_required_by_harness": false,
   "cloud_bundle_smoke_required": false,
   "capability_radar_now": "NONE",
   "implementation_bindings": {
-    "catalog/assets/core.yaml": "314ef841b3a2878f94e10a0734a61c0a00aca2cd200842b850d0f4ba756ce0c2",
+    "catalog/assets/core.yaml": "a96a45971e1c20936b7376180aa0392b896ecb2afc6de23d0efdfaa18733cf05",
     "catalog/assets/lifecycle.yaml": "2dd940652f029f4ce58e76a2d611ff6859110bd218ed10f37e176052626c50f8",
     "catalog/catalog_manifest.yaml": "52c89b1701506eb35fd37a458f4c0134cbf23257b8833359cb3f2adb7ed3a235",
     "catalog/generated/asset_edges.json": "0e9b3541bb4c2af36c40ffecdcbc6de3f1ccd1b3866126257cac4175c5f1898e",
@@ -24,7 +24,7 @@
     "configs/hypothesis_fast_lane_v1.yaml": "dd58be68e22e386e65d8bb84bf3fa1e958469d9f4195454eace9469bb480557d",
     "docs/PROJECT_MAP.md": "de7cba724c574d3695721c7611954179733bb1e253bf77ddb3a42bb271a37bf6",
     "docs/decisions/ADR-006-hypothesis-fast-lane-research-data-plane.md": "51e4406686cd599349950614cafa2e6200440f5205ff67b21aaa4906389cc21e",
-    "docs/tasks/HYPOTHESIS_FAST_LANE_AND_RESEARCH_DATA_PLANE_V1.md": "1dea827836362c70c772c57d1c030451fcfbbaba9b496d746ddd4ec44e8d7550",
+    "docs/tasks/HYPOTHESIS_FAST_LANE_AND_RESEARCH_DATA_PLANE_V1.md": "039fe8499d98f170f7a20e1ba84b0623f7c4d7ed0a02a759b73280eac084dc26",
     "schemas/research_memory_projection_v1.sql": "b044f9e5e91d7e76ba51e49681f851c2ec70e528510aa8fdb7342bb2ebb19e67",
     "scripts/hypothesis_fast_lane.py": "7746a59da22f22c587b71587ce976e359863cfe9aca71e2dc92c3355a7001230",
     "src/solana_alpha_lab/factory/commissioning_fixture.py": "31f3fb967675ea10718733fe9734d5f4024a95918fe75a1dfb29df81bf735c81",
@@ -60,14 +60,14 @@
   },
   "factory_fit": {
     "path": "docs/evidence/hypothesis_fast_lane/a1_delivery_factory_fit_v1.json",
-    "sha256": "0cb70478b57cd7aa9fca2f02f3160b36496b4dc1176ff732459b18c144a6541b",
+    "sha256": "9d55f79ba3661198532ebee672fa9d77f8acb31d88e063c1161c90ede87b7995",
     "verdict": "PASS"
   },
   "validation": {
     "targeted": "PASS_FAST_LANE_FOUNDATION_SUITE",
     "independent_review": {
       "path": "docs/evidence/hypothesis_fast_lane/a1_delivery_independent_review_v1.json",
-      "sha256": "b875db8f8582ad77b01bdaa65bbfdfd21de15588a562499ea5116d25a6823380",
+      "sha256": "97bb04d35abd437fc520f4f94552e823f3936fe25315a54cbafe7f89dde7d8fb",
       "verdict": "PASS"
     },
     "full_gate": "ENFORCED_BY_PROJECT_BOUND_VALIDATION",
