@@ -9,7 +9,7 @@
   "cloud_bundle_smoke_required": false,
   "factory_fit": {
     "path": "docs/evidence/hypothesis_forge_operational_closure/a1_delivery_factory_fit_v1.json",
-    "sha256": "60ddb4302a3623437c3cfc5c2a1b3ee53a5d888b6d18a171549b2a9fe43aa585",
+    "sha256": "4b420cbba286a21f35a05f8504b9701ca7314d17627a814204c8a85b16367978",
     "verdict": "PASS"
   },
   "implementation_bindings": {
@@ -39,7 +39,7 @@
     "src/solana_alpha_lab/factory/hfic_session.py": "9ff841aedf677baa24cced7259016a3d68b885a6d748ac4719559a54703a1fd3",
     "tests/fixtures/hypothesis_forge/draft_c3_c4_mismatch_v1.json": "09602c513dce677d8ed470297ab9a8c0951bf0a16962342ad0a91a233847d95d",
     "tests/fixtures/hypothesis_forge/draft_happy_path_v1.json": "06c8889fda4c50b61624b566c7e979824bb96b325056b209344cff6ae56ae14a",
-    "tests/test_hfic_cli.py": "ef956023cc4b77986146dbee15ca6541509ed2ba0483421f346a4e6705f02205",
+    "tests/test_hfic_cli.py": "0629e6c733fca7af5e996bc4ba7299bdb974eaba8d132ac0eab9d1cc58d6f1d0",
     "tests/test_hfic_identity.py": "189f69a4e5f9108b7a68d3fb92a12e757e5b23d177f5dc3f3b111e806304c1da",
     "tests/test_hfic_operational_closure_v1.py": "af10f597b13565fceccbb4a01cc2edaf856a91e2b2f187601aae84a57b8f08c8",
     "tests/test_hfic_preflight.py": "321bd94e7dc1bd93537b33ac5d588e762fa168f2fbf1e53450452b5aa19de496",
@@ -78,7 +78,7 @@
     "github_ci": "ENFORCED_LIVE_AT_GUARDED_MERGE",
     "independent_review": {
       "path": "docs/evidence/hypothesis_forge_operational_closure/a1_delivery_independent_review_v1.json",
-      "sha256": "93531a141f43caca715aa16acd66dcf1ea813e9e07de4821c394f0dbe39713c2",
+      "sha256": "2e2026d195a3a621da7cbcb8d4f5844fd7a32615c7e477ae9553135c6adca73f",
       "verdict": "PASS"
     },
     "project_checks": [
