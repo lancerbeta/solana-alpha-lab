@@ -444,6 +444,30 @@ class CiOwnedDeliveryPilotTests(unittest.TestCase):
             changed_paths,
         )
 
+    def test_product_research_memory_projection_ddl_is_eligible(self) -> None:
+        changed_paths = [
+            "src/solana_alpha_lab/factory/research_memory.py",
+            "tests/test_fast_lane_semantic_dod.py",
+            "schemas/research_memory_projection_v1.sql",
+        ]
+        self.assertEqual(
+            ci.validate_ci_owned_delivery_eligibility(changed_paths),
+            changed_paths,
+        )
+
+    def test_unnamed_repo_root_schema_sql_stays_ineligible(self) -> None:
+        for path in (
+            "schemas/schema_v1.sql",
+            "schemas/research_memory_projection_v2.sql",
+            "schemas/other_product.sql",
+        ):
+            with self.subTest(path=path):
+                with self.assertRaisesRegex(
+                    ci.CiValidationError,
+                    "ci_owned_delivery_ineligible_paths",
+                ):
+                    ci.validate_ci_owned_delivery_eligibility([path])
+
     def test_tracked_only_clone_env_uses_hardlink_and_drops_sandbox_cache(
         self,
     ) -> None:

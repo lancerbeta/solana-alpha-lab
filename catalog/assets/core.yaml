@@ -936,7 +936,7 @@ records:
     repository_path: scripts/validate_ci.py
   integrity:
     kind: sha256
-    sha256: 7d3d99758a3d07a9cae8e4c6f9e28db10459611ed53f91091ed16187073bb435
+    sha256: 125d7e766936b589af53709887c1572fa4acfb6da9bf16196a8945918e7c837e
   access:
     mode: read_only
     method: command
@@ -4156,7 +4156,7 @@ records:
     repository_path: docs/agent/EXECUTION_ROUTER_PROTOCOL.md
   integrity:
     kind: sha256
-    sha256: 72df429789819e74cfe5d0aff0729e96692104802046382a00ccc76f85b82e56
+    sha256: c249d5085b849c0837d7ee02b137563985ebea6f7beaa4a7710f43def406813c
   access:
     mode: read_only
     method: file
@@ -19729,7 +19729,7 @@ records:
   as_of: '2026-08-15'
   truth_owner: CTRL-DELIVERY-HARNESS-001
   location: {kind: git_path, logical_uri: 'repo://delivery-harness/harness.yaml', repository_path: delivery-harness/harness.yaml}
-  integrity: {kind: sha256, sha256: 10bc691cbe53565e20071c0dcd49a6aa77d50292e078d1e6f78d1ea09ea0804d}
+  integrity: {kind: sha256, sha256: 969882a93b79d2fb45a75fe368ecc9c3c43983153d704eff6eea3938b50f9c2a}
   access: *t25_read_file
   relations:
   - {relation_type: governed_by, target_asset_id: CTRL-DELIVERY-HARNESS-001}
