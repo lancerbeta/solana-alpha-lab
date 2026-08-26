@@ -9,14 +9,15 @@
   "cloud_bundle_smoke_required": false,
   "factory_fit": {
     "path": "docs/evidence/hypothesis_forge_operational_closure/a1_delivery_factory_fit_v1.json",
-    "sha256": "08a00c69dfc937d7fe354cbca507ad2cec340c818d2d3247fe91435350547e9c",
+    "sha256": "4e90ccb5ea90d48e4a7be275bdc918b0f7cc0d490c4f80b2274da5a55218db0d",
     "verdict": "PASS"
   },
   "implementation_bindings": {
     ".agents/skills/hypothesis-forge/SKILL.md": "04ce14a926309dc8cb3b9b04f581cb882aefb320c05267833bc2ef45655c5e0b",
     ".agents/skills/independent-hypothesis-critic/SKILL.md": "dacedd69a6a5136380842d406d7bdb6a10774e1cf90f02b1a30867c17e725fb0",
     ".cursor/commands/hypothesis-forge.md": "7f7e87e7e0d6033f5d50a1f3a21259d6216e4bf439c65b4b3a4d8c2789c5ed69",
-    "catalog/assets/core.yaml": "18a9a4078188dad8858a8df76d0ccca5e7f8751e635b9eb731690652e8e1245d",
+    ".github/workflows/ci.yml": "35abf9951dd5204737bd3715113793d48dfdbe1834c1ed7a2e51f0a836dda0f5",
+    "catalog/assets/core.yaml": "fe4b251eacdf54fd8150b833509211897fb84becccc63f0909889da7acf3e593",
     "catalog/assets/lifecycle.yaml": "dd4e668faf5501b40aacad3da8289ce3f57e241a2580319b929e28b618d690d0",
     "catalog/catalog_manifest.yaml": "fef752585cc02e7f41bd7c7ee86faa3df7febdf758105d5775e2b5348cf8a7a9",
     "catalog/generated/asset_edges.json": "e3d7732e56a484f62721cb129ebed5623cbb957796aabbd32c758f597332e0ee",
@@ -29,10 +30,11 @@
     "configs/hypothesis_forge_independent_critic_v1.yaml": "dbff68e01fd239816703b7092cbfb5a2fbb8ee1461fa2fe8f556b3da8eeca2ba",
     "docs/PROJECT_MAP.md": "edcde317280728fdd5f2021daac9dd5a226c951acc512d132587911c775bf019",
     "docs/operator/HYPOTHESIS_FORGE_AND_INDEPENDENT_CRITIC_OPERATOR_V1.md": "f93b879e0d71c83d7786c08cb5b7a3f6d02d4ab662af2f94fc6c72551b2275fc",
-    "docs/tasks/HYPOTHESIS_FORGE_OPERATIONAL_CLOSURE_V1.md": "e133cd98698a51a430a25d645762d44769b8c946eeee6390068a5848be131935",
+    "docs/tasks/HYPOTHESIS_FORGE_OPERATIONAL_CLOSURE_V1.md": "d9d9c0e471edd704f3ac4d7f0c6c32f9696733baace80b8ac58eec67022165d1",
     "schemas/research_memory_projection_v1.sql": "aae281f735b8a8f7596e5d622a885077c0de3bc8ba116c3dc933fb65770e9ca2",
     "scripts/hypothesis_fast_lane.py": "9cd8e01517457ebf56c7cb7499514aaea71119561157c31e8cb675b44a8268e0",
     "scripts/hypothesis_forge.py": "5ac03c107729d2cc1173751a6d22cbebecddce90ce8fc6e906b7f0265a2a9c09",
+    "scripts/validate_ci.py": "81223661a47ed2666b54f73676b8f0d74330bc9288f251699c785ad4c6ed8b8c",
     "src/solana_alpha_lab/factory/commissioning_proof.py": "d971fb43c5bc26d3c1db5c45c193722d8734b59ddb1c2f6651cd5a656c5ee435",
     "src/solana_alpha_lab/factory/data_root.py": "eb7ec6b2e05408a53ff3f46d109895ccda6777045332a75e19e924e3fa8360ca",
     "src/solana_alpha_lab/factory/hfic_identity.py": "a7faba9f0e3573e51511f7bf442378cd147cfb53ebe3ea2c417ba568b9e7fe2f",
@@ -41,6 +43,7 @@
     "tests/fixtures/hypothesis_forge/draft_c3_c4_mismatch_v1.json": "79e71b57c82c5adac58ee6cf00e87cd942b983db860732ec21bf681146447e4f",
     "tests/fixtures/hypothesis_forge/draft_happy_path_v1.json": "8c8c5279f6846b8db961f6e2052c7790f5ed0f7c277e2ef779ce3d2129dc4598",
     "tests/fixtures/hypothesis_forge/prompt_a_forge_draft_v1.json": "8c8c5279f6846b8db961f6e2052c7790f5ed0f7c277e2ef779ce3d2129dc4598",
+    "tests/test_ci.py": "dd4ac3472a12f9e429d78323186aae81953cf912687a0e7e33a0e71c3a501a4c",
     "tests/test_hfic_cli.py": "344332bb2bf897c14e2ab266acfc577885954ca590a31dd3e2a22deb6973714e",
     "tests/test_hfic_identity.py": "189f69a4e5f9108b7a68d3fb92a12e757e5b23d177f5dc3f3b111e806304c1da",
     "tests/test_hfic_operational_closure_v1.py": "dfdd8a208e0bbdaed639f6e0a7592c6387e1cac02d1a8e4542e472bab0c01691",
@@ -80,7 +83,7 @@
     "github_ci": "ENFORCED_LIVE_AT_GUARDED_MERGE",
     "independent_review": {
       "path": "docs/evidence/hypothesis_forge_operational_closure/a1_delivery_independent_review_v1.json",
-      "sha256": "ea295450171def34a5773a0b4b60a0c8569f62c7f4ab43c5a8ea0a3cdc20e2e4",
+      "sha256": "39b9bca04e01e5ae8b0691e66155e4470b9d80655a4cdb1495e1db9707a4d3b7",
       "verdict": "PASS"
     },
     "project_checks": [
