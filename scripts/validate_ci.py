@@ -103,6 +103,12 @@ CI_OWNED_ELIGIBLE_PRODUCT_RESEARCH_DDL_PATHS = frozenset(
         "schemas/research_memory_projection_v1.sql",
     }
 )
+CI_OWNED_ELIGIBLE_PRODUCT_CURSOR_COMMAND_PATHS = frozenset(
+    {
+        ".cursor/commands/hypothesis-forge.md",
+        ".cursor/commands/independent-hypothesis-critic.md",
+    }
+)
 SANDBOX_UV_CACHE_MARKER = "cursor-sandbox-cache"
 DELIVERY_SKIP_CALL = re.compile(
     r"(?:\.skipTest\s*\(|@(?:unittest\.)?skip(?:If|Unless)?\s*\("
@@ -155,6 +161,12 @@ def ci_owned_eligible_product_research_ddl(path: str) -> bool:
     """Admit named product research-memory DDL; keep blanket schemas/ ineligible."""
 
     return path in CI_OWNED_ELIGIBLE_PRODUCT_RESEARCH_DDL_PATHS
+
+
+def ci_owned_eligible_product_cursor_command(path: str) -> bool:
+    """Admit named product slash commands; keep blanket .cursor/ ineligible."""
+
+    return path in CI_OWNED_ELIGIBLE_PRODUCT_CURSOR_COMMAND_PATHS
 
 
 def utc_now() -> str:
@@ -354,6 +366,8 @@ def validate_ci_owned_delivery_eligibility(
             continue
         normalized.append(path)
         if ci_owned_eligible_product_research_ddl(path):
+            continue
+        if ci_owned_eligible_product_cursor_command(path):
             continue
         if (
             path in CI_OWNED_INELIGIBLE_EXACT_PATHS

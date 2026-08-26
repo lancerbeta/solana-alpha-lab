@@ -455,6 +455,18 @@ class CiOwnedDeliveryPilotTests(unittest.TestCase):
             changed_paths,
         )
 
+    def test_product_hypothesis_forge_cursor_commands_are_eligible(self) -> None:
+        changed_paths = [
+            ".cursor/commands/hypothesis-forge.md",
+            ".cursor/commands/independent-hypothesis-critic.md",
+            ".agents/skills/hypothesis-forge/SKILL.md",
+            "docs/tasks/HYPOTHESIS_FORGE_AND_INDEPENDENT_CRITIC_V1.md",
+        ]
+        self.assertEqual(
+            ci.validate_ci_owned_delivery_eligibility(changed_paths),
+            changed_paths,
+        )
+
     def test_unnamed_repo_root_schema_sql_stays_ineligible(self) -> None:
         for path in (
             "schemas/schema_v1.sql",

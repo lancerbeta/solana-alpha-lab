@@ -1,0 +1,33 @@
+{
+  "schema": "smial.delivery-harness-factory-fit",
+  "schema_version": "1.0",
+  "review_id": "CI-OWNED-HFIC-CURSOR-COMMAND-ELIGIBILITY-FACTORY-FIT-001",
+  "as_of": "2026-08-26",
+  "task_id": "CTRL-CI-OWNED-HFIC-CURSOR-COMMAND-ELIGIBILITY-V1",
+  "reviewed_bindings_sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+  "reviewed_inventory_sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+  "mode": "FULL_REVIEW",
+  "verdict": "PASS",
+  "dimensions": {
+    "mission": "PASS",
+    "flexibility_and_history": "PASS",
+    "context_efficiency": "PASS",
+    "research_truth": "PASS",
+    "owner_operability": "PASS",
+    "execution_to_cashflow": "PASS",
+    "monitoring_and_recovery": "PASS",
+    "build_vs_buy": "PASS",
+    "security": "PASS",
+    "red_team": "PASS"
+  },
+  "capability_radar": {
+    "now": "NONE",
+    "watch": "NONE"
+  },
+  "recovery": "REVERT",
+  "limits": [
+    "NO_PRODUCT_ACCEPTANCE",
+    "NO_TIMEOUT_CAP_CHANGE",
+    "NO_LIVE_PR_HEAD_FOR_PRODUCT"
+  ]
+}
