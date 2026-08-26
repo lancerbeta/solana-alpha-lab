@@ -1,0 +1,23 @@
+{
+  "schema": "smial.hypothesis-forge-synthesis-handoff",
+  "schema_version": "1.0",
+  "contract_id": "HYPOTHESIS_FORGE_AND_INDEPENDENT_CRITIC_V1",
+  "prompt_version": "HFIC-V1.0",
+  "generator_mode": "MANUAL_FALLBACK_UNTIL_GENERATOR",
+  "forge_invocation": "EXPLICIT_SLASH_ONLY",
+  "critic_launch": "AUTO_AFTER_SYNTHESIS",
+  "synthesis_status": "PENDING_CRITIC",
+  "forge_report_present": true,
+  "critic_input_packet_present": true,
+  "critic_input_packet_sha256": "4f98272c58a94e52e25b7c116047fe2bfaee9a410f4ffeb5cc77fb1334e7c876",
+  "critic_terminal": null,
+  "critic_report_present": false,
+  "classifier_receipt_present": false,
+  "lane_classifier_terminal": null,
+  "critic_context_isolation": "NEW_CONTEXT_REQUIRED",
+  "authority": {
+    "git_mutation": 0,
+    "experiment_execution": 0,
+    "provider_api_rpc_wss_calls": 0
+  }
+}

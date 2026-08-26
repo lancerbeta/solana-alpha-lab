@@ -1,0 +1,64 @@
+{
+  "packet_schema": "smial.hypothesis-critic-input",
+  "packet_version": "1.0",
+  "generator_prompt_version": "HFIC-V1.0",
+  "generated_at": "2026-08-26T09:00:00Z",
+  "live_git_head": "e1c8c3f4f31707fa2ae2de7b161e5954f517fd7a",
+  "research_memory_as_of": "2026-08-26T09:00:00Z",
+  "owner_focus": "AUTO",
+  "authority": {
+    "git_mutation": 0,
+    "experiment_execution": 0,
+    "provider_api_rpc_wss_calls": 0
+  },
+  "holdouts_not_touched": ["forward_oos_holdout_v1"],
+  "truth_roots_used": [
+    "repo://AGENTS.md",
+    "repo://configs/hypothesis_fast_lane_v1.yaml",
+    "repo://configs/experiment_capability_registry_v1.yaml"
+  ],
+  "prior_work_queries": [
+    "mechanism:route deterioration veto",
+    "terminal:null H16 family"
+  ],
+  "selected_candidate": {
+    "candidate_id": "HFIC-FIXTURE-001",
+    "claim": "Fixture-only claim for schema validation; not a live alpha assertion.",
+    "nearest_prior_and_difference": "Differs from H16 only in fixture text for contract tests.",
+    "actor_counterparty": "UNKNOWN",
+    "mechanism": "Fixture mechanism for offline schema validation.",
+    "why_not_arbitraged": "UNKNOWN",
+    "population": "Fixture population",
+    "decision_timestamp": "token_first_trade_plus_15m",
+    "primary_x": "fixture_x",
+    "primary_y": "NetReturn@H900 fixture definition",
+    "horizon_notional": "100 USD intended notional fixture",
+    "disconfirming_prediction": "Fixture disconfirming prediction",
+    "negative_control": "Fixture negative control",
+    "alternative_world": "Fixture mundane explanation",
+    "confounders": ["fixture_confounder"],
+    "pit_leakage_survivorship_risks": ["fixture_pit_risk"],
+    "execution_capacity_risks": ["fixture_capacity_risk"],
+    "available_data_bindings": ["CONFIG-EXPERIMENT-CAPABILITY-REGISTRY-FAST-LANE-001"],
+    "missing_or_forward_only_data": [],
+    "proposed_method": "Fixture bucket comparison",
+    "cheapest_falsifier": "Offline classifier + schema validate only",
+    "pass_fail_inconclusive_semantics": "PASS if falsifier would change owner decision; FAIL otherwise",
+    "decision_unlocked": "Whether to commission a bounded Fast Lane falsifier atom"
+  },
+  "provisional_lane": {
+    "value": "FAST_LANE_CANDIDATE",
+    "required_capability_ids": ["CAP-JUPITER-FREE-KEY-QUOTE-NATIVE-BOUNDED-CAPTURE-001"],
+    "required_query_recipe_ids": [],
+    "required_data_bindings": [],
+    "exact_gap": "NONE"
+  },
+  "provisional_execution_unit": "NO_GIT_FAST_LANE_EXPERIMENT fixture",
+  "strongest_rejected_alternative": "Fixture runner-up",
+  "known_unknowns": ["fixture_unknown"],
+  "non_claims": [
+    "NO_ALPHA",
+    "NO_CANONICAL_DONE",
+    "FIXTURE_ONLY_NOT_LIVE_HYPOTHESIS"
+  ]
+}
