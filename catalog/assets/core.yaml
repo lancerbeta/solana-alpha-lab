@@ -897,7 +897,7 @@ records:
     repository_path: .github/workflows/ci.yml
   integrity:
     kind: sha256
-    sha256: f3cf61f9d5efa6b36596f4f52d76e9713fc3946fb12595b1182a91aa28c1a8c2
+    sha256: 35abf9951dd5204737bd3715113793d48dfdbe1834c1ed7a2e51f0a836dda0f5
   access:
     mode: read_only
     method: file
@@ -936,7 +936,7 @@ records:
     repository_path: scripts/validate_ci.py
   integrity:
     kind: sha256
-    sha256: 83373dc958bf26b99d16daf60b5fa98cc1034772bc50f50d8d735b357ed964ca
+    sha256: 81223661a47ed2666b54f73676b8f0d74330bc9288f251699c785ad4c6ed8b8c
   access:
     mode: read_only
     method: command
@@ -32236,7 +32236,7 @@ records:
   as_of: '2026-08-26'
   truth_owner: HYPOTHESIS_FORGE_OPERATIONAL_CLOSURE_V1
   location: {kind: git_path, logical_uri: 'repo://docs/tasks/HYPOTHESIS_FORGE_OPERATIONAL_CLOSURE_V1.md', repository_path: docs/tasks/HYPOTHESIS_FORGE_OPERATIONAL_CLOSURE_V1.md}
-  integrity: {kind: sha256, sha256: e133cd98698a51a430a25d645762d44769b8c946eeee6390068a5848be131935}
+  integrity: {kind: sha256, sha256: d9d9c0e471edd704f3ac4d7f0c6c32f9696733baace80b8ac58eec67022165d1}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: governed_by, target_asset_id: CTRL-HYPOTHESIS-FAST-LANE-001}

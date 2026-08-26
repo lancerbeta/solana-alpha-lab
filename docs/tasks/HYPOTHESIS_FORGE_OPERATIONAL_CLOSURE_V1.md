@@ -56,6 +56,9 @@ managed_write_set:
 - docs/evidence/hypothesis_forge_operational_closure/a1_delivery_completion_evidence_v1.json
 - docs/evidence/hypothesis_forge_operational_closure/a1_delivery_independent_review_v1.json
 - docs/evidence/hypothesis_forge_operational_closure/a1_delivery_factory_fit_v1.json
+- .github/workflows/ci.yml
+- scripts/validate_ci.py
+- tests/test_ci.py
 external_caps:
   network: false
   credentials: false
