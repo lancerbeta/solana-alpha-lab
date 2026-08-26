@@ -14,6 +14,7 @@
     "catalog/assets/core.yaml": "d5f57554cf6ce8011218eedb5c64b2e606c438d0fd96fc44bca19604bd0fc369",
     "delivery-harness/harness.yaml": "0dce36aea96af67c281acc120303eba1188e1c53f104c0bd610e4b2ad6647add",
     "docs/agent/EXECUTION_ROUTER_PROTOCOL.md": "df9950ee4e4a61f3007111c06b48861f60fd1aaa9fc55a38fdaac46ec384acec",
+    "docs/evidence/control/delivery_harness_acceptance_v1.json": "cc36dc7b70f6bc233dbfe9ecf6528d3c27197ce99f71be8d595112d3e980abcb",
     "docs/tasks/CTRL-CI-OWNED-HFIC-CURSOR-COMMAND-ELIGIBILITY-V1.md": "4c2184cdc766e85bfb68e1883ff7e836f1ddc4e5f8277b76a382205f8fe9c5e0",
     "scripts/validate_ci.py": "83373dc958bf26b99d16daf60b5fa98cc1034772bc50f50d8d735b357ed964ca",
     "tests/test_ci.py": "ea761bdd478f7b566c6d40f8e76e642a79de50025617ced8bb68edd5657d763d"
@@ -28,14 +29,14 @@
   },
   "factory_fit": {
     "path": "docs/evidence/control/a1_ci_owned_hfic_cursor_command_eligibility_factory_fit_v1.json",
-    "sha256": "d897167f3b8967ddaba21268e59897182471e3930594b76efca0c6889a8c31a1",
+    "sha256": "ea4e0f06c92e5f94d7733d9c51b9e836a03d7085c54ebb99662c14f43b0ac78e",
     "verdict": "PASS"
   },
   "validation": {
     "targeted": "PASS_CI_OWNED_HFIC_CURSOR_COMMAND_ELIGIBILITY_TESTS",
     "independent_review": {
       "path": "docs/evidence/control/a1_ci_owned_hfic_cursor_command_eligibility_review_v1.json",
-      "sha256": "feb284bad744cc2775876357b89c4e3a276396039df73f3e11d71c0e12c02bf2",
+      "sha256": "75f2143963686fb0bfe759a5a666942103c8fcf4fde0fc9be7545f0ca9dcf142",
       "verdict": "PASS"
     },
     "full_gate": "ENFORCED_BY_PROJECT_BOUND_VALIDATION",
