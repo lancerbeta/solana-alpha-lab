@@ -181,15 +181,52 @@ class DeliveryHarnessAdapterTests(unittest.TestCase):
             self.assertIn("ACTIVE_BATON_REFERENCE", result["errors"])
 
     def test_commands_are_thin_exact_task_adapters(self) -> None:
-        names = {"delivery-start.md", "delivery-status.md", "delivery-review.md", "delivery-finish.md"}
+        delivery_names = {
+            "delivery-start.md",
+            "delivery-status.md",
+            "delivery-review.md",
+            "delivery-finish.md",
+        }
+        product_names = {
+            "hypothesis-forge.md",
+            "independent-hypothesis-critic.md",
+        }
         commands = {path.name: path for path in (CURSOR / "commands").glob("*.md")}
-        self.assertEqual(set(commands), names)
-        for name, path in commands.items():
+        self.assertEqual(set(commands), delivery_names | product_names)
+        for name in delivery_names:
+            path = commands[name]
             text = path.read_text(encoding="utf-8")
             self.assertIn("DELIVERY_HARNESS_V1", text, name)
             self.assertIn("scripts/delivery_harness.py", text, name)
             self.assertIn("exact task contract", text.casefold(), name)
             self.assertNotRegex(text.casefold(), r"search (the )?(latest|newest|current)")
+
+    def test_product_slash_commands_are_explicit_manual_contours(self) -> None:
+        product = {
+            "hypothesis-forge.md": {
+                "skill": ".agents/skills/hypothesis-forge/SKILL.md",
+                "required": (
+                    "MANUAL_FALLBACK_UNTIL_GENERATOR",
+                    "auto-launch",
+                    "incomplete",
+                ),
+            },
+            "independent-hypothesis-critic.md": {
+                "skill": ".agents/skills/independent-hypothesis-critic/SKILL.md",
+                "required": (
+                    "CRITIC_INPUT_PACKET",
+                    "new chat",
+                ),
+            },
+        }
+        for name, spec in product.items():
+            path = CURSOR / "commands" / name
+            text = path.read_text(encoding="utf-8")
+            self.assertIn(spec["skill"], text, name)
+            for phrase in spec["required"]:
+                self.assertIn(phrase.casefold(), text.casefold(), name)
+            self.assertNotIn("DELIVERY_HARNESS_V1", text, name)
+            self.assertNotIn("GITHUB_BATON", text, name)
 
     def test_custom_critics_are_read_only_and_have_deterministic_fallback(self) -> None:
         expected = {

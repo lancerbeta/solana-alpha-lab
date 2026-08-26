@@ -24,6 +24,7 @@ managed_write_set:
   - .agents/skills/hypothesis-forge/SKILL.md
   - .agents/skills/independent-hypothesis-critic/SKILL.md
   - tests/test_hypothesis_forge_independent_critic_v1.py
+  - tests/test_delivery_harness_adapters.py
   - tests/fixtures/hypothesis_forge/critic_input_packet_valid_v1.json
   - tests/fixtures/hypothesis_forge/synthesis_handoff_pending_critic_v1.json
   - tests/fixtures/hypothesis_forge/synthesis_handoff_complete_v1.json
