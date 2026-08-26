@@ -104,6 +104,8 @@ class HypothesisForgeIndependentCriticV1Tests(unittest.TestCase):
     def test_operator_pack_contains_hfic_prompts(self) -> None:
         text = OPERATOR_PATH.read_text(encoding="utf-8")
         self.assertIn("HFIC-V1.0", text)
+        self.assertIn("/hypothesis-forge", text)
+        self.assertIn("auto-handoff", text.casefold())
         self.assertIn("BEGIN PROMPT A", text)
         self.assertIn("END PROMPT A", text)
         self.assertIn("BEGIN PROMPT B", text)

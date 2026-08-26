@@ -28,7 +28,6 @@ managed_write_set:
   - tests/fixtures/hypothesis_forge/critic_input_packet_valid_v1.json
   - tests/fixtures/hypothesis_forge/synthesis_handoff_pending_critic_v1.json
   - tests/fixtures/hypothesis_forge/synthesis_handoff_complete_v1.json
-  - catalog/assets/core.yaml
   - docs/evidence/hypothesis_forge_independent_critic/a1_delivery_completion_evidence_v1.json
   - docs/evidence/hypothesis_forge_independent_critic/a1_delivery_independent_review_v1.json
   - docs/evidence/hypothesis_forge_independent_critic/a1_delivery_factory_fit_v1.json

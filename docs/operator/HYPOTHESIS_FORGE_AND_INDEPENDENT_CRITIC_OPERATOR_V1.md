@@ -39,7 +39,22 @@
 
 ## 2. Как использовать вечером
 
-### Шаг 1 — Forge
+**Канонический путь (после merge этого pack в репозиторий):**
+
+1. Явно вызовите **`/hypothesis-forge`** в новом чате в корне актуального repository.
+2. Агент следует `.agents/skills/hypothesis-forge/SKILL.md` и PROMPT A ниже, возвращает
+   `FORGE_REPORT` + `CRITIC_INPUT_PACKET`, затем **автоматически** запускает Independent
+   Critic в **новом изолированном контексте** (subagent или новый чат).
+3. Вечерний цикл **не завершён**, пока Critic не вернул один terminal и один NEXT.
+4. Recovery: **`/independent-hypothesis-critic`** с вставленным packet только если auto-handoff
+   прервался.
+
+Опциональный фокус передаётся в slash-чате, например `OWNER_FOCUS=execution-aware entry/exit asymmetry at small notional`.
+
+**Ручной fallback (если slash недоступен):** paste-блоки ниже эквивалентны, но owner должен
+сам открыть шаг 2 — предпочтительнее slash + auto-handoff.
+
+### Шаг 1 — Forge (manual fallback)
 
 Откройте новый агентный чат в корне актуального repository, включите сильную модель с высоким reasoning, дайте ей этот файл и отправьте:
 
@@ -64,7 +79,7 @@ OWNER_FOCUS=execution-aware entry/exit asymmetry at small notional
 
 Фокус направляет поиск, но не разрешает агенту защищать исходную идею или пропускать более сильный механизм.
 
-### Шаг 2 — независимый Critic
+### Шаг 2 — независимый Critic (manual fallback; при slash auto-handoff этот шаг не нужен)
 
 Откройте **новый чат**. Желательно использовать другую сильную модель; если модель та же — новый контекст обязателен. Передайте ей этот файл и только `CRITIC_INPUT_PACKET` из первого прогона:
 
