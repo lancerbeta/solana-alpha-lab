@@ -9,7 +9,7 @@
   "cloud_bundle_smoke_required": false,
   "factory_fit": {
     "path": "docs/evidence/hypothesis_forge_operational_closure/a1_delivery_factory_fit_v1.json",
-    "sha256": "5c5e8e68db00a36a61a7d98641b467ffed5591efc2924943565e7d0741d2a872",
+    "sha256": "a657ec3a4157fd4cf822b761a566eefa11308af2c694e498f83b58a48135f436",
     "verdict": "PASS"
   },
   "implementation_bindings": {
@@ -33,12 +33,14 @@
     "schemas/research_memory_projection_v1.sql": "cd172baf5e558e4606e7b337872645a1d119368aa87e4dbb928c0160f5ca2d74",
     "scripts/hypothesis_fast_lane.py": "9cd8e01517457ebf56c7cb7499514aaea71119561157c31e8cb675b44a8268e0",
     "scripts/hypothesis_forge.py": "5ac03c107729d2cc1173751a6d22cbebecddce90ce8fc6e906b7f0265a2a9c09",
+    "src/solana_alpha_lab/factory/commissioning_proof.py": "d971fb43c5bc26d3c1db5c45c193722d8734b59ddb1c2f6651cd5a656c5ee435",
     "src/solana_alpha_lab/factory/data_root.py": "eb7ec6b2e05408a53ff3f46d109895ccda6777045332a75e19e924e3fa8360ca",
     "src/solana_alpha_lab/factory/hfic_identity.py": "a7faba9f0e3573e51511f7bf442378cd147cfb53ebe3ea2c417ba568b9e7fe2f",
     "src/solana_alpha_lab/factory/hfic_preflight.py": "2f2929550e6a22c6d15949d0362376478b32394bd2ac9fb6efcc3526f2f49f53",
     "src/solana_alpha_lab/factory/hfic_session.py": "46a1e30494850b3fd67c6c54e53eb7132cf8197431b2eea8e697229cb1f4728e",
     "tests/fixtures/hypothesis_forge/draft_c3_c4_mismatch_v1.json": "79e71b57c82c5adac58ee6cf00e87cd942b983db860732ec21bf681146447e4f",
     "tests/fixtures/hypothesis_forge/draft_happy_path_v1.json": "8c8c5279f6846b8db961f6e2052c7790f5ed0f7c277e2ef779ce3d2129dc4598",
+    "tests/fixtures/hypothesis_forge/prompt_a_forge_draft_v1.json": "8c8c5279f6846b8db961f6e2052c7790f5ed0f7c277e2ef779ce3d2129dc4598",
     "tests/test_hfic_cli.py": "e7dae840a683e38cd74fb4b59d0a332d467d4557cb93f08b9edebd607285f38e",
     "tests/test_hfic_identity.py": "189f69a4e5f9108b7a68d3fb92a12e757e5b23d177f5dc3f3b111e806304c1da",
     "tests/test_hfic_operational_closure_v1.py": "30222f20454c4a38e509908977f3ce34d3032391cad6145aa8ef92fc8d392eb0",
@@ -78,7 +80,7 @@
     "github_ci": "ENFORCED_LIVE_AT_GUARDED_MERGE",
     "independent_review": {
       "path": "docs/evidence/hypothesis_forge_operational_closure/a1_delivery_independent_review_v1.json",
-      "sha256": "d11b03c643f1c851d0ee5550c166a38fdac60b5fef3329a8f8c9a49567dcc151",
+      "sha256": "c9e43be9fdabf9535eeba16a40ece23dcac6232c70b69983c45a7ebaf419a330",
       "verdict": "PASS"
     },
     "project_checks": [
