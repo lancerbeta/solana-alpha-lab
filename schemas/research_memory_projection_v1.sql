@@ -272,3 +272,103 @@ SELECT
     record_id
 FROM _research_events
 WHERE record_kind = 'CAPABILITY_GAP';
+
+CREATE VIEW hfic_sessions AS
+SELECT
+    json_extract_string(payload_json, '$.session_id') AS session_id,
+    json_extract_string(payload_json, '$.phase') AS session_state,
+    json_extract_string(payload_json, '$.evidence_epoch_sha256')
+        AS evidence_epoch_sha256,
+    json_extract_string(payload_json, '$.focus_key_sha256') AS focus_key_sha256,
+    json_extract_string(payload_json, '$.search_key_sha256') AS search_key_sha256,
+    json_extract_string(payload_json, '$.prompt_version') AS prompt_version,
+    json_extract_string(payload_json, '$.owner_focus') AS owner_focus,
+    producer_git_sha AS live_git_head,
+    payload_sha256,
+    effective_at,
+    first_reliable_available_at,
+    record_id
+FROM _research_events AS cycle
+WHERE record_kind = 'RESEARCH_CYCLE'
+  AND json_extract_string(payload_json, '$.hfic_protocol') IS NOT NULL
+  AND record_id = (
+      SELECT inner_cycle.record_id
+      FROM _research_events AS inner_cycle
+      WHERE inner_cycle.record_kind = 'RESEARCH_CYCLE'
+        AND json_extract_string(inner_cycle.payload_json, '$.session_id')
+            = json_extract_string(cycle.payload_json, '$.session_id')
+      ORDER BY
+          CASE json_extract_string(inner_cycle.payload_json, '$.phase')
+              WHEN 'SYNTHESIS_COMPLETE' THEN 0
+              WHEN 'LEGACY_PARTIAL' THEN 0
+              WHEN 'CRITIC_RESULT_READY' THEN 1
+              WHEN 'FROZEN_AWAITING_CRITIC' THEN 2
+              WHEN 'DRAFT_VALIDATED' THEN 3
+              WHEN 'PREFLIGHT_PROVEN' THEN 4
+              ELSE 5
+          END,
+          inner_cycle.effective_at DESC,
+          inner_cycle.record_id ASC
+      LIMIT 1
+  );
+
+CREATE VIEW hfic_candidates AS
+SELECT
+    json_extract_string(payload_json, '$.session_id') AS session_id,
+    stable_id AS candidate_id,
+    definition_sha256,
+    json_extract_string(payload_json, '$.statement') AS claim,
+    json_extract_string(payload_json, '$.mechanism') AS mechanism,
+    json_extract_string(payload_json, '$.primary_x_family') AS primary_x_family,
+    json_extract_string(payload_json, '$.role_in_session') AS role_in_session,
+    payload_sha256,
+    effective_at,
+    first_reliable_available_at,
+    record_id
+FROM _research_events
+WHERE record_kind = 'HYPOTHESIS_VERSION'
+  AND json_extract_string(payload_json, '$.hfic_protocol') IS NOT NULL;
+
+CREATE VIEW hfic_candidate_decisions AS
+SELECT
+    json_extract_string(payload_json, '$.session_id') AS session_id,
+    hypothesis_version_id AS candidate_id,
+    json_extract_string(payload_json, '$.decision_kind') AS decision_kind,
+    json_extract_string(payload_json, '$.reason_code') AS reason_code,
+    payload_sha256,
+    effective_at,
+    first_reliable_available_at,
+    record_id
+FROM _research_events
+WHERE record_kind = 'DECISION_EVENT'
+  AND json_extract_string(payload_json, '$.hfic_protocol') IS NOT NULL;
+
+CREATE VIEW hfic_search_budget AS
+SELECT
+    evidence_epoch_sha256,
+    focus_key_sha256,
+    search_key_sha256,
+    prompt_version,
+    session_id,
+    session_state,
+    effective_at,
+    record_id
+FROM hfic_sessions;
+
+CREATE VIEW hfic_pending_sessions AS
+SELECT
+    session_id,
+    session_state,
+    evidence_epoch_sha256,
+    focus_key_sha256,
+    search_key_sha256,
+    prompt_version,
+    effective_at,
+    record_id
+FROM hfic_sessions
+WHERE session_state IN (
+    'PREFLIGHT_PROVEN',
+    'DRAFT_VALIDATED',
+    'FROZEN_AWAITING_CRITIC',
+    'CRITIC_RESULT_READY'
+);

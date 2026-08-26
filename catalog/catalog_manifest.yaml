@@ -4,10 +4,10 @@ catalog_version: 0.120.0
 as_of: '2026-08-25'
 implementation_status: VALIDATED_ACTIVE
 current_checkpoint:
-  assets: 1517
+  assets: 1525
   asset_registries: 4
-  schemas: 64
-  queries: 14
+  schemas: 68
+  queries: 17
   lifecycle_registries: 9
   lifecycle_records: 84
 canonical_bindings:
@@ -110,6 +110,10 @@ root_resolver:
   - catalog/schemas/factory_v1_common_market_feature_surface.schema.json
   - catalog/schemas/factory_v1_pit_data_truth_canonicalization.schema.json
   - catalog/schemas/provider_route_capability_registry_v10.schema.json
+  - catalog/schemas/hypothesis_forge_draft_v1.schema.json
+  - catalog/schemas/hypothesis_critic_result_v1.schema.json
+  - catalog/schemas/hypothesis_forge_session_receipt_v1.schema.json
+  - catalog/schemas/hypothesis_forge_synthesis_handoff_v1_1.schema.json
   commands:
     validate:
     - uv
@@ -891,5 +895,13 @@ mandatory_asset_ids:
 - EVIDENCE-HYPOTHESIS-FAST-LANE-DELIVERY-COMPLETION-001
 - EVIDENCE-HYPOTHESIS-FAST-LANE-DELIVERY-INDEPENDENT-REVIEW-001
 - EVIDENCE-HYPOTHESIS-FAST-LANE-DELIVERY-FACTORY-FIT-001
+- CTRL-HYPOTHESIS-FORGE-OPERATIONAL-CLOSURE-001
+- SCRIPT-HYPOTHESIS-FORGE-001
+- MODULE-FACTORY-V1-HFIC-SESSION-001
+- SCHEMA-HYPOTHESIS-FORGE-DRAFT-V1-001
+- SCHEMA-HYPOTHESIS-CRITIC-RESULT-V1-001
+- SCHEMA-HYPOTHESIS-FORGE-SESSION-RECEIPT-V1-001
+- SCHEMA-HYPOTHESIS-FORGE-SYNTHESIS-HANDOFF-V1-1-001
+- TEST-HFIC-OPERATIONAL-CLOSURE-001
 deferred_capabilities:
 - GRAPH_DATABASE

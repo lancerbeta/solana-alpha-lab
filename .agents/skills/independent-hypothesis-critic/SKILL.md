@@ -15,6 +15,8 @@ Read `configs/hypothesis_forge_independent_critic_v1.yaml` and **PROMPT B** in
 
 Input must be a structured **CRITIC_INPUT_PACKET** only. Reject free-form Forge
 narrative, pleas to «improve the idea», or requests to generate a new portfolio.
+Return `hypothesis_critic_result_v1`. The critic does not persist; `finalize`
+owns Research Data Plane writes.
 
 Hard boundaries — same as Forge:
 

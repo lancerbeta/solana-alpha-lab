@@ -1,0 +1,81 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://smial.local/schemas/hypothesis_forge_draft_v1.schema.json",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "packet_schema",
+    "packet_version",
+    "generator_prompt_version",
+    "owner_focus",
+    "preflight_receipt_id",
+    "preflight_receipt_sha256",
+    "authority",
+    "candidates",
+    "selected_candidate_ref",
+    "runner_up_candidate_ref",
+    "strongest_rejected_alternative",
+    "pareto_factors",
+    "non_claims"
+  ],
+  "properties": {
+    "packet_schema": {"const": "smial.hypothesis-forge-draft"},
+    "packet_version": {"const": "1.1"},
+    "generator_prompt_version": {"const": "HFIC-V1.1"},
+    "owner_focus": {"type": "string", "minLength": 1},
+    "preflight_receipt_id": {"type": "string", "minLength": 1},
+    "preflight_receipt_sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+    "authority": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["git_mutation", "experiment_execution", "provider_api_rpc_wss_calls"],
+      "properties": {
+        "git_mutation": {"const": 0},
+        "experiment_execution": {"const": 0},
+        "provider_api_rpc_wss_calls": {"const": 0}
+      }
+    },
+    "candidates": {
+      "type": "array",
+      "minItems": 4,
+      "maxItems": 6,
+      "items": {
+        "type": "object",
+        "additionalProperties": true,
+        "required": [
+          "display_ordinal",
+          "label",
+          "claim",
+          "mechanism",
+          "actor_counterparty",
+          "population",
+          "decision_timestamp",
+          "primary_x_family",
+          "primary_y",
+          "horizon_notional",
+          "negative_control",
+          "cheapest_falsifier"
+        ],
+        "properties": {
+          "display_ordinal": {"type": "integer", "minimum": 1, "maximum": 6},
+          "label": {"type": "string", "minLength": 1},
+          "claim": {"type": "string", "minLength": 1},
+          "mechanism": {"type": "string", "minLength": 1},
+          "actor_counterparty": {"type": "string", "minLength": 1},
+          "population": {"type": "string", "minLength": 1},
+          "decision_timestamp": {"type": "string", "minLength": 1},
+          "primary_x_family": {"type": "string", "minLength": 1},
+          "primary_y": {"type": "string", "minLength": 1},
+          "horizon_notional": {"type": "string", "minLength": 1},
+          "negative_control": {"type": "string", "minLength": 1},
+          "cheapest_falsifier": {"type": "string", "minLength": 1}
+        }
+      }
+    },
+    "selected_candidate_ref": {"type": "string", "minLength": 1},
+    "runner_up_candidate_ref": {"type": "string", "minLength": 1},
+    "strongest_rejected_alternative": {"type": "string", "minLength": 1},
+    "pareto_factors": {"type": "array", "items": {"type": "string"}},
+    "non_claims": {"type": "array", "items": {"type": "string"}}
+  }
+}

@@ -1,0 +1,166 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://smial.local/schemas/hypothesis_forge_synthesis_handoff_v1_1.schema.json",
+  "$defs": {
+    "critic_terminal_b4": {
+      "enum": [
+        "PASS_TO_CLASSIFICATION",
+        "REVISE_ONCE",
+        "KILL_DUPLICATE_OR_PREVIOUSLY_CLOSED",
+        "KILL_MECHANISM",
+        "KILL_PIT_OR_LEAKAGE",
+        "KILL_EXECUTION_OR_ECONOMICS",
+        "KILL_DATA_INFEASIBLE",
+        "KILL_STATISTICALLY_UNIDENTIFIABLE",
+        "KILL_LOW_INFORMATION_VALUE",
+        "KILL_PREPARATORY_LOOP",
+        "KILL_UNBOUND_EVIDENCE",
+        "OWNER_DECISION_REQUIRED",
+        "NO_WORTHY_HYPOTHESIS"
+      ]
+    },
+    "critic_terminal_post_classification": {
+      "enum": [
+        "PASS_FAST_LANE_READY",
+        "PASS_CHANGE_LANE_REQUIRED",
+        "PASS_DATA_OPTION_REQUIRED"
+      ]
+    }
+  },
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema",
+    "schema_version",
+    "contract_id",
+    "prompt_version",
+    "generator_mode",
+    "forge_invocation",
+    "critic_launch",
+    "synthesis_status",
+    "forge_report_present",
+    "critic_input_packet_present",
+    "critic_context_isolation",
+    "classifier_receipt_present",
+    "lane_classifier_terminal",
+    "authority"
+  ],
+  "properties": {
+    "schema": {"const": "smial.hypothesis-forge-synthesis-handoff"},
+    "schema_version": {"const": "1.1"},
+    "contract_id": {
+      "enum": [
+        "HYPOTHESIS_FORGE_AND_INDEPENDENT_CRITIC_V1",
+        "HYPOTHESIS_FORGE_OPERATIONAL_CLOSURE_V1"
+      ]
+    },
+    "prompt_version": {"const": "HFIC-V1.1"},
+    "generator_mode": {"const": "MANUAL_FALLBACK_UNTIL_GENERATOR"},
+    "forge_invocation": {"const": "EXPLICIT_SLASH_ONLY"},
+    "critic_launch": {"const": "AUTO_AFTER_SYNTHESIS"},
+    "synthesis_status": {
+      "enum": ["FORGE_NOT_READY", "PENDING_CRITIC", "SYNTHESIS_COMPLETE"]
+    },
+    "forge_report_present": {"type": "boolean"},
+    "critic_input_packet_present": {"type": "boolean"},
+    "critic_input_packet_sha256": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{64}$"
+    },
+    "critic_terminal": {
+      "oneOf": [
+        {"type": "null"},
+        {"$ref": "#/$defs/critic_terminal_b4"},
+        {"$ref": "#/$defs/critic_terminal_post_classification"}
+      ]
+    },
+    "critic_report_present": {"type": "boolean"},
+    "classifier_receipt_present": {"type": "boolean"},
+    "lane_classifier_terminal": {"type": ["string", "null"]},
+    "critic_context_isolation": {"const": "NEW_CONTEXT_REQUIRED"},
+    "session_id": {"type": "string", "minLength": 1},
+    "authority": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["git_mutation", "experiment_execution", "provider_api_rpc_wss_calls"],
+      "properties": {
+        "git_mutation": {"const": 0},
+        "experiment_execution": {"const": 0},
+        "provider_api_rpc_wss_calls": {"const": 0}
+      }
+    }
+  },
+  "allOf": [
+    {
+      "if": {
+        "properties": {"synthesis_status": {"const": "PENDING_CRITIC"}},
+        "required": ["synthesis_status"]
+      },
+      "then": {
+        "properties": {
+          "forge_report_present": {"const": true},
+          "critic_input_packet_present": {"const": true},
+          "critic_report_present": {"const": false},
+          "critic_terminal": {"type": "null"},
+          "classifier_receipt_present": {"const": false},
+          "lane_classifier_terminal": {"type": "null"}
+        },
+        "required": ["critic_input_packet_sha256"]
+      }
+    },
+    {
+      "if": {
+        "properties": {"synthesis_status": {"const": "SYNTHESIS_COMPLETE"}},
+        "required": ["synthesis_status"]
+      },
+      "then": {
+        "properties": {
+          "forge_report_present": {"const": true},
+          "critic_input_packet_present": {"const": true},
+          "critic_report_present": {"const": true},
+          "critic_terminal": {
+            "oneOf": [
+              {"$ref": "#/$defs/critic_terminal_b4"},
+              {"$ref": "#/$defs/critic_terminal_post_classification"}
+            ]
+          }
+        },
+        "required": ["critic_input_packet_sha256", "critic_terminal"]
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "synthesis_status": {"const": "SYNTHESIS_COMPLETE"},
+          "critic_terminal": {"$ref": "#/$defs/critic_terminal_post_classification"}
+        },
+        "required": ["synthesis_status", "critic_terminal"]
+      },
+      "then": {
+        "properties": {
+          "classifier_receipt_present": {"const": true},
+          "lane_classifier_terminal": {"type": "string", "minLength": 1}
+        },
+        "required": ["lane_classifier_terminal"]
+      }
+    },
+    {
+      "if": {
+        "properties": {"synthesis_status": {"const": "FORGE_NOT_READY"}},
+        "required": ["synthesis_status"]
+      },
+      "then": {
+        "properties": {
+          "critic_report_present": {"const": false},
+          "critic_terminal": {"type": "null"},
+          "classifier_receipt_present": {"const": false},
+          "lane_classifier_terminal": {"type": "null"}
+        },
+        "anyOf": [
+          {"properties": {"forge_report_present": {"const": false}}},
+          {"properties": {"critic_input_packet_present": {"const": false}}}
+        ]
+      }
+    }
+  ]
+}

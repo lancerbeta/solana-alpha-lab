@@ -511,3 +511,101 @@ recipes:
   output_contract:
     format: json
     max_records: 50
+- recipe_id: QUERY-HFIC-EXACT-RELATED-PRIOR-001
+  record_version: '1.0'
+  purpose: Find exact definition matches and component-overlap related HFIC prior work without scanning the repository.
+  kind: local_command
+  read_only: true
+  bounded: true
+  network_required: false
+  write_effects: NONE
+  timeout_seconds: 30
+  command:
+  - uv
+  - run
+  - --locked
+  - --managed-python
+  - python
+  - -B
+  - scripts/hypothesis_forge.py
+  - prior
+  - --candidate
+  - '{candidate_json}'
+  - --format
+  - json
+  parameters:
+  - name: candidate_json
+    required: true
+    pattern: '^\{.+\}$'
+  target_asset_ids:
+  - SCRIPT-HYPOTHESIS-FORGE-001
+  - MODULE-FACTORY-V1-HFIC-SESSION-001
+  - SCHEMA-RESEARCH-MEMORY-PROJECTION-V1-001
+  output_contract:
+    format: json
+    max_records: 25
+- recipe_id: QUERY-HFIC-SESSION-BY-SEARCH-KEY-001
+  record_version: '1.0'
+  purpose: Look up an HFIC session by evidence epoch, focus and prompt search key.
+  kind: local_command
+  read_only: true
+  bounded: true
+  network_required: false
+  write_effects: NONE
+  timeout_seconds: 30
+  command:
+  - uv
+  - run
+  - --locked
+  - --managed-python
+  - python
+  - -B
+  - scripts/hypothesis_forge.py
+  - show-session
+  - --search-key
+  - '{search_key_sha256}'
+  - --format
+  - json
+  parameters:
+  - name: search_key_sha256
+    required: true
+    pattern: '^[0-9a-f]{64}$'
+  target_asset_ids:
+  - SCRIPT-HYPOTHESIS-FORGE-001
+  - MODULE-FACTORY-V1-HFIC-SESSION-001
+  output_contract:
+    format: json
+    max_records: 1
+- recipe_id: QUERY-HFIC-PENDING-SESSION-001
+  record_version: '1.0'
+  purpose: Find a resumable pending HFIC session for the current evidence epoch and focus.
+  kind: local_command
+  read_only: true
+  bounded: true
+  network_required: false
+  write_effects: NONE
+  timeout_seconds: 30
+  command:
+  - uv
+  - run
+  - --locked
+  - --managed-python
+  - python
+  - -B
+  - scripts/hypothesis_forge.py
+  - pending
+  - --search-key
+  - '{search_key_sha256}'
+  - --format
+  - json
+  parameters:
+  - name: search_key_sha256
+    required: true
+    pattern: '^[0-9a-f]{64}$'
+  target_asset_ids:
+  - SCRIPT-HYPOTHESIS-FORGE-001
+  - MODULE-FACTORY-V1-HFIC-SESSION-001
+  output_contract:
+    format: json
+    max_records: 5
+    max_records: 1

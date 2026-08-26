@@ -1,6 +1,6 @@
 ---
 name: hypothesis-forge
-description: Manual Hypothesis Forge for Solana Alpha Lab under MANUAL_FALLBACK_UNTIL_GENERATOR. Use only when the owner explicitly invokes /hypothesis-forge. Returns FORGE_REPORT and CRITIC_INPUT_PACKET, then auto-launches Independent Critic in new isolated context. No Git mutation, provider calls, experiment execution or autonomous generator.
+description: Manual Hypothesis Forge for Solana Alpha Lab under MANUAL_FALLBACK_UNTIL_GENERATOR. Use only when the owner explicitly invokes /hypothesis-forge. Runs executable preflight → freeze → isolated Critic → finalize. No Git mutation, provider calls, experiment execution or autonomous generator.
 ---
 
 # Hypothesis Forge
@@ -9,7 +9,9 @@ Use **only** when the owner explicitly invokes `/hypothesis-forge`. Do not run F
 from orientation, autonomous delivery, or implicit continuation phrases.
 
 Manual hypothesis synthesis contour for Solana Alpha Lab while
-`MANUAL_FALLBACK_UNTIL_GENERATOR` remains active. Design and discovery only.
+`MANUAL_FALLBACK_UNTIL_GENERATOR` remains active. Prompt version `HFIC-V1.1`.
+
+Canonical entrypoint: `scripts/hypothesis_forge.py`.
 
 ## Authority
 
@@ -24,41 +26,59 @@ Hard boundaries — zero tolerance:
 - Provider/API/RPC/WSS, credentials, wallet, signer, transaction, cash spend
 - Autonomous Hypothesis Generator («magic ball»)
 
-Allowed: read-only Git/Catalog navigation, bounded prior-work query, design packets.
+Allowed: read-only Git/Catalog navigation, bounded prior-work query, offline
+commissioning when Fast Lane proof is absent and safe, design packets.
 
-## Workflow
+## Executable workflow
 
-`REALITY → OPPORTUNITY_MAP → CANDIDATE_PORTFOLIO → PARETO → FORGE_REPORT → CRITIC_INPUT_PACKET → AUTO CRITIC`
+Happy path — no owner copy/paste between the slash command and the final terminal:
 
-1. Restore live Git truth from repository front door (`AGENTS.md`, harness, Catalog).
-   Do not trust stale chat exports as authority.
-2. Execute **PROMPT A** from the operator pack (`HFIC-V1.0`).
-3. Return the full **FORGE_REPORT** sections A13 in order, ending with a canonical
-   **CRITIC_INPUT_PACKET** that validates against
-   `catalog/schemas/hypothesis_critic_input_v1.schema.json`.
-4. Set `generator_prompt_version: HFIC-V1.0` and keep all authority counters at `0`.
+1. Run `python -B scripts/hypothesis_forge.py preflight --owner-focus <AUTO|text> --format json`.
+2. Branch on `action`:
+   - `RETURN_EXISTING_SESSION` → report the stored terminal/NEXT; stop.
+   - `RESUME_CRITIC` → use `critic_input_packet` from the preflight JSON
+     (canonical frozen bytes); do not generate.
+   - `RESUME_FINALIZE` → run finalize only.
+   - `STOP` → report the named terminal; stop.
+   - `START_NEW_SESSION` → continue.
+3. Only for `START_NEW_SESSION`, run **PROMPT A** from the operator pack using
+   `HFIC-V1.1` and only the bounded `FORGE_CONTEXT_PACKET` plus explicitly
+   resolved evidence. Display ordinals are display-only; do not invent canonical IDs.
+4. Write machine `FORGE_DRAFT` to an OS temp file.
+5. Run `python -B scripts/hypothesis_forge.py freeze --draft <temp> --preflight-receipt <temp> --format json`.
+   Frozen packet is authority. One schema-repair attempt, then `HFIC_PROTOCOL_INVALID`.
+6. **Mandatory auto-handoff:** launch Independent Critic in a new isolated context
+   with only the frozen packet. Do not persist from Critic.
+7. After critic returns `hypothesis_critic_result_v1`, run
+   `python -B scripts/hypothesis_forge.py finalize --session-id <id> --critic-result <temp> --format json`.
+8. Verify `SYNTHESIS_COMPLETE` / RDP receipt, Git mutation 0, provider calls 0
+   before telling the owner the cycle is complete.
+9. On crash/retry, resume; never regenerate the same evidence+focus search.
 
 ## Mandatory auto-handoff (non-negotiable)
 
 Forge is **not complete** when the packet is printed. The owner must not need to
 remember step 2.
 
-Immediately after a valid `CRITIC_INPUT_PACKET`:
+Immediately after a valid frozen `CRITIC_INPUT_PACKET`:
 
 1. Emit a synthesis handoff receipt with `synthesis_status: PENDING_CRITIC` per
-   `catalog/schemas/hypothesis_forge_synthesis_handoff_v1.schema.json`.
+   `catalog/schemas/hypothesis_forge_synthesis_handoff_v1_1.schema.json` (v1.0
+   readers remain valid for historical fixtures).
 2. **Launch Independent Critic in a new isolated context** using one of:
    - `Task` subagent with read-only critic instructions and **only** the packet
      (no Forge narrative, no intermediate reasoning); or
    - instruct the owner to open a **new chat** and run `/independent-hypothesis-critic`
      with the packet — only if subagent launch is unavailable.
 3. Do not mark the evening cycle done, do not propose execution tasks, and do not
-   treat synthesis as finished until the critic returns one terminal and one NEXT.
+   treat synthesis as finished until the critic returns one terminal and one NEXT
+   and `finalize` has persisted them.
 4. After critic returns, emit handoff with `synthesis_status: SYNTHESIS_COMPLETE`,
    `critic_terminal`, `critic_report_present: true`, and when the final terminal is
    post-classification (`PASS_FAST_LANE_READY`, `PASS_CHANGE_LANE_REQUIRED`,
    `PASS_DATA_OPTION_REQUIRED`): `classifier_receipt_present: true` plus
-   `lane_classifier_terminal` from offline `classify_lane()`.
+   `lane_classifier_terminal` from offline `classify_lane()`. `PASS_*` is readiness
+   / `PAUSE`, never promotion or alpha.
 
 If packet validation fails, return `STATUS=NOT_READY`, keep
 `synthesis_status: FORGE_NOT_READY`, and one repair action. Do not launch critic
@@ -70,6 +90,7 @@ Speak to the owner in Russian. Keep schemas, enums, packet fields and paths
 canonical in English.
 
 Never end with a conditional backlog. One execution unit maximum per cycle.
+KILL/STOP is a complete useful result.
 
 ## Model effort
 

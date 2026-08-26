@@ -5,7 +5,6 @@ from __future__ import annotations
 
 import argparse
 import json
-import os
 import sys
 import uuid
 from collections.abc import Mapping
@@ -59,6 +58,10 @@ from solana_alpha_lab.factory.fast_lane_snapshot import (  # noqa: E402
     export_snapshot,
     restore_snapshot,
 )
+from solana_alpha_lab.factory.data_root import (  # noqa: E402
+    DataRootError,
+    resolve_data_root,
+)
 from solana_alpha_lab.factory.document_runner import (  # noqa: E402
     DocumentRunner,
     ExperimentRunnerError,
@@ -86,23 +89,6 @@ def parse_as_of(value: str) -> datetime:
         return datetime.fromisoformat(value.replace("Z", "+00:00")).astimezone(UTC)
     except ValueError as exc:
         raise FastLaneCliError("AS_OF_INVALID") from exc
-
-
-def resolve_data_root(root: Path) -> Path:
-    raw = os.environ.get("SMIAL_DATA_ROOT")
-    candidate = Path(raw) if raw else root / "local/factory_v1/data_plane"
-    if not candidate.is_absolute():
-        candidate = candidate.resolve()
-    if candidate.is_symlink():
-        raise FastLaneCliError("DATA_ROOT_INVALID")
-    try:
-        candidate.mkdir(parents=True, exist_ok=True)
-        resolved = candidate.resolve(strict=True)
-    except OSError as exc:
-        raise FastLaneCliError("DATA_ROOT_UNAVAILABLE") from exc
-    if not resolved.is_dir():
-        raise FastLaneCliError("DATA_ROOT_INVALID")
-    return resolved
 
 
 def load_packet(path: Path) -> dict[str, Any]:
@@ -623,7 +609,7 @@ def cmd_rebuild_projection(data_root: Path) -> int:
     return emit(execute_rebuild_projection(data_root))
 
 
-def cmd_commission_offline(root: Path, data_root: Path, packet_path: Path) -> int:
+def execute_commission_offline(root: Path, data_root: Path, packet_path: Path) -> dict[str, Any]:
     publish_commissioning_dataset(data_root)
     git_before = repository_git_snapshot(root)
     submit_payload = execute_submit(
@@ -755,7 +741,11 @@ def cmd_commission_offline(root: Path, data_root: Path, packet_path: Path) -> in
         },
         "cold_copy_proof": cold_copy_proof,
     }
-    return emit(payload)
+    return payload
+
+
+def cmd_commission_offline(root: Path, data_root: Path, packet_path: Path) -> int:
+    return emit(execute_commission_offline(root, data_root, packet_path))
 
 
 def cmd_backup_export(data_root: Path, destination: Path) -> int:
@@ -876,7 +866,10 @@ def main(argv: list[str] | None = None) -> int:
     parser = build_parser()
     args = parser.parse_args(argv)
     root = args.root.resolve()
-    data_root = resolve_data_root(root)
+    try:
+        data_root = resolve_data_root(root)
+    except DataRootError as exc:
+        return emit_error(str(exc))
     try:
         if args.command == "doctor":
             return cmd_doctor(root, data_root)

@@ -2768,6 +2768,26 @@
       "target_asset_id": "TEST-HYPOTHESIS-FAST-LANE-ACCEPTANCE-001"
     },
     {
+      "source_asset_id": "CTRL-HYPOTHESIS-FORGE-OPERATIONAL-CLOSURE-001",
+      "relation": "depends_on",
+      "target_asset_id": "MODULE-FACTORY-V1-HFIC-SESSION-001"
+    },
+    {
+      "source_asset_id": "CTRL-HYPOTHESIS-FORGE-OPERATIONAL-CLOSURE-001",
+      "relation": "depends_on",
+      "target_asset_id": "SCRIPT-HYPOTHESIS-FORGE-001"
+    },
+    {
+      "source_asset_id": "CTRL-HYPOTHESIS-FORGE-OPERATIONAL-CLOSURE-001",
+      "relation": "governed_by",
+      "target_asset_id": "CTRL-HYPOTHESIS-FAST-LANE-001"
+    },
+    {
+      "source_asset_id": "CTRL-HYPOTHESIS-FORGE-OPERATIONAL-CLOSURE-001",
+      "relation": "validated_by",
+      "target_asset_id": "TEST-HFIC-OPERATIONAL-CLOSURE-001"
+    },
+    {
       "source_asset_id": "CTRL-IN-SCOPE-POPULATION-AND-STATE-DISCOVERY-001",
       "relation": "contains",
       "target_asset_id": "CONFIG-IN-SCOPE-POPULATION-AND-STATE-DISCOVERY-001"
@@ -8993,6 +9013,16 @@
       "target_asset_id": "CTRL-FRESH-OOS-BASELINE-VS-FRICTION-VETO-001"
     },
     {
+      "source_asset_id": "MODULE-FACTORY-V1-HFIC-SESSION-001",
+      "relation": "depends_on",
+      "target_asset_id": "MODULE-FACTORY-V1-RESEARCH-STORE-001"
+    },
+    {
+      "source_asset_id": "MODULE-FACTORY-V1-HFIC-SESSION-001",
+      "relation": "governed_by",
+      "target_asset_id": "CTRL-HYPOTHESIS-FORGE-OPERATIONAL-CLOSURE-001"
+    },
+    {
       "source_asset_id": "MODULE-FACTORY-V1-LANE-CLASSIFIER-001",
       "relation": "depends_on",
       "target_asset_id": "CONFIG-EXPERIMENT-CAPABILITY-REGISTRY-FAST-LANE-001"
@@ -11403,6 +11433,26 @@
       "target_asset_id": "CTRL-QUOTE-SURFACE-RETENTION-FALSIFIER-001"
     },
     {
+      "source_asset_id": "SCHEMA-HYPOTHESIS-CRITIC-RESULT-V1-001",
+      "relation": "governed_by",
+      "target_asset_id": "CTRL-HYPOTHESIS-FORGE-OPERATIONAL-CLOSURE-001"
+    },
+    {
+      "source_asset_id": "SCHEMA-HYPOTHESIS-FORGE-DRAFT-V1-001",
+      "relation": "governed_by",
+      "target_asset_id": "CTRL-HYPOTHESIS-FORGE-OPERATIONAL-CLOSURE-001"
+    },
+    {
+      "source_asset_id": "SCHEMA-HYPOTHESIS-FORGE-SESSION-RECEIPT-V1-001",
+      "relation": "governed_by",
+      "target_asset_id": "CTRL-HYPOTHESIS-FORGE-OPERATIONAL-CLOSURE-001"
+    },
+    {
+      "source_asset_id": "SCHEMA-HYPOTHESIS-FORGE-SYNTHESIS-HANDOFF-V1-1-001",
+      "relation": "governed_by",
+      "target_asset_id": "CTRL-HYPOTHESIS-FORGE-OPERATIONAL-CLOSURE-001"
+    },
+    {
       "source_asset_id": "SCHEMA-OWNER-AUTHORITY-PACKET-001",
       "relation": "governed_by",
       "target_asset_id": "CONTRACT-OWNER-AUTHORITY-PACKET-001"
@@ -12136,6 +12186,21 @@
       "source_asset_id": "SCRIPT-HYPOTHESIS-FAST-LANE-001",
       "relation": "governed_by",
       "target_asset_id": "CTRL-HYPOTHESIS-FAST-LANE-001"
+    },
+    {
+      "source_asset_id": "SCRIPT-HYPOTHESIS-FORGE-001",
+      "relation": "depends_on",
+      "target_asset_id": "MODULE-FACTORY-V1-HFIC-SESSION-001"
+    },
+    {
+      "source_asset_id": "SCRIPT-HYPOTHESIS-FORGE-001",
+      "relation": "depends_on",
+      "target_asset_id": "MODULE-FACTORY-V1-RESEARCH-STORE-001"
+    },
+    {
+      "source_asset_id": "SCRIPT-HYPOTHESIS-FORGE-001",
+      "relation": "governed_by",
+      "target_asset_id": "CTRL-HYPOTHESIS-FORGE-OPERATIONAL-CLOSURE-001"
     },
     {
       "source_asset_id": "SCRIPT-IN-SCOPE-POPULATION-FIT-RECONCILIATION-001",
@@ -13146,6 +13211,16 @@
       "source_asset_id": "TEST-FRESH-OOS-BASELINE-VS-FRICTION-VETO-001",
       "relation": "depends_on",
       "target_asset_id": "MODULE-FACTORY-V1-FRICTION-VETO-001"
+    },
+    {
+      "source_asset_id": "TEST-HFIC-OPERATIONAL-CLOSURE-001",
+      "relation": "depends_on",
+      "target_asset_id": "SCRIPT-HYPOTHESIS-FORGE-001"
+    },
+    {
+      "source_asset_id": "TEST-HFIC-OPERATIONAL-CLOSURE-001",
+      "relation": "governed_by",
+      "target_asset_id": "CTRL-HYPOTHESIS-FORGE-OPERATIONAL-CLOSURE-001"
     },
     {
       "source_asset_id": "TEST-HYPOTHESIS-FAST-LANE-ACCEPTANCE-001",

@@ -8,9 +8,11 @@
 
 **Режим:** discovery и design only. Генерация не запускает эксперимент, не меняет Git, не создаёт branch/PR, не вызывает market/provider API/RPC/WSS, не тратит деньги и не получает торговых полномочий.
 
-**Версия промпта:** `HFIC-V1.0`
+**Версия промпта:** `HFIC-V1.1` (исторические пакеты `HFIC-V1.0` остаются читаемыми).
+Display ordinal (`C1`/`C2`/…) is display-only. Canonical `candidate_id` is assigned
+by `freeze`, not by the model.
 
-**Целевая эксплуатационная точка:** после успешного commissioning `HYPOTHESIS_FAST_LANE_OFFLINE_V1`. До commissioning документ можно использовать только для формирования и критики design-пакетов.
+**Целевая эксплуатационная точка:** `/hypothesis-forge` → `scripts/hypothesis_forge.py preflight` → bounded draft → `freeze` → isolated Critic → `finalize`. До commissioning preflight сам выполняет безопасный offline Fast Lane commissioning.
 
 ---
 
@@ -270,7 +272,8 @@ whether resolving it changes a real decision
 Для каждого кандидата заполни:
 
 ```text
-candidate_id
+display_ordinal (display-only; freeze assigns HFIC-CAND-*)
+label
 one_sentence_claim
 novelty_class: NEW_MECHANISM | NEW_STATE_INTERACTION | NEW_MEASUREMENT | REFORMULATION | DUPLICATE
 nearest_prior_hypotheses_and_terminals
