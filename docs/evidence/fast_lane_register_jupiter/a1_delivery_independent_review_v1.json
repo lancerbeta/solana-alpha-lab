@@ -1,0 +1,37 @@
+{
+  "schema": "smial.delivery-independent-review-evidence",
+  "schema_version": "1.0",
+  "review_id": "FAST-LANE-REGISTER-JUPITER-INDEPENDENT-REVIEW-001",
+  "as_of": "2026-08-26",
+  "task_id": "FAST_LANE_REGISTER_JUPITER_BOUNDED_CAPTURE_V1",
+  "reviewed_bindings_sha256": "67c835a87ff8267e319200236f164b821266348492e91a6cf92fefb3a974a3f3",
+  "reviewed_inventory_sha256": "8e27b136037a8816f67c15692c1b624d964696b9b079ca4bb585d9a8e6cbfb32",
+  "required_roles": [
+    "ARCHITECTURE_CRITIC",
+    "CODE_REVIEWER",
+    "GOAL_DOD_CRITIC"
+  ],
+  "reviews": [
+    {
+      "role": "ARCHITECTURE_CRITIC",
+      "verdict": "PASS",
+      "findings": []
+    },
+    {
+      "role": "CODE_REVIEWER",
+      "verdict": "PASS",
+      "findings": []
+    },
+    {
+      "role": "GOAL_DOD_CRITIC",
+      "verdict": "PASS",
+      "findings": []
+    }
+  ],
+  "verdict": "PASS",
+  "non_claims": [
+    "NO_CRYPTOGRAPHIC_REVIEWER_IDENTITY",
+    "NO_TWO_RUNG_EXECUTION",
+    "NO_LIVE_PROVIDER_CALLS"
+  ]
+}

@@ -32053,7 +32053,7 @@ records:
   as_of: '2026-08-25'
   truth_owner: HYPOTHESIS_FAST_LANE_AND_RESEARCH_DATA_PLANE_V1
   location: {kind: git_path, logical_uri: 'repo://tests/test_fast_lane_classifier.py', repository_path: tests/test_fast_lane_classifier.py}
-  integrity: {kind: sha256, sha256: 838d67995ef3bf46f5f9721989cff8205c743ea702b208dddb67d43aa291f0ef}
+  integrity: {kind: sha256, sha256: 669f0222e6b0e58be3f249c23f40eb1a2c81271ffed09560cee1971427aee2c8}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: governed_by, target_asset_id: CTRL-HYPOTHESIS-FAST-LANE-001}

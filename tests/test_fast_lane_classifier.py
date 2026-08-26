@@ -441,6 +441,29 @@ class FastLaneContractTests(unittest.TestCase):
         self.assertEqual(decision.reason_codes, ("OWNER_AUTHORITY_REQUIRED",))
         self.assertEqual(decision.next_action, "PROVIDE_EXACT_OWNER_AUTHORITY")
 
+    def test_two_rung_commissioning_packet_reaches_owner_gate_without_provider_entrypoint(
+        self,
+    ) -> None:
+        packet = json.loads(
+            (
+                ROOT
+                / "tests/fixtures/fast_lane/two_rung_live_h900_classify_packet_v1.json"
+            ).read_text(encoding="utf-8")
+        )
+        with patch(
+            "solana_alpha_lab.factory.capabilities.capture_quote_native_free_key"
+        ) as capture:
+            decision = self.classify(packet)
+        capture.assert_not_called()
+        self.assertIs(decision.lane, Lane.FAST_LANE)
+        self.assertEqual(decision.terminal, "FAST_LANE_OWNER_GATE_REQUIRED")
+        self.assertEqual(decision.reason_codes, ("OWNER_AUTHORITY_REQUIRED",))
+        self.assertEqual(decision.next_action, "PROVIDE_EXACT_OWNER_AUTHORITY")
+        self.assertEqual(
+            packet["experiment_spec"]["evidence_budget"]["provider_api_rpc_wss_calls"],
+            60,
+        )
+
     def test_offline_capability_rejects_requested_provider_calls(self) -> None:
         packet = submission()
         packet["experiment_spec"]["evidence_budget"][  # type: ignore[index]

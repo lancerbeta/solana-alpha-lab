@@ -1,0 +1,34 @@
+{
+  "schema": "smial.delivery-harness-factory-fit",
+  "schema_version": "1.0",
+  "review_id": "FAST-LANE-REGISTER-JUPITER-FACTORY-FIT-001",
+  "as_of": "2026-08-26",
+  "task_id": "FAST_LANE_REGISTER_JUPITER_BOUNDED_CAPTURE_V1",
+  "reviewed_bindings_sha256": "67c835a87ff8267e319200236f164b821266348492e91a6cf92fefb3a974a3f3",
+  "reviewed_inventory_sha256": "8e27b136037a8816f67c15692c1b624d964696b9b079ca4bb585d9a8e6cbfb32",
+  "mode": "FULL_REVIEW",
+  "verdict": "PASS",
+  "dimensions": {
+    "mission": "PASS",
+    "flexibility_and_history": "PASS",
+    "context_efficiency": "PASS",
+    "research_truth": "PASS",
+    "owner_operability": "PASS",
+    "execution_to_cashflow": "PASS",
+    "monitoring_and_recovery": "PASS",
+    "build_vs_buy": "PASS",
+    "security": "PASS",
+    "red_team": "PASS"
+  },
+  "capability_radar": {
+    "now": "NONE",
+    "watch": "TWO_RUNG_OWNER_AUTHORITY_AFTER_MERGE"
+  },
+  "recovery": "REVERT",
+  "limits": [
+    "NO_TWO_RUNG_EXECUTION",
+    "NO_LIVE_PROVIDER_CALLS",
+    "RETENTION_62_CALL_BUDGET_OUT_OF_SCOPE",
+    "NO_CANONICAL_DONE"
+  ]
+}
