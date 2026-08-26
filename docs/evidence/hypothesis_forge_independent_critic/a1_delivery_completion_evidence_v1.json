@@ -9,7 +9,7 @@
   "cloud_bundle_smoke_required": false,
   "factory_fit": {
     "path": "docs/evidence/hypothesis_forge_independent_critic/a1_delivery_factory_fit_v1.json",
-    "sha256": "525164e5aa8575b347d7a18af682e91d48da77f43c2b3dccd4d415d5b0cffa87",
+    "sha256": "22870a2b7b0eca570ef8f5607fe54770008f0ccaef2c3172985de63094c94879",
     "verdict": "PASS"
   },
   "implementation_bindings": {
@@ -21,10 +21,11 @@
     "catalog/schemas/hypothesis_forge_synthesis_handoff_v1.schema.json": "f4964d610f2822939a19c7e422f4aaacf3793c956ebba8e17db15d9695c238cf",
     "configs/hypothesis_forge_independent_critic_v1.yaml": "f0478b98dee336841511482e61ca137363d91bd3d24ae8967c0f8e362f1f0be8",
     "docs/operator/HYPOTHESIS_FORGE_AND_INDEPENDENT_CRITIC_OPERATOR_V1.md": "86a2e31c65d92cdd635a5c20531a74f340d01c32d594aecf2880d4e055591841",
-    "docs/tasks/HYPOTHESIS_FORGE_AND_INDEPENDENT_CRITIC_V1.md": "55425950aae2119e94600e70bbb823a3550ee24dc3d1037bd71e31522fb0294c",
+    "docs/tasks/HYPOTHESIS_FORGE_AND_INDEPENDENT_CRITIC_V1.md": "efb3a12a4a1914a79e117334764c2194045b53bc57872117ed0d6f5dbf1c027a",
     "tests/fixtures/hypothesis_forge/critic_input_packet_valid_v1.json": "4f98272c58a94e52e25b7c116047fe2bfaee9a410f4ffeb5cc77fb1334e7c876",
     "tests/fixtures/hypothesis_forge/synthesis_handoff_complete_v1.json": "5ee92dca0b7cfd541a974c1cde6ebbb7d3e5103f9022c9878766fb9dc58b91b4",
     "tests/fixtures/hypothesis_forge/synthesis_handoff_pending_critic_v1.json": "cb386f4d2601caf4c517406d174fd081ed325021279480831a818283515f3a91",
+    "tests/test_delivery_harness_adapters.py": "bf9aebca28bcc51fba4abc2a2c098ef2defc7cf04c347bc701f919f41893f631",
     "tests/test_hypothesis_forge_independent_critic_v1.py": "a56e40ab85cf5da5e3e9b25c258fc8336c7c28554959506e5a52f04fc56ef1f4"
   },
   "non_claims": [
@@ -57,7 +58,7 @@
     "github_ci": "ENFORCED_LIVE_AT_GUARDED_MERGE",
     "independent_review": {
       "path": "docs/evidence/hypothesis_forge_independent_critic/a1_delivery_independent_review_v1.json",
-      "sha256": "e5c511295d8f1e2a57d8f3b8cf41d251d6859ce8049c018109bb65229a0cb355",
+      "sha256": "8c3766405b2a60bbd8a6edf64b7bf1c51817e11af0c410df723136848d9d8570",
       "verdict": "PASS"
     },
     "project_checks": [
