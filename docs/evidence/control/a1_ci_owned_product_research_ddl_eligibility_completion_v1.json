@@ -1,0 +1,61 @@
+{
+  "schema": "smial.delivery-completion-evidence",
+  "schema_version": "1.0",
+  "acceptance_id": "CI-OWNED-PRODUCT-RESEARCH-DDL-ELIGIBILITY-COMPLETION-001",
+  "as_of": "2026-08-26",
+  "task_id": "CTRL-CI-OWNED-PRODUCT-RESEARCH-DDL-ELIGIBILITY-V1",
+  "state_change": "ADMIT_EXACT_PRODUCT_RESEARCH_MEMORY_DDL_TO_CI_OWNED",
+  "base_main": "016904b4991a0c8f3e81daf821de90eebf0cea79",
+  "cloud_bundle_mode": "OWNER_MANAGED_OPTIONAL_EXPORT",
+  "cloud_bundle_required_by_harness": false,
+  "cloud_bundle_smoke_required": false,
+  "capability_radar_now": "NONE",
+  "implementation_bindings": {
+    "catalog/assets/core.yaml": "61f81f9033256c7181b44448c9e12d000fbbc847e2e855858d602c8e1b6af348",
+    "delivery-harness/harness.yaml": "969882a93b79d2fb45a75fe368ecc9c3c43983153d704eff6eea3938b50f9c2a",
+    "docs/agent/EXECUTION_ROUTER_PROTOCOL.md": "c249d5085b849c0837d7ee02b137563985ebea6f7beaa4a7710f43def406813c",
+    "docs/evidence/control/delivery_harness_acceptance_v1.json": "a0c75858aff8a9fd97d0929473ac92d1f6757196423fd30c8f9bd1e1446e6db7",
+    "docs/tasks/CTRL-CI-OWNED-PRODUCT-RESEARCH-DDL-ELIGIBILITY-V1.md": "38dfabf79ba1fa02ecd9c44b2910b7aa78b0a077cd080476b31bee325427fc70",
+    "scripts/validate_ci.py": "125d7e766936b589af53709887c1572fa4acfb6da9bf16196a8945918e7c837e",
+    "tests/test_ci.py": "c5ead77ff5dc794cbfdaae2fd5502754ef50ebc686be264a335481903a0680e4"
+  },
+  "active_stop_conditions": [],
+  "owner_attention_triggers": {
+    "auth_or_access_recovery": false,
+    "material_owner_decision": false,
+    "user_only_activation": false,
+    "external_material_action": false,
+    "unresolved_safety_or_truth_conflict": false
+  },
+  "factory_fit": {
+    "path": "docs/evidence/control/a1_ci_owned_product_research_ddl_eligibility_factory_fit_v1.json",
+    "sha256": "b2810c70caf646d5eeef75ded5973ea2607d11f47a5c19147b7d14d0dd6ef0d0",
+    "verdict": "PASS"
+  },
+  "validation": {
+    "targeted": "PASS_CI_OWNED_PRODUCT_RESEARCH_DDL_ELIGIBILITY_TESTS",
+    "independent_review": {
+      "path": "docs/evidence/control/a1_ci_owned_product_research_ddl_eligibility_review_v1.json",
+      "sha256": "cd0ae1310cbcb4afafef7ff7664c88f0e61c53e4f1a1bb55854bbc7ef2e2ad77",
+      "verdict": "PASS"
+    },
+    "full_gate": "ENFORCED_BY_PROJECT_BOUND_VALIDATION",
+    "github_ci": "ENFORCED_LIVE_AT_GUARDED_MERGE",
+    "project_checks": [
+      "PASS_CI_OWNED_PRODUCT_RESEARCH_DDL_ELIGIBILITY_TESTS"
+    ]
+  },
+  "non_claims": [
+    "NO_CANONICAL_DONE",
+    "NO_PRODUCT_ACCEPTANCE",
+    "NO_FAST_LANE_BEHAVIOR_CHANGE"
+  ],
+  "side_effects": {
+    "cash_spend_usd_cents": 0,
+    "credential_reads": 0,
+    "fallbacks": 0,
+    "provider_requests": 0,
+    "retries": 0,
+    "wallet_signer_transaction_actions": 0
+  }
+}

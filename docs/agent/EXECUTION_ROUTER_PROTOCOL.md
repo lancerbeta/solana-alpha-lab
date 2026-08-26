@@ -64,9 +64,13 @@ The exact pilot command retained for policy verification is
 fourth before keep/repair/rollback. A missed clean-checkout defect falls back
 to `--tracked-only-delivery`.
 Product `catalog/schemas/task*_*.schema.json`,
-`provider_route_capability_registry*.schema.json`, and mechanical
-`tests/test_catalog.py` inventory updates are eligible for the focused
-primary. Meta/harness catalog schemas (`asset_catalog.schema.json`,
+`provider_route_capability_registry*.schema.json`, mechanical
+`tests/test_catalog.py` inventory updates, and the exact product
+research-memory projection DDL
+`schemas/research_memory_projection_v1.sql` are eligible for the focused
+primary. Repo-root `schemas/` stays a deny prefix except that exact
+allowlist; `schemas/schema_v1.sql` and unnamed `schemas/*` SQL remain
+ineligible. Meta/harness catalog schemas (`asset_catalog.schema.json`,
 `catalog_manifest.schema.json`, `lifecycle_registry.schema.json`,
 `delivery_harness*.schema.json`, `owner_attention_gate_v2.schema.json`,
 `project_sources_release_registry.schema.json`, and other

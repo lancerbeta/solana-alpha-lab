@@ -98,6 +98,11 @@ CI_OWNED_INELIGIBLE_CATALOG_SCHEMA_NAMES = frozenset(
     }
 )
 CI_OWNED_CATALOG_SCHEMAS_PREFIX = "catalog/schemas/"
+CI_OWNED_ELIGIBLE_PRODUCT_RESEARCH_DDL_PATHS = frozenset(
+    {
+        "schemas/research_memory_projection_v1.sql",
+    }
+)
 SANDBOX_UV_CACHE_MARKER = "cursor-sandbox-cache"
 DELIVERY_SKIP_CALL = re.compile(
     r"(?:\.skipTest\s*\(|@(?:unittest\.)?skip(?:If|Unless)?\s*\("
@@ -144,6 +149,12 @@ def ci_owned_ineligible_catalog_schema(path: str) -> bool:
     if name in CI_OWNED_INELIGIBLE_CATALOG_SCHEMA_NAMES:
         return True
     return name.startswith("delivery_harness") and name.endswith(".schema.json")
+
+
+def ci_owned_eligible_product_research_ddl(path: str) -> bool:
+    """Admit named product research-memory DDL; keep blanket schemas/ ineligible."""
+
+    return path in CI_OWNED_ELIGIBLE_PRODUCT_RESEARCH_DDL_PATHS
 
 
 def utc_now() -> str:
@@ -342,6 +353,8 @@ def validate_ci_owned_delivery_eligibility(
             violations.append(f"unsafe:{raw_path}")
             continue
         normalized.append(path)
+        if ci_owned_eligible_product_research_ddl(path):
+            continue
         if (
             path in CI_OWNED_INELIGIBLE_EXACT_PATHS
             or path.startswith(CI_OWNED_INELIGIBLE_PREFIXES)
