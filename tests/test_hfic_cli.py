@@ -23,11 +23,7 @@ def run_cli(*args: str, data_root: Path, env: dict[str, str] | None = None) -> s
     merged["SMIAL_DATA_ROOT"] = str(data_root)
     return subprocess.run(
         [
-            "uv",
-            "run",
-            "--locked",
-            "--managed-python",
-            "python",
+            sys.executable,
             "-B",
             str(CLI),
             "--root",
