@@ -1,0 +1,35 @@
+{
+  "schema": "smial.delivery-independent-review-evidence",
+  "schema_version": "1.0",
+  "review_id": "CI-OWNED-HFIC-CURSOR-COMMAND-ELIGIBILITY-REVIEW-001",
+  "as_of": "2026-08-26",
+  "task_id": "CTRL-CI-OWNED-HFIC-CURSOR-COMMAND-ELIGIBILITY-V1",
+  "reviewed_bindings_sha256": "97187f1c92df717e4b8652e4f28fe4ceef5d773f70bd375ddc1c425dcee8a025",
+  "reviewed_inventory_sha256": "e1e544d6b9deee7a0989263decc81e179f0411389607646ffef34f20e0e85051",
+  "required_roles": [
+    "CODE_REVIEWER",
+    "GOAL_DOD_CRITIC",
+    "ARCHITECTURE_CRITIC"
+  ],
+  "reviews": [
+    {
+      "role": "CODE_REVIEWER",
+      "verdict": "PASS",
+      "findings": []
+    },
+    {
+      "role": "GOAL_DOD_CRITIC",
+      "verdict": "PASS",
+      "findings": []
+    },
+    {
+      "role": "ARCHITECTURE_CRITIC",
+      "verdict": "PASS",
+      "findings": []
+    }
+  ],
+  "verdict": "PASS",
+  "non_claims": [
+    "NO_CRYPTOGRAPHIC_REVIEWER_IDENTITY"
+  ]
+}

@@ -70,7 +70,11 @@ research-memory projection DDL
 `schemas/research_memory_projection_v1.sql` are eligible for the focused
 primary. Repo-root `schemas/` stays a deny prefix except that exact
 allowlist; `schemas/schema_v1.sql` and unnamed `schemas/*` SQL remain
-ineligible. Meta/harness catalog schemas (`asset_catalog.schema.json`,
+ineligible. The exact HFIC product slash commands
+`.cursor/commands/hypothesis-forge.md` and
+`.cursor/commands/independent-hypothesis-critic.md` are eligible for the
+focused primary. Blanket `.cursor/**` stays a deny prefix except that exact
+allowlist. Meta/harness catalog schemas (`asset_catalog.schema.json`,
 `catalog_manifest.schema.json`, `lifecycle_registry.schema.json`,
 `delivery_harness*.schema.json`, `owner_attention_gate_v2.schema.json`,
 `project_sources_release_registry.schema.json`, and other

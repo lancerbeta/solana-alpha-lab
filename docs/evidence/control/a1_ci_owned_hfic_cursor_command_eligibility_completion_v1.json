@@ -1,0 +1,61 @@
+{
+  "schema": "smial.delivery-completion-evidence",
+  "schema_version": "1.0",
+  "acceptance_id": "CI-OWNED-HFIC-CURSOR-COMMAND-ELIGIBILITY-COMPLETION-001",
+  "as_of": "2026-08-26",
+  "task_id": "CTRL-CI-OWNED-HFIC-CURSOR-COMMAND-ELIGIBILITY-V1",
+  "state_change": "ADMIT_EXACT_HFIC_CURSOR_COMMANDS_TO_CI_OWNED",
+  "base_main": "e1c8c3f4f31707fa2ae2de7b161e5954f517fd7a",
+  "cloud_bundle_mode": "OWNER_MANAGED_OPTIONAL_EXPORT",
+  "cloud_bundle_required_by_harness": false,
+  "cloud_bundle_smoke_required": false,
+  "capability_radar_now": "NONE",
+  "implementation_bindings": {
+    "catalog/assets/core.yaml": "d5f57554cf6ce8011218eedb5c64b2e606c438d0fd96fc44bca19604bd0fc369",
+    "delivery-harness/harness.yaml": "0dce36aea96af67c281acc120303eba1188e1c53f104c0bd610e4b2ad6647add",
+    "docs/agent/EXECUTION_ROUTER_PROTOCOL.md": "df9950ee4e4a61f3007111c06b48861f60fd1aaa9fc55a38fdaac46ec384acec",
+    "docs/evidence/control/delivery_harness_acceptance_v1.json": "cc36dc7b70f6bc233dbfe9ecf6528d3c27197ce99f71be8d595112d3e980abcb",
+    "docs/tasks/CTRL-CI-OWNED-HFIC-CURSOR-COMMAND-ELIGIBILITY-V1.md": "4c2184cdc766e85bfb68e1883ff7e836f1ddc4e5f8277b76a382205f8fe9c5e0",
+    "scripts/validate_ci.py": "83373dc958bf26b99d16daf60b5fa98cc1034772bc50f50d8d735b357ed964ca",
+    "tests/test_ci.py": "ea761bdd478f7b566c6d40f8e76e642a79de50025617ced8bb68edd5657d763d"
+  },
+  "active_stop_conditions": [],
+  "owner_attention_triggers": {
+    "auth_or_access_recovery": false,
+    "material_owner_decision": false,
+    "user_only_activation": false,
+    "external_material_action": false,
+    "unresolved_safety_or_truth_conflict": false
+  },
+  "factory_fit": {
+    "path": "docs/evidence/control/a1_ci_owned_hfic_cursor_command_eligibility_factory_fit_v1.json",
+    "sha256": "ea4e0f06c92e5f94d7733d9c51b9e836a03d7085c54ebb99662c14f43b0ac78e",
+    "verdict": "PASS"
+  },
+  "validation": {
+    "targeted": "PASS_CI_OWNED_HFIC_CURSOR_COMMAND_ELIGIBILITY_TESTS",
+    "independent_review": {
+      "path": "docs/evidence/control/a1_ci_owned_hfic_cursor_command_eligibility_review_v1.json",
+      "sha256": "75f2143963686fb0bfe759a5a666942103c8fcf4fde0fc9be7545f0ca9dcf142",
+      "verdict": "PASS"
+    },
+    "full_gate": "ENFORCED_BY_PROJECT_BOUND_VALIDATION",
+    "github_ci": "ENFORCED_LIVE_AT_GUARDED_MERGE",
+    "project_checks": [
+      "PASS_CI_OWNED_HFIC_CURSOR_COMMAND_ELIGIBILITY_TESTS"
+    ]
+  },
+  "non_claims": [
+    "NO_CANONICAL_DONE",
+    "NO_PRODUCT_ACCEPTANCE",
+    "NO_HFIC_BEHAVIOR_CHANGE"
+  ],
+  "side_effects": {
+    "cash_spend_usd_cents": 0,
+    "credential_reads": 0,
+    "fallbacks": 0,
+    "provider_requests": 0,
+    "retries": 0,
+    "wallet_signer_transaction_actions": 0
+  }
+}
