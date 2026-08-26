@@ -1,6 +1,6 @@
 ---
 name: hypothesis-forge
-description: Manual Hypothesis Forge for Solana Alpha Lab under MANUAL_FALLBACK_UNTIL_GENERATOR. Use only when the owner explicitly invokes /hypothesis-forge. Runs executable preflight → freeze → isolated Critic → finalize. No Git mutation, provider calls, experiment execution or autonomous generator.
+description: Manual Hypothesis Forge for Solana Alpha Lab under MANUAL_FALLBACK_UNTIL_GENERATOR. Use only when the owner explicitly invokes /hypothesis-forge. Runs executable preflight → freeze → isolated Critic → optional revise/classify → finalize. No Git mutation, provider calls, experiment execution or autonomous generator.
 ---
 
 # Hypothesis Forge
@@ -39,9 +39,11 @@ Happy path — no owner copy/paste between the slash command and the final termi
    - `RESUME_CRITIC` → use `critic_input_packet` from the preflight JSON
      (canonical frozen bytes); do not generate.
    - `RESUME_FINALIZE` → run finalize only.
-   - `RESUME_REVISE` → apply exactly one bounded revision, then isolated Critic.
-   - `RESUME_CLASSIFY` → schema-valid ExperimentSpec + network-free `classify_lane()`,
-     then finalize. `PASS_TO_CLASSIFICATION` is not complete.
+   - `RESUME_REVISE` → `python -B scripts/hypothesis_forge.py revise` (exactly one
+     bounded revision), then isolated Critic again. Do not freeze a new search.
+   - `RESUME_CLASSIFY` → `python -B scripts/hypothesis_forge.py classify` with a
+     schema-valid ExperimentSpec (network-free `classify_lane()`), then finalize.
+     `PASS_TO_CLASSIFICATION` is not complete.
    - `STOP` → report the named terminal; stop.
    - `START_NEW_SESSION` → continue.
 3. Only for `START_NEW_SESSION`, run **PROMPT A** from the operator pack using
@@ -56,9 +58,15 @@ Happy path — no owner copy/paste between the slash command and the final termi
 6. **Mandatory auto-handoff:** launch Independent Critic in a new isolated context
    with only the frozen packet. Do not persist from Critic.
 7. After critic returns `hypothesis_critic_result_v1`:
-   - `REVISE_ONCE` → persist intermediate; one revision; second Critic must PASS/KILL.
-   - `PASS_TO_CLASSIFICATION` → persist intermediate; run classifier; then finalize.
-   - `KILL_*` / `NO_WORTHY_HYPOTHESIS` → `finalize`.
+   - `REVISE_ONCE` → `python -B scripts/hypothesis_forge.py finalize` persists
+     `REVISION_REQUIRED`; then `python -B scripts/hypothesis_forge.py revise`
+     (one claim-wording repair); then isolated Critic again; second terminal
+     must be PASS/KILL, never a second `REVISE_ONCE`.
+   - `PASS_TO_CLASSIFICATION` → `python -B scripts/hypothesis_forge.py finalize`
+     persists `AWAITING_CLASSIFICATION`; then
+     `python -B scripts/hypothesis_forge.py classify`; then finalize. This is
+     not a completed terminal.
+   - `KILL_*` / `NO_WORTHY_HYPOTHESIS` → `python -B scripts/hypothesis_forge.py finalize`.
    Fake/nonempty classifier objects are invalid. Final `PASS_*` requires a live
    network-free classifier receipt bound to session/selected/spec hash.
 8. Verify `SYNTHESIS_COMPLETE` / RDP receipt, Git mutation 0, provider calls 0

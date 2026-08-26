@@ -114,12 +114,11 @@ class CommissioningProofTests(unittest.TestCase):
             self.assertEqual(str(raised.exception), "FAST_LANE_NOT_COMMISSIONED")
 
     def test_unrelated_store_records_do_not_prove_commissioning(self) -> None:
-        from solana_alpha_lab.factory.document_runner import repository_git_snapshot
         from solana_alpha_lab.factory.research_store import RecordKind, ResearchEvent, ResearchStore
 
         with tempfile.TemporaryDirectory() as tmp:
             store = ResearchStore(Path(tmp))
-            git = repository_git_snapshot(ROOT)
+            git_head = "0" * 40
             now = __import__("datetime").datetime(1970, 1, 1, tzinfo=__import__("datetime").UTC)
             payload = {
                 "hypothesis_version_id": "HYP-UNRELATED-001",
@@ -142,7 +141,7 @@ class CommissioningProofTests(unittest.TestCase):
                         payload_sha256=__import__("hashlib").sha256(encoded.encode()).hexdigest(),
                         schema_version="1.0",
                         producer_capability_id="CAP-OFFLINE-CANONICAL-RECEIPT-REPLAY-001",
-                        producer_git_sha=git.head_sha,
+                        producer_git_sha=git_head,
                         created_at=now,
                     )
                 ],

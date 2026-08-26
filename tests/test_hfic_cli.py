@@ -95,6 +95,8 @@ class HficCliContractTests(unittest.TestCase):
                     "START_NEW_SESSION",
                     "RESUME_CRITIC",
                     "RESUME_FINALIZE",
+                    "RESUME_REVISE",
+                    "RESUME_CLASSIFY",
                     "RETURN_EXISTING_SESSION",
                     "STOP",
                 })

@@ -126,6 +126,8 @@ class HficOperationalClosureContractTests(unittest.TestCase):
         self.assertIn("FORGE_DRAFT", text)
         self.assertIn("RESUME_REVISE", text)
         self.assertIn("RESUME_CLASSIFY", text)
+        self.assertIn("hypothesis_forge.py revise", text)
+        self.assertIn("hypothesis_forge.py classify", text)
         self.assertNotRegex(text, re.compile(r"Execute \*\*PROMPT A\*\* from the operator pack \(`HFIC-V1\.0`\)"))
 
     def test_critic_skill_returns_result_schema_and_does_not_persist(self) -> None:
@@ -137,6 +139,8 @@ class HficOperationalClosureContractTests(unittest.TestCase):
     def test_slash_command_happy_path_is_single_owner_action(self) -> None:
         text = FORGE_COMMAND_PATH.read_text(encoding="utf-8")
         self.assertIn("preflight", text)
+        self.assertIn("revise", text)
+        self.assertIn("classify", text)
         self.assertIn("no owner copy/paste", text.casefold())
 
     def test_operator_pack_mentions_v1_1_and_keeps_prompts(self) -> None:
@@ -148,6 +152,8 @@ class HficOperationalClosureContractTests(unittest.TestCase):
         self.assertIn("display-only", text.casefold())
         self.assertIn("FORGE_DRAFT", text)
         self.assertIn("hypothesis_forge_draft_v1", text)
+        self.assertIn("hypothesis_forge.py revise", text)
+        self.assertIn("hypothesis_forge.py classify", text)
 
     def test_prompt_a_fixture_is_schema_valid_forge_draft(self) -> None:
         draft = load_json(ROOT / "tests/fixtures/hypothesis_forge/prompt_a_forge_draft_v1.json")

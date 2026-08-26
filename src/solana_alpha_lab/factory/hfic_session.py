@@ -20,6 +20,7 @@ from solana_alpha_lab.factory.hfic_identity import (
 from solana_alpha_lab.factory.run_passport import canonical_sha256
 
 
+_SCHEMA_VALIDATORS: dict[str, Draft202012Validator] = {}
 PROMPT_VERSION = "HFIC-V1.1"
 MIN_CANDIDATES = 4
 MAX_CANDIDATES = 6
@@ -1751,8 +1752,13 @@ def finalize_session(
 
 
 def _validate_json_schema(document: Mapping[str, Any], schema_path: Path) -> None:
-    schema = json.loads(schema_path.read_text(encoding="utf-8"))
-    errors = list(Draft202012Validator(schema).iter_errors(document))
+    key = str(schema_path)
+    validator = _SCHEMA_VALIDATORS.get(key)
+    if validator is None:
+        schema = json.loads(schema_path.read_text(encoding="utf-8"))
+        validator = Draft202012Validator(schema)
+        _SCHEMA_VALIDATORS[key] = validator
+    errors = list(validator.iter_errors(document))
     if errors:
         raise HficSessionError("HFIC_PROTOCOL_INVALID")
 

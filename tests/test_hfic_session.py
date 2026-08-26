@@ -21,10 +21,16 @@ from solana_alpha_lab.factory.hfic_session import (  # noqa: E402
     search_key_sha256,
 )
 
+_CACHED_GIT = None
+
+
 def _preflight_receipt() -> dict[str, object]:
+    global _CACHED_GIT
     from solana_alpha_lab.factory.document_runner import repository_git_snapshot
 
-    git = repository_git_snapshot(ROOT)
+    if _CACHED_GIT is None:
+        _CACHED_GIT = repository_git_snapshot(ROOT)
+    git = _CACHED_GIT
     return {
         "receipt_id": "HFIC-PREFLIGHT-FIXTURE-001",
         "evidence_epoch_sha256": "aa" * 32,
@@ -465,14 +471,21 @@ class HficFreezeFinalizeTests(unittest.TestCase):
             self.assertEqual(str(raised.exception), "HFIC_PROTOCOL_INVALID")
 
     def test_crash_before_session_receipt_is_resumable(self) -> None:
-        from solana_alpha_lab.factory.document_runner import repository_git_snapshot
+        import duckdb
+
         from solana_alpha_lab.factory.hfic_session import load_session_bundle, prove_runtime
-        from solana_alpha_lab.factory.research_store import RecordKind, ResearchEvent, ResearchStore
+        from solana_alpha_lab.factory.research_store import (
+            RESEARCH_PROJECTION_LOCATION,
+            RecordKind,
+            ResearchEvent,
+            ResearchStore,
+        )
 
         with tempfile.TemporaryDirectory() as tmp:
             store = ResearchStore(Path(tmp))
             frozen = freeze_draft(valid_draft(), preflight_receipt=_preflight_receipt())
-            git = repository_git_snapshot(ROOT)
+            git = _CACHED_GIT
+            assert git is not None
             now = __import__("datetime").datetime(1970, 1, 1, tzinfo=__import__("datetime").UTC)
             payload = {
                 "research_cycle_id": f"{frozen['session_id']}-COMPLETE",
@@ -515,6 +528,21 @@ class HficFreezeFinalizeTests(unittest.TestCase):
             with self.assertRaises(HficSessionError) as raised:
                 prove_runtime(store, frozen["session_id"], repo_root=ROOT)
             self.assertEqual(str(raised.exception), "SESSION_RECEIPT_MISSING")
+            store.rebuild_projection()
+            projection = Path(tmp) / RESEARCH_PROJECTION_LOCATION
+            connection = duckdb.connect(str(projection), read_only=True)
+            try:
+                row = connection.execute(
+                    """
+                    SELECT session_state
+                    FROM hfic_sessions
+                    WHERE session_id = ?
+                    """,
+                    [frozen["session_id"]],
+                ).fetchone()
+            finally:
+                connection.close()
+            self.assertEqual(row[0], "FROZEN_AWAITING_CRITIC")
 
     def test_revise_once_is_intermediate_and_second_revise_is_blocked(self) -> None:
         from solana_alpha_lab.factory.hfic_session import finalize_session

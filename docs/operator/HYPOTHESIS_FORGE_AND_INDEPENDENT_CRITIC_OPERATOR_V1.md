@@ -12,7 +12,7 @@
 Display ordinal (`C1`/`C2`/…) is display-only. Canonical `candidate_id` is assigned
 by `freeze`, not by the model.
 
-**Целевая эксплуатационная точка:** `/hypothesis-forge` → `scripts/hypothesis_forge.py preflight` → bounded draft → `freeze` → isolated Critic → `finalize`. До commissioning preflight сам выполняет безопасный offline Fast Lane commissioning.
+**Целевая эксплуатационная точка:** `/hypothesis-forge` → `scripts/hypothesis_forge.py preflight` → bounded draft → `freeze` → isolated Critic → optional `revise` / `classify` → `finalize`. До commissioning preflight сам выполняет безопасный offline Fast Lane commissioning.
 
 ---
 
@@ -46,11 +46,14 @@ by `freeze`, not by the model.
 1. Явно вызовите **`/hypothesis-forge`** в новом чате в корне актуального repository.
 2. Агент следует `.agents/skills/hypothesis-forge/SKILL.md`: executable
    `preflight` → PROMPT A выдаёт machine-valid `FORGE_DRAFT` → `freeze` создаёт
-   `CRITIC_INPUT_PACKET` → isolated Critic → `finalize`.
+   `CRITIC_INPUT_PACKET` → isolated Critic → при `REVISE_ONCE` ровно один
+   `hypothesis_forge.py revise` и повтор Critic; при `PASS_TO_CLASSIFICATION`
+   `hypothesis_forge.py classify`; затем `finalize`.
 3. Вечерний цикл **не завершён**, пока Critic не вернул финальный terminal
    (`KILL_*` / `NO_WORTHY_HYPOTHESIS` или post-classifier `PASS_*`) и `finalize`
    не записал `SESSION_RECEIPT`. `REVISE_ONCE` и `PASS_TO_CLASSIFICATION` —
-   intermediate states, не complete.
+   intermediate states, не complete. Команды `revise` и `classify` — тот же CLI,
+   не prose-only переход.
 4. Recovery: **`/independent-hypothesis-critic`** с вставленным packet только если auto-handoff
    прервался.
 
