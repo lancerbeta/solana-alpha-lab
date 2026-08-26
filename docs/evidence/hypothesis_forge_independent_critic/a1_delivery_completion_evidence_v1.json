@@ -9,7 +9,7 @@
   "cloud_bundle_smoke_required": false,
   "factory_fit": {
     "path": "docs/evidence/hypothesis_forge_independent_critic/a1_delivery_factory_fit_v1.json",
-    "sha256": "23cc72c0ca73ef36dc68dea858dcc9bb01ec56bb0b98403f6fe915e4646c97d0",
+    "sha256": "a4566e5b5450d8a9d2d50badc308f8f02e70c518b0e42d9b8e388731352d2da2",
     "verdict": "PASS"
   },
   "implementation_bindings": {
@@ -20,8 +20,9 @@
     "catalog/schemas/hypothesis_critic_input_v1.schema.json": "ee361d90e559ace5b0044f978f771b89fc83239434ec2ff7784dee94eda0d92f",
     "catalog/schemas/hypothesis_forge_synthesis_handoff_v1.schema.json": "f4964d610f2822939a19c7e422f4aaacf3793c956ebba8e17db15d9695c238cf",
     "configs/hypothesis_forge_independent_critic_v1.yaml": "f0478b98dee336841511482e61ca137363d91bd3d24ae8967c0f8e362f1f0be8",
+    "docs/evidence/control/delivery_harness_acceptance_v1.json": "2cc36909c5b83bb25d3281beaffccf776a9d09268f18914829894954a550eb39",
     "docs/operator/HYPOTHESIS_FORGE_AND_INDEPENDENT_CRITIC_OPERATOR_V1.md": "9d72e2635d95005e88ec7517bd74a4abf7d4739044aa584e8c63057de74d4b95",
-    "docs/tasks/HYPOTHESIS_FORGE_AND_INDEPENDENT_CRITIC_V1.md": "8e1043a250fc70e098ce6f81eef3f44f0791e4a918a865595f2eede2df5c77be",
+    "docs/tasks/HYPOTHESIS_FORGE_AND_INDEPENDENT_CRITIC_V1.md": "d05a6c7abfb9ae6f585360609dc0ad9f117c1dcb9f5bf643c2ae6ae120046b11",
     "tests/fixtures/hypothesis_forge/critic_input_packet_valid_v1.json": "4f98272c58a94e52e25b7c116047fe2bfaee9a410f4ffeb5cc77fb1334e7c876",
     "tests/fixtures/hypothesis_forge/synthesis_handoff_complete_v1.json": "5ee92dca0b7cfd541a974c1cde6ebbb7d3e5103f9022c9878766fb9dc58b91b4",
     "tests/fixtures/hypothesis_forge/synthesis_handoff_pending_critic_v1.json": "cb386f4d2601caf4c517406d174fd081ed325021279480831a818283515f3a91",
@@ -58,7 +59,7 @@
     "github_ci": "ENFORCED_LIVE_AT_GUARDED_MERGE",
     "independent_review": {
       "path": "docs/evidence/hypothesis_forge_independent_critic/a1_delivery_independent_review_v1.json",
-      "sha256": "ce2f656754a33eaf7d5b6d3a12d5b37086c0162ef12993a9162596c8e767c2f2",
+      "sha256": "bcf2af1ad7d6eb67fe56d4cb637461094a4caaf1cf2f2e1803f272b4eef3524e",
       "verdict": "PASS"
     },
     "project_checks": [
