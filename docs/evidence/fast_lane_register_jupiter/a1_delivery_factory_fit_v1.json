@@ -5,7 +5,7 @@
   "as_of": "2026-08-26",
   "task_id": "FAST_LANE_REGISTER_JUPITER_BOUNDED_CAPTURE_V1",
   "reviewed_bindings_sha256": "a0c39e02ef95feaf07f1ad86a5df8efa0647582d8fa48606d3d6d191fb9a57b7",
-  "reviewed_inventory_sha256": "b3206ad798237ae7c64363738654f7cade6946c05f2acd6c68aef949c3d0af7a",
+  "reviewed_inventory_sha256": "c6179aac541d37d8a9dc6de8a058966eafe1a9bb7f48e679b287ec92bc54a3ad",
   "mode": "FULL_REVIEW",
   "verdict": "PASS",
   "dimensions": {

@@ -27,14 +27,14 @@
   },
   "factory_fit": {
     "path": "docs/evidence/fast_lane_register_jupiter/a1_delivery_factory_fit_v1.json",
-    "sha256": "74c08f525b95ec348b307f3e9c3fb5e40e1fd420c4c9cb64e31e1d3042841eec",
+    "sha256": "817aac53c907bf738d4eb29c2d73bd31b080dd4885419449cdba0bc2855fb060",
     "verdict": "PASS"
   },
   "validation": {
     "targeted": "PASS_FAST_LANE_JUPITER_REGISTRY_CLASSIFIER",
     "independent_review": {
       "path": "docs/evidence/fast_lane_register_jupiter/a1_delivery_independent_review_v1.json",
-      "sha256": "1273b9a5e7afe52bb9d6fc7ab383bbd4f8bde7368ad13b6c60409a0533197c4a",
+      "sha256": "b70817e395ddfabe8766be990428e995615b3a2245bba4b955978fb1a34cdb30",
       "verdict": "PASS"
     },
     "full_gate": "ENFORCED_BY_PROJECT_BOUND_VALIDATION",
