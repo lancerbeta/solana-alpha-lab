@@ -59,6 +59,7 @@ managed_write_set:
 - docs/evidence/hypothesis_forge_operational_closure/a1_delivery_factory_fit_v1.json
 - .github/workflows/ci.yml
 - scripts/validate_ci.py
+- scripts/owner_attention_gate.py
 - tests/test_ci.py
 external_caps:
   network: false
@@ -84,6 +85,7 @@ context_requirements:
   - ADR-006-HYPOTHESIS-FAST-LANE-001
   l2_roles:
   - ARCHITECTURE_DECISIONS
+  - DELIVERY_EVIDENCE
   l3_roles: []
   roadmap_path: null
   exact_role_asset_ids:

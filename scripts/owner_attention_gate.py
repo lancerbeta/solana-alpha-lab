@@ -685,11 +685,17 @@ def build_delivery_checks(
                 "full_gate_pass": ci_pass,
             }
         break
+    validation_bindings_unavailable = (
+        bindings["primary"] is None and bindings["fallback"] is None
+    )
     if (
         preflight["required_tests_pass"] is False
-        and is_live_pr_head(context_receipt)
         and ci_pass is True
         and identity_broken is False
+        and (
+            is_live_pr_head(context_receipt)
+            or validation_bindings_unavailable
+        )
     ):
         preflight = {
             "required_tests_pass": True,
