@@ -13,8 +13,8 @@
     "GOAL_DOD_CRITIC"
   ],
   "review_id": "HFIC-INDEPENDENT-REVIEW-001",
-  "reviewed_bindings_sha256": "0000000000000000000000000000000000000000000000000000000000000000",
-  "reviewed_inventory_sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+  "reviewed_bindings_sha256": "0eb2f14d1d96caafc83d7026fb9023b4babc180b82b7a1c27521a379f8612bb4",
+  "reviewed_inventory_sha256": "526bea899d20790a773dcb63576ac5606940038c90c371144a65f5ea5fa6b2ac",
   "reviews": [
     {
       "findings": [

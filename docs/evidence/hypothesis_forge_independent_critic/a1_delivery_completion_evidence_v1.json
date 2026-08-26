@@ -9,10 +9,24 @@
   "cloud_bundle_smoke_required": false,
   "factory_fit": {
     "path": "docs/evidence/hypothesis_forge_independent_critic/a1_delivery_factory_fit_v1.json",
-    "sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+    "sha256": "525164e5aa8575b347d7a18af682e91d48da77f43c2b3dccd4d415d5b0cffa87",
     "verdict": "PASS"
   },
-  "implementation_bindings": {},
+  "implementation_bindings": {
+    ".agents/skills/hypothesis-forge/SKILL.md": "be570b3cce2c06d377bb22499c430becb9635fe0f1deb3446eca45b21ed1330c",
+    ".agents/skills/independent-hypothesis-critic/SKILL.md": "9fe879373d15301861adbfd93ce35ffbdc38a964fa961df06ecc777b16eb2452",
+    ".cursor/commands/hypothesis-forge.md": "36d3d93ba54eaa12b45a007521a8bd422d8a98524f25d61886389825e1f77148",
+    ".cursor/commands/independent-hypothesis-critic.md": "b89f21a21ab39e985f1a5f7e3cfbf0ef0a76fd05a235b87f9302c4b4074eb844",
+    "catalog/schemas/hypothesis_critic_input_v1.schema.json": "ee361d90e559ace5b0044f978f771b89fc83239434ec2ff7784dee94eda0d92f",
+    "catalog/schemas/hypothesis_forge_synthesis_handoff_v1.schema.json": "f4964d610f2822939a19c7e422f4aaacf3793c956ebba8e17db15d9695c238cf",
+    "configs/hypothesis_forge_independent_critic_v1.yaml": "f0478b98dee336841511482e61ca137363d91bd3d24ae8967c0f8e362f1f0be8",
+    "docs/operator/HYPOTHESIS_FORGE_AND_INDEPENDENT_CRITIC_OPERATOR_V1.md": "86a2e31c65d92cdd635a5c20531a74f340d01c32d594aecf2880d4e055591841",
+    "docs/tasks/HYPOTHESIS_FORGE_AND_INDEPENDENT_CRITIC_V1.md": "55425950aae2119e94600e70bbb823a3550ee24dc3d1037bd71e31522fb0294c",
+    "tests/fixtures/hypothesis_forge/critic_input_packet_valid_v1.json": "4f98272c58a94e52e25b7c116047fe2bfaee9a410f4ffeb5cc77fb1334e7c876",
+    "tests/fixtures/hypothesis_forge/synthesis_handoff_complete_v1.json": "5ee92dca0b7cfd541a974c1cde6ebbb7d3e5103f9022c9878766fb9dc58b91b4",
+    "tests/fixtures/hypothesis_forge/synthesis_handoff_pending_critic_v1.json": "cb386f4d2601caf4c517406d174fd081ed325021279480831a818283515f3a91",
+    "tests/test_hypothesis_forge_independent_critic_v1.py": "a56e40ab85cf5da5e3e9b25c258fc8336c7c28554959506e5a52f04fc56ef1f4"
+  },
   "non_claims": [
     "NO_ALPHA",
     "NO_CANONICAL_DONE",
@@ -43,7 +57,7 @@
     "github_ci": "ENFORCED_LIVE_AT_GUARDED_MERGE",
     "independent_review": {
       "path": "docs/evidence/hypothesis_forge_independent_critic/a1_delivery_independent_review_v1.json",
-      "sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+      "sha256": "e5c511295d8f1e2a57d8f3b8cf41d251d6859ce8049c018109bb65229a0cb355",
       "verdict": "PASS"
     },
     "project_checks": [
