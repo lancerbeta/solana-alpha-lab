@@ -211,12 +211,12 @@ records:
   search_terms: [negative results, decisions registry]
   classification: *id004
 - asset_id: GENERATED-PROJECT-MAP-001
-  record_version: '2.25'
+  record_version: '2.26'
   asset_type: generated_view
   purpose: Deterministic human-readable navigation projected only from the Catalog.
   status: IMPLEMENTED_UNVERIFIED
   origin: REPOSITORY
-  as_of: '2026-08-22'
+  as_of: '2026-08-25'
   truth_owner: TASK-04
   location:
     kind: git_path
@@ -224,7 +224,7 @@ records:
     repository_path: docs/PROJECT_MAP.md
   integrity:
     kind: sha256
-    sha256: 0e84a545b1e2832289e2e9852078640fc8c7e8484489ab693c323f85c5f30895
+    sha256: de7cba724c574d3695721c7611954179733bb1e253bf77ddb3a42bb271a37bf6
   access:
     mode: read_only
     method: file
@@ -268,6 +268,7 @@ records:
   - TASK-28
   - TASK-30
   - CTRL-TASK-CLOSE-FAST-PATH
+  - HYPOTHESIS-FAST-LANE-001
   evidence: []
   classification: *id004
 - asset_id: GENERATED-EDGE-PROJECTION-001
@@ -284,7 +285,7 @@ records:
     repository_path: catalog/generated/asset_edges.json
   integrity:
     kind: sha256
-    sha256: 94770c733f6577cab301b99a776294f76ec2b20c19b49e9ffa94290cc6277cca
+    sha256: 0e9b3541bb4c2af36c40ffecdcbc6de3f1ccd1b3866126257cac4175c5f1898e
   access:
     mode: read_only
     method: file
@@ -327,5 +328,6 @@ records:
   - TASK-28
   - TASK-30
   - CTRL-TASK-CLOSE-FAST-PATH
+  - HYPOTHESIS-FAST-LANE-001
   evidence: []
   classification: *id004

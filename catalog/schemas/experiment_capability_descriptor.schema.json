@@ -1,0 +1,138 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://smial.local/schemas/experiment_capability_descriptor.schema.json",
+  "title": "SMIAL experiment capability descriptor",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "capability_id",
+    "status",
+    "entrypoint",
+    "implementation_asset_ids",
+    "parameter_schema_asset_id",
+    "input_kinds",
+    "output_kinds",
+    "effect_class",
+    "output_zone",
+    "provider_policy_asset_id",
+    "max_provider_calls",
+    "supports_pit",
+    "determinism_class",
+    "promotion_authority",
+    "query_recipe_required"
+  ],
+  "properties": {
+    "capability_id": {
+      "type": "string",
+      "pattern": "^CAP-[A-Z0-9]+(?:-[A-Z0-9]+)+$"
+    },
+    "status": {
+      "enum": ["ACCEPTED", "PROPOSED", "RETIRED"]
+    },
+    "entrypoint": {
+      "type": "string",
+      "pattern": "^[a-z_][a-z0-9_.]*:[a-z_][a-z0-9_]*$"
+    },
+    "implementation_asset_ids": {
+      "type": "array",
+      "minItems": 1,
+      "uniqueItems": true,
+      "items": {"$ref": "#/$defs/stable_id"}
+    },
+    "parameter_schema_asset_id": {"$ref": "#/$defs/stable_id"},
+    "input_kinds": {
+      "type": "array",
+      "uniqueItems": true,
+      "items": {"$ref": "#/$defs/kind"}
+    },
+    "output_kinds": {
+      "type": "array",
+      "uniqueItems": true,
+      "items": {"$ref": "#/$defs/kind"}
+    },
+    "effect_class": {
+      "enum": [
+        "OFFLINE_READ_ONLY",
+        "OFFLINE_DATA_PLANE_WRITE",
+        "PROVIDER_READ_ONLY_BOUNDED",
+        "PROMOTION_PREPARE_ONLY"
+      ]
+    },
+    "output_zone": {
+      "enum": [
+        "DATA_ROOT_ONLY",
+        "GIT_REPOSITORY",
+        "BARE_LOCAL_FILESYSTEM"
+      ]
+    },
+    "provider_policy_asset_id": {
+      "oneOf": [
+        {"$ref": "#/$defs/stable_id"},
+        {"type": "null"}
+      ]
+    },
+    "max_provider_calls": {
+      "type": "integer",
+      "minimum": 0,
+      "maximum": 62
+    },
+    "supports_pit": {"type": "boolean"},
+    "determinism_class": {
+      "enum": [
+        "DETERMINISTIC",
+        "SEEDED_DETERMINISTIC",
+        "BOUNDED_NONDETERMINISTIC"
+      ]
+    },
+    "promotion_authority": {
+      "enum": ["NONE", "PREPARE_ONLY"]
+    },
+    "query_recipe_required": {"type": "boolean"}
+  },
+  "allOf": [
+    {
+      "if": {
+        "properties": {
+          "effect_class": {"const": "PROVIDER_READ_ONLY_BOUNDED"}
+        },
+        "required": ["effect_class"]
+      },
+      "then": {
+        "properties": {
+          "provider_policy_asset_id": {"$ref": "#/$defs/stable_id"},
+          "max_provider_calls": {"minimum": 1}
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "effect_class": {
+            "enum": [
+              "OFFLINE_READ_ONLY",
+              "OFFLINE_DATA_PLANE_WRITE",
+              "PROMOTION_PREPARE_ONLY"
+            ]
+          }
+        },
+        "required": ["effect_class"]
+      },
+      "then": {
+        "properties": {
+          "provider_policy_asset_id": {"type": "null"},
+          "max_provider_calls": {"const": 0}
+        }
+      }
+    }
+  ],
+  "$defs": {
+    "stable_id": {
+      "type": "string",
+      "pattern": "^[A-Z][A-Z0-9]*(?:-[A-Z0-9]+)+$"
+    },
+    "kind": {
+      "type": "string",
+      "pattern": "^[A-Z][A-Z0-9]*(?:_[A-Z0-9]+)*$"
+    }
+  }
+}

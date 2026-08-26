@@ -1,0 +1,35 @@
+schema: smial.hypothesis-fast-lane
+schema_version: '1.0'
+contract_id: HYPOTHESIS_FAST_LANE_V1
+as_of: '2026-08-25'
+cutover_at: '2026-08-25T00:00:00Z'
+data_root:
+  environment_variable: SMIAL_DATA_ROOT
+  persist_physical_value: false
+  logical_uri_schemes:
+    - smial-data://research/
+    - smial-data://datasets/
+  logical_layout:
+    research_events: research/events/date=YYYY-MM-DD
+    partition_manifests: research/manifests/partitions
+    dataset_manifests: research/manifests/datasets
+    run_artifacts: research/artifacts
+    datasets: datasets
+    projections: projections/research_memory.duckdb
+    operational_state: ops/operational_state.sqlite
+    writer_lock: locks/research-writer.lock
+    snapshots: snapshots
+writer_lease_policy: CREATE_EXCLUSIVE_SINGLE_WRITER_V1
+writer_lease:
+  concurrent_writers: 1
+  second_writer_terminal: WRITER_BUSY
+  foreign_or_unverifiable_lease_auto_steal: false
+foundation_authority:
+  provider_calls: 0
+  credential_reads: 0
+  cash_spend_usd_cents: 0
+  wallet_signer_transaction_actions: 0
+  deployment_actions: 0
+two_rung_live_h900_v1:
+  status: FROZEN_PENDING_FAST_LANE
+  provider_calls: 0

@@ -1,0 +1,89 @@
+{
+  "schema": "smial.delivery-completion-evidence",
+  "schema_version": "1.0",
+  "acceptance_id": "HYPOTHESIS-FAST-LANE-DELIVERY-COMPLETION-001",
+  "as_of": "2026-08-25",
+  "task_id": "HYPOTHESIS_FAST_LANE_AND_RESEARCH_DATA_PLANE_V1",
+  "state_change": "HYPOTHESIS_FAST_LANE_FOUNDATION_CANDIDATE",
+  "base_main": "7935f9acd8ff51c8d906d9b91d9ca4c2ab03ac2d",
+  "cloud_bundle_mode": "OWNER_MANAGED_OPTIONAL_EXPORT",
+  "cloud_bundle_required_by_harness": false,
+  "cloud_bundle_smoke_required": false,
+  "capability_radar_now": "NONE",
+  "implementation_bindings": {
+    "catalog/assets/core.yaml": "a96a45971e1c20936b7376180aa0392b896ecb2afc6de23d0efdfaa18733cf05",
+    "catalog/assets/lifecycle.yaml": "2dd940652f029f4ce58e76a2d611ff6859110bd218ed10f37e176052626c50f8",
+    "catalog/catalog_manifest.yaml": "52c89b1701506eb35fd37a458f4c0134cbf23257b8833359cb3f2adb7ed3a235",
+    "catalog/generated/asset_edges.json": "0e9b3541bb4c2af36c40ffecdcbc6de3f1ccd1b3866126257cac4175c5f1898e",
+    "catalog/query_recipes.yaml": "048f6af9e46819b310aac7974d4d666a0cccd706e08edf0a02505d262fb6e072",
+    "catalog/schemas/experiment_capability_descriptor.schema.json": "f50f23cfdc279169999bb70d7196ca8a4727083b47baf41e10247a36242baed8",
+    "catalog/schemas/experiment_spec_v1_1.schema.json": "7ba24a5109b539469bdfd0d1d74d88171cffaed03e5819fae3e3b9346d9e2ccd",
+    "catalog/schemas/research_event_envelope.schema.json": "6126305e8a8f490a45bf8e3a324a9ea3a9701380f5705ba9e6ee20ef7e7dfcb9",
+    "catalog/schemas/run_passport.schema.json": "84cbb725d33cf6a1d424b2d428fd219ff84e65c4c04f6eb07b7739f23744cbbc",
+    "configs/experiment_capability_registry_v1.yaml": "cb1198af6393b7d3e6c92b3f6836851fdb8ef76e0194bb519be0eff470d429a1",
+    "configs/hypothesis_fast_lane_v1.yaml": "dd58be68e22e386e65d8bb84bf3fa1e958469d9f4195454eace9469bb480557d",
+    "docs/PROJECT_MAP.md": "de7cba724c574d3695721c7611954179733bb1e253bf77ddb3a42bb271a37bf6",
+    "docs/decisions/ADR-006-hypothesis-fast-lane-research-data-plane.md": "51e4406686cd599349950614cafa2e6200440f5205ff67b21aaa4906389cc21e",
+    "docs/tasks/HYPOTHESIS_FAST_LANE_AND_RESEARCH_DATA_PLANE_V1.md": "039fe8499d98f170f7a20e1ba84b0623f7c4d7ed0a02a759b73280eac084dc26",
+    "schemas/research_memory_projection_v1.sql": "b044f9e5e91d7e76ba51e49681f851c2ec70e528510aa8fdb7342bb2ebb19e67",
+    "scripts/hypothesis_fast_lane.py": "7746a59da22f22c587b71587ce976e359863cfe9aca71e2dc92c3355a7001230",
+    "src/solana_alpha_lab/factory/commissioning_fixture.py": "31f3fb967675ea10718733fe9734d5f4024a95918fe75a1dfb29df81bf735c81",
+    "src/solana_alpha_lab/factory/data_resolver.py": "22b551e65924113595f0170158e0a13dbb919c6358f17cf72c92087e6e113b19",
+    "src/solana_alpha_lab/factory/document_runner.py": "8db68adabe19a11e253d32e65b7642b87d8e8ba0bf3fda57ed5960241bd973bd",
+    "src/solana_alpha_lab/factory/experiment_spec.py": "4c9228d9f116a0e101d32dcbd6e04e69e539c1d79c1d0f310d3cfbeb06bab3f7",
+    "src/solana_alpha_lab/factory/fast_lane_cold_copy.py": "bdd59caeace554eea9a3e6adebfed4253d63ee4c6ec17a936cc6038cb4340e39",
+    "src/solana_alpha_lab/factory/fast_lane_snapshot.py": "5b7c6df5f8fb78f32c66064f03fe4cfa0f5f0e417460701fa4c328463511ed49",
+    "src/solana_alpha_lab/factory/git_write_fence.py": "6c0c2bc80fabd4929cfe9d1e22009678e25f8ac0c413da24ccdc95b94b83625f",
+    "src/solana_alpha_lab/factory/lane_classifier.py": "5caee743f7132127f3f5e15f867812b3f271cd32faa225939bb2b7e640ce1b14",
+    "src/solana_alpha_lab/factory/prior_work.py": "9f3e6f5ef567aa9d90bc3c24ea7a36fad5192b211175ceda7ff643170aef252f",
+    "src/solana_alpha_lab/factory/research_store.py": "c2abd0e944584e365377724df0f74d4a8a14c2ad029e80b51f001fadb720136d",
+    "src/solana_alpha_lab/factory/run_passport.py": "7b6dfbb038acdc20e23aef01d786548bddc38b613ec6c5a86a4080856040f36c",
+    "tests/fixtures/fast_lane/commissioning_manifest_v1.json": "e67064302998f61bda9af9b75d05327685a4e57e409d00b592f7a60309dcfb68",
+    "tests/fixtures/fast_lane/offline_submission.template.json": "1a550df7b332d5967f78893933ec0cd2e6eccc47f6f75761bfb7f56d77ea920d",
+    "tests/test_fast_lane_classifier.py": "88e1dccb74e4970d8e5659bef45fb81cc20618ae2be4eaf29a761cd08b627e90",
+    "tests/test_fast_lane_cli.py": "5656147cdd4ede009e286aff7c7efddd1964406b230ad0fd56edf189f4edc1eb",
+    "tests/test_fast_lane_runner.py": "b5b3512f5a66d70dd72072e194282daf4fb8a3983efed09c4d91ae8a3998239d",
+    "tests/test_fast_lane_semantic_dod.py": "f3f87e930e072be76402ed49ef46571242715b8dd2d323b43477b2716eaddd4e",
+    "tests/test_research_projection.py": "1deef044e9499d3d5faa449c195e02ab2d14784c23f0f6aafe41cec8aaa2afd5",
+    "tests/test_research_store.py": "1dabcdab6e59596c02282df8f1c095cfb38a89abc4626900c370d91e2de49b61"
+  },
+  "active_stop_conditions": [],
+  "owner_attention_triggers": {
+    "auth_or_access_recovery": false,
+    "material_owner_decision": false,
+    "user_only_activation": false,
+    "external_material_action": false,
+    "unresolved_safety_or_truth_conflict": false
+  },
+  "factory_fit": {
+    "path": "docs/evidence/hypothesis_fast_lane/a1_delivery_factory_fit_v1.json",
+    "sha256": "9d55f79ba3661198532ebee672fa9d77f8acb31d88e063c1161c90ede87b7995",
+    "verdict": "PASS"
+  },
+  "validation": {
+    "targeted": "PASS_FAST_LANE_FOUNDATION_SUITE",
+    "independent_review": {
+      "path": "docs/evidence/hypothesis_fast_lane/a1_delivery_independent_review_v1.json",
+      "sha256": "97bb04d35abd437fc520f4f94552e823f3936fe25315a54cbafe7f89dde7d8fb",
+      "verdict": "PASS"
+    },
+    "full_gate": "ENFORCED_BY_PROJECT_BOUND_VALIDATION",
+    "github_ci": "ENFORCED_LIVE_AT_GUARDED_MERGE",
+    "project_checks": [
+      "PASS_VALIDATE_CATALOG"
+    ]
+  },
+  "non_claims": [
+    "NO_ALPHA",
+    "NO_CANONICAL_DONE",
+    "NO_NETRETURN",
+    "NO_TWO_RUNG_EXECUTION",
+    "NO_OFFLINE_COMMISSION_BEFORE_MERGE"
+  ],
+  "side_effects": {
+    "provider_api_rpc_wss_calls": 0,
+    "credentials_read": 0,
+    "wallet_signer_transaction": 0,
+    "cash_spend_usd_cents": 0
+  }
+}

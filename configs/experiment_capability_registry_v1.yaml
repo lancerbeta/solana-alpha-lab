@@ -1,0 +1,61 @@
+schema: smial.experiment-capability-registry
+schema_version: '1.0'
+registry_id: EXPERIMENT_CAPABILITY_REGISTRY_V1
+as_of: '2026-08-25'
+capabilities:
+  - capability_id: CAP-OFFLINE-CANONICAL-RECEIPT-REPLAY-001
+    status: ACCEPTED
+    entrypoint: solana_alpha_lab.factory.capabilities:replay_canonical_receipts
+    implementation_asset_ids:
+      - MODULE-FACTORY-V1-CAPABILITY-OFFLINE-REPLAY-001
+    parameter_schema_asset_id: SCHEMA-EXPERIMENT-SPEC-001
+    input_kinds:
+      - CATALOG_ASSET
+    output_kinds:
+      - SCIENTIFIC_RESULT
+    effect_class: OFFLINE_READ_ONLY
+    output_zone: DATA_ROOT_ONLY
+    provider_policy_asset_id: null
+    max_provider_calls: 0
+    supports_pit: true
+    determinism_class: DETERMINISTIC
+    promotion_authority: NONE
+    query_recipe_required: false
+
+  - capability_id: CAP-FIXTURE-GIT-RECEIPT-WRITER-001
+    status: ACCEPTED
+    entrypoint: solana_alpha_lab.factory.capabilities:capture_quote_native_free_key
+    implementation_asset_ids:
+      - MODULE-FACTORY-V1-CAPABILITY-FREE-KEY-CAPTURE-001
+    parameter_schema_asset_id: SCHEMA-EXPERIMENT-SPEC-001
+    input_kinds:
+      - CATALOG_ASSET
+    output_kinds:
+      - GIT_RECEIPT
+    effect_class: OFFLINE_DATA_PLANE_WRITE
+    output_zone: GIT_REPOSITORY
+    provider_policy_asset_id: null
+    max_provider_calls: 0
+    supports_pit: true
+    determinism_class: DETERMINISTIC
+    promotion_authority: NONE
+    query_recipe_required: false
+
+  - capability_id: CAP-FIXTURE-PROVIDER-READ-ONLY-001
+    status: ACCEPTED
+    entrypoint: solana_alpha_lab.factory.capabilities:capture_quote_native_free_key
+    implementation_asset_ids:
+      - MODULE-FACTORY-V1-CAPABILITY-FREE-KEY-CAPTURE-001
+    parameter_schema_asset_id: SCHEMA-EXPERIMENT-SPEC-001
+    input_kinds:
+      - CATALOG_ASSET
+    output_kinds:
+      - RAW_API_EVENT
+    effect_class: PROVIDER_READ_ONLY_BOUNDED
+    output_zone: DATA_ROOT_ONLY
+    provider_policy_asset_id: CONFIG-PROVIDER-ROUTE-CAPABILITY-REGISTRY-010
+    max_provider_calls: 1
+    supports_pit: true
+    determinism_class: BOUNDED_NONDETERMINISTIC
+    promotion_authority: NONE
+    query_recipe_required: false

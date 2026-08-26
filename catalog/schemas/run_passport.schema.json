@@ -1,0 +1,133 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://smial.local/schemas/run_passport.schema.json",
+  "title": "SMIAL Run Passport",
+  "type": "object",
+  "additionalProperties": true,
+  "required": [
+    "run_id",
+    "run_key_sha256",
+    "trial_id",
+    "hypothesis_version_id",
+    "hypothesis_definition_sha256",
+    "experiment_spec_sha256",
+    "runner_capability_id",
+    "runner_git_sha",
+    "capability_closure_sha256",
+    "uv_lock_sha256",
+    "dataset_manifest_ids",
+    "dataset_fingerprints",
+    "query_recipe_ids",
+    "query_recipe_sha256s",
+    "config_sha256",
+    "as_of",
+    "availability_cutoff",
+    "holdout_consumption_ids",
+    "random_seed_or_null",
+    "started_at",
+    "completed_at",
+    "first_reliable_available_at",
+    "provider_calls_planned",
+    "provider_calls_actual",
+    "cash_spend_usd_cents",
+    "execution_status",
+    "trial_outcome",
+    "scientific_terminal",
+    "result_digest_sha256",
+    "artifact_manifest_sha256",
+    "limitations",
+    "non_claims"
+  ],
+  "properties": {
+    "run_id": {"$ref": "#/$defs/stable_id"},
+    "run_key_sha256": {"$ref": "#/$defs/sha256"},
+    "trial_id": {"$ref": "#/$defs/stable_id"},
+    "hypothesis_version_id": {"$ref": "#/$defs/stable_id"},
+    "hypothesis_definition_sha256": {"$ref": "#/$defs/sha256"},
+    "experiment_spec_sha256": {"$ref": "#/$defs/sha256"},
+    "runner_capability_id": {"$ref": "#/$defs/stable_id"},
+    "runner_git_sha": {"$ref": "#/$defs/git_sha"},
+    "capability_closure_sha256": {"$ref": "#/$defs/sha256"},
+    "uv_lock_sha256": {"$ref": "#/$defs/sha256"},
+    "dataset_manifest_ids": {
+      "type": "array",
+      "items": {"$ref": "#/$defs/stable_id"}
+    },
+    "dataset_fingerprints": {
+      "type": "array",
+      "items": {"$ref": "#/$defs/sha256"}
+    },
+    "query_recipe_ids": {
+      "type": "array",
+      "items": {"$ref": "#/$defs/stable_id"}
+    },
+    "query_recipe_sha256s": {
+      "type": "array",
+      "items": {"$ref": "#/$defs/sha256"}
+    },
+    "config_sha256": {"$ref": "#/$defs/sha256"},
+    "as_of": {"$ref": "#/$defs/timestamp"},
+    "availability_cutoff": {"$ref": "#/$defs/timestamp"},
+    "holdout_consumption_ids": {
+      "type": "array",
+      "items": {"$ref": "#/$defs/stable_id"}
+    },
+    "random_seed_or_null": {"type": ["integer", "null"]},
+    "started_at": {"$ref": "#/$defs/timestamp"},
+    "completed_at": {"$ref": "#/$defs/timestamp"},
+    "first_reliable_available_at": {"$ref": "#/$defs/timestamp"},
+    "provider_calls_planned": {"type": "integer", "minimum": 0},
+    "provider_calls_actual": {"type": "integer", "minimum": 0},
+    "cash_spend_usd_cents": {"type": "integer", "minimum": 0},
+    "execution_status": {
+      "enum": [
+        "COMPLETE",
+        "FAILED_INFRA",
+        "BLOCKED_DATA",
+        "BLOCKED_AUTHORITY",
+        "ABORTED",
+        "INVALID_EVIDENCE"
+      ]
+    },
+    "trial_outcome": {
+      "enum": ["POSITIVE", "NEGATIVE", "INCONCLUSIVE", "INVALID"]
+    },
+    "scientific_terminal": {
+      "enum": [
+        "REJECTED",
+        "RETAINED",
+        "INCONCLUSIVE",
+        "PROMOTION_CANDIDATE",
+        "INVALID"
+      ]
+    },
+    "result_digest_sha256": {"$ref": "#/$defs/sha256"},
+    "artifact_manifest_sha256": {"$ref": "#/$defs/sha256"},
+    "limitations": {
+      "type": "array",
+      "items": {"type": "string"}
+    },
+    "non_claims": {
+      "type": "array",
+      "items": {"type": "string"}
+    }
+  },
+  "$defs": {
+    "stable_id": {
+      "type": "string",
+      "pattern": "^[A-Z][A-Z0-9]*(?:-[A-Z0-9]+)+$"
+    },
+    "sha256": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{64}$"
+    },
+    "git_sha": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{40}$"
+    },
+    "timestamp": {
+      "type": "string",
+      "pattern": "^20[0-9]{2}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}(?:\\.[0-9]+)?Z$"
+    }
+  }
+}
