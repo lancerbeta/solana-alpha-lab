@@ -31922,7 +31922,7 @@ records:
   as_of: '2026-08-25'
   truth_owner: HYPOTHESIS_FAST_LANE_AND_RESEARCH_DATA_PLANE_V1
   location: {kind: git_path, logical_uri: 'repo://configs/experiment_capability_registry_v1.yaml', repository_path: configs/experiment_capability_registry_v1.yaml}
-  integrity: {kind: sha256, sha256: cb1198af6393b7d3e6c92b3f6836851fdb8ef76e0194bb519be0eff470d429a1}
+  integrity: {kind: sha256, sha256: 16da925e14d298546e3f300cff305cf57c57eebd9ec08f95daad8e4be6fed24a}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: governed_by, target_asset_id: CTRL-HYPOTHESIS-FAST-LANE-001}
@@ -32053,7 +32053,7 @@ records:
   as_of: '2026-08-25'
   truth_owner: HYPOTHESIS_FAST_LANE_AND_RESEARCH_DATA_PLANE_V1
   location: {kind: git_path, logical_uri: 'repo://tests/test_fast_lane_classifier.py', repository_path: tests/test_fast_lane_classifier.py}
-  integrity: {kind: sha256, sha256: 88e1dccb74e4970d8e5659bef45fb81cc20618ae2be4eaf29a761cd08b627e90}
+  integrity: {kind: sha256, sha256: 838d67995ef3bf46f5f9721989cff8205c743ea702b208dddb67d43aa291f0ef}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: governed_by, target_asset_id: CTRL-HYPOTHESIS-FAST-LANE-001}

@@ -47,6 +47,7 @@ from solana_alpha_lab.factory.run_passport import (  # noqa: E402
 AS_OF = datetime(2026, 8, 25, tzinfo=UTC)
 OFFLINE_CAPABILITY = "CAP-OFFLINE-CANONICAL-RECEIPT-REPLAY-001"
 LIVE_CAPABILITY = "CAP-FIXTURE-PROVIDER-READ-ONLY-001"
+JUPITER_CAPABILITY = "CAP-JUPITER-FREE-KEY-QUOTE-NATIVE-BOUNDED-CAPTURE-001"
 GIT_WRITING_CAPABILITY = "CAP-FIXTURE-GIT-RECEIPT-WRITER-001"
 DATA_BINDING_ID = "BINDING-CANONICAL-RECEIPT-001"
 HYPOTHESIS_DEFINITION_SHA256 = "1" * 64
@@ -89,7 +90,13 @@ def experiment_spec(*, capability_id: str = OFFLINE_CAPABILITY) -> dict[str, obj
         "method": "classify_audition_terminal",
         "parameters": {},
         "evidence_budget": {
-            "provider_api_rpc_wss_calls": 1 if capability_id == LIVE_CAPABILITY else 0
+            "provider_api_rpc_wss_calls": (
+                60
+                if capability_id == JUPITER_CAPABILITY
+                else 1
+                if capability_id == LIVE_CAPABILITY
+                else 0
+            )
         },
         "holdout_policy": "No holdout is opened by classification",
         "terminal_outcomes": ["SUPPORTED", "FALSIFIED", "INCONCLUSIVE"],
@@ -358,6 +365,15 @@ class FastLaneContractTests(unittest.TestCase):
             descriptors[LIVE_CAPABILITY]["effect_class"],
             "PROVIDER_READ_ONLY_BOUNDED",
         )
+        self.assertEqual(
+            descriptors[JUPITER_CAPABILITY]["effect_class"],
+            "PROVIDER_READ_ONLY_BOUNDED",
+        )
+        self.assertEqual(descriptors[JUPITER_CAPABILITY]["max_provider_calls"], 60)
+        self.assertEqual(
+            descriptors[JUPITER_CAPABILITY]["provider_policy_asset_id"],
+            "CONFIG-PROVIDER-ROUTE-CAPABILITY-REGISTRY-009",
+        )
 
     def test_non_provider_descriptor_cannot_claim_provider_calls(self) -> None:
         descriptor_schema = json.loads(
@@ -415,6 +431,15 @@ class FastLaneContractTests(unittest.TestCase):
         self.assertIs(decision.lane, Lane.FAST_LANE)
         self.assertEqual(decision.terminal, "FAST_LANE_OWNER_GATE_REQUIRED")
         self.assertEqual(decision.reason_codes, ("OWNER_AUTHORITY_REQUIRED",))
+
+    def test_jupiter_bounded_capture_requires_owner_gate_without_calling_provider(
+        self,
+    ) -> None:
+        decision = self.classify(submission(capability_id=JUPITER_CAPABILITY))
+        self.assertIs(decision.lane, Lane.FAST_LANE)
+        self.assertEqual(decision.terminal, "FAST_LANE_OWNER_GATE_REQUIRED")
+        self.assertEqual(decision.reason_codes, ("OWNER_AUTHORITY_REQUIRED",))
+        self.assertEqual(decision.next_action, "PROVIDE_EXACT_OWNER_AUTHORITY")
 
     def test_offline_capability_rejects_requested_provider_calls(self) -> None:
         packet = submission()
