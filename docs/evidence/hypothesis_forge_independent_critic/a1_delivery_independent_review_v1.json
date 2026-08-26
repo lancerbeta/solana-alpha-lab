@@ -1,0 +1,57 @@
+{
+  "as_of": "2026-08-26",
+  "non_claims": [
+    "NO_CRYPTOGRAPHIC_REVIEWER_IDENTITY",
+    "NO_AUTONOMOUS_GENERATOR",
+    "NO_PROVIDER_CALLS",
+    "NO_EXPERIMENT_EXECUTION",
+    "NO_GIT_MUTATION_FROM_FORGE_RUNTIME"
+  ],
+  "required_roles": [
+    "ARCHITECTURE_CRITIC",
+    "CODE_REVIEWER",
+    "GOAL_DOD_CRITIC"
+  ],
+  "review_id": "HFIC-INDEPENDENT-REVIEW-001",
+  "reviewed_bindings_sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+  "reviewed_inventory_sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+  "reviews": [
+    {
+      "findings": [
+        "CHECKED_EXPLICIT_SLASH_FORGE_ONLY",
+        "CHECKED_AUTO_CRITIC_HANDOFF_IN_SKILL",
+        "CHECKED_SYNTHESIS_COMPLETE_REQUIRES_CRITIC_TERMINAL",
+        "CHECKED_CRITIC_INPUT_PACKET_SCHEMA",
+        "CHECKED_MANUAL_FALLBACK_UNTIL_GENERATOR",
+        "CHECKED_ZERO_PROVIDER_GIT_EXPERIMENT_AUTHORITY"
+      ],
+      "role": "CODE_REVIEWER",
+      "verdict": "PASS"
+    },
+    {
+      "findings": [
+        "CHECKED_FORGE_NOT_COMPLETE_WITHOUT_CRITIC",
+        "CHECKED_NEW_CONTEXT_ISOLATION",
+        "CHECKED_NO_MAGIC_BALL_GENERATOR",
+        "CHECKED_ONE_EXECUTION_UNIT_MAX",
+        "CHECKED_DESIGN_DISCOVERY_ONLY"
+      ],
+      "role": "GOAL_DOD_CRITIC",
+      "verdict": "PASS"
+    },
+    {
+      "findings": [
+        "CHECKED_FORGE_CRITIC_BOUNDARY",
+        "CHECKED_LANE_CLASSIFIER_NOT_ASSIGNED_BY_FORGE",
+        "CHECKED_OPERATOR_PACK_CANONICAL_IN_REPO",
+        "CHECKED_NO_RUNTIME_PROVIDER_OR_GIT_FROM_CONTOUR"
+      ],
+      "role": "ARCHITECTURE_CRITIC",
+      "verdict": "PASS"
+    }
+  ],
+  "schema": "smial.delivery-independent-review-evidence",
+  "schema_version": "1.0",
+  "task_id": "HYPOTHESIS_FORGE_AND_INDEPENDENT_CRITIC_V1",
+  "verdict": "PASS"
+}

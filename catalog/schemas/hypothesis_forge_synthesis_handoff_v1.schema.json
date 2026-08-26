@@ -1,0 +1,95 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://smial.local/schemas/hypothesis_forge_synthesis_handoff_v1.schema.json",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema",
+    "schema_version",
+    "contract_id",
+    "prompt_version",
+    "generator_mode",
+    "forge_invocation",
+    "critic_launch",
+    "synthesis_status",
+    "forge_report_present",
+    "critic_input_packet_present",
+    "critic_context_isolation",
+    "authority"
+  ],
+  "properties": {
+    "schema": {"const": "smial.hypothesis-forge-synthesis-handoff"},
+    "schema_version": {"const": "1.0"},
+    "contract_id": {"const": "HYPOTHESIS_FORGE_AND_INDEPENDENT_CRITIC_V1"},
+    "prompt_version": {"type": "string", "minLength": 1},
+    "generator_mode": {"const": "MANUAL_FALLBACK_UNTIL_GENERATOR"},
+    "forge_invocation": {"const": "EXPLICIT_SLASH_ONLY"},
+    "critic_launch": {"const": "AUTO_AFTER_SYNTHESIS"},
+    "synthesis_status": {
+      "enum": ["FORGE_NOT_READY", "PENDING_CRITIC", "SYNTHESIS_COMPLETE"]
+    },
+    "forge_report_present": {"type": "boolean"},
+    "critic_input_packet_present": {"type": "boolean"},
+    "critic_input_packet_sha256": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{64}$"
+    },
+    "critic_terminal": {"type": ["string", "null"]},
+    "critic_report_present": {"type": "boolean"},
+    "critic_context_isolation": {"const": "NEW_CONTEXT_REQUIRED"},
+    "authority": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["git_mutation", "experiment_execution", "provider_api_rpc_wss_calls"],
+      "properties": {
+        "git_mutation": {"const": 0},
+        "experiment_execution": {"const": 0},
+        "provider_api_rpc_wss_calls": {"const": 0}
+      }
+    }
+  },
+  "allOf": [
+    {
+      "if": {
+        "properties": {"synthesis_status": {"const": "PENDING_CRITIC"}},
+        "required": ["synthesis_status"]
+      },
+      "then": {
+        "properties": {
+          "forge_report_present": {"const": true},
+          "critic_input_packet_present": {"const": true},
+          "critic_report_present": {"const": false},
+          "critic_terminal": {"type": "null"}
+        },
+        "required": ["critic_input_packet_sha256"]
+      }
+    },
+    {
+      "if": {
+        "properties": {"synthesis_status": {"const": "SYNTHESIS_COMPLETE"}},
+        "required": ["synthesis_status"]
+      },
+      "then": {
+        "properties": {
+          "forge_report_present": {"const": true},
+          "critic_input_packet_present": {"const": true},
+          "critic_report_present": {"const": true},
+          "critic_terminal": {"type": "string", "minLength": 1}
+        },
+        "required": ["critic_input_packet_sha256", "critic_terminal"]
+      }
+    },
+    {
+      "if": {
+        "properties": {"synthesis_status": {"const": "FORGE_NOT_READY"}},
+        "required": ["synthesis_status"]
+      },
+      "then": {
+        "properties": {
+          "critic_report_present": {"const": false},
+          "critic_terminal": {"type": "null"}
+        }
+      }
+    }
+  ]
+}

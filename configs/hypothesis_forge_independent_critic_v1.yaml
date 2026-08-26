@@ -1,0 +1,42 @@
+schema: smial.hypothesis-forge-independent-critic
+schema_version: '1.0'
+contract_id: HYPOTHESIS_FORGE_AND_INDEPENDENT_CRITIC_V1
+prompt_version: HFIC-V1.0
+as_of: '2026-08-26'
+generator_mode: MANUAL_FALLBACK_UNTIL_GENERATOR
+forge_invocation:
+  mode: EXPLICIT_SLASH_ONLY
+  slash_commands:
+    - hypothesis-forge
+critic_launch:
+  mode: AUTO_AFTER_SYNTHESIS
+  context_isolation: NEW_CONTEXT_REQUIRED
+  recovery_slash_commands:
+    - independent-hypothesis-critic
+operator_pack:
+  path: docs/operator/HYPOTHESIS_FORGE_AND_INDEPENDENT_CRITIC_OPERATOR_V1.md
+skills:
+  forge: .agents/skills/hypothesis-forge/SKILL.md
+  critic: .agents/skills/independent-hypothesis-critic/SKILL.md
+schemas:
+  critic_input: catalog/schemas/hypothesis_critic_input_v1.schema.json
+  synthesis_handoff: catalog/schemas/hypothesis_forge_synthesis_handoff_v1.schema.json
+synthesis_invariants:
+  forge_complete_requires:
+    - FORGE_REPORT
+    - CRITIC_INPUT_PACKET
+  synthesis_complete_requires:
+    - critic_terminal
+    - critic_report
+  forbidden_without_owner_contract:
+    - autonomous_hypothesis_generator
+    - experiment_execution
+    - git_mutation
+    - provider_api_rpc_wss_calls
+authority:
+  git_mutation: 0
+  experiment_execution: 0
+  provider_api_rpc_wss_calls: 0
+  credential_reads: 0
+  cash_spend_usd_cents: 0
+  wallet_signer_transaction_actions: 0

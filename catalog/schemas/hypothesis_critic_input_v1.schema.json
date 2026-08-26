@@ -1,0 +1,130 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://smial.local/schemas/hypothesis_critic_input_v1.schema.json",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "packet_schema",
+    "packet_version",
+    "generator_prompt_version",
+    "generated_at",
+    "live_git_head",
+    "research_memory_as_of",
+    "owner_focus",
+    "authority",
+    "holdouts_not_touched",
+    "truth_roots_used",
+    "prior_work_queries",
+    "selected_candidate",
+    "provisional_lane",
+    "provisional_execution_unit",
+    "strongest_rejected_alternative",
+    "known_unknowns",
+    "non_claims"
+  ],
+  "properties": {
+    "packet_schema": {"const": "smial.hypothesis-critic-input"},
+    "packet_version": {"const": "1.0"},
+    "generator_prompt_version": {"type": "string", "minLength": 1},
+    "generated_at": {"type": "string", "minLength": 1},
+    "live_git_head": {"type": "string", "pattern": "^[0-9a-f]{40}$"},
+    "research_memory_as_of": {"type": "string", "minLength": 1},
+    "owner_focus": {"type": "string", "minLength": 1},
+    "authority": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["git_mutation", "experiment_execution", "provider_api_rpc_wss_calls"],
+      "properties": {
+        "git_mutation": {"const": 0},
+        "experiment_execution": {"const": 0},
+        "provider_api_rpc_wss_calls": {"const": 0}
+      }
+    },
+    "holdouts_not_touched": {"type": "array", "items": {"type": "string"}},
+    "truth_roots_used": {"type": "array", "items": {"type": "string", "minLength": 1}},
+    "prior_work_queries": {"type": "array", "items": {"type": "string", "minLength": 1}},
+    "selected_candidate": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "candidate_id",
+        "claim",
+        "nearest_prior_and_difference",
+        "actor_counterparty",
+        "mechanism",
+        "why_not_arbitraged",
+        "population",
+        "decision_timestamp",
+        "primary_x",
+        "primary_y",
+        "horizon_notional",
+        "disconfirming_prediction",
+        "negative_control",
+        "alternative_world",
+        "confounders",
+        "pit_leakage_survivorship_risks",
+        "execution_capacity_risks",
+        "available_data_bindings",
+        "missing_or_forward_only_data",
+        "proposed_method",
+        "cheapest_falsifier",
+        "pass_fail_inconclusive_semantics",
+        "decision_unlocked"
+      ],
+      "properties": {
+        "candidate_id": {"type": "string", "minLength": 1},
+        "claim": {"type": "string", "minLength": 1},
+        "nearest_prior_and_difference": {"type": "string", "minLength": 1},
+        "actor_counterparty": {"type": "string", "minLength": 1},
+        "mechanism": {"type": "string", "minLength": 1},
+        "why_not_arbitraged": {"type": "string", "minLength": 1},
+        "population": {"type": "string", "minLength": 1},
+        "decision_timestamp": {"type": "string", "minLength": 1},
+        "primary_x": {"type": "string", "minLength": 1},
+        "primary_y": {"type": "string", "minLength": 1},
+        "horizon_notional": {"type": "string", "minLength": 1},
+        "disconfirming_prediction": {"type": "string", "minLength": 1},
+        "negative_control": {"type": "string", "minLength": 1},
+        "alternative_world": {"type": "string", "minLength": 1},
+        "confounders": {"type": "array", "items": {"type": "string"}},
+        "pit_leakage_survivorship_risks": {"type": "array", "items": {"type": "string"}},
+        "execution_capacity_risks": {"type": "array", "items": {"type": "string"}},
+        "available_data_bindings": {"type": "array", "items": {"type": "string"}},
+        "missing_or_forward_only_data": {"type": "array", "items": {"type": "string"}},
+        "proposed_method": {"type": "string", "minLength": 1},
+        "cheapest_falsifier": {"type": "string", "minLength": 1},
+        "pass_fail_inconclusive_semantics": {"type": "string", "minLength": 1},
+        "decision_unlocked": {"type": "string", "minLength": 1}
+      }
+    },
+    "provisional_lane": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "value",
+        "required_capability_ids",
+        "required_query_recipe_ids",
+        "required_data_bindings",
+        "exact_gap"
+      ],
+      "properties": {
+        "value": {
+          "enum": [
+            "FAST_LANE_CANDIDATE",
+            "CHANGE_LANE_CANDIDATE",
+            "DATA_OPTION_CANDIDATE",
+            "DENY_CANDIDATE"
+          ]
+        },
+        "required_capability_ids": {"type": "array", "items": {"type": "string"}},
+        "required_query_recipe_ids": {"type": "array", "items": {"type": "string"}},
+        "required_data_bindings": {"type": "array", "items": {"type": "string"}},
+        "exact_gap": {"type": "string", "minLength": 1}
+      }
+    },
+    "provisional_execution_unit": {"type": "string", "minLength": 1},
+    "strongest_rejected_alternative": {"type": "string", "minLength": 1},
+    "known_unknowns": {"type": "array", "items": {"type": "string"}},
+    "non_claims": {"type": "array", "minItems": 1, "items": {"type": "string", "minLength": 1}}
+  }
+}
