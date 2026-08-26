@@ -13,7 +13,7 @@
   "implementation_bindings": {
     "catalog/assets/core.yaml": "b1e417538cf57bee4cf83e734e6302b40ed0e90c0295d4b62c81c2adbe9238c6",
     "configs/experiment_capability_registry_v1.yaml": "16da925e14d298546e3f300cff305cf57c57eebd9ec08f95daad8e4be6fed24a",
-    "docs/tasks/FAST_LANE_REGISTER_JUPITER_BOUNDED_CAPTURE_V1.md": "8e2e2bc8faa92cee0c1d06dbc9d8603b55ebb314488417e5d9ea0daf0052720d",
+    "docs/tasks/FAST_LANE_REGISTER_JUPITER_BOUNDED_CAPTURE_V1.md": "410a815b0f015ae1a39b9c693e69243f387a4db39990556dc04d0f6d4e479064",
     "tests/fixtures/fast_lane/two_rung_live_h900_classify_packet_v1.json": "41e8246e6080cb99f7d2a1790fe2f5db78f9df670bb1d469f1717e683f20b4a5",
     "tests/test_fast_lane_classifier.py": "669f0222e6b0e58be3f249c23f40eb1a2c81271ffed09560cee1971427aee2c8"
   },
@@ -27,14 +27,14 @@
   },
   "factory_fit": {
     "path": "docs/evidence/fast_lane_register_jupiter/a1_delivery_factory_fit_v1.json",
-    "sha256": "d73c8fab483e27983038626bb8de11ed123dfde036a8b3b6e8e26beb5d4e09da",
+    "sha256": "74c08f525b95ec348b307f3e9c3fb5e40e1fd420c4c9cb64e31e1d3042841eec",
     "verdict": "PASS"
   },
   "validation": {
     "targeted": "PASS_FAST_LANE_JUPITER_REGISTRY_CLASSIFIER",
     "independent_review": {
       "path": "docs/evidence/fast_lane_register_jupiter/a1_delivery_independent_review_v1.json",
-      "sha256": "6d5de711cd55e2f784e5058b5895eb853ca9b9fb9dc40f61d7d71bb2ce547077",
+      "sha256": "1273b9a5e7afe52bb9d6fc7ab383bbd4f8bde7368ad13b6c60409a0533197c4a",
       "verdict": "PASS"
     },
     "full_gate": "ENFORCED_BY_PROJECT_BOUND_VALIDATION",
