@@ -245,6 +245,8 @@ class TempBindAndContextE2ETests(unittest.TestCase):
             self.assertIsNone(frozen.get("critic_input_packet"))
             self.assertEqual(frozen["critic_terminal"], "NO_WORTHY_HYPOTHESIS")
             self.assertFalse(frozen["critic_launched"])
+            self.assertEqual(frozen["next"], "WAIT_FOR_NEW_EVIDENCE")
+            self.assertEqual(frozen["next_action_status"], "RECORDED")
             self.assertEqual(frozen["forge_context_packet_sha256"], digest)
 
             replay = run_cli(

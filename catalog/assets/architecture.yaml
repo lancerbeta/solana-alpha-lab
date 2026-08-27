@@ -216,9 +216,9 @@ records:
     canonicality: CURRENT_INTENT
     availability_note: Git-native registration by FACTORY-V1-OPERATIONAL-READINESS-V1; not a TASK-21 import and not implementation evidence.
 - asset_id: ARCH-INTENT-006
-  record_version: '1.0'
+  record_version: '1.1'
   asset_type: architecture_intent
-  purpose: Accepted product-horizon memory for a bounded hypothesis discovery and opportunity surface upstream of the existing hypothesis lifecycle; not implementation and not a roadmap activation.
+  purpose: Accepted product-horizon memory for a bounded hypothesis discovery and opportunity surface; v1.1 adds advisory prospect memory and a post-no-worthy router consumer without proving ranker activation.
   status: ACCEPTED_DIRECTION_NOT_IMPLEMENTED
   origin: REPOSITORY
   as_of: '2026-08-22'
@@ -229,7 +229,7 @@ records:
     repository_path: docs/architecture/intents/ARCH-INTENT-006-hypothesis-discovery-and-opportunity-surface.md
   integrity:
     kind: sha256
-    sha256: 3c1992c5c5b6b9d39ada33d41596a1cc7c1d6c317084b1e920bd7138a1d63f97
+    sha256: b85d3d3138af34da6ca63d1460a9acdd4d1b22d1413837cc75b02e345a6942cf
   access:
     mode: read_only
     method: file
@@ -246,6 +246,7 @@ records:
   consumers:
   - GOAL-OWNER
   - REG-RESEARCH-001
+  - HFIC-POST-NO-WORTHY-ROUTER
   evidence: []
   classification:
     contains_secrets: false
@@ -259,4 +260,39 @@ records:
     past_availability_claim: NO_PAST_AVAILABILITY_CLAIM
     retention: TRACKED_REFERENCE
     canonicality: CURRENT_INTENT
-    availability_note: Horizon memory only; does not authorize generator, provider, trial, holdout, roadmap insertion or TASK-28 unfreeze.
+    availability_note: Horizon memory only; does not authorize generator, provider, trial, holdout, roadmap insertion or TASK-28 unfreeze. v1.1 does not prove ARCH-INTENT-006 trigger.
+- asset_id: DOC-HFIC-SCIENTIFIC-DISCOVERY-RESEARCH-001
+  record_version: '1.0'
+  asset_type: control_document
+  purpose: Dated advisory research snapshot of 23 scientific-discovery directions; not current implementation truth or execution authority.
+  status: ACCEPTED_DIRECTION_NOT_IMPLEMENTED
+  origin: REPOSITORY
+  as_of: '2026-08-27'
+  truth_owner: HFIC_DISCOVERY_PROSPECT_MEMORY_AND_NEXT_ACTION_V1
+  location: {kind: git_path, logical_uri: 'repo://docs/architecture/prospects/HFIC_SCIENTIFIC_DISCOVERY_ENGINE_RESEARCH_V1.md', repository_path: docs/architecture/prospects/HFIC_SCIENTIFIC_DISCOVERY_ENGINE_RESEARCH_V1.md}
+  integrity: {kind: sha256, sha256: 1a2ac80b02e0a77a892d7ea27b2cff8a03ca99c3a1805c95c5d2611423cabf67}
+  access: {mode: read_only, method: file, network_required: false, secrets_required: false}
+  relations:
+  - {relation_type: governed_by, target_asset_id: ARCH-INTENT-006}
+  consumers: [HFIC-POST-NO-WORTHY-ROUTER, GOAL-OWNER]
+  evidence: []
+  search_terms: [HFIC, SCIENTIFIC_DISCOVERY, PROSPECT, ADVISORY]
+  classification: {contains_secrets: false, contains_raw_data: false, sensitivity: INTERNAL_NON_SECRET}
+- asset_id: DOC-HFIC-SCIENTIFIC-DISCOVERY-PROSPECTS-001
+  record_version: '1.0'
+  asset_type: control_document
+  purpose: Machine-readable 23-record advisory prospect portfolio governed by ARCH-INTENT-006; default Forge visibility HIDDEN.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-08-27'
+  truth_owner: HFIC_DISCOVERY_PROSPECT_MEMORY_AND_NEXT_ACTION_V1
+  location: {kind: git_path, logical_uri: 'repo://docs/architecture/prospects/hfic_scientific_discovery_prospects_v1.yaml', repository_path: docs/architecture/prospects/hfic_scientific_discovery_prospects_v1.yaml}
+  integrity: {kind: sha256, sha256: 4896597ee1780401e8c3ce3f546608ce72906fc8d3365d2408627b2eb9f9dc0a}
+  access: {mode: read_only, method: command, recipe_id: QUERY-HFIC-SCIENTIFIC-DISCOVERY-PROSPECTS-001, network_required: false, secrets_required: false}
+  relations:
+  - {relation_type: governed_by, target_asset_id: ARCH-INTENT-006}
+  - {relation_type: derived_from, target_asset_id: DOC-HFIC-SCIENTIFIC-DISCOVERY-RESEARCH-001}
+  consumers: [HFIC-POST-NO-WORTHY-ROUTER, GOAL-OWNER]
+  evidence: []
+  search_terms: [HFIC, PROSPECT, POST_NO_WORTHY_REVIEW]
+  classification: {contains_secrets: false, contains_raw_data: false, sensitivity: INTERNAL_NON_SECRET}

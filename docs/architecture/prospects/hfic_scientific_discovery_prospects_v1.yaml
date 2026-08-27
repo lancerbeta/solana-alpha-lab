@@ -1,0 +1,731 @@
+schema: smial.hfic-scientific-discovery-prospect-portfolio
+schema_version: '1.0'
+portfolio_id: HFIC-SCIENTIFIC-DISCOVERY-PROSPECT-PORTFOLIO-001
+as_of: '2026-08-27'
+governed_by: ARCH-INTENT-006
+authority:
+  provider_read: false
+  credential_read: false
+  git_mutation: false
+  rdp_mutation: false
+  experiment_execution: false
+  holdout_consumption: false
+  cash_spend: false
+  wallet_signer_transaction: false
+  roadmap_activation: false
+  next_hypothesis_selection: false
+activation_policy:
+  default_forge_visibility: HIDDEN
+  max_records_per_query: 3
+  allowed_triggers:
+  - OWNER_DISCOVERY_REFRAME
+  - POST_NO_WORTHY_REVIEW
+  - MEASURED_DUPLICATE_COLLAPSE
+  - MEASURED_PREPARATORY_LOOP
+  measured_trigger_min_sessions: 5
+  duplicate_or_reopen_share_gt: 0.2
+  preparatory_loop_share_gt: 0.4
+  suppress_while_scientific_spend_pending_terminal: true
+  execution_authority: NONE
+records:
+- prospect_id: HFIC-PROSPECT-001
+  rank: 1
+  title: Evidence Opportunity World Model
+  donor_domains:
+  - SPACECRAFT_AUTONOMY
+  - MISSION_PLANNING
+  problem: Forge sees datasets and closed ledger but not a compact observed/missing/collectable frontier
+    after NO_WORTHY.
+  capability: Bounded opportunity map used only after no-worthy to name the cheapest next observation.
+  disposition: ADOPT_NOW
+  implementation_state: PARTIAL
+  current_project_fit: 5
+  expected_process_impact: 5
+  durable_edge: 4
+  effort_class: S
+  activation_triggers:
+  - POST_NO_WORTHY_REVIEW
+  - OWNER_DISCOVERY_REFRAME
+  prerequisites:
+  - HFIC_CONTEXT_PACKET
+  named_consumers:
+  - HFIC-POST-NO-WORTHY-ROUTER
+  minimal_first_atom: HFIC_DISCOVERY_PROSPECT_MEMORY_AND_NEXT_ACTION_V1
+  satisfied_by: []
+  residual_gap: Full world model remains WATCH; this atom closes only post-no-worthy routing.
+  success_signal: Ordinary slash returns one typed next action after NO_WORTHY without Prompt A contamination.
+  kill_or_defer_if: If prospects leak into preflight or Prompt A.
+  non_goals:
+  - NO_AUTONOMOUS_GENERATOR
+  - NO_FULL_WORLD_MODEL
+  source_refs:
+  - docs/architecture/prospects/HFIC_SCIENTIFIC_DISCOVERY_ENGINE_RESEARCH_V1.md
+  reassess_when: After two distinct no-worthy epochs or a named missing observation class repeats.
+- prospect_id: HFIC-PROSPECT-002
+  rank: 2
+  title: Quality-Diversity mechanism map
+  donor_domains:
+  - QUALITY_DIVERSITY
+  - MAP_ELITES
+  problem: Search can collapse into one niche even when six mechanism classes exist.
+  capability: Archive of mechanism niches with a measured duplicate/reopen trigger.
+  disposition: WATCH_TRIGGERED_ONLY
+  implementation_state: NOT_IMPLEMENTED
+  current_project_fit: 3
+  expected_process_impact: 4
+  durable_edge: 4
+  effort_class: M
+  activation_triggers:
+  - MEASURED_DUPLICATE_COLLAPSE
+  - OWNER_DISCOVERY_REFRAME
+  prerequisites:
+  - MEASURED_DUPLICATE_OR_REOPEN_SHARE
+  named_consumers:
+  - HFIC-POST-NO-WORTHY-ROUTER
+  minimal_first_atom: Do not implement MAP-Elites now.
+  satisfied_by: []
+  residual_gap: Activate only on measured duplicate/reopen collapse or same-niche concentration.
+  success_signal: Duplicate/reopen share exceeds policy after at least five sessions.
+  kill_or_defer_if: If last smoke still shows unused mechanism classes and zero preparatory loops.
+  non_goals:
+  - NO_QUALITY_DIVERSITY_ENGINE
+  source_refs:
+  - docs/architecture/prospects/HFIC_SCIENTIFIC_DISCOVERY_ENGINE_RESEARCH_V1.md
+  reassess_when: After five honest sessions with duplicate/reopen share above 0.20.
+- prospect_id: HFIC-PROSPECT-003
+  rank: 3
+  title: Adaptive-analysis firewall and search debt
+  donor_domains:
+  - ADAPTIVE_CLINICAL_TRIALS
+  - MULTIPLE_TESTING
+  problem: Adaptive search can manufacture apparent effects without recording the search path.
+  capability: Firewall that binds reported effects to consumed search and confirmation role.
+  disposition: WATCH_TRIGGERED_ONLY
+  implementation_state: NOT_IMPLEMENTED
+  current_project_fit: 4
+  expected_process_impact: 5
+  durable_edge: 5
+  effort_class: M
+  activation_triggers:
+  - OWNER_DISCOVERY_REFRAME
+  prerequisites:
+  - SEARCH_BUDGET_FENCE
+  named_consumers:
+  - HFIC-POST-NO-WORTHY-ROUTER
+  minimal_first_atom: Keep existing consumed-evidence fences; do not add a second search ledger now.
+  satisfied_by: []
+  residual_gap: Activate before scaled generation or after the first promising adaptive-family result.
+  success_signal: Every reported effect names its search-debt and confirmation status.
+  kill_or_defer_if: If scaled generation starts without this fence.
+  non_goals:
+  - NO_ALPHA_FROM_SEARCH_PATH
+  source_refs:
+  - docs/architecture/prospects/HFIC_SCIENTIFIC_DISCOVERY_ENGINE_RESEARCH_V1.md
+  reassess_when: Before any autonomous generator or after first PASS from an adaptively searched family.
+- prospect_id: HFIC-PROSPECT-004
+  rank: 4
+  title: Exploration confirmation protocol
+  donor_domains:
+  - ADAPTIVE_CLINICAL_TRIALS
+  problem: Dataset roles exist, but NO_WORTHY still ended at bare STOP.
+  capability: Typed post-no-worthy branch among wait, one forward option, or one capability option.
+  disposition: WATCH_TRIGGERED_ONLY
+  implementation_state: PARTIAL
+  current_project_fit: 5
+  expected_process_impact: 5
+  durable_edge: 4
+  effort_class: S
+  activation_triggers:
+  - POST_NO_WORTHY_REVIEW
+  - OWNER_DISCOVERY_REFRAME
+  prerequisites:
+  - HFIC_CONTEXT_PACKET
+  named_consumers:
+  - HFIC-POST-NO-WORTHY-ROUTER
+  minimal_first_atom: HFIC_DISCOVERY_PROSPECT_MEMORY_AND_NEXT_ACTION_V1
+  satisfied_by: []
+  residual_gap: Dataset roles and confirmation fences exist; this atom adds typed routing only.
+  success_signal: Same slash persists one of three action types after NO_WORTHY.
+  kill_or_defer_if: If a fourth catch-all type appears or WAIT is skipped to manufacture work.
+  non_goals:
+  - NO_AUTOMATIC_CAPTURE
+  - NO_AUTOMATIC_TASK
+  source_refs:
+  - docs/architecture/prospects/HFIC_SCIENTIFIC_DISCOVERY_ENGINE_RESEARCH_V1.md
+  reassess_when: After this atom merges; reopen only if routing still leaves owner with STOP.
+- prospect_id: HFIC-PROSPECT-005
+  rank: 5
+  title: Negative controls and metamorphic falsification
+  donor_domains:
+  - SOFTWARE_TESTING
+  - METAMORPHIC_TESTING
+  problem: negative_control is mandatory; proxy ambiguity still lacks a named relation.
+  capability: Add one metamorphic relation only when a selected candidate names a proxy ambiguity.
+  disposition: WATCH_TRIGGERED_ONLY
+  implementation_state: PARTIAL
+  current_project_fit: 4
+  expected_process_impact: 4
+  durable_edge: 4
+  effort_class: S
+  activation_triggers:
+  - POST_NO_WORTHY_REVIEW
+  - OWNER_DISCOVERY_REFRAME
+  prerequisites:
+  - SELECTED_PROXY_AMBIGUITY
+  named_consumers:
+  - HFIC-POST-NO-WORTHY-ROUTER
+  minimal_first_atom: Do not duplicate the existing negative_control field.
+  satisfied_by: []
+  residual_gap: Metamorphic relation remains future-triggered.
+  success_signal: Selected candidate with named proxy ambiguity carries one extra invariant.
+  kill_or_defer_if: If a generic second negative-control field is added without a named ambiguity.
+  non_goals:
+  - NO_DUPLICATE_NEGATIVE_CONTROL_FIELD
+  source_refs:
+  - docs/architecture/prospects/HFIC_SCIENTIFIC_DISCOVERY_ENGINE_RESEARCH_V1.md
+  reassess_when: When a selected candidate exposes a named proxy ambiguity.
+- prospect_id: HFIC-PROSPECT-006
+  rank: 6
+  title: Claim Evidence Argument assurance graph
+  donor_domains:
+  - ASSURANCE_CASES
+  - GSN
+  problem: Reviewers can disagree about why evidence supports a claim without a shared graph.
+  capability: A later assurance graph linking claim, evidence and argument.
+  disposition: DEFERRED_CURRENT_HORIZON
+  implementation_state: NOT_IMPLEMENTED
+  current_project_fit: 2
+  expected_process_impact: 3
+  durable_edge: 3
+  effort_class: L
+  activation_triggers:
+  - OWNER_DISCOVERY_REFRAME
+  prerequisites:
+  - REPEATED_REVIEW_DISAGREEMENT
+  named_consumers:
+  - FUTURE_DISCOVERY_RANKER_ENTRY_GATE
+  minimal_first_atom: Do not add another receipt graph now.
+  satisfied_by: []
+  residual_gap: Trigger after repeated review disagreement; not current routing gap.
+  success_signal: Disagreement about claim support becomes a typed graph dispute.
+  kill_or_defer_if: If added as ceremony without a named disagreement consumer.
+  non_goals:
+  - NO_SECOND_RECEIPT_GRAPH_NOW
+  source_refs:
+  - docs/architecture/prospects/HFIC_SCIENTIFIC_DISCOVERY_ENGINE_RESEARCH_V1.md
+  reassess_when: After repeated independent-review disagreement on the same claim family.
+- prospect_id: HFIC-PROSPECT-007
+  rank: 7
+  title: Evidence FDIR
+  donor_domains:
+  - SPACECRAFT_FDIR
+  problem: Ambiguity among data defect, software defect, regime mismatch and market null.
+  capability: Fault-detection isolation that names which of those four is live.
+  disposition: WATCH_TRIGGERED_ONLY
+  implementation_state: NOT_IMPLEMENTED
+  current_project_fit: 3
+  expected_process_impact: 4
+  durable_edge: 4
+  effort_class: M
+  activation_triggers:
+  - POST_NO_WORTHY_REVIEW
+  - OWNER_DISCOVERY_REFRAME
+  prerequisites:
+  - REPEATED_AMBIGUOUS_NULL
+  named_consumers:
+  - HFIC-POST-NO-WORTHY-ROUTER
+  minimal_first_atom: Use existing terminals first; do not invent a new diagnostic engine now.
+  satisfied_by: []
+  residual_gap: Trigger after repeated ambiguity among those four classes.
+  success_signal: A typed isolation among data, software, regime and market-null.
+  kill_or_defer_if: If nulls remain unlabeled after several comparable windows.
+  non_goals:
+  - NO_AUTONOMOUS_DIAGNOSTIC_ENGINE
+  source_refs:
+  - docs/architecture/prospects/HFIC_SCIENTIFIC_DISCOVERY_ENGINE_RESEARCH_V1.md
+  reassess_when: After repeated unlabeled nulls across distinct evidence epochs.
+- prospect_id: HFIC-PROSPECT-008
+  rank: 8
+  title: Value of Information scheduler
+  donor_domains:
+  - DECISION_ANALYSIS
+  - VOI
+  problem: Cannot rank evidence options until several comparable admissible options exist.
+  capability: Choose the cheapest informative observation among named options.
+  disposition: PREREQUISITE_BLOCKED
+  implementation_state: NOT_IMPLEMENTED
+  current_project_fit: 2
+  expected_process_impact: 5
+  durable_edge: 5
+  effort_class: L
+  activation_triggers:
+  - OWNER_DISCOVERY_REFRAME
+  prerequisites:
+  - THREE_COMPARABLE_ADMISSIBLE_OPTIONS
+  named_consumers:
+  - FUTURE_DISCOVERY_RANKER_ENTRY_GATE
+  minimal_first_atom: Do not implement VOI now.
+  satisfied_by: []
+  residual_gap: Require at least three comparable admissible evidence options over multiple epochs.
+  success_signal: Scheduler picks one bounded option with an explicit opportunity cost.
+  kill_or_defer_if: If fewer than three honest options exist.
+  non_goals:
+  - NO_VOI_SCHEDULER
+  source_refs:
+  - docs/architecture/prospects/HFIC_SCIENTIFIC_DISCOVERY_ENGINE_RESEARCH_V1.md
+  reassess_when: After three comparable admissible evidence options exist over multiple epochs.
+- prospect_id: HFIC-PROSPECT-009
+  rank: 9
+  title: Anytime-valid sequential kill and futility
+  donor_domains:
+  - SEQUENTIAL_ANALYSIS
+  - E_VALUES
+  problem: Interim decisions without a preplanned sequential envelope overfit stopping.
+  capability: Anytime-valid kill/futility for repeated prospective windows.
+  disposition: PREREQUISITE_BLOCKED
+  implementation_state: NOT_IMPLEMENTED
+  current_project_fit: 2
+  expected_process_impact: 4
+  durable_edge: 5
+  effort_class: L
+  activation_triggers:
+  - OWNER_DISCOVERY_REFRAME
+  prerequisites:
+  - REPEATED_PROSPECTIVE_WINDOWS
+  named_consumers:
+  - FUTURE_DISCOVERY_RANKER_ENTRY_GATE
+  minimal_first_atom: Do not add sequential inference now.
+  satisfied_by: []
+  residual_gap: Require repeated prospective windows with planned interim decisions.
+  success_signal: A predeclared envelope can stop for futility without peeking privilege.
+  kill_or_defer_if: If only one window exists.
+  non_goals:
+  - NO_SEQUENTIAL_INFERENCE_ENGINE
+  source_refs:
+  - docs/architecture/prospects/HFIC_SCIENTIFIC_DISCOVERY_ENGINE_RESEARCH_V1.md
+  reassess_when: After repeated prospective windows with planned interim looks.
+- prospect_id: HFIC-PROSPECT-010
+  rank: 10
+  title: Abductive competing-mechanism matrix
+  donor_domains:
+  - ABDUCTIVE_REASONING
+  - SCIENTIFIC_DISCOVERY
+  problem: Several mechanisms can explain the same observable.
+  capability: A diagnostic observation that separates competing surviving mechanisms.
+  disposition: WATCH_TRIGGERED_ONLY
+  implementation_state: NOT_IMPLEMENTED
+  current_project_fit: 3
+  expected_process_impact: 4
+  durable_edge: 4
+  effort_class: M
+  activation_triggers:
+  - POST_NO_WORTHY_REVIEW
+  - OWNER_DISCOVERY_REFRAME
+  prerequisites:
+  - TWO_SURVIVING_MECHANISMS_ONE_DIAGNOSTIC
+  named_consumers:
+  - HFIC-POST-NO-WORTHY-ROUTER
+  minimal_first_atom: Use ordinary candidate comparison until a diagnostic split is named.
+  satisfied_by: []
+  residual_gap: Trigger when multiple surviving mechanisms explain one observable.
+  success_signal: One named observation would kill at least one competing mechanism.
+  kill_or_defer_if: If the matrix becomes a brainstorming table without a diagnostic.
+  non_goals:
+  - NO_MECHANISM_TOURNAMENT_WITHOUT_DIAGNOSTIC
+  source_refs:
+  - docs/architecture/prospects/HFIC_SCIENTIFIC_DISCOVERY_ENGINE_RESEARCH_V1.md
+  reassess_when: When two surviving mechanisms share one observable and one split exists.
+- prospect_id: HFIC-PROSPECT-011
+  rank: 11
+  title: Cohort-relative cross-sectional state
+  donor_domains:
+  - EPIDEMIOLOGY
+  - PANEL_DATA
+  problem: Token panels exist; relative state still needs a fresh unconsumed outcome.
+  capability: Cross-sectional relative features with a named consumer and fresh Y.
+  disposition: WATCH_TRIGGERED_ONLY
+  implementation_state: NOT_IMPLEMENTED
+  current_project_fit: 3
+  expected_process_impact: 3
+  durable_edge: 3
+  effort_class: M
+  activation_triggers:
+  - POST_NO_WORTHY_REVIEW
+  - OWNER_DISCOVERY_REFRAME
+  prerequisites:
+  - FRESH_UNCONSUMED_OUTCOME
+  - NAMED_CONSUMER
+  named_consumers:
+  - HFIC-POST-NO-WORTHY-ROUTER
+  minimal_first_atom: Do not add a panel platform without a named Y.
+  satisfied_by: []
+  residual_gap: Multi-token panels make it plausible; require fresh outcome and named consumer.
+  success_signal: A named consumer uses cohort-relative state on unconsumed Y.
+  kill_or_defer_if: If built as a generic entity platform.
+  non_goals:
+  - NO_PREPARATORY_ENTITY_PLATFORM
+  source_refs:
+  - docs/architecture/prospects/HFIC_SCIENTIFIC_DISCOVERY_ENGINE_RESEARCH_V1.md
+  reassess_when: When a named consumer and fresh unconsumed outcome exist.
+- prospect_id: HFIC-PROSPECT-012
+  rank: 12
+  title: Survival hazard competing risks
+  donor_domains:
+  - SURVIVAL_ANALYSIS
+  problem: Lifecycle events are sparse; competing-risk models need event/censor counts.
+  capability: Hazard/competing-risk estimates over multiple windows.
+  disposition: PREREQUISITE_BLOCKED
+  implementation_state: NOT_IMPLEMENTED
+  current_project_fit: 2
+  expected_process_impact: 3
+  durable_edge: 4
+  effort_class: L
+  activation_triggers:
+  - OWNER_DISCOVERY_REFRAME
+  prerequisites:
+  - LIFECYCLE_EVENTS_AND_CENSOR_COUNTS
+  named_consumers:
+  - FUTURE_DISCOVERY_RANKER_ENTRY_GATE
+  minimal_first_atom: Do not fit survival models on sparse events now.
+  satisfied_by: []
+  residual_gap: Require lifecycle events and sufficient event/censor counts across windows.
+  success_signal: Event counts support a predeclared hazard contrast.
+  kill_or_defer_if: If event counts remain below a named floor.
+  non_goals:
+  - NO_SPARSE_SURVIVAL_FIT
+  source_refs:
+  - docs/architecture/prospects/HFIC_SCIENTIFIC_DISCOVERY_ENGINE_RESEARCH_V1.md
+  reassess_when: After sufficient event and censor counts across multiple windows.
+- prospect_id: HFIC-PROSPECT-013
+  rank: 13
+  title: Executable microstructure world
+  donor_domains:
+  - MARKET_MICROSTRUCTURE
+  problem: Quote surfaces exist; a richer executable world still lacks a named falsifier.
+  capability: Extend quote/capability surfaces only for a named falsifier or cash-layer consumer.
+  disposition: WATCH_TRIGGERED_ONLY
+  implementation_state: PARTIAL
+  current_project_fit: 4
+  expected_process_impact: 3
+  durable_edge: 3
+  effort_class: M
+  activation_triggers:
+  - POST_NO_WORTHY_REVIEW
+  - OWNER_DISCOVERY_REFRAME
+  prerequisites:
+  - NAMED_FALSIFIER_OR_CASH_CONSUMER
+  named_consumers:
+  - HFIC-POST-NO-WORTHY-ROUTER
+  minimal_first_atom: Reuse existing quote capture; do not build a new simulator.
+  satisfied_by: []
+  residual_gap: Quote surfaces and capability exist. Extend only for a named consumer.
+  success_signal: A named falsifier consumes the existing quote surface without a new world.
+  kill_or_defer_if: If a digital-twin simulator is proposed first.
+  non_goals:
+  - NO_DIGITAL_TWIN
+  - NO_NEW_SIMULATOR
+  source_refs:
+  - docs/architecture/prospects/HFIC_SCIENTIFIC_DISCOVERY_ENGINE_RESEARCH_V1.md
+  reassess_when: When a named falsifier or cash-layer consumer is commissioned.
+- prospect_id: HFIC-PROSPECT-014
+  rank: 14
+  title: Regime and environment model
+  donor_domains:
+  - NONSTATIONARITY
+  - HMM
+  problem: Environment labels are not yet a declared set of at least three regimes.
+  capability: Coarse declared environments before any latent HMM.
+  disposition: PREREQUISITE_BLOCKED
+  implementation_state: NOT_IMPLEMENTED
+  current_project_fit: 2
+  expected_process_impact: 4
+  durable_edge: 4
+  effort_class: M
+  activation_triggers:
+  - OWNER_DISCOVERY_REFRAME
+  prerequisites:
+  - THREE_DECLARED_ENVIRONMENTS
+  named_consumers:
+  - FUTURE_DISCOVERY_RANKER_ENTRY_GATE
+  minimal_first_atom: Start coarse; never HMM by default.
+  satisfied_by: []
+  residual_gap: Require at least three declared environments.
+  success_signal: Three named environments with explicit assignment rules.
+  kill_or_defer_if: If HMM is the first environment model.
+  non_goals:
+  - NO_DEFAULT_HMM
+  source_refs:
+  - docs/architecture/prospects/HFIC_SCIENTIFIC_DISCOVERY_ENGINE_RESEARCH_V1.md
+  reassess_when: After three declared environments exist.
+- prospect_id: HFIC-PROSPECT-015
+  rank: 15
+  title: Hierarchical Bayesian family memory
+  donor_domains:
+  - HIERARCHICAL_BAYES
+  problem: One panel cannot manufacture family precision.
+  capability: Partial pooling across independent windows or families.
+  disposition: PREREQUISITE_BLOCKED
+  implementation_state: NOT_IMPLEMENTED
+  current_project_fit: 2
+  expected_process_impact: 3
+  durable_edge: 4
+  effort_class: L
+  activation_triggers:
+  - OWNER_DISCOVERY_REFRAME
+  prerequisites:
+  - SEVERAL_INDEPENDENT_WINDOWS_OR_FAMILIES
+  named_consumers:
+  - FUTURE_DISCOVERY_RANKER_ENTRY_GATE
+  minimal_first_atom: Do not pool one panel into fake precision.
+  satisfied_by: []
+  residual_gap: Require several independent windows/families.
+  success_signal: Partial pooling uses more than one independent family.
+  kill_or_defer_if: If only one panel is available.
+  non_goals:
+  - NO_FAKE_PRECISION_FROM_ONE_PANEL
+  source_refs:
+  - docs/architecture/prospects/HFIC_SCIENTIFIC_DISCOVERY_ENGINE_RESEARCH_V1.md
+  reassess_when: After several independent windows or families exist.
+- prospect_id: HFIC-PROSPECT-016
+  rank: 16
+  title: Symbolic program discovery with deterministic evaluator
+  donor_domains:
+  - PROGRAM_SYNTHESIS
+  - SYMBOLIC_REGRESSION
+  problem: Program search without an independent evaluator overfits consumed backtests.
+  capability: Symbolic search gated by an evaluator independent of consumed backtests.
+  disposition: DEFERRED_CURRENT_HORIZON
+  implementation_state: NOT_IMPLEMENTED
+  current_project_fit: 1
+  expected_process_impact: 4
+  durable_edge: 5
+  effort_class: XL
+  activation_triggers:
+  - OWNER_DISCOVERY_REFRAME
+  prerequisites:
+  - INDEPENDENT_EVALUATOR
+  named_consumers:
+  - FUTURE_DISCOVERY_RANKER_ENTRY_GATE
+  minimal_first_atom: Do not start program discovery now.
+  satisfied_by: []
+  residual_gap: Requires an evaluator independent of consumed backtests.
+  success_signal: An evaluator exists that does not reuse consumed backtests.
+  kill_or_defer_if: If search uses the same consumed panel as fitness.
+  non_goals:
+  - NO_SYMBOLIC_SEARCH_ON_CONSUMED_BACKTESTS
+  source_refs:
+  - docs/architecture/prospects/HFIC_SCIENTIFIC_DISCOVERY_ENGINE_RESEARCH_V1.md
+  reassess_when: When an independent evaluator exists.
+- prospect_id: HFIC-PROSPECT-017
+  rank: 17
+  title: Invariant prediction and environment stress
+  donor_domains:
+  - INVARIANT_RISK_MINIMIZATION
+  problem: Invariant claims need multiple environments and explicit assumptions.
+  capability: Stress tests that fail a predictor that does not transfer.
+  disposition: PREREQUISITE_BLOCKED
+  implementation_state: NOT_IMPLEMENTED
+  current_project_fit: 2
+  expected_process_impact: 4
+  durable_edge: 5
+  effort_class: L
+  activation_triggers:
+  - OWNER_DISCOVERY_REFRAME
+  prerequisites:
+  - MULTIPLE_ENVIRONMENTS
+  - EXPLICIT_ASSUMPTIONS
+  named_consumers:
+  - FUTURE_DISCOVERY_RANKER_ENTRY_GATE
+  minimal_first_atom: Do not claim invariance from one regime.
+  satisfied_by: []
+  residual_gap: Require multiple environments and explicit assumptions.
+  success_signal: A predictor that fails under a declared environment shift is killed.
+  kill_or_defer_if: If only one environment is labeled.
+  non_goals:
+  - NO_INVARIANCE_FROM_ONE_REGIME
+  source_refs:
+  - docs/architecture/prospects/HFIC_SCIENTIFIC_DISCOVERY_ENGINE_RESEARCH_V1.md
+  reassess_when: After multiple environments and explicit assumptions exist.
+- prospect_id: HFIC-PROSPECT-018
+  rank: 18
+  title: Marked event processes and Hawkes
+  donor_domains:
+  - POINT_PROCESSES
+  - HAWKES
+  problem: Event streams are not retained as a first-class marked process.
+  capability: Simple inter-arrival baseline before Hawkes.
+  disposition: PREREQUISITE_BLOCKED
+  implementation_state: NOT_IMPLEMENTED
+  current_project_fit: 2
+  expected_process_impact: 3
+  durable_edge: 3
+  effort_class: L
+  activation_triggers:
+  - OWNER_DISCOVERY_REFRAME
+  prerequisites:
+  - RETAINED_EVENT_STREAM
+  named_consumers:
+  - FUTURE_DISCOVERY_RANKER_ENTRY_GATE
+  minimal_first_atom: Require retained event stream and a simple inter-arrival baseline first.
+  satisfied_by: []
+  residual_gap: Require retained event stream and simple inter-arrival baseline first.
+  success_signal: A baseline inter-arrival model exists on retained events.
+  kill_or_defer_if: If Hawkes is fit without a baseline.
+  non_goals:
+  - NO_HAWKES_WITHOUT_BASELINE
+  source_refs:
+  - docs/architecture/prospects/HFIC_SCIENTIFIC_DISCOVERY_ENGINE_RESEARCH_V1.md
+  reassess_when: After a retained event stream and inter-arrival baseline exist.
+- prospect_id: HFIC-PROSPECT-019
+  rank: 19
+  title: Temporal actor graph and motifs
+  donor_domains:
+  - TEMPORAL_GRAPHS
+  problem: Graph features without a named consumer become a preparatory platform.
+  capability: Bounded graph evidence for one named consumer.
+  disposition: PREREQUISITE_BLOCKED
+  implementation_state: NOT_IMPLEMENTED
+  current_project_fit: 2
+  expected_process_impact: 3
+  durable_edge: 3
+  effort_class: L
+  activation_triggers:
+  - OWNER_DISCOVERY_REFRAME
+  prerequisites:
+  - NAMED_CONSUMER
+  - BOUNDED_GRAPH_EVIDENCE_ROUTE
+  named_consumers:
+  - FUTURE_DISCOVERY_RANKER_ENTRY_GATE
+  minimal_first_atom: No preparatory entity platform.
+  satisfied_by: []
+  residual_gap: Require a named consumer and bounded graph evidence route.
+  success_signal: One named consumer uses a bounded motif on existing evidence.
+  kill_or_defer_if: If a general graph platform is proposed first.
+  non_goals:
+  - NO_PREPARATORY_ENTITY_PLATFORM
+  source_refs:
+  - docs/architecture/prospects/HFIC_SCIENTIFIC_DISCOVERY_ENGINE_RESEARCH_V1.md
+  reassess_when: When a named consumer and bounded graph route exist.
+- prospect_id: HFIC-PROSPECT-020
+  rank: 20
+  title: Co-Scientist evolutionary population
+  donor_domains:
+  - MULTI_AGENT
+  - EVOLUTIONARY_SEARCH
+  problem: More agents do not help until evaluator and diversity debt are proven.
+  capability: Population search only after evaluator and diversity debt exist.
+  disposition: DEFERRED_CURRENT_HORIZON
+  implementation_state: NOT_IMPLEMENTED
+  current_project_fit: 1
+  expected_process_impact: 3
+  durable_edge: 3
+  effort_class: XL
+  activation_triggers:
+  - OWNER_DISCOVERY_REFRAME
+  prerequisites:
+  - EVALUATOR_AND_DIVERSITY_DEBT_PROVEN
+  named_consumers:
+  - FUTURE_DISCOVERY_RANKER_ENTRY_GATE
+  minimal_first_atom: Do not add agent swarms now.
+  satisfied_by: []
+  residual_gap: More agents do not help until evaluator and diversity debt are proven.
+  success_signal: Evaluator and diversity debt are independently proven.
+  kill_or_defer_if: If extra agents are added to hide a missing evaluator.
+  non_goals:
+  - NO_AGENT_SWARM_WITHOUT_EVALUATOR
+  source_refs:
+  - docs/architecture/prospects/HFIC_SCIENTIFIC_DISCOVERY_ENGINE_RESEARCH_V1.md
+  reassess_when: After evaluator and diversity debt are proven.
+- prospect_id: HFIC-PROSPECT-021
+  rank: 21
+  title: Decision-focused learning and abstention
+  donor_domains:
+  - DECISION_FOCUSED_LEARNING
+  problem: Abstention and promotion/risk-layer loss are not the current discovery gap.
+  capability: Decision-aware loss only after a promotion/risk consumer exists.
+  disposition: DEFERRED_CURRENT_HORIZON
+  implementation_state: NOT_IMPLEMENTED
+  current_project_fit: 1
+  expected_process_impact: 3
+  durable_edge: 4
+  effort_class: L
+  activation_triggers:
+  - OWNER_DISCOVERY_REFRAME
+  prerequisites:
+  - PROMOTION_OR_RISK_LAYER_CONSUMER
+  named_consumers:
+  - FUTURE_DISCOVERY_RANKER_ENTRY_GATE
+  minimal_first_atom: Not a current discovery evidence gap.
+  satisfied_by: []
+  residual_gap: Promotion/risk-layer concern, not current discovery evidence gap.
+  success_signal: A named risk-layer consumer owns the abstention loss.
+  kill_or_defer_if: If used to rank discovery candidates now.
+  non_goals:
+  - NO_PROMOTION_LAYER_NOW
+  source_refs:
+  - docs/architecture/prospects/HFIC_SCIENTIFIC_DISCOVERY_ENGINE_RESEARCH_V1.md
+  reassess_when: When a promotion or risk-layer consumer is commissioned.
+- prospect_id: HFIC-PROSPECT-022
+  rank: 22
+  title: Contextual bandit for research budget
+  donor_domains:
+  - BANDITS
+  problem: Budget allocation learning needs many honest comparable cycles.
+  capability: A contextual policy over research actions with learning-progress outcomes.
+  disposition: PREREQUISITE_BLOCKED
+  implementation_state: NOT_IMPLEMENTED
+  current_project_fit: 1
+  expected_process_impact: 3
+  durable_edge: 3
+  effort_class: L
+  activation_triggers:
+  - OWNER_DISCOVERY_REFRAME
+  prerequisites:
+  - TWENTY_HONEST_COMPARABLE_CYCLES
+  named_consumers:
+  - FUTURE_DISCOVERY_RANKER_ENTRY_GATE
+  minimal_first_atom: Do not fit a bandit on sparse cycles.
+  satisfied_by: []
+  residual_gap: Require at least 20 honest comparable cycles with learning-progress outcomes.
+  success_signal: Twenty comparable cycles with a declared learning-progress outcome.
+  kill_or_defer_if: If fewer than 20 honest cycles exist.
+  non_goals:
+  - NO_BANDIT_ON_SPARSE_CYCLES
+  source_refs:
+  - docs/architecture/prospects/HFIC_SCIENTIFIC_DISCOVERY_ENGINE_RESEARCH_V1.md
+  reassess_when: After 20 honest comparable cycles exist.
+- prospect_id: HFIC-PROSPECT-023
+  rank: 23
+  title: RL digital twin giant GNN or foundation model
+  donor_domains:
+  - RL
+  - GNN
+  - FOUNDATION_MODELS
+  problem: No evidenced state/action simulator or decision consumer justifies this class.
+  capability: Reconsider only after a separately evidenced simulator and decision consumer.
+  disposition: REJECTED_CURRENT_HORIZON
+  implementation_state: NOT_IMPLEMENTED
+  current_project_fit: 1
+  expected_process_impact: 2
+  durable_edge: 2
+  effort_class: XL
+  activation_triggers:
+  - OWNER_DISCOVERY_REFRAME
+  prerequisites:
+  - SEPARATELY_EVIDENCED_SIMULATOR_AND_DECISION_CONSUMER
+  named_consumers:
+  - FUTURE_DISCOVERY_RANKER_ENTRY_GATE
+  minimal_first_atom: Do not start RL, digital twin, giant GNN or foundation-model work.
+  satisfied_by: []
+  residual_gap: Reconsider only after a separately evidenced state/action simulator and decision consumer
+    exist.
+  success_signal: A separately evidenced simulator and decision consumer exist.
+  kill_or_defer_if: If proposed as the next discovery engine.
+  non_goals:
+  - NO_RL
+  - NO_DIGITAL_TWIN
+  - NO_GIANT_GNN
+  - NO_FOUNDATION_MODEL
+  source_refs:
+  - docs/architecture/prospects/HFIC_SCIENTIFIC_DISCOVERY_ENGINE_RESEARCH_V1.md
+  reassess_when: Only after a separately evidenced simulator and decision consumer exist.

@@ -635,3 +635,41 @@ recipes:
   output_contract:
     format: json
     max_records: 1
+- recipe_id: QUERY-HFIC-SCIENTIFIC-DISCOVERY-PROSPECTS-001
+  record_version: '1.0'
+  purpose: Return at most three advisory HFIC scientific-discovery prospects for an allowlisted trigger without scanning the repository.
+  kind: local_command
+  read_only: true
+  bounded: true
+  network_required: false
+  write_effects: NONE
+  timeout_seconds: 30
+  command:
+  - uv
+  - run
+  - --locked
+  - --managed-python
+  - python
+  - -B
+  - scripts/hypothesis_forge.py
+  - prospects
+  - --trigger
+  - '{trigger}'
+  - --max-results
+  - '{max_results}'
+  - --format
+  - json
+  parameters:
+  - name: trigger
+    required: true
+    pattern: '^(OWNER_DISCOVERY_REFRAME|POST_NO_WORTHY_REVIEW|MEASURED_DUPLICATE_COLLAPSE|MEASURED_PREPARATORY_LOOP)$'
+  - name: max_results
+    required: false
+    pattern: '^[1-3]$'
+  target_asset_ids:
+  - SCRIPT-HYPOTHESIS-FORGE-001
+  - MODULE-FACTORY-V1-HFIC-PROSPECTS-001
+  - DOC-HFIC-SCIENTIFIC-DISCOVERY-PROSPECTS-001
+  output_contract:
+    format: json
+    max_records: 3

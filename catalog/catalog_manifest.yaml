@@ -4,10 +4,10 @@ catalog_version: 0.120.0
 as_of: '2026-08-25'
 implementation_status: VALIDATED_ACTIVE
 current_checkpoint:
-  assets: 1532
+  assets: 1540
   asset_registries: 4
-  schemas: 69
-  queries: 18
+  schemas: 72
+  queries: 19
   lifecycle_registries: 9
   lifecycle_records: 84
 canonical_bindings:
@@ -115,6 +115,9 @@ root_resolver:
   - catalog/schemas/hypothesis_forge_session_receipt_v1.schema.json
   - catalog/schemas/hfic_provenance_time_correction_v1.schema.json
   - catalog/schemas/hypothesis_forge_synthesis_handoff_v1_1.schema.json
+  - catalog/schemas/hfic_scientific_discovery_prospects_v1.schema.json
+  - catalog/schemas/hfic_next_epistemic_action_draft_v1.schema.json
+  - catalog/schemas/hfic_next_epistemic_action_v1.schema.json
   commands:
     validate:
     - uv
@@ -905,5 +908,13 @@ mandatory_asset_ids:
 - SCHEMA-HFIC-PROVENANCE-TIME-CORRECTION-V1-001
 - SCHEMA-HYPOTHESIS-FORGE-SYNTHESIS-HANDOFF-V1-1-001
 - TEST-HFIC-OPERATIONAL-CLOSURE-001
+- CTRL-HFIC-DISCOVERY-PROSPECT-MEMORY-AND-NEXT-ACTION-001
+- MODULE-FACTORY-V1-HFIC-PROSPECTS-001
+- SCHEMA-HFIC-SCIENTIFIC-DISCOVERY-PROSPECTS-V1-001
+- SCHEMA-HFIC-NEXT-EPISTEMIC-ACTION-DRAFT-V1-001
+- SCHEMA-HFIC-NEXT-EPISTEMIC-ACTION-V1-001
+- TEST-HFIC-DISCOVERY-PROSPECTS-AND-NEXT-ACTION-001
+- DOC-HFIC-SCIENTIFIC-DISCOVERY-RESEARCH-001
+- DOC-HFIC-SCIENTIFIC-DISCOVERY-PROSPECTS-001
 deferred_capabilities:
 - GRAPH_DATABASE

@@ -24,13 +24,15 @@ session (`ONE_SLASH_ONE_SESSION`), expiring at final terminal/STOP.
 approve an RDP write between preflight, freeze, Critic, revision/classification
 and finalize. `PASS_TO_CLASSIFICATION` and exactly one bounded `REVISE_ONCE`
 remain inside the original slash authority and continue automatically.
+After Prompt A `NO_WORTHY_HYPOTHESIS`, the same slash automatically runs
+Prompt C (`HFIC-NEXT-V1.0`) and freeze `--next-action` without owner intervention.
 
 Authorized without additional owner questions: read-only Git/Catalog/active RDP
 navigation; preflight and safe offline commissioning on the same canonical data
 root if genuinely required; process-owned OS temp files; append-only RDP writes
 for context artifact, session/cycle, all candidate versions, frozen Critic
 packet, Critic result, revision receipt, classifier receipt, decisions, session
-receipt and terminal; automatic isolated Critic handoff; network-free
+receipt, next epistemic action and terminal; automatic isolated Critic handoff; network-free
 deterministic lane classification; finalize; replay/resume/`prove-runtime`;
 cleanup of process-owned temp files.
 
@@ -89,12 +91,26 @@ Happy path — no owner copy/paste between the slash command and the final termi
    Output a machine-valid `FORGE_DRAFT` (`hypothesis_forge_draft_v1.schema.json`).
    Copy `truth_roots_used`, `prior_work_receipts` and `research_memory_as_of` from
    preflight. Do **not** emit `CRITIC_INPUT_PACKET`; freeze is the only packet builder.
+   Do **not** query prospects or include prospect IDs/research text in Prompt A.
 4. Write machine `FORGE_DRAFT` to an OS temp file.
-5. Run `python -B scripts/hypothesis_forge.py freeze --draft <temp> --preflight-receipt <temp> --format json`.
+5. If Prompt A returned `NO_WORTHY_HYPOTHESIS` (empty `selected_candidate_ref`):
+   - query `python -B scripts/hypothesis_forge.py prospects --trigger POST_NO_WORTHY_REVIEW --max-results 3 --format json`;
+   - run **PROMPT C** (`HFIC-NEXT-V1.0`) from the operator pack using only the
+     already-bound `FORGE_CONTEXT_PACKET`, no-worthy portfolio, terminal, and
+     at most three prospect summaries;
+   - write a draft matching `hfic_next_epistemic_action_draft_v1.schema.json`;
+   - one schema-repair attempt; if still invalid, omit `--next-action` so freeze
+     persists deterministic `WAIT_FOR_NEW_EVIDENCE` / `NEXT_ACTION_GENERATION_FALLBACK`;
+   - run `python -B scripts/hypothesis_forge.py freeze --draft <temp> --preflight-receipt <temp> --next-action <temp-or-omit> --format json`;
+   - skip Independent Critic; do not finalize; report `NO_WORTHY_HYPOTHESIS` plus
+     the typed next action. Proposed owner phrases are `PROPOSED_NOT_AUTHORITY`
+     and must not be executed.
+6. Otherwise run `python -B scripts/hypothesis_forge.py freeze --draft <temp> --preflight-receipt <temp> --format json`.
    Frozen packet is authority. One schema-repair attempt, then `HFIC_PROTOCOL_INVALID`.
-6. **Mandatory auto-handoff:** launch Independent Critic in a new isolated context
+   Do not pass `--next-action` on a selected-candidate path.
+7. **Mandatory auto-handoff (selected path only):** launch Independent Critic in a new isolated context
    with only the frozen packet. Do not persist from Critic.
-7. After critic returns `hypothesis_critic_result_v1`:
+8. After critic returns `hypothesis_critic_result_v1`:
    - `REVISE_ONCE` → `python -B scripts/hypothesis_forge.py finalize` persists
      `REVISION_REQUIRED`; then `python -B scripts/hypothesis_forge.py revise`
      (one claim-wording repair); then isolated Critic again; second terminal
@@ -103,19 +119,19 @@ Happy path — no owner copy/paste between the slash command and the final termi
      persists `AWAITING_CLASSIFICATION`; then
      `python -B scripts/hypothesis_forge.py classify`; then finalize. This is
      not a completed terminal.
-   - `KILL_*` / `NO_WORTHY_HYPOTHESIS` → `python -B scripts/hypothesis_forge.py finalize`.
+   - `KILL_*` → `python -B scripts/hypothesis_forge.py finalize`.
    Fake/nonempty classifier objects are invalid. Final `PASS_*` requires a live
    network-free classifier receipt bound to session/selected/spec hash.
-8. Verify `SYNTHESIS_COMPLETE` / RDP receipt, Git mutation 0, provider calls 0
+9. Verify `SYNTHESIS_COMPLETE` / RDP receipt, Git mutation 0, provider calls 0
    before telling the owner the cycle is complete.
-9. On crash/retry, resume; never regenerate the same evidence+focus search.
+10. On crash/retry, resume; never regenerate the same evidence+focus search.
 
 ## Mandatory auto-handoff (non-negotiable)
 
 Forge is **not complete** when the packet is printed. The owner must not need to
 remember step 2.
 
-Immediately after a valid frozen `CRITIC_INPUT_PACKET`:
+Immediately after a valid frozen `CRITIC_INPUT_PACKET` (selected path only):
 
 1. Emit a synthesis handoff receipt with `synthesis_status: PENDING_CRITIC` per
    `catalog/schemas/hypothesis_forge_synthesis_handoff_v1_1.schema.json` (v1.0

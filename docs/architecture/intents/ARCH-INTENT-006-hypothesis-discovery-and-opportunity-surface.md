@@ -1,6 +1,6 @@
 ---
 intent_id: ARCH-INTENT-006
-intent_version: '1.0'
+intent_version: '1.1'
 status: ACCEPTED_DIRECTION_NOT_IMPLEMENTED
 as_of: '2026-08-22'
 truth_owner: USER_GOAL_OWNER
@@ -11,6 +11,7 @@ activation_mode: WATCH_ONLY_UNTIL_ENTRY_GATE
 named_consumers:
   - FUTURE_DISCOVERY_RANKER_ENTRY_GATE
   - GOAL_OWNER_HYPOTHESIS_PRIORITIZATION
+  - HFIC-POST-NO-WORTHY-ROUTER
 extends:
   - ARCH-INTENT-001
   - ARCH-INTENT-002
@@ -53,10 +54,23 @@ This horizon memory is for:
    minimum contract before any build atom;
 2. `GOAL_OWNER_HYPOTHESIS_PRIORITIZATION` — owner prioritization when Factory
    throughput outpaces high-quality next-hypothesis supply.
+3. `HFIC-POST-NO-WORTHY-ROUTER` — ordinary `/hypothesis-forge` after a completed
+   `NO_WORTHY_HYPOTHESIS`. This consumer may query at most three advisory
+   prospect summaries. It does not activate a discovery ranker.
 
 Factory execution speed is an **activation precondition**, not the primary
 consumer of this memory. This record does not advise or insert roadmap items
 and remains WATCH-only until the activation trigger.
+
+v1.1 adds Git-discoverable advisory research at
+`docs/architecture/prospects/HFIC_SCIENTIFIC_DISCOVERY_ENGINE_RESEARCH_V1.md`
+(byte-for-byte dated snapshot; not current implementation truth) and a
+23-record machine portfolio at
+`docs/architecture/prospects/hfic_scientific_discovery_prospects_v1.yaml`.
+Prospect default Forge visibility is `HIDDEN`. Bounded manual-HFIC post-no-worthy
+routing is not `ARCH-INTENT-006` trigger proof and is not
+`DISCOVERY_RANKER_TRIGGER_PROVEN`. Full quality-diversity / VOI / sequential
+inference engines remain unimplemented.
 
 ## 2. Product layer
 
@@ -224,4 +238,5 @@ intent adds no new authority plane.
 `ACCEPTED_DIRECTION_NOT_IMPLEMENTED`.
 
 No generator, ranker, queue, UI, DB, provider route, trial, holdout use, or
-roadmap insertion is authorized by registering this intent.
+roadmap insertion is authorized by registering this intent. v1.1 does not prove
+the ARCH-INTENT-006 activation trigger.

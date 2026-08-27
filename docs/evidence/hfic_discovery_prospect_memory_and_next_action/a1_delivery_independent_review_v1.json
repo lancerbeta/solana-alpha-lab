@@ -1,0 +1,57 @@
+{
+  "as_of": "2026-08-27",
+  "non_claims": [
+    "NO_CRYPTOGRAPHIC_REVIEWER_IDENTITY",
+    "NO_ALPHA",
+    "NO_AUTONOMOUS_GENERATOR",
+    "NO_DISCOVERY_RANKER_TRIGGER_PROVEN",
+    "NO_PROVIDER_OR_EXPERIMENT_AUTHORITY"
+  ],
+  "required_roles": [
+    "ARCHITECTURE_CRITIC",
+    "CODE_REVIEWER",
+    "GOAL_DOD_CRITIC"
+  ],
+  "review_id": "HFIC-DISCOVERY-PROSPECT-MEMORY-INDEPENDENT-REVIEW-001",
+  "reviewed_bindings_sha256": "99c89344b8c408c27eda669a3622f8b4c14d20d5701bcbc296fa9bf3493f3a77",
+  "reviewed_inventory_sha256": "a3852272ca506ba63f325ae770d749db73cce0f7aa69af3150a5fa40849d31d4",
+  "reviews": [
+    {
+      "findings": [
+        "FIXED_HISTORICAL_NO_WORTHY_LEGACY_SKIP",
+        "FIXED_PROSPECT_IDS_BOUND_TO_POST_NO_WORTHY_QUERY",
+        "CHECKED_SELECTED_PATH_REJECTS_NEXT_ACTION",
+        "CHECKED_RUNTIME_AUTHORITY_ZEROS",
+        "RESIDUAL_REPLAY_RECEIPT_HASH_PRIORITY"
+      ],
+      "role": "CODE_REVIEWER",
+      "verdict": "PASS"
+    },
+    {
+      "findings": [
+        "CHECKED_DEFINITION_OF_DONE_IN_TASK_CONTRACT",
+        "CHECKED_ALL_23_DISPOSITIONS_LOCKED",
+        "CHECKED_WAIT_FALLBACK_RESIDUAL_NON_CLAIMS",
+        "CHECKED_CAPABILITY_PERSIST_SEPARATE_TEMP_ROOT",
+        "FIXED_PROSPECT_002_CANNOT_BYPASS_QUERY"
+      ],
+      "role": "GOAL_DOD_CRITIC",
+      "verdict": "PASS"
+    },
+    {
+      "findings": [
+        "CHECKED_ARCH_INTENT_006_V1_1_WATCH_ONLY",
+        "CHECKED_HFIC_V1_1_PROMPT_A_UNCHANGED",
+        "CHECKED_HFIC_PROTOCOL_EPOCH_SKIP",
+        "CHECKED_PROPOSED_NOT_AUTHORITY",
+        "RESIDUAL_FORWARD_AVAILABILITY_FIELDS_ARE_PROSE"
+      ],
+      "role": "ARCHITECTURE_CRITIC",
+      "verdict": "PASS"
+    }
+  ],
+  "schema": "smial.delivery-independent-review-evidence",
+  "schema_version": "1.0",
+  "task_id": "HFIC_DISCOVERY_PROSPECT_MEMORY_AND_NEXT_ACTION_V1",
+  "verdict": "PASS"
+}

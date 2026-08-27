@@ -116,3 +116,19 @@ slash_session_authority:
   pass_fast_lane_ready: STOP_BEFORE_EXPERIMENT
   pass_change_lane_required: RETURN_PRD_SSD_DO_NOT_CREATE_PR
   pass_data_option_required: RETURN_DATA_OPTION_DO_NOT_COLLECT
+next_epistemic_action:
+  prompt_identity: HFIC-NEXT-V1.0
+  trigger: POST_NO_WORTHY_REVIEW
+  max_prospects: 3
+  same_slash: true
+  mid_cycle_owner_interventions: 0
+  token: ZERO_MID_CYCLE_OWNER_INTERVENTION
+  skip_independent_critic: true
+  schema_repair_attempts: 1
+  missing_or_invalid_after_repair: DETERMINISTIC_SAFE_FALLBACK
+  types:
+    - WAIT_FOR_NEW_EVIDENCE
+    - FORWARD_DATA_OPTION_READY
+    - CAPABILITY_OPTION_READY
+  proposed_phrase_status: PROPOSED_NOT_AUTHORITY
+  execute_proposed_phrase: false

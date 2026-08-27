@@ -1,0 +1,39 @@
+{
+  "packet_schema": "smial.hfic-next-epistemic-action-draft",
+  "packet_version": "1.0",
+  "prompt_version": "HFIC-NEXT-V1.0",
+  "action_type": "WAIT_FOR_NEW_EVIDENCE",
+  "reason_code": "NO_ADMISSIBLE_UNCONSUMED_EVIDENCE",
+  "named_consumer": "HFIC-POST-NO-WORTHY-ROUTER",
+  "basis_candidate_refs": [],
+  "prospect_ids": ["HFIC-PROSPECT-001"],
+  "evidence_gap": "No admissible unconsumed observation remains on this evidence epoch.",
+  "why_now": "Prompt A already returned NO_WORTHY_HYPOTHESIS; waiting is cheaper than a new spend.",
+  "why_cheaper_option_is_insufficient": "There is no cheaper option than wait when no unconsumed evidence exists.",
+  "action_payload": {
+    "wake_on": ["EVIDENCE_EPOCH_CHANGED", "OWNER_DISCOVERY_REFRAME"]
+  },
+  "owner_gate": {
+    "required": false,
+    "phrase_status": "NONE"
+  },
+  "authority": {
+    "git_mutation": 0,
+    "rdp_mutation_outside_freeze": 0,
+    "experiment_execution": 0,
+    "provider_api_rpc_wss_calls": 0,
+    "credential_reads": 0,
+    "cash_spend_usd_cents": 0,
+    "wallet_signer_transaction_actions": 0
+  },
+  "non_claims": [
+    "NO_ALPHA",
+    "NO_AUTONOMOUS_GENERATOR",
+    "NO_DISCOVERY_RANKER_TRIGGER_PROVEN",
+    "NO_ARCH_INTENT_006_FULL_IMPLEMENTATION",
+    "NO_QUALITY_DIVERSITY_ENGINE",
+    "NO_VOI_SCHEDULER",
+    "NO_SEQUENTIAL_INFERENCE_ENGINE",
+    "NO_PROVIDER_OR_EXPERIMENT_AUTHORITY"
+  ]
+}
