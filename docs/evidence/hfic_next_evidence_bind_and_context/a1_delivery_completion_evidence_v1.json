@@ -56,7 +56,7 @@
     "github_ci": "ENFORCED_LIVE_AT_GUARDED_MERGE",
     "independent_review": {
       "path": "docs/evidence/hfic_next_evidence_bind_and_context/a1_delivery_independent_review_v1.json",
-      "sha256": "a4cc3c538c6d815f336c3e2314ca3d5b5c2f14f74e741e429aa062b72461bd01",
+      "sha256": "8c8fad9698e4faa3e8f32c12567ded07aa985e0b1f1413b60465f2a4dee57ba3",
       "verdict": "PASS"
     },
     "project_checks": [
