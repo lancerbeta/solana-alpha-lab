@@ -40,6 +40,15 @@ CONSUMED_RECEIPT = (
 )
 
 
+def _offline_preflight(*_args: object, **_kwargs: object) -> dict[str, object]:
+    return {"credential_reads": 0, "provider_requests": 0}
+
+
+def _run_wave(policy: dict[str, Any], /, **kwargs: Any) -> dict[str, object]:
+    kwargs.setdefault("preflight_fn", _offline_preflight)
+    return run_wave(policy, **kwargs)
+
+
 def _policy() -> dict[str, Any]:
     value = yaml.safe_load(CONFIG.read_text(encoding="utf-8"))
     if not isinstance(value, dict):
@@ -151,7 +160,7 @@ class FrictionH900Tests(unittest.TestCase):
     def test_due_wave_rejects_consumed_h900_receipt(self) -> None:
         old = json.loads(CONSUMED_RECEIPT.read_text(encoding="utf-8"))
         with self.assertRaisesRegex(Exception, "CONSUMED_H900_OUTCOME_REUSED"):
-            run_wave(
+            _run_wave(
                 _policy(),
                 root=ROOT,
                 wave="due",
@@ -162,7 +171,7 @@ class FrictionH900Tests(unittest.TestCase):
 
     def test_due_wave_rejects_forbidden_identity_in_prior(self) -> None:
         quoted = _quote_body()
-        t0 = run_wave(
+        t0 = _run_wave(
             _policy(),
             root=ROOT,
             wave="t0",
@@ -172,7 +181,7 @@ class FrictionH900Tests(unittest.TestCase):
         t0["observations"][0]["identity_id"] = "A24_POST_MIGRATION"
         t0["observations"][0]["mint"] = A24_MINT
         with self.assertRaisesRegex(Exception, "A24_OR_T21A_SELECTED"):
-            run_wave(
+            _run_wave(
                 _policy(),
                 root=ROOT,
                 wave="due",
@@ -184,7 +193,7 @@ class FrictionH900Tests(unittest.TestCase):
     def test_t0_quotes_four_cells_and_keeps_gaps(self) -> None:
         quoted = _quote_body()
         opener = _ScriptedOpener([(quoted, 200)] * 8)
-        receipt = run_wave(
+        receipt = _run_wave(
             _policy(),
             root=ROOT,
             wave="t0",
@@ -212,14 +221,14 @@ class FrictionH900Tests(unittest.TestCase):
             (_quote_body("11000000"), 200),
             (_quote_body("10600000"), 200),
         ]
-        t0 = run_wave(
+        t0 = _run_wave(
             _policy(),
             root=ROOT,
             wave="t0",
             now=datetime(2026, 8, 18, 10, 0, tzinfo=UTC),
             opener=_ScriptedOpener(t0_bodies),
         )
-        due = run_wave(
+        due = _run_wave(
             _policy(),
             root=ROOT,
             wave="due",
@@ -324,14 +333,14 @@ class FrictionH900Tests(unittest.TestCase):
 
     def test_late_h900_is_missed_offset_without_call(self) -> None:
         quoted = _quote_body()
-        t0 = run_wave(
+        t0 = _run_wave(
             _policy(),
             root=ROOT,
             wave="t0",
             now=datetime(2026, 8, 18, 10, 0, tzinfo=UTC),
             opener=_ScriptedOpener([(quoted, 200)] * 8),
         )
-        late = run_wave(
+        late = _run_wave(
             _policy(),
             root=ROOT,
             wave="due",

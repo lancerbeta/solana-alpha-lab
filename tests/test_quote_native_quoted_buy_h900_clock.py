@@ -32,6 +32,17 @@ from solana_alpha_lab.quote_native_quoted_buy_h900_clock import (  # noqa: E402
 CONFIG = ROOT / "configs/quote_native_quoted_buy_h900_clock_v1.yaml"
 MODULE = ROOT / "src/solana_alpha_lab/quote_native_quoted_buy_h900_clock.py"
 SCRIPT = ROOT / "scripts/run_quote_native_quoted_buy_h900_clock.py"
+
+
+def _offline_preflight(*_args: object, **_kwargs: object) -> dict[str, object]:
+    return {"credential_reads": 0, "provider_requests": 0}
+
+
+def _run_wave(policy: dict[str, Any], /, **kwargs: Any) -> dict[str, object]:
+    kwargs.setdefault("preflight_fn", _offline_preflight)
+    return run_wave(policy, **kwargs)
+
+
 OLD_RECEIPT = (
     ROOT
     / "docs/evidence/quote_native_evidence_fit_panel"
@@ -138,7 +149,7 @@ class QuotedBuyH900Tests(unittest.TestCase):
     def test_due_wave_rejects_old_panel_receipt(self) -> None:
         old = json.loads(OLD_RECEIPT.read_text(encoding="utf-8"))
         with self.assertRaisesRegex(Exception, "OLD_DUE_AT_REBUILT_OR_OLD_RECEIPT_MUTATED"):
-            run_wave(
+            _run_wave(
                 _policy(),
                 root=ROOT,
                 wave="due",
@@ -150,7 +161,7 @@ class QuotedBuyH900Tests(unittest.TestCase):
     def test_t0_quotes_three_cells_and_keeps_gaps(self) -> None:
         quoted = _quote_body()
         opener = _ScriptedOpener([(quoted, 200)] * 6)
-        receipt = run_wave(
+        receipt = _run_wave(
             _policy(),
             root=ROOT,
             wave="t0",
@@ -167,14 +178,14 @@ class QuotedBuyH900Tests(unittest.TestCase):
 
     def test_due_wave_fires_h900_only_inside_slack(self) -> None:
         quoted = _quote_body()
-        t0 = run_wave(
+        t0 = _run_wave(
             _policy(),
             root=ROOT,
             wave="t0",
             now=datetime(2026, 8, 18, 1, 30, tzinfo=UTC),
             opener=_ScriptedOpener([(quoted, 200)] * 6),
         )
-        due = run_wave(
+        due = _run_wave(
             _policy(),
             root=ROOT,
             wave="due",
@@ -190,14 +201,14 @@ class QuotedBuyH900Tests(unittest.TestCase):
 
     def test_late_h900_is_missed_offset_without_call(self) -> None:
         quoted = _quote_body()
-        t0 = run_wave(
+        t0 = _run_wave(
             _policy(),
             root=ROOT,
             wave="t0",
             now=datetime(2026, 8, 18, 1, 30, tzinfo=UTC),
             opener=_ScriptedOpener([(quoted, 200)] * 6),
         )
-        late = run_wave(
+        late = _run_wave(
             _policy(),
             root=ROOT,
             wave="due",
@@ -217,14 +228,14 @@ class QuotedBuyH900Tests(unittest.TestCase):
 
     def test_due_before_h900_does_not_fire(self) -> None:
         quoted = _quote_body()
-        t0 = run_wave(
+        t0 = _run_wave(
             _policy(),
             root=ROOT,
             wave="t0",
             now=datetime(2026, 8, 18, 1, 30, tzinfo=UTC),
             opener=_ScriptedOpener([(quoted, 200)] * 6),
         )
-        early = run_wave(
+        early = _run_wave(
             _policy(),
             root=ROOT,
             wave="due",
