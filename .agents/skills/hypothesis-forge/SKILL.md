@@ -121,8 +121,8 @@ Immediately after a valid frozen `CRITIC_INPUT_PACKET`:
    `catalog/schemas/hypothesis_forge_synthesis_handoff_v1_1.schema.json` (v1.0
    readers remain valid for historical fixtures).
 2. **Launch Independent Critic in a new isolated context** using `Task`
-   subagent with read-only critic instructions and **only** the packet
-   (no Forge narrative, no intermediate reasoning).
+   subagent, `.agents/skills/independent-hypothesis-critic/SKILL.md`, and
+   **only** the packet (no Forge narrative, no intermediate reasoning).
    If isolated context cannot launch, return typed `AUTO_HANDOFF_UNAVAILABLE`
    and STOP. Do not instruct the owner to open a new chat, paste the packet,
    or press Run. Do not silently self-criticize in the Forge context.
