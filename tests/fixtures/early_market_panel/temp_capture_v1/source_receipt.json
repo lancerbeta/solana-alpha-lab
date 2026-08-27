@@ -1,0 +1,20 @@
+{
+  "atom_id": "EARLY_VALUATION_LIQUIDITY_DIVERGENCE_CONFIRMATION_V1",
+  "schema": "smial.early-market-panel-temp-source-receipt",
+  "schema_version": "1.0",
+  "provider_requests": 0,
+  "raw_retention": {
+    "manifests": [
+      {
+        "bytes": 719,
+        "capture_envelope_sha256": "6f856304af103071b67b6c7a6f4c176fcd30c193572599e7ffe121337c8f4ed6",
+        "envelope_path": "DISCOVERY_SEARCH_R0.envelope.json",
+        "observation_id": "DISCOVERY:SEARCH_R0",
+        "observed_at": "2026-08-24T00:24:22Z",
+        "path": "DISCOVERY_SEARCH_R0.body",
+        "retention": "A4_OUTSIDE_GIT",
+        "sha256": "d22eea8181f0e12197e25f53a8989e160b98f2881e41a99f209d6e2b4987e84a"
+      }
+    ]
+  }
+}

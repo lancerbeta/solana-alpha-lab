@@ -15,7 +15,6 @@
     "prior_work_receipts",
     "authority",
     "candidates",
-    "selected_candidate_ref",
     "runner_up_candidate_ref",
     "strongest_rejected_alternative",
     "pareto_factors",

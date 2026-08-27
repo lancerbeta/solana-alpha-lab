@@ -1,0 +1,69 @@
+{
+  "as_of": "2026-08-27",
+  "non_claims": [
+    "NO_CRYPTOGRAPHIC_REVIEWER_IDENTITY",
+    "NO_PROVIDER_CALLS",
+    "NO_EXPERIMENT_EXECUTION",
+    "NO_X_Y_SCORE",
+    "NO_HYPOTHESIS_FORGE_SLASH",
+    "NO_POST_MERGE_PRODUCTION_BIND",
+    "DEFERRED_NEW_CATALOG_ASSET_REGISTRATION"
+  ],
+  "required_roles": [
+    "ARCHITECTURE_CRITIC",
+    "CODE_REVIEWER",
+    "GOAL_DOD_CRITIC",
+    "OWNER_UX_CRITIC"
+  ],
+  "review_id": "HFIC-NEXT-EVIDENCE-INDEPENDENT-REVIEW-001",
+  "reviewed_bindings_sha256": "c6f8eb73dd1b6c352825e62b4ceaa8adfc6c15dc1dc26a1565aef06a84a6ccef",
+  "reviewed_inventory_sha256": "07f51972fed3f43c3c13115ae4ff3f5fd83101c091c72dbfb63250dd13a654ff",
+  "reviews": [
+    {
+      "findings": [
+        "FIXED_CATALOG_SCHEMA_AND_HFIC_SESSION_INTEGRITY_HASHES",
+        "FIXED_PROVE_RUNTIME_AND_SHOW_SESSION_FOR_NO_WORTHY",
+        "FIXED_UNREGISTERED_CAPABILITY_ADVERTISEMENT",
+        "FIXED_SOURCE_PATH_ESCAPE_AND_ENVELOPE_HASH_REQUIRED",
+        "FIXED_AVAILABILITY_CLOCK_FROM_CAPTURE_ENVELOPE",
+        "ADDED_DRAFT_NO_WORTHY_TO_WRITE_SET",
+        "REMAINING_CONFIRMATORY_FENCE_IS_LABEL_PLUS_CONSUMER_NON_GOAL"
+      ],
+      "role": "CODE_REVIEWER",
+      "verdict": "PASS"
+    },
+    {
+      "findings": [
+        "CHECKED_R0_MIX_RATIO_PROVEN_ON_OFFICIAL_SWAPSTATS_SHAPE",
+        "CHECKED_TEMP_E2E_IMPORT_EPOCH_IDEMPOTENCE_HASH_CONTEXT_NO_WORTHY",
+        "CHECKED_PRODUCTION_BODY_STAYS_A4_OUTSIDE_GIT",
+        "CHECKED_NO_HYP_EARLY_TAKER_VOLUME_MIX_REGISTERED"
+      ],
+      "role": "GOAL_DOD_CRITIC",
+      "verdict": "PASS"
+    },
+    {
+      "findings": [
+        "FIXED_SESSION_RECEIPT_NO_WORTHY_IF_THEN",
+        "FIXED_CLOSED_FAMILY_ALWAYS_FROM_GIT_ACCEPTANCE",
+        "FIXED_RANKING_FEATURE_TERMS_ONLY_WHEN_PANEL_BOUND",
+        "CHECKED_EVIDENCE_EPOCH_CHANGES_ON_PANEL_FINGERPRINT"
+      ],
+      "role": "ARCHITECTURE_CRITIC",
+      "verdict": "PASS"
+    },
+    {
+      "findings": [
+        "FIXED_CLI_HELP_BIND_STAGE_AND_NEXT_SAFE_ACTION",
+        "CHECKED_TEMP_DEFAULT_STOPS_BEFORE_FORGE",
+        "DEFERRED_NEW_OPERATOR_NAV_ASSET"
+      ],
+      "role": "OWNER_UX_CRITIC",
+      "verdict": "PASS"
+    }
+  ],
+  "schema": "smial.delivery-independent-review-evidence",
+  "schema_version": "1.0",
+  "task_id": "HFIC_NEXT_EVIDENCE_BIND_AND_CONTEXT_V1",
+  "verdict": "PASS"
+}

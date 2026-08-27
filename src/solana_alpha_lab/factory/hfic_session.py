@@ -350,7 +350,17 @@ def freeze_draft(
     except HficIdentityError as exc:
         raise HficSessionError(str(exc)) from exc
 
-    selected_index = _resolve_ref(draft.get("selected_candidate_ref"), identities)
+    selected_ref = draft.get("selected_candidate_ref")
+    if selected_ref in (None, ""):
+        return _freeze_no_worthy(
+            draft,
+            identities=identities,
+            preflight_receipt=preflight_receipt,
+            store=store,
+            repo_root=repo_root,
+        )
+
+    selected_index = _resolve_ref(selected_ref, identities)
     if selected_index < 0:
         raise HficSessionError("SELECTED_CANDIDATE_MISSING")
     runner_up_index = _resolve_ref(draft.get("runner_up_candidate_ref"), identities)
@@ -544,6 +554,11 @@ def freeze_draft(
         "git_composite_sha256": git_composite,
         "research_memory_as_of": memory_as_of,
         "revision_count": 0,
+        "forge_context_packet_sha256": (
+            preflight_receipt.get("forge_context_packet_sha256")
+            if isinstance(preflight_receipt, Mapping)
+            else None
+        ),
         "identities": [
             {
                 "candidate_id": item.candidate_id,
@@ -572,6 +587,366 @@ def freeze_draft(
         result["store_inventory_digest"] = store.diagnostics().committed_inventory_sha256
     result.pop("identities", None)
     return result
+
+
+def _freeze_no_worthy(
+    draft: Mapping[str, Any],
+    *,
+    identities: Sequence[Any],
+    preflight_receipt: Mapping[str, Any] | None,
+    store: Any,
+    repo_root: Any,
+) -> dict[str, Any]:
+    runner_up_index = _resolve_ref(draft.get("runner_up_candidate_ref"), identities)
+    if runner_up_index < 0:
+        raise HficSessionError("CROSS_REFERENCE_MISMATCH")
+    rejected_index = _resolve_ref(
+        draft.get("strongest_rejected_alternative"),
+        identities,
+    )
+    if rejected_index < 0:
+        raise HficSessionError("CROSS_REFERENCE_MISMATCH")
+    truth_roots = _nonempty_str_list(
+        draft.get("truth_roots_used"),
+        code="TRUTH_ROOTS_REQUIRED",
+    )
+    prior_work = _nonempty_str_list(
+        draft.get("prior_work_receipts") or draft.get("prior_work_queries"),
+        code="PRIOR_WORK_RECEIPTS_REQUIRED",
+    )
+    memory_as_of = _require_memory_timestamp(draft.get("research_memory_as_of"))
+    bound: dict[str, Any] | None = None
+    if store is not None:
+        if repo_root is None or not isinstance(preflight_receipt, Mapping):
+            raise HficSessionError("PREFLIGHT_RECEIPT_REQUIRED")
+        existing_before_bind = None
+        epoch_hint = str(preflight_receipt.get("evidence_epoch_sha256") or "")
+        focus_hint = str(preflight_receipt.get("focus_key_sha256") or "")
+        if epoch_hint and focus_hint:
+            existing_before_bind = find_session_by_epoch_focus(
+                store, epoch_hint, focus_hint
+            )
+        bound = bind_preflight_receipt(
+            preflight_receipt,
+            draft,
+            store=store,
+            repo_root=repo_root,
+            require_current_store_digest=existing_before_bind is None,
+        )
+        if bound["research_memory_as_of"] != memory_as_of:
+            raise HficSessionError("RESEARCH_MEMORY_AS_OF_MISMATCH")
+        _validate_draft_forge_context_binding(draft, preflight_receipt, bound)
+        if existing_before_bind is not None:
+            return existing_before_bind
+    owner_focus = str(draft.get("owner_focus") or "AUTO")
+    epoch = ""
+    focus_key = ""
+    search_key = ""
+    store_digest = None
+    git_composite = None
+    git_head = "0" * 40
+    if bound is not None:
+        epoch = str(bound["evidence_epoch_sha256"])
+        focus_key = str(bound["focus_key_sha256"])
+        search_key = str(bound["search_key_sha256"])
+        store_digest = bound["store_inventory_digest"]
+        git_composite = bound["git_composite_sha256"]
+        owner_focus = str(bound["owner_focus"])
+        git_head = str(bound["live_git_head"])
+    elif isinstance(preflight_receipt, Mapping):
+        epoch = str(preflight_receipt.get("evidence_epoch_sha256") or "")
+        focus_key = str(preflight_receipt.get("focus_key_sha256") or "")
+        search_key = str(preflight_receipt.get("search_key_sha256") or "")
+        digest = preflight_receipt.get("store_inventory_digest")
+        if isinstance(digest, str) and len(digest) == 64:
+            store_digest = digest
+        maybe_head = preflight_receipt.get("live_git_head")
+        if isinstance(maybe_head, str) and len(maybe_head) == 40:
+            git_head = maybe_head.lower()
+        maybe_composite = preflight_receipt.get("git_composite_sha256")
+        if isinstance(maybe_composite, str) and len(maybe_composite) == 64:
+            git_composite = maybe_composite
+        owner_focus = str(preflight_receipt.get("owner_focus") or owner_focus)
+    if not focus_key:
+        focus_key = focus_key_sha256(owner_focus)
+    if epoch and not search_key:
+        search_key = search_key_sha256(epoch, owner_focus, PROMPT_VERSION)
+    if search_key:
+        session_id = "HFIC-SESS-" + search_key[:16].upper()
+    else:
+        session_id = "HFIC-SESS-" + canonical_sha256(
+            {
+                "candidate_ids": [item.candidate_id for item in identities],
+                "selected": None,
+                "prompt_version": PROMPT_VERSION,
+                "terminal": "NO_WORTHY_HYPOTHESIS",
+            }
+        )[:16].upper()
+    packet_digest = None
+    if isinstance(preflight_receipt, Mapping):
+        digest = preflight_receipt.get("forge_context_packet_sha256")
+        if isinstance(digest, str) and len(digest) == 64:
+            packet_digest = digest
+        packet = preflight_receipt.get("forge_context_packet")
+        if packet_digest is None and isinstance(packet, Mapping):
+            packet_digest = packet.get("forge_context_packet_sha256")
+            if not isinstance(packet_digest, str):
+                packet_digest = canonical_sha256(packet)
+    result = {
+        "session_id": session_id,
+        "session_state": "SYNTHESIS_COMPLETE",
+        "prompt_version": PROMPT_VERSION,
+        "owner_focus": owner_focus,
+        "evidence_epoch_sha256": epoch,
+        "focus_key_sha256": focus_key,
+        "search_key_sha256": search_key,
+        "selected_candidate_id": None,
+        "runner_up_candidate_id": identities[runner_up_index].candidate_id,
+        "rejected_alternative_id": identities[rejected_index].candidate_id,
+        "selected_definition_sha256": None,
+        "candidate_ids": [item.candidate_id for item in identities],
+        "critic_input_packet": None,
+        "critic_input_packet_sha256": None,
+        "critic_launched": False,
+        "critic_terminal": "NO_WORTHY_HYPOTHESIS",
+        "next": "STOP",
+        "forge_context_packet_sha256": packet_digest,
+        "store_inventory_digest": store_digest,
+        "git_composite_sha256": git_composite,
+        "live_git_head": git_head,
+        "research_memory_as_of": memory_as_of,
+        "revision_count": 0,
+        "truth_roots_used": truth_roots,
+        "prior_work_receipts": prior_work,
+    }
+    if store is not None and repo_root is not None:
+        if not epoch or not search_key or not focus_key:
+            raise HficSessionError("PREFLIGHT_RECEIPT_REQUIRED")
+        persist_no_worthy_session(
+            store,
+            result,
+            repo_root=repo_root,
+            identities=identities,
+            draft=draft,
+            preflight_receipt=preflight_receipt,
+        )
+        store.rebuild_projection()
+        result["store_inventory_digest"] = store.diagnostics().committed_inventory_sha256
+    return result
+
+
+def persist_no_worthy_session(
+    store: Any,
+    frozen: Mapping[str, Any],
+    *,
+    repo_root: Any,
+    identities: Sequence[Any],
+    draft: Mapping[str, Any] | None = None,
+    preflight_receipt: Mapping[str, Any] | None = None,
+) -> None:
+    from solana_alpha_lab.factory.document_runner import repository_git_snapshot
+    from solana_alpha_lab.factory.research_store import RecordKind, ResearchEvent
+
+    git = repository_git_snapshot(Path(repo_root))
+    now = HFIC_EVENT_TIME
+    session_id = str(frozen["session_id"])
+    transaction_id = f"RESEARCH-TXN-{session_id.replace('HFIC-SESS-', 'HFICNW-')}"
+    producer = "CAP-OFFLINE-CANONICAL-RECEIPT-REPLAY-001"
+
+    def event(
+        *,
+        record_id: str,
+        kind: RecordKind,
+        entity_id: str,
+        payload: dict[str, Any],
+        hypothesis_version_id: str | None = None,
+    ) -> ResearchEvent:
+        payload_json = json.dumps(
+            payload,
+            ensure_ascii=False,
+            sort_keys=True,
+            separators=(",", ":"),
+            allow_nan=False,
+        )
+        return ResearchEvent(
+            record_id=record_id,
+            record_kind=kind,
+            entity_id=entity_id,
+            hypothesis_version_id=hypothesis_version_id,
+            run_id=None,
+            transaction_id=transaction_id,
+            effective_at=now,
+            first_reliable_available_at=now,
+            supersedes_record_id=None,
+            payload_json=payload_json,
+            payload_sha256=hashlib.sha256(payload_json.encode("utf-8")).hexdigest(),
+            schema_version="1.0",
+            producer_capability_id=producer,
+            producer_git_sha=git.head_sha,
+            created_at=now,
+        )
+
+    context_digest = frozen.get("forge_context_packet_sha256")
+    context_bytes = None
+    if isinstance(preflight_receipt, Mapping):
+        packet = preflight_receipt.get("forge_context_packet")
+        if isinstance(packet, Mapping):
+            context_bytes = _canonical_bytes(packet)
+            if not isinstance(context_digest, str) or len(context_digest) != 64:
+                context_digest = hashlib.sha256(context_bytes).hexdigest()
+    created_at = HFIC_EVENT_TIME.strftime("%Y-%m-%dT%H:%M:%SZ")
+    receipt = {
+        "session_id": session_id,
+        "session_state": "SYNTHESIS_COMPLETE",
+        "evidence_epoch_sha256": str(frozen.get("evidence_epoch_sha256") or "0" * 64),
+        "focus_key_sha256": str(frozen.get("focus_key_sha256") or "0" * 64),
+        "search_key_sha256": str(frozen.get("search_key_sha256") or "0" * 64),
+        "prompt_version": PROMPT_VERSION,
+        "live_git_head": str(frozen.get("live_git_head") or git.head_sha.lower()),
+        "store_inventory_digest": frozen.get("store_inventory_digest") or ("0" * 64),
+        "candidate_ids": list(frozen.get("candidate_ids") or []),
+        "selected_candidate_id": None,
+        "runner_up_candidate_id": frozen.get("runner_up_candidate_id"),
+        "critic_input_packet_sha256": None,
+        "critic_result_sha256": None,
+        "critic_launched": False,
+        "critic_terminal": "NO_WORTHY_HYPOTHESIS",
+        "lane_classifier_terminal": None,
+        "decision_event_ids": [f"HFIC-DEC-{session_id}-NO-WORTHY"],
+        "next": "STOP",
+        "forge_context_packet_sha256": context_digest,
+        "authority": {
+            "git_mutation": 0,
+            "experiment_execution": 0,
+            "provider_api_rpc_wss_calls": 0,
+        },
+        "no_git_fence_receipt": {
+            "preflight_git_composite_sha256": frozen.get("git_composite_sha256"),
+            "final_git_composite_sha256": git.composite_sha256,
+            "provider_calls_actual": 0,
+        },
+        "created_at": created_at,
+    }
+    if repo_root is not None:
+        _validate_json_schema(
+            receipt,
+            Path(repo_root)
+            / "catalog/schemas/hypothesis_forge_session_receipt_v1.schema.json",
+        )
+    receipt_bytes = _canonical_bytes(receipt)
+    receipt_sha = hashlib.sha256(receipt_bytes).hexdigest()
+    records = [
+        event(
+            record_id=f"HFIC-CYCLE-{session_id}-NO-WORTHY",
+            kind=RecordKind.RESEARCH_CYCLE,
+            entity_id=session_id,
+            payload={
+                "research_cycle_id": f"{session_id}-NO-WORTHY",
+                "session_id": session_id,
+                "phase": "SYNTHESIS_COMPLETE",
+                "hfic_protocol": PROMPT_VERSION,
+                "prompt_version": PROMPT_VERSION,
+                "owner_focus": frozen.get("owner_focus") or "AUTO",
+                "evidence_epoch_sha256": frozen.get("evidence_epoch_sha256") or "",
+                "focus_key_sha256": frozen.get("focus_key_sha256") or "",
+                "search_key_sha256": frozen.get("search_key_sha256") or "",
+                "selected_candidate_id": None,
+                "runner_up_candidate_id": frozen.get("runner_up_candidate_id"),
+                "rejected_alternative_id": frozen.get("rejected_alternative_id"),
+                "candidate_ids": list(frozen.get("candidate_ids") or []),
+                "critic_launched": False,
+                "critic_terminal": "NO_WORTHY_HYPOTHESIS",
+                "next": "STOP",
+                "critic_input_packet_sha256": None,
+                "critic_result_sha256": None,
+                "session_receipt_sha256": receipt_sha,
+                "forge_context_packet_sha256": context_digest,
+                "git_composite_sha256": frozen.get("git_composite_sha256"),
+                "research_memory_as_of": frozen.get("research_memory_as_of"),
+                "revision_count": 0,
+            },
+        ),
+        event(
+            record_id=f"HFIC-ART-SESSION-RECEIPT-{session_id}",
+            kind=RecordKind.RESEARCH_ARTIFACT,
+            entity_id=f"HFIC-ART-SESSION-RECEIPT-{session_id}",
+            payload={
+                "research_artifact_id": f"HFIC-ART-SESSION-RECEIPT-{session_id}",
+                "session_id": session_id,
+                "hfic_protocol": PROMPT_VERSION,
+                "artifact_kind": "SESSION_RECEIPT",
+                "payload_canonical": receipt_bytes.decode("utf-8"),
+                "payload_sha256": receipt_sha,
+            },
+        ),
+        event(
+            record_id=f"HFIC-DEC-{session_id}-NO-WORTHY",
+            kind=RecordKind.DECISION_EVENT,
+            entity_id=f"HFIC-DEC-{session_id}-NO-WORTHY",
+            payload={
+                "decision_event_id": f"HFIC-DEC-{session_id}-NO-WORTHY",
+                "session_id": session_id,
+                "hfic_protocol": PROMPT_VERSION,
+                "decision_kind": "REJECT",
+                "reason_code": "NO_WORTHY_HYPOTHESIS",
+                "hypothesis_version_id": None,
+            },
+        ),
+    ]
+    for identity in identities:
+        records.append(
+            event(
+                record_id=f"HFIC-HYP-{identity.candidate_id}",
+                kind=RecordKind.HYPOTHESIS_VERSION,
+                entity_id=identity.candidate_id,
+                hypothesis_version_id=identity.candidate_id,
+                payload={
+                    "hypothesis_version_id": identity.candidate_id,
+                    "session_id": session_id,
+                    "hfic_protocol": PROMPT_VERSION,
+                    "statement": identity.definition["claim"],
+                    "claim": identity.definition["claim"],
+                    "mechanism": identity.definition["mechanism"],
+                    "actor_counterparty": identity.definition["actor_counterparty"],
+                    "population": identity.definition["population"],
+                    "decision_timestamp": identity.definition["decision_timestamp"],
+                    "primary_x_family": identity.definition["primary_x_family"],
+                    "primary_y": identity.definition["primary_y"],
+                    "horizon_notional": identity.definition["horizon_notional"],
+                    "negative_control": identity.definition["negative_control"],
+                    "falsifier": identity.definition["cheapest_falsifier"],
+                    "cheapest_falsifier": identity.definition["cheapest_falsifier"],
+                    "definition_sha256": identity.full_sha256,
+                    "role_in_session": "CONSIDERED_UNSELECTED",
+                },
+            )
+        )
+    if draft is not None:
+        draft_bytes = json.dumps(
+            draft,
+            ensure_ascii=False,
+            sort_keys=True,
+            separators=(",", ":"),
+            allow_nan=False,
+        )
+        records.append(
+            event(
+                record_id=f"HFIC-ART-FORGE-DRAFT-{session_id}",
+                kind=RecordKind.RESEARCH_ARTIFACT,
+                entity_id=f"HFIC-ART-FORGE-DRAFT-{session_id}",
+                payload={
+                    "research_artifact_id": f"HFIC-ART-FORGE-DRAFT-{session_id}",
+                    "session_id": session_id,
+                    "hfic_protocol": PROMPT_VERSION,
+                    "artifact_kind": "FORGE_DRAFT",
+                    "payload_canonical": draft_bytes,
+                    "payload_sha256": hashlib.sha256(
+                        draft_bytes.encode("utf-8")
+                    ).hexdigest(),
+                },
+            )
+        )
+    store.append(records, transaction_id=transaction_id)
 
 
 def backfill_legacy(
@@ -2227,15 +2602,27 @@ def load_session_bundle(store: Any, session_id: str) -> dict[str, Any] | None:
             artifact_kind="SESSION_RECEIPT",
             expected_sha=expected_receipt_sha,
         )
-        if critic_input_sha is None or critic_result_sha is None:
-            raise HficSessionError("SESSION_RECEIPT_HASH_MISMATCH")
-        _verify_complete_hash_chain(
-            cycle,
-            session_receipt=session_receipt,
-            critic_input_sha=critic_input_sha,
-            critic_result_sha=critic_result_sha,
-            receipt_sha=receipt_sha,
+        no_worthy = (
+            isinstance(session_receipt, Mapping)
+            and session_receipt.get("critic_terminal") == "NO_WORTHY_HYPOTHESIS"
+            and session_receipt.get("critic_launched") is False
+            and not session_receipt.get("selected_candidate_id")
         )
+        if no_worthy:
+            if session_receipt.get("critic_input_packet_sha256") or session_receipt.get(
+                "critic_result_sha256"
+            ):
+                raise HficSessionError("CRITIC_LAUNCHED_FOR_NO_WORTHY")
+        else:
+            if critic_input_sha is None or critic_result_sha is None:
+                raise HficSessionError("SESSION_RECEIPT_HASH_MISMATCH")
+            _verify_complete_hash_chain(
+                cycle,
+                session_receipt=session_receipt,
+                critic_input_sha=critic_input_sha,
+                critic_result_sha=critic_result_sha,
+                receipt_sha=receipt_sha,
+            )
     if isinstance(session_receipt, Mapping):
         for wrapper, raw in artifacts:
             if wrapper.get("artifact_kind") != "CLASSIFIER_RECEIPT":
@@ -2249,6 +2636,10 @@ def load_session_bundle(store: Any, session_id: str) -> dict[str, Any] | None:
             classifier_receipt = dict(embedded)
     state = str(cycle.get("phase") or "FROZEN_AWAITING_CRITIC")
     if state == "SYNTHESIS_COMPLETE" and not isinstance(session_receipt, Mapping):
+        if cycle.get("critic_terminal") == "NO_WORTHY_HYPOTHESIS" and not cycle.get(
+            "selected_candidate_id"
+        ):
+            raise HficSessionError("NO_WORTHY_RECEIPT_MISSING")
         state = "CRITIC_RESULT_READY" if critic_result is not None else "FROZEN_AWAITING_CRITIC"
     bundle = {
         "session_id": session_id,
@@ -2348,12 +2739,22 @@ def show_session(store: Any, session_id: str, *, repo_root: Any = None) -> dict[
                 "head_sha": live_git_head,
             }
         ),
-        "artifacts_retrievable": bool(bundle.get("critic_input_packet"))
-        and (
-            str(bundle.get("session_state")) != "SYNTHESIS_COMPLETE"
-            or (
-                bool(bundle.get("critic_result"))
+        "artifacts_retrievable": (
+            (
+                bundle.get("critic_terminal") == "NO_WORTHY_HYPOTHESIS"
+                and not bundle.get("selected_candidate_id")
+                and bundle.get("critic_input_packet") is None
                 and isinstance(bundle.get("session_receipt"), Mapping)
+            )
+            or (
+                bool(bundle.get("critic_input_packet"))
+                and (
+                    str(bundle.get("session_state")) != "SYNTHESIS_COMPLETE"
+                    or (
+                        bool(bundle.get("critic_result"))
+                        and isinstance(bundle.get("session_receipt"), Mapping)
+                    )
+                )
             )
         ),
         "candidates_retrievable": len(bundle.get("candidates") or []) >= 4,
@@ -2433,14 +2834,25 @@ def prove_runtime(
     terminal = str(bundle.get("critic_terminal") or "")
     if terminal in _INTERMEDIATE_CRITIC_TERMINALS:
         raise HficSessionError("CRITIC_RESULT_NOT_FINAL")
+    no_worthy = (
+        terminal == "NO_WORTHY_HYPOTHESIS"
+        and not receipt.get("selected_candidate_id")
+        and receipt.get("critic_launched") is False
+    )
     receipt_input = str(receipt.get("critic_input_packet_sha256") or "")
     receipt_result = str(receipt.get("critic_result_sha256") or "")
     bundle_input = str(bundle.get("critic_input_packet_sha256") or "")
     bundle_result = str(bundle.get("critic_result_sha256") or "")
-    if not receipt_input or receipt_input != bundle_input:
-        raise HficSessionError("SESSION_RECEIPT_HASH_MISMATCH")
-    if not receipt_result or receipt_result != bundle_result:
-        raise HficSessionError("SESSION_RECEIPT_HASH_MISMATCH")
+    if no_worthy:
+        if receipt.get("critic_input_packet_sha256") or receipt.get("critic_result_sha256"):
+            raise HficSessionError("CRITIC_LAUNCHED_FOR_NO_WORTHY")
+        if bundle.get("critic_input_packet") is not None or bundle.get("critic_result") is not None:
+            raise HficSessionError("CRITIC_LAUNCHED_FOR_NO_WORTHY")
+    else:
+        if not receipt_input or receipt_input != bundle_input:
+            raise HficSessionError("SESSION_RECEIPT_HASH_MISMATCH")
+        if not receipt_result or receipt_result != bundle_result:
+            raise HficSessionError("SESSION_RECEIPT_HASH_MISMATCH")
     shown = show_session(store, session_id, repo_root=repo_root)
     after = repository_git_snapshot(Path(repo_root))
     if not before.unchanged(after):
@@ -2454,8 +2866,9 @@ def prove_runtime(
         raise HficSessionError("NO_GIT_FENCE_MISSING")
     if preflight_composite != final_composite:
         raise HficSessionError("GIT_COMPOSITE_CHANGED")
-    if bundle.get("critic_input_packet") is None or bundle.get("critic_result") is None:
-        raise HficSessionError("SESSION_ARTIFACT_MISSING")
+    if not no_worthy:
+        if bundle.get("critic_input_packet") is None or bundle.get("critic_result") is None:
+            raise HficSessionError("SESSION_ARTIFACT_MISSING")
     if not shown["artifacts_retrievable"] or not shown["candidates_retrievable"]:
         raise HficSessionError("SESSION_ARTIFACT_MISSING")
     provider_calls = int(fence.get("provider_calls_actual", -1))

@@ -1,0 +1,37 @@
+{
+  "as_of": "2026-08-27",
+  "capability_radar": {
+    "now": "NONE",
+    "watch": "POST_MERGE_HASH_VERIFIED_BIND_THEN_OWNER_FORGE"
+  },
+  "dimensions": {
+    "build_vs_buy": "PASS",
+    "context_efficiency": "PASS",
+    "execution_to_cashflow": "PASS",
+    "flexibility_and_history": "PASS",
+    "mission": "PASS",
+    "monitoring_and_recovery": "PASS",
+    "owner_operability": "PASS",
+    "red_team": "PASS",
+    "research_truth": "PASS",
+    "security": "PASS"
+  },
+  "limits": [
+    "NO_ALPHA",
+    "NO_CANONICAL_DONE",
+    "NO_PROVIDER_CALLS",
+    "NO_X_Y_SCORE",
+    "NO_HYPOTHESIS_FORGE_SLASH",
+    "DISCOVERY_ONLY_SECOND_LOOK",
+    "POST_MERGE_BIND_REQUIRES_OWNER_PHRASE"
+  ],
+  "mode": "FULL_REVIEW",
+  "recovery": "REVERT",
+  "review_id": "HFIC-NEXT-EVIDENCE-FACTORY-FIT-001",
+  "reviewed_bindings_sha256": "c6f8eb73dd1b6c352825e62b4ceaa8adfc6c15dc1dc26a1565aef06a84a6ccef",
+  "reviewed_inventory_sha256": "07f51972fed3f43c3c13115ae4ff3f5fd83101c091c72dbfb63250dd13a654ff",
+  "schema": "smial.delivery-harness-factory-fit",
+  "schema_version": "1.0",
+  "task_id": "HFIC_NEXT_EVIDENCE_BIND_AND_CONTEXT_V1",
+  "verdict": "PASS"
+}

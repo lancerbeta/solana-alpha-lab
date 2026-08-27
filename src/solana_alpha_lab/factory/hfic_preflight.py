@@ -15,6 +15,11 @@ from solana_alpha_lab.factory.commissioning_fixture import (
     COMMISSIONING_DATASET_MANIFEST_ID,
     commissioning_dataset_fingerprint,
 )
+from solana_alpha_lab.factory.early_market_panel_importer import (
+    CLOSED_FAMILY,
+    FEATURE_ID as PANEL_FEATURE_HINT,
+    load_bound_panel,
+)
 from solana_alpha_lab.factory.commissioning_proof import (
     CommissioningProofError,
     prove_fast_lane_commissioned as _prove_fast_lane_commissioned,
@@ -41,6 +46,16 @@ from solana_alpha_lab.factory.run_passport import canonical_sha256
 AUTO_FOCUS = "AUTO"
 AUTO_SESSIONS_PER_EPOCH = 1
 MAX_DISTINCT_FOCUSES_PER_EPOCH = 3
+MAX_RANKED_PRIORS = 8
+MAX_DATASETS = 8
+MAX_FEATURE_HINTS = 8
+MAX_CLOSED_FAMILIES = 8
+MAX_PACKET_BYTES = 16384
+FORGE_CONTEXT_ARTIFACT_DIR = "research/artifacts/forge_context"
+CLOSED_FAMILY_ACCEPTANCE_RELATIVE = (
+    "docs/evidence/early_valuation_liquidity_divergence_confirmation/"
+    "a1_acceptance_v1.json"
+)
 GOLDEN_OFFLINE_SPEC = (
     "configs/experiment_specs/quote_native_admissible_friction_audition_offline_v1.yaml"
 )
@@ -109,11 +124,19 @@ def evidence_epoch_material(
         if prior_parts
         else b"HFIC-EPOCH-CATALOG-BINDING-V1"
     ).hexdigest()
+    dataset_manifest_ids = [COMMISSIONING_DATASET_MANIFEST_ID]
+    dataset_fingerprints = [commissioning_dataset_fingerprint(root)]
+    lifecycle_terminals = ["NO_GIT_FAST_LANE_PROVEN", CLOSED_FAMILY]
+    if data_root is not None:
+        panel = load_bound_panel(Path(data_root))
+        if panel is not None:
+            dataset_manifest_ids.append(panel["dataset_manifest_id"])
+            dataset_fingerprints.append(panel["dataset_fingerprint"])
     return {
         "catalog_root_hashes": hashes,
-        "dataset_manifest_ids": [COMMISSIONING_DATASET_MANIFEST_ID],
-        "dataset_fingerprints": [commissioning_dataset_fingerprint(root)],
-        "lifecycle_terminals": ["NO_GIT_FAST_LANE_PROVEN"],
+        "dataset_manifest_ids": dataset_manifest_ids,
+        "dataset_fingerprints": dataset_fingerprints,
+        "lifecycle_terminals": lifecycle_terminals,
         "scientific_terminals": ["INCONCLUSIVE"],
         "capability_schema_hashes": [hashes[-1]],
         "accepted_query_recipe_hashes": [hashes[1]],
@@ -281,6 +304,200 @@ def decide_preflight_action(
     return ("START_NEW_SESSION", None)
 
 
+def _term_set(value: str) -> set[str]:
+    return {token for token in value.casefold().replace("_", " ").replace("-", " ").split() if token}
+
+
+def rank_prior_candidate_ids(
+    store: ResearchStore,
+    *,
+    owner_focus: str,
+    feature_hints: list[str],
+    limit: int = MAX_RANKED_PRIORS,
+) -> tuple[list[str], int]:
+    focus_terms = _term_set(owner_focus)
+    feature_terms = set()
+    for hint in feature_hints:
+        feature_terms.update(_term_set(hint))
+    if feature_hints:
+        feature_terms.update(
+            {"taker", "volume", "mix", "valuation", "liquidity", "divergence"}
+        )
+    scored: list[tuple[int, str]] = []
+    seen: set[str] = set()
+    for record in store.iter_committed_records():
+        kind = getattr(record.record_kind, "value", record.record_kind)
+        if kind != RecordKind.HYPOTHESIS_VERSION.value:
+            continue
+        payload = json.loads(record.payload_json)
+        hyp_id = payload.get("hypothesis_version_id")
+        if not isinstance(hyp_id, str) or hyp_id in seen:
+            continue
+        seen.add(hyp_id)
+        blob = " ".join(
+            str(payload.get(key) or "")
+            for key in (
+                "hypothesis_version_id",
+                "claim",
+                "statement",
+                "mechanism",
+                "primary_x_family",
+            )
+        )
+        tokens = _term_set(blob)
+        score = 3 * len(tokens & feature_terms) + 2 * len(tokens & focus_terms)
+        scored.append((score, hyp_id))
+    scored.sort(key=lambda item: (-item[0], item[1]))
+    kept = [item[1] for item in scored[:limit]]
+    dropped = max(0, len(scored) - len(kept))
+    return kept, dropped
+
+
+def persist_forge_context_packet(data_root: Path, packet: Mapping[str, Any]) -> str:
+    digest = canonical_sha256(packet)
+    path = Path(data_root) / FORGE_CONTEXT_ARTIFACT_DIR / f"{digest}.json"
+    path.parent.mkdir(parents=True, exist_ok=True)
+    canonical = json.dumps(
+        packet,
+        ensure_ascii=False,
+        sort_keys=True,
+        separators=(",", ":"),
+        allow_nan=False,
+    )
+    if path.is_file() and not path.is_symlink():
+        if path.read_text(encoding="utf-8") != canonical:
+            raise HficPreflightError("FORGE_CONTEXT_HASH_CONFLICT")
+        return digest
+    path.write_text(canonical, encoding="utf-8")
+    return digest
+
+
+def verify_forge_context_packet(data_root: Path, digest: str) -> dict[str, Any]:
+    path = Path(data_root) / FORGE_CONTEXT_ARTIFACT_DIR / f"{digest}.json"
+    if not path.is_file() or path.is_symlink():
+        raise HficPreflightError("FORGE_CONTEXT_ARTIFACT_MISSING")
+    loaded = json.loads(path.read_text(encoding="utf-8"))
+    if not isinstance(loaded, dict):
+        raise HficPreflightError("FORGE_CONTEXT_ARTIFACT_INVALID")
+    observed = canonical_sha256(loaded)
+    if observed != digest:
+        raise HficPreflightError("FORGE_CONTEXT_HASH_MISMATCH")
+    return loaded
+
+
+def build_forge_context_packet(
+    repo_root: Path,
+    data_root: Path,
+    *,
+    owner_focus: str,
+    evidence_epoch: str,
+    search_key: str,
+    commissioning_status: str,
+    research_memory_as_of: str,
+    store: ResearchStore,
+) -> tuple[dict[str, Any], str]:
+    panel = load_bound_panel(Path(data_root))
+    dataset_manifest_ids = [COMMISSIONING_DATASET_MANIFEST_ID]
+    dataset_fingerprints = [commissioning_dataset_fingerprint(repo_root)]
+    feature_hints: list[dict[str, Any]] = []
+    if panel is not None:
+        dataset_manifest_ids.append(panel["dataset_manifest_id"])
+        dataset_fingerprints.append(panel["dataset_fingerprint"])
+        feature_hints.append(
+            {
+                "feature_id": PANEL_FEATURE_HINT,
+                "availability": "R0_ONLY",
+                "yield_eligible": panel["yield_eligible"],
+                "yield_missing": panel["yield_missing"],
+                "evidence_role": "DISCOVERY_ONLY_SECOND_LOOK",
+                "confirmatory_reuse_forbidden": True,
+                "accepted_hypothesis_id": None,
+            }
+        )
+    closed_family_ledger = [
+        {
+            "terminal": CLOSED_FAMILY,
+            "source_receipt": CLOSED_FAMILY_ACCEPTANCE_RELATIVE,
+            "reopen_forbidden": True,
+        }
+    ]
+    capability_ids = ["CAP-OFFLINE-CANONICAL-RECEIPT-REPLAY-001"]
+    hint_ids = [str(item["feature_id"]) for item in feature_hints]
+    ranked, dropped_priors = rank_prior_candidate_ids(
+        store,
+        owner_focus=owner_focus,
+        feature_hints=hint_ids,
+    )
+    truth_roots = [
+        "catalog/catalog_manifest.yaml",
+        "configs/hypothesis_forge_independent_critic_v1.yaml",
+        CLOSED_FAMILY_ACCEPTANCE_RELATIVE,
+    ]
+    prior_work_receipts = [
+        "QUERY-HFIC-EXACT-RELATED-PRIOR-001",
+        "QUERY-HFIC-SESSION-BY-SEARCH-KEY-001",
+        "QUERY-HFIC-PENDING-SESSION-001",
+        *ranked,
+    ][:8]
+    truncation = {
+        "truncated": False,
+        "kept_priors": len(ranked),
+        "dropped_priors": dropped_priors,
+        "tie_break": "hypothesis_version_id_asc",
+        "max_priors": MAX_RANKED_PRIORS,
+        "max_datasets": MAX_DATASETS,
+        "max_closed_families": MAX_CLOSED_FAMILIES,
+        "max_feature_hints": MAX_FEATURE_HINTS,
+        "max_packet_bytes": MAX_PACKET_BYTES,
+    }
+    if len(dataset_manifest_ids) > MAX_DATASETS:
+        dataset_manifest_ids = dataset_manifest_ids[:MAX_DATASETS]
+        dataset_fingerprints = dataset_fingerprints[:MAX_DATASETS]
+        truncation["truncated"] = True
+    if len(feature_hints) > MAX_FEATURE_HINTS:
+        feature_hints = feature_hints[:MAX_FEATURE_HINTS]
+        truncation["truncated"] = True
+    if dropped_priors:
+        truncation["truncated"] = True
+    packet = {
+        "prompt_version": PROMPT_VERSION,
+        "owner_focus": owner_focus,
+        "evidence_epoch_sha256": evidence_epoch,
+        "search_key_sha256": search_key,
+        "related_prior_recipe_ids": [
+            "QUERY-HFIC-EXACT-RELATED-PRIOR-001",
+            "QUERY-HFIC-SESSION-BY-SEARCH-KEY-001",
+            "QUERY-HFIC-PENDING-SESSION-001",
+        ],
+        "truth_roots_used": truth_roots,
+        "commissioning_status": commissioning_status,
+        "research_memory_as_of": research_memory_as_of,
+        "prior_work_receipts": prior_work_receipts,
+        "dataset_manifest_ids": dataset_manifest_ids,
+        "dataset_fingerprints": dataset_fingerprints,
+        "capability_ids": capability_ids,
+        "feature_hints": feature_hints,
+        "closed_family_ledger": closed_family_ledger[:MAX_CLOSED_FAMILIES],
+        "ranked_prior_candidate_ids": ranked,
+        "truncation_receipt": truncation,
+    }
+    encoded = json.dumps(
+        packet, ensure_ascii=False, sort_keys=True, separators=(",", ":")
+    )
+    if len(encoded.encode("utf-8")) > MAX_PACKET_BYTES:
+        packet["ranked_prior_candidate_ids"] = ranked[:3]
+        packet["prior_work_receipts"] = prior_work_receipts[:5]
+        packet["truncation_receipt"] = {
+            **truncation,
+            "truncated": True,
+            "kept_priors": min(3, len(ranked)),
+            "reason": "MAX_PACKET_BYTES",
+        }
+    digest = persist_forge_context_packet(data_root, packet)
+    verify_forge_context_packet(data_root, digest)
+    return packet, digest
+
+
 def run_preflight(
     repo_root: Path,
     data_root: Path,
@@ -359,31 +576,7 @@ def run_preflight(
             "git_mutation_count": int(proof.get("git_mutation_count") or 0),
             "run_id": proof.get("run_id"),
         },
-        "forge_context_packet": {
-            "prompt_version": PROMPT_VERSION,
-            "owner_focus": focus,
-            "evidence_epoch_sha256": epoch,
-            "search_key_sha256": search_key,
-            "related_prior_recipe_ids": [
-                "QUERY-HFIC-EXACT-RELATED-PRIOR-001",
-                "QUERY-HFIC-SESSION-BY-SEARCH-KEY-001",
-                "QUERY-HFIC-PENDING-SESSION-001",
-            ],
-            "truth_roots_used": [
-                "catalog/catalog_manifest.yaml",
-                "configs/hypothesis_forge_independent_critic_v1.yaml",
-            ],
-            "commissioning_status": proof["status"],
-            "research_memory_as_of": str(
-                proof.get("research_memory_as_of") or "2026-08-25T00:00:00Z"
-            ),
-            "prior_work_receipts": [
-                "QUERY-HFIC-EXACT-RELATED-PRIOR-001",
-                "QUERY-HFIC-SESSION-BY-SEARCH-KEY-001",
-                "QUERY-HFIC-PENDING-SESSION-001",
-            ],
-            "ranked_prior_candidate_ids": [],
-        },
+            "forge_context_packet": {},
         "authority": {
             "git_mutation": 0,
             "experiment_execution": 0,
@@ -393,22 +586,20 @@ def run_preflight(
     if action == "STOP" and bound_session == "SEARCH_BUDGET_EXHAUSTED":
         receipt_body["terminal"] = "SEARCH_BUDGET_EXHAUSTED"
         receipt_body["session_id"] = None
-    prior_ids: list[str] = []
-    for record in store.iter_committed_records():
-        kind = getattr(record.record_kind, "value", record.record_kind)
-        if kind != RecordKind.HYPOTHESIS_VERSION.value:
-            continue
-        payload = json.loads(record.payload_json)
-        hyp_id = payload.get("hypothesis_version_id")
-        if isinstance(hyp_id, str) and hyp_id not in prior_ids:
-            prior_ids.append(hyp_id)
-        if len(prior_ids) >= 5:
-            break
-    receipt_body["forge_context_packet"]["ranked_prior_candidate_ids"] = prior_ids
-    context_priors = list(
-        receipt_body["forge_context_packet"]["prior_work_receipts"]
-    ) + prior_ids
-    receipt_body["forge_context_packet"]["prior_work_receipts"] = context_priors[:8]
+    packet, packet_digest = build_forge_context_packet(
+        repo_root,
+        data_root,
+        owner_focus=focus,
+        evidence_epoch=epoch,
+        search_key=search_key,
+        commissioning_status=str(proof["status"]),
+        research_memory_as_of=str(
+            proof.get("research_memory_as_of") or "2026-08-25T00:00:00Z"
+        ),
+        store=store,
+    )
+    receipt_body["forge_context_packet"] = packet
+    receipt_body["forge_context_packet_sha256"] = packet_digest
     if bound_session and action in {
         "RESUME_CRITIC",
         "RESUME_FINALIZE",

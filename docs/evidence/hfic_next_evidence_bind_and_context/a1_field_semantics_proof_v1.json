@@ -1,0 +1,58 @@
+{
+  "as_of": "2026-08-27",
+  "availability": "R0_ONLY",
+  "buy_field": "stats5m.buyVolume",
+  "feature_id": "R0_TAKER_VOLUME_MIX",
+  "missingness_codes": {
+    "BUY_VOLUME_ABSENT": 1,
+    "ZERO_DENOMINATOR": 1
+  },
+  "non_claims": [
+    "NOT_USD_CLAIM_FOR_RAW_VOLUMES",
+    "NOT_CONFIRMATORY_FALSIFIER",
+    "NO_X_Y_SCORE",
+    "NO_HYP_EARLY_TAKER_VOLUME_MIX_REGISTERED"
+  ],
+  "official_citation": "https://developers.jup.ag/docs/guides/how-to-get-token-information",
+  "official_facts": {
+    "liquidity_documented_unit": "USD",
+    "mcap_documented_unit": "USD",
+    "swapstats_buy_volume_documented_unit": null,
+    "swapstats_sell_volume_documented_unit": null,
+    "swapstats_shape": "same optional number fields in one object",
+    "swapstats_windows": [
+      "stats5m",
+      "stats1h",
+      "stats6h",
+      "stats24h"
+    ]
+  },
+  "official_volume_unit_annotated": false,
+  "provider_calls_actual": 0,
+  "ratio_definition": "buyVolume / (buyVolume + sellVolume) from the same stats5m object",
+  "ratio_unit": "DIMENSIONLESS_UNIT_INTERVAL",
+  "raw_volume_unit_status": "OFFICIAL_UNANNOTATED",
+  "same_optional_number_type": true,
+  "same_swapstats_object": true,
+  "same_unknown_unit_for_both_legs": true,
+  "schema": "smial.early-market-panel-field-semantics-proof",
+  "schema_version": "1.0",
+  "sell_field": "stats5m.sellVolume",
+  "production_capture": {
+    "atom_id": "EARLY_VALUATION_LIQUIDITY_DIVERGENCE_CONFIRMATION_V1",
+    "git_runtime_receipt_sha256": "a8c8df4a7c02a8e6cf4d2be2fe004f2cfbff170efcf5645064788ea20f12db63",
+    "r0_observation_id": "DISCOVERY:SEARCH_R0",
+    "r0_body_sha256": "f84cea38c076a1189e664454d0a23b11ab716cb255fc296c432ef77ef5d5fd21",
+    "raw_retention": "A4_OUTSIDE_GIT",
+    "bind_gate": "POST_MERGE_OWNER_PHRASE_ONLY",
+    "note": "Official SwapStats unit remains unannotated; the bound feature is the dimensionless R0 mix. Production yield is re-proven at POST-MERGE bind against the Git receipt hash, not copied into Git."
+  },
+  "source_kind": "TEMP_FIXTURE",
+  "task_id": "HFIC_NEXT_EVIDENCE_BIND_AND_CONTEXT_V1",
+  "terminal": "R0_TAKER_VOLUME_MIX_RATIO_PROVEN",
+  "window": "stats5m",
+  "x_source_observation": "DISCOVERY:SEARCH_R0",
+  "x_uses_r0_only": true,
+  "yield_eligible": 1,
+  "yield_missing": 2
+}
