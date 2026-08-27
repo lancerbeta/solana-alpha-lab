@@ -19,7 +19,6 @@ objective: Persist the 23-direction HFIC scientific-discovery research as a
   HFIC-V1.1 candidate generation.
 managed_write_set:
 - docs/tasks/HFIC_DISCOVERY_PROSPECT_MEMORY_AND_NEXT_ACTION_V1.md
-- .gitattributes
 - docs/architecture/prospects/HFIC_SCIENTIFIC_DISCOVERY_ENGINE_RESEARCH_V1.md
 - docs/architecture/prospects/hfic_scientific_discovery_prospects_v1.yaml
 - docs/architecture/intents/ARCH-INTENT-006-hypothesis-discovery-and-opportunity-surface.md

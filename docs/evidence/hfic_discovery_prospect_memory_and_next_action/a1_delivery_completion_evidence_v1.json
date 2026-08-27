@@ -9,15 +9,14 @@
   "cloud_bundle_smoke_required": false,
   "factory_fit": {
     "path": "docs/evidence/hfic_discovery_prospect_memory_and_next_action/a1_delivery_factory_fit_v1.json",
-    "sha256": "e04bb5ba75986dd1b8e0f46e03b0cd809990e7022082578363cc5771eb201672",
+    "sha256": "d3ce6368f213f3a2f3f822e4e6510beb5f5ae264628110de4c2b342f1fc3ce42",
     "verdict": "PASS"
   },
   "implementation_bindings": {
     ".agents/skills/hypothesis-forge/SKILL.md": "e63526990f645303a6473bc586267c8916dca27bbe863501c398c475f64ba6f0",
     ".cursor/commands/hypothesis-forge.md": "c2d6fe0e92a5d4ed88a1ad851171504ff09a47521bef3b27a760702e14319f90",
-    ".gitattributes": "a97f635cc05ab34344b099ddee0d9a6ea0d77e84cb1c4507d3e21340348574ca",
     "catalog/assets/architecture.yaml": "9eb48a15c9ad221863dfed3b005a07d225d80b8693d5e3083ef7df11e04b37eb",
-    "catalog/assets/core.yaml": "56106241a21ed7280defbd746ee2be3054ac18870d70694a77e971e8ae5dc43b",
+    "catalog/assets/core.yaml": "9d8d99faf346f8dabb94c081f7dc225fbaf42dab60ec2b1ba6ce09163c218c51",
     "catalog/assets/lifecycle.yaml": "d3b7b87bda67fc99d6f7b9da0341c0c6ad8d89dbc55b44314b925ec14259e69e",
     "catalog/catalog_manifest.yaml": "37a269a7515224e3eae47a524b7540111310ce56a1d2aad9d8b0905af9ab3128",
     "catalog/generated/asset_edges.json": "1902dffb8766684fff5f3cb14596cb348ab9e5e12ddef1137d140276d2337849",
@@ -33,7 +32,7 @@
     "docs/architecture/prospects/hfic_scientific_discovery_prospects_v1.yaml": "4896597ee1780401e8c3ce3f546608ce72906fc8d3365d2408627b2eb9f9dc0a",
     "docs/evidence/hfic_discovery_prospect_memory_and_next_action/a1_temp_e2e_receipt_v1.json": "ea6a80824279e41460be7c379f80dc2cdfc3a18243b38ec6c04713aa2657aaf0",
     "docs/operator/HYPOTHESIS_FORGE_AND_INDEPENDENT_CRITIC_OPERATOR_V1.md": "b780847e1dab399d19f3bc2d3d330d52d29265112cc474afec75ae66f7c41963",
-    "docs/tasks/HFIC_DISCOVERY_PROSPECT_MEMORY_AND_NEXT_ACTION_V1.md": "ab66bcca98f607a8aec49cecd2cda04e7c0ea92ff4fc9da10f107249fa556927",
+    "docs/tasks/HFIC_DISCOVERY_PROSPECT_MEMORY_AND_NEXT_ACTION_V1.md": "6c3d7ae32070dcf830300248c6998af4e62995252e597e83dee2c4319b6b3326",
     "scripts/hypothesis_forge.py": "62b2ddfcebf2337892e14c117deb2ea65f62518cebb6d6ed85695787d62e388c",
     "src/solana_alpha_lab/factory/hfic_prospects.py": "27e77a31baa045e253c9aba3a44cdde9888c844e96b949fae2a7cbc06044d77e",
     "src/solana_alpha_lab/factory/hfic_session.py": "0a04776d121a73c597cdd831574a719a12e0d969a0a19e2c1585f0fb64bc595e",
@@ -78,7 +77,7 @@
     "github_ci": "ENFORCED_LIVE_AT_GUARDED_MERGE",
     "independent_review": {
       "path": "docs/evidence/hfic_discovery_prospect_memory_and_next_action/a1_delivery_independent_review_v1.json",
-      "sha256": "8d28acff131354be10e820c82dcbe23bd30dd440af67b1439f06d74f825be552",
+      "sha256": "fcc6700ef3f4661931b70b7c3a28856214b0fc1e8dd8ae4288daf4b8c8814bbe",
       "verdict": "PASS"
     },
     "project_checks": [

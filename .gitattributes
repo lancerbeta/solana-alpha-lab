@@ -2,4 +2,3 @@
 *.ps1 text eol=lf
 *.bat text eol=crlf
 *.cmd text eol=crlf
-docs/architecture/prospects/HFIC_SCIENTIFIC_DISCOVERY_ENGINE_RESEARCH_V1.md -whitespace

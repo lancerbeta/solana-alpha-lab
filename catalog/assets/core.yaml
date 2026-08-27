@@ -32507,7 +32507,7 @@ records:
   as_of: '2026-08-27'
   truth_owner: HFIC_DISCOVERY_PROSPECT_MEMORY_AND_NEXT_ACTION_V1
   location: {kind: git_path, logical_uri: 'repo://docs/tasks/HFIC_DISCOVERY_PROSPECT_MEMORY_AND_NEXT_ACTION_V1.md', repository_path: docs/tasks/HFIC_DISCOVERY_PROSPECT_MEMORY_AND_NEXT_ACTION_V1.md}
-  integrity: {kind: sha256, sha256: ab66bcca98f607a8aec49cecd2cda04e7c0ea92ff4fc9da10f107249fa556927}
+  integrity: {kind: sha256, sha256: 6c3d7ae32070dcf830300248c6998af4e62995252e597e83dee2c4319b6b3326}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: governed_by, target_asset_id: ARCH-INTENT-006}
