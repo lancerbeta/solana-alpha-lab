@@ -55,6 +55,9 @@ CAP_OFFLINE_CANONICAL_RECEIPT_REPLAY = "CAP-OFFLINE-CANONICAL-RECEIPT-REPLAY-001
 CAP_JUPITER_FREE_KEY_QUOTE_NATIVE_BOUNDED_CAPTURE = (
     "CAP-JUPITER-FREE-KEY-QUOTE-NATIVE-BOUNDED-CAPTURE-001"
 )
+CAP_JUPITER_FREE_KEY_FORWARD_H900_QUOTE_CAPTURE = (
+    "CAP-JUPITER-FREE-KEY-FORWARD-H900-QUOTE-CAPTURE-001"
+)
 INPUT_KINDS = frozenset(
     {
         "GIT_CANONICAL_RECEIPT",
@@ -489,9 +492,67 @@ def resolve_market_feature_surface(
     }
 
 
+def capture_forward_h900_quote(
+    spec: Mapping[str, Any],
+    *,
+    root: Path,
+    authority_phrase: str | None = None,
+    capture_hooks: Mapping[str, Any] | None = None,
+) -> dict[str, Any]:
+    """Thin router for reusable forward H900 quote capture. Not a mix-specific runner."""
+    del spec
+    from solana_alpha_lab.factory.forward_h900_quote_capture import (
+        ForwardCaptureError,
+        run_forward_capture,
+    )
+
+    hooks = dict(capture_hooks or {})
+    data_root = hooks.get("data_root")
+    if data_root is None:
+        raise CapabilityError("FORWARD_CAPTURE_DATA_ROOT_REQUIRED")
+    kwargs: dict[str, Any] = {
+        "repo_root": root,
+        "data_root": Path(data_root),
+        "authority_phrase": str(authority_phrase or ""),
+    }
+    for key in (
+        "opener",
+        "clock",
+        "sleeper",
+        "monotonic_clock",
+        "preflight_fn",
+        "credential_loader",
+        "environ",
+        "excluded_mints",
+    ):
+        if key in hooks and hooks[key] is not None:
+            kwargs[key] = hooks[key]
+    try:
+        receipt = run_forward_capture(**kwargs)
+    except ForwardCaptureError as exc:
+        return {
+            "status": "FAILED",
+            "blocker": str(exc),
+            "terminal": str(exc),
+            "result": str(exc),
+            "provider_api_rpc_wss_calls": int(getattr(exc, "provider_requests", 0) or 0),
+            "credential_reads": 0,
+        }
+    return {
+        "status": "COMPLETE",
+        "blocker": "NONE",
+        "terminal": receipt.get("terminal_outcome"),
+        "result": receipt.get("terminal_outcome"),
+        "provider_api_rpc_wss_calls": int(receipt.get("provider_requests") or 0),
+        "credential_reads": int(receipt.get("credential_reads") or 0),
+        "receipt": receipt,
+    }
+
+
 CAPABILITY_ROUTER: dict[str, Callable[..., dict[str, Any]]] = {
     CAP_OFFLINE_CANONICAL_RECEIPT_REPLAY: replay_canonical_receipts,
     CAP_JUPITER_FREE_KEY_QUOTE_NATIVE_BOUNDED_CAPTURE: capture_quote_native_free_key,
+    CAP_JUPITER_FREE_KEY_FORWARD_H900_QUOTE_CAPTURE: capture_forward_h900_quote,
     CAP_OFFLINE_MARKET_FEATURE_RESOLVE: resolve_market_feature_surface,
 }
 
@@ -517,6 +578,9 @@ def execute_capability(
         raise CapabilityError("PROVIDER_BUDGET_NOT_ZERO")
     if capability_id == CAP_JUPITER_FREE_KEY_QUOTE_NATIVE_BOUNDED_CAPTURE:
         if budget < 1 or budget > 62:
+            raise CapabilityError("PROVIDER_BUDGET_INVALID")
+    if capability_id == CAP_JUPITER_FREE_KEY_FORWARD_H900_QUOTE_CAPTURE:
+        if budget < 1 or budget > 60:
             raise CapabilityError("PROVIDER_BUDGET_INVALID")
     return handler(
         spec,

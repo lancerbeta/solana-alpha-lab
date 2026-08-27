@@ -1,0 +1,38 @@
+{
+  "as_of": "2026-08-27",
+  "capability_radar": {
+    "now": "NONE",
+    "watch": "POST_MERGE_ONE_AUTHORIZED_LIVE_WINDOW"
+  },
+  "dimensions": {
+    "build_vs_buy": "PASS",
+    "context_efficiency": "PASS",
+    "execution_to_cashflow": "PASS",
+    "flexibility_and_history": "PASS",
+    "mission": "PASS",
+    "monitoring_and_recovery": "PASS",
+    "owner_operability": "PASS",
+    "red_team": "PASS",
+    "research_truth": "PASS",
+    "security": "PASS"
+  },
+  "limits": [
+    "NO_ALPHA",
+    "NO_CANONICAL_DONE",
+    "NO_LIVE_PROVIDER_CALL_BEFORE_MERGE",
+    "NO_HYPOTHESIS_FORGE_SLASH",
+    "NO_CONFIRMATORY_SECOND_WINDOW",
+    "NO_HYPOTHESIS_SPECIFIC_PROVIDER_RUNNER",
+    "FACTORY_RUNNER_UNCHANGED",
+    "CLASSIFY_R0_MIX_OFFLINE_ONLY"
+  ],
+  "mode": "FULL_REVIEW",
+  "recovery": "REVERT",
+  "review_id": "HFIC-NEXT-FORWARD-EVIDENCE-FACTORY-FIT-001",
+  "reviewed_bindings_sha256": "fe9a9f1fb59f3c91b62f8662c577e63439297904e35695a469b55cf2f036c888",
+  "reviewed_inventory_sha256": "5b55a0edee8cafec67cc93cbf714ce6aaaca7ecf79493d176ec3082e52092238",
+  "schema": "smial.delivery-harness-factory-fit",
+  "schema_version": "1.0",
+  "task_id": "HFIC_NEXT_FORWARD_EVIDENCE_EXECUTION_V1",
+  "verdict": "PASS"
+}
