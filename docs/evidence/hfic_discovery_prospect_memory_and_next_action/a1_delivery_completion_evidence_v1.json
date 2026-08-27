@@ -9,14 +9,14 @@
   "cloud_bundle_smoke_required": false,
   "factory_fit": {
     "path": "docs/evidence/hfic_discovery_prospect_memory_and_next_action/a1_delivery_factory_fit_v1.json",
-    "sha256": "d3ce6368f213f3a2f3f822e4e6510beb5f5ae264628110de4c2b342f1fc3ce42",
+    "sha256": "dabead440f6900d572c5664594e8430b23c8f8bee24da5eb9545710adce273d4",
     "verdict": "PASS"
   },
   "implementation_bindings": {
     ".agents/skills/hypothesis-forge/SKILL.md": "e63526990f645303a6473bc586267c8916dca27bbe863501c398c475f64ba6f0",
     ".cursor/commands/hypothesis-forge.md": "c2d6fe0e92a5d4ed88a1ad851171504ff09a47521bef3b27a760702e14319f90",
     "catalog/assets/architecture.yaml": "9eb48a15c9ad221863dfed3b005a07d225d80b8693d5e3083ef7df11e04b37eb",
-    "catalog/assets/core.yaml": "9d8d99faf346f8dabb94c081f7dc225fbaf42dab60ec2b1ba6ce09163c218c51",
+    "catalog/assets/core.yaml": "b9ea8dabd8dc7c049fb64dcee259452865c6ba2767da2f7808548ed309b5cf7e",
     "catalog/assets/lifecycle.yaml": "d3b7b87bda67fc99d6f7b9da0341c0c6ad8d89dbc55b44314b925ec14259e69e",
     "catalog/catalog_manifest.yaml": "37a269a7515224e3eae47a524b7540111310ce56a1d2aad9d8b0905af9ab3128",
     "catalog/generated/asset_edges.json": "1902dffb8766684fff5f3cb14596cb348ab9e5e12ddef1137d140276d2337849",
@@ -42,7 +42,7 @@
     "tests/fixtures/hypothesis_forge/next_action_wait_valid_v1.json": "d125e04710f6ea9e9cd01d342e98a3ff05048d846354666e6f50252eeb78b2bc",
     "tests/test_arch_intent_006_hypothesis_discovery_surface.py": "f788fd841dbf33f4651267807ed743c06dfd766f44a33b8e1d1413485c87f556",
     "tests/test_hfic_cli.py": "002848ae37e94a80aa5fdf3140d06e1f410b7792f277294370732e481fc8934d",
-    "tests/test_hfic_discovery_prospects_and_next_action.py": "5a698f87d29568574322dcaa5256761e51b902b42c24800c649113c7e7efc14b",
+    "tests/test_hfic_discovery_prospects_and_next_action.py": "c0e13bc6e0e30878ed99923f040931c455255bf19bf6e80b438f9617d94beeba",
     "tests/test_hfic_forge_context_and_no_worthy.py": "331dec5236c899ad891ba5aa679ce200ceb1a045ebca5f0e414116869c8e4b5e"
   },
   "non_claims": [
@@ -77,7 +77,7 @@
     "github_ci": "ENFORCED_LIVE_AT_GUARDED_MERGE",
     "independent_review": {
       "path": "docs/evidence/hfic_discovery_prospect_memory_and_next_action/a1_delivery_independent_review_v1.json",
-      "sha256": "fcc6700ef3f4661931b70b7c3a28856214b0fc1e8dd8ae4288daf4b8c8814bbe",
+      "sha256": "afb16f3d6f98e7d1c50dbad0c0f73af18e743ec50f22583804dd312948fe2920",
       "verdict": "PASS"
     },
     "project_checks": [

@@ -3,6 +3,7 @@ from __future__ import annotations
 import hashlib
 import json
 import os
+import shutil
 import subprocess
 import sys
 import tempfile
@@ -284,27 +285,58 @@ class NextActionBindingTests(unittest.TestCase):
 
 
 class NextActionPersistTests(unittest.TestCase):
-    def _prepare_store(self, tmp: str) -> tuple[Path, dict]:
-        source = Path(tmp) / "source"
+    _tmp: tempfile.TemporaryDirectory[str] | None = None
+    _template: Path
+    _receipt: dict
+
+    @classmethod
+    def setUpClass(cls) -> None:
+        cls._tmp = tempfile.TemporaryDirectory()
+        source = Path(cls._tmp.name) / "source"
         write_temp_capture(source, eligible=10)
-        data_root = Path(tmp) / "rdp"
+        data_root = Path(cls._tmp.name) / "rdp"
         data_root.mkdir()
         import_early_market_panel(
             source_root=source,
             data_root=data_root,
             source_receipt_path=source / "source_receipt.json",
         )
-        preflight = run_cli("preflight", "--owner-focus", "AUTO", "--format", "json", data_root=data_root)
-        self.assertEqual(preflight.returncode, 0, preflight.stderr)
+        preflight = run_cli(
+            "preflight",
+            "--owner-focus",
+            "AUTO",
+            "--format",
+            "json",
+            data_root=data_root,
+        )
+        if preflight.returncode != 0:
+            raise AssertionError(preflight.stderr)
         receipt = json.loads(preflight.stdout)
-        self.assertNotIn("HFIC-PROSPECT-001", json.dumps(receipt))
-        self.assertNotIn("HFIC-NEXT-V1.0", json.dumps(receipt.get("forge_context_packet") or {}))
-        return data_root, receipt
+        if "HFIC-PROSPECT-001" in json.dumps(receipt):
+            raise AssertionError("prospect_leaked_into_preflight")
+        if "HFIC-NEXT-V1.0" in json.dumps(receipt.get("forge_context_packet") or {}):
+            raise AssertionError("next_prompt_leaked_into_preflight")
+        template = Path(cls._tmp.name) / "template"
+        shutil.copytree(data_root, template)
+        cls._template = template
+        cls._receipt = receipt
+
+    @classmethod
+    def tearDownClass(cls) -> None:
+        if cls._tmp is not None:
+            cls._tmp.cleanup()
+            cls._tmp = None
+
+    def _clone_store(self, tmp: str) -> Path:
+        data_root = Path(tmp) / "rdp"
+        shutil.copytree(self._template, data_root)
+        return data_root
 
     def test_no_worthy_wait_persists_atomically_and_replays(self) -> None:
         git_before = repository_git_snapshot(ROOT)
         with tempfile.TemporaryDirectory() as tmp:
-            data_root, receipt = self._prepare_store(tmp)
+            data_root = self._clone_store(tmp)
+            receipt = self._receipt
             epoch_before = evidence_epoch_sha256(evidence_epoch_material(ROOT, data_root))
             inventory_before = ResearchStore(data_root).diagnostics().committed_inventory_sha256
             receipt_path = Path(tmp) / "preflight.json"
@@ -378,58 +410,32 @@ class NextActionPersistTests(unittest.TestCase):
 
     def test_invalid_next_action_does_not_mutate_rdp(self) -> None:
         with tempfile.TemporaryDirectory() as tmp:
-            data_root, receipt = self._prepare_store(tmp)
-            inventory_before = ResearchStore(data_root).diagnostics().committed_inventory_sha256
-            receipt_path = Path(tmp) / "preflight.json"
-            receipt_path.write_text(json.dumps(receipt), encoding="utf-8")
-            draft_path = Path(tmp) / "draft.json"
-            draft_path.write_text(
-                json.dumps(bind_draft(json.loads(NO_WORTHY.read_text(encoding="utf-8")), receipt)),
-                encoding="utf-8",
-            )
-            bad_path = Path(tmp) / "bad.json"
-            bad_path.write_text(INVALID.read_text(encoding="utf-8"), encoding="utf-8")
-            frozen_run = run_cli(
-                "freeze",
-                "--draft",
-                str(draft_path),
-                "--preflight-receipt",
-                str(receipt_path),
-                "--next-action",
-                str(bad_path),
-                "--format",
-                "json",
-                data_root=data_root,
-            )
-            self.assertNotEqual(frozen_run.returncode, 0)
-            self.assertIn("HFIC_PROSPECT_REF_UNKNOWN", frozen_run.stderr)
-            self.assertEqual(
-                inventory_before,
-                ResearchStore(data_root).diagnostics().committed_inventory_sha256,
-            )
+            data_root = self._clone_store(tmp)
+            receipt = self._receipt
+            store = ResearchStore(data_root)
+            inventory_before = store.diagnostics().committed_inventory_sha256
+            draft = bind_draft(json.loads(NO_WORTHY.read_text(encoding="utf-8")), receipt)
+            with self.assertRaises(HficSessionError) as raised:
+                freeze_draft(
+                    draft,
+                    preflight_receipt=receipt,
+                    store=store,
+                    repo_root=ROOT,
+                    next_action_draft=json.loads(INVALID.read_text(encoding="utf-8")),
+                )
+            self.assertEqual(str(raised.exception), "HFIC_PROSPECT_REF_UNKNOWN")
+            self.assertEqual(inventory_before, store.diagnostics().committed_inventory_sha256)
 
     def test_missing_draft_falls_back_to_wait(self) -> None:
         with tempfile.TemporaryDirectory() as tmp:
-            data_root, receipt = self._prepare_store(tmp)
-            receipt_path = Path(tmp) / "preflight.json"
-            receipt_path.write_text(json.dumps(receipt), encoding="utf-8")
-            draft_path = Path(tmp) / "draft.json"
-            draft_path.write_text(
-                json.dumps(bind_draft(json.loads(NO_WORTHY.read_text(encoding="utf-8")), receipt)),
-                encoding="utf-8",
+            data_root = self._clone_store(tmp)
+            receipt = self._receipt
+            frozen = freeze_draft(
+                bind_draft(json.loads(NO_WORTHY.read_text(encoding="utf-8")), receipt),
+                preflight_receipt=receipt,
+                store=ResearchStore(data_root),
+                repo_root=ROOT,
             )
-            frozen_run = run_cli(
-                "freeze",
-                "--draft",
-                str(draft_path),
-                "--preflight-receipt",
-                str(receipt_path),
-                "--format",
-                "json",
-                data_root=data_root,
-            )
-            self.assertEqual(frozen_run.returncode, 0, frozen_run.stderr)
-            frozen = json.loads(frozen_run.stdout)
             self.assertEqual(frozen["next"], "WAIT_FOR_NEW_EVIDENCE")
             self.assertEqual(frozen["next_action"]["generation_mode"], "DETERMINISTIC_SAFE_FALLBACK")
 
@@ -439,30 +445,15 @@ class NextActionPersistTests(unittest.TestCase):
             (CAPABILITY, "CAPABILITY_OPTION_READY"),
         ):
             with tempfile.TemporaryDirectory() as tmp:
-                data_root, receipt = self._prepare_store(tmp)
-                receipt_path = Path(tmp) / "preflight.json"
-                receipt_path.write_text(json.dumps(receipt), encoding="utf-8")
-                draft_path = Path(tmp) / "draft.json"
-                draft_path.write_text(
-                    json.dumps(bind_draft(json.loads(NO_WORTHY.read_text(encoding="utf-8")), receipt)),
-                    encoding="utf-8",
+                data_root = self._clone_store(tmp)
+                receipt = self._receipt
+                frozen = freeze_draft(
+                    bind_draft(json.loads(NO_WORTHY.read_text(encoding="utf-8")), receipt),
+                    preflight_receipt=receipt,
+                    store=ResearchStore(data_root),
+                    repo_root=ROOT,
+                    next_action_draft=json.loads(fixture.read_text(encoding="utf-8")),
                 )
-                action_path = Path(tmp) / f"{expected}.json"
-                action_path.write_text(fixture.read_text(encoding="utf-8"), encoding="utf-8")
-                frozen_run = run_cli(
-                    "freeze",
-                    "--draft",
-                    str(draft_path),
-                    "--preflight-receipt",
-                    str(receipt_path),
-                    "--next-action",
-                    str(action_path),
-                    "--format",
-                    "json",
-                    data_root=data_root,
-                )
-                self.assertEqual(frozen_run.returncode, 0, frozen_run.stderr)
-                frozen = json.loads(frozen_run.stdout)
                 self.assertEqual(frozen["next"], expected)
                 self.assertEqual(
                     frozen["next_action"]["owner_gate"]["phrase_status"],

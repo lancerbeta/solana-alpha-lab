@@ -13,8 +13,8 @@
     "GOAL_DOD_CRITIC"
   ],
   "review_id": "HFIC-DISCOVERY-PROSPECT-MEMORY-INDEPENDENT-REVIEW-001",
-  "reviewed_bindings_sha256": "dfa9a49058a439b39eab17c2c1432d866aecc9a56764722fb6e92c659b3393e5",
-  "reviewed_inventory_sha256": "dcdbf39787fd8da5c70b7255230d71d39763850e3713de3cbcfbc37b8b70a297",
+  "reviewed_bindings_sha256": "99c89344b8c408c27eda669a3622f8b4c14d20d5701bcbc296fa9bf3493f3a77",
+  "reviewed_inventory_sha256": "a3852272ca506ba63f325ae770d749db73cce0f7aa69af3150a5fa40849d31d4",
   "reviews": [
     {
       "findings": [
