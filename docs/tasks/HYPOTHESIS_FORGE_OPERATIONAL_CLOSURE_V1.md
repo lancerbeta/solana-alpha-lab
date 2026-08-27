@@ -19,6 +19,7 @@ objective: Close the Hypothesis Forge operational loop so one slash invocation
   Research Data Plane, and refuses same-evidence shopping.
 managed_write_set:
 - docs/tasks/HYPOTHESIS_FORGE_OPERATIONAL_CLOSURE_V1.md
+- delivery-harness/harness.yaml
 - configs/hypothesis_forge_independent_critic_v1.yaml
 - docs/operator/HYPOTHESIS_FORGE_AND_INDEPENDENT_CRITIC_OPERATOR_V1.md
 - catalog/schemas/hypothesis_forge_draft_v1.schema.json

@@ -16,8 +16,8 @@
     "ARCHITECTURE_CRITIC"
   ],
   "review_id": "HFIC-OPERATIONAL-CLOSURE-INDEPENDENT-REVIEW-001",
-  "reviewed_bindings_sha256": "ebced26be16482c60530c052094f10b7de2b8b0c908f925a83daed03063ba528",
-  "reviewed_inventory_sha256": "4e307d44e13cfea6cbe3d9e67fc11ad77a259f1d88853bc84015301ad74d5184",
+  "reviewed_bindings_sha256": "042697109fbdf2aa2f694575d2a10d76c56ac380650f6aec76f9c944ecccedbb",
+  "reviewed_inventory_sha256": "4107d52d1bd1225079c5e6377a97aab5fff14521bec078730ccfef0d558e1042",
   "reviews": [
     {
       "findings": [
