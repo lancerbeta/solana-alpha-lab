@@ -1,0 +1,30 @@
+{
+  "packet_schema": "smial.hfic-next-epistemic-action-draft",
+  "packet_version": "1.0",
+  "prompt_version": "HFIC-NEXT-V1.0",
+  "action_type": "WAIT_FOR_NEW_EVIDENCE",
+  "reason_code": "NO_ADMISSIBLE_UNCONSUMED_EVIDENCE",
+  "named_consumer": "HFIC-POST-NO-WORTHY-ROUTER",
+  "basis_candidate_refs": [],
+  "prospect_ids": ["HFIC-PROSPECT-999"],
+  "evidence_gap": "Invalid because prospect 999 does not exist.",
+  "why_now": "Fixture for fail-closed validation.",
+  "why_cheaper_option_is_insufficient": "Unknown prospect must not persist.",
+  "action_payload": {
+    "wake_on": ["EVIDENCE_EPOCH_CHANGED"]
+  },
+  "owner_gate": {
+    "required": false,
+    "phrase_status": "NONE"
+  },
+  "authority": {
+    "git_mutation": 0,
+    "rdp_mutation_outside_freeze": 0,
+    "experiment_execution": 0,
+    "provider_api_rpc_wss_calls": 0,
+    "credential_reads": 0,
+    "cash_spend_usd_cents": 0,
+    "wallet_signer_transaction_actions": 0
+  },
+  "non_claims": ["NO_ALPHA"]
+}

@@ -1,0 +1,89 @@
+{
+  "acceptance_id": "HFIC-DISCOVERY-PROSPECT-MEMORY-AND-NEXT-ACTION-COMPLETION-001",
+  "active_stop_conditions": [],
+  "as_of": "2026-08-27",
+  "base_main": "dd6692edf9cbfa44c9535695aa23751403052ca1",
+  "capability_radar_now": "NONE",
+  "cloud_bundle_mode": "OWNER_MANAGED_OPTIONAL_EXPORT",
+  "cloud_bundle_required_by_harness": false,
+  "cloud_bundle_smoke_required": false,
+  "factory_fit": {
+    "path": "docs/evidence/hfic_discovery_prospect_memory_and_next_action/a1_delivery_factory_fit_v1.json",
+    "sha256": "e04bb5ba75986dd1b8e0f46e03b0cd809990e7022082578363cc5771eb201672",
+    "verdict": "PASS"
+  },
+  "implementation_bindings": {
+    ".agents/skills/hypothesis-forge/SKILL.md": "e63526990f645303a6473bc586267c8916dca27bbe863501c398c475f64ba6f0",
+    ".cursor/commands/hypothesis-forge.md": "c2d6fe0e92a5d4ed88a1ad851171504ff09a47521bef3b27a760702e14319f90",
+    ".gitattributes": "a97f635cc05ab34344b099ddee0d9a6ea0d77e84cb1c4507d3e21340348574ca",
+    "catalog/assets/architecture.yaml": "9eb48a15c9ad221863dfed3b005a07d225d80b8693d5e3083ef7df11e04b37eb",
+    "catalog/assets/core.yaml": "56106241a21ed7280defbd746ee2be3054ac18870d70694a77e971e8ae5dc43b",
+    "catalog/assets/lifecycle.yaml": "d3b7b87bda67fc99d6f7b9da0341c0c6ad8d89dbc55b44314b925ec14259e69e",
+    "catalog/catalog_manifest.yaml": "37a269a7515224e3eae47a524b7540111310ce56a1d2aad9d8b0905af9ab3128",
+    "catalog/generated/asset_edges.json": "1902dffb8766684fff5f3cb14596cb348ab9e5e12ddef1137d140276d2337849",
+    "catalog/query_recipes.yaml": "01fb68ddd846f4dc61ad6f69be66caa28d0c099067c233bc3e5a943bfaa9ac8e",
+    "catalog/schemas/hfic_next_epistemic_action_draft_v1.schema.json": "e8adb93c3f8d994b71a694f31599c593af31cfd910284b9ab2a53e0448606574",
+    "catalog/schemas/hfic_next_epistemic_action_v1.schema.json": "32012907f85c5a4d612c4179ba6aa07e360cf7229e6547fcfb6c3c31b61e5e93",
+    "catalog/schemas/hfic_scientific_discovery_prospects_v1.schema.json": "b26de674870c61f6a114049d02439e03cd4c11fcce5f5f1e12e44dafa9148561",
+    "catalog/schemas/hypothesis_forge_session_receipt_v1.schema.json": "126db21d968ca3c0c13d934dbc42c31fd275b328cd7b81665e4d1ff053a08b69",
+    "configs/hypothesis_forge_independent_critic_v1.yaml": "36a54ae1ca096fd0db604b05594d126514c48ad89eeb7806b9cdb5eed575fc57",
+    "docs/PROJECT_MAP.md": "55b1af7bba305b6b364fa97242896c8373cdd5d7d8ed2306c1071cf078638f2d",
+    "docs/architecture/intents/ARCH-INTENT-006-hypothesis-discovery-and-opportunity-surface.md": "b85d3d3138af34da6ca63d1460a9acdd4d1b22d1413837cc75b02e345a6942cf",
+    "docs/architecture/prospects/HFIC_SCIENTIFIC_DISCOVERY_ENGINE_RESEARCH_V1.md": "1a2ac80b02e0a77a892d7ea27b2cff8a03ca99c3a1805c95c5d2611423cabf67",
+    "docs/architecture/prospects/hfic_scientific_discovery_prospects_v1.yaml": "4896597ee1780401e8c3ce3f546608ce72906fc8d3365d2408627b2eb9f9dc0a",
+    "docs/evidence/hfic_discovery_prospect_memory_and_next_action/a1_temp_e2e_receipt_v1.json": "ea6a80824279e41460be7c379f80dc2cdfc3a18243b38ec6c04713aa2657aaf0",
+    "docs/operator/HYPOTHESIS_FORGE_AND_INDEPENDENT_CRITIC_OPERATOR_V1.md": "b780847e1dab399d19f3bc2d3d330d52d29265112cc474afec75ae66f7c41963",
+    "docs/tasks/HFIC_DISCOVERY_PROSPECT_MEMORY_AND_NEXT_ACTION_V1.md": "ab66bcca98f607a8aec49cecd2cda04e7c0ea92ff4fc9da10f107249fa556927",
+    "scripts/hypothesis_forge.py": "62b2ddfcebf2337892e14c117deb2ea65f62518cebb6d6ed85695787d62e388c",
+    "src/solana_alpha_lab/factory/hfic_prospects.py": "27e77a31baa045e253c9aba3a44cdde9888c844e96b949fae2a7cbc06044d77e",
+    "src/solana_alpha_lab/factory/hfic_session.py": "0a04776d121a73c597cdd831574a719a12e0d969a0a19e2c1585f0fb64bc595e",
+    "tests/fixtures/hypothesis_forge/next_action_capability_valid_v1.json": "ecbefe76bda1cc0c97889b2b3403675fdf2adc8ca8a54ce2d53306c113e73edf",
+    "tests/fixtures/hypothesis_forge/next_action_forward_valid_v1.json": "ee7546dbea3e0fd4793a21a8faca697585c98ec368b4df2072a1a51f6cf0a31c",
+    "tests/fixtures/hypothesis_forge/next_action_invalid_v1.json": "97dade02b726b59df0bef5bfa2a06036d5c49444f8b159efcfe4f5d20aad74fc",
+    "tests/fixtures/hypothesis_forge/next_action_wait_valid_v1.json": "d125e04710f6ea9e9cd01d342e98a3ff05048d846354666e6f50252eeb78b2bc",
+    "tests/test_arch_intent_006_hypothesis_discovery_surface.py": "f788fd841dbf33f4651267807ed743c06dfd766f44a33b8e1d1413485c87f556",
+    "tests/test_hfic_cli.py": "002848ae37e94a80aa5fdf3140d06e1f410b7792f277294370732e481fc8934d",
+    "tests/test_hfic_discovery_prospects_and_next_action.py": "5a698f87d29568574322dcaa5256761e51b902b42c24800c649113c7e7efc14b",
+    "tests/test_hfic_forge_context_and_no_worthy.py": "331dec5236c899ad891ba5aa679ce200ceb1a045ebca5f0e414116869c8e4b5e"
+  },
+  "non_claims": [
+    "NO_ALPHA",
+    "NO_AUTONOMOUS_GENERATOR",
+    "NO_DISCOVERY_RANKER_TRIGGER_PROVEN",
+    "NO_ARCH_INTENT_006_FULL_IMPLEMENTATION",
+    "NO_QUALITY_DIVERSITY_ENGINE",
+    "NO_VOI_SCHEDULER",
+    "NO_SEQUENTIAL_INFERENCE_ENGINE",
+    "NO_PROVIDER_OR_EXPERIMENT_AUTHORITY"
+  ],
+  "owner_attention_triggers": {
+    "auth_or_access_recovery": false,
+    "external_material_action": false,
+    "material_owner_decision": false,
+    "unresolved_safety_or_truth_conflict": false,
+    "user_only_activation": false
+  },
+  "schema": "smial.delivery-completion-evidence",
+  "schema_version": "1.0",
+  "side_effects": {
+    "cash_spend_usd_cents": 0,
+    "credentials_read": 0,
+    "provider_api_rpc_wss_calls": 0,
+    "wallet_signer_transaction": 0
+  },
+  "state_change": "HFIC_DISCOVERY_PROSPECT_MEMORY_AND_NEXT_ACTION_CANDIDATE",
+  "task_id": "HFIC_DISCOVERY_PROSPECT_MEMORY_AND_NEXT_ACTION_V1",
+  "validation": {
+    "full_gate": "ENFORCED_BY_PROJECT_BOUND_VALIDATION",
+    "github_ci": "ENFORCED_LIVE_AT_GUARDED_MERGE",
+    "independent_review": {
+      "path": "docs/evidence/hfic_discovery_prospect_memory_and_next_action/a1_delivery_independent_review_v1.json",
+      "sha256": "8d28acff131354be10e820c82dcbe23bd30dd440af67b1439f06d74f825be552",
+      "verdict": "PASS"
+    },
+    "project_checks": [
+      "PASS_VALIDATE_CATALOG"
+    ],
+    "targeted": "PASS_HFIC_DISCOVERY_PROSPECT_MEMORY_SUITE"
+  }
+}

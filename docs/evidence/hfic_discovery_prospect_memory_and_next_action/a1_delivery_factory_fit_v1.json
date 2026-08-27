@@ -1,0 +1,38 @@
+{
+  "as_of": "2026-08-27",
+  "capability_radar": {
+    "now": "NONE",
+    "watch": "POST_MERGE_ORDINARY_HYPOTHESIS_FORGE"
+  },
+  "dimensions": {
+    "build_vs_buy": "PASS",
+    "context_efficiency": "PASS",
+    "execution_to_cashflow": "PASS",
+    "flexibility_and_history": "PASS",
+    "mission": "PASS",
+    "monitoring_and_recovery": "PASS",
+    "owner_operability": "PASS",
+    "red_team": "PASS",
+    "research_truth": "PASS",
+    "security": "PASS"
+  },
+  "limits": [
+    "NO_ALPHA",
+    "NO_AUTONOMOUS_GENERATOR",
+    "NO_DISCOVERY_RANKER_TRIGGER_PROVEN",
+    "NO_ARCH_INTENT_006_FULL_IMPLEMENTATION",
+    "NO_QUALITY_DIVERSITY_ENGINE",
+    "NO_VOI_SCHEDULER",
+    "NO_SEQUENTIAL_INFERENCE_ENGINE",
+    "NO_PROVIDER_OR_EXPERIMENT_AUTHORITY"
+  ],
+  "mode": "FULL_REVIEW",
+  "recovery": "REVERT",
+  "review_id": "HFIC-DISCOVERY-PROSPECT-MEMORY-FACTORY-FIT-001",
+  "reviewed_bindings_sha256": "9cda256a3724da763e931daf5ba91dc9f94f2d37efe72431bb99a16b3f3a24e0",
+  "reviewed_inventory_sha256": "a8e492b44b1528eb451f56d15040dc47b16fe97a72792a3bb4ad4d3bd8d92b9e",
+  "schema": "smial.delivery-harness-factory-fit",
+  "schema_version": "1.0",
+  "task_id": "HFIC_DISCOVERY_PROSPECT_MEMORY_AND_NEXT_ACTION_V1",
+  "verdict": "PASS"
+}

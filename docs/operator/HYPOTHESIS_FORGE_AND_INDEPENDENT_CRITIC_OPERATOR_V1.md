@@ -8,7 +8,8 @@
 
 **Режим:** discovery и design only. Генерация не запускает эксперимент, не меняет Git, не создаёт branch/PR, не вызывает market/provider API/RPC/WSS, не тратит деньги и не получает торговых полномочий.
 
-**Версия промпта:** `HFIC-V1.1` (исторические пакеты `HFIC-V1.0` остаются читаемыми).
+**Версия промпта:** `HFIC-V1.1` для Prompt A/B (исторические пакеты `HFIC-V1.0` остаются читаемыми).
+Prompt C identity: `HFIC-NEXT-V1.0`. Candidate-generation search identity stays `HFIC-V1.1`.
 Display ordinal (`C1`/`C2`/…) is display-only. Canonical `candidate_id` is assigned
 by `freeze`, not by the model.
 
@@ -144,7 +145,7 @@ typed `AUTO_HANDOFF_UNAVAILABLE`.
 | `PASS_DATA_OPTION_REQUIRED` | Сначала решить, оправдан ли forward collection по цене и option value. |
 | `REVISE_ONCE` | Fallback only: вернуть packet Forge ровно один раз. Slash path does this without an owner prompt. |
 | `KILL_*` | Ничего не выполнять. Можно отправить Critic уже оценённого runner-up; новую генерацию на тех же evidence в этот вечер не запускать. |
-| `NO_WORTHY_HYPOTHESIS` | Нормальный полезный результат. Закончить цикл без задачи. |
+| `NO_WORTHY_HYPOTHESIS` | Нормальный полезный результат. Same slash runs Prompt C and persists one typed next action. Do not invent a task. |
 | `OWNER_DECISION_REQUIRED` | Принять только названное материальное решение; не выдавать общее разрешение. |
 
 ---
@@ -868,6 +869,54 @@ Post-merge path back to no-Git Fast Lane
 При любом критическом нарушении PASS запрещён.
 
 ## END PROMPT B
+
+---
+
+# PROMPT C — NEXT EPISTEMIC ACTION (`HFIC-NEXT-V1.0`)
+
+Same slash, after Prompt A returns `NO_WORTHY_HYPOTHESIS`. Do not launch Independent Critic. Do not ask the owner to paste another prompt. Token: `ZERO_MID_CYCLE_OWNER_INTERVENTION`.
+
+## Inputs only
+
+- exact `FORGE_CONTEXT_PACKET` already used by Prompt A;
+- no-worthy candidate portfolio and stable candidate refs;
+- terminal `NO_WORTHY_HYPOTHESIS`;
+- at most three prospect summaries from `prospects --trigger POST_NO_WORTHY_REVIEW --max-results 3`;
+- active/persisted prior terminals already in context.
+
+## Forbidden inputs
+
+- holdout or new outcome values;
+- full repository scan;
+- full 23-prospect research text;
+- Forge hidden reasoning;
+- provider credentials or physical data paths;
+- prospect lookup before the no-worthy decision.
+
+## Decision policy
+
+1. Existing active/persisted spend already answers the gap → `WAIT_FOR_NEW_EVIDENCE`.
+2. One fresh bounded observation can resolve a named hint/family → `FORWARD_DATA_OPTION_READY`.
+3. A single reusable missing capability blocks a named falsifier and no data-only route exists → `CAPABILITY_OPTION_READY`.
+4. Otherwise → `WAIT_FOR_NEW_EVIDENCE`.
+
+Never manufacture a forward option merely to avoid WAIT. Never route a broad collector/platform as a capability option. Unknown or ambiguous cases become WAIT with a typed reason.
+
+## Output
+
+One machine draft matching `catalog/schemas/hfic_next_epistemic_action_draft_v1.schema.json`.
+One schema-repair attempt; if still invalid, omit the packet so freeze persists deterministic WAIT (`NEXT_ACTION_GENERATION_FALLBACK`).
+
+Proposed owner phrases have status `PROPOSED_NOT_AUTHORITY` and must not be executed.
+
+## BEGIN PROMPT C
+
+You are the post-no-worthy router for Solana Alpha Lab. Prompt identity `HFIC-NEXT-V1.0`.
+Candidate generation already finished with `NO_WORTHY_HYPOTHESIS`. Do not invent a new hypothesis. Do not change `HFIC-V1.1` search identity. Choose exactly one typed next action using only the supplied context, no-worthy portfolio and at most three prospect summaries. Authority remains all zeros. Output only a valid next-action draft.
+
+## END PROMPT C
+
+---
 
 ---
 

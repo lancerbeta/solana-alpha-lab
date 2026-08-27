@@ -2748,6 +2748,21 @@
       "target_asset_id": "CTRL-TASK-04-001"
     },
     {
+      "source_asset_id": "CTRL-HFIC-DISCOVERY-PROSPECT-MEMORY-AND-NEXT-ACTION-001",
+      "relation": "depends_on",
+      "target_asset_id": "DOC-HFIC-SCIENTIFIC-DISCOVERY-PROSPECTS-001"
+    },
+    {
+      "source_asset_id": "CTRL-HFIC-DISCOVERY-PROSPECT-MEMORY-AND-NEXT-ACTION-001",
+      "relation": "governed_by",
+      "target_asset_id": "ARCH-INTENT-006"
+    },
+    {
+      "source_asset_id": "CTRL-HFIC-DISCOVERY-PROSPECT-MEMORY-AND-NEXT-ACTION-001",
+      "relation": "validated_by",
+      "target_asset_id": "TEST-HFIC-DISCOVERY-PROSPECTS-AND-NEXT-ACTION-001"
+    },
+    {
       "source_asset_id": "CTRL-HFIC-NEXT-FORWARD-EVIDENCE-EXECUTION-001",
       "relation": "depends_on",
       "target_asset_id": "CONFIG-FORWARD-H900-QUOTE-CAPTURE-001"
@@ -4131,6 +4146,21 @@
       "source_asset_id": "DOC-FACTORY-REMOTE-HOST-001",
       "relation": "governed_by",
       "target_asset_id": "CTRL-FACTORY-REMOTE-OPERATIONS-001"
+    },
+    {
+      "source_asset_id": "DOC-HFIC-SCIENTIFIC-DISCOVERY-PROSPECTS-001",
+      "relation": "derived_from",
+      "target_asset_id": "DOC-HFIC-SCIENTIFIC-DISCOVERY-RESEARCH-001"
+    },
+    {
+      "source_asset_id": "DOC-HFIC-SCIENTIFIC-DISCOVERY-PROSPECTS-001",
+      "relation": "governed_by",
+      "target_asset_id": "ARCH-INTENT-006"
+    },
+    {
+      "source_asset_id": "DOC-HFIC-SCIENTIFIC-DISCOVERY-RESEARCH-001",
+      "relation": "governed_by",
+      "target_asset_id": "ARCH-INTENT-006"
     },
     {
       "source_asset_id": "DOC-OWNER-AUTHORITY-PACKET-001",
@@ -9033,6 +9063,16 @@
       "target_asset_id": "CTRL-FRESH-OOS-BASELINE-VS-FRICTION-VETO-001"
     },
     {
+      "source_asset_id": "MODULE-FACTORY-V1-HFIC-PROSPECTS-001",
+      "relation": "depends_on",
+      "target_asset_id": "DOC-HFIC-SCIENTIFIC-DISCOVERY-PROSPECTS-001"
+    },
+    {
+      "source_asset_id": "MODULE-FACTORY-V1-HFIC-PROSPECTS-001",
+      "relation": "governed_by",
+      "target_asset_id": "CTRL-HFIC-DISCOVERY-PROSPECT-MEMORY-AND-NEXT-ACTION-001"
+    },
+    {
       "source_asset_id": "MODULE-FACTORY-V1-HFIC-SESSION-001",
       "relation": "depends_on",
       "target_asset_id": "MODULE-FACTORY-V1-RESEARCH-STORE-001"
@@ -11478,9 +11518,24 @@
       "target_asset_id": "CTRL-QUOTE-SURFACE-RETENTION-FALSIFIER-001"
     },
     {
+      "source_asset_id": "SCHEMA-HFIC-NEXT-EPISTEMIC-ACTION-DRAFT-V1-001",
+      "relation": "governed_by",
+      "target_asset_id": "CTRL-HFIC-DISCOVERY-PROSPECT-MEMORY-AND-NEXT-ACTION-001"
+    },
+    {
+      "source_asset_id": "SCHEMA-HFIC-NEXT-EPISTEMIC-ACTION-V1-001",
+      "relation": "governed_by",
+      "target_asset_id": "CTRL-HFIC-DISCOVERY-PROSPECT-MEMORY-AND-NEXT-ACTION-001"
+    },
+    {
       "source_asset_id": "SCHEMA-HFIC-PROVENANCE-TIME-CORRECTION-V1-001",
       "relation": "governed_by",
       "target_asset_id": "CTRL-HYPOTHESIS-FORGE-OPERATIONAL-CLOSURE-001"
+    },
+    {
+      "source_asset_id": "SCHEMA-HFIC-SCIENTIFIC-DISCOVERY-PROSPECTS-V1-001",
+      "relation": "governed_by",
+      "target_asset_id": "CTRL-HFIC-DISCOVERY-PROSPECT-MEMORY-AND-NEXT-ACTION-001"
     },
     {
       "source_asset_id": "SCHEMA-HYPOTHESIS-CRITIC-RESULT-V1-001",
@@ -13291,6 +13346,21 @@
       "source_asset_id": "TEST-FRESH-OOS-BASELINE-VS-FRICTION-VETO-001",
       "relation": "depends_on",
       "target_asset_id": "MODULE-FACTORY-V1-FRICTION-VETO-001"
+    },
+    {
+      "source_asset_id": "TEST-HFIC-DISCOVERY-PROSPECTS-AND-NEXT-ACTION-001",
+      "relation": "depends_on",
+      "target_asset_id": "MODULE-FACTORY-V1-HFIC-PROSPECTS-001"
+    },
+    {
+      "source_asset_id": "TEST-HFIC-DISCOVERY-PROSPECTS-AND-NEXT-ACTION-001",
+      "relation": "depends_on",
+      "target_asset_id": "SCRIPT-HYPOTHESIS-FORGE-001"
+    },
+    {
+      "source_asset_id": "TEST-HFIC-DISCOVERY-PROSPECTS-AND-NEXT-ACTION-001",
+      "relation": "governed_by",
+      "target_asset_id": "CTRL-HFIC-DISCOVERY-PROSPECT-MEMORY-AND-NEXT-ACTION-001"
     },
     {
       "source_asset_id": "TEST-HFIC-OPERATIONAL-CLOSURE-001",

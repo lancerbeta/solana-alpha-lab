@@ -35,7 +35,7 @@ class ArchIntent006HypothesisDiscoverySurfaceTests(unittest.TestCase):
     def test_intent_is_horizon_memory_not_implementation(self) -> None:
         document = frontmatter(INTENT_PATH)
         self.assertEqual(document["intent_id"], INTENT_ID)
-        self.assertEqual(document["intent_version"], "1.0")
+        self.assertEqual(document["intent_version"], "1.1")
         self.assertEqual(document["status"], "ACCEPTED_DIRECTION_NOT_IMPLEMENTED")
         self.assertEqual(document["implementation"], "NOT_IMPLEMENTED")
         self.assertEqual(document["projection_kind"], "PRODUCT_HORIZON_NOT_IMPLEMENTATION")
@@ -46,6 +46,7 @@ class ArchIntent006HypothesisDiscoverySurfaceTests(unittest.TestCase):
             {
                 "FUTURE_DISCOVERY_RANKER_ENTRY_GATE",
                 "GOAL_OWNER_HYPOTHESIS_PRIORITIZATION",
+                "HFIC-POST-NO-WORTHY-ROUTER",
             },
         )
         self.assertFalse(document["authority"]["provider_read"])
@@ -70,6 +71,7 @@ class ArchIntent006HypothesisDiscoverySurfaceTests(unittest.TestCase):
         self.assertIn("does not advise or insert roadmap items", text)
         self.assertIn("`mechanism`", text)
         self.assertIn("MARKET_OBSERVABLE", text)
+        self.assertIn("does not prove", text.lower())
         self.assertNotIn("AUTHORIZED_TO_BUILD_NOW", text)
 
     def test_catalog_registration_is_content_bound(self) -> None:
@@ -87,7 +89,10 @@ class ArchIntent006HypothesisDiscoverySurfaceTests(unittest.TestCase):
                 for item in record["relations"]
             )
         )
-        self.assertEqual(set(record["consumers"]), {"GOAL-OWNER", "REG-RESEARCH-001"})
+        self.assertEqual(
+            set(record["consumers"]),
+            {"GOAL-OWNER", "REG-RESEARCH-001", "HFIC-POST-NO-WORTHY-ROUTER"},
+        )
 
         manifest = yaml.safe_load(MANIFEST_PATH.read_text(encoding="utf-8"))
         self.assertIn(INTENT_ID, manifest["mandatory_asset_ids"])

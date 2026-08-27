@@ -1,0 +1,57 @@
+{
+  "packet_schema": "smial.hfic-next-epistemic-action-draft",
+  "packet_version": "1.0",
+  "prompt_version": "HFIC-NEXT-V1.0",
+  "action_type": "FORWARD_DATA_OPTION_READY",
+  "reason_code": "ONE_BOUNDED_FORWARD_OBSERVATION_JUSTIFIED",
+  "named_consumer": "HFIC-POST-NO-WORTHY-ROUTER",
+  "basis_candidate_refs": [],
+  "prospect_ids": ["HFIC-PROSPECT-004"],
+  "evidence_gap": "A named family still lacks one fresh bounded observation.",
+  "why_now": "One bounded capture can resolve the named hint without a new capability.",
+  "why_cheaper_option_is_insufficient": "WAIT would leave the named hint unmeasured while a bounded option already exists.",
+  "action_payload": {
+    "option_id": "HFIC-FWD-OPT-FIXTURE-001",
+    "hypothesis_or_hint_consumer": "HYP-EARLY-TAKER-VOLUME-MIX-H900-V1",
+    "population": "ICP-EARLY-PUMPFUN-V1 age 300-899s",
+    "exclusions": ["holdout", "already-consumed-panel"],
+    "primary_x": "R0_TAKER_VOLUME_MIX",
+    "primary_y": "H900_NET_QUOTE_RETURN",
+    "decision_time": "frozen T+0 search then absolute H900",
+    "first_reliable_available_at_rule": "quote receipts after H900 sell",
+    "freshness_and_consumption_fence": "one window, no second confirmatory window",
+    "sample_floor": 10,
+    "missingness_policy": "STOP_BEFORE_QUOTES_ELIGIBLE_BELOW_FLOOR",
+    "provider_route_or_existing_capture": "CAP-JUPITER-FREE-KEY-FORWARD-H900-QUOTE-CAPTURE-001",
+    "provider_request_cap": 60,
+    "cash_cap_usd_cents": 0,
+    "wall_time_cap_seconds": 900,
+    "stop_rules": ["ELIGIBLE_BELOW_FLOOR", "CALL_CAP"],
+    "raw_retention": "RDP receipts only",
+    "discovery_confirmation_role": "DISCOVERY_ONLY",
+    "proposed_owner_execution_phrase": "PROPOSED: run the already-bound forward capture under its own contract; this phrase is not authority."
+  },
+  "owner_gate": {
+    "required": true,
+    "phrase_status": "PROPOSED_NOT_AUTHORITY"
+  },
+  "authority": {
+    "git_mutation": 0,
+    "rdp_mutation_outside_freeze": 0,
+    "experiment_execution": 0,
+    "provider_api_rpc_wss_calls": 0,
+    "credential_reads": 0,
+    "cash_spend_usd_cents": 0,
+    "wallet_signer_transaction_actions": 0
+  },
+  "non_claims": [
+    "NO_ALPHA",
+    "NO_AUTOMATIC_CAPTURE",
+    "NO_DISCOVERY_RANKER_TRIGGER_PROVEN",
+    "NO_ARCH_INTENT_006_FULL_IMPLEMENTATION",
+    "NO_QUALITY_DIVERSITY_ENGINE",
+    "NO_VOI_SCHEDULER",
+    "NO_SEQUENTIAL_INFERENCE_ENGINE",
+    "NO_PROVIDER_OR_EXPERIMENT_AUTHORITY"
+  ]
+}

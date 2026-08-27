@@ -31,6 +31,9 @@ from solana_alpha_lab.factory.hfic_preflight import (  # noqa: E402
     run_preflight,
     store_inventory_digest,
 )
+from solana_alpha_lab.factory.hfic_prospects import (  # noqa: E402
+    HficProspectError,
+)
 from solana_alpha_lab.factory.hfic_session import (  # noqa: E402
     HficSessionError,
     PENDING_STATES,
@@ -201,12 +204,16 @@ def cmd_freeze(
     draft_path: Path,
     preflight_path: Path | None,
     explicit_data_root: Path | None,
+    next_action_path: Path | None = None,
 ) -> int:
     git_before = repository_git_snapshot(repo_root)
     draft = _load_json_file(draft_path)
     if preflight_path is None:
         raise HficCliError("PREFLIGHT_RECEIPT_REQUIRED")
     receipt = _load_json_file(preflight_path)
+    next_action_draft = None
+    if next_action_path is not None:
+        next_action_draft = _load_json_file(next_action_path)
     data_root = _store_root(repo_root, explicit_data_root)
     store = ResearchStore(data_root)
     frozen = freeze_draft(
@@ -214,6 +221,7 @@ def cmd_freeze(
         preflight_receipt=receipt,
         store=store,
         repo_root=repo_root,
+        next_action_draft=next_action_draft,
     )
     git_after = repository_git_snapshot(repo_root)
     if not git_before.unchanged(git_after):
@@ -225,6 +233,27 @@ def cmd_freeze(
     }
     _assert_no_path_leak(frozen, str(data_root), str(repo_root))
     return emit(frozen)
+
+
+def cmd_prospects(
+    repo_root: Path,
+    *,
+    trigger: str,
+    max_results: int,
+) -> int:
+    from solana_alpha_lab.factory.hfic_prospects import query_prospects
+
+    git_before = repository_git_snapshot(repo_root)
+    payload = query_prospects(
+        repo_root,
+        trigger=trigger,
+        max_results=max_results,
+    )
+    git_after = repository_git_snapshot(repo_root)
+    if not git_before.unchanged(git_after):
+        raise HficCliError("GIT_MUTATION_DETECTED")
+    _assert_no_path_leak(payload, str(repo_root))
+    return emit(payload)
 
 
 def cmd_finalize(
@@ -488,7 +517,13 @@ def build_parser() -> argparse.ArgumentParser:
     freeze = subparsers.add_parser("freeze")
     freeze.add_argument("--draft", type=Path, required=True)
     freeze.add_argument("--preflight-receipt", type=Path, required=True)
+    freeze.add_argument("--next-action", type=Path, default=None)
     freeze.add_argument("--format", choices=("json",), default="json")
+
+    prospects = subparsers.add_parser("prospects")
+    prospects.add_argument("--trigger", required=True)
+    prospects.add_argument("--max-results", type=int, default=3)
+    prospects.add_argument("--format", choices=("json",), default="json")
 
     finalize = subparsers.add_parser("finalize")
     finalize.add_argument("--session-id", required=True)
@@ -565,6 +600,13 @@ def main(argv: list[str] | None = None) -> int:
                 args.draft,
                 args.preflight_receipt,
                 args.data_root,
+                next_action_path=getattr(args, "next_action", None),
+            )
+        if args.command == "prospects":
+            return cmd_prospects(
+                repo_root,
+                trigger=args.trigger,
+                max_results=args.max_results,
             )
         if args.command == "backfill-legacy":
             return cmd_backfill(
@@ -625,7 +667,7 @@ def main(argv: list[str] | None = None) -> int:
                 confirm_append_only=bool(args.confirm_append_only),
             )
         raise HficCliError(f"HFIC_COMMAND_NOT_READY:{args.command}")
-    except (HficCliError, HficSessionError, HficPreflightError, DataRootError, ResearchStoreError) as exc:
+    except (HficCliError, HficSessionError, HficPreflightError, HficProspectError, DataRootError, ResearchStoreError) as exc:
         return emit_error(str(exc))
     except (OSError, ValueError, json.JSONDecodeError):
         return emit_error("HFIC_PROTOCOL_INVALID")

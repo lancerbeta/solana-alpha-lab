@@ -1,0 +1,48 @@
+{
+  "packet_schema": "smial.hfic-next-epistemic-action-draft",
+  "packet_version": "1.0",
+  "prompt_version": "HFIC-NEXT-V1.0",
+  "action_type": "CAPABILITY_OPTION_READY",
+  "reason_code": "ONE_NAMED_CAPABILITY_GAP_BLOCKS_FALSIFIER",
+  "named_consumer": "HFIC-POST-NO-WORTHY-ROUTER",
+  "basis_candidate_refs": [],
+  "prospect_ids": ["HFIC-PROSPECT-001"],
+  "evidence_gap": "A named falsifier cannot run because one reusable capability is missing.",
+  "why_now": "No data-only route exists for that named falsifier.",
+  "why_cheaper_option_is_insufficient": "WAIT or another capture would not create the missing reusable capability.",
+  "action_payload": {
+    "option_id": "HFIC-CAP-OPT-FIXTURE-001",
+    "named_consumer": "HFIC-POST-NO-WORTHY-ROUTER",
+    "missing_capability": "CAP-FIXTURE-NAMED-FALSIFIER-SURFACE-001",
+    "reuse_search_summary": "Existing quote capture and HFIC session protocol were inspected; neither supplies the named falsifier surface.",
+    "bounded_delta": "One offline schema plus a thin validator for the named falsifier surface.",
+    "managed_write_surface_hint": "docs/tasks plus catalog schema only after a later Entry Gate",
+    "cheapest_offline_acceptance": "Schema rejects unknown fields and authority zeros remain false.",
+    "stop_if": "If a data-only route can falsify the same claim, do not open a capability atom.",
+    "proposed_owner_execution_phrase": "PROPOSED: commission one bounded capability atom after a later exact contract; this phrase is not authority."
+  },
+  "owner_gate": {
+    "required": true,
+    "phrase_status": "PROPOSED_NOT_AUTHORITY"
+  },
+  "authority": {
+    "git_mutation": 0,
+    "rdp_mutation_outside_freeze": 0,
+    "experiment_execution": 0,
+    "provider_api_rpc_wss_calls": 0,
+    "credential_reads": 0,
+    "cash_spend_usd_cents": 0,
+    "wallet_signer_transaction_actions": 0
+  },
+  "non_claims": [
+    "NO_ALPHA",
+    "NO_AUTOMATIC_TASK",
+    "NO_AUTONOMOUS_GENERATOR",
+    "NO_DISCOVERY_RANKER_TRIGGER_PROVEN",
+    "NO_ARCH_INTENT_006_FULL_IMPLEMENTATION",
+    "NO_QUALITY_DIVERSITY_ENGINE",
+    "NO_VOI_SCHEDULER",
+    "NO_SEQUENTIAL_INFERENCE_ENGINE",
+    "NO_PROVIDER_OR_EXPERIMENT_AUTHORITY"
+  ]
+}

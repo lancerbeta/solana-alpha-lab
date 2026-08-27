@@ -73,6 +73,7 @@ class HficCliContractTests(unittest.TestCase):
             "prove-runtime",
             "inventory-placeholder-times",
             "apply-provenance-correction",
+            "prospects",
         ):
             self.assertIn(command, completed.stdout)
 

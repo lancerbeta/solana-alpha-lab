@@ -1,0 +1,29 @@
+{
+  "as_of": "2026-08-27",
+  "authority": {
+    "experiment_execution": 0,
+    "git_mutation": 0,
+    "provider_api_rpc_wss_calls": 0,
+    "credential_reads": 0,
+    "wallet_signer_transaction": 0
+  },
+  "checks": {
+    "atomic_no_worthy_persist": true,
+    "blocked_prospect_refs_fail_closed": true,
+    "historical_legacy_not_recorded": true,
+    "post_no_worthy_query_max_3": true,
+    "prompt_a_hidden_prospects": true,
+    "provider_calls": 0,
+    "runtime_git_unchanged": true,
+    "selected_path_rejects_next_action": true,
+    "wait_fallback_residual_non_claims": true
+  },
+  "provider_calls_actual": 0,
+  "schema": "smial.hfic-discovery-prospect-temp-e2e-receipt",
+  "schema_version": "1.0",
+  "source_kind": "TEMP_FIXTURE",
+  "task_id": "HFIC_DISCOVERY_PROSPECT_MEMORY_AND_NEXT_ACTION_V1",
+  "terminal": "TEMP_E2E_PASS",
+  "test_module": "tests.test_hfic_discovery_prospects_and_next_action",
+  "test_name": "targeted_hfic_discovery_suite"
+}
