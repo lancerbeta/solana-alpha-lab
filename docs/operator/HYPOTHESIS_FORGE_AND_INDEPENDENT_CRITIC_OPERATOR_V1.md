@@ -13,7 +13,17 @@ Prompt C identity: `HFIC-NEXT-V1.0`. Candidate-generation search identity stays 
 Display ordinal (`C1`/`C2`/…) is display-only. Canonical `candidate_id` is assigned
 by `freeze`, not by the model.
 
-**Целевая эксплуатационная точка:** `/hypothesis-forge` → `scripts/hypothesis_forge.py preflight` → bounded draft → `freeze` → isolated Critic → optional `revise` / `classify` → `finalize`. До commissioning preflight сам выполняет безопасный offline Fast Lane commissioning.
+**Целевая эксплуатационная точка:** `/hypothesis-forge` →
+`uv run --locked --managed-python python -B scripts/hypothesis_forge.py preflight`
+→ bounded draft → `freeze` → isolated Critic → optional `revise` / `classify` →
+`finalize`. До commissioning preflight сам выполняет безопасный offline Fast Lane
+commissioning.
+
+**Canonical operator prefix:** `uv run --locked --managed-python python -B scripts/hypothesis_forge.py`.
+Required interpreter is CPython `3.13.14` from `.python-version` /
+`pyproject.toml` `exact_python_pin`. A non-matching interpreter must return
+typed `HFIC_RUNTIME_PYTHON_VERSION_INCOMPATIBLE` before any project import, RDP
+write or Git mutation. Do not invoke a bare workstation `python`.
 
 `ONE_SLASH_ONE_SESSION`. Token: `ZERO_MID_CYCLE_OWNER_INTERVENTION`.
 Один явный `/hypothesis-forge` авторизует ровно одну HFIC-сессию до финального
@@ -72,10 +82,13 @@ presents 1970 as an operational date. Uncovered placeholder HFIC records make
 
 1. Явно вызовите **`/hypothesis-forge`** в новом чате в корне актуального repository.
 2. Агент следует `.agents/skills/hypothesis-forge/SKILL.md`: executable
-   `preflight` → PROMPT A выдаёт machine-valid `FORGE_DRAFT` → `freeze` создаёт
+   `uv run --locked --managed-python python -B scripts/hypothesis_forge.py preflight`
+   → PROMPT A выдаёт machine-valid `FORGE_DRAFT` → `freeze` создаёт
    `CRITIC_INPUT_PACKET` → isolated Critic → при `REVISE_ONCE` ровно один
-   `hypothesis_forge.py revise` и повтор Critic; при `PASS_TO_CLASSIFICATION`
-   `hypothesis_forge.py classify`; затем `finalize`.
+   `uv run --locked --managed-python python -B scripts/hypothesis_forge.py revise`
+   и повтор Critic; при `PASS_TO_CLASSIFICATION`
+   `uv run --locked --managed-python python -B scripts/hypothesis_forge.py classify`;
+   затем `finalize`.
 3. Вечерний цикл **не завершён**, пока Critic не вернул финальный terminal
    (`KILL_*` / `NO_WORTHY_HYPOTHESIS` или post-classifier `PASS_*`) и `finalize`
    не записал `SESSION_RECEIPT`. `REVISE_ONCE` и `PASS_TO_CLASSIFICATION` —

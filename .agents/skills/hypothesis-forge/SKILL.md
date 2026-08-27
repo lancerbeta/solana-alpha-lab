@@ -12,6 +12,9 @@ Manual hypothesis synthesis contour for Solana Alpha Lab while
 `MANUAL_FALLBACK_UNTIL_GENERATOR` remains active. Prompt version `HFIC-V1.1`.
 
 Canonical entrypoint: `scripts/hypothesis_forge.py`.
+Operator-executable prefix:
+`uv run --locked --managed-python python -B scripts/hypothesis_forge.py`.
+Required interpreter: CPython `3.13.14`. Do not invoke a bare workstation `python`.
 
 ## Authority
 
@@ -44,10 +47,11 @@ Slash does **not** authorize `apply-provenance-correction`. Read-only
 after the exact owner merge phrase.
 
 If the host platform mechanically requires command approval, request at most one
-narrowly scoped batch at cycle start for `python -B scripts/hypothesis_forge.py ...`,
+narrowly scoped batch at cycle start for
+`uv run --locked --managed-python python -B scripts/hypothesis_forge.py ...`,
 process-owned OS temp files, and append-only writes under the resolved canonical
-RDP. Do not request broad shell/filesystem authority, unrestricted “Run
-Everything”, or user-level settings changes.
+RDP. Do not request broad shell/filesystem authority, a bare `python`
+interpreter, unrestricted “Run Everything”, or user-level settings changes.
 
 Hard boundaries — the slash does **not** authorize:
 
@@ -72,15 +76,15 @@ commissioning when Fast Lane proof is absent and safe, design packets.
 
 Happy path — no owner copy/paste between the slash command and the final terminal:
 
-1. Run `python -B scripts/hypothesis_forge.py preflight --owner-focus <AUTO|text> --format json`.
+1. Run `uv run --locked --managed-python python -B scripts/hypothesis_forge.py preflight --owner-focus <AUTO|text> --format json`.
 2. Branch on `action`:
    - `RETURN_EXISTING_SESSION` → report the stored terminal/NEXT; stop.
    - `RESUME_CRITIC` → use `critic_input_packet` from the preflight JSON
      (canonical frozen bytes); do not generate.
    - `RESUME_FINALIZE` → run finalize only.
-   - `RESUME_REVISE` → `python -B scripts/hypothesis_forge.py revise` (exactly one
+   - `RESUME_REVISE` → `uv run --locked --managed-python python -B scripts/hypothesis_forge.py revise` (exactly one
      bounded revision), then isolated Critic again. Do not freeze a new search.
-   - `RESUME_CLASSIFY` → `python -B scripts/hypothesis_forge.py classify` with a
+   - `RESUME_CLASSIFY` → `uv run --locked --managed-python python -B scripts/hypothesis_forge.py classify` with a
      schema-valid ExperimentSpec (network-free `classify_lane()`), then finalize.
      `PASS_TO_CLASSIFICATION` is not complete.
    - `STOP` → report the named terminal; stop.
@@ -94,32 +98,32 @@ Happy path — no owner copy/paste between the slash command and the final termi
    Do **not** query prospects or include prospect IDs/research text in Prompt A.
 4. Write machine `FORGE_DRAFT` to an OS temp file.
 5. If Prompt A returned `NO_WORTHY_HYPOTHESIS` (empty `selected_candidate_ref`):
-   - query `python -B scripts/hypothesis_forge.py prospects --trigger POST_NO_WORTHY_REVIEW --max-results 3 --format json`;
+   - query `uv run --locked --managed-python python -B scripts/hypothesis_forge.py prospects --trigger POST_NO_WORTHY_REVIEW --max-results 3 --format json`;
    - run **PROMPT C** (`HFIC-NEXT-V1.0`) from the operator pack using only the
      already-bound `FORGE_CONTEXT_PACKET`, no-worthy portfolio, terminal, and
      at most three prospect summaries;
    - write a draft matching `hfic_next_epistemic_action_draft_v1.schema.json`;
    - one schema-repair attempt; if still invalid, omit `--next-action` so freeze
      persists deterministic `WAIT_FOR_NEW_EVIDENCE` / `NEXT_ACTION_GENERATION_FALLBACK`;
-   - run `python -B scripts/hypothesis_forge.py freeze --draft <temp> --preflight-receipt <temp> --next-action <temp-or-omit> --format json`;
+   - run `uv run --locked --managed-python python -B scripts/hypothesis_forge.py freeze --draft <temp> --preflight-receipt <temp> --next-action <temp-or-omit> --format json`;
    - skip Independent Critic; do not finalize; report `NO_WORTHY_HYPOTHESIS` plus
      the typed next action. Proposed owner phrases are `PROPOSED_NOT_AUTHORITY`
      and must not be executed.
-6. Otherwise run `python -B scripts/hypothesis_forge.py freeze --draft <temp> --preflight-receipt <temp> --format json`.
+6. Otherwise run `uv run --locked --managed-python python -B scripts/hypothesis_forge.py freeze --draft <temp> --preflight-receipt <temp> --format json`.
    Frozen packet is authority. One schema-repair attempt, then `HFIC_PROTOCOL_INVALID`.
    Do not pass `--next-action` on a selected-candidate path.
 7. **Mandatory auto-handoff (selected path only):** launch Independent Critic in a new isolated context
    with only the frozen packet. Do not persist from Critic.
 8. After critic returns `hypothesis_critic_result_v1`:
-   - `REVISE_ONCE` → `python -B scripts/hypothesis_forge.py finalize` persists
-     `REVISION_REQUIRED`; then `python -B scripts/hypothesis_forge.py revise`
+   - `REVISE_ONCE` → `uv run --locked --managed-python python -B scripts/hypothesis_forge.py finalize` persists
+     `REVISION_REQUIRED`; then `uv run --locked --managed-python python -B scripts/hypothesis_forge.py revise`
      (one claim-wording repair); then isolated Critic again; second terminal
      must be PASS/KILL, never a second `REVISE_ONCE`.
-   - `PASS_TO_CLASSIFICATION` → `python -B scripts/hypothesis_forge.py finalize`
+   - `PASS_TO_CLASSIFICATION` → `uv run --locked --managed-python python -B scripts/hypothesis_forge.py finalize`
      persists `AWAITING_CLASSIFICATION`; then
-     `python -B scripts/hypothesis_forge.py classify`; then finalize. This is
+     `uv run --locked --managed-python python -B scripts/hypothesis_forge.py classify`; then finalize. This is
      not a completed terminal.
-   - `KILL_*` → `python -B scripts/hypothesis_forge.py finalize`.
+   - `KILL_*` → `uv run --locked --managed-python python -B scripts/hypothesis_forge.py finalize`.
    Fake/nonempty classifier objects are invalid. Final `PASS_*` requires a live
    network-free classifier receipt bound to session/selected/spec hash.
 9. Verify `SYNTHESIS_COMPLETE` / RDP receipt, Git mutation 0, provider calls 0

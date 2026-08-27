@@ -16,9 +16,11 @@ finalize. If isolated Critic context cannot launch, return typed
 `AUTO_HANDOFF_UNAVAILABLE`; do not silently self-criticize.
 
 If the host platform requires command approval, request at most one narrowly
-scoped batch at cycle start for `python -B scripts/hypothesis_forge.py ...`,
+scoped batch at cycle start for
+`uv run --locked --managed-python python -B scripts/hypothesis_forge.py ...`,
 process-owned OS temp files, and append-only writes under the resolved canonical
-RDP. Do not request broad shell/filesystem authority.
+RDP. Do not request broad shell/filesystem authority or a bare `python`
+interpreter. Required runtime is CPython 3.13.14 via that prefix.
 
 Read and follow `.agents/skills/hypothesis-forge/SKILL.md` and
 `docs/operator/HYPOTHESIS_FORGE_AND_INDEPENDENT_CRITIC_OPERATOR_V1.md`.

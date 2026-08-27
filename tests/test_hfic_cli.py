@@ -1,11 +1,13 @@
 from __future__ import annotations
 
+import io
 import json
 import os
 import subprocess
 import sys
 import tempfile
 import unittest
+from contextlib import redirect_stderr
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -170,6 +172,36 @@ class HficCliContractTests(unittest.TestCase):
             data_root=Path(tempfile.gettempdir()),
         )
         self.assertEqual(completed.returncode, 0, completed.stderr)
+
+    def test_runtime_gate_is_stdlib_only_and_before_factory_imports(self) -> None:
+        text = CLI.read_text(encoding="utf-8")
+        gate_call = text.index("\nenforce_hfic_runtime_python()\n")
+        factory_import = text.index("from solana_alpha_lab.factory")
+        self.assertLess(gate_call, factory_import)
+        self.assertIn('HFIC_REQUIRED_PYTHON = "3.13.14"', text)
+        prefix = text[:gate_call]
+        self.assertNotIn("solana_alpha_lab", prefix)
+        self.assertNotIn("datetime", prefix)
+
+    def test_runtime_gate_rejects_noncanonical_python_without_factory_import(self) -> None:
+        # In-process exec of the stdlib prefix only. Do not spawn uv or persist RDP.
+        text = CLI.read_text(encoding="utf-8")
+        prefix, sep, remainder = text.partition("\nenforce_hfic_runtime_python()\n")
+        self.assertTrue(sep)
+        self.assertTrue(remainder.lstrip().startswith("ROOT = Path"))
+        namespace: dict[str, object] = {"__name__": "hfic_runtime_gate_test"}
+        exec(compile(prefix, str(CLI), "exec"), namespace, namespace)
+        fake = type("VersionInfo", (), {"major": 3, "minor": 10, "micro": 11})()
+        terminal = namespace["hfic_runtime_python_terminal"]
+        enforce = namespace["enforce_hfic_runtime_python"]
+        self.assertEqual(terminal(fake), "HFIC_RUNTIME_PYTHON_VERSION_INCOMPATIBLE")
+        self.assertIsNone(terminal())
+        stderr = io.StringIO()
+        with redirect_stderr(stderr):
+            with self.assertRaises(SystemExit) as raised:
+                enforce(fake)
+        self.assertEqual(raised.exception.code, 1)
+        self.assertIn("HFIC_RUNTIME_PYTHON_VERSION_INCOMPATIBLE", stderr.getvalue())
 
 
 class HficTempRootE2ETests(unittest.TestCase):

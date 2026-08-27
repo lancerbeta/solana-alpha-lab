@@ -1,0 +1,57 @@
+{
+  "schema": "smial.delivery-completion-evidence",
+  "schema_version": "1.0",
+  "acceptance_id": "HFIC-MANAGED-RUNTIME-ENTRYPOINT-COMPLETION-001",
+  "as_of": "2026-08-28",
+  "task_id": "HFIC_MANAGED_RUNTIME_ENTRYPOINT_CORRECTIVE_V1",
+  "state_change": "BIND_HFIC_OPERATOR_LAUNCH_TO_UV_MANAGED_PYTHON_31314",
+  "base_main": "988aa98f1678a390b2c421ce54cd4559e26df317",
+  "cloud_bundle_mode": "OWNER_MANAGED_OPTIONAL_EXPORT",
+  "cloud_bundle_required_by_harness": false,
+  "cloud_bundle_smoke_required": false,
+  "capability_radar_now": "NONE",
+  "implementation_bindings": {
+    "docs/tasks/HFIC_MANAGED_RUNTIME_ENTRYPOINT_CORRECTIVE_V1.md": "0000000000000000000000000000000000000000000000000000000000000000"
+  },
+  "active_stop_conditions": [],
+  "owner_attention_triggers": {
+    "auth_or_access_recovery": false,
+    "material_owner_decision": false,
+    "user_only_activation": false,
+    "external_material_action": false,
+    "unresolved_safety_or_truth_conflict": false
+  },
+  "factory_fit": {
+    "path": "docs/evidence/hypothesis_forge_operational_closure/a1_managed_runtime_entrypoint_factory_fit_v1.json",
+    "sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+    "verdict": "PASS"
+  },
+  "validation": {
+    "targeted": "PASS_HFIC_RUNTIME_LAUNCH_CONTRACT_TESTS",
+    "independent_review": {
+      "path": "docs/evidence/hypothesis_forge_operational_closure/a1_managed_runtime_entrypoint_review_v1.json",
+      "sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+      "verdict": "PASS"
+    },
+    "full_gate": "ENFORCED_BY_PROJECT_BOUND_VALIDATION",
+    "github_ci": "ENFORCED_LIVE_AT_GUARDED_MERGE",
+    "project_checks": [
+      "PASS_HFIC_RUNTIME_LAUNCH_CONTRACT_TESTS"
+    ]
+  },
+  "non_claims": [
+    "NO_CANONICAL_DONE",
+    "NO_PRODUCT_ACCEPTANCE",
+    "NO_PRODUCTION_FORGE_BEFORE_MERGE",
+    "NO_PYTHON_310_COMPATIBILITY",
+    "NO_NESTED_UV_IN_HFIC_TESTS"
+  ],
+  "side_effects": {
+    "cash_spend_usd_cents": 0,
+    "credential_reads": 0,
+    "fallbacks": 0,
+    "provider_requests": 0,
+    "retries": 0,
+    "wallet_signer_transaction_actions": 0
+  }
+}

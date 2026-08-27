@@ -12,6 +12,31 @@ import tempfile
 from pathlib import Path
 from typing import Any
 
+HFIC_REQUIRED_PYTHON = "3.13.14"
+HFIC_RUNTIME_PYTHON_VERSION_INCOMPATIBLE = "HFIC_RUNTIME_PYTHON_VERSION_INCOMPATIBLE"
+
+
+def running_python_release(version_info: Any = None) -> str:
+    info = sys.version_info if version_info is None else version_info
+    return "{}.{}.{}".format(info.major, info.minor, info.micro)
+
+
+def hfic_runtime_python_terminal(version_info: Any = None) -> str | None:
+    if running_python_release(version_info) != HFIC_REQUIRED_PYTHON:
+        return HFIC_RUNTIME_PYTHON_VERSION_INCOMPATIBLE
+    return None
+
+
+def enforce_hfic_runtime_python(version_info: Any = None) -> None:
+    terminal = hfic_runtime_python_terminal(version_info)
+    if terminal is None:
+        return
+    print(terminal, file=sys.stderr)
+    raise SystemExit(1)
+
+
+enforce_hfic_runtime_python()
+
 ROOT = Path(__file__).resolve().parents[1]
 SRC = ROOT / "src"
 if str(SRC) not in sys.path:

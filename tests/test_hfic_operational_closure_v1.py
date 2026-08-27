@@ -186,9 +186,42 @@ class HficOperationalClosureContractTests(unittest.TestCase):
             ROOT / "tests/test_hfic_session.py",
             ROOT / "tests/test_hfic_preflight.py",
             ROOT / "tests/test_hfic_provenance_clock.py",
+            ROOT / "tests/test_hfic_forge_context_and_no_worthy.py",
+            ROOT / "tests/test_hfic_discovery_prospects_and_next_action.py",
         ):
             text = path.read_text(encoding="utf-8")
             self.assertNotIn("uv run", text)
-            if path.name == "test_hfic_cli.py":
+            if path.name in {
+                "test_hfic_cli.py",
+                "test_hfic_forge_context_and_no_worthy.py",
+                "test_hfic_discovery_prospects_and_next_action.py",
+            }:
                 self.assertIn("sys.executable", text)
                 self.assertIn("-B", text)
+
+    def test_operator_hfic_commands_use_canonical_managed_python_prefix(self) -> None:
+        config = load_yaml(CONFIG_PATH)
+        prefix = " ".join(config["cli"]["operator_invocation_prefix"])
+        self.assertEqual(
+            prefix,
+            "uv run --locked --managed-python python -B scripts/hypothesis_forge.py",
+        )
+        self.assertEqual(config["cli"]["required_python"], "3.13.14")
+        bare = re.compile(r"(?<!managed-python )python -B scripts/hypothesis_forge\.py")
+        for path in (FORGE_SKILL_PATH, FORGE_COMMAND_PATH, OPERATOR_PATH):
+            text = path.read_text(encoding="utf-8")
+            self.assertIn(prefix, text)
+            self.assertIsNone(bare.search(text), path)
+
+    def test_runtime_python_pin_is_aligned(self) -> None:
+        pin = (ROOT / ".python-version").read_text(encoding="utf-8").strip()
+        self.assertEqual(pin, "3.13.14")
+        pyproject = (ROOT / "pyproject.toml").read_text(encoding="utf-8")
+        self.assertIn('exact_python_pin = "3.13.14"', pyproject)
+        self.assertIn('requires-python = ">=3.13,<3.14"', pyproject)
+        cli = (ROOT / "scripts/hypothesis_forge.py").read_text(encoding="utf-8")
+        self.assertIn('HFIC_REQUIRED_PYTHON = "3.13.14"', cli)
+        self.assertLess(
+            cli.index("enforce_hfic_runtime_python()"),
+            cli.index("from solana_alpha_lab.factory"),
+        )
