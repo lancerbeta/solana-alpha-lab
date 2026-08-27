@@ -1,0 +1,52 @@
+{
+  "as_of": "2026-08-27",
+  "non_claims": [
+    "NO_CRYPTOGRAPHIC_REVIEWER_IDENTITY",
+    "NO_PROVIDER_CALLS",
+    "NO_PRODUCTION_RDP_MUTATION",
+    "NO_X_Y_SCORE",
+    "NO_HYPOTHESIS_FORGE_SLASH"
+  ],
+  "required_roles": [
+    "ARCHITECTURE_CRITIC",
+    "CODE_REVIEWER",
+    "GOAL_DOD_CRITIC"
+  ],
+  "review_id": "HFIC-REPO-LOCAL-RDP-GUARD-REVIEW-001",
+  "reviewed_bindings_sha256": "ef95e2faa52724238759851948ce45f461b449cd0677555bfc6753a3a9b62ad6",
+  "reviewed_inventory_sha256": "7da50417442365ef9e07f75bd8d21af704114627ac00ed8e2a04a03505b31769",
+  "reviews": [
+    {
+      "findings": [
+        "FIXED_CHECK_IGNORE_LOCAL_SLASH_ONLY",
+        "FIXED_LEXICAL_SYMLINK_WALK_BEFORE_RESOLVE",
+        "CHECKED_CANONICAL_SUBTREE_NOT_GENERIC_LOCAL",
+        "CHECKED_TRACKED_STAGED_GIT_DIR_AND_FAIL_CLOSED"
+      ],
+      "role": "CODE_REVIEWER",
+      "verdict": "PASS"
+    },
+    {
+      "findings": [
+        "CHECKED_FALSIFIABLE_ISOLATED_REGRESSIONS",
+        "CHECKED_NO_PRODUCTION_REBIND_CLAIM",
+        "CHECKED_PROVIDER_CALLS_ZERO"
+      ],
+      "role": "GOAL_DOD_CRITIC",
+      "verdict": "PASS"
+    },
+    {
+      "findings": [
+        "CHECKED_IN_REPO_WRITE_ZONE_IS_ONE_IGNORED_SUBTREE",
+        "CHECKED_BOUND_PANEL_NOT_MOVED_OR_DELETED",
+        "RESIDUAL_CANONICAL_DESCENDANT_NESTING_UNTESTED"
+      ],
+      "role": "ARCHITECTURE_CRITIC",
+      "verdict": "PASS"
+    }
+  ],
+  "schema": "smial.delivery-independent-review-evidence",
+  "schema_version": "1.0",
+  "task_id": "HFIC_REPO_LOCAL_RDP_GUARD_V1",
+  "verdict": "PASS"
+}
