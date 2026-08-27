@@ -56,6 +56,26 @@ merge_policy:
     - docs/evidence/kcdn_atom_b/a1_delivery_completion_evidence_v1.json
     - docs/evidence/kcdn_atom_b/a1_delivery_factory_fit_v1.json
     - docs/evidence/kcdn_atom_b/a1_delivery_independent_review_v1.json
+    - docs/evidence/hypothesis_forge_operational_closure/**
+    - docs/operator/HYPOTHESIS_FORGE_AND_INDEPENDENT_CRITIC_OPERATOR_V1.md
+    - docs/tasks/HYPOTHESIS_FORGE_OPERATIONAL_CLOSURE_V1.md
+    - configs/hypothesis_forge_independent_critic_v1.yaml
+    - catalog/query_recipes.yaml
+    - schemas/research_memory_projection_v1.sql
+    - scripts/hypothesis_fast_lane.py
+    - scripts/hypothesis_forge.py
+    - src/solana_alpha_lab/factory/commissioning_proof.py
+    - src/solana_alpha_lab/factory/data_root.py
+    - src/solana_alpha_lab/factory/document_runner.py
+    - src/solana_alpha_lab/factory/hfic_identity.py
+    - src/solana_alpha_lab/factory/hfic_preflight.py
+    - src/solana_alpha_lab/factory/hfic_session.py
+    - tests/fixtures/hypothesis_forge/**
+    - tests/test_hfic_cli.py
+    - tests/test_hfic_identity.py
+    - tests/test_hfic_operational_closure_v1.py
+    - tests/test_hfic_preflight.py
+    - tests/test_hfic_session.py
     - docs/PROJECT_MAP.md
     - docs/tasks/KCDN_ATOM_B_STABLE_DELIVERY_CONTEXT_REFERENCES_V1.md
     - docs/tasks/CTRL-DELIVERY-HARNESS-V1.md
