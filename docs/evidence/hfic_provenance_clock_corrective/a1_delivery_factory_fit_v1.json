@@ -1,0 +1,37 @@
+{
+  "as_of": "2026-08-27",
+  "capability_radar": {
+    "now": "NONE",
+    "watch": "NONE"
+  },
+  "dimensions": {
+    "build_vs_buy": "PASS",
+    "context_efficiency": "PASS",
+    "execution_to_cashflow": "PASS",
+    "flexibility_and_history": "PASS",
+    "mission": "PASS",
+    "monitoring_and_recovery": "PASS",
+    "owner_operability": "PASS",
+    "red_team": "PASS",
+    "research_truth": "PASS",
+    "security": "PASS"
+  },
+  "limits": [
+    "NO_ALPHA",
+    "NO_CANONICAL_DONE",
+    "NO_PROVIDER_CALLS",
+    "NO_PRODUCTION_RDP_MUTATION",
+    "NO_HYPOTHESIS_FORGE_SLASH",
+    "NO_FABRICATED_HISTORICAL_TIMESTAMP",
+    "NO_RECOVERED_EXACT_TIME"
+  ],
+  "mode": "FULL_REVIEW",
+  "recovery": "REVERT",
+  "review_id": "HFIC-PROVENANCE-CLOCK-FACTORY-FIT-001",
+  "reviewed_bindings_sha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+  "reviewed_inventory_sha256": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+  "schema": "smial.delivery-harness-factory-fit",
+  "schema_version": "1.0",
+  "task_id": "HFIC_PROVENANCE_CLOCK_CORRECTIVE_V1",
+  "verdict": "PASS"
+}

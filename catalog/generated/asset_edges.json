@@ -11433,6 +11433,11 @@
       "target_asset_id": "CTRL-QUOTE-SURFACE-RETENTION-FALSIFIER-001"
     },
     {
+      "source_asset_id": "SCHEMA-HFIC-PROVENANCE-TIME-CORRECTION-V1-001",
+      "relation": "governed_by",
+      "target_asset_id": "CTRL-HYPOTHESIS-FORGE-OPERATIONAL-CLOSURE-001"
+    },
+    {
       "source_asset_id": "SCHEMA-HYPOTHESIS-CRITIC-RESULT-V1-001",
       "relation": "governed_by",
       "target_asset_id": "CTRL-HYPOTHESIS-FORGE-OPERATIONAL-CLOSURE-001"

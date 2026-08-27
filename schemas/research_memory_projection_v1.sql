@@ -371,7 +371,42 @@ SELECT
     payload_sha256,
     effective_at,
     first_reliable_available_at,
-    record_id
+    record_id,
+    CASE
+        WHEN EXISTS (
+            SELECT 1
+            FROM _research_events AS marker
+            WHERE json_extract_string(marker.payload_json, '$.session_id')
+                = ranked.session_id
+            AND json_extract_string(marker.payload_json, '$.artifact_kind')
+                IS DISTINCT FROM 'PROVENANCE_TIME_CORRECTION'
+            AND (
+                CAST(marker.created_at AS VARCHAR) LIKE '1970-01-01%'
+                OR CAST(marker.effective_at AS VARCHAR) LIKE '1970-01-01%'
+                OR CAST(marker.first_reliable_available_at AS VARCHAR) LIKE '1970-01-01%'
+                OR json_extract_string(marker.payload_json, '$.created_at')
+                    LIKE '1970-01-01%'
+                OR json_extract_string(marker.payload_json, '$.session_started_at')
+                    LIKE '1970-01-01%'
+            )
+        )
+        THEN CASE
+            WHEN EXISTS (
+                SELECT 1
+                FROM _research_events AS correction
+                WHERE json_extract_string(correction.payload_json, '$.artifact_kind')
+                    = 'PROVENANCE_TIME_CORRECTION'
+                AND json_extract_string(correction.payload_json, '$.payload_canonical')
+                    LIKE '%' || ranked.session_id || '%'
+                AND json_extract_string(correction.payload_json, '$.payload_canonical')
+                    LIKE '%"original_exact_time_status":"UNKNOWN"%'
+                AND json_extract_string(correction.payload_json, '$.payload_canonical')
+                    LIKE '%"chronological_use_forbidden":true%'
+            ) THEN 'CORRECTED_ORIGINAL_UNKNOWN'
+            ELSE 'PLACEHOLDER_UNCOVERED'
+        END
+        ELSE 'VALID'
+    END AS provenance_time_status
 FROM ranked
 WHERE cycle_rank = 1;
 

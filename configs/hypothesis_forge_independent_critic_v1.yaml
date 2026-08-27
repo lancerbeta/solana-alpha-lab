@@ -68,3 +68,51 @@ authority:
   credential_reads: 0
   cash_spend_usd_cents: 0
   wallet_signer_transaction_actions: 0
+slash_session_authority:
+  invocation: ONE_SLASH_ONE_SESSION
+  expires_at: FINAL_TERMINAL_OR_STOP
+  mid_cycle_owner_interventions: 0
+  token: ZERO_MID_CYCLE_OWNER_INTERVENTION
+  auto_continue:
+    - PASS_TO_CLASSIFICATION
+    - REVISE_ONCE
+  isolated_critic_unavailable: AUTO_HANDOFF_UNAVAILABLE
+  silent_self_critic_forbidden: true
+  batch_approval_at_cycle_start_only: true
+  authorized_without_mid_cycle_prompt:
+    - read_only_git_catalog_active_rdp
+    - preflight
+    - safe_offline_commissioning
+    - process_owned_os_temp_files
+    - append_only_rdp_context_session_candidates_critic_revision_classifier_finalize
+    - automatic_isolated_critic_handoff
+    - exactly_one_bounded_revise_once
+    - network_free_deterministic_lane_classification
+    - replay_resume_prove_runtime
+    - cleanup_process_owned_temp_files
+  still_requires_explicit_owner_authority:
+    - git_mutation_branch_commit_pr_task
+    - experiment_execution
+    - provider_api_rpc_wss_or_public_market_data
+    - cash_spend
+    - untouched_forward_holdout
+    - wallet_signer_transaction
+    - deployment_or_promotion
+    - production_strategy_bot_execution
+    - destructive_rdp_mutation
+    - new_capability_atom
+    - reopen_completed_search
+    - provenance_correction_append_until_merge_phrase
+  provenance_correction:
+    not_part_of_slash: true
+    when: AFTER_EXACT_OWNER_MERGE_PHRASE
+    read_command: inventory-placeholder-times
+    write_command: apply-provenance-correction
+    write_confirm_flag: --confirm-append-only
+    fail_closed_uncovered: PROVENANCE_TIME_UNCOVERED
+    statuses:
+      - VALID
+      - CORRECTED_ORIGINAL_UNKNOWN
+  pass_fast_lane_ready: STOP_BEFORE_EXPERIMENT
+  pass_change_lane_required: RETURN_PRD_SSD_DO_NOT_CREATE_PR
+  pass_data_option_required: RETURN_DATA_OPTION_DO_NOT_COLLECT

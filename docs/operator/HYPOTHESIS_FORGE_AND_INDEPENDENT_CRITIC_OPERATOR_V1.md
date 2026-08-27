@@ -14,6 +14,32 @@ by `freeze`, not by the model.
 
 **Целевая эксплуатационная точка:** `/hypothesis-forge` → `scripts/hypothesis_forge.py preflight` → bounded draft → `freeze` → isolated Critic → optional `revise` / `classify` → `finalize`. До commissioning preflight сам выполняет безопасный offline Fast Lane commissioning.
 
+`ONE_SLASH_ONE_SESSION`. Token: `ZERO_MID_CYCLE_OWNER_INTERVENTION`.
+Один явный `/hypothesis-forge` авторизует ровно одну HFIC-сессию до финального
+terminal/STOP. Не спрашивать owner про Run или append-only RDP write между
+preflight, freeze, Critic, revision/classification и finalize.
+`PASS_TO_CLASSIFICATION` и ровно один bounded `REVISE_ONCE` продолжаются
+автоматически внутри той же slash-authority. Если isolated Critic context
+недоступен — typed `AUTO_HANDOFF_UNAVAILABLE`, без silent self-critic.
+
+Slash **не** даёт Git mutation, experiment execution, provider/API/RPC/WSS,
+деньги, holdout, wallet/signer/tx, deployment/promotion, destructive RDP,
+новый capability atom, reopen completed search или
+`apply-provenance-correction`. `PASS_FAST_LANE_READY` —
+стоп до experiment. `PASS_CHANGE_LANE_REQUIRED` — один PRD+SSD, без PR.
+`PASS_DATA_OPTION_REQUIRED` — data option, без collection.
+
+**Provenance clock (не часть `/hypothesis-forge`).** Future HFIC writes use an
+injectable UTC stage clock; placeholder `1970-01-01` is denied. Historical
+placeholder envelopes are covered only after the exact owner merge phrase by
+read-only `inventory-placeholder-times` then append-only
+`apply-provenance-correction --confirm-append-only`. That write does not
+rewrite RDP bytes, does not recover an exact original time, and is not a
+slash-cycle step. `show-session` reports session-local
+`provenance_time_status` = `VALID` or `CORRECTED_ORIGINAL_UNKNOWN` and never
+presents 1970 as an operational date. Uncovered placeholder HFIC records make
+`prove-runtime` fail closed with `PROVENANCE_TIME_UNCOVERED`.
+
 ---
 
 ## 1. Простая модель
@@ -105,14 +131,18 @@ RUN INDEPENDENT_HYPOTHESIS_CRITIC_V1
 
 Не передавайте Critic свободный рассказ Forge, промежуточные рассуждения или просьбу «улучшить идею». Ему нужен структурированный packet: это уменьшает anchoring и желание спасать красивую историю.
 
-### Шаг 3 — действие после Critic
+### Шаг 3 — действие после Critic (manual fallback only)
+
+На каноническом slash-пути `REVISE_ONCE` и `PASS_TO_CLASSIFICATION` продолжаются
+агентом автоматически. Эта таблица — только для manual fallback или после
+typed `AUTO_HANDOFF_UNAVAILABLE`.
 
 | Terminal | Что делать владельцу |
 |---|---|
 | `PASS_FAST_LANE_READY` | Передать сюда итог Critic. После проверки отдельно разрешить no-Git run. |
 | `PASS_CHANGE_LANE_REQUIRED` | Передать сюда PRD+SSD capability-атома. После проверки отдельно разрешить один PR. |
 | `PASS_DATA_OPTION_REQUIRED` | Сначала решить, оправдан ли forward collection по цене и option value. |
-| `REVISE_ONCE` | Вернуть packet Forge ровно один раз с указанной ограниченной правкой. |
+| `REVISE_ONCE` | Fallback only: вернуть packet Forge ровно один раз. Slash path does this without an owner prompt. |
 | `KILL_*` | Ничего не выполнять. Можно отправить Critic уже оценённого runner-up; новую генерацию на тех же evidence в этот вечер не запускать. |
 | `NO_WORTHY_HYPOTHESIS` | Нормальный полезный результат. Закончить цикл без задачи. |
 | `OWNER_DECISION_REQUIRED` | Принять только названное материальное решение; не выдавать общее разрешение. |
@@ -923,7 +953,7 @@ Catalog/prior resolution
 При каждом использовании сохраняйте в research packet:
 
 ```text
-generator_prompt_version = HFIC-V1.0
+generator_prompt_version = HFIC-V1.1
 generator_model_and_effort
 critic_model_and_effort
 live_git_head

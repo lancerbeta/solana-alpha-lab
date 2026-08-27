@@ -18,13 +18,50 @@ Canonical entrypoint: `scripts/hypothesis_forge.py`.
 Read `configs/hypothesis_forge_independent_critic_v1.yaml` and the operator pack at
 `docs/operator/HYPOTHESIS_FORGE_AND_INDEPENDENT_CRITIC_OPERATOR_V1.md`.
 
-Hard boundaries — zero tolerance:
+One explicit `/hypothesis-forge` is scoped authorization for exactly one HFIC
+session (`ONE_SLASH_ONE_SESSION`), expiring at final terminal/STOP.
+`ZERO_MID_CYCLE_OWNER_INTERVENTION`: do not ask the owner to press Run or
+approve an RDP write between preflight, freeze, Critic, revision/classification
+and finalize. `PASS_TO_CLASSIFICATION` and exactly one bounded `REVISE_ONCE`
+remain inside the original slash authority and continue automatically.
 
-- Git mutation, branch, PR, task or evidence file creation
+Authorized without additional owner questions: read-only Git/Catalog/active RDP
+navigation; preflight and safe offline commissioning on the same canonical data
+root if genuinely required; process-owned OS temp files; append-only RDP writes
+for context artifact, session/cycle, all candidate versions, frozen Critic
+packet, Critic result, revision receipt, classifier receipt, decisions, session
+receipt and terminal; automatic isolated Critic handoff; network-free
+deterministic lane classification; finalize; replay/resume/`prove-runtime`;
+cleanup of process-owned temp files.
+
+If isolated Critic context is unavailable, return typed `AUTO_HANDOFF_UNAVAILABLE`.
+Do not silently self-criticize in the Forge context.
+
+Slash does **not** authorize `apply-provenance-correction`. Read-only
+`inventory-placeholder-times` is also outside the slash cycle and runs only
+after the exact owner merge phrase.
+
+If the host platform mechanically requires command approval, request at most one
+narrowly scoped batch at cycle start for `python -B scripts/hypothesis_forge.py ...`,
+process-owned OS temp files, and append-only writes under the resolved canonical
+RDP. Do not request broad shell/filesystem authority, unrestricted “Run
+Everything”, or user-level settings changes.
+
+Hard boundaries — the slash does **not** authorize:
+
+- Git mutation, branch, commit, PR or task creation
 - Experiment execution or viewing new outcomes for ranking
 - Untouched/forward holdout access
 - Provider/API/RPC/WSS, credentials, wallet, signer, transaction, cash spend
+- Deployment, promotion, or production strategy/bot execution
+- Destructive RDP mutation, deletion, overwrite or restore
+- A new capability atom
+- Reopening a completed search on the same evidence+focus
 - Autonomous Hypothesis Generator («magic ball»)
+
+For `PASS_FAST_LANE_READY`, stop before experiment execution.
+For `PASS_CHANGE_LANE_REQUIRED`, return one PRD+SSD and stop; do not create the PR.
+For `PASS_DATA_OPTION_REQUIRED`, return the data option and stop; do not collect.
 
 Allowed: read-only Git/Catalog navigation, bounded prior-work query, offline
 commissioning when Fast Lane proof is absent and safe, design packets.
@@ -83,11 +120,12 @@ Immediately after a valid frozen `CRITIC_INPUT_PACKET`:
 1. Emit a synthesis handoff receipt with `synthesis_status: PENDING_CRITIC` per
    `catalog/schemas/hypothesis_forge_synthesis_handoff_v1_1.schema.json` (v1.0
    readers remain valid for historical fixtures).
-2. **Launch Independent Critic in a new isolated context** using one of:
-   - `Task` subagent with read-only critic instructions and **only** the packet
-     (no Forge narrative, no intermediate reasoning); or
-   - instruct the owner to open a **new chat** and run `/independent-hypothesis-critic`
-     with the packet — only if subagent launch is unavailable.
+2. **Launch Independent Critic in a new isolated context** using `Task`
+   subagent with read-only critic instructions and **only** the packet
+   (no Forge narrative, no intermediate reasoning).
+   If isolated context cannot launch, return typed `AUTO_HANDOFF_UNAVAILABLE`
+   and STOP. Do not instruct the owner to open a new chat, paste the packet,
+   or press Run. Do not silently self-criticize in the Forge context.
 3. Do not mark the evening cycle done, do not propose execution tasks, and do not
    treat synthesis as finished until the critic returns one terminal and one NEXT
    and `finalize` has persisted them.
