@@ -23,7 +23,7 @@
     "src/solana_alpha_lab/factory/early_market_panel_importer.py": "f5f392e8ac1750861ab04ee230e74c8b1d63d0cc6ea8098153047855c12ff9c9",
     "src/solana_alpha_lab/factory/hfic_preflight.py": "fc7d1cbb913154407d72d10df0be1751d254048ca117005c4660507a7c28d6e1",
     "src/solana_alpha_lab/factory/hfic_session.py": "69f678daf63e6d4a174041de274442d3460021b3800b20a113f9752656bce13a",
-    "tests/test_early_market_panel_importer.py": "c4ebac45c8a91e4077cd3f79582bfb44c003363cce4159ab8b4fe40d6eb91cc9",
+    "tests/test_early_market_panel_importer.py": "15045cbe5fcd0b2309e9abfdd80a7ec87d1e9264a0525a2f844dc13777f44fa8",
     "tests/test_hfic_forge_context_and_no_worthy.py": "3bffb71b952d7d0efc611474dde7458405f280e61d77c9d8566383e1ae8c6b29"
   },
   "non_claims": [
@@ -56,7 +56,7 @@
     "github_ci": "ENFORCED_LIVE_AT_GUARDED_MERGE",
     "independent_review": {
       "path": "docs/evidence/hfic_next_evidence_bind_and_context/a1_delivery_independent_review_v1.json",
-      "sha256": "fe71d72a0d9252abcd960124ba367333627328cfa993b62e243b12baed412a17",
+      "sha256": "7b656401fed4c3cff63a486a3f253db80b69f1d0e87d058696c5e12b1658bfd7",
       "verdict": "PASS"
     },
     "project_checks": [

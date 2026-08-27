@@ -7,6 +7,7 @@ import sys
 import tempfile
 import unittest
 from pathlib import Path
+from unittest.mock import patch
 
 ROOT = Path(__file__).resolve().parents[1]
 SRC = ROOT / "src"
@@ -332,21 +333,27 @@ class ImporterTests(unittest.TestCase):
 
     def test_symlink_data_root_denied_before_mutation(self) -> None:
         with tempfile.TemporaryDirectory() as tmp:
-            real = Path(tmp) / "real"
-            real.mkdir()
-            link = Path(tmp) / "link"
-            try:
-                link.symlink_to(real, target_is_directory=True)
-            except OSError:
-                self.skipTest("symlink privilege unavailable")
-            with self.assertRaises(EarlyMarketPanelImportError) as raised:
-                import_early_market_panel(
-                    source_root=FIXTURE,
-                    data_root=link,
-                    source_receipt_path=FIXTURE / "source_receipt.json",
-                )
-            self.assertEqual(str(raised.exception), "DATA_ROOT_SYMLINK")
-            self.assertEqual(inspect_canonical_targets(link)["state"], "ABSENT")
+            data_root = Path(tmp) / "link"
+            data_root.mkdir()
+            original_is_symlink = Path.is_symlink
+
+            def synthetic_symlink(path: Path) -> bool:
+                try:
+                    if path.resolve() == data_root.resolve():
+                        return True
+                except OSError:
+                    pass
+                return original_is_symlink(path)
+
+            with patch.object(Path, "is_symlink", synthetic_symlink):
+                with self.assertRaises(EarlyMarketPanelImportError) as raised:
+                    import_early_market_panel(
+                        source_root=FIXTURE,
+                        data_root=data_root,
+                        source_receipt_path=FIXTURE / "source_receipt.json",
+                    )
+                self.assertEqual(str(raised.exception), "DATA_ROOT_SYMLINK")
+            self.assertEqual(inspect_canonical_targets(data_root)["state"], "ABSENT")
 
     def test_invalid_and_missing_observed_at_denied(self) -> None:
         cases = [
