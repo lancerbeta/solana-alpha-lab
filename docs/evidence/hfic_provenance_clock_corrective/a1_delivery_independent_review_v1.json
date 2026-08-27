@@ -15,8 +15,8 @@
     "OWNER_UX_CRITIC"
   ],
   "review_id": "HFIC-PROVENANCE-CLOCK-REVIEW-001",
-  "reviewed_bindings_sha256": "1e215e2117d723cf3820055e33eb35817251d164329cf660b18f566986f2128e",
-  "reviewed_inventory_sha256": "606f2f65d436d50657a2467e08b66fe3dcf836aa55840c759421f99249cdf3f2",
+  "reviewed_bindings_sha256": "7fa1c3722cec3db93c18cbc537ebed501734fe990c7c44ad32b34f761a17a796",
+  "reviewed_inventory_sha256": "c6d5c1392ac813e303bc19914f31448600f7b1d94a70a8a03725571cb9e27825",
   "reviews": [
     {
       "findings": [

@@ -9,11 +9,11 @@
   "cloud_bundle_smoke_required": false,
   "factory_fit": {
     "path": "docs/evidence/hfic_provenance_clock_corrective/a1_delivery_factory_fit_v1.json",
-    "sha256": "788a06149ac41dbc37bc24445c74301301bc6de0ca8fb1787f3acbbd8d3fb5ae",
+    "sha256": "b49652080c4a8df2e185287cd74a5061daa9bc3aeee69a2f1245895ea8a3efa1",
     "verdict": "PASS"
   },
   "implementation_bindings": {
-    ".agents/skills/hypothesis-forge/SKILL.md": "b5ddb28266dbc5f8785bf60e71f5521068209599752a8b6087df388af0ca0dce",
+    ".agents/skills/hypothesis-forge/SKILL.md": "104a5536fc47863bd4a12f896eb01dec87c69a80e940839cb5443eab1c03ae6d",
     ".cursor/commands/hypothesis-forge.md": "fff24e798c5b34090dde9b5ebdcae85bd1f57112b589554492e9a97989dec230",
     "catalog/assets/core.yaml": "dd629fbd8f945411cdebdc0424a43a4b81638a0baf7a6fddad1e0665e39b0253",
     "catalog/assets/lifecycle.yaml": "648ccffa2c20e76aee30c13c9cb1c87e84e8817b69bc08686312f0ec256ca9ca",
@@ -70,7 +70,7 @@
     "github_ci": "ENFORCED_LIVE_AT_GUARDED_MERGE",
     "independent_review": {
       "path": "docs/evidence/hfic_provenance_clock_corrective/a1_delivery_independent_review_v1.json",
-      "sha256": "3bb7c6f6162ead9bd8cca66b82311ab3ff70f6ad9a862aadf563d6bdcf058147",
+      "sha256": "fef56fe56f82d28c0a8727fff99e2f555f2442b9cd72d593af9fb1bc9fb4d8c9",
       "verdict": "PASS"
     },
     "project_checks": [
