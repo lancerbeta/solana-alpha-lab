@@ -45,7 +45,7 @@ stop_conditions:
   - PROVIDER_OR_NETWORK_CALL
 context_requirements:
   catalog_asset_ids: []
-  l2_roles: []
+  l2_roles: [DELIVERY_EVIDENCE]
   l3_roles: []
   roadmap_path: null
   exact_role_paths:
