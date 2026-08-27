@@ -1,0 +1,91 @@
+schema: smial.forward-h900-quote-capture
+schema_version: '1.0'
+atom_id: FORWARD_H900_QUOTE_CAPTURE_V1
+capability_id: CAP-JUPITER-FREE-KEY-FORWARD-H900-QUOTE-CAPTURE-001
+as_of: '2026-08-27'
+external_authority:
+  owner_phrase: 'OK HFIC_NEXT_FORWARD_EVIDENCE_OPTION_V2: one bounded Jupiter Free-key read-only PIT capture using a local process-environment key only; Tokens V2 /recent plus one bulk /tokens/v2/search R0 snapshot plus quote-only /swap/v2/order; x-api-key header only; no .env read, no key in URL/log/receipt/Git, no taker, /build, /execute, wallet, signer, transaction, paid plan, second provider, retry or fallback; cash cap $0; call cap 60; global provider pace >=3s; ICP-EARLY-PUMPFUN-V1 fresh mints only excluding all prior consumed mints including the 2026-08-24 valuation window; X = R0_TAKER_VOLUME_MIX from stats5m buyVolume/(buyVolume+sellVolume) at one prospective search snapshot (dimensionless; UNKNOWN never zero; no USD volume claim; no R1 search); stop before quotes if valid-mix eligible < 10; quote-only BUY at R0 and quote-only SELL at H900; Y previously unconsumed; no ln(R1/R0), no closed-family threshold, window, quartile or LOO reopen; one window only; Factory runner unchanged; Discovery, A7, Strategy, Bot, Shadow, alpha, NetReturn, micro-live and /hypothesis-forge forbidden.'
+  credential_name: JUPITER_API_KEY
+  credential_reads: 1
+  dotenv_reads: false
+  execute: false
+  build: false
+  taker: OMITTED_QUOTE_ONLY
+  cash_cap_usd_cents: 0
+  call_cap: 60
+registry: configs/provider_route_capability_registry_v10.yaml
+routes:
+  recent:
+    route_id: JUPITER-SOLANA-TOKENS-V2-RECENT-FREE-API-KEY-001
+    endpoint: https://api.jup.ag/tokens/v2/recent
+    host: api.jup.ag
+    method: GET
+  search:
+    route_id: JUPITER-SOLANA-TOKENS-V2-SEARCH-FREE-API-KEY-001
+    endpoint: https://api.jup.ag/tokens/v2/search
+    host: api.jup.ag
+    method: GET
+  quote:
+    route_id: JUPITER-SOLANA-SWAP-V2-ORDER-FREE-API-KEY-001
+    endpoint: https://api.jup.ag/swap/v2/order
+    host: api.jup.ag
+    method: GET
+wrapped_sol_mint: So11111111111111111111111111111111111111112
+population:
+  launchpad: pump.fun
+  icp_id: ICP-EARLY-PUMPFUN-V1
+  r0_age_band_seconds:
+    min: 300
+    max_exclusive: 600
+  liquidity_usd_min: 1000
+  search_one_call_max_mints: 100
+  quote_pair_cap: 29
+  min_eligible_before_quotes: 10
+consumed_mint_receipts:
+  - docs/evidence/early_valuation_liquidity_divergence_confirmation/a1_runtime_receipt_v1.json
+quote:
+  slippage_bps: '100'
+  notional_atomic: '10000000'
+  horizon_seconds: 900
+  horizon_kind: ABSOLUTE_CREATE_AT_PLUS_H900
+  lateness_slack_seconds: 120
+  buy_after: R0_SEARCH
+  r1_search: forbidden
+decision_rule:
+  min_decision_time_eligible: 10
+  min_rankable_h900: 8
+  score_kind: SIGN_ONLY_KENDALL_TAU_B
+  tau_b_floor: forbidden
+  top_x_quartile: false
+  leave_one_out_positive_share: forbidden
+windows:
+  max_windows: 1
+  window_b: forbidden
+  second_window: forbidden
+execution_controls:
+  retries: 0
+  fallback: false
+  persist_transaction_bytes: false
+  provider_requests_max: 60
+  min_interval_seconds: 3
+  background_scheduler: false
+  second_provider: false
+  paid_plan: false
+runtime_limits:
+  timeout_seconds: 20.0
+  max_response_bytes: 2000000
+raw_retention:
+  body: A4_OUTSIDE_GIT
+  response_headers: SAFE_ALLOWLIST_ONLY
+factory_runner: src/solana_alpha_lab/factory/runner.py
+factory_runner_sha256: d8d22bcb51fb6992d40f09e58274c52e0f9942c12d043cc57b96ffca524e918f
+non_claims:
+  alpha: false
+  netreturn: false
+  execution: false
+  strategy: false
+  shadow: false
+  discovery: false
+  a7: false
+  hypothesis_forge: false
+  confirmatory_second_window: false

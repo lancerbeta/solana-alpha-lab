@@ -1,0 +1,55 @@
+{
+  "acceptance_id": "HFIC-NEXT-FORWARD-EVIDENCE-EXECUTION-COMPLETION-001",
+  "active_stop_conditions": [],
+  "as_of": "2026-08-27",
+  "base_main": "259314e07e7097c3ba9d685e4a9a4a11eea1b3db",
+  "capability_radar_now": "NONE",
+  "cloud_bundle_mode": "OWNER_MANAGED_OPTIONAL_EXPORT",
+  "cloud_bundle_required_by_harness": false,
+  "cloud_bundle_smoke_required": false,
+  "factory_fit": {
+    "path": "docs/evidence/hfic_next_forward_evidence_execution/a1_delivery_factory_fit_v1.json",
+    "sha256": "c5f3b0e160db84e26b4985285105c37028c64f3c124e0d8198bf18a57922f012",
+    "verdict": "PASS"
+  },
+  "implementation_bindings": {
+    "configs/experiment_capability_registry_v1.yaml": "c1b28bac61fe7cd7f05236f20c90f616efc37cd665f951c9be14f6851e3c9e8a",
+    "configs/forward_h900_quote_capture_v1.yaml": "e335e76eb60dd2102f5dff43b71e8d42b014c6853d9b2de0ec235c0c5f374253",
+    "docs/tasks/HFIC_NEXT_FORWARD_EVIDENCE_EXECUTION_V1.md": "9f91a1fa344585e0a5811e62a05f093835a9c67cebb6ec198b8132ab6d6870bb",
+    "scripts/run_forward_h900_quote_capture.py": "c4426fc57f395e81b389f912dca72f3740dd852f7e7a8df1ea8eeb533a3a086a",
+    "src/solana_alpha_lab/factory/capabilities.py": "44a6e16e16e1f00d3340cb238e60163fc2f28c675747e39b873498f20457a383",
+    "src/solana_alpha_lab/factory/forward_h900_quote_capture.py": "82eef8c715e02ea9d6927ac3e52f2e830deb591f6d5b476aca38b46b3b327552",
+    "src/solana_alpha_lab/factory/forward_mix_offline.py": "7ad086f0530f7e5ac7185a8978bf12c91a0a0478405d68bca5271da04b720942",
+    "tests/test_forward_h900_quote_capture.py": "285cdae80bfc53727879be2844bb64614faf6be9f25d54b227c9978e9c8728e9"
+  },
+  "independent_review": {
+    "path": "docs/evidence/hfic_next_forward_evidence_execution/a1_delivery_independent_review_v1.json",
+    "sha256": "1a92582867c89ce099f10f1c365ed746342ef30a723734d6616dabf452853c55",
+    "verdict": "PASS"
+  },
+  "non_claims": [
+    "NO_ALPHA",
+    "NO_CANONICAL_DONE",
+    "NO_LIVE_PROVIDER_CALL_BEFORE_MERGE",
+    "NO_HYPOTHESIS_FORGE_SLASH",
+    "NO_CONFIRMATORY_SECOND_WINDOW",
+    "NO_HYPOTHESIS_SPECIFIC_PROVIDER_RUNNER"
+  ],
+  "owner_attention_triggers": {
+    "auth_or_access_recovery": false,
+    "external_material_action": false,
+    "material_owner_decision": false,
+    "unresolved_safety_or_truth_conflict": false,
+    "user_only_activation": false
+  },
+  "schema": "smial.delivery-completion-evidence",
+  "schema_version": "1.0",
+  "side_effects": {
+    "cash_spend_usd_cents": 0,
+    "credentials_read": 0,
+    "provider_api_rpc_wss_calls": 0,
+    "wallet_signer_transaction": 0
+  },
+  "task_id": "HFIC_NEXT_FORWARD_EVIDENCE_EXECUTION_V1",
+  "verdict": "PASS"
+}
