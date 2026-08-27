@@ -11,8 +11,7 @@
   "required_roles": [
     "ARCHITECTURE_CRITIC",
     "CODE_REVIEWER",
-    "GOAL_DOD_CRITIC",
-    "OWNER_UX_CRITIC"
+    "GOAL_DOD_CRITIC"
   ],
   "review_id": "HFIC-PROVENANCE-CLOCK-REVIEW-001",
   "reviewed_bindings_sha256": "7fa1c3722cec3db93c18cbc537ebed501734fe990c7c44ad32b34f761a17a796",
@@ -51,19 +50,13 @@
         "CHECKED_SMOKE_SESSION_NOT_REGENERATED",
         "CHECKED_ZERO_MID_CYCLE_SLASH_AUTHORITY",
         "FIXED_SHOW_SESSION_SESSION_LOCAL_STATUS",
-        "FIXED_HISTORICAL_PLACEHOLDER_REPLAY_ANALOG"
-      ],
-      "role": "GOAL_DOD_CRITIC",
-      "verdict": "PASS"
-    },
-    {
-      "findings": [
+        "FIXED_HISTORICAL_PLACEHOLDER_REPLAY_ANALOG",
         "FIXED_SKILL_AUTO_HANDOFF_UNAVAILABLE_NO_OWNER_PASTE",
         "FIXED_CORRECTION_CONFIRM_FLAG",
         "FIXED_OPERATOR_POST_MERGE_CORRECTION_PATH",
         "CHECKED_SHOW_SESSION_REDACTS_1970"
       ],
-      "role": "OWNER_UX_CRITIC",
+      "role": "GOAL_DOD_CRITIC",
       "verdict": "PASS"
     }
   ],

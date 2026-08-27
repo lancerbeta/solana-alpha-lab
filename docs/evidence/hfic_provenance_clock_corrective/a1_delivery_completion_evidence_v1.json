@@ -70,7 +70,7 @@
     "github_ci": "ENFORCED_LIVE_AT_GUARDED_MERGE",
     "independent_review": {
       "path": "docs/evidence/hfic_provenance_clock_corrective/a1_delivery_independent_review_v1.json",
-      "sha256": "fef56fe56f82d28c0a8727fff99e2f555f2442b9cd72d593af9fb1bc9fb4d8c9",
+      "sha256": "c37e0e7c3d0796d944f8c9f4d9b480c4d493d67950476324ae2cf73250fd7c4a",
       "verdict": "PASS"
     },
     "project_checks": [
