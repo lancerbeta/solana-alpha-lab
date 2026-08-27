@@ -897,7 +897,7 @@ records:
     repository_path: .github/workflows/ci.yml
   integrity:
     kind: sha256
-    sha256: f3cf61f9d5efa6b36596f4f52d76e9713fc3946fb12595b1182a91aa28c1a8c2
+    sha256: 35abf9951dd5204737bd3715113793d48dfdbe1834c1ed7a2e51f0a836dda0f5
   access:
     mode: read_only
     method: file
@@ -936,7 +936,7 @@ records:
     repository_path: scripts/validate_ci.py
   integrity:
     kind: sha256
-    sha256: 83373dc958bf26b99d16daf60b5fa98cc1034772bc50f50d8d735b357ed964ca
+    sha256: 81223661a47ed2666b54f73676b8f0d74330bc9288f251699c785ad4c6ed8b8c
   access:
     mode: read_only
     method: command
@@ -19729,7 +19729,7 @@ records:
   as_of: '2026-08-15'
   truth_owner: CTRL-DELIVERY-HARNESS-001
   location: {kind: git_path, logical_uri: 'repo://delivery-harness/harness.yaml', repository_path: delivery-harness/harness.yaml}
-  integrity: {kind: sha256, sha256: 0dce36aea96af67c281acc120303eba1188e1c53f104c0bd610e4b2ad6647add}
+  integrity: {kind: sha256, sha256: bd196187f458bf5e7195c965d0814ee13a92ade04d6f58dd83652aa27fec7563}
   access: *t25_read_file
   relations:
   - {relation_type: governed_by, target_asset_id: CTRL-DELIVERY-HARNESS-001}
@@ -31887,7 +31887,7 @@ records:
   as_of: '2026-08-25'
   truth_owner: HYPOTHESIS_FAST_LANE_AND_RESEARCH_DATA_PLANE_V1
   location: {kind: git_path, logical_uri: 'repo://schemas/research_memory_projection_v1.sql', repository_path: schemas/research_memory_projection_v1.sql}
-  integrity: {kind: sha256, sha256: b044f9e5e91d7e76ba51e49681f851c2ec70e528510aa8fdb7342bb2ebb19e67}
+  integrity: {kind: sha256, sha256: aae281f735b8a8f7596e5d622a885077c0de3bc8ba116c3dc933fb65770e9ca2}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: governed_by, target_asset_id: CTRL-HYPOTHESIS-FAST-LANE-001}
@@ -32033,7 +32033,7 @@ records:
   as_of: '2026-08-25'
   truth_owner: HYPOTHESIS_FAST_LANE_AND_RESEARCH_DATA_PLANE_V1
   location: {kind: git_path, logical_uri: 'repo://scripts/hypothesis_fast_lane.py', repository_path: scripts/hypothesis_fast_lane.py}
-  integrity: {kind: sha256, sha256: 7746a59da22f22c587b71587ce976e359863cfe9aca71e2dc92c3355a7001230}
+  integrity: {kind: sha256, sha256: 9cd8e01517457ebf56c7cb7499514aaea71119561157c31e8cb675b44a8268e0}
   access: {mode: read_only, method: command, recipe_id: QUERY-HYPOTHESIS-FAST-LANE-CLASSIFY-001, network_required: false, secrets_required: false}
   relations:
   - {relation_type: governed_by, target_asset_id: CTRL-HYPOTHESIS-FAST-LANE-001}
@@ -32226,4 +32226,147 @@ records:
   consumers: [FACTORY-001, GOAL-OWNER]
   evidence: []
   search_terms: [HYPOTHESIS_FAST_LANE, FACTORY_V1]
+  classification: {contains_secrets: false, contains_raw_data: false, sensitivity: INTERNAL_NON_SECRET}
+- asset_id: CTRL-HYPOTHESIS-FORGE-OPERATIONAL-CLOSURE-001
+  record_version: '1.0'
+  asset_type: control_document
+  purpose: Exact contract for the Hypothesis Forge operational loop over Fast Lane and ResearchStore.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-08-26'
+  truth_owner: HYPOTHESIS_FORGE_OPERATIONAL_CLOSURE_V1
+  location: {kind: git_path, logical_uri: 'repo://docs/tasks/HYPOTHESIS_FORGE_OPERATIONAL_CLOSURE_V1.md', repository_path: docs/tasks/HYPOTHESIS_FORGE_OPERATIONAL_CLOSURE_V1.md}
+  integrity: {kind: sha256, sha256: f31ed8b66eeeca22ecc290a227b666734f0a52f2ee3c14106be09b57d4c975c2}
+  access: {mode: read_only, method: file, network_required: false, secrets_required: false}
+  relations:
+  - {relation_type: governed_by, target_asset_id: CTRL-HYPOTHESIS-FAST-LANE-001}
+  - {relation_type: depends_on, target_asset_id: SCRIPT-HYPOTHESIS-FORGE-001}
+  - {relation_type: depends_on, target_asset_id: MODULE-FACTORY-V1-HFIC-SESSION-001}
+  - {relation_type: validated_by, target_asset_id: TEST-HFIC-OPERATIONAL-CLOSURE-001}
+  consumers: [FACTORY-001, GOAL-OWNER]
+  evidence: []
+  search_terms: [HYPOTHESIS_FORGE, HFIC]
+  classification: {contains_secrets: false, contains_raw_data: false, sensitivity: INTERNAL_NON_SECRET}
+- asset_id: SCRIPT-HYPOTHESIS-FORGE-001
+  record_version: '1.0'
+  asset_type: script
+  purpose: Thin network-free CLI for HFIC preflight, freeze, finalize, prior lookup and runtime proof.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-08-26'
+  truth_owner: HYPOTHESIS_FORGE_OPERATIONAL_CLOSURE_V1
+  location: {kind: git_path, logical_uri: 'repo://scripts/hypothesis_forge.py', repository_path: scripts/hypothesis_forge.py}
+  integrity: {kind: sha256, sha256: 5ac03c107729d2cc1173751a6d22cbebecddce90ce8fc6e906b7f0265a2a9c09}
+  access: {mode: read_only, method: command, recipe_id: QUERY-HFIC-EXACT-RELATED-PRIOR-001, network_required: false, secrets_required: false}
+  relations:
+  - {relation_type: governed_by, target_asset_id: CTRL-HYPOTHESIS-FORGE-OPERATIONAL-CLOSURE-001}
+  - {relation_type: depends_on, target_asset_id: MODULE-FACTORY-V1-HFIC-SESSION-001}
+  - {relation_type: depends_on, target_asset_id: MODULE-FACTORY-V1-RESEARCH-STORE-001}
+  consumers: [FACTORY-001, GOAL-OWNER]
+  evidence: []
+  search_terms: [HYPOTHESIS_FORGE, HFIC]
+  classification: {contains_secrets: false, contains_raw_data: false, sensitivity: INTERNAL_NON_SECRET}
+- asset_id: MODULE-FACTORY-V1-HFIC-SESSION-001
+  record_version: '1.0'
+  asset_type: script
+  purpose: HFIC identity, freeze validation, search budget and session protocol library.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-08-26'
+  truth_owner: HYPOTHESIS_FORGE_OPERATIONAL_CLOSURE_V1
+  location: {kind: git_path, logical_uri: 'repo://src/solana_alpha_lab/factory/hfic_session.py', repository_path: src/solana_alpha_lab/factory/hfic_session.py}
+  integrity: {kind: sha256, sha256: 7b6cc00cf5a39df94fb97acaa34970cb18b737ecb94f236f950023aef2a5df45}
+  access: {mode: read_only, method: file, network_required: false, secrets_required: false}
+  relations:
+  - {relation_type: governed_by, target_asset_id: CTRL-HYPOTHESIS-FORGE-OPERATIONAL-CLOSURE-001}
+  - {relation_type: depends_on, target_asset_id: MODULE-FACTORY-V1-RESEARCH-STORE-001}
+  consumers: [FACTORY-001, GOAL-OWNER]
+  evidence: []
+  search_terms: [HYPOTHESIS_FORGE, HFIC]
+  classification: {contains_secrets: false, contains_raw_data: false, sensitivity: INTERNAL_NON_SECRET}
+- asset_id: SCHEMA-HYPOTHESIS-FORGE-DRAFT-V1-001
+  record_version: '1.0'
+  asset_type: schema
+  purpose: JSON Schema for the machine FORGE_DRAFT packet before freeze identity rewrite.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-08-26'
+  truth_owner: HYPOTHESIS_FORGE_OPERATIONAL_CLOSURE_V1
+  location: {kind: git_path, logical_uri: 'repo://catalog/schemas/hypothesis_forge_draft_v1.schema.json', repository_path: catalog/schemas/hypothesis_forge_draft_v1.schema.json}
+  integrity: {kind: sha256, sha256: 94880efe888a596d9f6a6b9bda12972b56fed124f93005ed214177c2db84a2b7}
+  access: {mode: read_only, method: file, network_required: false, secrets_required: false}
+  relations:
+  - {relation_type: governed_by, target_asset_id: CTRL-HYPOTHESIS-FORGE-OPERATIONAL-CLOSURE-001}
+  consumers: [FACTORY-001, GOAL-OWNER]
+  evidence: []
+  search_terms: [HYPOTHESIS_FORGE, HFIC]
+  classification: {contains_secrets: false, contains_raw_data: false, sensitivity: INTERNAL_NON_SECRET}
+- asset_id: SCHEMA-HYPOTHESIS-CRITIC-RESULT-V1-001
+  record_version: '1.0'
+  asset_type: schema
+  purpose: JSON Schema for Independent Critic structured result before finalize persistence.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-08-26'
+  truth_owner: HYPOTHESIS_FORGE_OPERATIONAL_CLOSURE_V1
+  location: {kind: git_path, logical_uri: 'repo://catalog/schemas/hypothesis_critic_result_v1.schema.json', repository_path: catalog/schemas/hypothesis_critic_result_v1.schema.json}
+  integrity: {kind: sha256, sha256: b4e72ddb954fe126edc0ba94acea49c17297bacd0a3bf8cf5b13d6489e252284}
+  access: {mode: read_only, method: file, network_required: false, secrets_required: false}
+  relations:
+  - {relation_type: governed_by, target_asset_id: CTRL-HYPOTHESIS-FORGE-OPERATIONAL-CLOSURE-001}
+  consumers: [FACTORY-001, GOAL-OWNER]
+  evidence: []
+  search_terms: [HYPOTHESIS_FORGE, HFIC]
+  classification: {contains_secrets: false, contains_raw_data: false, sensitivity: INTERNAL_NON_SECRET}
+- asset_id: SCHEMA-HYPOTHESIS-FORGE-SESSION-RECEIPT-V1-001
+  record_version: '1.0'
+  asset_type: schema
+  purpose: JSON Schema for the canonical HFIC session receipt after synthesis complete.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-08-26'
+  truth_owner: HYPOTHESIS_FORGE_OPERATIONAL_CLOSURE_V1
+  location: {kind: git_path, logical_uri: 'repo://catalog/schemas/hypothesis_forge_session_receipt_v1.schema.json', repository_path: catalog/schemas/hypothesis_forge_session_receipt_v1.schema.json}
+  integrity: {kind: sha256, sha256: fc23d06c66b3a3d205eb35ca8687cc6eacd25fbb418a3a082f2e69b7c331ccce}
+  access: {mode: read_only, method: file, network_required: false, secrets_required: false}
+  relations:
+  - {relation_type: governed_by, target_asset_id: CTRL-HYPOTHESIS-FORGE-OPERATIONAL-CLOSURE-001}
+  consumers: [FACTORY-001, GOAL-OWNER]
+  evidence: []
+  search_terms: [HYPOTHESIS_FORGE, HFIC]
+  classification: {contains_secrets: false, contains_raw_data: false, sensitivity: INTERNAL_NON_SECRET}
+- asset_id: SCHEMA-HYPOTHESIS-FORGE-SYNTHESIS-HANDOFF-V1-1-001
+  record_version: '1.0'
+  asset_type: schema
+  purpose: JSON Schema for HFIC-V1.1 synthesis handoff while keeping v1.0 historical readers.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-08-26'
+  truth_owner: HYPOTHESIS_FORGE_OPERATIONAL_CLOSURE_V1
+  location: {kind: git_path, logical_uri: 'repo://catalog/schemas/hypothesis_forge_synthesis_handoff_v1_1.schema.json', repository_path: catalog/schemas/hypothesis_forge_synthesis_handoff_v1_1.schema.json}
+  integrity: {kind: sha256, sha256: 1d4c78255e8525062e63e291035f795fecb292e220effc087f1b4d25b0fcb3fd}
+  access: {mode: read_only, method: file, network_required: false, secrets_required: false}
+  relations:
+  - {relation_type: governed_by, target_asset_id: CTRL-HYPOTHESIS-FORGE-OPERATIONAL-CLOSURE-001}
+  consumers: [FACTORY-001, GOAL-OWNER]
+  evidence: []
+  search_terms: [HYPOTHESIS_FORGE, HFIC]
+  classification: {contains_secrets: false, contains_raw_data: false, sensitivity: INTERNAL_NON_SECRET}
+- asset_id: TEST-HFIC-OPERATIONAL-CLOSURE-001
+  record_version: '1.0'
+  asset_type: script
+  purpose: Contract tests for HFIC identity, preflight, freeze references, CLI and Catalog bindings.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-08-26'
+  truth_owner: HYPOTHESIS_FORGE_OPERATIONAL_CLOSURE_V1
+  location: {kind: git_path, logical_uri: 'repo://tests/test_hfic_operational_closure_v1.py', repository_path: tests/test_hfic_operational_closure_v1.py}
+  integrity: {kind: sha256, sha256: dfdd8a208e0bbdaed639f6e0a7592c6387e1cac02d1a8e4542e472bab0c01691}
+  access: {mode: read_only, method: file, network_required: false, secrets_required: false}
+  relations:
+  - {relation_type: governed_by, target_asset_id: CTRL-HYPOTHESIS-FORGE-OPERATIONAL-CLOSURE-001}
+  - {relation_type: depends_on, target_asset_id: SCRIPT-HYPOTHESIS-FORGE-001}
+  consumers: [FACTORY-001]
+  evidence: []
+  search_terms: [HYPOTHESIS_FORGE, HFIC]
   classification: {contains_secrets: false, contains_raw_data: false, sensitivity: INTERNAL_NON_SECRET}

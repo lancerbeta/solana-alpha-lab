@@ -1,9 +1,10 @@
 schema: smial.hypothesis-forge-independent-critic
-schema_version: '1.0'
-contract_id: HYPOTHESIS_FORGE_AND_INDEPENDENT_CRITIC_V1
-prompt_version: HFIC-V1.0
+schema_version: '1.1'
+contract_id: HYPOTHESIS_FORGE_OPERATIONAL_CLOSURE_V1
+prompt_version: HFIC-V1.1
 as_of: '2026-08-26'
 generator_mode: MANUAL_FALLBACK_UNTIL_GENERATOR
+runtime_mode: EXPLICIT_SLASH_ONLY
 forge_invocation:
   mode: EXPLICIT_SLASH_ONLY
   slash_commands:
@@ -13,14 +14,41 @@ critic_launch:
   context_isolation: NEW_CONTEXT_REQUIRED
   recovery_slash_commands:
     - independent-hypothesis-critic
+commissioning_gate:
+  required_owner_terminal: NO_GIT_FAST_LANE_PROVEN
+  auto_commission_offline_when_safe: true
+session_memory:
+  backend: EXISTING_RESEARCH_STORE
+  append_only: true
+  persist_all_candidates: true
+  resume_incomplete: true
+candidate_policy:
+  min_candidates: 4
+  max_candidates: 6
+  selected_count: 1
+  runner_up_count: 1
+  max_revisions: 1
+search_budget:
+  auto_sessions_per_evidence_epoch: 1
+  distinct_focus_sessions_per_evidence_epoch: 3
+  same_search_key_replay: RETURN_EXISTING_SESSION
+identity:
+  canonical_content_hash: SHA256
+  display_ordinal_is_identity: false
 operator_pack:
   path: docs/operator/HYPOTHESIS_FORGE_AND_INDEPENDENT_CRITIC_OPERATOR_V1.md
 skills:
   forge: .agents/skills/hypothesis-forge/SKILL.md
   critic: .agents/skills/independent-hypothesis-critic/SKILL.md
+cli:
+  entrypoint: scripts/hypothesis_forge.py
 schemas:
   critic_input: catalog/schemas/hypothesis_critic_input_v1.schema.json
   synthesis_handoff: catalog/schemas/hypothesis_forge_synthesis_handoff_v1.schema.json
+  synthesis_handoff_v1_1: catalog/schemas/hypothesis_forge_synthesis_handoff_v1_1.schema.json
+  forge_draft: catalog/schemas/hypothesis_forge_draft_v1.schema.json
+  critic_result: catalog/schemas/hypothesis_critic_result_v1.schema.json
+  session_receipt: catalog/schemas/hypothesis_forge_session_receipt_v1.schema.json
 synthesis_invariants:
   forge_complete_requires:
     - FORGE_REPORT

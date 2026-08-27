@@ -24,8 +24,8 @@
   ],
   "properties": {
     "packet_schema": {"const": "smial.hypothesis-critic-input"},
-    "packet_version": {"const": "1.0"},
-    "generator_prompt_version": {"const": "HFIC-V1.0"},
+    "packet_version": {"enum": ["1.0", "1.1"]},
+    "generator_prompt_version": {"enum": ["HFIC-V1.0", "HFIC-V1.1"]},
     "generated_at": {"type": "string", "minLength": 1},
     "live_git_head": {"type": "string", "pattern": "^[0-9a-f]{40}$"},
     "research_memory_as_of": {"type": "string", "minLength": 1},

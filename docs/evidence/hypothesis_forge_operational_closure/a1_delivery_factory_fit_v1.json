@@ -1,0 +1,37 @@
+{
+  "as_of": "2026-08-26",
+  "capability_radar": {
+    "now": "NONE",
+    "watch": "AUTONOMOUS_GENERATOR_DEFERRED"
+  },
+  "dimensions": {
+    "build_vs_buy": "PASS",
+    "context_efficiency": "PASS",
+    "execution_to_cashflow": "PASS",
+    "flexibility_and_history": "PASS",
+    "mission": "PASS",
+    "monitoring_and_recovery": "PASS",
+    "owner_operability": "PASS",
+    "red_team": "PASS",
+    "research_truth": "PASS",
+    "security": "PASS"
+  },
+  "limits": [
+    "NO_ALPHA",
+    "NO_CANONICAL_DONE",
+    "NO_AUTONOMOUS_GENERATOR",
+    "NO_PROVIDER_CALLS",
+    "NO_EXPERIMENT_EXECUTION",
+    "NO_PRODUCTION_COMMISSION_BEFORE_MERGE",
+    "NO_HFIC_OPERATIONAL_LOOP_PROVEN_UNTIL_POST_MERGE"
+  ],
+  "mode": "FULL_REVIEW",
+  "recovery": "REVERT",
+  "review_id": "HFIC-OPERATIONAL-CLOSURE-FACTORY-FIT-001",
+  "reviewed_bindings_sha256": "042697109fbdf2aa2f694575d2a10d76c56ac380650f6aec76f9c944ecccedbb",
+  "reviewed_inventory_sha256": "4107d52d1bd1225079c5e6377a97aab5fff14521bec078730ccfef0d558e1042",
+  "schema": "smial.delivery-harness-factory-fit",
+  "schema_version": "1.0",
+  "task_id": "HYPOTHESIS_FORGE_OPERATIONAL_CLOSURE_V1",
+  "verdict": "PASS"
+}

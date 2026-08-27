@@ -1,0 +1,70 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://smial.local/schemas/hypothesis_forge_session_receipt_v1.schema.json",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "session_id",
+    "session_state",
+    "evidence_epoch_sha256",
+    "focus_key_sha256",
+    "search_key_sha256",
+    "prompt_version",
+    "live_git_head",
+    "store_inventory_digest",
+    "candidate_ids",
+    "selected_candidate_id",
+    "runner_up_candidate_id",
+    "critic_input_packet_sha256",
+    "critic_result_sha256",
+    "critic_terminal",
+    "lane_classifier_terminal",
+    "decision_event_ids",
+    "next",
+    "authority",
+    "no_git_fence_receipt",
+    "created_at"
+  ],
+  "properties": {
+    "session_id": {"type": "string", "minLength": 1},
+    "session_state": {"const": "SYNTHESIS_COMPLETE"},
+    "evidence_epoch_sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+    "focus_key_sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+    "search_key_sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+    "prompt_version": {"const": "HFIC-V1.1"},
+    "live_git_head": {"type": "string", "pattern": "^[0-9a-f]{40}$"},
+    "store_inventory_digest": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+    "candidate_ids": {
+      "type": "array",
+      "minItems": 4,
+      "maxItems": 6,
+      "items": {"type": "string", "pattern": "^HFIC-CAND-[0-9A-F]{12,64}$"}
+    },
+    "selected_candidate_id": {
+      "type": "string",
+      "pattern": "^HFIC-CAND-[0-9A-F]{12,64}$"
+    },
+    "runner_up_candidate_id": {
+      "type": "string",
+      "pattern": "^HFIC-CAND-[0-9A-F]{12,64}$"
+    },
+    "critic_input_packet_sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+    "critic_result_sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+    "critic_terminal": {"type": "string", "minLength": 1},
+    "lane_classifier_terminal": {"type": ["string", "null"]},
+    "decision_event_ids": {"type": "array", "items": {"type": "string"}},
+    "next": {"type": "string", "minLength": 1},
+    "authority": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["git_mutation", "experiment_execution", "provider_api_rpc_wss_calls"],
+      "properties": {
+        "git_mutation": {"const": 0},
+        "experiment_execution": {"const": 0},
+        "provider_api_rpc_wss_calls": {"const": 0}
+      }
+    },
+    "no_git_fence_receipt": {"type": "object"},
+    "created_at": {"type": "string", "minLength": 1}
+  }
+}

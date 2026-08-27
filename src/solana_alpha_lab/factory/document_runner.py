@@ -518,7 +518,10 @@ class DocumentRunner(ExperimentRunner):
                 run_id=run_id,
                 transaction_id=transaction_id,
                 effective_at=now,
-                payload=dict(passport.model_dump(mode="json")),
+                payload={
+                    **passport.model_dump(mode="json"),
+                    "git_mutation_count": git_mutation_count,
+                },
                 producer_capability_id=capability_id,
                 producer_git_sha=producer_git_sha,
             ),

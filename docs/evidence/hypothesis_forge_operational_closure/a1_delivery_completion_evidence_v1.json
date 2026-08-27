@@ -1,0 +1,99 @@
+{
+  "acceptance_id": "HFIC-OPERATIONAL-CLOSURE-DELIVERY-COMPLETION-001",
+  "active_stop_conditions": [],
+  "as_of": "2026-08-26",
+  "base_main": "b559646ebf62583d357a3f3bb349695cbec320dc",
+  "capability_radar_now": "NONE",
+  "cloud_bundle_mode": "OWNER_MANAGED_OPTIONAL_EXPORT",
+  "cloud_bundle_required_by_harness": false,
+  "cloud_bundle_smoke_required": false,
+  "factory_fit": {
+    "path": "docs/evidence/hypothesis_forge_operational_closure/a1_delivery_factory_fit_v1.json",
+    "sha256": "1b378e9b5f10b3c99195d6017175454682d8254bad3976753fd5cfdbb07e056e",
+    "verdict": "PASS"
+  },
+  "implementation_bindings": {
+    ".agents/skills/hypothesis-forge/SKILL.md": "04ce14a926309dc8cb3b9b04f581cb882aefb320c05267833bc2ef45655c5e0b",
+    ".agents/skills/independent-hypothesis-critic/SKILL.md": "dacedd69a6a5136380842d406d7bdb6a10774e1cf90f02b1a30867c17e725fb0",
+    ".cursor/commands/hypothesis-forge.md": "7f7e87e7e0d6033f5d50a1f3a21259d6216e4bf439c65b4b3a4d8c2789c5ed69",
+    ".github/workflows/ci.yml": "35abf9951dd5204737bd3715113793d48dfdbe1834c1ed7a2e51f0a836dda0f5",
+    "catalog/assets/core.yaml": "5e1f8012136e5e5cb2380cd661aa6cd78eade15e1891a06d593fa6b4b50026ce",
+    "catalog/assets/lifecycle.yaml": "dd4e668faf5501b40aacad3da8289ce3f57e241a2580319b929e28b618d690d0",
+    "catalog/catalog_manifest.yaml": "fef752585cc02e7f41bd7c7ee86faa3df7febdf758105d5775e2b5348cf8a7a9",
+    "catalog/generated/asset_edges.json": "e3d7732e56a484f62721cb129ebed5623cbb957796aabbd32c758f597332e0ee",
+    "catalog/query_recipes.yaml": "55c9e8cc10d16510f0fd2989baae59136ceb7976ca30e8f6e9dd694e20510506",
+    "catalog/schemas/hypothesis_critic_input_v1.schema.json": "339c5989b1ff10ad47c4105a07d67e25333679843ddb25e2d9ef542af324b80e",
+    "catalog/schemas/hypothesis_critic_result_v1.schema.json": "b4e72ddb954fe126edc0ba94acea49c17297bacd0a3bf8cf5b13d6489e252284",
+    "catalog/schemas/hypothesis_forge_draft_v1.schema.json": "94880efe888a596d9f6a6b9bda12972b56fed124f93005ed214177c2db84a2b7",
+    "catalog/schemas/hypothesis_forge_session_receipt_v1.schema.json": "fc23d06c66b3a3d205eb35ca8687cc6eacd25fbb418a3a082f2e69b7c331ccce",
+    "catalog/schemas/hypothesis_forge_synthesis_handoff_v1_1.schema.json": "1d4c78255e8525062e63e291035f795fecb292e220effc087f1b4d25b0fcb3fd",
+    "configs/hypothesis_forge_independent_critic_v1.yaml": "dbff68e01fd239816703b7092cbfb5a2fbb8ee1461fa2fe8f556b3da8eeca2ba",
+    "delivery-harness/harness.yaml": "bd196187f458bf5e7195c965d0814ee13a92ade04d6f58dd83652aa27fec7563",
+    "docs/PROJECT_MAP.md": "edcde317280728fdd5f2021daac9dd5a226c951acc512d132587911c775bf019",
+    "docs/operator/HYPOTHESIS_FORGE_AND_INDEPENDENT_CRITIC_OPERATOR_V1.md": "f93b879e0d71c83d7786c08cb5b7a3f6d02d4ab662af2f94fc6c72551b2275fc",
+    "docs/tasks/HYPOTHESIS_FORGE_OPERATIONAL_CLOSURE_V1.md": "f31ed8b66eeeca22ecc290a227b666734f0a52f2ee3c14106be09b57d4c975c2",
+    "schemas/research_memory_projection_v1.sql": "aae281f735b8a8f7596e5d622a885077c0de3bc8ba116c3dc933fb65770e9ca2",
+    "scripts/hypothesis_fast_lane.py": "9cd8e01517457ebf56c7cb7499514aaea71119561157c31e8cb675b44a8268e0",
+    "scripts/hypothesis_forge.py": "5ac03c107729d2cc1173751a6d22cbebecddce90ce8fc6e906b7f0265a2a9c09",
+    "scripts/validate_ci.py": "81223661a47ed2666b54f73676b8f0d74330bc9288f251699c785ad4c6ed8b8c",
+    "src/solana_alpha_lab/factory/commissioning_proof.py": "e31fa9f29bc925623d97b33a2e1f486f74c8397f00ff7cce123166f466700b5b",
+    "src/solana_alpha_lab/factory/data_root.py": "eb7ec6b2e05408a53ff3f46d109895ccda6777045332a75e19e924e3fa8360ca",
+    "src/solana_alpha_lab/factory/document_runner.py": "658f05a4cce2af3c5318a82d19a4a81cef24f1324040ec15016d5430be6abe34",
+    "src/solana_alpha_lab/factory/hfic_identity.py": "a7faba9f0e3573e51511f7bf442378cd147cfb53ebe3ea2c417ba568b9e7fe2f",
+    "src/solana_alpha_lab/factory/hfic_preflight.py": "2f2929550e6a22c6d15949d0362376478b32394bd2ac9fb6efcc3526f2f49f53",
+    "src/solana_alpha_lab/factory/hfic_session.py": "7b6cc00cf5a39df94fb97acaa34970cb18b737ecb94f236f950023aef2a5df45",
+    "tests/fixtures/hypothesis_forge/draft_c3_c4_mismatch_v1.json": "79e71b57c82c5adac58ee6cf00e87cd942b983db860732ec21bf681146447e4f",
+    "tests/fixtures/hypothesis_forge/draft_happy_path_v1.json": "8c8c5279f6846b8db961f6e2052c7790f5ed0f7c277e2ef779ce3d2129dc4598",
+    "tests/fixtures/hypothesis_forge/prompt_a_forge_draft_v1.json": "8c8c5279f6846b8db961f6e2052c7790f5ed0f7c277e2ef779ce3d2129dc4598",
+    "tests/test_ci.py": "dd4ac3472a12f9e429d78323186aae81953cf912687a0e7e33a0e71c3a501a4c",
+    "tests/test_hfic_cli.py": "344332bb2bf897c14e2ab266acfc577885954ca590a31dd3e2a22deb6973714e",
+    "tests/test_hfic_identity.py": "189f69a4e5f9108b7a68d3fb92a12e757e5b23d177f5dc3f3b111e806304c1da",
+    "tests/test_hfic_operational_closure_v1.py": "dfdd8a208e0bbdaed639f6e0a7592c6387e1cac02d1a8e4542e472bab0c01691",
+    "tests/test_hfic_preflight.py": "c539a641aece832b2983c22ca0d0c3d8b7bbf157c8f9dbb0041ac29ce25a80cc",
+    "tests/test_hfic_session.py": "f9dca238626b64584fe964d0712632235049ec61d353263069c90b04ac5a04eb"
+  },
+  "non_claims": [
+    "NO_ALPHA",
+    "NO_CANONICAL_DONE",
+    "NO_AUTONOMOUS_GENERATOR",
+    "NO_PROVIDER_CALLS",
+    "NO_EXPERIMENT_EXECUTION",
+    "NO_FORGE_RUNTIME_GIT_MUTATION",
+    "NO_PRODUCTION_COMMISSION_OR_LEGACY_BACKFILL_BEFORE_MERGE",
+    "NO_TWO_RUNG",
+    "NO_HFIC_OPERATIONAL_LOOP_PROVEN_UNTIL_POST_MERGE"
+  ],
+  "owner_attention_triggers": {
+    "auth_or_access_recovery": false,
+    "external_material_action": false,
+    "material_owner_decision": false,
+    "unresolved_safety_or_truth_conflict": false,
+    "user_only_activation": false
+  },
+  "schema": "smial.delivery-completion-evidence",
+  "schema_version": "1.0",
+  "side_effects": {
+    "cash_spend_usd_cents": 0,
+    "credentials_read": 0,
+    "provider_api_rpc_wss_calls": 0,
+    "wallet_signer_transaction": 0
+  },
+  "state_change": "CLOSE_HYPOTHESIS_FORGE_OPERATIONAL_LOOP_PRE_MERGE",
+  "task_id": "HYPOTHESIS_FORGE_OPERATIONAL_CLOSURE_V1",
+  "validation": {
+    "full_gate": "ENFORCED_BY_PROJECT_BOUND_VALIDATION",
+    "github_ci": "ENFORCED_LIVE_AT_GUARDED_MERGE",
+    "independent_review": {
+      "path": "docs/evidence/hypothesis_forge_operational_closure/a1_delivery_independent_review_v1.json",
+      "sha256": "957a2375f0d65ef6a4a9daec9871018f755ab24eefa28b3df6498b329137f3e9",
+      "verdict": "PASS"
+    },
+    "project_checks": [
+      "PASS_HFIC_CONTRACT_TESTS",
+      "PASS_HFIC_TEMP_ROOT_E2E",
+      "PASS_CATALOG_VALIDATE",
+      "PASS_NAVIGATION_GENERATOR_CHECK"
+    ],
+    "targeted": "PASS_HFIC_TEMP_ROOT_E2E"
+  }
+}

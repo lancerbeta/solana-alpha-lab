@@ -8,9 +8,11 @@
 
 **Режим:** discovery и design only. Генерация не запускает эксперимент, не меняет Git, не создаёт branch/PR, не вызывает market/provider API/RPC/WSS, не тратит деньги и не получает торговых полномочий.
 
-**Версия промпта:** `HFIC-V1.0`
+**Версия промпта:** `HFIC-V1.1` (исторические пакеты `HFIC-V1.0` остаются читаемыми).
+Display ordinal (`C1`/`C2`/…) is display-only. Canonical `candidate_id` is assigned
+by `freeze`, not by the model.
 
-**Целевая эксплуатационная точка:** после успешного commissioning `HYPOTHESIS_FAST_LANE_OFFLINE_V1`. До commissioning документ можно использовать только для формирования и критики design-пакетов.
+**Целевая эксплуатационная точка:** `/hypothesis-forge` → `scripts/hypothesis_forge.py preflight` → bounded draft → `freeze` → isolated Critic → optional `revise` / `classify` → `finalize`. До commissioning preflight сам выполняет безопасный offline Fast Lane commissioning.
 
 ---
 
@@ -42,10 +44,16 @@
 **Канонический путь (после merge этого pack в репозиторий):**
 
 1. Явно вызовите **`/hypothesis-forge`** в новом чате в корне актуального repository.
-2. Агент следует `.agents/skills/hypothesis-forge/SKILL.md` и PROMPT A ниже, возвращает
-   `FORGE_REPORT` + `CRITIC_INPUT_PACKET`, затем **автоматически** запускает Independent
-   Critic в **новом изолированном контексте** (subagent или новый чат).
-3. Вечерний цикл **не завершён**, пока Critic не вернул один terminal и один NEXT.
+2. Агент следует `.agents/skills/hypothesis-forge/SKILL.md`: executable
+   `preflight` → PROMPT A выдаёт machine-valid `FORGE_DRAFT` → `freeze` создаёт
+   `CRITIC_INPUT_PACKET` → isolated Critic → при `REVISE_ONCE` ровно один
+   `hypothesis_forge.py revise` и повтор Critic; при `PASS_TO_CLASSIFICATION`
+   `hypothesis_forge.py classify`; затем `finalize`.
+3. Вечерний цикл **не завершён**, пока Critic не вернул финальный terminal
+   (`KILL_*` / `NO_WORTHY_HYPOTHESIS` или post-classifier `PASS_*`) и `finalize`
+   не записал `SESSION_RECEIPT`. `REVISE_ONCE` и `PASS_TO_CLASSIFICATION` —
+   intermediate states, не complete. Команды `revise` и `classify` — тот же CLI,
+   не prose-only переход.
 4. Recovery: **`/independent-hypothesis-critic`** с вставленным packet только если auto-handoff
    прервался.
 
@@ -67,8 +75,9 @@ MARKET_PROVIDER_CALLS=0
 GIT_MUTATION=0
 EXPERIMENT_EXECUTION=0
 
-Используй PROMPT A из приложенного HFIC-V1.0.
-Верни полный FORGE_REPORT и канонический CRITIC_INPUT_PACKET в конце.
+Используй PROMPT A из приложенного HFIC-V1.1.
+Верни полный FORGE_REPORT и machine-valid FORGE_DRAFT (hypothesis_forge_draft_v1).
+Не генерируй CRITIC_INPUT_PACKET: его создаёт только freeze.
 ```
 
 Если хочется исследовать конкретную область, замените `OWNER_FOCUS=AUTO`, например:
@@ -86,7 +95,7 @@ OWNER_FOCUS=execution-aware entry/exit asymmetry at small notional
 ```text
 RUN INDEPENDENT_HYPOTHESIS_CRITIC_V1
 
-Используй PROMPT B из приложенного HFIC-V1.0.
+Используй PROMPT B из приложенного HFIC-V1.1.
 Не доверяй выводам Forge без независимой проверки.
 Эксперимент не запускать.
 Верни один terminal и ровно один NEXT.
@@ -270,7 +279,8 @@ whether resolving it changes a real decision
 Для каждого кандидата заполни:
 
 ```text
-candidate_id
+display_ordinal (display-only; freeze assigns HFIC-CAND-*)
+label
 one_sentence_claim
 novelty_class: NEW_MECHANISM | NEW_STATE_INTERACTION | NEW_MEASUREMENT | REFORMULATION | DUPLICATE
 nearest_prior_hypotheses_and_terminals
@@ -521,61 +531,42 @@ decision after collection
 10. `PROVISIONAL_LANE_AND_SYSTEM_DELTA`.
 11. `PROVISIONAL_EXECUTION_UNIT` — одна единица либо `NONE`.
 12. `NON_CLAIMS_AND_HOLDOUT_RECEIPT`.
-13. `CRITIC_INPUT_PACKET` — самодостаточный блок по форме ниже.
+13. `FORGE_DRAFT` — единственный machine handshake. JSON object по
+    `catalog/schemas/hypothesis_forge_draft_v1.schema.json`. Не выдавай
+    `CRITIC_INPUT_PACKET`: его строит только `freeze`.
 
 Не добавляй roadmap из множества задач. Runners-up остаются watchlist, а не backlog tasks.
 
-## A14. Формат CRITIC_INPUT_PACKET
+## A14. Формат FORGE_DRAFT
 
-```yaml
-packet_schema: smial.hypothesis-critic-input
-packet_version: '1.0'
-generator_prompt_version: HFIC-V1.0
-generated_at: <UTC>
-live_git_head: <40-char SHA>
-research_memory_as_of: <UTC>
-owner_focus: <AUTO or text>
-authority:
-  git_mutation: 0
-  experiment_execution: 0
-  provider_api_rpc_wss_calls: 0
-holdouts_not_touched: []
-truth_roots_used: []
-prior_work_queries: []
-selected_candidate:
-  candidate_id: <id>
-  claim: <one sentence>
-  nearest_prior_and_difference: <text>
-  actor_counterparty: <text>
-  mechanism: <text>
-  why_not_arbitraged: <text>
-  population: <text>
-  decision_timestamp: <text>
-  primary_x: <text>
-  primary_y: <taxonomy + definition>
-  horizon_notional: <text>
-  disconfirming_prediction: <text>
-  negative_control: <text>
-  alternative_world: <text>
-  confounders: []
-  pit_leakage_survivorship_risks: []
-  execution_capacity_risks: []
-  available_data_bindings: []
-  missing_or_forward_only_data: []
-  proposed_method: <text>
-  cheapest_falsifier: <text>
-  pass_fail_inconclusive_semantics: <text>
-  decision_unlocked: <text>
-provisional_lane:
-  value: <FAST_LANE_CANDIDATE|CHANGE_LANE_CANDIDATE|DATA_OPTION_CANDIDATE|DENY_CANDIDATE>
-  required_capability_ids: []
-  required_query_recipe_ids: []
-  required_data_bindings: []
-  exact_gap: <NONE or text>
-provisional_execution_unit: <structured summary>
-strongest_rejected_alternative: <structured summary>
-known_unknowns: []
-non_claims: []
+Скопируйте значения `preflight_receipt_id`, `preflight_receipt_sha256`,
+`research_memory_as_of`, `truth_roots_used` и `prior_work_receipts` из
+фактического preflight JSON / `forge_context_packet`. Запрещены пустые arrays
+и timestamps `1970-01-01`. Display ordinals — display-only.
+
+```json
+{
+  "packet_schema": "smial.hypothesis-forge-draft",
+  "packet_version": "1.1",
+  "generator_prompt_version": "HFIC-V1.1",
+  "owner_focus": "AUTO",
+  "preflight_receipt_id": "<from preflight.receipt_id>",
+  "preflight_receipt_sha256": "<from preflight.preflight_receipt_sha256>",
+  "research_memory_as_of": "<from preflight.research_memory_as_of>",
+  "truth_roots_used": ["catalog/catalog_manifest.yaml"],
+  "prior_work_receipts": ["QUERY-HFIC-SESSION-BY-SEARCH-KEY-001"],
+  "authority": {
+    "git_mutation": 0,
+    "experiment_execution": 0,
+    "provider_api_rpc_wss_calls": 0
+  },
+  "candidates": [],
+  "selected_candidate_ref": "<label>",
+  "runner_up_candidate_ref": "<label>",
+  "strongest_rejected_alternative": "<label>",
+  "pareto_factors": [],
+  "non_claims": ["NO_ALPHA"]
+}
 ```
 
 Если поле невозможно заполнить из truth, используй `UNKNOWN` и объясни blocker. Не фабрикуй stable IDs или hashes.

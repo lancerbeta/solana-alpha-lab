@@ -1,0 +1,130 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://smial.local/schemas/hypothesis_critic_result_v1.schema.json",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema",
+    "schema_version",
+    "session_id",
+    "critic_input_packet_sha256",
+    "selected_candidate_id",
+    "selected_definition_sha256",
+    "critic_prompt_version",
+    "isolated_context_attestation",
+    "critic_terminal",
+    "next",
+    "authority",
+    "non_claims"
+  ],
+  "properties": {
+    "schema": {"const": "smial.hypothesis-critic-result"},
+    "schema_version": {"const": "1.1"},
+    "session_id": {"type": "string", "minLength": 1},
+    "critic_input_packet_sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+    "selected_candidate_id": {
+      "type": "string",
+      "pattern": "^HFIC-CAND-[0-9A-F]{12,64}$"
+    },
+    "selected_definition_sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+    "critic_prompt_version": {"const": "HFIC-V1.1"},
+    "critic_model": {"type": "string"},
+    "critic_effort": {"type": "string"},
+    "isolated_context_attestation": {"const": "NEW_CONTEXT_REQUIRED"},
+    "critic_terminal": {
+      "enum": [
+        "PASS_TO_CLASSIFICATION",
+        "PASS_FAST_LANE_READY",
+        "PASS_CHANGE_LANE_REQUIRED",
+        "PASS_DATA_OPTION_REQUIRED",
+        "REVISE_ONCE",
+        "NO_WORTHY_HYPOTHESIS",
+        "OWNER_DECISION_REQUIRED",
+        "KILL_DUPLICATE_OR_PREVIOUSLY_CLOSED",
+        "KILL_MECHANISM",
+        "KILL_PIT_OR_LEAKAGE",
+        "KILL_EXECUTION_OR_ECONOMICS",
+        "KILL_DATA_INFEASIBLE",
+        "KILL_STATISTICALLY_UNIDENTIFIABLE",
+        "KILL_LOW_INFORMATION_VALUE",
+        "KILL_PREPARATORY_LOOP",
+        "KILL_UNBOUND_EVIDENCE"
+      ]
+    },
+    "next": {"type": "string", "minLength": 1},
+    "attack_matrix": {"type": "object"},
+    "material_defects": {"type": "array", "items": {"type": "string"}},
+    "revision_receipt": {"type": ["object", "null"]},
+    "classifier_receipt": {"type": ["object", "null"]},
+    "experiment_spec": {"type": ["object", "null"]},
+    "experiment_spec_packet": {"type": ["object", "null"]},
+    "authority": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["git_mutation", "experiment_execution", "provider_api_rpc_wss_calls"],
+      "properties": {
+        "git_mutation": {"const": 0},
+        "experiment_execution": {"const": 0},
+        "provider_api_rpc_wss_calls": {"const": 0}
+      }
+    },
+    "non_claims": {"type": "array", "items": {"type": "string"}}
+  },
+  "allOf": [
+    {
+      "if": {
+        "properties": {
+          "critic_terminal": {
+            "enum": [
+              "PASS_FAST_LANE_READY",
+              "PASS_CHANGE_LANE_REQUIRED",
+              "PASS_DATA_OPTION_REQUIRED"
+            ]
+          }
+        },
+        "required": ["critic_terminal"]
+      },
+      "then": {
+        "required": ["classifier_receipt"],
+        "properties": {
+          "classifier_receipt": {
+            "type": "object",
+            "required": ["schema"],
+            "properties": {
+              "schema": {"const": "smial.hfic-classifier-receipt"}
+            }
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {"critic_terminal": {"const": "REVISE_ONCE"}},
+        "required": ["critic_terminal"]
+      },
+      "then": {
+        "required": ["revision_receipt"],
+        "properties": {
+          "revision_receipt": {"type": "object", "minProperties": 1}
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {"critic_terminal": {"const": "PASS_TO_CLASSIFICATION"}},
+        "required": ["critic_terminal"]
+      },
+      "then": {
+        "not": {
+          "required": ["classifier_receipt"],
+          "properties": {
+            "classifier_receipt": {
+              "type": "object",
+              "minProperties": 1
+            }
+          }
+        }
+      }
+    }
+  ]
+}
