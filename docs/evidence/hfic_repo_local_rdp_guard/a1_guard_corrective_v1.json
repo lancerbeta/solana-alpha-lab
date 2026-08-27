@@ -1,0 +1,51 @@
+{
+  "as_of": "2026-08-27",
+  "authority": {
+    "closed_family_reopen": 0,
+    "experiment_execution": 0,
+    "hypothesis_forge_slash": 0,
+    "production_rdp_mutated": 0,
+    "provider_api_rpc_wss_calls": 0,
+    "two_rung": 0,
+    "x_y_score": 0
+  },
+  "guard_policy": {
+    "allow_in_repo": "CANONICAL_SUBTREE_ONLY",
+    "canonical_relative": "local/factory_v1/data_plane",
+    "deny": [
+      "REPO_ROOT",
+      "GIT_DIR_AND_DESCENDANTS",
+      "NON_CANONICAL_REPO_DESCENDANT",
+      "UNTRACKED_BUT_NOT_IGNORED",
+      "TRACKED_OR_STAGED_TARGET",
+      "SYMLINK_PATH_COMPONENT",
+      "SOURCE_DATA_ROOT_OVERLAP",
+      "BROAD_OR_ROOT_UNSAFE",
+      "GIT_COMMAND_FAILURE"
+    ],
+    "require": [
+      "GIT_CHECK_IGNORE_LOCAL",
+      "NO_SYMLINK_COMPONENTS",
+      "NO_TRACKED_OR_STAGED_UNDER_TARGET",
+      "NO_GIT_DIR_OVERLAP",
+      "GIT_COMMANDS_SUCCEED"
+    ]
+  },
+  "provider_calls_actual": 0,
+  "regressions": {
+    "canonical_ignored_data_plane": "ALLOW",
+    "external_temp_data_root": "ALLOW",
+    "git_command_failure": "DENY_GIT_GUARD_UNAVAILABLE",
+    "git_descendant": "DENY_DATA_ROOT_INSIDE_GIT",
+    "ignored_non_canonical_local": "DENY_DATA_ROOT_INSIDE_GIT",
+    "non_ignored_repository_descendant": "DENY_DATA_ROOT_INSIDE_GIT",
+    "production_shaped_idempotent_reuse": "IDEMPOTENT_REUSE",
+    "symlink_ancestor": "DENY_DATA_ROOT_SYMLINK",
+    "tracked_or_staged_target": "DENY_DATA_ROOT_INSIDE_GIT"
+  },
+  "schema": "smial.hfic-repo-local-rdp-guard-corrective",
+  "schema_version": "1.0",
+  "task_id": "HFIC_REPO_LOCAL_RDP_GUARD_V1",
+  "terminal": "GUARD_CORRECTED_OFFLINE",
+  "test_module": "tests.test_hfic_repo_local_rdp_guard"
+}

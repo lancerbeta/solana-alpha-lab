@@ -12,6 +12,7 @@ import json
 import os
 import shutil
 import stat
+import subprocess
 import uuid
 from collections.abc import Callable, Mapping
 from datetime import UTC, datetime
@@ -29,6 +30,7 @@ from solana_alpha_lab.factory.early_market_panel_field_semantics import (
     classify_r0_mix,
     prove_r0_taker_volume_mix_semantics,
 )
+from solana_alpha_lab.factory.data_root import DEFAULT_DATA_PLANE_RELATIVE
 from solana_alpha_lab.factory.run_passport import canonical_sha256
 from solana_alpha_lab.storage.manifests import canonical_manifest_bytes
 
@@ -166,23 +168,103 @@ def _git_root_of(path: Path) -> Path | None:
     return None
 
 
+GitRunner = Callable[[Path, list[str]], tuple[int, bytes]]
+
+
+def _run_git(repo: Path, args: list[str]) -> tuple[int, bytes]:
+    try:
+        completed = subprocess.run(
+            ["git", *args],
+            cwd=repo,
+            stdout=subprocess.PIPE,
+            stderr=subprocess.PIPE,
+            check=False,
+            shell=False,
+        )
+    except OSError as exc:
+        raise EarlyMarketPanelImportError("GIT_GUARD_UNAVAILABLE") from exc
+    return completed.returncode, completed.stdout
+
+
+def _posix_relative(root: Path, path: Path) -> str:
+    return path.resolve().relative_to(root.resolve()).as_posix()
+
+
+def _is_canonical_data_plane(worktree: Path, data_root: Path) -> bool:
+    canonical = (worktree / DEFAULT_DATA_PLANE_RELATIVE).resolve()
+    resolved = data_root.resolve()
+    return resolved == canonical or resolved.is_relative_to(canonical)
+
+
+def _any_link_component(path: Path, *, stop_at: Path) -> bool:
+    cursor = path
+    stop = stop_at.resolve()
+    for _ in range(64):
+        if cursor.is_symlink() or (cursor.exists() and _is_link(cursor)):
+            return True
+        try:
+            if cursor.exists() and cursor.resolve() == stop:
+                return stop.is_symlink() or _is_link(stop)
+        except OSError:
+            return True
+        parent = cursor.parent
+        if parent == cursor:
+            return False
+        cursor = parent
+    raise EarlyMarketPanelImportError("GIT_GUARD_UNAVAILABLE")
+
+
+def _git_is_ignored(repo: Path, relative: str, runner: GitRunner) -> bool:
+    code, _payload = runner(repo, ["check-ignore", "-q", "--", relative])
+    if code == 0:
+        return True
+    if code == 1:
+        return False
+    raise EarlyMarketPanelImportError("GIT_GUARD_UNAVAILABLE")
+
+
+def _git_has_tracked_or_staged(repo: Path, relative: str, runner: GitRunner) -> bool:
+    code, tracked = runner(repo, ["ls-files", "-z", "--cached", "--", relative])
+    if code != 0:
+        raise EarlyMarketPanelImportError("GIT_GUARD_UNAVAILABLE")
+    if tracked.strip(b"\0"):
+        return True
+    code, staged = runner(repo, ["diff", "--cached", "--name-only", "-z", "--", relative])
+    if code != 0:
+        raise EarlyMarketPanelImportError("GIT_GUARD_UNAVAILABLE")
+    return bool(staged.strip(b"\0"))
+
+
 def assert_publication_fences(
     *,
     source_root: Path,
     data_root: Path,
     source_receipt_path: Path,
     repo_root: Path | None = None,
+    git_runner: GitRunner | None = None,
 ) -> None:
+    runner = git_runner or _run_git
     _require(not _is_link(source_root), "SOURCE_SYMLINK")
     _require(not _is_link(source_receipt_path), "SOURCE_RECEIPT_SYMLINK")
     if data_root.exists() or data_root.is_symlink():
         _require(not _is_link(data_root), "DATA_ROOT_SYMLINK")
     _require(not _is_broad_unsafe_target(data_root), "DATA_ROOT_UNSAFE")
-    if repo_root is not None:
-        repo = repo_root.resolve()
-        _require(not _paths_overlap(data_root, repo), "DATA_ROOT_INSIDE_GIT")
-    git_root = _git_root_of(data_root)
-    _require(git_root is None, "DATA_ROOT_INSIDE_GIT")
+    worktree = _git_root_of(data_root)
+    if worktree is not None:
+        git_dir = (worktree / ".git").resolve()
+        _require(not _paths_overlap(data_root.resolve(), git_dir), "DATA_ROOT_INSIDE_GIT")
+        _require(data_root.resolve() != worktree.resolve(), "DATA_ROOT_INSIDE_GIT")
+        if repo_root is not None:
+            _require(worktree == repo_root.resolve(), "DATA_ROOT_INSIDE_GIT")
+        _require(_is_canonical_data_plane(worktree, data_root), "DATA_ROOT_INSIDE_GIT")
+        _require(_git_is_ignored(worktree, "local", runner), "DATA_ROOT_INSIDE_GIT")
+        _require(_git_is_ignored(worktree, "local/", runner), "DATA_ROOT_INSIDE_GIT")
+        relative = _posix_relative(worktree, data_root)
+        _require(_git_is_ignored(worktree, relative, runner), "DATA_ROOT_INSIDE_GIT")
+        _require(not _git_has_tracked_or_staged(worktree, relative, runner), "DATA_ROOT_INSIDE_GIT")
+        _require(not _any_link_component(data_root, stop_at=worktree), "DATA_ROOT_SYMLINK")
+    elif repo_root is not None and _paths_overlap(data_root, repo_root.resolve()):
+        raise EarlyMarketPanelImportError("GIT_GUARD_UNAVAILABLE")
     _require(not _paths_overlap(source_root, data_root), "SOURCE_DATA_ROOT_OVERLAP")
     _require(
         not _paths_overlap(source_receipt_path, data_root),
@@ -504,6 +586,7 @@ def import_early_market_panel(
     generation_run_id: str = "RUN-EARLY-MARKET-PANEL-TEMP-001",
     repo_root: Path | None = None,
     publication_hook: Callable[[], None] | None = None,
+    git_runner: GitRunner | None = None,
 ) -> dict[str, Any]:
     _require(source_root is not None, "SOURCE_REQUIRED")
     _require(source_root.is_dir() and not _is_link(source_root), "SOURCE_INVALID")
@@ -512,6 +595,7 @@ def import_early_market_panel(
         data_root=data_root,
         source_receipt_path=source_receipt_path,
         repo_root=repo_root,
+        git_runner=git_runner,
     )
     existing_state = inspect_canonical_targets(data_root)
     receipt_bytes, receipt_obj = _load_json_bytes(source_receipt_path)
@@ -725,6 +809,8 @@ __all__ = [
     "REQUIRED_LABELS",
     "SAMPLE_INVALID",
     "SAMPLE_VALID",
+    "DEFAULT_DATA_PLANE_RELATIVE",
+    "GitRunner",
     "assert_publication_fences",
     "import_early_market_panel",
     "inspect_canonical_targets",
