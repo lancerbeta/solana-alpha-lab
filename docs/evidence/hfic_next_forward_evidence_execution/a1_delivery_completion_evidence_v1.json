@@ -15,7 +15,7 @@
   "implementation_bindings": {
     "configs/experiment_capability_registry_v1.yaml": "c1b28bac61fe7cd7f05236f20c90f616efc37cd665f951c9be14f6851e3c9e8a",
     "configs/forward_h900_quote_capture_v1.yaml": "e335e76eb60dd2102f5dff43b71e8d42b014c6853d9b2de0ec235c0c5f374253",
-    "docs/tasks/HFIC_NEXT_FORWARD_EVIDENCE_EXECUTION_V1.md": "9f91a1fa344585e0a5811e62a05f093835a9c67cebb6ec198b8132ab6d6870bb",
+    "docs/tasks/HFIC_NEXT_FORWARD_EVIDENCE_EXECUTION_V1.md": "4b7b2dd441e00febed7d9dc09cb1eced6af472245c7ba9e85e6a561392e5f28e",
     "scripts/run_forward_h900_quote_capture.py": "c4426fc57f395e81b389f912dca72f3740dd852f7e7a8df1ea8eeb533a3a086a",
     "src/solana_alpha_lab/factory/capabilities.py": "44a6e16e16e1f00d3340cb238e60163fc2f28c675747e39b873498f20457a383",
     "src/solana_alpha_lab/factory/forward_h900_quote_capture.py": "82eef8c715e02ea9d6927ac3e52f2e830deb591f6d5b476aca38b46b3b327552",

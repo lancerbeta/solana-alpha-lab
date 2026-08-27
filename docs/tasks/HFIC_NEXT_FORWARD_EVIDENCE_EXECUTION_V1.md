@@ -26,6 +26,7 @@ managed_write_set:
 - src/solana_alpha_lab/factory/capabilities.py
 - scripts/run_forward_h900_quote_capture.py
 - tests/test_forward_h900_quote_capture.py
+- tests/test_factory_ordinary_market_hypothesis.py
 - catalog/catalog_manifest.yaml
 - catalog/assets/core.yaml
 - catalog/assets/lifecycle.yaml

@@ -38,7 +38,7 @@ RESEARCH_CYCLES = ROOT / "registries/research_cycles.yaml"
 PRODUCT_TERMINAL = "ORDINARY_HYPOTHESIS_COMPOSED_NOT_PROMOTABLE"
 FACTORY_CORE = {
     "src/solana_alpha_lab/factory/runner.py": "d8d22bcb51fb6992d40f09e58274c52e0f9942c12d043cc57b96ffca524e918f",
-    "src/solana_alpha_lab/factory/capabilities.py": "31384242c928eae20e3029a04beef5a50e44c314e0c51d7255799b32c1e7ee65",
+    "src/solana_alpha_lab/factory/capabilities.py": "44a6e16e16e1f00d3340cb238e60163fc2f28c675747e39b873498f20457a383",
     "src/solana_alpha_lab/factory/read_model.py": "1bdc9b61e5a4bb579d93f66d99eac9db7f6aaed44c9d79dcb781f89725d7fef1",
     "src/solana_alpha_lab/factory/workbench.py": "18b16798a2b8d0303586e260a9fcb8272b27cb922e633d9d5e294d69a08ddd66",
     "src/solana_alpha_lab/factory/market_feature_surface.py": "e6bbb655629da5582eaf30571a07ca37dac28aefdb93a4b808cf57ae45958e2b",
