@@ -111,6 +111,7 @@ class HficOperationalClosureContractTests(unittest.TestCase):
         by_id = {item["recipe_id"]: item for item in recipes["recipes"]}
         self.assertIn("QUERY-HFIC-SESSION-BY-SEARCH-KEY-001", by_id)
         self.assertIn("QUERY-HFIC-PENDING-SESSION-001", by_id)
+        self.assertIn("QUERY-HFIC-PLACEHOLDER-TIME-INVENTORY-001", by_id)
         self.assertIn("--search-key", by_id["QUERY-HFIC-SESSION-BY-SEARCH-KEY-001"]["command"])
         self.assertIn("pending", by_id["QUERY-HFIC-PENDING-SESSION-001"]["command"])
 
@@ -142,6 +143,25 @@ class HficOperationalClosureContractTests(unittest.TestCase):
         self.assertIn("revise", text)
         self.assertIn("classify", text)
         self.assertIn("no owner copy/paste", text.casefold())
+        self.assertIn("ZERO_MID_CYCLE_OWNER_INTERVENTION", text)
+        self.assertIn("PASS_TO_CLASSIFICATION", text)
+        self.assertIn("REVISE_ONCE", text)
+        self.assertIn("AUTO_HANDOFF_UNAVAILABLE", text)
+
+    def test_slash_skill_operator_config_zero_mid_cycle_authority(self) -> None:
+        config = load_yaml(CONFIG_PATH)
+        authority = config["slash_session_authority"]
+        self.assertEqual(authority["mid_cycle_owner_interventions"], 0)
+        self.assertEqual(authority["token"], "ZERO_MID_CYCLE_OWNER_INTERVENTION")
+        self.assertIn("PASS_TO_CLASSIFICATION", authority["auto_continue"])
+        self.assertIn("REVISE_ONCE", authority["auto_continue"])
+        self.assertEqual(authority["isolated_critic_unavailable"], "AUTO_HANDOFF_UNAVAILABLE")
+        for path in (FORGE_SKILL_PATH, OPERATOR_PATH, FORGE_COMMAND_PATH):
+            text = path.read_text(encoding="utf-8")
+            self.assertIn("ZERO_MID_CYCLE_OWNER_INTERVENTION", text)
+            self.assertIn("PASS_TO_CLASSIFICATION", text)
+            self.assertIn("REVISE_ONCE", text)
+            self.assertIn("AUTO_HANDOFF_UNAVAILABLE", text)
 
     def test_operator_pack_mentions_v1_1_and_keeps_prompts(self) -> None:
         text = OPERATOR_PATH.read_text(encoding="utf-8")
@@ -165,6 +185,7 @@ class HficOperationalClosureContractTests(unittest.TestCase):
             ROOT / "tests/test_hfic_cli.py",
             ROOT / "tests/test_hfic_session.py",
             ROOT / "tests/test_hfic_preflight.py",
+            ROOT / "tests/test_hfic_provenance_clock.py",
         ):
             text = path.read_text(encoding="utf-8")
             self.assertNotIn("uv run", text)

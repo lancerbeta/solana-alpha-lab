@@ -6,6 +6,7 @@ import hashlib
 import json
 import re
 from collections.abc import Callable, Mapping
+from datetime import datetime
 from pathlib import Path
 from typing import Any
 
@@ -26,8 +27,13 @@ from solana_alpha_lab.factory.commissioning_proof import (
     CommissioningProofError,
     prove_fast_lane_commissioned as _prove_fast_lane_commissioned,
 )
+from solana_alpha_lab.factory.hfic_clock import (
+    Clock,
+    HficClockError,
+    capture_stage_time,
+    render_canonical_utc,
+)
 from solana_alpha_lab.factory.hfic_session import (
-    HFIC_EVENT_TIME,
     PENDING_STATES,
     PROMPT_VERSION,
     evidence_epoch_sha256,
@@ -650,6 +656,8 @@ def persist_forge_context_packet(
     *,
     store: ResearchStore | None = None,
     repo_root: Path | None = None,
+    stage_time: datetime | None = None,
+    clock: Clock | None = None,
 ) -> str:
     body = canonical_json_bytes(packet)
     digest = hashlib.sha256(body).hexdigest()
@@ -671,6 +679,11 @@ def persist_forge_context_packet(
         if not isinstance(raw, str) or raw.encode("utf-8") != body:
             raise HficPreflightError("FORGE_CONTEXT_HASH_CONFLICT")
         return digest
+    try:
+        now = stage_time if stage_time is not None else capture_stage_time(clock)
+        render_canonical_utc(now)
+    except HficClockError as exc:
+        raise HficPreflightError(str(exc)) from exc
     git_sha = "0" * 40
     if repo_root is not None:
         from solana_alpha_lab.factory.document_runner import repository_git_snapshot
@@ -698,15 +711,15 @@ def persist_forge_context_packet(
         hypothesis_version_id=None,
         run_id=None,
         transaction_id=transaction_id,
-        effective_at=HFIC_EVENT_TIME,
-        first_reliable_available_at=HFIC_EVENT_TIME,
+        effective_at=now,
+        first_reliable_available_at=now,
         supersedes_record_id=None,
         payload_json=payload_json,
         payload_sha256=hashlib.sha256(payload_json.encode("utf-8")).hexdigest(),
         schema_version="1.0",
         producer_capability_id="CAP-OFFLINE-CANONICAL-RECEIPT-REPLAY-001",
         producer_git_sha=git_sha,
-        created_at=HFIC_EVENT_TIME,
+        created_at=now,
     )
     active.append([event], transaction_id=transaction_id)
     active.rebuild_projection()
@@ -757,6 +770,8 @@ def build_forge_context_packet(
     commissioning_status: str,
     research_memory_as_of: str,
     store: ResearchStore,
+    stage_time: datetime | None = None,
+    clock: Clock | None = None,
 ) -> tuple[dict[str, Any], str]:
     datasets, warnings = enumerate_rdp_datasets(Path(data_root))
     if not datasets:
@@ -908,6 +923,8 @@ def build_forge_context_packet(
         packet,
         store=store,
         repo_root=repo_root,
+        stage_time=stage_time,
+        clock=clock,
     )
     verify_forge_context_packet(data_root, digest)
     return packet, digest
@@ -921,6 +938,7 @@ def run_preflight(
     auto_commission: bool,
     commission_fn: Callable[[Path, Path], Mapping[str, Any]] | None = None,
     git_snapshot: Mapping[str, Any] | None = None,
+    clock: Clock | None = None,
 ) -> dict[str, Any]:
     try:
         proof = prove_fast_lane_commissioned(data_root)
@@ -937,6 +955,12 @@ def run_preflight(
         store.rebuild_projection()
         digest = store.diagnostics().committed_inventory_sha256
     except ResearchStoreError as exc:
+        raise HficPreflightError(str(exc)) from exc
+
+    try:
+        session_started = capture_stage_time(clock)
+        session_started_text = render_canonical_utc(session_started)
+    except HficClockError as exc:
         raise HficPreflightError(str(exc)) from exc
 
     epoch = evidence_epoch_sha256(evidence_epoch_material(repo_root, data_root))
@@ -983,6 +1007,7 @@ def run_preflight(
         "research_memory_as_of": str(
             proof.get("research_memory_as_of") or "2026-08-25T00:00:00Z"
         ),
+        "session_started_at": session_started_text,
         "session_id": bound_session if action != "STOP" else None,
         "commissioning": {
             "status": proof["status"],
@@ -1012,6 +1037,7 @@ def run_preflight(
             proof.get("research_memory_as_of") or "2026-08-25T00:00:00Z"
         ),
         store=store,
+        stage_time=session_started,
     )
     receipt_body["forge_context_packet"] = packet
     receipt_body["forge_context_packet_sha256"] = packet_digest

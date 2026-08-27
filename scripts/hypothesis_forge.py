@@ -45,6 +45,10 @@ from solana_alpha_lab.factory.hfic_session import (  # noqa: E402
     prove_runtime,
     show_session,
 )
+from solana_alpha_lab.factory.hfic_provenance import (  # noqa: E402
+    apply_provenance_correction,
+    inventory_placeholder_hfic_records,
+)
 from solana_alpha_lab.factory.research_store import (  # noqa: E402
     ResearchStore,
     ResearchStoreError,
@@ -397,6 +401,55 @@ def cmd_prove_runtime(
     return emit(payload)
 
 
+def cmd_inventory_placeholder_times(
+    repo_root: Path,
+    explicit_data_root: Path | None,
+) -> int:
+    data_root = _store_root(repo_root, explicit_data_root)
+    store = ResearchStore(data_root)
+    payload = inventory_placeholder_hfic_records(store)
+    public = {
+        "record_count": payload["record_count"],
+        "counts_by_session_id": payload["counts_by_session_id"],
+        "counts_by_record_kind": payload["counts_by_record_kind"],
+        "counts_by_artifact_kind": payload["counts_by_artifact_kind"],
+        "counts_by_affected_field": payload["counts_by_affected_field"],
+        "inventory_sha256": payload["inventory_sha256"],
+        "original_placeholder_value": payload["original_placeholder_value"],
+        "original_exact_time_status": "UNKNOWN",
+        "chronological_use_forbidden": True,
+        "records": [
+            {
+                "record_id": item["record_id"],
+                "payload_sha256": item["payload_sha256"],
+                "record_kind": item["record_kind"],
+                "artifact_kind": item.get("artifact_kind"),
+                "session_id": item.get("session_id"),
+                "affected_fields": item["affected_fields"],
+            }
+            for item in payload["records"]
+        ],
+        "authority": payload["authority"],
+    }
+    _assert_no_path_leak(public, str(data_root), str(repo_root))
+    return emit(public)
+
+
+def cmd_apply_provenance_correction(
+    repo_root: Path,
+    explicit_data_root: Path | None,
+    *,
+    confirm_append_only: bool,
+) -> int:
+    if not confirm_append_only:
+        raise HficCliError("PROVENANCE_CORRECTION_CONFIRM_REQUIRED")
+    data_root = _store_root(repo_root, explicit_data_root)
+    store = ResearchStore(data_root)
+    payload = apply_provenance_correction(store, repo_root=repo_root)
+    _assert_no_path_leak(payload, str(data_root), str(repo_root))
+    return emit(payload)
+
+
 def cmd_backfill(
     packet_path: Path,
     *,
@@ -474,6 +527,23 @@ def build_parser() -> argparse.ArgumentParser:
     prove = subparsers.add_parser("prove-runtime")
     prove.add_argument("--session-id", required=True)
     prove.add_argument("--format", choices=("json",), default="json")
+
+    inventory = subparsers.add_parser(
+        "inventory-placeholder-times",
+        help="read-only counts of HFIC records with placeholder provenance times",
+    )
+    inventory.add_argument("--format", choices=("json",), default="json")
+
+    correction = subparsers.add_parser(
+        "apply-provenance-correction",
+        help="append-only HFIC provenance-time correction; requires --confirm-append-only after merge phrase",
+    )
+    correction.add_argument("--format", choices=("json",), default="json")
+    correction.add_argument(
+        "--confirm-append-only",
+        action="store_true",
+        help="required; does not rewrite RDP bytes or recover an exact original time",
+    )
     return parser
 
 
@@ -546,6 +616,14 @@ def main(argv: list[str] | None = None) -> int:
             )
         if args.command == "prove-runtime":
             return cmd_prove_runtime(repo_root, args.session_id, args.data_root)
+        if args.command == "inventory-placeholder-times":
+            return cmd_inventory_placeholder_times(repo_root, args.data_root)
+        if args.command == "apply-provenance-correction":
+            return cmd_apply_provenance_correction(
+                repo_root,
+                args.data_root,
+                confirm_append_only=bool(args.confirm_append_only),
+            )
         raise HficCliError(f"HFIC_COMMAND_NOT_READY:{args.command}")
     except (HficCliError, HficSessionError, HficPreflightError, DataRootError, ResearchStoreError) as exc:
         return emit_error(str(exc))

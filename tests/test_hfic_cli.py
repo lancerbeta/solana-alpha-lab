@@ -71,8 +71,37 @@ class HficCliContractTests(unittest.TestCase):
             "classify",
             "backfill-legacy",
             "prove-runtime",
+            "inventory-placeholder-times",
+            "apply-provenance-correction",
         ):
             self.assertIn(command, completed.stdout)
+
+    def test_apply_provenance_correction_requires_confirm_flag(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            completed = run_cli(
+                "apply-provenance-correction",
+                "--format",
+                "json",
+                data_root=Path(tmp),
+            )
+        self.assertNotEqual(completed.returncode, 0, completed.stdout)
+        self.assertIn("PROVENANCE_CORRECTION_CONFIRM_REQUIRED", completed.stderr)
+
+    def test_cli_help_documents_placeholder_inventory_and_correction(self) -> None:
+        completed = run_cli(
+            "apply-provenance-correction",
+            "--help",
+            data_root=Path(tempfile.gettempdir()),
+        )
+        self.assertEqual(completed.returncode, 0, completed.stderr)
+        self.assertIn("--confirm-append-only", completed.stdout)
+        inventory = run_cli(
+            "inventory-placeholder-times",
+            "--help",
+            data_root=Path(tempfile.gettempdir()),
+        )
+        self.assertEqual(inventory.returncode, 0, inventory.stderr)
+        self.assertIn("placeholder", inventory.stdout.casefold())
 
     def test_preflight_json_never_leaks_physical_path(self) -> None:
         with tempfile.TemporaryDirectory() as tmp:

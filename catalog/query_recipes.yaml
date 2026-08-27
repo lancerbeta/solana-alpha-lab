@@ -607,5 +607,31 @@ recipes:
   - MODULE-FACTORY-V1-HFIC-SESSION-001
   output_contract:
     format: json
-    max_records: 5
+    max_records: 1
+- recipe_id: QUERY-HFIC-PLACEHOLDER-TIME-INVENTORY-001
+  record_version: '1.0'
+  purpose: Read-only counts of HFIC records whose envelope or receipt timestamps are the 1970 placeholder. Does not rewrite RDP bytes.
+  kind: local_command
+  read_only: true
+  bounded: true
+  network_required: false
+  write_effects: NONE
+  timeout_seconds: 30
+  command:
+  - uv
+  - run
+  - --locked
+  - --managed-python
+  - python
+  - -B
+  - scripts/hypothesis_forge.py
+  - inventory-placeholder-times
+  - --format
+  - json
+  parameters: []
+  target_asset_ids:
+  - SCRIPT-HYPOTHESIS-FORGE-001
+  - MODULE-FACTORY-V1-HFIC-SESSION-001
+  output_contract:
+    format: json
     max_records: 1

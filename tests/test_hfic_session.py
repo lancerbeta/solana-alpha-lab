@@ -39,6 +39,7 @@ def _preflight_receipt() -> dict[str, object]:
         "owner_focus": "AUTO",
         "live_git_head": git.head_sha.lower(),
         "git_composite_sha256": git.composite_sha256,
+        "session_started_at": "2026-08-27T12:00:00Z",
     }
 
 
@@ -456,6 +457,16 @@ class HficFreezeFinalizeTests(unittest.TestCase):
                 done.get("session_receipt") or {}
             ).get("no_git_fence_receipt")
             self.assertTrue(fence["git_composite_unchanged"])
+            replay = apply_classification(
+                frozen,
+                packet,
+                store=store,
+                repo_root=ROOT,
+                data_root=Path(tmp),
+            )
+            self.assertEqual(replay["session_state"], "SYNTHESIS_COMPLETE")
+            self.assertEqual(replay["session_id"], done["session_id"])
+            self.assertEqual(replay["critic_result_sha256"], done["critic_result_sha256"])
 
     def test_fake_classifier_receipt_is_rejected(self) -> None:
         from solana_alpha_lab.factory.hfic_session import finalize_session

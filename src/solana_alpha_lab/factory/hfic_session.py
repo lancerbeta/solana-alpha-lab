@@ -5,12 +5,19 @@ from __future__ import annotations
 import hashlib
 import json
 from collections.abc import Mapping, Sequence
-from datetime import UTC, datetime
+from datetime import datetime
 from pathlib import Path
 from typing import Any
 
 from jsonschema import Draft202012Validator
 
+from solana_alpha_lab.factory.hfic_clock import (
+    Clock,
+    HficClockError,
+    capture_stage_time,
+    parse_hfic_timestamp,
+    render_canonical_utc,
+)
 from solana_alpha_lab.factory.hfic_identity import (
     HficIdentityError,
     assign_portfolio_ids,
@@ -24,7 +31,6 @@ _SCHEMA_VALIDATORS: dict[str, Draft202012Validator] = {}
 PROMPT_VERSION = "HFIC-V1.1"
 MIN_CANDIDATES = 4
 MAX_CANDIDATES = 6
-HFIC_EVENT_TIME = datetime(1970, 1, 1, tzinfo=UTC)
 PHASE_RANK = {
     "SYNTHESIS_COMPLETE": 0,
     "LEGACY_PARTIAL": 0,
@@ -99,7 +105,6 @@ _FINAL_PASS_TERMINALS = frozenset(
     }
 )
 _CLASSIFIER_RECEIPT_SCHEMA = "smial.hfic-classifier-receipt"
-_PLACEHOLDER_TIME = "1970-01-01T00:00:00Z"
 _FORBIDDEN_DECISION_TERMINALS = frozenset({"PROMOTE", "PROMOTION_LANE"})
 _INTERMEDIATE_CRITIC_TERMINALS = frozenset({"REVISE_ONCE", "PASS_TO_CLASSIFICATION"})
 
@@ -110,6 +115,29 @@ class HficSessionError(ValueError):
     def __init__(self, code: str) -> None:
         self.code = code
         super().__init__(code)
+
+
+def _wrap_clock_error(exc: HficClockError) -> HficSessionError:
+    code = str(exc)
+    if code == "HFIC_TIMESTAMP_MISSING":
+        return HficSessionError("SESSION_STARTED_AT_REQUIRED")
+    return HficSessionError(code)
+
+
+def bound_session_started_at(receipt: Mapping[str, Any] | None) -> datetime:
+    if not isinstance(receipt, Mapping):
+        raise HficSessionError("SESSION_STARTED_AT_REQUIRED")
+    try:
+        return parse_hfic_timestamp(receipt.get("session_started_at"))
+    except HficClockError as exc:
+        raise _wrap_clock_error(exc) from exc
+
+
+def _stage_datetime(clock: Clock | None) -> datetime:
+    try:
+        return capture_stage_time(clock)
+    except HficClockError as exc:
+        raise _wrap_clock_error(exc) from exc
 
 
 def evidence_epoch_sha256(material: Mapping[str, Any]) -> str:
@@ -294,6 +322,7 @@ def bind_preflight_receipt(
     search_key = str(receipt.get("search_key_sha256") or "")
     if not epoch or not focus_key or not search_key:
         raise HficSessionError("PREFLIGHT_RECEIPT_REQUIRED")
+    started = bound_session_started_at(receipt)
     return {
         "evidence_epoch_sha256": epoch,
         "focus_key_sha256": focus_key,
@@ -307,6 +336,7 @@ def bind_preflight_receipt(
         ),
         "commissioning_run_id": proof.get("run_id"),
         "provider_calls_actual": 0,
+        "session_started_at": render_canonical_utc(started),
     }
 
 
@@ -559,6 +589,15 @@ def freeze_draft(
             if isinstance(preflight_receipt, Mapping)
             else None
         ),
+        "session_started_at": (
+            bound.get("session_started_at")
+            if bound is not None
+            else (
+                preflight_receipt.get("session_started_at")
+                if isinstance(preflight_receipt, Mapping)
+                else None
+            )
+        ),
         "identities": [
             {
                 "candidate_id": item.candidate_id,
@@ -582,6 +621,7 @@ def freeze_draft(
             repo_root=repo_root,
             identities=identities,
             draft=draft,
+            stage_time=bound_session_started_at(preflight_receipt),
         )
         store.rebuild_projection()
         result["store_inventory_digest"] = store.diagnostics().committed_inventory_sha256
@@ -716,6 +756,15 @@ def _freeze_no_worthy(
         "live_git_head": git_head,
         "research_memory_as_of": memory_as_of,
         "revision_count": 0,
+        "session_started_at": (
+            bound.get("session_started_at")
+            if bound is not None
+            else (
+                preflight_receipt.get("session_started_at")
+                if isinstance(preflight_receipt, Mapping)
+                else None
+            )
+        ),
         "truth_roots_used": truth_roots,
         "prior_work_receipts": prior_work,
     }
@@ -729,6 +778,7 @@ def _freeze_no_worthy(
             identities=identities,
             draft=draft,
             preflight_receipt=preflight_receipt,
+            stage_time=bound_session_started_at(preflight_receipt),
         )
         store.rebuild_projection()
         result["store_inventory_digest"] = store.diagnostics().committed_inventory_sha256
@@ -743,13 +793,21 @@ def persist_no_worthy_session(
     identities: Sequence[Any],
     draft: Mapping[str, Any] | None = None,
     preflight_receipt: Mapping[str, Any] | None = None,
+    stage_time: datetime | None = None,
 ) -> None:
     from solana_alpha_lab.factory.document_runner import repository_git_snapshot
     from solana_alpha_lab.factory.research_store import RecordKind, ResearchEvent
 
-    git = repository_git_snapshot(Path(repo_root))
-    now = HFIC_EVENT_TIME
     session_id = str(frozen["session_id"])
+    existing = load_session_bundle(store, session_id)
+    if existing is not None:
+        return
+    git = repository_git_snapshot(Path(repo_root))
+    now = (
+        _stage_datetime(lambda: stage_time)
+        if stage_time is not None
+        else bound_session_started_at(preflight_receipt)
+    )
     transaction_id = f"RESEARCH-TXN-{session_id.replace('HFIC-SESS-', 'HFICNW-')}"
     producer = "CAP-OFFLINE-CANONICAL-RECEIPT-REPLAY-001"
 
@@ -794,7 +852,8 @@ def persist_no_worthy_session(
             context_bytes = _canonical_bytes(packet)
             if not isinstance(context_digest, str) or len(context_digest) != 64:
                 context_digest = hashlib.sha256(context_bytes).hexdigest()
-    created_at = HFIC_EVENT_TIME.strftime("%Y-%m-%dT%H:%M:%SZ")
+    created_at = render_canonical_utc(now)
+    started_at = str(frozen.get("session_started_at") or created_at)
     receipt = {
         "session_id": session_id,
         "session_state": "SYNTHESIS_COMPLETE",
@@ -826,6 +885,7 @@ def persist_no_worthy_session(
             "provider_calls_actual": 0,
         },
         "created_at": created_at,
+        "session_started_at": started_at,
     }
     if repo_root is not None:
         _validate_json_schema(
@@ -1012,6 +1072,7 @@ def persist_frozen_session(
     repo_root: Any,
     identities: Sequence[Any],
     draft: Mapping[str, Any] | None = None,
+    stage_time: datetime | None = None,
 ) -> None:
     """Append freeze records to an existing ResearchStore. Optional for unit tests."""
 
@@ -1020,9 +1081,16 @@ def persist_frozen_session(
     from solana_alpha_lab.factory.document_runner import repository_git_snapshot
     from solana_alpha_lab.factory.research_store import RecordKind, ResearchEvent
 
-    git = repository_git_snapshot(Path(repo_root))
-    now = HFIC_EVENT_TIME
     session_id = str(frozen["session_id"])
+    existing = load_session_bundle(store, session_id)
+    if existing is not None:
+        return
+    git = repository_git_snapshot(Path(repo_root))
+    now = (
+        _stage_datetime(lambda: stage_time)
+        if stage_time is not None
+        else bound_session_started_at(frozen)
+    )
     transaction_id = f"RESEARCH-TXN-{session_id.replace('HFIC-SESS-', 'HFIC-')}"
     producer = "CAP-OFFLINE-CANONICAL-RECEIPT-REPLAY-001"
 
@@ -1184,6 +1252,7 @@ def persist_legacy_session(
     identities: Sequence[Any],
     packet: Mapping[str, Any],
     repo_root: Any,
+    clock: Clock | None = None,
 ) -> None:
     from pathlib import Path
 
@@ -1191,7 +1260,7 @@ def persist_legacy_session(
     from solana_alpha_lab.factory.research_store import RecordKind, ResearchEvent
 
     git = repository_git_snapshot(Path(repo_root))
-    now = HFIC_EVENT_TIME
+    now = _stage_datetime(clock)
     session_id = str(receipt["session_id"])
     transaction_id = f"RESEARCH-TXN-HFICLEG-{session_id[-16:]}"
     producer = "CAP-OFFLINE-CANONICAL-RECEIPT-REPLAY-001"
@@ -1388,10 +1457,16 @@ def _require_critic_identity(
     return selected_id
 
 
-def _make_event_factory(repo_root: Any, git: Any, session_id: str, producer: str):
+def _make_event_factory(
+    repo_root: Any,
+    git: Any,
+    session_id: str,
+    producer: str,
+    stage_time: datetime,
+):
     from solana_alpha_lab.factory.research_store import RecordKind, ResearchEvent
 
-    now = HFIC_EVENT_TIME
+    now = stage_time
 
     def event(
         *,
@@ -1818,15 +1893,25 @@ def persist_intermediate_cycle(
     repo_root: Any,
     phase: str,
     extra_artifacts: Sequence[Mapping[str, Any]] | None = None,
+    clock: Clock | None = None,
 ) -> dict[str, Any]:
     from solana_alpha_lab.factory.document_runner import repository_git_snapshot
     from solana_alpha_lab.factory.research_store import RecordKind
 
-    git = repository_git_snapshot(Path(repo_root))
     session_id = str(frozen["session_id"])
-    transaction_id = f"RESEARCH-TXN-HFICINT-{session_id[-16:]}"
+    existing = load_session_bundle(store, session_id)
+    if existing is not None and existing.get("session_state") == phase:
+        return existing
+    git = repository_git_snapshot(Path(repo_root))
+    stage_time = _stage_datetime(clock)
+    phase_token = "REV" if phase == "REVISION_REQUIRED" else "CLS"
+    transaction_id = f"RESEARCH-TXN-HFICINT-{phase_token}-{session_id[-12:]}"
     event = _make_event_factory(
-        repo_root, git, session_id, "CAP-OFFLINE-CANONICAL-RECEIPT-REPLAY-001"
+        repo_root,
+        git,
+        session_id,
+        "CAP-OFFLINE-CANONICAL-RECEIPT-REPLAY-001",
+        stage_time,
     )
     critic_bytes = _canonical_bytes(critic_result)
     critic_result_sha256 = hashlib.sha256(critic_bytes).hexdigest()
@@ -1928,6 +2013,7 @@ def apply_revision(
     *,
     store: Any,
     repo_root: Any,
+    clock: Clock | None = None,
 ) -> dict[str, Any]:
     from solana_alpha_lab.factory.document_runner import repository_git_snapshot
     from solana_alpha_lab.factory.research_store import RecordKind
@@ -1935,6 +2021,8 @@ def apply_revision(
     existing = load_session_bundle(store, str(frozen["session_id"]))
     if existing is None:
         raise HficSessionError("SESSION_NOT_FOUND")
+    if existing.get("session_state") == "REVISED_AWAITING_CRITIC":
+        return existing
     if existing.get("session_state") != "REVISION_REQUIRED":
         raise HficSessionError("REVISION_NOT_PENDING")
     if int(existing.get("revision_count") or 0) >= 1:
@@ -2107,9 +2195,14 @@ def apply_revision(
     ]
     git = repository_git_snapshot(Path(repo_root))
     session_id = str(frozen["session_id"])
+    stage_time = _stage_datetime(clock)
     transaction_id = f"RESEARCH-TXN-HFICREV-{session_id[-16:]}"
     event = _make_event_factory(
-        repo_root, git, session_id, "CAP-OFFLINE-CANONICAL-RECEIPT-REPLAY-001"
+        repo_root,
+        git,
+        session_id,
+        "CAP-OFFLINE-CANONICAL-RECEIPT-REPLAY-001",
+        stage_time,
     )
     records = [
         event(
@@ -2199,10 +2292,13 @@ def apply_classification(
     store: Any,
     repo_root: Any,
     data_root: Any,
+    clock: Clock | None = None,
 ) -> dict[str, Any]:
     existing = load_session_bundle(store, str(frozen["session_id"]))
     if existing is None:
         raise HficSessionError("SESSION_NOT_FOUND")
+    if existing.get("session_state") == "SYNTHESIS_COMPLETE":
+        return existing
     if existing.get("session_state") != "AWAITING_CLASSIFICATION":
         raise HficSessionError("CLASSIFICATION_NOT_PENDING")
     critic_result = dict(existing.get("critic_result") or {})
@@ -2223,6 +2319,7 @@ def apply_classification(
         store=store,
         repo_root=repo_root,
         data_root=data_root,
+        clock=clock,
     )
 
 
@@ -2233,6 +2330,7 @@ def finalize_session(
     store: Any,
     repo_root: Any,
     data_root: Any = None,
+    clock: Clock | None = None,
 ) -> dict[str, Any]:
     from solana_alpha_lab.factory.document_runner import repository_git_snapshot
     from solana_alpha_lab.factory.research_store import RecordKind
@@ -2257,6 +2355,8 @@ def finalize_session(
             revision_count = max(revision_count, int(existing.get("revision_count") or 0))
         if revision_count >= 1:
             raise HficSessionError("REVISION_BUDGET_EXHAUSTED")
+        if existing is not None and existing.get("session_state") == "REVISION_REQUIRED":
+            return existing
         if not isinstance(critic_result.get("revision_receipt"), Mapping):
             raise HficSessionError("REVISION_RECEIPT_REQUIRED")
         return persist_intermediate_cycle(
@@ -2265,17 +2365,21 @@ def finalize_session(
             critic_result,
             repo_root=repo_root,
             phase="REVISION_REQUIRED",
+            clock=clock,
         )
     if terminal == "PASS_TO_CLASSIFICATION":
         fake = critic_result.get("classifier_receipt")
         if fake:
             raise HficSessionError("CLASSIFIER_RECEIPT_INVALID")
+        if existing is not None and existing.get("session_state") == "AWAITING_CLASSIFICATION":
+            return existing
         return persist_intermediate_cycle(
             store,
             frozen,
             critic_result,
             repo_root=repo_root,
             phase="AWAITING_CLASSIFICATION",
+            clock=clock,
         )
     classifier_receipt = None
     if terminal in _FINAL_PASS_TERMINALS:
@@ -2298,16 +2402,18 @@ def finalize_session(
     decision_kind, reason = map_critic_terminal_to_decision(terminal)
     git_before = repository_git_snapshot(Path(repo_root))
     session_id = str(frozen["session_id"])
+    stage_time = _stage_datetime(clock)
+    created_at = render_canonical_utc(stage_time)
     transaction_id = f"RESEARCH-TXN-HFICFIN-{session_id[-16:]}"
     event = _make_event_factory(
         repo_root,
         git_before,
         session_id,
         "CAP-OFFLINE-CANONICAL-RECEIPT-REPLAY-001",
+        stage_time,
     )
     critic_bytes = _canonical_bytes(critic_result)
     critic_result_sha256 = hashlib.sha256(critic_bytes).hexdigest()
-    created_at = HFIC_EVENT_TIME.strftime("%Y-%m-%dT%H:%M:%SZ")
     decision_ids: list[str] = []
     records = [
         event(
@@ -2440,6 +2546,9 @@ def finalize_session(
         },
         "created_at": created_at,
     }
+    started = frozen.get("session_started_at")
+    if isinstance(started, str) and started.strip():
+        receipt["session_started_at"] = started
     if repo_root is not None:
         _validate_json_schema(
             receipt,
@@ -2718,6 +2827,50 @@ def load_session_bundle(store: Any, session_id: str) -> dict[str, Any] | None:
     return bundle
 
 
+def _redact_placeholder_times(value: object) -> object:
+    from solana_alpha_lab.factory.hfic_clock import is_placeholder_timestamp
+
+    if isinstance(value, Mapping):
+        return {key: _redact_placeholder_times(item) for key, item in value.items()}
+    if isinstance(value, list):
+        return [_redact_placeholder_times(item) for item in value]
+    if is_placeholder_timestamp(value):
+        return "UNKNOWN"
+    return value
+
+
+def _display_session_receipt(receipt: object, status: str) -> object:
+    from solana_alpha_lab.factory.hfic_clock import is_placeholder_timestamp
+    from solana_alpha_lab.factory.hfic_provenance import PROVENANCE_CORRECTED
+
+    if not isinstance(receipt, Mapping):
+        return receipt
+    displayed = dict(receipt)
+    placeholder = is_placeholder_timestamp(displayed.get("created_at")) or is_placeholder_timestamp(
+        displayed.get("session_started_at")
+    )
+    if status == PROVENANCE_CORRECTED or placeholder:
+        if is_placeholder_timestamp(displayed.get("created_at")):
+            displayed["created_at"] = "UNKNOWN"
+        if is_placeholder_timestamp(displayed.get("session_started_at")):
+            displayed["session_started_at"] = "UNKNOWN"
+        displayed["original_exact_time_status"] = "UNKNOWN"
+        displayed["chronological_use_forbidden"] = True
+        displayed["recovered_exact_time"] = False
+    return displayed
+
+
+def _session_provenance_status(store: Any, session_id: str) -> str:
+    from solana_alpha_lab.factory.hfic_provenance import provenance_status_for_session
+
+    try:
+        return provenance_status_for_session(store, session_id)
+    except HficSessionError as exc:
+        if str(exc) == "PROVENANCE_TIME_UNCOVERED":
+            return "PLACEHOLDER_UNCOVERED"
+        raise
+
+
 def show_session(store: Any, session_id: str, *, repo_root: Any = None) -> dict[str, Any]:
     bundle = load_session_bundle(store, session_id)
     if bundle is None:
@@ -2731,6 +2884,7 @@ def show_session(store: Any, session_id: str, *, repo_root: Any = None) -> dict[
         snap = repository_git_snapshot(Path(repo_root))
         live_git_head = snap.head_sha.lower()
         composite = snap.composite_sha256
+    provenance_status = _session_provenance_status(store, session_id)
     payload = {
         "session_id": bundle["session_id"],
         "session_state": bundle["session_state"],
@@ -2743,7 +2897,7 @@ def show_session(store: Any, session_id: str, *, repo_root: Any = None) -> dict[
         "candidate_ids": bundle.get("candidate_ids") or [],
         "selected_candidate_id": bundle.get("selected_candidate_id"),
         "runner_up_candidate_id": bundle.get("runner_up_candidate_id"),
-        "critic_input_packet": bundle.get("critic_input_packet"),
+        "critic_input_packet": _redact_placeholder_times(bundle.get("critic_input_packet")),
         "critic_input_packet_sha256": bundle.get("critic_input_packet_sha256"),
         "critic_result_sha256": bundle.get("critic_result_sha256"),
         "critic_terminal": bundle.get("critic_terminal"),
@@ -2752,7 +2906,10 @@ def show_session(store: Any, session_id: str, *, repo_root: Any = None) -> dict[
         "next": bundle.get("next") or "STOP",
         "decisions": bundle.get("decisions") or {},
         "authority": bundle["authority"],
-        "session_receipt": bundle.get("session_receipt"),
+        "session_receipt": _display_session_receipt(
+            bundle.get("session_receipt"), provenance_status
+        ),
+        "provenance_time_status": provenance_status,
         "no_git_fence_receipt": (
             (bundle.get("session_receipt") or {}).get("no_git_fence_receipt")
             or {
@@ -2785,6 +2942,10 @@ def show_session(store: Any, session_id: str, *, repo_root: Any = None) -> dict[
         ),
         "candidates_retrievable": len(bundle.get("candidates") or []) >= 4,
     }
+    if provenance_status != "VALID":
+        payload["original_exact_time_status"] = "UNKNOWN"
+        payload["chronological_use_forbidden"] = True
+        payload["recovered_exact_time"] = False
     return payload
 
 
@@ -2901,11 +3062,23 @@ def prove_runtime(
     if provider_calls != 0:
         raise HficSessionError("PROVIDER_CALLS_NONZERO")
     _verify_store_reference_resolution(store, bundle)
-    return {
+    from solana_alpha_lab.factory.hfic_provenance import (
+        PROVENANCE_CORRECTED,
+        resolve_provenance_status,
+    )
+
+    provenance_status = resolve_provenance_status(store)
+    payload = {
         **shown,
         "runtime_no_git": "PROVEN",
         "provider_calls_actual": provider_calls,
         "git_composite_unchanged": True,
         "candidates_retrievable": shown["candidates_retrievable"],
         "artifacts_retrievable": shown["artifacts_retrievable"],
+        "provenance_time_status": provenance_status,
+        "recovered_exact_time": False,
     }
+    if provenance_status == PROVENANCE_CORRECTED:
+        payload["original_exact_time_status"] = "UNKNOWN"
+        payload["chronological_use_forbidden"] = True
+    return payload

@@ -1,0 +1,81 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://smial.local/schemas/hfic_provenance_time_correction_v1.schema.json",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema",
+    "schema_version",
+    "correction_id",
+    "artifact_kind",
+    "hfic_protocol",
+    "affected_records",
+    "original_placeholder_value",
+    "original_exact_time_status",
+    "chronological_use_forbidden",
+    "correction_created_at",
+    "producer_git_sha",
+    "reason_code",
+    "inventory_sha256",
+    "authority",
+    "non_claims"
+  ],
+  "properties": {
+    "schema": {"const": "smial.hfic-provenance-time-correction"},
+    "schema_version": {"const": "1.0"},
+    "correction_id": {"type": "string", "pattern": "^HFIC-ART-PROVENANCE-CORR-[0-9A-F]{12,64}$"},
+    "artifact_kind": {"const": "PROVENANCE_TIME_CORRECTION"},
+    "hfic_protocol": {"const": "HFIC-V1.1"},
+    "affected_records": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "record_id",
+          "payload_sha256",
+          "record_kind",
+          "affected_fields"
+        ],
+        "properties": {
+          "record_id": {"type": "string", "minLength": 1},
+          "payload_sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+          "record_kind": {"type": "string", "minLength": 1},
+          "artifact_kind": {"type": ["string", "null"]},
+          "session_id": {"type": ["string", "null"]},
+          "affected_fields": {
+            "type": "array",
+            "minItems": 1,
+            "items": {"type": "string", "minLength": 1}
+          }
+        }
+      }
+    },
+    "original_placeholder_value": {"const": "1970-01-01T00:00:00Z"},
+    "original_exact_time_status": {"const": "UNKNOWN"},
+    "chronological_use_forbidden": {"const": true},
+    "correction_created_at": {
+      "type": "string",
+      "pattern": "^20[0-9]{2}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}Z$"
+    },
+    "producer_git_sha": {"type": "string", "pattern": "^[0-9a-f]{40}$"},
+    "reason_code": {"const": "HFIC_PLACEHOLDER_PROVENANCE_TIME"},
+    "inventory_sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+    "authority": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["git_mutation", "experiment_execution", "provider_api_rpc_wss_calls"],
+      "properties": {
+        "git_mutation": {"const": 0},
+        "experiment_execution": {"const": 0},
+        "provider_api_rpc_wss_calls": {"const": 0}
+      }
+    },
+    "non_claims": {
+      "type": "array",
+      "minItems": 1,
+      "items": {"type": "string", "minLength": 1}
+    }
+  }
+}
