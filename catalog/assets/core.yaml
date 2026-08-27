@@ -19729,7 +19729,7 @@ records:
   as_of: '2026-08-15'
   truth_owner: CTRL-DELIVERY-HARNESS-001
   location: {kind: git_path, logical_uri: 'repo://delivery-harness/harness.yaml', repository_path: delivery-harness/harness.yaml}
-  integrity: {kind: sha256, sha256: bd196187f458bf5e7195c965d0814ee13a92ade04d6f58dd83652aa27fec7563}
+  integrity: {kind: sha256, sha256: 80401bfbb49dc6197dbdbcd62eba02d69f0629a49c6b7af27a2abe1846c039b1}
   access: *t25_read_file
   relations:
   - {relation_type: governed_by, target_asset_id: CTRL-DELIVERY-HARNESS-001}
