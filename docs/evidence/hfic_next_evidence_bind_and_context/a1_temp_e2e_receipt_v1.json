@@ -1,0 +1,38 @@
+{
+  "as_of": "2026-08-27",
+  "authority": {
+    "experiment_execution": 0,
+    "git_mutation": 0,
+    "provider_api_rpc_wss_calls": 0
+  },
+  "checks": {
+    "closed_family_visible": true,
+    "context_artifact_hash_bound": true,
+    "context_artifact_missing_breaks_prove": true,
+    "fail_closed_publication": true,
+    "feature_hint_r0_taker_volume_mix": true,
+    "feature_unusable_when_yield_below_10": true,
+    "feature_usable_when_yield_at_least_10": true,
+    "hash_corruption_fail_closed": true,
+    "import_then_epoch_changed": true,
+    "no_hypothesis_forge_slash": true,
+    "no_x_y_score": true,
+    "observed_at_required": true,
+    "prove_runtime_no_worthy": true,
+    "provider_calls": 0,
+    "repeat_import_idempotent": true,
+    "runtime_git_unchanged": true,
+    "second_registered_dataset_and_capability_enumerated": true,
+    "selected_path_resolves_context_artifact": true
+  },
+  "dataset_manifest_id": "DATASET-MANIFEST-EARLY-MARKET-PANEL-VALUATION-WINDOW-001",
+  "feature_hint": "R0_TAKER_VOLUME_MIX",
+  "provider_calls_actual": 0,
+  "schema": "smial.hfic-next-evidence-temp-e2e-receipt",
+  "schema_version": "1.0",
+  "source_kind": "TEMP_FIXTURE",
+  "task_id": "HFIC_NEXT_EVIDENCE_BIND_AND_CONTEXT_V1",
+  "terminal": "TEMP_E2E_PASS",
+  "test_module": "tests.test_hfic_forge_context_and_no_worthy",
+  "test_name": "TempBindAndContextE2ETests.test_import_epoch_preflight_context_no_worthy_and_fail_closed"
+}

@@ -1,0 +1,67 @@
+{
+  "acceptance_id": "HFIC-NEXT-EVIDENCE-BIND-COMPLETION-002",
+  "active_stop_conditions": [],
+  "as_of": "2026-08-27",
+  "base_main": "240843deef71835b60c04a1dfa371e767ec0af30",
+  "capability_radar_now": "NONE",
+  "cloud_bundle_mode": "OWNER_MANAGED_OPTIONAL_EXPORT",
+  "cloud_bundle_required_by_harness": false,
+  "cloud_bundle_smoke_required": false,
+  "factory_fit": {
+    "path": "docs/evidence/hfic_next_evidence_bind_and_context/a1_delivery_factory_fit_v1.json",
+    "sha256": "b00d8fdece4585e8e9a0d1e71745494b0b1c39f38e5f79c0e3e03f91ae4c210a",
+    "verdict": "PASS"
+  },
+  "implementation_bindings": {
+    "catalog/schemas/hypothesis_forge_draft_v1.schema.json": "721171e48e38e35baa5ad8234292c18076e180cf4ef3c8b5744d221b46c9fe60",
+    "catalog/schemas/hypothesis_forge_session_receipt_v1.schema.json": "8e835b993750ecbade3d8981e47bd455356cc104fd808111feec84f6b0a9456a",
+    "docs/evidence/hfic_next_evidence_bind_and_context/a1_field_semantics_proof_v1.json": "f6cdaf579de4616f50679a0b9ddf8314177278bfb94fb3538772979040fa98ea",
+    "docs/evidence/hfic_next_evidence_bind_and_context/a1_temp_e2e_receipt_v1.json": "fcaca1c69110fd8390456077abfe219a7b102f69ce1d01f962defbe44e84f07f",
+    "docs/tasks/HFIC_NEXT_EVIDENCE_BIND_AND_CONTEXT_V1.md": "6cb7b8effa4a5a73218ddc1bc139fac2ee10bbfd4933dd92eae3c485f00a4ce4",
+    "scripts/import_early_market_panel.py": "9a2c15bf0620a8002f66121066815714cdfd3484d3e4c2defc8cc9382ff070c2",
+    "src/solana_alpha_lab/factory/early_market_panel_field_semantics.py": "4d556063d1dec495852eb818e8e4155f743ae00996b461d0642d9476f4f3e4e4",
+    "src/solana_alpha_lab/factory/early_market_panel_importer.py": "f5f392e8ac1750861ab04ee230e74c8b1d63d0cc6ea8098153047855c12ff9c9",
+    "src/solana_alpha_lab/factory/hfic_preflight.py": "fc7d1cbb913154407d72d10df0be1751d254048ca117005c4660507a7c28d6e1",
+    "src/solana_alpha_lab/factory/hfic_session.py": "69f678daf63e6d4a174041de274442d3460021b3800b20a113f9752656bce13a",
+    "tests/test_early_market_panel_importer.py": "15045cbe5fcd0b2309e9abfdd80a7ec87d1e9264a0525a2f844dc13777f44fa8",
+    "tests/test_hfic_forge_context_and_no_worthy.py": "3bffb71b952d7d0efc611474dde7458405f280e61d77c9d8566383e1ae8c6b29"
+  },
+  "non_claims": [
+    "NO_ALPHA",
+    "NO_CANONICAL_DONE",
+    "NO_PROVIDER_CALLS",
+    "NO_X_Y_SCORE",
+    "NO_HYPOTHESIS_FORGE_SLASH",
+    "NO_POST_MERGE_PRODUCTION_BIND"
+  ],
+  "owner_attention_triggers": {
+    "auth_or_access_recovery": false,
+    "external_material_action": false,
+    "material_owner_decision": false,
+    "unresolved_safety_or_truth_conflict": false,
+    "user_only_activation": false
+  },
+  "schema": "smial.delivery-completion-evidence",
+  "schema_version": "1.0",
+  "side_effects": {
+    "cash_spend_usd_cents": 0,
+    "credentials_read": 0,
+    "provider_api_rpc_wss_calls": 0,
+    "wallet_signer_transaction": 0
+  },
+  "state_change": "PRE_MERGE_FAIL_CLOSED_PUBLICATION_SAMPLE_FLOOR_ENUMERATED_CONTEXT",
+  "task_id": "HFIC_NEXT_EVIDENCE_BIND_AND_CONTEXT_V1",
+  "validation": {
+    "full_gate": "ENFORCED_BY_PROJECT_BOUND_VALIDATION",
+    "github_ci": "ENFORCED_LIVE_AT_GUARDED_MERGE",
+    "independent_review": {
+      "path": "docs/evidence/hfic_next_evidence_bind_and_context/a1_delivery_independent_review_v1.json",
+      "sha256": "8c8fad9698e4faa3e8f32c12567ded07aa985e0b1f1413b60465f2a4dee57ba3",
+      "verdict": "PASS"
+    },
+    "project_checks": [
+      "PASS_HFIC_NEXT_EVIDENCE_CORRECTIVE_REGRESSIONS"
+    ],
+    "targeted": "PASS_HFIC_NEXT_EVIDENCE_CORRECTIVE_REGRESSIONS"
+  }
+}

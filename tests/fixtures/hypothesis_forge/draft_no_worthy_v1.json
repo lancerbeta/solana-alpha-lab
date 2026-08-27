@@ -1,0 +1,84 @@
+{
+  "packet_schema": "smial.hypothesis-forge-draft",
+  "packet_version": "1.1",
+  "generator_prompt_version": "HFIC-V1.1",
+  "owner_focus": "AUTO",
+  "preflight_receipt_id": "HFIC-PREFLIGHT-FIXTURE-001",
+  "preflight_receipt_sha256": "11aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+  "research_memory_as_of": "2026-08-25T00:00:00Z",
+  "truth_roots_used": [
+    "catalog/catalog_manifest.yaml",
+    "configs/hypothesis_forge_independent_critic_v1.yaml"
+  ],
+  "prior_work_receipts": [
+    "QUERY-HFIC-EXACT-RELATED-PRIOR-001",
+    "QUERY-HFIC-SESSION-BY-SEARCH-KEY-001"
+  ],
+  "authority": {
+    "git_mutation": 0,
+    "experiment_execution": 0,
+    "provider_api_rpc_wss_calls": 0
+  },
+  "candidates": [
+    {
+      "display_ordinal": 1,
+      "label": "HFIC-C1-CORROBORATED-EARLY-COHORT-H900-PATHRISK",
+      "claim": "Corroborated linked-cohort supply share at T+5 increases H900 MEU.",
+      "mechanism": "Synchronized unwind or liquidity withdrawal.",
+      "actor_counterparty": "linked early-wallet cohort versus later buyers",
+      "population": "ICP-EARLY-PUMPFUN-V1 age 300-899s",
+      "decision_timestamp": "frozen T+5",
+      "primary_x_family": "CORROBORATED_EARLY_COHORT_SUPPLY_SHARE",
+      "primary_y": "MARKET_EXECUTION_UNAVAILABLE",
+      "horizon_notional": "H900 / 0.01 SOL quote-only reverse sell",
+      "negative_control": "service-signer-only links",
+      "cheapest_falsifier": "fail TASK-24 reactivation floors before collection"
+    },
+    {
+      "display_ordinal": 2,
+      "label": "HFIC-C2-RAW-CONCENTRATION-MEU-REFRAME",
+      "claim": "Raw topHoldersPercentage predicts H900 MEU rather than numeric return.",
+      "mechanism": "Concentrated holders synchronously unload.",
+      "actor_counterparty": "concentrated holders versus remaining float",
+      "population": "ICP-EARLY-PUMPFUN-V1 age 300-899s",
+      "decision_timestamp": "frozen T+5",
+      "primary_x_family": "RAW_TOP_HOLDERS_PERCENTAGE",
+      "primary_y": "MARKET_EXECUTION_UNAVAILABLE",
+      "horizon_notional": "H900 / 0.01 SOL quote-only reverse sell",
+      "negative_control": "matched liquidity without concentration tail",
+      "cheapest_falsifier": "fresh outcome-blind window"
+    },
+    {
+      "display_ordinal": 3,
+      "label": "HFIC-C3-PREDECISION-ROUTE-FRAGMENTATION-RECOVERY",
+      "claim": "Route fragmentation at equal T0 price path predicts H900 route disappearance.",
+      "mechanism": "LP or router inventory fragmentation before decision.",
+      "actor_counterparty": "LP/router/MM inventory versus small-notional buyers",
+      "population": "ICP-EARLY-PUMPFUN-V1 age 300-899s",
+      "decision_timestamp": "frozen T0 quote snapshot",
+      "primary_x_family": "ROUTE_FRAGMENTATION",
+      "primary_y": "MARKET_EXECUTION_UNAVAILABLE",
+      "horizon_notional": "H900 / 0.01 SOL quote-only reverse sell",
+      "negative_control": "provider-wide route outage",
+      "cheapest_falsifier": "fragmentation bucket plus outage control"
+    },
+    {
+      "display_ordinal": 4,
+      "label": "HFIC-C4-CREATOR-LINKED-OUTFLOW-WITHDRAWAL",
+      "claim": "Creator-linked native outflow before T+5 predicts later exit-route withdrawal.",
+      "mechanism": "Creator or funder withdraws inventory before decision.",
+      "actor_counterparty": "creator/funder versus LPs and late buyers",
+      "population": "ICP-EARLY-PUMPFUN-V1 age 300-899s",
+      "decision_timestamp": "frozen T+5",
+      "primary_x_family": "CREATOR_LINKED_OUTFLOW",
+      "primary_y": "MARKET_EXECUTION_UNAVAILABLE",
+      "horizon_notional": "H900 / 0.01 SOL quote-only reverse sell",
+      "negative_control": "equivalent outflow from unrelated service wallets",
+      "cheapest_falsifier": "bounded availability audit before effect study"
+    }
+  ],
+  "runner_up_candidate_ref": "HFIC-C3-PREDECISION-ROUTE-FRAGMENTATION-RECOVERY",
+  "strongest_rejected_alternative": "HFIC-C2-RAW-CONCENTRATION-MEU-REFRAME",
+  "pareto_factors": ["mechanistic orthogonality", "data feasibility"],
+  "non_claims": ["NO_ALPHA", "NO_ENTITY_TRUTH", "NO_WORTHY_HYPOTHESIS"]
+}

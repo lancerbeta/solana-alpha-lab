@@ -41,15 +41,26 @@
       "items": {"type": "string", "pattern": "^HFIC-CAND-[0-9A-F]{12,64}$"}
     },
     "selected_candidate_id": {
-      "type": "string",
+      "type": ["string", "null"],
       "pattern": "^HFIC-CAND-[0-9A-F]{12,64}$"
+    },
+    "critic_launched": {"type": "boolean"},
+    "forge_context_packet_sha256": {
+      "type": ["string", "null"],
+      "pattern": "^[0-9a-f]{64}$"
     },
     "runner_up_candidate_id": {
       "type": "string",
       "pattern": "^HFIC-CAND-[0-9A-F]{12,64}$"
     },
-    "critic_input_packet_sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
-    "critic_result_sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+    "critic_input_packet_sha256": {
+      "type": ["string", "null"],
+      "pattern": "^[0-9a-f]{64}$"
+    },
+    "critic_result_sha256": {
+      "type": ["string", "null"],
+      "pattern": "^[0-9a-f]{64}$"
+    },
     "critic_terminal": {"type": "string", "minLength": 1},
     "lane_classifier_terminal": {"type": ["string", "null"]},
     "decision_event_ids": {"type": "array", "items": {"type": "string"}},
@@ -66,5 +77,33 @@
     },
     "no_git_fence_receipt": {"type": "object"},
     "created_at": {"type": "string", "minLength": 1}
-  }
+  },
+  "allOf": [
+    {
+      "if": {
+        "properties": {"critic_terminal": {"const": "NO_WORTHY_HYPOTHESIS"}},
+        "required": ["critic_terminal"]
+      },
+      "then": {
+        "required": ["critic_launched", "forge_context_packet_sha256"],
+        "properties": {
+          "selected_candidate_id": {"type": "null"},
+          "critic_input_packet_sha256": {"type": "null"},
+          "critic_result_sha256": {"type": "null"},
+          "critic_launched": {"const": false},
+          "forge_context_packet_sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"}
+        }
+      },
+      "else": {
+        "properties": {
+          "selected_candidate_id": {
+            "type": "string",
+            "pattern": "^HFIC-CAND-[0-9A-F]{12,64}$"
+          },
+          "critic_input_packet_sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+          "critic_result_sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"}
+        }
+      }
+    }
+  ]
 }
