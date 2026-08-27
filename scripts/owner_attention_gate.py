@@ -297,6 +297,25 @@ def require_base_bound_control_runtime(
             raise ValueError("CONTROL_RUNTIME_CHANGED")
 
 
+def managed_write_set_covers_control_runtime_changes(
+    root: Path,
+    *,
+    expected_base: str,
+    managed: list[str],
+    runner=run_read,
+) -> bool:
+    for relative in CONTROL_RUNTIME_PATHS:
+        candidate = root.resolve() / relative
+        try:
+            base_bytes = runner(["git", "show", f"{expected_base}:{relative}"], root)
+        except ValueError:
+            return False
+        if candidate.is_file() and candidate.read_bytes() != base_bytes:
+            if not path_in_managed_write_set(relative, managed):
+                return False
+    return True
+
+
 def _trusted_path_matches_base(
     root: Path,
     relative: str,
@@ -615,7 +634,14 @@ def guarded_delivery_scope(
             root, expected_base=expected_base, runner=runner
         )
     except ValueError as exc:
-        if str(exc) != "CONTROL_RUNTIME_CHANGED" or not is_live_pr_head(receipt):
+        if str(exc) != "CONTROL_RUNTIME_CHANGED":
+            raise
+        if not is_live_pr_head(receipt) and not managed_write_set_covers_control_runtime_changes(
+            root,
+            expected_base=expected_base,
+            managed=managed,
+            runner=runner,
+        ):
             raise
     profile = load_base_bound_profile(
         root, expected_base=expected_base, runner=runner

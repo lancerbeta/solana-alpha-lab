@@ -9,7 +9,7 @@
   "cloud_bundle_smoke_required": false,
   "factory_fit": {
     "path": "docs/evidence/hypothesis_forge_operational_closure/a1_delivery_factory_fit_v1.json",
-    "sha256": "548e1e9f3e4f751e4d1d8a8ea46db93156fb35b0a23ee2250d6d9e8bd28af4ae",
+    "sha256": "9a16e7f06f5bd88118c4cecd281a2676e4b89daaef6e0eeeb577bea9719094b9",
     "verdict": "PASS"
   },
   "implementation_bindings": {
@@ -17,7 +17,7 @@
     ".agents/skills/independent-hypothesis-critic/SKILL.md": "dacedd69a6a5136380842d406d7bdb6a10774e1cf90f02b1a30867c17e725fb0",
     ".cursor/commands/hypothesis-forge.md": "7f7e87e7e0d6033f5d50a1f3a21259d6216e4bf439c65b4b3a4d8c2789c5ed69",
     ".github/workflows/ci.yml": "35abf9951dd5204737bd3715113793d48dfdbe1834c1ed7a2e51f0a836dda0f5",
-    "catalog/assets/core.yaml": "fc3bf5565c895679de541a6b2bce041fca93dec6570b4dc2e8bfbb4adb1aa717",
+    "catalog/assets/core.yaml": "26a4df99e9bdee2c3a1be41a89b743dd0d439367cbd483edc40bca2a22602883",
     "catalog/assets/lifecycle.yaml": "dd4e668faf5501b40aacad3da8289ce3f57e241a2580319b929e28b618d690d0",
     "catalog/catalog_manifest.yaml": "fef752585cc02e7f41bd7c7ee86faa3df7febdf758105d5775e2b5348cf8a7a9",
     "catalog/generated/asset_edges.json": "e3d7732e56a484f62721cb129ebed5623cbb957796aabbd32c758f597332e0ee",
@@ -34,7 +34,7 @@
     "schemas/research_memory_projection_v1.sql": "aae281f735b8a8f7596e5d622a885077c0de3bc8ba116c3dc933fb65770e9ca2",
     "scripts/hypothesis_fast_lane.py": "9cd8e01517457ebf56c7cb7499514aaea71119561157c31e8cb675b44a8268e0",
     "scripts/hypothesis_forge.py": "5ac03c107729d2cc1173751a6d22cbebecddce90ce8fc6e906b7f0265a2a9c09",
-    "scripts/owner_attention_gate.py": "a87c3cf47df1ceac18e30832723a01446752a874afe1bf84955c6b1988f392b6",
+    "scripts/owner_attention_gate.py": "f2e19a00f5d45f1c59faf9f12b0a72a1db6d11cec2282793707f92267f91487f",
     "scripts/validate_ci.py": "81223661a47ed2666b54f73676b8f0d74330bc9288f251699c785ad4c6ed8b8c",
     "src/solana_alpha_lab/factory/commissioning_proof.py": "e31fa9f29bc925623d97b33a2e1f486f74c8397f00ff7cce123166f466700b5b",
     "src/solana_alpha_lab/factory/data_root.py": "eb7ec6b2e05408a53ff3f46d109895ccda6777045332a75e19e924e3fa8360ca",
@@ -85,7 +85,7 @@
     "github_ci": "ENFORCED_LIVE_AT_GUARDED_MERGE",
     "independent_review": {
       "path": "docs/evidence/hypothesis_forge_operational_closure/a1_delivery_independent_review_v1.json",
-      "sha256": "ce82957ea7aa6f0cb61db1bdb5d5b9c552cc373028a06b7f755ff266b604d2fa",
+      "sha256": "a8bdb94e84a790aebdcce27b207a5c645449eb6538d8a646eace5756e22bb5bf",
       "verdict": "PASS"
     },
     "project_checks": [

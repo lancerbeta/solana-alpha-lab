@@ -28,7 +28,7 @@
   "mode": "FULL_REVIEW",
   "recovery": "REVERT",
   "review_id": "HFIC-OPERATIONAL-CLOSURE-FACTORY-FIT-001",
-  "reviewed_bindings_sha256": "2b45aeaf2142f42f6d5c0bc5acf0a80147c4a695a35d10cc28169393af370c7c",
+  "reviewed_bindings_sha256": "ebced26be16482c60530c052094f10b7de2b8b0c908f925a83daed03063ba528",
   "reviewed_inventory_sha256": "60c431287418ad52152d7e501e931473993c0fc4290163c8a55dc0bc148a3646",
   "schema": "smial.delivery-harness-factory-fit",
   "schema_version": "1.0",
