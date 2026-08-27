@@ -29,7 +29,7 @@
   "recovery": "REVERT",
   "review_id": "HFIC-OPERATIONAL-CLOSURE-FACTORY-FIT-001",
   "reviewed_bindings_sha256": "ebced26be16482c60530c052094f10b7de2b8b0c908f925a83daed03063ba528",
-  "reviewed_inventory_sha256": "60c431287418ad52152d7e501e931473993c0fc4290163c8a55dc0bc148a3646",
+  "reviewed_inventory_sha256": "4e307d44e13cfea6cbe3d9e67fc11ad77a259f1d88853bc84015301ad74d5184",
   "schema": "smial.delivery-harness-factory-fit",
   "schema_version": "1.0",
   "task_id": "HYPOTHESIS_FORGE_OPERATIONAL_CLOSURE_V1",
