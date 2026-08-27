@@ -9,7 +9,7 @@
   "cloud_bundle_smoke_required": false,
   "factory_fit": {
     "path": "docs/evidence/hfic_next_forward_evidence_execution/a1_delivery_factory_fit_v1.json",
-    "sha256": "c5f3b0e160db84e26b4985285105c37028c64f3c124e0d8198bf18a57922f012",
+    "sha256": "5ffdbe35c9b80996777597fda1d1d0eee70f7249c66a240e97a00007ab903b52",
     "verdict": "PASS"
   },
   "implementation_bindings": {
@@ -21,11 +21,6 @@
     "src/solana_alpha_lab/factory/forward_h900_quote_capture.py": "82eef8c715e02ea9d6927ac3e52f2e830deb591f6d5b476aca38b46b3b327552",
     "src/solana_alpha_lab/factory/forward_mix_offline.py": "7ad086f0530f7e5ac7185a8978bf12c91a0a0478405d68bca5271da04b720942",
     "tests/test_forward_h900_quote_capture.py": "285cdae80bfc53727879be2844bb64614faf6be9f25d54b227c9978e9c8728e9"
-  },
-  "independent_review": {
-    "path": "docs/evidence/hfic_next_forward_evidence_execution/a1_delivery_independent_review_v1.json",
-    "sha256": "1a92582867c89ce099f10f1c365ed746342ef30a723734d6616dabf452853c55",
-    "verdict": "PASS"
   },
   "non_claims": [
     "NO_ALPHA",
@@ -50,6 +45,19 @@
     "provider_api_rpc_wss_calls": 0,
     "wallet_signer_transaction": 0
   },
+  "state_change": "FORWARD_H900_QUOTE_CAPTURE_CANDIDATE",
   "task_id": "HFIC_NEXT_FORWARD_EVIDENCE_EXECUTION_V1",
-  "verdict": "PASS"
+  "validation": {
+    "full_gate": "ENFORCED_BY_PROJECT_BOUND_VALIDATION",
+    "github_ci": "ENFORCED_LIVE_AT_GUARDED_MERGE",
+    "independent_review": {
+      "path": "docs/evidence/hfic_next_forward_evidence_execution/a1_delivery_independent_review_v1.json",
+      "sha256": "bcaf109b6f78290cf7917127d94821594ea6eb4afb6a0d220c9f6be8b4018a89",
+      "verdict": "PASS"
+    },
+    "project_checks": [
+      "PASS_VALIDATE_CATALOG"
+    ],
+    "targeted": "PASS_FORWARD_H900_QUOTE_CAPTURE_SUITE"
+  }
 }
