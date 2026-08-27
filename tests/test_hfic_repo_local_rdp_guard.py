@@ -17,6 +17,7 @@ from solana_alpha_lab.factory.data_root import DEFAULT_DATA_PLANE_RELATIVE
 from solana_alpha_lab.factory.early_market_panel_importer import (
     EarlyMarketPanelImportError,
     PUBLISHED_RELATIVE,
+    assert_publication_fences,
     import_early_market_panel,
     inspect_canonical_targets,
 )
@@ -65,6 +66,20 @@ class RepoLocalRdpGuardTests(unittest.TestCase):
             self.assertEqual(result["status"], "IMPORTED")
             self.assertEqual(result["provider_calls_actual"], 0)
             self.assertTrue((data_root / PUBLISHED_RELATIVE).is_file())
+
+    def test_canonical_plane_absent_dir_still_passes_ignore_guard(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            worktree = _init_worktree(Path(tmp) / "repo")
+            source = Path(tmp) / "source"
+            shutil.copytree(FIXTURE, source)
+            data_root = worktree / DEFAULT_DATA_PLANE_RELATIVE
+            assert_publication_fences(
+                source_root=source,
+                data_root=data_root,
+                source_receipt_path=source / "source_receipt.json",
+                repo_root=worktree,
+            )
+            self.assertFalse(data_root.exists())
 
     def test_non_ignored_repository_descendant_is_denied(self) -> None:
         with tempfile.TemporaryDirectory() as tmp:

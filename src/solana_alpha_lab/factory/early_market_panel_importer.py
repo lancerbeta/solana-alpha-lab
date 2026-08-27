@@ -196,17 +196,31 @@ def _is_canonical_data_plane(worktree: Path, data_root: Path) -> bool:
     return resolved == canonical or resolved.is_relative_to(canonical)
 
 
-def _any_link_component(path: Path, *, stop_at: Path) -> bool:
-    cursor = path
-    stop = stop_at.resolve()
+def _absolute_unresolved(path: Path) -> Path:
+    return path if path.is_absolute() else Path.cwd() / path
+
+
+def _git_root_lexical(path: Path) -> Path | None:
+    current = _absolute_unresolved(path)
     for _ in range(64):
-        if cursor.is_symlink() or (cursor.exists() and _is_link(cursor)):
+        marker = current / ".git"
+        if marker.exists() or marker.is_symlink():
+            return current
+        parent = current.parent
+        if parent == current:
+            return None
+        current = parent
+    raise EarlyMarketPanelImportError("GIT_GUARD_UNAVAILABLE")
+
+
+def _any_lexical_link(path: Path, *, stop_at: Path) -> bool:
+    cursor = _absolute_unresolved(path)
+    stop = _absolute_unresolved(stop_at)
+    for _ in range(64):
+        if cursor.is_symlink() or _is_link(cursor):
             return True
-        try:
-            if cursor.exists() and cursor.resolve() == stop:
-                return stop.is_symlink() or _is_link(stop)
-        except OSError:
-            return True
+        if cursor == stop:
+            return stop.is_symlink() or _is_link(stop)
         parent = cursor.parent
         if parent == cursor:
             return False
@@ -249,7 +263,15 @@ def assert_publication_fences(
     if data_root.exists() or data_root.is_symlink():
         _require(not _is_link(data_root), "DATA_ROOT_SYMLINK")
     _require(not _is_broad_unsafe_target(data_root), "DATA_ROOT_UNSAFE")
-    worktree = _git_root_of(data_root)
+    if repo_root is not None:
+        _require(
+            not _any_lexical_link(
+                repo_root / DEFAULT_DATA_PLANE_RELATIVE,
+                stop_at=repo_root,
+            ),
+            "DATA_ROOT_SYMLINK",
+        )
+    worktree = _git_root_lexical(data_root) or _git_root_of(data_root)
     if worktree is not None:
         git_dir = (worktree / ".git").resolve()
         _require(not _paths_overlap(data_root.resolve(), git_dir), "DATA_ROOT_INSIDE_GIT")
@@ -257,12 +279,11 @@ def assert_publication_fences(
         if repo_root is not None:
             _require(worktree == repo_root.resolve(), "DATA_ROOT_INSIDE_GIT")
         _require(_is_canonical_data_plane(worktree, data_root), "DATA_ROOT_INSIDE_GIT")
-        _require(_git_is_ignored(worktree, "local", runner), "DATA_ROOT_INSIDE_GIT")
         _require(_git_is_ignored(worktree, "local/", runner), "DATA_ROOT_INSIDE_GIT")
         relative = _posix_relative(worktree, data_root)
         _require(_git_is_ignored(worktree, relative, runner), "DATA_ROOT_INSIDE_GIT")
         _require(not _git_has_tracked_or_staged(worktree, relative, runner), "DATA_ROOT_INSIDE_GIT")
-        _require(not _any_link_component(data_root, stop_at=worktree), "DATA_ROOT_SYMLINK")
+        _require(not _any_lexical_link(data_root, stop_at=worktree), "DATA_ROOT_SYMLINK")
     elif repo_root is not None and _paths_overlap(data_root, repo_root.resolve()):
         raise EarlyMarketPanelImportError("GIT_GUARD_UNAVAILABLE")
     _require(not _paths_overlap(source_root, data_root), "SOURCE_DATA_ROOT_OVERLAP")
