@@ -1081,6 +1081,7 @@ def persist_frozen_session(
                 "critic_input_packet_sha256": frozen.get("critic_input_packet_sha256"),
                 "selected_definition_sha256": frozen.get("selected_definition_sha256"),
                 "selected_display_ordinal": frozen.get("selected_display_ordinal"),
+                "forge_context_packet_sha256": frozen.get("forge_context_packet_sha256"),
                 "git_composite_sha256": frozen.get("git_composite_sha256"),
                 "research_memory_as_of": frozen.get("research_memory_as_of"),
                 "revision_count": int(frozen.get("revision_count") or 0),
@@ -1641,6 +1642,22 @@ def _verify_store_reference_resolution(
     for decision_id in bundle.get("decision_event_ids") or []:
         if str(decision_id) not in known_decisions:
             raise HficSessionError("DECISION_REFERENCE_UNRESOLVED")
+    digest = bundle.get("forge_context_packet_sha256")
+    if isinstance(digest, str) and len(digest) == 64:
+        _verify_forge_context_artifact(store, digest)
+
+
+def _verify_forge_context_artifact(store: Any, digest: str) -> None:
+    from solana_alpha_lab.factory.hfic_preflight import (
+        HficPreflightError,
+        verify_forge_context_packet,
+    )
+
+    data_root = Path(store._root)
+    try:
+        verify_forge_context_packet(data_root, digest)
+    except HficPreflightError as exc:
+        raise HficSessionError(str(exc)) from exc
 
 
 def _effective_cycle_phase(
@@ -2686,7 +2703,16 @@ def load_session_bundle(store: Any, session_id: str) -> dict[str, Any] | None:
             "experiment_execution": 0,
             "provider_api_rpc_wss_calls": 0,
         },
+        "forge_context_packet_sha256": cycle.get("forge_context_packet_sha256")
+        or (
+            session_receipt.get("forge_context_packet_sha256")
+            if isinstance(session_receipt, Mapping)
+            else None
+        ),
     }
+    context_digest = bundle.get("forge_context_packet_sha256")
+    if isinstance(context_digest, str) and len(context_digest) == 64:
+        _verify_forge_context_artifact(store, context_digest)
     if state == "SYNTHESIS_COMPLETE":
         _verify_store_reference_resolution(store, bundle)
     return bundle

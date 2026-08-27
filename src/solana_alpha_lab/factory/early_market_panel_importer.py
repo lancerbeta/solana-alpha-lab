@@ -2,13 +2,18 @@
 
 Explicit source only. No provider/API/RPC/WSS. Raw bodies stay outside Git.
 X is R0-only. Dataset role is DISCOVERY_ONLY_SECOND_LOOK.
+Publication is fail-closed: process-owned staging, then one commit-point.
 """
 
 from __future__ import annotations
 
 import hashlib
 import json
-from collections.abc import Mapping
+import os
+import shutil
+import stat
+import uuid
+from collections.abc import Callable, Mapping
 from datetime import UTC, datetime
 from pathlib import Path
 from typing import Any
@@ -48,11 +53,28 @@ GIT_RECEIPT_RELATIVE = (
 )
 GIT_RECEIPT_SHA256 = "a8c8df4a7c02a8e6cf4d2be2fe004f2cfbff170efcf5645064788ea20f12db63"
 PANEL_CREATED_AT = datetime(2026, 8, 24, 0, 24, 22, tzinfo=UTC)
+AVAILABILITY_WINDOW_START = datetime(2026, 8, 24, 0, 0, 0, tzinfo=UTC)
+AVAILABILITY_WINDOW_END = datetime(2026, 8, 24, 23, 59, 59, tzinfo=UTC)
+RECEIPT_OBSERVED_AT_RELATION = "EQUALS_ENVELOPE_OBSERVED_AT"
+MIN_USABLE_YIELD_ELIGIBLE = 10
+SAMPLE_VALID = "SAMPLE_VALID"
+SAMPLE_INVALID = "SAMPLE_INVALID"
 LOGICAL_LOCATION = (
     "datasets/partitions/date=2026-08-24/"
     f"{PARTITION_ID}.parquet"
 )
 LABELS_RELATIVE = f"datasets/manifests/{DATASET_MANIFEST_ID}.labels.json"
+MANIFEST_RELATIVE = f"datasets/manifests/{DATASET_MANIFEST_ID}.json"
+PARTITION_RELATIVE = f"datasets/manifests/partitions/{PARTITION_MANIFEST_ID}.json"
+PUBLISHED_RELATIVE = f"datasets/manifests/{DATASET_MANIFEST_ID}.published"
+CANONICAL_TARGET_RELATIVES = (
+    MANIFEST_RELATIVE,
+    LABELS_RELATIVE,
+    PARTITION_RELATIVE,
+    LOGICAL_LOCATION,
+    PUBLISHED_RELATIVE,
+)
+COMMIT_POINT_KIND = "EARLY_MARKET_PANEL_PUBLICATION_V1"
 
 
 class EarlyMarketPanelImportError(ValueError):
@@ -90,8 +112,106 @@ def _schema_sha256() -> str:
     ).hexdigest()
 
 
+def is_link_path(path: Path) -> bool:
+    return _is_link(path)
+
+
+def _is_link(path: Path) -> bool:
+    if path.is_symlink():
+        return True
+    try:
+        attributes = getattr(path.lstat(), "st_file_attributes", 0)
+    except OSError:
+        return False
+    reparse = getattr(stat, "FILE_ATTRIBUTE_REPARSE_POINT", 0x400)
+    return bool(attributes & reparse)
+
+
+def _is_filesystem_root(path: Path) -> bool:
+    resolved = path.resolve()
+    return resolved.parent == resolved
+
+
+def _is_broad_unsafe_target(path: Path) -> bool:
+    resolved = path.resolve()
+    if _is_filesystem_root(resolved) or _is_filesystem_root(resolved.parent):
+        return True
+    try:
+        home = Path.home().resolve()
+    except OSError:
+        home = None
+    return home is not None and resolved == home
+
+
+def _paths_overlap(left: Path, right: Path) -> bool:
+    left_parts = left.resolve().parts
+    right_parts = right.resolve().parts
+    if left_parts == right_parts:
+        return True
+    shorter, longer = (
+        (left_parts, right_parts)
+        if len(left_parts) <= len(right_parts)
+        else (right_parts, left_parts)
+    )
+    return longer[: len(shorter)] == shorter
+
+
+def _git_root_of(path: Path) -> Path | None:
+    current = path.resolve()
+    if current.is_file():
+        current = current.parent
+    for candidate in (current, *current.parents):
+        if (candidate / ".git").exists():
+            return candidate
+    return None
+
+
+def assert_publication_fences(
+    *,
+    source_root: Path,
+    data_root: Path,
+    source_receipt_path: Path,
+    repo_root: Path | None = None,
+) -> None:
+    _require(not _is_link(source_root), "SOURCE_SYMLINK")
+    _require(not _is_link(source_receipt_path), "SOURCE_RECEIPT_SYMLINK")
+    if data_root.exists() or data_root.is_symlink():
+        _require(not _is_link(data_root), "DATA_ROOT_SYMLINK")
+    _require(not _is_broad_unsafe_target(data_root), "DATA_ROOT_UNSAFE")
+    if repo_root is not None:
+        repo = repo_root.resolve()
+        _require(not _paths_overlap(data_root, repo), "DATA_ROOT_INSIDE_GIT")
+    git_root = _git_root_of(data_root)
+    _require(git_root is None, "DATA_ROOT_INSIDE_GIT")
+    _require(not _paths_overlap(source_root, data_root), "SOURCE_DATA_ROOT_OVERLAP")
+    _require(
+        not _paths_overlap(source_receipt_path, data_root),
+        "SOURCE_RECEIPT_DATA_ROOT_OVERLAP",
+    )
+
+
+def inspect_canonical_targets(data_root: Path) -> dict[str, Any]:
+    root = Path(data_root)
+    paths = [root / relative for relative in CANONICAL_TARGET_RELATIVES]
+    present = [path for path in paths if path.exists() or path.is_symlink()]
+    if not present:
+        return {"state": "ABSENT", "paths": []}
+    if any(_is_link(path) for path in present):
+        return {"state": "SYMLINK", "paths": [str(path.name) for path in present]}
+    if len(present) != len(paths):
+        return {"state": "PARTIAL", "paths": [path.name for path in present]}
+    bound = _load_bound_panel_strict(root)
+    if bound is None:
+        return {"state": "CORRUPT", "paths": [path.name for path in present]}
+    return {
+        "state": "COMPLETE_VALID",
+        "dataset_fingerprint": bound["dataset_fingerprint"],
+        "bound": bound,
+    }
+
+
 def _load_json_bytes(path: Path) -> tuple[bytes, object]:
-    _require(path.is_file() and not path.is_symlink(), "SOURCE_FILE_MISSING")
+    _require(path.is_file() and not _is_link(path), "SOURCE_FILE_MISSING")
     payload = path.read_bytes()
     try:
         loaded = json.loads(payload.decode("utf-8"))
@@ -123,7 +243,7 @@ def _resolve_r0_body(source_root: Path, binding: Mapping[str, Any]) -> Path:
     root = source_root.resolve()
     candidate = (source_root / name).resolve()
     _require(candidate.is_relative_to(root), "R0_PATH_ESCAPE")
-    _require(candidate.is_file() and not candidate.is_symlink(), "R0_BODY_MISSING")
+    _require(candidate.is_file() and not _is_link(candidate), "R0_BODY_MISSING")
     return candidate
 
 
@@ -141,19 +261,28 @@ def _parse_rows(payload: object) -> list[dict[str, Any]]:
     return rows
 
 
-def _parse_timestamp(value: object) -> datetime:
-    if not isinstance(value, str) or "T" not in value:
-        return PANEL_CREATED_AT
+def _parse_required_timestamp(value: object, *, code: str) -> datetime:
+    if value is None or value == "":
+        raise EarlyMarketPanelImportError("OBSERVED_AT_MISSING")
+    if not isinstance(value, str):
+        raise EarlyMarketPanelImportError("OBSERVED_AT_INVALID")
     text = value
     if text.endswith("Z"):
         text = text[:-1] + "+00:00"
+    if "T" not in text:
+        raise EarlyMarketPanelImportError("OBSERVED_AT_INVALID")
     try:
         parsed = datetime.fromisoformat(text)
-    except ValueError:
-        return PANEL_CREATED_AT
+    except ValueError as exc:
+        raise EarlyMarketPanelImportError("OBSERVED_AT_INVALID") from exc
     if parsed.tzinfo is None:
-        parsed = parsed.replace(tzinfo=UTC)
-    return parsed.astimezone(UTC)
+        raise EarlyMarketPanelImportError("OBSERVED_AT_NAIVE")
+    aware = parsed.astimezone(UTC)
+    if aware < AVAILABILITY_WINDOW_START or aware > AVAILABILITY_WINDOW_END:
+        raise EarlyMarketPanelImportError("OBSERVED_AT_OUT_OF_WINDOW")
+    if code and code != "OBSERVED_AT":
+        pass
+    return aware
 
 
 def _normalized_table(
@@ -220,24 +349,32 @@ def dataset_labels() -> dict[str, Any]:
         "capture_atom_id": CAPTURE_ATOM_ID,
         "x_uses_r0_only": True,
         "forbidden_hypothesis_id": FORBIDDEN_HYPOTHESIS_ID,
+        "min_usable_yield_eligible": MIN_USABLE_YIELD_ELIGIBLE,
+        "receipt_observed_at_relation": RECEIPT_OBSERVED_AT_RELATION,
     }
 
 
-def load_bound_panel(data_root: Path) -> dict[str, Any] | None:
-    manifest_path = Path(data_root) / "datasets" / "manifests" / f"{DATASET_MANIFEST_ID}.json"
+def _load_bound_panel_strict(data_root: Path) -> dict[str, Any] | None:
+    manifest_path = Path(data_root) / MANIFEST_RELATIVE
     labels_path = Path(data_root) / LABELS_RELATIVE
-    partition_path = (
-        Path(data_root)
-        / "datasets"
-        / "manifests"
-        / "partitions"
-        / f"{PARTITION_MANIFEST_ID}.json"
-    )
-    if not manifest_path.is_file() or not labels_path.is_file() or not partition_path.is_file():
+    partition_path = Path(data_root) / PARTITION_RELATIVE
+    if (
+        not manifest_path.is_file()
+        or not labels_path.is_file()
+        or not partition_path.is_file()
+        or _is_link(manifest_path)
+        or _is_link(labels_path)
+        or _is_link(partition_path)
+    ):
         return None
-    manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
-    labels = json.loads(labels_path.read_text(encoding="utf-8"))
-    partition = json.loads(partition_path.read_text(encoding="utf-8"))
+    try:
+        DatasetManifest.model_validate_json(manifest_path.read_bytes())
+        PartitionManifest.model_validate_json(partition_path.read_bytes())
+        manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
+        labels = json.loads(labels_path.read_text(encoding="utf-8"))
+        partition = json.loads(partition_path.read_text(encoding="utf-8"))
+    except (OSError, UnicodeDecodeError, json.JSONDecodeError, Exception):
+        return None
     if not isinstance(manifest, dict) or not isinstance(labels, dict) or not isinstance(partition, dict):
         return None
     for key, expected in REQUIRED_LABELS.items():
@@ -253,19 +390,108 @@ def load_bound_panel(data_root: Path) -> dict[str, Any] | None:
     if not isinstance(parquet_rel, str) or not isinstance(expected_file, str):
         return None
     parquet_path = Path(data_root) / parquet_rel
-    if not parquet_path.is_file() or parquet_path.is_symlink():
+    if not parquet_path.is_file() or _is_link(parquet_path):
         return None
     if sha256_bytes(parquet_path.read_bytes()) != expected_file:
+        return None
+    yield_eligible = int(labels.get("yield_eligible") or 0)
+    feature_usable = yield_eligible >= MIN_USABLE_YIELD_ELIGIBLE
+    published_path = Path(data_root) / PUBLISHED_RELATIVE
+    if not published_path.is_file() or _is_link(published_path):
+        return None
+    try:
+        published = json.loads(published_path.read_text(encoding="utf-8"))
+    except (OSError, UnicodeDecodeError, json.JSONDecodeError):
+        return None
+    if (
+        not isinstance(published, dict)
+        or published.get("commit_point") != COMMIT_POINT_KIND
+        or published.get("dataset_fingerprint") != fingerprint
+        or published.get("dataset_manifest_id") != DATASET_MANIFEST_ID
+    ):
         return None
     return {
         "dataset_manifest_id": DATASET_MANIFEST_ID,
         "dataset_fingerprint": fingerprint,
         "labels": labels,
         "row_count": int(labels.get("row_count") or 0),
-        "yield_eligible": int(labels.get("yield_eligible") or 0),
+        "yield_eligible": yield_eligible,
         "yield_missing": int(labels.get("yield_missing") or 0),
         "feature_hint": FEATURE_ID,
+        "feature_usable": feature_usable,
+        "dataset_terminal": labels.get("dataset_terminal")
+        or (SAMPLE_VALID if feature_usable else SAMPLE_INVALID),
     }
+
+
+def load_bound_panel(data_root: Path) -> dict[str, Any] | None:
+    return _load_bound_panel_strict(Path(data_root))
+
+
+def _cleanup_owned_staging(staging_root: Path) -> None:
+    if staging_root.exists() or staging_root.is_symlink():
+        if staging_root.is_symlink() or staging_root.is_file():
+            staging_root.unlink()
+            return
+        shutil.rmtree(staging_root)
+
+
+def publication_marker(fingerprint: str) -> dict[str, str]:
+    return {
+        "commit_point": COMMIT_POINT_KIND,
+        "dataset_manifest_id": DATASET_MANIFEST_ID,
+        "dataset_fingerprint": fingerprint,
+    }
+
+
+def _write_targets(
+    dest_root: Path,
+    *,
+    parquet_bytes: bytes,
+    partition_bytes: bytes,
+    manifest_bytes: bytes,
+    labels_text: str,
+    fingerprint: str,
+) -> None:
+    mapping = {
+        LOGICAL_LOCATION: parquet_bytes,
+        PARTITION_RELATIVE: partition_bytes,
+        MANIFEST_RELATIVE: manifest_bytes,
+        LABELS_RELATIVE: labels_text.encode("utf-8"),
+        PUBLISHED_RELATIVE: (
+            json.dumps(
+                publication_marker(fingerprint),
+                ensure_ascii=False,
+                sort_keys=True,
+                separators=(",", ":"),
+            )
+            + "\n"
+        ).encode("utf-8"),
+    }
+    for relative, payload in mapping.items():
+        path = dest_root / relative
+        path.parent.mkdir(parents=True, exist_ok=True)
+        _require(not _is_link(path.parent), "TARGET_PARENT_SYMLINK")
+        path.write_bytes(payload)
+
+
+def _publish_commit_point(staging_root: Path, data_root: Path) -> None:
+    payload_relatives = CANONICAL_TARGET_RELATIVES[:-1]
+    marker_relative = CANONICAL_TARGET_RELATIVES[-1]
+    for relative in payload_relatives:
+        dest = data_root / relative
+        _require(not dest.exists() and not dest.is_symlink(), "CANONICAL_TARGET_EXISTS")
+        dest.parent.mkdir(parents=True, exist_ok=True)
+        _require(not _is_link(dest.parent), "TARGET_PARENT_SYMLINK")
+        os.replace(staging_root / relative, dest)
+    marker_dest = data_root / marker_relative
+    _require(
+        not marker_dest.exists() and not marker_dest.is_symlink(),
+        "CANONICAL_TARGET_EXISTS",
+    )
+    marker_dest.parent.mkdir(parents=True, exist_ok=True)
+    _require(not _is_link(marker_dest.parent), "TARGET_PARENT_SYMLINK")
+    os.replace(staging_root / marker_relative, marker_dest)
 
 
 def import_early_market_panel(
@@ -276,9 +502,18 @@ def import_early_market_panel(
     expected_receipt_sha256: str | None = None,
     generation_task_id: str = "HFIC_NEXT_EVIDENCE_BIND_AND_CONTEXT_V1",
     generation_run_id: str = "RUN-EARLY-MARKET-PANEL-TEMP-001",
+    repo_root: Path | None = None,
+    publication_hook: Callable[[], None] | None = None,
 ) -> dict[str, Any]:
     _require(source_root is not None, "SOURCE_REQUIRED")
-    _require(source_root.is_dir() and not source_root.is_symlink(), "SOURCE_INVALID")
+    _require(source_root.is_dir() and not _is_link(source_root), "SOURCE_INVALID")
+    assert_publication_fences(
+        source_root=source_root,
+        data_root=data_root,
+        source_receipt_path=source_receipt_path,
+        repo_root=repo_root,
+    )
+    existing_state = inspect_canonical_targets(data_root)
     receipt_bytes, receipt_obj = _load_json_bytes(source_receipt_path)
     _require(isinstance(receipt_obj, dict), "SOURCE_RECEIPT_INVALID")
     receipt: dict[str, Any] = receipt_obj
@@ -291,7 +526,7 @@ def import_early_market_panel(
     expected_body_sha = r0_binding.get("sha256")
     _require(isinstance(expected_body_sha, str) and len(expected_body_sha) == 64, "R0_HASH_MISSING")
     body_path = _resolve_r0_body(source_root, r0_binding)
-    _require(body_path.is_file() and not body_path.is_symlink(), "R0_BODY_MISSING")
+    _require(body_path.is_file() and not _is_link(body_path), "R0_BODY_MISSING")
     body_bytes = body_path.read_bytes()
     _require(sha256_bytes(body_bytes) == expected_body_sha, "R0_BODY_HASH_MISMATCH")
     try:
@@ -302,7 +537,7 @@ def import_early_market_panel(
     _require(isinstance(envelope_name, str) and envelope_name, "R0_ENVELOPE_PATH_MISSING")
     envelope_path = (source_root / Path(str(envelope_name).replace("\\", "/")).name).resolve()
     _require(envelope_path.is_relative_to(source_root.resolve()), "R0_PATH_ESCAPE")
-    _require(envelope_path.is_file() and not envelope_path.is_symlink(), "R0_ENVELOPE_MISSING")
+    _require(envelope_path.is_file() and not _is_link(envelope_path), "R0_ENVELOPE_MISSING")
     envelope_bytes, envelope_obj = _load_json_bytes(envelope_path)
     expected_envelope = r0_binding.get("capture_envelope_sha256")
     _require(
@@ -310,11 +545,14 @@ def import_early_market_panel(
         "R0_ENVELOPE_HASH_MISSING",
     )
     _require(sha256_bytes(envelope_bytes) == expected_envelope, "R0_ENVELOPE_HASH_MISMATCH")
-    available_at = PANEL_CREATED_AT
-    if isinstance(envelope_obj, Mapping) and envelope_obj.get("observed_at"):
-        available_at = _parse_timestamp(envelope_obj.get("observed_at"))
-    elif isinstance(r0_binding.get("observed_at"), str):
-        available_at = _parse_timestamp(r0_binding.get("observed_at"))
+    _require(isinstance(envelope_obj, Mapping), "R0_ENVELOPE_INVALID")
+    available_at = _parse_required_timestamp(
+        envelope_obj.get("observed_at"),
+        code="OBSERVED_AT",
+    )
+    receipt_observed = r0_binding.get("observed_at")
+    receipt_at = _parse_required_timestamp(receipt_observed, code="OBSERVED_AT")
+    _require(receipt_at == available_at, "RECEIPT_OBSERVED_AT_MISMATCH")
     rows = _parse_rows(body_obj)
     try:
         semantics = prove_r0_taker_volume_mix_semantics(
@@ -336,34 +574,53 @@ def import_early_market_panel(
             "outcome_previously_consumed": True,
         }
     )
+    yield_eligible = int(semantics["yield_eligible"])
+    sample_terminal = (
+        SAMPLE_VALID if yield_eligible >= MIN_USABLE_YIELD_ELIGIBLE else SAMPLE_INVALID
+    )
+    feature_usable = sample_terminal == SAMPLE_VALID
     labels = {
         **dataset_labels(),
         "row_count": table.num_rows,
-        "yield_eligible": semantics["yield_eligible"],
+        "yield_eligible": yield_eligible,
         "yield_missing": semantics["yield_missing"],
         "missingness_codes": semantics["missingness_codes"],
         "source_receipt_sha256": observed_receipt_sha,
         "r0_body_sha256": expected_body_sha,
         "dataset_fingerprint": fingerprint,
         "field_semantics_terminal": semantics["terminal"],
+        "dataset_terminal": sample_terminal,
+        "feature_usable": feature_usable,
         "provider_calls_actual": 0,
+        "observed_at": available_at.strftime("%Y-%m-%dT%H:%M:%SZ"),
     }
-    existing = load_bound_panel(data_root)
-    if existing is not None and existing["dataset_fingerprint"] == fingerprint:
-        return {
-            "status": "IDEMPOTENT_REUSE",
-            "dataset_manifest_id": DATASET_MANIFEST_ID,
-            "dataset_fingerprint": fingerprint,
-            "row_count": existing["row_count"],
-            "yield_eligible": existing["yield_eligible"],
-            "yield_missing": existing["yield_missing"],
-            "provider_calls_actual": 0,
-            "field_semantics": semantics,
-            "labels": existing["labels"],
-            "epoch_material_changed": False,
-        }
-    if existing is not None and existing["dataset_fingerprint"] != fingerprint:
+    state = existing_state["state"]
+    if state == "COMPLETE_VALID":
+        if existing_state["dataset_fingerprint"] == fingerprint:
+            bound = existing_state["bound"]
+            return {
+                "status": "IDEMPOTENT_REUSE",
+                "dataset_manifest_id": DATASET_MANIFEST_ID,
+                "dataset_fingerprint": fingerprint,
+                "row_count": bound["row_count"],
+                "yield_eligible": bound["yield_eligible"],
+                "yield_missing": bound["yield_missing"],
+                "dataset_terminal": bound["dataset_terminal"],
+                "feature_usable": bound["feature_usable"],
+                "provider_calls_actual": 0,
+                "field_semantics": semantics,
+                "labels": bound["labels"],
+                "epoch_material_changed": False,
+            }
         raise EarlyMarketPanelImportError("DATASET_FINGERPRINT_CONFLICT")
+    if state == "PARTIAL":
+        raise EarlyMarketPanelImportError("EXISTING_TARGET_PARTIAL")
+    if state == "CORRUPT":
+        raise EarlyMarketPanelImportError("EXISTING_TARGET_CORRUPT")
+    if state == "SYMLINK":
+        raise EarlyMarketPanelImportError("EXISTING_TARGET_SYMLINK")
+    if state != "ABSENT":
+        raise EarlyMarketPanelImportError("EXISTING_TARGET_INVALID")
 
     partition_manifest = PartitionManifest(
         partition_manifest_id=PARTITION_MANIFEST_ID,
@@ -393,6 +650,7 @@ def import_early_market_panel(
             {
                 "field_semantics_terminal": semantics["terminal"],
                 "r0_body_sha256": expected_body_sha,
+                "dataset_terminal": sample_terminal,
             }
         ),
         first_reliable_available_at=available_at,
@@ -405,33 +663,47 @@ def import_early_market_panel(
             }
         ),
     )
-    parquet_path = Path(data_root) / LOGICAL_LOCATION
-    parquet_path.parent.mkdir(parents=True, exist_ok=True)
-    parquet_path.write_bytes(parquet_bytes)
-    partition_path = (
-        Path(data_root)
-        / "datasets"
-        / "manifests"
-        / "partitions"
-        / f"{PARTITION_MANIFEST_ID}.json"
+    staging_root = (
+        Path(data_root).resolve().parent
+        / f".{Path(data_root).name}.panel-import-{os.getpid()}-{uuid.uuid4().hex}"
     )
-    partition_path.parent.mkdir(parents=True, exist_ok=True)
-    partition_path.write_bytes(canonical_manifest_bytes(partition_manifest))
-    manifest_path = Path(data_root) / "datasets" / "manifests" / f"{DATASET_MANIFEST_ID}.json"
-    manifest_path.parent.mkdir(parents=True, exist_ok=True)
-    manifest_path.write_bytes(canonical_manifest_bytes(dataset_manifest))
-    labels_path = Path(data_root) / LABELS_RELATIVE
-    labels_path.write_text(
-        json.dumps(labels, ensure_ascii=False, sort_keys=True, indent=2) + "\n",
-        encoding="utf-8",
-    )
+    _require(not staging_root.exists() and not staging_root.is_symlink(), "STAGING_EXISTS")
+    staging_owned = False
+    published = False
+    try:
+        staging_root.mkdir(parents=False, exist_ok=False)
+        staging_owned = True
+        labels_text = json.dumps(labels, ensure_ascii=False, sort_keys=True, indent=2) + "\n"
+        _write_targets(
+            staging_root,
+            parquet_bytes=parquet_bytes,
+            partition_bytes=canonical_manifest_bytes(partition_manifest),
+            manifest_bytes=canonical_manifest_bytes(dataset_manifest),
+            labels_text=labels_text,
+            fingerprint=fingerprint,
+        )
+        staged = _load_bound_panel_strict(staging_root)
+        _require(staged is not None, "STAGING_VERIFY_FAILED")
+        _require(staged["dataset_fingerprint"] == fingerprint, "STAGING_FINGERPRINT_MISMATCH")
+        if publication_hook is not None:
+            publication_hook()
+        _publish_commit_point(staging_root, Path(data_root))
+        published = True
+        staging_owned = False
+        _cleanup_owned_staging(staging_root)
+    finally:
+        if staging_owned and not published:
+            _cleanup_owned_staging(staging_root)
+
     return {
         "status": "IMPORTED",
         "dataset_manifest_id": DATASET_MANIFEST_ID,
         "dataset_fingerprint": fingerprint,
         "row_count": table.num_rows,
-        "yield_eligible": semantics["yield_eligible"],
+        "yield_eligible": yield_eligible,
         "yield_missing": semantics["yield_missing"],
+        "dataset_terminal": sample_terminal,
+        "feature_usable": feature_usable,
         "provider_calls_actual": 0,
         "field_semantics": semantics,
         "labels": labels,
@@ -448,7 +720,14 @@ __all__ = [
     "FORBIDDEN_HYPOTHESIS_ID",
     "GIT_RECEIPT_RELATIVE",
     "GIT_RECEIPT_SHA256",
+    "MIN_USABLE_YIELD_ELIGIBLE",
+    "RECEIPT_OBSERVED_AT_RELATION",
     "REQUIRED_LABELS",
+    "SAMPLE_INVALID",
+    "SAMPLE_VALID",
+    "assert_publication_fences",
     "import_early_market_panel",
+    "inspect_canonical_targets",
+    "is_link_path",
     "load_bound_panel",
 ]

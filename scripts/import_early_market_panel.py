@@ -71,6 +71,7 @@ def main() -> int:
             source_receipt_path=args.source_receipt.resolve(),
             expected_receipt_sha256=expected,
             generation_run_id=args.generation_run_id,
+            repo_root=repo_root,
         )
     except EarlyMarketPanelImportError as exc:
         print(str(exc), file=sys.stderr)

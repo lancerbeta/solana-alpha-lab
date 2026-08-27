@@ -47,6 +47,13 @@
     "bind_gate": "POST_MERGE_OWNER_PHRASE_ONLY",
     "note": "Official SwapStats unit remains unannotated; the bound feature is the dimensionless R0 mix. Production yield is re-proven at POST-MERGE bind against the Git receipt hash, not copied into Git."
   },
+  "sample_floor": {
+    "min_usable_yield_eligible": 10,
+    "temp_fixture_yield_eligible": 1,
+    "temp_dataset_terminal": "SAMPLE_INVALID",
+    "temp_feature_usable": false,
+    "production_yield_gate": "POST_MERGE_OWNER_PHRASE_ONLY"
+  },
   "source_kind": "TEMP_FIXTURE",
   "task_id": "HFIC_NEXT_EVIDENCE_BIND_AND_CONTEXT_V1",
   "terminal": "R0_TAKER_VOLUME_MIX_RATIO_PROVEN",

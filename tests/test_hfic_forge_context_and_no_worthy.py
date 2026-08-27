@@ -16,23 +16,32 @@ SRC = ROOT / "src"
 if str(SRC) not in sys.path:
     sys.path.insert(0, str(SRC))
 
+from solana_alpha_lab.contracts.schema_v1 import DatasetManifest, PartitionManifest
 from solana_alpha_lab.factory.early_market_panel_importer import (
     CLOSED_FAMILY,
     DATASET_MANIFEST_ID,
     FEATURE_ID,
+    SAMPLE_INVALID,
+    SAMPLE_VALID,
     import_early_market_panel,
 )
 from solana_alpha_lab.factory.hfic_preflight import (
+    FORGE_CONTEXT_ARTIFACT_DIR,
     evidence_epoch_material,
     evidence_epoch_sha256,
     rank_prior_candidate_ids,
     verify_forge_context_packet,
 )
+from solana_alpha_lab.storage.manifests import canonical_manifest_bytes
+from tests.test_early_market_panel_importer import write_temp_capture
 from solana_alpha_lab.factory.research_store import RecordKind, ResearchEvent, ResearchStore
 
 CLI = ROOT / "scripts/hypothesis_forge.py"
 FIXTURE = ROOT / "tests/fixtures/early_market_panel/temp_capture_v1"
 NO_WORTHY = ROOT / "tests/fixtures/hypothesis_forge/draft_no_worthy_v1.json"
+HAPPY = ROOT / "tests/fixtures/hypothesis_forge/draft_happy_path_v1.json"
+SECOND_DATASET_MANIFEST_ID = "DATASET-MANIFEST-SYNTHETIC-CONTEXT-002"
+SECOND_CAPABILITY_ID = "CAP-FIXTURE-GIT-RECEIPT-WRITER-001"
 
 
 def bind_draft(draft: dict, receipt: dict) -> dict:
@@ -190,10 +199,17 @@ class TempBindAndContextE2ETests(unittest.TestCase):
                 packet["capability_ids"],
             )
             hints = packet["feature_hints"]
-            self.assertTrue(any(item.get("feature_id") == FEATURE_ID for item in hints))
+            panel_hints = [item for item in hints if item.get("feature_id") == FEATURE_ID]
+            self.assertTrue(panel_hints)
+            self.assertFalse(any(item.get("usable") for item in panel_hints))
+            self.assertTrue(
+                any(item.get("dataset_terminal") == SAMPLE_INVALID for item in panel_hints)
+            )
+            self.assertIn(SECOND_CAPABILITY_ID, packet["capability_ids"])
             self.assertTrue(
                 any(item.get("terminal") == CLOSED_FAMILY for item in packet["closed_family_ledger"])
             )
+            self.assertGreaterEqual(len(packet["closed_family_ledger"]), 2)
             self.assertIn("truncation_receipt", packet)
             ranked = packet.get("ranked_prior_candidate_ids") or []
             self.assertIsInstance(ranked, list)
@@ -276,6 +292,242 @@ class TempBindAndContextE2ETests(unittest.TestCase):
 
         git_after = repository_git_snapshot(ROOT)
         self.assertTrue(git_before.unchanged(git_after))
+
+    def test_ten_eligible_rows_advertise_usable_hint(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            source = Path(tmp) / "source"
+            write_temp_capture(source, eligible=10)
+            data_root = Path(tmp) / "rdp"
+            data_root.mkdir()
+            imported = import_early_market_panel(
+                source_root=source,
+                data_root=data_root,
+                source_receipt_path=source / "source_receipt.json",
+            )
+            self.assertEqual(imported["dataset_terminal"], SAMPLE_VALID)
+            self.assertTrue(imported["feature_usable"])
+            preflight = run_cli(
+                "preflight",
+                "--owner-focus",
+                "AUTO",
+                "--format",
+                "json",
+                data_root=data_root,
+            )
+            self.assertEqual(preflight.returncode, 0, preflight.stderr)
+            packet = json.loads(preflight.stdout)["forge_context_packet"]
+            hints = [
+                item
+                for item in packet["feature_hints"]
+                if item.get("feature_id") == FEATURE_ID
+            ]
+            self.assertTrue(hints)
+            self.assertTrue(any(item.get("usable") for item in hints))
+
+    def test_second_registered_dataset_and_capability_appear_without_preflight_edit(
+        self,
+    ) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            data_root = Path(tmp) / "rdp"
+            data_root.mkdir()
+            commissioned = run_cli(
+                "preflight",
+                "--owner-focus",
+                "AUTO",
+                "--format",
+                "json",
+                data_root=data_root,
+            )
+            self.assertEqual(commissioned.returncode, 0, commissioned.stderr)
+            _publish_second_synthetic_dataset(data_root)
+            after = run_cli(
+                "preflight",
+                "--owner-focus",
+                "AUTO",
+                "--format",
+                "json",
+                data_root=data_root,
+            )
+            self.assertEqual(after.returncode, 0, after.stderr)
+            packet = json.loads(after.stdout)["forge_context_packet"]
+            self.assertIn(SECOND_DATASET_MANIFEST_ID, packet["dataset_manifest_ids"])
+            self.assertIn(SECOND_CAPABILITY_ID, packet["capability_ids"])
+            self.assertTrue(
+                any(
+                    item.get("capability_id") == SECOND_CAPABILITY_ID
+                    and "effect_class" in item
+                    and "supports_pit" in item
+                    and "max_provider_calls" in item
+                    for item in packet["capability_entries"]
+                )
+            )
+
+    def test_deleted_context_artifact_breaks_prove_runtime_no_worthy(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            data_root = Path(tmp) / "rdp"
+            data_root.mkdir()
+            preflight = run_cli(
+                "preflight",
+                "--owner-focus",
+                "AUTO",
+                "--format",
+                "json",
+                data_root=data_root,
+            )
+            self.assertEqual(preflight.returncode, 0, preflight.stderr)
+            receipt = json.loads(preflight.stdout)
+            digest = receipt["forge_context_packet_sha256"]
+            receipt_path = Path(tmp) / "preflight.json"
+            receipt_path.write_text(preflight.stdout, encoding="utf-8")
+            draft_path = Path(tmp) / "no_worthy.json"
+            draft_path.write_text(
+                json.dumps(bind_draft(json.loads(NO_WORTHY.read_text(encoding="utf-8")), receipt)),
+                encoding="utf-8",
+            )
+            frozen_run = run_cli(
+                "freeze",
+                "--draft",
+                str(draft_path),
+                "--preflight-receipt",
+                str(receipt_path),
+                "--format",
+                "json",
+                data_root=data_root,
+            )
+            self.assertEqual(frozen_run.returncode, 0, frozen_run.stderr)
+            frozen = json.loads(frozen_run.stdout)
+            blob = data_root / FORGE_CONTEXT_ARTIFACT_DIR / f"{digest}.json"
+            self.assertTrue(blob.is_file())
+            blob.unlink()
+            proved = run_cli(
+                "prove-runtime",
+                "--session-id",
+                frozen["session_id"],
+                "--format",
+                "json",
+                data_root=data_root,
+            )
+            self.assertNotEqual(proved.returncode, 0)
+            self.assertIn("FORGE_CONTEXT", proved.stderr + proved.stdout)
+
+    def test_selected_path_resolves_context_and_fails_closed_on_corrupt_blob(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            data_root = Path(tmp) / "rdp"
+            data_root.mkdir()
+            preflight = run_cli(
+                "preflight",
+                "--owner-focus",
+                "AUTO",
+                "--format",
+                "json",
+                data_root=data_root,
+            )
+            self.assertEqual(preflight.returncode, 0, preflight.stderr)
+            receipt = json.loads(preflight.stdout)
+            digest = receipt["forge_context_packet_sha256"]
+            receipt_path = Path(tmp) / "preflight.json"
+            receipt_path.write_text(preflight.stdout, encoding="utf-8")
+            draft_path = Path(tmp) / "selected.json"
+            draft_path.write_text(
+                json.dumps(bind_draft(json.loads(HAPPY.read_text(encoding="utf-8")), receipt)),
+                encoding="utf-8",
+            )
+            frozen_run = run_cli(
+                "freeze",
+                "--draft",
+                str(draft_path),
+                "--preflight-receipt",
+                str(receipt_path),
+                "--format",
+                "json",
+                data_root=data_root,
+            )
+            self.assertEqual(frozen_run.returncode, 0, frozen_run.stderr)
+            frozen = json.loads(frozen_run.stdout)
+            self.assertIsNotNone(frozen.get("selected_candidate_id"))
+            shown = run_cli(
+                "show-session",
+                "--session-id",
+                frozen["session_id"],
+                "--format",
+                "json",
+                data_root=data_root,
+            )
+            self.assertEqual(shown.returncode, 0, shown.stderr)
+            blob = data_root / FORGE_CONTEXT_ARTIFACT_DIR / f"{digest}.json"
+            blob.write_bytes(blob.read_bytes() + b" ")
+            broken = run_cli(
+                "show-session",
+                "--session-id",
+                frozen["session_id"],
+                "--format",
+                "json",
+                data_root=data_root,
+            )
+            self.assertNotEqual(broken.returncode, 0)
+            self.assertIn("FORGE_CONTEXT", broken.stderr + broken.stdout)
+
+
+def _publish_second_synthetic_dataset(data_root: Path) -> None:
+    created = datetime(2026, 8, 25, tzinfo=UTC)
+    parquet_path = (
+        data_root
+        / "datasets"
+        / "partitions"
+        / "date=2026-08-25"
+        / "PARTITION-SYNTHETIC-CONTEXT-002.parquet"
+    )
+    parquet_path.parent.mkdir(parents=True, exist_ok=True)
+    from solana_alpha_lab.factory.commissioning_fixture import _deterministic_parquet_bytes
+
+    parquet_bytes = _deterministic_parquet_bytes()
+    parquet_path.write_bytes(parquet_bytes)
+    file_sha = hashlib.sha256(parquet_bytes).hexdigest()
+    partition = PartitionManifest(
+        partition_manifest_id="PARTITION-MANIFEST-SYNTHETIC-CONTEXT-002",
+        dataset_manifest_id=SECOND_DATASET_MANIFEST_ID,
+        partition_id="PARTITION-SYNTHETIC-CONTEXT-002",
+        logical_location=(
+            "datasets/partitions/date=2026-08-25/"
+            "PARTITION-SYNTHETIC-CONTEXT-002.parquet"
+        ),
+        file_sha256=file_sha,
+        content_sha256=file_sha,
+        row_count=3,
+        min_event_time=created,
+        max_event_time=created,
+        min_available_to_strategy_at=created,
+        max_available_to_strategy_at=created,
+        first_reliable_available_at=created,
+        created_at=created,
+    )
+    dataset = DatasetManifest(
+        dataset_manifest_id=SECOND_DATASET_MANIFEST_ID,
+        dataset_id="DATASET-SYNTHETIC-CONTEXT-002",
+        dataset_version="1.0",
+        schema_id="SCHEMA-SYNTHETIC-CONTEXT-002",
+        schema_sha256="ab" * 32,
+        dataset_fingerprint="cd" * 32,
+        generation_task_id="HFIC_NEXT_EVIDENCE_BIND_AND_CONTEXT_V1",
+        generation_run_id="RUN-SYNTHETIC-CONTEXT-002",
+        validation_receipt_sha256="ef" * 32,
+        first_reliable_available_at=created,
+        created_at=created,
+        content_sha256="aa" * 32,
+    )
+    part_path = (
+        data_root
+        / "datasets"
+        / "manifests"
+        / "partitions"
+        / "PARTITION-MANIFEST-SYNTHETIC-CONTEXT-002.json"
+    )
+    part_path.parent.mkdir(parents=True, exist_ok=True)
+    part_path.write_bytes(canonical_manifest_bytes(partition))
+    manifest_path = (
+        data_root / "datasets" / "manifests" / f"{SECOND_DATASET_MANIFEST_ID}.json"
+    )
+    manifest_path.write_bytes(canonical_manifest_bytes(dataset))
 
 
 if __name__ == "__main__":

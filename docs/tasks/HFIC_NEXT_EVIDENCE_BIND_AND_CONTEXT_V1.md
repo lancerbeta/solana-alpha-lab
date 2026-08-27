@@ -98,11 +98,13 @@ context_requirements:
   canonical `NO_WORTHY_HYPOTHESIS` without a dummy Critic.
 - **Named consumers:** Hypothesis Forge preflight; later owner-invoked
   `/hypothesis-forge` after POST-MERGE bind. This atom does not run Forge.
-- **Cheapest falsifier:** TEMP E2E import → manifest → epoch change;
-  repeat import idempotent; hash corruption fail-closed; preflight sees
-  dataset, capability, feature hint and
-  `CLOSE_VALUATION_LIQUIDITY_DIVERGENCE_FAMILY`; context artifact
-  hash-bound; `provider_calls=0`; runtime Git unchanged; no X↔Y score.
+- **Cheapest falsifier:** TEMP E2E import → fail-closed commit-point
+  publication; yield below 10 is `SAMPLE_INVALID` and not a usable hint;
+  yield of 10 or more advertises the hint; strict envelope `observed_at`;
+  enumerated context (second registered dataset/capability without
+  editing `hfic_preflight.py`); content-addressed context artifact
+  required by load/show/prove; idempotent retry; `provider_calls=0`;
+  runtime Git unchanged; no X↔Y score.
 - **Evidence budget:** offline only. `provider_calls_for_bind=0`.
 - **Non-goals:** provider collection; X↔Y scoring; experiment;
   `/hypothesis-forge`; TWO_RUNG; reopening closed families; registering
