@@ -58,6 +58,9 @@ CAP_JUPITER_FREE_KEY_QUOTE_NATIVE_BOUNDED_CAPTURE = (
 CAP_JUPITER_FREE_KEY_FORWARD_H900_QUOTE_CAPTURE = (
     "CAP-JUPITER-FREE-KEY-FORWARD-H900-QUOTE-CAPTURE-001"
 )
+CAP_JUPITER_FREE_KEY_EARLY_ICP_FIRST_HIT_MIX_FALSIFIER = (
+    "CAP-JUPITER-FREE-KEY-EARLY-ICP-FIRST-HIT-MIX-FALSIFIER-001"
+)
 INPUT_KINDS = frozenset(
     {
         "GIT_CANONICAL_RECEIPT",
@@ -549,10 +552,72 @@ def capture_forward_h900_quote(
     }
 
 
+def capture_early_icp_first_hit_mix_falsifier(
+    spec: Mapping[str, Any],
+    *,
+    root: Path,
+    authority_phrase: str | None = None,
+    capture_hooks: Mapping[str, Any] | None = None,
+) -> dict[str, Any]:
+    """Thin router for the WRAP first-hit mix falsifier. Scorer stays unchanged."""
+    del spec
+    from solana_alpha_lab.factory.early_icp_first_hit_mix_falsifier import (
+        FirstHitError,
+        run_first_hit_mix_falsifier,
+    )
+
+    hooks = dict(capture_hooks or {})
+    data_root = hooks.get("data_root")
+    staging_root = hooks.get("staging_root")
+    if data_root is None:
+        raise CapabilityError("FIRST_HIT_DATA_ROOT_REQUIRED")
+    if staging_root is None:
+        raise CapabilityError("FIRST_HIT_STAGING_ROOT_REQUIRED")
+    kwargs: dict[str, Any] = {
+        "repo_root": root,
+        "data_root": Path(data_root),
+        "staging_root": Path(staging_root),
+        "authority_phrase": str(authority_phrase or ""),
+    }
+    for key in (
+        "opener",
+        "clock",
+        "sleeper",
+        "monotonic_clock",
+        "preflight_fn",
+        "credential_loader",
+        "excluded_mints",
+        "publication_hook",
+    ):
+        if key in hooks and hooks[key] is not None:
+            kwargs[key] = hooks[key]
+    try:
+        receipt = run_first_hit_mix_falsifier(**kwargs)
+    except FirstHitError as exc:
+        return {
+            "status": "FAILED",
+            "blocker": str(exc),
+            "terminal": str(exc),
+            "result": str(exc),
+            "provider_api_rpc_wss_calls": int(getattr(exc, "provider_requests", 0) or 0),
+            "credential_reads": 0,
+        }
+    return {
+        "status": "COMPLETE",
+        "blocker": "NONE",
+        "terminal": receipt.get("terminal_outcome") or receipt.get("scientific_terminal"),
+        "result": receipt.get("terminal_outcome") or receipt.get("scientific_terminal"),
+        "provider_api_rpc_wss_calls": int(receipt.get("provider_requests") or 0),
+        "credential_reads": int(receipt.get("credential_reads") or 0),
+        "receipt": receipt,
+    }
+
+
 CAPABILITY_ROUTER: dict[str, Callable[..., dict[str, Any]]] = {
     CAP_OFFLINE_CANONICAL_RECEIPT_REPLAY: replay_canonical_receipts,
     CAP_JUPITER_FREE_KEY_QUOTE_NATIVE_BOUNDED_CAPTURE: capture_quote_native_free_key,
     CAP_JUPITER_FREE_KEY_FORWARD_H900_QUOTE_CAPTURE: capture_forward_h900_quote,
+    CAP_JUPITER_FREE_KEY_EARLY_ICP_FIRST_HIT_MIX_FALSIFIER: capture_early_icp_first_hit_mix_falsifier,
     CAP_OFFLINE_MARKET_FEATURE_RESOLVE: resolve_market_feature_surface,
 }
 
@@ -580,6 +645,9 @@ def execute_capability(
         if budget < 1 or budget > 62:
             raise CapabilityError("PROVIDER_BUDGET_INVALID")
     if capability_id == CAP_JUPITER_FREE_KEY_FORWARD_H900_QUOTE_CAPTURE:
+        if budget < 1 or budget > 60:
+            raise CapabilityError("PROVIDER_BUDGET_INVALID")
+    if capability_id == CAP_JUPITER_FREE_KEY_EARLY_ICP_FIRST_HIT_MIX_FALSIFIER:
         if budget < 1 or budget > 60:
             raise CapabilityError("PROVIDER_BUDGET_INVALID")
     return handler(
