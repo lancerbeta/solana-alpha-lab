@@ -543,6 +543,16 @@
       "target_asset_id": "CTRL-EARLY-HOLDER-CONCENTRATION-H900-FALSIFIER-001"
     },
     {
+      "source_asset_id": "CONFIG-EARLY-ICP-FIRST-HIT-MIX-FALSIFIER-001",
+      "relation": "depends_on",
+      "target_asset_id": "CONFIG-PROVIDER-ROUTE-CAPABILITY-REGISTRY-010"
+    },
+    {
+      "source_asset_id": "CONFIG-EARLY-ICP-FIRST-HIT-MIX-FALSIFIER-001",
+      "relation": "governed_by",
+      "target_asset_id": "CTRL-EARLY-ICP-FIRST-HIT-MIX-FALSIFIER-001"
+    },
+    {
       "source_asset_id": "CONFIG-EARLY-ICP-FREEZE-AND-MATURITY-BRANCH-CLOSE-001",
       "relation": "governed_by",
       "target_asset_id": "CTRL-EARLY-ICP-FREEZE-AND-MATURITY-BRANCH-CLOSE-001"
@@ -2376,6 +2386,16 @@
       "source_asset_id": "CTRL-EARLY-HOLDER-CONCENTRATION-H900-FALSIFIER-001",
       "relation": "validated_by",
       "target_asset_id": "TEST-EARLY-HOLDER-CONCENTRATION-H900-FALSIFIER-001"
+    },
+    {
+      "source_asset_id": "CTRL-EARLY-ICP-FIRST-HIT-MIX-FALSIFIER-001",
+      "relation": "depends_on",
+      "target_asset_id": "CONFIG-EARLY-ICP-FIRST-HIT-MIX-FALSIFIER-001"
+    },
+    {
+      "source_asset_id": "CTRL-EARLY-ICP-FIRST-HIT-MIX-FALSIFIER-001",
+      "relation": "validated_by",
+      "target_asset_id": "TEST-EARLY-ICP-FIRST-HIT-MIX-FALSIFIER-001"
     },
     {
       "source_asset_id": "CTRL-EARLY-ICP-FREEZE-AND-MATURITY-BRANCH-CLOSE-001",
@@ -8948,6 +8968,31 @@
       "target_asset_id": "MODULE-ORDINARY-RECENT-ORGANIC-PRESSURE-H900-AUDITION-001"
     },
     {
+      "source_asset_id": "MODULE-EARLY-ICP-FIRST-HIT-MIX-FALSIFIER-001",
+      "relation": "depends_on",
+      "target_asset_id": "CONFIG-EARLY-ICP-FIRST-HIT-MIX-FALSIFIER-001"
+    },
+    {
+      "source_asset_id": "MODULE-EARLY-ICP-FIRST-HIT-MIX-FALSIFIER-001",
+      "relation": "depends_on",
+      "target_asset_id": "MODULE-FORWARD-H900-QUOTE-CAPTURE-001"
+    },
+    {
+      "source_asset_id": "MODULE-EARLY-ICP-FIRST-HIT-MIX-FALSIFIER-001",
+      "relation": "depends_on",
+      "target_asset_id": "MODULE-FORWARD-MIX-OFFLINE-001"
+    },
+    {
+      "source_asset_id": "MODULE-EARLY-ICP-FIRST-HIT-MIX-FALSIFIER-001",
+      "relation": "governed_by",
+      "target_asset_id": "CTRL-EARLY-ICP-FIRST-HIT-MIX-FALSIFIER-001"
+    },
+    {
+      "source_asset_id": "MODULE-EARLY-ICP-FIRST-HIT-MIX-FALSIFIER-001",
+      "relation": "validated_by",
+      "target_asset_id": "TEST-EARLY-ICP-FIRST-HIT-MIX-FALSIFIER-001"
+    },
+    {
       "source_asset_id": "MODULE-EARLY-ICP-FREEZE-ACCEPTANCE-001",
       "relation": "depends_on",
       "target_asset_id": "CONFIG-EARLY-ICP-FREEZE-AND-MATURITY-BRANCH-CLOSE-001"
@@ -12188,6 +12233,16 @@
       "target_asset_id": "CTRL-EARLY-HOLDER-CONCENTRATION-H900-FALSIFIER-001"
     },
     {
+      "source_asset_id": "SCRIPT-EARLY-ICP-FIRST-HIT-MIX-FALSIFIER-001",
+      "relation": "depends_on",
+      "target_asset_id": "MODULE-EARLY-ICP-FIRST-HIT-MIX-FALSIFIER-001"
+    },
+    {
+      "source_asset_id": "SCRIPT-EARLY-ICP-FIRST-HIT-MIX-FALSIFIER-001",
+      "relation": "governed_by",
+      "target_asset_id": "CTRL-EARLY-ICP-FIRST-HIT-MIX-FALSIFIER-001"
+    },
+    {
       "source_asset_id": "SCRIPT-EARLY-ICP-FREEZE-RUNNER-001",
       "relation": "depends_on",
       "target_asset_id": "MODULE-EARLY-ICP-FREEZE-ACCEPTANCE-001"
@@ -13181,6 +13236,21 @@
       "source_asset_id": "TEST-EARLY-HOLDER-CONCENTRATION-H900-FALSIFIER-001",
       "relation": "depends_on",
       "target_asset_id": "MODULE-EARLY-HOLDER-CONCENTRATION-H900-FALSIFIER-001"
+    },
+    {
+      "source_asset_id": "TEST-EARLY-ICP-FIRST-HIT-MIX-FALSIFIER-001",
+      "relation": "depends_on",
+      "target_asset_id": "MODULE-EARLY-ICP-FIRST-HIT-MIX-FALSIFIER-001"
+    },
+    {
+      "source_asset_id": "TEST-EARLY-ICP-FIRST-HIT-MIX-FALSIFIER-001",
+      "relation": "depends_on",
+      "target_asset_id": "SCRIPT-EARLY-ICP-FIRST-HIT-MIX-FALSIFIER-001"
+    },
+    {
+      "source_asset_id": "TEST-EARLY-ICP-FIRST-HIT-MIX-FALSIFIER-001",
+      "relation": "governed_by",
+      "target_asset_id": "CTRL-EARLY-ICP-FIRST-HIT-MIX-FALSIFIER-001"
     },
     {
       "source_asset_id": "TEST-EARLY-ICP-FREEZE-ACCEPTANCE-001",
