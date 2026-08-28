@@ -1,0 +1,45 @@
+{
+  "as_of": "2026-08-28",
+  "capability_radar": {
+    "now": "NONE",
+    "watch": "POST_MERGE_ONE_AUTHORIZED_LIVE_FALSIFIER"
+  },
+  "dimensions": {
+    "build_vs_buy": "PASS",
+    "context_efficiency": "PASS",
+    "execution_to_cashflow": "PASS",
+    "flexibility_and_history": "PASS",
+    "mission": "PASS",
+    "monitoring_and_recovery": "PASS",
+    "owner_operability": "PASS",
+    "red_team": "PASS",
+    "research_truth": "PASS",
+    "security": "PASS"
+  },
+  "limits": [
+    "NO_ALPHA",
+    "NO_CANONICAL_DONE",
+    "NO_LIVE_PROVIDER_CALL_BEFORE_MERGE",
+    "NO_HYPOTHESIS_FORGE_SLASH",
+    "NO_OTHER_EXPERIMENT",
+    "NO_PROMOTION",
+    "NO_SHADOW",
+    "NO_TWO_RUNG",
+    "NO_CONFIRMATORY_SECOND_WINDOW",
+    "NO_AGE_GATE_CHANGE",
+    "NO_PAID_PROVIDER",
+    "NO_DECLARATIVE_BRIDGE",
+    "FACTORY_RUNNER_UNCHANGED",
+    "SCORE_FROZEN_MIX_DATASET_UNCHANGED",
+    "CLASSIFY_R0_MIX_OFFLINE_ONLY"
+  ],
+  "mode": "FULL_REVIEW",
+  "recovery": "REVERT",
+  "review_id": "EARLY-ICP-RETAINED-COHORT-MATURITY-CORRECTIVE-FACTORY-FIT-001",
+  "reviewed_bindings_sha256": "25e50d1487b4640d2678d28489b47487e318df13bee2cc86d92a043cb2d760c7",
+  "reviewed_inventory_sha256": "e0ca3a8baec39d937d261b48a42db5595a784927d5f6d00a2a936b60898dc6ea",
+  "schema": "smial.delivery-harness-factory-fit",
+  "schema_version": "1.0",
+  "task_id": "EARLY_ICP_RETAINED_COHORT_MATURITY_CORRECTIVE_V1",
+  "verdict": "PASS"
+}

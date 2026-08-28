@@ -37,9 +37,13 @@ def main(argv: list[str] | None = None) -> int:
         epilog=(
             "Post-merge only. Do not retry IN_FLIGHT_CALL_INDETERMINATE.\n"
             "STAGING_INSIDE_RDP: staging-root must be outside data-root.\n"
+            "STAGING_ATTEMPT_IDENTITY_MISMATCH: a pre-corrective or other-atom "
+            "staging journal is not resumed; existing bytes stay unchanged.\n"
             "Owner-visible terminals: SLEEP_ELIGIBLE_BELOW_10, "
             "INVALID_EVIDENCE_REPLAN, CLOSE_EARLY_TAKER_VOLUME_MIX_FAMILY, "
             "EARN_ONE_CONFIRMATORY_FRESH_OOS.\n"
+            "R0 requires valid_mix_eligible >= 10 from the retained pool; "
+            "stats5m mapping alone does not open quotes.\n"
             "Exact owner phrase is configs/early_icp_first_hit_mix_falsifier_v1.yaml "
             "external_authority.owner_phrase; reprint it after merge, do not invent one.\n"
             "Example run:\n"
