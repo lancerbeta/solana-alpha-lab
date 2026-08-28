@@ -9,12 +9,12 @@
   "cloud_bundle_smoke_required": false,
   "factory_fit": {
     "path": "docs/evidence/declarative_observation_schedule_bridge/a1_delivery_factory_fit_v1.json",
-    "sha256": "264f611d9f612d49b76d16068e0abaad0fddbc8aa88bcec894b4e33d0cb66906",
+    "sha256": "73f963c3dc51c0e43bed40c3ca52ab63513321d2fd29710fedf152aaa8db4645",
     "verdict": "PASS"
   },
   "implementation_bindings": {
     ".github/workflows/ci.yml": "48fe2fe9572132917b0f8719310a095f8ea0fbf7b1c0d5c6b79f2abaa1de8620",
-    "catalog/assets/core.yaml": "6c94b3c2b82670b569209ae6328b980a66db30b9481a2ebe493d7891fafd7e00",
+    "catalog/assets/core.yaml": "01dae77635c14dbfdf7266e3ac2cad1c66ffcb22abfa9507b8a25e90a680d13b",
     "catalog/assets/lifecycle.yaml": "ac6c8a699f78c42dd2bdcbbd1b16eac3ef3bad53c3980f3636202776ec9460ac",
     "catalog/catalog_manifest.yaml": "51e93116dee7b7a24d7b004a446d1c56a57f82497fd4f621804a40c43974935f",
     "catalog/generated/asset_edges.json": "e37c570e9546e53db7cb0948d0e24c7b5cdf462db6cbfe698e937e5c10b6250d",
@@ -34,7 +34,7 @@
     "configs/observation_primitive_registry_v1.yaml": "851aff223687d2ffe07e4498ffe24343d405f374c122029f6cdd6d1115284a47",
     "docs/PROJECT_MAP.md": "ab6cd06a09e0b9708f558f649f9800885c9e8fee40e96aea27fd9e70a3686a49",
     "docs/decisions/ADR-007-declarative-observation-schedule-bridge.md": "101d97725f80d170694fa25c35ba6e796b22dc18b052304c8e29c52f630e1093",
-    "docs/tasks/DECLARATIVE_OBSERVATION_SCHEDULE_BRIDGE_V1.md": "10e8b1ed61cdec39ef902394fa1306fe6db434d8ea94b6da528aa5db53ee6fdd",
+    "docs/tasks/DECLARATIVE_OBSERVATION_SCHEDULE_BRIDGE_V1.md": "bf06d2ddf1517f54d5054ea3dee1e306c70df120a7b51731b995d484c6cdc31b",
     "schemas/research_memory_projection_v1.sql": "c95c04766095df5c4183daa2fe09a76676d2fcda1be8220f9f55c028dd8b45ff",
     "scripts/observation_schedule.py": "e2080f6c4cc4885fc693197c51fb3e011b7581bb63da45304affc431f3b07973",
     "scripts/validate_ci.py": "76080a56668244d2a7e0add0f08fa8d63c218d8a1f4069e0e0705deaab76e286",
@@ -58,6 +58,7 @@
     "tests/fixtures/observation_schedule/successor_y259200.yaml": "b298f1de4d8d70eabf4bd55521fe326ded64d7d768260ddd2e180a13ef8eb349",
     "tests/fixtures/observation_schedule/x300_y900.yaml": "8a59ebd5dbb182836d207329bb98b9e33c023f1e77a929ac86ef8fd0839cc5f8",
     "tests/test_ci.py": "59f309277bdb73903d7250a2396d9e16bc3afa9d99fffcb41fdffc8e92bba96f",
+    "tests/test_factory_ordinary_market_hypothesis.py": "650f7844580beada1821004abb99d7f2cccaef70b16610be859654285069e085",
     "tests/test_hfic_preflight.py": "cc4684e34d496f7434446f4102c9325bb58235d6183810ad28b7df0f42c247d9",
     "tests/test_observation_panel_publisher.py": "9952fc99bee8174eb9e30eef6f639383a4ee62b17adcc7310c0cd50f6bfbd134",
     "tests/test_observation_primitive_registry.py": "f8af5e8262305952f80fc741f59b41140c2ee67f209841877a2dba8f69bf4ade",
@@ -106,7 +107,7 @@
     "github_ci": "ENFORCED_LIVE_AT_GUARDED_MERGE",
     "independent_review": {
       "path": "docs/evidence/declarative_observation_schedule_bridge/a1_delivery_independent_review_v1.json",
-      "sha256": "d24216e117ee2a0bf47b45170366f68480c924d59c0bb1d43be818a9a678dc22",
+      "sha256": "ef935db506e4fd15479476f78f0ce34a28cc765e3d2e39967d340ce234f98ab4",
       "verdict": "PASS"
     },
     "project_checks": [
