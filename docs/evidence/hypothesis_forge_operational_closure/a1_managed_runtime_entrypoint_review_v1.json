@@ -1,0 +1,52 @@
+{
+  "as_of": "2026-08-28",
+  "non_claims": [
+    "NO_CRYPTOGRAPHIC_REVIEWER_IDENTITY",
+    "NO_PYTHON_310_COMPATIBILITY",
+    "NO_NESTED_UV_IN_HFIC_TESTS",
+    "NO_HFIC_LOGIC_CHANGE",
+    "NO_PRODUCTION_FORGE_BEFORE_MERGE"
+  ],
+  "required_roles": [
+    "CODE_REVIEWER",
+    "GOAL_DOD_CRITIC",
+    "ARCHITECTURE_CRITIC"
+  ],
+  "review_id": "HFIC-MANAGED-RUNTIME-ENTRYPOINT-INDEPENDENT-REVIEW-001",
+  "reviewed_bindings_sha256": "d02cefc1bbd82a743042fb79a7e14dff4a6c659c2581ced72680674917ef93d1",
+  "reviewed_inventory_sha256": "a846ede9b8c9170a6942e082267491e0e1652a5dd8e5220caa74f2627cbe3bc8",
+  "reviews": [
+    {
+      "findings": [
+        "OPERATOR_PREFIX_PINNED_UV_LOCKED_MANAGED_PYTHON",
+        "CLI_GATE_BEFORE_FACTORY_IMPORT_TYPED_HFIC_RUNTIME_PYTHON_VERSION_INCOMPATIBLE",
+        "TESTS_KEEP_SYS_EXECUTABLE_NO_NESTED_UV_NO_NEW_PERSIST_E2E",
+        "OWNER_UX_PASS_BATCH_WORDING_USES_UV_PREFIX"
+      ],
+      "role": "CODE_REVIEWER",
+      "verdict": "PASS"
+    },
+    {
+      "findings": [
+        "CHEAPEST_FALSIFIER_CLOSED_NO_BARE_PYTHON_B_ON_OPERATOR_SURFACES",
+        "PIN_ALIGNMENT_PYTHON_VERSION_PYPROJECT_YAML_CLI_CONSTANT",
+        "TEMP_ROOT_MANAGED_PYTHON_PREFLIGHT_ONE_SHOT_NOT_SUITE_E2E"
+      ],
+      "role": "GOAL_DOD_CRITIC",
+      "verdict": "PASS"
+    },
+    {
+      "findings": [
+        "FAIL_CLOSED_BEFORE_RDP_GIT_FACTORY_IMPORT",
+        "VERSION_GATE_IS_RELEASE_STRING_NOT_UV_LOCK_IDENTITY",
+        "ROLLBACK_REVERT_SUFFICIENT"
+      ],
+      "role": "ARCHITECTURE_CRITIC",
+      "verdict": "PASS"
+    }
+  ],
+  "schema": "smial.delivery-independent-review-evidence",
+  "schema_version": "1.0",
+  "task_id": "HFIC_MANAGED_RUNTIME_ENTRYPOINT_CORRECTIVE_V1",
+  "verdict": "PASS"
+}

@@ -42,6 +42,15 @@ skills:
   critic: .agents/skills/independent-hypothesis-critic/SKILL.md
 cli:
   entrypoint: scripts/hypothesis_forge.py
+  required_python: '3.13.14'
+  operator_invocation_prefix:
+    - uv
+    - run
+    - --locked
+    - --managed-python
+    - python
+    - -B
+    - scripts/hypothesis_forge.py
 schemas:
   critic_input: catalog/schemas/hypothesis_critic_input_v1.schema.json
   synthesis_handoff: catalog/schemas/hypothesis_forge_synthesis_handoff_v1.schema.json
