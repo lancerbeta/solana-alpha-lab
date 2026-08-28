@@ -43,6 +43,7 @@ from solana_alpha_lab.factory.forward_mix_offline import score_frozen_mix_datase
 from solana_alpha_lab.factory.run_passport import canonical_sha256
 from solana_alpha_lab.ordinary_recent_organic_pressure_h900_audition import (
     QUOTE_OBSERVED,
+    OrganicPressureError,
     _assert_quote_body_has_no_transaction,
     _format_utc,
     _order_url,
@@ -67,6 +68,7 @@ RECEIPT_SCHEMA = "smial.early-icp-first-hit-mix-falsifier.runtime-receipt"
 MAX_DENSITY_CHECKS = 20
 DENSITY_CHECK_PERIOD_SECONDS = 60
 QUOTE_CALL_RESERVE = 20
+SEARCH_POOL_CAP = 100
 PACE_SECONDS = 3
 SLEEP_TERMINAL = "SLEEP_ELIGIBLE_BELOW_10"
 IN_FLIGHT_TERMINAL = "IN_FLIGHT_CALL_INDETERMINATE"
@@ -78,38 +80,44 @@ PARTITION_MANIFEST_ID = "PARTITION-MANIFEST-EARLY-ICP-FIRST-HIT-MIX-FALSIFIER-00
 SCHEMA_ID = "SCHEMA-EARLY-ICP-FIRST-HIT-MIX-FALSIFIER-001"
 COMMIT_POINT_KIND = "EARLY_ICP_FIRST_HIT_MIX_FALSIFIER_PUBLICATION_V1"
 AUTHORITY_PHRASE = (
-    "OK EARLY_ICP_FIRST_HIT_MIX_FALSIFIER_V1: one bounded Jupiter Free-key "
-    "foreground falsifier using a local process-environment key only; this "
-    "exact pre-registered falsifier is authorized; any other experiment, "
-    "promotion, Shadow, TWO_RUNG and /hypothesis-forge are forbidden; up to "
-    "20 quote-free density checks of Tokens V2 /recent plus one bulk "
-    "/tokens/v2/search each, period 60s, pace >=3s; the first search with "
-    "select_eligible >=10 is the sole R0 snapshot, its search bytes are "
-    "hash-bound, and a second /search is forbidden; quote-only /swap/v2/order "
-    "BUY at that R0 then quote-only SELL at absolute create_at+H900; after "
-    "internal CAPTURE_COMPLETE, publish one immutable dataset bundle with "
-    "commit-marker last and run existing unchanged score_frozen_mix_dataset; "
-    "persist exactly one scientific terminal INVALID_EVIDENCE_REPLAN, "
-    "CLOSE_EARLY_TAKER_VOLUME_MIX_FAMILY or EARN_ONE_CONFIRMATORY_FRESH_OOS "
-    "and mark that Y consumed; x-api-key header only; no .env read, no key in "
-    "URL/log/receipt/Git, no taker, /build, /execute, wallet, signer, "
-    "transaction, paid plan, second provider, retry, fallback or mid-run "
-    "owner intervention; cash cap $0; call cap 60 covering checks and quotes "
-    "without raising the cap; quote_call_reserve 20; quoted = min(eligible, "
-    "remaining/2, 29) and never below 10; Y-blind V2 search order; unquoted "
-    "eligible rows kept with typed Y-null; floors mix_eligible >=10, "
-    "decision-time eligible >=10, rankable H900 >=8; typed missingness, no "
-    "imputation, no universe deletion, UNKNOWN never zero; ICP-EARLY-PUMPFUN-V1 "
-    "exclusions include the 2026-08-24 valuation window and the completed V2 "
+    "OK EARLY_ICP_RETAINED_COHORT_MATURITY_CORRECTIVE_V1: one bounded Jupiter "
+    "Free-key foreground falsifier using a local process-environment key only; "
+    "this exact pre-registered EARLY_ICP_FIRST_HIT_MIX_FALSIFIER_V1 in-place "
+    "corrective is authorized; any other experiment, promotion, Shadow, "
+    "TWO_RUNG and /hypothesis-forge are forbidden; up to 20 quote-free density "
+    "checks of Tokens V2 /recent plus one bulk /tokens/v2/search each, period "
+    "60s, pace >=3s; each /recent adds new pump.fun mints to a crash-safe "
+    "retained candidate pool; each /search is built from that retained pool, "
+    "not only the current /recent, max 100 mints, deterministic Y-blind order; "
+    "frozen ICP, X, Y and age-band [300,600) are unchanged; the first search "
+    "with valid_mix_eligible >=10 is the sole R0 snapshot, its search bytes "
+    "are hash-bound, and a second /search is forbidden; stats5m mapping alone "
+    "does not open quotes; quote only valid_mix_eligible then quote-only "
+    "/swap/v2/order BUY at that R0 then quote-only SELL at absolute "
+    "create_at+H900; after internal CAPTURE_COMPLETE, publish one immutable "
+    "dataset bundle with commit-marker last and run existing unchanged "
+    "score_frozen_mix_dataset; persist exactly one scientific terminal "
+    "INVALID_EVIDENCE_REPLAN, CLOSE_EARLY_TAKER_VOLUME_MIX_FAMILY or "
+    "EARN_ONE_CONFIRMATORY_FRESH_OOS and mark that Y consumed; x-api-key "
+    "header only; no .env read, no key in URL/log/receipt/Git, no taker, "
+    "/build, /execute, wallet, signer, transaction, paid plan, second "
+    "provider, retry, fallback or mid-run owner intervention; cash cap $0; "
+    "call cap 60 covering checks and quotes without raising the cap; "
+    "quote_call_reserve 20; quoted = min(valid_mix_eligible, remaining/2, 29) "
+    "and never below 10; unquoted valid-mix and structural invalid-X rows kept "
+    "with typed Y-null; floors valid_mix_eligible >=10, decision-time "
+    "mix_eligible >=10, rankable H900 >=8; typed missingness, no imputation, "
+    "no universe deletion, UNKNOWN never zero; ICP-EARLY-PUMPFUN-V1 exclusions "
+    "include the 2026-08-24 valuation window and the completed V2 "
     "STOP_BEFORE_QUOTES window; after 20 misses SLEEP_ELIGIBLE_BELOW_10 with "
     "no dataset, no score, no ResearchStore append and evidence_epoch "
     "unchanged; one Y-bearing window only on a new atom root; do not write or "
-    "reopen V2 COMPLETE; X = R0_TAKER_VOLUME_MIX from stats5m buyVolume/"
-    "(buyVolume+sellVolume) at that R0 only (dimensionless; no USD volume "
-    "claim; no R1 search); no ln(R1/R0), no closed-family threshold, window, "
-    "quartile, LOO or tau_b_floor reopen; Factory runner unchanged; Discovery, "
-    "A7, Strategy, Bot, Shadow, alpha, NetReturn, micro-live, promotion and "
-    "confirmatory second window forbidden."
+    "reopen V2 COMPLETE or prior SLEEP artifacts; X = R0_TAKER_VOLUME_MIX from "
+    "stats5m buyVolume/(buyVolume+sellVolume) at that R0 only (dimensionless; "
+    "no USD volume claim; no R1 search); no ln(R1/R0), no closed-family "
+    "threshold, window, quartile, LOO or tau_b_floor reopen; Factory runner "
+    "unchanged; Discovery, A7, Strategy, Bot, Shadow, alpha, NetReturn, "
+    "micro-live, promotion and confirmatory second window forbidden."
 )
 
 MANIFEST_RELATIVE = f"datasets/manifests/{DATASET_MANIFEST_ID}.json"
@@ -187,6 +195,11 @@ def validate_policy(policy: Mapping[str, Any], *, repo_root: Path) -> None:
     )
     _require(int(cadence.get("quote_call_reserve") or 0) == QUOTE_CALL_RESERVE, "RESERVE_DRIFT")
     _require(int(cadence.get("provider_pace_seconds") or 0) == PACE_SECONDS, "PACE_DRIFT")
+    cohort = policy.get("retained_cohort")
+    _require(isinstance(cohort, Mapping), "COHORT_INVALID")
+    _require(cohort.get("search_from") == "retained_pool", "SEARCH_FROM_DRIFT")
+    _require(cohort.get("r0_floor") == "valid_mix_eligible", "R0_FLOOR_DRIFT")
+    _require(int(cohort.get("search_pool_cap") or 0) == SEARCH_POOL_CAP, "SEARCH_POOL_CAP_DRIFT")
     controls = policy.get("execution_controls")
     _require(isinstance(controls, Mapping), "CONTROLS_INVALID")
     _require(controls.get("retries") == 0, "RETRIES_NOT_ZERO")
@@ -207,6 +220,141 @@ def validate_policy(policy: Mapping[str, Any], *, repo_root: Path) -> None:
 def quote_capacity(provider_requests: int) -> int:
     remaining = CALL_CAP - int(provider_requests)
     return min(QUOTE_PAIR_CAP, remaining // 2)
+
+
+def _safe_age_seconds(created_at: object, snapshot_at: datetime) -> float | None:
+    if not isinstance(created_at, str) or not created_at:
+        return None
+    try:
+        created = _parse_datetime(created_at, "FIRST_POOL_TIMESTAMP_INVALID")
+    except (OrganicPressureError, TypeError, ValueError):
+        return None
+    return (snapshot_at.astimezone(UTC) - created).total_seconds()
+
+
+def ingest_recent_into_pool(
+    pool: dict[str, Any],
+    recent_rows: Sequence[Mapping[str, Any]],
+    *,
+    observed_at: str,
+    excluded_mints: set[str],
+) -> dict[str, Any]:
+    for row in recent_rows:
+        if not isinstance(row, Mapping):
+            continue
+        mint = row.get("id")
+        if not isinstance(mint, str) or not mint:
+            continue
+        if row.get("launchpad") != "pump.fun":
+            continue
+        existing = pool.get(mint)
+        if isinstance(existing, Mapping):
+            entry = dict(existing)
+            entry["consumed"] = bool(entry.get("consumed")) or mint in excluded_mints
+            if not isinstance(entry.get("first_seen_at"), str) or not entry.get("first_seen_at"):
+                entry["first_seen_at"] = observed_at
+            pool[mint] = entry
+            continue
+        pool[mint] = {
+            "mint": mint,
+            "first_seen_at": observed_at,
+            "consumed": mint in excluded_mints,
+            "created_at": None,
+            "active": True,
+        }
+    return pool
+
+
+def expire_matured_pool(pool: dict[str, Any], *, snapshot_at: datetime) -> dict[str, Any]:
+    for mint, raw in list(pool.items()):
+        if not isinstance(raw, Mapping):
+            continue
+        entry = dict(raw)
+        age = _safe_age_seconds(entry.get("created_at"), snapshot_at)
+        if age is not None and age >= float(R0_AGE_MAX_EXCLUSIVE):
+            entry["active"] = False
+            pool[mint] = entry
+    return pool
+
+
+def select_search_mints(
+    pool: Mapping[str, Any],
+    *,
+    snapshot_at: datetime,
+    limit: int = SEARCH_POOL_CAP,
+) -> list[str]:
+    mature: list[tuple[str, str]] = []
+    young: list[tuple[float, str]] = []
+    unknown: list[tuple[str, str]] = []
+    for mint, raw in pool.items():
+        if not isinstance(mint, str) or not isinstance(raw, Mapping):
+            continue
+        if raw.get("active") is False or raw.get("consumed"):
+            continue
+        created = raw.get("created_at")
+        age = _safe_age_seconds(created, snapshot_at)
+        if age is not None:
+            if age >= float(R0_AGE_MAX_EXCLUSIVE):
+                continue
+            if age >= float(R0_AGE_MIN):
+                mature.append((str(created), mint))
+            else:
+                young.append((-age, mint))
+            continue
+        first_seen = str(raw.get("first_seen_at") or "")
+        unknown.append((first_seen, mint))
+    mature.sort(key=lambda item: (item[0], item[1]))
+    young.sort(key=lambda item: (item[0], item[1]))
+    unknown.sort(key=lambda item: (item[0], item[1]))
+    ordered = [item[1] for item in mature] + [item[1] for item in young] + [item[1] for item in unknown]
+    return ordered[: int(limit)]
+
+
+def update_pool_from_search(
+    pool: dict[str, Any],
+    search_rows: Sequence[Mapping[str, Any]],
+    *,
+    snapshot_at: datetime,
+) -> dict[str, Any]:
+    by_id: dict[str, Mapping[str, Any]] = {}
+    for row in search_rows:
+        if isinstance(row, Mapping) and isinstance(row.get("id"), str) and row["id"] not in by_id:
+            by_id[str(row["id"])] = row
+    for mint, raw in list(pool.items()):
+        if not isinstance(raw, Mapping):
+            continue
+        entry = dict(raw)
+        row = by_id.get(mint)
+        if isinstance(row, Mapping):
+            first_pool = row.get("firstPool")
+            created = first_pool.get("createdAt") if isinstance(first_pool, Mapping) else None
+            if isinstance(created, str) and created:
+                entry["created_at"] = created
+        pool[mint] = entry
+    return expire_matured_pool(pool, snapshot_at=snapshot_at)
+
+
+def order_search_rows(
+    search_rows: Sequence[Mapping[str, Any]],
+    requested_mints: Sequence[str],
+) -> list[dict[str, Any]]:
+    by_id: dict[str, Mapping[str, Any]] = {}
+    for row in search_rows:
+        if not isinstance(row, Mapping):
+            continue
+        mint = row.get("id")
+        if isinstance(mint, str) and mint and mint not in by_id:
+            by_id[mint] = row
+    return [dict(by_id[mint]) for mint in requested_mints if mint in by_id]
+
+
+def is_valid_mix_row(row: Mapping[str, Any]) -> bool:
+    value, code = classify_r0_mix(row)
+    return value is not None and code is None and value >= 0
+
+
+def select_valid_mix_eligible(structural: Sequence[Mapping[str, Any]]) -> list[dict[str, Any]]:
+    return [dict(row) for row in structural if is_valid_mix_row(row)]
 
 
 def _schema_sha256() -> str:
@@ -236,9 +384,11 @@ def _journal_path(staging_root: Path) -> Path:
 def _load_journal(staging_root: Path) -> dict[str, Any]:
     path = _journal_path(staging_root)
     if not path.is_file():
-        return {"observations": {}, "last_call_at": None, "hit_check_index": None}
+        return {"observations": {}, "last_call_at": None, "hit_check_index": None, "retained_pool": {}}
     loaded = json.loads(path.read_text(encoding="utf-8"))
     _require(isinstance(loaded, dict), "JOURNAL_INVALID")
+    if not isinstance(loaded.get("retained_pool"), dict):
+        loaded["retained_pool"] = {}
     return loaded
 
 
@@ -277,6 +427,8 @@ def credential_free_first_hit_preflight(
         "retries": 0,
         "fallback": False,
         "second_search_after_r0": "forbidden",
+        "search_from": "retained_pool",
+        "r0_floor": "valid_mix_eligible",
         "factory_runner_sha256": FACTORY_RUNNER_SHA256,
     }
 
@@ -637,13 +789,83 @@ def run_first_hit_mix_falsifier(
             "r1_search_calls": 0,
         }
 
+    def persisted_search_mints(check_index: int) -> list[str] | None:
+        obs = observations.get(f"CHECK:{check_index:02d}:SEARCH")
+        if not isinstance(obs, Mapping) or obs.get("state") != "COMPLETED":
+            return None
+        raw = obs.get("search_mints")
+        if not isinstance(raw, list) or not raw:
+            return None
+        mints = [str(item) for item in raw if isinstance(item, str) and item]
+        return mints or None
+
+    def remember_search_mints(check_index: int, mints: Sequence[str]) -> None:
+        observation_id = f"CHECK:{check_index:02d}:SEARCH"
+        item = observations.get(observation_id)
+        if not isinstance(item, Mapping):
+            return
+        stored = dict(item)
+        stored["search_mints"] = list(mints)
+        observations[observation_id] = stored
+        journal["observations"] = observations
+        journal["retained_pool"] = retained_pool
+        _save_journal(staging, journal)
+
+    def evaluate_search(
+        check_index: int,
+        search_mints: Sequence[str],
+        search_result: Mapping[str, Any],
+        *,
+        freeze_hit: bool,
+    ) -> bool:
+        nonlocal eligible, structural_eligible, search_at, r0_sha
+        search_terminal, _search_error, search_rows = _search_rows(search_result)
+        if search_terminal != "TOKEN_LIST_OBSERVED" or search_rows is None:
+            return False
+        search_at = _parse_datetime(search_result["observed_at"], "SEARCH_TIMESTAMP_INVALID")
+        update_pool_from_search(retained_pool, search_rows, snapshot_at=search_at)
+        remember_search_mints(check_index, search_mints)
+        if search_commit_hook is not None:
+            search_commit_hook()
+        ordered_rows = order_search_rows(search_rows, search_mints)
+        structural_eligible = select_eligible(
+            ordered_rows,
+            excluded_mints=excluded,
+            snapshot_at=search_at,
+        )
+        eligible = select_valid_mix_eligible(structural_eligible)
+        if len(eligible) < MIN_ELIGIBLE_BEFORE_QUOTES:
+            return False
+        if freeze_hit:
+            journal["hit_check_index"] = check_index
+            journal["r0_search_mints"] = list(search_mints)
+            journal["retained_pool"] = retained_pool
+            _save_journal(staging, journal)
+        body = search_result.get("body") if isinstance(search_result.get("body"), bytes) else b""
+        r0_sha = str(search_result.get("response_sha256") or _sha256_bytes(body))
+        return True
+
     hit_index = journal.get("hit_check_index")
     eligible: list[dict[str, Any]] = []
+    structural_eligible: list[dict[str, Any]] = []
     search_at: datetime | None = None
     r0_sha: str | None = None
-    start_index = 0
+    retained_pool: dict[str, Any] = dict(journal.get("retained_pool") or {})
+    journal["retained_pool"] = retained_pool
     if isinstance(hit_index, int):
-        start_index = hit_index
+        frozen = journal.get("r0_search_mints")
+        search_mints = (
+            [str(item) for item in frozen if isinstance(item, str) and item]
+            if isinstance(frozen, list) and frozen
+            else persisted_search_mints(hit_index)
+        )
+        _require(bool(search_mints), "R0_SEARCH_MINTS_UNBOUND", provider_requests=provider_requests)
+        search_result = call(build_search_url(search_mints), f"CHECK:{hit_index:02d}:SEARCH")
+        _require(
+            evaluate_search(hit_index, search_mints, search_result, freeze_hit=False),
+            "R0_UNBOUND",
+            provider_requests=provider_requests,
+        )
     else:
         start_index = MAX_DENSITY_CHECKS
         for check_probe in range(MAX_DENSITY_CHECKS):
@@ -662,70 +884,53 @@ def run_first_hit_mix_falsifier(
             break
         else:
             start_index = MAX_DENSITY_CHECKS
-    for check_index in range(start_index, MAX_DENSITY_CHECKS):
-        cycle_started = clock()
-        recent_result = call(RECENT_ENDPOINT, f"CHECK:{check_index:02d}:RECENT")
-        recent_terminal, _recent_error, recent_rows = _search_rows(recent_result)
-        if recent_terminal != "TOKEN_LIST_OBSERVED" or recent_rows is None:
-            if isinstance(hit_index, int):
-                raise FirstHitError("INVALID_EVIDENCE_REPLAN", provider_requests=provider_requests)
-            observations[f"CHECK:{check_index:02d}:SEARCH"] = {
-                "state": "SKIPPED",
-                "reason": "RECENT_NOT_OBSERVED",
-            }
+        for check_index in range(start_index, MAX_DENSITY_CHECKS):
+            cycle_started = clock()
+            recent_result = call(RECENT_ENDPOINT, f"CHECK:{check_index:02d}:RECENT")
+            recent_terminal, _recent_error, recent_rows = _search_rows(recent_result)
+            recent_observed = recent_terminal == "TOKEN_LIST_OBSERVED" and recent_rows is not None
+            if recent_observed:
+                observed_at = str(recent_result.get("observed_at") or "")
+                ingest_recent_into_pool(
+                    retained_pool,
+                    recent_rows,
+                    observed_at=observed_at,
+                    excluded_mints=excluded,
+                )
+                schedule_at = _parse_datetime(observed_at, "RECENT_TIMESTAMP_INVALID")
+            else:
+                schedule_at = clock()
+            expire_matured_pool(retained_pool, snapshot_at=schedule_at)
             journal["observations"] = observations
+            journal["retained_pool"] = retained_pool
             _save_journal(staging, journal)
+            search_mints = persisted_search_mints(check_index) or select_search_mints(
+                retained_pool,
+                snapshot_at=schedule_at,
+            )
+            if not search_mints:
+                observations[f"CHECK:{check_index:02d}:SEARCH"] = {
+                    "state": "SKIPPED",
+                    "reason": "EMPTY_SEARCH_POOL" if recent_observed else "RECENT_NOT_OBSERVED",
+                }
+                journal["observations"] = observations
+                journal["retained_pool"] = retained_pool
+                _save_journal(staging, journal)
+                elapsed = (clock() - cycle_started).total_seconds()
+                wait = DENSITY_CHECK_PERIOD_SECONDS - elapsed
+                if wait > 0:
+                    sleeper(wait)
+                continue
+            search_result = call(build_search_url(search_mints), f"CHECK:{check_index:02d}:SEARCH")
+            remember_search_mints(check_index, search_mints)
+            if evaluate_search(check_index, search_mints, search_result, freeze_hit=True):
+                break
             elapsed = (clock() - cycle_started).total_seconds()
             wait = DENSITY_CHECK_PERIOD_SECONDS - elapsed
             if wait > 0:
                 sleeper(wait)
-            continue
-        search_pool = [
-            row
-            for row in recent_rows
-            if isinstance(row, Mapping)
-            and isinstance(row.get("id"), str)
-            and row.get("launchpad") == "pump.fun"
-            and row.get("id") not in excluded
-        ][:100]
-        if not search_pool:
-            observations[f"CHECK:{check_index:02d}:SEARCH"] = {
-                "state": "SKIPPED",
-                "reason": "EMPTY_SEARCH_POOL",
-            }
-            journal["observations"] = observations
-            _save_journal(staging, journal)
-            elapsed = (clock() - cycle_started).total_seconds()
-            wait = DENSITY_CHECK_PERIOD_SECONDS - elapsed
-            if wait > 0:
-                sleeper(wait)
-            continue
-        search_url = build_search_url([str(row["id"]) for row in search_pool])
-        search_result = call(search_url, f"CHECK:{check_index:02d}:SEARCH")
-        if search_commit_hook is not None:
-            search_commit_hook()
-        search_terminal, _search_error, search_rows = _search_rows(search_result)
-        if search_terminal != "TOKEN_LIST_OBSERVED" or search_rows is None:
-            elapsed = (clock() - cycle_started).total_seconds()
-            wait = DENSITY_CHECK_PERIOD_SECONDS - elapsed
-            if wait > 0:
-                sleeper(wait)
-            continue
-        search_at = _parse_datetime(search_result["observed_at"], "SEARCH_TIMESTAMP_INVALID")
-        eligible = select_eligible(search_rows, excluded_mints=excluded, snapshot_at=search_at)
-        if len(eligible) < MIN_ELIGIBLE_BEFORE_QUOTES:
-            elapsed = (clock() - cycle_started).total_seconds()
-            wait = DENSITY_CHECK_PERIOD_SECONDS - elapsed
-            if wait > 0:
-                sleeper(wait)
-            continue
-        journal["hit_check_index"] = check_index
-        _save_journal(staging, journal)
-        body = search_result.get("body") if isinstance(search_result.get("body"), bytes) else b""
-        r0_sha = str(search_result.get("response_sha256") or _sha256_bytes(body))
-        break
-    else:
-        return sleep_receipt()
+        else:
+            return sleep_receipt()
 
     _require(search_at is not None and r0_sha is not None, "R0_UNBOUND", provider_requests=provider_requests)
     capacity = quote_capacity(provider_requests)
@@ -733,6 +938,8 @@ def run_first_hit_mix_falsifier(
     quoted_n = min(len(eligible), capacity)
     quoted = eligible[:quoted_n]
     unquoted = eligible[quoted_n:]
+    valid_ids = {str(item["id"]) for item in eligible}
+    invalid_x = [item for item in structural_eligible if str(item["id"]) not in valid_ids]
     pending: list[dict[str, Any]] = []
     for item in quoted:
         mint = str(item["id"])
@@ -843,6 +1050,17 @@ def run_first_hit_mix_falsifier(
                 "y": None,
             }
         )
+    for item in invalid_x:
+        rows.append(
+            {
+                "mint": str(item["id"]),
+                "search_row": item,
+                "quoted": False,
+                "buy_terminal": None,
+                "h900_terminal": None,
+                "y": None,
+            }
+        )
     _require(all(_row_complete_for_score(row) for row in rows), "PARTIAL_QUOTE_SCORE_FORBIDDEN")
     score = score_frozen_mix_dataset(rows)
     _require(
@@ -875,8 +1093,10 @@ def run_first_hit_mix_falsifier(
     decision = json.loads((Path(data_root) / DECISION_RELATIVE).read_text(encoding="utf-8"))
     decision["terminal_outcome"] = score.get("terminal")
     decision["eligible_count"] = len(eligible)
+    decision["structural_eligible_count"] = len(structural_eligible)
     decision["quoted_count"] = quoted_n
     decision["unquoted_count"] = len(unquoted)
+    decision["invalid_x_count"] = len(invalid_x)
     decision["credential_reads"] = credential_reads
     decision["dataset_published"] = True
     decision["internal_capture_state"] = "CAPTURE_COMPLETE"
