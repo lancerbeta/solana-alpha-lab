@@ -775,6 +775,12 @@ def run_first_hit_mix_falsifier(
         due_at = row["due_at"]
         late_limit = due_at + timedelta(seconds=LATENESS_SLACK_SECONDS)
         sell_obs = observations.get(f"{mint}:SELL_H900")
+        if isinstance(sell_obs, Mapping):
+            sell_state = sell_obs.get("state")
+            if sell_state == "STARTED" or (
+                sell_state == "COMPLETED" and not sell_obs.get("body_sha256")
+            ):
+                raise FirstHitError(IN_FLIGHT_TERMINAL, provider_requests=provider_requests)
         sell_bound = (
             isinstance(sell_obs, Mapping)
             and sell_obs.get("state") == "COMPLETED"

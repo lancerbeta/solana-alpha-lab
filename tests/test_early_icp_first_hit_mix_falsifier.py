@@ -47,6 +47,7 @@ from solana_alpha_lab.factory.early_icp_first_hit_mix_falsifier import (  # noqa
     FirstHitError,
     credential_free_first_hit_preflight,
     load_policy,
+    published_marker_path,
     quote_capacity,
     run_first_hit_mix_falsifier,
     validate_policy,
@@ -525,6 +526,31 @@ class EarlyIcpFirstHitMixFalsifierTests(unittest.TestCase):
             receipt = _run(data_root, staging, opener, clock, search_commit_hook=hook)
             self.assertEqual(receipt["terminal_outcome"], "EARN_ONE_CONFIRMATORY_FRESH_OOS")
             self.assertEqual(sum("/tokens/v2/search" in url for url in opener.urls), 1)
+
+    def test_late_clock_does_not_mask_in_flight_sell(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            data_root = Path(tmp) / "rdp"
+            staging = Path(tmp) / "staging"
+            data_root.mkdir()
+            _seed_v2(data_root)
+            clock = _Clock()
+            # 1 recent + 1 search + 10 buys = 12 completed HTTP; next opener call is first SELL.
+            opener = _Opener(clock, n_eligible=10, y_mode="earn", crash_after=12)
+            with self.assertRaises(RuntimeError):
+                _run(data_root, staging, opener, clock)
+            journal = json.loads((staging / "journal.json").read_text(encoding="utf-8"))
+            started_sells = [
+                key
+                for key, value in journal["observations"].items()
+                if key.endswith(":SELL_H900") and value.get("state") == "STARTED"
+            ]
+            self.assertTrue(started_sells)
+            clock.current += timedelta(seconds=10_000)
+            opener.crash_after = None
+            with self.assertRaises(FirstHitError) as raised:
+                _run(data_root, staging, opener, clock)
+            self.assertEqual(str(raised.exception), IN_FLIGHT_TERMINAL)
+            self.assertFalse(published_marker_path(data_root).exists())
 
     def test_delayed_resume_keeps_completed_sell_not_late_before_quote(self) -> None:
         with tempfile.TemporaryDirectory() as tmp:
