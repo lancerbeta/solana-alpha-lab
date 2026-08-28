@@ -20,8 +20,8 @@
     "GOAL_DOD_CRITIC"
   ],
   "review_id": "EARLY-ICP-RETAINED-COHORT-MATURITY-CORRECTIVE-INDEPENDENT-REVIEW-001",
-  "reviewed_bindings_sha256": "PENDING_BIND",
-  "reviewed_inventory_sha256": "PENDING_BIND",
+  "reviewed_bindings_sha256": "25e50d1487b4640d2678d28489b47487e318df13bee2cc86d92a043cb2d760c7",
+  "reviewed_inventory_sha256": "e0ca3a8baec39d937d261b48a42db5595a784927d5f6d00a2a936b60898dc6ea",
   "reviews": [
     {
       "findings": [
