@@ -33,6 +33,8 @@ retained_cohort:
   search_from: retained_pool
   r0_floor: valid_mix_eligible
   search_pool_cap: 100
+  journal_schema: smial.early-icp-first-hit-mix-falsifier.journal
+  journal_schema_version: '2.0'
   scheduling_clock_for_unknown_created_at: first_seen_at
   eligibility_clock: hash_bound_firstPool_createdAt
 consumed_mint_receipts:

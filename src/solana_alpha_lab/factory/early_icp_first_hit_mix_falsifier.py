@@ -72,7 +72,11 @@ SEARCH_POOL_CAP = 100
 PACE_SECONDS = 3
 SLEEP_TERMINAL = "SLEEP_ELIGIBLE_BELOW_10"
 IN_FLIGHT_TERMINAL = "IN_FLIGHT_CALL_INDETERMINATE"
+IDENTITY_MISMATCH = "STAGING_ATTEMPT_IDENTITY_MISMATCH"
+REQUEST_SHA256_MISMATCH = "STAGING_REQUEST_SHA256_MISMATCH"
 NOT_QUOTED = "NOT_QUOTED_CAPACITY"
+JOURNAL_SCHEMA = "smial.early-icp-first-hit-mix-falsifier.journal"
+JOURNAL_SCHEMA_VERSION = "2.0"
 DATASET_MANIFEST_ID = "DATASET-MANIFEST-EARLY-ICP-FIRST-HIT-MIX-FALSIFIER-001"
 DATASET_ID = "DATASET-EARLY-ICP-FIRST-HIT-MIX-FALSIFIER-001"
 PARTITION_ID = "PARTITION-EARLY-ICP-FIRST-HIT-MIX-FALSIFIER-001"
@@ -161,6 +165,10 @@ def _sha256_bytes(payload: bytes) -> str:
     return hashlib.sha256(payload).hexdigest()
 
 
+def _freeze_wall_clock(value: datetime, code: str) -> datetime:
+    return _parse_datetime(_format_utc(value), code)
+
+
 def v2_complete_path(data_root: Path) -> Path:
     return complete_marker(Path(data_root))
 
@@ -200,6 +208,8 @@ def validate_policy(policy: Mapping[str, Any], *, repo_root: Path) -> None:
     _require(cohort.get("search_from") == "retained_pool", "SEARCH_FROM_DRIFT")
     _require(cohort.get("r0_floor") == "valid_mix_eligible", "R0_FLOOR_DRIFT")
     _require(int(cohort.get("search_pool_cap") or 0) == SEARCH_POOL_CAP, "SEARCH_POOL_CAP_DRIFT")
+    _require(cohort.get("journal_schema") == JOURNAL_SCHEMA, "JOURNAL_SCHEMA_DRIFT")
+    _require(cohort.get("journal_schema_version") == JOURNAL_SCHEMA_VERSION, "JOURNAL_SCHEMA_VERSION_DRIFT")
     controls = policy.get("execution_controls")
     _require(isinstance(controls, Mapping), "CONTROLS_INVALID")
     _require(controls.get("retries") == 0, "RETRIES_NOT_ZERO")
@@ -381,21 +391,74 @@ def _journal_path(staging_root: Path) -> Path:
     return Path(staging_root) / "journal.json"
 
 
-def _load_journal(staging_root: Path) -> dict[str, Any]:
+def request_fingerprint_sha256(*, method: str, url: str) -> str:
+    return _sha256_bytes(_canonical_json({"method": str(method), "url": str(url)}))
+
+
+def journal_attempt_identity(*, repo_root: Path, authority_phrase: str) -> dict[str, str]:
+    policy_bytes = (Path(repo_root) / POLICY_RELATIVE).read_bytes()
+    return {
+        "schema": JOURNAL_SCHEMA,
+        "schema_version": JOURNAL_SCHEMA_VERSION,
+        "atom_id": ATOM_ID,
+        "policy_sha256": _sha256_bytes(policy_bytes),
+        "authority_sha256": _sha256_bytes(authority_phrase.encode("utf-8")),
+    }
+
+
+def journal_identity_matches(journal: Mapping[str, Any], identity: Mapping[str, str]) -> bool:
+    return all(journal.get(key) == value for key, value in identity.items())
+
+
+def assert_staging_attempt_identity(staging_root: Path, identity: Mapping[str, str]) -> None:
     path = _journal_path(staging_root)
     if not path.is_file():
-        return {"observations": {}, "last_call_at": None, "hit_check_index": None, "retained_pool": {}}
-    loaded = json.loads(path.read_text(encoding="utf-8"))
-    _require(isinstance(loaded, dict), "JOURNAL_INVALID")
+        return
+    raw = path.read_bytes()
+    try:
+        loaded = json.loads(raw.decode("utf-8"))
+    except (UnicodeDecodeError, json.JSONDecodeError) as exc:
+        raise FirstHitError(IDENTITY_MISMATCH) from exc
+    _require(isinstance(loaded, dict) and journal_identity_matches(loaded, identity), IDENTITY_MISMATCH)
+
+
+def _empty_journal(identity: Mapping[str, str]) -> dict[str, Any]:
+    return {
+        **dict(identity),
+        "observations": {},
+        "last_call_at": None,
+        "hit_check_index": None,
+        "retained_pool": {},
+        "r0_event_at": None,
+        "decision_at": None,
+        "r0_search_mints": None,
+    }
+
+
+def _load_journal(staging_root: Path, identity: Mapping[str, str]) -> dict[str, Any]:
+    path = _journal_path(staging_root)
+    if not path.is_file():
+        return _empty_journal(identity)
+    raw = path.read_bytes()
+    try:
+        loaded = json.loads(raw.decode("utf-8"))
+    except (UnicodeDecodeError, json.JSONDecodeError) as exc:
+        raise FirstHitError(IDENTITY_MISMATCH) from exc
+    _require(isinstance(loaded, dict), IDENTITY_MISMATCH)
+    _require(journal_identity_matches(loaded, identity), IDENTITY_MISMATCH)
+    if not isinstance(loaded.get("observations"), dict):
+        loaded["observations"] = {}
     if not isinstance(loaded.get("retained_pool"), dict):
         loaded["retained_pool"] = {}
     return loaded
 
 
-def _save_journal(staging_root: Path, journal: Mapping[str, Any]) -> None:
+def _save_journal(staging_root: Path, journal: Mapping[str, Any], identity: Mapping[str, str]) -> None:
     path = _journal_path(staging_root)
     path.parent.mkdir(parents=True, exist_ok=True)
-    path.write_bytes(_canonical_json(journal))
+    payload = dict(journal)
+    payload.update(identity)
+    path.write_bytes(_canonical_json(payload))
 
 
 def credential_free_first_hit_preflight(
@@ -429,6 +492,8 @@ def credential_free_first_hit_preflight(
         "second_search_after_r0": "forbidden",
         "search_from": "retained_pool",
         "r0_floor": "valid_mix_eligible",
+        "journal_schema": JOURNAL_SCHEMA,
+        "journal_schema_version": JOURNAL_SCHEMA_VERSION,
         "factory_runner_sha256": FACTORY_RUNNER_SHA256,
     }
 
@@ -466,7 +531,8 @@ def _parquet_and_manifests(
     rows: Sequence[Mapping[str, Any]],
     score: Mapping[str, Any],
     r0_search_sha256: str,
-    available_at: datetime,
+    r0_event_at: datetime,
+    decision_at: datetime,
     generation_run_id: str,
     provider_requests: int,
 ) -> dict[str, bytes]:
@@ -535,12 +601,12 @@ def _parquet_and_manifests(
         file_sha256=file_sha256,
         content_sha256=file_sha256,
         row_count=table.num_rows,
-        min_event_time=available_at,
-        max_event_time=available_at,
-        min_available_to_strategy_at=available_at,
-        max_available_to_strategy_at=available_at,
-        first_reliable_available_at=available_at,
-        created_at=available_at,
+        min_event_time=r0_event_at,
+        max_event_time=decision_at,
+        min_available_to_strategy_at=decision_at,
+        max_available_to_strategy_at=decision_at,
+        first_reliable_available_at=decision_at,
+        created_at=decision_at,
     )
     dataset = DatasetManifest(
         dataset_manifest_id=DATASET_MANIFEST_ID,
@@ -552,8 +618,8 @@ def _parquet_and_manifests(
         generation_task_id=ATOM_ID,
         generation_run_id=generation_run_id,
         validation_receipt_sha256=canonical_sha256({"score": score, "r0": r0_search_sha256}),
-        first_reliable_available_at=available_at,
-        created_at=available_at,
+        first_reliable_available_at=decision_at,
+        created_at=decision_at,
         content_sha256=canonical_sha256({"fingerprint": fingerprint, "file": file_sha256}),
     )
     decision = {
@@ -564,6 +630,8 @@ def _parquet_and_manifests(
         "internal_capture_state": "CAPTURE_COMPLETE",
         "score": dict(score),
         "r0_search_sha256": r0_search_sha256,
+        "r0_event_at": _format_utc(r0_event_at),
+        "decision_at": _format_utc(decision_at),
         "dataset_fingerprint": fingerprint,
         "provider_requests": provider_requests,
         "outcome_consumed": True,
@@ -647,6 +715,8 @@ def run_first_hit_mix_falsifier(
         pass
     else:
         raise FirstHitError("STAGING_INSIDE_RDP")
+    identity = journal_attempt_identity(repo_root=repo_root, authority_phrase=authority_phrase)
+    assert_staging_attempt_identity(staging, identity)
     git_exclusions = consumed_mints_from_git(repo_root, policy)
     excluded = set(excluded_mints or set()) | git_exclusions
     _require(bool(excluded), "PRIOR_MINT_EXCLUSION_INPUT_REQUIRED")
@@ -667,7 +737,7 @@ def run_first_hit_mix_falsifier(
     credential_reads = 1
     limits = policy.get("runtime_limits") if isinstance(policy.get("runtime_limits"), Mapping) else {}
     staging.mkdir(parents=True, exist_ok=True)
-    journal = _load_journal(staging)
+    journal = _load_journal(staging, identity)
     observations: dict[str, Any] = dict(journal.get("observations") or {})
     provider_requests = sum(
         1
@@ -696,10 +766,13 @@ def run_first_hit_mix_falsifier(
 
     def call(url: str, observation_id: str) -> dict[str, Any]:
         nonlocal provider_requests, last_monotonic
+        request_sha256 = request_fingerprint_sha256(method="GET", url=url)
         cached = observations.get(observation_id)
         if isinstance(cached, Mapping) and cached.get("state") == "COMPLETED":
             if not cached.get("body_sha256"):
                 raise FirstHitError(IN_FLIGHT_TERMINAL, provider_requests=provider_requests)
+            if cached.get("request_sha256") != request_sha256:
+                raise FirstHitError(REQUEST_SHA256_MISMATCH, provider_requests=provider_requests)
             raw_path = staging / "raw" / f"{observation_id.replace(':', '_')}.body"
             body = raw_path.read_bytes()
             return {
@@ -711,6 +784,9 @@ def run_first_hit_mix_falsifier(
                 "resumed": True,
             }
         if isinstance(cached, Mapping) and cached.get("state") == "STARTED":
+            cached_hash = cached.get("request_sha256")
+            if cached_hash is not None and cached_hash != request_sha256:
+                raise FirstHitError(REQUEST_SHA256_MISMATCH, provider_requests=provider_requests)
             raise FirstHitError(IN_FLIGHT_TERMINAL, provider_requests=provider_requests)
         last_at = journal.get("last_call_at")
         if isinstance(last_at, str) and last_at:
@@ -725,11 +801,12 @@ def run_first_hit_mix_falsifier(
         _require(provider_requests < CALL_CAP, "CALL_CAP_EXCEEDED", provider_requests=provider_requests)
         observations[observation_id] = {
             "state": "STARTED",
-            "url": url.split("?", 1)[0],
+            "url": url,
+            "request_sha256": request_sha256,
             "started_at": _format_utc(clock()),
         }
         journal["observations"] = observations
-        _save_journal(staging, journal)
+        _save_journal(staging, journal, identity)
         try:
             result = perform_credentialed_get(
                 url,
@@ -757,11 +834,12 @@ def run_first_hit_mix_falsifier(
             "http_status": result.get("http_status"),
             "body_sha256": sha,
             "observed_at": result.get("observed_at"),
-            "url": url.split("?", 1)[0],
+            "url": url,
+            "request_sha256": request_sha256,
         }
         journal["observations"] = observations
         journal["last_call_at"] = result["observed_at"]
-        _save_journal(staging, journal)
+        _save_journal(staging, journal, identity)
         return result
 
     def sleep_receipt() -> dict[str, Any]:
@@ -809,7 +887,7 @@ def run_first_hit_mix_falsifier(
         observations[observation_id] = stored
         journal["observations"] = observations
         journal["retained_pool"] = retained_pool
-        _save_journal(staging, journal)
+        _save_journal(staging, journal, identity)
 
     def evaluate_search(
         check_index: int,
@@ -839,8 +917,9 @@ def run_first_hit_mix_falsifier(
         if freeze_hit:
             journal["hit_check_index"] = check_index
             journal["r0_search_mints"] = list(search_mints)
+            journal["r0_event_at"] = _format_utc(search_at)
             journal["retained_pool"] = retained_pool
-            _save_journal(staging, journal)
+            _save_journal(staging, journal, identity)
         body = search_result.get("body") if isinstance(search_result.get("body"), bytes) else b""
         r0_sha = str(search_result.get("response_sha256") or _sha256_bytes(body))
         return True
@@ -903,7 +982,7 @@ def run_first_hit_mix_falsifier(
             expire_matured_pool(retained_pool, snapshot_at=schedule_at)
             journal["observations"] = observations
             journal["retained_pool"] = retained_pool
-            _save_journal(staging, journal)
+            _save_journal(staging, journal, identity)
             search_mints = persisted_search_mints(check_index) or select_search_mints(
                 retained_pool,
                 snapshot_at=schedule_at,
@@ -915,7 +994,7 @@ def run_first_hit_mix_falsifier(
                 }
                 journal["observations"] = observations
                 journal["retained_pool"] = retained_pool
-                _save_journal(staging, journal)
+                _save_journal(staging, journal, identity)
                 elapsed = (clock() - cycle_started).total_seconds()
                 wait = DENSITY_CHECK_PERIOD_SECONDS - elapsed
                 if wait > 0:
@@ -1072,13 +1151,42 @@ def run_first_hit_mix_falsifier(
         },
         "SCIENTIFIC_TERMINAL_INVALID",
     )
-    available_at = search_at if search_at is not None else clock()
+    _require(search_at is not None, "R0_UNBOUND", provider_requests=provider_requests)
+    if isinstance(journal.get("r0_event_at"), str) and journal.get("r0_event_at"):
+        r0_event_at = _parse_datetime(str(journal["r0_event_at"]), "R0_EVENT_AT_INVALID")
+    else:
+        r0_event_at = _freeze_wall_clock(search_at, "R0_EVENT_AT_INVALID")
+    if isinstance(journal.get("decision_at"), str) and journal.get("decision_at"):
+        decision_at = _parse_datetime(str(journal["decision_at"]), "DECISION_AT_INVALID")
+    else:
+        decision_at = _freeze_wall_clock(clock(), "DECISION_AT_INVALID")
+        journal["r0_event_at"] = _format_utc(r0_event_at)
+        journal["decision_at"] = _format_utc(decision_at)
+        journal["observations"] = observations
+        journal["retained_pool"] = retained_pool
+        _save_journal(staging, journal, identity)
+    _require(decision_at > r0_event_at, "PROVENANCE_CLOCK_NOT_AFTER_R0", provider_requests=provider_requests)
+    latest_terminal = r0_event_at
+    for obs_id, item in observations.items():
+        if not isinstance(item, Mapping) or item.get("state") != "COMPLETED":
+            continue
+        if not (str(obs_id).endswith(":BUY_R0") or str(obs_id).endswith(":SELL_H900")):
+            continue
+        observed = item.get("observed_at")
+        if isinstance(observed, str) and observed:
+            latest_terminal = max(latest_terminal, _parse_datetime(observed, "OBSERVED_AT_INVALID"))
+    _require(
+        decision_at >= latest_terminal,
+        "PROVENANCE_CLOCK_BEFORE_H900",
+        provider_requests=provider_requests,
+    )
     bundle = _parquet_and_manifests(
         rows=rows,
         score=score,
         r0_search_sha256=str(r0_sha),
-        available_at=available_at,
-        generation_run_id="run-" + hashlib.sha256((_format_utc(available_at) + str(r0_sha)).encode()).hexdigest()[:16],
+        r0_event_at=r0_event_at,
+        decision_at=decision_at,
+        generation_run_id="run-" + hashlib.sha256((_format_utc(decision_at) + str(r0_sha)).encode()).hexdigest()[:16],
         provider_requests=provider_requests,
     )
     payload_dir = staging / f"publish-{uuid.uuid4().hex}"

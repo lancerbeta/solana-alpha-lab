@@ -32,6 +32,7 @@ from solana_alpha_lab.factory.early_icp_first_hit_mix_falsifier import (  # noqa
     CALL_CAP,
     CAPABILITY_ID,
     DATASET_MANIFEST_ID,
+    DECISION_RELATIVE,
     DENSITY_CHECK_PERIOD_SECONDS,
     FACTORY_RUNNER,
     FACTORY_RUNNER_SHA256,
@@ -43,6 +44,11 @@ from solana_alpha_lab.factory.early_icp_first_hit_mix_falsifier import (  # noqa
     POLICY_RELATIVE,
     PUBLISHED_RELATIVE,
     QUOTE_CALL_RESERVE,
+    IDENTITY_MISMATCH,
+    JOURNAL_SCHEMA,
+    JOURNAL_SCHEMA_VERSION,
+    PARTITION_RELATIVE,
+    REQUEST_SHA256_MISMATCH,
     SEARCH_POOL_CAP,
     SLEEP_TERMINAL,
     FirstHitError,
@@ -75,6 +81,10 @@ SCORER_SHA256 = "7ad086f0530f7e5ac7185a8978bf12c91a0a0478405d68bca5271da04b72094
 SNAPSHOT = datetime(2026, 8, 28, 12, 0, tzinfo=UTC)
 V2_COMPLETE_BYTES = b'{"terminal_outcome":"STOP_BEFORE_QUOTES_ELIGIBLE_BELOW_FLOOR","window_complete":true}\n'
 WRAPPED_SOL = "So11111111111111111111111111111111111111112"
+
+
+def _as_dt(value: str) -> datetime:
+    return datetime.fromisoformat(value.replace("Z", "+00:00"))
 
 
 class _Response:
@@ -357,6 +367,10 @@ class EarlyIcpFirstHitMixFalsifierTests(unittest.TestCase):
         preflight = credential_free_first_hit_preflight(ROOT, preflight_fn=_stub_preflight)
         self.assertEqual(preflight["call_cap"], 60)
         self.assertEqual(preflight["max_density_checks"], 20)
+        self.assertEqual(loaded["retained_cohort"]["journal_schema"], JOURNAL_SCHEMA)
+        self.assertEqual(loaded["retained_cohort"]["journal_schema_version"], JOURNAL_SCHEMA_VERSION)
+        self.assertEqual(preflight["journal_schema"], JOURNAL_SCHEMA)
+        self.assertEqual(preflight["journal_schema_version"], JOURNAL_SCHEMA_VERSION)
         self.assertEqual(preflight["quote_call_reserve"], 20)
         self.assertEqual(preflight["retries"], 0)
         self.assertIs(preflight["fallback"], False)
@@ -562,11 +576,54 @@ class EarlyIcpFirstHitMixFalsifierTests(unittest.TestCase):
             )
             self.assertEqual(_epoch(data_root), before_epoch)
             http_after_crash = len(opener.urls)
+            journal_after_crash = json.loads((staging / "journal.json").read_text(encoding="utf-8"))
+            self.assertIsNotNone(journal_after_crash.get("decision_at"))
+            self.assertIsNotNone(journal_after_crash.get("r0_event_at"))
             receipt = _run(data_root, staging, opener, clock, publication_hook=hook)
             self.assertEqual(receipt["terminal_outcome"], "EARN_ONE_CONFIRMATORY_FRESH_OOS")
+            self.assertEqual(receipt["decision_at"], journal_after_crash["decision_at"])
+            self.assertEqual(receipt["r0_event_at"], journal_after_crash["r0_event_at"])
             self.assertTrue((data_root / PUBLISHED_RELATIVE).is_file())
             self.assertNotEqual(_epoch(data_root), before_epoch)
             self.assertEqual(len(opener.urls), http_after_crash)
+
+    def test_microsecond_clock_crash_before_marker_resume_is_byte_identical(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            data_root = Path(tmp) / "rdp"
+            staging = Path(tmp) / "staging"
+            data_root.mkdir()
+            _seed_v2(data_root)
+
+            class _Hook:
+                def __init__(self) -> None:
+                    self.calls = 0
+
+                def __call__(self) -> None:
+                    self.calls += 1
+                    if self.calls == 1:
+                        raise RuntimeError("crash before marker")
+
+            hook = _Hook()
+            clock = _Clock()
+            clock.current = datetime(2026, 8, 28, 12, 0, 0, 123456, tzinfo=UTC)
+            opener = _Opener(clock, n_eligible=10, y_mode="earn")
+            with self.assertRaises(RuntimeError):
+                _run(data_root, staging, opener, clock, publication_hook=hook)
+            manifest_after_crash = (data_root / MANIFEST_RELATIVE).read_bytes()
+            partition_after_crash = (data_root / PARTITION_RELATIVE).read_bytes()
+            decision_after_crash = (data_root / DECISION_RELATIVE).read_bytes()
+            journal_after_crash = json.loads((staging / "journal.json").read_text(encoding="utf-8"))
+            self.assertRegex(journal_after_crash["decision_at"], r"^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}Z$")
+            http_after_crash = len(opener.urls)
+            receipt = _run(data_root, staging, opener, clock, publication_hook=hook)
+            self.assertEqual(receipt["terminal_outcome"], "EARN_ONE_CONFIRMATORY_FRESH_OOS")
+            self.assertEqual((data_root / MANIFEST_RELATIVE).read_bytes(), manifest_after_crash)
+            self.assertEqual((data_root / PARTITION_RELATIVE).read_bytes(), partition_after_crash)
+            self.assertEqual((data_root / DECISION_RELATIVE).read_bytes(), decision_after_crash)
+            self.assertEqual(len(opener.urls), http_after_crash)
+            self.assertEqual(receipt["decision_at"], journal_after_crash["decision_at"])
+            partition = json.loads(partition_after_crash.decode("utf-8"))
+            self.assertEqual(_as_dt(partition["created_at"]), _as_dt(journal_after_crash["decision_at"]))
 
     def test_transport_error_is_in_flight_and_not_retried(self) -> None:
         with tempfile.TemporaryDirectory() as tmp:
@@ -681,6 +738,7 @@ class EarlyIcpFirstHitMixFalsifierTests(unittest.TestCase):
         help_text = buf.getvalue()
         self.assertIn("IN_FLIGHT_CALL_INDETERMINATE", help_text)
         self.assertIn("SLEEP_ELIGIBLE_BELOW_10", help_text)
+        self.assertIn("STAGING_ATTEMPT_IDENTITY_MISMATCH", help_text)
         self.assertIn("staging-root must be outside data-root", help_text)
         self.assertIn("valid_mix_eligible", help_text)
 
@@ -998,6 +1056,180 @@ class EarlyIcpFirstHitMixFalsifierTests(unittest.TestCase):
             self.assertEqual(receipt["terminal_outcome"], "EARN_ONE_CONFIRMATORY_FRESH_OOS")
             self.assertEqual(marker.read_bytes(), frozen)
             self.assertEqual(v2_complete_path(data_root).read_bytes(), V2_COMPLETE_BYTES)
+
+    def test_published_provenance_uses_decision_at_not_r0_search_at(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            data_root = Path(tmp) / "rdp"
+            staging = Path(tmp) / "staging"
+            data_root.mkdir()
+            _seed_v2(data_root)
+            clock = _Clock()
+            opener = _Opener(clock, n_eligible=10, y_mode="earn")
+            receipt = _run(data_root, staging, opener, clock)
+            self.assertEqual(receipt["terminal_outcome"], "EARN_ONE_CONFIRMATORY_FRESH_OOS")
+            journal = json.loads((staging / "journal.json").read_text(encoding="utf-8"))
+            decision = json.loads((data_root / DECISION_RELATIVE).read_text(encoding="utf-8"))
+            partition = json.loads((data_root / PARTITION_RELATIVE).read_text(encoding="utf-8"))
+            dataset = json.loads((data_root / MANIFEST_RELATIVE).read_text(encoding="utf-8"))
+            r0_event_at = _as_dt(journal["r0_event_at"])
+            decision_at = _as_dt(journal["decision_at"])
+            self.assertEqual(decision["r0_event_at"], journal["r0_event_at"])
+            self.assertEqual(decision["decision_at"], journal["decision_at"])
+            self.assertGreater(decision_at, r0_event_at)
+            self.assertEqual(_as_dt(partition["min_event_time"]), r0_event_at)
+            self.assertEqual(_as_dt(partition["max_event_time"]), decision_at)
+            self.assertEqual(_as_dt(partition["min_available_to_strategy_at"]), decision_at)
+            self.assertEqual(_as_dt(partition["max_available_to_strategy_at"]), decision_at)
+            self.assertEqual(_as_dt(partition["created_at"]), decision_at)
+            self.assertEqual(_as_dt(partition["first_reliable_available_at"]), decision_at)
+            self.assertEqual(_as_dt(dataset["created_at"]), decision_at)
+            self.assertEqual(_as_dt(dataset["first_reliable_available_at"]), decision_at)
+            self.assertGreater(_as_dt(dataset["first_reliable_available_at"]), r0_event_at)
+            h900_times = [
+                _as_dt(str(item["observed_at"]))
+                for obs_id, item in journal["observations"].items()
+                if str(obs_id).endswith(":SELL_H900") or str(obs_id).endswith(":BUY_R0")
+                if isinstance(item, dict) and item.get("state") == "COMPLETED" and item.get("observed_at")
+            ]
+            self.assertTrue(h900_times)
+            self.assertGreaterEqual(_as_dt(dataset["first_reliable_available_at"]), max(h900_times))
+            search_obs = journal["observations"]["CHECK:00:SEARCH"]
+            self.assertNotEqual(str(dataset["first_reliable_available_at"])[:19], str(search_obs["observed_at"])[:19])
+
+    def test_legacy_pre_corrective_journal_is_rejected_with_zero_calls(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            data_root = Path(tmp) / "rdp"
+            staging = Path(tmp) / "staging"
+            data_root.mkdir()
+            staging.mkdir()
+            _seed_v2(data_root)
+            journal_path = staging / "journal.json"
+            leftover = staging / "raw" / "CHECK_00_RECENT.body"
+            leftover.parent.mkdir()
+            leftover.write_bytes(b'{"legacy":true}')
+            frozen = json.dumps(
+                {
+                    "observations": {
+                        "CHECK:00:RECENT": {
+                            "state": "COMPLETED",
+                            "url": "https://example.invalid/tokens/v2/recent",
+                            "body_sha256": "0" * 64,
+                            "observed_at": "2026-08-28T12:00:00Z",
+                        }
+                    },
+                    "last_call_at": "2026-08-28T12:00:00Z",
+                    "retained_pool": {
+                        "mint-00": {
+                            "mint": "mint-00",
+                            "first_seen_at": "2026-08-28T12:00:00Z",
+                            "consumed": False,
+                            "active": True,
+                        }
+                    },
+                },
+                ensure_ascii=True,
+                sort_keys=True,
+                separators=(",", ":"),
+            ).encode("utf-8")
+            journal_path.write_bytes(frozen)
+            clock = _Clock()
+            opener = _Opener(clock, n_eligible=10, y_mode="earn")
+            credential_reads: list[int] = []
+
+            def loader() -> str:
+                credential_reads.append(1)
+                return TEST_FREE_KEY
+
+            with self.assertRaises(FirstHitError) as raised:
+                run_first_hit_mix_falsifier(
+                    repo_root=ROOT,
+                    data_root=data_root,
+                    staging_root=staging,
+                    authority_phrase=AUTHORITY_PHRASE,
+                    credential_loader=loader,
+                    opener=opener,
+                    clock=clock.now,
+                    sleeper=clock.sleep,
+                    monotonic_clock=clock.monotonic,
+                    preflight_fn=_stub_preflight,
+                )
+            self.assertEqual(str(raised.exception), IDENTITY_MISMATCH)
+            self.assertEqual(raised.exception.provider_requests, 0)
+            self.assertEqual(opener.urls, [])
+            self.assertEqual(credential_reads, [])
+            self.assertEqual(journal_path.read_bytes(), frozen)
+            self.assertEqual(leftover.read_bytes(), b'{"legacy":true}')
+
+    def test_cached_search_with_different_mint_query_is_rejected(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            data_root = Path(tmp) / "rdp"
+            staging = Path(tmp) / "staging"
+            data_root.mkdir()
+            _seed_v2(data_root)
+            clock = _Clock()
+            opener = _Opener(clock, n_eligible=10, y_mode="earn")
+
+            class _Hook:
+                def __init__(self) -> None:
+                    self.calls = 0
+
+                def __call__(self) -> None:
+                    self.calls += 1
+                    if self.calls == 1:
+                        raise RuntimeError("crash after frozen search bytes")
+
+            hook = _Hook()
+            with self.assertRaises(RuntimeError):
+                _run(data_root, staging, opener, clock, search_commit_hook=hook)
+            journal_path = staging / "journal.json"
+            journal = json.loads(journal_path.read_text(encoding="utf-8"))
+            search_obs = journal["observations"]["CHECK:00:SEARCH"]
+            self.assertEqual(search_obs["state"], "COMPLETED")
+            self.assertIn("request_sha256", search_obs)
+            journal["hit_check_index"] = 0
+            journal["r0_search_mints"] = ["other-mint"]
+            rewritten = json.dumps(journal, ensure_ascii=True, sort_keys=True, separators=(",", ":")).encode("utf-8")
+            journal_path.write_bytes(rewritten)
+            http_after_crash = len(opener.urls)
+            with self.assertRaises(FirstHitError) as raised:
+                _run(data_root, staging, opener, clock)
+            self.assertEqual(str(raised.exception), REQUEST_SHA256_MISMATCH)
+            self.assertEqual(len(opener.urls), http_after_crash)
+            self.assertEqual(journal_path.read_bytes(), rewritten)
+
+    def test_current_version_exact_request_crash_resume_is_idempotent(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            data_root = Path(tmp) / "rdp"
+            staging = Path(tmp) / "staging"
+            data_root.mkdir()
+            _seed_v2(data_root)
+            clock = _Clock()
+            opener = _Opener(clock, n_eligible=10, y_mode="earn")
+
+            class _Hook:
+                def __init__(self) -> None:
+                    self.calls = 0
+
+                def __call__(self) -> None:
+                    self.calls += 1
+                    if self.calls == 1:
+                        raise RuntimeError("crash after first retained search")
+
+            hook = _Hook()
+            with self.assertRaises(RuntimeError):
+                _run(data_root, staging, opener, clock, search_commit_hook=hook)
+            journal = json.loads((staging / "journal.json").read_text(encoding="utf-8"))
+            search_hash = journal["observations"]["CHECK:00:SEARCH"]["request_sha256"]
+            self.assertEqual(len(search_hash), 64)
+            receipt = _run(data_root, staging, opener, clock, search_commit_hook=hook)
+            self.assertEqual(receipt["terminal_outcome"], "EARN_ONE_CONFIRMATORY_FRESH_OOS")
+            resumed = json.loads((staging / "journal.json").read_text(encoding="utf-8"))
+            self.assertEqual(resumed["observations"]["CHECK:00:SEARCH"]["request_sha256"], search_hash)
+            self.assertEqual(sum("/tokens/v2/search" in url for url in opener.urls), 1)
+            self.assertEqual(resumed["schema"], JOURNAL_SCHEMA)
+            self.assertEqual(resumed["schema_version"], JOURNAL_SCHEMA_VERSION)
+            self.assertEqual(resumed["r0_event_at"], receipt["r0_event_at"])
+            self.assertEqual(resumed["decision_at"], receipt["decision_at"])
 
 
 if __name__ == "__main__":

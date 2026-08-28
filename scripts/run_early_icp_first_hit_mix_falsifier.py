@@ -37,6 +37,8 @@ def main(argv: list[str] | None = None) -> int:
         epilog=(
             "Post-merge only. Do not retry IN_FLIGHT_CALL_INDETERMINATE.\n"
             "STAGING_INSIDE_RDP: staging-root must be outside data-root.\n"
+            "STAGING_ATTEMPT_IDENTITY_MISMATCH: a pre-corrective or other-atom "
+            "staging journal is not resumed; existing bytes stay unchanged.\n"
             "Owner-visible terminals: SLEEP_ELIGIBLE_BELOW_10, "
             "INVALID_EVIDENCE_REPLAN, CLOSE_EARLY_TAKER_VOLUME_MIX_FAMILY, "
             "EARN_ONE_CONFIRMATORY_FRESH_OOS.\n"

@@ -111,6 +111,12 @@ young mint; about five checks later the same mint can enter a real R0.
 If valid_mix still stays below 10, that is an honest supply/quality miss,
 not the runner wiping its own queue. Call cap stays 60.
 
+HOLD on PR #211 additionally freezes provenance clocks and attempt
+identity: H900-bearing dataset timestamps use `decision_at` after score
+and bundle-ready, not R0 `search_at`; a pre-corrective staging journal
+is `STAGING_ATTEMPT_IDENTITY_MISMATCH` with zero network; cached HTTP
+reuse is bound to `request_sha256` over method + full credential-free URL.
+
 ## UNCERTAINTY_REMOVED
 
 Whether R0 can open from a crash-safe retained cohort while keeping

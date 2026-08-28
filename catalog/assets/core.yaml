@@ -32626,13 +32626,13 @@ records:
 - asset_id: CONFIG-EARLY-ICP-FIRST-HIT-MIX-FALSIFIER-001
   record_version: '1.0'
   asset_type: configuration
-  purpose: Cadence, retained-cohort search, valid_mix R0 floor, call-cap reserve, owner phrase and scorer-freeze policy for the first-hit mix falsifier.
+  purpose: Cadence, retained-cohort search, valid_mix R0 floor, journal schema/identity pin, call-cap reserve, owner phrase and scorer-freeze policy for the first-hit mix falsifier.
   status: IMPLEMENTED_UNVERIFIED
   origin: REPOSITORY
   as_of: '2026-08-28'
   truth_owner: EARLY_ICP_FIRST_HIT_MIX_FALSIFIER_V1
   location: {kind: git_path, logical_uri: 'repo://configs/early_icp_first_hit_mix_falsifier_v1.yaml', repository_path: configs/early_icp_first_hit_mix_falsifier_v1.yaml}
-  integrity: {kind: sha256, sha256: c69a2a58cdcdaf85dfa0013432ce442941b28df62dc9436815239062d4f3c48a}
+  integrity: {kind: sha256, sha256: 5b8acb0180489c760111ae8af942ef604fdc07e4f96f494654ad35f7d1468817}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: governed_by, target_asset_id: CTRL-EARLY-ICP-FIRST-HIT-MIX-FALSIFIER-001}
@@ -32644,13 +32644,13 @@ records:
 - asset_id: MODULE-EARLY-ICP-FIRST-HIT-MIX-FALSIFIER-001
   record_version: '1.0'
   asset_type: script
-  purpose: WRAP first-hit density loop with crash-safe retained candidate pool, valid_mix R0 floor, commit-marker publication and unchanged mix scorer.
+  purpose: WRAP first-hit density loop with crash-safe retained candidate pool, valid_mix R0 floor, decision_at provenance, staging-attempt identity, commit-marker publication and unchanged mix scorer.
   status: IMPLEMENTED_UNVERIFIED
   origin: REPOSITORY
   as_of: '2026-08-28'
   truth_owner: EARLY_ICP_FIRST_HIT_MIX_FALSIFIER_V1
   location: {kind: git_path, logical_uri: 'repo://src/solana_alpha_lab/factory/early_icp_first_hit_mix_falsifier.py', repository_path: src/solana_alpha_lab/factory/early_icp_first_hit_mix_falsifier.py}
-  integrity: {kind: sha256, sha256: d4f665402ce66f93045fe37e84acb586541478ce8fa3b3c8aeb3b63e1323bacc}
+  integrity: {kind: sha256, sha256: 6ae71bdc12c080000628eeafbdbac44bdc804baaf2f7600a98ab22bd2f79c41c}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: governed_by, target_asset_id: CTRL-EARLY-ICP-FIRST-HIT-MIX-FALSIFIER-001}
@@ -32666,13 +32666,13 @@ records:
 - asset_id: SCRIPT-EARLY-ICP-FIRST-HIT-MIX-FALSIFIER-001
   record_version: '1.0'
   asset_type: script
-  purpose: CLI for credential-free preflight and one owner-phrase first-hit mix falsifier run with staging outside RDP.
+  purpose: CLI for credential-free preflight and one owner-phrase first-hit mix falsifier run with staging outside RDP; STAGING_ATTEMPT_IDENTITY_MISMATCH is fail-closed.
   status: IMPLEMENTED_UNVERIFIED
   origin: REPOSITORY
   as_of: '2026-08-28'
   truth_owner: EARLY_ICP_FIRST_HIT_MIX_FALSIFIER_V1
   location: {kind: git_path, logical_uri: 'repo://scripts/run_early_icp_first_hit_mix_falsifier.py', repository_path: scripts/run_early_icp_first_hit_mix_falsifier.py}
-  integrity: {kind: sha256, sha256: 0c7732b0c6704ab9473b630061e217d7aa90b7fe83b9879e0b5c8e83c99cb040}
+  integrity: {kind: sha256, sha256: ccfe3702a56388516b823d262bd7b8fa9518deaeaafb8856e12b46ddc2c467c2}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: governed_by, target_asset_id: CTRL-EARLY-ICP-FIRST-HIT-MIX-FALSIFIER-001}
@@ -32684,13 +32684,13 @@ records:
 - asset_id: TEST-EARLY-ICP-FIRST-HIT-MIX-FALSIFIER-001
   record_version: '1.0'
   asset_type: script
-  purpose: Zero-network proofs for retained-pool maturity, valid_mix R0 floor, SLEEP, first-hit, last-budget, typed invalid-X, crash/resume, in-flight fail-closed and epoch honesty.
+  purpose: Zero-network proofs for retained-pool maturity, valid_mix R0 floor, decision_at provenance, staging-attempt identity, SLEEP, first-hit, last-budget, typed invalid-X, crash/resume, in-flight fail-closed and epoch honesty.
   status: IMPLEMENTED_UNVERIFIED
   origin: REPOSITORY
   as_of: '2026-08-28'
   truth_owner: EARLY_ICP_FIRST_HIT_MIX_FALSIFIER_V1
   location: {kind: git_path, logical_uri: 'repo://tests/test_early_icp_first_hit_mix_falsifier.py', repository_path: tests/test_early_icp_first_hit_mix_falsifier.py}
-  integrity: {kind: sha256, sha256: efd2daaefac405c41c1d5f602ccfd4aa76f9f645a30d469ff54ef564969c923d}
+  integrity: {kind: sha256, sha256: 40feb4bd3d6d69e4b67e8e9f01db344ad0d8d7bcd17f0d75aa0f00c9cb02013b}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: governed_by, target_asset_id: CTRL-EARLY-ICP-FIRST-HIT-MIX-FALSIFIER-001}
@@ -32709,7 +32709,7 @@ records:
   as_of: '2026-08-28'
   truth_owner: EARLY_ICP_RETAINED_COHORT_MATURITY_CORRECTIVE_V1
   location: {kind: git_path, logical_uri: 'repo://docs/tasks/EARLY_ICP_RETAINED_COHORT_MATURITY_CORRECTIVE_V1.md', repository_path: docs/tasks/EARLY_ICP_RETAINED_COHORT_MATURITY_CORRECTIVE_V1.md}
-  integrity: {kind: sha256, sha256: 27896054aceba86a9f08e012c071dfa22251aa964de8a048d09fad61e05891dc}
+  integrity: {kind: sha256, sha256: 824c04642d237d5bc97f0b0fdcd23b91fd6762f815ff18a2744d853b5b8cb8c2}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: depends_on, target_asset_id: MODULE-EARLY-ICP-FIRST-HIT-MIX-FALSIFIER-001}

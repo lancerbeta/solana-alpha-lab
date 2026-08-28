@@ -224,7 +224,7 @@ records:
     repository_path: docs/PROJECT_MAP.md
   integrity:
     kind: sha256
-    sha256: f7374e480b20eb5c00fcfcc78ada7f0341777c1965985cd5dfafb7c26c9dabc3
+    sha256: 879352221fd6353fad84a025c17f3fd052d63b817b12a1305a299f459f5fa7a7
   access:
     mode: read_only
     method: file

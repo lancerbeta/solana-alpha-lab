@@ -9,21 +9,10 @@
   "cloud_bundle_smoke_required": false,
   "factory_fit": {
     "path": "docs/evidence/early_icp_retained_cohort_maturity_corrective/a1_delivery_factory_fit_v1.json",
-    "sha256": "3dc946456d3e4eba3861bf19212c94ff14bc34ffa4f54f708dd1e9cea87b7f22",
+    "sha256": "PENDING_BIND",
     "verdict": "PASS"
   },
-  "implementation_bindings": {
-    "catalog/assets/core.yaml": "b6374b8b4ecc13c28f8dd1f8bd1afc8cf33c4bff35b6fae38e44175f280a58a0",
-    "catalog/assets/lifecycle.yaml": "4bed105803b5f2e0601a11bd87079bfcc38528e1f6b2cb73e17653f0f43c1922",
-    "catalog/catalog_manifest.yaml": "e64e188b9bfd97a08365513365cd9c1eff6a9cea37c520ad776b3bd5aa3acf52",
-    "catalog/generated/asset_edges.json": "f26ec39ee1b37b10416a102077d465c35c5ee6f2576167bb0c346ec5928e04a7",
-    "configs/early_icp_first_hit_mix_falsifier_v1.yaml": "c69a2a58cdcdaf85dfa0013432ce442941b28df62dc9436815239062d4f3c48a",
-    "docs/PROJECT_MAP.md": "f7374e480b20eb5c00fcfcc78ada7f0341777c1965985cd5dfafb7c26c9dabc3",
-    "docs/tasks/EARLY_ICP_RETAINED_COHORT_MATURITY_CORRECTIVE_V1.md": "27896054aceba86a9f08e012c071dfa22251aa964de8a048d09fad61e05891dc",
-    "scripts/run_early_icp_first_hit_mix_falsifier.py": "0c7732b0c6704ab9473b630061e217d7aa90b7fe83b9879e0b5c8e83c99cb040",
-    "src/solana_alpha_lab/factory/early_icp_first_hit_mix_falsifier.py": "d4f665402ce66f93045fe37e84acb586541478ce8fa3b3c8aeb3b63e1323bacc",
-    "tests/test_early_icp_first_hit_mix_falsifier.py": "efd2daaefac405c41c1d5f602ccfd4aa76f9f645a30d469ff54ef564969c923d"
-  },
+  "implementation_bindings": {},
   "non_claims": [
     "NO_ALPHA",
     "NO_CANONICAL_DONE",
@@ -61,7 +50,7 @@
     "github_ci": "ENFORCED_LIVE_AT_GUARDED_MERGE",
     "independent_review": {
       "path": "docs/evidence/early_icp_retained_cohort_maturity_corrective/a1_delivery_independent_review_v1.json",
-      "sha256": "8d0e2bb6b4bac5bf46d3016e0ac000f05a0bbf361f58490228d56f19edd428b7",
+      "sha256": "PENDING_BIND",
       "verdict": "PASS"
     },
     "project_checks": [
