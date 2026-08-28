@@ -198,6 +198,7 @@ def compile_observation_request(
     coverage: CoverageIndex | None = None,
     hypothesis_registered_at: datetime | None = None,
     closed_family: bool = False,
+    data_root=None,
 ) -> CompilerResult:
     try:
         request = spec["observation_request"]
@@ -207,6 +208,7 @@ def compile_observation_request(
             return _deny("CHANGE_LANE_ESTIMATOR_GAP", "ESTIMATOR_NOT_RUNTIME")
         document = schedule_from_observation_request(request)
         registry = load_observation_primitive_registry(root)
+        registry.verify_implementation_hashes()
         validated = validate_observation_schedule(document, root=root)
         _resolve_registered(validated, registry)
         envelope = _compute_budget(validated, registry)
@@ -218,14 +220,24 @@ def compile_observation_request(
         registered_at = hypothesis_registered_at or parse_utc(spec["as_of"])
         index = coverage or CoverageIndex()
         snapshot_record = index.covering_snapshot_record(validated, cutoff)
+        y_proven = False
         first_y = None
-        if snapshot_record is not None:
-            first_y = snapshot_record.get("first_y_available_at")
+        if snapshot_record is not None and data_root is not None:
+            from solana_alpha_lab.factory.observation_panel_coverage import (
+                derive_first_y_available_at,
+            )
+
+            covering_digest = str(
+                snapshot_record["schedule"].get("schedule_sha256")
+                or schedule_sha256(snapshot_record["schedule"])
+            )
+            first_y, y_proven = derive_first_y_available_at(data_root, covering_digest)
         role = compute_evidence_role(
             hypothesis_registered_at=registered_at,
             first_admission_at=parse_utc(validated["activation"]["starts_at"]),
             first_y_available_at=first_y if isinstance(first_y, datetime) else None,
             closed_or_consumed=closed_family,
+            y_availability_proven=y_proven if snapshot_record is not None else True,
         )
         if snapshot_record is not None and mode in {"REUSE_ONLY", "REUSE_OR_SCHEDULE"}:
             covering_digest = str(
@@ -286,6 +298,8 @@ def compile_observation_request(
         code = str(exc)
         if code in {"BLOCKED_AUTHORITY"}:
             return _deny(code)
+        if code == "IMPLEMENTATION_HASH_DRIFT":
+            return _deny("CHANGE_LANE_PRIMITIVE_GAP", code)
         return _deny("CHANGE_LANE_PRIMITIVE_GAP", code)
     except ObservationScheduleError as exc:
         code = str(exc)

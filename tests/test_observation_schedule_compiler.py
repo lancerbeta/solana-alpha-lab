@@ -229,6 +229,16 @@ class ObservationScheduleCompilerTests(unittest.TestCase):
         )
         self.assertEqual(
             compute_evidence_role(
+                hypothesis_registered_at=datetime(2026, 8, 1, tzinfo=UTC),
+                first_admission_at=start,
+                first_y_available_at=y_ready,
+                closed_or_consumed=False,
+                y_availability_proven=False,
+            ),
+            "EXPLORATORY_REUSE",
+        )
+        self.assertEqual(
+            compute_evidence_role(
                 hypothesis_registered_at=datetime(2026, 9, 1, 12, tzinfo=UTC),
                 first_admission_at=start,
                 first_y_available_at=None,

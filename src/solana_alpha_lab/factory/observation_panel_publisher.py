@@ -38,6 +38,17 @@ class ObservationPanelPublisherError(ValueError):
     """Typed panel publication failure."""
 
 
+class PublicationFault(ObservationPanelPublisherError):
+    """Deterministic fault injection after a publication stage."""
+
+
+STAGE_ARTIFACTS = "ARTIFACTS"
+STAGE_RDP_OBS = "RDP_OBSERVATION_BATCH"
+STAGE_RDP_MEMBER = "RDP_MEMBER_BATCH"
+STAGE_MANIFEST = "MANIFEST"
+STAGE_MARKER = "MARKER"
+
+
 def _schema_sha256(root: Path) -> str:
     path = root / PANEL_SCHEMA_RELATIVE
     return hashlib.sha256(path.read_bytes()).hexdigest()
@@ -204,6 +215,54 @@ def persist_panel_snapshot_binding(
         raise
 
 
+def _job_path(data_root: Path, content: str) -> Path:
+    return data_root / "datasets" / "publication_jobs" / f"{content}.json"
+
+
+def _load_job(data_root: Path, content: str) -> dict[str, Any] | None:
+    path = _job_path(data_root, content)
+    if path.is_file() is False:
+        return None
+    loaded = json.loads(path.read_text(encoding="utf-8"))
+    if not isinstance(loaded, dict):
+        raise ObservationPanelPublisherError("PUBLICATION_JOB_INVALID")
+    return loaded
+
+
+def _save_job(data_root: Path, content: str, payload: Mapping[str, Any]) -> None:
+    path = _job_path(data_root, content)
+    path.parent.mkdir(parents=True, exist_ok=True)
+    tmp = path.with_suffix(".json.tmp")
+    tmp.write_text(json.dumps(dict(payload), sort_keys=True), encoding="utf-8")
+    tmp.replace(path)
+
+
+def _rdp_has(data_root: Path, record_id: str, payload_sha256: str | None = None) -> bool:
+    store = ResearchStore(data_root)
+    for item in store.iter_committed_records():
+        if item.record_id != record_id:
+            continue
+        if payload_sha256 is not None and item.payload_sha256 != payload_sha256:
+            raise ObservationPanelPublisherError("CANONICAL_TARGET_CONFLICT")
+        return True
+    return False
+
+
+def _append_event(data_root: Path, event: ResearchEvent) -> None:
+    store = ResearchStore(data_root)
+    try:
+        store.append([event], transaction_id=event.transaction_id)
+    except Exception:
+        if _rdp_has(data_root, event.record_id, event.payload_sha256):
+            return
+        raise
+
+
+def _maybe_fault(fault_after: str | None, stage: str) -> None:
+    if fault_after == stage:
+        raise PublicationFault(stage)
+
+
 def publish_observation_batch(
     *,
     data_root: Path,
@@ -214,6 +273,7 @@ def publish_observation_batch(
     producer_git_sha: str,
     members: Sequence[Mapping[str, Any]] | None = None,
     observations: Sequence[Mapping[str, Any]] | None = None,
+    fault_after: str | None = None,
 ) -> dict[str, Any]:
     now = now.astimezone(UTC)
     if not observations or not members:
@@ -229,27 +289,59 @@ def publish_observation_batch(
     manifests_dir = data_root / "datasets" / "manifests"
     manifests_dir.mkdir(parents=True, exist_ok=True)
     manifest_path = manifests_dir / f"{dataset_manifest_id}.json"
-    if manifest_path.exists():
-        loaded = json.loads(manifest_path.read_text(encoding="utf-8"))
+    published_path = manifests_dir / f"{dataset_manifest_id}.published"
+    obs_record_id = f"OBS-BATCH-{content[:16].upper()}"
+    member_record_id = f"OBS-MEMB-{content[:16].upper()}"
+    job = _load_job(data_root, content) or {"stage": None, "content_sha256": content}
+
+    if published_path.is_file():
+        if not _rdp_has(data_root, obs_record_id) or not _rdp_has(data_root, member_record_id):
+            raise ObservationPanelPublisherError("PUBLICATION_INCOMPLETE")
+        loaded = json.loads(published_path.read_text(encoding="utf-8"))
         return {
             "dataset_manifest_id": dataset_manifest_id,
             "dataset_fingerprint": loaded.get("dataset_fingerprint"),
             "replay": True,
         }
+
     created_at = now
     min_event, max_event, min_available, max_available = _clocks_from_rows(
         rows,
         fallback=created_at,
     )
     parquet_rel = f"datasets/parquet/{dataset_manifest_id}/observations.parquet"
+    member_rel = f"datasets/parquet/{dataset_manifest_id}/members.parquet"
     parquet_path = data_root / parquet_rel
-    file_sha256 = _write_parquet(parquet_path, rows)
+    member_path = data_root / member_rel
+
+    if job.get("stage") is None:
+        file_sha256 = _write_parquet(parquet_path, rows)
+        member_sha256 = _write_parquet(member_path, member_rows)
+        existing_obs = parquet_path.read_bytes() if parquet_path.is_file() else b""
+        if hashlib.sha256(existing_obs).hexdigest() != file_sha256:
+            raise ObservationPanelPublisherError("CANONICAL_TARGET_CONFLICT")
+        job = {
+            "stage": STAGE_ARTIFACTS,
+            "content_sha256": content,
+            "file_sha256": file_sha256,
+            "member_sha256": member_sha256,
+            "observation_count": len(rows),
+            "member_count": len(member_rows),
+            "dataset_manifest_id": dataset_manifest_id,
+            "sampling": dict(schedule.get("sampling") or {}),
+            "schedule_sha256": digest,
+            "observations": rows,
+            "members": member_rows,
+        }
+        _save_job(data_root, content, job)
+        _maybe_fault(fault_after, "AFTER_ARTIFACTS")
+
     partition = build_partition_manifest(
         dataset_id=dataset_id,
         dataset_version=dataset_version,
         partition_id=f"utc-day-{utc_day}",
         logical_location=parquet_rel.replace("\\", "/"),
-        file_sha256=file_sha256,
+        file_sha256=str(job["file_sha256"]),
         content_sha256=content,
         row_count=len(rows),
         min_event_time=min_event,
@@ -259,8 +351,72 @@ def publish_observation_batch(
         first_reliable_available_at=max_available,
         created_at=created_at,
     )
-    member_rel = f"datasets/parquet/{dataset_manifest_id}/members.parquet"
-    _write_parquet(data_root / member_rel, member_rows)
+    member_partition = build_partition_manifest(
+        dataset_id=dataset_id,
+        dataset_version=dataset_version,
+        partition_id=f"utc-day-{utc_day}-members",
+        logical_location=member_rel.replace("\\", "/"),
+        file_sha256=str(job["member_sha256"]),
+        content_sha256=content,
+        row_count=len(member_rows),
+        min_event_time=min_event,
+        max_event_time=max_event,
+        min_available_to_strategy_at=min_available,
+        max_available_to_strategy_at=max_available,
+        first_reliable_available_at=max_available,
+        created_at=created_at,
+    )
+
+    obs_event = _research_event(
+        record_id=obs_record_id,
+        record_kind=RecordKind.OBSERVATION_BATCH,
+        entity_id=digest,
+        payload={
+            "batch_id": f"BATCH-{content[:12].upper()}",
+            "schedule_sha256": digest,
+            "dataset_manifest_id": dataset_manifest_id,
+            "observation_sha256": job["file_sha256"],
+            "row_count": len(rows),
+            "dataset_fingerprint": content,
+        },
+        now=created_at,
+        producer_git_sha=producer_git_sha,
+        run_id=activation_id,
+        transaction_id=f"RESEARCH-TXN-OBS-{content[:12].upper()}",
+    )
+    member_event = _research_event(
+        record_id=member_record_id,
+        record_kind=RecordKind.OBSERVATION_MEMBER_BATCH,
+        entity_id=digest,
+        payload={
+            "batch_id": f"MEMB-{content[:12].upper()}",
+            "schedule_sha256": digest,
+            "dataset_manifest_id": dataset_manifest_id,
+            "member_location": member_rel.replace("\\", "/"),
+            "content_sha256": job["member_sha256"],
+            "row_count": len(member_rows),
+            "sampling": dict(schedule.get("sampling") or {}),
+        },
+        now=created_at,
+        producer_git_sha=producer_git_sha,
+        run_id=activation_id,
+        transaction_id=f"RESEARCH-TXN-MEM-{content[:12].upper()}",
+    )
+
+    if job.get("stage") in {STAGE_ARTIFACTS, None}:
+        _append_event(data_root, obs_event)
+        job["stage"] = STAGE_RDP_OBS
+        _save_job(data_root, content, job)
+        _maybe_fault(fault_after, "AFTER_ONE_RDP_EVENT")
+
+    if job.get("stage") == STAGE_RDP_OBS:
+        _append_event(data_root, member_event)
+        job["stage"] = STAGE_RDP_MEMBER
+        _save_job(data_root, content, job)
+
+    if not _rdp_has(data_root, obs_record_id) or not _rdp_has(data_root, member_record_id):
+        raise ObservationPanelPublisherError("PUBLICATION_INCOMPLETE")
+
     manifest = build_dataset_manifest(
         dataset_id=dataset_id,
         dataset_version=dataset_version,
@@ -271,62 +427,46 @@ def publish_observation_batch(
         validation_receipt_sha256=content,
         first_reliable_available_at=max_available,
         created_at=created_at,
-        partitions=[partition],
+        partitions=[partition, member_partition],
     )
     partitions_dir = manifests_dir / "partitions"
     partitions_dir.mkdir(parents=True, exist_ok=True)
-    part_path = partitions_dir / f"{partition.partition_manifest_id}.json"
-    part_tmp = part_path.with_suffix(".json.tmp")
-    part_tmp.write_text(partition.model_dump_json(), encoding="utf-8")
-    part_tmp.replace(part_path)
-    tmp = manifest_path.with_suffix(".json.tmp")
-    tmp.write_text(manifest.model_dump_json(), encoding="utf-8")
-    tmp.replace(manifest_path)
-    published_path = manifests_dir / f"{dataset_manifest_id}.published"
-    published_path.write_text(
-        json.dumps(
-            {
-                "dataset_manifest_id": dataset_manifest_id,
-                "dataset_fingerprint": manifest.dataset_fingerprint,
-            },
-            sort_keys=True,
-        ),
-        encoding="utf-8",
-    )
-    store = ResearchStore(data_root)
-    event = _research_event(
-        record_id=f"OBS-BATCH-{content[:16].upper()}",
-        record_kind=RecordKind.OBSERVATION_BATCH,
-        entity_id=digest,
-        payload={
-            "batch_id": f"BATCH-{content[:12].upper()}",
-            "schedule_sha256": digest,
-            "dataset_manifest_id": dataset_manifest_id,
-            "dataset_fingerprint": manifest.dataset_fingerprint,
-        },
-        now=created_at,
-        producer_git_sha=producer_git_sha,
-        run_id=activation_id,
-        transaction_id=f"RESEARCH-TXN-OBS-{content[:12].upper()}",
-    )
-    try:
-        store.append([event], transaction_id=event.transaction_id)
-    except Exception:
-        existing = list(store.iter_committed_records())
-        if any(item.record_id == event.record_id for item in existing):
-            return {
-                "dataset_manifest_id": dataset_manifest_id,
-                "dataset_fingerprint": manifest.dataset_fingerprint,
-                "replay": True,
-            }
-        raise
-    persist_observation_schedule(
-        data_root=data_root,
-        schedule=schedule,
-        now=created_at,
-        producer_git_sha=producer_git_sha,
-        activation_id=activation_id,
-    )
+    if job.get("stage") == STAGE_RDP_MEMBER:
+        for part in (partition, member_partition):
+            part_path = partitions_dir / f"{part.partition_manifest_id}.json"
+            part_tmp = part_path.with_suffix(".json.tmp")
+            part_tmp.write_text(part.model_dump_json(), encoding="utf-8")
+            part_tmp.replace(part_path)
+        tmp = manifest_path.with_suffix(".json.tmp")
+        tmp.write_text(manifest.model_dump_json(), encoding="utf-8")
+        tmp.replace(manifest_path)
+        job["stage"] = STAGE_MANIFEST
+        job["dataset_fingerprint"] = manifest.dataset_fingerprint
+        _save_job(data_root, content, job)
+        _maybe_fault(fault_after, "AFTER_MANIFEST")
+
+    if job.get("stage") == STAGE_MANIFEST:
+        published_path.write_text(
+            json.dumps(
+                {
+                    "dataset_manifest_id": dataset_manifest_id,
+                    "dataset_fingerprint": manifest.dataset_fingerprint,
+                },
+                sort_keys=True,
+            ),
+            encoding="utf-8",
+        )
+        job["stage"] = STAGE_MARKER
+        _save_job(data_root, content, job)
+        persist_observation_schedule(
+            data_root=data_root,
+            schedule=schedule,
+            now=created_at,
+            producer_git_sha=producer_git_sha,
+            activation_id=activation_id,
+        )
+        _maybe_fault(fault_after, "AFTER_MARKER")
+
     return {
         "dataset_manifest_id": dataset_manifest_id,
         "dataset_fingerprint": manifest.dataset_fingerprint,
@@ -334,7 +474,52 @@ def publish_observation_batch(
         "min_event_time": render_utc(min_event),
         "first_reliable_available_at": render_utc(max_available),
         "replay": False,
+        "member_count": len(member_rows),
+        "observation_count": len(rows),
     }
+
+
+def repair_open_publication_jobs(
+    *,
+    data_root: Path,
+    root: Path,
+    schedule: Mapping[str, Any],
+    activation_id: str,
+    now: datetime,
+    producer_git_sha: str,
+    fault_after: str | None = None,
+) -> list[dict[str, Any]]:
+    jobs_dir = data_root / "datasets" / "publication_jobs"
+    if jobs_dir.is_dir() is False:
+        return []
+    digest = str(schedule["schedule_sha256"])
+    repaired: list[dict[str, Any]] = []
+    for path in sorted(jobs_dir.glob("*.json")):
+        job = json.loads(path.read_text(encoding="utf-8"))
+        if not isinstance(job, dict):
+            raise ObservationPanelPublisherError("PUBLICATION_JOB_INVALID")
+        if job.get("schedule_sha256") != digest:
+            continue
+        if job.get("stage") == STAGE_MARKER:
+            continue
+        observations = list(job.get("observations") or [])
+        members = list(job.get("members") or [])
+        if not observations or not members:
+            raise ObservationPanelPublisherError("PUBLICATION_INCOMPLETE")
+        repaired.append(
+            publish_observation_batch(
+                data_root=data_root,
+                root=root,
+                schedule=schedule,
+                activation_id=activation_id,
+                now=now,
+                producer_git_sha=producer_git_sha,
+                members=members,
+                observations=observations,
+                fault_after=fault_after,
+            )
+        )
+    return repaired
 
 
 def build_panel_snapshot(
@@ -361,8 +546,10 @@ def build_panel_snapshot(
 
 __all__ = [
     "ObservationPanelPublisherError",
+    "PublicationFault",
     "build_panel_snapshot",
     "persist_observation_schedule",
     "persist_panel_snapshot_binding",
     "publish_observation_batch",
+    "repair_open_publication_jobs",
 ]

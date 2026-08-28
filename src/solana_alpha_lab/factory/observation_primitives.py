@@ -185,19 +185,32 @@ def execute_primitive(
     response_hash = canonical_sha256(body)
     entities: dict[str, Any] = {}
     if expected_entities:
-        rows = body if isinstance(body, list) else [body]
-        indexed: dict[str, Any] = {}
-        for row in rows:
-            if isinstance(row, Mapping):
-                mint = str(row.get("id") or row.get("mint") or "")
-                if mint:
-                    indexed[mint] = row
-        for entity_id in expected_entities:
-            row = indexed.get(entity_id)
-            if row is None:
-                entities[entity_id] = {"status": "MISSING_TYPED", "missing_reason": "ENTITY_ABSENT_FROM_RESPONSE"}
-            else:
-                entities[entity_id] = {"status": "OBSERVED", "row": row}
+        if isinstance(body, list):
+            indexed: dict[str, Any] = {}
+            for row in body:
+                if isinstance(row, Mapping):
+                    mint = str(row.get("id") or row.get("mint") or "")
+                    if mint:
+                        indexed[mint] = row
+            for entity_id in expected_entities:
+                row = indexed.get(entity_id)
+                if row is None:
+                    entities[entity_id] = {
+                        "status": "MISSING_TYPED",
+                        "missing_reason": "ENTITY_ABSENT_FROM_RESPONSE",
+                    }
+                else:
+                    entities[entity_id] = {"status": "OBSERVED", "row": row}
+        elif isinstance(body, Mapping):
+            mint = str(body.get("id") or body.get("mint") or "")
+            for entity_id in expected_entities:
+                if mint and mint != entity_id:
+                    entities[entity_id] = {
+                        "status": "MISSING_TYPED",
+                        "missing_reason": "ENTITY_ABSENT_FROM_RESPONSE",
+                    }
+                else:
+                    entities[entity_id] = {"status": "OBSERVED", "row": body}
     return {
         "status": "OBSERVED",
         "missing_reason": None,
@@ -208,6 +221,16 @@ def execute_primitive(
         "entities": entities,
         "primitive_id": primitive_id,
     }
+
+
+def parse_first_seen(row: Mapping[str, Any]) -> datetime | None:
+    raw = row.get("first_seen_at")
+    if isinstance(raw, str):
+        try:
+            return parse_utc(raw if raw.endswith("Z") else raw + "Z")
+        except Exception:
+            return None
+    return None
 
 
 def parse_anchor(row: Mapping[str, Any]) -> datetime | None:
@@ -235,6 +258,7 @@ __all__ = [
     "SOL_MINT",
     "execute_primitive",
     "parse_anchor",
+    "parse_first_seen",
     "quote_url",
     "redact",
     "request_sha256",

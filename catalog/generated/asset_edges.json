@@ -898,6 +898,11 @@
       "target_asset_id": "CTRL-DECLARATIVE-OBSERVATION-SCHEDULE-BRIDGE-001"
     },
     {
+      "source_asset_id": "CONFIG-OBSERVATION-SCHEDULE-RUNTIME-V1-001",
+      "relation": "governed_by",
+      "target_asset_id": "CTRL-DECLARATIVE-OBSERVATION-SCHEDULE-BRIDGE-001"
+    },
+    {
       "source_asset_id": "CONFIG-ORDINARY-MARKET-PIT-LOCAL-RAW-ENVELOPE-BIND-001",
       "relation": "depends_on",
       "target_asset_id": "CTRL-ORDINARY-MARKET-PIT-LOCAL-RAW-ENVELOPE-BIND-001"
@@ -9353,6 +9358,16 @@
       "target_asset_id": "CTRL-DECLARATIVE-OBSERVATION-SCHEDULE-BRIDGE-001"
     },
     {
+      "source_asset_id": "MODULE-OBSERVATION-SCHEDULE-LIFECYCLE-001",
+      "relation": "governed_by",
+      "target_asset_id": "CTRL-DECLARATIVE-OBSERVATION-SCHEDULE-BRIDGE-001"
+    },
+    {
+      "source_asset_id": "MODULE-OBSERVATION-SCHEDULE-RUNTIME-001",
+      "relation": "governed_by",
+      "target_asset_id": "CTRL-DECLARATIVE-OBSERVATION-SCHEDULE-BRIDGE-001"
+    },
+    {
       "source_asset_id": "MODULE-ORDINARY-MARKET-PIT-LOCAL-RAW-ENVELOPE-001",
       "relation": "depends_on",
       "target_asset_id": "CONFIG-ORDINARY-MARKET-PIT-LOCAL-RAW-ENVELOPE-BIND-001"
@@ -11693,6 +11708,11 @@
       "target_asset_id": "CTRL-DECLARATIVE-OBSERVATION-SCHEDULE-BRIDGE-001"
     },
     {
+      "source_asset_id": "SCHEMA-OBSERVATION-SCHEDULE-RUNTIME-V1-001",
+      "relation": "governed_by",
+      "target_asset_id": "CTRL-DECLARATIVE-OBSERVATION-SCHEDULE-BRIDGE-001"
+    },
+    {
       "source_asset_id": "SCHEMA-OBSERVATION-SCHEDULE-V1-001",
       "relation": "governed_by",
       "target_asset_id": "CTRL-DECLARATIVE-OBSERVATION-SCHEDULE-BRIDGE-001"
@@ -13641,6 +13661,16 @@
       "source_asset_id": "TEST-KCDN-ATOM-B-STABLE-CONTEXT-001",
       "relation": "governed_by",
       "target_asset_id": "CTRL-KCDN-ATOM-B-001"
+    },
+    {
+      "source_asset_id": "TEST-OBSERVATION-SCHEDULE-COMMISSIONING-001",
+      "relation": "governed_by",
+      "target_asset_id": "CTRL-DECLARATIVE-OBSERVATION-SCHEDULE-BRIDGE-001"
+    },
+    {
+      "source_asset_id": "TEST-OBSERVATION-SCHEDULE-LIFECYCLE-001",
+      "relation": "governed_by",
+      "target_asset_id": "CTRL-DECLARATIVE-OBSERVATION-SCHEDULE-BRIDGE-001"
     },
     {
       "source_asset_id": "TEST-OBSERVATION-SCHEDULE-SCHEMAS-001",

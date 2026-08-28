@@ -151,6 +151,7 @@ class ObservationSchedulerTests(unittest.TestCase):
                 now=NOW,
                 opener=opener,
                 producer_git_sha=GIT_SHA,
+                discovery_rows=[],
             )
             self.assertEqual(opener.urls, [])
             self.assertEqual(store.due_counts().get("IN_FLIGHT_CALL_INDETERMINATE"), 1)
@@ -189,6 +190,7 @@ class ObservationSchedulerTests(unittest.TestCase):
                 now=datetime(2026, 9, 1, 0, 20, tzinfo=UTC),
                 opener=opener,
                 producer_git_sha=GIT_SHA,
+                discovery_rows=[],
             )
             self.assertEqual(opener.urls, [])
             self.assertEqual(store.due_counts().get("CENSORED"), 1)
@@ -268,7 +270,7 @@ class ObservationSchedulerTests(unittest.TestCase):
                         "ACT-OBS-001",
                     ]
                 )
-            self.assertEqual(code, 0)
+            self.assertEqual(code, 2)
             self.assertIn("TICK_REFUSED_NO_LIVE_DEFAULT", buf.getvalue())
 
     def test_dependent_sell_without_buy_out_is_dependency_missing(self) -> None:
@@ -304,6 +306,7 @@ class ObservationSchedulerTests(unittest.TestCase):
                 now=NOW,
                 opener=opener,
                 producer_git_sha=GIT_SHA,
+                discovery_rows=[],
             )
             self.assertEqual(opener.urls, [])
             self.assertEqual(store.due_counts().get("DEPENDENCY_MISSING"), 1)
@@ -360,6 +363,7 @@ class ObservationSchedulerTests(unittest.TestCase):
                 now=NOW,
                 opener=opener,
                 producer_git_sha=GIT_SHA,
+                discovery_rows=[],
             )
             self.assertEqual(opener.urls, [])
             self.assertEqual(store.due_counts().get("IN_FLIGHT_CALL_INDETERMINATE"), 1)
@@ -397,6 +401,122 @@ class ObservationSchedulerTests(unittest.TestCase):
             )
             self.assertEqual(result["provider_calls"], 0)
             self.assertEqual(store.due_counts(), {})
+            store.close()
+
+    def test_all_predicate_operators_are_typed(self) -> None:
+        from solana_alpha_lab.factory.observation_scheduler import _predicate_holds
+
+        row = {
+            "id": MINT,
+            "liquidity": "2500",
+            "firstPool": {"createdAt": "2026-09-01T00:00:00Z", "source": "pump.fun"},
+        }
+        self.assertTrue(
+            _predicate_holds(
+                {"field_id": "FIELD-LIQUIDITY-USD-001", "operator": "EQ", "value_decimal": "2500"},
+                row,
+            )
+        )
+        self.assertTrue(
+            _predicate_holds(
+                {"field_id": "FIELD-LIQUIDITY-USD-001", "operator": "NEQ", "value_decimal": "1"},
+                row,
+            )
+        )
+        self.assertTrue(
+            _predicate_holds(
+                {"field_id": "FIELD-LIQUIDITY-USD-001", "operator": "GT", "value_decimal": "1000"},
+                row,
+            )
+        )
+        self.assertTrue(
+            _predicate_holds(
+                {"field_id": "FIELD-LIQUIDITY-USD-001", "operator": "GTE", "value_decimal": "2500"},
+                row,
+            )
+        )
+        self.assertTrue(
+            _predicate_holds(
+                {"field_id": "FIELD-LIQUIDITY-USD-001", "operator": "LT", "value_decimal": "3000"},
+                row,
+            )
+        )
+        self.assertTrue(
+            _predicate_holds(
+                {"field_id": "FIELD-LIQUIDITY-USD-001", "operator": "LTE", "value_decimal": "2500"},
+                row,
+            )
+        )
+        self.assertFalse(
+            _predicate_holds(
+                {
+                    "field_id": "FIELD-FIRST-POOL-SOURCE-001",
+                    "operator": "GT",
+                    "value_text": "pump.fun",
+                },
+                row,
+            )
+        )
+        self.assertTrue(
+            _predicate_holds(
+                {
+                    "field_id": "FIELD-FIRST-POOL-SOURCE-001",
+                    "operator": "NEQ",
+                    "value_text": "other",
+                },
+                row,
+            )
+        )
+
+    def test_omitted_entity_is_missing_not_aggregate_status(self) -> None:
+        schedule = load_observation_schedule(
+            ROOT, "tests/fixtures/observation_schedule/x300_y900.yaml"
+        )
+        missing = "MintMissing111111111111111111111111111111"
+        with tempfile.TemporaryDirectory() as tmp:
+            data_root = Path(tmp) / "rdp"
+            data_root.mkdir()
+            store = ObservationScheduleStore(Path(tmp) / "ops.sqlite")
+            activation_id = _activate(store, schedule)
+
+            class Partial:
+                def open(self, url: str) -> dict:
+                    if "/tokens/v2/search" in url:
+                        return {"http_status": 200, "body": [{"id": MINT, "liquidity": "2000"}]}
+                    if "/swap/v2/order" in url:
+                        return {"http_status": 200, "body": {"outAmount": "9900000"}}
+                    return {"http_status": 200, "body": []}
+
+            tick_once(
+                root=ROOT,
+                data_root=data_root,
+                store=store,
+                schedule=schedule,
+                activation_id=activation_id,
+                now=NOW,
+                opener=Partial(),
+                producer_git_sha=GIT_SHA,
+                discovery_rows=[
+                    {
+                        "id": MINT,
+                        "liquidity": "2000",
+                        "firstPool": {"createdAt": "2026-09-01T00:00:00Z", "source": "pump.fun"},
+                    },
+                    {
+                        "id": missing,
+                        "liquidity": "2000",
+                        "firstPool": {"createdAt": "2026-09-01T00:00:00Z", "source": "pump.fun"},
+                    },
+                ],
+            )
+            dues = store.due_in_states(("OBSERVED", "MISSING_TYPED", "DISAPPEARED"))
+            search_states = {
+                row["entity_id"]: row["state"]
+                for row in dues
+                if row["primitive_id"] == "PRIM-JUPITER-TOKENS-V2-SEARCH-001"
+            }
+            self.assertEqual(search_states[MINT], "OBSERVED")
+            self.assertEqual(search_states[missing], "MISSING_TYPED")
             store.close()
 
 

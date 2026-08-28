@@ -1,0 +1,59 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://smial.local/schemas/observation_schedule_runtime_v1.schema.json",
+  "title": "SMIAL ObservationSchedule credential-free runtime config v1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema",
+    "schema_version",
+    "data_root",
+    "ops_store_relative",
+    "credential_env"
+  ],
+  "properties": {
+    "schema": {"const": "smial.observation-schedule-runtime"},
+    "schema_version": {"const": "1.0"},
+    "data_root": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 512
+    },
+    "ops_store_relative": {
+      "type": "string",
+      "pattern": "^[A-Za-z0-9._/-]+\\.sqlite$"
+    },
+    "schedule_sha256": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{64}$"
+    },
+    "activation_id": {
+      "type": "string",
+      "pattern": "^ACT-[A-Z0-9]+(?:-[A-Z0-9]+)+$"
+    },
+    "credential_env": {
+      "type": "string",
+      "pattern": "^[A-Z][A-Z0-9_]{2,63}$"
+    },
+    "producer_git_sha": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{40}$"
+    },
+    "clock_utc": {
+      "type": "string",
+      "pattern": "^20[0-9]{2}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}(?:\\.[0-9]+)?Z$"
+    },
+    "fake_provider_fixture": {
+      "type": "string",
+      "pattern": "^tests/fixtures/observation_schedule/[A-Za-z0-9._-]+\\.json$"
+    },
+    "publish_fault_after": {
+      "enum": [
+        "AFTER_ARTIFACTS",
+        "AFTER_ONE_RDP_EVENT",
+        "AFTER_MANIFEST",
+        "AFTER_MARKER"
+      ]
+    }
+  }
+}

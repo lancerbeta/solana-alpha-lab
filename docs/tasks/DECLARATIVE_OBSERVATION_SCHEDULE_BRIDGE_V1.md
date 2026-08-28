@@ -25,12 +25,14 @@ managed_write_set:
 - catalog/schemas/observation_primitive_descriptor_v1.schema.json
 - catalog/schemas/observation_panel_snapshot_v1.schema.json
 - catalog/schemas/observation_schedule_authority_v1.schema.json
+- catalog/schemas/observation_schedule_runtime_v1.schema.json
 - catalog/schemas/experiment_spec_v1_2.schema.json
 - catalog/schemas/observation_primitive_registry_v1.schema.json
 - catalog/schemas/factory_remote_operations_v1_1.schema.json
 - catalog/schemas/research_event_envelope.schema.json
 - catalog/schemas/run_passport.schema.json
 - configs/observation_primitive_registry_v1.yaml
+- configs/observation_schedule_runtime_v1.yaml
 - configs/experiment_capability_registry_v2.yaml
 - configs/factory_remote_operations_v1_1.yaml
 - configs/factory_remote_ops/factory-observation-schedule.service
@@ -52,6 +54,8 @@ managed_write_set:
 - src/solana_alpha_lab/factory/observation_schedule_capability.py
 - src/solana_alpha_lab/factory/observation_scheduler.py
 - src/solana_alpha_lab/factory/observation_panel_publisher.py
+- src/solana_alpha_lab/factory/observation_schedule_runtime.py
+- src/solana_alpha_lab/factory/observation_schedule_lifecycle.py
 - scripts/observation_schedule.py
 - tests/test_observation_schedule_schemas.py
 - tests/test_observation_primitive_registry.py
@@ -64,9 +68,13 @@ managed_write_set:
 - tests/test_hfic_preflight.py
 - tests/test_observation_schedule_remote_ops.py
 - tests/test_observation_schedule_artifact_pin.py
+- tests/test_observation_schedule_lifecycle.py
+- tests/test_observation_schedule_commissioning.py
 - tests/fixtures/observation_schedule/common_panel.yaml
 - tests/fixtures/observation_schedule/x300_y900.yaml
 - tests/fixtures/observation_schedule/successor_y259200.yaml
+- tests/fixtures/observation_schedule/fake_provider.json
+- tests/fixtures/observation_schedule/runtime_commissioning.yaml
 - catalog/assets/core.yaml
 - catalog/assets/lifecycle.yaml
 - .github/workflows/ci.yml
@@ -76,6 +84,7 @@ managed_write_set:
 - catalog/catalog_manifest.yaml
 - catalog/generated/asset_edges.json
 - docs/PROJECT_MAP.md
+- docs/OPERATOR_NAVIGATION.md
 - docs/evidence/declarative_observation_schedule_bridge/a1_delivery_completion_evidence_v1.json
 - docs/evidence/declarative_observation_schedule_bridge/a1_delivery_independent_review_v1.json
 - docs/evidence/declarative_observation_schedule_bridge/a1_delivery_factory_fit_v1.json

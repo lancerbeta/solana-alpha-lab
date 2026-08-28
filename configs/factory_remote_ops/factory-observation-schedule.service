@@ -6,5 +6,6 @@ After=network-online.target
 [Service]
 Type=oneshot
 WorkingDirectory=/opt/solana-alpha-lab
-ExecStart=/usr/bin/uv run --locked --managed-python python -B scripts/observation_schedule.py tick --once
+Environment=OBSERVATION_SCHEDULE_RUNTIME_CONFIG=/opt/solana-alpha-lab/configs/observation_schedule_runtime_v1.yaml
+ExecStart=/usr/bin/uv run --locked --managed-python python -B scripts/observation_schedule.py tick --once --runtime-config ${OBSERVATION_SCHEDULE_RUNTIME_CONFIG}
 NoNewPrivileges=true

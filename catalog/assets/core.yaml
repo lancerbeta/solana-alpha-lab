@@ -32728,7 +32728,7 @@ records:
   as_of: '2026-08-28'
   truth_owner: DECLARATIVE_OBSERVATION_SCHEDULE_BRIDGE_V1
   location: {kind: git_path, logical_uri: 'repo://docs/tasks/DECLARATIVE_OBSERVATION_SCHEDULE_BRIDGE_V1.md', repository_path: docs/tasks/DECLARATIVE_OBSERVATION_SCHEDULE_BRIDGE_V1.md}
-  integrity: {kind: sha256, sha256: bf06d2ddf1517f54d5054ea3dee1e306c70df120a7b51731b995d484c6cdc31b}
+  integrity: {kind: sha256, sha256: 650ff4cb0a85ed54ee6c835104c7cca12eb05c61d32b90296f009ae347625339}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: depends_on, target_asset_id: ADR-006-HYPOTHESIS-FAST-LANE-001}
@@ -32848,13 +32848,30 @@ records:
   as_of: '2026-08-28'
   truth_owner: DECLARATIVE_OBSERVATION_SCHEDULE_BRIDGE_V1
   location: {kind: git_path, logical_uri: 'repo://catalog/schemas/observation_schedule_authority_v1.schema.json', repository_path: catalog/schemas/observation_schedule_authority_v1.schema.json}
-  integrity: {kind: sha256, sha256: abb86d4e277a81c9c31f6d222e934e0493264ad455868f762b5745ad6743d7e2}
+  integrity: {kind: sha256, sha256: 81e9363dfed87c61730fb5e47dc9af740cb319be48dad2c4a31ddafcd114154c}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: governed_by, target_asset_id: CTRL-DECLARATIVE-OBSERVATION-SCHEDULE-BRIDGE-001}
   consumers: [FACTORY-001]
   evidence: []
   search_terms: [OBSERVATION_SCHEDULE, AUTHORITY]
+  classification: {contains_secrets: false, contains_raw_data: false, sensitivity: INTERNAL_NON_SECRET}
+- asset_id: SCHEMA-OBSERVATION-SCHEDULE-RUNTIME-V1-001
+  record_version: '1.0'
+  asset_type: schema
+  purpose: Credential-free ObservationSchedule runtime configuration schema.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-08-28'
+  truth_owner: DECLARATIVE_OBSERVATION_SCHEDULE_BRIDGE_V1
+  location: {kind: git_path, logical_uri: 'repo://catalog/schemas/observation_schedule_runtime_v1.schema.json', repository_path: catalog/schemas/observation_schedule_runtime_v1.schema.json}
+  integrity: {kind: sha256, sha256: 084d8f926132c6adb4961e6c7b75b2eb15095ed799a8a44ebf4c7ee3740c849e}
+  access: {mode: read_only, method: file, network_required: false, secrets_required: false}
+  relations:
+  - {relation_type: governed_by, target_asset_id: CTRL-DECLARATIVE-OBSERVATION-SCHEDULE-BRIDGE-001}
+  consumers: [FACTORY-001]
+  evidence: []
+  search_terms: [OBSERVATION_SCHEDULE, RUNTIME]
   classification: {contains_secrets: false, contains_raw_data: false, sensitivity: INTERNAL_NON_SECRET}
 - asset_id: SCHEMA-FACTORY-REMOTE-OPERATIONS-V1-1-001
   record_version: '1.0'
@@ -32882,13 +32899,30 @@ records:
   as_of: '2026-08-28'
   truth_owner: DECLARATIVE_OBSERVATION_SCHEDULE_BRIDGE_V1
   location: {kind: git_path, logical_uri: 'repo://configs/observation_primitive_registry_v1.yaml', repository_path: configs/observation_primitive_registry_v1.yaml}
-  integrity: {kind: sha256, sha256: 851aff223687d2ffe07e4498ffe24343d405f374c122029f6cdd6d1115284a47}
+  integrity: {kind: sha256, sha256: 16ac6b040b3b36be4ba54130553e34c8bc5dac85b08259f78400e7af1a048a05}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: governed_by, target_asset_id: CTRL-DECLARATIVE-OBSERVATION-SCHEDULE-BRIDGE-001}
   consumers: [FACTORY-001]
   evidence: []
   search_terms: [OBSERVATION_PRIMITIVE, JUPITER]
+  classification: {contains_secrets: false, contains_raw_data: false, sensitivity: INTERNAL_NON_SECRET}
+- asset_id: CONFIG-OBSERVATION-SCHEDULE-RUNTIME-V1-001
+  record_version: '1.0'
+  asset_type: configuration
+  purpose: Fail-closed credential-free ObservationSchedule runtime template.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-08-28'
+  truth_owner: DECLARATIVE_OBSERVATION_SCHEDULE_BRIDGE_V1
+  location: {kind: git_path, logical_uri: 'repo://configs/observation_schedule_runtime_v1.yaml', repository_path: configs/observation_schedule_runtime_v1.yaml}
+  integrity: {kind: sha256, sha256: b15e4cddf88adb4ed752daaf81ae9a506b6ca689ff73310658315fa736c83190}
+  access: {mode: read_only, method: file, network_required: false, secrets_required: false}
+  relations:
+  - {relation_type: governed_by, target_asset_id: CTRL-DECLARATIVE-OBSERVATION-SCHEDULE-BRIDGE-001}
+  consumers: [FACTORY-001]
+  evidence: []
+  search_terms: [OBSERVATION_SCHEDULE, RUNTIME]
   classification: {contains_secrets: false, contains_raw_data: false, sensitivity: INTERNAL_NON_SECRET}
 - asset_id: CONFIG-EXPERIMENT-CAPABILITY-REGISTRY-V2-001
   record_version: '1.0'
@@ -32924,6 +32958,40 @@ records:
   evidence: []
   search_terms: [REMOTE_OPS, V1_1]
   classification: {contains_secrets: false, contains_raw_data: false, sensitivity: INTERNAL_NON_SECRET}
+- asset_id: MODULE-OBSERVATION-SCHEDULE-RUNTIME-001
+  record_version: '1.0'
+  asset_type: script
+  purpose: Credential-free runtime loader, fake provider opener and ExecStart parser.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-08-28'
+  truth_owner: DECLARATIVE_OBSERVATION_SCHEDULE_BRIDGE_V1
+  location: {kind: git_path, logical_uri: 'repo://src/solana_alpha_lab/factory/observation_schedule_runtime.py', repository_path: src/solana_alpha_lab/factory/observation_schedule_runtime.py}
+  integrity: {kind: sha256, sha256: 16d9e568b20e3eff68d1f389637b69c6a2437b1553daf57be5a33f8a618f1fbe}
+  access: {mode: read_only, method: file, network_required: false, secrets_required: false}
+  relations:
+  - {relation_type: governed_by, target_asset_id: CTRL-DECLARATIVE-OBSERVATION-SCHEDULE-BRIDGE-001}
+  consumers: [FACTORY-001]
+  evidence: []
+  search_terms: [OBSERVATION_SCHEDULE, RUNTIME]
+  classification: {contains_secrets: false, contains_raw_data: false, sensitivity: INTERNAL_NON_SECRET}
+- asset_id: MODULE-OBSERVATION-SCHEDULE-LIFECYCLE-001
+  record_version: '1.0'
+  asset_type: script
+  purpose: Persistent register/authorize/activate/pause/status/snapshot lifecycle.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-08-28'
+  truth_owner: DECLARATIVE_OBSERVATION_SCHEDULE_BRIDGE_V1
+  location: {kind: git_path, logical_uri: 'repo://src/solana_alpha_lab/factory/observation_schedule_lifecycle.py', repository_path: src/solana_alpha_lab/factory/observation_schedule_lifecycle.py}
+  integrity: {kind: sha256, sha256: 872e9d08317d92cc8a1ab27f08abf6314076b4efb53acb5c45e9df49db177ceb}
+  access: {mode: read_only, method: file, network_required: false, secrets_required: false}
+  relations:
+  - {relation_type: governed_by, target_asset_id: CTRL-DECLARATIVE-OBSERVATION-SCHEDULE-BRIDGE-001}
+  consumers: [FACTORY-001]
+  evidence: []
+  search_terms: [OBSERVATION_SCHEDULE, LIFECYCLE]
+  classification: {contains_secrets: false, contains_raw_data: false, sensitivity: INTERNAL_NON_SECRET}
 - asset_id: MODULE-OBSERVATION-SCHEDULE-COMPILER-001
   record_version: '1.0'
   asset_type: script
@@ -32933,7 +33001,7 @@ records:
   as_of: '2026-08-28'
   truth_owner: DECLARATIVE_OBSERVATION_SCHEDULE_BRIDGE_V1
   location: {kind: git_path, logical_uri: 'repo://src/solana_alpha_lab/factory/observation_schedule_compiler.py', repository_path: src/solana_alpha_lab/factory/observation_schedule_compiler.py}
-  integrity: {kind: sha256, sha256: 14384852d32f1d65ec786dd8b1386cd7ff33669d1c0a583bfbb05f4f82456c68}
+  integrity: {kind: sha256, sha256: b8a36a6282159004931e362cc65b86b9469f032a9da0fd02df79cd2eebf2b9d0}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: governed_by, target_asset_id: CTRL-DECLARATIVE-OBSERVATION-SCHEDULE-BRIDGE-001}
@@ -32950,7 +33018,7 @@ records:
   as_of: '2026-08-28'
   truth_owner: DECLARATIVE_OBSERVATION_SCHEDULE_BRIDGE_V1
   location: {kind: git_path, logical_uri: 'repo://src/solana_alpha_lab/factory/observation_primitives.py', repository_path: src/solana_alpha_lab/factory/observation_primitives.py}
-  integrity: {kind: sha256, sha256: 0ef43aeeb761f843148c9743e8ba2032e2dafc411fbb2ef3d7972ba80d9220bb}
+  integrity: {kind: sha256, sha256: b0496d74b378ac86234e01ca4b1b6322c3d1edb88d530dffba7c88e35f9bd261}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: governed_by, target_asset_id: CTRL-DECLARATIVE-OBSERVATION-SCHEDULE-BRIDGE-001}
@@ -32967,13 +33035,47 @@ records:
   as_of: '2026-08-28'
   truth_owner: DECLARATIVE_OBSERVATION_SCHEDULE_BRIDGE_V1
   location: {kind: git_path, logical_uri: 'repo://scripts/observation_schedule.py', repository_path: scripts/observation_schedule.py}
-  integrity: {kind: sha256, sha256: e2080f6c4cc4885fc693197c51fb3e011b7581bb63da45304affc431f3b07973}
+  integrity: {kind: sha256, sha256: aa528aee27bb8164c116e48bfcbbe8aa47365a784d1fd74527b25812049b5138}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: depends_on, target_asset_id: MODULE-OBSERVATION-SCHEDULE-COMPILER-001}
   consumers: [FACTORY-001]
   evidence: []
   search_terms: [OBSERVATION_SCHEDULE, CLI]
+  classification: {contains_secrets: false, contains_raw_data: false, sensitivity: INTERNAL_NON_SECRET}
+- asset_id: TEST-OBSERVATION-SCHEDULE-LIFECYCLE-001
+  record_version: '1.0'
+  asset_type: script
+  purpose: Durable ObservationSchedule register/authorize/activate proofs.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-08-28'
+  truth_owner: DECLARATIVE_OBSERVATION_SCHEDULE_BRIDGE_V1
+  location: {kind: git_path, logical_uri: 'repo://tests/test_observation_schedule_lifecycle.py', repository_path: tests/test_observation_schedule_lifecycle.py}
+  integrity: {kind: sha256, sha256: 6edf9d57eb2ecea3c3967144a9e640f9e0e982baf8c9dff6ca03f9a326be065f}
+  access: {mode: read_only, method: file, network_required: false, secrets_required: false}
+  relations:
+  - {relation_type: governed_by, target_asset_id: CTRL-DECLARATIVE-OBSERVATION-SCHEDULE-BRIDGE-001}
+  consumers: [FACTORY-001]
+  evidence: []
+  search_terms: [OBSERVATION_SCHEDULE, LIFECYCLE]
+  classification: {contains_secrets: false, contains_raw_data: false, sensitivity: INTERNAL_NON_SECRET}
+- asset_id: TEST-OBSERVATION-SCHEDULE-COMMISSIONING-001
+  record_version: '1.0'
+  asset_type: script
+  purpose: Zero-network public CLI commissioning path for ObservationSchedule.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-08-28'
+  truth_owner: DECLARATIVE_OBSERVATION_SCHEDULE_BRIDGE_V1
+  location: {kind: git_path, logical_uri: 'repo://tests/test_observation_schedule_commissioning.py', repository_path: tests/test_observation_schedule_commissioning.py}
+  integrity: {kind: sha256, sha256: 5fcf2d7a797deace22d8a995fda6cfd67c8d8220b1219a0805efa8e1419c8394}
+  access: {mode: read_only, method: file, network_required: false, secrets_required: false}
+  relations:
+  - {relation_type: governed_by, target_asset_id: CTRL-DECLARATIVE-OBSERVATION-SCHEDULE-BRIDGE-001}
+  consumers: [FACTORY-001]
+  evidence: []
+  search_terms: [OBSERVATION_SCHEDULE, COMMISSIONING]
   classification: {contains_secrets: false, contains_raw_data: false, sensitivity: INTERNAL_NON_SECRET}
 - asset_id: TEST-OBSERVATION-SCHEDULE-SCHEMAS-001
   record_version: '1.0'

@@ -44,15 +44,71 @@ def _x_cover_compatible(requested: Mapping[str, Any], available: Mapping[str, An
     return set(requested["x_point"]["bundle_ids"]).issubset(set(available["x_point"]["bundle_ids"]))
 
 
+def derive_first_y_available_at(
+    data_root,
+    schedule_sha256: str,
+) -> tuple[datetime | None, bool]:
+    """Return (first_y_available_at, proven_from_rdp). Unproven never promotes OOS."""
+    from pathlib import Path
+
+    import json
+
+    from solana_alpha_lab.factory.observation_schedule import parse_utc
+    from solana_alpha_lab.factory.research_store import ResearchStore
+
+    root = Path(data_root)
+    published = root / "datasets" / "manifests"
+    if published.is_dir() is False:
+        return None, False
+    store = ResearchStore(root)
+    batch_ids: set[str] = set()
+    member_ids: set[str] = set()
+    for record in store.iter_committed_records():
+        kind = str(record.record_kind)
+        payload = json.loads(record.payload_json)
+        if payload.get("schedule_sha256") != schedule_sha256:
+            continue
+        if kind == "OBSERVATION_BATCH":
+            batch_ids.add(str(payload.get("dataset_manifest_id") or ""))
+        if kind == "OBSERVATION_MEMBER_BATCH":
+            member_ids.add(str(payload.get("dataset_manifest_id") or ""))
+    earliest: datetime | None = None
+    proven = False
+    for manifest_id in batch_ids:
+        marker = published / f"{manifest_id}.published"
+        manifest_path = published / f"{manifest_id}.json"
+        if not marker.is_file() or not manifest_path.is_file():
+            continue
+        if manifest_id not in member_ids:
+            continue
+        loaded = json.loads(manifest_path.read_text(encoding="utf-8"))
+        available = loaded.get("first_reliable_available_at")
+        if not available:
+            continue
+        try:
+            instant = parse_utc(available) if isinstance(available, str) else None
+        except Exception:
+            instant = None
+        if instant is None:
+            continue
+        proven = True
+        if earliest is None or instant < earliest:
+            earliest = instant
+    return earliest, proven
+
+
 def compute_evidence_role(
     *,
     hypothesis_registered_at: datetime,
     first_admission_at: datetime,
     first_y_available_at: datetime | None,
     closed_or_consumed: bool,
+    y_availability_proven: bool = True,
 ) -> str:
     if closed_or_consumed:
         return "CONSUMED_PRIOR_EVIDENCE"
+    if not y_availability_proven:
+        return "EXPLORATORY_REUSE"
     if first_y_available_at is not None and hypothesis_registered_at >= first_y_available_at:
         return "EXPLORATORY_REUSE"
     if hypothesis_registered_at < first_admission_at:
@@ -163,6 +219,7 @@ class CoverageIndex:
 __all__ = [
     "CoverageIndex",
     "compute_evidence_role",
+    "derive_first_y_available_at",
     "schedule_covers",
     "source_population_key",
 ]

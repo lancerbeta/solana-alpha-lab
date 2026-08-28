@@ -117,6 +117,20 @@ class ObservationPrimitiveRegistry:
 
         return canonical_sha256(self.require_primitive(primitive_id))
 
+    def implementation_bytes_sha256(self) -> str:
+        path = self.root / IMPLEMENTATION_RELATIVE
+        return __import__("hashlib").sha256(path.read_bytes()).hexdigest()
+
+    def verify_implementation_hashes(self) -> None:
+        actual = self.implementation_bytes_sha256()
+        for primitive_id, primitive in self.primitives.items():
+            expected = (primitive.get("implementation_git_hashes") or {}).get(
+                "MODULE-OBSERVATION-PRIMITIVES-001"
+            )
+            if expected != actual:
+                raise PrimitiveRegistryError("IMPLEMENTATION_HASH_DRIFT")
+            self.require_parser("MODULE-OBSERVATION-PRIMITIVES-001")
+
 
 def load_observation_primitive_registry(root: Path) -> ObservationPrimitiveRegistry:
     return ObservationPrimitiveRegistry(root)

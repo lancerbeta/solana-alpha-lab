@@ -4,9 +4,9 @@ catalog_version: 0.120.0
 as_of: '2026-08-25'
 implementation_status: VALIDATED_ACTIVE
 current_checkpoint:
-  assets: 1562
+  assets: 1568
   asset_registries: 4
-  schemas: 79
+  schemas: 80
   queries: 19
   lifecycle_registries: 9
   lifecycle_records: 84
@@ -108,6 +108,7 @@ root_resolver:
   - catalog/schemas/observation_primitive_descriptor_v1.schema.json
   - catalog/schemas/observation_panel_snapshot_v1.schema.json
   - catalog/schemas/observation_schedule_authority_v1.schema.json
+  - catalog/schemas/observation_schedule_runtime_v1.schema.json
   - catalog/schemas/observation_primitive_registry_v1.schema.json
   - catalog/schemas/factory_v1_owner_cockpit.schema.json
   - catalog/schemas/factory_v1_friction_veto.schema.json

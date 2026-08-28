@@ -33,6 +33,7 @@ def compile_and_bind_observation_schedule(
         root=root,
         coverage=coverage,
         closed_family=closed_family,
+        data_root=data_root,
     )
     passport_bindings: dict[str, str] = {}
     if result.schedule_sha256:

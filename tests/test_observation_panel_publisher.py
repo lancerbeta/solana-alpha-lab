@@ -14,6 +14,7 @@ if str(SRC) not in sys.path:
 
 from solana_alpha_lab.factory.observation_panel_publisher import (  # noqa: E402
     ObservationPanelPublisherError,
+    PublicationFault,
     build_panel_snapshot,
     publish_observation_batch,
 )
@@ -138,6 +139,80 @@ class ObservationPanelPublisherTests(unittest.TestCase):
             compute_dataset_manifest_id("observation-panel-abc", "20260901-1-deadbeef"),
             compute_dataset_manifest_id("observation-panel-abc", "20260901-1-deadbeef"),
         )
+
+    def test_publication_faults_repair_to_one_complete_dataset(self) -> None:
+        schedule = load_observation_schedule(
+            ROOT, "tests/fixtures/observation_schedule/x300_y900.yaml"
+        )
+        members = [{"schedule_sha256": schedule["schedule_sha256"], "entity_id": "MintA"}]
+        observations = [
+            {
+                "schedule_sha256": schedule["schedule_sha256"],
+                "entity_id": "MintA",
+                "point_id": "X300",
+                "state": "OBSERVED",
+                "event_time": "2026-09-01T00:05:00Z",
+                "first_reliable_available_at": "2026-09-01T00:10:00Z",
+            }
+        ]
+        for stage in (
+            "AFTER_ARTIFACTS",
+            "AFTER_ONE_RDP_EVENT",
+            "AFTER_MANIFEST",
+            "AFTER_MARKER",
+        ):
+            with tempfile.TemporaryDirectory() as tmp:
+                data_root = Path(tmp) / "rdp"
+                data_root.mkdir()
+                with self.assertRaises(PublicationFault):
+                    publish_observation_batch(
+                        data_root=data_root,
+                        root=ROOT,
+                        schedule=schedule,
+                        activation_id="ACT-OBS-001",
+                        now=NOW,
+                        producer_git_sha=GIT_SHA,
+                        members=members,
+                        observations=observations,
+                        fault_after=stage,
+                    )
+                repaired = publish_observation_batch(
+                    data_root=data_root,
+                    root=ROOT,
+                    schedule=schedule,
+                    activation_id="ACT-OBS-001",
+                    now=NOW,
+                    producer_git_sha=GIT_SHA,
+                    members=members,
+                    observations=observations,
+                )
+                replay = publish_observation_batch(
+                    data_root=data_root,
+                    root=ROOT,
+                    schedule=schedule,
+                    activation_id="ACT-OBS-001",
+                    now=NOW,
+                    producer_git_sha=GIT_SHA,
+                    members=members,
+                    observations=observations,
+                )
+                self.assertTrue(replay["replay"])
+                self.assertEqual(replay["dataset_manifest_id"], repaired["dataset_manifest_id"])
+                marker = (
+                    data_root
+                    / "datasets"
+                    / "manifests"
+                    / f"{repaired['dataset_manifest_id']}.published"
+                )
+                self.assertTrue(marker.is_file())
+                from solana_alpha_lab.factory.research_store import ResearchStore
+
+                kinds = {
+                    str(item.record_kind)
+                    for item in ResearchStore(data_root).iter_committed_records()
+                }
+                self.assertIn("OBSERVATION_BATCH", kinds)
+                self.assertIn("OBSERVATION_MEMBER_BATCH", kinds)
 
 
 if __name__ == "__main__":
