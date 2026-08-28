@@ -32984,7 +32984,7 @@ records:
   as_of: '2026-08-28'
   truth_owner: DECLARATIVE_OBSERVATION_SCHEDULE_BRIDGE_V1
   location: {kind: git_path, logical_uri: 'repo://src/solana_alpha_lab/factory/observation_schedule_lifecycle.py', repository_path: src/solana_alpha_lab/factory/observation_schedule_lifecycle.py}
-  integrity: {kind: sha256, sha256: 0235baad3f72bcdf60084fc76b37ed147c099147bbf6f607eea3ac5a65167596}
+  integrity: {kind: sha256, sha256: b550746d85f3c8f7e86c576436bb2c73f749de2e16634e9b47f0b261e1976649}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: governed_by, target_asset_id: CTRL-DECLARATIVE-OBSERVATION-SCHEDULE-BRIDGE-001}
@@ -33035,7 +33035,7 @@ records:
   as_of: '2026-08-28'
   truth_owner: DECLARATIVE_OBSERVATION_SCHEDULE_BRIDGE_V1
   location: {kind: git_path, logical_uri: 'repo://scripts/observation_schedule.py', repository_path: scripts/observation_schedule.py}
-  integrity: {kind: sha256, sha256: 91c8fe7f2011194b847b6ea574145f45ae637d484ca0562940d9b942b717326b}
+  integrity: {kind: sha256, sha256: cf88a30465b11c8263f40917991a51c02cef1ea04945f3fcea7e6fa21195b1dc}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: depends_on, target_asset_id: MODULE-OBSERVATION-SCHEDULE-COMPILER-001}
@@ -33052,7 +33052,7 @@ records:
   as_of: '2026-08-28'
   truth_owner: DECLARATIVE_OBSERVATION_SCHEDULE_BRIDGE_V1
   location: {kind: git_path, logical_uri: 'repo://tests/test_observation_schedule_lifecycle.py', repository_path: tests/test_observation_schedule_lifecycle.py}
-  integrity: {kind: sha256, sha256: 0b16ec760af3084e7419afee8b6c2838eaaf132a4534b200ef9e1ed9b2648f62}
+  integrity: {kind: sha256, sha256: 6fff28cd14c50faa2df018fa5ef31d2ae6c8eb75275174faafd2b1111cec95b0}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: governed_by, target_asset_id: CTRL-DECLARATIVE-OBSERVATION-SCHEDULE-BRIDGE-001}
@@ -33069,7 +33069,7 @@ records:
   as_of: '2026-08-28'
   truth_owner: DECLARATIVE_OBSERVATION_SCHEDULE_BRIDGE_V1
   location: {kind: git_path, logical_uri: 'repo://tests/test_observation_schedule_commissioning.py', repository_path: tests/test_observation_schedule_commissioning.py}
-  integrity: {kind: sha256, sha256: 6ef2ce173c19d8a866ad478b2792a9dfb6219a9573fa31a78f869488b83949e3}
+  integrity: {kind: sha256, sha256: 0cc603911a37ab4d2f8d6f6a79816e7c63dc13cae53149755e7ede51f1425094}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: governed_by, target_asset_id: CTRL-DECLARATIVE-OBSERVATION-SCHEDULE-BRIDGE-001}

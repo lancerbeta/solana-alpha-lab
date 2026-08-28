@@ -97,6 +97,15 @@ class ObservationScheduleLifecycleTests(unittest.TestCase):
                 producer_git_sha=GIT,
             )
             self.assertEqual(paused["terminal"], "PAUSED")
+            with self.assertRaisesRegex(ObservationLifecycleError, "ACTIVATION_ALREADY_LIVE"):
+                activate_schedule(
+                    data_root=data_root,
+                    store=store,
+                    schedule_sha256=digest,
+                    activation_id="ACT-OBS-LIFE-LIVE-3",
+                    now=NOW,
+                    producer_git_sha=GIT,
+                )
             still = activate_schedule(
                 data_root=data_root,
                 store=store,
@@ -106,6 +115,7 @@ class ObservationScheduleLifecycleTests(unittest.TestCase):
                 producer_git_sha=GIT,
             )
             self.assertEqual(still["terminal"], "ACTIVATE_STILL_PAUSED")
+            self.assertEqual(still["next_action"], "RESUME")
             resumed = resume_schedule(
                 data_root=data_root,
                 store=store,

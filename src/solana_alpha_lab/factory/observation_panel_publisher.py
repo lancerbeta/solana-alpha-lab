@@ -279,20 +279,22 @@ def publish_observation_batch(
     if not observations or not members:
         raise ObservationPanelPublisherError("PARTIAL_DATASET_FORBIDDEN")
     digest = str(schedule["schedule_sha256"])
-    utc_day = now.strftime("%Y%m%d")
     rows = [dict(item) for item in observations]
     member_rows = [dict(item) for item in members]
     content = canonical_sha256({"members": member_rows, "observations": rows})
+    job = _load_job(data_root, content) or {"stage": None, "content_sha256": content}
+    utc_day = str(job.get("utc_day") or now.strftime("%Y%m%d"))
     dataset_id = f"observation-panel-{digest[:12]}"
-    dataset_version = f"{utc_day}-1-{content[:12]}"
-    dataset_manifest_id = compute_dataset_manifest_id(dataset_id, dataset_version)
+    dataset_version = str(job.get("dataset_version") or f"{utc_day}-1-{content[:12]}")
+    dataset_manifest_id = str(
+        job.get("dataset_manifest_id") or compute_dataset_manifest_id(dataset_id, dataset_version)
+    )
     manifests_dir = data_root / "datasets" / "manifests"
     manifests_dir.mkdir(parents=True, exist_ok=True)
     manifest_path = manifests_dir / f"{dataset_manifest_id}.json"
     published_path = manifests_dir / f"{dataset_manifest_id}.published"
     obs_record_id = f"OBS-BATCH-{content[:16].upper()}"
     member_record_id = f"OBS-MEMB-{content[:16].upper()}"
-    job = _load_job(data_root, content) or {"stage": None, "content_sha256": content}
 
     if published_path.is_file():
         if not _rdp_has(data_root, obs_record_id) or not _rdp_has(data_root, member_record_id):
@@ -304,13 +306,17 @@ def publish_observation_batch(
             "replay": True,
         }
 
-    created_at = now
+    created_at = parse_utc(str(job["created_at"])) if job.get("created_at") else now
     min_event, max_event, min_available, max_available = _clocks_from_rows(
         rows,
         fallback=created_at,
     )
-    parquet_rel = f"datasets/parquet/{dataset_manifest_id}/observations.parquet"
-    member_rel = f"datasets/parquet/{dataset_manifest_id}/members.parquet"
+    parquet_rel = str(
+        job.get("parquet_rel") or f"datasets/parquet/{dataset_manifest_id}/observations.parquet"
+    )
+    member_rel = str(
+        job.get("member_rel") or f"datasets/parquet/{dataset_manifest_id}/members.parquet"
+    )
     parquet_path = data_root / parquet_rel
     member_path = data_root / member_rel
 
@@ -328,6 +334,11 @@ def publish_observation_batch(
             "observation_count": len(rows),
             "member_count": len(member_rows),
             "dataset_manifest_id": dataset_manifest_id,
+            "utc_day": utc_day,
+            "dataset_version": dataset_version,
+            "parquet_rel": parquet_rel.replace("\\", "/"),
+            "member_rel": member_rel.replace("\\", "/"),
+            "created_at": render_utc(created_at),
             "sampling": dict(schedule.get("sampling") or {}),
             "schedule_sha256": digest,
             "observations": rows,

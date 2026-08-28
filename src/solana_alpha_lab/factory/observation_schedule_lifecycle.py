@@ -262,12 +262,12 @@ def activate_schedule(
     receipt = _require_live_authority(store, schedule_sha256=schedule_sha256, now=now)
     existing = store.get_activation(schedule_sha256, activation_id)
     if existing is None:
-        live = [
+        siblings = [
             row
             for row in store.list_activations()
-            if row["schedule_sha256"] == schedule_sha256 and row["state"] == "ACTIVE"
+            if row["schedule_sha256"] == schedule_sha256
         ]
-        if live:
+        if siblings:
             raise ObservationLifecycleError("ACTIVATION_ALREADY_LIVE")
     if existing is not None:
         if str(existing.get("authority_receipt_sha256")) != receipt["receipt_sha256"]:
@@ -296,6 +296,9 @@ def activate_schedule(
                 "activation_id": activation_id,
                 "schedule_sha256": schedule_sha256,
                 "state": existing["state"],
+                "next_action": "RESUME"
+                if existing["state"] == "PAUSED_OPERATOR"
+                else "STATUS",
             }
         return {
             "terminal": "ACTIVATE_REPLAY",

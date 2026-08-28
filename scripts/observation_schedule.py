@@ -270,6 +270,18 @@ def main(argv: list[str] | None = None) -> int:
                     },
                     2,
                 )
+            paused = any(row["state"] == "PAUSED_OPERATOR" for row in activations)
+            if paused and not live:
+                return _emit(
+                    {
+                        "terminal": "DOCTOR_PAUSED",
+                        "live_activation": False,
+                        "restore_marker_unresolved": False,
+                        "activation_count": len(activations),
+                        "next_action": "RESUME",
+                    },
+                    2,
+                )
             if not live:
                 return _emit(
                     {
@@ -304,7 +316,28 @@ def main(argv: list[str] | None = None) -> int:
                 )
             registered = store.get_registered_schedule(digest)
             activation = store.get_activation(digest, str(activation_id))
-            if registered is None or activation is None or activation["state"] != "ACTIVE":
+            if registered is None or activation is None:
+                return _emit(
+                    {
+                        "terminal": "TICK_REFUSED_NO_LIVE_DEFAULT",
+                        "reason": "activation missing or not ACTIVE",
+                        "schedule_sha256": digest,
+                        "activation_id": activation_id,
+                    },
+                    2,
+                )
+            if activation["state"] == "PAUSED_OPERATOR":
+                return _emit(
+                    {
+                        "terminal": "PAUSED_OPERATOR",
+                        "reason": "activation is paused; resume before tick",
+                        "schedule_sha256": digest,
+                        "activation_id": activation_id,
+                        "next_action": "RESUME",
+                    },
+                    2,
+                )
+            if activation["state"] != "ACTIVE":
                 return _emit(
                     {
                         "terminal": "TICK_REFUSED_NO_LIVE_DEFAULT",

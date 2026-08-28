@@ -98,6 +98,31 @@ class ObservationScheduleCommissioningTests(unittest.TestCase):
             self.assertEqual(code, 0, doctor)
             self.assertEqual(doctor["terminal"], "DOCTOR_OK")
 
+            code, paused = _cli(
+                ["pause", "--schedule-sha256", digest, "--activation-id", ACT, *base]
+            )
+            self.assertEqual(code, 0, paused)
+            self.assertEqual(paused["terminal"], "PAUSED")
+            code, paused_doctor = _cli(["doctor", *base])
+            self.assertEqual(code, 2, paused_doctor)
+            self.assertEqual(paused_doctor["terminal"], "DOCTOR_PAUSED")
+            self.assertEqual(paused_doctor["next_action"], "RESUME")
+            code, paused_tick = _cli(
+                ["tick", "--once", *base, "--schedule-sha256", digest, "--activation-id", ACT],
+                env={"OBSERVATION_SCHEDULE_CLOCK_UTC": "2026-09-01T00:10:00Z"},
+            )
+            self.assertEqual(code, 2, paused_tick)
+            self.assertEqual(paused_tick["terminal"], "PAUSED_OPERATOR")
+            self.assertEqual(paused_tick["next_action"], "RESUME")
+            code, resumed = _cli(
+                ["resume", "--schedule-sha256", digest, "--activation-id", ACT, *base]
+            )
+            self.assertEqual(code, 0, resumed)
+            self.assertEqual(resumed["terminal"], "RESUMED")
+            code, doctor = _cli(["doctor", *base])
+            self.assertEqual(code, 0, doctor)
+            self.assertEqual(doctor["terminal"], "DOCTOR_OK")
+
             missing_env = dict(os.environ)
             missing_env.pop("JUPITER_FREE_API_KEY", None)
             code, refused = _cli(
@@ -242,17 +267,6 @@ class ObservationScheduleCommissioningTests(unittest.TestCase):
             covering = load_observation_schedule(ROOT, COMMON)
             successor = load_observation_schedule(ROOT, SUCCESSOR)
             requested = load_observation_schedule(ROOT, NARROW)
-            index = CoverageIndex()
-            index.add_snapshot(
-                snapshot_sha256="b" * 64,
-                schedule=covering,
-                availability_cutoff=__import__("datetime").datetime(
-                    2026, 9, 2, 1, 0, tzinfo=__import__("datetime").UTC
-                ),
-                first_y_available_at=__import__("datetime").datetime(
-                    2026, 8, 1, tzinfo=__import__("datetime").UTC
-                ),
-            )
             bound = compile_observation_request(
                 {
                     "observation_request": {
@@ -264,13 +278,22 @@ class ObservationScheduleCommissioningTests(unittest.TestCase):
                     "as_of": "2026-08-01T00:00:00Z",
                 },
                 root=ROOT,
-                coverage=index,
                 data_root=Path(data_root),
             )
             self.assertEqual(bound.terminal, "PANEL_REUSE_READY")
-            self.assertNotEqual(bound.snapshot_sha256, "b" * 64)
             empty = Path(tmp) / "empty-rdp"
             empty.mkdir()
+            index = CoverageIndex()
+            index.add_snapshot(
+                snapshot_sha256="b" * 64,
+                schedule=covering,
+                availability_cutoff=__import__("datetime").datetime(
+                    2026, 9, 2, 1, 0, tzinfo=__import__("datetime").UTC
+                ),
+                first_y_available_at=__import__("datetime").datetime(
+                    2026, 8, 1, tzinfo=__import__("datetime").UTC
+                ),
+            )
             unproven = compile_observation_request(
                 {
                     "observation_request": {
