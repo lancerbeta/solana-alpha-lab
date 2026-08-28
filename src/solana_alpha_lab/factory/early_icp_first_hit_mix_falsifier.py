@@ -473,6 +473,7 @@ def run_first_hit_mix_falsifier(
     monotonic_clock: Callable[[], float] = time.monotonic,
     preflight_fn: Callable[..., Mapping[str, Any]] = credential_free_preflight,
     publication_hook: Callable[[], None] | None = None,
+    search_commit_hook: Callable[[], None] | None = None,
 ) -> dict[str, Any]:
     v2_before = v2_complete_path(data_root).read_bytes() if v2_complete_path(data_root).is_file() else None
     published = _load_published_bundle(data_root)
@@ -519,7 +520,7 @@ def run_first_hit_mix_falsifier(
     provider_requests = sum(
         1
         for item in observations.values()
-        if isinstance(item, Mapping) and item.get("state") == "COMPLETED"
+        if isinstance(item, Mapping) and item.get("state") == "COMPLETED" and item.get("body_sha256")
     )
     last_monotonic: float | None = None
 
@@ -544,7 +545,9 @@ def run_first_hit_mix_falsifier(
     def call(url: str, observation_id: str) -> dict[str, Any]:
         nonlocal provider_requests, last_monotonic
         cached = observations.get(observation_id)
-        if isinstance(cached, Mapping) and cached.get("state") == "COMPLETED" and cached.get("body_sha256"):
+        if isinstance(cached, Mapping) and cached.get("state") == "COMPLETED":
+            if not cached.get("body_sha256"):
+                raise FirstHitError(IN_FLIGHT_TERMINAL, provider_requests=provider_requests)
             raw_path = staging / "raw" / f"{observation_id.replace(':', '_')}.body"
             body = raw_path.read_bytes()
             return {
@@ -589,16 +592,18 @@ def run_first_hit_mix_falsifier(
             raise FirstHitError("API_KEY_IN_URL_LOG_RECEIPT_OR_GIT", provider_requests=provider_requests)
         result["observed_at"] = _format_utc(clock())
         body = result.get("body")
-        if isinstance(body, bytes):
-            if credential.encode("utf-8") in body:
-                raise FirstHitError("RAW_BODY_CONTAINS_CREDENTIAL", provider_requests=provider_requests)
-            _assert_quote_body_has_no_transaction(body)
-            persist_raw(observation_id, body, str(result["observed_at"]))
+        sha = result.get("response_sha256")
+        if not isinstance(body, bytes) or not isinstance(sha, str) or not sha:
+            raise FirstHitError(IN_FLIGHT_TERMINAL, provider_requests=provider_requests)
+        if credential.encode("utf-8") in body:
+            raise FirstHitError("RAW_BODY_CONTAINS_CREDENTIAL", provider_requests=provider_requests)
+        _assert_quote_body_has_no_transaction(body)
+        persist_raw(observation_id, body, str(result["observed_at"]))
         provider_requests += 1
         observations[observation_id] = {
             "state": "COMPLETED",
             "http_status": result.get("http_status"),
-            "body_sha256": result.get("response_sha256"),
+            "body_sha256": sha,
             "observed_at": result.get("observed_at"),
             "url": url.split("?", 1)[0],
         }
@@ -651,9 +656,10 @@ def run_first_hit_mix_falsifier(
             if isinstance(search_obs, Mapping) and search_obs.get("state") == "STARTED":
                 start_index = check_probe
                 break
-            if search_obs is None:
-                start_index = check_probe
-                break
+            if isinstance(search_obs, Mapping) and search_obs.get("state") == "SKIPPED":
+                continue
+            start_index = check_probe
+            break
         else:
             start_index = MAX_DENSITY_CHECKS
     for check_index in range(start_index, MAX_DENSITY_CHECKS):
@@ -696,6 +702,8 @@ def run_first_hit_mix_falsifier(
             continue
         search_url = build_search_url([str(row["id"]) for row in search_pool])
         search_result = call(search_url, f"CHECK:{check_index:02d}:SEARCH")
+        if search_commit_hook is not None:
+            search_commit_hook()
         search_terminal, _search_error, search_rows = _search_rows(search_result)
         if search_terminal != "TOKEN_LIST_OBSERVED" or search_rows is None:
             elapsed = (clock() - cycle_started).total_seconds()
@@ -765,15 +773,22 @@ def run_first_hit_mix_falsifier(
     for row in pending:
         mint = str(row["mint"])
         due_at = row["due_at"]
-        wait = (due_at - clock()).total_seconds()
-        if wait > 0:
-            sleeper(wait)
-        now = clock()
         late_limit = due_at + timedelta(seconds=LATENESS_SLACK_SECONDS)
-        if now > late_limit:
-            row["h900_terminal"] = "H900_LATE_BEFORE_QUOTE"
-            rows.append(row)
-            continue
+        sell_obs = observations.get(f"{mint}:SELL_H900")
+        sell_bound = (
+            isinstance(sell_obs, Mapping)
+            and sell_obs.get("state") == "COMPLETED"
+            and bool(sell_obs.get("body_sha256"))
+        )
+        if not sell_bound:
+            wait = (due_at - clock()).total_seconds()
+            if wait > 0:
+                sleeper(wait)
+            now = clock()
+            if now > late_limit:
+                row["h900_terminal"] = "H900_LATE_BEFORE_QUOTE"
+                rows.append(row)
+                continue
         buy_out = row.get("buy_out_amount")
         if row.get("buy_terminal") != QUOTE_OBSERVED or not isinstance(buy_out, str):
             row["h900_terminal"] = "BUY_NOT_OBSERVED"

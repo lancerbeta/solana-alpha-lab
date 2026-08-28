@@ -5,6 +5,7 @@ import io
 import json
 import tempfile
 import unittest
+import urllib.error
 from datetime import UTC, datetime, timedelta
 from pathlib import Path
 from typing import Any
@@ -117,6 +118,7 @@ class _Opener:
         crash_after: int | None = None,
         y_mode: str = "earn",
         sell_mode: str = "quote",
+        transport_error: bool = False,
     ) -> None:
         self.clock = clock
         self.n_eligible = n_eligible
@@ -124,6 +126,7 @@ class _Opener:
         self.crash_after = crash_after
         self.y_mode = y_mode
         self.sell_mode = sell_mode
+        self.transport_error = transport_error
         self.urls: list[str] = []
 
     def _eligible_rows(self) -> list[dict[str, Any]]:
@@ -160,6 +163,8 @@ class _Opener:
         url = str(getattr(request, "full_url"))
         if self.crash_after is not None and len(self.urls) >= self.crash_after:
             raise RuntimeError("injected crash")
+        if self.transport_error:
+            raise urllib.error.URLError("injected transport")
         self.urls.append(url)
         if TEST_FREE_KEY in url:
             raise AssertionError("secret in URL")
@@ -222,6 +227,7 @@ def _run(
     *,
     phrase: str = AUTHORITY_PHRASE,
     publication_hook: Any = None,
+    search_commit_hook: Any = None,
 ) -> dict[str, Any]:
     return run_first_hit_mix_falsifier(
         repo_root=ROOT,
@@ -235,6 +241,7 @@ def _run(
         monotonic_clock=clock.monotonic,
         preflight_fn=_stub_preflight,
         publication_hook=publication_hook,
+        search_commit_hook=search_commit_hook,
     )
 
 
@@ -468,6 +475,96 @@ class EarlyIcpFirstHitMixFalsifierTests(unittest.TestCase):
             self.assertTrue((data_root / PUBLISHED_RELATIVE).is_file())
             self.assertNotEqual(_epoch(data_root), before_epoch)
             self.assertEqual(len(opener.urls), http_after_crash)
+
+    def test_transport_error_is_in_flight_and_not_retried(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            data_root = Path(tmp) / "rdp"
+            staging = Path(tmp) / "staging"
+            data_root.mkdir()
+            _seed_v2(data_root)
+            clock = _Clock()
+            opener = _Opener(clock, n_eligible=10, transport_error=True)
+            with self.assertRaises(FirstHitError) as raised:
+                _run(data_root, staging, opener, clock)
+            self.assertEqual(str(raised.exception), IN_FLIGHT_TERMINAL)
+            opener.transport_error = False
+            with self.assertRaises(FirstHitError) as second:
+                _run(data_root, staging, opener, clock)
+            self.assertEqual(str(second.exception), IN_FLIGHT_TERMINAL)
+            self.assertEqual(opener.urls, [])
+            journal = json.loads((staging / "journal.json").read_text(encoding="utf-8"))
+            recent = journal["observations"]["CHECK:00:RECENT"]
+            self.assertEqual(recent["state"], "STARTED")
+            self.assertNotEqual(recent.get("state"), "COMPLETED")
+
+    def test_resume_after_completed_search_does_not_issue_second_search(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            data_root = Path(tmp) / "rdp"
+            staging = Path(tmp) / "staging"
+            data_root.mkdir()
+            _seed_v2(data_root)
+            clock = _Clock()
+            opener = _Opener(clock, n_eligible=10, y_mode="earn")
+
+            class _Hook:
+                def __init__(self) -> None:
+                    self.calls = 0
+
+                def __call__(self) -> None:
+                    self.calls += 1
+                    if self.calls == 1:
+                        raise RuntimeError("crash after hash-bound search")
+
+            hook = _Hook()
+            with self.assertRaises(RuntimeError):
+                _run(data_root, staging, opener, clock, search_commit_hook=hook)
+            self.assertEqual(sum("/tokens/v2/search" in url for url in opener.urls), 1)
+            journal = json.loads((staging / "journal.json").read_text(encoding="utf-8"))
+            self.assertIsNone(journal.get("hit_check_index"))
+            self.assertEqual(journal["observations"]["CHECK:00:SEARCH"]["state"], "COMPLETED")
+            receipt = _run(data_root, staging, opener, clock, search_commit_hook=hook)
+            self.assertEqual(receipt["terminal_outcome"], "EARN_ONE_CONFIRMATORY_FRESH_OOS")
+            self.assertEqual(sum("/tokens/v2/search" in url for url in opener.urls), 1)
+
+    def test_delayed_resume_keeps_completed_sell_not_late_before_quote(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            data_root = Path(tmp) / "rdp"
+            staging = Path(tmp) / "staging"
+            data_root.mkdir()
+            _seed_v2(data_root)
+
+            class _Hook:
+                def __init__(self) -> None:
+                    self.calls = 0
+
+                def __call__(self) -> None:
+                    self.calls += 1
+                    if self.calls == 1:
+                        raise RuntimeError("crash before marker")
+
+            hook = _Hook()
+            clock = _Clock()
+            opener = _Opener(clock, n_eligible=10, y_mode="earn")
+            with self.assertRaises(RuntimeError):
+                _run(data_root, staging, opener, clock, publication_hook=hook)
+            http_after_crash = len(opener.urls)
+            clock.current += timedelta(seconds=10_000)
+            receipt = _run(data_root, staging, opener, clock, publication_hook=hook)
+            self.assertEqual(receipt["terminal_outcome"], "EARN_ONE_CONFIRMATORY_FRESH_OOS")
+            self.assertEqual(len(opener.urls), http_after_crash)
+            self.assertEqual(receipt["score"]["rankable_h900"], 10)
+
+    def test_cli_help_states_operator_terminals_and_in_flight(self) -> None:
+        from contextlib import redirect_stdout
+
+        buf = io.StringIO()
+        with redirect_stdout(buf):
+            with self.assertRaises(SystemExit):
+                falsifier_cli(["--help"])
+        help_text = buf.getvalue()
+        self.assertIn("IN_FLIGHT_CALL_INDETERMINATE", help_text)
+        self.assertIn("SLEEP_ELIGIBLE_BELOW_10", help_text)
+        self.assertIn("staging-root must be outside data-root", help_text)
 
     def test_cli_run_without_staging_is_zero_network(self) -> None:
         with tempfile.TemporaryDirectory() as tmp:

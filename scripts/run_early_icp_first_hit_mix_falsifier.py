@@ -31,7 +31,22 @@ def _emit(payload: dict[str, object], exit_code: int = 0) -> int:
 
 
 def main(argv: list[str] | None = None) -> int:
-    parser = argparse.ArgumentParser(prog="run_early_icp_first_hit_mix_falsifier")
+    parser = argparse.ArgumentParser(
+        prog="run_early_icp_first_hit_mix_falsifier",
+        formatter_class=argparse.RawDescriptionHelpFormatter,
+        epilog=(
+            "Post-merge only. Do not retry IN_FLIGHT_CALL_INDETERMINATE.\n"
+            "STAGING_INSIDE_RDP: staging-root must be outside data-root.\n"
+            "Owner-visible terminals: SLEEP_ELIGIBLE_BELOW_10, "
+            "INVALID_EVIDENCE_REPLAN, CLOSE_EARLY_TAKER_VOLUME_MIX_FAMILY, "
+            "EARN_ONE_CONFIRMATORY_FRESH_OOS.\n"
+            "Exact owner phrase is configs/early_icp_first_hit_mix_falsifier_v1.yaml "
+            "external_authority.owner_phrase; reprint it after merge, do not invent one.\n"
+            "Example run:\n"
+            "  python scripts/run_early_icp_first_hit_mix_falsifier.py "
+            "--data-root <RDP> --staging-root <OUTSIDE_RDP> run --owner-phrase '<PHRASE>'"
+        ),
+    )
     parser.add_argument("--root", type=Path, default=ROOT)
     parser.add_argument("--data-root", type=Path, required=True)
     parser.add_argument(
